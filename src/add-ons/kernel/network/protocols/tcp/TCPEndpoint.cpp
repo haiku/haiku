@@ -666,10 +666,16 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 	if (numBytes < fReceiveQueue.Available())
 		fReceiveList.Signal();
 
-	ssize_t receivedBytes = fReceiveQueue.Get(numBytes,
-		(flags & MSG_PEEK) == 0, _buffer);
+	bool clone = (flags & MSG_PEEK);
+
+	ssize_t receivedBytes = fReceiveQueue.Get(numBytes, !clone, _buffer);
 
 	TRACE("  ReadData(): %lu bytes kept.", fReceiveQueue.Available());
+
+	if (!clone) {
+		// we are opening the window, check if we should send an ACK
+		_SendQueued();
+	}
 
 	return receivedBytes;
 }
