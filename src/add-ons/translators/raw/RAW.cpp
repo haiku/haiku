@@ -119,7 +119,7 @@ DCRaw::DCRaw(BPositionIO& stream)
 	fDNGVersion(0),
 	fIsTIFF(false),
 	fImageData(NULL),
-	fThreshold(0),
+	fThreshold(0.0f),
 	fHalfSize(false),
 	fUseCameraWhiteBalance(true),
 	fUseAutoWhiteBalance(true),
@@ -1023,6 +1023,154 @@ DCRaw::_ScaleColors()
 void
 DCRaw::_WaveletDenoise()
 {
+	if (fProgressMonitor != NULL)
+		fProgressMonitor("Wavelet Denoise", 8, fProgressData);
+
+	float *fimg, *temp, mul[2], avg, diff;
+	int32 scale = 1, sh, c, i, j, k, m, row, col, size, numColors, dim = 0;
+	int32 wlast;
+	ushort *window[4];
+	// Daubechies 9-tap/7-tap filter
+	static const float wlet[] =	{ 1.149604398, -1.586134342,
+		-0.05298011854, 0.8829110762, 0.4435068522 };
+
+	while ((fMeta.maximum << scale) < 0x10000) {
+		scale++;
+	}
+	fMeta.maximum <<= fMeta.maximum << --scale;
+	fMeta.black <<= scale;
+
+	while ((1UL << dim) < fOutputWidth || (1UL << dim) < fOutputHeight) {
+		dim++;
+	}
+
+	fimg = (float *)calloc((1UL << dim*2) + (1UL << dim) + 2, sizeof *fimg);
+	if (fimg == NULL)
+		return;
+
+	temp = fimg + (1 << dim * 2) + 1;
+	numColors = fColors;
+	if (numColors == 3 && fFilters)
+		numColors++;
+
+	for (c = 0; c < numColors; c++) {
+		// denoise R,G1,B,G3 individually
+		for (row = 0; row < (int32)fOutputHeight; row++) {
+			for (col = 0; col < (int32)fOutputWidth; col++) {
+				fimg[(row << dim) + col]
+					= fImageData[row * fOutputWidth + col][c] << scale;
+			}
+		}
+		for (size = 1UL << dim; size > 1; size >>= 1) {
+			for (sh = 0; sh <= dim; sh += dim) {
+				for (i = 0; i < size; i++) {
+					for (j = 0; j < size; j++) {
+						temp[j] = fimg[(i << (dim-sh))+(j << sh)];
+					}
+					for (k = 1; k < 5; k += 2) {
+						temp[size] = temp[size - 2];
+						for (m = 1; m < size; m += 2) {
+							temp[m] += wlet[k] * (temp[m-1] + temp[m+1]);
+						}
+						temp[-1] = temp[1];
+						for (m = 0; m < size; m += 2) {
+							temp[m] += wlet[k+1] * (temp[m-1] + temp[m+1]);
+						}
+					}
+					for (m = 0; m < size; m++) {
+						temp[m] *= (m & 1) ? 1/wlet[0] : wlet[0];
+					}
+					for (j = k = 0; j < size; j++, k+=2) {
+						if (k == size)
+							k = 1;
+						fimg[(i << (dim-sh))+(j << sh)] = temp[k];
+					}
+				}
+			}
+		}
+
+		for (i = 0; i < (1 << dim * 2); i++) {
+			if (fimg[i] < -fThreshold)
+				fimg[i] += fThreshold;
+			else if (fimg[i] > fThreshold)
+				fimg[i] -= fThreshold;
+			else
+				fimg[i] = 0;
+		}
+
+		for (size = 2; size <= (1 << dim); size <<= 1) {
+			for (sh = dim; sh >= 0; sh -= dim) {
+				for (i = 0; i < size; i++) {
+					for (j = k = 0; j < size; j++, k+=2) {
+						if (k == size)
+							k = 1;
+						temp[k] = fimg[(i << (dim-sh))+(j << sh)];
+					}
+					for (m = 0; m < size; m++) {
+						temp[m] *= (m & 1) ? wlet[0] : 1/wlet[0];
+					}
+					for (k = 3; k > 0; k-=2) {
+						temp[-1] = temp[1];
+						for (m = 0; m < size; m += 2) {
+							temp[m] -= wlet[k+1] * (temp[m-1] + temp[m+1]);
+						}
+						temp[size] = temp[size - 2];
+						for (m = 1; m < size; m += 2) {
+							temp[m] -= wlet[k] * (temp[m-1] + temp[m+1]);
+						}
+					}
+					for (j = 0; j < size; j++) {
+						fimg[(i << (dim-sh))+(j << sh)] = temp[j];
+					}
+				}
+			}
+		}
+
+		for (row = 0; row < (int32)fOutputHeight; row++) {
+			for (col = 0; col < (int32)fOutputWidth; col++) {
+				fImageData[row * fOutputWidth + col][c]
+					= (uint16)CLIP(fimg[(row << dim) + col] + 0.5);
+			}
+		}
+	}
+
+	if (fFilters && fColors == 3) {
+		// pull G1 and G3 closer together
+		for (row = 0; row < 2; row++) {
+			mul[row] = 0.125 * fMeta.pre_multipliers[FC(row + 1, 0) | 1]
+				/ fMeta.pre_multipliers[FC(row, 0) | 1];
+		}
+		for (i = 0; i < 4; i++) {
+			window[i] = (ushort *) fimg + fInputWidth * i;
+		}
+		for (wlast = -1, row = 1; row < (int32)fInputHeight - 1; row++) {
+			while (wlast < (int32)row + 1) {
+				for (wlast++, i=0; i < 4; i++) {
+					window[(i+3) & 3] = window[i];
+				}
+				for (col = FC(wlast,1) & 1; col < (int32)fInputWidth; col += 2) {
+					window[2][col] = _Bayer(col, wlast);
+				}
+			}
+
+			for (col = (FC(row, 0) & 1)+1; col < (int32)fInputWidth - 1; col += 2) {
+				avg = ( window[0][col - 1] + window[0][col + 1]
+					+ window[2][col - 1] + window[2][col + 1] - fMeta.black * 4)
+					* mul[row & 1] + (window[1][col] - fMeta.black) * 0.5 + fMeta.black;
+				diff = _Bayer(col, row) - avg;
+
+				if (diff < -fThreshold / M_SQRT2)
+					diff += fThreshold / M_SQRT2;
+				else if (diff > fThreshold / M_SQRT2)
+					diff -= fThreshold / M_SQRT2;
+				else
+					diff = 0;
+				_Bayer(col, row) = (uint16)CLIP(avg + diff + 0.5);
+			}
+		}
+	}
+
+	free(fimg);
 }
 
 

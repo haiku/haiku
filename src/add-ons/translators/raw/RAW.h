@@ -28,7 +28,7 @@ struct image_meta_info {
 	uint32	dng_version;
 	uint32	shot_order;
 	int32	black;
-	double	maximum;
+	int32	maximum;
 	float	camera_multipliers[4];
 	float	pre_multipliers[4];
 	float	rgb_camera[3][4];	/* RGB from camera color */
@@ -144,7 +144,7 @@ class DCRaw {
 
 		uint16		(*fImageData)[4];
 			// output image data
-		int32		fThreshold;
+		float		fThreshold;
 		int32		fShrink;
 		bool		fHalfSize;
 		bool		fUseCameraWhiteBalance;
