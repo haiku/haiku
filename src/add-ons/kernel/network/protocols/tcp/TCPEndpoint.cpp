@@ -1075,7 +1075,7 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 		if (fFlags & FLAG_OPTION_TIMESTAMP) {
 			segment.options |= TCP_HAS_TIMESTAMPS;
 			segment.TSecr = fReceivedTSval;
-			segment.TSval = htonl(tcp_now());
+			segment.TSval = tcp_now();
 		}
 
 		if ((segment.flags & TCP_FLAG_SYNCHRONIZE)
@@ -1665,14 +1665,14 @@ TCPEndpoint::_Acknowledged(tcp_segment_header &segment)
 	if (fSendUnacknowledged == fSendMax)
 		gStackModule->cancel_timer(&fRetransmitTimer);
 
-	if (segment.options & TCP_HAS_TIMESTAMPS)
-		_UpdateSRTT(tcp_diff_timestamp(ntohl(segment.TSecr)));
-	else {
-		// TODO Fallback to RFC 793 type estimation
-	}
-
 	if (fSendQueue.Used() < previouslyUsed) {
 		// this ACK acknowledged data
+
+		if (segment.options & TCP_HAS_TIMESTAMPS)
+			_UpdateSRTT(tcp_diff_timestamp(segment.TSecr));
+		else {
+			// TODO Fallback to RFC 793 type estimation
+		}
 
 		if (is_writable(fState)) {
 			// notify threads waiting on the socket to become writable again
