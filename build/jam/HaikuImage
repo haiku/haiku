@@ -150,7 +150,7 @@ AddDriversToHaikuImage disk scsi	: scsi_cd scsi_dsk ;
 AddDriversToHaikuImage dvb			: cx23882 ;
 AddDriversToHaikuImage graphics		: $(BEOS_ADD_ONS_DRIVERS_GRAPHICS) ;
 AddDriversToHaikuImage input		: ps2_hid usb_hid ;
-AddDriversToHaikuImage misc			: <driver>poke ;
+AddDriversToHaikuImage misc			: <driver>poke <driver>test ;
 AddDriversToHaikuImage net			: $(BEOS_ADD_ONS_DRIVERS_NET) ;
 #AddDriversToHaikuImage power		: $(BEOS_ADD_ONS_DRIVERS_ACPI) ;
 
