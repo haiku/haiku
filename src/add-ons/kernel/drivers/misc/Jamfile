@@ -10,3 +10,7 @@ KernelAddon <driver>config :
 KernelAddon <driver>poke :
 	poke.c
 	;
+
+KernelAddon <driver>test :
+	test.c
+	;
