@@ -37,8 +37,8 @@ public:
 
  	virtual void    	FrameResized(float width, float height);
 	
-	void				DirectConnected( direct_buffer_info *info );
-	void				EnableDirectMode( bool enabled );
+	virtual void			DirectConnected(direct_buffer_info *info);
+	virtual void			EnableDirectMode(bool enabled);
 
 	inline	int32			ReferenceCount()	{ return fRefCount; };			
 	inline	ulong			Options() 			{ return fOptions; };
