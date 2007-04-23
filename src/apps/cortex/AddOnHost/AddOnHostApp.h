@@ -8,38 +8,34 @@
 //
 // * HISTORY
 //   e.moon			6nov99
+#ifndef NODE_MANAGER_ADD_ON_HOST_APP_H
+#define NODE_MANAGER_ADD_ON_HOST_APP_H
 
-#ifndef __NodeManager_AddOnHostApp_H__
-#define __NodeManager_AddOnHostApp_H__
+
+#include "cortex_defs.h"
 
 #include <Application.h>
 #include <MediaAddOn.h>
 #include <MediaDefs.h>
 
-#include "cortex_defs.h"
+
 __BEGIN_CORTEX_NAMESPACE
 namespace addon_host {
 
-class App :
-	public	BApplication {
+class App:public BApplication {
 	typedef	BApplication _inherited;
 
-public:											// *** implementation
-	~App();
-	App();
+	public:
+		~App();
+		App();
 
-public:											// *** BLooper
-	bool QuitRequested();
-	
-public:											// *** BHandler
-	void MessageReceived(
-		BMessage*								message);
-		
-private:										// implementation
+	public:
+		bool QuitRequested();
+		void MessageReceived(BMessage* message);
 
 };
 
-}; // addon_host
+}	// addon_host
 __END_CORTEX_NAMESPACE
-#endif /*__NodeManager_AddOnHostApp_H__*/
 
+#endif	// NODE_MANAGER_ADD_ON_HOST_APP_H

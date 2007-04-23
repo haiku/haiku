@@ -5,17 +5,15 @@
 #include <Debug.h>
 #include <ParameterWeb.h>
 
-status_t _AudioAdapterParams::store(
-	int32										parameterID,
-	const void*							data,
-	size_t									size) {
-	
-	if(size < sizeof(int32))
+status_t
+_AudioAdapterParams::store(parameterID, const void* data, size_t size)
+{
+	if (size < sizeof(int32))
 		return B_NO_MEMORY;
-	
+
 	const uint32 d = *(uint32*)data;
-	
-	switch(parameterID) {
+
+	switch (parameterID) {
 		// input format restrictions (0='wildcard')
 		case P_INPUT_FORMAT:
 			inputFormat.format = d;
