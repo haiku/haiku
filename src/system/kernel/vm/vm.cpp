@@ -737,6 +737,8 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 
 	TRACE(("create_anonymous_area %s: size 0x%lx\n", name, size));
 
+	if (size == 0)
+		return B_BAD_VALUE;
 	if (!arch_vm_supports_protection(protection))
 		return B_NOT_SUPPORTED;
 
