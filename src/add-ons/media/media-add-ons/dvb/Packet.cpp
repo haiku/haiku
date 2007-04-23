@@ -28,7 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "packet.h"
+#include "Packet.h"
 
 #define PACKET
 #ifdef PACKET

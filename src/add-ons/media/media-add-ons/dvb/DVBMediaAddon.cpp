@@ -42,7 +42,6 @@ struct device_info
 	char			info[200];
 	media_format 	formats[5];
 	flavor_info 	flavor;
-	bool			active; // workaround for zeta
 };
 
 
@@ -107,16 +106,7 @@ DVBMediaAddon::InstantiateNodeFor(const flavor_info * info, BMessage * config,	s
 	}
 	*out_error = B_OK;
 	
-	// workaround for Zeta
-	if (dev->active) {
-		printf("DVB: max instances violation!!!\n");
-		*out_error = B_ERROR;
-		return NULL;
-	} else {
-		dev->active = true;
-	}
-	
-	return new DVBMediaNode(this, dev->name, dev->flavor.internal_id, dev->card, &dev->active);
+	return new DVBMediaNode(this, dev->name, dev->flavor.internal_id, dev->card);
 }
 	
 
@@ -149,19 +139,8 @@ DVBMediaAddon::AutoStart(int index, BMediaNode **outNode, int32 *outInternalID, 
 	}
 		
 	*outHasMore = fDeviceList.ItemAt(index + 1) ? true : false;
-
-	// workaround for Zeta
-	if (dev->active) {
-		printf("DVB: max instances violation!!!\n");
-		*outInternalID = -1;
-		*outNode = NULL;
-		return B_MEDIA_ADDON_FAILED;
-	}
-
-	dev->active = true;
-	
 	*outInternalID = dev->flavor.internal_id;
-	*outNode = new DVBMediaNode(this, dev->name, dev->flavor.internal_id, dev->card, &dev->active);
+	*outNode = new DVBMediaNode(this, dev->name, dev->flavor.internal_id, dev->card);
 
 	printf("DVB: DVBMediaAddon::AutoStart, success\n");
 
@@ -233,8 +212,6 @@ DVBMediaAddon::AddDevice(DVBCard *card, const char *path)
 	fDeviceList.AddItem(dev);
 	
 	dev->card = card;
-	
-	dev->active = false; // workaround for Zeta
 	
 	// setup name and info, it's important that name starts with "DVB"
 //	snprintf(dev->name, sizeof(dev->name), "DVB-%s %s (%s)", dvbtype, dvbnumber, name);

@@ -44,12 +44,10 @@
 #include <Entry.h>
 #include <Path.h>
 
-#include "DefaultDecoder.h"
-#include "Support.h"
-#include "HeaderFormat.h"
-#include "packet.h"
-#include "packet_queue.h"
-#include "pes_extract.h"
+#include "MediaFormat.h"
+#include "Packet.h"
+#include "PacketQueue.h"
+#include "pes.h"
 #include "media_header_ex.h"
 #include "config.h"
 
@@ -113,11 +111,11 @@
 
 DVBMediaNode::DVBMediaNode(
 	BMediaAddOn *addon, const char *name,
-	int32 internal_id, DVBCard *card, bool *active) // bool *active is a workaround for Zeta
+	int32 internal_id, DVBCard *card)
  :	BMediaNode(name)
- ,	BMediaEventLooper()
  ,	BBufferProducer(B_MEDIA_RAW_VIDEO)
  ,	BControllable()
+ ,	BMediaEventLooper()
  ,	fStopDisabled(false)
  ,	fOutputEnabledRawVideo(false)
  ,	fOutputEnabledRawAudio(false)
@@ -140,7 +138,7 @@ DVBMediaNode::DVBMediaNode(
  ,	fThreadIdEncVideo(-1)
  ,	fThreadIdMpegTS(-1)
  ,	fTerminateThreads(false)
- ,	fDemux(new TSDemux(fRawVideoQueue, fRawAudioQueue, fEncVideoQueue, fEncAudioQueue, fMpegTsQueue))
+ ,	fDemux(new TransportStreamDemux(fRawVideoQueue, fRawAudioQueue, fEncVideoQueue, fEncAudioQueue, fMpegTsQueue))
  ,	fBufferGroupRawVideo(0)
  ,	fBufferGroupRawAudio(0)
  ,	fInterfaceType(DVB_TYPE_UNKNOWN)
@@ -163,15 +161,6 @@ DVBMediaNode::DVBMediaNode(
  ,	fAudioDecoder(0)
  ,	fCurrentVideoPacket(0)
  ,	fCurrentAudioPacket(0)
- ,	fMpeg2VideoDecoderImage(-1)
- ,	fMpeg2AudioDecoderImage(-1)
- ,	fAC3DecoderImage(-1)
- ,	fDeinterlaceFilterImage(-1)
- ,	instantiate_mpeg2_video_decoder(NULL)
- ,	instantiate_mpeg2_audio_decoder(NULL)
- ,	instantiate_ac3_audio_decoder(NULL)
- ,	instantiate_deinterlace_filter(NULL)
- ,	fActive(active)
 {
 	TRACE("DVBMediaNode::DVBMediaNode\n");
 
@@ -181,8 +170,6 @@ DVBMediaNode::DVBMediaNode(
 	fAddOn = addon;
 	
 	fInitStatus = B_OK;
-	
-	LoadAddons();
 	
 	InitDefaultFormats();
 
@@ -244,8 +231,6 @@ printf("deleting audio buffer group done\n");
 	delete fChannelList;
 	delete fAudioList;
 	
-	UnloadAddons();
-
 #ifdef DUMP_VIDEO
 	close(fVideoFile);
 #endif
@@ -256,59 +241,6 @@ printf("deleting audio buffer group done\n");
 	close(fRawAudioFile);
 #endif
 
-	*fActive = false; // workaround for zeta
-}
-
-
-image_id
-DVBMediaNode::LoadAddon(const char *path, const char *name, void **ptr)
-{
-	image_id id = load_add_on(path);
-	if (id <= 0) {
-		*ptr = NULL;
-		printf("loading addon '%s' failed\n", path);
-		return -1;
-	}
-	status_t s = get_image_symbol(id, name, B_SYMBOL_TYPE_TEXT, ptr);
-	if (s < B_OK) {
-		unload_add_on(id);
-		*ptr = NULL;
-		printf("locating function '%s' in addon '%s' failed\n", name, path);
-		return -1;
-	}
-	return id;
-}
-
-
-void
-DVBMediaNode::LoadAddons()
-{
-	fMpeg2VideoDecoderImage = LoadAddon(MPEG2_VIDEO_DECODER_PATH, 
-										"instantiate_mpeg2_video_decoder",
-										(void **)&instantiate_mpeg2_video_decoder);
-	fMpeg2AudioDecoderImage = LoadAddon(MPEG2_AUDIO_DECODER_PATH, 
-										"instantiate_mpeg2_audio_decoder", 
-										(void **)&instantiate_mpeg2_audio_decoder);
-	fAC3DecoderImage        = LoadAddon(AC3_AUDIO_DECODER_PATH, 
-										"instantiate_ac3_audio_decoder", 
-										(void **)&instantiate_ac3_audio_decoder);
-	fDeinterlaceFilterImage = LoadAddon(DEINTERLACE_FILTER_PATH, 
-										"instantiate_deinterlace_filter", 
-										(void **)&instantiate_deinterlace_filter);
-}
-
-
-void
-DVBMediaNode::UnloadAddons()
-{
-	if (fMpeg2VideoDecoderImage >= 0)
-		unload_add_on(fMpeg2VideoDecoderImage);
-	if (fMpeg2AudioDecoderImage >= 0)
-		unload_add_on(fMpeg2AudioDecoderImage);
-	if (fAC3DecoderImage >= 0)
-		unload_add_on(fAC3DecoderImage);
-	if (fDeinterlaceFilterImage >= 0)
-		unload_add_on(fDeinterlaceFilterImage);
 }
 
 
@@ -1593,10 +1525,7 @@ DVBMediaNode::raw_audio_thread()
 	
 	// create decoder interface
 
-	if (instantiate_mpeg2_audio_decoder)
-		fAudioDecoder = (*instantiate_mpeg2_audio_decoder)(&_GetNextAudioChunk, this, "");
-	else
-		fAudioDecoder = new DefaultDecoder(&_GetNextAudioChunk, this);
+	fAudioDecoder = new MediaStreamDecoder(&_GetNextAudioChunk, this);
 	
 	err = fAudioDecoder->SetInputFormat(format);
 	if (err) {
@@ -1771,10 +1700,7 @@ DVBMediaNode::raw_video_thread()
 	
 	// create decoder interface
 
-	if (instantiate_mpeg2_video_decoder)
-		fVideoDecoder = (*instantiate_mpeg2_video_decoder)(&_GetNextVideoChunk, this, "");
-	else
-		fVideoDecoder = new DefaultDecoder(&_GetNextVideoChunk, this);
+	fVideoDecoder = new MediaStreamDecoder(&_GetNextVideoChunk, this);
 	
 	err = fVideoDecoder->SetInputFormat(format);
 	if (err) {

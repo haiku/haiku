@@ -25,8 +25,7 @@
 #ifndef _DVB_MEDIA_ADDON_CONFIG_H_
 #define _DVB_MEDIA_ADDON_CONFIG_H_
 
-#include "revision.h"
-
+#define REVISION		"unknown"
 #define VERSION			"1.0"
 #define BUILD	 		__DATE__ " "__TIME__
 

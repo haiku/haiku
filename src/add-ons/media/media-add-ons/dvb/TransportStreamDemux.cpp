@@ -28,9 +28,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ts_demux.h"
-#include "packet.h"
-#include "packet_queue.h"
+#include "TransportStreamDemux.h"
+#include "Packet.h"
+#include "PacketQueue.h"
 
 #define TRACE_TS_DEMUX
 #ifdef TRACE_TS_DEMUX

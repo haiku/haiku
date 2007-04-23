@@ -33,10 +33,10 @@
 #include <media/MediaNode.h>
 #include <support/Locker.h>
 
-#include "ts_demux.h"
+#include "TransportStreamDemux.h"
+#include "MediaStreamDecoder.h"
 #include "DVBCard.h"
 #include "StringList.h"
-#include "DecoderInterface.h"
 
 class BDiscreteParameter;
 class PacketQueue;
@@ -49,7 +49,7 @@ class DVBMediaNode :
 {
 public:
 						DVBMediaNode(BMediaAddOn *addon,
-								const char *name, int32 internal_id, DVBCard *card, bool *active); // bool *active is a workaround for Zeta
+								const char *name, int32 internal_id, DVBCard *card);
 virtual					~DVBMediaNode();
 
 virtual	status_t		InitCheck() const { return fInitStatus; }
@@ -149,10 +149,6 @@ private:
 		
 		void				LoadSettings();
 		
-		void				LoadAddons();
-		void				UnloadAddons();
-		image_id			LoadAddon(const char *path, const char *name, void **ptr);
-		
 		void				AddStateItems(BDiscreteParameter *param);
 		void				AddRegionItems(BDiscreteParameter *param);
 		void				AddChannelItems(BDiscreteParameter *param);
@@ -247,7 +243,7 @@ private:
 		
 		volatile bool		fTerminateThreads;
 		
-		TSDemux *			fDemux;
+		TransportStreamDemux * fDemux;
 		
 		BBufferGroup *		fBufferGroupRawVideo;
 		BBufferGroup *		fBufferGroupRawAudio;
@@ -277,26 +273,14 @@ private:
 		StringList *		fChannelList;
 		StringList *		fAudioList;
 		
-		DecoderInterface *	fVideoDecoder;
-		DecoderInterface *	fAudioDecoder;
+		MediaStreamDecoder *fVideoDecoder;
+		MediaStreamDecoder *fAudioDecoder;
 
 		Packet *			fCurrentVideoPacket;
 		Packet *			fCurrentAudioPacket;
 
-		image_id			fMpeg2VideoDecoderImage;
-		image_id			fMpeg2AudioDecoderImage;
-		image_id			fAC3DecoderImage;
-		image_id			fDeinterlaceFilterImage;
-		
-		DecoderInterface * (*instantiate_mpeg2_video_decoder)(get_next_chunk_func, void *, const char *);
-		DecoderInterface * (*instantiate_mpeg2_audio_decoder)(get_next_chunk_func, void *, const char *);
-		DecoderInterface * (*instantiate_ac3_audio_decoder)(get_next_chunk_func, void *, const char *);
-		DecoderInterface * (*instantiate_deinterlace_filter)(get_next_chunk_func, void *, const char *);
-		
 		BLocker lock;
 		
-		bool *				fActive; // workaround for Zeta
-
 		// used only for debugging:
 		int					fVideoFile;
 		int					fAudioFile;

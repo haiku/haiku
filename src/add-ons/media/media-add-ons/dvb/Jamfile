@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src add-ons media media-add-ons dvb ;
+
+UsePrivateHeaders drivers ;
+
+Addon dvb.media_addon :
+	DVBCard.cpp
+	DVBMediaAddon.cpp
+	DVBMediaNode.cpp
+	MediaFormat.cpp
+	MediaStreamDecoder.cpp
+	Packet.cpp
+	PacketQueue.cpp
+	pes.cpp
+	TransportStreamDemux.cpp
+	: be media
+;

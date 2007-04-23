@@ -25,7 +25,7 @@
 #ifndef __DVB_CARD_H
 #define __DVB_CARD_H
 
-#include "../drivers/cx23882/dvb.h"
+#include "dvb.h"
 
 class DVBCard
 {

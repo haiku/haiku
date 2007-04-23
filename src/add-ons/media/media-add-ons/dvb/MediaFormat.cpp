@@ -23,6 +23,7 @@
  */
 
 #include <media/MediaFormats.h>
+#include <media/MediaNode.h>
 #include <stdio.h>
 #include "MediaFormat.h"
 
