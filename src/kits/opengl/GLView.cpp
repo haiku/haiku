@@ -158,6 +158,10 @@ BGLView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 
+	m_bounds = Bounds();
+	for (BView *v = this; v; v = v->Parent())
+		v->ConvertToParent(&m_bounds);
+	
 	fRenderer = fRoster->GetRenderer();
 	if (fRenderer) {
 		// Don't paint white window background when resized
@@ -205,7 +209,10 @@ BGLView::AllDetached()
 void
 BGLView::FrameResized(float width, float height)
 {
-	m_bounds.Set(0, 0, width, height);
+	m_bounds = Bounds();
+	for (BView *v = this; v; v = v->Parent())
+		v->ConvertToParent(&m_bounds);
+
 	if (fRenderer)
 		fRenderer->FrameResized(width, height);
 
@@ -311,7 +318,7 @@ BGLView::DirectConnected(direct_buffer_info *info)
 			// TODO: I have the feeling that this Bounds() call won't work here.
 			// Probably m_bounds should be used, but it should then be maintained correctly
 			// on view resizing/moving...		
-			BRegion boundsRegion = Bounds();		
+			BRegion boundsRegion = m_bounds.OffsetByCopy(localInfo->window_bounds.left, localInfo->window_bounds.top);		
 			region.IntersectWith(&boundsRegion);
 				
 			localInfo->clip_list_count = region.CountRects();
