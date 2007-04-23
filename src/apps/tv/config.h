@@ -27,13 +27,13 @@
 
 #include <InterfaceDefs.h>
 #include <time.h>
-#include "revision.h"
 
 #define NAME		"TV-O-Rama"
+#define REVISION	"unknown"
 #define VERSION		"1.1"
 #define BUILD 		__DATE__ " "__TIME__
-#define COPYRIGHT 	B_UTF8_COPYRIGHT" Marcus Overhagen 2005-2006"
+#define COPYRIGHT 	B_UTF8_COPYRIGHT" Marcus Overhagen 2005-2007"
 #define INFO1 		"DVB - Digital Video Broadcasting TV"
-#define APP_SIG		"application/x-vnd.MarcusOverhagen."##NAME
+#define APP_SIG		"application/x-vnd.MarcusOverhagen."NAME
 
 #endif

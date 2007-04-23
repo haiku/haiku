@@ -30,6 +30,7 @@
 #include "ConvertBitmap.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define CHECK_ACTIVITY 'ChkA'
@@ -383,10 +384,10 @@ VideoView::IsOverlaySupported()
 				printf("Overlay restrictions: destination max_width %d\n", restrict.destination.max_width);
 				printf("Overlay restrictions: destination min_height %d\n", restrict.destination.min_height);
 				printf("Overlay restrictions: destination max_height %d\n", restrict.destination.max_height);
-				printf("Overlay restrictions: min_width_scale %d\n", restrict.min_width_scale);
-				printf("Overlay restrictions: max_width_scale %d\n", restrict.max_width_scale);
-				printf("Overlay restrictions: min_height_scale %d\n", restrict.min_height_scale);
-				printf("Overlay restrictions: max_height_scale %d\n", restrict.max_height_scale);
+				printf("Overlay restrictions: min_width_scale %.3f\n", restrict.min_width_scale);
+				printf("Overlay restrictions: max_width_scale %.3f\n", restrict.max_width_scale);
+				printf("Overlay restrictions: min_height_scale %.3f\n", restrict.min_height_scale);
+				printf("Overlay restrictions: max_height_scale %.3f\n", restrict.max_height_scale);
 			}
 			supported = true;
 		}

@@ -1,0 +1,13 @@
+SubDir HAIKU_TOP src apps tv ;
+
+Application TV :
+	Controller.cpp
+	ConvertBitmap.cpp
+	DeviceRoster.cpp
+	MainApp.cpp
+	MainWin.cpp
+	VideoNode.cpp
+	VideoView.cpp
+	: be media
+	: tv.rdef
+;
