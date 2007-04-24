@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 
 #include <Application.h>
 #include <Window.h>
@@ -42,6 +43,19 @@ private:
 };
 
 
+void AddItem(BListView *list, int level, char *text, ...)
+{
+	char buffer[512];
+	va_list arg;
+	
+	va_start(arg, text);
+	vsnprintf(buffer, sizeof(buffer), text, arg);
+	va_end(arg);
+	
+	list->AddItem(new BStringItem(buffer, level));
+}
+ 
+
 GLInfoApp::GLInfoApp()
    : BApplication("application/x-vnd.OBOS-GLInfo")
 {
@@ -51,17 +65,17 @@ GLInfoApp::GLInfoApp()
 GLInfoWindow::GLInfoWindow(BRect frame)
    : BWindow(frame, "OpenGL Info", B_TITLED_WINDOW, 0)
 {
-	BRect	r = Bounds();
-	char *s;
-	BString l;
+	BRect	rect = Bounds();
+	char *string;
+	BString label;
 
 	// Add a outline list view
-	r.right -= B_V_SCROLL_BAR_WIDTH;
-	list 		= new BOutlineListView(r, "GLInfoList", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
+	rect.right -= B_V_SCROLL_BAR_WIDTH;
+	list 		= new BOutlineListView(rect, "GLInfoList", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
 	scroller 	= new BScrollView("GLInfoListScroller", list, B_FOLLOW_ALL_SIDES,
 						B_WILL_DRAW | B_FRAME_EVENTS, false, true);
 						
-	gl = new BGLView(r, "opengl", B_FOLLOW_ALL_SIDES, 0, BGL_RGB | BGL_DOUBLE);
+	gl = new BGLView(rect, "opengl", B_FOLLOW_ALL_SIDES, 0, BGL_RGB | BGL_DOUBLE);
 	gl->Hide();
 	AddChild(gl);
 	AddChild(scroller);
@@ -72,67 +86,105 @@ GLInfoWindow::GLInfoWindow(BRect frame)
 	
 	gl->LockGL();
 	
-	list->AddItem(new BStringItem("OpenGL", 0));
+	// list->AddItem(new BStringItem("OpenGL", 0));
+	AddItem(list, 0, "OpenGL");
+	AddItem(list, 1, "Version: %s", glGetString(GL_VERSION));
+	AddItem(list, 1, "Vendor Name: %s", glGetString(GL_VENDOR));
+	AddItem(list, 1, "Renderer Name: %s", glGetString(GL_RENDERER));
 
-	s = (char *) glGetString(GL_VENDOR);
-	if (s) {
-		l = ""; l << "Vendor Name: " << s;
-		list->AddItem(new BStringItem(l.String(), 1));
-	}
+	int lights = 0;
+	int clipping_planes = 0;
+	int model_stack = 0;
+	int projection_stack = 0;
+	int texture_stack = 0;
+	int max_tex3d = 0;
+	int max_tex2d = 0;
+	int name_stack = 0;
+	int list_stack = 0;
+	int max_poly = 0;
+	int attrib_stack = 0;
+	int buffers = 0;
+	int convolution_width = 0;
+	int convolution_height = 0;
+	int max_index = 0;
+	int max_vertex = 0;
+	int texture_units = 0;
 
-	s = (char *) glGetString(GL_VERSION);
-	if (s) {
-		l = ""; l << "Version: " << s;
-		list->AddItem(new BStringItem(l.String(), 1));
-	}
-	
-	s = (char *) glGetString(GL_RENDERER);
-	if (s) {
-		l = ""; l << "Renderer Name: " << s;
-		list->AddItem(new BStringItem(l.String(), 1));
-	}
+	glGetIntegerv (GL_MAX_LIGHTS, &lights);
+	glGetIntegerv (GL_MAX_CLIP_PLANES, &clipping_planes);
+	glGetIntegerv (GL_MAX_MODELVIEW_STACK_DEPTH, &model_stack);
+	glGetIntegerv (GL_MAX_PROJECTION_STACK_DEPTH, &projection_stack);
+	glGetIntegerv (GL_MAX_TEXTURE_STACK_DEPTH, &texture_stack);
+	glGetIntegerv (GL_MAX_3D_TEXTURE_SIZE, &max_tex3d);
+	glGetIntegerv (GL_MAX_TEXTURE_SIZE, &max_tex2d);
+	glGetIntegerv (GL_MAX_NAME_STACK_DEPTH, &name_stack);
+	glGetIntegerv (GL_MAX_LIST_NESTING, &list_stack);
+	glGetIntegerv (GL_MAX_EVAL_ORDER, &max_poly);
+	glGetIntegerv (GL_MAX_ATTRIB_STACK_DEPTH, &attrib_stack);
+	glGetIntegerv (GL_AUX_BUFFERS, &buffers);
+	glGetIntegerv (GL_MAX_CONVOLUTION_WIDTH, &convolution_width);
+	glGetIntegerv (GL_MAX_CONVOLUTION_HEIGHT, &convolution_height);
+	glGetIntegerv (GL_MAX_ELEMENTS_INDICES, &max_index);
+	glGetIntegerv (GL_MAX_ELEMENTS_VERTICES, &max_vertex);
+	glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &texture_units);
 
-	s = (char *) glGetString(GL_EXTENSIONS);
-	if (s) {
-		list->AddItem(new BStringItem("Extensions", 1));
-		while (*s) {
+	AddItem(list, 1, "Auxiliary buffer(s): %d", buffers);
+
+	AddItem(list, 1, "Model stack size: %d", model_stack);
+	AddItem(list, 1, "Projection stack size: %d", projection_stack);
+	AddItem(list, 1, "Texture stack size: %d", texture_stack);
+	AddItem(list, 1, "Name stack size: %d", name_stack);
+	AddItem(list, 1, "List stack size: %d", list_stack);
+	AddItem(list, 1, "Attributes stack size: %d", attrib_stack);
+
+	AddItem(list, 1, "Maximum 3D texture size: %d", max_tex3d);
+	AddItem(list, 1, "Maximum 2D texture size: %d", max_tex2d);
+	AddItem(list, 1, "Maximum texture units: %d", texture_units);
+
+	AddItem(list, 1, "Maximum lights: %d", lights);
+	AddItem(list, 1, "Maximum clipping planes: %d", clipping_planes);
+	AddItem(list, 1, "Maximum evaluators equation order: %d", max_poly);
+	AddItem(list, 1, "Maximum convolution: %d x %d",
+		convolution_width, convolution_height);
+	AddItem(list, 1, "Maximum recommended index elements: %d", max_index);
+	AddItem(list, 1, "Maximum recommended vertex elements: %d", max_vertex);
+
+	string = (char *) glGetString(GL_EXTENSIONS);
+	if (string) {
+		AddItem(list, 1, "Extensions");
+		while (*string) {
 			char extname[255];
-			int n = strcspn(s, " ");
-			strncpy(extname, s, n);
+			int n = strcspn(string, " ");
+			strncpy(extname, string, n);
 			extname[n] = 0;
-			list->AddItem(new BStringItem(extname, 2));
-			if (! s[n])
+			AddItem(list, 2, extname);
+			if (! string[n])
 				break;
-			s += (n + 1);	// next !
+			string += (n + 1);	// next !
 		}
 	}
 
-	list->AddItem(new BStringItem("GLU", 0));
-	s = (char *) gluGetString(GLU_VERSION);
-	if (s) {
-		l = ""; l << "Version: " << s;
-		list->AddItem(new BStringItem(l.String(), 1));
-	}
+	AddItem(list, 0, "GLU");
+	AddItem(list, 1, "Version: %s", gluGetString(GLU_VERSION));
 
-	s = (char *) gluGetString(GLU_EXTENSIONS);
-	if (s) {
-		list->AddItem(new BStringItem("Extensions", 1));
-		while (*s) {
+	string = (char *) gluGetString(GLU_EXTENSIONS);
+	if (string) {
+		AddItem(list, 1, "Extensions");
+		while (*string) {
 			char extname[255];
-			int n = strcspn(s, " ");
-			strncpy(extname, s, n);
+			int n = strcspn(string, " ");
+			strncpy(extname, string, n);
 			extname[n] = 0;
-			list->AddItem(new BStringItem(extname, 2));
-			if (! s[n])
+			AddItem(list, 2, extname);
+			if (! string[n])
 				break;
-			s += (n + 1);	// next !
+			string += (n + 1);	// next !
 		}
 	}
 
 #ifdef GLUT_INFO
-	list->AddItem(new BStringItem("GLUT", 0));
-	l = "API version: "; l << GLUT_API_VERSION;
-	list->AddItem(new BStringItem(l.String(), 1));
+	AddItem(list, 0, "GLUT");
+	AddItem(list, 1, "API version: %d", GLUT_API_VERSION);
 #endif
 
 	gl->UnlockGL();
