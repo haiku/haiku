@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -181,7 +181,7 @@ load_driver(driver_entry *driver)
 
 	// load the module
 	image_id image = load_kernel_add_on(driver->path);
-	if (image < 0)
+	if (image < B_OK)
 		return image;
 
 	// for prettier debug output
@@ -910,6 +910,31 @@ get_device_name(struct devfs_vnode *vnode, char *buffer, size_t size)
 }
 
 
+static int
+dump_node(int argc, char **argv)
+{
+	if (argc < 2) {
+		kprintf("usage: %s <address>\n", argv[0]);
+		return 0;
+	}
+
+	struct devfs_vnode *vnode = (struct devfs_vnode *)strtoul(argv[1], NULL, 0);
+	if (vnode == NULL) {
+		kprintf("invalid node address\n");
+		return 0;
+	}
+
+	kprintf("DEVFS NODE: %p\n", vnode);
+	kprintf(" id:       %Ld\n", vnode->id);
+	kprintf(" name:     %s\n", vnode->name);
+	kprintf(" type:     %x\n", vnode->stream.type);
+	kprintf(" parent:   %p\n", vnode->parent);
+	kprintf(" dir_next: %p\n", vnode->dir_next);
+
+	return 0;
+}
+
+
 //	#pragma mark - file system interface
 
 
@@ -1019,7 +1044,7 @@ devfs_unmount(fs_volume _fs)
 	recursive_lock_destroy(&fs->lock);
 	free(fs);
 
-	return 0;
+	return B_OK;
 }
 
 
@@ -1028,7 +1053,7 @@ devfs_sync(fs_volume fs)
 {
 	TRACE(("devfs_sync: entry\n"));
 
-	return 0;
+	return B_OK;
 }
 
 
@@ -1139,7 +1164,7 @@ devfs_put_vnode(fs_volume _fs, fs_vnode _v, bool reenter)
 	TRACE(("devfs_put_vnode: entry on vnode %p, id = %Ld, reenter %d\n", vnode, vnode->id, reenter));
 #endif
 
-	return 0; // whatever
+	return B_OK;
 }
 
 
@@ -1294,14 +1319,14 @@ devfs_free_cookie(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie)
 	}
 
 	free(cookie);
-	return 0;
+	return B_OK;
 }
 
 
 static status_t
 devfs_fsync(fs_volume _fs, fs_vnode _v)
 {
-	return 0;
+	return B_OK;
 }
 
 
@@ -1838,9 +1863,12 @@ devfs_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
+			add_debugger_command("devfs_node", &dump_node,
+				"info about a private devfs node");
 			return B_OK;
 
 		case B_MODULE_UNINIT:
+			remove_debugger_command("devfs_node", &dump_node);
 			return B_OK;
 
 		default:
