@@ -15,6 +15,7 @@ SubInclude HAIKU_TOP src apps icon-o-matic ;
 SubInclude HAIKU_TOP src apps installer ;
 SubInclude HAIKU_TOP src apps magnify ;
 SubInclude HAIKU_TOP src apps mail ;
+SubInclude HAIKU_TOP src apps mandelbrot ;
 SubInclude HAIKU_TOP src apps mediaplayer ;
 SubInclude HAIKU_TOP src apps midiplayer ;
 SubInclude HAIKU_TOP src apps networkstatus ;
