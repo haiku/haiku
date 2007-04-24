@@ -43,4 +43,5 @@ SimpleTest wait_test_4 : wait_test_4.cpp ;
 SubInclude HAIKU_TOP src tests system kernel cache ;
 #SubInclude HAIKU_TOP src tests system kernel disk_device_manager ;
 SubInclude HAIKU_TOP src tests system kernel device_manager ;
+SubInclude HAIKU_TOP src tests system kernel slab ;
 SubInclude HAIKU_TOP src tests system kernel util ;
