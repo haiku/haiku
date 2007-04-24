@@ -65,9 +65,8 @@ GLInfoApp::GLInfoApp()
 GLInfoWindow::GLInfoWindow(BRect frame)
    : BWindow(frame, "OpenGL Info", B_TITLED_WINDOW, 0)
 {
-	BRect	rect = Bounds();
+	BRect rect = Bounds();
 	char *string;
-	BString label;
 
 	// Add a outline list view
 	rect.right -= B_V_SCROLL_BAR_WIDTH;
