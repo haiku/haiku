@@ -1010,8 +1010,10 @@ FrameMoved(origin);
 			
 			// Close an eventually opened menu, unless the target is the menu itself
 			BMenu *menu = dynamic_cast<BMenu *>(fFocus);
-			if (menu != NULL && menu != view)
+			if (menu != NULL && menu != view && menu->State() != MENU_STATE_CLOSED) {
 				menu->QuitTracking();
+				return;			
+			}
 			
 			if (view != NULL) {
 				BPoint where;
