@@ -1569,7 +1569,7 @@ void
 TCPEndpoint::_AddData(tcp_segment_header &segment, net_buffer *buffer)
 {
 	fReceiveQueue.Add(buffer, segment.sequence);
-	fReceiveNext = fReceiveQueue.LastSequence();
+	fReceiveNext = fReceiveQueue.NextSequence();
 
 	TRACE("  _AddData(): adding data, receive next = %lu. Now have %lu bytes.",
 		(uint32)fReceiveNext, fReceiveQueue.Available());
