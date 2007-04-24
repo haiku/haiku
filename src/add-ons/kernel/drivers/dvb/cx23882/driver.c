@@ -234,8 +234,9 @@ driver_open(const char *name, uint32 flags, void** _cookie)
 static status_t
 driver_close(void* cookie)
 {
-	TRACE("cx23882: driver close\n");
+	TRACE("cx23882: driver close enter\n");
 	interface_detach(((interface_cookie *)cookie)->cookie);
+	TRACE("cx23882: driver close leave\n");
 	return B_OK;
 }
 
@@ -245,6 +246,7 @@ driver_free(void* cookie)
 {
 	TRACE("cx23882: driver free\n");
 	atomic_and(&sOpenMask, ~(1 << ((interface_cookie *)cookie)->dev_id));
+	free(cookie);
 	return B_OK;
 }
 
