@@ -1,4 +1,13 @@
 /*
+ * Copyright 2006-2007, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jérôme Duval, korli@users.berlios.de
+ *		Philippe Houdoin, philippe.houdoin@free.fr
+ *		Stefano Ceccherini, burton666@libero.it
+ */
+/*
  * Mesa 3-D graphics library
  * Version:  6.1
  * 
@@ -35,6 +44,7 @@
 struct glview_direct_info {
 	direct_buffer_info *direct_info;
 	bool direct_connected;
+	bool enable_direct_mode;
 
 	glview_direct_info();
 	~glview_direct_info();
@@ -170,6 +180,11 @@ BGLView::AttachedToWindow()
 		// Set default OpenGL viewport:
 		glViewport(0, 0, Bounds().IntegerWidth(), Bounds().IntegerHeight());
 
+		if (m_clip_info) {
+			fRenderer->DirectConnected(((glview_direct_info *)m_clip_info)->direct_info);
+			fRenderer->EnableDirectMode(((glview_direct_info *)m_clip_info)->enable_direct_mode);
+		}
+
 		return;
 	}
 	
@@ -285,14 +300,15 @@ BGLView::DirectConnected(direct_buffer_info *info)
 	// TODO: We should probably prevent the renderer to draw anything
 	// (lock_draw() ??) while we are in this method
 
-	if (!m_clip_info/* && m_direct_connection_disabled*/) 
-		return; 
+	if (!m_clip_info/* && m_direct_connection_disabled*/) {
+		m_clip_info = new glview_direct_info();
+	}
 
 	glview_direct_info *glviewDirectInfo = (glview_direct_info *)m_clip_info;
 	direct_buffer_info *localInfo = glviewDirectInfo->direct_info;
 	//direct_info_locker->Lock(); 
 	switch(info->buffer_state & B_DIRECT_MODE_MASK) { 
-		case B_DIRECT_START: 
+		case B_DIRECT_START:
 			glviewDirectInfo->direct_connected = true;
 		case B_DIRECT_MODIFY:
 		{
@@ -309,16 +325,12 @@ BGLView::DirectConnected(direct_buffer_info *info)
 			//localInfo->_dd_type_ = info->_dd_type_;
 			//localInfo->_dd_token_ = info->_dd_token_;
 
-			localInfo->window_bounds = info->window_bounds;
-			
 			// Collect the rects into a BRegion, then clip to the view's bounds
 			BRegion region;
 			for (uint32 c = 0; c < info->clip_list_count; c++)
 				region.Include(info->clip_list[c]);
-			// TODO: I have the feeling that this Bounds() call won't work here.
-			// Probably m_bounds should be used, but it should then be maintained correctly
-			// on view resizing/moving...		
-			BRegion boundsRegion = m_bounds.OffsetByCopy(localInfo->window_bounds.left, localInfo->window_bounds.top);		
+			BRegion boundsRegion = m_bounds.OffsetByCopy(info->window_bounds.left, info->window_bounds.top);
+			localInfo->window_bounds = boundsRegion.RectAtInt(0); // window_bounds are now view bounds
 			region.IntersectWith(&boundsRegion);
 				
 			localInfo->clip_list_count = region.CountRects();
@@ -343,15 +355,12 @@ BGLView::DirectConnected(direct_buffer_info *info)
 void
 BGLView::EnableDirectMode(bool enabled)
 {
-	if (!m_clip_info && enabled)
-		m_clip_info = new glview_direct_info();
-	else if (m_clip_info && !enabled) {
-		delete (glview_direct_info *)m_clip_info;
-		m_clip_info = NULL;		
-	}
-
 	if (fRenderer)
 		fRenderer->EnableDirectMode(enabled);
+	if (!m_clip_info) {
+                m_clip_info = new glview_direct_info();
+        }
+	((glview_direct_info *)m_clip_info)->enable_direct_mode = enabled;
 }
 
 
@@ -511,6 +520,7 @@ glview_direct_info::glview_direct_info()
 	// TODO: See direct_window_data() in app_server's ServerWindow.cpp
 	direct_info = (direct_buffer_info *)calloc(1, B_PAGE_SIZE);
 	direct_connected = false;
+	enable_direct_mode = false;
 }
 
 
