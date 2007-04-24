@@ -1,0 +1,8 @@
+SubDir HAIKU_TOP src tests system kernel slab ;
+
+UsePrivateHeaders kernel ;
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
+
+BinCommand test_slab
+	: Slab.cpp
+	;
