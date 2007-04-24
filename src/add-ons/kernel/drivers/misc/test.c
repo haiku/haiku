@@ -70,7 +70,9 @@ driver_open(const char *name, uint32 flags, void** _cookie)
 static status_t
 driver_close(void* cookie)
 {
-	dprintf("test: close\n");
+	dprintf("test: close enter\n");
+	snooze(200000);
+	dprintf("test: close leave\n");
 	return B_OK;
 }
 
