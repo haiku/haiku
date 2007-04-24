@@ -423,6 +423,7 @@ AttributeWindow::MessageReceived(BMessage* message)
 
 		case kMsgDisplayAsChosen:
 			fSpecialControl->SetEnabled(!_DefaultDisplayAs()->IsMarked());
+			_CheckAcceptable();
 			break;
 
 		case kMsgVisibilityChanged:
