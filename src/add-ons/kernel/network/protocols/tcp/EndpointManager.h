@@ -25,30 +25,33 @@ class EndpointManager;
 class TCPEndpoint;
 
 struct ConnectionHashDefinition {
-	typedef EndpointManager *ParentType;
+public:
+	typedef EndpointManager ParentType;
 	typedef std::pair<const sockaddr *, const sockaddr *> KeyType;
 	typedef TCPEndpoint ValueType;
 
-	static size_t HashKey(EndpointManager *manager, const KeyType &key);
-	static size_t Hash(EndpointManager *manager, TCPEndpoint *endpoint);
-	static bool Compare(EndpointManager *manager, const KeyType &key,
-		TCPEndpoint *endpoint);
-	static HashTableLink<TCPEndpoint> *GetLink(EndpointManager *manager,
-		TCPEndpoint *endpoint);
+	ConnectionHashDefinition(EndpointManager *manager);
+
+	size_t HashKey(const KeyType &key) const;
+	size_t Hash(TCPEndpoint *endpoint) const;
+	bool Compare(const KeyType &key, TCPEndpoint *endpoint) const;
+	HashTableLink<TCPEndpoint> *GetLink(TCPEndpoint *endpoint) const;
+
+private:
+	EndpointManager *fManager;
 };
 
 
-struct EndpointHashDefinition {
-	typedef EndpointManager *ParentType;
+class EndpointHashDefinition {
+public:
+	typedef EndpointManager ParentType;
 	typedef uint16 KeyType;
 	typedef TCPEndpoint ValueType;
 
-	static size_t HashKey(EndpointManager *manager, uint16 port);
-	static size_t Hash(EndpointManager *manager, TCPEndpoint *endpoint);
-	static bool Compare(EndpointManager *manager, uint16 port,
-		TCPEndpoint *endpoint);
-	static HashTableLink<TCPEndpoint> *GetLink(EndpointManager *manager,
-		TCPEndpoint *endpoint);
+	size_t HashKey(uint16 port) const;
+	size_t Hash(TCPEndpoint *endpoint) const;
+	bool Compare(uint16 port, TCPEndpoint *endpoint) const;
+	HashTableLink<TCPEndpoint> *GetLink(TCPEndpoint *endpoint) const;
 };
 
 

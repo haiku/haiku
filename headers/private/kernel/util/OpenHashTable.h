@@ -12,7 +12,7 @@
 
 #include <KernelExport.h>
 
-// the Definition template must have three methods: `HashKey', `Hash',
+// the Definition template must have four methods: `HashKey', `Hash',
 // `Compare' and `GetLink;. It must also define several types as shown in the
 // following example:
 //
@@ -23,16 +23,16 @@
 // };
 //
 // struct HashTableDefinition {
-//	typedef void *	ParentType;
+//	typedef void	ParentType;
 //	typedef int		KeyType;
 //	typedef	Foo		ValueType;
 //
-//	static size_t HashKey(void *parent, int key) { return key >> 1; }
-//	static size_t Hash(void *parent, Foo *value) { return HashKey(value->bar); }
-//	static bool Compare(void *parent, int key, Foo *value)
-//		{ return value->bar == key; }
-//  static HashTableLink<Foo> *GetLink(void *parent, Foo *value)
-//		{ return value; }
+//	HashTableDefinition(void *parent) {}
+//
+//	size_t HashKey(int key) { return key >> 1; }
+//	size_t Hash(Foo *value) { return HashKey(value->bar); }
+//	bool Compare(int key, Foo *value) { return value->bar == key; }
+//  HashTableLink<Foo> *GetLink(Foo *value) { return value; }
 // };
 
 template<typename Type>
@@ -44,7 +44,6 @@ template<typename Definition, bool AutoExpand = true,
 	bool CheckDuplicates = false>
 class OpenHashTable {
 public:
-	typedef typename Definition::ParentType	ParentType;
 	typedef typename Definition::KeyType	KeyType;
 	typedef typename Definition::ValueType	ValueType;
 
@@ -57,8 +56,18 @@ public:
 	// regrowth factor: 200 / 256 = 78.125%
 	//                   50 / 256 = 19.53125%
 
-	OpenHashTable(const ParentType &parent, size_t initialSize = kMinimumSize)
-		: fParent(parent), fItemCount(0), fTable(NULL)
+	OpenHashTable(size_t initialSize = kMinimumSize)
+		: fItemCount(0), fTable(NULL)
+	{
+		if (initialSize < kMinimumSize)
+			initialSize = kMinimumSize;
+
+		_Resize(initialSize);
+	}
+
+	OpenHashTable(typename Definition::ParentType *parent,
+		size_t initialSize = kMinimumSize)
+		: fDefinition(parent), fItemCount(0), fTable(NULL)
 	{
 		if (initialSize < kMinimumSize)
 			initialSize = kMinimumSize;
@@ -75,11 +84,11 @@ public:
 
 	ValueType *Lookup(const KeyType &key) const
 	{
-		size_t index = Definition::HashKey(fParent, key) & (fTableSize - 1);
+		size_t index = fDefinition.HashKey(key) & (fTableSize - 1);
 		ValueType *slot = fTable[index];
 
 		while (slot) {
-			if (Definition::Compare(fParent, key, slot))
+			if (fDefinition.Compare(key, slot))
 				break;
 			slot = _Link(slot)->fNext;
 		}
@@ -123,7 +132,7 @@ public:
 
 	void RemoveUnchecked(ValueType *value)
 	{
-		size_t index = Definition::Hash(fParent, value) & (fTableSize - 1);
+		size_t index = fDefinition.Hash(value) & (fTableSize - 1);
 		ValueType *previous = NULL, *slot = fTable[index];
 
 		while (slot) {
@@ -158,7 +167,7 @@ public:
 private:
 	void _Insert(ValueType **table, size_t tableSize, ValueType *value)
 	{
-		size_t index = Definition::Hash(fParent, value) & (tableSize - 1);
+		size_t index = fDefinition.Hash(value) & (tableSize - 1);
 
 		_Link(value)->fNext = table[index];
 		table[index] = value;
@@ -193,10 +202,10 @@ private:
 
 	HashTableLink<ValueType> *_Link(ValueType *bucket) const
 	{
-		return Definition::GetLink(fParent, bucket);
+		return fDefinition.GetLink(bucket);
 	}
 
-	ParentType fParent;
+	Definition fDefinition;
 	size_t fTableSize, fItemCount;
 	ValueType **fTable;
 };

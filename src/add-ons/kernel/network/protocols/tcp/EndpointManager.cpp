@@ -29,24 +29,27 @@ static const uint16 kLastReservedPort = 1023;
 static const uint16 kFirstEphemeralPort = 40000;
 
 
+ConnectionHashDefinition::ConnectionHashDefinition(EndpointManager *manager)
+	: fManager(manager) {}
+
 size_t
-ConnectionHashDefinition::HashKey(EndpointManager *manager, const KeyType &key)
+ConnectionHashDefinition::HashKey(const KeyType &key) const
 {
-	return ConstSocketAddress(manager->AddressModule(),
+	return ConstSocketAddress(fManager->AddressModule(),
 		key.first).HashPair(key.second);
 }
 
 
 size_t
-ConnectionHashDefinition::Hash(EndpointManager *manager, TCPEndpoint *endpoint)
+ConnectionHashDefinition::Hash(TCPEndpoint *endpoint) const
 {
 	return endpoint->LocalAddress().HashPair(*endpoint->PeerAddress());
 }
 
 
 bool
-ConnectionHashDefinition::Compare(EndpointManager *manager, const KeyType &key,
-	TCPEndpoint *endpoint)
+ConnectionHashDefinition::Compare(const KeyType &key,
+	TCPEndpoint *endpoint) const
 {
 	return endpoint->LocalAddress().EqualTo(key.first, true)
 		&& endpoint->PeerAddress().EqualTo(key.second, true);
@@ -54,45 +57,42 @@ ConnectionHashDefinition::Compare(EndpointManager *manager, const KeyType &key,
 
 
 HashTableLink<TCPEndpoint> *
-ConnectionHashDefinition::GetLink(EndpointManager *manager,
-	TCPEndpoint *endpoint)
+ConnectionHashDefinition::GetLink(TCPEndpoint *endpoint) const
 {
 	return &endpoint->fConnectionHashLink;
 }
 
 
 size_t
-EndpointHashDefinition::HashKey(EndpointManager *manager, uint16 port)
+EndpointHashDefinition::HashKey(uint16 port) const
 {
 	return port;
 }
 
 
 size_t
-EndpointHashDefinition::Hash(EndpointManager *manager, TCPEndpoint *endpoint)
+EndpointHashDefinition::Hash(TCPEndpoint *endpoint) const
 {
 	return endpoint->LocalAddress().GetPort();
 }
 
 
 bool
-EndpointHashDefinition::Compare(EndpointManager *manager, uint16 port,
-	TCPEndpoint *endpoint)
+EndpointHashDefinition::Compare(uint16 port, TCPEndpoint *endpoint) const
 {
 	return endpoint->LocalAddress().GetPort() == port;
 }
 
 
 HashTableLink<TCPEndpoint> *
-EndpointHashDefinition::GetLink(EndpointManager *manager,
-	TCPEndpoint *endpoint)
+EndpointHashDefinition::GetLink(TCPEndpoint *endpoint) const
 {
 	return &endpoint->fEndpointHashLink;
 }
 
 
 EndpointManager::EndpointManager(net_domain *domain)
-	: fDomain(domain), fConnectionHash(this), fEndpointHash(this)
+	: fDomain(domain), fConnectionHash(this)
 {
 	benaphore_init(&fLock, "endpoint manager");
 }
