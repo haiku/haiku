@@ -29,6 +29,7 @@
 #include "debug.h"
 #include "driver_io.h"
 #include <MediaDefs.h>
+#include <errno.h>
 #include <string.h>
 
 float SAMPLE_RATES[] = {
@@ -198,9 +199,10 @@ status_t MultiAudioDevice::InitDriver()
 	CALLED();
 
 	//open the device driver for output
-	fd = open( fDevice_path, O_WRONLY );
+	fd = open(fDevice_path, O_WRONLY);
 
-	if ( fd == 0 ) {
+	if (fd == -1) {
+		fprintf(stderr, "Failed to open %s: %s\n", fDevice_path, strerror(errno));
 		return B_ERROR;
 	}
 	
