@@ -1,30 +1,8 @@
 /*
- * multiaudio replacement media addon for BeOS
- *
- * Copyright (c) 2002, 2003, Jerome Duval (jerome.duval@free.fr)
- *
- * All rights reserved.
- * Redistribution and use in source and binary forms, with or without modification, 
- * are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice, 
- *   this list of conditions and the following disclaimer.
- * - Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation 
- *   and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR 
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES 
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS 
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY 
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * Copyright (c) 2002-2007, Jerome Duval (jerome.duval@free.fr)
+ * Distributed under the terms of the MIT License.
  */
+
 #ifndef _MULTIAUDIODEVICE_H
 #define _MULTIAUDIODEVICE_H
 
@@ -36,47 +14,47 @@
 
 class MultiAudioDevice
 {
-public:
-	explicit MultiAudioDevice(const char *name, const char* path);
-	virtual ~MultiAudioDevice(void);
-	
-	virtual status_t InitCheck(void) const;
+	public:
+		explicit MultiAudioDevice(const char *name, const char* path);
+		virtual ~MultiAudioDevice(void);
 
-	static float convert_multiaudio_rate_to_media_rate(uint32 rate);
-	static uint32 convert_media_rate_to_multiaudio_rate(float rate);
-	static uint32 convert_multiaudio_format_to_media_format(uint32 fmt);
-	static int16 convert_multiaudio_format_to_valid_bits(uint32 fmt);
-	static uint32 convert_media_format_to_multiaudio_format(uint32 fmt);
-	static uint32 select_multiaudio_rate(uint32 rate);
-	static uint32 select_multiaudio_format(uint32 fmt);
-	
-	int DoBufferExchange(multi_buffer_info *MBI);
-	int DoSetMix(multi_mix_value_info *MMVI);
-	int DoGetMix(multi_mix_value_info *MMVI);
+		virtual status_t InitCheck(void) const;
 
-private:
-	status_t			InitDriver();
-	
-	int						fd; 			//file descriptor for hw driver
-	char					fDevice_name[32];
-	char					fDevice_path[32];
+		static float convert_multiaudio_rate_to_media_rate(uint32 rate);
+		static uint32 convert_media_rate_to_multiaudio_rate(float rate);
+		static uint32 convert_multiaudio_format_to_media_format(uint32 fmt);
+		static int16 convert_multiaudio_format_to_valid_bits(uint32 fmt);
+		static uint32 convert_media_format_to_multiaudio_format(uint32 fmt);
+		static uint32 select_multiaudio_rate(uint32 rate);
+		static uint32 select_multiaudio_format(uint32 fmt);
 
-public:
-	multi_description		MD;
-	multi_channel_info		MCI[MAX_CHANNELS];
-	multi_format_info 		MFI;
-	multi_buffer_list 		MBL;
-	
-	multi_mix_control_info 	MMCI;
-	multi_mix_control		MMC[MAX_CONTROLS];
-		
-	buffer_desc		play_buffer_list[NB_BUFFERS * MAX_CHANNELS];
-	buffer_desc		record_buffer_list[NB_BUFFERS * MAX_CHANNELS];
-	buffer_desc 	*play_buffer_desc[NB_BUFFERS];
-	buffer_desc 	*record_buffer_desc[NB_BUFFERS];
+		int DoBufferExchange(multi_buffer_info *MBI);
+		int DoSetMix(multi_mix_value_info *MMVI);
+		int DoGetMix(multi_mix_value_info *MMVI);
 
-private:
-	status_t 				fInitCheckStatus;
+	private:
+		status_t			InitDriver();
+
+		int						fd; 			//file descriptor for hw driver
+		char					fDevice_name[32];
+		char					fDevice_path[32];
+
+	public:
+		multi_description		MD;
+		multi_channel_info		MCI[MAX_CHANNELS];
+		multi_format_info 		MFI;
+		multi_buffer_list 		MBL;
+
+		multi_mix_control_info 	MMCI;
+		multi_mix_control		MMC[MAX_CONTROLS];
+
+		buffer_desc		play_buffer_list[NB_BUFFERS * MAX_CHANNELS];
+		buffer_desc		record_buffer_list[NB_BUFFERS * MAX_CHANNELS];
+		buffer_desc 	*play_buffer_desc[NB_BUFFERS];
+		buffer_desc 	*record_buffer_desc[NB_BUFFERS];
+
+	private:
+		status_t 				fInitCheckStatus;
 };
 
 #endif
