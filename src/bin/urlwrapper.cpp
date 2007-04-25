@@ -26,7 +26,7 @@
 /* compile-time configuration */
 #include "urlwrapper.h"
 
-const char *kAppSig = "application/x-vnd.haiku.urlwrapper";
+const char *kAppSig = APP_SIGNATURE;
 const char *kTrackerSig = "application/x-vnd.Be-TRAK";
 
 #ifdef __HAIKU__
@@ -86,6 +86,7 @@ public:
 status_t	SplitUrl(const char *url, BString &host, BString &port, BString &user, BString &pass, BString &path);
 status_t	UnurlString(BString &s);
 status_t	Warn(const char *url);
+virtual void	RefsReceived(BMessage *msg);
 virtual void	ArgvReceived(int32 argc, char **argv);
 virtual void	ReadyToRun(void);
 private:
@@ -222,6 +223,24 @@ status_t UrlWrapperApp::Warn(const char *url)
 	return B_ERROR;
 }
 
+void UrlWrapperApp::RefsReceived(BMessage *msg)
+{
+	char buff[B_PATH_NAME_LENGTH];
+	int32 index = 0;
+	entry_ref ref;
+	char *args[] = { "urlwrapper", buff, NULL };
+#ifdef HANDLE_BOOKMARK_FILES
+	/* eat everything as bookmark files */
+	while (msg->FindRef("refs", index++, &ref) == B_OK) {
+		BFile f(&ref, B_READ_ONLY);
+		if (f.InitCheck() == B_OK) {
+			if (f.ReadAttr("META:url", B_STRING_TYPE, 0LL, buff, B_PATH_NAME_LENGTH) > 0) {
+				ArgvReceived(2, args);
+			}
+		}
+	}
+#endif
+}
 
 void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 {

@@ -1,10 +1,14 @@
 #include "urlwrapper.h"
 
-resource app_signature "application/x-vnd.haiku.urlwrapper";
-resource app_flags B_MULTIPLE_LAUNCH | B_BACKGROUND_APP | B_ARGV_ONLY;
+resource app_signature APP_SIGNATURE;
+/*resource app_flags B_MULTIPLE_LAUNCH | B_BACKGROUND_APP | B_ARGV_ONLY;*/
+resource app_flags B_MULTIPLE_LAUNCH | B_BACKGROUND_APP;
 
 resource(1, "BEOS:FILE_TYPES") message
 {
+#ifdef HANDLE_BOOKMARK_FILES
+	"types" =  "application/x-vnd.Be-bookmark",
+#endif
 #ifdef HANDLE_FILE
 	"types" = "application/x-vnd.Be.URL.file",
 #endif

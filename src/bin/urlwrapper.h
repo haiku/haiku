@@ -10,9 +10,15 @@
  * urlwrapper: compile-time configuration of supported protocols.
  */
 
+#define APP_SIGNATURE "application/x-vnd.Haiku-urlwrapper"
+
 /* 
  * comment out to disable handling a specific protocol
  */
+
+
+/* NetPositive Bookmark file type */
+#define HANDLE_BOOKMARK_FILES
 
 /* file: redirects to Tracker */
 #define HANDLE_FILE
