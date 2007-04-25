@@ -2037,6 +2037,9 @@ Inode::Sync()
 	// We may also want to flush the attribute's data stream to
 	// disk here... (do we?)
 
+	if (IsSymLink() && (Flags() & INODE_LONG_SYMLINK) == 0)
+		return B_OK;
+
 	data_stream *data = &Node().data;
 	status_t status = B_OK;
 
