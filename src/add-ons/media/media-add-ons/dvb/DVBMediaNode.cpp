@@ -216,15 +216,8 @@ DVBMediaNode::~DVBMediaNode()
 
 	delete fDemux;
 
-printf("deleting video buffer group...\n");
 	delete fBufferGroupRawVideo;
-printf("deleting video buffer group done\n");
-
-printf("deleting audio buffer group...\n");
-	// deleting the audio buffer group does hang on Zeta neo,
-	// but works on Haiku and seems to work on Zeta 1.0 with updated media_server
 	delete fBufferGroupRawAudio;
-printf("deleting audio buffer group done\n");
 
 	delete fStateList;
 	delete fRegionList;
@@ -896,15 +889,16 @@ DVBMediaNode::InitDefaultFormats()
 	fDefaultFormatRawAudio.type = B_MEDIA_RAW_AUDIO;
 	fDefaultFormatRawAudio.u.raw_audio.frame_rate = 48000;
 	fDefaultFormatRawAudio.u.raw_audio.channel_count = 2;
-	fDefaultFormatRawAudio.u.raw_audio.format = 0; // wildcard
-//	fDefaultFormatRawAudio.u.raw_audio.format = media_raw_audio_format::B_AUDIO_SHORT;
+//  XXX broken in Haiku...
+//	fDefaultFormatRawAudio.u.raw_audio.format = 0; // wildcard
+	fDefaultFormatRawAudio.u.raw_audio.format = media_raw_audio_format::B_AUDIO_SHORT;
 //  when set to 0, haiku mixer has problems when diung a format change
 //  set to short and debug the buffer_size problem first!
 	fDefaultFormatRawAudio.u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
-	fDefaultFormatRawAudio.u.raw_audio.buffer_size = 0; // wildcard
+//	fDefaultFormatRawAudio.u.raw_audio.buffer_size = 0; // wildcard
 //	fDefaultFormatRawAudio.u.raw_audio.buffer_size = 0x1200;
 //	fDefaultFormatRawAudio.u.raw_audio.buffer_size = 0x1000;
-//	fDefaultFormatRawAudio.u.raw_audio.buffer_size = 32768;
+	fDefaultFormatRawAudio.u.raw_audio.buffer_size = 32768;
 //	fDefaultFormatRawAudio.u.raw_audio.buffer_size = 333 * 8;
 //	fDefaultFormatRawAudio.u.raw_audio.buffer_size = 512;
 //  when set to anything different from 32768 haiku mixer has problems
