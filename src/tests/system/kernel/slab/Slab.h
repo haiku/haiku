@@ -312,24 +312,21 @@ Fls(size_t value)
 }
 
 
-template<typename Backend>
-struct HashCacheStrategy : BaseCacheStrategy<Backend> {
-	typedef typename BaseCacheStrategy<Backend>::Slab Slab;
-	typedef HashCacheStrategy<Backend> Strategy;
+struct BaseHashCacheStrategy {
 	typedef BaseCache::ObjectLink ObjectLink;
 	typedef BaseCache::ObjectInfo ObjectInfo;
 
 	struct Link : ObjectLink, HashTableLink<Link> {
-		Slab *slab;
+		BaseCache::Slab *slab;
 		void *buffer;
 	};
 
 	struct HashTableDefinition {
-		typedef Strategy	ParentType;
-		typedef void *		KeyType;
-		typedef Link		ValueType;
+		typedef BaseHashCacheStrategy	ParentType;
+		typedef void *					KeyType;
+		typedef Link					ValueType;
 
-		HashTableDefinition(Strategy *_parent) : parent(_parent) {}
+		HashTableDefinition(BaseHashCacheStrategy *_parent) : parent(_parent) {}
 
 		size_t HashKey(void *key) const
 		{
@@ -345,7 +342,7 @@ struct HashCacheStrategy : BaseCacheStrategy<Backend> {
 
 		HashTableLink<Link> *GetLink(Link *value) const { return value; }
 
-		Strategy *parent;
+		BaseHashCacheStrategy *parent;
 	};
 
 	// for g++ 2.95
@@ -353,15 +350,8 @@ struct HashCacheStrategy : BaseCacheStrategy<Backend> {
 
 	typedef OpenHashTable<HashTableDefinition> HashTable;
 
-	HashCacheStrategy(BaseCache *parent)
-		: BaseCacheStrategy<Backend>(parent), fHashTable(this),
-			fSlabCache("slab cache", 0), fLinkCache("link cache", 0),
-			fLowerBoundary(Fls(parent->ObjectSize()) - 1) {}
-
-	static size_t RequiredSpace(size_t objectSize)
-	{
-		return objectSize;
-	}
+	BaseHashCacheStrategy(BaseCache *parent)
+		: fHashTable(this), fLowerBoundary(Fls(parent->ObjectSize()) - 1) {}
 
 	void *Object(ObjectLink *link) const
 	{
@@ -372,6 +362,36 @@ struct HashCacheStrategy : BaseCacheStrategy<Backend> {
 	{
 		Link *link = _Linkage(object);
 		return ObjectInfo(link->slab, link);
+	}
+
+protected:
+	Link *_Linkage(void *object) const
+	{
+		return fHashTable.Lookup(object);
+	}
+
+	static ObjectLink *_Linkage(void *_this, void *object)
+	{
+		return ((BaseHashCacheStrategy *)_this)->_Linkage(object);
+	}
+
+	HashTable fHashTable;
+	const size_t fLowerBoundary;
+};
+
+
+template<typename Backend>
+struct HashCacheStrategy : BaseCacheStrategy<Backend>, BaseHashCacheStrategy {
+	typedef typename BaseCacheStrategy<Backend>::Slab Slab;
+	typedef HashCacheStrategy<Backend> Strategy;
+
+	HashCacheStrategy(BaseCache *parent)
+		: BaseCacheStrategy<Backend>(parent), BaseHashCacheStrategy(parent),
+			fSlabCache("slab cache", 0), fLinkCache("link cache", 0) {}
+
+	static size_t RequiredSpace(size_t objectSize)
+	{
+		return objectSize;
 	}
 
 	BaseCache::Slab *NewSlab(uint32_t flags)
@@ -389,31 +409,21 @@ struct HashCacheStrategy : BaseCacheStrategy<Backend> {
 			return NULL;
 		}
 
-		uint8_t *data = (uint8_t *)pages;
-		for (uint8_t *it = data;
-				it < (data + byteCount); it += fParent->ObjectSize()) {
-			Link *link = fLinkCache.Alloc(flags);
-			link->slab = slab;
-			link->buffer = it;
-			fHashTable.Insert(link);
+		if (_PrepareSlab(fParent, slab, pages, byteCount, flags) < B_OK) {
+			Backend::FreePages(fParent, slab->id);
+			fSlabCache.Free(slab);
+			return NULL;
 		}
 
+		// it's very important that we cast this to BaseHashCacheStrategy
+		// so we get the proper instance offset through void *
 		return BaseCacheStrategy<Backend>::_ConstructSlab(slab, pages, 0,
-			_Linkage, this);
+			_Linkage, (BaseHashCacheStrategy *)this);
 	}
 
 	void ReturnSlab(BaseCache::Slab *slab)
 	{
-		uint8_t *data = (uint8_t *)slab->pages;
-		size_t byteCount = _SlabSize();
-
-		for (uint8_t *it = data;
-				it < (data + byteCount); it += fParent->ObjectSize()) {
-			Link *link = fHashTable.Lookup(it);
-			fHashTable.Remove(link);
-			fLinkCache.Free(link);
-		}
-
+		_ClearSlab(fParent, slab->pages, _SlabSize());
 		BaseCacheStrategy<Backend>::_DestructSlab(slab);
 		fSlabCache.Free((Slab *)slab);
 	}
@@ -424,20 +434,44 @@ private:
 		return BaseCacheStrategy<Backend>::SlabSize(0);
 	}
 
-	Link *_Linkage(void *object) const
+	status_t _PrepareSlab(BaseCache *parent, Slab *slab, void *pages,
+		size_t byteCount, uint32_t flags)
 	{
-		return fHashTable.Lookup(object);
+		uint8_t *data = (uint8_t *)pages;
+		for (uint8_t *it = data;
+				it < (data + byteCount); it += parent->ObjectSize()) {
+			Link *link = fLinkCache.Alloc(flags);
+
+			if (link == NULL) {
+				_ClearSlabRange(parent, data, it);
+				return B_NO_MEMORY;
+			}
+
+			link->slab = slab;
+			link->buffer = it;
+			fHashTable.Insert(link);
+		}
+
+		return B_OK;
 	}
 
-	static ObjectLink *_Linkage(void *_this, void *object)
+	void _ClearSlab(BaseCache *parent, void *pages, size_t byteCount)
 	{
-		return ((Strategy *)_this)->_Linkage(object);
+		_ClearSlabRange(parent, (uint8_t *)pages,
+			((uint8_t *)pages) + byteCount);
 	}
 
-	HashTable fHashTable;
+	void _ClearSlabRange(BaseCache *parent, uint8_t *data, uint8_t *end)
+	{
+		for (uint8_t *it = data; it < end; it += parent->ObjectSize()) {
+			Link *link = fHashTable.Lookup(it);
+			fHashTable.Remove(link);
+			fLinkCache.Free(link);
+		}
+	}
+
 	TypedCache<Slab, Backend> fSlabCache;
 	TypedCache<Link, Backend> fLinkCache;
-	const size_t fLowerBoundary;
 };
 
 
