@@ -707,7 +707,7 @@ TCPEndpoint::SetReceiveBufferSize(size_t length)
 bool
 TCPEndpoint::IsBound() const
 {
-	return !AddressModule()->is_empty_address((sockaddr *)&socket->address, true);
+	return !AddressModule()->is_empty_address(LocalAddress(), true);
 }
 
 
@@ -814,7 +814,7 @@ TCPEndpoint::Spawn(TCPEndpoint *parent, tcp_segment_header &segment,
 	TRACE("Spawn()");
 
 	// TODO: proper error handling!
-	if (_PrepareSendPath((sockaddr *)&socket->peer) < B_OK)
+	if (_PrepareSendPath(PeerAddress()) < B_OK)
 		return DROP;
 
 	fOptions = parent->fOptions;
@@ -1158,8 +1158,8 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 			return status;
 		}
 
-		AddressModule()->set_to((sockaddr *)&buffer->source, (sockaddr *)&socket->address);
-		AddressModule()->set_to((sockaddr *)&buffer->destination, (sockaddr *)&socket->peer);
+		AddressModule()->set_to((sockaddr *)&buffer->source, LocalAddress());
+		AddressModule()->set_to((sockaddr *)&buffer->destination, PeerAddress());
 
 		uint32 size = buffer->size;
 		segment.sequence = fSendNext;
@@ -1616,8 +1616,8 @@ TCPEndpoint::_PrepareSendPath(const sockaddr *peer)
 	}
 
 	// make sure connection does not already exist
-	status_t status = fManager->SetConnection(this,
-		(sockaddr *)&socket->address, peer, fRoute->interface->address);
+	status_t status = fManager->SetConnection(this, LocalAddress(), peer,
+		fRoute->interface->address);
 	if (status < B_OK)
 		return status;
 

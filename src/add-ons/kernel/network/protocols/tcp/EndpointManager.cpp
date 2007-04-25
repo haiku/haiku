@@ -384,7 +384,7 @@ EndpointManager::Unbind(TCPEndpoint *endpoint)
 	endpoint->fEndpointNextWithSamePort = NULL;
 	fConnectionHash.Remove(endpoint);
 
-	endpoint->socket->address.ss_len = 0;
+	endpoint->LocalAddress()->sa_len = 0;
 
 	return B_OK;
 }
