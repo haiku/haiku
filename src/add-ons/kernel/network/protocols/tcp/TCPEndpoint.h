@@ -18,6 +18,7 @@
 #include <net_stack.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
+#include <util/OpenHashTable.h>
 
 #include <stddef.h>
 
@@ -134,8 +135,12 @@ class TCPEndpoint : public net_protocol {
 
 		EndpointManager *fManager;
 
-		TCPEndpoint		*fConnectionHashNext;
-		TCPEndpoint		*fEndpointHashNext;
+		HashTableLink<TCPEndpoint> fConnectionHashLink;
+		HashTableLink<TCPEndpoint> fEndpointHashLink;
+
+		friend class ConnectionHashDefinition;
+		friend class EndpointHashDefinition;
+
 		TCPEndpoint		*fEndpointNextWithSamePort;
 
 		recursive_lock	fLock;

@@ -74,7 +74,7 @@
 #endif
 
 // Initial estimate for packet round trip time (RTT)
-#define TCP_INITIAL_RTT		4000000
+#define TCP_INITIAL_RTT		2000000
 
 // constants for the fFlags field
 enum {

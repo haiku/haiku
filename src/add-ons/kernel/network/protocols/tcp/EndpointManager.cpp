@@ -53,6 +53,14 @@ ConnectionHashDefinition::Compare(EndpointManager *manager, const KeyType &key,
 }
 
 
+HashTableLink<TCPEndpoint> *
+ConnectionHashDefinition::GetLink(EndpointManager *manager,
+	TCPEndpoint *endpoint)
+{
+	return &endpoint->fConnectionHashLink;
+}
+
+
 size_t
 EndpointHashDefinition::HashKey(EndpointManager *manager, uint16 port)
 {
@@ -72,6 +80,14 @@ EndpointHashDefinition::Compare(EndpointManager *manager, uint16 port,
 	TCPEndpoint *endpoint)
 {
 	return endpoint->LocalAddress().GetPort() == port;
+}
+
+
+HashTableLink<TCPEndpoint> *
+EndpointHashDefinition::GetLink(EndpointManager *manager,
+	TCPEndpoint *endpoint)
+{
+	return &endpoint->fEndpointHashLink;
 }
 
 
@@ -141,9 +157,7 @@ EndpointManager::SetConnection(TCPEndpoint *endpoint,
 	endpoint->LocalAddress().SetTo(*local);
 	endpoint->PeerAddress().SetTo(peer);
 
-	if (!fConnectionHash.Insert(endpoint))
-		return B_NO_MEMORY;
-
+	fConnectionHash.Insert(endpoint);
 	return B_OK;
 }
 
@@ -170,9 +184,7 @@ EndpointManager::SetPassive(TCPEndpoint *endpoint)
 		return EADDRINUSE;
 
 	endpoint->PeerAddress().SetTo(*passive);
-	if (!fConnectionHash.Insert(endpoint))
-		return B_NO_MEMORY;
-
+	fConnectionHash.Insert(endpoint);
 	return B_OK;
 }
 

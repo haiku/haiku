@@ -33,6 +33,8 @@ struct ConnectionHashDefinition {
 	static size_t Hash(EndpointManager *manager, TCPEndpoint *endpoint);
 	static bool Compare(EndpointManager *manager, const KeyType &key,
 		TCPEndpoint *endpoint);
+	static HashTableLink<TCPEndpoint> *GetLink(EndpointManager *manager,
+		TCPEndpoint *endpoint);
 };
 
 
@@ -44,6 +46,8 @@ struct EndpointHashDefinition {
 	static size_t HashKey(EndpointManager *manager, uint16 port);
 	static size_t Hash(EndpointManager *manager, TCPEndpoint *endpoint);
 	static bool Compare(EndpointManager *manager, uint16 port,
+		TCPEndpoint *endpoint);
+	static HashTableLink<TCPEndpoint> *GetLink(EndpointManager *manager,
 		TCPEndpoint *endpoint);
 };
 
@@ -81,8 +85,8 @@ class EndpointManager : public DoublyLinkedListLinkImpl<EndpointManager> {
 
 		net_domain *fDomain;
 
-		OpenHashTable<ConnectionHashDefinition> fConnectionHash;
-		OpenHashTable<EndpointHashDefinition> fEndpointHash;
+		OpenHashTable<ConnectionHashDefinition, true, true> fConnectionHash;
+		OpenHashTable<EndpointHashDefinition, true, true> fEndpointHash;
 		benaphore fLock;
 };
 
