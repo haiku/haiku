@@ -27,14 +27,15 @@
  * THE SOFTWARE.
  *
  */
-
 #ifndef TERMPARSE_H
 #define TERMPARSE_H
+
+
+#include "TermConst.h"
 
 #include <OS.h>
 #include <MessageRunner.h>
 
-#include "TermConst.h"
 
 class TermView;
 class CodeConv;

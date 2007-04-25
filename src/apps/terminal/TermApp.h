@@ -1,4 +1,5 @@
 /*
+ * Copyright 2001-2007, Haiku.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
  *
@@ -27,12 +28,13 @@
  * THE SOFTWARE.
  *
  */
+#ifndef TERM_APP_H
+#define TERM_APP_H
 
-#ifndef TERMAPP_H
-#define TERMAPP_H
 
-#include <app/Application.h>
+#include <Application.h>
 #include <String.h>
+
 
 extern int gPfd;
 extern char *ptyname;
@@ -42,51 +44,41 @@ class TermParse;
 class BRect;
 class AboutDlg;
 
-class TermApp : public BApplication
-{
-public:
-               TermApp();
-               ~TermApp();
+class TermApp : public BApplication {
+	public:
+		TermApp();
+		virtual ~TermApp();
 
-private:
-  /*
-   * Hook functions
-   */
-  void          ReadyToRun();
-  void          Quit();
-  void			AboutRequested();
-  void          MessageReceived(BMessage* msg);
-  void          RefsReceived(BMessage *message);
-  void          ArgvReceived(int32 argc, char **argv);
+	protected:
+		void ReadyToRun();
+		void Quit();
+		void AboutRequested();
+		void MessageReceived(BMessage* message);
+		void RefsReceived(BMessage* message);
+		void ArgvReceived(int32 argc, char** argv);
 
-  /*
-   * Public Member functions.
-   */
-  status_t      MakeTermWindow (BRect &frame);
-  void          SwitchTerm(void);
-  void          ActivateTermWindow(team_id id);
+	private:
+		status_t _MakeTermWindow(BRect& frame);
+		void _SwitchTerm();
+		void _ActivateTermWindow(team_id id);
+		bool _IsMinimized(team_id id);
+		void _UpdateRegistration(bool set);
+		void _UnregisterTerminal();
+		void _RegisterTerminal();
 
-  void          Usage(char *name);
-  
-private:
-  bool          IsMinimize (team_id);
-  int32			FindTerminalId();
+		void _Usage(char *name);
 
-  int		fRows, fCols, fXpos, fYpos;
-  bool		fStartFullscreen;
-  BString	fWindowTitle;
-  int		fWindowNumber;
-  rgb_color	fFg, fBg, fCurFg, fCurBg, fSelFg, fSelbg;
-  rgb_color	fImfg, fImbg, fImSel;
-  
-  TermWindow    *fTermWindow;
-  TermParse     *fTermParse;
-  BRect         fTermFrame;
-  AboutDlg	*fAboutPanel;
-
-  BString	CommandLine;
-  
+		port_id		fRegistrationPort;
+		int32		fRows, fCols, fXpos, fYpos;
+		bool		fStartFullscreen;
+		BString		fWindowTitle;
+		int32		fWindowNumber;
+		rgb_color	fFg, fBg, fCurFg, fCurBg, fSelFg, fSelbg;
+		rgb_color	fImfg, fImbg, fImSel;
+		TermWindow*	fTermWindow;
+		TermParse*	fTermParse;
+		BRect		fTermFrame;
+		BString		CommandLine;
 };
 
-#endif
-
+#endif	// TERM_APP_H

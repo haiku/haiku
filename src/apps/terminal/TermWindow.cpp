@@ -228,9 +228,9 @@ TermWindow::SetupMenu(void)
 	fFilemenu->AddSeparatorItem();
 	fFilemenu->AddItem(new BMenuItem("About Terminal...", new BMessage(B_ABOUT_REQUESTED)));
 	fFilemenu->AddSeparatorItem();
-	fFilemenu->AddItem(new BMenuItem("Quit", new BMessage(MENU_FILE_QUIT), 'Q'));
+	fFilemenu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q'));
 	fMenubar->AddItem(fFilemenu);
-	
+
 	// Make Edit Menu.
 	fEditmenu = new BMenu ("Edit");
 	fEditmenu->AddItem (new BMenuItem ("Copy", new BMessage (B_COPY),'C'));
@@ -246,10 +246,9 @@ TermWindow::SetupMenu(void)
 	fFindForwardMenuItem = new BMenuItem ("Find Forward", new BMessage (MENU_FIND_FORWARD), ']');
 	fEditmenu->AddItem (fFindForwardMenuItem);
 	fFindForwardMenuItem->SetEnabled(false);
-	
 
 	fMenubar->AddItem (fEditmenu);
-  
+
 	// Make Help Menu.
 	fHelpmenu = new BMenu("Settings");
 	fWindowSizeMenu = new BMenu("Window Size");
@@ -259,7 +258,7 @@ TermWindow::SetupMenu(void)
 	fWindowSizeMenu->AddItem(new BMenuItem("132x24", new BMessage(ONETHREETWOTWENTYFOUR))); 
 	fWindowSizeMenu->AddItem(new BMenuItem("132x25", new BMessage(ONETHREETWOTWENTYFIVE))); 
 	fWindowSizeMenu->AddItem(new BMenuItem("Fullscreen", new BMessage(FULLSCREEN), B_ENTER)); 
- 	
+
  	// Considering we have this in the preferences window, this menu is not
  	// needed and should not be shown if we are to not confuse the user
 /*  fNewFontMenu = new BMenu("Font");
@@ -369,8 +368,8 @@ TermWindow::MessageReceived(BMessage *message)
 				fFindForwardMenuItem->SetEnabled(false);
 				break;
 			}
-			
-			//Enable the menu items Find Forward and Find Backward
+
+			// Enable the menu items Find Forward and Find Backward
 			fFindBackwardMenuItem->SetEnabled(true);
 			fFindForwardMenuItem->SetEnabled(true);
 			break;
@@ -393,14 +392,10 @@ TermWindow::MessageReceived(BMessage *message)
 			}
 			break;
 		}
-		case MSG_FIND_CLOSED: {
+		case MSG_FIND_CLOSED:
 			fFindPanel = NULL;
 			break;
-		}
-		case MENU_FILE_QUIT: {
-			be_app->PostMessage(B_QUIT_REQUESTED);
-			break;
-		}
+
 		case MENU_ENCODING: {
 			message->FindInt32 ("op", &coding_id);
 			gNowCoding = coding_id;
@@ -600,35 +595,16 @@ TermWindow::WindowActivated (bool )
 
 }
 
-////////////////////////////////////////////////////////////////////////////
-// Quit (void)
-//  Quit Application.
-////////////////////////////////////////////////////////////////////////////
-//void 
-//TermWindow::colRequested() {
-//	colWindow *colW=new colWindow("Colours for Terminal");
-//	colW->Show();
-//	}
-
-
-void
-TermWindow::Quit()
-{
-	BWindow::Quit();
-}
-
 
 bool
-TermWindow::QuitRequested(void)
+TermWindow::QuitRequested()
 {
-	return BWindow::QuitRequested();
+	be_app->PostMessage(B_QUIT_REQUESTED);
+	return true;
 }
 
 
-////////////////////////////////////////////////////////////////////////////
-// int GetTimeZone (void)
-//  Get Machine Timezone.
-////////////////////////////////////////////////////////////////////////////
+//!	Get Machine Timezone.
 int
 TermWindow::GetTimeZone()
 {

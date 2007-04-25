@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2005, Haiku, Inc.
+ * Copyright 2001-2007, Haiku, Inc.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
  * Distributed under the terms of the MIT license.
@@ -48,10 +48,9 @@ int gNowCoding = M_UTF8;
 #define DEFAULT -1
 #define NPARAM 10		// Max parameters
 
-/*
- *  Constructor and Destructor.
- */
-TermParse::TermParse(int fd, TermWindow *inWinObj, TermView *inViewObj, CodeConv *inConvObj)
+
+TermParse::TermParse(int fd, TermWindow *inWinObj, TermView *inViewObj,
+		CodeConv *inConvObj)
 	:
 	fFd(fd),
 	fViewObj(inViewObj),
@@ -77,6 +76,9 @@ TermParse::~TermParse()
 	delete_sem(fReaderSem);
 	delete_sem(fReaderLocker);
 
+	//suspend_thread(fReaderThread);
+		// TODO: interrupt read() - doesn't work for whatever reason
+
 	status_t dummy;
 	wait_for_thread(fReaderThread, &dummy);	
 	wait_for_thread(fParseThread, &dummy);
@@ -101,10 +103,7 @@ TermParse::StartThreads()
 }
 
 
-/////////////////////////////////////////////////////////////////////////////
-// PtyReader ... Get character from pty device.
-//
-/////////////////////////////////////////////////////////////////////////////
+//! Get data from pty device.
 int32
 TermParse::PtyReader()
 {
@@ -120,18 +119,20 @@ TermParse::PtyReader()
 			if (status < B_OK)
 				return status;		
 		}
-    
+
 		// Read PTY
 		uchar buf[READ_BUF_SIZE];
 		int nread = read(fFd, buf, READ_BUF_SIZE - (read_p - fParser_p));
-    		if (nread <= 0) {
-      			be_app->PostMessage(B_QUIT_REQUESTED);
-      			exit_thread(B_ERROR);
-      		}
-    		int left = READ_BUF_SIZE - (read_p % READ_BUF_SIZE);
-    		int mod = read_p % READ_BUF_SIZE;
-    		// Copy read string to PtyBuffer.
-     
+		if (nread <= 0) {
+			be_app->PostMessage(B_QUIT_REQUESTED);
+			exit_thread(B_ERROR);
+		}
+
+		// Copy read string to PtyBuffer.
+
+		int left = READ_BUF_SIZE - (read_p % READ_BUF_SIZE);
+		int mod = read_p % READ_BUF_SIZE;
+
 		if (nread >= left) {
 			memcpy(fReadBuf + mod, buf, left);
 			memcpy(fReadBuf, buf + left, nread - left);
@@ -139,21 +140,17 @@ TermParse::PtyReader()
 			memcpy(fReadBuf + mod, buf, nread);
 
 		read_p += nread;
-    
+
 		// Release semaphore. Number of semaphore counter is nread.
-    		release_sem_etc(fReaderSem, nread, 0);
+		release_sem_etc(fReaderSem, nread, 0);
 	}
 
 	fReaderThread = -1;
-	exit_thread(B_OK);
 	return B_OK;
 }
 
 
-///////////////////////////////////////////////////////////////////////////
-// GetReaderBuf ... Get char pty reader buffer.
-//
-///////////////////////////////////////////////////////////////////////////
+//! Get char from pty reader buffer.
 status_t
 TermParse::GetReaderBuf(uchar &c)
 {
@@ -163,15 +160,15 @@ TermParse::GetReaderBuf(uchar &c)
 	} while (status == B_INTERRUPTED);
 
 	if (status == B_TIMED_OUT) {
-      		fViewObj->ScrollAtCursor();
-      		fViewObj->UpdateLine();
+		fViewObj->ScrollAtCursor();
+		fViewObj->UpdateLine();
 
 		// Reset cursor blinking time and turn on cursor blinking.
-      		fCursorUpdate->SetInterval (1000000);
-      		fViewObj->SetCurDraw (CURON);
+		fCursorUpdate->SetInterval (1000000);
+		fViewObj->SetCurDraw (CURON);
 
-      		// wait new input from pty.
-      		do {
+		// wait new input from pty.
+		do {
 			status = acquire_sem(fReaderSem);
 		} while (status == B_INTERRUPTED);
 		if (status < B_OK)
@@ -185,39 +182,34 @@ TermParse::GetReaderBuf(uchar &c)
 	fParser_p++;
   	// If PtyReader thread locked, decrement counter and unlock thread.
 	if (fLockFlag != 0) {
-    		if (--fLockFlag == 0)
-      			release_sem(fReaderLocker);
-    	}
-	
+		if (--fLockFlag == 0)
+			release_sem(fReaderLocker);
+	}
+
 	fViewObj->SetCurDraw(CUROFF);
-  
 	return B_OK;
 }
 
 
-///////////////////////////////////////////////////////////////////////////
-// InitTermParse ... Initialize and spawn EscParse thread.
-//
-///////////////////////////////////////////////////////////////////////////
+//! Initialize and spawn EscParse thread.
 status_t
 TermParse::InitTermParse()
 {
 	if (fParseThread >= 0)
 		return B_ERROR; // we might want to return B_OK instead ?
 
+	BMessage cursor(MSGRUN_CURSOR);
 	fCursorUpdate = new BMessageRunner(BMessenger(fViewObj),
-				new BMessage(MSGRUN_CURSOR), 1000000);
-	  
-	fParseThread = spawn_thread(_escparse_thread, "EscParse", B_DISPLAY_PRIORITY, this);
-	  
+		&cursor, 1000000);
+
+	fParseThread = spawn_thread(_escparse_thread, "EscParse",
+		B_DISPLAY_PRIORITY, this);
+
 	return resume_thread(fParseThread);
 }
 
 
-///////////////////////////////////////////////////////////////////////////
-// InitPtyReader ... Initialize and spawn PtyReader thread.
-//
-///////////////////////////////////////////////////////////////////////////
+//! Initialize and spawn PtyReader thread.
 thread_id
 TermParse::InitPtyReader()
 {
@@ -234,13 +226,14 @@ TermParse::InitPtyReader()
 		return fReaderLocker;	
 	}
 
-	fReaderThread = spawn_thread(_ptyreader_thread, "PtyReader", B_NORMAL_PRIORITY, this);
+	fReaderThread = spawn_thread(_ptyreader_thread, "PtyReader",
+		B_NORMAL_PRIORITY, this);
   	if (fReaderThread < 0) {
 		delete_sem(fReaderSem);
 		delete_sem(fReaderLocker);
 		return fReaderThread;	
 	}	
-  
+
 	return resume_thread(fReaderThread);
 }
 
@@ -869,16 +862,14 @@ TermParse::EscParse()
 }
 
 
-/* static */
-int32
+/*static*/ int32
 TermParse::_ptyreader_thread(void *data)
 {
 	return reinterpret_cast<TermParse *>(data)->PtyReader();
 }
 
 
-/* static */
-int32
+/*static*/ int32
 TermParse::_escparse_thread(void *data)
 {
 	return reinterpret_cast<TermParse *>(data)->EscParse();

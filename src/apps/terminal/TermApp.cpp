@@ -1,38 +1,42 @@
 /*
+ * Copyright 2001-2007, Haiku.
  * Copyright (c) 2003-2004 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
  *
  * Distributed unter the terms of the MIT license.
  */
-#include <stdio.h>
-#include <signal.h>
-#include <sys/wait.h>
-#include <stdlib.h>
-#include <malloc.h>
 
-#include <storage/Path.h>
-#include <NodeInfo.h>
-#include <Roster.h>
+
+#include "TermApp.h"
+
+#include "CodeConv.h"
+#include "PrefHandler.h"
+#include "spawn.h"
+#include "TermBuffer.h"
+#include "TermWindow.h"
+#include "TermConst.h"
+
 #include <Alert.h>
+#include <NodeInfo.h>
+#include <Path.h>
+#include <Roster.h>
 #include <Screen.h>
 #include <String.h>
 #include <TextView.h>
 
-#include "TermApp.h"
-#include "TermBuffer.h"
-#include "TermWindow.h"
-#include "TermConst.h"
-#include "spawn.h"
-#include "PrefHandler.h"
-#include "CodeConv.h"
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/wait.h>
+
 
 // Preference temporary
 extern PrefHandler *gTermPref;
 extern char gWindowName[];
 
-bool usage_requested = false;
-bool geometry_requested = false;
-bool color_requested = false;
+bool gUsageRequested = false;
+bool gGeometryRequested = false;
+bool gColorRequested = false;
 
 struct standard_args {
 	char *name;
@@ -71,23 +75,22 @@ const ulong MSG_TERM_IS_MINIMIZE = 'mtim';
 
 
 TermApp::TermApp()
-	: BApplication(TERM_SIGNATURE)
+	: BApplication(TERM_SIGNATURE),
+	fStartFullscreen(false),
+	fWindowNumber(-1),
+	fTermWindow(NULL)
 {
-	fWindowNumber = FindTerminalId();
+	fWindowTitle = "Terminal";
+	_RegisterTerminal();
 
-	char title[256];
-	snprintf(title, sizeof(title), "Terminal %d", fWindowNumber);
-	fWindowTitle = title;
-	fStartFullscreen = false;
+	if (fWindowNumber > 0)
+		fWindowTitle << " " << fWindowNumber;
 
 	int i = fWindowNumber / 16;
 	int j = fWindowNumber % 16;
+	int k = (j * 16) + (i * 64) + 50;
+	int l = (j * 16)  + 50;
 
-	int k =(j * 16) + (i * 64) + 50;
-	int l =(j * 16)  + 50;
-
-	fTermWindow = NULL;
-	fAboutPanel = NULL;
 	fTermFrame.Set(k, l, k + 50, k + 50);
 
 	gTermPref = new PrefHandler();
@@ -96,7 +99,6 @@ TermApp::TermApp()
 
 TermApp::~TermApp()
 {
-	// delete gTermPref;
 }
 
 
@@ -104,10 +106,10 @@ void
 TermApp::ReadyToRun()
 {
 	// Prevent opeing window when option -h is given.
-	if (usage_requested)
+	if (gUsageRequested)
 		return;
-	
-	status_t status = MakeTermWindow(fTermFrame);
+
+	status_t status = _MakeTermWindow(fTermFrame);
 
 	// failed spawn, print stdout and open alert panel
 	if (status < B_OK) {
@@ -118,7 +120,6 @@ TermApp::ReadyToRun()
 		return;
 	}
 
-	
 	// using BScreen::Frame isn't enough
 	if (fStartFullscreen)
 		BMessenger(fTermWindow).SendMessage(FULLSCREEN);
@@ -128,11 +129,13 @@ TermApp::ReadyToRun()
 void
 TermApp::Quit()
 {
-	if (!usage_requested){
+	if (!gUsageRequested){
 		int status;
 
 		kill(-sh_pid, SIGHUP);
 		wait(&status);
+
+		_UnregisterTerminal();
 	}
 
 	delete gTermPref;
@@ -166,7 +169,7 @@ TermApp::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
 		case MENU_SWITCH_TERM:
-			SwitchTerm();
+			_SwitchTerm();
 			break;
 
 		case MSG_ACTIVATE_TERM:
@@ -204,8 +207,8 @@ TermApp::ArgvReceived(int32 argc, char **argv)
 
 	// Print usage
 	if (argmatch(argv, argc, "-help", "--help", 3, NULL, &skip_args)) {
-		Usage(argv[0]);
-		usage_requested = true;
+		_Usage(argv[0]);
+		gUsageRequested = true;
 		PostMessage(B_QUIT_REQUESTED);
 	}
 
@@ -230,14 +233,14 @@ TermApp::ArgvReceived(int32 argc, char **argv)
 			|| width >= 256 || height >= 256 || xpos >= 2048 || ypos >= 2048) {
 			fprintf(stderr, "%s: invalid geometry format or value.\n", argv[0]);
 			fprintf(stderr, "Try `%s --help' for more information.\n", argv[0]);
-			usage_requested = true;
+			gUsageRequested = true;
 			PostMessage(B_QUIT_REQUESTED);
 		}
 		gTermPref->setInt32(PREF_COLS, width);
 		gTermPref->setInt32(PREF_ROWS, height);
 
 		fTermFrame.Set(xpos, ypos, xpos + 50, ypos + 50);
-		geometry_requested = true;
+		gGeometryRequested = true;
     }
 
 #if 0
@@ -248,7 +251,7 @@ TermApp::ArgvReceived(int32 argc, char **argv)
 	status_t status = inFile.SetTo("/etc/rgb.txt", B_READ_ONLY);
 	if (status != B_OK) {
 		fprintf(stderr, "%s: Can't open /etc/rgb.txt file.\n", argv[0]);
-		usage_requested = true;
+		gUsageRequested = true;
 		PostMessage(B_QUIT_REQUESTED);
 	}
 
@@ -278,7 +281,7 @@ TermApp::ArgvReceived(int32 argc, char **argv)
 		if (*argv[skip_args] == '-') {
 			fprintf(stderr, "%s: invalid option `%s'\n", argv[0], argv[skip_args]);
 			fprintf(stderr, "Try `%s --help' for more information.\n", argv[0]);
-			usage_requested = true;
+			gUsageRequested = true;
 			PostMessage(B_QUIT_REQUESTED);
 		}
 
@@ -290,25 +293,9 @@ TermApp::ArgvReceived(int32 argc, char **argv)
 	}
 }
 
-//void
-//TermApp::AboutRequested(void)
-//{
-//  if(fAboutPanel) {
-  //  fAboutPanel->Activate();
- // }
- // else {
- //   BRect rect(0, 0, 350 - 1, 170 - 1);
- //   rect.OffsetTo(fTermWindow->Frame().LeftTop());
- //   rect.OffsetBy(100, 100);
-  
-  //  fAboutPanel = new AboutDlg(rect, this);
- //   fAboutPanel->Show();
- // }
-  
-//}
 
 void
-TermApp::RefsReceived(BMessage *message) 
+TermApp::RefsReceived(BMessage* message) 
 { 
 	// Works Only Launced by Double-Click file, or Drags file to App.
 	if (!IsLaunching())
@@ -345,7 +332,7 @@ TermApp::RefsReceived(BMessage *message)
 
 
 status_t
-TermApp::MakeTermWindow(BRect &frame)
+TermApp::_MakeTermWindow(BRect &frame)
 {
 	const char *encoding = gTermPref->getString(PREF_TEXT_ENCODING);
 	
@@ -385,10 +372,9 @@ TermApp::MakeTermWindow(BRect &frame)
 
 
 void
-TermApp::ActivateTermWindow(team_id id)
+TermApp::_ActivateTermWindow(team_id id)
 {
 	BMessenger app(TERM_SIGNATURE, id);
-	
 	if (app.IsTargetLocal())
 		fTermWindow->Activate();
 	else
@@ -397,7 +383,7 @@ TermApp::ActivateTermWindow(team_id id)
 
 
 void
-TermApp::SwitchTerm()
+TermApp::_SwitchTerm()
 {
 	team_id myId = be_app->Team(); // My id
 	BList teams;
@@ -418,73 +404,98 @@ TermApp::SwitchTerm()
 	do {
 		if (--i < 0)
 			i = numTerms - 1;
-	} while (IsMinimize(reinterpret_cast<team_id>(teams.ItemAt(i))));
+	} while (_IsMinimized(reinterpret_cast<team_id>(teams.ItemAt(i))));
 
 	// Activate switched terminal.
-	ActivateTermWindow(reinterpret_cast<team_id>(teams.ItemAt(i)));
+	_ActivateTermWindow(reinterpret_cast<team_id>(teams.ItemAt(i)));
 }
 
 
 bool
-TermApp::IsMinimize(team_id id)
+TermApp::_IsMinimized(team_id id)
 {
 	BMessenger app(TERM_SIGNATURE, id);
-
 	if (app.IsTargetLocal())
 		return fTermWindow->IsMinimized();
 
 	BMessage reply;
-	bool hidden;
-
 	if (app.SendMessage(MSG_TERM_IS_MINIMIZE, &reply) != B_OK)
 		return true;
 
+	bool hidden;
 	reply.FindBool("result", &hidden);
 	return hidden;
 }
 
 
-int32
-TermApp::FindTerminalId()
+void
+TermApp::_UpdateRegistration(bool set)
 {
-	BList teams;
-	be_roster->GetAppList(TERM_SIGNATURE, &teams);
-	int32 count = teams.CountItems();
-	int32 numbers[count];
-	thread_info info;
-	get_thread_info(find_thread(NULL), &info);
-	
-	for (int32 i=0; i<count; i++) {
-		numbers[i] = 0;
-		team_id id = (team_id)teams.ItemAt(i);
-		if (id == info.team)
-			continue;
-		
-		BMessage msg(B_GET_PROPERTY);
-		BMessage reply;
-		msg.AddSpecifier("Title");
-		msg.AddSpecifier("Window", (int32)0);
-		if (BMessenger(TERM_SIGNATURE, id).SendMessage(&msg, &reply) != B_OK)
-			continue;
-		BString title;
-		if (reply.FindString("result", &title)!=B_OK)
-			continue;
-		sscanf(title.String(), "Terminal %ld", &numbers[i]);
+	if (set)
+		fWindowNumber = -1;
+	else if (fWindowNumber < 0)
+		return;
+
+	int fd = open("/tmp/terminal_ids", O_RDWR | O_CREAT);
+	if (fd < 0)
+		return;
+
+	struct flock lock;
+	lock.l_type = F_WRLCK;
+	lock.l_whence = SEEK_CUR;
+	lock.l_start = 0;
+	lock.l_len = -1;
+	fcntl(fd, F_SETLKW, &lock);
+
+	uint8 windows[256];
+	ssize_t length = read_pos(fd, 0, windows, sizeof(windows));
+	if (length < 0) {
+		close(fd);
+		return;
 	}
-	
-	for (int32 i=1; i<count; i++) {
-		bool found = false;
-		for (int32 j=0; j<count; j++) {
-			if (i == numbers[j]) {
-				found = true;
+	if (length > (ssize_t)sizeof(windows))
+		length = sizeof(windows);
+
+	if (set) {
+		int32 i;
+		for (i = 0; i < length; i++) {
+			if (!windows[i]) {
+				windows[i] = true;
+				fWindowNumber = i + 1;
 				break;
 			}
 		}
-		if (!found)
-			return i;
+		if (i == length) {
+			if (length >= (ssize_t)sizeof(windows)) {
+				close(fd);
+				return;
+			}
+
+			windows[length] = true;
+			length++;
+			fWindowNumber = length;
+		}
+	} else {
+		// update information and write it back
+		windows[fWindowNumber - 1] = false;
 	}
 
-	return count;
+	write_pos(fd, 0, windows, length);
+	close(fd);
+}
+
+
+void
+TermApp::_UnregisterTerminal()
+{
+	_UpdateRegistration(false);
+}
+
+
+void
+TermApp::_RegisterTerminal()
+{
+	_UpdateRegistration(true);
 }
 
 
@@ -510,34 +521,31 @@ TermApp::FindTerminalId()
 //  be_roster->ActivateApp(be_roster->TeamFor(B_NETPOSITIVE_APP_SIGNATURE));
 //}
 
-#define PR(a) fprintf(stderr, a)
 
-// Display usage to stderr
 void
-TermApp::Usage(char *name)
+TermApp::_Usage(char *name)
 {
-	fprintf(stderr, "\n");
-	fprintf(stderr, "Haiku Terminal\n");
-	fprintf(stderr, "Copyright 2004 Haiku, Inc.\n");
-	fprintf(stderr, "Parts Copyright(C) 1999 Kazuho Okui and Takashi Murai.\n");
-	fprintf(stderr, "\n");
-	fprintf(stderr, "Usage: %s [OPTION] [SHELL]\n", name);
-	
-	PR("  -p,     --preference         load preference file\n");
-	PR("  -t,     --title              set window title\n");
-	PR("  -geom,  --geometry           set window geometry\n");
-	PR("                               An example of geometry is \"80x25+100+100\"\n");
+	fprintf(stderr, "Haiku Terminal\n"
+		"Copyright 2001-2007 Haiku, Inc.\n"
+		"Copyright(C) 1999 Kazuho Okui and Takashi Murai.\n"
+		"\n"
+		"Usage: %s [OPTION] [SHELL]\n", name);
+
+	fprintf(stderr, "  -p,     --preference         load preference file\n"
+		"  -t,     --title              set window title\n"
+		"  -geom,  --geometry           set window geometry\n"
+		"                               An example of geometry is \"80x25+100+100\"\n");
 #if 0
-	PR("  -fg,    --text-fore-color    set window foreground color\n");
-	PR("  -bg,    --text-back-color    set window background color\n");
-	PR("  -curfg, --cursor-fore-color  set cursor foreground color\n");
-	PR("  -curbg, --cursor-back-color  set cursor background color\n");
-	PR("  -selfg, --select-fore-color  set selection area foreground color\n");
-	PR("  -selbg, --select-back-color  set selection area background color\n");
-	PR("                               Examples of color are \"#FF00FF\" and \"purple\"\n");
+	fprintf(stderr, "  -fg,    --text-fore-color    set window foreground color\n"
+		"  -bg,    --text-back-color    set window background color\n"
+		"  -curfg, --cursor-fore-color  set cursor foreground color\n"
+		"  -curbg, --cursor-back-color  set cursor background color\n"
+		"  -selfg, --select-fore-color  set selection area foreground color\n"
+		"  -selbg, --select-back-color  set selection area background color\n"
+		"                               Examples of color are \"#FF00FF\" and \"purple\"\n");
 #endif
-	PR("\n");
 }
+
 
 int
 text_to_rgb(char *name, rgb_color *color, char *buffer)

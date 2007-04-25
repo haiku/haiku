@@ -50,28 +50,27 @@ class FindWindow;
 class TermWindow : public BWindow {
 	public:
 		TermWindow(BRect frame, const char* title, int gPfd);
-		~TermWindow();
+		virtual ~TermWindow();
 
-  void		Quit (void);
-  bool		QuitRequested (void);
-  void		TermWinActivate (void);
-  status_t	GetSupportedSuites (BMessage *msg);
-  BHandler*	ResolveSpecifier (BMessage *msg, int32 index,
-				  BMessage *specifier, int32 form,
-				  const char *property);
+		void			TermWinActivate();
 
-private:
-  void		InitWindow (void);
-  void		SetupMenu (void);
-//  void		colRequested (void);
-  void		MessageReceived (BMessage *message);
-  void		WindowActivated (bool);
-  int		GetTimeZone (void);
-  void		MenusBeginning(void);
-//  void		doShowHelp (uint32 command);
-  // Printing
-  status_t	DoPageSetup (void);
-  void		DoPrint (void);
+	protected:
+		virtual void	MessageReceived(BMessage *message);
+		virtual void	WindowActivated(bool);
+		virtual void	MenusBeginning(void);
+		virtual bool	QuitRequested();
+
+		status_t		GetSupportedSuites(BMessage *msg);
+		BHandler*		ResolveSpecifier(BMessage *msg, int32 index,
+							BMessage *specifier, int32 form,
+							const char *property);
+
+	private:
+		void			InitWindow();
+		void			SetupMenu();
+		int				GetTimeZone();
+		status_t		DoPageSetup();
+		void			DoPrint();
 
   /*
    * data member
