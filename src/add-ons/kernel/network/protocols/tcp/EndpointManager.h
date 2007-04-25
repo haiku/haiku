@@ -10,13 +10,11 @@
 
 #include "tcp.h"
 
-#include <net_datalink.h>
+#include <AddressUtilities.h>
 
 #include <lock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
-
-#include <sys/socket.h>
 
 #include <utility>
 

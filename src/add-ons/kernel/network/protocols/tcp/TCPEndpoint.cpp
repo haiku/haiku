@@ -707,7 +707,7 @@ TCPEndpoint::SetReceiveBufferSize(size_t length)
 bool
 TCPEndpoint::IsBound() const
 {
-	return !AddressModule()->is_empty_address(LocalAddress(), true);
+	return !LocalAddress().IsEmpty(true);
 }
 
 
@@ -791,13 +791,12 @@ TCPEndpoint::_ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 	if (gSocketModule->spawn_pending_socket(socket, &newSocket) < B_OK)
 		return DROP;
 
-	AddressModule()->set_to((sockaddr *)&newSocket->address,
-		(sockaddr *)&buffer->destination);
-	AddressModule()->set_to((sockaddr *)&newSocket->peer,
-		(sockaddr *)&buffer->source);
+	TCPEndpoint *newEndpoint = (TCPEndpoint *)newSocket->first_protocol;
 
-	return ((TCPEndpoint *)newSocket->first_protocol)->Spawn(this,
-		segment, buffer);
+	newEndpoint->LocalAddress().SetTo(&buffer->destination);
+	newEndpoint->PeerAddress().SetTo(&buffer->source);
+
+	return newEndpoint->Spawn(this, segment, buffer);
 }
 
 
@@ -814,7 +813,7 @@ TCPEndpoint::Spawn(TCPEndpoint *parent, tcp_segment_header &segment,
 	TRACE("Spawn()");
 
 	// TODO: proper error handling!
-	if (_PrepareSendPath(PeerAddress()) < B_OK)
+	if (_PrepareSendPath(*PeerAddress()) < B_OK)
 		return DROP;
 
 	fOptions = parent->fOptions;
@@ -1158,8 +1157,8 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 			return status;
 		}
 
-		AddressModule()->set_to((sockaddr *)&buffer->source, LocalAddress());
-		AddressModule()->set_to((sockaddr *)&buffer->destination, PeerAddress());
+		LocalAddress().CopyTo(&buffer->source);
+		PeerAddress().CopyTo(&buffer->destination);
 
 		uint32 size = buffer->size;
 		segment.sequence = fSendNext;
@@ -1616,7 +1615,7 @@ TCPEndpoint::_PrepareSendPath(const sockaddr *peer)
 	}
 
 	// make sure connection does not already exist
-	status_t status = fManager->SetConnection(this, LocalAddress(), peer,
+	status_t status = fManager->SetConnection(this, *LocalAddress(), peer,
 		fRoute->interface->address);
 	if (status < B_OK)
 		return status;

@@ -32,15 +32,15 @@ static const uint16 kFirstEphemeralPort = 40000;
 size_t
 ConnectionHashDefinition::HashKey(EndpointManager *manager, const KeyType &key)
 {
-	return manager->AddressModule()->hash_address_pair(key.first, key.second);
+	return ConstSocketAddress(manager->AddressModule(),
+		key.first).HashPair(key.second);
 }
 
 
 size_t
 ConnectionHashDefinition::Hash(EndpointManager *manager, TCPEndpoint *endpoint)
 {
-	return manager->AddressModule()->hash_address_pair(
-			endpoint->LocalAddress(), endpoint->PeerAddress());
+	return endpoint->LocalAddress().HashPair(*endpoint->PeerAddress());
 }
 
 
@@ -48,10 +48,8 @@ bool
 ConnectionHashDefinition::Compare(EndpointManager *manager, const KeyType &key,
 	TCPEndpoint *endpoint)
 {
-	net_address_module_info *module = manager->AddressModule();
-
-	return module->equal_addresses_and_ports(key.first, endpoint->LocalAddress())
-		&& module->equal_addresses_and_ports(key.second, endpoint->PeerAddress());
+	return endpoint->LocalAddress().EqualTo(key.first, true)
+		&& endpoint->PeerAddress().EqualTo(key.second, true);
 }
 
 
@@ -65,7 +63,7 @@ EndpointHashDefinition::HashKey(EndpointManager *manager, uint16 port)
 size_t
 EndpointHashDefinition::Hash(EndpointManager *manager, TCPEndpoint *endpoint)
 {
-	return endpoint->AddressModule()->get_port(endpoint->LocalAddress());
+	return endpoint->LocalAddress().GetPort();
 }
 
 
@@ -73,7 +71,7 @@ bool
 EndpointHashDefinition::Compare(EndpointManager *manager, uint16 port,
 	TCPEndpoint *endpoint)
 {
-	return endpoint->AddressModule()->get_port(endpoint->LocalAddress()) == port;
+	return endpoint->LocalAddress().GetPort() == port;
 }
 
 
@@ -122,25 +120,26 @@ EndpointManager::_LookupConnection(const sockaddr *local, const sockaddr *peer)
 
 status_t
 EndpointManager::SetConnection(TCPEndpoint *endpoint,
-	const sockaddr *local, const sockaddr *peer, const sockaddr *interfaceLocal)
+	const sockaddr *_local, const sockaddr *peer, const sockaddr *interfaceLocal)
 {
 	TRACE(("EndpointManager::SetConnection(%p)\n", endpoint));
 
 	BenaphoreLocker _(fLock);
-	sockaddr localBuffer;
 
-	// need to associate this connection with a real address, not INADDR_ANY
-	if (AddressModule()->is_empty_address(local, false)) {
-		AddressModule()->set_to(&localBuffer, interfaceLocal);
-		AddressModule()->set_port(&localBuffer, AddressModule()->get_port(local));
-		local = &localBuffer;
+	SocketAddressStorage local(AddressModule());
+	local.SetTo(_local);
+
+	if (local.IsEmpty(false)) {
+		uint16 port = local.GetPort();
+		local.SetTo(interfaceLocal);
+		local.SetPort(port);
 	}
 
-	if (_LookupConnection(local, peer) != NULL)
+	if (_LookupConnection(*local, peer) != NULL)
 		return EADDRINUSE;
 
-	AddressModule()->set_to(endpoint->LocalAddress(), local);
-	AddressModule()->set_to(endpoint->PeerAddress(), peer);
+	endpoint->LocalAddress().SetTo(*local);
+	endpoint->PeerAddress().SetTo(peer);
 
 	if (!fConnectionHash.Insert(endpoint))
 		return B_NO_MEMORY;
@@ -156,22 +155,21 @@ EndpointManager::SetPassive(TCPEndpoint *endpoint)
 
 	if (!endpoint->IsBound()) {
 		// if the socket is unbound first bind it to ephemeral
-		sockaddr_storage localAddress;
-		AddressModule()->set_to_empty_address((sockaddr *)&localAddress);
+		SocketAddressStorage local(AddressModule());
+		local.SetToEmpty();
 
-		status_t status = _BindToEphemeral(endpoint,
-			(sockaddr *)&localAddress);
+		status_t status = _BindToEphemeral(endpoint, *local);
 		if (status < B_OK)
 			return status;
 	}
 
-	sockaddr_storage passive;
-	AddressModule()->set_to_empty_address((sockaddr *)&passive);
+	SocketAddressStorage passive(AddressModule());
+	passive.SetToEmpty();
 
-	if (_LookupConnection(endpoint->LocalAddress(), (sockaddr *)&passive))
+	if (_LookupConnection(*endpoint->LocalAddress(), *passive))
 		return EADDRINUSE;
 
-	AddressModule()->set_to(endpoint->PeerAddress(), (sockaddr *)&passive);
+	endpoint->PeerAddress().SetTo(*passive);
 	if (!fConnectionHash.Insert(endpoint))
 		return B_NO_MEMORY;
 
@@ -192,20 +190,20 @@ EndpointManager::FindConnection(sockaddr *local, sockaddr *peer)
 
 	// no explicit endpoint exists, check for wildcard endpoints
 
-	sockaddr wildcard;
-	AddressModule()->set_to_empty_address(&wildcard);
+	SocketAddressStorage wildcard(AddressModule());
+	wildcard.SetToEmpty();
 
-	endpoint = _LookupConnection(local, &wildcard);
+	endpoint = _LookupConnection(local, *wildcard);
 	if (endpoint != NULL) {
 		TRACE(("TCP: Received packet corresponds to wildcard endpoint %p\n", endpoint));
 		return endpoint;
 	}
 
-	sockaddr localWildcard;
-	AddressModule()->set_to_empty_address(&localWildcard);
-	AddressModule()->set_port(&localWildcard, AddressModule()->get_port(local));
+	SocketAddressStorage localWildcard(AddressModule());
+	localWildcard.SetToEmpty();
+	localWildcard.SetPort(AddressModule()->get_port(local));
 
-	endpoint = _LookupConnection(&localWildcard, &wildcard);
+	endpoint = _LookupConnection(*localWildcard, *wildcard);
 	if (endpoint != NULL) {
 		TRACE(("TCP: Received packet corresponds to local wildcard endpoint %p\n", endpoint));
 		return endpoint;
@@ -276,15 +274,15 @@ EndpointManager::_BindToEphemeral(TCPEndpoint *endpoint,
 
 			TCPEndpoint *other = fEndpointHash.Lookup(port);
 			if (other == NULL) {
-				sockaddr_storage newAddress;
-				AddressModule()->set_to((sockaddr *)&newAddress, address);
-				AddressModule()->set_port((sockaddr *)&newAddress, port);
+				SocketAddressStorage newAddress(AddressModule());
+				newAddress.SetTo(address);
+				newAddress.SetPort(port);
 
 				// found a port
 				TRACE(("   EndpointManager::BindToEphemeral(%p) -> %s\n", endpoint,
-					AddressString(Domain(), (sockaddr *)&newAddress, true).Data()));
+					AddressString(Domain(), *newAddress, true).Data()));
 
-				return _Bind(endpoint, (sockaddr *)&newAddress);
+				return _Bind(endpoint, *newAddress);
 			}
 
 			counter += step;
@@ -317,9 +315,9 @@ EndpointManager::_Bind(TCPEndpoint *endpoint, const sockaddr *address)
 	if (first != NULL) {
 		while (true) {
 			// check if this endpoint binds to a wildcard address
-			if (AddressModule()->is_empty_address(first->LocalAddress(), false)) {
-				// you cannot specialize a wildcard endpoint - you have to open the
-				// wildcard endpoint last
+			if (first->LocalAddress().IsEmpty(false)) {
+				// you cannot specialize a wildcard endpoint - you have to open
+				// the wildcard endpoint last
 				return B_PERMISSION_DENIED;
 			}
 
@@ -361,8 +359,8 @@ EndpointManager::Unbind(TCPEndpoint *endpoint)
 
 	BenaphoreLocker _(fLock);
 
-	TCPEndpoint *other = fEndpointHash.Lookup(
-			AddressModule()->get_port(endpoint->LocalAddress()));
+	TCPEndpoint *other =
+		fEndpointHash.Lookup(endpoint->LocalAddress().GetPort());
 	if (other != endpoint) {
 		// remove endpoint from the list of endpoints with the same port
 		while (other != NULL && other->fEndpointNextWithSamePort != endpoint)
@@ -384,7 +382,7 @@ EndpointManager::Unbind(TCPEndpoint *endpoint)
 	endpoint->fEndpointNextWithSamePort = NULL;
 	fConnectionHash.Remove(endpoint);
 
-	endpoint->LocalAddress()->sa_len = 0;
+	(*endpoint->LocalAddress())->sa_len = 0;
 
 	return B_OK;
 }

@@ -13,6 +13,7 @@
 #include "tcp.h"
 #include "BufferQueue.h"
 
+#include <AddressUtilities.h>
 #include <net_protocol.h>
 #include <net_stack.h>
 #include <util/AutoLock.h>
@@ -65,15 +66,15 @@ class TCPEndpoint : public net_protocol {
 		tcp_state State() const { return fState; }
 		bool IsBound() const;
 
-		const sockaddr *LocalAddress() const
-			{ return (sockaddr *)&socket->address; }
-		sockaddr *LocalAddress()
-			{ return (sockaddr *)&socket->address; }
+		SocketAddress LocalAddress()
+			{ return SocketAddress(AddressModule(), &socket->address); }
+		ConstSocketAddress LocalAddress() const
+			{ return ConstSocketAddress(AddressModule(), &socket->address); }
 
-		const sockaddr *PeerAddress() const
-			{ return (sockaddr *)&socket->peer; }
-		sockaddr *PeerAddress()
-			{ return (sockaddr *)&socket->peer; }
+		SocketAddress PeerAddress()
+			{ return SocketAddress(AddressModule(), &socket->peer); }
+		ConstSocketAddress PeerAddress() const
+			{ return ConstSocketAddress(AddressModule(), &socket->peer); }
 
 		void DeleteSocket();
 
