@@ -27,12 +27,6 @@
 #include <stdio.h>
 #include "MediaFormat.h"
 
-void
-PrintFormat(const media_output &output)
-{
-	PrintFormat(output.format);
-}
-
 
 void
 PrintFormat(const media_format &format)
@@ -43,67 +37,137 @@ PrintFormat(const media_format &format)
 }
 
 
+void
+PrintFormat(const media_output &output)
+{
+	PrintFormat(output.format);
+}
+
+
+static status_t
+GetHeaderFormatAc3Audio(media_format *out_format, const uint8 *header, size_t size)
+{
+	printf("GetHeaderFormatAc3Audio\n");
+
+	status_t status;
+	media_format_description desc;
+	desc.family = B_WAV_FORMAT_FAMILY;
+	desc.u.wav.codec = 0x2000;
+
+	BMediaFormats formats;	
+	status = formats.InitCheck();
+	if (status)
+		return status;
+	
+	return formats.GetFormatFor(desc, out_format);
+}
+
+
+static status_t
+GetHeaderFormatDtsAudio(media_format *out_format, const uint8 *header, size_t size)
+{
+	printf("GetHeaderFormatDtsAudio: unsupported\n");
+	return B_ERROR;
+}
+
+
+static status_t
+GetHeaderFormatLpcmAudio(media_format *out_format, const uint8 *header, size_t size)
+{
+	printf("GetHeaderFormatLpcmAudio: unsupported\n");
+	return B_ERROR;
+}
+
+
+static status_t
+GetHeaderFormatPrivateStream(media_format *out_format, const uint8 *header, size_t size)
+{
+	printf("GetHeaderFormatPrivateStream: unsupported, assuming AC3\n");
+	return GetHeaderFormatAc3Audio(out_format, header, size);
+}
+
+
+static status_t
+GetHeaderFormatMpegAudio(media_format *out_format, const uint8 *header, size_t size)
+{
+	printf("GetHeaderFormatMpegAudio\n");
+
+	status_t status;
+	media_format_description desc;
+	desc.family = B_MPEG_FORMAT_FAMILY;
+	desc.u.mpeg.id = B_MPEG_2_AUDIO_LAYER_2;
+
+	BMediaFormats formats;	
+	status = formats.InitCheck();
+	if (status)
+		return status;
+	
+	status = formats.GetFormatFor(desc, out_format);
+	if (status)
+		return status;
+
+	out_format->u.encoded_audio.output.frame_rate = 48000;
+	out_format->u.encoded_audio.output.channel_count = 2;
+	out_format->u.encoded_audio.output.buffer_size = 1024;
+	return B_OK;
+}
+
+
+static status_t
+GetHeaderFormatMpegVideo(media_format *out_format, const uint8 *header, size_t size)
+{
+	printf("GetHeaderFormatMpegVideo\n");
+
+	status_t status;
+	media_format_description desc;
+	desc.family = B_MPEG_FORMAT_FAMILY;
+	desc.u.mpeg.id = B_MPEG_2_VIDEO;
+
+	BMediaFormats formats;
+	status = formats.InitCheck();
+	if (status)
+		return status;
+	
+	return formats.GetFormatFor(desc, out_format);
+}
+
+
 status_t
 GetHeaderFormat(media_format *out_format, const void *header, size_t size, int stream_id)
 {
-	
-	const uint8 *d = (const uint8 *)header;
+	const uint8 *h = (const uint8 *)header;
+	status_t status;
+
 	printf("GetHeaderFormat: stream_id %02x\n", stream_id);
-	printf("frame header: "
+	printf("inner frame header: "
 		   "%02x %02x %02x %02x %02x %02x %02x %02x "
 		   "%02x %02x %02x %02x %02x %02x %02x %02x\n",
-		   d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], 
-		   d[8], d[9], d[10], d[11], d[12], d[13], d[14], d[15]);
+		   h[0], h[1], h[2], h[3], h[4], h[5], h[6], h[7], 
+		   h[8], h[9], h[10], h[11], h[12], h[13], h[14], h[15]);
 
-	if (d[0] == 0xff && d[1] == 0xfc) {
-		
-		printf("GetHeaderFormat: assuming mepeg audio\n");
-		
-		status_t err;
-	
-		media_format_description desc;
-		desc.family = B_MPEG_FORMAT_FAMILY;
-		desc.u.mpeg.id = B_MPEG_1_AUDIO_LAYER_3;
-
-		BMediaFormats formats;
-		media_format format;
-	
-		err = formats.InitCheck();
-		if (err)
-			return err;
-	
-		err = formats.GetFormatFor(desc, out_format);
-		if (err)
-			return err;
-
-		out_format->u.encoded_audio.output.frame_rate = 48000;
-		out_format->u.encoded_audio.output.channel_count = 2;
-		out_format->u.encoded_audio.output.buffer_size = 1024;
-
-		printf("GetHeaderFormat: ");
-		PrintFormat(*out_format);
-	} else {
-		
-		printf("GetHeaderFormat: assuming mepeg video\n");
-		
-		status_t err;
-	
-		media_format_description desc;
-		desc.family = B_MPEG_FORMAT_FAMILY;
-		desc.u.mpeg.id = B_MPEG_1_VIDEO;
-
-		BMediaFormats formats;
-		media_format format;
-	
-		err = formats.InitCheck();
-		if (err)
-			return err;
-	
-		err = formats.GetFormatFor(desc, out_format);
-		if (err)
-			return err;
-		
+	if (stream_id >= 0x80 && stream_id <= 0x87)
+		status = GetHeaderFormatAc3Audio(out_format, h, size);
+	else if (stream_id >= 0x88 && stream_id <= 0x8F)
+		status = GetHeaderFormatDtsAudio(out_format, h, size);
+	else if (stream_id >= 0xA0 && stream_id <= 0xA7)
+		status = GetHeaderFormatLpcmAudio(out_format, h, size);
+	else if (stream_id == 0xBD)
+		status = GetHeaderFormatPrivateStream(out_format, h, size);
+	else if (stream_id >= 0xC0 && stream_id <= 0xDF)
+		status = GetHeaderFormatMpegAudio(out_format, h, size);
+	else if (stream_id >= 0xE0 && stream_id <= 0xEF)
+		status = GetHeaderFormatMpegVideo(out_format, h, size);
+	else {
+		printf("GetHeaderFormat: don't know what this stream_id means\n");
+		status = B_ERROR;
 	}
-
-	return B_OK;
+	
+	if (status != B_OK) {
+		printf("GetHeaderFormat: failed!\n");
+	} else {
+		printf("GetHeaderFormat: out_format ");
+		PrintFormat(*out_format);
+	}
+	return status;
 }
+

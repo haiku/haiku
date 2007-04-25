@@ -1964,7 +1964,7 @@ DVBMediaNode::_GetNextAudioChunk(const void **chunkData, size_t *chunkLen, media
 status_t
 DVBMediaNode::GetStreamFormat(PacketQueue *queue, media_format *format)
 {
-	status_t err;
+	status_t status;
 	Packet *packet;
 	const uint8 *data;
 	size_t size;
@@ -1972,29 +1972,29 @@ DVBMediaNode::GetStreamFormat(PacketQueue *queue, media_format *format)
 	
 	// get copy of the first packet from queue, and determine format
 
-	if ((err = queue->Peek(&packet)) != B_OK) {
-		TRACE("queue->Peek failed, error %lx\n", err);
-		return err;
+	if ((status = queue->Peek(&packet)) != B_OK) {
+		TRACE("queue->Peek failed, error %lx\n", status);
+		return status;
 	}
 
-	if ((err = pes_extract(packet->Data(), packet->Size(), &data, &size)) != B_OK) {
+	if ((status = pes_extract(packet->Data(), packet->Size(), &data, &size)) != B_OK) {
 		TRACE("pes_extract failed\n");
-		return err;
+		goto done;
 	}
 
-	if ((err = pes_stream_id(packet->Data(), packet->Size(), &stream_id)) != B_OK) {
+	if ((status = pes_stream_id(packet->Data(), packet->Size(), &stream_id)) != B_OK) {
 		TRACE("pes_stream_id failed\n");
-		return err;
+		goto done;
 	}
 
-	if ((err = GetHeaderFormat(format, data, size, stream_id)) != B_OK) {
-		TRACE("GetHeaderFormat failed, error %lx\n", err);
-		return err;
+	if ((status = GetHeaderFormat(format, data, size, stream_id)) != B_OK) {
+		TRACE("GetHeaderFormat failed, error %lx\n", status);
+		goto done;
 	}
 
+done:
 	delete packet;
-	
-	return B_OK;
+	return status;
 }
 
 
