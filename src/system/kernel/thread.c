@@ -933,35 +933,6 @@ thread_exit(void)
 	// boost our priority to get this over with
 	thread->priority = thread->next_priority = B_URGENT_DISPLAY_PRIORITY;
 
-	// Stop debugging for this thread
-	state = disable_interrupts();
-	GRAB_THREAD_LOCK();
-
-	debugInfo = thread->debug_info;
-	clear_thread_debug_info(&thread->debug_info, true);
-
-	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
-
-	destroy_thread_debug_info(&debugInfo);
-
-	// shutdown the thread messaging
-
-	status = acquire_sem_etc(thread->msg.write_sem, 1, B_RELATIVE_TIMEOUT, 0);
-	if (status == B_WOULD_BLOCK) {
-		// there is data waiting for us, so let us eat it
-		thread_id sender;
-
-		delete_sem(thread->msg.write_sem);
-			// first, let's remove all possibly waiting writers
-		receive_data_etc(&sender, NULL, 0, B_RELATIVE_TIMEOUT);
-	} else {
-		// we probably own the semaphore here, and we're the last to do so
-		delete_sem(thread->msg.write_sem);
-	}
-	// now we can safely remove the msg.read_sem
-	delete_sem(thread->msg.read_sem);
-
 	// Cancel previously installed alarm timer, if any
 	cancel_timer(&thread->alarm);
 
@@ -1005,10 +976,6 @@ thread_exit(void)
 
 		cachedDeathSem = team->death_sem;
 
-		// remove thread from hash, so it's no longer accessible
-		hash_remove(sThreadHash, thread);
-		sUsedThreads--;
-
 		if (deleteTeam) {
 			struct team *parent = team->parent;
 
@@ -1047,16 +1014,6 @@ thread_exit(void)
 		restore_interrupts(state);
 
 		TRACE(("thread_exit: thread 0x%lx now a kernel thread!\n", thread->id));
-	} else {
-		// for kernel threads, we don't need to care about their death entries
-		state = disable_interrupts();
-		GRAB_THREAD_LOCK();
-
-		hash_remove(sThreadHash, thread);
-		sUsedThreads--;
-
-		RELEASE_THREAD_LOCK();
-		restore_interrupts(state);
 	}
 
 	// delete the team if we're its main thread
@@ -1071,6 +1028,39 @@ thread_exit(void)
 		send_signal_etc(parentID, SIGCHLD, B_DO_NOT_RESCHEDULE);
 		cachedDeathSem = -1;
 	}
+
+	state = disable_interrupts();
+	GRAB_THREAD_LOCK();
+
+	// remove thread from hash, so it's no longer accessible
+	hash_remove(sThreadHash, thread);
+	sUsedThreads--;
+
+	// Stop debugging for this thread
+	debugInfo = thread->debug_info;
+	clear_thread_debug_info(&thread->debug_info, true);
+
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(state);
+
+	destroy_thread_debug_info(&debugInfo);
+
+	// shutdown the thread messaging
+
+	status = acquire_sem_etc(thread->msg.write_sem, 1, B_RELATIVE_TIMEOUT, 0);
+	if (status == B_WOULD_BLOCK) {
+		// there is data waiting for us, so let us eat it
+		thread_id sender;
+
+		delete_sem(thread->msg.write_sem);
+			// first, let's remove all possibly waiting writers
+		receive_data_etc(&sender, NULL, 0, B_RELATIVE_TIMEOUT);
+	} else {
+		// we probably own the semaphore here, and we're the last to do so
+		delete_sem(thread->msg.write_sem);
+	}
+	// now we can safely remove the msg.read_sem
+	delete_sem(thread->msg.read_sem);
 
 	// fill all death entries and delete the sem that others will use to wait on us
 	{
