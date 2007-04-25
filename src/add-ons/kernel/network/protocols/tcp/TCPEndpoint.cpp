@@ -14,6 +14,7 @@
 
 #include <net_buffer.h>
 #include <net_datalink.h>
+#include <net_stat.h>
 #include <NetBufferUtilities.h>
 #include <NetUtilities.h>
 
@@ -583,6 +584,19 @@ TCPEndpoint::SendAvailable()
 
 	TRACE("SendAvailable(): %li", available);
 	return available;
+}
+
+
+status_t
+TCPEndpoint::FillStat(net_stat *stat)
+{
+	RecursiveLocker _(fLock);
+
+	strlcpy(stat->state, name_for_state(fState), sizeof(stat->state));
+	stat->receive_queue_size = fReceiveQueue.Available();
+	stat->send_queue_size = fSendQueue.Used();
+
+	return B_OK;
 }
 
 

@@ -21,8 +21,10 @@ typedef struct net_stat {
 	int		protocol;
 	char	state[B_OS_NAME_LENGTH];
 	team_id	owner;
-	struct sockaddr_storage address;
-	struct sockaddr_storage peer;
+	struct	sockaddr_storage address;
+	struct	sockaddr_storage peer;
+	size_t	receive_queue_size;
+	size_t	send_queue_size;
 } net_stat;
 
 #endif	// NET_STAT_H

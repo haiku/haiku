@@ -55,7 +55,7 @@ inet_print_address(sockaddr* _address)
 	sockaddr_in& address = *(sockaddr_in *)_address;
 	
 	if (address.sin_family != AF_INET || address.sin_len == 0) {
-		printf("%-30s", "-");
+		printf("%-22s", "-");
 		return;
 	}
 
@@ -83,7 +83,7 @@ inet_print_address(sockaddr* _address)
 
 	snprintf(buffer + length, sizeof(buffer) - length, ":%s", port);
 
-	printf("%-30s", buffer);
+	printf("%-22s", buffer);
 }
 
 
@@ -153,7 +153,7 @@ main(int argc, char** argv)
 	bool printProgram = true;
 		// TODO: add some program options... :-)
 
-	printf("Proto  Local Address                 Foreign Address               State        Program\n");
+	printf("Proto  Recv-Q Send-Q Local Address         Foreign Address       State        Program\n");
 
 	uint32 cookie = 0;
 	int family = -1;
@@ -164,6 +164,9 @@ main(int argc, char** argv)
 			printf("%-6s ", proto->p_name);
 		else
 			printf("%-6d ", stat.protocol);
+
+		printf("%6lu ", stat.receive_queue_size);
+		printf("%6lu ", stat.send_queue_size);
 
 		inet_print_address((sockaddr*)&stat.address);
 		inet_print_address((sockaddr*)&stat.peer);

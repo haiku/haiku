@@ -274,6 +274,8 @@ socket_get_next_stat(uint32 *_cookie, int family, struct net_stat *stat)
 	stat->state[0] = '\0';
 	memcpy(&stat->address, &socket->address, sizeof(struct sockaddr_storage));
 	memcpy(&stat->peer, &socket->peer, sizeof(struct sockaddr_storage));
+	stat->receive_queue_size = 0;
+	stat->send_queue_size = 0;
 
 	// fill in protocol specific data (if supported by the protocol)
 	size_t length = sizeof(net_stat);

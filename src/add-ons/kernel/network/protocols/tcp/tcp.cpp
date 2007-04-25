@@ -457,12 +457,8 @@ tcp_control(net_protocol *_protocol, int level, int option, void *value,
 	TCPEndpoint *protocol = (TCPEndpoint *)_protocol;
 
 	if ((level & LEVEL_MASK) == IPPROTO_TCP) {
-		if (option == NET_STAT_SOCKET) {
-			net_stat *stat = (net_stat *)value;
-			strlcpy(stat->state, name_for_state(protocol->State()),
-				sizeof(stat->state));
-			return B_OK;
-		}
+		if (option == NET_STAT_SOCKET)
+			return protocol->FillStat((net_stat *)value);
 	}
 
 	return protocol->next->module->control(protocol->next, level, option,
