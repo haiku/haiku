@@ -10,7 +10,7 @@
 #ifndef _OPEN_HASH_TABLE_H_
 #define _OPEN_HASH_TABLE_H_
 
-#include <sys/types.h>
+#include <KernelExport.h>
 
 // the Definition template must have three methods: `HashKey', `Hash' and
 // `Compare'. It must also define several types as shown in the following
@@ -36,7 +36,7 @@
 // is the same (property of the hash function) while not wasting one additional
 // word per item and having better cache locality. The usage of quadratic
 // probing reduces the effectiveness of cache locality but prevents clustering.
-template<typename Definition>
+template<typename Definition, bool CheckDuplicates = false>
 class OpenHashTable {
 public:
 	typedef typename Definition::ParentType	ParentType;
@@ -100,6 +100,13 @@ public:
 
 	void InsertUnchecked(ValueType *value)
 	{
+		if (CheckDuplicates) {
+			for (size_t i = 0; i < fTableSize; i++) {
+				if (fTable[i] == value)
+					panic("HashTable: item already in table");
+			}
+		}
+
 		ValueType *previous = _Insert(fTable, fTableSize, value);
 		if (_IsDeleted(previous))
 			fDeletedCount--;
@@ -126,6 +133,13 @@ public:
 			}
 
 			index = _NextSlot(f, index, fTableSize);
+		}
+
+		if (CheckDuplicates) {
+			for (size_t i = 0; i < fTableSize; i++) {
+				if (fTable[i] == value)
+					panic("HashTable: item removed, but still in table.");
+			}
 		}
 
 		fItemCount--;

@@ -320,7 +320,7 @@ link_control(net_protocol *_protocol, int level, int option, void *value,
 
 
 status_t
-link_bind(net_protocol *protocol, struct sockaddr *address)
+link_bind(net_protocol *protocol, const struct sockaddr *address)
 {
 	// TODO: bind to a specific interface and ethernet type
 	return B_ERROR;

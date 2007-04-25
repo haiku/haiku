@@ -130,7 +130,7 @@ icmp_control(net_protocol *protocol, int level, int option, void *value,
 
 
 status_t
-icmp_bind(net_protocol *protocol, struct sockaddr *address)
+icmp_bind(net_protocol *protocol, const struct sockaddr *address)
 {
 	return B_ERROR;
 }

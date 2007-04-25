@@ -450,7 +450,7 @@ TCPEndpoint::Accept(struct net_socket **_acceptedSocket)
 
 
 status_t
-TCPEndpoint::Bind(sockaddr *address)
+TCPEndpoint::Bind(const sockaddr *address)
 {
 	if (address == NULL)
 		return B_BAD_VALUE;
@@ -462,20 +462,7 @@ TCPEndpoint::Bind(sockaddr *address)
 	if (fState != CLOSED)
 		return EISCONN;
 
-	// let IP check whether there is an interface that supports the given address:
-	status_t status = next->module->bind(next, address);
-	if (status < B_OK)
-		return status;
-
-	if (AddressModule()->get_port(address) == 0)
-		status = fManager->BindToEphemeral(this);
-	else
-		status = fManager->Bind(this);
-
-	TRACE("  Bind() bound to %s (status %i)", PrintAddress(&socket->address),
-	  (int)status);
-
-	return status;
+	return fManager->Bind(this, address);
 }
 
 
@@ -498,12 +485,17 @@ TCPEndpoint::Listen(int count)
 
 	if (fState != CLOSED)
 		return B_BAD_VALUE;
-	if (!IsBound())
-		return EDESTADDRREQ;
 
 	fAcceptSemaphore = create_sem(0, "tcp accept");
 	if (fAcceptSemaphore < B_OK)
 		return ENOBUFS;
+
+	status_t status = fManager->SetPassive(this);
+	if (status < B_OK) {
+		delete_sem(fAcceptSemaphore);
+		fAcceptSemaphore = -1;
+		return status;
+	}
 
 	fState = LISTEN;
 	return B_OK;

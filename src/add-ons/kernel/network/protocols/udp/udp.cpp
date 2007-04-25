@@ -66,7 +66,7 @@ class UdpEndpoint : public net_protocol, public DatagramSocket<> {
 public:
 	UdpEndpoint(net_socket *socket);
 
-	status_t				Bind(sockaddr *newAddr);
+	status_t				Bind(const sockaddr *newAddr);
 	status_t				Unbind(sockaddr *newAddr);
 	status_t				Connect(const sockaddr *newAddr);
 
@@ -711,7 +711,7 @@ UdpEndpoint::UdpEndpoint(net_socket *socket)
 
 
 status_t
-UdpEndpoint::Bind(sockaddr *address)
+UdpEndpoint::Bind(const sockaddr *address)
 {
 	TRACE_EP("Bind(%s)", AddressString(Domain(), address, true).Data());
 
@@ -1021,7 +1021,7 @@ udp_control(net_protocol *protocol, int level, int option, void *value,
 
 
 status_t
-udp_bind(net_protocol *protocol, struct sockaddr *address)
+udp_bind(net_protocol *protocol, const struct sockaddr *address)
 {
 	return ((UdpEndpoint *)protocol)->Bind(address);
 }

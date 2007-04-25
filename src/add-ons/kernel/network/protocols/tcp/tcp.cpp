@@ -500,7 +500,7 @@ tcp_setsockopt(net_protocol *_protocol, int level, int option,
 
 
 status_t
-tcp_bind(net_protocol *protocol, struct sockaddr *address)
+tcp_bind(net_protocol *protocol, const struct sockaddr *address)
 {
 	return ((TCPEndpoint *)protocol)->Bind(address);
 }
@@ -630,7 +630,6 @@ tcp_receive_data(net_buffer *buffer)
 	if (endpointManager == NULL)
 		return B_ERROR;
 
-	RecursiveLocker locker(endpointManager->Locker());
 	int32 segmentAction = DROP;
 
 	TCPEndpoint *endpoint = endpointManager->FindConnection(

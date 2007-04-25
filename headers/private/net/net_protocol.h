@@ -41,7 +41,7 @@ struct net_protocol_module_info {
 	status_t	(*setsockopt)(net_protocol *self, int level, int option,
 					const void *value, int length);
 
-	status_t	(*bind)(net_protocol *self, struct sockaddr *address);
+	status_t	(*bind)(net_protocol *self, const struct sockaddr *address);
 	status_t	(*unbind)(net_protocol *self, struct sockaddr *address);
 	status_t	(*listen)(net_protocol *self, int count);
 	status_t	(*shutdown)(net_protocol *self, int direction);

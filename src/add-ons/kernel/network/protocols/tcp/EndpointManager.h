@@ -14,14 +14,41 @@
 
 #include <lock.h>
 #include <util/DoublyLinkedList.h>
-#include <util/khash.h>
+#include <util/OpenHashTable.h>
 
 #include <sys/socket.h>
+
+#include <utility>
 
 
 struct net_address_module_info;
 struct net_domain;
+class EndpointManager;
 class TCPEndpoint;
+
+struct ConnectionHashDefinition {
+	typedef EndpointManager *ParentType;
+	typedef std::pair<const sockaddr *, const sockaddr *> KeyType;
+	typedef TCPEndpoint ValueType;
+
+	static size_t HashKey(EndpointManager *manager, const KeyType &key);
+	static size_t Hash(EndpointManager *manager, TCPEndpoint *endpoint);
+	static bool Compare(EndpointManager *manager, const KeyType &key,
+		TCPEndpoint *endpoint);
+};
+
+
+struct EndpointHashDefinition {
+	typedef EndpointManager *ParentType;
+	typedef uint16 KeyType;
+	typedef TCPEndpoint ValueType;
+
+	static size_t HashKey(EndpointManager *manager, uint16 port);
+	static size_t Hash(EndpointManager *manager, TCPEndpoint *endpoint);
+	static bool Compare(EndpointManager *manager, uint16 port,
+		TCPEndpoint *endpoint);
+};
+
 
 class EndpointManager : public DoublyLinkedListLinkImpl<EndpointManager> {
 	public:
@@ -30,14 +57,13 @@ class EndpointManager : public DoublyLinkedListLinkImpl<EndpointManager> {
 
 		status_t InitCheck() const;
 
-		recursive_lock *Locker() { return &fLock; }
+		TCPEndpoint *FindConnection(sockaddr *local, sockaddr *peer);
 
 		status_t SetConnection(TCPEndpoint *endpoint, const sockaddr *local,
 			const sockaddr *peer, const sockaddr *interfaceLocal);
-		TCPEndpoint *FindConnection(sockaddr *local, sockaddr *peer);
+		status_t SetPassive(TCPEndpoint *endpoint);
 
-		status_t Bind(TCPEndpoint *endpoint);
-		status_t BindToEphemeral(TCPEndpoint *endpoint);
+		status_t Bind(TCPEndpoint *endpoint, const sockaddr *address);
 		status_t Unbind(TCPEndpoint *endpoint);
 
 		status_t ReplyWithReset(tcp_segment_header &segment,
@@ -48,21 +74,18 @@ class EndpointManager : public DoublyLinkedListLinkImpl<EndpointManager> {
 			{ return Domain()->address_module; }
 
 	private:
-		TCPEndpoint *_LookupConnection(sockaddr *local, sockaddr *peer);
-		status_t _RemoveConnection(TCPEndpoint *endpoint);
-		TCPEndpoint *_LookupEndpoint(uint16 port);
-		void _DumpConnections();
-
-		static int _ConnectionCompare(void *_endpoint, const void *_key);
-		static uint32 _ConnectionHash(void *_endpoint, const void *_key, uint32 range);
-		static int _EndpointCompare(void *_endpoint, const void *_key);
-		static uint32 _EndpointHash(void *_endpoint, const void *_key, uint32 range);
+		TCPEndpoint *_LookupConnection(const sockaddr *local,
+			const sockaddr *peer);
+		status_t _Bind(TCPEndpoint *endpoint, const sockaddr *address);
+		status_t _BindToAddress(TCPEndpoint *endpoint, const sockaddr *address);
+		status_t _BindToEphemeral(TCPEndpoint *endpoint,
+			const sockaddr *address);
 
 		net_domain *fDomain;
 
-		hash_table *fConnectionHash;
-		hash_table *fEndpointHash;
-		recursive_lock fLock;
+		OpenHashTable<ConnectionHashDefinition> fConnectionHash;
+		OpenHashTable<EndpointHashDefinition> fEndpointHash;
+		benaphore fLock;
 };
 
 #endif	// ENDPOINT_MANAGER_H

@@ -50,7 +50,7 @@ class TCPEndpoint : public net_protocol {
 		status_t Free();
 		status_t Connect(const struct sockaddr *address);
 		status_t Accept(struct net_socket **_acceptedSocket);
-		status_t Bind(struct sockaddr *address);
+		status_t Bind(const sockaddr *address);
 		status_t Unbind(struct sockaddr *address);
 		status_t Listen(int count);
 		status_t Shutdown(int direction);
@@ -64,6 +64,16 @@ class TCPEndpoint : public net_protocol {
 
 		tcp_state State() const { return fState; }
 		bool IsBound() const;
+
+		const sockaddr *LocalAddress() const
+			{ return (sockaddr *)&socket->address; }
+		sockaddr *LocalAddress()
+			{ return (sockaddr *)&socket->address; }
+
+		const sockaddr *PeerAddress() const
+			{ return (sockaddr *)&socket->peer; }
+		sockaddr *PeerAddress()
+			{ return (sockaddr *)&socket->peer; }
 
 		void DeleteSocket();
 

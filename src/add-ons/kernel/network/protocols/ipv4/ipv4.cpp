@@ -1231,7 +1231,7 @@ ipv4_setsockopt(net_protocol *_protocol, int level, int option,
 
 
 status_t
-ipv4_bind(net_protocol *protocol, struct sockaddr *address)
+ipv4_bind(net_protocol *protocol, const struct sockaddr *address)
 {
 	if (address->sa_family != AF_INET)
 		return EAFNOSUPPORT;
