@@ -786,9 +786,11 @@ Inode::WriteAttribute(Transaction *transaction, const char *name, int32 type, of
 		small_data *smallData = FindSmallData(name);
 		if (smallData != NULL) {
 			oldLength = smallData->DataSize();
-			if (oldLength > BPLUSTREE_MAX_KEY_LENGTH)
-				oldLength = BPLUSTREE_MAX_KEY_LENGTH;
-			memcpy(oldData = oldBuffer, smallData->Data(), oldLength);
+			if (oldLength > 0) {
+				if (oldLength > BPLUSTREE_MAX_KEY_LENGTH)
+					oldLength = BPLUSTREE_MAX_KEY_LENGTH;
+				memcpy(oldData = oldBuffer, smallData->Data(), oldLength);
+			}
 		}
 		fSmallDataLock.Unlock();
 
@@ -807,7 +809,7 @@ Inode::WriteAttribute(Transaction *transaction, const char *name, int32 type, of
 	if (attribute != NULL) {
 		if (attribute->Lock().LockWrite() == B_OK) {
 			// save the old attribute data (if this fails, oldLength will reflect it)
-			if (fVolume->CheckForLiveQuery(name)) {
+			if (fVolume->CheckForLiveQuery(name) && attribute->Size() > 0) {
 				oldLength = BPLUSTREE_MAX_KEY_LENGTH;
 				if (attribute->ReadAt(0, oldBuffer, &oldLength) == B_OK)
 					oldData = oldBuffer;
@@ -913,7 +915,7 @@ Inode::RemoveAttribute(Transaction *transaction, const char *name)
 
 
 status_t
-Inode::GetAttribute(const char *name, Inode **attribute)
+Inode::GetAttribute(const char *name, Inode **_attribute)
 {
 	// does this inode even have attributes?
 	if (Attributes().IsZero())
@@ -932,11 +934,12 @@ Inode::GetAttribute(const char *name, Inode **attribute)
 		vnode_id id;
 		if ((status = tree->Find((uint8 *)name, (uint16)strlen(name), &id)) == B_OK) {
 			Vnode vnode(fVolume, id);
+			Inode *inode;
 			// Check if the attribute is really an attribute
-			if (vnode.Get(attribute) < B_OK
-				|| !(*attribute)->IsAttribute())
+			if (vnode.Get(&inode) < B_OK || !inode->IsAttribute())
 				return B_ERROR;
 
+			*_attribute = inode;
 			vnode.Keep();
 			return B_OK;
 		}
