@@ -2027,6 +2027,7 @@ Inode::Free(Transaction &transaction)
 }
 
 
+//!	Synchronizes (writes back to disk) the file stream of the inode.
 status_t
 Inode::Sync()
 {
@@ -2045,14 +2046,14 @@ Inode::Sync()
 		if (data->direct[i].IsZero())
 			return B_OK;
 
-//		status = flush_blocks(fVolume->Device(), fVolume->ToBlock(data->direct[i]),
-//			data->direct[i].Length());
+		status = block_cache_sync_etc(fVolume->BlockCache(),
+			fVolume->ToBlock(data->direct[i]), data->direct[i].Length());
 		if (status != B_OK)
 			return status;
 	}
 
 	// flush indirect range
-	
+
 	if (data->max_indirect_range == 0)
 		return B_OK;
 
@@ -2069,7 +2070,8 @@ Inode::Sync()
 			if (runs[i].IsZero())
 				return B_OK;
 
-//			status = flush_blocks(fVolume->Device(), fVolume->ToBlock(runs[i]), runs[i].Length());
+			status = block_cache_sync_etc(fVolume->BlockCache(),
+				fVolume->ToBlock(runs[i]), runs[i].Length());
 			if (status != B_OK)
 				return status;
 		}
@@ -2081,7 +2083,7 @@ Inode::Sync()
 		return B_OK;
 
 	off_t indirectBlock = fVolume->ToBlock(data->double_indirect);
-	
+
 	for (int32 l = 0; l < data->double_indirect.Length(); l++) {
 		block_run *indirectRuns = (block_run *)cached.SetTo(indirectBlock + l);
 		if (indirectRuns == NULL)
@@ -2103,10 +2105,10 @@ Inode::Sync()
 					if (runs[i].IsZero())
 						return B_OK;
 
-					// ToDo: combine single block_runs to bigger ones when
+					// TODO: combine single block_runs to bigger ones when
 					// they are adjacent
-//					status = flush_blocks(fVolume->Device(), fVolume->ToBlock(runs[i]),
-//						runs[i].Length());
+					status = block_cache_sync_etc(fVolume->BlockCache(),
+						fVolume->ToBlock(runs[i]), runs[i].Length());
 					if (status != B_OK)
 						return status;
 				}
