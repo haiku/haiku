@@ -1,3 +1,16 @@
+/*
+ * Copyright 2007, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		François Revol, revol@free.fr
+ */
+
+/*
+ * urlwrapper: wraps URL mime types around command line apps
+ * or other apps that don't handle them directly.
+ */
+
 #include <Alert.h>
 #include <Application.h>
 #include <AppFileInfo.h>
@@ -10,14 +23,8 @@
 #include <unistd.h>
 #include <Debug.h>
 
-#define HANDLE_FILE
-#define HANDLE_QUERY
-//#define HANDLE_MID_CID // http://www.rfc-editor.org/rfc/rfc2392.txt query MAIL:cid
-#define HANDLE_SH
-#define HANDLE_BESHARE
-//#define HANDLE_IM
-#define HANDLE_VLC
-#define HANDLE_AUDIO
+/* compile-time configuration */
+#include "urlwrapper.h"
 
 const char *kAppSig = "application/x-vnd.haiku.urlwrapper";
 const char *kTrackerSig = "application/x-vnd.Be-TRAK";
@@ -322,6 +329,23 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 		return;
 	}
 
+#ifdef HANDLE_HTTP_WGET
+	if (u.proto == "http") {
+		BString cmd("wget ");
+		
+		//cmd << url;
+		if (u.HasUser())
+			cmd << u.user << "@";
+		cmd << u.full;
+		PRINT(("CMD='%s'\n", cmd.String()));
+		cmd << pausec;
+		args[2] = (char *)cmd.String();
+		be_roster->Launch(kTerminalSig, 3, args);
+		// TODO: handle errors
+		return;
+	}
+#endif
+
 #ifdef HANDLE_FILE
 	if (u.proto == "file") {
 		BMessage m(B_REFS_RECEIVED);
@@ -336,7 +360,7 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 #endif
 
 #ifdef HANDLE_QUERY
-	// XXX:TODO
+	// XXX:TODO: unencode the formula + split options
 	if (u.proto == "query") {
 		// mktemp ?
 		BString qname("/tmp/query-url-temp-");
