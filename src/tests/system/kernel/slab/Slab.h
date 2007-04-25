@@ -319,30 +319,33 @@ struct HashCacheStrategy : BaseCacheStrategy<Backend> {
 	typedef BaseCache::ObjectLink ObjectLink;
 	typedef BaseCache::ObjectInfo ObjectInfo;
 
-	struct Link : ObjectLink {
+	struct Link : ObjectLink, HashTableLink<Link> {
 		Slab *slab;
 		void *buffer;
 	};
 
 	struct HashTableDefinition {
-		typedef Strategy *	ParentType;
+		typedef Strategy	ParentType;
 		typedef void *		KeyType;
 		typedef Link		ValueType;
 
-		static size_t HashKey(Strategy *parent, void *key)
+		HashTableDefinition(Strategy *_parent) : parent(_parent) {}
+
+		size_t HashKey(void *key) const
 		{
 			return (((uint8_t *)key) - ((uint8_t *)0)) >> parent->fLowerBoundary;
 		}
 
-		static size_t Hash(Strategy *parent, Link *value)
-		{
-			return HashKey(parent, value->buffer);
-		}
+		size_t Hash(Link *value) const { return HashKey(value->buffer); }
 
-		static bool Compare(Strategy *parent, void *key, Link *value)
+		bool Compare(void *key, Link *value) const
 		{
 			return value->buffer == key;
 		}
+
+		HashTableLink<Link> *GetLink(Link *value) const { return value; }
+
+		Strategy *parent;
 	};
 
 	// for g++ 2.95
