@@ -23,7 +23,7 @@
 #include <errno.h>
 
 
-// ToDo: this is a naive but growing implementation to test the API:
+// TODO: this is a naive but growing implementation to test the API:
 //	1) block reading/writing is not at all optimized for speed, it will
 //	   just read and write single blocks.
 //	2) the locking could be improved; getting a block should not need to
@@ -1167,6 +1167,39 @@ block_cache_sync(void *_cache)
 	}
 
 	hash_close(cache->hash, &iterator, false);
+	return B_OK;
+}
+
+
+extern "C" status_t
+block_cache_sync_etc(void *_cache, off_t blockNumber, size_t numBlocks)
+{
+	block_cache *cache = (block_cache *)_cache;
+
+	// we will sync all dirty blocks to disk that have a completed
+	// transaction or no transaction only
+
+	if (blockNumber < 0 || blockNumber >= cache->max_blocks) {
+		panic("block_cache_sync_etc: invalid block number %Ld (max %Ld)",
+			blockNumber, cache->max_blocks - 1);
+		return NULL;
+	}
+
+	BenaphoreLocker locker(&cache->lock);
+
+	for (; numBlocks > 0; numBlocks--, blockNumber++) {
+		cached_block *block = (cached_block *)hash_lookup(cache->hash,
+			&blockNumber);
+		if (block == NULL)
+			continue;
+		if (block->previous_transaction != NULL
+			|| (block->transaction == NULL && block->is_dirty)) {
+			status_t status = write_cached_block(cache, block);
+			if (status != B_OK)
+				return status;
+		}
+	}
+
 	return B_OK;
 }
 

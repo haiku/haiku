@@ -1,10 +1,11 @@
-/* File System File and Block Caches
- *
- * Copyright 2004-2005, Haiku Inc. All Rights Reserved.
+/*
+ * Copyright 2004-2007, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef USERLAND_FS_HAIKU_FS_CACHE_H
 #define USERLAND_FS_HAIKU_FS_CACHE_H
+
+//! File System File and Block Caches
 
 
 #include <fs_cache.h>
@@ -37,6 +38,8 @@ extern void block_cache_delete(void *_cache, bool allowWrites);
 extern void *block_cache_create(int fd, off_t numBlocks, size_t blockSize,
 					bool readOnly);
 extern status_t block_cache_sync(void *_cache);
+extern status_t block_cache_sync_etc(void *_cache, off_t blockNumber,
+					size_t numBlocks);
 
 extern status_t block_cache_make_writable(void *_cache, off_t blockNumber,
 					int32 transaction);

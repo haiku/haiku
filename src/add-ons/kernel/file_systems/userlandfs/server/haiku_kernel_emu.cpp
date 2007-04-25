@@ -265,6 +265,14 @@ block_cache_sync(void *_cache)
 	return UserlandFS::HaikuKernelEmu::block_cache_sync(_cache);
 }
 
+// block_cache_sync_etc
+status_t
+block_cache_sync_etc(void *_cache, off_t blockNumber, size_t numBlocks)
+{
+	return UserlandFS::HaikuKernelEmu::block_cache_sync_etc(_cache,
+		blockNumber, numBlocks);
+}
+
 // block_cache_make_writable
 status_t
 block_cache_make_writable(void *_cache, off_t blockNumber, int32 transaction)
