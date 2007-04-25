@@ -7,6 +7,9 @@
 #include <DirectWindow.h>
 #include <CheckBox.h>
 #include <GLView.h>
+#include <GL/glu.h>
+
+#define REDRAW_MSG	'rdrw'
 
 class SampleGLView : public BGLView
 {
@@ -14,17 +17,18 @@ public:
    SampleGLView(BRect frame, uint32 type);
    virtual void   AttachedToWindow(void);
    virtual void   FrameResized(float newWidth, float newHeight);
-   virtual void   ErrorCallback(GLenum which);
+   virtual void   MessageReceived(BMessage * msg);
    
    void         Render(void);
    
 private:
    void         gInit(void);
-   void         gDraw(void);
+   void         gDraw(float rotation = 0);
    void         gReshape(int width, int height);
          
-   float         width;
-   float         height;
+   float        width;
+   float        height;
+   float		rotate;
 };
 
 
@@ -33,11 +37,14 @@ class SampleGLWindow : public BDirectWindow
 {
 public:
    SampleGLWindow(BRect frame, uint32 type);
+   ~SampleGLWindow();
+   
    virtual bool QuitRequested();
    virtual void DirectConnected( direct_buffer_info *info );
    
 private:
    SampleGLView   *theView;
+   BMessageRunner *updateRunner;
 };
 
 
@@ -54,7 +61,7 @@ SampleGLApp::SampleGLApp()
    : BApplication("application/x-vnd.sample")
 {
    BRect windowRect;
-   uint32 type = BGL_RGB|BGL_DOUBLE;
+   uint32 type = BGL_RGB|BGL_DOUBLE|BGL_DEPTH;
 
    windowRect.Set(50, 50, 350, 350);
 
@@ -72,7 +79,17 @@ SampleGLWindow::SampleGLWindow(BRect frame, uint32 type)
    theView = new SampleGLView(r, type);
    AddChild(theView);
    Show();
+   
+   updateRunner = new BMessageRunner(BMessenger(theView),
+   		new BMessage(REDRAW_MSG), 1000000/60 /* 60 fps */);
+   
    theView->Render();
+}
+
+
+SampleGLWindow::~SampleGLWindow()
+{
+	delete updateRunner;
 }
 
 
@@ -90,10 +107,10 @@ void SampleGLWindow::DirectConnected(direct_buffer_info *info)
 	theView->EnableDirectMode(true);
 }
 
-
+// ----
 
 SampleGLView::SampleGLView(BRect frame, uint32 type)
-   : BGLView(frame, "SampleGLView", B_FOLLOW_ALL_SIDES, 0, type)
+   : BGLView(frame, "SampleGLView", B_FOLLOW_ALL_SIDES, 0, type), rotate(0)
 {
    width = frame.right-frame.left;
    height = frame.bottom-frame.top;
@@ -126,93 +143,65 @@ void SampleGLView::FrameResized(float newWidth, float newHeight)
 }
 
 
-void SampleGLView::ErrorCallback(GLenum whichError) 
-{
-//      fprintf(stderr, "Unexpected error occured (%d):\\n", whichError);
-//      fprintf(stderr, "    %s\\n", gluErrorString(whichError));
-}
-
-
-
-// globals
-GLenum use_stipple_mode;    // GL_TRUE to use dashed lines
-GLenum use_smooth_mode;     // GL_TRUE to use anti-aliased lines
-GLint linesize;             // Line width
-GLint pointsize;            // Point diameter
-   
-float pntA[3] = {
-   -160.0, 0.0, 0.0
-};
-float pntB[3] = {
-   -130.0, 0.0, 0.0
-};
-
-
-
 void SampleGLView::gInit(void) 
 {
    glClearColor(0.0, 0.0, 0.0, 0.0);
-   glLineStipple(1, 0xF0E0);
-   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-   use_stipple_mode = GL_FALSE;
-   use_smooth_mode = GL_TRUE;
-   linesize = 2;
-   pointsize = 6;
+   glEnable(GL_DEPTH_TEST);
+   glDepthMask(GL_TRUE);
 }
 
 
 
-void SampleGLView::gDraw(void)
+void SampleGLView::gDraw(float rotation)
 {
-   GLint i;
-   
-   glClear(GL_COLOR_BUFFER_BIT);
-   glLineWidth(linesize);
-   
-/*
+  /* Clear the buffer, clear the matrix */
+  glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glLoadIdentity();
 
-   if (use_stipple_mode) {
-      glEnable(GL_LINE_STIPPLE);
-   } else {
-      glDisable(GL_LINE_STIPPLE);
-   }
-*/
+  /* A step backward, then spin the cube */
+  glTranslatef(0, 0, -5);
+  glRotatef(rotation, 0, 0, 1);
+  glRotatef(rotation, 1, 0.6, 0);
 
-   glDisable(GL_POINT_SMOOTH);
+  /* We tell we want to draw quads */
+  glBegin (GL_QUADS);
 
+  /* Every four calls to glVertex, a quad is drawn */
+  glColor3f (0, 0, 0); glVertex3f (-1, -1, -1);
+  glColor3f (0, 0, 1); glVertex3f (-1, -1,  1);
+  glColor3f (0, 1, 1); glVertex3f (-1,  1,  1);
+  glColor3f (0, 1, 0); glVertex3f (-1,  1, -1);
 
-   glPushMatrix();
-   
-   glPointSize(pointsize);         // Set size for point
+  glColor3f (1, 0, 0); glVertex3f ( 1, -1, -1);
+  glColor3f (1, 0, 1); glVertex3f ( 1, -1,  1);
+  glColor3f (1, 1, 1); glVertex3f ( 1,  1,  1);
+  glColor3f (1, 1, 0); glVertex3f ( 1,  1, -1);
 
-   for (i = 0; i < 360; i += 5) {
-      glRotatef(5.0, 0,0,1);         // Rotate right 5 degrees
+  glColor3f (0, 0, 0); glVertex3f (-1, -1, -1);
+  glColor3f (0, 0, 1); glVertex3f (-1, -1,  1);
+  glColor3f (1, 0, 1); glVertex3f ( 1, -1,  1);
+  glColor3f (1, 0, 0); glVertex3f ( 1, -1, -1);
 
-	  if (use_smooth_mode) {
-		glEnable(GL_LINE_SMOOTH);
-	    glEnable(GL_BLEND);
-	   } else {
-	      glDisable(GL_LINE_SMOOTH);
-	      glDisable(GL_BLEND);
-	   }
+  glColor3f (0, 1, 0); glVertex3f (-1,  1, -1);
+  glColor3f (0, 1, 1); glVertex3f (-1,  1,  1);
+  glColor3f (1, 1, 1); glVertex3f ( 1,  1,  1);
+  glColor3f (1, 1, 0); glVertex3f ( 1,  1, -1);
 
-      glColor3f(1.0, 1.0, 0.0);      // Set color for line
-      glBegin(GL_LINE_STRIP);         // And create the line
-      	glVertex3fv(pntA);
-      	glVertex3fv(pntB);
-      glEnd();
+  glColor3f (0, 0, 0); glVertex3f (-1, -1, -1);
+  glColor3f (0, 1, 0); glVertex3f (-1,  1, -1);
+  glColor3f (1, 1, 0); glVertex3f ( 1,  1, -1);
+  glColor3f (1, 0, 0); glVertex3f ( 1, -1, -1);
 
-      glDisable(GL_POINT_SMOOTH);
-      glDisable(GL_BLEND);
+  glColor3f (0, 0, 1); glVertex3f (-1, -1,  1);
+  glColor3f (0, 1, 1); glVertex3f (-1,  1,  1);
+  glColor3f (1, 1, 1); glVertex3f ( 1,  1,  1);
+  glColor3f (1, 0, 1); glVertex3f ( 1, -1,  1);
 
-      glColor3f(0.0, 1.0, 0.0);      // Set color for point
-      glBegin(GL_POINTS);
-      	glVertex3fv(pntA);         // Draw point at one end
-      	glVertex3fv(pntB);         // Draw point at other end
-      glEnd();
-   }
-   
-   glPopMatrix();                  // Done with matrix
+  /* No more quads */
+  glEnd ();
+
+  /* End */
+  glFlush ();
 }
 
 
@@ -221,7 +210,7 @@ void SampleGLView::gReshape(int width, int height)
    glViewport(0, 0, width, height);
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
-   glOrtho(-175, 175, -175, 175, -1, 1);
+   gluPerspective(45, width / (float) height, 1, 500);
    glMatrixMode(GL_MODELVIEW);
 }
 
@@ -229,9 +218,23 @@ void SampleGLView::gReshape(int width, int height)
 void SampleGLView::Render(void)
 {
    LockGL();
-   gDraw();
+   gDraw(rotate);
    SwapBuffers();
    UnlockGL();
+}
+
+void SampleGLView::MessageReceived(BMessage * msg)
+{
+	switch (msg->what) {
+	case REDRAW_MSG:
+		Render();
+		/* Rotate a bit more */
+		rotate++;
+		break;
+
+	default:	
+		BGLView::MessageReceived(msg);
+	}
 }
 
 
