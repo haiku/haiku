@@ -490,8 +490,8 @@ tcp_setsockopt(net_protocol *_protocol, int level, int option,
 		}
 	}
 
-	return protocol->next->module->setsockopt(protocol, level, option, _value,
-		length);
+	return protocol->next->module->setsockopt(protocol->next, level, option,
+		_value, length);
 }
 
 
