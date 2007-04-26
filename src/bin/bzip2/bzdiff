@@ -12,7 +12,7 @@
 # necessary) and fed to cmp or diff.  The exit status from cmp
 # or diff is preserved.
 
-PATH="/usr/bin:$PATH"; export PATH
+PATH="/usr/bin:/bin:$PATH"; export PATH
 prog=`echo $0 | sed 's|.*/||'`
 case "$prog" in
   *cmp) comp=${CMP-cmp}   ;;
@@ -37,7 +37,7 @@ if test -z "$FILES"; then
 	echo "Usage: $prog [${comp}_options] file [file]"
 	exit 1
 fi
-tmp=`tempfile -d /tmp -p bz` || {
+tmp=`mktemp ${TMPDIR:-/tmp}/bzdiff.XXXXXXXXXX` || {
       echo 'cannot create a temporary file' >&2
       exit 1
 }

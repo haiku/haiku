@@ -63,7 +63,11 @@ for i do
     bzip2 -cdfq "$i" | $grep $opt "$pat"
     r=$?
   else
-    bzip2 -cdfq "$i" | $grep $opt "$pat" | sed "s|^|${i}:|"
+    j=${i//\\/\\\\}
+    j=${j//|/\\|}
+    j=${j//&/\\&}
+    j=`printf "%s" "$j" | tr '\n' ' '`
+    bzip2 -cdfq "$i" | $grep $opt "$pat" | sed "s|^|${j}:|"
     r=$?
   fi
   test "$r" -ne 0 && res="$r"

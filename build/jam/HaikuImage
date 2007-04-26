@@ -20,7 +20,7 @@ if $(INCLUDE_GPL_ADDONS) = 1 {
 	GPL_ONLY = ;
 }
 
-BEOS_BIN = "[" addattr alert arp basename bc beep cat cardctl catattr chgrp
+BEOS_BIN = "[" addattr alert arp basename bc beep bzip2 cat cardctl catattr chgrp
 	chmod chop chown cksum clear clockconfig cmp comm compress cp copyattr
 	csplit ctags cut date dc dd desklink df diff diff3 dircolors dirname
 	driveinfo dstcheck du dump_cis dump_cisreg echo eject env error expand
@@ -183,6 +183,7 @@ AddSymlinkToHaikuImage home config be : /boot/beos/apps : Applications ;
 AddSymlinkToHaikuImage home config be : /boot/beos/preferences : Preferences ;
 AddSymlinkToHaikuImage home config be : /boot/beos/demos : Demos ;
 
+AddSymlinkToHaikuImage beos bin : bzip2 : bunzip2 ;
 AddSymlinkToHaikuImage beos bin : less : more ;
 AddSymlinkToHaikuImage beos bin : gzip : gunzip ;
 AddSymlinkToHaikuImage beos bin : gzip : zcat ;
