@@ -1,5 +1,5 @@
-#ifndef _MEDIA_DEBUG_H_
-#define _MEDIA_DEBUG_H_
+#ifndef _MEDIA_DEBUG_OLD_H_
+#define _MEDIA_DEBUG_OLD_H_
 
 #ifndef DEBUG
   #define DEBUG 1
