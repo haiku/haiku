@@ -34,11 +34,11 @@ protected:
 		typename Backend::AllocationID id;
 	};
 
-	BaseSlab *_ConstructSlab(Slab *slab, void *pages, size_t tailSpace,
+	BaseSlab *_ConstructSlab(Slab *slab, void *pages, size_t byteCount,
 		ObjectLink *(*getLink)(void *parent, void *object), void *parent)
 	{
-		return base_cache_construct_slab(fParent, slab, pages,
-			SlabSize(tailSpace) - tailSpace, getLink, parent);
+		return base_cache_construct_slab(fParent, slab, pages, byteCount,
+			getLink, parent);
 	}
 
 	void _DestructSlab(BaseSlab *slab)

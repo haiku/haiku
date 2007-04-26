@@ -21,6 +21,15 @@
 //      same code. We'll have to resolve all of the dependencies
 //      then, for now, it is still not required.
 
+//#define TRACE_SLAB
+
+#ifdef TRACE_SLAB
+#define TRACE_CACHE(cache, format, args...) \
+	dprintf("Cache[%p, %s] " format "\n", cache, cache->name , ##args)
+#else
+#define TRACE_CACHE(cache, format, bananas...) do { } while (0)
+#endif
+
 
 // TODO this value should be dynamically tuned per cache.
 static const int kMagazineCapacity = 32;
@@ -54,14 +63,14 @@ slab_area_backend_allocate(base_cache *cache, area_id *id, void **pages,
 	if (flags & CACHE_ALIGN_TO_TOTAL && byteCount > B_PAGE_SIZE)
 		return NULL;
 
-	dprintf("AreaBackend::AllocatePages(%lu, 0x%lx)\n", byteCount, flags);
+	TRACE_CACHE(cache, "allocate pages (%lu, 0x0%lx)", byteCount, flags);
 
 	area_id areaId = create_area(cache->name, pages,
 		B_ANY_KERNEL_ADDRESS, byteCount, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (areaId < 0)
 		return areaId;
 
-	dprintf("  AreaBackend::AllocatePages() = { %ld, %p }\n", areaId, *pages);
+	TRACE_CACHE(cache, "  ... = { %ld, %p }", areaId, *pages);
 
 	*id = areaId;
 	return B_OK;
@@ -70,7 +79,7 @@ slab_area_backend_allocate(base_cache *cache, area_id *id, void **pages,
 void
 slab_area_backend_free(base_cache *cache, area_id area)
 {
-	dprintf("AreaBackend::DeletePages(%ld)\n", area);
+	TRACE_CACHE(cache, "delete pages %ld", area);
 	delete_area(area);
 }
 
@@ -82,6 +91,8 @@ base_cache_init(base_cache *cache, const char *name, size_t objectSize,
 {
 	strlcpy(cache->name, name, sizeof(cache->name));
 
+	TRACE_CACHE(cache, "init %lu, %lu", objectSize, alignment);
+
 	if (alignment > 0 && (objectSize & (alignment - 1)))
 		cache->object_size = objectSize + alignment
 			- (objectSize & (alignment - 1));
@@ -90,18 +101,53 @@ base_cache_init(base_cache *cache, const char *name, size_t objectSize,
 
 	cache->cache_color_cycle = 0;
 
+	list_init_etc(&cache->empty, offsetof(cache_slab, link));
 	list_init_etc(&cache->partial, offsetof(cache_slab, link));
 	list_init_etc(&cache->full, offsetof(cache_slab, link));
+
+	cache->empty_count = 0;
+
+	cache->constructor = constructor;
+	cache->destructor = destructor;
+	cache->cookie = cookie;
+}
+
+
+void
+base_cache_destroy(base_cache *cache,
+	void (*return_slab)(base_cache *, cache_slab *))
+{
+	if (!list_is_empty(&cache->full))
+		panic("cache destroy: still has full slabs");
+
+	if (!list_is_empty(&cache->partial))
+		panic("cache destroy: still has partial slabs");
+
+	while (!list_is_empty(&cache->empty)) {
+		cache_slab *slab = (cache_slab *)list_remove_head_item(&cache->empty);
+		return_slab(cache, slab);
+	}
+
+	cache->empty_count = 0;
 }
 
 
 cache_object_link *
 base_cache_allocate_object(base_cache *cache)
 {
-	cache_slab *slab = (cache_slab *)list_get_first_item(&cache->partial);
+	cache_slab *slab;
 
-	dprintf("BaseCache::AllocateObject() from %p, %lu remaining\n",
-		slab, slab->count);
+	if (list_is_empty(&cache->partial)) {
+		if (list_is_empty(&cache->empty))
+			return NULL;
+
+		cache->empty_count--;
+		slab = (cache_slab *)list_remove_head_item(&cache->empty);
+		list_add_item(&cache->partial, slab);
+	} else
+		slab = (cache_slab *)list_get_first_item(&cache->partial);
+
+	TRACE_CACHE(cache, "allocate from %p, %lu remaining.", slab, slab->count);
 
 	cache_object_link *link = SListPop(slab->free);
 	slab->count--;
@@ -115,17 +161,34 @@ base_cache_allocate_object(base_cache *cache)
 }
 
 
+cache_object_link *
+base_cache_allocate_object_with_new_slab(base_cache *cache,
+	cache_slab *newSlab)
+{
+	list_add_item(&cache->partial, newSlab);
+	return base_cache_allocate_object(cache);
+}
+
+
 int
 base_cache_return_object(base_cache *cache, cache_slab *slab,
 	cache_object_link *link)
 {
 	// We return true if the slab is completely unused.
 
+	TRACE_CACHE(cache, "returning %p to %p, %lu used (%lu empty slabs).",
+		link, slab, slab->size - slab->count, cache->empty_count);
+
 	SListPush(slab->free, link);
 	slab->count++;
 	if (slab->count == slab->size) {
 		list_remove_item(&cache->partial, slab);
-		return 1;
+
+		if (cache->empty_count > 2)
+			return 1;
+
+		cache->empty_count++;
+		list_add_item(&cache->empty, slab);
 	} else if (slab->count == 1) {
 		list_remove_item(&cache->full, slab);
 		list_add_item(&cache->partial, slab);
@@ -140,8 +203,7 @@ base_cache_construct_slab(base_cache *cache, cache_slab *slab, void *pages,
 	size_t byteCount, cache_object_link *(*getLink)(void *parent, void *object),
 	void *parent)
 {
-	dprintf("BaseCache::ConstructSlab(%p, %p, %lu, %p, %p)\n", slab, pages,
-		byteCount, getLink, parent);
+	TRACE_CACHE(cache, "construct (%p, %p, %lu)", slab, pages, byteCount);
 
 	slab->pages = pages;
 	slab->count = slab->size = byteCount / cache->object_size;
@@ -155,7 +217,7 @@ base_cache_construct_slab(base_cache *cache, cache_slab *slab, void *pages,
 	else
 		cache->cache_color_cycle += kCacheColorPeriod;
 
-	dprintf("  %lu objects, %lu spare bytes, cycle %lu\n",
+	TRACE_CACHE(cache, "  %lu objects, %lu spare bytes, cycle %lu",
 		slab->size, spareBytes, cycle);
 
 	uint8_t *data = ((uint8_t *)pages) + cycle;
@@ -174,8 +236,13 @@ base_cache_construct_slab(base_cache *cache, cache_slab *slab, void *pages,
 void
 base_cache_destruct_slab(base_cache *cache, cache_slab *slab)
 {
+	TRACE_CACHE(cache, "destruct %p", slab);
+
 	if (cache->destructor == NULL)
 		return;
+
+	if (slab->count != slab->size)
+		panic("cache: destroying a slab which isn't empty.");
 
 	uint8_t *data = (uint8_t *)slab->pages;
 

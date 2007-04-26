@@ -25,13 +25,16 @@ static const int kMinimumSlabItems = 32;
 typedef void (*base_cache_constructor)(void *cookie, void *object);
 typedef void (*base_cache_destructor)(void *cookie, void *object);
 
-/* base Slab implementation, opaque to the backend used. */
+/* base Slab implementation, opaque to the backend used.
+ *
+ * NOTE: the caller is responsible for the Cache's locking. */
 
 typedef struct base_cache {
 	char name[32];
 	size_t object_size;
 	size_t cache_color_cycle;
-	struct list partial, full;
+	struct list empty, partial, full;
+	size_t empty_count;
 	base_cache_constructor constructor;
 	base_cache_destructor destructor;
 	void *cookie;
@@ -51,8 +54,12 @@ typedef struct cache_slab {
 void base_cache_init(base_cache *cache, const char *name, size_t object_size,
 	size_t alignment, base_cache_constructor constructor,
 	base_cache_destructor destructor, void *cookie);
+void base_cache_destroy(base_cache *cache,
+	void (*return_slab)(base_cache *, cache_slab *));
 
 cache_object_link *base_cache_allocate_object(base_cache *cache);
+cache_object_link *base_cache_allocate_object_with_new_slab(base_cache *cache,
+	cache_slab *slab);
 int base_cache_return_object(base_cache *cache, cache_slab *slab,
 	cache_object_link *link);
 
@@ -82,16 +89,26 @@ public:
 			destructor, cookie);
 	}
 
+	~Cache()
+	{
+		base_cache_destroy(this, _ReturnSlab);
+	}
+
 	void *AllocateObject(uint32_t flags)
 	{
-		if (list_is_empty(&partial)) {
+		cache_object_link *link = base_cache_allocate_object(this);
+
+		// if the cache is returning NULL it is because it ran out of slabs
+		if (link == NULL) {
 			cache_slab *newSlab = fStrategy.NewSlab(flags);
 			if (newSlab == NULL)
 				return NULL;
-			list_add_item(&partial, newSlab);
+			link = base_cache_allocate_object_with_new_slab(this, newSlab);
+			if (link == NULL)
+				panic("cache: failed to allocate with an empty slab");
 		}
 
-		return fStrategy.Object(base_cache_allocate_object(this));
+		return fStrategy.Object(link);
 	}
 
 	void ReturnObject(void *object)
@@ -103,9 +120,14 @@ public:
 	}
 
 private:
+	static void _ReturnSlab(base_cache *self, cache_slab *slab)
+	{
+		((Cache<Strategy> *)self)->fStrategy.ReturnSlab(slab);
+	}
+
 	Strategy fStrategy;
 };
 
-#endif
+#endif /* __cplusplus */
 
 #endif

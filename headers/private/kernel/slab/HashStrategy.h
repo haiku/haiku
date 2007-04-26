@@ -133,8 +133,8 @@ struct HashCacheStrategy : BaseCacheStrategy<Backend>, BaseHashCacheStrategy {
 
 		// it's very important that we cast this to BaseHashCacheStrategy
 		// so we get the proper instance offset through void *
-		return BaseCacheStrategy<Backend>::_ConstructSlab(slab, pages, 0,
-			_Linkage, (BaseHashCacheStrategy *)this);
+		return BaseCacheStrategy<Backend>::_ConstructSlab(slab, pages,
+			_SlabSize(), _Linkage, (BaseHashCacheStrategy *)this);
 	}
 
 	void ReturnSlab(BaseSlab *slab)

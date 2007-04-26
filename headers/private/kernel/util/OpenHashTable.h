@@ -11,6 +11,7 @@
 #define _OPEN_HASH_TABLE_H_
 
 #include <KernelExport.h>
+#include <util/kernel_cpp.h>
 
 // the Definition template must have four methods: `HashKey', `Hash',
 // `Compare' and `GetLink;. It must also define several types as shown in the

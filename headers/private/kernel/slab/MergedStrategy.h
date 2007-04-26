@@ -57,9 +57,6 @@ public:
 		void *pages;
 
 		size_t byteCount = _SlabSize();
-		if (byteCount > Backend::kMaximumAlignedLength)
-			byteCount = Backend::kMaximumAlignedLength;
-
 		// in order to save a pointer per object or a hash table to
 		// map objects to slabs we required this set of pages to be
 		// aligned in a (pageCount * PAGE_SIZE) boundary.
@@ -70,7 +67,7 @@ public:
 		_SlabInPages(pages)->id = id;
 
 		return BaseCacheStrategy<Backend>::_ConstructSlab(_SlabInPages(pages),
-			pages, sizeof(Slab), _Linkage, this);
+			pages, _SlabSize() - sizeof(Slab), _Linkage, this);
 	}
 
 	void ReturnSlab(BaseSlab *slab)
@@ -81,7 +78,10 @@ public:
 private:
 	size_t _SlabSize() const
 	{
-		return BaseCacheStrategy<Backend>::SlabSize(sizeof(Slab));
+		size_t byteCount = BaseCacheStrategy<Backend>::SlabSize(sizeof(Slab));
+		if (byteCount > Backend::kMaximumAlignedLength)
+			byteCount = Backend::kMaximumAlignedLength;
+		return byteCount;
 	}
 
 	Link *_Linkage(void *object) const
