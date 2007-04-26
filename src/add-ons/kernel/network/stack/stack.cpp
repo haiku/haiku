@@ -785,6 +785,10 @@ init_stack()
 		goto err8;
 	}
 
+	status = init_net_buffers();
+	if (status < B_OK)
+		goto err9;
+
 	sInitialized = true;
 
 	link_init();
@@ -802,6 +806,8 @@ init_stack()
 
 	return B_OK;
 
+err9:
+	hash_uninit(sReceivingProtocolChains);
 err8:
 	hash_uninit(sDatalinkProtocolChains);
 err7:
@@ -830,6 +836,8 @@ uninit_stack()
 	uninit_timers();
 	uninit_interfaces();
 	uninit_domains();
+
+	uninit_net_buffers();
 
 	benaphore_destroy(&sChainLock);
 	benaphore_destroy(&sInitializeChainLock);

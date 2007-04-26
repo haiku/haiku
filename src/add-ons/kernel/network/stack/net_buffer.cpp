@@ -10,10 +10,12 @@
 #include "utility.h"
 
 #include <net_buffer.h>
+#include <slab/Slab.h>
 #include <util/list.h>
 
 #include <ByteOrder.h>
 #include <KernelExport.h>
+#include <util/AutoLock.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -63,6 +65,17 @@ struct net_buffer_private : net_buffer {
 };
 
 
+typedef MergedLinkCacheStrategy<AreaBackend> AreaMergedCacheStrategy;
+typedef HashCacheStrategy<AreaBackend> AreaHashCacheStrategy;
+
+typedef Cache<AreaMergedCacheStrategy> NetBufferCache;
+typedef Cache<AreaHashCacheStrategy> DataNodeCache;
+
+static NetBufferCache *sNetBufferCache;
+static DataNodeCache *sDataNodeCache;
+static benaphore sCachesLock;
+
+
 static status_t append_data(net_buffer *buffer, const void *data, size_t size);
 static status_t trim_data(net_buffer *_buffer, size_t newSize);
 static status_t remove_header(net_buffer *_buffer, size_t bytes);
@@ -87,11 +100,43 @@ dump_buffer(net_buffer *_buffer)
 #endif
 
 
+static inline data_header *
+allocate_data_header()
+{
+	BenaphoreLocker _(sCachesLock);
+	return (data_header *)sDataNodeCache->AllocateObject(CACHE_DONT_SLEEP);
+}
+
+
+static inline net_buffer_private *
+allocate_net_buffer()
+{
+	BenaphoreLocker _(sCachesLock);
+	return (net_buffer_private *)sNetBufferCache->AllocateObject(
+		CACHE_DONT_SLEEP);
+}
+
+
+static inline void
+free_data_header(data_header *header)
+{
+	BenaphoreLocker _(sCachesLock);
+	sDataNodeCache->ReturnObject(header);
+}
+
+
+static inline void
+free_net_buffer(net_buffer_private *buffer)
+{
+	BenaphoreLocker _(sCachesLock);
+	sNetBufferCache->ReturnObject(buffer);
+}
+
+
 static data_header *
 create_data_header(size_t headerSpace)
 {
-	// TODO: don't use malloc!
-	data_header *header = (data_header *)malloc(BUFFER_SIZE);
+	data_header *header = allocate_data_header();
 	if (header == NULL)
 		return NULL;
 
@@ -115,7 +160,7 @@ release_data_header(data_header *header)
 		return;
 
 	TRACE(("  free header %p\n", header));
-	free(header);
+	free_data_header(header);
 }
 
 
@@ -275,8 +320,7 @@ get_node_at_offset(net_buffer_private *buffer, size_t offset)
 static net_buffer *
 create_buffer(size_t headerSpace)
 {
-	net_buffer_private *buffer = (net_buffer_private *)malloc(
-		sizeof(struct net_buffer_private));
+	net_buffer_private *buffer = allocate_net_buffer();
 	if (buffer == NULL)
 		return NULL;
 
@@ -284,7 +328,7 @@ create_buffer(size_t headerSpace)
 
 	data_header *header = create_data_header(headerSpace);
 	if (header == NULL) {
-		free(buffer);
+		free_net_buffer(buffer);
 		return NULL;
 	}
 
@@ -318,7 +362,7 @@ free_buffer(net_buffer *_buffer)
 		remove_data_node(node);
 	}
 
-	free(buffer);
+	free_net_buffer(buffer);
 }
 
 
@@ -380,14 +424,13 @@ clone_buffer(net_buffer *_buffer, bool shareFreeSpace)
 
 	TRACE(("clone_buffer(buffer %p)\n", buffer));
 
-	net_buffer_private *clone = (net_buffer_private *)malloc(
-		sizeof(struct net_buffer_private));
+	net_buffer_private *clone = allocate_net_buffer();
 	if (clone == NULL)
 		return NULL;
 
 	data_node *sourceNode = (data_node *)list_get_first_item(&buffer->buffers);
 	if (sourceNode == NULL) {
-		free(clone);
+		free_net_buffer(clone);
 		return NULL;
 	}
 
@@ -428,7 +471,7 @@ clone_buffer(net_buffer *_buffer, bool shareFreeSpace)
 			// There was not enough space left for another node in this buffer
 			// TODO: handle this case!
 			panic("clone buffer hits size limit... (fix me)");
-			free(clone);
+			free_net_buffer(clone);
 			return NULL;
 		}
 	}
@@ -1133,6 +1176,49 @@ count_iovecs(net_buffer *_buffer)
 	}
 
 	return count;
+}
+
+
+status_t
+init_net_buffers()
+{
+	// TODO improve our code a bit so we can add constructors
+	//		and keep around half-constructed buffers in the slab
+
+	status_t status = benaphore_init(&sCachesLock, "net buffer cache lock");
+	if (status < B_OK)
+		return status;
+
+	sNetBufferCache = new (std::nothrow) NetBufferCache("net buffer cache",
+		sizeof(net_buffer_private), 8, NULL, NULL, NULL);
+	if (sNetBufferCache == NULL) {
+		benaphore_destroy(&sCachesLock);
+		return B_NO_MEMORY;
+	}
+
+	sDataNodeCache = new (std::nothrow) DataNodeCache("data node cache",
+		BUFFER_SIZE, 0, NULL, NULL, NULL);
+	if (sDataNodeCache == NULL) {
+		benaphore_destroy(&sCachesLock);
+		delete sNetBufferCache;
+		return B_NO_MEMORY;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+uninit_net_buffers()
+{
+	benaphore_lock(&sCachesLock);
+
+	delete sNetBufferCache;
+	delete sDataNodeCache;
+
+	benaphore_destroy(&sCachesLock);
+
+	return B_OK;
 }
 
 
