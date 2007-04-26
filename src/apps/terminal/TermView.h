@@ -195,7 +195,6 @@ class TermView : public BView {
 		void DoSelectAll();
 		void DoClearAll();
 
-		int SubstMetaChar (const char *p, char *q);
 		void WritePTY (const uchar *text, int num_byteses);
 
 		// Comunicate Input Method 
@@ -207,9 +206,6 @@ class TermView : public BView {
 		void ConfirmString (const char *, int32);
 		int32 GetCharFromUTF8String (const char *, char *);
 		int32 GetWidthFromUTF8String (const char *);
-
-		// mouse operation
-		int32 SetupMouseButton(const char *bname);
 
 		// Mouse select
 		void  Select(CurPos start, CurPos end);
@@ -303,11 +299,6 @@ class TermView : public BView {
 		int fScrBot;
 		int fScrBufSize;
 		bool fScrRegionSet;
-
-		// mouse
-		int32 mSelectButton;
-		int32 mSubMenuButton;
-		int32 mPasteMenuButton;
 
 		bool	fMouseImage;
 

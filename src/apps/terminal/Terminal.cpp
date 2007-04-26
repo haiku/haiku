@@ -36,15 +36,13 @@
 
 PrefHandler *gTermPref;		/* Preference temporary */
 
-////////////////////////////////////////////////////////////////////////////
-// main (int argc, char **argv)
-//	main routine of MuTerminal.
-////////////////////////////////////////////////////////////////////////////
-int
-main ()
-{
-  TermApp app;
-  app.Run ();
 
-  return 0;
+int
+main()
+{
+	TermApp app;
+	app.Run();
+
+	return 0;
 }
+

@@ -752,7 +752,7 @@ TermView::_InitViewThread()
 
 	resume_thread(fMouseThread);
 
-	return fViewThread;
+	return B_OK;
 }
 
 
@@ -1675,34 +1675,6 @@ TermView::DoClearAll(void)
 	fScrollBar->SetProportion(1);
 }
 
-// Substitution meta character
-int
-TermView::SubstMetaChar(const char *p, char *q)
-{
-	char *metachar = " ~`#$&*()\\|[]{};'\"<>?!";
-	int num_char = 0;
-	
-	while(*p) {
-		
-		char *mp = metachar;
-		for(int i = 0; i < 22; i++){
-			
-			if (*p == *mp++) {
-				*q++ = '\\';
-				num_char++;
-				break;
-			}
-		}
-		
-		*q++ = *p++;
-		num_char++;
-	}
-	
-	// Add null string
-	*q = *p;
-	return num_char + 1;
-}
-
 
 /*!	Write strings to PTY device. If encoding system isn't UTF8, change
 	encoding to UTF8 before writing PTY.
@@ -2143,20 +2115,16 @@ TermView::GetFontInfo(int *width, int *height)
 
 // Find a string, and select it if found
 bool
-TermView::Find (const BString &str, bool forwardSearch, bool matchCase, bool matchWord)
+TermView::Find(const BString &str, bool forwardSearch, bool matchCase, bool matchWord)
 {
-	BString buffer;
-	CurPos selectionstart, selectionend;
-	int offset = 0;
-	int initialresult = -1;
-	int result = B_ERROR;
-
 	//Get the buffer contents
+	BString buffer;	
 	fTextBuffer->ToString(buffer);
 
-	selectionstart = fTextBuffer->GetSelectionStart();
-	selectionend = fTextBuffer->GetSelectionEnd();
+	CurPos selectionstart = fTextBuffer->GetSelectionStart();
+	CurPos selectionend = fTextBuffer->GetSelectionEnd();
 
+	int offset = 0;
 	if (selectionstart.x >= 0 || selectionstart.y >= 0) {
 		if (forwardSearch)
 			//Set the offset to the end of the selection
@@ -2164,6 +2132,9 @@ TermView::Find (const BString &str, bool forwardSearch, bool matchCase, bool mat
 		else
 			offset = (selectionstart.y) * fTermColumns + selectionstart.x;
 	}
+
+	int initialresult = -1;
+	int result = B_ERROR;
 
 	for (;;) {		
 		//Actual search
@@ -2263,3 +2234,4 @@ TermView::SendDataToDrawEngine(int x1, int y1, int x2, int y2)
 	
 	release_sem(fDrawRectSem);
 }
+

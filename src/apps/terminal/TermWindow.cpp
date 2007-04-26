@@ -688,76 +688,64 @@ void SetCoding (int coding)
     
   return;
 }
-////////////////////////////////////////////////////////////////////////////
-// DoPageSetUp ()
-//
-////////////////////////////////////////////////////////////////////////////
+
+
 status_t
 TermWindow::DoPageSetup() 
 { 
-  status_t rv;
-  BPrintJob job("PageSetup");
+	BPrintJob job("PageSetup");
 
-  /* display the page configure panel */
-  rv = job.ConfigPage();
+	// display the page configure panel
+	status_t status = job.ConfigPage();
 
-  /* save a pointer to the settings */
-  fPrintSettings = job.Settings();
+	// save a pointer to the settings
+	fPrintSettings = job.Settings();
 
-  return rv;
+	return status;
 }
   
-////////////////////////////////////////////////////////////////////////////
-// DoPrint ()
-//
-////////////////////////////////////////////////////////////////////////////
+
 void
 TermWindow::DoPrint()
 {
-//#if B_BEOS_VERSION < 0x0460
-  BPrintJob job("Print"); 
-
-  if((! fPrintSettings) || (DoPageSetup() != B_NO_ERROR)) {
-    (new BAlert("Cancel", "Print cancelled.", "OK"))->Go();
-  return;
-  }
+	if (!fPrintSettings || (DoPageSetup() != B_NO_ERROR)) {
+		(new BAlert("Cancel", "Print cancelled.", "OK"))->Go();
+		return;
+	}
   
-  job.SetSettings(new BMessage(*fPrintSettings));
+	BPrintJob job("Print"); 
+	job.SetSettings(new BMessage(*fPrintSettings));
  
-  BRect pageRect = job.PrintableRect();
-  BRect curPageRect = pageRect;
+	BRect pageRect = job.PrintableRect();
+	BRect curPageRect = pageRect;
 
-  int pHeight = (int)pageRect.Height();
-  int pWidth = (int)pageRect.Width();
-  float w,h;
-  fTermView->GetFrameSize (&w, &h);
-  int xPages = (int)ceil(w / pWidth);
-  int yPages = (int)ceil(h / pHeight);
+	int pHeight = (int)pageRect.Height();
+	int pWidth = (int)pageRect.Width();
+	float w,h;
+	fTermView->GetFrameSize(&w, &h);
+	int xPages = (int)ceil(w / pWidth);
+	int yPages = (int)ceil(h / pHeight);
 
-   /* engage the print server */
-  job.BeginJob();
+	job.BeginJob();
 
-  /* loop through and draw each page, and write to spool */
-  for(int x = 0; x < xPages; x++)
-    for(int y = 0; y < yPages; y++){
-      curPageRect.OffsetTo(x * pWidth, y * pHeight);
-      job.DrawView(fTermView, curPageRect, BPoint(0, 0));
-      job.SpoolPage();
+	// loop through and draw each page, and write to spool
+	for (int x = 0; x < xPages; x++) {
+		for (int y = 0; y < yPages; y++) {
+			curPageRect.OffsetTo(x * pWidth, y * pHeight);
+			job.DrawView(fTermView, curPageRect, B_ORIGIN);
+			job.SpoolPage();
     
-      if(!job.CanContinue()){
-      	  // It is likely that the only way that the job was cancelled is
-      	  // because the user hit 'Cancel' in the page setup window, in which
-      	  // case, the user does *not* need to be told that it was cancelled.
-      	  // He/she will simply expect that it was done.
-//        (new BAlert("Cancel", "Print job cancelled", "OK"))->Go();
-        return;
-      }
-  }
-
-  /* commit the job, send the spool file */
-  job.CommitJob();
-//#endif 
+			if (!job.CanContinue()){
+				// It is likely that the only way that the job was cancelled is
+			      	// because the user hit 'Cancel' in the page setup window, in which
+			      	// case, the user does *not* need to be told that it was cancelled.
+			      	// He/she will simply expect that it was done.
+				// (new BAlert("Cancel", "Print job cancelled", "OK"))->Go();
+			        return;
+			}
+		}
+	}
+	
+	job.CommitJob(); 
 }
-
-
 

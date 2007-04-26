@@ -86,13 +86,13 @@ class TermWindow : public BWindow {
   PrefWindow	*fPrefWindow;
   FindWindow	*fFindPanel;
   BMessageRunner *fWindowUpdate;
-  BMenuItem *item;
+
   BRect		fSavedFrame;
   window_look	fSavedLook;
   //Saved search parameters
   BString	fFindString;
   BMenuItem	*fFindForwardMenuItem;
-  BMenuItem *fFindBackwardMenuItem;
+  BMenuItem 	*fFindBackwardMenuItem;
   bool		fFindSelection;
   bool		fForwardSearch;
   bool		fMatchCase;
