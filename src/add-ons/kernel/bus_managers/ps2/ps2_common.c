@@ -176,9 +176,9 @@ ps2_setup_active_multiplexing(bool *enabled)
 no_support:	
 	TRACE("ps2: active multiplexing not supported\n");
 	*enabled = false;
-	// some controllers get upset by the d3 command and will continue data 
-	// loopback, thus send a harmless command (enable keybaord interface)
-	// see bug report #1175
+	// Some controllers get upset by the d3 command and will continue data loopback,
+	// thus we need to send a harmless command (enable keyboard interface) next
+	// This fixes bug report #1175
 	res = ps2_command(0xae, NULL, 0, NULL, 0);
 	if (res != B_OK) {
 		INFO("ps2: active multiplexing d3 workaround failed, status 0x%08lx\n", res);
