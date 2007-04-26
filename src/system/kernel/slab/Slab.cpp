@@ -21,7 +21,7 @@
 //      same code. We'll have to resolve all of the dependencies
 //      then, for now, it is still not required.
 
-//#define TRACE_SLAB
+#define TRACE_SLAB
 
 #ifdef TRACE_SLAB
 #define TRACE_CACHE(cache, format, args...) \
@@ -50,15 +50,12 @@ public:
 
 
 typedef MergedLinkCacheStrategy<AreaBackend> SmallObjectStrategy;
-typedef MergedLinkAndSlabCacheStrategy<AreaBackend> MediumObjectStrategy;
-typedef HashCacheStrategy<AreaBackend> BigObjectStrategy;
+typedef HashCacheStrategy<AreaBackend> LargeObjectStrategy;
 
 typedef Cache<SmallObjectStrategy> SmallObjectCache;
-typedef Cache<MediumObjectStrategy> MediumObjectCache;
-typedef Cache<BigObjectStrategy> BigObjectCache;
+typedef Cache<LargeObjectStrategy> LargeObjectCache;
 
 
-// SmallObjectCache: one word overhead per object, needs pages to be aligned
 class SmallObjectAbstractCache : public AbstractCache,
 	public LocalCache<SmallObjectCache> {
 public:
@@ -74,30 +71,12 @@ public:
 };
 
 
-// MediumObjectCache: two words overhead per object
-class MediumObjectAbstractCache : public AbstractCache,
-	public LocalCache<MediumObjectCache> {
+class LargeObjectAbstractCache : public AbstractCache,
+	public LocalCache<LargeObjectCache> {
 public:
-	typedef LocalCache<MediumObjectCache> Base;
+	typedef LocalCache<LargeObjectCache> Base;
 
-	MediumObjectAbstractCache(const char *name, size_t objectSize,
-		size_t alignment, base_cache_constructor constructor,
-		base_cache_destructor destructor, void *cookie)
-		: Base(name, objectSize, alignment, constructor, destructor, cookie) {}
-
-	void *Allocate(uint32_t flags) { return Base::Alloc(flags); }
-	void Return(void *object) { Base::Free(object); }
-};
-
-
-// BigObjectCache: uses an hash table to map objects to links but packs
-// the objects tightly in the pages. Good for power of 2 lengths.
-class BigObjectAbstractCache : public AbstractCache,
-	public LocalCache<BigObjectCache> {
-public:
-	typedef LocalCache<BigObjectCache> Base;
-
-	BigObjectAbstractCache(const char *name, size_t objectSize,
+	LargeObjectAbstractCache(const char *name, size_t objectSize,
 		size_t alignment, base_cache_constructor constructor,
 		base_cache_destructor destructor, void *cookie)
 		: Base(name, objectSize, alignment, constructor, destructor, cookie) {}
@@ -124,6 +103,21 @@ SListPush(Type* &head, Type *object)
 {
 	object->next = head;
 	head = object;
+}
+
+
+static inline void *
+_LinkToObject(cache_object_link *link, size_t objectSize)
+{
+	return ((uint8_t *)link) - (objectSize - sizeof(cache_object_link));
+}
+
+
+static inline cache_object_link *
+_ObjectToLink(void *object, size_t objectSize)
+{
+	return (cache_object_link *)(((uint8_t *)object)
+		+ (objectSize - sizeof(cache_object_link)));
 }
 
 
@@ -161,6 +155,9 @@ base_cache_init(base_cache *cache, const char *name, size_t objectSize,
 	base_cache_destructor destructor, void *cookie)
 {
 	strlcpy(cache->name, name, sizeof(cache->name));
+
+	if (objectSize < sizeof(void *) && alignment < sizeof(void *))
+		objectSize = sizeof(void *);
 
 	if (alignment > 0 && (objectSize & (alignment - 1)))
 		cache->object_size = objectSize + alignment
@@ -245,7 +242,7 @@ base_cache_low_memory(base_cache *cache, int32 level,
 }
 
 
-cache_object_link *
+void *
 base_cache_allocate_object(base_cache *cache)
 {
 	cache_slab *slab;
@@ -274,11 +271,11 @@ base_cache_allocate_object(base_cache *cache)
 		list_add_item(&cache->full, slab);
 	}
 
-	return link;
+	return _LinkToObject(link, cache->object_size);
 }
 
 
-cache_object_link *
+void *
 base_cache_allocate_object_with_new_slab(base_cache *cache,
 	cache_slab *newSlab)
 {
@@ -289,9 +286,10 @@ base_cache_allocate_object_with_new_slab(base_cache *cache,
 
 int
 base_cache_return_object(base_cache *cache, cache_slab *slab,
-	cache_object_link *link)
+	void *object)
 {
 	// We return true if the slab is completely unused.
+	cache_object_link *link = _ObjectToLink(object, cache->object_size);
 
 	TRACE_CACHE(cache, "returning %p to %p, %lu used (%lu empty slabs).",
 		link, slab, slab->size - slab->count, cache->empty_count);
@@ -318,7 +316,6 @@ base_cache_return_object(base_cache *cache, cache_slab *slab,
 cache_slab *
 base_cache_construct_slab(base_cache *cache, cache_slab *slab, void *pages,
 	size_t byteCount, void *parent,
-	cache_object_link *(*getLink)(void *parent, void *object),
 	base_cache_owner_prepare prepare, base_cache_owner_unprepare unprepare)
 {
 	TRACE_CACHE(cache, "construct (%p, %p, %lu)", slab, pages, byteCount);
@@ -328,17 +325,17 @@ base_cache_construct_slab(base_cache *cache, cache_slab *slab, void *pages,
 	slab->free = NULL;
 
 	size_t spareBytes = byteCount - (slab->size * cache->object_size);
-	size_t cycle = cache->cache_color_cycle;
+	slab->offset = cache->cache_color_cycle;
 
-	if (cycle > spareBytes)
-		cache->cache_color_cycle = cycle = 0;
+	if (slab->offset > spareBytes)
+		cache->cache_color_cycle = slab->offset = 0;
 	else
 		cache->cache_color_cycle += kCacheColorPeriod;
 
-	TRACE_CACHE(cache, "  %lu objects, %lu spare bytes, cycle %lu",
-		slab->size, spareBytes, cycle);
+	TRACE_CACHE(cache, "  %lu objects, %lu spare bytes, offset %lu",
+		slab->size, spareBytes, slab->offset);
 
-	uint8_t *data = ((uint8_t *)pages) + cycle;
+	uint8_t *data = ((uint8_t *)pages) + slab->offset;
 
 	for (size_t i = 0; i < slab->size; i++) {
 		if (prepare || cache->constructor) {
@@ -356,7 +353,7 @@ base_cache_construct_slab(base_cache *cache, cache_slab *slab, void *pages,
 				if (!failedOnFirst && unprepare)
 					unprepare(parent, slab, data);
 
-				data = ((uint8_t *)pages) + cycle;
+				data = ((uint8_t *)pages) + slab->offset;
 				for (size_t j = 0; j < i; j++) {
 					if (cache->destructor)
 						cache->destructor(cache->cookie, data);
@@ -369,7 +366,7 @@ base_cache_construct_slab(base_cache *cache, cache_slab *slab, void *pages,
 			}
 		}
 
-		SListPush(slab->free, getLink(parent, data));
+		SListPush(slab->free, _ObjectToLink(data, cache->object_size));
 		data += cache->object_size;
 	}
 
@@ -378,20 +375,21 @@ base_cache_construct_slab(base_cache *cache, cache_slab *slab, void *pages,
 
 
 void
-base_cache_destruct_slab(base_cache *cache, cache_slab *slab)
+base_cache_destruct_slab(base_cache *cache, cache_slab *slab, void *parent,
+	base_cache_owner_unprepare unprepare)
 {
 	TRACE_CACHE(cache, "destruct %p", slab);
-
-	if (cache->destructor == NULL)
-		return;
 
 	if (slab->count != slab->size)
 		panic("cache: destroying a slab which isn't empty.");
 
-	uint8_t *data = (uint8_t *)slab->pages;
+	uint8_t *data = ((uint8_t *)slab->pages) + slab->offset;
 
 	for (size_t i = 0; i < slab->size; i++) {
-		cache->destructor(cache->cookie, data);
+		if (cache->destructor)
+			cache->destructor(cache->cookie, data);
+		if (unprepare)
+			unprepare(parent, slab, data);
 		data += cache->object_size;
 	}
 }
@@ -616,19 +614,6 @@ base_depot_make_empty(base_depot *depot)
 }
 
 
-static inline int
-__Fls(size_t value)
-{
-	if (value == 0)
-		return -1;
-
-	int bit;
-	for (bit = 1; value != 1; bit++)
-		value >>= 1;
-	return bit;
-}
-
-
 object_cache_t
 object_cache_create(const char *name, size_t object_size, size_t alignment,
 	status_t (*_constructor)(void *, void *), void (*_destructor)(void *,
@@ -636,18 +621,11 @@ object_cache_create(const char *name, size_t object_size, size_t alignment,
 {
 	if (object_size == 0)
 		return NULL;
-	else if (object_size < 64)
+	else if (object_size <= 256)
 		return new (std::nothrow) SmallObjectAbstractCache(name, object_size,
 			alignment, _constructor, _destructor, cookie);
 
-	size_t upperBoundary = 1 << __Fls(object_size);
-
-	if (object_size <= 256
-		|| (upperBoundary - object_size) >= (4 * sizeof(void *)))
-		return new (std::nothrow) MediumObjectAbstractCache(name, object_size,
-			alignment, _constructor, _destructor, cookie);
-
-	return new (std::nothrow) BigObjectAbstractCache(name, object_size,
+	return new (std::nothrow) LargeObjectAbstractCache(name, object_size,
 		alignment, _constructor, _destructor, cookie);
 }
 

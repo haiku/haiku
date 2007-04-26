@@ -15,7 +15,6 @@
 template<typename Backend>
 class BaseCacheStrategy {
 protected:
-	typedef cache_object_link	ObjectLink;
 	typedef cache_slab			BaseSlab;
 
 	BaseCacheStrategy(base_cache *parent)
@@ -35,16 +34,17 @@ protected:
 	};
 
 	BaseSlab *_ConstructSlab(Slab *slab, void *pages, size_t byteCount,
-		void *parent, ObjectLink *(*getLink)(void *parent, void *object),
-		base_cache_owner_prepare prepare, base_cache_owner_unprepare unprepare)
+		void *parent, base_cache_owner_prepare prepare,
+		base_cache_owner_unprepare unprepare)
 	{
 		return base_cache_construct_slab(fParent, slab, pages, byteCount,
-			parent, getLink, prepare, unprepare);
+			parent, prepare, unprepare);
 	}
 
-	void _DestructSlab(BaseSlab *slab)
+	void _DestructSlab(BaseSlab *slab, void *parent,
+		base_cache_owner_unprepare unprepare)
 	{
-		base_cache_destruct_slab(fParent, slab);
+		base_cache_destruct_slab(fParent, slab, parent, unprepare);
 		Backend::FreePages(fParent, ((Slab *)slab)->id);
 	}
 

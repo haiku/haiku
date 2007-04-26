@@ -58,6 +58,7 @@ typedef struct cache_object_link {
 typedef struct cache_slab {
 	void *pages;
 	size_t count, size;
+	size_t offset;
 	cache_object_link *free;
 	struct list_link link;
 } cache_slab;
@@ -73,11 +74,11 @@ void base_cache_destroy(base_cache *cache,
 void base_cache_low_memory(base_cache *cache, int32 level,
 	void (*return_slab)(base_cache *, cache_slab *));
 
-cache_object_link *base_cache_allocate_object(base_cache *cache);
-cache_object_link *base_cache_allocate_object_with_new_slab(base_cache *cache,
+void *base_cache_allocate_object(base_cache *cache);
+void *base_cache_allocate_object_with_new_slab(base_cache *cache,
 	cache_slab *slab);
 int base_cache_return_object(base_cache *cache, cache_slab *slab,
-	cache_object_link *link);
+	void *object);
 
 typedef status_t (*base_cache_owner_prepare)(void *parent,
 	cache_slab *slab, void *object);
@@ -86,14 +87,12 @@ typedef void (*base_cache_owner_unprepare)(void *parent, cache_slab *slab,
 
 cache_slab *base_cache_construct_slab(base_cache *cache, cache_slab *slab,
 	void *pages, size_t byte_count, void *parent,
-	cache_object_link *(*get_link)(void *parent, void *object),
 	base_cache_owner_prepare prepare, base_cache_owner_unprepare unprepare);
-void base_cache_destruct_slab(base_cache *cache, cache_slab *slab);
+void base_cache_destruct_slab(base_cache *cache, cache_slab *slab,
+	void *parent, base_cache_owner_unprepare unprepare);
 
 #ifdef __cplusplus
 }
-
-typedef std::pair<cache_slab *, cache_object_link *> CacheObjectInfo;
 
 // Slab implementation, glues together the frontend, backend as
 // well as the Slab strategy used.
@@ -109,8 +108,8 @@ public:
 		: fStrategy(this)
 	{
 		if (benaphore_init(&fLock, name) >= B_OK) {
-			base_cache_init(this, name, Strategy::RequiredSpace(objectSize),
-				alignment, constructor, destructor, cookie);
+			base_cache_init(this, name, objectSize, alignment, constructor,
+				destructor, cookie);
 			register_low_memory_handler(_LowMemory, this, 0);
 		}
 	}
@@ -131,29 +130,29 @@ public:
 	{
 		BenaphoreLocker _(fLock);
 
-		cache_object_link *link = base_cache_allocate_object(this);
+		void *object = base_cache_allocate_object(this);
 
 		// if the cache is returning NULL it is because it ran out of slabs
-		if (link == NULL) {
+		if (object == NULL) {
 			cache_slab *newSlab = fStrategy.NewSlab(flags);
 			if (newSlab == NULL)
 				return NULL;
-			link = base_cache_allocate_object_with_new_slab(this, newSlab);
-			if (link == NULL)
+			object = base_cache_allocate_object_with_new_slab(this, newSlab);
+			if (object == NULL)
 				panic("cache: failed to allocate with an empty slab");
 		}
 
-		return fStrategy.Object(link);
+		return object;
 	}
 
 	void ReturnObject(void *object)
 	{
 		BenaphoreLocker _(fLock);
 
-		CacheObjectInfo location = fStrategy.ObjectInformation(object);
+		cache_slab *slab = fStrategy.ObjectSlab(object);
 
-		if (base_cache_return_object(this, location.first, location.second))
-			fStrategy.ReturnSlab(location.first);
+		if (base_cache_return_object(this, slab, object))
+			fStrategy.ReturnSlab(slab);
 	}
 
 private:

@@ -17,26 +17,27 @@
 
 
 struct BaseHashCacheStrategy {
-	struct Link : cache_object_link, HashTableLink<Link> {
+	struct Link : HashTableLink<Link> {
+		const void *buffer;
 		cache_slab *slab;
-		void *buffer;
 	};
 
 	struct HashTableDefinition {
 		typedef BaseHashCacheStrategy	ParentType;
-		typedef void *					KeyType;
+		typedef const void *			KeyType;
 		typedef Link					ValueType;
 
 		HashTableDefinition(BaseHashCacheStrategy *_parent) : parent(_parent) {}
 
-		size_t HashKey(void *key) const
+		size_t HashKey(const void *key) const
 		{
-			return (((uint8_t *)key) - ((uint8_t *)0)) >> parent->fLowerBoundary;
+			return (((const uint8_t *)key)
+				- ((const uint8_t *)0)) >> parent->fLowerBoundary;
 		}
 
 		size_t Hash(Link *value) const { return HashKey(value->buffer); }
 
-		bool Compare(void *key, Link *value) const
+		bool Compare(const void *key, Link *value) const
 		{
 			return value->buffer == key;
 		}
@@ -66,15 +67,9 @@ struct BaseHashCacheStrategy {
 	BaseHashCacheStrategy(base_cache *parent)
 		: fHashTable(this), fLowerBoundary(__Fls0(parent->object_size)) {}
 
-	void *Object(cache_object_link *link) const
+	cache_slab *ObjectSlab(void *object) const
 	{
-		return ((Link *)link)->buffer;
-	}
-
-	CacheObjectInfo ObjectInformation(void *object) const
-	{
-		Link *link = _Linkage(object);
-		return CacheObjectInfo(link->slab, link);
+		return _Linkage(object)->slab;
 	}
 
 protected:
@@ -84,11 +79,6 @@ protected:
 		if (link == NULL)
 			panic("slab: missing buffer link from hash table.");
 		return link;
-	}
-
-	static cache_object_link *_Linkage(void *_this, void *object)
-	{
-		return ((BaseHashCacheStrategy *)_this)->_Linkage(object);
 	}
 
 	HashTable fHashTable;
@@ -105,11 +95,6 @@ struct HashCacheStrategy : BaseCacheStrategy<Backend>, BaseHashCacheStrategy {
 	HashCacheStrategy(base_cache *parent)
 		: BaseCacheStrategy<Backend>(parent), BaseHashCacheStrategy(parent),
 			fSlabCache("slab cache", 0), fLinkCache("link cache", 0) {}
-
-	static size_t RequiredSpace(size_t objectSize)
-	{
-		return objectSize;
-	}
 
 	BaseSlab *NewSlab(uint32_t flags)
 	{
@@ -129,8 +114,7 @@ struct HashCacheStrategy : BaseCacheStrategy<Backend>, BaseHashCacheStrategy {
 		// it's very important that we cast this to BaseHashCacheStrategy
 		// so we get the proper instance offset through void *
 		cache_slab *result = BaseCacheStrategy<Backend>::_ConstructSlab(slab,
-			pages, _SlabSize(), (BaseHashCacheStrategy *)this, _Linkage,
-			_PrepareObject, _UnprepareObject);
+			pages, _SlabSize(), this, _PrepareObject, _UnprepareObject);
 		if (result == NULL) {
 			Backend::FreePages(Parent(), slab->id);
 			fSlabCache.Free(slab);
@@ -141,8 +125,7 @@ struct HashCacheStrategy : BaseCacheStrategy<Backend>, BaseHashCacheStrategy {
 
 	void ReturnSlab(BaseSlab *slab)
 	{
-		_ClearSlab(slab->pages, _SlabSize());
-		BaseCacheStrategy<Backend>::_DestructSlab(slab);
+		BaseCacheStrategy<Backend>::_DestructSlab(slab, this, _UnprepareObject);
 		fSlabCache.Free((Slab *)slab);
 	}
 
@@ -156,8 +139,7 @@ private:
 
 	static status_t _PrepareObject(void *_self, cache_slab *slab, void *object)
 	{
-		BaseHashCacheStrategy *base = (BaseHashCacheStrategy *)_self;
-		Strategy *self = (Strategy *)base;
+		Strategy *self = (Strategy *)_self;
 
 		Link *link = self->fLinkCache.Alloc(CACHE_DONT_SLEEP);
 		if (link == NULL)
@@ -173,8 +155,7 @@ private:
 
 	static void _UnprepareObject(void *_self, cache_slab *slab, void *object)
 	{
-		BaseHashCacheStrategy *base = (BaseHashCacheStrategy *)_self;
-		((Strategy *)base)->_UnprepareObject(object);
+		((Strategy *)_self)->_UnprepareObject(object);
 	}
 
 	void _UnprepareObject(void *object)
@@ -182,15 +163,6 @@ private:
 		Link *link = _Linkage(object);
 		fHashTable.Remove(link);
 		fLinkCache.Free(link);
-	}
-
-	void _ClearSlab(void *pages, size_t size)
-	{
-		uint8_t *data = (uint8_t *)pages;
-		uint8_t *end = data + size;
-
-		for (uint8_t *it = data; it < end; it += Parent()->object_size)
-			_UnprepareObject(it);
 	}
 
 	TypedCache<Slab, Backend> fSlabCache;

@@ -65,7 +65,7 @@ struct net_buffer_private : net_buffer {
 };
 
 
-typedef MergedLinkAndSlabCacheStrategy<AreaBackend> AreaMergedCacheStrategy;
+typedef MergedLinkCacheStrategy<AreaBackend> AreaMergedCacheStrategy;
 typedef HashCacheStrategy<AreaBackend> AreaHashCacheStrategy;
 
 typedef Cache<AreaMergedCacheStrategy> NetBufferCache;
