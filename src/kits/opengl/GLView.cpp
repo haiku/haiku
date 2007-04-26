@@ -45,6 +45,8 @@ struct glview_direct_info {
 	direct_buffer_info *direct_info;
 	bool direct_connected;
 	bool enable_direct_mode;
+	sem_id draw_sem;
+	int32 draw_lock;
 
 	glview_direct_info();
 	~glview_direct_info();
@@ -154,9 +156,12 @@ BGLView::ErrorCallback(unsigned long errorCode)
 void
 BGLView::Draw(BRect updateRect)
 {
-	if (fRenderer)
-		return fRenderer->Draw(updateRect);
-	
+	if (fRenderer) {
+		lock_draw();	
+		fRenderer->Draw(updateRect);
+		unlock_draw();
+		return;	
+	}
 	// TODO: auto-size and center the string
 	MovePenTo(8, 32);
 	DrawString("No OpenGL renderer available!");
@@ -296,20 +301,17 @@ BGLView::GetSupportedSuites(BMessage *data)
 void
 BGLView::DirectConnected(direct_buffer_info *info)
 {
-	// TODO: Locking !!!!!
-	// TODO: We should probably prevent the renderer to draw anything
-	// (lock_draw() ??) while we are in this method
-
 	if (!m_clip_info/* && m_direct_connection_disabled*/) {
 		m_clip_info = new glview_direct_info();
 	}
 
 	glview_direct_info *glviewDirectInfo = (glview_direct_info *)m_clip_info;
 	direct_buffer_info *localInfo = glviewDirectInfo->direct_info;
-	//direct_info_locker->Lock(); 
+	
 	switch(info->buffer_state & B_DIRECT_MODE_MASK) { 
 		case B_DIRECT_START:
 			glviewDirectInfo->direct_connected = true;
+			unlock_draw();
 		case B_DIRECT_MODIFY:
 		{
 			localInfo->buffer_state = info->buffer_state;
@@ -342,11 +344,11 @@ BGLView::DirectConnected(direct_buffer_info *info)
 			break; 
 		}		
 		case B_DIRECT_STOP: 
-			glviewDirectInfo->direct_connected = false; 
+			glviewDirectInfo->direct_connected = false;
+			lock_draw();
 			break; 
 	} 
-	//direct_info_locker->Unlock();
-
+	
 	if (fRenderer)
 		fRenderer->DirectConnected(localInfo);
 }
@@ -361,6 +363,34 @@ BGLView::EnableDirectMode(bool enabled)
                 m_clip_info = new glview_direct_info();
         }
 	((glview_direct_info *)m_clip_info)->enable_direct_mode = enabled;
+}
+
+
+void
+BGLView::lock_draw()
+{
+	glview_direct_info *info = (glview_direct_info *)m_clip_info;
+
+	if (!info || !info->enable_direct_mode)
+		return;
+
+	if (atomic_add(&info->draw_lock, 1) > 0) {
+		while (acquire_sem(info->draw_sem) == B_INTERRUPTED)
+			;	
+	}	
+}
+
+
+void
+BGLView::unlock_draw()
+{
+	glview_direct_info *info = (glview_direct_info *)m_clip_info;
+
+	if (!info || !info->enable_direct_mode)
+		return;
+	
+	if (atomic_add(&info->draw_lock, -1) > 1)
+		release_sem(info->draw_sem);
 }
 
 
@@ -521,11 +551,14 @@ glview_direct_info::glview_direct_info()
 	direct_info = (direct_buffer_info *)calloc(1, B_PAGE_SIZE);
 	direct_connected = false;
 	enable_direct_mode = false;
+	draw_sem = create_sem(0, "glview_draw_sem");
+	draw_lock = 0;
 }
 
 
 glview_direct_info::~glview_direct_info()
 {
 	free(direct_info);
+	delete_sem(draw_sem);
 }
 
