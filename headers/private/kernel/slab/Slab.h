@@ -9,11 +9,11 @@
 #ifndef _SLAB_SLAB_H_
 #define _SLAB_SLAB_H_
 
-#ifdef __cplusplus
+#include <slab/Depot.h>
 
+#ifdef __cplusplus
 #include <slab/Backend.h>
 #include <slab/Base.h>
-#include <slab/Depot.h>
 #include <slab/MergedStrategy.h>
 #include <slab/HashStrategy.h>
 #include <slab/Utilities.h>
@@ -21,11 +21,6 @@
 
 extern "C" {
 #endif
-
-enum {
-	CACHE_DONT_SLEEP		= 1 << 0,
-	CACHE_ALIGN_TO_TOTAL	= 1 << 16,
-};
 
 typedef void *object_cache_t;
 

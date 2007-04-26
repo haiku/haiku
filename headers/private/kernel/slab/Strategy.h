@@ -47,6 +47,8 @@ protected:
 		Backend::FreePages(fParent, ((Slab *)slab)->id);
 	}
 
+	base_cache *Parent() const { return fParent; }
+
 	base_cache *fParent;
 };
 

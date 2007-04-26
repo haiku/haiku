@@ -9,6 +9,7 @@
 #ifndef _SLAB_MERGED_STRATEGY_H_
 #define _SLAB_MERGED_STRATEGY_H_
 
+#include <slab/Base.h>
 #include <slab/Strategy.h>
 
 
@@ -29,6 +30,7 @@ namespace Private {
 template<typename Backend>
 class MergedLinkCacheStrategy : public BaseCacheStrategy<Backend> {
 public:
+	typedef typename BaseCacheStrategy<Backend>::BaseSlab BaseSlab;
 	typedef typename BaseCacheStrategy<Backend>::Slab Slab;
 	typedef cache_object_link Link;
 
@@ -42,7 +44,7 @@ public:
 
 	void *Object(Link *link) const
 	{
-		return ((uint8_t *)link) - (fParent->object_size - sizeof(Link));
+		return ((uint8_t *)link) - (Parent()->object_size - sizeof(Link));
 	}
 
 	CacheObjectInfo ObjectInformation(void *object) const
@@ -60,7 +62,7 @@ public:
 		// in order to save a pointer per object or a hash table to
 		// map objects to slabs we required this set of pages to be
 		// aligned in a (pageCount * PAGE_SIZE) boundary.
-		if (Backend::AllocatePages(fParent, &id, &pages, byteCount,
+		if (Backend::AllocatePages(Parent(), &id, &pages, byteCount,
 				CACHE_ALIGN_TO_TOTAL | flags) < B_OK)
 			return NULL;
 
@@ -84,10 +86,12 @@ private:
 		return byteCount;
 	}
 
+	base_cache *Parent() const { return BaseCacheStrategy<Backend>::Parent(); }
+
 	Link *_Linkage(void *object) const
 	{
 		return (Link *)(((uint8_t *)object)
-			+ (fParent->object_size - sizeof(Link)));
+			+ (Parent()->object_size - sizeof(Link)));
 	}
 
 	Slab *_SlabInPages(const void *pages) const

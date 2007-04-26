@@ -20,6 +20,11 @@
 extern "C" {
 #endif
 
+enum {
+	CACHE_DONT_SLEEP		= 1 << 0,
+	CACHE_ALIGN_TO_TOTAL	= 1 << 16,
+};
+
 static const int kMinimumSlabItems = 32;
 
 typedef void (*base_cache_constructor)(void *cookie, void *object);

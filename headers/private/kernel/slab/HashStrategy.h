@@ -98,6 +98,7 @@ protected:
 
 template<typename Backend>
 struct HashCacheStrategy : BaseCacheStrategy<Backend>, BaseHashCacheStrategy {
+	typedef typename BaseCacheStrategy<Backend>::BaseSlab BaseSlab;
 	typedef typename BaseCacheStrategy<Backend>::Slab Slab;
 	typedef HashCacheStrategy<Backend> Strategy;
 
@@ -119,14 +120,14 @@ struct HashCacheStrategy : BaseCacheStrategy<Backend>, BaseHashCacheStrategy {
 			return NULL;
 
 		void *pages;
-		if (Backend::AllocatePages(fParent, &slab->id, &pages, byteCount,
+		if (Backend::AllocatePages(Parent(), &slab->id, &pages, byteCount,
 				flags) < B_OK) {
 			fSlabCache.Free(slab);
 			return NULL;
 		}
 
 		if (_PrepareSlab(slab, pages, byteCount, flags) < B_OK) {
-			Backend::FreePages(fParent, slab->id);
+			Backend::FreePages(Parent(), slab->id);
 			fSlabCache.Free(slab);
 			return NULL;
 		}
@@ -150,12 +151,14 @@ private:
 		return BaseCacheStrategy<Backend>::SlabSize(0);
 	}
 
+	base_cache *Parent() const { return BaseCacheStrategy<Backend>::Parent(); }
+
 	status_t _PrepareSlab(Slab *slab, void *pages, size_t byteCount,
 		uint32_t flags)
 	{
 		uint8_t *data = (uint8_t *)pages;
 		for (uint8_t *it = data;
-				it < (data + byteCount); it += fParent->object_size) {
+				it < (data + byteCount); it += Parent()->object_size) {
 			Link *link = fLinkCache.Alloc(flags);
 
 			if (link == NULL) {
@@ -178,7 +181,7 @@ private:
 
 	void _ClearSlabRange(uint8_t *data, uint8_t *end)
 	{
-		for (uint8_t *it = data; it < end; it += fParent->object_size) {
+		for (uint8_t *it = data; it < end; it += Parent()->object_size) {
 			Link *link = _Linkage(it);
 			fHashTable.Remove(link);
 			fLinkCache.Free(link);
