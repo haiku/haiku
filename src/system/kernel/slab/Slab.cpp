@@ -36,6 +36,77 @@ static const int kMagazineCapacity = 32;
 
 static const size_t kCacheColorPeriod = 8;
 
+
+// all the AbstractCache stuff is used with the C interface, we
+// should probably move this to its own file.
+
+class AbstractCache {
+public:
+	virtual ~AbstractCache() {}
+
+	virtual void *Allocate(uint32_t flags) = 0;
+	virtual void Return(void *object) = 0;
+};
+
+
+typedef MergedLinkCacheStrategy<AreaBackend> SmallObjectStrategy;
+typedef MergedLinkAndSlabCacheStrategy<AreaBackend> MediumObjectStrategy;
+typedef HashCacheStrategy<AreaBackend> BigObjectStrategy;
+
+typedef Cache<SmallObjectStrategy> SmallObjectCache;
+typedef Cache<MediumObjectStrategy> MediumObjectCache;
+typedef Cache<BigObjectStrategy> BigObjectCache;
+
+
+// SmallObjectCache: one word overhead per object, needs pages to be aligned
+class SmallObjectAbstractCache : public AbstractCache,
+	public LocalCache<SmallObjectCache> {
+public:
+	typedef LocalCache<SmallObjectCache> Base;
+
+	SmallObjectAbstractCache(const char *name, size_t objectSize,
+		size_t alignment, base_cache_constructor constructor,
+		base_cache_destructor destructor, void *cookie)
+		: Base(name, objectSize, alignment, constructor, destructor, cookie) {}
+
+	void *Allocate(uint32_t flags) { return Base::Alloc(flags); }
+	void Return(void *object) { Base::Free(object); }
+};
+
+
+// MediumObjectCache: two words overhead per object
+class MediumObjectAbstractCache : public AbstractCache,
+	public LocalCache<MediumObjectCache> {
+public:
+	typedef LocalCache<MediumObjectCache> Base;
+
+	MediumObjectAbstractCache(const char *name, size_t objectSize,
+		size_t alignment, base_cache_constructor constructor,
+		base_cache_destructor destructor, void *cookie)
+		: Base(name, objectSize, alignment, constructor, destructor, cookie) {}
+
+	void *Allocate(uint32_t flags) { return Base::Alloc(flags); }
+	void Return(void *object) { Base::Free(object); }
+};
+
+
+// BigObjectCache: uses an hash table to map objects to links but packs
+// the objects tightly in the pages. Good for power of 2 lengths.
+class BigObjectAbstractCache : public AbstractCache,
+	public LocalCache<BigObjectCache> {
+public:
+	typedef LocalCache<BigObjectCache> Base;
+
+	BigObjectAbstractCache(const char *name, size_t objectSize,
+		size_t alignment, base_cache_constructor constructor,
+		base_cache_destructor destructor, void *cookie)
+		: Base(name, objectSize, alignment, constructor, destructor, cookie) {}
+
+	void *Allocate(uint32_t flags) { return Base::Alloc(flags); }
+	void Return(void *object) { Base::Free(object); }
+};
+
+
 static depot_magazine *_AllocMagazine();
 static void _FreeMagazine(depot_magazine *magazine);
 
@@ -545,44 +616,66 @@ base_depot_make_empty(base_depot *depot)
 }
 
 
-typedef MergedLinkCacheStrategy<AreaBackend> AreaMergedCacheStrategy;
-typedef Cache<AreaMergedCacheStrategy> AreaMergedCache;
-typedef LocalCache<AreaMergedCache> AreaLocalCache;
+static inline int
+__Fls(size_t value)
+{
+	if (value == 0)
+		return -1;
+
+	int bit;
+	for (bit = 1; value != 1; bit++)
+		value >>= 1;
+	return bit;
+}
+
 
 object_cache_t
 object_cache_create(const char *name, size_t object_size, size_t alignment,
 	status_t (*_constructor)(void *, void *), void (*_destructor)(void *,
 	void *), void *cookie)
 {
-	return new (std::nothrow) AreaLocalCache(name, object_size, alignment,
-		_constructor, _destructor, cookie);
+	if (object_size == 0)
+		return NULL;
+	else if (object_size < 64)
+		return new (std::nothrow) SmallObjectAbstractCache(name, object_size,
+			alignment, _constructor, _destructor, cookie);
+
+	size_t upperBoundary = 1 << __Fls(object_size);
+
+	if (object_size <= 256
+		|| (upperBoundary - object_size) >= (4 * sizeof(void *)))
+		return new (std::nothrow) MediumObjectAbstractCache(name, object_size,
+			alignment, _constructor, _destructor, cookie);
+
+	return new (std::nothrow) BigObjectAbstractCache(name, object_size,
+		alignment, _constructor, _destructor, cookie);
 }
 
 
 void *
 object_cache_alloc(object_cache_t cache)
 {
-	return ((AreaLocalCache *)cache)->Alloc(0);
+	return object_cache_alloc_etc(cache, 0);
 }
 
 
 void *
 object_cache_alloc_etc(object_cache_t cache, uint32_t flags)
 {
-	return ((AreaLocalCache *)cache)->Alloc(flags);
+	return ((AbstractCache *)cache)->Allocate(flags);
 }
 
 
 void
 object_cache_free(object_cache_t cache, void *object)
 {
-	((AreaLocalCache *)cache)->Free(object);
+	((AbstractCache *)cache)->Return(object);
 }
 
 
 void
 object_cache_destroy(object_cache_t cache)
 {
-	delete (AreaLocalCache *)cache;
+	delete (AbstractCache *)cache;
 }
 
