@@ -11,7 +11,12 @@
 
 #include <stdint.h>
 
+#include <KernelExport.h>
 #include <OS.h>
+
+#include <lock.h>
+#include <vm_low_memory.h>
+#include <util/AutoLock.h>
 #include <util/list.h>
 
 #ifdef __cplusplus
@@ -32,14 +37,15 @@ typedef void (*base_cache_destructor)(void *cookie, void *object);
 
 /* base Slab implementation, opaque to the backend used.
  *
- * NOTE: the caller is responsible for the Cache's locking. */
+ * NOTE: the caller is responsible for the Cache's locking.
+ *       Cache<> below handles it as well. */
 
 typedef struct base_cache {
 	char name[32];
 	size_t object_size;
 	size_t cache_color_cycle;
 	struct list empty, partial, full;
-	size_t empty_count;
+	size_t empty_count, pressure;
 	base_cache_constructor constructor;
 	base_cache_destructor destructor;
 	void *cookie;
@@ -56,10 +62,15 @@ typedef struct cache_slab {
 	struct list_link link;
 } cache_slab;
 
+// TODO add reclaim method to base_cache to be called under severe memory
+//		pressure so the slab owner can free as much buffers as possible.
+
 void base_cache_init(base_cache *cache, const char *name, size_t object_size,
 	size_t alignment, base_cache_constructor constructor,
 	base_cache_destructor destructor, void *cookie);
 void base_cache_destroy(base_cache *cache,
+	void (*return_slab)(base_cache *, cache_slab *));
+void base_cache_low_memory(base_cache *cache, int32 level,
 	void (*return_slab)(base_cache *, cache_slab *));
 
 cache_object_link *base_cache_allocate_object(base_cache *cache);
@@ -83,6 +94,7 @@ typedef std::pair<cache_slab *, cache_object_link *> CacheObjectInfo;
 template<typename Strategy>
 class Cache : protected base_cache {
 public:
+	typedef Cache<Strategy>			ThisCache;
 	typedef base_cache_constructor	Constructor;
 	typedef base_cache_destructor	Destructor;
 
@@ -90,17 +102,29 @@ public:
 		Constructor constructor, Destructor destructor, void *cookie)
 		: fStrategy(this)
 	{
-		base_cache_init(this, name, objectSize, alignment, constructor,
-			destructor, cookie);
+		if (benaphore_init(&fLock, name) >= B_OK) {
+			base_cache_init(this, name, objectSize, alignment, constructor,
+				destructor, cookie);
+			register_low_memory_handler(_LowMemory, this, 0);
+		}
 	}
 
 	~Cache()
 	{
-		base_cache_destroy(this, _ReturnSlab);
+		if (fLock.sem >= B_OK) {
+			benaphore_lock(&fLock);
+			unregister_low_memory_handler(_LowMemory, this);
+			base_cache_destroy(this, _ReturnSlab);
+			benaphore_destroy(&fLock);
+		}
 	}
+
+	status_t InitCheck() const { return fLock.sem; }
 
 	void *AllocateObject(uint32_t flags)
 	{
+		BenaphoreLocker _(fLock);
+
 		cache_object_link *link = base_cache_allocate_object(this);
 
 		// if the cache is returning NULL it is because it ran out of slabs
@@ -118,6 +142,8 @@ public:
 
 	void ReturnObject(void *object)
 	{
+		BenaphoreLocker _(fLock);
+
 		CacheObjectInfo location = fStrategy.ObjectInformation(object);
 
 		if (base_cache_return_object(this, location.first, location.second))
@@ -127,9 +153,22 @@ public:
 private:
 	static void _ReturnSlab(base_cache *self, cache_slab *slab)
 	{
-		((Cache<Strategy> *)self)->fStrategy.ReturnSlab(slab);
+		// Already locked, ~Cache() -> base_cache_destroy -> _ReturnSlab
+		((ThisCache *)self)->fStrategy.ReturnSlab(slab);
 	}
 
+	static void _LowMemory(void *_self, int32 level)
+	{
+		if (level == B_NO_LOW_MEMORY)
+			return;
+
+		ThisCache *self = (ThisCache *)_self;
+
+		BenaphoreLocker _(self->fLock);
+		base_cache_low_memory(self, level, _ReturnSlab);
+	}
+
+	benaphore fLock;
 	Strategy fStrategy;
 };
 

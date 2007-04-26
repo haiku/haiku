@@ -73,7 +73,6 @@ typedef Cache<AreaHashCacheStrategy> DataNodeCache;
 
 static NetBufferCache *sNetBufferCache;
 static DataNodeCache *sDataNodeCache;
-static benaphore sCachesLock;
 
 
 static status_t append_data(net_buffer *buffer, const void *data, size_t size);
@@ -103,7 +102,6 @@ dump_buffer(net_buffer *_buffer)
 static inline data_header *
 allocate_data_header()
 {
-	BenaphoreLocker _(sCachesLock);
 	return (data_header *)sDataNodeCache->AllocateObject(CACHE_DONT_SLEEP);
 }
 
@@ -111,7 +109,6 @@ allocate_data_header()
 static inline net_buffer_private *
 allocate_net_buffer()
 {
-	BenaphoreLocker _(sCachesLock);
 	return (net_buffer_private *)sNetBufferCache->AllocateObject(
 		CACHE_DONT_SLEEP);
 }
@@ -120,7 +117,6 @@ allocate_net_buffer()
 static inline void
 free_data_header(data_header *header)
 {
-	BenaphoreLocker _(sCachesLock);
 	sDataNodeCache->ReturnObject(header);
 }
 
@@ -128,7 +124,6 @@ free_data_header(data_header *header)
 static inline void
 free_net_buffer(net_buffer_private *buffer)
 {
-	BenaphoreLocker _(sCachesLock);
 	sNetBufferCache->ReturnObject(buffer);
 }
 
@@ -1185,23 +1180,29 @@ init_net_buffers()
 	// TODO improve our code a bit so we can add constructors
 	//		and keep around half-constructed buffers in the slab
 
-	status_t status = benaphore_init(&sCachesLock, "net buffer cache lock");
-	if (status < B_OK)
-		return status;
-
 	sNetBufferCache = new (std::nothrow) NetBufferCache("net buffer cache",
 		sizeof(net_buffer_private), 8, NULL, NULL, NULL);
-	if (sNetBufferCache == NULL) {
-		benaphore_destroy(&sCachesLock);
+	if (sNetBufferCache == NULL)
 		return B_NO_MEMORY;
+
+	status_t status = sNetBufferCache->InitCheck();
+	if (status < B_OK) {
+		delete sNetBufferCache;
+		return status;
 	}
 
 	sDataNodeCache = new (std::nothrow) DataNodeCache("data node cache",
 		BUFFER_SIZE, 0, NULL, NULL, NULL);
 	if (sDataNodeCache == NULL) {
-		benaphore_destroy(&sCachesLock);
 		delete sNetBufferCache;
 		return B_NO_MEMORY;
+	}
+
+	status = sDataNodeCache->InitCheck();
+	if (status < B_OK) {
+		delete sDataNodeCache;
+		delete sNetBufferCache;
+		return status;
 	}
 
 	return B_OK;
@@ -1211,12 +1212,8 @@ init_net_buffers()
 status_t
 uninit_net_buffers()
 {
-	benaphore_lock(&sCachesLock);
-
 	delete sNetBufferCache;
 	delete sDataNodeCache;
-
-	benaphore_destroy(&sCachesLock);
 
 	return B_OK;
 }

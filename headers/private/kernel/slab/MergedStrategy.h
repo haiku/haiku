@@ -9,7 +9,6 @@
 #ifndef _SLAB_MERGED_STRATEGY_H_
 #define _SLAB_MERGED_STRATEGY_H_
 
-#include <slab/Base.h>
 #include <slab/Strategy.h>
 
 

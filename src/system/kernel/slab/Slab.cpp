@@ -107,6 +107,9 @@ base_cache_init(base_cache *cache, const char *name, size_t objectSize,
 
 	cache->empty_count = 0;
 
+	// pressure is increased whenever we need a slab and don't have one
+	cache->pressure = 0;
+
 	cache->constructor = constructor;
 	cache->destructor = destructor;
 	cache->cookie = cookie;
@@ -132,14 +135,54 @@ base_cache_destroy(base_cache *cache,
 }
 
 
+void
+base_cache_low_memory(base_cache *cache, int32 level,
+	void (*return_slab)(base_cache *, cache_slab *))
+{
+	size_t minimumAllowed;
+
+	// only thing we can do right now is free up empty slabs
+
+	switch (level) {
+	case B_LOW_MEMORY_NOTE:
+		minimumAllowed = cache->pressure / 2 + 1;
+		break;
+
+	case B_LOW_MEMORY_WARNING:
+		cache->pressure /= 2;
+		minimumAllowed = 0;
+		break;
+
+	default:
+		cache->pressure = 0;
+		minimumAllowed = 0;
+		break;
+	}
+
+	if (cache->empty_count <= minimumAllowed)
+		return;
+
+	TRACE_CACHE(cache, "cache: memory pressure, will release down to %lu.",
+		minimumAllowed);
+
+	while (cache->empty_count > minimumAllowed) {
+		cache_slab *slab = (cache_slab *)list_remove_head_item(&cache->empty);
+		return_slab(cache, slab);
+		cache->empty_count--;
+	}
+}
+
+
 cache_object_link *
 base_cache_allocate_object(base_cache *cache)
 {
 	cache_slab *slab;
 
 	if (list_is_empty(&cache->partial)) {
-		if (list_is_empty(&cache->empty))
+		if (list_is_empty(&cache->empty)) {
+			cache->pressure++;
 			return NULL;
+		}
 
 		cache->empty_count--;
 		slab = (cache_slab *)list_remove_head_item(&cache->empty);
@@ -184,7 +227,7 @@ base_cache_return_object(base_cache *cache, cache_slab *slab,
 	if (slab->count == slab->size) {
 		list_remove_item(&cache->partial, slab);
 
-		if (cache->empty_count > 2)
+		if (cache->empty_count >= cache->pressure)
 			return 1;
 
 		cache->empty_count++;
