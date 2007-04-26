@@ -126,16 +126,17 @@ struct HashCacheStrategy : BaseCacheStrategy<Backend>, BaseHashCacheStrategy {
 			return NULL;
 		}
 
-		if (_PrepareSlab(slab, pages, byteCount, flags) < B_OK) {
-			Backend::FreePages(Parent(), slab->id);
-			fSlabCache.Free(slab);
-			return NULL;
-		}
-
 		// it's very important that we cast this to BaseHashCacheStrategy
 		// so we get the proper instance offset through void *
-		return BaseCacheStrategy<Backend>::_ConstructSlab(slab, pages,
-			_SlabSize(), _Linkage, (BaseHashCacheStrategy *)this);
+		cache_slab *result = BaseCacheStrategy<Backend>::_ConstructSlab(slab,
+			pages, _SlabSize(), (BaseHashCacheStrategy *)this, _Linkage,
+			_PrepareObject, _UnprepareObject);
+		if (result == NULL) {
+			Backend::FreePages(Parent(), slab->id);
+			fSlabCache.Free(slab);
+		}
+
+		return result;
 	}
 
 	void ReturnSlab(BaseSlab *slab)
@@ -153,39 +154,43 @@ private:
 
 	base_cache *Parent() const { return BaseCacheStrategy<Backend>::Parent(); }
 
-	status_t _PrepareSlab(Slab *slab, void *pages, size_t byteCount,
-		uint32_t flags)
+	static status_t _PrepareObject(void *_self, cache_slab *slab, void *object)
 	{
-		uint8_t *data = (uint8_t *)pages;
-		for (uint8_t *it = data;
-				it < (data + byteCount); it += Parent()->object_size) {
-			Link *link = fLinkCache.Alloc(flags);
+		BaseHashCacheStrategy *base = (BaseHashCacheStrategy *)_self;
+		Strategy *self = (Strategy *)base;
 
-			if (link == NULL) {
-				_ClearSlabRange(data, it);
-				return B_NO_MEMORY;
-			}
+		Link *link = self->fLinkCache.Alloc(CACHE_DONT_SLEEP);
+		if (link == NULL)
+			return B_NO_MEMORY;
 
-			link->slab = slab;
-			link->buffer = it;
-			fHashTable.Insert(link);
-		}
+		link->slab = slab;
+		link->buffer = object;
+
+		self->fHashTable.Insert(link);
 
 		return B_OK;
 	}
 
-	void _ClearSlab(void *pages, size_t size)
+	static void _UnprepareObject(void *_self, cache_slab *slab, void *object)
 	{
-		_ClearSlabRange((uint8_t *)pages, ((uint8_t *)pages) + size);
+		BaseHashCacheStrategy *base = (BaseHashCacheStrategy *)_self;
+		((Strategy *)base)->_UnprepareObject(object);
 	}
 
-	void _ClearSlabRange(uint8_t *data, uint8_t *end)
+	void _UnprepareObject(void *object)
 	{
-		for (uint8_t *it = data; it < end; it += Parent()->object_size) {
-			Link *link = _Linkage(it);
-			fHashTable.Remove(link);
-			fLinkCache.Free(link);
-		}
+		Link *link = _Linkage(object);
+		fHashTable.Remove(link);
+		fLinkCache.Free(link);
+	}
+
+	void _ClearSlab(void *pages, size_t size)
+	{
+		uint8_t *data = (uint8_t *)pages;
+		uint8_t *end = data + size;
+
+		for (uint8_t *it = data; it < end; it += Parent()->object_size)
+			_UnprepareObject(it);
 	}
 
 	TypedCache<Slab, Backend> fSlabCache;

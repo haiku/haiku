@@ -28,9 +28,9 @@ public:
 	void Free(Type *object) { BaseType::ReturnObject(object); }
 
 private:
-	static void _ConstructObject(void *cookie, void *object)
+	static status_t _ConstructObject(void *cookie, void *object)
 	{
-		((TypedCache *)cookie)->ConstructObject((Type *)object);
+		return ((TypedCache *)cookie)->ConstructObject((Type *)object);
 	}
 
 	static void _DestructObject(void *cookie, void *object)
@@ -38,7 +38,7 @@ private:
 		((TypedCache *)cookie)->DestructObject((Type *)object);
 	}
 
-	virtual void ConstructObject(Type *object) {}
+	virtual status_t ConstructObject(Type *object) { return B_OK; }
 	virtual void DestructObject(Type *object) {}
 };
 

@@ -27,7 +27,7 @@ typedef void *object_cache_t;
 
 object_cache_t
 object_cache_create(const char *name, size_t object_size, size_t alignment,
-	void (*_constructor)(void *, void *), void (*_destructor)(void *, void *),
+	base_cache_constructor constructor, base_cache_destructor destructor,
 	void *cookie);
 void *object_cache_alloc(object_cache_t cache);
 void *object_cache_alloc_etc(object_cache_t cache, uint32_t flags);

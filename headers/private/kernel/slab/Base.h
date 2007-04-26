@@ -32,7 +32,7 @@ enum {
 
 static const int kMinimumSlabItems = 32;
 
-typedef void (*base_cache_constructor)(void *cookie, void *object);
+typedef status_t (*base_cache_constructor)(void *cookie, void *object);
 typedef void (*base_cache_destructor)(void *cookie, void *object);
 
 /* base Slab implementation, opaque to the backend used.
@@ -79,9 +79,15 @@ cache_object_link *base_cache_allocate_object_with_new_slab(base_cache *cache,
 int base_cache_return_object(base_cache *cache, cache_slab *slab,
 	cache_object_link *link);
 
+typedef status_t (*base_cache_owner_prepare)(void *parent,
+	cache_slab *slab, void *object);
+typedef void (*base_cache_owner_unprepare)(void *parent, cache_slab *slab,
+	void *object);
+
 cache_slab *base_cache_construct_slab(base_cache *cache, cache_slab *slab,
-	void *pages, size_t byte_count, cache_object_link *(*get_link)(
-		void *parent, void *object), void *parent);
+	void *pages, size_t byte_count, void *parent,
+	cache_object_link *(*get_link)(void *parent, void *object),
+	base_cache_owner_prepare prepare, base_cache_owner_unprepare unprepare);
 void base_cache_destruct_slab(base_cache *cache, cache_slab *slab);
 
 #ifdef __cplusplus
@@ -103,8 +109,8 @@ public:
 		: fStrategy(this)
 	{
 		if (benaphore_init(&fLock, name) >= B_OK) {
-			base_cache_init(this, name, objectSize, alignment, constructor,
-				destructor, cookie);
+			base_cache_init(this, name, Strategy::RequiredSpace(objectSize),
+				alignment, constructor, destructor, cookie);
 			register_low_memory_handler(_LowMemory, this, 0);
 		}
 	}

@@ -23,8 +23,8 @@ protected:
 
 	size_t SlabSize(size_t tailSpace) const
 	{
-		size_t pageCount = (kMinimumSlabItems * fParent->object_size
-			+ tailSpace) / Backend::kPageSize;
+		size_t pageCount = ((kMinimumSlabItems * fParent->object_size
+			+ tailSpace) + Backend::kPageSize / 2) / Backend::kPageSize;
 		if (pageCount < 1)
 			pageCount = 1;
 		return pageCount * Backend::kPageSize;
@@ -35,10 +35,11 @@ protected:
 	};
 
 	BaseSlab *_ConstructSlab(Slab *slab, void *pages, size_t byteCount,
-		ObjectLink *(*getLink)(void *parent, void *object), void *parent)
+		void *parent, ObjectLink *(*getLink)(void *parent, void *object),
+		base_cache_owner_prepare prepare, base_cache_owner_unprepare unprepare)
 	{
 		return base_cache_construct_slab(fParent, slab, pages, byteCount,
-			getLink, parent);
+			parent, getLink, prepare, unprepare);
 	}
 
 	void _DestructSlab(BaseSlab *slab)

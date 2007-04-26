@@ -91,13 +91,14 @@ base_cache_init(base_cache *cache, const char *name, size_t objectSize,
 {
 	strlcpy(cache->name, name, sizeof(cache->name));
 
-	TRACE_CACHE(cache, "init %lu, %lu", objectSize, alignment);
-
 	if (alignment > 0 && (objectSize & (alignment - 1)))
 		cache->object_size = objectSize + alignment
 			- (objectSize & (alignment - 1));
 	else
 		cache->object_size = objectSize;
+
+	TRACE_CACHE(cache, "init %lu, %lu -> %lu", objectSize, alignment,
+		cache->object_size);
 
 	cache->cache_color_cycle = 0;
 
@@ -190,10 +191,12 @@ base_cache_allocate_object(base_cache *cache)
 	} else
 		slab = (cache_slab *)list_get_first_item(&cache->partial);
 
-	TRACE_CACHE(cache, "allocate from %p, %lu remaining.", slab, slab->count);
-
 	cache_object_link *link = SListPop(slab->free);
 	slab->count--;
+
+	TRACE_CACHE(cache, "allocate %p from %p, %lu remaining.", link, slab,
+		slab->count);
+
 	if (slab->count == 0) {
 		// move the partial slab to the full list
 		list_remove_item(&cache->partial, slab);
@@ -243,8 +246,9 @@ base_cache_return_object(base_cache *cache, cache_slab *slab,
 
 cache_slab *
 base_cache_construct_slab(base_cache *cache, cache_slab *slab, void *pages,
-	size_t byteCount, cache_object_link *(*getLink)(void *parent, void *object),
-	void *parent)
+	size_t byteCount, void *parent,
+	cache_object_link *(*getLink)(void *parent, void *object),
+	base_cache_owner_prepare prepare, base_cache_owner_unprepare unprepare)
 {
 	TRACE_CACHE(cache, "construct (%p, %p, %lu)", slab, pages, byteCount);
 
@@ -266,8 +270,34 @@ base_cache_construct_slab(base_cache *cache, cache_slab *slab, void *pages,
 	uint8_t *data = ((uint8_t *)pages) + cycle;
 
 	for (size_t i = 0; i < slab->size; i++) {
-		if (cache->constructor)
-			cache->constructor(cache->cookie, data);
+		if (prepare || cache->constructor) {
+			bool failedOnFirst = false;
+			status_t status = B_OK;
+
+			if (prepare)
+				status = prepare(parent, slab, data);
+			if (status < B_OK)
+				failedOnFirst = true;
+			else if (cache->constructor)
+				status = cache->constructor(cache->cookie, data);
+
+			if (status < B_OK) {
+				if (!failedOnFirst && unprepare)
+					unprepare(parent, slab, data);
+
+				data = ((uint8_t *)pages) + cycle;
+				for (size_t j = 0; j < i; j++) {
+					if (cache->destructor)
+						cache->destructor(cache->cookie, data);
+					if (unprepare)
+						unprepare(parent, slab, data);
+					data += cache->object_size;
+				}
+
+				return NULL;
+			}
+		}
+
 		SListPush(slab->free, getLink(parent, data));
 		data += cache->object_size;
 	}
@@ -521,8 +551,8 @@ typedef LocalCache<AreaMergedCache> AreaLocalCache;
 
 object_cache_t
 object_cache_create(const char *name, size_t object_size, size_t alignment,
-	void (*_constructor)(void *, void *), void (*_destructor)(void *, void *),
-	void *cookie)
+	status_t (*_constructor)(void *, void *), void (*_destructor)(void *,
+	void *), void *cookie)
 {
 	return new (std::nothrow) AreaLocalCache(name, object_size, alignment,
 		_constructor, _destructor, cookie);
