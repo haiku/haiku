@@ -14,6 +14,7 @@
 
 #include <lock.h>
 #include <util/DoublyLinkedList.h>
+#include <util/MultiHashTable.h>
 #include <util/OpenHashTable.h>
 
 #include <utility>
@@ -51,6 +52,7 @@ public:
 	size_t HashKey(uint16 port) const;
 	size_t Hash(TCPEndpoint *endpoint) const;
 	bool Compare(uint16 port, TCPEndpoint *endpoint) const;
+	bool CompareValues(TCPEndpoint *first, TCPEndpoint *second) const;
 	HashTableLink<TCPEndpoint> *GetLink(TCPEndpoint *endpoint) const;
 };
 
@@ -88,8 +90,11 @@ class EndpointManager : public DoublyLinkedListLinkImpl<EndpointManager> {
 
 		net_domain *fDomain;
 
-		OpenHashTable<ConnectionHashDefinition, true, true> fConnectionHash;
-		OpenHashTable<EndpointHashDefinition, true, true> fEndpointHash;
+		typedef OpenHashTable<ConnectionHashDefinition> ConnectionTable;
+		typedef MultiHashTable<EndpointHashDefinition> EndpointTable;
+
+		ConnectionTable fConnectionHash;
+		EndpointTable fEndpointHash;
 		benaphore fLock;
 };
 

@@ -84,6 +84,14 @@ EndpointHashDefinition::Compare(uint16 port, TCPEndpoint *endpoint) const
 }
 
 
+bool
+EndpointHashDefinition::CompareValues(TCPEndpoint *first,
+	TCPEndpoint *second) const
+{
+	return first->LocalAddress().Port() == second->LocalAddress().Port();
+}
+
+
 HashTableLink<TCPEndpoint> *
 EndpointHashDefinition::GetLink(TCPEndpoint *endpoint) const
 {
@@ -260,6 +268,34 @@ EndpointManager::_BindToAddress(TCPEndpoint *endpoint, const sockaddr *address)
 	if (ntohs(port) <= kLastReservedPort && geteuid() != 0)
 		return B_PERMISSION_DENIED;
 
+	EndpointTable::Iterator portUsers = fEndpointHash.Lookup(port);
+
+	// If there is already an endpoint bound to that port, SO_REUSEADDR has to be
+	// specified by the new endpoint to be allowed to bind to that same port.
+	// Alternatively, all endpoints must have the SO_REUSEPORT option set.
+	if (portUsers.HasNext()) {
+		TCPEndpoint *user = portUsers.Next();
+
+		if ((endpoint->socket->options & SO_REUSEADDR) == 0
+			&& ((endpoint->socket->options & SO_REUSEPORT) == 0
+				|| (user->socket->options & SO_REUSEPORT) == 0))
+			return EADDRINUSE;
+
+		do {
+			// check if this endpoint binds to a wildcard address
+			if (user->LocalAddress().IsEmpty(false)) {
+				// you cannot specialize a wildcard endpoint - you have to open
+				// the wildcard endpoint last
+				return B_PERMISSION_DENIED;
+			}
+
+			if (portUsers.HasNext())
+				user = portUsers.Next();
+			else
+				break;
+		} while (true);
+	}
+
 	return _Bind(endpoint, address);
 }
 
@@ -284,8 +320,7 @@ EndpointManager::_BindToEphemeral(TCPEndpoint *endpoint,
 
 			port = htons(port);
 
-			TCPEndpoint *other = fEndpointHash.Lookup(port);
-			if (other == NULL) {
+			if (!fEndpointHash.Lookup(port).HasNext()) {
 				SocketAddressStorage newAddress(AddressModule());
 				newAddress.SetTo(address);
 				newAddress.SetPort(port);
@@ -309,51 +344,13 @@ EndpointManager::_BindToEphemeral(TCPEndpoint *endpoint,
 status_t
 EndpointManager::_Bind(TCPEndpoint *endpoint, const sockaddr *address)
 {
-	uint16 port = AddressModule()->get_port(address);
-
-	TCPEndpoint *first = fEndpointHash.Lookup(port);
-
-	// If there is already an endpoint bound to that port, SO_REUSEADDR has to be
-	// specified by the new endpoint to be allowed to bind to that same port.
-	// Alternatively, all endpoints must have the SO_REUSEPORT option set.
-	if (first != NULL
-		&& (endpoint->socket->options & SO_REUSEADDR) == 0
-		&& ((endpoint->socket->options & SO_REUSEPORT) == 0
-			|| (first->socket->options & SO_REUSEPORT) == 0))
-		return EADDRINUSE;
-
-	TCPEndpoint *insertionPoint = NULL;
-
-	if (first != NULL) {
-		while (true) {
-			// check if this endpoint binds to a wildcard address
-			if (first->LocalAddress().IsEmpty(false)) {
-				// you cannot specialize a wildcard endpoint - you have to open
-				// the wildcard endpoint last
-				return B_PERMISSION_DENIED;
-			}
-
-			if (first->fEndpointNextWithSamePort == NULL)
-				break;
-
-			first = first->fEndpointNextWithSamePort;
-		}
-
-		insertionPoint = first;
-	}
-
 	// Thus far we have checked if the Bind() is allowed
 
 	status_t status = endpoint->next->module->bind(endpoint->next, address);
 	if (status < B_OK)
 		return status;
 
-	endpoint->fEndpointNextWithSamePort = NULL;
-
-	if (insertionPoint)
-		insertionPoint->fEndpointNextWithSamePort = endpoint;
-	else
-		fEndpointHash.Insert(endpoint);
+	fEndpointHash.Insert(endpoint);
 
 	return B_OK;
 }
@@ -371,27 +368,11 @@ EndpointManager::Unbind(TCPEndpoint *endpoint)
 
 	BenaphoreLocker _(fLock);
 
-	TCPEndpoint *other =
-		fEndpointHash.Lookup(endpoint->LocalAddress().Port());
-	if (other != endpoint) {
-		// remove endpoint from the list of endpoints with the same port
-		while (other != NULL && other->fEndpointNextWithSamePort != endpoint)
-			other = other->fEndpointNextWithSamePort;
-
-		if (other != NULL)
-			other->fEndpointNextWithSamePort = endpoint->fEndpointNextWithSamePort;
-		else if (!endpoint->fSpawned)
+	if (!fEndpointHash.Remove(endpoint)) {
+		if (!endpoint->fSpawned)
 			panic("bound endpoint %p not in hash!", endpoint);
-	} else {
-		// we need to replace the first endpoint in the list
-		fEndpointHash.Remove(endpoint);
-
-		other = endpoint->fEndpointNextWithSamePort;
-		if (other != NULL)
-			fEndpointHash.Insert(other);
 	}
 
-	endpoint->fEndpointNextWithSamePort = NULL;
 	fConnectionHash.Remove(endpoint);
 
 	(*endpoint->LocalAddress())->sa_len = 0;

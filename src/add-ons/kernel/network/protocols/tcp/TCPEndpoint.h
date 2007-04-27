@@ -125,8 +125,6 @@ class TCPEndpoint : public net_protocol, public ProtocolSocket {
 		friend class ConnectionHashDefinition;
 		friend class EndpointHashDefinition;
 
-		TCPEndpoint		*fEndpointNextWithSamePort;
-
 		recursive_lock	fLock;
 		WaitList		fReceiveList;
 		WaitList		fSendList;
