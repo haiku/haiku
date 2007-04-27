@@ -21,13 +21,13 @@ public:
 		// sets up the view
 		
 	~WonderBrushView();
-		// releases the SGITranslator settings
+		// releases the WonderBrushTranslator settings
 
 	virtual void AttachedToWindow();
 	virtual void MessageReceived(BMessage *message);
 
 	virtual	void Draw(BRect area);
-		// draws information about the SGITranslator
+		// draws information about the WonderBrushTranslator 
 	virtual	void GetPreferredSize(float* width, float* height);
 
 	enum {

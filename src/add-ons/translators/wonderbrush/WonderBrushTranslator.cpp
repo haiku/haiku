@@ -108,7 +108,7 @@ identify_wbi_header(BPositionIO* inSource, translator_info* outInfo,
 	uint32 outType, WonderBrushImage** _wbImage = NULL)
 {
 	status_t status = B_NO_MEMORY;
-	// construct new SGIImage object and set it to the provided BPositionIO
+	// construct new WonderBrushImage object and set it to the provided BPositionIO
 	WonderBrushImage* wbImage = new(nothrow) WonderBrushImage();
 	if (wbImage)
 		status = wbImage->SetTo(inSource);
