@@ -29,7 +29,7 @@ int32
 atomic_add(vint32 *value, int32 addValue)
 {
 	int32 oldValue = *value;
-	value += addValue;
+	*value += addValue;
 	return oldValue;
 }
 
