@@ -52,6 +52,16 @@ public:
 		return EqualTo(second.fAddress, checkPort);
 	}
 
+	bool EqualPorts(const sockaddr *second) const
+	{
+		return fModule->equal_ports(fAddress, second);
+	}
+
+	bool MatchMasked(const sockaddr *address, const sockaddr *mask) const
+	{
+		return fModule->equal_masked_addresses(fAddress, address, mask);
+	}
+
 	uint16 GetPort() const
 	{
 		return fModule->get_port(fAddress);
@@ -139,6 +149,16 @@ public:
 			return fModule->equal_addresses_and_ports(fAddress, address);
 		else
 			return fModule->equal_addresses(fAddress, address);
+	}
+
+	bool EqualPorts(const sockaddr *second) const
+	{
+		return fModule->equal_ports(fAddress, second);
+	}
+
+	bool MatchMasked(const sockaddr *address, const sockaddr *mask) const
+	{
+		return fModule->equal_masked_addresses(fAddress, address, mask);
 	}
 
 	uint16 GetPort() const

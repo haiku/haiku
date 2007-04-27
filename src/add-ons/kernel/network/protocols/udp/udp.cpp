@@ -241,7 +241,6 @@ UdpDomainSupport::CheckBindRequest(sockaddr *address, int socketOptions)
 {		// sUdpEndpointManager->Locker() must be locked!
 	status_t status = B_OK;
 	UdpEndpoint *otherEndpoint;
-	sockaddr *otherAddr;
 	struct hash_iterator endpointIterator;
 
 	// Iterate over all active UDP-endpoints and check if the requested bind
@@ -253,18 +252,20 @@ UdpDomainSupport::CheckBindRequest(sockaddr *address, int socketOptions)
 		otherEndpoint = (UdpEndpoint *)hash_next(fActiveEndpoints, &endpointIterator);
 		if (!otherEndpoint)
 			break;
-		otherAddr = (sockaddr *)&otherEndpoint->socket->address;
+
 		TRACE_DOMAIN("  ...checking endpoint %p (port=%u)...", otherEndpoint,
-			ntohs(AddressModule()->get_port(otherAddr)));
-		if (AddressModule()->equal_ports(otherAddr, address)) {
+			ntohs(otherEndpoint->LocalAddress().GetPort()));
+
+		if (otherEndpoint->LocalAddress().EqualPorts(address)) {
 			// port is already bound, SO_REUSEADDR or SO_REUSEPORT is required:
 			if (otherEndpoint->socket->options & (SO_REUSEADDR | SO_REUSEPORT) == 0
 				|| socketOptions & (SO_REUSEADDR | SO_REUSEPORT) == 0) {
 				status = EADDRINUSE;
 				break;
 			}
+
 			// if both addresses are the same, SO_REUSEPORT is required:
-			if (AddressModule()->equal_addresses(otherAddr, address)
+			if (otherEndpoint->LocalAddress().EqualTo(address, false)
 				&& (otherEndpoint->socket->options & SO_REUSEPORT == 0
 					|| socketOptions & SO_REUSEPORT == 0)) {
 				status = EADDRINUSE;
@@ -283,7 +284,7 @@ status_t
 UdpDomainSupport::ActivateEndpoint(UdpEndpoint *endpoint)
 {		// sUdpEndpointManager->Locker() must be locked!
 	TRACE_DOMAIN("Endpoint(%s) was activated",
-		AddressString(fDomain, (sockaddr *)&endpoint->socket->address, true).Data());
+		AddressString(fDomain, *endpoint->LocalAddress(), true).Data());
 	return hash_insert(fActiveEndpoints, endpoint);
 }
 
@@ -292,7 +293,7 @@ status_t
 UdpDomainSupport::DeactivateEndpoint(UdpEndpoint *endpoint)
 {		// sUdpEndpointManager->Locker() must be locked!
 	TRACE_DOMAIN("Endpoint(%s) was deactivated",
-		AddressString(fDomain, (sockaddr *)&endpoint->socket->address, true).Data());
+		AddressString(fDomain, *endpoint->LocalAddress(), true).Data());
 	return hash_remove(fActiveEndpoints, endpoint);
 }
 
@@ -335,29 +336,28 @@ UdpDomainSupport::_DemuxBroadcast(net_buffer *buffer)
 	hash_open(fActiveEndpoints, &endpointIterator);
 	while ((endpoint = (UdpEndpoint *)hash_next(fActiveEndpoints,
 		&endpointIterator)) != NULL) {
-		sockaddr *addr = (sockaddr *)&endpoint->socket->address;
-		TRACE_DOMAIN("  _DemuxBroadcast(): checking endpoint %s...",
-			AddressString(fDomain, addr, true).Data());
 
-		if (incomingPort != AddressModule()->get_port(addr)) {
+		TRACE_DOMAIN("  _DemuxBroadcast(): checking endpoint %s...",
+			AddressString(fDomain, *endpoint->LocalAddress(), true).Data());
+
+		if (endpoint->LocalAddress().GetPort() != incomingPort) {
 			// ports don't match, so we do not dispatch to this endpoint...
 			continue;
 		}
 
-		sockaddr *connectAddr = (sockaddr *)&endpoint->socket->peer;
-		if (!AddressModule()->is_empty_address(connectAddr, true)) {
+		if (!endpoint->PeerAddress().IsEmpty(true)) {
 			// endpoint is connected to a specific destination, we check if
 			// this datagram is from there:
-			if (!AddressModule()->equal_addresses_and_ports(connectAddr, peerAddr)) {
+			if (!endpoint->PeerAddress().EqualTo(peerAddr, true)) {
 				// no, datagram is from another peer, so we do not dispatch to
 				// this endpoint...
 				continue;
 			}
 		}
 
-		if (AddressModule()->equal_masked_addresses(addr, broadcastAddr, mask)
-			|| AddressModule()->is_empty_address(addr, false)) {
-				// address matches, dispatch to this endpoint:
+		if (endpoint->LocalAddress().MatchMasked(broadcastAddr, mask)
+			|| endpoint->LocalAddress().IsEmpty(false)) {
+			// address matches, dispatch to this endpoint:
 			endpoint->StoreData(buffer);
 		}
 	}
@@ -391,14 +391,13 @@ UdpDomainSupport::_DemuxUnicast(net_buffer *buffer)
 		endpoint = _FindActiveEndpoint(localAddr, NULL);
 		if (!endpoint) {
 			// look for endpoint matching peer address & port and local port:
-			sockaddr localPortAddr;
-			AddressModule()->set_to_empty_address(&localPortAddr);
-			uint16 localPort = AddressModule()->get_port(localAddr);
-			AddressModule()->set_port(&localPortAddr, localPort);
-			endpoint = _FindActiveEndpoint(&localPortAddr, peerAddr);
+			SocketAddressStorage local(AddressModule());
+			local.SetToEmpty();
+			local.SetPort(AddressModule()->get_port(localAddr));
+			endpoint = _FindActiveEndpoint(*local, peerAddr);
 			if (!endpoint) {
 				// last chance: look for endpoint matching local port only:
-				endpoint = _FindActiveEndpoint(&localPortAddr, NULL);
+				endpoint = _FindActiveEndpoint(*local, NULL);
 			}
 		}
 	}
@@ -441,10 +440,12 @@ UdpDomainSupport::_GetNextEphemeral()
 				found = true;
 				break;
 			}
-			endpointPort = AddressModule()->get_port(
-				(sockaddr *)&endpoint->socket->address);
+
+			endpointPort = endpoint->LocalAddress().GetPort();
+
 			TRACE_DOMAIN("  _GetNextEphemeral(): checking endpoint %p (port %hu)...",
 				endpoint, ntohs(endpointPort));
+
 			if (endpointPort == ncurr)
 				break;
 		}
@@ -470,35 +471,23 @@ UdpDomainSupport::_Compare(void *_udpEndpoint, const void *_key)
 	struct UdpEndpoint *udpEndpoint = (UdpEndpoint*)_udpEndpoint;
 	const HashKey *key = (const HashKey *)_key;
 
-	sockaddr *ourAddr = (sockaddr *)&udpEndpoint->socket->address;
-	sockaddr *peerAddr = (sockaddr *)&udpEndpoint->socket->peer;
-
-	net_address_module_info *addressModule = key->address_module;
-
-	if (addressModule->equal_addresses_and_ports(ourAddr, key->local)
-		&& addressModule->equal_addresses_and_ports(peerAddr, key->peer))
-		return 0;
-
-	return 1;
+	return (udpEndpoint->LocalAddress().EqualTo(key->local, true)
+		&& udpEndpoint->PeerAddress().EqualTo(key->peer, true)) ? 0 : 1;
 }
 
 
 uint32
 UdpDomainSupport::_Hash(void *_udpEndpoint, const void *_key, uint32 range)
 {
+	const UdpEndpoint *udpEndpoint = (const UdpEndpoint *)_udpEndpoint;
 	const HashKey *key = (const HashKey *)_key;
-	HashKey key_storage;
 	uint32 hash;
 
-	if (_udpEndpoint) {
-		const UdpEndpoint *udpEndpoint = (const UdpEndpoint *)_udpEndpoint;
-		key_storage = HashKey(udpEndpoint->DomainSupport()->AddressModule(),
-			(const sockaddr *)&udpEndpoint->socket->address,
-			(const sockaddr *)&udpEndpoint->socket->peer);
-		key = &key_storage;
-	}
-
-	hash = key->address_module->hash_address_pair(key->local, key->peer);
+	if (udpEndpoint)
+		hash = udpEndpoint->LocalAddress().HashPair(
+			*udpEndpoint->PeerAddress());
+	else
+		hash = key->address_module->hash_address_pair(key->local, key->peer);
 
 	// move the bits into the relevant range (as defined by kNumHashBuckets):
 	hash = (hash & 0x000007FF) ^ (hash & 0x003FF800) >> 11
@@ -717,11 +706,9 @@ UdpEndpoint::Bind(const sockaddr *address)
 		uint16 port = htons(fManager->GetEphemeralPort());
 		if (port == 0)
 			return ENOBUFS;
-				// whoa, no more ephemeral port available!?!
-		AddressModule()->set_port((sockaddr *)&socket->address, port);
+		LocalAddress().SetPort(port);
 	} else {
-		status = fManager->CheckBindRequest((sockaddr *)&socket->address,
-			socket->options);
+		status = fManager->CheckBindRequest(*LocalAddress(), socket->options);
 		if (status < B_OK)
 			return status;
 	}
@@ -754,10 +741,10 @@ UdpEndpoint::Connect(const sockaddr *address)
 	if (address->sa_family == AF_UNSPEC) {
 		// [Stevens-UNP1, p226]: specifying AF_UNSPEC requests a "disconnect",
 		// so we reset the peer address:
-		AddressModule()->set_to_empty_address((sockaddr *)&socket->peer);
+		PeerAddress().SetToEmpty();
 	} else {
 		// TODO check if `address' is compatible with AddressModule()
-		AddressModule()->set_to((sockaddr *)&socket->peer, address);
+		PeerAddress().SetTo(address);
 	}
 
 	// we need to activate no matter whether or not we have just disconnected,
