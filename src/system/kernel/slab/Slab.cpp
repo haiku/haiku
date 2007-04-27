@@ -21,7 +21,7 @@
 //      same code. We'll have to resolve all of the dependencies
 //      then, for now, it is still not required.
 
-#define TRACE_SLAB
+//#define TRACE_SLAB
 
 #ifdef TRACE_SLAB
 #define TRACE_CACHE(cache, format, args...) \
