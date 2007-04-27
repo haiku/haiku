@@ -13,6 +13,7 @@
 #include "fssh_kernel_priv.h"
 #include "fssh_string.h"
 #include "fssh_uio.h"
+#include "syscalls.h"
 
 
 //#define TRACE_FD

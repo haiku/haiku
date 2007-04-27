@@ -22,7 +22,9 @@ BuildPlatformStaticLibrary <build2>fs_shell.a :
 	hash.cpp
 	list.cpp
 	lock.cpp
+	module.cpp
 	node_monitor.cpp
+	rootfs.cpp
 	sem.cpp
 	stat.cpp
 	stat_util.cpp

@@ -40,23 +40,16 @@ typedef struct fssh_module_dependency {
 } fssh_module_dependency;
 
 
-#if 0
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern status_t get_module(const char *path, module_info **_info);
-extern status_t put_module(const char *path);
-extern status_t get_next_loaded_module_name(uint32 *cookie, char *buffer, size_t *_bufferSize);
-extern void *open_module_list(const char *prefix);
-extern status_t close_module_list(void *cookie);
-extern status_t read_next_module_name(void *cookie, char *buffer, size_t *_bufferSize);
+extern fssh_status_t	fssh_get_module(const char *path,
+								fssh_module_info **_info);
+extern fssh_status_t	fssh_put_module(const char *path);
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif	// 0
 
 #endif	/* _FSSH_MODULE_H */

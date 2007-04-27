@@ -20,11 +20,14 @@
 #include "fssh_fs_info.h"
 #include "fssh_fs_volume.h"
 #include "fssh_kernel_export.h"
+#include "fssh_module.h"
 #include "fssh_stat.h"
+#include "fssh_stdio.h"
 #include "fssh_string.h"
 #include "fssh_unistd.h"
 #include "hash.h"
 #include "KPath.h"
+#include "syscalls.h"
 
 
 //#define TRACE_VFS
@@ -459,8 +462,7 @@ put_mount(struct fs_mount *mount)
 static fssh_status_t
 put_file_system(fssh_file_system_module_info *fs)
 {
-//	return put_module(fs->info.name);
-	return FSSH_B_ERROR;
+	return fssh_put_module(fs->info.name);
 }
 
 
@@ -473,22 +475,19 @@ put_file_system(fssh_file_system_module_info *fs)
 static fssh_file_system_module_info *
 get_file_system(const char *fsName)
 {
-#if 0
 	char name[FSSH_B_FILE_NAME_LENGTH];
-	if (strncmp(fsName, "file_systems/", strlen("file_systems/"))) {
+	if (fssh_strncmp(fsName, "file_systems/", fssh_strlen("file_systems/"))) {
 		// construct module name if we didn't get one
 		// (we currently support only one API)
-		snprintf(name, sizeof(name), "file_systems/%s/v1", fsName);
+		fssh_snprintf(name, sizeof(name), "file_systems/%s/v1", fsName);
 		fsName = NULL;
 	}
 
 	fssh_file_system_module_info *info;
-	if (get_module(fsName ? fsName : name, (module_info **)&info) != FSSH_B_OK)
+	if (fssh_get_module(fsName ? fsName : name, (fssh_module_info **)&info) != FSSH_B_OK)
 		return NULL;
 
 	return info;
-#endif	// 0
-return NULL;
 }
 
 
@@ -4068,7 +4067,9 @@ fs_mount(char *path, const char *device, const char *fsName, uint32_t flags,
 
 	if (!(flags & FSSH_B_MOUNT_VIRTUAL_DEVICE) && device) {
 		// normalize the device path
-		status = normalizedDevice.SetTo(device, true);
+//		status = normalizedDevice.SetTo(device, true);
+// NOTE: normalizing works only in our namespace.
+		status = normalizedDevice.SetTo(device, false);
 		if (status != FSSH_B_OK)
 			return status;
 
