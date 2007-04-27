@@ -9,14 +9,9 @@
 #define BFS_H
 
 
-#include <SupportDefs.h>
-
 #include "bfs_endian.h"
+#include "system_dependencies.h"
 
-
-#ifndef B_BEOS_VERSION_DANO
-#	define B_BAD_DATA B_ERROR
-#endif
 
 // ToDo: temporary fix! (missing but public ioctls)
 #define IOCTL_FILE_UNCACHED_IO	10000

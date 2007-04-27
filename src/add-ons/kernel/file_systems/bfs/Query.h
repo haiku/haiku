@@ -6,12 +6,10 @@
 #ifndef QUERY_H
 #define QUERY_H
 
+#include "system_dependencies.h"
 
 #include "Chain.h"
 #include "Index.h"
-
-#include <util/Stack.h>
-#include <SupportDefs.h>
 
 class Volume;
 class Term;

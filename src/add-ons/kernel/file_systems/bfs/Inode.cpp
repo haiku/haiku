@@ -11,12 +11,6 @@
 #include "BPlusTree.h"
 #include "Index.h"
 
-#include <fs_cache.h>
-#include <util/kernel_cpp.h>
-
-#include <string.h>
-#include <stdio.h>
-
 
 class InodeAllocator {
 	public:
@@ -183,8 +177,8 @@ Inode::Inode(Volume *volume, vnode_id id)
 	memcpy(&fNode, node.Node(), sizeof(bfs_inode));
 
 	char lockName[B_OS_NAME_LENGTH];
-	snprintf(lockName, sizeof(lockName), "bfs inode %ld.%d",
-		BlockRun().AllocationGroup(), BlockRun().Start());
+	snprintf(lockName, sizeof(lockName), "bfs inode %d.%d",
+		(int)BlockRun().AllocationGroup(), BlockRun().Start());
 	fLock.Initialize(lockName);
 
 	// these two will help to maintain the indices
@@ -210,8 +204,8 @@ Inode::Inode(Volume *volume, Transaction &transaction, vnode_id id, mode_t mode,
 		volume, &transaction, id, this));
 
 	char lockName[B_OS_NAME_LENGTH];
-	snprintf(lockName, sizeof(lockName), "bfs inode+%ld.%d",
-		run.AllocationGroup(), run.Start());
+	snprintf(lockName, sizeof(lockName), "bfs inode+%d.%d",
+		(int)run.AllocationGroup(), run.Start());
 	fLock.Initialize(lockName);
 
 	NodeGetter node(volume, transaction, this, true);

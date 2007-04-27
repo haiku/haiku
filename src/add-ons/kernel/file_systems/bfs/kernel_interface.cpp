@@ -14,21 +14,6 @@
 #include "Attribute.h"
 #include "bfs_control.h"
 
-#include <util/kernel_cpp.h>
-
-#include <string.h>
-#include <stdio.h>
-
-#include <KernelExport.h>
-#include <NodeMonitor.h>
-#include <fs_interface.h>
-#include <fs_cache.h>
-
-#include <fs_attr.h>
-#include <fs_info.h>
-#include <fs_index.h>
-#include <fs_query.h>
-#include <fs_volume.h>
 
 #define BFS_IO_SIZE	65536
 
@@ -1265,8 +1250,8 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 		if (needsTrimming) {
 			status = inode->TrimPreallocation(transaction);
 			if (status < B_OK) {
-				FATAL(("Could not trim preallocated blocks: inode %Ld, transaction %ld: %s!\n",
-					inode->ID(), transaction.ID(), strerror(status)));
+				FATAL(("Could not trim preallocated blocks: inode %Ld, transaction %d: %s!\n",
+					inode->ID(), (int)transaction.ID(), strerror(status)));
 
 				// we still want this transaction to succeed
 				status = B_OK;

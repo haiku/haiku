@@ -13,14 +13,6 @@
 #include "Inode.h"
 #include "Utility.h"
 
-#include <util/kernel_cpp.h>
-#include <util/Stack.h>
-#include <TypeConstants.h>
-
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-
 
 #ifdef DEBUG
 class NodeChecker {
@@ -795,8 +787,8 @@ BPlusTree::InsertDuplicate(Transaction &transaction, CachedNode &cached,
 			duplicate_array *array = duplicate->FragmentAt(bplustree_node::FragmentIndex(oldValue));
 			if (array->count > NUM_FRAGMENT_VALUES
 				|| array->count < 1) {
-				FATAL(("insertDuplicate: Invalid array[%ld] size in fragment %Ld == %Ld!\n",
-					bplustree_node::FragmentIndex(oldValue),
+				FATAL(("insertDuplicate: Invalid array[%d] size in fragment %Ld == %Ld!\n",
+					(int)bplustree_node::FragmentIndex(oldValue),
 					bplustree_node::FragmentOffset(oldValue),
 					array->count));
 				return B_BAD_DATA;
@@ -1365,8 +1357,8 @@ BPlusTree::RemoveDuplicate(Transaction &transaction, const bplustree_node *node,
 
 		if (array->count > NUM_FRAGMENT_VALUES
 			|| array->count < 1) {
-			FATAL(("removeDuplicate: Invalid array[%ld] size in fragment %Ld == %Ld!\n",
-				bplustree_node::FragmentIndex(oldValue), duplicateOffset, array->count));
+			FATAL(("removeDuplicate: Invalid array[%d] size in fragment %Ld == %Ld!\n",
+				(int)bplustree_node::FragmentIndex(oldValue), duplicateOffset, array->count));
 			return B_BAD_DATA;
 		}
 		if (!array->Remove(value)) {
@@ -1549,8 +1541,8 @@ BPlusTree::RemoveKey(bplustree_node *node, uint16 index)
 	uint8 *key = node->KeyAt(index, &length);
 	if (key + length + sizeof(off_t) + sizeof(uint16) > (uint8 *)node + fNodeSize
 		|| length > BPLUSTREE_MAX_KEY_LENGTH) {
-		FATAL(("Key length to long: %s, %u (inode at %ld,%u)\n", key, length,
-			fStream->BlockRun().allocation_group, fStream->BlockRun().start));
+		FATAL(("Key length to long: %s, %u (inode at %d,%u)\n", key, length,
+			(int)fStream->BlockRun().allocation_group, fStream->BlockRun().start));
 		fStream->GetVolume()->Panic();
 		return;
 	}

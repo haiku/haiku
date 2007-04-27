@@ -7,9 +7,7 @@
 #define VOLUME_H
 
 
-#include <KernelExport.h>
-#include <fs_interface.h>
-#include <fs_cache.h>
+#include "system_dependencies.h"
 
 #include "bfs.h"
 #include "BlockAllocator.h"

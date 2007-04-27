@@ -7,7 +7,7 @@
 */
 
 
-#include <fs_interface.h>
+#include "system_dependencies.h"
 
 
 /* ioctl to check the version of BFS used - parameter is a uint32 *

@@ -7,7 +7,7 @@
 #define UTILITY_H
 
 
-#include <SupportDefs.h>
+#include "system_dependencies.h"
 
 
 // Simple array, used for the duplicate handling in the B+Tree,

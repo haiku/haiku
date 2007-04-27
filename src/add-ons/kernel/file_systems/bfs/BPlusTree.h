@@ -14,8 +14,6 @@
 #include "Journal.h"
 #include "Chain.h"
 
-#include <string.h>
-
 
 //****************** on-disk structures ********************
 

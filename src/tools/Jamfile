@@ -59,6 +59,7 @@ SEARCH on [ FGristFiles
 		UpdateMimeInfoThread.cpp MimeUpdateThread.cpp database_support.cpp
 	] = [ FDirName $(HAIKU_TOP) src build libbe storage mime ] ;
 
+SubInclude HAIKU_TOP src tools bfs_shell ;
 SubInclude HAIKU_TOP src tools copy_to_bfs_image ;
 SubInclude HAIKU_TOP src tools cppunit ;
 SubInclude HAIKU_TOP src tools docbook ;

@@ -7,17 +7,11 @@
 #define DEBUG_H
 
 
-#include <KernelExport.h>
-
-#ifdef DEBUG
-#	include <string.h>
-#endif
+#include "system_dependencies.h"
 
 #ifdef USER
-#	include <stdio.h>
 #	define __out printf
 #else
-#	include <null.h>
 #	define __out dprintf
 #endif
 

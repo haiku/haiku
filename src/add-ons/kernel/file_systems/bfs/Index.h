@@ -7,7 +7,7 @@
 #define INDEX_H
 
 
-#include <KernelExport.h>
+#include "system_dependencies.h"
 
 class Transaction;
 class Volume;

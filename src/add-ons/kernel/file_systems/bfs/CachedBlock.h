@@ -7,14 +7,7 @@
 #define CACHED_BLOCK_H
 
 
-#include <KernelExport.h>
-#ifdef USER
-//#	include "myfs.h"
-#	include <stdio.h>
-#endif
-
-#include <string.h>
-#include <unistd.h>
+#include "system_dependencies.h"
 
 #include "Volume.h"
 #include "Journal.h"

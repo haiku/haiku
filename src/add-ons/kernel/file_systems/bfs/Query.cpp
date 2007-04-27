@@ -17,17 +17,6 @@
 #include "BPlusTree.h"
 #include "Index.h"
 
-#include <util/kernel_cpp.h>
-#include <SupportDefs.h>
-#include <NodeMonitor.h>
-#include <TypeConstants.h>
-#include <AppDefs.h>
-#include <fs_query.h>
-
-#include <malloc.h>
-#include <stdio.h>
-#include <string.h>
-
 
 // The parser has a very static design, but it will do what is required.
 //
@@ -698,7 +687,7 @@ Equation::ConvertValue(type_code type)
 			fSize = sizeof(double);
 			break;
 		default:
-			FATAL(("query value conversion to 0x%lx requested!\n", type));
+			FATAL(("query value conversion to 0x%x requested!\n", (int)type));
 			// should we fail here or just do a safety int32 conversion?
 			return B_ERROR;
 	}

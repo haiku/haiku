@@ -1,0 +1,40 @@
+SubDir HAIKU_TOP src tools bfs_shell ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems bfs ] ;
+
+# set some additional defines
+{
+	local defines =
+		#BFS_BIG_ENDIAN_ONLY
+		BFS_SHELL
+		;
+
+	if $(DEBUG) = 0 {
+		# the gcc on BeOS doesn't compile BFS correctly with -O2 or more
+		OPTIM = -O1 ;
+	}
+
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
+	SubDirC++Flags $(defines) -Wall -Wno-multichar -fno-rtti ;
+}
+
+UsePrivateHeaders fs_shell ;
+
+BuildPlatformMain <build2>bfs_shell
+	:
+	BlockAllocator.cpp
+	BPlusTree.cpp
+	Attribute.cpp
+	Debug.cpp
+	Index.cpp
+	Inode.cpp
+	Journal.cpp
+	Query.cpp
+	Utility.cpp
+	Volume.cpp
+
+	kernel_interface.cpp
+
+	: <build2>fs_shell.a $(HOST_LIBSUPC++) $(HOST_LIBROOT)
+;

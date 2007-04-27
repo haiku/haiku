@@ -11,17 +11,6 @@
 #include "Inode.h"
 #include "Query.h"
 
-#include <util/kernel_cpp.h>
-#include <KernelExport.h>
-#include <Drivers.h>
-#include <fs_volume.h>
-
-#include <ctype.h>
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 
 static const int32 kDesiredAllocationGroups = 56;
 	// This is the number of allocation groups that will be tried
@@ -444,7 +433,7 @@ Volume::ValidateBlockRun(block_run run)
 		|| run.length == 0
 		|| uint32(run.Length() + run.Start()) > (1UL << AllocationGroupShift())) {
 		Panic();
-		FATAL(("*** invalid run(%ld,%d,%d)\n", run.AllocationGroup(), run.Start(), run.Length()));
+		FATAL(("*** invalid run(%d,%d,%d)\n", (int)run.AllocationGroup(), run.Start(), run.Length()));
 		return B_BAD_DATA;
 	}
 	return B_OK;

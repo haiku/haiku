@@ -8,11 +8,6 @@
 #include "Utility.h"
 #include "Debug.h"
 
-#include <util/kernel_cpp.h>
-
-#include <stdlib.h>
-#include <string.h>
-
 
 bool
 sorted_array::FindInternal(off_t value, int32 &index) const

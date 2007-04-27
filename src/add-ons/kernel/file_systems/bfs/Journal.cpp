@@ -9,11 +9,6 @@
 #include "Inode.h"
 #include "Debug.h"
 
-#include <Drivers.h>
-#include <util/kernel_cpp.h>
-#include <util/Stack.h>
-#include <errno.h>
-
 
 struct run_array {
 	int32		count;
@@ -337,8 +332,8 @@ Journal::_CheckRunArray(const run_array *array)
 	if (array->MaxRuns() != maxRuns
 		|| array->CountRuns() > maxRuns
 		|| array->CountRuns() <= 0) {
-		dprintf("run count: %ld, array max: %ld, max runs: %ld\n",
-			array->CountRuns(), array->MaxRuns(), maxRuns);
+		dprintf("run count: %d, array max: %d, max runs: %d\n",
+			(int)array->CountRuns(), (int)array->MaxRuns(), (int)maxRuns);
 		FATAL(("Log entry has broken header!\n"));
 		return B_ERROR;
 	}
@@ -433,7 +428,7 @@ Journal::ReplayLog()
 
 		status_t status = _ReplayRunArray(&start);
 		if (status < B_OK) {
-			FATAL(("replaying log entry from %ld failed: %s\n", start, strerror(status)));
+			FATAL(("replaying log entry from %d failed: %s\n", (int)start, strerror(status)));
 			return B_ERROR;
 		}
 		start = start % fLogSize;

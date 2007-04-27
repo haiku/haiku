@@ -7,13 +7,7 @@
 #define JOURNAL_H
 
 
-#include <KernelExport.h>
-#include <util/DoublyLinkedList.h>
-
-#ifdef USER
-//#	include "myfs.h"
-#	include <stdio.h>
-#endif
+#include "system_dependencies.h"
 
 #ifndef _IMPEXP_KERNEL
 #	define _IMPEXP_KERNEL

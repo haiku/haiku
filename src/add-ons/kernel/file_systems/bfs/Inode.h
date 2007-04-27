@@ -6,18 +6,11 @@
 #define INODE_H
 
 
-#include <KernelExport.h>
-#ifdef USER
-//#	include "myfs.h"
-#	include <stdio.h>
-#endif
+#include "system_dependencies.h"
 
 #ifndef _IMPEXP_KERNEL
 #	define _IMPEXP_KERNEL
 #endif
-
-#include <string.h>
-#include <unistd.h>
 
 #include "Volume.h"
 #include "Journal.h"

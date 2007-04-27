@@ -7,9 +7,8 @@
 #ifndef LOCK_H
 #define LOCK_H
 
+#include "system_dependencies.h"
 
-#include <KernelExport.h>
-#include <stdio.h>
 #include "Utility.h"
 #include "Debug.h"
 
@@ -165,7 +164,7 @@ class RecursiveLock {
 		{
 			thread_id thread = find_thread(NULL);
 			if (thread != fOwner) {
-				panic("RecursiveLock unlocked by %ld, owned by %ld\n", thread, fOwner);
+				panic("RecursiveLock unlocked by %d, owned by %d\n", (int)thread, (int)fOwner);
 			}
 
 			if (--fOwnerCount == 0) {

@@ -6,7 +6,7 @@
 #define BFS_ENDIAN_H
 
 
-#include <ByteOrder.h>
+#include "system_dependencies.h"
 
 
 #if !defined(BFS_LITTLE_ENDIAN_ONLY) && !defined(BFS_BIG_ENDIAN_ONLY)

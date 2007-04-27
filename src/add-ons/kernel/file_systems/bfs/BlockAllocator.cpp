@@ -12,9 +12,7 @@
 #include "BPlusTree.h"
 #include "bfs_control.h"
 
-#include <util/Stack.h>
-#include <util/kernel_cpp.h>
-#include <stdlib.h>
+#include "system_dependencies.h"
 
 #ifdef USER
 #	define spawn_kernel_thread spawn_thread
@@ -161,7 +159,7 @@ AllocationBlock::Allocate(uint16 start, uint16 numBlocks)
 #endif
 
 	if (uint32(start + numBlocks) > fNumBits) {
-		FATAL(("Allocation::Allocate(): tried to allocate too many blocks: %u (numBlocks = %lu)!\n", numBlocks, fNumBits));
+		FATAL(("Allocation::Allocate(): tried to allocate too many blocks: %u (numBlocks = %u)!\n", numBlocks, (unsigned)fNumBits));
 		DIE(("Allocation::Allocate(): tried to allocate too many blocks"));
 	}
 
@@ -195,7 +193,7 @@ AllocationBlock::Free(uint16 start, uint16 numBlocks)
 #endif
 
 	if (uint32(start + numBlocks) > fNumBits) {
-		FATAL(("Allocation::Free(): tried to free too many blocks: %u (numBlocks = %lu)!\n", numBlocks, fNumBits));
+		FATAL(("Allocation::Free(): tried to free too many blocks: %u (numBlocks = %u)!\n", numBlocks, (unsigned)fNumBits));
 		DIE(("Allocation::Free(): tried to free too many blocks"));
 	}
 
@@ -736,13 +734,13 @@ BlockAllocator::Free(Transaction &transaction, block_run run)
 		|| start > fGroups[group].NumBits()
 		|| uint32(start + length) > fGroups[group].NumBits()
 		|| length == 0) {
-		FATAL(("tried to free an invalid block_run (%ld, %u, %u)\n", group, start, length));
+		FATAL(("tried to free an invalid block_run (%d, %u, %u)\n", (int)group, start, length));
 		DEBUGGER(("tried to free invalid block_run"));
 		return B_BAD_VALUE;
 	}
 	// check if someone tries to free reserved areas at the beginning of the drive
 	if (group == 0 && start < uint32(fVolume->Log().Start() + fVolume->Log().Length())) {
-		FATAL(("tried to free a reserved block_run (%ld, %u, %u)\n", group, start, length));
+		FATAL(("tried to free a reserved block_run (%d, %u, %u)\n", (int)group, start, length));
 		DEBUGGER(("tried to free reserved block"));
 		return B_BAD_VALUE;
 	}
@@ -1161,8 +1159,8 @@ BlockAllocator::CheckBlockRun(block_run run, const char *type, check_control *co
 					control->stats.already_set++;
 				} else {
 					if (firstSet != -1) {
-						FATAL(("%s: block_run(%ld, %u, %u): blocks %Ld - %Ld are already set!\n",
-							type, run.AllocationGroup(), run.Start(), run.Length(), firstSet, firstGroupBlock + offset - 1));
+						FATAL(("%s: block_run(%d, %u, %u): blocks %Ld - %Ld are already set!\n",
+							type, (int)run.AllocationGroup(), run.Start(), run.Length(), firstSet, firstGroupBlock + offset - 1));
 						firstSet = -1;
 					}
 					_SetCheckBitmapAt(firstGroupBlock + offset);
@@ -1176,7 +1174,7 @@ BlockAllocator::CheckBlockRun(block_run run, const char *type, check_control *co
 			if (firstMissing != -1)
 				PRINT(("%s: block_run(%ld, %u, %u): blocks %Ld - %Ld are not allocated!\n", type, run.AllocationGroup(), run.Start(), run.Length(), firstMissing, firstGroupBlock + pos + block * bitsPerBlock - 1));
 			if (firstSet != -1)
-				FATAL(("%s: block_run(%ld, %u, %u): blocks %Ld - %Ld are already set!\n", type, run.AllocationGroup(), run.Start(), run.Length(), firstSet, firstGroupBlock + pos + block * bitsPerBlock - 1));
+				FATAL(("%s: block_run(%d, %u, %u): blocks %Ld - %Ld are already set!\n", type, (int)run.AllocationGroup(), run.Start(), run.Length(), firstSet, firstGroupBlock + pos + block * bitsPerBlock - 1));
 		}
 	}
 

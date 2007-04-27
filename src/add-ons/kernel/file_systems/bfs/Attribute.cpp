@@ -6,7 +6,6 @@
 
 
 #include "Attribute.h"
-#include <stdlib.h>
 
 
 // ToDo: clean this up, find a better separation between Inode and this class
