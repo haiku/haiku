@@ -211,6 +211,7 @@ WaitList::Signal()
 
 TCPEndpoint::TCPEndpoint(net_socket *socket)
 	:
+	ProtocolSocket(socket),
 	fManager(NULL),
 	fReceiveList("tcp receive"),
 	fSendList("tcp send"),
@@ -298,8 +299,9 @@ TCPEndpoint::Open()
 {
 	TRACE("Open()");
 
-	if (Domain() == NULL || AddressModule() == NULL)
-		return EAFNOSUPPORT;
+	status_t status = ProtocolSocket::Open();
+	if (status < B_OK)
+		return status;
 
 	fManager = create_endpoint_manager(Domain());
 	if (fManager == NULL)

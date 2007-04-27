@@ -14,8 +14,11 @@
 #include <util/DoublyLinkedList.h>
 
 #include <net_buffer.h>
+#include <net_protocol.h>
 #include <net_socket.h>
 #include <net_stack.h>
+
+#include <AddressUtilities.h>
 
 class BenaphoreLocking {
 public:
@@ -40,9 +43,52 @@ public:
 };
 
 
+class ProtocolSocket {
+public:
+	ProtocolSocket(net_socket *socket);
+
+	status_t Open();
+
+	SocketAddress LocalAddress()
+		{ return SocketAddress(fDomain->address_module, &fSocket->address); }
+	ConstSocketAddress LocalAddress() const
+		{ return ConstSocketAddress(fDomain->address_module, &fSocket->address); }
+
+	SocketAddress PeerAddress()
+		{ return SocketAddress(fDomain->address_module, &fSocket->peer); }
+	ConstSocketAddress PeerAddress() const
+		{ return ConstSocketAddress(fDomain->address_module, &fSocket->peer); }
+
+	net_domain *Domain() const { return fDomain; }
+	net_address_module_info *AddressModule() const
+		{ return fDomain->address_module; }
+
+protected:
+	net_socket *fSocket;
+	net_domain *fDomain;
+};
+
+
+inline ProtocolSocket::ProtocolSocket(net_socket *socket)
+	: fSocket(socket), fDomain(NULL) {}
+
+
+inline status_t
+ProtocolSocket::Open()
+{
+	fDomain = fSocket->first_protocol->module->get_domain(
+		fSocket->first_protocol);
+
+	if (fDomain == NULL || fDomain->address_module == NULL)
+		return EAFNOSUPPORT;
+
+	return B_OK;
+}
+
+
 template<typename LockingBase = BenaphoreLocking,
 	typename ModuleBundle = NetModuleBundleGetter>
-class DatagramSocket {
+class DatagramSocket : public ProtocolSocket {
 public:
 	DatagramSocket(const char *name, net_socket *socket);
 	virtual ~DatagramSocket();
@@ -83,7 +129,6 @@ protected:
 	typedef DoublyLinkedListCLink<net_buffer> NetBufferLink;
 	typedef DoublyLinkedList<net_buffer, NetBufferLink> BufferList;
 
-	net_socket *fSocket;
 	sem_id fNotify;
 	BufferList fBuffers;
 	size_t fCurrentBytes;
@@ -98,7 +143,7 @@ protected:
 
 DECL_DATAGRAM_SOCKET(inline)::DatagramSocket(const char *name,
 	net_socket *socket)
-	: fSocket(socket), fCurrentBytes(0)
+	: ProtocolSocket(socket), fCurrentBytes(0)
 {
 	status_t status = LockingBase::Init(&fLock, name);
 	if (status < B_OK)

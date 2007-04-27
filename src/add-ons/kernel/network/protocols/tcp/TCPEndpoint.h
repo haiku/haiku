@@ -10,10 +10,12 @@
 #define TCP_ENDPOINT_H
 
 
-#include "tcp.h"
 #include "BufferQueue.h"
+#include "EndpointManager.h"
+#include "tcp.h"
 
-#include <AddressUtilities.h>
+
+#include <ProtocolUtilities.h>
 #include <net_protocol.h>
 #include <net_stack.h>
 #include <util/AutoLock.h>
@@ -22,8 +24,6 @@
 
 #include <stddef.h>
 
-
-class EndpointManager;
 
 class WaitList {
 public:
@@ -40,7 +40,7 @@ private:
 };
 
 
-class TCPEndpoint : public net_protocol {
+class TCPEndpoint : public net_protocol, public ProtocolSocket {
 	public:
 		TCPEndpoint(net_socket *socket);
 		~TCPEndpoint();
@@ -69,16 +69,6 @@ class TCPEndpoint : public net_protocol {
 		tcp_state State() const { return fState; }
 		bool IsBound() const;
 
-		SocketAddress LocalAddress()
-			{ return SocketAddress(AddressModule(), &socket->address); }
-		ConstSocketAddress LocalAddress() const
-			{ return ConstSocketAddress(AddressModule(), &socket->address); }
-
-		SocketAddress PeerAddress()
-			{ return SocketAddress(AddressModule(), &socket->peer); }
-		ConstSocketAddress PeerAddress() const
-			{ return ConstSocketAddress(AddressModule(), &socket->peer); }
-
 		void DeleteSocket();
 
 		status_t DelayedAcknowledge();
@@ -88,12 +78,6 @@ class TCPEndpoint : public net_protocol {
 		int32 SegmentReceived(tcp_segment_header& segment, net_buffer *buffer);
 		int32 Spawn(TCPEndpoint *parent, tcp_segment_header& segment,
 			net_buffer *buffer);
-
-		net_domain *Domain() const
-			{ return socket->first_protocol->module->get_domain(
-				socket->first_protocol); }
-		net_address_module_info *AddressModule() const
-			{ return Domain()->address_module; }
 
 	private:
 		friend class EndpointManager;

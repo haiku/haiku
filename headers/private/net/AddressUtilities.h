@@ -16,20 +16,13 @@
 class SocketAddress {
 public:
 	SocketAddress(net_address_module_info *module, sockaddr *address)
-		: fModule(module), fAddress(NULL)
-	{
-		SetAddressTo(address);
-	}
+		: fModule(module), fAddress(address) {}
 
 	SocketAddress(net_address_module_info *module, sockaddr_storage *address)
-		: fModule(module), fAddress(NULL)
-	{
-		SetAddressTo((sockaddr *)address);
-	}
+		: fModule(module), fAddress((sockaddr *)address) {}
 
 	SocketAddress(const SocketAddress &address)
-		: fModule(address.fModule), fAddress(address.fAddress)
-	{}
+		: fModule(address.fModule), fAddress(address.fAddress) {}
 
 	void SetAddressTo(sockaddr *address)
 	{
@@ -113,25 +106,17 @@ class ConstSocketAddress {
 public:
 	ConstSocketAddress(net_address_module_info *module,
 		const sockaddr *address)
-		: fModule(module), fAddress(NULL)
-	{
-		SetAddressTo(address);
-	}
+		: fModule(module), fAddress(address) {}
 
 	ConstSocketAddress(net_address_module_info *module,
 		const sockaddr_storage *address)
-		: fModule(module), fAddress(NULL)
-	{
-		SetAddressTo((sockaddr *)address);
-	}
+		: fModule(module), fAddress((sockaddr *)address) {}
 
 	ConstSocketAddress(const ConstSocketAddress &address)
-		: fModule(address.fModule), fAddress(address.fAddress)
-	{}
+		: fModule(address.fModule), fAddress(address.fAddress) {}
 
 	ConstSocketAddress(const SocketAddress &address)
-		: fModule(address.Module()), fAddress(*address)
-	{}
+		: fModule(address.Module()), fAddress(*address) {}
 
 	void SetAddressTo(const sockaddr *address)
 	{
