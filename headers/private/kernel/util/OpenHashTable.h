@@ -123,16 +123,19 @@ public:
 		fItemCount++;
 	}
 
-	void Remove(ValueType *value)
+	bool Remove(ValueType *value)
 	{
-		RemoveUnchecked(value);
+		if (!RemoveUnchecked(value))
+			return false;
 
 		if (AutoExpand && fTableSize > kMinimumSize
 			&& fItemCount < (fTableSize * 50 / 256))
 			_Resize(fTableSize / 2);
+
+		return true;
 	}
 
-	void RemoveUnchecked(ValueType *value)
+	bool RemoveUnchecked(ValueType *value)
 	{
 		size_t index = fDefinition.Hash(value) & (fTableSize - 1);
 		ValueType *previous = NULL, *slot = fTable[index];
@@ -152,6 +155,9 @@ public:
 			slot = next;
 		}
 
+		if (slot == NULL)
+			return false;
+
 		if (CheckDuplicates) {
 			for (size_t i = 0; i < fTableSize; i++) {
 				ValueType *bucket = fTable[i];
@@ -164,6 +170,7 @@ public:
 		}
 
 		fItemCount--;
+		return true;
 	}
 
 	class Iterator {
@@ -173,6 +180,9 @@ public:
 		{
 			Rewind();
 		}
+
+		Iterator(const HashTable *table, size_t index, ValueType *value)
+			: fTable(table), fIndex(index), fNext(value) {}
 
 		bool HasNext() const { return fNext != NULL; }
 
@@ -208,7 +218,7 @@ public:
 
 	Iterator GetIterator() const { return Iterator(this); }
 
-private:
+protected:
 	// for g++ 2.95
 	friend class Iterator;
 
