@@ -1182,7 +1182,7 @@ block_cache_sync_etc(void *_cache, off_t blockNumber, size_t numBlocks)
 	if (blockNumber < 0 || blockNumber >= cache->max_blocks) {
 		panic("block_cache_sync_etc: invalid block number %Ld (max %Ld)",
 			blockNumber, cache->max_blocks - 1);
-		return B_ERROR;
+		return B_BAD_VALUE;
 	}
 
 	BenaphoreLocker locker(&cache->lock);
