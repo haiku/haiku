@@ -84,17 +84,7 @@ public:
 	status_t				StoreData(net_buffer *buffer);
 	status_t				DeliverData(net_buffer *buffer);
 
-	net_domain *			Domain() const
-	{
-		return socket->first_protocol->module->get_domain(socket->first_protocol);
-	}
-
-	net_address_module_info *AddressModule() const
-	{
-		return Domain()->address_module;
-	}
-
-	UdpDomainSupport		*DomainSupport() const { return fDomain; }
+	UdpDomainSupport		*DomainSupport() const { return fManager; }
 
 	UdpEndpoint				*hash_link;
 								// link required by hash_table (see khash.h)
@@ -102,7 +92,7 @@ private:
 	status_t				_Activate();
 	status_t				_Deactivate();
 
-	UdpDomainSupport		*fDomain;
+	UdpDomainSupport		*fManager;
 	bool					fActive;
 								// an active UdpEndpoint is part of the endpoint 
 								// hash (and it is bound and optionally connected)
@@ -699,12 +689,7 @@ UdpEndpointManager::_GetDomain(net_domain *domain, bool create)
 
 
 UdpEndpoint::UdpEndpoint(net_socket *socket)
-	:
-	DatagramSocket<>("udp endpoint", socket),
-	fDomain(NULL),
-	fActive(false)
-{
-}
+	: DatagramSocket<>("udp endpoint", socket), fActive(false) {}
 
 
 // #pragma mark - activation
@@ -729,13 +714,13 @@ UdpEndpoint::Bind(const sockaddr *address)
 	}
 
 	if (AddressModule()->get_port(address) == 0) {
-		uint16 port = htons(fDomain->GetEphemeralPort());
+		uint16 port = htons(fManager->GetEphemeralPort());
 		if (port == 0)
 			return ENOBUFS;
 				// whoa, no more ephemeral port available!?!
 		AddressModule()->set_port((sockaddr *)&socket->address, port);
 	} else {
-		status = fDomain->CheckBindRequest((sockaddr *)&socket->address,
+		status = fManager->CheckBindRequest((sockaddr *)&socket->address,
 			socket->options);
 		if (status < B_OK)
 			return status;
@@ -786,17 +771,12 @@ UdpEndpoint::Open()
 {
 	TRACE_EP("Open()");
 
-	// we can't be the first protocol, there must an underlying
-	// network protocol that supplies us with an address module.
-	if (socket->first_protocol == NULL)
-		return EAFNOSUPPORT;
+	status_t status = ProtocolSocket::Open();
+	if (status < B_OK)
+		return status;
 
-	if (Domain() == NULL || Domain()->address_module == NULL)
-		return EAFNOSUPPORT;
-
-	fDomain = sUdpEndpointManager->OpenEndpoint(this);
-
-	if (fDomain == NULL)
+	fManager = sUdpEndpointManager->OpenEndpoint(this);
+	if (fManager == NULL)
 		return EAFNOSUPPORT;
 
 	return B_OK;
@@ -821,7 +801,7 @@ UdpEndpoint::Free()
 {
 	TRACE_EP("Free()");
 
-	return sUdpEndpointManager->FreeEndpoint(fDomain);
+	return sUdpEndpointManager->FreeEndpoint(fManager);
 }
 
 
@@ -830,7 +810,7 @@ UdpEndpoint::_Activate()
 {
 	if (fActive)
 		return B_ERROR;
-	status_t status = fDomain->ActivateEndpoint(this);
+	status_t status = fManager->ActivateEndpoint(this);
 	fActive = (status == B_OK);
 	return status;
 }
@@ -842,7 +822,7 @@ UdpEndpoint::_Deactivate()
 	if (!fActive)
 		return B_ERROR;
 	fActive = false;
-	return fDomain->DeactivateEndpoint(this);
+	return fManager->DeactivateEndpoint(this);
 }
 
 
