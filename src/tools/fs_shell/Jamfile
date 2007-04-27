@@ -1,0 +1,38 @@
+SubDir HAIKU_TOP src tools fs_shell ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) headers build ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers build os ] : true ;
+#UseHeaders [ FDirName $(HAIKU_TOP) headers build os app ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers build os kernel ] : true ;
+#UseHeaders [ FDirName $(HAIKU_TOP) headers build os interface ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers build os storage ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
+
+UsePrivateHeaders fs_shell ;
+
+BuildPlatformStaticLibrary <build2>fs_shell.a :
+	atomic.cpp
+	block_cache.cpp
+	errno.cpp
+	fcntl.cpp
+	fd.cpp
+	file_cache.cpp
+	kernel_export.cpp
+	KPath.cpp
+	hash.cpp
+	list.cpp
+	lock.cpp
+	node_monitor.cpp
+	sem.cpp
+	stat.cpp
+	stat_util.cpp
+	stdio.cpp
+	string.cpp
+	thread.cpp
+	time.cpp
+	uio.cpp
+	unistd.cpp
+	vfs.cpp
+
+	fssh.cpp
+;

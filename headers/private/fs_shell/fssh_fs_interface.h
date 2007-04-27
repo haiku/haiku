@@ -1,0 +1,284 @@
+/* File System Interface Layer Definition
+ *
+ * Copyright 2004-2006, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef _FSSH_FS_INTERFACE_H
+#define _FSSH_FS_INTERFACE_H
+
+
+#include "fssh_module.h"
+#include "fssh_os.h"
+
+
+struct fssh_dirent;
+struct fssh_fs_info;
+struct fssh_iovec;
+struct fssh_partition_data;
+struct fssh_selectsync;
+struct fssh_stat;
+
+typedef fssh_dev_t fssh_mount_id;
+typedef fssh_ino_t fssh_vnode_id;
+
+/* the file system's private data structures */
+typedef void *fssh_fs_volume;
+typedef void *fssh_fs_cookie;
+typedef void *fssh_fs_vnode;
+
+/* passed to write_stat() */
+enum fssh_write_stat_mask {
+	FSSH_FS_WRITE_STAT_MODE		= 0x0001,
+	FSSH_FS_WRITE_STAT_UID		= 0x0002,
+	FSSH_FS_WRITE_STAT_GID		= 0x0004,
+	FSSH_FS_WRITE_STAT_SIZE		= 0x0008,
+	FSSH_FS_WRITE_STAT_ATIME	= 0x0010,
+	FSSH_FS_WRITE_STAT_MTIME	= 0x0020,
+	FSSH_FS_WRITE_STAT_CRTIME	= 0x0040
+};
+
+/* passed to write_fs_info() */
+#define	FSSH_FS_WRITE_FSINFO_NAME	0x0001
+
+struct fssh_file_io_vec {
+	fssh_off_t	offset;
+	fssh_off_t	length;
+};
+
+#define	FSSH_B_CURRENT_FS_API_VERSION "/v1"
+
+#ifdef __cplusplus
+extern "C" {
+#endif 
+
+typedef struct fssh_file_system_module_info {
+	struct fssh_module_info	info;
+	const char				*pretty_name;
+
+	/* scanning (the device is write locked) */
+	float (*identify_partition)(int fd, fssh_partition_data *partition,
+				void **cookie);
+	fssh_status_t (*scan_partition)(int fd, fssh_partition_data *partition,
+				void *cookie);
+	void (*free_identify_partition_cookie)(fssh_partition_data *partition,
+				void *cookie);
+	void (*free_partition_content_cookie)(fssh_partition_data *partition);
+
+	/* general operations */
+	fssh_status_t (*mount)(fssh_mount_id id, const char *device, uint32_t flags, 
+				const char *args, fssh_fs_volume *_fs,
+				fssh_vnode_id *_rootVnodeID);
+	fssh_status_t (*unmount)(fssh_fs_volume fs);
+
+	fssh_status_t (*read_fs_info)(fssh_fs_volume fs, struct fssh_fs_info *info);
+	fssh_status_t (*write_fs_info)(fssh_fs_volume fs,
+				const struct fssh_fs_info *info, uint32_t mask);
+	fssh_status_t (*sync)(fssh_fs_volume fs);
+
+	/* vnode operations */
+	fssh_status_t (*lookup)(fssh_fs_volume fs, fssh_fs_vnode dir,
+				const char *name, fssh_vnode_id *_id, int *_type);
+	fssh_status_t (*get_vnode_name)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				char *buffer, fssh_size_t bufferSize);
+
+	fssh_status_t (*get_vnode)(fssh_fs_volume fs, fssh_vnode_id id,
+				fssh_fs_vnode *_vnode, bool reenter);
+	fssh_status_t (*put_vnode)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				bool reenter);
+	fssh_status_t (*remove_vnode)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				bool reenter);
+
+	/* VM file access */
+	bool (*can_page)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie);
+	fssh_status_t (*read_pages)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie, fssh_off_t pos, const fssh_iovec *vecs,
+				fssh_size_t count, fssh_size_t *_numBytes, bool reenter);
+	fssh_status_t (*write_pages)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie, fssh_off_t pos, const fssh_iovec *vecs,
+				fssh_size_t count, fssh_size_t *_numBytes, bool reenter);
+
+	/* cache file access */
+	fssh_status_t (*get_file_map)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_off_t offset, fssh_size_t size,
+				struct fssh_file_io_vec *vecs, fssh_size_t *_count);
+
+	/* common operations */
+	fssh_status_t (*ioctl)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie, fssh_ulong op, void *buffer,
+				fssh_size_t length);
+	fssh_status_t (*set_flags)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie, int flags);
+	fssh_status_t (*select)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie, uint8_t event, uint32_t ref,
+				fssh_selectsync *sync);
+	fssh_status_t (*deselect)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie, uint8_t event, fssh_selectsync *sync);
+	fssh_status_t (*fsync)(fssh_fs_volume fs, fssh_fs_vnode vnode);
+
+	fssh_status_t (*read_symlink)(fssh_fs_volume fs, fssh_fs_vnode link,
+				char *buffer, fssh_size_t *_bufferSize);
+	fssh_status_t (*create_symlink)(fssh_fs_volume fs, fssh_fs_vnode dir,
+				const char *name, const char *path, int mode);
+
+	fssh_status_t (*link)(fssh_fs_volume fs, fssh_fs_vnode dir,
+				const char *name, fssh_fs_vnode vnode);
+	fssh_status_t (*unlink)(fssh_fs_volume fs, fssh_fs_vnode dir,
+				const char *name);
+	fssh_status_t (*rename)(fssh_fs_volume fs, fssh_fs_vnode fromDir,
+				const char *fromName, fssh_fs_vnode toDir, const char *toName);
+
+	fssh_status_t (*access)(fssh_fs_volume fs, fssh_fs_vnode vnode, int mode);
+	fssh_status_t (*read_stat)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				struct fssh_stat *stat);
+	fssh_status_t (*write_stat)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				const struct fssh_stat *stat, uint32_t statMask);
+
+	/* file operations */
+	fssh_status_t (*create)(fssh_fs_volume fs, fssh_fs_vnode dir,
+				const char *name, int openMode, int perms,
+				fssh_fs_cookie *_cookie, fssh_vnode_id *_newVnodeID);
+	fssh_status_t (*open)(fssh_fs_volume fs, fssh_fs_vnode vnode, int openMode,
+				fssh_fs_cookie *_cookie);
+	fssh_status_t (*close)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie);
+	fssh_status_t (*free_cookie)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie);
+	fssh_status_t (*read)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie, fssh_off_t pos, void *buffer,
+				fssh_size_t *length);
+	fssh_status_t (*write)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie, fssh_off_t pos, const void *buffer,
+				fssh_size_t *length);
+
+	/* directory operations */
+	fssh_status_t (*create_dir)(fssh_fs_volume fs, fssh_fs_vnode parent,
+				const char *name, int perms, fssh_vnode_id *_newVnodeID);
+	fssh_status_t (*remove_dir)(fssh_fs_volume fs, fssh_fs_vnode parent,
+				const char *name);
+	fssh_status_t (*open_dir)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie *_cookie);
+	fssh_status_t (*close_dir)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie);
+	fssh_status_t (*free_dir_cookie)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie);
+	fssh_status_t (*read_dir)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie, struct fssh_dirent *buffer,
+				fssh_size_t bufferSize, uint32_t *_num);
+	fssh_status_t (*rewind_dir)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie);
+
+	/* attribute directory operations */
+	fssh_status_t (*open_attr_dir)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie *_cookie);
+	fssh_status_t (*close_attr_dir)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie);
+	fssh_status_t (*free_attr_dir_cookie)(fssh_fs_volume fs,
+				fssh_fs_vnode vnode, fssh_fs_cookie cookie);
+	fssh_status_t (*read_attr_dir)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie, struct fssh_dirent *buffer,
+				fssh_size_t bufferSize, uint32_t *_num);
+	fssh_status_t (*rewind_attr_dir)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie);
+
+	/* attribute operations */
+	fssh_status_t (*create_attr)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				const char *name, uint32_t type, int openMode,
+				fssh_fs_cookie *_cookie);
+	fssh_status_t (*open_attr)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				const char *name, int openMode, fssh_fs_cookie *_cookie);
+	fssh_status_t (*close_attr)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie);
+	fssh_status_t (*free_attr_cookie)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie);
+	fssh_status_t (*read_attr)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie, fssh_off_t pos, void *buffer,
+				fssh_size_t *length);
+	fssh_status_t (*write_attr)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie, fssh_off_t pos, const void *buffer,
+				fssh_size_t *length);
+
+	fssh_status_t (*read_attr_stat)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie, struct fssh_stat *stat);
+	fssh_status_t (*write_attr_stat)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				fssh_fs_cookie cookie, const struct fssh_stat *stat,
+				int statMask);
+	fssh_status_t (*rename_attr)(fssh_fs_volume fs, fssh_fs_vnode fromVnode,
+				const char *fromName, fssh_fs_vnode toVnode,
+				const char *toName);
+	fssh_status_t (*remove_attr)(fssh_fs_volume fs, fssh_fs_vnode vnode,
+				const char *name);
+
+	/* index directory & index operations */
+	fssh_status_t (*open_index_dir)(fssh_fs_volume fs, fssh_fs_cookie *cookie);
+	fssh_status_t (*close_index_dir)(fssh_fs_volume fs, fssh_fs_cookie cookie);
+	fssh_status_t (*free_index_dir_cookie)(fssh_fs_volume fs,
+				fssh_fs_cookie cookie);
+	fssh_status_t (*read_index_dir)(fssh_fs_volume fs, fssh_fs_cookie cookie,
+				struct fssh_dirent *buffer, fssh_size_t bufferSize,
+				uint32_t *_num);
+	fssh_status_t (*rewind_index_dir)(fssh_fs_volume fs, fssh_fs_cookie cookie);
+
+	fssh_status_t (*create_index)(fssh_fs_volume fs, const char *name,
+				uint32_t type, uint32_t flags);
+	fssh_status_t (*remove_index)(fssh_fs_volume fs, const char *name);
+	fssh_status_t (*read_index_stat)(fssh_fs_volume fs, const char *name,
+				struct fssh_stat *stat);
+
+	/* query operations */
+	fssh_status_t (*open_query)(fssh_fs_volume fs, const char *query,
+				uint32_t flags, fssh_port_id port, uint32_t token,
+				fssh_fs_cookie *_cookie);
+	fssh_status_t (*close_query)(fssh_fs_volume fs, fssh_fs_cookie cookie);
+	fssh_status_t (*free_query_cookie)(fssh_fs_volume fs,
+				fssh_fs_cookie cookie);
+	fssh_status_t (*read_query)(fssh_fs_volume fs, fssh_fs_cookie cookie, 
+				struct fssh_dirent *buffer, fssh_size_t bufferSize,
+				uint32_t *_num);
+	fssh_status_t (*rewind_query)(fssh_fs_volume fs, fssh_fs_cookie cookie);
+} fssh_file_system_module_info;
+
+
+/* file system add-ons only prototypes */
+extern fssh_status_t fssh_new_vnode(fssh_mount_id mountID,
+				fssh_vnode_id vnodeID, fssh_fs_vnode privateNode);
+extern fssh_status_t fssh_publish_vnode(fssh_mount_id mountID,
+				fssh_vnode_id vnodeID, fssh_fs_vnode privateNode);
+extern fssh_status_t fssh_get_vnode(fssh_mount_id mountID,
+				fssh_vnode_id vnodeID, fssh_fs_vnode *_privateNode);
+extern fssh_status_t fssh_put_vnode(fssh_mount_id mountID,
+				fssh_vnode_id vnodeID);
+extern fssh_status_t fssh_remove_vnode(fssh_mount_id mountID,
+				fssh_vnode_id vnodeID);
+extern fssh_status_t fssh_unremove_vnode(fssh_mount_id mountID,
+				fssh_vnode_id vnodeID);
+extern fssh_status_t fssh_get_vnode_removed(fssh_mount_id mountID,
+				fssh_vnode_id vnodeID, bool* removed);
+
+extern fssh_status_t fssh_notify_entry_created(fssh_mount_id device,
+				fssh_vnode_id directory, const char *name, fssh_vnode_id node);
+extern fssh_status_t fssh_notify_entry_removed(fssh_mount_id device,
+				fssh_vnode_id directory, const char *name, fssh_vnode_id node);
+extern fssh_status_t fssh_notify_entry_moved(fssh_mount_id device,
+				fssh_vnode_id fromDirectory, const char *fromName,
+				fssh_vnode_id toDirectory, const char *toName,
+				fssh_vnode_id node);
+extern fssh_status_t fssh_notify_stat_changed(fssh_mount_id device,
+				fssh_vnode_id node, uint32_t statFields);
+extern fssh_status_t fssh_notify_attribute_changed(fssh_mount_id device,
+				fssh_vnode_id node, const char *attribute, int32_t cause);
+
+extern fssh_status_t fssh_notify_query_entry_created(fssh_port_id port,
+				int32_t token, fssh_mount_id device,
+				fssh_vnode_id directory, const char *name,
+				fssh_vnode_id node);
+extern fssh_status_t fssh_notify_query_entry_removed(fssh_port_id port,
+				int32_t token, fssh_mount_id device,
+				fssh_vnode_id directory, const char *name,
+				fssh_vnode_id node);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif	/* _FSSH_FS_INTERFACE_H */
