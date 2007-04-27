@@ -169,7 +169,7 @@ public:
 	class Iterator {
 	public:
 		Iterator(const HashTable *table)
-			: fTable(table), fIndex(0), fCurrent(NULL), fNext(NULL)
+			: fTable(table)
 		{
 			Rewind();
 		}
@@ -178,8 +178,7 @@ public:
 
 		ValueType *Next()
 		{
-			ValueType *current = fCurrent;
-			fCurrent = fNext;
+			ValueType *current = fNext;
 			_GetNext();
 			return current;
 		}
@@ -188,22 +187,15 @@ public:
 		{
 			// get the first one
 			fIndex = 0;
-			fCurrent = NULL;
+			fNext = NULL;
 			_GetNext();
-			fCurrent = fNext;
-			// get the proper next one
-			if (fCurrent)
-				_GetNext();
 		}
 
 	private:
 		void _GetNext()
 		{
-			if (fCurrent) {
-				fNext = fTable->_Link(fCurrent)->fNext;
-			} else {
-				fNext = NULL;
-			}
+			if (fNext)
+				fNext = fTable->_Link(fNext)->fNext;
 
 			while (fNext == NULL && fIndex < fTable->fTableSize)
 				fNext = fTable->fTable[fIndex++];
@@ -211,7 +203,7 @@ public:
 
 		const HashTable *fTable;
 		size_t fIndex;
-		ValueType *fCurrent, *fNext;
+		ValueType *fNext;
 	};
 
 	Iterator GetIterator() const { return Iterator(this); }
