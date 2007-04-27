@@ -45,6 +45,7 @@ template<typename Definition, bool AutoExpand = true,
 	bool CheckDuplicates = false>
 class OpenHashTable {
 public:
+	typedef OpenHashTable<Definition, AutoExpand, CheckDuplicates> HashTable;
 	typedef typename Definition::KeyType	KeyType;
 	typedef typename Definition::ValueType	ValueType;
 
@@ -165,7 +166,60 @@ public:
 		fItemCount--;
 	}
 
+	class Iterator {
+	public:
+		Iterator(const HashTable *table)
+			: fTable(table), fIndex(0), fCurrent(NULL), fNext(NULL)
+		{
+			Rewind();
+		}
+
+		bool HasNext() const { return fNext != NULL; }
+
+		ValueType *Next()
+		{
+			ValueType *current = fCurrent;
+			fCurrent = fNext;
+			_GetNext();
+			return current;
+		}
+
+		void Rewind()
+		{
+			// get the first one
+			fIndex = 0;
+			fCurrent = NULL;
+			_GetNext();
+			fCurrent = fNext;
+			// get the proper next one
+			if (fCurrent)
+				_GetNext();
+		}
+
+	private:
+		void _GetNext()
+		{
+			if (fCurrent) {
+				fNext = fTable->_Link(fCurrent)->fNext;
+			} else {
+				fNext = NULL;
+			}
+
+			while (fNext == NULL && fIndex < fTable->fTableSize)
+				fNext = fTable->fTable[fIndex++];
+		}
+
+		const HashTable *fTable;
+		size_t fIndex;
+		ValueType *fCurrent, *fNext;
+	};
+
+	Iterator GetIterator() const { return Iterator(this); }
+
 private:
+	// for g++ 2.95
+	friend class Iterator;
+
 	void _Insert(ValueType **table, size_t tableSize, ValueType *value)
 	{
 		size_t index = fDefinition.Hash(value) & (tableSize - 1);
