@@ -101,11 +101,11 @@ keyboard_handle_int(ps2_dev *dev)
 
 	if (scancode == EXTENDED_KEY) {
 		sIsExtended = true;
-		TRACE("Extended key\n");
+//		TRACE("Extended key\n");
 		return B_HANDLED_INTERRUPT;
 	} 
 
-	TRACE("scancode: %x\n", scancode);
+//	TRACE("scancode: %x\n", scancode);
 
 	if (scancode & 0x80) {
 		keyInfo.is_keydown = false;
@@ -138,7 +138,7 @@ read_keyboard_packet(at_kbd_io *packet)
 {
 	status_t status;
 
-	TRACE("ps2: read_keyboard_packet\n");
+	TRACE("ps2: read_keyboard_packet: enter\n");
 
 	status = acquire_sem_etc(sKeyboardSem, 1, B_CAN_INTERRUPT, 0);
 	if (status < B_OK)
@@ -154,7 +154,7 @@ read_keyboard_packet(at_kbd_io *packet)
 		return B_ERROR;
 	}
 
-	TRACE("scancode: %x, keydown: %s\n", packet->scancode, packet->is_keydown ? "true" : "false");
+	TRACE("ps2: read_keyboard_packet: scancode: %x, keydown: %s\n", packet->scancode, packet->is_keydown ? "true" : "false");
 	return B_OK;
 }
 
@@ -227,6 +227,8 @@ keyboard_open(const char *name, uint32 flags, void **_cookie)
 		goto err1;
 	}
 
+	INFO("ps2: keyboard found\n");
+
 	sKeyboardSem = create_sem(0, "keyboard_sem");
 	if (sKeyboardSem < 0) {
 		status = sKeyboardSem;
@@ -261,7 +263,7 @@ err1:
 static status_t
 keyboard_close(void *cookie)
 {
-	TRACE("ps2: keyboard_close\n");
+	TRACE("ps2: keyboard_close enter\n");
 
 	delete_packet_buffer(sKeyBuffer);
 	delete_sem(sKeyboardSem);
@@ -270,6 +272,7 @@ keyboard_close(void *cookie)
 	
 	atomic_and(&sKeyboardOpenMask, 0);
 
+	TRACE("ps2: keyboard_close done\n");
 	return B_OK;
 }
 
@@ -302,13 +305,12 @@ keyboard_write(void *cookie, off_t pos, const void *buffer,  size_t *_length)
 static status_t
 keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 {
-	TRACE("ps2: keyboard ioctl\n");
 	switch (op) {
 		case KB_READ:
 		{
 			at_kbd_io packet;
 			status_t status;
-			TRACE("ps2: KB_READ\n");
+			TRACE("ps2: ioctl KB_READ\n");
 			if ((status = read_keyboard_packet(&packet)) < B_OK)
 				return status;
 			return user_memcpy(buffer, &packet, sizeof(packet));
@@ -317,7 +319,7 @@ keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		case KB_SET_LEDS:
 		{
 			led_info info;
-			TRACE("ps2: KB_SET_LEDS\n");
+			TRACE("ps2: ioctl KB_SET_LEDS\n");
 			if (user_memcpy(&info, buffer, sizeof(led_info)) < B_OK)
 				return B_BAD_ADDRESS;
 			return set_leds(&info);
@@ -325,12 +327,14 @@ keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 
 		case KB_SET_KEY_REPEATING:
 		{
+			TRACE("ps2: ioctl KB_SET_KEY_REPEATING\n");
 			// 0xFA (Set All Keys Typematic/Make/Break) - Keyboard responds with "ack" (0xFA).
 			return ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], 0xfa, NULL, 0, NULL, 0);
 		}
 
 		case KB_SET_KEY_NONREPEATING:
 		{
+			TRACE("ps2: ioctl KB_SET_KEY_NONREPEATING\n");
 			// 0xF8 (Set All Keys Make/Break) - Keyboard responds with "ack" (0xFA).
 			return ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], 0xf8, NULL, 0, NULL, 0);
 		}
@@ -338,9 +342,9 @@ keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		case KB_SET_KEY_REPEAT_RATE:
 		{
 			int32 key_repeat_rate;
+			TRACE("ps2: ioctl KB_SET_KEY_REPEAT_RATE\n");
 			if (user_memcpy(&key_repeat_rate, buffer, sizeof(key_repeat_rate)) < B_OK)
 				return B_BAD_ADDRESS;
-			TRACE("ps2: KB_SET_KEY_REPEAT_RATE %ld\n", key_repeat_rate);
 			if (set_typematic(key_repeat_rate, sKeyboardRepeatDelay) < B_OK)
 				return B_ERROR;
 			sKeyboardRepeatRate = key_repeat_rate;
@@ -349,15 +353,16 @@ keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		
 		case KB_GET_KEY_REPEAT_RATE:
 		{
+			TRACE("ps2: ioctl KB_GET_KEY_REPEAT_RATE\n");
 			return user_memcpy(buffer, &sKeyboardRepeatRate, sizeof(sKeyboardRepeatRate));
 		}
 
 		case KB_SET_KEY_REPEAT_DELAY:
 		{
 			bigtime_t key_repeat_delay;
+			TRACE("ps2: ioctl KB_SET_KEY_REPEAT_DELAY\n");
 			if (user_memcpy(&key_repeat_delay, buffer, sizeof(key_repeat_delay)) < B_OK)
 				return B_BAD_ADDRESS;
-			TRACE("ps2: KB_SET_KEY_REPEAT_DELAY %Ld\n", key_repeat_delay);
 			if (set_typematic(sKeyboardRepeatRate, key_repeat_delay) < B_OK)
 				return B_ERROR;
 			sKeyboardRepeatDelay = key_repeat_delay;
@@ -367,6 +372,7 @@ keyboard_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 
 		case KB_GET_KEY_REPEAT_DELAY:
 		{
+			TRACE("ps2: ioctl KB_GET_KEY_REPEAT_DELAY\n");
 			return user_memcpy(buffer, &sKeyboardRepeatDelay, sizeof(sKeyboardRepeatDelay));
 		}
 

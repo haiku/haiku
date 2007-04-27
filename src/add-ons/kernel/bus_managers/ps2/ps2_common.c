@@ -41,7 +41,7 @@ ps2_read_data(void)
 void
 ps2_write_ctrl(uint8 ctrl)
 {
-	TRACE("ps2_write_ctrl 0x%02x\n", ctrl);
+	TRACE("ps2: ps2_write_ctrl 0x%02x\n", ctrl);
 
 	gIsa->write_io_8(PS2_PORT_CTRL, ctrl);
 }
@@ -50,7 +50,7 @@ ps2_write_ctrl(uint8 ctrl)
 void
 ps2_write_data(uint8 data)
 {
-	TRACE("ps2_write_data 0x%02x\n", data);
+	TRACE("ps2: ps2_write_data 0x%02x\n", data);
 
 	gIsa->write_io_8(PS2_PORT_DATA, data);
 }
@@ -259,7 +259,7 @@ ps2_interrupt(void* cookie)
 		return B_UNHANDLED_INTERRUPT;
 		
 	if (atomic_get(&sIgnoreInterrupts)) {
-		TRACE("ps2_interrupt: ignoring, ctrl 0x%02x (%s)\n", ctrl, (ctrl & PS2_STATUS_AUX_DATA) ? "aux" : "keyb");
+		TRACE("ps2: ps2_interrupt ignoring, ctrl 0x%02x (%s)\n", ctrl, (ctrl & PS2_STATUS_AUX_DATA) ? "aux" : "keyb");
 		return B_HANDLED_INTERRUPT;
 	}
 	
@@ -270,15 +270,15 @@ ps2_interrupt(void* cookie)
 		if (gActiveMultiplexingEnabled) {
 			idx = ctrl >> 6;
 			error = (ctrl & 0x04) != 0;
-			TRACE("ps2_interrupt: ctrl 0x%02x, data 0x%02x (mouse %d)\n", ctrl, data, idx);
+			TRACE("ps2: ps2_interrupt ctrl 0x%02x, data 0x%02x (mouse %d)\n", ctrl, data, idx);
 		} else {
 			idx = 0;
 			error = (ctrl & 0xC0) != 0;
-			TRACE("ps2_interrupt: ctrl 0x%02x, data 0x%02x (aux)\n", ctrl, data);
+			TRACE("ps2: ps2_interrupt ctrl 0x%02x, data 0x%02x (aux)\n", ctrl, data);
 		}
 		dev = &ps2_device[PS2_DEVICE_MOUSE + idx];
 	} else {
-		TRACE("ps2_interrupt: ctrl 0x%02x, data 0x%02x (keyb)\n", ctrl, data);
+		TRACE("ps2: ps2_interrupt ctrl 0x%02x, data 0x%02x (keyb)\n", ctrl, data);
 		dev = &ps2_device[PS2_DEVICE_KEYB];
 		error = (ctrl & 0xC0) != 0;
 

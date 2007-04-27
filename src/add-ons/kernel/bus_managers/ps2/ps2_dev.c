@@ -61,7 +61,7 @@ void
 ps2_dev_publish(ps2_dev *dev)
 {
 	status_t status;
-	TRACE("ps2_dev_publish %s\n", dev->name);
+	TRACE("ps2: ps2_dev_publish %s\n", dev->name);
 	
 	if (dev->active)
 		return;
@@ -79,7 +79,7 @@ void
 ps2_dev_unpublish(ps2_dev *dev)
 {
 	status_t status;
-	TRACE("ps2_dev_unpublish %s\n", dev->name);
+	TRACE("ps2: ps2_dev_unpublish %s\n", dev->name);
 
 	if (!dev->active)
 		return;
@@ -193,9 +193,9 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 	int32 sem_count;
 	int i;
 
-	TRACE("ps2: ps2_dev_command cmd 0x%02x, out %d, in %d, dev %s\n", cmd, out_count, in_count, dev->name);
+	TRACE("ps2: ps2_dev_command cmd 0x%02x, out-count %d, in-count %d, dev %s\n", cmd, out_count, in_count, dev->name);
 	for (i = 0; i < out_count; i++)
-		TRACE("ps2: ps2_dev_command out 0x%02x\n", out[i]);
+		TRACE("ps2: ps2_dev_command tx: 0x%02x\n", out[i]);
 
 	res = get_sem_count(dev->result_sem, &sem_count);
 	if (res == B_OK && sem_count != 0) {
@@ -245,10 +245,11 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 
 		start = system_time();
 		res = acquire_sem_etc(dev->result_sem, 1, B_RELATIVE_TIMEOUT, 4000000);
-		TRACE("ps2: ps2_dev_command wait for ack res 0x%08lx, wait-time %Ld\n", res, system_time() - start);
 
 		if (res != B_OK)
-			break;
+			atomic_and(&dev->flags, ~PS2_FLAG_CMD);
+
+		TRACE("ps2: ps2_dev_command wait for ack res 0x%08lx, wait-time %Ld\n", res, system_time() - start);
 
 		if (atomic_get(&dev->flags) & PS2_FLAG_ACK) {
 			TRACE("ps2: ps2_dev_command got ACK\n");
@@ -256,29 +257,37 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 
 		if (atomic_get(&dev->flags) & PS2_FLAG_NACK) {
 			TRACE("ps2: ps2_dev_command got NACK\n");
-			res = B_ERROR;
+			res = B_IO_ERROR;
+		}
+
+		if (res != B_OK)
 			break;
-		}
-
 	}	
-	
-	if (res == B_OK && in_count != 0) {
-		start = system_time();
-		res = acquire_sem_etc(dev->result_sem, 1, B_RELATIVE_TIMEOUT, 4000000);
-		TRACE("ps2: ps2_dev_command wait for input res 0x%08lx, wait-time %Ld\n", res, system_time() - start);
 
-		if (dev->result_buf_cnt != 0) {
-			TRACE("ps2: ps2_dev_command error: %d input bytes not received\n", dev->result_buf_cnt);
-			dev->result_buf_cnt = 0;
-		}
+	if (res == B_OK) {
+		if (in_count == 0) {
+			atomic_and(&dev->flags, ~PS2_FLAG_CMD);
+		} else {
+			start = system_time();
+			res = acquire_sem_etc(dev->result_sem, 1, B_RELATIVE_TIMEOUT, 4000000);
+
+			atomic_and(&dev->flags, ~PS2_FLAG_CMD);
+
+			if (dev->result_buf_cnt != 0) {
+				TRACE("ps2: ps2_dev_command error: %d rx bytes not received\n", dev->result_buf_cnt);
+				in_count -= dev->result_buf_cnt;
+				dev->result_buf_cnt = 0;
+				res = B_IO_ERROR;
+			}
+
+			TRACE("ps2: ps2_dev_command wait for input res 0x%08lx, wait-time %Ld\n", res, system_time() - start);
 		
-		for (i = 0; i < in_count; i++)
-			TRACE("ps2: ps2_dev_command in 0x%02x\n", in[i]);
+			for (i = 0; i < in_count; i++)
+				TRACE("ps2: ps2_dev_command rx: 0x%02x\n", in[i]);
+		}
 	}
 
 	TRACE("ps2: ps2_dev_command result 0x%08lx\n", res);
-
-	atomic_and(&dev->flags, ~PS2_FLAG_CMD);
 
 	return res;
 }

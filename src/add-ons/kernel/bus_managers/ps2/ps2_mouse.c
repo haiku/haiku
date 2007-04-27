@@ -88,17 +88,17 @@ ps2_reset_mouse(mouse_cookie *cookie)
 	uint8 data[2];
 	status_t status;
 	
-	TRACE("ps2_reset_mouse\n");
+	TRACE("ps2: ps2_reset_mouse\n");
 	
 	status = ps2_dev_command(cookie->dev, PS2_CMD_RESET, NULL, 0, data, 2);
 		
 	if (status == B_OK && data[0] != 0xAA && data[1] != 0x00) {
-		TRACE("reset mouse failed, response was: 0x%02x 0x%02x\n", data[0], data[1]);
+		TRACE("ps2: reset mouse failed, response was: 0x%02x 0x%02x\n", data[0], data[1]);
 		status = B_ERROR;
 	} else if (status != B_OK) {
-		TRACE("reset mouse failed\n");
+		TRACE("ps2: reset mouse failed\n");
 	} else {
-		TRACE("reset mouse success\n");
+		TRACE("ps2: reset mouse success\n");
 	}
 	
 	return status;
@@ -159,7 +159,7 @@ ps2_packet_to_movement(mouse_cookie *cookie, uint8 packet[], mouse_movement *pos
 		pos->wheel_ydelta = (int)wheel_ydelta;
 		pos->wheel_xdelta = (int)wheel_xdelta;
 
-		TRACE("xdelta: %d, ydelta: %d, buttons %x, clicks: %d, timestamp %Ld\n",
+		TRACE("ps2: ps2_packet_to_movement xdelta: %d, ydelta: %d, buttons %x, clicks: %d, timestamp %Ld\n",
 			xDelta, yDelta, buttons, cookie->click_count, currentTime);
 	}
 }
@@ -219,7 +219,7 @@ mouse_handle_int(ps2_dev *dev)
 	const uint8 data = dev->history[0].data;
 		
 	if (cookie->packet_index == 0 && !(data & 8)) {
-		TRACE("bad mouse data, trying resync\n");
+		TRACE("ps2: bad mouse data, trying resync\n");
 		return B_HANDLED_INTERRUPT;
 	}
 
@@ -290,7 +290,7 @@ probe_mouse(mouse_cookie *cookie, size_t *probed_packet_size)
 		if (probed_packet_size)
 			*probed_packet_size = PS2_PACKET_INTELLIMOUSE;
 	} else {
-		// Something's wrong. Better quit
+		INFO("ps2: probe_mouse Something's wrong.\n");
 		return B_ERROR;
 	}
 
@@ -320,7 +320,7 @@ mouse_open(const char *name, uint32 flags, void **_cookie)
 	}
 	
 	if (dev == NULL) {
-		TRACE("dev = NULL\n");
+		TRACE("ps2: dev = NULL\n");
 		return B_ERROR;
 	}
 	
@@ -348,7 +348,7 @@ mouse_open(const char *name, uint32 flags, void **_cookie)
 
 	cookie->mouse_buffer = create_packet_buffer(MOUSE_HISTORY_SIZE * cookie->packet_size);
 	if (cookie->mouse_buffer == NULL) {
-		TRACE("can't allocate mouse actions buffer\n");
+		TRACE("ps2: can't allocate mouse actions buffer\n");
 		goto err2;
 	}
 
@@ -356,7 +356,7 @@ mouse_open(const char *name, uint32 flags, void **_cookie)
 	// the interrupt handler and the read operation
 	cookie->mouse_sem = create_sem(0, "ps2_mouse_sem");
 	if (cookie->mouse_sem < 0) {
-		TRACE("failed creating PS/2 mouse semaphore!\n");
+		TRACE("ps2: failed creating PS/2 mouse semaphore!\n");
 		goto err3;
 	}
 
@@ -390,7 +390,7 @@ mouse_close(void *_cookie)
 {
 	mouse_cookie *cookie = _cookie;
 
-	TRACE("ps2: mouse_close %s\n", cookie->dev->name);
+	TRACE("ps2: mouse_close %s enter\n", cookie->dev->name);
 
 	ps2_dev_command(cookie->dev, PS2_CMD_DISABLE, NULL, 0, NULL, 0);
 
@@ -400,6 +400,7 @@ mouse_close(void *_cookie)
 	atomic_and(&cookie->dev->flags, ~PS2_FLAG_OPEN);
 	atomic_and(&cookie->dev->flags, ~PS2_FLAG_ENABLED);
 
+	TRACE("ps2: mouse_close %s done\n", cookie->dev->name);
 	return B_OK;
 }
 
@@ -438,7 +439,7 @@ mouse_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 		case MS_NUM_EVENTS:
 		{
 			int32 count;
-			TRACE("MS_NUM_EVENTS\n");
+			TRACE("ps2: ioctl MS_NUM_EVENTS\n");
 			get_sem_count(cookie->mouse_sem, &count);
 			return count;
 		}
@@ -447,7 +448,7 @@ mouse_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 		{
 			mouse_movement movement;
 			status_t status;
-			TRACE("MS_READ\n");
+			TRACE("ps2: ioctl MS_READ\n");
 			if ((status = mouse_read_event(cookie, &movement)) < B_OK)
 				return status;
 //			TRACE("%s %d %d %d %d\n", cookie->dev->name, 
@@ -456,27 +457,27 @@ mouse_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 		}
 
 		case MS_SET_TYPE:
-			TRACE("MS_SET_TYPE not implemented\n");
+			TRACE("ps2: ioctl MS_SET_TYPE not implemented\n");
 			return B_BAD_VALUE;
 
 		case MS_SET_MAP:
-			TRACE("MS_SET_MAP (set mouse mapping) not implemented\n");
+			TRACE("ps2: ioctl MS_SET_MAP (set mouse mapping) not implemented\n");
 			return B_BAD_VALUE;
 
 		case MS_GET_ACCEL:
-			TRACE("MS_GET_ACCEL (get mouse acceleration) not implemented\n");
+			TRACE("ps2: ioctl MS_GET_ACCEL (get mouse acceleration) not implemented\n");
 			return B_BAD_VALUE;
 
 		case MS_SET_ACCEL:
-			TRACE("MS_SET_ACCEL (set mouse acceleration) not implemented\n");
+			TRACE("ps2: ioctl MS_SET_ACCEL (set mouse acceleration) not implemented\n");
 			return B_BAD_VALUE;
 
 		case MS_SET_CLICKSPEED:
-			TRACE("MS_SETCLICK (set click speed)\n");
+			TRACE("ps2: ioctl MS_SETCLICK (set click speed)\n");
 			return user_memcpy(&cookie->click_speed, buffer, sizeof(bigtime_t));
 
 		default:
-			TRACE("unknown opcode: %ld\n", op);
+			TRACE("ps2: ioctl unknown mouse opcode: %ld\n", op);
 			return B_BAD_VALUE;
 	}
 }
