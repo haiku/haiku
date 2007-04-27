@@ -807,12 +807,8 @@ TCPEndpoint::_ListenReceive(tcp_segment_header &segment, net_buffer *buffer)
 	if (gSocketModule->spawn_pending_socket(socket, &newSocket) < B_OK)
 		return DROP;
 
-	TCPEndpoint *newEndpoint = (TCPEndpoint *)newSocket->first_protocol;
-
-	newEndpoint->LocalAddress().SetTo(&buffer->destination);
-	newEndpoint->PeerAddress().SetTo(&buffer->source);
-
-	return newEndpoint->Spawn(this, segment, buffer);
+	return ((TCPEndpoint *)newSocket->first_protocol)->Spawn(this,
+		segment, buffer);
 }
 
 
@@ -822,9 +818,15 @@ TCPEndpoint::Spawn(TCPEndpoint *parent, tcp_segment_header &segment,
 {
 	RecursiveLocker _(fLock);
 
+	// TODO error checking
+	ProtocolSocket::Open();
+
 	fState = SYNCHRONIZE_RECEIVED;
 	fManager = parent->fManager;
 	fSpawned = true;
+
+	LocalAddress().SetTo(&buffer->destination);
+	PeerAddress().SetTo(&buffer->source);
 
 	TRACE("Spawn()");
 
