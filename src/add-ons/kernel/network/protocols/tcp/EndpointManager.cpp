@@ -282,6 +282,8 @@ EndpointManager::_BindToAddress(TCPEndpoint *endpoint, const sockaddr *_address)
 
 	while (portUsers.HasNext()) {
 		TCPEndpoint *user = portUsers.Next();
+		if (user->LocalAddress().Port() != port)
+			break;
 
 		if (user->LocalAddress().IsEmpty(false)
 			|| address.EqualTo(*user->LocalAddress(), false)) {
