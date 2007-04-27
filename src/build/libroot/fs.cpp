@@ -959,3 +959,41 @@ write_pos(int fd, off_t pos, const void *buffer, size_t bufferSize)
 
 	return bytesWritten;
 }
+
+// readv_pos
+ssize_t
+readv_pos(int fd, off_t pos, const struct iovec *vec, size_t count)
+{
+	// seek
+	off_t result = lseek(fd, pos, SEEK_SET);
+	if (result < 0)
+		return errno;
+	
+	// read
+	ssize_t bytesRead = readv(fd, vec, count);
+	if (bytesRead < 0) {
+		errno = bytesRead;
+		return -1;
+	}
+
+	return bytesRead;
+}
+
+// writev_pos
+ssize_t
+writev_pos(int fd, off_t pos, const struct iovec *vec, size_t count)
+{
+	// seek
+	off_t result = lseek(fd, pos, SEEK_SET);
+	if (result < 0)
+		return errno;
+	
+	// read
+	ssize_t bytesWritten = writev(fd, vec, count);
+	if (bytesWritten < 0) {
+		errno = bytesWritten;
+		return -1;
+	}
+
+	return bytesWritten;
+}

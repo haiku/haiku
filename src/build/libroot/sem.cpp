@@ -142,11 +142,63 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 	return B_OK;
 }
 
-// atomic_add
-int32
-atomic_add(vint32 *value, int32 addValue)
+// get_sem_count
+status_t
+get_sem_count(sem_id id, int32 *threadCount)
 {
-	int32 oldValue = *value;
-	value += addValue;
-	return oldValue;
+	if (!check_sem(id))
+		return B_BAD_SEM_ID;
+
+	if (!threadCount)
+		return B_BAD_VALUE;
+
+	*threadCount = sSemaphores[id].count;
+	return B_OK;
+}
+
+// set_sem_owner
+status_t
+set_sem_owner(sem_id id, team_id team)
+{
+	if (!check_sem(id))
+		return B_BAD_SEM_ID;
+
+	return B_OK;
+}
+
+// _get_sem_info
+status_t
+_get_sem_info(sem_id id, struct sem_info *info, size_t infoSize)
+{
+	if (!check_sem(id))
+		return B_BAD_SEM_ID;
+
+	if (!info)
+		return B_BAD_VALUE;
+
+	info->sem = id;
+	info->team = 1;
+	info->name[0] = '\0';
+	info->count = sSemaphores[id].count;
+	info->latest_holder = -1;
+
+	return B_OK;
+}
+
+// _get_next_sem_info
+status_t
+_get_next_sem_info(team_id team, int32 *cookie, struct sem_info *info,
+	size_t infoSize)
+{
+	if (team < 0 || team > 2)
+		return B_BAD_TEAM_ID;
+
+	for (int i = *cookie; i < kSemaphoreCount; i++) {
+		if (sSemaphores[i].inUse) {
+			*cookie = i + 1;
+			return _get_sem_info(i, info, infoSize);
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
 }

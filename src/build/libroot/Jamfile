@@ -22,6 +22,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers build private kernel ] : true ;
 MakeLocate libroot_build.so : $(HOST_BUILD_COMPATIBILITY_LIB_DIR) ;
 
 BuildPlatformSharedLibrary libroot_build.so :
+	atomic.cpp
 	byteorder.cpp
 	errors.cpp
 	fs.cpp

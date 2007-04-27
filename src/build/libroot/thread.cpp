@@ -5,6 +5,28 @@
 
 static const thread_id kMainThreadID = 3;
 
+
+// kill_thread
+status_t
+kill_thread(thread_id thread)
+{
+	return B_BAD_VALUE;
+}
+
+// resume_thread
+status_t
+resume_thread(thread_id thread)
+{
+	return B_BAD_VALUE;
+}
+
+// suspend_thread
+status_t
+suspend_thread(thread_id thread)
+{
+	return B_BAD_VALUE;
+}
+
 // find_thread
 thread_id
 find_thread(const char *name)
