@@ -169,8 +169,6 @@ class TCPEndpoint : public net_protocol, public ProtocolSocket {
 		uint32			fFlags;
 		status_t		fError;
 
-		bool			fSpawned;
-
 		// timer
 		net_timer		fRetransmitTimer;
 		net_timer		fPersistTimer;

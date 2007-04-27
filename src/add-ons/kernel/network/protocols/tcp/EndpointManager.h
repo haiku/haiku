@@ -71,6 +71,7 @@ class EndpointManager : public DoublyLinkedListLinkImpl<EndpointManager> {
 		status_t SetPassive(TCPEndpoint *endpoint);
 
 		status_t Bind(TCPEndpoint *endpoint, const sockaddr *address);
+		status_t BindChild(TCPEndpoint *endpoint);
 		status_t Unbind(TCPEndpoint *endpoint);
 
 		status_t ReplyWithReset(tcp_segment_header &segment,

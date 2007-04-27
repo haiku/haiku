@@ -257,11 +257,21 @@ EndpointManager::Bind(TCPEndpoint *endpoint, const sockaddr *address)
 
 
 status_t
-EndpointManager::_BindToAddress(TCPEndpoint *endpoint, const sockaddr *address)
+EndpointManager::BindChild(TCPEndpoint *endpoint)
+{
+	BenaphoreLocker _(fLock);
+	return _Bind(endpoint, *endpoint->LocalAddress());
+}
+
+
+status_t
+EndpointManager::_BindToAddress(TCPEndpoint *endpoint, const sockaddr *_address)
 {
 	TRACE(("EndpointManager::BindToAddress(%p)\n", endpoint));
 
-	uint16 port = AddressModule()->get_port(address);
+	ConstSocketAddress address(AddressModule(), _address);
+
+	uint16 port = address.Port();
 
 	// TODO this check follows very typical UNIX semantics
 	//      and generally should be improved.
@@ -270,33 +280,20 @@ EndpointManager::_BindToAddress(TCPEndpoint *endpoint, const sockaddr *address)
 
 	EndpointTable::Iterator portUsers = fEndpointHash.Lookup(port);
 
-	// If there is already an endpoint bound to that port, SO_REUSEADDR has to be
-	// specified by the new endpoint to be allowed to bind to that same port.
-	// Alternatively, all endpoints must have the SO_REUSEPORT option set.
-	if (portUsers.HasNext()) {
+	while (portUsers.HasNext()) {
 		TCPEndpoint *user = portUsers.Next();
 
-		if ((endpoint->socket->options & SO_REUSEADDR) == 0
-			&& ((endpoint->socket->options & SO_REUSEPORT) == 0
-				|| (user->socket->options & SO_REUSEPORT) == 0))
-			return EADDRINUSE;
-
-		do {
-			// check if this endpoint binds to a wildcard address
-			if (user->LocalAddress().IsEmpty(false)) {
-				// you cannot specialize a wildcard endpoint - you have to open
-				// the wildcard endpoint last
-				return B_PERMISSION_DENIED;
-			}
-
-			if (portUsers.HasNext())
-				user = portUsers.Next();
-			else
-				break;
-		} while (true);
+		if (user->LocalAddress().IsEmpty(false)
+			|| address.EqualTo(*user->LocalAddress(), false)) {
+			if ((endpoint->socket->options & SO_REUSEADDR) == 0)
+				return EADDRINUSE;
+			// TODO lock endpoint before retriving state?
+			if (user->State() != TIME_WAIT && user->State() != CLOSED)
+				return EADDRINUSE;
+		}
 	}
 
-	return _Bind(endpoint, address);
+	return _Bind(endpoint, *address);
 }
 
 
@@ -368,10 +365,8 @@ EndpointManager::Unbind(TCPEndpoint *endpoint)
 
 	BenaphoreLocker _(fLock);
 
-	if (!fEndpointHash.Remove(endpoint)) {
-		if (!endpoint->fSpawned)
-			panic("bound endpoint %p not in hash!", endpoint);
-	}
+	if (!fEndpointHash.Remove(endpoint))
+		panic("bound endpoint %p not in hash!", endpoint);
 
 	fConnectionHash.Remove(endpoint);
 

@@ -241,8 +241,7 @@ TCPEndpoint::TCPEndpoint(net_socket *socket)
 	fSlowStartThreshold(0),
 	fState(CLOSED),
 	fFlags(FLAG_OPTION_WINDOW_SCALE | FLAG_OPTION_TIMESTAMP),
-	fError(B_OK),
-	fSpawned(false)
+	fError(B_OK)
 {
 	//gStackModule->init_timer(&fTimer, _TimeWait, this);
 
@@ -823,7 +822,6 @@ TCPEndpoint::Spawn(TCPEndpoint *parent, tcp_segment_header &segment,
 
 	fState = SYNCHRONIZE_RECEIVED;
 	fManager = parent->fManager;
-	fSpawned = true;
 
 	LocalAddress().SetTo(&buffer->destination);
 	PeerAddress().SetTo(&buffer->source);
@@ -831,6 +829,9 @@ TCPEndpoint::Spawn(TCPEndpoint *parent, tcp_segment_header &segment,
 	TRACE("Spawn()");
 
 	// TODO: proper error handling!
+	if (fManager->BindChild(this) < B_OK)
+		return DROP;
+
 	if (_PrepareSendPath(*PeerAddress()) < B_OK)
 		return DROP;
 
