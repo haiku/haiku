@@ -13,9 +13,9 @@ namespace boot {
 }
 
 
-namespace BFS {
-
 #include "bfs.h"
+
+namespace BFS {
 
 class Directory;
 

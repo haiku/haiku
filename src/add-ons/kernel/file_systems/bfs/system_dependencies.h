@@ -22,6 +22,9 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <ByteOrder.h>
+
+#ifndef _BOOT_MODE
 #include <fs_attr.h>
 #include <fs_cache.h>
 #include <fs_index.h>
@@ -29,12 +32,12 @@
 #include <fs_interface.h>
 #include <fs_query.h>
 #include <fs_volume.h>
-#include <ByteOrder.h>
 #include <Drivers.h>
 #include <KernelExport.h>
 #include <NodeMonitor.h>
 #include <SupportDefs.h>
 #include <TypeConstants.h>
+#endif	// _BOOT_MODE
 
 #include <util/DoublyLinkedList.h>
 #include <util/kernel_cpp.h>

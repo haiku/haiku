@@ -13,6 +13,10 @@
 #include "system_dependencies.h"
 
 
+#ifdef _BOOT_MODE
+namespace BFS {
+#endif
+
 // ToDo: temporary fix! (missing but public ioctls)
 #define IOCTL_FILE_UNCACHED_IO	10000
 
@@ -364,5 +368,8 @@ small_data::IsLast(const bfs_inode *inode) const
 	return (uint32)this > (uint32)inode + inode->InodeSize() - sizeof(small_data) || name_size == 0;
 }
 
+#ifdef _BOOT_MODE
+}	// namespace BFS
+#endif
 
 #endif	/* BFS_H */
