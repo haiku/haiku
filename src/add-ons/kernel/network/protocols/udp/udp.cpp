@@ -16,7 +16,7 @@
 #include <lock.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
-#include <util/khash.h>
+#include <util/OpenHashTable.h>
 
 #include <KernelExport.h>
 
@@ -86,8 +86,8 @@ public:
 
 	UdpDomainSupport		*DomainSupport() const { return fManager; }
 
-	UdpEndpoint				*hash_link;
-								// link required by hash_table (see khash.h)
+	HashTableLink<UdpEndpoint> *HashTableLink() { return &fLink; }
+
 private:
 	status_t				_Activate();
 	status_t				_Deactivate();
@@ -96,13 +96,56 @@ private:
 	bool					fActive;
 								// an active UdpEndpoint is part of the endpoint 
 								// hash (and it is bound and optionally connected)
+
+	::HashTableLink<UdpEndpoint> fLink;
+};
+
+
+class UdpDomainSupport;
+
+struct UdpHashDefinition {
+	typedef net_address_module_info ParentType;
+	typedef std::pair<const sockaddr *, const sockaddr *> KeyType;
+	typedef UdpEndpoint ValueType;
+
+	UdpHashDefinition(net_address_module_info *parent)
+		: module(parent) {}
+
+	size_t HashKey(const KeyType &key) const
+	{
+		return _Mix(module->hash_address_pair(key.first, key.second));
+	}
+
+	size_t Hash(UdpEndpoint *endpoint) const
+	{
+		return _Mix(endpoint->LocalAddress().HashPair(*endpoint->PeerAddress()));
+	}
+
+	static size_t _Mix(size_t hash)
+	{
+		// move the bits into the relevant range (as defined by kNumHashBuckets):
+		return (hash & 0x000007FF) ^ (hash & 0x003FF800) >> 11
+			^ (hash & 0xFFC00000UL) >> 22;
+	}
+
+	bool Compare(const KeyType &key, UdpEndpoint *endpoint) const
+	{
+		return endpoint->LocalAddress().EqualTo(key.first, true)
+			&& endpoint->PeerAddress().EqualTo(key.second, true);
+	}
+
+	HashTableLink<UdpEndpoint> *GetLink(UdpEndpoint *endpoint) const
+	{
+		return endpoint->HashTableLink();
+	}
+
+	net_address_module_info *module;
 };
 
 
 class UdpDomainSupport : public DoublyLinkedListLinkImpl<UdpDomainSupport> {
 public:
 	UdpDomainSupport(net_domain *domain);
-	~UdpDomainSupport();
 
 	status_t InitCheck() const;
 
@@ -121,36 +164,24 @@ public:
 	uint16 GetEphemeralPort();
 
 private:
-	struct HashKey {
-		HashKey() {}
-		HashKey(net_address_module_info *module, const sockaddr *_local,
-			const sockaddr *_peer)
-			: address_module(module), local(_local), peer(_peer) {}
-
-		net_address_module_info *address_module;
-		const sockaddr *local;
-		const sockaddr *peer;
-	};
-
-	UdpEndpoint *_FindActiveEndpoint(sockaddr *ourAddress,
-		sockaddr *peerAddress);
+	UdpEndpoint *_FindActiveEndpoint(const sockaddr *ourAddress,
+		const sockaddr *peerAddress);
 	status_t _DemuxBroadcast(net_buffer *buffer);
 	status_t _DemuxMulticast(net_buffer *buffer);
 	status_t _DemuxUnicast(net_buffer *buffer);
 
 	uint16 _GetNextEphemeral();
 
-	static int _Compare(void *udpEndpoint, const void *_key);
-	static uint32 _Hash(void *udpEndpoint, const void *key, uint32 range);
-
 	net_address_module_info *AddressModule() const
 	{
 		return fDomain->address_module;
 	}
 
+	typedef OpenHashTable<UdpHashDefinition, false> EndpointTable;
+
 	net_domain		*fDomain;
 	uint16			fLastUsedEphemeral;
-	hash_table		*fActiveEndpoints;
+	EndpointTable	fActiveEndpoints;
 	uint32			fEndpointCount;
 
 	static const uint16		kFirst = 49152;
@@ -203,24 +234,16 @@ UdpDomainSupport::UdpDomainSupport(net_domain *domain)
 	:
 	fDomain(domain),
 	fLastUsedEphemeral(kLast),
+	fActiveEndpoints(domain->address_module, kNumHashBuckets),
 	fEndpointCount(0)
 {
-	fActiveEndpoints = hash_init(kNumHashBuckets, offsetof(UdpEndpoint, hash_link),
-		&_Compare, &_Hash);
-}
-
-
-UdpDomainSupport::~UdpDomainSupport()
-{
-	if (fActiveEndpoints)
-		hash_uninit(fActiveEndpoints);
 }
 
 
 status_t
 UdpDomainSupport::InitCheck() const
 {
-	return fActiveEndpoints ? B_OK : B_NO_MEMORY;
+	return fActiveEndpoints.InitCheck();
 }
 
 
@@ -240,18 +263,15 @@ status_t
 UdpDomainSupport::CheckBindRequest(sockaddr *address, int socketOptions)
 {		// sUdpEndpointManager->Locker() must be locked!
 	status_t status = B_OK;
-	UdpEndpoint *otherEndpoint;
-	struct hash_iterator endpointIterator;
+
+	EndpointTable::Iterator it = fActiveEndpoints.GetIterator();
 
 	// Iterate over all active UDP-endpoints and check if the requested bind
 	// is allowed (see figure 22.24 in [Stevens - TCP2, p735]):
-	hash_open(fActiveEndpoints, &endpointIterator);
 	TRACE_DOMAIN("CheckBindRequest() for %s...",
 		AddressString(fDomain, address, true).Data());
-	while(1) {
-		otherEndpoint = (UdpEndpoint *)hash_next(fActiveEndpoints, &endpointIterator);
-		if (!otherEndpoint)
-			break;
+	while (it.HasNext()) {
+		UdpEndpoint *otherEndpoint = it.Next();
 
 		TRACE_DOMAIN("  ...checking endpoint %p (port=%u)...", otherEndpoint,
 			ntohs(otherEndpoint->LocalAddress().Port()));
@@ -273,7 +293,6 @@ UdpDomainSupport::CheckBindRequest(sockaddr *address, int socketOptions)
 			}
 		}
 	}
-	hash_close(fActiveEndpoints, &endpointIterator, false);
 
 	TRACE_DOMAIN("  CheckBindRequest done (status=%lx)", status);
 	return status;
@@ -285,7 +304,9 @@ UdpDomainSupport::ActivateEndpoint(UdpEndpoint *endpoint)
 {		// sUdpEndpointManager->Locker() must be locked!
 	TRACE_DOMAIN("Endpoint(%s) was activated",
 		AddressString(fDomain, *endpoint->LocalAddress(), true).Data());
-	return hash_insert(fActiveEndpoints, endpoint);
+
+	fActiveEndpoints.Insert(endpoint);
+	return B_OK;
 }
 
 
@@ -294,7 +315,9 @@ UdpDomainSupport::DeactivateEndpoint(UdpEndpoint *endpoint)
 {		// sUdpEndpointManager->Locker() must be locked!
 	TRACE_DOMAIN("Endpoint(%s) was deactivated",
 		AddressString(fDomain, *endpoint->LocalAddress(), true).Data());
-	return hash_remove(fActiveEndpoints, endpoint);
+
+	fActiveEndpoints.Remove(endpoint);
+	return B_OK;
 }
 
 
@@ -306,15 +329,14 @@ UdpDomainSupport::GetEphemeralPort()
 
 
 UdpEndpoint *
-UdpDomainSupport::_FindActiveEndpoint(sockaddr *ourAddress,
-	sockaddr *peerAddress)
+UdpDomainSupport::_FindActiveEndpoint(const sockaddr *ourAddress,
+	const sockaddr *peerAddress)
 {
 	TRACE_DOMAIN("finding Endpoint for %s -> %s",
 		AddressString(fDomain, ourAddress, true).Data(),
 		AddressString(fDomain, peerAddress, true).Data());
 
-	HashKey key(AddressModule(), ourAddress, peerAddress);
-	return (UdpEndpoint *)hash_lookup(fActiveEndpoints, &key);
+	return fActiveEndpoints.Lookup(std::make_pair(ourAddress, peerAddress));
 }
 
 
@@ -331,11 +353,10 @@ UdpDomainSupport::_DemuxBroadcast(net_buffer *buffer)
 
 	uint16 incomingPort = AddressModule()->get_port(broadcastAddr);
 
-	UdpEndpoint *endpoint;
-	hash_iterator endpointIterator;
-	hash_open(fActiveEndpoints, &endpointIterator);
-	while ((endpoint = (UdpEndpoint *)hash_next(fActiveEndpoints,
-		&endpointIterator)) != NULL) {
+	EndpointTable::Iterator it = fActiveEndpoints.GetIterator();
+
+	while (it.HasNext()) {
+		UdpEndpoint *endpoint = it.Next();
 
 		TRACE_DOMAIN("  _DemuxBroadcast(): checking endpoint %s...",
 			AddressString(fDomain, *endpoint->LocalAddress(), true).Data());
@@ -361,7 +382,7 @@ UdpDomainSupport::_DemuxBroadcast(net_buffer *buffer)
 			endpoint->StoreData(buffer);
 		}
 	}
-	hash_close(fActiveEndpoints, &endpointIterator, false);
+
 	return B_OK;
 }
 
@@ -413,7 +434,7 @@ UdpDomainSupport::_DemuxUnicast(net_buffer *buffer)
 uint16
 UdpDomainSupport::_GetNextEphemeral()
 {
-	uint16 stop, curr, ncurr;
+	uint16 stop, curr;
 	if (fLastUsedEphemeral < kLast) {
 		stop = fLastUsedEphemeral;
 		curr = fLastUsedEphemeral + 1;
@@ -426,29 +447,30 @@ UdpDomainSupport::_GetNextEphemeral()
 	// TODO: a free list could be used to avoid the impact of these
 	//       two nested loops most of the time... let's see how bad this really is
 	bool found = false;
-	uint16 endpointPort;
-	hash_iterator endpointIterator;
-	hash_open(fActiveEndpoints, &endpointIterator);
-	while(!found && curr != stop) {
+
+	EndpointTable::Iterator it = fActiveEndpoints.GetIterator();
+
+	while (!found && curr != stop) {
 		TRACE_DOMAIN("  _GetNextEphemeral(): trying port %hu...", curr);
-		ncurr = htons(curr);
-		hash_rewind(fActiveEndpoints, &endpointIterator);
+
+		it.Rewind();
+
 		while (!found) {
-			UdpEndpoint *endpoint = (UdpEndpoint *)hash_next(fActiveEndpoints,
-				&endpointIterator);
-			if (!endpoint) {
+			if (!it.HasNext()) {
 				found = true;
 				break;
 			}
 
-			endpointPort = endpoint->LocalAddress().Port();
+			UdpEndpoint *endpoint = it.Next();
+			uint16 endpointPort = endpoint->LocalAddress().Port();
 
 			TRACE_DOMAIN("  _GetNextEphemeral(): checking endpoint %p (port %hu)...",
 				endpoint, ntohs(endpointPort));
 
-			if (endpointPort == ncurr)
+			if (endpointPort == htons(curr))
 				break;
 		}
+
 		if (!found) {
 			if (curr < kLast)
 				curr++;
@@ -456,44 +478,13 @@ UdpDomainSupport::_GetNextEphemeral()
 				curr = kFirst;
 		}
 	}
-	hash_close(fActiveEndpoints, &endpointIterator, false);
+
 	if (!found)
 		return 0;
+
 	TRACE_DOMAIN("  _GetNextEphemeral(): ...using port %hu", curr);
 	fLastUsedEphemeral = curr;
 	return curr;
-}
-
-
-int
-UdpDomainSupport::_Compare(void *_udpEndpoint, const void *_key)
-{
-	struct UdpEndpoint *udpEndpoint = (UdpEndpoint*)_udpEndpoint;
-	const HashKey *key = (const HashKey *)_key;
-
-	return (udpEndpoint->LocalAddress().EqualTo(key->local, true)
-		&& udpEndpoint->PeerAddress().EqualTo(key->peer, true)) ? 0 : 1;
-}
-
-
-uint32
-UdpDomainSupport::_Hash(void *_udpEndpoint, const void *_key, uint32 range)
-{
-	const UdpEndpoint *udpEndpoint = (const UdpEndpoint *)_udpEndpoint;
-	const HashKey *key = (const HashKey *)_key;
-	uint32 hash;
-
-	if (udpEndpoint)
-		hash = udpEndpoint->LocalAddress().HashPair(
-			*udpEndpoint->PeerAddress());
-	else
-		hash = key->address_module->hash_address_pair(key->local, key->peer);
-
-	// move the bits into the relevant range (as defined by kNumHashBuckets):
-	hash = (hash & 0x000007FF) ^ (hash & 0x003FF800) >> 11
-			^ (hash & 0xFFC00000UL) >> 22;
-
-	return hash % range;
 }
 
 
