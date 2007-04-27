@@ -34,7 +34,7 @@ public:
 	int32 SelectionOffset() const;
 	void SetSelectionOffset(int32 offset);
 	
-	void AddClause(int32, int32);
+	bool AddClause(int32, int32);
 	bool GetClause(int32 index, int32 *start, int32 *end) const;
 	int32 CountClauses() const;
 	

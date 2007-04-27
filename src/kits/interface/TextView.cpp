@@ -4427,7 +4427,8 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 	int32 clauseEnd;
 	while (message->FindInt32("be:clause_start", clauseCount, &clauseStart) == B_OK &&
 			message->FindInt32("be:clause_end", clauseCount, &clauseEnd) == B_OK) {
-		fInline->AddClause(clauseStart, clauseEnd);
+		if (!fInline->AddClause(clauseStart, clauseEnd))
+			break;
 		clauseCount++;	
 	}
 

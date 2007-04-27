@@ -153,12 +153,18 @@ _BInlineInput_::SetSelectionOffset(int32 offset)
 	\param start The offset into the string where the clause starts.
 	\param end The offset into the string where the clause finishes.
 */
-void
+bool
 _BInlineInput_::AddClause(int32 start, int32 end)
 {
-	fClauses = (clause *)realloc(fClauses, ++fNumClauses * sizeof(clause));
-	fClauses[fNumClauses - 1].start = start;
-	fClauses[fNumClauses - 1].end = end;
+	void *newData = realloc(fClauses, (fNumClauses + 1) * sizeof(clause));
+	if (newData == NULL)
+		return false;
+
+	fClauses = (clause *)newData;
+	fClauses[fNumClauses].start = start;
+	fClauses[fNumClauses].end = end;
+	fNumClauses++;
+	return true;
 }
 
 
