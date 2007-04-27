@@ -219,6 +219,8 @@ fssh_strcasestr(const char *string, const char *searchString)
 char*
 fssh_strdup(const char *string)
 {
+	if (!string)
+		return NULL;
 	return strdup(string);
 }
 
