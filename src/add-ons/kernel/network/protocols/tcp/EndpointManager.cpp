@@ -73,14 +73,14 @@ EndpointHashDefinition::HashKey(uint16 port) const
 size_t
 EndpointHashDefinition::Hash(TCPEndpoint *endpoint) const
 {
-	return endpoint->LocalAddress().GetPort();
+	return endpoint->LocalAddress().Port();
 }
 
 
 bool
 EndpointHashDefinition::Compare(uint16 port, TCPEndpoint *endpoint) const
 {
-	return endpoint->LocalAddress().GetPort() == port;
+	return endpoint->LocalAddress().Port() == port;
 }
 
 
@@ -146,7 +146,7 @@ EndpointManager::SetConnection(TCPEndpoint *endpoint,
 	local.SetTo(_local);
 
 	if (local.IsEmpty(false)) {
-		uint16 port = local.GetPort();
+		uint16 port = local.Port();
 		local.SetTo(interfaceLocal);
 		local.SetPort(port);
 	}
@@ -372,7 +372,7 @@ EndpointManager::Unbind(TCPEndpoint *endpoint)
 	BenaphoreLocker _(fLock);
 
 	TCPEndpoint *other =
-		fEndpointHash.Lookup(endpoint->LocalAddress().GetPort());
+		fEndpointHash.Lookup(endpoint->LocalAddress().Port());
 	if (other != endpoint) {
 		// remove endpoint from the list of endpoints with the same port
 		while (other != NULL && other->fEndpointNextWithSamePort != endpoint)

@@ -254,7 +254,7 @@ UdpDomainSupport::CheckBindRequest(sockaddr *address, int socketOptions)
 			break;
 
 		TRACE_DOMAIN("  ...checking endpoint %p (port=%u)...", otherEndpoint,
-			ntohs(otherEndpoint->LocalAddress().GetPort()));
+			ntohs(otherEndpoint->LocalAddress().Port()));
 
 		if (otherEndpoint->LocalAddress().EqualPorts(address)) {
 			// port is already bound, SO_REUSEADDR or SO_REUSEPORT is required:
@@ -340,7 +340,7 @@ UdpDomainSupport::_DemuxBroadcast(net_buffer *buffer)
 		TRACE_DOMAIN("  _DemuxBroadcast(): checking endpoint %s...",
 			AddressString(fDomain, *endpoint->LocalAddress(), true).Data());
 
-		if (endpoint->LocalAddress().GetPort() != incomingPort) {
+		if (endpoint->LocalAddress().Port() != incomingPort) {
 			// ports don't match, so we do not dispatch to this endpoint...
 			continue;
 		}
@@ -441,7 +441,7 @@ UdpDomainSupport::_GetNextEphemeral()
 				break;
 			}
 
-			endpointPort = endpoint->LocalAddress().GetPort();
+			endpointPort = endpoint->LocalAddress().Port();
 
 			TRACE_DOMAIN("  _GetNextEphemeral(): checking endpoint %p (port %hu)...",
 				endpoint, ntohs(endpointPort));

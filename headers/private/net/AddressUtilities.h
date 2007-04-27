@@ -62,7 +62,7 @@ public:
 		return fModule->equal_masked_addresses(fAddress, address, mask);
 	}
 
-	uint16 GetPort() const
+	uint16 Port() const
 	{
 		return fModule->get_port(fAddress);
 	}
@@ -161,7 +161,7 @@ public:
 		return fModule->equal_masked_addresses(fAddress, address, mask);
 	}
 
-	uint16 GetPort() const
+	uint16 Port() const
 	{
 		return fModule->get_port(fAddress);
 	}
