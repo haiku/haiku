@@ -17,6 +17,7 @@
 #include "command_cp.h"
 #include "fd.h"
 #include "fssh_dirent.h"
+#include "fssh_errno.h"
 #include "fssh_errors.h"
 #include "fssh_module.h"
 #include "fssh_stat.h"
@@ -249,7 +250,13 @@ command_cd(int argc, const char* const* argv)
 	}
 	const char* directory = argv[1];
 
-	fssh_status_t error = _kern_setcwd(-1, directory);
+	fssh_status_t error = FSSH_B_OK;
+	if (directory[0] == ':') {
+		if (chdir(directory + 1) < 0)
+			error = fssh_get_errno();
+	} else
+		error = _kern_setcwd(-1, directory);
+
 	if (error != FSSH_B_OK) {
 		fprintf(stderr, "Error: cd %s: %s\n", directory, fssh_strerror(error));
 		return error;
