@@ -16,7 +16,7 @@ namespace FSShell {
 mode_t to_platform_mode(fssh_mode_t mode);
 
 void from_platform_stat(const struct stat *st, struct fssh_stat *fsshStat);
-void to_platform_stat(const struct my_stat *fsshStat, struct stat *st);
+void to_platform_stat(const struct fssh_stat *fsshStat, struct stat *st);
 
 extern int to_platform_open_mode(int fsshMode);
 
