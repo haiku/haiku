@@ -1729,7 +1729,7 @@ fssh_file_cache_create(fssh_mount_id mountID, fssh_vnode_id vnodeID,
 	ref->virtual_size = size;
 
 	// get vnode
-	fssh_status_t error = vfs_get_vnode(mountID, vnodeID, &ref->node);
+	fssh_status_t error = vfs_lookup_vnode(mountID, vnodeID, &ref->node);
 	if (error != FSSH_B_OK) {
 		fssh_dprintf("file_cache_create(): Failed get vnode %d:%lld: %s\n",
 			mountID, vnodeID, fssh_strerror(error));
@@ -1771,8 +1771,6 @@ fssh_file_cache_delete(void *_cacheRef)
 	vm_cache_resize(ref, 0);
 
 	mutex_destroy(&ref->lock);
-
-	vfs_put_vnode(ref->node);
 
 	delete ref;
 }
