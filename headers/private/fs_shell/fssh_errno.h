@@ -17,6 +17,7 @@ extern int *_fssh_errnop(void);
 extern int	fssh_get_errno(void);
 extern void	fssh_set_errno(int error);
 
+extern int	fssh_to_host_error(int error);
 
 #ifdef __cplusplus
 } /* "C" */

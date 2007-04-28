@@ -29,3 +29,13 @@ fssh_set_errno(int error)
 {
 	errno = error;
 }
+
+int
+fssh_to_host_error(int error)
+{
+	#if __BEOS__
+		return error;
+	#else
+		return _haiku_to_host_error(error);
+	#endif
+}

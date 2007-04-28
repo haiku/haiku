@@ -408,6 +408,7 @@ extern "C" {
 #endif
 
 extern int *_haiku_build_errno();
+extern int _haiku_to_host_error(int error);
 
 #ifdef __cplusplus
 }

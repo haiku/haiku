@@ -180,3 +180,9 @@ _haiku_build_errno()
 	return &localErrno;
 }
 
+// _haiku_to_host_error
+int
+_haiku_to_host_error(int error)
+{
+	return to_host_error(error);
+}
