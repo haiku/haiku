@@ -100,29 +100,38 @@ Checksum::PseudoHeader(net_address_module_info *addressModule,
 // is automatically freed at end of scope:
 class AddressString {
 public:
-	inline AddressString(net_domain *domain, const sockaddr *address, 
+	AddressString(net_domain *domain, const sockaddr *address,
 		bool printPort = false)
 		: fBuffer(NULL)
 	{
 		domain->address_module->print_address(address, &fBuffer, printPort);
 	}
 
-	inline AddressString(net_domain *domain, const sockaddr &address, 
+	AddressString(net_domain *domain, const sockaddr &address,
 		bool printPort = false)
 		: fBuffer(NULL)
 	{
 		domain->address_module->print_address(&address, &fBuffer, printPort);
 	}
 
-	inline ~AddressString()
+	AddressString(net_address_module_info *address_module,
+		const sockaddr *address, bool printPort = false)
+		: fBuffer(NULL)
 	{
-		free(fBuffer);
+		address_module->print_address(address, &fBuffer, printPort);
 	}
-	
-	inline char *Data()
+
+	~AddressString()
+	{
+		if (fBuffer)
+			free(fBuffer);
+	}
+
+	const char *Data() const
 	{
 		return fBuffer;
 	}
+
 private:
 	char *fBuffer;
 };

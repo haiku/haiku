@@ -635,9 +635,6 @@ UdpEndpointManager::Deframe(net_buffer *buffer)
 
 	udp_header &header = bufferHeader.Data();
 
-	struct sockaddr *source = (struct sockaddr *)&buffer->source;
-	struct sockaddr *destination = (struct sockaddr *)&buffer->destination;
-
 	if (buffer->interface == NULL || buffer->interface->domain == NULL) {
 		TRACE_EPM("  Deframe(): UDP packed dropped as there was no domain "
 			"specified (interface %p).", buffer->interface);
@@ -647,12 +644,14 @@ UdpEndpointManager::Deframe(net_buffer *buffer)
 	net_domain *domain = buffer->interface->domain;
 	net_address_module_info *addressModule = domain->address_module;
 
-	addressModule->set_port(source, header.source_port);
-	addressModule->set_port(destination, header.destination_port);
+	SocketAddress source(addressModule, &buffer->source);
+	SocketAddress destination(addressModule, &buffer->destination);
 
-	TRACE_EPM("  Deframe(): data from %s to %s",
-		AddressString(domain, source, true).Data(),
-		AddressString(domain, destination, true).Data());
+	source.SetPort(header.source_port);
+	destination.SetPort(header.destination_port);
+
+	TRACE_EPM("  Deframe(): data from %s to %s", source.AsString(true).Data(),
+		destination.AsString(true).Data());
 
 	uint16 udpLength = ntohs(header.udp_length);
 	if (udpLength > buffer->size) {

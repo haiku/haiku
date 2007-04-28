@@ -9,6 +9,8 @@
 #ifndef ADDRESS_UTILITIES_H
 #define ADDRESS_UTILITIES_H
 
+#include <NetUtilities.h>
+
 #include <net_datalink.h>
 
 #include <sys/socket.h>
@@ -102,6 +104,11 @@ public:
 		return fModule->update_to(fAddress, from);
 	}
 
+	AddressString AsString(bool printPort = false) const
+	{
+		return AddressString(fModule, fAddress, printPort);
+	}
+
 	const sockaddr *operator *() const { return fAddress; }
 	sockaddr *operator *() { return fAddress; }
 
@@ -174,6 +181,11 @@ public:
 	status_t CopyTo(sockaddr_storage *to) const
 	{
 		return CopyTo((sockaddr *)to);
+	}
+
+	AddressString AsString(bool printPort = false) const
+	{
+		return AddressString(fModule, fAddress, printPort);
 	}
 
 	const sockaddr *operator *() const { return fAddress; }
