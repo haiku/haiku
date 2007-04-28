@@ -85,7 +85,7 @@ DiagramBox::draw(BRect updateRect)
 					region.Exclude(&clipping);
 				view()->ConstrainClippingRegion(&region);
 				drawBox();
-				for (int32 i = 0; i < countItems(); i++) {
+				for (uint32 i = 0; i < countItems(); i++) {
 					DiagramItem *item = itemAt(i);
 					if (region.Intersects(item->frame()))
 						item->draw(item->frame());
@@ -95,7 +95,7 @@ DiagramBox::draw(BRect updateRect)
 				region.Include(frame());
 				if (view()->getClippingAbove(this, &clipping))
 					region.Exclude(&clipping);
-				for (int32 i = 0; i < countItems(); i++) {
+				for (uint32 i = 0; i < countItems(); i++) {
 					DiagramItem *item = itemAt(i);
 					BRect r;
 					if (region.Intersects(r = item->frame())) {
@@ -210,7 +210,7 @@ DiagramBox::moveBy(float x, float y, BRegion *wireRegion)
 	if (view()) {
 		view()->PushState();
 		{
-			for (int32 i = 0; i < countItems(); i++) {
+			for (uint32 i = 0; i < countItems(); i++) {
 				DiagramEndPoint *endPoint = dynamic_cast<DiagramEndPoint *>(itemAt(i));
 				if (endPoint)
 					endPoint->moveBy(x, y, wireRegion);
@@ -243,7 +243,7 @@ DiagramBox::_setOwner(DiagramView *owner)
 {
 	D_METHOD(("DiagramBox::_setOwner()\n"));
 	m_view = owner;
-	for (int32 i = 0; i < countItems(DiagramItem::M_ENDPOINT); i++) {
+	for (uint32 i = 0; i < countItems(DiagramItem::M_ENDPOINT); i++) {
 		DiagramItem *item = itemAt(i);
 		item->_setOwner(m_view);
 		if (m_view)

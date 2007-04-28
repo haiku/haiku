@@ -7,26 +7,22 @@
 
 __USE_CORTEX_NAMESPACE
 
-// ---------------------------------------------------------------- //
-// ctor/dtor
-// ---------------------------------------------------------------- //
 
-MouseTrackingSourceView::MouseTrackingSourceView(
-	BRect frame,
-	const char* pName,
-	uint32 resizeMode,
-	uint32 flags,
-	uint32 trackingFlags) :
-	
-	BView(frame, pName, resizeMode, flags),
+MouseTrackingSourceView::MouseTrackingSourceView(BRect frame, const char* name,
+		uint32 resizeMode, uint32 flags, uint32 trackingFlags)
+	: BView(frame, name, resizeMode, flags),
+	m_pDest(0),
 	m_trackingFlags(trackingFlags),
-	m_bTracking(false),
-	m_pDest(0) {
-	
-//	FrameResized(frame.Width(), frame.Height());
+	m_bTracking(false)
+{
+	//FrameResized(frame.Width(), frame.Height());
 }
 
-MouseTrackingSourceView::~MouseTrackingSourceView() {}
+
+MouseTrackingSourceView::~MouseTrackingSourceView()
+{
+}
+
 
 // get mouse-down point in screen coordinates; returns
 // B_OK on success, or B_ERROR if no longer tracking

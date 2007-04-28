@@ -613,25 +613,26 @@ void DiagramView::setBackgroundColor(
 	m_useBackgroundBitmap = false;
 }
 
-void DiagramView::setBackgroundBitmap(
-	BBitmap *bitmap)
+
+void
+DiagramView::setBackgroundBitmap(BBitmap* bitmap)
 {
 	D_METHOD(("DiagramView::setBackgroundBitmap()\n"));
 	if (m_backgroundBitmap)
-	{
 		delete m_backgroundBitmap;
-	}
+
 	m_backgroundBitmap = new BBitmap(bitmap);
 	m_useBackgroundBitmap = true;
 }
 
-void DiagramView::updateDataRect()
+
+void
+DiagramView::updateDataRect()
 {
 	D_METHOD(("DiagramView::updateDataRect()\n"));
 	// calculate the area in which boxes display
 	m_boxRegion.MakeEmpty();
-	for (int32 i = 0; i < countItems(DiagramItem::M_BOX); i++)
-	{
+	for (uint32 i = 0; i < countItems(DiagramItem::M_BOX); i++) {
 		m_boxRegion.Include(itemAt(i, DiagramItem::M_BOX)->frame());
 	}
 	// adapt the data rect to the new region of boxes
@@ -642,12 +643,12 @@ void DiagramView::updateDataRect()
 	_updateScrollBars();
 }
 
-// -------------------------------------------------------- //
-// *** internal operations (private)
-// -------------------------------------------------------- //
 
-void DiagramView::_beginWireTracking(
-	DiagramEndPoint *startPoint)
+//	#pragma mark - internal operations (private)
+
+
+void
+DiagramView::_beginWireTracking(DiagramEndPoint *startPoint)
 {
 	D_METHOD(("DiagramView::beginWireTracking()\n"));
 	m_draggedWire = createWire(startPoint);
@@ -687,9 +688,9 @@ void DiagramView::_beginRectTracking(
 	BView::BeginRectTracking(BRect(origin, origin), B_TRACK_RECT_CORNER);
 }
 
-void DiagramView::_trackRect(
-	BPoint origin,
-	BPoint current)
+
+void
+DiagramView::_trackRect(BPoint origin, BPoint current)
 {
 	D_METHOD(("DiagramView::trackRect()\n"));
 	bool changed = false;
@@ -698,29 +699,25 @@ void DiagramView::_trackRect(
 	rect.top = origin.y < current.y ? origin.y : current.y;
 	rect.right = origin.x < current.x ? current.x : origin.x;
 	rect.bottom = origin.y < current.y ? current.y : origin.y;
-	for (int32 i = 0; i < countItems(DiagramItem::M_BOX); i++)
-	{
+	for (uint32 i = 0; i < countItems(DiagramItem::M_BOX); i++) {
 		DiagramBox *box = dynamic_cast<DiagramBox *>(itemAt(i, DiagramItem::M_BOX));
-		if (box)
-		{
+		if (box) {
 			if (rect.Intersects(box->frame()))
-			{
 				changed  |= selectItem(box, false);
-			}
 			else
-			{
 				changed |= deselectItem(box);
-			}
 		}
 	}
-	if (changed)
-	{
+
+	if (changed) {
 		sortItems(DiagramItem::M_BOX, &compareSelectionTime);
 		selectionChanged();
 	}
 }
 
-void DiagramView::_updateScrollBars()
+
+void
+DiagramView::_updateScrollBars()
 {
 	D_METHOD(("DiagramView::_updateScrollBars()\n"));
 	// fetch the vertical ScrollBar
