@@ -12,15 +12,17 @@
 #include <map>
 #include <string>
 
+#include "fssh_defs.h"
 
-typedef int command_function(int argc, const char* const* argv);
+
+typedef fssh_status_t command_function(int argc, const char* const* argv);
 
 
 namespace FSShell {
 
 
 enum {
-	COMMAND_RESULT_EXIT	= -1,
+	COMMAND_RESULT_EXIT	= 1,
 };
 
 
@@ -36,7 +38,7 @@ public:
 			const char*			Name() const;
 			const char*			Description() const;
 
-	virtual	int					Do(int argc, const char* const* argv);
+	virtual	fssh_status_t		Do(int argc, const char* const* argv);
 
 private:
 			std::string			fName;

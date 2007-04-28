@@ -20,7 +20,9 @@
 #include "fssh_module.h"
 #include "fssh_stat.h"
 #include "fssh_string.h"
+#include "fssh_type_constants.h"
 #include "module.h"
+#include "path_util.h"
 #include "syscalls.h"
 #include "vfs.h"
 
@@ -134,12 +136,12 @@ Command::Description() const
 }
 
 
-int
+fssh_status_t
 Command::Do(int argc, const char* const* argv)
 {
 	if (!fFunction) {
 		fprintf(stderr, "No function given for command \"%s\"\n", Name());
-		return 1;
+		return FSSH_B_BAD_VALUE;
 	}
 
 	return (*fFunction)(argc, argv);
@@ -237,31 +239,140 @@ CommandManager*	CommandManager::sManager = NULL;
 // #pragma mark - Commands
 
 
-static int
+static fssh_status_t
 command_cd(int argc, const char* const* argv)
 {
 	if (argc != 2) {
-		fprintf(stderr, "Usage: cd <directory>\n");
-		return 1;
+		fprintf(stderr, "Usage: %s <directory>\n", argv[0]);
+		return FSSH_B_BAD_VALUE;
 	}
 	const char* directory = argv[1];
 
 	fssh_status_t error = _kern_setcwd(-1, directory);
 	if (error != FSSH_B_OK) {
 		fprintf(stderr, "Error: cd %s: %s\n", directory, fssh_strerror(error));
-		return 1;
+		return error;
 	}
 
-	return 0;
+	return FSSH_B_OK;
 }
 
 
-static int
+static fssh_status_t
 command_help(int argc, const char* const* argv)
 {
 	printf("supported commands:\n");
 	CommandManager::Default()->ListCommands();
-	return 0;
+	return FSSH_B_OK;
+}
+
+
+static fssh_status_t
+command_ln(int argc, const char* const* argv)
+{
+	bool force = false;
+	bool symbolic = false;
+	bool dereference = true;
+
+	// parse parameters
+	int argi = 1;
+	for (argi = 1; argi < argc; argi++) {
+		const char *arg = argv[argi];
+		if (arg[0] != '-')
+			break;
+
+		if (arg[1] == '\0') {
+			fprintf(stderr, "Error: Invalid option \"-\"\n");
+			return FSSH_B_BAD_VALUE;
+		}
+
+		for (int i = 1; arg[i]; i++) {
+			switch (arg[i]) {
+				case 'f':
+					force = true;
+					break;
+				case 's':
+					symbolic = true;
+					break;
+				case 'n':
+					dereference = false;
+					break;
+				default:
+					fprintf(stderr, "Error: Unknown option \"-%c\"\n", arg[i]);
+					return FSSH_B_BAD_VALUE;
+			}
+		}
+	}
+
+	if (argc - argi != 2) {
+		fprintf(stderr, "Usage: %s [Options] <source> <target>\n", argv[0]);
+		return FSSH_B_BAD_VALUE;
+	}
+
+	const char *source = argv[argi];
+	const char *target = argv[argi + 1];
+
+	// check, if the the target is an existing directory
+	struct fssh_stat st;
+	char targetBuffer[FSSH_B_PATH_NAME_LENGTH];
+	fssh_status_t error = _kern_read_stat(-1, target, dereference, &st,
+		sizeof(st));
+	if (error == FSSH_B_OK) {
+		if (FSSH_S_ISDIR(st.fssh_st_mode)) {
+			// get source leaf
+			char leaf[FSSH_B_FILE_NAME_LENGTH];
+			error = get_last_path_component(source, leaf, sizeof(leaf));
+			if (error != FSSH_B_OK) {
+				fprintf(stderr, "Error: Failed to get leaf name of source "
+					"path: %s\n", fssh_strerror(error));
+				return error;
+			}
+
+			// compose a new path
+			int len = strlen(target) + 1 + strlen(leaf);
+			if (len > (int)sizeof(targetBuffer)) {
+				fprintf(stderr, "Error: Resulting target path is too long.\n");
+				return FSSH_B_BAD_VALUE;
+			}
+			
+			strcpy(targetBuffer, target);
+			strcat(targetBuffer, "/");
+			strcat(targetBuffer, leaf);
+			target = targetBuffer;
+		}
+	}
+
+	// check, if the target exists
+	error = _kern_read_stat(-1, target, false, &st, sizeof(st));
+	if (error == FSSH_B_OK) {
+		if (!force) {
+			fprintf(stderr, "Error: Can't create link. \"%s\" is in the way.\n",
+				target);
+			return FSSH_B_FILE_EXISTS;
+		}
+
+		// unlink the entry
+		error = _kern_unlink(-1, target);
+		if (error != FSSH_B_OK) {
+			fprintf(stderr, "Error: Failed to remove \"%s\" to make way for "
+				"link: %s\n", target, fssh_strerror(error));
+			return error;
+		}
+	}
+
+	// finally create the link
+	if (symbolic) {
+		error = _kern_create_symlink(-1, target, source,
+			FSSH_S_IRWXU | FSSH_S_IRWXG | FSSH_S_IRWXO);
+	} else
+		error = _kern_create_link(target, source);
+
+	if (error != FSSH_B_OK) {
+		fprintf(stderr, "Error: Failed to create link: %s\n",
+			fssh_strerror(error));
+	}
+
+	return error;
 }
 
 
@@ -338,13 +449,11 @@ list_entry(const char* file, const char* name = NULL)
 		char buffer[FSSH_B_PATH_NAME_LENGTH];
 		fssh_size_t size = sizeof(buffer);
 		error = _kern_read_link(-1, file, buffer, &size);
-		if (error == FSSH_B_OK) {
-			nameSuffix += " -> ";
-			nameSuffix += buffer;
-		} else {
-			fprintf(stderr, "Error: Failed to read symlink \"%s\": %s\n", file,
-				fssh_strerror(error));
-		}
+		if (error != FSSH_B_OK)
+			snprintf(buffer, sizeof(buffer), "(%s)", fssh_strerror(error));
+
+		nameSuffix += " -> ";
+		nameSuffix += buffer;
 	}
 
 	printf("%c%s %2d %2d %10lld %d-%02d-%02d %02d:%02d:%02d %s%s\n",
@@ -356,7 +465,7 @@ list_entry(const char* file, const char* name = NULL)
 }
 
 
-static int
+static fssh_status_t
 command_ls(int argc, const char* const* argv)
 {
 	const char* const currentDirFiles[] = { ".", NULL };
@@ -415,14 +524,307 @@ command_ls(int argc, const char* const* argv)
 			list_entry(file);
 	}
 
-	return 0;
+	return FSSH_B_OK;
 }
 
 
-static int
+static fssh_status_t
+create_dir(const char *path, bool createParents)
+{
+	// stat the entry
+	struct fssh_stat st;
+	fssh_status_t error = _kern_read_stat(-1, path, false, &st, sizeof(st));
+	if (error == FSSH_B_OK) {
+		if (createParents && FSSH_S_ISDIR(st.fssh_st_mode))
+			return FSSH_B_OK;
+
+		fprintf(stderr, "Error: Cannot make dir, entry \"%s\" is in the way.\n",
+			path);
+		return FSSH_B_FILE_EXISTS;
+	}
+
+	// the dir doesn't exist yet
+	// if we shall create all parents, do that first
+	if (createParents) {
+		// create the parent dir path
+		// eat the trailing '/'s
+		int len = strlen(path);
+		while (len > 0 && path[len - 1] == '/')
+			len--;
+
+		// eat the last path component
+		while (len > 0 && path[len - 1] != '/')
+			len--;
+
+		// eat the trailing '/'s
+		while (len > 0 && path[len - 1] == '/')
+			len--;
+
+		// Now either nothing remains, which means we had a single component,
+		// a root subdir -- in those cases we can just fall through (we should
+		// actually never be here in case of the root dir, but anyway) -- or
+		// there is something left, which we can call a parent directory and
+		// try to create it.
+		if (len > 0) {
+			char *parentPath = (char*)malloc(len + 1);
+			if (!parentPath) {
+				fprintf(stderr, "Error: Failed to allocate memory for parent "
+					"path.\n");
+				return FSSH_B_NO_MEMORY;
+			}
+			memcpy(parentPath, path, len);
+			parentPath[len] = '\0';
+
+			error = create_dir(parentPath, createParents);
+
+			free(parentPath);
+
+			if (error != FSSH_B_OK)
+				return error;
+		}
+	}
+
+	// make the directory
+	error = _kern_create_dir(-1, path, FSSH_S_IRWXU);
+	if (error != FSSH_B_OK) {
+		fprintf(stderr, "Error: Failed to make directory \"%s\": %s\n", path,
+			fssh_strerror(error));
+		return error;
+	}
+
+	return FSSH_B_OK;
+}
+
+
+static fssh_status_t
+command_mkdir(int argc, const char* const* argv)
+{
+	bool createParents = false;
+
+	// parse parameters
+	int argi = 1;
+	for (argi = 1; argi < argc; argi++) {
+		const char *arg = argv[argi];
+		if (arg[0] != '-')
+			break;
+
+		if (arg[1] == '\0') {
+			fprintf(stderr, "Error: Invalid option \"-\"\n");
+			return FSSH_B_BAD_VALUE;
+		}
+
+		for (int i = 1; arg[i]; i++) {
+			switch (arg[i]) {
+				case 'p':
+					createParents = true;
+					break;
+				default:
+					fprintf(stderr, "Error: Unknown option \"-%c\"\n", arg[i]);
+					return FSSH_B_BAD_VALUE;
+			}
+		}
+	}
+
+	if (argi >= argc) {
+		printf("Usage: %s [ -p ] <dir>...\n", argv[0]);
+		return FSSH_B_BAD_VALUE;
+	}
+
+	// create loop
+	for (; argi < argc; argi++) {
+		const char *dir = argv[argi];
+		if (strlen(dir) == 0) {
+			fprintf(stderr, "Error: An empty path is not a valid argument!\n");
+			return FSSH_B_BAD_VALUE;
+		}
+
+		fssh_status_t error = create_dir(dir, createParents);
+		if (error != FSSH_B_OK)
+			return error;
+	}
+
+	return FSSH_B_OK;
+}
+
+
+static fssh_status_t
+command_mkindex(int argc, const char* const* argv)
+{
+	if (argc != 2) {
+		fprintf(stderr, "Usage: %s <index name>\n", argv[0]);
+		return FSSH_B_BAD_VALUE;
+	}
+
+	const char* indexName = argv[1];
+
+	// get the device ID
+	struct fssh_stat st;
+	fssh_status_t error = _kern_read_stat(-1, kMountPoint, false, &st,
+		sizeof(st));
+	if (error != FSSH_B_OK) {
+		fprintf(stderr, "Error: Failed to stat() mount point: %s\n",
+			fssh_strerror(error));
+		return error;
+	}
+	
+	// create the index
+	error =_kern_create_index(st.fssh_st_dev, indexName, FSSH_B_STRING_TYPE, 0);
+	if (error != FSSH_B_OK) {
+		fprintf(stderr, "Error: Failed to create index \"%s\": %s\n",
+			indexName, fssh_strerror(error));
+		return error;
+	}
+
+	return FSSH_B_OK;
+}
+
+
+static fssh_status_t
 command_quit(int argc, const char* const* argv)
 {
 	return COMMAND_RESULT_EXIT;
+}
+
+
+static fssh_status_t remove_entry(int dir, const char *entry, bool recursive,
+	bool force);
+
+
+static fssh_status_t
+remove_dir_contents(int parentDir, const char *name, bool force)
+{
+	// open the dir
+	int dir = _kern_open_dir(parentDir, name);
+	if (dir < 0) {
+		fprintf(stderr, "Error: Failed to open dir \"%s\": %s\n", name,
+			fssh_strerror(dir));
+		return dir;
+	}
+
+	fssh_status_t error = FSSH_B_OK;
+
+	// iterate through the entries
+	fssh_ssize_t numRead;
+	char buffer[sizeof(fssh_dirent) + FSSH_B_FILE_NAME_LENGTH];
+	fssh_dirent *entry = (fssh_dirent*)buffer;
+	while ((numRead = _kern_read_dir(dir, entry, sizeof(buffer), 1)) > 0) {
+		// skip "." and ".."
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+			continue;
+
+		error = remove_entry(dir, entry->d_name, true, force);
+		if (error != FSSH_B_OK)
+			break;
+	}
+
+	if (numRead < 0) {
+		fprintf(stderr, "Error: Failed to read directory \"%s\": %s\n", name,
+			fssh_strerror(numRead));
+		return numRead;
+	}
+
+	// close
+	_kern_close(dir);
+
+	return error;
+}
+
+
+static fssh_status_t
+remove_entry(int dir, const char *entry, bool recursive, bool force)
+{
+	// stat the file
+	struct fssh_stat st;
+	fssh_status_t error = _kern_read_stat(dir, entry, false, &st, sizeof(st));
+	if (error != FSSH_B_OK) {
+		if (force && error == FSSH_B_ENTRY_NOT_FOUND)
+			return FSSH_B_OK;
+
+		fprintf(stderr, "Error: Failed to remove \"%s\": %s\n", entry,
+			fssh_strerror(error));
+		return error;
+	}
+
+	if (FSSH_S_ISDIR(st.fssh_st_mode)) {
+		if (!recursive) {
+			fprintf(stderr, "Error: \"%s\" is a directory.\n", entry);
+				// TODO: get the full path
+			return FSSH_EISDIR;
+		}
+
+		// remove the contents
+		error = remove_dir_contents(dir, entry, force);
+		if (error != FSSH_B_OK)
+			return error;
+
+		// remove the directory
+		error = _kern_remove_dir(dir, entry);
+		if (error != FSSH_B_OK) {
+			fprintf(stderr, "Error: Failed to remove directory \"%s\": %s\n",
+				entry, fssh_strerror(error));
+			return error;
+		}
+	} else {
+		// remove the entry
+		error = _kern_unlink(dir, entry);
+		if (error != FSSH_B_OK) {
+			fprintf(stderr, "Error: Failed to remove entry \"%s\": %s\n", entry,
+				fssh_strerror(error));
+			return error;
+		}
+	}
+
+	return FSSH_B_OK;
+}
+
+
+static fssh_status_t
+command_rm(int argc, char **argv)
+{
+	bool recursive = false;
+	bool force = false;
+
+	// parse parameters
+	int argi = 1;
+	for (argi = 1; argi < argc; argi++) {
+		const char *arg = argv[argi];
+		if (arg[0] != '-')
+			break;
+
+		if (arg[1] == '\0') {
+			fprintf(stderr, "Error: Invalid option \"-\"\n");
+			return FSSH_B_BAD_VALUE;
+		}
+
+		for (int i = 1; arg[i]; i++) {
+			switch (arg[i]) {
+				case 'f':
+					force = true;
+					break;
+				case 'r':
+					recursive = true;
+					break;
+				default:
+					fprintf(stderr, "Error: Unknown option \"-%c\"\n", arg[i]);
+					return FSSH_B_BAD_VALUE;
+			}
+		}
+	}
+	
+	// check params
+	if (argi >= argc) {
+		fprintf(stderr, "Usage: %s [ -r ] <file>...\n", argv[0]);
+		return FSSH_B_BAD_VALUE;
+	}
+
+	// remove loop
+	for (; argi < argc; argi++) {
+		fssh_status_t error = remove_entry(-1, argv[argi], recursive, force);
+		if (error != FSSH_B_OK)
+			return error;
+	}
+
+	return FSSH_B_OK;
 }
 
 
@@ -430,10 +832,14 @@ static void
 register_commands()
 {
 	CommandManager::Default()->AddCommands(
-		command_cd,		"cd", "change current directory",
-		command_ls,		"ls", "list files or directories",
-		command_help,	"help", "list supported commands",
-		command_quit,	"quit/exit", "quit the shell",
+		command_cd,			"cd",			"change current directory",
+		command_help,		"help",			"list supported commands",
+		command_ln,			"ln",			"create a hard or symbolic link",
+		command_ls,			"ls",			"list files or directories",
+		command_mkdir,		"mkdir",		"create directories",
+		command_mkindex,	"mkindex",		"create an index",
+		command_quit,		"quit/exit",	"quit the shell",
+		command_rm,			"rm",			"remove files and directories",
 		NULL
 	);
 }

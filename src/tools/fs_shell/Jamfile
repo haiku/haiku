@@ -24,6 +24,7 @@ BuildPlatformStaticLibrary <build2>fs_shell.a :
 	lock.cpp
 	module.cpp
 	node_monitor.cpp
+	path_util.cpp
 	rootfs.cpp
 	sem.cpp
 	stat.cpp
