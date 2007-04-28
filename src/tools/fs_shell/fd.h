@@ -16,7 +16,7 @@ struct file_descriptor;
 struct select_sync;
 struct vnode;
 
-extern io_context gKernelIOContext;
+extern io_context* gKernelIOContext;
 
 
 struct fd_ops {
@@ -107,7 +107,7 @@ static io_context*		get_current_io_context(bool kernel);
 static inline struct io_context *
 get_current_io_context(bool /*kernel*/)
 {
-	return &gKernelIOContext;
+	return gKernelIOContext;
 }
 
 

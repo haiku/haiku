@@ -27,7 +27,7 @@
 namespace FSShell {
 
 
-io_context gKernelIOContext;
+io_context* gKernelIOContext;
 
 
 /*** General fd routines ***/
