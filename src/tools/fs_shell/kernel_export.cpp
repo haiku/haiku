@@ -57,9 +57,12 @@ fssh_panic(const char *format, ...)
 	va_start(args, format);
 
 	vfprintf(stderr, format, args);
-	exit(1);
 
 	va_end(args);
+
+//	exit(1);
+	int* badAddress = 0;
+	*badAddress = 42;
 }
 
 void
