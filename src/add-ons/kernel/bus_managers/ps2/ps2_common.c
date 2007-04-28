@@ -109,6 +109,20 @@ ps2_flush(void)
 
 
 static status_t
+ps2_selftest()
+{
+	status_t res;
+	uint8 in;
+	res = ps2_command(PS2_CTRL_SELF_TEST, NULL, 0, &in, 1);
+	if (res != B_OK || in != 0x55) {
+		INFO("ps2: controller self test failed, status 0x%08lx, data 0x%02x\n", res, in);
+		return B_ERROR;
+	}
+	return B_OK;
+}
+
+
+static status_t
 ps2_setup_command_byte()
 {
 	status_t res;
@@ -171,11 +185,13 @@ ps2_setup_active_multiplexing(bool *enabled)
 
 	INFO("ps2: active multiplexing v%d.%d enabled\n", (in >> 4), in & 0xf);
 	*enabled = true;
-	return B_OK;
+	goto done;
 
 no_support:	
 	TRACE("ps2: active multiplexing not supported\n");
 	*enabled = false;
+
+done:
 	// Some controllers get upset by the d3 command and will continue data loopback,
 	// thus we need to send a harmless command (enable keyboard interface) next
 	// This fixes bug report #1175
@@ -190,9 +206,9 @@ fail:
 	*enabled = false;
 	// this should revert the controller into legacy mode, 
 	// just in case it has switched to multiplexed mode
-	res = ps2_command(PS2_CTRL_SELF_TEST, NULL, 0, &out, 1);
-	if (res != B_OK || out != 0x55) {
-		INFO("ps2: controller self test failed, status 0x%08lx, data 0x%02x\n", res, out);
+	res = ps2_command(PS2_CTRL_SELF_TEST, NULL, 0, &in, 1);
+	if (res != B_OK || in != 0x55) {
+		INFO("ps2: controller self test failed, status 0x%08lx, data 0x%02x\n", res, in);
 		return B_ERROR;
 	}
 	return B_OK;
@@ -329,6 +345,8 @@ ps2_init(void)
 	status = install_io_interrupt_handler(INT_PS2_MOUSE,    &ps2_interrupt, NULL, 0);
 	if (status)
 		goto err4;
+
+	ps2_selftest();
 		
 	status = ps2_setup_command_byte();
 	if (status) {
