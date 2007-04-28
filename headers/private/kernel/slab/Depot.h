@@ -18,27 +18,20 @@
 extern "C" {
 #endif
 
-typedef struct depot_magazine {
-	struct depot_magazine *next;
-	uint16_t current_round, round_count;
-	void *rounds[0];
-} depot_magazine;
+typedef struct base_depot {
+	benaphore lock;
+	struct depot_magazine *full, *empty;
+	size_t full_count, empty_count;
+	struct depot_cpu_store *stores;
+
+	void (*return_object)(struct base_depot *depot, void *object);
+} base_depot;
 
 
 typedef struct depot_cpu_store {
 	benaphore lock;
-	depot_magazine *loaded, *previous;
+	struct depot_magazine *loaded, *previous;
 } depot_cpu_store;
-
-
-typedef struct base_depot {
-	benaphore lock;
-	depot_magazine *full, *empty;
-	size_t full_count, empty_count;
-	depot_cpu_store *stores;
-
-	void (*return_object)(base_depot *depot, void *object);
-} base_depot;
 
 
 static inline depot_cpu_store *

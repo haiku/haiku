@@ -65,14 +65,8 @@ struct net_buffer_private : net_buffer {
 };
 
 
-typedef MergedLinkCacheStrategy<AreaBackend> AreaMergedCacheStrategy;
-typedef HashCacheStrategy<AreaBackend> AreaHashCacheStrategy;
-
-typedef Cache<AreaMergedCacheStrategy> NetBufferCache;
-typedef Cache<AreaHashCacheStrategy> DataNodeCache;
-
-static NetBufferCache *sNetBufferCache;
-static DataNodeCache *sDataNodeCache;
+static object_cache *sNetBufferCache;
+static object_cache *sDataNodeCache;
 
 
 static status_t append_data(net_buffer *buffer, const void *data, size_t size);
@@ -102,14 +96,14 @@ dump_buffer(net_buffer *_buffer)
 static inline data_header *
 allocate_data_header()
 {
-	return (data_header *)sDataNodeCache->AllocateObject(CACHE_DONT_SLEEP);
+	return (data_header *)object_cache_alloc(sDataNodeCache, CACHE_DONT_SLEEP);
 }
 
 
 static inline net_buffer_private *
 allocate_net_buffer()
 {
-	return (net_buffer_private *)sNetBufferCache->AllocateObject(
+	return (net_buffer_private *)object_cache_alloc(sNetBufferCache,
 		CACHE_DONT_SLEEP);
 }
 
@@ -117,14 +111,14 @@ allocate_net_buffer()
 static inline void
 free_data_header(data_header *header)
 {
-	sDataNodeCache->ReturnObject(header);
+	object_cache_free(sDataNodeCache, header);
 }
 
 
 static inline void
 free_net_buffer(net_buffer_private *buffer)
 {
-	sNetBufferCache->ReturnObject(buffer);
+	object_cache_free(sNetBufferCache, buffer);
 }
 
 
@@ -1180,29 +1174,16 @@ init_net_buffers()
 	// TODO improve our code a bit so we can add constructors
 	//		and keep around half-constructed buffers in the slab
 
-	sNetBufferCache = new (std::nothrow) NetBufferCache("net buffer cache",
+	sNetBufferCache = create_object_cache("net buffer cache",
 		sizeof(net_buffer_private), 8, NULL, NULL, NULL);
 	if (sNetBufferCache == NULL)
 		return B_NO_MEMORY;
 
-	status_t status = sNetBufferCache->InitCheck();
-	if (status < B_OK) {
-		delete sNetBufferCache;
-		return status;
-	}
-
-	sDataNodeCache = new (std::nothrow) DataNodeCache("data node cache",
-		BUFFER_SIZE, 0, NULL, NULL, NULL);
+	sDataNodeCache = create_object_cache("data node cache", BUFFER_SIZE, 0,
+		NULL, NULL, NULL);
 	if (sDataNodeCache == NULL) {
-		delete sNetBufferCache;
+		delete_object_cache(sNetBufferCache);
 		return B_NO_MEMORY;
-	}
-
-	status = sDataNodeCache->InitCheck();
-	if (status < B_OK) {
-		delete sDataNodeCache;
-		delete sNetBufferCache;
-		return status;
 	}
 
 	return B_OK;
@@ -1212,8 +1193,8 @@ init_net_buffers()
 status_t
 uninit_net_buffers()
 {
-	delete sNetBufferCache;
-	delete sDataNodeCache;
+	delete_object_cache(sNetBufferCache);
+	delete_object_cache(sDataNodeCache);
 
 	return B_OK;
 }
