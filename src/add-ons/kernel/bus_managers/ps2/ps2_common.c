@@ -360,12 +360,19 @@ ps2_init(void)
 		goto err5;
 	}
 
-	ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_KEYB]);
-	ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE]);
 	if (gActiveMultiplexingEnabled) {
+		if (B_TIMED_OUT == ps2_dev_command_timeout(&ps2_device[PS2_DEVICE_MOUSE], 0xe6, NULL, 0, NULL, 0, 100000)) {
+			INFO("ps2: accessing multiplexed mouse port 0 timed out, ignoring it!\n");
+		} else {
+			ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE]);
+		}
 		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE + 1]);
 		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE + 2]);
 		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE + 3]);
+		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_KEYB]);
+	} else {
+		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE]);
+		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_KEYB]);
 	}
 		
 	TRACE("ps2: init done!\n");
