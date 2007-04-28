@@ -10,12 +10,14 @@
 __USE_CORTEX_NAMESPACE
 
 /*static*/
-ValCtrlLayoutEntry ValCtrlLayoutEntry::decimalPoint(
-	DECIMAL_POINT_ENTRY, LAYOUT_NO_PADDING);
+ValCtrlLayoutEntry	ValCtrlLayoutEntry::decimalPoint(DECIMAL_POINT_ENTRY,
+	LAYOUT_NO_PADDING);
 
 /*static*/
-void ValCtrlLayoutEntry::InitChildFrame(ValCtrlLayoutEntry& e) {
-	if(e.pView) {
+void
+ValCtrlLayoutEntry::InitChildFrame(ValCtrlLayoutEntry& e)
+{
+	if (e.pView) {
 //		PRINT((
 //			"### ValCtrlLayoutEntry::InitChildFrame(): (%.1f,%.1f)-(%.1f,%.1f)\n",
 //			e.frame.left, e.frame.top, e.frame.right, e.frame.bottom));
@@ -23,7 +25,3 @@ void ValCtrlLayoutEntry::InitChildFrame(ValCtrlLayoutEntry& e) {
 		e.pView->ResizeTo(e.frame.Width(), e.frame.Height());
 	}
 }
-
-
-// END -- ValCtrlLayoutEntry.cpp -- 
-

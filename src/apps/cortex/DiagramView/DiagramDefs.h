@@ -7,9 +7,8 @@
 // * HISTORY
 //   c.lenz		25sep99		Begun
 //
-
-#ifndef __DiagramDefs_H__
-#define __DiagramDefs_H__
+#ifndef DIAGRAM_DEFS_H
+#define DIAGRAM_DEFS_H
 
 #include "cortex_defs.h"
 __BEGIN_CORTEX_NAMESPACE
@@ -43,4 +42,4 @@ enum message_t
 };
 
 __END_CORTEX_NAMESPACE
-#endif /* __DiagramDefs_H__ */
+#endif	// DIAGRAM_DEFS_H

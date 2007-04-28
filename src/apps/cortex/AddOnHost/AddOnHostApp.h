@@ -22,7 +22,7 @@
 __BEGIN_CORTEX_NAMESPACE
 namespace addon_host {
 
-class App:public BApplication {
+class App : public BApplication {
 	typedef	BApplication _inherited;
 
 	public:

@@ -11,13 +11,13 @@
 //
 // * HISTORY
 //   e.moon		25jun99		Begun
+#ifndef CORTEX_DEFS_H
+#define CORTEX_DEFS_H
 
-#ifndef __cortex_defs_h__
-#define __cortex_defs_h__
 
 #include <SupportDefs.h>
 
-// *** namespace support
+// namespace support
 #ifdef CORTEX_NAMESPACE
 	#define __BEGIN_CORTEX_NAMESPACE namespace CORTEX_NAMESPACE {
 	#define __END_CORTEX_NAMESPACE }
@@ -33,7 +33,7 @@
 
 #define TOUCH(x) ((void)(x))
 
-// *** message 'what' code base values
+// message 'what' code base values
 
 const uint32 NodeManager_message_base				= 'NMaA';
 const uint32 NodeManager_int_message_base		= 'Nm_A';
@@ -63,4 +63,4 @@ const uint32 InfoView_message_base					= 'InVA';
 
 const uint32 ParameterWindow_message_base		= 'PaWA';
 
-#endif /*__cortex_defs_h__*/
+#endif	// CORTEX_DEFS_H

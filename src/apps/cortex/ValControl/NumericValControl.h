@@ -9,146 +9,117 @@
 // +++++ 31jan99: negatives are still handled wrong...
 //
 // CLASS: NumericValControl
-
-#ifndef __NumericValControl_H__
-#define __NumericValControl_H__
-
-#include "ValControl.h"
-
-class BContinuousParameter;
-#include <MediaDefs.h>
+#ifndef NUMERIC_VAL_CONTROL_H
+#define NUMERIC_VAL_CONTROL_H
 
 #include "cortex_defs.h"
+#include "ValControl.h"
+
+#include <MediaDefs.h>
+
+
+class BContinuousParameter;
+
+
 __BEGIN_CORTEX_NAMESPACE
 
 class ValControlDigitSegment;
 
-class NumericValControl : /*extends*/ public ValControl {
-	typedef ValControl _inherited;
 
-public:													// ctor/dtor/accessors
+class NumericValControl : public ValControl {
+	public:
+		typedef ValControl _inherited;
 
-	// +++++ need control over number of segments +++++
+	public:
 
-	// parameter-linked ctor
-	NumericValControl(
-		BRect												frame,
-		const char*									name,
-		BContinuousParameter*				param,
-		uint16											wholeDigits,
-		uint16											fractionalDigits=0,
-		align_mode									alignMode=ALIGN_FLUSH_RIGHT,
-		align_flags									alignFlags=ALIGN_NONE);
+		// +++++ need control over number of segments +++++
+
+		// parameter-linked ctor
+		NumericValControl(BRect	frame, const char* name, BContinuousParameter* param,
+			uint16 wholeDigits, uint16 fractionalDigits = 0, align_mode alignMode = ALIGN_FLUSH_RIGHT,
+			align_flags alignFlags = ALIGN_NONE);
 	
-	// 'plain' ctor
-	NumericValControl(
-		BRect												frame,
-		const char*									name,
-		BMessage*										message,
-		uint16											wholeDigits,
-		uint16											fractionalDigits=0,
-		bool												negativeVisible=true,
-		align_mode									alignMode=ALIGN_FLUSH_RIGHT,
-		align_flags									alignFlags=ALIGN_NONE);
-		
-	~NumericValControl();
+		// 'plain' ctor
+		NumericValControl(BRect frame, const char* name, BMessage* message, uint16 wholeDigits,
+			uint16 fractionalDigits = 0, bool negativeVisible = true,
+			align_mode alignMode = ALIGN_FLUSH_RIGHT, align_flags alignFlags = ALIGN_NONE);
+
+		~NumericValControl();
+
+		BContinuousParameter* param() const;
+			// bound parameter, or 0 if none
+
+		void getConstraints(double* outMinValue, double* outMaxValue);
+			// value constraints (by default, the min/max allowed by the ctor
+			// settings: wholeDigits, fractionalDigits, and negativeVisible)
+
+		status_t setConstraints(double minValue, double maxValue);
+			// the current value is not yet re-constrained by this call
+
+		double value() const;
+			// fetches the current value (calculated on the spot from each
+			// segment.) 
+
+		void setValue(double value, bool setParam = false);
+			// set the displayed value (and, if setParam is true, the
+			// linked parameter.)  The value will be constrained if necessary.
+
+	public: // segment interface
+		// 18sep99: old segment interface
+		//	virtual void offsetValue(double dfDelta);
+
+		// 18sep99: new segment interface.  'offset' is given
+		// in the segment's units.
 	
-	// bound parameter, or 0 if none
-	BContinuousParameter* param() const;
+		virtual void offsetSegmentValue(ValControlDigitSegment* segment, int64 offset);
 
-	// value constraints (by default, the min/max allowed by the ctor
-	// settings: wholeDigits, fractionalDigits, and negativeVisible)
+	public:
+		virtual void mediaParameterChanged();
+
+		virtual void updateParameter(double value);
+			// writes the stored value to the bound parameter
+
+		virtual void initSegments();
+		virtual void initConstraintsFromParam();
+
+	public: // ValControl impl.
+		void setValue(const void* data, size_t size); //nyi
+
+		void getValue(void* data, size_t* ioSize); //nyi
+
+		// string value access
+		virtual status_t setValueFrom(const char* text);
+		virtual status_t getString(BString& buffer);
+
+	public:
+		virtual void MessageReceived(BMessage* message);
+
+	protected: // internal operations
+		virtual void _SetDefaultConstraints(bool negativeVisible);
+
+	private:
+		int64 _ValueFixed() const; //nyi
+			// calculates the current value as an int64
+
+		void _SetValueFixed(int64 fixed); //nyi
+			// sets the value of each segment based on an int64 value;
+			// does not constrain the value
 	
-	void getConstraints(
-		double*											outMinValue,
-		double*											outMaxValue);
+	protected:
+		//	double								m_dfValue; removed 18sep99
 
-	// +++++ the current value is not yet re-constrained by this call
+		BContinuousParameter*	fParam;
+			// bound parameter
+
+		uint16					fWholeDigits;
+		uint16					fFractionalDigits;
+
+		// constraints
+		int64					fMinFixed;
+		int64					fMaxFixed;
 	
-	status_t setConstraints(
-		double											minValue,
-		double											maxValue);
 
-	// fetches the current value (calculated on the spot from each
-	// segment.) 
-	double value() const;
-	
-	// set the displayed value (and, if setParam is true, the
-	// linked parameter.)  The value will be constrained if necessary.
-	void setValue(
-		double											value,
-		bool												setParam=false);
-	
-public:													// segment interface
-// 18sep99: old segment interface
-//	virtual void offsetValue(double dfDelta);
-
-	// 18sep99: new segment interface.  'offset' is given
-	// in the segment's units.
-	
-	virtual void offsetSegmentValue(
-		ValControlDigitSegment*			segment,
-		int64												offset);
-	
-public:													// hooks
-	virtual void mediaParameterChanged();
-
-	// writes the stored value to the bound parameter
-	virtual void updateParameter(
-		double											value);
-
-	virtual void initSegments();
-	virtual void initConstraintsFromParam();
-
-public:													// ValControl impl.
-	void setValue(
-		const void*									data,
-		size_t											size); //nyi
-
-	void getValue(
-		void*												data,
-		size_t*											ioSize); //nyi
-
-	// * string value access
-
-	virtual status_t setValueFrom(
-		const char*									text);
-	virtual status_t getString(
-		BString&										buffer);
-
-
-public:													// BHandler impl.
-	virtual void MessageReceived(
-		BMessage*										message);
-
-protected:											// internal operations
-	virtual void setDefaultConstraints(
-		bool												negativeVisible);
-
-private:												// guts
-
-	// calculates the current value as an int64
-	int64 _value_fixed() const; //nyi
-
-	// sets the value of each segment based on an int64 value;
-	// does not constrain the value
-	void _set_value_fixed(
-		int64												fixed); //nyi
-	
-protected:											// members
-
-//	double								m_dfValue; removed 18sep99
-
-	uint16												m_wholeDigits;
-	uint16												m_fractionalDigits;
-	
-	// constraints
-	int64													m_minFixed;
-	int64													m_maxFixed;
-	
-	// bound parameter
-	BContinuousParameter*					m_param;
 };
 
 __END_CORTEX_NAMESPACE
-#endif /* __NumericValControl_H__ */
+#endif /* NUMERIC_VAL_CONTROL_H */
