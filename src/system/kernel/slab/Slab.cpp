@@ -15,6 +15,7 @@
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 
+#include <smp.h>
 #include <vm_low_memory.h>
 
 #include <algorithm> // swap
@@ -63,7 +64,7 @@ struct object_cache : DoublyLinkedListLinkImpl<object_cache> {
 	size_t object_size;
 	size_t cache_color_cycle;
 	SlabList empty, partial, full;
-	size_t empty_count, pressure;
+	size_t used_count, empty_count, pressure;
 
 	size_t slab_size;
 	size_t usage, maximum;
@@ -74,7 +75,7 @@ struct object_cache : DoublyLinkedListLinkImpl<object_cache> {
 	object_cache_destructor destructor;
 	object_cache_reclaimer reclaimer;
 
-	base_depot depot;
+	object_depot depot;
 
 	virtual slab *CreateSlab(uint32 flags) = 0;
 	virtual void ReturnSlab(slab *slab) = 0;
@@ -143,8 +144,14 @@ struct HashedObjectCache : object_cache {
 
 struct depot_magazine {
 	struct depot_magazine *next;
-	uint16_t current_round, round_count;
+	uint16 current_round, round_count;
 	void *rounds[0];
+};
+
+
+struct depot_cpu_store {
+	benaphore lock;
+	struct depot_magazine *loaded, *previous;
 };
 
 
@@ -176,15 +183,22 @@ _push(Type* &head, Type *object)
 static inline void *
 link_to_object(object_link *link, size_t objectSize)
 {
-	return ((uint8_t *)link) - (objectSize - sizeof(object_link));
+	return ((uint8 *)link) - (objectSize - sizeof(object_link));
 }
 
 
 static inline object_link *
 object_to_link(void *object, size_t objectSize)
 {
-	return (object_link *)(((uint8_t *)object)
+	return (object_link *)(((uint8 *)object)
 		+ (objectSize - sizeof(object_link)));
+}
+
+
+static inline depot_cpu_store *
+object_depot_cpu(object_depot *depot)
+{
+	return &depot->stores[smp_get_current_cpu()];
 }
 
 
@@ -243,11 +257,17 @@ object_cache_low_memory(void *_self, int32 level)
 
 	object_cache *cache = (object_cache *)_self;
 
+	// we are calling the reclaimer without the object cache lock
+	// to give the owner a chance to return objects to the slabs.
+	// As we only register the low memory handler after we complete
+	// the init of the object cache, unless there are some funky
+	// memory re-order business going on, we should be ok.
+
+	if (cache->reclaimer)
+		cache->reclaimer(cache->cookie, level);
+
 	BenaphoreLocker _(cache->lock);
-
 	size_t minimumAllowed;
-
-	// TODO: call reclaim
 
 	switch (level) {
 	case B_LOW_MEMORY_NOTE:
@@ -278,6 +298,16 @@ object_cache_low_memory(void *_self, int32 level)
 }
 
 
+static void
+object_cache_return_object_wrapper(object_depot *depot, void *object)
+{
+	object_cache *cache = (object_cache *)(((uint8 *)depot)
+		- offsetof(object_cache, depot));
+
+	object_cache_free(cache, object);
+}
+
+
 static status_t
 object_cache_init(object_cache *cache, const char *name, size_t objectSize,
 	size_t alignment, size_t maximum, uint32 flags, void *cookie,
@@ -303,6 +333,7 @@ object_cache_init(object_cache *cache, const char *name, size_t objectSize,
 		cache->object_size);
 
 	cache->cache_color_cycle = 0;
+	cache->used_count = 0;
 	cache->empty_count = 0;
 	cache->pressure = 0;
 
@@ -311,8 +342,17 @@ object_cache_init(object_cache *cache, const char *name, size_t objectSize,
 
 	cache->flags = flags;
 
-	if (!(flags & CACHE_NO_DEPOT)) {
-		// TODO init depot
+	// no gain in using the depot in single cpu setups
+	if (smp_get_num_cpus() == 1)
+		cache->flags |= CACHE_NO_DEPOT;
+
+	if (!(cache->flags & CACHE_NO_DEPOT)) {
+		status_t status = object_depot_init(&cache->depot,
+			object_cache_return_object_wrapper);
+		if (status < B_OK) {
+			benaphore_destroy(&cache->lock);
+			return status;
+		}
 	}
 
 	cache->cookie = cookie;
@@ -367,7 +407,7 @@ create_hashed_object_cache(const char *name, size_t object_size,
 		return NULL;
 	}
 
-	cache->slab_size = 16 * B_PAGE_SIZE;
+	cache->slab_size = max_c(16 * B_PAGE_SIZE, 8 * object_size);
 	cache->lower_boundary = __fls0(cache->object_size);
 
 	return cache;
@@ -411,6 +451,9 @@ delete_object_cache(object_cache *cache)
 
 	benaphore_lock(&cache->lock);
 
+	if (!(cache->flags & CACHE_NO_DEPOT))
+		object_depot_destroy(&cache->depot);
+
 	unregister_low_memory_handler(object_cache_low_memory, cache);
 
 	if (!cache->full.IsEmpty())
@@ -422,8 +465,6 @@ delete_object_cache(object_cache *cache)
 	while (!cache->empty.IsEmpty())
 		cache->ReturnSlab(cache->empty.RemoveHead());
 
-	cache->empty_count = 0;
-
 	benaphore_destroy(&cache->lock);
 	delete cache;
 }
@@ -432,9 +473,15 @@ delete_object_cache(object_cache *cache)
 void *
 object_cache_alloc(object_cache *cache, uint32 flags)
 {
-	BenaphoreLocker _(cache->lock);
+	// flags are read only.
+	if (!(cache->flags & CACHE_NO_DEPOT)) {
+		void *object = object_depot_obtain(&cache->depot);
+		if (object)
+			return object;
+	}
 
-	slab *source = NULL;
+	BenaphoreLocker _(cache->lock);
+	slab *source;
 
 	if (cache->partial.IsEmpty()) {
 		if (cache->empty.IsEmpty()) {
@@ -444,8 +491,8 @@ object_cache_alloc(object_cache *cache, uint32 flags)
 
 			cache->pressure++;
 		} else {
-			cache->empty_count--;
 			source = cache->empty.RemoveHead();
+			cache->empty_count--;
 		}
 
 		cache->partial.Add(source);
@@ -455,6 +502,7 @@ object_cache_alloc(object_cache *cache, uint32 flags)
 
 	object_link *link = _pop(source->free);
 	source->count--;
+	cache->used_count++;
 
 	TRACE_CACHE(cache, "allocate %p from %p, %lu remaining.", link, source,
 		source->count);
@@ -481,6 +529,8 @@ object_cache_return_to_slab(object_cache *cache, slab *source, void *object)
 
 	_push(source->free, link);
 	source->count++;
+	cache->used_count--;
+
 	if (source->count == source->size) {
 		cache->partial.Remove(source);
 
@@ -500,6 +550,12 @@ object_cache_return_to_slab(object_cache *cache, slab *source, void *object)
 void
 object_cache_free(object_cache *cache, void *object)
 {
+	// flags are read only.
+	if (!(cache->flags & CACHE_NO_DEPOT)) {
+		if (object_depot_store(&cache->depot, object))
+			return;
+	}
+
 	BenaphoreLocker _(cache->lock);
 	object_cache_return_to_slab(cache, cache->ObjectSlab(object), object);
 }
@@ -525,7 +581,7 @@ object_cache::InitSlab(slab *slab, void *pages, size_t byteCount)
 	TRACE_CACHE(this, "  %lu objects, %lu spare bytes, offset %lu",
 		slab->size, spareBytes, slab->offset);
 
-	uint8_t *data = ((uint8_t *)pages) + slab->offset;
+	uint8 *data = ((uint8 *)pages) + slab->offset;
 
 	for (size_t i = 0; i < slab->size; i++) {
 		bool failedOnFirst = false;
@@ -540,7 +596,7 @@ object_cache::InitSlab(slab *slab, void *pages, size_t byteCount)
 			if (!failedOnFirst)
 				UnprepareObject(slab, data);
 
-			data = ((uint8_t *)pages) + slab->offset;
+			data = ((uint8 *)pages) + slab->offset;
 			for (size_t j = 0; j < i; j++) {
 				if (destructor)
 					destructor(cookie, data);
@@ -567,7 +623,7 @@ object_cache::UninitSlab(slab *slab)
 	if (slab->count != slab->size)
 		panic("cache: destroying a slab which isn't empty.");
 
-	uint8_t *data = ((uint8_t *)slab->pages) + slab->offset;
+	uint8 *data = ((uint8 *)slab->pages) + slab->offset;
 
 	for (size_t i = 0; i < slab->size; i++) {
 		if (destructor)
@@ -581,15 +637,15 @@ object_cache::UninitSlab(slab *slab)
 static inline slab *
 slab_in_pages(const void *pages, size_t slab_size)
 {
-	return (slab *)(((uint8_t *)pages) + slab_size - sizeof(slab));
+	return (slab *)(((uint8 *)pages) + slab_size - sizeof(slab));
 }
 
 
 static inline const void *
 lower_boundary(void *object, size_t byteCount)
 {
-	const uint8_t *null = (uint8_t *)NULL;
-	return null + ((((uint8_t *)object) - null) & ~(byteCount - 1));
+	const uint8 *null = (uint8 *)NULL;
+	return null + ((((uint8 *)object) - null) & ~(byteCount - 1));
 }
 
 
@@ -673,18 +729,16 @@ HashedObjectCache::CreateSlab(uint32 flags)
 		return NULL;
 
 	void *pages;
-	if (allocate_pages(this, &pages, flags) < B_OK) {
-		free_slab(slab);
-		return NULL;
-	}
 
-	if (InitSlab(slab, pages, slab_size) == NULL) {
+	if (allocate_pages(this, &pages, flags) == B_OK) {
+		if (InitSlab(slab, pages, slab_size))
+			return slab;
+
 		free_pages(this, pages);
-		free_slab(slab);
-		return NULL;
 	}
 
-	return slab;
+	free_slab(slab);
+	return NULL;
 }
 
 
@@ -767,7 +821,7 @@ push_magazine(depot_magazine *magazine, void *object)
 
 
 static bool
-exchange_with_full(base_depot *depot, depot_magazine* &magazine)
+exchange_with_full(object_depot *depot, depot_magazine* &magazine)
 {
 	BenaphoreLocker _(depot->lock);
 
@@ -784,7 +838,7 @@ exchange_with_full(base_depot *depot, depot_magazine* &magazine)
 
 
 static bool
-exchange_with_empty(base_depot *depot, depot_magazine* &magazine)
+exchange_with_empty(object_depot *depot, depot_magazine* &magazine)
 {
 	BenaphoreLocker _(depot->lock);
 
@@ -829,17 +883,17 @@ free_magazine(depot_magazine *magazine)
 
 
 static void
-empty_magazine(base_depot *depot, depot_magazine *magazine)
+empty_magazine(object_depot *depot, depot_magazine *magazine)
 {
-	for (uint16_t i = 0; i < magazine->current_round; i++)
+	for (uint16 i = 0; i < magazine->current_round; i++)
 		depot->return_object(depot, magazine->rounds[i]);
 	free_magazine(magazine);
 }
 
 
 status_t
-base_depot_init(base_depot *depot,
-	void (*return_object)(base_depot *depot, void *object))
+object_depot_init(object_depot *depot,
+	void (*return_object)(object_depot *depot, void *object))
 {
 	depot->full = NULL;
 	depot->empty = NULL;
@@ -867,9 +921,9 @@ base_depot_init(base_depot *depot,
 
 
 void
-base_depot_destroy(base_depot *depot)
+object_depot_destroy(object_depot *depot)
 {
-	base_depot_make_empty(depot);
+	object_depot_make_empty(depot);
 
 	for (int i = 0; i < smp_get_num_cpus(); i++) {
 		benaphore_destroy(&depot->stores[i].lock);
@@ -881,8 +935,8 @@ base_depot_destroy(base_depot *depot)
 }
 
 
-void *
-base_depot_obtain_from_store(base_depot *depot, depot_cpu_store *store)
+static void *
+object_depot_obtain_from_store(object_depot *depot, depot_cpu_store *store)
 {
 	BenaphoreLocker _(store->lock);
 
@@ -909,8 +963,8 @@ base_depot_obtain_from_store(base_depot *depot, depot_cpu_store *store)
 }
 
 
-int
-base_depot_return_to_store(base_depot *depot, depot_cpu_store *store,
+static int
+object_depot_return_to_store(object_depot *depot, depot_cpu_store *store,
 	void *object)
 {
 	BenaphoreLocker _(store->lock);
@@ -933,18 +987,37 @@ base_depot_return_to_store(base_depot *depot, depot_cpu_store *store,
 }
 
 
-void
-base_depot_make_empty(base_depot *depot)
+void *
+object_depot_obtain(object_depot *depot)
 {
-	// TODO locking
+	return object_depot_obtain_from_store(depot, object_depot_cpu(depot));
+}
 
+
+int
+object_depot_store(object_depot *depot, void *object)
+{
+	return object_depot_return_to_store(depot, object_depot_cpu(depot),
+		object);
+}
+
+
+void
+object_depot_make_empty(object_depot *depot)
+{
 	for (int i = 0; i < smp_get_num_cpus(); i++) {
+		depot_cpu_store *store = &depot->stores[i];
+
+		BenaphoreLocker _(store->lock);
+
 		if (depot->stores[i].loaded)
 			empty_magazine(depot, depot->stores[i].loaded);
 		if (depot->stores[i].previous)
 			empty_magazine(depot, depot->stores[i].previous);
 		depot->stores[i].loaded = depot->stores[i].previous = NULL;
 	}
+
+	BenaphoreLocker _(depot->lock);
 
 	while (depot->full)
 		empty_magazine(depot, _pop(depot->full));
@@ -957,16 +1030,17 @@ base_depot_make_empty(base_depot *depot)
 static int
 dump_slabs(int argc, char *argv[])
 {
-	kprintf("%10s %32s %8s %8s %6s\n", "address", "name", "objsize", "usage",
-		"empty");
+	kprintf("%10s %32s %8s %8s %6s %8s %6s\n", "address", "name", "objsize", "usage",
+		"empty", "usedobj", "flags");
 
 	ObjectCacheList::Iterator it = sObjectCaches.GetIterator();
 
 	while (it.HasNext()) {
 		object_cache *cache = it.Next();
 
-		kprintf("%p %32s %8lu %8lu %6lu\n", cache, cache->name,
-			cache->object_size, cache->usage, cache->empty_count);
+		kprintf("%p %32s %8lu %8lu %6lu %8lu %6lx\n", cache, cache->name,
+			cache->object_size, cache->usage, cache->empty_count,
+			cache->used_count, cache->flags);
 	}
 
 	return 0;

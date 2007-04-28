@@ -30,7 +30,7 @@ typedef struct object_cache object_cache;
 
 typedef status_t (*object_cache_constructor)(void *cookie, void *object);
 typedef void (*object_cache_destructor)(void *cookie, void *object);
-typedef void (*object_cache_reclaimer)(void *cookie, void *object);
+typedef void (*object_cache_reclaimer)(void *cookie, int32 level);
 
 object_cache *create_object_cache(const char *name, size_t object_size,
 	size_t alignment, void *cookie, object_cache_constructor constructor,
