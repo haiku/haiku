@@ -59,7 +59,7 @@ status_t	ps2_dev_init(void);
 void		ps2_dev_exit(void);
 
 status_t	ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count);
-
+status_t	ps2_dev_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count, bigtime_t timeout);
 
 void		ps2_dev_publish(ps2_dev *dev);
 void		ps2_dev_unpublish(ps2_dev *dev);

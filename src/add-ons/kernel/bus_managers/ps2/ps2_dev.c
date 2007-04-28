@@ -158,10 +158,11 @@ pass_to_handler:
 		if (data == 0x00 && dev->history[1].data == 0xaa && (dev->history[0].time - dev->history[1].time) < 50000) {
 			INFO("ps2: hot plugin of %s\n", dev->name);
 			if (dev->active) {
-				TRACE("ps2: device %s still active, removing...\n", dev->name);
-				ps2_service_notify_device_removed(dev);
+				INFO("ps2: device %s still active, republishing...\n", dev->name);
+				ps2_service_notify_device_republish(dev);
+			} else {
+				ps2_service_notify_device_added(dev);
 			}
-			ps2_service_notify_device_added(dev);
 			return B_INVOKE_SCHEDULER;
 		}
 	}
@@ -187,6 +188,13 @@ pass_to_handler:
 
 status_t
 ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
+{
+	return ps2_dev_command_timeout(dev, cmd, out, out_count, in, in_count, 4000000);
+}
+
+
+status_t
+ps2_dev_command_timeout(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count, bigtime_t timeout)
 {
 	status_t res;
 	bigtime_t start;
@@ -244,7 +252,7 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 		release_sem(gControllerSem);
 
 		start = system_time();
-		res = acquire_sem_etc(dev->result_sem, 1, B_RELATIVE_TIMEOUT, 4000000);
+		res = acquire_sem_etc(dev->result_sem, 1, B_RELATIVE_TIMEOUT, timeout);
 
 		if (res != B_OK)
 			atomic_and(&dev->flags, ~PS2_FLAG_CMD);
@@ -256,8 +264,9 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 		}
 
 		if (atomic_get(&dev->flags) & PS2_FLAG_NACK) {
-			TRACE("ps2: ps2_dev_command got NACK\n");
+			atomic_and(&dev->flags, ~PS2_FLAG_CMD);
 			res = B_IO_ERROR;
+			TRACE("ps2: ps2_dev_command got NACK\n");
 		}
 
 		if (res != B_OK)
@@ -269,7 +278,7 @@ ps2_dev_command(ps2_dev *dev, uint8 cmd, const uint8 *out, int out_count, uint8 
 			atomic_and(&dev->flags, ~PS2_FLAG_CMD);
 		} else {
 			start = system_time();
-			res = acquire_sem_etc(dev->result_sem, 1, B_RELATIVE_TIMEOUT, 4000000);
+			res = acquire_sem_etc(dev->result_sem, 1, B_RELATIVE_TIMEOUT, timeout);
 
 			atomic_and(&dev->flags, ~PS2_FLAG_CMD);
 
