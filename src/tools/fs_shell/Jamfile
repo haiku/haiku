@@ -11,6 +11,18 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
 UsePrivateHeaders fs_shell ;
 UsePrivateHeaders shared ;
 
+# platform specific sources
+local fsShellCommandSources ;
+local externalCommandsSources ;
+if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+	fsShellCommandSources = fs_shell_command_beos.cpp ;
+	externalCommandsSources = external_commands_beos.cpp ;
+} else {
+	fsShellCommandSources = fs_shell_command_unix.cpp ;
+	externalCommandsSources = external_commands_unix.cpp ;
+}
+
+
 BuildPlatformStaticLibrary <build2>fs_shell.a :
 	atomic.cpp
 	block_cache.cpp
@@ -39,5 +51,11 @@ BuildPlatformStaticLibrary <build2>fs_shell.a :
 	unistd.cpp
 	vfs.cpp
 
+	$(externalCommandsSources)
+
 	fssh.cpp
 ;
+
+BuildPlatformMain <build2>fs_shell_command
+	: fs_shell_command.cpp $(fsShellCommandSources)
+	: $(HOST_LIBSUPC++) ;

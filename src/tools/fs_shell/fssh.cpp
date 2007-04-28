@@ -15,6 +15,7 @@
 #include <vector>
 
 #include "command_cp.h"
+#include "external_commands.h"
 #include "fd.h"
 #include "fssh_dirent.h"
 #include "fssh_errno.h"
@@ -38,6 +39,10 @@ extern fssh_file_system_module_info gRootFileSystem;
 
 const char* kMountPoint = "/myfs";
 
+// command line args
+static	int					sArgc;
+static	const char* const*	sArgv;
+
 
 static fssh_status_t
 init_kernel()
@@ -49,8 +54,7 @@ init_kernel()
 	if (error != FSSH_B_OK) {
 		fprintf(stderr, "module_init() failed: %s\n", fssh_strerror(error));
 		return error;
-	} else
-		printf("module_init() succeeded!\n");
+	}
 
 	// register built-in modules, i.e. the rootfs and the client FS
 	register_builtin_module(&gRootFileSystem.info);
@@ -62,8 +66,7 @@ init_kernel()
 	if (error != FSSH_B_OK) {
 		fprintf(stderr, "initializing VFS failed: %s\n", fssh_strerror(error));
 		return error;
-	} else
-		printf("VFS initialized successfully!\n");
+	}
 
 	// init kernel IO context
 	gKernelIOContext = (io_context*)vfs_new_io_context(NULL);
@@ -77,16 +80,14 @@ init_kernel()
 	if (rootDev < 0) {
 		fprintf(stderr, "mounting rootfs failed: %s\n", fssh_strerror(rootDev));
 		return rootDev;
-	} else
-		printf("mounted rootfs successfully!\n");
+	}
 
 	// set cwd to "/"	
 	error = _kern_setcwd(-1, "/");
 	if (error != FSSH_B_OK) {
 		fprintf(stderr, "setting cwd failed: %s\n", fssh_strerror(error));
 		return error;
-	} else
-		printf("set cwd successfully!\n");
+	}
 
 	// create mount point for the client FS
 	error = _kern_create_dir(-1, kMountPoint, 0775);
@@ -94,8 +95,7 @@ init_kernel()
 		fprintf(stderr, "creating mount point failed: %s\n",
 			fssh_strerror(error));
 		return error;
-	} else
-		printf("mount point created successfully!\n");
+	}
 
 	return FSSH_B_OK;
 }
@@ -1036,15 +1036,20 @@ read_command_line(char* buffer, int bufferSize)
 
 
 static void
-input_loop()
+input_loop(bool interactive)
 {
 	static const int kInputBufferSize = 100 * 1024;
 	char* inputBuffer = new char[kInputBufferSize];
 
 	for (;;) {
 		// read command line
-		if (!read_command_line(inputBuffer, kInputBufferSize))
-			break;
+		if (interactive) {
+			if (!read_command_line(inputBuffer, kInputBufferSize))
+				break;
+		} else {
+			if (!get_external_command(inputBuffer, kInputBufferSize))
+				break;
+		}
 
 		// construct argv vector
 		ArgVector argVector;
@@ -1062,11 +1067,76 @@ input_loop()
 		}
 
 		int result = command->Do(argc, argv);
-		if (result == COMMAND_RESULT_EXIT)
+		if (result == COMMAND_RESULT_EXIT) {
+			reply_to_external_command(0);
 			break;
+		}
+
+		reply_to_external_command(fssh_to_host_error(result));
 	}
 
+	if (!interactive)
+		external_command_cleanup();
+
 	delete[] inputBuffer;
+}
+
+
+static int
+standard_session(const char* device, const char* fsName, bool interactive)
+{
+	// mount FS
+	fssh_dev_t fsDev = _kern_mount(kMountPoint, device, fsName, 0, NULL, 0);
+	if (fsDev < 0) {
+		fprintf(stderr, "Error: Mounting FS failed: %s\n",
+			fssh_strerror(fsDev));
+		return 1;
+	}
+
+	// register commands
+	register_commands();
+
+	// process commands
+	input_loop(interactive);
+
+	// unmount FS
+	_kern_setcwd(-1, "/");	// avoid a "busy" vnode
+	fssh_status_t error = _kern_unmount(kMountPoint, 0);
+	if (error != FSSH_B_OK) {
+		fprintf(stderr, "Error: Unmounting FS failed: %s\n",
+			fssh_strerror(error));
+		return 1;
+	}
+
+	return 0;
+}
+
+
+static int
+initialization_session(const char* device, const char* fsName,
+	const char* initParameters)
+{
+	fprintf(stderr, "initialization not implemented yet\n");
+	return 1;
+}
+
+
+static void
+print_usage(bool error)
+{
+	fprintf((error ? stderr : stdout),
+		"Usage: %s [-n] <device>\n"
+		"       %s --initialize [-n] <device> [ <init parameters> ]\n",
+		sArgv[0], sArgv[0]
+	);
+}
+
+
+static void
+print_usage_and_exit(bool error)
+{
+	print_usage(error);
+	exit(error ? 1 : 0);
 }
 
 
@@ -1079,16 +1149,46 @@ using namespace FSShell;
 int
 main(int argc, const char* const* argv)
 {
-	if (argc != 2) {
-		fprintf(stderr, "Usage: ...\n");
-		return 1;
+	sArgc = argc;
+	sArgv = argv;
+
+	// process arguments
+	bool interactive = true;
+	bool initialize = false;
+	const char* device = NULL;
+	const char* initParameters = NULL;
+
+	// eat options
+	int argi = 1;
+	while (argi < argc && argv[argi][0] == '-') {
+		const char* arg = argv[argi++];
+		if (strcmp(arg, "--help") == 0) {
+			print_usage_and_exit(false);
+		} else if (strcmp(arg, "--initialize") == 0) {
+			initialize = true;
+		} else if (strcmp(arg, "-n") == 0) {
+			interactive = false;
+		} else {
+			print_usage_and_exit(true);
+		}
 	}
 
-	const char* device = argv[1];
+	// get device
+	if (argi >= argc)
+		print_usage_and_exit(true);
+	device = argv[argi++];
+
+	// get init parameters
+	if (initialize && argi < argc)
+		initParameters = argv[argi++];
+
+	// if more parameters are excess
+	if (argi < argc)
+		print_usage_and_exit(true);
 
 	// get FS module
 	if (!modules[0]) {
-		fprintf(stderr, "Couldn't find FS module!\n");
+		fprintf(stderr, "Error: Couldn't find FS module!\n");
 		return 1;
 	}
 	const char* fsName = modules[0]->name;
@@ -1098,34 +1198,17 @@ main(int argc, const char* const* argv)
 	// init kernel
 	error = init_kernel();
 	if (error != FSSH_B_OK) {
-		fprintf(stderr, "initializing kernel failed: %s\n",
+		fprintf(stderr, "Error: Initializing kernel failed: %s\n",
 			fssh_strerror(error));
 		return error;
-	} else
-		printf("kernel initialized successfully!\n");
+	}
 
-	// mount FS
-	fssh_dev_t fsDev = _kern_mount(kMountPoint, device, fsName, 0, NULL, 0);
-	if (fsDev < 0) {
-		fprintf(stderr, "mounting FS failed: %s\n", fssh_strerror(fsDev));
-		return 1;
-	} else
-		printf("mounted FS successfully!\n");
+	// start the action
+	int result;
+	if (initialize)
+		result = initialization_session(device, fsName, initParameters);
+	else
+		result = standard_session(device, fsName, interactive);
 
-	// register commands
-	register_commands();
-
-	// process commands
-	input_loop();
-
-	// unmount FS
-	_kern_setcwd(-1, "/");	// avoid a "busy" vnode
-	error = _kern_unmount(kMountPoint, 0);
-	if (error != FSSH_B_OK) {
-		fprintf(stderr, "unmounting FS failed: %s\n", fssh_strerror(error));
-		return error;
-	} else
-		printf("FS unmounted successfully!\n");
-
-	return 0;
+	return result;
 }
