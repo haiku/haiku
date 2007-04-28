@@ -9,10 +9,12 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers build os storage ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
 
 UsePrivateHeaders fs_shell ;
+UsePrivateHeaders shared ;
 
 BuildPlatformStaticLibrary <build2>fs_shell.a :
 	atomic.cpp
 	block_cache.cpp
+	command_cp.cpp
 	errno.cpp
 	fcntl.cpp
 	fd.cpp
