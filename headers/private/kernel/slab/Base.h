@@ -51,15 +51,11 @@ typedef struct base_cache {
 	void *cookie;
 } base_cache;
 
-typedef struct cache_object_link {
-	struct cache_object_link *next;
-} cache_object_link;
-
 typedef struct cache_slab {
 	void *pages;
 	size_t count, size;
 	size_t offset;
-	cache_object_link *free;
+	struct cache_object_link *free;
 	struct list_link link;
 } cache_slab;
 

@@ -36,61 +36,16 @@ static const int kMagazineCapacity = 32;
 
 static const size_t kCacheColorPeriod = 8;
 
-
-// all the AbstractCache stuff is used with the C interface, we
-// should probably move this to its own file.
-
-class AbstractCache {
-public:
-	virtual ~AbstractCache() {}
-
-	virtual void *Allocate(uint32_t flags) = 0;
-	virtual void Return(void *object) = 0;
-};
+typedef struct cache_object_link {
+	struct cache_object_link *next;
+} cache_object_link;
 
 
-typedef MergedLinkCacheStrategy<AreaBackend> SmallObjectStrategy;
-typedef HashCacheStrategy<AreaBackend> LargeObjectStrategy;
-
-typedef Cache<SmallObjectStrategy> SmallObjectCache;
-typedef Cache<LargeObjectStrategy> LargeObjectCache;
-
-
-class SmallObjectAbstractCache : public AbstractCache,
-	public LocalCache<SmallObjectCache> {
-public:
-	typedef LocalCache<SmallObjectCache> Base;
-
-	SmallObjectAbstractCache(const char *name, size_t objectSize,
-		size_t alignment, base_cache_constructor constructor,
-		base_cache_destructor destructor, void *cookie)
-		: Base(name, objectSize, alignment, constructor, destructor, cookie) {}
-
-	void *Allocate(uint32_t flags) { return Base::Alloc(flags); }
-	void Return(void *object) { Base::Free(object); }
-};
-
-
-class LargeObjectAbstractCache : public AbstractCache,
-	public LocalCache<LargeObjectCache> {
-public:
-	typedef LocalCache<LargeObjectCache> Base;
-
-	LargeObjectAbstractCache(const char *name, size_t objectSize,
-		size_t alignment, base_cache_constructor constructor,
-		base_cache_destructor destructor, void *cookie)
-		: Base(name, objectSize, alignment, constructor, destructor, cookie) {}
-
-	void *Allocate(uint32_t flags) { return Base::Alloc(flags); }
-	void Return(void *object) { Base::Free(object); }
-};
-
-
-static depot_magazine *_AllocMagazine();
-static void _FreeMagazine(depot_magazine *magazine);
+static depot_magazine *alloc_magazine();
+static void free_magazine(depot_magazine *magazine);
 
 template<typename Type> static Type *
-SListPop(Type* &head)
+_pop(Type* &head)
 {
 	Type *oldHead = head;
 	head = head->next;
@@ -99,7 +54,7 @@ SListPop(Type* &head)
 
 
 template<typename Type> static inline void
-SListPush(Type* &head, Type *object)
+_push(Type* &head, Type *object)
 {
 	object->next = head;
 	head = object;
@@ -107,14 +62,14 @@ SListPush(Type* &head, Type *object)
 
 
 static inline void *
-_LinkToObject(cache_object_link *link, size_t objectSize)
+link_to_object(cache_object_link *link, size_t objectSize)
 {
 	return ((uint8_t *)link) - (objectSize - sizeof(cache_object_link));
 }
 
 
 static inline cache_object_link *
-_ObjectToLink(void *object, size_t objectSize)
+object_to_link(void *object, size_t objectSize)
 {
 	return (cache_object_link *)(((uint8_t *)object)
 		+ (objectSize - sizeof(cache_object_link)));
@@ -259,7 +214,7 @@ base_cache_allocate_object(base_cache *cache)
 	} else
 		slab = (cache_slab *)list_get_first_item(&cache->partial);
 
-	cache_object_link *link = SListPop(slab->free);
+	cache_object_link *link = _pop(slab->free);
 	slab->count--;
 
 	TRACE_CACHE(cache, "allocate %p from %p, %lu remaining.", link, slab,
@@ -271,7 +226,7 @@ base_cache_allocate_object(base_cache *cache)
 		list_add_item(&cache->full, slab);
 	}
 
-	return _LinkToObject(link, cache->object_size);
+	return link_to_object(link, cache->object_size);
 }
 
 
@@ -289,12 +244,12 @@ base_cache_return_object(base_cache *cache, cache_slab *slab,
 	void *object)
 {
 	// We return true if the slab is completely unused.
-	cache_object_link *link = _ObjectToLink(object, cache->object_size);
+	cache_object_link *link = object_to_link(object, cache->object_size);
 
 	TRACE_CACHE(cache, "returning %p to %p, %lu used (%lu empty slabs).",
 		link, slab, slab->size - slab->count, cache->empty_count);
 
-	SListPush(slab->free, link);
+	_push(slab->free, link);
 	slab->count++;
 	if (slab->count == slab->size) {
 		list_remove_item(&cache->partial, slab);
@@ -366,7 +321,7 @@ base_cache_construct_slab(base_cache *cache, cache_slab *slab, void *pages,
 			}
 		}
 
-		SListPush(slab->free, _ObjectToLink(data, cache->object_size));
+		_push(slab->free, object_to_link(data, cache->object_size));
 		data += cache->object_size;
 	}
 
@@ -396,30 +351,30 @@ base_cache_destruct_slab(base_cache *cache, cache_slab *slab, void *parent,
 
 
 static inline bool
-_IsMagazineEmpty(depot_magazine *magazine)
+is_magazine_empty(depot_magazine *magazine)
 {
 	return magazine->current_round == 0;
 }
 
 
 static inline bool
-_IsMagazineFull(depot_magazine *magazine)
+is_magazine_full(depot_magazine *magazine)
 {
 	return magazine->current_round == magazine->round_count;
 }
 
 
 static inline void *
-_PopMagazine(depot_magazine *magazine)
+pop_magazine(depot_magazine *magazine)
 {
 	return magazine->rounds[--magazine->current_round];
 }
 
 
 static inline bool
-_PushMagazine(depot_magazine *magazine, void *object)
+push_magazine(depot_magazine *magazine, void *object)
 {
-	if (_IsMagazineFull(magazine))
+	if (is_magazine_full(magazine))
 		return false;
 	magazine->rounds[magazine->current_round++] = object;
 	return true;
@@ -427,7 +382,7 @@ _PushMagazine(depot_magazine *magazine, void *object)
 
 
 static bool
-_ExchangeWithFull(base_depot *depot, depot_magazine* &magazine)
+exchange_with_full(base_depot *depot, depot_magazine* &magazine)
 {
 	BenaphoreLocker _(depot->lock);
 
@@ -437,19 +392,19 @@ _ExchangeWithFull(base_depot *depot, depot_magazine* &magazine)
 	depot->full_count--;
 	depot->empty_count++;
 
-	SListPush(depot->empty, magazine);
-	magazine = SListPop(depot->full);
+	_push(depot->empty, magazine);
+	magazine = _pop(depot->full);
 	return true;
 }
 
 
 static bool
-_ExchangeWithEmpty(base_depot *depot, depot_magazine* &magazine)
+exchange_with_empty(base_depot *depot, depot_magazine* &magazine)
 {
 	BenaphoreLocker _(depot->lock);
 
 	if (depot->empty == NULL) {
-		depot->empty = _AllocMagazine();
+		depot->empty = alloc_magazine();
 		if (depot->empty == NULL)
 			return false;
 	} else {
@@ -457,17 +412,17 @@ _ExchangeWithEmpty(base_depot *depot, depot_magazine* &magazine)
 	}
 
 	if (magazine) {
-		SListPush(depot->full, magazine);
+		_push(depot->full, magazine);
 		depot->full_count++;
 	}
 
-	magazine = SListPop(depot->empty);
+	magazine = _pop(depot->empty);
 	return true;
 }
 
 
 static depot_magazine *
-_AllocMagazine()
+alloc_magazine()
 {
 	depot_magazine *magazine = (depot_magazine *)malloc(sizeof(depot_magazine)
 		+ kMagazineCapacity * sizeof(void *));
@@ -482,18 +437,18 @@ _AllocMagazine()
 
 
 static void
-_FreeMagazine(depot_magazine *magazine)
+free_magazine(depot_magazine *magazine)
 {
 	free(magazine);
 }
 
 
 static void
-_EmptyMagazine(base_depot *depot, depot_magazine *magazine)
+empty_magazine(base_depot *depot, depot_magazine *magazine)
 {
 	for (uint16_t i = 0; i < magazine->current_round; i++)
 		depot->return_object(depot, magazine->rounds[i]);
-	_FreeMagazine(magazine);
+	free_magazine(magazine);
 }
 
 
@@ -557,11 +512,11 @@ base_depot_obtain_from_store(base_depot *depot, depot_cpu_store *store)
 		return NULL;
 
 	while (true) {
-		if (!_IsMagazineEmpty(store->loaded))
-			return _PopMagazine(store->loaded);
+		if (!is_magazine_empty(store->loaded))
+			return pop_magazine(store->loaded);
 
-		if (store->previous && (_IsMagazineFull(store->previous)
-			|| _ExchangeWithFull(depot, store->previous)))
+		if (store->previous && (is_magazine_full(store->previous)
+			|| exchange_with_full(depot, store->previous)))
 			std::swap(store->previous, store->loaded);
 		else
 			return NULL;
@@ -581,11 +536,11 @@ base_depot_return_to_store(base_depot *depot, depot_cpu_store *store,
 	// we return the object directly to the slab.
 
 	while (true) {
-		if (store->loaded && _PushMagazine(store->loaded, object))
+		if (store->loaded && push_magazine(store->loaded, object))
 			return 1;
 
-		if ((store->previous && _IsMagazineEmpty(store->previous))
-			|| _ExchangeWithEmpty(depot, store->previous))
+		if ((store->previous && is_magazine_empty(store->previous))
+			|| exchange_with_empty(depot, store->previous))
 			std::swap(store->loaded, store->previous);
 		else
 			return 0;
@@ -600,60 +555,16 @@ base_depot_make_empty(base_depot *depot)
 
 	for (int i = 0; i < smp_get_num_cpus(); i++) {
 		if (depot->stores[i].loaded)
-			_EmptyMagazine(depot, depot->stores[i].loaded);
+			empty_magazine(depot, depot->stores[i].loaded);
 		if (depot->stores[i].previous)
-			_EmptyMagazine(depot, depot->stores[i].previous);
+			empty_magazine(depot, depot->stores[i].previous);
 		depot->stores[i].loaded = depot->stores[i].previous = NULL;
 	}
 
 	while (depot->full)
-		_EmptyMagazine(depot, SListPop(depot->full));
+		empty_magazine(depot, _pop(depot->full));
 
 	while (depot->empty)
-		_EmptyMagazine(depot, SListPop(depot->empty));
-}
-
-
-object_cache_t
-object_cache_create(const char *name, size_t object_size, size_t alignment,
-	status_t (*_constructor)(void *, void *), void (*_destructor)(void *,
-	void *), void *cookie)
-{
-	if (object_size == 0)
-		return NULL;
-	else if (object_size <= 256)
-		return new (std::nothrow) SmallObjectAbstractCache(name, object_size,
-			alignment, _constructor, _destructor, cookie);
-
-	return new (std::nothrow) LargeObjectAbstractCache(name, object_size,
-		alignment, _constructor, _destructor, cookie);
-}
-
-
-void *
-object_cache_alloc(object_cache_t cache)
-{
-	return object_cache_alloc_etc(cache, 0);
-}
-
-
-void *
-object_cache_alloc_etc(object_cache_t cache, uint32_t flags)
-{
-	return ((AbstractCache *)cache)->Allocate(flags);
-}
-
-
-void
-object_cache_free(object_cache_t cache, void *object)
-{
-	((AbstractCache *)cache)->Return(object);
-}
-
-
-void
-object_cache_destroy(object_cache_t cache)
-{
-	delete (AbstractCache *)cache;
+		empty_magazine(depot, _pop(depot->empty));
 }
 
