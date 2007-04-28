@@ -14,6 +14,7 @@
 
 #include <vector>
 
+#include "command_cp.h"
 #include "fd.h"
 #include "fssh_dirent.h"
 #include "fssh_errors.h"
@@ -833,6 +834,7 @@ register_commands()
 {
 	CommandManager::Default()->AddCommands(
 		command_cd,			"cd",			"change current directory",
+		command_cp,			"cp",			"copy files and directories",
 		command_help,		"help",			"list supported commands",
 		command_ln,			"ln",			"create a hard or symbolic link",
 		command_ls,			"ls",			"list files or directories",
