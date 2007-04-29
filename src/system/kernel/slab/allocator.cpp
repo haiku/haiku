@@ -29,6 +29,7 @@ static const size_t kBlockSizes[] = {
 static const size_t kNumBlockSizes = sizeof(kBlockSizes) / sizeof(size_t) - 1;
 
 static object_cache *sBlockCaches[kNumBlockSizes];
+static int32 sBlockCacheWaste[kNumBlockSizes];
 
 struct boundary_tag {
 	uint32 size;
@@ -46,44 +47,39 @@ struct area_boundary_tag {
 static const uint32 kBoundaryMagic = 0x6da78d13;
 
 
-static object_cache *
-size_to_cache(size_t size)
+static int
+size_to_index(size_t size)
 {
 	if (size <= 16)
-		return sBlockCaches[0];
+		return 0;
 	else if (size <= 32)
-		return sBlockCaches[1 + (size - 16 - 1) / 8];
+		return 1 + (size - 16 - 1) / 8;
 	else if (size <= 128)
-		return sBlockCaches[3 + (size - 32 - 1) / 16];
+		return 3 + (size - 32 - 1) / 16;
 	else if (size <= 256)
-		return sBlockCaches[9 + (size - 128 - 1) / 32];
+		return 9 + (size - 128 - 1) / 32;
 	else if (size <= 512)
-		return sBlockCaches[13 + (size - 256 - 1) / 64];
+		return 13 + (size - 256 - 1) / 64;
 	else if (size <= 1024)
-		return sBlockCaches[17 + (size - 512 - 1) / 128];
+		return 17 + (size - 512 - 1) / 128;
 	else if (size <= 2048)
-		return sBlockCaches[21 + (size - 1024 - 1) / 256];
+		return 21 + (size - 1024 - 1) / 256;
 	else if (size <= 8192)
-		return sBlockCaches[25 + (size - 2048 - 1) / 512];
+		return 25 + (size - 2048 - 1) / 512;
 
-	return NULL;
+	return -1;
 }
 
 
 void *
 block_alloc(size_t size)
 {
-	object_cache *cache = size_to_cache(size + sizeof(boundary_tag));
+	int index = size_to_index(size + sizeof(boundary_tag));
 
 	void *block;
 	boundary_tag *tag;
 
-	if (cache) {
-		tag = (boundary_tag *)object_cache_alloc(cache, 0);
-		if (tag == NULL)
-			return NULL;
-		block = tag + 1;
-	} else {
+	if (index < 0) {
 		void *pages;
 		area_id area = create_area("alloc'ed block", &pages,
 			B_ANY_KERNEL_ADDRESS, ROUNDUP(size + sizeof(area_boundary_tag),
@@ -95,6 +91,13 @@ block_alloc(size_t size)
 		areaTag->area = area;
 		tag = &areaTag->tag;
 		block = areaTag + 1;
+	} else {
+		tag = (boundary_tag *)object_cache_alloc(sBlockCaches[index], 0);
+		if (tag == NULL)
+			return NULL;
+		atomic_add(&sBlockCacheWaste[index], kBlockSizes[index] - size
+			- sizeof(boundary_tag));
+		block = tag + 1;
 	}
 
 	tag->size = size;
@@ -118,13 +121,15 @@ block_free(void *block)
 		panic("allocator: boundary tag magic doesn't match this universe");
 #endif
 
-	object_cache *cache = size_to_cache(tag->size);
-	if (cache == NULL) {
+	int index = size_to_index(tag->size + sizeof(boundary_tag));
+	if (index < 0) {
 		area_boundary_tag *areaTag = (area_boundary_tag *)(((uint8 *)block)
 			- sizeof(area_boundary_tag));
 		delete_area(areaTag->area);
 	} else {
-		object_cache_free(cache, tag);
+		atomic_add(&sBlockCacheWaste[index], -(kBlockSizes[index] - tag->size
+			- sizeof(boundary_tag)));
+		object_cache_free(sBlockCaches[index], tag);
 	}
 }
 
@@ -139,6 +144,26 @@ block_create_cache(size_t index, bool boot)
 		0, 0, boot ? CACHE_DURING_BOOT : 0, NULL, NULL, NULL, NULL);
 	if (sBlockCaches[index] == NULL)
 		panic("allocator: failed to init block cache");
+
+	sBlockCacheWaste[index] = 0;
+}
+
+
+static int
+show_waste(int argc, char *argv[])
+{
+	size_t total = 0;
+
+	for (size_t index = 0; index < kNumBlockSizes; index++) {
+		if (sBlockCacheWaste[index] > 0) {
+			kprintf("%lu: %lu\n", kBlockSizes[index], sBlockCacheWaste[index]);
+			total += sBlockCacheWaste[index];
+		}
+	}
+
+	kprintf("total waste: %lu\n", total);
+
+	return 0;
 }
 
 
@@ -151,6 +176,9 @@ block_allocator_init_boot()
 
 		block_create_cache(index, true);
 	}
+
+	add_debugger_command("show_waste", show_waste,
+		"show cache allocator's memory waste");
 }
 
 
