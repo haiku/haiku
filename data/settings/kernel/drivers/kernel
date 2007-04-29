@@ -1,36 +1,47 @@
 #serial_debug_output false
-	# enables serial debug output
+	# disables serial debug output, default is enabled
 
-#serial_debug_port 0
+#serial_debug_port 1
 	# possible values: <num>|<port>
 	# serial interface number (as enumerated by the BIOS) or the
 	# base port of the serial interface to be used for kernel
 	# debug output and the kernel debugger
+	# default is 0 (COM1)
 
-#serial_debug_speed 115200
+#serial_debug_speed 57600
 	# possible values: <9600|19200|38400|57600|115200>
+	# default is 115200
 
 #syslog_debug_output false
-	# enables syslog debug output - all debug output is also sent to
-	# the syslog service
+	# disables syslog debug output - all debug output is also sent to
+	# the syslog service by default.
 
-#bluescreen true
-	# enables/disables on-screen KDL (defaults to on)
+#syslog_time_stamps true
+	# Include time stamps in syslog debug output,
+	# you don't get them by default
 
-#bochs_debug_output false
+#syslog_max_size 20MB
+	# change maximum syslog file size, default is 512kB
+
+#bluescreen false
+	# enables/disables on-screen KDL (defaults to on),
+	# you want to disable this for serial debugging
+
+#bochs_debug_output true
 	# Activates Bochs debug output if enabled in the kernel
 	# (available on x86 as a build option only)
 
-#qemu_single_step_hack false
+#qemu_single_step_hack true
 	# Activates a hack that allows single-stepping under qemu
 	# to work.
 
-#load_symbols false
-	# load kernel and kernel add-on symbols
+#load_symbols true
+	# load kernel and kernel add-on symbols, default is off
 
-#apm false
+#apm true
 	# APM (advanced power management) support
 	# (system shutdown, battery info, ...)
+	# default is off
 
-#acpi true
-	# ACPI support
+#acpi false
+	# ACPI support, on by default
