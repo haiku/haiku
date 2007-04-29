@@ -11,6 +11,13 @@
 #include "ps2_service.h"
 #include "packet_buffer.h"
 
+#define DEBUG_PUBLISHING
+
+#ifdef DEBUG_PUBLISHING
+  #include <debug.h>
+  #include <stdlib.h>
+#endif
+
 static sem_id			sServiceSem;
 static thread_id		sServiceThread;
 static volatile bool	sServiceTerminate;
@@ -126,6 +133,21 @@ ps2_service_thread(void *arg)
 }
 
 
+#ifdef DEBUG_PUBLISHING
+static int
+ps2_republish(int argc, char **argv)
+{
+	int dev = 4;
+	if (argc == 2) 
+		dev = strtoul(argv[1], NULL, 0);
+	if (dev < 0 || dev > 4)
+		dev = 4;
+	ps2_service_notify_device_republish(&ps2_device[dev]);
+	return 0;
+}
+#endif
+
+
 status_t
 ps2_service_init(void)
 {
@@ -141,6 +163,11 @@ ps2_service_init(void)
 		goto err3;
 	sServiceTerminate = false;
 	resume_thread(sServiceThread);
+
+#ifdef DEBUG_PUBLISHING
+	add_debugger_command("ps2republish", &ps2_republish, "republish a ps2 device (0-3 mouse, 4 keyb (default))");
+#endif
+
 	TRACE("ps2: ps2_service_init done\n");
 	return B_OK;
 	
