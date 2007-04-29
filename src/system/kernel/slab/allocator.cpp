@@ -10,6 +10,8 @@
 
 #include "slab_private.h"
 
+#include <kernel.h> // for ROUNDUP
+
 #include <stdio.h>
 
 #define DEBUG_ALLOCATOR
@@ -34,6 +36,12 @@ struct boundary_tag {
 	uint32 magic;
 #endif
 };
+
+struct area_boundary_tag {
+	area_id area;
+	boundary_tag tag;
+};
+
 
 static const uint32 kBoundaryMagic = 0x6da78d13;
 
@@ -68,16 +76,26 @@ block_alloc(size_t size)
 	object_cache *cache = size_to_cache(size + sizeof(boundary_tag));
 
 	void *block;
+	boundary_tag *tag;
 
 	if (cache) {
-		block = object_cache_alloc(cache, 0);
+		tag = (boundary_tag *)object_cache_alloc(cache, 0);
+		if (tag == NULL)
+			return NULL;
+		block = tag + 1;
 	} else {
-		// TODO create areas
-		panic("allocator: unimplemented");
-		return NULL;
-	}
+		void *pages;
+		area_id area = create_area("alloc'ed block", &pages,
+			B_ANY_KERNEL_ADDRESS, ROUNDUP(size + sizeof(area_boundary_tag),
+				B_PAGE_SIZE), B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+		if (area < B_OK)
+			return NULL;
 
-	boundary_tag *tag = (boundary_tag *)block;
+		area_boundary_tag *areaTag = (area_boundary_tag *)pages;
+		areaTag->area = area;
+		tag = &areaTag->tag;
+		block = areaTag + 1;
+	}
 
 	tag->size = size;
 
@@ -85,7 +103,7 @@ block_alloc(size_t size)
 	tag->magic = kBoundaryMagic;
 #endif
 
-	return ((uint8 *)block) + sizeof(boundary_tag);
+	return block;
 }
 
 
@@ -101,10 +119,13 @@ block_free(void *block)
 #endif
 
 	object_cache *cache = size_to_cache(tag->size);
-	if (cache == NULL)
-		panic("allocator: unimplemented");
-
-	object_cache_free(cache, tag);
+	if (cache == NULL) {
+		area_boundary_tag *areaTag = (area_boundary_tag *)(((uint8 *)block)
+			- sizeof(area_boundary_tag));
+		delete_area(areaTag->area);
+	} else {
+		object_cache_free(cache, tag);
+	}
 }
 
 

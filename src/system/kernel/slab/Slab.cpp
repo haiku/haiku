@@ -26,10 +26,6 @@
 #include <new>
 
 
-// TODO all of the small allocations we perform here will fallback
-//      to the internal allocator which in the future will use this
-//      same code. We'll have to resolve all of the dependencies
-//      then, for now, it is still not required.
 // TODO kMagazineCapacity should be dynamically tuned per cache.
 
 
