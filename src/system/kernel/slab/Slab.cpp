@@ -72,6 +72,10 @@ struct object_cache : DoublyLinkedListLinkImpl<object_cache> {
 	object_cache_destructor destructor;
 	object_cache_reclaimer reclaimer;
 
+	status_t (*allocate_pages)(object_cache *cache, void **pages,
+		uint32 flags);
+	void (*free_pages)(object_cache *cache, void *pages);
+
 	object_depot depot;
 
 	virtual slab *CreateSlab(uint32 flags) = 0;
@@ -156,6 +160,7 @@ static ObjectCacheList sObjectCaches;
 static benaphore sObjectCacheListLock;
 
 static uint8 *sInitialBegin, *sInitialLimit, *sInitialPointer;
+static kernel_args *sKernelArgs;
 
 
 static status_t object_cache_reserve_internal(object_cache *cache,
@@ -258,7 +263,7 @@ benaphore_boot_init(benaphore *lock, const char *name, uint32 flags)
 
 
 static status_t
-allocate_pages(object_cache *cache, void **pages, uint32 flags)
+area_allocate_pages(object_cache *cache, void **pages, uint32 flags)
 {
 	TRACE_CACHE(cache, "allocate pages (%lu, 0x0%lx)", cache->slab_size, flags);
 
@@ -283,7 +288,7 @@ allocate_pages(object_cache *cache, void **pages, uint32 flags)
 
 
 static void
-free_pages(object_cache *cache, void *pages)
+area_free_pages(object_cache *cache, void *pages)
 {
 	area_id id = area_for(pages);
 
@@ -295,6 +300,24 @@ free_pages(object_cache *cache, void *pages)
 	delete_area(id);
 
 	cache->usage -= cache->slab_size;
+}
+
+
+static status_t
+early_allocate_pages(object_cache *cache, void **pages, uint32 flags)
+{
+	addr_t base = vm_allocate_early(sKernelArgs, cache->slab_size,
+		cache->slab_size, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+
+	*pages = (void *)base;
+	return B_OK;
+}
+
+
+static void
+early_free_pages(object_cache *cache, void *pages)
+{
+	panic("memory pressure on bootup?");
 }
 
 
@@ -409,6 +432,14 @@ object_cache_init(object_cache *cache, const char *name, size_t objectSize,
 	cache->destructor = destructor;
 	cache->reclaimer = reclaimer;
 
+	if (cache->flags & CACHE_DURING_BOOT) {
+		cache->allocate_pages = early_allocate_pages;
+		cache->free_pages = early_free_pages;
+	} else {
+		cache->allocate_pages = area_allocate_pages;
+		cache->free_pages = area_free_pages;
+	}
+
 	register_low_memory_handler(object_cache_low_memory, cache, 0);
 
 	BenaphoreLocker _(sObjectCacheListLock);
@@ -429,6 +460,36 @@ object_cache_init_locks(object_cache *cache)
 		return B_OK;
 
 	return object_depot_init_locks(&cache->depot);
+}
+
+
+static void
+object_cache_commit_slab(object_cache *cache, slab *slab)
+{
+	void *pages = (void *)ROUNDOWN((addr_t)slab->pages, B_PAGE_SIZE);
+	if (create_area(cache->name, &pages, B_EXACT_ADDRESS, cache->slab_size,
+		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA) < B_OK)
+		panic("failed to create_area()");
+}
+
+
+static void
+object_cache_commit_pre_pages(object_cache *cache)
+{
+	SlabList::Iterator it = cache->full.GetIterator();
+	while (it.HasNext())
+		object_cache_commit_slab(cache, it.Next());
+
+	it = cache->partial.GetIterator();
+	while (it.HasNext())
+		object_cache_commit_slab(cache, it.Next());
+
+	it = cache->empty.GetIterator();
+	while (it.HasNext())
+		object_cache_commit_slab(cache, it.Next());
+
+	cache->allocate_pages = area_allocate_pages;
+	cache->free_pages = area_free_pages;
 }
 
 
@@ -1202,11 +1263,13 @@ dump_cache_info(int argc, char *argv[])
 
 
 void
-slab_init(addr_t initialBase, size_t initialSize)
+slab_init(kernel_args *args, addr_t initialBase, size_t initialSize)
 {
 	sInitialBegin = (uint8 *)initialBase;
 	sInitialLimit = sInitialBegin + initialSize;
 	sInitialPointer = sInitialBegin;
+
+	sKernelArgs = args;
 
 	new (&sObjectCaches) ObjectCacheList();
 
@@ -1228,8 +1291,11 @@ slab_init_post_sem()
 	ObjectCacheList::Iterator it = sObjectCaches.GetIterator();
 
 	while (it.HasNext()) {
-		if (object_cache_init_locks(it.Next()) < B_OK)
+		object_cache *cache = it.Next();
+		if (object_cache_init_locks(cache) < B_OK)
 			panic("slab_init: failed to create sems");
+		if (cache->allocate_pages == early_allocate_pages)
+			object_cache_commit_pre_pages(cache);
 	}
 
 	block_allocator_init_rest();

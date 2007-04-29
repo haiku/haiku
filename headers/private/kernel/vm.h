@@ -32,7 +32,8 @@ addr_t vm_allocate_early(kernel_args *args, size_t virtualSize,
 			size_t physicalSize, uint32 attributes);
 
 
-void slab_init(addr_t initialBase, size_t initialSize);
+void slab_init(struct kernel_args *args, addr_t initialBase,
+	size_t initialSize);
 void slab_init_post_sem();
 
 // to protect code regions with interrupts turned on

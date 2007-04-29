@@ -2894,7 +2894,7 @@ vm_init(kernel_args *args)
 	size_t slabInitialSize = 2 * B_PAGE_SIZE;
 	addr_t slabInitialBase = vm_allocate_early(args, slabInitialSize,
 		slabInitialSize, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	slab_init(slabInitialBase, slabInitialSize);
+	slab_init(args, slabInitialBase, slabInitialSize);
 
 	// initialize the free page list and physical page mapper
 	vm_page_init(args);
