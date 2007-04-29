@@ -18,6 +18,7 @@ extern "C" {
 enum {
 	/* create_object_cache_etc flags */
 	CACHE_NO_DEPOT			= 1 << 0,
+	CACHE_UNLOCKED_PAGES	= 1 << 1,
 
 	/* object_cache_alloc flags */
 	CACHE_DONT_SLEEP		= 1 << 8,

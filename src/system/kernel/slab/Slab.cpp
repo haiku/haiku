@@ -260,11 +260,15 @@ allocate_pages(object_cache *cache, void **pages, uint32 flags)
 {
 	TRACE_CACHE(cache, "allocate pages (%lu, 0x0%lx)", cache->slab_size, flags);
 
+	uint32 lock = B_FULL_LOCK;
+	if (cache->flags & CACHE_UNLOCKED_PAGES)
+		lock = B_NO_LOCK;
+
 	// if we are allocating, it is because we need the pages immediatly
 	// so we lock them. when moving the slab to the empty list we should
 	// unlock them, and lock them again when getting one from the empty list.
 	area_id areaId = create_area(cache->name, pages, B_ANY_KERNEL_ADDRESS,
-		cache->slab_size, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
+		cache->slab_size, lock, B_READ_AREA | B_WRITE_AREA);
 	if (areaId < 0)
 		return areaId;
 
