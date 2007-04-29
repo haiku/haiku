@@ -251,34 +251,44 @@ ipv4_check_mask(const sockaddr *_mask)
 	\return B_NO_MEMORY if the buffer could not be allocated
 */
 static status_t
-ipv4_print_address(const sockaddr *_address, char **_buffer, bool printPort)
+ipv4_print_address_buffer(const sockaddr *_address, char *buffer,
+	size_t bufferSize, bool printPort)
 {
 	const sockaddr_in *address = (const sockaddr_in *)_address;
 
-	if (_buffer == NULL)
+	if (buffer == NULL)
 		return B_BAD_VALUE;
 
-	char tmp[64];
-
 	if (address == NULL)
-		strcpy(tmp, "<none>");
+		strlcpy(buffer, "<none>", bufferSize);
 	else {
 		unsigned int addr = ntohl(address->sin_addr.s_addr);
 
 		if (printPort)
-			sprintf(tmp, "%u.%u.%u.%u:%u", (addr >> 24) & 0xff,
-				(addr >> 16) & 0xff, (addr >> 8) & 0xff, addr & 0xff,
-				ntohs(address->sin_port));
+			snprintf(buffer, bufferSize, "%u.%u.%u.%u:%u",
+				(addr >> 24) & 0xff, (addr >> 16) & 0xff, (addr >> 8) & 0xff,
+				addr & 0xff, ntohs(address->sin_port));
 		else
-			sprintf(tmp, "%u.%u.%u.%u", (addr >> 24) & 0xff,
+			snprintf(buffer, bufferSize, "%u.%u.%u.%u", (addr >> 24) & 0xff,
 				(addr >> 16) & 0xff, (addr >> 8) & 0xff, addr & 0xff);
 	}
+
+	return B_OK;
+}
+
+
+static status_t
+ipv4_print_address(const sockaddr *_address, char **_buffer, bool printPort)
+{
+	if (_buffer == NULL)
+		return B_BAD_VALUE;
+
+	char tmp[64];
+	ipv4_print_address_buffer(_address, tmp, sizeof(tmp), printPort);
 
 	*_buffer = strdup(tmp);
 	if (*_buffer == NULL)
 		return B_NO_MEMORY;
-
-
 
 	return B_OK;
 }
@@ -426,6 +436,7 @@ net_address_module_info gIPv4AddressModule = {
 	ipv4_first_mask_bit,
 	ipv4_check_mask,
 	ipv4_print_address,
+	ipv4_print_address_buffer,
 	ipv4_get_port,
 	ipv4_set_port,
 	ipv4_set_to,

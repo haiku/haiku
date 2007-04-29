@@ -109,6 +109,12 @@ public:
 		return AddressString(fModule, fAddress, printPort);
 	}
 
+	const char *AsString(char *buffer, size_t bufferSize,
+		bool printPort = false) const {
+		fModule->print_address_buffer(fAddress, buffer, bufferSize, printPort);
+		return buffer;
+	}
+
 	const sockaddr *operator *() const { return fAddress; }
 	sockaddr *operator *() { return fAddress; }
 
@@ -186,6 +192,12 @@ public:
 	AddressString AsString(bool printPort = false) const
 	{
 		return AddressString(fModule, fAddress, printPort);
+	}
+
+	const char *AsString(char *buffer, size_t bufferSize,
+		bool printPort = false) const {
+		fModule->print_address_buffer(fAddress, buffer, bufferSize, printPort);
+		return buffer;
 	}
 
 	const sockaddr *operator *() const { return fAddress; }

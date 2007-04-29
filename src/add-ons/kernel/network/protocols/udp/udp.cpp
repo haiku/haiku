@@ -168,8 +168,7 @@ public:
 	status_t ConnectEndpoint(UdpEndpoint *endpoint, const sockaddr *address);
 	status_t UnbindEndpoint(UdpEndpoint *endpoint);
 
-	status_t ActivateEndpoint(UdpEndpoint *endpoint);
-	status_t DeactivateEndpoint(UdpEndpoint *endpoint);
+	void DumpEndpoints() const;
 
 private:
 	status_t _BindEndpoint(UdpEndpoint *endpoint, const sockaddr *address);
@@ -219,6 +218,8 @@ public:
 	status_t FreeEndpoint(UdpDomainSupport *domain);
 
 	status_t		InitCheck() const;
+
+	static int DumpEndpoints(int argc, char *argv[]);
 
 private:
 	UdpDomainSupport *_GetDomain(net_domain *domain, bool create);
@@ -334,6 +335,27 @@ UdpDomainSupport::UnbindEndpoint(UdpEndpoint *endpoint)
 	endpoint->SetActive(false);
 
 	return B_OK;
+}
+
+
+void
+UdpDomainSupport::DumpEndpoints() const
+{
+	kprintf("-------- UDP Domain %p ---------\n", this);
+	kprintf("%10s %20s %20s %8s\n", "address", "local", "peer", "recv-q");
+
+	EndpointTable::Iterator it = fActiveEndpoints.GetIterator();
+
+	while (it.HasNext()) {
+		UdpEndpoint *endpoint = it.Next();
+
+		char localBuf[64], peerBuf[64];
+		endpoint->LocalAddress().AsString(localBuf, sizeof(localBuf), true);
+		endpoint->PeerAddress().AsString(peerBuf, sizeof(peerBuf), true);
+
+		kprintf("%p %20s %20s %8lu\n", endpoint, localBuf, peerBuf,
+			endpoint->AvailableData());
+	}
 }
 
 
@@ -577,6 +599,18 @@ status_t
 UdpEndpointManager::InitCheck() const
 {
 	return fStatus;
+}
+
+
+int
+UdpEndpointManager::DumpEndpoints(int argc, char *argv[])
+{
+	UdpDomainList::Iterator it = sUdpEndpointManager->fDomains.GetIterator();
+
+	while (it.HasNext())
+		it.Next()->DumpEndpoints();
+
+	return 0;
 }
 
 
@@ -1127,6 +1161,9 @@ init_udp()
 	if (status < B_OK)
 		goto err1;
 
+	add_debugger_command("udp_endpoints", UdpEndpointManager::DumpEndpoints,
+		"lists all open UDP endpoints");
+
 	return B_OK;
 
 err1:
@@ -1141,6 +1178,8 @@ static status_t
 uninit_udp()
 {
 	TRACE_EPM("uninit_udp()");
+	remove_debugger_command("udp_endpoints",
+		UdpEndpointManager::DumpEndpoints);
 	delete sUdpEndpointManager;
 	return B_OK;
 }

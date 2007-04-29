@@ -118,6 +118,8 @@ struct net_address_module_info {
 	
 	status_t (*print_address)(const sockaddr *address, char **buffer, 
 					bool printPort);
+	status_t (*print_address_buffer)(const sockaddr *address, char *buffer,
+					size_t bufferSize, bool printPort);
 
 	uint16 (*get_port)(const sockaddr *address);
 	status_t (*set_port)(sockaddr *address, uint16 port);
