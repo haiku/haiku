@@ -22,6 +22,7 @@
 #include <util/list.h>
 #include <util/khash.h>
 #include <util/DoublyLinkedList.h>
+#include <util/OpenHashTable.h>
 
 #include <netinet/in.h>
 #include <netinet/ip.h>
@@ -128,19 +129,32 @@ public:
 	void Remove(Link *link);
 	bool IsEmpty() const { return fLinks.IsEmpty(); }
 
-	static uint32 Hash(void *address, const void *key, uint32 range);
-	static int Compare(void *address, const void *key);
-	static int32 NextOffset() { return offsetof(MulticastGroup, fNext); }
+	struct HashDefinition {
+		typedef void ParentType;
+		typedef const in_addr KeyType;
+		typedef MulticastGroup ValueType;
 
-	static const int kMaxGroups = 64;
+		size_t HashKey(const in_addr &address) const
+			{ return address.s_addr; }
+		size_t Hash(MulticastGroup *group) const
+			{ return HashKey(group->fMulticastAddress); }
+		bool Compare(const in_addr &address, MulticastGroup *group) const
+			{ return group->fMulticastAddress.s_addr == address.s_addr; }
+		HashTableLink<MulticastGroup> *GetLink(MulticastGroup *group) const
+			{ return &group->fLink; }
+	};
 
 private:
+	// for g++ 2.95
+	friend class HashDefinition;
+
 	typedef DoublyLinkedListCLink<Link> LinkLink;
 	typedef DoublyLinkedList<Link, LinkLink> Links;
 
-	MulticastGroup *fNext;
 	in_addr fMulticastAddress;
 	Links fLinks;
+
+	HashTableLink<MulticastGroup> fLink;
 };
 
 class RawSocket : public DoublyLinkedListLinkImpl<RawSocket>, public DatagramSocket<> {
@@ -188,7 +202,8 @@ static benaphore sRawSocketsLock;
 static benaphore sFragmentLock;
 static hash_table *sFragmentHash;
 static benaphore sMulticastGroupsLock;
-static hash_table *sMulticastGroups;
+typedef OpenHashTable<MulticastGroup::HashDefinition> MulticastGroups;
+static MulticastGroups *sMulticastGroups;
 static net_protocol_module_info *sReceivingProtocol[256];
 static benaphore sReceivingProtocolLock;
 
@@ -488,33 +503,6 @@ MulticastGroup::Remove(Link *link)
 }
 
 
-int
-MulticastGroup::Compare(void *_group, const void *_key)
-{
-	MulticastGroup *group = (MulticastGroup *)_group;
-
-	return memcmp(&group->fMulticastAddress, _key, sizeof(in_addr));
-}
-
-
-uint32
-MulticastGroup::Hash(void *_group, const void *_key, uint32 range)
-{
-	const in_addr *address = (const in_addr *)_key;
-	if (_group != NULL)
-		address = &((MulticastGroup *)_group)->fMulticastAddress;
-
-	union {
-		in_addr_t address;
-		uint8 data[4];
-	} addr;
-
-	addr.address = address->s_addr & IN_CLASSD_HOST;
-
-	return (addr.data[0] ^ addr.data[1] ^ addr.data[2] ^ addr.data[3]) % range;
-}
-
-
 //	#pragma mark -
 
 
@@ -714,8 +702,8 @@ deliver_multicast(net_protocol_module_info *module, net_buffer *buffer,
 {
 	BenaphoreLocker _(sMulticastGroupsLock);
 
-	MulticastGroup *group = (MulticastGroup *)hash_lookup(sMulticastGroups,
-		&buffer->destination);
+	MulticastGroup *group = sMulticastGroups->Lookup(
+		((sockaddr_in *)&buffer->destination)->sin_addr);
 	if (group == NULL)
 		return B_OK;
 
@@ -758,18 +746,13 @@ IPv4Multicast::JoinGroup(const in_addr &groupAddr, MulticastGroup::Link *link)
 {
 	BenaphoreLocker _(sMulticastGroupsLock);
 
-	MulticastGroup *group = (MulticastGroup *)hash_lookup(sMulticastGroups,
-		&groupAddr);
+	MulticastGroup *group = sMulticastGroups->Lookup(groupAddr);
 	if (group == NULL) {
 		group = new (std::nothrow) MulticastGroup(groupAddr);
 		if (group == NULL)
 			return B_NO_MEMORY;
 
-		status_t status = hash_insert(sMulticastGroups, group);
-		if (status < B_OK) {
-			delete group;
-			return status;
-		}
+		sMulticastGroups->Insert(group);
 	}
 
 	group->Add(link);
@@ -782,14 +765,13 @@ IPv4Multicast::LeaveGroup(const in_addr &groupAddr, MulticastGroup::Link *link)
 {
 	BenaphoreLocker _(sMulticastGroupsLock);
 
-	MulticastGroup *group = (MulticastGroup *)hash_lookup(sMulticastGroups,
-		&groupAddr);
+	MulticastGroup *group = sMulticastGroups->Lookup(groupAddr);
 	if (group == NULL)
 		return ENOENT;
 
 	group->Remove(link);
 	if (group->IsEmpty()) {
-		hash_remove(sMulticastGroups, group);
+		sMulticastGroups->Remove(group);
 		delete group;
 	}
 
@@ -1607,11 +1589,13 @@ init_ipv4()
 	if (status < B_OK)
 		goto err3;
 
-	sMulticastGroups = hash_init(MulticastGroup::kMaxGroups,
-		MulticastGroup::NextOffset(), &MulticastGroup::Compare,
-		&MulticastGroup::Hash);
+	sMulticastGroups = new MulticastGroups();
 	if (sMulticastGroups == NULL)
 		goto err4;
+
+	status = sMulticastGroups->InitCheck();
+	if (status < B_OK)
+		goto err5;
 
 	sFragmentHash = hash_init(MAX_HASH_FRAGMENTS, FragmentPacket::NextOffset(),
 		&FragmentPacket::Compare, &FragmentPacket::Hash);
@@ -1638,7 +1622,7 @@ init_ipv4()
 err6:
 	hash_uninit(sFragmentHash);
 err5:
-	hash_uninit(sMulticastGroups);
+	delete sMulticastGroups;
 err4:
 	benaphore_destroy(&sReceivingProtocolLock);
 err3:
@@ -1665,7 +1649,7 @@ uninit_ipv4()
 	gStackModule->unregister_domain(sDomain);
 	benaphore_unlock(&sReceivingProtocolLock);
 
-	hash_uninit(sMulticastGroups);
+	delete sMulticastGroups;
 	hash_uninit(sFragmentHash);
 
 	benaphore_destroy(&sMulticastGroupsLock);
