@@ -8,15 +8,15 @@
 
 #include <FindDirectory.h>
 #include <Path.h>
+#include <driver_settings.h>
 
 #include <syslog.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/stat.h>
 
-
-static const size_t kMaxLogSize = 524288;	// 512kB
 
 static const char *kFacilities[] = {
 	"KERN", "USER", "MAIL", "DAEMON",
@@ -29,10 +29,12 @@ static const char *kFacilities[] = {
 };
 static const int32 kNumFacilities = 24;
 
-int sLog = -1;
-char sLastMessage[1024];
-thread_id sLastThread;
-int32 sRepeatCount;
+static int		 sLog = -1;
+static char		 sLastMessage[1024];
+static thread_id sLastThread;
+static int32	 sRepeatCount;
+static size_t	 sLogMaxSize = 524288;	// 512kB
+static bool		 sLogTimeStamps = false;
 
 
 /*!
@@ -49,7 +51,7 @@ prepare_output()
 		// check file size
 		struct stat stat;
 		if (fstat(sLog, &stat) == 0) {
-			if (stat.st_size < kMaxLogSize)
+			if (stat.st_size < sLogMaxSize)
 				needNew = false;
 			else
 				tooLarge = true;
@@ -118,15 +120,14 @@ syslog_output(syslog_message &message)
 {
 	char header[128];
 	int32 headerLength;
-
-#if 0
-	// parse & nicely print the time stamp from the message
-	struct tm when;
-	localtime_r(&message.when, &when);
-	int32 pos = strftime(buffer, sizeof(buffer), "%b %d, %H:%M:%S ", &when);
-#else
 	int32 pos = 0;
-#endif
+
+	if (sLogTimeStamps) {
+		// parse & nicely print the time stamp from the message
+		struct tm when;
+		localtime_r(&message.when, &when);
+		pos = strftime(header, sizeof(header), "%Y-%m-%d %H:%M:%S", &when);
+	}
 
 	// add facility
 	int facility = SYSLOG_FACILITY_INDEX(message.priority);
@@ -202,6 +203,26 @@ syslog_output(syslog_message &message)
 void
 init_syslog_output(SyslogDaemon *daemon)
 {
+	void *handle;
+
+	// get kernel syslog settings
+	handle = load_driver_settings("kernel");
+	if (handle != NULL) {
+		sLogTimeStamps = get_driver_boolean_parameter(handle,
+			"syslog_time_stamps", false, false);
+		const char *param = get_driver_parameter(handle,
+			"syslog_max_size", "0", "0");
+		int maxSize = strtol(param, NULL, 0);
+		if (strchr(param, 'k') || strchr(param, 'K'))
+			maxSize *= 1024;
+		else if (strchr(param, 'm') || strchr(param, 'M'))
+			maxSize *= 1048576;
+		if (maxSize > 0)
+			sLogMaxSize = maxSize;
+
+		unload_driver_settings(handle);
+	}
+	
 	daemon->AddHandler(syslog_output);
 }
 
