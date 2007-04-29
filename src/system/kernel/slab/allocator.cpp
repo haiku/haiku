@@ -13,6 +13,7 @@
 #include <stdio.h>
 
 #define DEBUG_ALLOCATOR
+// #define TEST_ALL_CACHES_DURING_BOOT
 
 static const size_t kBlockSizes[] = {
 	16, 24, 32, 48, 64, 80, 96, 112,
@@ -23,7 +24,9 @@ static const size_t kBlockSizes[] = {
 	0
 };
 
-static object_cache *sBlockCaches[sizeof(kBlockSizes) / sizeof(size_t)];
+static const size_t kNumBlockSizes = sizeof(kBlockSizes) / sizeof(size_t) - 1;
+
+static object_cache *sBlockCaches[kNumBlockSizes];
 
 struct boundary_tag {
 	uint32 size;
@@ -38,18 +41,22 @@ static const uint32 kBoundaryMagic = 0x6da78d13;
 static object_cache *
 size_to_cache(size_t size)
 {
-	if (size <= 128)
-		return sBlockCaches[size / 16];
+	if (size <= 16)
+		return sBlockCaches[0];
+	else if (size <= 32)
+		return sBlockCaches[1 + (size - 16 - 1) / 8];
+	else if (size <= 128)
+		return sBlockCaches[3 + (size - 32 - 1) / 16];
 	else if (size <= 256)
-		return sBlockCaches[8 + (size - 128) / 32];
+		return sBlockCaches[9 + (size - 128 - 1) / 32];
 	else if (size <= 512)
-		return sBlockCaches[12 + (size - 256) / 64];
+		return sBlockCaches[13 + (size - 256 - 1) / 64];
 	else if (size <= 1024)
-		return sBlockCaches[16 + (size - 512) / 128];
+		return sBlockCaches[17 + (size - 512 - 1) / 128];
 	else if (size <= 2048)
-		return sBlockCaches[20 + (size - 1024) / 256];
+		return sBlockCaches[21 + (size - 1024 - 1) / 256];
 	else if (size <= 8192)
-		return sBlockCaches[24 + (size - 2048) / 512];
+		return sBlockCaches[25 + (size - 2048 - 1) / 512];
 
 	return NULL;
 }
@@ -135,5 +142,11 @@ block_allocator_init_rest()
 
 		block_create_cache(index, false);
 	}
+
+#ifdef TEST_ALL_CACHES_DURING_BOOT
+	for (int index = 0; kBlockSizes[index] != 0; index++) {
+		block_free(block_alloc(kBlockSizes[index] - sizeof(boundary_tag)));
+	}
+#endif
 }
 
