@@ -8,6 +8,9 @@
 
 #include <Slab.h>
 
+#include "slab_private.h"
+
+#include <stdlib.h>
 #include <string.h>
 
 #include <KernelExport.h>
@@ -16,6 +19,7 @@
 #include <util/OpenHashTable.h>
 
 #include <smp.h>
+#include <vm.h>
 #include <vm_low_memory.h>
 
 #include <algorithm> // swap
@@ -37,9 +41,6 @@
 #else
 #define TRACE_CACHE(cache, format, bananas...) do { } while (0)
 #endif
-
-
-extern "C" status_t slab_init();
 
 
 static const int kMagazineCapacity = 32;
@@ -155,11 +156,13 @@ struct depot_cpu_store {
 };
 
 
-static object_cache *sSlabCache, *sLinkCache;
 static ObjectCacheList sObjectCaches;
 static benaphore sObjectCacheListLock;
 
+static uint8 *sInitialBegin, *sInitialLimit, *sInitialPointer;
 
+
+static status_t object_depot_init_locks(object_depot *depot);
 static depot_magazine *alloc_magazine();
 static void free_magazine(depot_magazine *magazine);
 
@@ -215,13 +218,57 @@ __fls0(size_t value)
 }
 
 
+static void *
+internal_alloc(size_t size, uint32 flags)
+{
+	if (flags & CACHE_DURING_BOOT) {
+		if ((sInitialPointer + size) > sInitialLimit)
+			panic("internal_alloc: ran out of initial space");
+
+		uint8 *buffer = sInitialPointer;
+		sInitialPointer += size;
+		return buffer;
+	}
+
+	return block_alloc(size);
+}
+
+
+static void
+internal_free(void *_buffer)
+{
+	uint8 *buffer = (uint8 *)_buffer;
+
+	if (buffer >= sInitialBegin && buffer < sInitialLimit)
+		return;
+
+	block_free(buffer);
+}
+
+
+static status_t
+benaphore_boot_init(benaphore *lock, const char *name, uint32 flags)
+{
+	if (flags & CACHE_DURING_BOOT) {
+		lock->sem = -1;
+		lock->count = 0;
+		return B_OK;
+	}
+
+	return benaphore_init(lock, name);
+}
+
+
 static status_t
 allocate_pages(object_cache *cache, void **pages, uint32 flags)
 {
 	TRACE_CACHE(cache, "allocate pages (%lu, 0x0%lx)", cache->slab_size, flags);
 
+	// if we are allocating, it is because we need the pages immediatly
+	// so we lock them. when moving the slab to the empty list we should
+	// unlock them, and lock them again when getting one from the empty list.
 	area_id areaId = create_area(cache->name, pages, B_ANY_KERNEL_ADDRESS,
-		cache->slab_size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+		cache->slab_size, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (areaId < 0)
 		return areaId;
 
@@ -314,11 +361,11 @@ object_cache_init(object_cache *cache, const char *name, size_t objectSize,
 	object_cache_constructor constructor, object_cache_destructor destructor,
 	object_cache_reclaimer reclaimer)
 {
-	status_t status = benaphore_init(&cache->lock, name);
+	strlcpy(cache->name, name, sizeof(cache->name));
+
+	status_t status = benaphore_boot_init(&cache->lock, name, flags);
 	if (status < B_OK)
 		return status;
-
-	strlcpy(cache->name, name, sizeof(cache->name));
 
 	if (objectSize < sizeof(object_link))
 		objectSize = sizeof(object_link);
@@ -347,7 +394,7 @@ object_cache_init(object_cache *cache, const char *name, size_t objectSize,
 		cache->flags |= CACHE_NO_DEPOT;
 
 	if (!(cache->flags & CACHE_NO_DEPOT)) {
-		status_t status = object_depot_init(&cache->depot,
+		status_t status = object_depot_init(&cache->depot, flags,
 			object_cache_return_object_wrapper);
 		if (status < B_OK) {
 			benaphore_destroy(&cache->lock);
@@ -369,19 +416,43 @@ object_cache_init(object_cache *cache, const char *name, size_t objectSize,
 }
 
 
+static status_t
+object_cache_init_locks(object_cache *cache)
+{
+	status_t status = benaphore_init(&cache->lock, cache->name);
+	if (status < B_OK)
+		return status;
+
+	if (cache->flags & CACHE_NO_DEPOT)
+		return B_OK;
+
+	return object_depot_init_locks(&cache->depot);
+}
+
+
+static void
+delete_cache(object_cache *cache)
+{
+	cache->~object_cache();
+	internal_free(cache);
+}
+
+
 static SmallObjectCache *
 create_small_object_cache(const char *name, size_t object_size,
 	size_t alignment, size_t maximum, uint32 flags, void *cookie,
 	object_cache_constructor constructor, object_cache_destructor destructor,
 	object_cache_reclaimer reclaimer)
 {
-	SmallObjectCache *cache = new (std::nothrow) SmallObjectCache();
-	if (cache == NULL)
+	void *buffer = internal_alloc(sizeof(SmallObjectCache), flags);
+	if (buffer == NULL)
 		return NULL;
+
+	SmallObjectCache *cache = new (buffer) SmallObjectCache();
 
 	if (object_cache_init(cache, name, object_size, alignment, maximum, flags,
 		cookie, constructor, destructor, reclaimer) < B_OK) {
-		delete cache;
+		delete_cache(cache);
 		return NULL;
 	}
 
@@ -397,13 +468,15 @@ create_hashed_object_cache(const char *name, size_t object_size,
 	object_cache_constructor constructor, object_cache_destructor destructor,
 	object_cache_reclaimer reclaimer)
 {
-	HashedObjectCache *cache = new (std::nothrow) HashedObjectCache();
-	if (cache == NULL)
+	void *buffer = internal_alloc(sizeof(HashedObjectCache), flags);
+	if (buffer == NULL)
 		return NULL;
+
+	HashedObjectCache *cache = new (buffer) HashedObjectCache();
 
 	if (object_cache_init(cache, name, object_size, alignment, maximum, flags,
 		cookie, constructor, destructor, reclaimer) < B_OK) {
-		delete cache;
+		delete_cache(cache);
 		return NULL;
 	}
 
@@ -466,7 +539,7 @@ delete_object_cache(object_cache *cache)
 		cache->ReturnSlab(cache->empty.RemoveHead());
 
 	benaphore_destroy(&cache->lock);
-	delete cache;
+	delete_cache(cache);
 }
 
 
@@ -504,8 +577,8 @@ object_cache_alloc(object_cache *cache, uint32 flags)
 	source->count--;
 	cache->used_count++;
 
-	TRACE_CACHE(cache, "allocate %p from %p, %lu remaining.", link, source,
-		source->count);
+	TRACE_CACHE(cache, "allocate %p (%p) from %p, %lu remaining.",
+		link_to_object(link, cache->object_size), link, source, source->count);
 
 	if (source->count == 0) {
 		cache->partial.Remove(source);
@@ -524,8 +597,9 @@ object_cache_return_to_slab(object_cache *cache, slab *source, void *object)
 
 	object_link *link = object_to_link(object, cache->object_size);
 
-	TRACE_CACHE(cache, "returning %p to %p, %lu used (%lu empty slabs).",
-		link, source, source->size - source->count, cache->empty_count);
+	TRACE_CACHE(cache, "returning %p (%p) to %p, %lu used (%lu empty slabs).",
+		object, link, source, source->size - source->count,
+		cache->empty_count);
 
 	_push(source->free, link);
 	source->count++;
@@ -693,28 +767,29 @@ SmallObjectCache::ObjectSlab(void *object) const
 static slab *
 allocate_slab(uint32 flags)
 {
-	return (slab *)object_cache_alloc(sSlabCache, flags);
+	return (slab *)internal_alloc(sizeof(slab), flags);
 }
 
 
 static void
 free_slab(slab *slab)
 {
-	object_cache_free(sSlabCache, slab);
+	internal_free(slab);
 }
 
 
 static HashedObjectCache::Link *
 allocate_link(uint32 flags)
 {
-	return (HashedObjectCache::Link *)object_cache_alloc(sLinkCache, flags);
+	return (HashedObjectCache::Link *)
+		internal_alloc(sizeof(HashedObjectCache::Link), flags);
 }
 
 
 static void
 free_link(HashedObjectCache::Link *link)
 {
-	object_cache_free(sLinkCache, link);
+	internal_free(link);
 }
 
 
@@ -863,8 +938,8 @@ exchange_with_empty(object_depot *depot, depot_magazine* &magazine)
 static depot_magazine *
 alloc_magazine()
 {
-	depot_magazine *magazine = (depot_magazine *)malloc(sizeof(depot_magazine)
-		+ kMagazineCapacity * sizeof(void *));
+	depot_magazine *magazine = (depot_magazine *)internal_alloc(
+		sizeof(depot_magazine) + kMagazineCapacity * sizeof(void *), 0);
 	if (magazine) {
 		magazine->next = NULL;
 		magazine->current_round = 0;
@@ -878,7 +953,7 @@ alloc_magazine()
 static void
 free_magazine(depot_magazine *magazine)
 {
-	free(magazine);
+	internal_free(magazine);
 }
 
 
@@ -892,29 +967,47 @@ empty_magazine(object_depot *depot, depot_magazine *magazine)
 
 
 status_t
-object_depot_init(object_depot *depot,
+object_depot_init(object_depot *depot, uint32 flags,
 	void (*return_object)(object_depot *depot, void *object))
 {
 	depot->full = NULL;
 	depot->empty = NULL;
 	depot->full_count = depot->empty_count = 0;
 
-	status_t status = benaphore_init(&depot->lock, "depot");
+	status_t status = benaphore_boot_init(&depot->lock, "depot", flags);
 	if (status < B_OK)
 		return status;
 
-	depot->stores = new (std::nothrow) depot_cpu_store[smp_get_num_cpus()];
+	depot->stores = (depot_cpu_store *)internal_alloc(sizeof(depot_cpu_store)
+		* smp_get_num_cpus(), flags);
 	if (depot->stores == NULL) {
 		benaphore_destroy(&depot->lock);
 		return B_NO_MEMORY;
 	}
 
 	for (int i = 0; i < smp_get_num_cpus(); i++) {
-		benaphore_init(&depot->stores[i].lock, "cpu store");
+		benaphore_boot_init(&depot->stores[i].lock, "cpu store", flags);
 		depot->stores[i].loaded = depot->stores[i].previous = NULL;
 	}
 
 	depot->return_object = return_object;
+
+	return B_OK;
+}
+
+
+status_t
+object_depot_init_locks(object_depot *depot)
+{
+	status_t status = benaphore_init(&depot->lock, "depot");
+	if (status < B_OK)
+		return status;
+
+	for (int i = 0; i < smp_get_num_cpus(); i++) {
+		status = benaphore_init(&depot->stores[i].lock, "cpu store");
+		if (status < B_OK)
+			return status;
+	}
 
 	return B_OK;
 }
@@ -929,7 +1022,7 @@ object_depot_destroy(object_depot *depot)
 		benaphore_destroy(&depot->stores[i].lock);
 	}
 
-	delete [] depot->stores;
+	internal_free(depot->stores);
 
 	benaphore_destroy(&depot->lock);
 }
@@ -1030,44 +1123,83 @@ object_depot_make_empty(object_depot *depot)
 static int
 dump_slabs(int argc, char *argv[])
 {
-	kprintf("%10s %32s %8s %8s %6s %8s %6s\n", "address", "name", "objsize", "usage",
-		"empty", "usedobj", "flags");
+	kprintf("%10s %22s %8s %8s %6s %8s %8s %8s\n", "address", "name",
+		"objsize", "usage", "empty", "usedobj", "total", "flags");
 
 	ObjectCacheList::Iterator it = sObjectCaches.GetIterator();
 
 	while (it.HasNext()) {
 		object_cache *cache = it.Next();
 
-		kprintf("%p %32s %8lu %8lu %6lu %8lu %6lx\n", cache, cache->name,
+		kprintf("%p %22s %8lu %8lu %6lu %8lu %8lu %8lx\n", cache, cache->name,
 			cache->object_size, cache->usage, cache->empty_count,
-			cache->used_count, cache->flags);
+			cache->used_count, cache->usage / cache->object_size,
+			cache->flags);
 	}
 
 	return 0;
 }
 
 
-status_t
-slab_init()
+static int
+dump_cache_info(int argc, char *argv[])
+{
+	if (argc < 2) {
+		kprintf("usage: cache_info [address]\n");
+		return 0;
+	}
+
+	object_cache *cache = (object_cache *)strtoul(argv[1], NULL, 16);
+
+	kprintf("name: %s\n", cache->name);
+	kprintf("lock: { count: %i, sem: %ld }\n", cache->lock.count,
+		cache->lock.sem);
+	kprintf("object_size: %lu\n", cache->object_size);
+	kprintf("cache_color_cycle: %lu\n", cache->cache_color_cycle);
+	kprintf("used_count: %lu\n", cache->used_count);
+	kprintf("empty_count: %lu\n", cache->empty_count);
+	kprintf("pressure: %lu\n", cache->pressure);
+	kprintf("slab_size: %lu\n", cache->slab_size);
+	kprintf("usage: %lu\n", cache->usage);
+	kprintf("maximum: %lu\n", cache->maximum);
+	kprintf("flags: 0x%lx\n", cache->flags);
+	kprintf("cookie: %p\n", cache->cookie);
+
+	return 0;
+}
+
+
+void
+slab_init(addr_t initialBase, size_t initialSize)
+{
+	sInitialBegin = (uint8 *)initialBase;
+	sInitialLimit = sInitialBegin + initialSize;
+	sInitialPointer = sInitialBegin;
+
+	new (&sObjectCaches) ObjectCacheList();
+
+	block_allocator_init_boot();
+
+	add_debugger_command("slabs", dump_slabs, "list all object caches");
+	add_debugger_command("cache_info", dump_cache_info,
+		"dump information about a specific cache");
+}
+
+
+void
+slab_init_post_sem()
 {
 	status_t status = benaphore_init(&sObjectCacheListLock, "object cache list");
 	if (status < B_OK)
 		panic("slab_init: failed to create object cache list lock");
 
-	new (&sObjectCaches) ObjectCacheList();
+	ObjectCacheList::Iterator it = sObjectCaches.GetIterator();
 
-	sSlabCache = create_object_cache("slab cache", sizeof(slab), 4, NULL, NULL,
-		NULL);
-	if (sSlabCache == NULL)
-		panic("slab_init: failed to create slab cache");
+	while (it.HasNext()) {
+		if (object_cache_init_locks(it.Next()) < B_OK)
+			panic("slab_init: failed to create sems");
+	}
 
-	sLinkCache = create_object_cache("link cache",
-		sizeof(HashedObjectCache::Link), 4, NULL, NULL, NULL);
-	if (sLinkCache == NULL)
-		panic("slab_init: failed to create link cache");
-
-	add_debugger_command("slabs", dump_slabs, "list all object caches");
-
-	return B_OK;
+	block_allocator_init_rest();
 }
 

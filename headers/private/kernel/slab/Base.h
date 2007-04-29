@@ -16,14 +16,15 @@
 extern "C" {
 #endif
 
-/* create_object_cache_etc flags */
 enum {
+	/* create_object_cache_etc flags */
 	CACHE_NO_DEPOT			= 1 << 0,
-};
 
-/* object_cache_alloc flags */
-enum {
-	CACHE_DONT_SLEEP		= 1 << 0,
+	/* object_cache_alloc flags */
+	CACHE_DONT_SLEEP		= 1 << 8,
+
+	/* internal */
+	CACHE_DURING_BOOT		= 1 << 31
 };
 
 typedef struct object_cache object_cache;

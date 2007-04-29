@@ -26,7 +26,7 @@ typedef struct object_depot {
 } object_depot;
 
 
-status_t object_depot_init(object_depot *depot,
+status_t object_depot_init(object_depot *depot, uint32 flags,
 	void (*return_object)(object_depot *, void *));
 void object_depot_destroy(object_depot *depot);
 

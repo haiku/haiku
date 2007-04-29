@@ -137,8 +137,6 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		generic_syscall_init();
 		TRACE("init cbuf\n");
 		cbuf_init();
-		TRACE("init slab\n");
-		slab_init();
 		TRACE("init teams\n");
 		team_init(&sKernelArgs);
 		TRACE("init threads\n");

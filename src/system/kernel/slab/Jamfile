@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src system kernel slab ;
 UsePrivateHeaders [ FDirName kernel slab ] ;
 
 KernelMergeObject kernel_slab.o :
+	allocator.cpp
 	Slab.cpp
 
 	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused

@@ -2891,6 +2891,11 @@ vm_init(kernel_args *args)
 	TRACE(("heap at 0x%lx\n", heapBase));
 	heap_init(heapBase, heapSize);
 
+	size_t slabInitialSize = 2 * B_PAGE_SIZE;
+	addr_t slabInitialBase = vm_allocate_early(args, slabInitialSize,
+		slabInitialSize, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	slab_init(slabInitialBase, slabInitialSize);
+
 	// initialize the free page list and physical page mapper
 	vm_page_init(args);
 
@@ -2918,6 +2923,11 @@ vm_init(kernel_args *args)
 	address = (void *)ROUNDOWN(heapBase, B_PAGE_SIZE);
 	create_area("kernel heap", &address, B_EXACT_ADDRESS, heapSize,
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+
+	address = (void *)ROUNDOWN(slabInitialBase, B_PAGE_SIZE);
+	create_area("initial slab space", &address, B_EXACT_ADDRESS,
+		slabInitialSize, B_ALREADY_WIRED, B_KERNEL_READ_AREA
+		| B_KERNEL_WRITE_AREA);
 
 	allocate_kernel_args(args);
 
@@ -2984,6 +2994,8 @@ vm_init_post_sem(kernel_args *args)
 	}
 
 	sAreaHashLock = create_sem(WRITE_COUNT, "area hash");
+
+	slab_init_post_sem();
 
 	return heap_init_post_sem(args);
 }
