@@ -219,8 +219,31 @@ mouse_handle_int(ps2_dev *dev)
 	const uint8 data = dev->history[0].data;
 		
 	if (cookie->packet_index == 0 && !(data & 8)) {
-		TRACE("ps2: bad mouse data, trying resync\n");
+		INFO("ps2: bad mouse data, trying resync\n");
 		return B_HANDLED_INTERRUPT;
+	}
+
+	// Workarounds for active multiplexing keyboard controllers
+	// that lose data or send them to the wrong port.
+	if (cookie->packet_index == 0 && (data & 0xc0)) {
+		INFO("ps2: strange mouse data, x/y overflow, trying resync\n");
+		return B_HANDLED_INTERRUPT;
+	}
+	if (cookie->packet_index == 1) {
+		int xDelta = ((cookie->packet_buffer[0] & 0x10) ? 0xFFFFFF00 : 0) | data;
+		if (xDelta < -100 || xDelta > 100) {
+			INFO("ps2: strange mouse data, x-delta %d, trying resync\n", xDelta);
+			cookie->packet_index = 0;
+			return B_HANDLED_INTERRUPT;
+		}
+	}
+	if (cookie->packet_index == 2) {
+		int yDelta = ((cookie->packet_buffer[0] & 0x20) ? 0xFFFFFF00 : 0) | data;
+		if (yDelta < -100 || yDelta > 100) {
+			INFO("ps2: strange mouse data, y-delta %d, trying resync\n", yDelta);
+			cookie->packet_index = 0;
+			return B_HANDLED_INTERRUPT;
+		}
 	}
 
 	cookie->packet_buffer[cookie->packet_index++] = data;
