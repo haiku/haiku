@@ -5,17 +5,15 @@
  * Authors:
  *      Hugo Santos, hugosantos@gmail.com
  */
-
-
 #ifndef _SLAB_PRIVATE_H_
 #define _SLAB_PRIVATE_H_
 
-extern "C" {
-	void *block_alloc(size_t size);
-	void block_free(void *block);
-	void block_allocator_init_boot();
-	void block_allocator_init_rest();
-}
+#include <stddef.h>
+
+void *block_alloc(size_t size);
+void block_free(void *block);
+void block_allocator_init_boot();
+void block_allocator_init_rest();
 
 #endif
 

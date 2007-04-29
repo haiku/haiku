@@ -1152,7 +1152,7 @@ dump_cache_info(int argc, char *argv[])
 	object_cache *cache = (object_cache *)strtoul(argv[1], NULL, 16);
 
 	kprintf("name: %s\n", cache->name);
-	kprintf("lock: { count: %i, sem: %ld }\n", cache->lock.count,
+	kprintf("lock: { count: %ld, sem: %ld }\n", cache->lock.count,
 		cache->lock.sem);
 	kprintf("object_size: %lu\n", cache->object_size);
 	kprintf("cache_color_cycle: %lu\n", cache->cache_color_cycle);

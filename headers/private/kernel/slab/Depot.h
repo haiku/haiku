@@ -5,7 +5,6 @@
  * Authors:
  *      Hugo Santos, hugosantos@gmail.com
  */
-
 #ifndef _SLAB_DEPOT_H_
 #define _SLAB_DEPOT_H_
 
