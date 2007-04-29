@@ -717,7 +717,7 @@ debug_init_post_vm(kernel_args *args)
 		sSerialDebugEnabled = get_driver_boolean_parameter(handle,
 			"serial_debug_output", true, true);
 		sSyslogOutputEnabled = get_driver_boolean_parameter(handle,
-			"syslog_debug_output", false, false);
+			"syslog_debug_output", true, true);
 		sBlueScreenOutput = get_driver_boolean_parameter(handle,
 			"bluescreen", true, true);
 
