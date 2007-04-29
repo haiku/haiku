@@ -72,11 +72,13 @@ InodeAllocator::New(block_run *parentRun, mode_t mode, block_run &run, Inode **_
 	if (fInode == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 
-	status = new_vnode(volume->ID(), fInode->ID(), fInode);
-	if (status < B_OK) {
-		delete fInode;
-		fInode = NULL;
-		RETURN_ERROR(status);
+	if (volume->ID() >= 0) {
+		status = new_vnode(volume->ID(), fInode->ID(), fInode);
+		if (status < B_OK) {
+			delete fInode;
+			fInode = NULL;
+			RETURN_ERROR(status);
+		}
 	}
 
 	*_inode = fInode;
@@ -118,7 +120,7 @@ InodeAllocator::Keep()
 		return status;
 	}
 
-	if (!fInode->IsSymLink())
+	if (!fInode->IsSymLink() && volume->ID() >= 0)
 		status = publish_vnode(volume->ID(), fInode->ID(), fInode);
 
 	fTransaction = NULL;

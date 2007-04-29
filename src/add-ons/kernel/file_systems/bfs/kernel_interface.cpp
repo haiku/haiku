@@ -2010,6 +2010,131 @@ bfs_rewind_query(void */*fs*/, void *cookie)
 //	#pragma mark -
 
 
+bool
+bfs_supports_initializing(partition_data *partition)
+{
+	// TODO: We should at least check the partition size.
+	return true;
+}
+
+
+bool
+bfs_validate_initialize(partition_data *partition, char *name,
+	const char *parameters)
+{
+	// TODO: Actual checks.
+	return true;
+}
+
+
+status_t
+bfs_initialize(const char *partition, const char *name, const char *parameters,
+	disk_job_id job)
+{
+	if (partition == NULL)
+		return B_BAD_VALUE;
+
+// TODO: Handle parameters!
+//	char **argv = (char**)parms;
+	
+	uint32 blockSize = 1024;
+	uint32 flags = 0;
+	bool verbose = false;
+
+#if 0
+	while (argv && *++argv) {
+		char *arg = *argv;
+		if (*arg == '-') {
+			if (arg[1] == '-') {
+				if (!strcmp(arg, "--noindex"))
+					flags |= VOLUME_NO_INDICES;
+				else
+					return B_BAD_VALUE;
+			}
+
+			while (*++arg && *arg >= 'a' && *arg <= 'z') {
+				switch (*arg) {
+					case 'v':
+						verbose = true;
+						break;
+					case 'b':
+						if (*++argv == NULL || !(**argv >= '0' && **argv <= '9'))
+							return B_BAD_VALUE;
+
+						blockSize = atol(*argv);
+						break;
+					case 'n':
+						flags |= VOLUME_NO_INDICES;
+						break;
+				}
+			}
+		}
+		else
+			break;
+	}
+#endif	// 0
+
+	if (blockSize != 1024 && blockSize != 2048 && blockSize != 4096 && blockSize != 8192) {
+		FATAL(("valid block sizes are: 1024, 2048, 4096, and 8192\n"));
+		return -1;
+	}
+
+	Volume volume(-1);
+	status_t status = volume.Initialize(partition, name, blockSize, flags);
+	if (status < B_OK) {
+		FATAL(("Initializing volume failed: %s\n", strerror(status)));
+		return -1;
+	}
+
+	if (verbose) {
+		disk_super_block super = volume.SuperBlock();
+
+		INFORM(("Disk was initialized successfully.\n"));
+		INFORM(("\tname: \"%s\"\n", super.name));
+		INFORM(("\tnum blocks: %Ld\n", super.NumBlocks()));
+		INFORM(("\tused blocks: %Ld\n", super.UsedBlocks()));
+		INFORM(("\tblock size: %u bytes\n", (unsigned)super.BlockSize()));
+		INFORM(("\tnum allocation groups: %d\n",
+			(int)super.AllocationGroups()));
+		INFORM(("\tallocation group size: %ld blocks\n",
+			1L << super.AllocationGroupShift()));
+		INFORM(("\tlog size: %u blocks\n", super.log_blocks.Length()));
+	}
+
+	// make the disk image bootable
+
+// TODO: Check whether this is necessary. Actually makebootable should do the
+// trick anyway.
+#if 0
+	int device = open(partition, O_RDWR);
+	if (device < 0) {
+		FATAL(("Could not make image bootable: Failed to open \"%s\"\n",
+			partition));
+		return B_FILE_ERROR;
+	}
+
+	// change BIOS drive and partition offset
+	// TODO: for now, this will only work for images only
+
+	sBootBlockData1[kBIOSDriveOffset] = 0x80;
+		// for now, this should be replaced by the real thing
+	uint32 *offset = (uint32 *)&sBootBlockData1[kPartitionDataOffset];
+	*offset = 0;
+
+	write_pos(device, 0, sBootBlockData1, kBootBlockData1Size);
+	write_pos(device, kBootBlockData2Offset, sBootBlockData2,
+		kBootBlockData2Size);
+
+	close(device);
+#endif	// 0
+
+	return B_OK;
+}
+
+
+//	#pragma mark -
+
+
 static status_t
 bfs_std_ops(int32 op, ...)
 {
@@ -2137,6 +2262,33 @@ static file_system_module_info sBeFileSystem = {
 	&bfs_free_query_cookie,
 	&bfs_read_query,
 	&bfs_rewind_query,
+
+	/* capability querying operations */
+	NULL,	// supports_defragmenting
+	NULL,	// supports_repairing
+	NULL,	// supports_resizing
+	NULL,	// supports_moving
+	NULL,	// supports_setting_content_name
+	NULL,	// supports_setting_content_parameters
+	&bfs_supports_initializing,
+
+	NULL,	// validate_resize
+	NULL,	// validate_move
+	NULL,	// validate_set_content_name
+	NULL,	// validate_set_content_parameters
+	&bfs_validate_initialize,
+
+	/* shadow partition modification */
+	NULL,	// shadow_changed
+
+	/* writing */
+	NULL,	// defragment
+	NULL,	// repair
+	NULL,	// resize
+	NULL,	// move
+	NULL,	// set_content_name
+	NULL,	// set_content_parameters
+	bfs_initialize,
 };
 
 module_info *modules[] = {

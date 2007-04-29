@@ -562,12 +562,10 @@ Volume::Identify(int fd, disk_super_block *superBlock)
 	return B_OK;
 }
 
-#ifdef USER
-//extern "C" void kill_device_vnodes(dev_t id);
-	// This call is only available in the userland fs_shell
 
 status_t
-Volume::Initialize(const char *device, const char *name, uint32 blockSize, uint32 flags)
+Volume::Initialize(const char *device, const char *name, uint32 blockSize,
+	uint32 flags)
 {
 	// although there is no really good reason for it, we won't
 	// accept '/' in disk names (mkbfs does this, too - and since
@@ -657,15 +655,11 @@ Volume::Initialize(const char *device, const char *name, uint32 blockSize, uint3
 	WriteSuperBlock();
 	transaction.Done();
 
-	put_vnode(ID(), fRootNode->ID());
-	if (fIndicesNode != NULL)
-		put_vnode(ID(), fIndicesNode->ID());
-
-//	kill_device_vnodes(ID());
-		// This call is only available in the userland fs_shell
+// 	put_vnode(ID(), fRootNode->ID());
+// 	if (fIndicesNode != NULL)
+// 		put_vnode(ID(), fIndicesNode->ID());
 
 	Sync();
 	opener.RemoveCache(true);
 	return B_OK;
 }
-#endif

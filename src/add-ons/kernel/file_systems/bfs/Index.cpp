@@ -33,7 +33,8 @@ Index::~Index()
 	if (fNode == NULL)
 		return;
 
-	put_vnode(fVolume->ID(), fNode->ID());
+	if (fVolume->ID() >= 0)
+		put_vnode(fVolume->ID(), fNode->ID());
 }
 
 
@@ -43,7 +44,8 @@ Index::Unset()
 	if (fNode == NULL)
 		return;
 
-	put_vnode(fVolume->ID(), fNode->ID());
+	if (fVolume->ID() >= 0)
+		put_vnode(fVolume->ID(), fNode->ID());
 	fNode = NULL;
 	fName = NULL;
 }
