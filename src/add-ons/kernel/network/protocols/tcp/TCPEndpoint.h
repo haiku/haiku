@@ -79,6 +79,8 @@ class TCPEndpoint : public net_protocol, public ProtocolSocket {
 		int32 Spawn(TCPEndpoint *parent, tcp_segment_header& segment,
 			net_buffer *buffer);
 
+		void DumpInternalState() const;
+
 	private:
 		friend class EndpointManager;
 

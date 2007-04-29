@@ -415,3 +415,26 @@ EndpointManager::ReplyWithReset(tcp_segment_header &segment,
 	return status;
 }
 
+
+void
+EndpointManager::DumpEndpoints() const
+{
+	kprintf("-------- TCP Domain %p ---------\n", this);
+	kprintf("%10s %20s %20s %8s %8s %12s\n", "address", "local", "peer",
+		"recv-q", "send-q", "state");
+
+	ConnectionTable::Iterator it = fConnectionHash.GetIterator();
+
+	while (it.HasNext()) {
+		TCPEndpoint *endpoint = it.Next();
+
+		char localBuf[64], peerBuf[64];
+		endpoint->LocalAddress().AsString(localBuf, sizeof(localBuf), true);
+		endpoint->PeerAddress().AsString(peerBuf, sizeof(peerBuf), true);
+
+		kprintf("%p %20s %20s %8lu %8lu %12s\n", endpoint, localBuf, peerBuf,
+			endpoint->fReceiveQueue.Available(), endpoint->fSendQueue.Used(),
+			name_for_state(endpoint->State()));
+	}
+}
+

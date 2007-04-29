@@ -851,6 +851,42 @@ TCPEndpoint::Spawn(TCPEndpoint *parent, tcp_segment_header &segment,
 }
 
 
+void
+TCPEndpoint::DumpInternalState() const
+{
+	kprintf("Lock: { sem: %ld, holder: %ld, recursion: %i }\n",
+		fLock.sem, fLock.holder, fLock.recursion);
+	kprintf("AcceptSem: %ld\n", fAcceptSemaphore);
+	kprintf("Options: 0x%lx\n", (uint32)fOptions);
+	kprintf("SendWindowShift: %lu\n", (uint32)fSendWindowShift);
+	kprintf("ReceiveWindowShift: %lu\n", (uint32)fReceiveWindowShift);
+	kprintf("SendUnacknowledged: %lu\n", (uint32)fSendUnacknowledged);
+	kprintf("SendNext: %lu\n", (uint32)fSendNext);
+	kprintf("SendMax: %lu\n", (uint32)fSendMax);
+	kprintf("SendWindow: %lu\n", fSendWindow);
+	kprintf("SendMaxWindow: %lu\n", fSendMaxWindow);
+	kprintf("SendMaxSegmentSize: %lu\n", fSendMaxSegmentSize);
+	kprintf("Send-Q: %lu / %lu\n", fSendQueue.Used(), fSendQueue.Size());
+	kprintf("LastAcknowledgeSent: %lu\n", (uint32)fLastAcknowledgeSent);
+	kprintf("InitialSendSequence: %lu\n", (uint32)fInitialSendSequence);
+	kprintf("DuplicateAcknowledgeCount: %lu\n", fDuplicateAcknowledgeCount);
+	kprintf("ReceiveNext: %lu\n", (uint32)fReceiveNext);
+	kprintf("ReceiveMaxAdvertised: %lu\n", (uint32)fReceiveMaxAdvertised);
+	kprintf("ReceiveWindow: %lu\n", (uint32)fReceiveWindow);
+	kprintf("ReceiveMaxSegmentSize: %lu\n", (uint32)fReceiveMaxSegmentSize);
+	kprintf("Recv-Q: %lu / %lu\n", fReceiveQueue.Available(),
+		fReceiveQueue.Size());
+	kprintf("InitialReceiveSequence: %lu\n", (uint32)fInitialReceiveSequence);
+	kprintf("RoundTripTime: %ld (dev %ld)\n", fRoundTripTime,
+		fRoundTripDeviation);
+	kprintf("RetransmitTimeout: %llu\n", (uint64)fRetransmitTimeout);
+	kprintf("CongestionWindow: %lu\n", fCongestionWindow);
+	kprintf("SlowStartThreshold: %lu\n", fSlowStartThreshold);
+	kprintf("State: %s\n", name_for_state(fState));
+	kprintf("Flags: 0x%lx\n", fFlags);
+}
+
+
 int32
 TCPEndpoint::_SynchronizeSentReceive(tcp_segment_header &segment, net_buffer *buffer)
 {

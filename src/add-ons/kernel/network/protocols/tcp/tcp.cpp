@@ -661,6 +661,33 @@ tcp_error_reply(net_protocol *protocol, net_buffer *causedError, uint32 code,
 }
 
 
+static int
+dump_endpoints(int argc, char *argv[])
+{
+	EndpointManagerList::Iterator it = sEndpointManagers.GetIterator();
+
+	while (it.HasNext())
+		it.Next()->DumpEndpoints();
+
+	return 0;
+}
+
+
+static int
+dump_endpoint(int argc, char *argv[])
+{
+	if (argc < 2) {
+		kprintf("usage: tcp_endpoint [address]\n");
+		return 0;
+	}
+
+	TCPEndpoint *endpoint = (TCPEndpoint *)strtoul(argv[1], NULL, 16);
+	endpoint->DumpInternalState();
+
+	return 0;
+}
+
+
 //	#pragma mark -
 
 
@@ -692,6 +719,11 @@ tcp_init()
 	if (status < B_OK)
 		return status;
 
+	add_debugger_command("tcp_endpoints", dump_endpoints,
+		"lists all open TCP endpoints");
+	add_debugger_command("tcp_endpoint", dump_endpoint,
+		"dumps a TCP endpoint internal state");
+
 	return B_OK;
 }
 
@@ -699,6 +731,8 @@ tcp_init()
 static status_t
 tcp_uninit()
 {
+	remove_debugger_command("tcp_endpoint", dump_endpoint);
+	remove_debugger_command("tcp_endpoints", dump_endpoints);
 	recursive_lock_destroy(&sEndpointManagersLock);
 	return B_OK;
 }

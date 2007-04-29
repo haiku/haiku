@@ -77,6 +77,8 @@ class EndpointManager : public DoublyLinkedListLinkImpl<EndpointManager> {
 		status_t ReplyWithReset(tcp_segment_header &segment,
 			net_buffer *buffer);
 
+		void DumpEndpoints() const;
+
 		net_domain *Domain() const { return fDomain; }
 		net_address_module_info *AddressModule() const
 			{ return Domain()->address_module; }
