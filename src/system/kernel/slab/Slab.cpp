@@ -33,7 +33,7 @@
 // TODO kMagazineCapacity should be dynamically tuned per cache.
 
 
-#define TRACE_SLAB
+//#define TRACE_SLAB
 
 #ifdef TRACE_SLAB
 #define TRACE_CACHE(cache, format, args...) \
