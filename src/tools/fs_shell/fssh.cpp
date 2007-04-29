@@ -1114,10 +1114,17 @@ standard_session(const char* device, const char* fsName, bool interactive)
 
 static int
 initialization_session(const char* device, const char* fsName,
-	const char* initParameters)
+	const char* volumeName, const char* initParameters)
 {
-	fprintf(stderr, "initialization not implemented yet\n");
-	return 1;
+	fssh_status_t error = _kern_initialize_volume(fsName, device,
+		volumeName, initParameters);
+	if (error != FSSH_B_OK) {
+		fprintf(stderr, "Error: Initializing volume failed: %s\n",
+			fssh_strerror(error));
+		return 1;
+	}
+
+	return 0;
 }
 
 
@@ -1126,7 +1133,8 @@ print_usage(bool error)
 {
 	fprintf((error ? stderr : stdout),
 		"Usage: %s [-n] <device>\n"
-		"       %s --initialize [-n] <device> [ <init parameters> ]\n",
+		"       %s --initialize [-n] <device> <volume name> "
+			"[ <init parameters> ]\n",
 		sArgv[0], sArgv[0]
 	);
 }
@@ -1156,6 +1164,7 @@ main(int argc, const char* const* argv)
 	bool interactive = true;
 	bool initialize = false;
 	const char* device = NULL;
+	const char* volumeName = NULL;
 	const char* initParameters = NULL;
 
 	// eat options
@@ -1178,11 +1187,19 @@ main(int argc, const char* const* argv)
 		print_usage_and_exit(true);
 	device = argv[argi++];
 
-	// get init parameters
-	if (initialize && argi < argc)
-		initParameters = argv[argi++];
+	// get volume name and init parameters
+	if (initialize) {
+		// volume name
+		if (argi >= argc)
+			print_usage_and_exit(true);
+		volumeName = argv[argi++];
 
-	// if more parameters are excess
+		// (optional) init paramaters
+		if (argi < argc)
+			initParameters = argv[argi++];
+	}
+
+	// more parameters are excess
 	if (argi < argc)
 		print_usage_and_exit(true);
 
@@ -1205,9 +1222,10 @@ main(int argc, const char* const* argv)
 
 	// start the action
 	int result;
-	if (initialize)
-		result = initialization_session(device, fsName, initParameters);
-	else
+	if (initialize) {
+		result = initialization_session(device, fsName, volumeName,
+			initParameters);
+	} else
 		result = standard_session(device, fsName, interactive);
 
 	return result;

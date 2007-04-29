@@ -67,6 +67,10 @@ fssh_status_t	_kern_remove_index(fssh_dev_t device, const char *name);
 fssh_status_t	_kern_getcwd(char *buffer, fssh_size_t size);
 fssh_status_t	_kern_setcwd(int fd, const char *path);
 
+fssh_status_t	_kern_initialize_volume(const char* fileSystem,
+					const char *partition, const char *name,
+					const char *parameters);
+
 // defined in fd.cpp
 fssh_ssize_t	_kern_read(int fd, fssh_off_t pos, void *buffer,
 					fssh_size_t length);

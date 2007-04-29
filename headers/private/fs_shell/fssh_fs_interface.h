@@ -7,6 +7,7 @@
 #define _FSSH_FS_INTERFACE_H
 
 
+#include "fssh_disk_device_defs.h"
 #include "fssh_module.h"
 #include "fssh_os.h"
 
@@ -236,6 +237,52 @@ typedef struct fssh_file_system_module_info {
 				struct fssh_dirent *buffer, fssh_size_t bufferSize,
 				uint32_t *_num);
 	fssh_status_t (*rewind_query)(fssh_fs_volume fs, fssh_fs_cookie cookie);
+
+	/* capability querying (the device is read locked) */
+	// ToDo: this will probably be combined to a single call
+	bool (*supports_defragmenting)(fssh_partition_data *partition,
+				bool *whileMounted);
+	bool (*supports_repairing)(fssh_partition_data *partition,
+				bool checkOnly, bool *whileMounted);
+	bool (*supports_resizing)(fssh_partition_data *partition,
+				bool *whileMounted);
+	bool (*supports_moving)(fssh_partition_data *partition, bool *isNoOp);
+	bool (*supports_setting_content_name)(fssh_partition_data *partition,
+				bool *whileMounted);
+	bool (*supports_setting_content_parameters)(fssh_partition_data *partition, 
+				bool *whileMounted);
+	bool (*supports_initializing)(fssh_partition_data *partition);
+
+	bool (*validate_resize)(fssh_partition_data *partition, fssh_off_t *size);
+	bool (*validate_move)(fssh_partition_data *partition, fssh_off_t *start);
+	bool (*validate_set_content_name)(fssh_partition_data *partition,
+				char *name);
+	bool (*validate_set_content_parameters)(fssh_partition_data *partition,
+				const char *parameters);
+	bool (*validate_initialize)(fssh_partition_data *partition, char *name,
+				const char *parameters);
+
+	/* shadow partition modification (device is write locked) */
+	fssh_status_t (*shadow_changed)(fssh_partition_data *partition,
+				uint32_t operation);
+
+	/* writing (the device is NOT locked) */
+	fssh_status_t (*defragment)(int fd, fssh_partition_id partition,
+				fssh_disk_job_id job);
+	fssh_status_t (*repair)(int fd, fssh_partition_id partition, bool checkOnly,
+				fssh_disk_job_id job);
+	fssh_status_t (*resize)(int fd, fssh_partition_id partition,
+				fssh_off_t size, fssh_disk_job_id job);
+	fssh_status_t (*move)(int fd, fssh_partition_id partition,
+				fssh_off_t offset, fssh_disk_job_id job);
+	fssh_status_t (*set_content_name)(int fd, fssh_partition_id partition,
+				const char *name, fssh_disk_job_id job);
+	fssh_status_t (*set_content_parameters)(int fd, fssh_partition_id partition,
+				const char *parameters, fssh_disk_job_id job);
+	fssh_status_t (*initialize)(const char *partition, const char *name,
+				const char *parameters, fssh_disk_job_id job);
+		// This is pretty close to how the hook in R5 looked. Save the job ID,
+		// of course and that the parameters were given as (void*, size_t) pair.
 } fssh_file_system_module_info;
 
 

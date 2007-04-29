@@ -5169,3 +5169,41 @@ _kern_setcwd(int fd, const char *path)
 	return set_cwd(fd, path != NULL ? pathBuffer.LockBuffer() : NULL, true);
 }
 
+
+fssh_status_t
+_kern_initialize_volume(const char* fsName, const char *partition,
+	const char *name, const char *parameters)
+{
+	if (!fsName || ! partition)
+		return FSSH_B_BAD_VALUE;
+
+	// The partition argument should point to a real file/device.
+
+	// normalize the device path
+	KPath normalizedDevice;
+//	status = normalizedDevice.SetTo(device, true);
+// NOTE: normalizing works only in our namespace.
+	fssh_status_t status = normalizedDevice.SetTo(partition, false);
+	if (status != FSSH_B_OK)
+		return status;
+
+	partition = normalizedDevice.Path();
+		// correct path to file device
+
+	// get the file system module
+	fssh_file_system_module_info* fsModule = get_file_system(fsName);
+	if (fsModule == NULL)
+		return FSSH_ENODEV;
+
+	// initialize
+	if (fsModule->initialize) 
+		status = (*fsModule->initialize)(partition, name, parameters, -1);
+	else
+		status = FSSH_B_NOT_SUPPORTED;
+
+	// put the file system module
+	put_file_system(fsModule);
+
+	return status;
+}
+
