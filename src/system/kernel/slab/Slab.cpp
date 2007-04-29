@@ -158,6 +158,8 @@ static benaphore sObjectCacheListLock;
 static uint8 *sInitialBegin, *sInitialLimit, *sInitialPointer;
 
 
+static status_t object_cache_reserve_internal(object_cache *cache,
+	size_t object_count, uint32 flags);
 static status_t object_depot_init_locks(object_depot *depot);
 static depot_magazine *alloc_magazine();
 static void free_magazine(depot_magazine *magazine);
@@ -558,16 +560,14 @@ object_cache_alloc(object_cache *cache, uint32 flags)
 
 	if (cache->partial.IsEmpty()) {
 		if (cache->empty.IsEmpty()) {
-			source = cache->CreateSlab(flags);
-			if (source == NULL)
+			if (object_cache_reserve_internal(cache, 1, flags) < B_OK)
 				return NULL;
 
 			cache->pressure++;
-		} else {
-			source = cache->empty.RemoveHead();
-			cache->empty_count--;
 		}
 
+		source = cache->empty.RemoveHead();
+		cache->empty_count--;
 		cache->partial.Add(source);
 	} else {
 		source = cache->partial.Head();
@@ -632,6 +632,38 @@ object_cache_free(object_cache *cache, void *object)
 
 	BenaphoreLocker _(cache->lock);
 	object_cache_return_to_slab(cache, cache->ObjectSlab(object), object);
+}
+
+
+static status_t
+object_cache_reserve_internal(object_cache *cache, size_t object_count,
+	uint32 flags)
+{
+	size_t numBytes = object_count * cache->object_size;
+	size_t slabCount = ((numBytes - 1) / cache->slab_size) + 1;
+
+	while (slabCount > 0) {
+		slab *newSlab = cache->CreateSlab(flags);
+		if (newSlab == NULL)
+			return B_NO_MEMORY;
+
+		cache->empty.Add(newSlab);
+		cache->empty_count++;
+		slabCount--;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+object_cache_reserve(object_cache *cache, size_t object_count, uint32 flags)
+{
+	if (object_count == 0)
+		return B_OK;
+
+	BenaphoreLocker _(cache->lock);
+	return object_cache_reserve_internal(cache, object_count, flags);
 }
 
 
