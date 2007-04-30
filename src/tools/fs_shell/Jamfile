@@ -1,12 +1,15 @@
 SubDir HAIKU_TOP src tools fs_shell ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) headers build ] : true ;
-UseHeaders [ FDirName $(HAIKU_TOP) headers build os ] : true ;
-#UseHeaders [ FDirName $(HAIKU_TOP) headers build os app ] : true ;
-UseHeaders [ FDirName $(HAIKU_TOP) headers build os kernel ] : true ;
-#UseHeaders [ FDirName $(HAIKU_TOP) headers build os interface ] : true ;
-UseHeaders [ FDirName $(HAIKU_TOP) headers build os storage ] : true ;
-UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
+
+if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os ] : true ;
+	#UseHeaders [ FDirName $(HAIKU_TOP) headers build os app ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os kernel ] : true ;
+	#UseHeaders [ FDirName $(HAIKU_TOP) headers build os interface ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os storage ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
+}
 
 UsePrivateHeaders fs_shell ;
 UsePrivateHeaders shared ;
