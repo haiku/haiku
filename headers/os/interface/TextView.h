@@ -327,6 +327,11 @@ virtual void			_ReservedTextView12();
 									 int32					toOffset,
 									 _BTextChangeResult_	*outResult);
 		
+		void			_DrawLine(BView *view, const int32 &startLine,
+								const int32 &startOffset,
+								const bool &erase,
+								BRect &eraseRect,
+								BRegion &inputRegion);
 		void			DrawLines(int32	startLine, 
 								  int32	endLine, 
 							  	  int32	startOffset = -1, 

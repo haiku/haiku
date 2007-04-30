@@ -1534,7 +1534,7 @@ BTextView::SetRunArray(int32 startOffset, int32 endOffset, const text_run_array 
 
 	CancelInputMethod();
 	
-	int32 textLength = fText->Length();
+	const int32 textLength = fText->Length();
 		
 	// pin offsets at reasonable values
 	if (startOffset < 0)
@@ -1634,15 +1634,13 @@ BPoint
 BTextView::PointAt(int32 inOffset, float *outHeight) const
 {
 	// TODO: Cleanup.
-	
-	BPoint result;
 	const int32 textLength = fText->Length();
 	int32 lineNum = LineAt(inOffset);
 	STELine* line = (*fLines)[lineNum];
 	float height = 0;
 	
-	result.x = 0.0;
-			
+	BPoint result;
+	result.x = 0.0;	
 	result.y = line->origin + fTextRect.top;
 	
 	// Handle the case where there is only one line
@@ -1753,13 +1751,10 @@ BTextView::OffsetAt(BPoint point) const
 	// so when the point is near the right end it's very slow.
 	int32 offset = line->offset;
 	const int32 limit = (line + 1)->offset;
-	
-	int32 saveOffset;
 	float location = 0;
 	do {
-		const int32 nextInitial = NextInitialByte(offset);
-		
-		saveOffset = offset;
+		const int32 nextInitial = NextInitialByte(offset);	
+		const int32 saveOffset = offset;
 		float width = 0;
 		if (ByteAt(offset) == B_TAB)
 			width = ActualTabWidth(location);
@@ -1883,7 +1878,7 @@ BTextView::LineHeight(int32 lineNum) const
 float
 BTextView::TextHeight(int32 startLine, int32 endLine) const
 {
-	int32 numLines = fLines->NumLines();
+	const int32 numLines = fLines->NumLines();
 	if (startLine < 0)
 		startLine = 0;
 	if (endLine > numLines - 1)
@@ -3152,7 +3147,6 @@ BTextView::Refresh(int32 fromOffset, int32 toOffset, bool erase, bool scroll)
 		 newHeight < saveHeight || fromLine < saveFromLine || fAlignment != B_ALIGN_LEFT)
 		drawOffset = (*fLines)[fromLine]->offset;
 	
-	// TODO: Is it ok here ?
 	if (fResizable)
 		AutoResize(false);
 
@@ -3502,7 +3496,7 @@ BTextView::DoInsertText(const char *inText, int32 inLength, int32 inOffset,
 	// Don't do any check, the public methods will have adjusted
 	// eventual bogus values...
 
-	int32 textLength = TextLength();
+	const int32 textLength = TextLength();
 	if (inOffset > textLength)
 		inOffset = textLength;
 
@@ -3523,6 +3517,120 @@ void
 BTextView::DoDeleteText(int32 fromOffset, int32 toOffset, _BTextChangeResult_ *outResult)
 {
 	CALLED();
+}
+
+
+void
+BTextView::_DrawLine(BView *view, const int32 &lineNum, const int32 &startOffset,
+			const bool &erase, BRect &eraseRect, BRegion &inputRegion)
+{
+	STELine *line = (*fLines)[lineNum];
+	float startLeft = fTextRect.left;
+	if (startOffset != -1) {
+		if (ByteAt(startOffset) == B_ENTER) {
+			// StartOffset is a newline
+			startLeft = PointAt(line->offset).x;
+		} else
+			startLeft = PointAt(startOffset).x;	
+	}
+	
+	int32 length = (line + 1)->offset;
+	if (startOffset != -1)
+		length -= startOffset;
+	else
+		length -= line->offset;
+	
+	// DrawString() chokes if you draw a newline
+	if (ByteAt((line + 1)->offset - 1) == B_ENTER)
+		length--;	
+	if (fAlignment != B_ALIGN_LEFT) {
+		// B_ALIGN_RIGHT
+		startLeft = (fTextRect.right - LineWidth(lineNum));
+		if (fAlignment == B_ALIGN_CENTER)
+			startLeft /= 2;
+		startLeft += fTextRect.left;
+	}	
+	view->MovePenTo(startLeft, line->origin + line->ascent + fTextRect.top + 1);
+	if (erase) {
+		eraseRect.top = line->origin + fTextRect.top;
+		eraseRect.bottom = (line + 1)->origin + fTextRect.top;
+		
+		view->FillRect(eraseRect, B_SOLID_LOW);
+	}
+	
+	// do we have any text to draw?
+	if (length > 0) {
+		bool foundTab = false;
+		int32 tabChars = 0;
+		int32 numTabs = 0;
+		int32 offset = startOffset != -1 ? startOffset : line->offset;
+		const BFont *font = NULL;
+		const rgb_color *color = NULL;
+		int32 numBytes;
+		// iterate through each style on this line
+		while ((numBytes = fStyles->Iterate(offset, length, fInline, &font, &color)) != 0) {
+			view->SetFont(font);
+			view->SetHighColor(*color);
+			
+			tabChars = numBytes;
+			do {
+				foundTab = fText->FindChar(B_TAB, offset, &tabChars);
+				if (foundTab) {
+					do {
+						numTabs++;
+						if (ByteAt(offset + tabChars + numTabs) != B_TAB)
+							break;
+					} while ((tabChars + numTabs) < numBytes);
+				}
+				
+				if (inputRegion.CountRects() > 0) {
+					BRegion textRegion;
+					GetTextRegion(offset, offset + length, &textRegion);
+					
+					textRegion.IntersectWith(&inputRegion);
+					view->PushState();	
+						
+					// Highlight in blue the inputted text
+					view->SetHighColor(kBlueInputColor);
+					view->FillRect(textRegion.Frame());
+					
+					// Highlight in red the selected part
+					if (fInline->SelectionLength() > 0) {
+						BRegion selectedRegion;
+						GetTextRegion(fInline->Offset() + fInline->SelectionOffset(),
+									fInline->Offset() + fInline->SelectionOffset() + fInline->SelectionLength(),
+									&selectedRegion);
+						
+						textRegion.IntersectWith(&selectedRegion);
+						
+						view->SetHighColor(kRedInputColor);
+						view->FillRect(textRegion.Frame());										
+					}
+					
+					view->PopState();
+				}
+				
+				int32 returnedBytes = tabChars;
+				view->DrawString(fText->GetString(offset, &returnedBytes), returnedBytes);
+				
+				if (foundTab) {
+					float penPos = PenLocation().x - fTextRect.left;
+					float tabWidth = ActualTabWidth(penPos);
+					if (numTabs > 1)
+						tabWidth += ((numTabs - 1) * fTabWidth);
+						
+					view->MovePenBy(tabWidth, 0.0);
+					tabChars += numTabs;
+				}
+				
+				offset += tabChars;
+				length -= tabChars;
+				numBytes -= tabChars;
+				tabChars = numBytes;
+				numTabs = 0;
+			} while (foundTab && tabChars > 0);
+		}
+	}
 }
 
 
@@ -3569,7 +3677,7 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 		DrawCaret(fSelStart);
 		
 	BRect eraseRect = clipRect;
-	long startEraseLine = startLine;
+	int32 startEraseLine = startLine;
 	STELine* line = (*fLines)[startLine];
 	if (erase && startOffset != -1 && fAlignment == B_ALIGN_LEFT) {
 		// erase only to the right of startOffset
@@ -3591,120 +3699,11 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 		GetTextRegion(fInline->Offset(), fInline->Offset() + fInline->Length(), &inputRegion);
 	
 	//BPoint leftTop(startLeft, line->origin);
-	for (long i = startLine; i <= endLine; i++) {
-		float startLeft = fTextRect.left;
-		if (startOffset != -1) {
-			startLeft = PointAt(startOffset).x;
-			if (ByteAt(startOffset) == B_ENTER) {
-				// StartOffset is a newline
-				startLeft = PointAt((*fLines)[i]->offset).x;
-			}
-		}
-		
-		long length = (line + 1)->offset;
-		if (startOffset != -1)
-			length -= startOffset;
-		else
-			length -= line->offset;
-		
-		// DrawString() chokes if you draw a newline
-		if ((*fText)[(line + 1)->offset - 1] == B_ENTER)
-			length--;	
-
-		if (fAlignment != B_ALIGN_LEFT) {
-			// B_ALIGN_RIGHT
-			startLeft = (fTextRect.right - LineWidth(i));
-			if (fAlignment == B_ALIGN_CENTER)
-				startLeft /= 2;
-			startLeft += fTextRect.left;
-		}
-
-		view->MovePenTo(startLeft, line->origin + line->ascent + fTextRect.top + 1);
-
-		if (erase && i >= startEraseLine) {
-			eraseRect.top = line->origin + fTextRect.top;
-			eraseRect.bottom = (line + 1)->origin + fTextRect.top;
-			
-			view->FillRect(eraseRect, B_SOLID_LOW);
-		}
-		
-		// do we have any text to draw?
-		if (length > 0) {
-			bool foundTab = false;
-			long tabChars = 0;
-			long numTabs = 0;
-			long offset = startOffset != -1 ? startOffset : line->offset;
-			const BFont *font = NULL;
-			const rgb_color *color = NULL;
-			int32 numBytes;
-			// iterate through each style on this line
-			while ((numBytes = fStyles->Iterate(offset, length, fInline, &font, &color)) != 0) {
-				view->SetFont(font);
-				view->SetHighColor(*color);
-				
-				tabChars = numBytes;
-				do {
-					foundTab = fText->FindChar(B_TAB, offset, &tabChars);
-					if (foundTab) {
-						do {
-							numTabs++;
-							if ((*fText)[offset + tabChars + numTabs] != B_TAB)
-								break;
-						} while ((tabChars + numTabs) < numBytes);
-					}
-					
-					if (inputRegion.CountRects() > 0) {
-						BRegion textRegion;
-						GetTextRegion(offset, offset + length, &textRegion);
-						
-						textRegion.IntersectWith(&inputRegion);
-						view->PushState();	
-							
-						// Highlight in blue the inputted text
-						view->SetHighColor(kBlueInputColor);
-						view->FillRect(textRegion.Frame());
-						
-						// Highlight in red the selected part
-						if (fInline->SelectionLength() > 0) {
-							BRegion selectedRegion;
-							GetTextRegion(fInline->Offset() + fInline->SelectionOffset(),
-										fInline->Offset() + fInline->SelectionOffset() + fInline->SelectionLength(),
-										&selectedRegion);
-							
-							textRegion.IntersectWith(&selectedRegion);
-							
-							view->SetHighColor(kRedInputColor);
-							view->FillRect(textRegion.Frame());										
-						}
-						
-						view->PopState();
-					}
-					
-					int32 returnedBytes = tabChars;
-					view->DrawString(fText->GetString(offset, &returnedBytes), returnedBytes);
-					
-					if (foundTab) {
-						float penPos = PenLocation().x - fTextRect.left;
-						float tabWidth = ActualTabWidth(penPos);
-						if (numTabs > 1)
-							tabWidth += ((numTabs - 1) * fTabWidth);
-							
-						view->MovePenBy(tabWidth, 0.0);
-
-						tabChars += numTabs;
-					}
-					
-					offset += tabChars;
-					length -= tabChars;
-					numBytes -= tabChars;
-					tabChars = numBytes;
-					numTabs = 0;
-				} while (foundTab && tabChars > 0);
-			}
-		}
-		line++;
-		// Set this to -1 so the next iteration will use the line offset
+	for (int32 lineNum = startLine; lineNum <= endLine; lineNum++) {
+		const bool eraseThisLine = erase && lineNum >= startEraseLine;
+		_DrawLine(view, lineNum, startOffset, eraseThisLine, eraseRect, inputRegion);
 		startOffset = -1;
+			// Set this to -1 so the next iteration will use the line offset
 	}
 
 	// draw the caret/hilite the selection
