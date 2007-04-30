@@ -11,24 +11,12 @@
 // Manager for devices monitoring
 
 #include <Handler.h>
+#include <Looper.h>
 #include <Locker.h>
 #include <InputServerDevice.h>
 #include <InputServerFilter.h>
 #include <InputServerMethod.h>
 #include "TList.h"
-
-class DeviceManager;
-
-class IAHandler : public BHandler {
-	public:
-		IAHandler(DeviceManager * manager);
-		void MessageReceived(BMessage * msg);
-		status_t AddDirectory(const node_ref * nref, _BDeviceAddOn_ *addon);
-		status_t RemoveDirectory(const node_ref * nref, _BDeviceAddOn_ *addon);
-	private:
-		DeviceManager * fManager;
-		
-};
 
 class DeviceManager : public BLooper {
 	public:
@@ -45,10 +33,15 @@ class DeviceManager : public BLooper {
 		_BDeviceAddOn_ *GetAddOn(int32 index) {
 			return (_BDeviceAddOn_*)fDeviceAddons.ItemAt(index);
 		}
+
+		void MessageReceived(BMessage *msg);
+		
 	private:
+		status_t AddDirectory(const node_ref *nref, _BDeviceAddOn_ *addon);
+		status_t RemoveDirectory(const node_ref *nref, _BDeviceAddOn_ *addon);
+		
 		BList 	fDeviceAddons;
 		BLocker fLock;
-		IAHandler	*fHandler;
 };
 
 #endif // _DEVICE_MANAGER_H
