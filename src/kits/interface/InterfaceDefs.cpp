@@ -503,10 +503,19 @@ get_key_info(key_info *info)
 _IMPEXP_BE void
 get_key_map(key_map **map, char **key_buffer)
 {
+	_get_key_map(map, key_buffer, NULL);
+}
+
+
+_IMPEXP_BE void
+_get_key_map(key_map **map, char **key_buffer, ssize_t *key_buffer_size)
+{
 	BMessage command(IS_GET_KEY_MAP);
 	BMessage reply;
 	ssize_t map_count, key_count;
 	const void *map_array = 0, *key_array = 0;
+	if (key_buffer_size == NULL)
+		key_buffer_size = &key_count;
 	
 	_control_input_server_(&command, &reply);
 	
@@ -515,15 +524,15 @@ get_key_map(key_map **map, char **key_buffer)
 		return;
 	}
 	
-	if (reply.FindData("key_buffer", B_ANY_TYPE, &key_array, &key_count) != B_OK) {
+	if (reply.FindData("key_buffer", B_ANY_TYPE, &key_array, key_buffer_size) != B_OK) {
 		*map = 0; *key_buffer = 0;
 		return;
 	}
 	
 	*map = (key_map *)malloc(map_count);
 	memcpy(*map, map_array, map_count);
-	*key_buffer = (char *)malloc(key_count);
-	memcpy(*key_buffer, key_array, key_count);
+	*key_buffer = (char *)malloc(*key_buffer_size);
+	memcpy(*key_buffer, key_array, *key_buffer_size);
 }
 
 
