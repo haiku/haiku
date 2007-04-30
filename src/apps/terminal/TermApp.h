@@ -62,6 +62,9 @@ class TermApp : public BApplication {
 		void _SwitchTerm();
 		void _ActivateTermWindow(team_id id);
 		bool _IsMinimized(team_id id);
+		void _SanitizeIDs(BMessage* data, uint8* windows, ssize_t length);
+		bool _UpdateIDs(bool set, uint8* windows, ssize_t maxLength,
+			ssize_t* _length);
 		void _UpdateRegistration(bool set);
 		void _UnregisterTerminal();
 		void _RegisterTerminal();

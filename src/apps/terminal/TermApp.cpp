@@ -17,6 +17,7 @@
 #include "TermConst.h"
 
 #include <Alert.h>
+#include <Clipboard.h>
 #include <NodeInfo.h>
 #include <Path.h>
 #include <Roster.h>
@@ -428,6 +429,75 @@ TermApp::_IsMinimized(team_id id)
 }
 
 
+/*!
+	Checks if all teams that have an ID-to-team mapping in the message
+	are still running.
+	The IDs for teams that are gone will be made available again, and
+	their mapping is removed from the message.
+*/
+void
+TermApp::_SanitizeIDs(BMessage* data, uint8* windows, ssize_t length)
+{
+	BList teams;
+	be_roster->GetAppList(TERM_SIGNATURE, &teams);
+
+	for (int32 i = 0; i < length; i++) {
+		if (!windows[i])
+			continue;
+
+		BString id("id-");
+		id << i;
+
+		team_id team;
+		if (data->FindInt32(id.String(), &team) != B_OK)
+			continue;
+
+		if (!teams.HasItem((void*)team)) {
+			windows[i] = false;
+			data->RemoveName(id.String());
+		}
+	}
+}
+
+
+/*!
+	Removes the current fWindowNumber (ID) from the supplied array, or
+	finds a free ID in it, and sets fWindowNumber accordingly.
+*/
+bool
+TermApp::_UpdateIDs(bool set, uint8* windows, ssize_t maxLength,
+	ssize_t* _length)
+{
+	ssize_t length = *_length;
+
+	if (set) {
+		int32 i;
+		for (i = 0; i < length; i++) {
+			if (!windows[i]) {
+				windows[i] = true;
+				fWindowNumber = i + 1;
+				break;
+			}
+		}
+
+		if (i == length) {
+			if (length >= maxLength)
+				return false;
+
+			windows[length] = true;
+			length++;
+			fWindowNumber = length;
+		}
+	} else {
+		// update information and write it back
+		windows[fWindowNumber - 1] = false;
+	}
+
+	*_length = length;
+	return true;
+}
+
+
 void
 TermApp::_UpdateRegistration(bool set)
 {
@@ -436,6 +506,56 @@ TermApp::_UpdateRegistration(bool set)
 	else if (fWindowNumber < 0)
 		return;
 
+#ifdef __HAIKU__
+	// use BClipboard - it supports atomic access in Haiku
+	BClipboard clipboard(TERM_SIGNATURE);
+
+	while (true) {
+		if (!clipboard.Lock())
+			return;
+
+		BMessage* data = clipboard.Data();
+
+		const uint8* windowsData;
+		uint8 windows[512];
+		ssize_t length;
+		if (data->FindData("ids", B_RAW_TYPE,
+				(const void**)&windowsData, &length) != B_OK)
+			length = 0;
+
+		if (length > (ssize_t)sizeof(windows))
+			length = sizeof(windows);
+		if (length > 0)
+			memcpy(windows, windowsData, length);
+
+		_SanitizeIDs(data, windows, length);
+
+		status_t status = B_OK;
+		if (_UpdateIDs(set, windows, sizeof(windows), &length)) {
+			// add/remove our ID-to-team mapping
+			BString id("id-");
+			id << fWindowNumber;
+
+			if (set)
+				data->AddInt32(id.String(), Team());
+			else
+				data->RemoveName(id.String());
+
+			data->RemoveName("ids");
+			//if (data->ReplaceData("ids", B_RAW_TYPE, windows, length) != B_OK)
+			data->AddData("ids", B_RAW_TYPE, windows, length);
+
+			status = clipboard.Commit(true);
+		}
+
+		clipboard.Unlock();
+
+		if (status == B_OK)
+			break;
+	}
+#else	// !__HAIKU__
+	// use a file to store the IDs - unfortunately, locking
+	// doesn't work on BeOS either here
 	int fd = open("/tmp/terminal_ids", O_RDWR | O_CREAT);
 	if (fd < 0)
 		return;
@@ -447,41 +567,21 @@ TermApp::_UpdateRegistration(bool set)
 	lock.l_len = -1;
 	fcntl(fd, F_SETLKW, &lock);
 
-	uint8 windows[256];
+	uint8 windows[512];
 	ssize_t length = read_pos(fd, 0, windows, sizeof(windows));
 	if (length < 0) {
 		close(fd);
 		return;
 	}
+
 	if (length > (ssize_t)sizeof(windows))
 		length = sizeof(windows);
 
-	if (set) {
-		int32 i;
-		for (i = 0; i < length; i++) {
-			if (!windows[i]) {
-				windows[i] = true;
-				fWindowNumber = i + 1;
-				break;
-			}
-		}
-		if (i == length) {
-			if (length >= (ssize_t)sizeof(windows)) {
-				close(fd);
-				return;
-			}
+	if (_UpdateIDs(set, windows, sizeof(windows), &length))
+		write_pos(fd, 0, windows, length);
 
-			windows[length] = true;
-			length++;
-			fWindowNumber = length;
-		}
-	} else {
-		// update information and write it back
-		windows[fWindowNumber - 1] = false;
-	}
-
-	write_pos(fd, 0, windows, length);
 	close(fd);
+#endif	// !__HAIKU__
 }
 
 
