@@ -35,6 +35,7 @@ public:
 private:
 	char *fChars;
 	key_map fKeys;
+	ssize_t fCharsSize;
 };
 
 

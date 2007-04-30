@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons input_server devices keyboard ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders input kernel tracker ;
+UsePrivateHeaders input interface kernel tracker ;
 UseArchHeaders $(TARGET_ARCH) ;
 
 Addon <input>keyboard : 

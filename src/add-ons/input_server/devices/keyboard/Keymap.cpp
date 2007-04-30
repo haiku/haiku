@@ -11,6 +11,9 @@
 
 #include <ByteOrder.h>
 #include <File.h>
+#include <InputServerTypes.h>
+#include <Message.h>
+#include <input_globals.h>
 
 #include <new>
 #include <stdlib.h>
@@ -84,7 +87,7 @@ Keymap::Keymap()
 	fChars(NULL)
 {
 	key_map *keys;
-	get_key_map(&keys, &fChars);
+	_get_key_map(&keys, &fChars, &fCharsSize);
 
 	if (keys) {
 		memcpy(&fKeys, keys, sizeof(key_map));
@@ -175,8 +178,8 @@ Keymap::IsDeadKey(uint32 keyCode, uint32 modifiers)
 		default: offset = fKeys.normal_map[keyCode]; tableMask = B_NORMAL_TABLE; break;
 	}
 
-	if (offset <= 0)
-		return 0;	
+	if (offset <= 0 || offset > fCharsSize)
+		return 0;
 
 	uint32 numBytes = fChars[offset];
 	if (!numBytes)
@@ -241,7 +244,7 @@ Keymap::IsDeadSecondKey(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey)
 		default: offset = fKeys.normal_map[keyCode]; break;
 	}
 
-	if (offset <= 0)
+	if (offset <= 0 || offset > fCharsSize)
 		return false;	
 
 	uint32 numBytes = fChars[offset];
@@ -402,7 +405,7 @@ Keymap::LoadCurrent()
 	free(fChars);
 	fChars = NULL;
 
-	get_key_map(&keys, &fChars);
+	_get_key_map(&keys, &fChars, &fCharsSize);
 	if (!keys) {
 		fprintf(stderr, "error while getting current keymap!\n");
 		return B_ERROR;
