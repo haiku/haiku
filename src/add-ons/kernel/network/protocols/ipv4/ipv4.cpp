@@ -116,17 +116,16 @@ class FragmentPacket {
 		net_timer		fTimer;
 };
 
+
 class MulticastGroup {
 public:
-	typedef MulticastGroupLink<IPv4Multicast> Link;
-
 	MulticastGroup(const in_addr &address);
 
 	status_t Deliver(net_protocol_module_info *module, net_buffer *buffer,
 		bool raw);
 
-	void Add(Link *link);
-	void Remove(Link *link);
+	void Add(IPv4Multicast::GroupState *groupState);
+	void Remove(IPv4Multicast::GroupState *groupState);
 	bool IsEmpty() const { return fLinks.IsEmpty(); }
 
 	struct HashDefinition {
@@ -148,14 +147,15 @@ private:
 	// for g++ 2.95
 	friend class HashDefinition;
 
-	typedef DoublyLinkedListCLink<Link> LinkLink;
-	typedef DoublyLinkedList<Link, LinkLink> Links;
+	typedef DoublyLinkedList<IPv4Multicast::GroupState> Links;
 
 	in_addr fMulticastAddress;
 	Links fLinks;
 
 	HashTableLink<MulticastGroup> fLink;
 };
+
+
 
 class RawSocket : public DoublyLinkedListLinkImpl<RawSocket>, public DatagramSocket<> {
 	public:
@@ -456,26 +456,19 @@ status_t
 MulticastGroup::Deliver(net_protocol_module_info *module, net_buffer *buffer,
 	bool deliverToRaw)
 {
-	if (module->deliver_data == NULL)
-		return B_OK;
-
 	Links::Iterator iterator = fLinks.GetIterator();
 
 	while (iterator.HasNext()) {
-		Link *link = iterator.Next();
+		IPv4Multicast::GroupState *groupState = iterator.Next();
 
-		// we are pretty sure of this cast since multicast filters
-		// are installed with the IPv4 protocol reference
-		ipv4_protocol *protocol = (ipv4_protocol *)link->group->Socket();
-
-		if (deliverToRaw && protocol->raw == NULL)
+		if (deliverToRaw && groupState->Socket()->raw == NULL)
 			continue;
 
-		if (link->group->FilterAccepts(buffer)) {
+		if (groupState->FilterAccepts(buffer)) {
 			// as Multicast filters are installed with an IPv4 protocol
 			// reference, we need to go and find the appropriate instance
 			// related to the 'receiving protocol' with module 'module'.
-			net_protocol *proto = link->group->Socket();
+			net_protocol *proto = groupState->Socket()->socket->first_protocol;
 
 			while (proto && proto->module != module)
 				proto = proto->next;
@@ -490,16 +483,16 @@ MulticastGroup::Deliver(net_protocol_module_info *module, net_buffer *buffer,
 
 
 void
-MulticastGroup::Add(Link *link)
+MulticastGroup::Add(IPv4Multicast::GroupState *groupState)
 {
-	fLinks.Add(link);
+	fLinks.Add(groupState);
 }
 
 
 void
-MulticastGroup::Remove(Link *link)
+MulticastGroup::Remove(IPv4Multicast::GroupState *groupState)
 {
-	fLinks.Remove(link);
+	fLinks.Remove(groupState);
 }
 
 
@@ -700,6 +693,9 @@ static status_t
 deliver_multicast(net_protocol_module_info *module, net_buffer *buffer,
 	bool deliverToRaw)
 {
+	if (module->deliver_data == NULL)
+		return B_OK;
+
 	BenaphoreLocker _(sMulticastGroupsLock);
 
 	MulticastGroup *group = sMulticastGroups->Lookup(
@@ -742,34 +738,34 @@ raw_receive_data(net_buffer *buffer)
 
 
 status_t
-IPv4Multicast::JoinGroup(const in_addr &groupAddr, MulticastGroup::Link *link)
+IPv4Multicast::JoinGroup(GroupState *groupState)
 {
 	BenaphoreLocker _(sMulticastGroupsLock);
 
-	MulticastGroup *group = sMulticastGroups->Lookup(groupAddr);
+	MulticastGroup *group = sMulticastGroups->Lookup(groupState->Address());
 	if (group == NULL) {
-		group = new (std::nothrow) MulticastGroup(groupAddr);
+		group = new (std::nothrow) MulticastGroup(groupState->Address());
 		if (group == NULL)
 			return B_NO_MEMORY;
 
 		sMulticastGroups->Insert(group);
 	}
 
-	group->Add(link);
+	group->Add(groupState);
 	return B_OK;
 }
 
 
 status_t
-IPv4Multicast::LeaveGroup(const in_addr &groupAddr, MulticastGroup::Link *link)
+IPv4Multicast::LeaveGroup(GroupState *groupState)
 {
 	BenaphoreLocker _(sMulticastGroupsLock);
 
-	MulticastGroup *group = sMulticastGroups->Lookup(groupAddr);
+	MulticastGroup *group = sMulticastGroups->Lookup(groupState->Address());
 	if (group == NULL)
 		return ENOENT;
 
-	group->Remove(link);
+	group->Remove(groupState);
 	if (group->IsEmpty()) {
 		sMulticastGroups->Remove(group);
 		delete group;

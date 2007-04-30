@@ -30,10 +30,10 @@
 //
 //	HashTableDefinition(void *parent) {}
 //
-//	size_t HashKey(int key) { return key >> 1; }
-//	size_t Hash(Foo *value) { return HashKey(value->bar); }
-//	bool Compare(int key, Foo *value) { return value->bar == key; }
-//  HashTableLink<Foo> *GetLink(Foo *value) { return value; }
+//	size_t HashKey(int key) const { return key >> 1; }
+//	size_t Hash(Foo *value) const { return HashKey(value->bar); }
+//	bool Compare(int key, Foo *value) const { return value->bar == key; }
+//  HashTableLink<Foo> *GetLink(Foo *value) const { return value; }
 // };
 
 template<typename Type>
@@ -49,7 +49,7 @@ public:
 	typedef typename Definition::KeyType	KeyType;
 	typedef typename Definition::ValueType	ValueType;
 
-	static const size_t kMinimumSize = 32;
+	static const size_t kMinimumSize = 8;
 
 	// we use new [] / delete [] for allocation. If in the future this
 	// is revealed to be insufficient we can switch to a template based
@@ -59,22 +59,18 @@ public:
 	//                   50 / 256 = 19.53125%
 
 	OpenHashTable(size_t initialSize = kMinimumSize)
-		: fItemCount(0), fTable(NULL)
+		: fTableSize(0), fItemCount(0), fTable(NULL)
 	{
-		if (initialSize < kMinimumSize)
-			initialSize = kMinimumSize;
-
-		_Resize(initialSize);
+		if (initialSize > 0)
+			_Resize(initialSize);
 	}
 
 	OpenHashTable(typename Definition::ParentType *parent,
 		size_t initialSize = kMinimumSize)
-		: fDefinition(parent), fItemCount(0), fTable(NULL)
+		: fDefinition(parent), fTableSize(0), fItemCount(0), fTable(NULL)
 	{
-		if (initialSize < kMinimumSize)
-			initialSize = kMinimumSize;
-
-		_Resize(initialSize);
+		if (initialSize > 0)
+			_Resize(initialSize);
 	}
 
 	~OpenHashTable()
@@ -82,10 +78,16 @@ public:
 		delete [] fTable;
 	}
 
-	status_t InitCheck() const { return fTable ? B_OK : B_NO_MEMORY; }
+	status_t InitCheck() const
+	{
+		return (fTableSize == 0 || fTable) ? B_OK : B_NO_MEMORY;
+	}
 
 	ValueType *Lookup(const KeyType &key) const
 	{
+		if (fTableSize == 0)
+			return NULL;
+
 		size_t index = fDefinition.HashKey(key) & (fTableSize - 1);
 		ValueType *slot = fTable[index];
 
@@ -98,12 +100,16 @@ public:
 		return slot;
 	}
 
-	void Insert(ValueType *value)
+	status_t Insert(ValueType *value)
 	{
-		if (AutoExpand && fItemCount >= (fTableSize * 200 / 256))
+		if (fTableSize == 0) {
+			if (!_Resize(kMinimumSize))
+				return B_NO_MEMORY;
+		} else if (AutoExpand && fItemCount >= (fTableSize * 200 / 256))
 			_Resize(fTableSize * 2);
 
 		InsertUnchecked(value);
+		return B_OK;
 	}
 
 	void InsertUnchecked(ValueType *value)

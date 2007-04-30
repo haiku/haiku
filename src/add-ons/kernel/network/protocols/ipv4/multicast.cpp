@@ -93,7 +93,7 @@ MulticastGroupInterfaceState<AddressType>::_Remove(Source *state)
 
 
 template<typename Addressing>
-MulticastGroupState<Addressing>::MulticastGroupState(net_protocol *socket,
+MulticastGroupState<Addressing>::MulticastGroupState(ProtocolType *socket,
 	const AddressType &address)
 	: fSocket(socket), fMulticastAddress(address), fFilterMode(kInclude)
 {
@@ -210,7 +210,7 @@ MulticastGroupState<Addressing>::FilterAccepts(net_buffer *buffer)
 	if (state == NULL)
 		return false;
 
-	bool has = state->Contains(*Addressing::AddressFromSockAddr(
+	bool has = state->Contains(Addressing::AddressFromSockAddr(
 		(sockaddr *)&buffer->source));
 
 	return (has && fFilterMode == kInclude) || (!has && fFilterMode == kExclude);
@@ -248,8 +248,8 @@ MulticastGroupState<Addressing>::_RemoveInterface(InterfaceState *state)
 
 
 template<typename Addressing>
-MulticastFilter<Addressing>::MulticastFilter(net_protocol *socket)
-	: fParent(socket)
+MulticastFilter<Addressing>::MulticastFilter(ProtocolType *socket)
+	: fParent(socket), fStates((size_t)0)
 {
 }
 
@@ -262,6 +262,7 @@ MulticastFilter<Addressing>::~MulticastFilter()
 		GroupState *state = iterator.Next();
 		state->Clear();
 		ReturnGroup(state);
+		iterator.Rewind();
 	}
 }
 
@@ -270,28 +271,25 @@ template<typename Addressing> typename MulticastFilter<Addressing>::GroupState *
 MulticastFilter<Addressing>::GetGroup(const AddressType &groupAddress,
 	bool create)
 {
-	typename States::Iterator iterator = fStates.GetIterator();
+	GroupState *state = fStates.Lookup(groupAddress);
+	if (state)
+		return state;
 
-	while (iterator.HasNext()) {
-		GroupState *state = iterator.Next();
-		if (state->Address() == groupAddress)
-			return state;
-	}
+	if (create) {
+		state = new (nothrow) GroupState(fParent, groupAddress);
+		if (state) {
+			if (fStates.Insert(state) >= B_OK) {
+				if (Addressing::JoinGroup(state) >= B_OK)
+					return state;
 
-	if (!create)
-		return NULL;
+				fStates.Remove(state);
+			}
 
-	GroupState *state = new (nothrow) GroupState(fParent, groupAddress);
-	if (state) {
-		if (Addressing::JoinGroup(groupAddress, state->ProtocolLink()) < B_OK) {
 			delete state;
-			return NULL;
 		}
-
-		fStates.Add(state);
 	}
 
-	return state;
+	return NULL;
 }
 
 
@@ -299,8 +297,7 @@ template<typename Addressing> void
 MulticastFilter<Addressing>::ReturnGroup(GroupState *group)
 {
 	if (group->IsEmpty()) {
-		Addressing::LeaveGroup(group->Address(), group->ProtocolLink());
-
+		Addressing::LeaveGroup(group);
 		fStates.Remove(group);
 		delete group;
 	}
