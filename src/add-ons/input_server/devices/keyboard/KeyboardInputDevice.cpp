@@ -372,9 +372,6 @@ KeyboardInputDevice::KeyboardInputDevice()
 		sLogFile = fopen("/var/log/keyboard_device_log.log", "a");
 #endif
 	CALLED();
-
-	StartMonitoringDevice(kKeyboardDevicesDirectoryPS2);
-	StartMonitoringDevice(kKeyboardDevicesDirectoryUSB);
 }
 
 
@@ -447,6 +444,9 @@ KeyboardInputDevice::InitCheck()
 	CALLED();
 	// TODO: this doesn't belong here!
 	_RecursiveScan(kKeyboardDevicesDirectory);
+
+	StartMonitoringDevice(kKeyboardDevicesDirectoryPS2);
+	StartMonitoringDevice(kKeyboardDevicesDirectoryUSB);
 
 	return B_OK;
 }
