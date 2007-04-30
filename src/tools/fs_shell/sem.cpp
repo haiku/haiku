@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include <BeOSBuildCompatibility.h>
+#include "compatibility.h"
 
 #include <OS.h>
 
@@ -78,7 +78,9 @@ fssh_get_sem_count(fssh_sem_id id, int32_t *threadCount)
 fssh_status_t
 fssh_set_sem_owner(fssh_sem_id id, fssh_team_id team)
 {
-	return set_sem_owner(id, team);
+	// return set_sem_owner(id, team);
+	// The FS shell is the kernel and no other teams exist.
+	return FSSH_B_OK;
 }
 
 

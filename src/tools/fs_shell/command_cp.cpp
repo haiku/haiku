@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include <BeOSBuildCompatibility.h>
+#include "compatibility.h"
 
 #include "command_cp.h"
 
@@ -160,7 +160,7 @@ public:
 		if (!fAttrDir)
 			return 0;
 		
-		errno = 0;
+		fssh_set_errno(FSSH_B_OK);
 		struct dirent *entry = fs_read_attr_dir(fAttrDir);
 		if (!entry)
 			return fssh_get_errno();
@@ -242,7 +242,7 @@ public:
 
 	virtual	fssh_ssize_t GetNextEntry(struct fssh_dirent *entry, int size)
 	{
-		errno = 0;
+		fssh_set_errno(FSSH_B_OK);
 		struct dirent *hostEntry = readdir(fDir);
 		if (!hostEntry)
 			return fssh_get_errno();

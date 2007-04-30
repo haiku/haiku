@@ -6,8 +6,7 @@
 #ifndef _FSSH_FSSH_H
 #define _FSSH_FSSH_H
 
-
-#include <BeOSBuildCompatibility.h>
+#include "compatibility.h"
 
 #include <map>
 #include <string>

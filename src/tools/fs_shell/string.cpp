@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include <BeOSBuildCompatibility.h>
+#include "compatibility.h"
 
 #include "fssh_string.h"
 
@@ -31,11 +31,13 @@ fssh_memcpy(void *dest, const void *source, fssh_size_t length)
 }
 
 
+#if 0
 void*
 fssh_memccpy(void *dest, const void *source, int stopByte, fssh_size_t length)
 {
 	return memccpy(dest, source, stopByte, length);
 }
+#endif	// 0
 
 
 void*
@@ -209,11 +211,13 @@ fssh_strncasecmp(const char *string1, const char *string2, fssh_size_t length)
 }
 
 
+#if 0
 char*
 fssh_strcasestr(const char *string, const char *searchString)
 {
 	return strcasestr(string, searchString);
 }
+#endif	// 0
 
 
 char*
@@ -269,15 +273,19 @@ fssh_ffs(int i)
 }
 
 
+#if 0
 char*
 fssh_index(const char *s, int c)
 {
 	return index(s, c);
 }
+#endif	// 0
 
 
+#if 0
 char*
 fssh_rindex(char const *s, int c)
 {
 	return rindex(s, c);
 }
+#endif	// 0

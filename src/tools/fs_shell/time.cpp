@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include <BeOSBuildCompatibility.h>
+#include "compatibility.h"
 
 #include "fssh_os.h"
 #include "fssh_time.h"

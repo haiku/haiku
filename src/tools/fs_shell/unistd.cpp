@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include <BeOSBuildCompatibility.h>
+#include "compatibility.h"
 
 #include "fssh_unistd.h"
 
@@ -88,17 +88,18 @@ fssh_ioctl(int fd, unsigned long op, ...)
 				= va_arg(list, fssh_device_geometry*);
 
 			#ifdef __BEOS__
-				if (ioctl(fd, B_GET_GEOMETRY, systemGeometry) == 0) {
+				device_geometry systemGeometry;
+				if (ioctl(fd, B_GET_GEOMETRY, &systemGeometry) == 0) {
 					geometry->bytes_per_sector
-						= systemGeometry->bytes_per_sector;
+						= systemGeometry.bytes_per_sector;
 					geometry->sectors_per_track
-						= systemGeometry->sectors_per_track;
-					geometry->cylinder_count = systemGeometry->cylinder_count;
-					geometry->head_count = systemGeometry->head_count;
-					geometry->device_type = systemGeometry->device_type;
-					geometry->removable = systemGeometry->removable;
-					geometry->read_only = systemGeometry->read_only;
-					geometry->write_once = systemGeometry->write_once;
+						= systemGeometry.sectors_per_track;
+					geometry->cylinder_count = systemGeometry.cylinder_count;
+					geometry->head_count = systemGeometry.head_count;
+					geometry->device_type = systemGeometry.device_type;
+					geometry->removable = systemGeometry.removable;
+					geometry->read_only = systemGeometry.read_only;
+					geometry->write_once = systemGeometry.write_once;
 					error = B_OK;
 				} else
 					error = errno;
