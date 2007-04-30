@@ -210,7 +210,7 @@ rule RunCommandLine commandLine
 actions RunCommandLine1 {
 	target=target;
 	for t in $(2) ; do
-		target+=X
+		target=${target}X
 		eval "${target}=${t}"
 	done
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
