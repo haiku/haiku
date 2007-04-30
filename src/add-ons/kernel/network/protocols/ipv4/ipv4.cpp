@@ -28,6 +28,7 @@
 #include <netinet/ip.h>
 #include <new>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 
@@ -143,6 +144,8 @@ public:
 			{ return &group->fLink; }
 	};
 
+	void DumpInternalState() const;
+
 private:
 	// for g++ 2.95
 	friend class HashDefinition;
@@ -206,6 +209,18 @@ typedef OpenHashTable<MulticastGroup::HashDefinition> MulticastGroups;
 static MulticastGroups *sMulticastGroups;
 static net_protocol_module_info *sReceivingProtocol[256];
 static benaphore sReceivingProtocolLock;
+
+
+static const char *
+print_address(const in_addr *address, char *buf, size_t bufLen)
+{
+	unsigned int addr = ntohl(address->s_addr);
+
+	snprintf(buf, bufLen, "%u.%u.%u.%u", (addr >> 24) & 0xff,
+		(addr >> 16) & 0xff, (addr >> 8) & 0xff, addr & 0xff);
+
+	return buf;
+}
 
 
 RawSocket::RawSocket(net_socket *socket)
@@ -493,6 +508,23 @@ void
 MulticastGroup::Remove(IPv4Multicast::GroupState *groupState)
 {
 	fLinks.Remove(groupState);
+}
+
+
+void
+MulticastGroup::DumpInternalState() const
+{
+	char addrBuf[64];
+
+	kprintf("group %s (%p)\n", print_address(&fMulticastAddress, addrBuf,
+		sizeof(addrBuf)), this);
+
+	Links::ConstIterator it = fLinks.GetIterator();
+	while (it.HasNext()) {
+		IPv4Multicast::GroupState *group = it.Next();
+
+		kprintf("  socket %p\n", group->Socket());
+	}
 }
 
 
@@ -1561,6 +1593,18 @@ ipv4_error_reply(net_protocol *protocol, net_buffer *causedError, uint32 code,
 }
 
 
+static int
+dump_ipv4_multicast(int argc, char *argv[])
+{
+	MulticastGroups::Iterator it = sMulticastGroups->GetIterator();
+
+	while (it.HasNext())
+		it.Next()->DumpInternalState();
+
+	return 0;
+}
+
+
 //	#pragma mark -
 
 
@@ -1613,6 +1657,9 @@ init_ipv4()
 	if (status < B_OK)
 		goto err6;
 
+	add_debugger_command("ipv4_multicast", dump_ipv4_multicast,
+		"list all current IPv4 multicast states");
+
 	return B_OK;
 
 err6:
@@ -1635,6 +1682,8 @@ status_t
 uninit_ipv4()
 {
 	benaphore_lock(&sReceivingProtocolLock);
+
+	remove_debugger_command("ipv4_multicast", dump_ipv4_multicast);
 
 	// put all the domain receiving protocols we gathered so far
 	for (uint32 i = 0; i < 256; i++) {
