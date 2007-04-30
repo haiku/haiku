@@ -160,6 +160,8 @@ private:
 	typedef typename GroupState::HashDefinition GroupHashDefinition;
 	typedef OpenHashTable<GroupHashDefinition> States;
 
+	void _ReturnGroup(GroupState *group);
+
 	ProtocolType *fParent;
 	States fStates;
 };

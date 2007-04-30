@@ -749,8 +749,12 @@ socket_getsockopt(net_socket *socket, int level, int option, void *value,
 {
 	status_t status = (level == SOL_SOCKET) ? B_OK : B_BAD_VALUE;
 
-	if (socket->first_info->getsockopt)
-		status = socket->first_info->getsockopt(socket->first_protocol, level,
+	net_protocol *protocol = socket->first_protocol;
+	while (protocol && protocol->module->getsockopt == NULL)
+		protocol = protocol->next;
+
+	if (protocol)
+		status = protocol->module->getsockopt(protocol, level,
 			option, value, _length);
 
 	if (status < B_OK)
@@ -1066,9 +1070,13 @@ socket_setsockopt(net_socket *socket, int level, int option, const void *value,
 {
 	status_t status = (level == SOL_SOCKET) ? B_OK : B_BAD_VALUE;
 
-	if (socket->first_info->setsockopt)
-		status = socket->first_info->setsockopt(socket->first_protocol, level,
-			option, value, length);
+	net_protocol *protocol = socket->first_protocol;
+	while (protocol && protocol->module->setsockopt == NULL)
+		protocol = protocol->next;
+
+	if (protocol)
+		status = protocol->module->setsockopt(protocol, level, option,
+			value, length);
 
 	if (status < B_OK)
 		return status;

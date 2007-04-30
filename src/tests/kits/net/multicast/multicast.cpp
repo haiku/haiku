@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 
 	inet_pton(AF_INET, argv[1], &mreq.imr_multiaddr);
 
-	setsockopt(sock, AF_INET, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
+	setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
 
 	while (1) {
 		int len = recv(sock, buf, sizeof(buf), 0);

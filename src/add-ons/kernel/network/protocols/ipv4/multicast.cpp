@@ -257,12 +257,14 @@ MulticastFilter<Addressing>::MulticastFilter(ProtocolType *socket)
 template<typename Addressing>
 MulticastFilter<Addressing>::~MulticastFilter()
 {
-	typename States::Iterator iterator = fStates.GetIterator();
-	while (iterator.HasNext()) {
+	while (true) {
+		typename States::Iterator iterator = fStates.GetIterator();
+		if (!iterator.HasNext())
+			return;
+
 		GroupState *state = iterator.Next();
 		state->Clear();
-		ReturnGroup(state);
-		iterator.Rewind();
+		_ReturnGroup(state);
 	}
 }
 
@@ -296,11 +298,17 @@ MulticastFilter<Addressing>::GetGroup(const AddressType &groupAddress,
 template<typename Addressing> void
 MulticastFilter<Addressing>::ReturnGroup(GroupState *group)
 {
-	if (group->IsEmpty()) {
-		Addressing::LeaveGroup(group);
-		fStates.Remove(group);
-		delete group;
-	}
+	if (group->IsEmpty())
+		_ReturnGroup(group);
+}
+
+
+template<typename Addressing> void
+MulticastFilter<Addressing>::_ReturnGroup(GroupState *group)
+{
+	Addressing::LeaveGroup(group);
+	fStates.Remove(group);
+	delete group;
 }
 
 // IPv4 explicit template instantiation
