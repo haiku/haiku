@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include <BeOSBuildCompatibility.h>
+#include "compatibility.h"
 
 #include "fssh.h"
 
@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 #include <vector>
 
@@ -836,6 +837,19 @@ command_rm(int argc, char **argv)
 }
 
 
+static fssh_status_t
+command_sync(int argc, const char* const* argv)
+{
+	fssh_status_t error = _kern_sync();
+	if (error != FSSH_B_OK) {
+		fprintf(stderr, "Error: syncing: %s\n", fssh_strerror(error));
+		return error;
+	}
+
+	return FSSH_B_OK;
+}
+
+
 static void
 register_commands()
 {
@@ -849,6 +863,7 @@ register_commands()
 		command_mkindex,	"mkindex",		"create an index",
 		command_quit,		"quit/exit",	"quit the shell",
 		command_rm,			"rm",			"remove files and directories",
+		command_sync,		"sync",			"syncs the file system",
 		NULL
 	);
 }
@@ -1052,27 +1067,30 @@ input_loop(bool interactive)
 		}
 
 		// construct argv vector
+		int result = FSSH_B_BAD_VALUE;
 		ArgVector argVector;
-		if (!argVector.Parse(inputBuffer) || argVector.Argc() == 0)
-			continue;
-		int argc = argVector.Argc();
-		const char* const* argv = argVector.Argv();
+		if (argVector.Parse(inputBuffer) && argVector.Argc() > 0) {
+			int argc = argVector.Argc();
+			const char* const* argv = argVector.Argv();
 
-		// find command
-		Command* command = CommandManager::Default()->FindCommand(argv[0]);
-		if (!command) {
-			fprintf(stderr, "Error: Invalid command \"%s\". Type \"help\" for "
-				"a list of supported commands\n", argv[0]);
-			continue;
+			// find command
+			Command* command = CommandManager::Default()->FindCommand(argv[0]);
+			if (command) {
+				// execute it
+				result = command->Do(argc, argv);
+				if (result == COMMAND_RESULT_EXIT) {
+					if (!interactive)
+						reply_to_external_command(0);
+					break;
+				}
+			} else {
+				fprintf(stderr, "Error: Invalid command \"%s\". Type \"help\" "
+					"for a list of supported commands\n", argv[0]);
+			}
 		}
 
-		int result = command->Do(argc, argv);
-		if (result == COMMAND_RESULT_EXIT) {
-			reply_to_external_command(0);
-			break;
-		}
-
-		reply_to_external_command(fssh_to_host_error(result));
+		if (!interactive)
+			reply_to_external_command(fssh_to_host_error(result));
 	}
 
 	if (!interactive)
