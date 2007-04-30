@@ -2,6 +2,7 @@
 #define HAIKU_BUILD_COMPATIBILITY_H
 
 #include <sys/types.h>
+#include <SupportDefs.h>
 
 #ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 #	define _BE_ERRNO_H_
@@ -40,6 +41,11 @@ typedef unsigned long haiku_build_addr_t;
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+extern int32	atomic_set(vint32 *value, int32 newValue);
+extern int32	atomic_test_and_set(vint32 *value, int32 newValue,
+					int32 testAgainst);
+extern int32	atomic_get(vint32 *value);
 
 extern size_t	strnlen(const char *string, size_t count);
 
