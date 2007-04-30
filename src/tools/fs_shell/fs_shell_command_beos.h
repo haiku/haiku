@@ -5,12 +5,15 @@
 #ifndef FS_SHELL_COMMAND_BEOS_H
 #define FS_SHELL_COMMAND_BEOS_H
 
+#include <OS.h>
+
+
 static const char *kFSShellCommandPort = "fs shell command port";
+static const int kMaxCommandLength = 102400;
 
 struct external_command_message {
 	port_id		reply_port;
-	char		command[20480];
-// TODO: Increase command size and transmit only as much as necessary.
+	char		command[1];
 };
 
 struct external_command_reply {

@@ -16,8 +16,15 @@
 bool
 send_external_command(const char *command, int *result)
 {
-	external_command_message message;
-	strncpy(message.command, command, sizeof(message.command));
+	int commandLen = strlen(command);
+	if (commandLen > kMaxCommandLength) {
+		fprintf(stderr, "Error: Command line too long.\n");
+		return false;
+	}
+
+	char _message[sizeof(external_command_message) + kMaxCommandLength];
+	external_command_message* message = (external_command_message*)_message;
+	strcpy(message->command, command);
 
 	// find the command port
 	port_id commandPort = find_port(kFSShellCommandPort);
@@ -33,12 +40,13 @@ send_external_command(const char *command, int *result)
 			strerror(replyPort));
 		return false;
 	}
-	message.reply_port = replyPort;
+	message->reply_port = replyPort;
 
 	// send the command message
 	status_t error;
 	do {
-		error = write_port(commandPort, 0, &message, sizeof(message));
+		error = write_port(commandPort, 0, message,
+			sizeof(external_command_message) + commandLen);
 	} while (error == B_INTERRUPTED);
 
 	if (error != B_OK) {
