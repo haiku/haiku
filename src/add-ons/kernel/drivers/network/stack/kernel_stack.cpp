@@ -428,9 +428,9 @@ net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 				if (status < B_OK)
 					return status;
 
-				char valueBuffer[128];
+				char valueBuffer[256];
 				if (args.length > (int)sizeof(valueBuffer))
-					args.length = (int)sizeof(valueBuffer);
+					return ENOBUFS;
 
 				status = sSocket->getsockopt(cookie->socket, args.level, args.option,
 					valueBuffer, &args.length);
@@ -451,9 +451,9 @@ net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 				if (status < B_OK)
 					return status;
 
-				char valueBuffer[128];
+				char valueBuffer[256];
 				if (args.length > (int)sizeof(valueBuffer))
-					return B_BAD_VALUE;
+					return ENOBUFS;
 				if (user_memcpy(valueBuffer, args.value, args.length) < B_OK)
 					return B_BAD_ADDRESS;
 

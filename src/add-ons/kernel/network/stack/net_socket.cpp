@@ -642,8 +642,12 @@ socket_getsockname(net_socket *socket, struct sockaddr *address, socklen_t *_add
 
 
 status_t
-socket_get_option(net_socket *socket, int option, void *value, int *_length)
+socket_get_option(net_socket *socket, int level, int option, void *value,
+	int *_length)
 {
+	if (level != SOL_SOCKET)
+		return ENOPROTOOPT;
+
 	switch (option) {
 		case SO_SNDBUF:
 		{
@@ -747,20 +751,14 @@ int
 socket_getsockopt(net_socket *socket, int level, int option, void *value,
 	int *_length)
 {
-	status_t status = (level == SOL_SOCKET) ? B_OK : B_BAD_VALUE;
+	for (net_protocol *protocol = socket->first_protocol;
+			protocol; protocol = protocol->next) {
+		if (protocol->module->getsockopt)
+			return protocol->module->getsockopt(protocol, level, option,
+				value, _length);
+	}
 
-	net_protocol *protocol = socket->first_protocol;
-	while (protocol && protocol->module->getsockopt == NULL)
-		protocol = protocol->next;
-
-	if (protocol)
-		status = protocol->module->getsockopt(protocol, level,
-			option, value, _length);
-
-	if (status < B_OK)
-		return status;
-
-	return socket_get_option(socket, option, value, _length);
+	return socket_get_option(socket, level, option, value, _length);
 }
 
 
@@ -958,9 +956,12 @@ socket_send(net_socket *socket, msghdr *header, const void *data,
 
 
 status_t
-socket_set_option(net_socket *socket, int option, const void *value,
+socket_set_option(net_socket *socket, int level, int option, const void *value,
 	int length)
 {
+	if (level != SOL_SOCKET)
+		return ENOPROTOOPT;
+
 	switch (option) {
 		// TODO: implement other options!
 		case SO_LINGER:
@@ -1068,20 +1069,14 @@ int
 socket_setsockopt(net_socket *socket, int level, int option, const void *value,
 	int length)
 {
-	status_t status = (level == SOL_SOCKET) ? B_OK : B_BAD_VALUE;
+	for (net_protocol *protocol = socket->first_protocol;
+			protocol; protocol = protocol->next) {
+		if (protocol->module->setsockopt)
+			return protocol->module->setsockopt(protocol, level, option,
+				value, length);
+	}
 
-	net_protocol *protocol = socket->first_protocol;
-	while (protocol && protocol->module->setsockopt == NULL)
-		protocol = protocol->next;
-
-	if (protocol)
-		status = protocol->module->setsockopt(protocol, level, option,
-			value, length);
-
-	if (status < B_OK)
-		return status;
-
-	return socket_set_option(socket, option, value, length);
+	return socket_set_option(socket, level, option, value, length);
 }
 
 

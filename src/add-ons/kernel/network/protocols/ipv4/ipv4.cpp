@@ -882,7 +882,7 @@ ipv4_delta_membership(ipv4_protocol *protocol, int option,
 		case IP_DROP_SOURCE_MEMBERSHIP:
 			group = filter.GetGroup(*groupAddr, false);
 			if (group == NULL) {
-				if (option == IP_DROP_SOURCE_MEMBERSHIP
+				if (option == IP_DROP_MEMBERSHIP
 					|| option == IP_DROP_SOURCE_MEMBERSHIP)
 					return EADDRNOTAVAIL;
 				else
@@ -896,6 +896,28 @@ ipv4_delta_membership(ipv4_protocol *protocol, int option,
 	filter.ReturnGroup(group);
 
 	return status;
+}
+
+
+static int
+generic_to_ipv4(int option)
+{
+	switch (option) {
+		case MCAST_JOIN_GROUP:
+			return IP_ADD_MEMBERSHIP;
+		case MCAST_JOIN_SOURCE_GROUP:
+			return IP_ADD_SOURCE_MEMBERSHIP;
+		case MCAST_LEAVE_GROUP:
+			return IP_DROP_MEMBERSHIP;
+		case MCAST_BLOCK_SOURCE:
+			return IP_BLOCK_SOURCE;
+		case MCAST_UNBLOCK_SOURCE:
+			return IP_UNBLOCK_SOURCE;
+		case MCAST_LEAVE_SOURCE_GROUP:
+			return IP_DROP_SOURCE_MEMBERSHIP;
+	}
+
+	return -1;
 }
 
 
@@ -918,8 +940,8 @@ ipv4_delta_membership(ipv4_protocol *protocol, int option,
 	if (interface == NULL)
 		return ENODEV;
 
-	return ipv4_delta_membership(protocol, option, interface, groupAddr,
-		sourceAddr);
+	return ipv4_delta_membership(protocol, option, interface,
+		groupAddr, sourceAddr);
 }
 
 
@@ -945,8 +967,8 @@ ipv4_generic_delta_membership(ipv4_protocol *protocol, int option,
 	if (_sourceAddr)
 		sourceAddr = &((const sockaddr_in *)_sourceAddr)->sin_addr;
 
-	return ipv4_delta_membership(protocol, option, interface, groupAddr,
-		sourceAddr);
+	return ipv4_delta_membership(protocol, generic_to_ipv4(option), interface,
+		groupAddr, sourceAddr);
 }
 
 
@@ -1092,50 +1114,41 @@ ipv4_getsockopt(net_protocol *_protocol, int level, int option, void *value,
 {
 	ipv4_protocol *protocol = (ipv4_protocol *)_protocol;
 
-	// as we are the last protocol in the chain (i.e. no socket protocol
-	// below) we must call into the socket module directly.
-	if (level == SOL_SOCKET)
-		return sSocketModule->get_option(protocol->socket, option, value,
-			_length);
-	else if (level != IPPROTO_IP)
-		return B_BAD_VALUE;
-
-	switch (option) {
-		case IP_HDRINCL:
+	if (level == IPPROTO_IP) {
+		if (option == IP_HDRINCL)
 			return get_int_option(value, *_length,
 				(protocol->flags & IP_FLAG_HEADER_INCLUDED) != 0);
-
-		case IP_TTL:
+		else if (option == IP_TTL)
 			return get_int_option(value, *_length, protocol->time_to_live);
-
-		case IP_TOS:
+		else if (option == IP_TOS)
 			return get_int_option(value, *_length, protocol->service_type);
-
-		case IP_MULTICAST_TTL:
+		else if (IP_MULTICAST_TTL)
 			return get_int_option(value, *_length,
 				protocol->multicast_time_to_live);
-
-		case IP_ADD_MEMBERSHIP:
-		case IP_DROP_MEMBERSHIP:
-		case IP_BLOCK_SOURCE:
-		case IP_UNBLOCK_SOURCE:
-		case IP_ADD_SOURCE_MEMBERSHIP:
-		case IP_DROP_SOURCE_MEMBERSHIP:
-		case MCAST_JOIN_GROUP:
-		case MCAST_LEAVE_GROUP:
-		case MCAST_BLOCK_SOURCE:
-		case MCAST_UNBLOCK_SOURCE:
-		case MCAST_JOIN_SOURCE_GROUP:
-		case MCAST_LEAVE_SOURCE_GROUP:
-			// RFC 3678, Section 4.1:
-			// ``An error of EOPNOTSUPP is returned if these options are
-			// used with getsockopt().''
-			return EOPNOTSUPP;
-
-		default:
+		else if (option == IP_ADD_MEMBERSHIP
+			|| option == IP_DROP_MEMBERSHIP
+			|| option == IP_BLOCK_SOURCE
+			|| option == IP_UNBLOCK_SOURCE
+			|| option == IP_ADD_SOURCE_MEMBERSHIP
+			|| option == IP_DROP_SOURCE_MEMBERSHIP
+			|| option == MCAST_JOIN_GROUP
+			|| option == MCAST_LEAVE_GROUP
+			|| option == MCAST_BLOCK_SOURCE
+			|| option == MCAST_UNBLOCK_SOURCE
+			|| option == MCAST_JOIN_SOURCE_GROUP
+			|| option == MCAST_LEAVE_SOURCE_GROUP) {
+				// RFC 3678, Section 4.1:
+				// ``An error of EOPNOTSUPP is returned if these options are
+				// used with getsockopt().''
+				return EOPNOTSUPP;
+		} else {
 			dprintf("IPv4::getsockopt(): get unknown option: %d\n", option);
 			return ENOPROTOOPT;
+		}
 	}
+
+	return sSocketModule->get_option(protocol->socket, level, option, value,
+		_length);
 }
 
 
@@ -1145,15 +1158,8 @@ ipv4_setsockopt(net_protocol *_protocol, int level, int option,
 {
 	ipv4_protocol *protocol = (ipv4_protocol *)_protocol;
 
-	if (level == SOL_SOCKET)
-		return sSocketModule->set_option(protocol->socket, option, value,
-			length);
-	else if (level != IPPROTO_IP)
-		return B_BAD_VALUE;
-
-	switch (option) {
-		case IP_HDRINCL:
-		{
+	if (level == IPPROTO_IP) {
+		if (option == IP_HDRINCL) {
 			int headerIncluded;
 			if (length != sizeof(int))
 				return B_BAD_VALUE;
@@ -1165,21 +1171,15 @@ ipv4_setsockopt(net_protocol *_protocol, int level, int option,
 			else
 				protocol->flags &= ~IP_FLAG_HEADER_INCLUDED;
 			return B_OK;
-		}
-
-		case IP_TTL:
+		} else if (option == IP_TTL) {
 			return set_int_option(protocol->time_to_live, value, length);
-
-		case IP_TOS:
+		} else if (option == IP_TOS) {
 			return set_int_option(protocol->service_type, value, length);
-
-		case IP_MULTICAST_TTL:
+		} else if (option == IP_MULTICAST_TTL) {
 			return set_int_option(protocol->multicast_time_to_live, value,
 				length);
-
-		case IP_ADD_MEMBERSHIP:
-		case IP_DROP_MEMBERSHIP:
-		{
+		} else if (option == IP_ADD_MEMBERSHIP
+			|| option == IP_DROP_MEMBERSHIP) {
 			ip_mreq mreq;
 			if (length != sizeof(ip_mreq))
 				return B_BAD_VALUE;
@@ -1188,13 +1188,10 @@ ipv4_setsockopt(net_protocol *_protocol, int level, int option,
 
 			return ipv4_delta_membership(protocol, option, &mreq.imr_interface,
 				&mreq.imr_multiaddr, NULL);
-		}
-
-		case IP_BLOCK_SOURCE:
-		case IP_UNBLOCK_SOURCE:
-		case IP_ADD_SOURCE_MEMBERSHIP:
-		case IP_DROP_SOURCE_MEMBERSHIP:
-		{
+		} else if (option == IP_BLOCK_SOURCE
+			|| option == IP_UNBLOCK_SOURCE
+			|| option == IP_ADD_SOURCE_MEMBERSHIP
+			|| option == IP_DROP_SOURCE_MEMBERSHIP) {
 			ip_mreq_source mreq;
 			if (length != sizeof(ip_mreq_source))
 				return B_BAD_VALUE;
@@ -1203,11 +1200,8 @@ ipv4_setsockopt(net_protocol *_protocol, int level, int option,
 
 			return ipv4_delta_membership(protocol, option, &mreq.imr_interface,
 				&mreq.imr_multiaddr, &mreq.imr_sourceaddr);
-		}
-
-		case MCAST_JOIN_GROUP:
-		case MCAST_LEAVE_GROUP:
-		{
+		} else if (option == MCAST_LEAVE_GROUP
+			|| option == MCAST_JOIN_GROUP) {
 			group_req greq;
 			if (length != sizeof(group_req))
 				return B_BAD_VALUE;
@@ -1216,13 +1210,10 @@ ipv4_setsockopt(net_protocol *_protocol, int level, int option,
 
 			return ipv4_generic_delta_membership(protocol, option,
 				greq.gr_interface, &greq.gr_group, NULL);
-		}
-
-		case MCAST_BLOCK_SOURCE:
-		case MCAST_UNBLOCK_SOURCE:
-		case MCAST_JOIN_SOURCE_GROUP:
-		case MCAST_LEAVE_SOURCE_GROUP:
-		{
+		} else if (option == MCAST_BLOCK_SOURCE
+			|| option == MCAST_UNBLOCK_SOURCE
+			|| option == MCAST_JOIN_SOURCE_GROUP
+			|| option == MCAST_LEAVE_SOURCE_GROUP) {
 			group_source_req greq;
 			if (length != sizeof(group_source_req))
 				return B_BAD_VALUE;
@@ -1231,12 +1222,14 @@ ipv4_setsockopt(net_protocol *_protocol, int level, int option,
 
 			return ipv4_generic_delta_membership(protocol, option,
 				greq.gsr_interface, &greq.gsr_group, &greq.gsr_source);
-		}
-
-		default:
+		} else {
 			dprintf("IPv4::setsockopt(): set unknown option: %d\n", option);
 			return ENOPROTOOPT;
+		}
 	}
+
+	return sSocketModule->set_option(protocol->socket, level, option,
+		value, length);
 }
 
 
@@ -1248,6 +1241,7 @@ ipv4_bind(net_protocol *protocol, const struct sockaddr *address)
 
 	// only INADDR_ANY and addresses of local interfaces are accepted:
 	if (((sockaddr_in *)address)->sin_addr.s_addr == INADDR_ANY
+		|| IN_MULTICAST(((sockaddr_in *)address)->sin_addr.s_addr)
 		|| sDatalinkModule->is_local_address(sDomain, address, NULL, NULL)) {
 		memcpy(&protocol->socket->address, address, sizeof(struct sockaddr_in));
 		protocol->socket->address.ss_len = sizeof(struct sockaddr_in);
