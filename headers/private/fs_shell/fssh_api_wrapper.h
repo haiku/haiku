@@ -150,11 +150,13 @@
 #define	B_DIRECTORY_NODE	FSSH_B_DIRECTORY_NODE
 #define	B_ANY_NODE			FSSH_B_ANY_NODE
 
+#undef	offsetof
 #define offsetof(type,member)	fssh_offsetof(type,member)
 
 #define min_c(a,b)				fssh_min_c(a,b)
 #define max_c(a,b)				fssh_max_c(a,b)
 
+#undef	_PACKED
 #define _PACKED	_FSSH_PACKED
 
 
@@ -1266,6 +1268,10 @@
 #define time_t		fssh_time_t
 #define suseconds_t	fssh_suseconds_t
 #define useconds_t	fssh_useconds_t
+
+#undef CLOCKS_PER_SEC
+#undef CLK_TCK
+#undef MAX_TIMESTR
 
 #define CLOCKS_PER_SEC	FSSH_CLOCKS_PER_SEC
 #define CLK_TCK			FSSH_CLK_TCK
