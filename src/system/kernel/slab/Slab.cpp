@@ -254,7 +254,7 @@ benaphore_boot_init(benaphore *lock, const char *name, uint32 flags)
 {
 	if (flags & CACHE_DURING_BOOT) {
 		lock->sem = -1;
-		lock->count = 0;
+		lock->count = 1;
 		return B_OK;
 	}
 
@@ -306,10 +306,18 @@ area_free_pages(object_cache *cache, void *pages)
 static status_t
 early_allocate_pages(object_cache *cache, void **pages, uint32 flags)
 {
+	TRACE_CACHE(cache, "early allocate pages (%lu, 0x0%lx)", cache->slab_size,
+		flags);
+
 	addr_t base = vm_allocate_early(sKernelArgs, cache->slab_size,
 		cache->slab_size, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	*pages = (void *)base;
+
+	cache->usage += cache->slab_size;
+
+	TRACE_CACHE(cache, "  ... = { %p }", *pages);
+
 	return B_OK;
 }
 
@@ -731,7 +739,8 @@ object_cache_reserve(object_cache *cache, size_t object_count, uint32 flags)
 slab *
 object_cache::InitSlab(slab *slab, void *pages, size_t byteCount)
 {
-	TRACE_CACHE(this, "construct (%p, %p, %lu)", slab, pages, byteCount);
+	TRACE_CACHE(this, "construct (%p, %p .. %p, %lu)", slab, pages,
+		((uint8 *)pages) + byteCount, byteCount);
 
 	slab->pages = pages;
 	slab->count = slab->size = byteCount / object_size;
@@ -853,7 +862,7 @@ SmallObjectCache::ReturnSlab(slab *slab)
 slab *
 SmallObjectCache::ObjectSlab(void *object) const
 {
-	return slab_in_pages(lower_boundary(object, object_size), slab_size);
+	return slab_in_pages(lower_boundary(object, slab_size), slab_size);
 }
 
 
@@ -1265,6 +1274,8 @@ dump_cache_info(int argc, char *argv[])
 void
 slab_init(kernel_args *args, addr_t initialBase, size_t initialSize)
 {
+	dprintf("slab: init base %p + 0x%lx\n", (void *)initialBase, initialSize);
+
 	sInitialBegin = (uint8 *)initialBase;
 	sInitialLimit = sInitialBegin + initialSize;
 	sInitialPointer = sInitialBegin;

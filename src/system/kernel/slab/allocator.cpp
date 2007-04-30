@@ -13,9 +13,10 @@
 #include <kernel.h> // for ROUNDUP
 
 #include <stdio.h>
+#include <string.h>
 
 #define DEBUG_ALLOCATOR
-// #define TEST_ALL_CACHES_DURING_BOOT
+//#define TEST_ALL_CACHES_DURING_BOOT
 
 static const size_t kBlockSizes[] = {
 	16, 24, 32, 48, 64, 80, 96, 112,
@@ -122,6 +123,7 @@ block_free(void *block)
 #endif
 
 	int index = size_to_index(tag->size + sizeof(boundary_tag));
+
 	if (index < 0) {
 		area_boundary_tag *areaTag = (area_boundary_tag *)(((uint8 *)block)
 			- sizeof(area_boundary_tag));
@@ -170,12 +172,8 @@ show_waste(int argc, char *argv[])
 void
 block_allocator_init_boot()
 {
-	for (int index = 0; kBlockSizes[index] != 0; index++) {
-		if (kBlockSizes[index] > 256)
-			break;
-
+	for (int index = 0; kBlockSizes[index] != 0; index++)
 		block_create_cache(index, true);
-	}
 
 	add_debugger_command("show_waste", show_waste,
 		"show cache allocator's memory waste");
@@ -185,13 +183,6 @@ block_allocator_init_boot()
 void
 block_allocator_init_rest()
 {
-	for (int index = 0; kBlockSizes[index] != 0; index++) {
-		if (kBlockSizes[index] <= 256)
-			continue;
-
-		block_create_cache(index, false);
-	}
-
 #ifdef TEST_ALL_CACHES_DURING_BOOT
 	for (int index = 0; kBlockSizes[index] != 0; index++) {
 		block_free(block_alloc(kBlockSizes[index] - sizeof(boundary_tag)));
