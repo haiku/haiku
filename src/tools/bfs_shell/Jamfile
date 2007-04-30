@@ -19,6 +19,11 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems bfs ] ;
 	SubDirC++Flags $(defines) -Wall -Wno-multichar -fno-rtti ;
 }
 
+local libHaikuCompat ;
+if $(HOST_PLATFORM_BEOS_COMPATIBLE) && $(HOST_PLATFORM) != haiku {
+	libHaikuCompat = libhaikucompat_build.a ;
+}
+
 UsePrivateHeaders fs_shell ;
 
 BuildPlatformMain <build2>bfs_shell
@@ -36,5 +41,6 @@ BuildPlatformMain <build2>bfs_shell
 
 	kernel_interface.cpp
 
-	: <build2>fs_shell.a $(HOST_LIBSUPC++) $(HOST_LIBROOT)
+	: <build2>fs_shell.a $(libHaikuCompat) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+	  $(HOST_LIBROOT)
 ;
