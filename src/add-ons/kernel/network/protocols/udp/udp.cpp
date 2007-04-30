@@ -840,6 +840,7 @@ status_t
 UdpEndpoint::Free()
 {
 	TRACE_EP("Free()");
+	fManager->UnbindEndpoint(this);
 	return sUdpEndpointManager->FreeEndpoint(fManager);
 }
 
