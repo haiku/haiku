@@ -1,13 +1,21 @@
-// ClipboardHandler.cpp
+/*
+ * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, bonefish@users.sf.net
+ *		Gabe Yoder
+ */
 
-#include <map>
-#include <string>
+
+#include "Clipboard.h"
+#include "ClipboardHandler.h"
 
 #include <Message.h>
 #include <RegistrarDefs.h>
 
-#include "Clipboard.h"
-#include "ClipboardHandler.h"
+#include <map>
+#include <string>
 
 using std::map;
 using std::string;
@@ -151,9 +159,19 @@ ClipboardHandler::MessageReceived(BMessage *message)
 	  			&& message->FindMessage("data", &data) == B_OK) {
 	  			Clipboard *clipboard = _GetClipboard(name);
 	  			if (clipboard) {
-	  				clipboard->SetData(&data, source);
-					reply.AddInt32("count", clipboard->Count());
-	  				result = B_OK;
+	  				int32 localCount;
+	  				bool failIfChanged;
+	  				if (message->FindInt32("count", &localCount) == B_OK
+	  					&& message->FindBool("fail if changed", &failIfChanged) == B_OK
+	  					&& failIfChanged
+	  					&& localCount != clipboard->Count()) {
+	  					// atomic support
+	  					result = B_ERROR;
+	  				} else {
+		  				clipboard->SetData(&data, source);
+						result = reply.AddInt32("count", clipboard->Count());
+	  					result = B_OK;
+	  				}
 	  			}
 	  		}
 

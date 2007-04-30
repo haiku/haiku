@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -146,7 +146,7 @@ BClipboard::Lock()
 	bool locked = fLock.Lock();
 
 #ifndef RUN_WITHOUT_REGISTRAR
-	if (locked && DownloadFromSystem() != B_OK) {
+	if (locked && _DownloadFromSystem() != B_OK) {
 		locked = false;
 		fLock.Unlock();
 	}
@@ -173,7 +173,7 @@ BClipboard::IsLocked() const
 status_t
 BClipboard::Clear()
 {
-	if (!AssertLocked())
+	if (!_AssertLocked())
 		return B_NOT_ALLOWED;
 
 	return fData->MakeEmpty();
@@ -183,22 +183,44 @@ BClipboard::Clear()
 status_t
 BClipboard::Commit()
 {
-	if (!AssertLocked())
+	return Commit(false);
+}
+
+
+status_t
+BClipboard::Commit(bool failIfChanged)
+{
+	if (!_AssertLocked())
 		return B_NOT_ALLOWED;
 
-	return UploadToSystem();
+	status_t status = B_ERROR;
+	BMessage message(B_REG_UPLOAD_CLIPBOARD), reply;
+	if (message.AddString("name", fName) == B_OK
+		&& message.AddMessage("data", fData) == B_OK
+		&& message.AddMessenger("data source", be_app_messenger) == B_OK
+		&& message.AddInt32("count", fCount) == B_OK
+		&& message.AddBool("fail if changed", failIfChanged) == B_OK)
+		status = fClipHandler.SendMessage(&message, &reply);
+
+	if (status == B_OK) {
+		int32 count;
+		if (reply.FindInt32("count", &count) == B_OK)
+			fCount = count;
+	}
+
+	return status;
 }
 
 
 status_t
 BClipboard::Revert()
 {
-	if (!AssertLocked())
+	if (!_AssertLocked())
 		return B_NOT_ALLOWED;
-		
+
 	status_t status = fData->MakeEmpty();
 	if (status == B_OK)
-		status = DownloadFromSystem();
+		status = _DownloadFromSystem();
 
 	return status;
 }
@@ -214,7 +236,7 @@ BClipboard::DataSource() const
 BMessage *
 BClipboard::Data() const
 {
-	if (!AssertLocked())
+	if (!_AssertLocked())
 		return NULL;
 
     return fData;
@@ -243,7 +265,7 @@ void BClipboard::_ReservedClipboard3() {}
 
 
 bool
-BClipboard::AssertLocked() const
+BClipboard::_AssertLocked() const
 {
 	// This function is for jumping to the debugger if not locked
 	if (!fLock.IsLocked()) {
@@ -255,7 +277,7 @@ BClipboard::AssertLocked() const
 
 
 status_t
-BClipboard::DownloadFromSystem(bool force)
+BClipboard::_DownloadFromSystem(bool force)
 {
 	// Apparently, the force paramater was used in some sort of
 	// optimization in R5. Currently, we ignore it.
@@ -267,21 +289,6 @@ BClipboard::DownloadFromSystem(bool force)
 		&& reply.FindInt32("count", (int32 *)&fCount) == B_OK)
 		return B_OK;
 
-	return B_ERROR;
-}
-
-
-status_t
-BClipboard::UploadToSystem()
-{
-	BMessage message(B_REG_UPLOAD_CLIPBOARD), reply;
-	if (message.AddString("name", fName) == B_OK
-		&& message.AddMessage("data", fData) == B_OK
-		&& message.AddMessenger("data source", be_app_messenger) == B_OK
-		&& fClipHandler.SendMessage(&message, &reply) == B_OK
-		&& reply.FindInt32("count", (int32 *)&fCount) == B_OK) {
-		return B_OK;
-	}
 	return B_ERROR;
 }
 
