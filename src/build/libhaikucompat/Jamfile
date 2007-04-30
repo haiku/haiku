@@ -9,14 +9,24 @@ if $(TARGET_PLATFORM) = libbe_test {
 	libbeTestSources = misc.cpp syscalls.cpp ;
 }
 
-StaticLibrary libhaikucompat.a :
+BuildPlatformStaticLibrary libhaikucompat_build.a :
+	atomic.S
 	strcasestr.c
 	strlcat.c
 	strlcpy.c
 	strnlen.c
+;	
+
+StaticLibrary libhaikucompat.a :
+	strcasestr.o
+	strlcat.o
+	strlcpy.o
+	strnlen.o
 
 	$(libbeTestSources)
 ;
 
 SEARCH on [ FGristFiles strcasestr.c strlcat.c strlcpy.c strnlen.c ]
 	= [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
+SEARCH on [ FGristFiles atomic.S ]
+	= [ FDirName $(HAIKU_TOP) src system libroot os arch $(HOST_ARCH) ] ;
