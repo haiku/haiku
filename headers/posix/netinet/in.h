@@ -8,6 +8,9 @@
 #include <endian.h>
 #include <stdint.h>
 
+/* RFC 2553 states that these must be available through <netinet/in.h> */
+#include <netinet6/in6.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif 
@@ -131,6 +134,10 @@ struct group_source_req {
 #define MCAST_LEAVE_GROUP           21 /* group_req */
 #define MCAST_JOIN_SOURCE_GROUP     22 /* group_source_req */
 #define MCAST_LEAVE_SOURCE_GROUP    23 /* group_source_req */
+
+#define IPV6_MULTICAST_IF			24 /* int */
+#define IPV6_MULTICAST_HOPS			25 /* int */
+#define IPV6_MULTICAST_LOOP			26 /* int */
 
 #define __IPADDR(x)     ((uint32_t)htonl((uint32_t)(x)))
 

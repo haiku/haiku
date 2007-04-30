@@ -4,3 +4,7 @@ BinCommand multicast :
 	multicast.cpp
 	: libnetwork.so
 ;
+
+
+BinCommand multicat : multicat.c : libnetwork.so ;
+BinCommand multisend : multisend.c : libnetwork.so ;

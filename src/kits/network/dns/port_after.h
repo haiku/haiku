@@ -71,10 +71,6 @@
 #endif
 
 #ifndef HAS_INET6_STRUCTS
-/* Replace with structure from later rev of O/S if known. */
-struct in6_addr {
-        u_int8_t        s6_addr[16];
-};
 
 #define IN6ADDR_ANY_INIT \
 	{{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
@@ -84,19 +80,6 @@ struct in6_addr {
 	{{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
 	   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 }}
 
-/* Replace with structure from later rev of O/S if known. */
-struct sockaddr_in6 {
-#ifdef  HAVE_SA_LEN
-        u_int8_t        sin6_len;       /* length of this struct */
-        u_int8_t        sin6_family;    /* AF_INET6 */
-#else
-        u_int16_t       sin6_family;    /* AF_INET6 */
-#endif
-        u_int16_t       sin6_port;      /* transport layer port # */
-        u_int32_t       sin6_flowinfo;  /* IPv6 flow information */
-        struct in6_addr sin6_addr;      /* IPv6 address */
-        u_int32_t       sin6_scope_id;  /* set of interfaces for a scope */
-};
 #endif  /* HAS_INET6_STRUCTS */
 
 #ifdef BROKEN_IN6ADDR_INIT_MACROS
