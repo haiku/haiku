@@ -1,0 +1,6 @@
+SubDir HAIKU_TOP src tests kits net multicast ;
+
+BinCommand multicast :
+	multicast.cpp
+	: libnetwork.so
+;
