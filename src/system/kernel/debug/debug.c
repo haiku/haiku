@@ -46,8 +46,8 @@ typedef struct debugger_command {
 int dbg_register_file[B_MAX_CPU_COUNT][14];
 	/* XXXmpetit -- must be made generic */
 
-static bool sSerialDebugEnabled = false;
-static bool sSyslogOutputEnabled = false;
+static bool sSerialDebugEnabled = true;
+static bool sSyslogOutputEnabled = true;
 static bool sBlueScreenEnabled = false;
 static bool sDebugScreenEnabled = false;
 static bool sBlueScreenOutput = true;
