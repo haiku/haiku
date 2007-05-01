@@ -860,6 +860,24 @@ generic_to_ipv4(int option)
 }
 
 
+static net_interface *
+get_multicast_interface(ipv4_protocol *protocol, const in_addr *address)
+{
+	sockaddr_in groupAddr;
+	memset(&groupAddr, 0, sizeof(groupAddr));
+	groupAddr.sin_family = AF_INET;
+	if (address)
+		groupAddr.sin_addr = *address;
+
+	net_route *route = sDatalinkModule->get_route(sDomain,
+		(sockaddr *)&groupAddr);
+	if (route == NULL)
+		return NULL;
+
+	return route->interface;
+}
+
+
 static status_t
 ipv4_delta_membership(ipv4_protocol *protocol, int option,
 	in_addr *interfaceAddr, in_addr *groupAddr, in_addr *sourceAddr)
@@ -867,7 +885,7 @@ ipv4_delta_membership(ipv4_protocol *protocol, int option,
 	net_interface *interface = NULL;
 
 	if (interfaceAddr->s_addr == INADDR_ANY) {
-		interface = sDatalinkModule->get_interface_with_address(sDomain, NULL);
+		interface = get_multicast_interface(protocol, groupAddr);
 	} else {
 		sockaddr_in address;
 		fill_sockaddr_in(&address, interfaceAddr->s_addr);
