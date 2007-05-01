@@ -804,7 +804,7 @@ interface_protocol_join_multicast(net_datalink_protocol *_protocol,
 	const sockaddr *address)
 {
 	// TODO
-	return EINVAL;
+	return ENOTSUP;
 }
 
 
@@ -813,7 +813,7 @@ interface_protocol_leave_multicast(net_datalink_protocol *_protocol,
 	const sockaddr *address)
 {
 	// TODO
-	return EINVAL;
+	return ENOTSUP;
 }
 
 

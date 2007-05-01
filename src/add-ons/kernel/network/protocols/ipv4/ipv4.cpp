@@ -11,6 +11,7 @@
 #include "multicast.h"
 
 #include <net_datalink.h>
+#include <net_datalink_protocol.h>
 #include <net_protocol.h>
 #include <net_stack.h>
 #include <NetBufferUtilities.h>
@@ -22,7 +23,7 @@
 #include <util/list.h>
 #include <util/khash.h>
 #include <util/DoublyLinkedList.h>
-#include <util/OpenHashTable.h>
+#include <util/MultiHashTable.h>
 
 #include <netinet/in.h>
 #include <netinet/ip.h>
@@ -30,6 +31,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <utility>
 
 
 //#define TRACE_IPV4
@@ -118,48 +120,6 @@ class FragmentPacket {
 };
 
 
-class MulticastGroup {
-public:
-	MulticastGroup(const in_addr &address);
-
-	status_t Deliver(net_protocol_module_info *module, net_buffer *buffer,
-		bool raw);
-
-	void Add(IPv4Multicast::GroupState *groupState);
-	void Remove(IPv4Multicast::GroupState *groupState);
-	bool IsEmpty() const { return fLinks.IsEmpty(); }
-
-	struct HashDefinition {
-		typedef void ParentType;
-		typedef const in_addr KeyType;
-		typedef MulticastGroup ValueType;
-
-		size_t HashKey(const in_addr &address) const
-			{ return address.s_addr; }
-		size_t Hash(MulticastGroup *group) const
-			{ return HashKey(group->fMulticastAddress); }
-		bool Compare(const in_addr &address, MulticastGroup *group) const
-			{ return group->fMulticastAddress.s_addr == address.s_addr; }
-		HashTableLink<MulticastGroup> *GetLink(MulticastGroup *group) const
-			{ return &group->fLink; }
-	};
-
-	void DumpInternalState() const;
-
-private:
-	// for g++ 2.95
-	friend class HashDefinition;
-
-	typedef DoublyLinkedList<IPv4Multicast::GroupState> Links;
-
-	in_addr fMulticastAddress;
-	Links fLinks;
-
-	HashTableLink<MulticastGroup> fLink;
-};
-
-
-
 class RawSocket : public DoublyLinkedListLinkImpl<RawSocket>, public DatagramSocket<> {
 	public:
 		RawSocket(net_socket *socket);
@@ -167,7 +127,28 @@ class RawSocket : public DoublyLinkedListLinkImpl<RawSocket>, public DatagramSoc
 
 typedef DoublyLinkedList<RawSocket> RawSocketList;
 
+typedef MulticastGroupInterface<IPv4Multicast> IPv4GroupInterface;
 typedef MulticastFilter<IPv4Multicast> IPv4MulticastFilter;
+
+struct MulticastStateHash {
+	typedef void ParentType;
+	typedef std::pair<const in_addr *, uint32> KeyType;
+	typedef IPv4GroupInterface ValueType;
+
+	size_t HashKey(const KeyType &key) const
+		{ return key.first->s_addr ^ key.second; }
+	size_t Hash(ValueType *value) const
+		{ return HashKey(std::make_pair(&value->Address(),
+			value->Interface()->index)); }
+	bool Compare(const KeyType &key, ValueType *value) const
+		{ return value->Interface()->index == key.second
+			&& value->Address().s_addr == key.first->s_addr; }
+	bool CompareValues(ValueType *value1, ValueType *value2) const
+		{ return value1->Interface()->index == value2->Interface()->index
+			&& value1->Address().s_addr == value2->Address().s_addr; }
+	HashTableLink<ValueType> *GetLink(ValueType *value) const { return value; }
+};
+
 
 struct ipv4_protocol : net_protocol {
 	ipv4_protocol()
@@ -205,8 +186,10 @@ static benaphore sRawSocketsLock;
 static benaphore sFragmentLock;
 static hash_table *sFragmentHash;
 static benaphore sMulticastGroupsLock;
-typedef OpenHashTable<MulticastGroup::HashDefinition> MulticastGroups;
-static MulticastGroups *sMulticastGroups;
+
+typedef MultiHashTable<MulticastStateHash> MulticastState;
+static MulticastState *sMulticastState;
+
 static net_protocol_module_info *sReceivingProtocol[256];
 static benaphore sReceivingProtocolLock;
 
@@ -461,73 +444,6 @@ FragmentPacket::StaleTimer(struct net_timer *timer, void *data)
 }
 
 
-MulticastGroup::MulticastGroup(const in_addr &address)
-	: fMulticastAddress(address)
-{
-}
-
-
-status_t
-MulticastGroup::Deliver(net_protocol_module_info *module, net_buffer *buffer,
-	bool deliverToRaw)
-{
-	Links::Iterator iterator = fLinks.GetIterator();
-
-	while (iterator.HasNext()) {
-		IPv4Multicast::GroupState *groupState = iterator.Next();
-
-		if (deliverToRaw && groupState->Socket()->raw == NULL)
-			continue;
-
-		if (groupState->FilterAccepts(buffer)) {
-			// as Multicast filters are installed with an IPv4 protocol
-			// reference, we need to go and find the appropriate instance
-			// related to the 'receiving protocol' with module 'module'.
-			net_protocol *proto = groupState->Socket()->socket->first_protocol;
-
-			while (proto && proto->module != module)
-				proto = proto->next;
-
-			if (proto)
-				module->deliver_data(proto, buffer);
-		}
-	}
-
-	return B_OK;
-}
-
-
-void
-MulticastGroup::Add(IPv4Multicast::GroupState *groupState)
-{
-	fLinks.Add(groupState);
-}
-
-
-void
-MulticastGroup::Remove(IPv4Multicast::GroupState *groupState)
-{
-	fLinks.Remove(groupState);
-}
-
-
-void
-MulticastGroup::DumpInternalState() const
-{
-	char addrBuf[64];
-
-	kprintf("group %s (%p)\n", print_address(&fMulticastAddress, addrBuf,
-		sizeof(addrBuf)), this);
-
-	Links::ConstIterator it = fLinks.GetIterator();
-	while (it.HasNext()) {
-		IPv4Multicast::GroupState *group = it.Next();
-
-		kprintf("  socket %p\n", group->Socket());
-	}
-}
-
-
 //	#pragma mark -
 
 
@@ -730,12 +646,37 @@ deliver_multicast(net_protocol_module_info *module, net_buffer *buffer,
 
 	BenaphoreLocker _(sMulticastGroupsLock);
 
-	MulticastGroup *group = sMulticastGroups->Lookup(
-		((sockaddr_in *)&buffer->destination)->sin_addr);
-	if (group == NULL)
-		return B_OK;
+	sockaddr_in *multicastAddr = (sockaddr_in *)&buffer->destination;
 
-	return group->Deliver(module, buffer, deliverToRaw);
+	MulticastState::Iterator it = sMulticastState->Lookup(std::make_pair(
+		&multicastAddr->sin_addr, buffer->interface->index));
+
+	while (it.HasNext()) {
+		IPv4GroupInterface *state = it.Next();
+
+		if (state->Interface()->index != buffer->interface->index
+			|| state->Address().s_addr != multicastAddr->sin_addr.s_addr)
+			break;
+
+		if (deliverToRaw && state->Parent()->Socket()->raw == NULL)
+			continue;
+
+		if (state->FilterAccepts(buffer)) {
+			// as Multicast filters are installed with an IPv4 protocol
+			// reference, we need to go and find the appropriate instance
+			// related to the 'receiving protocol' with module 'module'.
+			net_protocol *proto =
+				state->Parent()->Socket()->socket->first_protocol;
+
+			while (proto && proto->module != module)
+				proto = proto->next;
+
+			if (proto)
+				module->deliver_data(proto, buffer);
+		}
+	}
+
+	return B_OK;
 }
 
 
@@ -770,40 +711,42 @@ raw_receive_data(net_buffer *buffer)
 
 
 status_t
-IPv4Multicast::JoinGroup(GroupState *groupState)
+IPv4Multicast::JoinGroup(IPv4GroupInterface *state)
 {
 	BenaphoreLocker _(sMulticastGroupsLock);
 
-	MulticastGroup *group = sMulticastGroups->Lookup(groupState->Address());
-	if (group == NULL) {
-		group = new (std::nothrow) MulticastGroup(groupState->Address());
-		if (group == NULL)
-			return B_NO_MEMORY;
+	sockaddr_in groupAddr;
+	memset(&groupAddr, 0, sizeof(groupAddr));
+	groupAddr.sin_addr = state->Address();
 
-		sMulticastGroups->Insert(group);
-	}
+	net_interface *intf = state->Interface();
 
-	group->Add(groupState);
+	status_t status =
+		intf->first_protocol->module->join_multicast(intf->first_protocol,
+			(sockaddr *)&groupAddr);
+	if (status < B_OK)
+		return status;
+
+	sMulticastState->Insert(state);
 	return B_OK;
 }
 
 
 status_t
-IPv4Multicast::LeaveGroup(GroupState *groupState)
+IPv4Multicast::LeaveGroup(IPv4GroupInterface *state)
 {
 	BenaphoreLocker _(sMulticastGroupsLock);
 
-	MulticastGroup *group = sMulticastGroups->Lookup(groupState->Address());
-	if (group == NULL)
-		return ENOENT;
+	sMulticastState->Remove(state);
 
-	group->Remove(groupState);
-	if (group->IsEmpty()) {
-		sMulticastGroups->Remove(group);
-		delete group;
-	}
+	sockaddr_in groupAddr;
+	memset(&groupAddr, 0, sizeof(groupAddr));
+	groupAddr.sin_addr = state->Address();
 
-	return B_OK;
+	net_interface *intf = state->Interface();
+
+	return intf->first_protocol->module->join_multicast(intf->first_protocol,
+		(sockaddr *)&groupAddr);
 }
 
 
@@ -838,22 +781,22 @@ fill_sockaddr_in(sockaddr_in *target, in_addr_t address)
 
 
 static status_t
-ipv4_delta_group(IPv4MulticastFilter::GroupState *group, int option,
+ipv4_delta_group(IPv4GroupInterface *group, int option,
 	net_interface *interface, const in_addr *sourceAddr)
 {
 	switch (option) {
 		case IP_ADD_MEMBERSHIP:
-			return group->Add(interface);
+			return group->Add();
 		case IP_DROP_MEMBERSHIP:
-			return group->Drop(interface);
+			return group->Drop();
 		case IP_BLOCK_SOURCE:
-			return group->BlockSource(interface, *sourceAddr);
+			return group->BlockSource(*sourceAddr);
 		case IP_UNBLOCK_SOURCE:
-			return group->UnblockSource(interface, *sourceAddr);
+			return group->UnblockSource(*sourceAddr);
 		case IP_ADD_SOURCE_MEMBERSHIP:
-			return group->AddSSM(interface, *sourceAddr);
+			return group->AddSSM(*sourceAddr);
 		case IP_DROP_SOURCE_MEMBERSHIP:
-			return group->DropSSM(interface, *sourceAddr);
+			return group->DropSSM(*sourceAddr);
 	}
 
 	return B_ERROR;
@@ -866,22 +809,21 @@ ipv4_delta_membership(ipv4_protocol *protocol, int option,
 	const in_addr *sourceAddr)
 {
 	IPv4MulticastFilter &filter = protocol->multicast_filter;
-	IPv4MulticastFilter::GroupState *group = NULL;
+	IPv4GroupInterface *state = NULL;
+	status_t status = B_OK;
 
 	switch (option) {
 		case IP_ADD_MEMBERSHIP:
 		case IP_ADD_SOURCE_MEMBERSHIP:
-			group = filter.GetGroup(*groupAddr, true);
-			if (group == NULL)
-				return ENOBUFS;
+			status = filter.GetState(*groupAddr, interface, state, true);
 			break;
 
 		case IP_DROP_MEMBERSHIP:
 		case IP_BLOCK_SOURCE:
 		case IP_UNBLOCK_SOURCE:
 		case IP_DROP_SOURCE_MEMBERSHIP:
-			group = filter.GetGroup(*groupAddr, false);
-			if (group == NULL) {
+			filter.GetState(*groupAddr, interface, state, false);
+			if (state == NULL) {
 				if (option == IP_DROP_MEMBERSHIP
 					|| option == IP_DROP_SOURCE_MEMBERSHIP)
 					return EADDRNOTAVAIL;
@@ -891,10 +833,11 @@ ipv4_delta_membership(ipv4_protocol *protocol, int option,
 			break;
 	}
 
-	status_t status = ipv4_delta_group(group, option, interface, sourceAddr);
+	if (status < B_OK)
+		return status;
 
-	filter.ReturnGroup(group);
-
+	status = ipv4_delta_group(state, option, interface, sourceAddr);
+	filter.ReturnState(state);
 	return status;
 }
 
@@ -1590,10 +1533,17 @@ ipv4_error_reply(net_protocol *protocol, net_buffer *causedError, uint32 code,
 static int
 dump_ipv4_multicast(int argc, char *argv[])
 {
-	MulticastGroups::Iterator it = sMulticastGroups->GetIterator();
+	MulticastState::Iterator it = sMulticastState->GetIterator();
 
-	while (it.HasNext())
-		it.Next()->DumpInternalState();
+	while (it.HasNext()) {
+		IPv4GroupInterface *state = it.Next();
+
+		char addrBuf[64];
+
+		kprintf("%p: group <%s, %s> sock %p\n", state,
+			state->Interface()->name, print_address(&state->Address(),
+				addrBuf, sizeof(addrBuf)), state->Parent()->Socket());
+	}
 
 	return 0;
 }
@@ -1623,11 +1573,11 @@ init_ipv4()
 	if (status < B_OK)
 		goto err3;
 
-	sMulticastGroups = new MulticastGroups();
-	if (sMulticastGroups == NULL)
+	sMulticastState = new MulticastState();
+	if (sMulticastState == NULL)
 		goto err4;
 
-	status = sMulticastGroups->InitCheck();
+	status = sMulticastState->InitCheck();
 	if (status < B_OK)
 		goto err5;
 
@@ -1659,7 +1609,7 @@ init_ipv4()
 err6:
 	hash_uninit(sFragmentHash);
 err5:
-	delete sMulticastGroups;
+	delete sMulticastState;
 err4:
 	benaphore_destroy(&sReceivingProtocolLock);
 err3:
@@ -1688,7 +1638,7 @@ uninit_ipv4()
 	gStackModule->unregister_domain(sDomain);
 	benaphore_unlock(&sReceivingProtocolLock);
 
-	delete sMulticastGroups;
+	delete sMulticastState;
 	hash_uninit(sFragmentHash);
 
 	benaphore_destroy(&sMulticastGroupsLock);

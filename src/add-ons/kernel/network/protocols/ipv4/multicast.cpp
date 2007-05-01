@@ -23,227 +23,120 @@ operator==(const in_addr &a1, const in_addr &a2)
 using std::nothrow;
 
 
-template<typename AddressType>
-MulticastGroupInterfaceState<AddressType>::MulticastGroupInterfaceState(
-	net_interface *interface)
-	: fInterface(interface)
-{
-}
-
-
-template<typename AddressType>
-MulticastGroupInterfaceState<AddressType>::~MulticastGroupInterfaceState()
-{
-	typename SourceList::Iterator iterator = fSources.GetIterator();
-	while (iterator.HasNext()) {
-		_Remove(iterator.Next());
-	}
-}
-
-
-template<typename AddressType> status_t
-MulticastGroupInterfaceState<AddressType>::Add(const AddressType &address)
-{
-	return _Get(address, true) ? B_OK : ENOBUFS;
-}
-
-
-template<typename AddressType> status_t
-MulticastGroupInterfaceState<AddressType>::Remove(const AddressType &address)
-{
-	Source *state = _Get(address, false);
-	if (state == NULL)
-		return EADDRNOTAVAIL;
-
-	_Remove(state);
-	return B_OK;
-}
-
-
-template<typename AddressType> typename MulticastGroupInterfaceState<AddressType>::Source *
-MulticastGroupInterfaceState<AddressType>::_Get(const AddressType &address,
-	bool create)
-{
-	typename SourceList::Iterator iterator = fSources.GetIterator();
-	while (iterator.HasNext()) {
-		Source *state = iterator.Next();
-		if (state->address == address)
-			return state;
-	}
-
-	if (!create)
-		return false;
-
-	Source *state = new (nothrow) Source;
-	if (state) {
-		state->address = address;
-		fSources.Add(state);
-	}
-
-	return state;
-}
-
-
-template<typename AddressType> void
-MulticastGroupInterfaceState<AddressType>::_Remove(Source *state)
-{
-	fSources.Remove(state);
-	delete state;
-}
-
-
 template<typename Addressing>
-MulticastGroupState<Addressing>::MulticastGroupState(ProtocolType *socket,
-	const AddressType &address)
-	: fSocket(socket), fMulticastAddress(address), fFilterMode(kInclude)
+MulticastGroupInterface<Addressing>::MulticastGroupInterface(Filter *parent,
+	const AddressType &address, net_interface *interface)
+	: fParent(parent), fMulticastAddress(address), fInterface(interface)
 {
 }
 
 
 template<typename Addressing>
-MulticastGroupState<Addressing>::~MulticastGroupState()
+MulticastGroupInterface<Addressing>::~MulticastGroupInterface()
 {
 	Clear();
 }
 
 
 template<typename Addressing> status_t
-MulticastGroupState<Addressing>::Add(net_interface *interface)
+MulticastGroupInterface<Addressing>::Add()
 {
-	if (fFilterMode == kInclude && !fInterfaces.IsEmpty())
+	if (fFilterMode == kInclude && !fAddresses.IsEmpty())
 		return EINVAL;
 
 	fFilterMode = kExclude;
-
-	return _GetInterface(interface, true) != NULL ? B_OK : ENOBUFS;
-}
-
-
-template<typename Addressing> status_t
-MulticastGroupState<Addressing>::Drop(net_interface *interface)
-{
-	InterfaceState *state = _GetInterface(interface, false);
-	if (state == NULL)
-		return EADDRNOTAVAIL;
-
-	_RemoveInterface(state);
-
-	if (fInterfaces.IsEmpty())
-		fFilterMode = kInclude;
-
 	return B_OK;
 }
 
 
 template<typename Addressing> status_t
-MulticastGroupState<Addressing>::BlockSource(net_interface *interface,
+MulticastGroupInterface<Addressing>::Drop()
+{
+	fAddresses.Clear();
+	fFilterMode = kInclude;
+	return B_OK;
+}
+
+
+template<typename Addressing> status_t
+MulticastGroupInterface<Addressing>::BlockSource(
 	const AddressType &sourceAddress)
 {
 	if (fFilterMode != kExclude)
 		return EINVAL;
 
-	InterfaceState *state = _GetInterface(interface, false);
-	if (state == NULL)
-		return EINVAL;
-
-	return state->Add(sourceAddress);
+	fAddresses.Add(sourceAddress);
+	return B_OK;
 }
 
 
 template<typename Addressing> status_t
-MulticastGroupState<Addressing>::UnblockSource(net_interface *interface,
+MulticastGroupInterface<Addressing>::UnblockSource(
 	const AddressType &sourceAddress)
 {
 	if (fFilterMode != kExclude)
 		return EINVAL;
 
-	InterfaceState *state = _GetInterface(interface, false);
-	if (state == NULL)
-		return EINVAL;
-
-	return state->Remove(sourceAddress);
-}
-
-template<typename Addressing> status_t
-MulticastGroupState<Addressing>::AddSSM(net_interface *interface,
-	const AddressType &sourceAddress)
-{
-	if (fFilterMode == kExclude)
-		return EINVAL;
-
-	InterfaceState *state = _GetInterface(interface, true);
-	if (state == NULL)
-		return ENOBUFS;
-
-	return state->Add(sourceAddress);
-}
-
-
-template<typename Addressing> status_t
-MulticastGroupState<Addressing>::DropSSM(net_interface *interface,
-	const AddressType &sourceAddress)
-{
-	if (fFilterMode == kExclude)
-		return EINVAL;
-
-	InterfaceState *state = _GetInterface(interface, false);
-	if (state == NULL)
+	if (!fAddresses.Has(sourceAddress))
 		return EADDRNOTAVAIL;
 
-	return state->Remove(sourceAddress);
+	fAddresses.Add(sourceAddress);
+	return B_OK;
 }
 
 
-template<typename Addressing> void
-MulticastGroupState<Addressing>::Clear()
+template<typename Addressing> status_t
+MulticastGroupInterface<Addressing>::AddSSM(const AddressType &sourceAddress)
 {
-	typename InterfaceList::Iterator iterator = fInterfaces.GetIterator();
-	while (iterator.HasNext())
-		_RemoveInterface(iterator.Next());
+	if (fFilterMode == kExclude)
+		return EINVAL;
+
+	fAddresses.Add(sourceAddress);
+	return B_OK;
+}
+
+
+template<typename Addressing> status_t
+MulticastGroupInterface<Addressing>::DropSSM(const AddressType &sourceAddress)
+{
+	if (fFilterMode == kExclude)
+		return EINVAL;
+
+	if (!fAddresses.Has(sourceAddress))
+		return EADDRNOTAVAIL;
+
+	fAddresses.Add(sourceAddress);
+	return B_OK;
 }
 
 
 template<typename Addressing> bool
-MulticastGroupState<Addressing>::FilterAccepts(net_buffer *buffer)
+MulticastGroupInterface<Addressing>::IsEmpty() const
 {
-	InterfaceState *state = _GetInterface(buffer->interface, false);
-	if (state == NULL)
-		return false;
-
-	bool has = state->Contains(Addressing::AddressFromSockAddr(
-		(sockaddr *)&buffer->source));
-
-	return (has && fFilterMode == kInclude) || (!has && fFilterMode == kExclude);
-}
-
-
-template<typename Addressing> typename MulticastGroupState<Addressing>::InterfaceState *
-MulticastGroupState<Addressing>::_GetInterface(net_interface *interface,
-	bool create)
-{
-	typename InterfaceList::Iterator iterator = fInterfaces.GetIterator();
-	while (iterator.HasNext()) {
-		InterfaceState *state = iterator.Next();
-		if (state->Interface() == interface)
-			return state;
-	}
-
-	if (!create)
-		return false;
-
-	InterfaceState *state = new (nothrow) InterfaceState(interface);
-	if (state)
-		fInterfaces.Add(state);
-
-	return state;
+	return fFilterMode == kInclude && fAddresses.IsEmpty();
 }
 
 
 template<typename Addressing> void
-MulticastGroupState<Addressing>::_RemoveInterface(InterfaceState *state)
+MulticastGroupInterface<Addressing>::Clear()
 {
-	fInterfaces.Remove(state);
-	delete state;
+	if (IsEmpty())
+		return;
+
+	fFilterMode = kInclude;
+	fAddresses.Clear();
+	Addressing::LeaveGroup(this);
+}
+
+
+template<typename Addressing> bool
+MulticastGroupInterface<Addressing>::FilterAccepts(net_buffer *buffer) const
+{
+	bool has = fAddresses.Has(Addressing::AddressFromSockAddr(
+		(sockaddr *)&buffer->source));
+
+	return (has && fFilterMode == kInclude)
+		|| (!has && fFilterMode == kExclude);
 }
 
 
@@ -262,56 +155,58 @@ MulticastFilter<Addressing>::~MulticastFilter()
 		if (!iterator.HasNext())
 			return;
 
-		GroupState *state = iterator.Next();
+		GroupInterface *state = iterator.Next();
 		state->Clear();
-		_ReturnGroup(state);
+		_ReturnState(state);
 	}
 }
 
 
-template<typename Addressing> typename MulticastFilter<Addressing>::GroupState *
-MulticastFilter<Addressing>::GetGroup(const AddressType &groupAddress,
-	bool create)
+template<typename Addressing> status_t
+MulticastFilter<Addressing>::GetState(const AddressType &groupAddress,
+	net_interface *interface, GroupInterface* &state, bool create)
 {
-	GroupState *state = fStates.Lookup(groupAddress);
-	if (state)
-		return state;
+	state = fStates.Lookup(std::make_pair(&groupAddress, interface->index));
 
-	if (create) {
-		state = new (nothrow) GroupState(fParent, groupAddress);
-		if (state) {
-			if (fStates.Insert(state) >= B_OK) {
-				if (Addressing::JoinGroup(state) >= B_OK)
-					return state;
+	if (state == NULL && create) {
+		state = new (nothrow) GroupInterface(this, groupAddress, interface);
+		if (state == NULL)
+			return B_NO_MEMORY;
 
-				fStates.Remove(state);
-			}
-
+		status_t status = fStates.Insert(state);
+		if (status < B_OK) {
 			delete state;
+			return status;
 		}
+
+		status = Addressing::JoinGroup(state);
+		if (status < B_OK) {
+			fStates.Remove(state);
+			delete state;
+			return status;
+		}
+
 	}
 
-	return NULL;
+	return B_OK;
 }
 
 
 template<typename Addressing> void
-MulticastFilter<Addressing>::ReturnGroup(GroupState *group)
+MulticastFilter<Addressing>::ReturnState(GroupInterface *state)
 {
-	if (group->IsEmpty())
-		_ReturnGroup(group);
+	if (state->IsEmpty())
+		_ReturnState(state);
 }
 
 
 template<typename Addressing> void
-MulticastFilter<Addressing>::_ReturnGroup(GroupState *group)
+MulticastFilter<Addressing>::_ReturnState(GroupInterface *state)
 {
-	Addressing::LeaveGroup(group);
-	fStates.Remove(group);
-	delete group;
+	fStates.Remove(state);
+	delete state;
 }
 
 // IPv4 explicit template instantiation
 template class MulticastFilter<IPv4Multicast>;
-template class MulticastGroupState<IPv4Multicast>;
-template class MulticastGroupInterfaceState<in_addr>;
+template class MulticastGroupInterface<IPv4Multicast>;

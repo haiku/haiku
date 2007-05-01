@@ -85,6 +85,8 @@ public:
 		return true;
 	}
 
+	Iterator GetIterator() const { return HashTable::GetIterator(); }
+
 private:
 	void _Insert(ValueType **table, size_t tableSize, ValueType *value)
 	{
