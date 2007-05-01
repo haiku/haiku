@@ -415,7 +415,7 @@ mouse_close(void *_cookie)
 
 	TRACE("ps2: mouse_close %s enter\n", cookie->dev->name);
 
-	ps2_dev_command(cookie->dev, PS2_CMD_DISABLE, NULL, 0, NULL, 0);
+	ps2_dev_command_timeout(cookie->dev, PS2_CMD_DISABLE, NULL, 0, NULL, 0, 150000);
 
 	delete_packet_buffer(cookie->mouse_buffer);
 	delete_sem(cookie->mouse_sem);
