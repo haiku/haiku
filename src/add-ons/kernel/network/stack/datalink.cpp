@@ -799,6 +799,24 @@ interface_protocol_control(net_datalink_protocol *_protocol,
 }
 
 
+static status_t
+interface_protocol_join_multicast(net_datalink_protocol *_protocol,
+	const sockaddr *address)
+{
+	// TODO
+	return EINVAL;
+}
+
+
+static status_t
+interface_protocol_leave_multicast(net_datalink_protocol *_protocol,
+	const sockaddr *address)
+{
+	// TODO
+	return EINVAL;
+}
+
+
 net_datalink_module_info gNetDatalinkModule = {
 	{
 		NET_DATALINK_MODULE_NAME,
@@ -835,4 +853,6 @@ net_datalink_protocol_module_info gDatalinkInterfaceProtocolModule = {
 	interface_protocol_up,
 	interface_protocol_down,
 	interface_protocol_control,
+	interface_protocol_join_multicast,
+	interface_protocol_leave_multicast,
 };

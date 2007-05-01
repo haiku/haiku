@@ -170,6 +170,22 @@ ethernet_frame_control(net_datalink_protocol *protocol,
 
 
 static status_t
+ethernet_frame_join_multicast(net_datalink_protocol *protocol,
+	const sockaddr *address)
+{
+	return protocol->next->module->join_multicast(protocol, address);
+}
+
+
+static status_t
+ethernet_frame_leave_multicast(net_datalink_protocol *protocol,
+	const sockaddr *address)
+{
+	return protocol->next->module->leave_multicast(protocol, address);
+}
+
+
+static status_t
 ethernet_frame_std_ops(int32 op, ...)
 {
 	switch (op) {
@@ -197,6 +213,8 @@ static net_datalink_protocol_module_info sEthernetFrameModule = {
 	ethernet_frame_up,
 	ethernet_frame_down,
 	ethernet_frame_control,
+	ethernet_frame_join_multicast,
+	ethernet_frame_leave_multicast,
 };
 
 module_info *modules[] = {

@@ -30,6 +30,11 @@ struct net_datalink_protocol_module_info {
 
 	status_t	(*control)(net_datalink_protocol *self,
 					int32 op, void *argument, size_t length);
+
+	status_t	(*join_multicast)(net_datalink_protocol *self,
+					const sockaddr *address);
+	status_t	(*leave_multicast)(net_datalink_protocol *self,
+					const sockaddr *address);
 };
 
 #endif	// NET_DATALINK_PROTOCOL_H

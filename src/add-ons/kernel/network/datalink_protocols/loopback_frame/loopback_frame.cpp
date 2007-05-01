@@ -131,6 +131,22 @@ loopback_frame_control(net_datalink_protocol *protocol,
 
 
 static status_t
+loopback_frame_join_multicast(net_datalink_protocol *protocol,
+	const sockaddr *address)
+{
+	return protocol->next->module->join_multicast(protocol, address);
+}
+
+
+static status_t
+loopback_frame_leave_multicast(net_datalink_protocol *protocol,
+	const sockaddr *address)
+{
+	return protocol->next->module->leave_multicast(protocol, address);
+}
+
+
+static status_t
 loopback_frame_std_ops(int32 op, ...)
 {
 	switch (op) {
@@ -158,6 +174,8 @@ static net_datalink_protocol_module_info sLoopbackFrameModule = {
 	loopback_frame_up,
 	loopback_frame_down,
 	loopback_frame_control,
+	loopback_frame_join_multicast,
+	loopback_frame_leave_multicast,
 };
 
 module_info *modules[] = {

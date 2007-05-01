@@ -248,6 +248,32 @@ arp_entry::MarkValid()
 }
 
 
+static void
+ipv4_to_ether_multicast(sockaddr_dl *destination, const sockaddr_in *source)
+{
+	// RFC 1112 - Host extensions for IP multicasting
+	//
+	//   ``An IP host group address is mapped to an Ethernet multicast
+	//   address by placing the low-order 23-bits of the IP address into
+	//   the low-order 23 bits of the Ethernet multicast address
+	//   01-00-5E-00-00-00 (hex).''
+
+	memcpy(((uint8 *)destination->sdl_data) + 2, &source->sin_addr,
+		sizeof(in_addr));
+
+	destination->sdl_len = sizeof(sockaddr_dl);
+	destination->sdl_family = AF_DLI;
+	destination->sdl_index = 0;
+	destination->sdl_type = IFT_ETHER;
+	destination->sdl_e_type = ETHER_TYPE_IP;
+	destination->sdl_nlen = destination->sdl_slen = 0;
+	destination->sdl_alen = ETHER_ADDRESS_LENGTH;
+
+	uint32 *data = (uint32 *)destination->sdl_data;
+	data[0] = (data[0] & htonl(0x7f)) | htonl(0x01005e00);
+}
+
+
 //	#pragma mark -
 
 
@@ -791,28 +817,11 @@ arp_send_data(net_datalink_protocol *protocol,
 			entry->hardware_address.sdl_len);
 
 		if (buffer->flags & MSG_MCAST) {
-			// RFC 1112 - Host extensions for IP multicasting
-			//
-			//   ``An IP host group address is mapped to an Ethernet multicast
-			//   address by placing the low-order 23-bits of the IP address into
-			//   the low-order 23 bits of the Ethernet multicast address
-			//   01-00-5E-00-00-00 (hex).''
-
-			sockaddr_dl *destination = (sockaddr_dl *)&buffer->destination;
-
-			memmove(((uint8 *)destination->sdl_data) + 2,
-				&((sockaddr_in *)&buffer->destination)->sin_addr, sizeof(in_addr));
-
-			destination->sdl_len = sizeof(sockaddr_dl);
-			destination->sdl_family = AF_DLI;
-			destination->sdl_index = 0;
-			destination->sdl_type = IFT_ETHER;
-			destination->sdl_e_type = ETHER_TYPE_IP;
-			destination->sdl_nlen = destination->sdl_slen = 0;
-			destination->sdl_alen = ETHER_ADDRESS_LENGTH;
-
-			uint32 *data = (uint32 *)destination->sdl_data;
-			data[0] = (data[0] & htonl(0x7f)) | htonl(0x01005e00);
+			sockaddr_dl multicastDestination;
+			ipv4_to_ether_multicast(&multicastDestination,
+				(sockaddr_in *)&buffer->destination);
+			memcpy(&buffer->destination, &multicastDestination,
+				sizeof(multicastDestination));
 		} else if ((buffer->flags & MSG_BCAST) == 0) {
 			// Lookup destination (we may need to wait for this)
 			entry = arp_entry::Lookup(
@@ -928,6 +937,34 @@ arp_control(net_datalink_protocol *protocol,
 
 
 static status_t
+arp_join_multicast(net_datalink_protocol *protocol, const sockaddr *address)
+{
+	if (address->sa_family != AF_INET)
+		return EINVAL;
+
+	sockaddr_dl multicastAddress;
+	ipv4_to_ether_multicast(&multicastAddress, (const sockaddr_in *)address);
+
+	return protocol->next->module->join_multicast(protocol->next,
+		(sockaddr *)&multicastAddress);
+}
+
+
+static status_t
+arp_leave_multicast(net_datalink_protocol *protocol, const sockaddr *address)
+{
+	if (address->sa_family != AF_INET)
+		return EINVAL;
+
+	sockaddr_dl multicastAddress;
+	ipv4_to_ether_multicast(&multicastAddress, (const sockaddr_in *)address);
+
+	return protocol->next->module->leave_multicast(protocol->next,
+		(sockaddr *)&multicastAddress);
+}
+
+
+static status_t
 arp_std_ops(int32 op, ...)
 {
 	switch (op) {
@@ -954,6 +991,8 @@ static net_datalink_protocol_module_info sARPModule = {
 	arp_up,
 	arp_down,
 	arp_control,
+	arp_join_multicast,
+	arp_leave_multicast,
 };
 
 
