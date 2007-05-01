@@ -73,9 +73,12 @@ GraphicsDriver::setupData(BFile *spool_file)
 		// already initialized
 		return true;
 	}
-			
-	print_file_header pfh;
 
+#ifndef __ZETA__
+	print_file_header pfh;
+#else			
+	BPrintJob::print_file_header pfh;
+#endif
 	spool_file->Seek(0, SEEK_SET);
 	spool_file->Read(&pfh, sizeof(pfh));
 

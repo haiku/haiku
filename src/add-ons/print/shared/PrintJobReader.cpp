@@ -28,6 +28,7 @@ THE SOFTWARE.
 */
 
 #include <stdio.h>
+#include <Picture.h>
 #include <PrintJob.h>
 #include "PrintJobReader.h"
 
@@ -103,7 +104,11 @@ PrintJobReader::PrintJobReader(BFile* jobFile)
 	, fNumberOfPages(-1)
 	, fPageIndex(NULL)
 {
+#ifndef __ZETA__
 	print_file_header header;
+#else
+	BPrintJob::print_file_header header;
+#endif
 	fJobFile.Seek(0, SEEK_SET);
 	if (fJobFile.Read(&header, sizeof(header)) == sizeof(header) &&
 		fJobSettings.Unflatten(&fJobFile) == B_OK) {

@@ -103,7 +103,11 @@ static bool InList(const char* list[], const char* name) {
 
 void AddFields(BMessage* to, const BMessage* from, const char* excludeList[], const char* includeList[], bool overwrite) {
 	if (to == from) return;
+#ifndef __ZETA__
 	char* name;
+#else
+	const char* name;
+#endif
 	type_code type;
 	int32 count;
 	for (int32 i = 0; from->GetInfo(B_ANY_TYPE, i, &name, &type, &count) == B_OK; i ++) {
