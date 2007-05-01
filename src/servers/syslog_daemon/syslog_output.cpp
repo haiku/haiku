@@ -126,7 +126,7 @@ syslog_output(syslog_message &message)
 		// parse & nicely print the time stamp from the message
 		struct tm when;
 		localtime_r(&message.when, &when);
-		pos = strftime(header, sizeof(header), "%Y-%m-%d %H:%M:%S", &when);
+		pos = strftime(header, sizeof(header), "%Y-%m-%d %H:%M:%S ", &when);
 	}
 
 	// add facility
