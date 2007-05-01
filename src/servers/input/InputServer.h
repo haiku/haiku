@@ -5,6 +5,7 @@
 #ifndef INPUT_SERVER_APP_H
 #define INPUT_SERVER_APP_H
 
+// #define DEBUG 1
 
 #include "AddOnManager.h"
 #include "DeviceManager.h"
