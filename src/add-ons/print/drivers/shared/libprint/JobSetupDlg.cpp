@@ -6,7 +6,6 @@
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
-#include <sstream>
 #include <string>
 #include <fcntl.h>  
 #include <unistd.h>
@@ -29,6 +28,7 @@
 #include <RadioButton.h>
 #include <Rect.h>
 #include <Slider.h>
+#include <String.h>
 #include <TextControl.h>
 #include <TextView.h>
 #include <View.h>
@@ -597,13 +597,13 @@ JobSetupView::AttachedToWindow()
 		if (first_page > last_page)
 			last_page = -1;
 
-		ostringstream oss1;
+		BString oss1;
 		oss1 << first_page;
-		fFromPage->SetText(oss1.str().c_str());
+		fFromPage->SetText(oss1.String());
 
-		ostringstream oss2;
+		BString oss2;
 		oss2 << last_page;
-		fToPage->SetText(oss2.str().c_str());
+		fToPage->SetText(oss2.String());
 	}
 
 	fAll->SetTarget(this);
@@ -674,9 +674,9 @@ JobSetupView::AttachedToWindow()
 	fCopies->SetDivider(width);
 	AllowOnlyDigits(fCopies->TextView(), 3);
 
-	ostringstream oss4;
+	BString oss4;
 	oss4 << fJobData->getCopies();
-	fCopies->SetText(oss4.str().c_str());
+	fCopies->SetText(oss4.String());
 
 	/* collate */
 
