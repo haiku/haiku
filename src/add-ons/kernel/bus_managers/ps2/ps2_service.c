@@ -104,6 +104,7 @@ ps2_service_thread(void *arg)
 			packet_buffer_read(sServiceCmdBuffer, (uint8 *)&cmd, sizeof(cmd));
 			switch (cmd.id) {
 				case PS2_SERVICE_NOTIFY_DEVICE_ADDED:
+					snooze(1000000); // for better testing of possible input server race condition
 					TRACE("ps2: PS2_SERVICE_NOTIFY_DEVICE_ADDED %s\n", cmd.dev->name);
 					ps2_dev_publish(cmd.dev);
 					break;
