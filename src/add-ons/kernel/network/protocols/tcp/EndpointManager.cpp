@@ -278,12 +278,10 @@ EndpointManager::_BindToAddress(TCPEndpoint *endpoint, const sockaddr *_address)
 	if (ntohs(port) <= kLastReservedPort && geteuid() != 0)
 		return B_PERMISSION_DENIED;
 
-	EndpointTable::Iterator portUsers = fEndpointHash.Lookup(port);
+	EndpointTable::ValueIterator portUsers = fEndpointHash.Lookup(port);
 
 	while (portUsers.HasNext()) {
 		TCPEndpoint *user = portUsers.Next();
-		if (user->LocalAddress().Port() != port)
-			break;
 
 		if (user->LocalAddress().IsEmpty(false)
 			|| address.EqualTo(*user->LocalAddress(), false)) {

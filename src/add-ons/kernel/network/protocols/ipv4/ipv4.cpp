@@ -648,15 +648,11 @@ deliver_multicast(net_protocol_module_info *module, net_buffer *buffer,
 
 	sockaddr_in *multicastAddr = (sockaddr_in *)&buffer->destination;
 
-	MulticastState::Iterator it = sMulticastState->Lookup(std::make_pair(
+	MulticastState::ValueIterator it = sMulticastState->Lookup(std::make_pair(
 		&multicastAddr->sin_addr, buffer->interface->index));
 
 	while (it.HasNext()) {
 		IPv4GroupInterface *state = it.Next();
-
-		if (state->Interface()->index != buffer->interface->index
-			|| state->Address().s_addr != multicastAddr->sin_addr.s_addr)
-			break;
 
 		if (deliverToRaw && state->Parent()->Socket()->raw == NULL)
 			continue;

@@ -93,7 +93,7 @@ private:
 
 	ContainedAddress *_Get(const AddressType &address) const
 	{
-		AddressList::ConstIterator it = fAddresses.GetIterator();
+		typename AddressList::ConstIterator it = fAddresses.GetIterator();
 		while (it.HasNext()) {
 			ContainedAddress *container = it.Next();
 			if (container->address == address)

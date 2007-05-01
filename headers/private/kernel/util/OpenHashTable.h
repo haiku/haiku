@@ -207,7 +207,9 @@ public:
 			_GetNext();
 		}
 
-	private:
+	protected:
+		Iterator() {}
+
 		void _GetNext()
 		{
 			if (fNext)

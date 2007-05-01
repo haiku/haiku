@@ -40,24 +40,6 @@ public:
 
 	status_t InitCheck() const { return HashTable::InitCheck(); }
 
-	Iterator Lookup(const KeyType &key) const
-	{
-		size_t index = HashTable::fDefinition.HashKey(key)
-			& (HashTable::fTableSize - 1);
-		ValueType *slot = HashTable::fTable[index];
-
-		while (slot) {
-			if (HashTable::fDefinition.Compare(key, slot))
-				break;
-			slot = HashTable::_Link(slot)->fNext;
-		}
-
-		if (slot == NULL)
-			return Iterator(this, HashTable::fTableSize, NULL);
-
-		return Iterator(this, index, slot);
-	}
-
 	void Insert(ValueType *value)
 	{
 		if (AutoExpand
@@ -87,7 +69,63 @@ public:
 
 	Iterator GetIterator() const { return HashTable::GetIterator(); }
 
+	class ValueIterator : protected Iterator {
+	public:
+		ValueIterator(const HashTable *table, size_t index, ValueType *value)
+			: fOriginalIndex(index), fOriginalValue(value)
+		{
+			Iterator::fTable = table;
+			Iterator::fIndex = index;
+			Iterator::fNext = value;
+		}
+
+		bool HasNext() const
+		{
+			if (Iterator::fNext == NULL)
+				return false;
+			if (Iterator::fNext == fOriginalValue)
+				return true;
+			return ((const MultiTable *)Iterator::fTable)->_Definition().CompareValues(
+				fOriginalValue, Iterator::fNext);
+		}
+
+		void Rewind()
+		{
+			Iterator::fIndex = fOriginalIndex;
+			Iterator::fNext = fOriginalValue;
+		}
+
+		ValueType *Next() { return Iterator::Next(); }
+
+	private:
+		size_t fOriginalIndex;
+		ValueType *fOriginalValue;
+	};
+
+	ValueIterator Lookup(const KeyType &key) const
+	{
+		size_t index = HashTable::fDefinition.HashKey(key)
+			& (HashTable::fTableSize - 1);
+		ValueType *slot = HashTable::fTable[index];
+
+		while (slot) {
+			if (HashTable::fDefinition.Compare(key, slot))
+				break;
+			slot = HashTable::_Link(slot)->fNext;
+		}
+
+		if (slot == NULL)
+			return ValueIterator(this, HashTable::fTableSize, NULL);
+
+		return ValueIterator(this, index, slot);
+	}
+
 private:
+	// for g++ 2.95
+	friend class ValueIterator;
+
+	const Definition &_Definition() const { return HashTable::fDefinition; }
+
 	void _Insert(ValueType **table, size_t tableSize, ValueType *value)
 	{
 		size_t index = HashTable::fDefinition.Hash(value) & (tableSize - 1);
