@@ -134,7 +134,7 @@ static status_t
 loopback_frame_join_multicast(net_datalink_protocol *protocol,
 	const sockaddr *address)
 {
-	return protocol->next->module->join_multicast(protocol, address);
+	return protocol->next->module->join_multicast(protocol->next, address);
 }
 
 
@@ -142,7 +142,7 @@ static status_t
 loopback_frame_leave_multicast(net_datalink_protocol *protocol,
 	const sockaddr *address)
 {
-	return protocol->next->module->leave_multicast(protocol, address);
+	return protocol->next->module->leave_multicast(protocol->next, address);
 }
 
 
