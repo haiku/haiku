@@ -1,0 +1,5 @@
+SubDir HAIKU_TOP src tests add-ons kernel busses scsi example ;
+
+KernelAddon example_scsi :
+	example_scsi.c
+;

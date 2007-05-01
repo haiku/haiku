@@ -23,6 +23,7 @@ SEARCH on [ FGristFiles
 		list.c khash.c
 	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
+SubInclude HAIKU_TOP src tests add-ons kernel busses ;
 # SubInclude HAIKU_TOP src tests add-ons kernel disk_scanner ;
 SubInclude HAIKU_TOP src tests add-ons kernel drivers ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems ;
