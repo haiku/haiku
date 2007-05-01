@@ -380,18 +380,36 @@ ethernet_set_media(net_device *device, uint32 media)
 
 
 status_t
-ethernet_add_multi(struct net_device *device, const sockaddr *address)
+ethernet_add_multi(struct net_device *_device, const sockaddr *_address)
 {
-	// TODO: see etherpci driver for details
-	return EOPNOTSUPP;
+	ethernet_device *device = (ethernet_device *)_device;
+
+	if (_address->sa_family != AF_DLI)
+		return EINVAL;
+
+	const sockaddr_dl *address = (const sockaddr_dl *)_address;
+	if (address->sdl_type != IFT_ETHER)
+		return EINVAL;
+
+	return ioctl(device->fd, ETHER_ADDMULTI, address->sdl_data,
+		address->sdl_alen);
 }
 
 
 status_t
-ethernet_rem_multi(struct net_device *device, const sockaddr *address)
+ethernet_rem_multi(struct net_device *_device, const sockaddr *_address)
 {
-	// TODO: see etherpci driver for details
-	return EOPNOTSUPP;
+	ethernet_device *device = (ethernet_device *)_device;
+
+	if (_address->sa_family != AF_DLI)
+		return EINVAL;
+
+	const sockaddr_dl *address = (const sockaddr_dl *)_address;
+	if (address->sdl_type != IFT_ETHER)
+		return EINVAL;
+
+	return ioctl(device->fd, ETHER_REMMULTI, address->sdl_data,
+		address->sdl_alen);
 }
 
 
