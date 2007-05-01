@@ -322,6 +322,7 @@ AddDirectoryToHaikuImage home config add-ons Tracker ;
 AddDirectoryToHaikuImage home config add-ons Screen\ Savers ;
 AddDirectoryToHaikuImage home config add-ons Translators ;
 AddDirectoryToHaikuImage beos etc synth ;
+AddDirectoryToHaikuImage beos system add-ons input_server methods ;
 
 #optional
 AddFilesToHaikuImage optional beos system add-ons input_server methods : canna ;
