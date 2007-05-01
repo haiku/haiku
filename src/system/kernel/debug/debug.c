@@ -855,8 +855,6 @@ panic(const char *format, ...)
 {
 	va_list args;
 	char temp[128];
-	
-	set_dprintf_enabled(true);
 
 	va_start(args, format);
 	vsnprintf(temp, sizeof(temp), format, args);
@@ -870,9 +868,10 @@ void
 kernel_debugger(const char *message)
 {
 	cpu_status state;
+	bool dprintfState;
 
 	arch_debug_save_registers(&dbg_register_file[smp_get_current_cpu()][0]);
-	set_dprintf_enabled(true);
+	dprintfState = set_dprintf_enabled(true);
 
 	state = disable_interrupts();
 
@@ -893,6 +892,8 @@ kernel_debugger(const char *message)
 		kprintf("PANIC: %s\n", message);
 
 	kernel_debugger_loop();
+
+	set_dprintf_enabled(dprintfState);
 
 	sBlueScreenEnabled = false;
 	restore_interrupts(state);
