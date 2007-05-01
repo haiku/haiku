@@ -288,6 +288,11 @@ AddFilesToHaikuImage beos system add-ons opengl
 	: $(X86_ONLY)Mesa\ Software\ Renderer ;
 AddFilesToHaikuImage beos system add-ons Translators
 	: $(BEOS_ADD_ONS_TRANSLATORS) ;
+AddFilesToHaikuImage beos system add-ons mail_daemon inbound_protocols : POP3 IMAP ;
+AddFilesToHaikuImage beos system add-ons mail_daemon outbound_protocols : SMTP ;
+AddFilesToHaikuImage beos system add-ons mail_daemon inbound_filters : Match\ Header Spam\ Filter R5\ Daemon\ Filter ;
+AddFilesToHaikuImage beos system add-ons mail_daemon outbound_filters : Fortune ;
+AddFilesToHaikuImage beos system add-ons mail_daemon system_filters : Inbox New\ Mail\ Notification Outbox Message\ Parser ;
 AddFilesToHaikuImage beos system add-ons media : $(BEOS_ADD_ONS_MEDIA) ;
 AddFilesToHaikuImage beos system add-ons media plugins
 	: $(BEOS_ADD_ONS_MEDIA_PLUGINS) ;
