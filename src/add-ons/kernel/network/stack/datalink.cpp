@@ -803,8 +803,8 @@ static status_t
 interface_protocol_join_multicast(net_datalink_protocol *_protocol,
 	const sockaddr *address)
 {
-	// TODO
-	return ENOTSUP;
+	interface_protocol *protocol = (interface_protocol *)_protocol;
+	return protocol->device_module->add_multi(protocol->device, address);
 }
 
 
@@ -812,8 +812,8 @@ static status_t
 interface_protocol_leave_multicast(net_datalink_protocol *_protocol,
 	const sockaddr *address)
 {
-	// TODO
-	return ENOTSUP;
+	interface_protocol *protocol = (interface_protocol *)_protocol;
+	return protocol->device_module->rem_multi(protocol->device, address);
 }
 
 

@@ -380,8 +380,7 @@ ethernet_set_media(net_device *device, uint32 media)
 
 
 status_t
-ethernet_get_multicast_addrs(struct net_device *device,
-	net_hardware_address **addressArray, uint32 count)
+ethernet_add_multi(struct net_device *device, const sockaddr *address)
 {
 	// TODO: see etherpci driver for details
 	return EOPNOTSUPP;
@@ -389,8 +388,7 @@ ethernet_get_multicast_addrs(struct net_device *device,
 
 
 status_t
-ethernet_set_multicast_addrs(struct net_device *device, 
-	const net_hardware_address **addressArray, uint32 count)
+ethernet_rem_multi(struct net_device *device, const sockaddr *address)
 {
 	// TODO: see etherpci driver for details
 	return EOPNOTSUPP;
@@ -463,8 +461,8 @@ net_device_module_info sEthernetModule = {
 	ethernet_set_mtu,
 	ethernet_set_promiscuous,
 	ethernet_set_media,
-	ethernet_get_multicast_addrs,
-	ethernet_set_multicast_addrs
+	ethernet_add_multi,
+	ethernet_rem_multi,
 };
 
 module_info *modules[] = {

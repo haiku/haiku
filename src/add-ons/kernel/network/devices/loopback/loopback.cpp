@@ -192,6 +192,20 @@ loopback_set_media(net_device *device, uint32 media)
 }
 
 
+status_t
+loopback_add_multi(net_device *device, const sockaddr *address)
+{
+	return B_OK;
+}
+
+
+status_t
+loopback_rem_multi(net_device *device, const sockaddr *address)
+{
+	return B_OK;
+}
+
+
 static status_t
 loopback_std_ops(int32 op, ...)
 {
@@ -222,6 +236,8 @@ net_device_module_info sLoopbackModule = {
 	loopback_set_mtu,
 	loopback_set_promiscuous,
 	loopback_set_media,
+	loopback_add_multi,
+	loopback_rem_multi,
 };
 
 module_info *modules[] = {
