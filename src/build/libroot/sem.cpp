@@ -1,6 +1,7 @@
 
 #include <BeOSBuildCompatibility.h>
 
+#include <stdlib.h>
 #include <string.h>
 
 #include <OS.h>
@@ -56,6 +57,8 @@ delete_sem(sem_id id)
 		return B_BAD_SEM_ID;
 
 	sSemaphores[id].inUse = false;
+	free(sSemaphores[id].name);
+	sSemaphores[id].name = NULL;
 	
 	return B_OK;
 }
