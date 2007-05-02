@@ -1293,7 +1293,7 @@ em_set_multi(struct adapter * adapter)
         u_int8_t  mta[MAX_NUM_MULTICAST_ADDRESSES * ETH_LENGTH_OF_ADDRESS];
         struct ifmultiaddr  *ifma;
         int mcnt = 0;
-//        struct ifnet   *ifp = &adapter->interface_data.ac_if;
+        struct ifnet   *ifp = &adapter->interface_data.ac_if;
     
         IOCTL_DEBUGOUT("em_set_multi: begin");
  

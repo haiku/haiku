@@ -22,6 +22,9 @@
 #include "debug.h"
 #include "mempool.h"
 
+#undef malloc
+#undef free
+
 spinlock	mbuf_lock = 0;
 
 struct mbuf *
@@ -96,6 +99,8 @@ ether_ifattach(struct ifnet *ifp, const uint8 *etheraddr)
 
 	INIT_DEBUGOUT("ether_ifattach");
 
+	TAILQ_INIT(&ifp->if_multiaddrs);
+
 	memcpy(dev->macaddr, etheraddr, 6);
 	
 	ifp->if_input = ether_input;
@@ -108,12 +113,85 @@ ether_ifattach(struct ifnet *ifp, const uint8 *etheraddr)
 	INIT_DEBUGOUT("done calling if_init!");
 }
 
+
+static struct ifmultiaddr *
+ether_find_multi(struct ifnet *ifp, const struct sockaddr *_address)
+{
+	const struct sockaddr_dl *address = (const struct sockaddr_dl *)_address;
+	struct ifmultiaddr *ifma;
+
+	TAILQ_FOREACH (ifma, &ifp->if_multiaddrs, ifma_link) {
+		if (memcmp(LLADDR(address),
+				LLADDR((struct sockaddr_dl *)ifma->ifma_addr),
+				ETHER_ADDR_LEN) == 0)
+			return ifma;
+	}
+
+	return NULL;
+}
+
+
+int
+ether_add_multi(struct ifnet *ifp, const struct sockaddr *address)
+{
+	struct ifmultiaddr *addr = ether_find_multi(ifp, address);
+
+	if (addr != NULL) {
+		addr->ifma_refcount++;
+		return 0;
+	}
+
+	addr = (struct ifmultiaddr *)malloc(sizeof(struct ifmultiaddr));
+	if (addr == NULL)
+		return ENOBUFS;
+
+	memcpy(&addr->ifma_addr_storage, address, sizeof(struct sockaddr_dl));
+	addr->ifma_addr = (struct sockaddr *)&addr->ifma_addr_storage;
+
+	addr->ifma_refcount = 1;
+
+	TAILQ_INSERT_HEAD(&ifp->if_multiaddrs, addr, ifma_link);
+
+	return ifp->if_ioctl(ifp, SIOCADDMULTI, NULL);
+}
+
+
+static void
+ether_delete_multi(struct ifnet *ifp, struct ifmultiaddr *ifma)
+{
+	TAILQ_REMOVE(&ifp->if_multiaddrs, ifma, ifma_link);
+	free(ifma);
+}
+
+
+int
+ether_rem_multi(struct ifnet *ifp, const struct sockaddr *address)
+{
+	struct ifmultiaddr *addr = ether_find_multi(ifp, address);
+	if (addr == NULL)
+		return EADDRNOTAVAIL;
+
+	addr->ifma_refcount--;
+	if (addr->ifma_refcount == 0) {
+		ether_delete_multi(ifp, addr);
+		return ifp->if_ioctl(ifp, SIOCDELMULTI, NULL);
+	}
+
+	return 0;
+}
+
+
 void
 ether_ifdetach(struct ifnet *ifp)
 {
+	struct ifmultiaddr *ifma, *next;
+
 	INIT_DEBUGOUT("ether_ifdetach");
 
 	delete_sem(ifp->if_rcv_sem);
+
+	TAILQ_FOREACH_SAFE(ifma, &ifp->if_multiaddrs, ifma_link, next)
+		ether_delete_multi(ifp, ifma);
 }
 
 struct mbuf *

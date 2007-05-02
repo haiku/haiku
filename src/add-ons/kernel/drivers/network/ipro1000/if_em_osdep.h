@@ -45,6 +45,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include <sys/types.h>
 
 #define usec_delay(x) snooze(x)
@@ -71,18 +72,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #define hz					1000000LL
 
-typedef uint64	u_int64_t;
-typedef uint32	u_int32_t;
-typedef uint16	u_int16_t;
-typedef uint8	u_int8_t;
-typedef uint64	uint64_t;
-typedef uint32	uint32_t;
-typedef uint16	uint16_t;
-typedef uint8	uint8_t;
-typedef int64	int64_t;
-typedef int32	int32_t;
-typedef int16	int16_t;
-typedef int8	int8_t;
 typedef bool	boolean_t;
 typedef unsigned long vm_offset_t;
 
@@ -210,16 +199,45 @@ void  driver_free(void *p, int p2);
 #define E1000_WRITE_REG_ARRAY(hw, reg, index, value) \
     E1000_WRITE_OFFSET(hw, E1000_REG_OFFSET(hw, reg) + ((index) << 2), value)
 
+#define TAILQ_HEAD(name, type) \
+	struct name { struct type *tqh_first, **tqh_last; }
 
-/*
-#define TAILQ_FIRST(head)       ((head)->tqh_first)
-#define TAILQ_NEXT(elm, field) ((elm)->field.tqe_next)
-#define TAILQ_FOREACH(var, head, field)		\
-	for ((var) = TAILQ_FIRST((head));		\
-		(var);								\
-		(var) = TAILQ_NEXT((var), field))
-*/
-// used only for multicast setup, fix later...
-#define TAILQ_FOREACH(a, b, c) for (a = 0; a != 0; a = 0)
+#define TAILQ_ENTRY(type) \
+	struct { struct type *tqe_next, **tqe_prev; }
+
+#define TAILQ_FIRST(head) \
+	((head)->tqh_first)
+
+#define TAILQ_NEXT(elm, field) \
+	((elm)->field.tqe_next)
+
+#define TAILQ_FOREACH(var, head, field) \
+	for ((var) = TAILQ_FIRST((head)); (var); (var) = TAILQ_NEXT((var), field))
+
+#define TAILQ_FOREACH_SAFE(var, head, field, tvar) \
+	for ((var) = TAILQ_FIRST((head)); \
+		(var) && ((tvar) = TAILQ_NEXT((var), field), 1); (var) = (tvar))
+
+#define TAILQ_INIT(head) do { \
+	TAILQ_FIRST((head)) = NULL; \
+	(head)->tqh_last = &TAILQ_FIRST((head)); \
+} while (0)
+
+#define TAILQ_INSERT_HEAD(head, elm, field) do { \
+	if ((TAILQ_NEXT((elm), field) = TAILQ_FIRST((head))) != NULL) \
+		TAILQ_FIRST((head))->field.tqe_prev = &TAILQ_NEXT((elm), field); \
+	else \
+		(head)->tqh_last = &TAILQ_NEXT((elm), field); \
+	TAILQ_FIRST((head)) = (elm); \
+	(elm)->field.tqe_prev = &TAILQ_FIRST((head)); \
+} while (0)
+
+#define TAILQ_REMOVE(head, elm, field) do { \
+	if ((TAILQ_NEXT((elm), field)) != NULL) \
+		TAILQ_NEXT((elm), field)->field.tqe_prev = (elm)->field.tqe_prev; \
+	else \
+		(head)->tqh_last = (elm)->field.tqe_prev; \
+	*(elm)->field.tqe_prev = TAILQ_NEXT((elm), field); \
+} while (0)
 
 #endif

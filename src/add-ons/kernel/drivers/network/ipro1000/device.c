@@ -296,6 +296,13 @@ ipro1000_write(void* cookie, off_t position, const void* buffer, size_t* num_byt
 }
 
 
+static struct ifnet *
+device_ifp(ipro1000_device *device)
+{
+	return &device->adapter->interface_data.ac_if;
+}
+
+
 status_t
 ipro1000_control(void *cookie, uint32 op, void *arg, size_t len)
 {
@@ -322,13 +329,24 @@ ipro1000_control(void *cookie, uint32 op, void *arg, size_t len)
 			return B_OK;
 
 		case ETHER_ADDMULTI:
-			DEVICE_DEBUGOUT("ipro1000_control() ETHER_ADDMULTI not supported");
-			break;
-		
 		case ETHER_REMMULTI:
-			DEVICE_DEBUGOUT("ipro1000_control() ETHER_REMMULTI not supported");
-			return B_OK;
-		
+		{
+			struct ifnet *ifp = device_ifp(device);
+			struct sockaddr_dl address;
+
+			if (len != ETHER_ADDR_LEN)
+				return EINVAL;
+
+			memset(&address, 0, sizeof(address));
+			address.sdl_family = AF_LINK;
+			memcpy(LLADDR(&address), arg, ETHER_ADDR_LEN);
+
+			if (op == ETHER_ADDMULTI)
+				return ether_add_multi(ifp, (struct sockaddr *)&address);
+			else
+				return ether_rem_multi(ifp, (struct sockaddr *)&address);
+		}
+
 		case ETHER_SETPROMISC:
 			if (*(int32 *)arg) {
 				DEVICE_DEBUGOUT("promiscuous mode on not supported");
@@ -345,14 +363,13 @@ ipro1000_control(void *cookie, uint32 op, void *arg, size_t len)
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		case ETHER_GET_LINK_STATE:
 		{
-			struct ifnet ifp = { .if_softc = device->adapter };
 			struct ifmediareq mediareq;
 			ether_link_state_t state;
 
 			if (len < sizeof(ether_link_state_t))
 				return ENOBUFS;
 
-			em_media_status(&ifp, &mediareq);
+			em_media_status(device_ifp(device), &mediareq);
 
 			state.media = mediareq.ifm_active;
 			if (mediareq.ifm_status & IFM_ACTIVE)

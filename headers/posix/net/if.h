@@ -52,6 +52,7 @@ struct ifreq {
 		int		ifr_mtu;
 		int		ifr_media;
 		int		ifr_type;
+		int		ifr_reqcap;
 	};
 };
 

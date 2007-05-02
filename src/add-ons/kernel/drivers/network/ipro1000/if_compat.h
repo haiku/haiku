@@ -20,18 +20,16 @@
 #define __IF_COMPAT_H
 
 #include <OS.h>
+#include <net/if.h>
+#include <net/if_dl.h>
 #include <net/if_media.h>
+
+#include "if_em_osdep.h" // for TAILQ_...
 
 #define __FreeBSD_version	500001
 
-#define IFF_BROADCAST	0x0001
-#define IFF_SIMPLEX		0x0002
-#define IFF_MULTICAST	0x0004
-#define IFF_RUNNING		0x0008
-#define IFF_OACTIVE		0x0010
-#define IFF_UP			0x0020
-#define IFF_PROMISC		0x0040
-#define IFF_ALLMULTI	0x0080
+#define IFF_RUNNING		0x10000
+#define IFF_OACTIVE		0x20000
 
 #define IFCAP_HWCSUM			0x0001
 #define IFCAP_VLAN_HWTAGGING	0x0002
@@ -203,15 +201,19 @@ void m_freem(struct mbuf *mp);
 void ether_ifattach(struct ifnet *ifp, const uint8 *etheraddr);
 void ether_ifdetach(struct ifnet *ifp);
 
-#define AF_LINK 0
-struct ifma_addr
-{
-	int sa_family; // must be AF_LINK
-};
+int ether_add_multi(struct ifnet *ifp, const struct sockaddr *address);
+int ether_rem_multi(struct ifnet *ifp, const struct sockaddr *address);
+
+TAILQ_HEAD(ifmultihead, ifmultiaddr);
 
 struct ifmultiaddr
 {
-	struct ifma_addr *ifma_addr;
+	TAILQ_ENTRY(ifmultiaddr) ifma_link;
+	struct sockaddr *ifma_addr;
+	int ifma_refcount;
+
+	/* private */
+	struct sockaddr_dl ifma_addr_storage;
 };
 
 struct if_data
@@ -257,8 +259,8 @@ struct ifnet
 	
 	sem_id if_rcv_sem;
 
-//	struct if_multiaddrs if_multiaddrs; // multicast addr list
 	struct if_data if_data;
+	struct ifmultihead if_multiaddrs;
 	
 	if_start	if_start;
 	if_ioctl	if_ioctl;
@@ -295,33 +297,11 @@ enum { // ioctl commands
 	SIOCSIFCAP,
 };
 
-struct ifreq // ioctl command data
-{
-	uint32	ifr_reqcap;
-	int		ifr_mtu;
-};
-
 // used for media properties
 #define ifmedia_init(a, b, c, d)
 #define ifmedia_add(a, b, c, d)
 #define ifmedia_set(a, b)
 #define ifmedia_ioctl(ifp, ifr, media, command) 0
-
-// used inside multicast stuff
-struct sockaddr_dl
-{
-	u_char  sdl_len;
-	u_char  sdl_family;
-	u_short sdl_index;
-	u_char  sdl_type;
-	u_char  sdl_nlen;
-	u_char  sdl_alen;
-	u_char  sdl_slen;
-	char    sdl_data[46];
-};
-
-// used inside multicast stuff
-#define LLADDR(s) ((caddr_t)((s)->sdl_data + (s)->sdl_nlen))
 
 // called for SIOCxIFADDR (Get/Set Interface Addr)
 #define ether_ioctl(ifp, command, data)
