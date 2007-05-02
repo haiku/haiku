@@ -1744,7 +1744,6 @@ fssh_file_cache_create(fssh_mount_id mountID, fssh_vnode_id vnodeID,
 	if (error != FSSH_B_OK) {
 		fssh_dprintf("file_cache_create(): Failed to init mutex: %s\n",
 			fssh_strerror(error));
-		vfs_put_vnode(ref->node);
 		delete ref;
 		return NULL;
 	}
