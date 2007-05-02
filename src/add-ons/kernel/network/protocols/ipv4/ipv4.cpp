@@ -1554,9 +1554,21 @@ dump_ipv4_multicast(int argc, char *argv[])
 
 		char addrBuf[64];
 
-		kprintf("%p: group <%s, %s> sock %p\n", state,
-			state->Interface()->name, print_address(&state->Address(),
-				addrBuf, sizeof(addrBuf)), state->Parent()->Socket());
+		kprintf("%p: group <%s, %s, %s {", state, state->Interface()->name,
+			print_address(&state->Address(), addrBuf, sizeof(addrBuf)),
+			state->Mode() == IPv4GroupInterface::kExclude ?  "Exclude" :
+			"Include");
+
+		int count = 0;
+		IPv4GroupInterface::AddressSet::Iterator it =
+			state->Sources().GetIterator();
+		while (it.HasNext()) {
+			kprintf("%s%s", count > 0 ? ", " : "", print_address(&it.Next(),
+				addrBuf, sizeof(addrBuf)));
+			count++;
+		}
+
+		kprintf("}> sock %p\n", state->Parent()->Socket());
 	}
 
 	return 0;

@@ -43,10 +43,15 @@ struct IPv4Multicast {
 
 template<typename AddressType>
 class AddressSet {
-public:
 	struct ContainedAddress : DoublyLinkedListLinkImpl<ContainedAddress> {
 		AddressType address;
 	};
+
+	typedef DoublyLinkedList<ContainedAddress> AddressList;
+
+public:
+	AddressSet()
+		: fCount(0) {}
 
 	~AddressSet() { Clear(); }
 
@@ -88,9 +93,21 @@ public:
 			Remove(fAddresses.Head()->address);
 	}
 
-private:
-	typedef DoublyLinkedList<ContainedAddress> AddressList;
+	class Iterator {
+	public:
+		Iterator(const AddressList &addresses)
+			: fBaseIterator(addresses.GetIterator()) {}
 
+		bool HasNext() const { return fBaseIterator.HasNext(); }
+		AddressType &Next() { return fBaseIterator.Next()->address; }
+
+	private:
+		typename AddressList::ConstIterator fBaseIterator;
+	};
+
+	Iterator GetIterator() const { return Iterator(fAddresses); }
+
+private:
 	ContainedAddress *_Get(const AddressType &address) const
 	{
 		typename AddressList::ConstIterator it = fAddresses.GetIterator();
@@ -103,6 +120,7 @@ private:
 	}
 
 	AddressList fAddresses;
+	int fCount;
 };
 
 
@@ -114,6 +132,7 @@ public:
 	typedef HashTableLink<ThisType> HashLink;
 	typedef typename Addressing::AddressType AddressType;
 	typedef MulticastFilter<Addressing> Filter;
+	typedef AddressSet<AddressType> AddressSet;
 
 	enum FilterMode {
 		kInclude,
@@ -138,6 +157,9 @@ public:
 
 	bool IsEmpty() const;
 	void Clear();
+
+	FilterMode Mode() const { return fFilterMode; }
+	const AddressSet &Sources() const { return fAddresses; }
 
 	bool FilterAccepts(net_buffer *buffer) const;
 
@@ -165,7 +187,7 @@ private:
 	AddressType fMulticastAddress;
 	net_interface *fInterface;
 	FilterMode fFilterMode;
-	AddressSet<AddressType> fAddresses;
+	AddressSet fAddresses;
 	HashLink fLink;
 };
 
