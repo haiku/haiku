@@ -163,12 +163,28 @@ DeviceManager::StartMonitoringDevice(_BDeviceAddOn_ *addon,
 	node_ref nref;
 	BDirectory directory;
 	BPath path("/dev");
-	if (((err = path.Append(device)) != B_OK)
-		|| ((err = directory.SetTo(path.Path())) != B_OK) 
-		|| ((err = directory.GetNodeRef(&nref)) != B_OK)) {
-		PRINTERR(("DeviceManager::StartMonitoringDevice error %s: %s\n", path.Path(), strerror(err)));
+	if ((err = path.Append(device)) != B_OK) {
+		PRINTERR(("DeviceManager::StartMonitoringDevice BPath::Append() error %s: %s\n", path.Path(), strerror(err)));
 		return err;
 	}
+
+	if ((err = directory.SetTo(path.Path())) != B_OK) {
+		if (err != B_ENTRY_NOT_FOUND) {
+			PRINTERR(("DeviceManager::StartMonitoringDevice SetTo error %s: %s\n", path.Path(), strerror(err)));
+			return err;
+		}
+	if ((err = create_directory(path.Path(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH)) != B_OK
+			|| (err = directory.SetTo(path.Path())) != B_OK) {
+			PRINTERR(("DeviceManager::StartMonitoringDevice CreateDirectory error %s: %s\n", path.Path(), strerror(err)));
+			return err;
+		}
+	}
+
+	if ((err = directory.GetNodeRef(&nref)) != B_OK) {
+		PRINTERR(("DeviceManager::StartMonitoringDevice GetNodeRef error %s: %s\n", path.Path(), strerror(err)));
+		return err;
+	}
+	
 	// test if already monitored
 	bool alreadyMonitored = false;
 	_BDeviceAddOn_ *tmpaddon = NULL;
