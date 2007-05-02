@@ -25,8 +25,7 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	externalCommandsSources = external_commands_unix.cpp ;
 }
 
-
-BuildPlatformStaticLibrary <build2>fs_shell.a :
+BuildPlatformStaticLibrary <build>fs_shell.a :
 	atomic.cpp
 	block_cache.cpp
 	command_cp.cpp
@@ -59,6 +58,6 @@ BuildPlatformStaticLibrary <build2>fs_shell.a :
 	fssh.cpp
 ;
 
-BuildPlatformMain <build2>fs_shell_command
+BuildPlatformMain <build>fs_shell_command
 	: fs_shell_command.cpp $(fsShellCommandSources)
 	: $(HOST_LIBSUPC++) ;

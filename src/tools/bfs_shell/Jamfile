@@ -26,7 +26,7 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) && $(HOST_PLATFORM) != haiku {
 
 UsePrivateHeaders fs_shell ;
 
-BuildPlatformMain <build2>bfs_shell
+BuildPlatformMain <build>bfs_shell
 	:
 	BlockAllocator.cpp
 	BPlusTree.cpp
