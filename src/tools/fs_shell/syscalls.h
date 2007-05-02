@@ -11,6 +11,9 @@
 struct fssh_iovec;
 
 
+namespace FSShell {
+
+
 // defined in vfs.cpp
 fssh_dev_t 		_kern_mount(const char *path, const char *device,
 					const char *fsName, uint32_t flags, const char *args,
@@ -88,5 +91,9 @@ fssh_status_t	_kern_rewind_dir(int fd);
 fssh_status_t	_kern_close(int fd);
 int				_kern_dup(int fd);
 int				_kern_dup2(int ofd, int nfd);
+
+
+}	// namespace FSShell
+
 
 #endif	// _FSSH_SYSCALLS_H

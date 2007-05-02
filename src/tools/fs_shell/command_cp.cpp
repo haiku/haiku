@@ -22,6 +22,7 @@
 #include "fssh_fs_attr.h"
 #include "fssh_stat.h"
 #include "fssh_string.h"
+#include "fssh_unistd.h"
 #include "path_util.h"
 #include "stat_util.h"
 #include "syscalls.h"
@@ -136,7 +137,7 @@ public:
 	virtual ~HostNode()
 	{
 		if (fFD >= 0)
-			close(fFD);
+			fssh_close(fFD);
 		if (fAttrDir)
 			fs_close_attr_dir(fAttrDir);
 	}
@@ -340,40 +341,36 @@ public:
 	virtual fssh_status_t Open(const char *path, int openMode, Node *&_node)
 	{
 		// open the node
-		int fd = open(path, to_platform_open_mode(openMode));
+		int fd = fssh_open(path, openMode);
 		if (fd < 0)
 			return fssh_get_errno();
 
 		// stat the node
-		struct stat st;
-		if (fstat(fd, &st) < 0) {
-			close(fd);
+		struct fssh_stat st;
+		if (fssh_fstat(fd, &st) < 0) {
+			fssh_close(fd);
 			return fssh_get_errno();
 		}
 
 		// check the node type and create the node
 		HostNode *node = NULL;
-		switch (st.st_mode & S_IFMT) {
-			case S_IFLNK:
+		switch (st.fssh_st_mode & FSSH_S_IFMT) {
+			case FSSH_S_IFLNK:
 				node = new HostSymLink;
 				break;
-			case S_IFREG:
+			case FSSH_S_IFREG:
 				node = new HostFile;
 				break;
-			case S_IFDIR:
+			case FSSH_S_IFDIR:
 				node = new HostDirectory;
 				break;
 			default:
-				close(fd);
+				fssh_close(fd);
 				return FSSH_EINVAL;
 		}
 
-		// convert the stat
-		struct fssh_stat myst;
-		from_platform_stat(&st, &myst);
-
 		// init the node
-		fssh_status_t error = node->Init(path, fd, myst);
+		fssh_status_t error = node->Init(path, fd, st);
 			// the node receives ownership of the FD
 		if (error != FSSH_B_OK) {
 			delete node;
@@ -385,26 +382,23 @@ public:
 	}
 	
 	virtual fssh_status_t CreateFile(const char *path,
-		const struct fssh_stat &myst, File *&_file)
+		const struct fssh_stat &st, File *&_file)
 	{
-		struct stat st;
-		to_platform_stat(&myst, &st);
-
 		// create the file
-		int fd = creat(path, st.st_mode & S_IUMSK);
+		int fd = fssh_creat(path, st.fssh_st_mode & FSSH_S_IUMSK);
 		if (fd < 0)
 			return fssh_get_errno();
 
 		// apply the other stat fields
 		fssh_status_t error = _ApplyStat(fd, st);
 		if (error != FSSH_B_OK) {
-			close(fd);
+			fssh_close(fd);
 			return error;
 		}
 
 		// create the object
 		HostFile *file = new HostFile;
-		error = file->Init(path, fd, myst);
+		error = file->Init(path, fd, st);
 		if (error != FSSH_B_OK) {
 			delete file;
 			return error;
@@ -415,30 +409,27 @@ public:
 	}
 
 	virtual fssh_status_t CreateDirectory(const char *path,
-		const struct fssh_stat &myst, Directory *&_dir)
+		const struct fssh_stat &st, Directory *&_dir)
 	{
-		struct stat st;
-		to_platform_stat(&myst, &st);
-
 		// create the dir
-		if (mkdir(path, st.st_mode & S_IUMSK) < 0)
+		if (fssh_mkdir(path, st.fssh_st_mode & FSSH_S_IUMSK) < 0)
 			return fssh_get_errno();
 
 		// open the dir node
-		int fd = open(path, O_RDONLY | O_NOTRAVERSE);
+		int fd = fssh_open(path, FSSH_O_RDONLY | FSSH_O_NOTRAVERSE);
 		if (fd < 0)
 			return fssh_get_errno();
 
 		// apply the other stat fields
 		fssh_status_t error = _ApplyStat(fd, st);
 		if (error != FSSH_B_OK) {
-			close(fd);
+			fssh_close(fd);
 			return error;
 		}
 
 		// create the object
 		HostDirectory *dir = new HostDirectory;
-		error = dir->Init(path, fd, myst);
+		error = dir->Init(path, fd, st);
 		if (error != FSSH_B_OK) {
 			delete dir;
 			return error;
@@ -449,30 +440,27 @@ public:
 	}
 
 	virtual fssh_status_t CreateSymLink(const char *path, const char *linkTo,
-		const struct fssh_stat &myst, SymLink *&_link)
+		const struct fssh_stat &st, SymLink *&_link)
 	{
-		struct stat st;
-		to_platform_stat(&myst, &st);
-
 		// create the link
 		if (symlink(linkTo, path) < 0)
 			return fssh_get_errno();
 
 		// open the symlink node
-		int fd = open(path, O_RDONLY | O_NOTRAVERSE);
+		int fd = fssh_open(path, FSSH_O_RDONLY | FSSH_O_NOTRAVERSE);
 		if (fd < 0)
 			return fssh_get_errno();
 
 		// apply the other stat fields
 		fssh_status_t error = _ApplyStat(fd, st);
 		if (error != FSSH_B_OK) {
-			close(fd);
+			fssh_close(fd);
 			return error;
 		}
 
 		// create the object
 		HostSymLink *link = new HostSymLink;
-		error = link->Init(path, fd, myst);
+		error = link->Init(path, fd, st);
 		if (error != FSSH_B_OK) {
 			delete link;
 			return error;
@@ -485,13 +473,13 @@ public:
 
 	virtual fssh_status_t Unlink(const char *path)
 	{
-		if (unlink(path) < 0)
+		if (fssh_unlink(path) < 0)
 			return fssh_get_errno();
 		return FSSH_B_OK;
 	}
 
 private:
-	fssh_status_t _ApplyStat(int fd, const struct stat &st)
+	fssh_status_t _ApplyStat(int fd, const struct fssh_stat &st)
 	{
 		// TODO: Set times...
 		return FSSH_B_OK;

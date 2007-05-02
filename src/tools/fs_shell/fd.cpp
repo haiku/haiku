@@ -458,15 +458,9 @@ common_close(int fd, bool kernel)
 	return FSSH_B_OK;
 }
 
-}	// namespace FSShell
-
-
 
 //	#pragma mark -
 //	Kernel calls
-
-
-using namespace FSShell;
 
 
 fssh_ssize_t
@@ -735,3 +729,4 @@ _kern_dup2(int ofd, int nfd)
 	return dup2_fd(ofd, nfd, true);
 }
 
+}	// namespace FSShell

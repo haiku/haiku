@@ -13,6 +13,14 @@
 
 
 using FSShell::from_platform_stat;
+using FSShell::to_platform_mode;
+
+
+int
+fssh_mkdir(const char *path, fssh_mode_t mode)
+{
+	return mkdir(path, to_platform_mode(mode));
+}
 
 
 int

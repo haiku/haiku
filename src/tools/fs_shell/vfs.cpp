@@ -4551,14 +4551,8 @@ err:
 }
 
 
-}	// namespace FSShell
-
-
 //	#pragma mark -
 //	Calls from within the kernel
-
-
-using namespace FSShell;
 
 
 fssh_dev_t
@@ -5208,3 +5202,4 @@ _kern_initialize_volume(const char* fsName, const char *partition,
 	return status;
 }
 
+}	// namespace FSShell

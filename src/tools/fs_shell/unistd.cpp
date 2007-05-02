@@ -27,6 +27,12 @@
 #endif
 
 
+#ifndef __BEOS__
+	// The _kern_close() defined in libroot_build.so.
+	extern "C" status_t _kern_close(int fd);
+#endif
+
+
 #ifdef HAIKU_HOST_PLATFORM_LINUX
 
 static bool
@@ -67,7 +73,20 @@ get_partition_size(int fd, off_t maxSize)
 int
 fssh_close(int fd)
 {
-	return close(fd);
+	// Use the _kern_close() defined in libroot on BeOS incompatible systems.
+	// Required for proper attribute emulation support.
+	#if __BEOS__
+		return close(fd);
+	#else
+		return _kern_close(fd);
+	#endif
+}
+
+
+int
+fssh_unlink(const char *name)
+{
+	return unlink(name);
 }
 
 
