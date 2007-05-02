@@ -746,7 +746,7 @@ BDirectory::CreateDirectory(const char *path, BDirectory *dir)
 		return B_BAD_VALUE;
 	// create the dir
 	status_t error = _kern_create_dir(fDirFd, path,
-		S_IRWXU | S_IRWXG | S_IRWXU);
+		S_IRWXU | S_IRWXG | S_IRWXO);
 	if (error != B_OK)
 		return error;
 	if (!dir)
@@ -833,7 +833,7 @@ BDirectory::CreateSymLink(const char *path, const char *linkToPath,
 		return B_BAD_VALUE;
 	// create the symlink
 	status_t error = _kern_create_symlink(fDirFd, path, linkToPath,
-		S_IRWXU | S_IRWXG | S_IRWXU);
+		S_IRWXU | S_IRWXG | S_IRWXO);
 	if (error != B_OK)
 		return error;
 	if (!link)
