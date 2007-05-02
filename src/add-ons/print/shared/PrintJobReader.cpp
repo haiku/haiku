@@ -104,7 +104,7 @@ PrintJobReader::PrintJobReader(BFile* jobFile)
 	, fNumberOfPages(-1)
 	, fPageIndex(NULL)
 {
-#ifndef __ZETA__
+#ifndef B_BEOS_VERSION_DANO
 	print_file_header header;
 #else
 	BPrintJob::print_file_header header;

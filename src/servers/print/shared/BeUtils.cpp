@@ -103,7 +103,7 @@ static bool InList(const char* list[], const char* name) {
 
 void AddFields(BMessage* to, const BMessage* from, const char* excludeList[], const char* includeList[], bool overwrite) {
 	if (to == from) return;
-#ifndef __ZETA__
+#ifndef B_BEOS_VERSION_DANO
 	char* name;
 #else
 	const char* name;

@@ -74,7 +74,7 @@ GraphicsDriver::setupData(BFile *spool_file)
 		return true;
 	}
 
-#ifndef __ZETA__
+#ifndef B_BEOS_VERSION_DANO
 	print_file_header pfh;
 #else			
 	BPrintJob::print_file_header pfh;
