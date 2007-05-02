@@ -10,12 +10,12 @@
 // semaphores. Simple fakes are sufficient.
 
 struct semaphore {
-	char	name[B_OS_NAME_LENGTH];
+	char*	name;
 	int32	count;
 	bool	inUse;
 };
 
-static const int kSemaphoreCount = 1024;
+static const int kSemaphoreCount = 10240;
 static semaphore sSemaphores[kSemaphoreCount];
 
 
@@ -34,9 +34,13 @@ create_sem(int32 count, const char *name)
 	for (int i = 0; i < kSemaphoreCount; i++) {
 		semaphore &sem = sSemaphores[i];
 		if (!sem.inUse) {
+			sem.name = strdup(name ? name : "unnamed sem");
+			if (!sem.name)
+				return B_NO_MEMORY;
+
 			sem.inUse = true;
 			sem.count = count;
-			strlcpy(sem.name, name, sizeof(sem.name));
+			
 			return i;
 		}
 	}
@@ -178,7 +182,7 @@ _get_sem_info(sem_id id, struct sem_info *info, size_t infoSize)
 
 	info->sem = id;
 	info->team = 1;
-	info->name[0] = '\0';
+	strlcpy(info->name, sSemaphores[id].name, sizeof(info->name));
 	info->count = sSemaphores[id].count;
 	info->latest_holder = -1;
 
