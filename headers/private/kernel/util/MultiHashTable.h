@@ -75,8 +75,7 @@ public:
 			: fOriginalIndex(index), fOriginalValue(value)
 		{
 			Iterator::fTable = table;
-			Iterator::fIndex = index;
-			Iterator::fNext = value;
+			Rewind();
 		}
 
 		bool HasNext() const
@@ -91,7 +90,7 @@ public:
 
 		void Rewind()
 		{
-			Iterator::fIndex = fOriginalIndex;
+			Iterator::fIndex = fOriginalIndex + 1;
 			Iterator::fNext = fOriginalValue;
 		}
 

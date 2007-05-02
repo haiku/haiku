@@ -114,16 +114,8 @@ public:
 
 	void InsertUnchecked(ValueType *value)
 	{
-		if (CheckDuplicates) {
-			for (size_t i = 0; i < fTableSize; i++) {
-				ValueType *bucket = fTable[i];
-				while (bucket) {
-					if (bucket == value)
-						panic("Hash Table: value already in table.");
-					bucket = _Link(bucket)->fNext;
-				}
-			}
-		}
+		if (CheckDuplicates && _ExaustiveSearch(value))
+			panic("Hash Table: value already in table.");
 
 		_Insert(fTable, fTableSize, value);
 		fItemCount++;
@@ -164,16 +156,8 @@ public:
 		if (slot == NULL)
 			return false;
 
-		if (CheckDuplicates) {
-			for (size_t i = 0; i < fTableSize; i++) {
-				ValueType *bucket = fTable[i];
-				while (bucket) {
-					if (bucket == value)
-						panic("Hash Table: duplicate detected.");
-					bucket = _Link(bucket)->fNext;
-				}
-			}
-		}
+		if (CheckDuplicates && _ExaustiveSearch(value))
+			panic("Hash Table: duplicate detected.");
 
 		fItemCount--;
 		return true;
@@ -268,6 +252,20 @@ protected:
 	HashTableLink<ValueType> *_Link(ValueType *bucket) const
 	{
 		return fDefinition.GetLink(bucket);
+	}
+
+	bool _ExaustiveSearch(ValueType *value) const
+	{
+		for (size_t i = 0; i < fTableSize; i++) {
+			ValueType *bucket = fTable[i];
+			while (bucket) {
+				if (bucket == value)
+					return true;
+				bucket = _Link(bucket)->fNext;
+			}
+		}
+
+		return false;
 	}
 
 	Definition fDefinition;

@@ -933,6 +933,8 @@ UdpEndpoint::StoreData(net_buffer *buffer)
 status_t
 UdpEndpoint::DeliverData(net_buffer *_buffer)
 {
+	TRACE_EP("DeliverData(%p [%ld bytes])", _buffer, _buffer->size);
+
 	net_buffer *buffer = gBufferModule->clone(_buffer, false);
 	if (buffer == NULL)
 		return B_NO_MEMORY;
