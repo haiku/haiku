@@ -1422,7 +1422,29 @@ static status_t
 devfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name,
 	int perms, vnode_id *_newVnodeID)
 {
-	return EROFS;
+	struct devfs *fs = (struct devfs *)_fs;
+	struct devfs_vnode *dir = (struct devfs_vnode *)_dir;
+
+	struct devfs_vnode *vnode = devfs_find_in_dir(dir, name);
+	if (vnode != NULL) {
+		return EEXIST;
+	}
+	
+	vnode = devfs_create_vnode(fs, dir, name);
+	if (vnode == NULL) {
+		return B_NO_MEMORY;
+	}
+
+	// set up the new directory
+	vnode->stream.type = S_IFDIR | perms;
+	vnode->stream.u.dir.dir_head = NULL;
+	list_init(&vnode->stream.u.dir.cookies);
+
+	hash_insert(sDeviceFileSystem->vnode_hash, vnode);
+	devfs_insert_in_dir(dir, vnode);
+
+	*_newVnodeID = vnode->id;
+	return B_OK;
 }
 
 
