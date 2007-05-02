@@ -2,7 +2,6 @@
  * Copyright 2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef _FSSH_SYSCALLS_H
 #define _FSSH_SYSCALLS_H
 

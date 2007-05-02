@@ -3,7 +3,6 @@
  * Copyright 2004-2006, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef _FSSH_SEM_H
 #define _FSSH_SEM_H
 

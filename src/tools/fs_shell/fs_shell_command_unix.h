@@ -2,7 +2,6 @@
  * Copyright 2005-2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef _FSSH_FS_SHELL_COMMAND_UNIX_H
 #define _FSSH_FS_SHELL_COMMAND_UNIX_H
 
