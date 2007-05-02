@@ -358,8 +358,8 @@ AddVariableToScript $(script) : imageSize : $(HAIKU_IMAGE_SIZE) ;
 AddVariableToScript $(script) : addBuildCompatibilityLibDir
 	: $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ;
 AddVariableToScript $(script) : updateOnly : $(HAIKU_IMAGE_UPDATE_ONLY) ;
-AddTargetVariableToScript $(script) : bfs_shell : bfsShell ;
-AddTargetVariableToScript $(script) : fs_shell_command : fsShellCommand ;
+AddTargetVariableToScript $(script) : <build>bfs_shell : bfsShell ;
+AddTargetVariableToScript $(script) : <build>fs_shell_command : fsShellCommand ;
 AddTargetVariableToScript $(script) : <build>copyattr ;
 AddTargetVariableToScript $(script) : <build>makebootable ;
 AddTargetVariableToScript $(script) : <build>rc ;
