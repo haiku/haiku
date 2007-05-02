@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src add-ons kernel drivers disk virtual nbd ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+#if $(TARGET_PLATFORM) != haiku {
+#	# Needed for <ACPI.h>. Unfortunately we also get the other headers there,
+#	# that we don't really want.
+#	UsePublicHeaders drivers ;
+#}
+
+UsePrivateHeaders drivers ;
+
+KernelAddon nbd :
+	nbd.c
+	;
