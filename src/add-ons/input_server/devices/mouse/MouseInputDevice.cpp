@@ -89,7 +89,7 @@ LOG(const char *fmt, ...)
 	va_list ap;
 	va_start(ap, fmt);
 	vsprintf(buf, fmt, ap); va_end(ap);
-    fputs(buf, MouseInputDevice::sLogFile); fflush(MouseInputDevice::sLogFile);
+	fputs(buf, MouseInputDevice::sLogFile); fflush(MouseInputDevice::sLogFile);
 }
 #endif
 
