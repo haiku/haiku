@@ -48,7 +48,7 @@
 namespace FSShell {
 
 
-const static uint32_t kMaxUnusedVnodes = 8192;
+const static uint32_t kMaxUnusedVnodes = 1024;
 	// This is the maximum number of unused vnodes that the system
 	// will keep around (weak limit, if there is enough memory left,
 	// they won't get flushed even when hitting that limit).
