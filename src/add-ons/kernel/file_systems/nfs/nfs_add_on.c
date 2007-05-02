@@ -862,6 +862,10 @@ fs_write_vnode(fs_nspace *ns, fs_node *node, char r)
 }
 
 #ifdef __HAIKU__
+/* no reason to do it,
+ * the VFS does it the best possible way for an unix fs anyway.
+ * so we use NULL for this call.
+ */
 extern int
 fs_get_vnode_name(fs_nspace *ns, fs_node *node, char *buffer, size_t len)
 {
@@ -2441,7 +2445,7 @@ static file_system_module_info sNFSModule = {
 
 	/* vnode operations */
 	&fs_walk,
-	&fs_get_vnode_name,
+	NULL,	// &fs_get_vnode_name,
 	&fs_read_vnode,
 	&fs_release_vnode,
 	&fs_remove_vnode,
