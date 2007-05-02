@@ -414,6 +414,7 @@ interpret_kb_buffer(hid_device_info *device)
 {
 	uint8 modifiers = ((uint8*)device->buffer)[0];
 	uint8 bits = device->last_buffer[0] ^ modifiers;
+	bool timerSet = false;
 	uint32 i, j;
 
 	if (bits) {
@@ -446,6 +447,7 @@ interpret_kb_buffer(hid_device_info *device)
 					// unmapped key
 					key = 0x200000 + ((uint8*)device->buffer)[i];
 				}
+				//dprintf("key down: %x, mapping: %lx\n", ((uint8*)device->buffer)[i], key);
 
 				write_key(device, key, true);
 
@@ -454,6 +456,7 @@ interpret_kb_buffer(hid_device_info *device)
 				device->repeat_timer.key = key;
 				add_timer(&device->repeat_timer.timer, timer_delay_hook,
 					device->repeat_delay, B_ONE_SHOT_RELATIVE_TIMER);
+				timerSet = true;
 			}
 		} else
 			break;
@@ -485,7 +488,8 @@ interpret_kb_buffer(hid_device_info *device)
 				}
 
 				write_key(device, key, false);
-				cancel_timer(&device->repeat_timer.timer);
+				if (!timerSet)
+					cancel_timer(&device->repeat_timer.timer);
 			}
 		} else
 			break;
