@@ -98,6 +98,22 @@ ipv4_datalink_control(net_datalink_protocol *protocol, int32 op,
 
 
 static status_t
+ipv4_datalink_join_multicast(net_datalink_protocol *protocol,
+	const sockaddr *address)
+{
+	return protocol->next->module->join_multicast(protocol->next, address);
+}
+
+
+static status_t
+ipv4_datalink_leave_multicast(net_datalink_protocol *protocol,
+	const sockaddr *address)
+{
+	return protocol->next->module->leave_multicast(protocol->next, address);
+}
+
+
+static status_t
 ipv4_datalink_std_ops(int32 op, ...)
 {
 	switch (op) {
@@ -123,6 +139,8 @@ net_datalink_protocol_module_info gIPv4DataLinkModule = {
 	ipv4_datalink_up,
 	ipv4_datalink_down,
 	ipv4_datalink_control,
+	ipv4_datalink_join_multicast,
+	ipv4_datalink_leave_multicast,
 };
 
 module_info *modules[] = {

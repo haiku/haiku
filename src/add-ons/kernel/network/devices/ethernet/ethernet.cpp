@@ -391,8 +391,7 @@ ethernet_add_multi(struct net_device *_device, const sockaddr *_address)
 	if (address->sdl_type != IFT_ETHER)
 		return EINVAL;
 
-	return ioctl(device->fd, ETHER_ADDMULTI, address->sdl_data,
-		address->sdl_alen);
+	return ioctl(device->fd, ETHER_ADDMULTI, LLADDR(address), 6);
 }
 
 
@@ -408,8 +407,7 @@ ethernet_rem_multi(struct net_device *_device, const sockaddr *_address)
 	if (address->sdl_type != IFT_ETHER)
 		return EINVAL;
 
-	return ioctl(device->fd, ETHER_REMMULTI, address->sdl_data,
-		address->sdl_alen);
+	return ioctl(device->fd, ETHER_REMMULTI, LLADDR(address), 6);
 }
 
 

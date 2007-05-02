@@ -258,9 +258,6 @@ ipv4_to_ether_multicast(sockaddr_dl *destination, const sockaddr_in *source)
 	//   the low-order 23 bits of the Ethernet multicast address
 	//   01-00-5E-00-00-00 (hex).''
 
-	memcpy(((uint8 *)destination->sdl_data) + 2, &source->sin_addr,
-		sizeof(in_addr));
-
 	destination->sdl_len = sizeof(sockaddr_dl);
 	destination->sdl_family = AF_DLI;
 	destination->sdl_index = 0;
@@ -269,7 +266,8 @@ ipv4_to_ether_multicast(sockaddr_dl *destination, const sockaddr_in *source)
 	destination->sdl_nlen = destination->sdl_slen = 0;
 	destination->sdl_alen = ETHER_ADDRESS_LENGTH;
 
-	uint32 *data = (uint32 *)destination->sdl_data;
+	memcpy(LLADDR(destination) + 2, &source->sin_addr, sizeof(in_addr));
+	uint32 *data = (uint32 *)LLADDR(destination);
 	data[0] = (data[0] & htonl(0x7f)) | htonl(0x01005e00);
 }
 

@@ -706,20 +706,26 @@ raw_receive_data(net_buffer *buffer)
 }
 
 
+static sockaddr *
+fill_sockaddr_in(sockaddr_in *destination, const in_addr &source)
+{
+	memset(destination, 0, sizeof(sockaddr_in));
+	destination->sin_family = AF_INET;
+	destination->sin_addr = source;
+	return (sockaddr *)destination;
+}
+
+
 status_t
 IPv4Multicast::JoinGroup(IPv4GroupInterface *state)
 {
 	BenaphoreLocker _(sMulticastGroupsLock);
 
 	sockaddr_in groupAddr;
-	memset(&groupAddr, 0, sizeof(groupAddr));
-	groupAddr.sin_addr = state->Address();
-
 	net_interface *intf = state->Interface();
 
-	status_t status =
-		intf->first_protocol->module->join_multicast(intf->first_protocol,
-			(sockaddr *)&groupAddr);
+	status_t status = intf->first_info->join_multicast(intf->first_protocol,
+		fill_sockaddr_in(&groupAddr, state->Address()));
 	if (status < B_OK)
 		return status;
 
@@ -736,13 +742,10 @@ IPv4Multicast::LeaveGroup(IPv4GroupInterface *state)
 	sMulticastState->Remove(state);
 
 	sockaddr_in groupAddr;
-	memset(&groupAddr, 0, sizeof(groupAddr));
-	groupAddr.sin_addr = state->Address();
-
 	net_interface *intf = state->Interface();
 
 	return intf->first_protocol->module->join_multicast(intf->first_protocol,
-		(sockaddr *)&groupAddr);
+		fill_sockaddr_in(&groupAddr, state->Address()));
 }
 
 
@@ -913,13 +916,18 @@ ipv4_generic_delta_membership(ipv4_protocol *protocol, int option,
 	if (_sourceAddr && _sourceAddr->ss_family != AF_INET)
 		return EINVAL;
 
-	net_interface *interface = sDatalinkModule->get_interface(sDomain, index);
-	if (interface == NULL)
-		return ENODEV;
-
+	net_interface *interface;
 	const in_addr *groupAddr, *sourceAddr = NULL;
 
 	groupAddr = &((const sockaddr_in *)_groupAddr)->sin_addr;
+
+	if (index == 0)
+		interface = get_multicast_interface(protocol, groupAddr);
+	else
+		interface = sDatalinkModule->get_interface(sDomain, index);
+
+	if (interface == NULL)
+		return ENODEV;
 
 	if (_sourceAddr)
 		sourceAddr = &((const sockaddr_in *)_sourceAddr)->sin_addr;
