@@ -6,7 +6,7 @@
 /*
 	nbd driver for Haiku
 
-	Maps BEOS/IMAGE.BE files as virtual partitions.
+	Maps a Network Block Device as virtual partitions.
 */
 
 #include <KernelExport.h>
@@ -51,6 +51,8 @@ status_t nbd_post_request(struct nbd_device, uint64 handle, struct nbd_request_e
 status_t nbd_dequeue_request(struct nbd_device, uint64 handle, struct nbd_request_entry **req);
 status_t nbd_free_request(struct nbd_device, struct nbd_request_entry *req);
 
+struct nbd_device *nbd_find_device(const char* name);
+
 #pragma mark ==== request manager ====
 
 
@@ -68,14 +70,21 @@ int32 postoffice(void *arg)
 
 #pragma mark ==== device hooks ====
 
+static struct nbd_device nbd_devices[MAX_NBDS];
+
 status_t nbd_open(const char *name, uint32 flags, cookie_t **cookie) {
+	struct nbd_device *dev = NULL;
 	(void)name; (void)flags;
+	dev = nbd_find_device(name);
+	if (!dev)
+		return ENOENT;
 	*cookie = (void*)malloc(sizeof(cookie_t));
 	if (*cookie == NULL) {
 		dprintf("nbd_open : error allocating cookie\n");
 		goto err0;
 	}
 	memset(*cookie, 0, sizeof(cookie_t));
+	(*cookie)->dev = dev;
 	return B_OK;
 err0:
 	return B_ERROR;
@@ -191,6 +200,7 @@ init_driver (void)
 		if (nbd_name[i] == NULL)
 			break;
 		sprintf(nbd_name[i], DEVICE_FMT, i);
+		// XXX: init nbd_devices[i]
 	}
 	nbd_name[i] = NULL;
 	return B_OK;
@@ -215,4 +225,15 @@ device_hooks*
 find_device(const char* name)
 {
 	return &nbd_hooks;
+}
+
+struct nbd_device*
+nbd_find_device(const char* name)
+{
+	int i;
+	for (i = 0; i < MAX_NBDS; i++) {
+		if (!strcmp(nbd_name[i], name))
+			return &nbd_devices[i];
+	}
+	return NULL;
 }

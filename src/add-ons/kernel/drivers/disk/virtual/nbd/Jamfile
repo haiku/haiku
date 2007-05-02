@@ -8,6 +8,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 #	UsePublicHeaders drivers ;
 #}
 
+# not Haiku-specific, ksocket.h also works in BONE.
 UsePrivateHeaders drivers ;
 
 KernelAddon nbd :
