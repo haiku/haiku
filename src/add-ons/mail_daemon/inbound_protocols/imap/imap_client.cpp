@@ -45,6 +45,8 @@ struct mailbox_info {
 	BString server_mb_name;
 };
 
+class NoopWorker;
+
 class IMAP4Client : public BRemoteMailStorageProtocol {
 	public:
 		IMAP4Client(BMessage *settings, BMailChainRunner *run);

@@ -51,6 +51,8 @@
 #	define D(x) ;
 #endif
 
+using namespace std;
+
 /*
 ** Function: md5_hmac
 ** taken from the file rfc2104.txt
