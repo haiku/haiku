@@ -41,6 +41,6 @@ BuildPlatformMain <build>bfs_shell
 
 	kernel_interface.cpp
 
-	: <build2>fs_shell.a $(libHaikuCompat) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+	: <build>fs_shell.a $(libHaikuCompat) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
 	  $(HOST_LIBROOT)
 ;
