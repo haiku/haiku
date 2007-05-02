@@ -1,0 +1,14 @@
+#ifndef _FBSD_COMPAT_DEV_PCI_PCIREG_H_
+#define _FBSD_COMPAT_DEV_PCI_PCIREG_H_
+
+#define PCIR_COMMAND	0x04
+#define PCIR_REVID		0x08
+#define PCIR_CACHELNSZ	0x0c
+#define PCIR_SUBVEND_0	0x2c
+#define PCIR_SUBDEV_0	0x2e
+
+#define PCIM_CMD_PORTEN		0x0001
+#define PCIM_CMD_MEMEN		0x0002
+#define PCIM_CMD_MWRICEN	0x0010
+
+#endif

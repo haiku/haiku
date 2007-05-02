@@ -1,0 +1,4 @@
+#ifndef _FBSD_COMPAT_MACHINE_ENDIAN_H_
+#define _FBSD_COMPAT_MACHINE_ENDIAN_H_
+
+#endif

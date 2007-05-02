@@ -1,0 +1,12 @@
+SubDir HAIKU_TOP src libs compat freebsd_network ;
+
+UsePrivateHeaders kernel net ;
+
+UseHeaders [ FDirName $(SUBDIR) ] : true ;
+UseHeaders [ FDirName $(SUBDIR) headers ] : true ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 ] ;
+
+Library libfreebsd_network.a :
+	compat.c
+	;
