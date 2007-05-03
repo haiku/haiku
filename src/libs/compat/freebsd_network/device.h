@@ -31,6 +31,11 @@ struct device {
 	sem_id			receive_sem;
 
 	struct ifnet *	ifp;
+
+	int				unit;
+	char			nameunit[64];
+	const char *	description;
+	void *			softc;
 };
 
 

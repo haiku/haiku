@@ -53,10 +53,40 @@ pci_get_device(device_t dev)
 }
 
 
+uint16_t
+pci_get_subvendor(device_t dev)
+{
+	return pci_read_config(dev, PCI_subsystem_vendor_id, 2);
+}
+
+
+uint16_t
+pci_get_subdevice(device_t dev)
+{
+	return pci_read_config(dev, PCI_subsystem_id, 2);
+}
+
+
 uint8_t
 pci_get_revid(device_t dev)
 {
 	return pci_read_config(dev, PCI_revision, 1);
+}
+
+
+static void
+pci_set_command_bit(device_t dev, uint16_t bit)
+{
+	uint16_t command = pci_read_config(dev, PCI_command, 2);
+	pci_write_config(dev, PCI_command, command | bit, 2);
+}
+
+
+int
+pci_enable_busmaster(device_t dev)
+{
+	pci_set_command_bit(dev, PCI_command_master);
+	return 0;
 }
 
 
@@ -71,6 +101,45 @@ device_printf(device_t dev, const char *format, ...)
 
 	dprintf("[...] %s", buf);
 	return 0;
+}
+
+
+void
+device_set_desc(device_t dev, const char *desc)
+{
+	dev->description = desc;
+}
+
+
+const char *
+device_get_name(device_t dev)
+{
+	/*
+	 * if (dev != NULL && dev->devclass)
+	 *	return devclass_get_name(dev->devclass);
+	 */
+	return NULL;
+}
+
+
+int
+device_get_unit(device_t dev)
+{
+	return dev->unit;
+}
+
+
+const char *
+device_get_nameunit(device_t dev)
+{
+	return dev->nameunit;
+}
+
+
+void *
+device_get_softc(device_t dev)
+{
+	return dev->softc;
 }
 
 
@@ -99,9 +168,16 @@ int resource_int_value(const char *name, int unit, const char *resname,
 void *
 _kernel_malloc(size_t size, int flags)
 {
-	// our kernel malloc() is insufficent
+	// our kernel malloc() is insufficent, must handle M_WAIT
 
-	return malloc(size);
+	void *ptr = malloc(size);
+	if (ptr == NULL)
+		return ptr;
+
+	if (flags & M_ZERO)
+		memset(ptr, 0, size);
+
+	return ptr;
 }
 
 

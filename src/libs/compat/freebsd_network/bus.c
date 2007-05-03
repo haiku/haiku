@@ -206,3 +206,12 @@ bus_teardown_intr(device_t dev, struct resource *res, void *arg)
 	return 0;
 }
 
+
+int
+bus_generic_detach(device_t dev)
+{
+	/* TODO */
+
+	return B_ERROR;
+}
+
