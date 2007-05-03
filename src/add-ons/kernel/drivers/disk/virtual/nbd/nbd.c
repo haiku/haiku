@@ -9,10 +9,12 @@
  * Maps a Network Block Device as virtual partitions.
  */
 
+#include <ByteOrder.h>
 #include <KernelExport.h>
 #include <Drivers.h>
-#include <Errors.h>
 #include <driver_settings.h>
+#include <Errors.h>
+#include <errno.h>
 #include <ksocket.h>
 #include <netinet/in.h>
 
@@ -23,6 +25,12 @@
  * as it happens with the python server.
  */
 //#define MOUNT_KLUDGE
+
+
+/* names, ohh names... */
+#ifndef SHUT_RDWR
+#define SHUT_RDWR SHUTDOWN_BOTH 
+#endif
 
 /* locking support */
 #ifdef __HAIKU__
@@ -388,7 +396,7 @@ status_t nbd_teardown(struct nbd_device *dev)
 {
 	status_t err, ret;
 	PRINT((DP ">%s()\n", __FUNCTION__));
-	kshutdown(dev->sock, SHUTDOWN_BOTH);
+	kshutdown(dev->sock, SHUT_RDWR);
 	kclosesocket(dev->sock);
 	dev->sock = -1;
 	err = wait_for_thread(dev->postoffice, &ret);
@@ -784,7 +792,6 @@ init_driver (void)
 		const driver_settings *settings = get_driver_settings(handle);
 		driver_parameter *p = NULL;
 		char keyname[10];
-		char *v;
 		sprintf(keyname, "%d", i);
 		for (j = 0; j < settings->parameter_count; j++)
 			if (!strcmp(settings->parameters[j].name, keyname))
@@ -824,7 +831,7 @@ uninit_driver (void)
 	PRINT((DP ">%s()\n", __FUNCTION__));
 	for (i = 0; i < MAX_NBDS; i++) {
 		free(nbd_name[i]);
-		err = benaphore_destroy(&nbd_devices[i].ben);
+		benaphore_destroy(&nbd_devices[i].ben);
 	}
 	err = ksocket_cleanup();
 	/* HACK */
