@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		<unknown, please fill in who knows>
+ *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  */
 
 

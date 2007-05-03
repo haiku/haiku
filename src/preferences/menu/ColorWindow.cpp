@@ -59,11 +59,6 @@ ColorWindow::ColorWindow(BMessenger owner)
 }
 
 
-ColorWindow::~ColorWindow()
-{
-}
-
-
 void
 ColorWindow::Quit()
 {

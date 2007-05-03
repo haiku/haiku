@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2006, Haiku Inc. All rights reserved.
+ * Copyright 2002-2007, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		<unknown, please fill in who knows>
+ *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  */
 
 
@@ -13,8 +14,6 @@
 
 #include <MenuItem.h>
 #include <Message.h>
-
-#include <stdlib.h>
 
 
 FontMenu::FontMenu()
@@ -48,30 +47,32 @@ void
 FontMenu::GetFonts()
 {
 	int32 numFamilies = count_font_families();
-	for ( int32 i = 0; i < numFamilies; i++ ) {
-		font_family *family = (font_family*)malloc(sizeof(font_family));
+	for (int32 i = 0; i < numFamilies; i++) {
+		font_family family;
 		uint32 flags;
-		if ( get_font_family(i, family, &flags) == B_OK ) {
-			BMenu *fontStyleMenu = new BMenu(*family, B_ITEMS_IN_COLUMN);
+		if (get_font_family(i, &family, &flags) == B_OK) {
+			BMenu *fontStyleMenu = new BMenu(family, B_ITEMS_IN_COLUMN);
 			fontStyleMenu->SetRadioMode(true);
-			int32 numStyles = count_font_styles(*family);
-			for ( int32 j = 0; j < numStyles; j++ ) {
-				font_style *style = (font_style*)malloc(sizeof(font_style));
-				if ( get_font_style(*family, j, style, &flags) == B_OK ) {
+			int32 numStyles = count_font_styles(family);
+			for (int32 j = 0; j < numStyles; j++) {
+				font_style style;
+				if (get_font_style(family, j, &style, &flags) == B_OK) {
 					BMessage *msg = new BMessage(MENU_FONT_STYLE);
-					msg->AddPointer("family", family);
-					msg->AddPointer("style", style);
-					BMenuItem *fontStyleItem = new BMenuItem(*style, msg, 0, 0);
+					msg->AddString("family", family);
+					msg->AddString("style", style);
+					BMenuItem *fontStyleItem = new BMenuItem(style, msg);
 					fontStyleMenu->AddItem(fontStyleItem);
 				}
 			}
+
 			BMessage *msg = new BMessage(MENU_FONT_FAMILY);
-			msg->AddPointer("family", family);
-			font_style *style = (font_style*)malloc(sizeof(font_style));
+			msg->AddString("family", family);
+			
 			// if font family selected, we need to change style to
 			// first style
-			if ( get_font_style(*family, 0, style, &flags) == B_OK )
-				msg->AddPointer("style", style);
+			font_style style;
+			if (get_font_style(family, 0, &style, &flags) == B_OK)
+				msg->AddString("style", style);
 			BMenuItem *fontFamily = new BMenuItem(fontStyleMenu, msg);
 			AddItem(fontFamily);
 		}

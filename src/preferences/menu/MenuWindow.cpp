@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2006, Haiku Inc. All rights reserved.
+ * Copyright 2002-2007, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		<unknown, please fill in who knows>
+ *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  *		Vasilis Kaoutsis, kaoutsis@sch.gr
  */
 
@@ -64,11 +65,6 @@ MenuWindow::MenuWindow(BRect rect)
 }
 
 
-MenuWindow::~MenuWindow()
-{
-}
-
-
 void
 MenuWindow::MessageReceived(BMessage *msg)
 {
@@ -96,13 +92,14 @@ MenuWindow::MessageReceived(BMessage *msg)
 		case MENU_FONT_STYLE:
 		{
 			fRevert = true;
-			font_family *family;
-			msg->FindPointer("family", (void**)&family);
-			font_style *style;
-			msg->FindPointer("style", (void**)&style);
+			const font_family *family;
+			msg->FindString("family", (const char **)&family);
+			const font_style *style;
+			msg->FindString("style", (const char **)&style);
+
 			settings->Get(info);
-			memcpy(info.f_family, family, sizeof(info.f_family));
-			memcpy(info.f_style, style, sizeof(info.f_style));
+			strlcpy(info.f_family, (const char *)family, B_FONT_FAMILY_LENGTH);
+			strlcpy(info.f_style, (const char *)style, B_FONT_STYLE_LENGTH);
 			settings->Set(info);
 			Update();
 			break;
@@ -112,14 +109,6 @@ MenuWindow::MessageReceived(BMessage *msg)
 			fRevert = true;
 			settings->Get(info);
 			msg->FindFloat("size", &info.font_size);
-			settings->Set(info);
-			Update();
-			break;
-
-		case MENU_SEP_TYPE:
-			fRevert = true;
-			settings->Get(info);
-			msg->FindInt32("sep", &info.separator);
 			settings->Set(info);
 			Update();
 			break;

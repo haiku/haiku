@@ -4,7 +4,7 @@
  *
  * Authors:
  *		<unknown, please fill in who knows>
- *		Jack Burton
+ *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  */
 #ifndef MENU_APP_H
 #define MENU_APP_H

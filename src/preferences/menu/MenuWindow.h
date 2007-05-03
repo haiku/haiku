@@ -1,10 +1,12 @@
 /*
- * Copyright 2002-2006, Haiku Inc. All rights reserved.
+ * Copyright 2002-2007, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		<unknown, please fill in who knows>
+ *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  */
+
 #ifndef MENU_WINDOW_H
 #define MENU_WINDOW_H
 
@@ -16,13 +18,10 @@
 class ColorWindow;
 class BButton;
 class MenuBar;
-
-
 class MenuWindow : public BWindow {
 	public:
 		MenuWindow(BRect frame);
-		virtual ~MenuWindow();
-
+		
 		virtual void MessageReceived(BMessage *message);
 		virtual bool QuitRequested();
 

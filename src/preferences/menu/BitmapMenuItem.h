@@ -1,20 +1,19 @@
 /*
- * Copyright 2002-2006, Haiku Inc. All rights reserved.
+ * Copyright 2002-2007, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		<unknown, please fill in who knows>
+ *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  */
+
 #ifndef BITMAP_MENU_ITEM_H
 #define BITMAP_MENU_ITEM_H
-
 
 #include <MenuItem.h>
 #include <String.h>
 
 class BBitmap;
-
-
 class BitmapMenuItem : public BMenuItem {
 	public:
 		BitmapMenuItem(const char* name, BMessage* message, BBitmap* bmp,

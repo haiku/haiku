@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2006, Haiku Inc. All rights reserved.
+ * Copyright 2002-2007, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		<unknown, please fill in who knows>
+ *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  */
 
 
@@ -15,7 +16,7 @@
 
 // BitmapMenuItem class definition
 BitmapMenuItem::BitmapMenuItem(const char* name, BMessage* message, 
-	BBitmap* bmp, char shortcut, uint32 modifiers)
+				BBitmap* bmp, char shortcut, uint32 modifiers)
 	: BMenuItem(name, message, shortcut, modifiers),
 	fBitmap(bmp),
 	fName(name)

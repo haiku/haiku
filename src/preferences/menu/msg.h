@@ -35,7 +35,5 @@ const uint32 MENU_FONT_FAMILY		= 'mffm';
 const uint32 MENU_FONT_STYLE		= 'mfst';
 const uint32 MENU_FONT_SIZE			= 'mfsz';
 
-// seperator	
-const uint32 MENU_SEP_TYPE			= 'mstp';
 
 #endif	// MESSAGES_H

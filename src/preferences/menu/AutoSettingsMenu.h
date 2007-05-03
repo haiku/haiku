@@ -1,10 +1,11 @@
 /*
- * Copyright 2002-2006, Haiku Inc. All rights reserved.
+ * Copyright 2002-2007, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		<unknown, please fill in who knows>
+ *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  */
+
 #ifndef AUTO_SETTINGS_MENU_H
 #define AUTO_SETTINGS_MENU_H
 
@@ -20,3 +21,4 @@ class AutoSettingsMenu : public BMenu {
 };
 
 #endif	// AUTO_SETTINGS_MENU_H
+
