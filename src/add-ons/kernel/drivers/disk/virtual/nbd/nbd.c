@@ -54,8 +54,14 @@
 
 struct nbd_request_entry {
 	struct nbd_request_entry *next;
-	struct nbd_request req;
-	bool r; /* is read */
+	struct nbd_request req; /* net byte order */
+	struct nbd_reply reply; /* net byte order */
+	sem_id sem;
+	bool replied;
+	bool discard;
+	uint64 handle;
+	uint32 type;
+	uint64 from;
 	size_t len;
 	void *buffer; /* write: ptr to passed buffer; read: ptr to malloc()ed extra */
 };
@@ -78,10 +84,10 @@ typedef struct cookie {
 } cookie_t;
 
 /* data=NULL on read */
-status_t nbd_alloc_request(struct nbd_device, struct nbd_request_entry **req, size_t len, const char *data);
-status_t nbd_post_request(struct nbd_device, uint64 handle, struct nbd_request_entry **req);
-status_t nbd_dequeue_request(struct nbd_device, uint64 handle, struct nbd_request_entry **req);
-status_t nbd_free_request(struct nbd_device, struct nbd_request_entry *req);
+status_t nbd_alloc_request(struct nbd_device *dev, struct nbd_request_entry **req, uint32 type, off_t from, size_t len, const char *data);
+status_t nbd_queue_request(struct nbd_device *dev, struct nbd_request_entry *req);
+status_t nbd_dequeue_request(struct nbd_device *dev, uint64 handle, struct nbd_request_entry **req);
+status_t nbd_free_request(struct nbd_device *dev, struct nbd_request_entry *req);
 
 struct nbd_device *nbd_find_device(const char* name);
 
@@ -98,19 +104,191 @@ bool gDelayUnload = false;
 
 #pragma mark ==== request manager ====
 
+status_t nbd_alloc_request(struct nbd_device *dev, struct nbd_request_entry **req, uint32 type, off_t from, size_t len, const char *data)
+{
+	bool w = (type == NBD_CMD_WRITE);
+	struct nbd_request_entry *r;
+	status_t err = EINVAL;
+	uint64 handle;
+	PRINT((DP ">%s(%ld, %Ld, %ld)\n", __FUNCTION__, type, from, len));
+	
+	if (type != NBD_CMD_READ && type != NBD_CMD_WRITE && type != NBD_CMD_DISC)
+		return err;
+	if (!dev || !req || from < 0)
+		return err;
+	
+	//LOCK
+	err = benaphore_lock(&dev->ben);
+	if (err)
+		return err;
+
+	// atomic
+	handle = dev->req++;
+	
+	
+	//UNLOCK
+	benaphore_unlock(&dev->ben);
+	
+	err = ENOMEM;
+	r = malloc(sizeof(struct nbd_request_entry) + (w ? 0 : len));
+	if (r == NULL)
+		goto err0;
+	r->next = NULL;
+	err = r->sem = create_sem(0, "nbd request sem");
+	if (err < 0)
+		goto err1;
+	
+	r->replied = false;
+	r->discard = false;
+	r->handle = handle;
+	r->type = type;
+	r->from = from;
+	r->len = len;
+	
+	r->req.magic = B_HOST_TO_BENDIAN_INT32(NBD_REQUEST_MAGIC);
+	r->req.type = B_HOST_TO_BENDIAN_INT32(type);
+	r->req.handle = B_HOST_TO_BENDIAN_INT64(r->handle);
+	r->req.from = B_HOST_TO_BENDIAN_INT64(r->from);
+	r->req.len = B_HOST_TO_BENDIAN_INT32(len);
+	
+	r->buffer = w ? data : (((char *)r) + sizeof(struct nbd_request_entry));
+	
+	*req = r;
+	return B_OK;
+
+err1:
+	free(r);
+err0:
+	dprintf(DP " %s: error 0x%08lx\n", __FUNCTION__, err);
+	return err;
+}
+
+status_t nbd_queue_request(struct nbd_device *dev, struct nbd_request_entry *req)
+{
+	PRINT((DP ">%s(handle:%Ld)\n", __FUNCTION__, req->handle));
+	req->next = dev->reqs;
+	dev->reqs = req;
+	return B_OK;
+}
+
+status_t nbd_dequeue_request(struct nbd_device *dev, uint64 handle, struct nbd_request_entry **req)
+{
+	struct nbd_request_entry *r, *prev;
+	PRINT((DP ">%s(handle:%Ld)\n", __FUNCTION__, handle));
+	r = dev->reqs;
+	prev = NULL;
+	while (r && r->handle != handle) {
+		prev = r;
+		r = r->next;
+	}
+	if (!r)
+		return ENOENT;
+	
+	if (prev)
+		prev->next = r->next;
+	else
+		dev->reqs = r->next;
+	
+	*req = r;
+	return B_OK;
+}
+
+status_t nbd_free_request(struct nbd_device *dev, struct nbd_request_entry *req)
+{
+	PRINT((DP ">%s(handle:%Ld)\n", __FUNCTION__, req->handle));
+	delete_sem(req->sem);
+	free(req);
+	return B_OK;
+}
+
+
 
 #pragma mark ==== nbd handler ====
 
 int32 nbd_postoffice(void *arg)
 {
 	struct nbd_device *dev = (struct nbd_device *)arg;
+	struct nbd_request_entry *req = NULL;
+	struct nbd_reply reply;
 	int sock = dev->sock;
+	status_t err;
+	const char *reason;
 	PRINT((DP ">%s()\n", __FUNCTION__));
 	
-	
+	for (;;) {
+		reason = "recv";
+		err = krecv(dev->sock, &reply, sizeof(reply), 0);
+		if (err == -1 && errno < 0)
+			err = errno;
+		if (err < 0)
+			goto err;
+		reason = "recv:size";
+		if (err < sizeof(reply))
+			err = EINVAL;
+		if (err < 0)
+			goto err;
+		reason = "magic";
+		err = EINVAL;
+		if (B_BENDIAN_TO_HOST_INT32(reply.magic) != NBD_REPLY_MAGIC)
+			goto err;
+		
+		reason = "lock";
+		//LOCK
+		err = benaphore_lock(&dev->ben);
+		if (err)
+			goto err;
+		
+		reason = "dequeue_request";
+		err = nbd_dequeue_request(dev, B_BENDIAN_TO_HOST_INT64(reply.handle), &req);
+		
+		//UNLOCK
+		benaphore_unlock(&dev->ben);
+		
+		if (!err && !req) {
+			dprintf(DP "nbd_dequeue_rquest found NULL!\n");
+			err = ENOENT;
+		}
+		
+		if (err == B_OK) {
+			memcpy(&req->reply, &reply, sizeof(reply));
+			if (req->type == NBD_CMD_READ) {
+				err = 0;
+				reason = "recv(data)";
+				if (reply.error == 0)
+					err = krecv(dev->sock, req->buffer, req->len, 0);
+				if (err < 0)
+					goto err;
+				/* tell back how much we've got (?) */
+				req->len = err;
+			} else {
+				if (reply.error)
+					req->len = 0;
+			}
+			
+			reason = "lock";
+			//LOCK
+			err = benaphore_lock(&dev->ben);
+			if (err)
+				goto err;
+			
+			// this also must be atomic!
+			release_sem(req->sem);
+			req->replied = true;
+			if (req->discard)
+				nbd_free_request(dev, req);
+			
+			//UNLOCK
+			benaphore_unlock(&dev->ben);
+		}
+		
+	}
 	
 	PRINT((DP "<%s\n", __FUNCTION__));
 	return 0;
+
+err:
+	dprintf(DP "%s: %s: error 0x%08lx\n", __FUNCTION__, reason, err);
+	return err;
 }
 
 status_t nbd_connect(struct nbd_device *dev)
@@ -183,6 +361,20 @@ status_t nbd_teardown(struct nbd_device *dev)
 	err = wait_for_thread(dev->postoffice, &ret);
 	return B_OK;
 }
+
+status_t nbd_post_request(struct nbd_device *dev, struct nbd_request_entry *req)
+{
+	status_t err;
+	PRINT((DP ">%s(handle:%Ld)\n", __FUNCTION__, req->handle));
+	
+	err = ksend(dev->sock, &req->req, sizeof(req->req), 0);
+	if (err < 0)
+		return err;
+	
+	err = nbd_queue_request(dev, req);
+	return err;
+}
+
 
 #pragma mark ==== device hooks ====
 
@@ -312,9 +504,70 @@ status_t nbd_control(cookie_t *cookie, uint32 op, void *data, size_t len) {
 }
 
 status_t nbd_read(cookie_t *cookie, off_t position, void *data, size_t *numbytes) {
+	struct nbd_device *dev = cookie->dev;
+	struct nbd_request_entry *req;
+	status_t err, semerr;
 	PRINT((DP ">%s(%d, %Ld, , )\n", __FUNCTION__, WHICH(cookie->dev), position));
+	
+	if (position < 0)
+		return EINVAL;
+	if (!data)
+		return EINVAL;
+	
+	err = nbd_alloc_request(dev, &req, NBD_CMD_READ, position, *numbytes, NULL);
+	if (err)
+		goto err0;
+	
+	//LOCK
+	err = benaphore_lock(&dev->ben);
+	if (err)
+		goto err1;
+	
+	err = nbd_post_request(dev, req);
+	
+	//UNLOCK
+	benaphore_unlock(&dev->ben);
+
+	if (err)
+		goto err2;
+
+
+	semerr = acquire_sem(req->sem);
+	
+	//LOCK
+	err = benaphore_lock(&dev->ben);
+	if(err)
+		goto err3;
+	
+	/* bad scenarii */
+	if (!req->replied)
+		req->discard = true;
+	else if (semerr)
+		nbd_free_request(dev, req);
+	
+	//UNLOCK
+	benaphore_unlock(&dev->ben);
+
+	if (semerr == B_OK) {
+		*numbytes = req->len;
+		memcpy(data, req->buffer, req->len);
+		nbd_free_request(dev, req);
+		if (*numbytes == 0 && req->reply.error)
+			return B_ERROR;
+		return B_OK;
+	}
+	
 	*numbytes = 0;
-	return B_NOT_ALLOWED;
+	return semerr;
+			
+
+err3:
+err2:
+err1:
+	nbd_free_request(dev, req);
+err0:
+	*numbytes = 0;
+	return err;
 }
 
 status_t nbd_write(cookie_t *cookie, off_t position, const void *data, size_t *numbytes) {
