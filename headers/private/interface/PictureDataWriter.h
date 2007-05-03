@@ -18,8 +18,11 @@
 class BPositionIO;
 class PictureDataWriter {
 public:
+	PictureDataWriter();
 	PictureDataWriter(BPositionIO *data);
 	
+	status_t SetTo(BPositionIO *data);
+
 	status_t WriteSetOrigin(const BPoint &point);
 	status_t WriteInvertRect(const BRect &rect);
 	

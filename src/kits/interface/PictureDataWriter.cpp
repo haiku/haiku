@@ -15,10 +15,25 @@
 
 #include <stdio.h>
 
+PictureDataWriter::PictureDataWriter()
+	:
+	fData(NULL)
+{
+}
+
+
 PictureDataWriter::PictureDataWriter(BPositionIO *data)
 	:
 	fData(data)
 {
+}
+
+
+status_t
+PictureDataWriter::SetTo(BPositionIO *data)
+{
+	fData = data;
+	return B_OK;
 }
 
 
