@@ -2,12 +2,27 @@
 #define _FBSD_COMPAT_SYS_MBUF_H_
 
 #include <sys/malloc.h>
+#include <sys/param.h>
 
-struct m_pkthdr {
+#define MLEN		(MSIZE - sizeof(struct m_hdr))
+#define MHLEN		(MSIZE - sizeof(struct pkthdr))
+
+#ifdef _KERNEL
+
+struct m_hdr {
+	struct mbuf *	mh_next;
+	struct mbuf *	mh_nextpkt;
+	void *			mh_data;
+	int				mh_len;
+	int				mh_flags;
+	short			mh_type;
+};
+
+struct pkthdr {
+	struct ifnet *	rcvif;
 	int				len;
 	int				csum_flags;
 	uint16_t		csum_data;
-	struct ifnet *	rcvif;
 };
 
 struct m_ext {
@@ -16,15 +31,31 @@ struct m_ext {
 };
 
 struct mbuf {
-	struct mbuf *	m_next;
-	struct mbuf *	m_nextpkt;
-	int				m_len;
-	int				m_flags;
-	void *			m_data;
-
-	struct m_pkthdr	m_pkthdr;
-	struct m_ext	m_ext;
+	struct m_hdr m_hdr;
+	union {
+		struct {
+			struct pkthdr	MH_pkthdr;
+			union {
+				struct m_ext	MH_ext;
+				char			MH_databuf[MHLEN];
+			} MH_dat;
+		} MH;
+		char M_databuf[MLEN];
+	} M_dat;
 };
+
+#define m_next      m_hdr.mh_next
+#define m_len       m_hdr.mh_len
+#define m_data      m_hdr.mh_data
+#define m_type      m_hdr.mh_type
+#define m_flags     m_hdr.mh_flags
+#define m_nextpkt   m_hdr.mh_nextpkt
+#define m_act       m_nextpkt
+#define m_pkthdr    M_dat.MH.MH_pkthdr
+#define m_ext       M_dat.MH.MH_dat.MH_ext
+#define m_pktdat    M_dat.MH.MH_dat.MH_databuf
+#define m_dat       M_dat.M_databuf
+
 
 #define M_DONTWAIT		M_NOWAIT
 #define M_TRYWAIT		M_WAITOK
@@ -49,5 +80,7 @@ void m_freem(struct mbuf *mbuf);
 struct mbuf *m_defrag(struct mbuf *m, int);
 
 #define mtod(m, type)	(type)((m)->m_data)
+
+#endif
 
 #endif

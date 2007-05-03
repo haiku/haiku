@@ -24,6 +24,43 @@ static object_cache *sMBufCache;
 static object_cache *sChunkCache;
 
 
+static void
+construct_mbuf(struct mbuf *mb, short type, int flags)
+{
+	mb->m_next = NULL;
+	mb->m_nextpkt = NULL;
+	mb->m_len = 0;
+	mb->m_flags = flags;
+	mb->m_type = type;
+
+	if (flags & M_PKTHDR) {
+		mb->m_data = mb->m_pktdat;
+		memset(&mb->m_pkthdr, 0, sizeof(mb->m_pkthdr));
+	} else {
+		mb->m_data = mb->m_dat;
+	}
+}
+
+
+struct mbuf *
+m_getcl(int how, short type, int flags)
+{
+	uint32 cacheFlags = 0;
+	struct mbuf *mb;
+
+	if (how & M_NOWAIT)
+		cacheFlags = CACHE_DONT_SLEEP;
+
+	mb = (struct mbuf *)object_cache_alloc(sMBufCache, cacheFlags);
+	if (mb == NULL)
+		return NULL;
+
+	construct_mbuf(mb, type, flags);
+
+	return mb;
+}
+
+
 void
 m_freem(struct mbuf *mp)
 {

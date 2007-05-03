@@ -74,6 +74,22 @@ device_printf(device_t dev, const char *format, ...)
 }
 
 
+void *
+_kernel_malloc(size_t size, int flags)
+{
+	// our kernel malloc() is insufficent
+
+	return malloc(size);
+}
+
+
+void
+_kernel_free(void *ptr)
+{
+	free(ptr);
+}
+
+
 status_t
 init_compat_layer()
 {

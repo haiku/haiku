@@ -6,6 +6,11 @@
 #include <sys/time.h> /* for timeval */
 
 
+#define IF_Kbps(x)		((x) * 1000)
+#define IF_Mbps(x)		(IF_Kbps((x) * 1000))
+#define IF_Gbps(x)		(IF_Mbps((x) * 1000))
+
+
 /* Capabilities that interfaces can advertise. */
 #define IFCAP_RXCSUM		0x0001  /* can offload checksum on RX */
 #define IFCAP_TXCSUM		0x0002  /* can offload checksum on TX */

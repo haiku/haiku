@@ -11,6 +11,7 @@ Library libfreebsd_network.a :
 	bus.c
 	compat.c
 	device.c
+	if_media.c
 	mbuf.c
 	mutex.c
 	;

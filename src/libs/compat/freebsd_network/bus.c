@@ -17,11 +17,34 @@
 #include <compat/sys/bus.h>
 
 
+#define ROUNDUP(a, b) (((a) + ((b)-1)) & ~((b)-1))
+
+
 struct internal_intr {
 	driver_intr_t handler;
 	void *arg;
 	int irq;
 };
+
+
+static area_id
+map_mem(void **virtualAddr, void *_phy, size_t size, uint32 protection,
+	const char *name)
+{
+	uint32 offset = (uint32)_phy & (B_PAGE_SIZE - 1);
+	void *physicalAddr = (uint8 *)_phy - offset;
+	area_id area;
+
+	size = ROUNDUP(size + offset, B_PAGE_SIZE);
+	area = map_physical_memory(name, physicalAddr, size, B_ANY_KERNEL_ADDRESS,
+		protection, virtualAddr);
+	if (area < B_OK)
+		return area;
+
+	*virtualAddr = (uint8 *)(*virtualAddr) + offset;
+
+	return area;
+}
 
 
 /* straight from Marcus' ipro1000 driver */
