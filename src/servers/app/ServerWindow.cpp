@@ -2783,7 +2783,6 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 		fDirectWindowData->buffer_info->pixel_format = buffer->ColorSpace();
 		fDirectWindowData->buffer_info->layout = B_BUFFER_NONINTERLEAVED;
 		fDirectWindowData->buffer_info->orientation = B_BUFFER_TOP_TO_BOTTOM; // TODO
-
 		fDirectWindowData->buffer_info->window_bounds = to_clipping_rect(fWindowLayer->Frame());
 
 		// TODO: Review this

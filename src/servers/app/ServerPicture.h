@@ -5,6 +5,10 @@
 
 #include <PictureDataWriter.h>
 
+#include <PortLink.h> 
+	// TODO: For some reason, the forward declaration "class BPrivate::PortLink" causes compiling errors 
+
+
 class ServerApp;
 class ViewLayer;
 class BPrivate::LinkReceiver;
@@ -22,20 +26,21 @@ public:
 		
 		void		Play(ViewLayer *view);
 		
-		const void	*Data() const { return fData.Buffer(); }
-		int32		DataLength() const { return fData.BufferLength(); }
+		off_t		DataLength() const;
 		
 		status_t	ImportData(BPrivate::LinkReceiver &link);
+		status_t	ExportData(BPrivate::PortLink &link);
 
 private:
 friend class	ServerApp;
 	
 		ServerPicture();
 		ServerPicture(const ServerPicture &);
+		ServerPicture(const char *fileName, const int32 &offset);
 		~ServerPicture();
 
 		int32		fToken;
-		BMallocIO	fData;
+		BPositionIO	*fData;
 		// DrawState	*fState;
 };
 

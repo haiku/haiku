@@ -740,12 +740,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<int32>(&token);
 			ServerPicture *picture = FindPicture(token);
 			if (picture != NULL) {
-				fLink.StartMessage(B_OK);
-				
-				// TODO: support nested pictures (subpictures)
-				fLink.Attach<int32>(0); // number of subpictures
-				fLink.Attach<int32>(picture->DataLength());
-				fLink.Attach(picture->Data(), picture->DataLength());
+				picture->ExportData(fLink);
+					// ExportData() calls StartMessage() already
 			} else
 				fLink.StartMessage(B_ERROR);
 			

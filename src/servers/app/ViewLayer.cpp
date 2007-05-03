@@ -125,8 +125,6 @@ ViewLayer::~ViewLayer()
 
 //	if (fWindow && this == fWindow->TopLayer())
 //		fWindow->SetTopLayer(NULL);
-//
-	// TODO: Don't know yet if we should also delete fPicture
 
 	if (fCursor)
 		fCursor->Release();

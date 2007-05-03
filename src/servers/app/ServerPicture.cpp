@@ -17,8 +17,10 @@
 #include "WindowLayer.h"
 
 #include <LinkReceiver.h>
+#include <OffsetFile.h>
 #include <PicturePlayer.h>
 #include <PictureProtocol.h>
+#include <PortLink.h>
 #include <ServerProtocol.h>
 #include <ShapePrivate.h>
 
@@ -661,23 +663,61 @@ const void *tableEntries[] = {
 
 // ServerPicture
 ServerPicture::ServerPicture()
-	:PictureDataWriter(&fData)
+	:
+	PictureDataWriter(),
+	fData(NULL)
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
+	fData = new (std::nothrow) BMallocIO();
+	
+	PictureDataWriter::SetTo(fData);
 }
 
 
 ServerPicture::ServerPicture(const ServerPicture &picture)
-	:PictureDataWriter(&fData)
+	:
+	PictureDataWriter(),
+	fData(NULL)
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
 
-	fData.Write(picture.Data(), picture.DataLength());
+	BMallocIO *mallocIO = new (std::nothrow) BMallocIO();
+	if (mallocIO == NULL)
+		return;
+
+	fData = mallocIO;
+	
+	const off_t size = picture.DataLength();
+	if (mallocIO->SetSize(size) < B_OK)
+		return;
+	
+	picture.fData->ReadAt(0, const_cast<void *>(mallocIO->Buffer()), size);
+		
+	PictureDataWriter::SetTo(fData);
+}
+
+
+ServerPicture::ServerPicture(const char *fileName, const int32 &offset)
+	:
+	PictureDataWriter(),
+	fData(NULL)
+{
+	BPrivate::Storage::OffsetFile *file =
+		new BPrivate::Storage::OffsetFile(new BFile(fileName, B_READ_WRITE), (off_t)offset);
+
+	if (file == NULL || file->InitCheck() != B_OK)
+		return;
+	
+	fData = file;
+	fToken = gTokenSpace.NewToken(kPictureToken, this);
+	
+	PictureDataWriter::SetTo(fData);
 }
 
 
 ServerPicture::~ServerPicture()
 {
+	delete fData;
 	gTokenSpace.RemoveToken(fToken);
 }
 
@@ -717,9 +757,28 @@ ServerPicture::SyncState(ViewLayer *view)
 void
 ServerPicture::Play(ViewLayer *view)
 {
-	PicturePlayer player(fData.Buffer(), fData.BufferLength(), NULL);
+	// TODO: for now: then change PicturePlayer to accept a BPositionIO object
+	BMallocIO *mallocIO = dynamic_cast<BMallocIO *>(fData);
+	if (mallocIO == NULL)
+		return;
+
+	PicturePlayer player(mallocIO->Buffer(), mallocIO->BufferLength(), NULL);
 	player.Play(const_cast<void **>(tableEntries), sizeof(tableEntries) / sizeof(void *), view);
 }
+
+
+off_t
+ServerPicture::DataLength() const
+{
+	if (fData == NULL)
+		return 0;
+	off_t size;
+	fData->GetSize(&size);
+	return size;	
+}
+
+
+#define BUFFER_SIZE 4096
 
 
 status_t
@@ -733,14 +792,59 @@ ServerPicture::ImportData(BPrivate::LinkReceiver &link)
 	
 	int32 size = 0;
 	link.Read<int32>(&size);
-	if (fData.SetSize(size) != B_OK)
-		return B_ERROR;
 
-	// TODO: The best way to do this would be to read the data into
-	// a temporary buffer, and then use the BMallocIO::Write() method,
-	// but this way we avoid an extra copy. Unfortunately BMallocIO::Write()
-	// only accepts a pointer to raw data...
-	link.Read(const_cast<void *>(fData.Buffer()), size);
+	off_t oldPosition = fData->Position();
+	fData->Seek(0, SEEK_SET);
+
+	ssize_t toWrite = size;
+	// TODO: For some reason, this doesn't work. Bug in LinkReceiver ?
+	/*char buffer[BUFFER_SIZE];
+	while (toWrite > 0) {
+		ssize_t read = link.Read(buffer, toWrite > BUFFER_SIZE ? BUFFER_SIZE : toWrite);
+		if (read < B_OK)
+			return (status_t)read;		
+		fData->Write(buffer, read);
+		toWrite -= read;
+	}*/
+
+	char buffer[toWrite];
+	link.Read(buffer, toWrite);
+	fData->Write(buffer, toWrite);
+
+	fData->Seek(oldPosition, SEEK_SET);
+	
+	return B_OK;
+}
+
+
+status_t
+ServerPicture::ExportData(BPrivate::PortLink &link)
+{
+	link.StartMessage(B_OK);
+
+	off_t oldPosition = fData->Position();
+	fData->Seek(0, SEEK_SET);
+
+	int32 subPicturesCount = 0;
+	link.Attach<int32>(subPicturesCount);
+
+	off_t size = 0;
+	fData->GetSize(&size);
+	link.Attach<int32>((int32)size);
+
+	ssize_t toWrite = size;
+	char buffer[BUFFER_SIZE];
+	while (toWrite > 0) {
+		ssize_t read = fData->Read(buffer, toWrite > BUFFER_SIZE ? BUFFER_SIZE : toWrite);
+		if (read < B_OK)
+			return (status_t)read;		
+		link.Attach(buffer, read);
+		toWrite -= read;
+	}
+	
+	fData->Seek(oldPosition, SEEK_SET);
 
 	return B_OK;
 }
+
+
