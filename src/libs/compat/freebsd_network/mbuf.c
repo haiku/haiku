@@ -6,12 +6,20 @@
  *      Hugo Santos, hugosantos@gmail.com
  *
  * Some of this code is based on previous work by Marcus Overhagen.
+ *
+ * `m_defrag' and friends are straight from FreeBSD 6.2.
  */
 
 #include <stdint.h>
+#include <string.h>
 #include <slab/Slab.h>
 
 #include <compat/sys/mbuf.h>
+#include <compat/sys/kernel.h>
+
+
+#define MBUF_CHECKSLEEP(how) do { } while (0)
+#define MBTOM(how) (how)
 
 
 status_t init_mbufs(void);
@@ -24,7 +32,17 @@ static object_cache *sMBufCache;
 static object_cache *sChunkCache;
 
 
-static void
+static int
+m_to_oc_flags(int how)
+{
+	if (how & M_NOWAIT)
+		return CACHE_DONT_SLEEP;
+
+	return 0;
+}
+
+
+static int
 construct_mbuf(struct mbuf *mb, short type, int flags)
 {
 	mb->m_next = NULL;
@@ -36,22 +54,75 @@ construct_mbuf(struct mbuf *mb, short type, int flags)
 	if (flags & M_PKTHDR) {
 		mb->m_data = mb->m_pktdat;
 		memset(&mb->m_pkthdr, 0, sizeof(mb->m_pkthdr));
+		/* SLIST_INIT(&m->m_pkthdr.tags); */
 	} else {
 		mb->m_data = mb->m_dat;
 	}
+
+	return 0;
+}
+
+
+static int
+construct_ext_mbuf(struct mbuf *mb, int how)
+{
+	mb->m_ext.ext_buf = object_cache_alloc(sChunkCache, m_to_oc_flags(how));
+	if (mb->m_ext.ext_buf == NULL)
+		return B_NO_MEMORY;
+
+	mb->m_data = mb->m_ext.ext_buf;
+	mb->m_flags |= M_EXT;
+	/* mb->m_ext.ext_free = NULL; */
+	/* mb->m_ext.ext_args = NULL; */
+	mb->m_ext.ext_size = MCLBYTES;
+	mb->m_ext.ext_type = EXT_CLUSTER;
+	/* mb->m_ext.ref_cnt = NULL; */
+
+	return 0;
+}
+
+
+static int
+construct_pkt_mbuf(int how, struct mbuf *mb, short type, int flags)
+{
+	construct_mbuf(mb, type, flags);
+	if (construct_ext_mbuf(mb, how) < 0)
+		return -1;
+	mb->m_ext.ext_type = EXT_PACKET;
+	return 0;
+}
+
+
+static void
+destruct_pkt_mbuf(struct mbuf *mb)
+{
+	object_cache_free(sChunkCache, mb->m_ext.ext_buf);
+	mb->m_ext.ext_buf = NULL;
 }
 
 
 struct mbuf *
 m_getcl(int how, short type, int flags)
 {
-	uint32 cacheFlags = 0;
-	struct mbuf *mb;
+	struct mbuf *mb =
+		(struct mbuf *)object_cache_alloc(sMBufCache, m_to_oc_flags(how));
+	if (mb == NULL)
+		return NULL;
 
-	if (how & M_NOWAIT)
-		cacheFlags = CACHE_DONT_SLEEP;
+	if (construct_pkt_mbuf(how, mb, type, flags) < 0) {
+		object_cache_free(sMBufCache, mb);
+		return NULL;
+	}
 
-	mb = (struct mbuf *)object_cache_alloc(sMBufCache, cacheFlags);
+	return mb;
+}
+
+
+static struct mbuf *
+_m_get(int how, short type, int flags)
+{
+	struct mbuf *mb =
+		(struct mbuf *)object_cache_alloc(sMBufCache, m_to_oc_flags(how));
 	if (mb == NULL)
 		return NULL;
 
@@ -61,31 +132,249 @@ m_getcl(int how, short type, int flags)
 }
 
 
-void
-m_freem(struct mbuf *mp)
+struct mbuf *
+m_get(int how, short type)
 {
-	struct mbuf *next = mp;
+	return _m_get(how, type, 0);
+}
 
-	do {
-		mp = next;
-		next = next->m_next;
 
-		if (mp->m_flags & M_EXT)
-			object_cache_free(sChunkCache, mp->m_ext.ext_buf);
-		object_cache_free(sMBufCache, mp);
-	} while (next);
+struct mbuf *
+m_gethdr(int how, short type)
+{
+	return _m_get(how, type, M_PKTHDR);
+}
+
+
+void
+m_freem(struct mbuf *mb)
+{
+	while (mb)
+		mb = m_free(mb);
+}
+
+
+static void
+mb_free_ext(struct mbuf *m)
+{
+	/*
+	if (m->m_ext.ref_count != NULL)
+		panic("unsupported");
+		*/
+
+	if (m->m_ext.ext_type == EXT_PACKET)
+		destruct_pkt_mbuf(m);
+	else if (m->m_ext.ext_type == EXT_CLUSTER) {
+		object_cache_free(sChunkCache, m->m_ext.ext_buf);
+		m->m_ext.ext_buf = NULL;
+	} else
+		panic("unknown type");
+
+	object_cache_free(sMBufCache, m);
+}
+
+
+struct mbuf *
+m_free(struct mbuf *m)
+{
+	struct mbuf *next = m->m_next;
+
+	if (m->m_flags & M_EXT)
+		mb_free_ext(m);
+	else
+		object_cache_free(sMBufCache, m);
+
+	return next;
+}
+
+
+/*
+ * Copy data from an mbuf chain starting "off" bytes from the beginning,
+ * continuing for "len" bytes, into the indicated buffer.
+ */
+void
+m_copydata(const struct mbuf *m, int off, int len, caddr_t cp)
+{
+	u_int count;
+
+	KASSERT(off >= 0, ("m_copydata, negative off %d", off));
+	KASSERT(len >= 0, ("m_copydata, negative len %d", len));
+	while (off > 0) {
+		KASSERT(m != NULL, ("m_copydata, offset > size of mbuf chain"));
+		if (off < m->m_len)
+			break;
+		off -= m->m_len;
+		m = m->m_next;
+	}
+	while (len > 0) {
+		KASSERT(m != NULL, ("m_copydata, length > size of mbuf chain"));
+		count = min(m->m_len - off, len);
+		bcopy(mtod(m, caddr_t) + off, cp, count);
+		len -= count;
+		cp += count;
+		off = 0;
+		m = m->m_next;
+	}
+}
+
+
+/*
+ * Concatenate mbuf chain n to m.
+ * Both chains must be of the same type (e.g. MT_DATA).
+ * Any m_pkthdr is not updated.
+ */
+void
+m_cat(struct mbuf *m, struct mbuf *n)
+{
+	while (m->m_next)
+		m = m->m_next;
+	while (n) {
+		if (m->m_flags & M_EXT ||
+		    m->m_data + m->m_len + n->m_len >= &m->m_dat[MLEN]) {
+			/* just join the two chains */
+			m->m_next = n;
+			return;
+		}
+		/* splat the data from one into the other */
+		bcopy(mtod(n, caddr_t), mtod(m, caddr_t) + m->m_len,
+		    (u_int)n->m_len);
+		m->m_len += n->m_len;
+		n = m_free(n);
+	}
+}
+
+
+u_int
+m_length(struct mbuf *m0, struct mbuf **last)
+{
+	struct mbuf *m;
+	u_int len;
+
+	len = 0;
+	for (m = m0; m != NULL; m = m->m_next) {
+		len += m->m_len;
+		if (m->m_next == NULL)
+			break;
+	}
+	if (last != NULL)
+		*last = m;
+	return (len);
+}
+
+
+u_int
+m_fixhdr(struct mbuf *m0)
+{
+	u_int len;
+
+	len = m_length(m0, NULL);
+	m0->m_pkthdr.len = len;
+	return (len);
+}
+
+
+static int
+m_tag_copy_chain(struct mbuf *to, struct mbuf *from, int how)
+{
+	return 1;
+}
+
+
+/*
+ * Duplicate "from"'s mbuf pkthdr in "to".
+ * "from" must have M_PKTHDR set, and "to" must be empty.
+ * In particular, this does a deep copy of the packet tags.
+ */
+static int
+m_dup_pkthdr(struct mbuf *to, struct mbuf *from, int how)
+{
+	MBUF_CHECKSLEEP(how);
+	/* to->m_flags = (from->m_flags & M_COPYFLAGS) | (to->m_flags & M_EXT); */
+	to->m_flags = (to->m_flags & M_EXT);
+	if ((to->m_flags & M_EXT) == 0)
+		to->m_data = to->m_pktdat;
+	to->m_pkthdr = from->m_pkthdr;
+	/* SLIST_INIT(&to->m_pkthdr.tags); */
+	return (m_tag_copy_chain(to, from, MBTOM(how)));
+}
+
+
+/*
+ * Defragment a mbuf chain, returning the shortest possible
+ * chain of mbufs and clusters.  If allocation fails and
+ * this cannot be completed, NULL will be returned, but
+ * the passed in chain will be unchanged.  Upon success,
+ * the original chain will be freed, and the new chain
+ * will be returned.
+ *
+ * If a non-packet header is passed in, the original
+ * mbuf (chain?) will be returned unharmed.
+ */
+struct mbuf *
+m_defrag(struct mbuf *m0, int how)
+{
+	struct mbuf *m_new = NULL, *m_final = NULL;
+	int progress = 0, length;
+
+	MBUF_CHECKSLEEP(how);
+	if (!(m0->m_flags & M_PKTHDR))
+		return (m0);
+
+	m_fixhdr(m0); /* Needed sanity check */
+
+	if (m0->m_pkthdr.len > MHLEN)
+		m_final = m_getcl(how, MT_DATA, M_PKTHDR);
+	else
+		m_final = m_gethdr(how, MT_DATA);
+
+	if (m_final == NULL)
+		goto nospace;
+
+	if (m_dup_pkthdr(m_final, m0, how) == 0)
+		goto nospace;
+
+	m_new = m_final;
+
+	while (progress < m0->m_pkthdr.len) {
+		length = m0->m_pkthdr.len - progress;
+		if (length > MCLBYTES)
+			length = MCLBYTES;
+
+		if (m_new == NULL) {
+			if (length > MLEN)
+				m_new = m_getcl(how, MT_DATA, 0);
+			else
+				m_new = m_get(how, MT_DATA);
+			if (m_new == NULL)
+				goto nospace;
+		}
+
+		m_copydata(m0, progress, length, mtod(m_new, caddr_t));
+		progress += length;
+		m_new->m_len = length;
+		if (m_new != m_final)
+			m_cat(m_final, m_new);
+		m_new = NULL;
+	}
+
+	m_freem(m0);
+	m0 = m_final;
+	return (m0);
+nospace:
+	if (m_final)
+		m_freem(m_final);
+	return (NULL);
 }
 
 
 status_t
 init_mbufs()
 {
-	sMBufCache = create_object_cache("mbufs", sizeof(struct mbuf), 8, NULL,
-		NULL, NULL);
+	sMBufCache = create_object_cache("mbufs", MSIZE, 8, NULL, NULL, NULL);
 	if (sMBufCache == NULL)
 		return B_NO_MEMORY;
 
-	sChunkCache = create_object_cache("mbuf chunks", CHUNK_SIZE, 0, NULL, NULL,
+	sChunkCache = create_object_cache("mbuf chunks", MCLBYTES, 0, NULL, NULL,
 		NULL);
 	if (sChunkCache == NULL) {
 		delete_object_cache(sMBufCache);

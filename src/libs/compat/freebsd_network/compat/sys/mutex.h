@@ -46,6 +46,6 @@ static inline void mtx_unlock(struct mtx *mtx)
 void mtx_init(struct mtx *m, const char *name, const char *type, int opts);
 void mtx_destroy(struct mtx *m);
 
-extern struct mutex Giant;
+extern struct mtx Giant;
 
 #endif

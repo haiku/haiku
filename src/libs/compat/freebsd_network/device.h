@@ -15,6 +15,8 @@
 #include <KernelExport.h>
 #include <drivers/PCI.h>
 
+#include <net_stack.h>
+
 #include <compat/sys/kernel.h>
 #include <compat/net/if.h>
 #include <compat/net/if_var.h>
@@ -45,6 +47,7 @@ enum {
 };
 
 
+extern struct net_stack_module_info *gStack;
 extern pci_module_info *gPci;
 
 #endif

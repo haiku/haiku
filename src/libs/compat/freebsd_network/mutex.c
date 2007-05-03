@@ -17,7 +17,7 @@ void uninit_mutexes(void);
 
 // these methods are bit unfriendly, a bit too much panic() around
 
-struct mutex Giant;
+struct mtx Giant;
 
 
 void

@@ -4,15 +4,15 @@
 #include <sys/malloc.h>
 #include <sys/param.h>
 
-#define MLEN		(MSIZE - sizeof(struct m_hdr))
-#define MHLEN		(MSIZE - sizeof(struct pkthdr))
+#define MLEN		((int)(MSIZE - sizeof(struct m_hdr)))
+#define MHLEN		((int)(MSIZE - sizeof(struct pkthdr)))
 
 #ifdef _KERNEL
 
 struct m_hdr {
 	struct mbuf *	mh_next;
 	struct mbuf *	mh_nextpkt;
-	void *			mh_data;
+	caddr_t			mh_data;
 	int				mh_len;
 	int				mh_flags;
 	short			mh_type;
@@ -28,6 +28,7 @@ struct pkthdr {
 struct m_ext {
 	void *			ext_buf;
 	unsigned int	ext_size;
+	int				ext_type;
 };
 
 struct mbuf {
@@ -66,6 +67,9 @@ struct mbuf {
 #define M_EXT			0x0001
 #define M_PKTHDR		0x0002
 
+#define EXT_CLUSTER		1
+#define EXT_PACKET		3
+
 #define M_BCAST			0x0200
 #define M_MCAST			0x0400
 
@@ -80,7 +84,16 @@ struct mbuf {
 
 struct mbuf *m_getcl(int how, short type, int flags);
 void m_freem(struct mbuf *mbuf);
+struct mbuf *m_free(struct mbuf *m);
 struct mbuf *m_defrag(struct mbuf *m, int);
+
+u_int m_length(struct mbuf *m, struct mbuf **last);
+u_int m_fixhdr(struct mbuf *m);
+void m_cat(struct mbuf *m, struct mbuf *n);
+void m_copydata(const struct mbuf *m, int off, int len, caddr_t cp);
+
+struct mbuf *m_get(int how, short type);
+struct mbuf *m_gethdr(int how, short type);
 
 #define mtod(m, type)	(type)((m)->m_data)
 

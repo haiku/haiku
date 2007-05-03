@@ -21,6 +21,7 @@
 
 status_t init_compat_layer(void);
 
+struct net_stack_module_info *gStack;
 pci_module_info *gPci;
 
 uint32_t
@@ -144,6 +145,13 @@ device_get_softc(device_t dev)
 
 
 int
+device_delete_child(device_t dev, device_t child)
+{
+	return -1;
+}
+
+
+int
 printf(const char *format, ...)
 {
 	char buf[256];
@@ -222,6 +230,7 @@ init_compat_layer()
 }
 
 module_dependency module_dependencies[] = {
+	{NET_STACK_MODULE_NAME, (module_info **)&gStack},
 	{B_PCI_MODULE_NAME, (module_info **)&gPci},
 	{}
 };

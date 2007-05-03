@@ -14,6 +14,16 @@
 
 #define NET_STACK_MODULE_NAME "network/stack/v1"
 
+
+struct net_address_module_info;
+struct net_protocol_module_info;
+
+struct net_buffer;
+struct net_device;
+struct net_domain;
+struct net_socket;
+struct net_timer;
+
 struct net_fifo {
 	benaphore	lock;
 	sem_id		notify;
