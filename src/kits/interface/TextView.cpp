@@ -2861,10 +2861,12 @@ BTextView::HandleArrowKey(uint32 inArrowKey)
 			point.y -= height;
 			fClickOffset = OffsetAt(point);
 			if (shiftDown) {
-				if (fClickOffset >= fSelStart)
-					selEnd = fClickOffset;
-				else
-					selStart = fClickOffset;
+				if (fClickOffset != currentOffset) {
+					if (fClickOffset >= fSelStart)
+						selEnd = fClickOffset;
+					else
+						selStart = fClickOffset;
+				}
 			}
 			break;
 		}
@@ -2876,10 +2878,12 @@ BTextView::HandleArrowKey(uint32 inArrowKey)
 			point.y += height;
 			fClickOffset = OffsetAt(point);
 			if (shiftDown) {
-				if (fClickOffset <= fSelEnd)
-					selStart = fClickOffset;
-				else
-					selEnd = fClickOffset;
+				if (fClickOffset != currentOffset) {
+					if (fClickOffset <= fSelEnd)
+						selStart = fClickOffset;
+					else
+						selEnd = fClickOffset;
+				}
 			}
 			break;
 		}
