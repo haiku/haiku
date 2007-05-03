@@ -43,6 +43,7 @@
 #define DEVICE_FMT DEVICE_PREFIX "%d/raw"
 #define DEVICE_NAME_MAX 32
 #define MAX_REQ_SIZE (32*1024*1024)
+#define BLKSIZE 512
 
 /* debugging */
 #if DEBUG
@@ -450,7 +451,7 @@ status_t nbd_free(cookie_t *cookie) {
 }
 
 status_t nbd_control(cookie_t *cookie, uint32 op, void *data, size_t len) {
-	PRINT((DP ">%s(%d, %ul, , %d)\n", __FUNCTION__, WHICH(cookie->dev), op, len));
+	PRINT((DP ">%s(%d, %lu, , %d)\n", __FUNCTION__, WHICH(cookie->dev), op, len));
 	switch (op) {
 	case B_GET_DEVICE_SIZE: /* this one is broken anyway... */
 		if (data) {
@@ -475,9 +476,9 @@ status_t nbd_control(cookie_t *cookie, uint32 op, void *data, size_t len) {
 	case B_GET_BIOS_GEOMETRY:
 		if (data) {
 			device_geometry *geom = (device_geometry *)data;
-			geom->bytes_per_sector = 256;
+			geom->bytes_per_sector = BLKSIZE;
 			geom->sectors_per_track = 1;
-			geom->cylinder_count = cookie->dev->size / 256;
+			geom->cylinder_count = cookie->dev->size / BLKSIZE;
 			geom->head_count = 1;
 			geom->device_type = B_DISK;
 			geom->removable = false;
@@ -495,10 +496,11 @@ status_t nbd_control(cookie_t *cookie, uint32 op, void *data, size_t len) {
 		
 	case B_EJECT_DEVICE:
 	case B_LOAD_MEDIA:
-		return ENOSYS;
+		return B_BAD_VALUE;
 	case B_FLUSH_DRIVE_CACHE: /* wait for request list to be empty ? */
+		return B_OK;
 	default:
-		return ENOSYS;
+		return B_BAD_VALUE;
 	}
 	return B_NOT_ALLOWED;
 }
