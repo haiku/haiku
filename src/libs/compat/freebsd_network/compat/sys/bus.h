@@ -111,7 +111,7 @@ enum intr_type {
 
 int bus_generic_detach(device_t dev);
 
-typedef void driver_intr_t(void *);
+typedef void (*driver_intr_t)(void *);
 
 struct resource;
 

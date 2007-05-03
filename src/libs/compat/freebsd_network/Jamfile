@@ -8,6 +8,7 @@ UseHeaders [ FDirName $(SUBDIR) compat ] : true ;
 SubDirCcFlags [ FDefines _KERNEL=1 ] ;
 
 Library libfreebsd_network.a :
+	bus.c
 	compat.c
 	device.c
 	mbuf.c
