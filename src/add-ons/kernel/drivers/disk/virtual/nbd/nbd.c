@@ -403,6 +403,13 @@ status_t nbd_post_request(struct nbd_device *dev, struct nbd_request_entry *req)
 	err = ksend(dev->sock, &req->req, sizeof(req->req), 0);
 	if (err < 0)
 		return err;
+
+	if (req->type == NBD_CMD_WRITE)
+		err = ksend(dev->sock, req->buffer, req->len, 0);
+	if (err < 0)
+		return err;
+	else
+		req->len = err;
 	
 	err = nbd_queue_request(dev, req);
 	return err;
@@ -546,7 +553,7 @@ status_t nbd_control(cookie_t *cookie, uint32 op, void *data, size_t len) {
 			geom->head_count = 1;
 			geom->device_type = B_DISK;
 			geom->removable = false;
-			geom->read_only = false; // XXX
+			geom->read_only = cookie->dev->readonly;
 			geom->write_once = false;
 			return B_OK;
 		}
@@ -617,10 +624,11 @@ status_t nbd_read(cookie_t *cookie, off_t position, void *data, size_t *numbytes
 	if (semerr == B_OK) {
 		*numbytes = req->len;
 		memcpy(data, req->buffer, req->len);
-		nbd_free_request(dev, req);
+		err = B_OK;
 		if (*numbytes == 0 && req->reply.error)
-			return B_ERROR;
-		return B_OK;
+			err = EIO;
+		nbd_free_request(dev, req);
+		return err;
 	}
 	
 	*numbytes = 0;
@@ -637,15 +645,79 @@ err0:
 }
 
 status_t nbd_write(cookie_t *cookie, off_t position, const void *data, size_t *numbytes) {
-	PRINT((DP ">%s(%d, %Ld, , )\n", __FUNCTION__, WHICH(cookie->dev), position));
-	(void)cookie; (void)position; (void)data; (void)numbytes;
+	struct nbd_device *dev = cookie->dev;
+	struct nbd_request_entry *req;
+	status_t err, semerr;
+	PRINT((DP ">%s(%d, %Ld, %ld, )\n", __FUNCTION__, WHICH(cookie->dev), position, *numbytes));
+	
+	if (position < 0)
+		return EINVAL;
+	if (!data)
+		return EINVAL;
+	err = B_NOT_ALLOWED;
+	if (dev->readonly)
+		goto err0;
+	
+	err = nbd_alloc_request(dev, &req, NBD_CMD_WRITE, position, *numbytes, data);
+	if (err)
+		goto err0;
+	
+	//LOCK
+	err = benaphore_lock(&dev->ben);
+	if (err)
+		goto err1;
+	
+	/* sending request+data must be atomic */
+	err = nbd_post_request(dev, req);
+	
+	//UNLOCK
+	benaphore_unlock(&dev->ben);
+
+	if (err)
+		goto err2;
+
+
+	semerr = acquire_sem(req->sem);
+	
+	//LOCK
+	err = benaphore_lock(&dev->ben);
+	if(err)
+		goto err3;
+	
+	/* bad scenarii */
+	if (!req->replied)
+		req->discard = true;
+	else if (semerr)
+		nbd_free_request(dev, req);
+	
+	//UNLOCK
+	benaphore_unlock(&dev->ben);
+
+	if (semerr == B_OK) {
+		*numbytes = req->len;
+		err = B_OK;
+		if (*numbytes == 0 && req->reply.error)
+			err = EIO;
+		nbd_free_request(dev, req);
+		return err;
+	}
+	
 	*numbytes = 0;
-	return EIO;
+	return semerr;
+			
+
+err3:
+err2:
+err1:
+	nbd_free_request(dev, req);
+err0:
+	*numbytes = 0;
+	return err;
 }
 
 device_hooks nbd_hooks={
 	(device_open_hook)nbd_open,
-	nbd_close,
+	(device_close_hook)nbd_close,
 	(device_free_hook)nbd_free,
 	(device_control_hook)nbd_control,
 	(device_read_hook)nbd_read,
@@ -659,7 +731,7 @@ device_hooks nbd_hooks={
 
 #pragma mark ==== driver hooks ====
 
-static const char *nbd_name[MAX_NBDS+1] = {
+static char *nbd_name[MAX_NBDS+1] = {
 	NULL
 };
 
@@ -677,6 +749,7 @@ init_driver (void)
 	int i, j;
 	// XXX: load settings
 	void *handle;
+	char **names = nbd_name;
 	PRINT((DP ">%s()\n", __FUNCTION__));
 
 	handle = load_driver_settings(DRV);
@@ -704,16 +777,12 @@ init_driver (void)
 #ifdef MOUNT_KLUDGE
 		nbd_devices[i].kludge = -1;
 #endif
-		nbd_name[i] = malloc(DEVICE_NAME_MAX);
-		if (nbd_name[i] == NULL)
-			break;
-		sprintf(nbd_name[i], DEVICE_FMT, i);
+		nbd_name[i] = NULL;
 	}
-	nbd_name[i] = NULL;
 	
 	for (i = 0; i < MAX_NBDS; i++) {
-		driver_settings *settings = get_driver_settings(handle);
-		driver_parameter *p;
+		const driver_settings *settings = get_driver_settings(handle);
+		driver_parameter *p = NULL;
 		char keyname[10];
 		char *v;
 		sprintf(keyname, "%d", i);
@@ -732,11 +801,16 @@ init_driver (void)
 				nbd_devices[i].server.sin_family = AF_INET;
 				kinet_aton(p->parameters[j].values[0], &nbd_devices[i].server.sin_addr);
 				nbd_devices[i].server.sin_port = htons(atoi(p->parameters[j].values[1]));
-				
+				dprintf(DP " configured [%d]\n", i);
+				*(names) = malloc(DEVICE_NAME_MAX);
+				if (*(names) == NULL)
+					return ENOMEM;
+				sprintf(*(names++), DEVICE_FMT, i);
 				nbd_devices[i].valid = true;
 			}
 		}
 	}
+	*names = NULL;
 		
 	unload_driver_settings(handle);
 	return B_OK;
@@ -762,7 +836,7 @@ const char**
 publish_devices()
 {
 	PRINT((DP ">%s()\n", __FUNCTION__));
-	return nbd_name;
+	return (const char **)nbd_name;
 }
 
 device_hooks*
@@ -778,7 +852,9 @@ nbd_find_device(const char* name)
 	int i;
 	PRINT((DP ">%s(%s)\n", __FUNCTION__, name));
 	for (i = 0; i < MAX_NBDS; i++) {
-		if (!strcmp(nbd_name[i], name))
+		char buf[DEVICE_NAME_MAX];
+		sprintf(buf, DEVICE_FMT, i);
+		if (!strcmp(buf, name))
 			return &nbd_devices[i];
 	}
 	return NULL;
