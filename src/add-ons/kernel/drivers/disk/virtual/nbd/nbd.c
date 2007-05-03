@@ -4,18 +4,37 @@
  */
 
 /*
-	nbd driver for Haiku
-
-	Maps a Network Block Device as virtual partitions.
-*/
+ * nbd driver for Haiku
+ *
+ * Maps a Network Block Device as virtual partitions.
+ */
 
 #include <KernelExport.h>
 #include <Drivers.h>
 #include <Errors.h>
+#include <driver_settings.h>
 #include <ksocket.h>
+#include <netinet/in.h>
+
+#ifdef __HAIKU__
+#include <kernel/lock.h>
+#else
+/* wrappers */
+#ifndef _IMPEXP_KERNEL
+#define _IMPEXP_KERNEL
+#endif
+#include "lock.h"
+#define benaphore lock
+#define benaphore_init new_lock
+#define benaphore_destroy free_lock
+#define benaphore_lock LOCK
+#define benaphore_unlock UNLOCK
+#endif
 
 #include "nbd.h"
 
+#define DRV "nbd"
+#define D "nbd:"
 #define MAX_NBDS 4
 #define DEVICE_PREFIX "disk/virtual/nbd/"
 #define DEVICE_FMT DEVICE_PREFIX "%2d/raw"
@@ -31,7 +50,9 @@ struct nbd_request_entry {
 };
 
 struct nbd_device {
-	//lock
+	char target[64]; // "ip:port"
+	struct sockaddr_in server;
+	benaphore ben;
 	vint32 refcnt;
 	uint64 req; /* next ID for requests */
 	int sock;
@@ -53,6 +74,8 @@ status_t nbd_free_request(struct nbd_device, struct nbd_request_entry *req);
 
 struct nbd_device *nbd_find_device(const char* name);
 
+KSOCKET_MODULE_DECL;
+
 #pragma mark ==== request manager ====
 
 
@@ -68,36 +91,86 @@ int32 postoffice(void *arg)
 	return 0;
 }
 
+status_t nbd_connect(struct nbd_device *dev)
+{
+	
+	return B_OK;
+}
+
+status_t nbd_teardown(struct nbd_device *dev)
+{
+	close(dev->sock);
+	return B_OK;
+}
+
 #pragma mark ==== device hooks ====
 
 static struct nbd_device nbd_devices[MAX_NBDS];
 
 status_t nbd_open(const char *name, uint32 flags, cookie_t **cookie) {
+	status_t err;
 	struct nbd_device *dev = NULL;
 	(void)name; (void)flags;
 	dev = nbd_find_device(name);
 	if (!dev)
 		return ENOENT;
+	err = ENOMEM;
 	*cookie = (void*)malloc(sizeof(cookie_t));
-	if (*cookie == NULL) {
-		dprintf("nbd_open : error allocating cookie\n");
+	if (*cookie == NULL)
 		goto err0;
-	}
 	memset(*cookie, 0, sizeof(cookie_t));
 	(*cookie)->dev = dev;
+	err = benaphore_lock(&dev->ben);
+	if (err)
+		goto err1;
+	/*  */
+	if (dev->sock < 0)
+		err = nbd_connect(dev);
+	if (err)
+		goto err2;
+	dev->refcnt++;
+	benaphore_unlock(&dev->ben);
 	return B_OK;
+	
+err2:
+	benaphore_unlock(&dev->ben);
+err1:
+	free(*cookie);
 err0:
-	return B_ERROR;
+	dprintf("nbd_open : error 0x%08lx\n", err);
+	return err;
 }
 
-status_t nbd_close(void *cookie) {
-	(void)cookie;
+status_t nbd_close(cookie_t *cookie) {
+	struct nbd_device *dev = cookie->dev;
+	status_t err;
+	
+	err = benaphore_lock(&dev->ben);
+	if (err)
+		return err;
+	
+	// XXX: do something ?
+	
+	benaphore_unlock(&dev->ben);
 	return B_OK;
 }
 
 status_t nbd_free(cookie_t *cookie) {
+	struct nbd_device *dev = cookie->dev;
+	status_t err;
+	
+	err = benaphore_lock(&dev->ben);
+	if (err)
+		return err;
+	
+	if (--dev->refcnt == 0) {
+		err = nbd_teardown(dev);
+	}
+	
+	benaphore_unlock(&dev->ben);
+	
 	free(cookie);
-	return B_OK;
+	return err;
 }
 
 status_t nbd_control(cookie_t *cookie, uint32 op, void *data, size_t len) {
@@ -193,9 +266,26 @@ init_hardware (void)
 status_t
 init_driver (void)
 {
-	int i;
-	// load settings
+	status_t err;
+	int i, j;
+	// XXX: load settings
+	void *handle;
+
+	err = ksocket_init();
+	if (err < B_OK)
+		return err;
+	
 	for (i = 0; i < MAX_NBDS; i++) {
+		memset(nbd_devices[i].target, 0, 64);
+		err = benaphore_init(&nbd_devices[i].ben, "nbd lock");
+		if (err < B_OK)
+			return err; // XXX
+		nbd_devices[i].refcnt = 0;
+		nbd_devices[i].req = 0LL; /* next ID for requests */
+		nbd_devices[i].sock = -1;
+		nbd_devices[i].postoffice = -1;
+		nbd_devices[i].size = 0LL;
+		nbd_devices[i].reqs = NULL;
 		nbd_name[i] = malloc(DEVICE_NAME_MAX);
 		if (nbd_name[i] == NULL)
 			break;
@@ -203,16 +293,50 @@ init_driver (void)
 		// XXX: init nbd_devices[i]
 	}
 	nbd_name[i] = NULL;
+	
+	handle = load_driver_settings(DRV);
+	if (handle) {
+		for (i = 0; i < MAX_NBDS; i++) {
+			char keyname[10];
+			char *v;
+			sprintf(keyname, "nbd%d", i);
+			v = get_driver_parameter(handle, keyname, NULL, NULL);
+			/* should be "ip:port" */
+			// XXX: test
+			if (v || 0) {
+				//strncpy(nbd_devices[i].target, v, 64);
+				//XXX:TEST
+				//strncpy(nbd_devices[i].target, "127.0.0.1:1337", 64);
+				//XXX:parse it
+				nbd_devices[i].server.sin_len = sizeof(struct sockaddr_in);
+				nbd_devices[i].server.sin_family = AF_INET;
+				nbd_devices[i].server.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+				nbd_devices[i].server.sin_port = htons(1337 + i);
+			}
+		}
+		/*should parse as a tree:
+		  settings = get_driver_settings(handle);
+		  for (i = 0; i < settings->parameter_count; i++) {
+		    
+		  }
+		*/
+		
+		unload_driver_settings(handle);
+	}
+
 	return B_OK;
 }
 
 void
 uninit_driver (void)
 {
+	status_t err;
 	int i;
 	for (i = 0; i < MAX_NBDS; i++) {
 		free(nbd_name[i]);
+		err = benaphore_destroy(&nbd_devices[i].ben);
 	}
+	err = ksocket_cleanup();
 }
 
 const char**
