@@ -226,27 +226,6 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView *view, ulong options, BGLDisp
 	fRenderBuffer->Data = NULL;
 	fRenderBuffer->AllocStorage = RenderbufferStorage;
 
-	/*switch (fColorSpace) {
-	case B_RGBA32:
-		fRenderBuffer->GetRow = get_row_RGBA8;
-		fRenderBuffer->GetValues = get_values_RGBA8;
-		fRenderBuffer->PutRow = put_row_RGBA8;
-		fRenderBuffer->PutRowRGB = put_row_rgb_RGBA8;
-		fRenderBuffer->PutMonoRow = put_mono_row_RGBA8;
-		fRenderBuffer->PutValues = put_values_RGBA8;
-		fRenderBuffer->PutMonoValues = put_mono_values_RGBA8;
-		break;
-	case B_RGB16:
-		fRenderBuffer->GetRow = get_row_RGB16;
-		fRenderBuffer->GetValues = get_values_RGB16;
-		fRenderBuffer->PutRow = put_row_RGB16;
-		fRenderBuffer->PutRowRGB = put_row_rgb_RGB16;
-		fRenderBuffer->PutMonoRow = put_mono_row_RGB16;
-		fRenderBuffer->PutValues = put_values_RGB16;
-		fRenderBuffer->PutMonoValues = put_mono_values_RGB16;
-		break;
-	}*/
-
 	_mesa_add_renderbuffer(fFrameBuffer, BUFFER_FRONT_LEFT, fRenderBuffer);
 
 	_mesa_add_soft_renderbuffers(fFrameBuffer,
