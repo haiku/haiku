@@ -78,8 +78,8 @@ extern const char * color_space_name(color_space space);
 /*****        Read/write spans/arrays of pixels                   *****/
 /**********************************************************************/
 
-/* 8-bit RGBA */
-#define NAME(PREFIX) PREFIX##_RGBA8
+/* 32-bit RGBA */
+#define NAME(PREFIX) PREFIX##_RGBA32
 #define RB_TYPE GLubyte
 #define SPAN_VARS \
 	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
@@ -101,6 +101,25 @@ extern const char * color_space_name(color_space space);
    DST[GCOMP] = SRC[BE_GCOMP];  \
    DST[BCOMP] = SRC[BE_BCOMP];  \
    DST[ACOMP] = SRC[BE_ACOMP]
+#include "swrast/s_spantemp.h"
+
+/* 32-bit RGB */
+#define NAME(PREFIX) PREFIX##_RGB32
+#define RB_TYPE GLubyte
+#define SPAN_VARS \
+	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
+#define INIT_PIXEL_PTR(P, X, Y) \
+	GLuint *P = (GLuint *)(((GLubyte **) mr->GetRows())[Y] + (X) * 4)
+#define INC_PIXEL_PTR(P) P += 1
+#define STORE_PIXEL(DST, X, Y, VALUE) \
+   *DST = ( ((VALUE[RCOMP]) << 16) | \
+   			((VALUE[GCOMP]) << 8) | \
+   			((VALUE[BCOMP]) ) )
+#define FETCH_PIXEL(DST, SRC) \
+   DST[RCOMP] = ((*SRC & 0x00ff0000) >> 16);  \
+   DST[GCOMP] = ((*SRC & 0x0000ff00) >> 8);  \
+   DST[BCOMP] = ((*SRC & 0x000000ff)); \
+   DST[ACOMP] = 0xff;
 #include "swrast/s_spantemp.h"
 
 /* 16-bit RGB */
@@ -285,13 +304,22 @@ MesaSoftwareRenderer::LockGL()
 		if (cs != fColorSpace) {
 			switch (cs) {
 				case B_RGBA32:
-					fRenderBuffer->GetRow = get_row_RGBA8;
-					fRenderBuffer->GetValues = get_values_RGBA8;
-					fRenderBuffer->PutRow = put_row_RGBA8;
-					fRenderBuffer->PutRowRGB = put_row_rgb_RGBA8;
-					fRenderBuffer->PutMonoRow = put_mono_row_RGBA8;
-					fRenderBuffer->PutValues = put_values_RGBA8;
-					fRenderBuffer->PutMonoValues = put_mono_values_RGBA8;
+					fRenderBuffer->GetRow = get_row_RGBA32;
+					fRenderBuffer->GetValues = get_values_RGBA32;
+					fRenderBuffer->PutRow = put_row_RGBA32;
+					fRenderBuffer->PutRowRGB = put_row_rgb_RGBA32;
+					fRenderBuffer->PutMonoRow = put_mono_row_RGBA32;
+					fRenderBuffer->PutValues = put_values_RGBA32;
+					fRenderBuffer->PutMonoValues = put_mono_values_RGBA32;
+					break;
+				case B_RGB32:
+					fRenderBuffer->GetRow = get_row_RGB32;
+					fRenderBuffer->GetValues = get_values_RGB32;
+					fRenderBuffer->PutRow = put_row_RGB32;
+					fRenderBuffer->PutRowRGB = put_row_rgb_RGB32;
+					fRenderBuffer->PutMonoRow = put_mono_row_RGB32;
+					fRenderBuffer->PutValues = put_values_RGB32;
+					fRenderBuffer->PutMonoValues = put_mono_values_RGB32;
 					break;
 				case B_RGB16:
 					fRenderBuffer->GetRow = get_row_RGB16;
@@ -303,6 +331,7 @@ MesaSoftwareRenderer::LockGL()
 					fRenderBuffer->PutMonoValues = put_mono_values_RGB16;
 					break;
 				default:
+					fprintf(stderr, "unsupported screen color space %ld\n", cs);
 					debugger("unsupported OpenGL color space");
 					break;
 			}
