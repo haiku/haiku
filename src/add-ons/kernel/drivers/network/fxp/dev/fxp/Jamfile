@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network fxp dev fxp ;
+
+SubDirCcFlags -Wall ;
+
+UsePrivateHeaders kernel net ;
+
+UseHeaders [ FDirName $(SUBDIR) .. .. ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 ] ;
+
+KernelAddon fxp :
+	if_fxp.c
+	: libfreebsd_network.a
+	;
+
