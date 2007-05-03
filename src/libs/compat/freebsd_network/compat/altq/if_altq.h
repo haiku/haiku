@@ -10,6 +10,7 @@ struct ifaltq {
 
 	int				ifq_len;
 	int				ifq_maxlen;
+	int				ifq_drops;
 	struct mtx		ifq_mtx;
 
 	struct mbuf *	ifq_drv_head;
@@ -25,6 +26,8 @@ struct ifaltq {
 #define ALTDQ_REMOVE	1
 
 #define ALTQ_IS_ENABLED(ifq)	0
+#define ALTQ_ENQUEUE(ifr, m, foo, error) \
+	do { m_freem(m); error = -1; } while (0)
 #define ALTQ_DEQUEUE(ifr, m)	(m) = NULL
 
 #define TBR_IS_ENABLED(ifq)		0

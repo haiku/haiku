@@ -12,6 +12,7 @@ Library libfreebsd_network.a :
 	busdma_machdep.c
 	compat.c
 	device.c
+	if.c
 	if_media.c
 	mbuf.c
 	mutex.c

@@ -66,6 +66,9 @@ struct mbuf {
 #define M_EXT			0x0001
 #define M_PKTHDR		0x0002
 
+#define M_BCAST			0x0200
+#define M_MCAST			0x0400
+
 #define CSUM_IP			0x0001
 #define CSUM_TCP		0x0002
 #define CSUM_UDP		0x0004
