@@ -81,6 +81,11 @@ struct mbuf *m_defrag(struct mbuf *m, int);
 
 #define mtod(m, type)	(type)((m)->m_data)
 
+/* Check if the supplied mbuf has a packet header, or else panic. */
+#define	M_ASSERTPKTHDR(m)						\
+	KASSERT(m != NULL && m->m_flags & M_PKTHDR,			\
+	    ("%s: no mbuf packet header!", __func__))
+
 #endif
 
 #endif

@@ -4,6 +4,7 @@
 #include <arch/x86/arch_cpu.h>
 
 #include <sys/systm.h>
+#include <sys/sysctl.h>
 
 // TODO per platform, these are x86
 typedef uint32_t	bus_addr_t;
@@ -145,6 +146,18 @@ void device_set_desc(device_t dev, const char *desc);
 
 device_t device_add_child(device_t dev, const char *name, int unit);
 int device_delete_child(device_t dev, device_t child);
+
+static inline struct sysctl_ctx_list *
+device_get_sysctl_ctx(device_t dev)
+{
+	return NULL;
+}
+
+static inline void *
+device_get_sysctl_tree(device_t dev)
+{
+	return NULL;
+}
 
 #include <sys/bus_dma.h>
 

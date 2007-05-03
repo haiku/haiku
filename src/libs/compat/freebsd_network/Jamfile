@@ -9,6 +9,7 @@ SubDirCcFlags [ FDefines _KERNEL=1 ] ;
 
 Library libfreebsd_network.a :
 	bus.c
+	busdma_machdep.c
 	compat.c
 	device.c
 	if_media.c

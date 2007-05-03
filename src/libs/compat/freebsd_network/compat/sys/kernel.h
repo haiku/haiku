@@ -2,6 +2,7 @@
 #define _FBSD_COMPAT_SYS_KERNEL_H_
 
 #include <stddef.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <KernelExport.h>
@@ -17,6 +18,15 @@
 		panic msg; \
 } while(0)
 
+typedef void (*system_init_func_t)(void *);
+
+struct __system_init {
+	system_init_func_t func;
+};
+
+/* TODO */
+#define SYSINIT(uniquifier, subsystem, order, func, ident) \
+	struct __system_init __init_##uniquifier = { func }
 
 #define __printflike(a, b) __attribute__ ((format (__printf__, a, b)))
 

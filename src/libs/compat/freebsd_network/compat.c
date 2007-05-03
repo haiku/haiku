@@ -74,6 +74,28 @@ device_printf(device_t dev, const char *format, ...)
 }
 
 
+int
+printf(const char *format, ...)
+{
+	char buf[256];
+	va_list vl;
+	va_start(vl, format);
+	vsnprintf(buf, sizeof(buf), format, vl);
+	va_end(vl);
+
+	dprintf(buf);
+	return 0;
+}
+
+
+int resource_int_value(const char *name, int unit, const char *resname,
+	int *result)
+{
+	/* no support for hints */
+	return -1;
+}
+
+
 void *
 _kernel_malloc(size_t size, int flags)
 {
@@ -87,6 +109,33 @@ void
 _kernel_free(void *ptr)
 {
 	free(ptr);
+}
+
+
+void *
+_kernel_contigmalloc(const char *file, int line, size_t size, int flags,
+	vm_paddr_t low, vm_paddr_t high, unsigned long alignment,
+	unsigned long boundary)
+{
+	char name[256];
+	area_id area;
+	void *addr;
+
+	snprintf(name, sizeof(name), "contig:%s:%d", file, line);
+
+	area = create_area(name, &addr, B_ANY_KERNEL_ADDRESS, size,
+		B_FULL_LOCK | B_CONTIGUOUS, 0);
+	if (area < 0)
+		return NULL;
+
+	return addr;
+}
+
+
+void
+_kernel_contigfree(void *addr, size_t size)
+{
+	delete_area(area_for(addr));
 }
 
 
