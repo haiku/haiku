@@ -18,7 +18,7 @@
 #include <ksocket.h>
 #include <netinet/in.h>
 
-#define DEBUG 1
+//#define DEBUG 1
 
 /* on the first open(), open ourselves for some seconds, 
  * to avoid trying to reconnect and failing on a 2nd open,
@@ -47,6 +47,8 @@
 #define benaphore_lock LOCK
 #define benaphore_unlock UNLOCK
 #endif
+
+#define DEBUG 1
 
 #include "nbd.h"
 
@@ -736,8 +738,9 @@ device_hooks nbd_hooks={
 	NULL
 };
 
-
 #pragma mark ==== driver hooks ====
+
+int32 api_version = B_CUR_DRIVER_API_VERSION;
 
 static char *nbd_name[MAX_NBDS+1] = {
 	NULL

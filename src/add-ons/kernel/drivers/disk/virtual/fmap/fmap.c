@@ -16,6 +16,8 @@
 #define MAX_FMAPS 4
 #define DEVNAME_FMT "disk/virtual/fmap/%2d"
 
+int32 api_version = B_CUR_DRIVER_API_VERSION;
+
 status_t
 init_hardware (void)
 {
