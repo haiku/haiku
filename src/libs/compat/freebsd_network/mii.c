@@ -14,6 +14,11 @@
 #include <compat/dev/mii/miivar.h>
 
 
+driver_t miibus_driver = {
+	"mii",
+};
+
+
 int
 mii_phy_probe(device_t dev, device_t *miiDev, ifm_change_cb_t change,
 	ifm_stat_cb_t stat)

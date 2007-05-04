@@ -11,6 +11,7 @@ SubDirCcFlags [ FDefines _KERNEL=1 ] ;
 
 KernelAddon fxp :
 	if_fxp.c
+	glue.c
 	: libfreebsd_network.a
 	;
 

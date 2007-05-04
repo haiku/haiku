@@ -133,9 +133,21 @@ int bus_setup_intr(device_t dev, struct resource *r, int flags,
 	driver_intr_t handler, void *arg, void **cookiep);
 int bus_teardown_intr(device_t dev, struct resource *r, void *cookie);
 
-#define BUS_PROBE_DEFAULT		-20
+#define BUS_PROBE_DEFAULT		20
 
-#define DRIVER_MODULE(name, busname, driver, devclass, evh, arg)
+#define DRIVER_MODULE_NAME(name, busname) \
+	__fbsd_##name##busname
+
+driver_t *__fbsd_driver(void);
+
+#define HAIKU_FBSD_DRIVER_GLUE(name, busname) \
+	driver_t *__fbsd_driver() { \
+		extern driver_t *DRIVER_MODULE_NAME(name, busname); \
+		return DRIVER_MODULE_NAME(name, busname); \
+	}
+
+#define DRIVER_MODULE(name, busname, driver, devclass, evh, arg) \
+	driver_t *DRIVER_MODULE_NAME(name, busname) = &(driver)
 
 const char *device_get_name(device_t dev);
 const char *device_get_nameunit(device_t dev);
