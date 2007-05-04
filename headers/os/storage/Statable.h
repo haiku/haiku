@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _STATABLE_H
@@ -17,6 +17,8 @@ class BVolume;
 
 class BStatable {
 	public:
+		virtual ~BStatable();
+
 		virtual status_t GetStat(struct stat *st) const = 0;
 
 		bool IsFile() const;

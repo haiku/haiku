@@ -1,7 +1,12 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered 
-//  by the MIT license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		Ingo Weinhold, bonefish@users.sf.net
+ */
+
 /*!
 	\file Statable.cpp
 	BStatable implementation.
@@ -13,6 +18,12 @@
 #include <Volume.h>
 
 #include <sys/stat.h>
+
+
+BStatable::~BStatable()
+{
+}
+
 
 /*!	\fn status_t GetStat(struct stat *st) const
 	\brief Returns the stat stucture for the node.
