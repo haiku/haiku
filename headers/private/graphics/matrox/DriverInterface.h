@@ -17,7 +17,7 @@
 #include <PCI.h>
 #include <OS.h>
 
-#define DRIVER_PREFIX "mga" // apsed
+#define DRIVER_PREFIX "matrox" // apsed
 #define DEVICE_FORMAT "%04x_%04x_%02x%02x%02x" // apsed
 
 /*

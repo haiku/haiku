@@ -6,7 +6,7 @@ UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics nvidia ] ;
 UseHeaders [ FDirName $(SUBDIR) engine ] ;
 
-Addon nv.accelerant :
+Addon nvidia.accelerant :
 	Acceleration.c
 	Cursor.c
 	EngineManagment.c
@@ -22,9 +22,9 @@ Addon nv.accelerant :
 ;
 
 Package haiku-nvidia-cvs :
-	nv.accelerant : 
+	nvidia.accelerant : 
 	boot home config add-ons accelerants ;
 
-Depends nv.accelerant : nv.driver ;
+Depends nvidia.accelerant : nvidia ;
 
 SubInclude HAIKU_TOP src add-ons accelerants nvidia engine ;

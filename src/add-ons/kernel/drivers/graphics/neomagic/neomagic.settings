@@ -1,11 +1,11 @@
-# Settings file for the nm driver and accelerant
+# Settings file for the neomagic driver and accelerant
 #
 # This file should be moved to the directory
 # ~/config/settings/kernel/drivers/
 #
 
-# nm.driver parameters
-# accelerant "nm.accelerant"
+# neomagic parameters
+# accelerant "neomagic.accelerant"
 
 # nm.accelerant parameters
 usebios     true			# if true rely on bios to coldstart the card instead of driver (not functional)
@@ -16,7 +16,7 @@ hardcursor true			# if true use on-chip cursor capabilities
 #logmask   0x80000000	# log following mask
 #logmask   0x08000604	# log overlay use in full
 #logmask 	0xffffffff		# log everything
-dumprom    false        		# dump bios rom in ~/nm.rom
+dumprom    false        		# dump bios rom in ~/neomagic.rom
 
 #--------- that's all.
 

@@ -6,7 +6,7 @@ UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics neomagic ] ;
 UseHeaders [ FDirName $(SUBDIR) engine ] ;
 
-Addon nm.accelerant :
+Addon neomagic.accelerant :
 	Acceleration.c
 	Cursor.c
 	EngineManagment.c
@@ -22,9 +22,9 @@ Addon nm.accelerant :
 ;
 
 Package haiku-neomagic-cvs :
-	nm.accelerant :
+	neomagic.accelerant :
 	boot home config add-ons accelerants ;
 
-Depends nm.accelerant : nm.driver ;
+Depends neomagic.accelerant : neomagic ;
 
 SubInclude HAIKU_TOP src add-ons accelerants neomagic engine ;

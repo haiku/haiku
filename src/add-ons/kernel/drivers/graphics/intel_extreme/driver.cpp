@@ -42,7 +42,7 @@ const struct supported_device {
 	{0x2572, INTEL_TYPE_8xx | INTEL_TYPE_85x, "i865G"},
 	{0x3582, INTEL_TYPE_8xx | INTEL_TYPE_85x, "i855G"},
 
-#if 0
+#if 1
 	{0x2792, INTEL_TYPE_9xx, "i910"},
 	{0x258a, INTEL_TYPE_9xx, "i915"},
 	{0x2582, INTEL_TYPE_9xx, "i915G"},

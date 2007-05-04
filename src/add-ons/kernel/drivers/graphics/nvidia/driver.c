@@ -7,29 +7,21 @@
 	Rudolf Cornelissen 3/2002-4/2006.
 */
 
-/* standard kernel driver stuff */
+
+#include "AGP.h"
+#include "DriverInterface.h"
+#include "nv_macros.h"
+
+#include <graphic_driver.h>
 #include <KernelExport.h>
 #include <ISA.h>
 #include <PCI.h>
 #include <OS.h>
 #include <driver_settings.h>
-#include <malloc.h>
-#include <stdlib.h> // for strtoXX
-#include "AGP.h"
 
-/* this is for the standardized portion of the driver API */
-/* currently only one operation is defined: B_GET_ACCELERANT_SIGNATURE */
-#include <graphic_driver.h>
-
-/* this is for sprintf() */
+#include <stdlib.h>
 #include <stdio.h>
-
-/* this is for string compares */
 #include <string.h>
-
-/* The private interface between the accelerant and the kernel driver. */
-#include "DriverInterface.h"
-#include "nv_macros.h"
 
 #define get_pci(o, s) (*pci_bus->read_pci_config)(pcii->bus, pcii->device, pcii->function, (o), (s))
 #define set_pci(o, s, v) (*pci_bus->write_pci_config)(pcii->bus, pcii->device, pcii->function, (o), (s), (v))
@@ -42,7 +34,7 @@
 #endif
 
 /* Tell the kernel what revision of the driver API we support */
-int32	api_version = B_CUR_DRIVER_API_VERSION; // apsed, was 2, is 2 in R5
+int32 api_version = B_CUR_DRIVER_API_VERSION;
 
 /* these structures are private to the kernel driver */
 typedef struct device_info device_info;
@@ -70,12 +62,12 @@ typedef struct {
 } DeviceData;
 
 /* prototypes for our private functions */
-static status_t open_hook (const char* name, uint32 flags, void** cookie);
-static status_t close_hook (void* dev);
-static status_t free_hook (void* dev);
-static status_t read_hook (void* dev, off_t pos, void* buf, size_t* len);
-static status_t write_hook (void* dev, off_t pos, const void* buf, size_t* len);
-static status_t control_hook (void* dev, uint32 msg, void *buf, size_t len);
+static status_t open_hook(const char* name, uint32 flags, void** cookie);
+static status_t close_hook(void* dev);
+static status_t free_hook(void* dev);
+static status_t read_hook(void* dev, off_t pos, void* buf, size_t* len);
+static status_t write_hook(void* dev, off_t pos, const void* buf, size_t* len);
+static status_t control_hook(void* dev, uint32 msg, void *buf, size_t len);
 static status_t map_device(device_info *di);
 static void unmap_device(device_info *di);
 static void probe_devices(void);
@@ -363,7 +355,7 @@ static struct {
 	{0x0000, NULL}
 };
 
-static nv_settings current_settings = { // see comments in nv.settings 
+static nv_settings sSettings = { // see comments in nvidia.settings 
 	/* for driver */
 	DRIVER_PREFIX ".accelerant",
 	"none",					// primary
@@ -386,7 +378,9 @@ static nv_settings current_settings = { // see comments in nv.settings
 	0,						// ram_clk
 };
 
-static void dumprom (void *rom, uint32 size, pci_info pcii)
+
+static void
+dumprom(void *rom, uint32 size, pci_info pcii)
 {
 	int fd;
 	uint32 cnt;
@@ -406,19 +400,25 @@ static void dumprom (void *rom, uint32 size, pci_info pcii)
 	close (fd);
 }
 
-/* return 1 if vblank interrupt has occured */
-static int caused_vbi_crtc1(vuint32 * regs)
+
+/*! return 1 if vblank interrupt has occured */
+static int
+caused_vbi_crtc1(vuint32 * regs)
 {
 	return (NV_REG32(NV32_CRTC_INTS) & 0x00000001);
 }
 
-/* clear the vblank interrupt */
-static void clear_vbi_crtc1(vuint32 * regs)
+
+/*! clear the vblank interrupt */
+static void
+clear_vbi_crtc1(vuint32 * regs)
 {
 	NV_REG32(NV32_CRTC_INTS) = 0x00000001;
 }
 
-static void enable_vbi_crtc1(vuint32 * regs)
+
+static void
+enable_vbi_crtc1(vuint32 * regs)
 {
 	/* clear the vblank interrupt */
 	NV_REG32(NV32_CRTC_INTS) = 0x00000001;
@@ -428,7 +428,9 @@ static void enable_vbi_crtc1(vuint32 * regs)
 	NV_REG32(NV32_MAIN_INTE) = 0x00000001;
 }
 
-static void disable_vbi_crtc1(vuint32 * regs)
+
+static void
+disable_vbi_crtc1(vuint32 * regs)
 {
 	/* disable nVidia interrupt source vblank */
 	NV_REG32(NV32_CRTC_INTE) &= 0xfffffffe;
@@ -436,19 +438,25 @@ static void disable_vbi_crtc1(vuint32 * regs)
 	NV_REG32(NV32_CRTC_INTS) = 0x00000001;
 }
 
-/* return 1 if vblank interrupt has occured */
-static int caused_vbi_crtc2(vuint32 * regs)
+
+/*! return 1 if vblank interrupt has occured */
+static int
+caused_vbi_crtc2(vuint32 * regs)
 {
 	return (NV_REG32(NV32_CRTC2_INTS) & 0x00000001);
 }
 
-/* clear the vblank interrupt */
-static void clear_vbi_crtc2(vuint32 * regs)
+
+/*! clear the vblank interrupt */
+static void
+clear_vbi_crtc2(vuint32 * regs)
 {
 	NV_REG32(NV32_CRTC2_INTS) = 0x00000001;
 }
 
-static void enable_vbi_crtc2(vuint32 * regs)
+
+static void
+enable_vbi_crtc2(vuint32 * regs)
 {
 	/* clear the vblank interrupt */
 	NV_REG32(NV32_CRTC2_INTS) = 0x00000001;
@@ -458,7 +466,9 @@ static void enable_vbi_crtc2(vuint32 * regs)
 	NV_REG32(NV32_MAIN_INTE) = 0x00000001;
 }
 
-static void disable_vbi_crtc2(vuint32 * regs)
+
+static void
+disable_vbi_crtc2(vuint32 * regs)
 {
 	/* disable nVidia interrupt source vblank */
 	NV_REG32(NV32_CRTC2_INTE) &= 0xfffffffe;
@@ -466,13 +476,15 @@ static void disable_vbi_crtc2(vuint32 * regs)
 	NV_REG32(NV32_CRTC2_INTS) = 0x00000001;
 }
 
+
 //fixme:
 //dangerous code, on singlehead cards better not try accessing secondary head
 //registers (card might react in unpredictable ways, though there's only a small
 //chance we actually run into this).
 //fix requires (some) card recognition code to be moved from accelerant to
 //kerneldriver...
-static void disable_vbi_all(vuint32 * regs)
+static void
+disable_vbi_all(vuint32 * regs)
 {
 	/* disable nVidia interrupt source vblank */
 	NV_REG32(NV32_CRTC_INTE) &= 0xfffffffe;
@@ -488,177 +500,9 @@ static void disable_vbi_all(vuint32 * regs)
 	NV_REG32(NV32_MAIN_INTE) = 0x00000000;
 }
 
-/*
-	init_hardware() - Returns B_OK if one is
-	found, otherwise returns B_ERROR so the driver will be unloaded.
-*/
-status_t
-init_hardware(void) {
-	long		pci_index = 0;
-	pci_info	pcii;
-	bool		found_one = false;
-	
-	/* choke if we can't find the PCI bus */
-	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci_bus) != B_OK)
-		return B_ERROR;
 
-	/* choke if we can't find the ISA bus */
-	if (get_module(B_ISA_MODULE_NAME, (module_info **)&isa_bus) != B_OK)
-	{
-		put_module(B_PCI_MODULE_NAME);
-		return B_ERROR;
-	}
-
-	/* while there are more pci devices */
-	while ((*pci_bus->get_nth_pci_info)(pci_index, &pcii) == B_NO_ERROR) {
-		int vendor = 0;
-		
-		/* if we match a supported vendor */
-		while (SupportedDevices[vendor].vendor) {
-			if (SupportedDevices[vendor].vendor == pcii.vendor_id) {
-				uint16 *devices = SupportedDevices[vendor].devices;
-				/* while there are more supported devices */
-				while (*devices) {
-					/* if we match a supported device */
-					if (*devices == pcii.device_id ) {
-						
-						found_one = true;
-						goto done;
-					}
-					/* next supported device */
-					devices++;
-				}
-			}
-			vendor++;
-		}
-		/* next pci_info struct, please */
-		pci_index++;
-	}
-
-done:
-	/* put away the module manager */
-	put_module(B_PCI_MODULE_NAME);
-	return (found_one ? B_OK : B_ERROR);
-}
-
-status_t
-init_driver(void) {
-	void *settings_handle;
-
-	// get driver/accelerant settings, apsed
-	settings_handle  = load_driver_settings (DRIVER_PREFIX ".settings");
-	if (settings_handle != NULL) {
-		const char *item;
-		char       *end;
-		uint32      value;
-		
-		// for driver
-		item = get_driver_parameter (settings_handle, "accelerant", "", "");
-		if ((strlen (item) > 0) && (strlen (item) < sizeof (current_settings.accelerant) - 1)) {
-			strcpy (current_settings.accelerant, item);
-		}
-		item = get_driver_parameter (settings_handle, "primary", "", "");
-		if ((strlen (item) > 0) && (strlen (item) < sizeof (current_settings.primary) - 1)) {
-			strcpy (current_settings.primary, item);
-		}
-		current_settings.dumprom = get_driver_boolean_parameter (settings_handle, "dumprom", false, false);
-
-		// for accelerant
-		item = get_driver_parameter (settings_handle, "logmask", "0x00000000", "0x00000000");
-		value = strtoul (item, &end, 0);
-		if (*end == '\0') current_settings.logmask = value;
-
-		item = get_driver_parameter (settings_handle, "memory", "0", "0");
-		value = strtoul (item, &end, 0);
-		if (*end == '\0') current_settings.memory = value;
-
-		item = get_driver_parameter (settings_handle, "tv_output", "0", "0");
-		value = strtoul (item, &end, 0);
-		if (*end == '\0') current_settings.tv_output = value;
-
-		current_settings.hardcursor = get_driver_boolean_parameter (settings_handle, "hardcursor", false, false);
-		current_settings.usebios = get_driver_boolean_parameter (settings_handle, "usebios", false, false);
-		current_settings.switchhead = get_driver_boolean_parameter (settings_handle, "switchhead", false, false);
-		current_settings.force_pci = get_driver_boolean_parameter (settings_handle, "force_pci", false, false);
-		current_settings.unhide_fw = get_driver_boolean_parameter (settings_handle, "unhide_fw", false, false);
-		current_settings.pgm_panel = get_driver_boolean_parameter (settings_handle, "pgm_panel", false, false);
-		current_settings.dma_acc = get_driver_boolean_parameter (settings_handle, "dma_acc", false, false);
-		current_settings.vga_on_tv = get_driver_boolean_parameter (settings_handle, "vga_on_tv", false, false);
-		current_settings.force_sync = get_driver_boolean_parameter (settings_handle, "force_sync", false, false);
-		current_settings.force_ws = get_driver_boolean_parameter (settings_handle, "force_ws", false, false);
-
-		item = get_driver_parameter (settings_handle, "gpu_clk", "0", "0");
-		value = strtoul (item, &end, 0);
-		if (*end == '\0') current_settings.gpu_clk = value;
-
-		item = get_driver_parameter (settings_handle, "ram_clk", "0", "0");
-		value = strtoul (item, &end, 0);
-		if (*end == '\0') current_settings.ram_clk = value;
-
-		unload_driver_settings (settings_handle);
-	}
-
-	/* get a handle for the pci bus */
-	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci_bus) != B_OK)
-		return B_ERROR;
-
-	/* get a handle for the isa bus */
-	if (get_module(B_ISA_MODULE_NAME, (module_info **)&isa_bus) != B_OK)
-	{
-		put_module(B_PCI_MODULE_NAME);
-		return B_ERROR;
-	}
-
-	/* get a handle for the agp bus if it exists */
-	get_module(B_AGP_MODULE_NAME, (module_info **)&agp_bus);
-
-	/* driver private data */
-	pd = (DeviceData *)calloc(1, sizeof(DeviceData));
-	if (!pd) {
-		put_module(B_PCI_MODULE_NAME);
-		return B_ERROR;
-	}
-	/* initialize the benaphore */
-	INIT_BEN(pd->kernel);
-	/* find all of our supported devices */
-	probe_devices();
-	return B_OK;
-}
-
-const char **
-publish_devices(void) {
-	/* return the list of supported devices */
-	return (const char **)pd->device_names;
-}
-
-device_hooks *
-find_device(const char *name) {
-	int index = 0;
-	while (pd->device_names[index]) {
-		if (strcmp(name, pd->device_names[index]) == 0)
-			return &graphics_device_hooks;
-		index++;
-	}
-	return NULL;
-
-}
-
-void uninit_driver(void) {
-
-	/* free the driver data */
-	DELETE_BEN(pd->kernel);
-	free(pd);
-	pd = NULL;
-
-	/* put the pci module away */
-	put_module(B_PCI_MODULE_NAME);
-	put_module(B_ISA_MODULE_NAME);
-
-	/* put the agp module away if it's there */
-	if (agp_bus) put_module(B_AGP_MODULE_NAME);
-}
-
-static status_t map_device(device_info *di)
+static status_t
+map_device(device_info *di)
 {
 	char buffer[B_OS_NAME_LENGTH]; /*memory for device name*/
 	shared_info *si = di->si;
@@ -735,8 +579,7 @@ static status_t map_device(device_info *di)
 	//having the ROM mapped on PCI and PCIe cards. Falling back to fetching from ISA
 	//legacy space will get us into trouble if we aren't the primary graphics card!!
 	//(as legacy space always has the primary card's ROM 'mapped'!)
-	if (tmpUlong)
-	{
+	if (tmpUlong) {
 		/* ROM was assigned an adress, so enable ROM decoding - see PCI standard */
 		tmpUlong |= 0x00000001;
 		set_pci(PCI_rom_base, 4, tmpUlong);
@@ -751,35 +594,24 @@ static status_t map_device(device_info *di)
 		);
 
 		/* check if we got the BIOS and signature (might fail on laptops..) */
-		if (rom_area >= 0)
-		{
-			if ((rom_temp[0] != 0x55) || (rom_temp[1] != 0xaa))
-			{
+		if (rom_area >= 0) {
+			if ((rom_temp[0] != 0x55) || (rom_temp[1] != 0xaa)) {
 				/* apparantly no ROM is mapped here */
 				delete_area(rom_area);
 				rom_area = -1;
 				/* force using ISA legacy map as fall-back */
 				tmpUlong = 0x00000000;
 			}
-		}
-		else
-		{
+		} else {
 			/* mapping failed: force using ISA legacy map as fall-back */
 			tmpUlong = 0x00000000;
 		}
 	}
 
-	if (!tmpUlong)
-	{
+	if (!tmpUlong) {
 		/* ROM was not assigned an adress, fetch it from ISA legacy memory map! */
-		rom_area = map_physical_memory(
-			buffer,
-			(void *)0x000c0000,
-			65536,
-			B_ANY_KERNEL_ADDRESS,
-			B_READ_AREA,
-			(void **)&(rom_temp)
-		);
+		rom_area = map_physical_memory(buffer, (void *)0x000c0000,
+			65536, B_ANY_KERNEL_ADDRESS, B_READ_AREA, (void **)&(rom_temp));
 	}
 
 	/* if mapping ROM to vmem failed then clean up and pass on error */
@@ -789,11 +621,13 @@ static status_t map_device(device_info *di)
 		return rom_area;
 	}
 
-	/* dump ROM to file if selected in nv.settings
+	/* dump ROM to file if selected in nvidia.settings
 	 * (ROM always fits in 64Kb: checked TNT1 - FX5950) */
-	if (current_settings.dumprom) dumprom (rom_temp, 65536, di->pcii);
+	if (sSettings.dumprom)
+		dumprom(rom_temp, 65536, di->pcii);
+
 	/* make a copy of ROM for future reference */
-	memcpy (si->rom_mirror, rom_temp, 65536);
+	memcpy(si->rom_mirror, rom_temp, 65536);
 
 	/* disable ROM decoding - this is defined in the PCI standard, and delete the area */
 	tmpUlong = get_pci(PCI_rom_base, 4);
@@ -810,8 +644,7 @@ static status_t map_device(device_info *di)
 		di->pcii.bus, di->pcii.device, di->pcii.function);
 
 	/* map the framebuffer into vmem, using Write Combining*/
-	si->fb_area = map_physical_memory(
-		buffer,
+	si->fb_area = map_physical_memory(buffer,
 		/* WARNING: Nvidia needs to map framebuffer as viewed from PCI space! */
 		(void *) di->pcii.u.h0.base_registers_pci[frame_buffer],
 		di->pcii.u.h0.base_register_sizes[frame_buffer],
@@ -821,8 +654,7 @@ static status_t map_device(device_info *di)
 
 	/*if failed with write combining try again without*/
 	if (si->fb_area < 0) {
-		si->fb_area = map_physical_memory(
-			buffer,
+		si->fb_area = map_physical_memory(buffer,
 			/* WARNING: Nvidia needs to map framebuffer as viewed from PCI space! */
 			(void *) di->pcii.u.h0.base_registers_pci[frame_buffer],
 			di->pcii.u.h0.base_register_sizes[frame_buffer],
@@ -830,26 +662,29 @@ static status_t map_device(device_info *di)
 			B_READ_AREA | B_WRITE_AREA,
 			&(si->framebuffer));
 	}
-		
+
 	/* if there was an error, delete our other areas and pass on error*/
-	if (si->fb_area < 0)
-	{
+	if (si->fb_area < 0) {
 		delete_area(si->regs_area);
 		si->regs_area = -1;
 		return si->fb_area;
 	}
-//fixme: retest for card coldstart and PCI/virt_mem mapping!!
+
+	//fixme: retest for card coldstart and PCI/virt_mem mapping!!
 	/* remember the DMA address of the frame buffer for BDirectWindow?? purposes */
 	si->framebuffer_pci = (void *) di->pcii.u.h0.base_registers_pci[frame_buffer];
 
 	// remember settings for use here and in accelerant
-	si->settings = current_settings; 
+	si->settings = sSettings; 
 
 	/* in any case, return the result */
 	return si->fb_area;
 }
 
-static void unmap_device(device_info *di) {
+
+static void
+unmap_device(device_info *di)
+{
 	shared_info *si = di->si;
 	uint32	tmpUlong;
 	pci_info *pcii = &(di->pcii);
@@ -859,23 +694,29 @@ static void unmap_device(device_info *di) {
 	tmpUlong &= 0xfffffffc;
 	set_pci(PCI_command, 4, tmpUlong);
 	/* delete the areas */
-	if (si->regs_area >= 0) delete_area(si->regs_area);
-	if (si->fb_area >= 0) delete_area(si->fb_area);
+	if (si->regs_area >= 0)
+		delete_area(si->regs_area);
+	if (si->fb_area >= 0)
+		delete_area(si->fb_area);
 	si->regs_area = si->fb_area = -1;
 	si->framebuffer = NULL;
 	di->regs = NULL;
 }
 
-static void probe_devices(void) {
+
+static void
+probe_devices(void)
+{
 	uint32 pci_index = 0;
 	uint32 count = 0;
 	device_info *di = pd->di;
 	char tmp_name[B_OS_NAME_LENGTH];
 
 	/* while there are more pci devices */
-	while ((count < MAX_DEVICES) && ((*pci_bus->get_nth_pci_info)(pci_index, &(di->pcii)) == B_NO_ERROR)) {
+	while (count < MAX_DEVICES
+		&& (*pci_bus->get_nth_pci_info)(pci_index, &(di->pcii)) == B_OK) {
 		int vendor = 0;
-		
+
 		/* if we match a supported vendor */
 		while (SupportedDevices[vendor].vendor) {
 			if (SupportedDevices[vendor].vendor == di->pcii.vendor_id) {
@@ -890,9 +731,9 @@ static void probe_devices(void) {
 							di->pcii.bus, di->pcii.device, di->pcii.function);
 						/* tweak the exported name to show first in the alphabetically ordered /dev/
 						 * hierarchy folder, so the system will use it as primary adaptor if requested
-						 * via nv.settings. */
-						if (strcmp(tmp_name, current_settings.primary) == 0)
-							sprintf(tmp_name, "-%s", current_settings.primary);
+						 * via nvidia.settings. */
+						if (strcmp(tmp_name, sSettings.primary) == 0)
+							sprintf(tmp_name, "-%s", sSettings.primary);
 						/* add /dev/ hierarchy path */
 						sprintf(di->name, "graphics/%s", tmp_name);
 						/* remember the name */
@@ -926,7 +767,10 @@ next_device:
 	pd->device_names[pd->count] = NULL;
 }
 
-static uint32 thread_interrupt_work(int32 *flags, vuint32 *regs, shared_info *si) {
+
+static uint32
+thread_interrupt_work(int32 *flags, vuint32 *regs, shared_info *si)
+{
 	uint32 handled = B_HANDLED_INTERRUPT;
 	/* release the vblank semaphore */
 	if (si->vblank >= 0) {
@@ -938,6 +782,7 @@ static uint32 thread_interrupt_work(int32 *flags, vuint32 *regs, shared_info *si
 	}
 	return handled;
 }
+
 
 static int32
 nv_interrupt(void *data)
@@ -956,23 +801,18 @@ nv_interrupt(void *data)
 
 	/* was it a VBI? */
 	/* note: si->ps.secondary_head was cleared by kerneldriver earlier! (at least) */
-	if (si->ps.secondary_head)
-	{
+	if (si->ps.secondary_head) {
 		//fixme:
 		//rewrite once we use one driver instance 'per head' (instead of 'per card')
-		if (caused_vbi_crtc1(regs) || caused_vbi_crtc2(regs))
-		{
+		if (caused_vbi_crtc1(regs) || caused_vbi_crtc2(regs)) {
 			/* clear the interrupt(s) */
 			clear_vbi_crtc1(regs);
 			clear_vbi_crtc2(regs);
 			/* release the semaphore */
 			handled = thread_interrupt_work(flags, regs, si);
 		}
-	}
-	else
-	{
-		if (caused_vbi_crtc1(regs))
-		{
+	} else {
+		if (caused_vbi_crtc1(regs)) {
 			/* clear the interrupt */
 			clear_vbi_crtc1(regs);
 			/* release the semaphore */
@@ -987,7 +827,13 @@ exit0:
 	return handled;				
 }
 
-static status_t open_hook (const char* name, uint32 flags, void** cookie) {
+
+//	#pragma mark - device hooks
+
+
+static status_t
+open_hook(const char* name, uint32 flags, void** cookie)
+{
 	int32 index = 0;
 	device_info *di;
 	shared_info *si;
@@ -1001,7 +847,9 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 
 	/* find the device name in the list of devices */
 	/* we're never passed a name we didn't publish */
-	while (pd->device_names[index] && (strcmp(name, pd->device_names[index]) != 0)) index++;
+	while (pd->device_names[index]
+		&& (strcmp(name, pd->device_names[index]) != 0))
+		index++;
 
 	/* for convienience */
 	di = &(pd->di[index]);
@@ -1203,41 +1051,34 @@ done:
 	return result;
 }
 
-/* ----------
-	read_hook - does nothing, gracefully
------ */
+
 static status_t
-read_hook (void* dev, off_t pos, void* buf, size_t* len)
+read_hook(void* dev, off_t pos, void* buf, size_t* len)
 {
 	*len = 0;
 	return B_NOT_ALLOWED;
 }
 
-/* ----------
-	write_hook - does nothing, gracefully
------ */
+
 static status_t
-write_hook (void* dev, off_t pos, const void* buf, size_t* len)
+write_hook(void* dev, off_t pos, const void* buf, size_t* len)
 {
 	*len = 0;
 	return B_NOT_ALLOWED;
 }
 
-/* ----------
-	close_hook - does nothing, gracefully
------ */
+
 static status_t
-close_hook (void* dev)
+close_hook(void* dev)
 {
 	/* we don't do anything on close: there might be dup'd fd */
 	return B_NO_ERROR;
 }
 
-/* -----------
-	free_hook - close down the device
------------ */
+
 static status_t
-free_hook (void* dev) {
+free_hook(void* dev)
+{
 	device_info *di = (device_info *)dev;
 	shared_info	*si = di->si;
 	vuint32 *regs = di->regs;
@@ -1254,12 +1095,12 @@ free_hook (void* dev) {
 	//distinquish between crtc1/crtc2 once all heads get seperate driver instances!
 	disable_vbi_all(regs);
 
-	if (si->ps.int_assigned)
-	{
+	if (si->ps.int_assigned) {
 		/* remove interrupt handler */
 		remove_io_interrupt_handler(di->pcii.u.h0.interrupt_line, nv_interrupt, di);
 
-		/* delete the semaphores, ignoring any errors ('cause the owning team may have died on us) */
+		/* delete the semaphores, ignoring any errors ('cause the owning
+		   team may have died on us) */
 		delete_sem(si->vblank);
 		si->vblank = -1;
 	}
@@ -1291,55 +1132,68 @@ unlock_and_exit:
 	return B_OK;
 }
 
-/* -----------
-	control_hook - where the real work is done
------------ */
+
 static status_t
-control_hook (void* dev, uint32 msg, void *buf, size_t len) {
+control_hook(void* dev, uint32 msg, void *buf, size_t len)
+{
 	device_info *di = (device_info *)dev;
 	status_t result = B_DEV_INVALID_IOCTL;
 	uint32 tmpUlong;
 
 	switch (msg) {
 		/* the only PUBLIC ioctl */
-		case B_GET_ACCELERANT_SIGNATURE: {
-			char *sig = (char *)buf;
-			strcpy(sig, current_settings.accelerant);
+		case B_GET_ACCELERANT_SIGNATURE:
+		{
+			strcpy((char* )buf, sSettings.accelerant);
 			result = B_OK;
-		} break;
-		
+			break;
+		}
+
 		/* PRIVATE ioctl from here on */
-		case NV_GET_PRIVATE_DATA: {
+		case NV_GET_PRIVATE_DATA:
+		{
 			nv_get_private_data *gpd = (nv_get_private_data *)buf;
 			if (gpd->magic == NV_PRIVATE_DATA_MAGIC) {
 				gpd->shared_info_area = di->shared_area;
 				result = B_OK;
 			}
-		} break;
-		case NV_GET_PCI: {
+			break;
+		}
+
+		case NV_GET_PCI:
+		{
 			nv_get_set_pci *gsp = (nv_get_set_pci *)buf;
 			if (gsp->magic == NV_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
 				gsp->value = get_pci(gsp->offset, gsp->size);
 				result = B_OK;
 			}
-		} break;
-		case NV_SET_PCI: {
+			break;
+		}
+
+		case NV_SET_PCI:
+		{
 			nv_get_set_pci *gsp = (nv_get_set_pci *)buf;
 			if (gsp->magic == NV_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
 				set_pci(gsp->offset, gsp->size, gsp->value);
 				result = B_OK;
 			}
-		} break;
-		case NV_DEVICE_NAME: { // apsed
+			break;
+		}
+
+		case NV_DEVICE_NAME:
+		{
 			nv_device_name *dn = (nv_device_name *)buf;
 			if (dn->magic == NV_PRIVATE_DATA_MAGIC) {
 				strcpy(dn->name, di->name);
 				result = B_OK;
 			}
-		} break;
-		case NV_RUN_INTERRUPTS: {
+			break;
+		}
+
+		case NV_RUN_INTERRUPTS:
+		{
 			nv_set_vblank_int *vi = (nv_set_vblank_int *)buf;
 			if (vi->magic == NV_PRIVATE_DATA_MAGIC) {
 				vuint32 *regs = di->regs;
@@ -1358,8 +1212,11 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 				}
 				result = B_OK;
 			}
-		} break;
-		case NV_GET_NTH_AGP_INFO: {
+			break;
+		}
+
+		case NV_GET_NTH_AGP_INFO:
+		{
 			nv_nth_agp_info *nai = (nv_nth_agp_info *)buf;
 			if (nai->magic == NV_PRIVATE_DATA_MAGIC) {
 				nai->exist = false;
@@ -1372,8 +1229,11 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 				}
 				result = B_OK;
 			}
-		} break;
-		case NV_ENABLE_AGP: {
+			break;
+		}
+
+		case NV_ENABLE_AGP:
+		{
 			nv_cmd_agp *nca = (nv_cmd_agp *)buf;
 			if (nca->magic == NV_PRIVATE_DATA_MAGIC) {
 				if (agp_bus) {
@@ -1385,8 +1245,11 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 				}
 				result = B_OK;
 			}
-		} break;
-		case NV_ISA_OUT: {
+			break;
+		}
+
+		case NV_ISA_OUT:
+		{
 			nv_in_out_isa *io_isa = (nv_in_out_isa *)buf;
 			if (io_isa->magic == NV_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
@@ -1414,8 +1277,11 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 				/* end of critical section */
 				RELEASE_BEN(pd->kernel);
    			}
-		} break;
-		case NV_ISA_IN: {
+			break;
+		}
+
+		case NV_ISA_IN:
+		{
 			nv_in_out_isa *io_isa = (nv_in_out_isa *)buf;
 			if (io_isa->magic == NV_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
@@ -1443,7 +1309,206 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 				/* end of critical section */
 				RELEASE_BEN(pd->kernel);
    			}
-		} break;
+			break;
+		}
 	}
+
 	return result;
 }
+
+
+//	#pragma mark - driver API
+
+
+status_t
+init_hardware(void)
+{
+	long index = 0;
+	pci_info pcii;
+	bool found = false;
+
+	/* choke if we can't find the PCI bus */
+	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci_bus) != B_OK)
+		return B_ERROR;
+
+	/* choke if we can't find the ISA bus */
+	if (get_module(B_ISA_MODULE_NAME, (module_info **)&isa_bus) != B_OK)
+	{
+		put_module(B_PCI_MODULE_NAME);
+		return B_ERROR;
+	}
+
+	/* while there are more pci devices */
+	while ((*pci_bus->get_nth_pci_info)(index, &pcii) == B_NO_ERROR) {
+		int vendor = 0;
+		
+		/* if we match a supported vendor */
+		while (SupportedDevices[vendor].vendor) {
+			if (SupportedDevices[vendor].vendor == pcii.vendor_id) {
+				uint16 *devices = SupportedDevices[vendor].devices;
+				/* while there are more supported devices */
+				while (*devices) {
+					/* if we match a supported device */
+					if (*devices == pcii.device_id ) {
+						
+						found = true;
+						goto done;
+					}
+					/* next supported device */
+					devices++;
+				}
+			}
+			vendor++;
+		}
+		/* next pci_info struct, please */
+		index++;
+	}
+
+done:
+	/* put away the module manager */
+	put_module(B_PCI_MODULE_NAME);
+	return found ? B_OK : B_ERROR;
+}
+
+
+status_t
+init_driver(void)
+{
+	void *settings;
+
+	// get driver/accelerant settings
+	settings = load_driver_settings(DRIVER_PREFIX ".settings");
+	if (settings != NULL) {
+		const char *item;
+		char *end;
+		uint32 value;
+
+		// for driver
+		item = get_driver_parameter(settings, "accelerant", "", "");
+		if (item[0] && strlen(item) < sizeof(sSettings.accelerant) - 1)
+			strcpy (sSettings.accelerant, item);
+
+		item = get_driver_parameter(settings, "primary", "", "");
+		if (item[0] && strlen(item) < sizeof(sSettings.primary) - 1)
+			strcpy(sSettings.primary, item);
+
+		sSettings.dumprom = get_driver_boolean_parameter(settings,
+			"dumprom", false, false);
+
+		// for accelerant
+		item = get_driver_parameter(settings, "logmask",
+			"0x00000000", "0x00000000");
+		value = strtoul(item, &end, 0);
+		if (*end == '\0')
+			sSettings.logmask = value;
+
+		item = get_driver_parameter(settings, "memory", "0", "0");
+		value = strtoul(item, &end, 0);
+		if (*end == '\0')
+			sSettings.memory = value;
+
+		item = get_driver_parameter(settings, "tv_output", "0", "0");
+		value = strtoul(item, &end, 0);
+		if (*end == '\0')
+			sSettings.tv_output = value;
+
+		sSettings.hardcursor = get_driver_boolean_parameter(settings,
+			"hardcursor", false, false);
+		sSettings.usebios = get_driver_boolean_parameter(settings,
+			"usebios", false, false);
+		sSettings.switchhead = get_driver_boolean_parameter(settings,
+			"switchhead", false, false);
+		sSettings.force_pci = get_driver_boolean_parameter(settings,
+			"force_pci", false, false);
+		sSettings.unhide_fw = get_driver_boolean_parameter(settings,
+			"unhide_fw", false, false);
+		sSettings.pgm_panel = get_driver_boolean_parameter(settings,
+			"pgm_panel", false, false);
+		sSettings.dma_acc = get_driver_boolean_parameter(settings,
+			"dma_acc", false, false);
+		sSettings.vga_on_tv = get_driver_boolean_parameter(settings,
+			"vga_on_tv", false, false);
+		sSettings.force_sync = get_driver_boolean_parameter(settings,
+			"force_sync", false, false);
+		sSettings.force_ws = get_driver_boolean_parameter(settings,
+			"force_ws", false, false);
+
+		item = get_driver_parameter(settings, "gpu_clk", "0", "0");
+		value = strtoul(item, &end, 0);
+		if (*end == '\0')
+			sSettings.gpu_clk = value;
+
+		item = get_driver_parameter(settings, "ram_clk", "0", "0");
+		value = strtoul(item, &end, 0);
+		if (*end == '\0')
+			sSettings.ram_clk = value;
+
+		unload_driver_settings(settings);
+	}
+
+	/* get a handle for the pci bus */
+	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci_bus) != B_OK)
+		return B_ERROR;
+
+	/* get a handle for the isa bus */
+	if (get_module(B_ISA_MODULE_NAME, (module_info **)&isa_bus) != B_OK) {
+		put_module(B_PCI_MODULE_NAME);
+		return B_ERROR;
+	}
+
+	/* get a handle for the agp bus if it exists */
+	get_module(B_AGP_MODULE_NAME, (module_info **)&agp_bus);
+
+	/* driver private data */
+	pd = (DeviceData *)calloc(1, sizeof(DeviceData));
+	if (!pd) {
+		put_module(B_PCI_MODULE_NAME);
+		return B_ERROR;
+	}
+	/* initialize the benaphore */
+	INIT_BEN(pd->kernel);
+	/* find all of our supported devices */
+	probe_devices();
+	return B_OK;
+}
+
+
+const char **
+publish_devices(void)
+{
+	/* return the list of supported devices */
+	return (const char **)pd->device_names;
+}
+
+
+device_hooks *
+find_device(const char *name)
+{
+	int index = 0;
+	while (pd->device_names[index]) {
+		if (strcmp(name, pd->device_names[index]) == 0)
+			return &graphics_device_hooks;
+		index++;
+	}
+	return NULL;
+
+}
+
+
+void
+uninit_driver(void)
+{
+	/* free the driver data */
+	DELETE_BEN(pd->kernel);
+	free(pd);
+	pd = NULL;
+
+	/* put the pci module away */
+	put_module(B_PCI_MODULE_NAME);
+	put_module(B_ISA_MODULE_NAME);
+
+	/* put the agp module away if it's there */
+	if (agp_bus)
+		put_module(B_AGP_MODULE_NAME);
+}
+

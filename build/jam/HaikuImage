@@ -22,6 +22,7 @@ if $(INCLUDE_GPL_ADDONS) = 1 {
 
 BEOS_BIN = "[" addattr alert arp basename bc beep bzip2 cat cardctl catattr chgrp
 	chmod chop chown cksum clear clockconfig cmp comm compress cp copyattr
+	$(X86_ONLY)CortexAddOnHost
 	csplit ctags cut date dc dd desklink df diff diff3 dircolors dirname
 	driveinfo dstcheck du dump_cis dump_cisreg echo eject env error expand
 	expr factor false fdinfo ffm find finddir fmt fold fortune frcode ftp funzip gawk
@@ -44,7 +45,7 @@ BEOS_BIN = "[" addattr alert arp basename bc beep bzip2 cat cardctl catattr chgr
 
 BEOS_APPS = Terminal Expander People ShowImage Pulse ProcessController
 	SoundRecorder Magnify DiskProbe AboutHaiku StyledEdit Installer Workspaces
-	$(X86_ONLY)Cortex $(X86_ONLY)CortexAddOnHost MediaPlayer DeskCalc MidiPlayer
+	$(X86_ONLY)Cortex MediaPlayer DeskCalc MidiPlayer
 	Icon-O-Matic Mail CDPlayer NetworkStatus TV
 ;
 BEOS_PREFERENCES = Appearance Backgrounds DataTranslations E-mail FileTypes
@@ -52,7 +53,7 @@ BEOS_PREFERENCES = Appearance Backgrounds DataTranslations E-mail FileTypes
 	Time VirtualMemory
 ;
 BEOS_DEMOS = BitmapDrawing Chart Clock FontDemo $(X86_ONLY)GLTeapot PictureTest
-	Playground
+	Playground Mandelbrot GLDirectMode
 ;
 BEOS_SYSTEM_LIB = libbe.so $(HAIKU_LIBSTDC++) libmedia.so libtracker.so
 	libtranslation.so libnetwork.so libdebug.so libbsd.so libmail.so
@@ -70,8 +71,8 @@ BEOS_NETWORK_DATALINK_PROTOCOLS = ethernet_frame <module>arp loopback_frame ipv4
 #BEOS_NETWORK_PPP = ipcp modem pap pppoe ;
 BEOS_NETWORK_PROTOCOLS = ipv4 tcp udp icmp ;
 
-BEOS_ADD_ONS_ACCELERANTS = $(X86_ONLY)radeon.accelerant $(X86_ONLY)nv.accelerant
-	$(X86_ONLY)mga.accelerant $(X86_ONLY)nm.accelerant
+BEOS_ADD_ONS_ACCELERANTS = $(X86_ONLY)radeon.accelerant $(X86_ONLY)nvidia.accelerant
+	$(X86_ONLY)matrox.accelerant $(X86_ONLY)neomagic.accelerant
 	$(X86_ONLY)intel_extreme.accelerant vesa.accelerant
 	#$(X86_ONLY)vmware.accelerant
 ;
@@ -103,8 +104,8 @@ BEOS_ADD_ONS_PRINT_TRANSPORT = HP\ JetDirect IPP LPR Parallel\ Port
 ;
 BEOS_ADD_ONS_SCREENSAVERS = Haiku IFS ;
 BEOS_ADD_ONS_DRIVERS_AUDIO = auich auvia emuxki ;
-BEOS_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon.driver $(X86_ONLY)nv.driver
-	$(X86_ONLY)nm.driver $(X86_ONLY)mga.driver $(X86_ONLY)intel_extreme vesa
+BEOS_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon $(X86_ONLY)nvidia
+	$(X86_ONLY)neomagic $(X86_ONLY)matrox $(X86_ONLY)intel_extreme vesa
 	#$(X86_ONLY)vmware
 ;
 BEOS_ADD_ONS_DRIVERS_MIDI = emuxki ;

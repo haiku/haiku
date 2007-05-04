@@ -15,7 +15,7 @@
 #include <PCI.h>
 #include <OS.h>
 
-#define DRIVER_PREFIX "nm" // apsed
+#define DRIVER_PREFIX "neomagic"
 
 /*
 	Internal driver state (also for sharing info between driver and accelerant)

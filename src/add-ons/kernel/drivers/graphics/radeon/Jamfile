@@ -11,7 +11,7 @@ StaticLibrary libradeon.a :
 	utils.c
 ;
 
-KernelAddon radeon.driver :
+KernelAddon radeon :
 	driver.c
 	agp.c
 	bios.c
@@ -30,9 +30,9 @@ KernelAddon radeon.driver :
 #Package haiku-radeon-cvs :
 #	README.html UPDATE.html ;
 Package haiku-radeon-cvs :
-	radeon.driver : 
+	radeon : 
 	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-radeon-cvs : graphics radeon.driver ;
+PackageDriverSymLink haiku-radeon-cvs : graphics radeon ;
 #Package haiku-radeon-cvs :
 #	radeon.settings :
 #	boot home config settings kernel drivers ;

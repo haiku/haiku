@@ -18,7 +18,7 @@
 #include <OS.h>
 #include "AGP.h"
 
-#define DRIVER_PREFIX "nv" // apsed
+#define DRIVER_PREFIX "nvidia" // apsed
 #define DEVICE_FORMAT "%04x_%04x_%02x%02x%02x" // apsed
 
 /*

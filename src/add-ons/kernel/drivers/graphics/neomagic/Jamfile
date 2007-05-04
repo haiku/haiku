@@ -5,17 +5,17 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics neomagic ] ;
 
-KernelAddon nm.driver :
+KernelAddon neomagic :
 	driver.c
 ;
 
 Package haiku-neomagic-cvs :
 	README.html UPDATE.html ;
 Package haiku-neomagic-cvs :
-	nm.driver : 
+	neomagic : 
 	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-neomagic-cvs : graphics nm.driver ;
+PackageDriverSymLink haiku-neomagic-cvs : graphics neomagic ;
 Package haiku-neomagic-cvs :
-	nm.settings :
+	neomagic.settings :
 	boot home config settings kernel drivers ;
 

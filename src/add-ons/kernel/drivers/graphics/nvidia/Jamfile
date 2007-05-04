@@ -5,17 +5,17 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics nvidia ] ;
 
-KernelAddon nv.driver :
+KernelAddon nvidia :
 	driver.c
 ;
 
 Package haiku-nvidia-cvs :
 	README.html UPDATE.html ;
 Package haiku-nvidia-cvs :
-	nv.driver : 
+	nvidia : 
 	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-nvidia-cvs : graphics nv.driver ;
+PackageDriverSymLink haiku-nvidia-cvs : graphics nvidia ;
 Package haiku-nvidia-cvs :
-	nv.settings :
+	nvidia.settings :
 	boot home config settings kernel drivers ;
 
