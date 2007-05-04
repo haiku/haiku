@@ -236,7 +236,7 @@ TCPEndpoint::TCPEndpoint(net_socket *socket)
 	fRoundTripTime(TCP_INITIAL_RTT / kTimestampFactor),
 	fRoundTripDeviation(TCP_INITIAL_RTT / kTimestampFactor),
 	fRetransmitTimeout(TCP_INITIAL_RTT),
-	fReceivedTSval(0),
+	fReceivedTimestamp(0),
 	fCongestionWindow(0),
 	fSlowStartThreshold(0),
 	fState(CLOSED),
@@ -1120,8 +1120,8 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 	if ((fOptions & TCP_NOOPT) == 0) {
 		if (fFlags & FLAG_OPTION_TIMESTAMP) {
 			segment.options |= TCP_HAS_TIMESTAMPS;
-			segment.TSecr = fReceivedTSval;
-			segment.TSval = tcp_now();
+			segment.TimestampReply = fReceivedTimestamp;
+			segment.TimestampValue = tcp_now();
 		}
 
 		if ((segment.flags & TCP_FLAG_SYNCHRONIZE)
@@ -1579,7 +1579,7 @@ TCPEndpoint::_UpdateTimestamps(tcp_segment_header &segment,
 
 		if ((fLastAcknowledgeSent >= sequence
 				&& fLastAcknowledgeSent < (sequence + segmentLength)))
-			fReceivedTSval = segment.TSval;
+			fReceivedTimestamp = segment.TimestampValue;
 	}
 }
 
@@ -1650,7 +1650,7 @@ TCPEndpoint::_PrepareReceivePath(tcp_segment_header &segment)
 
 		if (segment.options & TCP_HAS_TIMESTAMPS) {
 			fFlags |= FLAG_OPTION_TIMESTAMP;
-			fReceivedTSval = segment.TSval;
+			fReceivedTimestamp = segment.TimestampValue;
 		} else
 			fFlags &= ~FLAG_OPTION_TIMESTAMP;
 	}
@@ -1715,7 +1715,7 @@ TCPEndpoint::_Acknowledged(tcp_segment_header &segment)
 		// this ACK acknowledged data
 
 		if (segment.options & TCP_HAS_TIMESTAMPS)
-			_UpdateSRTT(tcp_diff_timestamp(segment.TSecr));
+			_UpdateSRTT(tcp_diff_timestamp(segment.TimestampReply));
 		else {
 			// TODO Fallback to RFC 793 type estimation
 		}

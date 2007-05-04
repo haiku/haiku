@@ -162,7 +162,7 @@ class TCPEndpoint : public net_protocol, public ProtocolSocket {
 		int32			fRoundTripDeviation;
 		bigtime_t		fRetransmitTimeout;
 
-		uint32			fReceivedTSval;
+		uint32			fReceivedTimestamp;
 
 		uint32			fCongestionWindow;
 		uint32			fSlowStartThreshold;
