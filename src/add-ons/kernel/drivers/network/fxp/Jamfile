@@ -1,3 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel drivers network fxp ;
-
-SubInclude HAIKU_TOP src add-ons kernel drivers network fxp dev ;
