@@ -37,5 +37,5 @@ UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa ppc ] ;
 
 Addon Mesa\ Software\ Renderer :
 	MesaSoftwareRenderer.cpp
-	: libGL.so libmesa.a /system/lib/libbe.so
+	: libGL.so libmesa.a be
 ;
