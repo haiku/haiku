@@ -4,8 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 Application Mandelbrot : 
-	main.cpp
+	Mandelbrot.cpp
 	tsb.cpp
 	: be
 	: Mandelbrot.rdef ;
-
