@@ -45,9 +45,7 @@ struct glview_direct_info {
 	direct_buffer_info *direct_info;
 	bool direct_connected;
 	bool enable_direct_mode;
-	sem_id draw_sem;
-	int32 draw_lock;
-
+	
 	glview_direct_info();
 	~glview_direct_info();
 };
@@ -374,10 +372,7 @@ BGLView::lock_draw()
 	if (!info || !info->enable_direct_mode)
 		return;
 
-	if (atomic_add(&info->draw_lock, 1) > 0) {
-		while (acquire_sem(info->draw_sem) == B_INTERRUPTED)
-			;	
-	}	
+	m_drawLock.Lock();
 }
 
 
@@ -389,8 +384,7 @@ BGLView::unlock_draw()
 	if (!info || !info->enable_direct_mode)
 		return;
 	
-	if (atomic_add(&info->draw_lock, -1) > 1)
-		release_sem(info->draw_sem);
+	m_drawLock.Unlock();
 }
 
 
@@ -551,14 +545,11 @@ glview_direct_info::glview_direct_info()
 	direct_info = (direct_buffer_info *)calloc(1, B_PAGE_SIZE);
 	direct_connected = false;
 	enable_direct_mode = false;
-	draw_sem = create_sem(0, "glview_draw_sem");
-	draw_lock = 0;
 }
 
 
 glview_direct_info::~glview_direct_info()
 {
 	free(direct_info);
-	delete_sem(draw_sem);
 }
 
