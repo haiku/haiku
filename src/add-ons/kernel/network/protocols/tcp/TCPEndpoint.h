@@ -36,6 +36,7 @@ public:
 	void Signal();
 
 private:
+	int32 fCondition;
 	sem_id fSem;
 };
 

@@ -171,6 +171,7 @@ state_needs_finish(int32 state)
 
 WaitList::WaitList(const char *name)
 {
+	fCondition = 0;
 	fSem = create_sem(0, name);
 }
 
@@ -192,11 +193,17 @@ status_t
 WaitList::Wait(RecursiveLocker &locker, bigtime_t timeout, bool wakeNext)
 {
 	locker.Unlock();
-	status_t status = acquire_sem_etc(fSem, 1, B_ABSOLUTE_TIMEOUT
-		| B_CAN_INTERRUPT, timeout);
+
+	status_t status = B_OK;
+
+	while (status == B_OK && !atomic_test_and_set(&fCondition, 0, 1))
+		status = acquire_sem_etc(fSem, 1, B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT,
+			timeout);
+
 	locker.Lock();
-	if (wakeNext && status == B_OK)
+	if (status == B_OK && wakeNext)
 		Signal();
+
 	return status;
 }
 
@@ -204,8 +211,8 @@ WaitList::Wait(RecursiveLocker &locker, bigtime_t timeout, bool wakeNext)
 void
 WaitList::Signal()
 {
-	release_sem_etc(fSem, 1, B_DO_NOT_RESCHEDULE
-		| B_RELEASE_IF_WAITING_ONLY);
+	atomic_or(&fCondition, 1);
+	release_sem_etc(fSem, 1, B_DO_NOT_RESCHEDULE | B_RELEASE_IF_WAITING_ONLY);
 }
 
 
@@ -418,7 +425,8 @@ TCPEndpoint::Connect(const sockaddr *address)
 	}
 
 	status = _WaitForEstablished(locker, absolute_timeout(timeout));
-	TRACE("  Connect(): Connection complete: %s", strerror(status));
+	TRACE("  Connect(): Connection complete: %s (timeout was %llu)",
+		strerror(status), timeout);
 	return posix_error(status);
 }
 
