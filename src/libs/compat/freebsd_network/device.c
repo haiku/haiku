@@ -13,17 +13,15 @@
 #include <stdlib.h>
 #include <Drivers.h>
 
-#include <compat/sys/bus.h>
+#include <compat/sys/haiku-module.h>
+
 #include <compat/sys/mbuf.h>
 
 
 #define MAX_DEVICES		8
 
 
-int32 api_version = B_CUR_DRIVER_API_VERSION;
-
-
-static char *sDevNameList[MAX_DEVICES + 1];
+char *gDevNameList[MAX_DEVICES + 1];
 
 
 static status_t
@@ -106,7 +104,7 @@ compat_control(void *cookie, uint32 op, void *arg, size_t len)
 }
 
 
-static device_hooks sDeviceHooks = {
+device_hooks gDeviceHooks = {
 	compat_open,
 	compat_close,
 	compat_free,
@@ -116,34 +114,29 @@ static device_hooks sDeviceHooks = {
 };
 
 
-static int
-_device_probe(device_t dev)
-{
-	device_method_t *methods = __fbsd_driver()->methods;
-	int i;
-
-	for (i = 0; methods[i].name != NULL; i++) {
-		if (!strcmp(methods[i].name, "device_probe"))
-			return methods[i].method(dev);
-	}
-
-	panic("fsbd compat layer: method missing, device_probe");
-	return -1;
-}
-
-
 status_t
-init_hardware()
+_fbsd_init_hardware(driver_t *driver)
 {
+	device_method_signature_t probe = NULL;
 	struct device fakeDevice;
 	pci_info info;
 	int i;
+
+	for (i = 0; probe == NULL && driver->methods[i].name != NULL; i++) {
+		if (strcmp(driver->methods[i].name, "device_probe") == 0)
+			probe = driver->methods[i].method;
+	}
+
+	if (probe == NULL) {
+		dprintf("_fbsd_init_hardware: driver has no device_probe method.\n");
+		return B_ERROR;
+	}
 
 	memset(&fakeDevice, 0, sizeof(struct device));
 	fakeDevice.pciInfo = &info;
 
 	for (i = 0; gPci->get_nth_pci_info(i, &info) == B_OK; i++) {
-		if (_device_probe(&fakeDevice) >= 0)
+		if (probe(&fakeDevice) >= 0)
 			return B_OK;
 	}
 
@@ -152,27 +145,13 @@ init_hardware()
 
 
 status_t
-init_driver()
+_fbsd_init_driver(driver_t *driver)
 {
 	return B_ERROR;
 }
 
 
 void
-uninit_driver()
+_fbsd_uninit_driver(driver_t *driver)
 {
-}
-
-
-const char **
-publish_devices()
-{
-	return (const char **)sDevNameList;
-}
-
-
-device_hooks *
-find_device(const char *name)
-{
-	return &sDeviceHooks;
 }

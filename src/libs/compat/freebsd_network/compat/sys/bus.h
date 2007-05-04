@@ -6,6 +6,8 @@
 #include <sys/systm.h>
 #include <sys/sysctl.h>
 
+#include <sys/haiku-module.h>
+
 // TODO per platform, these are x86
 typedef uint32_t	bus_addr_t;
 typedef uint32_t	bus_size_t;
@@ -85,26 +87,6 @@ bus_space_write_4(bus_space_tag_t tag, bus_space_handle_t handle,
 }
 
 
-typedef struct device *device_t;
-typedef struct devclass *devclass_t;
-
-typedef int (*device_method_signature_t)(device_t dev);
-
-struct device_method {
-	const char *name;
-	device_method_signature_t method;
-};
-
-typedef struct device_method device_method_t;
-
-#define DEVMETHOD(name, func)	{ #name, (device_method_signature_t)func }
-
-typedef struct {
-	const char *name;
-	device_method_t *methods;
-	size_t size;
-} driver_t;
-
 enum intr_type {
 	INTR_TYPE_NET	= 4,
 	INTR_MPSAFE		= 512,
@@ -132,22 +114,6 @@ bus_alloc_resource_any(device_t dev, int type, int *rid, uint32 flags)
 int bus_setup_intr(device_t dev, struct resource *r, int flags,
 	driver_intr_t handler, void *arg, void **cookiep);
 int bus_teardown_intr(device_t dev, struct resource *r, void *cookie);
-
-#define BUS_PROBE_DEFAULT		20
-
-#define DRIVER_MODULE_NAME(name, busname) \
-	__fbsd_##name##busname
-
-driver_t *__fbsd_driver(void);
-
-#define HAIKU_FBSD_DRIVER_GLUE(name, busname) \
-	driver_t *__fbsd_driver() { \
-		extern driver_t *DRIVER_MODULE_NAME(name, busname); \
-		return DRIVER_MODULE_NAME(name, busname); \
-	}
-
-#define DRIVER_MODULE(name, busname, driver, devclass, evh, arg) \
-	driver_t *DRIVER_MODULE_NAME(name, busname) = &(driver)
 
 const char *device_get_name(device_t dev);
 const char *device_get_nameunit(device_t dev);
