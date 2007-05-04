@@ -55,8 +55,10 @@ struct net_device_module_info {
 	status_t	(*set_promiscuous)(struct net_device *device, bool promiscuous);
 	status_t	(*set_media)(struct net_device *device, uint32 media);
 
-	status_t	(*add_multi)(struct net_device *device, const sockaddr *);
-	status_t	(*rem_multi)(struct net_device *device, const sockaddr *);
+	status_t	(*add_multicast)(struct net_device *device,
+					const sockaddr *address);
+	status_t	(*remove_multicast)(struct net_device *device,
+					const sockaddr *address);
 };
 
 #endif	// NET_DEVICE_H

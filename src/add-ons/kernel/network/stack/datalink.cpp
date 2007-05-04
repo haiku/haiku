@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Hugo Santos, hugosantos@gmail.com
  */
 
 
@@ -804,7 +805,8 @@ interface_protocol_join_multicast(net_datalink_protocol *_protocol,
 	const sockaddr *address)
 {
 	interface_protocol *protocol = (interface_protocol *)_protocol;
-	return protocol->device_module->add_multi(protocol->device, address);
+
+	return protocol->device_module->add_multicast(protocol->device, address);
 }
 
 
@@ -813,7 +815,9 @@ interface_protocol_leave_multicast(net_datalink_protocol *_protocol,
 	const sockaddr *address)
 {
 	interface_protocol *protocol = (interface_protocol *)_protocol;
-	return protocol->device_module->rem_multi(protocol->device, address);
+
+	return protocol->device_module->remove_multicast(protocol->device,
+		address);
 }
 
 

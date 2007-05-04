@@ -380,7 +380,7 @@ ethernet_set_media(net_device *device, uint32 media)
 
 
 status_t
-ethernet_add_multi(struct net_device *_device, const sockaddr *_address)
+ethernet_add_multicast(struct net_device *_device, const sockaddr *_address)
 {
 	ethernet_device *device = (ethernet_device *)_device;
 
@@ -396,7 +396,7 @@ ethernet_add_multi(struct net_device *_device, const sockaddr *_address)
 
 
 status_t
-ethernet_rem_multi(struct net_device *_device, const sockaddr *_address)
+ethernet_remove_multicast(struct net_device *_device, const sockaddr *_address)
 {
 	ethernet_device *device = (ethernet_device *)_device;
 
@@ -477,8 +477,8 @@ net_device_module_info sEthernetModule = {
 	ethernet_set_mtu,
 	ethernet_set_promiscuous,
 	ethernet_set_media,
-	ethernet_add_multi,
-	ethernet_rem_multi,
+	ethernet_add_multicast,
+	ethernet_remove_multicast,
 };
 
 module_info *modules[] = {

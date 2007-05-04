@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -193,14 +193,14 @@ loopback_set_media(net_device *device, uint32 media)
 
 
 status_t
-loopback_add_multi(net_device *device, const sockaddr *address)
+loopback_add_multicast(net_device *device, const sockaddr *address)
 {
 	return B_OK;
 }
 
 
 status_t
-loopback_rem_multi(net_device *device, const sockaddr *address)
+loopback_remove_multicast(net_device *device, const sockaddr *address)
 {
 	return B_OK;
 }
@@ -236,8 +236,8 @@ net_device_module_info sLoopbackModule = {
 	loopback_set_mtu,
 	loopback_set_promiscuous,
 	loopback_set_media,
-	loopback_add_multi,
-	loopback_rem_multi,
+	loopback_add_multicast,
+	loopback_remove_multicast,
 };
 
 module_info *modules[] = {
