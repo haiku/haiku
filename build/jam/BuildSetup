@@ -478,10 +478,9 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 		HOST_DEFINES += __POWERPC__ ;
 	}
 
-	# Supposing this is a glibc platform, let's try to get large file support
-	HOST_DEFINES +=
-		_LARGEFILE_SOURCE _LARGEFILE64_SOURCE _FILE_OFFSET_BITS=64
-	;
+	# Supposing this is a glibc platform, let's try to get features like large
+	# file support, ISO C 99 definitions, etc.
+	HOST_DEFINES += _GNU_SOURCE ;
 
 	# On Linux with xattr support we can use it for our attribute emulation,
 	# which is somewhat more robust.
