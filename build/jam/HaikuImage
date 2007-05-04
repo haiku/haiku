@@ -53,7 +53,7 @@ BEOS_PREFERENCES = Appearance Backgrounds DataTranslations E-mail FileTypes
 	Time VirtualMemory
 ;
 BEOS_DEMOS = BitmapDrawing Chart Clock FontDemo $(X86_ONLY)GLTeapot PictureTest
-	Playground Mandelbrot GLDirectMode
+	Playground Mandelbrot $(X86_ONLY)GLDirectMode
 ;
 BEOS_SYSTEM_LIB = libbe.so $(HAIKU_LIBSTDC++) libmedia.so libtracker.so
 	libtranslation.so libnetwork.so libdebug.so libbsd.so libmail.so
