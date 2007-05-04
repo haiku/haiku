@@ -118,8 +118,8 @@ struct tcp_option {
 		uint8	window_shift;
 		uint16	max_segment_size;
 		struct {
-			uint32 TimestampValue;
-			uint32 TimestampReply;
+			uint32 timestamp_value;
+			uint32 timestamp_reply;
 		} timestamp;
 		tcp_sack sack[0];
 	};
@@ -161,8 +161,8 @@ struct tcp_segment_header {
 	uint8	window_shift;
 	uint16	max_segment_size;
 
-	uint32	TimestampValue;
-	uint32	TimestampReply;
+	uint32	timestamp_value;
+	uint32	timestamp_reply;
 
 	tcp_sack	*sacks;
 	int			sack_count;

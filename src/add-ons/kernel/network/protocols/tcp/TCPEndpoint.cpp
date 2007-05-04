@@ -1120,8 +1120,8 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 	if ((fOptions & TCP_NOOPT) == 0) {
 		if (fFlags & FLAG_OPTION_TIMESTAMP) {
 			segment.options |= TCP_HAS_TIMESTAMPS;
-			segment.TimestampReply = fReceivedTimestamp;
-			segment.TimestampValue = tcp_now();
+			segment.timestamp_reply = fReceivedTimestamp;
+			segment.timestamp_value = tcp_now();
 		}
 
 		if ((segment.flags & TCP_FLAG_SYNCHRONIZE)
@@ -1579,7 +1579,7 @@ TCPEndpoint::_UpdateTimestamps(tcp_segment_header &segment,
 
 		if ((fLastAcknowledgeSent >= sequence
 				&& fLastAcknowledgeSent < (sequence + segmentLength)))
-			fReceivedTimestamp = segment.TimestampValue;
+			fReceivedTimestamp = segment.timestamp_value;
 	}
 }
 
@@ -1650,7 +1650,7 @@ TCPEndpoint::_PrepareReceivePath(tcp_segment_header &segment)
 
 		if (segment.options & TCP_HAS_TIMESTAMPS) {
 			fFlags |= FLAG_OPTION_TIMESTAMP;
-			fReceivedTimestamp = segment.TimestampValue;
+			fReceivedTimestamp = segment.timestamp_value;
 		} else
 			fFlags &= ~FLAG_OPTION_TIMESTAMP;
 	}
@@ -1715,7 +1715,7 @@ TCPEndpoint::_Acknowledged(tcp_segment_header &segment)
 		// this ACK acknowledged data
 
 		if (segment.options & TCP_HAS_TIMESTAMPS)
-			_UpdateSRTT(tcp_diff_timestamp(segment.TimestampReply));
+			_UpdateSRTT(tcp_diff_timestamp(segment.timestamp_reply));
 		else {
 			// TODO Fallback to RFC 793 type estimation
 		}
