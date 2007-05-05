@@ -30,4 +30,7 @@
 
 #define MCLBYTES	(1 << MCLSHIFT)
 
+#define ALIGN_BYTES		(sizeof(int) - 1)
+#define ALIGN(x)		((((unsigned)x) + ALIGN_BYTES) & ~ALIGN_BYTES)
+
 #endif

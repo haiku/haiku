@@ -122,13 +122,18 @@ _fbsd_init_hardware(driver_t *driver)
 	pci_info info;
 	int i;
 
+	dprintf("%s: init_hardware(%p)\n", gDriverName, driver);
+
+	if (get_module(B_PCI_MODULE_NAME, (module_info **)&gPci) < B_OK)
+		return B_ERROR;
+
 	for (i = 0; probe == NULL && driver->methods[i].name != NULL; i++) {
 		if (strcmp(driver->methods[i].name, "device_probe") == 0)
 			probe = driver->methods[i].method;
 	}
 
 	if (probe == NULL) {
-		dprintf("_fbsd_init_hardware: driver has no device_probe method.\n");
+		dprintf("%s: driver has no device_probe method.\n", gDriverName);
 		return B_ERROR;
 	}
 
@@ -136,9 +141,16 @@ _fbsd_init_hardware(driver_t *driver)
 	fakeDevice.pciInfo = &info;
 
 	for (i = 0; gPci->get_nth_pci_info(i, &info) == B_OK; i++) {
-		if (probe(&fakeDevice) >= 0)
+		if (probe(&fakeDevice) >= 0) {
+			dprintf("%s, found %s at %i\n", gDriverName,
+				fakeDevice.description, i);
+			put_module(B_PCI_MODULE_NAME);
 			return B_OK;
+		}
 	}
+
+	dprintf("%s: no hardware found.\n", gDriverName);
+	put_module(B_PCI_MODULE_NAME);
 
 	return B_ERROR;
 }
@@ -147,6 +159,8 @@ _fbsd_init_hardware(driver_t *driver)
 status_t
 _fbsd_init_driver(driver_t *driver)
 {
+	dprintf("%s: init_driver(%p)\n", gDriverName, driver);
+
 	return B_ERROR;
 }
 
@@ -154,4 +168,5 @@ _fbsd_init_driver(driver_t *driver)
 void
 _fbsd_uninit_driver(driver_t *driver)
 {
+	dprintf("%s: uninit_driver(%p)\n", gDriverName, driver);
 }

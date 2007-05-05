@@ -87,6 +87,20 @@ bus_space_write_4(bus_space_tag_t tag, bus_space_handle_t handle,
 }
 
 
+#define BUS_SPACE_BARRIER_READ		1
+#define BUS_SPACE_BARRIER_WRITE		2
+
+static inline void
+bus_space_barrier(bus_space_tag_t tag, bus_space_handle_t handle,
+	bus_size_t offset, bus_size_t len, int flags)
+{
+	if (flags & BUS_SPACE_BARRIER_READ)
+		__asm__ __volatile__ ("lock; addl $0,0(%%esp)" : : : "memory");
+	else
+		__asm__ __volatile__ ("" : : : "memory");
+}
+
+
 enum intr_type {
 	INTR_TYPE_NET	= 4,
 	INTR_MPSAFE		= 512,

@@ -11,4 +11,7 @@
 #define PCIM_CMD_MEMEN		0x0002
 #define PCIM_CMD_MWRICEN	0x0010
 
+#define PCIR_BARS		0x10
+#define PCIR_BAR(x)		(PCIR_BARS + (x) * 4)
+
 #endif

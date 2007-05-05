@@ -28,6 +28,14 @@
 #define IFF_LINK0			0x40000
 
 
+#define LINK_STATE_UNKNOWN	0
+#define LINK_STATE_DOWN		1
+#define LINK_STATE_UP		2
+
+
+#define IFQ_MAXLEN			50
+
+
 struct ifmediareq {
 	char	ifm_name[IFNAMSIZ];	/* if name, e.g. "en0" */
 	int	ifm_current;		/* current media options */

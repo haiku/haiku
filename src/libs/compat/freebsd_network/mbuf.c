@@ -147,6 +147,15 @@ m_gethdr(int how, short type)
 
 
 void
+m_clget(struct mbuf *m, int how)
+{
+	m->m_ext.ext_buf = NULL;
+	/* called checks for errors by looking for M_EXT */
+	construct_ext_mbuf(m, how);
+}
+
+
+void
 m_freem(struct mbuf *mb)
 {
 	while (mb)

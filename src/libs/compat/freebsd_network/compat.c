@@ -14,6 +14,7 @@
 
 #include <KernelExport.h>
 
+#include <compat/machine/resource.h>
 #include <compat/dev/pci/pcivar.h>
 #include <compat/sys/bus.h>
 
@@ -92,6 +93,34 @@ pci_enable_busmaster(device_t dev)
 
 
 int
+pci_enable_io(device_t dev, int space)
+{
+	/* adapted from FreeBSD's pci_enable_io_method */
+	uint16_t command;
+	int bit = 0;
+
+	switch (space) {
+	case SYS_RES_IOPORT:
+		bit = PCI_command_io;
+		break;
+	case SYS_RES_MEMORY:
+		bit = PCI_command_memory;
+		break;
+	default:
+		return EINVAL;
+	}
+
+	pci_set_command_bit(dev, bit);
+	if (pci_read_config(dev, PCI_command, 2) & bit)
+		return 0;
+
+	device_printf(dev, "pci_enable_io(%d) failed.\n", space);
+
+	return ENXIO;
+}
+
+
+int
 device_printf(device_t dev, const char *format, ...)
 {
 	char buf[256];
@@ -100,7 +129,7 @@ device_printf(device_t dev, const char *format, ...)
 	vsnprintf(buf, sizeof(buf), format, vl);
 	va_end(vl);
 
-	dprintf("[...] %s", buf);
+	dprintf("[%s...] %s", gDriverName, buf);
 	return 0;
 }
 
@@ -162,6 +191,21 @@ printf(const char *format, ...)
 
 	dprintf(buf);
 	return 0;
+}
+
+
+int
+ffs(int value)
+{
+	int i = 1;
+
+	if (value == 0)
+		return 0;
+
+	for (; !(value & 1); i++)
+		value >>= 1;
+
+	return i;
 }
 
 

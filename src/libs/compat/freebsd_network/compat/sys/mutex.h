@@ -43,6 +43,13 @@ static inline void mtx_unlock(struct mtx *mtx)
 }
 
 
+static inline int mtx_initialized(struct mtx *mtx)
+{
+	/* XXX */
+	return 1;
+}
+
+
 void mtx_init(struct mtx *m, const char *name, const char *type, int opts);
 void mtx_destroy(struct mtx *m);
 

@@ -7,6 +7,8 @@
 #define MLEN		((int)(MSIZE - sizeof(struct m_hdr)))
 #define MHLEN		((int)(MSIZE - sizeof(struct pkthdr)))
 
+#define MINCLSIZE	(MHLEN + 1)
+
 #ifdef _KERNEL
 
 struct m_hdr {
@@ -82,6 +84,10 @@ struct mbuf {
 #define CSUM_PSEUDO_HDR	0x0800
 #define CSUM_DELAY_DATA	(CSUM_TCP | CSUM_UDP)
 
+#define MGET(m, how, type)		((m) = m_get((how), (type)))
+#define MGETHDR(m, how, type)	((m) = m_gethdr((how), (type)))
+#define MCLGET(m, how)			m_clget((m), (how))
+
 struct mbuf *m_getcl(int how, short type, int flags);
 void m_freem(struct mbuf *mbuf);
 struct mbuf *m_free(struct mbuf *m);
@@ -94,6 +100,7 @@ void m_copydata(const struct mbuf *m, int off, int len, caddr_t cp);
 
 struct mbuf *m_get(int how, short type);
 struct mbuf *m_gethdr(int how, short type);
+void m_clget(struct mbuf *m, int how);
 
 #define mtod(m, type)	(type)((m)->m_data)
 

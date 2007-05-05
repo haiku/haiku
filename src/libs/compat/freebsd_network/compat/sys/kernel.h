@@ -28,7 +28,8 @@ struct __system_init {
 #define SYSINIT(uniquifier, subsystem, order, func, ident) \
 	struct __system_init __init_##uniquifier = { func }
 
-#define __printflike(a, b) __attribute__ ((format (__printf__, a, b)))
+#define __packed			__attribute__ ((packed))
+#define __printflike(a, b)	__attribute__ ((format (__printf__, a, b)))
 
 int printf(const char *format, ...) __printflike(1, 2);
 

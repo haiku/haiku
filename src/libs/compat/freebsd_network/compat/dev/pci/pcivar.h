@@ -4,6 +4,7 @@
 #include <sys/bus.h>
 
 int pci_enable_busmaster(device_t dev);
+int pci_enable_io(device_t dev, int reg);
 
 uint32_t pci_get_devid(device_t dev);
 void pci_set_intpin(device_t dev, uint8_t pin);

@@ -86,6 +86,8 @@ struct	carp_if;
 
 #include <altq/if_altq.h>
 
+#include <net/if_dl.h> /* for sockaddr_dl */
+
 TAILQ_HEAD(ifnethead, ifnet);	/* we use TAILQs so that the order of */
 TAILQ_HEAD(ifaddrhead, ifaddr);	/* instantiation is preserved in the list */
 TAILQ_HEAD(ifprefixhead, ifprefix);
@@ -180,6 +182,9 @@ struct ifnet {
 	struct	task if_starttask;	/* task for IFF_NEEDSGIANT */
 	struct	task if_linktask;	/* task for link change events */
 	struct	mtx if_addr_mtx;	/* mutex to protect address lists */
+
+	/* Haiku additions */
+	struct sockaddr_dl if_lladdr;
 };
 
 typedef void if_init_f_t(void *);
@@ -657,8 +662,7 @@ typedef	void if_com_free_t(void *com, u_char type);
 void	if_register_com_alloc(u_char type, if_com_alloc_t *a, if_com_free_t *f);
 void	if_deregister_com_alloc(u_char type);
 
-#define IF_LLADDR(ifp)							\
-    LLADDR((struct sockaddr_dl *) ifaddr_byindex((ifp)->if_index)->ifa_addr)
+#define IF_LLADDR(ifp)		LLADDR(&ifp->if_lladdr)
 
 #ifdef DEVICE_POLLING
 enum poll_cmd {	POLL_ONLY, POLL_AND_CHECK_STATUS };
