@@ -413,6 +413,7 @@ AboutView::AboutView(const BRect &rect)
 		"David Reid\n"
 		"Daniel Reinhold\n"
 		"François Revol\n"
+		"Samuel Rodriguez Perez\n"
 		"Thomas Roell\n"
 		"Rafael Romo\n"
 		"Reznikov Sergei\n"
