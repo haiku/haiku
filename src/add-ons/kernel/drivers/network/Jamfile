@@ -12,7 +12,9 @@ SubInclude HAIKU_TOP src add-ons kernel drivers network via-rhine ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network vlance ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network wb840 ;
 
+# FreeBSD 6.2 drivers
 SubInclude HAIKU_TOP src add-ons kernel drivers network ipro100 ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network pcnet ;
 
 SubIncludeGPL HAIKU_TOP src add-ons kernel drivers network bcm440x ;
 SubIncludeGPL HAIKU_TOP src add-ons kernel drivers network bcm570x ;
