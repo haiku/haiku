@@ -17,7 +17,9 @@ class BVolume;
 
 class BStatable {
 	public:
+#if __GNUC__ > 3
 		virtual ~BStatable();
+#endif
 
 		virtual status_t GetStat(struct stat *st) const = 0;
 

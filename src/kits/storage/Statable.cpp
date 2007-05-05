@@ -20,9 +20,11 @@
 #include <sys/stat.h>
 
 
+#if __GNUC__ > 3
 BStatable::~BStatable()
 {
 }
+#endif
 
 
 /*!	\fn status_t GetStat(struct stat *st) const
