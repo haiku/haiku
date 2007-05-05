@@ -25,7 +25,7 @@ struct ifnet;
 
 struct device {
 	int				devId;
-	pci_info *		pciInfo;
+	pci_info		pciInfo;
 
 	int32			flags;
 

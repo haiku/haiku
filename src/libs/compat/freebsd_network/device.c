@@ -12,10 +12,12 @@
 
 #include <stdlib.h>
 #include <Drivers.h>
+#include <ether_driver.h>
 
 #include <compat/sys/haiku-module.h>
 
 #include <compat/sys/mbuf.h>
+#include <compat/net/ethernet.h>
 
 
 #define MAX_DEVICES		8
@@ -57,16 +59,15 @@ compat_read(void *cookie, off_t position, void *buf, size_t *numBytes)
 	struct mbuf *mb;
 	size_t len;
 
-	if (atomic_or(&dev->flags, 0) & DEVICE_CLOSED)
+	if (dev->flags & DEVICE_CLOSED)
 		return B_INTERRUPTED;
 
-	if (atomic_or(&dev->flags, 0) & DEVICE_NON_BLOCK)
+	if (dev->flags & DEVICE_NON_BLOCK)
 		semFlags |= B_RELATIVE_TIMEOUT;
-
 
 	do {
 		status = acquire_sem_etc(dev->receive_sem, 1, semFlags, 0);
-		if (atomic_or(&dev->flags, 0) & DEVICE_CLOSED)
+		if (dev->flags & DEVICE_CLOSED)
 			return B_INTERRUPTED;
 
 		if (status == B_WOULD_BLOCK) {
@@ -80,7 +81,12 @@ compat_read(void *cookie, off_t position, void *buf, size_t *numBytes)
 
 	len = min_c(max_c((size_t)mb->m_len, 0), *numBytes);
 
-	// TODO we need something that cna join various chunks
+	mb = m_defrag(mb, 0);
+	if (mb == NULL) {
+		*numBytes = 0;
+		return B_NO_MEMORY;
+	}
+
 	memcpy(buf, mtod(mb, const void *), len);
 	*numBytes = len;
 
@@ -93,14 +99,65 @@ static status_t
 compat_write(void *cookie, off_t position, const void *buffer,
 	size_t *numBytes)
 {
-	return B_ERROR;
+	device_t dev = cookie;
+	struct mbuf *mb;
+
+	mb = m_getcl(0, MT_DATA, 0);
+	if (mb == NULL)
+		return ENOBUFS;
+
+	/* if we are waiting, check after if the ifp is still valid */
+
+	mb->m_len = min_c(*numBytes, (size_t)MCLBYTES);
+	memcpy(mtod(mb, void *), buffer, mb->m_len);
+
+	return dev->ifp->if_output(dev->ifp, mb, NULL, NULL);
 }
 
 
 static status_t
 compat_control(void *cookie, uint32 op, void *arg, size_t len)
 {
-	return B_ERROR;
+	device_t dev = cookie;
+
+	switch (op) {
+		case ETHER_INIT:
+			return B_OK;
+
+		case ETHER_GETADDR:
+			memcpy(arg, IF_LLADDR(dev->ifp), ETHER_ADDR_LEN);
+			return B_OK;
+
+		case ETHER_NONBLOCK:
+			if (*(int32 *)arg)
+				dev->flags |= DEVICE_NON_BLOCK;
+			else
+				dev->flags &= ~DEVICE_NON_BLOCK;
+			return B_OK;
+
+		case ETHER_SETPROMISC:
+			/* TODO */
+			return B_ERROR;
+
+		case ETHER_GETFRAMESIZE:
+			*(uint32 *)arg = dev->ifp->if_mtu;
+			return B_OK;
+
+		case ETHER_ADDMULTI:
+		case ETHER_REMMULTI:
+			/* TODO */
+			return B_ERROR;
+
+		case ETHER_GET_LINK_STATE:
+			/* TODO */
+			return B_ERROR;
+
+		case ETHER_SET_LINK_STATE_SEM:
+			/* TODO */
+			return B_OK;
+	}
+
+	return B_BAD_VALUE;
 }
 
 
@@ -119,7 +176,6 @@ _fbsd_init_hardware(driver_t *driver)
 {
 	device_method_signature_t probe = NULL;
 	struct device fakeDevice;
-	pci_info info;
 	int i;
 
 	dprintf("%s: init_hardware(%p)\n", gDriverName, driver);
@@ -138,9 +194,8 @@ _fbsd_init_hardware(driver_t *driver)
 	}
 
 	memset(&fakeDevice, 0, sizeof(struct device));
-	fakeDevice.pciInfo = &info;
 
-	for (i = 0; gPci->get_nth_pci_info(i, &info) == B_OK; i++) {
+	for (i = 0; gPci->get_nth_pci_info(i, &fakeDevice.pciInfo) == B_OK; i++) {
 		if (probe(&fakeDevice) >= 0) {
 			dprintf("%s, found %s at %i\n", gDriverName,
 				fakeDevice.description, i);

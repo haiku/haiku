@@ -28,16 +28,16 @@ pci_module_info *gPci;
 uint32_t
 pci_read_config(device_t dev, int offset, int size)
 {
-	return gPci->read_pci_config(dev->pciInfo->bus, dev->pciInfo->device,
-		dev->pciInfo->function, offset, size);
+	return gPci->read_pci_config(dev->pciInfo.bus, dev->pciInfo.device,
+		dev->pciInfo.function, offset, size);
 }
 
 
 void
 pci_write_config(device_t dev, int offset, uint32_t value, int size)
 {
-	gPci->write_pci_config(dev->pciInfo->bus, dev->pciInfo->device,
-		dev->pciInfo->function, offset, size, value);
+	gPci->write_pci_config(dev->pciInfo.bus, dev->pciInfo.device,
+		dev->pciInfo.function, offset, size, value);
 }
 
 
