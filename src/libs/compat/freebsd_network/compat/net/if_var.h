@@ -105,6 +105,8 @@ struct	ifqueue {
 	struct	mtx ifq_mtx;
 };
 
+struct device;
+
 /*
  * Structure defining a network interface.
  *
@@ -185,6 +187,7 @@ struct ifnet {
 
 	/* Haiku additions */
 	struct sockaddr_dl if_lladdr;
+	struct device *if_dev;
 };
 
 typedef void if_init_f_t(void *);

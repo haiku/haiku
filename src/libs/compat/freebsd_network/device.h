@@ -42,8 +42,9 @@ struct device {
 
 
 enum {
-	DEVICE_CLOSED		= 1 << 0,
-	DEVICE_NON_BLOCK	= 1 << 1,
+	DEVICE_OPEN			= 1 << 0,
+	DEVICE_CLOSED		= 1 << 1,
+	DEVICE_NON_BLOCK	= 1 << 2,
 };
 
 
@@ -59,5 +60,8 @@ void uninit_bounce_pages(void);
 
 extern struct net_stack_module_info *gStack;
 extern pci_module_info *gPci;
+
+extern char *gDevNameList[];
+extern struct device *gDevices[];
 
 #endif

@@ -33,7 +33,7 @@ typedef struct device_method device_method_t;
 typedef struct {
 	const char *name;
 	device_method_t *methods;
-	size_t size;
+	size_t softc_size;
 } driver_t;
 
 #define BUS_PROBE_LOW_PRIORITY	10

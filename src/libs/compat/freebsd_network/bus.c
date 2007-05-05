@@ -183,7 +183,7 @@ bus_setup_intr(device_t dev, struct resource *res, int flags,
 
 	intr->handler = handler;
 	intr->arg = arg;
-	intr->irq = (int)res;
+	intr->irq = res->handle;
 
 	status = install_io_interrupt_handler(intr->irq, intr_wrapper, intr, 0);
 	if (status < B_OK) {
@@ -193,7 +193,7 @@ bus_setup_intr(device_t dev, struct resource *res, int flags,
 
 	*cookiep = intr;
 
-	return status;
+	return 0;
 }
 
 

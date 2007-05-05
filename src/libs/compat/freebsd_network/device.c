@@ -27,8 +27,13 @@ device_t gDevices[MAX_DEVICES];
 char *gDevNameList[MAX_DEVICES + 1];
 
 
+static device_probe_t  *sDeviceProbe;
+static device_attach_t *sDeviceAttach;
+static device_detach_t *sDeviceDetach;
+
+
 static device_t
-allocate_device()
+allocate_device(driver_t *driver)
 {
 	char semName[64];
 
@@ -40,8 +45,15 @@ allocate_device()
 
 	snprintf(semName, sizeof(semName), "%s rcv", gDriverName);
 
+	dev->softc = malloc(driver->softc_size);
+	if (dev->softc == NULL) {
+		free(dev);
+		return NULL;
+	}
+
 	dev->receive_sem = create_sem(0, semName);
 	if (dev->receive_sem < 0) {
+		free(dev->softc);
 		free(dev);
 		return NULL;
 	}
@@ -54,15 +66,55 @@ static void
 free_device(device_t dev)
 {
 	delete_sem(dev->receive_sem);
+	free(dev->softc);
 	free(dev);
+}
+
+
+static device_method_signature_t
+_resolve_method(driver_t *driver, const char *name)
+{
+	device_method_signature_t method = NULL;
+	int i;
+
+	for (i = 0; method == NULL && driver->methods[i].name != NULL; i++) {
+		if (strcmp(driver->methods[i].name, name) == 0)
+			method = driver->methods[i].method;
+	}
+
+	return method;
 }
 
 
 static status_t
 compat_open(const char *name, uint32 flags, void **cookie)
 {
+	status_t status;
+	device_t dev;
+	int i;
+
 	dprintf("%s, compat_open(%s, 0x%lx)\n", gDriverName, name, flags);
-	return B_ERROR;
+
+	for (i = 0; gDevNameList[i] != NULL; i++) {
+		if (strcmp(gDevNameList[i], name) == 0)
+			break;
+	}
+
+	if (gDevNameList[i] == NULL)
+		return B_ERROR;
+
+	dev = gDevices[i];
+
+	if (atomic_or(&dev->flags, DEVICE_OPEN) & DEVICE_OPEN)
+		return B_BUSY;
+
+	status = sDeviceAttach(dev);
+	if (status != 0)
+		dev->flags = 0;
+
+	*cookie = dev;
+
+	return status;
 }
 
 
@@ -210,21 +262,6 @@ device_hooks gDeviceHooks = {
 };
 
 
-static device_method_signature_t
-_resolve_method(driver_t *driver, const char *name)
-{
-	device_method_signature_t method = NULL;
-	int i;
-
-	for (i = 0; method == NULL && driver->methods[i].name != NULL; i++) {
-		if (strcmp(driver->methods[i].name, name) == 0)
-			method = driver->methods[i].method;
-	}
-
-	return method;
-}
-
-
 status_t
 _fbsd_init_hardware(driver_t *driver)
 {
@@ -264,16 +301,17 @@ _fbsd_init_hardware(driver_t *driver)
 status_t
 _fbsd_init_driver(driver_t *driver)
 {
-	device_probe_t *probe;
 	int i, ncards = 0;
 	status_t status;
 	device_t dev;
 
 	dprintf("%s: init_driver(%p)\n", gDriverName, driver);
 
-	probe = (device_probe_t *)_resolve_method(driver, "device_probe");
+	sDeviceProbe  = (device_probe_t  *)_resolve_method(driver, "device_probe");
+	sDeviceAttach = (device_attach_t *)_resolve_method(driver, "device_attach");
+	sDeviceDetach = (device_detach_t *)_resolve_method(driver, "device_detach");
 
-	dev = allocate_device();
+	dev = allocate_device(driver);
 	if (dev == NULL)
 		return B_NO_MEMORY;
 
@@ -294,10 +332,10 @@ _fbsd_init_driver(driver_t *driver)
 
 	for (i = 0; dev != NULL
 			&& gPci->get_nth_pci_info(i, &dev->pci_info) == B_OK; i++) {
-		if (probe(dev) >= 0) {
-			snprintf(dev->dev_name, sizeof(dev->dev_name), "/dev/net/%s/%i",
+		if (sDeviceProbe(dev) >= 0) {
+			snprintf(dev->dev_name, sizeof(dev->dev_name), "net/%s/%i",
 				gDriverName, ncards);
-			dprintf("%s, adding %s @%d -> %s\n", gDriverName, dev->description,
+			dprintf("%s, adding %s @%d -> /dev/%s\n", gDriverName, dev->description,
 				i, dev->dev_name);
 
 			gDevices[ncards] = dev;
@@ -305,7 +343,7 @@ _fbsd_init_driver(driver_t *driver)
 
 			ncards++;
 			if (ncards < MAX_DEVICES)
-				dev = allocate_device();
+				dev = allocate_device(driver);
 			else
 				dev = NULL;
 		}

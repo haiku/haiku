@@ -47,11 +47,28 @@ if_free(struct ifnet *ifp)
 void
 if_initname(struct ifnet *ifp, const char *name, int unit)
 {
+	int i;
+
+	dprintf("if_initname(%p, %s, %d)\n", ifp, name, unit);
+
+	if (name == NULL)
+		panic("interface goes unamed");
+
 	ifp->if_dname = name;
 	ifp->if_dunit = unit;
 
-	/* XXX use a more Haiku friendly name here? */
-	snprintf(ifp->if_xname, IFNAMSIZ, "%s%d", name, unit);
+	strlcpy(ifp->if_xname, name, sizeof(ifp->if_xname));
+
+	for (i = 0; gDevNameList[i] != NULL; i++) {
+		if (strcmp(gDevNameList[i], name) == 0)
+			break;
+	}
+
+	if (gDevNameList[i] == NULL)
+		panic("unknown interface");
+
+	ifp->if_dev = gDevices[i];
+	ifp->if_dev->ifp = ifp;
 }
 
 

@@ -96,7 +96,6 @@ int
 pci_enable_io(device_t dev, int space)
 {
 	/* adapted from FreeBSD's pci_enable_io_method */
-	uint16_t command;
 	int bit = 0;
 
 	switch (space) {
@@ -144,10 +143,8 @@ device_set_desc(device_t dev, const char *desc)
 const char *
 device_get_name(device_t dev)
 {
-	/*
-	 * if (dev != NULL && dev->devclass)
-	 *	return devclass_get_name(dev->devclass);
-	 */
+	if (dev)
+		return dev->dev_name;
 	return NULL;
 }
 
