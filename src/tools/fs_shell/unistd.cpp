@@ -19,7 +19,12 @@
 #ifdef __BEOS__
 #	include <Drivers.h>
 #else
-#	include <stropts.h>		// the correct place of definition for ioctl()
+#	if defined(HAIKU_HOST_PLATFORM_FREEBSD)
+#		incluce <sys/ioctl.h>
+#	else
+		// the (POSIX) correct place of definition for ioctl()
+#		include <stropts.h>
+#	endif
 
 #	if defined(HAIKU_HOST_PLATFORM_LINUX)
 #			include <linux/hdreg.h>
