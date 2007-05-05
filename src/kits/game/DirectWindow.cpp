@@ -16,6 +16,12 @@
 #include <DirectWindowPrivate.h>
 #include <ServerProtocol.h>
 
+//#define DEBUG 1
+
+#if DEBUG
+	#include <string.h>
+	#include <stdio.h>
+#endif
 
 // We don't need this kind of locking, since the directDaemonFunc 
 // doesn't access critical shared data.
@@ -27,6 +33,60 @@ enum dw_status_bits {
 	DW_STATUS_SEM_CREATED	 = 0x4
 };
 
+
+#if DEBUG
+static void
+print_direct_buffer_state(const direct_buffer_state &state)
+{
+	if (state == 0)
+		return;
+
+	char string[128];
+	int modeState = state & B_DIRECT_MODE_MASK;
+	if (state == B_DIRECT_START)
+		strcpy(string, "B_DIRECT_START");
+	else if (state == B_DIRECT_MODIFY)
+		strcpy(string, "B_DIRECT_MODIFY"); 
+	else if (state == B_DIRECT_STOP)
+		strcpy(string, "B_DIRECT_STOP");
+
+	if (state & B_CLIPPING_MODIFIED)
+		strcat(string, " | B_CLIPPING_MODIFIED");
+	if (state & B_BUFFER_RESIZED)
+		strcat(string, " | B_BUFFER_RESIZED");
+	if (state & B_BUFFER_MOVED)
+		strcat(string, " | B_BUFFER_MOVED");
+	if (state & B_BUFFER_RESET)
+		strcat(string, " | B_BUFFER_RESET");
+	
+	printf("direct_buffer_state: %s", string);	
+}
+
+
+static void
+print_direct_driver_state(const direct_driver_state &state)
+{
+	if (state == 0)
+		return;
+
+	char string[64];
+	if (state == B_DRIVER_CHANGED)
+		strcpy(string, "B_DRIVER_CHANGED");	
+	else if (state == B_MODE_CHANGED)
+		strcpy(string, "B_MODE_CHANGED");
+	
+	printf("direct_driver_state: %s\n", string);
+}
+
+
+static void
+print_direct_buffer_info(const direct_buffer_info &info)
+{
+	print_direct_buffer_state(info.buffer_state);
+	print_direct_driver_state(info.driver_state);
+}
+
+#endif
 
 BDirectWindow::BDirectWindow(BRect frame, const char *title, window_type type,
 	uint32 flags, uint32 workspace)
@@ -335,11 +395,15 @@ BDirectWindow::DirectDaemonFunc()
 		if (status < B_OK)
 			return -1;
 
+#if DEBUG
+		print_direct_buffer_info(*fBufferDesc);
+#endif
+
 		if (LockDirect()) {
 			if ((fBufferDesc->buffer_state & B_DIRECT_MODE_MASK) == B_DIRECT_START)
 				fConnectionEnable = true;
 
-			fInDirectConnect = true;
+			fInDirectConnect = true;			
 			DirectConnected(fBufferDesc);	
 			fInDirectConnect = false;
 
