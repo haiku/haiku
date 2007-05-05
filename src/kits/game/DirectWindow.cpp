@@ -59,7 +59,7 @@ print_direct_buffer_state(const direct_buffer_state &state)
 	if (state & B_BUFFER_RESET)
 		strcat(string, " | B_BUFFER_RESET");
 	
-	printf("direct_buffer_state: %s", string);	
+	printf("direct_buffer_state: %s\n", string);	
 }
 
 
