@@ -53,6 +53,8 @@ __FBSDID("$FreeBSD: src/sys/i386/i386/busdma_machdep.c,v 1.74.2.4 2006/10/21 16:
 #define contigfree(a, b, c)					kernel_contigfree(a, b, c)
 #define __unused
 void busdma_swi(void);
+void init_bounce_pages(void);
+void uninit_bounce_pages(void);
 /* </> */
 
 struct bounce_zone;
@@ -130,7 +132,6 @@ static STAILQ_HEAD(, bus_dmamap) bounce_map_waitinglist;
 static STAILQ_HEAD(, bus_dmamap) bounce_map_callbacklist;
 static struct bus_dmamap nobounce_dmamap;
 
-static void init_bounce_pages(void *dummy);
 static int alloc_bounce_zone(bus_dma_tag_t dmat);
 static int alloc_bounce_pages(bus_dma_tag_t dmat, u_int numpages);
 static int reserve_bounce_pages(bus_dma_tag_t dmat, bus_dmamap_t map,
@@ -936,8 +937,9 @@ _bus_dmamap_sync(bus_dma_tag_t dmat, bus_dmamap_t map, bus_dmasync_op_t op)
 	}
 }
 
-static void
-init_bounce_pages(void *dummy __unused)
+
+void
+init_bounce_pages()
 {
 
 	total_bpages = 0;
@@ -946,7 +948,17 @@ init_bounce_pages(void *dummy __unused)
 	STAILQ_INIT(&bounce_map_callbacklist);
 	mtx_init(&bounce_lock, "bounce pages lock", NULL, MTX_DEF);
 }
-SYSINIT(bpages, SI_SUB_LOCK, SI_ORDER_ANY, init_bounce_pages, NULL);
+
+
+/* Haiku extension */
+void
+uninit_bounce_pages()
+{
+	/* XXX deep free */
+
+	mtx_destroy(&bounce_lock);
+}
+
 
 static struct sysctl_ctx_list *
 busdma_sysctl_tree(struct bounce_zone *bz)

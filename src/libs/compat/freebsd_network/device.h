@@ -24,8 +24,8 @@
 struct ifnet;
 
 struct device {
-	int				devId;
-	pci_info		pciInfo;
+	pci_info		pci_info;
+	char			dev_name[128];
 
 	int32			flags;
 
@@ -46,6 +46,16 @@ enum {
 	DEVICE_NON_BLOCK	= 1 << 1,
 };
 
+
+status_t init_mbufs(void);
+void uninit_mbufs(void);
+
+status_t init_mutexes(void);
+void uninit_mutexes(void);
+
+/* busdma_machdep.c */
+void init_bounce_pages(void);
+void uninit_bounce_pages(void);
 
 extern struct net_stack_module_info *gStack;
 extern pci_module_info *gPci;

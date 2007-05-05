@@ -10,6 +10,8 @@
  * `m_defrag' and friends are straight from FreeBSD 6.2.
  */
 
+#include "device.h"
+
 #include <stdint.h>
 #include <string.h>
 #include <slab/Slab.h>
@@ -20,10 +22,6 @@
 
 #define MBUF_CHECKSLEEP(how) do { } while (0)
 #define MBTOM(how) (how)
-
-
-status_t init_mbufs(void);
-void uninit_mbufs(void);
 
 
 #define CHUNK_SIZE	2048

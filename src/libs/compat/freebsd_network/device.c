@@ -23,12 +23,45 @@
 #define MAX_DEVICES		8
 
 
+device_t gDevices[MAX_DEVICES];
 char *gDevNameList[MAX_DEVICES + 1];
+
+
+static device_t
+allocate_device()
+{
+	char semName[64];
+
+	device_t dev = (device_t)malloc(sizeof(struct device));
+	if (dev == NULL)
+		return NULL;
+
+	memset(dev, 0, sizeof(struct device));
+
+	snprintf(semName, sizeof(semName), "%s rcv", gDriverName);
+
+	dev->receive_sem = create_sem(0, semName);
+	if (dev->receive_sem < 0) {
+		free(dev);
+		return NULL;
+	}
+
+	return dev;
+}
+
+
+static void
+free_device(device_t dev)
+{
+	delete_sem(dev->receive_sem);
+	free(dev);
+}
 
 
 static status_t
 compat_open(const char *name, uint32 flags, void **cookie)
 {
+	dprintf("%s, compat_open(%s, 0x%lx)\n", gDriverName, name, flags);
 	return B_ERROR;
 }
 
@@ -37,6 +70,9 @@ static status_t
 compat_close(void *cookie)
 {
 	device_t dev = cookie;
+
+	dprintf("%s, compat_close(%p)\n", gDriverName, dev);
+
 	return B_ERROR;
 }
 
@@ -45,7 +81,10 @@ static status_t
 compat_free(void *cookie)
 {
 	device_t dev = cookie;
-	free(dev);
+
+	dprintf("%s, compat_free(%p)\n", gDriverName, dev);
+
+	free_device(dev);
 	return B_ERROR;
 }
 
@@ -106,7 +145,7 @@ compat_write(void *cookie, off_t position, const void *buffer,
 	if (mb == NULL)
 		return ENOBUFS;
 
-	/* if we are waiting, check after if the ifp is still valid */
+	/* if we waited, check after if the ifp is still valid */
 
 	mb->m_len = min_c(*numBytes, (size_t)MCLBYTES);
 	memcpy(mtod(mb, void *), buffer, mb->m_len);
@@ -171,11 +210,26 @@ device_hooks gDeviceHooks = {
 };
 
 
+static device_method_signature_t
+_resolve_method(driver_t *driver, const char *name)
+{
+	device_method_signature_t method = NULL;
+	int i;
+
+	for (i = 0; method == NULL && driver->methods[i].name != NULL; i++) {
+		if (strcmp(driver->methods[i].name, name) == 0)
+			method = driver->methods[i].method;
+	}
+
+	return method;
+}
+
+
 status_t
 _fbsd_init_hardware(driver_t *driver)
 {
-	device_method_signature_t probe = NULL;
 	struct device fakeDevice;
+	device_probe_t *probe;
 	int i;
 
 	dprintf("%s: init_hardware(%p)\n", gDriverName, driver);
@@ -183,11 +237,7 @@ _fbsd_init_hardware(driver_t *driver)
 	if (get_module(B_PCI_MODULE_NAME, (module_info **)&gPci) < B_OK)
 		return B_ERROR;
 
-	for (i = 0; probe == NULL && driver->methods[i].name != NULL; i++) {
-		if (strcmp(driver->methods[i].name, "device_probe") == 0)
-			probe = driver->methods[i].method;
-	}
-
+	probe = (device_probe_t *)_resolve_method(driver, "device_probe");
 	if (probe == NULL) {
 		dprintf("%s: driver has no device_probe method.\n", gDriverName);
 		return B_ERROR;
@@ -195,9 +245,9 @@ _fbsd_init_hardware(driver_t *driver)
 
 	memset(&fakeDevice, 0, sizeof(struct device));
 
-	for (i = 0; gPci->get_nth_pci_info(i, &fakeDevice.pciInfo) == B_OK; i++) {
+	for (i = 0; gPci->get_nth_pci_info(i, &fakeDevice.pci_info) == B_OK; i++) {
 		if (probe(&fakeDevice) >= 0) {
-			dprintf("%s, found %s at %i\n", gDriverName,
+			dprintf("%s, found %s at %d\n", gDriverName,
 				fakeDevice.description, i);
 			put_module(B_PCI_MODULE_NAME);
 			return B_OK;
@@ -214,14 +264,76 @@ _fbsd_init_hardware(driver_t *driver)
 status_t
 _fbsd_init_driver(driver_t *driver)
 {
+	device_probe_t *probe;
+	int i, ncards = 0;
+	status_t status;
+	device_t dev;
+
 	dprintf("%s: init_driver(%p)\n", gDriverName, driver);
 
-	return B_ERROR;
+	probe = (device_probe_t *)_resolve_method(driver, "device_probe");
+
+	dev = allocate_device();
+	if (dev == NULL)
+		return B_NO_MEMORY;
+
+	status = init_mutexes();
+	if (status < B_OK) {
+		free_device(dev);
+		return status;
+	}
+
+	status = init_mbufs();
+	if (status < B_OK) {
+		uninit_mutexes();
+		free_device(dev);
+		return status;
+	}
+
+	init_bounce_pages();
+
+	for (i = 0; dev != NULL
+			&& gPci->get_nth_pci_info(i, &dev->pci_info) == B_OK; i++) {
+		if (probe(dev) >= 0) {
+			snprintf(dev->dev_name, sizeof(dev->dev_name), "/dev/net/%s/%i",
+				gDriverName, ncards);
+			dprintf("%s, adding %s @%d -> %s\n", gDriverName, dev->description,
+				i, dev->dev_name);
+
+			gDevices[ncards] = dev;
+			gDevNameList[ncards] = dev->dev_name;
+
+			ncards++;
+			if (ncards < MAX_DEVICES)
+				dev = allocate_device();
+			else
+				dev = NULL;
+		}
+	}
+
+	if (dev != NULL)
+		free_device(dev);
+
+	dprintf("%s, ... %d cards.\n", gDriverName, ncards);
+
+	gDevNameList[ncards + 1] = NULL;
+
+	return B_OK;
 }
 
 
 void
 _fbsd_uninit_driver(driver_t *driver)
 {
+	int i;
+
 	dprintf("%s: uninit_driver(%p)\n", gDriverName, driver);
+
+	for (i = 0; gDevNameList[i] != NULL; i++) {
+		free_device(gDevices[i]);
+	}
+
+	uninit_bounce_pages();
+	uninit_mbufs();
+	uninit_mutexes();
 }

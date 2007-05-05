@@ -6,13 +6,9 @@
  *      Hugo Santos, hugosantos@gmail.com
  */
 
-#include <KernelExport.h>
+#include "device.h"
 
 #include <compat/sys/mutex.h>
-
-
-status_t init_mutexes(void);
-void uninit_mutexes(void);
 
 
 // these methods are bit unfriendly, a bit too much panic() around
@@ -51,12 +47,15 @@ mtx_destroy(struct mtx *m)
 status_t
 init_mutexes()
 {
-	return B_ERROR;
+	mtx_init(&Giant, "Banana Giant", NULL, MTX_DEF);
+
+	return B_OK;
 }
 
 
 void
 uninit_mutexes()
 {
+	mtx_destroy(&Giant);
 }
 
