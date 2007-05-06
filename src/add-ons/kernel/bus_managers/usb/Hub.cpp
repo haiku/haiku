@@ -13,9 +13,14 @@
 
 Hub::Hub(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
 	usb_speed speed)
-	:	Device(parent, desc, deviceAddress, speed)
+	:	Device(parent, desc, deviceAddress, speed),
+		fInterruptPipe(NULL)
 {
 	TRACE(("USB Hub %d: creating hub\n", DeviceAddress()));
+
+	memset(&fHubDescriptor, 0, sizeof(fHubDescriptor));
+	for (int32 i = 0; i < 8; i++)
+		fChildren[i] = NULL;
 
 	if (!fInitOK) {
 		TRACE_ERROR(("USB Hub %d: device failed to initialize\n", DeviceAddress()));
@@ -29,9 +34,6 @@ Hub::Hub(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
 		TRACE_ERROR(("USB Hub %d: failed to create hub lock\n", DeviceAddress()));
 		return;
 	}
-
-	for (int32 i = 0; i < 8; i++)
-		fChildren[i] = NULL;
 
 	if (fDeviceDescriptor.device_class != 9) {
 		TRACE_ERROR(("USB Hub %d: wrong class! bailing out\n", DeviceAddress()));
@@ -57,6 +59,11 @@ Hub::Hub(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
 	TRACE(("\tpower_on_to_power_g:.%d\n", fHubDescriptor.power_on_to_power_good));
 	TRACE(("\tdevice_removeable:...0x%02x\n", fHubDescriptor.device_removeable));
 	TRACE(("\tpower_control_mask:..0x%02x\n", fHubDescriptor.power_control_mask));
+
+	if (fHubDescriptor.num_ports > 8) {
+		TRACE(("USB Hub %d: hub supports more ports than we do (%d vs. 8)\n", DeviceAddress(), fHubDescriptor.num_ports));
+		fHubDescriptor.num_ports = 8;
+	}
 
 	Object *object = GetStack()->GetObject(Configuration()->interface->active->endpoint[0].handle);
 	if (!object || (object->Type() & USB_OBJECT_INTERRUPT_PIPE) == 0) {
@@ -183,12 +190,6 @@ void
 Hub::Explore()
 {
 	for (int32 i = 0; i < fHubDescriptor.num_ports; i++) {
-		if (i >= 8) {
-			TRACE(("USB Hub %d: hub supports more ports than we do (%d)\n", DeviceAddress(), fHubDescriptor.num_ports));
-			fHubDescriptor.num_ports = 8;
-			continue;
-		}
-
 		status_t result = UpdatePortStatus(i);
 		if (result < B_OK)
 			continue;
@@ -226,6 +227,20 @@ Hub::Explore()
 					// device has vanished after reset, ignore
 					TRACE(("USB Hub %d: device disappeared on reset\n", DeviceAddress()));
 					continue;
+				}
+
+				if (fChildren[i]) {
+					TRACE_ERROR(("USB Hub %d: new device on a port that is already in use\n", DeviceAddress()));
+
+					// Remove previous device first
+					TRACE(("USB Hub %d: removing device 0x%08lx\n", DeviceAddress(), fChildren[i]));
+					GetStack()->NotifyDeviceChange(fChildren[i], false);
+
+					if (Lock()) {
+						GetBusManager()->FreeDevice(fChildren[i]);
+						fChildren[i] = NULL;
+						Unlock();
+					}
 				}
 
 				usb_speed speed = USB_SPEED_FULLSPEED;

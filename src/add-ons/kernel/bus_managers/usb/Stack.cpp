@@ -75,11 +75,6 @@ Stack::Stack()
 	fExploreThread = spawn_kernel_thread(ExploreThread, "usb explore",
 		B_LOW_PRIORITY, this);
 	resume_thread(fExploreThread);
-
-	// wait for the first explore to complete
-	// this ensures that we get all initial devices under InstallNotify
-	while (!fFirstExploreDone)
-		snooze(1000);
 }
 
 
@@ -379,6 +374,11 @@ status_t
 Stack::InstallNotify(const char *driverName, const usb_notify_hooks *hooks)
 {
 	TRACE(("USB Stack: installing notify hooks for driver \"%s\"\n", driverName));
+
+	// wait for the first explore to complete
+	// this ensures that we get all initial devices
+	while (!fFirstExploreDone)
+		snooze(1000);
 
 	usb_driver_info *element = fDriverList;
 	while (element) {
