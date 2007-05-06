@@ -603,7 +603,6 @@ public:
 
 	virtual fssh_status_t RemoveAttr(const char *name)
 	{
-printf("GuestNode::RemoveAttr(\"%s\")\n", name);
 		return _kern_remove_attr(fFD, name);
 	}
 
