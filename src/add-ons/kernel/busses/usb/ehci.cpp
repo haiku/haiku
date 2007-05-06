@@ -903,7 +903,7 @@ EHCI::AddPendingTransfer(Transfer *transfer, ehci_qh *queueHead,
 
 
 status_t
-EHCI::CancelPendingTransfer(Transfer *transfer)
+EHCI::CancelQueuedTransfers(Pipe *pipe)
 {
 	if (!Lock())
 		return B_ERROR;
@@ -911,7 +911,8 @@ EHCI::CancelPendingTransfer(Transfer *transfer)
 	transfer_data *last = NULL;
 	transfer_data *current = fFirstTransfer;
 	while (current) {
-		if (current->transfer == transfer) {
+		if (current->transfer->TransferPipe() == pipe) {
+			UnlinkQueueHead(current->queue_head, &fFreeListHead);
 			current->transfer->Finished(B_CANCELED, 0);
 			delete current->transfer;
 
@@ -924,8 +925,6 @@ EHCI::CancelPendingTransfer(Transfer *transfer)
 				fLastTransfer = last;
 
 			delete current;
-			Unlock();
-			return B_OK;
 		}
 
 		last = current;
@@ -933,7 +932,7 @@ EHCI::CancelPendingTransfer(Transfer *transfer)
 	}
 
 	Unlock();
-	return B_BAD_VALUE;
+	return B_OK;
 }
 
 

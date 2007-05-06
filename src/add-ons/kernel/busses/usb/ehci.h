@@ -37,6 +37,7 @@ public:
 virtual	status_t					SubmitTransfer(Transfer *transfer);
 		status_t					SubmitPeriodicTransfer(Transfer *transfer);
 		status_t					SubmitAsyncTransfer(Transfer *transfer);
+virtual	status_t					CancelQueuedTransfers(Pipe *pipe);
 
 virtual	status_t					NotifyPipeChange(Pipe *pipe,
 										usb_change change);
@@ -66,7 +67,6 @@ static	int32						InterruptHandler(void *data);
 										ehci_qh *queueHead,
 										ehci_qtd *dataDescriptor,
 										bool directionIn);
-		status_t					CancelPendingTransfer(Transfer *transfer);
 		status_t					CancelAllPendingTransfers();
 
 static	int32						FinishThread(void *data);
