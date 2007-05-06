@@ -20,6 +20,14 @@
 
 // TODO a lot.
 
+#define DEBUG_PCI
+
+#ifdef DEBUG_PCI
+#define TRACE_PCI(dev, format, args...) device_printf(dev, format , ##args)
+#else
+#define TRACE_PCI(dev, format, args...) do { } while (0)
+#endif
+
 status_t init_compat_layer(void);
 
 struct net_stack_module_info *gStack;
@@ -28,14 +36,18 @@ pci_module_info *gPci;
 uint32_t
 pci_read_config(device_t dev, int offset, int size)
 {
-	return gPci->read_pci_config(dev->pci_info.bus, dev->pci_info.device,
-		dev->pci_info.function, offset, size);
+	uint32_t value = gPci->read_pci_config(dev->pci_info.bus,
+		dev->pci_info.device, dev->pci_info.function, offset, size);
+	TRACE_PCI(dev, "pci_read_config(%i, %i) = 0x%lx\n", offset, size, value);
+	return value;
 }
 
 
 void
 pci_write_config(device_t dev, int offset, uint32_t value, int size)
 {
+	TRACE_PCI(dev, "pci_write_config(%i, 0x%lx, %i)\n", offset, value, size);
+
 	gPci->write_pci_config(dev->pci_info.bus, dev->pci_info.device,
 		dev->pci_info.function, offset, size, value);
 }
@@ -119,16 +131,48 @@ pci_enable_io(device_t dev, int space)
 }
 
 
+void
+driver_printf(const char *format, ...)
+{
+	va_list vl;
+	va_start(vl, format);
+	driver_vprintf(format, vl);
+	va_end(vl);
+}
+
+
+static void
+driver_vprintf_etc(const char *extra, const char *format, va_list vl)
+{
+	char buf[256];
+	vsnprintf(buf, sizeof(buf), format, vl);
+
+	if (extra)
+		dprintf("[%s] (%s) %s", gDriverName, extra, buf);
+	else
+		dprintf("[%s] %s", gDriverName, buf);
+}
+
+
+void
+driver_vprintf(const char *format, va_list vl)
+{
+	driver_vprintf_etc(NULL, format, vl);
+}
+
+
 int
 device_printf(device_t dev, const char *format, ...)
 {
-	char buf[256];
+	char devDesc[32];
 	va_list vl;
-	va_start(vl, format);
-	vsnprintf(buf, sizeof(buf), format, vl);
-	va_end(vl);
 
-	dprintf("[%s...] %s", gDriverName, buf);
+	snprintf(devDesc, sizeof(devDesc), "%i:%i:%i", (int)dev->pci_info.bus,
+		(int)dev->pci_info.device, (int)dev->pci_info.function);
+
+	va_start(vl, format);
+	driver_vprintf_etc(devDesc, format, vl);
+	va_end(vl);
 	return 0;
 }
 
@@ -180,13 +224,11 @@ device_delete_child(device_t dev, device_t child)
 int
 printf(const char *format, ...)
 {
-	char buf[256];
 	va_list vl;
 	va_start(vl, format);
-	vsnprintf(buf, sizeof(buf), format, vl);
+	driver_vprintf(format, vl);
 	va_end(vl);
 
-	dprintf(buf);
 	return 0;
 }
 

@@ -73,20 +73,40 @@ if_initname(struct ifnet *ifp, const char *name, int unit)
 
 
 void
+ifq_init(struct ifqueue *ifq, const char *name)
+{
+	ifq->ifq_head = NULL;
+	ifq->ifq_tail = NULL;
+	ifq->ifq_len = 0;
+	ifq->ifq_maxlen = IFQ_MAXLEN;
+	ifq->ifq_drops = 0;
+
+	mtx_init(&ifq->ifq_mtx, name, NULL, MTX_DEF);
+}
+
+
+void
+ifq_uninit(struct ifqueue *ifq)
+{
+	mtx_destroy(&ifq->ifq_mtx);
+}
+
+
+void
 if_attach(struct ifnet *ifp)
 {
 	TAILQ_INIT(&ifp->if_addrhead);
 	TAILQ_INIT(&ifp->if_prefixhead);
 	TAILQ_INIT(&ifp->if_multiaddrs);
 
-	mtx_init(&ifp->if_snd.ifq_mtx, ifp->if_xname, NULL, MTX_DEF);
+	ifq_init((struct ifqueue *)&ifp->if_snd, ifp->if_xname);
 }
 
 
 void
 if_detach(struct ifnet *ifp)
 {
-	mtx_destroy(&ifp->if_snd.ifq_mtx);
+	ifq_uninit((struct ifqueue *)&ifp->if_snd);
 }
 
 
@@ -97,7 +117,6 @@ if_start(struct ifnet *ifp)
 	if (ifp->if_flags & IFF_NEEDSGIANT)
 		panic("freebsd compat.: unsupported giant requirement");
 #endif
-
 	ifp->if_start(ifp);
 }
 
@@ -133,7 +152,7 @@ int
 ether_output(struct ifnet *ifp, struct mbuf *m, struct sockaddr *dst,
 	struct rtentry *rt0)
 {
-	int error;
+	int error = 0;
 	IFQ_HANDOFF(ifp, m, error);
 	return error;
 }
@@ -270,3 +289,13 @@ ether_ioctl(struct ifnet *ifp, int command, caddr_t data)
 	return 0;
 }
 
+
+char *
+ether_sprintf(const u_char *ap)
+{
+	static char etherbuf[18];
+	snprintf(etherbuf, sizeof (etherbuf),
+		"%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx",
+		ap[0], ap[1], ap[2], ap[3], ap[4], ap[5]);
+	return (etherbuf);
+}

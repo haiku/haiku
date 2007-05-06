@@ -8,9 +8,9 @@
  * Some of this code is based on previous work by Marcus Overhagen.
  */
 
-#include <malloc.h>
+#include "device.h"
 
-#include <drivers/PCI.h>
+#include <malloc.h>
 
 #include <compat/dev/pci/pcivar.h>
 #include <compat/machine/resource.h>
@@ -34,7 +34,15 @@ struct internal_intr {
 	driver_intr_t handler;
 	void *arg;
 	int irq;
+
+	void *context;
+
+	thread_id thread;
+	sem_id sem;
 };
+
+
+static int32 intr_wrapper(void *data);
 
 
 static area_id
@@ -111,6 +119,9 @@ bus_alloc_resource(device_t dev, int type, int *rid, unsigned long start,
 		&& type != SYS_RES_IOPORT)
 		return NULL;
 
+	device_printf(dev, "bus_alloc_resource(%i, [%i], 0x%lx, 0x%lx, 0x%lx, 0x%lx)\n",
+		type, *rid, start, end, count, flags);
+
 	// maybe a local array of resources is enough
 	res = malloc(sizeof(struct resource));
 	if (res == NULL)
@@ -165,8 +176,50 @@ static int32
 intr_wrapper(void *data)
 {
 	struct internal_intr *intr = data;
-	intr->handler(intr->arg);
+	driver_printf("in interrupt handler.\n");
+
+	disable_io_interrupt_handler(intr->context, B_IN_INTERRUPT_CONTEXT);
+	release_sem_etc(intr->sem, 1, B_DO_NOT_RESCHEDULE);
+
+	return B_INVOKE_SCHEDULER;
+}
+
+
+static int32
+intr_handler(void *data)
+{
+	struct internal_intr *intr = data;
+	status_t status;
+
+	while (1) {
+		enable_io_interrupt_handler(intr->context);
+
+		status = acquire_sem(intr->sem);
+		if (status < B_OK)
+			break;
+
+		driver_printf("in soft interrupt handler.\n");
+
+		intr->handler(intr->arg);
+	}
+
+	disable_io_interrupt_handler(intr->context, 0);
+
 	return 0;
+}
+
+
+static void
+free_internal_intr(struct internal_intr *intr)
+{
+	status_t status;
+	delete_sem(intr->sem);
+	wait_for_thread(intr->thread, &status);
+
+	if (intr->context)
+		delete_io_interrupt_handler(intr->context);
+
+	free(intr);
 }
 
 
@@ -174,9 +227,14 @@ int
 bus_setup_intr(device_t dev, struct resource *res, int flags,
 	driver_intr_t handler, void *arg, void **cookiep)
 {
+	/* TODO check MPSAFE etc */
+
 	struct internal_intr *intr = (struct internal_intr *)malloc(
 		sizeof(struct internal_intr));
+	char semName[64];
 	status_t status;
+
+	/* status_t status; */
 
 	if (intr == NULL)
 		return B_NO_MEMORY;
@@ -185,11 +243,33 @@ bus_setup_intr(device_t dev, struct resource *res, int flags,
 	intr->arg = arg;
 	intr->irq = res->handle;
 
-	status = install_io_interrupt_handler(intr->irq, intr_wrapper, intr, 0);
-	if (status < B_OK) {
+	snprintf(semName, sizeof(semName), "%s intr", dev->dev_name);
+
+	intr->sem = create_sem(0, semName);
+	if (intr->sem < B_OK) {
 		free(intr);
+		return B_NO_MEMORY;
+	}
+
+	snprintf(semName, sizeof(semName), "%s intr handler", dev->dev_name);
+
+	intr->thread = spawn_kernel_thread(intr_handler, semName,
+		B_REAL_TIME_DISPLAY_PRIORITY, intr);
+	if (intr->thread < B_OK) {
+		delete_sem(intr->sem);
+		free(intr);
+		return B_NO_MEMORY;
+	}
+
+	intr->context = NULL;
+	status = create_io_interrupt_handler(intr->irq, intr_wrapper, intr,
+		&intr->context);
+	if (status < B_OK) {
+		free_internal_intr(intr);
 		return status;
 	}
+
+	resume_thread(intr->thread);
 
 	*cookiep = intr;
 
@@ -201,8 +281,8 @@ int
 bus_teardown_intr(device_t dev, struct resource *res, void *arg)
 {
 	struct internal_intr *intr = arg;
-	remove_io_interrupt_handler(intr->irq, intr_wrapper, intr);
-	free(intr);
+	/* remove_io_interrupt_handler(intr->irq, intr_wrapper, intr); */
+	free_internal_intr(intr);
 	return 0;
 }
 
@@ -215,3 +295,33 @@ bus_generic_detach(device_t dev)
 	return B_ERROR;
 }
 
+
+#define BUS_SPACE_READ(size, type, fun) \
+	type bus_space_read_##size(bus_space_tag_t tag, \
+		bus_space_handle_t handle, bus_size_t offset) \
+	{ \
+		type value; \
+		if (tag == I386_BUS_SPACE_IO) \
+			value = fun(handle + offset); \
+		else \
+			value = *(volatile type *)(handle + offset); \
+		return value; \
+	}
+
+#define BUS_SPACE_WRITE(size, type, fun) \
+	void bus_space_write_##size(bus_space_tag_t tag, \
+		bus_space_handle_t handle, bus_size_t offset, type value) \
+	{ \
+		if (tag == I386_BUS_SPACE_IO) \
+			fun(value, handle + offset); \
+		else \
+			*(volatile type *)(handle + offset) = value; \
+	}
+
+BUS_SPACE_READ(1, uint8_t, in8)
+BUS_SPACE_READ(2, uint16_t, in16)
+BUS_SPACE_READ(4, uint32_t, in32)
+
+BUS_SPACE_WRITE(1, uint8_t, out8)
+BUS_SPACE_WRITE(2, uint16_t, out16)
+BUS_SPACE_WRITE(4, uint32_t, out32)

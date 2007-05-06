@@ -26,6 +26,7 @@
 #define IFF_DRV_RUNNING		0x10000
 #define IFF_DRV_OACTIVE		0x20000
 #define IFF_LINK0			0x40000
+#define IFF_DEBUG			0x80000
 
 
 #define LINK_STATE_UNKNOWN	0

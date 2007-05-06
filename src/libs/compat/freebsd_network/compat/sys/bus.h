@@ -24,67 +24,18 @@ typedef unsigned int	bus_space_handle_t;
 #define BUS_SPACE_MAXSIZE_32BIT		0xffffffff
 #define BUS_SPACE_MAXSIZE			0xffffffff
 
-static inline uint8_t
-bus_space_read_1(bus_space_tag_t tag, bus_space_handle_t handle,
-	bus_size_t offset)
-{
-	if (tag == I386_BUS_SPACE_IO)
-		return in8(handle + offset);
-	return *(volatile uint8_t *)(handle + offset);
-}
-
-
-static inline void
-bus_space_write_1(bus_space_tag_t tag, bus_space_handle_t handle,
-	bus_size_t offset, uint8_t value)
-{
-	if (tag == I386_BUS_SPACE_IO)
-		out8(handle + offset, value);
-	else
-		*(volatile uint8_t *)(handle + offset) = value;
-}
-
-
-static inline uint16_t
-bus_space_read_2(bus_space_tag_t tag, bus_space_handle_t handle,
-	bus_size_t offset)
-{
-	if (tag == I386_BUS_SPACE_IO)
-		return in16(handle + offset);
-	return *(volatile uint16_t *)(handle + offset);
-}
-
-
-static inline void
-bus_space_write_2(bus_space_tag_t tag, bus_space_handle_t handle,
-	bus_size_t offset, uint16_t value)
-{
-	if (tag == I386_BUS_SPACE_IO)
-		out16(handle + offset, value);
-	else
-		*(volatile uint16_t *)(handle + offset) = value;
-}
-
-
-static inline uint32_t
-bus_space_read_4(bus_space_tag_t tag, bus_space_handle_t handle,
-	bus_size_t offset)
-{
-	if (tag == I386_BUS_SPACE_IO)
-		return in32(handle + offset);
-	return *(volatile uint32_t *)(handle + offset);
-}
-
-
-static inline void
-bus_space_write_4(bus_space_tag_t tag, bus_space_handle_t handle,
-	bus_size_t offset, uint32_t value)
-{
-	if (tag == I386_BUS_SPACE_IO)
-		out32(handle + offset, value);
-	else
-		*(volatile uint32_t *)(handle + offset) = value;
-}
+uint8_t bus_space_read_1(bus_space_tag_t tag, bus_space_handle_t handle,
+	bus_size_t offset);
+void bus_space_write_1(bus_space_tag_t tag, bus_space_handle_t handle,
+	bus_size_t offset, uint8_t value);
+uint16_t bus_space_read_2(bus_space_tag_t tag, bus_space_handle_t handle,
+	bus_size_t offset);
+void bus_space_write_2(bus_space_tag_t tag, bus_space_handle_t handle,
+	bus_size_t offset, uint16_t value);
+uint32_t bus_space_read_4(bus_space_tag_t tag, bus_space_handle_t handle,
+	bus_size_t offset);
+void bus_space_write_4(bus_space_tag_t tag, bus_space_handle_t handle,
+	bus_size_t offset, uint32_t value);
 
 
 #define BUS_SPACE_BARRIER_READ		1

@@ -58,6 +58,8 @@ allocate_device(driver_t *driver)
 		return NULL;
 	}
 
+	ifq_init(&dev->receive_queue, semName);
+
 	return dev;
 }
 
@@ -66,6 +68,7 @@ static void
 free_device(device_t dev)
 {
 	delete_sem(dev->receive_sem);
+	ifq_uninit(&dev->receive_queue);
 	free(dev->softc);
 	free(dev);
 }
@@ -93,7 +96,7 @@ compat_open(const char *name, uint32 flags, void **cookie)
 	device_t dev;
 	int i;
 
-	dprintf("%s, compat_open(%s, 0x%lx)\n", gDriverName, name, flags);
+	driver_printf("compat_open(%s, 0x%lx)\n", name, flags);
 
 	for (i = 0; gDevNameList[i] != NULL; i++) {
 		if (strcmp(gDevNameList[i], name) == 0)
@@ -112,6 +115,8 @@ compat_open(const char *name, uint32 flags, void **cookie)
 	if (status != 0)
 		dev->flags = 0;
 
+	driver_printf(" ... status = 0x%ld\n", status);
+
 	*cookie = dev;
 
 	return status;
@@ -123,7 +128,7 @@ compat_close(void *cookie)
 {
 	device_t dev = cookie;
 
-	dprintf("%s, compat_close(%p)\n", gDriverName, dev);
+	device_printf(dev, "compat_close()\n");
 
 	return B_ERROR;
 }
@@ -134,7 +139,7 @@ compat_free(void *cookie)
 {
 	device_t dev = cookie;
 
-	dprintf("%s, compat_free(%p)\n", gDriverName, dev);
+	device_printf(dev, "compat_free()\n");
 
 	free_device(dev);
 	return B_ERROR;
@@ -149,6 +154,9 @@ compat_read(void *cookie, off_t position, void *buf, size_t *numBytes)
 	status_t status;
 	struct mbuf *mb;
 	size_t len;
+
+	driver_printf("compat_read(%p, %lld, %p, [%lu])\n", cookie, position, buf,
+		*numBytes);
 
 	if (dev->flags & DEVICE_CLOSED)
 		return B_INTERRUPTED;
@@ -192,6 +200,9 @@ compat_write(void *cookie, off_t position, const void *buffer,
 {
 	device_t dev = cookie;
 	struct mbuf *mb;
+
+	driver_printf("compat_write(%p, %lld, %p, [%lu])\n", cookie, position,
+		buffer, *numBytes);
 
 	mb = m_getcl(0, MT_DATA, 0);
 	if (mb == NULL)

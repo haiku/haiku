@@ -58,6 +58,12 @@ void uninit_mutexes(void);
 void init_bounce_pages(void);
 void uninit_bounce_pages(void);
 
+void driver_printf(const char *format, ...) __attribute__ ((format (__printf__, 1, 2)));
+void driver_vprintf(const char *format, va_list vl);
+
+void ifq_init(struct ifqueue *ifq, const char *name);
+void ifq_uninit(struct ifqueue *ifq);
+
 extern struct net_stack_module_info *gStack;
 extern pci_module_info *gPci;
 
