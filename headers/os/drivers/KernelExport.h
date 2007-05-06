@@ -54,6 +54,18 @@ extern status_t		remove_io_interrupt_handler(long interrupt_number,
 						interrupt_handler handler, void	*data);
 
 
+/* Private, Haiku specific */
+
+/* Flags that can be passwd to disable_io_interrupt_handle() */
+#define B_IN_INTERRUPT_CONTEXT	1
+
+extern status_t		create_io_interrupt_handler(long interrupt_number,
+						interrupt_handler handler, void *data, void **context);
+void				enable_io_interrupt_handler(void *context);
+void				disable_io_interrupt_handler(void *context, uint32 flags);
+void				delete_io_interrupt_handler(void *context);
+
+
 /*-------------------------------------------------------------*/
 /* timer interrupts services */
 
