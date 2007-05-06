@@ -222,7 +222,7 @@ Device::~Device()
 	for (int32 i = 0; i < fDeviceDescriptor.num_configurations; i++) {
 		usb_configuration_info *configuration = &fConfigurations[i];
 		for (size_t j = 0; j < configuration->interface_count; j++) {
-			usb_interface_list *interfaceList = configuration->interface;
+			usb_interface_list *interfaceList = &configuration->interface[j];
 			for (size_t k = 0; k < interfaceList->alt_count; k++) {
 				usb_interface_info *interface = &interfaceList->alt[k];
 				delete (Interface *)GetStack()->GetObject(interface->handle);
