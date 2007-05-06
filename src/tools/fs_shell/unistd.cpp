@@ -20,7 +20,7 @@
 #	include <Drivers.h>
 #else
 #	if defined(HAIKU_HOST_PLATFORM_FREEBSD)
-#		incluce <sys/ioctl.h>
+#		include <sys/ioctl.h>
 #	else
 		// the (POSIX) correct place of definition for ioctl()
 #		include <stropts.h>
