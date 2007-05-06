@@ -171,6 +171,7 @@ virtual	status_t						Start();
 virtual	status_t						Stop();
 
 virtual	status_t						SubmitTransfer(Transfer *transfer);
+virtual	status_t						CancelQueuedTransfers(Pipe *pipe);
 
 virtual	status_t						NotifyPipeChange(Pipe *pipe,
 											usb_change change);
