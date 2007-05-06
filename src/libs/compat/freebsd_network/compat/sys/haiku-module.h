@@ -74,6 +74,21 @@ extern const char gDriverName[];
 	const char **publish_devices() { return (const char **)gDevNameList; } \
 	device_hooks *find_device(const char *name) { return &gDeviceHooks; }
 
+extern spinlock __haiku_intr_spinlock;
+extern int __haiku_disable_interrupts(device_t dev);
+
+#define HAIKU_CHECK_DISABLE_INTERRUPTS		__haiku_disable_interrupts
+
+#define HAIKU_INTR_REGISTER_ENTER(status) do { \
+	status = disable_interrupts(); \
+	acquire_spinlock(&__haiku_intr_spinlock); \
+} while (0)
+
+#define HAIKU_INTR_REGISTER_LEAVE(status) do { \
+	release_spinlock(&__haiku_intr_spinlock); \
+	restore_interrupts(status); \
+} while (0)
+
 #define DEFINE_CLASS_0(name, driver, methods, size) \
 	driver_t driver = { #name, methods, size }
 

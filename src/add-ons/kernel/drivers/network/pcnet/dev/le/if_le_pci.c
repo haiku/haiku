@@ -195,22 +195,35 @@ static void
 le_pci_wrcsr(struct lance_softc *sc, uint16_t port, uint16_t val)
 {
 	struct le_pci_softc *lesc = (struct le_pci_softc *)sc;
+	cpu_status status = 0;
 
+	if (port == LE_CSR0)
+		HAIKU_INTR_REGISTER_ENTER(status);
 	bus_space_write_2(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RAP, port);
 	bus_space_barrier(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RAP, 2,
 	    BUS_SPACE_BARRIER_WRITE);
 	bus_space_write_2(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RDP, val);
+	if (port == LE_CSR0)
+		HAIKU_INTR_REGISTER_LEAVE(status);
 }
 
 static uint16_t
 le_pci_rdcsr(struct lance_softc *sc, uint16_t port)
 {
 	struct le_pci_softc *lesc = (struct le_pci_softc *)sc;
+	cpu_status status = 0;
+	uint16_t value;
 
+	if (port == LE_CSR0)
+		HAIKU_INTR_REGISTER_ENTER(status);
 	bus_space_write_2(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RAP, port);
 	bus_space_barrier(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RAP, 2,
 	    BUS_SPACE_BARRIER_WRITE);
-	return (bus_space_read_2(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RDP));
+	value = bus_space_read_2(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RDP);
+	if (port == LE_CSR0)
+		HAIKU_INTR_REGISTER_LEAVE(status);
+
+	return value;
 }
 
 static int

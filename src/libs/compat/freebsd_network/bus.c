@@ -31,11 +31,10 @@ struct resource {
 
 
 struct internal_intr {
+	device_t dev;
 	driver_intr_t handler;
 	void *arg;
 	int irq;
-
-	void *context;
 
 	thread_id thread;
 	sem_id sem;
@@ -176,11 +175,13 @@ static int32
 intr_wrapper(void *data)
 {
 	struct internal_intr *intr = data;
-	driver_printf("in interrupt handler.\n");
 
-	disable_io_interrupt_handler(intr->context, B_IN_INTERRUPT_CONTEXT);
+	device_printf(intr->dev, "in interrupt handler.\n");
+
+	if (!HAIKU_CHECK_DISABLE_INTERRUPTS(intr->dev))
+		return B_UNHANDLED_INTERRUPT;
+
 	release_sem_etc(intr->sem, 1, B_DO_NOT_RESCHEDULE);
-
 	return B_INVOKE_SCHEDULER;
 }
 
@@ -192,18 +193,14 @@ intr_handler(void *data)
 	status_t status;
 
 	while (1) {
-		enable_io_interrupt_handler(intr->context);
-
 		status = acquire_sem(intr->sem);
 		if (status < B_OK)
 			break;
 
-		driver_printf("in soft interrupt handler.\n");
+		device_printf(intr->dev, "in soft interrupt handler.\n");
 
 		intr->handler(intr->arg);
 	}
-
-	disable_io_interrupt_handler(intr->context, 0);
 
 	return 0;
 }
@@ -215,10 +212,6 @@ free_internal_intr(struct internal_intr *intr)
 	status_t status;
 	delete_sem(intr->sem);
 	wait_for_thread(intr->thread, &status);
-
-	if (intr->context)
-		delete_io_interrupt_handler(intr->context);
-
 	free(intr);
 }
 
@@ -234,11 +227,10 @@ bus_setup_intr(device_t dev, struct resource *res, int flags,
 	char semName[64];
 	status_t status;
 
-	/* status_t status; */
-
 	if (intr == NULL)
 		return B_NO_MEMORY;
 
+	intr->dev = dev;
 	intr->handler = handler;
 	intr->arg = arg;
 	intr->irq = res->handle;
@@ -261,9 +253,7 @@ bus_setup_intr(device_t dev, struct resource *res, int flags,
 		return B_NO_MEMORY;
 	}
 
-	intr->context = NULL;
-	status = create_io_interrupt_handler(intr->irq, intr_wrapper, intr,
-		&intr->context);
+	status = install_io_interrupt_handler(intr->irq, intr_wrapper, intr, 0);
 	if (status < B_OK) {
 		free_internal_intr(intr);
 		return status;
@@ -281,7 +271,7 @@ int
 bus_teardown_intr(device_t dev, struct resource *res, void *arg)
 {
 	struct internal_intr *intr = arg;
-	/* remove_io_interrupt_handler(intr->irq, intr_wrapper, intr); */
+	remove_io_interrupt_handler(intr->irq, intr_wrapper, intr);
 	free_internal_intr(intr);
 	return 0;
 }
@@ -296,6 +286,15 @@ bus_generic_detach(device_t dev)
 }
 
 
+#define DEBUG_BUS_SPACE_RW
+
+#ifdef DEBUG_BUS_SPACE_RW
+#define TRACE_BUS_SPACE_RW(x) driver_printf x
+#else
+#define TRACE_BUS_SPACE_RW(x)
+#endif
+
+
 #define BUS_SPACE_READ(size, type, fun) \
 	type bus_space_read_##size(bus_space_tag_t tag, \
 		bus_space_handle_t handle, bus_size_t offset) \
@@ -305,6 +304,8 @@ bus_generic_detach(device_t dev)
 			value = fun(handle + offset); \
 		else \
 			value = *(volatile type *)(handle + offset); \
+		TRACE_BUS_SPACE_RW(("bus_space_read_%s(0x%lx, 0x%lx, 0x%lx) = 0x%lx\n", \
+			#size, (uint32)tag, (uint32)handle, (uint32)offset, (uint32)value)); \
 		return value; \
 	}
 
@@ -312,6 +313,8 @@ bus_generic_detach(device_t dev)
 	void bus_space_write_##size(bus_space_tag_t tag, \
 		bus_space_handle_t handle, bus_size_t offset, type value) \
 	{ \
+		TRACE_BUS_SPACE_RW(("bus_space_write_%s(0x%lx, 0x%lx, 0x%lx, 0x%lx)\n", \
+			#size, (uint32)tag, (uint32)handle, (uint32)offset, (uint32)value)); \
 		if (tag == I386_BUS_SPACE_IO) \
 			fun(value, handle + offset); \
 		else \

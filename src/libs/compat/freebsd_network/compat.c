@@ -28,7 +28,7 @@
 #define TRACE_PCI(dev, format, args...) do { } while (0)
 #endif
 
-status_t init_compat_layer(void);
+spinlock __haiku_intr_spinlock;
 
 struct net_stack_module_info *gStack;
 pci_module_info *gPci;
@@ -224,10 +224,12 @@ device_delete_child(device_t dev, device_t child)
 int
 printf(const char *format, ...)
 {
+	char buf[256];
 	va_list vl;
 	va_start(vl, format);
-	driver_vprintf(format, vl);
+	vsnprintf(buf, sizeof(buf), format, vl);
 	va_end(vl);
+	dprintf(buf);
 
 	return 0;
 }
@@ -309,6 +311,7 @@ _kernel_contigfree(void *addr, size_t size)
 status_t
 init_compat_layer()
 {
+	__haiku_intr_spinlock = 0;
 	return B_OK;
 }
 

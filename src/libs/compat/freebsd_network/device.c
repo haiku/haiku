@@ -16,6 +16,7 @@
 
 #include <compat/sys/haiku-module.h>
 
+#include <compat/sys/bus.h>
 #include <compat/sys/mbuf.h>
 #include <compat/net/ethernet.h>
 
@@ -325,6 +326,8 @@ _fbsd_init_driver(driver_t *driver)
 	dev = allocate_device(driver);
 	if (dev == NULL)
 		return B_NO_MEMORY;
+
+	init_compat_layer();
 
 	status = init_mutexes();
 	if (status < B_OK) {

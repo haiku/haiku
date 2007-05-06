@@ -295,7 +295,8 @@ ether_sprintf(const u_char *ap)
 {
 	static char etherbuf[18];
 	snprintf(etherbuf, sizeof (etherbuf),
-		"%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx",
-		ap[0], ap[1], ap[2], ap[3], ap[4], ap[5]);
+		"%02x:%02x:%02x:%02x:%02x:%02x",
+		(uint32)ap[0], (uint32)ap[1], (uint32)ap[2], (uint32)ap[3],
+		(uint32)ap[4], (uint32)ap[5]);
 	return (etherbuf);
 }
