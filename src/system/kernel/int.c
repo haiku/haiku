@@ -31,7 +31,6 @@
 struct io_handler {
 	struct io_handler	*next;
 	struct io_handler	*prev;
-	long				vector;
 	interrupt_handler	func;
 	void				*data;
 	bool				use_enable_counter;
@@ -145,16 +144,40 @@ int_init_post_device_manager(kernel_args *args)
 status_t
 install_io_interrupt_handler(long vector, interrupt_handler handler, void *data, ulong flags)
 {
-	struct io_handler *io;
-	status_t status;
+	struct io_handler *io = NULL; 
+	cpu_status state;
 
-	status = create_io_interrupt_handler(vector, handler, data, (void **)&io);
-	if (status < B_OK)
-		return status;
+	if (vector < 0 || vector >= NUM_IO_VECTORS)
+		return B_BAD_VALUE;
 
+	io = (struct io_handler *)malloc(sizeof(struct io_handler));
+	if (io == NULL)
+		return B_NO_MEMORY;
+
+	arch_debug_remove_interrupt_handler(vector);
+		// There might be a temporary debug interrupt installed on this
+		// vector that should be removed now.
+
+	io->func = handler;
+	io->data = data;
 	io->use_enable_counter = (flags & B_NO_ENABLE_COUNTER) == 0;
 
-	enable_io_interrupt_handler(io);
+	// Disable the interrupts, get the spinlock for this irq only
+	// and then insert the handler
+	state = disable_interrupts();
+	acquire_spinlock(&io_vectors[vector].vector_lock);
+
+	insque(io, &io_vectors[vector].handler_list);
+
+	// If B_NO_ENABLE_COUNTER is set, we're being asked to not alter
+	// whether the interrupt should be enabled or not
+	if (io->use_enable_counter) {
+		if (io_vectors[vector].enable_count++ == 0)
+			arch_int_enable_io_interrupt(vector);
+	}
+
+	release_spinlock(&io_vectors[vector].vector_lock);
+	restore_interrupts(state);
 
 	return B_OK;
 }
@@ -207,90 +230,6 @@ remove_io_interrupt_handler(long vector, interrupt_handler handler, void *data)
 } 
 
 
-status_t
-create_io_interrupt_handler(long vector, interrupt_handler handler, void *data,
-	void **context)
-{
-	struct io_handler *io = NULL;
-
-	if (vector < 0 || vector >= NUM_IO_VECTORS)
-		return B_BAD_VALUE;
-
-	io = (struct io_handler *)malloc(sizeof(struct io_handler));
-	if (io == NULL)
-		return B_NO_MEMORY;
-
-	io->vector = vector;
-	io->func = handler;
-	io->data = data;
-	io->use_enable_counter = true;
-
-	*context = io;
-	return B_OK;
-}
-
-
-void
-enable_io_interrupt_handler(void *context)
-{
-	struct io_handler *io = context;
-	long vector = io->vector;
-	cpu_status state;
-
-	// Disable the interrupts, get the spinlock for this irq only
-	// and then insert the handler
-	state = disable_interrupts();
-	acquire_spinlock(&io_vectors[vector].vector_lock);
-
-	insque(io, &io_vectors[vector].handler_list);
-
-	// If B_NO_ENABLE_COUNTER is set, we're being asked to not alter
-	// whether the interrupt should be enabled or not
-	if (io->use_enable_counter) {
-		if (io_vectors[vector].enable_count++ == 0)
-			arch_int_enable_io_interrupt(vector);
-	}
-
-	release_spinlock(&io_vectors[vector].vector_lock);
-	restore_interrupts(state);
-}
-
-
-void
-disable_io_interrupt_handler(void *context, uint32 flags)
-{
-	struct io_handler *io = context;
-	long vector = io->vector;
-	cpu_status state = 0;
-
-	if ((flags & B_IN_INTERRUPT_CONTEXT) == 0) {
-		/* lock the structures down so it is not modified while we search */
-		state = disable_interrupts();
-		acquire_spinlock(&io_vectors[vector].vector_lock);
-	}
-
-	remque(io);
-
-	// Check if we need to disable the interrupt
-	if (io->use_enable_counter && --io_vectors[vector].enable_count == 0)
-		arch_int_disable_io_interrupt(vector);
-
-	if ((flags & B_IN_INTERRUPT_CONTEXT) == 0) {
-		release_spinlock(&io_vectors[vector].vector_lock);
-		restore_interrupts(state);
-	}
-}
-
-
-void
-delete_io_interrupt_handler(void *context)
-{
-	struct io_handler *io = context;
-
-	free(io);
-}
-
-
 /** actually process an interrupt via the handlers registered for that
  *	vector (irq)
  */
@@ -320,10 +259,9 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 	 * whatever the driver thought would be useful (ie. B_INVOKE_SCHEDULER)
 	 */
 
-	io = io_vectors[vector].handler_list.next;
-	while (io != &io_vectors[vector].handler_list) {
-		struct io_handler *next = io->next;
-
+	for (io = io_vectors[vector].handler_list.next;
+			io != &io_vectors[vector].handler_list; // Are we already at the end of the list?
+			io = io->next) {
 		status = io->func(io->data);
 
 		if (levelTriggered && status != B_UNHANDLED_INTERRUPT)
@@ -333,8 +271,6 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 			handled = true;
 		else if (status == B_INVOKE_SCHEDULER)
 			invokeScheduler = true;
-
-		io = next;
 	}
 
 #ifdef DEBUG_INT
