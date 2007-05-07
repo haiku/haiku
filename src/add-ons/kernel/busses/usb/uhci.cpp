@@ -668,6 +668,10 @@ UHCI::AddPendingTransfer(Transfer *transfer, Queue *queue,
 	if (!data)
 		return B_NO_MEMORY;
 
+	status_t result = transfer->InitKernelAccess();
+	if (result < B_OK)
+		return result;
+
 	data->transfer = transfer;
 	data->queue = queue;
 	data->transfer_queue = transferQueue;
@@ -676,49 +680,6 @@ UHCI::AddPendingTransfer(Transfer *transfer, Queue *queue,
 	data->user_area = -1;
 	data->incoming = directionIn;
 	data->link = NULL;
-
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
-	if (directionIn) {
-		// we might need to access a buffer in userspace. this will not
-		// be possible in the kernel space finisher thread unless we
-		// get the proper area id for the space we need and then clone it
-		// before writing to it. this is of course terribly inefficient...
-		iovec *vector = transfer->Vector();
-		size_t vectorCount = transfer->VectorCount();
-		for (size_t i = 0; i < vectorCount; i++) {
-			if (IS_USER_ADDRESS(vector[i].iov_base)) {
-				data->user_area = area_for(vector[i].iov_base);
-				if (data->user_area < B_OK) {
-					TRACE_ERROR(("usb_uhci: failed to get area of userspace buffer\n"));
-					delete data;
-					return B_BAD_ADDRESS;
-				}
-
-				break;
-			}
-		}
-
-		if (data->user_area >= B_OK) {
-			area_info areaInfo;
-			if (get_area_info(data->user_area, &areaInfo) < B_OK) {
-				TRACE_ERROR(("usb_uhci: failed to get info about user area\n"));
-				delete data;
-				return B_BAD_ADDRESS;
-			}
-
-			for (size_t i = 0; i < vectorCount; i++) {
-				(uint8 *)vector[i].iov_base -= (uint8 *)areaInfo.address;
-
-				if ((size_t)vector[i].iov_base > areaInfo.size
-					|| (size_t)vector[i].iov_base + vector[i].iov_len > areaInfo.size) {
-					TRACE_ERROR(("usb_uhci: output data buffer spans across multiple areas!\n"));
-					delete data;
-					return B_BAD_ADDRESS;
-				}
-			}
-		}
-	}
-#endif // !HAIKU_TARGET_PLATFORM_HAIKU
 
 	if (!Lock()) {
 		delete data;
@@ -840,35 +801,11 @@ UHCI::FinishTransfers()
 						iovec *vector = transfer->transfer->Vector();
 						size_t vectorCount = transfer->transfer->VectorCount();
 
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
-						area_id clonedArea = -1;
-						void *clonedMemory = NULL;
-						if (transfer->user_area >= B_OK) {
-							// we got a userspace output buffer, need to clone
-							// the area for that space first and map the iovecs
-							// to this cloned area.
-							clonedArea = clone_area("userspace accessor",
-								&clonedMemory, B_ANY_ADDRESS,
-								B_WRITE_AREA | B_KERNEL_WRITE_AREA,
-								transfer->user_area);
-
-							for (size_t i = 0; i < vectorCount; i++)
-								(uint8 *)vector[i].iov_base += (addr_t)clonedMemory;
-						}
-#endif // !HAIKU_TARGET_PLATFORM_HAIKU
-
+						transfer->transfer->PrepareKernelAccess();
 						actualLength = ReadDescriptorChain(
 							transfer->data_descriptor,
 							vector, vectorCount,
 							&lastDataToggle);
-
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
-						if (clonedArea >= B_OK) {
-							for (size_t i = 0; i < vectorCount; i++)
-								(uint8 *)vector[i].iov_base -= (addr_t)clonedMemory;
-							delete_area(clonedArea);
-						}
-#endif // !HAIKU_TARGET_PLATFORM_HAIKU
 					} else {
 						// read the actual length that was sent
 						actualLength = ReadActualLength(
@@ -886,6 +823,7 @@ UHCI::FinishTransfers()
 							TRACE(("usb_uhci: still %ld bytes left on transfer\n", transfer->transfer->VectorLength()));
 							// resubmit the advanced transfer so the rest
 							// of the buffers are transmitted over the bus
+							transfer->transfer->PrepareKernelAccess();
 							status_t result = CreateFilledTransfer(transfer->transfer,
 								&transfer->first_descriptor,
 								&transfer->transfer_queue);

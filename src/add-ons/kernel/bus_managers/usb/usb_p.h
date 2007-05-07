@@ -533,6 +533,9 @@ public:
 		bool						IsFragmented() { return fFragmented; };
 		void						AdvanceByFragment(size_t actualLength);
 
+		status_t					InitKernelAccess();
+		status_t					PrepareKernelAccess();
+
 		void						SetCallback(usb_callback_func callback,
 										void *cookie);
 
@@ -547,6 +550,8 @@ private:
 		void						*fBaseAddress;
 		bool						fFragmented;
 		size_t						fActualLength;
+		area_id						fUserArea;
+		area_id						fClonedArea;
 
 		usb_callback_func			fCallback;
 		void						*fCallbackCookie;
