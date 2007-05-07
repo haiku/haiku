@@ -539,6 +539,45 @@ UHCI::SubmitTransfer(Transfer *transfer)
 
 
 status_t
+UHCI::CancelQueuedTransfers(Pipe *pipe)
+{
+	if (!Lock())
+		return B_ERROR;
+
+	transfer_data *last = NULL;
+	transfer_data *current = fFirstTransfer;
+	while (current) {
+		if (current->transfer->TransferPipe() == pipe) {
+			current->queue->RemoveTransfer(current->transfer_queue);
+			FreeDescriptorChain(current->first_descriptor);
+			FreeTransferQueue(current->transfer_queue);
+			current->transfer->Finished(B_CANCELED, 0);
+			delete current->transfer;
+
+			transfer_data *next = current->link;
+			if (last)
+				last->link = next;
+			else
+				fFirstTransfer = next;
+			
+			if (fLastTransfer == current)
+				fLastTransfer = last;
+
+			delete current;
+			current = next;
+		} else {
+			last = current;
+			current = current->link;
+		}
+	}
+
+	Unlock();
+	
+	return B_OK;
+}
+
+
+status_t
 UHCI::SubmitRequest(Transfer *transfer)
 {
 	Pipe *pipe = transfer->TransferPipe();
