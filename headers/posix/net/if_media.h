@@ -26,6 +26,7 @@
 /* Media subtypes */
 
 /* Ethernet */
+#define IFM_AUTO		0
 #define	IFM_10_T		3			/* 10Base-T - RJ45 */
 #define	IFM_100_TX		6			/* 100Base-TX - RJ45 */
 #define IFM_1000_T		16			/* 1000Base-T - RJ45 */

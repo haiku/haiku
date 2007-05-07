@@ -223,6 +223,9 @@ list_interface(int socket, const char* name)
 		switch (IFM_TYPE(request.ifr_media)) {
 			case IFM_ETHER:
 				switch (IFM_SUBTYPE(request.ifr_media)) {
+					case IFM_AUTO:
+						type = "Auto-select";
+						break;
 					case IFM_10_T:
 						type = "10 MBit, 10BASE-T";
 						break;
