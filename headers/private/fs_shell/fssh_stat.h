@@ -31,6 +31,7 @@ struct fssh_stat {
 	//		can only retrieve the R5 stat structure
 	unsigned int		fssh_st_type;		/* attribute/index type */
 };
+typedef struct fssh_stat fssh_struct_stat;
 
 /* extended file types */
 #define FSSH_S_ATTR_DIR			01000000000	/* attribute directory */

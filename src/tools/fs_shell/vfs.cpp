@@ -4959,17 +4959,17 @@ _kern_access(const char *path, int mode)
 
 fssh_status_t
 _kern_read_stat(int fd, const char *path, bool traverseLeafLink,
-	struct ::fssh_stat *stat, fssh_size_t statSize)
+	fssh_struct_stat *stat, fssh_size_t statSize)
 {
-	struct ::fssh_stat completeStat;
-	struct ::fssh_stat *originalStat = NULL;
+	fssh_struct_stat completeStat;
+	fssh_struct_stat *originalStat = NULL;
 	fssh_status_t status;
 
-	if (statSize > sizeof(struct ::fssh_stat))
+	if (statSize > sizeof(fssh_struct_stat))
 		return FSSH_B_BAD_VALUE;
 
 	// this supports different stat extensions
-	if (statSize < sizeof(struct ::fssh_stat)) {
+	if (statSize < sizeof(fssh_struct_stat)) {
 		originalStat = stat;
 		stat = &completeStat;
 	}
@@ -5028,16 +5028,16 @@ _kern_read_stat(int fd, const char *path, bool traverseLeafLink,
 
 fssh_status_t
 _kern_write_stat(int fd, const char *path, bool traverseLeafLink,
-	const struct ::fssh_stat *stat, fssh_size_t statSize, int statMask)
+	const fssh_struct_stat *stat, fssh_size_t statSize, int statMask)
 {
-	struct ::fssh_stat completeStat;
+	fssh_struct_stat completeStat;
 
-	if (statSize > sizeof(struct ::fssh_stat))
+	if (statSize > sizeof(fssh_struct_stat))
 		return FSSH_B_BAD_VALUE;
 
 	// this supports different stat extensions
-	if (statSize < sizeof(struct ::fssh_stat)) {
-		fssh_memset((uint8_t *)&completeStat + statSize, 0, sizeof(struct ::fssh_stat) - statSize);
+	if (statSize < sizeof(fssh_struct_stat)) {
+		fssh_memset((uint8_t *)&completeStat + statSize, 0, sizeof(fssh_struct_stat) - statSize);
 		fssh_memcpy(&completeStat, stat, statSize);
 		stat = &completeStat;
 	}
@@ -5128,7 +5128,7 @@ _kern_create_index(fssh_dev_t device, const char *name, uint32_t type, uint32_t 
 
 
 fssh_status_t
-_kern_read_index_stat(fssh_dev_t device, const char *name, struct ::fssh_stat *stat)
+_kern_read_index_stat(fssh_dev_t device, const char *name, fssh_struct_stat *stat)
 {
 	return index_name_read_stat(device, name, stat, true);
 }
