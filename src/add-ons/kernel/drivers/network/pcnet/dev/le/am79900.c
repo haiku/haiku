@@ -172,6 +172,8 @@ am79900_config(struct am79900_softc *sc, const char* name, int unit)
 	if (mem > sc->lsc.sc_memsize)
 		panic("%s: memsize", __func__);
 
+	sc->lsc.sc_flags |= LE_DEBUG;
+
 	lance_attach(&sc->lsc);
 
 	return (0);
@@ -450,10 +452,12 @@ am79900_intr(void *arg)
 	if (sc->sc_flags & LE_DEBUG)
 		if_printf(ifp, "%s: entering with isr=%04x\n", __func__, isr);
 #endif
+#if 0
 	if ((isr & LE_C0_INTR) == 0) {
 		LE_UNLOCK(sc);
 		return;
 	}
+#endif
 
 	/*
 	 * Clear interrupt source flags and turn off interrupts. If we

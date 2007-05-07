@@ -128,9 +128,15 @@ extern struct ktr_entry ktr_buf[];
 
 #ifdef KTR
 
+#if 0
 void	ktr_tracepoint(u_int mask, const char *file, int line,
 	    const char *format, u_long arg1, u_long arg2, u_long arg3,
 	    u_long arg4, u_long arg5, u_long arg6);
+#else
+extern void driver_printf(const char *format, ...);
+#define ktr_tracepoint(mask, file, line, format, arg1, arg2, arg3, arg4, arg5, arg6) \
+	driver_printf("(%s:%i) " format "\n", file, line, arg1, arg2, arg3, arg4, arg5, arg6)
+#endif
 
 #define CTR6(m, format, p1, p2, p3, p4, p5, p6) do {			\
 	if (KTR_COMPILE & (m))						\

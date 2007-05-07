@@ -62,11 +62,13 @@
  * 	Useful for debugging newly-ported  drivers.
  */
 
+#define IFMEDIA_DEBUG
+
 static struct ifmedia_entry *ifmedia_match(struct ifmedia *ifm,
     int flags, int mask);
 
 #ifdef IFMEDIA_DEBUG
-int	ifmedia_debug = 0;
+int	ifmedia_debug = 1;
 static	void ifmedia_printword(int);
 #endif
 
@@ -198,7 +200,6 @@ ifmedia_ioctl(ifp, ifr, ifm, cmd)
 	struct ifmedia *ifm;
 	u_long cmd;
 {
-#if 0
 	struct ifmedia_entry *match;
 	struct ifmediareq *ifmr = (struct ifmediareq *) ifr;
 	int error = 0, sticky;
@@ -330,9 +331,13 @@ ifmedia_ioctl(ifp, ifr, ifm, cmd)
 		 */
 		sticky = error;
 		if ((error == 0 || error == E2BIG) && ifmr->ifm_count != 0) {
+#if 0
 			error = copyout((caddr_t)kptr,
 			    (caddr_t)ifmr->ifm_ulist,
 			    ifmr->ifm_count * sizeof(int));
+#endif
+			/* this ioctl() is only called from within the kernel -hugo */
+			memcpy(kptr, ifmr->ifm_ulist, ifmr->ifm_count * sizeof(int));
 		}
 
 		if (error == 0)
@@ -350,8 +355,6 @@ ifmedia_ioctl(ifp, ifr, ifm, cmd)
 	}
 
 	return (error);
-#endif
-	return ENOTSUP;
 }
 
 /*

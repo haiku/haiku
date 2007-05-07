@@ -293,9 +293,12 @@ _kernel_contigmalloc(const char *file, int line, size_t size, int flags,
 	snprintf(name, sizeof(name), "contig:%s:%d", file, line);
 
 	area = create_area(name, &addr, B_ANY_KERNEL_ADDRESS, size,
-		B_FULL_LOCK | B_CONTIGUOUS, 0);
+		B_FULL_LOCK | B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
 	if (area < 0)
 		return NULL;
+
+	driver_printf("(%s) addr = %p, area = %d, size = %lu\n",
+		name, addr, area, size);
 
 	return addr;
 }
@@ -307,6 +310,21 @@ _kernel_contigfree(void *addr, size_t size)
 	delete_area(area_for(addr));
 }
 
+
+/* Marcus' vtophys */
+unsigned long
+vtophys(vm_offset_t vaddr)
+{
+	physical_entry pe;
+	status_t status;
+
+	status = get_memory_map((void *)vaddr, 1, &pe, 1);
+	if (status < 0)
+		panic("fbsd compat: get_memory_map failed for %p, error %08lx\n",
+			(void *)vaddr, status);
+
+	return (unsigned long)pe.address;
+}
 
 status_t
 init_compat_layer()

@@ -14,6 +14,8 @@
 #include <Drivers.h>
 #include <ether_driver.h>
 
+#include <sys/sockio.h>
+
 #include <compat/sys/haiku-module.h>
 
 #include <compat/sys/bus.h>
@@ -117,6 +119,21 @@ compat_open(const char *name, uint32 flags, void **cookie)
 		dev->flags = 0;
 
 	driver_printf(" ... status = 0x%ld\n", status);
+
+	if (status == 0) {
+		struct ifnet *ifp = dev->ifp;
+		struct ifreq ifr;
+
+		ifp->if_flags = 0;
+		ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
+
+		memset(&ifr, 0, sizeof(ifr));
+		ifr.ifr_media = IFM_MAKEWORD(IFM_ETHER, IFM_AUTO, 0, 0);
+		ifp->if_ioctl(ifp, SIOCSIFMEDIA, &ifr);
+
+		ifp->if_flags = IFF_UP;
+		ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
+	}
 
 	*cookie = dev;
 

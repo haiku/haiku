@@ -17,19 +17,6 @@ typedef void *		pmap_t;
 
 #define pmap_kextract(vaddr)	vtophys(vaddr)
 
-/* Marcus' vtophys */
-static inline unsigned long
-vtophys(vm_offset_t vaddr)
-{
-	physical_entry pe;
-	status_t status;
-
-	status = get_memory_map((void *)vaddr, 1, &pe, 1);
-	if (status < 0)
-		panic("fbsd compat: get_memory_map failed for %p, error %08lx\n",
-			(void *)vaddr, status);
-
-	return (unsigned long)pe.address;
-}
+unsigned long vtophys(vm_offset_t vaddr);
 
 #endif

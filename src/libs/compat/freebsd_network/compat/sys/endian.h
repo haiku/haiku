@@ -58,7 +58,7 @@
  * Host to big endian, host to little endian, big endian to host, and little
  * endian to host byte order functions as detailed in byteorder(9).
  */
-#if _YTE_ORDER == _LITTLE_ENDIAN
+#if _BYTE_ORDER == _LITTLE_ENDIAN
 #define	htobe16(x)	bswap16((x))
 #define	htobe32(x)	bswap32((x))
 #define	htobe64(x)	bswap64((x))
