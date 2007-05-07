@@ -1,8 +1,9 @@
-/* Volume - BFS super block, mounting, etc.
- *
- * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
+
+//! super block, mounting, etc.
 
 
 #include "Debug.h"
@@ -233,7 +234,7 @@ disk_super_block::Initialize(const char *diskName, off_t numBlocks, uint32 block
 	}
 
 	num_ags = HOST_ENDIAN_TO_BFS_INT32(numGroups);
-	blocks_per_ag = HOST_ENDIAN_TO_BFS_INT32(1);
+	blocks_per_ag = HOST_ENDIAN_TO_BFS_INT32(blocksPerGroup);
 	ag_shift = HOST_ENDIAN_TO_BFS_INT32(groupShift);
 }
 

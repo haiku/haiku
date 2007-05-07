@@ -1,8 +1,9 @@
-/* BlockAllocator - block bitmap handling and allocation policies
- *
+/*
  * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
+
+//! block bitmap handling and allocation policies
 
 
 #include "Debug.h"
@@ -451,11 +452,10 @@ BlockAllocator::_Initialize(BlockAllocator *allocator)
 
 	Volume *volume = allocator->fVolume;
 	uint32 blocks = allocator->fBlocksPerGroup;
-	uint32 numBits = 8 * blocks * volume->BlockSize();
 	uint32 blockShift = volume->BlockShift();
 	off_t freeBlocks = 0;
 
-	uint32 *buffer = (uint32 *)malloc(numBits >> 3);
+	uint32 *buffer = (uint32 *)malloc(blocks << blockShift);
 	if (buffer == NULL) {
 		allocator->fLock.Unlock();
 		RETURN_ERROR(B_NO_MEMORY);
@@ -463,36 +463,41 @@ BlockAllocator::_Initialize(BlockAllocator *allocator)
 
 	AllocationGroup *groups = allocator->fGroups;
 	off_t offset = 1;
-	int32 num = allocator->fNumGroups;
+	uint32 bitsPerGroup = 8 * (blocks << blockShift);
+	int32 numGroups = allocator->fNumGroups;
 
-	for (int32 i = 0; i < num; i++) {
+	for (int32 i = 0; i < numGroups; i++) {
 		if (read_pos(volume->Device(), offset << blockShift, buffer,
 				blocks << blockShift) < B_OK)
 			break;
 
 		// the last allocation group may contain less blocks than the others
-		if (i == num - 1) {
-			groups[i].fNumBits = volume->NumBlocks() - i * numBits;
+		if (i == numGroups - 1) {
+			groups[i].fNumBits = volume->NumBlocks() - i * bitsPerGroup;
 			groups[i].fNumBlocks = 1 + ((groups[i].NumBits() - 1) >> (blockShift + 3));
 		} else {
-			groups[i].fNumBits = numBits;
+			groups[i].fNumBits = bitsPerGroup;
 			groups[i].fNumBlocks = blocks;
 		}
 		groups[i].fStart = offset;
 
 		// finds all free ranges in this allocation group
 		int32 start = -1, range = 0;
-		int32 size = groups[i].fNumBits, num = 0;
+		int32 numBits = groups[i].fNumBits, bit = 0;
+		int32 count = (numBits + 31) / 32;
 
-		for (int32 k = 0;k < (size >> 2);k++) {
-			for (int32 j = 0; j < 32 && num < size; j++, num++) {
+		for (int32 k = 0; k < count; k++) {
+			for (int32 j = 0; j < 32 && bit < numBits; j++, bit++) {
 				if (buffer[k] & (1UL << j)) {
+					// block is in use
 					if (range > 0) {
 						groups[i].AddFreeRange(start, range);
 						range = 0;
 					}
-				} else if (range++ == 0)
-					start = num;
+				} else if (range++ == 0) {
+					// block is free, start new free range
+					start = bit;
+				}
 			}
 		}
 		if (range)
