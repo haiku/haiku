@@ -327,6 +327,9 @@ init_driver(void)
 		be_b57_dev_cards[cards_found].opened = 0;
 		be_b57_dev_cards[cards_found].block = 1;
 		be_b57_dev_cards[cards_found].lock = 0;
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		be_b57_dev_cards[cards_found].linkChangeSem = -1;
+#endif
 
 		if (LM_GetAdapterInfo(&be_b57_dev_cards[cards_found].lm_dev) != LM_STATUS_SUCCESS) {
 			put_module(B_PCI_MODULE_NAME);
@@ -519,6 +522,15 @@ b57_ioctl(void *cookie,uint32 op,void *data,size_t len)
 			
 			return user_memcpy(data, &state, sizeof(ether_link_state_t));
 		}
+		case ETHER_SET_LINK_STATE_SEM:
+		{
+			if (user_memcpy(&pUmDevice->linkChangeSem, data, sizeof(sem_id)) < B_OK) {
+				pUmDevice->linkChangeSem = -1;
+				return B_BAD_ADDRESS;
+			}
+			return B_OK;
+		}
+
 #endif
 	}
 	return B_ERROR;
@@ -909,7 +921,16 @@ MM_GetConfig(PLM_DEVICE_BLOCK pDevice)
 
 
 LM_STATUS
-MM_IndicateStatus(PLM_DEVICE_BLOCK pDevice, LM_STATUS Status) {
+MM_IndicateStatus(PLM_DEVICE_BLOCK pDevice, LM_STATUS Status)
+{
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	struct be_b57_dev *pUmDevice = (struct be_b57_dev *)pDevice;
+	
+	if (pUmDevice->linkChangeSem != -1)
+		release_sem_etc(pUmDevice->linkChangeSem, 1,
+			B_DO_NOT_RESCHEDULE);
+#endif
+
 	return LM_STATUS_SUCCESS;
 }
 

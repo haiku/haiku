@@ -82,6 +82,10 @@ struct be_b44_dev {
 
 	int block;
 	spinlock lock;
+	
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	sem_id				linkChangeSem;
+#endif
 };
 
 struct B_UM_PACKET {

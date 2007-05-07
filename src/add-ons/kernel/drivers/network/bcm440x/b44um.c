@@ -109,6 +109,9 @@ init_driver(void)
 		be_b44_dev_cards[sCardsFound].opened = 0;
 		be_b44_dev_cards[sCardsFound].block = 1;
 		be_b44_dev_cards[sCardsFound].lock = 0;
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		be_b44_dev_cards[sCardsFound].linkChangeSem = -1;
+#endif
 
 		if (b44_LM_GetAdapterInfo(&be_b44_dev_cards[sCardsFound].lm_dev) != LM_STATUS_SUCCESS)
 			return ENODEV;
@@ -216,7 +219,7 @@ b44_free(void *cookie)
 
 
 status_t
-b44_ioctl(void *cookie,uint32 op,void *data,size_t len)
+b44_ioctl(void *cookie,uint32 op, void *data, size_t len)
 {
 	struct be_b44_dev *pUmDevice = (struct be_b44_dev *)cookie;
 
@@ -278,6 +281,16 @@ b44_ioctl(void *cookie,uint32 op,void *data,size_t len)
 
 			return user_memcpy(data, &state, sizeof(ether_link_state_t));
 		}
+		
+		case ETHER_SET_LINK_STATE_SEM:
+		{
+			if (user_memcpy(&pUmDevice->linkChangeSem, data, sizeof(sem_id)) < B_OK) {
+				pUmDevice->linkChangeSem = -1;
+				return B_BAD_ADDRESS;
+			}
+			return B_OK;
+		}
+
 #endif
 	}
 	return B_ERROR;
@@ -600,6 +613,14 @@ b44_MM_GetConfig(PLM_DEVICE_BLOCK pDevice)
 LM_STATUS
 b44_MM_IndicateStatus(PLM_DEVICE_BLOCK pDevice, LM_STATUS Status)
 {
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	struct be_b44_dev *pUmDevice = (struct be_b44_dev *)pDevice;
+	
+	if (pUmDevice->linkChangeSem != -1)
+		release_sem_etc(pUmDevice->linkChangeSem, 1,
+			B_DO_NOT_RESCHEDULE);
+#endif
+
 	return LM_STATUS_SUCCESS;
 }
 
