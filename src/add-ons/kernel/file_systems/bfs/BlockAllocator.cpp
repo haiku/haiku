@@ -15,10 +15,6 @@
 
 #include "system_dependencies.h"
 
-#ifdef USER
-#	define spawn_kernel_thread spawn_thread
-#endif
-
 
 // Things the BlockAllocator should do:
 

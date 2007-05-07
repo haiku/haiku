@@ -16,12 +16,10 @@
 // Configure here if and when real benaphores should be used
 #define USE_BENAPHORE
 	// if defined, benaphores are used for the Semaphore/RecursiveLock classes
-#ifdef USER
 //#	define FAST_LOCK
 	// the ReadWriteLock class uses a second Semaphore to
 	// speed up locking - only makes sense if USE_BENAPHORE
 	// is defined, too.
-#endif
 #ifdef FAST_LOCK
 #	error implement recursive write locking first
 #endif
@@ -37,9 +35,6 @@ class Semaphore {
 			fSemaphore(create_sem(1, name))
 #endif
 		{
-#ifndef USER
-			set_sem_owner(fSemaphore, B_SYSTEM_TEAM);
-#endif
 		}
 
 		~Semaphore()
@@ -126,9 +121,6 @@ class RecursiveLock {
 #endif
 			fOwner(-1)
 		{
-#ifndef USER
-			set_sem_owner(fSemaphore, B_SYSTEM_TEAM);
-#endif
 		}
 
 		status_t LockWithTimeout(bigtime_t timeout)
@@ -276,9 +268,6 @@ class ReadWriteLock {
 		{
 			fSemaphore = create_sem(0, name);
 			fCount = MAX_READERS;
-#ifndef USER
-			set_sem_owner(fSemaphore, B_SYSTEM_TEAM);
-#endif
 			return fSemaphore;
 		}
 
@@ -360,9 +349,6 @@ class ReadWriteLock {
 		status_t Initialize(const char *name = "bfs r/w lock")
 		{
 			fSemaphore = create_sem(MAX_READERS, name);
-#ifndef USER
-			set_sem_owner(fSemaphore, B_SYSTEM_TEAM);
-#endif
 			return fSemaphore;
 		}
 

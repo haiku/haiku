@@ -1,6 +1,5 @@
-/* Debug - debug stuff
- *
- * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
  * Some code is based on work previously done by Marcus Overhagen.
  *
  * This file may be used under the terms of the MIT License.
@@ -242,13 +241,11 @@ dump_bplustree_node(const bplustree_node *node, const bplustree_header *header,
 //	#pragma mark -
 
 
-#ifndef USER
-
 static int
-dbg_inode(int argc, char **argv)
+debug_inode(int argc, char **argv)
 {
 	if (argc < 2) {
-		kprintf("usage: bfsinode ptr-to-inode\n");
+		kprintf("usage: bfsinode <ptr-to-inode>\n");
 		return 0;
 	}
 
@@ -258,22 +255,17 @@ dbg_inode(int argc, char **argv)
 	return B_OK;
 }
 
-#endif
 
 void
 remove_debugger_commands()
 {
-#ifndef USER
-	remove_debugger_command("bfsinode", dbg_inode);
-#endif
+	remove_debugger_command("bfsinode", debug_inode);
 }
 
 
 void
 add_debugger_commands()
 {
-#ifndef USER
-	add_debugger_command("bfsinode", dbg_inode, "dump an Inode object");
-#endif
+	add_debugger_command("bfsinode", debug_inode, "dump an Inode object");
 }
 

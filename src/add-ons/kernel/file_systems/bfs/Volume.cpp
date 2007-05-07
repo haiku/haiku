@@ -273,9 +273,7 @@ Volume::Panic()
 {
 	FATAL(("we have to panic... switch to read-only mode!\n"));
 	fFlags |= VOLUME_READ_ONLY;
-#ifdef USER
-	debugger("BFS panics!");
-#elif defined(DEBUG)
+#ifdef DEBUG
 	kernel_debugger("BFS panics!");
 #endif
 }
