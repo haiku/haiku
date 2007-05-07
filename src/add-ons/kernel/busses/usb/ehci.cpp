@@ -916,19 +916,21 @@ EHCI::CancelQueuedTransfers(Pipe *pipe)
 			current->transfer->Finished(B_CANCELED, 0);
 			delete current->transfer;
 
+			transfer_data *next = current->link;
 			if (last)
-				last->link = current->link;
+				last->link = next;
 			else
-				fFirstTransfer = current->link;
+				fFirstTransfer = next;
 
 			if (fLastTransfer == current)
 				fLastTransfer = last;
 
 			delete current;
+			current = next;
+		} else {
+			last = current;
+			current = current->link;
 		}
-
-		last = current;
-		current = current->link;
 	}
 
 	Unlock();
