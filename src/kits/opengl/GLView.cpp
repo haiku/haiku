@@ -98,8 +98,11 @@ BGLView::SwapBuffers()
 void
 BGLView::SwapBuffers(bool vSync)
 {
-	if (fRenderer)
+	if (fRenderer) {
+		lock_draw();
 		fRenderer->SwapBuffers(vSync);
+		unlock_draw();
+	}
 }
 
 
@@ -177,9 +180,16 @@ BGLView::AttachedToWindow()
 	
 	fRenderer = fRoster->GetRenderer();
 	if (fRenderer) {
+		// Jackburton: The following code was commented because it doesn't look good in "direct" mode:
+		// when the window is moved, the app_server doesn't paint the view's background, and 
+		// the stuff behind the window itself shows up. 
+		// Setting the view color to black, instead, looks a bit more elegant.
+#if 0
 		// Don't paint white window background when resized
 		SetViewColor(B_TRANSPARENT_32_BIT);
-
+#else
+		SetViewColor(0, 0, 0);
+#endif
 		// Set default OpenGL viewport:
 		glViewport(0, 0, Bounds().IntegerWidth(), Bounds().IntegerHeight());
 
@@ -205,7 +215,7 @@ BGLView::AllAttached()
 	BView::AllAttached();
 }
 
-
+	
 void
 BGLView::DetachedFromWindow()
 {
