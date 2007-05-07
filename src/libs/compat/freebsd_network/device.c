@@ -198,11 +198,13 @@ compat_read(void *cookie, off_t position, void *buf, size_t *numBytes)
 
 	len = min_c(max_c((size_t)mb->m_len, 0), *numBytes);
 
+#if 0
 	mb = m_defrag(mb, 0);
 	if (mb == NULL) {
 		*numBytes = 0;
 		return B_NO_MEMORY;
 	}
+#endif
 
 	memcpy(buf, mtod(mb, const void *), len);
 	*numBytes = len;

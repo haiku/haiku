@@ -50,6 +50,7 @@ int HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev) {
 			BUS_SPACE_BARRIER_WRITE);
 		bus_space_write_2(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RDP,
 			value & ~LE_C0_INEA);
+		lesc->sc_am79900.lsc.sc_lastisr |= value;
 	}
 
 	HAIKU_INTR_REGISTER_LEAVE(status);

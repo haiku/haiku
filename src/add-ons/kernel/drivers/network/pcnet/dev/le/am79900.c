@@ -447,17 +447,25 @@ am79900_intr(void *arg)
 		return;
 	}
 
+#if 0
 	isr = (*sc->sc_rdcsr)(sc, LE_CSR0);
+#endif
+	{
+		cpu_status status;
+		HAIKU_INTR_REGISTER_ENTER(status);
+		isr = sc->sc_lastisr;
+		sc->sc_lastisr = 0;
+		HAIKU_INTR_REGISTER_LEAVE(status);
+	}
+
 #if defined(LEDEBUG) && LEDEBUG > 1
 	if (sc->sc_flags & LE_DEBUG)
 		if_printf(ifp, "%s: entering with isr=%04x\n", __func__, isr);
 #endif
-#if 0
 	if ((isr & LE_C0_INTR) == 0) {
 		LE_UNLOCK(sc);
 		return;
 	}
-#endif
 
 	/*
 	 * Clear interrupt source flags and turn off interrupts. If we

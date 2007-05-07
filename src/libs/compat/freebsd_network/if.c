@@ -161,7 +161,7 @@ ether_output(struct ifnet *ifp, struct mbuf *m, struct sockaddr *dst,
 static void
 ether_input(struct ifnet *ifp, struct mbuf *m)
 {
-	device_t dev = NULL; /* XXX */
+	device_t dev = ifp->if_dev;
 
 	IF_ENQUEUE(&dev->receive_queue, m);
 	release_sem_etc(dev->receive_sem, 1, B_DO_NOT_RESCHEDULE);

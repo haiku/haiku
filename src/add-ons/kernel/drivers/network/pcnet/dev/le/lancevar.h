@@ -119,6 +119,8 @@ struct lance_softc {
 #define	LE_CARRIER	(1 << 2)
 #define	LE_DEBUG	(1 << 3)
 #define	LE_PROMISC	(1 << 4)
+
+	uint16_t sc_lastisr;
 };
 
 #define	LE_LOCK_INIT(_sc, _name)					\
