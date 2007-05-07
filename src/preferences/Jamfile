@@ -8,6 +8,7 @@ SubInclude HAIKU_TOP src preferences drivesetup ;
 SubInclude HAIKU_TOP src preferences dun ;
 SubInclude HAIKU_TOP src preferences filetypes ;
 SubInclude HAIKU_TOP src preferences fonts ;
+SubInclude HAIKU_TOP src preferences joysticks ;
 SubInclude HAIKU_TOP src preferences keyboard ;
 SubInclude HAIKU_TOP src preferences keymap ;
 SubInclude HAIKU_TOP src preferences mail ;

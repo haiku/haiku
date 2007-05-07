@@ -1,0 +1,18 @@
+SubDir HAIKU_TOP src preferences joysticks ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
+Preference Joysticks :
+	CalibWin.cpp
+	JoyWin.cpp
+	Joysticks.cpp
+	MessageWin.cpp
+	: be device
+	: Joysticks.rdef
+	;
+
+if $(TARGET_PLATFORM) = libbe_test {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Joysticks
+		: tests!apps ;
+}
