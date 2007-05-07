@@ -16,6 +16,10 @@ const ulong MSG_FIND = 'msgf';
 const ulong MSG_FIND_START = 'msac';
 const ulong MSG_FIND_CLOSED = 'mfcl';
 
+class BTextControl;
+class BRadioButton;
+class BBox;
+class BCheckBox;
 
 class FindWindow : public BWindow {
 	public:
