@@ -1,7 +1,7 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <SupportDefs.h>
@@ -34,6 +34,11 @@ main(int argc, char **argv)
 		return -1;
 	}
 
+	int32 blockShift = 9;
+	while ((1UL << blockShift) < blockSize) {
+		blockShift++;
+	}
+
 	uint32 blocks_per_ag = 1;
 	uint32 ag_shift = 13;
 	uint32 num_ags = 0;
@@ -61,11 +66,17 @@ main(int argc, char **argv)
 	}
 
 	printf("blocks = %Ld\n", numBlocks);
+	printf("block shift = %ld\n", blockShift);
 	printf("bits per block = %lu\n", bitsPerBlock);
 	printf("bitmap blocks = %Ld\n", bitmapBlocks);
 	printf("allocation groups = %lu\n", num_ags);
 	printf("shift = %lu (%lu)\n", ag_shift, 1UL << ag_shift);
 	printf("blocks per group = %lu\n", blocks_per_ag);
+
+	uint32 bitsPerGroup = 8 * (blocks_per_ag << blockShift);
+
+	printf("\nBits per group: %ld\n", bitsPerGroup);
+	printf("Bits in last group: %ld\n", numBlocks - (num_ags - 1) * bitsPerGroup);
 
 	return 0;
 }
