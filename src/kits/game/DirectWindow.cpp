@@ -38,16 +38,13 @@ enum dw_status_bits {
 static void
 print_direct_buffer_state(const direct_buffer_state &state)
 {
-	if (state == 0)
-		return;
-
 	char string[128];
 	int modeState = state & B_DIRECT_MODE_MASK;
-	if (state == B_DIRECT_START)
+	if (modeState == B_DIRECT_START)
 		strcpy(string, "B_DIRECT_START");
-	else if (state == B_DIRECT_MODIFY)
+	else if (modeState == B_DIRECT_MODIFY)
 		strcpy(string, "B_DIRECT_MODIFY"); 
-	else if (state == B_DIRECT_STOP)
+	else if (modeState == B_DIRECT_STOP)
 		strcpy(string, "B_DIRECT_STOP");
 
 	if (state & B_CLIPPING_MODIFIED)
