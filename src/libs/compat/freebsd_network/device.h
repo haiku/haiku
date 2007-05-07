@@ -32,6 +32,8 @@ struct device {
 	struct ifqueue	receive_queue;
 	sem_id			receive_sem;
 
+	sem_id			link_state_sem;
+
 	struct ifnet *	ifp;
 
 	int				unit;

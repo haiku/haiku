@@ -143,8 +143,7 @@ if_link_state_change(struct ifnet *ifp, int link_state)
 
 	ifp->if_link_state = link_state;
 
-	/* XXX */
-	/* wake network stack's link state sem */
+	release_sem_etc(ifp->if_dev->link_state_sem, 1, B_DO_NOT_RESCHEDULE);
 }
 
 

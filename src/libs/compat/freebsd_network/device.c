@@ -61,6 +61,8 @@ allocate_device(driver_t *driver)
 		return NULL;
 	}
 
+	dev->link_state_sem = -1;
+
 	ifq_init(&dev->receive_queue, semName);
 
 	return dev;
@@ -241,29 +243,47 @@ static status_t
 compat_control(void *cookie, uint32 op, void *arg, size_t len)
 {
 	device_t dev = cookie;
+	struct ifnet *ifp = dev->ifp;
 
 	switch (op) {
 		case ETHER_INIT:
 			return B_OK;
 
 		case ETHER_GETADDR:
-			memcpy(arg, IF_LLADDR(dev->ifp), ETHER_ADDR_LEN);
-			return B_OK;
+			return user_memcpy(arg, IF_LLADDR(dev->ifp), ETHER_ADDR_LEN);
 
 		case ETHER_NONBLOCK:
-			if (*(int32 *)arg)
+		{
+			int32 value;
+			if (len < 4)
+				return B_BAD_VALUE;
+			if (user_memcpy(&value, arg, sizeof(int32)) < B_OK)
+				return B_BAD_ADDRESS;
+			if (value)
 				dev->flags |= DEVICE_NON_BLOCK;
 			else
 				dev->flags &= ~DEVICE_NON_BLOCK;
 			return B_OK;
+		}
 
 		case ETHER_SETPROMISC:
-			/* TODO */
-			return B_ERROR;
+		{
+			int32 value;
+			if (len < 4)
+				return B_BAD_VALUE;
+			if (user_memcpy(&value, arg, sizeof(int32)) < B_OK)
+				return B_BAD_ADDRESS;
+			if (value)
+				ifp->if_flags |= IFF_PROMISC;
+			else
+				ifp->if_flags &= ~IFF_PROMISC;
+			return ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
+		}
 
 		case ETHER_GETFRAMESIZE:
-			*(uint32 *)arg = dev->ifp->if_mtu;
-			return B_OK;
+			if (len < 4)
+				return B_BAD_VALUE;
+			return user_memcpy(arg, &dev->ifp->if_mtu, 4);
 
 		case ETHER_ADDMULTI:
 		case ETHER_REMMULTI:
@@ -271,11 +291,38 @@ compat_control(void *cookie, uint32 op, void *arg, size_t len)
 			return B_ERROR;
 
 		case ETHER_GET_LINK_STATE:
-			/* TODO */
-			return B_ERROR;
+		{
+			struct ifmediareq mediareq;
+			ether_link_state_t state;
+			status_t status;
+
+			if (len < sizeof(ether_link_state_t))
+				return EINVAL;
+
+			memset(&mediareq, 0, sizeof(mediareq));
+			status = ifp->if_ioctl(ifp, SIOCGIFMEDIA, &mediareq);
+			if (status < B_OK)
+				return status;
+
+			state.media = mediareq.ifm_active;
+			if (mediareq.ifm_status & IFM_ACTIVE)
+				state.media |= IFM_ACTIVE;
+			if (mediareq.ifm_active & IFM_10_T)
+				state.speed = 10000;
+			else if (mediareq.ifm_active & IFM_100_TX)
+				state.speed = 100000;
+			else
+				state.speed = 1000000;
+			state.quality = 1000;
+
+			return user_memcpy(arg, &state, sizeof(ether_link_state_t));
+		}
 
 		case ETHER_SET_LINK_STATE_SEM:
-			/* TODO */
+			if (user_memcpy(&dev->link_state_sem, arg, sizeof(sem_id)) < B_OK) {
+				dev->link_state_sem = -1;
+				return B_BAD_ADDRESS;
+			}
 			return B_OK;
 	}
 
