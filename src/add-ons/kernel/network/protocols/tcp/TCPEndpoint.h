@@ -67,6 +67,8 @@ class TCPEndpoint : public net_protocol, public ProtocolSocket {
 		status_t SetSendBufferSize(size_t length);
 		status_t SetReceiveBufferSize(size_t length);
 
+		status_t SetOption(int option, const void *value, int length);
+
 		tcp_state State() const { return fState; }
 		bool IsBound() const;
 

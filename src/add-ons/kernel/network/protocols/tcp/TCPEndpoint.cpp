@@ -724,6 +724,27 @@ TCPEndpoint::SetReceiveBufferSize(size_t length)
 }
 
 
+status_t
+TCPEndpoint::SetOption(int option, const void *_value, int length)
+{
+	if (option != TCP_NODELAY)
+		return B_BAD_VALUE;
+
+	if (length != sizeof(int))
+		return B_BAD_VALUE;
+
+	const int *value = (const int *)_value;
+
+	RecursiveLocker _(fLock);
+	if (*value)
+		fOptions |= TCP_NODELAY;
+	else
+		fOptions &= ~TCP_NODELAY;
+
+	return B_OK;
+}
+
+
 //	#pragma mark - misc
 
 

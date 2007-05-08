@@ -489,7 +489,8 @@ tcp_setsockopt(net_protocol *_protocol, int level, int option,
 			if (status < B_OK)
 				return status;
 		}
-	}
+	} else if (level == IPPROTO_TCP)
+		return protocol->SetOption(option, _value, length);
 
 	return protocol->next->module->setsockopt(protocol->next, level, option,
 		_value, length);
