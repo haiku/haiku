@@ -399,20 +399,21 @@ _fbsd_init_driver(driver_t *driver)
 	if (dev == NULL)
 		return B_NO_MEMORY;
 
-	init_compat_layer();
+	status = init_compat_layer();
+	if (status < B_OK)
+		goto err_1;
 
 	status = init_mutexes();
-	if (status < B_OK) {
-		free_device(dev);
-		return status;
-	}
+	if (status < B_OK)
+		goto err_2;
+
+	status = init_taskqueues();
+	if (status < B_OK)
+		goto err_3;
 
 	status = init_mbufs();
-	if (status < B_OK) {
-		uninit_mutexes();
-		free_device(dev);
-		return status;
-	}
+	if (status < B_OK)
+		goto err_4;
 
 	init_bounce_pages();
 
@@ -443,6 +444,15 @@ _fbsd_init_driver(driver_t *driver)
 	gDevNameList[ncards + 1] = NULL;
 
 	return B_OK;
+
+err_4:
+	uninit_taskqueues();
+err_3:
+	uninit_mutexes();
+err_2:
+err_1:
+	free(dev);
+	return status;
 }
 
 
@@ -459,5 +469,6 @@ _fbsd_uninit_driver(driver_t *driver)
 
 	uninit_bounce_pages();
 	uninit_mbufs();
+	uninit_taskqueues();
 	uninit_mutexes();
 }

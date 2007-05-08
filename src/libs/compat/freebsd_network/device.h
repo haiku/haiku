@@ -62,6 +62,9 @@ void uninit_mutexes(void);
 
 status_t init_compat_layer(void);
 
+status_t init_taskqueues(void);
+void uninit_taskqueues(void);
+
 /* busdma_machdep.c */
 void init_bounce_pages(void);
 void uninit_bounce_pages(void);
