@@ -59,6 +59,11 @@ struct	vlanreq {
 #define	SIOCGETVLAN	SIOCGIFGENERIC
 
 #ifdef _KERNEL
+#if 1
+#define	VLAN_INPUT_TAG_NEW(_ifp, _m, _t)	do { } while (0)
+#define	VLAN_OUTPUT_TAG(_ifp, _m)			NULL
+#define	VLAN_TAG_VALUE(_mt)					0
+#else
 /*
  * Drivers that are capable of adding and removing the VLAN header
  * in hardware indicate they support this by marking IFCAP_VLAN_HWTAGGING
@@ -141,6 +146,7 @@ struct	vlanreq {
 #define	VLAN_OUTPUT_TAG(_ifp, _m)				\
 	((_m)->m_flags & M_VLANTAG ?				\
 		m_tag_locate((_m), MTAG_VLAN, MTAG_VLAN_TAG, NULL) : NULL)
+#endif
 #endif /* _KERNEL */
 
 #endif /* _NET_IF_VLAN_VAR_H_ */

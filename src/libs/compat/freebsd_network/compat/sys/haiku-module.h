@@ -79,6 +79,12 @@ extern int __haiku_disable_interrupts(device_t dev);
 
 #define HAIKU_CHECK_DISABLE_INTERRUPTS		__haiku_disable_interrupts
 
+#define NO_HAIKU_CHECK_DISABLE_INTERRUPTS() \
+	int HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev) { \
+		panic("should never be called."); \
+		return -1; \
+	}
+
 #define HAIKU_INTR_REGISTER_ENTER(status) do { \
 	status = disable_interrupts(); \
 	acquire_spinlock(&__haiku_intr_spinlock); \

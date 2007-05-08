@@ -47,8 +47,12 @@ enum {
 	DEVICE_OPEN			= 1 << 0,
 	DEVICE_CLOSED		= 1 << 1,
 	DEVICE_NON_BLOCK	= 1 << 2,
+	DEVICE_DESC_ALLOCED	= 1 << 3,
 };
 
+
+#define UNIMPLEMENTED() \
+	panic("fbsd compat, unimplemented: " __FUNCTION__)
 
 status_t init_mbufs(void);
 void uninit_mbufs(void);

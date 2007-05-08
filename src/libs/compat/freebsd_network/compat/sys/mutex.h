@@ -53,6 +53,9 @@ static inline int mtx_initialized(struct mtx *mtx)
 void mtx_init(struct mtx *m, const char *name, const char *type, int opts);
 void mtx_destroy(struct mtx *m);
 
+#define NET_LOCK_GIANT()
+#define NET_UNLOCK_GIANT()
+
 extern struct mtx Giant;
 
 #endif

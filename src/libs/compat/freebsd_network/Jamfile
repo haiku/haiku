@@ -18,4 +18,5 @@ Library libfreebsd_network.a :
 	mbuf.c
 	mii.c
 	mutex.c
+	taskqueue.c
 	;

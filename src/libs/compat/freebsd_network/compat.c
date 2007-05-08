@@ -184,6 +184,14 @@ device_set_desc(device_t dev, const char *desc)
 }
 
 
+void
+device_set_desc_copy(device_t dev, const char *desc)
+{
+	dev->description = strdup(desc);
+	dev->flags |= DEVICE_DESC_ALLOCED;
+}
+
+
 const char *
 device_get_name(device_t dev)
 {
@@ -297,7 +305,7 @@ _kernel_contigmalloc(const char *file, int line, size_t size, int flags,
 	if (area < 0)
 		return NULL;
 
-	driver_printf("(%s) addr = %p, area = %d, size = %lu\n",
+	driver_printf("(%s) addr = %p, area = %ld, size = %lu\n",
 		name, addr, area, size);
 
 	return addr;

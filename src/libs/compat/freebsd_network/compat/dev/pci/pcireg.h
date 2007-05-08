@@ -7,11 +7,13 @@
 #define PCIR_SUBVEND_0	0x2c
 #define PCIR_SUBDEV_0	0x2e
 
-#define PCIM_CMD_PORTEN		0x0001
-#define PCIM_CMD_MEMEN		0x0002
-#define PCIM_CMD_MWRICEN	0x0010
+#define PCIM_CMD_PORTEN			0x0001
+#define PCIM_CMD_MEMEN			0x0002
+#define PCIM_CMD_BUSMASTEREN	0x0004
+#define PCIM_CMD_MWRICEN		0x0010
 
 #define PCIR_BARS		0x10
 #define PCIR_BAR(x)		(PCIR_BARS + (x) * 4)
+#define PCIR_CIS		0x28
 
 #endif

@@ -187,6 +187,18 @@ intr_wrapper(void *data)
 
 
 static int32
+intr_fast_wrapper(void *data)
+{
+	struct internal_intr *intr = data;
+
+	intr->handler(intr->arg);
+
+	/* no way to know, so let other devices get it as well */
+	return B_UNHANDLED_INTERRUPT;
+}
+
+
+static int32
 intr_handler(void *data)
 {
 	struct internal_intr *intr = data;
@@ -209,9 +221,12 @@ intr_handler(void *data)
 static void
 free_internal_intr(struct internal_intr *intr)
 {
-	status_t status;
-	delete_sem(intr->sem);
-	wait_for_thread(intr->thread, &status);
+	if (intr->sem >= B_OK) {
+		status_t status;
+		delete_sem(intr->sem);
+		wait_for_thread(intr->thread, &status);
+	}
+
 	free(intr);
 }
 
@@ -235,25 +250,35 @@ bus_setup_intr(device_t dev, struct resource *res, int flags,
 	intr->arg = arg;
 	intr->irq = res->handle;
 
-	snprintf(semName, sizeof(semName), "%s intr", dev->dev_name);
+	if (flags & INTR_FAST) {
+		intr->sem = -1;
+		intr->thread = -1;
 
-	intr->sem = create_sem(0, semName);
-	if (intr->sem < B_OK) {
-		free(intr);
-		return B_NO_MEMORY;
+		status = install_io_interrupt_handler(intr->irq,
+			intr_fast_wrapper, intr, 0);
+	} else {
+		snprintf(semName, sizeof(semName), "%s intr", dev->dev_name);
+
+		intr->sem = create_sem(0, semName);
+		if (intr->sem < B_OK) {
+			free(intr);
+			return B_NO_MEMORY;
+		}
+
+		snprintf(semName, sizeof(semName), "%s intr handler", dev->dev_name);
+
+		intr->thread = spawn_kernel_thread(intr_handler, semName,
+			B_REAL_TIME_DISPLAY_PRIORITY, intr);
+		if (intr->thread < B_OK) {
+			delete_sem(intr->sem);
+			free(intr);
+			return B_NO_MEMORY;
+		}
+
+		status = install_io_interrupt_handler(intr->irq,
+			intr_wrapper, intr, 0);
 	}
 
-	snprintf(semName, sizeof(semName), "%s intr handler", dev->dev_name);
-
-	intr->thread = spawn_kernel_thread(intr_handler, semName,
-		B_REAL_TIME_DISPLAY_PRIORITY, intr);
-	if (intr->thread < B_OK) {
-		delete_sem(intr->sem);
-		free(intr);
-		return B_NO_MEMORY;
-	}
-
-	status = install_io_interrupt_handler(intr->irq, intr_wrapper, intr, 0);
 	if (status < B_OK) {
 		free_internal_intr(intr);
 		return status;
@@ -280,8 +305,23 @@ bus_teardown_intr(device_t dev, struct resource *res, void *arg)
 int
 bus_generic_detach(device_t dev)
 {
-	/* TODO */
+	UNIMPLEMENTED();
+	return B_ERROR;
+}
 
+
+int
+bus_generic_suspend(device_t dev)
+{
+	UNIMPLEMENTED();
+	return B_ERROR;
+}
+
+
+int
+bus_generic_resume(device_t dev)
+{
+	UNIMPLEMENTED();
 	return B_ERROR;
 }
 

@@ -75,6 +75,8 @@ free_device(device_t dev)
 	delete_sem(dev->receive_sem);
 	ifq_uninit(&dev->receive_queue);
 	free(dev->softc);
+	if (dev->flags & DEVICE_DESC_ALLOCED)
+		free((char *)dev->description);
 	free(dev);
 }
 
@@ -131,7 +133,7 @@ compat_open(const char *name, uint32 flags, void **cookie)
 
 		memset(&ifr, 0, sizeof(ifr));
 		ifr.ifr_media = IFM_MAKEWORD(IFM_ETHER, IFM_AUTO, 0, 0);
-		ifp->if_ioctl(ifp, SIOCSIFMEDIA, &ifr);
+		ifp->if_ioctl(ifp, SIOCSIFMEDIA, (caddr_t)&ifr);
 
 		ifp->if_flags = IFF_UP;
 		ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
@@ -300,7 +302,7 @@ compat_control(void *cookie, uint32 op, void *arg, size_t len)
 				return EINVAL;
 
 			memset(&mediareq, 0, sizeof(mediareq));
-			status = ifp->if_ioctl(ifp, SIOCGIFMEDIA, &mediareq);
+			status = ifp->if_ioctl(ifp, SIOCGIFMEDIA, (caddr_t)&mediareq);
 			if (status < B_OK)
 				return status;
 
@@ -358,10 +360,14 @@ _fbsd_init_hardware(driver_t *driver)
 		return B_ERROR;
 	}
 
-	memset(&fakeDevice, 0, sizeof(struct device));
 
 	for (i = 0; gPci->get_nth_pci_info(i, &fakeDevice.pci_info) == B_OK; i++) {
-		if (probe(&fakeDevice) >= 0) {
+		int result;
+		memset(&fakeDevice, 0, sizeof(struct device));
+		result = probe(&fakeDevice);
+		if (fakeDevice.flags & DEVICE_DESC_ALLOCED)
+			free((char *)fakeDevice.description);
+		if (result >= 0) {
 			dprintf("%s, found %s at %d\n", gDriverName,
 				fakeDevice.description, i);
 			put_module(B_PCI_MODULE_NAME);

@@ -20,14 +20,12 @@
 #include <compat/sys/kernel.h>
 
 
-#define MBUF_CHECKSLEEP(how) do { } while (0)
 #define MBTOM(how) (how)
-
-
-#define CHUNK_SIZE	2048
 
 static object_cache *sMBufCache;
 static object_cache *sChunkCache;
+
+static const int max_protohdr = 40 + 20; /* ip6 + tcp */
 
 
 static int
@@ -371,6 +369,201 @@ nospace:
 	if (m_final)
 		m_freem(m_final);
 	return (NULL);
+}
+
+
+void
+m_adj(struct mbuf *mp, int req_len)
+{
+	int len = req_len;
+	struct mbuf *m;
+	int count;
+
+	if ((m = mp) == NULL)
+		return;
+	if (len >= 0) {
+		/*
+		 * Trim from head.
+		 */
+		while (m != NULL && len > 0) {
+			if (m->m_len <= len) {
+				len -= m->m_len;
+				m->m_len = 0;
+				m = m->m_next;
+			} else {
+				m->m_len -= len;
+				m->m_data += len;
+				len = 0;
+			}
+		}
+		m = mp;
+		if (mp->m_flags & M_PKTHDR)
+			m->m_pkthdr.len -= (req_len - len);
+	} else {
+		/*
+		 * Trim from tail.  Scan the mbuf chain,
+		 * calculating its length and finding the last mbuf.
+		 * If the adjustment only affects this mbuf, then just
+		 * adjust and return.  Otherwise, rescan and truncate
+		 * after the remaining size.
+		 */
+		len = -len;
+		count = 0;
+		for (;;) {
+			count += m->m_len;
+			if (m->m_next == (struct mbuf *)0)
+				break;
+			m = m->m_next;
+		}
+		if (m->m_len >= len) {
+			m->m_len -= len;
+			if (mp->m_flags & M_PKTHDR)
+				mp->m_pkthdr.len -= len;
+			return;
+		}
+		count -= len;
+		if (count < 0)
+			count = 0;
+		/*
+		 * Correct length for chain is "count".
+		 * Find the mbuf with last data, adjust its length,
+		 * and toss data from remaining mbufs on chain.
+		 */
+		m = mp;
+		if (m->m_flags & M_PKTHDR)
+			m->m_pkthdr.len = count;
+		for (; m; m = m->m_next) {
+			if (m->m_len >= count) {
+				m->m_len = count;
+				if (m->m_next != NULL) {
+					m_freem(m->m_next);
+					m->m_next = NULL;
+				}
+				break;
+			}
+			count -= m->m_len;
+		}
+	}
+}
+
+
+/*
+ * Rearange an mbuf chain so that len bytes are contiguous
+ * and in the data area of an mbuf (so that mtod and dtom
+ * will work for a structure of size len).  Returns the resulting
+ * mbuf chain on success, frees it and returns null on failure.
+ * If there is room, it will add up to max_protohdr-len extra bytes to the
+ * contiguous region in an attempt to avoid being called next time.
+ */
+struct mbuf *
+m_pullup(struct mbuf *n, int len)
+{
+	struct mbuf *m;
+	int count;
+	int space;
+
+	/*
+	 * If first mbuf has no cluster, and has room for len bytes
+	 * without shifting current data, pullup into it,
+	 * otherwise allocate a new mbuf to prepend to the chain.
+	 */
+	if ((n->m_flags & M_EXT) == 0 &&
+	    n->m_data + len < &n->m_dat[MLEN] && n->m_next) {
+		if (n->m_len >= len)
+			return (n);
+		m = n;
+		n = n->m_next;
+		len -= m->m_len;
+	} else {
+		if (len > MHLEN)
+			goto bad;
+		MGET(m, M_DONTWAIT, n->m_type);
+		if (m == NULL)
+			goto bad;
+		m->m_len = 0;
+		if (n->m_flags & M_PKTHDR)
+			M_MOVE_PKTHDR(m, n);
+	}
+	space = &m->m_dat[MLEN] - (m->m_data + m->m_len);
+	do {
+		count = min(min(max(len, max_protohdr), space), n->m_len);
+		bcopy(mtod(n, caddr_t), mtod(m, caddr_t) + m->m_len,
+		  (u_int)count);
+		len -= count;
+		m->m_len += count;
+		n->m_len -= count;
+		space -= count;
+		if (n->m_len)
+			n->m_data += count;
+		else
+			n = m_free(n);
+	} while (len > 0 && n);
+	if (len > 0) {
+		(void) m_free(m);
+		goto bad;
+	}
+	m->m_next = n;
+	return (m);
+bad:
+	m_freem(n);
+	return (NULL);
+}
+
+
+/*
+ * Lesser-used path for M_PREPEND:
+ * allocate new mbuf to prepend to chain,
+ * copy junk along.
+ */
+struct mbuf *
+m_prepend(struct mbuf *m, int len, int how)
+{
+	struct mbuf *mn;
+
+	if (m->m_flags & M_PKTHDR)
+		MGETHDR(mn, how, m->m_type);
+	else
+		MGET(mn, how, m->m_type);
+	if (mn == NULL) {
+		m_freem(m);
+		return (NULL);
+	}
+	if (m->m_flags & M_PKTHDR)
+		M_MOVE_PKTHDR(mn, m);
+	mn->m_next = m;
+	m = mn;
+	if (len < MHLEN)
+		MH_ALIGN(m, len);
+	m->m_len = len;
+	return (m);
+}
+
+
+/*
+ * "Move" mbuf pkthdr from "from" to "to".
+ * "from" must have M_PKTHDR set, and "to" must be empty.
+ */
+void
+m_move_pkthdr(struct mbuf *to, struct mbuf *from)
+{
+#ifdef MAC
+	/*
+	 * XXXMAC: It could be this should also occur for non-MAC?
+	 */
+	if (to->m_flags & M_PKTHDR)
+		m_tag_delete_chain(to, NULL);
+#endif
+	/* to->m_flags = (from->m_flags & M_COPYFLAGS) | (to->m_flags & M_EXT); */
+	/* we don't have M_COPYFLAGS -hugo */
+	to->m_flags = to->m_flags & M_EXT;
+	if ((to->m_flags & M_EXT) == 0)
+		to->m_data = to->m_pktdat;
+	to->m_pkthdr = from->m_pkthdr;		/* especially tags */
+	/* we don't have tags -hugo */
+#if 0
+	SLIST_INIT(&from->m_pkthdr.tags);	/* purge tags from src */
+#endif
+	from->m_flags &= ~M_PKTHDR;
 }
 
 

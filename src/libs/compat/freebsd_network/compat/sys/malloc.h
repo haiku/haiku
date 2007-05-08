@@ -31,4 +31,9 @@ void _kernel_contigfree(void *addr, unsigned long size);
 #define kernel_contigfree(addr, size, base) \
 	_kernel_contigfree(addr, size)
 
+#ifdef FBSD_DRIVER
+#define malloc(size, tag, flags)	kernel_malloc(size, tag, flags)
+#define free(pointer, tag)			kernel_free(pointer, tag)
+#endif
+
 #endif
