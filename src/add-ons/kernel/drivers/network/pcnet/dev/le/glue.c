@@ -6,6 +6,9 @@
 #include <dev/le/lancevar.h>
 #include <dev/le/am79900var.h>
 
+HAIKU_FBSD_DRIVER_GLUE(pcnet, le, pci);
+HAIKU_DRIVER_REQUIREMENTS(0);
+
 /* from if_le_pci.c */
 #define	PCNET_PCI_RDP	0x10
 #define	PCNET_PCI_RAP	0x12
@@ -26,8 +29,6 @@ struct le_pci_softc {
 	bus_dma_tag_t		sc_dmat;
 	bus_dmamap_t		sc_dmam;
 };
-
-HAIKU_FBSD_DRIVER_GLUE(pcnet, le, pci)
 
 int HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev) {
 	struct le_pci_softc *lesc = (struct le_pci_softc *)device_get_softc(dev);

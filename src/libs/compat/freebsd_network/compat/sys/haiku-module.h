@@ -85,6 +85,17 @@ extern int __haiku_disable_interrupts(device_t dev);
 		return -1; \
 	}
 
+extern int __haiku_driver_requirements;
+
+enum {
+	FBSD_TASKQUEUES		= 1 << 0,
+};
+
+#define HAIKU_DRIVER_REQUIREMENTS(flags) \
+	int __haiku_driver_requirements = (flags)
+
+#define HAIKU_DRIVER_REQUIRES(flag) (__haiku_driver_requirements & (flag))
+
 #define HAIKU_INTR_REGISTER_ENTER(status) do { \
 	status = disable_interrupts(); \
 	acquire_spinlock(&__haiku_intr_spinlock); \
