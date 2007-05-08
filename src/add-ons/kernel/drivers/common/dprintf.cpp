@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku Inc. All rights reserved.
+ * Copyright 2005-2007, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Author(s):
@@ -10,13 +10,13 @@
  */
 
 
-#include <string.h>
-
 #include <debug.h>
 
 #include <Drivers.h>
 #include <KernelExport.h>
 
+#include <string.h>
+#include <termios.h>
 
 
 #define DEVICE_NAME "dprintf"
@@ -49,6 +49,12 @@ dprintf_freecookie(void *cookie)
 static status_t
 dprintf_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 {
+	if (op == TCGETA) {
+		// let isatty() think we are a terminal
+		// (this lets libroot use unbuffered I/O)
+		return B_OK;
+	}
+
 	return EPERM;
 }
 
