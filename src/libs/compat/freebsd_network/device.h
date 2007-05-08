@@ -11,6 +11,7 @@
 #define _DEVICE_H_
 
 #include <stdint.h>
+#include <stdio.h>
 
 #include <KernelExport.h>
 #include <drivers/PCI.h>
@@ -51,8 +52,16 @@ enum {
 };
 
 
-#define UNIMPLEMENTED() \
-	panic("fbsd compat, unimplemented: " __FUNCTION__)
+static inline void
+__unimplemented(const char *method)
+{
+	char msg[128];
+	snprintf(msg, sizeof(msg), "fbsd compat, unimplemented: %s", method);
+	panic(msg);
+}
+
+
+#define UNIMPLEMENTED() __unimplemented(__FUNCTION__)
 
 status_t init_mbufs(void);
 void uninit_mbufs(void);

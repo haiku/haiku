@@ -2,13 +2,11 @@
 #define _FBSD_COMPAT_SYS_TASKQUEUE_H_
 
 #include <sys/kernel.h>
+#include <sys/_task.h>
 
 #define PI_NET	0
 
-struct task;
 struct taskqueue;
-
-typedef void (*task_handler_t)(void *context, int pending);
 
 #define TASK_INIT(taskp, prio, hand, arg) task_init(taskp, prio, hand, arg)
 

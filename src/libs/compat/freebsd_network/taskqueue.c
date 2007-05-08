@@ -9,19 +9,9 @@
 #include "device.h"
 
 #include <stdio.h>
-#include <util/list.h>
 
 #include <compat/sys/taskqueue.h>
 #include <compat/sys/haiku-module.h>
-
-struct task {
-	int ta_priority;
-	task_handler_t ta_handler;
-	void *ta_argument;
-	int ta_pending;
-
-	struct list_link ta_link;
-};
 
 struct taskqueue {
 	char tq_name[64];
