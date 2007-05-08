@@ -12,6 +12,7 @@
 #include <util/list.h>
 
 #include <compat/sys/taskqueue.h>
+#include <compat/sys/haiku-module.h>
 
 struct task {
 	int ta_priority;
@@ -267,14 +268,16 @@ task_init(struct task *t, int prio, task_handler_t handler, void *context)
 status_t
 init_taskqueues()
 {
-	taskqueue_fast = taskqueue_create_fast("fast taskq", 0,
-		taskqueue_thread_enqueue, NULL);
-	if (taskqueue_fast == NULL)
-		return B_NO_MEMORY;
+	if (HAIKU_DRIVER_REQUIRES(FBSD_FAST_TASKQUEUE)) {
+		taskqueue_fast = taskqueue_create_fast("fast taskq", 0,
+			taskqueue_thread_enqueue, NULL);
+		if (taskqueue_fast == NULL)
+			return B_NO_MEMORY;
 
-	if (taskqueue_start_threads(&taskqueue_fast, 1, 0, "fast taskq") < 0) {
-		taskqueue_free(taskqueue_fast);
-		return B_ERROR;
+		if (taskqueue_start_threads(&taskqueue_fast, 1, 0, "fast taskq") < 0) {
+			taskqueue_free(taskqueue_fast);
+			return B_ERROR;
+		}
 	}
 
 	return B_OK;
@@ -284,5 +287,6 @@ init_taskqueues()
 void
 uninit_taskqueues()
 {
-	taskqueue_free(taskqueue_fast);
+	if (HAIKU_DRIVER_REQUIRES(FBSD_FAST_TASKQUEUE))
+		taskqueue_free(taskqueue_fast);
 }
