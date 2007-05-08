@@ -4,7 +4,7 @@
 #include <sys/kernel.h>
 #include <sys/_task.h>
 
-#define PI_NET	0
+#define PI_NET	(B_REAL_TIME_DISPLAY_PRIORITY - 1)
 
 struct taskqueue;
 

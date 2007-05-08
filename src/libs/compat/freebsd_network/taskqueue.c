@@ -101,9 +101,15 @@ tq_handle_thread(void *data)
 	cpu_status cpu_state;
 	struct task *t;
 	int pending;
+	sem_id sem;
+
+	/* just a synchronization point */
+	tq_lock(tq, &cpu_state);
+	sem = tq->tq_sem;
+	tq_unlock(tq, cpu_state);
 
 	while (1) {
-		status_t status = acquire_sem(tq->tq_sem);
+		status_t status = acquire_sem(sem);
 		if (status < B_OK)
 			break;
 
@@ -121,10 +127,11 @@ tq_handle_thread(void *data)
 
 
 int
-taskqueue_start_threads(struct taskqueue **tqp, int count, int pri,
+taskqueue_start_threads(struct taskqueue **tqp, int count, int prio,
 	const char *format, ...)
 {
 	struct taskqueue *tq = (*tqp);
+	cpu_status state;
 	char name[64];
 	va_list vl;
 	int i, j;
@@ -132,27 +139,34 @@ taskqueue_start_threads(struct taskqueue **tqp, int count, int pri,
 	if (count == 0)
 		return -1;
 
-	if (tq->tq_threads != NULL)
+	tq_lock(tq, &state);
+
+	if (tq->tq_threads != NULL) {
+		tq_unlock(tq, state);
 		return -1;
+	}
 
 	va_start(vl, format);
 	vsnprintf(name, sizeof(name), format, vl);
 	va_end(vl);
 
 	tq->tq_threads = malloc(sizeof(thread_id) * count);
-	if (tq->tq_threads == NULL)
+	if (tq->tq_threads == NULL) {
+		tq_unlock(tq, state);
 		return B_NO_MEMORY;
+	}
 
 	tq->tq_sem = create_sem(0, tq->tq_name);
 	if (tq->tq_sem < B_OK) {
 		free(tq->tq_threads);
 		tq->tq_threads = NULL;
+		tq_unlock(tq, state);
 		return tq->tq_sem;
 	}
 
 	for (i = 0; i < count; i++) {
 		tq->tq_threads[i] = spawn_kernel_thread(tq_handle_thread, tq->tq_name,
-			B_REAL_TIME_DISPLAY_PRIORITY - 20, tq);
+			prio, tq);
 		if (tq->tq_threads[i] < B_OK) {
 			status_t status = tq->tq_threads[i];
 			for (j = 0; j < i; j++)
@@ -160,13 +174,17 @@ taskqueue_start_threads(struct taskqueue **tqp, int count, int pri,
 			free(tq->tq_threads);
 			tq->tq_threads = NULL;
 			delete_sem(tq->tq_sem);
+			tq_unlock(tq, state);
 			return status;
 		}
 	}
 
+	tq->tq_threadcount = count;
+
 	for (i = 0; i < count; i++)
 		resume_thread(tq->tq_threads[i]);
 
+	tq_unlock(tq, state);
 	return 0;
 }
 
@@ -264,7 +282,8 @@ init_taskqueues()
 		if (taskqueue_fast == NULL)
 			return B_NO_MEMORY;
 
-		if (taskqueue_start_threads(&taskqueue_fast, 1, 0, "fast taskq") < 0) {
+		if (taskqueue_start_threads(&taskqueue_fast, 1, B_REAL_TIME_PRIORITY,
+			"fast taskq") < 0) {
 			taskqueue_free(taskqueue_fast);
 			return B_ERROR;
 		}
