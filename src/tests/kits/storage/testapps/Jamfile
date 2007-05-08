@@ -1,7 +1,11 @@
 SubDir HAIKU_TOP src tests kits storage testapps ;
 
+UsePrivateHeaders shared storage ;
+
 SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
+
+SEARCH_SOURCE += [ FDirName $(TOP) src kits storage ] ;
 
 SimpleTest <test>clipboard
 	: clipboard.cpp : be ;
@@ -11,3 +15,8 @@ SimpleTest dump_mime_types
 
 SimpleTest NodeMonitorTest
 	: NodeMonitorTest.cpp : be ;
+
+SimpleTest PathMonitorTest
+	: PathMonitorTest.cpp PathMonitor.cpp
+	: be $(TARGET_LIBSTDC++)
+;

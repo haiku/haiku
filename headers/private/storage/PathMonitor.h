@@ -17,22 +17,18 @@
 
 namespace BPrivate {
 
-class PathHandler;
-
 class BPathMonitor {
 	public:
-		BPathMonitor();
-		BPathMonitor(const char* path, uint32 flags, BMessenger target);
-		~BPathMonitor();
+		static status_t StartWatching(const char* path, uint32 flags, BMessenger target);
 
-		status_t InitCheck() const;
-		status_t SetTo(const char* path, uint32 flags, BMessenger target);
-		status_t SetTarget(BMessenger target);
-		void Unset();
+		static status_t StopWatching(const char* path, BMessenger target);
+		static status_t StopWatching(BMessenger target);
 
 	private:
-		PathHandler*	fHandler;
-		status_t		fStatus;
+		BPathMonitor();
+		~BPathMonitor();
+
+		static status_t _InitIfNeeded();
 };
 
 }	// namespace BPrivate
