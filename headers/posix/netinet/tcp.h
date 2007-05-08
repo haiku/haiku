@@ -10,8 +10,6 @@
 #include <stdint.h>
 
 
-// TODO: if tcpdump is the only potential user of the part commented out, remove it
-#if 0
 struct tcphdr {
 	uint16_t	th_sport;	/* source port */
 	uint16_t	th_dport;	/* destination port */
@@ -31,6 +29,7 @@ struct tcphdr {
 	uint16_t	th_urp;		/* end of urgent data offset */
 } _PACKED;
 
+#if 0
 #define	TH_FIN	0x01
 #define	TH_SYN	0x02
 #define	TH_RST	0x04
