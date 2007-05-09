@@ -55,4 +55,4 @@ PackageDriverSymLink haiku-networkingkit-cvs : net rtl8139 ;
 #	rtl8139.settings :
 #	boot home config settings kernel drivers sample ;
 
-
+SubInclude HAIKU_TOP src add-ons kernel drivers network rtl8139 pci ;
