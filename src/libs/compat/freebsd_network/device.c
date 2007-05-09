@@ -48,7 +48,8 @@ allocate_device(driver_t *driver)
 
 	snprintf(semName, sizeof(semName), "%s rcv", gDriverName);
 
-	dev->softc = _kernel_malloc(driver->softc_size, M_ZERO);
+	dev->softc_size = driver->softc_size;
+	dev->softc = malloc(driver->softc_size);
 	if (dev->softc == NULL) {
 		free(dev);
 		return NULL;
@@ -119,8 +120,11 @@ compat_open(const char *name, uint32 flags, void **cookie)
 
 	dev = gDevices[i];
 
-	if (atomic_or(&dev->flags, DEVICE_OPEN) & DEVICE_OPEN)
+	if (!atomic_test_and_set(&dev->open, 1, 0))
 		return B_BUSY;
+
+	/* some drivers expect the softc to be zero'ed out */
+	memset(dev->softc, 0, dev->softc_size);
 
 	status = sDeviceAttach(dev);
 	if (status != 0)
@@ -144,7 +148,6 @@ compat_open(const char *name, uint32 flags, void **cookie)
 	}
 
 	*cookie = dev;
-
 	return status;
 }
 
@@ -155,8 +158,15 @@ compat_close(void *cookie)
 	device_t dev = cookie;
 
 	device_printf(dev, "compat_close()\n");
-	UNIMPLEMENTED();
-	return B_ERROR;
+
+	atomic_or(&dev->flags, DEVICE_CLOSED);
+
+	/* do we need a memory barrier in read() or is the atomic_or
+	 * (and the implicit 'lock') enough? */
+
+	release_sem_etc(dev->receive_sem, 1, B_RELEASE_ALL);
+
+	return B_OK;
 }
 
 
@@ -167,10 +177,14 @@ compat_free(void *cookie)
 
 	device_printf(dev, "compat_free()\n");
 
+	sDeviceDetach(dev);
+
+	/* XXX empty out the send queue */
+
+	atomic_and(&dev->open, 0);
 	put_module(NET_STACK_MODULE_NAME);
-	free_device(dev);
-	UNIMPLEMENTED();
-	return B_ERROR;
+
+	return B_OK;
 }
 
 
@@ -469,7 +483,6 @@ err_3:
 err_2:
 	free(dev);
 err_1:
-err_0:
 	put_module(B_PCI_MODULE_NAME);
 	return status;
 }

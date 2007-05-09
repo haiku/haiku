@@ -28,6 +28,7 @@ struct device {
 	pci_info		pci_info;
 	char			dev_name[128];
 
+	int32			open;
 	int32			flags;
 
 	struct ifqueue	receive_queue;
@@ -41,6 +42,7 @@ struct device {
 	char			nameunit[64];
 	const char *	description;
 	void *			softc;
+	size_t			softc_size;
 };
 
 
