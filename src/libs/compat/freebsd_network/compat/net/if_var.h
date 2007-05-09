@@ -580,6 +580,9 @@ struct ifmultiaddr {
 	struct	ifnet *ifma_ifp;	/* back-pointer to interface */
 	u_int	ifma_refcount;		/* reference count */
 	void	*ifma_protospec;	/* protocol-specific state, if any */
+
+	/* haiku additions, save a allocation -hugo */
+	struct sockaddr_dl ifma_addr_storage;
 };
 
 #ifdef _KERNEL

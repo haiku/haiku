@@ -99,6 +99,8 @@ if_attach(struct ifnet *ifp)
 	TAILQ_INIT(&ifp->if_prefixhead);
 	TAILQ_INIT(&ifp->if_multiaddrs);
 
+	IF_ADDR_LOCK_INIT(ifp);
+
 	ifq_init((struct ifqueue *)&ifp->if_snd, ifp->if_xname);
 }
 
@@ -106,6 +108,7 @@ if_attach(struct ifnet *ifp)
 void
 if_detach(struct ifnet *ifp)
 {
+	IF_ADDR_LOCK_DESTROY(ifp);
 	ifq_uninit((struct ifqueue *)&ifp->if_snd);
 }
 
@@ -144,6 +147,110 @@ if_link_state_change(struct ifnet *ifp, int link_state)
 	ifp->if_link_state = link_state;
 
 	release_sem_etc(ifp->if_dev->link_state_sem, 1, B_DO_NOT_RESCHEDULE);
+}
+
+
+static struct ifmultiaddr *
+if_findmulti(struct ifnet *ifp, struct sockaddr *_address)
+{
+	struct sockaddr_dl *address = (struct sockaddr_dl *)_address;
+	struct ifmultiaddr *ifma;
+
+	TAILQ_FOREACH (ifma, &ifp->if_multiaddrs, ifma_link) {
+		if (memcmp(LLADDR(address),
+				LLADDR((struct sockaddr_dl *)ifma->ifma_addr),
+				ETHER_ADDR_LEN) == 0)
+			return ifma;
+	}
+
+	return NULL;
+}
+
+
+static struct ifmultiaddr *
+_if_addmulti(struct ifnet *ifp, struct sockaddr *address)
+{
+	struct ifmultiaddr *addr = if_findmulti(ifp, address);
+
+	if (addr != NULL) {
+		addr->ifma_refcount++;
+		return addr;
+	}
+
+	addr = (struct ifmultiaddr *)malloc(sizeof(struct ifmultiaddr));
+	if (addr == NULL)
+		return NULL;
+
+	addr->ifma_lladdr = NULL;
+	addr->ifma_ifp = ifp;
+	addr->ifma_protospec = NULL;
+
+	memcpy(&addr->ifma_addr_storage, address, sizeof(struct sockaddr_dl));
+	addr->ifma_addr = (struct sockaddr *)&addr->ifma_addr_storage;
+
+	addr->ifma_refcount = 1;
+
+	TAILQ_INSERT_HEAD(&ifp->if_multiaddrs, addr, ifma_link);
+
+	return addr;
+}
+
+
+int
+if_addmulti(struct ifnet *ifp, struct sockaddr *address,
+	struct ifmultiaddr **out)
+{
+	struct ifmultiaddr *result;
+	int refcount = 0;
+
+	IF_ADDR_LOCK(ifp);
+	result = _if_addmulti(ifp, address);
+	if (result)
+		refcount = result->ifma_refcount;
+	IF_ADDR_UNLOCK(ifp);
+
+	if (result == NULL)
+		return ENOBUFS;
+
+	if (refcount == 1)
+		ifp->if_ioctl(ifp, SIOCADDMULTI, NULL);
+
+	if (out)
+		(*out) = result;
+
+	return 0;
+}
+
+
+static void
+if_delete_multiaddr(struct ifnet *ifp, struct ifmultiaddr *ifma)
+{
+	TAILQ_REMOVE(&ifp->if_multiaddrs, ifma, ifma_link);
+	free(ifma);
+}
+
+
+int
+if_delmulti(struct ifnet *ifp, struct sockaddr *address)
+{
+	struct ifmultiaddr *addr;
+	int deleted = 0;
+
+	IF_ADDR_LOCK(ifp);
+	addr = if_findmulti(ifp, address);
+	if (addr != NULL) {
+		addr->ifma_refcount--;
+		if (addr->ifma_refcount == 0) {
+			if_delete_multiaddr(ifp, addr);
+			deleted = 1;
+		}
+	}
+	IF_ADDR_UNLOCK(ifp);
+
+	if (deleted)
+		ifp->if_ioctl(ifp, SIOCDELMULTI, NULL);
+
+	return 0;
 }
 
 

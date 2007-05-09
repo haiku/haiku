@@ -309,9 +309,21 @@ compat_control(void *cookie, uint32 op, void *arg, size_t len)
 
 		case ETHER_ADDMULTI:
 		case ETHER_REMMULTI:
-			/* TODO */
-			UNIMPLEMENTED();
-			return B_ERROR;
+		{
+			struct sockaddr_dl address;
+
+			if (!(ifp->if_flags & IFF_MULTICAST) == 0)
+				return EOPNOTSUPP;
+
+			memset(&address, 0, sizeof(address));
+			address.sdl_family = AF_LINK;
+			memcpy(LLADDR(&address), arg, ETHER_ADDR_LEN);
+
+			if (op == ETHER_ADDMULTI)
+				return if_addmulti(ifp, (struct sockaddr *)&address, NULL);
+			else
+				return if_delmulti(ifp, (struct sockaddr *)&address);
+		}
 
 		case ETHER_GET_LINK_STATE:
 		{
