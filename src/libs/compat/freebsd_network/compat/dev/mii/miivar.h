@@ -189,6 +189,15 @@ struct mii_media {
 
 #ifdef _KERNEL
 
+int miibus_readreg(device_t dev, int phy, int reg);
+int miibus_writereg(device_t dev, int phy, int reg, int data);
+
+#define MIIBUS_READREG(dev, phy, reg) \
+	miibus_readreg((dev), (phy), (reg))
+
+#define MIIBUS_WRITEREG(dev, phy, reg, value) \
+	miibus_writereg((dev), (phy), (reg), (value))
+
 #define PHY_READ(p, r) \
 	MIIBUS_READREG((p)->mii_dev, (p)->mii_phy, (r))
 

@@ -30,18 +30,38 @@ struct network_device *gDevices[MAX_DEVICES];
 const char *gDevNameList[MAX_DEVICES + 1];
 
 
-static device_probe_t  *sDeviceProbe;
-static device_attach_t *sDeviceAttach;
-static device_detach_t *sDeviceDetach;
-
-
 static device_t
 init_device(device_t dev, driver_t *driver)
 {
+	device_method_signature_t method = NULL;
+	int i;
+
 	dev->driver = driver;
 	dev->softc = malloc(driver->softc_size);
 	if (dev->softc == NULL)
 		return NULL;
+
+	for (i = 0; method == NULL && driver->methods[i].name != NULL; i++) {
+		device_method_t *mth = &driver->methods[i];
+		if (strcmp(mth->name, "device_probe") == 0)
+			dev->methods.probe = (void *)mth->method;
+		else if (strcmp(mth->name, "device_attach") == 0)
+			dev->methods.attach = (void *)mth->method;
+		else if (strcmp(mth->name, "device_detach") == 0)
+			dev->methods.detach = (void *)mth->method;
+		else if (strcmp(mth->name, "device_suspend") == 0)
+			dev->methods.suspend = (void *)mth->method;
+		else if (strcmp(mth->name, "device_resume") == 0)
+			dev->methods.resume = (void *)mth->method;
+		else if (strcmp(mth->name, "device_shutdown") == 0)
+			dev->methods.shutdown = (void *)mth->method;
+		else if (strcmp(mth->name, "miibus_readreg") == 0)
+			dev->methods.miibus_readreg = (void *)mth->method;
+		else if (strcmp(mth->name, "miibus_writereg") == 0)
+			dev->methods.miibus_writereg = (void *)mth->method;
+		else if (strcmp(mth->name, "miibus_statchg") == 0)
+			dev->methods.miibus_statchg = (void *)mth->method;
+	}
 
 	return dev;
 }
@@ -143,7 +163,7 @@ compat_open(const char *name, uint32 flags, void **cookie)
 	/* some drivers expect the softc to be zero'ed out */
 	memset(dev->base.softc, 0, dev->base.driver->softc_size);
 
-	status = sDeviceAttach(DEVNET(dev));
+	status = DEVNET(dev)->methods.attach(DEVNET(dev));
 	if (status != 0)
 		atomic_and(&dev->open, 0);
 
@@ -194,7 +214,7 @@ compat_free(void *cookie)
 
 	device_printf(DEVNET(dev), "compat_free()\n");
 
-	sDeviceDetach(DEVNET(dev));
+	DEVNET(dev)->methods.detach(DEVNET(dev));
 
 	/* XXX empty out the send queue */
 
@@ -447,10 +467,6 @@ _fbsd_init_driver(driver_t *driver)
 		return status;
 	}
 
-	sDeviceProbe  = (device_probe_t  *)_resolve_method(driver, "device_probe");
-	sDeviceAttach = (device_attach_t *)_resolve_method(driver, "device_attach");
-	sDeviceDetach = (device_detach_t *)_resolve_method(driver, "device_detach");
-
 	dev = allocate_device(driver);
 	if (dev == NULL)
 		goto err_1;
@@ -479,7 +495,7 @@ _fbsd_init_driver(driver_t *driver)
 			&& gPci->get_nth_pci_info(i, &dev->pci_info) == B_OK; i++) {
 		device_t base = DEVNET(dev);
 
-		if (sDeviceProbe(base) >= 0) {
+		if (base->methods.probe(base) >= 0) {
 			device_sprintf_name(base, "net/%s/%i", gDriverName, ncards);
 			dprintf("%s, adding %s @%d -> /dev/%s\n", gDriverName,
 				device_get_desc(base), i, device_get_name(base));

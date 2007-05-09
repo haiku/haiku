@@ -25,6 +25,7 @@
 struct ifnet;
 
 struct device {
+	struct device * parent;
 	char			dev_name[128];
 
 	driver_t		*driver;
@@ -35,6 +36,19 @@ struct device {
 	char			nameunit[64];
 	const char *	description;
 	void *			softc;
+
+	struct {
+		int (*probe)(device_t dev);
+		int (*attach)(device_t dev);
+		int (*detach)(device_t dev);
+		int (*suspend)(device_t dev);
+		int (*resume)(device_t dev);
+		void (*shutdown)(device_t dev);
+
+		int (*miibus_readreg)(device_t, int, int);
+		int (*miibus_writereg)(device_t, int, int, int);
+		void (*miibus_statchg)(device_t);
+	} methods;
 };
 
 
