@@ -184,7 +184,9 @@ BHandler *
 BMessenger::Target(BLooper** _looper) const
 {
 	BHandler *handler = NULL;
-	if (IsTargetLocal() && fHandlerToken > B_NULL_TOKEN) {
+	if (IsTargetLocal() 
+		&& (fHandlerToken > B_NULL_TOKEN
+			|| fHandlerToken == B_PREFERRED_TOKEN)) {
 		gDefaultTokens.GetToken(fHandlerToken, B_HANDLER_TOKEN,
 			(void**)&handler);
 		if (_looper)
