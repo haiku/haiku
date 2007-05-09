@@ -48,7 +48,7 @@ allocate_device(driver_t *driver)
 
 	snprintf(semName, sizeof(semName), "%s rcv", gDriverName);
 
-	dev->softc = malloc(driver->softc_size);
+	dev->softc = _kernel_malloc(driver->softc_size, M_ZERO);
 	if (dev->softc == NULL) {
 		free(dev);
 		return NULL;
@@ -105,6 +105,10 @@ compat_open(const char *name, uint32 flags, void **cookie)
 
 	driver_printf("compat_open(%s, 0x%lx)\n", name, flags);
 
+	status = get_module(NET_STACK_MODULE_NAME, (module_info **)&gStack);
+	if (status < B_OK)
+		return status;
+
 	for (i = 0; gDevNameList[i] != NULL; i++) {
 		if (strcmp(gDevNameList[i], name) == 0)
 			break;
@@ -151,7 +155,7 @@ compat_close(void *cookie)
 	device_t dev = cookie;
 
 	device_printf(dev, "compat_close()\n");
-
+	UNIMPLEMENTED();
 	return B_ERROR;
 }
 
@@ -163,7 +167,9 @@ compat_free(void *cookie)
 
 	device_printf(dev, "compat_free()\n");
 
+	put_module(NET_STACK_MODULE_NAME);
 	free_device(dev);
+	UNIMPLEMENTED();
 	return B_ERROR;
 }
 
@@ -290,6 +296,7 @@ compat_control(void *cookie, uint32 op, void *arg, size_t len)
 		case ETHER_ADDMULTI:
 		case ETHER_REMMULTI:
 			/* TODO */
+			UNIMPLEMENTED();
 			return B_ERROR;
 
 		case ETHER_GET_LINK_STATE:
@@ -360,16 +367,16 @@ _fbsd_init_hardware(driver_t *driver)
 		return B_ERROR;
 	}
 
+	memset(&fakeDevice, 0, sizeof(struct device));
 
 	for (i = 0; gPci->get_nth_pci_info(i, &fakeDevice.pci_info) == B_OK; i++) {
 		int result;
-		memset(&fakeDevice, 0, sizeof(struct device));
 		result = probe(&fakeDevice);
-		if (fakeDevice.flags & DEVICE_DESC_ALLOCED)
-			free((char *)fakeDevice.description);
 		if (result >= 0) {
 			dprintf("%s, found %s at %d\n", gDriverName,
 				fakeDevice.description, i);
+			if (fakeDevice.flags & DEVICE_DESC_ALLOCED)
+				free((char *)fakeDevice.description);
 			put_module(B_PCI_MODULE_NAME);
 			return B_OK;
 		}
@@ -391,31 +398,37 @@ _fbsd_init_driver(driver_t *driver)
 
 	dprintf("%s: init_driver(%p)\n", gDriverName, driver);
 
+	status = get_module(B_PCI_MODULE_NAME, (module_info **)&gPci);
+	if (status < B_OK) {
+		driver_printf("Failed to load PCI module.\n");
+		return status;
+	}
+
 	sDeviceProbe  = (device_probe_t  *)_resolve_method(driver, "device_probe");
 	sDeviceAttach = (device_attach_t *)_resolve_method(driver, "device_attach");
 	sDeviceDetach = (device_detach_t *)_resolve_method(driver, "device_detach");
 
 	dev = allocate_device(driver);
 	if (dev == NULL)
-		return B_NO_MEMORY;
+		goto err_1;
 
 	status = init_compat_layer();
 	if (status < B_OK)
-		goto err_1;
+		goto err_2;
 
 	status = init_mutexes();
 	if (status < B_OK)
-		goto err_2;
+		goto err_3;
 
 	if (HAIKU_DRIVER_REQUIRES(FBSD_TASKQUEUES)) {
 		status = init_taskqueues();
 		if (status < B_OK)
-			goto err_3;
+			goto err_4;
 	}
 
 	status = init_mbufs();
 	if (status < B_OK)
-		goto err_4;
+		goto err_5;
 
 	init_bounce_pages();
 
@@ -447,14 +460,17 @@ _fbsd_init_driver(driver_t *driver)
 
 	return B_OK;
 
-err_4:
+err_5:
 	if (HAIKU_DRIVER_REQUIRES(FBSD_TASKQUEUES))
 		uninit_taskqueues();
-err_3:
+err_4:
 	uninit_mutexes();
+err_3:
 err_2:
-err_1:
 	free(dev);
+err_1:
+err_0:
+	put_module(B_PCI_MODULE_NAME);
 	return status;
 }
 
@@ -475,4 +491,6 @@ _fbsd_uninit_driver(driver_t *driver)
 	if (HAIKU_DRIVER_REQUIRES(FBSD_TASKQUEUES))
 		uninit_taskqueues();
 	uninit_mutexes();
+
+	put_module(B_PCI_MODULE_NAME);
 }

@@ -344,8 +344,9 @@ bus_generic_resume(device_t dev)
 			value = fun(handle + offset); \
 		else \
 			value = *(volatile type *)(handle + offset); \
-		TRACE_BUS_SPACE_RW(("bus_space_read_%s(0x%lx, 0x%lx, 0x%lx) = 0x%lx\n", \
-			#size, (uint32)tag, (uint32)handle, (uint32)offset, (uint32)value)); \
+		if (tag == I386_BUS_SPACE_IO) \
+			TRACE_BUS_SPACE_RW(("bus_space_read_%s(0x%lx, 0x%lx, 0x%lx) = 0x%lx\n", \
+				#size, (uint32)tag, (uint32)handle, (uint32)offset, (uint32)value)); \
 		return value; \
 	}
 
@@ -353,8 +354,9 @@ bus_generic_resume(device_t dev)
 	void bus_space_write_##size(bus_space_tag_t tag, \
 		bus_space_handle_t handle, bus_size_t offset, type value) \
 	{ \
-		TRACE_BUS_SPACE_RW(("bus_space_write_%s(0x%lx, 0x%lx, 0x%lx, 0x%lx)\n", \
-			#size, (uint32)tag, (uint32)handle, (uint32)offset, (uint32)value)); \
+		if (tag == I386_BUS_SPACE_IO) \
+			TRACE_BUS_SPACE_RW(("bus_space_write_%s(0x%lx, 0x%lx, 0x%lx, 0x%lx)\n", \
+				#size, (uint32)tag, (uint32)handle, (uint32)offset, (uint32)value)); \
 		if (tag == I386_BUS_SPACE_IO) \
 			fun(value, handle + offset); \
 		else \

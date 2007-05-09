@@ -13,6 +13,8 @@
 #include <compat/sys/taskqueue.h>
 #include <compat/sys/haiku-module.h>
 
+#define MAX_TASKQUEUE_THREADS 2
+
 struct taskqueue {
 	char tq_name[64];
 	mutex tq_mutex;
@@ -22,7 +24,7 @@ struct taskqueue {
 	int tq_fast;
 	int32 tq_spinlock;
 	sem_id tq_sem;
-	thread_id *tq_threads;
+	thread_id tq_threads[MAX_TASKQUEUE_THREADS];
 	int tq_threadcount;
 };
 
@@ -40,10 +42,17 @@ _taskqueue_create(const char *name, int mflags, int fast,
 
 	tq->tq_fast = fast;
 
+	tq->tq_sem = create_sem(0, tq->tq_name);
+	if (tq->tq_sem < B_OK) {
+		free(tq);
+		return tq->tq_sem;
+	}
+
 	if (fast) {
 		tq->tq_spinlock = 0;
 	} else {
 		if (mutex_init(&tq->tq_mutex, name) < B_OK) {
+			delete_sem(tq->tq_sem);
 			free(tq);
 			return NULL;
 		}
@@ -54,8 +63,6 @@ _taskqueue_create(const char *name, int mflags, int fast,
 	tq->tq_enqueue = enqueue;
 	tq->tq_arg = context;
 
-	tq->tq_sem = -1;
-	tq->tq_threads = NULL;
 	tq->tq_threadcount = 0;
 
 	return tq;
@@ -101,15 +108,9 @@ tq_handle_thread(void *data)
 	cpu_status cpu_state;
 	struct task *t;
 	int pending;
-	sem_id sem;
-
-	/* just a synchronization point */
-	tq_lock(tq, &cpu_state);
-	sem = tq->tq_sem;
-	tq_unlock(tq, cpu_state);
 
 	while (1) {
-		status_t status = acquire_sem(sem);
+		status_t status = acquire_sem(tq->tq_sem);
 		if (status < B_OK)
 			break;
 
@@ -126,43 +127,18 @@ tq_handle_thread(void *data)
 }
 
 
-int
-taskqueue_start_threads(struct taskqueue **tqp, int count, int prio,
-	const char *format, ...)
+static int
+_taskqueue_start_threads(struct taskqueue **tqp, int count, int prio,
+	const char *name)
 {
 	struct taskqueue *tq = (*tqp);
-	cpu_status state;
-	char name[64];
-	va_list vl;
 	int i, j;
 
 	if (count == 0)
 		return -1;
 
-	tq_lock(tq, &state);
-
-	if (tq->tq_threads != NULL) {
-		tq_unlock(tq, state);
-		return -1;
-	}
-
-	va_start(vl, format);
-	vsnprintf(name, sizeof(name), format, vl);
-	va_end(vl);
-
-	tq->tq_threads = malloc(sizeof(thread_id) * count);
-	if (tq->tq_threads == NULL) {
-		tq_unlock(tq, state);
-		return B_NO_MEMORY;
-	}
-
-	tq->tq_sem = create_sem(0, tq->tq_name);
-	if (tq->tq_sem < B_OK) {
-		free(tq->tq_threads);
-		tq->tq_threads = NULL;
-		tq_unlock(tq, state);
-		return tq->tq_sem;
-	}
+	if (count > MAX_TASKQUEUE_THREADS)
+		panic("_taskqueue_start_threads, too many threads requested");
 
 	for (i = 0; i < count; i++) {
 		tq->tq_threads[i] = spawn_kernel_thread(tq_handle_thread, tq->tq_name,
@@ -171,10 +147,6 @@ taskqueue_start_threads(struct taskqueue **tqp, int count, int prio,
 			status_t status = tq->tq_threads[i];
 			for (j = 0; j < i; j++)
 				kill_thread(tq->tq_threads[j]);
-			free(tq->tq_threads);
-			tq->tq_threads = NULL;
-			delete_sem(tq->tq_sem);
-			tq_unlock(tq, state);
 			return status;
 		}
 	}
@@ -184,8 +156,33 @@ taskqueue_start_threads(struct taskqueue **tqp, int count, int prio,
 	for (i = 0; i < count; i++)
 		resume_thread(tq->tq_threads[i]);
 
-	tq_unlock(tq, state);
 	return 0;
+}
+
+
+int
+taskqueue_start_threads(struct taskqueue **tqp, int count, int prio,
+	const char *format, ...)
+{
+	/* we assume that start_threads is called in a sane place, and
+	 * thus don't lock. This is mostly due to the fact that if the
+	 * TQ is 'fast', locking it disables interrupts... and then we
+	 * can't create semaphores, threads and bananas. */
+
+	/* cpu_status state; */
+	char name[64];
+	int result;
+	va_list vl;
+
+	va_start(vl, format);
+	vsnprintf(name, sizeof(name), format, vl);
+	va_end(vl);
+
+	/*tq_lock(*tqp, &state);*/
+	result = _taskqueue_start_threads(tqp, count, prio, name);
+	/*tq_unlock(*tqp, state);*/
+
+	return result;
 }
 
 

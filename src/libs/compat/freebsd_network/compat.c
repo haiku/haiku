@@ -340,9 +340,3 @@ init_compat_layer()
 	__haiku_intr_spinlock = 0;
 	return B_OK;
 }
-
-module_dependency module_dependencies[] = {
-	{NET_STACK_MODULE_NAME, (module_info **)&gStack},
-	{B_PCI_MODULE_NAME, (module_info **)&gPci},
-	{}
-};
