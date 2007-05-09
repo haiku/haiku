@@ -314,6 +314,9 @@ _kernel_contigmalloc(const char *file, int line, size_t size, int flags,
 	if (area < 0)
 		return NULL;
 
+	if (flags & M_ZERO)
+		memset(addr, 0, size);
+
 	driver_printf("(%s) addr = %p, area = %ld, size = %lu\n",
 		name, addr, area, size);
 

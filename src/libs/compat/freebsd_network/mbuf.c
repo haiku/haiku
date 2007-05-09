@@ -22,6 +22,7 @@
 static object_cache *sMBufCache;
 static object_cache *sChunkCache;
 
+int max_linkhdr = 16;
 int max_protohdr = 40 + 20; /* ip6 + tcp */
 
 

@@ -81,14 +81,19 @@ extern const char gDriverName[];
 
 extern spinlock __haiku_intr_spinlock;
 extern int __haiku_disable_interrupts(device_t dev);
+extern void __haiku_reenable_interrupts(device_t dev);
 
 #define HAIKU_CHECK_DISABLE_INTERRUPTS		__haiku_disable_interrupts
+#define HAIKU_REENABLE_INTERRUPTS			__haiku_reenable_interrupts
 
 #define NO_HAIKU_CHECK_DISABLE_INTERRUPTS() \
 	int HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev) { \
 		panic("should never be called."); \
 		return -1; \
 	}
+
+#define NO_HAIKU_REENABLE_INTERRUPTS() \
+	void HAIKU_REENABLE_INTERRUPTS(device_t dev) {}
 
 extern int __haiku_driver_requirements;
 
@@ -103,14 +108,24 @@ enum {
 
 #define HAIKU_DRIVER_REQUIRES(flag) (__haiku_driver_requirements & (flag))
 
-#define HAIKU_INTR_REGISTER_ENTER(status) do { \
-	status = disable_interrupts(); \
-	acquire_spinlock(&__haiku_intr_spinlock); \
+#define HAIKU_INTR_REGISTER_STATE \
+	cpu_status __haiku_cpu_state = 0
+
+#define HAIKU_INTR_REGISTER_ENTER() do {		\
+	__haiku_cpu_state = disable_interrupts();	\
+	acquire_spinlock(&__haiku_intr_spinlock);	\
 } while (0)
 
-#define HAIKU_INTR_REGISTER_LEAVE(status) do { \
-	release_spinlock(&__haiku_intr_spinlock); \
-	restore_interrupts(status); \
+#define HAIKU_INTR_REGISTER_LEAVE() do {		\
+	release_spinlock(&__haiku_intr_spinlock);	\
+	restore_interrupts(__haiku_cpu_state);		\
+} while (0)
+
+#define HAIKU_PROTECT_INTR_REGISTER(x) do {		\
+	HAIKU_INTR_REGISTER_STATE;					\
+	HAIKU_INTR_REGISTER_ENTER();				\
+	x;											\
+	HAIKU_INTR_REGISTER_LEAVE();				\
 } while (0)
 
 #define DEFINE_CLASS_0(name, driver, methods, size) \

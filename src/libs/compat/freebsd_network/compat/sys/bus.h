@@ -37,6 +37,9 @@ uint32_t bus_space_read_4(bus_space_tag_t tag, bus_space_handle_t handle,
 void bus_space_write_4(bus_space_tag_t tag, bus_space_handle_t handle,
 	bus_size_t offset, uint32_t value);
 
+#define bus_space_write_stream_4(t, h, o, v) \
+	bus_space_write_4((t), (h), (o), (v))
+
 
 #define BUS_SPACE_BARRIER_READ		1
 #define BUS_SPACE_BARRIER_WRITE		2

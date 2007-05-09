@@ -103,6 +103,11 @@ u_int m_fixhdr(struct mbuf *m);
 void m_cat(struct mbuf *m, struct mbuf *n);
 void m_copydata(const struct mbuf *m, int off, int len, caddr_t cp);
 
+struct ifnet;
+struct mbuf *m_devget(char *, int, int, struct ifnet *,
+	void (*)(char *, caddr_t, u_int));
+void m_copyback(struct mbuf *, int, int, caddr_t);
+
 struct mbuf *m_get(int how, short type);
 struct mbuf *m_gethdr(int how, short type);
 void m_clget(struct mbuf *m, int how);
@@ -120,6 +125,7 @@ void m_clget(struct mbuf *m, int how);
 #define MBUF_CHECKSLEEP(how) do { } while (0)
 #define MBTOM(how) (how)
 
+extern int max_linkhdr;
 extern int max_protohdr;
 
 #include <sys/mbuf-fbsd.h>

@@ -32,10 +32,10 @@ struct le_pci_softc {
 
 int HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev) {
 	struct le_pci_softc *lesc = (struct le_pci_softc *)device_get_softc(dev);
-	cpu_status status;
+	HAIKU_INTR_REGISTER_STATE;
 	uint16_t value;
 
-	HAIKU_INTR_REGISTER_ENTER(status);
+	HAIKU_INTR_REGISTER_ENTER();
 
 	/* get current flags */
 	bus_space_write_2(lesc->sc_regt, lesc->sc_regh, PCNET_PCI_RAP, LE_CSR0);
@@ -54,7 +54,9 @@ int HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev) {
 		lesc->sc_am79900.lsc.sc_lastisr |= value;
 	}
 
-	HAIKU_INTR_REGISTER_LEAVE(status);
+	HAIKU_INTR_REGISTER_LEAVE();
 
 	return value & LE_C0_INTR;
 }
+
+NO_HAIKU_REENABLE_INTERRUPTS();

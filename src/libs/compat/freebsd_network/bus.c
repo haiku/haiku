@@ -212,6 +212,7 @@ intr_handler(void *data)
 		device_printf(intr->dev, "in soft interrupt handler.\n");
 
 		intr->handler(intr->arg);
+		HAIKU_REENABLE_INTERRUPTS(intr->dev);
 	}
 
 	return 0;

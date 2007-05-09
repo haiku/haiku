@@ -451,11 +451,11 @@ am79900_intr(void *arg)
 	isr = (*sc->sc_rdcsr)(sc, LE_CSR0);
 #endif
 	{
-		cpu_status status;
-		HAIKU_INTR_REGISTER_ENTER(status);
+		HAIKU_INTR_REGISTER_STATE;
+		HAIKU_INTR_REGISTER_ENTER();
 		isr = sc->sc_lastisr;
 		sc->sc_lastisr = 0;
-		HAIKU_INTR_REGISTER_LEAVE(status);
+		HAIKU_INTR_REGISTER_LEAVE();
 	}
 
 #if defined(LEDEBUG) && LEDEBUG > 1

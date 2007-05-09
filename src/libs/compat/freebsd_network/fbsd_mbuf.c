@@ -404,3 +404,119 @@ m_move_pkthdr(struct mbuf *to, struct mbuf *from)
 #endif
 	from->m_flags &= ~M_PKTHDR;
 }
+
+/*
+ * Routine to copy from device local memory into mbufs.
+ * Note that `off' argument is offset into first mbuf of target chain from
+ * which to begin copying the data to.
+ */
+struct mbuf *
+m_devget(char *buf, int totlen, int off, struct ifnet *ifp,
+	 void (*copy)(char *from, caddr_t to, u_int len))
+{
+	struct mbuf *m;
+	struct mbuf *top = NULL, **mp = &top;
+	int len;
+
+	if (off < 0 || off > MHLEN)
+		return (NULL);
+
+	while (totlen > 0) {
+		if (top == NULL) {	/* First one, must be PKTHDR */
+			if (totlen + off >= MINCLSIZE) {
+				m = m_getcl(M_DONTWAIT, MT_DATA, M_PKTHDR);
+				len = MCLBYTES;
+			} else {
+				m = m_gethdr(M_DONTWAIT, MT_DATA);
+				len = MHLEN;
+
+				/* Place initial small packet/header at end of mbuf */
+				if (m && totlen + off + max_linkhdr <= MLEN) {
+					m->m_data += max_linkhdr;
+					len -= max_linkhdr;
+				}
+			}
+			if (m == NULL)
+				return NULL;
+			m->m_pkthdr.rcvif = ifp;
+			m->m_pkthdr.len = totlen;
+		} else {
+			if (totlen + off >= MINCLSIZE) {
+				m = m_getcl(M_DONTWAIT, MT_DATA, 0);
+				len = MCLBYTES;
+			} else {
+				m = m_get(M_DONTWAIT, MT_DATA);
+				len = MLEN;
+			}
+			if (m == NULL) {
+				m_freem(top);
+				return NULL;
+			}
+		}
+		if (off) {
+			m->m_data += off;
+			len -= off;
+			off = 0;
+		}
+		m->m_len = len = min(totlen, len);
+		if (copy)
+			copy(buf, mtod(m, caddr_t), (u_int)len);
+		else
+			bcopy(buf, mtod(m, caddr_t), (u_int)len);
+		buf += len;
+		*mp = m;
+		mp = &m->m_next;
+		totlen -= len;
+	}
+	return (top);
+}
+
+/*
+ * Copy data from a buffer back into the indicated mbuf chain,
+ * starting "off" bytes from the beginning, extending the mbuf
+ * chain if necessary.
+ */
+void
+m_copyback(struct mbuf *m0, int off, int len, caddr_t cp)
+{
+	int mlen;
+	struct mbuf *m = m0, *n;
+	int totlen = 0;
+
+	if (m0 == NULL)
+		return;
+	while (off > (mlen = m->m_len)) {
+		off -= mlen;
+		totlen += mlen;
+		if (m->m_next == NULL) {
+			n = m_get(M_DONTWAIT, m->m_type);
+			if (n == NULL)
+				goto out;
+			bzero(mtod(n, caddr_t), MLEN);
+			n->m_len = min(MLEN, len + off);
+			m->m_next = n;
+		}
+		m = m->m_next;
+	}
+	while (len > 0) {
+		mlen = min (m->m_len - off, len);
+		bcopy(cp, off + mtod(m, caddr_t), (u_int)mlen);
+		cp += mlen;
+		len -= mlen;
+		mlen += off;
+		off = 0;
+		totlen += mlen;
+		if (len == 0)
+			break;
+		if (m->m_next == NULL) {
+			n = m_get(M_DONTWAIT, m->m_type);
+			if (n == NULL)
+				break;
+			n->m_len = min(MLEN, len);
+			m->m_next = n;
+		}
+		m = m->m_next;
+	}
+out:	if (((m = m0)->m_flags & M_PKTHDR) && (m->m_pkthdr.len < totlen))
+		m->m_pkthdr.len = totlen;
+}
