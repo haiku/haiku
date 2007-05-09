@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network ipro1000 ;
 
-SubInclude HAIKU_TOP src add-ons kernel drivers network ipro1000 dev ;
-
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 # set some additional flags
@@ -51,4 +49,6 @@ HaikuInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/dri
 	<installed>ipro1000 : 
 	installed-symlink 
 ;
+
+SubInclude HAIKU_TOP src add-ons kernel drivers network ipro1000 dev ;
 
