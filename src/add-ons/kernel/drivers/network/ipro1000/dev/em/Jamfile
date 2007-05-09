@@ -1,0 +1,18 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network ipro1000 dev em ;
+
+SubDirCcFlags -Wall ;
+
+UsePrivateHeaders kernel net ;
+
+UseHeaders [ FDirName $(SUBDIR) .. .. ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 EM_FAST_INTR=1 DBG=1 ] ;
+
+KernelAddon e1000 :
+	if_em.c
+	if_em_hw.c
+	glue.c
+	: libfreebsd_network.a
+	;
+
