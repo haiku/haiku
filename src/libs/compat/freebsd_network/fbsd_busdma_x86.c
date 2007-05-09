@@ -1000,7 +1000,7 @@ alloc_bounce_zone(bus_dma_tag_t dmat)
 	bz->boundary = dmat->boundary;
 	snprintf(bz->zoneid, 8, "zone%d", busdma_zonecount);
 	busdma_zonecount++;
-	snprintf(bz->lowaddrid, 18, "%lx", (uintmax_t)bz->lowaddr);
+	snprintf(bz->lowaddrid, 18, "%llx", (uintmax_t)bz->lowaddr);
 	STAILQ_INSERT_TAIL(&bounce_zone_list, bz, links);
 	dmat->bounce_zone = bz;
 

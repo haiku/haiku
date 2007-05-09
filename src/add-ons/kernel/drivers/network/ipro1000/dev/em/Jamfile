@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network ipro1000 dev em ;
 
-SubDirCcFlags -Wall ;
-
 UsePrivateHeaders kernel net ;
 
 UseHeaders [ FDirName $(SUBDIR) .. .. ] : true ;

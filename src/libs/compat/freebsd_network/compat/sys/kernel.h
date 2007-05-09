@@ -5,8 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <KernelExport.h>
-
+#include <sys/haiku-module.h>
 #include <sys/module.h>
 
 #define hz	1000000LL

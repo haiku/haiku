@@ -1,7 +1,7 @@
 #ifndef _FBSD_COMPAT_SYS_CALLOUT_H_
 #define _FBSD_COMPAT_SYS_CALLOUT_H_
 
-#include <net_stack.h>
+#include <sys/haiku-module.h>
 
 #include <sys/mutex.h>
 #include <sys/queue.h>

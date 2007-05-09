@@ -9,6 +9,11 @@
 #define _FBSD_COMPAT_SYS_HAIKU_MODULE_H_
 
 #include <Drivers.h> /* for device_hooks */
+#include <KernelExport.h>
+
+#include <lock.h> /* mutex, recursive_lock for mtx */
+#include <net_stack.h> /* net_timer, for callout */
+#undef ASSERT /* private/kernel/debug.h sets it */
 
 typedef struct device *device_t;
 typedef struct devclass *devclass_t;

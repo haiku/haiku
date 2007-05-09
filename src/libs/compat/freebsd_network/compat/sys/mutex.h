@@ -1,7 +1,7 @@
 #ifndef _FBSD_COMPAT_SYS_MUTEX_H_
 #define _FBSD_COMPAT_SYS_MUTEX_H_
 
-#include <lock.h>
+#include <sys/haiku-module.h>
 
 struct mtx {
 	int type;
