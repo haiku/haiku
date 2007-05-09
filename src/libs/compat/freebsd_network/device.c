@@ -26,8 +26,8 @@
 #define MAX_DEVICES		8
 
 
-device_t gDevices[MAX_DEVICES];
-char *gDevNameList[MAX_DEVICES + 1];
+struct network_device *gDevices[MAX_DEVICES];
+const char *gDevNameList[MAX_DEVICES + 1];
 
 
 static device_probe_t  *sDeviceProbe;
@@ -36,28 +36,47 @@ static device_detach_t *sDeviceDetach;
 
 
 static device_t
+init_device(device_t dev, driver_t *driver)
+{
+	dev->driver = driver;
+	dev->softc = malloc(driver->softc_size);
+	if (dev->softc == NULL)
+		return NULL;
+
+	return dev;
+}
+
+
+static void
+uninit_device(device_t dev)
+{
+	if (dev->flags & DEVICE_DESC_ALLOCED)
+		free((char *)dev->description);
+	free(dev->softc);
+}
+
+
+static struct network_device *
 allocate_device(driver_t *driver)
 {
 	char semName[64];
 
-	device_t dev = (device_t)malloc(sizeof(struct device));
+	struct network_device *dev = malloc(sizeof(struct network_device));
 	if (dev == NULL)
 		return NULL;
 
 	memset(dev, 0, sizeof(struct device));
 
-	snprintf(semName, sizeof(semName), "%s rcv", gDriverName);
-
-	dev->softc_size = driver->softc_size;
-	dev->softc = malloc(driver->softc_size);
-	if (dev->softc == NULL) {
+	if (init_device(DEVNET(dev), driver) == NULL) {
 		free(dev);
 		return NULL;
 	}
 
+	snprintf(semName, sizeof(semName), "%s rcv", gDriverName);
+
 	dev->receive_sem = create_sem(0, semName);
 	if (dev->receive_sem < 0) {
-		free(dev->softc);
+		uninit_device(DEVNET(dev));
 		free(dev);
 		return NULL;
 	}
@@ -71,13 +90,11 @@ allocate_device(driver_t *driver)
 
 
 static void
-free_device(device_t dev)
+free_device(struct network_device *dev)
 {
 	delete_sem(dev->receive_sem);
 	ifq_uninit(&dev->receive_queue);
-	free(dev->softc);
-	if (dev->flags & DEVICE_DESC_ALLOCED)
-		free((char *)dev->description);
+	uninit_device(DEVNET(dev));
 	free(dev);
 }
 
@@ -100,8 +117,8 @@ _resolve_method(driver_t *driver, const char *name)
 static status_t
 compat_open(const char *name, uint32 flags, void **cookie)
 {
+	struct network_device *dev;
 	status_t status;
-	device_t dev;
 	int i;
 
 	driver_printf("compat_open(%s, 0x%lx)\n", name, flags);
@@ -124,11 +141,11 @@ compat_open(const char *name, uint32 flags, void **cookie)
 		return B_BUSY;
 
 	/* some drivers expect the softc to be zero'ed out */
-	memset(dev->softc, 0, dev->softc_size);
+	memset(dev->base.softc, 0, dev->base.driver->softc_size);
 
-	status = sDeviceAttach(dev);
+	status = sDeviceAttach(DEVNET(dev));
 	if (status != 0)
-		dev->flags = 0;
+		atomic_and(&dev->open, 0);
 
 	driver_printf(" ... status = 0x%ld\n", status);
 
@@ -155,11 +172,11 @@ compat_open(const char *name, uint32 flags, void **cookie)
 static status_t
 compat_close(void *cookie)
 {
-	device_t dev = cookie;
+	struct network_device *dev = cookie;
 
-	device_printf(dev, "compat_close()\n");
+	device_printf(DEVNET(dev), "compat_close()\n");
 
-	atomic_or(&dev->flags, DEVICE_CLOSED);
+	atomic_or(&DEVNET(dev)->flags, DEVICE_CLOSED);
 
 	/* do we need a memory barrier in read() or is the atomic_or
 	 * (and the implicit 'lock') enough? */
@@ -173,11 +190,11 @@ compat_close(void *cookie)
 static status_t
 compat_free(void *cookie)
 {
-	device_t dev = cookie;
+	struct network_device *dev = cookie;
 
-	device_printf(dev, "compat_free()\n");
+	device_printf(DEVNET(dev), "compat_free()\n");
 
-	sDeviceDetach(dev);
+	sDeviceDetach(DEVNET(dev));
 
 	/* XXX empty out the send queue */
 
@@ -191,24 +208,24 @@ compat_free(void *cookie)
 static status_t
 compat_read(void *cookie, off_t position, void *buf, size_t *numBytes)
 {
+	struct network_device *dev = cookie;
 	uint32 semFlags = B_CAN_INTERRUPT;
-	device_t dev = cookie;
 	status_t status;
 	struct mbuf *mb;
 	size_t len;
 
-	driver_printf("compat_read(%p, %lld, %p, [%lu])\n", cookie, position, buf,
+	device_printf(DEVNET(dev), "compat_read(%lld, %p, [%lu])\n", position, buf,
 		*numBytes);
 
-	if (dev->flags & DEVICE_CLOSED)
+	if (DEVNET(dev)->flags & DEVICE_CLOSED)
 		return B_INTERRUPTED;
 
-	if (dev->flags & DEVICE_NON_BLOCK)
+	if (DEVNET(dev)->flags & DEVICE_NON_BLOCK)
 		semFlags |= B_RELATIVE_TIMEOUT;
 
 	do {
 		status = acquire_sem_etc(dev->receive_sem, 1, semFlags, 0);
-		if (dev->flags & DEVICE_CLOSED)
+		if (DEVNET(dev)->flags & DEVICE_CLOSED)
 			return B_INTERRUPTED;
 
 		if (status == B_WOULD_BLOCK) {
@@ -242,10 +259,10 @@ static status_t
 compat_write(void *cookie, off_t position, const void *buffer,
 	size_t *numBytes)
 {
-	device_t dev = cookie;
+	struct network_device *dev = cookie;
 	struct mbuf *mb;
 
-	driver_printf("compat_write(%p, %lld, %p, [%lu])\n", cookie, position,
+	device_printf(DEVNET(dev), "compat_write(%lld, %p, [%lu])\n", position,
 		buffer, *numBytes);
 
 	mb = m_getcl(0, MT_DATA, 0);
@@ -264,7 +281,7 @@ compat_write(void *cookie, off_t position, const void *buffer,
 static status_t
 compat_control(void *cookie, uint32 op, void *arg, size_t len)
 {
-	device_t dev = cookie;
+	struct network_device *dev = cookie;
 	struct ifnet *ifp = dev->ifp;
 
 	switch (op) {
@@ -282,9 +299,9 @@ compat_control(void *cookie, uint32 op, void *arg, size_t len)
 			if (user_memcpy(&value, arg, sizeof(int32)) < B_OK)
 				return B_BAD_ADDRESS;
 			if (value)
-				dev->flags |= DEVICE_NON_BLOCK;
+				DEVNET(dev)->flags |= DEVICE_NON_BLOCK;
 			else
-				dev->flags &= ~DEVICE_NON_BLOCK;
+				DEVNET(dev)->flags &= ~DEVICE_NON_BLOCK;
 			return B_OK;
 		}
 
@@ -378,7 +395,7 @@ device_hooks gDeviceHooks = {
 status_t
 _fbsd_init_hardware(driver_t *driver)
 {
-	struct device fakeDevice;
+	struct network_device fakeDevice;
 	device_probe_t *probe;
 	int i;
 
@@ -397,12 +414,12 @@ _fbsd_init_hardware(driver_t *driver)
 
 	for (i = 0; gPci->get_nth_pci_info(i, &fakeDevice.pci_info) == B_OK; i++) {
 		int result;
-		result = probe(&fakeDevice);
+		result = probe(DEVNET(&fakeDevice));
 		if (result >= 0) {
 			dprintf("%s, found %s at %d\n", gDriverName,
-				fakeDevice.description, i);
-			if (fakeDevice.flags & DEVICE_DESC_ALLOCED)
-				free((char *)fakeDevice.description);
+				device_get_desc(DEVNET(&fakeDevice)), i);
+			if (DEVNET(&fakeDevice)->flags & DEVICE_DESC_ALLOCED)
+				free((char *)DEVNET(&fakeDevice)->description);
 			put_module(B_PCI_MODULE_NAME);
 			return B_OK;
 		}
@@ -420,7 +437,7 @@ _fbsd_init_driver(driver_t *driver)
 {
 	int i, ncards = 0;
 	status_t status;
-	device_t dev;
+	struct network_device *dev;
 
 	dprintf("%s: init_driver(%p)\n", gDriverName, driver);
 
@@ -460,14 +477,15 @@ _fbsd_init_driver(driver_t *driver)
 
 	for (i = 0; dev != NULL
 			&& gPci->get_nth_pci_info(i, &dev->pci_info) == B_OK; i++) {
-		if (sDeviceProbe(dev) >= 0) {
-			snprintf(dev->dev_name, sizeof(dev->dev_name), "net/%s/%i",
-				gDriverName, ncards);
-			dprintf("%s, adding %s @%d -> /dev/%s\n", gDriverName, dev->description,
-				i, dev->dev_name);
+		device_t base = DEVNET(dev);
+
+		if (sDeviceProbe(base) >= 0) {
+			device_sprintf_name(base, "net/%s/%i", gDriverName, ncards);
+			dprintf("%s, adding %s @%d -> /dev/%s\n", gDriverName,
+				device_get_desc(base), i, device_get_name(base));
 
 			gDevices[ncards] = dev;
-			gDevNameList[ncards] = dev->dev_name;
+			gDevNameList[ncards] = device_get_name(base);
 
 			ncards++;
 			if (ncards < MAX_DEVICES)

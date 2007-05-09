@@ -93,6 +93,7 @@ void *device_get_softc(device_t dev);
 int device_printf(device_t dev, const char *, ...) __printflike(2, 3);
 void device_set_desc(device_t dev, const char *desc);
 void device_set_desc_copy(device_t dev, const char *desc);
+const char *device_get_desc(device_t dev);
 
 device_t device_add_child(device_t dev, const char *name, int unit);
 int device_delete_child(device_t dev, device_t child);

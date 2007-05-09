@@ -36,8 +36,9 @@ pci_module_info *gPci;
 uint32_t
 pci_read_config(device_t dev, int offset, int size)
 {
-	uint32_t value = gPci->read_pci_config(dev->pci_info.bus,
-		dev->pci_info.device, dev->pci_info.function, offset, size);
+	uint32_t value = gPci->read_pci_config(NETDEV(dev)->pci_info.bus,
+		NETDEV(dev)->pci_info.device, NETDEV(dev)->pci_info.function,
+		offset, size);
 	TRACE_PCI(dev, "pci_read_config(%i, %i) = 0x%lx\n", offset, size, value);
 	return value;
 }
@@ -48,8 +49,9 @@ pci_write_config(device_t dev, int offset, uint32_t value, int size)
 {
 	TRACE_PCI(dev, "pci_write_config(%i, 0x%lx, %i)\n", offset, value, size);
 
-	gPci->write_pci_config(dev->pci_info.bus, dev->pci_info.device,
-		dev->pci_info.function, offset, size, value);
+	gPci->write_pci_config(NETDEV(dev)->pci_info.bus,
+		NETDEV(dev)->pci_info.device, NETDEV(dev)->pci_info.function,
+		offset, size, value);
 }
 
 
@@ -164,14 +166,10 @@ driver_vprintf(const char *format, va_list vl)
 int
 device_printf(device_t dev, const char *format, ...)
 {
-	char devDesc[32];
 	va_list vl;
 
-	snprintf(devDesc, sizeof(devDesc), "%i:%i:%i", (int)dev->pci_info.bus,
-		(int)dev->pci_info.device, (int)dev->pci_info.function);
-
 	va_start(vl, format);
-	driver_vprintf_etc(devDesc, format, vl);
+	driver_vprintf_etc(dev->dev_name, format, vl);
 	va_end(vl);
 	return 0;
 }
@@ -189,6 +187,23 @@ device_set_desc_copy(device_t dev, const char *desc)
 {
 	dev->description = strdup(desc);
 	dev->flags |= DEVICE_DESC_ALLOCED;
+}
+
+
+const char *
+device_get_desc(device_t dev)
+{
+	return dev->description;
+}
+
+
+void
+device_sprintf_name(device_t dev, const char *format, ...)
+{
+	va_list vl;
+	va_start(vl, format);
+	vsnprintf(dev->dev_name, sizeof(dev->dev_name), format, vl);
+	va_end(vl);
 }
 
 

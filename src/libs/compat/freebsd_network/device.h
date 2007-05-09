@@ -25,11 +25,25 @@
 struct ifnet;
 
 struct device {
-	pci_info		pci_info;
 	char			dev_name[128];
 
-	int32			open;
+	driver_t		*driver;
+
 	int32			flags;
+
+	int				unit;
+	char			nameunit[64];
+	const char *	description;
+	void *			softc;
+};
+
+
+struct network_device {
+	struct device base;
+
+	pci_info		pci_info;
+
+	int32			open;
 
 	struct ifqueue	receive_queue;
 	sem_id			receive_sem;
@@ -37,13 +51,11 @@ struct device {
 	sem_id			link_state_sem;
 
 	struct ifnet *	ifp;
-
-	int				unit;
-	char			nameunit[64];
-	const char *	description;
-	void *			softc;
-	size_t			softc_size;
 };
+
+
+#define DEVNET(dev)		((device_t)(&(dev)->base))
+#define NETDEV(base)	((struct network_device *)(base))
 
 
 enum {
@@ -80,8 +92,12 @@ void uninit_taskqueues(void);
 void init_bounce_pages(void);
 void uninit_bounce_pages(void);
 
-void driver_printf(const char *format, ...) __attribute__ ((format (__printf__, 1, 2)));
+void driver_printf(const char *format, ...)
+	__attribute__ ((format (__printf__, 1, 2)));
 void driver_vprintf(const char *format, va_list vl);
+
+void device_sprintf_name(device_t dev, const char *format, ...)
+	__attribute__ ((format (__printf__, 2, 3)));
 
 void ifq_init(struct ifqueue *ifq, const char *name);
 void ifq_uninit(struct ifqueue *ifq);
@@ -89,7 +105,7 @@ void ifq_uninit(struct ifqueue *ifq);
 extern struct net_stack_module_info *gStack;
 extern pci_module_info *gPci;
 
-extern char *gDevNameList[];
-extern struct device *gDevices[];
+extern const char *gDevNameList[];
+extern struct network_device *gDevices[];
 
 #endif

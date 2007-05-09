@@ -67,8 +67,8 @@ if_initname(struct ifnet *ifp, const char *name, int unit)
 	if (gDevNameList[i] == NULL)
 		panic("unknown interface");
 
-	ifp->if_dev = gDevices[i];
-	ifp->if_dev->ifp = ifp;
+	ifp->if_dev = DEVNET(gDevices[i]);
+	gDevices[i]->ifp = ifp;
 }
 
 
@@ -146,7 +146,8 @@ if_link_state_change(struct ifnet *ifp, int link_state)
 
 	ifp->if_link_state = link_state;
 
-	release_sem_etc(ifp->if_dev->link_state_sem, 1, B_DO_NOT_RESCHEDULE);
+	release_sem_etc(NETDEV(ifp->if_dev)->link_state_sem, 1,
+		B_DO_NOT_RESCHEDULE);
 }
 
 
@@ -269,8 +270,8 @@ ether_input(struct ifnet *ifp, struct mbuf *m)
 {
 	device_t dev = ifp->if_dev;
 
-	IF_ENQUEUE(&dev->receive_queue, m);
-	release_sem_etc(dev->receive_sem, 1, B_DO_NOT_RESCHEDULE);
+	IF_ENQUEUE(&NETDEV(dev)->receive_queue, m);
+	release_sem_etc(NETDEV(dev)->receive_sem, 1, B_DO_NOT_RESCHEDULE);
 }
 
 
