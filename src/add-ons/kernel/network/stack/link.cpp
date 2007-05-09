@@ -320,6 +320,24 @@ link_control(net_protocol *_protocol, int level, int option, void *value,
 
 
 status_t
+link_getsockopt(net_protocol *protocol, int level, int option, void *value,
+	int *length)
+{
+	return protocol->next->module->getsockopt(protocol, level, option,
+		value, length);
+}
+
+
+status_t
+link_setsockopt(net_protocol *protocol, int level, int option,
+	const void *value, int length)
+{
+	return protocol->next->module->setsockopt(protocol, level, option,
+		value, length);
+}
+
+
+status_t
 link_bind(net_protocol *protocol, const struct sockaddr *address)
 {
 	// TODO: bind to a specific interface and ethernet type
@@ -467,8 +485,8 @@ net_protocol_module_info gLinkModule = {
 	link_connect,
 	link_accept,
 	link_control,
-	NULL, // getsockopt
-	NULL, // setsockopt
+	link_getsockopt,
+	link_setsockopt,
 	link_bind,
 	link_unbind,
 	link_listen,

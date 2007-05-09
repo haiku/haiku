@@ -1022,6 +1022,24 @@ udp_control(net_protocol *protocol, int level, int option, void *value,
 
 
 status_t
+udp_getsockopt(net_protocol *protocol, int level, int option, void *value,
+	int *length)
+{
+	return protocol->next->module->getsockopt(protocol->next, level, option,
+		value, length);
+}
+
+
+status_t
+udp_setsockopt(net_protocol *protocol, int level, int option,
+	const void *value, int length)
+{
+	return protocol->next->module->setsockopt(protocol->next, level, option,
+		value, length);
+}
+
+
+status_t
 udp_bind(net_protocol *protocol, const struct sockaddr *address)
 {
 	return ((UdpEndpoint *)protocol)->Bind(address);
@@ -1218,8 +1236,8 @@ net_protocol_module_info sUDPModule = {
 	udp_connect,
 	udp_accept,
 	udp_control,
-	NULL, // getsockopt
-	NULL, // setsockopt
+	udp_getsockopt,
+	udp_setsockopt,
 	udp_bind,
 	udp_unbind,
 	udp_listen,

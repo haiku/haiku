@@ -130,6 +130,24 @@ icmp_control(net_protocol *protocol, int level, int option, void *value,
 
 
 status_t
+icmp_getsockopt(net_protocol *protocol, int level, int option,
+	void *value, int *length)
+{
+	return protocol->next->module->getsockopt(protocol->next, level, option,
+		value, length);
+}
+
+
+status_t
+icmp_setsockopt(net_protocol *protocol, int level, int option,
+	const void *value, int length)
+{
+	return protocol->next->module->setsockopt(protocol->next, level, option,
+		value, length);
+}
+
+
+status_t
 icmp_bind(net_protocol *protocol, const struct sockaddr *address)
 {
 	return B_ERROR;
@@ -330,8 +348,8 @@ net_protocol_module_info sICMPModule = {
 	icmp_connect,
 	icmp_accept,
 	icmp_control,
-	NULL, // getsockopt
-	NULL, // setsockopt
+	icmp_getsockopt,
+	icmp_setsockopt,
 	icmp_bind,
 	icmp_unbind,
 	icmp_listen,

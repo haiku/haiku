@@ -751,14 +751,8 @@ int
 socket_getsockopt(net_socket *socket, int level, int option, void *value,
 	int *_length)
 {
-	for (net_protocol *protocol = socket->first_protocol;
-			protocol; protocol = protocol->next) {
-		if (protocol->module->getsockopt)
-			return protocol->module->getsockopt(protocol, level, option,
-				value, _length);
-	}
-
-	return socket_get_option(socket, level, option, value, _length);
+	return socket->first_protocol->module->getsockopt(socket->first_protocol,
+		level, option, value, _length);
 }
 
 
@@ -1069,14 +1063,8 @@ int
 socket_setsockopt(net_socket *socket, int level, int option, const void *value,
 	int length)
 {
-	for (net_protocol *protocol = socket->first_protocol;
-			protocol; protocol = protocol->next) {
-		if (protocol->module->setsockopt)
-			return protocol->module->setsockopt(protocol, level, option,
-				value, length);
-	}
-
-	return socket_set_option(socket, level, option, value, length);
+	return socket->first_protocol->module->setsockopt(socket->first_protocol,
+		level, option, value, length);
 }
 
 
