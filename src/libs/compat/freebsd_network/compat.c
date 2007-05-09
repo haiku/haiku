@@ -334,6 +334,7 @@ vtophys(vm_offset_t vaddr)
 	return (unsigned long)pe.address;
 }
 
+
 status_t
 init_compat_layer()
 {

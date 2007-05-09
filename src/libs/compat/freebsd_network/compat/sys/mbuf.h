@@ -118,78 +118,11 @@ void m_clget(struct mbuf *m, int how);
 	    ("%s: no mbuf packet header!", __func__))
 
 #define MBUF_CHECKSLEEP(how) do { } while (0)
+#define MBTOM(how) (how)
 
+extern int max_protohdr;
 
-/*
- * Set the m_data pointer of a newly-allocated mbuf (m_get/MGET) to place
- * an object of the specified size at the end of the mbuf, longword aligned.
- */
-#define	M_ALIGN(m, len) do {						\
-	(m)->m_data += (MLEN - (len)) & ~(sizeof(long) - 1);		\
-} while (0)
-
-/*
- * As above, for mbufs allocated with m_gethdr/MGETHDR
- * or initialized by M_COPY_PKTHDR.
- */
-#define	MH_ALIGN(m, len) do {						\
-	(m)->m_data += (MHLEN - (len)) & ~(sizeof(long) - 1);		\
-} while (0)
-
-
-/*
-#define	MEXT_IS_REF(m)	(((m)->m_ext.ref_cnt != NULL)			\
-    && (*((m)->m_ext.ref_cnt) > 1))
- */
-#define MEXT_IS_REF(m)	0
-
-/*
- * Evaluate TRUE if it's safe to write to the mbuf m's data region (this
- * can be both the local data payload, or an external buffer area,
- * depending on whether M_EXT is set).
- */
-
-/*
-#define	M_WRITABLE(m)	(!((m)->m_flags & M_RDONLY) && (!((m)->m_flags  \
-			    & M_EXT) || !MEXT_IS_REF(m)))
- */
-#define M_WRITABLE(m)	(!((m)->m_flags & M_EXT) || !MEXT_IS_REF(m))
-
-/*
- * Compute the amount of space available
- * before the current start of data in an mbuf.
- *
- * The M_WRITABLE() is a temporary, conservative safety measure: the burden
- * of checking writability of the mbuf data area rests solely with the caller.
- */
-#define	M_LEADINGSPACE(m)						\
-	((m)->m_flags & M_EXT ?						\
-	    (M_WRITABLE(m) ? (m)->m_data - (m)->m_ext.ext_buf : 0):	\
-	    (m)->m_flags & M_PKTHDR ? (m)->m_data - (m)->m_pktdat :	\
-	    (m)->m_data - (m)->m_dat)
-
-/*
- * Arrange to prepend space of size plen to mbuf m.
- * If a new mbuf must be allocated, how specifies whether to wait.
- * If the allocation fails, the original mbuf chain is freed and m is
- * set to NULL.
- */
-#define	M_PREPEND(m, plen, how) do {					\
-	struct mbuf **_mmp = &(m);					\
-	struct mbuf *_mm = *_mmp;					\
-	int _mplen = (plen);						\
-	int __mhow = (how);						\
-									\
-	MBUF_CHECKSLEEP(how);						\
-	if (M_LEADINGSPACE(_mm) >= _mplen) {				\
-		_mm->m_data -= _mplen;					\
-		_mm->m_len += _mplen;					\
-	} else								\
-		_mm = m_prepend(_mm, _mplen, __mhow);			\
-	if (_mm != NULL && _mm->m_flags & M_PKTHDR)			\
-		_mm->m_pkthdr.len += _mplen;				\
-	*_mmp = _mm;							\
-} while (0)
+#include <sys/mbuf-fbsd.h>
 
 #endif
 
