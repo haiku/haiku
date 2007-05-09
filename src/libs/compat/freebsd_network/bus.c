@@ -326,6 +326,21 @@ bus_generic_resume(device_t dev)
 }
 
 
+int
+bus_generic_print_child(device_t dev, device_t child)
+{
+	UNIMPLEMENTED();
+	return B_ERROR;
+}
+
+
+void
+bus_generic_driver_added(device_t dev, driver_t *driver)
+{
+	UNIMPLEMENTED();
+}
+
+
 #define DEBUG_BUS_SPACE_RW
 
 #ifdef DEBUG_BUS_SPACE_RW

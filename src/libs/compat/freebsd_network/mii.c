@@ -23,6 +23,7 @@ int
 mii_phy_probe(device_t dev, device_t *miiDev, ifm_change_cb_t change,
 	ifm_stat_cb_t stat)
 {
+	UNIMPLEMENTED();
 	return -1;
 }
 
@@ -30,11 +31,13 @@ mii_phy_probe(device_t dev, device_t *miiDev, ifm_change_cb_t change,
 void
 mii_tick(struct mii_data *data)
 {
+	UNIMPLEMENTED();
 }
 
 int
 mii_mediachg(struct mii_data *data)
 {
+	UNIMPLEMENTED();
 	return -1;
 }
 
@@ -42,4 +45,5 @@ mii_mediachg(struct mii_data *data)
 void
 mii_pollstat(struct mii_data *data)
 {
+	UNIMPLEMENTED();
 }

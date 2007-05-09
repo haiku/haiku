@@ -93,6 +93,9 @@ void device_set_desc_copy(device_t dev, const char *desc);
 
 device_t device_add_child(device_t dev, const char *name, int unit);
 int device_delete_child(device_t dev, device_t child);
+int device_is_attached(device_t dev);
+int bus_generic_print_child(device_t dev, device_t child);
+void bus_generic_driver_added(device_t dev, driver_t *driver);
 
 static inline struct sysctl_ctx_list *
 device_get_sysctl_ctx(device_t dev)

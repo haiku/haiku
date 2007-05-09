@@ -90,6 +90,7 @@ extern int __haiku_driver_requirements;
 enum {
 	FBSD_TASKQUEUES		= 1 << 0,
 	FBSD_FAST_TASKQUEUE	= 1 << 1,
+	FBSD_SWI_TASKQUEUE	= 1 << 2,
 };
 
 #define HAIKU_DRIVER_REQUIREMENTS(flags) \

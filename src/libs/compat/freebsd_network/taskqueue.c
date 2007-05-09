@@ -29,6 +29,7 @@ struct taskqueue {
 
 
 struct taskqueue *taskqueue_fast = NULL;
+struct taskqueue *taskqueue_swi = NULL;
 
 
 static struct taskqueue *
@@ -296,26 +297,54 @@ task_init(struct task *t, int prio, task_handler_t handler, void *context)
 status_t
 init_taskqueues()
 {
+	status_t status = B_NO_MEMORY;
+
 	if (HAIKU_DRIVER_REQUIRES(FBSD_FAST_TASKQUEUE)) {
 		taskqueue_fast = taskqueue_create_fast("fast taskq", 0,
-			taskqueue_thread_enqueue, NULL);
+			taskqueue_thread_enqueue, &taskqueue_fast);
 		if (taskqueue_fast == NULL)
 			return B_NO_MEMORY;
 
-		if (taskqueue_start_threads(&taskqueue_fast, 1, B_REAL_TIME_PRIORITY,
-			"fast taskq") < 0) {
-			taskqueue_free(taskqueue_fast);
-			return B_ERROR;
+		status = taskqueue_start_threads(&taskqueue_fast, 1,
+			B_REAL_TIME_PRIORITY, "fast taskq");
+		if (status < B_OK)
+			goto err_1;
+	}
+
+	if (HAIKU_DRIVER_REQUIRES(FBSD_SWI_TASKQUEUE)) {
+		taskqueue_swi = taskqueue_create_fast("swi taskq", 0,
+			taskqueue_thread_enqueue, &taskqueue_swi);
+		if (taskqueue_swi == NULL) {
+			status = B_NO_MEMORY;
+			goto err_1;
 		}
+
+		status = taskqueue_start_threads(&taskqueue_swi, 1,
+			B_REAL_TIME_PRIORITY, "swi taskq");
+		if (status < B_OK)
+			goto err_2;
 	}
 
 	return B_OK;
+
+err_2:
+	if (taskqueue_swi)
+		taskqueue_free(taskqueue_swi);
+
+err_1:
+	if (taskqueue_fast)
+		taskqueue_free(taskqueue_fast);
+
+	return status;
 }
 
 
 void
 uninit_taskqueues()
 {
+	if (HAIKU_DRIVER_REQUIRES(FBSD_SWI_TASKQUEUE))
+		taskqueue_free(taskqueue_swi);
+
 	if (HAIKU_DRIVER_REQUIRES(FBSD_FAST_TASKQUEUE))
 		taskqueue_free(taskqueue_fast);
 }

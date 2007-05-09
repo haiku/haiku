@@ -24,6 +24,8 @@ int taskqueue_enqueue(struct taskqueue *tq, struct task *task);
 void taskqueue_thread_enqueue(void *context);
 
 extern struct taskqueue *taskqueue_fast;
+extern struct taskqueue *taskqueue_swi;
+
 int taskqueue_enqueue_fast(struct taskqueue *queue, struct task *task);
 struct taskqueue *taskqueue_create_fast(const char *name, int mflags,
 	taskqueue_enqueue_fn enqueue, void *context);

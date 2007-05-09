@@ -225,6 +225,15 @@ device_get_softc(device_t dev)
 int
 device_delete_child(device_t dev, device_t child)
 {
+	UNIMPLEMENTED();
+	return -1;
+}
+
+
+int
+device_is_attached(device_t dev)
+{
+	UNIMPLEMENTED();
 	return -1;
 }
 
