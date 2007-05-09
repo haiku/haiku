@@ -180,6 +180,7 @@ static uint16 nvidia_device_list[] = {
 	0x0167, /* Nvidia GeForce 6200 Go */
 	0x0168, /* Nvidia GeForce 6400 Go */
 	0x0169, /* Nvidia GeForce 6250 Go */
+	0x016a, /* Nvidia Geforce 7100 GS */
 	0x016b, /* Nvidia unknown FX Go */
 	0x016c, /* Nvidia unknown FX Go */
 	0x016d, /* Nvidia unknown FX Go */

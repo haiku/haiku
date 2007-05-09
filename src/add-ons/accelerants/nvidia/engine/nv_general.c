@@ -553,6 +553,13 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
+	case 0x016a10de: /* Nvidia 7100 GS */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia GeForce 7100 GS");
+		sprintf(si->adi.chipset, "NV44");
+		status = nvxx_general_powerup();
+		break;
 	case 0x016b10de: /* Nvidia unknown FX Go */
 	case 0x016c10de: /* Nvidia unknown FX Go */
 	case 0x016d10de: /* Nvidia unknown FX Go */
