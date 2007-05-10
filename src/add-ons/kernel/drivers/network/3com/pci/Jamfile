@@ -12,6 +12,6 @@ SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
 KernelAddon 3com :
 	if_xl.c
 	glue.c
-	: libfreebsd_network.a
+	: libfreebsd_network.a 3com_mii.a
 	;
 
