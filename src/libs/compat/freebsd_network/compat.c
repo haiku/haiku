@@ -360,6 +360,30 @@ device_add_child(device_t dev, const char *name, int order)
 }
 
 
+driver_t *
+__haiku_probe_miibus(device_t dev, driver_t *drivers[], int count)
+{
+	driver_t *selected = NULL;
+	int i, selcost = 0;
+
+	for (i = 0; i < count; i++) {
+		device_probe_t *probe = (device_probe_t *)
+			_resolve_method(drivers[i], "device_probe");
+		if (probe) {
+			int result = probe(dev);
+			if (result >= 0) {
+				if (selected == NULL || result > selcost) {
+					selected = drivers[i];
+					selcost = result;
+				}
+			}
+		}
+	}
+
+	return selected;
+}
+
+
 void
 bus_generic_attach(device_t dev)
 {
@@ -369,26 +393,7 @@ bus_generic_attach(device_t dev)
 			child; child = list_get_next_item(&dev->children, child)) {
 		if (child->driver == NULL) {
 			if (dev->driver == &miibus_driver) {
-				int i, driver_count, driver_cost = INT_MIN;
-				driver_t **drivers, *driver = NULL;
-
-				drivers = __haiku_get_miibus_drivers(&driver_count);
-
-				for (i = 0; i < driver_count; i++) {
-					device_probe_t *probe = (device_probe_t *)
-						_resolve_method(drivers[i], "device_probe");
-
-					if (probe) {
-						/* XXX this kinda reverses the original logic */
-						int result = probe(child);
-						if (result >= 0) {
-							if (driver == NULL || result > driver_cost) {
-								driver = drivers[i];
-								driver_cost = result;
-							}
-						}
-					}
-				}
+				driver_t *driver = __haiku_select_miibus_driver(child);
 
 				if (driver)
 					device_set_driver(child, driver);

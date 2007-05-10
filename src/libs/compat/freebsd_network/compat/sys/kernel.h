@@ -7,6 +7,7 @@
 
 #include <sys/haiku-module.h>
 #include <sys/module.h>
+#include <sys/errno.h>
 
 #define hz	1000000LL
 
