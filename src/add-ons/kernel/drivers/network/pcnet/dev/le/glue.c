@@ -8,6 +8,9 @@
 
 HAIKU_FBSD_DRIVER_GLUE(pcnet, le, pci);
 HAIKU_DRIVER_REQUIREMENTS(0);
+NO_HAIKU_FBSD_MII_DRIVER();
+
+NO_HAIKU_REENABLE_INTERRUPTS();
 
 /* from if_le_pci.c */
 #define	PCNET_PCI_RDP	0x10
@@ -58,5 +61,3 @@ int HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev) {
 
 	return value & LE_C0_INTR;
 }
-
-NO_HAIKU_REENABLE_INTERRUPTS();

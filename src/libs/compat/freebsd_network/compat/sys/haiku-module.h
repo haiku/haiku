@@ -52,7 +52,7 @@ status_t _fbsd_init_driver(driver_t *);
 void _fbsd_uninit_driver(driver_t *);
 
 extern const char gDriverName[];
-driver_t *__haiku_get_miibus_driver(device_t dev);
+driver_t **__haiku_get_miibus_drivers(int *count);
 
 /* we define the driver methods with HAIKU_FBSD_DRIVER_GLUE to
  * force the rest of the stuff to be linked back with the driver.
@@ -80,14 +80,20 @@ driver_t *__haiku_get_miibus_driver(device_t dev);
 	device_hooks *find_device(const char *name)							\
 		{ return &gDeviceHooks; }
 
-#define HAIKU_FBSD_MII_DRIVER(name)								\
-	driver_t *__haiku_get_miibus_driver(device_t dev)			\
-		{ extern driver_t *DRIVER_MODULE_NAME(name, miibus);	\
-			return DRIVER_MODULE_NAME(name, miibus); }
+#define HAIKU_FBSD_RETURN_MII_DRIVER(drivers, driver_count)		\
+	driver_t **__haiku_get_miibus_drivers(int *count)			\
+	{															\
+		(*count) = (driver_count);								\
+		return (drivers);										\
+	}
 
-#define HAIKU_NO_FBSD_MII_DRIVER()						\
-	driver_t *__haiku_get_miibus_driver(device_t dev)	\
-		{ return NULL; }
+#define HAIKU_FBSD_MII_DRIVER(name)								\
+	extern driver_t *DRIVER_MODULE_NAME(name, miibus);			\
+	HAIKU_FBSD_RETURN_MII_DRIVER(								\
+		&DRIVER_MODULE_NAME(name, miibus), 1)
+
+#define NO_HAIKU_FBSD_MII_DRIVER()								\
+	HAIKU_FBSD_RETURN_MII_DRIVER(NULL, 0)
 
 extern spinlock __haiku_intr_spinlock;
 extern int __haiku_disable_interrupts(device_t dev);
@@ -96,9 +102,9 @@ extern void __haiku_reenable_interrupts(device_t dev);
 #define HAIKU_CHECK_DISABLE_INTERRUPTS		__haiku_disable_interrupts
 #define HAIKU_REENABLE_INTERRUPTS			__haiku_reenable_interrupts
 
-#define NO_HAIKU_CHECK_DISABLE_INTERRUPTS() \
-	int HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev) { \
-		panic("should never be called."); \
+#define NO_HAIKU_CHECK_DISABLE_INTERRUPTS()				\
+	int HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev) {	\
+		panic("should never be called.");				\
 		return -1; \
 	}
 
