@@ -248,6 +248,8 @@ AddOnManager::UnregisterAddOn(BEntry& entry)
 		filter_info *pinfo;
 		for (fFilterList.Rewind(); fFilterList.GetNext(&pinfo);) {
 			if (!strcmp(pinfo->ref.name, ref.name)) {
+				BAutolock lock2(InputServer::gInputFilterListLocker);
+				InputServer::gInputFilterList.RemoveItem(pinfo->filter);
 				delete pinfo->filter;
 				if (pinfo->addon_image >= B_OK)
 					unload_add_on(pinfo->addon_image);
@@ -256,9 +258,11 @@ AddOnManager::UnregisterAddOn(BEntry& entry)
 			}
 		}
 	} else if (pathString.FindFirst("input_server/methods") > 0) {
-		method_info *pinfo;
+		method_info *pinfo = NULL;
 		for (fMethodList.Rewind(); fMethodList.GetNext(&pinfo);) {
 			if (!strcmp(pinfo->ref.name, ref.name)) {
+				BAutolock lock2(InputServer::gInputMethodListLocker);
+				InputServer::gInputMethodList.RemoveItem(pinfo->method);
 				delete pinfo->method;
 				if (pinfo->addon_image >= B_OK)
 					unload_add_on(pinfo->addon_image);
@@ -271,7 +275,7 @@ AddOnManager::UnregisterAddOn(BEntry& entry)
 			// we remove the method replicant
 			BDeskbar().RemoveItem(REPLICANT_CTL_NAME);
 			gInputServer->SetMethodReplicant(NULL);
-		} else {
+		} else if (pinfo != NULL) {
 			BMessage msg(IS_REMOVE_METHOD);
 			msg.AddInt32("cookie", (uint32)pinfo->method);
 			if (gInputServer->MethodReplicant())
