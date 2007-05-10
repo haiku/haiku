@@ -21,5 +21,7 @@ void
 HAIKU_REENABLE_INTERRUPTS(device_t dev)
 {
 	struct rl_softc *sc = device_get_softc(dev);
+	RL_LOCK(sc);
 	HAIKU_PROTECT_INTR_REGISTER(CSR_WRITE_2(sc, RL_IMR, RL_INTRS));
+	RL_UNLOCK(sc);
 }
