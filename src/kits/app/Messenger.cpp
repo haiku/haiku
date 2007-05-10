@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -161,9 +161,7 @@ BMessenger::~BMessenger()
 bool
 BMessenger::IsTargetLocal() const
 {
-	thread_info info;
-	return get_thread_info(find_thread(NULL), &info) == B_OK
-		&& fTeam == info.team;
+	return BPrivate::current_team() == fTeam;
 }
 
 
