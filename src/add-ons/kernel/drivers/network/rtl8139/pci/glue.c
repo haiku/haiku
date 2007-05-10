@@ -5,6 +5,8 @@
 HAIKU_FBSD_DRIVER_GLUE(rtl8139exp, rl, pci);
 HAIKU_DRIVER_REQUIREMENTS(0);
 
+HAIKU_FBSD_MII_DRIVER(rlphy);
+
 int
 HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev) {
 	struct rl_softc *sc = device_get_softc(dev);
