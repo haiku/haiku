@@ -1323,8 +1323,9 @@ BListView::_Deselect(int32 index)
 	if (index < 0 || index >= CountItems())
 		return false;
 
-	BAutolock locker(Window());
-	if (Window() && !locker.IsLocked())
+	BWindow *window = Window();
+	BAutolock locker(window);
+	if (window && !locker.IsLocked())
 		return false;
 
 	BListItem *item = ItemAt(index);
@@ -1346,7 +1347,7 @@ BListView::_Deselect(int32 index)
 				fLastSelected = _CalcLastSelected(index);
 		}
 
-		if (bounds.Intersects(frame))
+		if (window && bounds.Intersects(frame))
 			DrawItem(ItemAt(index), frame, true);
 	}
 
