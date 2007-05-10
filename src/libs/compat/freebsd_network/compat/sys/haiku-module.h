@@ -52,7 +52,7 @@ status_t _fbsd_init_driver(driver_t *);
 void _fbsd_uninit_driver(driver_t *);
 
 extern const char gDriverName[];
-driver_t *__haiku_get_miibus_driver(void);
+driver_t *__haiku_get_miibus_driver(device_t dev);
 
 /* we define the driver methods with HAIKU_FBSD_DRIVER_GLUE to
  * force the rest of the stuff to be linked back with the driver.
@@ -80,9 +80,10 @@ driver_t *__haiku_get_miibus_driver(void);
 	device_hooks *find_device(const char *name)							\
 		{ return &gDeviceHooks; }
 
-#define HAIKU_FBSD_MII_DRIVER(name)						\
-	driver_t *__haiku_get_miibus_driver(device_t dev)	\
-		{ return DRIVER_MODULE_NAME(name, miibus); }
+#define HAIKU_FBSD_MII_DRIVER(name)								\
+	driver_t *__haiku_get_miibus_driver(device_t dev)			\
+		{ extern driver_t *DRIVER_MODULE_NAME(name, miibus);	\
+			return DRIVER_MODULE_NAME(name, miibus); }
 
 #define HAIKU_NO_FBSD_MII_DRIVER()						\
 	driver_t *__haiku_get_miibus_driver(device_t dev)	\

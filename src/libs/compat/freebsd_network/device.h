@@ -16,6 +16,8 @@
 #include <KernelExport.h>
 #include <drivers/PCI.h>
 
+#include <util/list.h>
+
 #include <net_stack.h>
 
 #include <compat/sys/kernel.h>
@@ -29,6 +31,7 @@ struct device {
 	char			dev_name[128];
 
 	driver_t		*driver;
+	struct list		children;
 
 	int32			flags;
 
@@ -36,6 +39,7 @@ struct device {
 	char			nameunit[64];
 	const char *	description;
 	void *			softc;
+	void *			ivars;
 
 	struct {
 		int (*probe)(device_t dev);
@@ -48,7 +52,11 @@ struct device {
 		int (*miibus_readreg)(device_t, int, int);
 		int (*miibus_writereg)(device_t, int, int, int);
 		void (*miibus_statchg)(device_t);
+		void (*miibus_linkchg)(device_t);
+		void (*miibus_mediainit)(device_t);
 	} methods;
+
+	struct list_link link;
 };
 
 
@@ -112,6 +120,10 @@ void driver_vprintf(const char *format, va_list vl);
 
 void device_sprintf_name(device_t dev, const char *format, ...)
 	__attribute__ ((format (__printf__, 2, 3)));
+
+device_t init_device(device_t dev, driver_t *driver);
+void uninit_device(device_t dev);
+device_method_signature_t _resolve_method(driver_t *driver, const char *name);
 
 void ifq_init(struct ifqueue *ifq, const char *name);
 void ifq_uninit(struct ifqueue *ifq);

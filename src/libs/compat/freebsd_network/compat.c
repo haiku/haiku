@@ -18,7 +18,7 @@
 #include <compat/dev/pci/pcivar.h>
 #include <compat/sys/bus.h>
 
-// TODO a lot.
+#include <compat/dev/mii/miivar.h>
 
 #define DEBUG_PCI
 
@@ -197,6 +197,27 @@ device_get_desc(device_t dev)
 }
 
 
+device_t
+device_get_parent(device_t dev)
+{
+	return dev->parent;
+}
+
+
+void
+device_set_ivars(device_t dev, void *ivars)
+{
+	dev->ivars = ivars;
+}
+
+
+void *
+device_get_ivars(device_t dev)
+{
+	return dev->ivars;
+}
+
+
 void
 device_sprintf_name(device_t dev, const char *format, ...)
 {
@@ -234,6 +255,137 @@ void *
 device_get_softc(device_t dev)
 {
 	return dev->softc;
+}
+
+
+device_t
+init_device(device_t dev, driver_t *driver)
+{
+	list_init_etc(&dev->children, offsetof(struct device, link));
+
+	if (driver == NULL)
+		return dev;
+
+	if (device_set_driver(dev, driver) < 0)
+		return NULL;
+
+	return dev;
+}
+
+
+int
+device_set_driver(device_t dev, driver_t *driver)
+{
+	device_method_signature_t method = NULL;
+	int i;
+
+	dev->softc = malloc(driver->softc_size);
+	if (dev->softc == NULL)
+		return -1;
+
+	dev->driver = driver;
+
+	for (i = 0; method == NULL && driver->methods[i].name != NULL; i++) {
+		device_method_t *mth = &driver->methods[i];
+		if (strcmp(mth->name, "device_probe") == 0)
+			dev->methods.probe = (void *)mth->method;
+		else if (strcmp(mth->name, "device_attach") == 0)
+			dev->methods.attach = (void *)mth->method;
+		else if (strcmp(mth->name, "device_detach") == 0)
+			dev->methods.detach = (void *)mth->method;
+		else if (strcmp(mth->name, "device_suspend") == 0)
+			dev->methods.suspend = (void *)mth->method;
+		else if (strcmp(mth->name, "device_resume") == 0)
+			dev->methods.resume = (void *)mth->method;
+		else if (strcmp(mth->name, "device_shutdown") == 0)
+			dev->methods.shutdown = (void *)mth->method;
+		else if (strcmp(mth->name, "miibus_readreg") == 0)
+			dev->methods.miibus_readreg = (void *)mth->method;
+		else if (strcmp(mth->name, "miibus_writereg") == 0)
+			dev->methods.miibus_writereg = (void *)mth->method;
+		else if (strcmp(mth->name, "miibus_statchg") == 0)
+			dev->methods.miibus_statchg = (void *)mth->method;
+	}
+
+	return 0;
+}
+
+
+void
+uninit_device(device_t dev)
+{
+	if (dev->flags & DEVICE_DESC_ALLOCED)
+		free((char *)dev->description);
+	if (dev->softc)
+		free(dev->softc);
+}
+
+
+static device_t
+new_device(driver_t *driver)
+{
+	device_t dev = malloc(sizeof(struct device));
+	if (dev == NULL)
+		return NULL;
+
+	memset(dev, 0, sizeof(struct device));
+
+	if (init_device(dev, driver) == NULL) {
+		free(dev);
+		return NULL;
+	}
+
+	return dev;
+}
+
+
+device_t
+device_add_child(device_t dev, const char *name, int order)
+{
+	device_t child = NULL;
+
+	if (name != NULL) {
+		if (strcmp(name, "miibus") == 0)
+			child = new_device(&miibus_driver);
+	} else
+		child = new_device(NULL);
+
+	if (child == NULL)
+		return NULL;
+
+	child->parent = dev;
+	list_add_item(&dev->children, child);
+
+	return child;
+}
+
+
+void
+bus_generic_attach(device_t dev)
+{
+	device_t child;
+
+	for (child = list_get_first_item(&dev->children);
+			child; child = list_get_next_item(&dev->children, child)) {
+		if (child->driver == NULL) {
+			if (dev->driver == &miibus_driver) {
+				driver_t *driver = __haiku_get_miibus_driver(dev);
+
+				if (driver) {
+					device_probe_t *probe = (device_probe_t *)
+						_resolve_method(driver, "device_probe");
+
+					if (probe && probe(child) >= 0)
+						device_set_driver(child, driver);
+				}
+			}
+
+			if (dev->driver == NULL)
+				panic("can't attach unknown driver");
+		}
+
+		child->methods.attach(child);
+	}
 }
 
 

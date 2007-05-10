@@ -16,6 +16,8 @@ KernelStaticLibrary libfreebsd_network.a :
 	fbsd_ether.c
 	fbsd_if_media.c
 	fbsd_mbuf.c
+	fbsd_mii.c
+	fbsd_mii_physubr.c
 	if.c
 	mbuf.c
 	mii.c

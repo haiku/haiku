@@ -64,6 +64,7 @@ enum intr_type {
 int bus_generic_detach(device_t dev);
 int bus_generic_suspend(device_t dev);
 int bus_generic_resume(device_t dev);
+void bus_generic_shutdown(device_t dev);
 
 typedef void (*driver_intr_t)(void *);
 
@@ -94,12 +95,18 @@ int device_printf(device_t dev, const char *, ...) __printflike(2, 3);
 void device_set_desc(device_t dev, const char *desc);
 void device_set_desc_copy(device_t dev, const char *desc);
 const char *device_get_desc(device_t dev);
+device_t device_get_parent(device_t dev);
+
+void device_set_ivars(device_t dev, void *);
+void *device_get_ivars(device_t dev);
 
 device_t device_add_child(device_t dev, const char *name, int unit);
 int device_delete_child(device_t dev, device_t child);
 int device_is_attached(device_t dev);
 int bus_generic_print_child(device_t dev, device_t child);
 void bus_generic_driver_added(device_t dev, driver_t *driver);
+void bus_generic_attach(device_t dev);
+int device_set_driver(device_t dev, driver_t *driver);
 
 static inline struct sysctl_ctx_list *
 device_get_sysctl_ctx(device_t dev)

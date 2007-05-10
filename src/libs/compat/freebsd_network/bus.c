@@ -327,6 +327,13 @@ bus_generic_resume(device_t dev)
 }
 
 
+void
+bus_generic_shutdown(device_t dev)
+{
+	UNIMPLEMENTED();
+}
+
+
 int
 bus_generic_print_child(device_t dev, device_t child)
 {

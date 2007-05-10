@@ -189,14 +189,26 @@ struct mii_media {
 
 #ifdef _KERNEL
 
-int miibus_readreg(device_t dev, int phy, int reg);
-int miibus_writereg(device_t dev, int phy, int reg, int data);
+int __haiku_miibus_readreg(device_t dev, int phy, int reg);
+int __haiku_miibus_writereg(device_t dev, int phy, int reg, int data);
+void __haiku_miibus_statchg(device_t dev);
+void __haiku_miibus_linkchg(device_t dev);
+void __haiku_miibus_mediainit(device_t dev);
 
 #define MIIBUS_READREG(dev, phy, reg) \
-	miibus_readreg((dev), (phy), (reg))
+	__haiku_miibus_readreg((dev), (phy), (reg))
 
 #define MIIBUS_WRITEREG(dev, phy, reg, value) \
-	miibus_writereg((dev), (phy), (reg), (value))
+	__haiku_miibus_writereg((dev), (phy), (reg), (value))
+
+#define MIIBUS_STATCHG(dev) \
+	__haiku_miibus_statchg(dev)
+
+#define MIIBUS_LINKCHG(dev) \
+	__haiku_miibus_linkchg(dev)
+
+#define MIIBUS_MEDIAINIT(dev) \
+	__haiku_miibus_mediainit(dev)
 
 #define PHY_READ(p, r) \
 	MIIBUS_READREG((p)->mii_dev, (p)->mii_phy, (r))
