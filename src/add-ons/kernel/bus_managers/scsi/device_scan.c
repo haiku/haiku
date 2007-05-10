@@ -1,11 +1,11 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
-/*
-	Part of Open SCSI bus manager
-
+/*!
 	Device scanner.
 
 	Scans SCSI busses for devices. Scanning is initiated by
@@ -19,10 +19,12 @@
 #include <stdlib.h>
 
 
-// send TUR
-// result: true, if device answered
-//         false, if there is no device
-static bool scsi_scan_send_tur( scsi_ccb *worker_req )
+/*! send TUR
+	result: true, if device answered
+		false, if there is no device
+*/
+static bool
+scsi_scan_send_tur(scsi_ccb *worker_req)
 {
 	scsi_cmd_tur *cmd = (scsi_cmd_tur *)worker_req->cdb;
 	
@@ -33,8 +35,8 @@ static bool scsi_scan_send_tur( scsi_ccb *worker_req )
 	
 	worker_req->sg_list = NULL;
 	worker_req->data = NULL;
-	worker_req->data_len = 0;
-	worker_req->cdb_len = sizeof( *cmd );
+	worker_req->data_length = 0;
+	worker_req->cdb_length = sizeof(*cmd);
 	worker_req->timeout = 0;
 	worker_req->sort = -1;
 	worker_req->flags = 0;
@@ -44,42 +46,41 @@ static bool scsi_scan_send_tur( scsi_ccb *worker_req )
 	SHOW_FLOW( 3, "status=%x", worker_req->subsys_status );
 	
 	// as this command was only for syncing, we ignore almost all errors
-	switch( worker_req->subsys_status ) {
-	case SCSI_SEL_TIMEOUT:
-		// there seems to be no device around
-		return false;
-		
-	default:
-		return true;
+	switch (worker_req->subsys_status) {
+		case SCSI_SEL_TIMEOUT:
+			// there seems to be no device around
+			return false;
+
+		default:
+			return true;
 	}
 }
 
 
-/**	get inquiry data
- *	returns true on success
- */
-
+/*!	get inquiry data
+	returns true on success
+*/
 static bool
 scsi_scan_get_inquiry(scsi_ccb *worker_req, scsi_res_inquiry *new_inquiry_data)
 {
 	scsi_cmd_inquiry *cmd = (scsi_cmd_inquiry *)worker_req->cdb;
 	scsi_device_info *device = worker_req->device;
 
-	SHOW_FLOW0( 3, "" );
+	SHOW_FLOW0(3, "");
 
 	// in case not whole structure gets transferred, we set remaining data to zero
 	memset(new_inquiry_data, 0, sizeof(*new_inquiry_data));
 
 	cmd->opcode = SCSI_OP_INQUIRY;
-	cmd->LUN = device->target_lun;
-	cmd->EVPD = 0;
+	cmd->lun = device->target_lun;
+	cmd->evpd = 0;
 	cmd->page_code = 0;
-	cmd->allocation_length = sizeof( *new_inquiry_data );
+	cmd->allocation_length = sizeof(*new_inquiry_data);
 
 	worker_req->sg_list = NULL;
 	worker_req->data = (uchar *)new_inquiry_data;
-	worker_req->data_len = sizeof(*new_inquiry_data);
-	worker_req->cdb_len = 6;
+	worker_req->data_length = sizeof(*new_inquiry_data);
+	worker_req->cdb_length = 6;
 	worker_req->timeout = SCSI_STD_TIMEOUT;
 	worker_req->sort = -1;
 	worker_req->flags = SCSI_DIR_IN;
@@ -102,7 +103,7 @@ scsi_scan_get_inquiry(scsi_ccb *worker_req, scsi_res_inquiry *new_inquiry_data)
 			SHOW_INFO(3, "device type: %d, qualifier: %d, removable: %d, ANSI version: %d, response data format: %d\n"
 				"vendor: %s, product: %s, rev: %s", 
 				new_inquiry_data->device_type, new_inquiry_data->device_qualifier,
-				new_inquiry_data->RMB, new_inquiry_data->ANSI_version,
+				new_inquiry_data->removable_medium, new_inquiry_data->ansi_version,
 				new_inquiry_data->response_data_format, 
 				vendor, product, rev);
 
@@ -114,19 +115,17 @@ scsi_scan_get_inquiry(scsi_ccb *worker_req, scsi_res_inquiry *new_inquiry_data)
 			// bad luck
 			if (min(cmd->allocation_length, new_inquiry_data->additional_length + 4) 
 					>= (int)offsetof(scsi_res_inquiry, version_descriptor[9])) {
-				int i, prev_standard;
-
-				prev_standard = -1;
+				int i, previousStandard = -1;
 
 				for (i = 0; i < 8; ++i) {
-					int standard = (new_inquiry_data->version_descriptor[0].high << 8) |
-						new_inquiry_data->version_descriptor[0].low;
+					int standard = B_BENDIAN_TO_HOST_INT16(
+						new_inquiry_data->version_descriptor[i]);
 
 					// omit standards reported twice	
-					if( standard != prev_standard && standard != 0 )
-						SHOW_INFO( 3, "standard: %04x", standard );
+					if (standard != previousStandard && standard != 0)
+						SHOW_INFO(3, "standard: %04x", standard);
 
-					prev_standard = standard;
+					previousStandard = standard;
 				}
 			}
 
@@ -135,7 +134,7 @@ scsi_scan_get_inquiry(scsi_ccb *worker_req, scsi_res_inquiry *new_inquiry_data)
 	/*		{
 				unsigned int i;
 				
-				for( i = 0; i < worker_req->data_len - worker_req->data_resid; ++i ) {
+				for( i = 0; i < worker_req->data_length - worker_req->data_resid; ++i ) {
 					dprintf( "%2x ", *((char *)new_inquiry_data + i) );
 				}
 				
@@ -160,25 +159,24 @@ scsi_scan_lun(scsi_bus_info *bus, uchar target_id, uchar target_lun)
 	scsi_device_info *device;
 	bool found;
 
-	//snooze( 1000000 );
+	//snooze(1000000);
 
-	SHOW_FLOW( 3, "%d:%d:%d", bus->path_id, target_id, target_lun );
+	SHOW_FLOW(3, "%d:%d:%d", bus->path_id, target_id, target_lun);
 
 	res = scsi_force_get_device(bus, target_id, target_lun, &device);
 	if (res != B_OK)
 		goto err;
 
-	//SHOW_FLOW( 3, "temp_device: %d", (int)temp_device );
+	//SHOW_FLOW(3, "temp_device: %d", (int)temp_device);
 
 	worker_req = scsi_alloc_ccb(device);
-
 	if (worker_req == NULL) {
 		// there is no out-of-mem code
 		res = B_NO_MEMORY;
 		goto err2;
 	}
 
-	SHOW_FLOW0( 3, "2" );
+	SHOW_FLOW0(3, "2");
 
 	worker_req->flags = SCSI_DIR_IN;
 
@@ -245,44 +243,42 @@ scsi_scan_bus(scsi_bus_info *bus)
 	SHOW_FLOW0( 3, "" );
 	
 	// get ID of initiator (i.e. controller)
-	res = scsi_inquiry_path( bus, &inquiry );
-	
-	if( res != SCSI_REQ_CMP )
+	res = scsi_inquiry_path(bus, &inquiry);
+	if (res != SCSI_REQ_CMP)
 		return B_ERROR;
-	
+
 	initiator_id = inquiry.initiator_id;
-	
-	SHOW_FLOW( 3, "initiator_id=%d", initiator_id );
+
+	SHOW_FLOW(3, "initiator_id=%d", initiator_id);
 
 	// tell SIM to rescan bus (needed at least by IDE translator)
 	// as this function is optional for SIM, we ignore its result
-	bus->interface->scan_bus( bus->sim_cookie );
-	
-	for( target_id = 0; target_id <= 1/*MAX_TARGET_ID*/; ++target_id ) {
+	bus->interface->scan_bus(bus->sim_cookie);
+
+	for (target_id = 0; target_id <= 1/*MAX_TARGET_ID*/; ++target_id) {
 		int lun;
-		
-		SHOW_FLOW( 3, "target: %d", target_id );
-		
-		if( target_id == initiator_id )
+
+		SHOW_FLOW(3, "target: %d", target_id);
+
+		if (target_id == initiator_id)
 			continue;
-			
+
 		// TODO: there are a lot of devices out there that go mad if you probe
 		// anything but LUN 0, so we should probably add a black-list
 		// or something
-		for( lun = 0; lun <= MAX_LUN_ID; ++lun ) {
+		for (lun = 0; lun <= MAX_LUN_ID; ++lun) {
 			status_t res;
-			
-			SHOW_FLOW( 3, "lun: %d", lun );
 
-			res = scsi_scan_lun( bus, target_id, lun );
-			
+			SHOW_FLOW(3, "lun: %d", lun);
+
+			res = scsi_scan_lun(bus, target_id, lun);
+
 			// if there is no device at lun 0, there's probably no device at all
-			if( lun == 0 && res != SCSI_REQ_CMP )
+			if (lun == 0 && res != SCSI_REQ_CMP)
 				break;
 		}
 	}
-	
-	SHOW_FLOW0( 3, "done" );
-	
+
+	SHOW_FLOW0(3, "done");
 	return B_OK;
 }

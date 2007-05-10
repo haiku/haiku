@@ -1,5 +1,7 @@
 /*
+ * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ *
  * Distributed under the terms of the MIT License.
  */
 
@@ -25,41 +27,41 @@ ata_mode_sense_10(ide_device_info *device, ide_qrequest *qrequest)
 	scsi_ccb *request = qrequest->request;
 	scsi_cmd_mode_sense_10 *cmd = (scsi_cmd_mode_sense_10 *)request->cdb;
 	scsi_mode_param_header_10 param_header;
-	scsi_modepage_contr contr;
+	scsi_modepage_control control;
 	scsi_mode_param_block_desc block_desc;
-	size_t total_length = sizeof(scsi_mode_param_header_10)
+	size_t totalLength = sizeof(scsi_mode_param_header_10)
 		+ sizeof(scsi_mode_param_block_desc)
-		+ sizeof(scsi_modepage_contr);
+		+ sizeof(scsi_modepage_control);
 	scsi_mode_param_dev_spec_da devspec = {
-		res0_0 : 0,
-		DPOFUA : 0,
-		res0_6 : 0,
-		WP : 0
+		_res0_0 : 0,
+		dpo_fua : 0,
+		_res0_6 : 0,
+		write_protected : 0
 	};
-	uint32 allocation_length;
+	uint32 allocationLength;
 
 	SHOW_FLOW0(1, "Hi!");
 
-	allocation_length = ((int16)cmd->high_allocation_length << 8) 
-		| cmd->low_allocation_length;
+	allocationLength = B_BENDIAN_TO_HOST_INT16(cmd->allocation_length);
 
 	// we answer control page requests and "all pages" requests
 	// (as the latter are the same as the first)
 	if ((cmd->page_code != SCSI_MODEPAGE_CONTROL && cmd->page_code != SCSI_MODEPAGE_ALL)
-		|| (cmd->PC != SCSI_MODE_SENSE_PC_CURRENT && cmd->PC != SCSI_MODE_SENSE_PC_SAVED)) {
+		|| (cmd->page_control != SCSI_MODE_SENSE_PC_CURRENT
+			&& cmd->page_control != SCSI_MODE_SENSE_PC_SAVED)) {
 		set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_CDB_FIELD);
 		return;
 	}
 
 	//param_header = (scsi_mode_param_header_10 *)request->data;
-	param_header.low_mode_data_len = total_length - 1;
-	param_header.high_mode_data_len = 0;
+	param_header.mode_data_length = B_HOST_TO_BENDIAN_INT16(totalLength - 1);
 	param_header.medium_type = 0; 		// XXX standard is a bit vague here
 	param_header.dev_spec_parameter = *(uint8 *)&devspec;
-	param_header.low_block_desc_len = sizeof(scsi_mode_param_block_desc);
-	param_header.high_block_desc_len = 0;
+	param_header.block_desc_length
+		= B_HOST_TO_BENDIAN_INT16(sizeof(scsi_mode_param_block_desc));
 
-	copy_sg_data(request, 0, allocation_length, &param_header, sizeof(param_header), false);
+	copy_sg_data(request, 0, allocationLength, &param_header,
+		sizeof(param_header), false);
 
 	/*block_desc = (scsi_mode_param_block_desc *)(request->data 
 		+ sizeof(*param_header));*/
@@ -70,7 +72,7 @@ ata_mode_sense_10(ide_device_info *device, ide_qrequest *qrequest)
 	block_desc.med_blocklen = 512 >> 8;
 	block_desc.low_blocklen = 512 & 0xff;
 
-	copy_sg_data(request, sizeof(param_header), allocation_length,
+	copy_sg_data(request, sizeof(param_header), allocationLength,
 		&block_desc, sizeof(block_desc), false);
 
 	/*contr = (scsi_modepage_contr *)(request->data 
@@ -78,33 +80,31 @@ ata_mode_sense_10(ide_device_info *device, ide_qrequest *qrequest)
 		+ ((uint16)param_header->high_block_desc_len << 8) 
 		+ param_header->low_block_desc_len);*/
 
-	memset(&contr, 0, sizeof(contr));
-	contr.RLEC = false;
-	contr.DQue = !device->CQ_enabled;
-	contr.QErr = false;
+	memset(&control, 0, sizeof(control));
+	control.RLEC = false;
+	control.DQue = !device->CQ_enabled;
+	control.QErr = false;
 		// when a command fails we requeue all 
 		// lost commands automagically
-	contr.QAM = SCSI_QAM_UNRESTRICTED;
+	control.QAM = SCSI_QAM_UNRESTRICTED;
 
-	copy_sg_data(request, sizeof(param_header) 
-		+ ((uint16)param_header.high_block_desc_len << 8) 
-		+ param_header.low_block_desc_len, 
-		allocation_length, &contr, sizeof(contr), false);
+	copy_sg_data(request, sizeof(param_header)
+		+ B_BENDIAN_TO_HOST_INT16(param_header.block_desc_length),
+		allocationLength, &control, sizeof(control), false);
 
 	// the number of bytes that were transferred to buffer is
 	// restricted by allocation length and by request data buffer size
-	total_length = min(total_length, allocation_length);
-	total_length = min(total_length, request->data_len);
+	totalLength = min(totalLength, allocationLength);
+	totalLength = min(totalLength, request->data_length);
 
-	request->data_resid = request->data_len - total_length;
+	request->data_resid = request->data_length - totalLength;
 }
 
 
-/** emulate modifying control page */
-
+/*! Emulate modifying control page */
 static bool
 ata_mode_select_control_page(ide_device_info *device, ide_qrequest *qrequest,
-	scsi_modepage_contr *page)
+	scsi_modepage_control *page)
 {
 	if (page->header.page_length != sizeof(*page) - sizeof(page->header)) {
 		set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_PARAM_LIST_LENGTH_ERR);
@@ -117,8 +117,7 @@ ata_mode_select_control_page(ide_device_info *device, ide_qrequest *qrequest,
 }
 
 
-/** emulate MODE SELECT 10 command */
-
+/*! Emulate MODE SELECT 10 command */
 static void
 ata_mode_select_10(ide_device_info *device, ide_qrequest *qrequest)
 {
@@ -126,50 +125,50 @@ ata_mode_select_10(ide_device_info *device, ide_qrequest *qrequest)
 	scsi_cmd_mode_select_10 *cmd = (scsi_cmd_mode_select_10 *)request->cdb;
 	scsi_mode_param_header_10 param_header;
 	scsi_modepage_header page_header;
-	uint32 total_length;
-	uint32 modepage_offset;
+	uint32 totalLength;
+	uint32 modepageOffset;
 	char modepage_buffer[64];	// !!! enlarge this to support longer mode pages
 
-	if (cmd->SP || cmd->PF != 1) {
+	if (cmd->save_pages || cmd->pf != 1) {
 		set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_CDB_FIELD);
 		return;
 	}
 
-	total_length = min(request->data_len,
-		((uint16)cmd->high_param_list_length << 8) | (uint32)cmd->low_param_list_length);
+	totalLength = min(request->data_length,
+		B_BENDIAN_TO_HOST_INT16(cmd->param_list_length));
 
 	// first, retrieve page header to get size of different chunks
 	//param_header = (scsi_mode_param_header_10 *)request->data;
-	if (!copy_sg_data(request, 0, total_length, &param_header, sizeof(param_header), true))
+	if (!copy_sg_data(request, 0, totalLength, &param_header, sizeof(param_header), true))
 		goto err;
 
-	total_length = min(total_length, (((uint16)param_header.high_mode_data_len << 8)
-		| param_header.low_mode_data_len) + 1UL);
+	totalLength = min(totalLength,
+		B_BENDIAN_TO_HOST_INT16(param_header.mode_data_length) + 1UL);
 
 	// this is the start of the first mode page;
 	// we ignore the block descriptor silently
-	modepage_offset = sizeof(param_header) + (((uint16)param_header.high_block_desc_len << 8)
-		| param_header.low_block_desc_len);
+	modepageOffset = sizeof(param_header)
+		+ B_BENDIAN_TO_HOST_INT16(param_header.block_desc_length);
 
 	// go through list of pages		
-	while (modepage_offset < total_length) {
-		uint32 page_len;
+	while (modepageOffset < totalLength) {
+		uint32 pageLength;
 
 		// get header to know how long page is
-		if (!copy_sg_data(request, modepage_offset, total_length,
+		if (!copy_sg_data(request, modepageOffset, totalLength,
 				&page_header, sizeof(page_header), true))
 			goto err;
 
 		// get size of one page and copy it to buffer
-		page_len = page_header.page_length + sizeof(scsi_modepage_header);
+		pageLength = page_header.page_length + sizeof(scsi_modepage_header);
 
 		// the buffer has a maximum size - this is really standard compliant but
 		// sufficient for our needs
-		if (page_len > sizeof(modepage_buffer))
+		if (pageLength > sizeof(modepage_buffer))
 			goto err;
 
-		if (!copy_sg_data(request, modepage_offset, total_length,
-				&modepage_buffer, min(page_len, sizeof(modepage_buffer)), true))
+		if (!copy_sg_data(request, modepageOffset, totalLength,
+				&modepage_buffer, min(pageLength, sizeof(modepage_buffer)), true))
 			goto err;
 
 		// modify page;
@@ -177,22 +176,23 @@ ata_mode_select_10(ide_device_info *device, ide_qrequest *qrequest)
 		switch (page_header.page_code) {
 			case SCSI_MODEPAGE_CONTROL:
 				if (!ata_mode_select_control_page(device, qrequest,
-						(scsi_modepage_contr *)modepage_buffer))
+						(scsi_modepage_control *)modepage_buffer))
 					return;
 				break;
 
 			default:
-				set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_PARAM_LIST_FIELD);
+				set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST,
+					SCSIS_ASC_INV_PARAM_LIST_FIELD);
 				return;
 		}
 
-		modepage_offset += page_len;
+		modepageOffset += pageLength;
 	}
 
-	if (modepage_offset != total_length)
+	if (modepageOffset != totalLength)
 		goto err;
 
-	request->data_resid = request->data_len - total_length;
+	request->data_resid = request->data_length - totalLength;
 	return;
 
 	// if we arrive here, data length was incorrect
@@ -201,8 +201,7 @@ err:
 }
 
 
-/** emulate TEST UNIT READY */
-
+/*! Emulate TEST UNIT READY */
 static bool
 ata_test_unit_ready(ide_device_info *device, ide_qrequest *qrequest)
 {
@@ -234,8 +233,7 @@ ata_test_unit_ready(ide_device_info *device, ide_qrequest *qrequest)
 }
 
 
-/** flush internal device cache */
-
+/*! Flush internal device cache */
 static bool
 ata_flush_cache(ide_device_info *device, ide_qrequest *qrequest)
 {
@@ -259,10 +257,9 @@ ata_flush_cache(ide_device_info *device, ide_qrequest *qrequest)
 }
 
 
-/**	load or eject medium
- *	load = true - load medium
- */
-
+/*!	Load or eject medium
+	load = true - load medium
+*/
 static bool
 ata_load_eject(ide_device_info *device, ide_qrequest *qrequest, bool load)
 {
@@ -284,8 +281,7 @@ ata_load_eject(ide_device_info *device, ide_qrequest *qrequest, bool load)
 }
 
 
-/** emulate PREVENT ALLOW command */
-
+/*! Emulate PREVENT ALLOW command */
 static bool
 ata_prevent_allow(ide_device_info *device, bool prevent)
 {
@@ -294,8 +290,7 @@ ata_prevent_allow(ide_device_info *device, bool prevent)
 }
 
 
-/** emulate INQUIRY command */
-
+/*! Emulate INQUIRY command */
 static void
 ata_inquiry(ide_device_info *device, ide_qrequest *qrequest)
 {
@@ -305,7 +300,7 @@ ata_inquiry(ide_device_info *device, ide_qrequest *qrequest)
 	uint32 allocation_length = cmd->allocation_length;
 	uint32 transfer_size;
 
-	if (cmd->EVPD || cmd->page_code) {
+	if (cmd->evpd || cmd->page_code) {
 		set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_CDB_FIELD);
 		return;
 	}
@@ -316,27 +311,28 @@ ata_inquiry(ide_device_info *device, ide_qrequest *qrequest)
 	data.device_qualifier = scsi_periph_qual_connected;
 
 	data.device_type_modifier = 0;
-	data.RMB = false;
+	data.removable_medium = false;
 
-	data.ANSI_version = 2;
-	data.ECMA_version = 0;
-	data.ISO_version = 0;
+	data.ansi_version = 2;
+	data.ecma_version = 0;
+	data.iso_version = 0;
 
 	data.response_data_format = 2;
-	data.TrmIOP = false;		// to be changed if we support TERM I/O
+	data.term_iop = false;
+		// to be changed if we support TERM I/O
 
 	data.additional_length = sizeof(scsi_res_inquiry) - 4;
 
-	data.SftRe = false;
-	data.CmdQue = device->queue_depth > 1;
-	data.Linked = false;
+	data.soft_reset = false;
+	data.cmd_queue = device->queue_depth > 1;
+	data.linked = false;
 
 	// these values are free-style
-	data.Sync = false;
-	data.WBus16 = true;
-	data.WBus32 = false;
+	data.sync = false;
+	data.write_bus16 = true;
+	data.write_bus32 = false;
 
-	data.RelAdr = false;
+	data.relative_address = false;
 
 	// the following fields are *much* to small, sigh...
 	memcpy(data.vendor_ident, device->infoblock.model_number, 
@@ -348,48 +344,38 @@ ata_inquiry(ide_device_info *device, ide_qrequest *qrequest)
 	copy_sg_data(request, 0, allocation_length, &data, sizeof(data), false);
 
 	transfer_size = min(sizeof(data), allocation_length);
-	transfer_size = min(transfer_size, request->data_len);
+	transfer_size = min(transfer_size, request->data_length);
 
-	request->data_resid = request->data_len - transfer_size;
+	request->data_resid = request->data_length - transfer_size;
 }
 
 
-/** emulate READ CAPACITY command */
-
+/*! Emulate READ CAPACITY command */
 static void
 read_capacity(ide_device_info *device, ide_qrequest *qrequest)
 {
 	scsi_ccb *request = qrequest->request;
 	scsi_res_read_capacity data;
 	scsi_cmd_read_capacity *cmd = (scsi_cmd_read_capacity *)request->cdb;
-	uint32 last_block;
+	uint32 lastBlock;
 
-	if (cmd->PMI || cmd->top_LBA || cmd->high_LBA || cmd->mid_LBA || cmd->low_LBA) {
+	if (cmd->pmi || cmd->lba) {
 		set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_CDB_FIELD);
 		return;
 	}
 
-	// ToDo: 512 bytes fixed block size?
-	data.top_block_size = (512 >> 24) & 0xff;
-	data.high_block_size = (512 >> 16) & 0xff;
-	data.mid_block_size = (512 >> 8) & 0xff;
-	data.low_block_size = 512 & 0xff;
+	// TODO: 512 bytes fixed block size?
+	data.block_size = B_HOST_TO_BENDIAN_INT32(512);
 
-	last_block = device->total_sectors - 1;
+	lastBlock = device->total_sectors - 1;
+	data.lba = B_HOST_TO_BENDIAN_INT32(lastBlock);
 
-	data.top_LBA = (last_block >> 24) & 0xff;
-	data.high_LBA = (last_block >> 16) & 0xff;
-	data.mid_LBA = (last_block >> 8) & 0xff;
-	data.low_LBA = last_block & 0xff;
-
-	copy_sg_data(request, 0, request->data_len, &data, sizeof(data), false);
-
-	request->data_resid = max(request->data_len - sizeof(data), 0);
+	copy_sg_data(request, 0, request->data_length, &data, sizeof(data), false);
+	request->data_resid = max(request->data_length - sizeof(data), 0);
 }
 
 
-/** execute SCSI command */
-
+/*! Execute SCSI command */
 void
 ata_exec_io(ide_device_info *device, ide_qrequest *qrequest)
 {
@@ -463,7 +449,7 @@ ata_exec_io(ide_device_info *device, ide_qrequest *qrequest)
 				// we must always flush cache if start = 0
 				ata_flush_cache(device, qrequest);
 
-			if (cmd->LoEj)
+			if (cmd->load_eject)
 				ata_load_eject(device, qrequest, cmd->start);
 
 			break;
@@ -494,14 +480,14 @@ ata_exec_io(ide_device_info *device, ide_qrequest *qrequest)
 		// sadly, there are two possible read/write operation codes;
 		// at least, the third one, read/write(12), is not valid for DAS
 		case SCSI_OP_READ_6:
-		case SCSI_OP_WRITE_6: {
+		case SCSI_OP_WRITE_6:
+		{
 			scsi_cmd_rw_6 *cmd = (scsi_cmd_rw_6 *)request->cdb;
 			uint32 pos;
 			size_t length;
 
-			pos = ((uint32)cmd->high_LBA << 16) | ((uint32)cmd->mid_LBA << 8)
-				| (uint32)cmd->low_LBA;
-
+			pos = ((uint32)cmd->high_lba << 16) | ((uint32)cmd->mid_lba << 8)
+				| (uint32)cmd->low_lba;
 			length = cmd->length != 0 ? cmd->length : 256;
 
 			SHOW_FLOW(3, "READ6/WRITE6 pos=%lx, length=%lx", pos, length);
@@ -511,15 +497,14 @@ ata_exec_io(ide_device_info *device, ide_qrequest *qrequest)
 		}
 
 		case SCSI_OP_READ_10:
-		case SCSI_OP_WRITE_10: {
+		case SCSI_OP_WRITE_10:
+		{
 			scsi_cmd_rw_10 *cmd = (scsi_cmd_rw_10 *)request->cdb;
 			uint32 pos;
 			size_t length;
 
-			pos = ((uint32)cmd->top_LBA << 24) | ((uint32)cmd->high_LBA << 16) 
-				| ((uint32)cmd->mid_LBA << 8) | (uint32)cmd->low_LBA;
-
-			length = ((uint32)cmd->high_length << 8) | cmd->low_length;
+			pos = B_BENDIAN_TO_HOST_INT32(cmd->lba);
+			length = B_BENDIAN_TO_HOST_INT16(cmd->length);
 
 			if (length != 0) {
 				ata_send_rw(device, qrequest, pos, length, cmd->opcode == SCSI_OP_WRITE_10);

@@ -1,13 +1,11 @@
 /*
- * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
+ * Copyright 2002-2003, Thomas Kurschel. All rights reserved.
+ *
  * Distributed under the terms of the MIT License.
  */
 
-/*
-	Part of Open SCSI Peripheral Driver
-
-	Handling of removable media.
-*/
+//!	Handling of removable media.
 
 
 #include "scsi_periph_int.h"
@@ -25,7 +23,7 @@ periph_media_changed(scsi_periph_device_info *device, scsi_ccb *request)
 	bigtime_t backup_timeout;
 	uchar *backup_data;
 	const physical_entry *backup_sg_list;
-	uint16 backup_sg_cnt;
+	uint16 backup_sg_count;
 	uint32 backup_data_len;
 
 	// if there is no hook, the driver doesn't handle removal devices
@@ -44,26 +42,26 @@ periph_media_changed(scsi_periph_device_info *device, scsi_ccb *request)
 	// path)
 	backup_flags = request->flags;
 	memcpy(backup_cdb, request->cdb, SCSI_MAX_CDB_SIZE);
-	backup_cdb_len = request->cdb_len;
+	backup_cdb_len = request->cdb_length;
 	backup_sort = request->sort;
 	backup_timeout = request->timeout;
 	backup_data = request->data;
 	backup_sg_list = request->sg_list;
-	backup_sg_cnt = request->sg_cnt;
-	backup_data_len = request->data_len;
+	backup_sg_count = request->sg_count;
+	backup_data_len = request->data_length;
 
 	if (device->callbacks->media_changed != NULL)
 		device->callbacks->media_changed(device->periph_device, request);
 
 	request->flags = backup_flags;
 	memcpy(request->cdb, backup_cdb, SCSI_MAX_CDB_SIZE);
-	request->cdb_len = backup_cdb_len;
+	request->cdb_length = backup_cdb_len;
 	request->sort = backup_sort;
 	request->timeout = backup_timeout;
 	request->data = backup_data;
 	request->sg_list = backup_sg_list;
-	request->sg_cnt = backup_sg_cnt;
-	request->data_len = backup_data_len;
+	request->sg_count = backup_sg_count;
+	request->data_length = backup_data_len;
 }
 
 
@@ -94,7 +92,7 @@ send_tur(scsi_periph_device_info *device, scsi_ccb *request)
 
 	request->data = NULL;
 	request->sg_list = NULL;
-	request->data_len = 0;
+	request->data_length = 0;
 	request->timeout = device->std_timeout;
 	request->sort = -1;
 	request->sg_list = NULL;
@@ -102,7 +100,7 @@ send_tur(scsi_periph_device_info *device, scsi_ccb *request)
 	memset(cmd, 0, sizeof(*cmd));
 	cmd->opcode = SCSI_OP_TUR;
 
-	request->cdb_len = sizeof(*cmd);
+	request->cdb_length = sizeof(*cmd);
 
 	device->scsi->sync_io(request);
 
@@ -194,14 +192,13 @@ err:
 }
 
 
-/**	send START/STOP command to device
- *	start 		- true for start, false for stop
- *	with_LoEj	- if true, then lock drive on start and eject on stop
- */
-
+/*!	Send START/STOP command to device
+	start - true for start, false for stop
+	withLoadEject - if true, then lock drive on start and eject on stop
+*/
 err_res
-periph_send_start_stop(scsi_periph_device_info *device, scsi_ccb *request, 
-	bool start, bool with_LoEj)
+periph_send_start_stop(scsi_periph_device_info *device, scsi_ccb *request,
+	bool start, bool withLoadEject)
 {
 	scsi_cmd_ssu *cmd = (scsi_cmd_ssu *)request->cdb;
 
@@ -210,7 +207,7 @@ periph_send_start_stop(scsi_periph_device_info *device, scsi_ccb *request,
 
 	request->data = NULL;
 	request->sg_list = NULL;
-	request->data_len = 0;
+	request->data_length = 0;
 	request->timeout = device->std_timeout;
 	request->sort = -1;
 	request->sg_list = NULL;
@@ -219,11 +216,11 @@ periph_send_start_stop(scsi_periph_device_info *device, scsi_ccb *request,
 	cmd->opcode = SCSI_OP_START_STOP;
 	// we don't want to poll; we give a long timeout instead
 	// (well - the default timeout _is_ large)
-	cmd->immed = 0;
+	cmd->immediately = 0;
 	cmd->start = start;
-	cmd->LoEj = with_LoEj;
+	cmd->load_eject = withLoadEject;
 
-	request->cdb_len = sizeof(*cmd);
+	request->cdb_length = sizeof(*cmd);
 
 	device->scsi->sync_io(request);
 

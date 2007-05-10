@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Haiku, Inc. All RightsReserved.
+ * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
  * Copyright 2002-2004, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -48,26 +48,24 @@
 #define ERR_TOO_BIG	(B_ERRORS_END + 1)
 
 
-/** Prepare PIO transfer */
-
+/*! Prepare PIO transfer */
 void
 prep_PIO_transfer(ide_device_info *device, ide_qrequest *qrequest)
 {
 	SHOW_FLOW0(4, "");
 
-	device->left_sg_elem = qrequest->request->sg_cnt;
+	device->left_sg_elem = qrequest->request->sg_count;
 	device->cur_sg_elem = qrequest->request->sg_list;
 	device->cur_sg_ofs = 0;
 	device->has_odd_byte = false;
-	qrequest->request->data_resid = qrequest->request->data_len;
+	qrequest->request->data_resid = qrequest->request->data_length;
 }
 
 
-/** transfer virtually continuous data */
-
+/*! Transfer virtually continuous data */
 static inline status_t
-transfer_PIO_virtcont(ide_device_info *device, uint8 *virtualAddress, int length,
-	bool write, int *transferred)
+transfer_PIO_virtcont(ide_device_info *device, uint8 *virtualAddress,
+	int length, bool write, int *transferred)
 {
 	ide_bus_info *bus = device->bus;
 	ide_controller_interface *controller = bus->controller;
@@ -89,7 +87,8 @@ transfer_PIO_virtcont(ide_device_info *device, uint8 *virtualAddress, int length
 			*transferred += 2;
 		}
 
-		controller->write_pio(channel_cookie, (uint16 *)virtualAddress, length / 2, false);
+		controller->write_pio(channel_cookie, (uint16 *)virtualAddress,
+			length / 2, false);
 
 		// take care if chunk size was odd, which means that 1 byte remains		
 		virtualAddress += length & ~1;
@@ -108,7 +107,8 @@ transfer_PIO_virtcont(ide_device_info *device, uint8 *virtualAddress, int length
 
 		SHOW_FLOW(4, "Reading PIO to %p, %d bytes", virtualAddress, length);
 
-		controller->read_pio(channel_cookie, (uint16 *)virtualAddress, length / 2, false);
+		controller->read_pio(channel_cookie, (uint16 *)virtualAddress,
+			length / 2, false);
 
 		// take care of odd chunk size;
 		// in this case we read 1 byte to few!		
@@ -135,8 +135,7 @@ transfer_PIO_virtcont(ide_device_info *device, uint8 *virtualAddress, int length
 }
 
 
-/** transmit physically continuous data */
-
+/*! Transmit physically continuous data */
 static inline status_t
 transfer_PIO_physcont(ide_device_info *device, addr_t physicalAddress,
 	int length, bool write, int *transferred)
@@ -184,8 +183,7 @@ transfer_PIO_physcont(ide_device_info *device, addr_t physicalAddress,
 }
 
 
-/** transfer PIO block from/to buffer */
-
+/*! Transfer PIO block from/to buffer */
 static inline int
 transfer_PIO_block(ide_device_info *device, int length, bool write, int *transferred)
 {
@@ -227,7 +225,7 @@ transfer_PIO_block(ide_device_info *device, int length, bool write, int *transfe
 }
 
 
-/** write zero data (required for ATAPI if we ran out of data) */
+/*! Write zero data (required for ATAPI if we ran out of data) */
 
 static void
 write_discard_PIO(ide_device_info *device, int length)
@@ -254,8 +252,7 @@ write_discard_PIO(ide_device_info *device, int length)
 }
 
 
-/** read PIO data and discard it (required for ATAPI if buffer was too small) */
-
+/*! Read PIO data and discard it (required for ATAPI if buffer was too small) */
 static void
 read_discard_PIO(ide_device_info *device, int length)
 {
@@ -276,13 +273,12 @@ read_discard_PIO(ide_device_info *device, int length)
 }
 
 
-/** write PIO data
- *	return: there are 3 possible results
- *	NO_ERROR - everything's nice and groovy
- *	ERR_TOO_BIG - data buffer was too short, remaining data got discarded
- *	B_ERROR - something serious went wrong, sense data was set
- */
-
+/*! write PIO data
+	return: there are 3 possible results
+	NO_ERROR - everything's nice and groovy
+	ERR_TOO_BIG - data buffer was too short, remaining data got discarded
+	B_ERROR - something serious went wrong, sense data was set
+*/
 status_t
 write_PIO_block(ide_qrequest *qrequest, int length)
 {
@@ -327,10 +323,9 @@ write_PIO_block(ide_qrequest *qrequest, int length)
 }
 
 
-/**	read PIO data
- *	return: see write_PIO_block
- */
-
+/*!	read PIO data
+	return: see write_PIO_block
+*/
 status_t
 read_PIO_block(ide_qrequest *qrequest, int length)
 {

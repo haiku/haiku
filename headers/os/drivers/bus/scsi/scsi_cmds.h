@@ -1,18 +1,17 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef _SCSI_CMDS_H
+#define _SCSI_CMDS_H
 
-/*
-	Part of Open SCSI bus manager
+// SCSI commands and their data structures and constants
 
-	SCSI commands and their data structures and constants
-*/
-
-#ifndef __SCSI_CMDS_H__
-#define __SCSI_CMDS_H__
 
 #include <lendian_bitfield.h>
+
 
 // always keep in mind that SCSI is big-endian !!!
 
@@ -122,7 +121,6 @@
 #define SCSIS_ASC_REMOVAL_PREVENTED 0x5302	// medium removal prevented
 #define SCSIS_ASC_REMOVAL_REQUESTED 0x5a01	// operator requests medium removal
 
-
 // some scsi op-codes
 #define	SCSI_OP_TUR 0x00
 #define SCSI_OP_REQUEST_SENSE 0x03
@@ -165,17 +163,17 @@
 // INQUIRY
 
 typedef struct scsi_cmd_inquiry {
-	uint8 opcode;
+	uint8	opcode;
 	LBITFIELD8_3(
-		EVPD : 1,							// enhanced vital product data
-		res1_1 : 4,
-		LUN : 3
+		evpd : 1,						// enhanced vital product data
+		_res1_1 : 4,
+		lun : 3
 	);
-	uint8 page_code;
-	uint8 res3;
-	uint8 allocation_length;
-	uint8 control;
-} scsi_cmd_inquiry;
+	uint8	page_code;
+	uint8	_res3;
+	uint8	allocation_length;
+	uint8	control;
+} _PACKED scsi_cmd_inquiry;
 
 typedef struct scsi_res_inquiry {
 	LBITFIELD8_2(
@@ -183,60 +181,56 @@ typedef struct scsi_res_inquiry {
 		device_qualifier : 3
 	);
 	LBITFIELD8_2(
-		device_type_modifier : 7,			// obsolete, normally set to zero
-		RMB : 1								// 1 = removable medium
+		device_type_modifier : 7,		// obsolete, normally set to zero
+		removable_medium : 1
 	);
-	LBITFIELD8_3(							// 0 always means "not conforming"
-		ANSI_version : 3,					// 1 for SCSI-1, 2 for SCSI-2 etc.
-		ECMA_version : 3,
-		ISO_version : 2
+	LBITFIELD8_3(						// 0 always means "not conforming"
+		ansi_version : 3,				// 1 for SCSI-1, 2 for SCSI-2 etc.
+		ecma_version : 3,
+		iso_version : 2
 	);
 	LBITFIELD8_4(
-		response_data_format : 4,			// 2 = SCSI/2 compliant
-		res3_4 : 2,
-		TrmIOP : 1,							// 1 = supports TERMINATE I/O PROCESS
-		AENC : 1							// processor devices only : 
-											// Asynchronous Event Notification Capable
+		response_data_format : 4,		// 2 = SCSI/2 compliant
+		_res3_4 : 2,
+		term_iop : 1,					// 1 = supports TERMINATE I/O PROCESS
+		async_enc : 1					// processor devices only : 
+										// Asynchronous Event Notification Capable
 	);
-	uint8 additional_length;				// total (whished) length = this + 4
-	uint8 res5;
-	uint8 res6;
+	uint8	additional_length;			// total (whished) length = this + 4
+	uint8	_res5;
+	uint8	_res6;
 	LBITFIELD8_8(
-		SftRe : 1,							// 0 = soft reset leads to hard reset
-		CmdQue : 1,							// 1 = supports tagged command queuing
-		res7_2 : 1,
-		Linked : 1,							// 1 = supports linked commands
-		Sync : 1,							// 1 = supports synchronous transfers
-		WBus16 : 1,							// 1 = supports 16 bit transfers
-		WBus32 : 1,							// 1 = supports 32 bit transfers
-		RelAdr : 1							// 1 = supports relative addr. for linking
+		soft_reset : 1,					// 0 = soft reset leads to hard reset
+		cmd_queue : 1,					// 1 = supports tagged command queuing
+		_res7_2 : 1,
+		linked : 1,						// 1 = supports linked commands
+		sync : 1,						// 1 = supports synchronous transfers
+		write_bus16 : 1,				// 1 = supports 16 bit transfers
+		write_bus32 : 1,				// 1 = supports 32 bit transfers
+		relative_address : 1			// 1 = supports relative addr. for linking
 	);
-	char vendor_ident[8];					// 8
-	char product_ident[16];					// 16
-	char product_rev[4];					// 32
-	
-	// XPT doesn't return following data on XPT_GDEV_TYPE
-	uint8 vendor_spec[20];					// 36
-	uint8 res56[2];							// 56
-	
-	struct {
-		uint8 high;
-		uint8 low;
-	} version_descriptor[8];				// array of supported standards
-	
-	uint8 res74[22];						// 74
-	
-	/* additional vendor specific data */	// 96
-} scsi_res_inquiry;
+	char	vendor_ident[8];
+	char	product_ident[16];
+	char	product_rev[4];
 
-enum {
+	// XPT doesn't return following data on XPT_GDEV_TYPE
+	uint8	vendor_spec[20];
+	uint8	_res56[2];
+
+	uint16	version_descriptor[8];		// array of supported standards, big endian
+
+	uint8	_res74[22];
+	/* additional vendor specific data */
+} _PACKED scsi_res_inquiry;
+
+enum scsi_peripheral_qualifier {
 	scsi_periph_qual_connected = 0,
 	scsi_periph_qual_not_connected = 2,
 	scsi_periph_qual_not_connectable = 3
 	// value 1 is reserved, values of 4 and above are vendor-specific
-} scsi_peripheral_qualifier;
+};
 
-enum {
+enum scsi_device_type {
 	scsi_dev_direct_access = 0,
 	scsi_dev_sequential_access = 1,
 	scsi_dev_printer = 2,
@@ -254,131 +248,112 @@ enum {
 	scsi_dev_simplified_direct_access = 0xe,
 	scsi_dev_optical_card = 0xf,
 	scsi_dev_unknown = 0x1f 	// used for scsi_periph_qual_not_connectable
-} scsi_device_type;
+};
 
 
 // vital product data: unit serial number page
 
 #define SCSI_PAGE_USN 0x80
 
-typedef struct scsi_page_USN {
+typedef struct scsi_page_usn {
 	LBITFIELD8_2(
 		device_type : 5,
 		device_qualifier : 3
 	);
-	uint8 page_code;
-	uint8 res2;
-	
-	uint8 page_length;		// total size = this + 3
-	char PSN[1];			// size according to page_length
-} scsi_page_USN;
+	uint8	page_code;
+	uint8	_res2;
+
+	uint8	_page_length;		// total size = this + 3
+	char	psn[1];			// size according to page_length
+} _PACKED scsi_page_usn;
 
 // READ CAPACITY
 
 typedef struct scsi_cmd_read_capacity {
-	uint8 opcode;
+	uint8	opcode;
 	LBITFIELD8_3(
-		RelAdr : 1,							// relative address
-		res1_1 : 4,
-		LUN : 3
+		relative_address : 1,		// relative address
+		_res1_1 : 4,
+		lun : 3
 	);
-	uint8 top_LBA;
-	uint8 high_LBA;
-	uint8 mid_LBA;
-	uint8 low_LBA;
-	uint8 res6[2];
+	uint32	lba;
+	uint8	_res6[2];
 	LBITFIELD8_2(
-		PMI : 1,							// partial medium indicator
-		res8_1 : 7
+		pmi : 1,							// partial medium indicator
+		_res8_1 : 7
 	);
-	uint8 control;
-} scsi_cmd_read_capacity;
+	uint8	control;
+} _PACKED scsi_cmd_read_capacity;
 
 typedef struct scsi_res_read_capacity {
-	uint8 top_LBA;
-	uint8 high_LBA;
-	uint8 mid_LBA;
-	uint8 low_LBA;
-	uint8 top_block_size;					// in bytes
-	uint8 high_block_size;
-	uint8 mid_block_size;
-	uint8 low_block_size;
-} scsi_res_read_capacity;
+	uint32	lba;					// big endian
+	uint32	block_size;				// in bytes
+} _PACKED scsi_res_read_capacity;
 
 
 // READ (6), WRITE (6)
 
 typedef struct scsi_cmd_rw_6 {
-	uint8 opcode;
+	uint8	opcode;
 	LBITFIELD8_2(
-		high_LBA : 5,
-		LUN : 3
+		high_lba : 5,
+		lun : 3
 	);
-	uint8 mid_LBA;
-	uint8 low_LBA;
-	uint8 length;							// 0 = 256 blocks
-	uint8 control;
-} scsi_cmd_rw_6;
+	uint8	mid_lba;
+	uint8	low_lba;
+	uint8	length;					// 0 = 256 blocks
+	uint8	control;
+} _PACKED scsi_cmd_rw_6;
 
 
 // READ (10), WRITE (10)
 
 typedef struct scsi_cmd_rw_10 {
-	uint8 opcode;
+	uint8	opcode;
 	LBITFIELD8_5(
-		RelAdr : 1,							// relative address
-		res1_1 : 2,
-		FUA : 1,							// force unit access (1 = safe, cacheless access)
-		DPO : 1,							// disable page out (1 = not worth caching)
-		LUN : 3
+		relative_address : 1,		// relative address
+		_res1_1 : 2,
+		force_unit_access : 1,		// force unit access (1 = safe, cacheless access)
+		disable_page_out : 1,		// disable page out (1 = not worth caching)
+		lun : 3
 	);
-	uint8 top_LBA;
-	uint8 high_LBA;
-	uint8 mid_LBA;
-	uint8 low_LBA;
-	uint8 res6;
-	uint8 high_length;						// 0 = no block
-	uint8 low_length;
-	uint8 control;
-} scsi_cmd_rw_10;
+	uint32	lba;					// big endian
+	uint8	_res6;
+	uint16	length;					// 0 = no block
+	uint8	control;
+} _PACKED scsi_cmd_rw_10;
 
 
 // READ (12), WRITE (12)
 
 typedef struct scsi_cmd_rw_12 {
-	uint8 opcode;
+	uint8	opcode;
 	LBITFIELD8_5(
-		RelAdr : 1,							// relative address
-		res1_1 : 2,
-		FUA : 1,							// force unit access (1 = safe, cacheless access)
-		DPO : 1,							// disable page out (1 = not worth caching)
-		LUN : 3
+		relative_address : 1,		// relative address
+		_res1_1 : 2,
+		force_unit_access : 1,		// force unit access (1 = safe, cacheless access)
+		disable_page_out : 1,		// disable page out (1 = not worth caching)
+		lun : 3
 	);
-	uint8 top_LBA;
-	uint8 high_LBA;
-	uint8 mid_LBA;
-	uint8 low_LBA;
-	uint8 top_length;						// 0 = no block
-	uint8 high_length;
-	uint8 mid_length;
-	uint8 low_length;
-	uint8 res10;
-	uint8 control;
-} scsi_cmd_rw_12;
+	uint32	lba;					// big endian
+	uint32	length;					// 0 = no block
+	uint8	_res10;
+	uint8	control;
+} _PACKED scsi_cmd_rw_12;
 
 
 // REQUEST SENSE
 
 typedef struct scsi_cmd_request_sense {
-	uint8 opcode;
+	uint8	opcode;
 	LBITFIELD8_2(
-		res1_0 : 5,
-		LUN : 3
+		_res1_0 : 5,
+		lun : 3
 	);
-	uint8 res2[2];
-	uint8 alloc_length;
-	uint8 control;
-} scsi_cmd_request_sense;
+	uint8	_res2[2];
+	uint8	allocation_length;
+	uint8	control;
+} _PACKED scsi_cmd_request_sense;
 
 
 // sense data structures
@@ -455,127 +430,124 @@ typedef struct scsi_sense {
 			res15_0 : 7,
 			SKSV : 1	
 		);
-		uint8 high_progress;				// 0 = start, 0xffff = almost finished
-		uint8 low_progress;
+		uint16	progress;				// 0 = start, 0xffff = almost finished
 		} format_progress;
 	} sense_key_spec;
 		
 	// starting with offset 18 there are additional sense byte
-} scsi_sense;
+} _PACKED scsi_sense;
 
 
 // PREVENT ALLOW
 
 typedef struct scsi_cmd_prevent_allow {
-	uint8 opcode;
+	uint8	opcode;
 	LBITFIELD8_2(
-		res1_0 : 5,
-		LUN : 3
+		_res1_0 : 5,
+		lun : 3
 	);
-	uint8 res2[2];
+	uint8	_res2[2];
 	LBITFIELD8_2(
 		prevent : 1,		// 1 - prevent medium removal, 0 - allow removal
-		res4_1 : 7
+		_res4_1 : 7
 	);
-	uint8 control;
-} scsi_cmd_prevent_allow;
+	uint8	control;
+} _PACKED scsi_cmd_prevent_allow;
 
 // START STOP UNIT
 
 typedef struct scsi_cmd_ssu {
-	uint8 opcode;
+	uint8	opcode;
 	LBITFIELD8_3(
-		immed : 1,			// 1 - return immediately, 0 - return on completion
-		res1_1 : 4,
-		LUN : 3
+		immediately : 1,			// 1 - return immediately, 0 - return on completion
+		_res1_1 : 4,
+		lun : 3
 	);
 	uint8 res2[2];
 	LBITFIELD8_3(
 		start : 1,			// 1 - load+start, i.e. allow, 0 - eject+stop, i.e. deny
-		LoEj : 1,			// 1 - include loading/ejecting, 0 - only to allow/deny
-		res4_2 : 6
+		load_eject : 1,			// 1 - include loading/ejecting, 0 - only to allow/deny
+		_res4_2 : 6
 	);
-	uint8 control;
-} scsi_cmd_ssu;
+	uint8	control;
+} _PACKED scsi_cmd_ssu;
 
 
 // MODE SELECT (6)
 
 typedef struct scsi_cmd_mode_select_6 {
-	uint8 opcode;
+	uint8	opcode;
 	LBITFIELD8_4(
-		SP : 1,				// 1 = save pages to non-volatile memory
-		res1_1 : 3,
-		PF : 1,				// 0 = old SCSI-1; 1 = new SCSI-2 format
-		LUN : 3
+		save_pages : 1,		// 1 = save pages to non-volatile memory
+		_res1_1 : 3,
+		pf : 1,				// 0 = old SCSI-1; 1 = new SCSI-2 format
+		lun : 3
 	);
-	uint8 res2[2];
-	uint8 param_list_length;	// data size
-	uint8 control;
-} scsi_cmd_mode_select_6;
+	uint8	_res2[2];
+	uint8	param_list_length;	// data size
+	uint8	control;
+} _PACKED scsi_cmd_mode_select_6;
 
 
 // MODE SENSE (6)
 
 typedef struct scsi_cmd_mode_sense_6 {
-	uint8 opcode;
+	uint8	opcode;
 	LBITFIELD8_4(
-		res1_0 : 3,
-		DBD : 1,			// disable block descriptors
-		res1_4 : 1,
-		LUN : 3
+		_res1_0 : 3,
+		disable_block_desc : 1,		// disable block descriptors
+		_res1_4 : 1,
+		lun : 3
 	);
 	LBITFIELD8_2(
 		page_code : 6,
-		PC : 2				// page control field
+		page_control : 2			// page control field
 	);
-	uint8 res3;
-	uint8 allocation_length;	// maximum amount of data
-	uint8 control;
-} scsi_cmd_mode_sense_6;
+	uint8	_res3;
+	uint8	allocation_length;		// maximum amount of data
+	uint8	control;
+} _PACKED scsi_cmd_mode_sense_6;
 
 
 // MODE SELECT (10)
 
 typedef struct scsi_cmd_mode_select_10 {
-	uint8 opcode;
+	uint8	opcode;
 	LBITFIELD8_4(
-		SP : 1,				// 1 = save pages to non-volatile memory
-		res1_1 : 3,
-		PF : 1,				// 0 = old SCSI-1; 1 = new SCSI-2 format
-		LUN : 3
+		save_pages : 1,				// 1 = save pages to non-volatile memory
+		_res1_1 : 3,
+		pf : 1,						// 0 = old SCSI-1; 1 = new SCSI-2 format
+		lun : 3
 	);
-	uint8 res2[5];
-	uint8 high_param_list_length;	// data size
-	uint8 low_param_list_length;
-	uint8 control;
-} scsi_cmd_mode_select_10;
+	uint8	_res2[5];
+	uint16	param_list_length;		// data size, big endian
+	uint8	control;
+} _PACKED scsi_cmd_mode_select_10;
 
 
 // MODE SENSE (10)
 
 typedef struct scsi_cmd_mode_sense_10 {
-	uint8 opcode;
+	uint8	opcode;
 	LBITFIELD8_4(
-		res1_0 : 3,
-		DBD : 1,			// disable block descriptors
-		res1_4 : 1,
-		LUN : 3
+		_res1_0 : 3,
+		disable_block_desc : 1,		// disable block descriptors
+		_res1_4 : 1,
+		lun : 3
 	);
 	LBITFIELD8_2(
 		page_code : 6,
-		PC : 2				// page control field
+		page_control : 2			// page control field
 	);
-	uint8 res3[4];
-	uint8 high_allocation_length;	// maximum amount of data
-	uint8 low_allocation_length;
-	uint8 control;
-} scsi_cmd_mode_sense_10;
+	uint8	_res3[4];
+	uint16	allocation_length;		// maximum amount of data, big endian
+	uint8	control;
+} _PACKED scsi_cmd_mode_sense_10;
 
-
-// possible contents of PC
+// possible contents of page control (PC)
 #define SCSI_MODE_SENSE_PC_CURRENT 0
-#define SCSI_MODE_SENSE_PC_CHANGABLE 1		// changable field are filled with "1"
+#define SCSI_MODE_SENSE_PC_CHANGABLE 1
+	// changable field are filled with "1"
 #define SCSI_MODE_SENSE_PC_DEFAULT 2
 #define SCSI_MODE_SENSE_PC_SAVED 3
 
@@ -584,60 +556,58 @@ typedef struct scsi_cmd_mode_sense_10 {
 
 // header of mode data; followed by block descriptors and mode pages
 typedef struct scsi_mode_param_header_6 {
-	uint8 mode_data_len;		// total length excluding this byte
-	uint8 medium_type;
-	uint8 dev_spec_parameter;
-	uint8 block_desc_len;		// total length of all transmitted block descriptors
-} scsi_mode_param_header_6;
+	uint8	mode_data_length;		// total length excluding this byte
+	uint8	medium_type;
+	uint8	dev_spec_parameter;
+	uint8	block_desc_length;		// total length of all transmitted block descriptors
+} _PACKED scsi_mode_param_header_6;
 
 typedef struct scsi_mode_param_header_10 {
-	uint8 high_mode_data_len;	// total length excluding these two bytes
-	uint8 low_mode_data_len;
-	uint8 medium_type;
-	uint8 dev_spec_parameter;
-	uint8 res4[2];
-	uint8 high_block_desc_len;	// total length of all transmitted block descriptors
-	uint8 low_block_desc_len;
-} scsi_mode_param_header_10;
+	uint16	mode_data_length;		// total length excluding these two bytes
+	uint8	medium_type;
+	uint8	dev_spec_parameter;
+	uint8	_res4[2];
+	uint16	block_desc_length;		// total length of all transmitted block descriptors
+} _PACKED scsi_mode_param_header_10;
 
 
 // content of dev_spec_parameter for direct access devices
 typedef struct scsi_mode_param_dev_spec_da {
 	LBITFIELD8_4(
-		res0_0 : 4,
-		DPOFUA : 1,				// 1 = supports DPO and FUA, see READ (10) (sense only)
-		res0_6 : 1,
-		WP : 1					// write protected (sense only)
+		_res0_0 : 4,
+		dpo_fua : 1,			// 1 = supports DPO and FUA, see READ (10) (sense only)
+		_res0_6 : 1,
+		write_protected : 1		// write protected (sense only)
 	);
-} scsi_mode_param_dev_spec_da;
+} _PACKED scsi_mode_param_dev_spec_da;
 
 typedef struct scsi_mode_param_block_desc {
-	uint8 density;				// density code of area
-	uint8 high_numblocks;		// size of this area in blocks
-	uint8 med_numblocks;		// 0 = all remaining blocks
-	uint8 low_numblocks;
-	uint8 res4;
-	uint8 high_blocklen;		// block size
-	uint8 med_blocklen;
-	uint8 low_blocklen;
-} scsi_mode_param_block_desc;
+	uint8	density;			// density code of area
+	uint8	high_numblocks;		// size of this area in blocks
+	uint8	med_numblocks;		// 0 = all remaining blocks
+	uint8	low_numblocks;
+	uint8	_res4;
+	uint8	high_blocklen;		// block size
+	uint8	med_blocklen;
+	uint8	low_blocklen;
+} _PACKED scsi_mode_param_block_desc;
 
 
 // header of a mode pages
 typedef struct scsi_modepage_header {
 	LBITFIELD8_3(
 		page_code : 6,
-		res0_6 : 1,
+		_res0_6 : 1,
 		PS : 1				// 1 = page can be saved (only valid for MODE SENSE)
 	);
-	uint8 page_length;		// size of page excluding this common header
-} scsi_modepage_header;
+	uint8	page_length;	// size of page excluding this common header
+} _PACKED scsi_modepage_header;
 
 
 // control mode page
 #define SCSI_MODEPAGE_CONTROL 0xa
 
-typedef struct scsi_modepage_contr {
+typedef struct scsi_modepage_control {
 	scsi_modepage_header header;
 	LBITFIELD8_2(
 		RLEC : 1,			// Report Log Exception Condition
@@ -663,7 +633,7 @@ typedef struct scsi_modepage_contr {
 	uint8 res5;
 	uint8 high_AEN_holdoff;	// ready AEN hold off period - delay in ms between 
 	uint8 low_AEN_holdoff;	// initialization and AEN
-} scsi_modepage_contr;
+} scsi_modepage_control;
 
 // values for QAM
 #define SCSI_QAM_RESTRICTED 0
@@ -677,22 +647,22 @@ typedef struct scsi_modepage_contr {
 typedef struct scsi_modepage_audio {
 	scsi_modepage_header header;
 	LBITFIELD8_4(
-		res2_0 : 1,
-		SOTC : 1,			// Stop On Track Crossing
-							// 0 - stop according transfer length, 1 - stop at end of track
-		IMMED : 1,			// must be one
-		res2_3 : 5
+		_res2_0 : 1,
+		stop_on_track_crossing : 1,		// Stop On Track Crossing
+			// 0 - stop according transfer length, 1 - stop at end of track
+		immediately : 1,					// must be one
+		_res2_3 : 5
 	);
-	uint8 res3[3];
-	uint8 obs6[2];
+	uint8 _res3[3];
+	uint8 _obsolete6[2];
 	struct {
 		LBITFIELD8_2(
 			channel : 4,	// select channel to connect to this port
-			res0_4 : 4
+			_res0_4 : 4
 		);
 		uint8 volume;
 	} ports[4];
-} scsi_modepage_audio;
+} _PACKED scsi_modepage_audio;
 
 // connection between output port and audio channel
 #define SCSI_CHANNEL_SEL_MUTED		0	// mute port
@@ -705,36 +675,35 @@ typedef struct scsi_modepage_audio {
 // TUR
 
 typedef struct scsi_cmd_tur {
-	uint8 opcode;
+	uint8	opcode;
 	LBITFIELD8_2(
-		res1_0 : 5,
-		LUN : 3
+		_res1_0 : 5,
+		lun : 3
 	);
-	uint8 res3[3];
-	uint8 control;
-} scsi_cmd_tur;
+	uint8	_res3[3];
+	uint8	control;
+} _PACKED scsi_cmd_tur;
 
 
 // READ_TOC
 
 typedef struct scsi_cmd_read_toc {
-	uint8 opcode;
+	uint8	opcode;
 	LBITFIELD8_4(
-		res1_0 : 1,
-		TIME : 1,					// true, to use TIME format, false for LBA format
-		res1_2 : 3,
-		LUN : 3
+		_res1_0 : 1,
+		time : 1,					// true, to use MSF format, false for LBA format
+		_res1_2 : 3,
+		lun : 3
 	);
 	LBITFIELD8_2(
 		format : 4,					// see below
-		res2_4 : 4
+		_res2_4 : 4
 	);
-	uint8 res3[3];
-	uint8 track;					// (starting) track
-	uint8 high_allocation_length;	// maximum amount of data
-	uint8 low_allocation_length;
-	uint8 control;
-} scsi_cmd_read_toc;
+	uint8	_res3[3];
+	uint8	track;					// (starting) track
+	uint16	allocation_length;		// maximum amount of data (big endian)
+	uint8	control;
+} _PACKED scsi_cmd_read_toc;
 
 // values of <format> in TOC command
 #define SCSI_TOC_FORMAT_TOC 0			// all TOCs starting with <track> (0xaa for lead-out)
@@ -746,60 +715,54 @@ typedef struct scsi_cmd_read_toc {
 
 // general structure of response
 typedef struct scsi_toc_general {
-	uint8 high_data_len;				// total length - 2
-	uint8 low_data_len;
-	uint8 first;						// first track/session/reserved
-	uint8 last;							// last one
+	uint16	data_length;				// big endian, total length - 2
+	uint8	first;						// first track/session/reserved
+	uint8	last;							// last one
 	// remainder are parameter list descriptors
-} scsi_toc_general;
+} _PACKED scsi_toc_general;
 
 // definition of CD-ROM LBA
-typedef struct scsi_cd_lba {
-	uint8 top;	
-	uint8 high;
-	uint8 mid;
-	uint8 low;
-} scsi_cd_lba;
+typedef uint32 scsi_cd_lba;				// big endian
 
 // definition of CD-ROM MSF time
 typedef struct scsi_cd_msf {
-	uint8 reserved;
-	uint8 minute;
-	uint8 second;
-	uint8 frame;
-} scsi_cd_msf;
+	uint8	_reserved;
+	uint8	minute;
+	uint8	second;
+	uint8	frame;
+} _PACKED scsi_cd_msf;
 
 // definition of Track Number address format
-typedef struct scsi_cd_tno {
-	uint8 res0[3];
-	uint8 track;
-} scsi_cd_tno;
+typedef struct scsi_cd_track_number {
+	uint8	_res0[3];
+	uint8	track;
+} _PACKED scsi_cd_track_number;
 
 // one track for SCSI_TOC_FORMAT_TOC
 typedef struct scsi_toc_track {
-	uint8 res0;
+	uint8	_res0;
 	LBITFIELD8_2(
-		CONTROL : 4,
-		ADR : 4
+		control : 4,
+		adr : 4
 	);
-	uint8 track_number;		// track number (hex)
-	uint8 res3;
+	uint8	track_number;		// track number (hex)
+	uint8	_res3;
 	union {					// start of track (time or LBA, see TIME of command)
 		scsi_cd_lba lba;
 		scsi_cd_msf time;
 	} start;
-} scsi_toc_track;
+} _PACKED scsi_toc_track;
 
 // possible value of ADR-field (described Q-channel content)
-enum {
+enum scsi_adr {
 	scsi_adr_none = 0,				// no Q-channel mode info
 	scsi_adr_position = 1,			// Q-channel encodes current position data
 	scsi_adr_mcn = 2,				// Q-channel encodes Media Catalog Number
 	scsi_adr_isrc = 3				// Q-channel encodes ISRC
-} scsi_adr;
+};
 
 // value of Q-channel control field (CONTROL)
-enum {
+enum scsi_q_control {
 	scsi_q_control_2audio 			= 0,	// stereo audio
 	scsi_q_control_2audio_preemp	= 1,	// stereo audio with 50/15µs pre-emphasis
 	scsi_q_control_1audio			= 8,	// audio (reserved in CD-R/W)
@@ -808,75 +771,72 @@ enum {
 	scsi_q_control_data_incr		= 5,	// data, recorded incremental
 	scsi_q_control_ddcd				= 4,	// DDCD data
 	scsi_q_control_copy_perm		= 2		// copy permitted (or-ed with value above)
-} scsi_q_control;
+};
 
 // format SCSI_TOC_FORMAT_TOC
 typedef struct scsi_toc_toc {
-	uint8 high_data_len;			// total length - 2 (independant of actual size)
-	uint8 low_data_len;
-	uint8 first_track;				// first track (hex)
-	uint8 last_track;				// last track (hex)
-	
+	uint16	data_length;			// big endian, total length - 2
+	uint8	first_track;			// first track
+	uint8	last_track;				// last track
+
 	scsi_toc_track tracks[1];		// one entry per track
-} scsi_toc_toc;
+} _PACKED scsi_toc_toc;
 
 
 // READ SUB-CHANNEL
 
 typedef struct scsi_cmd_read_subchannel {
-	uint8 opcode;
+	uint8	opcode;
 	LBITFIELD8_4(
-		res1_0 : 1,
-		TIME : 1,					// true, to use TIME format, false for LBA format
-		res1_2 : 3,
-		LUN : 3
+		_res1_0 : 1,
+		time : 1,					// true, to use MSF format, false for LBA format
+		_res1_2 : 3,
+		lun : 3
 	);
 	LBITFIELD8_3(
-		res2_0 : 6,
-		SUBQ : 1,					// 1 - return Q sub-channel data
-		res2_7 : 1
+		_res2_0 : 6,
+		subq : 1,					// 1 - return Q sub-channel data
+		_res2_7 : 1
 	);
-	uint8 parameter_list;			// see below
-	uint8 res4[2];
-	uint8 track;					// track number (hex)
-	uint8 high_allocation_length;	// maximum amount of data
-	uint8 low_allocation_length;
-	uint8 control;
-} scsi_cmd_read_subchannel;
+	uint8	parameter_list;			// see below
+	uint8	_res4[2];
+	uint8	track;					// track number (hex)
+	uint16	allocation_length;		// maximum amount of data, big endian
+	uint8	control;
+} _PACKED scsi_cmd_read_subchannel;
 
 // values of parameter_list
-enum {
+enum scsi_sub_channel_parameter_list {
 	scsi_sub_channel_parameter_list_cd_pos 	= 1,	// CD current position
 	scsi_sub_channel_parameter_list_mcn		= 2,	// Media Catalog Number
 	scsi_sub_channel_parameter_list_isrc	= 3		// Track International Standard Recording Code
-} scsi_sub_channel_parameter_list;
+};
 
 // header of response
 typedef struct scsi_subchannel_data_header {
-	uint8 res0;
-	uint8 audio_status;				// see below
-	uint8 high_data_len;			// total length - 4
-	uint8 low_data_len;
-} scsi_subchannel_data_header;
+	uint8	_res0;
+	uint8	audio_status;			// see below
+	uint16	data_length;			// total length - 4, big endian
+} _PACKED scsi_subchannel_data_header;
 
 // possible audio_status
-enum {
+enum scsi_audio_status {
 	scsi_audio_status_not_supported		= 0,
 	scsi_audio_status_playing			= 0x11,
 	scsi_audio_status_paused			= 0x12,
 	scsi_audio_status_completed			= 0x13,
 	scsi_audio_status_error_stop		= 0x14,
 	scsi_audio_status_no_status			= 0x15
-} scsi_audio_status;
+};
 
 typedef struct scsi_cd_current_position {
-	uint8 format_code;				// always 1
+	uint8	format_code;			// always 1
 	LBITFIELD8_2(
-		CONTROL : 4,				// see scsi_q_control
-		ADR : 4						// see scsi_adr
+		control : 4,				// see scsi_q_control
+		adr : 4						// see scsi_adr
 	);
-	uint8 track;
-	uint8 index;
+	uint8	track;
+	uint8	index;
 	union {							// current position, relative to logical beginning
 		scsi_cd_lba lba;
 		scsi_cd_msf time;
@@ -885,159 +845,158 @@ typedef struct scsi_cd_current_position {
 		scsi_cd_lba lba;
 		scsi_cd_msf time;
 	} track_relative_address;
-} scsi_cd_current_position;
+} _PACKED scsi_cd_current_position;
 
 
 // PLAY AUDIO MSF
 
 typedef struct scsi_cmd_play_msf {
-	uint8 opcode;
+	uint8	opcode;
 	LBITFIELD8_2(
-		res1_0 : 5,
-		LUN : 3
+		_res1_0 : 5,
+		lun : 3
 	);
-	uint8 res2;
-	uint8 start_minute;			// start time
-	uint8 start_second;
-	uint8 start_frame;
-	uint8 end_minute;			// end time (excluding)
-	uint8 end_second;
-	uint8 end_frame;
-	uint8 control;
-} scsi_cmd_play_msf;
+	uint8	_res2;
+	uint8	start_minute;			// start time
+	uint8	start_second;
+	uint8	start_frame;
+	uint8	end_minute;				// end time (excluding)
+	uint8	end_second;
+	uint8	end_frame;
+	uint8	control;
+} _PACKED scsi_cmd_play_msf;
 
 
 // STOP AUDIO
 
 typedef struct scsi_cmd_stop_play {
-	uint8 opcode;
+	uint8	opcode;
 	LBITFIELD8_2(
-		res1_0 : 5,
-		LUN : 3
+		_res1_0 : 5,
+		lun : 3
 	);
-	uint8 res2[7];
-	uint8 control;
-} scsi_cmd_stop_play;
+	uint8	_res2[7];
+	uint8	control;
+} _PACKED scsi_cmd_stop_play;
 
 
 // PAUSE/RESUME
 
 typedef struct scsi_cmd_pause_resume {
-	uint8 opcode;
+	uint8	opcode;
 	LBITFIELD8_2(
-		res1_0 : 5,
-		LUN : 3
+		_res1_0 : 5,
+		lun : 3
 	);
-	uint8 res2[6];
+	uint8	_res2[6];
 	LBITFIELD8_2(
 		resume : 1,				// 1 for resume, 0 for pause
-		res8_2 : 7
+		_res8_2 : 7
 	);
-	uint8 control;
-} scsi_cmd_pause_resume;
+	uint8	control;
+} _PACKED scsi_cmd_pause_resume;
 
 
 // SCAN 
 
 typedef struct scsi_cmd_scan {
-	uint8 opcode;
+	uint8	opcode;
 	LBITFIELD8_4(
-		RELADR : 1,				// must be 0
-		res1_1 : 3,
-		Direct : 1,				// direction: 0 forward, 1 backward
-		LUN : 3
+		relative_address : 1,	// must be zero
+		_res1_1 : 3,
+		direct : 1,				// direction: 0 forward, 1 backward
+		lun : 3
 	);
 	union {						// start of track (depends on <type>)
 		scsi_cd_lba lba;
 		scsi_cd_msf time;
-		scsi_cd_tno tno;
+		scsi_cd_track_number track_number;
 	} start;
-	uint8 res6[3];
+	uint8	_res6[3];
 	LBITFIELD8_2(
 		res9_0 : 6,
 		type : 2				// actual type of <start> (see below)
 	);
-	uint8 res10;
-	uint8 control;
-} scsi_cmd_scan;
+	uint8	_res10;
+	uint8	control;
+} _PACKED scsi_cmd_scan;
 
 // possible values for type
-enum {
+enum scsi_scan_type {
 	scsi_scan_lba = 0,
 	scsi_scan_msf = 1,
 	scsi_scan_tno = 2
-} scsi_scan_type;
+};
 
 
 // READ_CD
 
 typedef struct scsi_cmd_read_cd {
-	uint8 opcode;
+	uint8	opcode;
 	LBITFIELD8_4(
-		RELADR : 1,				// must be 0
-		res1_1 : 1,
+		relative_address : 1,	// must be zero
+		_res1_1 : 1,
 		sector_type : 3,		// required sector type (1=CDDA)
-		LUN : 3
+		lun : 3
 	);
 	scsi_cd_lba lba;
-	uint8 high_length;
-	uint8 mid_length;
-	uint8 low_length;
+	uint8	high_length;
+	uint8	mid_length;
+	uint8	low_length;
 	LBITFIELD8_6(
-		res9_0 : 1,
+		_res9_0 : 1,
 		error_field : 2,
-		EDC_ECC : 1,			// include EDC/ECC; includes 8 byte padding for Mode 1 format
+		edc_ecc : 1,			// include EDC/ECC; includes 8 byte padding for Mode 1 format
 		user_data : 1,			// if 1, include user data 
 								// (mode select block size is ignored)
 		header_code : 2,
-		SYNC : 1				// if 1, include sync field from sector
+		sync : 1				// if 1, include sync field from sector
 	);
 	LBITFIELD8_2(
 		sub_channel_selection : 4,
-		res10_4 : 4
+		_res10_4 : 4
 	);
-	uint8 control;
-} scsi_cmd_read_cd;
+	uint8	control;
+} _PACKED scsi_cmd_read_cd;
 
 // possible values for header_code
-enum {
+enum scsi_read_cd_header_code {
 	scsi_read_cd_header_none			= 0,
 	scsi_read_cd_header_hdr_only		= 1,	
 	scsi_read_cd_header_sub_header_only	= 2,
 	scsi_read_cd_header_all_headers		= 3,
-} scsi_read_cd_header_code;
+};
 
 // possible values for error_field
-enum {
+enum scsi_read_cd_error_field {
 	scsi_read_cd_error_none					= 0,
 	scsi_read_cd_error_c2_error				= 1, // include 2352 bits indicating error in byte
 	scsi_read_cd_error_c2_and_block_error	= 2, // include or of C2 data plus pad byte
-} scsi_read_cd_error_field;
+};
 
 // possible values for sub_channel_selection
-enum {
+enum scsi_read_cd_sub_channel_selection {
 	scsi_read_cd_sub_channel_none			= 0,
 	scsi_read_cd_sub_channel_RAW			= 1,
 	scsi_read_cd_sub_channel_Q				= 2,
 	scsi_read_cd_sub_channel_P_W			= 4	// R/W data, depending on CD capabilities
 												// and Mechanism status page
-} scsi_read_cd_sub_channel_selection;
+};
 
 // SYNCHRONIZE CACHE (10)
 
 typedef struct scsi_cmd_sync_cache {
-	uint8 opcode;
+	uint8	opcode;
 	LBITFIELD8_4(
-		RelAddr : 1,
-		immed : 1,		// 1 - return immediately, 0 - return on completion
-		res1_1 : 3,
-		LUN : 3
+		relative_address : 1,	// must be zero
+		immediately : 1,		// 1 - return immediately, 0 - return on completion
+		_res1_1 : 3,
+		lun : 3
 	);
 	scsi_cd_lba lba;
-	uint8 res2;	
-	uint8 nblocks_high;
-	uint8 nblocks_low;
-	uint8 control;
-} scsi_cmd_sync_cache;
+	uint8	_res2;	
+	uint16	block_count;		// big endian
+	uint8	control;
+} _PACKED scsi_cmd_sync_cache;
 
-#endif
+#endif	/* _SCSI_CMDS_H */

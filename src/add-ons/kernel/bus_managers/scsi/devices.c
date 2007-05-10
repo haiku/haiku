@@ -253,9 +253,9 @@ scsi_create_autosense_request(scsi_device_info *device)
 		goto err;
 
 	request->data = buffer;
-	request->data_len = SCSI_MAX_SENSE_SIZE;
+	request->data_length = SCSI_MAX_SENSE_SIZE;
 	request->sg_list = (physical_entry *)(buffer + SCSI_MAX_SENSE_SIZE);
-	request->sg_cnt = 1;
+	request->sg_count = 1;
 	
 	get_memory_map(buffer, SCSI_MAX_SENSE_SIZE, 
 		(physical_entry *)request->sg_list, 1);
@@ -268,12 +268,12 @@ scsi_create_autosense_request(scsi_device_info *device)
 		SCSI_ORDERED_QTAG | SCSI_DMA_SAFE;
 
 	cmd = (scsi_cmd_request_sense *)request->cdb;
-	request->cdb_len = sizeof(*cmd);
+	request->cdb_length = sizeof(*cmd);
 
 	memset(cmd, 0, sizeof(*cmd));
 	cmd->opcode = SCSI_OP_REQUEST_SENSE;	
-	cmd->LUN = device->target_lun;
-	cmd->alloc_length = SCSI_MAX_SENSE_SIZE;
+	cmd->lun = device->target_lun;
+	cmd->allocation_length = SCSI_MAX_SENSE_SIZE;
 
 	return B_OK;
 

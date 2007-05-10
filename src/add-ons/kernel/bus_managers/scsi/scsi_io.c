@@ -1,13 +1,11 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
+ * Copyright 2002-2004, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
-/*
-	Part of Open SCSI bus manager
-
-	Handling of SCSI I/O requests
-*/
+//!	Part of Open SCSI bus manager
 
 
 #include "scsi_internal.h"
@@ -184,7 +182,7 @@ finish_autosense(scsi_device_info *device)
 
 		// we got sense data -> copy it to sense buffer
 		sense_len = min(SCSI_MAX_SENSE_SIZE, 
-			request->data_len - request->data_resid);
+			request->data_length - request->data_resid);
 
 		SHOW_FLOW(3, "Got sense: %d bytes", sense_len);
 
@@ -407,9 +405,9 @@ scsi_async_io(scsi_ccb *request)
 	if (request->state != SCSI_STATE_FINISHED)
 		panic("Passed ccb to scsi_action that isn't ready (state = %d)\n", request->state);
 
-	if (request->cdb_len < func_group_len[request->cdb[0] >> 5]) {
+	if (request->cdb_length < func_group_len[request->cdb[0] >> 5]) {
 		SHOW_ERROR(3, "invalid command len (%d instead of %d)",
-			request->cdb_len, func_group_len[request->cdb[0] >> 5]);
+			request->cdb_length, func_group_len[request->cdb[0] >> 5]);
 
 		request->subsys_status = SCSI_REQ_INVALID;
 		goto err;
@@ -417,7 +415,7 @@ scsi_async_io(scsi_ccb *request)
 
 	FAST_LOGN(request->device->log, ev_scsi_async_io, 
 		func_group_len[request->cdb[0] >> 5] + 2, 
-		(uint32)request, request->data_len,
+		(uint32)request, request->data_length,
 		request->cdb[0], request->cdb[1], request->cdb[2], request->cdb[3],
 		request->cdb[4], request->cdb[5], request->cdb[6], request->cdb[7],
 		request->cdb[8], request->cdb[9], request->cdb[10], request->cdb[11],
@@ -432,9 +430,9 @@ scsi_async_io(scsi_ccb *request)
 	}
 
 	if ((request->flags & SCSI_DIR_MASK) != SCSI_DIR_NONE
-		&& request->sg_list == NULL && request->data_len > 0) {
+		&& request->sg_list == NULL && request->data_length > 0) {
 		SHOW_ERROR( 3, "Asynchronous SCSI I/O requires S/G list (data is %d bytes)",
-			(int)request->data_len );
+			(int)request->data_length );
 		request->subsys_status = SCSI_DATA_RUN_ERR;
 		goto err;
 	}
@@ -443,7 +441,7 @@ scsi_async_io(scsi_ccb *request)
 
 	// make data DMA safe
 	// (S/G list must be created first to be able to verify DMA restrictions)
-	if ((request->flags & SCSI_DMA_SAFE) == 0 && request->data_len > 0) {
+	if ((request->flags & SCSI_DMA_SAFE) == 0 && request->data_length > 0) {
 		request->buffered = true;
 		if (!scsi_get_dma_buffer(request)) {
 			SHOW_ERROR0( 3, "cannot create DMA buffer for request - reduce data volume" );
@@ -459,7 +457,7 @@ scsi_async_io(scsi_ccb *request)
 		request->emulated = true;
 
 		if (!scsi_start_emulation(request)) {
-			SHOW_ERROR( 3, "cannot emulate SCSI command 0x%02x", request->cdb[0] );
+			SHOW_ERROR(3, "cannot emulate SCSI command 0x%02x", request->cdb[0]);
 			goto err2;
 		}
 	}
@@ -475,7 +473,7 @@ scsi_async_io(scsi_ccb *request)
 		// abuse TUR to find proper spot in command packet for LUN
 		scsi_cmd_tur *cmd = (scsi_cmd_tur *)request->cdb;
 
-		cmd->LUN = request->device->target_lun;
+		cmd->lun = request->device->target_lun;
 	}
 
 	request->ordered = (request->flags & SCSI_ORDERED_QTAG) != 0;
@@ -513,7 +511,7 @@ scsi_sync_io(scsi_ccb *request)
 
 	// create scatter-gather list if required
 	if ((request->flags & SCSI_DIR_MASK) != SCSI_DIR_NONE
-		&& request->sg_list == NULL && request->data_len > 0) {
+		&& request->sg_list == NULL && request->data_length > 0) {
 		tmp_sg = true;
 		if (!create_temp_sg(request)) {
 			SHOW_ERROR0( 3, "data is too much fragmented - you should use s/g list" );

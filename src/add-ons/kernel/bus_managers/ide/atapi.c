@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Haiku, Inc. All RightsReserved.
+ * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -26,10 +26,10 @@
 #define IDE_ATAPI_BUFFER_SIZE 512
 
 
-/**	Set sense according to error reported by device
- *	return: true - device reported error
- */
-
+/*!
+	Set sense according to error reported by device
+	return: true - device reported error
+*/
 static bool
 check_packet_error(ide_device_info *device, ide_qrequest *qrequest)
 {
@@ -88,8 +88,7 @@ check_packet_error(ide_device_info *device, ide_qrequest *qrequest)
 }
 
 
-/** IRQ handler of packet transfer (executed as DPC) */
-
+/*! IRQ handler of packet transfer (executed as DPC) */
 void
 packet_dpc(ide_qrequest *qrequest)
 {
@@ -248,7 +247,7 @@ packet_dpc(ide_qrequest *qrequest)
 
 		SHOW_FLOW(3, "finished: %d of %d left", 
 			(int)qrequest->request->data_resid,
-			(int)qrequest->request->data_len);
+			(int)qrequest->request->data_length);
 
 		finish_checksense(qrequest);
 		return;
@@ -263,8 +262,7 @@ err:
 }
 
 
-/**	Create taskfile for ATAPI packet */
-
+/*!	Create taskfile for ATAPI packet */
 static bool
 create_packet_taskfile(ide_device_info *device, ide_qrequest *qrequest,
 	bool write)
@@ -278,16 +276,15 @@ create_packet_taskfile(ide_device_info *device, ide_qrequest *qrequest,
 
 	device->tf.packet.dma = qrequest->uses_dma;
 	device->tf.packet.ovl = 0;
-	device->tf.packet.byte_count_0_7 = request->data_len & 0xff;
-	device->tf.packet.byte_count_8_15 = request->data_len >> 8;
+	device->tf.packet.byte_count_0_7 = request->data_length & 0xff;
+	device->tf.packet.byte_count_8_15 = request->data_length >> 8;
 	device->tf.packet.command = IDE_CMD_PACKET;
 
 	return true;
 }
 
 
-/** Send ATAPI packet */
-
+/*! Send ATAPI packet */
 void
 send_packet(ide_device_info *device, ide_qrequest *qrequest, bool write)
 {
@@ -304,12 +301,12 @@ send_packet(ide_device_info *device, ide_qrequest *qrequest, bool write)
 			dprintf( "%x ", device->packet[i] );
 	}*/
 
-	SHOW_FLOW( 3, "%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x (len=%d)",
+	SHOW_FLOW(3, "%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x (len=%d)",
 		device->packet[0], device->packet[1], device->packet[2], 
 		device->packet[3], device->packet[4], device->packet[5], 
 		device->packet[6], device->packet[7], device->packet[8], 
 		device->packet[9], device->packet[10], device->packet[11],
-		qrequest->request->cdb_len );
+		qrequest->request->cdb_length);
 
 	//snooze( 1000000 );
 
@@ -322,11 +319,11 @@ send_packet(ide_device_info *device, ide_qrequest *qrequest, bool write)
 	// report how much data is transmitted, and this information is
 	// crucial for the SCSI protocol)
 	// special offer: let READ_CD commands use DMA too
-	qrequest->uses_dma = device->DMA_enabled && 
-		(scsi_cmd == SCSI_OP_READ_6 || scsi_cmd == SCSI_OP_WRITE_6 ||
-		 scsi_cmd == SCSI_OP_READ_10 || scsi_cmd == SCSI_OP_WRITE_10 ||
-		 scsi_cmd == SCSI_OP_READ_12 || scsi_cmd == SCSI_OP_WRITE_12 ||
-		 scsi_cmd == SCSI_OP_READ_CD );
+	qrequest->uses_dma = device->DMA_enabled
+		&& (scsi_cmd == SCSI_OP_READ_6 || scsi_cmd == SCSI_OP_WRITE_6
+		|| scsi_cmd == SCSI_OP_READ_10 || scsi_cmd == SCSI_OP_WRITE_10
+		|| scsi_cmd == SCSI_OP_READ_12 || scsi_cmd == SCSI_OP_WRITE_12
+		|| scsi_cmd == SCSI_OP_READ_CD);
 
 	// try preparing DMA, if that fails, fall back to PIO	
 	if (qrequest->uses_dma) {
@@ -437,8 +434,7 @@ err_setup:
 }
 
 
-/** Execute SCSI I/O for atapi devices */
-
+/*! Execute SCSI I/O for atapi devices */
 void
 atapi_exec_io(ide_device_info *device, ide_qrequest *qrequest)
 {
@@ -449,7 +445,7 @@ atapi_exec_io(ide_device_info *device, ide_qrequest *qrequest)
 	// ATAPI command packets are 12 bytes long; 
 	// if the command is shorter, remaining bytes must be padded with zeros
 	memset(device->packet, 0, sizeof(device->packet));
-	memcpy(device->packet, request->cdb, request->cdb_len);
+	memcpy(device->packet, request->cdb, request->cdb_length);
 
 	if (request->cdb[0] == SCSI_OP_REQUEST_SENSE && device->combined_sense) {
 		// we have a pending emulated sense - return it on REQUEST SENSE
@@ -466,8 +462,7 @@ atapi_exec_io(ide_device_info *device, ide_qrequest *qrequest)
 }
 
 
-/** prepare device info for ATAPI device */
-
+/*!	Prepare device info for ATAPI device */
 bool
 prep_atapi(ide_device_info *device)
 {

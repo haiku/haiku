@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -31,8 +31,7 @@ static void release_emulation_buffer(scsi_ccb *request);
 static void restore_request_data(scsi_ccb *request);
 
 
-/** free emulation buffer */
-
+/*! Free emulation buffer */
 void
 scsi_free_emulation_buffer(scsi_device_info *device)
 {
@@ -49,10 +48,9 @@ scsi_free_emulation_buffer(scsi_device_info *device)
 }
 
 
-/**	setup buffer used to emulate unsupported SCSI commands
- *	buffer_size must be power of two
- */
-
+/*!	Setup buffer used to emulate unsupported SCSI commands
+	buffer_size must be power of two
+*/
 status_t
 scsi_init_emulation_buffer(scsi_device_info *device, size_t buffer_size)
 {
@@ -98,17 +96,17 @@ scsi_init_emulation_buffer(scsi_device_info *device, size_t buffer_size)
 	device->buffer_sg_list = (void *)(aligned_addr + buffer_size);
 	device->buffer_sg_list[0].address = (void *)aligned_phys;
 	device->buffer_sg_list[0].size = buffer_size;
-	device->buffer_sg_cnt = 1;
+	device->buffer_sg_count = 1;
 
 	return B_OK;
 }
 
 
-/**	some ATAPI devices don't like 6 byte read/write commands, so
- *	we translate them to their 10 byte partners;
- *	USB devices usually don't like 10 bytes either
- */
-
+/*!
+	Some ATAPI devices don't like 6 byte read/write commands, so
+	we translate them to their 10 byte counterparts;
+	USB devices usually don't like 10 bytes either
+*/
 static bool
 scsi_read_write_6(scsi_ccb *request)
 {
@@ -117,50 +115,46 @@ scsi_read_write_6(scsi_ccb *request)
 
 	SHOW_FLOW0(3, "patching READ/WRITE(6) to READ/WRITE(10)");
 
-	request->cdb_len = sizeof(*cdb);
+	request->cdb_length = sizeof(*cdb);
 	memset(cdb, 0, sizeof(*cdb));
 
 	cdb->opcode = cmd->opcode + (SCSI_OP_READ_10 - SCSI_OP_READ_6);
-	cdb->LUN = cmd->LUN;
-	cdb->low_LBA = cmd->low_LBA;
-	cdb->mid_LBA = cmd->mid_LBA;
-	cdb->high_LBA = cmd->high_LBA;
-	cdb->low_length = cmd->length;
-	cdb->high_length = cmd->length == 0;
+	cdb->lun = cmd->lun;
+	cdb->lba = B_HOST_TO_BENDIAN_INT32((uint32)cmd->low_lba
+		| ((uint32)cmd->mid_lba << 8) | ((uint32)cmd->high_lba << 16));
+	cdb->length = B_HOST_TO_BENDIAN_INT16((uint16)cmd->length);
 	cdb->control = cmd->control;
 
 	return true;
 }
 
 
-/**	all ATAPI devices don't like 6 byte MODE SENSE, so we translate
- *	that to 10 byte MODE SENSE
- */
-
+/*!	All ATAPI devices don't like 6 byte MODE SENSE, so we translate
+	that to 10 byte MODE SENSE
+*/
 static bool
 scsi_start_mode_sense_6(scsi_ccb *request)
 {
 	scsi_cmd_mode_sense_6 *cmd = (scsi_cmd_mode_sense_6 *)request->orig_cdb;
 	scsi_cmd_mode_sense_10 *cdb = (scsi_cmd_mode_sense_10 *)request->cdb;
-	size_t allocation_length;
+	size_t allocationLength;
 
 	SHOW_FLOW0(3, "patching MODE SENSE(6) to MODE SENSE(10)");
 
-	request->cdb_len = sizeof(*cdb);
+	request->cdb_length = sizeof(*cdb);
 	memset(cdb, 0, sizeof(*cdb));
 
 	cdb->opcode = SCSI_OP_MODE_SENSE_10;
-	cdb->DBD = cmd->DBD;
-	cdb->LUN = cmd->LUN;
+	cdb->disable_block_desc = cmd->disable_block_desc;
+	cdb->lun = cmd->lun;
 	cdb->page_code = cmd->page_code;
-	cdb->PC = cmd->PC;
+	cdb->page_control = cmd->page_control;
 
-	allocation_length = cmd->allocation_length
+	allocationLength = cmd->allocation_length
 		- sizeof(scsi_cmd_mode_sense_6) + sizeof(scsi_cmd_mode_sense_10);
-	cdb->high_allocation_length = allocation_length >> 8;
-	cdb->low_allocation_length = allocation_length & 0xff;
+	cdb->allocation_length = B_HOST_TO_BENDIAN_INT16(allocationLength);
 
-	SHOW_FLOW(3, "allocation_length=%ld", allocation_length);
+	SHOW_FLOW(3, "allocation_length=%ld", allocationLength);
 
 	cdb->control = cmd->control;
 
@@ -170,15 +164,14 @@ scsi_start_mode_sense_6(scsi_ccb *request)
 	replace_request_data(request);
 
 	// restrict data buffer len to length specified in cdb
-	request->data_len = allocation_length;
+	request->data_length = allocationLength;
 	return true;
 }
 
 
-/**	all ATAPI devices don't like 6 byte MODE SELECT, so we translate
- *	that to 10 byte MODE SELECT
- */
-
+/*!	All ATAPI devices don't like 6 byte MODE SELECT, so we translate
+	that to 10 byte MODE SELECT
+*/
 static bool
 scsi_start_mode_select_6(scsi_ccb *request)
 {
@@ -204,16 +197,14 @@ scsi_start_mode_select_6(scsi_ccb *request)
 		goto err;
 
 	// construct new cdb		
-	request->cdb_len = sizeof(*cdb);
+	request->cdb_length = sizeof(*cdb);
 	memset(cdb, 0, sizeof(*cdb));
 
 	cdb->opcode = SCSI_OP_MODE_SELECT_10;
-	cdb->SP = cmd->SP;
-	cdb->PF = cmd->PF;
-	cdb->LUN = cmd->LUN;
-
-	cdb->high_param_list_length = param_list_length_10 >> 8;
-	cdb->low_param_list_length = param_list_length_10 & 0xff;
+	cdb->save_pages = cmd->save_pages;
+	cdb->pf = cmd->pf;
+	cdb->lun = cmd->lun;
+	cdb->param_list_length = B_HOST_TO_BENDIAN_INT16(param_list_length_10);
 
 	SHOW_FLOW(3, "param_list_length=%ld", param_list_length_6);
 
@@ -228,17 +219,18 @@ scsi_start_mode_select_6(scsi_ccb *request)
 	// mode_data_len is reserved for MODE SELECT
 	header_10->medium_type = header_6.medium_type;
 	header_10->dev_spec_parameter = header_6.dev_spec_parameter;
-	header_10->low_block_desc_len = header_6.block_desc_len;
+	header_10->block_desc_length = B_HOST_TO_BENDIAN_INT16(
+		(uint16)header_6.block_desc_length);
 
 	// append actual mode select data		
-	if (!copy_sg_data( request, sizeof(header_6), param_list_length_6, header_10 + 1,
+	if (!copy_sg_data(request, sizeof(header_6), param_list_length_6, header_10 + 1,
 			param_list_length_10 - sizeof(*header_10), true))
 		goto err;
 
 	replace_request_data(request);
 
 	// restrict buffer size to the one specified in cdb
-	request->data_len = param_list_length_10;
+	request->data_length = param_list_length_10;
 	return true;
 
 err:
@@ -249,10 +241,9 @@ err:
 }
 
 
-/**	emulation procedure at start of command
- *	returns false if command is to be finished without further execution
- */
-
+/*!	Emulation procedure at start of command
+	returns false if command is to be finished without further execution
+*/
 bool
 scsi_start_emulation(scsi_ccb *request)
 {
@@ -261,7 +252,7 @@ scsi_start_emulation(scsi_ccb *request)
 	SHOW_FLOW(3, "command=%x", request->cdb[0]);
 
 	memcpy(request->orig_cdb, request->cdb, SCSI_MAX_CDB_SIZE);
-	request->orig_cdb_len = request->cdb_len;
+	request->orig_cdb_length = request->cdb_length;
 
 	switch (request->orig_cdb[0]) {
 		case SCSI_OP_READ_6:
@@ -279,8 +270,7 @@ scsi_start_emulation(scsi_ccb *request)
 }
 
 
-/** back-translate MODE SENSE 10 to MODE SENSE 6 */
-
+/*! Back-translate MODE SENSE 10 to MODE SENSE 6 */
 static void
 scsi_finish_mode_sense_10_6(scsi_ccb *request)
 {
@@ -289,7 +279,8 @@ scsi_finish_mode_sense_10_6(scsi_ccb *request)
 	scsi_mode_param_header_10 *header_10 = (scsi_mode_param_header_10 *)device->buffer;
 	int transfer_size_6, transfer_size_10;
 
-	if (request->subsys_status != SCSI_REQ_CMP || request->device_status != SCSI_STATUS_GOOD) {
+	if (request->subsys_status != SCSI_REQ_CMP
+		|| request->device_status != SCSI_STATUS_GOOD) {
 		// on error, do nothing
 		release_emulation_buffer(request);
 		return;
@@ -297,7 +288,7 @@ scsi_finish_mode_sense_10_6(scsi_ccb *request)
 
 	// check how much data we got from device and thus will copy into
 	// request data
-	transfer_size_10 = request->data_len - request->data_resid;
+	transfer_size_10 = request->data_length - request->data_resid;
 	transfer_size_6 = transfer_size_10 
 		- sizeof(scsi_mode_param_header_10 *) + sizeof(scsi_mode_param_header_6 *);
 
@@ -310,13 +301,13 @@ scsi_finish_mode_sense_10_6(scsi_ccb *request)
 	// convert total length
 	// (+1 is there because mode_data_len in 10 byte header ignores first
 	// two bytes, whereas in the 6 byte header it ignores only one byte)
-	header_6.mode_data_len = header_10->low_mode_data_len
+	header_6.mode_data_length = B_BENDIAN_TO_HOST_INT16(header_10->mode_data_length)
 		- sizeof(scsi_mode_param_header_10) + sizeof(scsi_mode_param_header_6)
 		+ 1;
 
 	header_6.medium_type = header_10->medium_type;
 	header_6.dev_spec_parameter = header_10->dev_spec_parameter;
-	header_6.block_desc_len = header_10->low_block_desc_len;
+	header_6.block_desc_length = B_BENDIAN_TO_HOST_INT16(header_10->block_desc_length);
 
 	// copy adapted header			
 	copy_sg_data(request, 0, transfer_size_6, &header_6, sizeof(header_6), false);
@@ -325,14 +316,13 @@ scsi_finish_mode_sense_10_6(scsi_ccb *request)
 	copy_sg_data(request, sizeof(header_6), transfer_size_6, 
 		header_10 + 1, transfer_size_10 - sizeof(*header_10), false);
 
-	request->data_resid = request->data_len - transfer_size_6;
+	request->data_resid = request->data_length - transfer_size_6;
 
 	release_emulation_buffer(request);
 }
 
 
-/** back-translate MODE SELECT 10 to MODE SELECT 6 */
-
+/*! Back-translate MODE SELECT 10 to MODE SELECT 6 */
 static void
 scsi_finish_mode_select_10_6(scsi_ccb *request)
 {
@@ -348,35 +338,34 @@ scsi_finish_mode_select_10_6(scsi_ccb *request)
 }
 
 
-/** fix inquiry data; some ATAPI devices return wrong version */
-
+/*! Fix inquiry data; some ATAPI devices return wrong version */
 static void
 scsi_finish_inquiry(scsi_ccb *request)
 {
-	int transfer_size;
+	int transferSize;
 	scsi_res_inquiry res;
 
 	SHOW_FLOW0(3, "fixing INQUIRY");
 
-	if (request->subsys_status != SCSI_REQ_CMP || request->device_status != SCSI_STATUS_GOOD)
+	if (request->subsys_status != SCSI_REQ_CMP
+		|| request->device_status != SCSI_STATUS_GOOD)
 		return;
 
-	transfer_size = request->data_len - request->data_resid;
+	transferSize = request->data_length - request->data_resid;
 
-	copy_sg_data(request, 0, transfer_size, &res, sizeof(res), true);
+	copy_sg_data(request, 0, transferSize, &res, sizeof(res), true);
 
 	SHOW_FLOW(3, "ANSI version: %d, response data format: %d",
-		res.ANSI_version, res.response_data_format);
+		res.ansi_version, res.response_data_format);
 
-	res.ANSI_version = 2;
+	res.ansi_version = 2;
 	res.response_data_format = 2;
 
-	copy_sg_data(request, 0, transfer_size, &res, sizeof(res), false);
+	copy_sg_data(request, 0, transferSize, &res, sizeof(res), false);
 }
 
 
-/** adjust result of emulated request */
-
+/*! Adjust result of emulated request */
 void
 scsi_finish_emulation(scsi_ccb *request)
 {
@@ -398,12 +387,11 @@ scsi_finish_emulation(scsi_ccb *request)
 
 	// restore cdb
 	memcpy(request->cdb, request->orig_cdb, SCSI_MAX_CDB_SIZE);
-	request->cdb_len = request->orig_cdb_len;
+	request->cdb_length = request->orig_cdb_length;
 }
 
 
-/** set sense of request */
-
+/*! Set sense of request */
 static void
 set_sense(scsi_ccb *request, int sense_key, int sense_asc)
 {
@@ -433,43 +421,42 @@ set_sense(scsi_ccb *request, int sense_key, int sense_asc)
 }
 
 
-/**	copy data between request data and buffer
- *	request			- request to copy data from/to
- *	offset			- offset of data in request
- *	allocation_length- limit of request's data buffer according to CDB
- *	buffer			- data to copy data from/to
- *	size			- number of bytes to copy
- *	to_buffer		- true: copy from request to buffer
- *					  false: copy from buffer to request
- *	return: true, if data of request was large enough
- */
-
+/*!	Copy data between request data and buffer
+	request			- request to copy data from/to
+	offset			- offset of data in request
+	allocation_length- limit of request's data buffer according to CDB
+	buffer			- data to copy data from/to
+	size			- number of bytes to copy
+	to_buffer		- true: copy from request to buffer
+					  false: copy from buffer to request
+	return: true, if data of request was large enough
+*/
 static bool
 copy_sg_data(scsi_ccb *request, uint offset, uint allocation_length,
 	void *buffer, int size, bool to_buffer)
 {
 	const physical_entry *sg_list = request->sg_list;
-	int sg_cnt = request->sg_cnt;
+	int sg_count = request->sg_count;
 	int req_size;
 
-	SHOW_FLOW(3, "offset=%u, req_size_limit=%d, size=%d, sg_list=%p, sg_cnt=%d, %s buffer", 
-		offset, allocation_length, size, sg_list, sg_cnt, to_buffer ? "to" : "from");
+	SHOW_FLOW(3, "offset=%u, req_size_limit=%d, size=%d, sg_list=%p, sg_count=%d, %s buffer", 
+		offset, allocation_length, size, sg_list, sg_count, to_buffer ? "to" : "from");
 
 	// skip unused S/G entries
-	while (sg_cnt > 0 && offset >= sg_list->size) {
+	while (sg_count > 0 && offset >= sg_list->size) {
 		offset -= sg_list->size;
 		++sg_list;
-		--sg_cnt;
+		--sg_count;
 	}
 
-	if (sg_cnt == 0)
+	if (sg_count == 0)
 		return 0;
 
 	// remaining bytes we are allowed to copy from/to request 		
-	req_size = min(allocation_length, request->data_len) - offset;
+	req_size = min(allocation_length, request->data_length) - offset;
 
 	// copy one S/G entry at a time
-	for (; size > 0 && req_size > 0 && sg_cnt > 0; ++sg_list, --sg_cnt) {
+	for (; size > 0 && req_size > 0 && sg_count > 0; ++sg_list, --sg_count) {
 		size_t bytes;
 		addr_t virtualAddress;
 
@@ -516,67 +503,63 @@ copy_sg_data(scsi_ccb *request, uint offset, uint allocation_length,
 }
 
 
-/** allocate emulation buffer */
-
+/*! Allocate emulation buffer */
 static void
 get_emulation_buffer(scsi_ccb *request)
 {
 	scsi_device_info *device = request->device;
 
-	SHOW_FLOW0( 3, "" );
+	SHOW_FLOW0(3, "");
 
 	acquire_sem(device->buffer_sem);
 
 	request->orig_sg_list = request->sg_list;
-	request->orig_sg_cnt = request->sg_cnt;
-	request->orig_data_len = request->data_len;
+	request->orig_sg_count = request->sg_count;
+	request->orig_data_length = request->data_length;
 
 	request->sg_list = device->buffer_sg_list;
-	request->sg_cnt = device->buffer_sg_cnt;
-	request->data_len = device->buffer_size;	
+	request->sg_count = device->buffer_sg_count;
+	request->data_length = device->buffer_size;	
 }
 
 
-/**	replace request data with emulation buffer, saving original pointer;
- *	you must have called get_emulation_buffer() first
- */
-
+/*!	Replace request data with emulation buffer, saving original pointer;
+	you must have called get_emulation_buffer() first
+*/
 static void
 replace_request_data(scsi_ccb *request)
 {
 	scsi_device_info *device = request->device;
 
-	SHOW_FLOW0( 3, "" );
+	SHOW_FLOW0(3, "");
 
 	request->orig_sg_list = request->sg_list;
-	request->orig_sg_cnt = request->sg_cnt;
-	request->orig_data_len = request->data_len;
+	request->orig_sg_count = request->sg_count;
+	request->orig_data_length = request->data_length;
 
 	request->sg_list = device->buffer_sg_list;
-	request->sg_cnt = device->buffer_sg_cnt;
-	request->data_len = device->buffer_size;	
+	request->sg_count = device->buffer_sg_count;
+	request->data_length = device->buffer_size;	
 }
 
 
-/** release emulation buffer */
-
+/*! Release emulation buffer */
 static void
 release_emulation_buffer(scsi_ccb *request)
 {
-	SHOW_FLOW0( 3, "" );
+	SHOW_FLOW0(3, "");
 
 	release_sem(request->device->buffer_sem);
 }
 
 
-/** restore original request data pointers */
-
+/*! Restore original request data pointers */
 static void
 restore_request_data(scsi_ccb *request)
 {
-	SHOW_FLOW0( 3, "" );
+	SHOW_FLOW0(3, "");
 
 	request->sg_list = request->orig_sg_list;
-	request->sg_cnt = request->orig_sg_cnt;
-	request->data_len = request->orig_data_len;
+	request->sg_count = request->orig_sg_count;
+	request->data_length = request->orig_data_length;
 }

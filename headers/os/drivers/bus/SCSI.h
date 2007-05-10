@@ -1,11 +1,11 @@
 /*
- * Copyright 2004-2006, Haiku, Inc. All RightsReserved.
+ * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
-#ifndef _SCSI_BUSMANAGER_H_
-#define _SCSI_BUSMANAGER_H_
+#ifndef _SCSI_BUSMANAGER_H
+#define _SCSI_BUSMANAGER_H
 
 /*
 	SCSI bus manager interface
@@ -26,7 +26,7 @@
 	Something about requests involving data transfer: you can either specify
 	the virtual address in <data> of CCB (in which case it must be continuous),
 	or store a pointer to a S/G list that contains physical addresses in
-	<sg_list>/<sg_cnt>. If <sg_list> is non-Null, <data> is ignored. 
+	<sg_list>/<sg_count>. If <sg_list> is non-Null, <data> is ignored. 
 	The S/G list must be in kernel space because the request can be executed 
 	in a different thread context. This is also the	reason why the S/G list has 
 	to contain physical addresses. For obvious reason, the data buffer specified
@@ -108,8 +108,7 @@ typedef struct scsi_device_info *scsi_device;
 
 
 // structure of one scsi i/o CCB (command control block)
-typedef struct scsi_ccb
-{
+typedef struct scsi_ccb {
 	struct scsi_ccb *next, *prev;	// internal
 
 	uchar		subsys_status;		// Returned subsystem status
@@ -126,14 +125,14 @@ typedef struct scsi_ccb
 	sem_id		completion_sem;
 
 	uint8		cdb[SCSI_MAX_CDB_SIZE];  // command data block
-	uchar		cdb_len;			// length of command in bytes
+	uchar		cdb_length;			// length of command in bytes
 	int64		sort;				// value of command to sort on (<0 means n/a)
 	bigtime_t	timeout;			// timeout - 0 = use default
 
 	uchar		*data;				// pointer to data
-	const physical_entry *sg_list;	// SG list
-	uint16		sg_cnt;				// number of SG entries
-	uint32		data_len;			// length of data
+	const physical_entry *sg_list;	// scatter/gather list
+	uint16		sg_count;			// number of S/G entries
+	uint32		data_length;		// length of data
 	int32		data_resid;			// data transfer residual length: 2's comp
 
 	uchar		sense[SCSI_MAX_SENSE_SIZE]; // autosense data
@@ -151,10 +150,10 @@ typedef struct scsi_ccb
 
 	// original data before command emulation was applied
 	uint8		orig_cdb[SCSI_MAX_CDB_SIZE];
-	uchar		orig_cdb_len;
-	const physical_entry	*orig_sg_list;
-	uint16		orig_sg_cnt;
-	uint32		orig_data_len;
+	uchar		orig_cdb_length;
+	const physical_entry *orig_sg_list;
+	uint16		orig_sg_count;
+	uint32		orig_data_length;
 
 	// private SIM data
 	uchar		sim_state;			// set to zero when request is submitted first time
@@ -249,8 +248,7 @@ typedef struct scsi_ccb
 
 
 // Path inquiry, extended by BeOS XPT_EXTENDED_PATH_INQ parameters
-typedef struct
-{
+typedef struct {
 	uchar		version_num;			/* Version number for the SIM/HBA */
 	uchar		hba_inquiry;			/* Mimic of INQ byte 7 for the HBA */
 	uchar		hba_misc;				/* Misc HBA feature flags */
@@ -457,4 +455,4 @@ typedef struct scsi_sim_interface {
 } scsi_sim_interface;
 
 
-#endif	/* _SCSI_BUSMANAGER_H_ */
+#endif	/* _SCSI_BUSMANAGER_H */

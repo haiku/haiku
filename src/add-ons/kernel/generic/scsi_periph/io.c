@@ -1,14 +1,12 @@
 /*
- * Copyright 2004-2006, Haiku, Inc. All RightsReserved.
+ * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
 
-/*
-	Part of Open SCSI Disk Driver
-	Everything doing the real input/output stuff.
-*/
+//!	Everything doing the real input/output stuff.
+
 
 #include "scsi_periph_int.h"
 #include <scsi.h>
@@ -25,28 +23,29 @@ static int periph_read_write(scsi_periph_handle_info *handle, const phys_vecs *v
 
 status_t
 periph_read(scsi_periph_handle_info *handle, const phys_vecs *vecs, off_t pos,
-	size_t num_blocks, uint32 block_size, size_t *bytes_transferred, int preferred_ccb_size)
+	size_t num_blocks, uint32 block_size, size_t *bytes_transferred,
+	int preferred_ccb_size)
 {
 	return periph_read_write(handle, vecs, pos, num_blocks, block_size,
-				bytes_transferred, preferred_ccb_size, false);
+		bytes_transferred, preferred_ccb_size, false);
 }
 
 
 status_t
 periph_write(scsi_periph_handle_info *handle, const phys_vecs *vecs, off_t pos,
-	size_t num_blocks, uint32 block_size, size_t *bytes_transferred, int preferred_ccb_size)
+	size_t num_blocks, uint32 block_size, size_t *bytes_transferred,
+	int preferred_ccb_size)
 {
 	return periph_read_write(handle, vecs, pos, num_blocks, block_size,
-				bytes_transferred, preferred_ccb_size, true);
+		bytes_transferred, preferred_ccb_size, true);
 }
 
 
-/** universal read/write function */
-
+/*! Universal read/write function */
 static int
 periph_read_write(scsi_periph_handle_info *handle, const phys_vecs *vecs,
-	off_t pos64, size_t num_blocks, uint32 block_size, size_t *bytes_transferred, 
-	int preferred_ccb_size, bool write)
+	off_t pos64, size_t num_blocks, uint32 block_size,
+	size_t *bytes_transferred, int preferred_ccb_size, bool write)
 {
 	scsi_periph_device_info *device = handle->device;
 	scsi_ccb *request;
@@ -90,8 +89,8 @@ periph_read_write(scsi_periph_handle_info *handle, const phys_vecs *vecs,
 
 		request->data = NULL;
 		request->sg_list = vecs->vec;
-		request->data_len = num_bytes;
-		request->sg_cnt = vecs->num;
+		request->data_length = num_bytes;
+		request->sg_count = vecs->num;
 		request->sort = pos;
 		request->timeout = device->std_timeout;
 		// see whether daemon instructed us to post an ordered command;
@@ -108,12 +107,12 @@ periph_read_write(scsi_periph_handle_info *handle, const phys_vecs *vecs,
 
 			memset(cmd, 0, sizeof(*cmd));
 			cmd->opcode = write ? SCSI_OP_WRITE_6 : SCSI_OP_READ_6;
-			cmd->high_LBA = (pos >> 16) & 0x1f;
-			cmd->mid_LBA = (pos >> 8) & 0xff;
-			cmd->low_LBA = pos & 0xff;
+			cmd->high_lba = (pos >> 16) & 0x1f;
+			cmd->mid_lba = (pos >> 8) & 0xff;
+			cmd->low_lba = pos & 0xff;
 			cmd->length = num_blocks;
 
-			request->cdb_len = sizeof(*cmd);
+			request->cdb_length = sizeof(*cmd);
 		} else {
 			scsi_cmd_rw_10 *cmd = (scsi_cmd_rw_10 *)request->cdb;
 
@@ -121,19 +120,13 @@ periph_read_write(scsi_periph_handle_info *handle, const phys_vecs *vecs,
 
 			memset(cmd, 0, sizeof(*cmd));
 			cmd->opcode = write ? SCSI_OP_WRITE_10 : SCSI_OP_READ_10;
-			cmd->RelAdr = 0;
-			cmd->FUA = 0;
-			cmd->DPO = 0;
+			cmd->relative_address = 0;
+			cmd->force_unit_access = 0;
+			cmd->disable_page_out = 0;
+			cmd->lba = B_HOST_TO_BENDIAN_INT32(pos);
+			cmd->length = B_HOST_TO_BENDIAN_INT16(num_blocks);
 
-			cmd->top_LBA = (pos >> 24) & 0xff;
-			cmd->high_LBA = (pos >> 16) & 0xff;
-			cmd->mid_LBA = (pos >> 8) & 0xff;
-			cmd->low_LBA = pos & 0xff;
-
-			cmd->high_length = (num_blocks >> 8) & 0xff;
-			cmd->low_length = num_blocks & 0xff;
-
-			request->cdb_len = sizeof(*cmd);
+			request->cdb_length = sizeof(*cmd);
 		}
 
 		// last chance to detect errors that occured during concurrent accesses
@@ -242,12 +235,12 @@ raw_command(scsi_periph_device_info *device, raw_device_command *cmd)
 
 	request->data = cmd->data;
 	request->sg_list = NULL;
-	request->data_len = cmd->data_length;
+	request->data_length = cmd->data_length;
 	request->sort = -1;
 	request->timeout = cmd->timeout;
 
 	memcpy(request->cdb, cmd->command, SCSI_MAX_CDB_SIZE);
-	request->cdb_len = cmd->command_length;
+	request->cdb_length = cmd->command_length;
 
 	device->scsi->sync_io(request);
 

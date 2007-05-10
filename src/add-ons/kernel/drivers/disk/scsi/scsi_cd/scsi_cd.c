@@ -1,18 +1,20 @@
 /*
- * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
+ * Copyright 2002-2003, Thomas Kurschel. All rights reserved.
+ *
  * Distributed under the terms of the MIT License.
  */
 
-/*
-	Part of Open SCSI CD-ROM driver
+//!	Main file.
 
-	Main file.
-*/
 
 #include "scsi_cd_int.h"
-#include <string.h>
+
 #include <scsi.h>
-#include <malloc.h>
+
+#include <stdlib.h>
+#include <string.h>
+
 
 extern block_device_interface cd_interface;
 
@@ -116,7 +118,7 @@ get_toc(cd_device_info *device, scsi_toc *toc)
 	scsi_ccb *ccb;
 	status_t res;
 	scsi_cmd_read_toc *cmd;
-	size_t data_len;
+	size_t dataLength;
 	scsi_toc_general *short_response = (scsi_toc_general *)toc->toc_data;
 
 	SHOW_FLOW0(0, "");
@@ -132,20 +134,19 @@ get_toc(cd_device_info *device, scsi_toc *toc)
 
 	memset(cmd, 0, sizeof(*cmd));
 	cmd->opcode = SCSI_OP_READ_TOC;
-	cmd->TIME = 1;
+	cmd->time = 1;
 	cmd->format = SCSI_TOC_FORMAT_TOC;
 	cmd->track = 1;
-	cmd->high_allocation_length = 0;
-	cmd->low_allocation_length = sizeof(scsi_toc_general);
+	cmd->allocation_length = B_HOST_TO_BENDIAN_INT16(sizeof(scsi_toc_general));
 
-	ccb->cdb_len = sizeof(*cmd);
+	ccb->cdb_length = sizeof(*cmd);
 
 	ccb->sort = -1;
 	ccb->timeout = SCSI_CD_STD_TIMEOUT;
 
 	ccb->data = toc->toc_data;
 	ccb->sg_list = NULL;
-	ccb->data_len = sizeof(toc->toc_data);
+	ccb->data_length = sizeof(toc->toc_data);
 
 	res = scsi_periph->safe_exec(device->scsi_periph_device, ccb);
 	if (res != B_OK)
@@ -158,14 +159,13 @@ get_toc(cd_device_info *device, scsi_toc *toc)
 	//  but scsi_toc_toc has already one track, so we get 
 	//  last - first extra tracks; finally, we want the lead-out as
 	//  well, so we add an extra track)
-	data_len = (short_response->last - short_response->first + 1) 
+	dataLength = (short_response->last - short_response->first + 1) 
 		* sizeof(scsi_toc_track) + sizeof(scsi_toc_toc);
-	data_len = min(data_len, sizeof(toc->toc_data));
+	dataLength = min(dataLength, sizeof(toc->toc_data));
 
-	SHOW_FLOW(0, "data_len: %d", (int)data_len);
+	SHOW_FLOW(0, "data_length: %d", (int)dataLength);
 
-	cmd->high_allocation_length = data_len >> 8;
-	cmd->low_allocation_length = data_len & 0xff;
+	cmd->allocation_length = B_HOST_TO_BENDIAN_INT16(dataLength);
 
 	res = scsi_periph->safe_exec(device->scsi_periph_device, ccb);
 
@@ -204,12 +204,11 @@ get_position(cd_device_info *device, scsi_position *position)
 
 	memset(&cmd, 0, sizeof(cmd));
 	cmd.opcode = SCSI_OP_READ_SUB_CHANNEL;
-	cmd.TIME = 1;
-	cmd.SUBQ = 1;
+	cmd.time = 1;
+	cmd.subq = 1;
 	cmd.parameter_list = scsi_sub_channel_parameter_list_cd_pos;
 	cmd.track = 0;
-	cmd.high_allocation_length = sizeof(*position) >> 8;
-	cmd.low_allocation_length = sizeof(*position) & 0xff;
+	cmd.allocation_length = B_HOST_TO_BENDIAN_INT16(sizeof(scsi_position));
 
 	return scsi_periph->simple_exec(device->scsi_periph_device,
 		&cmd, sizeof(cmd), position, sizeof(*position), SCSI_DIR_IN);
@@ -232,7 +231,7 @@ get_set_volume(cd_device_info *device, scsi_volume *volume, bool set)
 	memset(&cmd, 0, sizeof(cmd));
 	cmd.opcode = SCSI_OP_MODE_SENSE_6;
 	cmd.page_code = SCSI_MODEPAGE_AUDIO;
-	cmd.PC = SCSI_MODE_SENSE_PC_CURRENT;
+	cmd.page_control = SCSI_MODE_SENSE_PC_CURRENT;
 	cmd.allocation_length = sizeof(header);
 
 	memset(&header, -2, sizeof(header));
@@ -242,12 +241,12 @@ get_set_volume(cd_device_info *device, scsi_volume *volume, bool set)
 	if (res != B_OK)
 		return res;
 
-	SHOW_FLOW(0, "block_desc_len=%d", header.block_desc_len);
+	SHOW_FLOW(0, "block_desc_len=%d", header.block_desc_length);
 	// ToDo: why this??
 	return B_ERROR;
 
 	// retrieve param header, block descriptor and actual codepage
-	len = sizeof(header) + header.block_desc_len
+	len = sizeof(header) + header.block_desc_length
 		+ sizeof(scsi_modepage_audio);
 
 	buffer = malloc(len);
@@ -266,11 +265,12 @@ get_set_volume(cd_device_info *device, scsi_volume *volume, bool set)
 	}
 
 	SHOW_FLOW(3, "mode_data_len=%d, block_desc_len=%d", 
-		((scsi_mode_param_header_6 *)buffer)->mode_data_len,
-		((scsi_mode_param_header_6 *)buffer)->block_desc_len);
+		((scsi_mode_param_header_6 *)buffer)->mode_data_length,
+		((scsi_mode_param_header_6 *)buffer)->block_desc_length);
 
 	// find control page and retrieve values
-	page = (scsi_modepage_audio *)((char *)buffer + sizeof(header) + header.block_desc_len);
+	page = (scsi_modepage_audio *)((char *)buffer + sizeof(header)
+		+ header.block_desc_length);
 
 	SHOW_FLOW(0, "page=%p, codepage=%d", page, page->header.page_code);
 
@@ -312,8 +312,8 @@ get_set_volume(cd_device_info *device, scsi_volume *volume, bool set)
 
 		memset(&cmd, 0, sizeof(cmd));
 		cmd.opcode = SCSI_OP_MODE_SELECT_6;
-		cmd.PF = 1;
-		cmd.param_list_length = sizeof(header) + header.block_desc_len 
+		cmd.pf = 1;
+		cmd.param_list_length = sizeof(header) + header.block_desc_length
 			+ sizeof(*page);
 
 		res = scsi_periph->simple_exec(device->scsi_periph_device, 
@@ -351,8 +351,7 @@ play_msf(cd_device_info *device, scsi_play_position *buf)
 }
 
 
-/** play audio cd; time is in track/index */
-
+/*! Play audio cd; time is in track/index */
 static status_t
 play_track_index(cd_device_info *device, scsi_play_track *buf)
 {
@@ -468,7 +467,7 @@ scan(cd_device_info *device, scsi_scan *buf)
 	memset(&cmd, 0, sizeof(cmd));
 
 	cmd.opcode = SCSI_OP_SCAN;
-	cmd.Direct = buf->direction < 0;
+	cmd.direct = buf->direction < 0;
 	cmd.start.time = cd_pos->absolute_address.time;
 	cmd.type = scsi_scan_msf;
 
@@ -501,33 +500,28 @@ read_cd(cd_device_info *device, scsi_read_cd *read_cd)
 		return B_NO_MEMORY;
 
 	cmd = (scsi_cmd_read_cd *)ccb->cdb;		
-	memset( cmd, 0, sizeof( *cmd ));
+	memset(cmd, 0, sizeof(*cmd));
 	cmd->opcode = SCSI_OP_READ_CD;
 	cmd->sector_type = 1;
 
 	// skip first two seconds, they are lead-in
 	lba = (read_cd->start_m * 60 + read_cd->start_s) * 75 + read_cd->start_f
 		- 2 * 75;
-
-	cmd->lba.top = (lba >> 24) & 0xff;
-	cmd->lba.high = (lba >> 16) & 0xff;
-	cmd->lba.mid = (lba >> 8) & 0xff;
-	cmd->lba.low = lba & 0xff;
-
 	length = (read_cd->length_m * 60 + read_cd->length_s) * 75 + read_cd->length_f;
 
+	cmd->lba = B_HOST_TO_BENDIAN_INT32(lba);
 	cmd->high_length = (length >> 16) & 0xff;
 	cmd->mid_length = (length >> 8) & 0xff;
 	cmd->low_length = length & 0xff;
 
 	cmd->error_field = scsi_read_cd_error_none;
-	cmd->EDC_ECC = 0;
+	cmd->edc_ecc = 0;
 	cmd->user_data = 1;
 	cmd->header_code = scsi_read_cd_header_none;
-	cmd->SYNC = 0;
+	cmd->sync = 0;
 	cmd->sub_channel_selection = scsi_read_cd_sub_channel_none;
 
-	ccb->cdb_len = sizeof(*cmd);
+	ccb->cdb_length = sizeof(*cmd);
 
 	ccb->flags = SCSI_DIR_IN | SCSI_DIS_DISCONNECT;
 	ccb->sort = lba;
@@ -536,7 +530,7 @@ read_cd(cd_device_info *device, scsi_read_cd *read_cd)
 
 	ccb->data = read_cd->buffer;
 	ccb->sg_list = NULL;
-	ccb->data_len = read_cd->buffer_length;
+	ccb->data_length = read_cd->buffer_length;
 
 	res = scsi_periph->safe_exec(device->scsi_periph_device, ccb);
 

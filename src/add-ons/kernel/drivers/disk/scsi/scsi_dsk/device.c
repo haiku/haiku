@@ -1,18 +1,17 @@
 /*
- * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
+ * Copyright 2002-2004, Thomas Kurschel. All rights reserved.
+ *
  * Distributed under the terms of the MIT License.
  */
 
-/*
-	Part of Open SCSI Disk Driver
-
-	Device management.
-*/
+//!	Device management.
 
 
 #include "scsi_dsk_int.h"
 
 #include <pnp_devfs.h>
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -138,7 +137,7 @@ das_device_added(device_node_handle node)
 			{ B_DRIVER_MODULE, B_STRING_TYPE, { string: SCSI_DSK_MODULE_NAME }},
 			{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: B_BLOCK_IO_MODULE_NAME }},
 			// tell block_io whether the device is removable
-			{ "removable", B_UINT8_TYPE, { ui8: device_inquiry->RMB }},
+			{ "removable", B_UINT8_TYPE, { ui8: device_inquiry->removable_medium }},
 			// tell which name we want to have in devfs
 			{ PNP_DEVFS_FILENAME, B_STRING_TYPE, { string: name }},
 			// impose own max block restriction

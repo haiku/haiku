@@ -1,11 +1,13 @@
 /*
+ * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ *
  * Distributed under the terms of the MIT License.
  */
+#ifndef _SCSI_PERIPH_H
+#define _SCSI_PERIPH_H
 
 /*
-	Part of Open SCSI Peripheral Driver
-
 	Use this module to minimize work required to write a SCSI 
 	peripheral driver.
 	
@@ -15,8 +17,6 @@
 	- detection of medium capacity 
 */
 
-#ifndef __SCSI_PERIPH_H__
-#define __SCSI_PERIPH_H__
 
 #include <bus/SCSI.h>
 #include <block_io.h>
@@ -161,4 +161,4 @@ typedef struct scsi_periph_interface {
 
 #define SCSI_PERIPH_MODULE_NAME "generic/scsi_periph/v1"
 
-#endif
+#endif	/* _SCSI_PERIPH_H */

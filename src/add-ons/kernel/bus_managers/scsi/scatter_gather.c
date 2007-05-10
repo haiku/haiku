@@ -1,12 +1,11 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
+ * Copyright 2002-2003, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
-
-/*
-	Part of Open SCSI bus manager
-
+/*!
 	Creates temporary Scatter/Gather table if the peripheral
 	driver has provided a simple pointer only.
 */
@@ -17,7 +16,8 @@
 #include <string.h>
 #include <iovec.h>
 
-locked_pool_cookie temp_sg_pool;
+
+static locked_pool_cookie temp_sg_pool;
 
 
 static bool
@@ -30,14 +30,14 @@ fill_temp_sg(scsi_ccb *ccb)
 	uint32 max_sg_blocks = min(bus->dma_params.max_sg_blocks, MAX_TEMP_SG_FRAGMENTS);
 	iovec vec = {
 		ccb->data,
-		ccb->data_len
+		ccb->data_length
 	};
 	size_t num_entries;
 	size_t mapped_len;
 	uint32 cur_idx;
 	physical_entry *temp_sg = (physical_entry *)ccb->sg_list;
 
-	res = get_iovec_memory_map(&vec, 1, 0, ccb->data_len, temp_sg, max_sg_blocks,
+	res = get_iovec_memory_map(&vec, 1, 0, ccb->data_length, temp_sg, max_sg_blocks,
 				&num_entries, &mapped_len);
 
 	if (res != B_OK) {
@@ -45,10 +45,10 @@ fill_temp_sg(scsi_ccb *ccb)
 		return false;
 	}
 
-	if (mapped_len != ccb->data_len)
+	if (mapped_len != ccb->data_length)
 		goto too_complex;
 
-	if (dma_boundary != ~0UL || ccb->data_len > max_sg_block_size) {
+	if (dma_boundary != ~0UL || ccb->data_length > max_sg_block_size) {
 		// S/G list may not be controller-compatible:
 		// we have to split offending entries		
 		SHOW_FLOW(3, "Checking violation of dma boundary 0x%x and entry size 0x%x", 
@@ -82,7 +82,7 @@ fill_temp_sg(scsi_ccb *ccb)
 		}
 	}
 
-	ccb->sg_cnt = num_entries;
+	ccb->sg_count = num_entries;
 
 	return true;	
 
@@ -102,7 +102,7 @@ create_temp_sg(scsi_ccb *ccb)
 	physical_entry *temp_sg;
 	status_t res;
 
-	SHOW_FLOW(3, "ccb=%p, data=%p, data_len=%lu", ccb, ccb->data, ccb->data_len);
+	SHOW_FLOW(3, "ccb=%p, data=%p, data_length=%lu", ccb, ccb->data, ccb->data_length);
 
 	ccb->sg_list = temp_sg = locked_pool->alloc(temp_sg_pool);
 	if (temp_sg == NULL) {
@@ -110,7 +110,7 @@ create_temp_sg(scsi_ccb *ccb)
 		return false;
 	}
 
-	res = lock_memory(ccb->data, ccb->data_len, B_DMA_IO
+	res = lock_memory(ccb->data, ccb->data_length, B_DMA_IO
 		| ((ccb->flags & SCSI_DIR_MASK) == SCSI_DIR_IN ? B_READ_DEVICE : 0));
 
 	if (res != B_OK) {
@@ -122,7 +122,7 @@ create_temp_sg(scsi_ccb *ccb)
 		// this is the success path
 		return true;
 
-	unlock_memory(ccb->data, ccb->data_len, B_DMA_IO
+	unlock_memory(ccb->data, ccb->data_length, B_DMA_IO
 		| ((ccb->flags & SCSI_DIR_MASK) == SCSI_DIR_IN ? B_READ_DEVICE : 0));
 
 err:
@@ -147,11 +147,11 @@ cleanup_tmp_sg(scsi_ccb *ccb)
 {
 	status_t res;
 
-	SHOW_FLOW( 3, "ccb=%p, data=%p, data_len=%d", 
-		ccb, ccb->data, (int)ccb->data_len );
+	SHOW_FLOW(3, "ccb=%p, data=%p, data_length=%d", 
+		ccb, ccb->data, (int)ccb->data_length);
 
-	res = unlock_memory( ccb->data, ccb->data_len, B_DMA_IO | 
-		((ccb->flags & SCSI_DIR_MASK) == SCSI_DIR_IN ? B_READ_DEVICE : 0));
+	res = unlock_memory(ccb->data, ccb->data_length, B_DMA_IO
+		|  ((ccb->flags & SCSI_DIR_MASK) == SCSI_DIR_IN ? B_READ_DEVICE : 0));
 
 	if (res != B_OK) {
 		SHOW_FLOW0(3, "Cannot unlock previously locked memory!");

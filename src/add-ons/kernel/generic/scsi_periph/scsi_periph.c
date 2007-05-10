@@ -1,13 +1,12 @@
 /*
- * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
+ * Copyright 2002-2003, Thomas Kurschel. All rights reserved.
+ *
  * Distributed under the terms of the MIT License.
  */
 
-/*
-	Part of Open SCSI Peripheral Driver
+//!	Main file.
 
-	Main file.
-*/
 
 #include "scsi_periph_int.h"
 
@@ -20,8 +19,8 @@ device_manager_info *pnp;
 
 
 status_t
-periph_simple_exec(scsi_periph_device_info *device, void *cdb, uchar cdb_len,
-	void *data, size_t data_len, int ccb_flags)
+periph_simple_exec(scsi_periph_device_info *device, void *cdb, uchar cdbLength,
+	void *data, size_t dataLength, int ccb_flags)
 {
 	scsi_ccb *ccb;
 	status_t res;
@@ -34,15 +33,15 @@ periph_simple_exec(scsi_periph_device_info *device, void *cdb, uchar cdb_len,
 
 	ccb->flags = ccb_flags;
 
-	memcpy(ccb->cdb, cdb, cdb_len);
-	ccb->cdb_len = cdb_len;
+	memcpy(ccb->cdb, cdb, cdbLength);
+	ccb->cdb_length = cdbLength;
 
 	ccb->sort = -1;
 	ccb->timeout = device->std_timeout;
 
 	ccb->data = data;
 	ccb->sg_list = NULL;
-	ccb->data_len = data_len;
+	ccb->data_length = dataLength;
 
 	res = periph_safe_exec(device, ccb);
 
@@ -63,7 +62,6 @@ periph_safe_exec(scsi_periph_device_info *device, scsi_ccb *request)
 
 		// ask generic peripheral layer what to do now	
 		res = periph_check_error(device, request);
-
 		if (res.action == err_act_start) {
 			// backup request, as we need it temporarily for sending "start"
 			// (we cannot allocate a new cdb as there may be no more cdb and
@@ -76,18 +74,18 @@ periph_safe_exec(scsi_periph_device_info *device, scsi_ccb *request)
 			bigtime_t backup_timeout;
 			uchar *backup_data;
 			const physical_entry *backup_sg_list;
-			uint16 backup_sg_cnt;
+			uint16 backup_sg_count;
 			uint32 backup_data_len;
 
 			backup_flags = request->flags;
 			memcpy(backup_cdb, request->cdb, SCSI_MAX_CDB_SIZE);
-			backup_cdb_len = request->cdb_len;
+			backup_cdb_len = request->cdb_length;
 			backup_sort = request->sort;
 			backup_timeout = request->timeout;
 			backup_data = request->data;
 			backup_sg_list = request->sg_list;
-			backup_sg_cnt = request->sg_cnt;
-			backup_data_len = request->data_len;
+			backup_sg_count = request->sg_count;
+			backup_data_len = request->data_length;
 
 			SHOW_INFO0( 2, "Sending start to init LUN" );
 
@@ -95,13 +93,13 @@ periph_safe_exec(scsi_periph_device_info *device, scsi_ccb *request)
 
 			request->flags = backup_flags;
 			memcpy(request->cdb, backup_cdb, SCSI_MAX_CDB_SIZE);
-			request->cdb_len = backup_cdb_len;
+			request->cdb_length = backup_cdb_len;
 			request->sort = backup_sort;
 			request->timeout = backup_timeout;
 			request->data = backup_data;
 			request->sg_list = backup_sg_list;
-			request->sg_cnt = backup_sg_cnt;
-			request->data_len = backup_data_len;
+			request->sg_count = backup_sg_count;
+			request->data_length = backup_data_len;
 
 			if (res.action == err_act_ok)
 				res.action = err_act_retry;

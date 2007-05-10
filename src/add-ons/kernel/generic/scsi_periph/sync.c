@@ -3,19 +3,20 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *              Bruno Albuquerque, bga@bug-br.org.br
+ *		Bruno Albuquerque, bga@bug-br.org.br
  *
  * Copyright 2004-2006 yellowTAB GMbH. This file is
  * based on work I did for ZETA while employed by
  * yellowTAB and is used under permission.
- *  
- */    
+ */
+
 
 #include "scsi_periph_int.h"
 
 #include <bus/scsi/scsi_cmds.h>
 
 #include <string.h>
+
 
 err_res
 periph_synchronize_cache(scsi_periph_device_info *device, scsi_ccb *request)
@@ -26,20 +27,19 @@ periph_synchronize_cache(scsi_periph_device_info *device, scsi_ccb *request)
 	
 	request->data = NULL;
 	request->sg_list = NULL;
-	request->data_len = 0;
+	request->data_length = 0;
 	request->timeout = device->std_timeout;
 	request->sort = -1;
 	
 	memset(cmd, 0, sizeof(*cmd));
 	
 	cmd->opcode	= SCSI_OP_SYNCHRONIZE_CACHE;
-	cmd->immed = 0;
+	cmd->immediately = 0;
 	
-	// TODO(bga): Maybe we will actually want to set those one day...
-	cmd->nblocks_high = 0;
-	cmd->nblocks_low = 0;
+	// TODO: Maybe we will actually want to set this one day...
+	cmd->block_count = 0;
 	
-	request->cdb_len = sizeof(*cmd);
+	request->cdb_length = sizeof(*cmd);
 	
 	device->scsi->sync_io(request);
 

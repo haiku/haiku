@@ -1,13 +1,12 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
-/*
-	Part of Open IDE bus manager
+//!	DMA helper functions
 
-	DMA helper functions
-*/
 
 #include "ide_internal.h"
 
@@ -65,10 +64,9 @@ configure_dma(ide_device_info *device)
 }
 
 
-/**	abort DMA transmission
- *	must be called _before_ start_dma_wait
- */
-
+/*!	Abort DMA transmission
+	must be called _before_ start_dma_wait
+*/
 void
 abort_dma(ide_device_info *device, ide_qrequest *qrequest)
 {
@@ -80,11 +78,10 @@ abort_dma(ide_device_info *device, ide_qrequest *qrequest)
 }
 
 
-/**	prepare DMA transmission
- *	on return, DMA engine waits for device to transmit data
- *	warning: doesn't set sense data on error
- */
-
+/*!	Prepare DMA transmission
+	on return, DMA engine waits for device to transmit data
+	warning: doesn't set sense data on error
+*/
 bool
 prepare_dma(ide_device_info *device, ide_qrequest *qrequest)
 {
@@ -93,8 +90,7 @@ prepare_dma(ide_device_info *device, ide_qrequest *qrequest)
 	status_t res;
 
 	res = bus->controller->prepare_dma(bus->channel_cookie, request->sg_list,
-				request->sg_cnt, qrequest->is_write);
-
+		request->sg_count, qrequest->is_write);
 	if (res != B_OK)
 		return false;
 
@@ -102,8 +98,7 @@ prepare_dma(ide_device_info *device, ide_qrequest *qrequest)
 }
 
 
-/** start waiting for DMA to be finished */
-
+/*! Start waiting for DMA to be finished */
 void
 start_dma_wait(ide_device_info *device, ide_qrequest *qrequest)
 {
@@ -116,8 +111,7 @@ start_dma_wait(ide_device_info *device, ide_qrequest *qrequest)
 }
 
 
-/** start waiting for DMA to be finished with bus lock not hold */
-
+/*! Start waiting for DMA to be finished with bus lock not hold */
 void
 start_dma_wait_no_lock(ide_device_info *device, ide_qrequest *qrequest)
 {
@@ -128,8 +122,7 @@ start_dma_wait_no_lock(ide_device_info *device, ide_qrequest *qrequest)
 }
 
 
-/** finish dma transmission after device has fired IRQ */
-
+/*! Finish dma transmission after device has fired IRQ */
 bool
 finish_dma(ide_device_info *device)
 {

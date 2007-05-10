@@ -1,13 +1,11 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
+ * Copyright 2002-2003, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
-/*
-	Part of Open SCSI Peripheral Driver
-
-	Handling of block device (currently, only a capacity check is provided)
-*/
+//!	Handling of block device (currently, only a capacity check is provided)
 
 
 #include "scsi_periph_int.h"
@@ -17,10 +15,10 @@
 status_t
 periph_check_capacity(scsi_periph_device_info *device, scsi_ccb *request)
 {
-	scsi_res_read_capacity capacity_res;
+	scsi_res_read_capacity capacityResult;
 	scsi_cmd_read_capacity *cmd = (scsi_cmd_read_capacity *)request->cdb;
 	uint64 capacity;
-	uint32 block_size;
+	uint32 blockSize;
 	status_t res;
 
 	SHOW_FLOW(3, "%p, %p", device, request);
@@ -32,9 +30,9 @@ periph_check_capacity(scsi_periph_device_info *device, scsi_ccb *request)
 
 	request->flags = SCSI_DIR_IN;
 
-	request->data = (char *)&capacity_res;
-	request->data_len = sizeof(capacity_res);
-	request->cdb_len = sizeof(scsi_cmd_read_capacity);
+	request->data = (char *)&capacityResult;
+	request->data_length = sizeof(capacityResult);
+	request->cdb_length = sizeof(scsi_cmd_read_capacity);
 	request->timeout = device->std_timeout;
 	request->sort = -1;
 	request->sg_list = NULL;
@@ -56,28 +54,22 @@ periph_check_capacity(scsi_periph_device_info *device, scsi_ccb *request)
 	ACQUIRE_BEN(&device->mutex);
 
 	if (res == B_OK && request->data_resid == 0) {
-		capacity = (capacity_res.top_LBA << 24)
-			| (capacity_res.high_LBA << 16)
-			| (capacity_res.mid_LBA << 8)
-			| capacity_res.low_LBA;
+		capacity = B_BENDIAN_TO_HOST_INT32(capacityResult.lba);
 
 		// the command returns the index of the _last_ block,
 		// i.e. the size is one larger
 		++capacity;
 
-		block_size = (capacity_res.top_block_size << 24)
-			| (capacity_res.high_block_size << 16)
-			| (capacity_res.mid_block_size << 8)
-			| capacity_res.low_block_size;
+		blockSize = B_BENDIAN_TO_HOST_INT32(capacityResult.block_size);
 	} else {
 		capacity = 0;
-		block_size = 0;
+		blockSize = 0;
 	}
 
-	SHOW_FLOW(3, "capacity = %Ld, block_size = %ld", capacity, block_size);
+	SHOW_FLOW(3, "capacity = %Ld, block_size = %ld", capacity, blockSize);
 
 	device->callbacks->set_capacity(device->periph_device, 
-		capacity, block_size);
+		capacity, blockSize);
 
 /*	device->byte2blk_shift = log2( device->block_size );
 	if( device->byte2blk_shift < 0 ) {

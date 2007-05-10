@@ -2,15 +2,10 @@
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef __SCSI_INTERNAL_H__
-#define __SCSI_INTERNAL_H__
+#ifndef _SCSI_INTERNAL_H
+#define _SCSI_INTERNAL_H
 
-/*
-	Part of Open SCSI bus manager
-
-	Internal structures/definitions
-*/
-
+//!	Internal structures/definitions
 
 
 #include <bus/SCSI.h>
@@ -146,18 +141,18 @@ typedef struct dma_buffer {
 	uint32 size;			// size of DMA buffer
 	area_id sg_list_area;	// area of S/G list
 	physical_entry *sg_list;	// address of S/G list
-	uint32 sg_cnt;			// number of entries in S/G list
+	uint32 sg_count;			// number of entries in S/G list
 	bool inuse;				// true, if in use
 	bigtime_t last_use;		// timestamp of last usage
 
 	area_id sg_orig;					// area of S/G list to original data
 	physical_entry *sg_list_orig;		// S/G list to original data
-	uint32 sg_cnt_max_orig;				// maximum size (in entries)
-	uint32 sg_cnt_orig;					// current size (in entries)
+	uint32 sg_count_max_orig;			// maximum size (in entries)
+	uint32 sg_count_orig;				// current size (in entries)
 
 	uchar *orig_data;					// pointer to original data
-	const physical_entry *orig_sg_list;		// original S/G list
-	uint32 orig_sg_cnt;					// size of original S/G list
+	const physical_entry *orig_sg_list;	// original S/G list
+	uint32 orig_sg_count;				// size of original S/G list
 } dma_buffer;
 
 
@@ -169,7 +164,7 @@ typedef struct scsi_device_info {
 	bool manual_autosense : 1;	// no autosense support
 	bool is_atapi : 1;			// ATAPI device - needs some commands emulated
 
-	int lock_count;	// sum of blocked[0..1] and sim_overflow
+	int lock_count;				// sum of blocked[0..1] and sim_overflow
 	int blocked[2];				// depth of nested locks by bus manager (0) and SIM (1)
 	int sim_overflow;			// 1, if SIM returned a request because of device queue overflow
 	int left_slots;				// left command queuing slots for device
@@ -209,7 +204,7 @@ typedef struct scsi_device_info {
 	// buffer used for emulating SCSI commands
 	char *buffer;
 	physical_entry *buffer_sg_list;
-	size_t buffer_sg_cnt;
+	size_t buffer_sg_count;
 	size_t buffer_size;	
 	area_id buffer_area;
 	sem_id buffer_sem;
@@ -253,89 +248,78 @@ extern struct pnp_devfs_driver_info scsi_bus_raw_module;
 
 
 
-// bus_mgr.c
-
-uchar scsi_inquiry_path( scsi_bus bus, scsi_path_inquiry *inquiry_data );
-
+// busses.c
+uchar scsi_inquiry_path(scsi_bus bus, scsi_path_inquiry *inquiry_data);
 
 
-// ccb_mgr.c
+// ccb.c
+scsi_ccb *scsi_alloc_ccb(scsi_device_info *device);
+void scsi_free_ccb(scsi_ccb *ccb);
 
-scsi_ccb *scsi_alloc_ccb( scsi_device_info *device );
-void scsi_free_ccb( scsi_ccb *ccb );
-
-status_t scsi_init_ccb_alloc( scsi_bus_info *bus );
-void scsi_uninit_ccb_alloc( scsi_bus_info *bus );
+status_t scsi_init_ccb_alloc(scsi_bus_info *bus);
+void scsi_uninit_ccb_alloc(scsi_bus_info *bus);
 
 
-// device_mgr.c
-
-status_t scsi_force_get_device( scsi_bus_info *bus, 
-	uchar target_id, uchar target_lun, scsi_device_info **res_device );
-void scsi_put_forced_device( scsi_device_info *device );
-status_t scsi_register_device( scsi_bus_info *bus, uchar target_id, 
-	uchar target_lun, scsi_res_inquiry *inquiry_data );
+// devices.c
+status_t scsi_force_get_device(scsi_bus_info *bus,
+	uchar target_id, uchar target_lun, scsi_device_info **res_device);
+void scsi_put_forced_device(scsi_device_info *device);
+status_t scsi_register_device(scsi_bus_info *bus, uchar target_id,
+	uchar target_lun, scsi_res_inquiry *inquiry_data);
 
 
 // device_scan.c
-
-status_t scsi_scan_bus( scsi_bus_info *bus );
-status_t scsi_scan_lun( scsi_bus_info *bus, uchar target_id, uchar target_lun );
+status_t scsi_scan_bus(scsi_bus_info *bus);
+status_t scsi_scan_lun(scsi_bus_info *bus, uchar target_id, uchar target_lun);
 
 
 // dpc.c
+status_t scsi_alloc_dpc(scsi_dpc_info **dpc);
+status_t scsi_free_dpc(scsi_dpc_info *dpc);
+bool scsi_check_exec_dpc(scsi_bus_info *bus);
 
-status_t scsi_alloc_dpc( scsi_dpc_info **dpc );
-status_t scsi_free_dpc( scsi_dpc_info *dpc );
-bool scsi_check_exec_dpc( scsi_bus_info *bus );
-
-status_t scsi_schedule_dpc( scsi_bus_info *bus, scsi_dpc_info *dpc, /*int flags,*/
-	void (*func)( void *arg ), void *arg );
+status_t scsi_schedule_dpc(scsi_bus_info *bus, scsi_dpc_info *dpc, /*int flags,*/
+	void (*func)( void *arg ), void *arg);
 
 
 // scsi_io.c
+void scsi_async_io(scsi_ccb *request);
+void scsi_sync_io(scsi_ccb *request);
+uchar scsi_term_io(scsi_ccb *ccb_to_terminate);
+uchar scsi_abort(scsi_ccb *ccb_to_abort);
 
-void scsi_async_io( scsi_ccb *request );
-void scsi_sync_io( scsi_ccb *request );
-uchar scsi_term_io( scsi_ccb *ccb_to_terminate );
-uchar scsi_abort( scsi_ccb *ccb_to_abort );
+bool scsi_check_exec_service(scsi_bus_info *bus);
 
-bool scsi_check_exec_service( scsi_bus_info *bus );
+void scsi_done_io(scsi_ccb *ccb);
 
-void scsi_done_io( scsi_ccb *ccb );
-
-void scsi_requeue_request( scsi_ccb *request, bool bus_overflow );
-void scsi_resubmit_request( scsi_ccb *request );
-void scsi_request_finished( scsi_ccb *request, uint num_requests );
+void scsi_requeue_request(scsi_ccb *request, bool bus_overflow);
+void scsi_resubmit_request(scsi_ccb *request);
+void scsi_request_finished(scsi_ccb *request, uint num_requests);
 
 
-// sg_mgr.c
+// scatter_gather.c
+bool create_temp_sg(scsi_ccb *ccb);
+void cleanup_tmp_sg(scsi_ccb *ccb);
 
-bool create_temp_sg( scsi_ccb *ccb );
-void cleanup_tmp_sg( scsi_ccb *ccb );
-
-int init_temp_sg( void );
-void uninit_temp_sg( void );
+int init_temp_sg(void);
+void uninit_temp_sg(void);
 
 
 // dma_buffer.c
-
-void scsi_dma_buffer_daemon( void *dev, int counter );
-void scsi_release_dma_buffer( scsi_ccb *request );
-bool scsi_get_dma_buffer( scsi_ccb *request );
-void scsi_dma_buffer_free( dma_buffer *buffer );
-void scsi_dma_buffer_init( dma_buffer *buffer );
+void scsi_dma_buffer_daemon(void *dev, int counter);
+void scsi_release_dma_buffer(scsi_ccb *request);
+bool scsi_get_dma_buffer(scsi_ccb *request);
+void scsi_dma_buffer_free(dma_buffer *buffer);
+void scsi_dma_buffer_init(dma_buffer *buffer);
 
 
 // queuing.c
 
 
-
 // emulation.c
+bool scsi_start_emulation(scsi_ccb *request);
+void scsi_finish_emulation(scsi_ccb *request);
+void scsi_free_emulation_buffer(scsi_device_info *device);
+status_t scsi_init_emulation_buffer(scsi_device_info *device, size_t buffer_size);
 
-bool scsi_start_emulation( scsi_ccb *request );
-void scsi_finish_emulation( scsi_ccb *request );
-void scsi_free_emulation_buffer( scsi_device_info *device );
-status_t scsi_init_emulation_buffer( scsi_device_info *device, size_t buffer_size );
-
-#endif
+#endif	/* _SCSI_INTERNAL_H */
