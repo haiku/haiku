@@ -1,0 +1,13 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems cdda ;
+
+UsePrivateHeaders [ FDirName kernel ] ;
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName storage ] ;
+
+KernelAddon cdda :
+	kernel_interface.cpp
+	;
+
+SimpleTest cdda_text :
+	cdda.cpp
+	: be ;
