@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -25,9 +25,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
-
-// ToDo: handles file names suboptimally - it has all file names
-//	in a singly linked list, no hash lookups or whatever.
+// TODO: pipefs entries aren't deleted automatically after usage yet!
 
 //#define TRACE_PIPEFS
 #ifdef TRACE_PIPEFS
@@ -108,7 +106,7 @@ class Volume {
 		void			Unlock();
 
 		Inode			*Lookup(vnode_id id);
-		Inode			*FindNode(const char *name);
+		Inode			*Lookup(const char *name);
 		Inode			*CreateNode(Inode *parent, const char *name, int32 type);
 		status_t		DeleteNode(Inode *inode, bool forceDelete = false);
 		status_t		RemoveNode(Inode *directory, const char *name);
@@ -132,6 +130,7 @@ class Volume {
 		Inode 			*fRootNode;
 		vnode_id		fNextNodeID;
 		hash_table		*fNodeHash;
+		hash_table		*fNameHash;
 
 		// root directory contents - we don't support other directories
 		Inode			*fFirstEntry;
@@ -182,6 +181,10 @@ class Inode {
 		status_t	Select(uint8 event, uint32 ref, selectsync *sync);
 		status_t	Deselect(uint8 event, selectsync *sync);
 
+		static int32 NameHashNextOffset();
+		static uint32 name_hash_func(void *_node, const void *_key, uint32 range);
+		static int name_compare_func(void *_node, const void *_key);
+
 		static int32 HashNextOffset();
 		static uint32 hash_func(void *_node, const void *_key, uint32 range);
 		static int compare_func(void *_node, const void *_key);
@@ -189,6 +192,7 @@ class Inode {
 	private:
 		Inode		*fNext;
 		Inode		*fHashNext;
+		Inode		*fNameHashNext;
 		vnode_id	fID;
 		int32		fType;
 		const char	*fName;
@@ -297,6 +301,7 @@ Volume::Volume(mount_id id)
 	fRootNode(NULL),
 	fNextNodeID(0),
 	fNodeHash(NULL),
+	fNameHash(NULL),
 	fFirstEntry(NULL),
 	fFirstDirCookie(NULL)
 {
@@ -306,6 +311,11 @@ Volume::Volume(mount_id id)
 	fNodeHash = hash_init(PIPEFS_HASH_SIZE, Inode::HashNextOffset(),
 		&Inode::compare_func, &Inode::hash_func);
 	if (fNodeHash == NULL)
+		return;
+
+	fNameHash = hash_init(PIPEFS_HASH_SIZE, Inode::NameHashNextOffset(),
+		&Inode::name_compare_func, &Inode::name_hash_func);
+	if (fNameHash == NULL)
 		return;
 
 	// create the root vnode
@@ -320,6 +330,9 @@ Volume::~Volume()
 	// put_vnode on the root to release the ref to it
 	if (fRootNode)
 		put_vnode(ID(), fRootNode->ID());
+
+	if (fNameHash != NULL)
+		hash_uninit(fNameHash);
 
 	if (fNodeHash != NULL) {
 		// delete all of the inodes
@@ -380,6 +393,7 @@ Volume::CreateNode(Inode *parent, const char *name, int32 type)
 		InsertNode(inode);
 
 	hash_insert(fNodeHash, inode);
+	hash_insert(fNameHash, inode);
 	publish_vnode(ID(), inode->ID(), inode);
 
 	if (fRootNode != NULL)
@@ -394,6 +408,7 @@ Volume::DeleteNode(Inode *inode, bool forceDelete)
 {
 	// remove it from the global hash table
 	hash_remove(fNodeHash, inode);
+	hash_remove(fNameHash, inode);
 
 	if (fRootNode != NULL)
 		fRootNode->SetModificationTime(time(NULL));
@@ -428,8 +443,7 @@ Volume::RemoveCookie(dir_cookie *cookie)
 }
 
 
-/* makes sure none of the dircookies point to the vnode passed in */
-
+/*! Makes sure none of the dircookies point to the vnode passed in */
 void
 Volume::UpdateDirCookies(Inode *inode)
 {
@@ -450,17 +464,13 @@ Volume::Lookup(vnode_id id)
 
 
 Inode *
-Volume::FindNode(const char *name)
+Volume::Lookup(const char *name)
 {
 	if (!strcmp(name, ".")
 		|| !strcmp(name, ".."))
 		return fRootNode;
 
-	for (Inode *inode = fFirstEntry; inode; inode = inode->Next()) {
-		if (!strcmp(inode->Name(), name))
-			return inode;
-	}
-	return NULL;
+	return (Inode *)hash_lookup(fNameHash, name);
 }
 
 
@@ -504,7 +514,7 @@ Volume::RemoveNode(Inode *directory, const char *name)
 
 	status_t status = B_OK;
 
-	Inode *inode = FindNode(name);
+	Inode *inode = Lookup(name);
 	if (inode == NULL)
 		status = B_ENTRY_NOT_FOUND;
 	else if (S_ISDIR(inode->Type()))
@@ -842,6 +852,40 @@ Inode::compare_func(void *_node, const void *_key)
 }
 
 
+int32
+Inode::NameHashNextOffset()
+{
+	Inode *inode;
+	return (addr_t)&inode->fNameHashNext - (addr_t)inode;
+}
+
+
+uint32
+Inode::name_hash_func(void *_node, const void *_key, uint32 range)
+{
+	Inode *inode = (Inode *)_node;
+	const char *key = (const char *)_key;
+
+	if (inode != NULL)
+		return hash_hash_string(inode->Name()) % range;
+
+	return hash_hash_string(key) % range;
+}
+
+
+int
+Inode::name_compare_func(void *_node, const void *_key)
+{
+	Inode *inode = (Inode *)_node;
+	const char *key = (const char *)_key;
+
+	if (!strcmp(inode->Name(), key))
+		return 0;
+
+	return -1;
+}
+
+
 status_t
 Inode::Select(uint8 event, uint32 ref, selectsync *sync)
 {
@@ -1053,7 +1097,7 @@ pipefs_lookup(fs_volume _volume, fs_vnode _dir, const char *name, vnode_id *_id,
 	volume->Lock();
 
 	// look it up
-	Inode *inode = volume->FindNode(name);
+	Inode *inode = volume->Lookup(name);
 	if (inode == NULL) {
 		status = B_ENTRY_NOT_FOUND;
 		goto err;
@@ -1171,7 +1215,7 @@ pipefs_create(fs_volume _volume, fs_vnode _dir, const char *name, int openMode, 
 	Inode *directory = (Inode *)_dir;
 	status_t status = B_OK;
 
-	Inode *inode = volume->FindNode(name);
+	Inode *inode = volume->Lookup(name);
 	if (inode != NULL && (openMode & O_EXCL) != 0) {
 		status = B_FILE_EXISTS;
 		goto err;
