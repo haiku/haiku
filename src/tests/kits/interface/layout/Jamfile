@@ -8,8 +8,15 @@ SimpleTest LayoutTest1 :
 	be
 ;
 
+SimpleTest WidgetLayoutTest :
+	WidgetLayoutTest.cpp
+	:
+	be
+;
+
 
 if $(TARGET_PLATFORM) = libbe_test {
-	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : LayoutTest1
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR)
+		: LayoutTest1 WidgetLayoutTest
 		: tests!apps ;
 }
