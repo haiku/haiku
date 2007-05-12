@@ -167,7 +167,7 @@ BCardLayout::LayoutView()
 {
 	_ValidateMinMax();
 
-	BSize size = BSize(View()->Bounds());
+	BSize size = View()->Bounds().Size();
 	size.width = max_c(size.width, fMin.width);
 	size.height = max_c(size.height, fMin.height);
 

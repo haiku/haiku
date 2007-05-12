@@ -11,6 +11,7 @@
 
 #include <SupportDefs.h>
 #include <Point.h>
+#include <Size.h>
 
 #include <math.h>
 
@@ -26,6 +27,7 @@ class BRect {
 		BRect(const BRect &r);
 		BRect(float l, float t, float r, float b);
 		BRect(BPoint lt, BPoint rb);
+		BRect(BPoint leftTop, BSize size);
 
 		BRect	&operator=(const BRect &r);
 		void	Set(float l, float t, float r, float b);
@@ -72,12 +74,14 @@ class BRect {
 		BRect	operator&(BRect r) const;
 		BRect	operator|(BRect r) const;
 
-		bool	Intersects(BRect r) const;
 		bool	IsValid() const;
 		float	Width() const;
 		int32	IntegerWidth() const;
 		float	Height() const;
 		int32	IntegerHeight() const;
+		BSize	Size() const;
+
+		bool	Intersects(BRect r) const;
 		bool	Contains(BPoint p) const;
 		bool	Contains(BRect r) const;
 };
@@ -151,6 +155,16 @@ BRect::BRect(BPoint leftTop, BPoint rightBottom)
 }
 
 
+inline
+BRect::BRect(BPoint leftTop, BSize size)
+	: left(leftTop.x),
+	  top(leftTop.y),
+	  right(leftTop.x + size.width),
+	  bottom(leftTop.y + size.height)
+{
+}
+
+
 inline BRect &
 BRect::operator=(const BRect& from)
 {
@@ -205,5 +219,12 @@ BRect::Height() const
 {
 	return bottom - top;
 }
+
+inline BSize
+BRect::Size() const
+{
+	return BSize(right - left, bottom - top);
+}
+
 
 #endif	// _RECT_H

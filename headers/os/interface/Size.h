@@ -7,7 +7,6 @@
 
 #include <limits.h>
 
-#include <Rect.h>
 #include <SupportDefs.h>
 
 
@@ -25,7 +24,6 @@ public:
 	inline						BSize();
 	inline						BSize(const BSize& other);
 	inline						BSize(float width, float height);
-	inline						BSize(const BRect& rect);
 
 	inline	float				Width() const;
 	inline	float				Height() const;
@@ -69,15 +67,6 @@ inline
 BSize::BSize(float width, float height)
 	: width(width),
 	  height(height)
-{
-}
-
-
-// constructor
-inline
-BSize::BSize(const BRect& rect)
-	: width(rect.Width()),
-	  height(rect.Height())
 {
 }
 

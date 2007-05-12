@@ -341,7 +341,7 @@ BTwoDimensionalLayout::LayoutView()
 	_ValidateMinMax();
 
 	// layout the horizontal/vertical elements
-	BSize size = SubtractInsets(BSize(View()->Frame()));
+	BSize size = SubtractInsets(View()->Frame().Size());
 printf("BTwoDimensionalLayout::LayoutView(%p): size: (%.1f, %.1f)\n",
 View(), size.width, size.height);
 

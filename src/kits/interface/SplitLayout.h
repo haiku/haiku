@@ -5,7 +5,10 @@
 #ifndef	_SPLIT_LAYOUT_H
 #define	_SPLIT_LAYOUT_H
 
+
 #include <Layout.h>
+#include <Point.h>
+
 
 namespace BPrivate {
 namespace Layout {

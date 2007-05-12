@@ -470,7 +470,7 @@ BSplitLayout::LayoutView()
 	_ValidateMinMax();
 
 	// layout the elements
-	BSize size = _SubtractInsets(BSize(View()->Bounds()));
+	BSize size = _SubtractInsets(View()->Bounds().Size());
 	fHorizontalLayouter->Layout(fHorizontalLayoutInfo, size.width);
 
 	Layouter* verticalLayouter;
@@ -562,7 +562,7 @@ BSplitLayout::StartDraggingSplitter(BPoint point)
 		return false;
 
 	// Things shouldn't be draggable, if we have a >= max layout.
-	BSize size = _SubtractInsets(BSize(View()->Frame()));
+	BSize size = _SubtractInsets(View()->Frame().Size());
 	if (fOrientation == B_HORIZONTAL && size.width >= fMax.width
 		|| fOrientation == B_VERTICAL && size.height >= fMax.height) {
 		return false;
@@ -757,7 +757,7 @@ BSplitLayout::_LayoutItem(BLayoutItem* item, BRect frame, bool visible)
 	info->max = item->MaxSize();
 
 	if (item->HasHeightForWidth()) {
-		BSize size = _SubtractInsets(BSize(View()->Frame()));
+		BSize size = _SubtractInsets(View()->Frame().Size());
 		float minHeight, maxHeight;
 		item->GetHeightForWidth(size.width, &minHeight, &maxHeight, NULL);
 		info->min.height = max_c(info->min.height, minHeight);
