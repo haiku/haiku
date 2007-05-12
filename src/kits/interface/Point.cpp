@@ -34,6 +34,13 @@ BPoint::PrintToStream() const
 
 
 BPoint
+BPoint::operator-() const
+{
+	return BPoint(-x, -y);
+}
+
+
+BPoint
 BPoint::operator+(const BPoint& p) const
 {
 	return BPoint(x + p.x, y + p.y);

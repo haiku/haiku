@@ -29,6 +29,7 @@ public:
 	void	ConstrainTo(BRect r);
 	void	PrintToStream() const;
 			
+	BPoint	operator-() const;
 	BPoint	operator+(const BPoint &p) const;
 	BPoint	operator-(const BPoint &p) const;
 	BPoint&	operator+=(const BPoint &p);
