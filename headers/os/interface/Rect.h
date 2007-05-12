@@ -1,28 +1,10 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Rect.h
-//	Author:			Frans van Nispen (xlr8@tref.nl)
-//	Description:	BRect represents a rectangular area.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Frans van Nispen
+ */
 #ifndef	_RECT_H
 #define	_RECT_H
 
@@ -109,11 +91,13 @@ BRect::LeftTop() const
 	return *(const BPoint *)&left;
 }
 
+
 inline BPoint
 BRect::RightBottom() const
 {
 	return *(const BPoint *)&right;
 }
+
 
 inline BPoint
 BRect::LeftBottom() const
@@ -121,11 +105,13 @@ BRect::LeftBottom() const
 	return BPoint(left, bottom);
 }
 
+
 inline BPoint
 BRect::RightTop() const
 {
 	return BPoint(right, top);
 }
+
 
 inline
 BRect::BRect()
@@ -133,6 +119,7 @@ BRect::BRect()
 	top = left = 0;
 	bottom = right = -1;
 }
+
 
 inline
 BRect::BRect(float l, float t, float r, float b)
@@ -143,6 +130,7 @@ BRect::BRect(float l, float t, float r, float b)
 	bottom = b;
 }
 
+
 inline
 BRect::BRect(const BRect &r)
 {
@@ -152,6 +140,7 @@ BRect::BRect(const BRect &r)
 	bottom = r.bottom;
 }
 
+
 inline
 BRect::BRect(BPoint leftTop, BPoint rightBottom)
 {
@@ -160,6 +149,7 @@ BRect::BRect(BPoint leftTop, BPoint rightBottom)
 	right = rightBottom.x;
 	bottom = rightBottom.y;
 }
+
 
 inline BRect &
 BRect::operator=(const BRect& from)
@@ -171,6 +161,7 @@ BRect::operator=(const BRect& from)
 	return *this;
 }
 
+
 inline void
 BRect::Set(float l, float t, float r, float b)
 {
@@ -180,11 +171,13 @@ BRect::Set(float l, float t, float r, float b)
 	bottom = b;
 }
 
+
 inline bool
 BRect::IsValid() const
 {
 	return left <= right && top <= bottom;
 }
+
 
 inline int32
 BRect::IntegerWidth() const
@@ -192,17 +185,20 @@ BRect::IntegerWidth() const
 	return (int32)ceil(right - left);
 }
 
+
 inline float
 BRect::Width() const
 {
 	return right - left;
 }
 
+
 inline int32
 BRect::IntegerHeight() const
 {
 	return (int32)ceil(bottom - top);
 }
+
 
 inline float
 BRect::Height() const
