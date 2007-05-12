@@ -21,7 +21,8 @@
 
 BButton::BButton(BRect frame, const char *name, const char *label, BMessage *message,
 				  uint32 resizingMode, uint32 flags)
-	:	BControl(frame, name, label, message, resizingMode, flags | B_WILL_DRAW),
+	:	BControl(frame, name, label, message, resizingMode,
+			flags | B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 		fDrawAsDefault(false)
 {
 	// Resize to minimum height if needed
@@ -36,7 +37,7 @@ BButton::BButton(BRect frame, const char *name, const char *label, BMessage *mes
 BButton::BButton(const char* name, const char* label, BMessage *message,
 				 uint32 flags)
 	:	BControl(BRect(0, 0, -1, -1), name, label, message, B_FOLLOW_NONE,
-			flags | B_WILL_DRAW | B_SUPPORTS_LAYOUT),
+			flags | B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_SUPPORTS_LAYOUT),
 		fDrawAsDefault(false)
 {
 	// Resize to minimum height if needed
@@ -50,7 +51,8 @@ BButton::BButton(const char* name, const char* label, BMessage *message,
 
 BButton::BButton(const char* label, BMessage *message)
 	:	BControl(BRect(0, 0, -1, -1), NULL, label, message, B_FOLLOW_NONE,
-			B_WILL_DRAW | B_NAVIGABLE | B_SUPPORTS_LAYOUT),
+			B_WILL_DRAW | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE
+			| B_SUPPORTS_LAYOUT),
 		fDrawAsDefault(false)
 {
 	// Resize to minimum height if needed

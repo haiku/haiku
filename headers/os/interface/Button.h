@@ -51,10 +51,12 @@ public:
 							const char *label,
 							BMessage *message,
 							uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-							uint32 flags = B_WILL_DRAW | B_NAVIGABLE); 
+							uint32 flags = B_WILL_DRAW | B_NAVIGABLE
+								| B_FULL_UPDATE_ON_RESIZE); 
 					BButton(const char* name, const char* label,
 							BMessage *message,
-							uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
+							uint32 flags = B_WILL_DRAW | B_NAVIGABLE
+								| B_FULL_UPDATE_ON_RESIZE);
 					BButton(const char* label, BMessage *message);
 	
 virtual				~BButton();
