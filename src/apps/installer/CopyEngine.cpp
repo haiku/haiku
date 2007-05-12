@@ -16,7 +16,7 @@
 #include <String.h>
 #include <VolumeRoster.h>
 
-#define COPY_TRACE
+//#define COPY_TRACE
 #ifdef COPY_TRACE
 #define CALLED() 			printf("CALLED %s\n",__PRETTY_FUNCTION__)
 #define ERR2(x, y...)			fprintf(stderr, "CopyEngine: "x" %s\n", y, strerror(err))
