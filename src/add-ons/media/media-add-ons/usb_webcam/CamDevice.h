@@ -64,6 +64,7 @@ class CamDevice
 	virtual bool		ValidateEndOfFrameTag(const uint8 *tag, size_t taglen, size_t datalen);
 
 	// several ways to get raw frames
+	virtual status_t	WaitFrame(bigtime_t timeout);
 	virtual status_t	GetFrameBitmap(BBitmap **bm);
 	virtual status_t	FillFrameBuffer(BBuffer *buffer);
 

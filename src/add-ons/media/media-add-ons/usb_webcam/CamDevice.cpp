@@ -233,6 +233,15 @@ CamDevice::ValidateEndOfFrameTag(const uint8 *tag, size_t taglen, size_t datalen
 
 // -----------------------------------------------------------------------------
 status_t
+CamDevice::WaitFrame(bigtime_t timeout)
+{
+	if (fDeframer)
+		return WaitFrame(timeout);
+	return EINVAL;
+}
+
+// -----------------------------------------------------------------------------
+status_t
 CamDevice::GetFrameBitmap(BBitmap **bm)
 {
 	return EINVAL;
