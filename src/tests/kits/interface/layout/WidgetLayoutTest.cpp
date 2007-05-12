@@ -26,13 +26,6 @@ enum {
 // missing operators in BPoint
 
 BPoint
-operator-(const BPoint& p)
-{
-	return BPoint(-p.x, -p.y);
-}
-
-
-BPoint
 operator+(const BPoint& p, const BSize& size)
 {
 	return BPoint(p.x + size.width, p.y + size.height);
@@ -100,7 +93,7 @@ public:
 
 	BSize Size() const
 	{
-		return BSize(Frame());
+		return Frame().Size();
 	}
 
 	BPoint LocationInContainer() const
@@ -798,8 +791,7 @@ public:
 		// wrapper view
 		fWrapperView = new WrapperView(BRect(10, 10, 100, 100),
 			new BButton(BRect(0, 0, 9, 9), "test button", "Ooh, press me!",
-				(BMessage*)NULL, B_FOLLOW_NONE,
-				B_WILL_DRAW | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE));
+				(BMessage*)NULL, B_FOLLOW_NONE));
 fWrapperView->GetView()->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 		view->AddChild(fWrapperView);
 		fWrapperView->SetSize(fWrapperView->PreferredSize());
@@ -973,7 +965,7 @@ private:
 		_UpdateSizeViews(fPreferredWidthView, fPreferredHeightView,
 			fWrapperView->GetView()->PreferredSize());
 		_UpdateSizeViews(fCurrentWidthView, fCurrentHeightView,
-			BRect(fWrapperView->GetView()->Frame()));
+			fWrapperView->GetView()->Frame().Size());
 	}
 
 private:
