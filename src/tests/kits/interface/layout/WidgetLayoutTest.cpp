@@ -3,6 +3,7 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+#include <math.h>
 #include <stdio.h>
 
 #include <Application.h>
@@ -11,6 +12,7 @@
 #include <LayoutUtils.h>
 #include <List.h>
 #include <Region.h>
+#include <String.h>
 #include <View.h>
 #include <Window.h>
 
@@ -394,16 +396,17 @@ public:
 
 	virtual void MouseDown(BPoint where)
 	{
-//printf("ViewContainer::MouseDown((%f, %f))\n", where.x, where.y);
 		// get mouse buttons and modifiers
 		uint32 buttons;
 		int32 modifiers;
 		_GetButtonsAndModifiers(buttons, modifiers);
 
 		// get mouse focus
-		if (!fMouseFocus && (buttons & B_PRIMARY_MOUSE_BUTTON))
+		if (!fMouseFocus && (buttons & B_PRIMARY_MOUSE_BUTTON)) {
 			fMouseFocus = AncestorAt(where);
-//printf("  mouse focus: %p (this: %p)\n", fMouseFocus, this);
+			if (fMouseFocus)
+				SetMouseEventMask(B_POINTER_EVENTS);
+		}
 
 		// call hook
 		if (fMouseFocus) {
@@ -414,7 +417,6 @@ public:
 
 	virtual void MouseUp(BPoint where)
 	{
-//printf("ViewContainer::MouseUp((%f, %f))\n", where.x, where.y);
 		if (!fMouseFocus)
 			return;
 
@@ -436,7 +438,6 @@ public:
 
 	virtual void MouseMoved(BPoint where, uint32 code, const BMessage* message)
 	{
-//printf("ViewContainer::MouseMoved((%f, %f))\n", where.x, where.y);
 		if (!fMouseFocus)
 			return;
 
@@ -676,6 +677,106 @@ private:
 };
 
 
+// StringView
+class StringView : public View {
+public:
+	StringView(BRect frame, const char* string)
+		: View(frame),
+		  fString(string),
+		  fAlignment(B_ALIGN_LEFT),
+		  fStringAscent(0),
+		  fStringDescent(0),
+		  fStringWidth(0)
+	{
+		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		fTextColor = (rgb_color){ 0, 0, 0, 255 };
+	}
+
+	void SetString(const char* string)
+	{
+		fString = string;
+
+		_UpdateStringMetrics();
+		Invalidate();
+	}
+
+	void SetAlignment(alignment align)
+	{
+		if (align != fAlignment) {
+			fAlignment = align;
+			Invalidate();
+		}
+	}
+
+	void SetTextColor(rgb_color color)
+	{
+		fTextColor = color;
+		Invalidate();
+	}
+
+	BSize PreferredSize() const
+	{
+		return BSize(fStringWidth - 1, fStringAscent + fStringDescent - 1);
+	}
+
+	virtual void AddedToContainer()
+	{
+		_UpdateStringMetrics();
+	}
+
+	virtual void Draw(BView* container, BRect updateRect)
+	{
+		BSize size(Size());
+		int widthDiff = (int)size.width + 1 - (int)fStringWidth;
+		int heightDiff = (int)size.height + 1
+			- (int)(fStringAscent + (int)fStringDescent);
+		BPoint base;
+
+		// horizontal alignment
+		switch (fAlignment) {
+			case B_ALIGN_RIGHT:
+				base.x = widthDiff;
+				break;
+			case B_ALIGN_LEFT:
+			default:
+				base.x = 0;
+				break;
+		}
+
+		base.y = heightDiff / 2 + fStringAscent;
+
+		container->SetHighColor(fTextColor);
+		container->DrawString(fString.String(), base);
+	}
+
+private:
+	void _UpdateStringMetrics()
+	{
+		BView* container = Container();
+		if (!container)
+			return;
+
+		BFont font;
+		container->GetFont(&font);
+
+		font_height fh;
+		font.GetHeight(&fh);
+
+		fStringAscent = ceilf(fh.ascent);
+		fStringDescent = ceilf(fh.descent);
+		fStringWidth = font.StringWidth(fString.String());
+	}
+
+private:
+	BString		fString;
+	alignment	fAlignment;
+	rgb_color	fTextColor;
+	float		fStringAscent;
+	float		fStringDescent;
+	float		fStringWidth;
+};
+
+
 // TestWindow
 class TestWindow : public BWindow {
 public:
@@ -685,12 +786,13 @@ public:
 			B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE | B_NOT_RESIZABLE
 			| B_NOT_ZOOMABLE)
 	{
-		ViewContainer* viewContainer = new ViewContainer(Bounds());
-		viewContainer->View::SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-		AddChild(viewContainer);
+		fViewContainer = new ViewContainer(Bounds());
+		fViewContainer->View::SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		AddChild(fViewContainer);
 
-		View* view = new View(BRect(10, 10, 400, 300));
-		viewContainer->View::AddChild(view);
+		BRect rect(10, 10, 400, 300);
+		View* view = new View(rect);
+		fViewContainer->View::AddChild(view);
 		view->SetViewColor((rgb_color){200, 200, 240, 255});
 
 		// wrapper view
@@ -709,6 +811,71 @@ fWrapperView->GetView()->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIM
 		view->AddChild(fSliderView);
 
 		_UpdateSliderConstraints();
+
+		// size labels
+
+		// min label
+		rect.top = rect.bottom + 10;
+		rect.bottom = rect.top + 10;
+		StringView* minLabel = new StringView(rect, "min:  ");
+		minLabel->SetAlignment(B_ALIGN_RIGHT);
+		fViewContainer->View::AddChild(minLabel);
+		minLabel->SetSize(minLabel->PreferredSize());
+		BRect minFrame(minLabel->Frame());
+
+		// max label
+		rect = minFrame.OffsetToCopy(minFrame.LeftBottom() + BPoint(0, 8));
+		StringView* maxLabel = new StringView(rect, "max:  ");
+		maxLabel->SetAlignment(B_ALIGN_RIGHT);
+		fViewContainer->View::AddChild(maxLabel);
+		maxLabel->SetSize(maxLabel->PreferredSize());
+		BRect maxFrame(maxLabel->Frame());
+
+		// preferred label
+		rect = maxFrame.OffsetToCopy(maxFrame.LeftBottom() + BPoint(0, 8));
+		StringView* preferredLabel = new StringView(rect, "preferred:  ");
+		preferredLabel->SetAlignment(B_ALIGN_RIGHT);
+		fViewContainer->View::AddChild(preferredLabel);
+		preferredLabel->SetSize(preferredLabel->PreferredSize());
+		BRect preferredFrame(preferredLabel->Frame());
+
+		// preferred label
+		rect = preferredFrame.OffsetToCopy(preferredFrame.LeftBottom()
+			+ BPoint(0, 8));
+		StringView* currentLabel = new StringView(rect, "current:  ");
+		currentLabel->SetAlignment(B_ALIGN_RIGHT);
+		fViewContainer->View::AddChild(currentLabel);
+		currentLabel->SetSize(currentLabel->PreferredSize());
+		BRect currentFrame(currentLabel->Frame());
+
+		float labelWidth = max_c(minFrame.Width(), maxFrame.Width());
+		labelWidth = max_c(labelWidth, preferredFrame.Width());
+		labelWidth = max_c(labelWidth, currentFrame.Width());
+		BSize labelSize(labelWidth, minLabel->Size().height);
+		minLabel->SetSize(labelSize);
+		maxLabel->SetSize(labelSize);
+		preferredLabel->SetSize(labelSize);
+		currentLabel->SetSize(labelSize);
+
+		// size views
+
+		// min
+		_CreateSizeViews(minFrame.LeftTop() + BPoint(labelWidth + 1, 0),
+			fMinWidthView, fMinHeightView);
+
+		// max
+		_CreateSizeViews(maxFrame.LeftTop() + BPoint(labelWidth + 1, 0),
+			fMaxWidthView, fMaxHeightView);
+
+		// preferred
+		_CreateSizeViews(preferredFrame.LeftTop() + BPoint(labelWidth + 1, 0),
+			fPreferredWidthView, fPreferredHeightView);
+
+		// current
+		_CreateSizeViews(currentFrame.LeftTop() + BPoint(labelWidth + 1, 0),
+			fCurrentWidthView, fCurrentHeightView);
+
+		_UpdateSizeViews();
 	}
 
 	virtual void MessageReceived(BMessage* message)
@@ -722,6 +889,7 @@ fWrapperView->GetView()->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIM
 				BSize size(sliderLocation.x - wrapperLocation.x - 1,
 					sliderLocation.y - wrapperLocation.y - 1);
 				fWrapperView->SetSize(size);
+				_UpdateSizeViews();
 				break;
 			}
 
@@ -753,9 +921,73 @@ private:
 		fSliderView->SetLocationRange(minSliderLocation, maxSliderLocation);
 	}
 
+	void _CreateSizeViews(BPoint location, StringView*& widthView,
+		StringView*& heightView)
+	{
+		// width view
+		BRect rect(location, location + BPoint(10, 10));
+		widthView = new StringView(rect, "9999999999.9");
+		widthView->SetAlignment(B_ALIGN_RIGHT);
+		fViewContainer->View::AddChild(widthView);
+		widthView->SetSize(widthView->PreferredSize());
+
+		// "," label
+		rect = widthView->Frame();
+		rect.OffsetTo(rect.RightTop() + BPoint(1, 0));
+		StringView* labelView = new StringView(rect, ",  ");
+		fViewContainer->View::AddChild(labelView);
+		labelView->SetSize(labelView->PreferredSize());
+
+		// height view
+		rect = labelView->Frame();
+		rect.OffsetTo(rect.RightTop() + BPoint(1, 0));
+		heightView = new StringView(rect, "9999999999.9");
+		heightView->SetAlignment(B_ALIGN_RIGHT);
+		fViewContainer->View::AddChild(heightView);
+		heightView->SetSize(heightView->PreferredSize());
+	}
+
+	void _UpdateSizeView(StringView* view, float size)
+	{
+		char buffer[32];
+		if (size < B_SIZE_UNLIMITED) {
+			sprintf(buffer, "%.1f", size);
+			view->SetString(buffer);
+		} else
+			view->SetString("unlimited");
+	}
+
+	void _UpdateSizeViews(StringView* widthView, StringView* heightView,
+		BSize size)
+	{
+		_UpdateSizeView(widthView, size.width);
+		_UpdateSizeView(heightView, size.height);
+	}
+
+	void _UpdateSizeViews()
+	{
+		_UpdateSizeViews(fMinWidthView, fMinHeightView,
+			fWrapperView->GetView()->MinSize());
+		_UpdateSizeViews(fMaxWidthView, fMaxHeightView,
+			fWrapperView->GetView()->MaxSize());
+		_UpdateSizeViews(fPreferredWidthView, fPreferredHeightView,
+			fWrapperView->GetView()->PreferredSize());
+		_UpdateSizeViews(fCurrentWidthView, fCurrentHeightView,
+			BRect(fWrapperView->GetView()->Frame()));
+	}
+
 private:
+	ViewContainer*				fViewContainer;
 	WrapperView*				fWrapperView;
 	TwoDimensionalSliderView*	fSliderView;
+	StringView*					fMinWidthView;
+	StringView*					fMinHeightView;
+	StringView*					fMaxWidthView;
+	StringView*					fMaxHeightView;
+	StringView*					fPreferredWidthView;
+	StringView*					fPreferredHeightView;
+	StringView*					fCurrentWidthView;
+	StringView*					fCurrentHeightView;
 };
 
 
