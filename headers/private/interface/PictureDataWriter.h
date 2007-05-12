@@ -64,11 +64,11 @@ public:
 	
 
 protected:
-	status_t WriteData(const void *data, size_t size);
-	template <typename T> status_t Write(const T &data) { return WriteData(&data, sizeof(data)); }
-
-	status_t BeginOp(const int16 &op);
-	status_t EndOp();	
+	// throw a status_t on error
+	void BeginOp(const int16 &op);
+	void EndOp();
+	void WriteData(const void *data, size_t size);
+	template <typename T> void Write(const T &data) { WriteData(&data, sizeof(data)); }
 	
 private:
 	BPositionIO *fData;
