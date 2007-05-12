@@ -9,6 +9,6 @@
 #endif
 
 #define CH "\033[" CD_COL "mWebcam::%s::%s"
-#define CT "\033[0m\n", __FILE__, __FUNCTION__
+#define CT "\033[0m\n", __BASE_FILE__, __FUNCTION__
 
 #endif
