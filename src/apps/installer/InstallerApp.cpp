@@ -28,30 +28,30 @@ int main(int, char **)
 InstallerApp::InstallerApp()
 	: BApplication(APP_SIG)
 {
-	BRect windowFrame(0,0,INSTALLER_RIGHT, 160);
+	BRect windowFrame(0, 0, INSTALLER_RIGHT, 160);
 	BRect frame = BScreen().Frame();
-	windowFrame.OffsetBy((frame.Width() - windowFrame.Width())/2, 
-		frame.Height()/2 - windowFrame.Height()/4 - 113);
+	windowFrame.OffsetBy((frame.Width() - windowFrame.Width()) / 2,
+		frame.Height() / 2 - windowFrame.Height() / 4 - 113);
 	fWindow = new InstallerWindow(windowFrame);
 
 	// show the EULA
 	BAlert *alert = new BAlert("", EULA_TEXT, " Disagree ", " Agree ", NULL,
-		 B_WIDTH_FROM_WIDEST, B_EMPTY_ALERT);
+		B_WIDTH_FROM_WIDEST, B_EMPTY_ALERT);
 	BTextView *alertView = alert->TextView();
-	alertView->SetViewColor(255,255,255);
+	alertView->SetViewColor(255, 255, 255);
 	BView *parent = alertView->Parent();
 	alertView->RemoveSelf();
-	alertView->MoveBy(3,7);
-	alertView->ResizeTo(460,283);
+	alertView->MoveBy(3, 7);
+	alertView->ResizeTo(460, 283);
 	alertView->SetResizingMode(B_FOLLOW_ALL_SIDES);
-	alert->ResizeTo(500,350);
+	alert->ResizeTo(500, 350);
 	BScrollView *scroll = new BScrollView("", alertView, B_FOLLOW_ALL_SIDES, B_FRAME_EVENTS, false, true, B_FANCY_BORDER);
 	parent->AddChild(scroll);
 	BRect alertFrame = alert->Frame();
-	alertFrame.OffsetTo((frame.Width() - alertFrame.Width())/2,
-		(frame.Height() - alertFrame.Height())/2);
+	alertFrame.OffsetTo((frame.Width() - alertFrame.Width()) / 2,
+		(frame.Height() - alertFrame.Height()) / 2);
 	alert->MoveTo(alertFrame.LeftTop());
-	if (alert->Go()!=1)
+	if (alert->Go() != 1)
 		PostMessage(B_QUIT_REQUESTED);
 }
 
@@ -68,7 +68,7 @@ InstallerApp::AboutRequested()
 
 	view->GetFont(&font);
 	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE); 			
+	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, 14, &font);
 
 	alert->Go();
@@ -79,6 +79,6 @@ InstallerApp::AboutRequested()
 void
 InstallerApp::ReadyToRun()
 {
-	
+
 }
 

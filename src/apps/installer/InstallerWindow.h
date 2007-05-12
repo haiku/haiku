@@ -25,39 +25,39 @@ const uint32 INSTALL_FINISHED = 'iIFN';
 const char PACKAGES_DIRECTORY[] = "_packages_";
 
 class InstallerWindow : public BWindow {
-public:
-	InstallerWindow(BRect frameRect);
-	virtual ~InstallerWindow();
+	public:
+		InstallerWindow(BRect frameRect);
+		virtual ~InstallerWindow();
 
-	virtual void MessageReceived(BMessage *msg);
-	virtual bool QuitRequested();
-	BMenu *GetSourceMenu() { return fSrcMenu; };
-	BMenu *GetTargetMenu() { return fDestMenu; };
-private:
-	void DisableInterface(bool disable);
-	void LaunchDriveSetup();
-	void PublishPackages();
-	void ShowBottom();
-	void StartScan();
-	void AdjustMenus();
-	void SetStatusMessage(const char *text);
-	static int ComparePackages(const void *firstArg, const void *secondArg);
-	BBox *fBackBox;
-	BButton *fBeginButton, *fSetupButton;
-	DrawButton *fDrawButton;
-	bool fDriveSetupLaunched;
-	BTextView *fStatusView;
-	BMenu* fSrcMenu, *fDestMenu;
-	BMenuField* fSrcMenuField, *fDestMenuField;
-	PackagesView *fPackagesView;
-	BScrollView *fPackagesScrollView;
-	BStringView *fSizeView;
+		virtual void MessageReceived(BMessage *msg);
+		virtual bool QuitRequested();
+		BMenu *GetSourceMenu() { return fSrcMenu; };
+		BMenu *GetTargetMenu() { return fDestMenu; };
+	private:
+		void DisableInterface(bool disable);
+		void LaunchDriveSetup();
+		void PublishPackages();
+		void ShowBottom();
+		void StartScan();
+		void AdjustMenus();
+		void SetStatusMessage(const char *text);
+		static int ComparePackages(const void *firstArg, const void *secondArg);
+		BBox *fBackBox;
+		BButton *fBeginButton, *fSetupButton;
+		DrawButton *fDrawButton;
+		bool fDriveSetupLaunched;
+		BTextView *fStatusView;
+		BMenu* fSrcMenu, *fDestMenu;
+		BMenuField* fSrcMenuField, *fDestMenuField;
+		PackagesView *fPackagesView;
+		BScrollView *fPackagesScrollView;
+		BStringView *fSizeView;
 
-	BBitmap *fLogo;
-	BPoint fDrawPoint;
-	CopyEngine *fCopyEngine;
-	BString fLastStatus;
-	BMenuItem *fLastSrcItem, *fLastTargetItem;
+		BBitmap *fLogo;
+		BPoint fDrawPoint;
+		CopyEngine *fCopyEngine;
+		BString fLastStatus;
+		BMenuItem *fLastSrcItem, *fLastTargetItem;
 };
 
 #endif /* _InstallerWindow_h */

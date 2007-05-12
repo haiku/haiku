@@ -20,24 +20,24 @@ class InstallerWindow;
 const uint32 ENGINE_START = 'eSRT';
 
 class CopyEngine : public BLooper {
-public:
-	CopyEngine(InstallerWindow *window);
-	void MessageReceived(BMessage *msg);
-	void SetStatusMessage(char *status);
-	void Start(BMenu *srcMenu, BMenu *targetMenu);
-	void ScanDisksPartitions(BMenu *srcMenu, BMenu *targetMenu);
-	void SetPackagesList(BList *list);
-	void SetSpaceRequired(off_t bytes) { fSpaceRequired = bytes; };
-private:
-	void LaunchInitScript(BPath &path);
-	void LaunchFinishScript(BPath &path);
-	void CopyFolder(BDirectory &srcDir, BDirectory &targetDir);
-	
-	InstallerWindow *fWindow;
-	BDiskDeviceRoster fDDRoster;
-	InstallerCopyLoopControl *fControl;
-	BList *fPackages;
-	off_t fSpaceRequired;
+	public:
+		CopyEngine(InstallerWindow *window);
+		void MessageReceived(BMessage *msg);
+		void SetStatusMessage(char *status);
+		status_t Start(BMenu *srcMenu, BMenu *targetMenu);
+		void ScanDisksPartitions(BMenu *srcMenu, BMenu *targetMenu);
+		void SetPackagesList(BList *list);
+		void SetSpaceRequired(off_t bytes) { fSpaceRequired = bytes; };
+	private:
+		void LaunchInitScript(BPath &path);
+		void LaunchFinishScript(BPath &path);
+		void CopyFolder(BDirectory &srcDir, BDirectory &targetDir);
+
+		InstallerWindow *fWindow;
+		BDiskDeviceRoster fDDRoster;
+		InstallerCopyLoopControl *fControl;
+		BList *fPackages;
+		off_t fSpaceRequired;
 };
 
 #endif /* _CopyEngine_h */

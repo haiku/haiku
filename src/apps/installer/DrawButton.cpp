@@ -9,7 +9,7 @@
 #include "DrawButton.h"
 
 DrawButton::DrawButton(BRect frame, const char *name,  const char *labelOn, const char* labelOff,
-		BMessage *msg, int32 resize, int32 flags)
+	BMessage *msg, int32 resize, int32 flags)
 	: PaneSwitch(frame, name, "", resize, flags)
 {
 	fLabelOn = strdup(labelOn);
@@ -28,7 +28,7 @@ DrawButton::~DrawButton(void)
 void
 DrawButton::Draw(BRect update)
 {
-	BPoint point(18,9);
+	BPoint point(18, 9);
 	if (Value()) {
 		DrawString(fLabelOn, point);
 	} else {

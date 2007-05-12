@@ -28,8 +28,8 @@ const uint32 PACKAGE_CHECKBOX = 'iPCB';
 
 class LogoView : public BBox {
 	public:
-			LogoView(const BRect &r);
-			~LogoView(void);
+		LogoView(const BRect &r);
+		~LogoView(void);
 		virtual void Draw(BRect update);
 	private:
 		BBitmap			*fLogo;
@@ -38,7 +38,7 @@ class LogoView : public BBox {
 
 
 LogoView::LogoView(const BRect &r)
-	: BBox(r, "logoview", B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW, B_NO_BORDER)
+	: BBox(r, "logoview", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW, B_NO_BORDER)
 {
 	fLogo = BTranslationUtils::GetBitmap('PNG ', "haikulogo.png");
 	if (fLogo) {
@@ -69,13 +69,13 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 	fLastTargetItem(NULL)
 {
 	fCopyEngine = new CopyEngine(this);
-	
+
 	BRect bounds = Bounds();
 	bounds.bottom += 1;
 	bounds.right += 1;
 	fBackBox = new BBox(bounds, NULL, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS, B_FANCY_BORDER);
 	AddChild(fBackBox);
-	
+
 	BRect logoRect = fBackBox->Bounds();
 	logoRect.left += 1;
 	logoRect.top = 12;
@@ -84,53 +84,53 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 	LogoView *logoView = new LogoView(logoRect);
 	fBackBox->AddChild(logoView);
 
-	BRect statusRect(bounds.right-222, logoRect.top+2, bounds.right-14, logoRect.bottom - B_H_SCROLL_BAR_HEIGHT+4);
+	BRect statusRect(bounds.right - 222, logoRect.top + 2, bounds.right - 14, logoRect.bottom - B_H_SCROLL_BAR_HEIGHT + 4);
 	BRect textRect(statusRect);
 	textRect.OffsetTo(B_ORIGIN);
-	textRect.InsetBy(2,2);
+	textRect.InsetBy(2, 2);
 	fStatusView = new BTextView(statusRect, "statusView", textRect,
 		be_plain_font, NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 	fStatusView->MakeEditable(false);
 	fStatusView->MakeSelectable(false);
-	
-	BScrollView *scroll = new BScrollView("statusScroll", fStatusView, B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW|B_FRAME_EVENTS);
-        fBackBox->AddChild(scroll);
 
-	fBeginButton = new BButton(BRect(bounds.right-90, bounds.bottom-35, bounds.right-11, bounds.bottom-11), 
+	BScrollView *scroll = new BScrollView("statusScroll", fStatusView, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_FRAME_EVENTS);
+	fBackBox->AddChild(scroll);
+
+	fBeginButton = new BButton(BRect(bounds.right - 90, bounds.bottom - 35, bounds.right - 11, bounds.bottom - 11),
 		"begin_button", "Begin", new BMessage(BEGIN_MESSAGE), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	fBeginButton->MakeDefault(true);
 	fBackBox->AddChild(fBeginButton);
 
-	fSetupButton = new BButton(BRect(bounds.left+11, bounds.bottom-35, 
-		bounds.left + be_plain_font->StringWidth("Setup partitions") + 36, bounds.bottom-22),
-		"setup_button", "Setup partitions" B_UTF8_ELLIPSIS, new BMessage(SETUP_MESSAGE), B_FOLLOW_LEFT|B_FOLLOW_BOTTOM);
+	fSetupButton = new BButton(BRect(bounds.left + 11, bounds.bottom - 35,
+		bounds.left + be_plain_font->StringWidth("Setup partitions") + 36, bounds.bottom - 22),
+		"setup_button", "Setup partitions" B_UTF8_ELLIPSIS, new BMessage(SETUP_MESSAGE), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	fBackBox->AddChild(fSetupButton);
 	fSetupButton->Hide();
 
-	fPackagesView = new PackagesView(BRect(bounds.left+12, bounds.top+4, bounds.right-15-B_V_SCROLL_BAR_WIDTH, bounds.bottom-61), "packages_view");
+	fPackagesView = new PackagesView(BRect(bounds.left + 12, bounds.top + 4, bounds.right - 15 - B_V_SCROLL_BAR_WIDTH, bounds.bottom - 61), "packages_view");
 	fPackagesScrollView = new BScrollView("packagesScroll", fPackagesView, B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW,
 		false, true);
 	fBackBox->AddChild(fPackagesScrollView);
 	fPackagesScrollView->Hide();
 
-	fDrawButton = new DrawButton(BRect(bounds.left+12, bounds.bottom-33, bounds.left+120, bounds.bottom-20),
+	fDrawButton = new DrawButton(BRect(bounds.left + 12, bounds.bottom - 33, bounds.left + 120, bounds.bottom - 20),
 		"options_button", "Fewer options", "More options", new BMessage(SHOW_BOTTOM_MESSAGE));
 	fBackBox->AddChild(fDrawButton);
 
 	fDestMenu = new BPopUpMenu("scanning" B_UTF8_ELLIPSIS, true, false);
 	fSrcMenu = new BPopUpMenu("scanning" B_UTF8_ELLIPSIS, true, false);
 
-	BRect fieldRect(bounds.left+50, bounds.top+70, bounds.right-13, bounds.top+90);
+	BRect fieldRect(bounds.left + 50, bounds.top + 70, bounds.right - 13, bounds.top + 90);
 	fSrcMenuField = new BMenuField(fieldRect, "srcMenuField",
-                "Install from: ", fSrcMenu);
-	fSrcMenuField->SetDivider(bounds.right-274);
+		"Install from: ", fSrcMenu);
+	fSrcMenuField->SetDivider(bounds.right - 274);
 	fSrcMenuField->SetAlignment(B_ALIGN_RIGHT);
 	fBackBox->AddChild(fSrcMenuField);
 
-	fieldRect.OffsetBy(0,23);
+	fieldRect.OffsetBy(0, 23);
 	fDestMenuField = new BMenuField(fieldRect, "destMenuField",
 		"Onto: ", fDestMenu);
-	fDestMenuField->SetDivider(bounds.right-274);
+	fDestMenuField->SetDivider(bounds.right - 274);
 	fDestMenuField->SetAlignment(B_ALIGN_RIGHT);
 	fBackBox->AddChild(fDestMenuField);
 
@@ -149,7 +149,7 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 
 	fDriveSetupLaunched = be_roster->IsRunning(DRIVESETUP_SIG);
 	be_roster->StartWatching(this);
-	
+
 	PostMessage(START_SCAN);
 }
 
@@ -166,7 +166,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 		case START_SCAN:
 			StartScan();
 			break;
-		case BEGIN_MESSAGE: 
+		case BEGIN_MESSAGE:
 		{
 			BList *list = new BList();
 			int32 size = 0;
@@ -219,17 +219,17 @@ InstallerWindow::MessageReceived(BMessage *msg)
 		case B_SOME_APP_QUIT:
 		{
 			const char *signature;
-			if (msg->FindString("be:signature", &signature)==B_OK
-				&& strcasecmp(signature, DRIVESETUP_SIG)==0) {
+			if (msg->FindString("be:signature", &signature) == B_OK
+				&& strcasecmp(signature, DRIVESETUP_SIG) == 0) {
 				fDriveSetupLaunched = msg->what == B_SOME_APP_LAUNCHED;
 				DisableInterface(fDriveSetupLaunched);
 				if (fDriveSetupLaunched)
 					SetStatusMessage("Running DriveSetup" B_UTF8_ELLIPSIS "\nClose DriveSetup to continue with the\ninstallation.");
 				else
 					StartScan();
-                        }
-                        break;
-                }
+			}
+			break;
+		}
 		default:
 			BWindow::MessageReceived(msg);
 			break;
@@ -240,7 +240,7 @@ bool
 InstallerWindow::QuitRequested()
 {
 	if (fDriveSetupLaunched) {
-		(new BAlert("driveSetup", 
+		(new BAlert("driveSetup",
 			"Please close the DriveSetup window before closing the\nInstaller window.", "OK"))->Go();
 		return false;
 	}
@@ -250,7 +250,7 @@ InstallerWindow::QuitRequested()
 }
 
 
-void 
+void
 InstallerWindow::ShowBottom()
 {
 	if (fDrawButton->Value()) {
@@ -276,7 +276,7 @@ InstallerWindow::ShowBottom()
 void
 InstallerWindow::LaunchDriveSetup()
 {
-	if (be_roster->Launch(DRIVESETUP_SIG)!=B_OK)
+	if (be_roster->Launch(DRIVESETUP_SIG) != B_OK)
 		fprintf(stderr, "There was an error while launching DriveSetup\n");
 }
 
@@ -324,7 +324,7 @@ InstallerWindow::AdjustMenus()
 		else
 			fSrcMenuField->MenuItem()->SetLabel(((PartitionMenuItem *)fSrcMenu->ItemAt(0))->MenuLabel());
 	}
-	
+
 	PartitionMenuItem *item2 = (PartitionMenuItem *)fDestMenu->FindMarked();
 	if (item2) {
 		fDestMenuField->MenuItem()->SetLabel(item2->MenuLabel());
@@ -335,7 +335,7 @@ InstallerWindow::AdjustMenus()
 			fDestMenuField->MenuItem()->SetLabel(((PartitionMenuItem *)fDestMenu->ItemAt(0))->MenuLabel());
 	}
 	char message[255];
-	sprintf(message, "Press the Begin button to install from '%s' onto '%s'", 
+	sprintf(message, "Press the Begin button to install from '%s' onto '%s'",
 		item1 ? item1->Name() : "null", item2 ? item2->Name() : "null");
 	SetStatusMessage(message);
 }
@@ -355,25 +355,25 @@ InstallerWindow::PublishPackages()
 	BDiskDevice device;
 	BPartition *partition;
 	if (roster.GetPartitionWithID(item->ID(), &device, &partition) == B_OK) {
-		if (partition->GetMountPoint(&directory)!=B_OK)
+		if (partition->GetMountPoint(&directory) != B_OK)
 			return;
 	} else if (roster.GetDeviceWithID(item->ID(), &device) == B_OK) {
-		if (device.GetMountPoint(&directory)!=B_OK)
+		if (device.GetMountPoint(&directory) != B_OK)
 			return;
-	} else 
+	} else
 		return; // shouldn't happen
 #else
 	BPath directory = "/BeOS 5 PE Max Edition V3.1 beta";
 #endif
-	
+
 	directory.Append(PACKAGES_DIRECTORY);
 	BDirectory dir(directory.Path());
-	if (dir.InitCheck()!=B_OK)
+	if (dir.InitCheck() != B_OK)
 		return;
 
 	BEntry packageEntry;
 	BList packages;
-	while (dir.GetNextEntry(&packageEntry)==B_OK) {
+	while (dir.GetNextEntry(&packageEntry) == B_OK) {
 		Package *package = Package::PackageFromEntry(packageEntry);
 		if (package) {
 			packages.AddItem(package);
@@ -382,11 +382,11 @@ InstallerWindow::PublishPackages()
 	packages.SortItems(ComparePackages);
 
 	fPackagesView->AddPackages(packages, new BMessage(PACKAGE_CHECKBOX));
-	PostMessage(PACKAGE_CHECKBOX);	
+	PostMessage(PACKAGE_CHECKBOX);
 }
 
 
-int 
+int
 InstallerWindow::ComparePackages(const void *firstArg, const void *secondArg)
 {
 	const Group *group1 = *static_cast<const Group * const *>(firstArg);

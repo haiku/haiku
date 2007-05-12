@@ -14,9 +14,9 @@ InstallerCopyLoopControl::InstallerCopyLoopControl(InstallerWindow *window)
 }
 
 
-bool 
+bool
 InstallerCopyLoopControl::FileError(const char *message, const char *name, status_t error,
-			bool allowContinue)
+	bool allowContinue)
 {
 	char buffer[512];
 	sprintf(buffer, message, name, strerror(error));
@@ -29,11 +29,11 @@ InstallerCopyLoopControl::FileError(const char *message, const char *name, statu
 		B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 	return false;
 }
-	
 
-void 
-InstallerCopyLoopControl::UpdateStatus(const char *name, entry_ref ref, int32 count, 
-			bool optional)
+
+void
+InstallerCopyLoopControl::UpdateStatus(const char *name, entry_ref ref, int32 count,
+	bool optional)
 {
 	if (name) {
 		BMessage msg(STATUS_MESSAGE);
@@ -45,17 +45,17 @@ InstallerCopyLoopControl::UpdateStatus(const char *name, entry_ref ref, int32 co
 }
 
 
-bool 
+bool
 InstallerCopyLoopControl::CheckUserCanceled()
 {
 	return false;
 }
 
 
-InstallerCopyLoopControl::OverwriteMode 
-InstallerCopyLoopControl::OverwriteOnConflict(const BEntry *srcEntry, 
-			const char *destName, const BDirectory *destDir, bool srcIsDir, 
-			bool dstIsDir)
+InstallerCopyLoopControl::OverwriteMode
+InstallerCopyLoopControl::OverwriteOnConflict(const BEntry *srcEntry,
+	const char *destName, const BDirectory *destDir, bool srcIsDir,
+	bool dstIsDir)
 {
 	if (srcIsDir && dstIsDir)
 		return kMerge;
@@ -64,34 +64,34 @@ InstallerCopyLoopControl::OverwriteOnConflict(const BEntry *srcEntry,
 }
 
 
-bool 
+bool
 InstallerCopyLoopControl::SkipEntry(const BEntry *, bool file)
 {
 	return false;
 }
 
 
-void 
+void
 InstallerCopyLoopControl::ChecksumChunk(const char *block, size_t size)
 {
 }
 
 
-bool 
+bool
 InstallerCopyLoopControl::ChecksumFile(const entry_ref *ref)
 {
 	return true;
 }
 
 
-bool 
+bool
 InstallerCopyLoopControl::SkipAttribute(const char *attributeName)
 {
 	return false;
 }
 
 
-bool 
+bool
 InstallerCopyLoopControl::PreserveAttribute(const char *attributeName)
 {
 	return false;

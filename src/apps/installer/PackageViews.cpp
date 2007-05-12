@@ -56,7 +56,7 @@ Package::Package(const char *folder)
 
 Package::~Package()
 {
-	delete fIcon;	
+	delete fIcon;
 }
 
 
@@ -66,7 +66,7 @@ Package::PackageFromEntry(BEntry &entry)
 	char folder[B_FILE_NAME_LENGTH];
 	entry.GetName(folder);
 	BDirectory directory(&entry);
-	if (directory.InitCheck()!=B_OK)
+	if (directory.InitCheck() != B_OK)
 		return NULL;
 	Package *package = new Package(folder);
 	bool alwaysOn;
@@ -74,17 +74,17 @@ Package::PackageFromEntry(BEntry &entry)
 	int32 size;
 	char group[64];
 	memset(group, 0, 64);
-	if (directory.ReadAttr("INSTALLER PACKAGE: NAME", B_STRING_TYPE, 0, package->fName, 64)<0)
+	if (directory.ReadAttr("INSTALLER PACKAGE: NAME", B_STRING_TYPE, 0, package->fName, 64) < 0)
 		goto err;
-	if (directory.ReadAttr("INSTALLER PACKAGE: GROUP", B_STRING_TYPE, 0, group, 64)<0)
+	if (directory.ReadAttr("INSTALLER PACKAGE: GROUP", B_STRING_TYPE, 0, group, 64) < 0)
 		goto err;
-	if (directory.ReadAttr("INSTALLER PACKAGE: DESCRIPTION", B_STRING_TYPE, 0, package->fDescription, 64)<0)
+	if (directory.ReadAttr("INSTALLER PACKAGE: DESCRIPTION", B_STRING_TYPE, 0, package->fDescription, 64) < 0)
 		goto err;
-	if (directory.ReadAttr("INSTALLER PACKAGE: ON_BY_DEFAULT", B_BOOL_TYPE, 0, &onByDefault, sizeof(onByDefault))<0)
+	if (directory.ReadAttr("INSTALLER PACKAGE: ON_BY_DEFAULT", B_BOOL_TYPE, 0, &onByDefault, sizeof(onByDefault)) < 0)
 		goto err;
-	if (directory.ReadAttr("INSTALLER PACKAGE: ALWAYS_ON", B_BOOL_TYPE, 0, &alwaysOn, sizeof(alwaysOn))<0)
+	if (directory.ReadAttr("INSTALLER PACKAGE: ALWAYS_ON", B_BOOL_TYPE, 0, &alwaysOn, sizeof(alwaysOn)) < 0)
 		goto err;
-	if (directory.ReadAttr("INSTALLER PACKAGE: SIZE", B_INT32_TYPE, 0, &size, sizeof(size))<0)
+	if (directory.ReadAttr("INSTALLER PACKAGE: SIZE", B_INT32_TYPE, 0, &size, sizeof(size)) < 0)
 		goto err;
 	package->SetGroupName(group);
 	package->SetSize(size);
@@ -107,7 +107,7 @@ err:
 }
 
 
-void 
+void
 Package::GetSizeAsString(char *string)
 {
 	SizeAsString(fSize, string);
@@ -124,8 +124,8 @@ Group::~Group()
 }
 
 
-PackageCheckBox::PackageCheckBox(BRect rect, Package *item) 
-	: BCheckBox(rect.OffsetBySelf(7,0), "pack_cb", item->Name(), NULL),
+PackageCheckBox::PackageCheckBox(BRect rect, Package *item)
+	: BCheckBox(rect.OffsetBySelf(7, 0), "pack_cb", item->Name(), NULL),
 	fPackage(item)
 {
 }
@@ -137,7 +137,7 @@ PackageCheckBox::~PackageCheckBox()
 }
 
 
-void 
+void
 PackageCheckBox::Draw(BRect update)
 {
 	BCheckBox::Draw(update);
@@ -182,7 +182,7 @@ GroupView::~GroupView()
 
 
 PackagesView::PackagesView(BRect rect, const char* name)
-	: BView(rect, name, B_FOLLOW_ALL_SIDES, B_WILL_DRAW|B_FRAME_EVENTS)
+	: BView(rect, name, B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS)
 {
 }
 
@@ -203,7 +203,7 @@ PackagesView::Clean()
 			delete view;
 		}
 	}
-	ScrollTo(0,0);
+	ScrollTo(0, 0);
 }
 
 
@@ -217,9 +217,9 @@ PackagesView::AddPackages(BList &packages, BMessage *msg)
 	rect.bottom = 15;
 	rect.top = 0;
 	BString lastGroup = "";
-	for (int32 i=0; i<count; i++) {
+	for (int32 i = 0; i < count; i++) {
 		void *item = packages.ItemAt(i);
-		Package *package = static_cast<Package *> (item);
+		Package *package = static_cast<Package *>(item);
 		if (lastGroup != BString(package->GroupName())) {
 			rect.OffsetBy(0, 1);
 			lastGroup = package->GroupName();
@@ -246,20 +246,20 @@ PackagesView::AddPackages(BList &packages, BMessage *msg)
 	} else {
 		vertScroller->SetRange(0.0f, rect.top - vertScroller->Bounds().Height());
 		vertScroller->SetProportion(vertScroller->Bounds().Height() / rect.top);
-        }
+	}
 
 	vertScroller->SetSteps(15, vertScroller->Bounds().Height());
-	
+
 	Invalidate();
 }
 
 
-void 
+void
 PackagesView::GetTotalSizeAsString(char *string)
 {
 	int32 count = CountChildren();
 	int32 size = 0;
-	for (int32 i=0; i<count; i++) {
+	for (int32 i = 0; i < count; i++) {
 		PackageCheckBox *cb = dynamic_cast<PackageCheckBox*>(ChildAt(i));
 		if (cb && cb->Value())
 			size += cb->GetPackage()->Size();
@@ -268,12 +268,12 @@ PackagesView::GetTotalSizeAsString(char *string)
 }
 
 
-void 
+void
 PackagesView::GetPackagesToInstall(BList *list, int32 *size)
 {
 	int32 count = CountChildren();
 	*size = 0;
-	for (int32 i=0; i<count; i++) {
+	for (int32 i = 0; i < count; i++) {
 		PackageCheckBox *cb = dynamic_cast<PackageCheckBox*>(ChildAt(i));
 		if (cb && cb->Value()) {
 			list->AddItem(cb->GetPackage());
