@@ -172,7 +172,12 @@ CamDevice::StopTransfer()
 	if (err < B_OK)
 		return err;
 	fTransferEnabled = false;
+	
+	// the thread itself might Lock()
+	fLocker.Unlock();
 	wait_for_thread(fPumpThread, &err);
+	fLocker.Lock();
+	
 	return B_OK;
 }
 

@@ -494,6 +494,12 @@ VideoProducer::Disconnect(const media_source &source,
 		return;
 	}
 
+#if 0
+	/* Some dumb apps don't stop nodes before disconnecting... */
+	if (fRunning)
+		HandleStop();
+#endif
+	
 	fEnabled = false;
 	fOutput.destination = media_destination::null;
 
@@ -616,7 +622,10 @@ VideoProducer::HandleStart(bigtime_t performance_time)
 
 	resume_thread(fThread);
 
-	fCamDevice->StartTransfer();
+	{
+		BAutolock lock(fCamDevice->Locker());
+		fCamDevice->StartTransfer();
+	}
 
 	fRunning = true;
 	return;
@@ -640,6 +649,7 @@ VideoProducer::HandleStop(void)
 	delete_sem(fFrameSync);
 	wait_for_thread(fThread, &fThread);
 
+	BAutolock lock(fCamDevice->Locker());
 	fCamDevice->StopTransfer();
 
 	fRunning = false;
@@ -673,6 +683,7 @@ VideoProducer::FrameGenerator()
 	bigtime_t wait_until = system_time();
 
 	while (1) {
+		PRINTF(1, ("FrameGenerator: acquire_sem_etc() until %Ldµs (in %Ldµs)\n", wait_until, wait_until - system_time()));
 		status_t err = acquire_sem_etc(fFrameSync, 1, B_ABSOLUTE_TIMEOUT,
 				wait_until);
 
@@ -696,6 +707,12 @@ VideoProducer::FrameGenerator()
 		/* Drop frame if it's at least a frame late */
 		if (wait_until < system_time())
 			continue;
+
+		PRINTF(1, ("FrameGenerator: wait until %Ld, %ctimed out, %crunning, %cenabled.\n", 
+					wait_until, 
+					(err == B_OK)?'!':' ',
+					(fRunning)?' ':'!',
+					(fEnabled)?' ':'!'));
 
 		/* If the semaphore was acquired successfully, it means something
 		 * changed the timing information (see VideoProducer::Connect()) and
@@ -751,6 +768,9 @@ VideoProducer::FrameGenerator()
 				*(p++) = ((((x+y)^0^x)+fFrame) & 0xff) * (0x01010101 & fColor);
 #endif
 
+		//NO! must be called without lock!
+		//BAutolock lock(fCamDevice->Locker());
+		
 //#ifdef UseFillFrameBuffer
 		err = fCamDevice->FillFrameBuffer(buffer);
 		if (err < B_OK) {
@@ -765,6 +785,7 @@ VideoProducer::FrameGenerator()
 		}
 #endif
 
+		PRINTF(1, ("FrameGenerator: SendBuffer...\n"));
 		/* Send the buffer on down to the consumer */
 		if (SendBuffer(buffer, fOutput.destination) < B_OK) {
 			PRINTF(-1, ("FrameGenerator: Error sending buffer\n"));
@@ -774,6 +795,7 @@ VideoProducer::FrameGenerator()
 		}
 	}
 
+	PRINTF(1, ("FrameGenerator: thread existed.\n"));
 	return B_OK;
 }
 
