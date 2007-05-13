@@ -48,3 +48,4 @@ void ReplaceColor(BBitmap *bitmap, rgb_color from, rgb_color to);
 void ReplaceTransparentColor(BBitmap *bitmap, rgb_color with);
 
 #endif
+

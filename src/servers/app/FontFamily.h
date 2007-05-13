@@ -49,6 +49,7 @@ class FontKey : public Hashable {
 			: fHash(familyID | (styleID << 16UL))
 		{
 		}
+		virtual ~FontKey() {};
 
 		virtual uint32	Hash() const
 							{ return fHash; }

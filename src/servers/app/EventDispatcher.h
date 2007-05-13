@@ -56,6 +56,7 @@ class EventTarget {
 
 class EventFilter {
 	public:
+		virtual ~EventFilter() {};
 		virtual filter_result Filter(BMessage* event, EventTarget** _target,
 			int32* _viewToken = NULL, BMessage* latestMouseMoved = NULL) = 0;
 		virtual void RemoveTarget(EventTarget* target);

@@ -24,6 +24,7 @@ typedef BObjectList<Screen> ScreenList;
 
 class ScreenOwner {
 	public:
+		virtual ~ScreenOwner() {};
 		virtual void	ScreenRemoved(Screen* screen) = 0;
 		virtual void	ScreenAdded(Screen* screen) = 0;
 

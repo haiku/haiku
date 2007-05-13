@@ -14,6 +14,7 @@
 
 class Hashable {
 	public:
+		virtual ~Hashable() {};
 		virtual uint32 Hash() const = 0;
 		virtual bool CompareTo(Hashable& hashable) const = 0;
 };

@@ -42,6 +42,7 @@
 
 class FolderListener {
 public:
+	virtual ~FolderListener() {};
 		// entry created or moved into folder
 	virtual void EntryCreated(node_ref* node, entry_ref* entry) {};
 		// entry removed from folder (or moved to another folder) 

@@ -24,7 +24,7 @@ class GenericThread
 		status_t	Kill(void);
 
 		void		ExitWithReturnValue(status_t a_return_value);
-		status_t	SetExitCallback(void(* a_callback)(void *), void * a_data);
+		status_t	SetExitCallback(void (* a_callback)(void *), void * a_data);
 		status_t	WaitForThread(status_t * a_exit_value);
 
 		status_t	Rename(char * a_name);

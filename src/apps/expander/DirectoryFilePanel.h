@@ -49,6 +49,7 @@ class DirectoryFilePanel : public BFilePanel {
 			uint32 node_flavors = 0, bool allow_multiple_selection = true,
 			BMessage *message = 0, BRefFilter * = 0,
 			bool modal = false, bool hide_when_done = true);
+		virtual ~DirectoryFilePanel() {};
 		virtual void SelectionChanged(void);
 		virtual void Show();
 
