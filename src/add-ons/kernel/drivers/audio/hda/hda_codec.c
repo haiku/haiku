@@ -323,7 +323,7 @@ hda_codec_audiofg_new(hda_codec* codec, uint32 afg_nid)
 
 		if (codec->afg_widgets[idx].type != WT_PIN_COMPLEX)
 			continue;
-		if (!codec->afg_widgets[idx].d.pin.output)
+		if (codec->afg_widgets[idx].d.pin.output)
 			continue;
 		if 	(codec->afg_widgets[idx].d.pin.device != PIN_DEV_HP_OUT &&
 			codec->afg_widgets[idx].d.pin.device != PIN_DEV_SPEAKER &&
@@ -338,26 +338,26 @@ hda_codec_audiofg_new(hda_codec* codec, uint32 afg_nid)
 				output_wid = hda_codec_afg_find_dac_path(codec, codec->afg_widgets[idx].inputs[iidx], 0);
 				if (output_wid) {
 					corb_t verb = MAKE_VERB(codec->addr,idx+codec->afg_wid_start,VID_SET_CONNSEL,iidx);
-					uint32 resp;
-					if (hda_send_verbs(codec, &verb, &resp, 1) == B_OK)
-						break;
+					if (hda_send_verbs(codec, &verb, NULL, 1) != B_OK)
+						dprintf("%s: Setting output selector failed!\n", __func__);
+					break;
 				}
 			}
 		}
 
 		if (output_wid) {
 			corb_t verb;
-			uint32 resp;
 
 			codec->playback_stream->pin_wid = idx + codec->afg_wid_start;
 			codec->playback_stream->io_wid = output_wid;
+
 			dprintf("%s: Found output PIN (%s) connected to output CONV wid:%ld\n", 
 				__func__, defdev[codec->afg_widgets[idx].d.pin.device], output_wid);
 
 			/* FIXME: Force Pin Widget to unmute */
 			verb = MAKE_VERB(codec->addr, codec->playback_stream->pin_wid,
 				VID_SET_AMPGAINMUTE, (1 << 15) | (1 << 13) | (1 << 12));
-			hda_send_verbs(codec, &verb, &resp, 1);
+			hda_send_verbs(codec, &verb, NULL, 1);
 			break;
 		}
 	}

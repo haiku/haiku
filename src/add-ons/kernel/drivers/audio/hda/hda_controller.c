@@ -59,11 +59,16 @@ hda_stream_check_intr(hda_controller* ctrlr, hda_stream* s)
 	if (s->running) {
 		uint8 sts = OREG8(ctrlr,s->off,STS);
 		if (sts) {
+			int32 count;
+
 			OREG8(ctrlr,s->off,STS) = sts;
 
 			s->played_real_time = system_time();
 			s->played_frames_count += s->buffer_length;
-			release_sem_etc(s->buffer_ready_sem, 1, B_DO_NOT_RESCHEDULE);
+
+			get_sem_count(s->buffer_ready_sem, &count);
+			if (count <= 0)
+				release_sem_etc(s->buffer_ready_sem, 1, B_DO_NOT_RESCHEDULE);
 		}
 	}
 
@@ -219,7 +224,7 @@ hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses, int count)
 	REG16(codec->ctrlr,CORBWP) = (codec->ctrlr->corbwp += count);
 
 	rc = acquire_sem_etc(codec->response_sem, count, B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT, 1000ULL * 50);
-	if (rc == B_OK)
+	if (rc == B_OK && responses != NULL)
 		memcpy(responses, codec->responses, count*sizeof(uint32));
 
 	return rc;
