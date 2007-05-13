@@ -15,6 +15,8 @@
 
 #include <stdio.h>
 
+#define THROW_ERROR(error) throw (status_t)(error)
+
 PictureDataWriter::PictureDataWriter()
 	:
 	fData(NULL)
@@ -450,7 +452,7 @@ void
 PictureDataWriter::BeginOp(const int16 &op)
 {
 	if (fData == NULL)
-		throw B_NO_INIT;
+		THROW_ERROR(B_NO_INIT);
 
 	fStack.push(fData->Position());
 	fData->Write(&op, sizeof(op));
@@ -465,7 +467,7 @@ void
 PictureDataWriter::EndOp()
 {
 	if (fData == NULL)
-		throw B_NO_INIT;
+		THROW_ERROR(B_NO_INIT);
 
 	off_t curPos = fData->Position();
 	off_t stackPos = fStack.top();
@@ -489,7 +491,7 @@ PictureDataWriter::WriteData(const void *data, size_t size)
 {
 	ssize_t result = fData->Write(data, size);
 	if (result < 0)
-		throw (status_t)result;
+		THROW_ERROR(result);
 	if (result != size)
-		throw B_IO_ERROR; 
+		THROW_ERROR(B_IO_ERROR); 
 }
