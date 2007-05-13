@@ -417,9 +417,17 @@ intel_extreme_init(intel_info &info)
 	info.shared_info->graphics_memory_size = totalSize;
 	info.shared_info->frame_buffer_offset = 0;
 	info.shared_info->dpms_mode = B_DPMS_ON;
-	info.shared_info->pll_info.reference_frequency = 48000;	// 48 kHz
-	info.shared_info->pll_info.min_frequency = 25000;		// 25 MHz (not tested)
-	info.shared_info->pll_info.max_frequency = 350000;		// 350 MHz RAM DAC speed
+
+	if (info.device_type == INTEL_TYPE_9xx) {
+		info.shared_info->pll_info.reference_frequency = 96000;	// 96 kHz
+		info.shared_info->pll_info.max_frequency = 400000;		// 400 MHz RAM DAC speed
+		info.shared_info->pll_info.min_frequency = 20000;		// 20 MHz (not tested)
+	} else {
+		info.shared_info->pll_info.reference_frequency = 48000;	// 48 kHz
+		info.shared_info->pll_info.max_frequency = 350000;		// 350 MHz RAM DAC speed
+		info.shared_info->pll_info.min_frequency = 25000;		// 25 MHz (not tested)
+	}
+
 	info.shared_info->pll_info.divisor_register = INTEL_DISPLAY_A_PLL_DIVISOR_0;
 
 	info.shared_info->device_type = info.device_type;
