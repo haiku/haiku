@@ -1,0 +1,18 @@
+SubDir HAIKU_TOP src add-ons kernel drivers audio hda ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders media ;
+
+KernelAddon hda :
+	driver.c
+	hooks.c
+	hda_multi_audio.c
+	hda_controller.c
+	hda_codec.c
+;
+
+Package haiku-hda-cvs :
+	hda :
+	boot home config add-ons kernel drivers bin ;
+PackageDriverSymLink haiku-hda-cvs : audio multi hda ;
