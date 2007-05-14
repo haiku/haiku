@@ -92,7 +92,7 @@ MediaRoutingView::MediaRoutingView(
 	ASSERT(manager);
 
 	setBackgroundColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
-	setItemAlignment(5.0, 5.0);
+	SetItemAlignment(5.0, 5.0);
 	_initLayout();
 }
 
@@ -240,7 +240,7 @@ void MediaRoutingView::messageDropped(
 							m_lastDroppedNode = droppedNode->id();
 							BPoint dropPoint, dropOffset;
 							dropPoint = message->DropPoint(&dropOffset);
-							m_lastDropPoint = align(ConvertFromScreen(dropPoint - dropOffset));
+							m_lastDropPoint = Align(ConvertFromScreen(dropPoint - dropOffset));
 						}
 						else
 						{
@@ -510,7 +510,7 @@ void MediaRoutingView::MessageReceived(
 		case M_SELECT_ALL:
 		{
 			D_MESSAGE(("MediaRoutingView::MessageReceived(M_SELECT_ALL)\n"));
-			selectAll(DiagramItem::M_BOX);
+			SelectAll(DiagramItem::M_BOX);
 			break;
 		}
 		case M_DELETE_SELECTION:
@@ -721,9 +721,9 @@ BPoint MediaRoutingView::findFreePositionFor(
 				}
 				// find the bottom item in the column
 				float bottom = 0.0;
-				for (uint32 i = 0; i < countItems(DiagramItem::M_BOX); i++)
+				for (uint32 i = 0; i < CountItems(DiagramItem::M_BOX); i++)
 				{
-					BRect r = itemAt(i, DiagramItem::M_BOX)->frame();
+					BRect r = ItemAt(i, DiagramItem::M_BOX)->frame();
 					if ((r.left >= p.x)
 					 && (r.left <= p.x + MediaNodePanel::M_DEFAULT_WIDTH))
 					{
@@ -750,9 +750,9 @@ BPoint MediaRoutingView::findFreePositionFor(
 				}
 				// find the right-most item in the row
 				float right = 0.0;
-				for (uint32 i = 0; i < countItems(DiagramItem::M_BOX); i++)
+				for (uint32 i = 0; i < CountItems(DiagramItem::M_BOX); i++)
 				{
-					BRect r = itemAt(i, DiagramItem::M_BOX)->frame();
+					BRect r = ItemAt(i, DiagramItem::M_BOX)->frame();
 					if ((r.top >= p.y)
 					 && (r.top <= p.y + MediaNodePanel::M_DEFAULT_HEIGHT))
 					{
@@ -821,7 +821,7 @@ void MediaRoutingView::layoutChanged(
 			bodyHeight = 2 * MediaNodePanel::M_BODY_V_MARGIN + B_LARGE_ICON;
 			MediaNodePanel::M_DEFAULT_WIDTH = labelWidth > bodyWidth ? labelWidth : bodyWidth;
 			MediaNodePanel::M_DEFAULT_HEIGHT = labelHeight + bodyHeight;
-			align(&MediaNodePanel::M_DEFAULT_WIDTH, &MediaNodePanel::M_DEFAULT_HEIGHT);
+			Align(&MediaNodePanel::M_DEFAULT_WIDTH, &MediaNodePanel::M_DEFAULT_HEIGHT);
 			break;
 		}
 		case M_MINI_ICON_VIEW:
@@ -864,14 +864,14 @@ void MediaRoutingView::layoutChanged(
 			bodyHeight = 2 * MediaNodePanel::M_BODY_V_MARGIN + B_MINI_ICON;
 			MediaNodePanel::M_DEFAULT_WIDTH = labelWidth + bodyWidth;
 			MediaNodePanel::M_DEFAULT_HEIGHT = labelHeight > bodyHeight ? labelHeight : bodyHeight;
-			align(&MediaNodePanel::M_DEFAULT_WIDTH, &MediaNodePanel::M_DEFAULT_HEIGHT);
+			Align(&MediaNodePanel::M_DEFAULT_WIDTH, &MediaNodePanel::M_DEFAULT_HEIGHT);
 			break;
 		}
 	}
 	m_layout = layout;
-	for (uint32 i = 0; i < countItems(DiagramItem::M_BOX); i++)
+	for (uint32 i = 0; i < CountItems(DiagramItem::M_BOX); i++)
 	{
-		MediaNodePanel *panel = dynamic_cast<MediaNodePanel *>(itemAt(i, DiagramItem::M_BOX));
+		MediaNodePanel *panel = dynamic_cast<MediaNodePanel *>(ItemAt(i, DiagramItem::M_BOX));
 		if (panel)
 		{
 			panel->layoutChanged(layout);
@@ -885,24 +885,24 @@ void MediaRoutingView::cleanUp()
 {
 	D_METHOD(("MediaRoutingView::cleanUp()\n"));
 
-	sortItems(DiagramItem::M_BOX, compareID);
+	SortItems(DiagramItem::M_BOX, compareID);
 
 	// move all the panels offscreen
-	for (uint32 i = 0; i < countItems(DiagramItem::M_BOX); i++)
+	for (uint32 i = 0; i < CountItems(DiagramItem::M_BOX); i++)
 	{
-		itemAt(i, DiagramItem::M_BOX)->moveTo(BPoint(-200.0, -200.0));
+		ItemAt(i, DiagramItem::M_BOX)->moveTo(BPoint(-200.0, -200.0));
 	}
 
 	// move all panels to their 'ideal' position
-	for (uint32 i = 0; i < countItems(DiagramItem::M_BOX); i++)
+	for (uint32 i = 0; i < CountItems(DiagramItem::M_BOX); i++)
 	{
 		MediaNodePanel *panel;
-		panel = dynamic_cast<MediaNodePanel *>(itemAt(i, DiagramItem::M_BOX));
+		panel = dynamic_cast<MediaNodePanel *>(ItemAt(i, DiagramItem::M_BOX));
 		BPoint p = findFreePositionFor(panel);
 		panel->moveTo(p);
 	}
 
-	sortItems(DiagramItem::M_BOX, compareSelectionTime);
+	SortItems(DiagramItem::M_BOX, compareSelectionTime);
 	Invalidate();
 	updateDataRect();
 }
@@ -1025,14 +1025,14 @@ status_t MediaRoutingView::importState(
 
 		// look up matching panel +++++ SLOW +++++
 		uint32 panelIndex;
-		uint32 items = countItems(DiagramItem::M_BOX);
+		uint32 items = CountItems(DiagramItem::M_BOX);
 		for(
 			panelIndex = 0;
 			panelIndex < items;
 			++panelIndex) {
 		
 			MediaNodePanel* panel = dynamic_cast<MediaNodePanel*>(
-				itemAt(panelIndex, DiagramItem::M_BOX));
+				ItemAt(panelIndex, DiagramItem::M_BOX));
 				
 			if(panel &&
 				!strcmp(panel->ref->name(), nodeName) &&
@@ -1080,9 +1080,9 @@ status_t MediaRoutingView::exportState(
 	}
 
 	// store panel positions w/ node names & signatures
-	for(uint32 n = 0; n < countItems(DiagramItem::M_BOX); ++n) {
+	for(uint32 n = 0; n < CountItems(DiagramItem::M_BOX); ++n) {
 		MediaNodePanel* panel = dynamic_cast<MediaNodePanel*>(
-			itemAt(n, DiagramItem::M_BOX));
+			ItemAt(n, DiagramItem::M_BOX));
 		if(!panel)
 			continue;
 		
@@ -1173,7 +1173,7 @@ status_t MediaRoutingView::importStateFor(
 		panel->importState(&m);
 		
 		// select the panel
-		selectItem(panel, false);
+		SelectItem(panel, false);
 	}
 	
 	return B_OK;
@@ -1229,14 +1229,14 @@ status_t MediaRoutingView::_addPanelFor(
 		MediaNodePanel *panel = 0;
 		if (id == m_lastDroppedNode) // this was instantiated thru drag & drop
 		{
-			addItem(panel = new MediaNodePanel(m_lastDropPoint, ref));
-			selectItem(panel, true);
+			AddItem(panel = new MediaNodePanel(m_lastDropPoint, ref));
+			SelectItem(panel, true);
 			m_lastDroppedNode = 0;
 		}
 		else // this was an externally created node, must find a nice position first
 		{
 			panel = new MediaNodePanel(BPoint(0.0, 0.0), ref);
-			addItem(panel);
+			AddItem(panel);
 			BMessage state;
 			if(_fetchInactiveNodeState(panel, &state) == B_OK)
 				panel->importState(&state);
@@ -1257,9 +1257,9 @@ status_t MediaRoutingView::_findPanelFor(
 {
 	D_METHOD(("MediaRoutingView::_findPanelFor()\n"));
 
-	for (uint32 i = 0; i < countItems(DiagramItem::M_BOX); i++)
+	for (uint32 i = 0; i < CountItems(DiagramItem::M_BOX); i++)
 	{
-		MediaNodePanel *panel = dynamic_cast<MediaNodePanel *>(itemAt(i, DiagramItem::M_BOX));
+		MediaNodePanel *panel = dynamic_cast<MediaNodePanel *>(ItemAt(i, DiagramItem::M_BOX));
 		if (panel)
 		{
 			if (panel->ref->id() == id)
@@ -1280,7 +1280,7 @@ status_t MediaRoutingView::_removePanelFor(
 	MediaNodePanel *panel;
 	if (_findPanelFor(id, &panel) == B_OK)
 	{
-		if (removeItem(panel))
+		if (RemoveItem(panel))
 		{
 			remove_observer(this, panel->ref);
 			Invalidate(panel->frame());
@@ -1309,7 +1309,7 @@ status_t MediaRoutingView::_addWireFor(
 			return error;
 		}
 		MediaJack *outputJack = new MediaJack(output);
-		source->addItem(outputJack);
+		source->AddItem(outputJack);
 
 		media_input input;
 		error = connection.getInput(&input);
@@ -1318,10 +1318,10 @@ status_t MediaRoutingView::_addWireFor(
 			return error;
 		}
 		MediaJack *inputJack =  new MediaJack(input);
-		destination->addItem(inputJack);
+		destination->AddItem(inputJack);
 
 		MediaWire *wire = new MediaWire(connection, outputJack, inputJack);
-		addItem(wire);
+		AddItem(wire);
 		source->updateIOJacks();
 		source->arrangeIOJacks();
 		destination->updateIOJacks();
@@ -1348,9 +1348,9 @@ status_t MediaRoutingView::_findWireFor(
 {
 	D_METHOD(("MediaRoutingView::_findWireFor()\n"));
 
-	for (uint32 i = 0; i < countItems(DiagramItem::M_WIRE); i++)
+	for (uint32 i = 0; i < CountItems(DiagramItem::M_WIRE); i++)
 	{
-		MediaWire *wire = dynamic_cast<MediaWire *>(itemAt(i, DiagramItem::M_WIRE));
+		MediaWire *wire = dynamic_cast<MediaWire *>(ItemAt(i, DiagramItem::M_WIRE));
 		if (wire && wire->connection.id() == connectionID)
 		{
 			*outWire = wire;
@@ -1371,7 +1371,7 @@ status_t MediaRoutingView::_removeWireFor(
 		MediaNodePanel *source, *destination;
 		_findPanelFor(wire->connection.sourceNode(), &source);
 		_findPanelFor(wire->connection.destinationNode(), &destination);
-		removeItem(wire);
+		RemoveItem(wire);
 		Invalidate(wire->frame());
 		delete wire;
 		if (source)
@@ -1449,7 +1449,7 @@ void MediaRoutingView::_initLayout()
 			bodyHeight = 2 * MediaNodePanel::M_BODY_V_MARGIN + B_LARGE_ICON;
 			MediaNodePanel::M_DEFAULT_WIDTH = labelWidth > bodyWidth ? labelWidth : bodyWidth;
 			MediaNodePanel::M_DEFAULT_HEIGHT = labelHeight + bodyHeight;
-			align(&MediaNodePanel::M_DEFAULT_WIDTH, &MediaNodePanel::M_DEFAULT_HEIGHT);
+			Align(&MediaNodePanel::M_DEFAULT_WIDTH, &MediaNodePanel::M_DEFAULT_HEIGHT);
 
 			// Adjust the cleanup settings
 			M_CLEANUP_H_GAP += MediaNodePanel::M_DEFAULT_WIDTH;
@@ -1472,7 +1472,7 @@ void MediaRoutingView::_initLayout()
 			bodyHeight = 2 * MediaNodePanel::M_BODY_V_MARGIN + B_MINI_ICON;
 			MediaNodePanel::M_DEFAULT_WIDTH = labelWidth + bodyWidth;
 			MediaNodePanel::M_DEFAULT_HEIGHT = labelHeight > bodyHeight ? labelHeight : bodyHeight;
-			align(&MediaNodePanel::M_DEFAULT_WIDTH, &MediaNodePanel::M_DEFAULT_HEIGHT);
+			Align(&MediaNodePanel::M_DEFAULT_WIDTH, &MediaNodePanel::M_DEFAULT_HEIGHT);
 
 			// Adjust the cleanup settings
 			M_CLEANUP_V_GAP += MediaNodePanel::M_DEFAULT_HEIGHT;
@@ -1532,12 +1532,12 @@ void MediaRoutingView::_changeCyclingForSelection(
 {
 	D_METHOD(("MediaRoutingView::_changeCyclingForSelection()\n"));
 
-	if (selectedType() == DiagramItem::M_BOX)
+	if (SelectedType() == DiagramItem::M_BOX)
 	{
 		manager->lock();
-		for (uint32 i = 0; i < countSelectedItems(); i++)
+		for (uint32 i = 0; i < CountSelectedItems(); i++)
 		{
-			MediaNodePanel *panel = dynamic_cast<MediaNodePanel *>(selectedItemAt(i));
+			MediaNodePanel *panel = dynamic_cast<MediaNodePanel *>(SelectedItemAt(i));
 			if (panel && (panel->ref->isCycling() != cycle))
 			{
 				panel->ref->setCycling(cycle);
@@ -1552,12 +1552,12 @@ void MediaRoutingView::_changeRunModeForSelection(
 {
 	D_METHOD(("MediaRoutingView::_changeRunModeForSelection()\n"));
 
-	if (selectedType() == DiagramItem::M_BOX)
+	if (SelectedType() == DiagramItem::M_BOX)
 	{
 		manager->lock();
-		for (uint32 i = 0; i < countSelectedItems(); i++)
+		for (uint32 i = 0; i < CountSelectedItems(); i++)
 		{
-			MediaNodePanel *panel = dynamic_cast<MediaNodePanel *>(selectedItemAt(i));
+			MediaNodePanel *panel = dynamic_cast<MediaNodePanel *>(SelectedItemAt(i));
 			if (panel && (panel->ref->runMode() != mode))
 			{
 				panel->ref->setRunMode(mode);
@@ -1575,18 +1575,18 @@ void MediaRoutingView::_openInfoWindowsForSelection() {
 		return;
 	}
 
-	if (selectedType() == DiagramItem::M_BOX) {
-		for (uint32 i = 0; i < countSelectedItems(); i++) {
-			MediaNodePanel *panel = dynamic_cast<MediaNodePanel *>(selectedItemAt(i));
+	if (SelectedType() == DiagramItem::M_BOX) {
+		for (uint32 i = 0; i < CountSelectedItems(); i++) {
+			MediaNodePanel *panel = dynamic_cast<MediaNodePanel *>(SelectedItemAt(i));
 			if (panel && manager->Lock()) {
 				manager->openWindowFor(panel->ref);
 				manager->Unlock();
 			}
 		}
 	}
-	else if (selectedType() == DiagramItem::M_WIRE) {
-		for (uint32 i = 0; i < countSelectedItems(); i++) {
-			MediaWire *wire = dynamic_cast<MediaWire *>(selectedItemAt(i));
+	else if (SelectedType() == DiagramItem::M_WIRE) {
+		for (uint32 i = 0; i < CountSelectedItems(); i++) {
+			MediaWire *wire = dynamic_cast<MediaWire *>(SelectedItemAt(i));
 			if (wire && manager->Lock()) {
 				manager->openWindowFor(wire->connection);
 				manager->Unlock();
@@ -1598,13 +1598,13 @@ void MediaRoutingView::_openInfoWindowsForSelection() {
 void MediaRoutingView::_openParameterWindowsForSelection() {
 	D_METHOD(("MediaRoutingView::_openParameterWindowsForSelection()\n"));
 
-	if (selectedType() != DiagramItem::M_BOX) {
+	if (SelectedType() != DiagramItem::M_BOX) {
 		// can only open parameter window for nodes
 		return;
 	}
 
-	for (uint32 i = 0; i < countSelectedItems(); i++) {
-		MediaNodePanel *panel = dynamic_cast<MediaNodePanel *>(selectedItemAt(i));
+	for (uint32 i = 0; i < CountSelectedItems(); i++) {
+		MediaNodePanel *panel = dynamic_cast<MediaNodePanel *>(SelectedItemAt(i));
 		if (panel && (panel->ref->kind() & B_CONTROLLABLE)) {
 			ParameterWindowManager *paramMgr= ParameterWindowManager::Instance();
 			if (paramMgr && paramMgr->Lock()) {
@@ -1618,13 +1618,13 @@ void MediaRoutingView::_openParameterWindowsForSelection() {
 void MediaRoutingView::_startControlPanelsForSelection() {
 	D_METHOD(("MediaRoutingView::_startControlPanelsForSelection()\n"));
 
-	if (selectedType() != DiagramItem::M_BOX) {
+	if (SelectedType() != DiagramItem::M_BOX) {
 		// can only start control panel for nodes
 		return;
 	}
 
-	for (uint32 i = 0; i < countSelectedItems(); i++) {
-		MediaNodePanel *panel = dynamic_cast<MediaNodePanel *>(selectedItemAt(i));
+	for (uint32 i = 0; i < CountSelectedItems(); i++) {
+		MediaNodePanel *panel = dynamic_cast<MediaNodePanel *>(SelectedItemAt(i));
 		if (panel && (panel->ref->kind() & B_CONTROLLABLE)) {
 			ParameterWindowManager *paramMgr= ParameterWindowManager::Instance();
 			if (paramMgr && paramMgr->Lock()) {
@@ -1638,11 +1638,11 @@ void MediaRoutingView::_startControlPanelsForSelection() {
 void MediaRoutingView::_deleteSelection()
 {
 	D_METHOD(("MediaRoutingView::_deleteSelection()\n"));
-	if (selectedType() == DiagramItem::M_BOX)
+	if (SelectedType() == DiagramItem::M_BOX)
 	{
-		for (uint32 i = 0; i < countSelectedItems(); i++)
+		for (uint32 i = 0; i < CountSelectedItems(); i++)
 		{
-			MediaNodePanel *panel = dynamic_cast<MediaNodePanel *>(selectedItemAt(i));
+			MediaNodePanel *panel = dynamic_cast<MediaNodePanel *>(SelectedItemAt(i));
 			if (panel && panel->ref->isInternal())
 			{
 				status_t error = panel->ref->releaseNode();
@@ -1655,11 +1655,11 @@ void MediaRoutingView::_deleteSelection()
 			}			
 		}
 	}
-	else if (selectedType() == DiagramItem::M_WIRE)
+	else if (SelectedType() == DiagramItem::M_WIRE)
 	{
-		for (uint32 i = 0; i < countSelectedItems(); i++)
+		for (uint32 i = 0; i < CountSelectedItems(); i++)
 		{
-			MediaWire *wire = dynamic_cast<MediaWire *>(selectedItemAt(i));
+			MediaWire *wire = dynamic_cast<MediaWire *>(SelectedItemAt(i));
 			if (wire && !(wire->connection.flags() & Connection::LOCKED))
 			{
 				status_t error = manager->disconnect(wire->connection);
@@ -1721,7 +1721,7 @@ void MediaRoutingView::_checkDroppedFile(
 								droppedNode->setFlags(droppedNode->flags() | NodeRef::NO_POSITION_REPORTING);
 							}
 							m_lastDroppedNode = droppedNode->id();
-							m_lastDropPoint = align(dropPoint);
+							m_lastDropPoint = Align(dropPoint);
 						}
 						else
 						{
@@ -1804,11 +1804,11 @@ MediaRoutingView::_broadcastSelection() const
 {
 	int32 selectedGroup = 0;
 
-	if (selectedType() == DiagramItem::M_BOX) {
+	if (SelectedType() == DiagramItem::M_BOX) {
 		// iterate thru the list of selected node panels and make the
 		// first group we find the selected group
-		for (uint32 i = 0; i < countSelectedItems(); i++) {
-			MediaNodePanel *panel = dynamic_cast<MediaNodePanel *>(selectedItemAt(i));
+		for (uint32 i = 0; i < CountSelectedItems(); i++) {
+			MediaNodePanel *panel = dynamic_cast<MediaNodePanel *>(SelectedItemAt(i));
 			if (panel && panel->ref->group()) {
 				selectedGroup = panel->ref->group()->id();
 				BMessenger messenger(Window());

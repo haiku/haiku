@@ -505,7 +505,7 @@ public:													// *** hooks
 		
 		if(m_routingView) {
 //			m_routingView->LockLooper();
-			m_routingView->deselectAll();
+			m_routingView->DeselectAll();
 			status_t err = m_routingView->importStateFor(
 				this,
 				archive);
@@ -595,8 +595,8 @@ status_t RouteApp::_writeSelectedNodeSet(
 	ASSERT(v);
 
 	if(
-		v->countSelectedItems() < 0 ||
-		v->selectedType() != DiagramItem::M_BOX) {
+		v->CountSelectedItems() < 0 ||
+		v->SelectedType() != DiagramItem::M_BOX) {
 		PRINT((
 			"!!! RouteApp::_writeSelectedNodeSet():\n"
 			"    Invalid selection!\n"));
@@ -607,8 +607,8 @@ status_t RouteApp::_writeSelectedNodeSet(
 
 	_RouteAppExportContext context(v);
 	
-	for(uint32 i = 0; i < v->countSelectedItems(); ++i) {
-		MediaNodePanel* panel = dynamic_cast<MediaNodePanel*>(v->selectedItemAt(i));
+	for(uint32 i = 0; i < v->CountSelectedItems(); ++i) {
+		MediaNodePanel* panel = dynamic_cast<MediaNodePanel*>(v->SelectedItemAt(i));
 		if(!panel)
 			continue;
 		err = context.addNode(panel->ref->id());

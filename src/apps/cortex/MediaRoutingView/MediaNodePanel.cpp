@@ -136,7 +136,7 @@ void MediaNodePanel::mouseDown(
 	_inherited::mouseDown(point, buttons, clicks);
 
 	// +++ REALLY BAD WORKAROUND
-	MediaJack *jack = dynamic_cast<MediaJack *>(lastItemUnder());
+	MediaJack *jack = dynamic_cast<MediaJack *>(_LastItemUnder());
 	if (jack && jack->frame().Contains(point))
 	{
 		return;
@@ -210,7 +210,7 @@ void MediaNodePanel::messageDropped(
 	D_METHOD(("MediaNodePanel::messageDropped()\n"));
 
 	// +++ REALLY BAD WORKAROUND
-	MediaJack *jack = dynamic_cast<MediaJack *>(itemUnder(point));
+	MediaJack *jack = dynamic_cast<MediaJack *>(ItemUnder(point));
 	if (jack)
 	{
 		jack->messageDropped(point, message);
@@ -253,9 +253,9 @@ void MediaNodePanel::layoutChanged(
 	m_alternatePosition = p;
 
 	resizeTo(M_DEFAULT_WIDTH, M_DEFAULT_HEIGHT);
-	for (uint32 i = 0; i < countItems(); i++)
+	for (uint32 i = 0; i < CountItems(); i++)
 	{
-		MediaJack *jack = dynamic_cast<MediaJack *>(itemAt(i));
+		MediaJack *jack = dynamic_cast<MediaJack *>(ItemAt(i));
 		jack->layoutChanged(layout);
 	}
 	_updateIcon(layout);
@@ -273,7 +273,7 @@ void MediaNodePanel::populateInit()
 		ref->getFreeInputs(freeInputs);
 		for (uint32 i = 0; i < freeInputs.size(); i++)
 		{
-			addItem(new MediaJack(freeInputs[i]));
+			AddItem(new MediaJack(freeInputs[i]));
 		}
 	}
 	if (ref->kind() & B_BUFFER_PRODUCER)
@@ -282,7 +282,7 @@ void MediaNodePanel::populateInit()
 		ref->getFreeOutputs(freeOutputs);
 		for (uint32 i = 0; i < freeOutputs.size(); i++)
 		{
-			addItem(new MediaJack(freeOutputs[i]));
+			AddItem(new MediaJack(freeOutputs[i]));
 		}
 	}
 }
@@ -292,12 +292,12 @@ void MediaNodePanel::updateIOJacks()
 	D_METHOD(("MediaNodePanel::updateIOJacks()\n"));
 
 	// remove all free inputs/outputs, they may be outdated
-	for (uint32 i = 0; i < countItems(); i++)
+	for (uint32 i = 0; i < CountItems(); i++)
 	{
-		MediaJack *jack = dynamic_cast<MediaJack *>(itemAt(i));
+		MediaJack *jack = dynamic_cast<MediaJack *>(ItemAt(i));
 		if (jack && !jack->isConnected())
 		{
-			removeItem(jack);
+			RemoveItem(jack);
 			delete jack;
 			i--; // account for reindexing in the BList
 		}
@@ -311,7 +311,7 @@ void MediaNodePanel::updateIOJacks()
 		for (uint32 i = 0; i < freeInputs.size(); i++)
 		{
 			MediaJack *jack;
-			addItem(jack = new MediaJack(freeInputs[i]));
+			AddItem(jack = new MediaJack(freeInputs[i]));
 		}
 	}
 
@@ -323,7 +323,7 @@ void MediaNodePanel::updateIOJacks()
 		for (uint32 i = 0; i < freeOutputs.size(); i++)
 		{
 			MediaJack *jack;
-			addItem(jack = new MediaJack(freeOutputs[i]));
+			AddItem(jack = new MediaJack(freeOutputs[i]));
 		}
 	}
 
@@ -335,7 +335,7 @@ void MediaNodePanel::updateIOJacks()
 void MediaNodePanel::arrangeIOJacks()
 {
 	D_METHOD(("MediaNodePanel::arrangeIOJacks()\n"));
-	sortItems(DiagramItem::M_ENDPOINT, &compareTypeAndID);
+	SortItems(DiagramItem::M_ENDPOINT, &compareTypeAndID);
 
 	switch (dynamic_cast<MediaRoutingView *>(view())->getLayout())
 	{
@@ -343,13 +343,13 @@ void MediaNodePanel::arrangeIOJacks()
 		{
 			BRegion updateRegion;
 			float align = 1.0;
-			view()->getItemAlignment(0, &align);
+			view()->GetItemAlignment(0, &align);
 
 			// adjust this panel's size
 			int32 numInputs = 0, numOutputs = 0;
-			for (uint32 i = 0; i < countItems(); i++)
+			for (uint32 i = 0; i < CountItems(); i++)
 			{
-				MediaJack *jack = dynamic_cast<MediaJack *>(itemAt(i));
+				MediaJack *jack = dynamic_cast<MediaJack *>(ItemAt(i));
 				if (jack)
 				{
 					if (jack->isInput())
@@ -406,9 +406,9 @@ void MediaNodePanel::arrangeIOJacks()
 					outputOffset = center - ((numOutputs + 1) / 2) * (MediaJack::M_DEFAULT_HEIGHT + MediaJack::M_DEFAULT_GAP);
 				}
 			}
-			for (uint32 i = 0; i < countItems(); i++)
+			for (uint32 i = 0; i < CountItems(); i++)
 			{
-				MediaJack *jack = dynamic_cast<MediaJack *>(itemAt(i));
+				MediaJack *jack = dynamic_cast<MediaJack *>(ItemAt(i));
 				if (jack)
 				{
 					if (jack->isInput())
@@ -433,13 +433,13 @@ void MediaNodePanel::arrangeIOJacks()
 		{
 			BRegion updateRegion;
 			float align = 1.0;
-			view()->getItemAlignment(&align, 0);
+			view()->GetItemAlignment(&align, 0);
 
 			// adjust this panel's size
 			int32 numInputs = 0, numOutputs = 0;
-			for (uint32 i = 0; i < countItems(); i++)
+			for (uint32 i = 0; i < CountItems(); i++)
 			{
-				MediaJack *jack = dynamic_cast<MediaJack *>(itemAt(i));
+				MediaJack *jack = dynamic_cast<MediaJack *>(ItemAt(i));
 				if (jack)
 				{
 					if (jack->isInput())
@@ -493,9 +493,9 @@ void MediaNodePanel::arrangeIOJacks()
 					outputOffset = center - ((numOutputs + 1) / 2) * (MediaJack::M_DEFAULT_WIDTH + MediaJack::M_DEFAULT_GAP);
 				}
 			}
-			for (uint32 i = 0; i < countItems(); i++)
+			for (uint32 i = 0; i < CountItems(); i++)
 			{
-				MediaJack *jack = dynamic_cast<MediaJack *>(itemAt(i));
+				MediaJack *jack = dynamic_cast<MediaJack *>(ItemAt(i));
 				if (jack)
 				{
 					if (jack->isInput())

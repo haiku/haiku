@@ -114,8 +114,8 @@ void DiagramView::Draw(
 {
 	D_METHOD(("DiagramView::Draw()\n"));
 	drawBackground(updateRect);
-	drawItems(updateRect, DiagramItem::M_WIRE);
-	drawItems(updateRect, DiagramItem::M_BOX);
+	DrawItems(updateRect, DiagramItem::M_WIRE);
+	DrawItems(updateRect, DiagramItem::M_BOX);
 }
 
 void DiagramView::FrameResized(
@@ -149,17 +149,17 @@ void DiagramView::MessageReceived(
 			{
 				bool deselectOthers = true;
 				message->FindBool("replace", &deselectOthers);
-				if (item->isSelected() && !deselectOthers && multipleSelection())
+				if (item->isSelected() && !deselectOthers && MultipleSelection())
 				{
-					if (deselectItem(item))
+					if (DeselectItem(item))
 					{
-						selectionChanged();
+						SelectionChanged();
 					}
 				}
-				else if (selectItem(item, deselectOthers))
+				else if (SelectItem(item, deselectOthers))
 				{
-					sortItems(item->type(), &compareSelectionTime);
-					selectionChanged();
+					SortItems(item->type(), &compareSelectionTime);
+					SelectionChanged();
 				}
 			}
 			break;
@@ -179,7 +179,7 @@ void DiagramView::MessageReceived(
 					{
 						_endWireTracking();
 						DiagramWire *wire = createWire(fromWhich, toWhich);
-						if (wire && addItem(wire))
+						if (wire && AddItem(wire))
 						{
 							connectionEstablished(fromWhich, toWhich);
 							break;
@@ -195,7 +195,7 @@ void DiagramView::MessageReceived(
 			if (message->WasDropped())
 			{
 				BPoint point = ConvertFromScreen(message->DropPoint());
-				DiagramItem *item = itemUnder(point);
+				DiagramItem *item = ItemUnder(point);
 				if (item)
 				{
 					item->messageDropped(point, message);
@@ -224,9 +224,9 @@ void DiagramView::KeyDown(
 		case B_LEFT_ARROW:
 		{
 			float x;
-			getItemAlignment(&x, 0);
+			GetItemAlignment(&x, 0);
 			BRegion updateRegion;
-			dragSelectionBy(-x, 0.0, &updateRegion);
+			DragSelectionBy(-x, 0.0, &updateRegion);
 			for (int32 i = 0; i < updateRegion.CountRects(); i++)
 				Invalidate(updateRegion.RectAt(i));
 			updateDataRect();
@@ -235,9 +235,9 @@ void DiagramView::KeyDown(
 		case B_RIGHT_ARROW:
 		{
 			float x;
-			getItemAlignment(&x, 0);
+			GetItemAlignment(&x, 0);
 			BRegion updateRegion;
-			dragSelectionBy(x, 0.0, &updateRegion);
+			DragSelectionBy(x, 0.0, &updateRegion);
 			for (int32 i = 0; i < updateRegion.CountRects(); i++)
 				Invalidate(updateRegion.RectAt(i));
 			updateDataRect();
@@ -246,9 +246,9 @@ void DiagramView::KeyDown(
 		case B_UP_ARROW:
 		{
 			float y;
-			getItemAlignment(0, &y);
+			GetItemAlignment(0, &y);
 			BRegion updateRegion;
-			dragSelectionBy(0.0, -y, &updateRegion);
+			DragSelectionBy(0.0, -y, &updateRegion);
 			for (int32 i = 0; i < updateRegion.CountRects(); i++)
 				Invalidate(updateRegion.RectAt(i));
 			updateDataRect();
@@ -257,9 +257,9 @@ void DiagramView::KeyDown(
 		case B_DOWN_ARROW:
 		{
 			float y;
-			getItemAlignment(0, &y);
+			GetItemAlignment(0, &y);
 			BRegion updateRegion;
-			dragSelectionBy(0.0, y, &updateRegion);
+			DragSelectionBy(0.0, y, &updateRegion);
 			for (int32 i = 0; i < updateRegion.CountRects(); i++)
 				Invalidate(updateRegion.RectAt(i));
 			updateDataRect();
@@ -305,16 +305,16 @@ void DiagramView::MouseDown(
 	}
  
 	// was an item clicked ?
- 	DiagramItem *item = itemUnder(point);
+ 	DiagramItem *item = ItemUnder(point);
 	if (item)
 	{
 		item->mouseDown(point, m_lastButton, m_clickCount);
 	}
 	else // no, the background was clicked
 	{
-		if (!(modifiers() & B_SHIFT_KEY) && deselectAll(DiagramItem::M_ANY))
-			selectionChanged();
-		if (multipleSelection() && (m_lastButton == B_PRIMARY_MOUSE_BUTTON) && !(modifiers() & B_CONTROL_KEY))
+		if (!(modifiers() & B_SHIFT_KEY) && DeselectAll(DiagramItem::M_ANY))
+			SelectionChanged();
+		if (MultipleSelection() && (m_lastButton == B_PRIMARY_MOUSE_BUTTON) && !(modifiers() & B_CONTROL_KEY))
 			_beginRectTracking(point);
 		mouseDown(point, m_lastButton, m_clickCount);
 	}
@@ -395,7 +395,7 @@ void DiagramView::MouseMoved(
 					if (box)
 					{
 						BRegion updateRegion;
-						dragSelectionBy(point.x - box->frame().left - offset.x, 
+						DragSelectionBy(point.x - box->frame().left - offset.x, 
 										point.y - box->frame().top - offset.y,
 										&updateRegion);
 						updateDataRect();
@@ -409,7 +409,7 @@ void DiagramView::MouseMoved(
 			}
 			default: // unkwown message -> redirect to messageDragged()
 			{
-				DiagramItem *last = lastItemUnder();
+				DiagramItem *last = _LastItemUnder();
 				if (transit == B_EXITED_VIEW)
 				{
 					if (last)
@@ -420,7 +420,7 @@ void DiagramView::MouseMoved(
 				}
 				else
 				{
-					DiagramItem *item = itemUnder(point);
+					DiagramItem *item = ItemUnder(point);
 					if (item)
 					{
 						if (item != last)
@@ -450,19 +450,19 @@ void DiagramView::MouseMoved(
 	}
 	else // no message at all -> redirect to mouseOver()
 	{
-		DiagramItem *last = lastItemUnder();
+		DiagramItem *last = _LastItemUnder();
 		if ((transit == B_EXITED_VIEW) || (transit == B_OUTSIDE_VIEW))
 		{
 			if (last)
 			{
 				last->mouseOver(point, B_EXITED_VIEW);
-				resetItemUnder();
+				_ResetItemUnder();
 				mouseOver(point, B_EXITED_VIEW);
 			}
 		}
 		else
 		{
-			DiagramItem *item = itemUnder(point);
+			DiagramItem *item = ItemUnder(point);
 			if (item)
 			{
 				if (item != last)
@@ -489,7 +489,7 @@ void DiagramView::MouseUp(
 	BPoint point)
 {
 	D_METHOD(("DiagramView::MouseUp()\n"));
-	if (multipleSelection())
+	if (MultipleSelection())
 		EndRectTracking();
 	_endWireTracking();
 
@@ -501,13 +501,13 @@ void DiagramView::MouseUp(
 // *** derived from DiagramItemGroup (public)
 // -------------------------------------------------------- //
 
-bool DiagramView::addItem(
+bool DiagramView::AddItem(
 	DiagramItem *item)
 {
-	D_METHOD(("DiagramBox::addItem()\n"));
+	D_METHOD(("DiagramBox::AddItem()\n"));
 	if (item)
 	{
-		if (DiagramItemGroup::addItem(item))
+		if (DiagramItemGroup::AddItem(item))
 		{
 			item->_setOwner(this);
 			item->attachedToDiagram();
@@ -521,14 +521,14 @@ bool DiagramView::addItem(
 	return false;
 }
 
-bool DiagramView::removeItem(
+bool DiagramView::RemoveItem(
 	DiagramItem *item)
 {
-	D_METHOD(("DiagramBox::removeItem()\n"));
+	D_METHOD(("DiagramBox::RemoveItem()\n"));
 	if (item)
 	{
 		item->detachedFromDiagram();
-		if (DiagramItemGroup::removeItem(item))
+		if (DiagramItemGroup::RemoveItem(item))
 		{
 			item->_setOwner(0);
 			if (item->type() == DiagramItem::M_BOX)
@@ -632,8 +632,8 @@ DiagramView::updateDataRect()
 	D_METHOD(("DiagramView::updateDataRect()\n"));
 	// calculate the area in which boxes display
 	m_boxRegion.MakeEmpty();
-	for (uint32 i = 0; i < countItems(DiagramItem::M_BOX); i++) {
-		m_boxRegion.Include(itemAt(i, DiagramItem::M_BOX)->frame());
+	for (uint32 i = 0; i < CountItems(DiagramItem::M_BOX); i++) {
+		m_boxRegion.Include(ItemAt(i, DiagramItem::M_BOX)->frame());
 	}
 	// adapt the data rect to the new region of boxes
 	BRect boxRect = m_boxRegion.Frame();
@@ -652,8 +652,8 @@ DiagramView::_beginWireTracking(DiagramEndPoint *startPoint)
 {
 	D_METHOD(("DiagramView::beginWireTracking()\n"));
 	m_draggedWire = createWire(startPoint);
-	addItem(m_draggedWire);
-	selectItem(m_draggedWire, true);
+	AddItem(m_draggedWire);
+	SelectItem(m_draggedWire, true);
 	Invalidate(startPoint->frame());
 }
 
@@ -662,7 +662,7 @@ void DiagramView::_endWireTracking()
 	D_METHOD(("DiagramView::endWireTracking()\n"));
 	if (m_draggedWire)
 	{
-		removeItem(m_draggedWire);
+		RemoveItem(m_draggedWire);
 		Invalidate(m_draggedWire->frame());
 		DiagramEndPoint *endPoint = m_draggedWire->startPoint();
 		if (!endPoint)
@@ -699,19 +699,19 @@ DiagramView::_trackRect(BPoint origin, BPoint current)
 	rect.top = origin.y < current.y ? origin.y : current.y;
 	rect.right = origin.x < current.x ? current.x : origin.x;
 	rect.bottom = origin.y < current.y ? current.y : origin.y;
-	for (uint32 i = 0; i < countItems(DiagramItem::M_BOX); i++) {
-		DiagramBox *box = dynamic_cast<DiagramBox *>(itemAt(i, DiagramItem::M_BOX));
+	for (uint32 i = 0; i < CountItems(DiagramItem::M_BOX); i++) {
+		DiagramBox *box = dynamic_cast<DiagramBox *>(ItemAt(i, DiagramItem::M_BOX));
 		if (box) {
 			if (rect.Intersects(box->frame()))
-				changed  |= selectItem(box, false);
+				changed  |= SelectItem(box, false);
 			else
-				changed |= deselectItem(box);
+				changed |= DeselectItem(box);
 		}
 	}
 
 	if (changed) {
-		sortItems(DiagramItem::M_BOX, &compareSelectionTime);
-		selectionChanged();
+		SortItems(DiagramItem::M_BOX, &compareSelectionTime);
+		SelectionChanged();
 	}
 }
 

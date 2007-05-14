@@ -39,11 +39,11 @@ DiagramBox::~DiagramBox()
 
 // derived from DiagramItemGroup (public)
 bool
-DiagramBox::addItem(DiagramItem *item)
+DiagramBox::AddItem(DiagramItem *item)
 {
-	D_METHOD(("DiagramBox::addItem()\n"));
+	D_METHOD(("DiagramBox::AddItem()\n"));
 	if (item) {
-		if (DiagramItemGroup::addItem(item)) {
+		if (DiagramItemGroup::AddItem(item)) {
 			if (m_view) {
 				item->_setOwner(m_view);
 				item->attachedToDiagram();
@@ -56,12 +56,12 @@ DiagramBox::addItem(DiagramItem *item)
 
 
 bool
-DiagramBox::removeItem(DiagramItem *item)
+DiagramBox::RemoveItem(DiagramItem *item)
 {
-	D_METHOD(("DiagramBox::removeItem()\n"));
+	D_METHOD(("DiagramBox::RemoveItem()\n"));
 	if (item) {
 		item->detachedFromDiagram();
-		if (DiagramItemGroup::removeItem(item)) {
+		if (DiagramItemGroup::RemoveItem(item)) {
 			item->_setOwner(0);
 			return true;
 		}
@@ -81,22 +81,22 @@ DiagramBox::draw(BRect updateRect)
 			if (m_flags & M_DRAW_UNDER_ENDPOINTS) {
 				BRegion region, clipping;
 				region.Include(frame());
-				if (group()->getClippingAbove(this, &clipping))
+				if (group()->GetClippingAbove(this, &clipping))
 					region.Exclude(&clipping);
 				view()->ConstrainClippingRegion(&region);
 				drawBox();
-				for (uint32 i = 0; i < countItems(); i++) {
-					DiagramItem *item = itemAt(i);
+				for (uint32 i = 0; i < CountItems(); i++) {
+					DiagramItem *item = ItemAt(i);
 					if (region.Intersects(item->frame()))
 						item->draw(item->frame());
 				}
 			} else {
 				BRegion region, clipping;
 				region.Include(frame());
-				if (view()->getClippingAbove(this, &clipping))
+				if (view()->GetClippingAbove(this, &clipping))
 					region.Exclude(&clipping);
-				for (uint32 i = 0; i < countItems(); i++) {
-					DiagramItem *item = itemAt(i);
+				for (uint32 i = 0; i < CountItems(); i++) {
+					DiagramItem *item = ItemAt(i);
 					BRect r;
 					if (region.Intersects(r = item->frame())) {
 						item->draw(r);
@@ -116,7 +116,7 @@ void
 DiagramBox::mouseDown(BPoint point, uint32 buttons, uint32 clicks)
 {
 	D_MOUSE(("DiagramBox::mouseDown()\n"));
-	DiagramItem *item = itemUnder(point);
+	DiagramItem *item = ItemUnder(point);
 	if (item)
 		item->mouseDown(point, buttons, clicks);
 	else if (clicks == 1) {
@@ -144,12 +144,12 @@ void
 DiagramBox::mouseOver(BPoint point, uint32 transit)
 {
 	D_MOUSE(("DiagramBox::mouseOver()\n"));
-	DiagramItem *last = lastItemUnder();
+	DiagramItem *last = _LastItemUnder();
 	if (last && (transit == B_EXITED_VIEW)) {
 		last->mouseOver(point, B_EXITED_VIEW);
-		resetItemUnder();
+		_ResetItemUnder();
 	} else {
-		DiagramItem *item = itemUnder(point);
+		DiagramItem *item = ItemUnder(point);
 		if (item) {
 			if (item != last) {
 				if (last)
@@ -168,12 +168,12 @@ void
 DiagramBox::messageDragged(BPoint point, uint32 transit, const BMessage *message)
 {
 	D_MOUSE(("DiagramBox::messageDragged()\n"));
-	DiagramItem *last = lastItemUnder();
+	DiagramItem *last = _LastItemUnder();
 	if (last && (transit == B_EXITED_VIEW)) {
 		last->messageDragged(point, B_EXITED_VIEW, message);
-		resetItemUnder();
+		_ResetItemUnder();
 	} else {
-		DiagramItem *item = itemUnder(point);
+		DiagramItem *item = ItemUnder(point);
 		if (item) {
 			if (item != last) {
 				if (last)
@@ -194,7 +194,7 @@ void
 DiagramBox::messageDropped(BPoint point, BMessage *message)
 {
 	D_METHOD(("DiagramBox::messageDropped()\n"));
-	DiagramItem *item = itemUnder(point);
+	DiagramItem *item = ItemUnder(point);
 	if (item) {
 		item->messageDropped(point, message);
 		return;
@@ -210,8 +210,8 @@ DiagramBox::moveBy(float x, float y, BRegion *wireRegion)
 	if (view()) {
 		view()->PushState();
 		{
-			for (uint32 i = 0; i < countItems(); i++) {
-				DiagramEndPoint *endPoint = dynamic_cast<DiagramEndPoint *>(itemAt(i));
+			for (uint32 i = 0; i < CountItems(); i++) {
+				DiagramEndPoint *endPoint = dynamic_cast<DiagramEndPoint *>(ItemAt(i));
 				if (endPoint)
 					endPoint->moveBy(x, y, wireRegion);
 			}
@@ -243,8 +243,8 @@ DiagramBox::_setOwner(DiagramView *owner)
 {
 	D_METHOD(("DiagramBox::_setOwner()\n"));
 	m_view = owner;
-	for (uint32 i = 0; i < countItems(DiagramItem::M_ENDPOINT); i++) {
-		DiagramItem *item = itemAt(i);
+	for (uint32 i = 0; i < CountItems(DiagramItem::M_ENDPOINT); i++) {
+		DiagramItem *item = ItemAt(i);
 		item->_setOwner(m_view);
 		if (m_view)
 			item->attachedToDiagram();

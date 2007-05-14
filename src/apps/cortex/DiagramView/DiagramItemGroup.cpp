@@ -1,5 +1,13 @@
 // DiagramItemGroup.cpp
 
+/*! \class DiagramItemGroup.
+	\brief Basic class for managing and accessing DiagramItem objects.
+
+	Objects of this class can manage one or more of the DiagramItem
+	type M_BOX, M_WIRE and M_ENDPOINT. Many methods let you specify
+	which type of item you want to deal with.	
+*/
+
 #include "DiagramItemGroup.h"
 #include "DiagramItem.h"
 
@@ -10,397 +18,341 @@ __USE_CORTEX_NAMESPACE
 #include <Debug.h>
 #define D_METHOD(x) //PRINT (x)
 
-// -------------------------------------------------------- //
-// *** ctor/dtor
-// -------------------------------------------------------- //
 
-DiagramItemGroup::DiagramItemGroup(
-	uint32 acceptedTypes,
-	bool multiSelection)
-	: m_boxes(0),
-	  m_wires(0),
-	  m_endPoints(0),
-	  m_selection(0),
-	  m_types(acceptedTypes),
-	  m_itemAlignment(1.0, 1.0),
-	  m_multiSelection(multiSelection),
-	  m_lastItemUnder(0)
+DiagramItemGroup::DiagramItemGroup(uint32 acceptedTypes, bool multiSelection)
+	: fBoxes(0),
+	fWires(0),
+	fEndPoints(0),
+	fSelection(0),
+	fTypes(acceptedTypes),
+	fItemAlignment(1.0, 1.0),
+	fMultiSelection(multiSelection),
+	fLastItemUnder(0)
 {
 	D_METHOD(("DiagramItemGroup::DiagramItemGroup()\n"));
-	m_selection = new BList(1);
+	fSelection = new BList(1);
 }
+
 
 DiagramItemGroup::~DiagramItemGroup()
 {
 	D_METHOD(("DiagramItemGroup::~DiagramItemGroup()\n"));
-	if (m_selection)
-	{
-		m_selection->MakeEmpty();
-		delete m_selection;
+	if (fSelection) {
+		fSelection->MakeEmpty();
+		delete fSelection;
 	}
-	if (m_boxes && (m_types & DiagramItem::M_BOX))
-	{
-		while (countItems(DiagramItem::M_BOX) > 0)
-		{
-			DiagramItem *item = itemAt(0, DiagramItem::M_BOX);
-			if (removeItem(item))
+
+	if (fBoxes && (fTypes & DiagramItem::M_BOX)) {
+		while (CountItems(DiagramItem::M_BOX) > 0) {
+			DiagramItem *item = ItemAt(0, DiagramItem::M_BOX);
+			if (RemoveItem(item))
 				delete item;
 		}
-		delete m_boxes;
+		delete fBoxes;
 	}
-	if (m_wires && (m_types & DiagramItem::M_WIRE))
-	{
-		while (countItems(DiagramItem::M_WIRE) > 0)
-		{
-			DiagramItem *item = itemAt(0, DiagramItem::M_WIRE);
-			if (removeItem(item))
+
+	if (fWires && (fTypes & DiagramItem::M_WIRE)) {
+		while (CountItems(DiagramItem::M_WIRE) > 0) {
+			DiagramItem *item = ItemAt(0, DiagramItem::M_WIRE);
+			if (RemoveItem(item))
 				delete item;
 		}
-		delete m_wires;
+		delete fWires;
 	}
-	if (m_endPoints && (m_types & DiagramItem::M_ENDPOINT))
-	{
-		while (countItems(DiagramItem::M_ENDPOINT) > 0)
-		{
-			DiagramItem *item = itemAt(0, DiagramItem::M_ENDPOINT);
-			if (removeItem(item))
+
+	if (fEndPoints && (fTypes & DiagramItem::M_ENDPOINT)) {
+		while (CountItems(DiagramItem::M_ENDPOINT) > 0) {
+			DiagramItem *item = ItemAt(0, DiagramItem::M_ENDPOINT);
+			if (RemoveItem(item))
 				delete item;
 		}
-		delete m_endPoints;
+		delete fEndPoints;
 	}
 }
 
-// -------------------------------------------------------- //
-// *** item accessors
-// -------------------------------------------------------- //
 
-uint32 DiagramItemGroup::countItems(
-	uint32 whichType) const
+//	#pragma mark - item accessors
+
+
+//! Returns the number of items in the group (optionally only those
+//	of the given type \param whichType)
+uint32
+DiagramItemGroup::CountItems(uint32 whichType) const
 {
-	D_METHOD(("DiagramItemGroup::countItems()\n"));
+	D_METHOD(("DiagramItemGroup::CountItems()\n"));
 	uint32 count = 0;
-	if (whichType & m_types)
-	{
-		if (whichType & DiagramItem::M_BOX)
-		{
-			if (m_boxes)
-			{
-				count += m_boxes->CountItems();
-			}
+	if (whichType & fTypes) {
+		if (whichType & DiagramItem::M_BOX) {
+			if (fBoxes)
+				count += fBoxes->CountItems();
+
 		}
-		if (whichType & DiagramItem::M_WIRE)
-		{
-			if (m_wires)
-			{
-				count += m_wires->CountItems();
-			}
+
+		if (whichType & DiagramItem::M_WIRE) {
+			if (fWires)
+				count += fWires->CountItems();
 		}
-		if (whichType & DiagramItem::M_ENDPOINT)
-		{
-			if (m_endPoints)
-			{
-				count += m_endPoints->CountItems();
-			}
+
+		if (whichType & DiagramItem::M_ENDPOINT) {
+			if (fEndPoints)
+				count += fEndPoints->CountItems();
 		}
 	}
+
 	return count;
 }
 
-DiagramItem *DiagramItemGroup::itemAt(
-	uint32 index,
-	uint32 whichType) const
+
+/*! Returns a pointer to the item in the lists which is
+	at the given index; if none is found, this function
+	returns 0
+*/
+DiagramItem*
+DiagramItemGroup::ItemAt(uint32 index, uint32 whichType) const
 {
-	D_METHOD(("DiagramItemGroup::itemAt()\n"));
-	if (m_types & whichType)
-	{
-		if (whichType & DiagramItem::M_BOX)
-		{
-			if (m_boxes && (index < countItems(DiagramItem::M_BOX)))
-			{
-				return static_cast<DiagramItem *>(m_boxes->ItemAt(index));
-			}
+	D_METHOD(("DiagramItemGroup::ItemAt()\n"));
+	if (fTypes & whichType) {
+		if (whichType & DiagramItem::M_BOX) {
+			if (fBoxes && (index < CountItems(DiagramItem::M_BOX)))
+				return static_cast<DiagramItem *>(fBoxes->ItemAt(index));
 			else
-			{
-				index -= countItems(DiagramItem::M_BOX);
-			}
+				index -= CountItems(DiagramItem::M_BOX);
 		}
-		if (whichType & DiagramItem::M_WIRE)
-		{
-			if (m_wires && (index < countItems(DiagramItem::M_WIRE)))
-			{
-				return static_cast<DiagramItem *>(m_wires->ItemAt(index));
-			}
+
+		if (whichType & DiagramItem::M_WIRE) {
+			if (fWires && (index < CountItems(DiagramItem::M_WIRE)))
+				return static_cast<DiagramItem *>(fWires->ItemAt(index));
 			else
-			{
-				index -= countItems(DiagramItem::M_WIRE);
-			}
+				index -= CountItems(DiagramItem::M_WIRE);
 		}
-		if (whichType & DiagramItem::M_ENDPOINT)
-		{
-			if (m_endPoints && (index < countItems(DiagramItem::M_ENDPOINT)))
-			{
-				return static_cast<DiagramItem *>(m_endPoints->ItemAt(index));
-			}
+
+		if (whichType & DiagramItem::M_ENDPOINT) {
+			if (fEndPoints && (index < CountItems(DiagramItem::M_ENDPOINT)))
+				return static_cast<DiagramItem *>(fEndPoints->ItemAt(index));
 		}
 	}
+
 	return 0;
 }
 
-// This function returns the first box or endpoint found that
-// contains the given point. For connections it looks at all
-// wires that 'might' contain the point and calls their method
-// howCloseTo() to find the one closest to the point.
-// The lists should be sorted by selection time for proper results!
-DiagramItem *DiagramItemGroup::itemUnder(
-	BPoint point)
+
+/*! This function returns the first box or endpoint found that
+	contains the given \param point. For connections it looks at all
+	wires that 'might' contain the point and calls their method
+	howCloseTo() to find the one closest to the point.
+	The lists should be sorted by selection time for proper results!
+*/
+DiagramItem*
+DiagramItemGroup::ItemUnder(BPoint point)
 {
-	D_METHOD(("DiagramItemGroup::itemUnder()\n"));
-	if (m_types & DiagramItem::M_BOX)
-	{
-		for (uint32 i = 0; i < countItems(DiagramItem::M_BOX); i++)
-		{
-			DiagramItem *item = itemAt(i, DiagramItem::M_BOX);
-			if (item->frame().Contains(point) && (item->howCloseTo(point) == 1.0))
-			{
-//				DiagramItemGroup *group = dynamic_cast<DiagramItemGroup *>(item);
-				return (m_lastItemUnder = item);
+	D_METHOD(("DiagramItemGroup::ItemUnder()\n"));
+	if (fTypes & DiagramItem::M_BOX) {
+		for (uint32 i = 0; i < CountItems(DiagramItem::M_BOX); i++) {
+			DiagramItem *item = ItemAt(i, DiagramItem::M_BOX);
+			if (item->frame().Contains(point) && (item->howCloseTo(point) == 1.0)) {
+				// DiagramItemGroup *group = dynamic_cast<DiagramItemGroup *>(item);
+				return (fLastItemUnder = item);
 			}
 		}
 	}
-	if (m_types & DiagramItem::M_WIRE)
-	{
+
+	if (fTypes & DiagramItem::M_WIRE) {
 		float closest = 0.0;
 		DiagramItem *closestItem = 0;
-		for (uint32 i = 0; i < countItems(DiagramItem::M_WIRE); i++)
-		{
-			DiagramItem *item = itemAt(i, DiagramItem::M_WIRE);
-			if (item->frame().Contains(point))
-			{
+		for (uint32 i = 0; i < CountItems(DiagramItem::M_WIRE); i++) {
+			DiagramItem *item = ItemAt(i, DiagramItem::M_WIRE);
+			if (item->frame().Contains(point)) {
 				float howClose = item->howCloseTo(point);
-				if (howClose > closest)
-				{
+				if (howClose > closest) {
 					closestItem = item;
 					if (howClose == 1.0)
-						return (m_lastItemUnder = item);
+						return (fLastItemUnder = item);
 					closest = howClose;
 				}
 			}
 		}
+
 		if (closest > 0.5)
-		{
-			return (m_lastItemUnder = closestItem);
-		}
+			return (fLastItemUnder = closestItem);
 	}
-	if (m_types & DiagramItem::M_ENDPOINT)
-	{
-		for (uint32 i = 0; i < countItems(DiagramItem::M_ENDPOINT); i++)
-		{
-			DiagramItem *item = itemAt(i, DiagramItem::M_ENDPOINT);
+
+	if (fTypes & DiagramItem::M_ENDPOINT) {
+		for (uint32 i = 0; i < CountItems(DiagramItem::M_ENDPOINT); i++) {
+			DiagramItem *item = ItemAt(i, DiagramItem::M_ENDPOINT);
 			if (item->frame().Contains(point) && (item->howCloseTo(point) == 1.0))
-			{
-				return (m_lastItemUnder = item);
-			}
+				return (fLastItemUnder = item);
 		}
 	}
-	return (m_lastItemUnder = 0); // no item was found!
+
+	return (fLastItemUnder = 0); // no item was found!
 }
 
-// -------------------------------------------------------- //
-// *** item operations
-// -------------------------------------------------------- //
 
-bool DiagramItemGroup::addItem(
-	DiagramItem *item)
+//	#pragma mark - item operations
+
+
+//! Adds an \param item to the group; returns true on success.
+bool
+DiagramItemGroup::AddItem(DiagramItem *item)
 {
-	D_METHOD(("DiagramItemGroup::addItem()\n"));
-	if (item && (m_types & item->type()))
-	{
-		switch (item->type())
-		{
+	D_METHOD(("DiagramItemGroup::AddItem()\n"));
+	if (item && (fTypes & item->type())) {
+		switch (item->type()) {
 			case DiagramItem::M_BOX:
-			{
-				if (!m_boxes)
-				{
-					m_boxes = new BList();
-				}
+				if (!fBoxes)
+					fBoxes = new BList();
 				item->m_group = this;
-				return m_boxes->AddItem(static_cast<void *>(item));
-			}
+				return fBoxes->AddItem(static_cast<void *>(item));
+
 			case DiagramItem::M_WIRE:
-			{
-				if (!m_wires)
-				{
-					m_wires = new BList();
-				}
+				if (!fWires)
+					fWires = new BList();
 				item->m_group = this;
-				return m_wires->AddItem(static_cast<void *>(item));
-			}
+				return fWires->AddItem(static_cast<void *>(item));
+
 			case DiagramItem::M_ENDPOINT:
-			{
-				if (!m_endPoints)
-				{
-					m_endPoints = new BList();
-				}
+				if (!fEndPoints)
+					fEndPoints = new BList();
 				item->m_group = this;
-				return m_endPoints->AddItem(static_cast<void *>(item));
-			}
+				return fEndPoints->AddItem(static_cast<void *>(item));
 		}
 	}
+
 	return false;
 }
 
-bool DiagramItemGroup::removeItem(
-	DiagramItem *item)
+
+//! Removes an \param item from the group; returns true on success.
+bool
+DiagramItemGroup::RemoveItem(DiagramItem* item)
 {
-	D_METHOD(("DiagramItemGroup::removeItem()\n"));
-	if (item && (m_types & item->type()))
-	{
+	D_METHOD(("DiagramItemGroup::RemoveItem()\n"));
+	if (item && (fTypes & item->type())) {
 		// reset the lastItemUnder-pointer if it pointed to this item
-		if (m_lastItemUnder == item)
-		{
-			m_lastItemUnder = 0;
-		}
+		if (fLastItemUnder == item)
+			fLastItemUnder = 0;
+
 		// remove it from the selection list if it was selected
 		if (item->isSelected())
-		{
-			m_selection->RemoveItem(static_cast<void *>(item));
-		}
+			fSelection->RemoveItem(static_cast<void *>(item));
+
 		// try to remove the item from its list
-		switch (item->type())
-		{
+		switch (item->type()) {
 			case DiagramItem::M_BOX:
-			{
-				if (m_boxes)
-				{
+				if (fBoxes) {
 					item->m_group = 0;
-					return m_boxes->RemoveItem(static_cast<void *>(item));
+					return fBoxes->RemoveItem(static_cast<void *>(item));
 				}
-			}
+				break;
+
 			case DiagramItem::M_WIRE:
-			{
-				if (m_wires)
-				{
+				if (fWires) {
 					item->m_group = 0;
-					return m_wires->RemoveItem(static_cast<void *>(item));
+					return fWires->RemoveItem(static_cast<void *>(item));
 				}
-			}
+				break;
+
 			case DiagramItem::M_ENDPOINT:
-			{
-				if (m_endPoints)
-				{
+				if (fEndPoints) {
 					item->m_group = 0;
-					return m_endPoints->RemoveItem(static_cast<void *>(item));
+					return fEndPoints->RemoveItem(static_cast<void *>(item));
 				}
-			}
 		}
 	}
+
 	return false;
 }
 
-void DiagramItemGroup::sortItems(
-	uint32 whichType,
+
+/*! Performs a quicksort on a list of items with the provided
+	compare function (one is already defined in the DiagramItem
+	implementation); can't handle more than one item type at a
+	time!
+*/
+void
+DiagramItemGroup::SortItems(uint32 whichType,
 	int (*compareFunc)(const void *, const void *))
 {
-	D_METHOD(("DiagramItemGroup::sortItems()\n"));
-	if ((whichType != DiagramItem::M_ANY) && (m_types & whichType))
-	{
-		switch (whichType)
-		{
+	D_METHOD(("DiagramItemGroup::SortItems()\n"));
+	if ((whichType != DiagramItem::M_ANY) && (fTypes & whichType)) {
+		switch (whichType) {
 			case DiagramItem::M_BOX:
-			{
-				if (m_boxes)
-				{
-					m_boxes->SortItems(compareFunc);
-				}
+				if (fBoxes)
+					fBoxes->SortItems(compareFunc);
 				break;
-			}
+
 			case DiagramItem::M_WIRE:
-			{
-				if (m_wires)
-				{
-					m_wires->SortItems(compareFunc);
-				}
+				if (fWires)
+					fWires->SortItems(compareFunc);
 				break;
-			}
+
 			case DiagramItem::M_ENDPOINT:
-			{
-				if (m_endPoints)
-				{
-					m_endPoints->SortItems(compareFunc);
-				}
+				if (fEndPoints)
+					fEndPoints->SortItems(compareFunc);
 				break;
-			}
 		}
 	}
 }
 
-// items are drawn in reverse order; they should be sorted by
-// selection time before this function gets called, so that
-// the more recently selected item are drawn above others
-void DiagramItemGroup::drawItems(
-	BRect updateRect,
-	uint32 whichType,
-	BRegion *updateRegion)
+
+/*! Fires a draw() command at all items of a specific type that
+	intersect with the \param updateRect;
+	items are drawn in reverse order; they should be sorted by
+	selection time before this function gets called, so that
+	the more recently selected item are drawn above others.
+*/
+void
+DiagramItemGroup::DrawItems(BRect updateRect, uint32 whichType, BRegion* updateRegion)
 {
-	D_METHOD(("DiagramItemGroup::drawItems()\n"));
-	if (whichType & DiagramItem::M_WIRE)
-	{
-		for (int32 i = countItems(DiagramItem::M_WIRE) - 1; i >= 0; i--)
-		{
-			DiagramItem *item = itemAt(i, DiagramItem::M_WIRE);
+	D_METHOD(("DiagramItemGroup::DrawItems()\n"));
+	if (whichType & DiagramItem::M_WIRE) {
+		for (int32 i = CountItems(DiagramItem::M_WIRE) - 1; i >= 0; i--) {
+			DiagramItem *item = ItemAt(i, DiagramItem::M_WIRE);
 			if (item->frame().Intersects(updateRect))
-			{	
 				item->draw(updateRect);
-			}
 		}
 	}
-	if (whichType & DiagramItem::M_BOX)
-	{
-		for (int32 i = countItems(DiagramItem::M_BOX) - 1; i >= 0; i--)
-		{
-			DiagramItem *item = itemAt(i, DiagramItem::M_BOX);
-			if (item && item->frame().Intersects(updateRect))
-			{	
+
+	if (whichType & DiagramItem::M_BOX) {
+		for (int32 i = CountItems(DiagramItem::M_BOX) - 1; i >= 0; i--) {
+			DiagramItem *item = ItemAt(i, DiagramItem::M_BOX);
+			if (item && item->frame().Intersects(updateRect)) {	
 				item->draw(updateRect);
 				if (updateRegion)
 					updateRegion->Exclude(item->frame());
 			}
 		}
 	}
-	if (whichType & DiagramItem::M_ENDPOINT)
-	{
-		for (int32 i = countItems(DiagramItem::M_ENDPOINT) - 1; i >= 0; i--)
-		{
-			DiagramItem *item = itemAt(i, DiagramItem::M_ENDPOINT);
+
+	if (whichType & DiagramItem::M_ENDPOINT) {
+		for (int32 i = CountItems(DiagramItem::M_ENDPOINT) - 1; i >= 0; i--) {
+			DiagramItem *item = ItemAt(i, DiagramItem::M_ENDPOINT);
 			if (item && item->frame().Intersects(updateRect))
-			{	
 				item->draw(updateRect);
-			}
 		}
 	}
 }
 
-bool DiagramItemGroup::getClippingAbove(
-	DiagramItem *which,
-	BRegion *region)
+
+/*!	Returns in outRegion the \param region of items that lay "over" the given
+	DiagramItem in \param which; returns false if no items are above or the item
+	doesn't exist.
+*/
+bool
+DiagramItemGroup::GetClippingAbove(DiagramItem *which, BRegion *region)
 {
-	D_METHOD(("DiagramItemGroup::getClippingAbove()\n"));
+	D_METHOD(("DiagramItemGroup::GetClippingAbove()\n"));
 	bool found = false;
-	if (which && region)
-	{
-		switch (which->type())
-		{
+	if (which && region) {
+		switch (which->type()) {
 			case DiagramItem::M_BOX:
 			{
-				int32 index = m_boxes->IndexOf(which);
-				if (index >= 0) // the item was found
-				{
+				int32 index = fBoxes->IndexOf(which);
+				if (index >= 0) { // the item was found
 					BRect r = which->frame();
-					for (int32 i = 0; i < index; i++)
-					{
-						DiagramItem *item = itemAt(i, DiagramItem::M_BOX);
-						if (item && item->frame().Intersects(r))
-						{
+					for (int32 i = 0; i < index; i++) {
+						DiagramItem *item = ItemAt(i, DiagramItem::M_BOX);
+						if (item && item->frame().Intersects(r)) {
 							region->Include(item->frame() & r);
 							found = true;
 						}
@@ -408,14 +360,13 @@ bool DiagramItemGroup::getClippingAbove(
 				}
 				break;
 			}
+
 			case DiagramItem::M_WIRE:
 			{
 				BRect r = which->frame();
-				for (uint32 i = 0; i < countItems(DiagramItem::M_BOX); i++)
-				{
-					DiagramItem *item = itemAt(i, DiagramItem::M_BOX);
-					if (item && item->frame().Intersects(r))
-					{
+				for (uint32 i = 0; i < CountItems(DiagramItem::M_BOX); i++) {
+					DiagramItem *item = ItemAt(i, DiagramItem::M_BOX);
+					if (item && item->frame().Intersects(r)) {
 						region->Include(item->frame() & r);
 						found = true;
 					}
@@ -424,219 +375,227 @@ bool DiagramItemGroup::getClippingAbove(
 			}
 		}
 	}
+
 	return found;
 }
 
-// -------------------------------------------------------- //
-// *** selection accessors
-// -------------------------------------------------------- //
 
-uint32 DiagramItemGroup::selectedType() const
+//	#pragma mark - selection accessors
+
+
+/*!	Returns the type of DiagramItems in the current selection
+	(currently only one type at a time is supported!)
+*/
+uint32
+DiagramItemGroup::SelectedType() const
 {
-	D_METHOD(("DiagramItemGroup::selectedType()\n"));
-	if (countSelectedItems() > 0)
-	{
-		return selectedItemAt(0)->type();
-	}
+	D_METHOD(("DiagramItemGroup::SelectedType()\n"));
+	if (CountSelectedItems() > 0)
+		return SelectedItemAt(0)->type();
+
 	return 0;
 }
 
-uint32 DiagramItemGroup::countSelectedItems() const
+
+//!	Returns the number of items in the current selection
+uint32
+DiagramItemGroup::CountSelectedItems() const
 {
-	D_METHOD(("DiagramItemGroup::countSelectedItems()\n"));
-	if (m_selection)
-	{
-		return m_selection->CountItems();
-	}
+	D_METHOD(("DiagramItemGroup::CountSelectedItems()\n"));
+	if (fSelection)
+		return fSelection->CountItems();
+
 	return 0;
 }
 
-DiagramItem *DiagramItemGroup::selectedItemAt(
-	uint32 index) const
+
+/*!	Returns a pointer to the item in the list which is
+	at the given \param index; if none is found, this function
+	returns 0
+*/
+DiagramItem*
+DiagramItemGroup::SelectedItemAt(uint32 index) const
 {
-	D_METHOD(("DiagramItemGroup::selectedItemAt()\n"));
-	if (m_selection)
-	{
-		return static_cast<DiagramItem *>(m_selection->ItemAt(index));
-	}
+	D_METHOD(("DiagramItemGroup::SelectedItemAt()\n"));
+	if (fSelection)
+		return static_cast<DiagramItem *>(fSelection->ItemAt(index));
+
 	return 0;
 }
 
-// -------------------------------------------------------- //
-// *** selection related operations
-// -------------------------------------------------------- //
 
-// selects an item, optionally replacing the complete former
-// selection. If the type of the item to be selected differs
-// from the type of items currently selected, this methods
-// automatically replaces the former selection
-bool DiagramItemGroup::selectItem(
-	DiagramItem *which,
-	bool deselectOthers)
+//	#pragma mark - selection related operations
+
+
+/*!	Selects an item, optionally replacing the complete former
+	selection. If the type of the item to be selected differs
+	from the type of items currently selected, this methods
+	automatically replaces the former selection
+*/
+bool
+DiagramItemGroup::SelectItem(DiagramItem* which, bool deselectOthers)
 {
-	D_METHOD(("DiagramItemGroup::selectItem()\n"));
+	D_METHOD(("DiagramItemGroup::SelectItem()\n"));
 	bool selectionChanged = false;
-	if (which && !which->isSelected() && which->isSelectable())
-	{
+	if (which && !which->isSelected() && which->isSelectable()) {
 		// check if the item's type is the same as of the other
 		// selected items
-		if (m_multiSelection)
-		{
-			if (which->type() != selectedType())
-			{
+		if (fMultiSelection) {
+			if (which->type() != SelectedType())
 				deselectOthers = true;
-			}
 		}
 
 		// check if the former selection has to be deselected
-		if (deselectOthers || !m_multiSelection)
-		{
-			while (countSelectedItems() > 0)
-			{
-				deselectItem(selectedItemAt(0));
-			}
+		if (deselectOthers || !fMultiSelection) {
+			while (CountSelectedItems() > 0)
+				DeselectItem(SelectedItemAt(0));
 		}
 
 		// select the item
-		if (deselectOthers || countSelectedItems() == 0)
-		{
+		if (deselectOthers || CountSelectedItems() == 0)
 			which->select();
-		}
 		else
-		{
 			which->selectAdding();
-		}
-		m_selection->AddItem(which);
+
+		fSelection->AddItem(which);
 		selectionChanged = true;
 	}
 
 	// resort the lists if necessary
-	if (selectionChanged)
-	{
-		sortItems(which->type(), compareSelectionTime);
-		sortSelectedItems(compareSelectionTime);
+	if (selectionChanged) {
+		SortItems(which->type(), compareSelectionTime);
+		SortSelectedItems(compareSelectionTime);
 		return true;
 	}
+
 	return false;
 }
 
-bool DiagramItemGroup::deselectItem(
-	DiagramItem *which)
+
+//!	Simply deselects one item
+bool
+DiagramItemGroup::DeselectItem(DiagramItem* which)
 {
-	D_METHOD(("DiagramItemGroup::deselectItem()\n"));
-	if (which && which->isSelected())
-	{
-		m_selection->RemoveItem(which);
+	D_METHOD(("DiagramItemGroup::DeselectItem()\n"));
+	if (which && which->isSelected()) {
+		fSelection->RemoveItem(which);
 		which->deselect();
-		sortItems(which->type(), compareSelectionTime);
-		sortSelectedItems(compareSelectionTime);
+		SortItems(which->type(), compareSelectionTime);
+		SortSelectedItems(compareSelectionTime);
 		return true;
 	}
+
 	return false;
 }
 
-bool DiagramItemGroup::selectAll(
-	uint32 itemType)
+
+//! Selects all items of the given \param itemType
+bool
+DiagramItemGroup::SelectAll(uint32 itemType)
 {
-	D_METHOD(("DiagramItemGroup::selectAll()\n"));
+	D_METHOD(("DiagramItemGroup::SelectAll()\n"));
 	bool selectionChanged = false;
-	if (m_types & itemType)
-	{
-		for (int32 i = 0; i < countItems(itemType); i++)
-		{
-			if (selectItem(itemAt(i, itemType), false))
+	if (fTypes & itemType) {
+		for (uint32 i = 0; i < CountItems(itemType); i++) {
+			if (SelectItem(ItemAt(i, itemType), false))
 				selectionChanged = true;
 		}
 	}
+
 	return selectionChanged;
 }
 
-bool DiagramItemGroup::deselectAll(
-	uint32 itemType)
+
+//! Deselects all items of the given \param itemType
+bool
+DiagramItemGroup::DeselectAll(uint32 itemType)
 {
-	D_METHOD(("DiagramItemGroup::deselectAll()\n"));
+	D_METHOD(("DiagramItemGroup::DeselectAll()\n"));
 	bool selectionChanged = false;
-	if (m_types & itemType)
-	{
-		for (int32 i = 0; i < countItems(itemType); i++)
-		{
-			if (deselectItem(itemAt(i, itemType)))
+	if (fTypes & itemType) {
+		for (uint32 i = 0; i < CountItems(itemType); i++) {
+			if (DeselectItem(ItemAt(i, itemType)))
 				selectionChanged = true;
 		}
 	}
+
 	return selectionChanged;
 }
 
-void DiagramItemGroup::sortSelectedItems(
-	int (*compareFunc)(const void *, const void *))
+
+/*!	Performs a quicksort on the list of selected items with the
+	provided compare function (one is already defined in the DiagramItem
+	implementation)
+*/
+void
+DiagramItemGroup::SortSelectedItems(int (*compareFunc)(const void *, const void *))
 {
-	D_METHOD(("DiagramItemGroup::sortSelectedItems()\n"));
-	m_selection->SortItems(compareFunc);
+	D_METHOD(("DiagramItemGroup::SortSelectedItems()\n"));
+	fSelection->SortItems(compareFunc);
 }
 
-void DiagramItemGroup::dragSelectionBy(
-	float x,
-	float y,
-	BRegion *updateRegion)
+
+/*!	Moves all selected items by a given amount, taking
+	item alignment into account; in updateRegion the areas
+	that still require updating by the caller are returned
+*/
+void
+DiagramItemGroup::DragSelectionBy(float x, float y, BRegion* updateRegion)
 {
-	D_METHOD(("DiagramItemGroup::dragSelectionBy()\n"));
-	if (selectedType() == DiagramItem::M_BOX)
-	{
-		align(&x, &y);
-		if ((x != 0) || (y != 0))
-		{
-			for (int32 i = countSelectedItems() - 1; i >= 0; i--)
-			{
-				DiagramItem *item = dynamic_cast<DiagramItem *>(selectedItemAt(i));
+	D_METHOD(("DiagramItemGroup::DragSelectionBy()\n"));
+	if (SelectedType() == DiagramItem::M_BOX) {
+		Align(&x, &y);
+		if ((x != 0) || (y != 0)) {
+			for (int32 i = CountSelectedItems() - 1; i >= 0; i--) {
+				DiagramItem *item = dynamic_cast<DiagramItem *>(SelectedItemAt(i));
 				if (item->isDraggable())
-				{
 					item->moveBy(x, y, updateRegion);
-				}
 			}
 		}
 	}
 }
 
-void DiagramItemGroup::removeSelection()
+
+//!	Removes all selected items from the group
+void
+DiagramItemGroup::RemoveSelection()
 {
-	D_METHOD(("DiagramItemGroup::removeSelection()\n"));
-	for (int32 i = 0; i < countSelectedItems(); i++)
-	{
-		removeItem(selectedItemAt(i));
-	}
+	D_METHOD(("DiagramItemGroup::RemoveSelection()\n"));
+	for (uint32 i = 0; i < CountSelectedItems(); i++)
+		RemoveItem(SelectedItemAt(i));
 }
 
-// -------------------------------------------------------- //
-// *** alignment related accessors & operations
-// -------------------------------------------------------- //
 
-void DiagramItemGroup::getItemAlignment(
-	float *horizontal,
-	float *vertical)
+//	#pragma mark - alignment related accessors & operations
+
+
+void
+DiagramItemGroup::GetItemAlignment(float *horizontal, float *vertical)
 {
-	D_METHOD(("DiagramItemGroup::getItemAlignment()\n"));
+	D_METHOD(("DiagramItemGroup::GetItemAlignment()\n"));
 	if (horizontal)
-		*horizontal = m_itemAlignment.x;
+		*horizontal = fItemAlignment.x;
 	if (vertical)
-		*vertical = m_itemAlignment.y;
+		*vertical = fItemAlignment.y;
 }
 
-void DiagramItemGroup::align(
-	float *x,
-	float *y) const
+
+//! Align a given point(\param x, \param y) to the current grid
+void
+DiagramItemGroup::Align(float *x, float *y) const
 {
-	D_METHOD(("DiagramItemGroup::align()\n"));
-	*x = ((int)*x / (int)m_itemAlignment.x) * m_itemAlignment.x;
-	*y = ((int)*y / (int)m_itemAlignment.y) * m_itemAlignment.y;
+	D_METHOD(("DiagramItemGroup::Align()\n"));
+	*x = ((int)*x / (int)fItemAlignment.x) * fItemAlignment.x;
+	*y = ((int)*y / (int)fItemAlignment.y) * fItemAlignment.y;
 }
 
-BPoint DiagramItemGroup::align(
-	BPoint point) const
+
+//! Align a given \param point to the current grid
+BPoint
+DiagramItemGroup::Align(BPoint point) const
 {
-	D_METHOD(("DiagramItemGroup::align()\n"));
+	D_METHOD(("DiagramItemGroup::Align()\n"));
 	float x = point.x, y = point.y;
-	align(&x, &y);
+	Align(&x, &y);
 	return BPoint(x, y);
 }
-
-// END -- DiagramItemGroup.cpp --

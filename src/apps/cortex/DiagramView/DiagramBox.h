@@ -42,11 +42,11 @@ class DiagramBox : public DiagramItem, public DiagramItemGroup {
 		// extends the DiagramItemGroup implementation by setting
 		// the items owner and calling the attachedToDiagram() hook
 		// on it
-		virtual bool addItem(DiagramItem *item);
+		virtual bool AddItem(DiagramItem *item);
 
 		// extends the DiagramItemGroup implementation by calling 
 		// the detachedToDiagram() hook on the item
-		virtual bool removeItem(DiagramItem *item);
+		virtual bool RemoveItem(DiagramItem *item);
 
 	public:	// derived from DiagramItem
 

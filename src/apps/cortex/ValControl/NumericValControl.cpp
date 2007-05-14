@@ -79,13 +79,13 @@ NumericValControl::initSegments()
 	// *** SEGMENT DIVISION NEEDS TO BE CONFIGURABLE +++++
 	// GOOD 23aug99
 	// init segments:
-	add(new ValControlDigitSegment(fWholeDigits, 0, negativeVisible), RIGHT_MOST);
+	_Add(new ValControlDigitSegment(fWholeDigits, 0, negativeVisible), RIGHT_MOST);
 
-	if(fFractionalDigits)
-		add(ValCtrlLayoutEntry::decimalPoint, RIGHT_MOST);
+	if (fFractionalDigits)
+		_Add(ValCtrlLayoutEntry::decimalPoint, RIGHT_MOST);
 
 	for (int n = 0; n < fFractionalDigits; ++n)
-		add(new ValControlDigitSegment(1, (-1)-n, false, ValControlDigitSegment::ZERO_FILL),
+		_Add(new ValControlDigitSegment(1, (-1)-n, false, ValControlDigitSegment::ZERO_FILL),
 			RIGHT_MOST);
 //		add(new ValControlDigitSegment(fFractionalDigits, -fFractionalDigits,
 //			false, ValControlDigitSegment::ZERO_FILL),
@@ -193,7 +193,7 @@ NumericValControl::value() const
 //	double acc = 0.0;
 //
 //	// walk segments, adding the value of each
-//	for(int n = countEntries(); n > 0; --n) {
+//	for(int n = CountEntries(); n > 0; --n) {
 //		const ValCtrlLayoutEntry& e = entryAt(n-1);
 //		if(e.type == ValCtrlLayoutEntry::SEGMENT_ENTRY) {
 //			const ValControlDigitSegment* digitSegment =
@@ -277,7 +277,7 @@ NumericValControl::setValue(double value, bool setParam)
 //	double dfCur = 0.0;
 //	
 //	// sum the values of all segments
-//	for(int nIndex = countEntries()-1; nIndex >= 0; nIndex--) {
+//	for(int nIndex = CountEntries()-1; nIndex >= 0; nIndex--) {
 //		if(entryAt(nIndex).type == ValCtrlLayoutEntry::SEGMENT_ENTRY)	{
 //			const ValControlDigitSegment* pSeg =
 //				dynamic_cast<ValControlDigitSegment*>(entryAt(nIndex).pView);
@@ -313,7 +313,7 @@ NumericValControl::setValue(double value, bool setParam)
 //	Invoke();
 //	
 //	// hand value to each segment
-//	for(int nIndex = 0; nIndex < countEntries(); nIndex++) {
+//	for(int nIndex = 0; nIndex < CountEntries(); nIndex++) {
 //		if(entryAt(nIndex).type == ValCtrlLayoutEntry::SEGMENT_ENTRY)	{
 //			const ValControlDigitSegment* pSeg =
 //				dynamic_cast<ValControlDigitSegment*>(entryAt(nIndex).pView);
@@ -527,11 +527,11 @@ NumericValControl::_ValueFixed() const {
 	int64 scaleBase = fFractionalDigits;
 	
 	// walk segments, adding the value of each
-	for (int n = countEntries(); n > 0; --n) {
-		const ValCtrlLayoutEntry& e = entryAt(n-1);
-		if (e.type == ValCtrlLayoutEntry::SEGMENT_ENTRY) {
+	for (int n = CountEntries(); n > 0; --n) {
+		const ValCtrlLayoutEntry& entry = _EntryAt(n-1);
+		if (entry.type == ValCtrlLayoutEntry::SEGMENT_ENTRY) {
 			const ValControlDigitSegment* digitSegment =
-				dynamic_cast<ValControlDigitSegment*>(e.pView);
+				dynamic_cast<ValControlDigitSegment*>(entry.pView);
 			ASSERT(digitSegment);
 
 //			PRINT((
@@ -571,13 +571,12 @@ NumericValControl::_SetValueFixed(int64 fixed)
 	int64 scaleBase = fFractionalDigits;
 
 	// set segments
-	for (int n = countEntries(); n > 0; --n) {
-	
-		const ValCtrlLayoutEntry& e = entryAt(n-1);
+	for (int n = CountEntries(); n > 0; --n) {
+		const ValCtrlLayoutEntry& entry = _EntryAt(n-1);
 		
-		if (e.type == ValCtrlLayoutEntry::SEGMENT_ENTRY) {
+		if (entry.type == ValCtrlLayoutEntry::SEGMENT_ENTRY) {
 			ValControlDigitSegment* digitSegment =
-				dynamic_cast<ValControlDigitSegment*>(e.pView);
+				dynamic_cast<ValControlDigitSegment*>(entry.pView);
 			ASSERT(digitSegment);
 
 //			PRINT((

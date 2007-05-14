@@ -128,7 +128,7 @@ void DiagramWire::draw(
 		{
 			BRegion region, clipping;
 			region.Include(frame() & updateRect);
-			if (view()->getClippingAbove(this, &clipping))
+			if (view()->GetClippingAbove(this, &clipping))
 				region.Exclude(&clipping);
 			view()->ConstrainClippingRegion(&region);
 			drawWire();

@@ -35,31 +35,30 @@
 
 // message 'what' code base values
 
-const uint32 NodeManager_message_base				= 'NMaA';
+const uint32 NodeManager_message_base			= 'NMaA';
 const uint32 NodeManager_int_message_base		= 'Nm_A';
-const uint32 NodeGroup_message_base					= 'NGrA';
-const uint32 NodeRef_message_base						= 'NReA';
+const uint32 NodeGroup_message_base				= 'NGrA';
+const uint32 NodeRef_message_base				= 'NReA';
 const uint32 NodeSyncThread_message_base		= 'NStA';
 
-const uint32 RouteApp_message_base					= 'RoAA';
-const uint32 RouteWindow_message_base				= 'RoWA';
-const uint32 DiagramView_message_base				= 'DiVA';
-const uint32 MediaRoutingView_message_base	= 'RoVA';
+const uint32 RouteApp_message_base				= 'RoAA';
+const uint32 RouteWindow_message_base			= 'RoWA';
+const uint32 DiagramView_message_base			= 'DiVA';
+const uint32 MediaRoutingView_message_base		= 'RoVA';
 
 const uint32 TransportWindow_message_base		= 'TrWA';
 const uint32 TransportView_message_base			= 'TrVA';
 
-const uint32 ValControl_message_base				= 'VcnA';
+const uint32 ValControl_message_base			= 'VcnA';
 
-const uint32 Observable_message_base				= 'ObTA';
-const uint32 Observer_message_base					= 'Ob_A';
+const uint32 Observable_message_base			= 'ObTA';
+const uint32 Observer_message_base				= 'Ob_A';
 
 const uint32 AddOnHostApp_message_base 			= 'NahA';
 
-const uint32 RouteAppNodeManager_message_base
-																						= 'RMaA';																
+const uint32 RouteAppNodeManager_message_base	= 'RMaA';																
 
-const uint32 InfoView_message_base					= 'InVA';
+const uint32 InfoView_message_base				= 'InVA';
 
 const uint32 ParameterWindow_message_base		= 'PaWA';
 
