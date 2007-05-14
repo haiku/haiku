@@ -46,7 +46,7 @@
 #include "emuxkireg.h"
 #include "config.h"
 #include "queue.h"
-#include "multi_audio.h"
+#include "hmulti_audio.h"
 #include "multi.h"
 
 

@@ -6,7 +6,7 @@
 #ifndef _MULTIAUDIODEVICE_H
 #define _MULTIAUDIODEVICE_H
 
-#include "multi_audio.h"
+#include "hmulti_audio.h"
 
 #define MAX_CONTROLS	128
 #define MAX_CHANNELS	32

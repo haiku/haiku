@@ -31,7 +31,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <Drivers.h>
-#include "multi_audio.h"
+#include "hmulti_audio.h"
 
 #define DRIVER_GET_DESCRIPTION(x...)				ioctl( fd, B_MULTI_GET_DESCRIPTION, x )
 #define DRIVER_GET_ENABLED_CHANNELS(x...)			ioctl( fd, B_MULTI_GET_ENABLED_CHANNELS, x )

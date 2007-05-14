@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src add-ons media media-add-ons multi_audio ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+UsePrivateHeaders media ;
+
 if $(TARGET_PLATFORM) != haiku {
 	SubDirC++Flags -fmultiple-symbol-spaces ;
 }

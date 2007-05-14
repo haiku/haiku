@@ -40,7 +40,7 @@
 #include <Controllable.h>
 #include <File.h>
 #include <Entry.h>
-#include "multi_audio.h"
+#include "hmulti_audio.h"
 #include "MultiAudioDevice.h"
 
 /*bool format_is_acceptible(

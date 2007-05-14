@@ -32,7 +32,7 @@
 #include <OS.h>
 #include <string.h>
 #include <MediaDefs.h>
-#include "multi_audio.h"
+#include "hmulti_audio.h"
 #include "multi.h"
 #include "ac97.h"
 

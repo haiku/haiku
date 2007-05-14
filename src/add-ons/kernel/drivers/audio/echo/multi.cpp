@@ -32,7 +32,7 @@
 #include <OS.h>
 #include <MediaDefs.h>
 #include "debug.h"
-#include "multi_audio.h"
+#include "hmulti_audio.h"
 #include "multi.h"
 
 //#define DEBUG 1

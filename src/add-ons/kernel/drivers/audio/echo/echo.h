@@ -31,7 +31,7 @@
 #endif
 #include "OsSupportBeOS.h"
 #include "CEchoGals.h"
-#include "multi_audio.h"
+#include "hmulti_audio.h"
 #include "multi.h"
 #include "queue.h"
 
