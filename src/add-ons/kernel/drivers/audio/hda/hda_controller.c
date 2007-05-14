@@ -59,12 +59,20 @@ hda_stream_check_intr(hda_controller* ctrlr, hda_stream* s)
 	if (s->running) {
 		uint8 sts = OREG8(ctrlr,s->off,STS);
 		if (sts) {
+			cpu_status status;
 			int32 count;
 
 			OREG8(ctrlr,s->off,STS) = sts;
 
-			s->played_real_time = system_time();
-			s->played_frames_count += s->buffer_length;
+			status = disable_interrupts();
+			acquire_spinlock(&s->lock);
+
+			s->real_time = system_time();
+			s->frames_count += s->buffer_length;
+			s->buffer_cycle = (s->buffer_cycle +1) % s->num_buffers;
+
+			release_spinlock(&s->lock);
+			restore_interrupts(status);
 
 			get_sem_count(s->buffer_ready_sem, &count);
 			if (count <= 0)

@@ -5,6 +5,9 @@ uint32 num_cards;
 
 pci_module_info* pci;
 
+const char** publish_devices(void); /* Just to silence compiler */
+
+
 status_t
 init_hardware(void)
 {
@@ -82,7 +85,7 @@ uninit_driver (void)
 }
 
 const char**
-publish_devices()
+publish_devices(void)
 {
 	static const char* devs[MAXCARDS+1];
 	long i;

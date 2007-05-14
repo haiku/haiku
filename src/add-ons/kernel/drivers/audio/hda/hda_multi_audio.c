@@ -209,24 +209,28 @@ static status_t
 buffer_exchange(hda_codec* codec, multi_buffer_info* data)
 {
 	static int debug_buffers_exchanged = 0;
+	cpu_status status;
 	status_t rc;
 
 	if (!codec->playback_stream->running)
 		hda_stream_start(codec->ctrlr, codec->playback_stream);
 
-//	if (!codec->record_stream->running)
-//		hda_stream_start(codec->ctrlr, codec->record_stream);
-
 	/* do playback */
-	rc=acquire_sem(codec->playback_stream->buffer_ready_sem);
-	if (rc != B_OK) return rc;
+	rc=acquire_sem_etc(codec->playback_stream->buffer_ready_sem, 1, B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, 50000);
+	if (rc != B_OK) {
+		dprintf("%s: Timeout waiting for playback buffer to finish!\n", __func__);
+		return rc;
+	}
 
-	data->played_real_time = codec->playback_stream->played_real_time;
-	data->played_frames_count = codec->playback_stream->played_frames_count;
+	status = disable_interrupts();
+	acquire_spinlock(&codec->playback_stream->lock);
 
-	/* do record */
-	data->record_buffer_cycle = 0;
-	data->recorded_frames_count = 0;
+	data->playback_buffer_cycle = codec->playback_stream->buffer_cycle;
+	data->played_real_time = codec->playback_stream->real_time;
+	data->played_frames_count = codec->playback_stream->frames_count;
+
+	release_spinlock(&codec->playback_stream->lock);
+	restore_interrupts(status);
 
 	debug_buffers_exchanged++;
 	if (((debug_buffers_exchanged % 100) == 1) && (debug_buffers_exchanged < 1111)) {

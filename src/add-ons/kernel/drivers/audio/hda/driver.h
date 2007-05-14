@@ -5,10 +5,17 @@
 #include <drivers/Drivers.h>
 #include <drivers/PCI.h>
 
+#include <multi_audio.h>
+
 #include <string.h>
 #include <stdlib.h>
 
-#include "multi_audio.h"
+#ifdef COMPILED_FOR_R5
+	#define DEVFS_PATH_FORMAT	"audio/multi/hda/%lu"
+#else
+	#define DEVFS_PATH_FORMAT	"audio/hmulti/hda/%lu"
+#endif
+
 #include "hda_controller_defs.h"
 #include "hda_codec_defs.h"
 
@@ -17,7 +24,6 @@
 /* values for the class_sub field for class_base = 0x04 (multimedia device) */
 #define PCI_hd_audio	3
 
-#define DEVFS_PATH_FORMAT	"audio/multi/hda/%lu"
 #define MAXWORK				16
 #define HDA_MAXCODECS		15
 #define HDA_MAXSTREAMS		16
@@ -38,7 +44,8 @@ typedef struct hda_stream_info_s {
 	uint32		id;						/* HDA controller stream # */
 	uint32		off;					/* HDA I/O/B descriptor offset */
 	bool		running;				/* Is this stream active? */
-
+	spinlock	lock;					/* Write lock */
+	
 	uint32		pin_wid;				/* PIN Widget ID */
 	uint32		io_wid;					/* Input/Output Converter Widget ID */
 
@@ -52,8 +59,9 @@ typedef struct hda_stream_info_s {
 	void*		buffers[STRMAXBUF];		/* Virtual addresses for buffer */
 	uint32		buffers_pa[STRMAXBUF];	/* Physical addresses for buffer */
 	sem_id		buffer_ready_sem;
-	bigtime_t	played_real_time;
-	uint32		played_frames_count;
+	bigtime_t	real_time;
+	uint32		frames_count;
+	uint32		buffer_cycle;
 
 	area_id		buffer_area;
 	area_id		bdl_area;
