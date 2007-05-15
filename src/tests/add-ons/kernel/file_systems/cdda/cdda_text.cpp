@@ -5,6 +5,7 @@
 
 
 #include "cdda.h"
+#include "cddb.h"
 
 #include <fcntl.h>
 #include <stdio.h>
@@ -36,13 +37,17 @@ main(int argc, char** argv)
 		return -1;
 
 	uint8 buffer[1024];
-	if (read_table_of_contents(fd, (scsi_toc_toc*)buffer, sizeof(buffer)) < 0) {
+	scsi_toc_toc *toc = (scsi_toc_toc *)buffer;
+	if (read_table_of_contents(fd, toc, sizeof(buffer)) < 0) {
 		fprintf(stderr, "%s: Retrieving TOC failed", __progname);
 		return -1;
 	}
 
 	cdtext text;
 	read_cdtext(fd, text);
+
+	uint32 id = compute_cddb_disc_id(*toc);
+	printf("CDDB disc ID: %lx\n", id);
 
 	close(fd);
 }

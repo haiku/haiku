@@ -56,7 +56,7 @@ is_garbage(char c)
 
 
 static void
-sanitize_string(char *string)
+sanitize_string(char *&string)
 {
 	if (string == NULL)
 		return;
@@ -77,6 +77,12 @@ sanitize_string(char *string)
 
 	while (length > 1 && isspace(string[length - 1])) {
 		string[--length] = '\0';
+	}
+
+	if (!string[0]) {
+		// free string if it's empty
+		free(string);
+		string = NULL;
 	}
 }
 
@@ -127,7 +133,13 @@ sanitize_album(cdtext &text)
 	cut_string(text.album, text.artist);
 	sanitize_string(text.album);
 
-	if ((text.artist == NULL || !text.artist[0]) && text.album != NULL) {
+	if (text.album != NULL && !strcasecmp(text.album, "My CD")) {
+		// don't laugh, people really do that!
+		free(text.album);
+		text.album = NULL;
+	}
+
+	if ((text.artist == NULL || text.artist[0] == NULL) && text.album != NULL) {
 		// try to extract artist from album
 		char *space = strstr(text.album, "  ");
 		if (space != NULL) {

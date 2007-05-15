@@ -6,4 +6,5 @@ SimpleTest cdda_text
 	:
 	cdda_text.cpp
 	cdda.cpp
+	cddb.cpp
 ;

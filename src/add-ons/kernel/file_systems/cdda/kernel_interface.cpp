@@ -10,8 +10,11 @@
 #include <fs_info.h>
 #include <fs_interface.h>
 #include <KernelExport.h>
+#include <Mime.h>
+#include <TypeConstants.h>
 
 #include <util/kernel_cpp.h>
+#include <util/DoublyLinkedList.h>
 
 #include <dirent.h>
 #include <errno.h>
@@ -29,9 +32,13 @@
 #endif
 
 
-class Volume;
+class Attribute;
 class Inode;
+struct attr_cookie;
 struct dir_cookie;
+
+typedef DoublyLinkedList<Attribute> AttributeList;
+typedef DoublyLinkedList<attr_cookie> AttrCookieList;
 
 class Volume {
 	public:
@@ -73,6 +80,29 @@ class Volume {
 		Inode			*fFirstEntry;
 };
 
+class Attribute : public DoublyLinkedListLinkImpl<Attribute> {
+	public:
+		Attribute(const char *name, type_code type);
+		~Attribute();
+
+		status_t InitCheck() const { return fName != NULL ? B_OK : B_NO_MEMORY; }
+		status_t SetTo(const char *name, type_code type);
+		void SetType(type_code type) { fType = type; }
+
+		status_t ReadAt(off_t offset, uint8 *buffer, size_t *_length);
+		status_t WriteAt(off_t offset, const uint8 *buffer, size_t *_length);
+		void Truncate();
+
+		const char *Name() const { return fName; }
+		size_t Size() const { return fSize; }
+		type_code Type() const { return fType; }
+
+	private:
+		char		*fName;
+		type_code	fType;
+		uint8		*fData;
+		size_t		fSize;
+};
 
 class Inode {
 	public:
@@ -103,6 +133,18 @@ class Inode {
 		off_t		Size() const
 						{ return fFrameCount * kFrameSize /* + WAV header */; }
 
+		Attribute	*FindAttribute(const char *name) const;
+		status_t	AddAttribute(const char *name, type_code type,
+						const uint8 *data = 0, size_t length = 0);
+		status_t	AddAttribute(const char *name, type_code type,
+						const char *string);
+		status_t	AddAttribute(const char *name, int32 value);
+		status_t	RemoveAttribute(const char *name);
+
+		void		AddAttrCookie(attr_cookie *cookie);
+		void		RemoveAttrCookie(attr_cookie *cookie);
+		void		RewindAttrCookie(attr_cookie *cookie);
+
 		Inode		*Next() const { return fNext; }
 		void		SetNext(Inode *inode) { fNext = inode; }
 
@@ -117,12 +159,13 @@ class Inode {
 		time_t		fModificationTime;
 		off_t		fStartFrame;
 		off_t		fFrameCount;
+		AttributeList fAttributes;
+		AttrCookieList fAttrCookies;
 };
 
-
 struct dir_cookie {
-	Inode	*current;
-	int		state;	// iteration state
+	Inode		*current;
+	int			state;	// iteration state
 };
 
 // directory iteration states
@@ -133,8 +176,12 @@ enum {
 	ITERATION_STATE_BEGIN	= ITERATION_STATE_DOT,
 };
 
+struct attr_cookie : DoublyLinkedListLinkImpl<attr_cookie> {
+	Attribute	*current;
+};
+
 struct file_cookie {
-	int		open_mode;
+	int			open_mode;
 };
 
 
@@ -212,6 +259,7 @@ Volume::Mount(const char* device)
 		scsi_cd_msf& next = toc->tracks[i + 1].start.time;
 			// the last track is always lead-out
 		scsi_cd_msf& start = toc->tracks[i].start.time;
+		int32 track = i + 1;
 
 		off_t startFrame = start.minute * kFramesPerMinute
 			+ start.second * kFramesPerSecond + start.frame;
@@ -219,18 +267,43 @@ Volume::Mount(const char* device)
 			+ next.second * kFramesPerSecond + next.frame
 			- startFrame;
 
-		if (text.titles[i] != NULL && text.titles[i]) {
-			if (text.artists[i] != NULL && text.artists[i]) {
-				snprintf(title, sizeof(title), "%02ld. %s - %s.wav", i + 1,
+		const char *artist = text.artists[i] != NULL
+			? text.artists[i] : text.artist;
+
+		if (text.titles[i] != NULL) {
+			if (artist != NULL) {
+				snprintf(title, sizeof(title), "%02ld. %s - %s.wav", track,
 					text.artists[i], text.titles[i]);
 			} else {
-				snprintf(title, sizeof(title), "%02ld. %s.wav", i + 1,
+				snprintf(title, sizeof(title), "%02ld. %s.wav", track,
 					text.titles[i]);
 			}
 		} else
-			snprintf(title, sizeof(title), "%02ld.wav", i + 1);
+			snprintf(title, sizeof(title), "%02ld.wav", track);
 
-		_CreateNode(fRootNode, title, startFrame, frames, S_IFREG | 0444);
+		// remove '/' from title
+		for (int32 j = 0; title[j]; j++) {
+			if (title[j] == '/')
+				title[j] = '-';
+		}
+
+		Inode *inode = _CreateNode(fRootNode, title, startFrame, frames,
+			S_IFREG | 0444);
+		if (inode == NULL)
+			continue;
+
+		// add attributes
+
+		inode->AddAttribute("Audio:Artist", B_STRING_TYPE, artist);
+		inode->AddAttribute("Audio:Title", B_STRING_TYPE, text.titles[i]);
+		inode->AddAttribute("Audio:Genre", B_STRING_TYPE, text.genre);
+		inode->AddAttribute("Audio:Track", track);
+
+		snprintf(title, sizeof(title), "%02lu:%02lu",
+			uint32(inode->FrameCount() / kFramesPerMinute),
+			uint32((inode->FrameCount() % kFramesPerMinute) / kFramesPerSecond));
+		inode->AddAttribute("Audio:Length", B_STRING_TYPE, title);
+		inode->AddAttribute("BEOS:TYPE", B_MIME_STRING_TYPE, "audio/x-wav");
 	}
 
 	free(toc);
@@ -330,6 +403,116 @@ Volume::SetName(const char *name)
 //	#pragma mark -
 
 
+Attribute::Attribute(const char *name, type_code type)
+	:
+	fName(NULL),
+	fType(0),
+	fData(NULL),
+	fSize(0)
+{
+	SetTo(name, type);
+}
+
+
+Attribute::~Attribute()
+{
+	free(fName);
+	free(fData);
+}
+
+
+status_t
+Attribute::SetTo(const char *name, type_code type)
+{
+	if (name == NULL || !name[0])
+		return B_BAD_VALUE;
+
+	name = strdup(name);
+	if (name == NULL)
+		return B_NO_MEMORY;
+
+	free(fName);
+
+	fName = (char *)name;
+	fType = type;
+	return B_OK;
+}
+
+
+status_t
+Attribute::ReadAt(off_t offset, uint8 *buffer, size_t *_length)
+{
+	size_t length = *_length;
+
+	if (offset < 0)
+		return B_BAD_VALUE;
+	if (offset >= length) {
+		*_length = 0;
+		return B_OK;
+	}
+	if (offset + length > fSize)
+		length = fSize - offset;
+
+	if (user_memcpy(buffer, fData + offset, length) < B_OK)
+		return B_BAD_ADDRESS;
+
+	*_length = length;
+	return B_OK;
+}
+
+
+status_t
+Attribute::WriteAt(off_t offset, const uint8 *buffer, size_t *_length)
+{
+	size_t length = *_length;
+
+	if (offset < 0)
+		return B_BAD_VALUE;
+
+	// we limit the attribute size to something reasonable
+	off_t end = offset + length;
+	if (end > 65536) {
+		end = 65536;
+		length = end - offset;
+	}
+	if (offset > end) {
+		*_length = 0;
+		return E2BIG;
+	}
+
+	if (end > fSize) {
+		// make room in the data stream
+		uint8 *data = (uint8 *)realloc(fData, end);
+		if (data == NULL)
+			return B_NO_MEMORY;
+
+		if (fSize < offset)
+			memset(data + fSize, 0, offset - fSize);
+
+		fData = data;
+		fSize = end;
+	}
+
+	if (user_memcpy(fData + offset, buffer, length) < B_OK)
+		return B_BAD_ADDRESS;
+
+	*_length = length;
+	return B_OK;
+}
+
+
+void
+Attribute::Truncate()
+{
+	free(fData);
+	fData = NULL;
+	fSize = 0;
+}
+
+
+//	#pragma mark -
+
+
 Inode::Inode(Volume *volume, Inode *parent, const char *name, off_t start,
 		off_t frames, int32 type)
 	:
@@ -380,6 +563,150 @@ Inode::SetName(const char* name)
 	free(fName);
 	fName = (char *)name;
 	return B_OK;
+}
+
+
+Attribute *
+Inode::FindAttribute(const char *name) const
+{
+	if (name == NULL || !name[0])
+		return NULL;
+
+	AttributeList::ConstIterator iterator = fAttributes.GetIterator();
+
+	while (iterator.HasNext()) {
+		Attribute *attribute = iterator.Next();
+		if (!strcmp(attribute->Name(), name))
+			return attribute;
+	}
+
+	return NULL;
+}
+
+
+status_t
+Inode::AddAttribute(const char *name, type_code type,
+	const uint8 *data, size_t length)
+{
+	if (FindAttribute(name) != NULL)
+		return B_NAME_IN_USE;
+
+	Attribute *attribute = new Attribute(name, type);
+	status_t status = attribute != NULL ? B_OK : B_NO_MEMORY;
+	if (status == B_OK)
+		status = attribute->InitCheck();
+	if (status == B_OK && data != NULL && length != 0)
+		status = attribute->WriteAt(0, data, &length);
+	if (status < B_OK) {
+		delete attribute;
+		return status;
+	}
+
+	fAttributes.Add(attribute);
+	return B_OK;
+}
+
+
+status_t
+Inode::AddAttribute(const char *name, type_code type,
+	const char *string)
+{
+	if (string == NULL)
+		return NULL;
+
+	return AddAttribute(name, type, (const uint8 *)string,
+		strlen(string));
+}
+
+
+status_t
+Inode::AddAttribute(const char *name, int32 value)
+{
+	return AddAttribute(name, B_INT32_TYPE, (const uint8 *)&value,
+		sizeof(int32));
+}
+
+
+status_t
+Inode::RemoveAttribute(const char *name)
+{
+	if (name == NULL || !name[0])
+		return B_ENTRY_NOT_FOUND;
+
+	AttributeList::Iterator iterator = fAttributes.GetIterator();
+	
+	while (iterator.HasNext()) {
+		Attribute *attribute = iterator.Next();
+		if (!strcmp(attribute->Name(), name)) {
+			// look for attribute in cookies
+			AttrCookieList::Iterator i = fAttrCookies.GetIterator();
+			while (i.HasNext()) {
+				attr_cookie *cookie = i.Next();
+				if (cookie->current == attribute)
+					cookie->current = attribute->GetDoublyLinkedListLink()->next;
+			}
+
+			iterator.Remove();
+			delete attribute;
+			return B_OK;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+void
+Inode::AddAttrCookie(attr_cookie *cookie)
+{
+	fAttrCookies.Add(cookie);
+	RewindAttrCookie(cookie);
+}
+
+
+void
+Inode::RemoveAttrCookie(attr_cookie *cookie)
+{
+	fAttrCookies.Remove(cookie);
+}
+
+
+void
+Inode::RewindAttrCookie(attr_cookie *cookie)
+{
+	cookie->current = fAttributes.First();
+}
+
+
+//	#pragma mark -
+
+
+void
+fill_stat_buffer(Volume *volume, Inode *inode, Attribute *attribute,
+	struct stat &stat)
+{
+	stat.st_dev = volume->ID();
+	stat.st_ino = inode->ID();
+
+	if (attribute != NULL) {
+		stat.st_size = attribute->Size();
+		stat.st_mode = S_ATTR | 0666;
+		stat.st_type = attribute->Type();
+	} else {
+		stat.st_size = inode->Size();
+		stat.st_mode = inode->Type();
+		stat.st_type = 0;
+	}
+
+	stat.st_nlink = 1;
+	stat.st_blksize = 2048;
+
+	stat.st_uid = inode->UserID();
+	stat.st_gid = inode->GroupID();
+
+	stat.st_atime = time(NULL);
+	stat.st_mtime = stat.st_ctime = inode->ModificationTime();
+	stat.st_crtime = inode->CreationTime();
 }
 
 
@@ -636,21 +963,7 @@ cdda_read_stat(fs_volume _volume, fs_vnode _node, struct stat *stat)
 
 	TRACE(("cdda_read_stat: vnode %p (0x%Lx), stat %p\n", inode, inode->ID(), stat));
 
-	stat->st_dev = volume->ID();
-	stat->st_ino = inode->ID();
-
-	stat->st_size = inode->Size();
-	stat->st_mode = inode->Type();
-
-	stat->st_nlink = 1;
-	stat->st_blksize = 2048;
-
-	stat->st_uid = inode->UserID();
-	stat->st_gid = inode->GroupID();
-
-	stat->st_atime = time(NULL);
-	stat->st_mtime = stat->st_ctime = inode->ModificationTime();
-	stat->st_crtime = inode->CreationTime();
+	fill_stat_buffer(volume, inode, NULL, *stat);
 
 	return B_OK;
 }
@@ -813,6 +1126,228 @@ cdda_free_dir_cookie(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie)
 }
 
 
+//	#pragma mark - attribute functions
+
+
+static status_t
+cdda_open_attr_dir(fs_volume _volume, fs_vnode _vnode, fs_cookie *_cookie)
+{
+	Volume *volume = (Volume *)_volume;
+	Inode *inode = (Inode *)_vnode;
+
+	attr_cookie *cookie = new attr_cookie;
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+
+	Locker _(volume->Lock());
+
+	inode->AddAttrCookie(cookie);
+	*_cookie = cookie;
+	return B_OK;
+}
+
+
+static status_t
+cdda_close_attr_dir(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie)
+{
+	return B_OK;
+}
+
+
+static status_t
+cdda_free_attr_dir_cookie(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie)
+{
+	Volume *volume = (Volume *)_volume;
+	Inode *inode = (Inode *)_vnode;
+	attr_cookie *cookie = (attr_cookie *)_cookie;
+
+	Locker _(volume->Lock());
+
+	inode->RemoveAttrCookie(cookie);
+	delete cookie;
+	return B_OK;
+}
+
+
+static status_t
+cdda_rewind_attr_dir(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie)
+{
+	Volume *volume = (Volume *)_volume;
+	Inode *inode = (Inode *)_vnode;
+	attr_cookie *cookie = (attr_cookie *)_cookie;
+
+	Locker _(volume->Lock());
+
+	inode->RewindAttrCookie(cookie);
+	return B_OK;
+}
+
+
+static status_t
+cdda_read_attr_dir(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie,
+	struct dirent *dirent, size_t bufferSize, uint32 *_num)
+{
+	Volume *volume = (Volume *)_volume;
+	Inode *inode = (Inode *)_vnode;
+	attr_cookie *cookie = (attr_cookie *)_cookie;
+
+	Locker _(volume->Lock());
+	Attribute *attribute = cookie->current;
+
+	if (attribute == NULL) {
+		*_num = 0;
+		return B_OK;
+	}
+
+	size_t length = strlcpy(dirent->d_name, attribute->Name(), bufferSize);
+	dirent->d_dev = volume->ID();
+	dirent->d_ino = inode->ID();
+	dirent->d_reclen = sizeof(struct dirent) + length;
+
+	cookie->current = attribute->GetDoublyLinkedListLink()->next;
+	*_num = 1;
+	return B_OK;
+}
+
+
+static status_t
+cdda_create_attr(fs_volume _volume, fs_vnode _node, const char *name,
+	uint32 type, int openMode, fs_cookie *_cookie)
+{
+	Volume *volume = (Volume *)_volume;
+	Inode *inode = (Inode *)_node;
+
+	Locker _(volume->Lock());
+
+	Attribute *attribute = inode->FindAttribute(name);
+	if (attribute == NULL) {
+		status_t status = inode->AddAttribute(name, type);
+		if (status < B_OK)
+			return status;
+	} else if ((openMode & O_EXCL) == 0) {
+		attribute->SetType(type);
+	} else
+		return B_FILE_EXISTS;
+
+	*_cookie = strdup(name);
+	if (*_cookie == NULL)
+		return B_NO_MEMORY;
+
+	return B_OK;
+}
+
+
+static status_t
+cdda_open_attr(fs_volume _volume, fs_vnode _node, const char *name,
+	int openMode, fs_cookie *_cookie)
+{
+	Volume *volume = (Volume *)_volume;
+	Inode *inode = (Inode *)_node;
+
+	Locker _(volume->Lock());
+
+	Attribute *attribute = inode->FindAttribute(name);
+	if (attribute == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	*_cookie = strdup(name);
+	if (*_cookie == NULL)
+		return B_NO_MEMORY;
+
+	return B_OK;
+}
+
+
+static status_t
+cdda_close_attr(fs_volume _fs, fs_vnode _file, fs_cookie cookie)
+{
+	return B_OK;
+}
+
+
+static status_t
+cdda_free_attr_cookie(fs_volume _fs, fs_vnode _file, fs_cookie cookie)
+{
+	free(cookie);
+	return B_OK;
+}
+
+
+static status_t
+cdda_read_attr(fs_volume _volume, fs_vnode _node, fs_cookie _cookie,
+	off_t offset, void *buffer, size_t *_length)
+{
+	Volume *volume = (Volume *)_volume;
+	Inode *inode = (Inode *)_node;
+
+	Locker _(volume->Lock());
+
+	Attribute *attribute = inode->FindAttribute((const char *)_cookie);
+	if (attribute == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	return attribute->ReadAt(offset, (uint8 *)buffer, _length);
+}
+
+
+static status_t
+cdda_write_attr(fs_volume _volume, fs_vnode _file, fs_cookie _cookie,
+	off_t offset, const void *buffer, size_t *_length)
+{
+	Volume *volume = (Volume *)_volume;
+	Inode *inode = (Inode *)_file;
+
+	Locker _(volume->Lock());
+
+	Attribute *attribute = inode->FindAttribute((const char *)_cookie);
+	if (attribute == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	return attribute->WriteAt(offset, (uint8 *)buffer, _length);
+}
+
+
+static status_t
+cdda_read_attr_stat(fs_volume _volume, fs_vnode _file, fs_cookie _cookie,
+	struct stat *stat)
+{
+	Volume *volume = (Volume *)_volume;
+	Inode *inode = (Inode *)_file;
+
+	Locker _(volume->Lock());
+
+	Attribute *attribute = inode->FindAttribute((const char *)_cookie);
+	if (attribute == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	fill_stat_buffer(volume, inode, attribute, *stat);
+	return B_OK;
+}
+
+
+static status_t
+cdda_write_attr_stat(fs_volume _volume, fs_vnode file, fs_cookie cookie,
+	const struct stat *stat, int statMask)
+{
+	return EOPNOTSUPP;
+}
+
+
+static status_t
+cdda_remove_attr(fs_volume _volume, fs_vnode _node, const char *name)
+{
+	if (name == NULL)
+		return B_BAD_VALUE;
+
+	Volume *volume = (Volume *)_volume;
+	Inode *inode = (Inode *)_node;
+
+	Locker _(volume->Lock());
+
+	return inode->RemoveAttribute(name);
+}
+
+
 static status_t
 cdda_std_ops(int32 op, ...)
 {
@@ -873,7 +1408,7 @@ static file_system_module_info sCDDAFileSystem = {
 	NULL,	// fs_symlink()
 	NULL,	// fs_link()
 	NULL,	// fs_unlink()
-	NULL,	// fs_rename()
+	&cdda_rename,
 
 	NULL,	// fs_access()
 	&cdda_read_stat,
@@ -896,7 +1431,6 @@ static file_system_module_info sCDDAFileSystem = {
 	&cdda_read_dir,
 	&cdda_rewind_dir,
 
-#if 0
 	// attribute directory operations
 	&cdda_open_attr_dir,
 	&cdda_close_attr_dir,
@@ -914,9 +1448,8 @@ static file_system_module_info sCDDAFileSystem = {
 
 	&cdda_read_attr_stat,
 	&cdda_write_attr_stat,
-	&cdda_rename_attr,
+	NULL,	// fs_rename_attr()
 	&cdda_remove_attr,
-#endif
 
 	// the other operations are not yet supported (indices, queries)
 	NULL,
