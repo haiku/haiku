@@ -4066,6 +4066,13 @@ BView::DisableLayoutInvalidation()
 }
 
 
+bool
+BView::IsLayoutValid() const
+{
+	return fLayoutData->fLayoutValid;
+}
+
+
 BLayoutContext*
 BView::LayoutContext() const
 {

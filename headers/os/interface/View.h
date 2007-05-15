@@ -536,6 +536,7 @@ public:
 			void			InvalidateLayout(bool descendants = false);
 			void			EnableLayoutInvalidation();
 			void			DisableLayoutInvalidation();
+			bool			IsLayoutValid() const;
 
 			BLayoutContext*	LayoutContext() const;
 
