@@ -258,10 +258,10 @@ public:
 	virtual	bool				QuitRequested();
 	virtual thread_id			Run();
 
-	virtual	void			SetLayout(BLayout* layout);
-			BLayout*		GetLayout() const;
+	virtual	void				SetLayout(BLayout* layout);
+			BLayout*			GetLayout() const;
 
-			void			InvalidateLayout(bool descendants = false);
+			void				InvalidateLayout(bool descendants = false);
 
 private:
 	typedef BLooper inherited;
