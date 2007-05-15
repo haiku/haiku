@@ -1,17 +1,15 @@
-SubDir HAIKU_TOP src tests kits interface layout ;
+SubDir HAIKU_TOP src tests kits interface layout widget_layout_test ;
 
 SetSubDirSupportedPlatforms haiku libbe_test ;
 
-SimpleTest LayoutTest1 :
-	LayoutTest1.cpp
+SimpleTest WidgetLayoutTest :
+	WidgetLayoutTest.cpp
 	:
 	be
 ;
 
 if $(TARGET_PLATFORM) = libbe_test {
 	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR)
-		: LayoutTest1
+		: WidgetLayoutTest
 		: tests!apps ;
 }
-
-HaikuSubInclude widget_layout_test ;
