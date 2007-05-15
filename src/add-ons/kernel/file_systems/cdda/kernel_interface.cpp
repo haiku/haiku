@@ -4,6 +4,7 @@
  */
 
 
+#include "cdda.h"
 #include "Lock.h"
 
 #include <fs_info.h>
@@ -57,7 +58,8 @@ class Volume {
 		off_t			NumBlocks() const { return fNumBlocks; }
 
 	private:
-		Inode			*_CreateNode(Inode *parent, const char *name, int32 type);
+		Inode			*_CreateNode(Inode *parent, const char *name,
+							off_t start, off_t frames, int32 type);
 
 		Semaphore		fLock;
 		int				fDevice;
@@ -74,7 +76,8 @@ class Volume {
 
 class Inode {
 	public:
-		Inode(Volume *volume, Inode *parent, const char *name, int32 type);
+		Inode(Volume *volume, Inode *parent, const char *name, off_t start,
+			off_t frames, int32 type);
 		~Inode();
 
 		status_t	InitCheck();
@@ -93,8 +96,12 @@ class Inode {
 						{ return fCreationTime; }
 		time_t		ModificationTime() const
 						{ return fModificationTime; }
+		off_t		StartFrame() const
+						{ return fStartFrame; }
+		off_t		FrameCount() const
+						{ return fFrameCount; }
 		off_t		Size() const
-						{ return fSize; }
+						{ return fFrameCount * kFrameSize /* + WAV header */; }
 
 		Inode		*Next() const { return fNext; }
 		void		SetNext(Inode *inode) { fNext = inode; }
@@ -103,12 +110,13 @@ class Inode {
 		Inode		*fNext;
 		vnode_id	fID;
 		int32		fType;
-		const char	*fName;
+		char		*fName;
 		gid_t		fGroupID;
 		uid_t		fUserID;
 		time_t		fCreationTime;
 		time_t		fModificationTime;
-		off_t		fSize;
+		off_t		fStartFrame;
+		off_t		fFrameCount;
 };
 
 
@@ -142,7 +150,7 @@ Volume::Volume(mount_id id)
 	fFirstEntry(NULL)
 {
 	// create the root vnode
-	fRootNode = _CreateNode(NULL, "", S_IFDIR | 0777);
+	fRootNode = _CreateNode(NULL, "", 0, 0, S_IFDIR | 0777);
 }
 
 
@@ -160,6 +168,8 @@ Volume::~Volume()
 		next = inode->Next();
 		delete inode;
 	}
+
+	free(fName);
 }
 
 
@@ -181,6 +191,64 @@ Volume::Mount(const char* device)
 	if (fDevice < 0)
 		return errno;
 
+	scsi_toc_toc *toc = (scsi_toc_toc *)malloc(1024);
+	if (toc == NULL)
+		return B_NO_MEMORY;
+
+	status_t status = read_table_of_contents(fDevice, toc, 1024);
+	if (status < B_OK) {
+		free(toc);
+		return status;
+	}
+
+	cdtext text;
+	if (read_cdtext(fDevice, text) < B_OK)
+		dprintf("CDDA: no CD-Text found.\n");
+
+	int32 trackCount = toc->last_track + 1 - toc->first_track;
+	char title[256];
+
+	for (int32 i = 0; i < trackCount; i++) {
+		scsi_cd_msf& next = toc->tracks[i + 1].start.time;
+			// the last track is always lead-out
+		scsi_cd_msf& start = toc->tracks[i].start.time;
+
+		off_t startFrame = start.minute * kFramesPerMinute
+			+ start.second * kFramesPerSecond + start.frame;
+		off_t frames = next.minute * kFramesPerMinute
+			+ next.second * kFramesPerSecond + next.frame
+			- startFrame;
+
+		if (text.titles[i] != NULL && text.titles[i]) {
+			if (text.artists[i] != NULL && text.artists[i]) {
+				snprintf(title, sizeof(title), "%02ld. %s - %s.wav", i + 1,
+					text.artists[i], text.titles[i]);
+			} else {
+				snprintf(title, sizeof(title), "%02ld. %s.wav", i + 1,
+					text.titles[i]);
+			}
+		} else
+			snprintf(title, sizeof(title), "%02ld.wav", i + 1);
+
+		_CreateNode(fRootNode, title, startFrame, frames, S_IFREG | 0444);
+	}
+
+	free(toc);
+
+	// determine volume title
+
+	if (text.artist != NULL && text.album != NULL)
+		snprintf(title, sizeof(title), "%s - %s", text.artist, text.album);
+	else if (text.artist != NULL || text.album != NULL) {
+		snprintf(title, sizeof(title), "%s", text.artist != NULL
+			? text.artist : text.album);
+	} else
+		strcpy(title, "Audio CD");
+
+	fName = strdup(title);
+	if (fName == NULL)
+		return B_NO_MEMORY;
+
 	return B_OK;
 }
 
@@ -193,9 +261,10 @@ Volume::Lock()
 
 
 Inode *
-Volume::_CreateNode(Inode *parent, const char *name, int32 type)
+Volume::_CreateNode(Inode *parent, const char *name, off_t start, off_t frames,
+	int32 type)
 {
-	Inode *inode = new Inode(this, parent, name, type);
+	Inode *inode = new Inode(this, parent, name, start, frames, type);
 	if (inode == NULL)
 		return NULL;
 
@@ -245,14 +314,24 @@ Volume::Find(const char *name)
 status_t
 Volume::SetName(const char *name)
 {
-	return B_ERROR;
+	if (name == NULL || !name[0])
+		return B_BAD_VALUE;
+
+	name = strdup(name);
+	if (name == NULL)
+		return B_NO_MEMORY;
+
+	free(fName);
+	fName = (char *)name;
+	return B_OK;
 }
 
 
 //	#pragma mark -
 
 
-Inode::Inode(Volume *volume, Inode *parent, const char *name, int32 type)
+Inode::Inode(Volume *volume, Inode *parent, const char *name, off_t start,
+		off_t frames, int32 type)
 	:
 	fNext(NULL)
 {
@@ -262,6 +341,8 @@ Inode::Inode(Volume *volume, Inode *parent, const char *name, int32 type)
 
 	fID = volume->GetNextNodeID();
 	fType = type;
+	fStartFrame = start;
+	fFrameCount = frames;
 
 	fUserID = geteuid();
 	fGroupID = parent ? parent->GroupID() : getegid();
@@ -289,7 +370,16 @@ Inode::InitCheck()
 status_t
 Inode::SetName(const char* name)
 {
-	return B_ERROR;
+	if (name == NULL || !name[0])
+		return B_BAD_VALUE;
+
+	name = strdup(name);
+	if (name == NULL)
+		return B_NO_MEMORY;
+
+	free(fName);
+	fName = (char *)name;
+	return B_OK;
 }
 
 
@@ -578,7 +668,19 @@ cdda_rename(fs_volume _volume, void *_oldDir, const char *oldName, void *_newDir
 		|| strchr(newName, '/') != NULL)
 		return B_BAD_VALUE;
 
-	return B_ERROR;
+	// we only have a single directory which simplifies things a bit :-)
+
+	Volume *volume = (Volume *)_volume;
+	Locker _(volume->Lock());
+
+	Inode *inode = volume->Find(oldName);
+	if (inode == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	if (volume->Find(newName) != NULL)
+		return B_NAME_IN_USE;
+
+	return inode->SetName(newName);
 }
 
 

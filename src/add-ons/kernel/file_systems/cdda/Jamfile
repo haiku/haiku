@@ -6,8 +6,5 @@ UsePrivateHeaders [ FDirName storage ] ;
 
 KernelAddon cdda :
 	kernel_interface.cpp
-	;
-
-SimpleTest cdda_text :
 	cdda.cpp
-	: be ;
+	;

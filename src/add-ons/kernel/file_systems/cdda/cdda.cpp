@@ -4,17 +4,15 @@
  */
 
 
-#include <bus/scsi/scsi_cmds.h>
+#include "cdda.h"
+
+#include <KernelExport.h>
 #include <device/scsi.h>
 
 #include <ctype.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
-#define kFramesPerSecond 75
-#define kFramesPerMinute (kFramesPerSecond * 60)
 
 struct cdtext_pack_data {
 	uint8	id;
@@ -27,35 +25,37 @@ struct cdtext_pack_data {
 	uint8	crc[2];
 } _PACKED;
 
-
-static const uint8 kMaxTracks = 0x63;
 enum {
 	kTrackID	= 0x80,
 	kArtistID	= 0x81,
 	kMessageID	= 0x85,
 };
 
-struct cdtext {
-	char *artist;
-	char *album;
-	char *titles[kMaxTracks];
-	char *artists[kMaxTracks];
-	uint8 track_count;
-	char *genre;
-};
+static const uint32 kBufferSize = 16384;
+static const uint32 kSenseSize = 1024;
 
 
 //	#pragma mark - string functions
 
 
-bool
+static char *
+copy_string(const char *string)
+{
+	if (string == NULL || !string[0])
+		return NULL;
+
+	return strdup(string);
+}
+
+
+static bool
 is_garbage(char c)
 {
 	return isspace(c) || c == '-' || c == '/' || c == '\\';
 }
 
 
-void
+static void
 sanitize_string(char *string)
 {
 	if (string == NULL)
@@ -106,7 +106,7 @@ find_string(const char *string, const char *find)
 }
 
 
-void
+static void
 cut_string(char *string, char *cut)
 {
 	if (string == NULL || cut == NULL)
@@ -121,7 +121,7 @@ cut_string(char *string, char *cut)
 }
 
 
-void
+static void
 sanitize_album(cdtext &text)
 {
 	cut_string(text.album, text.artist);
@@ -133,7 +133,7 @@ sanitize_album(cdtext &text)
 		if (space != NULL) {
 			space[0] = '\0';
 			text.artist = text.album;
-			text.album = strdup(space + 2);
+			text.album = copy_string(space + 2);
 
 			sanitize_string(text.artist);
 			sanitize_string(text.album);
@@ -142,26 +142,28 @@ sanitize_album(cdtext &text)
 }
 
 
-void
+static void
 sanitize_titles(cdtext &text)
 {
 	for (uint8 i = 0; i < text.track_count; i++) {
 		cut_string(text.titles[i], "(Album Version)");
 		sanitize_string(text.titles[i]);
 		sanitize_string(text.artists[i]);
-		if (!strcasecmp(text.artists[i], text.artist)) {
+
+		if (text.artists[i] != NULL && text.artist != NULL
+			&& !strcasecmp(text.artists[i], text.artist)) {
 			// if the title artist is the same as the main artist, remove it
 			free(text.artists[i]);
 			text.artists[i] = NULL;
 		}
 
 		if (text.titles[i] != NULL && text.titles[i][0] == '\t' && i > 0)
-			text.titles[i] = strdup(text.titles[i - 1]);
+			text.titles[i] = copy_string(text.titles[i - 1]);
 	}
 }
 
 
-bool
+static bool
 single_case(const char *string, bool &upper, bool &first)
 {
 	if (string == NULL)
@@ -185,7 +187,7 @@ single_case(const char *string, bool &upper, bool &first)
 }
 
 
-void
+static void
 capitalize_string(char *string)
 {
 	if (string == NULL)
@@ -207,7 +209,7 @@ capitalize_string(char *string)
 }
 
 
-void
+static void
 correct_case(cdtext &text)
 {
 	// check if all titles share a single case
@@ -238,14 +240,39 @@ correct_case(cdtext &text)
 //	#pragma mark - CD-Text
 
 
-bool
+cdtext::cdtext()
+	:
+	artist(NULL),
+	album(NULL),
+	genre(NULL),
+	track_count(0)
+{
+	memset(titles, 0, sizeof(titles));
+	memset(artists, 0, sizeof(artists));
+}
+
+
+cdtext::~cdtext()
+{
+	free(album);
+	free(artist);
+	free(genre);
+
+	for (uint8 i = 0; i < track_count; i++) {
+		free(titles[i]);
+		free(artists[i]);
+	}
+}
+
+
+static bool
 is_string_id(uint8 id)
 {
 	return id >= kTrackID && id <= kMessageID;
 }
 
 
-bool
+static bool
 parse_pack_data(cdtext_pack_data *&pack, uint32 &packLeft,
 	cdtext_pack_data *&lastPack, uint8 &id, uint8 &track, uint8 &state,
 	char *buffer, size_t &length)
@@ -280,13 +307,13 @@ parse_pack_data(cdtext_pack_data *&pack, uint32 &packLeft,
 
 	while (id == pack->id && track == pack->track) {
 #if 1
-		printf("%u.%u.%u, %u.%u.%u, ", pack->id, pack->track, pack->number,
+		dprintf("%u.%u.%u, %u.%u.%u, ", pack->id, pack->track, pack->number,
 			pack->double_byte, pack->block_number, pack->character_position);
 		for (int32 i = 0; i < 12; i++) {
 			if (isprint(pack->text[i]))
-				putchar(pack->text[i]);
+				dprintf("%c", pack->text[i]);
 		}
-		putchar('\n');
+		dprintf("\n");
 #endif
 		if (is_string_id(id)) {
 			// TODO: support double byte characters
@@ -330,72 +357,22 @@ parse_pack_data(cdtext_pack_data *&pack, uint32 &packLeft,
 }
 
 
-void
-dump_cdtext(cdtext_pack_data *pack, size_t packLength)
+static void
+dump_cdtext(cdtext &text)
 {
-	cdtext_pack_data *lastPack = NULL;
-	char buffer[256];
-	uint8 state = 0;
-	cdtext text;
-
-	memset(&text, 0, sizeof(cdtext));
-
-	while (true) {
-		size_t length = sizeof(buffer);
-		uint8 id, track;
-
-		if (!parse_pack_data(pack, packLength, lastPack, id, track,
-				state, buffer, length))
-			break;
-
-		switch (id) {
-			case kTrackID:
-				if (track == 0) {
-					if (text.album == NULL)
-						text.album = strdup(buffer);
-				} else if (track <= kMaxTracks) {
-					if (text.titles[track - 1] == NULL)
-						text.titles[track - 1] = strdup(buffer);
-					if (track > text.track_count)
-						text.track_count = track;
-				}
-				break;
-
-			case kArtistID:
-				if (track == 0) {
-					if (text.artist == NULL)
-						text.artist = strdup(buffer);
-				} else if (track <= kMaxTracks) {
-					if (text.artists[track - 1] == NULL)
-						text.artists[track - 1] = strdup(buffer);
-				}
-				break;
-
-			default:
-				if (is_string_id(id))
-					printf("UNKNOWN %u: \"%s\"\n", id, buffer);
-				break;
-		}
-	}
-
-	sanitize_string(text.artist);
-	sanitize_album(text);
-	sanitize_titles(text);
-	correct_case(text);
-
 	if (text.album)
-		printf("Album:    \"%s\"\n", text.album);
+		dprintf("Album:    \"%s\"\n", text.album);
 	if (text.artist)
-		printf("Artist:   \"%s\"\n", text.artist);
+		dprintf("Artist:   \"%s\"\n", text.artist);
 	for (uint8 i = 0; i < text.track_count; i++) {
-		printf("Track %02u: \"%s\"%s%s%s\n", i + 1, text.titles[i],
+		dprintf("Track %02u: \"%s\"%s%s%s\n", i + 1, text.titles[i],
 			text.artists[i] ? " (" : "", text.artists[i] ? text.artists[i] : "",
 			text.artists[i] ? ")" : "");
 	}
 }
 
 
-void
+static void
 dump_toc(scsi_toc_toc *toc)
 {
 	int32 numTracks = toc->last_track + 1 - toc->first_track;
@@ -415,22 +392,24 @@ dump_toc(scsi_toc_toc *toc)
 		length.second = (diff % kFramesPerMinute) / kFramesPerSecond;
 		length.frame = diff % kFramesPerSecond;
 
-		printf("%02u. %02u:%02u.%02u (length %02u:%02u.%02u)\n",
+		dprintf("%02u. %02u:%02u.%02u (length %02u:%02u.%02u)\n",
 			track.track_number, start.minute, start.second, start.frame,
 			length.minute, length.second, length.frame);
 	}
 }
 
 
-status_t
+static status_t
 read_table_of_contents(int fd, uint32 track, uint8 format, uint8 *buffer,
 	size_t bufferSize)
 {
 	raw_device_command raw;
-	uint8 senseData[1024];
+	uint8 *senseData = (uint8 *)malloc(kSenseSize);
+	if (senseData == NULL)
+		return B_NO_MEMORY;
 
 	memset(&raw, 0, sizeof(raw_device_command));
-	memset(senseData, 0, sizeof(senseData));
+	memset(senseData, 0, kSenseSize);
 	memset(buffer, 0, bufferSize);
 
 	scsi_cmd_read_toc &toc = *(scsi_cmd_read_toc*)&raw.command;
@@ -449,84 +428,106 @@ read_table_of_contents(int fd, uint32 track, uint8 format, uint8 *buffer,
 	raw.data_length = bufferSize;
 	raw.timeout = 10000000LL;	// 10 secs
 	raw.sense_data = senseData;
-	raw.sense_data_length = sizeof(senseData);
+	raw.sense_data_length = sizeof(kSenseSize);
 
-	if (ioctl(fd, B_RAW_DEVICE_COMMAND, &raw) == 0) {
-		if (raw.scsi_status == 0 && raw.cam_status == 1) {
-			puts("success!\n");
-		} else {
-			puts("failure!\n");
-		}
+	if (ioctl(fd, B_RAW_DEVICE_COMMAND, &raw) == 0
+		&& raw.scsi_status == 0 && raw.cam_status == 1) {
+		free(senseData);
+		return B_OK;
 	}
 
-	return 0;
+	free(senseData);
+	return B_ERROR;
 }
 
 
-void
-dump_block(const uint8 *buffer, int size, const char *prefix)
+//	#pragma mark - exported functions
+
+
+status_t
+read_cdtext(int fd, struct cdtext &cdtext)
 {
-	int i;
-	
-	for (i = 0; i < size;)
-	{
-		int start = i;
+	uint8 *buffer = (uint8 *)malloc(kBufferSize);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
 
-		printf(prefix);
-		for (; i < start+16; i++)
-		{
-			if (!(i % 4))
-				printf(" ");
-
-			if (i >= size)
-				printf("  ");
-			else
-				printf("%02x", *(unsigned char *)(buffer + i));
-		}
-		printf("  ");
-
-		for (i = start; i < start + 16; i++)
-		{
-			if (i < size)
-			{
-				char c = buffer[i];
-
-				if (c < 30)
-					printf(".");
-				else
-					printf("%c", c);
-			}
-			else
-				break;
-		}
-		printf("\n");
+	// do it twice, just in case...
+	// (at least my CD-ROM sometimes returned broken data on first try)
+	read_table_of_contents(fd, 1, SCSI_TOC_FORMAT_CD_TEXT, buffer,
+		kBufferSize);
+	if (read_table_of_contents(fd, 1, SCSI_TOC_FORMAT_CD_TEXT, buffer,
+			kBufferSize) < B_OK) {
+		free(buffer);
+		return B_ERROR;
 	}
-}
 
-
-int
-main(int argc, char** argv)
-{
-	int fd = open(argv[1], O_RDONLY);
-	if (fd < 0)
-		return -1;
-
-	uint8 buffer[1024];
 	scsi_toc_general *header = (scsi_toc_general *)buffer;
 
-	read_table_of_contents(fd, 1, SCSI_TOC_FORMAT_TOC, buffer, sizeof(buffer));
-	header->data_length = B_BENDIAN_TO_HOST_INT16(header->data_length);
-	printf("TOC header %u, %d, %d\n", header->data_length, header->first, header->last);
-	//dump_block(buffer, header->data_length + 2, "TOC");
-	dump_toc((scsi_toc_toc *)buffer);
+	size_t packLength = B_BENDIAN_TO_HOST_INT16(header->data_length) - 2;
+	cdtext_pack_data *pack = (cdtext_pack_data *)(header + 1);
+	cdtext_pack_data *lastPack = NULL;
+	uint8 state = 0;
+	char text[256];
 
-	read_table_of_contents(fd, 1, SCSI_TOC_FORMAT_CD_TEXT, buffer, sizeof(buffer));
-	read_table_of_contents(fd, 1, SCSI_TOC_FORMAT_CD_TEXT, buffer, sizeof(buffer));
-	header->data_length = B_BENDIAN_TO_HOST_INT16(header->data_length);
-	printf("TEXT header %u, %d, %d\n", header->data_length, header->first, header->last);
-	//dump_block(buffer, header->data_length + 2, "TEXT");
+	while (true) {
+		size_t length = sizeof(text);
+		uint8 id, track;
 
-	dump_cdtext((cdtext_pack_data *)(buffer + 4), header->data_length - 2);
+		if (!parse_pack_data(pack, packLength, lastPack, id, track,
+				state, text, length))
+			break;
 
-	close(fd);
+		switch (id) {
+			case kTrackID:
+				if (track == 0) {
+					if (cdtext.album == NULL)
+						cdtext.album = copy_string(text);
+				} else if (track <= kMaxTracks) {
+					if (cdtext.titles[track - 1] == NULL)
+						cdtext.titles[track - 1] = copy_string(text);
+					if (track > cdtext.track_count)
+						cdtext.track_count = track;
+				}
+				break;
+
+			case kArtistID:
+				if (track == 0) {
+					if (cdtext.artist == NULL)
+						cdtext.artist = copy_string(text);
+				} else if (track <= kMaxTracks) {
+					if (cdtext.artists[track - 1] == NULL)
+						cdtext.artists[track - 1] = copy_string(text);
+				}
+				break;
+
+			default:
+				if (is_string_id(id))
+					dprintf("UNKNOWN %u: \"%s\"\n", id, text);
+				break;
+		}
+	}
+
+	free(buffer);
+
+	sanitize_string(cdtext.artist);
+	sanitize_album(cdtext);
+	sanitize_titles(cdtext);
+	correct_case(cdtext);
+
+	dump_cdtext(cdtext);
+	return B_OK;
 }
+
+
+status_t
+read_table_of_contents(int fd, scsi_toc_toc *toc, size_t length)
+{
+	status_t status = read_table_of_contents(fd, 1, SCSI_TOC_FORMAT_TOC,
+		(uint8*)toc, length);
+	if (status < B_OK)
+		return status;
+
+	dump_toc(toc);
+	return B_OK;
+}
+

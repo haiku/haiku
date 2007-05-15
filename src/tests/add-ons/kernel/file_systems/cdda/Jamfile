@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src tests add-ons kernel file_systems cdda ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems cdda ] ;
+
+SimpleTest cdda_text
+	:
+	cdda_text.cpp
+	cdda.cpp
+;
