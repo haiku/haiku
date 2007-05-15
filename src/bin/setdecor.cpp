@@ -63,6 +63,7 @@ int main(int argc, char **argv)
 			return 1;
 		}
 		printf("%s\n", name.String());
+		return 0;
 	}
 	// we want to change it
 	int32 i, count;
