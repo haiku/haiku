@@ -64,6 +64,8 @@ class Volume {
 		Inode			*FirstEntry() const { return fFirstEntry; }
 		off_t			NumBlocks() const { return fNumBlocks; }
 
+		static void		DetermineName(cdtext &text, char *name, size_t length);
+
 	private:
 		Inode			*_CreateNode(Inode *parent, const char *name,
 							off_t start, off_t frames, int32 type);
@@ -231,6 +233,19 @@ Volume::InitCheck()
 }
 
 
+/*static*/ void
+Volume::DetermineName(cdtext &text, char *name, size_t length)
+{
+	if (text.artist != NULL && text.album != NULL)
+		snprintf(name, length, "%s - %s", text.artist, text.album);
+	else if (text.artist != NULL || text.album != NULL) {
+		snprintf(name, length, "%s", text.artist != NULL
+			? text.artist : text.album);
+	} else
+		strlcpy(name, "Audio CD", length);
+}
+
+
 status_t
 Volume::Mount(const char* device)
 {
@@ -309,14 +324,7 @@ Volume::Mount(const char* device)
 	free(toc);
 
 	// determine volume title
-
-	if (text.artist != NULL && text.album != NULL)
-		snprintf(title, sizeof(title), "%s - %s", text.artist, text.album);
-	else if (text.artist != NULL || text.album != NULL) {
-		snprintf(title, sizeof(title), "%s", text.artist != NULL
-			? text.artist : text.album);
-	} else
-		strcpy(title, "Audio CD");
+	DetermineName(text, title, sizeof(title));
 
 	fName = strdup(title);
 	if (fName == NULL)
@@ -710,7 +718,64 @@ fill_stat_buffer(Volume *volume, Inode *inode, Attribute *attribute,
 }
 
 
-//	#pragma mark - module API
+//	#pragma mark - Module API
+
+
+static float
+cdda_identify_partition(int fd, partition_data *partition, void **_cookie)
+{
+	scsi_toc_toc *toc = (scsi_toc_toc *)malloc(1024);
+	if (toc == NULL)
+		return B_NO_MEMORY;
+
+	status_t status = read_table_of_contents(fd, toc, 1024);
+	if (status < B_OK) {
+		free(toc);
+		return status;
+	}
+
+	*_cookie = toc;
+	return 0.8f;
+}
+
+
+static status_t
+cdda_scan_partition(int fd, partition_data *partition, void *_cookie)
+{
+	scsi_toc_toc *toc = (scsi_toc_toc *)_cookie;
+
+	partition->status = B_PARTITION_VALID;
+	partition->flags |= B_PARTITION_FILE_SYSTEM;
+
+	// compute length
+
+	uint32 lastTrack = toc->last_track + 1 - toc->first_track;
+	scsi_cd_msf& end = toc->tracks[lastTrack].start.time;
+
+	partition->content_size = off_t(end.minute * kFramesPerMinute
+		+ end.second * kFramesPerSecond + end.frame) * kFrameSize;
+	partition->block_size = kFrameSize;
+
+	// determine volume title
+
+	cdtext text;
+	read_cdtext(fd, text);
+
+	char name[256];
+	Volume::DetermineName(text, name, sizeof(name));
+	partition->content_name = strdup(name);
+	if (partition->content_name == NULL)
+		return B_NO_MEMORY;
+
+	return B_OK;
+}
+
+
+static void
+cdda_free_identify_partition_cookie(partition_data *partition, void *_cookie)
+{
+	free(_cookie);
+}
 
 
 static status_t
@@ -1373,27 +1438,27 @@ static file_system_module_info sCDDAFileSystem = {
 
 	"CDDA File System",
 
-	NULL,	// identify_partition()
-	NULL,	// scan_partition()
-	NULL,	// free_identify_partition_cookie()
+	cdda_identify_partition,
+	cdda_scan_partition,
+	cdda_free_identify_partition_cookie,
 	NULL,	// free_partition_content_cookie()
 
-	&cdda_mount,
-	&cdda_unmount,
-	&cdda_read_fs_stat,
-	&cdda_write_fs_stat,
-	&cdda_sync,
+	cdda_mount,
+	cdda_unmount,
+	cdda_read_fs_stat,
+	cdda_write_fs_stat,
+	cdda_sync,
 
-	&cdda_lookup,
-	&cdda_get_vnode_name,
+	cdda_lookup,
+	cdda_get_vnode_name,
 
-	&cdda_get_vnode,
-	&cdda_put_vnode,
+	cdda_get_vnode,
+	cdda_put_vnode,
 	NULL,	// fs_remove_vnode()
 
-	&cdda_can_page,
-	&cdda_read_pages,
-	&cdda_write_pages,
+	cdda_can_page,
+	cdda_read_pages,
+	cdda_write_pages,
 
 	NULL,	// get_file_map()
 
@@ -1402,54 +1467,54 @@ static file_system_module_info sCDDAFileSystem = {
 	NULL,	// fs_set_flags()
 	NULL,	// fs_select()
 	NULL,	// fs_deselect()
-	&cdda_fsync,
+	cdda_fsync,
 
 	NULL,	// fs_read_link()
 	NULL,	// fs_symlink()
 	NULL,	// fs_link()
 	NULL,	// fs_unlink()
-	&cdda_rename,
+	cdda_rename,
 
 	NULL,	// fs_access()
-	&cdda_read_stat,
+	cdda_read_stat,
 	NULL,	// fs_write_stat()
 
 	// file
 	NULL,	// fs_create()
-	&cdda_open,
-	&cdda_close,
-	&cdda_free_cookie,
-	&cdda_read,
+	cdda_open,
+	cdda_close,
+	cdda_free_cookie,
+	cdda_read,
 	NULL,	// fs_write()
 
 	// directory
 	NULL,	// fs_create_dir()
 	NULL,	// fs_remove_dir()
-	&cdda_open_dir,
-	&cdda_close_dir,
-	&cdda_free_dir_cookie,
-	&cdda_read_dir,
-	&cdda_rewind_dir,
+	cdda_open_dir,
+	cdda_close_dir,
+	cdda_free_dir_cookie,
+	cdda_read_dir,
+	cdda_rewind_dir,
 
 	// attribute directory operations
-	&cdda_open_attr_dir,
-	&cdda_close_attr_dir,
-	&cdda_free_attr_dir_cookie,
-	&cdda_read_attr_dir,
-	&cdda_rewind_attr_dir,
+	cdda_open_attr_dir,
+	cdda_close_attr_dir,
+	cdda_free_attr_dir_cookie,
+	cdda_read_attr_dir,
+	cdda_rewind_attr_dir,
 
 	// attribute operations
-	&cdda_create_attr,
-	&cdda_open_attr,
-	&cdda_close_attr,
-	&cdda_free_attr_cookie,
-	&cdda_read_attr,
-	&cdda_write_attr,
+	cdda_create_attr,
+	cdda_open_attr,
+	cdda_close_attr,
+	cdda_free_attr_cookie,
+	cdda_read_attr,
+	cdda_write_attr,
 
-	&cdda_read_attr_stat,
-	&cdda_write_attr_stat,
+	cdda_read_attr_stat,
+	cdda_write_attr_stat,
 	NULL,	// fs_rename_attr()
-	&cdda_remove_attr,
+	cdda_remove_attr,
 
 	// the other operations are not yet supported (indices, queries)
 	NULL,

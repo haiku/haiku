@@ -539,6 +539,22 @@ read_table_of_contents(int fd, scsi_toc_toc *toc, size_t length)
 	if (status < B_OK)
 		return status;
 
+	int32 lastTrack = toc->last_track + 1 - toc->first_track;
+	size_t dataLength = B_BENDIAN_TO_HOST_INT16(toc->data_length) + 2;
+	if (dataLength < sizeof(scsi_toc_toc)
+		|| lastTrack <= 0)
+		return B_BAD_DATA;
+
+	// make sure the values in the TOC make sense
+
+	if (length > dataLength)
+		length = dataLength;
+
+	length -= sizeof(scsi_toc_general);
+
+	if (lastTrack * sizeof(scsi_toc_track) > length)
+		toc->last_track = length / sizeof(scsi_toc_track) + toc->first_track;
+
 	dump_toc(toc);
 	return B_OK;
 }
