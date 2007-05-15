@@ -95,6 +95,7 @@ StdBinCommands
 	query.cpp
 	quit.cpp
 	roster.cpp
+	setdecor.cpp
 	settype.cpp
 	setversion.cpp
 	urlwrapper.cpp
