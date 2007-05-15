@@ -19,7 +19,9 @@
 
 // internal messages
 enum {
-	MSG_2D_SLIDER_VALUE_CHANGED	= '2dsv',
+	MSG_LAYOUT_CONTAINER			= 'layc',
+	MSG_2D_SLIDER_VALUE_CHANGED		= '2dsv',
+	MSG_UNLIMITED_MAX_SIZE_CHANGED	= 'usch',
 };
 
 
@@ -35,12 +37,23 @@ operator+(const BPoint& p, const BSize& size)
 // View
 class View {
 public:
+	View()
+		: fFrame(0, 0, 0, 0),
+		  fContainer(NULL),
+		  fParent(NULL),
+		  fChildren(),
+		  fViewColor(B_TRANSPARENT_32_BIT),
+		  fLayoutValid(false)
+	{
+	}
+
 	View(BRect frame)
 		: fFrame(frame),
 		  fContainer(NULL),
 		  fParent(NULL),
 		  fChildren(),
-		  fViewColor(B_TRANSPARENT_32_BIT)
+		  fViewColor(B_TRANSPARENT_32_BIT),
+		  fLayoutValid(false)
 	{
 	}
 
@@ -60,6 +73,12 @@ public:
 			Invalidate();
 
 			FrameChanged(oldFrame, frame);
+		}
+
+		// relayout if necessary
+		if (!fLayoutValid) {
+			Layout();
+			fLayoutValid = true;
 		}
 	}
 
@@ -94,6 +113,26 @@ public:
 	BSize Size() const
 	{
 		return Frame().Size();
+	}
+
+	virtual BSize MinSize()
+	{
+		return BSize(-1, -1);
+	}
+
+	virtual BSize MaxSize()
+	{
+		return BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED);
+	}
+
+	virtual BSize PreferredSize()
+	{
+		return MinSize();
+	}
+
+	virtual BAlignment Alignment()
+	{
+		return BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER);
 	}
 
 	BPoint LocationInContainer() const
@@ -155,6 +194,7 @@ public:
 		child->_AddedToParent(this);
 
 		child->Invalidate();
+		InvalidateLayout();
 
 		return true;
 	}
@@ -176,6 +216,8 @@ public:
 		child->Invalidate();
 		child->_RemovingFromParent();
 		fChildren.RemoveItem(index);
+
+		InvalidateLayout();
 
 		return child;
 	}
@@ -240,6 +282,20 @@ public:
 		Invalidate(Bounds());
 	}
 
+	virtual void InvalidateLayout()
+	{
+		if (fLayoutValid) {
+			fLayoutValid = false;
+			if (fParent)
+				fParent->InvalidateLayout();
+		}
+	}
+
+	bool IsLayoutValid() const
+	{
+		return fLayoutValid;
+	}
+
 	void SetViewColor(rgb_color color)
 	{
 		fViewColor = color;
@@ -271,6 +327,13 @@ public:
 
 	virtual void FrameChanged(BRect oldFrame, BRect newFrame)
 	{
+	}
+
+	virtual void Layout()
+	{
+		// simply trigger relayouting the children
+		for (int32 i = 0; View* child = ChildAt(i); i++)
+			child->SetFrame(child->Frame());
 	}
 
 protected:
@@ -314,9 +377,6 @@ protected:
 
 	void _Draw(BView* container, BRect updateRect)
 	{
-//printf("%p->View::_Draw(): ", this);
-//updateRect.PrintToStream();
-
 		// compute the clipping region
 		BRegion region(Bounds());
 		for (int32 i = 0; View* child = ChildAt(i); i++)
@@ -367,6 +427,7 @@ private:
 	View*		fParent;
 	BList		fChildren;
 	rgb_color	fViewColor;
+	bool		fLayoutValid;
 };
 
 
@@ -380,6 +441,34 @@ public:
 	{
 		BView::SetViewColor(B_TRANSPARENT_32_BIT);
 		_AddedToContainer(this);
+	}
+
+	virtual void InvalidateLayout()
+	{
+		if (View::IsLayoutValid()) {
+			View::InvalidateLayout();
+
+			// trigger asynchronous re-layout
+			if (Window())
+				Window()->PostMessage(MSG_LAYOUT_CONTAINER, this);
+		}
+	}
+
+	virtual void MessageReceived(BMessage* message)
+	{
+		switch (message->what) {
+			case MSG_LAYOUT_CONTAINER:
+				View::Layout();
+				break;
+			default:
+				BView::MessageReceived(message);
+				break;
+		}
+	}
+
+	virtual void AllAttached()
+	{
+		Window()->PostMessage(MSG_LAYOUT_CONTAINER, this);
 	}
 
 	virtual void Draw(BRect updateRect)
@@ -587,8 +676,8 @@ private:
 // WrapperView
 class WrapperView : public View {
 public:
-	WrapperView(BRect frame, BView* view)
-		: View(frame),
+	WrapperView(BView* view)
+		: View(),
 		  fView(view),
 		  fInsets(1, 1, 1, 1)
 	{
@@ -600,17 +689,17 @@ public:
 		return fView;
 	}
 
-	BSize MinSize() const
+	virtual BSize MinSize()
 	{
 		return _FromViewSize(fView->MinSize());
 	}
 
-	BSize MaxSize() const
+	virtual BSize MaxSize()
 	{
 		return _FromViewSize(fView->MaxSize());
 	}
 
-	BSize PreferredSize() const
+	virtual BSize PreferredSize()
 	{
 		return _FromViewSize(fView->PreferredSize());
 	}
@@ -673,13 +762,14 @@ private:
 // StringView
 class StringView : public View {
 public:
-	StringView(BRect frame, const char* string)
-		: View(frame),
+	StringView(const char* string)
+		: View(),
 		  fString(string),
 		  fAlignment(B_ALIGN_LEFT),
 		  fStringAscent(0),
 		  fStringDescent(0),
-		  fStringWidth(0)
+		  fStringWidth(0),
+		  fExplicitMinSize(B_SIZE_UNSET, B_SIZE_UNSET)
 	{
 		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		fTextColor = (rgb_color){ 0, 0, 0, 255 };
@@ -691,6 +781,7 @@ public:
 
 		_UpdateStringMetrics();
 		Invalidate();
+		InvalidateLayout();
 	}
 
 	void SetAlignment(alignment align)
@@ -707,9 +798,19 @@ public:
 		Invalidate();
 	}
 
-	BSize PreferredSize() const
+	virtual BSize MinSize()
 	{
-		return BSize(fStringWidth - 1, fStringAscent + fStringDescent - 1);
+		BSize size(fExplicitMinSize);
+		if (!size.IsWidthSet())
+			size.width = fStringWidth - 1;
+		if (!size.IsHeightSet())
+			size.height = fStringAscent + fStringDescent - 1;
+		return size;
+	}
+
+	void SetExplicitMinSize(BSize size)
+	{
+		fExplicitMinSize = size;
 	}
 
 	virtual void AddedToContainer()
@@ -767,6 +868,511 @@ private:
 	float		fStringAscent;
 	float		fStringDescent;
 	float		fStringWidth;
+	BSize		fExplicitMinSize;
+};
+
+
+// CheckBox
+class CheckBox : public View, public BInvoker {
+public:
+	CheckBox(BMessage* message = NULL, BMessenger target = BMessenger())
+		: View(BRect(0, 0, 12, 12)),
+		  BInvoker(message, target),
+		  fSelected(false),
+		  fPressed(false)
+	{
+		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	}
+
+	void SetSelected(bool selected)
+	{
+		if (selected != fSelected) {
+			fSelected = selected;
+			Invalidate();
+
+			// send the message
+			if (Message()) {
+				BMessage message(*Message());
+				message.AddBool("selected", IsSelected());
+				InvokeNotify(&message);
+			}
+		}
+	}
+
+	bool IsSelected() const
+	{
+		return fSelected;
+	}
+
+	virtual BSize MinSize()
+	{
+		return BSize(12, 12);
+	}
+
+	virtual BSize MaxSize()
+	{
+		return MinSize();
+	}
+
+	virtual void Draw(BView* container, BRect updateRect)
+	{
+		BRect rect(Bounds());
+
+		if (fPressed)
+			container->SetHighColor((rgb_color){ 120, 0, 0, 255 });
+		else
+			container->SetHighColor((rgb_color){ 0, 0, 0, 255 });
+
+		container->StrokeRect(rect);
+
+		if (fPressed ? fPressedSelected : fSelected) {
+			rect.InsetBy(2, 2);
+			container->StrokeLine(rect.LeftTop(), rect.RightBottom());
+			container->StrokeLine(rect.RightTop(), rect.LeftBottom());
+		}
+	}
+
+	virtual void MouseDown(BPoint where, uint32 buttons, int32 modifiers)
+	{
+		if (fPressed)
+			return;
+
+		fPressed = true;
+		fPressedSelected = fSelected;
+		_PressedUpdate(where);
+	}
+
+	virtual void MouseUp(BPoint where, uint32 buttons, int32 modifiers)
+	{
+		if (!fPressed || (buttons & B_PRIMARY_MOUSE_BUTTON))
+			return;
+
+		_PressedUpdate(where);
+		fPressed = false;
+		SetSelected(fPressedSelected);
+		Invalidate();
+	}
+
+	virtual void MouseMoved(BPoint where, uint32 buttons, int32 modifiers)
+	{
+		if (!fPressed)
+			return;
+
+		_PressedUpdate(where);
+	}
+
+private:
+	void _PressedUpdate(BPoint where)
+	{
+		bool pressedSelected = Bounds().Contains(where) ^ fSelected;
+		if (pressedSelected != fPressedSelected) {
+			fPressedSelected = pressedSelected;
+			Invalidate();
+		}
+	}
+
+private:
+	bool	fSelected;
+	bool	fPressed;
+	bool	fPressedSelected;
+};
+
+
+// GroupView
+class GroupView : public View {
+public:
+	GroupView(enum orientation orientation, int32 lineCount = 1)
+		: View(BRect(0, 0, 0, 0)),
+		  fOrientation(orientation),
+		  fLineCount(lineCount),
+		  fColumnSpacing(0),
+		  fRowSpacing(0),
+		  fInsets(0, 0, 0, 0),
+		  fMinMaxValid(false),
+		  fColumnInfos(NULL),
+		  fRowInfos(NULL)
+	{
+		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+		if (fLineCount < 1)
+			fLineCount = 1;
+	}
+
+	virtual ~GroupView()
+	{
+		delete fColumnInfos;
+		delete fRowInfos;
+	}
+
+	void SetSpacing(float horizontal, float vertical)
+	{
+		if (horizontal != fColumnSpacing || vertical != fRowSpacing) {
+			fColumnSpacing = horizontal;
+			fRowSpacing = vertical;
+
+			InvalidateLayout();
+		}
+	}
+
+	void SetInsets(float left, float top, float right, float bottom)
+	{
+		BRect newInsets(left, top, right, bottom);
+		if (newInsets != fInsets) {
+			fInsets = newInsets;
+			InvalidateLayout();
+		}
+	}
+
+	virtual BSize MinSize()
+	{
+		_ValidateMinMax();
+		return _AddInsetsAndSpacing(BSize(fMinWidth - 1, fMinHeight - 1));
+	}
+
+	virtual BSize MaxSize()
+	{
+		_ValidateMinMax();
+		return _AddInsetsAndSpacing(BSize(fMaxWidth - 1, fMaxHeight - 1));
+	}
+
+	virtual BSize PreferredSize()
+	{
+		_ValidateMinMax();
+		return _AddInsetsAndSpacing(BSize(fPreferredWidth - 1,
+			fPreferredHeight - 1));
+	}
+
+	virtual BAlignment Alignment()
+	{
+		return BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_USE_FULL_HEIGHT);
+	}
+
+
+	virtual void Layout()
+	{
+		_ValidateMinMax();
+			// actually a little late already
+
+		BSize size = _SubtractInsetsAndSpacing(Size());
+		_LayoutLine(size.IntegerWidth() + 1, fColumnInfos, fColumnCount);
+		_LayoutLine(size.IntegerHeight() + 1, fRowInfos, fRowCount);
+
+		// layout children
+		BPoint location = fInsets.LeftTop();
+		for (int32 column = 0; column < fColumnCount; column++) {
+			LayoutInfo& columnInfo = fColumnInfos[column];
+			location.y = fInsets.top;
+			for (int32 row = 0; row < fRowCount; row++) {
+				View* child = _ChildAt(column, row);
+				if (!child)
+					continue;
+
+				// get the grid cell frame
+				BRect cellFrame(location,
+					BSize(columnInfo.size - 1, fRowInfos[row].size - 1));
+
+				// align the child frame in the grid cell
+				BRect childFrame = BLayoutUtils::AlignInFrame(cellFrame,
+					child->MaxSize(), child->Alignment());
+
+				// layout child
+				child->SetFrame(childFrame);
+
+				location.y += fRowInfos[row].size + fRowSpacing;
+			}
+
+			location.x += columnInfo.size + fColumnSpacing;
+		}
+	}
+
+private:
+	struct LayoutInfo {
+		int32	min;
+		int32	max;
+		int32	preferred;
+		int32	size;
+
+		LayoutInfo()
+			: min(0),
+			  max(B_SIZE_UNLIMITED),
+			  preferred(0)
+		{
+		}
+
+		void AddConstraints(float addMin, float addMax, float addPreferred)
+		{
+			if (addMin >= min)
+				min = (int32)addMin + 1;
+			if (addMax <= max)
+				max = (int32)addMax + 1;
+			if (addPreferred >= preferred)
+				preferred = (int32)addPreferred + 1;
+		}
+
+		void Normalize()
+		{
+			if (max > min)
+				max = min;
+			if (preferred < min)
+				preferred = min;
+			if (preferred > max)
+				preferred = max;
+		}
+	};
+
+private:
+	void _ValidateMinMax()
+	{
+		if (fMinMaxValid)
+			return;
+
+		delete fColumnInfos;
+		delete fRowInfos;
+
+		fColumnCount = _ColumnCount();
+		fRowCount = _RowCount();
+
+		fColumnInfos = new LayoutInfo[fColumnCount];
+		fRowInfos = new LayoutInfo[fRowCount];
+
+		// collect the children's min/max constraints
+		for (int32 column = 0; column < fColumnCount; column++) {
+			for (int32 row = 0; row < fRowCount; row++) {
+				View* child = _ChildAt(column, row);
+				if (!child)
+					continue;
+
+				BSize min = child->MinSize();
+				BSize max = child->MaxSize();
+				BSize preferred = child->PreferredSize();
+
+				// apply constraints to column/row info
+				fColumnInfos[column].AddConstraints(min.width, max.width,
+					preferred.width);
+				fRowInfos[row].AddConstraints(min.height, max.height,
+					preferred.height);
+			}
+		}
+
+		// normalize the column/row constraints and compute sum min/max
+		fMinWidth = 0;
+		fMinHeight = 0;
+		fMaxWidth = 0;
+		fMaxHeight = 0;
+		fPreferredWidth = 0;
+		fPreferredHeight = 0;
+
+		for (int32 column = 0; column < fColumnCount; column++) {
+			fColumnInfos[column].Normalize();
+			fMinWidth = BLayoutUtils::AddSizesInt32(fMinWidth,
+				fColumnInfos[column].min);
+			fMaxWidth = BLayoutUtils::AddSizesInt32(fMaxWidth,
+				fColumnInfos[column].max);
+			fPreferredWidth = BLayoutUtils::AddSizesInt32(fPreferredWidth,
+				fColumnInfos[column].preferred);
+		}
+
+		for (int32 row = 0; row < fRowCount; row++) {
+			fRowInfos[row].Normalize();
+			fMinHeight = BLayoutUtils::AddSizesInt32(fMinHeight,
+				fRowInfos[row].min);
+			fMaxHeight = BLayoutUtils::AddSizesInt32(fMaxHeight,
+				fRowInfos[row].max);
+			fPreferredHeight = BLayoutUtils::AddSizesInt32(fPreferredHeight,
+				fRowInfos[row].preferred);
+		}
+
+		fMinMaxValid = true;
+	}
+
+	void _LayoutLine(int32 size, LayoutInfo* infos, int32 infoCount)
+	{
+		BList infosToLayout;
+		for (int32 i = 0; i < infoCount; i++) {
+			infos[i].size = 0;
+			infosToLayout.AddItem(infos + i);
+		}
+
+		// Distribute the available space over the infos. Each iteration we
+		// try to distribute the remaining space evenly. We respect min and
+		// max constraints, though, add up the space we failed to assign
+		// due to the constraints, and use the sum as remaining space for the
+		// next iteration (can be negative). Then we ignore infos that can't
+		// shrink or grow anymore (depending on what would be needed).
+		while (!infosToLayout.IsEmpty()) {
+			BList canShrinkInfos;
+			BList canGrowInfos;
+
+			int32 sizeDiff = 0;
+			int32 infosToLayoutCount = infosToLayout.CountItems();
+			for (int32 i = 0; i < infosToLayoutCount; i++) {
+				LayoutInfo* info = (LayoutInfo*)infosToLayout.ItemAt(i);
+				info->size += (i + 1) * size / infosToLayoutCount
+					- i * size / infosToLayoutCount;
+				if (info->size < info->min) {
+					sizeDiff -= info->min - info->size;
+					info->size = info->min;
+				} else if (info->size > info->max) {
+					sizeDiff += info->size - info->max;
+					info->size = info->max;
+				}
+
+				if (info->size > info->min)
+					canShrinkInfos.AddItem(info);
+				if (info->size < info->max)
+					canGrowInfos.AddItem(info);
+			}
+
+			size = sizeDiff;
+			if (size == 0)
+				break;
+
+			if (size > 0)
+				infosToLayout = canGrowInfos;
+			else
+				infosToLayout = canShrinkInfos;
+		}
+
+		// If unassigned space is remaining, that means, that the group has
+		// been resized beyond its max size. We distribute the excess space
+		// evenly.
+		if (size > 0) {
+			for (int32 i = 0; i < infoCount; i++) {
+				infos[i].size += (i + 1) * size / infoCount
+					- i * size / infoCount;
+			}
+		}
+	}
+
+	virtual BSize _AddInsetsAndSpacing(BSize size)
+	{
+		size.width = BLayoutUtils::AddDistances(size.width,
+			fInsets.left + fInsets.right - 1
+			+ (fColumnCount - 1) * fColumnSpacing);
+		size.height = BLayoutUtils::AddDistances(size.height,
+			fInsets.top + fInsets.bottom - 1
+			+ (fRowCount - 1) * fRowSpacing);
+		return size;
+	}
+
+	virtual BSize _SubtractInsetsAndSpacing(BSize size)
+	{
+		size.width = BLayoutUtils::SubtractDistances(size.width,
+			fInsets.left + fInsets.right - 1
+			+ (fColumnCount - 1) * fColumnSpacing);
+		size.height = BLayoutUtils::SubtractDistances(size.height,
+			fInsets.top + fInsets.bottom - 1
+			+ (fRowCount - 1) * fRowSpacing);
+		return size;
+	}
+
+	int32 _RowCount() const
+	{
+		int32 childCount = CountChildren();
+		int32 count;
+		if (fOrientation == B_HORIZONTAL)
+			count = min_c(fLineCount, childCount);
+		else
+			count = (childCount + fLineCount - 1) / fLineCount;
+
+		return max_c(count, 1);
+	}
+
+	int32 _ColumnCount() const
+	{
+		int32 childCount = CountChildren();
+		int32 count;
+		if (fOrientation == B_HORIZONTAL)
+			count = (childCount + fLineCount - 1) / fLineCount;
+		else
+			count = min_c(fLineCount, childCount);
+
+		return max_c(count, 1);
+	}
+
+	View* _ChildAt(int32 column, int32 row) const
+	{
+		if (fOrientation == B_HORIZONTAL)
+			return ChildAt(column * fLineCount + row);
+		else
+			return ChildAt(row * fLineCount + column);
+	}
+
+private:
+	enum orientation	fOrientation;
+	int32				fLineCount;
+	float				fColumnSpacing;
+	float				fRowSpacing;
+	BRect				fInsets;
+	bool				fMinMaxValid;
+	int32				fMinWidth;
+	int32				fMinHeight;
+	int32				fMaxWidth;
+	int32				fMaxHeight;
+	int32				fPreferredWidth;
+	int32				fPreferredHeight;
+	LayoutInfo*			fColumnInfos;
+	LayoutInfo*			fRowInfos;
+	int32				fColumnCount;
+	int32				fRowCount;
+};
+
+
+// Glue
+class Glue : public View {
+public:
+	Glue()
+		: View()
+	{
+		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	}
+};
+
+
+// Strut
+class Strut : public View {
+public:
+	Strut(float pixelWidth, float pixelHeight)
+		: View(),
+		  fSize(pixelWidth >= 0 ? pixelWidth - 1 : B_SIZE_UNSET,
+		  	pixelHeight >= 0 ? pixelHeight - 1 : B_SIZE_UNSET)
+	{
+		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	}
+
+	virtual BSize MinSize()
+	{
+		return BLayoutUtils::ComposeSize(fSize, BSize(-1, -1));
+	}
+
+	virtual BSize MaxSize()
+	{
+		return BLayoutUtils::ComposeSize(fSize,
+			BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+	}
+
+private:
+	BSize	fSize;
+};
+
+
+// HStrut
+class HStrut : public Strut {
+public:
+	HStrut(float width)
+		: Strut(width, -1)
+	{
+	}
+};
+
+
+// VStrut
+class VStrut : public Strut {
+public:
+	VStrut(float height)
+		: Strut(-1, height)
+	{
+	}
 };
 
 
@@ -789,10 +1395,10 @@ public:
 		view->SetViewColor((rgb_color){200, 200, 240, 255});
 
 		// wrapper view
-		fWrapperView = new WrapperView(BRect(10, 10, 100, 100),
+		fWrapperView = new WrapperView(
 			new BButton(BRect(0, 0, 9, 9), "test button", "Ooh, press me!",
 				(BMessage*)NULL, B_FOLLOW_NONE));
-fWrapperView->GetView()->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+		fWrapperView->SetLocation(BPoint(10, 10));
 		view->AddChild(fWrapperView);
 		fWrapperView->SetSize(fWrapperView->PreferredSize());
 
@@ -804,70 +1410,51 @@ fWrapperView->GetView()->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIM
 
 		_UpdateSliderConstraints();
 
-		// size labels
-
-		// min label
-		rect.top = rect.bottom + 10;
-		rect.bottom = rect.top + 10;
-		StringView* minLabel = new StringView(rect, "min:  ");
-		minLabel->SetAlignment(B_ALIGN_RIGHT);
-		fViewContainer->View::AddChild(minLabel);
-		minLabel->SetSize(minLabel->PreferredSize());
-		BRect minFrame(minLabel->Frame());
-
-		// max label
-		rect = minFrame.OffsetToCopy(minFrame.LeftBottom() + BPoint(0, 8));
-		StringView* maxLabel = new StringView(rect, "max:  ");
-		maxLabel->SetAlignment(B_ALIGN_RIGHT);
-		fViewContainer->View::AddChild(maxLabel);
-		maxLabel->SetSize(maxLabel->PreferredSize());
-		BRect maxFrame(maxLabel->Frame());
-
-		// preferred label
-		rect = maxFrame.OffsetToCopy(maxFrame.LeftBottom() + BPoint(0, 8));
-		StringView* preferredLabel = new StringView(rect, "preferred:  ");
-		preferredLabel->SetAlignment(B_ALIGN_RIGHT);
-		fViewContainer->View::AddChild(preferredLabel);
-		preferredLabel->SetSize(preferredLabel->PreferredSize());
-		BRect preferredFrame(preferredLabel->Frame());
-
-		// preferred label
-		rect = preferredFrame.OffsetToCopy(preferredFrame.LeftBottom()
-			+ BPoint(0, 8));
-		StringView* currentLabel = new StringView(rect, "current:  ");
-		currentLabel->SetAlignment(B_ALIGN_RIGHT);
-		fViewContainer->View::AddChild(currentLabel);
-		currentLabel->SetSize(currentLabel->PreferredSize());
-		BRect currentFrame(currentLabel->Frame());
-
-		float labelWidth = max_c(minFrame.Width(), maxFrame.Width());
-		labelWidth = max_c(labelWidth, preferredFrame.Width());
-		labelWidth = max_c(labelWidth, currentFrame.Width());
-		BSize labelSize(labelWidth, minLabel->Size().height);
-		minLabel->SetSize(labelSize);
-		maxLabel->SetSize(labelSize);
-		preferredLabel->SetSize(labelSize);
-		currentLabel->SetSize(labelSize);
-
 		// size views
+		GroupView* sizeViewsGroup = new GroupView(B_VERTICAL, 6);
+		sizeViewsGroup->SetSpacing(0, 8);
+		fViewContainer->View::AddChild(sizeViewsGroup);
 
 		// min
-		_CreateSizeViews(minFrame.LeftTop() + BPoint(labelWidth + 1, 0),
-			fMinWidthView, fMinHeightView);
+		_CreateSizeViews(sizeViewsGroup, "min:  ", fMinWidthView,
+			fMinHeightView);
 
-		// max
-		_CreateSizeViews(maxFrame.LeftTop() + BPoint(labelWidth + 1, 0),
-			fMaxWidthView, fMaxHeightView);
+		// max (with checkbox)
+		GroupView* unlimitedMaxGroup = new GroupView(B_HORIZONTAL);
+		fUnlimitedMaxSizeCheckBox = new CheckBox(
+			new BMessage(MSG_UNLIMITED_MAX_SIZE_CHANGED), this);
+		unlimitedMaxGroup->AddChild(fUnlimitedMaxSizeCheckBox);
+		unlimitedMaxGroup->AddChild(new StringView("  override"));
+
+		_CreateSizeViews(sizeViewsGroup, "max:  ", fMaxWidthView,
+			fMaxHeightView, unlimitedMaxGroup);
 
 		// preferred
-		_CreateSizeViews(preferredFrame.LeftTop() + BPoint(labelWidth + 1, 0),
-			fPreferredWidthView, fPreferredHeightView);
+		_CreateSizeViews(sizeViewsGroup, "preferred:  ", fPreferredWidthView,
+			fPreferredHeightView);
 
 		// current
-		_CreateSizeViews(currentFrame.LeftTop() + BPoint(labelWidth + 1, 0),
-			fCurrentWidthView, fCurrentHeightView);
+		_CreateSizeViews(sizeViewsGroup, "current:  ", fCurrentWidthView,
+			fCurrentHeightView);
+
+		sizeViewsGroup->SetFrame(BRect(BPoint(rect.left, rect.bottom + 10),
+			sizeViewsGroup->PreferredSize()));
 
 		_UpdateSizeViews();
+	}
+
+	virtual void DispatchMessage(BMessage* message, BHandler* handler)
+	{
+		switch (message->what) {
+			case B_LAYOUT_WINDOW:
+				if (!fWrapperView->GetView()->IsLayoutValid()) {
+					_UpdateSliderConstraints();
+					_UpdateSizeViews();
+				}
+				break;
+		}
+
+		BWindow::DispatchMessage(message, handler);
 	}
 
 	virtual void MessageReceived(BMessage* message)
@@ -875,7 +1462,6 @@ fWrapperView->GetView()->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIM
 		switch (message->what) {
 			case MSG_2D_SLIDER_VALUE_CHANGED:
 			{
-//				message->PrintToStream();
 				BPoint sliderLocation(fSliderView->Location());
 				BPoint wrapperLocation(fWrapperView->Location());
 				BSize size(sliderLocation.x - wrapperLocation.x - 1,
@@ -884,6 +1470,16 @@ fWrapperView->GetView()->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIM
 				_UpdateSizeViews();
 				break;
 			}
+
+			case MSG_UNLIMITED_MAX_SIZE_CHANGED:
+				if (fUnlimitedMaxSizeCheckBox->IsSelected())  {
+					fWrapperView->GetView()->SetExplicitMaxSize(
+						BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+				} else {
+					fWrapperView->GetView()->SetExplicitMaxSize(
+						BSize(B_SIZE_UNSET, B_SIZE_UNSET));
+				}
+				break;
 
 			default:
 				BWindow::MessageReceived(message);
@@ -913,30 +1509,39 @@ private:
 		fSliderView->SetLocationRange(minSliderLocation, maxSliderLocation);
 	}
 
-	void _CreateSizeViews(BPoint location, StringView*& widthView,
-		StringView*& heightView)
+	void _CreateSizeViews(View* group, const char* labelText,
+		StringView*& widthView, StringView*& heightView,
+		View* additionalView = NULL)
 	{
+		// label
+		StringView* label = new StringView(labelText);
+		label->SetAlignment(B_ALIGN_RIGHT);
+		group->AddChild(label);
+
 		// width view
-		BRect rect(location, location + BPoint(10, 10));
-		widthView = new StringView(rect, "9999999999.9");
+		widthView = new StringView("9999999999.9");
 		widthView->SetAlignment(B_ALIGN_RIGHT);
-		fViewContainer->View::AddChild(widthView);
-		widthView->SetSize(widthView->PreferredSize());
+		group->AddChild(widthView);
+		widthView->SetExplicitMinSize(widthView->PreferredSize());
 
 		// "," label
-		rect = widthView->Frame();
-		rect.OffsetTo(rect.RightTop() + BPoint(1, 0));
-		StringView* labelView = new StringView(rect, ",  ");
-		fViewContainer->View::AddChild(labelView);
-		labelView->SetSize(labelView->PreferredSize());
+		StringView* labelView = new StringView(",  ");
+		group->AddChild(labelView);
 
 		// height view
-		rect = labelView->Frame();
-		rect.OffsetTo(rect.RightTop() + BPoint(1, 0));
-		heightView = new StringView(rect, "9999999999.9");
+		heightView = new StringView("9999999999.9");
 		heightView->SetAlignment(B_ALIGN_RIGHT);
-		fViewContainer->View::AddChild(heightView);
-		heightView->SetSize(heightView->PreferredSize());
+		group->AddChild(heightView);
+		heightView->SetExplicitMinSize(heightView->PreferredSize());
+
+		// spacing
+		group->AddChild(new HStrut(20));
+
+		// glue or unlimited max size check box
+		if (additionalView)
+			group->AddChild(additionalView);
+		else
+			group->AddChild(new Glue());
 	}
 
 	void _UpdateSizeView(StringView* view, float size)
@@ -980,6 +1585,7 @@ private:
 	StringView*					fPreferredHeightView;
 	StringView*					fCurrentWidthView;
 	StringView*					fCurrentHeightView;
+	CheckBox*					fUnlimitedMaxSizeCheckBox;
 };
 
 
