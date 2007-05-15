@@ -34,7 +34,7 @@ BEOS_BIN = "[" addattr alert arp basename bc beep bzip2 cat cardctl catattr chgr
 	mount_nfs mountvolume mv nc netstat nl od open pack_cis paste patch pathchk pc
 	ping play playfile playsound playwav pr prio printenv printf ps ptx pwd
 	query quit release renice rescan rlog rm rmattr rmindex rmdir roster route
-	safemode screen_blanker sed settype setversion setvolume seq sh shar
+	safemode screen_blanker sed setdecor settype setversion setvolume seq sh shar
 	shutdown sleep sort split strace stty su sum sync sysinfo tac tail tar
 	tcpdump tcptester tee telnet telnetd test top touch tput tr traceroute
 	translate true tsort tty uname unchop unexpand unmount uniq unrar unshar
@@ -149,6 +149,7 @@ AddDriversToHaikuImage audio hmulti	: $(BEOS_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToHaikuImage midi		: $(BEOS_ADD_ONS_DRIVERS_MIDI) ;
 AddDriversToHaikuImage bus		: usb_raw ;
 AddDriversToHaikuImage disk scsi	: scsi_cd scsi_dsk ;
+AddDriversToHaikuImage disk virtual	: nbd ;
 AddDriversToHaikuImage dvb			: cx23882 ;
 AddDriversToHaikuImage graphics		: $(BEOS_ADD_ONS_DRIVERS_GRAPHICS) ;
 AddDriversToHaikuImage input		: ps2_hid usb_hid ;
