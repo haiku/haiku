@@ -4,6 +4,14 @@ SetSubDirSupportedPlatforms haiku libbe_test ;
 
 SimpleTest WidgetLayoutTest :
 	WidgetLayoutTest.cpp
+
+	CheckBox.cpp
+	GroupView.cpp
+	StringView.cpp
+	TwoDimensionalSliderView.cpp
+	View.cpp
+	ViewContainer.cpp
+	WrapperView.cpp
 	:
 	be
 ;
