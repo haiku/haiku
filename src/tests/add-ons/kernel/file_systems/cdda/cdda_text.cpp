@@ -16,6 +16,14 @@
 extern const char* __progname;
 
 
+extern "C" status_t
+user_memcpy(void *dest, const void *source, size_t length)
+{
+	memcpy(dest, source, length);
+	return B_OK;
+}
+
+
 extern "C" void
 dprintf(const char* format, ...)
 {

@@ -10,6 +10,7 @@
 #include <device/scsi.h>
 
 #include <ctype.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -412,6 +413,46 @@ dump_toc(scsi_toc_toc *toc)
 
 
 static status_t
+read_frames(int fd, off_t frame, uint8 *buffer, size_t count)
+{
+	size_t framesLeft = count;
+
+	while (framesLeft > 0) {
+		scsi_read_cd read;
+		read.start_m = frame / kFramesPerMinute;
+		read.start_s = (frame / kFramesPerSecond) % 60;
+		read.start_f = frame % kFramesPerSecond;
+
+		read.length_m = count / kFramesPerMinute;
+		read.length_s = (count / kFramesPerSecond) % 60;
+		read.length_f = count % kFramesPerSecond;
+
+		read.buffer_length = count * kFrameSize;
+		read.buffer = (char *)buffer;
+		read.play = false;
+
+		if (ioctl(fd, B_SCSI_READ_CD, &read) < 0) {
+			// drive couldn't read data - try again to read with a smaller block size
+			if (count == 1)
+				return errno;
+
+			if (count >= 32)
+				count = 8;
+			else
+				count = 1;
+			continue;
+		}
+
+		buffer += count * kFrameSize;
+		framesLeft -= count;
+		frame += count;
+	}
+
+	return B_OK;
+}
+
+
+static status_t
 read_table_of_contents(int fd, uint32 track, uint8 format, uint8 *buffer,
 	size_t bufferSize)
 {
@@ -559,3 +600,35 @@ read_table_of_contents(int fd, scsi_toc_toc *toc, size_t length)
 	return B_OK;
 }
 
+
+status_t
+read_cdda_data(int fd, off_t offset, void *data, size_t length,
+	off_t bufferOffset, void *buffer, size_t bufferSize)
+{
+	if (bufferOffset >= 0 && bufferOffset <= offset + length
+		&& bufferOffset + bufferSize > offset) {
+		// TODO: fill request from buffer
+	}
+
+	while (length > 0) {
+		off_t frame = offset / kFrameSize;
+		uint32 count = bufferSize / kFrameSize;
+
+		status_t status = read_frames(fd, frame, (uint8 *)buffer, count);
+		if (status < B_OK)
+			return status;
+
+		off_t dataOffset = offset - frame * kFrameSize;
+		size_t bytes = bufferSize - dataOffset;
+		if (bytes > length)
+			bytes = length;
+
+		if (user_memcpy(data, (uint8 *)buffer + dataOffset, bytes) < B_OK)
+			return B_BAD_ADDRESS;
+
+		length -= bytes;
+		offset += bytes;
+	}
+
+	return B_OK;
+}

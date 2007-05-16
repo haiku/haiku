@@ -40,6 +40,32 @@ struct dir_cookie;
 typedef DoublyLinkedList<Attribute> AttributeList;
 typedef DoublyLinkedList<attr_cookie> AttrCookieList;
 
+struct riff_header {
+	uint32	magic;
+	uint32	length;
+	uint32	id;
+} _PACKED;
+
+struct riff_chunk {
+	uint32	fourcc;
+	uint32	length;
+} _PACEKD;
+
+struct wav_format_chunk : riff_chunk {
+	uint16		format_tag;
+	uint16		channels;
+	uint32		samples_per_second;
+	uint32		average_bytes_per_second;
+	uint16		block_align;
+	uint16		bits_per_sample;
+} _PACKED;
+
+struct wav_header {
+	riff_header			header;
+	wav_format_chunk	format;
+	riff_chunk			data;
+} _PACKED;
+
 class Volume {
 	public:
 		Volume(mount_id id);
@@ -62,7 +88,10 @@ class Volume {
 		Inode			*Find(const char *name);
 
 		Inode			*FirstEntry() const { return fFirstEntry; }
+
 		off_t			NumBlocks() const { return fNumBlocks; }
+		size_t			BufferSize() const { return 32 * kFrameSize; }
+			// TODO: for now
 
 		static void		DetermineName(cdtext &text, char *name, size_t length);
 
@@ -147,6 +176,8 @@ class Inode {
 		void		RemoveAttrCookie(attr_cookie *cookie);
 		void		RewindAttrCookie(attr_cookie *cookie);
 
+		const wav_header *WAVHeader() const { return &fWAVHeader; }
+
 		Inode		*Next() const { return fNext; }
 		void		SetNext(Inode *inode) { fNext = inode; }
 
@@ -163,6 +194,7 @@ class Inode {
 		off_t		fFrameCount;
 		AttributeList fAttributes;
 		AttrCookieList fAttrCookies;
+		wav_header	fWAVHeader;
 };
 
 struct dir_cookie {
@@ -184,6 +216,8 @@ struct attr_cookie : DoublyLinkedListLinkImpl<attr_cookie> {
 
 struct file_cookie {
 	int			open_mode;
+	off_t		buffer_offset;
+	void		*buffer;
 };
 
 
@@ -268,6 +302,7 @@ Volume::Mount(const char* device)
 		dprintf("CDDA: no CD-Text found.\n");
 
 	int32 trackCount = toc->last_track + 1 - toc->first_track;
+	off_t totalFrames = 0;
 	char title[256];
 
 	for (int32 i = 0; i < trackCount; i++) {
@@ -302,6 +337,8 @@ Volume::Mount(const char* device)
 				title[j] = '-';
 		}
 
+		totalFrames += frames;
+
 		Inode *inode = _CreateNode(fRootNode, title, startFrame, frames,
 			S_IFREG | 0444);
 		if (inode == NULL)
@@ -330,6 +367,7 @@ Volume::Mount(const char* device)
 	if (fName == NULL)
 		return B_NO_MEMORY;
 
+	fNumBlocks = totalFrames;
 	return B_OK;
 }
 
@@ -539,6 +577,32 @@ Inode::Inode(Volume *volume, Inode *parent, const char *name, off_t start,
 	fGroupID = parent ? parent->GroupID() : getegid();
 
 	fCreationTime = fModificationTime = time(NULL);
+
+	if (frames) {
+		// initialize WAV header
+
+		// RIFF header
+		fWAVHeader.header.magic = B_HOST_TO_LENDIAN_INT32('RIFF');
+		fWAVHeader.header.length = B_HOST_TO_LENDIAN_INT32(Size()
+			+ sizeof(wav_header) - sizeof(riff_chunk));
+		fWAVHeader.header.id = B_HOST_TO_LENDIAN_INT32('WAVE');
+
+		// 'fmt ' format chunk
+		fWAVHeader.format.fourcc = B_HOST_TO_LENDIAN_INT32('fmt ');
+		fWAVHeader.format.length = B_HOST_TO_LENDIAN_INT32(
+			sizeof(wav_format_chunk) - sizeof(riff_chunk));
+		fWAVHeader.format.format_tag = B_HOST_TO_LENDIAN_INT16(1);
+		fWAVHeader.format.channels = B_HOST_TO_LENDIAN_INT16(2);
+		fWAVHeader.format.samples_per_second = B_HOST_TO_LENDIAN_INT32(44100);
+		fWAVHeader.format.average_bytes_per_second = B_HOST_TO_LENDIAN_INT32(
+			44100 * sizeof(uint16) * 2);
+		fWAVHeader.format.block_align = B_HOST_TO_LENDIAN_INT16(4);
+		fWAVHeader.format.bits_per_sample = B_HOST_TO_LENDIAN_INT16(16);
+
+		// 'data' chunk
+		fWAVHeader.data.fourcc = B_HOST_TO_LENDIAN_INT32('data');
+		fWAVHeader.data.length = B_HOST_TO_LENDIAN_INT32(Size());
+	}
 }
 
 
@@ -943,6 +1007,7 @@ cdda_open(fs_volume _volume, fs_vnode _node, int openMode, fs_cookie *_cookie)
 
 	TRACE(("  open cookie = %p\n", cookie));
 	cookie->open_mode = openMode;
+	cookie->buffer = NULL;
 
 	*_cookie = (void *)cookie;
 
@@ -981,6 +1046,7 @@ cdda_read(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t offset,
 	void *buffer, size_t *_length)
 {
 	file_cookie *cookie = (file_cookie *)_cookie;
+	Volume *volume = (Volume *)_volume;
 	Inode *inode = (Inode *)_node;
 
 	TRACE(("cdda_read(vnode = %p, offset %Ld, length = %lu, mode = %d)\n",
@@ -990,10 +1056,52 @@ cdda_read(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t offset,
 		return B_IS_A_DIRECTORY;
 	if ((cookie->open_mode & O_RWMASK) != O_RDONLY)
 		return B_NOT_ALLOWED;
+	if (offset < 0)
+		return B_BAD_VALUE;
 
-	// TODO: read!
-	*_length = 0;
-	return B_OK;
+	off_t maxSize = inode->Size() + sizeof(wav_header);
+	if (offset >= maxSize) {
+		*_length = 0;
+		return B_OK;
+	}
+
+	if (cookie->buffer == NULL) {
+		// TODO: move that to open() to make sure reading can't fail for this reason?
+		cookie->buffer = malloc(volume->BufferSize());
+		if (cookie->buffer == NULL)
+			return B_NO_MEMORY;
+
+		cookie->buffer_offset = -1;
+	}
+
+	size_t length = *_length;
+	if (offset + length > maxSize)
+		length = maxSize - offset;
+
+	status_t status = B_OK;
+
+	if (offset < sizeof(wav_header)) {
+		// read fake WAV header
+		size_t size = sizeof(wav_header) - offset;
+		size = min_c(size, length);
+
+		if (user_memcpy(buffer, (uint8 *)inode->WAVHeader() + offset, size) < B_OK)
+			return B_BAD_ADDRESS;
+
+		length -= size;
+	}
+
+	if (length > 0) {
+		// read actual CD data
+		offset -= sizeof(wav_header);
+
+		status = read_cdda_data(volume->Device(), offset, buffer, length,
+			cookie->buffer_offset, cookie->buffer, volume->BufferSize());
+	}
+	if (status == B_OK)
+		*_length = length;
+
+	return status;
 }
 
 
