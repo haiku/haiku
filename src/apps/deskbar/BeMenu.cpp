@@ -366,7 +366,12 @@ TBeMenu::AddStandardBeMenuItems()
 
 	AddSeparatorItem();
 
+#ifdef __HAIKU__
+	item = new BMenuItem("Restart" B_UTF8_ELLIPSIS,
+		new BMessage(CMD_REBOOT_SYSTEM));
+#else
 	item = new BMenuItem("Restart", new BMessage(CMD_REBOOT_SYSTEM));
+#endif
 	item->SetEnabled(!dragging);
 	AddItem(item);
 
@@ -378,7 +383,12 @@ TBeMenu::AddStandardBeMenuItems()
 	}
 #endif
 
+#ifdef __HAIKU__
+	item = new BMenuItem("Shut Down" B_UTF8_ELLIPSIS,
+		new BMessage(CMD_SHUTDOWN_SYSTEM));
+#else
 	item = new BMenuItem("Shut Down", new BMessage(CMD_SHUTDOWN_SYSTEM));
+#endif
 	item->SetEnabled(!dragging);
 	AddItem(item);
 
