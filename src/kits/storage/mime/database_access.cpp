@@ -1,7 +1,12 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2002-2007, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ */
+
+
 /*!
 	\file database_access.cpp
 	Mime database atomic read functions
@@ -35,13 +40,10 @@ namespace BPrivate {
 namespace Storage {
 namespace Mime {
 
-//------------------------------------------------------------------------------
-// Functions
-//------------------------------------------------------------------------------
 
-// get_app_hint
-//!	Fetches the application hint for the given MIME type.
-/*!	The entry_ref pointed to by \c ref must be pre-allocated.
+/*! \brief Fetches the application hint for the given MIME type.
+
+	The entry_ref pointed to by \c ref must be pre-allocated.
 	
 	\param type The MIME type of interest
 	\param ref Pointer to a pre-allocated \c entry_ref struct into
@@ -71,7 +73,7 @@ get_app_hint(const char *type, entry_ref *ref)
 	return status;
 }
 
-// get_attr_info
+
 /*! \brief Fetches from the MIME database a BMessage describing the attributes
 	typically associated with files of the given MIME type
 	
@@ -90,19 +92,26 @@ status_t
 get_attr_info(const char *type, BMessage *info)
 {
 	status_t err = read_mime_attr_message(type, kAttrInfoAttr, info);
-	if (!err) {
-		info->what = 233;	// Don't know why, but that's what R5 does.
+	if (err == B_ENTRY_NOT_FOUND) {
+		// return an empty message
+		info->MakeEmpty();
+		err = B_OK;
+	}
+	if (err == B_OK) {
+		info->what = 233;
+			// Don't know why, but that's what R5 does.
 		err = info->AddString("type", type);
 	}
 	return err;	
 }
 
-// get_short_description
-//!	Fetches the short description for the given MIME type.
-/*!	The string pointed to by \c description must be long enough to
+
+/*!	\brief Fetches the short description for the given MIME type.
+
+	The string pointed to by \c description must be long enough to
 	hold the short description; a length of \c B_MIME_TYPE_LENGTH is
 	recommended.
-	
+
 	\param type The MIME type of interest
 	\param description Pointer to a pre-allocated string into which the short
 	                   description is copied. If the function fails, the contents
@@ -117,7 +126,8 @@ status_t
 get_short_description(const char *type, char *description)
 {
 ///	DBG(OUT("Mime::Database::get_short_description()\n"));
-	ssize_t err = read_mime_attr(type, kShortDescriptionAttr, description, B_MIME_TYPE_LENGTH, kShortDescriptionType);
+	ssize_t err = read_mime_attr(type, kShortDescriptionAttr, description,
+		B_MIME_TYPE_LENGTH, kShortDescriptionType);
 	return err >= 0 ? B_OK : err ;
 }
 
@@ -141,17 +151,20 @@ status_t
 get_long_description(const char *type, char *description)
 {
 //	DBG(OUT("Mime::Database::get_long_description()\n"));
-	ssize_t err = read_mime_attr(type, kLongDescriptionAttr, description, B_MIME_TYPE_LENGTH, kLongDescriptionType);
+	ssize_t err = read_mime_attr(type, kLongDescriptionAttr, description,
+		B_MIME_TYPE_LENGTH, kLongDescriptionType);
 	return err >= 0 ? B_OK : err ;
 }
 
-// get_file_extensions
-//! Fetches a BMessage describing the MIME type's associated filename extensions
-/*! The list of extensions is returned in a pre-allocated BMessage pointed to by
-	the \c extensions parameter (note that the any prior contents of the message
-	will be destroyed). Please see BMimeType::GetFileExtensions() for a description
-	of the message format.
-	  
+
+/*!	\brief Fetches a BMessage describing the MIME type's associated filename
+	extensions
+
+	The list of extensions is returned in a pre-allocated BMessage pointed to
+	by the \c extensions parameter (note that the any prior contents of the
+	message will be destroyed). Please see BMimeType::GetFileExtensions() for
+	a description of the message format.
+
 	\param extensions Pointer to a pre-allocated BMessage into which the MIME
 	                  type's associated file extensions will be stored.
 	\return
@@ -162,16 +175,22 @@ status_t
 get_file_extensions(const char *type, BMessage *extensions)
 {
 	status_t err = read_mime_attr_message(type, kFileExtensionsAttr, extensions);
-	if (!err) {
+	if (err == B_ENTRY_NOT_FOUND) {
+		// return an empty message
+		extensions->MakeEmpty();
+		err = B_OK;
+	}
+	if (err == B_OK) {
 		extensions->what = 234;	// Don't know why, but that's what R5 does.
 		err = extensions->AddString("type", type);
 	}
 	return err;	
 }
 
-// get_icon
-//! Fetches the icon of given size associated with the given MIME type
-/*! The bitmap pointed to by \c icon must be of the proper size (\c 32x32
+
+/*!	\brief Fetches the icon of given size associated with the given MIME type
+
+	The bitmap pointed to by \c icon must be of the proper size (\c 32x32
 	for \c B_LARGE_ICON, \c 16x16 for \c B_MINI_ICON) and color depth
 	(\c B_CMAP8).
 	
@@ -224,7 +243,7 @@ get_icon(const char *type, uint8** data, size_t* size)
 */
 status_t
 get_icon_for_type(const char* type, const char* fileType, BBitmap* icon,
-				  icon_size which)
+	icon_size which)
 {
 	if (!type || !icon)
 		return B_BAD_VALUE;
@@ -412,18 +431,20 @@ get_icon_for_type(const char* type, const char* fileType, uint8** data,
 	return err;
 }
 
-// get_preferred_app
-//!	Fetches signature of the MIME type's preferred application for the given action.
-/*!	The string pointed to by \c signature must be long enough to
+
+/*!	\brief Fetches signature of the MIME type's preferred application for the
+	given action.
+
+	The string pointed to by \c signature must be long enough to
 	hold the short description; a length of \c B_MIME_TYPE_LENGTH is
 	recommended.
 	
 	Currently, the only supported app verb is \c B_OPEN.
 	
 	\param type The MIME type of interest
-	\param description Pointer to a pre-allocated string into which the preferred
-	                   application's signature is copied. If the function fails, the
-	                   contents of the string are undefined.
+	\param description Pointer to a pre-allocated string into which the
+		preferred application's signature is copied. If the function fails,
+		the contents of the string are undefined.
 	\param verb \c The action of interest
 
 	\return
@@ -435,11 +456,12 @@ status_t
 get_preferred_app(const char *type, char *signature, app_verb verb = B_OPEN)
 {
 	// Since B_OPEN is the currently the only app_verb, it is essentially ignored
-	ssize_t err = read_mime_attr(type, kPreferredAppAttr, signature, B_MIME_TYPE_LENGTH, kPreferredAppType);
+	ssize_t err = read_mime_attr(type, kPreferredAppAttr, signature,
+		B_MIME_TYPE_LENGTH, kPreferredAppType);
 	return err >= 0 ? B_OK : err ;
 }
 
-// get_sniffer_rule
+
 /*! \brief Fetches the sniffer rule for the given MIME type.
 	\param type The MIME type of interest
 	\param result Pointer to a pre-allocated BString into which the type's
@@ -455,19 +477,24 @@ get_sniffer_rule(const char *type, BString *result)
 	return read_mime_attr_string(type, kSnifferRuleAttr, result);
 }
 
-// get_supported_types
+
 status_t
 get_supported_types(const char *type, BMessage *types)
 {
 	status_t err = read_mime_attr_message(type, kSupportedTypesAttr, types);
-	if (!err) {
+	if (err == B_ENTRY_NOT_FOUND) {
+		// return an empty message
+		types->MakeEmpty();
+		err = B_OK;
+	}
+	if (err == B_OK) {
 		types->what = 0;	
 		err = types->AddString("type", type);
 	}
 	return err;	
 }
 
-// is_installed
+
 //! Checks if the given MIME type is present in the database
 bool
 is_installed(const char *type)
@@ -476,22 +503,25 @@ is_installed(const char *type)
 	return open_type(type, &node) == B_OK;
 }
 
-// get_icon_data
-/*! \brief Returns properly formatted raw bitmap data, ready to be shipped off to the hacked
-	up 4-parameter version of Database::SetIcon()
-	
-	This function exists as something of a hack until an OBOS::BBitmap implementation is
-	available. It takes the given bitmap, converts it to the B_CMAP8 color space if necessary
-	and able, and returns said bitmap data in a newly allocated array pointed to by the
-	pointer that's pointed to by \c data. The length of the array is stored in the integer
-	pointed to by \c dataSize. The array is allocated with \c new[], and it's your responsibility
-	to \c delete[] it when you're finished.
-	
+
+/*! \brief Returns properly formatted raw bitmap data, ready to be shipped off
+	to the hacked up 4-parameter version of Database::SetIcon()
+
+	This function exists as something of a hack until an OBOS::BBitmap
+	implementation is available. It takes the given bitmap, converts it to the
+	B_CMAP8 color space if necessary and able, and returns said bitmap data in
+	a newly allocated array pointed to by the pointer that's pointed to by
+	\c data. The length of the array is stored in the integer pointed to by
+	\c dataSize. The array is allocated with \c new[], and it's your
+	responsibility to \c delete[] it when you're finished.
 */
 status_t
-get_icon_data(const BBitmap *icon, icon_size which, void **data, int32 *dataSize)
+get_icon_data(const BBitmap *icon, icon_size which, void **data,
+	int32 *dataSize)
 {
-	ssize_t err = (icon && data && dataSize && icon->InitCheck() == B_OK) ? B_OK : B_BAD_VALUE;
+	if (icon == NULL || data == NULL || dataSize == 0
+		|| icon->InitCheck() != B_OK)
+		return B_BAD_VALUE;
 
 	BRect bounds;	
 	BBitmap *icon8 = NULL;
@@ -499,22 +529,20 @@ get_icon_data(const BBitmap *icon, icon_size which, void **data, int32 *dataSize
 	bool otherColorSpace = false;
 
 	// Figure out what kind of data we *should* have
-	if (!err) {
-		switch (which) {
-			case B_MINI_ICON:
-				bounds.Set(0, 0, 15, 15);
-				break;
-			case B_LARGE_ICON:
-				bounds.Set(0, 0, 31, 31);
-				break;
-			default:
-				err = B_BAD_VALUE;
-				break;
-		}
+	switch (which) {
+		case B_MINI_ICON:
+			bounds.Set(0, 0, 15, 15);
+			break;
+		case B_LARGE_ICON:
+			bounds.Set(0, 0, 31, 31);
+			break;
+		default:
+			return B_BAD_VALUE;
 	}
+
 	// Check the icon
-	if (!err)
-		err = (icon->Bounds() == bounds) ? B_OK : B_BAD_VALUE;
+	status_t err = icon->Bounds() == bounds ? B_OK : B_BAD_VALUE;
+
 	// Convert to B_CMAP8 if necessary
 	if (!err) {
 		otherColorSpace = (icon->ColorSpace() != B_CMAP8);
@@ -534,12 +562,14 @@ get_icon_data(const BBitmap *icon, icon_size which, void **data, int32 *dataSize
 			*dataSize = icon->BitsLength();
 		}		
 	}
+
 	// Alloc a new data buffer
 	if (!err) {
 		*data = new(std::nothrow) char[*dataSize];
 		if (!*data)
 			err = B_NO_MEMORY;
 	}
+
 	// Copy the data into it.
 	if (!err)
 		memcpy(*data, srcData, *dataSize);	
