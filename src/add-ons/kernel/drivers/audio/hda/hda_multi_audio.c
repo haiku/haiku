@@ -216,9 +216,10 @@ buffer_exchange(hda_codec* codec, multi_buffer_info* data)
 		hda_stream_start(codec->ctrlr, codec->playback_stream);
 
 	/* do playback */
-	rc=acquire_sem_etc(codec->playback_stream->buffer_ready_sem, 1, B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, 50000);
+	rc=acquire_sem(codec->playback_stream->buffer_ready_sem);
 	if (rc != B_OK) {
-		dprintf("%s: Timeout waiting for playback buffer to finish!\n", __func__);
+		dprintf("%s: Error waiting for playback buffer to finish (%s)!\n", __func__,
+			strerror(rc));
 		return rc;
 	}
 

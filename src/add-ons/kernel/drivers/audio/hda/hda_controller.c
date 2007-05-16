@@ -60,10 +60,8 @@ hda_stream_check_intr(hda_controller* ctrlr, hda_stream* s)
 		uint8 sts = OREG8(ctrlr,s->off,STS);
 		if (sts) {
 			cpu_status status;
-			int32 count;
 
 			OREG8(ctrlr,s->off,STS) = sts;
-
 			status = disable_interrupts();
 			acquire_spinlock(&s->lock);
 
@@ -74,9 +72,7 @@ hda_stream_check_intr(hda_controller* ctrlr, hda_stream* s)
 			release_spinlock(&s->lock);
 			restore_interrupts(status);
 
-			get_sem_count(s->buffer_ready_sem, &count);
-			if (count <= 0)
-				release_sem_etc(s->buffer_ready_sem, 1, B_DO_NOT_RESCHEDULE);
+			release_sem_etc(s->buffer_ready_sem, 1, B_DO_NOT_RESCHEDULE);
 		}
 	}
 
@@ -176,7 +172,7 @@ hda_stream_setup_buffers(hda_codec* codec, hda_stream* s, const char* desc)
 	/* Setup BDL entries */	
 	for (idx=0; idx < s->num_buffers; idx++, bdl++) {
 		bdl->address = buffer_pa + (idx*buffer_size);
-		bdl->length = buffer_size;
+		bdl->length = s->sample_size * s->num_channels * s->buffer_length;
 		bdl->ioc = 1;
 	}
 
@@ -208,7 +204,7 @@ hda_stream_setup_buffers(hda_codec* codec, hda_stream* s, const char* desc)
 	OREG32(codec->ctrlr,s->off,BDPL) = s->bdl_pa;
 	OREG32(codec->ctrlr,s->off,BDPU) = 0;
 	OREG16(codec->ctrlr,s->off,LVI) = s->num_buffers -1;
-	OREG32(codec->ctrlr,s->off,CBL) = s->num_channels * s->num_buffers * s->sample_size;
+	OREG32(codec->ctrlr,s->off,CBL) = s->num_channels * s->num_buffers;
 	OREG8(codec->ctrlr,s->off,CTL0) = CTL0_IOCE | CTL0_FEIE | CTL0_DEIE;
 	OREG8(codec->ctrlr,s->off,CTL2) = s->id << 4;
 

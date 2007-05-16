@@ -8,7 +8,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#ifdef COMPILED_FOR_R5
+#ifdef COMPILE_FOR_R5
 	#define DEVFS_PATH_FORMAT	"audio/multi/hda/%lu"
 	#include <multi_audio.h>
 #else
