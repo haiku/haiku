@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku Inc.
+ * Copyright 2001-2007, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,14 +14,15 @@
 
 
 BCheckBox::BCheckBox(BRect frame, const char *name, const char *label,
-					 BMessage *message, uint32 resizingMode, uint32 flags)
+		BMessage *message, uint32 resizingMode, uint32 flags)
 	: BControl(frame, name, label, message, resizingMode, flags),
 	fOutlined(false)
 {
 	// Resize to minimum height if needed
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
-	float minHeight = (float)ceil(6.0f + fontHeight.ascent + fontHeight.descent);
+	float minHeight = (float)ceil(6.0f + fontHeight.ascent
+		+ fontHeight.descent);
 	if (Bounds().Height() < minHeight)
 		ResizeTo(Bounds().Width(), minHeight);
 }
@@ -52,7 +53,7 @@ BCheckBox::Instantiate(BMessage *archive)
 status_t
 BCheckBox::Archive(BMessage *archive, bool deep) const
 {
-	return BControl::Archive(archive,deep);
+	return BControl::Archive(archive, deep);
 }
 
 
@@ -73,24 +74,23 @@ BCheckBox::Draw(BRect updateRect)
 			SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 		StrokeLine(BPoint(x, y), BPoint(x + StringWidth(Label()), y));
-
 		return;
 	}
 
-	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
-	lighten1 = tint_color(no_tint, B_LIGHTEN_1_TINT),
-	lightenmax = tint_color(no_tint, B_LIGHTEN_MAX_TINT),
-	darken1 = tint_color(no_tint, B_DARKEN_1_TINT),
-	darken2 = tint_color(no_tint, B_DARKEN_2_TINT),
-	darken3 = tint_color(no_tint, B_DARKEN_3_TINT),
-	darken4 = tint_color(no_tint, B_DARKEN_4_TINT),
-	darkenmax = tint_color(no_tint, B_DARKEN_MAX_TINT);
+	rgb_color noTint = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color lighten1 = tint_color(noTint, B_LIGHTEN_1_TINT);
+	rgb_color lightenMax = tint_color(noTint, B_LIGHTEN_MAX_TINT);
+	rgb_color darken1 = tint_color(noTint, B_DARKEN_1_TINT);
+	rgb_color darken2 = tint_color(noTint, B_DARKEN_2_TINT);
+	rgb_color darken3 = tint_color(noTint, B_DARKEN_3_TINT);
+	rgb_color darken4 = tint_color(noTint, B_DARKEN_4_TINT);
+	rgb_color darkenmax = tint_color(noTint, B_DARKEN_MAX_TINT);
 
 	BRect rect = _CheckBoxFrame();
 
 	if (IsEnabled()) {
 		// Filling
-		SetHighColor(lightenmax);
+		SetHighColor(lightenMax);
 		FillRect(rect);
 
 		// Box
@@ -98,7 +98,7 @@ BCheckBox::Draw(BRect updateRect)
 			SetHighColor(darken3);
 			StrokeRect(rect);
 
-			rect.InsetBy(1,1);
+			rect.InsetBy(1, 1);
 
 			BeginLineArray(6);
 
@@ -119,33 +119,33 @@ BCheckBox::Draw(BRect updateRect)
 					BPoint(rect.left, rect.top), darken1);
 			AddLine(BPoint(rect.left, rect.top),
 					BPoint(rect.right, rect.top), darken1);
-			rect.InsetBy(1,1);
+			rect.InsetBy(1, 1);
 			AddLine(BPoint(rect.left, rect.bottom),
 					BPoint(rect.left, rect.top), darken4);
 			AddLine(BPoint(rect.left, rect.top),
 					BPoint(rect.right, rect.top), darken4);
 			AddLine(BPoint(rect.left + 1.0f, rect.bottom),
-					BPoint(rect.right, rect.bottom), no_tint);
+					BPoint(rect.right, rect.bottom), noTint);
 			AddLine(BPoint(rect.right, rect.bottom),
-					BPoint(rect.right, rect.top + 1.0f), no_tint);
+					BPoint(rect.right, rect.top + 1.0f), noTint);
 
 			EndLineArray();
 		}
 
 		// Checkmark
 		if (Value() == B_CONTROL_ON) {
-			rect.InsetBy(2,2);
+			rect.InsetBy(2, 2);
 
 			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
 			SetPenSize(2);
-// Yes, Haiku is differnt because of the anti-aliasing
-SetDrawingMode(B_OP_OVER);
+			SetDrawingMode(B_OP_OVER);
+				// needed because of anti-aliasing
 			StrokeLine(BPoint(rect.left, rect.top),
 					   BPoint(rect.right, rect.bottom));
 			StrokeLine(BPoint(rect.left, rect.bottom),
 					   BPoint(rect.right, rect.top));
 			SetPenSize(1);
-SetDrawingMode(B_OP_COPY);
+			SetDrawingMode(B_OP_COPY);
 		}
 
 		// Label
@@ -170,10 +170,10 @@ SetDrawingMode(B_OP_COPY);
 		BeginLineArray(6);
 
 		AddLine(BPoint(rect.left, rect.bottom),
-				BPoint(rect.left, rect.top), no_tint);
+				BPoint(rect.left, rect.top), noTint);
 		AddLine(BPoint(rect.left, rect.top),
-				BPoint(rect.right, rect.top), no_tint);
-		rect.InsetBy(1,1);
+				BPoint(rect.right, rect.top), noTint);
+		rect.InsetBy(1, 1);
 		AddLine(BPoint(rect.left, rect.bottom),
 				BPoint(rect.left, rect.top), darken2);
 		AddLine(BPoint(rect.left, rect.top),
@@ -192,18 +192,18 @@ SetDrawingMode(B_OP_COPY);
 			SetHighColor(tint_color(ui_color(B_KEYBOARD_NAVIGATION_COLOR),
 				B_DISABLED_MARK_TINT));
 			SetPenSize(2);
-// Yes, Haiku is differnt because of the anti-aliasing
-SetDrawingMode(B_OP_OVER);
+			SetDrawingMode(B_OP_OVER);
+				// needed because of anti-aliasing
 			StrokeLine(BPoint(rect.left, rect.top),
 					   BPoint(rect.right, rect.bottom));
 			StrokeLine(BPoint(rect.left, rect.bottom),
 					   BPoint(rect.right, rect.top));
 			SetPenSize(1);
-SetDrawingMode(B_OP_COPY);
+			SetDrawingMode(B_OP_COPY);
 		}
 
 		// Label
-		SetHighColor(tint_color(no_tint, B_DISABLED_LABEL_TINT));
+		SetHighColor(tint_color(noTint, B_DISABLED_LABEL_TINT));
 		DrawString(Label(), BPoint((float)ceil(10.0f + fontHeight.ascent),
 			3.0f + (float)ceil(fontHeight.ascent)));
 	}
@@ -242,7 +242,6 @@ BCheckBox::MouseDown(BPoint point)
 			GetMouse(&point, &buttons, true);
 
 			bool inside = bounds.Contains(point);
-
 			if (fOutlined != inside) {
 				fOutlined = inside;
 				Invalidate();
@@ -309,8 +308,7 @@ BCheckBox::MouseUp(BPoint point)
 
 
 void
-BCheckBox::MouseMoved(BPoint point, uint32 transit,
-						   const BMessage *message)
+BCheckBox::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 {
 	if (!IsTracking())
 		return;
@@ -396,7 +394,8 @@ BHandler *
 BCheckBox::ResolveSpecifier(BMessage *message, int32 index,
 	BMessage *specifier, int32 what, const char *property)
 {
-	return BControl::ResolveSpecifier(message, index, specifier, what, property);
+	return BControl::ResolveSpecifier(message, index, specifier, what,
+		property);
 }
 
 
@@ -446,12 +445,13 @@ BCheckBox::operator=(const BCheckBox &)
 	return *this;
 }
 
-// _CheckBoxFrame
+
 BRect
 BCheckBox::_CheckBoxFrame() const
 {
-	font_height fh;
-	GetFontHeight(&fh);
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
 
-	return BRect(1.0f, 3.0f, ceilf(3.0f + fh.ascent), ceilf(5.0f + fh.ascent));
+	return BRect(1.0f, 3.0f, ceilf(3.0f + fontHeight.ascent),
+		ceilf(5.0f + fontHeight.ascent));
 }
