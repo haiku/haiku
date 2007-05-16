@@ -55,7 +55,7 @@ BView(BRect(40,31,290,157),"detailsview",B_FOLLOW_NONE,B_WILL_DRAW)
 	btnr.top = btnr.bottom - 24;
 	btnr.left = btnr.right - 70;
    
-	settingsbtn = new BButton(btnr,"Settings...","Settings...", new BMessage(BTN_SETTINGS), B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
+	settingsbtn = new BButton(btnr,"Settings","Settings" B_UTF8_ELLIPSIS", new BMessage(BTN_SETTINGS), B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
 	AddChild(settingsbtn);
 }
 void DetailsView::MessageReceived(BMessage* msg)

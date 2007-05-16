@@ -211,7 +211,7 @@ DataTranslationsWindow::_SetupViews()
 
 	// Add the translator info button
 	BRect infoRect(0, 0, 80, 20);
-	BButton *button = new BButton(infoRect, "STD", "Info...",
+	BButton *button = new BButton(infoRect, "STD", "Info" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgTranslatorInfo), B_FOLLOW_BOTTOM | B_FOLLOW_RIGHT,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
 	button->ResizeToPreferred();

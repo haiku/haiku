@@ -221,12 +221,12 @@ TermWindow::SetupMenu(void)
 	// Make File Menu.
 	fFilemenu = new BMenu("Terminal");
 	fFilemenu->AddItem(new BMenuItem("Switch Terminals", new BMessage(MENU_SWITCH_TERM),'G'));
-	fFilemenu->AddItem(new BMenuItem("Start New Terminal", new BMessage(MENU_NEW_TERM), 'N'));
+	fFilemenu->AddItem(new BMenuItem("New Terminal" B_UTF8_ELLIPSIS, new BMessage(MENU_NEW_TERM), 'N'));
 	fFilemenu->AddSeparatorItem();
 	fFilemenu->AddItem(new BMenuItem("Page Setup...", new BMessage(MENU_PAGE_SETUP)));
 	fFilemenu->AddItem(new BMenuItem("Print", new BMessage(MENU_PRINT),'P'));
 	fFilemenu->AddSeparatorItem();
-	fFilemenu->AddItem(new BMenuItem("About Terminal...", new BMessage(B_ABOUT_REQUESTED)));
+	fFilemenu->AddItem(new BMenuItem("About Terminal" B_UTF8_ELLIPSIS, new BMessage(B_ABOUT_REQUESTED)));
 	fFilemenu->AddSeparatorItem();
 	fFilemenu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q'));
 	fMenubar->AddItem(fFilemenu);
@@ -239,7 +239,7 @@ TermWindow::SetupMenu(void)
 	fEditmenu->AddItem (new BMenuItem ("Select All", new BMessage (B_SELECT_ALL), 'A'));
 	fEditmenu->AddItem (new BMenuItem ("Clear All", new BMessage (MENU_CLEAR_ALL), 'L'));
 	fEditmenu->AddSeparatorItem ();
-	fEditmenu->AddItem (new BMenuItem ("Find", new BMessage (MENU_FIND_STRING),'F'));
+	fEditmenu->AddItem (new BMenuItem ("Find" B_UTF8_ELLIPSIS, new BMessage (MENU_FIND_STRING),'F'));
 	fFindBackwardMenuItem = new BMenuItem ("Find Backward", new BMessage (MENU_FIND_BACKWARD), '[');
 	fEditmenu->AddItem (fFindBackwardMenuItem);
 	fFindBackwardMenuItem->SetEnabled(false);
@@ -282,7 +282,7 @@ TermWindow::SetupMenu(void)
 	fHelpmenu->AddItem(fEncodingmenu);
 //  fHelpmenu->AddItem(fNewFontMenu);
 	fHelpmenu->AddSeparatorItem();
-	fHelpmenu->AddItem(new BMenuItem("Preferences", new BMessage(MENU_PREF_OPEN)));
+	fHelpmenu->AddItem(new BMenuItem("Preferences" B_UTF8_ELLIPSIS, new BMessage(MENU_PREF_OPEN)));
 	fHelpmenu->AddSeparatorItem();
 	fHelpmenu->AddItem(new BMenuItem("Save as default", new BMessage(SAVE_AS_DEFAULT))); 
 	fMenubar->AddItem(fHelpmenu);

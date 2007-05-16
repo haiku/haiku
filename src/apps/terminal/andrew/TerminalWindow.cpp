@@ -126,10 +126,10 @@ TerminalWindow::InitWindow(int32 id, entry_ref * settingsRef)
 	fTerminal->AddItem(fSwitchTerminals);
 	fSwitchTerminals->SetTrigger('T');
 	
-	fStartNewTerminal = new BMenuItem("Start New Terminal", new BMessage(TERMINAL_START_NEW_TERMINAL), 'N');
+	fStartNewTerminal = new BMenuItem("New Terminal" B_UTF8_ELLIPSIS, new BMessage(TERMINAL_START_NEW_TERMINAL), 'N');
 	fTerminal->AddItem(fStartNewTerminal);
 	
-	fLogToFile = new BMenuItem("Log to File...", new BMessage(TERMINAL_LOG_TO_FILE));
+	fLogToFile = new BMenuItem("Log to File" B_UTF8_ELLIPSIS, new BMessage(TERMINAL_LOG_TO_FILE));
 	fTerminal->AddItem(fLogToFile);
 	
 	// Edit menu
@@ -148,7 +148,7 @@ TerminalWindow::InitWindow(int32 id, entry_ref * settingsRef)
 	fSelectAll = new BMenuItem("Select All", new BMessage(B_SELECT_ALL), 'A');
 	fEdit->AddItem(fSelectAll);
 	
-	fWriteSelection = new BMenuItem("Write Selection...", new BMessage(EDIT_WRITE_SELECTION));
+	fWriteSelection = new BMenuItem("Write Selection" B_UTF8_ELLIPSIS, new BMessage(EDIT_WRITE_SELECTION));
 	fEdit->AddItem(fWriteSelection);
 	
 	fClearAll = new BMenuItem("Clear All", new BMessage(EDIT_CLEAR_ALL), 'L');
@@ -156,7 +156,7 @@ TerminalWindow::InitWindow(int32 id, entry_ref * settingsRef)
 
 	fEdit->AddSeparatorItem();
 	
-	fFind = new BMenuItem("Find...", new BMessage(EDIT_FIND),'F');
+	fFind = new BMenuItem("Find" B_UTF8_ELLIPSIS, new BMessage(EDIT_FIND),'F');
 	fEdit->AddItem(fFind);
 	
 	fFindBackward = new BMenuItem("Find Backward",new BMessage(EDIT_FIND_BACKWARD),'[');

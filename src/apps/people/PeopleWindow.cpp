@@ -38,7 +38,7 @@ TPeopleWindow::TPeopleWindow(BRect frame, char *title, entry_ref *ref)
 	BRect rect(0, 0, 32767, 15);
 	BMenuBar* menuBar = new BMenuBar(rect, "");
 	menu = new BMenu("File");
-	menu->AddItem(item = new BMenuItem("New Person", new BMessage(M_NEW), 'N'));
+	menu->AddItem(item = new BMenuItem("New Person" B_UTF8_ELLIPSIS, new BMessage(M_NEW), 'N'));
 	item->SetTarget(NULL, be_app);
 	menu->AddItem(new BMenuItem("Close", new BMessage(B_CLOSE_REQUESTED), 'W'));
 	menu->AddSeparatorItem();

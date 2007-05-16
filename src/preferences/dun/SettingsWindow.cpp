@@ -144,7 +144,7 @@ void SettingsWindow::InitWindow()
 	BMenuItem* item1 = new BMenuItem("Standard PPP",NULL); //n.b bmessage left out, add later
 	YourServerTypeIsMenu->AddItem(item1);
 	
-	BMenuItem* item2 = new BMenuItem("etc,etc...",NULL);
+	BMenuItem* item2 = new BMenuItem("Etc" B_UTF8_ELLIPSIS,NULL);
 	YourServerTypeIsMenu->AddItem(item2);
 	
 	

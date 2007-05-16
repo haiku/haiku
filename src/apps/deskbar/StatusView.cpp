@@ -88,7 +88,8 @@ static void
 DumpItem(DeskbarItemInfo *item)
 {
 	printf("is addon: %i, id: %li\n", item->isAddOn, item->id);
-	printf("entry_ref:  %ld, %Ld, %s\n", item->entryRef.device, item->entryRef.directory, item->entryRef.name);
+	printf("entry_ref:  %ld, %Ld, %s\n", item->entryRef.device,
+		item->entryRef.directory, item->entryRef.name);
 	printf("node_ref:  %ld, %Ld\n", item->nodeRef.device, item->nodeRef.node);
 }
 
@@ -115,7 +116,7 @@ DumpList(BList *itemlist)
 // don't change the name of this view to anything other than "Status"!
 
 TReplicantTray::TReplicantTray(TBarView *parent, bool vertical)
-	:	BView(BRect(0, 0, 1, 1), "Status", B_FOLLOW_LEFT | B_FOLLOW_TOP,
+	: BView(BRect(0, 0, 1, 1), "Status", B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			B_WILL_DRAW | B_FRAME_EVENTS),
 	fClock(NULL),
 	fBarView(parent),
@@ -137,8 +138,10 @@ TReplicantTray::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 
-	SetViewColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_1_TINT));
+	SetViewColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
+		B_DARKEN_1_TINT));
 	SetDrawingMode(B_OP_COPY);
+
 	Window()->SetPulseRate(1000000);
 	DealWithClock(fBarView->ShowingClock());
 
@@ -233,8 +236,9 @@ TReplicantTray::DealWithClock(bool showClock)
 		if (!fClock) {
 			desk_settings *settings = ((TBarApp *)be_app)->Settings();
 
-			fClock = new TTimeView(settings->timeShowSeconds, settings->timeShowMil,
-				settings->timeFullDate, settings->timeShowEuro, false);
+			fClock = new TTimeView(settings->timeShowSeconds,
+				settings->timeShowMil, settings->timeFullDate,
+				settings->timeShowEuro, false);
 			AddChild(fClock);
 
 			fClock->MoveTo(Bounds().right - fClock->Bounds().Width() - 1, 2);
@@ -252,12 +256,12 @@ TReplicantTray::DealWithClock(bool showClock)
 }
 
 
-/**	width is set to a minimum of kMinimumReplicantCount by kMaxReplicantWidth
- *	if not in multirowmode and greater than kMinimumReplicantCount
- *	the width should be calculated based on the actual
- *	replicant widths
- */
-
+/*!
+	Width is set to a minimum of kMinimumReplicantCount by kMaxReplicantWidth
+	if not in multirowmode and greater than kMinimumReplicantCount
+	the width should be calculated based on the actual
+	replicant widths
+*/
 void
 TReplicantTray::GetPreferredSize(float *preferredWidth, float *preferredHeight)
 {
@@ -281,7 +285,8 @@ TReplicantTray::GetPreferredSize(float *preferredWidth, float *preferredHeight)
 		if (fShelf->CountReplicants() > 0) {
 			if (fBarView->ShowingClock()
 				&& fRightBottomReplicant.right + 6 >= fClock->Frame().left) {
-				width = fRightBottomReplicant.right + 6 + fClock->Frame().Width();
+				width = fRightBottomReplicant.right + 6
+					+ fClock->Frame().Width();
 			} else 
 				width = fRightBottomReplicant.right + 3;
 		}
@@ -384,7 +389,7 @@ TReplicantTray::ShowReplicantMenu(BPoint point)
 
 	// If the clock is visible, show the extended menu
 	// otheriwse, show "Show Time".
-	
+
 	if (fBarView->ShowingClock())
 		fClock->ShowClockOptions(ConvertToScreen(point));
 	else {
@@ -462,7 +467,8 @@ TReplicantTray::InitAddOnSupport()
 		// two computers would have to have exactly matching clocks, and launch
 		// Deskbar at the exact same time into the bootsequence in order for their
 		// security-ID to be identical
-		fDeskbarSecurityCode = ((real&0xffffffffULL)<<32)|(boot&0xffffffffULL);
+		fDeskbarSecurityCode = ((real & 0xffffffffULL) << 32)
+			| (boot & 0xffffffffULL);
 
     	if (find_directory (B_USER_SETTINGS_DIRECTORY, &path, true) == B_OK) {
 			path.Append(kDeskbarSecurityCodeFile);
@@ -513,7 +519,8 @@ TReplicantTray::RunAddOnQuery(BVolume *volume, const char *predicate)
 	// newly mounted devices only - the Deskbar will automatically
 	// create an index for every device mounted at startup).
 	index_info info;
-	if (!volume->KnowsQuery() || fs_stat_index(volume->Device(),kStatusPredicate,&info) != 0)
+	if (!volume->KnowsQuery()
+		|| fs_stat_index(volume->Device(), kStatusPredicate, &info) != 0)
 		return;
 
 	// run a new query on a specific volume
@@ -540,7 +547,8 @@ TReplicantTray::IsAddOn(entry_ref &ref)
 	BFile file(&ref, B_READ_ONLY);
 
 	char status[64];
-	ssize_t size = file.ReadAttr(kStatusPredicate, B_STRING_TYPE, 0, &status, 64);
+	ssize_t size = file.ReadAttr(kStatusPredicate, B_STRING_TYPE, 0, &status,
+		sizeof(status));
 	return size > 0;
 }
 
@@ -549,7 +557,7 @@ DeskbarItemInfo *
 TReplicantTray::DeskbarItemFor(node_ref &nodeRef)
 {
 	for (int32 i = fItemList->CountItems(); i-- > 0 ;) {
-		DeskbarItemInfo *item = static_cast<DeskbarItemInfo *>(fItemList->ItemAt(i));
+		DeskbarItemInfo *item = (DeskbarItemInfo *)fItemList->ItemAt(i);
 		if (item == NULL)
 			continue;
 
@@ -565,7 +573,7 @@ DeskbarItemInfo *
 TReplicantTray::DeskbarItemFor(int32 id)
 {
 	for (int32 i = fItemList->CountItems(); i-- > 0 ;) {
-		DeskbarItemInfo *item = static_cast<DeskbarItemInfo *>(fItemList->ItemAt(i));
+		DeskbarItemInfo *item = (DeskbarItemInfo *)fItemList->ItemAt(i);
 		if (item == NULL)
 			continue;
 
@@ -584,10 +592,9 @@ TReplicantTray::NodeExists(node_ref &nodeRef)
 }
 
 
-/**	This handles B_NODE_MONITOR & B_QUERY_UPDATE messages received
- *	for the registered add-ons.
- */
-
+/*!	This handles B_NODE_MONITOR & B_QUERY_UPDATE messages received
+	for the registered add-ons.
+*/
 void
 TReplicantTray::HandleEntryUpdate(BMessage *message)
 {
@@ -598,82 +605,82 @@ TReplicantTray::HandleEntryUpdate(BMessage *message)
 	BPath path;
 	switch (opcode) {
 		case B_ENTRY_CREATED:
+		{
 			// entry was just listed, matches live query
-			{
-				const char *name;
-				ino_t directory;
-				dev_t device;
-				// received when an app adds a ref to the
-				// Deskbar add-ons folder
-				if (message->FindString("name", &name) == B_OK
-					&& message->FindInt64("directory", &directory) == B_OK
-					&& message->FindInt32("device", &device) == B_OK) {
-					entry_ref ref(device, directory, name);
-					// see if this item has the attribute
-					// that we expect
-					if (IsAddOn(ref)) {
-						int32 id;
-						BEntry entry(&ref);					
-						LoadAddOn(&entry, &id);
-					}
+			const char *name;
+			ino_t directory;
+			dev_t device;
+			// received when an app adds a ref to the
+			// Deskbar add-ons folder
+			if (message->FindString("name", &name) == B_OK
+				&& message->FindInt64("directory", &directory) == B_OK
+				&& message->FindInt32("device", &device) == B_OK) {
+				entry_ref ref(device, directory, name);
+				// see if this item has the attribute
+				// that we expect
+				if (IsAddOn(ref)) {
+					int32 id;
+					BEntry entry(&ref);					
+					LoadAddOn(&entry, &id);
 				}
 			}
 			break;
+		}
 
 		case B_ATTR_CHANGED:
+		{
 			// from node watch on individual items
 			// (node_watch added in LoadAddOn)
-			{
-				node_ref nodeRef;
-				if (message->FindInt32("device", &(nodeRef.device)) == B_OK
-					&& message->FindInt64("node", &(nodeRef.node)) == B_OK) {
-					// get the add-on this is for
-					DeskbarItemInfo *item = DeskbarItemFor(nodeRef);
-					if (item == NULL)
-						break;
+			node_ref nodeRef;
+			if (message->FindInt32("device", &(nodeRef.device)) == B_OK
+				&& message->FindInt64("node", &(nodeRef.node)) == B_OK) {
+				// get the add-on this is for
+				DeskbarItemInfo *item = DeskbarItemFor(nodeRef);
+				if (item == NULL)
+					break;
 
-					BFile file(&item->entryRef, B_READ_ONLY);
+				BFile file(&item->entryRef, B_READ_ONLY);
 
-					char status[255];
-					ssize_t size = file.ReadAttr(kStatusPredicate,
-						B_STRING_TYPE, 0, status, sizeof(status) - 1);
-					status[sizeof(status) - 1] = '\0';
+				char status[255];
+				ssize_t size = file.ReadAttr(kStatusPredicate,
+					B_STRING_TYPE, 0, status, sizeof(status) - 1);
+				status[sizeof(status) - 1] = '\0';
 
-					// attribute was removed
-					if (size == B_ENTRY_NOT_FOUND) {
-						// cleans up and removes node_watch
-						UnloadAddOn(&nodeRef, NULL, true, false);
-					} else if (!strcmp(status, "enable")) {
-						int32 id;
-						BEntry entry(&item->entryRef, true);
-						LoadAddOn(&entry, &id);
-					}
+				// attribute was removed
+				if (size == B_ENTRY_NOT_FOUND) {
+					// cleans up and removes node_watch
+					UnloadAddOn(&nodeRef, NULL, true, false);
+				} else if (!strcmp(status, "enable")) {
+					int32 id;
+					BEntry entry(&item->entryRef, true);
+					LoadAddOn(&entry, &id);
 				}
 			}
 			break;
+		}
 
 		case B_ENTRY_MOVED:
-			{
-				entry_ref ref;
-				ino_t todirectory;
-				ino_t node;
-				const char *name;
-				if (message->FindString("name", &name) == B_OK
-					&& message->FindInt64("from directory", &(ref.directory)) == B_OK
-					&& message->FindInt64("to directory", &todirectory) == B_OK
-					&& message->FindInt32("device", &(ref.device)) == B_OK
-					&& message->FindInt64("node", &node) == B_OK ) {
+		{
+			entry_ref ref;
+			ino_t todirectory;
+			ino_t node;
+			const char *name;
+			if (message->FindString("name", &name) == B_OK
+				&& message->FindInt64("from directory", &(ref.directory)) == B_OK
+				&& message->FindInt64("to directory", &todirectory) == B_OK
+				&& message->FindInt32("device", &(ref.device)) == B_OK
+				&& message->FindInt64("node", &node) == B_OK ) {
 
-					if (!name)
-						break;
+				if (!name)
+					break;
 
-					ref.set_name(name);
-					// change the directory reference to
-					// the new directory
-					MoveItem(&ref, todirectory);
-				}
+				ref.set_name(name);
+				// change the directory reference to
+				// the new directory
+				MoveItem(&ref, todirectory);
 			}
 			break;
+		}
 
 		case B_ENTRY_REMOVED:
 		{
@@ -692,41 +699,42 @@ TReplicantTray::HandleEntryUpdate(BMessage *message)
 
 				UnloadAddOn(&nodeRef, NULL, true, false);
 			}
+			break;
 		}
-		break;
 
 		case B_DEVICE_MOUNTED:
-			{
-				// run a new query on the new device
-				dev_t device;
-				if (message->FindInt32("new device", &device) != B_OK)
-					break;
+		{
+			// run a new query on the new device
+			dev_t device;
+			if (message->FindInt32("new device", &device) != B_OK)
+				break;
 
-				RunAddOnQuery(new BVolume(device), kEnabledPredicate);
-			}
+			RunAddOnQuery(new BVolume(device), kEnabledPredicate);
 			break;
+		}
+
 		case B_DEVICE_UNMOUNTED:
-			{
-				// remove all items associated with the device
-				// unmounted
-				// contrary to what the BeBook says, the item is called "device",
-				// not "new device" like it is for B_DEVICE_MOUNTED
-				dev_t device;
-				if (message->FindInt32("device", &device) != B_OK)
-					break;
+		{
+			// remove all items associated with the device
+			// unmounted
+			// contrary to what the BeBook says, the item is called "device",
+			// not "new device" like it is for B_DEVICE_MOUNTED
+			dev_t device;
+			if (message->FindInt32("device", &device) != B_OK)
+				break;
 
-				UnloadAddOn(NULL, &device, false, true);	
-			}
+			UnloadAddOn(NULL, &device, false, true);	
 			break;
+		}
 	}	
 }
 
 
-/** The add-ons must support the exported C function API
- *	if they do, they will be loaded and added to deskbar
- *	primary function is the Instantiate function
- */
-
+/*!
+	The add-ons must support the exported C function API
+	if they do, they will be loaded and added to deskbar
+	primary function is the Instantiate function
+*/
 status_t
 TReplicantTray::LoadAddOn(BEntry *entry, int32 *id, bool force)
 {
@@ -746,21 +754,24 @@ TReplicantTray::LoadAddOn(BEntry *entry, int32 *id, bool force)
 			return error;
 
 		uint64 deskbarID;
-		ssize_t size = node.ReadAttr(kDeskbarSecurityCodeAttr, B_UINT64_TYPE, 0,
-			&deskbarID, sizeof(fDeskbarSecurityCode));
-		if (size != sizeof(fDeskbarSecurityCode) || deskbarID != fDeskbarSecurityCode) {
+		ssize_t size = node.ReadAttr(kDeskbarSecurityCodeAttr, B_UINT64_TYPE,
+			0, &deskbarID, sizeof(fDeskbarSecurityCode));
+		if (size != sizeof(fDeskbarSecurityCode)
+			|| deskbarID != fDeskbarSecurityCode) {
 			// no code or code doesn't match
 			return B_ERROR;
 		}
 	}
 
 	BPath path;
-	entry->GetPath(&path);
+	status_t status = entry->GetPath(&path);
+	if (status < B_OK)
+		return status;
 
 	// load the add-on
 	image_id image = load_add_on(path.Path());
-	if (image < 0)
-		return (status_t)image;
+	if (image < B_OK)
+		return image;
 
 	// get the view loading function symbol		
 	//    we first look for a symbol that takes an image_id
@@ -774,19 +785,17 @@ TReplicantTray::LoadAddOn(BEntry *entry, int32 *id, bool force)
 	entry->GetRef(&ref);
 
 	if (get_image_symbol(image, kInstantiateEntryCFunctionName,
-		B_SYMBOL_TYPE_TEXT, (void **)&entryFunction) >= 0) {
-
+			B_SYMBOL_TYPE_TEXT, (void **)&entryFunction) >= B_OK) {
 		view = (*entryFunction)(image, &ref);
 	} else if (get_image_symbol(image, kInstantiateItemCFunctionName,
-		B_SYMBOL_TYPE_TEXT, (void **)&itemFunction) >= 0) {
-
+			B_SYMBOL_TYPE_TEXT, (void **)&itemFunction) >= B_OK) {
 		view = (*itemFunction)();
 	} else {
 		unload_add_on(image);
 		return B_ERROR;
 	}
 
-	if (!view || IconExists(view->Name())) {
+	if (view == NULL || IconExists(view->Name())) {
 		delete view;
 		unload_add_on(image);
 		return B_ERROR;

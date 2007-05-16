@@ -48,7 +48,7 @@ PrefWindow::PrefWindow(BMessenger messenger)
 		fPrefDlgMessenger);
 	top->AddChild(prefView);
 	
-	fSaveAsFileButton = new BButton(BRect(0, 0, 1, 1), "savebutton", "Save to File", 
+	fSaveAsFileButton = new BButton(BRect(0, 0, 1, 1), "savebutton", "Save to File" B_UTF8_ELLIPSIS, 
 		new BMessage(MSG_SAVEAS_PRESSED), B_FOLLOW_TOP, B_WILL_DRAW);
 	fSaveAsFileButton->ResizeToPreferred();
 	fSaveAsFileButton->MoveTo(5, top->Bounds().Height() - 5 - 

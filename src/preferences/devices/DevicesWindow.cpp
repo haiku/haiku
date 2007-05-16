@@ -153,8 +153,8 @@ void DevicesWindow::InitWindow(void)
 	menubar->AddItem(menu);
 	
 	BMenu *jumperedDevicesMenu = new BMenu("New Jumpered Device");
-	jumperedDevicesMenu->AddItem(new BMenuItem("Custom ...", new BMessage(MENU_DEVICES_NEW_JUMPERED_DEVICE_CUSTOM), 0));
-	jumperedDevicesMenu->AddItem(new BMenuItem("Modem ...", new BMessage(MENU_DEVICES_NEW_JUMPERED_DEVICE_MODEM), 0));
+	jumperedDevicesMenu->AddItem(new BMenuItem("Custom" B_UTF8_ELLIPSIS, new BMessage(MENU_DEVICES_NEW_JUMPERED_DEVICE_CUSTOM), 0));
+	jumperedDevicesMenu->AddItem(new BMenuItem("Modem" B_UTF8_ELLIPSIS, new BMessage(MENU_DEVICES_NEW_JUMPERED_DEVICE_MODEM), 0));
 	
 	//DevicesMenu->AddItem(new BMenuItem("New Jumpered Device", new BMessage(MENU_DEVICES_NEW_JUMPERED_DEVICE), NULL));
 	menu->AddItem(jumperedDevicesMenu);

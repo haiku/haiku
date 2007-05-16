@@ -74,20 +74,20 @@ RouteWindow::RouteWindow(RouteAppNodeManager* manager) :
 	BMenuBar* pMenuBar = new BMenuBar(b, "menuBar");
 	BMenu* pFileMenu = new BMenu("File");
 	BMenuItem* item = new BMenuItem(
-		"Open...",
+		"Open" B_UTF8_ELLIPSIS,
 		new BMessage(RouteApp::M_SHOW_OPEN_PANEL),
 		'O');
 	item->SetTarget(be_app);
 	pFileMenu->AddItem(item);
 	pFileMenu->AddItem(new BSeparatorItem());
 	item = new BMenuItem(
-		"Save Nodes...",
+		"Save Nodes" B_UTF8_ELLIPSIS,
 		new BMessage(RouteApp::M_SHOW_SAVE_PANEL),
 		'S');
 	item->SetTarget(be_app);
 	pFileMenu->AddItem(item);
 	pFileMenu->AddItem(new BSeparatorItem());
-	pFileMenu->AddItem(new BMenuItem("About Cortex/Route...",
+	pFileMenu->AddItem(new BMenuItem("About Cortex/Route" B_UTF8_ELLIPSIS,
 		new BMessage(B_ABOUT_REQUESTED)));
 	pFileMenu->AddItem(new BSeparatorItem());
 	pFileMenu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED)));

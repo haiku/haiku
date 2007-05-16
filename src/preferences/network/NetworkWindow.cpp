@@ -206,7 +206,7 @@ NetworkWindow::NetworkWindow()
 	fIdentityView->AddChild(fInterfaces);
 	
 	workrect = fInterfaces->Bounds().InsetByCopy(5,5);
-	fSettings = new BButton(BRect(0,0,1,1),"Settings","Settings...",
+	fSettings = new BButton(BRect(0,0,1,1),"Settings","Settings" B_UTF8_ELLIPSIS,
 							new BMessage(kSettings_M),
 							B_FOLLOW_TOP | B_FOLLOW_RIGHT);
 	fSettings->ResizeToPreferred();
@@ -221,7 +221,7 @@ NetworkWindow::NetworkWindow()
 	fInterfaces->AddChild(fClear);
 	
 	workrect.OffsetBy(0,workrect.Height()+15);
-	fCustom = new BButton(workrect,"Custom","Custom...",new BMessage(kCustom_M),
+	fCustom = new BButton(workrect,"Custom","Custom" B_UTF8_ELLIPSIS,new BMessage(kCustom_M),
 							B_FOLLOW_TOP | B_FOLLOW_RIGHT);
 	fInterfaces->AddChild(fCustom);
 	
@@ -257,7 +257,7 @@ NetworkWindow::NetworkWindow()
 	fTelnetServer->MoveTo(10,height + 15);
 	fServicesView->AddChild(fTelnetServer);
 	
-	fLoginInfo = new BButton(workrect,"Login_Info","Login Info...",
+	fLoginInfo = new BButton(workrect,"Login_Info","Login Info" B_UTF8_ELLIPSIS,
 								new BMessage(kLogin_Info_M));
 	fLoginInfo->ResizeToPreferred();
 	fLoginInfo->MoveTo(10,(height * 2) + 25);

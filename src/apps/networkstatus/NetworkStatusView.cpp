@@ -352,7 +352,7 @@ NetworkStatusView::MouseDown(BPoint point)
 	}
 
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("About" B_UTF8_ELLIPSIS,
+	menu->AddItem(new BMenuItem("About NetworkStatus" B_UTF8_ELLIPSIS,
 		new BMessage(B_ABOUT_REQUESTED)));
 	if (fInDeskbar)
 		menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED)));
@@ -472,6 +472,7 @@ NetworkStatusView::_Update(bool force)
 extern "C" _EXPORT BView *
 instantiate_deskbar_item(void)
 {
-	return new NetworkStatusView(BRect(0, 0, 15, 15), B_FOLLOW_NONE, true);
+	return new NetworkStatusView(BRect(0, 0, 15, 15),
+		B_FOLLOW_LEFT | B_FOLLOW_TOP, true);
 }
 

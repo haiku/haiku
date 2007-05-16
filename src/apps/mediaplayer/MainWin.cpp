@@ -274,7 +274,7 @@ MainWin::CreateMenu()
 	fFileMenu->AddItem(new BMenuItem("Open File"B_UTF8_ELLIPSIS, new BMessage(M_FILE_OPEN), 'O', B_COMMAND_KEY));
 	fFileMenu->AddItem(new BMenuItem("File Info"B_UTF8_ELLIPSIS, new BMessage(M_FILE_INFO), 'I', B_COMMAND_KEY));
 	fFileMenu->AddSeparatorItem();
-	fFileMenu->AddItem(new BMenuItem("About", new BMessage(M_FILE_ABOUT), 'A', B_COMMAND_KEY));
+	fFileMenu->AddItem(new BMenuItem("About" NAME B_UTF8_ELLIPSIS, new BMessage(M_FILE_ABOUT)));
 	fFileMenu->AddSeparatorItem();
 	fFileMenu->AddItem(new BMenuItem("Close", new BMessage(M_FILE_CLOSE), 'W', B_COMMAND_KEY));
 	fFileMenu->AddItem(new BMenuItem("Quit", new BMessage(M_FILE_QUIT), 'Q', B_COMMAND_KEY));
@@ -480,7 +480,7 @@ MainWin::ShowContextMenu(const BPoint &screen_point)
 	menu->AddItem(item = new BMenuItem("Keep Aspect Ratio", new BMessage(M_TOGGLE_KEEP_ASPECT_RATIO), 'K', B_COMMAND_KEY));
 	item->SetMarked(fKeepAspectRatio);
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("About", new BMessage(M_FILE_ABOUT), 'A', B_COMMAND_KEY));
+	menu->AddItem(new BMenuItem("About" NAME B_UTF8_ELLIPSIS, new BMessage(M_FILE_ABOUT)));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("Quit", new BMessage(M_FILE_QUIT), 'Q', B_COMMAND_KEY));
 

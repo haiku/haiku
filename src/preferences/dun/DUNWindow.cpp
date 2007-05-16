@@ -58,7 +58,7 @@ void DUNWindow::InitWindow() {
    float ButtonWidth = 24;
    
    BRect btn1(10,ButtonTop,83,ButtonTop+ButtonWidth);
-   modembutton = new BButton(btn1,"Modem","Modem...", new BMessage(BTN_MODEM), B_FOLLOW_BOTTOM, B_WILL_DRAW | B_NAVIGABLE);
+   modembutton = new BButton(btn1,"Modem","Modem" B_UTF8_ELLIPSIS, new BMessage(BTN_MODEM), B_FOLLOW_BOTTOM, B_WILL_DRAW | B_NAVIGABLE);
    BRect btn2(143,ButtonTop,218,ButtonTop+ButtonWidth);
    disconnectbutton = new BButton(btn2,"Disconnect","Disconnect", new BMessage(BTN_DISCONNECT), B_FOLLOW_BOTTOM, B_WILL_DRAW | B_NAVIGABLE);
    BRect btn3(230,ButtonTop,302,ButtonTop+ButtonWidth);
@@ -82,7 +82,7 @@ void DUNWindow::InitWindow() {
    conmenufield = new BMenu("Click to add");
    //conmenufield = new BPopUpMenu("Click to add");
    conmenufield->AddSeparatorItem();
-   conmenufield->AddItem(menuconnew = new BMenuItem("New...", new BMessage(MENU_CON_NEW)));
+   conmenufield->AddItem(menuconnew = new BMenuItem("New" B_UTF8_ELLIPSIS, new BMessage(MENU_CON_NEW)));
    //menuconnew->SetTarget(be_app);
    conmenufield->AddItem(menucondelete = new BMenuItem("Delete Current", new BMessage(MENU_CON_DELETE_CURRENT)));
    menucondelete->SetEnabled(false);
@@ -114,7 +114,7 @@ void DUNWindow::InitWindow() {
    //menulocwork->SetTarget(be_app);
    locmenufield->AddSeparatorItem();
    
-   locmenufield->AddItem(menulocnew = new BMenuItem("New...", new BMessage(MENU_LOC_NEW)));
+   locmenufield->AddItem(menulocnew = new BMenuItem("New" B_UTF8_ELLIPSIS, new BMessage(MENU_LOC_NEW)));
    //menulocnew->SetTarget(be_app);
    
    locmenufield->AddItem(menulocdelete = new BMenuItem("Delete Current", new BMessage(MENU_LOC_DELETE_CURRENT)));

@@ -593,7 +593,7 @@ BDragger::_BuildDefaultPopUp()
 		msg->AddString("target", name);
 
 	char about[B_OS_NAME_LENGTH];
-	snprintf(about, B_OS_NAME_LENGTH, "About %s", name);
+	snprintf(about, B_OS_NAME_LENGTH, "About %s" B_UTF8_ELLIPSIS, name);
 	
 	fPopUp->AddItem(new BMenuItem(about, msg));
 	fPopUp->AddSeparatorItem();

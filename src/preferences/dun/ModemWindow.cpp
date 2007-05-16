@@ -50,7 +50,7 @@ void ModemWindow::InitWindow(void)
     BRect btn1(10,r.bottom - 34,83,r.bottom - 16);
     BRect btn2(108,r.bottom - 34,184,r.bottom - 16);
     BRect btn3(196,r.bottom - 34,271,r.bottom - 16);
-    btnModemWindowCustom = new BButton(btn1,"Custom","  Custom ...  ", new BMessage(BTN_MODEM_WINDOW_CUSTOM), B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
+    btnModemWindowCustom = new BButton(btn1,"Custom","  Custom" B_UTF8_ELLIPSIS "  ", new BMessage(BTN_MODEM_WINDOW_CUSTOM), B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
     btnModemWindowCancel = new BButton(btn2,"Cancel","  Cancel  ", new BMessage(BTN_MODEM_WINDOW_CANCEL), B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
     btnModemWindowDone = new BButton(btn3,"Done","  Done  ", new BMessage(BTN_MODEM_WINDOW_DONE), B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
    
@@ -59,7 +59,7 @@ void ModemWindow::InitWindow(void)
     BMenuItem *menu[100];
     YourModemIsMenu = new BMenu("<Pick One>                                 ");
     YourModemIsMenu->AddSeparatorItem();
-    YourModemIsMenu->AddItem(menu[1] = new BMenuItem("New...", new BMessage(MENU)));
+    YourModemIsMenu->AddItem(menu[1] = new BMenuItem("New" B_UTF8_ELLIPSIS, new BMessage(MENU)));
     menu[1]->SetTarget(be_app);
     YourModemIsMenuField = new BMenuField(mfld1,"yourmodem_menufield","Your modem is:",YourModemIsMenu,B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
     YourModemIsMenuField->SetDivider(76);	

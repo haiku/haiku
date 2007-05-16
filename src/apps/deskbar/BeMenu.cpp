@@ -232,11 +232,13 @@ TBeMenu::AddStandardBeMenuItems()
 	if (fBarView)
 		dragging = fBarView->Dragging();
 
+	BMenuItem* item = new BMenuItem(
 #ifdef __HAIKU__
-	BMenuItem* item = new BMenuItem("About Haiku", new BMessage(kShowSplash));
+		"About Haiku"
 #else
-	BMenuItem* item = new BMenuItem("About BeOS", new BMessage(kShowSplash));
+		"About BeOS"
 #endif
+		B_UTF8_ELLIPSIS, new BMessage(kShowSplash));
 	item->SetEnabled(!dragging);
 	AddItem(item);
 

@@ -52,11 +52,11 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref *ref, BMessage *sett
 	fBar = new BMenuBar(BRect(0, 0, Bounds().right, 20), "menu_bar");
 	BMenu *menu = new BMenu("File");
 	BMenuItem *item;
-	menu->AddItem(item = new BMenuItem("About Expander...", new BMessage(B_ABOUT_REQUESTED)));
+	menu->AddItem(item = new BMenuItem("About Expander" B_UTF8_ELLIPSIS, new BMessage(B_ABOUT_REQUESTED)));
 	item->SetTarget(be_app_messenger);
 	menu->AddSeparatorItem();
-	menu->AddItem(fSourceItem = new BMenuItem("Set Source...", new BMessage(MSG_SOURCE), 'O'));
-	menu->AddItem(fDestItem = new BMenuItem("Set Destination...", new BMessage(MSG_DEST), 'D'));
+	menu->AddItem(fSourceItem = new BMenuItem("Set Source" B_UTF8_ELLIPSIS, new BMessage(MSG_SOURCE), 'O'));
+	menu->AddItem(fDestItem = new BMenuItem("Set Destination" B_UTF8_ELLIPSIS, new BMessage(MSG_DEST), 'D'));
 	menu->AddSeparatorItem();
 	menu->AddItem(fExpandItem = new BMenuItem("Expand", new BMessage(MSG_EXPAND), 'E'));
 	fExpandItem->SetEnabled(false);
@@ -70,7 +70,7 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref *ref, BMessage *sett
 	fBar->AddItem(menu);
 
 	menu = new BMenu("Edit");
-	menu->AddItem(fPreferencesItem = new BMenuItem("Preferences...",
+	menu->AddItem(fPreferencesItem = new BMenuItem("Preferences" B_UTF8_ELLIPSIS,
 		new BMessage(MSG_PREFERENCES), 'P'));
 	fBar->AddItem(menu);
 	AddChild(fBar);

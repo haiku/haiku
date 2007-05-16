@@ -995,9 +995,9 @@ void
 CalcView::_CreatePopUpMenu()
 {
 	// construct items
-	fAboutItem = new BMenuItem("About Calculator...",
+	fAboutItem = new BMenuItem("About Calculator" B_UTF8_ELLIPSIS,
 		new BMessage(B_ABOUT_REQUESTED));
-	fOptionsItem = new BMenuItem("Options...",
+	fOptionsItem = new BMenuItem("Options" B_UTF8_ELLIPSIS,
 		new BMessage(K_OPTIONS_REQUESTED));
 
 	// construct menu

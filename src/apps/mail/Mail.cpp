@@ -1378,7 +1378,7 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref,
 	
 	menu->AddSeparatorItem();
 	menu->AddItem(item = new BMenuItem(
-		MDR_DIALECT_CHOICE ("About", "A) Mailについて") B_UTF8_ELLIPSIS,
+		MDR_DIALECT_CHOICE ("About Mail", "A) Mailについて") B_UTF8_ELLIPSIS,
 		new BMessage(B_ABOUT_REQUESTED)));
 	item->SetTarget(be_app);
 	

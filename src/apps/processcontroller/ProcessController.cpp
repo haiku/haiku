@@ -773,7 +773,7 @@ thread_popup(void *arg)
 
 	addtopbottom(new BSeparatorItem ());
 
-	item = new IconMenuItem(gPCView->fProcessControllerIcon, "About ProcessController",
+	item = new IconMenuItem(gPCView->fProcessControllerIcon, "About ProcessController" B_UTF8_ELLIPSIS,
 		new BMessage(B_ABOUT_REQUESTED));
 	item->SetTarget(gPCView);
 	addtopbottom(item);

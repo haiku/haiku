@@ -18,11 +18,11 @@ extern const char* STR_ERR_CANT_START
 extern const char* STR_MNU_FILE
 	= "File";
 extern const char* STR_MNU_FILE_SAVE_AS
-	= "Save Console As...";
+	= "Save Console As" B_UTF8_ELLIPSIS;
 extern const char* STR_MNU_FILE_SAVE_SELECTION
-	= "Save Console Selections As...";
+	= "Save Console Selections As" B_UTF8_ELLIPSIS;
 extern const char* STR_MNU_FILE_ABOUT
-	= "About PoorMan";
+	= "About PoorMan" B_UTF8_ELLIPSIS;
 extern const char* STR_MNU_FILE_QUIT
 	= "Quit";
 extern const char* STR_MNU_EDIT
@@ -32,7 +32,7 @@ extern const char* STR_MNU_EDIT_COPY
 extern const char* STR_MNU_EDIT_SELECT_ALL
 	= "Select All";
 extern const char* STR_MNU_EDIT_PREF
-	= "Preferences...";
+	= "Preferences" B_UTF8_ELLIPSIS;
 extern const char* STR_MNU_CTRL
 	= "Controls";
 extern const char* STR_MNU_CTRL_RUN_SERVER

@@ -129,7 +129,7 @@ StyledEditWindow::InitWindow(uint32 encoding)
 	menu->AddItem(menuItem = new BMenuItem("New", new BMessage(MENU_NEW), 'N'));
 	menuItem->SetTarget(be_app);
 	
-	menu->AddItem(menuItem = new BMenuItem(fRecentMenu = new BMenu("Open..."),
+	menu->AddItem(menuItem = new BMenuItem(fRecentMenu = new BMenu("Open" B_UTF8_ELLIPSIS),
 		new BMessage(MENU_OPEN)));
 	menuItem->SetShortcut('O', 0);
 	menuItem->SetTarget(be_app);
@@ -137,18 +137,18 @@ StyledEditWindow::InitWindow(uint32 encoding)
 
 	menu->AddItem(fSaveItem = new BMenuItem("Save", new BMessage(MENU_SAVE), 'S')); 
 	fSaveItem->SetEnabled(false); 
-	menu->AddItem(menuItem = new BMenuItem("Save As...", new BMessage(MENU_SAVEAS)));
+	menu->AddItem(menuItem = new BMenuItem("Save As" B_UTF8_ELLIPSIS, new BMessage(MENU_SAVEAS)));
 	menuItem->SetShortcut('S',B_SHIFT_KEY);
 	menuItem->SetEnabled(true);
 
-	menu->AddItem(fRevertItem = new BMenuItem("Revert to Saved...",
+	menu->AddItem(fRevertItem = new BMenuItem("Revert to Saved" B_UTF8_ELLIPSIS,
 		new BMessage(MENU_REVERT))); 
 	fRevertItem->SetEnabled(false);
 	menu->AddItem(menuItem = new BMenuItem("Close", new BMessage(MENU_CLOSE), 'W'));
 
 	menu->AddSeparatorItem();
-	menu->AddItem(menuItem = new BMenuItem("Page Setup...", new BMessage(MENU_PAGESETUP)));
-	menu->AddItem(menuItem = new BMenuItem("Print...", new BMessage(MENU_PRINT), 'P'));
+	menu->AddItem(menuItem = new BMenuItem("Page Setup" B_UTF8_ELLIPSIS, new BMessage(MENU_PAGESETUP)));
+	menu->AddItem(menuItem = new BMenuItem("Print" B_UTF8_ELLIPSIS, new BMessage(MENU_PRINT), 'P'));
 
 	menu->AddSeparatorItem();
 	menu->AddItem(menuItem = new BMenuItem("Quit", new BMessage(MENU_QUIT), 'Q'));
@@ -180,12 +180,12 @@ StyledEditWindow::InitWindow(uint32 encoding)
 	menuItem->SetTarget(fTextView);
 
 	menu->AddSeparatorItem();
-	menu->AddItem(menuItem = new BMenuItem("Find...", new BMessage(MENU_FIND),'F'));
+	menu->AddItem(menuItem = new BMenuItem("Find" B_UTF8_ELLIPSIS, new BMessage(MENU_FIND),'F'));
 	menu->AddItem(fFindAgainItem= new BMenuItem("Find Again",new BMessage(MENU_FIND_AGAIN),'G'));
 	fFindAgainItem->SetEnabled(false);
 
 	menu->AddItem(menuItem = new BMenuItem("Find Selection", new BMessage(MENU_FIND_SELECTION),'H'));
-	menu->AddItem(menuItem = new BMenuItem("Replace...", new BMessage(MENU_REPLACE),'R'));
+	menu->AddItem(menuItem = new BMenuItem("Replace" B_UTF8_ELLIPSIS, new BMessage(MENU_REPLACE),'R'));
 	menu->AddItem(fReplaceSameItem = new BMenuItem("Replace Same", new BMessage(MENU_REPLACE_SAME),'T'));
 	fReplaceSameItem->SetEnabled(false);
 

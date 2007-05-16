@@ -718,7 +718,7 @@ JobSetupView::AttachedToWindow()
 
 	/* preview */
 	
-	button = new BButton(preview_rect, "preview", "Preview ...", new BMessage(kMsgPreview));
+	button = new BButton(preview_rect, "preview", "Preview" B_UTF8_ELLIPSIS, new BMessage(kMsgPreview));
 	AddChild(button);
 
 	

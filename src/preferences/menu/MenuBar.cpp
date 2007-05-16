@@ -58,7 +58,7 @@ MenuBar::_BuildMenu()
 		new BMessage(ALT_MARKED_MSG), BTranslationUtils::GetBitmap(B_RAW_TYPE, "ALT"));
 
 	// color menu
-	BMenuItem* colorSchemeItem = new BMenuItem("Color Scheme...",
+	BMenuItem* colorSchemeItem = new BMenuItem("Color Scheme" B_UTF8_ELLIPSIS,
 		new BMessage(COLOR_SCHEME_OPEN_MSG), 0, 0);
 
 	// Add items to menubar	
