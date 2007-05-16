@@ -317,11 +317,8 @@ Volume::Mount(const char* device)
 			+ next.second * kFramesPerSecond + next.frame
 			- startFrame;
 
-		const char *artist = text.artists[i] != NULL
-			? text.artists[i] : text.artist;
-
 		if (text.titles[i] != NULL) {
-			if (artist != NULL) {
+			if (text.artists[i] != NULL) {
 				snprintf(title, sizeof(title), "%02ld. %s - %s.wav", track,
 					text.artists[i], text.titles[i]);
 			} else {
@@ -346,7 +343,8 @@ Volume::Mount(const char* device)
 
 		// add attributes
 
-		inode->AddAttribute("Audio:Artist", B_STRING_TYPE, artist);
+		inode->AddAttribute("Audio:Artist", B_STRING_TYPE,
+			text.artists[i] != NULL ? text.artists[i] : text.artist);
 		inode->AddAttribute("Audio:Title", B_STRING_TYPE, text.titles[i]);
 		inode->AddAttribute("Audio:Genre", B_STRING_TYPE, text.genre);
 		inode->AddAttribute("Audio:Track", track);
@@ -582,13 +580,13 @@ Inode::Inode(Volume *volume, Inode *parent, const char *name, off_t start,
 		// initialize WAV header
 
 		// RIFF header
-		fWAVHeader.header.magic = B_HOST_TO_LENDIAN_INT32('RIFF');
+		fWAVHeader.header.magic = B_HOST_TO_BENDIAN_INT32('RIFF');
 		fWAVHeader.header.length = B_HOST_TO_LENDIAN_INT32(Size()
 			+ sizeof(wav_header) - sizeof(riff_chunk));
-		fWAVHeader.header.id = B_HOST_TO_LENDIAN_INT32('WAVE');
+		fWAVHeader.header.id = B_HOST_TO_BENDIAN_INT32('WAVE');
 
 		// 'fmt ' format chunk
-		fWAVHeader.format.fourcc = B_HOST_TO_LENDIAN_INT32('fmt ');
+		fWAVHeader.format.fourcc = B_HOST_TO_BENDIAN_INT32('fmt ');
 		fWAVHeader.format.length = B_HOST_TO_LENDIAN_INT32(
 			sizeof(wav_format_chunk) - sizeof(riff_chunk));
 		fWAVHeader.format.format_tag = B_HOST_TO_LENDIAN_INT16(1);
@@ -600,7 +598,7 @@ Inode::Inode(Volume *volume, Inode *parent, const char *name, off_t start,
 		fWAVHeader.format.bits_per_sample = B_HOST_TO_LENDIAN_INT16(16);
 
 		// 'data' chunk
-		fWAVHeader.data.fourcc = B_HOST_TO_LENDIAN_INT32('data');
+		fWAVHeader.data.fourcc = B_HOST_TO_BENDIAN_INT32('data');
 		fWAVHeader.data.length = B_HOST_TO_LENDIAN_INT32(Size());
 	}
 }
@@ -1054,8 +1052,6 @@ cdda_read(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t offset,
 
 	if (S_ISDIR(inode->Type()))
 		return B_IS_A_DIRECTORY;
-	if ((cookie->open_mode & O_RWMASK) != O_RDONLY)
-		return B_NOT_ALLOWED;
 	if (offset < 0)
 		return B_BAD_VALUE;
 
@@ -1088,12 +1084,15 @@ cdda_read(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t offset,
 		if (user_memcpy(buffer, (uint8 *)inode->WAVHeader() + offset, size) < B_OK)
 			return B_BAD_ADDRESS;
 
+		buffer = (void *)((uint8 *)buffer + size);
 		length -= size;
-	}
+		offset = 0;
+	} else
+		offset -= sizeof(wav_header);
 
 	if (length > 0) {
 		// read actual CD data
-		offset -= sizeof(wav_header);
+		offset += inode->StartFrame() * kFrameSize;
 
 		status = read_cdda_data(volume->Device(), offset, buffer, length,
 			cookie->buffer_offset, cookie->buffer, volume->BufferSize());

@@ -413,15 +413,15 @@ dump_toc(scsi_toc_toc *toc)
 
 
 static status_t
-read_frames(int fd, off_t frame, uint8 *buffer, size_t count)
+read_frames(int fd, off_t firstFrame, uint8 *buffer, size_t count)
 {
 	size_t framesLeft = count;
 
 	while (framesLeft > 0) {
 		scsi_read_cd read;
-		read.start_m = frame / kFramesPerMinute;
-		read.start_s = (frame / kFramesPerSecond) % 60;
-		read.start_f = frame % kFramesPerSecond;
+		read.start_m = firstFrame / kFramesPerMinute;
+		read.start_s = (firstFrame / kFramesPerSecond) % 60;
+		read.start_f = firstFrame % kFramesPerSecond;
 
 		read.length_m = count / kFramesPerMinute;
 		read.length_s = (count / kFramesPerSecond) % 60;
@@ -445,7 +445,7 @@ read_frames(int fd, off_t frame, uint8 *buffer, size_t count)
 
 		buffer += count * kFrameSize;
 		framesLeft -= count;
-		frame += count;
+		firstFrame += count;
 	}
 
 	return B_OK;
@@ -618,7 +618,7 @@ read_cdda_data(int fd, off_t offset, void *data, size_t length,
 		if (status < B_OK)
 			return status;
 
-		off_t dataOffset = offset - frame * kFrameSize;
+		off_t dataOffset = offset % kFrameSize;
 		size_t bytes = bufferSize - dataOffset;
 		if (bytes > length)
 			bytes = length;
@@ -626,6 +626,7 @@ read_cdda_data(int fd, off_t offset, void *data, size_t length,
 		if (user_memcpy(data, (uint8 *)buffer + dataOffset, bytes) < B_OK)
 			return B_BAD_ADDRESS;
 
+		data = (void *)((uint8 *)data + bytes);
 		length -= bytes;
 		offset += bytes;
 	}
