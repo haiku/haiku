@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,6 +8,7 @@
 
 #include <apm.h>
 #include <descriptors.h>
+#include <generic_syscall.h>
 #include <safemode.h>
 #include <boot/kernel_args.h>
 
@@ -196,6 +197,56 @@ apm_daemon(void *arg, int iteration)
 }
 
 
+static status_t
+get_battery_info(battery_info *info)
+{
+	bios_regs regs;
+	regs.eax = BIOS_APM_GET_POWER_STATUS;
+	regs.ebx = APM_ALL_DEVICES;
+	regs.ecx = 0;
+
+	status_t status = call_apm_bios(&regs);
+	if (status != B_OK)
+		return status;
+
+	uint16 lineStatus = (regs.ebx >> 8) & 0xff;
+	if (lineStatus == 0xff)
+		return B_NOT_SUPPORTED;
+
+	info->online = lineStatus != 0 && lineStatus != 2;
+	info->percent = regs.ecx & 0xff;
+	if (info->percent > 100 || info->percent < 0)
+		info->percent = -1;
+
+	info->time_left = info->percent >= 0 ? (int32)(regs.edx & 0xffff) : -1;
+	if (info->time_left & 0x8000)
+		info->time_left = (info->time_left & 0x7fff) * 60;
+
+	return B_OK;
+}
+
+
+static status_t
+apm_control(const char *subsystem, uint32 function,
+	void *buffer, size_t bufferSize)
+{
+	struct battery_info info;
+	if (bufferSize != sizeof(struct battery_info))
+		return B_BAD_VALUE;
+
+	switch (function) {
+		case APM_GET_BATTERY_INFO:
+			status_t status = get_battery_info(&info);
+			if (status < B_OK)
+				return status;
+
+			return user_memcpy(buffer, &info, sizeof(struct battery_info));
+	}
+
+	return B_BAD_VALUE;
+}
+
+
 //	#pragma mark -
 
 
@@ -304,6 +355,7 @@ apm_init(kernel_args *args)
 	register_kernel_daemon(apm_daemon, NULL, 10);
 		// run the daemon once every second
 
+	register_generic_syscall(APM_SYSCALLS, apm_control, 1, 0);
 	sAPMEnabled = true;
 	return B_OK;
 }

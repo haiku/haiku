@@ -10,6 +10,11 @@
 #include "PowerStatusView.h"
 #include "PowerStatus.h"
 
+#include <arch/x86/apm.h>
+#include <generic_syscall.h>
+#include <syscalls.h>
+	// temporary, as long as there is no real power state API
+
 #include <Alert.h>
 #include <Application.h>
 #include <Deskbar.h>
@@ -110,7 +115,19 @@ PowerStatusView::_Init()
 	fTimeLeft = 0;
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
-	// TODO: implement me
+	uint32 version = 0;
+	status_t status = _kern_generic_syscall(APM_SYSCALLS, B_SYSCALL_INFO,
+		&version, sizeof(version));
+	if (status == B_OK) {
+		battery_info info;
+		status = _kern_generic_syscall(APM_SYSCALLS, APM_GET_BATTERY_INFO, &info,
+			sizeof(battery_info));
+	}
+
+	if (status != B_OK) {
+		fprintf(stderr, "No power interface found.\n");
+		_Quit();
+	}
 #else
 	fDevice = open("/dev/misc/apm", O_RDONLY);
 	if (fDevice < 0) {
@@ -422,9 +439,14 @@ PowerStatusView::_Update(bool force)
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	// TODO: retrieve data from APM/ACPI kernel interface
-	fPercent = 42;
-	fTimeLeft = 1500;
-	fOnline = true;
+	battery_info info;
+	status_t status = _kern_generic_syscall(APM_SYSCALLS, APM_GET_BATTERY_INFO, &info,
+		sizeof(battery_info));
+	if (status == B_OK) {
+		fPercent = info.percent;
+		fTimeLeft = info.time_left;
+		fOnline = info.online;
+	}
 #else
 	if (fDevice < 0)
 		return;

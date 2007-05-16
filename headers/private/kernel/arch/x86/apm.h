@@ -47,6 +47,17 @@ typedef struct apm_info {
 } apm_info;
 
 
+// temporary generic syscall interface
+#define APM_SYSCALLS "apm"
+#define APM_GET_BATTERY_INFO	1
+
+struct battery_info {
+	bool	online;
+	int32	percent;
+	time_t	time_left;
+};
+
+
 #ifndef _BOOT_MODE
 #ifdef __cplusplus
 extern "C" {

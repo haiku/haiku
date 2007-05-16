@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src apps powerstatus ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders shared ;
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
 Application PowerStatus :
 	PowerStatusWindow.cpp
