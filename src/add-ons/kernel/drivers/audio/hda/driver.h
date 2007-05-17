@@ -30,6 +30,9 @@
 #define MAX_CODEC_RESPONSES	10
 #define MAXINPUTS			32
 
+/* FIXME: Find out why we need so much! */
+#define DEFAULT_FRAMESPERBUF	4096
+
 typedef struct hda_controller_s hda_controller;
 typedef struct hda_codec_s hda_codec;
 typedef struct hda_afg_s hda_afg;

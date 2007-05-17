@@ -153,12 +153,25 @@ get_buffers(hda_afg* afg, multi_buffer_list* data)
 	dprintf("%s: record: %ld buffers, %ld channels, %ld samples\n", __func__, 
 		data->request_record_buffers, data->request_record_channels, data->request_record_buffer_size);
 
+	/* Workaround for Haiku multi_audio API, since it prefers to let the driver pick
+		values, while the BeOS multi_audio actually gives the user's defaults. */
 	if (data->request_playback_buffers > STRMAXBUF ||
-		data->request_playback_buffers < STRMINBUF ||
-		data->request_record_buffers > STRMAXBUF ||
-		data->request_record_buffers < STRMINBUF) {
-		return B_BAD_VALUE;
+		data->request_playback_buffers < STRMINBUF) {
+		data->request_playback_buffers = STRMINBUF;
 	}
+	
+	if (data->request_record_buffers > STRMAXBUF ||
+		data->request_record_buffers < STRMINBUF) {
+		data->request_record_buffers = STRMINBUF;
+	}
+
+	if (data->request_playback_buffer_size == 0)
+		data->request_playback_buffer_size  = DEFAULT_FRAMESPERBUF;
+
+	if (data->request_record_buffer_size == 0)
+		data->request_record_buffer_size  = DEFAULT_FRAMESPERBUF;
+
+	/* ... from here on, we can assume again that a reasonable request is being made */
 
 	data->flags = 0;
 
