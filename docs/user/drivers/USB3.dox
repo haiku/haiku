@@ -81,9 +81,11 @@
   \param device A unique id that identifies this USB device.
   \param[in] cookie You can store a pointer to an object in this variable.
     When the device is removed, this cookie will be provided to you.
-  \return You should return \c B_OK in case of success. If you return an error
-    value, the \a device id will become invalid and you will not be notified if
-    this device is removed.
+  \return You should return \c B_OK in case of success. The USB stack will then
+    request the kernel to republish your device names, so that the new device
+    will be shown in the \c /dev tree. If you return an error value, the 
+    \a device id will become invalid and you will not be notified if this
+    device is removed.
   \see device_removed()
 */
 
@@ -148,14 +150,147 @@
 
 ///// usb_endpoint_info /////
 
+/*!
+  \struct usb_endpoint_info
+  \brief Container for endpoint descriptors and their Haiku USB stack
+    identifiers.
+*/
+
+/*!
+  \var usb_endpoint_descriptor *usb_endpoint_info::descr
+  \brief Pointer to the descriptor of the endpoint.
+*/
+
+/*!
+  \var usb_pipe usb_endpoint_info::handle
+  \brief Handle to use when using the stack to transfer data to and from this
+    endpoint.
+*/
+
 ///// usb_interface_info /////
+
+/*!
+  \struct usb_interface_info
+  \brief Container for interface descriptors and their Haiku USB stack
+    identifiers.
+*/
+
+//! @{
+
+/*!
+  \var usb_interface_descriptor *usb_interface_info::descr
+  \brief Pointer to the descriptor of the interface.
+*/
+
+/*!
+  \var usb_interface usb_interface_info::handle
+  \brief Handle to use when using the stack to manipulate this interface.
+*/
+
+//! @}
+
+/*!
+  \name Endpoints
+*/
+
+//! @{
+
+/*!
+  \var size_t usb_interface_info::endpoint_count
+  \brief The number of endpoints in this interface.
+*/
+
+/*!
+  \var usb_endpoint_info *usb_interface_info::endpoint
+  \brief An array of endpoints that are associated to this interface.
+*/
+
+//! @}
+
+/*!
+  \name Unparsed descriptors
+*/
+
+//! @{
+
+/*!
+  \var size_t usb_interface_info::generic_count
+  \brief The number of unparsed descriptors in this interface.
+*/
+
+/*!
+  \var usb_descriptor **usb_interface_info::generic
+  \brief Unparsed descriptors in this interface.
+*/
+
+//! @}
 
 ///// usb_interface_list /////
 
+/*!
+  \struct usb_interface_list
+  \brief List of interfaces available to a configuration.
+*/
+
+/*!
+  \var size_t usb_interface_list::alt_count
+  \brief Number of available interfaces.
+*/
+
+/*!
+  \var usb_interface_info *usb_interface_list::alt
+  \brief Array of available interfaces.
+*/
+
+/*!
+  \var usb_interface_info *usb_interface_list::active
+  \brief Pointer to active interface.
+*/
+
 ///// usb_configuration_info /////
+
+/*!
+  \struct usb_configuration_info
+  \brief Container for a specific configuration descriptor of a device.
+*/
+
+/*!
+  \var usb_configuration_descriptor *usb_configuration_info::descr
+  \brief The configuration descriptor.
+*/
+
+/*!
+  \var size_t usb_configuration_info::interface_count
+  \brief The number of interfaces in this configuration.
+*/
+
+/*!
+  \var usb_interface_list *usb_configuration_info::interface
+  \brief The list of interfaces available to this configuration.
+*/
 
 ///// usb_iso_packet_descriptor /////
 
+/*!
+  \struct usb_iso_packet_descriptor
+  \brief The descriptor for data packets of isochronous transfers.
+*/
+
+/*!
+  \var int16 usb_iso_packet_descriptor::req_len
+  \brief Length of the request.
+*/
+
+/*!
+  \var int16 usb_iso_packet_descriptor::act_len
+  \brief The USB stack writes the actual transferred length in this variable.
+*/
+
+/*!
+  \var status_t	usb_iso_packet_descriptor::status
+  \brief The status of the transfer.
+*/
+  
 ///// usb_callback_func /////
 
 /*!
@@ -163,7 +298,51 @@
   \brief Callback function for asynchronous transfers.
 
   \param cookie The cookie you supplied when you queued the transfer.
-  \param status The status of the transfer (whether it succeeded or not).
+  \param status The status of the transfer. This is one of the following:
+    <table>
+      <tr>
+        <td><em>B_OK</em></td><td>Transfer succeeded.</td>
+      </tr>
+      <tr>
+        <td><em>B_CANCELED</em></td><td>Transfer cancelled by the user via a 
+          usb_module_info::cancel_queued_transfers() call.</td>
+      </tr>
+      <tr>
+        <td><em>B_DEV_MULTIPLE_ERRORS</em></td><td>More than one of the errors
+          below. Unfortunately, the stack cannot give you more information.</td>
+      </tr>
+      <tr>
+        <td><em>B_DEV_STALLED</em></td><td>The endpoint is stalled. You can use
+          usb_module_info::clear_feature() method with the associated pipe and
+          the USB_FEATURE_ENDPOINT_HALT arguments.</td>
+      </tr>
+      <tr>
+        <td><em>B_DEV_DATA_OVERRUN</em></td><td>Incoming transfer: more data
+          flowing in than the size of the buffer.</td>
+      </tr>
+      <tr>
+        <td><em>B_DEV_DATA_UNDERRUN</em></td><td>Outgoing transfer: more data
+          flowing out than the endpoint accepts.</td>
+      </tr>
+      <tr>
+        <td><em>B_DEV_CRC_ERROR</em></td><td>The internal data consistency
+          checks of the USB protocol failed. You are best to retry. If you keep
+          on getting this error, there might be something wrong with the
+          device.</td>
+      </tr>
+      <tr>
+        <td><em>B_DEV_UNEXPECTED_PID</em></td><td>Internal error. You should
+          retry your transfer.</td>
+      </tr>
+      <tr>
+        <td><em>B_DEV_FIFO_OVERRUN</em></td><td>Internal error. You should
+          retry your transfer.</td>
+      </tr>
+      <tr>
+         <td><em>B_DEV_FIFO_UNDERRUN</em></td><td>Internal error. You should
+          retry your transfer.</td>
+      </tr>
+    </table>
   \param data The provided buffer.
   \param actualLength The amount of bytes read or written during the transfer.
 */
@@ -204,8 +383,7 @@
     the amount of objects in the next parameter.
   \param supportDescriptorCount The number of objects in the array supplied in
     the previous parameter.
-  \param optionalRepublishDriverName Undocumented parameter. It is safe to
-   pass \c NULL.
+  \param optionalRepublishDriverName Unused parameter. You should pass \c NULL.
   \retval B_OK The driver is registered. You can now call install_notify()
   \retval B_BAD_VALUE You passed \c NULL as \a driverName.
   \retval B_ERROR General internal error in the USB stack. You may retry the
@@ -391,7 +569,7 @@
    value won't tell you if the transfer actually succeeded.
   \retval B_OK The interrupt transfer is queued.
   \retval B_NO_MEMORY Error allocating objects.
-  \retval B_DEV_INVALID_PIPE The \a pipe is invalid.
+  \retval B_DEV_INVALID_PIPE The \a pipe is not a valid interrupt pipe.
 */
 
 /*!
@@ -435,7 +613,7 @@
    value won't tell you if the transfer actually succeeded.
   \retval B_OK The control transfer is queued.
   \retval B_NO_MEMORY Error allocating objects.
-  \retval B_DEV_INVALID_PIPE The \a callback is invalid.
+  \retval B_DEV_INVALID_PIPE The \a device argument is invalid.
 */
 
 /*!
@@ -458,14 +636,21 @@
 
 /*!
   \fn status_t (*usb_module_info::cancel_queued_transfers)(usb_pipe pipe)
-  \brief Cancel pending transfers. Not Implemented.
+  \brief Cancel pending transfers on a pipe.
+
+  All the pending transfers will be cancelled. The stack will perform the
+  callback on all of them that are cancelled. 
   
-  Call this method to cancel pending transfers in a \a pipe.
+  \attention There might be transfers that are being executed the moment you
+    call this method. These will be executed, and their callbacks will be
+    performed. Make sure you don't delete any buffers that could still be used
+    by these transfers.
   
-  \warning This is currently not implemented!
+  \param pipe The id of the pipe to clear.
   
-  \param pipe The id of the pipe to clear. The method will always return
-    \c B_ERROR.
+  \retval B_OK All the pending transfers on this pipe are deleted.
+  \retval B_DEV_INVALID_PIPE The supplied usb_id is not a valid pipe.
+  \retval "other errors" There was an error clearing the pipe.
 */
 
 /*!
@@ -474,4 +659,11 @@
   
   This method is used to give lowlevel commands to the Stack. There are
   currently no uses documented.
+*/
+
+///// B_USB_MODULE_NAME /////
+
+/*!
+  \def B_USB_MODULE_NAME
+  \brief The identifier string for the USB Stack interface module.
 */
