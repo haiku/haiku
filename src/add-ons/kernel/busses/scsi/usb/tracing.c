@@ -154,7 +154,7 @@ usb_scsi_trace(bool b_force, const char *fmt, ...)
 {
 	if(b_force || b_log){
 		va_list arg_list;
-		static char *prefix = "\33[35m"MODULE_NAME":\33[0m";
+		static char *prefix = MODULE_NAME":";
 		static char buf[1024];
 		char *buf_ptr = buf;
 		port_id pid = find_port(log_port_name);
