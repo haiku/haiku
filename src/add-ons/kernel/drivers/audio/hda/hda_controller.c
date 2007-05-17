@@ -93,7 +93,7 @@ hda_stream_stop(hda_controller* ctrlr, hda_stream* s)
 }
 
 status_t
-hda_stream_setup_buffers(hda_codec* codec, hda_stream* s, const char* desc)
+hda_stream_setup_buffers(hda_afg* afg, hda_stream* s, const char* desc)
 {
 	uint32 buffer_size, buffer_pa, alloc;
 	uint32 response[2], idx;
@@ -200,17 +200,17 @@ hda_stream_setup_buffers(hda_codec* codec, hda_stream* s, const char* desc)
 		default:			dprintf("%s: Invalid sample rate: 0x%lx\n", __func__, s->samplerate); break;
 	}
 
-	OREG16(codec->ctrlr,s->off,FMT) = wfmt;
-	OREG32(codec->ctrlr,s->off,BDPL) = s->bdl_pa;
-	OREG32(codec->ctrlr,s->off,BDPU) = 0;
-	OREG16(codec->ctrlr,s->off,LVI) = s->num_buffers -1;
-	OREG32(codec->ctrlr,s->off,CBL) = s->num_channels * s->num_buffers;
-	OREG8(codec->ctrlr,s->off,CTL0) = CTL0_IOCE | CTL0_FEIE | CTL0_DEIE;
-	OREG8(codec->ctrlr,s->off,CTL2) = s->id << 4;
+	OREG16(afg->codec->ctrlr,s->off,FMT) = wfmt;
+	OREG32(afg->codec->ctrlr,s->off,BDPL) = s->bdl_pa;
+	OREG32(afg->codec->ctrlr,s->off,BDPU) = 0;
+	OREG16(afg->codec->ctrlr,s->off,LVI) = s->num_buffers -1;
+	OREG32(afg->codec->ctrlr,s->off,CBL) = s->num_channels * s->num_buffers;
+	OREG8(afg->codec->ctrlr,s->off,CTL0) = CTL0_IOCE | CTL0_FEIE | CTL0_DEIE;
+	OREG8(afg->codec->ctrlr,s->off,CTL2) = s->id << 4;
 
-	verb[0] = MAKE_VERB(codec->addr, s->io_wid, VID_SET_CONVFORMAT, wfmt);
-	verb[1] = MAKE_VERB(codec->addr, s->io_wid, VID_SET_CVTSTRCHN, s->id << 4);
-	rc = hda_send_verbs(codec, verb, response, 2);
+	verb[0] = MAKE_VERB(afg->codec->addr, s->io_wid, VID_SET_CONVFORMAT, wfmt);
+	verb[1] = MAKE_VERB(afg->codec->addr, s->io_wid, VID_SET_CVTSTRCHN, s->id << 4);
+	rc = hda_send_verbs(afg->codec, verb, response, 2);
 
 	return rc;	
 }

@@ -24,13 +24,15 @@
 /* values for the class_sub field for class_base = 0x04 (multimedia device) */
 #define PCI_hd_audio	3
 
-#define MAXWORK				16
+#define HDA_MAXAFGS			15
 #define HDA_MAXCODECS		15
 #define HDA_MAXSTREAMS		16
 #define MAX_CODEC_RESPONSES	10
 #define MAXINPUTS			32
 
 typedef struct hda_controller_s hda_controller;
+typedef struct hda_codec_s hda_codec;
+typedef struct hda_afg_s hda_afg;
 
 #define STRMAXBUF	10
 #define STRMINBUF	2
@@ -39,6 +41,12 @@ enum {
 	STRM_PLAYBACK,
 	STRM_RECORD
 };
+
+/* hda_stream_info
+ *
+ * This structure describes a single stream of audio data,
+ * which is can have multiple channels (for stereo or better).
+ */
 
 typedef struct hda_stream_info_s {
 	uint32		id;						/* HDA controller stream # */
@@ -68,27 +76,29 @@ typedef struct hda_stream_info_s {
 	uint32		bdl_pa;					/* BDL physical address */
 } hda_stream;
 
-typedef struct hda_codec_s {
-	uint16	vendor_id;
-	uint16	product_id;
-	uint8	hda_rev;
-	uint16	rev_stepping;		
-	uint8	addr;
+/* hda_afg
+ *
+ * This structure describes a single Audio Function Group. An afg
+ * is a group of audio widgets which can be used to configure multiple
+ * streams of audio either from the HDA Link to an output device (= playback)
+ * or from an input device to the HDA link (= recording).
+ */
 
-	sem_id	response_sem;
-	uint32	responses[MAX_CODEC_RESPONSES];
-	uint32	response_count;
+struct hda_afg_s {
+	hda_codec*		codec;
 
 	/* Multi Audio API data */
-	hda_stream*	playback_stream;
-	hda_stream*	record_stream;
+	hda_stream*		playback_stream;
+	hda_stream*		record_stream;
+
 	
-	/* Function Group Data */
-	uint32	afg_nid;
-	uint32	afg_wid_start, afg_wid_count;
-	uint32	afg_deffmts;
-	uint32	afg_defrates;
-	uint32	afg_defpm;
+	uint32				root_nid,
+						wid_start,
+						wid_count;
+						
+	uint32				deffmts,
+						defrates,
+						defpm;
 
 	struct {
 		uint32			num_inputs;
@@ -116,10 +126,43 @@ typedef struct hda_codec_s {
 				pin_dev_type	device;
 			} pin;
 		} d;
-	} *afg_widgets;
+	} *widgets;
+};
 
+/* hda_codec
+ *
+ * This structure describes a single codec module in the
+ * HDA compliant device. This is a discrete component, which
+ * can contain both Audio Function Groups, Modem Function Groups,
+ * and other customized (vendor specific) Function Groups.
+ *
+ * NOTE: Atm, only Audio Function Groups are supported.
+ */
+
+struct hda_codec_s {
+	uint16	vendor_id;
+	uint16	product_id;
+	uint8	hda_rev;
+	uint16	rev_stepping;		
+	uint8	addr;
+
+	sem_id	response_sem;
+	uint32	responses[MAX_CODEC_RESPONSES];
+	uint32	response_count;
+
+	hda_afg*	afgs[HDA_MAXAFGS];
+	uint32		num_afgs;
+	
 	struct hda_controller_s* ctrlr;
-} hda_codec;
+};
+
+/* hda_controller
+ *
+ * This structure describes a single HDA compliant 
+ * controller. It contains a list of available streams
+ * for use by the codecs contained, and the messaging queue
+ * (verb/response) buffers for communication.
+ */
 
 struct hda_controller_s {
 	pci_info	pcii;
@@ -149,21 +192,27 @@ struct hda_controller_s {
 	hda_stream*		streams[HDA_MAXSTREAMS];
 };
 
+/* driver.c */
 extern device_hooks driver_hooks;
-
 extern pci_module_info* pci;
-
 extern hda_controller cards[MAXCARDS];
 extern uint32 num_cards;
 
+/* hda_codec.c */
+hda_codec* hda_codec_new(hda_controller* ctrlr, uint32 cad);
+
+/* hda_multi_audio.c */
+status_t multi_audio_control(void* cookie, uint32 op, void* arg, size_t len);
+
+/* hda_controller.c: Basic controller support */
 status_t hda_hw_init(hda_controller* ctrlr);
 void hda_hw_stop(hda_controller* ctrlr);
 void hda_hw_uninit(hda_controller* ctrlr);
-hda_codec* hda_codec_new(hda_controller* ctrlr, uint32 cad);
 status_t hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses, int count);
-status_t multi_audio_control(void* cookie, uint32 op, void* arg, size_t len);
+
+/* hda_controller.c: Stream support */
 hda_stream* hda_stream_alloc(hda_controller* ctrlr, int type);
-status_t hda_stream_setup_buffers(hda_codec* codec, hda_stream* s, const char* desc);
+status_t hda_stream_setup_buffers(hda_afg* afg, hda_stream* s, const char* desc);
 status_t hda_stream_start(hda_controller* ctrlr, hda_stream* s);
 status_t hda_stream_stop(hda_controller* ctrlr, hda_stream* s);
 status_t hda_stream_check_intr(hda_controller* ctrlr, hda_stream* s);
