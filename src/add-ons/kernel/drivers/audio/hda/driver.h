@@ -200,6 +200,7 @@ extern uint32 num_cards;
 
 /* hda_codec.c */
 hda_codec* hda_codec_new(hda_controller* ctrlr, uint32 cad);
+void hda_codec_delete(hda_codec*);
 
 /* hda_multi_audio.c */
 status_t multi_audio_control(void* cookie, uint32 op, void* arg, size_t len);
@@ -211,7 +212,8 @@ void hda_hw_uninit(hda_controller* ctrlr);
 status_t hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses, int count);
 
 /* hda_controller.c: Stream support */
-hda_stream* hda_stream_alloc(hda_controller* ctrlr, int type);
+hda_stream* hda_stream_new(hda_controller* ctrlr, int type);
+void hda_stream_delete(hda_stream* s);
 status_t hda_stream_setup_buffers(hda_afg* afg, hda_stream* s, const char* desc);
 status_t hda_stream_start(hda_controller* ctrlr, hda_stream* s);
 status_t hda_stream_stop(hda_controller* ctrlr, hda_stream* s);

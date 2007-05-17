@@ -300,6 +300,21 @@ hda_codec_afg_find_dac_path(hda_afg* afg, uint32 wid, uint32 depth)
 	return 0;
 }
 
+static void
+hda_afg_delete(hda_afg* afg)
+{
+	if (afg != NULL) {
+		if (afg->playback_stream != NULL)
+			hda_stream_delete(afg->playback_stream);
+
+		if (afg->record_stream != NULL)
+			hda_stream_delete(afg->record_stream);
+
+		free(afg->widgets);
+		free(afg);
+	}
+}
+
 static status_t
 hda_codec_afg_new(hda_codec* codec, uint32 afg_nid)
 {
@@ -357,8 +372,8 @@ hda_codec_afg_new(hda_codec* codec, uint32 afg_nid)
 			corb_t verb;
 
 			/* Setup playback/record streams for Multi Audio API */
-			afg->playback_stream = hda_stream_alloc(afg->codec->ctrlr, STRM_PLAYBACK);
-			afg->record_stream = hda_stream_alloc(afg->codec->ctrlr, STRM_RECORD);
+			afg->playback_stream = hda_stream_new(afg->codec->ctrlr, STRM_PLAYBACK);
+			afg->record_stream = hda_stream_new(afg->codec->ctrlr, STRM_RECORD);
 
 			afg->playback_stream->pin_wid = idx + afg->wid_start;
 			afg->playback_stream->io_wid = output_wid;
@@ -387,6 +402,23 @@ free_afg:
 
 done:
 	return rc;
+}
+
+void
+hda_codec_delete(hda_codec* codec)
+{
+	if (codec != NULL) {
+		uint32 idx;
+		
+		delete_sem(codec->response_sem);
+
+		for (idx=0; idx < codec->num_afgs; idx++) {
+			hda_afg_delete(codec->afgs[idx]);
+			codec->afgs[idx] = NULL;
+		}
+		
+		free(codec);
+	}
 }
 
 hda_codec*

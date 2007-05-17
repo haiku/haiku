@@ -4,8 +4,23 @@
 
 #include "driver.h"
 
+void
+hda_stream_delete(hda_stream* s)
+{
+	if (s->buffer_ready_sem >= B_OK)
+		delete_sem(s->buffer_ready_sem);
+	
+	if (s->buffer_area >= B_OK)
+		delete_area(s->buffer_area);
+	
+	if (s->bdl_area >= B_OK)
+		delete_area(s->bdl_area);
+
+	free(s);
+}
+
 hda_stream*
-hda_stream_alloc(hda_controller* ctrlr, int type)
+hda_stream_new(hda_controller* ctrlr, int type)
 {
 	hda_stream* s = calloc(1, sizeof(hda_stream));
 	if (s != NULL) {
@@ -45,7 +60,7 @@ hda_stream_start(hda_controller* ctrlr, hda_stream* s)
 {
 	OREG8(ctrlr,s->off,CTL0) |= CTL0_RUN;
 
-	while(!(OREG8(ctrlr,s->off,CTL0) & CTL0_RUN))
+	while (!(OREG8(ctrlr,s->off,CTL0) & CTL0_RUN))
 		snooze(1);
 
 	s->running = true;
@@ -84,7 +99,7 @@ hda_stream_stop(hda_controller* ctrlr, hda_stream* s)
 {
 	OREG8(ctrlr,s->off,CTL0) &= ~CTL0_RUN;
 
-	while(OREG8(ctrlr,s->off,CTL0) & CTL0_RUN)
+	while (OREG8(ctrlr,s->off,CTL0) & CTL0_RUN)
 		snooze(1);
 
 	s->running = false;
@@ -262,7 +277,7 @@ hda_interrupt_handler(hda_controller* ctrlr)
 
 				if (rirbsts & RIRBSTS_RINTFL) {
 					uint16 rirbwp = REG16(ctrlr,RIRBWP);
-					while(ctrlr->rirbrp <= rirbwp) {
+					while (ctrlr->rirbrp <= rirbwp) {
 						uint32 resp_ex = ctrlr->rirb[ctrlr->rirbrp].resp_ex;
 						uint32 cad = resp_ex & HDA_MAXCODECS;
 						hda_codec* codec = ctrlr->codecs[cad];
@@ -326,7 +341,7 @@ hda_hw_start(hda_controller* ctrlr)
 	
 	do {
 		snooze(100);
-	} while(--timeout && !(REG32(ctrlr,GCTL) & GCTL_CRST));	
+	} while (--timeout && !(REG32(ctrlr,GCTL) & GCTL_CRST));	
 	
 	return timeout ? B_OK : B_TIMED_OUT;
 }
@@ -383,7 +398,7 @@ hda_hw_corb_rirb_init(hda_controller* ctrlr)
 	
 	if ((rc=get_memory_map(ctrlr->corb, memsz, &pe, 1)) != B_OK) {
 		delete_area(ctrlr->rb_area);
-		return ctrlr->rb_area;
+		return rc;
 	}
 	
 	/* Program CORB/RIRB for these locations */
@@ -395,7 +410,7 @@ hda_hw_corb_rirb_init(hda_controller* ctrlr)
 	REG16(ctrlr,CORBRP) = CORBRP_RST;
 	do {
 		snooze(10);
-	} while( !(REG16(ctrlr,CORBRP) & CORBRP_RST) );
+	} while ( !(REG16(ctrlr,CORBRP) & CORBRP_RST) );
 	REG16(ctrlr,CORBRP) = 0;
 	
 	/* Reset RIRB write pointer */
@@ -522,6 +537,8 @@ void
 hda_hw_uninit(hda_controller* ctrlr)
 {
 	if (ctrlr != NULL) {
+		uint32 idx;
+
 		/* Stop all audio streams */
 		hda_hw_stop(ctrlr);
 		
@@ -535,6 +552,14 @@ hda_hw_uninit(hda_controller* ctrlr)
 		remove_io_interrupt_handler(ctrlr->irq,
 			(interrupt_handler)hda_interrupt_handler,
 			ctrlr);
+
+		/* Delete corb/rirb area */
+		if (ctrlr->rb_area >= 0) {
+			delete_area(ctrlr->rb_area);
+			ctrlr->rb_area = B_ERROR;
+			ctrlr->corb = NULL;
+			ctrlr->rirb = NULL;
+		}
 	
 		/* Unmap registers */
 		if (ctrlr->regs_area >= 0) {
@@ -542,5 +567,10 @@ hda_hw_uninit(hda_controller* ctrlr)
 			ctrlr->regs_area = B_ERROR;
 			ctrlr->regs = NULL;
 		}
+		
+		/* Now delete all codecs */
+		for (idx=0; idx < HDA_MAXCODECS; idx++)
+			if (ctrlr->codecs[idx] != NULL)
+				hda_codec_delete(ctrlr->codecs[idx]);
 	}
 }
