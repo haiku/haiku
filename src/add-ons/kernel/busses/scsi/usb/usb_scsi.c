@@ -19,6 +19,8 @@
 #include <malloc.h>
 #include <strings.h>
 #include <stdio.h>
+#include <device_manager.h>
+#include <bus/SCSI.h>
 #include "device_info.h" 
 #include "settings.h" 
 #include "transform_procs.h" 
@@ -31,6 +33,8 @@
 #include "fake_device.h" 
 #include "sg_buffer.h" 
 
+
+#if 0
 status_t device_added(const usb_device device, void **cookie);
 											
 status_t device_removed(void *cookie);
@@ -52,7 +56,7 @@ static long sim_init();
 static long path_id		= -1;
 static int32 load_count	= 0;
  
-static char sim_vendor_name[]	= "S.Zharski";	/* who wrote this driver */
+static char sim_vendor_name[]	= "Haiku";		/* who wrote this driver */
 static char hba_vendor_name[]	= "USB";		/* who made the hardware */
 static char controller_family[]	= "USB SCSI";	/* what family of products */
  
@@ -893,6 +897,8 @@ static long sim_action(CCB_HEADER *ccbh)
 	}
 	return status;
 }
+#endif
+
 /**
 	\fn:std_ops
 	\param op: operation to be performed on this module
@@ -906,15 +912,16 @@ static long sim_action(CCB_HEADER *ccbh)
 */
 static status_t std_ops(int32 op, ...)
 {
-	int i;
-	status_t status = B_ERROR;
-	CAM_SIM_ENTRY entry;
+	//int i;
+	status_t status = B_OK;//B_ERROR;
+	//CAM_SIM_ENTRY entry;
 	switch(op) {
-	case B_MODULE_INIT:					
-		if(0 == atomic_add(&load_count, 1)){
-			thread_info tinfo = {0};
+	case B_MODULE_INIT:
+		TRACE_ALWAYS("std_ops: B_MODULE_INIT called!\n");
+	/*	if(0 == atomic_add(&load_count, 1)){
+			thread_info tinfo = {0}; */
 			load_module_settings();		 
-			get_thread_info(find_thread(0), &tinfo);
+/*			get_thread_info(find_thread(0), &tinfo);
 			if(!b_ignore_sysinit2 || (0 != strcmp(tinfo.name, "sysinit2"))){
 				create_log();							
 				if(get_module(B_USB_MODULE_NAME, (module_info **)&usb) == B_OK){ 
@@ -941,10 +948,11 @@ static status_t std_ops(int32 op, ...)
 			}
 		} else {
 			atomic_add(&load_count, -1);
-		}	
+		}*/	
 		break;
 	case B_MODULE_UNINIT:
-		if(1 == atomic_add(&load_count, -1)){
+		TRACE_ALWAYS("std_ops: B_MODULE_UNINIT called!\n");
+	/*	if(1 == atomic_add(&load_count, -1)){
 			(*usb->uninstall_notify)(MODULE_NAME);
 			status = B_OK;
 			if(path_id != -1){
@@ -956,23 +964,253 @@ static status_t std_ops(int32 op, ...)
 			put_module(B_CAM_FOR_SIM_MODULE_NAME); 
 		} else {
 			atomic_add(&load_count, 1);
-		}
+		}*/
 		break;
 	}
 	return status;
 }
 
 /**
+ * \fn: 
+ * \param :
+ * \return:
+ *  TODO
+ */
+static float 
+supports_device(device_node_handle parent, bool *_noConnection)
+{
+	TRACE_ALWAYS("supports_device\n");
+	return 0.f;
+}
+
+/**
+ * \fn: 
+ * \param :
+ * \return:
+ *  TODO
+ */
+static status_t
+register_device(device_node_handle parent)
+{
+	TRACE_ALWAYS("register_device\n");
+	return B_OK;
+}
+
+/**
+ * \fn: 
+ * \param :
+ * \return:
+ *  TODO
+ */
+static status_t
+init_module(device_node_handle node, void *user_cookie, void **_cookie)
+{
+	TRACE_ALWAYS("inti_driver\n");
+	return B_OK;
+}
+
+/**
+ * \fn: 
+ * \param :
+ * \return:
+ *  TODO
+ */
+static status_t
+uninit_module(void *cookie)
+{
+	TRACE_ALWAYS("uninit_driver\n");
+	return B_OK;
+}
+
+/**
+ * \fn: 
+ * \param :
+ *  TODO
+ */
+static void
+device_removed(device_node_handle node, void *cookie)
+{
+	TRACE_ALWAYS("device_removed\n");
+}
+
+/**
+ * \fn: 
+ * \param :
+ *  TODO
+ */
+static void
+device_cleanup(device_node_handle node)
+{
+	TRACE_ALWAYS("device_cleanup\n");
+}
+
+/**
+ * \fn: 
+ * \param :
+ *  TODO
+ */
+static void
+get_supported_paths(const char ***_busses, const char ***_devices)
+{
+	TRACE_ALWAYS("get_supported_path\n");
+}
+
+/**
+ * \fn: 
+ * \param :
+ *  TODO
+ */
+static void
+scsi_io( scsi_sim_cookie cookie, scsi_ccb *ccb )
+{
+	TRACE_ALWAYS("scsi_io\n");
+}
+
+/**
+ * \fn: 
+ * \param :
+ * \return:
+ *  TODO
+ */
+static uchar
+abort( scsi_sim_cookie cookie, scsi_ccb *ccb_to_abort )
+{
+	TRACE_ALWAYS("scsi_sim\n");
+	return 0;
+}
+
+/**
+ * \fn: 
+ * \param :
+ * \return:
+ *  TODO
+ */
+static uchar
+reset_device( scsi_sim_cookie cookie, uchar target_id, uchar target_lun )
+{
+	TRACE_ALWAYS("supports_device\n");
+	return 0;
+}
+
+/**
+ * \fn: 
+ * \param :
+ * \return:
+ *  TODO
+ */
+static uchar
+term_io( scsi_sim_cookie cookie, scsi_ccb *ccb_to_terminate )
+{
+	TRACE_ALWAYS("term_io\n");
+	return 0;
+}
+
+/**
+ * \fn: 
+ * \param :
+ * \return:
+ *  TODO
+ */
+static uchar
+path_inquiry( scsi_sim_cookie cookie, scsi_path_inquiry *inquiry_data )
+{
+	TRACE_ALWAYS("path_inquiry\n");
+	return 0;
+}
+
+/**
+ * \fn: 
+ * \param :
+ * \return:
+ *  TODO
+ */
+static uchar
+scan_bus( scsi_sim_cookie cookie )
+{
+	TRACE_ALWAYS("scan_bus\n");
+	return 0;
+}
+
+/**
+ * \fn: 
+ * \param :
+ * \return:
+ *  TODO
+ */
+static uchar
+reset_bus( scsi_sim_cookie cookie )
+{
+	TRACE_ALWAYS("reset_bus\n");
+	return 0;
+}
+
+/**
+ * \fn: 
+ * \param :
+ *  TODO
+ */
+static void
+get_restrictions(scsi_sim_cookie cookie, uchar target_id, bool *is_atapi, bool *no_autosense, uint32 *max_blocks )
+{
+	TRACE_ALWAYS("get_restrictions\n");
+}
+
+/**
+ * \fn: 
+ * \param :
+ * \return:
+ *  TODO
+ */
+static status_t
+module_ioctl(scsi_sim_cookie cookie, uint8 targetID, uint32 op, void *buffer, size_t length)
+{
+	TRACE_ALWAYS("ioctl\n");
+	return B_ERROR;
+}
+
+
+/**
 	Declare our module_info so we can be loaded as a kernel module
 */
-static sim_module_info sim_usb_module = {
-	{ "busses/scsi/usb/v1", 0, &std_ops }
+static scsi_sim_interface usb_scsi_sim = {
+	{	//driver_module_info 
+		{ // module_info
+			"busses/scsi/usb/device_v1", // is device_v1 really required? or v1 is enough?
+			0, 
+			&std_ops
+		},
+		
+		supports_device,
+		register_device,
+
+		init_module,	// init_driver, 
+		uninit_module,	// uninit_driver,
+		
+		device_removed,
+		device_cleanup,
+
+		get_supported_paths,
+	},
+	
+	scsi_io,
+	abort,
+	reset_device,
+	term_io,
+	
+	path_inquiry,
+	scan_bus,
+	reset_bus,
+	
+	get_restrictions,
+	
+	module_ioctl //ioctl	
 };
+
 /**
 	Export module_info-s list 
 */
 _EXPORT module_info *modules[] = {
-	(module_info *) &sim_usb_module,
+	(module_info *) &usb_scsi_sim,
 	NULL
 };
 
