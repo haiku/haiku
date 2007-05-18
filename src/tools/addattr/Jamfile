@@ -1,0 +1,10 @@
+SubDir HAIKU_TOP src tools addattr ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin addattr ] ;
+
+USES_BE_API on <build>addattr = true ;
+
+BuildPlatformMain <build>addattr
+	: main.cpp addAttr.cpp
+	: $(HOST_LIBBE) $(HOST_LIBSUPC++)
+;
