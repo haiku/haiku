@@ -30,8 +30,6 @@ rule AddFileDataAttribute target : attrName : attrType : dataFile
 	Depends $(target) : <build>addattr $(attrMetaFile) $(dataFile) ;
 	AddFileDataAttribute1 $(target)
 		: <build>addattr $(attrMetaFile) $(dataFile) ;
-
-	RmTemps $(target) : $(attrMetaFile) ;
 }
 
 actions CreateAttributeMetaFile
