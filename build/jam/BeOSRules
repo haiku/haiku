@@ -41,6 +41,7 @@ actions CreateAttributeMetaFile
 
 actions AddFileDataAttribute1
 {
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 	$(2[1]) -f $(2[3]) `cat $(2[2])` $(1)
 }
 
