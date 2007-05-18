@@ -17,11 +17,19 @@ if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd {
 	DEFINES += _USER_MODE ;
 }
 
-# write the stage 1 boot loader into the makebootable resources
-AddFileDataResource <build>makebootable : RAWT:666:BootCode : stage1.bin ;
+# Write the stage 1 boot loader into the makebootable resources. On Darwin
+# resources don't seem to work; there we use an attribute instead.
+if $(HOST_PLATFORM) != darwin {
+	AddFileDataResource <build>makebootable : RAWT:666:BootCode : stage1.bin ;
+}
 
 BuildPlatformMain <build>makebootable :
 	makebootable.cpp
 	$(hostPlatformSources)
 	: $(HOST_LIBBE) $(HOST_LIBSTDC++) $(HOST_LIBSUPC++)
 ;
+
+# on Darwin write the boot loader code into an attribute
+if $(HOST_PLATFORM) = darwin {
+	AddFileDataAttribute <build>makebootable : BootCode : raw : stage1.bin ;
+}

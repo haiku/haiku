@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2007, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
 
@@ -64,6 +64,7 @@ const char *kUsage =
 "  -safe         - Compatibility option. Fail when specified.\n"
 ;
 
+
 // print_usage
 static void
 print_usage(bool error)
@@ -85,6 +86,7 @@ print_usage(bool error)
 		commandName);
 }
 
+
 // print_usage_and_exit
 static void
 print_usage_and_exit(bool error)
@@ -92,6 +94,62 @@ print_usage_and_exit(bool error)
 	print_usage(error);
 	exit(error ? 1 : 0);
 }
+
+
+// read_boot_code_data
+static uint8 *
+read_boot_code_data(const char* programPath)
+{
+	// open our executable
+	BFile executableFile;
+	status_t error = executableFile.SetTo(programPath, B_READ_ONLY);
+	if (error != B_OK) {
+		fprintf(stderr, "Error: Failed to open my executable file (\"%s\": "
+			"%s\n", programPath, strerror(error));
+		exit(1);
+	}
+
+	uint8 *bootCodeData = new uint8[kBootCodeSize];
+
+	// open our resources
+	BResources resources;
+	error = resources.SetTo(&executableFile);
+	const void *resourceData = NULL;
+	if (error == B_OK) {
+		// read the boot block from the resources
+		size_t resourceSize;
+		resourceData = resources.LoadResource(B_RAW_TYPE, 666, &resourceSize);
+
+		if (resourceData && resourceSize != (size_t)kBootCodeSize) {
+			resourceData = NULL;
+			printf("Warning: Something is fishy with my resources! The boot "
+				"code doesn't have the correct size. Trying the attribute "
+				"instead ...\n");
+		}
+	}
+
+	if (resourceData) {
+		// found boot data in the resources
+		memcpy(bootCodeData, resourceData, kBootCodeSize);
+	} else {
+		// no boot data in the resources; try the attribute
+		ssize_t bytesRead = executableFile.ReadAttr("BootCode", B_RAW_TYPE,
+			0, bootCodeData, kBootCodeSize);
+		if (bytesRead < 0) {
+			fprintf(stderr, "Error: Failed to read boot code from resources "
+				"or attribute.");
+			exit(1);
+		}
+		if (bytesRead != kBootCodeSize) {
+			fprintf(stderr, "Error: Failed to read boot code from resources, "
+				"and the boot code in the attribute has the wrong size!");
+			exit(1);
+		}
+	}
+
+	return bootCodeData;
+}
+
 
 // write_boot_code_part
 static void
@@ -110,6 +168,7 @@ write_boot_code_part(const char *fileName, int fd, const uint8 *bootCodeData,
 		}
 	}
 }
+
 
 // main
 int
@@ -155,46 +214,15 @@ main(int argc, const char *const *argv)
 	if (fileCount == 0)
 		print_usage_and_exit(true);
 
-	// open our executable
-	BFile resourcesFile;
-	status_t error = resourcesFile.SetTo(argv[0], B_READ_ONLY);
-	if (error != B_OK) {
-		fprintf(stderr, "Error: Failed to open my resources: %s\n",
-			strerror(error));
+	// read the boot code
+	uint8 *bootCodeData = read_boot_code_data(argv[0]);
+	if (!bootCodeData) {
+		fprintf(stderr, "Error: Failed to read ");
 		exit(1);
 	}
-
-	// open our resources
-	BResources resources;
-	error = resources.SetTo(&resourcesFile);
-	if (error != B_OK) {
-		fprintf(stderr, "Error: Failed to read my resources: %s\n",
-			strerror(error));
-		exit(1);
-	}
-
-	// read the boot block from the resources
-	size_t resourceSize;
-	const void *resourceData = resources.LoadResource(B_RAW_TYPE, 666,
-		&resourceSize);
-	if (!resourceData) {
-		fprintf(stderr,
-			"Error: Failed to read the boot block from my resources!\n");
-		exit(1);
-	}
-
-	if (resourceSize != (size_t)kBootCodeSize) {
-		fprintf(stderr,
-			"Error: Something is fishy with my resources! The boot code "
-			"doesn't have the correct size.\n");
-		exit(1);
-	}
-
-	// clone the boot code data, so that we can modify it
-	uint8 *bootCodeData = new uint8[kBootCodeSize];
-	memcpy(bootCodeData, resourceData, kBootCodeSize);
 
 	// iterate through the files and make them bootable
+	status_t error;
 	for (int i = 0; i < fileCount; i++) {
 		const char *fileName = files[i];
 		BEntry entry;
