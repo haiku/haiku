@@ -62,7 +62,7 @@ PreprocessSyscalls $(syscallsHeaderPP) : $(syscallsHeader) ;
 
 BuildPlatformMain gensyscallinfos
 	: gensyscallinfos.cpp
-	: $(HOST_LIBSTDC++)
+	: $(HOST_LIBSTDC++) $(HOST_LIBSUPC++)
 ;
 
 
@@ -88,7 +88,7 @@ SubDirHdrs [ FDirName $(SUBDIR) arch $(TARGET_ARCH) ] ;
 # build gensyscalls
 
 BuildPlatformMain gensyscalls : gensyscalls.cpp $(syscallInfos) ;
-LinkAgainst gensyscalls : $(HOST_LIBSTDC++) ;
+LinkAgainst gensyscalls : $(HOST_LIBSTDC++) $(HOST_LIBSUPC++) ;
 
 # Explicitly tell jam that gensyscalls.cpp includes the generated header.
 Includes [ FGristFiles gensyscalls.cpp ] : $(syscallsHeaderPP) ;

@@ -457,8 +457,14 @@ rule BuildPlatformSharedLibrary
 	local libs = $(3) ;
 	
 	BuildPlatformMain $(target) : $(sources) : $(libs) ;
-	LINKFLAGS on $(target) = [ on $(target) return $(LINKFLAGS) ]
-		-shared -Xlinker -soname=\"$(target:G=)\" ;
+
+	if $(HOST_PLATFORM) = darwin {
+		LINKFLAGS on $(target) = [ on $(target) return $(LINKFLAGS) ]
+			-dynamic -dynamiclib -Xlinker -flat_namespace ;
+	} else {
+		LINKFLAGS on $(target) = [ on $(target) return $(LINKFLAGS) ]
+			-shared -Xlinker -soname=\"$(target:G=)\" ;
+	}
 }
 
 rule BuildPlatformMergeObject

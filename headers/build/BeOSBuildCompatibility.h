@@ -16,7 +16,7 @@ extern "C" {
 extern size_t   strlcpy(char *dest, const char *source, size_t length);
 extern size_t	strlcat(char *dest, const char *source, size_t length);
 
-#ifdef HAIKU_HOST_PLATFORM_FREEBSD
+#if defined(HAIKU_HOST_PLATFORM_FREEBSD) || defined(HAIKU_HOST_PLATFORM_DARWIN)
 extern size_t	strnlen(const char *string, size_t length);
 #endif
 

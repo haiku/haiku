@@ -21,7 +21,7 @@ BuildPlatformMain <build>rc :
 	strlcat.c
 ;
 LinkAgainst <build>rc
-	: <build>librdef.a $(HOST_LIBSTDC++) $(HOST_LIBBE) ;
+	: <build>librdef.a $(HOST_LIBSTDC++) $(HOST_LIBBE) $(HOST_LIBSUPC++) ;
 
 SEARCH on [ FGristFiles
 		strlcat.c strlcpy.c

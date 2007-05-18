@@ -23,5 +23,5 @@ AddFileDataResource <build>makebootable : RAWT:666:BootCode : stage1.bin ;
 BuildPlatformMain <build>makebootable :
 	makebootable.cpp
 	$(hostPlatformSources)
-	: $(HOST_LIBBE)
+	: $(HOST_LIBBE) $(HOST_LIBSTDC++) $(HOST_LIBSUPC++)
 ;

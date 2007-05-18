@@ -56,7 +56,7 @@ if [ $isImage ]; then
 	echo
 	if [ ! $updateOnly ]; then
 		echo "Creating image ..."
-		dd if=/dev/zero of=$imagePath bs=1M count=$imageSize
+		dd if=/dev/zero of=$imagePath bs=1048576 count=$imageSize
 		$bfsShell --initialize $imagePath Haiku
 		$makebootable $imagePath
 	fi

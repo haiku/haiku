@@ -335,9 +335,11 @@ HOST_AR				= $(HOST_AR[1]) ;
 HOST_UNARFLAGS		?= x ;
 
 # check the host platform compatibility
-SetPlatformCompatibilityFlagVariables HOST_PLATFORM : HOST : host : linux freebsd ;
+SetPlatformCompatibilityFlagVariables HOST_PLATFORM : HOST : host
+	: linux freebsd darwin ;
 
-if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd {
+if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd
+	|| $(HOST_PLATFORM) = darwin {
 	# don't use lex: otherwise rc will not work correctly
 	if $(LEX) = lex {
 		LEX = flex ;
@@ -404,6 +406,7 @@ switch $(HOST_PLATFORM) {
 	case haiku	: HOST_DEBUG_FLAGS ?= -ggdb ;
 	case linux	: HOST_DEBUG_FLAGS ?= -ggdb ;
 	case freebsd    : HOST_DEBUG_FLAGS ?= -ggdb ;
+	case darwin : HOST_DEBUG_FLAGS ?= -ggdb ;
 	case *		: HOST_DEBUG_FLAGS ?= -g ;
 }
 
@@ -465,10 +468,17 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 		HOST_LIBSUPC++ = supc++ ;
 	}
 
+	if $(HOST_PLATFORM) = darwin {
+		HOST_LIBSUPC++ = gcc_s.1 ;
+	}
+
 	# Unlike glibc FreeBSD's libc doesn't have built-in regex support.
 	if $(HOST_PLATFORM) = freebsd {
 		HOST_LIBROOT += /usr/lib/libgnuregex.so ;
+	} else if $(HOST_PLATFORM) = darwin {
+		HOST_LIBROOT += /opt/local/lib/libgnuregex.dylib ;
 	}
+  
 
 	# The BeOS compilers define __INTEL__ respectively __POWERPC__. On the
 	# build platform we need to make sure, this is also defined.
@@ -635,6 +645,7 @@ switch $(TARGET_PLATFORM) {
 	case haiku		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_HAIKU ;
 	case linux		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_LINUX ;
 	case freebsd	: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_FREEBSD ;
+	case darwin		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_DARWIN ;
 	case libbe_test	: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_LIBBE_TEST ;
 }
 
@@ -646,6 +657,7 @@ switch $(HOST_PLATFORM) {
 	case haiku		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_HAIKU ;
 	case linux		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_LINUX ;
 	case freebsd	: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_FREEBSD ;
+	case darwin		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_DARWIN ;
 }
 
 

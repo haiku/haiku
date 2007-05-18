@@ -272,6 +272,7 @@ case "${platform}" in
 			;;
 	Linux)	buildPlatform=linux ;;
 	FreeBSD) buildPlatform=freebsd ;;
+	Darwin)	buildPlatform=darwin ;;
 	*)		echo Unsupported platform: ${platform}
 			exit 1 ;;
 esac

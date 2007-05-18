@@ -22,7 +22,7 @@ USES_BE_API on $(tools) = true ;
 BuildPlatformMain <build>catattr : catattr.cpp : $(HOST_LIBBE) ;
 
 BuildPlatformMain <build>copyattr : copyattr.cpp
-	: $(HOST_LIBBE) $(HOST_LIBSTDC++) ;
+	: $(HOST_LIBBE) $(HOST_LIBSTDC++) $(HOST_LIBSUPC++) ;
 
 BuildPlatformMain <build>listattr : listattr.cpp : $(HOST_LIBBE) ;
 
@@ -35,7 +35,7 @@ BuildPlatformMain <build>mimeset :
 	database_support.cpp
 	UpdateMimeInfoThread.cpp
 	MimeUpdateThread.cpp
-	: $(HOST_LIBBE)
+	: $(HOST_LIBBE) $(HOST_LIBSTDC++) $(HOST_LIBSUPC++)
 ;
 
 BuildPlatformMain <build>mkindex : mkindex.cpp : $(HOST_LIBBE) ;
@@ -43,13 +43,16 @@ BuildPlatformMain <build>mkindex : mkindex.cpp : $(HOST_LIBBE) ;
 BuildPlatformMain <build>rmattr : rmattr.cpp : $(HOST_LIBBE) ;
 
 BuildPlatformMain <build>set_haiku_revision : set_haiku_revision.cpp
-	: $(HOST_LIBSTDC++) ;
+	: $(HOST_LIBSTDC++) $(HOST_LIBSUPC++) ;
 
-BuildPlatformMain <build>settype : settype.cpp : $(HOST_LIBBE) ;
+BuildPlatformMain <build>settype : settype.cpp : $(HOST_LIBBE)
+	$(HOST_LIBSTDC++) $(HOST_LIBSUPC++) ;
 
-BuildPlatformMain <build>setversion : setversion.cpp : $(HOST_LIBBE) ;
+BuildPlatformMain <build>setversion : setversion.cpp : $(HOST_LIBBE)
+	$(HOST_LIBSTDC++) $(HOST_LIBSUPC++) ;
 
-BuildPlatformMain <build>xres : xres.cpp : $(HOST_LIBBE) $(HOST_LIBSTDC++) ;
+BuildPlatformMain <build>xres : xres.cpp : $(HOST_LIBBE) $(HOST_LIBSTDC++)
+	$(HOST_LIBSUPC++) ;
 
 SEARCH on [ FGristFiles
 		Mime.cpp
