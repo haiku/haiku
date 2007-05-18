@@ -1,5 +1,48 @@
 # BeOS specific rules
 
+rule AddFileDataAttribute target : attrName : attrType : dataFile
+{
+	# AddFileAttribute <target> : <attrName> : <attrType> : <dataFile> ;
+	# Adds a single attribute to a file, retrieving the attribute data from
+	# a separate file.
+	# <target>: The file to which the attribute shall be added.
+	# <attrName>: The name of the attribute.
+	# <attrType>: Attribute type as supported by addattr (string, int, etc.)
+	# <dataFile>: The data to be written to the attribute will be read from
+	#             that file.
+	#             Note that this is supposed to be a build target, not a path
+	#             name - if you need to add a data file in a different path,
+	#			  you have to locate it first.
+	#
+
+	# We need to create a temporary file in which we store the attribute name
+	# and type. Otherwise we wouldn't have these data available in the
+	# addattr actions.
+	local id = [ NextID ] ;
+	local attrMetaFile
+		= [ FGristFiles $(target:G=)-attr-$(attrName)-$(attrType)-$(id) ] ;
+
+	ATTRIBUTE_NAME on $(attrMetaFile) = $(attrName) ;
+	ATTRIBUTE_TYPE on $(attrMetaFile) = $(attrType) ;
+	MakeLocateArch $(attrMetaFile) ;
+	CreateAttributeMetaFile $(attrMetaFile) ;
+
+	Depends $(target) : <build>addattr $(attrMetaFile) $(dataFile) ;
+	AddFileDataAttribute1 $(target)
+		: <build>addattr $(attrMetaFile) $(dataFile) ;
+
+	RmTemps $(target) : $(attrMetaFile) ;
+}
+
+actions CreateAttributeMetaFile
+{
+	echo "-t $(ATTRIBUTE_TYPE)" "$(ATTRIBUTE_NAME)" > "$(1)"
+}
+
+actions AddFileDataAttribute1
+{
+	$(2[1]) -f $(2[3]) `cat $(2[2])` $(1)
+}
 
 rule AddStringDataResource
 {
@@ -36,7 +79,6 @@ actions together AddStringDataResource1
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 	$(2[1]) -o "$(1)" $(RESOURCE_STRINGS)
 }
-
 
 rule AddFileDataResource
 {
