@@ -60,4 +60,4 @@ BuildPlatformStaticLibrary <build>fs_shell.a :
 
 BuildPlatformMain <build>fs_shell_command
 	: fs_shell_command.cpp $(fsShellCommandSources)
-	: $(HOST_LIBSUPC++) ;
+	: $(HOST_LIBSTDC++) $(HOST_LIBSUPC++) ;

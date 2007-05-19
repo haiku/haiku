@@ -19,7 +19,8 @@
 #ifdef __BEOS__
 #	include <Drivers.h>
 #else
-#	if defined(HAIKU_HOST_PLATFORM_FREEBSD)
+#	if defined(HAIKU_HOST_PLATFORM_FREEBSD) \
+		|| defined(HAIKU_HOST_PLATFORM_DARWIN)
 #		include <sys/ioctl.h>
 #	else
 		// the (POSIX) correct place of definition for ioctl()
