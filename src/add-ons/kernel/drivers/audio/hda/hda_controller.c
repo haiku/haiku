@@ -498,8 +498,11 @@ hda_hw_init(hda_controller* ctrlr)
 	for (idx=0; idx < HDA_MAXCODECS; idx++)
 		if (ctrlr->codecsts & (1 << idx))
 			hda_codec_new(ctrlr, idx);
-	
-	return B_OK;
+
+	if (ctrlr->codecs[0] != NULL)
+		return B_OK;
+	else
+		rc = ENODEV;
 
 corb_rirb_failed:
 	REG32(ctrlr,INTCTL) = 0;

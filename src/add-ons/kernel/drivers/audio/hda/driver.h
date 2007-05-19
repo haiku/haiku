@@ -105,7 +105,7 @@ struct hda_afg_s {
 
 	struct {
 		uint32			num_inputs;
-		uint32			active_input;
+		int32			active_input;
 		uint32			inputs[MAXINPUTS];
 		uint32			flags;
 
@@ -124,8 +124,8 @@ struct hda_afg_s {
 			struct {
 			} mixer;
 			struct {
-				uint32			output	: 1;
-				uint32			input	: 1;
+				uint32			output;
+				uint32			input;
 				pin_dev_type	device;
 			} pin;
 		} d;

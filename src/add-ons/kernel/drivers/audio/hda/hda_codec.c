@@ -126,7 +126,7 @@ hda_codec_parse_afg(hda_afg* afg)
 		afg->wid_start = resp[2] >> 16;
 		afg->wid_count = resp[2] & 0xFF;
 
-		afg->widgets = calloc(sizeof(*afg->widgets), afg->wid_count);
+		afg->widgets = calloc(afg->wid_count, sizeof(*afg->widgets));
 		if (afg->widgets == NULL) {
 			dprintf("ERROR: Not enough memory!\n");
 			return B_NO_MEMORY;
@@ -187,6 +187,12 @@ hda_codec_parse_afg(hda_afg* afg)
 					if (hda_send_verbs(afg->codec, verbs, resp, 1) == B_OK) {
 						afg->widgets[widx].d.pin.input = resp[0] & (1 << 5);
 						afg->widgets[widx].d.pin.output = resp[0] & (1 << 4);
+						
+						dprintf("\t%s%s\n", 
+							afg->widgets[widx].d.pin.input ? "[Input] " : "",
+							afg->widgets[widx].d.pin.input ? "[Output]" : "");
+					} else {
+						dprintf("%s: Error getting Pin Complex IO\n", __func__);
 					}
 
 					verbs[0] = MAKE_VERB(afg->codec->addr,wid,VID_GET_CFGDEFAULT,0);
@@ -260,19 +266,22 @@ hda_codec_parse_afg(hda_afg* afg)
 	return B_OK;
 }
 
+/* hda_codec_afg_find_path
+ *
+ * Find path from 'wid' to a widget of type 'wtype', returning its widget id.
+ * Returns 0 if not found.
+ */
+
 static uint32
-hda_codec_afg_find_dac_path(hda_afg* afg, uint32 wid, uint32 depth)
+hda_codec_afg_find_path(hda_afg* afg, uint32 wid, uint32 wtype, uint32 depth)
 {
 	int widx = wid - afg->wid_start;
 	int idx;
 
 	switch(afg->widgets[widx].type) {
-		case WT_AUDIO_OUTPUT:
-			return wid;
-
 		case WT_AUDIO_MIXER:
 			for (idx=0; idx < afg->widgets[widx].num_inputs; idx++) {
-				if (hda_codec_afg_find_dac_path(afg, afg->widgets[widx].inputs[idx], depth +1)) {
+				if (hda_codec_afg_find_path(afg, afg->widgets[widx].inputs[idx], wtype, depth +1)) {
 					if (afg->widgets[widx].active_input == -1)
 						afg->widgets[widx].active_input = idx;
 
@@ -286,7 +295,7 @@ hda_codec_afg_find_dac_path(hda_afg* afg, uint32 wid, uint32 depth)
 				int idx = afg->widgets[widx].active_input;
 				if (idx != -1) {
 					uint32 wid = afg->widgets[widx].inputs[idx];
-					if (hda_codec_afg_find_dac_path(afg, wid, depth +1)) {
+					if (hda_codec_afg_find_path(afg, wid, wtype, depth +1)) {
 						return wid;
 					}
 				}
@@ -294,6 +303,9 @@ hda_codec_afg_find_dac_path(hda_afg* afg, uint32 wid, uint32 depth)
 			break;
 
 		default:
+			if (afg->widgets[widx].type == wtype)
+				return wid;
+
 			break;
 	}
 	
@@ -310,7 +322,9 @@ hda_afg_delete(hda_afg* afg)
 		if (afg->record_stream != NULL)
 			hda_stream_delete(afg->record_stream);
 
-		free(afg->widgets);
+		if (afg->widgets)
+			free(afg->widgets);
+			
 		free(afg);
 	}
 }
@@ -340,60 +354,99 @@ hda_codec_afg_new(hda_codec* codec, uint32 afg_nid)
 		we cannot find any output Pin Widgets */
 	rc = ENODEV;
 
-	/* Try to locate all output channels */
+	dprintf("%s: Scanning all %ld widgets for outputs/inputs....\n", 
+		__func__, afg->wid_count);
+
+	/* Try to locate all input/output channels */
 	for (idx=0; idx < afg->wid_count; idx++) {
-		uint32 iidx, output_wid = 0;
+		uint32 output_wid = 0, input_wid = 0;
+		int32 iidx;
 
-		if (afg->widgets[idx].type != WT_PIN_COMPLEX)
-			continue;
-		if (afg->widgets[idx].d.pin.output)
-			continue;
-		if 	(afg->widgets[idx].d.pin.device != PIN_DEV_HP_OUT &&
-			afg->widgets[idx].d.pin.device != PIN_DEV_SPEAKER &&
-			afg->widgets[idx].d.pin.device != PIN_DEV_LINE_OUT)
-			continue;
-
-		iidx = afg->widgets[idx].active_input;
-		if (iidx != -1) {
-			output_wid = hda_codec_afg_find_dac_path(afg, afg->widgets[idx].inputs[iidx], 0);
-		} else {
-			for (iidx=0; iidx < afg->widgets[idx].num_inputs; iidx++) {
-				output_wid = hda_codec_afg_find_dac_path(afg, afg->widgets[idx].inputs[iidx], 0);
-				if (output_wid) {
-					corb_t verb = MAKE_VERB(codec->addr,idx+afg->wid_start,VID_SET_CONNSEL,iidx);
-					if (hda_send_verbs(codec, &verb, NULL, 1) != B_OK)
-						dprintf("%s: Setting output selector failed!\n", __func__);
-					break;
+		if (afg->widgets[idx].type == WT_PIN_COMPLEX && afg->widgets[idx].d.pin.output) {
+			if 	(afg->widgets[idx].d.pin.device != PIN_DEV_HP_OUT &&
+				afg->widgets[idx].d.pin.device != PIN_DEV_SPEAKER &&
+				afg->widgets[idx].d.pin.device != PIN_DEV_LINE_OUT)
+				continue;
+	
+			iidx = afg->widgets[idx].active_input;
+			if (iidx != -1) {
+				output_wid = hda_codec_afg_find_path(afg, afg->widgets[idx].inputs[iidx], WT_AUDIO_OUTPUT, 0);
+			} else {
+				for (iidx=0; iidx < afg->widgets[idx].num_inputs; iidx++) {
+					output_wid = hda_codec_afg_find_path(afg, afg->widgets[idx].inputs[iidx], WT_AUDIO_OUTPUT, 0);
+					if (output_wid) {
+						corb_t verb = MAKE_VERB(codec->addr,idx+afg->wid_start,VID_SET_CONNSEL,iidx);
+						if (hda_send_verbs(codec, &verb, NULL, 1) != B_OK)
+							dprintf("%s: Setting output selector failed!\n", __func__);
+						break;
+					}
 				}
 			}
-		}
+	
+			if (output_wid) {
+				if (!afg->playback_stream) {
+					corb_t verb;
+	
+					/* Setup playback/record streams for Multi Audio API */
+					afg->playback_stream = hda_stream_new(afg->codec->ctrlr, STRM_PLAYBACK);
+					afg->record_stream = hda_stream_new(afg->codec->ctrlr, STRM_RECORD);
+		
+					afg->playback_stream->pin_wid = idx + afg->wid_start;
+					afg->playback_stream->io_wid = output_wid;
+		
+					/* FIXME: Force Pin Widget to unmute */
+					verb = MAKE_VERB(codec->addr, afg->playback_stream->pin_wid,
+						VID_SET_AMPGAINMUTE, (1 << 15) | (1 << 13) | (1 << 12));
+					hda_send_verbs(codec, &verb, NULL, 1);
+				}	
+	
+				dprintf("%s: Found output PIN (%s) connected to output CONV wid:%ld\n", 
+					__func__, defdev[afg->widgets[idx].d.pin.device], output_wid);
+			}
+		} 
 
-		if (output_wid) {
-			corb_t verb;
-
-			/* Setup playback/record streams for Multi Audio API */
-			afg->playback_stream = hda_stream_new(afg->codec->ctrlr, STRM_PLAYBACK);
-			afg->record_stream = hda_stream_new(afg->codec->ctrlr, STRM_RECORD);
-
-			afg->playback_stream->pin_wid = idx + afg->wid_start;
-			afg->playback_stream->io_wid = output_wid;
-
-			dprintf("%s: Found output PIN (%s) connected to output CONV wid:%ld\n", 
-				__func__, defdev[afg->widgets[idx].d.pin.device], output_wid);
-
-			/* FIXME: Force Pin Widget to unmute */
-			verb = MAKE_VERB(codec->addr, afg->playback_stream->pin_wid,
-				VID_SET_AMPGAINMUTE, (1 << 15) | (1 << 13) | (1 << 12));
-			hda_send_verbs(codec, &verb, NULL, 1);
-			
-			rc = B_OK;
-			break;
+		if (afg->widgets[idx].type == WT_AUDIO_INPUT) {
+			iidx = afg->widgets[idx].active_input;
+			if (iidx != -1) {
+				input_wid = hda_codec_afg_find_path(afg, afg->widgets[idx].inputs[iidx], WT_PIN_COMPLEX, 0);
+			} else {
+				for (iidx=0; iidx < afg->widgets[idx].num_inputs; iidx++) {
+					input_wid = hda_codec_afg_find_path(afg, afg->widgets[idx].inputs[iidx], WT_PIN_COMPLEX, 0);
+					if (input_wid) {
+						corb_t verb = MAKE_VERB(codec->addr,idx+afg->wid_start,VID_SET_CONNSEL,iidx);
+						if (hda_send_verbs(codec, &verb, NULL, 1) != B_OK)
+							dprintf("%s: Setting input selector failed!\n", __func__);
+						break;
+					}
+				}
+			}
+	
+			if (input_wid) {
+				if (!afg->record_stream) {
+					corb_t verb;
+	
+					/* Setup playback/record streams for Multi Audio API */
+					afg->record_stream = hda_stream_new(afg->codec->ctrlr, STRM_RECORD);
+		
+					afg->record_stream->pin_wid = input_wid;
+					afg->record_stream->io_wid = idx + afg->wid_start;
+		
+					/* FIXME: Force Pin Widget to unmute */
+					verb = MAKE_VERB(codec->addr, afg->record_stream->pin_wid,
+						VID_SET_AMPGAINMUTE, (1 << 15) | (1 << 13) | (1 << 12));
+					hda_send_verbs(codec, &verb, NULL, 1);
+				}	
+	
+				dprintf("%s: Found input PIN (%s) connected to input CONV wid:%ld\n", 
+					__func__, defdev[afg->widgets[input_wid-afg->wid_start].d.pin.device], idx+afg->wid_start);
+			}
 		}
 	}
 
 	/* If we found any valid output channels, we're in the clear */
-	if (rc == B_OK) {
+	if (afg && afg->playback_stream) {
 		codec->afgs[codec->num_afgs++] = afg;
+		rc = B_OK;
 		goto done;
 	}
 
@@ -425,42 +478,54 @@ hda_codec*
 hda_codec_new(hda_controller* ctrlr, uint32 cad)
 {
 	hda_codec* codec = calloc(1, sizeof(hda_codec));
-	if (codec) {
-		uint32 responses[3];
-		corb_t verbs[3];
-		status_t rc;
-		uint32 nid;
-	
-		codec->ctrlr = ctrlr;
-		codec->addr = cad;
-		codec->response_count = 0;
-		codec->response_sem = create_sem(0, "hda_codec_response_sem");
-		ctrlr->codecs[cad] = codec;
-	
-		verbs[0] = MAKE_VERB(cad,0,VID_GET_PARAM,PID_VENDORID);
-		verbs[1] = MAKE_VERB(cad,0,VID_GET_PARAM,PID_REVISIONID);
-		verbs[2] = MAKE_VERB(cad,0,VID_GET_PARAM,PID_SUBORD_NODE_COUNT);
+	uint32 responses[3];
+	corb_t verbs[3];
+	status_t rc;
+	uint32 nid;
 
-		if (hda_send_verbs(codec, verbs, responses, 3) == B_OK) {
-			dprintf("Codec %ld Vendor: %04lx Product: %04lx\n",  
-				cad, responses[0] >> 16, responses[0] & 0xFFFF);
+	if (codec == NULL) goto exit_new;
+
+	codec->ctrlr = ctrlr;
+	codec->addr = cad;
+	codec->response_sem = create_sem(0, "hda_codec_response_sem");
+	ctrlr->codecs[cad] = codec;
 	
-			for (nid=responses[2] >> 16;
-				nid < (responses[2] >> 16) + (responses[2] & 0xFF); 
-				nid++) {
-				uint32 resp;
-				verbs[0] = MAKE_VERB(cad,nid,VID_GET_PARAM,PID_FUNCGRP_TYPE);
+	verbs[0] = MAKE_VERB(cad,0,VID_GET_PARAM,PID_VENDORID);
+	verbs[1] = MAKE_VERB(cad,0,VID_GET_PARAM,PID_REVISIONID);
+	verbs[2] = MAKE_VERB(cad,0,VID_GET_PARAM,PID_SUBORD_NODE_COUNT);
+
+	if (hda_send_verbs(codec, verbs, responses, 3) != B_OK)
+		goto cmd_failed;
+
+	dprintf("Codec %ld Vendor: %04lx Product: %04lx\n",  
+		cad, responses[0] >> 16, responses[0] & 0xFFFF);
+	
+	for (nid=responses[2] >> 16;
+		nid < (responses[2] >> 16) + (responses[2] & 0xFF); 
+		nid++) {
+		uint32 resp;
+		verbs[0] = MAKE_VERB(cad,nid,VID_GET_PARAM,PID_FUNCGRP_TYPE);
 				
-				if ((rc=hda_send_verbs(codec, verbs, &resp, 1)) == B_OK &&
-					(resp&0xFF) == 1 &&
-					(rc=hda_codec_afg_new(codec, nid)) == B_OK) {
-					/* Found an Audio Function Group! */
-				} else {
-					dprintf("%s: FG %ld: %s\n", __func__, nid, strerror(rc));
-				}
-			}	
+		if ((rc=hda_send_verbs(codec, verbs, &resp, 1)) != B_OK)
+			goto cmd_failed;
+
+		if ((resp&0xFF) == 1) {
+			/* Found an Audio Function Group! */
+			if ((rc=hda_codec_afg_new(codec, nid)) != B_OK) {
+				dprintf("%s: Failed to setup new audio function group (%s)!\n",
+					__func__, strerror(rc));
+				goto cmd_failed;
+			}
 		}
 	}
 
+	goto exit_new;
+
+cmd_failed:
+	ctrlr->codecs[cad] = NULL;
+	hda_codec_delete(codec);
+	codec = NULL;
+
+exit_new:
 	return codec;
 }
