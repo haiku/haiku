@@ -338,7 +338,6 @@ AboutView::AboutView(const BRect &rect)
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
-		"Bruno G. Albuquerque\n"
 		"Axel Dörfler\n"
 		"Phil Greenway\n"
 		"Philippe Houdoin\n"
@@ -373,6 +372,7 @@ AboutView::AboutView(const BRect &rect)
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
+		"Bruno G. Albuquerque\n"
 		"Andrea Anzani\n"
 		"Bruce Cameron\n"
 		"Greg Crain\n"
@@ -384,6 +384,7 @@ AboutView::AboutView(const BRect &rect)
 		"Daniel Furrer\n"
 		"Troeglazov Gerasim\n"
 		"Matthijs Hollemans\n"
+		"Morgan Howe\n"
 		"Erik Jaesler\n"
 		"Carwyn Jones\n"
 		"Vasilis Kaoutsis\n"
