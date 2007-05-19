@@ -16,6 +16,8 @@ extern "C" {
 #endif
 
 extern status_t system_info_init(struct kernel_args *args);
+extern uint32	get_haiku_revision(void);
+
 extern status_t _user_get_system_info(system_info *userInfo, size_t size);
 
 #ifdef __cplusplus

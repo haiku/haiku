@@ -32,6 +32,12 @@ const static int64 kKernelVersion = 0x1;
 const static char *kKernelName = "kernel_" HAIKU_ARCH;
 
 
+// Haiku SVN revision. Will be set when copying the kernel to the image.
+// Lives in a separate section so that it can easily be found.
+static uint32 sHaikuRevision __attribute__((section("_haiku_revision")));
+static uint32 sHaikuRevision = 0;
+
+
 static int
 dump_info(int argc, char **argv)
 {
@@ -104,6 +110,13 @@ system_info_init(struct kernel_args *args)
 	add_debugger_command("info", &dump_info, "System info");
 
 	return arch_system_info_init(args);
+}
+
+
+uint32
+get_haiku_revision(void)
+{
+	return sHaikuRevision;
 }
 
 

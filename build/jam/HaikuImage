@@ -158,7 +158,7 @@ AddDriversToHaikuImage net			: $(BEOS_ADD_ONS_DRIVERS_NET) ;
 #AddDriversToHaikuImage power		: $(BEOS_ADD_ONS_DRIVERS_ACPI) ;
 
 # kernel
-AddFilesToHaikuImage beos system : kernel_$(TARGET_ARCH) ;
+AddFilesToHaikuImage beos system : <revisioned>kernel_$(TARGET_ARCH) ;
 
 # libs
 AddFilesToHaikuImage beos system lib : $(BEOS_SYSTEM_LIB) ;
