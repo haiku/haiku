@@ -99,6 +99,11 @@ if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/midi_server
 fi
 
+# Launch Print Server 
+if [ "$SAFEMODE" != "yes" ]; then
+	launch $SERVERS/print_server
+fi
+
 # Check for daily saving time
 launch beos/bin/dstcheck
 
