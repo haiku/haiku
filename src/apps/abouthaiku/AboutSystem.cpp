@@ -95,7 +95,7 @@ AboutApp::AboutApp(void)
 
 
 AboutWindow::AboutWindow()
-	: BWindow(BRect(0, 0, 500, 300), "About Haiku", B_TITLED_WINDOW, 
+	: BWindow(BRect(0, 0, 500, 300), "About This System", B_TITLED_WINDOW, 
 			B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 {
 	AddChild(new AboutView(Bounds()));

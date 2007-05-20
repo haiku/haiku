@@ -44,7 +44,7 @@ BEOS_BIN = "[" addattr alert arp basename bc beep bzip2 cat cardctl catattr chgr
 ;
 
 BEOS_APPS = Terminal Expander People ShowImage Pulse ProcessController
-	SoundRecorder Magnify DiskProbe AboutHaiku StyledEdit Installer Workspaces
+	SoundRecorder Magnify DiskProbe AboutSystem StyledEdit Installer Workspaces
 	$(X86_ONLY)Cortex MediaPlayer DeskCalc MidiPlayer
 	Icon-O-Matic Mail CDPlayer NetworkStatus TV
 ;

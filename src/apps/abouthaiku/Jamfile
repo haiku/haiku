@@ -6,12 +6,12 @@ if $(TARGET_PLATFORM) = r5 {
 	SubDirC++Flags -DR5_COMPATIBLE ;
 }
 
-Application AboutHaiku :
-	AboutHaiku.cpp
-	: libbe.so libtranslation.so libroot.so
-	: AboutHaiku.rdef
+Application AboutSystem :
+	AboutSystem.cpp
+	: be translation
+	: AboutSystem.rdef
 ;
 
-Includes [ FGristFiles AboutHaiku.rdef ] : [ FGristFiles "HAIKU logo - black on white - tiny.png" ] ;
+Includes [ FGristFiles AboutSystem.rdef ] : [ FGristFiles "HAIKU logo - black on white - tiny.png" ] ;
 SEARCH on [ FGristFiles "HAIKU logo - black on white - tiny.png" ]
 	= [ FDirName $(HAIKU_TOP) data artwork ] ;
