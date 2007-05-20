@@ -234,7 +234,11 @@ TBeMenu::AddStandardBeMenuItems()
 
 	BMenuItem* item = new BMenuItem(
 #ifdef __HAIKU__
+#	ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
 		"About Haiku"
+#	else
+		"About This System"
+#	endif
 #else
 		"About BeOS"
 #endif
