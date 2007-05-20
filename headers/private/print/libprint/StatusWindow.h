@@ -7,12 +7,9 @@
 #ifndef STATUS_WINDOW_H										
 #define STATUS_WINDOW_H										
 
-#ifndef _WINDOW_H													 
 #include <Window.h>												
-#endif
-
+#include <StatusBar.h>
 #include <String.h>
-
 
 class StatusWindow : public BWindow 
 {
