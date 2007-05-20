@@ -106,7 +106,7 @@ ProtocolClassItem::getDescription()
 
 
 AddPrinterView::AddPrinterView(BRect frame, PrinterData *printer_data, const PrinterCap *printer_cap)
-	: BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW), fPrinterData(printer_data), fPrinterCap(printer_cap)
+	: BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS), fPrinterData(printer_data), fPrinterCap(printer_cap)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
@@ -182,6 +182,16 @@ AddPrinterView::AttachedToWindow()
 	// update description
 	BMessage updateDescription(kMsgProtocolClassChanged);
 	MessageReceived(&updateDescription);
+}
+
+void
+AddPrinterView::FrameResized(float w, float h)
+{
+	BView::FrameResized(w, h);
+	// update text rectangle
+	BRect rect(fDescription->TextRect());
+	rect.right = rect.left + fDescription->Frame().Width();
+	fDescription->SetTextRect(rect);
 }
 
 ProtocolClassItem *

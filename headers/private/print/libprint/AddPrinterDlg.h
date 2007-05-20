@@ -31,6 +31,7 @@ public:
 	AddPrinterView(BRect frame, PrinterData *printer_data, const PrinterCap *printer_cap);
 	~AddPrinterView();
 	virtual void AttachedToWindow();
+	void FrameResized(float w, float h);
 	void MessageReceived(BMessage *msg);
 
 	void Save();
