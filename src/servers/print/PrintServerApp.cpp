@@ -393,29 +393,40 @@ PrintServerApp::CreatePrinter(const char* printerName, const char* driverName,
 
 	// Notify printer driver that a new printer definition node
 	// has been created.
-	// TODO check why we keep the printer definition node
-	// although printer driver cannot be found or loaded	
-	if (FindPrinterDriver(driverName, path) != B_OK)
-		return B_OK;
-		 
-	image_id id = ::load_add_on(path.Path());
-	if (id <= 0)
-		return B_OK;
-		
+	image_id id = -1;
 	add_printer_func_t func;
-	if (get_image_symbol(id, "add_printer", B_SYMBOL_TYPE_TEXT, (void**)&func) == B_OK) {
-		// call the function and check its result
-		if ((*func)(printerName) == NULL) {
-			BEntry entry;
-			if (printer.GetEntry(&entry) == B_OK)
-				entry.Remove();
-			
-		} else
-			printer.WriteAttr(PSRV_PRINTER_ATTR_STATE, B_STRING_TYPE, 0, "free", ::strlen("free")+1);
+
+	rc = FindPrinterDriver(driverName, path);
+	if (rc != B_OK)
+		goto error;
+		 
+	id = ::load_add_on(path.Path());
+	if (id <= 0) {
+		rc = B_ERROR;
+		goto error;
 	}
 	
-	::unload_add_on(id);	
-	return B_OK;
+	rc = get_image_symbol(id, "add_printer", B_SYMBOL_TYPE_TEXT, (void**)&func);
+	if (rc != B_OK)
+		goto error;
+		
+	// call the function and check its result
+	if ((*func)(printerName) == NULL)
+		rc = B_ERROR;			
+	else
+		printer.WriteAttr(PSRV_PRINTER_ATTR_STATE, B_STRING_TYPE, 0, "free", ::strlen("free")+1);
+
+error:	
+	if (rc != B_OK) {
+		BEntry entry;
+		if (printer.GetEntry(&entry) == B_OK)
+			entry.Remove();	
+	}
+	
+	if (id > 0)
+		::unload_add_on(id);
+
+	return rc;
 }
 
 // ---------------------------------------------------------------
