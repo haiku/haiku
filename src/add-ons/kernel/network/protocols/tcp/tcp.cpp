@@ -468,6 +468,18 @@ tcp_control(net_protocol *_protocol, int level, int option, void *value,
 
 
 status_t
+tcp_getsockopt(net_protocol *_protocol, int level, int option, void *value,
+	int *_length)
+{
+	TCPEndpoint *protocol = (TCPEndpoint *)_protocol;
+
+	/* TODO getting IPPROTO_TCP options is missing */
+	return protocol->next->module->getsockopt(protocol->next, level, option,
+		value, _length);
+}
+
+
+status_t
 tcp_setsockopt(net_protocol *_protocol, int level, int option,
 	const void *_value, int length)
 {
@@ -770,7 +782,7 @@ net_protocol_module_info sTCPModule = {
 	tcp_connect,
 	tcp_accept,
 	tcp_control,
-	NULL, // getsockopt
+	tcp_getsockopt,
 	tcp_setsockopt,
 	tcp_bind,
 	tcp_unbind,
