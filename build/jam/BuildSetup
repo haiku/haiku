@@ -102,6 +102,16 @@ HAIKU_KERNEL_CCFLAGS = $(HAIKU_GCC_BASE_FLAGS) ;
 HAIKU_KERNEL_C++FLAGS = $(HAIKU_GCC_BASE_FLAGS) ;
 HAIKU_DEFINES = __HAIKU__ ;
 
+# distro compatibility level defines
+HAIKU_DISTRO_COMPATIBILITY ?= "default" ;
+switch $(HAIKU_DISTRO_COMPATIBILITY) {
+	case official	: HAIKU_DEFINES += HAIKU_DISTRO_COMPATIBILITY_OFFICIAL ;
+	case compatible	: HAIKU_DEFINES += HAIKU_DISTRO_COMPATIBILITY_COMPATIBLE ;
+	case "default"	: HAIKU_DEFINES += HAIKU_DISTRO_COMPATIBILITY_DEFAULT ;
+	case *			: Exit "Invalid value for HAIKU_DISTRO_COMPATIBILITY:"
+						$(HAIKU_DISTRO_COMPATIBILITY) ;
+}
+
 # analyze the gcc machine spec to determine HAIKU_CPU
 switch $(HAIKU_GCC_MACHINE) {
 	case i386-*		: HAIKU_CPU = x86 ;
