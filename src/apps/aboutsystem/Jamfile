@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src apps abouthaiku ;
+SubDir HAIKU_TOP src apps aboutsystem ;
 
 UsePrivateHeaders shared ;
 

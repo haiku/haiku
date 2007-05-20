@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src apps ;
 
-SubInclude HAIKU_TOP src apps abouthaiku ;
+SubInclude HAIKU_TOP src apps aboutsystem ;
 SubInclude HAIKU_TOP src apps cdplayer ;
 SubInclude HAIKU_TOP src apps clock ;
 SubInclude HAIKU_TOP src apps codycam ;
