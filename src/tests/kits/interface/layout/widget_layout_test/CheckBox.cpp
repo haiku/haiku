@@ -7,6 +7,11 @@
 
 #include <View.h>
 
+#include "StringView.h"
+
+
+// #pragma mark - CheckBox
+
 
 CheckBox::CheckBox(BMessage* message, BMessenger target)
 	: View(BRect(0, 0, 12, 12)),
@@ -119,4 +124,41 @@ CheckBox::_PressedUpdate(BPoint where)
 		fPressedSelected = pressedSelected;
 		Invalidate();
 	}
+}
+
+
+// #pragma mark - LabeledCheckBox
+
+
+LabeledCheckBox::LabeledCheckBox(const char* label, BMessage* message,
+	BMessenger target)
+	: GroupView(B_HORIZONTAL),
+	  fCheckBox(new CheckBox(message, target))
+{
+	SetSpacing(8, 0);
+
+	AddChild(fCheckBox);
+	if (label)
+		AddChild(new StringView(label));
+}
+
+
+void
+LabeledCheckBox::SetTarget(BMessenger messenger)
+{
+	fCheckBox->SetTarget(messenger);
+}
+
+
+void
+LabeledCheckBox::SetSelected(bool selected)
+{
+	fCheckBox->SetSelected(selected);
+}
+
+
+bool
+LabeledCheckBox::IsSelected() const
+{
+	return fCheckBox->IsSelected();
 }

@@ -82,14 +82,11 @@ public:
 			fMinHeightView);
 
 		// max (with checkbox)
-		GroupView* unlimitedMaxGroup = new GroupView(B_HORIZONTAL);
-		fUnlimitedMaxSizeCheckBox = new CheckBox(
+		fUnlimitedMaxSizeCheckBox = new LabeledCheckBox("override",
 			new BMessage(MSG_UNLIMITED_MAX_SIZE_CHANGED), this);
-		unlimitedMaxGroup->AddChild(fUnlimitedMaxSizeCheckBox);
-		unlimitedMaxGroup->AddChild(new StringView("  override"));
 
 		_CreateSizeViews(sizeViewsGroup, "max:  ", fMaxWidthView,
-			fMaxHeightView, unlimitedMaxGroup);
+			fMaxHeightView, fUnlimitedMaxSizeCheckBox);
 
 		// preferred
 		_CreateSizeViews(sizeViewsGroup, "preferred:  ", fPreferredWidthView,
@@ -253,7 +250,7 @@ private:
 	StringView*					fPreferredHeightView;
 	StringView*					fCurrentWidthView;
 	StringView*					fCurrentHeightView;
-	CheckBox*					fUnlimitedMaxSizeCheckBox;
+	LabeledCheckBox*			fUnlimitedMaxSizeCheckBox;
 };
 
 

@@ -8,9 +8,10 @@
 
 #include <Invoker.h>
 
-#include "View.h"
+#include "GroupView.h"
 
 
+// CheckBox
 class CheckBox : public View, public BInvoker {
 public:
 								CheckBox(BMessage* message = NULL,
@@ -38,6 +39,23 @@ private:
 			bool				fSelected;
 			bool				fPressed;
 			bool				fPressedSelected;
+};
+
+
+// LabeledCheckBox
+class LabeledCheckBox : public GroupView {
+public:
+								LabeledCheckBox(const char* label,
+									BMessage* message = NULL,
+									BMessenger target = BMessenger());
+
+			void				SetTarget(BMessenger messenger);
+
+			void				SetSelected(bool selected);
+			bool				IsSelected() const;
+
+private:
+			CheckBox*			fCheckBox;
 };
 
 

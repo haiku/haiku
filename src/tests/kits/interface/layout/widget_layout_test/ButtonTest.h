@@ -10,7 +10,8 @@
 
 
 class BButton;
-class CheckBox;
+class BFont;
+class LabeledCheckBox;
 class View;
 
 
@@ -26,10 +27,14 @@ public:
 
 private:
 			void				_SetButtonText(bool longText);
+			void				_SetButtonFont(bool bigFont);
 
 private:
 			BButton*			fButton;
-			CheckBox*			fLongTextCheckBox;
+			LabeledCheckBox*	fLongTextCheckBox;
+			LabeledCheckBox*	fBigFontCheckBox;
+			BFont*				fDefaultFont;
+			BFont*				fBigFont;
 };
 
 
