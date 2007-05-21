@@ -1,7 +1,6 @@
 SubDir HAIKU_TOP src apps terminal ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
-AddSubDirSupportedPlatforms libbe_test ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src kits tracker ] ;
 
@@ -26,15 +25,6 @@ Application Terminal :
 	UTF8WidthTbl.c
 	VTKeyTbl.c
 	VTPrsTbl.c
-	: be tracker textencoding
+	: be game tracker textencoding
 	: Terminal.rdef Terminal.icons.rdef
 	;
-
-if $(TARGET_PLATFORM) != libbe_test {
-	LinkAgainst Terminal : game ;
-}
-
-if $(TARGET_PLATFORM) = libbe_test {
-	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Terminal
-		: tests!apps ;
-}
