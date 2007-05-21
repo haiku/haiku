@@ -1512,20 +1512,18 @@ FSCopyAttributesAndStats(BNode *srcNode, BNode *destNode)
 }
 
 
-#if 0
 status_t
 FSCopyFile(BEntry* srcFile, StatStruct *srcStat, BDirectory* destDir,
-	CopyLoopControl *loopControl, BPoint *loc, bool makeOriginalName)
+	CopyLoopControl *loopControl, BPoint *loc, bool makeOriginalName, Undo &undo)
 {
 	try {
-		CopyFile(srcFile, srcStat, destDir, loopControl, loc, makeOriginalName);
+		CopyFile(srcFile, srcStat, destDir, loopControl, loc, makeOriginalName, undo);
 	} catch (status_t error) {
 		return error;
 	}
 
 	return B_OK;
 }
-#endif
 
 
 static status_t

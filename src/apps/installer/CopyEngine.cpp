@@ -241,13 +241,18 @@ CopyEngine::CopyFolder(BDirectory &srcDir, BDirectory &targetDir)
 	BEntry entry;
 	status_t err;
 	while (srcDir.GetNextEntry(&entry) == B_OK) {
-		char name[B_FILE_NAME_LENGTH];
-		entry.GetName(name);
-		if (strcmp(name, PACKAGES_DIRECTORY) == 0)
-			continue;
-
+		StatStruct statbuf;
+		entry.GetStat(&statbuf);
+		
 		Undo undo;
-		err = FSCopyFolder(&entry, &targetDir, fControl, NULL, false, undo);
+		if (S_ISDIR(statbuf.st_mode)) {
+			char name[B_FILE_NAME_LENGTH];
+			if (strcmp(name, PACKAGES_DIRECTORY) == 0)
+				continue;
+			err = FSCopyFolder(&entry, &targetDir, fControl, NULL, false, undo);
+		} else {
+			err = FSCopyFile(&entry, &statbuf, &targetDir, fControl, NULL, false, undo);
+		}
 		if (err != B_OK) {
 			BPath path;
 			entry.GetPath(&path);
