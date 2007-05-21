@@ -4,11 +4,12 @@ SubDir HAIKU_TOP src system kernel lib ;
 
 KernelMergeObject kernel_os_main.o :
 	driver_settings.c
+	find_directory.c
 	fs_info.c
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
 
-SEARCH on [ FGristFiles driver_settings.c fs_info.c ]
+SEARCH on [ FGristFiles driver_settings.c find_directory.c fs_info.c ]
 	= [ FDirName $(HAIKU_TOP) src system libroot os ] ;
 
 # kernel libroot posix files
@@ -104,7 +105,7 @@ KernelMergeObject kernel_posix.o :
 	strspn.c
 	strstr.c
 	strtok.c
-	
+
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
 

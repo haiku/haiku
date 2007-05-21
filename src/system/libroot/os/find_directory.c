@@ -1,13 +1,19 @@
 /*
- * Copyright (c) 2004, François Revol.
+ * Copyright (c) 2004-2007, François Revol.
  * Distributed under the terms of the MIT license.
  */
 
-// ToDo: that call should probably implemented by and in the kernel as well.
+// TODO: this call is currently compiled for the kernel and libroot separately;
+//		they may not always return the same directory right now!
+
+#ifdef _KERNEL_MODE
+#	include <vfs.h>
+#else
+#	include <syscalls.h>
+#endif
 
 #include <FindDirectory.h>
 #include <fs_info.h>
-#include <syscalls.h>
 
 #include <errno.h>
 #include <pwd.h>
@@ -21,77 +27,71 @@
 #define USE_PWENTS
 
 /* os root dir; just stick to 'beos' for now */
-#define OSDIR "beos"
-//#define OSDIR "haiku" // :)
-//#define OSDIR "os"
+#define OS "beos"
+//#define OS "haiku" // :)
+//#define OS "os"
 
 
 /* /bin/strings rox */
 static const char *os_dirs[] = {
-OSDIR,
-OSDIR"/system",
-OSDIR"/system/add-ons",
-OSDIR"/system/boot",
-OSDIR"/etc/fonts",
-OSDIR"/system/lib",
-OSDIR"/system/servers",
-OSDIR"/apps",
-OSDIR"/bin",
-OSDIR"/etc",
-OSDIR"/documentation",
-OSDIR"/preferences",
-OSDIR"/system/add-ons/Translators",
-OSDIR"/system/add-ons/media",
-OSDIR"/etc/sounds",
+	OS,
+	OS "/system",
+	OS "/system/add-ons",
+	OS "/system/boot",
+	OS "/etc/fonts",
+	OS "/system/lib",
+	OS "/system/servers",
+	OS "/apps",
+	OS "/bin",
+	OS "/etc",
+	OS "/documentation",
+	OS "/preferences",
+	OS "/system/add-ons/Translators",
+	OS "/system/add-ons/media",
+	OS "/etc/sounds",
 };
 
-/* R5 uses that, but it's *really* wrong, 
- * we don't want "common" directories to depend on user's home !
- * it should actually be something else than /boot/home even...
- */
-//#define HOME "$h"
-#define HOME "common"
+#define COMMON "common"
 	// ToDo: this is for now and might be changed back to "home"
 	//	(or even something else) later
 
 static const char *common_dirs[] = {
-HOME"",
-HOME"/config",
-HOME"/config/add-ons",
-HOME"/config/boot",
-HOME"/config/fonts",
-HOME"/config/lib",
-HOME"/config/servers",
-HOME"/config/bin",
-HOME"/config/etc",
-HOME"/config/documentation",
-HOME"/config/settings",
-"develop",
-"var/log",
-"var/spool",
-"var/tmp",
-"var",
-HOME"/config/add-ons/Translators",
-HOME"/config/add-ons/media",
-HOME"/config/sounds",
+	COMMON "",
+	COMMON "/config",
+	COMMON "/config/add-ons",
+	COMMON "/config/boot",
+	COMMON "/config/fonts",
+	COMMON "/config/lib",
+	COMMON "/config/servers",
+	COMMON "/config/bin",
+	COMMON "/config/etc",
+	COMMON "/config/documentation",
+	COMMON "/config/settings",
+	"develop",
+	"var/log",
+	"var/spool",
+	"var/tmp",
+	"var",
+	COMMON "/config/add-ons/Translators",
+	COMMON "/config/add-ons/media",
+	COMMON "/config/sounds",
 };
 
-#undef HOME
 #define HOME "$h"
 
 static const char *user_dirs[] = {
-HOME"",
-HOME"/config",
-HOME"/config/add-ons",
-HOME"/config/boot",
-HOME"/config/fonts",
-HOME"/config/lib",
-HOME"/config/settings",
-HOME"/config/be",
-HOME"/config/settings/printers",
-HOME"/config/add-ons/Translators",
-HOME"/config/add-ons/media",
-HOME"/config/sounds",
+	HOME "",
+	HOME "/config",
+	HOME "/config/add-ons",
+	HOME "/config/boot",
+	HOME "/config/fonts",
+	HOME "/config/lib",
+	HOME "/config/settings",
+	HOME "/config/be",
+	HOME "/config/settings/printers",
+	HOME "/config/add-ons/Translators",
+	HOME "/config/add-ons/media",
+	HOME "/config/sounds",
 };
 
 /*
@@ -100,10 +100,11 @@ preferences
 apps
 */
 
-/** make dir and parents if needed */
+
+/*! make dir and its parents if needed */
 
 static int
-mkdir_p(const char *path, mode_t mode)
+create_path(const char *path, mode_t mode)
 {
 	char buffer[B_PATH_NAME_LENGTH + 1];
 	int slash = 0;
@@ -129,7 +130,7 @@ mkdir_p(const char *path, mode_t mode)
 		else
 			continue;
 
-		strncpy(buffer, path, slash);
+		strlcpy(buffer, path, slash);
 		if (stat(buffer, &st) < 0) {
 			errno = 0;
 			if (mkdir(buffer, mode) < 0)
@@ -141,43 +142,52 @@ mkdir_p(const char *path, mode_t mode)
 }
 
 
+//	#pragma mark -
+
+
 status_t
-find_directory(directory_which which, dev_t device, bool create_it,
-	char *returned_path, int32 path_length)
+find_directory(directory_which which, dev_t device, bool createIt,
+	char *returnedPath, int32 pathLength)
 {
 	status_t err = B_OK;
-	dev_t bootdev = -1;
-	struct fs_info finfo;
+	dev_t bootDevice = -1;
+	struct fs_info fsInfo;
 	struct stat st;
 	char *buffer = NULL;
 	char *home = NULL;
 	const char *template = NULL;
 
 	/* as with the R5 version, no on-stack buffer */
-	buffer = (char *)malloc(path_length);
-	memset(buffer, 0, path_length);
+	buffer = (char *)malloc(pathLength);
+	memset(buffer, 0, pathLength);
 
 	/* fiddle with non-boot volume for items that need it */
 	switch (which) {
 		case B_DESKTOP_DIRECTORY:
 		case B_TRASH_DIRECTORY:
-			bootdev = dev_for_path("/boot");
+			bootDevice = dev_for_path("/boot");
 			if (device <= 0)
-				device = bootdev;
-			if (fs_stat_dev(device, &finfo) < B_OK) {
+				device = bootDevice;
+			if (fs_stat_dev(device, &fsInfo) < B_OK) {
 				free(buffer);
 				return ENODEV;
 			}
-			if (device != bootdev) {
-				err = _kern_entry_ref_to_path(device, finfo.root, /*"."*/ NULL, buffer, path_length);
+			if (device != bootDevice) {
+#ifdef _KERNEL_MODE
+				err = _user_entry_ref_to_path(device, fsInfo.root, /*"."*/
+					NULL, buffer, pathLength);
+#else
+				err = _kern_entry_ref_to_path(device, fsInfo.root, /*"."*/
+					NULL, buffer, pathLength);
+#endif
 			} else {
 				/* use the user id to find the home folder */
 				/* done later */
-				strncat(buffer, "/boot", path_length);
+				strlcat(buffer, "/boot", pathLength);
 			}
 			break;
 		default:
-			strncat(buffer, "/boot", path_length);
+			strlcat(buffer, "/boot", pathLength);
 			break;
 	}
 
@@ -188,13 +198,14 @@ find_directory(directory_which which, dev_t device, bool create_it,
 	
 	switch (which) {
 		case B_DESKTOP_DIRECTORY:
-			if (!strcmp(finfo.fsh_name, "bfs"))
+			if (!strcmp(fsInfo.fsh_name, "bfs"))
 				template = "$h/Desktop";
 			break;
 		case B_TRASH_DIRECTORY:
-			if (!strcmp(finfo.fsh_name, "bfs"))
+			// TODO: eventually put that into the file system API?
+			if (!strcmp(fsInfo.fsh_name, "bfs"))
 				template = "$h/Desktop/Trash";
-			else if (!strcmp(finfo.fsh_name, "dos"))
+			else if (!strcmp(fsInfo.fsh_name, "dos"))
 				template = "RECYCLED/_BEOS_";
 			break;
 		case B_BEOS_DIRECTORY:
@@ -266,41 +277,43 @@ find_directory(directory_which which, dev_t device, bool create_it,
 	err = B_OK;
 	if (template) {
 		if (!strncmp(template, "$h", 2)) {
-			if ((bootdev > -1) && (device != bootdev)) {
-				int l = path_length - strlen(buffer);
+			if (bootDevice > -1 && device != bootDevice) {
+				int l = pathLength - strlen(buffer);
 				if (l > 5)
 					strncat(buffer, "/home", 5);
 			} else {
+#ifndef _KERNEL_MODE
 #ifdef USE_PWENTS
 				struct passwd *pw;
 				// WARNING getpwuid() might not be threadsafe...
 				pw = getpwuid(getuid());
 				if (pw)
 					home = pw->pw_dir;
-#endif
+#endif	// USE_PWENTS
 				if (!home) {
 					/* use env var */
 					home = getenv("HOME");
 				}
+#endif	// !_KERNEL_MODE
 				if (!home)
 					home = "/boot/home";
-				strncpy(buffer, home, path_length);
+				strncpy(buffer, home, pathLength);
 			}
 			template += 2;
 		} else
-			strcat(buffer, "/");
+			strlcat(buffer, "/", pathLength);
 
-		if (!err && strlen(buffer) + 2 + strlen(template) < (uint32)path_length) {
+		if (!err && strlen(buffer) + 2 + strlen(template) < (uint32)pathLength) {
 			strcat(buffer, template);
 		} else
 			err = err ? err : E2BIG;
 	} else
 		err = err ? err : ENOENT;
 
-	if (!err && create_it && stat(buffer, &st) < 0)
-		err = mkdir_p(buffer, 0755);
+	if (!err && createIt && stat(buffer, &st) < 0)
+		err = create_path(buffer, 0755);
 	if (!err)
-		strncpy(returned_path, buffer, path_length);
+		strlcpy(returnedPath, buffer, pathLength);
 
 	free(buffer);
 	return err;
