@@ -294,9 +294,13 @@ compat_control(void *cookie, uint32 op, void *arg, size_t len)
 		}
 
 		case ETHER_GETFRAMESIZE:
+		{
+			uint32 frame_size;
 			if (len < 4)
 				return B_BAD_VALUE;
-			return user_memcpy(arg, &dev->ifp->if_mtu, 4);
+			frame_size = dev->ifp->if_mtu + ETHER_HDR_LEN;
+			return user_memcpy(arg, &frame_size, 4);
+		}
 
 		case ETHER_ADDMULTI:
 		case ETHER_REMMULTI:
