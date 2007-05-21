@@ -4,6 +4,7 @@ Building on a non-BeOS platform
 We currently support these non-BeOS platforms:
  * Linux
  * FreeBSD
+ * Mac OS X Intel (gcc 4 builds only)
 
 To build Haiku on a non-BeOS platform you must first check out and build the
 cross-compiler. The easiest method for doing so is to check it out in the
@@ -24,6 +25,15 @@ Haiku's build system itself:
 
 Whether they are installed can be tested for instance by running them in the
 shell with the "--version" parameter.
+
+On Mac OS X a case-sensitive file system is required for the Haiku tree
+(Disk Utility can be used to create a case-sensitive disk image of at least
+3GB size), and the following darwin ports need to be installed:
+ * expat
+ * gawk
+ * gettext
+ * libiconv
+ * gnuregex
 
 
 Building Jam
