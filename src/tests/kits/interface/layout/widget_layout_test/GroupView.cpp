@@ -5,6 +5,8 @@
 
 #include "GroupView.h"
 
+#include <stdio.h>
+
 #include <LayoutUtils.h>
 
 
@@ -36,7 +38,7 @@ struct GroupView::LayoutInfo {
 
 	void Normalize()
 	{
-		if (max > min)
+		if (max < min)
 			max = min;
 		if (preferred < min)
 			preferred = min;
@@ -127,8 +129,17 @@ GroupView::Alignment()
 
 
 void
+GroupView::InvalidateLayout()
+{
+	fMinMaxValid = false;
+	View::InvalidateLayout();
+}
+
+
+void
 GroupView::Layout()
 {
+//printf("%p->GroupView::Layout()\n", this);
 	_ValidateMinMax();
 		// actually a little late already
 
@@ -162,6 +173,7 @@ GroupView::Layout()
 
 		location.x += columnInfo.size + fColumnSpacing;
 	}
+//printf("%p->GroupView::Layout() done\n", this);
 }
 
 
@@ -171,6 +183,7 @@ GroupView::_ValidateMinMax()
 	if (fMinMaxValid)
 		return;
 
+//printf("%p->GroupView::_ValidateMinMax()\n", this);
 	delete fColumnInfos;
 	delete fRowInfos;
 
@@ -215,6 +228,7 @@ GroupView::_ValidateMinMax()
 			fColumnInfos[column].max);
 		fPreferredWidth = BLayoutUtils::AddSizesInt32(fPreferredWidth,
 			fColumnInfos[column].preferred);
+//printf("  column %ld: min: %ld, max: %ld, preferred: %ld\n", column, fColumnInfos[column].min, fColumnInfos[column].max, fColumnInfos[column].preferred);
 	}
 
 	for (int32 row = 0; row < fRowCount; row++) {
@@ -225,9 +239,11 @@ GroupView::_ValidateMinMax()
 			fRowInfos[row].max);
 		fPreferredHeight = BLayoutUtils::AddSizesInt32(fPreferredHeight,
 			fRowInfos[row].preferred);
+//printf("  row %ld: min: %ld, max: %ld, preferred: %ld\n", row, fRowInfos[row].min, fRowInfos[row].max, fRowInfos[row].preferred);
 	}
 
 	fMinMaxValid = true;
+//printf("%p->GroupView::_ValidateMinMax() done\n", this);
 }
 
 

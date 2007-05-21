@@ -6,12 +6,13 @@
 #include <stdio.h>
 
 #include <Application.h>
-#include <Button.h>
 #include <Window.h>
 
+#include "ButtonTest.h"
 #include "CheckBox.h"
 #include "GroupView.h"
 #include "StringView.h"
+#include "Test.h"
 #include "TwoDimensionalSliderView.h"
 #include "View.h"
 #include "ViewContainer.h"
@@ -36,25 +37,29 @@ operator+(const BPoint& p, const BSize& size)
 // TestWindow
 class TestWindow : public BWindow {
 public:
-	TestWindow()
-		: BWindow(BRect(100, 100, 700, 500), "Widget Layout",
+	TestWindow(Test* test)
+		: BWindow(BRect(50, 50, 750, 550), "Widget Layout",
 			B_TITLED_WINDOW,
 			B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE | B_NOT_RESIZABLE
-			| B_NOT_ZOOMABLE)
+			| B_NOT_ZOOMABLE),
+		  fTest(test)
 	{
 		fViewContainer = new ViewContainer(Bounds());
 		fViewContainer->View::SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		AddChild(fViewContainer);
 
-		BRect rect(10, 10, 400, 300);
+		// container view for the tested BView
+		BRect rect(10, 10, 400, 400);
 		View* view = new View(rect);
 		fViewContainer->View::AddChild(view);
 		view->SetViewColor((rgb_color){200, 200, 240, 255});
 
+		// container for the test's controls
+		fTestControlsView = new View(BRect(410, 10, 690, 400));
+		fViewContainer->View::AddChild(fTestControlsView);
+
 		// wrapper view
-		fWrapperView = new WrapperView(
-			new BButton(BRect(0, 0, 9, 9), "test button", "Ooh, press me!",
-				(BMessage*)NULL, B_FOLLOW_NONE));
+		fWrapperView = new WrapperView(fTest->GetView());
 		fWrapperView->SetLocation(BPoint(10, 10));
 		view->AddChild(fWrapperView);
 		fWrapperView->SetSize(fWrapperView->PreferredSize());
@@ -98,6 +103,10 @@ public:
 			sizeViewsGroup->PreferredSize()));
 
 		_UpdateSizeViews();
+
+		// activate test
+		AddHandler(fTest);
+		fTest->ActivateTest(fTestControlsView);
 	}
 
 	virtual void DispatchMessage(BMessage* message, BHandler* handler)
@@ -231,7 +240,9 @@ private:
 	}
 
 private:
+	Test*						fTest;
 	ViewContainer*				fViewContainer;
+	View*						fTestControlsView;
 	WrapperView*				fWrapperView;
 	TwoDimensionalSliderView*	fSliderView;
 	StringView*					fMinWidthView;
@@ -251,7 +262,9 @@ main()
 {
 	BApplication app("application/x-vnd.haiku.widget-layout-test");
 
-	BWindow* window = new TestWindow;
+	Test* test = new ButtonTest;
+
+	BWindow* window = new TestWindow(test);
 	window->Show();
 
 	app.Run();

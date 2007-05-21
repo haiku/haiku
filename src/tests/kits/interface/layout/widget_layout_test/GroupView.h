@@ -25,6 +25,7 @@ public:
 	virtual	BSize 				PreferredSize();
 	virtual	BAlignment			Alignment();
 
+	virtual	void				InvalidateLayout();
 	virtual	void				Layout();
 
 private:

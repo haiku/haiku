@@ -320,6 +320,7 @@ View::Invalidate()
 void
 View::InvalidateLayout()
 {
+//printf("%p->View::InvalidateLayout(): %d\n", this, fLayoutValid);
 	if (fLayoutValid) {
 		fLayoutValid = false;
 		if (fParent)
