@@ -2,8 +2,10 @@
  * Copyright 2007 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by: 
+ * Authors: 
  *   Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ * Proofreaders:
+ *   Alan Smale <ajsmale@gmail.com>
  */
 
 /*!
@@ -78,8 +80,10 @@
  * Copyright 2007 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by:
- *  Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ * Authors:
+ *   Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ * Proofreaders:
+ *   Alan Smale <ajsmale@gmail.com>
  * Corresponds to:
  *   /trunk/headers/os/support/String.h  rev 19731
  *   /trunk/src/kits/support/String.cpp  rev 19731
@@ -90,12 +94,14 @@
   -# The header is put in a standard C comment, which is enclosed between
     \c /* and \c *\/.
   -# Every line starts with a whitespace and an asterix, followed by another
-    space. If the text is part of a category, such as <tt>Documentation 
-    by</tt>, put three spaces after the delimiter.
+    space. If the text is part of a category, such as <tt>Authors</tt>, put
+    three spaces after the delimiter.
   -# We start with a copyright notice. The first line is empty, then the 
     copyright notice, then the line on \e MIT, followed by an empty line.
-  -# Then there is a label <tt>Documentation by:</tt>, which is followed by
+  -# Then there is a label <tt>Authors:</tt>, which is followed by
     lines with names and email addresses between brackets.
+  -# In the same vein there is the label <tt>Proofreaders:</tt> in case the
+    file has been proofread.
   -# The final part is underneath the label <tt>Corresponds to:</tt>.
     Underneath there is a list of files and their svn revisions that the
     current documentation is known to correspond with.
@@ -518,8 +524,9 @@
     of the kit or the API. What objects does it work with, how it interacts
     with the servers, etcetera. 
   -# One or more paragraphs that give a concrete example or use case. Keep it
-    tidy and self contained. Remember, an example can illustrate better than a
-    few paragraphs of text.
+    tidy and self contained. If you use code examples, make sure your examples
+    adhere to Haiku's coding guidelines. Remember, an example can illustrate
+    better than a few paragraphs of text.
   -# End with a list of references to other classes, functions, pages, etc. that
    might be of interest to the reader.
   
