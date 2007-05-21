@@ -573,14 +573,15 @@ MediaWindow::MessageReceived (BMessage *message)
 						roster->GetNodeFor(node_id, fCurrentNode);
 					
 					
-					if(roster->GetParameterWebFor(*fCurrentNode, &fParamWeb)==B_OK) {
-						BMediaTheme* theme = BMediaTheme::PreferredTheme();
-						paramView = theme->ViewFor(fParamWeb);
+					if (roster->GetParameterWebFor(*fCurrentNode, &fParamWeb)==B_OK
+						&& (paramView = BMediaTheme::PreferredTheme()->ViewFor(fParamWeb)) != NULL) {
 						fContentView->AddChild(paramView);
 						paramView->ResizeTo(fContentView->Bounds().Width(), fContentView->Bounds().Height() - 10);
 						
 						roster->StartWatching(this, *fCurrentNode, B_MEDIA_WILDCARD);				
 					} else {
+						if (fParamWeb)
+							delete fParamWeb;
 						fParamWeb = NULL;
 						BRect bounds = fContentView->Bounds();
 						BStringView* stringView = new BStringView(bounds, 
