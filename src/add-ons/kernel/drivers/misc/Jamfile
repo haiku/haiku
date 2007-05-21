@@ -1,10 +1,16 @@
 SubDir HAIKU_TOP src add-ons kernel drivers misc ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 UsePrivateHeaders drivers ;
 
 
 KernelAddon <driver>config :
 	config.c
+	;
+
+KernelAddon <driver>mem :
+	mem.c
 	;
 
 KernelAddon <driver>poke :
