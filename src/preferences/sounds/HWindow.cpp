@@ -74,19 +74,21 @@ HWindow::InitGUI()
 {
 	BRect rect = Bounds();
 	rect.bottom -= 106;
-	BView *view = new BView(rect,"",B_FOLLOW_ALL, B_WILL_DRAW|B_PULSE_NEEDED);
-	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(view);
-		
+	BView *listView = new BView(rect,"",B_FOLLOW_NONE, B_WILL_DRAW | B_PULSE_NEEDED);
+	listView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AddChild(listView);
+
 	BRect stringRect(16, 5, 60, 22);
 	BStringView *stringView = new BStringView(stringRect, "event", "Event");
 	stringView->SetFont(be_bold_font);
-	view->AddChild(stringView);
+	stringView->ResizeToPreferred();
+	listView->AddChild(stringView);
 	
-	stringRect.OffsetBy(100, 0);
+	stringRect.OffsetBy(120, 0);
 	stringView = new BStringView(stringRect, "sound", "Sound");
 	stringView->SetFont(be_bold_font);
-	view->AddChild(stringView);
+	stringView->ResizeToPreferred();
+	listView->AddChild(stringView);
 		
 	rect.left += 13;
 	rect.right -= B_V_SCROLL_BAR_WIDTH + 13;
@@ -101,11 +103,11 @@ HWindow::InitGUI()
 									,0
 									,false
 									,true);
-	view->AddChild(scrollView);
-	
+	listView->AddChild(scrollView);
+
 	rect = Bounds();
 	rect.top = rect.bottom - 105;
-	view = new BView(rect,"",B_FOLLOW_LEFT_RIGHT|B_FOLLOW_BOTTOM,B_WILL_DRAW|B_PULSE_NEEDED);
+	BView *view = new BView(rect,"", B_FOLLOW_NONE, B_WILL_DRAW | B_PULSE_NEEDED);
 	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(view);
 	rect = view->Bounds().InsetBySelf(12, 12);
@@ -127,25 +129,37 @@ HWindow::InitGUI()
 										,"filemenu"
 										,"Sound File:"
 										,menu
-										,B_FOLLOW_TOP|B_FOLLOW_LEFT);
-	menuField->SetDivider(menuField->StringWidth("Sound File:")+10);
+										,B_FOLLOW_TOP | B_FOLLOW_LEFT);
+	menuField->SetDivider(menuField->StringWidth("Sound File:") + 10);
 	box->AddChild(menuField);
-	rect.OffsetBy(-2,38);
-	rect.left = rect.right - 80;
+	rect.OffsetBy(-2, menuField->Bounds().Height() + 15);
 	BButton *button = new BButton(rect
 						,"stop"
 						,"Stop"
 						,new BMessage(M_STOP_MESSAGE)
-						,B_FOLLOW_RIGHT|B_FOLLOW_TOP);
+						,B_FOLLOW_RIGHT | B_FOLLOW_TOP);
+	button->ResizeToPreferred();
+	button->MoveTo(box->Bounds().right - button->Bounds().Width() - 15, rect.top);
 	box->AddChild(button);
 	
-	rect.OffsetBy(-90,0);
+	rect = button->Frame();
+	view->ResizeTo(view->Bounds().Width(), 24 + rect.bottom + 12);
+	box->ResizeTo(box->Bounds().Width(), rect.bottom + 12);
+
+	button->SetResizingMode(B_FOLLOW_RIGHT | B_FOLLOW_TOP);
 	button = new BButton(rect
 								,"play"
 								,"Play"
 								,new BMessage(M_PLAY_MESSAGE)
-								,B_FOLLOW_RIGHT|B_FOLLOW_TOP);
+								,B_FOLLOW_RIGHT | B_FOLLOW_TOP);
+	button->ResizeToPreferred();
+	button->MoveTo(rect.left - button->Bounds().Width() - 15, rect.top);
 	box->AddChild(button);
+	
+	view->MoveTo(0, listView->Frame().bottom);
+	ResizeTo(Bounds().Width(), listView->Frame().bottom + view->Bounds().Height());
+	listView->SetResizingMode(B_FOLLOW_ALL);
+	view->SetResizingMode(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
 
 	// setup file menu
 	SetupMenuField();

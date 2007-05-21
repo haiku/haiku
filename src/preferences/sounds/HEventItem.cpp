@@ -65,12 +65,11 @@ void
 HEventItem::DrawItem(BView *owner, BRect itemRect, bool complete)
 {
 	rgb_color kBlack = { 0,0,0,0 };
-	rgb_color kHighlight = { 206,207,206,0 };
 		
 	if (IsSelected() || complete) {
 		rgb_color color;
 		if (IsSelected())
-			color = kHighlight;
+			color = tint_color(owner->LowColor(), B_DARKEN_2_TINT);
 		else
 			color = owner->ViewColor();
 		
@@ -79,18 +78,21 @@ HEventItem::DrawItem(BView *owner, BRect itemRect, bool complete)
 		owner->FillRect(itemRect);
 		owner->SetHighColor(kBlack);
 		
-	} else {
+	} 
+	else {
 		owner->SetLowColor(owner->ViewColor());
 	}
 	
-	BPoint point = itemRect.LeftTop() + BPoint(5, 10);
+	font_height fontHeight;
+	be_plain_font->GetHeight(&fontHeight);
+	BPoint point = itemRect.LeftTop() + BPoint(5, fontHeight.ascent);
 	
 	owner->SetHighColor(kBlack);
 	owner->SetFont(be_plain_font);
 	owner->MovePenTo(point);
 	owner->DrawString(Name());
 	
-	point += BPoint(100, 0);
+	point += BPoint(120, 0);
 	BPath path(Path());
 	owner->MovePenTo(point);
 	owner->DrawString(path.Leaf() ? path.Leaf() : "<none>");
