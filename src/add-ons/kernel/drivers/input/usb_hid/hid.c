@@ -414,7 +414,6 @@ interpret_kb_buffer(hid_device_info *device)
 {
 	uint8 modifiers = ((uint8*)device->buffer)[0];
 	uint8 bits = device->last_buffer[0] ^ modifiers;
-	bool timerSet = false;
 	uint32 i, j;
 
 	if (bits) {
@@ -447,7 +446,6 @@ interpret_kb_buffer(hid_device_info *device)
 					// unmapped key
 					key = 0x200000 + ((uint8*)device->buffer)[i];
 				}
-				//dprintf("key down: %x, mapping: %lx\n", ((uint8*)device->buffer)[i], key);
 
 				write_key(device, key, true);
 
@@ -456,7 +454,6 @@ interpret_kb_buffer(hid_device_info *device)
 				device->repeat_timer.key = key;
 				add_timer(&device->repeat_timer.timer, timer_delay_hook,
 					device->repeat_delay, B_ONE_SHOT_RELATIVE_TIMER);
-				timerSet = true;
 			}
 		} else
 			break;
@@ -488,7 +485,7 @@ interpret_kb_buffer(hid_device_info *device)
 				}
 
 				write_key(device, key, false);
-				if (!timerSet)
+				if (device->repeat_timer.key == key)
 					cancel_timer(&device->repeat_timer.timer);
 			}
 		} else
@@ -664,14 +661,11 @@ hid_device_added(const usb_device *dev, void **cookie)
 
 	dev_desc = usb->get_device_descriptor(dev);
 
-	if (dev_desc->vendor_id == USB_VENDOR_WACOM) {
-		DPRINTF_INFO ((MY_ID "vendor ID 0x%04X, product ID 0x%04X\n",
-			dev_desc->vendor_id, dev_desc->product_id));
-		return B_ERROR;
-	}
-
 	DPRINTF_INFO ((MY_ID "vendor ID 0x%04X, product ID 0x%04X\n",
 		dev_desc->vendor_id, dev_desc->product_id));
+
+	if (dev_desc->vendor_id == USB_VENDOR_WACOM)
+		return B_ERROR;
 
 	/* check interface class */
 
