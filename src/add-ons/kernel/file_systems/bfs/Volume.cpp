@@ -455,7 +455,8 @@ Volume::CreateIndicesRoot(Transaction &transaction)
 {
 	off_t id;
 	status_t status = Inode::Create(transaction, NULL, NULL,
-		S_INDEX_DIR | S_STR_INDEX | S_DIRECTORY | 0700, 0, 0, &id, &fIndicesNode);
+		S_INDEX_DIR | S_STR_INDEX | S_DIRECTORY | 0700, 0, 0, NULL, &id,
+		&fIndicesNode);
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
@@ -496,12 +497,12 @@ Volume::UpdateLiveQueries(Inode *inode, const char *attribute, int32 type, const
 }
 
 
-/** Checks if there is a live query whose results depend on the presence
- *	or value of the specified attribute.
- *	Don't use it if you already have all the data together to evaluate
- *	the queries - it wouldn't safe you anything in this case.
- */
-
+/*!
+	Checks if there is a live query whose results depend on the presence
+	or value of the specified attribute.
+	Don't use it if you already have all the data together to evaluate
+	the queries - it wouldn't safe you anything in this case.
+*/
 bool
 Volume::CheckForLiveQuery(const char *attribute)
 {
@@ -534,8 +535,7 @@ Volume::RemoveQuery(Query *query)
 }
 
 
-//	#pragma mark -
-//	Disk scanning and initialization
+//	#pragma mark - Disk scanning and initialization
 
 
 status_t
@@ -572,7 +572,8 @@ Volume::Initialize(const char *device, const char *name, uint32 blockSize,
 	if (strchr(name, '/') != NULL)
 		return B_BAD_VALUE;
 
-	if (blockSize != 1024 && blockSize != 2048 && blockSize != 4096 && blockSize != 8192)
+	if (blockSize != 1024 && blockSize != 2048 && blockSize != 4096
+		&& blockSize != 8192)
 		return B_BAD_VALUE;
 
 	DeviceOpener opener(device, O_RDWR);
@@ -603,7 +604,8 @@ Volume::Initialize(const char *device, const char *name, uint32 blockSize,
 		* fSuperBlock.BlocksPerAllocationGroup() + 1);
 	fSuperBlock.log_blocks.length = HOST_ENDIAN_TO_BFS_INT16(2048);
 		// ToDo: set the log size depending on the disk size
-	fSuperBlock.log_start = fSuperBlock.log_end = HOST_ENDIAN_TO_BFS_INT64(ToBlock(Log()));
+	fSuperBlock.log_start = fSuperBlock.log_end = HOST_ENDIAN_TO_BFS_INT64(
+		ToBlock(Log()));
 
 	// set the current log pointers, so that journaling will work correctly
 	fLogStart = fSuperBlock.LogStart();
@@ -628,7 +630,7 @@ Volume::Initialize(const char *device, const char *name, uint32 blockSize,
 
 	off_t id;
 	status_t status = Inode::Create(transaction, NULL, NULL,
-		S_DIRECTORY | 0755, 0, 0, &id, &fRootNode);
+		S_DIRECTORY | 0755, 0, 0, NULL, &id, &fRootNode);
 	if (status < B_OK)
 		RETURN_ERROR(status);
 

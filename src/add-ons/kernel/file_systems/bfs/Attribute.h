@@ -30,7 +30,8 @@ class Attribute {
 		status_t Get(const char *name);
 		void Put();
 
-		status_t Create(const char *name, type_code type, int openMode, attr_cookie **_cookie);
+		status_t Create(const char *name, type_code type, int openMode,
+			attr_cookie **_cookie);
 		status_t Open(const char *name, int openMode, attr_cookie **_cookie);
 
 		status_t Stat(struct stat &stat);
@@ -40,6 +41,8 @@ class Attribute {
 					off_t pos, const uint8 *buffer, size_t *_length);
 
 	private:
+		status_t _Truncate();
+
 		NodeGetter	fNodeGetter;
 		Inode		*fInode;
 		small_data	*fSmall;

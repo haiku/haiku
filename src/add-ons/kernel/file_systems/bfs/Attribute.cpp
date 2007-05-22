@@ -1,8 +1,9 @@
-/* Attribute - connection between pure inode and kernel_interface attributes
- *
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
+
+//!	connection between pure inode and kernel_interface attributes
 
 
 #include "Attribute.h"
@@ -128,6 +129,11 @@ Attribute::Create(const char *name, type_code type, int openMode, attr_cookie **
 	cookie->open_mode = openMode;
 	cookie->create = true;
 
+	if (Get(name) == B_OK) {
+		// attribute already exists
+		if ((openMode & O_TRUNC) != 0)
+			_Truncate();
+	}
 	*_cookie = cookie;
 	return B_OK;
 }
@@ -154,9 +160,8 @@ Attribute::Open(const char *name, int openMode, attr_cookie **_cookie)
 	cookie->create = false;
 
 	// Should we truncate the attribute?
-	if (openMode & O_TRUNC) {
-		// ToDo!
-	}
+	if ((openMode & O_TRUNC) != 0)
+		_Truncate();
 
 	*_cookie = cookie;
 	return B_OK;
@@ -204,5 +209,32 @@ Attribute::Write(Transaction &transaction, attr_cookie *cookie,
 
 	return fInode->WriteAttribute(transaction, cookie->name, cookie->type,
 		pos, buffer, _length);
+}
+
+
+status_t
+Attribute::_Truncate()
+{
+	if (fSmall != NULL) {
+		// TODO: as long as Inode::_AddSmallData() works like it does,
+		// we've got nothing to do here
+		return B_OK;
+	}
+
+	if (fAttribute != NULL) {
+		WriteLocked locked(fAttribute->Lock());
+		Transaction transaction(fAttribute->GetVolume(), fAttribute->BlockNumber());
+
+		status_t status = fAttribute->SetFileSize(transaction, 0);
+		if (status >= B_OK)
+			status = fAttribute->WriteBack(transaction);
+
+		if (status < B_OK)
+			return status;
+
+		transaction.Done();
+	}
+
+	return B_OK;
 }
 

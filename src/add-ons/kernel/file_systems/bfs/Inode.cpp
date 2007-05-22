@@ -498,6 +498,7 @@ status_t
 Inode::_AddSmallData(Transaction &transaction, NodeGetter &nodeGetter,
 	const char *name, uint32 type, const uint8 *data, size_t length, bool force)
 {
+	// TODO: support new write attr semantics and write offset!
 	bfs_inode *node = nodeGetter.WritableNode();
 
 	if (node == NULL || name == NULL || data == NULL)
@@ -1047,7 +1048,7 @@ Inode::CreateAttribute(Transaction &transaction, const char *name, uint32 type,
 
 	// Inode::Create() locks the inode for us
 	return Inode::Create(transaction, attributes, name, 
-		S_ATTR | S_FILE | 0666, 0, type, NULL, attribute);
+		S_ATTR | S_FILE | 0666, 0, type, NULL, NULL, attribute);
 }
 
 
@@ -2122,7 +2123,7 @@ Inode::Sync()
 
 
 status_t
-Inode::Remove(Transaction &transaction, const char *name, off_t *_id,
+Inode::Remove(Transaction &transaction, const char *name, vnode_id *_id,
 	bool isDirectory)
 {
 	BPlusTree *tree;
@@ -2205,18 +2206,22 @@ Inode::Remove(Transaction &transaction, const char *name, off_t *_id,
 /*!
 	Creates the inode with the specified parent directory, and automatically
 	adds the created inode to that parent directory. If an attribute directory
-	is created, it will also automatically added to the parent inode as such.
-	However, the indices root node, and the regular root node won't be added
-	to the super block.
+	is created, it will also automatically  be added to the parent inode as
+	such. However, the indices root node, and the regular root node won't be
+	added to the super block.
 	It will also create the initial B+tree for the inode if it's a directory
 	of any kind.
-	If the "_id" or "_inode" variable is given and non-NULL to store the inode's
-	ID, the inode stays locked - you have to call put_vnode() if you don't use it
-	anymore.
+	If the "_id" or "_inode" variable is given and non-NULL to store the
+	inode's ID, the inode stays locked - you have to call put_vnode() if you
+	don't use it anymore.
+	If the node already exists, this method will fail if O_EXCL is set, or it's
+	a directory or a symlink. Otherwise, it will just be returned. If O_TRUNC
+	has been specified, the file will also be truncated.
 */
 status_t
 Inode::Create(Transaction &transaction, Inode *parent, const char *name,
-	int32 mode, int openMode, uint32 type, off_t *_id, Inode **_inode)
+	int32 mode, int openMode, uint32 type, bool *_created, vnode_id *_id,
+	Inode **_inode)
 {
 	FUNCTION_START(("name = %s, mode = %ld\n", name, mode));
 
@@ -2274,8 +2279,10 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name,
 					return status;
 			}
 
+			if (_created)
+				*_created = false;
 			if (_id)
-				*_id = offset;
+				*_id = inode->ID();
 			if (_inode)
 				*_inode = inode;
 
@@ -2395,6 +2402,8 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name,
 			inode->Size(), volume->Device()));
 	}
 
+	if (_created)
+		*_created = true;
 	if (_id != NULL)
 		*_id = inode->ID();
 	if (_inode != NULL)

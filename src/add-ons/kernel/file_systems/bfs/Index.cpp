@@ -209,7 +209,7 @@ Index::Create(Transaction &transaction, const char *name, uint32 type)
 
 	// Inode::Create() will keep the inode locked for us
 	return Inode::Create(transaction, fVolume->IndicesNode(), name,
-		S_INDEX_DIR | S_DIRECTORY | mode, 0, type, NULL, &fNode);
+		S_INDEX_DIR | S_DIRECTORY | mode, 0, type, NULL, NULL, &fNode);
 }
 
 

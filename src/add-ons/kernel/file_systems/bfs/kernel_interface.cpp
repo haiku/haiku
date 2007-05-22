@@ -1,8 +1,9 @@
-/* kernel_interface - file system interface to Haiku's vnode layer
- *
+/*
  * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
+
+//!	file system interface to Haiku's vnode layer
 
 
 #include "Debug.h"
@@ -14,6 +15,9 @@
 #include "Attribute.h"
 #include "bfs_control.h"
 
+#ifndef BFS_SHELL
+#	include <driver_settings.h>
+#endif
 
 #define BFS_IO_SIZE	65536
 
@@ -79,7 +83,8 @@ bfs_scan_partition(int fd, partition_data *partition, void *_cookie)
 
 	partition->status = B_PARTITION_VALID;
 	partition->flags |= B_PARTITION_FILE_SYSTEM;
-	partition->content_size = cookie->super_block.NumBlocks() * cookie->super_block.BlockSize();
+	partition->content_size = cookie->super_block.NumBlocks()
+		* cookie->super_block.BlockSize();
 	partition->block_size = cookie->super_block.BlockSize();
 	partition->content_name = strdup(cookie->super_block.name);
 	if (partition->content_name == NULL)
@@ -441,11 +446,6 @@ bfs_get_file_map(fs_volume _fs, fs_vnode _node, off_t offset, size_t size,
 //	#pragma mark -
 
 
-/**	the walk function just "walks" through a directory looking for the
- *	specified file. It calls get_vnode() on its vnode-id to init it
- *	for the kernel.
- */
-
 static status_t
 bfs_lookup(void *_ns, void *_directory, const char *file, vnode_id *_vnodeID, int *_type)
 {
@@ -487,7 +487,8 @@ bfs_lookup(void *_ns, void *_directory, const char *file, vnode_id *_vnodeID, in
 
 
 static status_t
-bfs_get_vnode_name(fs_volume _fs, fs_vnode _node, char *buffer, size_t bufferSize)
+bfs_get_vnode_name(fs_volume _fs, fs_vnode _node, char *buffer,
+	size_t bufferSize)
 {
 	Inode *inode = (Inode *)_node;
 
@@ -496,9 +497,11 @@ bfs_get_vnode_name(fs_volume _fs, fs_vnode _node, char *buffer, size_t bufferSiz
 
 
 static status_t
-bfs_ioctl(void *_fs, void *_node, void *_cookie, ulong cmd, void *buffer, size_t bufferLength)
+bfs_ioctl(void *_fs, void *_node, void *_cookie, ulong cmd, void *buffer,
+	size_t bufferLength)
 {
-	FUNCTION_START(("node = %p, cmd = %lu, buf = %p, len = %ld\n", _node, cmd, buffer, bufferLength));
+	FUNCTION_START(("node = %p, cmd = %lu, buf = %p, len = %ld\n", _node, cmd,
+		buffer, bufferLength));
 
 	Volume *volume = (Volume *)_fs;
 	Inode *inode = (Inode *)_node;
@@ -552,7 +555,8 @@ bfs_ioctl(void *_fs, void *_node, void *_cookie, ulong cmd, void *buffer, size_t
 			CachedBlock cached(volume);
 			block_run run;
 			while (allocator.AllocateBlocks(transaction, 8, 0, 64, 1, run) == B_OK) {
-				PRINT(("write block_run(%ld, %d, %d)\n", run.allocation_group, run.start, run.length));
+				PRINT(("write block_run(%ld, %d, %d)\n", run.allocation_group,
+					run.start, run.length));
 				for (int32 i = 0;i < run.length;i++) {
 					uint8 *block = cached.SetToWritable(transaction, run);
 					if (block != NULL)
@@ -739,7 +743,7 @@ bfs_write_stat(void *_ns, void *_node, const struct stat *stat, uint32 mask)
 
 status_t 
 bfs_create(void *_ns, void *_directory, const char *name, int openMode, int mode,
-	void **_cookie, vnode_id *vnodeID)
+	void **_cookie, vnode_id *_vnodeID)
 {
 	FUNCTION_START(("name = \"%s\", perms = %d, openMode = %d\n", name, mode, openMode));
 
@@ -766,8 +770,9 @@ bfs_create(void *_ns, void *_directory, const char *name, int openMode, int mode
 
 	Transaction transaction(volume, directory->BlockNumber());
 
-	status_t status = Inode::Create(transaction, directory, name, S_FILE | (mode & S_IUMSK),
-		openMode, 0, vnodeID);
+	bool created;
+	status_t status = Inode::Create(transaction, directory, name,
+		S_FILE | (mode & S_IUMSK), openMode, 0, &created, _vnodeID);
 
 	if (status >= B_OK) {
 		transaction.Done();
@@ -775,7 +780,8 @@ bfs_create(void *_ns, void *_directory, const char *name, int openMode, int mode
 		// register the cookie
 		*_cookie = cookie;
 
-		notify_entry_created(volume->ID(), directory->ID(), name, *vnodeID);
+		if (created)
+			notify_entry_created(volume->ID(), directory->ID(), name, *_vnodeID);
 	} else
 		free(cookie);
 
@@ -784,7 +790,8 @@ bfs_create(void *_ns, void *_directory, const char *name, int openMode, int mode
 
 
 static status_t 
-bfs_create_symlink(void *_ns, void *_directory, const char *name, const char *path, int mode)
+bfs_create_symlink(void *_ns, void *_directory, const char *name,
+	const char *path, int mode)
 {
 	FUNCTION_START(("name = \"%s\", path = \"%s\"\n", name, path));
 
@@ -806,7 +813,8 @@ bfs_create_symlink(void *_ns, void *_directory, const char *name, const char *pa
 
 	Inode *link;
 	off_t id;
-	status = Inode::Create(transaction, directory, name, S_SYMLINK | 0777, 0, 0, &id, &link);
+	status = Inode::Create(transaction, directory, name, S_SYMLINK | 0777,
+		0, 0, NULL, &id, &link);
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
@@ -814,10 +822,12 @@ bfs_create_symlink(void *_ns, void *_directory, const char *name, const char *pa
 	if (length < SHORT_SYMLINK_NAME_LENGTH) {
 		strcpy(link->Node().short_symlink, path);
 	} else {
-		link->Node().flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_LONG_SYMLINK | INODE_LOGGED);
-		
+		link->Node().flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_LONG_SYMLINK
+			| INODE_LOGGED);
+
 		// links usually don't have a file cache attached - but we now need one
-		link->SetFileCache(file_cache_create(volume->ID(), link->ID(), 0, volume->Device()));
+		link->SetFileCache(file_cache_create(volume->ID(), link->ID(), 0,
+			volume->Device()));
 
 		// The following call will have to write the inode back, so
 		// we don't have to do that here...
@@ -827,7 +837,8 @@ bfs_create_symlink(void *_ns, void *_directory, const char *name, const char *pa
 	if (status == B_OK)
 		status = link->WriteBack(transaction);
 
-	// Inode::Create() left the inode locked in memory, and also doesn't publish links
+	// Inode::Create() left the inode locked in memory, and also doesn't
+	// publish links
 	publish_vnode(volume->ID(), id, link);
 	put_vnode(volume->ID(), id);
 
@@ -1348,7 +1359,8 @@ bfs_read_link(void *_ns, void *_node, char *buffer, size_t *_bufferSize)
 
 
 static status_t
-bfs_create_dir(void *_ns, void *_directory, const char *name, int mode, vnode_id *_newVnodeID)
+bfs_create_dir(void *_ns, void *_directory, const char *name, int mode,
+	vnode_id *_newVnodeID)
 {
 	FUNCTION_START(("name = \"%s\", perms = %d\n", name, mode));
 
@@ -1371,7 +1383,8 @@ bfs_create_dir(void *_ns, void *_directory, const char *name, int mode, vnode_id
 	// Inode::Create() locks the inode if we pass the "id" parameter, but we
 	// need it anyway
 	off_t id;
-	status = Inode::Create(transaction, directory, name, S_DIRECTORY | (mode & S_IUMSK), 0, 0, &id);
+	status = Inode::Create(transaction, directory, name,
+		S_DIRECTORY | (mode & S_IUMSK), 0, 0, NULL, &id);
 	if (status == B_OK) {
 		*_newVnodeID = id;
 		put_vnode(volume->ID(), id);
@@ -1742,7 +1755,7 @@ bfs_remove_attr(fs_volume _fs, fs_vnode _node, const char *name)
 		notify_attribute_changed(volume->ID(), inode->ID(), name, B_ATTR_REMOVED);
 	}
 
-	RETURN_ERROR(status);
+	return status;
 }
 
 
@@ -2033,57 +2046,40 @@ bfs_initialize(const char *partition, const char *name, const char *parameters,
 {
 	if (partition == NULL)
 		return B_BAD_VALUE;
-
-// TODO: Handle parameters!
-//	char **argv = (char**)parms;
 	
 	uint32 blockSize = 1024;
 	uint32 flags = 0;
 	bool verbose = false;
 
-#if 0
-	while (argv && *++argv) {
-		char *arg = *argv;
-		if (*arg == '-') {
-			if (arg[1] == '-') {
-				if (!strcmp(arg, "--noindex"))
-					flags |= VOLUME_NO_INDICES;
-				else
-					return B_BAD_VALUE;
-			}
+// TODO: driver_settings are not yet supported by the fsshell
+#ifndef BFS_SHELL
+	void *handle = parse_driver_settings_string(parameters);
+	if (handle != NULL) {
+		if (get_driver_boolean_parameter(handle, "noindex", false, true))
+			flags |= VOLUME_NO_INDICES;
+		if (get_driver_boolean_parameter(handle, "verbose", false, true))
+			verbose = true;
 
-			while (*++arg && *arg >= 'a' && *arg <= 'z') {
-				switch (*arg) {
-					case 'v':
-						verbose = true;
-						break;
-					case 'b':
-						if (*++argv == NULL || !(**argv >= '0' && **argv <= '9'))
-							return B_BAD_VALUE;
+		const char *string = get_driver_parameter(handle, "block_size",
+			NULL, NULL);
+		if (string != NULL)
+			blockSize = strtoul(string, NULL, 0);
 
-						blockSize = atol(*argv);
-						break;
-					case 'n':
-						flags |= VOLUME_NO_INDICES;
-						break;
-				}
-			}
-		}
-		else
-			break;
+		delete_driver_settings(handle);
 	}
-#endif	// 0
 
-	if (blockSize != 1024 && blockSize != 2048 && blockSize != 4096 && blockSize != 8192) {
-		FATAL(("valid block sizes are: 1024, 2048, 4096, and 8192\n"));
-		return -1;
+	if (blockSize != 1024 && blockSize != 2048 && blockSize != 4096
+		&& blockSize != 8192) {
+		INFORM(("valid block sizes are: 1024, 2048, 4096, and 8192\n"));
+		return B_BAD_VALUE;
 	}
+#endif
 
 	Volume volume(-1);
 	status_t status = volume.Initialize(partition, name, blockSize, flags);
 	if (status < B_OK) {
-		FATAL(("Initializing volume failed: %s\n", strerror(status)));
-		return -1;
+		INFORM(("Initializing volume failed: %s\n", strerror(status)));
+		return status;
 	}
 
 	if (verbose) {
@@ -2100,33 +2096,6 @@ bfs_initialize(const char *partition, const char *name, const char *parameters,
 			1L << super.AllocationGroupShift()));
 		INFORM(("\tlog size: %u blocks\n", super.log_blocks.Length()));
 	}
-
-	// make the disk image bootable
-
-// TODO: Check whether this is necessary. Actually makebootable should do the
-// trick anyway.
-#if 0
-	int device = open(partition, O_RDWR);
-	if (device < 0) {
-		FATAL(("Could not make image bootable: Failed to open \"%s\"\n",
-			partition));
-		return B_FILE_ERROR;
-	}
-
-	// change BIOS drive and partition offset
-	// TODO: for now, this will only work for images only
-
-	sBootBlockData1[kBIOSDriveOffset] = 0x80;
-		// for now, this should be replaced by the real thing
-	uint32 *offset = (uint32 *)&sBootBlockData1[kPartitionDataOffset];
-	*offset = 0;
-
-	write_pos(device, 0, sBootBlockData1, kBootBlockData1Size);
-	write_pos(device, kBootBlockData2Offset, sBootBlockData2,
-		kBootBlockData2Size);
-
-	close(device);
-#endif	// 0
 
 	return B_OK;
 }

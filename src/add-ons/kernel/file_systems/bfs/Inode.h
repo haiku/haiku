@@ -8,10 +8,6 @@
 
 #include "system_dependencies.h"
 
-#ifndef _IMPEXP_KERNEL
-#	define _IMPEXP_KERNEL
-#endif
-
 #include "Volume.h"
 #include "Journal.h"
 #include "Lock.h"
@@ -40,7 +36,8 @@ enum inode_type {
 class Inode {
 	public:
 		Inode(Volume *volume, vnode_id id);
-		Inode(Volume *volume, Transaction &transaction, vnode_id id, mode_t mode, block_run &run);
+		Inode(Volume *volume, Transaction &transaction, vnode_id id,
+			mode_t mode, block_run &run);
 		//Inode(CachedBlock *cached);
 		~Inode();
 
@@ -52,17 +49,27 @@ class Inode {
 		SimpleLock &SmallDataLock() { return fSmallDataLock; }
 		status_t WriteBack(Transaction &transaction);
 
-		bool IsContainer() const { return Mode() & (S_DIRECTORY | S_INDEX_DIR | S_ATTR_DIR); }
-			// note, that this test will also be true for S_IFBLK (not that it's used in the fs :)
-		bool IsDirectory() const { return (Mode() & (S_DIRECTORY | S_INDEX_DIR | S_ATTR_DIR)) == S_DIRECTORY; }
-		bool IsIndex() const { return (Mode() & (S_INDEX_DIR | 0777)) == S_INDEX_DIR; }
-			// that's a stupid check, but AFAIK the only possible method...
+		bool IsContainer() const
+			{ return Mode() & (S_DIRECTORY | S_INDEX_DIR | S_ATTR_DIR); }
+				// note, that this test will also be true for S_IFBLK
+				// (not that it's used in the fs :)
+		bool IsDirectory() const
+			{ return (Mode() & (S_DIRECTORY | S_INDEX_DIR | S_ATTR_DIR))
+				== S_DIRECTORY; }
+		bool IsIndex() const
+			{ return (Mode() & (S_INDEX_DIR | 0777)) == S_INDEX_DIR; }
+				// that's a stupid check, but AFAIK the only possible method...
 
-		bool IsAttributeDirectory() const { return (Mode() & S_ATTR_DIR) != 0; }
-		bool IsAttribute() const { return (Mode() & S_ATTR) != 0; }
-		bool IsFile() const { return (Mode() & (S_IFMT | S_ATTR)) == S_FILE; }
-		bool IsRegularNode() const { return (Mode() & (S_ATTR_DIR | S_INDEX_DIR | S_ATTR)) == 0; }
-			// a regular node in the standard namespace (i.e. not an index or attribute)
+		bool IsAttributeDirectory() const
+			{ return (Mode() & S_ATTR_DIR) != 0; }
+		bool IsAttribute() const
+			{ return (Mode() & S_ATTR) != 0; }
+		bool IsFile() const
+			{ return (Mode() & (S_IFMT | S_ATTR)) == S_FILE; }
+		bool IsRegularNode() const
+			{ return (Mode() & (S_ATTR_DIR | S_INDEX_DIR | S_ATTR)) == 0; }
+				// a regular node in the standard namespace
+				// (i.e. not an index or attribute)
 		bool IsSymLink() const { return S_ISLNK(Mode()); }
 		bool HasUserAccessableStream() const { return IsFile(); }
 			// currently only files can be accessed with bfs_read()/bfs_write()
@@ -87,30 +94,36 @@ class Inode {
 		status_t CheckPermissions(int accessMode) const;
 
 		// small_data access methods
-		small_data *FindSmallData(const bfs_inode *node, const char *name) const;
+		small_data *FindSmallData(const bfs_inode *node,
+			const char *name) const;
 		const char *Name(const bfs_inode *node) const;
-		status_t GetName(char *buffer, size_t bufferSize = B_FILE_NAME_LENGTH) const;
+		status_t GetName(char *buffer,
+			size_t bufferSize = B_FILE_NAME_LENGTH) const;
 		status_t SetName(Transaction &transaction, const char *name);
 
 		// high-level attribute methods
-		status_t ReadAttribute(const char *name, int32 type, off_t pos, uint8 *buffer, size_t *_length);
-		status_t WriteAttribute(Transaction &transaction, const char *name, int32 type, off_t pos, const uint8 *buffer, size_t *_length);
+		status_t ReadAttribute(const char *name, int32 type, off_t pos,
+			uint8 *buffer, size_t *_length);
+		status_t WriteAttribute(Transaction &transaction, const char *name,
+			int32 type, off_t pos, const uint8 *buffer, size_t *_length);
 		status_t RemoveAttribute(Transaction &transaction, const char *name);
 
 		// attribute methods
 		status_t GetAttribute(const char *name, Inode **attribute);
 		void ReleaseAttribute(Inode *attribute);
-		status_t CreateAttribute(Transaction &transaction, const char *name, uint32 type, Inode **attribute);
+		status_t CreateAttribute(Transaction &transaction, const char *name,
+			uint32 type, Inode **attribute);
 
 		// for directories only:
-		status_t GetTree(BPlusTree **);
+		status_t GetTree(BPlusTree **_tree);
 		bool IsEmpty();
 
 		// manipulating the data stream
 		status_t FindBlockRun(off_t pos, block_run &run, off_t &offset);
 
 		status_t ReadAt(off_t pos, uint8 *buffer, size_t *length);
-		status_t WriteAt(Transaction &transaction, off_t pos, const uint8 *buffer, size_t *length);
+		status_t WriteAt(Transaction &transaction, off_t pos,
+			const uint8 *buffer, size_t *length);
 		status_t FillGapWithZeros(off_t oldSize, off_t newSize);
 
 		status_t SetFileSize(Transaction &transaction, off_t size);
@@ -124,16 +137,21 @@ class Inode {
 		bfs_inode &Node() { return fNode; }
 
 		// create/remove inodes
-		status_t Remove(Transaction &transaction, const char *name, off_t *_id = NULL,
-					bool isDirectory = false);
-		static status_t Create(Transaction &transaction, Inode *parent, const char *name,
-					int32 mode, int omode, uint32 type, off_t *_id = NULL, Inode **_inode = NULL);
+		status_t Remove(Transaction &transaction, const char *name,
+			vnode_id *_id = NULL, bool isDirectory = false);
+		static status_t Create(Transaction &transaction, Inode *parent,
+			const char *name, int32 mode, int openMode, uint32 type,
+			bool *_created = NULL, vnode_id *_id = NULL, Inode **_inode = NULL);
 
 		// index maintaining helper
-		void UpdateOldSize() { fOldSize = Size(); }
-		void UpdateOldLastModified() { fOldLastModified = Node().LastModifiedTime(); }
-		off_t OldSize() { return fOldSize; }
-		off_t OldLastModified() { return fOldLastModified; }
+		void UpdateOldSize()
+			{ fOldSize = Size(); }
+		void UpdateOldLastModified()
+			{ fOldLastModified = Node().LastModifiedTime(); }
+		off_t OldSize()
+			{ return fOldSize; }
+		off_t OldLastModified()
+			{ return fOldLastModified; }
 
 		// file cache
 		void *FileCache() const { return fCache; }
@@ -148,17 +166,19 @@ class Inode {
 		friend class InodeAllocator;
 
 		// small_data access methods
-		status_t _MakeSpaceForSmallData(Transaction &transaction, bfs_inode *node,
-					const char *name, int32 length);
+		status_t _MakeSpaceForSmallData(Transaction &transaction,
+			bfs_inode *node, const char *name, int32 length);
 		status_t _RemoveSmallData(Transaction &transaction, NodeGetter &node,
-					const char *name);
+			const char *name);
 		status_t _AddSmallData(Transaction &transaction, NodeGetter &node,
-					const char *name, uint32 type, const uint8 *data, size_t length,
-					bool force = false);
-		status_t _GetNextSmallData(bfs_inode *node, small_data **_smallData) const;
-		status_t _RemoveSmallData(bfs_inode *node, small_data *item, int32 index);
+			const char *name, uint32 type, const uint8 *data, size_t length,
+			bool force = false);
+		status_t _GetNextSmallData(bfs_inode *node,
+			small_data **_smallData) const;
+		status_t _RemoveSmallData(bfs_inode *node, small_data *item,
+			int32 index);
 		status_t _RemoveAttribute(Transaction &transaction, const char *name,
-					bool hasIndex, Index *index);
+			bool hasIndex, Index *index);
 
 		void _AddIterator(AttributeIterator *iterator);
 		void _RemoveIterator(AttributeIterator *iterator);
@@ -179,8 +199,11 @@ class Inode {
 		Inode			*fAttributes;
 		void			*fCache;
 		bfs_inode		fNode;
-		off_t			fOldSize;			// we need those values to ensure we will remove
-		off_t			fOldLastModified;	// the correct keys from the indices
+
+		off_t			fOldSize;
+		off_t			fOldLastModified;
+			// we need those values to ensure we will remove
+			// the correct keys from the indices
 
 		mutable SimpleLock	fSmallDataLock;
 		Chain<AttributeIterator> fIterators;
@@ -200,7 +223,8 @@ class NodeGetter : public CachedBlock {
 			SetTo(volume->VnodeToBlock(inode->ID()));
 		}
 
-		NodeGetter(Volume *volume, Transaction &transaction, const Inode *inode, bool empty = false)
+		NodeGetter(Volume *volume, Transaction &transaction,
+				const Inode *inode, bool empty = false)
 			: CachedBlock(volume)
 		{
 			SetToWritable(transaction, volume->VnodeToBlock(inode->ID()), empty);
@@ -293,11 +317,11 @@ class AttributeIterator {
 };
 
 
-/**	Converts the open mode, the open flags given to bfs_open(), into
- *	access modes, e.g. since O_RDONLY requires read access to the
- *	file, it will be converted to R_OK.
- */
-
+/*!
+	Converts the open mode, the open flags given to bfs_open(), into
+	access modes, e.g. since O_RDONLY requires read access to the
+	file, it will be converted to R_OK.
+*/
 inline int
 openModeToAccess(int openMode)
 {
