@@ -8,6 +8,7 @@
 #include <KernelExport.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/types.h>
 
 #define DRIVER_NAME "mem"
 #define DEVICE_NAME "misc/mem"
@@ -160,10 +161,22 @@ err1:
 area_id
 mem_map_target(off_t position, size_t len, uint32 protection, void **va)
 {
-	return EINVAL;
-/*	area_id area;
+	area_id area;
 	void *paddr;
 	void *vaddr;
+	int offset;
+	size_t size;
+	
+	/* SIZE_MAX actually but 2G should be enough anyway */
+	if (len > SSIZE_MAX - B_PAGE_SIZE)
+		return EINVAL;
+	
+	/* the first page address */
+	paddr = (void *)(addr_t)(position & ~((off_t)B_PAGE_SIZE - 1));
+	/* offset of target into it */
+	offset = position - (off_t)(addr_t)paddr;
+	/* size of the whole mapping (page rounded) */
+	size = (offset + len + B_PAGE_SIZE - 1) & ~((size_t)B_PAGE_SIZE - 1);
 	
 	area = map_physical_memory("mem_driver_temp",
 								paddr, size, B_ANY_KERNEL_ADDRESS,
@@ -172,8 +185,7 @@ mem_map_target(off_t position, size_t len, uint32 protection, void **va)
 	if (area < 0)
 		return area;
 	
-	*va = vaddr;
+	*va = vaddr + offset;
 	
 	return EINVAL;
-*/
 }
