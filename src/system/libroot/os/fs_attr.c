@@ -1,5 +1,5 @@
 /* 
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -54,7 +54,7 @@ fs_write_attr(int fd, const char *attribute, uint32 type,
 {
 	ssize_t bytes;
 
-	int attr = _kern_create_attr(fd, attribute, type, O_WRONLY);
+	int attr = _kern_create_attr(fd, attribute, type, O_WRONLY | O_TRUNC);
 	if (attr < 0)
 		RETURN_AND_SET_ERRNO(attr);
 
