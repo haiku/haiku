@@ -322,6 +322,8 @@ Volume::Volume(mount_id id)
 	fRootNode = CreateNode(NULL, "", S_IFDIR | 0777);
 	if (fRootNode == NULL)
 		return;
+
+	publish_vnode(ID(), fRootNode->ID(), fRootNode);
 }
 
 
@@ -394,7 +396,6 @@ Volume::CreateNode(Inode *parent, const char *name, int32 type)
 
 	hash_insert(fNodeHash, inode);
 	hash_insert(fNameHash, inode);
-	publish_vnode(ID(), inode->ID(), inode);
 
 	if (fRootNode != NULL)
 		fRootNode->SetModificationTime(time(NULL));
