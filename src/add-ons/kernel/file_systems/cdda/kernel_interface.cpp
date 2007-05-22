@@ -5,8 +5,10 @@
 
 
 #include "cdda.h"
+#include "cddb.h"
 #include "Lock.h"
 
+#include <FindDirectory.h>
 #include <fs_info.h>
 #include <fs_interface.h>
 #include <KernelExport.h>
@@ -66,49 +68,63 @@ struct wav_header {
 	riff_chunk			data;
 } _PACKED;
 
+enum attr_mode {
+	kDiscIDAttributes,
+	kSharedAttributes,
+	kDeviceAttributes
+};
+
 class Volume {
 	public:
 		Volume(mount_id id);
 		~Volume();
 
-		status_t		InitCheck();
-		mount_id		ID() const { return fID; }
-		Inode			&RootNode() const { return *fRootNode; }
+		status_t	InitCheck();
+		mount_id	ID() const { return fID; }
+		uint32		DiscID() const { return fDiscID; }
+		Inode		&RootNode() const { return *fRootNode; }
 
-		status_t		Mount(const char* device);
-		int				Device() const { return fDevice; }
-		vnode_id		GetNextNodeID() { return fNextID++; }
+		status_t	Mount(const char* device);
+		int			Device() const { return fDevice; }
+		vnode_id	GetNextNodeID() { return fNextID++; }
 
-		const char		*Name() const { return fName; }
-		status_t		SetName(const char *name);
+		const char	*Name() const { return fName; }
+		status_t	SetName(const char *name);
 
-		Semaphore		&Lock();
+		Semaphore	&Lock();
 
-		Inode			*Find(vnode_id id);
-		Inode			*Find(const char *name);
+		Inode		*Find(vnode_id id);
+		Inode		*Find(const char *name);
 
-		Inode			*FirstEntry() const { return fFirstEntry; }
+		Inode		*FirstEntry() const { return fFirstEntry; }
 
-		off_t			NumBlocks() const { return fNumBlocks; }
-		size_t			BufferSize() const { return 32 * kFrameSize; }
+		off_t		NumBlocks() const { return fNumBlocks; }
+		size_t		BufferSize() const { return 32 * kFrameSize; }
 			// TODO: for now
 
-		static void		DetermineName(cdtext &text, char *name, size_t length);
+		static void	DetermineName(cdtext &text, char *name, size_t length);
 
 	private:
-		Inode			*_CreateNode(Inode *parent, const char *name,
-							off_t start, off_t frames, int32 type);
+		Inode		*_CreateNode(Inode *parent, const char *name,
+						off_t start, off_t frames, int32 type);
+		int			_OpenAttributes(int mode,
+						enum attr_mode attrMode = kDiscIDAttributes);
+		void		_RestoreAttributes();
+		void		_StoreAttributes();
+		void		_RestoreSharedAttributes();
+		void		_StoreSharedAttributes();
 
-		Semaphore		fLock;
-		int				fDevice;
-		mount_id		fID;
-		Inode 			*fRootNode;
-		vnode_id		fNextID;
-		char			*fName;
-		off_t			fNumBlocks;
+		Semaphore	fLock;
+		int			fDevice;
+		mount_id	fID;
+		uint32		fDiscID;
+		Inode 		*fRootNode;
+		vnode_id	fNextID;
+		char		*fName;
+		off_t		fNumBlocks;
 
 		// root directory contents - we don't support other directories
-		Inode			*fFirstEntry;
+		Inode		*fFirstEntry;
 };
 
 class Attribute : public DoublyLinkedListLinkImpl<Attribute> {
@@ -123,10 +139,12 @@ class Attribute : public DoublyLinkedListLinkImpl<Attribute> {
 		status_t ReadAt(off_t offset, uint8 *buffer, size_t *_length);
 		status_t WriteAt(off_t offset, const uint8 *buffer, size_t *_length);
 		void Truncate();
+		status_t SetSize(off_t size);
 
 		const char *Name() const { return fName; }
 		size_t Size() const { return fSize; }
 		type_code Type() const { return fType; }
+		uint8 *Data() const { return fData; }
 
 	private:
 		char		*fName;
@@ -165,8 +183,10 @@ class Inode {
 						{ return fFrameCount * kFrameSize /* + WAV header */; }
 
 		Attribute	*FindAttribute(const char *name) const;
+		status_t	AddAttribute(Attribute *attribute, bool overwrite);
 		status_t	AddAttribute(const char *name, type_code type,
-						const uint8 *data = 0, size_t length = 0);
+						bool overwrite, const uint8 *data = 0,
+						size_t length = 0);
 		status_t	AddAttribute(const char *name, type_code type,
 						const char *string);
 		status_t	AddAttribute(const char *name, int32 value);
@@ -175,6 +195,9 @@ class Inode {
 		void		AddAttrCookie(attr_cookie *cookie);
 		void		RemoveAttrCookie(attr_cookie *cookie);
 		void		RewindAttrCookie(attr_cookie *cookie);
+
+		AttributeList::ConstIterator Attributes() const
+						{ return fAttributes.GetIterator(); }
 
 		const wav_header *WAVHeader() const { return &fWAVHeader; }
 
@@ -220,6 +243,209 @@ struct file_cookie {
 	void		*buffer;
 };
 
+static const uint32 kMaxAttributeSize = 65536;
+static const uint32 kMaxAttributes = 64;
+
+
+//	#pragma mark helper functions
+
+
+/*!
+	Determines if the attribute is shared among all devices or among
+	all CDs in a specific device.
+	We use this to share certain Tracker attributes.
+*/
+static bool
+is_special_attribute(const char *name, attr_mode attrMode)
+{
+	if (attrMode == kDeviceAttributes) {
+		static const char *kAttributes[] = {
+			"_trk/windframe",
+			"_trk/pinfo",
+			"_trk/pinfo_le",
+			NULL,
+		};
+
+		for (int32 i = 0; kAttributes[i]; i++) {
+			if (!strcmp(name, kAttributes[i]))
+				return true;
+		}
+	} else if (attrMode == kSharedAttributes) {
+		static const char *kAttributes[] = {
+			"_trk/columns",
+			"_trk/columns_le",
+			"_trk/viewstate",
+			"_trk/viewstate_le",
+			NULL,
+		};
+
+		for (int32 i = 0; kAttributes[i]; i++) {
+			if (!strcmp(name, kAttributes[i]))
+				return true;
+		}
+	}
+
+	return false;
+}
+
+
+static void
+write_line(int fd, const char *line)
+{
+	if (line == NULL)
+		line = "";
+
+	size_t length = strlen(line);
+	write(fd, line, length);
+	write(fd, "\n", 1);
+}
+
+
+static void
+write_attributes(int fd, Inode *inode, attr_mode attrMode = kDiscIDAttributes)
+{
+	// count attributes
+
+	AttributeList::ConstIterator iterator = inode->Attributes();
+	uint32 count = 0;
+	while (iterator.HasNext()) {
+		Attribute *attribute = iterator.Next();
+		if (attrMode == kDiscIDAttributes
+			|| is_special_attribute(attribute->Name(), attrMode))
+			count++;
+	}
+
+	// we're artificially limiting the attribute count per inode
+	if (count > kMaxAttributes)
+		count = kMaxAttributes;
+
+	count = B_HOST_TO_BENDIAN_INT32(count);
+	write(fd, &count, sizeof(uint32));
+
+	// write attributes
+
+	iterator.Rewind();
+
+	while (iterator.HasNext()) {
+		Attribute *attribute = iterator.Next();
+		if (attrMode != kDiscIDAttributes
+			&& !is_special_attribute(attribute->Name(), attrMode))
+			continue;
+
+		uint32 type = B_HOST_TO_BENDIAN_INT32(attribute->Type());
+		write(fd, &type, sizeof(uint32));
+
+		uint8 length = strlen(attribute->Name());
+		write(fd, &length, 1);
+		write(fd, attribute->Name(), length);
+
+		uint32 size = B_HOST_TO_BENDIAN_INT32(attribute->Size());
+		write(fd, &size, sizeof(uint32));
+		if (size != 0)
+			write(fd, attribute->Data(), attribute->Size());
+
+		if (--count == 0)
+			break;
+	}
+}
+
+
+static bool
+read_line(int fd, char *line, size_t length)
+{
+	bool first = true;
+	size_t pos = 0;
+	char c;
+
+	while (read(fd, &c, 1) == 1) {
+		first = false;
+
+		if (c == '\n')
+			break;
+		if (pos < length)
+			line[pos] = c;
+
+		pos++;
+	}
+
+	if (pos >= length - 1)
+		pos = length - 1;
+	line[pos] = '\0';
+
+	return !first;
+}
+
+
+static bool
+read_attributes(int fd, Inode *inode)
+{
+	uint32 count;
+	if (read(fd, &count, sizeof(uint32)) != (ssize_t)sizeof(uint32))
+		return false;
+
+	count = B_BENDIAN_TO_HOST_INT32(count);
+dprintf("inode %s read %lu attrs\n", inode->Name(), count);
+	if (count > kMaxAttributes)
+		return false;
+
+	for (uint32 i = 0; i < count; i++) {
+		char name[B_ATTR_NAME_LENGTH + 1];
+		uint32 type, size;
+		uint8 length;
+		if (read(fd, &type, sizeof(uint32)) != (ssize_t)sizeof(uint32)
+			|| read(fd, &length, 1) != 1
+			|| read(fd, name, length) != length
+			|| read(fd, &size, sizeof(uint32)) != (ssize_t)sizeof(uint32))
+			return false;
+
+		type = B_BENDIAN_TO_HOST_INT32(type);
+		size = B_BENDIAN_TO_HOST_INT32(size);
+		name[length] = '\0';
+dprintf("  type %08lx, size %lu, name %s\n", type, size, name);
+
+		Attribute *attribute = new Attribute(name, type);
+		if (attribute->SetSize(size) != B_OK
+			|| inode->AddAttribute(attribute, true) != B_OK) {
+			delete attribute;
+		} else
+			read(fd, attribute->Data(), size);
+	}
+
+	return true;
+}
+
+
+static void
+fill_stat_buffer(Volume *volume, Inode *inode, Attribute *attribute,
+	struct stat &stat)
+{
+	stat.st_dev = volume->ID();
+	stat.st_ino = inode->ID();
+
+	if (attribute != NULL) {
+		stat.st_size = attribute->Size();
+		stat.st_mode = S_ATTR | 0666;
+		stat.st_type = attribute->Type();
+	} else {
+		stat.st_size = inode->Size();
+		stat.st_mode = inode->Type();
+		stat.st_type = 0;
+	}
+
+	stat.st_nlink = 1;
+	stat.st_blksize = 2048;
+
+	stat.st_uid = inode->UserID();
+	stat.st_gid = inode->GroupID();
+
+	stat.st_atime = time(NULL);
+	stat.st_mtime = stat.st_ctime = inode->ModificationTime();
+	stat.st_crtime = inode->CreationTime();
+}
+
+
+//	#pragma mark - Volume class
+
 
 Volume::Volume(mount_id id)
 	:
@@ -232,18 +458,21 @@ Volume::Volume(mount_id id)
 	fNumBlocks(0),
 	fFirstEntry(NULL)
 {
-	// create the root vnode
-	fRootNode = _CreateNode(NULL, "", 0, 0, S_IFDIR | 0777);
 }
 
 
 Volume::~Volume()
 {
+	_StoreAttributes();
+	_StoreSharedAttributes();
+
 	close(fDevice);
 
 	// put_vnode on the root to release the ref to it
 	if (fRootNode)
 		put_vnode(ID(), fRootNode->ID());
+
+	delete fRootNode;
 
 	Inode *inode, *next;
 
@@ -259,8 +488,7 @@ Volume::~Volume()
 status_t 
 Volume::InitCheck()
 {
-	if (fLock.InitCheck() < B_OK
-		|| fRootNode == NULL)
+	if (fLock.InitCheck() < B_OK)
 		return B_ERROR;
 
 	return B_OK;
@@ -297,6 +525,19 @@ Volume::Mount(const char* device)
 		return status;
 	}
 
+	fDiscID = compute_cddb_disc_id(*toc);
+
+	// create the root vnode
+	fRootNode = _CreateNode(NULL, "", 0, 0, S_IFDIR | 0777);
+	if (fRootNode == NULL)
+		status = B_NO_MEMORY;
+	if (status >= B_OK)
+		status = publish_vnode(ID(), fRootNode->ID(), fRootNode);
+	if (status < B_OK) {
+		free(toc);
+		return status;
+	}
+
 	cdtext text;
 	if (read_cdtext(fDevice, text) < B_OK)
 		dprintf("CDDA: no CD-Text found.\n");
@@ -328,10 +569,12 @@ Volume::Mount(const char* device)
 		} else
 			snprintf(title, sizeof(title), "%02ld.wav", track);
 
-		// remove '/' from title
+		// remove '/' and '\n' from title
 		for (int32 j = 0; title[j]; j++) {
 			if (title[j] == '/')
 				title[j] = '-';
+			else if (title[j] == '\n')
+				title[j] = ' ';
 		}
 
 		totalFrames += frames;
@@ -355,6 +598,9 @@ Volume::Mount(const char* device)
 		inode->AddAttribute("Audio:Length", B_STRING_TYPE, title);
 		inode->AddAttribute("BEOS:TYPE", B_MIME_STRING_TYPE, "audio/x-wav");
 	}
+
+	_RestoreSharedAttributes();
+	_RestoreAttributes();
 
 	free(toc);
 
@@ -391,11 +637,19 @@ Volume::_CreateNode(Inode *parent, const char *name, off_t start, off_t frames,
 	}
 
 	if (S_ISREG(type)) {
-		inode->SetNext(fFirstEntry);
-		fFirstEntry = inode;
+		// we need to order it by track for compatibility with BeOS' cdda
+		Inode *last = NULL, *current = fFirstEntry;
+		while (current != NULL) {
+			last = current;
+			current = current->Next();
+		}
+
+		if (last)
+			last->SetNext(inode);
+		else
+			fFirstEntry = inode;
 	}
 
-	publish_vnode(ID(), inode->ID(), inode);
 	return inode;
 }
 
@@ -444,7 +698,168 @@ Volume::SetName(const char *name)
 }
 
 
-//	#pragma mark -
+/*!
+	Opens the file that contains the volume and inode titles as well as all
+	of their attributes.
+	The attributes are stored in files below B_USER_SETTINGS_DIRECTORY/cdda.
+*/
+int
+Volume::_OpenAttributes(int mode, enum attr_mode attrMode)
+{
+	char* path = (char*)malloc(B_PATH_NAME_LENGTH);
+	if (path == NULL)
+		return -1;
+
+	bool create = (mode & O_WRONLY) != 0;
+
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, -1, create, path,
+			B_PATH_NAME_LENGTH) != B_OK) {
+		free(path);
+		return -1;
+	}
+
+	strlcat(path, "/cdda", B_PATH_NAME_LENGTH);
+	if (create)
+		mkdir(path, 0755);
+
+	if (attrMode == kDiscIDAttributes) {
+		char id[64];
+		snprintf(id, sizeof(id), "/%08lx", fDiscID);
+		strlcat(path, id, B_PATH_NAME_LENGTH);
+	} else if (attrMode == kDeviceAttributes) {
+		uint32 length = strlen(path);
+		char *device = path + length;
+		if (ioctl(fDevice, B_GET_PATH_FOR_DEVICE, device,
+				B_PATH_NAME_LENGTH - length) < B_OK) {
+			free(path);
+			return B_ERROR;
+		}
+
+		device++;
+
+		// replace slashes in the device path
+		while (device[0]) {
+			if (device[0] == '/')
+				device[0] = '_';
+
+			device++;
+		}
+	} else
+		strlcat(path, "/shared", B_PATH_NAME_LENGTH);
+
+dprintf("PATH: %s\n", path);
+	int fd = open(path, mode | (create ? O_CREAT | O_TRUNC : 0), 0644);
+
+	free(path);
+	return fd;
+}
+
+
+/*!
+	Reads the attributes, if any, that belong to the CD currently being
+	mounted.
+*/
+void
+Volume::_RestoreAttributes()
+{
+	int fd = _OpenAttributes(O_RDONLY);
+	if (fd < 0)
+		return;
+
+	char line[B_FILE_NAME_LENGTH];
+	if (!read_line(fd, line, B_FILE_NAME_LENGTH)) {
+		close(fd);
+		return;
+	}
+
+dprintf("VOLUME %s\n", line);
+	SetName(line);
+
+	for (Inode *inode = fFirstEntry; inode != NULL; inode = inode->Next()) {
+		if (!read_line(fd, line, B_FILE_NAME_LENGTH))
+			break;
+
+		inode->SetName(line);
+dprintf("INODE %s\n", line);
+	}
+
+	if (read_attributes(fd, fRootNode)) {
+		for (Inode *inode = fFirstEntry; inode != NULL; inode = inode->Next()) {
+			if (!read_attributes(fd, inode))
+				break;
+		}
+	}
+
+	close(fd);
+}
+
+
+void
+Volume::_StoreAttributes()
+{
+	int fd = _OpenAttributes(O_WRONLY);
+	if (fd < 0)
+		return;
+
+	write_line(fd, Name());
+
+	for (Inode *inode = fFirstEntry; inode != NULL; inode = inode->Next()) {
+		write_line(fd, inode->Name());
+	}
+
+	write_attributes(fd, fRootNode);
+
+	for (Inode *inode = fFirstEntry; inode != NULL; inode = inode->Next()) {
+		write_attributes(fd, inode);
+	}
+
+	close(fd);
+}
+
+
+/*!
+	Restores the attributes, if any, that are shared between CDs; some are
+	stored per device, others are stored for all CDs no matter which device.
+*/
+void
+Volume::_RestoreSharedAttributes()
+{
+	// device attributes overwrite shared attributes
+
+	int fd = _OpenAttributes(O_RDONLY, kSharedAttributes);
+	if (fd >= 0) {
+		read_attributes(fd, fRootNode);
+		close(fd);
+	}
+
+	fd = _OpenAttributes(O_RDONLY, kDeviceAttributes);
+	if (fd >= 0) {
+		read_attributes(fd, fRootNode);
+		close(fd);
+	}
+}
+
+
+void
+Volume::_StoreSharedAttributes()
+{
+	// write shared and device specific settings
+
+	int fd = _OpenAttributes(O_WRONLY, kSharedAttributes);
+	if (fd >= 0) {
+		write_attributes(fd, fRootNode, kSharedAttributes);
+		close(fd);
+	}
+
+	fd = _OpenAttributes(O_WRONLY, kDeviceAttributes);
+	if (fd >= 0) {
+		write_attributes(fd, fRootNode, kDeviceAttributes);
+		close(fd);
+	}
+}
+
+
+//	#pragma mark - Attribute class
 
 
 Attribute::Attribute(const char *name, type_code type)
@@ -490,7 +905,7 @@ Attribute::ReadAt(off_t offset, uint8 *buffer, size_t *_length)
 
 	if (offset < 0)
 		return B_BAD_VALUE;
-	if (offset >= length) {
+	if (offset >= fSize) {
 		*_length = 0;
 		return B_OK;
 	}
@@ -505,6 +920,10 @@ Attribute::ReadAt(off_t offset, uint8 *buffer, size_t *_length)
 }
 
 
+/*!
+	Writes to the attribute and enlarges it as needed.
+	An attribute has a maximum size of 65536 bytes for now.
+*/
 status_t
 Attribute::WriteAt(off_t offset, const uint8 *buffer, size_t *_length)
 {
@@ -515,8 +934,8 @@ Attribute::WriteAt(off_t offset, const uint8 *buffer, size_t *_length)
 
 	// we limit the attribute size to something reasonable
 	off_t end = offset + length;
-	if (end > 65536) {
-		end = 65536;
+	if (end > kMaxAttributeSize) {
+		end = kMaxAttributeSize;
 		length = end - offset;
 	}
 	if (offset > end) {
@@ -545,6 +964,7 @@ Attribute::WriteAt(off_t offset, const uint8 *buffer, size_t *_length)
 }
 
 
+//!	Removes all data from the attribute.
 void
 Attribute::Truncate()
 {
@@ -554,7 +974,30 @@ Attribute::Truncate()
 }
 
 
-//	#pragma mark -
+/*!
+	Resizes the data part of an attribute to the requested amount \a size.
+	An attribute has a maximum size of 65536 bytes for now.
+*/
+status_t
+Attribute::SetSize(off_t size)
+{
+	if (size > kMaxAttributeSize)
+		return E2BIG;
+
+	uint8 *data = (uint8 *)realloc(fData, size);
+	if (data == NULL)
+		return B_NO_MEMORY;
+
+	if (fSize < size)
+		memset(data + fSize, 0, size - fSize);
+
+	fData = data;
+	fSize = size;
+	return B_OK;
+}
+
+
+//	#pragma mark - Inode class
 
 
 Inode::Inode(Volume *volume, Inode *parent, const char *name, off_t start,
@@ -623,7 +1066,9 @@ Inode::InitCheck()
 status_t
 Inode::SetName(const char* name)
 {
-	if (name == NULL || !name[0])
+	if (name == NULL || !name[0]
+		|| strchr(name, '/') != NULL
+		|| strchr(name, '\n') != NULL)
 		return B_BAD_VALUE;
 
 	name = strdup(name);
@@ -655,21 +1100,15 @@ Inode::FindAttribute(const char *name) const
 
 
 status_t
-Inode::AddAttribute(const char *name, type_code type,
-	const uint8 *data, size_t length)
+Inode::AddAttribute(Attribute *attribute, bool overwrite)
 {
-	if (FindAttribute(name) != NULL)
-		return B_NAME_IN_USE;
+	Attribute *oldAttribute = FindAttribute(attribute->Name());
+	if (oldAttribute != NULL) {
+		if (!overwrite)
+			return B_NAME_IN_USE;
 
-	Attribute *attribute = new Attribute(name, type);
-	status_t status = attribute != NULL ? B_OK : B_NO_MEMORY;
-	if (status == B_OK)
-		status = attribute->InitCheck();
-	if (status == B_OK && data != NULL && length != 0)
-		status = attribute->WriteAt(0, data, &length);
-	if (status < B_OK) {
-		delete attribute;
-		return status;
+		fAttributes.Remove(oldAttribute);
+		delete oldAttribute;
 	}
 
 	fAttributes.Add(attribute);
@@ -679,12 +1118,32 @@ Inode::AddAttribute(const char *name, type_code type,
 
 status_t
 Inode::AddAttribute(const char *name, type_code type,
-	const char *string)
+	bool overwrite, const uint8 *data, size_t length)
+{
+	Attribute *attribute = new Attribute(name, type);
+	status_t status = attribute != NULL ? B_OK : B_NO_MEMORY;
+	if (status == B_OK)
+		status = attribute->InitCheck();
+	if (status == B_OK && data != NULL && length != 0)
+		status = attribute->WriteAt(0, data, &length);
+	if (status == B_OK)
+		status = AddAttribute(attribute, overwrite);
+	if (status < B_OK) {
+		delete attribute;
+		return status;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+Inode::AddAttribute(const char *name, type_code type, const char *string)
 {
 	if (string == NULL)
 		return NULL;
 
-	return AddAttribute(name, type, (const uint8 *)string,
+	return AddAttribute(name, type, true, (const uint8 *)string,
 		strlen(string));
 }
 
@@ -692,8 +1151,8 @@ Inode::AddAttribute(const char *name, type_code type,
 status_t
 Inode::AddAttribute(const char *name, int32 value)
 {
-	return AddAttribute(name, B_INT32_TYPE, (const uint8 *)&value,
-		sizeof(int32));
+	return AddAttribute(name, B_INT32_TYPE, true,
+		(const uint8 *)&value, sizeof(int32));
 }
 
 
@@ -745,38 +1204,6 @@ void
 Inode::RewindAttrCookie(attr_cookie *cookie)
 {
 	cookie->current = fAttributes.First();
-}
-
-
-//	#pragma mark -
-
-
-void
-fill_stat_buffer(Volume *volume, Inode *inode, Attribute *attribute,
-	struct stat &stat)
-{
-	stat.st_dev = volume->ID();
-	stat.st_ino = inode->ID();
-
-	if (attribute != NULL) {
-		stat.st_size = attribute->Size();
-		stat.st_mode = S_ATTR | 0666;
-		stat.st_type = attribute->Type();
-	} else {
-		stat.st_size = inode->Size();
-		stat.st_mode = inode->Type();
-		stat.st_type = 0;
-	}
-
-	stat.st_nlink = 1;
-	stat.st_blksize = 2048;
-
-	stat.st_uid = inode->UserID();
-	stat.st_gid = inode->GroupID();
-
-	stat.st_atime = time(NULL);
-	stat.st_mtime = stat.st_ctime = inode->ModificationTime();
-	stat.st_crtime = inode->CreationTime();
 }
 
 
@@ -1398,6 +1825,8 @@ cdda_create_attr(fs_volume _volume, fs_vnode _node, const char *name,
 			return status;
 	} else if ((openMode & O_EXCL) == 0) {
 		attribute->SetType(type);
+		if ((openMode & O_TRUNC) != 0)
+			attribute->Truncate();
 	} else
 		return B_FILE_EXISTS;
 

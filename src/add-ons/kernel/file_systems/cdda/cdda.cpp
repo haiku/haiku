@@ -607,7 +607,27 @@ read_cdda_data(int fd, off_t offset, void *data, size_t length,
 {
 	if (bufferOffset >= 0 && bufferOffset <= offset + length
 		&& bufferOffset + bufferSize > offset) {
-		// TODO: fill request from buffer
+		if (offset >= bufferOffset) {
+			// buffer reaches into the beginning of the request
+			off_t dataOffset = offset - bufferOffset;
+			size_t bytes = min_c(bufferSize - dataOffset, length);
+			if (user_memcpy(data, (uint8 *)buffer + dataOffset, bytes) < B_OK)
+				return B_BAD_ADDRESS;
+
+			data = (void *)((uint8 *)data + bytes);
+			length -= bytes;
+			offset += bytes;
+		} else if (offset < bufferOffset
+			&& offset + length < bufferOffset + bufferSize) {
+			// buffer overlaps at the end of the request
+			off_t dataOffset = bufferOffset - offset;
+			size_t bytes = length - dataOffset;
+			if (user_memcpy((uint8 *)data + dataOffset, buffer, bytes) < B_OK)
+				return B_BAD_ADDRESS;
+
+			length -= bytes;
+		}
+		// we don't handle the case we would need to split the request
 	}
 
 	while (length > 0) {
