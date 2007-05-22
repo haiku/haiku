@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku Inc.
+ * Copyright 2001-2007, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -4002,12 +4002,17 @@ BTextView::PerformAutoScrolling()
 	BRect bounds = Bounds();
 	BPoint scrollBy;
 			
-	// TODO: refine horizontal scrolling, for example by
-	// scrolling char by char and not using fixed values
+	BPoint constraint = fWhere;
+	constraint.ConstrainTo(bounds);
+	// Scroll char by char horizontally
+	// TODO: Check how BeOS R5 behaves
+	float value = StyledWidthUTF8Safe(OffsetAt(constraint), 1); 
 	if (fWhere.x > bounds.right) {
-		scrollBy.x = floorf((fWhere.x - bounds.right) / 10);
+		if (bounds.right + value <= fTextRect.Width())
+			scrollBy.x = value;
 	} else if (fWhere.x < bounds.left) {
-		scrollBy.x = floorf((fWhere.x - bounds.left) / 10); // negative value
+		if (bounds.left - value >= 0)
+			scrollBy.x = -value;
 	}
 	
 	float lineHeight = 0;
