@@ -1117,6 +1117,8 @@ BPlusTree::_SplitNode(bplustree_node *node, off_t nodeOffset,
 			newKey = (uint8 *)malloc(newLength);
 			if (newKey == NULL)
 				return B_NO_MEMORY;
+
+			newAllocated = true;
 			memcpy(newKey, droppedKey, newLength);
 
 			other->overflow_link = inKeyValues[in];
@@ -1168,8 +1170,11 @@ BPlusTree::_SplitNode(bplustree_node *node, off_t nodeOffset,
 	} else if (keyIndex < skip)
 		bytesBefore = node->AllKeyLength() - total;
 
-	if (bytesBefore < 0 || bytesAfter < 0)
+	if (bytesBefore < 0 || bytesAfter < 0) {
+		if (newAllocated)
+			free(newKey);
 		return B_BAD_DATA;
+	}
 
 	node->left_link = HOST_ENDIAN_TO_BFS_INT64(otherOffset);
 		// right link, and overflow link can stay the same
