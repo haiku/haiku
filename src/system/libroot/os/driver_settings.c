@@ -1,35 +1,36 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
-/** \brief Implements the driver settings API
- *	This file is used by three different components with different needs:
- *	  1) the boot loader
- *		Buffers a list of settings files to move over to the kernel - the
- *		actual buffering is located in the boot loader directly, though.
- *		Creates driver_settings structures out of those on demand only.
- *	  2) the kernel
- *		Maintains a list of settings so that no disk access is required
- *		for known settings (such as those passed over from the boot
- *		loader).
- *	  3) libroot.so
- *		Exports the parser to userland applications, so that they can
- *		easily make use of driver_settings styled files.
- *
- *	The file has to be recompiled for every component separately, so that
- *	it properly exports the required functionality (which is specified by
- *	_BOOT_MODE for the boot loader, and _KERNEL_MODE for the kernel).
- */
+/*!	\brief Implements the driver settings API
+	This file is used by three different components with different needs:
+	  1) the boot loader
+		Buffers a list of settings files to move over to the kernel - the
+		actual buffering is located in the boot loader directly, though.
+		Creates driver_settings structures out of those on demand only.
+	  2) the kernel
+		Maintains a list of settings so that no disk access is required
+		for known settings (such as those passed over from the boot
+		loader).
+	  3) libroot.so
+		Exports the parser to userland applications, so that they can
+		easily make use of driver_settings styled files.
+
+	The file has to be recompiled for every component separately, so that
+	it properly exports the required functionality (which is specified by
+	_BOOT_MODE for the boot loader, and _KERNEL_MODE for the kernel).
+*/
 
 // The boot loader is compiled with kernel rules, but we want to explicitely
-// discriminate between the two here.
+// differentiate between the two here.
 #ifdef _BOOT_MODE
 #	undef _KERNEL_MODE
 #endif
 
+#include <driver_settings.h>
+#include <FindDirectory.h>
 #include <OS.h>
-#include <drivers/driver_settings.h>
 
 #ifdef _KERNEL_MODE
 #	include <KernelExport.h>
@@ -54,8 +55,7 @@
 #	define B_BUFFER_OVERFLOW B_ERROR
 #endif
 
-// ToDo: these should be retrieved via find_directory()
-#define SETTINGS_DIRECTORY "/boot/home/config/settings/kernel/drivers/"
+#define SETTINGS_DIRECTORY "/kernel/drivers/"
 #define SETTINGS_MAGIC		'DrvS'
 
 // Those maximum values are independent from the implementation - they
@@ -91,14 +91,15 @@ static struct list sHandles;
 static mutex sLock;
 #endif
 
-//	Functions not part of the public API
+
+//	#pragma mark - private functions
 
 
-/** Returns true for any characters that separate parameters -
- *	those are ignored in the input stream and won't be added
- *	to any words.
- */
-
+/*!
+	Returns true for any characters that separate parameters -
+	those are ignored in the input stream and won't be added
+	to any words.
+*/
 static inline bool
 is_parameter_separator(char c)
 {
@@ -139,20 +140,20 @@ get_parameter(settings_handle *handle, const char *name)
 }
 
 
-/** Returns the next word in the input buffer passed in via "_pos" - if
- *	this function returns, it will bump the input position after the word.
- *	It automatically cares about quoted strings and escaped characters.
- *	If "allowNewLine" is true, it reads over comments to get to the next
- *	word.
- *	Depending on the "assignmentMode" parameter, the '=' sign is either
- *	used as a work break, or not.
- *	The input buffer will be changed to contain the word without quotes
- *	or escaped characters and adds a terminating NULL byte. The "_word"
- *	parameter will be set to the beginning of the word.
- *	If the word is followed by a newline it will return B_OK, if white
- *	spaces follows, it will return CONTINUE_PARAMETER.
- */
-
+/*!
+	Returns the next word in the input buffer passed in via "_pos" - if
+	this function returns, it will bump the input position after the word.
+	It automatically cares about quoted strings and escaped characters.
+	If "allowNewLine" is true, it reads over comments to get to the next
+	word.
+	Depending on the "assignmentMode" parameter, the '=' sign is either
+	used as a work break, or not.
+	The input buffer will be changed to contain the word without quotes
+	or escaped characters and adds a terminating NULL byte. The "_word"
+	parameter will be set to the beginning of the word.
+	If the word is followed by a newline it will return B_OK, if white
+	spaces follows, it will return CONTINUE_PARAMETER.
+*/
 static status_t
 get_word(char **_pos, char **_word, int32 assignmentMode, bool allowNewLine)
 {
@@ -164,7 +165,8 @@ get_word(char **_pos, char **_word, int32 assignmentMode, bool allowNewLine)
 
 	// Skip any white space and comments
 	while (pos[0]
-		&& ((allowNewLine && (isspace(pos[0]) || is_parameter_separator(pos[0]) || pos[0] == '#'))
+		&& ((allowNewLine && (isspace(pos[0]) || is_parameter_separator(pos[0])
+				|| pos[0] == '#'))
 			|| (!allowNewLine && (pos[0] == '\t' || pos[0] == ' '))
 			|| (assignmentMode == ALLOW_ASSIGNMENT && pos[0] == '='))) {
 		// skip any comment lines
@@ -274,13 +276,15 @@ parse_parameter(struct driver_parameter *parameter, char **_pos, int32 level)
 	if (status == CONTINUE_PARAMETER) {
 		while (status == CONTINUE_PARAMETER) {
 			char **newArray, *value;
-			status = get_word(&pos, &value, parameter->value_count == 0 ? ALLOW_ASSIGNMENT : IGNORE_ASSIGNMENT, false);
+			status = get_word(&pos, &value, parameter->value_count == 0
+				? ALLOW_ASSIGNMENT : IGNORE_ASSIGNMENT, false);
 			if (status < B_OK)
 				break;
 
 			// enlarge value array and save the value
 
-			newArray = realloc(parameter->values, (parameter->value_count + 1) * sizeof(char *));
+			newArray = realloc(parameter->values, (parameter->value_count + 1)
+				* sizeof(char *));
 			if (newArray == NULL)
 				return B_NO_MEMORY;
 
@@ -295,7 +299,8 @@ parse_parameter(struct driver_parameter *parameter, char **_pos, int32 level)
 
 
 static status_t
-parse_parameters(struct driver_parameter **_parameters, int *_count, char **_pos, int32 level)
+parse_parameters(struct driver_parameter **_parameters, int *_count,
+	char **_pos, int32 level)
 {
 	if (level > MAX_SETTINGS_LEVEL)
 		return B_LINK_LIMIT;
@@ -312,7 +317,8 @@ parse_parameters(struct driver_parameter **_parameters, int *_count, char **_pos
 		if (status != NO_PARAMETER) {
 			driver_parameter *newParameter;
 
-			newArray = realloc(*_parameters, (*_count + 1) * sizeof(struct driver_parameter));
+			newArray = realloc(*_parameters, (*_count + 1)
+				* sizeof(struct driver_parameter));
 			if (newArray == NULL)
 				return B_NO_MEMORY;
 	
@@ -358,7 +364,8 @@ parse_settings(settings_handle *handle)
 	if (text == NULL)
 		return B_OK;
 
-	return parse_parameters(&handle->settings.parameters, &handle->settings.parameter_count, &text, 0);
+	return parse_parameters(&handle->settings.parameters,
+		&handle->settings.parameter_count, &text, 0);
 }
 
 
@@ -551,7 +558,8 @@ put_level_space(char **_buffer, size_t *_bufferSize, int32 level)
 
 
 static bool
-put_parameter(char **_buffer, size_t *_bufferSize, struct driver_parameter *parameter, int32 level, bool flat)
+put_parameter(char **_buffer, size_t *_bufferSize,
+	struct driver_parameter *parameter, int32 level, bool flat)
 {
 	int32 i;
 
@@ -573,7 +581,8 @@ put_parameter(char **_buffer, size_t *_bufferSize, struct driver_parameter *para
 			put_char(_buffer, _bufferSize, '\n');
 
 		for (i = 0; i < parameter->parameter_count; i++) {
-			put_parameter(_buffer, _bufferSize, &parameter->parameters[i], level + 1, flat);
+			put_parameter(_buffer, _bufferSize, &parameter->parameters[i],
+				level + 1, flat);
 
 			if (parameter->parameters[i].parameter_count == 0)
 				put_chars(_buffer, _bufferSize, flat ? "; " : "\n");
@@ -588,18 +597,7 @@ put_parameter(char **_buffer, size_t *_bufferSize, struct driver_parameter *para
 }
 
 
-// ToDo: the API to add an item to the driver_settings is obviously accessable
-//	to the kernel, so we should provide it, too (in BeOS this is used to add
-//	driver settings at boot time, using the safe boot menu).
-
-//static status_t
-//add_driver_parameter(const char *name, )
-//{
-//}
-
-
-//	#pragma mark -
-//	Kernel only functions
+//	#pragma mark - Kernel only functions
 
 
 #ifdef _KERNEL_MODE
@@ -663,8 +661,8 @@ driver_settings_init_post_sem(kernel_args *args)
 }
 #endif
 
-//	#pragma mark -
-//	The public API implementation
+
+//	#pragma mark - public API
 
 
 status_t
@@ -696,7 +694,7 @@ void *
 load_driver_settings(const char *driverName)
 {
 	settings_handle *handle;
-	int file;
+	int file = -1;
 	
 	if (driverName == NULL)
 		return NULL;
@@ -747,15 +745,25 @@ load_driver_settings(const char *driverName)
 			settings = settings->next;
 		}
 	}
-#endif
+#endif	// _BOOT_MODE
 
 	// open the settings from the standardized location
 	if (driverName[0] != '/') {
 		char path[B_FILE_NAME_LENGTH + 64];
 
-		// ToDo: use the kernel's find_directory for this
-		strcpy(path, SETTINGS_DIRECTORY);
-		strlcat(path, driverName, sizeof(path));
+#ifdef _BOOT_MODE
+		// TODO: for now the boot loader does not support find_directory()
+		//		(it might get a simplified version of it)
+		strcpy(path, "/boot/home/config/settings");
+#else
+		// TODO: use B_COMMON_SETTINGS_DIRECTORY instead!
+		if (find_directory(B_USER_SETTINGS_DIRECTORY, -1, false, path,
+				sizeof(path)) == B_OK)
+#endif
+		{
+			strlcat(path, SETTINGS_DIRECTORY, sizeof(path));
+			strlcat(path, driverName, sizeof(path));
+		}
 
 		file = open(path, O_RDONLY);
 	} else
@@ -812,12 +820,13 @@ load_driver_settings_from_path(const char *path)
 }
 #endif
 
-/** Returns a new driver_settings handle that has the parsed contents
- *	of the passed string.
- *	You can get an empty driver_settings object when you pass NULL as
- *	the "settingsString" parameter.
- */
 
+/*!
+	Returns a new driver_settings handle that has the parsed contents
+	of the passed string.
+	You can get an empty driver_settings object when you pass NULL as
+	the "settingsString" parameter.
+*/
 void *
 parse_driver_settings_string(const char *settingsString)
 {
@@ -841,19 +850,20 @@ parse_driver_settings_string(const char *settingsString)
 }
 
 
-/** This function prints out a driver settings structure to a human
- *	readable string.
- *	It's either in standard style or the single line style speficied
- *	by the "flat" parameter.
- *	If the buffer is too small to hold the string, B_BUFFER_OVERFLOW
- *	is returned, and the needed amount of bytes if placed in the
- *	"_bufferSize" parameter.
- *	If the "handle" parameter is not a valid driver settings handle, or
- *	the "buffer" parameter is NULL, B_BAD_VALUE is returned.
- */
-
+/*!
+	This function prints out a driver settings structure to a human
+	readable string.
+	It's either in standard style or the single line style speficied
+	by the "flat" parameter.
+	If the buffer is too small to hold the string, B_BUFFER_OVERFLOW
+	is returned, and the needed amount of bytes if placed in the
+	"_bufferSize" parameter.
+	If the "handle" parameter is not a valid driver settings handle, or
+	the "buffer" parameter is NULL, B_BAD_VALUE is returned.
+*/
 status_t
-get_driver_settings_string(void *_handle, char *buffer, size_t *_bufferSize, bool flat)
+get_driver_settings_string(void *_handle, char *buffer, size_t *_bufferSize,
+	bool flat)
 {
 	settings_handle *handle = (settings_handle *)_handle;
 	size_t bufferSize = *_bufferSize;
@@ -863,7 +873,8 @@ get_driver_settings_string(void *_handle, char *buffer, size_t *_bufferSize, boo
 		return B_BAD_VALUE;
 
 	for (i = 0; i < handle->settings.parameter_count; i++) {
-		put_parameter(&buffer, &bufferSize, &handle->settings.parameters[i], 0, flat);
+		put_parameter(&buffer, &bufferSize, &handle->settings.parameters[i],
+			0, flat);
 	}
 
 	*_bufferSize -= bufferSize;
@@ -871,16 +882,17 @@ get_driver_settings_string(void *_handle, char *buffer, size_t *_bufferSize, boo
 }
 
 
-/** Matches the first value of the parameter matching "keyName" with a set
- *	of boolean values like 1/true/yes/on/enabled/...
- *	Returns "unknownValue" if the parameter could not be found or doesn't
- *	have any valid boolean setting, and "noArgValue" if the parameter
- *	doesn't have any values.
- *	Also returns "unknownValue" if the handle passed in was not valid.
- */
-
+/*!
+	Matches the first value of the parameter matching "keyName" with a set
+	of boolean values like 1/true/yes/on/enabled/...
+	Returns "unknownValue" if the parameter could not be found or doesn't
+	have any valid boolean setting, and "noArgValue" if the parameter
+	doesn't have any values.
+	Also returns "unknownValue" if the handle passed in was not valid.
+*/
 bool
-get_driver_boolean_parameter(void *handle, const char *keyName, bool unknownValue, bool noArgValue)
+get_driver_boolean_parameter(void *handle, const char *keyName,
+	bool unknownValue, bool noArgValue)
 {
 	driver_parameter *parameter;
 	char *boolean;
@@ -919,7 +931,8 @@ get_driver_boolean_parameter(void *handle, const char *keyName, bool unknownValu
 
 
 const char *
-get_driver_parameter(void *handle, const char *keyName, const char *unknownValue, const char *noArgValue)
+get_driver_parameter(void *handle, const char *keyName,
+	const char *unknownValue, const char *noArgValue)
 {
 	struct driver_parameter *parameter;
 
