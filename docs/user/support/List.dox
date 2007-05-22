@@ -2,8 +2,12 @@
  * Copyright 2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by:
- *  Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ * Authors:
+ *   Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ * 
+ * Proofreading:
+ *   David Weizades <ddewbofh@hotmail.com>
+ *
  * Corresponds to:
  *   /trunk/headers/os/support/List.h  rev 19972
  *   /trunk/src/kits/support/List.cpp  rev 18649
@@ -22,27 +26,27 @@
     objects.
 
   This class is designed to be used for a variety of tasks. Unlike similar
-  implementations in other libraries, this class is not based on templates,
-  and as such is inherently not typed. So it will be the job of the coder to
-  make sure proper data will be entered, since the compiler cannot check this.
+  implementations in other libraries, this class is not based on templates
+  and as such is inherently not typed. So it will be the job of the programmer
+  to make sure proper data is entered since the compiler cannot check this
+  itself.
 
-  BList contains a list of items that will grow and shrink depending on
-  how much items are in it. So you will not have to do any of the
-  memory management. Furthermore, it's ordered. Those properties make it
-  useful in a whole range of situations, for example in the interface kit in 
-  the BListView class.
+  BList contains a list of items that will grow and shrink depending on how
+  many items are in it. So you will not have to do any of the memory management
+  nor any ordering. These properties makes it useful in a whole range of
+  situations such as the interface kit within the BListView class.
 
-  A note on ownership of the objects might come in handy. BList at no time
-  assumes ownership of the objects, so removing items from the list will
-  only remove those items from the list, it will not delete the item. In the
-  same spirit you should also make sure that before you might delete an
-  object that's in a list, you will remove it from the list first. 
+  A note on the ownership of the objects might come in handy. BList never
+  assumes ownership of the objects, removing items from the list will
+  only remove the entries from the list not delete the items themselves. In the
+  same way you should also make sure that before you might delete an object
+  that's in a list, you will have to remove it from the list first.
 
   \warning This class is not thread-safe.
 
-  The class implements methods to add and remove items, reorder items,
-  retrieve items, querying for items and some advanced methods which let
-  you perform a certain tasks to all the items of the list.
+  The class implements methods to add, remove, reorder, retrieve, query
+  items as well as some advanced methods which let you perform a task on all the
+  items in the list.
 */
 
 /*!
@@ -50,21 +54,21 @@
   \brief Create a new list with a number of empty slots.
 
   The memory management of this class allocates new memory per block. The
-  \c count parameter can be tweaked to determine the size of those blocks.
-  In general, if you know your list is only going to contain a fixed maximum
-  number of items, pass that value. If you expect your list to have very few 
-  items, it's probably safe to choose a low number. This is as to prevent the 
-  list from taking up unneccesary memory. If you expect the list to contain a 
-  large number of items, choose a higher value, since every time the memory is 
-  full, all the items have to be copied into a new piece of allocated memory 
-  which is an expensive operation.
+  \c count parameter can be tweaked to determine the size of these blocks.
+  In general, if you know your list is only going to contain a certain number of
+  items at most, you can pass that value. If you expect your list to have very
+  few items, it's safe to choose a low number. This is to prevent the list from
+  taking up unneeded memory. If you expect the list to contain  a large number
+  of items, choose a higher value. Every time the memory is full, all the items
+  have to be copied into a new piece of allocated memory which, in turn, is an
+  expensive operation.
 
-  If you are unsure, you don't have to break your head over this. As long as 
-  you don't use a lot of lists or as long as the list isn't used in one of the
+  If you are unsure, you don't have to overthink this. Just make sure you don't
+  use a lot of lists and as long as the list isn't used in one of the
   performance critical parts of the code, you are safe to go with the default
-  value.
+  values.
 
-  \param count The size of the blocks of memory allocated.
+  \param count The size of the blocks allocated in memory.
 */
 
 /*!
@@ -98,7 +102,7 @@
   \param item The item to add.
   \param index The place in the list.
   \retval true The item was added.
-  \retval false Item was not added. Either the index was  negative or invalid,
+  \retval false Item was not added. Either the index is negative or invalid,
     or resizing the list failed.
   \see AddItem(void *item)
 */
@@ -133,12 +137,12 @@
   \fn bool BList::AddList(const BList *list)
   \brief Append a list to this list.
 
-  Note that the \a list parameter is \c const, so the original list will not
+  Note that the \a list parameter is a \c const, so the original list will not
   be altered.
 
   \param list The list to be appended.
   \retval true The list was appended. 
-  \retval false Failed to append the list, due to the fact that resizing our
+  \retval false Failed to append the list, due to the resizing of our
     list failed. 
   \see AddList(const BList *list, int32 index)
 */
@@ -208,7 +212,7 @@
   The function should take two \c const pointers as arguments and should return
   an integer.
 
-  For an example, see the Compare(const BString *, const BString *) function. 
+  For an example, see the Compare(const BString *, const BString *) function.
 */
 
 /*!
@@ -225,13 +229,13 @@
   \fn bool BList::MoveItem(int32 fromIndex, int32 toIndex)
   \brief Move an item to a new place
 
-  This moves a list item from posititon a to position b, moving the appropriate 
-  block of list elements to make up for the move.  For example, in the array:
+  This moves a list item from position A to position B, moving the appropriate
+  block of list elements to make up for the move.  For example, in  the array:
   \verbatim
 A B C D E F G H I J
   \endverbatim
 
-  Moveing 1(B)->6(G) would result in this:
+  Moving 1(B)->6(G) would result in this:
   \verbatim
 A C D E F G B H I J
   \endverbatim
@@ -239,7 +243,7 @@ A C D E F G B H I J
   \param fromIndex The original location.
   \param toIndex The new location.
   \retval true Move succeeded.
-  \retval false Move failed since the indexes were invalid.
+  \retval false Move failed due to the indexes being invalid.
 */
 
 //! @}
@@ -264,7 +268,8 @@ A C D E F G B H I J
   \fn void *BList::FirstItem() const
   \brief Get the first item.
   
-  \return A pointer to the first item, or \c NULL if the list is empty.
+  \return A pointer to the first item or \c NULL if the list is empty.
+  \see LastItem() const
 */
 
 /*!
@@ -281,7 +286,8 @@ A C D E F G B H I J
 /*!
   \fn void *BList::LastItem() const
   \brief Get the last item.
-  \return A pointer to the last item, or \c NULL if the list is empty.
+  \return A pointer to the last item or \c NULL if the list is empty.
+  \see FirstItem() const
 */
 
 /*!
@@ -289,16 +295,16 @@ A C D E F G B H I J
   \brief Return the internal list of objects.
 
   This method will return a pointer to the internal pointer list. This means
-  you should be careful   what you are doing, since you are directly working
-  with the internals of the class.
+  that you should be careful what you are doing, since you are working with the
+  internals of the class directly.
 
-  It is definately not a good idea to make any changes to the list, since it
-  will mess up the internal consistency. 
+  It is not a good idea to make any changes to the list, since that will mess
+  up the internal consistency.
 
-  \warning If there is anything you want for which you need the list of
-    objects, please realize that that probably means that what you want to do
-    is a bad idea to begin with. Avoid this method. The list of objects doesn't
-    belong to you. Check if DoForEach() can help you.
+  \warning If there is anything you want, for which you need the list of
+    objects, please understand that that probably means that what you want to do
+    is a bad idea to begin with and you should avoid this method. The list of
+    objects doesn't belong to you. See if DoForEach() can help you out instead.
   \return The internal list of pointers.
 */
 
@@ -344,23 +350,25 @@ A C D E F G B H I J
   \fn void BList::DoForEach(bool (*func)(void* item))
   \brief Perform an action on every item in the list.
 
-  If one of the actions on the items fails, meaning that the \a func function
-  returned \c false, then the processing of the list will be stopped.
-
+  If one of the actions on the items fails it means that the \a func function
+  returned \c false and the processing of the list will be stopped.
+  
   \param func A function that takes a \c void * argument and returns a boolean.
+  \see DoForEach(bool (*func)(void* item, void* arg2), void *arg2)
 */
 
 /*!
   \fn void BList::DoForEach(bool (*func)(void* item, void* arg2), void *arg2)
   \brief Perform an action on every item in the list with an argument.
 
-  If one of the actions on the items fails, meaning that the \a func function
-  returned \c false, then the processing of the list will be stopped.
+  If one of the actions on the items fails it means that the \a func function
+  returned \c false and the processing of the list will be stopped.
 
-  \param func A function with the first \c void * argument being the item,
+  \param func A function with the first \c void * argument being the item
     and the second \c void * being the argument that you supply. It should
     return a boolean value on whether it succeeded or not.
   \param arg2 An argument to supply to \a func.
+  \see DoForEach(bool (*func)(void* item))
 */
 
 //! @}
