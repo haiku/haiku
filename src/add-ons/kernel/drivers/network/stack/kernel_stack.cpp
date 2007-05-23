@@ -371,14 +371,14 @@ net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 				if (status < B_OK)
 					return status;
 
-				net_stack_cookie *accept_cookie;
+				net_stack_cookie *acceptCookie;
 				status = resolve_cookie(kernel, args.accept_socket,
-					&accept_cookie);
+					&acceptCookie);
 				if (status < B_OK)
 					return status;
 
 				status = sSocket->accept(cookie->socket, args.address,
-					&args.address_length, &accept_cookie->socket);
+					&args.address_length, &acceptCookie->socket);
 				if (status < B_OK)
 					return status;
 

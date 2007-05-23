@@ -346,6 +346,26 @@ dup2_fd(int oldfd, int newfd, bool kernel)
 }
 
 
+static status_t
+fd_ioctl(bool kernelFD, int fd, ulong op, void *buffer, size_t length)
+{
+	struct file_descriptor *descriptor;
+	int status;
+
+	descriptor = get_fd(get_current_io_context(kernelFD), fd);
+	if (descriptor == NULL)
+		return B_FILE_ERROR;
+
+	if (descriptor->ops->fd_ioctl)
+		status = descriptor->ops->fd_ioctl(descriptor, op, buffer, length);
+	else
+		status = EOPNOTSUPP;
+
+	put_fd(descriptor);
+	return status;
+}
+
+
 status_t
 select_fd(int fd, uint8 event, uint32 ref, struct select_sync *sync, bool kernel)
 {
@@ -690,17 +710,7 @@ _user_ioctl(int fd, ulong op, void *buffer, size_t length)
 
 	TRACE(("user_ioctl: fd %d\n", fd));
 
-	descriptor = get_fd(get_current_io_context(false), fd);
-	if (!descriptor)
-		return B_FILE_ERROR;
-
-	if (descriptor->ops->fd_ioctl)
-		status = descriptor->ops->fd_ioctl(descriptor, op, buffer, length);
-	else
-		status = EOPNOTSUPP;
-
-	put_fd(descriptor);
-	return status;
+	return fd_ioctl(false, fd, op, buffer, length);
 }
 
 
@@ -956,39 +966,21 @@ _kern_seek(int fd, off_t pos, int seekType)
 }
 
 
-static status_t
-_fd_ioctl(bool kernel_fd, int fd, ulong op, void *buffer, size_t length)
-{
-	struct file_descriptor *descriptor;
-	int status;
-
-	TRACE(("sys_ioctl: fd %d\n", fd));
-
-	descriptor = get_fd(get_current_io_context(kernel_fd), fd);
-	if (descriptor == NULL)
-		return B_FILE_ERROR;
-
-	if (descriptor->ops->fd_ioctl)
-		status = descriptor->ops->fd_ioctl(descriptor, op, buffer, length);
-	else
-		status = EOPNOTSUPP;
-
-	put_fd(descriptor);
-	return status;
-}
-
-
 status_t
 _kern_ioctl(int fd, ulong op, void *buffer, size_t length)
 {
-	return _fd_ioctl(true, fd, op, buffer, length);
+	TRACE(("kern_ioctl: fd %d\n", fd));
+
+	return fd_ioctl(true, fd, op, buffer, length);
 }
 
 
 status_t
 user_fd_kernel_ioctl(int fd, ulong op, void *buffer, size_t length)
 {
-	return _fd_ioctl(false, fd, op, buffer, length);
+	TRACE(("user_fd_kernel_ioctl: fd %d\n", fd));
+
+	return fd_ioctl(false, fd, op, buffer, length);
 }
 
 
