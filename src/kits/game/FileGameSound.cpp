@@ -198,6 +198,9 @@ BFileGameSound::StopPlaying()
 {
 	status_t error = BStreamingGameSound::StopPlaying();
 	
+	if (!fAudioStream || !fAudioStream->stream)
+		return B_OK;
+		 
 	// start reading next time from the start of the file
 	int64 frame = 0;
 	fAudioStream->stream->SeekToFrame(&frame);
@@ -230,7 +233,13 @@ BFileGameSound::FillBuffer(void *inBuffer,
 		if (fPlayPosition == 0 || fPlayPosition + inByteCount >= fBufferSize) {
 			Load();
 		}
+		
+		if (fPlayPosition + bytes > fBufferSize)
+			bytes = fBufferSize - fPlayPosition;
 			
+		if (bytes == 0)
+			return;
+		
 		if (fPausing) {
 			Lock();
 		
@@ -349,7 +358,9 @@ BFileGameSound::Init(const entry_ref* file)
 	
 	// is this is an audio file?		
 	media_format playFormat;
-	fAudioStream->stream->EncodedFormat(&playFormat);
+	if ((error = fAudioStream->stream->EncodedFormat(&playFormat)) != B_OK)
+		return error;
+	
 	if (!playFormat.IsAudio()) 
 		return B_MEDIA_BAD_FORMAT;
 	
@@ -394,7 +405,8 @@ BFileGameSound::Load()
 {
 	
 	if (fPlayPosition != 0) {
-		memcpy(fBuffer, fBuffer + fPlayPosition, fBufferSize - fPlayPosition);
+		if (fBufferSize > fPlayPosition)
+			memcpy(fBuffer, fBuffer + fPlayPosition, fBufferSize - fPlayPosition);
 		fPlayPosition = fBufferSize - fPlayPosition;
 	}
 	
@@ -403,6 +415,16 @@ BFileGameSound::Load()
 	fAudioStream->stream->ReadFrames(fBuffer + fPlayPosition, &frames);
 	fBufferSize = fPlayPosition + frames * fFrameSize;
 	fPlayPosition = 0;
+	
+	if (fBufferSize == 0) {
+		if (fLooping) {
+			// start reading next time from the start of the file
+			int64 frame = 0;
+			fAudioStream->stream->SeekToFrame(&frame);
+		} else {
+			StopPlaying();
+		}
+	}
 		
 	return true;
 }

@@ -33,6 +33,7 @@
 
 // Project Includes ------------------------------------------------------------
 #include <GameSoundDefs.h>
+#include <MediaDefs.h>
 
 // Local Includes --------------------------------------------------------------
 

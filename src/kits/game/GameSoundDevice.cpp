@@ -190,6 +190,9 @@ BGameSoundDevice::CreateBuffer(gs_id * sound,
 void
 BGameSoundDevice::ReleaseBuffer(gs_id sound)
 {
+	if (sound <= 0)
+		return;
+
 	if (fSounds[sound-1])
 	{
 		// We must stop playback befor destroying the sound or else
@@ -207,12 +210,12 @@ BGameSoundDevice::Buffer(gs_id sound,
 						 gs_audio_format * format,
 						 void * data)
 {
-	if (!format) return B_BAD_VALUE;
+	if (!format || sound <= 0)
+		return B_BAD_VALUE;
 
 	memcpy(format, &fSounds[sound-1]->Format(), sizeof(gs_audio_format));
 	
-	if (fSounds[sound-1]->Data())
-	{
+	if (fSounds[sound-1]->Data()) {
 		data = malloc(format->buffer_size);
 		memcpy(data, fSounds[sound-1]->Data(), format->buffer_size);
 	}
@@ -224,38 +227,40 @@ BGameSoundDevice::Buffer(gs_id sound,
 status_t
 BGameSoundDevice::StartPlaying(gs_id sound)
 {
-	status_t error = EALREADY;
-	
-	if (!fSounds[sound-1]->IsPlaying())
-	{
+	if (sound <= 0)
+		return B_BAD_VALUE;
+		
+	if (!fSounds[sound-1]->IsPlaying()) {
 		// tell the producer to start playing the sound
-		error = fSounds[sound-1]->StartPlaying();
+		return fSounds[sound-1]->StartPlaying();
 	}
-	else fSounds[sound-1]->Reset();
 	
-	return error;
+	fSounds[sound-1]->Reset();
+	return EALREADY;
 }
 
 
 status_t
 BGameSoundDevice::StopPlaying(gs_id sound)
 {
-	status_t error = EALREADY;
+	if (sound <= 0)
+		return B_BAD_VALUE;
 	
-	if (fSounds[sound-1]->IsPlaying())
-	{
+	if (fSounds[sound-1]->IsPlaying()) {
 		// Tell the producer to stop play this sound
 		fSounds[sound-1]->Reset();  
-		error = fSounds[sound-1]->StopPlaying();
+		return fSounds[sound-1]->StopPlaying();
 	}
 	
-	return error;
+	return EALREADY;
 }
 
 
 bool
 BGameSoundDevice::IsPlaying(gs_id sound)
 {
+	if (sound <= 0)
+		return false;
 	return fSounds[sound-1]->IsPlaying();
 }	
 
