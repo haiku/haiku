@@ -13,6 +13,7 @@
 #include "interfaces.h"
 #include "routes.h"
 #include "stack_private.h"
+#include "utility.h"
 
 #include <net_device.h>
 #include <KernelExport.h>
@@ -54,41 +55,22 @@ device_reader_thread(void *_interface)
 		status = device->module->receive_data(device, &buffer);
 		rx_lock.Lock();
 		if (status == B_OK) {
-			//dprintf("received buffer of %ld bytes length\n", buffer->size);
-
 			// feed device monitors
-			DeviceMonitorList::Iterator iterator
-				= interface->monitor_funcs.GetIterator();
+			DeviceMonitorList::Iterator iterator =
+				interface->monitor_funcs.GetIterator();
 			while (iterator.HasNext()) {
 				net_device_monitor *monitor = iterator.Next();
 				monitor->receive(monitor, buffer);
 			}
 
-			int32 type = interface->deframe_func(device, buffer);
-			if (type >= 0) {
-				// find handler for this packet
-				DeviceHandlerList::Iterator iterator
-					= interface->receive_funcs.GetIterator();
-				status = B_ERROR;
-
-				while (iterator.HasNext()) {
-					net_device_handler *handler = iterator.Next();
-
-					if (handler->type == type) {
-						status = handler->func(handler->cookie, device, buffer);
-						if (status == B_OK)
-							break;
-					}
-				}
-			} else
-				status = type;
-
-			if (status == B_OK) {
-				// the buffer no longer belongs to us
+			buffer->interface = NULL;
+			buffer->type = interface->deframe_func(interface->device, buffer);
+			if (buffer->type < 0) {
+				gNetBufferModule.free(buffer);
 				continue;
 			}
 
-			gNetBufferModule.free(buffer);
+			fifo_enqueue_buffer(&interface->receive_queue, buffer);
 		} else {
 			// In case of error, give the other threads some
 			// time to run since this is a near real time thread.
@@ -336,8 +318,8 @@ datalink_control(net_domain *_domain, int32 option, void *value,
 status_t
 datalink_send_data(struct net_route *route, net_buffer *buffer)
 {
-	net_interface *interface = route->interface;
-	net_domain *domain = interface->domain;
+	net_interface_private *interface =
+		(net_interface_private *)route->interface;
 
 	//dprintf("send buffer (%ld bytes) to interface %s (route flags %lx)\n",
 	//	buffer->size, interface->name, route->flags);
@@ -346,8 +328,12 @@ datalink_send_data(struct net_route *route, net_buffer *buffer)
 		return ENETUNREACH;
 
 	if (route->flags & RTF_LOCAL) {
+		// we set the interface here so the buffer is delivered directly
+		// to the domain in interfaces.cpp:device_consumer_thread()
+		buffer->interface = interface;
 		// this one goes back to the domain directly
-		return domain->module->receive_data(buffer);
+		return fifo_enqueue_buffer(
+			&interface->device_interface->receive_queue, buffer);
 	}
 
 	if (route->flags & RTF_GATEWAY) {

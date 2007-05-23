@@ -654,7 +654,8 @@ UdpEndpointManager::ReceiveData(net_buffer *buffer)
 		return B_ERROR;
 	}
 
-	return B_ERROR;
+	gBufferModule->free(buffer);
+	return B_OK;
 }
 
 

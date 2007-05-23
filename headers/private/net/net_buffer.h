@@ -23,6 +23,7 @@ typedef struct net_buffer {
 	struct sockaddr *source;
 	struct sockaddr *destination;
 	struct net_interface *interface;
+	int32 type;
 	union {
 		struct {
 			uint16	start;

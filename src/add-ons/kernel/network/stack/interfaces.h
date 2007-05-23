@@ -27,7 +27,6 @@ typedef DoublyLinkedList<net_device_monitor,
 	DoublyLinkedListCLink<net_device_monitor> > DeviceMonitorList;
 
 struct net_device_interface : DoublyLinkedListLinkImpl<net_device_interface> {
-	//struct list_link	link;
 	const char			*name;
 	struct net_device_module_info *module;
 	struct net_device	*device;
@@ -43,6 +42,9 @@ struct net_device_interface : DoublyLinkedListLinkImpl<net_device_interface> {
 	DeviceHandlerList	receive_funcs;
 
 	recursive_lock		rx_lock;
+
+	thread_id			consumer_thread;
+	net_fifo			receive_queue;
 };
 
 typedef DoublyLinkedList<net_device_interface> DeviceInterfaceList;

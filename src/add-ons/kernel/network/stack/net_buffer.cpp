@@ -345,6 +345,8 @@ create_buffer(size_t headerSpace)
 	buffer->flags = 0;
 	buffer->size = 0;
 
+	buffer->type = -1;
+
 	return buffer;
 }
 
@@ -378,6 +380,7 @@ copy_metadata(net_buffer *destination, const net_buffer *source)
 	destination->offset = source->offset;
 	destination->size = source->size;
 	destination->protocol = source->protocol;
+	destination->type = source->type;
 }
 
 

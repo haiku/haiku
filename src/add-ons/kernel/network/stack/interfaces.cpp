@@ -21,6 +21,7 @@
 
 #include <net/if_dl.h>
 #include <new>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -37,6 +38,51 @@ static benaphore sInterfaceLock;
 static DeviceInterfaceList sInterfaces;
 static uint32 sInterfaceIndex;
 static uint32 sDeviceIndex;
+
+
+static status_t
+device_consumer_thread(void *_interface)
+{
+	net_device_interface *interface = (net_device_interface *)_interface;
+	net_device *device = interface->device;
+	net_buffer *buffer;
+
+	while (true) {
+		ssize_t status = fifo_dequeue_buffer(&interface->receive_queue, 0,
+			B_INFINITE_TIMEOUT, &buffer);
+		if (status == B_INTERRUPTED)
+			continue;
+		else if (status < B_OK)
+			break;
+
+		if (buffer->interface != NULL) {
+			// if the interface is already specified this buffer was
+			// delivered locally.
+
+			net_domain *domain = buffer->interface->domain;
+
+			if (domain->module->receive_data(buffer) == B_OK)
+				buffer = NULL;
+		} else {
+			// find handler for this packet
+			DeviceHandlerList::Iterator it2 =
+				interface->receive_funcs.GetIterator();
+			while (buffer && it2.HasNext()) {
+				net_device_handler *handler = it2.Next();
+
+				// if the handler returns B_OK, it consumed the buffer
+				if (handler->type == buffer->type
+					&& handler->func(handler->cookie, device, buffer) == B_OK)
+					buffer = NULL;
+			}
+		}
+
+		if (buffer)
+			gNetBufferModule.free(buffer);
+	}
+
+	return B_OK;
+}
 
 
 static net_device_interface *
@@ -62,6 +108,60 @@ domain_receive_adapter(void *cookie, net_device *device, net_buffer *buffer)
 
 	buffer->interface = find_interface(domain, device->index);
 	return domain->module->receive_data(buffer);
+}
+
+
+static net_device_interface *
+allocate_device_interface(net_device *device, net_device_module_info *module)
+{
+	net_device_interface *interface = new (std::nothrow) net_device_interface;
+	if (interface == NULL)
+		goto error_0;
+
+	if (recursive_lock_init(&interface->rx_lock, "rx lock") < B_OK)
+		goto error_1;
+
+	char name[128];
+	snprintf(name, sizeof(name), "%s receive queue", device->name);
+
+	if (init_fifo(&interface->receive_queue, name, 16 * 1024 * 1024) < B_OK)
+		goto error_2;
+
+	interface->name = device->name;
+	interface->module = module;
+	interface->device = device;
+	interface->up_count = 0;
+	interface->ref_count = 1;
+	interface->deframe_func = NULL;
+	interface->deframe_ref_count = 0;
+
+	snprintf(name, sizeof(name), "%s consumer", device->name);
+
+	interface->reader_thread   = -1;
+	interface->consumer_thread = spawn_kernel_thread(device_consumer_thread,
+		name, B_REAL_TIME_DISPLAY_PRIORITY - 10, interface);
+	if (interface->consumer_thread < B_OK)
+		goto error_3;
+	resume_thread(interface->consumer_thread);
+
+	// TODO: proper interface index allocation
+	device->index = ++sDeviceIndex;
+	device->module = module;
+
+	sInterfaces.Add(interface);
+	return interface;
+
+error_3:
+	uninit_fifo(&interface->receive_queue);
+
+error_2:
+	recursive_lock_destroy(&interface->rx_lock);
+
+error_1:
+	delete interface;
+
+error_0:
+	return NULL;
 }
 
 
@@ -337,12 +437,14 @@ put_device_interface(struct net_device_interface *interface)
 	if (atomic_add(&interface->ref_count, -1) != 1)
 		return;
 
-	// we need to remove this interface!
-
 	{
 		BenaphoreLocker locker(sInterfaceLock);
 		sInterfaces.Remove(interface);
 	}
+
+	uninit_fifo(&interface->receive_queue);
+	status_t status;
+	wait_for_thread(interface->consumer_thread, &status);
 
 	interface->module->uninit_device(interface->device);
 	put_module(interface->module->info.name);
@@ -411,27 +513,9 @@ get_device_interface(const char *name, bool create)
 			net_device *device;
 			status_t status = module->init_device(name, &device);
 			if (status == B_OK) {
-				// create new module interface for this
-				interface = new (std::nothrow) net_device_interface;
-				if (interface != NULL) {
-					if (recursive_lock_init(&interface->rx_lock,
-							"rx lock") >= B_OK) {
-						interface->name = device->name;
-						interface->module = module;
-						interface->device = device;
-						interface->up_count = 0;
-						interface->ref_count = 1;
-						interface->deframe_func = NULL;
-						interface->deframe_ref_count = 0;
-
-						device->index = ++sDeviceIndex;
-						device->module = module;
-
-						sInterfaces.Add(interface);
-						return interface;
-					}
-					delete interface;
-				}
+				interface = allocate_device_interface(device, module);
+				if (interface)
+					return interface;
 				module->uninit_device(device);
 			}
 			put_module(moduleName);
@@ -468,6 +552,8 @@ down_device_interface(net_device_interface *interface)
 	notify_device_monitors(interface, B_DEVICE_GOING_DOWN);
 
 	thread_id reader_thread = interface->reader_thread;
+
+	// TODO when setting the interface down, should we clear the receive queue?
 
 	// one of the callers must hold a reference to the net_device_interface
 	// usually it is one of the net_interfaces.
