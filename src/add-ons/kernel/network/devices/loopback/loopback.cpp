@@ -22,40 +22,11 @@
 
 
 struct loopback_device : net_device {
-	net_fifo	fifo;
 };
 
 
 struct net_buffer_module_info *gBufferModule;
 static struct net_stack_module_info *sStackModule;
-
-
-/*!
-	Swaps \a size bytes of the memory pointed to by \a and \b with each other.
-*/
-void
-swap_memory(void *a, void *b, size_t size)
-{
-	uint32 *a4 = (uint32 *)a;
-	uint32 *b4 = (uint32 *)b;
-	while (size > 4) {
-		uint32 temp = *a4;
-		*(a4++) = *b4;
-		*(b4++) = temp;
-
-		size -= 4;
-	}
-
-	uint8 *a1 = (uint8 *)a4;
-	uint8 *b1 = (uint8 *)b4;
-	while (size > 0) {
-		uint8 temp = *a1;
-		*(a1++) = *b1;
-		*(b1++) = temp;
-
-		size--;
-	}
-}
 
 
 //	#pragma mark -
@@ -116,18 +87,15 @@ loopback_uninit(net_device *_device)
 
 
 status_t
-loopback_up(net_device *_device)
+loopback_up(net_device *device)
 {
-	loopback_device *device = (loopback_device *)_device;
-	return sStackModule->init_fifo(&device->fifo, "loopback fifo", 65536);
+	return B_OK;
 }
 
 
 void
-loopback_down(net_device *_device)
+loopback_down(net_device *device)
 {
-	loopback_device *device = (loopback_device *)_device;
-	sStackModule->uninit_fifo(&device->fifo);
 }
 
 
@@ -140,36 +108,18 @@ loopback_control(net_device *device, int32 op, void *argument,
 
 
 status_t
-loopback_send_data(net_device *_device, net_buffer *buffer)
+loopback_send_data(net_device *device, net_buffer *buffer)
 {
-	loopback_device *device = (loopback_device *)_device;
-	return sStackModule->fifo_enqueue_buffer(&device->fifo, buffer);
-}
-
-
-status_t
-loopback_receive_data(net_device *_device, net_buffer **_buffer)
-{
-	loopback_device *device = (loopback_device *)_device;
-	net_buffer *buffer;
-
-	status_t status = sStackModule->fifo_dequeue_buffer(&device->fifo, 0, 0, &buffer);
-	if (status < B_OK)
-		return status;
-
-	// swap network addresses before delivering
 	gBufferModule->swap_addresses(buffer);
 
-	*_buffer = buffer;
-	return B_OK;
+	return sStackModule->device_enqueue_buffer(device, buffer);
 }
 
 
 status_t
 loopback_set_mtu(net_device *device, size_t mtu)
 {
-	if (mtu > 65536
-		|| mtu < 16)
+	if (mtu > 65536 || mtu < 16)
 		return B_BAD_VALUE;
 
 	device->mtu = mtu;
@@ -231,7 +181,7 @@ net_device_module_info sLoopbackModule = {
 	loopback_down,
 	loopback_control,
 	loopback_send_data,
-	loopback_receive_data,
+	NULL, // receive_data
 	loopback_set_mtu,
 	loopback_set_promiscuous,
 	loopback_set_media,

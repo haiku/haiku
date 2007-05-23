@@ -97,5 +97,6 @@ status_t unregister_device_monitor(struct net_device *device,
 	struct net_device_monitor *monitor);
 status_t device_link_changed(net_device *device);
 status_t device_removed(net_device *device);
+status_t device_enqueue_buffer(net_device *device, net_buffer *buffer);
 
 #endif	// INTERFACES_H

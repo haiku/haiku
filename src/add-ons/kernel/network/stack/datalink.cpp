@@ -555,17 +555,22 @@ interface_protocol_up(net_datalink_protocol *_protocol)
 	if (status < B_OK)
 		return status;
 
-	// give the thread a nice name
-	char name[B_OS_NAME_LENGTH];
-	snprintf(name, sizeof(name), "%s reader", device->name);
+	if (device->module->receive_data != NULL) {
+		// give the thread a nice name
+		char name[B_OS_NAME_LENGTH];
+		snprintf(name, sizeof(name), "%s reader", device->name);
 
-	deviceInterface->reader_thread = spawn_kernel_thread(device_reader_thread, name,
-		B_REAL_TIME_DISPLAY_PRIORITY - 10, deviceInterface);
-	if (deviceInterface->reader_thread < B_OK)
-		return deviceInterface->reader_thread;
+		deviceInterface->reader_thread =
+			spawn_kernel_thread(device_reader_thread, name,
+				B_REAL_TIME_DISPLAY_PRIORITY - 10, deviceInterface);
+		if (deviceInterface->reader_thread < B_OK)
+			return deviceInterface->reader_thread;
+	}
 
 	device->flags |= IFF_UP;
-	resume_thread(deviceInterface->reader_thread);
+
+	if (device->module->receive_data != NULL)
+		resume_thread(deviceInterface->reader_thread);
 
 	deviceInterface->up_count = 1;
 	return B_OK;

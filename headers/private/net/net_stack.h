@@ -101,6 +101,9 @@ struct net_stack_module_info {
 	status_t (*device_link_changed)(struct net_device *device);
 	status_t (*device_removed)(struct net_device *device);
 
+	status_t (*device_enqueue_buffer)(struct net_device *device,
+				struct net_buffer *buffer);
+
 	// Utility Functions
 
 	// notification

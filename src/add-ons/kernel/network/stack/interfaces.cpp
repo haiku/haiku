@@ -551,19 +551,22 @@ down_device_interface(net_device_interface *interface)
 
 	notify_device_monitors(interface, B_DEVICE_GOING_DOWN);
 
-	thread_id reader_thread = interface->reader_thread;
+	if (device->module->receive_data != NULL) {
+		thread_id reader_thread = interface->reader_thread;
 
-	// TODO when setting the interface down, should we clear the receive queue?
+		// TODO when setting the interface down,
+		//      should we clear the receive queue?
 
-	// one of the callers must hold a reference to the net_device_interface
-	// usually it is one of the net_interfaces.
-	recursive_lock_unlock(&interface->rx_lock);
+		// one of the callers must hold a reference to the net_device_interface
+		// usually it is one of the net_interfaces.
+		recursive_lock_unlock(&interface->rx_lock);
 
-	// make sure the reader thread is gone before shutting down the interface
-	status_t status;
-	wait_for_thread(reader_thread, &status);
+		// make sure the reader thread is gone before shutting down the interface
+		status_t status;
+		wait_for_thread(reader_thread, &status);
 
-	recursive_lock_lock(&interface->rx_lock);
+		recursive_lock_lock(&interface->rx_lock);
+	}
 }
 
 
@@ -801,6 +804,21 @@ device_removed(net_device *device)
 	put_device_interface(interface);
 
 	return B_OK;
+}
+
+
+status_t
+device_enqueue_buffer(net_device *device, net_buffer *buffer)
+{
+	net_device_interface *interface = get_device_interface(device->index);
+
+	if (interface == NULL)
+		return ENODEV;
+
+	status_t status = fifo_enqueue_buffer(&interface->receive_queue, buffer);
+
+	put_device_interface(interface);
+	return status;
 }
 
 

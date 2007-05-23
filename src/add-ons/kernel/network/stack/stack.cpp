@@ -923,6 +923,7 @@ net_stack_module_info gNetStackModule = {
 	unregister_device_monitor,
 	device_link_changed,
 	device_removed,
+	device_enqueue_buffer,
 
 	notify_socket,
 
