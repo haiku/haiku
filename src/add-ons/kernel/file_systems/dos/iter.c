@@ -2,9 +2,11 @@
 	Copyright 1999-2001, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
+
 #include <KernelExport.h>
 
 #include <fs_cache.h>
+#include <fs_info.h>
 #include <string.h>
 
 #include "iter.h"
@@ -16,7 +18,9 @@
 
 CHECK_MAGIC(diri,struct diri,DIRI_MAGIC)
 
-static int _validate_cs_(nspace *vol, uint32 cluster, uint32 sector)
+
+static int
+_validate_cs_(nspace *vol, uint32 cluster, uint32 sector)
 {
 	if (sector < 0) return -1;
 
@@ -33,7 +37,9 @@ static int _validate_cs_(nspace *vol, uint32 cluster, uint32 sector)
 	return 0;
 }
 
-off_t csi_to_block(struct csi *csi)
+
+off_t
+csi_to_block(struct csi *csi)
 {
 	// presumes the caller has already called _validate_cs_ on the argument
 	ASSERT(_validate_cs_(csi->vol, csi->cluster, csi->sector) == 0);
@@ -48,7 +54,9 @@ off_t csi_to_block(struct csi *csi)
 		csi->sector;
 }
 
-int init_csi(nspace *vol, uint32 cluster, uint32 sector, struct csi *csi)
+
+int
+init_csi(nspace *vol, uint32 cluster, uint32 sector, struct csi *csi)
 {
 	int ret;
 	if ((ret = _validate_cs_(vol,cluster,sector)) != 0)
@@ -59,7 +67,9 @@ int init_csi(nspace *vol, uint32 cluster, uint32 sector, struct csi *csi)
 	return 0;
 }
 
-int iter_csi(struct csi *csi, int sectors)
+
+int
+iter_csi(struct csi *csi, int sectors)
 {
 	if (csi->sector == 0xffff) // check if already at end of chain
 		return -1;
@@ -78,7 +88,8 @@ int iter_csi(struct csi *csi, int sectors)
 		csi->sector += sectors;
 		if (csi->sector < csi->vol->sectors_per_cluster)
 			return 0;
-		csi->cluster = get_nth_fat_entry(csi->vol, csi->cluster, csi->sector / csi->vol->sectors_per_cluster);
+		csi->cluster = get_nth_fat_entry(csi->vol, csi->cluster,
+			csi->sector / csi->vol->sectors_per_cluster);
 
 		if ((int32)csi->cluster < 0) {
 			csi->sector = 0xffff;
@@ -96,16 +107,28 @@ int iter_csi(struct csi *csi, int sectors)
 	return -1;
 }
 
-uint8 *csi_get_block(struct csi *csi, int32 tid)
+
+uint8 *
+csi_get_block(struct csi *csi, int32 tid)
 {
 	if (_validate_cs_(csi->vol, csi->cluster, csi->sector) != 0)
 		return NULL;
 
-	return block_cache_get_writable_etc(csi->vol->fBlockCache, csi_to_block(csi),
-		1, csi->vol->bytes_per_sector, tid);
+	// TODO: the file system should be a bit smarter than this
+	//		(ie. it should know when it needs a writable block)
+
+	if (csi->vol->flags & B_FS_IS_READONLY) {
+		return (uint8 *)block_cache_get_etc(csi->vol->fBlockCache, csi_to_block(csi),
+			1, csi->vol->bytes_per_sector);
+	} else {
+		return block_cache_get_writable_etc(csi->vol->fBlockCache, csi_to_block(csi),
+			1, csi->vol->bytes_per_sector, tid);
+	}
 }
 
-status_t csi_release_block(struct csi *csi)
+
+status_t
+csi_release_block(struct csi *csi)
 {
 	if (_validate_cs_(csi->vol, csi->cluster, csi->sector) != 0)
 		return EINVAL;
@@ -114,7 +137,9 @@ status_t csi_release_block(struct csi *csi)
 	return B_OK;
 }
 
-status_t csi_mark_block_dirty(struct csi *csi, int32 tid)
+
+status_t
+csi_mark_block_dirty(struct csi *csi, int32 tid)
 {
 	ASSERT(_validate_cs_(csi->vol, csi->cluster, csi->sector) == 0);
 	if (_validate_cs_(csi->vol, csi->cluster, csi->sector) != 0)
@@ -126,8 +151,10 @@ status_t csi_mark_block_dirty(struct csi *csi, int32 tid)
 	return B_OK;
 }
 
+
 /* XXX: not the most efficient implementation, but it gets the job done */
-status_t csi_read_blocks(struct csi *csi, uint8 *buffer, ssize_t len)
+status_t
+csi_read_blocks(struct csi *csi, uint8 *buffer, ssize_t len)
 {
 	struct csi old_csi;
 	uint32 sectors;
@@ -154,7 +181,7 @@ status_t csi_read_blocks(struct csi *csi, uint8 *buffer, ssize_t len)
 		sectors++;
 	}
 
-	for (i=block; i<block+sectors; i++) {
+	for (i = block; i < block + sectors; i++) {
 		char *blockData = (char *)block_cache_get(csi->vol->fBlockCache, i);
 		memcpy(buf, blockData, csi->vol->bytes_per_sector);
 		buf += csi->vol->bytes_per_sector;
@@ -166,7 +193,9 @@ status_t csi_read_blocks(struct csi *csi, uint8 *buffer, ssize_t len)
 	return sectors * csi->vol->bytes_per_sector;
 }
 
-status_t csi_write_blocks(struct csi *csi, uint8 *buffer, ssize_t len)
+
+status_t
+csi_write_blocks(struct csi *csi, uint8 *buffer, ssize_t len)
 {
 	struct csi old_csi;
 	uint32 sectors;
@@ -193,9 +222,9 @@ status_t csi_write_blocks(struct csi *csi, uint8 *buffer, ssize_t len)
 			break;
 		sectors++;
 	}
-	
+
 	tid = cache_start_transaction(csi->vol->fBlockCache);
-	for(i=block; i<block+sectors; i++) {
+	for (i = block; i < block + sectors; i++) {
 		char *blockData = block_cache_get_writable_etc(csi->vol->fBlockCache, i, 0, 1, tid);
 		memcpy(blockData, buf, csi->vol->bytes_per_sector);
 		buf += csi->vol->bytes_per_sector;
@@ -211,7 +240,9 @@ status_t csi_write_blocks(struct csi *csi, uint8 *buffer, ssize_t len)
 	return sectors * csi->vol->bytes_per_sector;
 }
 
-status_t csi_write_block(struct csi *csi, uint8 *buffer)
+
+status_t
+csi_write_block(struct csi *csi, uint8 *buffer)
 {
 	off_t block;
 	int32 tid;
@@ -232,7 +263,9 @@ status_t csi_write_block(struct csi *csi, uint8 *buffer)
 	return B_OK;
 }
 
-static void _diri_release_current_block_(struct diri *diri)
+
+static void
+_diri_release_current_block_(struct diri *diri)
 {
 	ASSERT(diri->current_block);
 	if (diri->current_block == NULL)
@@ -241,9 +274,11 @@ static void _diri_release_current_block_(struct diri *diri)
 	diri->current_block = NULL;
 }
 
-uint8 *diri_init(nspace *vol, uint32 cluster, uint32 index, struct diri *diri)
+
+uint8 *
+diri_init(nspace *vol, uint32 cluster, uint32 index, struct diri *diri)
 {
-	diri->magic = DIRI_MAGIC;
+	diri->magic = ~DIRI_MAGIC; // trash magic number
 	diri->current_block = NULL;
 
 	if (cluster >= vol->total_clusters + 2)
@@ -254,23 +289,32 @@ uint8 *diri_init(nspace *vol, uint32 cluster, uint32 index, struct diri *diri)
 
 	diri->starting_cluster = cluster;
 	diri->current_index = index;
-	if (index >= vol->bytes_per_sector / 0x20) {
-		if (iter_csi(&(diri->csi), diri->current_index / (vol->bytes_per_sector / 0x20)) != 0)
-			return NULL;
-	}
+	if (index >= vol->bytes_per_sector / 0x20
+		&& iter_csi(&(diri->csi), diri->current_index
+				/ (vol->bytes_per_sector / 0x20)) != 0)
+		return NULL;
 	
 	diri->tid = cache_start_transaction(diri->csi.vol->fBlockCache);
+	if (diri->tid < B_OK)
+		return NULL;
 
 	// get current sector
 	diri->current_block = csi_get_block(&(diri->csi), diri->tid);
 
-	if (diri->current_block == NULL)
+	if (diri->current_block == NULL) {
+		cache_end_transaction(diri->csi.vol->fBlockCache, diri->tid, NULL, NULL);
 		return NULL;
+	}
 
-	return diri->current_block + (diri->current_index % (diri->csi.vol->bytes_per_sector / 0x20))*0x20;
+	// now the diri is valid
+	diri->magic = DIRI_MAGIC;
+	return diri->current_block
+		+ (diri->current_index % (diri->csi.vol->bytes_per_sector / 0x20))*0x20;
 }
 
-int diri_free(struct diri *diri)
+
+int
+diri_free(struct diri *diri)
 {
 	if (check_diri_magic(diri, "diri_free")) return EINVAL;
 
@@ -284,17 +328,22 @@ int diri_free(struct diri *diri)
 	return 0;
 }
 
-uint8 *diri_current_entry(struct diri *diri)
+
+uint8 *
+diri_current_entry(struct diri *diri)
 {
 	if (check_diri_magic(diri, "diri_current_entry")) return NULL;
 	
 	if (diri->current_block == NULL)
 		return NULL;
 
-	return diri->current_block + (diri->current_index % (diri->csi.vol->bytes_per_sector / 0x20))*0x20;
+	return diri->current_block
+		+ (diri->current_index % (diri->csi.vol->bytes_per_sector / 0x20))*0x20;
 }
 
-uint8 *diri_next_entry(struct diri *diri)
+
+uint8 *
+diri_next_entry(struct diri *diri)
 {
 	if (check_diri_magic(diri, "diri_next_entry")) return NULL;
 	
@@ -310,12 +359,16 @@ uint8 *diri_next_entry(struct diri *diri)
 			return NULL;
 	}
 	
-	return diri->current_block + (diri->current_index % (diri->csi.vol->bytes_per_sector / 0x20))*0x20;
+	return diri->current_block
+		+ (diri->current_index % (diri->csi.vol->bytes_per_sector / 0x20))*0x20;
 }
 
-uint8 *diri_rewind(struct diri *diri)
+
+uint8 *
+diri_rewind(struct diri *diri)
 {
-	if (check_diri_magic(diri, "diri_rewind")) return NULL;
+	if (check_diri_magic(diri, "diri_rewind"))
+		return NULL;
 
 	if (diri->current_index > (diri->csi.vol->bytes_per_sector / 0x20 - 1)) {
 		if (diri->current_block)
@@ -328,7 +381,9 @@ uint8 *diri_rewind(struct diri *diri)
 	return diri->current_block;
 }
 
-void diri_mark_dirty(struct diri *diri)
+
+void
+diri_mark_dirty(struct diri *diri)
 {
 	csi_mark_block_dirty(&(diri->csi), diri->tid);
 }

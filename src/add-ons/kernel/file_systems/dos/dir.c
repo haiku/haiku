@@ -2,6 +2,7 @@
 	Copyright 1999-2001, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
+
 #include <KernelExport.h> 
 
 #include <stdlib.h>
@@ -31,8 +32,7 @@ const char illegal[] = "\\/:*?\"<>|";
 
 #define DIRCOOKIE_MAGIC 'AiC '
 
-typedef struct dircookie
-{
+typedef struct dircookie {
 	uint32		magic;
 	uint32		current_index;
 } dircookie;
@@ -53,19 +53,21 @@ struct _dirent_info_ {
 };
 
 // scans dir for the next entry, using the state stored in a struct diri.
-static status_t _next_dirent_(struct diri *iter, struct _dirent_info_ *oinfo,
-	char *filename, int len)
+static status_t
+_next_dirent_(struct diri *iter, struct _dirent_info_ *oinfo, char *filename,
+	int len)
 {
-	uint8		*buffer, hash = 0; /* quiet warning */
-	uchar		uni[1024];
-	uint16		*puni;
-	uint32		i;
+	uint8 *buffer, hash = 0; /* quiet warning */
+	uchar uni[1024];
+	uint16 *puni;
+	uint32 i;
 
 	// lfn state
-	uint32		start_index = 0xffff, filename_len = 0 /* quiet warning */,
-				lfn_count = 0 /* quiet warning */;
+	uint32 start_index = 0xffff, filename_len = 0; /* quiet warning */
+	uint32 lfn_count = 0 /* quiet warning */;
 
-	if (check_diri_magic(iter, "_next_dirent_")) return EINVAL;
+	if (check_diri_magic(iter, "_next_dirent_"))
+		return EINVAL;
 
 	if (iter->current_block == NULL)
 		return ENOENT;
@@ -75,10 +77,12 @@ static status_t _next_dirent_(struct diri *iter, struct _dirent_info_ *oinfo,
 		return ENOMEM;
 	}
 
-	buffer = iter->current_block + ((iter->current_index) % (iter->csi.vol->bytes_per_sector / 0x20)) * 0x20;
+	buffer = iter->current_block
+		+ ((iter->current_index) % (iter->csi.vol->bytes_per_sector / 0x20)) * 0x20;
 
-	for (;buffer != NULL;buffer = diri_next_entry(iter)) {
-		DPRINTF(2, ("_next_dirent_: %lx/%lx/%lx\n", iter->csi.cluster, iter->csi.sector, iter->current_index));
+	for (; buffer != NULL; buffer = diri_next_entry(iter)) {
+		DPRINTF(2, ("_next_dirent_: %lx/%lx/%lx\n", iter->csi.cluster,
+			iter->csi.sector, iter->current_index));
 		if (buffer[0] == 0) { // quit if at end of table
 			if (start_index != 0xffff) {
 				dprintf("lfn entry (%s) with no alias\n", filename);
@@ -110,7 +114,7 @@ static status_t _next_dirent_(struct diri *iter, struct _dirent_info_ *oinfo,
 				lfn_count = buffer[0] & 0x1f;
 				start_index = iter->current_index;
 				puni = (uint16 *)(uni + 2*13*(lfn_count - 1));
-				for (i=1;i<0x20;i+=2) {
+				for (i = 1; i < 0x20; i += 2) {
 					if (*(uint16 *)&buffer[i] == 0xffff)
 						break;
 					*puni++ = *(uint16 *)&buffer[i]; 
@@ -134,7 +138,7 @@ static status_t _next_dirent_(struct diri *iter, struct _dirent_info_ *oinfo,
 				}
 
 				puni = (uint16 *)(uni + 2*13*(lfn_count - 1));
-				for (i=1;i<0x20;i+=2) {
+				for (i = 1; i < 0x20; i += 2) {
 					if ((buffer[i] == 0xff) && (buffer[i+1] == 0xff)) {
 						dprintf("bad lfn entry in directory\n");
 						start_index = 0xffff;
@@ -169,7 +173,8 @@ static status_t _next_dirent_(struct diri *iter, struct _dirent_info_ *oinfo,
 				diri_init(iter->csi.vol, iter->starting_cluster, start_index, iter);
 				return ENAMETOOLONG;
 			} else if (hash_msdos_name((const char *)buffer) != hash) {
-				dprintf("error: long file name (%s) hash and short file name don't match\n", filename);
+				dprintf("error: long file name (%s) hash and short file name don't match\n",
+					filename);
 				start_index = 0xffff;
 			}
 		}
@@ -198,21 +203,24 @@ static status_t _next_dirent_(struct diri *iter, struct _dirent_info_ *oinfo,
 	return B_NO_ERROR;
 }
 
-static status_t get_next_dirent(nspace *vol, vnode *dir, struct diri *iter,
-			vnode_id *vnid, char *filename, int len)
+
+static status_t
+get_next_dirent(nspace *vol, vnode *dir, struct diri *iter, vnode_id *vnid,
+	char *filename, int len)
 {
 	struct _dirent_info_ info;
 	status_t result;
 
-	if (check_nspace_magic(vol, "get_next_dirent")) return EINVAL;
+	if (check_nspace_magic(vol, "get_next_dirent"))
+		return EINVAL;
 
 	do {
 		result = _next_dirent_(iter, &info, filename, len);
-	
-		if (result < 0) return result;
+		if (result < 0)
+			return result;
 		// only hide volume label entries in the root directory
 	} while ((info.mode & FAT_VOLUME) && (dir->vnid == vol->root_vnode.vnid));
-	
+
 	if (!strcmp(filename, ".")) {
 		// assign vnode based on parent
 		if (vnid) *vnid = dir->vnid;
@@ -221,9 +229,9 @@ static status_t get_next_dirent(nspace *vol, vnode *dir, struct diri *iter,
 		if (vnid) *vnid = dir->dir_vnid;
 	} else {
 		if (vnid) {
-			vnode_id loc = (IS_DATA_CLUSTER(info.cluster)) ?
-					GENERATE_DIR_CLUSTER_VNID(dir->vnid, info.cluster) :
-					GENERATE_DIR_INDEX_VNID(dir->vnid, info.sindex);
+			vnode_id loc = (IS_DATA_CLUSTER(info.cluster))
+				? GENERATE_DIR_CLUSTER_VNID(dir->vnid, info.cluster)
+				: GENERATE_DIR_INDEX_VNID(dir->vnid, info.sindex);
 			bool added_to_vcache = false;
 
 			/* if it matches a loc in the lookup table, we are done. */
@@ -264,36 +272,39 @@ static status_t get_next_dirent(nspace *vol, vnode *dir, struct diri *iter,
 	return B_NO_ERROR;
 }
 
-status_t check_dir_empty(nspace *vol, vnode *dir)
+
+status_t
+check_dir_empty(nspace *vol, vnode *dir)
 {
 	uint32 i;
 	struct diri iter;
 	status_t result = B_ERROR; /* quiet warning */
 
-	if (check_nspace_magic(vol, "check_dir_empty")) return EINVAL;
-	if (check_vnode_magic(dir, "check_dir_empty")) return EINVAL;
+	if (check_nspace_magic(vol, "check_dir_empty"))
+		return EINVAL;
+	if (check_vnode_magic(dir, "check_dir_empty"))
+		return EINVAL;
 
 	if (diri_init(vol, dir->cluster, 0, &iter) == NULL) {
 		dprintf("check_dir_empty: error opening directory\n");
-		ASSERT(0);
 		return B_ERROR;
 	}
 
 	i = (dir->vnid == vol->root_vnode.vnid) ? 2 : 0;
 
-	for (;i<3;i++) {
+	for (; i < 3; i++) {
 		char filename[512];
 		result = _next_dirent_(&iter, NULL, filename, 512);
-
 		if (result < 0) {
-			if ((i == 2) && (result == ENOENT)) result = B_OK;
+			if (i == 2 && result == ENOENT)
+				result = B_OK;
 			break;
 		}
 
-		if (((i == 0) && strcmp(filename, ".")) ||
-			((i == 1) && strcmp(filename, "..")) ||
+		if ((i == 0 && strcmp(filename, "."))
+			|| (i == 1 && strcmp(filename, ".."))
 			// weird case where ./.. are stored as long file names
-			((i < 2) && (iter.current_index != i+1))) {
+			|| (i < 2 && iter.current_index != i + 1)) {
 			dprintf("check_dir_empty: malformed directory\n");
 			result = ENOTDIR;
 			break;
@@ -307,33 +318,42 @@ status_t check_dir_empty(nspace *vol, vnode *dir)
 	return result;
 }
 
-status_t findfile_case(nspace *vol, vnode *dir, const char *file,
-		vnode_id *vnid, vnode **node)
+
+status_t
+findfile_case(nspace *vol, vnode *dir, const char *file, vnode_id *vnid,
+	vnode **node)
 {
 	return findfile(vol, dir, file, vnid, node, true, false, NULL);
 }
 
-status_t findfile_nocase(nspace *vol, vnode *dir, const char *file,
-		vnode_id *vnid, vnode **node)
+
+status_t
+findfile_nocase(nspace *vol, vnode *dir, const char *file, vnode_id *vnid,
+	vnode **node)
 {
 	return findfile(vol, dir, file, vnid, node, false, false, NULL);
 }
 
-status_t findfile_nocase_duplicates(nspace *vol, vnode *dir, const char *file,
-		vnode_id *vnid, vnode **node, bool *dups_exist)
+
+status_t
+findfile_nocase_duplicates(nspace *vol, vnode *dir, const char *file,
+	vnode_id *vnid, vnode **node, bool *dups_exist)
 {
 	return findfile(vol, dir, file, vnid, node, false, true, dups_exist);
 }
 
-status_t findfile_case_duplicates(nspace *vol, vnode *dir, const char *file,
-		vnode_id *vnid, vnode **node, bool *dups_exist)
+
+status_t
+findfile_case_duplicates(nspace *vol, vnode *dir, const char *file,
+	vnode_id *vnid, vnode **node, bool *dups_exist)
 {
 	return findfile(vol, dir, file, vnid, node, true, true, dups_exist);
 }
 
-static status_t findfile(nspace *vol, vnode *dir, const char *file,
-		vnode_id *vnid, vnode **node, bool check_case,
-		bool check_dups, bool *dups_exist)
+
+static status_t
+findfile(nspace *vol, vnode *dir, const char *file, vnode_id *vnid,
+	vnode **node, bool check_case, bool check_dups, bool *dups_exist)
 {
 	/* Starting at the base, find the file in the subdir
 	   and return its vnode id */
@@ -351,62 +371,68 @@ static status_t findfile(nspace *vol, vnode *dir, const char *file,
 
 //	dprintf("findfile: %s in %Lx, case %d dups %d\n", file, dir->vnid, check_case, check_dups);
 
-	if (check_nspace_magic(vol, "findfile")) return EINVAL;
-	if (check_vnode_magic(dir, "findfile")) return EINVAL;
+	if (check_nspace_magic(vol, "findfile"))
+		return EINVAL;
+	if (check_vnode_magic(dir, "findfile"))
+		return EINVAL;
 
 	DPRINTF(1, ("findfile: %s in %Lx\n", file, dir->vnid));
 
-	if(dups_exist != NULL) *dups_exist = false;
-	else check_dups = false;
+	if (dups_exist != NULL)
+		*dups_exist = false;
+	else
+		check_dups = false;
 
-	if ((strcmp(file,".") == 0) && (dir->vnid == vol->root_vnode.vnid)) {
+	if (strcmp(file,".") == 0 && dir->vnid == vol->root_vnode.vnid) {
 		found_file = true;
 		found_vnid = dir->vnid;
-	} else if ((strcmp(file, "..") == 0) && (dir->vnid == vol->root_vnode.vnid)) {
+	} else if (strcmp(file, "..") == 0 && dir->vnid == vol->root_vnode.vnid) {
 		found_file = true;
 		found_vnid = dir->dir_vnid;
 	} else {
 		struct diri diri;
 
 		// XXX: do it in a smarter way
-		diri_init(vol, dir->cluster, 0, &diri);
+		if (diri_init(vol, dir->cluster, 0, &diri) == NULL) {
+			dprintf("findfile: error opening directory\n");
+			return ENOENT;
+		}
 
-		while (1)
-		{
+		while (1) {
 			char filename[512];
-			vnode_id	_vnid;
+			vnode_id _vnid;
 
 			result = get_next_dirent(vol, dir, &diri, &_vnid, filename, 512);
-
 			if (result != B_NO_ERROR)
 				break;
 
-			if(check_case) {
+			if (check_case) {
 				if (!found_file && !strcmp(filename, file)) {
 					found_file = true;
 					found_vnid = _vnid;
-				} else if(check_dups && !strcasecmp(filename, file)) {
+				} else if (check_dups && !strcasecmp(filename, file)) {
 					*dups_exist = true;
 				}
 			} else {
 				if (!strcasecmp(filename, file)) {
-					if(check_dups && found_file) {
+					if (check_dups && found_file)
 						*dups_exist = true;
-					}
+
 					found_file = true;
 					found_vnid = _vnid;
 				}
 			}
 
-			if(found_file && (!check_dups || (check_dups && *dups_exist))) {
+			if (found_file && (!check_dups || (check_dups && *dups_exist)))
 				break;
-			}
 		}
 		diri_free(&diri);
 	}
 	if (found_file) {
-		if (vnid) *vnid = found_vnid;
-		if (node) result = get_vnode(vol->id, found_vnid, (void **)node);
+		if (vnid)
+			*vnid = found_vnid;
+		if (node)
+			result = get_vnode(vol->id, found_vnid, (void **)node);
 		result = B_OK;
 	} else {
 		result = ENOENT;
@@ -421,7 +447,9 @@ static status_t findfile(nspace *vol, vnode *dir, const char *file,
 	return result;
 }
 
-status_t erase_dir_entry(nspace *vol, vnode *node)
+
+status_t
+erase_dir_entry(nspace *vol, vnode *node)
 {
 	status_t result;
 	uint32 i;
@@ -430,7 +458,8 @@ status_t erase_dir_entry(nspace *vol, vnode *node)
 	struct _dirent_info_ info;
 	struct diri diri;
 	
-	DPRINTF(0, ("erasing directory entries %lx through %lx\n", node->sindex, node->eindex));
+	DPRINTF(0, ("erasing directory entries %lx through %lx\n",
+		node->sindex, node->eindex));
 	buffer = diri_init(vol,VNODE_PARENT_DIR_CLUSTER(node), node->sindex, &diri);
 
 	// first pass: check if the entry is still valid
@@ -442,10 +471,10 @@ status_t erase_dir_entry(nspace *vol, vnode *node)
 	result = _next_dirent_(&diri, &info, filename, 512);
 	diri_free(&diri);
 
-	if (result < 0) return result;
+	if (result < 0)
+		return result;
 	
-	if ((info.sindex != node->sindex) ||
-		(info.eindex != node->eindex)) {
+	if (info.sindex != node->sindex || info.eindex != node->eindex) {
 		// any other attributes may be in a state of flux due to wstat calls
 		dprintf("erase_dir_entry: directory entry doesn't match\n");
 		return B_ERROR;
@@ -453,7 +482,8 @@ status_t erase_dir_entry(nspace *vol, vnode *node)
 
 	// second pass: actually erase the entry
 	buffer = diri_init(vol, VNODE_PARENT_DIR_CLUSTER(node), node->sindex, &diri);
-	for (i=node->sindex;(i<=node->eindex)&&(buffer);buffer=diri_next_entry(&diri),i++) {
+	for (i = node->sindex; i <= node->eindex && buffer;
+			buffer = diri_next_entry(&diri), i++) {
 		buffer[0] = 0xe5; // mark entry erased
 		diri_mark_dirty(&diri);
 	}
@@ -462,11 +492,14 @@ status_t erase_dir_entry(nspace *vol, vnode *node)
 	return 0;
 }
 
-// shrink directory to the size needed
-// errors here are neither likely nor problematic
-// w95 doesn't seem to do this, so it's possible to create a
-// really large directory that consumes all available space!
-status_t compact_directory(nspace *vol, vnode *dir)
+
+/*!	shrink directory to the size needed
+	errors here are neither likely nor problematic
+	w95 doesn't seem to do this, so it's possible to create a
+	really large directory that consumes all available space!
+*/
+status_t
+compact_directory(nspace *vol, vnode *dir)
 {
 	uint32 last = 0;
 	struct diri diri;
@@ -478,7 +511,11 @@ status_t compact_directory(nspace *vol, vnode *dir)
 	if (IS_FIXED_ROOT(dir->cluster))
 		return 0;
 
-	diri_init(vol, dir->cluster, 0, &diri);
+	if (diri_init(vol, dir->cluster, 0, &diri) == NULL) {
+		dprintf("compact_directory: cannot open dir at cluster (%lx)\n",
+			dir->cluster);
+		return EIO;
+	}
 	while (diri.current_block) {
 		char filename[512];
 		struct _dirent_info_ info;
@@ -490,12 +527,15 @@ status_t compact_directory(nspace *vol, vnode *dir)
 			if (!(info.mode & FAT_VOLUME) || (dir->vnid != vol->root_vnode.vnid))
 				last = diri.current_index;
 		} else if (error == ENOENT) {
-			uint32 clusters = (last + vol->bytes_per_sector / 0x20 * vol->sectors_per_cluster - 1) / (vol->bytes_per_sector / 0x20) / vol->sectors_per_cluster;
+			uint32 clusters = (last + vol->bytes_per_sector / 0x20
+				* vol->sectors_per_cluster - 1) / (vol->bytes_per_sector / 0x20)
+				/ vol->sectors_per_cluster;
 			error = 0;
 
 			// special case for fat32 root directory; we don't want
 			// it to disappear
-			if (clusters == 0) clusters = 1;
+			if (clusters == 0)
+				clusters = 1;
 
 			if (clusters * vol->bytes_per_sector * vol->sectors_per_cluster < dir->st_size) {
 				DPRINTF(0, ("shrinking directory to %lx clusters\n", clusters));
@@ -505,7 +545,8 @@ status_t compact_directory(nspace *vol, vnode *dir)
 			}
 			break;
 		} else {
-			dprintf("compact_directory: unknown error from _next_dirent_ (%s)\n", strerror(error));
+			dprintf("compact_directory: unknown error from _next_dirent_ (%s)\n",
+				strerror(error));
 			break;
 		}
 	}
@@ -514,8 +555,10 @@ status_t compact_directory(nspace *vol, vnode *dir)
 	return error;
 }
 
-// name is array of char[11] as returned by findfile
-static status_t find_short_name(nspace *vol, vnode *dir, const uchar *name)
+
+//! name is array of char[11] as returned by findfile
+static status_t
+find_short_name(nspace *vol, vnode *dir, const uchar *name)
 {
 	struct diri diri;
 	uint8 *buffer;
@@ -541,6 +584,7 @@ static status_t find_short_name(nspace *vol, vnode *dir, const uchar *name)
 	return result;
 }
 
+
 struct _entry_info_ {
 	uint32 mode;
 	uint32 cluster;
@@ -548,8 +592,11 @@ struct _entry_info_ {
 	time_t time;
 };
 
-static status_t _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ *info,
-	const char nshort[11], const char *nlong, uint32 len, uint32 *ns, uint32 *ne)
+
+static status_t
+_create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ *info,
+	const char nshort[11], const char *nlong, uint32 len, uint32 *ns,
+	uint32 *ne)
 {
 	status_t error = B_ERROR; /* quiet warning */
 	uint32 required_entries, i;
@@ -576,13 +623,13 @@ static status_t _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ 
 	};
 
 	// check short name against device names
-	for (i=0;device_names[i];i++) {
+	for (i = 0; device_names[i]; i++) {
 		// only first 8 characters seem to matter
 		if (!memcmp(nshort, device_names[i], 8))
 			return EPERM;
 	}
 
-	if ((info->cluster != 0) && !IS_DATA_CLUSTER(info->cluster)) {
+	if (info->cluster != 0 && !IS_DATA_CLUSTER(info->cluster)) {
 		dprintf("_create_dir_entry_ for bad cluster (%lx)\n", info->cluster);
 		return EINVAL;
 	}
@@ -593,7 +640,11 @@ static status_t _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ 
 	// find a place to put the entries
 	*ns = 0;
 	last_entry = true;
-	diri_init(vol, dir->cluster, 0, &diri);
+	if (diri_init(vol, dir->cluster, 0, &diri) == NULL) {
+		dprintf("_create_dir_entry_: cannot open dir at cluster (%lx)\n", dir->cluster);
+		return EIO;
+	}
+
 	while (diri.current_block) {
 		char filename[512];
 		struct _dirent_info_ info;
@@ -608,7 +659,8 @@ static status_t _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ 
 			// hit end of directory marker
 			break;
 		} else {
-			dprintf("_create_dir_entry_: unknown error from _next_dirent_ (%s)\n", strerror(error));
+			dprintf("_create_dir_entry_: unknown error from _next_dirent_ (%s)\n",
+				strerror(error));
 			break;
 		}
 	}
@@ -617,11 +669,12 @@ static status_t _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ 
 
 	diri_free(&diri);
 	
-	if ((error != B_OK) && (error != ENOENT)) return error;
+	if (error != B_OK && error != ENOENT)
+		return error;
 
 	*ne = *ns + required_entries - 1;
 
-	for (i=*ns;i<=*ne;i++) {
+	for (i = *ns; i <= *ne; i++) {
 		ASSERT(find_loc_in_vcache(vol, \
 					GENERATE_DIR_INDEX_VNID(dir->cluster, i)) == ENOENT);
 	}
@@ -643,7 +696,8 @@ static status_t _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ 
 			vol->bytes_per_sector*vol->sectors_per_cluster - 1) /
 			vol->bytes_per_sector / vol->sectors_per_cluster;
 
-		DPRINTF(0, ("expanding directory from %Lx to %lx clusters\n", dir->st_size/vol->bytes_per_sector/vol->sectors_per_cluster, clusters_needed));
+		DPRINTF(0, ("expanding directory from %Lx to %lx clusters\n",
+			dir->st_size/vol->bytes_per_sector/vol->sectors_per_cluster, clusters_needed));
 		if ((error = set_fat_chain_length(vol, dir, clusters_needed)) < 0)
 			return error;
 		dir->st_size = vol->bytes_per_sector*vol->sectors_per_cluster*clusters_needed;
@@ -652,11 +706,17 @@ static status_t _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ 
 
 	// starting blitting entries
 	buffer = diri_init(vol,dir->cluster, *ns, &diri);
+	if (buffer == NULL) {
+		dprintf("_create_dir_entry_: cannot open dir at (%lx, %lu)\n",
+			dir->cluster, *ns);
+		return EIO;
+	}
 	hash = hash_msdos_name(nshort);
 
 	// write lfn entries
-	for (i=1;(i<required_entries)&&buffer;i++) {
-		const char *p = nlong + (required_entries - i - 1)*26; // go to unicode offset
+	for (i = 1; i < required_entries && buffer; i++) {
+		const char *p = nlong + (required_entries - i - 1) * 26;
+			// go to unicode offset
 		memset(buffer, 0, 0x20);
 		buffer[0] = required_entries - i + ((i == 1) ? 0x40 : 0);
 		buffer[0x0b] = 0x0f;
@@ -714,8 +774,10 @@ static status_t _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ 
 	return 0;
 }
 
-// doesn't do any name checking
-status_t create_volume_label(nspace *vol, const char name[11], uint32 *index)
+
+//! doesn't do any name checking
+status_t
+create_volume_label(nspace *vol, const char name[11], uint32 *index)
 {
 	status_t err;
 	uint32 dummy;
@@ -731,32 +793,43 @@ status_t create_volume_label(nspace *vol, const char name[11], uint32 *index)
 	if (err != ENOENT)
 		return err;
 
-	return _create_dir_entry_(vol, &(vol->root_vnode), &info, name, NULL, 0, index, &dummy);
+	return _create_dir_entry_(vol, &(vol->root_vnode), &info, name, NULL,
+		0, index, &dummy);
 }
 
-bool is_filename_legal(const char *name)
+
+bool
+is_filename_legal(const char *name)
 {
 	unsigned int i;
 	unsigned int len = strlen(name);
 	
-	if (len <= 0) return false;
+	if (len <= 0)
+		return false;
 	
 	// names ending with a dot are not allowed
-	if (name[len - 1] == '.') return false;
+	if (name[len - 1] == '.')
+		return false;
 	// names ending with a space are not allowed
-	if (name[len - 1] == ' ') return false;
+	if (name[len - 1] == ' ')
+		return false;
 
 	// XXX illegal character search can be made faster
-	for(i=0; i<len; i++) {
-		if(name[i] & 0x80) continue; //belongs to an utf8 char
-		if(strchr(illegal, name[i])) return false;
-		if((unsigned char)name[i] < 32) return false;
+	for (i = 0; i < len; i++) {
+		if (name[i] & 0x80)
+			continue; //belongs to an utf8 char
+		if (strchr(illegal, name[i]))
+			return false;
+		if ((unsigned char)name[i] < 32)
+			return false;
 	}
 	return true;
 }
 
-status_t create_dir_entry(nspace *vol, vnode *dir, vnode *node, 
-	const char *name, uint32 *ns, uint32 *ne)
+
+status_t
+create_dir_entry(nspace *vol, vnode *dir, vnode *node, const char *name,
+	uint32 *ns, uint32 *ne)
 {
 	status_t error;
 	int32 len;
@@ -765,11 +838,11 @@ status_t create_dir_entry(nspace *vol, vnode *dir, vnode *node,
 	struct _entry_info_ info;
 
 	// check name legality before doing anything
-	if(!is_filename_legal(name))
+	if (!is_filename_legal(name))
 		return EINVAL;
 
 	// check if name already exists
-	error = findfile_nocase(vol,dir,name,NULL,NULL);
+	error = findfile_nocase(vol, dir, name, NULL, NULL);
 	if (error == B_OK) {
 		DPRINTF(0, ("%s already found in directory %Lx\n", name, dir->vnid));
 		return EEXIST;
@@ -815,10 +888,11 @@ status_t create_dir_entry(nspace *vol, vnode *dir, vnode *node,
 				memcpy(nshort, tshort, 11);
 				DPRINTF(0, ("trying short name %11.11s\n", nshort));
 				munge_short_name1(nshort, iter, encoding);
-			} while (((error = find_short_name(vol, dir, nshort)) == B_OK) && (++iter < 10));
+			} while ((error = find_short_name(vol, dir, nshort)) == B_OK && ++iter < 10);
 		}
 
-		if ((error != B_OK) && (error != ENOENT)) return error;
+		if (error != B_OK && error != ENOENT)
+			return error;
 
 		if (error == B_OK) {
 			// XXX: possible infinite loop here
@@ -828,7 +902,8 @@ status_t create_dir_entry(nspace *vol, vnode *dir, vnode *node,
 				munge_short_name2(nshort, encoding);
 			} while ((error = find_short_name(vol, dir, nshort)) == B_OK);
 
-			if (error != ENOENT) return error;
+			if (error != ENOENT)
+				return error;
 		}
 	} else {
 		len = 0; /* entry doesn't need a long name */
@@ -841,22 +916,25 @@ status_t create_dir_entry(nspace *vol, vnode *dir, vnode *node,
 	info.size = node->st_size;
 	info.time = node->st_time;
 
-	return _create_dir_entry_(vol, dir, &info, (char *)nshort, (char *)nlong, len, ns, ne);
+	return _create_dir_entry_(vol, dir, &info, (char *)nshort,
+		(char *)nlong, len, ns, ne);
 }
 
 
 status_t 
 dosfs_read_vnode(void *_vol, vnode_id vnid, void **_node, bool reenter)
 {
-	nspace	*vol = (nspace*)_vol;
-	int		result = B_NO_ERROR;
+	nspace *vol = (nspace*)_vol;
+	int result = B_NO_ERROR;
 	vnode_id loc, dir_vnid;
 	vnode *entry;
 	struct _dirent_info_ info;
 	struct diri iter;
 	char filename[512]; /* need this for setting mime type */
 
-	if (!reenter) { LOCK_VOL(vol); }
+	if (!reenter) {
+		LOCK_VOL(vol);
+	}
 
 	*_node = NULL;
 
@@ -867,8 +945,7 @@ dosfs_read_vnode(void *_vol, vnode_id vnid, void **_node, bool reenter)
 
 	DPRINTF(0, ("dosfs_read_vnode (vnode id %Lx)\n", vnid));
 
-	if (vnid == vol->root_vnode.vnid)
-	{
+	if (vnid == vol->root_vnode.vnid) {
 		dprintf("??? dosfs_read_vnode called on root node ???\n");
 		*_node = (void *)&(vol->root_vnode);
 		goto bi;
@@ -884,7 +961,8 @@ dosfs_read_vnode(void *_vol, vnode_id vnid, void **_node, bool reenter)
 	}
 
 	if ((dir_vnid = dlist_find(vol, DIR_OF_VNID(loc))) == -1LL) {
-		DPRINTF(0, ("dosfs_read_vnode: unknown directory at cluster %lx\n", DIR_OF_VNID(loc)));
+		DPRINTF(0, ("dosfs_read_vnode: unknown directory at cluster %lx\n",
+			DIR_OF_VNID(loc)));
 		result = ENOENT;
 		goto bi;
 	}
@@ -892,7 +970,8 @@ dosfs_read_vnode(void *_vol, vnode_id vnid, void **_node, bool reenter)
 	if (diri_init(vol, DIR_OF_VNID(loc),
 			IS_DIR_CLUSTER_VNID(loc) ? 0 : INDEX_OF_DIR_INDEX_VNID(loc),
 			&iter) == NULL) {
-		dprintf("dosfs_read_vnode: error initializing directory for vnid %Lx (loc %Lx)\n", vnid, loc);
+		dprintf("dosfs_read_vnode: error initializing directory for vnid %Lx (loc %Lx)\n",
+			vnid, loc);
 		result = ENOENT;
 		goto bi;
 	}
@@ -900,7 +979,8 @@ dosfs_read_vnode(void *_vol, vnode_id vnid, void **_node, bool reenter)
 	while (1) {
 		result = _next_dirent_(&iter, &info, filename, 512);
 		if (result < 0) {
-			dprintf("dosfs_read_vnode: error finding vnid %Lx (loc %Lx) (%s)\n", vnid, loc, strerror(result));
+			dprintf("dosfs_read_vnode: error finding vnid %Lx (loc %Lx) (%s)\n",
+				vnid, loc, strerror(result));
 			goto bi2;
 		}
 
@@ -910,7 +990,8 @@ dosfs_read_vnode(void *_vol, vnode_id vnid, void **_node, bool reenter)
 		} else {
 			if (info.sindex == INDEX_OF_DIR_INDEX_VNID(loc))
 				break;
-			dprintf("dosfs_read_vnode: error finding vnid %Lx (loc %Lx) (%s)\n", vnid, loc, strerror(result));
+			dprintf("dosfs_read_vnode: error finding vnid %Lx (loc %Lx) (%s)\n",
+				vnid, loc, strerror(result));
 			result = ENOENT;
 			goto bi2;
 		}
@@ -943,7 +1024,8 @@ dosfs_read_vnode(void *_vol, vnode_id vnid, void **_node, bool reenter)
 	entry->st_size = info.size;
 	entry->dirty = false;
 	if (info.mode & FAT_SUBDIR) {
-		entry->st_size = count_clusters(vol,entry->cluster) * vol->sectors_per_cluster * vol->bytes_per_sector;
+		entry->st_size = count_clusters(vol,entry->cluster)
+			* vol->sectors_per_cluster * vol->bytes_per_sector;
 	}
 	if (entry->cluster)
 		entry->end_cluster = get_nth_fat_entry(vol, info.cluster, 
@@ -1003,6 +1085,7 @@ dosfs_walk(void *_vol, void *_dir, const char *file, vnode_id *_vnid, int *_type
 	return result;
 }
 
+
 status_t 
 dosfs_access(void *_vol, void *_node, int mode)
 {
@@ -1012,15 +1095,15 @@ dosfs_access(void *_vol, void *_node, int mode)
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_access") ||
-		check_vnode_magic(node, "dosfs_access")) {
+	if (check_nspace_magic(vol, "dosfs_access")
+		|| check_vnode_magic(node, "dosfs_access")) {
 		UNLOCK_VOL(vol);
 		return EINVAL;
 	}
 
 	DPRINTF(0, ("dosfs_access (vnode id %Lx, mode %x)\n", node->vnid, mode));
 
-	if ((mode & O_RWMASK) != O_RDONLY) {
+	if (mode & W_OK) {
 		if (vol->flags & B_FS_IS_READONLY) {
 			dprintf("dosfs_access: can't write on read-only volume\n");
 			result = EROFS;
@@ -1054,10 +1137,10 @@ dosfs_readlink(void *_vol, void *_node, char *buf, size_t *bufsize)
 status_t 
 dosfs_opendir(void *_vol, void *_node, void **_cookie)
 {
-	nspace		*vol = (nspace*)_vol;
-	vnode		*node = (vnode*)_node;
-	dircookie	*cookie = NULL;
-	int			result;
+	nspace *vol = (nspace*)_vol;
+	vnode *node = (vnode*)_node;
+	dircookie *cookie = NULL;
+	int result;
 
 	if (_cookie == NULL) {
 		dprintf("dosfs_opendir called with null _cookie\n");
@@ -1066,8 +1149,8 @@ dosfs_opendir(void *_vol, void *_node, void **_cookie)
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_opendir") ||
-		check_vnode_magic(node, "dosfs_opendir")) {
+	if (check_nspace_magic(vol, "dosfs_opendir")
+		|| check_vnode_magic(node, "dosfs_opendir")) {
 		UNLOCK_VOL(vol);
 		return EINVAL;
 	}
@@ -1100,7 +1183,8 @@ dosfs_opendir(void *_vol, void *_node, void **_cookie)
 bi:
 	*_cookie = (void*)cookie;
 
-	if (result != B_OK) DPRINTF(0, ("dosfs_opendir (%s)\n", strerror(result)));
+	if (result != B_OK)
+		DPRINTF(0, ("dosfs_opendir (%s)\n", strerror(result)));
 
 	UNLOCK_VOL(vol);
 
@@ -1127,7 +1211,8 @@ dosfs_readdir(void *_vol, void *_dir, void *_cookie,
 		return EINVAL;
 	}
 
-	DPRINTF(0, ("dosfs_readdir: vnode id %Lx, index %lx\n", dir->vnid, cookie->current_index));
+	DPRINTF(0, ("dosfs_readdir: vnode id %Lx, index %lx\n",
+		dir->vnid, cookie->current_index));
 
 	// simulate '.' and '..' entries for root directory
 	if (dir->vnid == vol->root_vnode.vnid) {
@@ -1149,8 +1234,16 @@ dosfs_readdir(void *_vol, void *_dir, void *_cookie,
 		}
 	}
 
-	diri_init(vol, dir->cluster, cookie->current_index, &diri);
-	result = get_next_dirent(vol, dir, &diri, &(entry->d_ino), entry->d_name, bufsize - sizeof(struct dirent) - 1);
+	if (diri_init(vol, dir->cluster, cookie->current_index, &diri) == NULL) {
+		DPRINTF(0, ("dosfs_readdir: no more entries!\n"));
+		// When you get to the end, don't return an error, just return 0
+		// in *num.
+		*num = 0;
+		result = B_NO_ERROR;
+		goto bi;
+	}
+	result = get_next_dirent(vol, dir, &diri, &(entry->d_ino), entry->d_name,
+		bufsize - sizeof(struct dirent) - 1);
 	cookie->current_index = diri.current_index;
 	diri_free(&diri);
 
@@ -1168,7 +1261,8 @@ dosfs_readdir(void *_vol, void *_dir, void *_cookie,
 		*num = 0;
 		result = B_NO_ERROR;
 	} else {
-		dprintf("dosfs_readdir: error returned by get_next_dirent (%s)\n", strerror(result));
+		dprintf("dosfs_readdir: error returned by get_next_dirent (%s)\n",
+			strerror(result));
 	}
 bi:
 	if (result != B_OK) DPRINTF(0, ("dosfs_readdir (%s)\n", strerror(result)));
@@ -1188,9 +1282,9 @@ dosfs_rewinddir(void *_vol, void *_node, void* _cookie)
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_rewinddir") ||
-		check_vnode_magic(node, "dosfs_rewinddir") ||
-		check_dircookie_magic(cookie, "dosfs_rewinddir")) {
+	if (check_nspace_magic(vol, "dosfs_rewinddir")
+		|| check_vnode_magic(node, "dosfs_rewinddir")
+		|| check_dircookie_magic(cookie, "dosfs_rewinddir")) {
 		UNLOCK_VOL(vol);
 		return EINVAL;
 	}
@@ -1224,9 +1318,9 @@ dosfs_free_dircookie(void *_vol, void *node, void *_cookie)
 
 	LOCK_VOL(vol);
 
-	if (check_nspace_magic(vol, "dosfs_free_dircookie") ||
-		check_vnode_magic((vnode *)node, "dosfs_free_dircookie") ||
-		check_dircookie_magic((dircookie *)cookie, "dosfs_free_dircookie")) {
+	if (check_nspace_magic(vol, "dosfs_free_dircookie")
+		|| check_vnode_magic((vnode *)node, "dosfs_free_dircookie")
+		|| check_dircookie_magic((dircookie *)cookie, "dosfs_free_dircookie")) {
 		UNLOCK_VOL(vol);
 		return EINVAL;
 	}
