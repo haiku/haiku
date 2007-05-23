@@ -84,7 +84,7 @@ _CreateDecoder(Decoder **_decoder, const media_format &format)
 	server_get_decoder_for_format_reply reply;
 	request.format = format;
 	if (B_OK != QueryServer(SERVER_GET_DECODER_FOR_FORMAT, &request, sizeof(request), &reply, sizeof(reply))) {
-		printf("_CreateReader: can't get decoder for format\n");
+		printf("_CreateDecoder: can't get decoder for format\n");
 		return B_ERROR;
 	}
 
