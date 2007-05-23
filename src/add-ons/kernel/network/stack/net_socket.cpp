@@ -176,8 +176,8 @@ socket_writev(net_socket *socket, const iovec *vecs, size_t vecCount, size_t *_l
 		}
 	}
 
-	memcpy(&buffer->source, &socket->address, socket->address.ss_len);
-	memcpy(&buffer->destination, &socket->peer, socket->peer.ss_len);
+	memcpy(buffer->source, &socket->address, socket->address.ss_len);
+	memcpy(buffer->destination, &socket->peer, socket->peer.ss_len);
 	size_t size = buffer->size;
 
 	ssize_t bytesWritten = socket->first_info->send_data(socket->first_protocol,
@@ -840,8 +840,8 @@ socket_receive(net_socket *socket, msghdr *header, void *data, size_t length,
 		}
 
 		if (header->msg_name != NULL) {
-			header->msg_namelen = min_c(nameLen, buffer->source.ss_len);
-			memcpy(header->msg_name, &buffer->source, header->msg_namelen);
+			header->msg_namelen = min_c(nameLen, buffer->source->sa_len);
+			memcpy(header->msg_name, buffer->source, header->msg_namelen);
 		}
 	}
 
@@ -929,8 +929,8 @@ socket_send(net_socket *socket, msghdr *header, const void *data,
 	}
 
 	buffer->flags = flags;
-	memcpy(&buffer->source, &socket->address, socket->address.ss_len);
-	memcpy(&buffer->destination, address, addressLength);
+	memcpy(buffer->source, &socket->address, socket->address.ss_len);
+	memcpy(buffer->destination, address, addressLength);
 
 	status_t status = socket->first_info->send_data(socket->first_protocol,
 		buffer);

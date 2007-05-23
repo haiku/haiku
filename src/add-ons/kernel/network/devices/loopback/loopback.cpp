@@ -13,6 +13,7 @@
 
 #include <KernelExport.h>
 
+#include <algorithm>
 #include <net/if.h>
 #include <net/if_types.h>
 #include <net/if_media.h>
@@ -157,9 +158,8 @@ loopback_receive_data(net_device *_device, net_buffer **_buffer)
 	if (status < B_OK)
 		return status;
 
-	// switch network addresses before delivering
-	swap_memory(&buffer->source, &buffer->destination,
-		max_c(buffer->source.ss_len, buffer->destination.ss_len));
+	// swap network addresses before delivering
+	std::swap(buffer->source, buffer->destination);
 
 	*_buffer = buffer;
 	return B_OK;

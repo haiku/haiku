@@ -62,6 +62,11 @@ struct data_header {
 struct net_buffer_private : net_buffer {
 	struct list	buffers;
 	data_node	first_node;
+
+	struct {
+		struct sockaddr_storage source;
+		struct sockaddr_storage destination;
+	} storage;
 };
 
 
@@ -328,8 +333,12 @@ create_buffer(size_t headerSpace)
 	list_init(&buffer->buffers);
 	list_add_item(&buffer->buffers, &buffer->first_node);
 
-	buffer->source.ss_len = 0;
-	buffer->destination.ss_len = 0;
+	buffer->source = (sockaddr *)&buffer->storage.source;
+	buffer->destination = (sockaddr *)&buffer->storage.destination;
+
+	buffer->storage.source.ss_len = 0;
+	buffer->storage.destination.ss_len = 0;
+
 	buffer->interface = NULL;
 	buffer->offset = 0;
 	buffer->flags = 0;
@@ -352,6 +361,22 @@ free_buffer(net_buffer *_buffer)
 	}
 
 	free_net_buffer(buffer);
+}
+
+
+static void
+copy_metadata(net_buffer *destination, const net_buffer *source)
+{
+	memcpy(destination->source, source->source,
+		min_c(source->source->sa_len, sizeof(sockaddr_storage)));
+	memcpy(destination->destination, source->destination,
+		min_c(source->destination->sa_len, sizeof(sockaddr_storage)));
+
+	destination->flags = source->flags;
+	destination->interface = source->interface;
+	destination->offset = source->offset;
+	destination->size = source->size;
+	destination->protocol = source->protocol;
 }
 
 
@@ -381,18 +406,7 @@ duplicate_buffer(net_buffer *_buffer)
 			break;
 	}
 
-	// copy meta data from source buffer
-
-	memcpy(&duplicate->source, &buffer->source,
-		min_c(buffer->source.ss_len, sizeof(sockaddr_storage)));
-	memcpy(&duplicate->destination, &buffer->destination,
-		min_c(buffer->destination.ss_len, sizeof(sockaddr_storage)));
-
-	duplicate->flags = buffer->flags;
-	duplicate->interface = buffer->interface;
-	duplicate->offset = buffer->offset;
-	duplicate->size = buffer->size;
-	duplicate->protocol = buffer->protocol;
+	copy_metadata(duplicate, buffer);
 
 	return duplicate;
 }
@@ -422,6 +436,9 @@ clone_buffer(net_buffer *_buffer, bool shareFreeSpace)
 		free_net_buffer(clone);
 		return NULL;
 	}
+
+	clone->source = (sockaddr *)&clone->storage.source;
+	clone->destination = (sockaddr *)&clone->storage.destination;
 
 	list_init(&clone->buffers);
 
@@ -465,18 +482,7 @@ clone_buffer(net_buffer *_buffer, bool shareFreeSpace)
 		}
 	}
 
-	// copy meta data from source buffer
-
-	memcpy(&clone->source, &buffer->source,
-		min_c(buffer->source.ss_len, sizeof(sockaddr_storage)));
-	memcpy(&clone->destination, &buffer->destination,
-		min_c(buffer->destination.ss_len, sizeof(sockaddr_storage)));
-
-	clone->flags = buffer->flags;
-	clone->interface = buffer->interface;
-	clone->offset = buffer->offset;
-	clone->size = buffer->size;
-	clone->protocol = buffer->protocol;
+	copy_metadata(clone, buffer);
 
 	return clone;
 }

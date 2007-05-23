@@ -15,6 +15,7 @@
 #include <KernelExport.h>
 #include <util/list.h>
 
+#include <algorithm>
 #include <netinet/in.h>
 #include <new>
 #include <stdlib.h>
@@ -254,7 +255,7 @@ icmp_receive_data(net_buffer *buffer)
 			if (buffer->interface != NULL)
 				domain = buffer->interface->domain;
 			else
-				domain = sStackModule->get_domain(buffer->source.ss_family);
+				domain = sStackModule->get_domain(buffer->source->sa_family);
 			if (domain == NULL || domain->module == NULL)
 				break;
 
@@ -262,9 +263,7 @@ icmp_receive_data(net_buffer *buffer)
 			if (reply == NULL)
 				return B_NO_MEMORY;
 
-			// switch source/destination address
-			memcpy(&reply->source, &buffer->destination, buffer->destination.ss_len);
-			memcpy(&reply->destination, &buffer->source, buffer->source.ss_len);
+			std::swap(reply->source, reply->destination);
 
 			// There already is an ICMP header, and we'll reuse it
 			NetBufferHeaderReader<icmp_header> header(reply);

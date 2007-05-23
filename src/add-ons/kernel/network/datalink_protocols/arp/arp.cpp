@@ -241,7 +241,7 @@ arp_entry::MarkValid()
 
 		TRACE(("  ARP Dequeing packet %p...\n", buffer));
 
-		memcpy(&buffer->destination, &hardware_address,
+		memcpy(buffer->destination, &hardware_address,
 			hardware_address.sdl_len);
 		protocol->next->module->send_data(protocol->next, buffer);
 	}
@@ -375,7 +375,7 @@ handle_arp_request(net_buffer *buffer, arp_header &header)
 	BenaphoreLocker locker(sCacheLock);
 
 	if (!sIgnoreReplies) {
-		arp_update_entry(header.protocol_sender, (sockaddr_dl *)&buffer->source, 0);
+		arp_update_entry(header.protocol_sender, (sockaddr_dl *)buffer->source, 0);
 			// remember the address of the sender as we might need it later
 	}
 
@@ -401,9 +401,9 @@ handle_arp_request(net_buffer *buffer, arp_header &header)
 	header.protocol_sender = entry->protocol_address;
 
 	// exchange source and destination address
-	memcpy(LLADDR((sockaddr_dl *)&buffer->source), header.hardware_sender,
+	memcpy(LLADDR((sockaddr_dl *)buffer->source), header.hardware_sender,
 		ETHER_ADDRESS_LENGTH);
-	memcpy(LLADDR((sockaddr_dl *)&buffer->destination), header.hardware_target,
+	memcpy(LLADDR((sockaddr_dl *)buffer->destination), header.hardware_target,
 		ETHER_ADDRESS_LENGTH);
 
 	buffer->flags = 0;
@@ -420,7 +420,7 @@ handle_arp_reply(net_buffer *buffer, arp_header &header)
 		return;
 
 	BenaphoreLocker locker(sCacheLock);
-	arp_update_entry(header.protocol_sender, (sockaddr_dl *)&buffer->source, 0);
+	arp_update_entry(header.protocol_sender, (sockaddr_dl *)buffer->source, 0);
 }
 
 
@@ -602,7 +602,7 @@ arp_start_resolve(net_datalink_protocol *protocol, in_addr_t address, arp_entry 
 
 	// prepare source and target addresses
 
-	struct sockaddr_dl &source = *(struct sockaddr_dl *)&entry->request_buffer->source;
+	struct sockaddr_dl &source = *(struct sockaddr_dl *)entry->request_buffer->source;
 	source.sdl_len = sizeof(sockaddr_dl);
 	source.sdl_family = AF_DLI;
 	source.sdl_index = device->index;
@@ -807,26 +807,26 @@ arp_send_data(net_datalink_protocol *protocol,
 		// TODO: this could be cached - the lookup isn't really needed at all
 
 		arp_entry *entry = arp_entry::Lookup(
-			((struct sockaddr_in *)&buffer->source)->sin_addr.s_addr);
+			((struct sockaddr_in *)buffer->source)->sin_addr.s_addr);
 		if (entry == NULL)
 			return B_ERROR;
 
-		memcpy(&buffer->source, &entry->hardware_address,
+		memcpy(buffer->source, &entry->hardware_address,
 			entry->hardware_address.sdl_len);
 
 		if (buffer->flags & MSG_MCAST) {
 			sockaddr_dl multicastDestination;
 			ipv4_to_ether_multicast(&multicastDestination,
-				(sockaddr_in *)&buffer->destination);
-			memcpy(&buffer->destination, &multicastDestination,
+				(sockaddr_in *)buffer->destination);
+			memcpy(buffer->destination, &multicastDestination,
 				sizeof(multicastDestination));
 		} else if ((buffer->flags & MSG_BCAST) == 0) {
 			// Lookup destination (we may need to wait for this)
 			entry = arp_entry::Lookup(
-				((struct sockaddr_in *)&buffer->destination)->sin_addr.s_addr);
+				((struct sockaddr_in *)buffer->destination)->sin_addr.s_addr);
 			if (entry == NULL) {
 				status_t status = arp_start_resolve(protocol,
-					((struct sockaddr_in *)&buffer->destination)->sin_addr.s_addr, &entry);
+					((struct sockaddr_in *)buffer->destination)->sin_addr.s_addr, &entry);
 				if (status < B_OK)
 					return status;
 			}
@@ -841,7 +841,7 @@ arp_send_data(net_datalink_protocol *protocol,
 				return B_OK;
 			}
 
-			memcpy(&buffer->destination, &entry->hardware_address,
+			memcpy(buffer->destination, &entry->hardware_address,
 				entry->hardware_address.sdl_len);
 		}
 	}

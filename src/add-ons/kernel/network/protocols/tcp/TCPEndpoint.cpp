@@ -48,7 +48,7 @@
 // Forward RTO-Recovery, RFC 4138
 
 #define PrintAddress(address) \
-	AddressString(Domain(), (const sockaddr *)(address), true).Data()
+	AddressString(Domain(), address, true).Data()
 
 //#define TRACE_TCP
 //#define PROBE_TCP
@@ -64,8 +64,8 @@
 #ifdef PROBE_TCP
 #	define PROBE(buffer, window) \
 	dprintf("TCP PROBE %llu %s %s %ld %lu %lu %lu %lu %lu %lu %lu %lu %lu %llu\n", \
-		system_time(), PrintAddress(&buffer->source), \
-		PrintAddress(&buffer->destination), buffer->size, (uint32)fSendNext, \
+		system_time(), PrintAddress(buffer->source), \
+		PrintAddress(buffer->destination), buffer->size, (uint32)fSendNext, \
 		(uint32)fSendUnacknowledged, fCongestionWindow, fSlowStartThreshold, \
 		window, fSendWindow, (uint32)(fSendMax - fSendUnacknowledged), \
 		fSendQueue.Available(fSendNext), fSendQueue.Used(), fRetransmitTimeout)
@@ -852,8 +852,8 @@ TCPEndpoint::Spawn(TCPEndpoint *parent, tcp_segment_header &segment,
 	fState = SYNCHRONIZE_RECEIVED;
 	fManager = parent->fManager;
 
-	LocalAddress().SetTo(&buffer->destination);
-	PeerAddress().SetTo(&buffer->source);
+	LocalAddress().SetTo(buffer->destination);
+	PeerAddress().SetTo(buffer->source);
 
 	TRACE("Spawn()");
 
@@ -958,8 +958,8 @@ TCPEndpoint::SegmentReceived(tcp_segment_header &segment, net_buffer *buffer)
 	RecursiveLocker locker(fLock);
 
 	TRACE("SegmentReceived(): buffer %p (%lu bytes) address %s to %s",
-		buffer, buffer->size, PrintAddress(&buffer->source),
-		PrintAddress(&buffer->destination));
+		buffer, buffer->size, PrintAddress(buffer->source),
+		PrintAddress(buffer->destination));
 	TRACE("                   flags 0x%x, seq %lu, ack %lu, wnd %lu",
 		segment.flags, segment.sequence, segment.acknowledge,
 		(uint32)segment.advertised_window << fSendWindowShift);
@@ -1241,15 +1241,15 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 			return status;
 		}
 
-		LocalAddress().CopyTo(&buffer->source);
-		PeerAddress().CopyTo(&buffer->destination);
+		LocalAddress().CopyTo(buffer->source);
+		PeerAddress().CopyTo(buffer->destination);
 
 		uint32 size = buffer->size;
 		segment.sequence = fSendNext;
 
 		TRACE("SendQueued(): buffer %p (%lu bytes) address %s to %s",
-			buffer, buffer->size, PrintAddress(&buffer->source),
-			PrintAddress(&buffer->destination));
+			buffer, buffer->size, PrintAddress(buffer->source),
+			PrintAddress(buffer->destination));
 		TRACE("              flags 0x%x, seq %lu, ack %lu, rwnd %hu, cwnd %lu"
 			", ssthresh %lu", segment.flags, segment.sequence,
 			segment.acknowledge, segment.advertised_window,

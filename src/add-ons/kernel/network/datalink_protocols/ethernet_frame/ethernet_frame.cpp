@@ -45,8 +45,8 @@ ethernet_deframe(net_device *device, net_buffer *buffer)
 	ether_header &header = bufferHeader.Data();
 	uint16 type = ntohs(header.type);
 
-	struct sockaddr_dl &source = *(struct sockaddr_dl *)&buffer->source;
-	struct sockaddr_dl &destination = *(struct sockaddr_dl *)&buffer->destination;
+	struct sockaddr_dl &source = *(struct sockaddr_dl *)buffer->source;
+	struct sockaddr_dl &destination = *(struct sockaddr_dl *)buffer->destination;
 
 	source.sdl_len = sizeof(sockaddr_dl);
 	source.sdl_family = AF_DLI;
@@ -119,8 +119,8 @@ status_t
 ethernet_frame_send_data(net_datalink_protocol *protocol,
 	net_buffer *buffer)
 {
-	struct sockaddr_dl &source = *(struct sockaddr_dl *)&buffer->source;
-	struct sockaddr_dl &destination = *(struct sockaddr_dl *)&buffer->destination;
+	struct sockaddr_dl &source = *(struct sockaddr_dl *)buffer->source;
+	struct sockaddr_dl &destination = *(struct sockaddr_dl *)buffer->destination;
 
 	if (source.sdl_family != AF_DLI || source.sdl_type != IFT_ETHER)
 		return B_ERROR;

@@ -454,8 +454,8 @@ UdpDomainSupport::_FindActiveEndpoint(const sockaddr *ourAddress,
 status_t
 UdpDomainSupport::_DemuxBroadcast(net_buffer *buffer)
 {
-	sockaddr *peerAddr = (sockaddr *)&buffer->source;
-	sockaddr *broadcastAddr = (sockaddr *)&buffer->destination;
+	sockaddr *peerAddr = buffer->source;
+	sockaddr *broadcastAddr = buffer->destination;
 	sockaddr *mask = NULL;
 	if (buffer->interface)
 		mask = (sockaddr *)buffer->interface->mask;
@@ -501,8 +501,8 @@ UdpDomainSupport::_DemuxBroadcast(net_buffer *buffer)
 status_t
 UdpDomainSupport::_DemuxUnicast(net_buffer *buffer)
 {
-	struct sockaddr *peerAddr = (struct sockaddr *)&buffer->source;
-	struct sockaddr *localAddr = (struct sockaddr *)&buffer->destination;
+	struct sockaddr *peerAddr = buffer->source;
+	struct sockaddr *localAddr = buffer->destination;
 
 	TRACE_DOMAIN("_DemuxUnicast(%p)", buffer);
 
@@ -678,8 +678,8 @@ UdpEndpointManager::Deframe(net_buffer *buffer)
 	net_domain *domain = buffer->interface->domain;
 	net_address_module_info *addressModule = domain->address_module;
 
-	SocketAddress source(addressModule, &buffer->source);
-	SocketAddress destination(addressModule, &buffer->destination);
+	SocketAddress source(addressModule, buffer->source);
+	SocketAddress destination(addressModule, buffer->destination);
 
 	source.SetPort(header.source_port);
 	destination.SetPort(header.destination_port);
@@ -863,9 +863,8 @@ UdpEndpoint::SendRoutedData(net_buffer *buffer, net_route *route)
 	if (header.Status() < B_OK)
 		return header.Status();
 
-	header->source_port = AddressModule()->get_port((sockaddr *)&buffer->source);
-	header->destination_port = AddressModule()->get_port(
-		(sockaddr *)&buffer->destination);
+	header->source_port = AddressModule()->get_port(buffer->source);
+	header->destination_port = AddressModule()->get_port(buffer->destination);
 	header->udp_length = htons(buffer->size);
 		// the udp-header is already included in the buffer-size
 	header->udp_checksum = 0;

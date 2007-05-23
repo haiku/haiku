@@ -355,7 +355,7 @@ datalink_send_data(struct net_route *route, net_buffer *buffer)
 		// instead of the destination address:
 		if (route->gateway == NULL)
 			return B_MISMATCHED_VALUES;
-		memcpy(&buffer->destination, route->gateway, sizeof(sockaddr));
+		memcpy(buffer->destination, route->gateway, route->gateway->sa_len);
 	}
 
 	// this goes out to the datalink protocols

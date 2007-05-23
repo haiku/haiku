@@ -133,7 +133,7 @@ template<typename Addressing> bool
 MulticastGroupInterface<Addressing>::FilterAccepts(net_buffer *buffer) const
 {
 	bool has = fAddresses.Has(Addressing::AddressFromSockAddr(
-		(sockaddr *)&buffer->source));
+		buffer->source));
 
 	return (has && fFilterMode == kInclude)
 		|| (!has && fFilterMode == kExclude);

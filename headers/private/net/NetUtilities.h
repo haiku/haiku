@@ -88,8 +88,8 @@ Checksum::PseudoHeader(net_address_module_info *addressModule,
 	net_buffer_module_info *bufferModule, net_buffer *buffer, uint16 protocol)
 {
 	Checksum checksum;
-	addressModule->checksum_address(&checksum, (sockaddr *)&buffer->source);
-	addressModule->checksum_address(&checksum, (sockaddr *)&buffer->destination);
+	addressModule->checksum_address(&checksum, buffer->source);
+	addressModule->checksum_address(&checksum, buffer->destination);
 	checksum << (uint16)htons(protocol) << (uint16)htons(buffer->size)
 		<< Checksum::BufferHelper(buffer, bufferModule);
 	return checksum;

@@ -646,7 +646,7 @@ deliver_multicast(net_protocol_module_info *module, net_buffer *buffer,
 
 	BenaphoreLocker _(sMulticastGroupsLock);
 
-	sockaddr_in *multicastAddr = (sockaddr_in *)&buffer->destination;
+	sockaddr_in *multicastAddr = (sockaddr_in *)buffer->destination;
 
 	MulticastState::ValueIterator it = sMulticastState->Lookup(std::make_pair(
 		&multicastAddr->sin_addr, buffer->interface->index));
@@ -769,13 +769,14 @@ receiving_protocol(uint8 protocol)
 }
 
 
-static inline void
+static inline sockaddr *
 fill_sockaddr_in(sockaddr_in *target, in_addr_t address)
 {
 	memset(target, 0, sizeof(sockaddr_in));
 	target->sin_family = AF_INET;
 	target->sin_len = sizeof(sockaddr_in);
 	target->sin_addr.s_addr = address;
+	return (sockaddr *)target;
 }
 
 
@@ -867,13 +868,8 @@ static net_interface *
 get_multicast_interface(ipv4_protocol *protocol, const in_addr *address)
 {
 	sockaddr_in groupAddr;
-	memset(&groupAddr, 0, sizeof(groupAddr));
-	groupAddr.sin_family = AF_INET;
-	if (address)
-		groupAddr.sin_addr = *address;
-
 	net_route *route = sDatalinkModule->get_route(sDomain,
-		(sockaddr *)&groupAddr);
+		fill_sockaddr_in(&groupAddr, address ? address->s_addr : INADDR_ANY));
 	if (route == NULL)
 		return NULL;
 
@@ -891,10 +887,8 @@ ipv4_delta_membership(ipv4_protocol *protocol, int option,
 		interface = get_multicast_interface(protocol, groupAddr);
 	} else {
 		sockaddr_in address;
-		fill_sockaddr_in(&address, interfaceAddr->s_addr);
-
 		interface = sDatalinkModule->get_interface_with_address(sDomain,
-			(sockaddr *)&address);
+			fill_sockaddr_in(&address, interfaceAddr->s_addr));
 	}
 
 	if (interface == NULL)
@@ -1255,8 +1249,8 @@ ipv4_send_routed_data(net_protocol *_protocol, struct net_route *route,
 	TRACE_SK(protocol, "SendRoutedData(%p, %p [%ld bytes])", route, buffer,
 		buffer->size);
 
-	sockaddr_in &source = *(sockaddr_in *)&buffer->source;
-	sockaddr_in &destination = *(sockaddr_in *)&buffer->destination;
+	sockaddr_in &source = *(sockaddr_in *)buffer->source;
+	sockaddr_in &destination = *(sockaddr_in *)buffer->destination;
 
 	bool headerIncluded = false, checksumNeeded = true;
 	if (protocol != NULL)
@@ -1348,8 +1342,8 @@ ipv4_send_data(net_protocol *_protocol, net_buffer *buffer)
 		if (buffer->size < sizeof(ipv4_header))
 			return EINVAL;
 
-		sockaddr_in *source = (sockaddr_in *)&buffer->source;
-		sockaddr_in *destination = (sockaddr_in *)&buffer->destination;
+		sockaddr_in *source = (sockaddr_in *)buffer->source;
+		sockaddr_in *destination = (sockaddr_in *)buffer->destination;
 
 		fill_sockaddr_in(source, *NetBufferField<in_addr_t,
 			offsetof(ipv4_header, source)>(buffer));
@@ -1445,8 +1439,8 @@ ipv4_receive_data(net_buffer *buffer)
 	if (gBufferModule->checksum(buffer, 0, headerLength, true) != 0)
 		return B_BAD_DATA;
 
-	struct sockaddr_in &source = *(struct sockaddr_in *)&buffer->source;
-	struct sockaddr_in &destination = *(struct sockaddr_in *)&buffer->destination;
+	struct sockaddr_in &source = *(struct sockaddr_in *)buffer->source;
+	struct sockaddr_in &destination = *(struct sockaddr_in *)buffer->destination;
 
 	fill_sockaddr_in(&source, header.source);
 	fill_sockaddr_in(&destination, header.destination);

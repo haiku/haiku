@@ -542,13 +542,12 @@ get_buffer_route(net_domain *_domain, net_buffer *buffer, net_route **_route)
 
 	BenaphoreLocker _(domain->lock);
 
-	net_route *route = get_route_internal(domain,
-		(sockaddr *)&buffer->destination);
+	net_route *route = get_route_internal(domain, buffer->destination);
 	if (route == NULL)
 		return ENETUNREACH;
 
 	status_t status = B_OK;
-	sockaddr *source = (sockaddr *)&buffer->source;
+	sockaddr *source = buffer->source;
 
 	// TODO we are quite relaxed in the address checking here
 	//      as we might proceed with srcaddr=INADDR_ANY.

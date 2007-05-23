@@ -206,8 +206,8 @@ add_tcp_header(net_address_module_info *addressModule,
 
 	tcp_header &header = bufferHeader.Data();
 
-	header.source_port = addressModule->get_port((sockaddr *)&buffer->source);
-	header.destination_port = addressModule->get_port((sockaddr *)&buffer->destination);
+	header.source_port = addressModule->get_port(buffer->source);
+	header.destination_port = addressModule->get_port(buffer->destination);
 	header.sequence = htonl(segment.sequence);
 	header.acknowledge = (segment.flags & TCP_FLAG_ACKNOWLEDGE)
 		? htonl(segment.acknowledge) : 0;
@@ -614,13 +614,12 @@ tcp_receive_data(net_buffer *buffer)
 			IPPROTO_TCP) != 0)
 		return B_BAD_DATA;
 
-	addressModule->set_port((sockaddr *)&buffer->source, header.source_port);
-	addressModule->set_port((sockaddr *)&buffer->destination,
-		header.destination_port);
+	addressModule->set_port(buffer->source, header.source_port);
+	addressModule->set_port(buffer->destination, header.destination_port);
 
 	TRACE(("  Looking for: peer %s, local %s\n",
-		AddressString(domain, (sockaddr *)&buffer->source, true).Data(),
-		AddressString(domain, (sockaddr *)&buffer->destination, true).Data()));
+		AddressString(domain, buffer->source, true).Data(),
+		AddressString(domain, buffer->destination, true).Data()));
 	//dump_tcp_header(header);
 	//gBufferModule->dump(buffer);
 
@@ -643,7 +642,7 @@ tcp_receive_data(net_buffer *buffer)
 	int32 segmentAction = DROP;
 
 	TCPEndpoint *endpoint = endpointManager->FindConnection(
-		(sockaddr *)&buffer->destination, (sockaddr *)&buffer->source);
+		buffer->destination, buffer->source);
 	if (endpoint != NULL)
 		segmentAction = endpoint->SegmentReceived(segment, buffer);
 	else if ((segment.flags & TCP_FLAG_RESET) == 0)

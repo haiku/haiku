@@ -19,8 +19,9 @@ typedef struct net_buffer {
 
 	// TODO: we should think about moving the address fields into the buffer data itself
 	//	via associated data or something like this. Or this structure as a whole, too...
-	struct sockaddr_storage source;
-	struct sockaddr_storage destination;
+
+	struct sockaddr *source;
+	struct sockaddr *destination;
 	struct net_interface *interface;
 	union {
 		struct {

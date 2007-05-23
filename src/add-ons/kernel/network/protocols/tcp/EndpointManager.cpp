@@ -386,10 +386,8 @@ EndpointManager::ReplyWithReset(tcp_segment_header &segment,
 	if (reply == NULL)
 		return B_NO_MEMORY;
 
-	AddressModule()->set_to((sockaddr *)&reply->source,
-		(sockaddr *)&buffer->destination);
-	AddressModule()->set_to((sockaddr *)&reply->destination,
-		(sockaddr *)&buffer->source);
+	AddressModule()->set_to(reply->source, buffer->destination);
+	AddressModule()->set_to(reply->destination, buffer->source);
 
 	tcp_segment_header outSegment(TCP_FLAG_RESET);
 	outSegment.sequence = 0;
