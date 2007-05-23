@@ -82,6 +82,8 @@ struct net_buffer_module_info {
 						struct iovec *iovecs, uint32 vecCount);
 	uint32 			(*count_iovecs)(net_buffer *buffer);
 
+	void			(*swap_addresses)(net_buffer *buffer);
+
 	void			(*dump)(net_buffer *buffer);
 };
 

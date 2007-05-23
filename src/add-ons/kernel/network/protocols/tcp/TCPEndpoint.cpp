@@ -1321,7 +1321,7 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 int
 TCPEndpoint::_GetMSS(const sockaddr *address) const
 {
-	return next->module->get_mtu(next, (sockaddr *)address) - sizeof(tcp_header);
+	return next->module->get_mtu(next, address) - sizeof(tcp_header);
 }
 
 

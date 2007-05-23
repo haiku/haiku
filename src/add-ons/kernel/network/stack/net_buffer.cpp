@@ -17,6 +17,7 @@
 #include <KernelExport.h>
 #include <util/AutoLock.h>
 
+#include <algorithm>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/uio.h>
@@ -1174,6 +1175,13 @@ count_iovecs(net_buffer *_buffer)
 }
 
 
+static void
+swap_addresses(net_buffer *buffer)
+{
+	std::swap(buffer->source, buffer->destination);
+}
+
+
 status_t
 init_net_buffers()
 {
@@ -1256,6 +1264,8 @@ net_buffer_module_info gNetBufferModule = {
 	NULL,	// get_memory_map
 	get_iovecs,
 	count_iovecs,
+
+	swap_addresses,
 
 	dump_buffer,	// dump
 };

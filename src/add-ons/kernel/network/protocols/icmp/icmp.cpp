@@ -15,7 +15,6 @@
 #include <KernelExport.h>
 #include <util/list.h>
 
-#include <algorithm>
 #include <netinet/in.h>
 #include <new>
 #include <stdlib.h>
@@ -263,7 +262,7 @@ icmp_receive_data(net_buffer *buffer)
 			if (reply == NULL)
 				return B_NO_MEMORY;
 
-			std::swap(reply->source, reply->destination);
+			gBufferModule->swap_addresses(reply);
 
 			// There already is an ICMP header, and we'll reuse it
 			NetBufferHeaderReader<icmp_header> header(reply);

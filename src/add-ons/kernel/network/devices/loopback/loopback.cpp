@@ -13,7 +13,6 @@
 
 #include <KernelExport.h>
 
-#include <algorithm>
 #include <net/if.h>
 #include <net/if_types.h>
 #include <net/if_media.h>
@@ -159,7 +158,7 @@ loopback_receive_data(net_device *_device, net_buffer **_buffer)
 		return status;
 
 	// swap network addresses before delivering
-	std::swap(buffer->source, buffer->destination);
+	gBufferModule->swap_addresses(buffer);
 
 	*_buffer = buffer;
 	return B_OK;
