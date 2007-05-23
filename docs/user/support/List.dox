@@ -7,6 +7,8 @@
  * 
  * Proofreading:
  *   David Weizades <ddewbofh@hotmail.com>
+ *   Thom Holwerda <slakje@quicknet.nl>
+ *   John Drinkwater <jdrinkwater@gmail.com>
  *
  * Corresponds to:
  *   /trunk/headers/os/support/List.h  rev 19972
@@ -28,7 +30,7 @@
   This class is designed to be used for a variety of tasks. Unlike similar
   implementations in other libraries, this class is not based on templates
   and as such is inherently not typed. So it will be the job of the programmer
-  to make sure proper data is entered since the compiler cannot check this
+  to make sure proper data is entered since the compiler cannot check this by
   itself.
 
   BList contains a list of items that will grow and shrink depending on how
@@ -37,14 +39,14 @@
   situations such as the interface kit within the BListView class.
 
   A note on the ownership of the objects might come in handy. BList never
-  assumes ownership of the objects, removing items from the list will
-  only remove the entries from the list not delete the items themselves. In the
-  same way you should also make sure that before you might delete an object
-  that's in a list, you will have to remove it from the list first.
+  assumes ownership of the objects. As such, removing items from the list will
+  only remove the entries from the list; it will not delete the items
+  themselves. Similarly, you should also make sure that before you might delete
+  an object that is in a list, you will have to remove it from the list first.
 
   \warning This class is not thread-safe.
 
-  The class implements methods to add, remove, reorder, retrieve, query
+  The class implements methods to add, remove, reorder, retrieve, and query
   items as well as some advanced methods which let you perform a task on all the
   items in the list.
 */
@@ -57,14 +59,14 @@
   \c count parameter can be tweaked to determine the size of these blocks.
   In general, if you know your list is only going to contain a certain number of
   items at most, you can pass that value. If you expect your list to have very
-  few items, it's safe to choose a low number. This is to prevent the list from
-  taking up unneeded memory. If you expect the list to contain  a large number
+  few items, it is safe to choose a low number. This is to prevent the list from
+  taking up unneeded memory. If you expect the list to contain a large number
   of items, choose a higher value. Every time the memory is full, all the items
-  have to be copied into a new piece of allocated memory which, in turn, is an
-  expensive operation.
+  have to be copied into a new piece of allocated memory, which is an expensive
+  operation.
 
-  If you are unsure, you don't have to overthink this. Just make sure you don't
-  use a lot of lists and as long as the list isn't used in one of the
+  If you are unsure, you do not have to worry too much. Just make sure you do
+  not use a lot of lists, and as long as the list is not used in one of the
   performance critical parts of the code, you are safe to go with the default
   values.
 
@@ -90,7 +92,7 @@
 */
 
 /*!
-  \name Adding and removing items
+  \name Adding and Removing Items
 */
 
 //! @{
@@ -142,8 +144,8 @@
 
   \param list The list to be appended.
   \retval true The list was appended. 
-  \retval false Failed to append the list, due to the resizing of our
-    list failed. 
+  \retval false Failed to append the list, due to the fact that resizing of our
+    list failed.
   \see AddList(const BList *list, int32 index)
 */
 
@@ -182,7 +184,7 @@
 
 /*!
   \fn bool BList::ReplaceItem(int32 index, void *newItem)
-  \brief Replace a item with another one.
+  \brief Replace an item with another one.
 
   \param index The offset in the list where to put the item.
   \param newItem The new item to put in the list.
@@ -200,7 +202,7 @@
 //! @}
 
 /*!
-  \name Reordering items
+  \name Reordering Items
 */
 
 //! @{
@@ -222,7 +224,7 @@
   \param indexA The first item.
   \param indexB The second item.
   \retval true Swap succeeded.
-  \retval false Swap failed because one of the indexes were invalid.
+  \retval false Swap failed because one of the indexes was invalid.
 */
 
 /*! 
@@ -230,7 +232,7 @@
   \brief Move an item to a new place
 
   This moves a list item from position A to position B, moving the appropriate
-  block of list elements to make up for the move.  For example, in  the array:
+  block of list elements to make up for the move. For example, in the array:
   \verbatim
 A B C D E F G H I J
   \endverbatim
@@ -249,7 +251,7 @@ A C D E F G B H I J
 //! @}
 
 /*!
-  \name Retrieving items
+  \name Retrieving Items
 */
 
 //! @{
@@ -260,7 +262,7 @@ A C D E F G B H I J
 
   \param index The item to retrieve.
   \return A pointer to the item in that position, or \c NULL if the index is
-    out of bounds.
+  out of bounds.
   \see ItemAtFast(int32 index) const
 */
 
@@ -276,9 +278,9 @@ A C D E F G B H I J
   \fn void *BList::ItemAtFast(int32 index) const
   \brief Get an item.
 
-  This method does not performs any boundary checks when it retrieves an item.
+  This method does not perform any boundary checks when it retrieves an item.
   Use this method in a performance critical area of your program where you are
-  sure you won't get an invalid item.
+  sure you will not get an invalid item.
 
   \return A pointer to the item.
 */
@@ -302,16 +304,17 @@ A C D E F G B H I J
   up the internal consistency.
 
   \warning If there is anything you want, for which you need the list of
-    objects, please understand that that probably means that what you want to do
-    is a bad idea to begin with and you should avoid this method. The list of
-    objects doesn't belong to you. See if DoForEach() can help you out instead.
+    objects, please realize that that probably means that what you want to do is
+    a bad idea to begin with and that you should avoid this method. The list of
+    objects does not belong to you. See also DoForEach() for an alternate
+    method.
   \return The internal list of pointers.
 */
 
 //! @}
 
 /*!
-  \name Querying for items
+  \name Querying for Items
 */
 
 //! @{
@@ -341,7 +344,7 @@ A C D E F G B H I J
 //! @}
 
 /*!
-  \name Iterating over the list
+  \name Iterating over the List
 */
 
 //! @{
