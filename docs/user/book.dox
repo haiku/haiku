@@ -11,11 +11,13 @@
   \section notes General Notes and Information
   - \ref compatibility
   - \ref apidoc
+  - \ref credits
 */
 
 ///// Define main kits /////
 
 /*!
+  \defgroup app Application Kit
   \defgroup drivers Drivers
   \defgroup midi2 MIDI 2 Kit
   \brief API for producing and consuming MIDI events.
