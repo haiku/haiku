@@ -32,7 +32,7 @@ public:
 
 	status_t InitCheck() const;
 
-	status_t Wait(RecursiveLocker &, bigtime_t timeout, bool wakeNext = true);
+	status_t Wait(MutexLocker &, bigtime_t timeout, bool wakeNext = true);
 	void Signal();
 
 private:
@@ -107,7 +107,7 @@ class TCPEndpoint : public net_protocol, public ProtocolSocket {
 		void _UpdateTimestamps(tcp_segment_header& segment,
 			size_t segmentLength);
 		void _MarkEstablished();
-		status_t _WaitForEstablished(RecursiveLocker &lock, bigtime_t timeout);
+		status_t _WaitForEstablished(MutexLocker &lock, bigtime_t timeout);
 		void _AddData(tcp_segment_header &segment, net_buffer *buffer);
 		void _PrepareReceivePath(tcp_segment_header &segment);
 		status_t _PrepareSendPath(const sockaddr *peer);
@@ -130,7 +130,7 @@ class TCPEndpoint : public net_protocol, public ProtocolSocket {
 		friend class ConnectionHashDefinition;
 		friend class EndpointHashDefinition;
 
-		recursive_lock	fLock;
+		mutex			fLock;
 		WaitList		fReceiveList;
 		WaitList		fSendList;
 		sem_id			fAcceptSemaphore;

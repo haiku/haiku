@@ -190,7 +190,7 @@ WaitList::InitCheck() const
 
 
 status_t
-WaitList::Wait(RecursiveLocker &locker, bigtime_t timeout, bool wakeNext)
+WaitList::Wait(MutexLocker &locker, bigtime_t timeout, bool wakeNext)
 {
 	locker.Unlock();
 
@@ -252,8 +252,8 @@ TCPEndpoint::TCPEndpoint(net_socket *socket)
 {
 	//gStackModule->init_timer(&fTimer, _TimeWait, this);
 
-	recursive_lock_init(&fLock, "tcp lock");
-		// TODO: to be replaced with a real locking strategy!
+	// TODO: to be replaced with a real locking strategy!
+	mutex_init(&fLock, "tcp lock");
 
 	gStackModule->init_timer(&fPersistTimer, TCPEndpoint::_PersistTimer, this);
 	gStackModule->init_timer(&fRetransmitTimer, TCPEndpoint::_RetransmitTimer, this);
@@ -265,7 +265,7 @@ TCPEndpoint::TCPEndpoint(net_socket *socket)
 
 TCPEndpoint::~TCPEndpoint()
 {
-	recursive_lock_lock(&fLock);
+	mutex_lock(&fLock);
 
 	gStackModule->cancel_timer(&fRetransmitTimer);
 	gStackModule->cancel_timer(&fPersistTimer);
@@ -277,7 +277,7 @@ TCPEndpoint::~TCPEndpoint()
 		return_endpoint_manager(fManager);
 	}
 
-	recursive_lock_destroy(&fLock);
+	mutex_destroy(&fLock);
 }
 
 
@@ -322,7 +322,7 @@ TCPEndpoint::Close()
 {
 	TRACE("Close()");
 
-	RecursiveLocker lock(fLock);
+	MutexLocker lock(fLock);
 
 	if (fState == LISTEN)
 		delete_sem(fAcceptSemaphore);
@@ -363,7 +363,7 @@ TCPEndpoint::Free()
 {
 	TRACE("Free()");
 
-	RecursiveLocker _(fLock);
+	MutexLocker _(fLock);
 
 	if (fState <= SYNCHRONIZE_SENT || fState == TIME_WAIT)
 		return B_OK;
@@ -384,7 +384,7 @@ TCPEndpoint::Connect(const sockaddr *address)
 {
 	TRACE("Connect() on address %s", PrintAddress(address));
 
-	RecursiveLocker locker(fLock);
+	MutexLocker locker(fLock);
 
 	// Can only call connect() from CLOSED or LISTEN states
 	// otherwise endpoint is considered already connected
@@ -436,7 +436,7 @@ TCPEndpoint::Accept(struct net_socket **_acceptedSocket)
 {
 	TRACE("Accept()");
 
-	RecursiveLocker locker(fLock);
+	MutexLocker locker(fLock);
 
 	status_t status;
 	bigtime_t timeout = absolute_timeout(socket->receive.timeout);
@@ -465,7 +465,7 @@ TCPEndpoint::Bind(const sockaddr *address)
 	if (address == NULL)
 		return B_BAD_VALUE;
 
-	RecursiveLocker lock(fLock);
+	MutexLocker lock(fLock);
 
 	TRACE("Bind() on address %s", PrintAddress(address));
 
@@ -481,7 +481,7 @@ TCPEndpoint::Unbind(struct sockaddr *address)
 {
 	TRACE("Unbind()");
 
-	RecursiveLocker lock(fLock);
+	MutexLocker lock(fLock);
 	return fManager->Unbind(this);
 }
 
@@ -491,7 +491,7 @@ TCPEndpoint::Listen(int count)
 {
 	TRACE("Listen()");
 
-	RecursiveLocker lock(fLock);
+	MutexLocker lock(fLock);
 
 	if (fState != CLOSED)
 		return B_BAD_VALUE;
@@ -517,7 +517,7 @@ TCPEndpoint::Shutdown(int direction)
 {
 	TRACE("Shutdown(%i)", direction);
 
-	RecursiveLocker lock(fLock);
+	MutexLocker lock(fLock);
 
 	if (direction == SHUT_RD || direction == SHUT_RDWR)
 		fFlags |= FLAG_NO_RECEIVE;
@@ -535,7 +535,7 @@ TCPEndpoint::Shutdown(int direction)
 status_t
 TCPEndpoint::SendData(net_buffer *buffer)
 {
-	RecursiveLocker lock(fLock);
+	MutexLocker lock(fLock);
 
 	TRACE("SendData(buffer %p, size %lu, flags %lx) [total %lu bytes, has %lu]",
 		  buffer, buffer->size, buffer->flags, fSendQueue.Size(),
@@ -582,7 +582,7 @@ TCPEndpoint::SendData(net_buffer *buffer)
 ssize_t
 TCPEndpoint::SendAvailable()
 {
-	RecursiveLocker locker(fLock);
+	MutexLocker locker(fLock);
 
 	ssize_t available;
 
@@ -599,7 +599,7 @@ TCPEndpoint::SendAvailable()
 status_t
 TCPEndpoint::FillStat(net_stat *stat)
 {
-	RecursiveLocker _(fLock);
+	MutexLocker _(fLock);
 
 	strlcpy(stat->state, name_for_state(fState), sizeof(stat->state));
 	stat->receive_queue_size = fReceiveQueue.Available();
@@ -614,7 +614,7 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 {
 	TRACE("ReadData(%lu bytes, flags 0x%x)", numBytes, (unsigned int)flags);
 
-	RecursiveLocker locker(fLock);
+	MutexLocker locker(fLock);
 
 	*_buffer = NULL;
 
@@ -698,7 +698,7 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 ssize_t
 TCPEndpoint::ReadAvailable()
 {
-	RecursiveLocker locker(fLock);
+	MutexLocker locker(fLock);
 
 	TRACE("ReadAvailable(): %li", _AvailableData());
 
@@ -709,7 +709,7 @@ TCPEndpoint::ReadAvailable()
 status_t
 TCPEndpoint::SetSendBufferSize(size_t length)
 {
-	RecursiveLocker _(fLock);
+	MutexLocker _(fLock);
 	fSendQueue.SetMaxBytes(length);
 	return B_OK;
 }
@@ -718,7 +718,7 @@ TCPEndpoint::SetSendBufferSize(size_t length)
 status_t
 TCPEndpoint::SetReceiveBufferSize(size_t length)
 {
-	RecursiveLocker _(fLock);
+	MutexLocker _(fLock);
 	fReceiveQueue.SetMaxBytes(length);
 	return B_OK;
 }
@@ -735,7 +735,7 @@ TCPEndpoint::SetOption(int option, const void *_value, int length)
 
 	const int *value = (const int *)_value;
 
-	RecursiveLocker _(fLock);
+	MutexLocker _(fLock);
 	if (*value)
 		fOptions |= TCP_NODELAY;
 	else
@@ -844,7 +844,7 @@ int32
 TCPEndpoint::Spawn(TCPEndpoint *parent, tcp_segment_header &segment,
 	net_buffer *buffer)
 {
-	RecursiveLocker _(fLock);
+	MutexLocker _(fLock);
 
 	// TODO error checking
 	ProtocolSocket::Open();
@@ -883,8 +883,7 @@ TCPEndpoint::Spawn(TCPEndpoint *parent, tcp_segment_header &segment,
 void
 TCPEndpoint::DumpInternalState() const
 {
-	kprintf("Lock: { sem: %ld, holder: %ld, recursion: %i }\n",
-		fLock.sem, fLock.holder, fLock.recursion);
+	kprintf("Lock: { sem: %ld, holder: %ld }\n", fLock.sem, fLock.holder);
 	kprintf("AcceptSem: %ld\n", fAcceptSemaphore);
 	kprintf("Options: 0x%lx\n", (uint32)fOptions);
 	kprintf("SendWindowShift: %lu\n", (uint32)fSendWindowShift);
@@ -955,7 +954,7 @@ TCPEndpoint::_SynchronizeSentReceive(tcp_segment_header &segment, net_buffer *bu
 int32
 TCPEndpoint::SegmentReceived(tcp_segment_header &segment, net_buffer *buffer)
 {
-	RecursiveLocker locker(fLock);
+	MutexLocker locker(fLock);
 
 	TRACE("SegmentReceived(): buffer %p (%lu bytes) address %s to %s",
 		buffer, buffer->size, PrintAddress(buffer->source),
@@ -1628,7 +1627,7 @@ TCPEndpoint::_MarkEstablished()
 
 
 status_t
-TCPEndpoint::_WaitForEstablished(RecursiveLocker &locker, bigtime_t timeout)
+TCPEndpoint::_WaitForEstablished(MutexLocker &locker, bigtime_t timeout)
 {
 	while (fState != ESTABLISHED) {
 		status_t status = fSendList.Wait(locker, timeout);
@@ -1843,7 +1842,7 @@ TCPEndpoint::_RetransmitTimer(net_timer *timer, void *data)
 {
 	TCPEndpoint *endpoint = (TCPEndpoint *)data;
 
-	RecursiveLocker locker(endpoint->fLock);
+	MutexLocker locker(endpoint->fLock);
 	if (!locker.IsLocked())
 		return;
 
@@ -1856,7 +1855,7 @@ TCPEndpoint::_PersistTimer(net_timer *timer, void *data)
 {
 	TCPEndpoint *endpoint = (TCPEndpoint *)data;
 
-	RecursiveLocker locker(endpoint->fLock);
+	MutexLocker locker(endpoint->fLock);
 	if (!locker.IsLocked())
 		return;
 
@@ -1869,7 +1868,7 @@ TCPEndpoint::_DelayedAcknowledgeTimer(struct net_timer *timer, void *data)
 {
 	TCPEndpoint *endpoint = (TCPEndpoint *)data;
 
-	RecursiveLocker locker(endpoint->fLock);
+	MutexLocker locker(endpoint->fLock);
 	if (!locker.IsLocked())
 		return;
 
@@ -1882,7 +1881,7 @@ TCPEndpoint::_TimeWaitTimer(struct net_timer *timer, void *data)
 {
 	TCPEndpoint *endpoint = (TCPEndpoint *)data;
 
-	if (recursive_lock_lock(&endpoint->fLock) < B_OK)
+	if (mutex_lock(&endpoint->fLock) < B_OK)
 		return;
 
 	endpoint->DeleteSocket();

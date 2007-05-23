@@ -53,7 +53,7 @@ net_stack_module_info *gStackModule;
 //      protocol cookie, so we don't have to go through the list
 //      for each segment.
 typedef DoublyLinkedList<EndpointManager> EndpointManagerList;
-static recursive_lock sEndpointManagersLock;
+static mutex sEndpointManagersLock;
 static EndpointManagerList sEndpointManagers;
 
 
@@ -633,7 +633,7 @@ tcp_receive_data(net_buffer *buffer)
 	bufferHeader.Remove(headerLength);
 		// we no longer need to keep the header around
 
-	RecursiveLocker _(sEndpointManagersLock);
+	MutexLocker _(sEndpointManagersLock);
 
 	EndpointManager *endpointManager = endpoint_manager_for(domain);
 	if (endpointManager == NULL)
@@ -707,7 +707,7 @@ dump_endpoint(int argc, char *argv[])
 static status_t
 tcp_init()
 {
-	status_t status = recursive_lock_init(&sEndpointManagersLock,
+	status_t status = mutex_init(&sEndpointManagersLock,
 		"endpoint managers lock");
 
 	if (status < B_OK)
@@ -746,7 +746,7 @@ tcp_uninit()
 {
 	remove_debugger_command("tcp_endpoint", dump_endpoint);
 	remove_debugger_command("tcp_endpoints", dump_endpoints);
-	recursive_lock_destroy(&sEndpointManagersLock);
+	mutex_destroy(&sEndpointManagersLock);
 	return B_OK;
 }
 
