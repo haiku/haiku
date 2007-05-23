@@ -15,6 +15,9 @@
 #include <KernelExport.h>
 #include <driver_settings.h>
 
+#include <kernel.h> // IS_KERNEL_ADDRESS
+#include <fs/fd.h>	// user_fd_kernel_ioctl
+
 #include <sys/ioctl.h>
 #include <stdlib.h>
 #include <string.h>
@@ -194,6 +197,17 @@ opcode_name(int op)
 #endif	// DEBUG
 
 
+static status_t
+resolve_cookie(int kernel, int socket, net_stack_cookie **cookie)
+{
+	if (kernel)
+		return ioctl(socket, NET_STACK_GET_COOKIE, cookie, sizeof(*cookie));
+	else
+		return user_fd_kernel_ioctl(socket, NET_STACK_GET_COOKIE, cookie,
+			sizeof(*cookie));
+}
+
+
 //	#pragma mark - device
 
 
@@ -297,10 +311,10 @@ net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 			}
 
 			case NET_STACK_GET_COOKIE:
-				// This is needed by accept() call, allowing libnet.so accept() to pass back
-				// in NET_STACK_ACCEPT opcode the cookie (aka the net_stack_cookie!)
-				// of the file descriptor to use for the new accepted socket
-				return user_memcpy(data, &cookie, sizeof(void *));
+				if (!IS_KERNEL_ADDRESS(data))
+					return B_BAD_ADDRESS;
+				*((net_stack_cookie **)data) = cookie;
+				return B_OK;
 
 			case NET_STACK_GET_NEXT_STAT:
 			{
@@ -349,18 +363,22 @@ net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 
 			case NET_STACK_ACCEPT:
 			{
+				int kernel = IS_KERNEL_ADDRESS(data);
 				sockaddr_storage address;
 				accept_args args;
+
 				status = check_args_and_address(args, address, data, length, false);
 				if (status < B_OK)
 					return status;
 
-				// args.cookie is the net_stack_cookie of the already opened socket
-				// TODO: find a safer way to do this!
+				net_stack_cookie *accept_cookie;
+				status = resolve_cookie(kernel, args.accept_socket,
+					&accept_cookie);
+				if (status < B_OK)
+					return status;
 
-				net_stack_cookie *acceptCookie = (net_stack_cookie *)args.cookie;
 				status = sSocket->accept(cookie->socket, args.address,
-					&args.address_length, &acceptCookie->socket);
+					&args.address_length, &accept_cookie->socket);
 				if (status < B_OK)
 					return status;
 

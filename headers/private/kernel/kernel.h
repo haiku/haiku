@@ -59,7 +59,7 @@ extern bool kernel_startup;
 extern "C" {
 #endif
 
-status_t shutdown(bool reboot);
+status_t system_shutdown(bool reboot);
 status_t _user_shutdown(bool reboot);
 
 #ifdef __cplusplus

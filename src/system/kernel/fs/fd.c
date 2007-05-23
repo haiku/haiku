@@ -956,15 +956,15 @@ _kern_seek(int fd, off_t pos, int seekType)
 }
 
 
-status_t
-_kern_ioctl(int fd, ulong op, void *buffer, size_t length)
+static status_t
+_fd_ioctl(bool kernel_fd, int fd, ulong op, void *buffer, size_t length)
 {
 	struct file_descriptor *descriptor;
 	int status;
 
 	TRACE(("sys_ioctl: fd %d\n", fd));
 
-	descriptor = get_fd(get_current_io_context(true), fd);
+	descriptor = get_fd(get_current_io_context(kernel_fd), fd);
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
@@ -975,6 +975,20 @@ _kern_ioctl(int fd, ulong op, void *buffer, size_t length)
 
 	put_fd(descriptor);
 	return status;
+}
+
+
+status_t
+_kern_ioctl(int fd, ulong op, void *buffer, size_t length)
+{
+	return _fd_ioctl(true, fd, op, buffer, length);
+}
+
+
+status_t
+user_fd_kernel_ioctl(int fd, ulong op, void *buffer, size_t length)
+{
+	return _fd_ioctl(false, fd, op, buffer, length);
 }
 
 

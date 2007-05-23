@@ -249,21 +249,11 @@ accept(int socket, struct sockaddr *address, socklen_t *_addressLength)
 	if (acceptSocket < 0)
 		return -1;
 
-	// The network stack driver will need to know to which net_stack_cookie to 
-	// *bind* with the new accepted socket. It can't itself find out, so we need
-	// to pass it the cookie used internally.
-	// TODO: change this to a safer approach using IDs!
-	void *cookie;
-	if (ioctl(acceptSocket, NET_STACK_GET_COOKIE, &cookie) < 0) {
-		close(acceptSocket);
-		return -1;
-	}
-
 	bool r5compatible = check_r5_compatibility();
 	struct sockaddr r5addr;
 	accept_args args;
 
-	args.cookie = cookie;
+	args.accept_socket = acceptSocket;
 
 	if (r5compatible && address != NULL) {
 		args.address = &r5addr;
@@ -549,14 +539,8 @@ socketpair(int family, int type, int protocol, int socketVector[2])
 	if (socketVector[1] < 0)
 		goto err1;
 
-	// TODO: find a better way to do this!
-	void *cookie;
-	if (ioctl(socketVector[1], NET_STACK_GET_COOKIE, &cookie) < 0)
-		goto err2;
-
 	socketpair_args args;
-	args.cookie = cookie;
-		// this way driver can use the right fd/cookie! 	
+	args.second_socket = socketVector[1];
 
 	if (ioctl(socketVector[0], NET_STACK_SOCKETPAIR, &args, sizeof(args)) < 0)
 		goto err2;
@@ -564,7 +548,7 @@ socketpair(int family, int type, int protocol, int socketVector[2])
 	return 0;
 
 err2:
-	close(socketVector[1]); 
+	close(socketVector[1]);
 err1:
 	close(socketVector[0]);
 	return -1;

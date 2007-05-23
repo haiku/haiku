@@ -23,7 +23,7 @@ enum {
 
 	// ops not acting on an existing socket
 	NET_STACK_SOCKET = NET_STACK_IOCTL_BASE,	// socket_args *
-	NET_STACK_GET_COOKIE,                       // void ** 
+	NET_STACK_GET_COOKIE,                       // void **
 	NET_STACK_CONTROL_NET_MODULE,				// control_net_module_args *
 	NET_STACK_GET_NEXT_STAT,					// get_next_stat_args *
 
@@ -72,13 +72,13 @@ struct socket_args {	// used by NET_STACK_SOCKET
 };
 
 struct socketpair_args {	// used by NET_STACK_SOCKETPAIR
-	void	*cookie;
+	int second_socket;
 };
 
-struct accept_args {  // used by NET_STACK_ACCEPT 
-	void	*cookie; 
-	struct sockaddr *address; 
-	socklen_t address_length; 
+struct accept_args {  // used by NET_STACK_ACCEPT
+	int accept_socket;
+	struct sockaddr *address;
+	socklen_t address_length;
 };
 
 struct get_next_stat_args {	// used by NET_STACK_GET_NEXT_STAT

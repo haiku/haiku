@@ -86,6 +86,8 @@ extern void fd_set_close_on_exec(struct io_context *context, int fd, bool closeF
 
 static struct io_context *get_current_io_context(bool kernel);
 
+extern status_t user_fd_kernel_ioctl(int fd, ulong op, void *buffer, size_t length);
+
 /* The prototypes of the (sys|user)_ functions are currently defined in vfs.h */
 
 

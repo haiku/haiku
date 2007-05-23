@@ -9,7 +9,7 @@
 
 
 status_t
-shutdown(bool reboot)
+system_shutdown(bool reboot)
 {
 	// ToDo: shutdown all system services!
 
@@ -27,6 +27,6 @@ _user_shutdown(bool reboot)
 {
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
-	return shutdown(reboot);
+	return system_shutdown(reboot);
 }
 

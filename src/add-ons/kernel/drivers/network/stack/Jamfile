@@ -11,6 +11,7 @@ if ( $(TARGET_PLATFORM) != haiku ) {
 }
 
 UsePrivateHeaders kernel net ;
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
 # a) Userland stack version:
 
