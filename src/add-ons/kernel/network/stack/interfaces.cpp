@@ -93,7 +93,7 @@ find_device_interface(const char *name)
 	while (iterator.HasNext()) {
 		net_device_interface *interface = iterator.Next();
 
-		if (!strcmp(interface->name, name))
+		if (!strcmp(interface->device->name, name))
 			return interface;
 	}
 
@@ -127,8 +127,6 @@ allocate_device_interface(net_device *device, net_device_module_info *module)
 	if (init_fifo(&interface->receive_queue, name, 16 * 1024 * 1024) < B_OK)
 		goto error_2;
 
-	interface->name = device->name;
-	interface->module = module;
 	interface->device = device;
 	interface->up_count = 0;
 	interface->ref_count = 1;
@@ -368,9 +366,9 @@ get_device_interface_address(net_device_interface *interface, sockaddr *_address
 	address.sdl_family = AF_LINK;
 	address.sdl_index = interface->device->index;
 	address.sdl_type = interface->device->type;
-	address.sdl_nlen = strlen(interface->name);
+	address.sdl_nlen = strlen(interface->device->name);
 	address.sdl_slen = 0;
-	memcpy(address.sdl_data, interface->name, address.sdl_nlen);
+	memcpy(address.sdl_data, interface->device->name, address.sdl_nlen);
 
 	address.sdl_alen = interface->device->address.length;
 	memcpy(LLADDR(&address), interface->device->address.data, address.sdl_alen);
@@ -414,7 +412,7 @@ list_device_interfaces(void *_buffer, size_t *bufferSize)
 		net_device_interface *interface = iterator.Next();
 
 		ifreq request;
-		strlcpy(request.ifr_name, interface->name, IF_NAMESIZE);
+		strlcpy(request.ifr_name, interface->device->name, IF_NAMESIZE);
 		get_device_interface_address(interface, &request.ifr_addr);
 
 		if (buffer.Copy(&request, IF_NAMESIZE
@@ -446,8 +444,9 @@ put_device_interface(struct net_device_interface *interface)
 	status_t status;
 	wait_for_thread(interface->consumer_thread, &status);
 
-	interface->module->uninit_device(interface->device);
-	put_module(interface->module->info.name);
+	net_device *device = interface->device;
+	device->module->uninit_device(device);
+	put_module(device->module->info.name);
 
 	recursive_lock_destroy(&interface->rx_lock);
 	delete interface;
@@ -544,10 +543,8 @@ down_device_interface(net_device_interface *interface)
 
 	net_device *device = interface->device;
 
-	dprintf("down_device_interface(%s)\n", interface->name);
-
 	device->flags &= ~IFF_UP;
-	interface->module->down(device);
+	device->module->down(device);
 
 	notify_device_monitors(interface, B_DEVICE_GOING_DOWN);
 

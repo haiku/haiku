@@ -27,8 +27,6 @@ typedef DoublyLinkedList<net_device_monitor,
 	DoublyLinkedListCLink<net_device_monitor> > DeviceMonitorList;
 
 struct net_device_interface : DoublyLinkedListLinkImpl<net_device_interface> {
-	const char			*name;
-	struct net_device_module_info *module;
 	struct net_device	*device;
 	thread_id			reader_thread;
 	uint32				up_count;

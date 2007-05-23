@@ -290,7 +290,8 @@ domain_removed_device_interface(net_device_interface *interface)
 
 		BenaphoreLocker locker(domain->lock);
 
-		net_interface_private *priv = find_interface(domain, interface->name);
+		net_interface_private *priv = find_interface(domain,
+			interface->device->name);
 		if (priv == NULL)
 			continue;
 

@@ -688,8 +688,8 @@ interface_protocol_control(net_datalink_protocol *_protocol,
 			// get interface parameter
 			struct ifreq request;
 			strlcpy(request.ifr_parameter.base_name, interface->base_name, IF_NAMESIZE);
-			strlcpy(request.ifr_parameter.device, interface->device_interface->name,
-				IF_NAMESIZE);
+			strlcpy(request.ifr_parameter.device,
+				interface->device_interface->device->name, IF_NAMESIZE);
 			request.ifr_parameter.sub_type = 0;
 				// TODO: for now, we ignore the sub type...
 
@@ -747,7 +747,7 @@ interface_protocol_control(net_datalink_protocol *_protocol,
 			if (user_memcpy(&request, argument, sizeof(struct ifreq)) < B_OK)
 				return B_BAD_ADDRESS;
 
-			return interface->device_interface->module->set_media(
+			return interface->device_interface->device->module->set_media(
 				interface->device, request.ifr_media);
 		}
 		case SIOCGIFMEDIA:

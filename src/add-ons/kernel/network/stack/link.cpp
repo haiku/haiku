@@ -252,7 +252,7 @@ link_control(net_protocol *_protocol, int level, int option, void *value,
 
 			net_device_interface *interface = get_device_interface(request.ifr_index);
 			if (interface != NULL) {
-				strlcpy(request.ifr_name, interface->name, IF_NAMESIZE);
+				strlcpy(request.ifr_name, interface->device->name, IF_NAMESIZE);
 				put_device_interface(interface);
 			} else
 				return ENODEV;
