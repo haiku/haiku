@@ -139,9 +139,9 @@ BuildInfoMenu(BMenu *menu)
 {
 	BMenuItem* menuItem;
 
-	menuItem = new BMenuItem("About Magnify...", new BMessage(B_ABOUT_REQUESTED));
+	menuItem = new BMenuItem("About Magnify" B_UTF8_ELLIPSIS, new BMessage(B_ABOUT_REQUESTED));
 	menu->AddItem(menuItem);
-	menuItem = new BMenuItem("Help...", new BMessage(msg_help));
+	menuItem = new BMenuItem("Help" B_UTF8_ELLIPSIS, new BMessage(msg_help));
 	menu->AddItem(menuItem);
 	menu->AddSeparatorItem();
 
