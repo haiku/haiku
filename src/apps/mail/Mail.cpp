@@ -3198,6 +3198,10 @@ TMailWindow::Send(bool now)
 		return status;
 	}
 
+	Hide();
+		// depending on the system (and I/O) load, this could take a while
+		// but the user shouldn't be left waiting
+
 	if (fHeaderView != NULL)
 		characterSetToUse = fHeaderView->fCharacterSetUserSees;
 
@@ -3206,22 +3210,22 @@ TMailWindow::Send(bool now)
 	// particularly Japanese stuff, they only understand base64.  They also
 	// prefer it for the smaller size.  Later on this will be reduced to 7bit
 	// if the encoded text is just 7bit characters.
-	if (characterSetToUse == B_SJIS_CONVERSION ||
-		characterSetToUse == B_EUC_CONVERSION)
+	if (characterSetToUse == B_SJIS_CONVERSION
+		|| characterSetToUse == B_EUC_CONVERSION)
 		encodingForBody = base64;
-	else if (characterSetToUse == B_JIS_CONVERSION ||
-		characterSetToUse == B_MAIL_US_ASCII_CONVERSION ||
-		characterSetToUse == B_ISO1_CONVERSION ||
-		characterSetToUse == B_EUC_KR_CONVERSION)
+	else if (characterSetToUse == B_JIS_CONVERSION
+		|| characterSetToUse == B_MAIL_US_ASCII_CONVERSION
+		|| characterSetToUse == B_ISO1_CONVERSION
+		|| characterSetToUse == B_EUC_KR_CONVERSION)
 		encodingForBody = eight_bit;
 
 	// Using quoted printable headers on almost completely non-ASCII Japanese
 	// is a waste of time.  Besides, some stupid cell phone services need
 	// base64 in the headers.
-	if (characterSetToUse == B_SJIS_CONVERSION ||
-		characterSetToUse == B_EUC_CONVERSION ||
-		characterSetToUse == B_JIS_CONVERSION ||
-		characterSetToUse == B_EUC_KR_CONVERSION)
+	if (characterSetToUse == B_SJIS_CONVERSION
+		|| characterSetToUse == B_EUC_CONVERSION
+		|| characterSetToUse == B_JIS_CONVERSION
+		|| characterSetToUse == B_EUC_KR_CONVERSION)
 		encodingForHeaders = base64;
 
 	// Count the number of characters in the message body which aren't in the
@@ -3229,25 +3233,22 @@ TMailWindow::Send(bool now)
 	// text can safely use 7 bit characters.
 	if (fContentView->fTextView->TextLength() > 0) {
 		// First do a trial encoding with the user's character set.
-		int32	converterState = 0;
-		int32	originalLength;
-		BString	tempString;
-		int32	tempStringLength;
-		char	*tempStringPntr;
+		int32 converterState = 0;
+		int32 originalLength;
+		BString tempString;
+		int32 tempStringLength;
+		char* tempStringPntr;
 		originalLength = fContentView->fTextView->TextLength();
 		tempStringLength = originalLength *
 			6 /* Some character sets bloat up on escape codes */;
 		tempStringPntr = tempString.LockBuffer (tempStringLength);
-		if (tempStringPntr != NULL &&
-			B_OK == mail_convert_from_utf8 (
-			characterSetToUse,
-			fContentView->fTextView->Text(), &originalLength,
-			tempStringPntr, &tempStringLength, &converterState,
-			0x1A /* The code to substitute for unknown characters */)) {
-
+		if (tempStringPntr != NULL && mail_convert_from_utf8(characterSetToUse,
+				fContentView->fTextView->Text(), &originalLength,
+				tempStringPntr, &tempStringLength, &converterState,
+				0x1A /* used for unknown characters */) == B_OK) {
 			// Check for any characters which don't fit in a 7 bit encoding.
-			int		i;
-			bool	has8Bit = false;
+			int i;
+			bool has8Bit = false;
 			for (i = 0; i < tempStringLength; i++)
 				if (tempString[i] == 0 || (tempString[i] & 0x80)) {
 					has8Bit = true;
@@ -3259,8 +3260,8 @@ TMailWindow::Send(bool now)
 
 			// Count up the number of unencoded characters and warn the user about them.
 			if (gWarnAboutUnencodableCharacters) {
-				int32	offset = 0;
-				int		count = 0;
+				int32 offset = 0;
+				int count = 0;
 				while (offset >= 0) {
 					offset = tempString.FindFirst (0x1A, offset);
 					if (offset >= 0) {
@@ -3269,7 +3270,7 @@ TMailWindow::Send(bool now)
 					}
 				}
 				if (count > 0) {
-					int32	userAnswer;
+					int32 userAnswer;
 					BString	messageString;
 					MDR_DIALECT_CHOICE (
 						messageString << "Your main text contains " << count <<
@@ -3303,8 +3304,7 @@ TMailWindow::Send(bool now)
 	if (fResending) {
 		BFile file(fRef, O_RDONLY);
 		result = file.InitCheck();
-		if (result == B_OK)
-		{
+		if (result == B_OK) {
 			BEmailMessage mail(&file);
 			mail.SetTo(fHeaderView->fTo->Text(), characterSetToUse, encodingForHeaders);
 
@@ -3322,40 +3322,34 @@ TMailWindow::Send(bool now)
 		// CC field meant that it got sent out anyway, so pass in empty strings
 		// when changing the header to force it to remove the header.
 
-		fMail->SetTo(fHeaderView->fTo->Text(), characterSetToUse, encodingForHeaders);
-		fMail->SetSubject(fHeaderView->fSubject->Text(), characterSetToUse, encodingForHeaders);
-		fMail->SetCC(fHeaderView->fCc->Text(), characterSetToUse, encodingForHeaders);
+		fMail->SetTo(fHeaderView->fTo->Text(), characterSetToUse,
+			encodingForHeaders);
+		fMail->SetSubject(fHeaderView->fSubject->Text(), characterSetToUse,
+			encodingForHeaders);
+		fMail->SetCC(fHeaderView->fCc->Text(), characterSetToUse,
+			encodingForHeaders);
 		fMail->SetBCC(fHeaderView->fBcc->Text());
 
 		//--- Add X-Mailer field
 		{
 			// get app version
-			version_info versionInfo;
-			memset(&versionInfo, 0, sizeof(version_info));
+			version_info info;
+			memset(&info, 0, sizeof(version_info));
 
 			app_info appInfo;
 			if (be_app->GetAppInfo(&appInfo) == B_OK) {
 				BFile file(&appInfo.ref, B_READ_ONLY);
 				if (file.InitCheck() == B_OK) {
-					BAppFileInfo info(&file);
-					if (info.InitCheck() == B_OK)
-						info.GetVersionInfo(&versionInfo, B_APP_VERSION_KIND);
+					BAppFileInfo appFileInfo(&file);
+					if (appFileInfo.InitCheck() == B_OK)
+						appFileInfo.GetVersionInfo(&info, B_APP_VERSION_KIND);
 				}
 			}
-			// prepare version variety string
-			const char *varietyStrings[] = {
-				"Development", "Alpha", "Beta",
-				"Gamma", "Golden master", "Final"
-			};
-			char varietyString[32];
-			strcpy(varietyString, varietyStrings[versionInfo.variety % 6]);
-			if (versionInfo.variety < 5)
-				sprintf(varietyString + strlen(varietyString), "/%li", versionInfo.internal);
 
 			char versionString[255];
 			sprintf(versionString,
-				"Mail - Mail Daemon Replacement %ld.%ld.%ld %s",
-				versionInfo.major, versionInfo.middle, versionInfo.minor, varietyString);
+				"Mail/Haiku %ld.%ld.%ld",
+				info.major, info.middle, info.minor);
 			fMail->SetHeaderField("X-Mailer", versionString);
 		}
 
@@ -3432,9 +3426,10 @@ TMailWindow::Send(bool now)
 				result = be_roster->Launch("application/x-vnd.Be-POST");
 				if (result == B_OK)
 					BMailDaemon::SendQueuedMail();
-				else
-					sprintf(errorMessage,"The mail_daemon could not be started:\n  (0x%.8lx) %s",
-							result,strerror(result));
+				else {
+					sprintf(errorMessage,"The mail_daemon could not be started:\n\t%s",
+						strerror(result));
+				}
 			}
 			break;
 		}
@@ -3450,8 +3445,9 @@ TMailWindow::Send(bool now)
 //			break;
 
 		default:
-			sprintf(errorMessage, "An error occurred trying to send mail (0x%.8lx): %s",
-							result,strerror(result));
+			sprintf(errorMessage, "An error occurred trying to send mail:\n\t%s",
+				strerror(result));
+			break;
 	}
 
 	if (result != B_NO_ERROR && result != B_MAIL_NO_DAEMON) {
