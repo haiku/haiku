@@ -386,8 +386,7 @@ main(int argc, const char *const *argv)
 			if (!noPartition) {
 				partition_info partitionInfo;
 				if (ioctl(fd, B_GET_PARTITION_INFO, &partitionInfo) == 0) {
-					// hard coded sector size: 512 bytes
-					partitionOffset = partitionInfo.offset / 512;
+					partitionOffset = partitionInfo.offset;
 				} else {
 					fprintf(stderr, "Error: Failed to get partition info: %s",
 						strerror(errno));
