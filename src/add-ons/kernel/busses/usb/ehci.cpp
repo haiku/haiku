@@ -10,6 +10,7 @@
 #include <PCI.h>
 #include <USB3.h>
 #include <KernelExport.h>
+#include <driver_settings.h>
 
 #include "ehci.h"
 
@@ -110,6 +111,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		fFreeListHead(NULL),
 		fRootHub(NULL),
 		fRootHubAddress(0),
+		fKeepPortOwnership(false),
 		fPortCount(0),
 		fPortResetChange(0),
 		fPortSuspendChange(0)
@@ -121,6 +123,12 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 
 	TRACE(("usb_ehci: constructing new EHCI Host Controller Driver\n"));
 	fInitOK = false;
+
+	void *handle = load_driver_settings("ehci");
+	if (handle) {
+		fKeepPortOwnership = get_driver_boolean_parameter(handle, "keep_port_ownership", false, true);
+		unload_driver_settings(handle);
+	}
 
 	// enable busmaster and memory mapped access
 	uint16 command = sPCIModule->read_pci_config(fPCIInfo->bus,
@@ -677,7 +685,7 @@ EHCI::ResetPort(uint8 index)
 	uint32 portRegister = EHCI_PORTSC + index * sizeof(uint32);
 	uint32 portStatus = ReadOpReg(portRegister) & EHCI_PORTSC_DATAMASK;
 
-	if (portStatus & EHCI_PORTSC_DMINUS) {
+	if (!fKeepPortOwnership && (portStatus & EHCI_PORTSC_DMINUS)) {
 		TRACE(("usb_ehci: lowspeed device connected, giving up port ownership\n"));
 		// there is a lowspeed device connected.
 		// we give the ownership to a companion controller.
@@ -701,7 +709,7 @@ EHCI::ResetPort(uint8 index)
 		return B_ERROR;
 	}
 
-	if ((portStatus & EHCI_PORTSC_ENABLE) == 0) {
+	if (!fKeepPortOwnership && (portStatus & EHCI_PORTSC_ENABLE) == 0) {
 		TRACE(("usb_ehci: fullspeed device connected, giving up port ownership\n"));
 		// the port was not enabled, this means that no high speed device is
 		// attached to this port. we give up ownership to a companion controler
