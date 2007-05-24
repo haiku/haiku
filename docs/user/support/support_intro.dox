@@ -17,7 +17,7 @@
   - Threading utility classes:
     - BLocker
     - BAutolock
-    - Thread Local Storage
+    - \ref TLS.h "Thread Local Storage"
   - Archiving and IO:
     - BArchivable
     - BFlattenable
