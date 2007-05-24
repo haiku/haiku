@@ -1,0 +1,24 @@
+SubDir HAIKU_TOP src add-ons opengl radeon ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os opengl ] : true ;
+		# We need our public GL headers also when not compiling for Haiku.
+}
+
+
+UsePrivateHeaders opengl ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa main ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa glapi ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa tnl ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa x86 ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src kits opengl mesa ppc ] ;
+
+Addon Radeon\ Hardware\ Renderer : opengl :
+	RadeonHardwareRenderer.cpp
+	: false
+	: libGL.so libmesa.a be
+;

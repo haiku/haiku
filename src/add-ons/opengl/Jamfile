@@ -1,4 +1,6 @@
 SubDir HAIKU_TOP src add-ons opengl ;
 
 SubInclude HAIKU_TOP src add-ons opengl mesa_software_renderer ;
+# SubInclude HAIKU_TOP src add-ons opengl nvidia ;
+# SubInclude HAIKU_TOP src add-ons opengl radeon ;
 
