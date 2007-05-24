@@ -39,3 +39,9 @@ Addon Mesa\ Software\ Renderer :
 	MesaSoftwareRenderer.cpp
 	: libGL.so libmesa.a be
 ;
+
+Package haiku-opengl-cvs : 
+	Mesa\ Software\ Renderer :  
+	boot home config add-ons opengl 
+;
+ 
