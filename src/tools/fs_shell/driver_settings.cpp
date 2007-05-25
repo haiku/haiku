@@ -617,15 +617,15 @@ fssh_unload_driver_settings(void *handle)
 	if (!check_handle(handle))
 		return FSSH_B_BAD_VALUE;
 
+#if 0
 	mutex_lock(&sLock);
 	// ToDo: as soon as "/boot" is accessible, we should start throwing away settings
-#if 0
 	if (--handle->ref_count == 0) {
 		list_remove_link(&handle->link);
 	} else
-#endif
 		handle = NULL;
 	mutex_unlock(&sLock);
+#endif
 
 	if (handle != NULL)
 		free_settings((settings_handle*)handle);
