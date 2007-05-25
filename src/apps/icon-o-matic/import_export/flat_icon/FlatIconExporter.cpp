@@ -109,7 +109,7 @@ FlatIconExporter::Export(const Icon* icon, BNode* node,
 		return ret;
 
 	// write buffer to attribute
-	ssize_t written = node->WriteAttr(attrName, B_RAW_TYPE, 0,
+	ssize_t written = node->WriteAttr(attrName, B_VECTOR_ICON_TYPE, 0,
 									  buffer.Buffer(), buffer.SizeUsed());
 	if (written != (ssize_t)buffer.SizeUsed()) {
 		if (written < 0)

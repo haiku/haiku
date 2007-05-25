@@ -35,6 +35,7 @@
 #include "MessageExporter.h"
 #include "MessageImporter.h"
 #include "MessengerSaver.h"
+#include "NativeSaver.h"
 #include "PathContainer.h"
 #include "RDefExporter.h"
 #include "SavePanel.h"
@@ -354,7 +355,7 @@ IconEditorApp::_Open(const entry_ref& ref, bool append)
 		switch (refMode) {
 			case REF_MESSAGE:
 				fDocument->SetNativeSaver(
-					new SimpleFileSaver(new MessageExporter(), ref));
+					new NativeSaver(ref));
 				break;
 			case REF_FLAT:
 				fDocument->SetExportSaver(
@@ -475,7 +476,7 @@ IconEditorApp::_CreateSaver(const entry_ref& ref, uint32 exportMode)
 
 		case EXPORT_MODE_MESSAGE:
 		default:
-			saver = new SimpleFileSaver(new MessageExporter(), ref);
+			saver = new NativeSaver(ref);
 			break;
 	}
 

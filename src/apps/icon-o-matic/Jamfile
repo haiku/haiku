@@ -116,6 +116,7 @@ Application Icon-O-Matic :
 	DocumentSaver.cpp
 	FileSaver.cpp
 	MessengerSaver.cpp
+	NativeSaver.cpp
 	SimpleFileSaver.cpp
 
 	# generic/command

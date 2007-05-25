@@ -480,6 +480,9 @@ MainWindow::_Init()
 	fSwatchGroup->SetCurrentColor(CurrentColor::Default());
 
 	SetIcon(fDocument->Icon());
+
+	AddShortcut('Y', 0, new BMessage(MSG_UNDO));
+	AddShortcut('Y', B_SHIFT_KEY, new BMessage(MSG_REDO));
 }
 
 // _CreateGUI
