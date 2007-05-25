@@ -363,6 +363,7 @@ OHCI::~OHCI()
 status_t
 OHCI::Start()
 {
+	TRACE(("OHCI::%s()\n", __FUNCTION__));
 	if (InitCheck())
 		return B_ERROR;
 	
@@ -403,6 +404,7 @@ status_t OHCI::SubmitTransfer( Transfer *t )
 status_t
 OHCI::NotifyPipeChange(Pipe *pipe, usb_change change)
 {
+	TRACE(("OHCI::%s(%p, %d)\n", __FUNCTION__, pipe, (int)change));
 	if (InitCheck())
 		return B_ERROR;
 
@@ -422,6 +424,7 @@ OHCI::NotifyPipeChange(Pipe *pipe, usb_change change)
 status_t
 OHCI::GetPortStatus(uint8 index, usb_port_status *status)
 {
+	TRACE(("OHCI::%s(%ud, )\n", __FUNCTION__, index));
 	if (index > fNumPorts)
 		return B_BAD_INDEX;
 	
@@ -465,6 +468,7 @@ OHCI::GetPortStatus(uint8 index, usb_port_status *status)
 status_t
 OHCI::SetPortFeature(uint8 index, uint16 feature)
 {
+	TRACE(("OHCI::%s(%ud, %ud)\n", __FUNCTION__, index, feature));
 	if (index > fNumPorts)
 		return B_BAD_INDEX;
 	
@@ -484,6 +488,7 @@ OHCI::SetPortFeature(uint8 index, uint16 feature)
 status_t
 OHCI::ClearPortFeature(uint8 index, uint16 feature)
 {
+	TRACE(("OHCI::%s(%ud, %ud)\n", __FUNCTION__, index, feature));
 	if (index > fNumPorts)
 		return B_BAD_INDEX;
 	
@@ -503,6 +508,7 @@ OHCI::ClearPortFeature(uint8 index, uint16 feature)
 Endpoint *
 OHCI::AllocateEndpoint()
 {
+	TRACE(("OHCI::%s()\n", __FUNCTION__));
 	//Allocate memory chunk
 	Endpoint *endpoint = new(std::nothrow) Endpoint;
 	void *phy;
@@ -527,6 +533,7 @@ OHCI::AllocateEndpoint()
 void
 OHCI::FreeEndpoint(Endpoint *end)
 {
+	TRACE(("OHCI::%s(%p)\n", __FUNCTION__, end));
 	fStack->FreeChunk((void *)end->ed, (void *) end->physicaladdress, sizeof(ohci_endpoint_descriptor));
 	delete end;
 }
@@ -534,6 +541,7 @@ OHCI::FreeEndpoint(Endpoint *end)
 TransferDescriptor *
 OHCI::AllocateTransfer()
 {
+	TRACE(("OHCI::%s()\n", __FUNCTION__));
 	TransferDescriptor *transfer = new TransferDescriptor;
 	void *phy;
 	if (fStack->AllocateChunk((void **)&transfer->td, &phy, sizeof(ohci_transfer_descriptor)) != B_OK) {
@@ -548,6 +556,7 @@ OHCI::AllocateTransfer()
 void
 OHCI::FreeTransfer(TransferDescriptor *trans)
 {
+	TRACE(("OHCI::%s(%p)\n", __FUNCTION__, trans));
 	fStack->FreeChunk((void *)trans->td, (void *) trans->physicaladdress, sizeof(ohci_transfer_descriptor));
 	delete trans;
 }
@@ -649,11 +658,13 @@ pci_module_info *OHCI::pci_module = 0;
 void
 OHCI::WriteReg(uint32 reg, uint32 value)
 {
+	TRACE(("OHCI::%s(%lu, %lu)\n", __FUNCTION__, reg, value));
 	*(volatile uint32 *)(fRegisters + reg) = value;
 }
 
 uint32
 OHCI::ReadReg(uint32 reg)
 {
+	TRACE(("OHCI::%s(%lu)\n", __FUNCTION__, reg));
 	return *(volatile uint32 *)(fRegisters + reg);
 }
