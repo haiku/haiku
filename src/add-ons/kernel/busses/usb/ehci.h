@@ -156,7 +156,6 @@ static	pci_module_info				*sPCIModule;
 		uint8						fRootHubAddress;
 
 		// Port management
-		bool						fKeepPortOwnership;
 		uint8						fPortCount;
 		uint16						fPortResetChange;
 		uint16						fPortSuspendChange;
