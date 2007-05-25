@@ -26,6 +26,7 @@ if ! $(HAIKU_COMPATIBLE) {
 SetSubDirSupportedPlatforms haiku libbe_test ;
 
 UsePrivateHeaders app input interface shared tracker ;
+UseLibraryHeaders icon ;
 
 # qoca headers
 SubDirSysHdrs $(SUBDIR) ;

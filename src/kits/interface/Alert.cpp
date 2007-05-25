@@ -16,6 +16,7 @@
 #include <Button.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <IconUtils.h>
 #include <Invoker.h>
 #include <Looper.h>
 #include <Message.h>
@@ -545,67 +546,108 @@ BAlert::_InitObject(const char* text, const char* button0, const char* button1,
 BBitmap*
 BAlert::_InitIcon()
 {
+	// Save the desired alert type and set it to "empty" until
+	// loading the icon was successful
+	alert_type alertType = fMsgType;
+	fMsgType = B_EMPTY_ALERT;
+
 	// After a bit of a search, I found the icons in app_server. =P
 	BBitmap* icon = NULL;
 	BPath path;
 	status_t status = find_directory(B_BEOS_SERVERS_DIRECTORY, &path);
-	if (status >= B_OK) {
-		path.Append("app_server");
-		BFile file;
-		status = file.SetTo(path.Path(), B_READ_ONLY);
-		if (status >= B_OK) {
-			BResources resources;
-			status = resources.SetTo(&file);
-			if (status >= B_OK) {
-				// Which icon are we trying to load?
-				const char* iconName = "";	// Don't want any seg faults
-				switch (fMsgType) {
-					case B_INFO_ALERT:
-						iconName = "info";
-						break;
-					case B_IDEA_ALERT:
-						iconName = "idea";
-						break;
-					case B_WARNING_ALERT:
-						iconName = "warn";
-						break;
-					case B_STOP_ALERT:
-						iconName = "stop";
-						break;
-
-					default:
-						// Alert type is either invalid or B_EMPTY_ALERT;
-						// either way, we're not going to load an icon
-						return NULL;
-				}
-
-				// Load the raw icon data
-				size_t size;
-				const void* rawIcon =
-					resources.LoadResource('ICON', iconName, &size);
-
-				if (rawIcon) {
-					// Now build the bitmap
-					icon = new (std::nothrow) BBitmap(BRect(0, 0, 31, 31), 0, B_CMAP8);
-					if (icon != NULL)
-						icon->SetBits(rawIcon, size, 0, B_CMAP8);
-				} else {
-					FTRACE((stderr, "BAlert::InitIcon() - Icon resource not found\n"));
-				}
-			} else {
-				FTRACE((stderr, "BAlert::InitIcon() - BResources init failed: %s\n", strerror(status)));
-			}
-		} else {
-			FTRACE((stderr, "BAlert::InitIcon() - BFile init failed: %s\n", strerror(status)));
-		}
-	} else {
-		FTRACE((stderr, "BAlert::InitIcon() - find_directory failed: %s\n", strerror(status)));
+	if (status < B_OK) {
+		FTRACE((stderr, "BAlert::_InitIcon() - find_directory failed: %s\n",
+			strerror(status)));
+		return NULL;
 	}
 
-	if (icon == NULL) {
-		// If there's no icon, it's an empty alert indeed.
-		fMsgType = B_EMPTY_ALERT;
+	path.Append("app_server");
+	BFile file;
+	status = file.SetTo(path.Path(), B_READ_ONLY);
+	if (status < B_OK) {
+		FTRACE((stderr, "BAlert::_InitIcon() - BFile init failed: %s\n",
+			strerror(status)));
+		return NULL;
 	}
+
+	BResources resources;
+	status = resources.SetTo(&file);
+	if (status < B_OK) {
+		FTRACE((stderr, "BAlert::_InitIcon() - BResources init failed: %s\n",
+			strerror(status)));
+		return NULL;
+	}
+	
+	// Which icon are we trying to load?
+	const char* iconName = "";	// Don't want any seg faults
+	switch (alertType) {
+		case B_INFO_ALERT:
+			iconName = "info";
+			break;
+		case B_IDEA_ALERT:
+			iconName = "idea";
+			break;
+		case B_WARNING_ALERT:
+			iconName = "warn";
+			break;
+		case B_STOP_ALERT:
+			iconName = "stop";
+			break;
+
+		default:
+			// Alert type is either invalid or B_EMPTY_ALERT;
+			// either way, we're not going to load an icon
+			return NULL;
+	}
+
+	int32 iconSize = 32;
+
+	// Allocate the icon bitmap
+	icon = new (std::nothrow) BBitmap(BRect(0, 0, iconSize - 1, iconSize - 1),
+		0, B_RGBA32);
+	if (icon == NULL || icon->InitCheck() < B_OK) {
+		FTRACE((stderr, "BAlert::_InitIcon() - No memory for bitmap\n"));
+		delete icon;
+		return NULL;
+	}
+
+	// Load the raw icon data
+	size_t size = 0;
+	const uint8* rawIcon;
+
+#ifdef __HAIKU__
+	// Try to load vector icon
+	rawIcon = (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE,
+		iconName, &size);
+	if (rawIcon != NULL
+		&& BIconUtils::GetVectorIcon(rawIcon, size, icon) == B_OK) {
+		// We have an icon, restore the saved alert type
+		fMsgType = alertType;
+		return icon;
+	}
+#endif
+
+	// Fall back to bitmap icon
+	rawIcon = (const uint8*)resources.LoadResource(B_LARGE_ICON_TYPE,
+		iconName, &size);
+	if (rawIcon == NULL) {
+		FTRACE((stderr, "BAlert::_InitIcon() - Icon resource not found\n"));
+		delete icon;
+		return NULL;
+	}
+
+	// Handle color space conversion
+#ifdef __HAIKU__
+	if (icon->ColorSpace() != B_CMAP8) {
+		BIconUtils::ConvertFromCMAP8(rawIcon, iconSize, iconSize,
+			iconSize, icon);
+	}
+#else
+	icon->SetBits(rawIcon, iconSize, 0, B_CMAP8);
+#endif
+
+	// We have an icon, restore the saved alert type
+	fMsgType = alertType;
 
 	return icon;
 }
@@ -697,9 +739,9 @@ TAlertView::Draw(BRect updateRect)
 		SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
 		FillRect(stripeRect);
 
-		SetDrawingMode(B_OP_OVER);
+		SetDrawingMode(B_OP_ALPHA);
+		SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
 		DrawBitmapAsync(fIconBitmap, BPoint(18, 6));
-		SetDrawingMode(B_OP_COPY);
 	}
 }
 
