@@ -29,6 +29,7 @@ BuildPlatformStaticLibrary <build>fs_shell.a :
 	atomic.cpp
 	block_cache.cpp
 	command_cp.cpp
+	driver_settings.cpp
 	errno.cpp
 	fcntl.cpp
 	fd.cpp

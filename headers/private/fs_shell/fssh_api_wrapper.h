@@ -22,6 +22,7 @@
 #include "fssh_defs.h"
 #include "fssh_disk_device_defs.h"
 #include "fssh_disk_device_manager.h"
+#include "fssh_driver_settings.h"
 #include "fssh_drivers.h"
 #include "fssh_errors.h"
 #include "fssh_fs_attr.h"
@@ -349,6 +350,24 @@
 #define set_disk_device_job_error_message			fssh_set_disk_device_job_error_message
 #define update_disk_device_job_interrupt_properties	fssh_update_disk_device_job_interrupt_properties
 
+
+////////////////////////////////////////////////////////////////////////////////
+// #pragma mark - fssh_driver_settings.h
+
+#define driver_parameter	fssh_driver_parameter
+#define driver_settings		fssh_driver_settings
+
+#define load_driver_settings			fssh_load_driver_settings
+#define unload_driver_settings			fssh_unload_driver_settings
+#define parse_driver_settings_string	fssh_parse_driver_settings_string
+#define get_driver_settings_string		fssh_get_driver_settings_string
+#define delete_driver_settings			fssh_delete_driver_settings
+#define get_driver_parameter			fssh_get_driver_parameter
+#define get_driver_boolean_parameter	fssh_get_driver_boolean_parameter
+#define get_driver_settings				fssh_get_driver_settings
+
+#define B_SAFEMODE_DRIVER_SETTINGS	FSSH_B_SAFEMODE_DRIVER_SETTINGS
+#define B_SAFEMODE_SAFE_MODE		FSSH_B_SAFEMODE_SAFE_MODE
 
 
 ////////////////////////////////////////////////////////////////////////////////
