@@ -25,6 +25,7 @@
 #include <ByteOrder.h>
 
 #ifndef _BOOT_MODE
+#include <driver_settings.h>
 #include <fs_attr.h>
 #include <fs_cache.h>
 #include <fs_index.h>

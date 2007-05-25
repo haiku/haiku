@@ -15,9 +15,6 @@
 #include "Attribute.h"
 #include "bfs_control.h"
 
-#ifndef BFS_SHELL
-#	include <driver_settings.h>
-#endif
 
 #define BFS_IO_SIZE	65536
 
@@ -2051,8 +2048,6 @@ bfs_initialize(const char *partition, const char *name, const char *parameters,
 	uint32 flags = 0;
 	bool verbose = false;
 
-// TODO: driver_settings are not yet supported by the fsshell
-#ifndef BFS_SHELL
 	void *handle = parse_driver_settings_string(parameters);
 	if (handle != NULL) {
 		if (get_driver_boolean_parameter(handle, "noindex", false, true))
@@ -2073,7 +2068,6 @@ bfs_initialize(const char *partition, const char *name, const char *parameters,
 		INFORM(("valid block sizes are: 1024, 2048, 4096, and 8192\n"));
 		return B_BAD_VALUE;
 	}
-#endif
 
 	Volume volume(-1);
 	status_t status = volume.Initialize(partition, name, blockSize, flags);
