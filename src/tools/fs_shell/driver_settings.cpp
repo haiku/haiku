@@ -871,6 +871,6 @@ fssh_get_driver_settings(void *handle)
 
 // this creates an alias of the above function
 // unload_driver_settings() is the same as delete_driver_settings()
-extern __typeof(fssh_unload_driver_settings) fssh_delete_driver_settings
+extern "C" __typeof(fssh_unload_driver_settings) fssh_delete_driver_settings
 	__attribute__ ((alias ("fssh_unload_driver_settings")));
 
