@@ -26,15 +26,16 @@
 /* use pwents to find home */
 #define USE_PWENTS
 
+
+/* Haiku system directories */
+
 /* os root dir; just stick to 'beos' for now */
 #define OS "beos"
 //#define OS "haiku" // :)
 //#define OS "os"
 
-
-/* /bin/strings rox */
 static const char *os_dirs[] = {
-	OS,
+	OS,										// B_BEOS_DIRECTORY
 	OS "/system",
 	OS "/system/add-ons",
 	OS "/system/boot",
@@ -51,13 +52,15 @@ static const char *os_dirs[] = {
 	OS "/etc/sounds",
 };
 
+/* Common directories, shared among users */
+
 #define COMMON "common"
 	// ToDo: this is for now and might be changed back to "home"
 	//	(or even something else) later
 
 static const char *common_dirs[] = {
-	COMMON "",
-	COMMON "/config",
+	COMMON "",								// B_COMMON_DIRECTORY
+	COMMON "/config",						// B_COMMON_SYSTEM_DIRECTORY
 	COMMON "/config/add-ons",
 	COMMON "/config/boot",
 	COMMON "/config/fonts",
@@ -67,21 +70,23 @@ static const char *common_dirs[] = {
 	COMMON "/config/etc",
 	COMMON "/config/documentation",
 	COMMON "/config/settings",
-	"develop",
-	"var/log",
-	"var/spool",
-	"var/tmp",
-	"var",
+	"develop",								// B_COMMON_DEVELOP_DIRECTORY
+	"var/log",								// B_COMMON_LOG_DIRECTORY
+	"var/spool",							// B_COMMON_SPOOL_DIRECTORY
+	"var/tmp",								// B_COMMON_TEMP_DIRECTORY
+	"var",									// B_COMMON_VAR_DIRECTORY
 	COMMON "/config/add-ons/Translators",
 	COMMON "/config/add-ons/media",
 	COMMON "/config/sounds",
 };
 
+/* User directories */
+
 #define HOME "$h"
 
 static const char *user_dirs[] = {
-	HOME "",
-	HOME "/config",
+	HOME "",								// B_USER_DIRECTORY
+	HOME "/config",							// B_USER_CONFIG_DIRECTORY
 	HOME "/config/add-ons",
 	HOME "/config/boot",
 	HOME "/config/fonts",
@@ -94,51 +99,38 @@ static const char *user_dirs[] = {
 	HOME "/config/sounds",
 };
 
-/*
-utilities
-preferences
-apps
-*/
-
 
 /*! make dir and its parents if needed */
-
 static int
 create_path(const char *path, mode_t mode)
 {
 	char buffer[B_PATH_NAME_LENGTH + 1];
-	int slash = 0;
-	int plen = 0;
-	char *p;
-	struct stat st;
+	int pathLength;
+	int i = 0;
 
-	if (!path || ((plen = strlen(path)) > B_PATH_NAME_LENGTH))
+	if (path == NULL || ((pathLength = strlen(path)) > B_PATH_NAME_LENGTH))
 		return EINVAL;
 
-	memset(buffer, 0, B_PATH_NAME_LENGTH + 1);
-	errno = 0;
+	while (++i < pathLength) {
+		char *slash = strchr(&path[i], '/');
+		struct stat st;
 
-	while (1) {
-		slash++;
-		if (slash > plen)
-			return errno;
-		p = strchr(&path[slash], '/');
-		if (!p)
-			slash = plen;
-		else if (slash != p - path)
-			slash = p - path;
+		if (slash == NULL)
+			i = pathLength;
+		else if (i != slash - path)
+			i = slash - path;
 		else
 			continue;
 
-		strlcpy(buffer, path, slash);
+		strlcpy(buffer, path, i + 1);
 		if (stat(buffer, &st) < 0) {
 			errno = 0;
 			if (mkdir(buffer, mode) < 0)
 				return errno;
 		}
 	}
+
 	return 0;
-	
 }
 
 
@@ -197,6 +189,7 @@ find_directory(directory_which which, dev_t device, bool createIt,
 	}
 	
 	switch (which) {
+		/* Per volume directories */
 		case B_DESKTOP_DIRECTORY:
 			if (!strcmp(fsInfo.fsh_name, "bfs"))
 				template = "$h/Desktop";
@@ -208,6 +201,8 @@ find_directory(directory_which which, dev_t device, bool createIt,
 			else if (!strcmp(fsInfo.fsh_name, "dos"))
 				template = "RECYCLED/_BEOS_";
 			break;
+
+		/* Haiku system directories */
 		case B_BEOS_DIRECTORY:
 		case B_BEOS_SYSTEM_DIRECTORY:
 		case B_BEOS_ADDONS_DIRECTORY:
@@ -225,6 +220,8 @@ find_directory(directory_which which, dev_t device, bool createIt,
 		case B_BEOS_SOUNDS_DIRECTORY:
 			template = os_dirs[which - B_BEOS_DIRECTORY];
 			break;
+
+		/* Common directories, shared among users */
 		case B_COMMON_DIRECTORY:
 		case B_COMMON_SYSTEM_DIRECTORY:
 		case B_COMMON_ADDONS_DIRECTORY:
@@ -246,6 +243,8 @@ find_directory(directory_which which, dev_t device, bool createIt,
 		case B_COMMON_SOUNDS_DIRECTORY:
 			template = common_dirs[which - B_COMMON_DIRECTORY];
 			break;
+
+		/* User directories */
 		case B_USER_DIRECTORY:
 		case B_USER_CONFIG_DIRECTORY:
 		case B_USER_ADDONS_DIRECTORY:
@@ -260,6 +259,8 @@ find_directory(directory_which which, dev_t device, bool createIt,
 		case B_USER_SOUNDS_DIRECTORY:
 			template = user_dirs[which - B_USER_DIRECTORY];
 			break;
+
+		/* Global directories */
 		case B_APPS_DIRECTORY:
 			template = "apps";
 			break;
@@ -269,6 +270,7 @@ find_directory(directory_which which, dev_t device, bool createIt,
 		case B_UTILITIES_DIRECTORY:
 			template = "utilities";
 			break;
+
 		default:
 			free(buffer);
 			return EINVAL;
