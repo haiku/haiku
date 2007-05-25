@@ -203,9 +203,23 @@ fssh_ioctl(int fd, unsigned long op, ...)
 
 
 fssh_ssize_t
+fssh_read(int fd, void *buffer, fssh_size_t count)
+{
+	return read(fd, buffer, count);
+}
+
+
+fssh_ssize_t
 fssh_read_pos(int fd, fssh_off_t pos, void *buffer, fssh_size_t count)
 {
 	return read_pos(fd, pos, buffer, count);
+}
+
+
+fssh_ssize_t
+fssh_write(int fd, const void *buffer, fssh_size_t count)
+{
+	return write(fd, buffer, count);
 }
 
 
