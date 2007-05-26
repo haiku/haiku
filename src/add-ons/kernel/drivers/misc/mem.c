@@ -28,18 +28,18 @@ static status_t mem_write(void*, off_t, const void*, size_t*);
 static area_id mem_map_target(off_t position, size_t len, uint32 protection, void **va);
 
 static const char* mem_name[] = {
-    DEVICE_NAME,
+	DEVICE_NAME,
 #ifdef PUBLISH_DEV_MEM
 	DRIVER_NAME,
 #endif
-    NULL
+	NULL
 };
 
 
 device_hooks mem_hooks = {
 	mem_open,
-    mem_close,
-    mem_free,
+	mem_close,
+	mem_free,
 	NULL, /*mem_control,*/
 	mem_read,
 	mem_write,
@@ -50,14 +50,14 @@ int32 api_version = B_CUR_DRIVER_API_VERSION;
 status_t
 init_hardware(void)
 {
-    return B_OK;
+	return B_OK;
 }
 
 
 status_t
 init_driver(void)
 {
-    return B_OK;
+	return B_OK;
 }
 
 
@@ -70,7 +70,7 @@ uninit_driver(void)
 const char**
 publish_devices(void)
 {
-    return mem_name;
+	return mem_name;
 }
 
 
@@ -85,23 +85,23 @@ status_t
 mem_open(const char* name, uint32 flags, void** cookie)
 {
 	// not really needed.
-    *cookie = NULL;
+	*cookie = NULL;
 
-    return B_OK;
+	return B_OK;
 }
 
 
 status_t
 mem_close(void* cookie)
 {
-    return B_OK;
+	return B_OK;
 }
 
 
 status_t
 mem_free(void* cookie)
 {
-    return B_OK;
+	return B_OK;
 }
 
 /*
