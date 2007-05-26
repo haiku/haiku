@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "command_cp.h"
+#include "driver_settings.h"
 #include "external_commands.h"
 #include "fd.h"
 #include "fssh_dirent.h"
@@ -54,6 +55,14 @@ init_kernel()
 	error = module_init(NULL);
 	if (error != FSSH_B_OK) {
 		fprintf(stderr, "module_init() failed: %s\n", fssh_strerror(error));
+		return error;
+	}
+
+	// init driver settings
+	error = driver_settings_init();
+	if (error != FSSH_B_OK) {
+		fprintf(stderr, "initializing driver settings failed: %s\n",
+			fssh_strerror(error));
 		return error;
 	}
 

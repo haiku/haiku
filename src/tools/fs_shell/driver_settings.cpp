@@ -598,13 +598,14 @@ find_driver_settings(const char *name)
 }
 
 
-static fssh_status_t driver_settings_init_post_sem()
-	__attribute__((constructor));
+namespace FSShell {
 
-static fssh_status_t
-driver_settings_init_post_sem()
+fssh_status_t
+driver_settings_init()
 {
 	return mutex_init(&sLock, "driver settings");
+}
+
 }
 
 
