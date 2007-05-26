@@ -3,6 +3,8 @@
 hda_controller cards[MAXCARDS];
 uint32 num_cards;
 
+int32 api_version = B_CUR_DRIVER_API_VERSION;
+
 pci_module_info* pci;
 
 const char** publish_devices(void); /* Just to silence compiler */
