@@ -15,8 +15,8 @@
 
 #define DEVMNT "/dev/"
 
-/* symlink to /dev/mem */
-#define DO_SYMLINK
+/* also publish /dev/mem */
+#define PUBLISH_DEV_MEM
 
 static status_t mem_open(const char*, uint32, void**);
 static status_t mem_close(void*);
@@ -29,6 +29,9 @@ static area_id mem_map_target(off_t position, size_t len, uint32 protection, voi
 
 static const char* mem_name[] = {
     DEVICE_NAME,
+#ifdef PUBLISH_DEV_MEM
+	DRIVER_NAME,
+#endif
     NULL
 };
 
@@ -47,10 +50,6 @@ int32 api_version = B_CUR_DRIVER_API_VERSION;
 status_t
 init_hardware(void)
 {
-#ifdef DO_SYMLINK
-	/* Unix apps expect /dev/mem */
-	symlink(DEVMNT DEVICE_NAME, DEVMNT "mem");
-#endif
     return B_OK;
 }
 
