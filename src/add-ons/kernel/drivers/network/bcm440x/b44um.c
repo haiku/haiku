@@ -45,6 +45,9 @@ int32	 b44_interrupt(void *cookie);
 int32 tx_cleanup_thread(void *us);
 
 
+int32 api_version = B_CUR_DRIVER_API_VERSION;
+
+
 status_t
 init_hardware(void)
 {

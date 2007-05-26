@@ -265,6 +265,7 @@ static int32 b57_interrupt(void *cookie);
 static int32 tx_cleanup_thread(void *us);
 
 device_hooks b57_hooks = {b57_open,b57_close,b57_free,b57_ioctl,b57_read,b57_write,NULL,NULL,NULL,NULL};
+int32 api_version = B_CUR_DRIVER_API_VERSION;
 
 //int debug_fd;
 
