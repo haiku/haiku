@@ -1,7 +1,7 @@
 
 resource app_flags B_SINGLE_LAUNCH;
 
-resource app_signature "application/x-vnd.Be-PRNT2";
+resource app_signature "application/x-vnd.Be-PRNT";
 
 resource app_version {
 	major  = 1,
