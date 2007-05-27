@@ -2129,8 +2129,6 @@ BView::SetFont(const BFont* font, uint32 mask)
 
 	fState->font_flags |= mask;
 
-	InvalidateLayout();
-
 	if (fOwner) {
 		check_lock();
 		do_owner_check();

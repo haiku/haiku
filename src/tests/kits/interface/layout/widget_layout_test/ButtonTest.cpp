@@ -126,5 +126,7 @@ ButtonTest::_SetButtonFont(bool bigFont)
 
 		// set font
 		fButton->SetFont(bigFont ? fBigFont : fDefaultFont);
+		fButton->InvalidateLayout();
+		fButton->Invalidate();
 	}
 }
