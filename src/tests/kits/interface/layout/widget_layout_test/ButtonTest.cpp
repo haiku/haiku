@@ -25,13 +25,11 @@ enum {
 // constructor
 ButtonTest::ButtonTest()
 	: Test("Button", NULL),
-	  fButton(new BButton(BRect(0, 0, 9, 9), "test button", "",
-		(BMessage*)NULL, B_FOLLOW_NONE)),
+	  fButton(new BButton("test button", "", (BMessage*)NULL)),
 	  fLongTextCheckBox(NULL),
 	  fBigFontCheckBox(NULL),
 	  fDefaultFont(NULL),
 	  fBigFont(NULL)
-
 {
 	_SetButtonText(false);
 	SetView(fButton);
