@@ -108,7 +108,7 @@ class TCPEndpoint : public net_protocol, public ProtocolSocket {
 			size_t segmentLength);
 		void _MarkEstablished();
 		status_t _WaitForEstablished(MutexLocker &lock, bigtime_t timeout);
-		void _AddData(tcp_segment_header &segment, net_buffer *buffer);
+		bool _AddData(tcp_segment_header &segment, net_buffer *buffer);
 		void _PrepareReceivePath(tcp_segment_header &segment);
 		status_t _PrepareSendPath(const sockaddr *peer);
 		void _Acknowledged(tcp_segment_header &segment);

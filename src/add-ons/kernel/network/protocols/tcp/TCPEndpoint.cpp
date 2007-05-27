@@ -648,18 +648,18 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 			return B_OK;
 		}
 
-		if (fReceiveQueue.Available() >= dataNeeded ||
+		if (fReceiveQueue.Available() > 0) {
+			if (fReceiveQueue.Available() >= dataNeeded ||
 				((fReceiveQueue.PushedData() > 0)
 					&& (fReceiveQueue.PushedData() >= fReceiveQueue.Available())))
-			break;
-
-		if (fState == FINISH_RECEIVED) {
+				break;
+		} else if (fState == FINISH_RECEIVED) {
 			// ``If no text is awaiting delivery, the RECEIVE will
 			//   get a Connection closing''.
 			return B_OK;
 		}
 
-		if (flags & MSG_DONTWAIT)
+		if ((flags & MSG_DONTWAIT) || (socket->receive.timeout == 0))
 			return B_WOULD_BLOCK;
 
 		status_t status = fReceiveList.Wait(locker, timeout, false);
@@ -1024,8 +1024,8 @@ TCPEndpoint::_SegmentReceived(tcp_segment_header &segment, net_buffer *buffer)
 			&& fReceiveQueue.IsContiguous()
 			&& fReceiveQueue.Free() >= buffer->size
 			&& !(fFlags & FLAG_NO_RECEIVE)) {
-			_AddData(segment, buffer);
-			_NotifyReader();
+			if (_AddData(segment, buffer))
+				_NotifyReader();
 			return KEEP | ((segment.flags & TCP_FLAG_PUSH) ?
 				IMMEDIATE_ACKNOWLEDGE : ACKNOWLEDGE);
 		}
@@ -1544,10 +1544,9 @@ TCPEndpoint::_Receive(tcp_segment_header &segment, net_buffer *buffer)
 
 	bool notify = false;
 
-	if (buffer->size > 0 &&	_ShouldReceive()) {
-		_AddData(segment, buffer);
-		notify = true;
-	} else
+	if (buffer->size > 0 &&	_ShouldReceive())
+		notify = _AddData(segment, buffer);
+	else
 		action = (action & ~KEEP) | DROP;
 
 	if (segment.flags & TCP_FLAG_FINISH) {
@@ -1639,7 +1638,7 @@ TCPEndpoint::_WaitForEstablished(MutexLocker &locker, bigtime_t timeout)
 }
 
 
-void
+bool
 TCPEndpoint::_AddData(tcp_segment_header &segment, net_buffer *buffer)
 {
 	fReceiveQueue.Add(buffer, segment.sequence);
@@ -1650,6 +1649,8 @@ TCPEndpoint::_AddData(tcp_segment_header &segment, net_buffer *buffer)
 
 	if (segment.flags & TCP_FLAG_PUSH)
 		fReceiveQueue.SetPushPointer();
+
+	return fReceiveQueue.Available() > 0;
 }
 
 
