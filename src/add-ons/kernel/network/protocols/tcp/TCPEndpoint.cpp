@@ -766,12 +766,6 @@ TCPEndpoint::DeleteSocket()
 status_t
 TCPEndpoint::DelayedAcknowledge()
 {
-	// if the timer is already running, and there is still more than
-	// half of the receive window free, just wait for the timer to expire
-	if (gStackModule->is_timer_active(&fDelayedAcknowledgeTimer)
-		&& (fReceiveMaxAdvertised - fReceiveNext) > (socket->receive.buffer_size >> 1))
-		return B_OK;
-
 	if (gStackModule->cancel_timer(&fDelayedAcknowledgeTimer)) {
 		// timer was active, send an ACK now (with the exception above,
 		// we send every other ACK)
