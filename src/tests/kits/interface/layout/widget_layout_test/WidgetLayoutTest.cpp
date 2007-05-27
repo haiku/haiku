@@ -8,6 +8,7 @@
 #include <Application.h>
 #include <Window.h>
 
+#include "BoxTest.h"
 #include "ButtonTest.h"
 #include "CheckBox.h"
 #include "GroupView.h"
@@ -56,6 +57,7 @@ public:
 
 		// container for the test's controls
 		fTestControlsView = new View(BRect(410, 10, 690, 400));
+		fTestControlsView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		fViewContainer->View::AddChild(fTestControlsView);
 
 		// wrapper view
@@ -255,12 +257,28 @@ private:
 
 
 int
-main()
+main(int argc, const char* const* argv)
 {
+	// get test name
+	const char* testName = "button";
+	if (argc >= 2)
+		testName = argv[1];
+
+	// create app
 	BApplication app("application/x-vnd.haiku.widget-layout-test");
 
-	Test* test = new ButtonTest;
+	// create test
+	Test* test;
+	if (strcmp(testName, "box") == 0) {
+		test = new BoxTest;
+	} else if (strcmp(testName, "button") == 0) {
+		test = new ButtonTest;
+	} else {
+		fprintf(stderr, "Error: Invalid test name: \"%s\"\n", testName);
+		exit(1);
+	}
 
+	// show test window
 	BWindow* window = new TestWindow(test);
 	window->Show();
 
