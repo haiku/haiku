@@ -3578,7 +3578,7 @@ create_vnode(struct vnode *directory, const char *name, int openMode, int perms,
 	mutex_unlock(&sVnodeMutex);
 
 	if (vnode == NULL) {
-		dprintf("vfs: fs_create() returned success but there is no vnode!");
+		dprintf("vfs: fs_create() returned success but there is no vnode!\n");
 		return EINVAL;
 	}
 
