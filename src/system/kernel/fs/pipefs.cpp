@@ -1231,10 +1231,10 @@ pipefs_create(fs_volume _volume, fs_vnode _dir, const char *name, int openMode, 
 		}
 	} else {
 		// we can just open the pipe again
-		void *dummy;
-		get_vnode(volume->ID(), inode->ID(), &dummy);
 		wasCreated = false;
 	}
+	void *dummy;
+	get_vnode(volume->ID(), inode->ID(), &dummy);
 
 	volume->Unlock();
 
