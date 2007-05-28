@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -3550,16 +3550,16 @@ vfs_init(kernel_args *args)
 }
 
 
-//	#pragma mark -
-//	The filetype-dependent implementations (fd_ops + open/create/rename/remove, ...)
+//	#pragma mark - fd_ops implementations
 
 
-/** Calls fs_open() on the given vnode and returns a new
- *	file descriptor for it
- */
-
+/*!
+	Calls fs_open() on the given vnode and returns a new
+	file descriptor for it
+*/
 static int
-create_vnode(struct vnode *directory, const char *name, int openMode, int perms, bool kernel)
+create_vnode(struct vnode *directory, const char *name, int openMode,
+	int perms, bool kernel)
 {
 	struct vnode *vnode;
 	fs_cookie cookie;
@@ -3569,7 +3569,8 @@ create_vnode(struct vnode *directory, const char *name, int openMode, int perms,
 	if (FS_CALL(directory, create) == NULL)
 		return EROFS;
 
-	status = FS_CALL(directory, create)(directory->mount->cookie, directory->private_node, name, openMode, perms, &cookie, &newID);
+	status = FS_CALL(directory, create)(directory->mount->cookie,
+		directory->private_node, name, openMode, perms, &cookie, &newID);
 	if (status < B_OK)
 		return status;
 
@@ -3578,8 +3579,9 @@ create_vnode(struct vnode *directory, const char *name, int openMode, int perms,
 	mutex_unlock(&sVnodeMutex);
 
 	if (vnode == NULL) {
-		dprintf("vfs: fs_create() returned success but there is no vnode!\n");
-		return EINVAL;
+		panic("vfs: fs_create() returned success but there is no vnode, mount ID %ld!\n",
+			directory->device);
+		return B_BAD_VALUE;
 	}
 
 	if ((status = get_new_fd(FDTYPE_FILE, NULL, vnode, cookie, openMode, kernel)) >= 0)
@@ -3597,10 +3599,10 @@ create_vnode(struct vnode *directory, const char *name, int openMode, int perms,
 }
 
 
-/** Calls fs_open() on the given vnode and returns a new
- *	file descriptor for it
- */
-
+/*!
+	Calls fs_open() on the given vnode and returns a new
+	file descriptor for it
+*/
 static int
 open_vnode(struct vnode *vnode, int openMode, bool kernel)
 {
@@ -5232,8 +5234,7 @@ query_rewind(struct file_descriptor *descriptor)
 }
 
 
-//	#pragma mark -
-//	General File System functions
+//	#pragma mark - General File System functions
 
 
 static dev_t
@@ -5877,8 +5878,7 @@ err:
 }
 
 
-//	#pragma mark -
-//	Calls from within the kernel
+//	#pragma mark - kernel mirrored syscalls
 
 
 dev_t
@@ -6560,8 +6560,7 @@ _kern_setcwd(int fd, const char *path)
 }
 
 
-//	#pragma mark -
-//	Calls from userland (with extra address checks)
+//	#pragma mark - userland syscalls
 
 
 dev_t
