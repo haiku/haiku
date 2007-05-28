@@ -14,6 +14,12 @@
 #include "uhci_hardware.h"
 #include <lock.h>
 
+#define UHCI_INTERRUPT_QUEUE				0
+#define UHCI_LOW_SPEED_CONTROL_QUEUE		1
+#define UHCI_FULL_SPEED_CONTROL_QUEUE		2
+#define UHCI_BULK_QUEUE						3
+#define UHCI_BANDWIDTH_RECLAMATION_QUEUE	4
+
 struct pci_info;
 struct pci_module_info;
 class UHCIRootHub;
@@ -70,6 +76,7 @@ public:
 virtual	status_t					SubmitTransfer(Transfer *transfer);
 virtual status_t					CancelQueuedTransfers(Pipe *pipe);
 		status_t					SubmitRequest(Transfer *transfer);
+		status_t					SubmitIsochronous(Transfer *transfer);
 
 static	status_t					AddTo(Stack *stack);
 
@@ -148,6 +155,10 @@ static	pci_module_info				*sPCIModule;
 		// Frame list memory
 		area_id						fFrameArea;
 		addr_t						*fFrameList;
+
+		// fFrameBandwidth[n] holds the available bandwidth 
+		// of the nth frame in microseconds
+		int32						*fFrameBandwidth;
 
 		// Queues
 		int32						fQueueCount;

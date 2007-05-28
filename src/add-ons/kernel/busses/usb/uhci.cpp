@@ -367,6 +367,7 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	// 1: low speed control transfers
 	// 2: full speed control transfers
 	// 3: bulk transfers
+	// TODO: 4: bandwidth reclamation queue
 	fQueueCount = 4;
 	fQueues = new(std::nothrow) Queue *[fQueueCount];
 	if (!fQueues) {
@@ -389,8 +390,14 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	// Make sure the last queue terminates
 	fQueues[fQueueCount - 1]->TerminateByStrayDescriptor();
 
-	for (int32 i = 0; i < 1024; i++)
-		fFrameList[i] = fQueues[0]->PhysicalAddress() | FRAMELIST_NEXT_IS_QH;
+	// Create the array that will keep bandwidth information
+	fFrameBandwidth = new(std::nothrow) int32[NUMBER_OF_FRAMES];
+
+	for (int32 i = 0; i < NUMBER_OF_FRAMES; i++) {
+		fFrameList[i] =	fQueues[UHCI_INTERRUPT_QUEUE]->PhysicalAddress()
+			| FRAMELIST_NEXT_IS_QH;
+		fFrameBandwidth[i] = MAX_AVAILABLE_BANDWIDTH;
+	}
 
 	// create semaphore the finisher thread will wait for
 	fFinishTransfersSem = create_sem(0, "UHCI Finish Transfers");
@@ -437,6 +444,7 @@ UHCI::~UHCI()
 		delete fQueues[i];
 
 	delete [] fQueues;
+	delete [] fFrameBandwidth;
 	delete fRootHub;
 	delete_area(fFrameArea);
 
@@ -506,6 +514,10 @@ UHCI::SubmitTransfer(Transfer *transfer)
 	if (transfer->TransferPipe()->Type() & USB_OBJECT_CONTROL_PIPE)
 		return SubmitRequest(transfer);
 
+	// Process isochronous transfers
+	if (transfer->TransferPipe()->Type() & USB_OBJECT_ISO_PIPE)
+		return SubmitIsochronous(transfer);
+
 	uhci_td *firstDescriptor = NULL;
 	uhci_qh *transferQueue = NULL;
 	status_t result = CreateFilledTransfer(transfer, &firstDescriptor,
@@ -516,11 +528,9 @@ UHCI::SubmitTransfer(Transfer *transfer)
 	Queue *queue = NULL;
 	Pipe *pipe = transfer->TransferPipe();
 	if (pipe->Type() & USB_OBJECT_INTERRUPT_PIPE) {
-		// use interrupt queue
-		queue = fQueues[0];
+		queue = fQueues[UHCI_INTERRUPT_QUEUE];
 	} else {
-		// use bulk queue
-		queue = fQueues[3];
+		queue = fQueues[UHCI_BULK_QUEUE];
 	}
 
 	bool directionIn = (pipe->Direction() == Pipe::In);
@@ -634,11 +644,9 @@ UHCI::SubmitRequest(Transfer *transfer)
 
 	Queue *queue = NULL;
 	if (pipe->Speed() == USB_SPEED_LOWSPEED) {
-		// use the low speed control queue
-		queue = fQueues[1];
+		queue = fQueues[UHCI_LOW_SPEED_CONTROL_QUEUE];
 	} else {
-		// use the full speed control queue
-		queue = fQueues[2];
+		queue = fQueues[UHCI_FULL_SPEED_CONTROL_QUEUE];
 	}
 
 	uhci_qh *transferQueue = CreateTransferQueue(setupDescriptor);
@@ -694,6 +702,26 @@ UHCI::AddPendingTransfer(Transfer *transfer, Queue *queue,
 	fLastTransfer = data;
 	Unlock();
 	return B_OK;
+}
+
+
+status_t
+UHCI::SubmitIsochronous(Transfer *transfer)
+{
+	/*
+	 * This is the main isochronous method.
+	 * Here we attach one Transfer Descriptor (TD) per frame by starting
+	 * at the position specified by StartingFrameNumber. If there is
+	 * not enought bandwidth at that entry number, we find the next
+	 * available one.
+	 * The TD is obviously appended to the latest existing isochronous
+	 * TD (if any) in that frame.
+	 * Everytime a TD is added, fFrameBandiwidth[i] is decremented by
+	 * the TD bandwidth, while it is incremented once the TD has been
+	 * processed by the controller
+	 */
+
+	return B_ERROR;
 }
 
 

@@ -79,15 +79,18 @@
 #define FRAMELIST_TERMINATE    0x1
 #define FRAMELIST_NEXT_IS_QH   0x2
 
+// Number of frames
+#define NUMBER_OF_FRAMES		1024
+#define MAX_AVAILABLE_BANDWIDTH	900	// Microseconds
 
 // Represents a Transfer Descriptor (TD)
 typedef struct
 {
 	// Hardware part
-	addr_t	link_phy;		// Link to the next TD/QH
+	uint32	link_phy;		// Link to the next TD/QH
 	uint32	status;			// Status field
 	uint32	token;			// Contains the packet header (where it needs to be sent)
-	void	*buffer_phy;	// A pointer to the buffer with the actual packet
+	uint32	buffer_phy;		// A pointer to the buffer with the actual packet
 	// Software part
 	addr_t	this_phy;		// A physical pointer to this address
 	void	*link_log;		// Pointer to the next logical TD/QT
@@ -139,8 +142,8 @@ typedef struct
 typedef struct
 {
 	// Hardware part
-	addr_t	link_phy;		// Link to the next TD/QH
-	addr_t	element_phy;	// Pointer to the first element in the queue
+	uint32	link_phy;		// Link to the next TD/QH
+	uint32	element_phy;	// Pointer to the first element in the queue
 	// Software part
 	addr_t	this_phy;		// The physical pointer to this address
 	void	*link_log;		// Pointer to the next logical TD/QH
