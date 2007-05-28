@@ -87,10 +87,10 @@
 typedef struct
 {
 	// Hardware part
-	uint32	link_phy;		// Link to the next TD/QH
+	addr_t	link_phy;		// Link to the next TD/QH
 	uint32	status;			// Status field
 	uint32	token;			// Contains the packet header (where it needs to be sent)
-	uint32	buffer_phy;		// A pointer to the buffer with the actual packet
+	void	*buffer_phy;	// A pointer to the buffer with the actual packet
 	// Software part
 	addr_t	this_phy;		// A physical pointer to this address
 	void	*link_log;		// Pointer to the next logical TD/QT
@@ -142,8 +142,8 @@ typedef struct
 typedef struct
 {
 	// Hardware part
-	uint32	link_phy;		// Link to the next TD/QH
-	uint32	element_phy;	// Pointer to the first element in the queue
+	addr_t	link_phy;		// Link to the next TD/QH
+	addr_t	element_phy;	// Pointer to the first element in the queue
 	// Software part
 	addr_t	this_phy;		// The physical pointer to this address
 	void	*link_log;		// Pointer to the next logical TD/QH
