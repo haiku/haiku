@@ -228,8 +228,9 @@ BColumn::_Sanitize(BColumn *column)
 		return NULL;
 	}
 #if DEBUG
-	else if (endianSwap)
-		PRINT(("Instantiated foreign column ok\n"));
+// TODO: Whatever this is supposed to mean, fix it.
+//	else if (endianSwap)
+//		PRINT(("Instantiated foreign column ok\n"));
 #endif
 
 	return column;
@@ -417,8 +418,9 @@ BViewState::_Sanitize(BViewState *state, bool fixOnly)
 		return NULL;
 	}
 #if DEBUG
-	else if (endianSwap)
-		PRINT(("Instantiated foreign view state ok\n"));
+// TODO: Whatever this is supposed to mean, fix it.
+//	else if (endianSwap)
+//		PRINT(("Instantiated foreign view state ok\n"));
 #endif
 
 	return state;
