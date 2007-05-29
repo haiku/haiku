@@ -575,8 +575,10 @@ jas_stream_positionIOopen(BPositionIO *positionIO)
 	memset(stream, 0, sizeof(jas_stream_t));
 	stream->rwlimit_ = -1;
 	stream->obj_=(jas_stream_obj_t *)malloc(sizeof(BPositionIO*));
-	if (stream->obj_ == (jas_stream_obj_t *)NULL)
+	if (stream->obj_ == (jas_stream_obj_t *)NULL) {
+		free(stream);
 		return (jas_stream_t *)NULL;
+	}
 
 	*((BPositionIO**)stream->obj_) = positionIO;
 	stream->ops_ = (&positionIOops);
@@ -669,7 +671,8 @@ SSlider::UpdateText() const
 }
 
 
-//!	BSlider::ResizeToPreferred + Resize width if it's too small to show label and status
+//!	BSlider::ResizeToPreferred + Resize width if it's too small to show label
+// and status
 void
 SSlider::ResizeToPreferred()
 {
@@ -857,7 +860,8 @@ TranslatorAboutView::TranslatorAboutView(const char *name, float x, float y)
 			strlcpy(text, current, sizeof(text));
 			current = NULL;
 		} else {
-			strlcpy(text, current, min_c((int32)sizeof(text), newLine + 1 - current));
+			strlcpy(text, current, min_c((int32)sizeof(text),
+				newLine + 1 - current));
 			current = newLine + 1;
 		}
 
@@ -890,7 +894,8 @@ TranslatorView::TranslatorView(const char *name)
 
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
-	fTabHeight = (int32)ceilf(fontHeight.ascent + fontHeight.descent + fontHeight.leading) + 7;
+	fTabHeight = (int32)ceilf(fontHeight.ascent + fontHeight.descent
+		+ fontHeight.leading) + 7;
 	// Add left and top margins
 	float top = fTabHeight + 20;
 	float left = 0;
@@ -1072,12 +1077,15 @@ MakeConfig(BMessage *ioExtension, BView **outView, BRect *outExtent)
 
 //!	Determine whether or not we can handle this data
 status_t
-Identify(BPositionIO *inSource, const translation_format *inFormat, BMessage *ioExtension, translator_info *outInfo, uint32 outType)
+Identify(BPositionIO *inSource, const translation_format *inFormat,
+	BMessage *ioExtension, translator_info *outInfo, uint32 outType)
 {
-	if ((outType != 0) && (outType != B_TRANSLATOR_BITMAP) && outType != JP2_FORMAT)
+	if ((outType != 0) && (outType != B_TRANSLATOR_BITMAP)
+		&& outType != JP2_FORMAT)
 		return B_NO_TRANSLATOR;
 
-	// !!! You might need to make this buffer bigger to test for your native format
+	// !!! You might need to make this buffer bigger to test for your
+	// native format
 	off_t position = inSource->Position();
 	uint8 header[sizeof(TranslatorBitmap)];
 	status_t err = inSource->Read(header, sizeof(TranslatorBitmap));
@@ -1085,7 +1093,8 @@ Identify(BPositionIO *inSource, const translation_format *inFormat, BMessage *io
 	if (err < B_OK)
 		return err;
 
-	if (B_BENDIAN_TO_HOST_INT32(((TranslatorBitmap *)header)->magic) == B_TRANSLATOR_BITMAP) {
+	if (B_BENDIAN_TO_HOST_INT32(((TranslatorBitmap *)header)->magic)
+		== B_TRANSLATOR_BITMAP) {
 		outInfo->type = inputFormats[1].type;
 		outInfo->translator = 0;
 		outInfo->group = inputFormats[1].group;
@@ -1094,8 +1103,10 @@ Identify(BPositionIO *inSource, const translation_format *inFormat, BMessage *io
 		strcpy(outInfo->name, inputFormats[1].name);
 		strcpy(outInfo->MIME, inputFormats[1].MIME);
 	} else {
-		if ((((header[4] << 24) | (header[5] << 16) | (header[6] << 8) | header[7]) == JP2_BOX_JP) ||	// JP2
-			(header[0] == (JPC_MS_SOC >> 8) && header[1] == (JPC_MS_SOC & 0xff)))	// JPC
+		if ((((header[4] << 24) | (header[5] << 16) | (header[6] << 8)
+			| header[7]) == JP2_BOX_JP) // JP2
+			|| (header[0] == (JPC_MS_SOC >> 8) && header[1]
+			== (JPC_MS_SOC & 0xff)))	// JPC
 		{
 			outInfo->type = inputFormats[0].type;
 			outInfo->translator = 0;
@@ -1115,7 +1126,8 @@ Identify(BPositionIO *inSource, const translation_format *inFormat, BMessage *io
 
 //!	Arguably the most important method in the add-on
 status_t
-Translate(BPositionIO *inSource, const translator_info *inInfo, BMessage *ioExtension, uint32 outType, BPositionIO *outDestination)
+Translate(BPositionIO *inSource, const translator_info *inInfo,
+	BMessage *ioExtension, uint32 outType, BPositionIO *outDestination)
 {
 	// If no specific type was requested, convert to the interchange format
 	if (outType == 0)
@@ -1199,7 +1211,8 @@ Compress(BPositionIO *in, BPositionIO *out)
 
 	// Function pointer to write function
 	// It MUST point to proper function
-	void (*converter)(jas_matrix_t **pixels, jpr_uchar_t *inscanline, int width) = write_rgba32;
+	void (*converter)(jas_matrix_t **pixels, jpr_uchar_t *inscanline,
+		int width) = write_rgba32;
 
 	// Default color info
 	int out_color_space = JAS_IMAGE_CS_RGB;
@@ -1312,7 +1325,8 @@ Compress(BPositionIO *in, BPositionIO *out)
 		component_info[i].prec = (unsigned int)8;
 	}
 
-	image = jas_image_create((short)out_color_components, component_info, out_color_space);
+	image = jas_image_create((short)out_color_components, component_info,
+		out_color_space);
 	if (image == (jas_image_t *)NULL)
 		return Error(outs, NULL, NULL, 0, NULL, B_ERROR);
 
@@ -1329,19 +1343,28 @@ Compress(BPositionIO *in, BPositionIO *out)
 	int32 y = 0;
 	for (y = 0; y < (long)height; y++) {
 		err = in->Read(in_scanline, in_row_bytes);
-		if (err < in_row_bytes)
-			return (err < B_OK) ? Error(outs, image, pixels, out_color_components, in_scanline, err) : Error(outs, image, pixels, out_color_components, in_scanline, B_ERROR);
+		if (err < in_row_bytes) {
+			return (err < B_OK) ?
+				Error(outs, image, pixels, out_color_components, in_scanline,
+					err)
+				: Error(outs, image, pixels, out_color_components, in_scanline,
+					B_ERROR);
+		}
 
 		converter(pixels, in_scanline, width);
 
-		for (i = 0; i < (long)out_color_components; i++)
-			(void)jas_image_writecmpt(image, (short)i, 0, (unsigned int)y, (unsigned int)width, 1, pixels[i]);
+		for (i = 0; i < (long)out_color_components; i++) {
+			(void)jas_image_writecmpt(image, (short)i, 0, (unsigned int)y,
+				(unsigned int)width, 1, pixels[i]);
+		}
 	}
 
 	char opts[16];
 	sprintf(opts, "rate=%1f", (float)settings.Quality / 100.0);
-	if (jas_image_encode(image, outs, jas_image_strtofmt(settings.JPC ? (char*)"jpc" : (char*)"jp2"), opts))
+	if (jas_image_encode(image, outs, jas_image_strtofmt(settings.JPC ?
+		(char*)"jpc" : (char*)"jp2"), opts)) {
 		return Error(outs, image, pixels, out_color_components, in_scanline, err);
+	}
 
 	free(in_scanline);
 
@@ -1383,7 +1406,8 @@ Decompress(BPositionIO *in, BPositionIO *out)
 
 	// Function pointer to read function
 	// It MUST point to proper function
-	void (*converter)(jas_matrix_t **pixels, jpr_uchar_t *outscanline, int width) = NULL;
+	void (*converter)(jas_matrix_t **pixels, jpr_uchar_t *outscanline,
+		int width) = NULL;
 
 	switch (jas_image_colorspace(image)) {
 		case JAS_IMAGE_CS_RGB:
@@ -1395,7 +1419,8 @@ Decompress(BPositionIO *in, BPositionIO *out)
 				out_color_space = B_RGBA32;
 				converter = read_rgba32;
 			} else {
-				(new BAlert("Error", "Other than RGB with 3 or 4 color components not implemented.", "Quit"))->Go();
+				(new BAlert("Error", "Other than RGB with 3 or 4 color "
+					"components not implemented.", "Quit"))->Go();
 				return Error(ins, image, NULL, 0, NULL, B_ERROR);
 			}
 			break;
@@ -1411,7 +1436,8 @@ Decompress(BPositionIO *in, BPositionIO *out)
 			}
 			break;
 		case JAS_IMAGE_CS_YCBCR:
-			(new BAlert("Error", "color space YCBCR not implemented yet.", "Quit"))->Go();
+			(new BAlert("Error", "color space YCBCR not implemented yet.",
+				"Quit"))->Go();
 			return Error(ins, image, NULL, 0, NULL, B_ERROR);
 			break;
 		case JAS_IMAGE_CS_UNKNOWN:
@@ -1462,14 +1488,21 @@ Decompress(BPositionIO *in, BPositionIO *out)
 
 	int32 y = 0;
 	for (y = 0; y < (long)height; y++) {
-		for (i = 0; i < (long)in_color_components; i++)
-			(void)jas_image_readcmpt(image, (short)i, 0, (unsigned int)y, (unsigned int)width, 1, pixels[i]);
+		for (i = 0; i < (long)in_color_components; i++) {
+			(void)jas_image_readcmpt(image, (short)i, 0, (unsigned int)y,
+				(unsigned int)width, 1, pixels[i]);
+		}
 
 		converter(pixels, out_scanline, (int32)width);
 
 		err = out->Write(out_scanline, out_row_bytes);
-		if (err < out_row_bytes)
-			return (err < B_OK) ? Error(ins, image, pixels, in_color_components, out_scanline, err) : Error(ins, image, pixels, in_color_components, out_scanline, B_ERROR);
+		if (err < out_row_bytes) {
+			return (err < B_OK) ?
+				Error(ins, image, pixels, in_color_components, out_scanline,
+					err)
+				: Error(ins, image, pixels, in_color_components, out_scanline,
+					B_ERROR);
+		}
 	}
 
 	free(out_scanline);
@@ -1490,7 +1523,8 @@ Decompress(BPositionIO *in, BPositionIO *out)
 	Returns given error (B_ERROR by default)
 */
 status_t
-Error(jas_stream_t *stream, jas_image_t *image, jas_matrix_t **pixels, int32 pixels_count, jpr_uchar_t *scanline, status_t error)
+Error(jas_stream_t *stream, jas_image_t *image, jas_matrix_t **pixels,
+	int32 pixels_count, jpr_uchar_t *scanline, status_t error)
 {
 	if (pixels) {
 		int32 i;
