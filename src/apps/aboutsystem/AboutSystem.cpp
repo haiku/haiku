@@ -396,7 +396,6 @@ AboutView::AboutView(const BRect &rect)
 		"Oscar Lesta\n"
 		"Jerome Leveque\n"
 		"Graham MacDonald\n"
-		"Jorge G. Mare\n"
 		"Brian Matzon\n"
 		"Christopher ML Zumwalt May\n"
 		"Andrew McCall\n"
