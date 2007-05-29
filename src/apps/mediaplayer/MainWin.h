@@ -2,6 +2,7 @@
  * MainWin.h - Media Player for the Haiku Operating System
  *
  * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
+ * Copyright (C) 2007 Stephan Aßmus <superstippi@gmx.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,11 +30,13 @@
 #include "ControllerView.h"
 #include "InfoWin.h"
 #include "VideoView.h"
-#include "Player.h"
 #include "Playlist.h"
 
-class MainWin : public BWindow, public Player
-{
+class ControllerObserver;
+class PlaylistObserver;
+class PlaylistWindow;
+
+class MainWin : public BWindow {
 public:
 						MainWin();
 						~MainWin();
@@ -45,8 +48,8 @@ public:
 	void				MessageReceived(BMessage *msg);
 	bool				QuitRequested();
 
-	void				MouseDown(BMessage *msg);
-	void				MouseMoved(BMessage *msg);
+	void				MouseDown(BMessage *msg, BView* originalHandler);
+	void				MouseMoved(BMessage *msg, BView* originalHandler);
 	void				MouseUp(BMessage *msg);
 	status_t			KeyDown(BMessage *msg);
 
@@ -58,9 +61,9 @@ public:
 	void				ResizeVideoView(int x, int y, int width, int height);
 	
 	void				ShowFileInfo();
+	void				ShowPlaylistWindow();
 	void				MaybeUpdateFileInfo(uint32 which=INFO_ALL);
 
-						// from Player
 	void				OpenFile(const entry_ref &ref);
 	
 	void				VideoFormatChange(int width, int height, float width_scale, float height_scale);
@@ -74,27 +77,39 @@ public:
 	void				ToggleNoBorderNoMenu();
 	
 	void				ShowContextMenu(const BPoint &screen_point);
-	
+
+	void				UpdateControlsEnabledStatus();
+	void				_UpdatePlaylistMenu();
+	void				_AddPlaylistItem(const entry_ref& ref, int32 index);
+	void				_RemovePlaylistItem(int32 index);
+	void				_MarkPlaylistItem(int32 index);
+
 	BMenuBar *			fMenuBar;
 	BView *				fBackground;
 	VideoView *			fVideoView;
 	BFilePanel *		fFilePanel;
 	ControllerView *	fControls;
 	InfoWin *			fInfoWin;
+	PlaylistWindow*		fPlaylistWindow;
 	bool				fInfoWinShowing;
 
 	BMenu *				fFileMenu;
-	BMenu *				fViewMenu;
 	BMenu *				fAudioMenu;
 	BMenu *				fVideoMenu;
+	BMenu *				fAudioTrackMenu;
+	BMenu *				fVideoTrackMenu;
 	BMenu *				fSettingsMenu;
+	BMenu *				fPlaylistMenu;
 	BMenu *				fDebugMenu;
 	
 	bool				fHasFile;
 	bool				fHasVideo;
+	bool				fHasAudio;
 
 	Playlist *			fPlaylist;
+	PlaylistObserver*	fPlaylistObserver;
 	Controller *		fController;
+	ControllerObserver*	fControllerObserver;
 	volatile bool		fIsFullscreen;
 	volatile bool		fKeepAspectRatio;
 	volatile bool		fAlwaysOnTop;
@@ -105,6 +120,7 @@ public:
 	int					fSourceHeight;
 	float				fWidthScale;
 	float				fHeightScale;
+	int					fMenuBarWidth;
 	int					fMenuBarHeight;
 	int					fControlsHeight;
 	int					fControlsWidth;
@@ -112,6 +128,10 @@ public:
 	bool				fMouseDownTracking;
 	BPoint				fMouseDownMousePos;
 	BPoint				fMouseDownWindowPos;
+
+private:
+	void				_AppendToPlaylist(const entry_ref& ref,
+							Playlist* playlist);
 };
 
 #endif

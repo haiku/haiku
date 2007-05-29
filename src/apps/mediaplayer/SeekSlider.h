@@ -34,6 +34,7 @@ class SeekSlider : public BControl {
 
 	// SeekSlider
 			void				SetPosition(float position);
+			bool				IsTracking() const;
 
 private:
 			int32				_ValueFor(float x) const;
@@ -44,8 +45,11 @@ private:
 											 rgb_color top,
 											 rgb_color right,
 											 rgb_color bottom);
+			void				_SetKnobPosition(int32 knobPos);
+
 
 			bool				fTracking;
+			bigtime_t			fLastTrackTime;
 			int32				fKnobPos;
 			int32				fMinValue;
 			int32				fMaxValue;

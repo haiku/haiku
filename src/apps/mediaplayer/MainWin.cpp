@@ -2,6 +2,7 @@
  * MainWin.cpp - Media Player for the Haiku Operating System
  *
  * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
+ * Copyright (C) 2007 Stephan Aßmus <superstippi@gmx.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +19,6 @@
  *
  */
 #include "MainWin.h"
-#include "MainApp.h"
 
 #include <View.h>
 #include <Screen.h>
@@ -35,6 +35,11 @@
 #include <Debug.h>
 #include <math.h>
 
+#include "ControllerObserver.h"
+#include "PlaylistObserver.h"
+#include "PlaylistWindow.h"
+#include "MainApp.h"
+
 #define NAME "MediaPlayer"
 #define MIN_WIDTH 250
 
@@ -48,6 +53,7 @@ enum
 	M_FILE_OPEN = 0x1000,
 	M_FILE_NEWPLAYER,
 	M_FILE_INFO,
+	M_FILE_PLAYLIST,
 	M_FILE_ABOUT,
 	M_FILE_CLOSE,
 	M_FILE_QUIT,	
@@ -79,6 +85,8 @@ enum
 	M_SELECT_AUDIO_TRACK_END	= 0x00000fff,
 	M_SELECT_VIDEO_TRACK		= 0x00010000,
 	M_SELECT_VIDEO_TRACK_END	= 0x000fffff,
+
+	M_SET_PLAYLIST_POSITION
 };
 
 //#define printf(a...)
@@ -88,11 +96,17 @@ MainWin::MainWin()
  :	BWindow(BRect(100,100,350,300), NAME, B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS /* | B_WILL_ACCEPT_FIRST_CLICK */)
  ,  fFilePanel(NULL)
  ,	fInfoWin(NULL)
+ ,	fPlaylistWindow(NULL)
  ,	fInfoWinShowing(false)
  ,	fHasFile(false)
  ,	fHasVideo(false)
+ ,	fHasAudio(false)
  ,	fPlaylist(new Playlist)
+ ,	fPlaylistObserver(new PlaylistObserver(this))
  ,	fController(new Controller)
+ ,	fControllerObserver(new ControllerObserver(this,
+ 		OBSERVE_FILE_CHANGES | OBSERVE_TRACK_CHANGES
+ 			| OBSERVE_PLAYBACK_STATE_CHANGES | OBSERVE_POSITION_CHANGES))
  ,	fIsFullscreen(false)
  ,	fKeepAspectRatio(true)
  ,	fAlwaysOnTop(false)
@@ -121,6 +135,7 @@ MainWin::MainWin()
 	CreateMenu();
 	fBackground->AddChild(fMenuBar);
 	fMenuBar->ResizeToPreferred();
+	fMenuBarWidth = (int)fMenuBar->Frame().Width() + 1;
 	fMenuBarHeight = (int)fMenuBar->Frame().Height() + 1;
 	fMenuBar->SetResizingMode(B_FOLLOW_NONE);
 
@@ -131,7 +146,7 @@ MainWin::MainWin()
 	
 	// controls
 	rect = BRect(0, fMenuBarHeight + 11, fBackground->Bounds().right, fBackground->Bounds().bottom);
-	fControls = new ControllerView(rect, fController, fPlaylist, this);
+	fControls = new ControllerView(rect, fController, fPlaylist);
 	fBackground->AddChild(fControls);
 	fControls->ResizeToPreferred();
 	fControlsHeight = (int)fControls->Frame().Height() + 1;
@@ -140,17 +155,18 @@ MainWin::MainWin()
 //	fControls->MoveTo(0, fBackground->Bounds().bottom - fControlsHeight + 1);
 	
 //	fVideoView->ResizeTo(fBackground->Bounds().Width(), fBackground->Bounds().Height() - fMenuBarHeight - fControlsHeight);
-	
+
+	fPlaylist->AddListener(fPlaylistObserver);
 	fController->SetVideoView(fVideoView);
-	fController->SetControllerView(fControls);
+	fController->AddListener(fControllerObserver);
 	fVideoView->IsOverlaySupported();
 	
-	printf("fMenuBarHeight %d\n", fMenuBarHeight);
-	printf("fControlsHeight %d\n", fControlsHeight);
-	printf("fControlsWidth %d\n", fControlsWidth);
+//	printf("fMenuBarHeight %d\n", fMenuBarHeight);
+//	printf("fControlsHeight %d\n", fControlsHeight);
+//	printf("fControlsWidth %d\n", fControlsWidth);
 
 	SetupWindow();
-	
+
 	Show();
 }
 
@@ -158,13 +174,27 @@ MainWin::MainWin()
 MainWin::~MainWin()
 {
 	printf("MainWin::~MainWin\n");
-	delete fPlaylist;
-	delete fController;
-	delete fFilePanel;
+
+	fPlaylist->RemoveListener(fPlaylistObserver);
+	fController->RemoveListener(fControllerObserver);
+
+	// give the views a chance to detach from any notifiers
+	// before we delete them
+	fBackground->RemoveSelf();
+	delete fBackground;
+
 	if (fInfoWin) {
 		fInfoWin->Lock();
 		fInfoWin->Quit();
 	}
+	if (fPlaylistWindow) {
+		fPlaylistWindow->Lock();
+		fPlaylistWindow->Quit();
+	}
+
+	delete fPlaylist;
+	delete fController;
+	delete fFilePanel;
 }
 
 
@@ -175,16 +205,26 @@ MainWin::OpenFile(const entry_ref &ref)
 
 	status_t err = fController->SetTo(ref);
 	if (err != B_OK) {
-		char s[300];
-		sprintf(s, "Can't open file\n\n%s\n\nError 0x%08lx\n(%s)\n",
-			ref.name, err, strerror(err));
-		(new BAlert("error", s, "OK"))->Go();
+		if (fPlaylist->CountItems() == 1) {
+			// display error if this is the only file we're supposed to play
+			char s[300];
+			sprintf(s, "Can't open file\n\n%s\n\nError 0x%08lx\n(%s)\n",
+				ref.name, err, strerror(err));
+			(new BAlert("error", s, "OK"))->Go();
+		} else {
+			// just go to the next file and don't bother user
+			// TODO: this makes it impossible to skip backwards
+			// over a non recognized file!
+			fPlaylist->SetCurrentRefIndex(fPlaylist->CurrentRefIndex() + 1);
+		}
 		fHasFile = false;
 		fHasVideo = false;
+		fHasAudio = false;
 		SetTitle(NAME);
 	} else {
 		fHasFile = true;
 		fHasVideo = fController->VideoTrackCount() != 0;
+		fHasAudio = fController->AudioTrackCount() != 0;
 		SetTitle(ref.name);
 	}
 	SetupWindow();
@@ -198,11 +238,15 @@ MainWin::SetupWindow()
 	// Populate the track menus
 	SetupTrackMenus();
 	// Enable both if a file was loaded
-	fAudioMenu->SetEnabled(fHasFile);
-	fVideoMenu->SetEnabled(fHasFile);
+	fAudioTrackMenu->SetEnabled(fHasFile);
+	fVideoTrackMenu->SetEnabled(fHasFile);
 	// Select first track (might be "none") in both
-	fAudioMenu->ItemAt(0)->SetMarked(true);
-	fVideoMenu->ItemAt(0)->SetMarked(true);
+	fAudioTrackMenu->ItemAt(0)->SetMarked(true);
+	fVideoTrackMenu->ItemAt(0)->SetMarked(true);
+
+	fVideoMenu->SetEnabled(fHasVideo);
+	fAudioMenu->SetEnabled(fHasAudio);
+	fDebugMenu->SetEnabled(fHasVideo);
 	
 	if (fHasVideo) {
 		fController->GetSize(&fSourceWidth, &fSourceHeight);
@@ -214,7 +258,9 @@ MainWin::SetupWindow()
 		fWidthScale = 1.0;
 		fHeightScale = 1.0;
 	}
-	
+
+	UpdateControlsEnabledStatus();
+
 	ResizeWindow(100);
 
 	fVideoView->MakeFocus();
@@ -238,7 +284,11 @@ MainWin::ResizeWindow(int percent)
 	
 	// Calculate and set the initial window size
 	int width = max_c(fControlsWidth, video_width);
-	int height = (fNoMenu ? 0 : fMenuBarHeight) + (fNoControls ? 0 : fControlsHeight) + video_height;
+	int height = (fNoControls ? 0 : fControlsHeight) + video_height;
+	if (!fNoMenu) {
+		width = max_c(width, fMenuBarWidth);
+		height += fMenuBarHeight;
+	}
 	SetWindowSizeLimits();
 	ResizeTo(width - 1, height - 1);
 }
@@ -247,10 +297,12 @@ MainWin::ResizeWindow(int percent)
 void
 MainWin::SetWindowSizeLimits()
 {
-	int min_width = fNoControls  ? MIN_WIDTH : fControlsWidth;
-	int min_height = (fNoMenu ? 0 : fMenuBarHeight) + (fNoControls ? 0 : fControlsHeight);
+	int minWidth = fNoControls  ? MIN_WIDTH : fControlsWidth;
+	if (!fNoMenu)
+		minWidth = max_c(minWidth, fMenuBarWidth);
+	int minHeight = (fNoMenu ? 0 : fMenuBarHeight) + (fNoControls ? 0 : fControlsHeight);
 	
-	SetSizeLimits(min_width - 1, 32000, min_height - 1, fHasVideo ? 32000 : min_height - 1);
+	SetSizeLimits(minWidth - 1, 32000, minHeight - 1, fHasVideo ? 32000 : minHeight - 1);
 }
 
 
@@ -258,48 +310,55 @@ void
 MainWin::CreateMenu()
 {
 	fFileMenu = new BMenu(NAME);
-	fViewMenu = new BMenu("View");
+	fPlaylistMenu = new BMenu("Playlist"B_UTF8_ELLIPSIS);
+	fAudioMenu = new BMenu("Audio");
+	fVideoMenu = new BMenu("Video");
 	fSettingsMenu = new BMenu("Settings");
-	fAudioMenu = new BMenu("Audio Track");
-	fVideoMenu = new BMenu("Video Track");
+	fAudioTrackMenu = new BMenu("Track");
+	fVideoTrackMenu = new BMenu("Track");
 	fDebugMenu = new BMenu("Debug");
 
 	fMenuBar->AddItem(fFileMenu);
-	fMenuBar->AddItem(fViewMenu);
+	fMenuBar->AddItem(fAudioMenu);
+	fMenuBar->AddItem(fVideoMenu);
 	fMenuBar->AddItem(fSettingsMenu);
-	fMenuBar->AddItem(fDebugMenu);
-	
-	fFileMenu->AddItem(new BMenuItem("New Player", new BMessage(M_FILE_NEWPLAYER), 'N', B_COMMAND_KEY));
+//	fMenuBar->AddItem(fDebugMenu);
+
+	fFileMenu->AddItem(new BMenuItem("New Player"B_UTF8_ELLIPSIS, new BMessage(M_FILE_NEWPLAYER), 'N', B_COMMAND_KEY));
 	fFileMenu->AddSeparatorItem();
 	fFileMenu->AddItem(new BMenuItem("Open File"B_UTF8_ELLIPSIS, new BMessage(M_FILE_OPEN), 'O', B_COMMAND_KEY));
 	fFileMenu->AddItem(new BMenuItem("File Info"B_UTF8_ELLIPSIS, new BMessage(M_FILE_INFO), 'I', B_COMMAND_KEY));
+	fFileMenu->AddItem(fPlaylistMenu);
+	fPlaylistMenu->Superitem()->SetShortcut('P', B_COMMAND_KEY);
+	fPlaylistMenu->Superitem()->SetMessage(new BMessage(M_FILE_PLAYLIST));
+
 	fFileMenu->AddSeparatorItem();
 	fFileMenu->AddItem(new BMenuItem("About" NAME B_UTF8_ELLIPSIS, new BMessage(M_FILE_ABOUT)));
 	fFileMenu->AddSeparatorItem();
 	fFileMenu->AddItem(new BMenuItem("Close", new BMessage(M_FILE_CLOSE), 'W', B_COMMAND_KEY));
 	fFileMenu->AddItem(new BMenuItem("Quit", new BMessage(M_FILE_QUIT), 'Q', B_COMMAND_KEY));
 
-	fViewMenu->AddItem(new BMenuItem("50% scale", new BMessage(M_VIEW_50), '0', B_COMMAND_KEY));
-	fViewMenu->AddItem(new BMenuItem("100% scale", new BMessage(M_VIEW_100), '1', B_COMMAND_KEY));
-	fViewMenu->AddItem(new BMenuItem("200% scale", new BMessage(M_VIEW_200), '2', B_COMMAND_KEY));
-	fViewMenu->AddItem(new BMenuItem("300% scale", new BMessage(M_VIEW_300), '3', B_COMMAND_KEY));
-	fViewMenu->AddItem(new BMenuItem("400% scale", new BMessage(M_VIEW_400), '4', B_COMMAND_KEY));
-	fViewMenu->AddSeparatorItem();
-	fViewMenu->AddItem(new BMenuItem("Full Screen", new BMessage(M_TOGGLE_FULLSCREEN), 'F', B_COMMAND_KEY));
-//	fViewMenu->SetRadioMode(true);
-//	fViewMenu->AddSeparatorItem();
-//	fViewMenu->AddItem(new BMenuItem("Always on Top", new BMessage(M_TOGGLE_ALWAYS_ON_TOP), 'T', B_COMMAND_KEY));
+	fPlaylistMenu->SetRadioMode(true);
 
-	fSettingsMenu->AddItem(fAudioMenu);
-	fSettingsMenu->AddItem(fVideoMenu);
-	fSettingsMenu->AddSeparatorItem();
+	fAudioMenu->AddItem(fAudioTrackMenu);
+
+	fVideoMenu->AddItem(fVideoTrackMenu);
+	fVideoMenu->AddSeparatorItem();
+	fVideoMenu->AddItem(new BMenuItem("50% scale", new BMessage(M_VIEW_50), '0', B_COMMAND_KEY));
+	fVideoMenu->AddItem(new BMenuItem("100% scale", new BMessage(M_VIEW_100), '1', B_COMMAND_KEY));
+	fVideoMenu->AddItem(new BMenuItem("200% scale", new BMessage(M_VIEW_200), '2', B_COMMAND_KEY));
+	fVideoMenu->AddItem(new BMenuItem("300% scale", new BMessage(M_VIEW_300), '3', B_COMMAND_KEY));
+	fVideoMenu->AddItem(new BMenuItem("400% scale", new BMessage(M_VIEW_400), '4', B_COMMAND_KEY));
+	fVideoMenu->AddSeparatorItem();
+	fVideoMenu->AddItem(new BMenuItem("Full Screen", new BMessage(M_TOGGLE_FULLSCREEN), 'F', B_COMMAND_KEY));
+	fVideoMenu->AddItem(new BMenuItem("Keep Aspect Ratio", new BMessage(M_TOGGLE_KEEP_ASPECT_RATIO), 'K', B_COMMAND_KEY));
+
 	fSettingsMenu->AddItem(new BMenuItem("No Menu", new BMessage(M_TOGGLE_NO_MENU), 'M', B_COMMAND_KEY));
 	fSettingsMenu->AddItem(new BMenuItem("No Border", new BMessage(M_TOGGLE_NO_BORDER), 'B', B_COMMAND_KEY));
 	fSettingsMenu->AddItem(new BMenuItem("No Controls", new BMessage(M_TOGGLE_NO_CONTROLS), 'C', B_COMMAND_KEY));
 	fSettingsMenu->AddItem(new BMenuItem("Always on Top", new BMessage(M_TOGGLE_ALWAYS_ON_TOP), 'T', B_COMMAND_KEY));
-	fSettingsMenu->AddItem(new BMenuItem("Keep Aspect Ratio", new BMessage(M_TOGGLE_KEEP_ASPECT_RATIO), 'K', B_COMMAND_KEY));
-	fSettingsMenu->AddSeparatorItem();
-	fSettingsMenu->AddItem(new BMenuItem("Preferences"B_UTF8_ELLIPSIS, new BMessage(M_PREFERENCES), 'P', B_COMMAND_KEY));
+//	fSettingsMenu->AddSeparatorItem();
+//	fSettingsMenu->AddItem(new BMenuItem("Preferences"B_UTF8_ELLIPSIS, new BMessage(M_PREFERENCES), 'P', B_COMMAND_KEY));
 
 	fDebugMenu->AddItem(new BMenuItem("pixel aspect ratio 1.00000:1", new BMessage(M_ASPECT_100000_1)));
 	fDebugMenu->AddItem(new BMenuItem("pixel aspect ratio 1.06666:1", new BMessage(M_ASPECT_106666_1)));
@@ -309,8 +368,8 @@ MainWin::CreateMenu()
 	fDebugMenu->AddItem(new BMenuItem("force 704 x 576, display aspect 4:3", new BMessage(M_ASPECT_704_576)));
 	fDebugMenu->AddItem(new BMenuItem("force 544 x 576, display aspect 4:3", new BMessage(M_ASPECT_544_576)));
 
-	fAudioMenu->SetRadioMode(true);
-	fVideoMenu->SetRadioMode(true);
+	fAudioTrackMenu->SetRadioMode(true);
+	fVideoTrackMenu->SetRadioMode(true);
 /*	
 	fSettingsMenu->ItemAt(3)->SetMarked(fIsFullscreen);
 	fSettingsMenu->ItemAt(5)->SetMarked(fNoMenu);
@@ -325,8 +384,8 @@ MainWin::CreateMenu()
 void
 MainWin::SetupTrackMenus()
 {
-	fAudioMenu->RemoveItems(0, fAudioMenu->CountItems(), true);
-	fVideoMenu->RemoveItems(0, fVideoMenu->CountItems(), true);
+	fAudioTrackMenu->RemoveItems(0, fAudioTrackMenu->CountItems(), true);
+	fVideoTrackMenu->RemoveItems(0, fVideoTrackMenu->CountItems(), true);
 	
 	int c, i;
 	char s[100];
@@ -334,18 +393,18 @@ MainWin::SetupTrackMenus()
 	c = fController->AudioTrackCount();
 	for (i = 0; i < c; i++) {
 		sprintf(s, "Track %d", i + 1);
-		fAudioMenu->AddItem(new BMenuItem(s, new BMessage(M_SELECT_AUDIO_TRACK + i)));
+		fAudioTrackMenu->AddItem(new BMenuItem(s, new BMessage(M_SELECT_AUDIO_TRACK + i)));
 	}
 	if (!c)
-		fAudioMenu->AddItem(new BMenuItem("none", new BMessage(M_DUMMY)));
+		fAudioTrackMenu->AddItem(new BMenuItem("none", new BMessage(M_DUMMY)));
 
 	c = fController->VideoTrackCount();
 	for (i = 0; i < c; i++) {
 		sprintf(s, "Track %d", i + 1);
-		fVideoMenu->AddItem(new BMenuItem(s, new BMessage(M_SELECT_VIDEO_TRACK + i)));
+		fVideoTrackMenu->AddItem(new BMenuItem(s, new BMessage(M_SELECT_VIDEO_TRACK + i)));
 	}
 	if (!c)
-		fVideoMenu->AddItem(new BMenuItem("none", new BMessage(M_DUMMY)));
+		fVideoTrackMenu->AddItem(new BMenuItem("none", new BMessage(M_DUMMY)));
 }
 
 
@@ -358,7 +417,7 @@ MainWin::QuitRequested()
 
 
 void
-MainWin::MouseDown(BMessage *msg)
+MainWin::MouseDown(BMessage *msg, BView* originalHandler)
 {
 	BPoint screen_where;
 	uint32 buttons = msg->FindInt32("buttons");
@@ -366,8 +425,9 @@ MainWin::MouseDown(BMessage *msg)
 	// On Zeta, only "screen_where" is relyable, "where" and "be:view_where" seem to be broken
 	if (B_OK != msg->FindPoint("screen_where", &screen_where)) {
 		// Workaround for BeOS R5, it has no "screen_where"
-		fVideoView->GetMouse(&screen_where, &buttons, false);
-		fVideoView->ConvertToScreen(&screen_where);
+		if (!originalHandler || msg->FindPoint("where", &screen_where) < B_OK)
+			return;
+		originalHandler->ConvertToScreen(&screen_where);
 	}
 
 //	msg->PrintToStream();
@@ -423,7 +483,7 @@ MainWin::MouseDown(BMessage *msg)
 
 
 void
-MainWin::MouseMoved(BMessage *msg)
+MainWin::MouseMoved(BMessage *msg, BView* originalHandler)
 {
 //	msg->PrintToStream();
 
@@ -437,11 +497,13 @@ MainWin::MouseMoved(BMessage *msg)
 		printf("view where: %.0f, %.0f => ", mousePos.x, mousePos.y);
 		fVideoView->ConvertToScreen(&mousePos);
 */
-		// On Zeta, only "screen_where" is relyable, "where" and "be:view_where" seem to be broken
+		// On Zeta, only "screen_where" is relyable, "where"
+		// and "be:view_where" seem to be broken
 		if (B_OK != msg->FindPoint("screen_where", &mousePos)) {
 			// Workaround for BeOS R5, it has no "screen_where"
-			fVideoView->GetMouse(&mousePos, &buttons, false);
-			fVideoView->ConvertToScreen(&mousePos);
+			if (!originalHandler || msg->FindPoint("where", &mousePos) < B_OK)
+				return;
+			originalHandler->ConvertToScreen(&mousePos);
 		}
 //		printf("screen where: %.0f, %.0f => ", mousePos.x, mousePos.y);
 		float delta_x = mousePos.x - fMouseDownMousePos.x;
@@ -470,6 +532,11 @@ MainWin::ShowContextMenu(const BPoint &screen_point)
 	BMenuItem *item;
 	menu->AddItem(item = new BMenuItem("Full Screen", new BMessage(M_TOGGLE_FULLSCREEN), 'F', B_COMMAND_KEY));
 	item->SetMarked(fIsFullscreen);
+	item->SetEnabled(fHasVideo);
+	menu->AddItem(item = new BMenuItem("Keep Aspect Ratio", new BMessage(M_TOGGLE_KEEP_ASPECT_RATIO), 'K', B_COMMAND_KEY));
+	item->SetMarked(fKeepAspectRatio);
+	item->SetEnabled(fHasVideo);
+
 	menu->AddSeparatorItem();
 	menu->AddItem(item = new BMenuItem("No Menu", new BMessage(M_TOGGLE_NO_MENU), 'M', B_COMMAND_KEY));
 	item->SetMarked(fNoMenu);
@@ -477,8 +544,7 @@ MainWin::ShowContextMenu(const BPoint &screen_point)
 	item->SetMarked(fNoBorder);
 	menu->AddItem(item = new BMenuItem("Always on Top", new BMessage(M_TOGGLE_ALWAYS_ON_TOP), 'T', B_COMMAND_KEY));
 	item->SetMarked(fAlwaysOnTop);
-	menu->AddItem(item = new BMenuItem("Keep Aspect Ratio", new BMessage(M_TOGGLE_KEEP_ASPECT_RATIO), 'K', B_COMMAND_KEY));
-	item->SetMarked(fKeepAspectRatio);
+
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("About" NAME B_UTF8_ELLIPSIS, new BMessage(M_FILE_ABOUT)));
 	menu->AddSeparatorItem();
@@ -592,12 +658,42 @@ MainWin::ShowFileInfo()
 {
 	if (!fInfoWin)
 		fInfoWin = new InfoWin(this);
+
+	if (fInfoWin->Lock()) {
+		if (fInfoWin->IsHidden())
+			fInfoWin->Show();
+		else
+			fInfoWin->Activate();
+		fInfoWin->Unlock();
+	}
+
 	BMessenger msgr(fInfoWin);
 	BMessage m(M_UPDATE_INFO);
 	m.AddInt32("which", INFO_ALL);
 	msgr.SendMessage(&m);
 	msgr.SendMessage(B_WINDOW_ACTIVATED);
 }
+
+
+void
+MainWin::ShowPlaylistWindow()
+{
+	if (!fPlaylistWindow) {
+		fPlaylistWindow = new PlaylistWindow(BRect(150, 150, 400, 500),
+			fPlaylist);
+		fPlaylistWindow->Show();
+		return;
+	}
+
+	if (fPlaylistWindow->Lock()) {
+		if (fPlaylistWindow->IsHidden())
+			fPlaylistWindow->Show();
+		else
+			fPlaylistWindow->Activate();
+		fPlaylistWindow->Unlock();
+	}
+}
+
 
 void
 MainWin::MaybeUpdateFileInfo(uint32 which)
@@ -777,28 +873,109 @@ MainWin::ToggleKeepAspectRatio()
 
 
 void
+MainWin::UpdateControlsEnabledStatus()
+{
+	uint32 enabledButtons = 0;
+	if (fHasVideo || fHasAudio) {
+		enabledButtons |= PLAYBACK_ENABLED | SEEK_ENABLED
+			| SEEK_BACK_ENABLED | SEEK_FORWARD_ENABLED;
+	}
+	if (fHasAudio)
+		enabledButtons |= VOLUME_ENABLED;
+
+	bool canSkipPrevious, canSkipNext;
+	fPlaylist->GetSkipInfo(&canSkipPrevious, &canSkipNext);
+	if (canSkipPrevious)
+		enabledButtons |= SKIP_BACK_ENABLED;
+	if (canSkipNext)
+		enabledButtons |= SKIP_FORWARD_ENABLED;
+
+	fControls->SetEnabled(enabledButtons);
+}
+
+
+void
+MainWin::_UpdatePlaylistMenu()
+{
+	fPlaylistMenu->RemoveItems(0, fPlaylistMenu->CountItems(), true);
+
+	// TODO: lock fPlaylist
+
+	int32 count = fPlaylist->CountItems();
+	for (int32 i = 0; i < count; i++) {
+		entry_ref ref;
+		if (fPlaylist->GetRefAt(i, &ref) < B_OK)
+			continue;
+		_AddPlaylistItem(ref, i);
+	}
+	fPlaylistMenu->SetTargetForItems(this);
+
+	_MarkPlaylistItem(fPlaylist->CurrentRefIndex());
+}
+
+
+void
+MainWin::_AddPlaylistItem(const entry_ref& ref, int32 index)
+{
+	BMessage* message = new BMessage(M_SET_PLAYLIST_POSITION);
+	message->AddInt32("index", index);
+	BMenuItem* item = new BMenuItem(ref.name, message);
+	fPlaylistMenu->AddItem(item, index);
+}
+
+
+void
+MainWin::_RemovePlaylistItem(int32 index)
+{
+	delete fPlaylistMenu->RemoveItem(index);
+}
+
+
+void
+MainWin::_MarkPlaylistItem(int32 index)
+{
+	if (BMenuItem* item = fPlaylistMenu->ItemAt(index)) {
+		item->SetMarked(true);
+		// ... and in case the menu is currently on screen:
+		if (fPlaylistMenu->LockLooper()) {
+			fPlaylistMenu->Invalidate();
+			fPlaylistMenu->UnlockLooper();
+		}
+	}
+}
+
+
+void
 MainWin::RefsReceived(BMessage *msg)
 {
 	printf("MainWin::RefsReceived\n");
-	
+
 	// the playlist ist replaced by dropped files
-	
-	fPlaylist->MakeEmpty();
-	
+	// or the dropped files are appended to the end
+	// of the existing playlist if <shift> is pressed
+	bool add = modifiers() & B_SHIFT_KEY;
+
+	if (!add)
+		fPlaylist->MakeEmpty();
+
+	bool startPlaying = fPlaylist->CountItems() == 0;
+
+	Playlist temporaryPlaylist;
+	Playlist* playlist = add ? &temporaryPlaylist : fPlaylist;
+
 	entry_ref ref;
-	for (int i = 0; B_OK == msg->FindRef("refs", i, &ref); i++) {
-		BEntry entry(&ref, true);
-		if (!entry.Exists() || !entry.IsFile())
-			continue;
-		fPlaylist->AddRef(ref);
+	for (int i = 0; B_OK == msg->FindRef("refs", i, &ref); i++)
+		_AppendToPlaylist(ref, playlist);
+
+	playlist->Sort();
+
+	if (add)
+		fPlaylist->AdoptPlaylist(temporaryPlaylist);
+
+	if (startPlaying) {
+		// open first file
+		fPlaylist->SetCurrentRefIndex(0);
 	}
-	
-	fPlaylist->Sort();
-
-	// open first file
-	if (fPlaylist->NextRef(&ref) == B_OK)
-		OpenFile(ref);
-
 }
 
 
@@ -818,7 +995,10 @@ MainWin::KeyDown(BMessage *msg)
 	
 	switch (raw_char) {
 		case B_SPACE:
-			PostMessage(M_TOGGLE_NO_BORDER_NO_MENU_NO_CONTROLS);
+			if (fController->IsPaused() || fController->IsStopped())
+				fController->Play();
+			else
+				fController->Pause();
 			return B_OK;
 
 		case B_ESCAPE:
@@ -928,14 +1108,22 @@ MainWin::KeyDown(BMessage *msg)
 void
 MainWin::DispatchMessage(BMessage *msg, BHandler *handler)
 {
-	if ((msg->what == B_MOUSE_DOWN) && (handler == fBackground || handler == fVideoView))
-		MouseDown(msg);
-	if ((msg->what == B_MOUSE_MOVED) && (handler == fBackground || handler == fVideoView))
-		MouseMoved(msg);
-	if ((msg->what == B_MOUSE_UP) && (handler == fBackground || handler == fVideoView))
+	if ((msg->what == B_MOUSE_DOWN)
+		&& (handler == fBackground || handler == fVideoView
+				|| handler == fControls))
+		MouseDown(msg, dynamic_cast<BView*>(handler));
+
+	if ((msg->what == B_MOUSE_MOVED)
+		&& (handler == fBackground || handler == fVideoView
+				|| handler == fControls))
+		MouseMoved(msg, dynamic_cast<BView*>(handler));
+
+	if ((msg->what == B_MOUSE_UP)
+		&& (handler == fBackground || handler == fVideoView))
 		MouseUp(msg);
 
-	if ((msg->what == B_KEY_DOWN) && (handler == fBackground || handler == fVideoView)) {
+	if ((msg->what == B_KEY_DOWN)
+		&& (handler == fBackground || handler == fVideoView)) {
 
 		// special case for PrintScreen key
 		if (msg->FindInt32("key") == B_PRINT_KEY) {
@@ -969,6 +1157,75 @@ MainWin::MessageReceived(BMessage *msg)
 			if (msg->HasRef("refs"))
 				RefsReceived(msg);
 			break;
+
+		// PlaylistObserver messages
+		case MSG_PLAYLIST_REF_ADDED: {
+			entry_ref ref;
+			int32 index;
+			if (msg->FindRef("refs", &ref) == B_OK
+				&& msg->FindInt32("index", &index) == B_OK) {
+				_AddPlaylistItem(ref, index);
+			}
+			break;
+		}
+		case MSG_PLAYLIST_REF_REMOVED: {
+			int32 index;
+			if (msg->FindInt32("index", &index) == B_OK) {
+				_RemovePlaylistItem(index);
+			}
+			break;
+		}
+		case MSG_PLAYLIST_CURRENT_REF_CHANGED: {
+			entry_ref ref;
+			int32 index = fPlaylist->CurrentRefIndex();
+			if (fPlaylist->GetRefAt(index, &ref) == B_OK) {
+				printf("open ref: %s\n", ref.name);
+				OpenFile(ref);
+				_MarkPlaylistItem(index);
+			}
+			break;
+		}
+
+		// ControllerObserver messages
+		case MSG_CONTROLLER_FILE_FINISHED:
+			fPlaylist->SetCurrentRefIndex(fPlaylist->CurrentRefIndex() + 1);
+			break;
+		case MSG_CONTROLLER_FILE_CHANGED:
+			// TODO: move all other GUI changes as a reaction to this notification
+//			_UpdatePlaylistMenu();
+			break;
+		case MSG_CONTROLLER_VIDEO_TRACK_CHANGED: {
+			int32 index;
+			if (msg->FindInt32("index", &index) == B_OK) {
+				BMenuItem* item = fVideoTrackMenu->ItemAt(index);
+				if (item)
+					item->SetMarked(true);
+			}
+			break;
+		}
+		case MSG_CONTROLLER_AUDIO_TRACK_CHANGED: {
+			int32 index;
+			if (msg->FindInt32("index", &index) == B_OK) {
+				BMenuItem* item = fAudioTrackMenu->ItemAt(index);
+				if (item)
+					item->SetMarked(true);
+			}
+			break;
+		}
+		case MSG_CONTROLLER_PLAYBACK_STATE_CHANGED: {
+			uint32 state;
+			if (msg->FindInt32("state", (int32*)&state) == B_OK)
+				fControls->SetPlaybackState(state);
+			break;
+		}
+		case MSG_CONTROLLER_POSITION_CHANGED: {
+			float position;
+			if (msg->FindFloat("position", &position) == B_OK)
+				fControls->SetPosition(position);
+			break;
+		}
+
+		// menu item messages
 		case M_FILE_NEWPLAYER:
 			gMainApp->NewWindow();
 			break;
@@ -982,6 +1239,9 @@ MainWin::MessageReceived(BMessage *msg)
 			break;
 		case M_FILE_INFO:
 			ShowFileInfo();
+			break;
+		case M_FILE_PLAYLIST:
+			ShowPlaylistWindow();
 			break;
 		case M_FILE_ABOUT:
 			BAlert *alert;
@@ -1176,8 +1436,39 @@ MainWin::MessageReceived(BMessage *msg)
 				break;
 			}
 */
+		case M_SET_PLAYLIST_POSITION: {
+			int32 index;
+			if (msg->FindInt32("index", &index) == B_OK)
+				fPlaylist->SetCurrentRefIndex(index);
+			break;
+		}
+
 		default:
 			// let BWindow handle the rest
 			BWindow::MessageReceived(msg);
 	}
 }
+
+
+void
+MainWin::_AppendToPlaylist(const entry_ref& ref, Playlist* playlist)
+{
+	// recursively append the ref (dive into folders)
+	BEntry entry(&ref, true);
+	if (entry.InitCheck() < B_OK)
+		return;
+	if (!entry.Exists())
+		return;
+	if (entry.IsDirectory()) {
+		BDirectory dir(&entry);
+		if (dir.InitCheck() < B_OK)
+			return;
+		entry.Unset();
+		entry_ref subRef;
+		while (dir.GetNextRef(&subRef) == B_OK)
+			_AppendToPlaylist(subRef, playlist);
+	} else if (entry.IsFile()) {
+		playlist->AddRef(ref);
+	}
+}
+

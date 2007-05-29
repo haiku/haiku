@@ -51,7 +51,7 @@ private:
 	
 private:
 	Controller *	fController;
-	bool			fOverlayActive;
+	volatile bool	fOverlayActive;
 	rgb_color		fOverlayKeyColor;
 };
 

@@ -161,37 +161,54 @@ VideoView::DrawFrame()
 {
 //	printf("VideoView::DrawFrame\n");
 	
-	bool want_overlay = fController->IsOverlayActive();
+	if (LockLooperWithTimeout(50000) != B_OK)
+		return;
 
-	if (!want_overlay && fOverlayActive) {
-		if (LockLooperWithTimeout(50000) == B_OK) {
-			ClearViewOverlay();
-			UnlockLooper();			
-			fOverlayActive = false;
+	fController->LockBitmap();
+	BBitmap *bmp = fController->Bitmap();
+
+	if (bmp) {
+		bool want_overlay = bmp->ColorSpace() == B_YCbCr422;
+	
+		if (!want_overlay && fOverlayActive) {
+			if (LockLooperWithTimeout(50000) == B_OK) {
+				ClearViewOverlay();
+				UnlockLooper();			
+				fOverlayActive = false;
+			} else {
+				printf("can't ClearViewOverlay, as LockLooperWithTimeout failed\n");
+				return;
+			}
+		}
+
+		if (want_overlay && !fOverlayActive ) {
+printf("trying to activate overlay...");
+			// reserve overlay channel
+			status_t ret = SetViewOverlay(bmp, bmp->Bounds(), Bounds(),
+				&fOverlayKeyColor, B_FOLLOW_ALL,
+				B_OVERLAY_FILTER_HORIZONTAL | B_OVERLAY_FILTER_VERTICAL);
+			if (ret == B_OK) {
+printf("success\n");
+				fOverlayActive = true;
+				Invalidate();
+			} else {
+printf("failed: %s\n", strerror(ret));
+			}
+		} else if (fOverlayActive) {
+			// transfer overlay channel
+			rgb_color overlayKey;
+			SetViewOverlay(bmp, bmp->Bounds(), Bounds(), &overlayKey,
+				B_FOLLOW_ALL, B_OVERLAY_TRANSFER_CHANNEL
+					| B_OVERLAY_FILTER_HORIZONTAL | B_OVERLAY_FILTER_VERTICAL);
 		} else {
-			printf("can't ClearViewOverlay, as LockLooperWithTimeout failed\n");
+			// no overlay
+			DrawBitmap(bmp, Bounds());
 		}
 	}
-	if (want_overlay && !fOverlayActive ) {
-		fController->LockBitmap();
-		BBitmap *bmp = fController->Bitmap();
-		if (bmp && LockLooperWithTimeout(50000) == B_OK) {
-			SetViewOverlay(bmp, bmp->Bounds(), Bounds(), &fOverlayKeyColor,
-				B_FOLLOW_ALL, 
-				/*B_OVERLAY_TRANSFER_CHANNEL |  */B_OVERLAY_FILTER_HORIZONTAL | B_OVERLAY_FILTER_VERTICAL );
-			fOverlayActive = true;
 
-			Invalidate();
-			UnlockLooper();
-		}
-		fController->UnlockBitmap();
-	}
-	if (!fOverlayActive) {
-		if (LockLooperWithTimeout(50000) != B_OK)
-			return;
-		Invalidate();
-		UnlockLooper();
-	}
+	fController->UnlockBitmap();
+
+	UnlockLooper();
 }
 
 

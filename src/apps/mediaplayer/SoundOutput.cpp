@@ -61,7 +61,14 @@ SoundOutput::InitCheck()
 		return B_ERROR;
 	return fSoundPlayer->InitCheck();
 }
-			
+
+
+media_raw_audio_format
+SoundOutput::Format() const
+{
+	return fSoundPlayer->Format();
+}
+
 
 bigtime_t
 SoundOutput::Latency()

@@ -18,8 +18,9 @@
 #include <String.h>
 
 #include "ButtonBitmaps.h"
-#include "TransportButton.h"
+#include "PlaybackState.h"
 #include "SeekSlider.h"
+#include "TransportButton.h"
 #include "VolumeSlider.h"
 
 enum {
@@ -51,11 +52,12 @@ enum {
 #define kPositionFactor	3000
 
 // constructor
-TransportControlGroup::TransportControlGroup(BRect frame)
+TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
+		bool useWindButtons)
 	: BView(frame, "transport control group",
 			B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
-			B_WILL_DRAW | B_FRAME_EVENTS),
-      fBottomControlHeight(0.0)
+			B_WILL_DRAW | B_FRAME_EVENTS)
+	, fBottomControlHeight(0.0)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -69,40 +71,50 @@ TransportControlGroup::TransportControlGroup(BRect frame)
 	AddChild(fSeekSlider);
 
     // Buttons
-    // Skip Back
-    frame.right = kRewindBitmapWidth - 1;
-    frame.bottom = kRewindBitmapHeight - 1;
-	fBottomControlHeight = kRewindBitmapHeight - 1.0;
-    fSkipBack = new TransportButton(frame, B_EMPTY_STRING,
-                                    kSkipBackBitmapBits,
-                                    kPressedSkipBackBitmapBits,
-                                    kDisabledSkipBackBitmapBits,
-                                    new BMessage(MSG_SKIP_BACKWARDS));
-    AddChild(fSkipBack);
+    if (useSkipButtons) {
+	    // Skip Back
+	    frame.right = kRewindBitmapWidth - 1;
+	    frame.bottom = kRewindBitmapHeight - 1;
+		fBottomControlHeight = kRewindBitmapHeight - 1.0;
+	    fSkipBack = new TransportButton(frame, B_EMPTY_STRING,
+	                                    kSkipBackBitmapBits,
+	                                    kPressedSkipBackBitmapBits,
+	                                    kDisabledSkipBackBitmapBits,
+	                                    new BMessage(MSG_SKIP_BACKWARDS));
+	    AddChild(fSkipBack);
+	
+	    // Skip Foward
+	    fSkipForward = new TransportButton(frame, B_EMPTY_STRING,
+	                                       kSkipForwardBitmapBits,
+	                                       kPressedSkipForwardBitmapBits,
+	                                       kDisabledSkipForwardBitmapBits,
+	                                       new BMessage(MSG_SKIP_FORWARD));
+	    AddChild(fSkipForward);
+    } else {
+    	fSkipBack = NULL;
+    	fSkipForward = NULL;
+	}
 
-    // Skip Foward
-    fSkipForward = new TransportButton(frame, B_EMPTY_STRING,
-                                       kSkipForwardBitmapBits,
-                                       kPressedSkipForwardBitmapBits,
-                                       kDisabledSkipForwardBitmapBits,
-                                       new BMessage(MSG_SKIP_FORWARD));
-    AddChild(fSkipForward);
-
-	// Forward
-	fForward = new TransportButton(frame, B_EMPTY_STRING,
-								   kForwardBitmapBits,
-								   kPressedForwardBitmapBits,
-								   kDisabledForwardBitmapBits,
-								   new BMessage(MSG_FORWARD));
-	AddChild(fForward);
-
-	// Rewind
-	fRewind = new TransportButton(frame, B_EMPTY_STRING,
-								  kRewindBitmapBits,
-								  kPressedRewindBitmapBits,
-								  kDisabledRewindBitmapBits,
-								  new BMessage(MSG_REWIND));
-	AddChild(fRewind);
+	if (useWindButtons) {
+		// Forward
+		fForward = new TransportButton(frame, B_EMPTY_STRING,
+									   kForwardBitmapBits,
+									   kPressedForwardBitmapBits,
+									   kDisabledForwardBitmapBits,
+									   new BMessage(MSG_FORWARD));
+		AddChild(fForward);
+	
+		// Rewind
+		fRewind = new TransportButton(frame, B_EMPTY_STRING,
+									  kRewindBitmapBits,
+									  kPressedRewindBitmapBits,
+									  kDisabledRewindBitmapBits,
+									  new BMessage(MSG_REWIND));
+		AddChild(fRewind);
+	} else {
+		fForward = NULL;
+		fRewind = NULL;
+	}
 
 	// Play Pause
     frame.right = kPlayPauseBitmapWidth - 1;
@@ -171,10 +183,14 @@ TransportControlGroup::AttachedToWindow()
 	// we are now a valid BHandler
 	fSeekSlider->SetTarget(this);
 	fVolumeSlider->SetTarget(this);
-	fSkipBack->SetTarget(this);
-	fSkipForward->SetTarget(this);
-	fRewind->SetTarget(this);
-	fForward->SetTarget(this);
+	if (fSkipBack)
+		fSkipBack->SetTarget(this);
+	if (fSkipForward)
+		fSkipForward->SetTarget(this);
+	if (fRewind)
+		fRewind->SetTarget(this);
+	if (fForward)
+		fForward->SetTarget(this);
 	fPlayPause->SetTarget(this);
 	fStop->SetTarget(this);
 	fMute->SetTarget(this);
@@ -320,21 +336,26 @@ TransportControlGroup::_GainToDb(float gain)
 void
 TransportControlGroup::SetEnabled(uint32 buttons)
 {
-//	if (B_OK != LockLooperWithTimeout(50000))
 	if (!LockLooper())
 		return;
+
 	fSeekSlider->SetEnabled(buttons & SEEK_ENABLED);
 
 	fVolumeSlider->SetEnabled(buttons & VOLUME_ENABLED);
 	fMute->SetEnabled(buttons & VOLUME_ENABLED);
 
-	fSkipBack->SetEnabled(buttons & SKIP_BACK_ENABLED);
-	fSkipForward->SetEnabled(buttons & SKIP_FORWARD_ENABLED);
-	fRewind->SetEnabled(buttons & SEEK_BACK_ENABLED);
-	fForward->SetEnabled(buttons & SEEK_FORWARD_ENABLED);
+	if (fSkipBack)
+		fSkipBack->SetEnabled(buttons & SKIP_BACK_ENABLED);
+	if (fSkipForward)
+		fSkipForward->SetEnabled(buttons & SKIP_FORWARD_ENABLED);
+	if (fRewind)
+		fRewind->SetEnabled(buttons & SEEK_BACK_ENABLED);
+	if (fForward)
+		fForward->SetEnabled(buttons & SEEK_FORWARD_ENABLED);
 
 	fPlayPause->SetEnabled(buttons & PLAYBACK_ENABLED);
 	fStop->SetEnabled(buttons & PLAYBACK_ENABLED);
+
 	UnlockLooper();
 }
 
@@ -344,9 +365,9 @@ TransportControlGroup::SetEnabled(uint32 buttons)
 void
 TransportControlGroup::SetPlaybackState(uint32 state)
 {
-//	if (B_OK != LockLooperWithTimeout(50000))
 	if (!LockLooper())
 		return;
+
 	switch (state) {
 		case PLAYBACK_STATE_PLAYING:
 			fPlayPause->SetPlaying();
@@ -358,6 +379,7 @@ TransportControlGroup::SetPlaybackState(uint32 state)
 			fPlayPause->SetStopped();
 			break;
 	}
+
 	UnlockLooper();
 }
 
@@ -365,11 +387,14 @@ TransportControlGroup::SetPlaybackState(uint32 state)
 void
 TransportControlGroup::SetSkippable(bool backward, bool forward)
 {
-//	if (B_OK != LockLooperWithTimeout(50000))
 	if (!LockLooper())
 		return;
-	fSkipBack->SetEnabled(backward);
-	fSkipForward->SetEnabled(forward);
+
+	if (fSkipBack)
+		fSkipBack->SetEnabled(backward);
+	if (fSkipForward)
+		fSkipForward->SetEnabled(forward);
+
 	UnlockLooper();
 }
 
@@ -379,11 +404,12 @@ TransportControlGroup::SetSkippable(bool backward, bool forward)
 void
 TransportControlGroup::SetAudioEnabled(bool enabled)
 {
-//	if (B_OK != LockLooperWithTimeout(50000))
 	if (!LockLooper())
 		return;
+
 	fMute->SetEnabled(enabled);
 	fVolumeSlider->SetEnabled(enabled);
+
 	UnlockLooper();
 }
 
@@ -391,10 +417,11 @@ TransportControlGroup::SetAudioEnabled(bool enabled)
 void
 TransportControlGroup::SetMuted(bool mute)
 {
-//	if (B_OK != LockLooperWithTimeout(50000))
 	if (!LockLooper())
 		return;
+
 	fVolumeSlider->SetMuted(mute);
+
 	UnlockLooper();
 }
 
@@ -404,7 +431,10 @@ TransportControlGroup::SetVolume(float value)
 {
 	if (B_OK != LockLooperWithTimeout(50000))
 		return;
-	fVolumeSlider->SetValue(_DbToGain(_ExponentialToLinear(_GainToDb(value))) * kVolumeFactor);
+
+	fVolumeSlider->SetValue(_DbToGain(_ExponentialToLinear(
+		_GainToDb(value))) * kVolumeFactor);
+
 	UnlockLooper();
 }
 
@@ -412,10 +442,10 @@ TransportControlGroup::SetVolume(float value)
 void
 TransportControlGroup::SetPosition(float value)
 {
-	if (B_OK != LockLooperWithTimeout(50000))
+	if (fSeekSlider->IsTracking())
 		return;
+
 	fSeekSlider->SetPosition(value);
-	UnlockLooper();
 }
 
 
@@ -427,12 +457,17 @@ TransportControlGroup::_LayoutControls(BRect frame) const
 {
 	BRect r(frame);
 	// calculate absolutly minimal width
-	float minWidth = fSkipBack->Bounds().Width();
-	minWidth += fRewind->Bounds().Width();
+	float minWidth = 0.0;
+	if (fSkipBack)
+		minWidth += fSkipBack->Bounds().Width();
+	if (fRewind)
+		minWidth += fRewind->Bounds().Width();
 	minWidth += fStop->Bounds().Width();
 	minWidth += fPlayPause->Bounds().Width();
-	minWidth += fForward->Bounds().Width();
-	minWidth += fSkipForward->Bounds().Width();
+	if (fForward)
+		minWidth += fForward->Bounds().Width();
+	if (fSkipForward)
+		minWidth += fSkipForward->Bounds().Width();
 	minWidth += fMute->Bounds().Width();
 	minWidth += VOLUME_MIN_WIDTH;
 
@@ -449,28 +484,37 @@ TransportControlGroup::_LayoutControls(BRect frame) const
 	r.top = r.bottom + MIN_SPACE + 1.0;
 	r.bottom = frame.bottom;
 	// skip back
-	r.right = r.left + fSkipBack->Bounds().Width();
-	_LayoutControl(fSkipBack, r);
+	if (fSkipBack) {
+		r.right = r.left + fSkipBack->Bounds().Width();
+		_LayoutControl(fSkipBack, r);
+		r.left = r.right + space;
+	}
 	// rewind
-	r.left = r.right + space;
-	r.right = r.left + fRewind->Bounds().Width();
-	_LayoutControl(fRewind, r);
+	if (fRewind) {
+		r.right = r.left + fRewind->Bounds().Width();
+		_LayoutControl(fRewind, r);
+		r.left = r.right + space;
+	}
 	// stop
-	r.left = r.right + space;
 	r.right = r.left + fStop->Bounds().Width();
 	_LayoutControl(fStop, r);
-	// play/pause
 	r.left = r.right + space;
+	// play/pause
 	r.right = r.left + fPlayPause->Bounds().Width();
 	_LayoutControl(fPlayPause, r);
+	r.left = r.right + space;
 	// forward
-	r.left = r.right + space;
-	r.right = r.left + fForward->Bounds().Width();
-	_LayoutControl(fForward, r);
+	if (fForward) {
+		r.right = r.left + fForward->Bounds().Width();
+		_LayoutControl(fForward, r);
+		r.left = r.right + space;
+	}
 	// skip forward
-	r.left = r.right + space;
-	r.right = r.left + fSkipForward->Bounds().Width();
-	_LayoutControl(fSkipForward, r);
+	if (fSkipForward) {
+		r.right = r.left + fSkipForward->Bounds().Width();
+		_LayoutControl(fSkipForward, r);
+		r.left = r.right + space;
+	}
 	// speaker icon
 	r.left = r.right + space + space;
 	r.right = r.left + fMute->Bounds().Width();
@@ -488,12 +532,16 @@ TransportControlGroup::_MinFrame() const
 {
 	// add up width of controls along bottom (seek slider will likely adopt)
 	float minWidth = 2 * BORDER_INSET;
-	minWidth += fSkipBack->Bounds().Width() + MIN_SPACE;
-	minWidth += fRewind->Bounds().Width() + MIN_SPACE;
+	if (fSkipBack)
+		minWidth += fSkipBack->Bounds().Width() + MIN_SPACE;
+	if (fRewind)
+		minWidth += fRewind->Bounds().Width() + MIN_SPACE;
 	minWidth += fStop->Bounds().Width() + MIN_SPACE;
 	minWidth += fPlayPause->Bounds().Width() + MIN_SPACE;
-	minWidth += fForward->Bounds().Width() + MIN_SPACE;
-	minWidth += fSkipForward->Bounds().Width() + MIN_SPACE + MIN_SPACE;
+	if (fForward)
+		minWidth += fForward->Bounds().Width() + MIN_SPACE;
+	if (fSkipForward)
+		minWidth += fSkipForward->Bounds().Width() + MIN_SPACE + MIN_SPACE;
 	minWidth += fMute->Bounds().Width() + SPEAKER_SLIDER_DIST;
 	minWidth += VOLUME_MIN_WIDTH;
 

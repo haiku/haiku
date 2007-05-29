@@ -2,6 +2,7 @@
  * Controller.h - Media Player for the Haiku Operating System
  *
  * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
+ * Copyright (C) 2007 Stephan Aßmus <superstippi@gmx.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,22 +23,47 @@
 
 #include <MediaDefs.h>
 #include <MediaNode.h>
+#include <List.h>
 #include <Locker.h>
 #include <String.h>
 
+class AudioSupplier;
 class BBitmap;
 class BMediaFile;
 class BMediaTrack;
 class SoundOutput;
+class VideoSupplier;
 class VideoView;
-class ControllerView;
 
-class Controller
-{
+class Controller {
 public:
+
+	class Listener {
+	public:
+							Listener();
+		virtual				~Listener();
+
+		virtual	void		FileFinished();
+		virtual	void		FileChanged();
+
+		virtual	void		VideoTrackChanged(int32 index);
+		virtual	void		AudioTrackChanged(int32 index);
+
+		virtual	void		VideoStatsChanged();
+		virtual	void		AudioStatsChanged();
+
+		virtual	void		PlaybackStateChanged(uint32 state);
+		virtual	void		PositionChanged(float position);
+		virtual	void		VolumeChanged(float volume);
+	};
+
 							Controller();
 	virtual 				~Controller();
-	
+
+	bool					Lock();
+	status_t				LockWithTimeout(bigtime_t timeout);
+	void					Unlock();
+
 	status_t				SetTo(const entry_ref &ref);
 	void					GetSize(int *width, int *height);
 
@@ -47,51 +73,67 @@ public:
 	status_t				SelectAudioTrack(int n);
 	status_t				SelectVideoTrack(int n);
 
-	bigtime_t				Duration();
-	bigtime_t				Position();
-
-	status_t				Seek(bigtime_t pos);
-
 	void					Stop();
 	void					Play();
 	void					Pause();
-	bool					IsPaused();
-	bool					IsStopped();
 
+	bool					IsPaused() const;
+	bool					IsStopped() const;
+	uint32					PlaybackState() const;
+
+	bigtime_t				Duration();
+	bigtime_t				Position();
+
+	void					SetVolume(float value);
+	float					Volume() const;
+	void					SetPosition(float value);
+	
+	// video view
 	void					SetVideoView(VideoView *view);
-	void					SetControllerView(ControllerView *view);
 	
 	bool					IsOverlayActive();
 
-	void					LockBitmap();
+	bool					LockBitmap();
 	void					UnlockBitmap();
 	BBitmap *				Bitmap();
 	
-	void					VolumeUp();
-	void					VolumeDown();
-	
-	void					SetVolume(float value);
-	
-	void					SetPosition(float value);
-	
-	void					UpdateVolume(float value);
-	void					UpdatePosition(float value);
+	// notification support
+	bool					AddListener(Listener* listener);
+	void					RemoveListener(Listener* listener);
 
 private:
-	static int32			audio_decode_thread(void *self);
-	static int32			video_decode_thread(void *self);
-	static int32			audio_play_thread(void *self);
-	static int32			video_play_thread(void *self);
+	void					_AudioDecodeThread();
+	void					_AudioPlayThread();
 
-	void					AudioDecodeThread();
-	void					VideoDecodeThread();
-	void					AudioPlayThread();
-	void					VideoPlayThread();
-		
-	void					StartThreads();
-	void					StopThreads();
-	
+	void					_VideoDecodeThread();
+	void					_VideoPlayThread();
+
+	void					_StartThreads();
+	void					_StopThreads();
+
+	void					_EndOfStreamReached(bool isVideo = false);
+	void					_UpdatePosition(bigtime_t position,
+								bool isVideoPosition = false,
+								bool force = false);
+
+	static int32			_VideoDecodeThreadEntry(void *self);
+	static int32			_VideoPlayThreadEntry(void *self);
+	static int32			_AudioDecodeThreadEntry(void *self);
+	static int32			_AudioPlayThreadEntry(void *self);
+
 private:
+	void					_NotifyFileChanged();
+	void					_NotifyFileFinished();
+	void					_NotifyVideoTrackChanged(int32 index);
+	void					_NotifyAudioTrackChanged(int32 index);
+
+	void					_NotifyVideoStatsChanged();
+	void					_NotifyAudioStatsChanged();
+
+	void					_NotifyPlaybackStateChanged();
+	void					_NotifyPositionChanged(float position);
+	void					_NotifyVolumeChanged(float volume);
+
 	friend class InfoWin;
 
 	enum {
@@ -106,24 +148,29 @@ private:
 		size_t			sizeMax;
 		bigtime_t		startTime;
 		bool			formatChanged;
+		bool			endOfStream;
 		media_format	mediaFormat;
 	};
 
 	VideoView *				fVideoView;
-	ControllerView *		fControllerView;
 	BString					fName;
 	volatile bool			fPaused;
 	volatile bool			fStopped;
+	float					fVolume;
+
 	BMediaFile *			fMediaFile;
-	BMediaTrack *			fAudioTrack;
-	BMediaTrack *			fVideoTrack;
-	
-	BLocker					fAudioTrackLock;
-	BLocker					fVideoTrackLock;
-	
+BMediaTrack *			fAudioTrack;
+BMediaTrack *			fVideoTrack;
+	mutable BLocker			fDataLock;
+
+	VideoSupplier*			fVideoSupplier;
+	AudioSupplier*			fAudioSupplier;
+
+	BLocker					fVideoSupplierLock;
+	BLocker					fAudioSupplierLock;
+
 	BList *					fAudioTrackList;
 	BList *					fVideoTrackList;
-	bigtime_t				fPosition;
 	media_format			fAudioFormat;
 	media_format			fVideoFormat;
 
@@ -141,6 +188,7 @@ private:
 	volatile bool			fSeekAudio;
 	volatile bool			fSeekVideo;
 	volatile bigtime_t		fSeekPosition;
+	bigtime_t				fPosition;
 	bigtime_t				fDuration;
 
 	int32					fAudioBufferCount;
@@ -157,9 +205,13 @@ private:
 	bigtime_t				fTimeSourceSysTime;
 	bigtime_t				fTimeSourcePerfTime;
 	bool 					fAutoplay;
+	volatile bool			fPauseAtEndOfStream;
+	volatile bool			fSeekToStartAfterPause;
 	
 	BBitmap *				fCurrentBitmap;
+	BLocker					fBitmapLock;
 
+	BList					fListeners;
 };
 
 

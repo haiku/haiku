@@ -4,14 +4,36 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 AddSubDirSupportedPlatforms libbe_test ;
 
+# source directories
+local sourceDirs =
+	supplier
+;
+
+local sourceDir ;
+for sourceDir in $(sourceDirs) {
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps mediaplayer $(sourceDir) ] ;
+}
+
 Application MediaPlayer :
+	# supplier
+	AudioSupplier.cpp
+	MediaTrackAudioSupplier.cpp
+	MediaTrackVideoSupplier.cpp
+	VideoSupplier.cpp
+
+	# .
+	AbstractLOAdapter.cpp
 	Controller.cpp
+	ControllerObserver.cpp
 	ControllerView.cpp
 	DrawingTidbits.cpp
 	InfoWin.cpp
+	ListViews.cpp
 	MainApp.cpp
 	MainWin.cpp
 	Playlist.cpp
+	PlaylistObserver.cpp
+	PlaylistWindow.cpp
 	SoundOutput.cpp
 	TransportButton.cpp
 	TransportControlGroup.cpp
@@ -19,7 +41,8 @@ Application MediaPlayer :
 	VideoNode.cpp
 	VideoView.cpp
 	VolumeSlider.cpp
-	: be media tracker $(TARGET_LIBSTDC++)
+
+	: be media tracker translation $(TARGET_LIBSTDC++)
 	: MediaPlayer.rdef
 ;
 

@@ -2,6 +2,7 @@
  * Controller.cpp - Media Player for the Haiku Operating System
  *
  * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
+ * Copyright (C) 2007 Stephan Aßmus <superstippi@gmx.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,26 +18,32 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  */
+#include "ControllerView.h"
+
 #include <Message.h>
 #include <stdio.h>
 #include <string.h>
 
-#include "ControllerView.h"
 #include "Controller.h"
 #include "Playlist.h"
-#include "Player.h"
+#include "PlaylistObserver.h"
 
-ControllerView::ControllerView(BRect frame, Controller *ctrl, Playlist *pl, Player *p)
+
+ControllerView::ControllerView(BRect frame, Controller* controller,
+		Playlist* playlist)
  :	TransportControlGroup(frame)
- ,	fController(ctrl)
- ,	fPlaylist(pl)
- ,	fPlayer(p)
+ ,	fController(controller)
+ ,	fPlaylist(playlist)
+ ,	fPlaylistObserver(new PlaylistObserver(this))
 {
+	fPlaylist->AddListener(fPlaylistObserver);
 }
 
 
 ControllerView::~ControllerView()
 {
+	fPlaylist->RemoveListener(fPlaylistObserver);
+	delete fPlaylistObserver;
 }
 
 
@@ -58,6 +65,11 @@ void
 ControllerView::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
+		case MSG_PLAYLIST_REF_ADDED:
+		case MSG_PLAYLIST_REF_REMOVED:
+			CheckSkippable();
+			break;
+
 		default:
 			TransportControlGroup::MessageReceived(msg);
 	}
@@ -69,6 +81,7 @@ ControllerView::MessageReceived(BMessage *msg)
 uint32
 ControllerView::EnabledButtons()
 {
+	// TODO: superflous
 	return 0xffffffff;
 }
 
@@ -112,11 +125,7 @@ void
 ControllerView::SkipBackward()
 {
 	printf("ControllerView::SkipBackward()\n");
-	entry_ref ref;
-	if (fPlaylist->PrevRef(&ref) == B_OK) {
-		printf("prev ref: %s\n", ref.name);
-		fPlayer->OpenFile(ref);
-	}
+	fPlaylist->SetCurrentRefIndex(fPlaylist->CurrentRefIndex() - 1);
 }
 
 
@@ -124,11 +133,7 @@ void
 ControllerView::SkipForward()
 {
 	printf("ControllerView::SkipForward()\n");
-	entry_ref ref;
-	if (fPlaylist->NextRef(&ref) == B_OK) {
-		printf("next ref: %s\n", ref.name);
-		fPlayer->OpenFile(ref);
-	}
+	fPlaylist->SetCurrentRefIndex(fPlaylist->CurrentRefIndex() + 1);
 }
 
 
@@ -154,4 +159,17 @@ ControllerView::PositionChanged(float value)
 	// 0.0 ... 1.0
 	fController->SetPosition(value);
 }
+
+
+// #pragma mark -
+
+
+void
+ControllerView::CheckSkippable()
+{
+	bool canSkipNext, canSkipPrevious;
+	fPlaylist->GetSkipInfo(&canSkipPrevious, &canSkipNext);
+	SetSkippable(canSkipPrevious, canSkipNext);
+}
+
 

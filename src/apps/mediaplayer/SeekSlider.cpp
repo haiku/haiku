@@ -32,11 +32,12 @@ const char* kDisabledSeekMessage = "Drop files to play";
 SeekSlider::SeekSlider(BRect frame, const char* name, BMessage* message,
 					   int32 minValue, int32 maxValue)
 	: BControl(frame, name, NULL, message, B_FOLLOW_NONE,
-			   B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
-	  fTracking(false),
-	  fKnobPos(_KnobPosFor(Bounds(), Value())),
-	  fMinValue(minValue),
-	  fMaxValue(maxValue)
+			   B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
+	, fTracking(false)
+	, fLastTrackTime(0)
+	, fKnobPos(_KnobPosFor(Bounds(), Value()))
+	, fMinValue(minValue)
+	, fMaxValue(maxValue)
 {
 	BFont font(be_plain_font);
 	font.SetSize(9.0);
@@ -67,26 +68,13 @@ SeekSlider::SetValue(int32 value)
 	BControl::SetValueNoUpdate(value);
 #else
 	BControl::SetValue(value);
+		// this will Invalidate() the whole view
 #endif
 	Invoke();
 
-#if __HAIKU__
-	int32 oldKnobPos = fKnobPos;
-	fKnobPos = _KnobPosFor(Bounds(), Value());
-	// invalidate
-	if (oldKnobPos != fKnobPos) {
-		float knobWidth2 = SEEK_SLIDER_KNOB_WIDTH / 2.0;
-		BRect oldKnob(Bounds());
-		BRect newKnob(oldKnob);
-		oldKnob.left = oldKnobPos - knobWidth2;
-		oldKnob.right = oldKnobPos + knobWidth2;
-		newKnob.left = fKnobPos - knobWidth2;
-		newKnob.right = fKnobPos + knobWidth2;
-		Invalidate(oldKnob | newKnob);
-	}
-#else
-	fKnobPos = _KnobPosFor(Bounds(), Value());
-#endif
+	_SetKnobPosition(_KnobPosFor(Bounds(), Value()));
+
+	fLastTrackTime = system_time();
 }
 
 
@@ -138,7 +126,7 @@ SeekSlider::Draw(BRect updateRect)
 		float sliderStart = (r.left + knobWidth2);
 
 		for (int32 i = 0; i < dotCount; i++) {
-			dotPos.x = sliderStart + i * 6.0 + 5.0;
+			dotPos.x = sliderStart + i * 6.0;
 			StrokeLine(dotPos, BPoint(dotPos.x, dotPos.y + 6.0));
 		}
 		// slider handle
@@ -298,8 +286,17 @@ SeekSlider::SetPosition(float position)
 	int32 value = fMinValue + (int32)floorf((fMaxValue - fMinValue) * position + 0.5);
 	if (value != Value()) {
 		BControl::SetValue(value);
-		
+		_SetKnobPosition(_KnobPosFor(Bounds(), Value()));
 	}
+}
+
+
+bool
+SeekSlider::IsTracking() const
+{
+	if (fTracking)
+		return true;
+	return system_time() - fLastTrackTime < 250000;
 }
 
 
@@ -349,5 +346,22 @@ SeekSlider::_StrokeFrame(BRect r, rgb_color left, rgb_color top,
 }
 
 
+void
+SeekSlider::_SetKnobPosition(int32 knobPos)
+{
+	if (fKnobPos == knobPos)
+		return;
 
+	float knobWidth2 = SEEK_SLIDER_KNOB_WIDTH / 2.0;
+	BRect oldKnob(Bounds());
+	BRect newKnob(oldKnob);
+	oldKnob.left = fKnobPos - knobWidth2;
+	oldKnob.right = fKnobPos + knobWidth2;
+
+	fKnobPos = knobPos;
+
+	newKnob.left = fKnobPos - knobWidth2;
+	newKnob.right = fKnobPos + knobWidth2;
+	Invalidate(oldKnob | newKnob);
+}
 

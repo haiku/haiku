@@ -2,6 +2,7 @@
  * Controller.cpp - Media Player for the Haiku Operating System
  *
  * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
+ * Copyright (C) 2007 Stephan Aßmus <superstippi@gmx.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,35 +27,39 @@
 
 class Controller;
 class Playlist;
-class Player;
+class PlaylistObserver;
 
 class ControllerView : public TransportControlGroup
 {
 public:
-					ControllerView(BRect frame, Controller *ctrl, Playlist *pl, Player *p);
-					~ControllerView();
+						ControllerView(BRect frame, Controller* controller,
+							Playlist* playlist);
+						~ControllerView();
 					
 private:
-	void			AttachedToWindow();
-	void			MessageReceived(BMessage *msg);
-	void			Draw(BRect updateRect);
+	void				AttachedToWindow();
+	void				MessageReceived(BMessage *msg);
+	void				Draw(BRect updateRect);
 
 	// TransportControlGroup interface
-	virtual	uint32	EnabledButtons();
-	virtual	void	TogglePlaying();
-	virtual	void	Stop();
-	virtual	void	Rewind();
-	virtual	void	Forward();
-	virtual	void	SkipBackward();
-	virtual	void	SkipForward();
-	virtual	void	VolumeChanged(float value);
-	virtual	void	ToggleMute();
-	virtual	void	PositionChanged(float value);
-	
+	virtual	uint32		EnabledButtons();
+	virtual	void		TogglePlaying();
+	virtual	void		Stop();
+	virtual	void		Rewind();
+	virtual	void		Forward();
+	virtual	void		SkipBackward();
+	virtual	void		SkipForward();
+	virtual	void		VolumeChanged(float value);
+	virtual	void		ToggleMute();
+	virtual	void		PositionChanged(float value);
+
+	// ControllerView
+			void		CheckSkippable();
+
 private:
-	Controller *	fController;
-	Playlist *		fPlaylist;
-	Player *		fPlayer;
+	Controller*			fController;
+	Playlist*			fPlaylist;
+	PlaylistObserver*	fPlaylistObserver;
 };
 
 #endif

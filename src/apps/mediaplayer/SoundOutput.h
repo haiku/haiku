@@ -32,13 +32,15 @@ public:
 					
 	status_t		InitCheck();
 					
+	media_raw_audio_format	Format() const;
+
 	bigtime_t		Latency();
 
 	float			Volume();
 	void			SetVolume(float new_volume);
 	
 	void			Play(const void *data, size_t size);
-	
+
 private:
 	static void		play_buffer(void *cookie, void *buffer, size_t size, const media_raw_audio_format & format);
 	void			PlayBuffer(void *buffer);

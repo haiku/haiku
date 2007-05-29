@@ -7,7 +7,7 @@
  */
 
 // NOTE: Based on my code in the BeOS interface for the VLC media player
-// that I did during the VLC 0.4.3 - 0.4.6 times. Code not done by me
+// that I did during the VLC 0.4.3 - 0.4.6 times. Code not written by me
 // removed. -Stephan Aßmus
 
 #ifndef TRANSPORT_CONTROL_GROUP_H
@@ -21,12 +21,6 @@ class SeekSlider;
 class VolumeSlider;
 
 enum {
-	PLAYBACK_STATE_PLAYING = 0,
-	PLAYBACK_STATE_PAUSED,
-	PLAYBACK_STATE_STOPPED,
-};
-
-enum {
 	SKIP_BACK_ENABLED		= 1 << 0,
 	SEEK_BACK_ENABLED		= 1 << 1,
 	PLAYBACK_ENABLED		= 1 << 2,
@@ -38,7 +32,9 @@ enum {
 
 class TransportControlGroup : public BView {
  public:
-								TransportControlGroup(BRect frame);
+								TransportControlGroup(BRect frame,
+									bool useSkipButtons = true,
+									bool useWindButtons = false);
 	virtual						~TransportControlGroup();
 
 	// BView interface
@@ -106,7 +102,6 @@ class TransportControlGroup : public BView {
 			TransportButton*	fStop;
 			TransportButton*	fMute;
 
-			int					fCurrentStatus;
 			float				fBottomControlHeight;
 };
 
