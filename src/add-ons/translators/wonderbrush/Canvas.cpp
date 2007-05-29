@@ -15,8 +15,6 @@
 #include <Entry.h>
 #include <Message.h>
 
-#include "defines.h"
-
 #include "Layer.h"
 
 using std::nothrow;
