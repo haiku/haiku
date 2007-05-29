@@ -73,8 +73,10 @@ extern float	roundf(float value);
 #endif	// HAIKU_TARGET_PLATFORM_LIBBE_TEST
 
 #if defined(HAIKU_TARGET_PLATFORM_BEOS) || defined(HAIKU_TARGET_PLATFORM_BONE)
-#	define B_REDO					'REDO'
-#	define B_BAD_DATA				(B_NOT_ALLOWED + 1)
+#	define B_REDO						'REDO'
+#	define B_BAD_DATA					(B_NOT_ALLOWED + 1)
+#	define B_DOCUMENT_BACKGROUND_COLOR	B_PANEL_BACKGROUND_COLOR
+#	define B_DOCUMENT_TEXT_COLOR		B_MENU_ITEM_TEXT_COLOR
 #endif
 
 #if !defined(HAIKU_TARGET_PLATFORM_HAIKU) && !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
@@ -95,7 +97,6 @@ extern float	roundf(float value);
 #define	B_MPEG_2_5_AUDIO_LAYER_1 (enum mpeg_id)0x301
 #define	B_MPEG_2_5_AUDIO_LAYER_2 (enum mpeg_id)0x302
 #define	B_MPEG_2_5_AUDIO_LAYER_3 (enum mpeg_id)0x303
-
 
 #endif	// HAIKU_BUILD_COMPATIBILITY_H
 
