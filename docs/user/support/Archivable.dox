@@ -2,8 +2,10 @@
  * Copyright 2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
- * Documentation by:
+ * Author:
  *  Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ * Proofreader:
+ *  David Weizades <ddewbofh@hotmail.com>
  * Corresponds to:
  * /trunk/headers/os/support/Archivable.h rev 19972
  * /trunk/src/kits/support/Archivable.cpp rev 19095
@@ -20,39 +22,39 @@
   \ingroup libbe
   \brief Interfaced for objects that can be archived into a BMessage.
   
-  BArchivable provides an interface for objects that can be archived into
-  messages and unarchived to objects in another location. By these means you
-  are able to send objects between applications, or even between computers over
+  BArchivable provides an interface for objects that can be put into message
+  archives and extracted into objects in another location. Using this you are
+  able to send objects between applications, or even between computers across
   networks.
   
-  BArchivable differs from BFlattenable in way that BFlattenable is designed to
-  store objects to flat streams of data, where the main objective is storing it
-  to disk. The objective of this interface is to archive objects that will be
-  restored as objects. To illustrate that point, BArchivable messages know how
-  to restore itself, whereas BFlattenables have a datatype which you manually
-  need to map to classes. 
+  BArchivable differs from BFlattenable in that BFlattenable is designed to
+  store objects into flat streams of data, the main objective being storage to
+  disk. The objective of this interface, however, is to store objects that will
+  be restored to other objects. To illustrate this point, BArchivable messages
+  know how to restore themselves whereas BFlattenables have a datatype which
+  you need to map to classes manually. 
   
-  Archiving is done with the Archive() method. If your class support it, the
-  caller can request your class to to a deep archivation, which means that all
-  child objects should be stored. Unarchiving works with the Instantiate()
-  method, which is static. However, since the interface is designed to
-  unarchive objects without the caller knowing what kind of object it
-  actually is, the global function #instantiate_object() instantiates a message
-  without you manually having to determine the class the message is from. This
-  adds considerable flexibility and allows BArchivable to be used in
-  combination with add-ons.
+  Archiving is done with the Archive() method. If your class supports it, the
+  caller can request it to store in to a deep archive, meaning that all child
+  objects in it will be stored. Extracting the archive works with the
+  Instantiate() method, which is static. Since the interface is designed to
+  extract objects without the caller knowing what kind of object it actually is
+  the global function #instantiate_object() instantiates a message without you
+  manually having to determine the class the message is from. This adds
+  considerable flexibility and allows BArchivable to be used in combination with
+  other add-ons.
   
-  To provide this interface in your classes, you should publicly inherit this
-  class. You should reimplement Archive() and Instantiate(), and provide one
-  constructor that takes one BMessage argument. 
+  To provide this interface in your classes you should publicly inherit this
+  class. You should implement Archive() and Instantiate(), and provide one
+  constructor  that takes one BMessage argument. 
 */
 
 /*!
   \fn BArchivable::BArchivable(BMessage* from)
   \brief Constructor. Does nothing.
   
-  If you inherit this interface, you should at least provide one constructor
-  that takes one BMessage argument.
+  If you inherit this interface you should provide at least one constructor that
+  takes one BMessage argument.
 */
 
 /*!
@@ -69,13 +71,12 @@
   \fn virtual	status_t BArchivable::Archive(BMessage* into, bool deep = true) const
   \brief Archive the object into a BMessage.
   
-  You should call this method from your derived implementation, as it finishes
-  the message to contain data to instantiate your object. 
+  You should call this method from your derived implementation as it adds the
+  data needed to instantiate your object to the message.
   
-  \param into The message you may store your object in.
-  \param deep If \c true, all child object of this object should be stored as
-    well. Naturally, only pay attention of this parameter if you actually have
-    child objects.
+  \param into The message you store your object in.
+  \param deep If \c true, all children of this object should be stored as well.
+    Only pay attention of this parameter if you actually have child objects.
   \retval B_OK The archiving succeeded.
   \retval "error codes" The archiving did not succeed.
 */
@@ -86,13 +87,13 @@
   
   You should always check that the \a archive argument actually corresponds to
   your class. The automatic functions, such as #instantiate_object() will not
-  choose the wrong class, but some manual calls to this member might be faulty.
+  choose the wrong class but manual calls to this member might be faulty.
   
-  \param archive The message with the data to restore an object.
+  \param archive The message with the data of the object to restore.
   \retval You should return a pointer to your object, or \c NULL if you 
-    failed to succeed.
+    fail.
   \warning The default implementation will always return \c NULL. Even though
-    it is possible to store plain BArchive objects, it is impossible to restore
+    it is possible to store plain BArchive objects it is impossible to restore
     them. 
   \see instantiate_object(BMessage *from)
 */
@@ -100,11 +101,11 @@
 /*!
   \fn virtual status_t BArchivable::Perform(perform_code d, void* arg)
   \brief Internal method.
-  \internal This method is used to extend the API or to provide 'hidden'
-    features. Currently nothing of interest is implemented.
+  \internal This method is defined in case of unforseen binary compatbility API
+    issues. Currently nothing of interest in implemented. 
 */
 
-///////////////////// Global methods
+///// Global methods /////
 /*!
   \addtogroup support_globals
   @{
@@ -122,26 +123,26 @@
     different application or library.
   
   This function is similar to instantiate_object(BMessage *from), except that
-  it takes the \a id argument that refers to an image where the object might
-  come from. 
+  it takes the \a id argument referring to an image where the object might
+  stored. 
   
-  \note Images are names for executable files. Image ids refer to these
+  \note Images are names for executable files. Image id's refer to these
     executable files that have been loaded by your application. Have a look
-    at the kernel API.
+    at the kernel API for further info.
 */
 
 /*!
   \fn BArchivable* instantiate_object(BMessage *from)
   \brief Instantiate an archived object.
   
-  This global function will determine the base class based on the \a from 
+  This global function will determine the base class, based on the \a from 
   argument, and it will call the Instantiate() function of that object to
   restore it. 
   
   \param from The archived object.
   \return The object returns a pointer to the instantiated object, or \c NULL
     if the instantiation failed. The global \c errno variable will contain the
-    reason it failed.
+    reason why it failed.
   \see instantiate_object(BMessage *from, image_id *id)
 */
 
