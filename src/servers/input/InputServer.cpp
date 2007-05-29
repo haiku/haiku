@@ -1434,6 +1434,7 @@ InputServer::_SanitizeEvents(EventList& events)
 	   		{
 	   			BPoint where;
 				int32 x, y;
+				float absX, absY;
 
 	    		if (event->FindInt32("x", &x) == B_OK
 	    			&& event->FindInt32("y", &y) == B_OK) {
@@ -1447,6 +1448,21 @@ InputServer::_SanitizeEvents(EventList& events)
 
 					PRINT(("new position: %f, %f, %ld, %ld\n",
 						fMousePos.x, fMousePos.y, x, y));
+	    		} else if (event->FindFloat("x", &absX) == B_OK
+	    			&& event->FindFloat("y", &absY) == B_OK) {
+	    			// device gives us absolute screen coords
+	    			// in range 0..1
+	    			// convert to absolute screen pos
+	    			// (the message is supposed to contain the original
+	    			// absolute coordinates as "be:tablet_x/y")
+		   			fMousePos.x = absX * fFrame.Width();
+		   			fMousePos.y = absY * fFrame.Height();
+					fMousePos.ConstrainTo(fFrame);
+
+					event->RemoveName("x"); 
+					event->RemoveName("y");
+					event->AddPoint("where", fMousePos);
+					PRINT(("new position : %f, %f\n", fMousePos.x, fMousePos.y));
 		   		} else if (event->FindPoint("where", &where) == B_OK) {
 		   			fMousePos = where;
 					fMousePos.ConstrainTo(fFrame);
