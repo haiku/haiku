@@ -77,6 +77,7 @@ BScreenSaver *instantiate_screen_saver(BMessage *msg, image_id image)
 
 Message::Message(BMessage *archive, image_id id)
  :	BScreenSaver(archive, id)
+ ,  fFontFamilies(NULL)
 {
 }
 
@@ -157,10 +158,11 @@ Message::Draw(BView *view, int32 frame)
 		tint_color(base_color, B_DARKEN_3_TINT),
 	};
 
+	offscreen.SetDrawingMode(B_OP_OVER);
+
 	// Set the basic font parameters, including random font family
 	BFont font;
 	offscreen.GetFont(&font);
-	font.SetFlags(B_DISABLE_ANTIALIASING);
 	font.SetFace(B_BOLD_FACE);
 	font.SetFamilyAndStyle((font_family) fFontFamilies->ItemAt(rand() % fFontFamilies->CountItems()), NULL);
 	offscreen.SetFont(&font);
