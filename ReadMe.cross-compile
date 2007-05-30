@@ -22,6 +22,8 @@ Haiku's build system itself:
  * bison
  * flex and lex (usually a mini shell script invoking flex)
  * makeinfo (part of texinfo, needed for building gcc 4 only)
+ * autoheader (part of autoconf, needed for building gcc)
+ * gawk
 
 Whether they are installed can be tested for instance by running them in the
 shell with the "--version" parameter.
