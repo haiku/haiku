@@ -20,6 +20,7 @@
  */
 #include "Controller.h"
 
+#include <new>
 #include <stdio.h>
 #include <string.h>
 #include <Debug.h>
@@ -40,6 +41,8 @@
 #include "MediaTrackAudioSupplier.h"
 #include "MediaTrackVideoSupplier.h"
 #include "VideoSupplier.h"
+
+using std::nothrow;
 
 
 #define AUDIO_PLAY_PRIORITY		110
@@ -73,6 +76,7 @@ void Controller::Listener::PlaybackStateChanged(uint32) {}
 void Controller::Listener::PositionChanged(float) {}
 void Controller::Listener::VolumeChanged(float) {}
 
+
 // #pragma mark -
 
 
@@ -84,8 +88,10 @@ Controller::Controller()
  ,	fVolume(1.0)
 
  ,	fMediaFile(0)
+// TODO: remove, InfoWin depends on it but should be fixed
 ,fAudioTrack(0)
 ,fVideoTrack(0)
+// 
  ,	fDataLock("controller data lock")
 
  ,	fVideoSupplier(NULL)
