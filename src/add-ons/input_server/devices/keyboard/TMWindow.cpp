@@ -381,7 +381,12 @@ TMDescView::Draw(BRect rect)
 		// draw icon and application path
 		BRect frame(rect);
 		frame.Set(frame.left, frame.top, frame.left + 31, frame.top + 31);
+#ifdef __HAIKU__
+		SetDrawingMode(B_OP_ALPHA);
+		SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+#else
 		SetDrawingMode(B_OP_OVER);
+#endif
 		DrawBitmap(fItem->LargeIcon(), frame);
 		SetDrawingMode(B_OP_COPY);
 
