@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Haiku.
+ * Copyright 2005-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -179,6 +179,8 @@ class HWInterface : protected MultiLocker {
 												 const BPoint& offset);
 
 			void				_NotifyFrameBufferChanged();
+
+	static	bool				_IsValidMode(const display_mode& mode);
 
 			// If we draw the cursor somewhere in the drawing buffer,
 			// we need to backup its contents before drawing, so that

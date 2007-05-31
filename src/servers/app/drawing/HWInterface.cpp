@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Haiku.
+ * Copyright 2005-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,13 +23,19 @@
 #include <unistd.h>
 
 
-HWInterfaceListener::HWInterfaceListener()		{}
-HWInterfaceListener::~HWInterfaceListener()		{}
+HWInterfaceListener::HWInterfaceListener()
+{
+}
+
+
+HWInterfaceListener::~HWInterfaceListener()
+{
+}
 
 
 // #pragma mark - HWInterface
 
-// constructor
+
 HWInterface::HWInterface(bool doubleBuffered)
 	: MultiLocker("hw interface lock"),
 	  fCursorAreaBackup(NULL),
@@ -954,5 +960,17 @@ HWInterface::_NotifyFrameBufferChanged()
 			= (HWInterfaceListener*)listeners.ItemAtFast(i);
 		listener->FrameBufferChanged();
 	}
+}
+
+
+/*static*/ bool
+HWInterface::_IsValidMode(const display_mode& mode)
+{
+	// TODO: more of those!
+	if (mode.virtual_width < 320
+		|| mode.virtual_height < 200)
+		return false;
+
+	return true;
 }
 

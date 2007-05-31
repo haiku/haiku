@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,7 +8,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-/**	Accelerant based HWInterface implementation */
+/*!	Accelerant based HWInterface implementation */
 
 
 #include "AccelerantHWInterface.h"
@@ -438,8 +438,7 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 
 	// some safety checks
 	// TODO: more of those!
-	if (mode.virtual_width < 320
-		|| mode.virtual_height < 200)
+	if (!_IsValidMode(mode))
 		return B_BAD_VALUE;
 
 	// just try to set the mode - we let the graphics driver
@@ -465,6 +464,10 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 			// use - this is always necessary for VESA mode, for example.
 			if (fAccGetDisplayMode(&newMode) != B_OK)
 				return B_ERROR;
+
+			// TODO: check if the mode returned is valid!
+			if (!_IsValidMode(newMode))
+				return B_BAD_DATA;
 
 			// TODO: if the mode switch before fails as well, we must forbid
 			//	any uses of this class!
@@ -497,7 +500,8 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 	// update backbuffer if neccessary
 	if (!fBackBuffer || fBackBuffer->Width() != fDisplayMode.virtual_width
 		|| fBackBuffer->Height() != fDisplayMode.virtual_height
-		|| (fDisplayMode.space == B_RGB32 && fBackBuffer != NULL && !HWInterface::IsDoubleBuffered())) {
+		|| (fDisplayMode.space == B_RGB32 && fBackBuffer != NULL
+			&& !HWInterface::IsDoubleBuffered())) {
 		// NOTE: backbuffer is always B_RGBA32, this simplifies the
 		// drawing backend implementation tremendously for the time
 		// being. The color space conversion is handled in CopyBackToFront()
