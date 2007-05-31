@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -347,11 +347,11 @@ static int32
 process_pending_ici(int32 currentCPU)
 {
 	struct smp_msg *msg;
-	bool halt = false;
-	int source_mailbox = 0;
+	vint32 *haltValue = NULL;
+	int sourceMailbox = 0;
 	int retval = B_HANDLED_INTERRUPT;
 
-	msg = check_for_message(currentCPU, &source_mailbox);
+	msg = check_for_message(currentCPU, &sourceMailbox);
 	if (msg == NULL)
 		return retval;
 
@@ -374,8 +374,8 @@ process_pending_ici(int32 currentCPU)
 			retval = B_INVOKE_SCHEDULER;
 			break;
 		case SMP_MSG_CPU_HALT:
-			halt = true;
-			dprintf("cpu %ld halted!\n", currentCPU);
+			haltValue = (vint32 *)msg->data_ptr;
+			dprintf("CPU %ld halted!\n", currentCPU);
 			break;
 		case SMP_MSG_CALL_FUNCTION:
 		{
@@ -389,13 +389,16 @@ process_pending_ici(int32 currentCPU)
 	}
 
 	// finish dealing with this message, possibly removing it from the list
-	finish_message_processing(currentCPU, msg, source_mailbox);
+	finish_message_processing(currentCPU, msg, sourceMailbox);
 
 	// special case for the halt message
-	// we otherwise wouldn't have gotten the opportunity to clean up
-	if (halt) {
-		disable_interrupts();
-		for(;;);
+	if (haltValue) {
+		cpu_status state = disable_interrupts();
+
+		while (*haltValue != 0)
+			;
+		
+		restore_interrupts(state);
 	}
 
 	return retval;

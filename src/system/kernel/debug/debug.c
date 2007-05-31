@@ -867,20 +867,23 @@ panic(const char *format, ...)
 void
 kernel_debugger(const char *message)
 {
+	static vint32 inDebugger;
 	cpu_status state;
 	bool dprintfState;
+
+	state = disable_interrupts();
+	atomic_add(&inDebugger, 1);
 
 	arch_debug_save_registers(&dbg_register_file[smp_get_current_cpu()][0]);
 	dprintfState = set_dprintf_enabled(true);
 
-	state = disable_interrupts();
-
 	if (sDebuggerOnCPU != smp_get_current_cpu()) {
-		// halt all of the other cpus
+		// First entry, halt all of the other cpus
 
 		// XXX need to flush current smp mailbox to make sure this goes
 		// through. Otherwise it'll hang
-		smp_send_broadcast_ici(SMP_MSG_CPU_HALT, 0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
+		smp_send_broadcast_ici(SMP_MSG_CPU_HALT, 0, 0, 0, (void *)&inDebugger,
+			SMP_MSG_FLAG_SYNC);
 	}
 
 	if (sBlueScreenOutput) {
@@ -896,6 +899,7 @@ kernel_debugger(const char *message)
 	set_dprintf_enabled(dprintfState);
 
 	sBlueScreenEnabled = false;
+	atomic_add(&inDebugger, -1);
 	restore_interrupts(state);
 
 	// ToDo: in case we change dbg_register_file - don't we want to restore it?
