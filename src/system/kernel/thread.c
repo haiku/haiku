@@ -6,7 +6,8 @@
  * Distributed under the terms of the NewOS License.
  */
 
-/** Threading routines */
+/*! Threading routines */
+
 
 #include <OS.h>
 
@@ -85,6 +86,8 @@ static unsigned int sNumDeathStacks;
 static unsigned int volatile sDeathStackBitmap;
 static sem_id sDeathStackSem;
 
+static struct thread *last_thread_dumped = NULL;
+
 // The dead queue is used as a pool from which to retrieve and reuse previously
 // allocated thread structs when creating a new thread. It should be gone once
 // the slab allocator is in.
@@ -94,10 +97,10 @@ static void thread_kthread_entry(void);
 static void thread_kthread_exit(void);
 
 
-/**	Inserts a thread into a team.
- *	You must hold the team lock when you call this function.
- */
-
+/*!
+	Inserts a thread into a team.
+	You must hold the team lock when you call this function.
+*/
 static void
 insert_thread_into_team(struct team *team, struct thread *thread)
 {
@@ -113,10 +116,10 @@ insert_thread_into_team(struct team *team, struct thread *thread)
 }
 
 
-/**	Removes a thread from a team.
- *	You must hold the team lock when you call this function.
- */
-
+/*!
+	Removes a thread from a team.
+	You must hold the team lock when you call this function.
+*/
 static void
 remove_thread_from_team(struct team *team, struct thread *thread)
 {
@@ -162,15 +165,19 @@ thread_struct_hash(void *_t, const void *_key, uint32 range)
 	return (uint32)key->id % range;
 }
 
-/**	Allocates and fills in thread structure (or reuses one from the dead queue).
- *
- * \param threadID The ID to be assigned to the new thread. If
- *		  \code < 0 \endcode a fresh one is allocated.
- * \param thread initialize this thread struct if nonnull
- */
+
+/*!
+	Allocates and fills in thread structure (or reuses one from the
+	dead queue).
+
+	\param threadID The ID to be assigned to the new thread. If
+		  \code < 0 \endcode a fresh one is allocated.
+	\param thread initialize this thread struct if nonnull
+*/
 
 static struct thread *
-create_thread_struct(struct thread *inthread, const char *name, thread_id threadID, struct cpu_ent *cpu)
+create_thread_struct(struct thread *inthread, const char *name,
+	thread_id threadID, struct cpu_ent *cpu)
 {
 	struct thread *thread;
 	cpu_status state;
@@ -275,8 +282,7 @@ delete_thread_struct(struct thread *thread)
 }
 
 
-// this function gets run by a new thread before anything else
-
+/*! This function gets run by a new thread before anything else */
 static void
 thread_kthread_entry(void)
 {
@@ -303,11 +309,11 @@ thread_kthread_exit(void)
 }
 
 
-/** Initializes the thread and jumps to its userspace entry point.
- *	This function is called at creation time of every user thread,
- *	but not for a team's main thread.
- */
-
+/*!
+	Initializes the thread and jumps to its userspace entry point.
+	This function is called at creation time of every user thread,
+	but not for a team's main thread.
+*/
 static int
 _create_user_thread_kentry(void)
 {
@@ -325,9 +331,7 @@ _create_user_thread_kentry(void)
 }
 
 
-/** Initializes the thread and calls it kernel space entry point.
- */
-
+/*! Initializes the thread and calls it kernel space entry point. */
 static int
 _create_kernel_thread_kentry(void)
 {
@@ -339,12 +343,12 @@ _create_kernel_thread_kentry(void)
 }
 
 
-/** Creates a new thread in the team with the specified team ID.
- *
- * \param threadID The ID to be assigned to the new thread. If
- *		  \code < 0 \endcode a fresh one is allocated.
- */
+/*!
+	Creates a new thread in the team with the specified team ID.
 
+	\param threadID The ID to be assigned to the new thread. If
+		  \code < 0 \endcode a fresh one is allocated.
+*/
 static thread_id
 create_thread(const char *name, team_id teamID, thread_entry_func entry,
 	void *args1, void *args2, int32 priority, bool kernel, thread_id threadID)
@@ -357,7 +361,8 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 	bool abort = false;
 	bool debugNewThread = false;
 
-	TRACE(("create_thread(%s, id = %ld, %s)\n", name, threadID, kernel ? "kernel" : "user"));
+	TRACE(("create_thread(%s, id = %ld, %s)\n", name, threadID,
+		kernel ? "kernel" : "user"));
 
 	thread = create_thread_struct(NULL, name, threadID, NULL);
 	if (thread == NULL)
@@ -373,8 +378,9 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 	clear_thread_debug_info(&thread->debug_info, false);
 
 	snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%lx_kstack", name, thread->id);
-	thread->kernel_stack_area = create_area(stack_name, (void **)&thread->kernel_stack_base,
-		B_ANY_KERNEL_ADDRESS, KERNEL_STACK_SIZE, B_FULL_LOCK,
+	thread->kernel_stack_area = create_area(stack_name,
+		(void **)&thread->kernel_stack_base, B_ANY_KERNEL_ADDRESS,
+		KERNEL_STACK_SIZE, B_FULL_LOCK,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_KERNEL_STACK_AREA);
 
 	if (thread->kernel_stack_area < 0) {
@@ -454,8 +460,8 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 	if (kernel) {
 		// this sets up an initial kthread stack that runs the entry
 
-		// Note: whatever function wants to set up a user stack later for this thread
-		// must initialize the TLS for it
+		// Note: whatever function wants to set up a user stack later for this
+		// thread must initialize the TLS for it
 		arch_thread_init_kthread_stack(thread, &_create_kernel_thread_kentry,
 			&thread_kthread_entry, &thread_kthread_exit);
 	} else {
@@ -482,7 +488,8 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 		// copy the user entry over to the args field in the thread struct
 		// the function this will call will immediately switch the thread into
 		// user space.
-		arch_thread_init_kthread_stack(thread, &_create_user_thread_kentry, &thread_kthread_entry, &thread_kthread_exit);
+		arch_thread_init_kthread_stack(thread, &_create_user_thread_kentry,
+			&thread_kthread_entry, &thread_kthread_exit);
 	}
 
 	return status;
@@ -550,8 +557,6 @@ state_to_text(struct thread *thread, int32 state)
 	}
 }
 
-
-static struct thread *last_thread_dumped = NULL;
 
 static void
 _dump_thread_info(struct thread *thread)
@@ -691,7 +696,8 @@ dump_thread_list(int argc, char **argv)
 			|| (realTimeOnly && thread->priority < B_REAL_TIME_DISPLAY_PRIORITY))
 			continue;
 
-		kprintf("%p %6lx  %-9s", thread, thread->id, state_to_text(thread, thread->state));
+		kprintf("%p %6lx  %-9s", thread, thread->id, state_to_text(thread,
+			thread->state));
 
 		// does it block on a semaphore?
 		if (thread->state == B_THREAD_WAITING)
@@ -774,10 +780,10 @@ dump_next_thread_in_team(int argc, char **argv)
 }
 
 
-/** Finds a free death stack for us and allocates it.
- *	Must be called with interrupts enabled.
- */
-
+/*!
+	Finds a free death stack for us and allocates it.
+	Must be called with interrupts enabled.
+*/
 static uint32
 get_death_stack(void)
 {
@@ -816,9 +822,7 @@ get_death_stack(void)
 }
 
 
-/**	Returns the thread's death stack to the pool.
- */
-
+/*!	Returns the thread's death stack to the pool. */
 static void
 put_death_stack(uint32 index)
 {
@@ -850,7 +854,8 @@ thread_exit2(void *_args)
 {
 	struct thread_exit_args args;
 
-	// copy the arguments over, since the source is probably on the kernel stack we're about to delete
+	// copy the arguments over, since the source is probably on the kernel
+	// stack we're about to delete
 	memcpy(&args, _args, sizeof(struct thread_exit_args));
 
 	// we can't let the interrupts disabled at this point
@@ -865,7 +870,8 @@ thread_exit2(void *_args)
 	delete_area(args.old_kernel_stack);
 
 	// remove this thread from all of the global lists
-	TRACE(("thread_exit2: removing thread 0x%lx from global lists\n", args.thread->id));
+	TRACE(("thread_exit2: removing thread 0x%lx from global lists\n",
+		args.thread->id));
 
 	disable_interrupts();
 	GRAB_TEAM_LOCK();
@@ -1075,7 +1081,8 @@ thread_exit(void)
 
 		// fill all death entries
 		death = NULL;
-		while ((death = list_get_next_item(&thread->exit.waiters, death)) != NULL) {
+		while ((death = list_get_next_item(&thread->exit.waiters,
+				death)) != NULL) {
 			death->status = thread->exit.status;
 			death->reason = thread->exit.reason;
 			death->signal = thread->exit.signal;
@@ -1105,8 +1112,8 @@ thread_exit(void)
 		thread->kernel_stack_base = sDeathStacks[args.death_stack].address;
 
 		// we will continue in thread_exit2(), on the new stack
-		arch_thread_switch_kstack_and_call(thread, thread->kernel_stack_base + KERNEL_STACK_SIZE,
-			thread_exit2, &args);
+		arch_thread_switch_kstack_and_call(thread, thread->kernel_stack_base
+			 + KERNEL_STACK_SIZE, thread_exit2, &args);
 	}
 
 	panic("never can get here\n");
@@ -1142,11 +1149,11 @@ thread_get_thread_struct_locked(thread_id id)
 }
 
 
-/** Called in the interrupt handler code when a thread enters
- *	the kernel for any reason.
- *	Only tracks time for now.
- */
-
+/*!
+	Called in the interrupt handler code when a thread enters
+	the kernel for any reason.
+	Only tracks time for now.
+*/
 void
 thread_at_kernel_entry(void)
 {
@@ -1169,10 +1176,10 @@ thread_at_kernel_entry(void)
 }
 
 
-/** Called whenever a thread exits kernel space to user space.
- *	Tracks time, handles signals, ...
- */
-
+/*!
+	Called whenever a thread exits kernel space to user space.
+	Tracks time, handles signals, ...
+*/
 void
 thread_at_kernel_exit(void)
 {
@@ -1207,9 +1214,7 @@ thread_at_kernel_exit(void)
 //	#pragma mark - private kernel API
 
 
-/** Insert a thread to the tail of a queue
- */
-
+/*! Insert a thread to the tail of a queue */
 void
 thread_enqueue(struct thread *thread, struct thread_queue *queue)
 {
@@ -1306,12 +1311,12 @@ thread_yield(void)
 }
 
 
-/** Kernel private thread creation function.
- *
- * \param threadID The ID to be assigned to the new thread. If
- *		  \code < 0 \endcode a fresh one is allocated.
- */
+/*!
+	Kernel private thread creation function.
 
+	\param threadID The ID to be assigned to the new thread. If
+		  \code < 0 \endcode a fresh one is allocated.
+*/
 thread_id
 spawn_kernel_thread_etc(thread_func function, const char *name, int32 priority,
 	void *arg, team_id team, thread_id threadID)
@@ -1322,7 +1327,8 @@ spawn_kernel_thread_etc(thread_func function, const char *name, int32 priority,
 
 
 status_t
-wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout, status_t *_returnCode)
+wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
+	status_t *_returnCode)
 {
 	sem_id exitSem = B_BAD_THREAD_ID;
 	struct death_entry death, *freeDeath = NULL;
@@ -1492,7 +1498,8 @@ thread_init(kernel_args *args)
 		sNumDeathStacks = 8 * sizeof(sDeathStackBitmap);
 	}
 	sDeathStackBitmap = 0;
-	sDeathStacks = (struct death_stack *)malloc(sNumDeathStacks * sizeof(struct death_stack));
+	sDeathStacks = (struct death_stack *)malloc(sNumDeathStacks
+		* sizeof(struct death_stack));
 	if (sDeathStacks == NULL) {
 		panic("error creating death stacks\n");
 		return B_NO_MEMORY;
@@ -1502,8 +1509,9 @@ thread_init(kernel_args *args)
 
 		for (i = 0; i < sNumDeathStacks; i++) {
 			sprintf(temp, "death stack %lu", i);
-			sDeathStacks[i].area = create_area(temp, (void **)&sDeathStacks[i].address,
-				B_ANY_KERNEL_ADDRESS, KERNEL_STACK_SIZE, B_FULL_LOCK,
+			sDeathStacks[i].area = create_area(temp,
+				(void **)&sDeathStacks[i].address, B_ANY_KERNEL_ADDRESS,
+				KERNEL_STACK_SIZE, B_FULL_LOCK,
 				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_KERNEL_STACK_AREA);
 			if (sDeathStacks[i].area < 0) {
 				panic("error creating death stacks\n");
@@ -1573,43 +1581,46 @@ kill_thread(thread_id id)
 
 
 static status_t
-send_data_etc(thread_id tid, int32 code, const void *buffer, size_t buffer_size, int32 flags)
+send_data_etc(thread_id id, int32 code, const void *buffer,
+	size_t bufferSize, int32 flags)
 {
 	struct thread *target;
-	sem_id cached_sem;
+	sem_id cachedSem;
 	cpu_status state;
-	status_t rv;
+	status_t status;
 	cbuf *data;
 
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
-	target = thread_get_thread_struct_locked(tid);
+	target = thread_get_thread_struct_locked(id);
 	if (!target) {
 		RELEASE_THREAD_LOCK();
 		restore_interrupts(state);
 		return B_BAD_THREAD_ID;
 	}
-	cached_sem = target->msg.write_sem;
+	cachedSem = target->msg.write_sem;
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
 
-	if (buffer_size > THREAD_MAX_MESSAGE_SIZE)
+	if (bufferSize > THREAD_MAX_MESSAGE_SIZE)
 		return B_NO_MEMORY;
 
-	rv = acquire_sem_etc(cached_sem, 1, flags, 0);
-	if (rv == B_INTERRUPTED)
+	status = acquire_sem_etc(cachedSem, 1, flags, 0);
+	if (status == B_INTERRUPTED) {
 		// We got interrupted by a signal
-		return rv;
-	if (rv != B_OK)
+		return status;
+	}
+	if (status != B_OK) {
 		// Any other acquisition problems may be due to thread deletion
 		return B_BAD_THREAD_ID;
+	}
 
-	if (buffer_size > 0) {
-		data = cbuf_get_chain(buffer_size);
-		if (!data)
+	if (bufferSize > 0) {
+		data = cbuf_get_chain(bufferSize);
+		if (data == NULL)
 			return B_NO_MEMORY;
-		rv = cbuf_user_memcpy_to_chain(data, 0, buffer, buffer_size);
-		if (rv < 0) {
+		status = cbuf_user_memcpy_to_chain(data, 0, buffer, bufferSize);
+		if (status < B_OK) {
 			cbuf_free_chain(data);
 			return B_NO_MEMORY;
 		}
@@ -1620,8 +1631,8 @@ send_data_etc(thread_id tid, int32 code, const void *buffer, size_t buffer_size,
 	GRAB_THREAD_LOCK();
 
 	// The target thread could have been deleted at this point
-	target = thread_get_thread_struct_locked(tid);
-	if (!target) {
+	target = thread_get_thread_struct_locked(id);
+	if (target == NULL) {
 		RELEASE_THREAD_LOCK();
 		restore_interrupts(state);
 		cbuf_free_chain(data);
@@ -1631,15 +1642,14 @@ send_data_etc(thread_id tid, int32 code, const void *buffer, size_t buffer_size,
 	// Save message informations
 	target->msg.sender = thread_get_current_thread()->id;
 	target->msg.code = code;
-	target->msg.size = buffer_size;
+	target->msg.size = bufferSize;
 	target->msg.buffer = data;
-	cached_sem = target->msg.read_sem;
+	cachedSem = target->msg.read_sem;
 
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
 
-	release_sem(cached_sem);
-
+	release_sem(cachedSem);
 	return B_OK;
 }
 
@@ -1652,7 +1662,8 @@ send_data(thread_id thread, int32 code, const void *buffer, size_t bufferSize)
 
 
 static int32
-receive_data_etc(thread_id *_sender, void *buffer, size_t bufferSize, int32 flags)
+receive_data_etc(thread_id *_sender, void *buffer, size_t bufferSize,
+	int32 flags)
 {
 	struct thread *thread = thread_get_current_thread();
 	status_t status;
@@ -1670,7 +1681,8 @@ receive_data_etc(thread_id *_sender, void *buffer, size_t bufferSize, int32 flag
 
 	if (buffer != NULL && bufferSize != 0) {
 		size = min(bufferSize, thread->msg.size);
-		status = cbuf_user_memcpy_from_chain(buffer, thread->msg.buffer, 0, size);
+		status = cbuf_user_memcpy_from_chain(buffer, thread->msg.buffer,
+			0, size);
 		if (status < B_OK) {
 			cbuf_free_chain(thread->msg.buffer);
 			release_sem(thread->msg.write_sem);
@@ -1700,18 +1712,19 @@ has_data(thread_id thread)
 {
 	int32 count;
 
-	if (get_sem_count(thread_get_current_thread()->msg.read_sem, &count) != B_OK)
+	if (get_sem_count(thread_get_current_thread()->msg.read_sem,
+			&count) != B_OK)
 		return false;
 
 	return count == 0 ? false : true;
 }
 
 
-/** Fills the thread_info structure with information from the specified
- *	thread.
- *	The thread lock must be held when called.
- */
-
+/*!
+	Fills the thread_info structure with information from the specified
+	thread.
+	The thread lock must be held when called.
+*/
 static void
 fill_thread_info(struct thread *thread, thread_info *info, size_t size)
 {
@@ -1735,7 +1748,8 @@ fill_thread_info(struct thread *thread, thread_info *info, size_t size)
 	info->user_time = thread->user_time;
 	info->kernel_time = thread->kernel_time;
 	info->stack_base = (void *)thread->user_stack_base;
-	info->stack_end = (void *)(thread->user_stack_base + thread->user_stack_size - 1);
+	info->stack_end = (void *)(thread->user_stack_base
+		+ thread->user_stack_size - 1);
 }
 
 
@@ -1769,7 +1783,8 @@ err:
 
 
 status_t
-_get_next_thread_info(team_id team, int32 *_cookie, thread_info *info, size_t size)
+_get_next_thread_info(team_id team, int32 *_cookie, thread_info *info,
+	size_t size)
 {
 	status_t status = B_BAD_VALUE;
 	struct thread *thread = NULL;
@@ -1795,7 +1810,8 @@ _get_next_thread_info(team_id team, int32 *_cookie, thread_info *info, size_t si
 		goto err;
 
 	while (slot < lastThreadID
-		&& (!(thread = thread_get_thread_struct_locked(slot)) || thread->team->id != team))
+		&& (!(thread = thread_get_thread_struct_locked(slot))
+			|| thread->team->id != team))
 		slot++;
 
 	if (thread != NULL && thread->team->id == team) {
@@ -1944,9 +1960,7 @@ snooze_etc(bigtime_t timeout, int timebase, uint32 flags)
 }
 
 
-/** snooze() for internal kernel use only; doesn't interrupt on signals.
- */
-
+/*!	snooze() for internal kernel use only; doesn't interrupt on signals. */
 status_t
 snooze(bigtime_t timeout)
 {
@@ -1954,9 +1968,10 @@ snooze(bigtime_t timeout)
 }
 
 
-/** snooze_until() for internal kernel use only; doesn't interrupt on signals.
- */
-
+/*!
+	snooze_until() for internal kernel use only; doesn't interrupt on
+	signals.
+*/
 status_t
 snooze_until(bigtime_t timeout, int timebase)
 {
@@ -2093,7 +2108,8 @@ _user_set_thread_priority(thread_id thread, int32 newPriority)
 
 
 thread_id
-_user_spawn_thread(int32 (*entry)(thread_func, void *), const char *userName, int32 priority, void *data1, void *data2)
+_user_spawn_thread(int32 (*entry)(thread_func, void *), const char *userName,
+	int32 priority, void *data1, void *data2)
 {
 	char name[B_OS_NAME_LENGTH];
 	thread_id threadID;
@@ -2138,7 +2154,8 @@ _user_get_thread_info(thread_id id, thread_info *userInfo)
 
 	status = _get_thread_info(id, &info, sizeof(thread_info));
 
-	if (status >= B_OK && user_memcpy(userInfo, &info, sizeof(thread_info)) < B_OK)
+	if (status >= B_OK
+		&& user_memcpy(userInfo, &info, sizeof(thread_info)) < B_OK)
 		return B_BAD_ADDRESS;
 
 	return status;
@@ -2146,7 +2163,8 @@ _user_get_thread_info(thread_id id, thread_info *userInfo)
 
 
 status_t
-_user_get_next_thread_info(team_id team, int32 *userCookie, thread_info *userInfo)
+_user_get_next_thread_info(team_id team, int32 *userCookie,
+	thread_info *userInfo)
 {
 	status_t status;
 	thread_info info;
@@ -2211,12 +2229,14 @@ _user_has_data(thread_id thread)
 
 
 status_t
-_user_send_data(thread_id thread, int32 code, const void *buffer, size_t bufferSize)
+_user_send_data(thread_id thread, int32 code, const void *buffer,
+	size_t bufferSize)
 {
 	if (!IS_USER_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
 
-	return send_data_etc(thread, code, buffer, bufferSize, B_KILL_CAN_INTERRUPT);
+	return send_data_etc(thread, code, buffer, bufferSize,
+		B_KILL_CAN_INTERRUPT);
 		// supports userland buffers
 }
 
@@ -2279,7 +2299,8 @@ _user_setrlimit(int resource, const struct rlimit *userResourceLimit)
 		return EINVAL;
 
 	if (!IS_USER_ADDRESS(userResourceLimit)
-		|| user_memcpy(&resourceLimit, userResourceLimit, sizeof(struct rlimit)) < B_OK)
+		|| user_memcpy(&resourceLimit, userResourceLimit,
+			sizeof(struct rlimit)) < B_OK)
 		return B_BAD_ADDRESS;
 
 	return setrlimit(resource, &resourceLimit);
