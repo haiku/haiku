@@ -55,7 +55,10 @@ enum {
 	RFLAG_RELOCATED				= 0x1000,
 	RFLAG_PROTECTED				= 0x2000,
 	RFLAG_DEPENDENCIES_LOADED	= 0x4000,
-	RFLAG_REMAPPED				= 0x8000
+	RFLAG_REMAPPED				= 0x8000,
+
+	RFLAG_VISITED				= 0x10000
+		// temporarily set in the symbol resolution code
 };
 
 
@@ -70,10 +73,15 @@ enum {
 typedef void (*init_term_function)(image_id);
 
 static image_queue_t sLoadedImages = {0, 0};
-static image_queue_t sLoadingImages = {0, 0};
 static image_queue_t sDisposableImages = {0, 0};
 static uint32 sLoadedImageCount = 0;
 static image_t *sProgramImage;
+
+#ifdef BEOS_STYLE_SYMBOLS_RESOLUTION
+static bool sResolveSymbolsBeOSStyle = true;
+#else
+static bool sResolveSymbolsBeOSStyle = false;
+#endif
 
 // a recursive lock
 static sem_id rld_sem;
@@ -198,13 +206,7 @@ static image_t *
 find_image(char const *name, uint32 typeMask)
 {
 	bool isPath = (strchr(name, '/') != NULL);
-	image_t *image;
-
-	image = find_image_in_queue(&sLoadedImages, name, isPath, typeMask);
-	if (image == NULL)
-		image = find_image_in_queue(&sLoadingImages, name, isPath, typeMask);
-
-	return image;
+	return find_image_in_queue(&sLoadedImages, name, isPath, typeMask);
 }
 
 
@@ -729,21 +731,88 @@ find_symbol(image_t *image, const char *name, int32 type)
 }
 
 
-static struct Elf32_Sym *
-find_symbol_in_loaded_images(image_t **_image, const char *name)
+static struct Elf32_Sym*
+find_symbol_recursively_impl(image_t* image, const char* name,
+	image_t** foundInImage)
 {
-	image_t *image;
+	image->flags |= RFLAG_VISITED;
 
-	for (image = sLoadedImages.head; image; image = image->next) {
-		struct Elf32_Sym *symbol;
+	struct Elf32_Sym *symbol;
 
-		if (image->dynamic_ptr == NULL)
-			continue;
-
+	// look up the symbol in this image
+	if (image->dynamic_ptr) {
 		symbol = find_symbol(image, name, B_SYMBOL_TYPE_ANY);
 		if (symbol) {
-			*_image = image;
+			*foundInImage = image;
 			return symbol;
+		}
+	}
+
+	// recursively search dependencies
+	for (uint32 i = 0; i < image->num_needed; i++) {
+		if (!(image->needed[i]->flags & RFLAG_VISITED)) {
+			symbol = find_symbol_recursively_impl(image->needed[i], name,
+				foundInImage);
+			if (symbol)
+				return symbol;
+		}
+	}
+
+	return NULL;
+}
+
+
+static void
+clear_image_flag_recursively(image_t* image, uint32 flag)
+{
+	image->flags &= ~flag;
+
+	for (uint32 i = 0; i < image->num_needed; i++) {
+		if (image->needed[i]->flags & flag)
+			clear_image_flag_recursively(image->needed[i], flag);
+	}
+}
+
+
+static struct Elf32_Sym*
+find_symbol_recursively(image_t* image, const char* name,
+	image_t** foundInImage)
+{
+	struct Elf32_Sym* symbol = find_symbol_recursively_impl(image, name,
+		foundInImage);
+	clear_image_flag_recursively(image, RFLAG_VISITED);
+	return symbol;
+}
+
+
+static struct Elf32_Sym*
+find_symbol_in_loaded_images(const char* name, image_t** foundInImage)
+{
+	return find_symbol_recursively(sLoadedImages.head, name, foundInImage);
+}
+
+
+static struct Elf32_Sym*
+find_undefined_symbol(image_t* rootImage, image_t* image, const char* name,
+	image_t** foundInImage)
+{
+	// If not simulating BeOS style symbol resolution, undefined symbols are
+	// search recursively starting from the root image. (Note, breadth first
+	// might be better than the depth first use here.)
+	if (!sResolveSymbolsBeOSStyle)
+		return find_symbol_recursively(rootImage, name, foundInImage);
+
+	// BeOS style symbol resolution: It is sufficient to check the direct
+	// dependencies. The linker would have complained, if the symbol wasn't
+	// there.
+	for (uint32 i = 0; i < image->num_needed; i++) {
+		if (image->needed[i]->dynamic_ptr) {
+			struct Elf32_Sym *symbol = find_symbol(image->needed[i], name,
+				B_SYMBOL_TYPE_ANY);
+			if (symbol) {
+				*foundInImage = image->needed[i];
+				return symbol;
+			}
 		}
 	}
 
@@ -752,7 +821,8 @@ find_symbol_in_loaded_images(image_t **_image, const char *name)
 
 
 int
-resolve_symbol(image_t *image, struct Elf32_Sym *sym, addr_t *sym_addr)
+resolve_symbol(image_t *rootImage, image_t *image, struct Elf32_Sym *sym,
+	addr_t *sym_addr)
 {
 	struct Elf32_Sym *sym2;
 	char *symname;
@@ -763,8 +833,8 @@ resolve_symbol(image_t *image, struct Elf32_Sym *sym, addr_t *sym_addr)
 			// patch the symbol name
 			symname = SYMNAME(image, sym);
 
-			// it's undefined, must be outside this image, try the other image
-			sym2 = find_symbol_in_loaded_images(&shimg, symname);
+			// it's undefined, must be outside this image, try the other images
+			sym2 = find_undefined_symbol(rootImage, image, symname, &shimg);
 			if (!sym2) {
 				printf("elf_resolve_symbol: could not resolve symbol '%s'\n", symname);
 				return B_MISSING_SYMBOL;
@@ -835,11 +905,11 @@ register_image(image_t *image, int fd, const char *path)
 
 
 static status_t
-relocate_image(image_t *image)
+relocate_image(image_t *rootImage, image_t *image)
 {
-	status_t status = arch_relocate_image(image);
+	status_t status = arch_relocate_image(rootImage, image);
 	if (status < B_OK) {
-		FATAL("troubles relocating: 0x%lx\n", status);
+		FATAL("troubles relocating: 0x%lx (image: %s)\n", status, image->name);
 		return status;
 	}
 
@@ -1124,7 +1194,7 @@ relocate_dependencies(image_t *image)
 		return count;
 
 	for (i = 0; i < count; i++) {
-		status_t status = relocate_image(list[i]);
+		status_t status = relocate_image(image, list[i]);
 		if (status < B_OK)
 			return status;
 	}
@@ -1219,7 +1289,8 @@ load_program(char const *path, void **_entry)
 
 	// We patch any exported __gRuntimeLoader symbols to point to our private API
 	{
-		struct Elf32_Sym *symbol = find_symbol_in_loaded_images(&image, "__gRuntimeLoader");
+		struct Elf32_Sym *symbol = find_symbol_in_loaded_images(
+			"__gRuntimeLoader", &image);
 		if (symbol != NULL) {
 			void **_export = (void **)(symbol->st_value + image->regions[0].delta);
 			*_export = &gRuntimeLoader;
@@ -1233,7 +1304,8 @@ load_program(char const *path, void **_entry)
 	// Since the images are initialized now, we no longer should use our
 	// getenv(), but use the one from libroot.so
 	{
-		struct Elf32_Sym *symbol = find_symbol_in_loaded_images(&image, "getenv");
+		struct Elf32_Sym *symbol = find_symbol_in_loaded_images("getenv",
+			&image);
 		if (symbol != NULL)
 			gGetEnv = (char* (*)(const char*))
 				(symbol->st_value + image->regions[0].delta);

@@ -24,18 +24,21 @@ extern "C" {
 
 int runtime_loader(void *arg);
 int open_executable(char *name, image_type type, const char *rpath);
-status_t test_executable(const char *path, uid_t user, gid_t group, char *starter);
+status_t test_executable(const char *path, uid_t user, gid_t group,
+	char *starter);
 
 void terminate_program(void);
 image_id load_program(char const *path, void **entry);
 status_t unload_library(image_id imageID, bool addOn);
 image_id load_library(char const *path, uint32 flags, bool addOn);
-status_t get_nth_symbol(image_id imageID, int32 num, char *nameBuffer, int32 *_nameLength,
-	int32 *_type, void **_location);
+status_t get_nth_symbol(image_id imageID, int32 num, char *nameBuffer,
+	int32 *_nameLength, int32 *_type, void **_location);
 status_t get_symbol(image_id imageID, char const *symbolName, int32 symbolType,
 	void **_location);
-status_t get_next_image_dependency(image_id id, uint32 *cookie, const char **_name);
-int resolve_symbol(image_t *image, struct Elf32_Sym *sym, addr_t *sym_addr);
+status_t get_next_image_dependency(image_id id, uint32 *cookie,
+	const char **_name);
+int resolve_symbol(image_t *rootImage, image_t *image, struct Elf32_Sym *sym,
+	addr_t *sym_addr);
 
 
 status_t elf_verify_header(void *header, int32 length);
@@ -45,7 +48,7 @@ void rldexport_init(void);
 status_t heap_init(void);
 
 // arch dependent prototypes
-status_t arch_relocate_image(image_t *image);
+status_t arch_relocate_image(image_t *rootImage, image_t *image);
 
 #ifdef __cplusplus
 }

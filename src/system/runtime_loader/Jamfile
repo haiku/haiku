@@ -8,6 +8,9 @@ UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 SubDirCcFlags -fno-builtin ;
 SubDirC++Flags -fno-builtin -fno-exceptions ;
 
+# default to BeOS style symbol resolution
+DEFINES += BEOS_STYLE_SYMBOLS_RESOLUTION ;
+
 # needed for "runtime_loader" only
 StaticLibrary libruntime_loader.a :
 	kernel_vsprintf.c

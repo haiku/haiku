@@ -21,7 +21,8 @@
 
 
 static int
-relocate_rel(image_t *image, struct Elf32_Rel *rel, int rel_len)
+relocate_rel(image_t *rootImage, image_t *image, struct Elf32_Rel *rel,
+	int rel_len)
 {
 	// ToDo: implement me!
 
@@ -30,19 +31,20 @@ relocate_rel(image_t *image, struct Elf32_Rel *rel, int rel_len)
 
 
 status_t
-arch_relocate_image(image_t *image)
+arch_relocate_image(image_t *rootImage, image_t *image)
 {
 	status_t status = B_NO_ERROR;
 
 	// deal with the rels first
 	if (image->rel) {
-		status = relocate_rel(image, image->rel, image->rel_len);
+		status = relocate_rel(rootImage, image, image->rel, image->rel_len);
 		if (status < B_OK)
 			return status;
 	}
 
 	if (image->pltrel) {
-		status = relocate_rel(image, image->pltrel, image->pltrel_len);
+		status = relocate_rel(rootImage, image, image->pltrel,
+			image->pltrel_len);
 		if (status < B_OK)
 			return status;
 	}
