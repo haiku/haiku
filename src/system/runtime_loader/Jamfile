@@ -58,7 +58,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) arch $(TARGET_ARCH) ] ;
 
 Objects
 	runtime_loader.c
-	elf.c
+	elf.cpp
 	export.c
 	heap.cpp
 	utility.cpp

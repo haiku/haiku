@@ -313,7 +313,7 @@ create_image(const char *name, const char *path, int num_regions)
 	size_t allocSize = sizeof(image_t) + (num_regions - 1) * sizeof(elf_region_t);
 	const char *lastSlash;
 
-	image_t *image = malloc(allocSize);
+	image_t *image = (image_t*)malloc(allocSize);
 	if (image == NULL) {
 		FATAL("no memory for image %s\n", path);
 		return NULL;
@@ -814,8 +814,8 @@ register_image(image_t *image, int fd, const char *path)
 	info.type = image->type;
 	info.sequence = 0;
 	info.init_order = 0;
-	info.init_routine = (void *)image->init_routine;
-	info.term_routine = (void *)image->term_routine;
+	info.init_routine = (void (*)())image->init_routine;
+	info.term_routine = (void (*)())image->term_routine;
 	
 	if (_kern_read_stat(fd, NULL, false, &stat, sizeof(struct stat)) == B_OK) {
 		info.device = stat.st_dev;
@@ -1039,7 +1039,7 @@ load_dependencies(image_t *image)
 	if (image->num_needed == 0)
 		return B_OK;
 
-	image->needed = malloc(image->num_needed * sizeof(image_t *));
+	image->needed = (image_t**)malloc(image->num_needed * sizeof(image_t *));
 	if (image->needed == NULL) {
 		FATAL("failed to allocate needed struct\n");
 		return B_NO_MEMORY;
@@ -1099,7 +1099,7 @@ get_sorted_image_list(image_t *image, image_t ***_list, uint32 sortFlag)
 {
 	image_t **list;
 
-	list = malloc(sLoadedImageCount * sizeof(image_t *));
+	list = (image_t**)malloc(sLoadedImageCount * sizeof(image_t *));
 	if (list == NULL) {
 		FATAL("memory shortage in get_sorted_image_list()");
 		*_list = NULL;
@@ -1235,7 +1235,8 @@ load_program(char const *path, void **_entry)
 	{
 		struct Elf32_Sym *symbol = find_symbol_in_loaded_images(&image, "getenv");
 		if (symbol != NULL)
-			gGetEnv = (void *)(symbol->st_value + image->regions[0].delta);
+			gGetEnv = (char* (*)(const char*))
+				(symbol->st_value + image->regions[0].delta);
 	}
 
 	if (sProgramImage->entry_point == NULL) {
