@@ -67,6 +67,8 @@ ControllerView::MessageReceived(BMessage *msg)
 	switch (msg->what) {
 		case MSG_PLAYLIST_REF_ADDED:
 		case MSG_PLAYLIST_REF_REMOVED:
+		case MSG_PLAYLIST_REFS_SORTED:
+		case MSG_PLAYLIST_CURRENT_REF_CHANGED:
 			CheckSkippable();
 			break;
 
