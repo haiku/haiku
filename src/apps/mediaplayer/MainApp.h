@@ -40,6 +40,7 @@ private:
 	void			RefsReceived(BMessage *msg);
 	void			ArgvReceived(int32 argc, char **argv);
 	void			MessageReceived(BMessage *msg);
+	void			AboutRequested();
 
 private:
 	BWindow *		fFirstWindow;

@@ -47,14 +47,12 @@
 // XXX TODO: why is lround not defined?
 #define lround(a) ((int)(0.99999 + (a)))
 
-enum 
-{
+enum {
 	M_DUMMY = 0x100,
 	M_FILE_OPEN = 0x1000,
 	M_FILE_NEWPLAYER,
 	M_FILE_INFO,
 	M_FILE_PLAYLIST,
-	M_FILE_ABOUT,
 	M_FILE_CLOSE,
 	M_FILE_QUIT,	
 	M_VIEW_50,
@@ -97,7 +95,6 @@ MainWin::MainWin()
  ,  fFilePanel(NULL)
  ,	fInfoWin(NULL)
  ,	fPlaylistWindow(NULL)
- ,	fInfoWinShowing(false)
  ,	fHasFile(false)
  ,	fHasVideo(false)
  ,	fHasAudio(false)
@@ -132,7 +129,7 @@ MainWin::MainWin()
 
 	// menu
 	fMenuBar = new BMenuBar(fBackground->Bounds(), "menu");
-	CreateMenu();
+	_CreateMenu();
 	fBackground->AddChild(fMenuBar);
 	fMenuBar->ResizeToPreferred();
 	fMenuBarWidth = (int)fMenuBar->Frame().Width() + 1;
@@ -165,7 +162,7 @@ MainWin::MainWin()
 //	printf("fControlsHeight %d\n", fControlsHeight);
 //	printf("fControlsWidth %d\n", fControlsWidth);
 
-	SetupWindow();
+	_SetupWindow();
 
 	Show();
 }
@@ -198,6 +195,438 @@ MainWin::~MainWin()
 }
 
 
+// #pragma mark -
+
+
+void
+MainWin::FrameResized(float new_width, float new_height)
+{
+	if (new_width != Bounds().Width() || new_height != Bounds().Height()) {
+		debugger("size wrong\n");
+	}
+	
+	bool no_menu = fNoMenu || fIsFullscreen;
+	bool no_controls = fNoControls || fIsFullscreen;
+	
+	printf("FrameResized enter: new_width %.0f, new_height %.0f\n", new_width, new_height);
+	
+	int max_video_width  = int(new_width) + 1;
+	int max_video_height = int(new_height) + 1 - (no_menu  ? 0 : fMenuBarHeight) - (no_controls ? 0 : fControlsHeight);
+
+	ASSERT(max_video_height >= 0);
+	
+	int y = 0;
+	
+	if (no_menu) {
+		if (!fMenuBar->IsHidden())
+			fMenuBar->Hide();
+	} else {
+//		fMenuBar->MoveTo(0, y);
+		fMenuBar->ResizeTo(new_width, fMenuBarHeight - 1);
+		if (fMenuBar->IsHidden())
+			fMenuBar->Show();
+		y += fMenuBarHeight;
+	}
+	
+	if (max_video_height == 0) {
+		if (!fVideoView->IsHidden())
+			fVideoView->Hide();
+	} else {
+//		fVideoView->MoveTo(0, y);
+//		fVideoView->ResizeTo(max_video_width - 1, max_video_height - 1);
+		_ResizeVideoView(0, y, max_video_width, max_video_height);
+		if (fVideoView->IsHidden())
+			fVideoView->Show();
+		y += max_video_height;
+	}
+	
+	if (no_controls) {
+		if (!fControls->IsHidden())
+			fControls->Hide();
+	} else {
+		fControls->MoveTo(0, y);
+		fControls->ResizeTo(new_width, fControlsHeight - 1);
+		if (fControls->IsHidden())
+			fControls->Show();
+//		y += fControlsHeight;
+	}
+
+	printf("FrameResized leave\n");
+}
+
+
+void
+MainWin::Zoom(BPoint rec_position, float rec_width, float rec_height)
+{
+	PostMessage(M_TOGGLE_FULLSCREEN);
+}
+
+
+void
+MainWin::DispatchMessage(BMessage *msg, BHandler *handler)
+{
+	if ((msg->what == B_MOUSE_DOWN)
+		&& (handler == fBackground || handler == fVideoView
+				|| handler == fControls))
+		_MouseDown(msg, dynamic_cast<BView*>(handler));
+
+	if ((msg->what == B_MOUSE_MOVED)
+		&& (handler == fBackground || handler == fVideoView
+				|| handler == fControls))
+		_MouseMoved(msg, dynamic_cast<BView*>(handler));
+
+	if ((msg->what == B_MOUSE_UP)
+		&& (handler == fBackground || handler == fVideoView))
+		_MouseUp(msg);
+
+	if ((msg->what == B_KEY_DOWN)
+		&& (handler == fBackground || handler == fVideoView)) {
+
+		// special case for PrintScreen key
+		if (msg->FindInt32("key") == B_PRINT_KEY) {
+			fVideoView->OverlayScreenshotPrepare();
+			BWindow::DispatchMessage(msg, handler);
+			fVideoView->OverlayScreenshotCleanup();
+			return;
+		}
+		
+		// every other key gets dispatched to our _KeyDown first
+		if (_KeyDown(msg) == B_OK) {
+			// it got handled, don't pass it on
+			return;
+		}
+	}
+	
+	BWindow::DispatchMessage(msg, handler);
+}
+
+
+void
+MainWin::MessageReceived(BMessage *msg)
+{
+	switch (msg->what) {
+		case B_REFS_RECEIVED:
+			printf("MainWin::MessageReceived: B_REFS_RECEIVED\n");
+			_RefsReceived(msg);
+			break;
+		case B_SIMPLE_DATA:
+			printf("MainWin::MessageReceived: B_SIMPLE_DATA\n");
+			if (msg->HasRef("refs"))
+				_RefsReceived(msg);
+			break;
+
+		// PlaylistObserver messages
+		case MSG_PLAYLIST_REF_ADDED: {
+printf("MSG_PLAYLIST_REF_ADDED\n");
+			entry_ref ref;
+			int32 index;
+			if (msg->FindRef("refs", &ref) == B_OK
+				&& msg->FindInt32("index", &index) == B_OK) {
+				_AddPlaylistItem(ref, index);
+			}
+			break;
+		}
+		case MSG_PLAYLIST_REF_REMOVED: {
+printf("MSG_PLAYLIST_REF_REMOVED\n");
+			int32 index;
+			if (msg->FindInt32("index", &index) == B_OK) {
+				_RemovePlaylistItem(index);
+			}
+			break;
+		}
+		case MSG_PLAYLIST_CURRENT_REF_CHANGED: {
+printf("MSG_PLAYLIST_CURRENT_REF_CHANGED\n");
+			int32 index;
+			if (msg->FindInt32("index", &index) < B_OK
+				|| index != fPlaylist->CurrentRefIndex())
+				break;
+printf(" index: %ld\n", index);
+			entry_ref ref;
+			if (fPlaylist->GetRefAt(index, &ref) == B_OK) {
+				printf("open ref: %s\n", ref.name);
+				OpenFile(ref);
+				_MarkPlaylistItem(index);
+			}
+			break;
+		}
+
+		// ControllerObserver messages
+		case MSG_CONTROLLER_FILE_FINISHED:
+printf("MSG_CONTROLLER_FILE_FINISHED\n");
+			fPlaylist->SetCurrentRefIndex(fPlaylist->CurrentRefIndex() + 1);
+			break;
+		case MSG_CONTROLLER_FILE_CHANGED:
+			// TODO: move all other GUI changes as a reaction to this notification
+//			_UpdatePlaylistMenu();
+			break;
+		case MSG_CONTROLLER_VIDEO_TRACK_CHANGED: {
+			int32 index;
+			if (msg->FindInt32("index", &index) == B_OK) {
+				BMenuItem* item = fVideoTrackMenu->ItemAt(index);
+				if (item)
+					item->SetMarked(true);
+			}
+			break;
+		}
+		case MSG_CONTROLLER_AUDIO_TRACK_CHANGED: {
+			int32 index;
+			if (msg->FindInt32("index", &index) == B_OK) {
+				BMenuItem* item = fAudioTrackMenu->ItemAt(index);
+				if (item)
+					item->SetMarked(true);
+			}
+			break;
+		}
+		case MSG_CONTROLLER_PLAYBACK_STATE_CHANGED: {
+			uint32 state;
+			if (msg->FindInt32("state", (int32*)&state) == B_OK)
+				fControls->SetPlaybackState(state);
+			break;
+		}
+		case MSG_CONTROLLER_POSITION_CHANGED: {
+			float position;
+			if (msg->FindFloat("position", &position) == B_OK)
+				fControls->SetPosition(position);
+			break;
+		}
+
+		// menu item messages
+		case M_FILE_NEWPLAYER:
+			gMainApp->NewWindow();
+			break;
+		case M_FILE_OPEN:
+			if (!fFilePanel) {
+				fFilePanel = new BFilePanel();
+				fFilePanel->SetTarget(BMessenger(0, this));
+				fFilePanel->SetPanelDirectory("/boot/home/");
+			}
+			fFilePanel->Show();
+			break;
+		case M_FILE_INFO:
+			ShowFileInfo();
+			break;
+		case M_FILE_PLAYLIST:
+			ShowPlaylistWindow();
+			break;
+		case B_ABOUT_REQUESTED:
+			BAlert *alert;
+			alert = new BAlert("about", NAME"\n\n Written by Marcus Overhagen "
+				"and Stephan Aßmus", "Thanks");
+			if (fAlwaysOnTop) {
+				_ToggleAlwaysOnTop();
+				alert->Go();
+				_ToggleAlwaysOnTop();
+			} else {
+				alert->Go();
+			}
+			break;
+		case M_FILE_CLOSE:
+			PostMessage(B_QUIT_REQUESTED);
+			break;
+		case M_FILE_QUIT:	
+			be_app->PostMessage(B_QUIT_REQUESTED);
+			break;
+
+		case M_TOGGLE_FULLSCREEN:
+			_ToggleFullscreen();
+//			fSettingsMenu->ItemAt(1)->SetMarked(fIsFullscreen);
+			break;
+
+		case M_TOGGLE_NO_MENU:
+			_ToggleNoMenu();
+//			fSettingsMenu->ItemAt(3)->SetMarked(fNoMenu);
+			break;
+			
+		case M_TOGGLE_NO_CONTROLS:
+			_ToggleNoControls();
+//			fSettingsMenu->ItemAt(3)->SetMarked(fNoControls);
+			break;
+		
+		case M_TOGGLE_NO_BORDER:
+			_ToggleNoBorder();
+//			fSettingsMenu->ItemAt(4)->SetMarked(fNoBorder);
+			break;
+			
+		case M_TOGGLE_ALWAYS_ON_TOP:
+			_ToggleAlwaysOnTop();
+//			fSettingsMenu->ItemAt(5)->SetMarked(fAlwaysOnTop);
+			break;
+	
+		case M_TOGGLE_KEEP_ASPECT_RATIO:
+			_ToggleKeepAspectRatio();
+//			fSettingsMenu->ItemAt(6)->SetMarked(fKeepAspectRatio);
+			break;
+
+		case M_TOGGLE_NO_BORDER_NO_MENU_NO_CONTROLS:
+			_ToggleNoBorderNoMenu();
+			break;
+
+		case M_VIEW_50:
+			if (!fHasVideo)
+				break;
+			if (fIsFullscreen)
+				_ToggleFullscreen();
+			_ResizeWindow(50);
+			break;
+			
+		case M_VIEW_100:
+			if (!fHasVideo)
+				break;
+			if (fIsFullscreen)
+				_ToggleFullscreen();
+			_ResizeWindow(100);
+			break;
+
+		case M_VIEW_200:
+			if (!fHasVideo)
+				break;
+			if (fIsFullscreen)
+				_ToggleFullscreen();
+			_ResizeWindow(200);
+			break;
+
+		case M_VIEW_300:
+			if (!fHasVideo)
+				break;
+			if (fIsFullscreen)
+				_ToggleFullscreen();
+			_ResizeWindow(300);
+			break;
+
+		case M_VIEW_400:
+			if (!fHasVideo)
+				break;
+			if (fIsFullscreen)
+				_ToggleFullscreen();
+			_ResizeWindow(400);
+			break;
+
+/*
+		
+		case B_ACQUIRE_OVERLAY_LOCK:
+			printf("B_ACQUIRE_OVERLAY_LOCK\n");
+			fVideoView->OverlayLockAcquire();
+			break;
+			
+		case B_RELEASE_OVERLAY_LOCK:
+			printf("B_RELEASE_OVERLAY_LOCK\n");
+			fVideoView->OverlayLockRelease();
+			break;
+			
+		case B_MOUSE_WHEEL_CHANGED:
+		{
+			printf("B_MOUSE_WHEEL_CHANGED\n");
+			float dx = msg->FindFloat("be:wheel_delta_x");
+			float dy = msg->FindFloat("be:wheel_delta_y");
+			bool inv = modifiers() & B_COMMAND_KEY;
+			if (dx > 0.1)	PostMessage(inv ? M_VOLUME_DOWN : M_CHANNEL_PREV);
+			if (dx < -0.1)	PostMessage(inv ? M_VOLUME_UP : M_CHANNEL_NEXT);
+			if (dy > 0.1)	PostMessage(inv ? M_CHANNEL_PREV : M_VOLUME_DOWN);
+			if (dy < -0.1)	PostMessage(inv ? M_CHANNEL_NEXT : M_VOLUME_UP);
+			break;
+		}
+
+		case M_CHANNEL_NEXT:
+		{
+			printf("M_CHANNEL_NEXT\n");
+			int chan = fController->CurrentChannel();
+			if (chan != -1) {
+				chan++;
+				if (chan < fController->ChannelCount())
+					SelectChannel(chan);
+			}
+			break;
+		}
+
+		case M_CHANNEL_PREV:
+		{
+			printf("M_CHANNEL_PREV\n");
+			int chan = fController->CurrentChannel();
+			if (chan != -1) {
+				chan--;
+				if (chan >= 0)
+					SelectChannel(chan);
+			}
+			break;
+		}
+
+		case M_VOLUME_UP:
+			printf("M_VOLUME_UP\n");
+			fController->VolumeUp();
+			break;
+
+		case M_VOLUME_DOWN:
+			printf("M_VOLUME_DOWN\n");
+			fController->VolumeDown();
+			break;
+*/
+
+		case M_ASPECT_100000_1:
+			VideoFormatChange(fSourceWidth, fSourceHeight, 1.0, 1.0);
+			break;
+
+		case M_ASPECT_106666_1:
+			VideoFormatChange(fSourceWidth, fSourceHeight, 1.06666, 1.0);
+			break;
+
+		case M_ASPECT_109091_1:
+			VideoFormatChange(fSourceWidth, fSourceHeight, 1.09091, 1.0);
+			break;
+
+		case M_ASPECT_141176_1:
+			VideoFormatChange(fSourceWidth, fSourceHeight, 1.41176, 1.0);
+			break;
+
+		case M_ASPECT_720_576:
+			VideoFormatChange(720, 576, 1.06666, 1.0);
+			break;
+
+		case M_ASPECT_704_576:
+			VideoFormatChange(704, 576, 1.09091, 1.0);
+			break;
+
+		case M_ASPECT_544_576:
+			VideoFormatChange(544, 576, 1.41176, 1.0);
+			break;
+/*
+		case M_PREFERENCES:
+			break;
+			
+		default:
+			if (msg->what >= M_SELECT_CHANNEL && msg->what <= M_SELECT_CHANNEL_END) {
+				SelectChannel(msg->what - M_SELECT_CHANNEL);
+				break;
+			}
+			if (msg->what >= M_SELECT_INTERFACE && msg->what <= M_SELECT_INTERFACE_END) {
+				SelectInterface(msg->what - M_SELECT_INTERFACE - 1);
+				break;
+			}
+*/
+		case M_SET_PLAYLIST_POSITION: {
+			int32 index;
+			if (msg->FindInt32("index", &index) == B_OK)
+				fPlaylist->SetCurrentRefIndex(index);
+			break;
+		}
+
+		default:
+			// let BWindow handle the rest
+			BWindow::MessageReceived(msg);
+	}
+}
+
+
+bool
+MainWin::QuitRequested()
+{
+	be_app->PostMessage(M_PLAYER_QUIT);
+	return true;
+}
+
+
+// #pragma mark -
+
+
 void
 MainWin::OpenFile(const entry_ref &ref)
 {
@@ -227,16 +656,119 @@ MainWin::OpenFile(const entry_ref &ref)
 		fHasAudio = fController->AudioTrackCount() != 0;
 		SetTitle(ref.name);
 	}
-	SetupWindow();
+	_SetupWindow();
 }
 
 void
-MainWin::SetupWindow()
+MainWin::ShowFileInfo()
 {
-	printf("MainWin::SetupWindow\n");	
+	if (!fInfoWin)
+		fInfoWin = new InfoWin(Frame().LeftTop(), fController);
+
+	if (fInfoWin->Lock()) {
+		if (fInfoWin->IsHidden())
+			fInfoWin->Show();
+		else
+			fInfoWin->Activate();
+		fInfoWin->Unlock();
+	}
+
+	BMessenger msgr(fInfoWin);
+	BMessage m(M_UPDATE_INFO);
+	m.AddInt32("which", INFO_ALL);
+	msgr.SendMessage(&m);
+	msgr.SendMessage(B_WINDOW_ACTIVATED);
+}
+
+
+void
+MainWin::ShowPlaylistWindow()
+{
+	if (!fPlaylistWindow) {
+		fPlaylistWindow = new PlaylistWindow(BRect(150, 150, 400, 500),
+			fPlaylist);
+		fPlaylistWindow->Show();
+		return;
+	}
+
+	if (fPlaylistWindow->Lock()) {
+		if (fPlaylistWindow->IsHidden())
+			fPlaylistWindow->Show();
+		else
+			fPlaylistWindow->Activate();
+		fPlaylistWindow->Unlock();
+	}
+}
+
+
+void
+MainWin::VideoFormatChange(int width, int height, float width_scale, float height_scale)
+{
+	// called when video format or aspect ratio changes
+	
+	printf("VideoFormatChange enter: width %d, height %d, width_scale %.6f, height_scale %.6f\n", width, height, width_scale, height_scale);
+
+	if (width_scale < 1.0 && height_scale >= 1.0) {
+		width_scale  = 1.0 / width_scale;
+		height_scale = 1.0 / height_scale;
+		printf("inverting! new values: width_scale %.6f, height_scale %.6f\n", width_scale, height_scale);
+	}
+	
+ 	fSourceWidth  = width;
+ 	fSourceHeight = height;
+ 	fWidthScale   = width_scale;
+ 	fHeightScale  = height_scale;
+ 	
+ 	FrameResized(Bounds().Width(), Bounds().Height());
+
+	printf("VideoFormatChange leave\n");
+}
+
+
+// #pragma mark -
+
+
+void
+MainWin::_RefsReceived(BMessage *msg)
+{
+	printf("MainWin::_RefsReceived\n");
+
+	// the playlist ist replaced by dropped files
+	// or the dropped files are appended to the end
+	// of the existing playlist if <shift> is pressed
+	bool add = modifiers() & B_SHIFT_KEY;
+
+	if (!add)
+		fPlaylist->MakeEmpty();
+
+	bool startPlaying = fPlaylist->CountItems() == 0;
+
+	Playlist temporaryPlaylist;
+	Playlist* playlist = add ? &temporaryPlaylist : fPlaylist;
+
+	entry_ref ref;
+	for (int i = 0; B_OK == msg->FindRef("refs", i, &ref); i++)
+		_AppendToPlaylist(ref, playlist);
+
+	playlist->Sort();
+
+	if (add)
+		fPlaylist->AdoptPlaylist(temporaryPlaylist);
+
+	if (startPlaying) {
+		// open first file
+		fPlaylist->SetCurrentRefIndex(0);
+	}
+}
+
+
+void
+MainWin::_SetupWindow()
+{
+	printf("MainWin::_SetupWindow\n");	
 
 	// Populate the track menus
-	SetupTrackMenus();
+	_SetupTrackMenus();
 	// Enable both if a file was loaded
 	fAudioTrackMenu->SetEnabled(fHasFile);
 	fVideoTrackMenu->SetEnabled(fHasFile);
@@ -259,55 +791,16 @@ MainWin::SetupWindow()
 		fHeightScale = 1.0;
 	}
 
-	UpdateControlsEnabledStatus();
+	_UpdateControlsEnabledStatus();
 
-	ResizeWindow(100);
+	_ResizeWindow(100);
 
 	fVideoView->MakeFocus();
-	
-	MaybeUpdateFileInfo();
 }
 
 
 void
-MainWin::ResizeWindow(int percent)
-{
-	int video_width;
-	int video_height;
-
-	// Get required window size
-	video_width = lround(fSourceWidth * fWidthScale);
-	video_height = lround(fSourceHeight * fHeightScale);
-	
-	video_width = (video_width * percent) / 100;
-	video_height = (video_height * percent) / 100;
-	
-	// Calculate and set the initial window size
-	int width = max_c(fControlsWidth, video_width);
-	int height = (fNoControls ? 0 : fControlsHeight) + video_height;
-	if (!fNoMenu) {
-		width = max_c(width, fMenuBarWidth);
-		height += fMenuBarHeight;
-	}
-	SetWindowSizeLimits();
-	ResizeTo(width - 1, height - 1);
-}
-
-
-void
-MainWin::SetWindowSizeLimits()
-{
-	int minWidth = fNoControls  ? MIN_WIDTH : fControlsWidth;
-	if (!fNoMenu)
-		minWidth = max_c(minWidth, fMenuBarWidth);
-	int minHeight = (fNoMenu ? 0 : fMenuBarHeight) + (fNoControls ? 0 : fControlsHeight);
-	
-	SetSizeLimits(minWidth - 1, 32000, minHeight - 1, fHasVideo ? 32000 : minHeight - 1);
-}
-
-
-void
-MainWin::CreateMenu()
+MainWin::_CreateMenu()
 {
 	fFileMenu = new BMenu(NAME);
 	fPlaylistMenu = new BMenu("Playlist"B_UTF8_ELLIPSIS);
@@ -333,7 +826,8 @@ MainWin::CreateMenu()
 	fPlaylistMenu->Superitem()->SetMessage(new BMessage(M_FILE_PLAYLIST));
 
 	fFileMenu->AddSeparatorItem();
-	fFileMenu->AddItem(new BMenuItem("About" NAME B_UTF8_ELLIPSIS, new BMessage(M_FILE_ABOUT)));
+	fFileMenu->AddItem(new BMenuItem("About" NAME B_UTF8_ELLIPSIS,
+		new BMessage(B_ABOUT_REQUESTED)));
 	fFileMenu->AddSeparatorItem();
 	fFileMenu->AddItem(new BMenuItem("Close", new BMessage(M_FILE_CLOSE), 'W', B_COMMAND_KEY));
 	fFileMenu->AddItem(new BMenuItem("Quit", new BMessage(M_FILE_QUIT), 'Q', B_COMMAND_KEY));
@@ -382,7 +876,7 @@ MainWin::CreateMenu()
 
 
 void
-MainWin::SetupTrackMenus()
+MainWin::_SetupTrackMenus()
 {
 	fAudioTrackMenu->RemoveItems(0, fAudioTrackMenu->CountItems(), true);
 	fVideoTrackMenu->RemoveItems(0, fVideoTrackMenu->CountItems(), true);
@@ -408,16 +902,79 @@ MainWin::SetupTrackMenus()
 }
 
 
-bool
-MainWin::QuitRequested()
+void
+MainWin::_SetWindowSizeLimits()
 {
-	be_app->PostMessage(M_PLAYER_QUIT);
-	return true;
+	int minWidth = fNoControls  ? MIN_WIDTH : fControlsWidth;
+	if (!fNoMenu)
+		minWidth = max_c(minWidth, fMenuBarWidth);
+	int minHeight = (fNoMenu ? 0 : fMenuBarHeight) + (fNoControls ? 0 : fControlsHeight);
+	
+	SetSizeLimits(minWidth - 1, 32000, minHeight - 1, fHasVideo ? 32000 : minHeight - 1);
 }
 
 
 void
-MainWin::MouseDown(BMessage *msg, BView* originalHandler)
+MainWin::_ResizeWindow(int percent)
+{
+	int video_width;
+	int video_height;
+
+	// Get required window size
+	video_width = lround(fSourceWidth * fWidthScale);
+	video_height = lround(fSourceHeight * fHeightScale);
+	
+	video_width = (video_width * percent) / 100;
+	video_height = (video_height * percent) / 100;
+	
+	// Calculate and set the initial window size
+	int width = max_c(fControlsWidth, video_width);
+	int height = (fNoControls ? 0 : fControlsHeight) + video_height;
+	if (!fNoMenu) {
+		width = max_c(width, fMenuBarWidth);
+		height += fMenuBarHeight;
+	}
+	_SetWindowSizeLimits();
+	ResizeTo(width - 1, height - 1);
+}
+
+
+void
+MainWin::_ResizeVideoView(int x, int y, int width, int height)
+{
+	printf("_ResizeVideoView: %d,%d, width %d, height %d\n", x, y, width, height);
+	
+	if (fKeepAspectRatio) {
+		// Keep aspect ratio, place video view inside
+		// the background area (may create black bars).
+		float scaled_width  = fSourceWidth * fWidthScale;
+		float scaled_height = fSourceHeight * fHeightScale;
+		float factor = min_c(width / scaled_width, height / scaled_height);
+		int render_width = lround(scaled_width * factor);
+		int render_height = lround(scaled_height * factor);
+		if (render_width > width)
+			render_width = width;
+		if (render_height > height)
+			render_height = height;
+
+		int x_ofs = x + (width - render_width) / 2;
+		int y_ofs = y + (height - render_height) / 2;
+
+		fVideoView->MoveTo(x_ofs, y_ofs);
+		fVideoView->ResizeTo(render_width - 1, render_height - 1);
+
+	} else {
+		fVideoView->MoveTo(x, y);
+		fVideoView->ResizeTo(width - 1, height - 1);
+	}
+}
+
+
+// #pragma mark -
+
+
+void
+MainWin::_MouseDown(BMessage *msg, BView* originalHandler)
 {
 	BPoint screen_where;
 	uint32 buttons = msg->FindInt32("buttons");
@@ -478,12 +1035,12 @@ MainWin::MouseDown(BMessage *msg, BView* originalHandler)
 	} while (system_time() - start < delay);
 
 	if (buttons & 2)
-		ShowContextMenu(screen_where);
+		_ShowContextMenu(screen_where);
 }
 
 
 void
-MainWin::MouseMoved(BMessage *msg, BView* originalHandler)
+MainWin::_MouseMoved(BMessage *msg, BView* originalHandler)
 {
 //	msg->PrintToStream();
 
@@ -517,7 +1074,7 @@ MainWin::MouseMoved(BMessage *msg, BView* originalHandler)
 
 
 void
-MainWin::MouseUp(BMessage *msg)
+MainWin::_MouseUp(BMessage *msg)
 {
 //	msg->PrintToStream();
 	fMouseDownTracking = false;
@@ -525,7 +1082,7 @@ MainWin::MouseUp(BMessage *msg)
 
 
 void
-MainWin::ShowContextMenu(const BPoint &screen_point)
+MainWin::_ShowContextMenu(const BPoint &screen_point)
 {
 	printf("Show context menu\n");
 	BPopUpMenu *menu = new BPopUpMenu("context menu", false, false);
@@ -546,7 +1103,8 @@ MainWin::ShowContextMenu(const BPoint &screen_point)
 	item->SetMarked(fAlwaysOnTop);
 
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("About" NAME B_UTF8_ELLIPSIS, new BMessage(M_FILE_ABOUT)));
+	menu->AddItem(new BMenuItem("About" NAME B_UTF8_ELLIPSIS,
+		new BMessage(B_ABOUT_REQUESTED)));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("Quit", new BMessage(M_FILE_QUIT), 'Q', B_COMMAND_KEY));
 
@@ -565,425 +1123,11 @@ MainWin::ShowContextMenu(const BPoint &screen_point)
 }
 
 
-void
-MainWin::VideoFormatChange(int width, int height, float width_scale, float height_scale)
-{
-	// called when video format or aspect ratio changes
-	
-	printf("VideoFormatChange enter: width %d, height %d, width_scale %.6f, height_scale %.6f\n", width, height, width_scale, height_scale);
-
-	if (width_scale < 1.0 && height_scale >= 1.0) {
-		width_scale  = 1.0 / width_scale;
-		height_scale = 1.0 / height_scale;
-		printf("inverting! new values: width_scale %.6f, height_scale %.6f\n", width_scale, height_scale);
-	}
-	
- 	fSourceWidth  = width;
- 	fSourceHeight = height;
- 	fWidthScale   = width_scale;
- 	fHeightScale  = height_scale;
- 	
- 	FrameResized(Bounds().Width(), Bounds().Height());
-
-	printf("VideoFormatChange leave\n");
-}
-
-
-void
-MainWin::Zoom(BPoint rec_position, float rec_width, float rec_height)
-{
-	PostMessage(M_TOGGLE_FULLSCREEN);
-}
-
-
-void
-MainWin::FrameResized(float new_width, float new_height)
-{
-	if (new_width != Bounds().Width() || new_height != Bounds().Height()) {
-		debugger("size wrong\n");
-	}
-	
-	bool no_menu = fNoMenu || fIsFullscreen;
-	bool no_controls = fNoControls || fIsFullscreen;
-	
-	printf("FrameResized enter: new_width %.0f, new_height %.0f\n", new_width, new_height);
-	
-	int max_video_width  = int(new_width) + 1;
-	int max_video_height = int(new_height) + 1 - (no_menu  ? 0 : fMenuBarHeight) - (no_controls ? 0 : fControlsHeight);
-
-	ASSERT(max_video_height >= 0);
-	
-	int y = 0;
-	
-	if (no_menu) {
-		if (!fMenuBar->IsHidden())
-			fMenuBar->Hide();
-	} else {
-//		fMenuBar->MoveTo(0, y);
-		fMenuBar->ResizeTo(new_width, fMenuBarHeight - 1);
-		if (fMenuBar->IsHidden())
-			fMenuBar->Show();
-		y += fMenuBarHeight;
-	}
-	
-	if (max_video_height == 0) {
-		if (!fVideoView->IsHidden())
-			fVideoView->Hide();
-	} else {
-//		fVideoView->MoveTo(0, y);
-//		fVideoView->ResizeTo(max_video_width - 1, max_video_height - 1);
-		ResizeVideoView(0, y, max_video_width, max_video_height);
-		if (fVideoView->IsHidden())
-			fVideoView->Show();
-		y += max_video_height;
-	}
-	
-	if (no_controls) {
-		if (!fControls->IsHidden())
-			fControls->Hide();
-	} else {
-		fControls->MoveTo(0, y);
-		fControls->ResizeTo(new_width, fControlsHeight - 1);
-		if (fControls->IsHidden())
-			fControls->Show();
-//		y += fControlsHeight;
-	}
-
-	printf("FrameResized leave\n");
-}
-
-
-void
-MainWin::ShowFileInfo()
-{
-	if (!fInfoWin)
-		fInfoWin = new InfoWin(this);
-
-	if (fInfoWin->Lock()) {
-		if (fInfoWin->IsHidden())
-			fInfoWin->Show();
-		else
-			fInfoWin->Activate();
-		fInfoWin->Unlock();
-	}
-
-	BMessenger msgr(fInfoWin);
-	BMessage m(M_UPDATE_INFO);
-	m.AddInt32("which", INFO_ALL);
-	msgr.SendMessage(&m);
-	msgr.SendMessage(B_WINDOW_ACTIVATED);
-}
-
-
-void
-MainWin::ShowPlaylistWindow()
-{
-	if (!fPlaylistWindow) {
-		fPlaylistWindow = new PlaylistWindow(BRect(150, 150, 400, 500),
-			fPlaylist);
-		fPlaylistWindow->Show();
-		return;
-	}
-
-	if (fPlaylistWindow->Lock()) {
-		if (fPlaylistWindow->IsHidden())
-			fPlaylistWindow->Show();
-		else
-			fPlaylistWindow->Activate();
-		fPlaylistWindow->Unlock();
-	}
-}
-
-
-void
-MainWin::MaybeUpdateFileInfo(uint32 which)
-{
-	// Update the Info Window if it's displayed.
-	if (!fInfoWinShowing)
-		return;
-	BMessenger msgr(fInfoWin);
-	BMessage m(M_UPDATE_INFO);
-	m.AddInt32("which", which);
-	msgr.SendMessage(&m);
-}
-
-void
-MainWin::ResizeVideoView(int x, int y, int width, int height)
-{
-	printf("ResizeVideoView: %d,%d, width %d, height %d\n", x, y, width, height);
-	
-	if (fKeepAspectRatio) {
-		// Keep aspect ratio, place video view inside
-		// the background area (may create black bars).
-		float scaled_width  = fSourceWidth * fWidthScale;
-		float scaled_height = fSourceHeight * fHeightScale;
-		float factor = min_c(width / scaled_width, height / scaled_height);
-		int render_width = lround(scaled_width * factor);
-		int render_height = lround(scaled_height * factor);
-		if (render_width > width)
-			render_width = width;
-		if (render_height > height)
-			render_height = height;
-
-		int x_ofs = x + (width - render_width) / 2;
-		int y_ofs = y + (height - render_height) / 2;
-
-		fVideoView->MoveTo(x_ofs, y_ofs);
-		fVideoView->ResizeTo(render_width - 1, render_height - 1);
-
-	} else {
-		fVideoView->MoveTo(x, y);
-		fVideoView->ResizeTo(width - 1, height - 1);
-	}
-}
-
-
-void
-MainWin::ToggleNoBorderNoMenu()
-{
-	if (!fNoMenu && !fNoBorder && !fNoControls) {
-		PostMessage(M_TOGGLE_NO_MENU);
-		PostMessage(M_TOGGLE_NO_BORDER);
-		PostMessage(M_TOGGLE_NO_CONTROLS);
-	} else {
-		if (!fNoMenu)
-			PostMessage(M_TOGGLE_NO_MENU);
-		if (!fNoBorder)
-			PostMessage(M_TOGGLE_NO_BORDER);
-		if (!fNoControls)
-			PostMessage(M_TOGGLE_NO_CONTROLS);
-	}
-}
-
-
-void
-MainWin::ToggleFullscreen()
-{
-	printf("ToggleFullscreen enter\n");
-
-	if (!fHasVideo) {
-		printf("ToggleFullscreen - ignoring, as we don't have a video\n");
-		return;
-	}
-
-	fIsFullscreen = !fIsFullscreen;
-	
-	if (fIsFullscreen) {
-		// switch to fullscreen
-		
-		fSavedFrame = Frame();
-		printf("saving current frame: %d %d %d %d\n", int(fSavedFrame.left), int(fSavedFrame.top), int(fSavedFrame.right), int(fSavedFrame.bottom));
-		BScreen screen(this);
-		BRect rect(screen.Frame());
-
-		Hide();
-		MoveTo(rect.left, rect.top);
-		ResizeTo(rect.Width(), rect.Height());
-		Show();
-
-	} else {
-		// switch back from full screen mode
-
-		Hide();
-		MoveTo(fSavedFrame.left, fSavedFrame.top);
-		ResizeTo(fSavedFrame.Width(), fSavedFrame.Height());
-		Show();
-	}
-
-	printf("ToggleFullscreen leave\n");
-}
-
-void
-MainWin::ToggleNoControls()
-{
-	printf("ToggleNoControls enter\n");
-
-	if (fIsFullscreen) {
-		// fullscreen is always without menu	
-		printf("ToggleNoControls leave, doing nothing, we are fullscreen\n");
-		return;
-	}
-
-	fNoControls = !fNoControls;
-	SetWindowSizeLimits();
-
-	if (fNoControls) {
-		ResizeBy(0, - fControlsHeight);
-	} else {
-		ResizeBy(0, fControlsHeight);
-	}
-
-	printf("ToggleNoControls leave\n");
-}
-
-void
-MainWin::ToggleNoMenu()
-{
-	printf("ToggleNoMenu enter\n");
-
-	if (fIsFullscreen) {
-		// fullscreen is always without menu	
-		printf("ToggleNoMenu leave, doing nothing, we are fullscreen\n");
-		return;
-	}
-
-	fNoMenu = !fNoMenu;
-	SetWindowSizeLimits();
-
-	if (fNoMenu) {
-		MoveBy(0, fMenuBarHeight);
-		ResizeBy(0, - fMenuBarHeight);
-	} else {
-		MoveBy(0, - fMenuBarHeight);
-		ResizeBy(0, fMenuBarHeight);
-	}
-
-	printf("ToggleNoMenu leave\n");
-}
-
-
-void
-MainWin::ToggleNoBorder()
-{
-	printf("ToggleNoBorder enter\n");
-	fNoBorder = !fNoBorder;
-	SetLook(fNoBorder ? B_BORDERED_WINDOW_LOOK : B_TITLED_WINDOW_LOOK);
-	printf("ToggleNoBorder leave\n");
-}
-
-
-void
-MainWin::ToggleAlwaysOnTop()
-{
-	printf("ToggleAlwaysOnTop enter\n");
-	fAlwaysOnTop = !fAlwaysOnTop;
-	SetFeel(fAlwaysOnTop ? B_FLOATING_ALL_WINDOW_FEEL : B_NORMAL_WINDOW_FEEL);
-	printf("ToggleAlwaysOnTop leave\n");
-}
-
-
-void
-MainWin::ToggleKeepAspectRatio()
-{
-	printf("ToggleKeepAspectRatio enter\n");
-	fKeepAspectRatio = !fKeepAspectRatio;
-	FrameResized(Bounds().Width(), Bounds().Height());
-	printf("ToggleKeepAspectRatio leave\n");
-}
-
-
-void
-MainWin::UpdateControlsEnabledStatus()
-{
-	uint32 enabledButtons = 0;
-	if (fHasVideo || fHasAudio) {
-		enabledButtons |= PLAYBACK_ENABLED | SEEK_ENABLED
-			| SEEK_BACK_ENABLED | SEEK_FORWARD_ENABLED;
-	}
-	if (fHasAudio)
-		enabledButtons |= VOLUME_ENABLED;
-
-	bool canSkipPrevious, canSkipNext;
-	fPlaylist->GetSkipInfo(&canSkipPrevious, &canSkipNext);
-	if (canSkipPrevious)
-		enabledButtons |= SKIP_BACK_ENABLED;
-	if (canSkipNext)
-		enabledButtons |= SKIP_FORWARD_ENABLED;
-
-	fControls->SetEnabled(enabledButtons);
-}
-
-
-void
-MainWin::_UpdatePlaylistMenu()
-{
-	fPlaylistMenu->RemoveItems(0, fPlaylistMenu->CountItems(), true);
-
-	// TODO: lock fPlaylist
-
-	int32 count = fPlaylist->CountItems();
-	for (int32 i = 0; i < count; i++) {
-		entry_ref ref;
-		if (fPlaylist->GetRefAt(i, &ref) < B_OK)
-			continue;
-		_AddPlaylistItem(ref, i);
-	}
-	fPlaylistMenu->SetTargetForItems(this);
-
-	_MarkPlaylistItem(fPlaylist->CurrentRefIndex());
-}
-
-
-void
-MainWin::_AddPlaylistItem(const entry_ref& ref, int32 index)
-{
-	BMessage* message = new BMessage(M_SET_PLAYLIST_POSITION);
-	message->AddInt32("index", index);
-	BMenuItem* item = new BMenuItem(ref.name, message);
-	fPlaylistMenu->AddItem(item, index);
-}
-
-
-void
-MainWin::_RemovePlaylistItem(int32 index)
-{
-	delete fPlaylistMenu->RemoveItem(index);
-}
-
-
-void
-MainWin::_MarkPlaylistItem(int32 index)
-{
-	if (BMenuItem* item = fPlaylistMenu->ItemAt(index)) {
-		item->SetMarked(true);
-		// ... and in case the menu is currently on screen:
-		if (fPlaylistMenu->LockLooper()) {
-			fPlaylistMenu->Invalidate();
-			fPlaylistMenu->UnlockLooper();
-		}
-	}
-}
-
-
-void
-MainWin::RefsReceived(BMessage *msg)
-{
-	printf("MainWin::RefsReceived\n");
-
-	// the playlist ist replaced by dropped files
-	// or the dropped files are appended to the end
-	// of the existing playlist if <shift> is pressed
-	bool add = modifiers() & B_SHIFT_KEY;
-
-	if (!add)
-		fPlaylist->MakeEmpty();
-
-	bool startPlaying = fPlaylist->CountItems() == 0;
-
-	Playlist temporaryPlaylist;
-	Playlist* playlist = add ? &temporaryPlaylist : fPlaylist;
-
-	entry_ref ref;
-	for (int i = 0; B_OK == msg->FindRef("refs", i, &ref); i++)
-		_AppendToPlaylist(ref, playlist);
-
-	playlist->Sort();
-
-	if (add)
-		fPlaylist->AdoptPlaylist(temporaryPlaylist);
-
-	if (startPlaying) {
-		// open first file
-		fPlaylist->SetCurrentRefIndex(0);
-	}
-}
-
-
 /* Trap keys that are about to be send to background or renderer view.
  * Return B_OK if it shouldn't be passed to the view
  */
 status_t
-MainWin::KeyDown(BMessage *msg)
+MainWin::_KeyDown(BMessage *msg)
 {
 //	msg->PrintToStream();
 	
@@ -1105,347 +1249,215 @@ MainWin::KeyDown(BMessage *msg)
 }
 
 
+// #pragma mark -
+
+
 void
-MainWin::DispatchMessage(BMessage *msg, BHandler *handler)
+MainWin::_ToggleNoBorderNoMenu()
 {
-	if ((msg->what == B_MOUSE_DOWN)
-		&& (handler == fBackground || handler == fVideoView
-				|| handler == fControls))
-		MouseDown(msg, dynamic_cast<BView*>(handler));
-
-	if ((msg->what == B_MOUSE_MOVED)
-		&& (handler == fBackground || handler == fVideoView
-				|| handler == fControls))
-		MouseMoved(msg, dynamic_cast<BView*>(handler));
-
-	if ((msg->what == B_MOUSE_UP)
-		&& (handler == fBackground || handler == fVideoView))
-		MouseUp(msg);
-
-	if ((msg->what == B_KEY_DOWN)
-		&& (handler == fBackground || handler == fVideoView)) {
-
-		// special case for PrintScreen key
-		if (msg->FindInt32("key") == B_PRINT_KEY) {
-			fVideoView->OverlayScreenshotPrepare();
-			BWindow::DispatchMessage(msg, handler);
-			fVideoView->OverlayScreenshotCleanup();
-			return;
-		}
-		
-		// every other key gets dispatched to our KeyDown first
-		if (KeyDown(msg) == B_OK) {
-			// it got handled, don't pass it on
-			return;
-		}
+	if (!fNoMenu && !fNoBorder && !fNoControls) {
+		PostMessage(M_TOGGLE_NO_MENU);
+		PostMessage(M_TOGGLE_NO_BORDER);
+		PostMessage(M_TOGGLE_NO_CONTROLS);
+	} else {
+		if (!fNoMenu)
+			PostMessage(M_TOGGLE_NO_MENU);
+		if (!fNoBorder)
+			PostMessage(M_TOGGLE_NO_BORDER);
+		if (!fNoControls)
+			PostMessage(M_TOGGLE_NO_CONTROLS);
 	}
-	
-	BWindow::DispatchMessage(msg, handler);
 }
 
 
 void
-MainWin::MessageReceived(BMessage *msg)
+MainWin::_ToggleFullscreen()
 {
-	switch (msg->what) {
-		case B_REFS_RECEIVED:
-			printf("MainWin::MessageReceived: B_REFS_RECEIVED\n");
-			RefsReceived(msg);
-			break;
-		case B_SIMPLE_DATA:
-			printf("MainWin::MessageReceived: B_SIMPLE_DATA\n");
-			if (msg->HasRef("refs"))
-				RefsReceived(msg);
-			break;
+	printf("_ToggleFullscreen enter\n");
 
-		// PlaylistObserver messages
-		case MSG_PLAYLIST_REF_ADDED: {
-			entry_ref ref;
-			int32 index;
-			if (msg->FindRef("refs", &ref) == B_OK
-				&& msg->FindInt32("index", &index) == B_OK) {
-				_AddPlaylistItem(ref, index);
-			}
-			break;
-		}
-		case MSG_PLAYLIST_REF_REMOVED: {
-			int32 index;
-			if (msg->FindInt32("index", &index) == B_OK) {
-				_RemovePlaylistItem(index);
-			}
-			break;
-		}
-		case MSG_PLAYLIST_CURRENT_REF_CHANGED: {
-			entry_ref ref;
-			int32 index = fPlaylist->CurrentRefIndex();
-			if (fPlaylist->GetRefAt(index, &ref) == B_OK) {
-				printf("open ref: %s\n", ref.name);
-				OpenFile(ref);
-				_MarkPlaylistItem(index);
-			}
-			break;
-		}
+	if (!fHasVideo) {
+		printf("_ToggleFullscreen - ignoring, as we don't have a video\n");
+		return;
+	}
 
-		// ControllerObserver messages
-		case MSG_CONTROLLER_FILE_FINISHED:
-			fPlaylist->SetCurrentRefIndex(fPlaylist->CurrentRefIndex() + 1);
-			break;
-		case MSG_CONTROLLER_FILE_CHANGED:
-			// TODO: move all other GUI changes as a reaction to this notification
-//			_UpdatePlaylistMenu();
-			break;
-		case MSG_CONTROLLER_VIDEO_TRACK_CHANGED: {
-			int32 index;
-			if (msg->FindInt32("index", &index) == B_OK) {
-				BMenuItem* item = fVideoTrackMenu->ItemAt(index);
-				if (item)
-					item->SetMarked(true);
-			}
-			break;
-		}
-		case MSG_CONTROLLER_AUDIO_TRACK_CHANGED: {
-			int32 index;
-			if (msg->FindInt32("index", &index) == B_OK) {
-				BMenuItem* item = fAudioTrackMenu->ItemAt(index);
-				if (item)
-					item->SetMarked(true);
-			}
-			break;
-		}
-		case MSG_CONTROLLER_PLAYBACK_STATE_CHANGED: {
-			uint32 state;
-			if (msg->FindInt32("state", (int32*)&state) == B_OK)
-				fControls->SetPlaybackState(state);
-			break;
-		}
-		case MSG_CONTROLLER_POSITION_CHANGED: {
-			float position;
-			if (msg->FindFloat("position", &position) == B_OK)
-				fControls->SetPosition(position);
-			break;
-		}
-
-		// menu item messages
-		case M_FILE_NEWPLAYER:
-			gMainApp->NewWindow();
-			break;
-		case M_FILE_OPEN:
-			if (!fFilePanel) {
-				fFilePanel = new BFilePanel();
-				fFilePanel->SetTarget(BMessenger(0, this));
-				fFilePanel->SetPanelDirectory("/boot/home/");
-			}
-			fFilePanel->Show();
-			break;
-		case M_FILE_INFO:
-			ShowFileInfo();
-			break;
-		case M_FILE_PLAYLIST:
-			ShowPlaylistWindow();
-			break;
-		case M_FILE_ABOUT:
-			BAlert *alert;
-			alert = new BAlert("about", NAME"\n\n Written by Marcus Overhagen","Thanks");
-			if (fAlwaysOnTop) {
-				ToggleAlwaysOnTop();
-				alert->Go();
-				ToggleAlwaysOnTop();
-			} else {
-				alert->Go();
-			}
-			break;
-		case M_FILE_CLOSE:
-			PostMessage(B_QUIT_REQUESTED);
-			break;
-		case M_FILE_QUIT:	
-			be_app->PostMessage(B_QUIT_REQUESTED);
-			break;
-
-		case M_TOGGLE_FULLSCREEN:
-			ToggleFullscreen();
-//			fSettingsMenu->ItemAt(1)->SetMarked(fIsFullscreen);
-			break;
-
-		case M_TOGGLE_NO_MENU:
-			ToggleNoMenu();
-//			fSettingsMenu->ItemAt(3)->SetMarked(fNoMenu);
-			break;
-			
-		case M_TOGGLE_NO_CONTROLS:
-			ToggleNoControls();
-//			fSettingsMenu->ItemAt(3)->SetMarked(fNoControls);
-			break;
-		
-		case M_TOGGLE_NO_BORDER:
-			ToggleNoBorder();
-//			fSettingsMenu->ItemAt(4)->SetMarked(fNoBorder);
-			break;
-			
-		case M_TOGGLE_ALWAYS_ON_TOP:
-			ToggleAlwaysOnTop();
-//			fSettingsMenu->ItemAt(5)->SetMarked(fAlwaysOnTop);
-			break;
+	fIsFullscreen = !fIsFullscreen;
 	
-		case M_TOGGLE_KEEP_ASPECT_RATIO:
-			ToggleKeepAspectRatio();
-//			fSettingsMenu->ItemAt(6)->SetMarked(fKeepAspectRatio);
-			break;
-
-		case M_TOGGLE_NO_BORDER_NO_MENU_NO_CONTROLS:
-			ToggleNoBorderNoMenu();
-			break;
-
-		case M_VIEW_50:
-			if (!fHasVideo)
-				break;
-			if (fIsFullscreen)
-				ToggleFullscreen();
-			ResizeWindow(50);
-			break;
-			
-		case M_VIEW_100:
-			if (!fHasVideo)
-				break;
-			if (fIsFullscreen)
-				ToggleFullscreen();
-			ResizeWindow(100);
-			break;
-
-		case M_VIEW_200:
-			if (!fHasVideo)
-				break;
-			if (fIsFullscreen)
-				ToggleFullscreen();
-			ResizeWindow(200);
-			break;
-
-		case M_VIEW_300:
-			if (!fHasVideo)
-				break;
-			if (fIsFullscreen)
-				ToggleFullscreen();
-			ResizeWindow(300);
-			break;
-
-		case M_VIEW_400:
-			if (!fHasVideo)
-				break;
-			if (fIsFullscreen)
-				ToggleFullscreen();
-			ResizeWindow(400);
-			break;
-
-/*
+	if (fIsFullscreen) {
+		// switch to fullscreen
 		
-		case B_ACQUIRE_OVERLAY_LOCK:
-			printf("B_ACQUIRE_OVERLAY_LOCK\n");
-			fVideoView->OverlayLockAcquire();
-			break;
-			
-		case B_RELEASE_OVERLAY_LOCK:
-			printf("B_RELEASE_OVERLAY_LOCK\n");
-			fVideoView->OverlayLockRelease();
-			break;
-			
-		case B_MOUSE_WHEEL_CHANGED:
-		{
-			printf("B_MOUSE_WHEEL_CHANGED\n");
-			float dx = msg->FindFloat("be:wheel_delta_x");
-			float dy = msg->FindFloat("be:wheel_delta_y");
-			bool inv = modifiers() & B_COMMAND_KEY;
-			if (dx > 0.1)	PostMessage(inv ? M_VOLUME_DOWN : M_CHANNEL_PREV);
-			if (dx < -0.1)	PostMessage(inv ? M_VOLUME_UP : M_CHANNEL_NEXT);
-			if (dy > 0.1)	PostMessage(inv ? M_CHANNEL_PREV : M_VOLUME_DOWN);
-			if (dy < -0.1)	PostMessage(inv ? M_CHANNEL_NEXT : M_VOLUME_UP);
-			break;
+		fSavedFrame = Frame();
+		printf("saving current frame: %d %d %d %d\n", int(fSavedFrame.left), int(fSavedFrame.top), int(fSavedFrame.right), int(fSavedFrame.bottom));
+		BScreen screen(this);
+		BRect rect(screen.Frame());
+
+		Hide();
+		MoveTo(rect.left, rect.top);
+		ResizeTo(rect.Width(), rect.Height());
+		Show();
+
+	} else {
+		// switch back from full screen mode
+
+		Hide();
+		MoveTo(fSavedFrame.left, fSavedFrame.top);
+		ResizeTo(fSavedFrame.Width(), fSavedFrame.Height());
+		Show();
+	}
+
+	printf("_ToggleFullscreen leave\n");
+}
+
+void
+MainWin::_ToggleNoControls()
+{
+	printf("_ToggleNoControls enter\n");
+
+	if (fIsFullscreen) {
+		// fullscreen is always without menu	
+		printf("_ToggleNoControls leave, doing nothing, we are fullscreen\n");
+		return;
+	}
+
+	fNoControls = !fNoControls;
+	_SetWindowSizeLimits();
+
+	if (fNoControls) {
+		ResizeBy(0, - fControlsHeight);
+	} else {
+		ResizeBy(0, fControlsHeight);
+	}
+
+	printf("_ToggleNoControls leave\n");
+}
+
+void
+MainWin::_ToggleNoMenu()
+{
+	printf("_ToggleNoMenu enter\n");
+
+	if (fIsFullscreen) {
+		// fullscreen is always without menu	
+		printf("_ToggleNoMenu leave, doing nothing, we are fullscreen\n");
+		return;
+	}
+
+	fNoMenu = !fNoMenu;
+	_SetWindowSizeLimits();
+
+	if (fNoMenu) {
+		MoveBy(0, fMenuBarHeight);
+		ResizeBy(0, - fMenuBarHeight);
+	} else {
+		MoveBy(0, - fMenuBarHeight);
+		ResizeBy(0, fMenuBarHeight);
+	}
+
+	printf("_ToggleNoMenu leave\n");
+}
+
+
+void
+MainWin::_ToggleNoBorder()
+{
+	printf("_ToggleNoBorder enter\n");
+	fNoBorder = !fNoBorder;
+	SetLook(fNoBorder ? B_BORDERED_WINDOW_LOOK : B_TITLED_WINDOW_LOOK);
+	printf("_ToggleNoBorder leave\n");
+}
+
+
+void
+MainWin::_ToggleAlwaysOnTop()
+{
+	printf("_ToggleAlwaysOnTop enter\n");
+	fAlwaysOnTop = !fAlwaysOnTop;
+	SetFeel(fAlwaysOnTop ? B_FLOATING_ALL_WINDOW_FEEL : B_NORMAL_WINDOW_FEEL);
+	printf("_ToggleAlwaysOnTop leave\n");
+}
+
+
+void
+MainWin::_ToggleKeepAspectRatio()
+{
+	printf("_ToggleKeepAspectRatio enter\n");
+	fKeepAspectRatio = !fKeepAspectRatio;
+	FrameResized(Bounds().Width(), Bounds().Height());
+	printf("_ToggleKeepAspectRatio leave\n");
+}
+
+
+// #pragma mark -
+
+
+void
+MainWin::_UpdateControlsEnabledStatus()
+{
+	uint32 enabledButtons = 0;
+	if (fHasVideo || fHasAudio) {
+		enabledButtons |= PLAYBACK_ENABLED | SEEK_ENABLED
+			| SEEK_BACK_ENABLED | SEEK_FORWARD_ENABLED;
+	}
+	if (fHasAudio)
+		enabledButtons |= VOLUME_ENABLED;
+
+	bool canSkipPrevious, canSkipNext;
+	fPlaylist->GetSkipInfo(&canSkipPrevious, &canSkipNext);
+	if (canSkipPrevious)
+		enabledButtons |= SKIP_BACK_ENABLED;
+	if (canSkipNext)
+		enabledButtons |= SKIP_FORWARD_ENABLED;
+
+	fControls->SetEnabled(enabledButtons);
+}
+
+
+void
+MainWin::_UpdatePlaylistMenu()
+{
+	fPlaylistMenu->RemoveItems(0, fPlaylistMenu->CountItems(), true);
+
+	// TODO: lock fPlaylist
+
+	int32 count = fPlaylist->CountItems();
+	for (int32 i = 0; i < count; i++) {
+		entry_ref ref;
+		if (fPlaylist->GetRefAt(i, &ref) < B_OK)
+			continue;
+		_AddPlaylistItem(ref, i);
+	}
+	fPlaylistMenu->SetTargetForItems(this);
+
+	_MarkPlaylistItem(fPlaylist->CurrentRefIndex());
+}
+
+
+void
+MainWin::_AddPlaylistItem(const entry_ref& ref, int32 index)
+{
+	BMessage* message = new BMessage(M_SET_PLAYLIST_POSITION);
+	message->AddInt32("index", index);
+	BMenuItem* item = new BMenuItem(ref.name, message);
+	fPlaylistMenu->AddItem(item, index);
+}
+
+
+void
+MainWin::_RemovePlaylistItem(int32 index)
+{
+	delete fPlaylistMenu->RemoveItem(index);
+}
+
+
+void
+MainWin::_MarkPlaylistItem(int32 index)
+{
+	if (BMenuItem* item = fPlaylistMenu->ItemAt(index)) {
+		item->SetMarked(true);
+		// ... and in case the menu is currently on screen:
+		if (fPlaylistMenu->LockLooper()) {
+			fPlaylistMenu->Invalidate();
+			fPlaylistMenu->UnlockLooper();
 		}
-
-		case M_CHANNEL_NEXT:
-		{
-			printf("M_CHANNEL_NEXT\n");
-			int chan = fController->CurrentChannel();
-			if (chan != -1) {
-				chan++;
-				if (chan < fController->ChannelCount())
-					SelectChannel(chan);
-			}
-			break;
-		}
-
-		case M_CHANNEL_PREV:
-		{
-			printf("M_CHANNEL_PREV\n");
-			int chan = fController->CurrentChannel();
-			if (chan != -1) {
-				chan--;
-				if (chan >= 0)
-					SelectChannel(chan);
-			}
-			break;
-		}
-
-		case M_VOLUME_UP:
-			printf("M_VOLUME_UP\n");
-			fController->VolumeUp();
-			break;
-
-		case M_VOLUME_DOWN:
-			printf("M_VOLUME_DOWN\n");
-			fController->VolumeDown();
-			break;
-*/
-
-		case M_ASPECT_100000_1:
-			VideoFormatChange(fSourceWidth, fSourceHeight, 1.0, 1.0);
-			break;
-
-		case M_ASPECT_106666_1:
-			VideoFormatChange(fSourceWidth, fSourceHeight, 1.06666, 1.0);
-			break;
-
-		case M_ASPECT_109091_1:
-			VideoFormatChange(fSourceWidth, fSourceHeight, 1.09091, 1.0);
-			break;
-
-		case M_ASPECT_141176_1:
-			VideoFormatChange(fSourceWidth, fSourceHeight, 1.41176, 1.0);
-			break;
-
-		case M_ASPECT_720_576:
-			VideoFormatChange(720, 576, 1.06666, 1.0);
-			break;
-
-		case M_ASPECT_704_576:
-			VideoFormatChange(704, 576, 1.09091, 1.0);
-			break;
-
-		case M_ASPECT_544_576:
-			VideoFormatChange(544, 576, 1.41176, 1.0);
-			break;
-/*
-		case M_PREFERENCES:
-			break;
-			
-		default:
-			if (msg->what >= M_SELECT_CHANNEL && msg->what <= M_SELECT_CHANNEL_END) {
-				SelectChannel(msg->what - M_SELECT_CHANNEL);
-				break;
-			}
-			if (msg->what >= M_SELECT_INTERFACE && msg->what <= M_SELECT_INTERFACE_END) {
-				SelectInterface(msg->what - M_SELECT_INTERFACE - 1);
-				break;
-			}
-*/
-		case M_SET_PLAYLIST_POSITION: {
-			int32 index;
-			if (msg->FindInt32("index", &index) == B_OK)
-				fPlaylist->SetCurrentRefIndex(index);
-			break;
-		}
-
-		default:
-			// let BWindow handle the rest
-			BWindow::MessageReceived(msg);
 	}
 }
 

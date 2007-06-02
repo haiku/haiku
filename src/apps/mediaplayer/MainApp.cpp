@@ -122,6 +122,13 @@ MainApp::MessageReceived(BMessage *msg)
 }
 
 
+void
+MainApp::AboutRequested()
+{
+	fFirstWindow->PostMessage(B_ABOUT_REQUESTED);
+}
+
+
 int 
 main()
 {

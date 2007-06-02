@@ -32,106 +32,111 @@
 #include "VideoView.h"
 #include "Playlist.h"
 
+
 class ControllerObserver;
 class PlaylistObserver;
 class PlaylistWindow;
 
 class MainWin : public BWindow {
 public:
-						MainWin();
-						~MainWin();
+								MainWin();
+	virtual						~MainWin();
 
-	void				FrameResized(float new_width, float new_height);
-	void				Zoom(BPoint rec_position, float rec_width, float rec_height);
-	void				RefsReceived(BMessage *msg);
-	void				DispatchMessage(BMessage *message, BHandler *handler);
-	void				MessageReceived(BMessage *msg);
-	bool				QuitRequested();
+	virtual	void				FrameResized(float newWidth, float newHeight);
+	virtual	void				Zoom(BPoint rectPosition, float rectWidth,
+									float rectHeight);
+	virtual	void				DispatchMessage(BMessage* message,
+									BHandler* handler);
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	bool				QuitRequested();
 
-	void				MouseDown(BMessage *msg, BView* originalHandler);
-	void				MouseMoved(BMessage *msg, BView* originalHandler);
-	void				MouseUp(BMessage *msg);
-	status_t			KeyDown(BMessage *msg);
-
-	void				CreateMenu();
-	void				SetupWindow();
-	void				SetupTrackMenus();
-	void				SetWindowSizeLimits();
-	void				ResizeWindow(int percent);
-	void				ResizeVideoView(int x, int y, int width, int height);
-	
-	void				ShowFileInfo();
-	void				ShowPlaylistWindow();
-	void				MaybeUpdateFileInfo(uint32 which=INFO_ALL);
-
-	void				OpenFile(const entry_ref &ref);
-	
-	void				VideoFormatChange(int width, int height, float width_scale, float height_scale);
-	
-	void				ToggleFullscreen();
-	void				ToggleKeepAspectRatio();
-	void				ToggleAlwaysOnTop();
-	void				ToggleNoBorder();
-	void				ToggleNoMenu();
-	void				ToggleNoControls();
-	void				ToggleNoBorderNoMenu();
-	
-	void				ShowContextMenu(const BPoint &screen_point);
-
-	void				UpdateControlsEnabledStatus();
-	void				_UpdatePlaylistMenu();
-	void				_AddPlaylistItem(const entry_ref& ref, int32 index);
-	void				_RemovePlaylistItem(int32 index);
-	void				_MarkPlaylistItem(int32 index);
-
-	BMenuBar *			fMenuBar;
-	BView *				fBackground;
-	VideoView *			fVideoView;
-	BFilePanel *		fFilePanel;
-	ControllerView *	fControls;
-	InfoWin *			fInfoWin;
-	PlaylistWindow*		fPlaylistWindow;
-	bool				fInfoWinShowing;
-
-	BMenu *				fFileMenu;
-	BMenu *				fAudioMenu;
-	BMenu *				fVideoMenu;
-	BMenu *				fAudioTrackMenu;
-	BMenu *				fVideoTrackMenu;
-	BMenu *				fSettingsMenu;
-	BMenu *				fPlaylistMenu;
-	BMenu *				fDebugMenu;
-	
-	bool				fHasFile;
-	bool				fHasVideo;
-	bool				fHasAudio;
-
-	Playlist *			fPlaylist;
-	PlaylistObserver*	fPlaylistObserver;
-	Controller *		fController;
-	ControllerObserver*	fControllerObserver;
-	volatile bool		fIsFullscreen;
-	volatile bool		fKeepAspectRatio;
-	volatile bool		fAlwaysOnTop;
-	volatile bool		fNoMenu;
-	volatile bool		fNoBorder;
-	volatile bool		fNoControls;
-	int					fSourceWidth;
-	int					fSourceHeight;
-	float				fWidthScale;
-	float				fHeightScale;
-	int					fMenuBarWidth;
-	int					fMenuBarHeight;
-	int					fControlsHeight;
-	int					fControlsWidth;
-	BRect				fSavedFrame;
-	bool				fMouseDownTracking;
-	BPoint				fMouseDownMousePos;
-	BPoint				fMouseDownWindowPos;
+			void				OpenFile(const entry_ref& ref);
+			
+			void				ShowFileInfo();
+			void				ShowPlaylistWindow();
+		
+			void				VideoFormatChange(int width, int height,
+									float widthScale, float heightScale);
 
 private:
-	void				_AppendToPlaylist(const entry_ref& ref,
-							Playlist* playlist);
+			void				_RefsReceived(BMessage *message);
+		
+			void				_SetupWindow();
+			void				_CreateMenu();
+			void				_SetupTrackMenus();
+			void				_SetWindowSizeLimits();
+			void				_ResizeWindow(int percent);
+			void				_ResizeVideoView(int x, int y, int width,
+									int height);
+			
+			void				_MouseDown(BMessage* message,
+									BView* originalHandler);
+			void				_MouseMoved(BMessage* message,
+									BView* originalHandler);
+			void				_MouseUp(BMessage* message);
+			void				_ShowContextMenu(const BPoint& screenPoint);
+			status_t			_KeyDown(BMessage* message);
+				
+			void				_ToggleFullscreen();
+			void				_ToggleKeepAspectRatio();
+			void				_ToggleAlwaysOnTop();
+			void				_ToggleNoBorder();
+			void				_ToggleNoMenu();
+			void				_ToggleNoControls();
+			void				_ToggleNoBorderNoMenu();
+			
+			void				_UpdateControlsEnabledStatus();
+			void				_UpdatePlaylistMenu();
+			void				_AddPlaylistItem(const entry_ref& ref,
+									int32 index);
+			void				_RemovePlaylistItem(int32 index);
+			void				_MarkPlaylistItem(int32 index);
+			void				_AppendToPlaylist(const entry_ref& ref,
+									Playlist* playlist);
+		
+			BMenuBar*			fMenuBar;
+			BView*				fBackground;
+			VideoView*			fVideoView;
+			BFilePanel*			fFilePanel;
+			ControllerView*		fControls;
+			InfoWin*			fInfoWin;
+			PlaylistWindow*		fPlaylistWindow;
+		
+			BMenu*				fFileMenu;
+			BMenu*				fAudioMenu;
+			BMenu*				fVideoMenu;
+			BMenu*				fAudioTrackMenu;
+			BMenu*				fVideoTrackMenu;
+			BMenu*				fSettingsMenu;
+			BMenu*				fPlaylistMenu;
+			BMenu*				fDebugMenu;
+			
+			bool				fHasFile;
+			bool				fHasVideo;
+			bool				fHasAudio;
+		
+			Playlist*			fPlaylist;
+			PlaylistObserver*	fPlaylistObserver;
+			Controller*			fController;
+			ControllerObserver*	fControllerObserver;
+			volatile bool		fIsFullscreen;
+			volatile bool		fKeepAspectRatio;
+			volatile bool		fAlwaysOnTop;
+			volatile bool		fNoMenu;
+			volatile bool		fNoBorder;
+			volatile bool		fNoControls;
+			int					fSourceWidth;
+			int					fSourceHeight;
+			float				fWidthScale;
+			float				fHeightScale;
+			int					fMenuBarWidth;
+			int					fMenuBarHeight;
+			int					fControlsHeight;
+			int					fControlsWidth;
+			BRect				fSavedFrame;
+			bool				fMouseDownTracking;
+			BPoint				fMouseDownMousePos;
+			BPoint				fMouseDownWindowPos;
 };
 
-#endif
+#endif // __MAIN_WIN_H

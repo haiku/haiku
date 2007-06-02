@@ -22,6 +22,7 @@
 
 #include <debugger.h>
 #include <new.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <Path.h>
@@ -188,28 +189,6 @@ Playlist::GetRefAt(int32 index, entry_ref* _ref) const
 // #pragma mark -
 
 
-//status_t
-//Playlist::NextRef(entry_ref* ref)
-//{
-//	int count = fRefs.CountItems();
-//	if (fCurrentIndex + 2 > count)
-//		return B_ERROR;
-//	*ref = *(entry_ref*)fRefs.ItemAt(++fCurrentIndex);
-//	return B_OK;
-//}
-//
-//
-//status_t
-//Playlist::PrevRef(entry_ref* ref)
-//{
-//	int count = fRefs.CountItems();
-//	if (count == 0 || fCurrentIndex <= 0)
-//		return B_ERROR;
-//	*ref = *(entry_ref*)fRefs.ItemAt(--fCurrentIndex);
-//	return B_OK;
-//}
-
-
 void
 Playlist::SetCurrentRefIndex(int32 index)
 {
@@ -257,7 +236,7 @@ Playlist::RemoveListener(Listener* listener)
 }
 
 
-// pragma mark -
+// #pragma mark -
 
 
 int

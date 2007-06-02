@@ -61,10 +61,6 @@ public:
 //	bool				HasRef(const entry_ref& ref) const;
 
 	// navigating current ref
-	// TODO: replace with SetCurrentRef() and listener
-//	status_t			NextRef(entry_ref* ref);
-//	status_t			PrevRef(entry_ref* ref);
-
 	void				SetCurrentRefIndex(int32 index);
 	int32				CurrentRefIndex() const;
 

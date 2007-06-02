@@ -24,46 +24,45 @@
 #include <TextView.h>
 #include <StringView.h>
 
+
 class MainWin;
 class Controller;
 class InfoView;
 
 #define M_UPDATE_INFO 'upda'
 
-#define INFO_STATS      0x00000001
-#define INFO_TRANSPORT  0x00000002
-#define INFO_FILE       0x00000004
-#define INFO_AUDIO      0x00000008
-#define INFO_VIDEO      0x00000010
-#define INFO_COPYRIGHT  0x00000020
+#define INFO_STATS		0x00000001
+#define INFO_TRANSPORT	0x00000002
+#define INFO_FILE		0x00000004
+#define INFO_AUDIO		0x00000008
+#define INFO_VIDEO		0x00000010
+#define INFO_COPYRIGHT	0x00000020
 
-#define INFO_ALL       0xffffffff
+#define INFO_ALL		0xffffffff
 
 
-class InfoWin : public BWindow
-{
+class InfoWin : public BWindow {
 public:
-						InfoWin(MainWin *mainWin);
-						~InfoWin();
+								InfoWin(BPoint leftTop,
+									Controller* controller);
+	virtual						~InfoWin();
+		
+	virtual	void				FrameResized(float newWidth, float newHeight);
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	bool				QuitRequested();
+	virtual void				Pulse();
 
-	void				FrameResized(float new_width, float new_height);
-	void				MessageReceived(BMessage *msg);
-	bool				QuitRequested();
-	virtual void		Show();
-	virtual void		Hide();
-	virtual void		Pulse();
+			void				ResizeToPreferred();
+			void				Update(uint32 which=INFO_ALL); // threadsafe
 
-	void				ResizeToPreferred();
-	void				Update(uint32 which=INFO_ALL); // threadsafe
-	
-	MainWin *			fMainWin;
-	Controller *		fController;
-
-	InfoView *			fInfoView;
-	BStringView *		fFilenameView;
-	BTextView *			fLabelsView;
-	BTextView *			fContentsView;
+private:			
+			Controller*			fController;
+		
+			InfoView*			fInfoView;
+			BStringView*		fFilenameView;
+			BTextView*			fLabelsView;
+			BTextView*			fContentsView;
 	
 };
 
-#endif
+#endif // __FILE_INFO_WIN_H
