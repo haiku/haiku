@@ -108,14 +108,14 @@ PluginManager::CreateDecoder(Decoder **_decoder, const media_format &format)
 	DecoderPlugin *decoderPlugin = dynamic_cast<DecoderPlugin *>(plugin);
 	if (!decoderPlugin) {
 		printf("PluginManager::CreateDecoder: dynamic_cast failed\n");
-		_plugin_manager.PutPlugin(plugin);
+		PutPlugin(plugin);
 		return B_ERROR;
 	}
 	
 	*_decoder = decoderPlugin->NewDecoder(0);
 	if (*_decoder == NULL) {
 		printf("PluginManager::CreateDecoder: NewDecoder() failed\n");
-		_plugin_manager.PutPlugin(plugin);
+		PutPlugin(plugin);
 		return B_ERROR;
 	}
 
@@ -200,10 +200,10 @@ PluginManager::GetPlugin(const entry_ref &ref)
 		}
 	}
 
-	if (!LoadPlugin(ref, &info.plugin, &info.image)) {
+	if (LoadPlugin(ref, &info.plugin, &info.image) < B_OK) {
 		printf("PluginManager: Error, loading PlugIn %s failed\n", ref.name);
 		fLocker->Unlock();
-		return 0;
+		return NULL;
 	}
 
 	strcpy(info.name, ref.name);
@@ -245,7 +245,7 @@ PluginManager::PutPlugin(MediaPlugin *plugin)
 }
 
 
-bool
+status_t
 PluginManager::LoadPlugin(const entry_ref &ref, MediaPlugin **plugin, image_id *image)
 {
 	BPath p(&ref);
@@ -255,14 +255,14 @@ PluginManager::LoadPlugin(const entry_ref &ref, MediaPlugin **plugin, image_id *
 	image_id id;
 	id = load_add_on(p.Path());
 	if (id < 0)
-		return false;
+		return B_ERROR;
 		
 	MediaPlugin *(*instantiate_plugin_func)();
 	
 	if (get_image_symbol(id, "instantiate_plugin", B_SYMBOL_TYPE_TEXT, (void**)&instantiate_plugin_func) < B_OK) {
 		printf("PluginManager: Error, LoadPlugin can't find instantiate_plugin in %s\n", p.Path());
 		unload_add_on(id);
-		return false;
+		return B_ERROR;
 	}
 	
 	MediaPlugin *pl;
@@ -271,10 +271,10 @@ PluginManager::LoadPlugin(const entry_ref &ref, MediaPlugin **plugin, image_id *
 	if (pl == NULL) {
 		printf("PluginManager: Error, LoadPlugin instantiate_plugin in %s returned NULL\n", p.Path());
 		unload_add_on(id);
-		return false;
+		return B_ERROR;
 	}
 	
 	*plugin = pl;
 	*image = id;
-	return true;
+	return B_OK;
 }

@@ -7,6 +7,8 @@
 #include <Locker.h>
 
 
+namespace BPrivate { namespace media {
+
 class PluginManager
 {
 public:
@@ -26,7 +28,7 @@ public:
 	void			DestroyDecoder(Decoder *decoder);
 	
 private:
-	bool			LoadPlugin(const entry_ref &ref, MediaPlugin **plugin, image_id *image);
+	status_t		LoadPlugin(const entry_ref &ref, MediaPlugin **plugin, image_id *image);
 
 	struct plugin_info
 	{
@@ -39,6 +41,10 @@ private:
 	List<plugin_info> *fPluginList;
 	BLocker 		*fLocker;
 };
+
+} } // namespace BPrivate::media
+
+using namespace BPrivate::media;
 
 extern PluginManager _plugin_manager;
 
