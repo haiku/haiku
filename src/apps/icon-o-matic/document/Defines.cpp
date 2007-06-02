@@ -5,6 +5,7 @@
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
+#include <SupportDefs.h>
 #include "Defines.h"
 
 const uint32 kNativeIconMagicNumber = 'GSMI';
