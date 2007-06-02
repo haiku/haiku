@@ -11,10 +11,9 @@ MediaStreamDecoder::MediaStreamDecoder(get_next_chunk_func next_chunk, void *coo
 status_t
 MediaStreamDecoder::SetInputFormat(const media_format &in_format)
 {
-//  XXX broken in Haiku...
-//	status_t err = BMediaDecoder::InitCheck();
-//	if (err)
-//		return err;
+	status_t err = BMediaDecoder::InitCheck();
+	if (err)
+		return err;
 
 	return BMediaDecoder::SetTo(&in_format);
 }
@@ -23,10 +22,9 @@ MediaStreamDecoder::SetInputFormat(const media_format &in_format)
 status_t
 MediaStreamDecoder::SetOutputFormat(media_format *output_format)
 {
-//  XXX broken in Haiku...
-//	status_t err = BMediaDecoder::InitCheck();
-//	if (err)
-//		return err;
+	status_t err = BMediaDecoder::InitCheck();
+	if (err)
+		return err;
 
 	return BMediaDecoder::SetOutputFormat(output_format);
 }
