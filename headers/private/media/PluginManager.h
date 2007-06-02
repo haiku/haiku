@@ -6,12 +6,6 @@
 #include <TList.h>
 #include <Locker.h>
 
-status_t _CreateReader(Reader **reader, int32 *streamCount, media_file_format *mff, BDataIO *source);
-status_t _CreateDecoder(Decoder **decoder, const media_format &format);
-
-void _DestroyReader(Reader *reader);
-void _DestroyDecoder(Decoder *decoder);
-
 
 class PluginManager
 {
@@ -21,6 +15,15 @@ public:
 	
 	MediaPlugin *	GetPlugin(const entry_ref &ref);
 	void			PutPlugin(MediaPlugin *plugin);
+
+
+	status_t		CreateReader(Reader **reader, int32 *streamCount, media_file_format *mff, BDataIO *source);
+	void			DestroyReader(Reader *reader);
+
+	status_t		CreateDecoder(Decoder **decoder, const media_format &format);
+	status_t		CreateDecoder(Decoder **decoder, const media_codec_info &mci);
+	status_t		GetDecoderInfo(Decoder *decoder, media_codec_info *out_info) const;
+	void			DestroyDecoder(Decoder *decoder);
 	
 private:
 	bool			LoadPlugin(const entry_ref &ref, MediaPlugin **plugin, image_id *image);
@@ -36,5 +39,7 @@ private:
 	List<plugin_info> *fPluginList;
 	BLocker 		*fLocker;
 };
+
+extern PluginManager _plugin_manager;
 
 #endif

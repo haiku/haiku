@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2004, Marcus Overhagen <marcus@overhagen.de>
+ * Copyright (c) 2002-2007, Marcus Overhagen <marcus@overhagen.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -27,9 +27,9 @@
 #include <Roster.h>
 #include <string.h>
 #include <stdlib.h>
+#include <new>
 #include "MediaExtractor.h"
 #include "PluginManager.h"
-#include "ReaderPlugin.h"
 #include "debug.h"
 
 #define CONVERT_TO_INT32 0 // XXX test! this triggers a few bugs!
@@ -71,10 +71,8 @@ private:
 BMediaTrack::~BMediaTrack()
 {
 	CALLED();
-	if (fRawDecoder)
-		_DestroyDecoder(fRawDecoder);
-	if (fDecoder)
-		_DestroyDecoder(fDecoder);
+	_plugin_manager.DestroyDecoder(fRawDecoder);
+	_plugin_manager.DestroyDecoder(fDecoder);
 }
 
 /*************************************************************
@@ -140,10 +138,8 @@ BMediaTrack::DecodedFormat(media_format *inout_format, uint32 flags)
 	if (!fExtractor || !fDecoder)
 		return B_NO_INIT;
 		
-	if (fRawDecoder) {
-		_DestroyDecoder(fRawDecoder);
-		fRawDecoder = 0;
-	}
+	_plugin_manager.DestroyDecoder(fRawDecoder);
+	fRawDecoder = 0;
 
 	char s[200];
 
@@ -641,7 +637,8 @@ BMediaTrack::BMediaTrack(BPrivate::media::MediaExtractor *extractor,
 {
 	CALLED();
 	fWorkaroundFlags = 0;
-	fRawDecoder = 0;
+	fDecoder = NULL;
+	fRawDecoder = NULL;
 	fExtractor = extractor;
 	fStream = stream;
 	fErr = B_OK;
@@ -712,24 +709,32 @@ BMediaTrack::SetupFormatTranslation(const media_format &from, media_format *to)
 {
 	char s[200];
 	status_t res;
+
+	_plugin_manager.DestroyDecoder(fRawDecoder);
+	fRawDecoder = NULL;
 	
 	string_for_format(from, s, sizeof(s));
 	printf("BMediaTrack::SetupFormatTranslation: from: %s\n", s);  
 
-	res = _CreateDecoder(&fRawDecoder, from);
+	res = _plugin_manager.CreateDecoder(&fRawDecoder, from);
 	if (res != B_OK) {
-		printf("BMediaTrack::SetupFormatTranslation: _CreateDecoder failed\n");
+		printf("BMediaTrack::SetupFormatTranslation: CreateDecoder failed\n");
 		return false;
 	}
 
 	// XXX video?
 	int buffer_size = from.u.raw_audio.buffer_size;
 	int frame_size = (from.u.raw_audio.format & 15) * from.u.raw_audio.channel_count;
+	media_format notconstFrom = from;
 
-	fRawDecoder->Setup(new RawDecoderChunkProvider(fDecoder, buffer_size, frame_size));
+	ChunkProvider *chunkProvider = new(std::nothrow) RawDecoderChunkProvider(fDecoder, buffer_size, frame_size);
+	if (!chunkProvider) {
+		printf("BMediaTrack::SetupFormatTranslation: can't create chunk provider\n");
+		goto error;
+	}
+	fRawDecoder->SetChunkProvider(chunkProvider);
 
-	media_format from_temp = from;
-	res = fRawDecoder->Setup(&from_temp, 0, 0);
+	res = fRawDecoder->Setup(&notconstFrom, 0, 0);
 	if (res != B_OK) {
 		printf("BMediaTrack::SetupFormatTranslation: Setup failed\n");
 		goto error;
@@ -750,8 +755,8 @@ BMediaTrack::SetupFormatTranslation(const media_format &from, media_format *to)
 	return true;
 
 error:
-	_DestroyDecoder(fRawDecoder);
-	fRawDecoder = 0;
+	_plugin_manager.DestroyDecoder(fRawDecoder);
+	fRawDecoder = NULL;
 	return false;
 }
 

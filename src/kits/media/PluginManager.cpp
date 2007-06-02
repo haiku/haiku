@@ -1,5 +1,5 @@
 /* 
-** Copyright 2004, Marcus Overhagen. All rights reserved.
+** Copyright 2004-2007, Marcus Overhagen. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -12,46 +12,49 @@
 #include "DataExchange.h"
 #include "debug.h"
 
+
 PluginManager _plugin_manager;
 
 
 status_t
-_CreateReader(Reader **reader, int32 *streamCount, media_file_format *mff, BDataIO *source)
+PluginManager::CreateReader(Reader **reader, int32 *streamCount, media_file_format *mff, BDataIO *source)
 {
-	TRACE("_CreateReader enter\n");
+	TRACE("PluginManager::CreateReader enter\n");
 
 	BPositionIO *seekable_source = dynamic_cast<BPositionIO *>(source);
 	if (seekable_source == 0) {
-		printf("_CreateReader: non-seekable sources not supported yet\n");
+		printf("PluginManager::CreateReader: non-seekable sources not supported yet\n");
 		return B_ERROR;
 	}
 
-	// get list of available readers from, the server
+	// get list of available readers from the server
 	server_get_readers_request request;
 	server_get_readers_reply reply;
 	if (B_OK != QueryServer(SERVER_GET_READERS, &request, sizeof(request), &reply, sizeof(reply))) {
-		printf("_CreateReader: can't get list of readers\n");
+		printf("PluginManager::CreateReader: can't get list of readers\n");
 		return B_ERROR;
 	}
 
 	// try each reader by calling it's Sniff function...
 	for (int32 i = 0; i < reply.count; i++) {
 		entry_ref ref = reply.ref[i];
-		MediaPlugin *plugin = _plugin_manager.GetPlugin(ref);
+		MediaPlugin *plugin = GetPlugin(ref);
 		if (!plugin) {
-			printf("_CreateReader: GetPlugin failed\n");
+			printf("PluginManager::CreateReader: GetPlugin failed\n");
 			return B_ERROR;
 		}
 
 		ReaderPlugin *readerPlugin = dynamic_cast<ReaderPlugin *>(plugin);
 		if (!readerPlugin) {
-			printf("_CreateReader: dynamic_cast failed\n");
+			printf("PluginManager::CreateReader: dynamic_cast failed\n");
+			PutPlugin(plugin);
 			return B_ERROR;
 		}
 
 		*reader = readerPlugin->NewReader();
 		if (! *reader) {
-			printf("_CreateReader: NewReader failed\n");
+			printf("PluginManager::CreateReader: NewReader failed\n");
+			PutPlugin(plugin);
 			return B_ERROR;
 		}
 
@@ -59,69 +62,94 @@ _CreateReader(Reader **reader, int32 *streamCount, media_file_format *mff, BData
 		(*reader)->Setup(seekable_source);
 
 		if (B_OK == (*reader)->Sniff(streamCount)) {
-			TRACE("_CreateReader: Sniff success (%ld stream(s))\n", *streamCount);
+			TRACE("PluginManager::CreateReader: Sniff success (%ld stream(s))\n", *streamCount);
 			(*reader)->GetFileFormatInfo(mff);
 			return B_OK;
 		}
 
 		// _DestroyReader(*reader);
 		delete *reader;
-		_plugin_manager.PutPlugin(plugin);
+		PutPlugin(plugin);
 	}
 
-	TRACE("_CreateReader leave\n");
+	TRACE("PluginManager::CreateReader leave\n");
 	return B_MEDIA_NO_HANDLER;
 }
 
 
-status_t
-_CreateDecoder(Decoder **_decoder, const media_format &format)
-{
-	TRACE("_CreateDecoder enter\n");
-
-	// get decoder for this format from the server
-	server_get_decoder_for_format_request request;
-	server_get_decoder_for_format_reply reply;
-	request.format = format;
-	if (B_OK != QueryServer(SERVER_GET_DECODER_FOR_FORMAT, &request, sizeof(request), &reply, sizeof(reply))) {
-		printf("_CreateDecoder: can't get decoder for format\n");
-		return B_ERROR;
-	}
-
-	MediaPlugin *plugin = _plugin_manager.GetPlugin(reply.ref);
-	if (!plugin) {
-		printf("_CreateDecoder: GetPlugin failed\n");
-		return B_ERROR;
-	}
-	
-	DecoderPlugin *decoderPlugin = dynamic_cast<DecoderPlugin *>(plugin);
-	if (!decoderPlugin) {
-		printf("_CreateDecoder: dynamic_cast failed\n");
-		return B_ERROR;
-	}
-	
-	*_decoder = decoderPlugin->NewDecoder(0);
-	if (*_decoder == NULL) {
-		printf("_CreateDecoder: NewDecoder() failed\n");
-		return B_ERROR;
-	}
-
-	TRACE("_CreateDecoder leave\n");
-
-	return B_OK;
-}
-
-
 void
-_DestroyReader(Reader *reader)
+PluginManager::DestroyReader(Reader *reader)
 {
 	// ToDo: must call put plugin
 	delete reader;
 }
 
 
+status_t
+PluginManager::CreateDecoder(Decoder **_decoder, const media_format &format)
+{
+	TRACE("PluginManager::CreateDecoder enter\n");
+
+	// get decoder for this format from the server
+	server_get_decoder_for_format_request request;
+	server_get_decoder_for_format_reply reply;
+	request.format = format;
+	if (B_OK != QueryServer(SERVER_GET_DECODER_FOR_FORMAT, &request, sizeof(request), &reply, sizeof(reply))) {
+		printf("PluginManager::CreateDecoder: can't get decoder for format\n");
+		return B_ERROR;
+	}
+
+	MediaPlugin *plugin = GetPlugin(reply.ref);
+	if (!plugin) {
+		printf("PluginManager::CreateDecoder: GetPlugin failed\n");
+		return B_ERROR;
+	}
+	
+	DecoderPlugin *decoderPlugin = dynamic_cast<DecoderPlugin *>(plugin);
+	if (!decoderPlugin) {
+		printf("PluginManager::CreateDecoder: dynamic_cast failed\n");
+		_plugin_manager.PutPlugin(plugin);
+		return B_ERROR;
+	}
+	
+	*_decoder = decoderPlugin->NewDecoder(0);
+	if (*_decoder == NULL) {
+		printf("PluginManager::CreateDecoder: NewDecoder() failed\n");
+		_plugin_manager.PutPlugin(plugin);
+		return B_ERROR;
+	}
+
+	TRACE("PluginManager::CreateDecoder leave\n");
+
+	return B_OK;
+}
+
+
+status_t
+PluginManager::CreateDecoder(Decoder **decoder, const media_codec_info &mci)
+{
+	// TODO
+	debugger("not implemented");
+	return B_ERROR;
+}
+
+
+status_t
+PluginManager::GetDecoderInfo(Decoder *decoder, media_codec_info *out_info) const
+{
+	if (!decoder)
+		return B_BAD_VALUE;
+
+	decoder->GetCodecInfo(out_info);
+	// TODO:
+	// out_info->id = 
+	// out_info->sub_id = 
+	return B_OK;
+}
+
+
 void
-_DestroyDecoder(Decoder *decoder)
+PluginManager::DestroyDecoder(Decoder *decoder)
 {
 	// ToDo: must call put plugin
 	delete decoder;
@@ -240,8 +268,8 @@ PluginManager::LoadPlugin(const entry_ref &ref, MediaPlugin **plugin, image_id *
 	MediaPlugin *pl;
 	
 	pl = (*instantiate_plugin_func)();
-	if (pl == 0) {
-		printf("PluginManager: Error, LoadPlugin instantiate_plugin in %s returned 0\n", p.Path());
+	if (pl == NULL) {
+		printf("PluginManager: Error, LoadPlugin instantiate_plugin in %s returned NULL\n", p.Path());
 		unload_add_on(id);
 		return false;
 	}

@@ -48,19 +48,11 @@ class BMediaDecoder {
 		status_t AttachToDecoder();
 
 		BPrivate::media::Decoder	*fDecoder;
-		int32				fDecoderID;
-		BPrivate::media::DecoderPlugin	*fDecoderPlugin;
-		int32				fDecoderPluginID;
 		status_t			fInitStatus;
-
-		bool				fNeedsInit;
-		media_format *		fInitFormat;
-		char *				fInitInfo;
-		size_t				fInitInfoSize;
 
 		/* fbc data and virtuals */
 
-		uint32 _reserved_BMediaDecoder_[26];
+		uint32 _reserved_BMediaDecoder_[33];
 
 		virtual	status_t _Reserved_BMediaDecoder_0(int32 arg, ...);
 		virtual	status_t _Reserved_BMediaDecoder_1(int32 arg, ...);
@@ -93,8 +85,8 @@ class BMediaBufferDecoder : public BMediaDecoder {
 	protected:
 		virtual status_t GetNextChunk(const void **chunkData, size_t *chunkLen,
 		                              media_header *mh);
-		const void *buffer;
-		int32 buffer_size;
+		const void *fBuffer;
+		int32 fBufferSize;
 };
 
 #endif

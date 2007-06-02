@@ -1,3 +1,7 @@
+/* 
+** Copyright 2004-2007, Marcus Overhagen. All rights reserved.
+** Distributed under the terms of the MIT License.
+*/
 #include "MediaExtractor.h"
 #include "PluginManager.h"
 #include "ChunkCache.h"
@@ -7,6 +11,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <new>
 
 // should be 0, to disable the chunk cache set it to 1
 #define DISABLE_CHUNK_CACHE 0
@@ -20,10 +25,10 @@ MediaExtractor::MediaExtractor(BDataIO *source, int32 flags)
 	fExtractorWaitSem = -1;
 	fTerminateExtractor = false;
 
-	fErr = _CreateReader(&fReader, &fStreamCount, &fMff, source);
+	fErr = _plugin_manager.CreateReader(&fReader, &fStreamCount, &fMff, source);
 	if (fErr) {
 		fStreamCount = 0;
-		fReader = 0;
+		fReader = NULL;
 		return;
 	}
 
@@ -93,8 +98,7 @@ MediaExtractor::~MediaExtractor()
 		delete fStreamInfo[i].chunkCache;
 	}
 
-	if (fReader)
-		_DestroyReader(fReader);
+	_plugin_manager.DestroyReader(fReader);
 
 	delete [] fStreamInfo;
 	// fSource is owned by the BMediaFile
@@ -227,10 +231,11 @@ public:
 
 
 status_t
-MediaExtractor::CreateDecoder(int32 stream, Decoder **decoder, media_codec_info *mci)
+MediaExtractor::CreateDecoder(int32 stream, Decoder **out_decoder, media_codec_info *mci)
 {
 	CALLED();
 	status_t res;
+	Decoder *decoder;
 
 	res = fStreamInfo[stream].status;
 	if (res != B_OK) {
@@ -238,23 +243,36 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder **decoder, media_codec_info 
 		return res;
 	}
 	
-	res = _CreateDecoder(decoder, fStreamInfo[stream].encodedFormat);
+	res = _plugin_manager.CreateDecoder(&decoder, fStreamInfo[stream].encodedFormat);
 	if (res != B_OK) {
-		printf("MediaExtractor::CreateDecoder failed for stream %ld\n", stream);
+		printf("MediaExtractor::CreateDecoder _plugin_manager.CreateDecoder failed for stream %ld\n", stream);
 		return res;
 	}
 
-	(*decoder)->Setup(new MediaExtractorChunkProvider(this, stream));
+	ChunkProvider *chunkProvider = new(std::nothrow) MediaExtractorChunkProvider(this, stream);
+	if (!chunkProvider) {
+		_plugin_manager.DestroyDecoder(decoder);
+		printf("MediaExtractor::CreateDecoder can't create chunk provider for stream %ld\n", stream);
+		return B_NO_MEMORY;
+	}
+
+	decoder->SetChunkProvider(chunkProvider);
 	
-	res = (*decoder)->Setup(&fStreamInfo[stream].encodedFormat, fStreamInfo[stream].infoBuffer , fStreamInfo[stream].infoBufferSize);
+	res = decoder->Setup(&fStreamInfo[stream].encodedFormat, fStreamInfo[stream].infoBuffer, fStreamInfo[stream].infoBufferSize);
 	if (res != B_OK) {
-		printf("MediaExtractor::CreateDecoder Setup failed for stream %ld: %ld (%s)\n",
-			stream, res, strerror(res));
+		_plugin_manager.DestroyDecoder(decoder);
+		printf("MediaExtractor::CreateDecoder Setup failed for stream %ld: %ld (%s)\n", stream, res, strerror(res));
 		return res;
 	}
 
-	(*decoder)->GetCodecInfo(mci);
+	res = _plugin_manager.GetDecoderInfo(decoder, mci);
+	if (res != B_OK) {
+		_plugin_manager.DestroyDecoder(decoder);
+		printf("MediaExtractor::CreateDecoder GetCodecInfo failed for stream %ld: %ld (%s)\n", stream, res, strerror(res));
+		return res;
+	}
 
+	*out_decoder = decoder;
 	return B_OK;
 }
 

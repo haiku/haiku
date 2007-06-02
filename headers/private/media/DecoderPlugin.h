@@ -39,7 +39,7 @@ public:
 	status_t			GetNextChunk(const void **chunkBuffer, size_t *chunkSize,
 									 media_header *mediaHeader);
 
-	void				Setup(ChunkProvider *provider);
+	void				SetChunkProvider(ChunkProvider *provider);
 private:
 	ChunkProvider *		fChunkProvider;
 };

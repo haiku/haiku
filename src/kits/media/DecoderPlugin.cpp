@@ -12,8 +12,8 @@
 
 
 Decoder::Decoder()
+ :	fChunkProvider(NULL)
 {
-	fChunkProvider = 0;
 }
 
 
@@ -32,7 +32,7 @@ Decoder::GetNextChunk(const void **chunkBuffer, size_t *chunkSize,
 
 
 void
-Decoder::Setup(ChunkProvider *provider)
+Decoder::SetChunkProvider(ChunkProvider *provider)
 {
 	delete fChunkProvider;
 	fChunkProvider = provider;
@@ -45,4 +45,3 @@ Decoder::Setup(ChunkProvider *provider)
 DecoderPlugin::DecoderPlugin()
 {
 }
-
