@@ -5,7 +5,6 @@
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef NATIVE_SAVER_H
 #define NATIVE_SAVER_H
 

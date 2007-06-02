@@ -8,10 +8,12 @@
 
 #include "MessageExporter.h"
 
+#include <ByteOrder.h>
 #include <DataIO.h>
 #include <Message.h>
 #include <TypeConstants.h>
 
+#include "Defines.h"
 #include "Icon.h"
 #include "PathContainer.h"
 #include "Shape.h"
@@ -98,6 +100,20 @@ MessageExporter::Export(const Icon* icon, BPositionIO* stream)
 			ret = archive.AddMessage("shapes", &allShapes);
 	}
 
+	// prepend the magic number to the file which
+	// later tells us that this file is one of us
+	if (ret == B_OK) {
+		ssize_t size = sizeof(uint32);
+		uint32 magic = B_HOST_TO_LENDIAN_INT32(kNativeIconMagicNumber);
+		ssize_t written = stream->Write(&magic, size);
+		if (written != size) {
+			if (written < 0)
+				ret = (status_t)written;
+			else
+				ret = B_IO_ERROR;
+		}
+	}
+
 	if (ret == B_OK)
 		ret = archive.Flatten(stream);
 
@@ -108,8 +124,7 @@ MessageExporter::Export(const Icon* icon, BPositionIO* stream)
 const char*
 MessageExporter::MIMEType()
 {
-	// TODO: come up with a MIME type
-	return NULL;
+	return kNativeIconMimeType;
 }
 
 // #pragma mark -

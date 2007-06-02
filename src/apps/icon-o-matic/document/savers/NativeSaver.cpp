@@ -5,7 +5,6 @@
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #include "NativeSaver.h"
 
 #include "FlatIconFormat.h"

@@ -78,6 +78,7 @@ class IconEditorApp : public BApplication {
 
 			void				_StoreSettings();
 			void				_RestoreSettings();
+			void				_InstallDocumentMimeType();
 
 			MainWindow*			fMainWindow;
 			Document*			fDocument;

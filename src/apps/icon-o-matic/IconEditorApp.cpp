@@ -18,6 +18,8 @@
 #include <File.h>
 #include <FilePanel.h>
 #include <IconEditorProtocol.h>
+#include <Message.h>
+#include <Mime.h>
 
 #include "support_settings.h"
 
@@ -26,6 +28,7 @@
 #include "BitmapExporter.h"
 #include "BitmapSetSaver.h"
 #include "CommandStack.h"
+#include "Defines.h"
 #include "Document.h"
 #include "FlatIconExporter.h"
 #include "FlatIconFormat.h"
@@ -46,9 +49,11 @@
 
 using std::nothrow;
 
+static const char* kAppSig = "application/x-vnd.haiku-icon_o_matic";
+
 // constructor
 IconEditorApp::IconEditorApp()
-	: BApplication("application/x-vnd.haiku-icon_o_matic"),
+	: BApplication(kAppSig),
 	  fMainWindow(NULL),
 	  fDocument(new Document("test")),
 
@@ -227,6 +232,8 @@ IconEditorApp::ReadyToRun()
 	_RestoreSettings();
 
 	fMainWindow->Show();
+
+	_InstallDocumentMimeType();
 }
 
 // RefsReceived
@@ -571,3 +578,80 @@ IconEditorApp::_RestoreSettings()
 	fMainWindow->RestoreSettings(&settings);
 }
 
+// _InstallDocumentMimeType
+void
+IconEditorApp::_InstallDocumentMimeType()
+{
+	// install mime type of documents
+	BMimeType mime(kNativeIconMimeType);
+	status_t ret = mime.InitCheck();
+	if (ret < B_OK) {
+		fprintf(stderr, "Could not init native document mime type (%s): %s.\n",
+			kNativeIconMimeType, strerror(ret));
+		return;
+	}
+
+	if (mime.IsInstalled() && !(modifiers() & B_SHIFT_KEY)) {
+		// mime is already installed, and the user is not
+		// pressing the shift key to force a re-install
+		return;
+	}
+
+	ret = mime.Install();
+	if (ret < B_OK) {
+		fprintf(stderr, "Could not install native document mime type (%s): %s.\n",
+			kNativeIconMimeType, strerror(ret));
+		return;
+	}
+	// set preferred app
+	ret = mime.SetPreferredApp(kAppSig);
+	if (ret < B_OK)
+		fprintf(stderr, "Could not set native document preferred app: %s\n",
+			strerror(ret));
+
+	// set descriptions
+	ret = mime.SetShortDescription("Haiku Icon");
+	if (ret < B_OK)
+		fprintf(stderr, "Could not set short description of mime type: %s\n",
+			strerror(ret));
+	ret = mime.SetLongDescription("Native Haiku vector icon");
+	if (ret < B_OK)
+		fprintf(stderr, "Could not set long description of mime type: %s\n",
+			strerror(ret));
+
+	// set extensions
+	BMessage message('extn');
+	message.AddString("extensions", "icon");
+	ret = mime.SetFileExtensions(&message);
+	if (ret < B_OK)
+		fprintf(stderr, "Could not set extensions of mime type: %s\n",
+			strerror(ret));
+
+	// set sniffer rule
+	const char* snifferRule = "0.9 ('GSMI')";
+	ret = mime.SetSnifferRule(snifferRule);
+	if (ret < B_OK) {
+		BString parseError;
+		BMimeType::CheckSnifferRule(snifferRule, &parseError);
+		fprintf(stderr, "Could not set sniffer rule of mime type: %s\n",
+			parseError.String());
+	}
+
+// NOTE: Icon-O-Matic writes the icon being saved as icon of the file anyways
+// therefor, the following code is not needed, it is also not tested and I am
+// spotting an error with SetIcon()
+//	// set document icon
+//	BResources* resources = AppResources();
+//		// does not need to be freed (belongs to BApplication base)
+//	if (resources) {
+//		size_t size;
+//		const void* iconData = resources->LoadResource('VICN', "IOM:DOC_ICON", &size);
+//		if (iconData && size > 0) {
+//			memcpy(largeIcon.Bits(), iconData, size);
+//			if (mime.SetIcon(&largeIcon, B_LARGE_ICON) < B_OK)
+//				fprintf(stderr, "Could not set large icon of mime type.\n");
+//		} else
+//			fprintf(stderr, "Could not find icon in app resources (data: %p, size: %ld).\n", iconData, size);
+//	} else
+//		fprintf(stderr, "Could not find app resources.\n");
+}

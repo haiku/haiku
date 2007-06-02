@@ -106,6 +106,7 @@ Application Icon-O-Matic :
 	########  Icon-O-Matic  ########
 
 	# document
+	Defines.cpp
 	Document.cpp
 	IconObject.cpp
 	SetPropertiesCommand.cpp

@@ -1,20 +1,21 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #include "MessageImporter.h"
 
 #include <new>
 #include <stdio.h>
 
 #include <Archivable.h>
+#include <ByteOrder.h>
 #include <DataIO.h>
 #include <Message.h>
 
+#include "Defines.h"
 #include "Icon.h"
 #include "PathContainer.h"
 #include "Shape.h"
@@ -44,6 +45,28 @@ MessageImporter::Import(Icon* icon, BPositionIO* stream)
 		printf("MessageImporter::Import() - "
 			   "Init() error: %s\n", strerror(ret));
 		return ret;
+	}
+
+	uint32 magic = 0;
+	ssize_t size = sizeof(magic);
+	off_t position = stream->Position();
+	ssize_t read = stream->Read(&magic, size);
+	if (read != size) {
+		if (read < 0)
+			ret = (status_t)read;
+		else
+			ret = B_IO_ERROR;
+		return ret;
+	}
+
+	if (B_LENDIAN_TO_HOST_INT32(magic) != kNativeIconMagicNumber) {
+		// this might be an old native icon file, where
+		// we didn't prepend the magic number yet, seek back
+		if (stream->Seek(position, SEEK_SET) != position) {
+			printf("MessageImporter::Import() - "
+				   "failed to seek back to beginning of stream\n");
+			return B_IO_ERROR;
+		}
 	}
 
 	BMessage archive;

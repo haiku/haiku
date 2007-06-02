@@ -1,11 +1,10 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef SIMPLE_FILE_SAVER_H
 #define SIMPLE_FILE_SAVER_H
 
