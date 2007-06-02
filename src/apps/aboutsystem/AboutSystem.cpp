@@ -353,18 +353,20 @@ AboutView::AboutView(const BRect &rect)
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
 	fCreditsView->Insert(
+		"Ithamar R. Adema\n"
 		"Stephan Aßmus\n"
 		"Andrew Bachmann\n"
 		"Stefano Ceccherini\n"
 		"Rudolf Cornelissen\n"
 		"Jérôme Duval\n"
 		"Waldemar Kornewald\n"
-		"Thomas Kurschel\n"
 		"Ryan Leavengood\n"
 		"Michael Lotz\n"
 		"Niels Reedijk\n"
+		"François Revol\n"
 		"Hugo Santos\n"
 		"Bryan Varner\n"
+		"Siarzhuk Zharski\n"
 		"\n");
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuOrange);
@@ -391,6 +393,7 @@ AboutView::AboutView(const BRect &rect)
 		"Euan Kirkhope\n"
 		"Marcin Konicki\n"
 		"Kurtis Kopf\n"
+		"Thomas Kurschel\n"
 		"Elad Lahav\n"
 		"Santiago Lema\n"
 		"Oscar Lesta\n"
@@ -400,6 +403,7 @@ AboutView::AboutView(const BRect &rect)
 		"Christopher ML Zumwalt May\n"
 		"Andrew McCall\n"
 		"David McPaul\n"
+		"Michele (zuMi)\n"
 		"Misza\n"
 		"MrSiggler\n"
 		"Alan Murta\n"
@@ -412,7 +416,6 @@ AboutView::AboutView(const BRect &rect)
 		"Hartmut Reh\n"
 		"David Reid\n"
 		"Daniel Reinhold\n"
-		"François Revol\n"
 		"Samuel Rodriguez Perez\n"
 		"Thomas Roell\n"
 		"Rafael Romo\n"
@@ -429,7 +432,6 @@ AboutView::AboutView(const BRect &rect)
 		"Ulrich Wimboeck\n"
 		"Gabe Yoder\n"
 		"Łukasz Zemczak\n"
-		"Siarzhuk Zharski\n"
 		"\n" B_UTF8_ELLIPSIS " and probably some more we forgot to mention (sorry!)"
 		"\n\n");
 
