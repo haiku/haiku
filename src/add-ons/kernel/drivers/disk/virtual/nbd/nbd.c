@@ -15,6 +15,9 @@
 #include <driver_settings.h>
 #include <Errors.h>
 #include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <ksocket.h>
 #include <netinet/in.h>
 
@@ -112,6 +115,18 @@ status_t nbd_free_request(struct nbd_device *dev, struct nbd_request_entry *req)
 
 struct nbd_device *nbd_find_device(const char* name);
 
+int32 nbd_postoffice(void *arg);
+status_t nbd_connect(struct nbd_device *dev);
+status_t nbd_teardown(struct nbd_device *dev);
+status_t nbd_post_request(struct nbd_device *dev, struct nbd_request_entry *req);
+
+status_t nbd_open(const char *name, uint32 flags, cookie_t **cookie);
+status_t nbd_close(cookie_t *cookie);
+status_t nbd_free(cookie_t *cookie);
+status_t nbd_control(cookie_t *cookie, uint32 op, void *data, size_t len);
+status_t nbd_read(cookie_t *cookie, off_t position, void *data, size_t *numbytes);
+status_t nbd_write(cookie_t *cookie, off_t position, const void *data, size_t *numbytes);
+
 KSOCKET_MODULE_DECL;
 
 /* HACK:
@@ -123,7 +138,9 @@ KSOCKET_MODULE_DECL;
 bool gDelayUnload = false;
 #define BONE_TEARDOWN_DELAY 60000000
 
+#if 0
 #pragma mark ==== support ====
+#endif
 
 // move that to ksocket inlined
 static int kinet_aton(const char *in, struct in_addr *addr)
@@ -131,7 +148,7 @@ static int kinet_aton(const char *in, struct in_addr *addr)
 	int i;
 	unsigned long a;
 	uint32 inaddr = 0L;
-	const char *p = in;
+	char *p = (char *)in;
 	for (i = 0; i < 4; i++) {
 		a = strtoul(p, &p, 10);
 		if (!p)
@@ -145,7 +162,9 @@ static int kinet_aton(const char *in, struct in_addr *addr)
 	return 0;
 }
 
+#if 0
 #pragma mark ==== request manager ====
+#endif
 
 status_t nbd_alloc_request(struct nbd_device *dev, struct nbd_request_entry **req, uint32 type, off_t from, size_t len, const char *data)
 {
@@ -194,7 +213,7 @@ status_t nbd_alloc_request(struct nbd_device *dev, struct nbd_request_entry **re
 	r->req.from = B_HOST_TO_BENDIAN_INT64(r->from);
 	r->req.len = B_HOST_TO_BENDIAN_INT32(len);
 	
-	r->buffer = w ? data : (((char *)r) + sizeof(struct nbd_request_entry));
+	r->buffer = (void *)(w ? data : (((char *)r) + sizeof(struct nbd_request_entry)));
 	
 	*req = r;
 	return B_OK;
@@ -246,14 +265,15 @@ status_t nbd_free_request(struct nbd_device *dev, struct nbd_request_entry *req)
 
 
 
+#if 0
 #pragma mark ==== nbd handler ====
+#endif
 
 int32 nbd_postoffice(void *arg)
 {
 	struct nbd_device *dev = (struct nbd_device *)arg;
 	struct nbd_request_entry *req = NULL;
 	struct nbd_reply reply;
-	int sock = dev->sock;
 	status_t err;
 	const char *reason;
 	PRINT((DP ">%s()\n", __FUNCTION__));
@@ -352,7 +372,7 @@ status_t nbd_connect(struct nbd_device *dev)
 	//err = ENOSYS;
 	if (err == -1 && errno < 0)
 		err = errno;
-	/* HACK: avoid the kernel unlading us with locked pages from TCP */
+	/* HACK: avoid the kernel unloading us with locked pages from TCP */
 	if (err)
 		gDelayUnload = true;
 	if (err)
@@ -426,7 +446,9 @@ status_t nbd_post_request(struct nbd_device *dev, struct nbd_request_entry *req)
 }
 
 
+#if 0
 #pragma mark ==== device hooks ====
+#endif
 
 static struct nbd_device nbd_devices[MAX_NBDS];
 
@@ -437,7 +459,7 @@ status_t nbd_open(const char *name, uint32 flags, cookie_t **cookie) {
 	int kfd;
 #endif
 	struct nbd_device *dev = NULL;
-	PRINT((DP ">%s(%s, %x, )\n", __FUNCTION__, name, flags));
+	PRINT((DP ">%s(%s, %lx, )\n", __FUNCTION__, name, flags));
 	(void)name; (void)flags;
 	dev = nbd_find_device(name);
 	if (!dev || !dev->valid)
@@ -532,7 +554,7 @@ status_t nbd_free(cookie_t *cookie) {
 }
 
 status_t nbd_control(cookie_t *cookie, uint32 op, void *data, size_t len) {
-	PRINT((DP ">%s(%d, %lu, , %d)\n", __FUNCTION__, WHICH(cookie->dev), op, len));
+	PRINT((DP ">%s(%d, %lu, , %ld)\n", __FUNCTION__, WHICH(cookie->dev), op, len));
 	switch (op) {
 	case B_GET_DEVICE_SIZE: /* this one is broken anyway... */
 		if (data) {
@@ -738,7 +760,9 @@ device_hooks nbd_hooks={
 	NULL
 };
 
+#if 0
 #pragma mark ==== driver hooks ====
+#endif
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
