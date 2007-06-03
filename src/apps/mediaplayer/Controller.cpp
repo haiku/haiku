@@ -23,11 +23,10 @@
 #include <new>
 #include <stdio.h>
 #include <string.h>
-#include <Debug.h>
-#include <Entry.h>
-#include <Window.h>
-#include <Bitmap.h>
+
 #include <Autolock.h>
+#include <Bitmap.h>
+#include <Debug.h>
 #include <MediaFile.h>
 #include <MediaTrack.h>
 
@@ -87,6 +86,7 @@ Controller::Controller()
  ,	fStopped(true)
  ,	fVolume(1.0)
 
+ ,	fRef()
  ,	fMediaFile(0)
 // TODO: remove, InfoWin depends on it but should be fixed
 ,fAudioTrack(0)
@@ -200,6 +200,11 @@ Controller::SetTo(const entry_ref &ref)
 	BAutolock dl(fDataLock);
 	BAutolock al(fVideoSupplierLock);
 	BAutolock vl(fAudioSupplierLock);
+
+	if (fRef == ref)
+		return B_OK;
+
+	fRef = ref;
 
 	fAudioTrackList->MakeEmpty();
 	fVideoTrackList->MakeEmpty();
@@ -463,6 +468,18 @@ Controller::Pause()
 	fPaused = true;
 
 	_NotifyPlaybackStateChanged();
+}
+
+
+void
+Controller::TogglePlaying()
+{
+	BAutolock _(fDataLock);
+
+	if (IsPaused() || IsStopped())
+		Play();
+	else
+		Pause();
 }
 
 

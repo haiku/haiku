@@ -23,8 +23,9 @@
 
 #include <Entry.h>
 #include <List.h>
+#include <Locker.h>
 
-class Playlist {
+class Playlist : public BLocker {
 public:
 	class Listener {
 	public:
@@ -40,51 +41,58 @@ public:
 	};
 
 public:
-						Playlist();
-						~Playlist();
-					
-	// list functionality
-	void				MakeEmpty();
-	int32				CountItems() const;
-	
-	void				Sort();
+								Playlist();
+								~Playlist();
+							
+			// list functionality
+			void				MakeEmpty();
+			int32				CountItems() const;
+			
+			void				Sort();
+		
+			bool				AddRef(const entry_ref& ref);
+			bool				AddRef(const entry_ref& ref, int32 index);
+			entry_ref			RemoveRef(int32 index,
+									bool careAboutCurrentIndex = true);
+		
+			bool				AdoptPlaylist(Playlist& other);
+			bool				AdoptPlaylist(Playlist& other, int32 index);
+		
+			int32				IndexOf(const entry_ref& ref) const;
+			status_t			GetRefAt(int32 index, entry_ref* ref) const;
+		//	bool				HasRef(const entry_ref& ref) const;
+		
+			// navigating current ref
+			void				SetCurrentRefIndex(int32 index);
+			int32				CurrentRefIndex() const;
+		
+			void				GetSkipInfo(bool* canSkipPrevious,
+									bool* canSkipNext) const;
 
-	bool				AddRef(const entry_ref& ref);
-	bool				AddRef(const entry_ref& ref, int32 index);
-	entry_ref			RemoveRef(int32 index);
+			// listener support
+			bool				AddListener(Listener* listener);
+			void				RemoveListener(Listener* listener);
 
-	bool				AdoptPlaylist(Playlist& other);
-	bool				AdoptPlaylist(Playlist& other, int32 index);
-
-//	int32				IndexOf(const entry_ref& ref) const;
-	status_t			GetRefAt(int32 index, entry_ref* ref) const;
-//	bool				HasRef(const entry_ref& ref) const;
-
-	// navigating current ref
-	void				SetCurrentRefIndex(int32 index);
-	int32				CurrentRefIndex() const;
-
-	void				GetSkipInfo(bool* canSkipPrevious,
-							bool* canSkipNext) const;
-
-	// listener support
-	bool				AddListener(Listener* listener);
-	void				RemoveListener(Listener* listener);
-
-private:
-	static int			playlist_cmp(const void* p1, const void* p2);
-
-	void				_NotifyRefAdded(const entry_ref& ref,
-							int32 index) const;
-	void				_NotifyRefRemoved(int32 index) const;
-	void				_NotifyRefsSorted() const;
-	void				_NotifyCurrentRefChanged(int32 newIndex) const;
+			// support functions
+			void				AppendRefs(BMessage* refsReceivedMessage,
+									int32 appendIndex = -1);
+	static	void				AppendToPlaylistRecursive(const entry_ref& ref,
+									Playlist* playlist);
 
 private:
-	BList				fRefs;
-	BList				fListeners;
+			static int			playlist_cmp(const void* p1, const void* p2);
 
-	int32				fCurrentIndex;
+			void				_NotifyRefAdded(const entry_ref& ref,
+									int32 index) const;
+			void				_NotifyRefRemoved(int32 index) const;
+			void				_NotifyRefsSorted() const;
+			void				_NotifyCurrentRefChanged(int32 newIndex) const;
+
+private:
+			BList				fRefs;
+			BList				fListeners;
+
+			int32				fCurrentIndex;
 };
 
 #endif

@@ -21,6 +21,7 @@
 #ifndef __CONTROLLER_H
 #define __CONTROLLER_H
 
+#include <Entry.h>
 #include <MediaDefs.h>
 #include <MediaNode.h>
 #include <List.h>
@@ -76,6 +77,7 @@ public:
 	void					Stop();
 	void					Play();
 	void					Pause();
+	void					TogglePlaying();
 
 	bool					IsPaused() const;
 	bool					IsStopped() const;
@@ -158,6 +160,7 @@ private:
 	volatile bool			fStopped;
 	float					fVolume;
 
+	entry_ref				fRef;
 	BMediaFile *			fMediaFile;
 BMediaTrack *			fAudioTrack;
 BMediaTrack *			fVideoTrack;

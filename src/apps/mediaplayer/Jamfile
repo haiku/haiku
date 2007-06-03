@@ -32,6 +32,7 @@ Application MediaPlayer :
 	MainApp.cpp
 	MainWin.cpp
 	Playlist.cpp
+	PlaylistListView.cpp
 	PlaylistObserver.cpp
 	PlaylistWindow.cpp
 	SoundOutput.cpp

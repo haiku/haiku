@@ -20,25 +20,27 @@
  */
 #include "MainWin.h"
 
-#include <View.h>
-#include <Screen.h>
+#include <math.h>
+#include <stdio.h>
+#include <string.h>
+
+#include <Alert.h>
+#include <Application.h>
+#include <Autolock.h>
+#include <Debug.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
-#include <Application.h>
-#include <Alert.h>
-#include <stdio.h>
-#include <string.h>
 #include <Messenger.h>
 #include <PopUpMenu.h>
+#include <Screen.h>
 #include <String.h>
-#include <Debug.h>
-#include <math.h>
+#include <View.h>
 
 #include "ControllerObserver.h"
+#include "MainApp.h"
 #include "PlaylistObserver.h"
 #include "PlaylistWindow.h"
-#include "MainApp.h"
 
 #define NAME "MediaPlayer"
 #define MIN_WIDTH 250
@@ -317,7 +319,6 @@ MainWin::MessageReceived(BMessage *msg)
 
 		// PlaylistObserver messages
 		case MSG_PLAYLIST_REF_ADDED: {
-printf("MSG_PLAYLIST_REF_ADDED\n");
 			entry_ref ref;
 			int32 index;
 			if (msg->FindRef("refs", &ref) == B_OK
@@ -327,7 +328,6 @@ printf("MSG_PLAYLIST_REF_ADDED\n");
 			break;
 		}
 		case MSG_PLAYLIST_REF_REMOVED: {
-printf("MSG_PLAYLIST_REF_REMOVED\n");
 			int32 index;
 			if (msg->FindInt32("index", &index) == B_OK) {
 				_RemovePlaylistItem(index);
@@ -335,12 +335,12 @@ printf("MSG_PLAYLIST_REF_REMOVED\n");
 			break;
 		}
 		case MSG_PLAYLIST_CURRENT_REF_CHANGED: {
-printf("MSG_PLAYLIST_CURRENT_REF_CHANGED\n");
+			BAutolock _(fPlaylist);
+
 			int32 index;
 			if (msg->FindInt32("index", &index) < B_OK
 				|| index != fPlaylist->CurrentRefIndex())
 				break;
-printf(" index: %ld\n", index);
 			entry_ref ref;
 			if (fPlaylist->GetRefAt(index, &ref) == B_OK) {
 				printf("open ref: %s\n", ref.name);
@@ -352,7 +352,6 @@ printf(" index: %ld\n", index);
 
 		// ControllerObserver messages
 		case MSG_CONTROLLER_FILE_FINISHED:
-printf("MSG_CONTROLLER_FILE_FINISHED\n");
 			fPlaylist->SetCurrentRefIndex(fPlaylist->CurrentRefIndex() + 1);
 			break;
 		case MSG_CONTROLLER_FILE_CHANGED:
@@ -686,7 +685,7 @@ MainWin::ShowPlaylistWindow()
 {
 	if (!fPlaylistWindow) {
 		fPlaylistWindow = new PlaylistWindow(BRect(150, 150, 400, 500),
-			fPlaylist);
+			fPlaylist, fController);
 		fPlaylistWindow->Show();
 		return;
 	}
@@ -731,34 +730,13 @@ MainWin::VideoFormatChange(int width, int height, float width_scale, float heigh
 void
 MainWin::_RefsReceived(BMessage *msg)
 {
-	printf("MainWin::_RefsReceived\n");
-
 	// the playlist ist replaced by dropped files
 	// or the dropped files are appended to the end
 	// of the existing playlist if <shift> is pressed
-	bool add = modifiers() & B_SHIFT_KEY;
+	int32 appendIndex = modifiers() & B_SHIFT_KEY ?
+		fPlaylist->CountItems() : -1;
 
-	if (!add)
-		fPlaylist->MakeEmpty();
-
-	bool startPlaying = fPlaylist->CountItems() == 0;
-
-	Playlist temporaryPlaylist;
-	Playlist* playlist = add ? &temporaryPlaylist : fPlaylist;
-
-	entry_ref ref;
-	for (int i = 0; B_OK == msg->FindRef("refs", i, &ref); i++)
-		_AppendToPlaylist(ref, playlist);
-
-	playlist->Sort();
-
-	if (add)
-		fPlaylist->AdoptPlaylist(temporaryPlaylist);
-
-	if (startPlaying) {
-		// open first file
-		fPlaylist->SetCurrentRefIndex(0);
-	}
+	fPlaylist->AppendRefs(msg, appendIndex);
 }
 
 
@@ -1414,9 +1392,10 @@ MainWin::_UpdateControlsEnabledStatus()
 void
 MainWin::_UpdatePlaylistMenu()
 {
-	fPlaylistMenu->RemoveItems(0, fPlaylistMenu->CountItems(), true);
+	if (!fPlaylist->Lock())
+		return;
 
-	// TODO: lock fPlaylist
+	fPlaylistMenu->RemoveItems(0, fPlaylistMenu->CountItems(), true);
 
 	int32 count = fPlaylist->CountItems();
 	for (int32 i = 0; i < count; i++) {
@@ -1428,6 +1407,8 @@ MainWin::_UpdatePlaylistMenu()
 	fPlaylistMenu->SetTargetForItems(this);
 
 	_MarkPlaylistItem(fPlaylist->CurrentRefIndex());
+
+	fPlaylist->Unlock();
 }
 
 
@@ -1461,26 +1442,4 @@ MainWin::_MarkPlaylistItem(int32 index)
 	}
 }
 
-
-void
-MainWin::_AppendToPlaylist(const entry_ref& ref, Playlist* playlist)
-{
-	// recursively append the ref (dive into folders)
-	BEntry entry(&ref, true);
-	if (entry.InitCheck() < B_OK)
-		return;
-	if (!entry.Exists())
-		return;
-	if (entry.IsDirectory()) {
-		BDirectory dir(&entry);
-		if (dir.InitCheck() < B_OK)
-			return;
-		entry.Unset();
-		entry_ref subRef;
-		while (dir.GetNextRef(&subRef) == B_OK)
-			_AppendToPlaylist(subRef, playlist);
-	} else if (entry.IsFile()) {
-		playlist->AddRef(ref);
-	}
-}
 

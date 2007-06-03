@@ -20,6 +20,7 @@
  */
 #include "ControllerView.h"
 
+#include <Autolock.h>
 #include <Message.h>
 #include <stdio.h>
 #include <string.h>
@@ -91,18 +92,13 @@ ControllerView::EnabledButtons()
 void
 ControllerView::TogglePlaying()
 {
-	printf("ControllerView::TogglePlaying()\n");
-	if (fController->IsPaused() || fController->IsStopped())
-		fController->Play();
-	else
-		fController->Pause();
+	fController->TogglePlaying();
 }
 
 
 void
 ControllerView::Stop()
 {
-	printf("ControllerView::Stop()\n");
 	fController->Stop();
 }
 
@@ -126,7 +122,7 @@ ControllerView::Forward()
 void
 ControllerView::SkipBackward()
 {
-	printf("ControllerView::SkipBackward()\n");
+	BAutolock _(fPlaylist);
 	fPlaylist->SetCurrentRefIndex(fPlaylist->CurrentRefIndex() - 1);
 }
 
@@ -134,7 +130,7 @@ ControllerView::SkipBackward()
 void
 ControllerView::SkipForward()
 {
-	printf("ControllerView::SkipForward()\n");
+	BAutolock _(fPlaylist);
 	fPlaylist->SetCurrentRefIndex(fPlaylist->CurrentRefIndex() + 1);
 }
 
@@ -142,7 +138,6 @@ ControllerView::SkipForward()
 void
 ControllerView::VolumeChanged(float value)
 {
-	printf("ControllerView::VolumeChanged(%.4f)\n", value);
 	fController->SetVolume(value);
 }
 
@@ -157,7 +152,6 @@ ControllerView::ToggleMute()
 void
 ControllerView::PositionChanged(float value)
 {
-	printf("ControllerView::PositionChanged(%.2f)\n", value);
 	// 0.0 ... 1.0
 	fController->SetPosition(value);
 }
@@ -169,6 +163,8 @@ ControllerView::PositionChanged(float value)
 void
 ControllerView::CheckSkippable()
 {
+	BAutolock _(fPlaylist);
+
 	bool canSkipNext, canSkipPrevious;
 	fPlaylist->GetSkipInfo(&canSkipPrevious, &canSkipNext);
 	SetSkippable(canSkipPrevious, canSkipNext);

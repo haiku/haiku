@@ -320,21 +320,20 @@ DragSortableListView::MessageReceived(BMessage* message)
 {
 	if (AcceptDragMessage(message)) {
 		DragSortableListView *list = NULL;
-		if ( message->FindPointer( "list", (void **)&list ) == B_OK
-			 && list == this ) {
+		if (message->FindPointer("list", (void **)&list) == B_OK
+			&& list == this) {
 			int32 count = CountItems();
-			if ( fDropIndex < 0 || fDropIndex > count )
+			if (fDropIndex < 0 || fDropIndex > count)
 				fDropIndex = count;
-			BList items;
+			BList indices;
 			int32 index;
-			for ( int32 i = 0; message->FindInt32( "index", i, &index ) == B_OK; i++ )
-				if ( BListItem* item = ItemAt(index) )
-					items.AddItem( (void*)item );
-			if ( items.CountItems() > 0 ) {
-				if ( modifiers() & B_SHIFT_KEY )
-					CopyItems( items, fDropIndex );
+			for (int32 i = 0; message->FindInt32("index", i, &index) == B_OK; i++)
+				indices.AddItem((void*)index);
+			if (indices.CountItems() > 0) {
+				if (modifiers() & B_SHIFT_KEY)
+					CopyItems(indices, fDropIndex);
 				else
-					MoveItems( items, fDropIndex );
+					MoveItems(indices, fDropIndex);
 			}
 			fDropIndex = -1;
 		}
@@ -371,9 +370,9 @@ DragSortableListView::MessageReceived(BMessage* message)
 				}
 				break;
 			}
-//			case B_MODIFIERS_CHANGED:
-//				ModifiersChanged();
-//				break;
+			case B_MODIFIERS_CHANGED:
+				ModifiersChanged();
+				break;
 			case B_MOUSE_WHEEL_CHANGED: {
 				BListView::MessageReceived( message );
 				BPoint point;
@@ -625,42 +624,39 @@ DragSortableListView::ScrollTo(int32 index)
 
 // MoveItems
 void
-DragSortableListView::MoveItems( BList& items, int32 index )
+DragSortableListView::MoveItems(BList& indices, int32 index)
 {
 	DeselectAll();
 	// we remove the items while we look at them, the insertion index is decreased
 	// when the items index is lower, so that we insert at the right spot after
 	// removal
 	BList removedItems;
-	int32 count = items.CountItems();
-	for ( int32 i = 0; i < count; i++ )
-	{
-		BListItem* item = (BListItem*)items.ItemAt( i );
-		int32 removeIndex = IndexOf( item );
-		if ( RemoveItem( item ) && removedItems.AddItem( (void*)item ) )
-		{
-			if ( removeIndex < index )
+	int32 count = indices.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		int32 removeIndex = (int32)indices.ItemAtFast(i) - i;
+		BListItem* item = RemoveItem(removeIndex);
+		if (item && removedItems.AddItem((void*)item)) {
+			if (removeIndex < index)
 				index--;
 		}
 		// else ??? -> blow up
 	}
-	for ( int32 i = 0; BListItem* item = (BListItem*)removedItems.ItemAt( i ); i++ )
-	{
-		if ( AddItem( item, index ) )
-		{
+	count = removedItems.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		BListItem* item = (BListItem*)removedItems.ItemAtFast(i);
+		if (AddItem(item, index)) {
 			// after we're done, the newly inserted items will be selected
-			Select( index, true );
+			Select(index, true);
 			// next items will be inserted after this one
 			index++;
-		}
-		else
+		} else
 			delete item;
 	}
 }
 
 // CopyItems
 void
-DragSortableListView::CopyItems( BList& items, int32 index )
+DragSortableListView::CopyItems(BList& indices, int32 toIndex)
 {
 	DeselectAll();
 	// by inserting the items after we copied all items first, we avoid
@@ -668,37 +664,34 @@ DragSortableListView::CopyItems( BList& items, int32 index )
 	// in other words, don't touch the list before we know which items
 	// need to be cloned
 	BList clonedItems;
-	int32 count = items.CountItems();
-	for ( int32 i = 0; i < count; i++ )
-	{
-		BListItem* item = CloneItem( IndexOf( (BListItem*)items.ItemAt( i ) ) );
-		if ( item && !clonedItems.AddItem( (void*)item ) )
+	int32 count = indices.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		int32 index = (int32)indices.ItemAtFast(i);
+		BListItem* item = CloneItem(index);
+		if (item && !clonedItems.AddItem((void*)item))
 			delete item;
 	}
-	for ( int32 i = 0; BListItem* item = (BListItem*)clonedItems.ItemAt( i ); i++ )
-	{
-		if ( AddItem( item, index ) )
-		{
+	count = clonedItems.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		BListItem* item = (BListItem*)clonedItems.ItemAtFast(i);
+		if (AddItem(item, toIndex)) {
 			// after we're done, the newly inserted items will be selected
-			Select( index, true );
+			Select(toIndex, true);
 			// next items will be inserted after this one
-			index++;
-		}
-		else
+			toIndex++;
+		} else
 			delete item;
 	}
 }
 
 // RemoveItemList
 void
-DragSortableListView::RemoveItemList( BList& items )
+DragSortableListView::RemoveItemList(BList& indices)
 {
-	int32 count = items.CountItems();
-	for ( int32 i = 0; i < count; i++ )
-	{
-		BListItem* item = (BListItem*)items.ItemAt( i );
-		if ( RemoveItem( item ) )
-			delete item;
+	int32 count = indices.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		int32 index = (int32)indices.ItemAtFast(i) - i;
+		delete RemoveItem(index);
 	}
 }
 
@@ -706,13 +699,19 @@ DragSortableListView::RemoveItemList( BList& items )
 void
 DragSortableListView::RemoveSelected()
 {
-//	if (fFocusedIndex >= 0)
-//		return;
+	BList indices;
+	for (int32 i = 0; true; i++) {
+		int32 index = CurrentSelection(i);
+		if (index < 0)
+			break;
+		if (!indices.AddItem((void*)index))
+			break;
+	}
 
-	BList items;
-	for ( int32 i = 0; BListItem* item = ItemAt( CurrentSelection( i ) ); i++ )
-		items.AddItem( (void*)item );
-	RemoveItemList( items );
+	DeselectAll();
+
+	if (indices.CountItems() > 0)
+		RemoveItemList(indices);
 }
 
 // CountSelectedItems
@@ -720,7 +719,7 @@ int32
 DragSortableListView::CountSelectedItems() const
 {
 	int32 count = 0;
-	while ( CurrentSelection( count ) >= 0 )
+	while (CurrentSelection(count) >= 0)
 		count++;
 	return count;
 }

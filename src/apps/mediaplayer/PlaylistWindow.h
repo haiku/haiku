@@ -8,17 +8,21 @@
 #ifndef PLAYLIST_WINDOW_H
 #define PLAYLIST_WINDOW_H
 
+
 #include <Window.h>
 
+class Controller;
 class Playlist;
 
 class PlaylistWindow : public BWindow {
  public:
 								PlaylistWindow(BRect frame,
-									Playlist* playlist);
+									Playlist* playlist,
+									Controller* controller);
 	virtual						~PlaylistWindow();
 
 	virtual	bool				QuitRequested();
+	virtual	void				MessageReceived(BMessage* message);
 
  private:
 			BView*				fTopView;

@@ -91,8 +91,6 @@ private:
 									int32 index);
 			void				_RemovePlaylistItem(int32 index);
 			void				_MarkPlaylistItem(int32 index);
-			void				_AppendToPlaylist(const entry_ref& ref,
-									Playlist* playlist);
 		
 			BMenuBar*			fMenuBar;
 			BView*				fBackground;

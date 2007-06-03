@@ -25,6 +25,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Autolock.h>
+#include <Directory.h>
+#include <Message.h>
 #include <Path.h>
 
 using std::nothrow;
@@ -43,7 +46,8 @@ void Playlist::Listener::CurrentRefChanged(int32 newIndex) {}
 
 
 Playlist::Playlist()
- :	fRefs()
+ :	BLocker("playlist lock")
+ ,	fRefs()
  ,	fCurrentIndex(-1)
 {
 }
@@ -104,6 +108,10 @@ Playlist::AddRef(const entry_ref &ref, int32 index)
 		return false;
 	}
 	_NotifyRefAdded(ref, index);
+
+	if (index <= fCurrentIndex)
+		SetCurrentRefIndex(fCurrentIndex + 1);
+
 	return true;
 }
 
@@ -129,6 +137,8 @@ Playlist::AdoptPlaylist(Playlist& other, int32 index)
 			entry_ref* ref = (entry_ref*)fRefs.ItemAtFast(i);
 			_NotifyRefAdded(*ref, i);
 		}
+		if (index <= fCurrentIndex)
+			SetCurrentRefIndex(fCurrentIndex + count);
 		// empty the other list, so that the entry_refs are no ours
 		other.fRefs.MakeEmpty();
 		return true;
@@ -138,7 +148,7 @@ Playlist::AdoptPlaylist(Playlist& other, int32 index)
 
 
 entry_ref
-Playlist::RemoveRef(int32 index)
+Playlist::RemoveRef(int32 index, bool careAboutCurrentIndex)
 {
 	entry_ref _ref;
 	entry_ref* ref = (entry_ref*)fRefs.RemoveItem(index);
@@ -147,21 +157,29 @@ Playlist::RemoveRef(int32 index)
 	_NotifyRefRemoved(index);
 	_ref = *ref;
 	delete ref;
+
+	if (careAboutCurrentIndex) {
+		if (index == fCurrentIndex)
+			SetCurrentRefIndex(-1);
+		else if (index < fCurrentIndex)
+			SetCurrentRefIndex(fCurrentIndex - 1);
+	}
+
 	return _ref;
 }
 
 
-//int32
-//Playlist::IndexOf(const entry_ref& _ref) const
-//{
-//	int32 count = CountItems();
-//	for (int32 i = 0; i < count; i++) {
-//		entry_ref* ref = (entry_ref*)fRefs.ItemAtFast(i);
-//		if (*ref == _ref)
-//			return i;
-//	}
-//	return -1;
-//}
+int32
+Playlist::IndexOf(const entry_ref& _ref) const
+{
+	int32 count = CountItems();
+	for (int32 i = 0; i < count; i++) {
+		entry_ref* ref = (entry_ref*)fRefs.ItemAtFast(i);
+		if (*ref == _ref)
+			return i;
+	}
+	return -1;
+}
 
 
 status_t
@@ -223,6 +241,7 @@ Playlist::GetSkipInfo(bool* canSkipPrevious, bool* canSkipNext) const
 bool
 Playlist::AddListener(Listener* listener)
 {
+	BAutolock _(this);
 	if (listener && !fListeners.HasItem(listener))
 		return fListeners.AddItem(listener);
 	return false;
@@ -232,7 +251,66 @@ Playlist::AddListener(Listener* listener)
 void
 Playlist::RemoveListener(Listener* listener)
 {
+	BAutolock _(this);
 	fListeners.RemoveItem(listener);
+}
+
+
+// #pragma mark -
+
+
+void
+Playlist::AppendRefs(BMessage* refsReceivedMessage, int32 appendIndex)
+{
+	// the playlist ist replaced by the refs in the message
+	// or the refs are appended at the appendIndex
+	// in the existing playlist
+	bool add = appendIndex >= 0;
+
+	if (!add)
+		MakeEmpty();
+
+	bool startPlaying = CountItems() == 0;
+
+	Playlist temporaryPlaylist;
+	Playlist* playlist = add ? &temporaryPlaylist : this;
+
+	entry_ref ref;
+	for (int i = 0; refsReceivedMessage->FindRef("refs", i, &ref) == B_OK; i++)
+		AppendToPlaylistRecursive(ref, playlist);
+
+	playlist->Sort();
+
+	if (add)
+		AdoptPlaylist(temporaryPlaylist, appendIndex);
+
+	if (startPlaying) {
+		// open first file
+		SetCurrentRefIndex(0);
+	}
+}
+
+
+/*static*/ void
+Playlist::AppendToPlaylistRecursive(const entry_ref& ref, Playlist* playlist)
+{
+	// recursively append the ref (dive into folders)
+	BEntry entry(&ref, true);
+	if (entry.InitCheck() < B_OK)
+		return;
+	if (!entry.Exists())
+		return;
+	if (entry.IsDirectory()) {
+		BDirectory dir(&entry);
+		if (dir.InitCheck() < B_OK)
+			return;
+		entry.Unset();
+		entry_ref subRef;
+		while (dir.GetNextRef(&subRef) == B_OK)
+			AppendToPlaylistRecursive(subRef, playlist);
+	} else if (entry.IsFile()) {
+		playlist->AddRef(ref);
+	}
 }
 
 
