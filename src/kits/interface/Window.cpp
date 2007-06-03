@@ -3138,6 +3138,15 @@ BWindow::_HandleKeyDown(BMessage* event)
 		return true;
 	}
 
+	// Optionally close window when the escape key is pressed
+	if (key == B_ESCAPE && (Flags() & B_CLOSE_ON_ESCAPE) != 0) {
+		BMessage message(B_QUIT_REQUESTED);
+		message.AddBool("shortcut", true);
+
+		PostMessage(&message);
+		return true;
+	}
+	
 	// Handle shortcuts
 	if ((modifiers & B_COMMAND_KEY) != 0) {
 		// Command+q has been pressed, so, we will quit
