@@ -565,7 +565,12 @@ DraggableIcon::DragStarted(BMessage *)
 void
 DraggableIcon::Draw(BRect)
 {
+#ifdef __HAIKU__
+	SetDrawingMode(B_OP_ALPHA);
+	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+#else
 	SetDrawingMode(B_OP_OVER);
+#endif
 	DrawBitmap(fBitmap);
 }
 
@@ -662,8 +667,7 @@ FlickerFreeStringView::Draw(BRect)
 			}
 		}
 		loc.y = bounds.bottom - (1 + height.descent);
-		offscreen->MovePenTo(loc);
-		offscreen->DrawString(Text());
+		offscreen->DrawString(Text(), loc);
 	}
 	offscreen->Sync();
 	SetDrawingMode(B_OP_COPY);
