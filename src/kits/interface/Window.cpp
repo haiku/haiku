@@ -2379,8 +2379,9 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 	fDefaultButton = NULL;
 
 	// Shortcut 'Q' is handled in _HandleKeyDown() directly, as its message
-	// get sent to the application, and not one of our handlers
-	fNoQuitShortcut = false;
+	// get sent to the application, and not one of our handlers.
+	// It is only installed for non-modal windows, though.
+	fNoQuitShortcut = IsModal();
 
 	if ((fFlags & B_NOT_CLOSABLE) == 0 && !IsModal()) {
 		// Modal windows default to non-closable, but you can add the shortcut manually,
