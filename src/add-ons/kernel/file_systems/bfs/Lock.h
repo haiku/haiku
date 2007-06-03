@@ -1,11 +1,14 @@
-/* Lock - simple semaphores, read/write lock implementation
- * Roughly based on a Be sample code written by Nathan Schrenk.
+/*
  *
- * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef LOCK_H
 #define LOCK_H
+
+/*!	Simple semaphores, read/write lock implementation
+	Roughly based on a Be sample code written by Nathan Schrenk.
+*/
 
 #include "system_dependencies.h"
 
@@ -333,11 +336,16 @@ class ReadWriteLock {
 class ReadWriteLock {
 	public:
 		ReadWriteLock(const char *name)
+			:
+			fOwner(-1)
 		{
 			Initialize(name);
 		}
 
 		ReadWriteLock()
+			:
+			fSemaphore(-1),
+			fOwner(-1)
 		{
 		}
 
@@ -362,6 +370,7 @@ class ReadWriteLock {
 
 		status_t Lock()
 		{
+			// This allows nested locking when holding a write lock
 			thread_id currentThread = find_thread(NULL);
 			if (currentThread == fOwner) {
 				fOwnerCount++;
