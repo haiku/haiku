@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -33,9 +33,9 @@ DirectoryRefFilter::Filter(const entry_ref *ref, BNode* node, struct stat *st,
 
 
 DirectoryFilePanel::DirectoryFilePanel(file_panel_mode mode, BMessenger *target,
-	const entry_ref *startDirectory, uint32 nodeFlavors,
-	bool allowMultipleSelection, BMessage *message, BRefFilter *filter,
-	bool modal,	bool hideWhenDone)
+		const entry_ref *startDirectory, uint32 nodeFlavors,
+		bool allowMultipleSelection, BMessage *message, BRefFilter *filter,
+		bool modal,	bool hideWhenDone)
 	: BFilePanel(mode, target, startDirectory, nodeFlavors,
 		allowMultipleSelection, message, filter, modal, hideWhenDone),
 	fCurrentButton(NULL)
@@ -60,13 +60,13 @@ DirectoryFilePanel::Show()
 			rect.top = rect.bottom - 35;
 			rect.bottom -= 10;
 		}
-		
+
 		rect.right = rect.left -= 30;
-		float directory_width = be_plain_font->StringWidth("Select current") + 20;
-		rect.left = (directory_width > 75) ? (rect.right - directory_width) : (rect.right - 75);
+		float width = be_plain_font->StringWidth("Select current") + 20;
+		rect.left = width > 75 ? rect.right - width : rect.right - 75;
 		fCurrentButton = new BButton(rect, "directoryButton", "Select current",
 			new BMessage(MSG_DIRECTORY), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-				
+
 		background->AddChild(fCurrentButton);
 		fCurrentButton->SetTarget(Messenger());
 
@@ -81,7 +81,7 @@ DirectoryFilePanel::Show()
 
 
 void
-DirectoryFilePanel::SelectionChanged(void)
+DirectoryFilePanel::SelectionChanged()
 {
 	Window()->Lock();
 
