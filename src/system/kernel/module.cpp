@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku Inc. All rights reserved.
+ * Copyright 2002-2007, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Thomas Kurschel. All rights reserved.
@@ -130,6 +130,7 @@ typedef struct module_iterator {
 	uint32				path_base_length;
 	const char			*current_module_path;
 	bool				builtin_modules;
+	bool				loaded_modules;
 } module_iterator;
 
 
@@ -693,31 +694,62 @@ iterator_push_path_on_stack(module_iterator *iterator, const char *path, uint32 
 
 
 static status_t
-iterator_get_next_module(module_iterator *iterator, char *buffer, size_t *_bufferSize)
+iterator_get_next_module(module_iterator *iterator, char *buffer,
+	size_t *_bufferSize)
 {
 	status_t status;
 
 	TRACE(("iterator_get_next_module() -- start\n"));
 
 	if (iterator->builtin_modules) {
-		int32 i;
-
-		for (i = iterator->module_offset; sBuiltInModules[i] != NULL; i++) {
+		for (int32 i = iterator->module_offset; sBuiltInModules[i] != NULL; i++) {
 			// the module name must fit the prefix
-			if (strncmp(sBuiltInModules[i]->name, iterator->prefix, iterator->prefix_length))
+			if (strncmp(sBuiltInModules[i]->name, iterator->prefix,
+					iterator->prefix_length))
 				continue;
 
-			*_bufferSize = strlcpy(buffer, sBuiltInModules[i]->name, *_bufferSize);
+			*_bufferSize = strlcpy(buffer, sBuiltInModules[i]->name,
+				*_bufferSize);
 			iterator->module_offset = i + 1;
 			return B_OK;
 		}
 		iterator->builtin_modules = false;
 	}
 
+	if (iterator->loaded_modules) {
+		recursive_lock_lock(&sModulesLock);
+		hash_iterator hashIterator;
+		hash_open(sModulesHash, &hashIterator);
+
+		struct module *module = (struct module *)hash_next(sModulesHash,
+			&hashIterator);
+		for (int32 i = 0; module != NULL; i++) {
+			if (i >= iterator->module_offset) {
+				if (!strncmp(module->name, iterator->prefix,
+						iterator->prefix_length)) {
+					*_bufferSize = strlcpy(buffer, module->name, *_bufferSize);
+					iterator->module_offset = i + 1;
+
+					hash_close(sModulesHash, &hashIterator, false);
+					recursive_lock_unlock(&sModulesLock);
+					return B_OK;
+				}
+			}
+			module = (struct module *)hash_next(sModulesHash, &hashIterator);
+		}
+
+		hash_close(sModulesHash, &hashIterator, false);
+		recursive_lock_unlock(&sModulesLock);
+
+		// prevent from falling into modules hash iteration again
+		iterator->loaded_modules = false; 
+	}
+	
 nextPath:
 	if (iterator->current_dir == NULL) {
 		// get next directory path from the stack
-		const char *path = iterator_pop_path_from_stack(iterator, &iterator->path_base_length);
+		const char *path = iterator_pop_path_from_stack(iterator,
+			&iterator->path_base_length);
 		if (path == NULL) {
 			// we are finished, there are no more entries on the stack
 			return B_ENTRY_NOT_FOUND;
@@ -755,7 +787,8 @@ nextModuleImage:
 		// check if the prefix matches
 		int32 passedOffset, commonLength;
 		passedOffset = strlen(iterator->current_path) + 1;
-		commonLength = iterator->path_base_length + iterator->prefix_length - passedOffset;
+		commonLength = iterator->path_base_length + iterator->prefix_length
+			- passedOffset;
 
 		if (commonLength > 0) {
 			// the prefix still reaches into the new path part
@@ -763,8 +796,8 @@ nextModuleImage:
 			if (commonLength > length)
 				commonLength = length;
 
-			if (strncmp(dirent->d_name,
-					iterator->prefix + passedOffset - iterator->path_base_length, commonLength))
+			if (strncmp(dirent->d_name, iterator->prefix + passedOffset
+					- iterator->path_base_length, commonLength))
 				goto nextModuleImage;
 		}
 
@@ -791,8 +824,8 @@ nextModuleImage:
 			return B_NO_MEMORY;
 
 		if (S_ISDIR(st.st_mode)) {
-			status = iterator_push_path_on_stack(iterator, iterator->current_module_path,
-				iterator->path_base_length);
+			status = iterator_push_path_on_stack(iterator,
+				iterator->current_module_path, iterator->path_base_length);
 			if (status < B_OK)
 				return status;
 
@@ -1058,12 +1091,6 @@ module_init(kernel_args *args)
  *	contain all modules available under the prefix.
  *	The structure is then used by read_next_module_name(), and
  *	must be freed by calling close_module_list().
- *
- *	During early boot, when there is no boot device accessible,
- *	it will only find built-in modules, not those that have
- *	been preloaded - use get_next_loaded_module_name() instead
- *	if you need to have a list of loaded modules.
- *	ToDo: this could be changed
  */
 
 void *
@@ -1085,36 +1112,45 @@ open_module_list(const char *prefix)
 
 	memset(iterator, 0, sizeof(module_iterator));
 
-	// ToDo: possibly, the prefix don't have to be copied, just referenced
-	iterator->prefix = strdup(prefix ? prefix : "");
+	iterator->prefix = strdup(prefix != NULL ? prefix : "");
 	if (iterator->prefix == NULL) {
 		free(iterator);
 		return NULL;
 	}
-	iterator->prefix_length = strlen(prefix);
+	iterator->prefix_length = strlen(iterator->prefix);
 
-	// first, we'll traverse over the built-in modules
-	iterator->builtin_modules = true;
+	if (gBootDevice > 0) {
+		// We do have a boot device to scan
 
-	// put all search paths on the stack
-	for (i = 0; i < NUM_MODULE_PATHS; i++) {
-		if (sDisableUserAddOns && i >= FIRST_USER_MODULE_PATH)
-			break;
+		// first, we'll traverse over the built-in modules
+		iterator->builtin_modules = true;
+		iterator->loaded_modules = false;
 
-		// Build path component: base path + '/' + prefix
-		size_t length = strlen(sModulePaths[i]);
-		char *path = (char *)malloc(length + iterator->prefix_length + 2);
-		if (path == NULL) {
-			// ToDo: should we abort the whole operation here?
-			//	if we do, don't forget to empty the stack
-			continue;
+		// put all search paths on the stack
+		for (i = 0; i < NUM_MODULE_PATHS; i++) {
+			if (sDisableUserAddOns && i >= FIRST_USER_MODULE_PATH)
+				break;
+
+			// Build path component: base path + '/' + prefix
+			size_t length = strlen(sModulePaths[i]);
+			char *path = (char *)malloc(length + iterator->prefix_length + 2);
+			if (path == NULL) {
+				// ToDo: should we abort the whole operation here?
+				//	if we do, don't forget to empty the stack
+				continue;
+			}
+
+			memcpy(path, sModulePaths[i], length);
+			path[length] = '/';
+			memcpy(path + length + 1, iterator->prefix,
+				iterator->prefix_length + 1);
+
+			iterator_push_path_on_stack(iterator, path, length + 1);
 		}
-
-		memcpy(path, sModulePaths[i], length);
-		path[length] = '/';
-		memcpy(path + length + 1, prefix, iterator->prefix_length + 1);
-
-		iterator_push_path_on_stack(iterator, path, length + 1);
+	} else {
+		// include loaded modules in case there is no boot device yet
+		iterator->builtin_modules = false;
+		iterator->loaded_modules = true;
 	}
 
 	return (void *)iterator;
@@ -1158,7 +1194,7 @@ close_module_list(void *cookie)
 
 
 /** Return the next module name from the available list, using
- *	a structure previously created by a call to open_module_list.
+ *	a structure previously created by a call to open_module_list().
  *	Returns B_OK as long as it found another module, B_ENTRY_NOT_FOUND
  *	when done.
  */
@@ -1221,6 +1257,8 @@ get_next_loaded_module_name(uint32 *_cookie, char *buffer, size_t *_bufferSize)
 	}
 
 	recursive_lock_lock(&sModulesLock);
+	
+	// TODO: this is completely unsafe!!!
 
 	struct module *module = (struct module *)hash_next(sModulesHash, iterator);
 	if (module != NULL) {
