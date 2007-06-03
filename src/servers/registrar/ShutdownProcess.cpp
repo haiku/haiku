@@ -1232,6 +1232,7 @@ ShutdownProcess::_WorkerDoShutdown()
 		const char *buttonText = (fReboot ? "Restart" : "Shut Down");
 		BAlert *alert = new BAlert(title, text, "Cancel", buttonText, NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetShortcut(0, B_ESCAPE);
 		int32 result = alert->Go();
 
 		if (result != 1)
