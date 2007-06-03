@@ -188,7 +188,7 @@ PlaylistListView::PlaylistListView(BRect frame, Playlist* playlist,
 	fController->AddListener(fControllerObserver);
 
 #ifdef __HAIKU__
-	SetFlags(Flags() & B_SUBPIXEL_PRECISE);
+	SetFlags(Flags() | B_SUBPIXEL_PRECISE);
 #endif
 }
 
