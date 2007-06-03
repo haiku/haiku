@@ -252,12 +252,12 @@ PlaylistListView::MessageReceived(BMessage* message)
 
 		case B_SIMPLE_DATA:
 			if (message->HasRef("refs"))
-				_RefsReceived(message, fDropIndex);
+				RefsReceived(message, fDropIndex);
 			else if (message->HasPointer("list"))
 				SimpleListView::MessageReceived(message);
 			break;
 		case B_REFS_RECEIVED:
-			_RefsReceived(message, fDropIndex);
+			RefsReceived(message, fDropIndex);
 			break;
 
 		default:
@@ -421,6 +421,18 @@ PlaylistListView::DrawListItem(BView* owner, int32 index, BRect frame) const
 }
 
 
+void
+PlaylistListView::RefsReceived(BMessage* message, int32 appendIndex)
+{
+	if (!fPlaylist->Lock())
+		return;
+
+	fPlaylist->AppendRefs(message, appendIndex);
+
+	fPlaylist->Unlock();
+}
+
+
 // #pragma mark -
 
 
@@ -488,15 +500,4 @@ PlaylistListView::_SetPlaybackState(uint32 state)
 	InvalidateItem(fCurrentPlaylistIndex);
 }
 
-
-void
-PlaylistListView::_RefsReceived(BMessage* message, int32 dropIndex)
-{
-	if (!fPlaylist->Lock())
-		return;
-
-	fPlaylist->AppendRefs(message, dropIndex);
-
-	fPlaylist->Unlock();
-}
 

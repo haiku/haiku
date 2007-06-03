@@ -7,6 +7,7 @@ AddSubDirSupportedPlatforms libbe_test ;
 # source directories
 local sourceDirs =
 	supplier
+	support
 ;
 
 local sourceDir ;
@@ -21,8 +22,16 @@ Application MediaPlayer :
 	MediaTrackVideoSupplier.cpp
 	VideoSupplier.cpp
 
-	# .
+	# support
 	AbstractLOAdapter.cpp
+	Command.cpp
+	CommandStack.cpp
+	Listener.cpp
+	ListenerAdapter.cpp
+	Notifier.cpp
+	RWLocker.cpp
+
+	# .
 	Controller.cpp
 	ControllerObserver.cpp
 	ControllerView.cpp

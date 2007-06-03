@@ -166,6 +166,15 @@ MainWin::MainWin()
 
 	_SetupWindow();
 
+	// setup the playlist window now, we need to have it 
+	// running for the undo/redo playlist editing
+	fPlaylistWindow = new PlaylistWindow(BRect(150, 150, 400, 500),
+		fPlaylist, fController);
+	fPlaylistWindow->Hide();
+	fPlaylistWindow->Show();
+		// this makes sure the window thread is running without
+		// showing the window just yet
+
 	Show();
 }
 
@@ -683,13 +692,6 @@ MainWin::ShowFileInfo()
 void
 MainWin::ShowPlaylistWindow()
 {
-	if (!fPlaylistWindow) {
-		fPlaylistWindow = new PlaylistWindow(BRect(150, 150, 400, 500),
-			fPlaylist, fController);
-		fPlaylistWindow->Show();
-		return;
-	}
-
 	if (fPlaylistWindow->Lock()) {
 		if (fPlaylistWindow->IsHidden())
 			fPlaylistWindow->Show();
@@ -728,15 +730,18 @@ MainWin::VideoFormatChange(int width, int height, float width_scale, float heigh
 
 
 void
-MainWin::_RefsReceived(BMessage *msg)
+MainWin::_RefsReceived(BMessage* msg)
 {
 	// the playlist ist replaced by dropped files
 	// or the dropped files are appended to the end
 	// of the existing playlist if <shift> is pressed
 	int32 appendIndex = modifiers() & B_SHIFT_KEY ?
 		fPlaylist->CountItems() : -1;
+	msg->AddInt32("append_index", appendIndex);
 
-	fPlaylist->AppendRefs(msg, appendIndex);
+	// forward the message to the playlist window,
+	// so that undo/redo is used for modifying the playlist
+	fPlaylistWindow->PostMessage(msg);
 }
 
 

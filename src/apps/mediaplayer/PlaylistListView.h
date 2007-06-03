@@ -38,6 +38,10 @@ class PlaylistListView : public SimpleListView {
 	virtual	void				DrawListItem(BView* owner, int32 index,
 									BRect frame) const;
 
+	// PlaylistListView
+			void				RefsReceived(BMessage* message,
+									int32 appendIndex);
+
  private:
 			void				_FullSync();
 			void				_AddItem(const entry_ref& ref, int32 index);
@@ -45,9 +49,6 @@ class PlaylistListView : public SimpleListView {
 
 			void				_SetCurrentPlaylistIndex(int32 index);
 			void				_SetPlaybackState(uint32 state);
-
-			void				_RefsReceived(BMessage* message,
-									int32 dropIndex);
 
 			Playlist*			fPlaylist;
 			PlaylistObserver*	fPlaylistObserver;

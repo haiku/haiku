@@ -11,8 +11,16 @@
 
 #include <Window.h>
 
+#include "ListenerAdapter.h"
+
+class BMenuBar;
+class BMenuItem;
+class CommandStack;
 class Controller;
+class Notifier;
 class Playlist;
+class PlaylistListView;
+class RWLocker;
 
 class PlaylistWindow : public BWindow {
  public:
@@ -25,7 +33,19 @@ class PlaylistWindow : public BWindow {
 	virtual	void				MessageReceived(BMessage* message);
 
  private:
+			void				_CreateMenu(BRect& frame);
+			void				_ObjectChanged(const Notifier* object);
+
+			Playlist*			fPlaylist;
+			PlaylistListView*	fListView;
+
 			BView*				fTopView;
+			BMenuItem*			fUndoMI;
+			BMenuItem*			fRedoMI;
+
+			RWLocker*			fLocker;
+			CommandStack*		fCommandStack;
+			ListenerAdapter		fCommandStackListener;
 };
 
 #endif // PLAYLIST_WINDOW_H
