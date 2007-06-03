@@ -1245,30 +1245,27 @@ get_next_loaded_module_name(uint32 *_cookie, char *buffer, size_t *_bufferSize)
 	if (_cookie == NULL || buffer == NULL || _bufferSize == NULL)
 		return B_BAD_VALUE;
 
-	hash_iterator *iterator = (hash_iterator *)*_cookie;
-	status_t status;
-
-	if (iterator == NULL) {
-		iterator = hash_open(sModulesHash, NULL);
-		if (iterator == NULL)
-			return B_NO_MEMORY;
-
-		*(hash_iterator **)_cookie = iterator;
-	}
+	status_t status = B_ENTRY_NOT_FOUND;
+	uint32 offset = *_cookie;
 
 	recursive_lock_lock(&sModulesLock);
-	
-	// TODO: this is completely unsafe!!!
 
-	struct module *module = (struct module *)hash_next(sModulesHash, iterator);
-	if (module != NULL) {
-		*_bufferSize = strlcpy(buffer, module->name, *_bufferSize);
-		status = B_OK;
-	} else {
-		hash_close(sModulesHash, iterator, true);
-		status = B_ENTRY_NOT_FOUND;
+	hash_iterator iterator;
+	hash_open(sModulesHash, &iterator);
+	struct module *module = (struct module *)hash_next(sModulesHash,
+		&iterator);
+
+	for (uint32 i = 0; module != NULL; i++) {
+		if (i >= offset) {
+			*_bufferSize = strlcpy(buffer, module->name, *_bufferSize);
+			*_cookie = i + 1;
+			status = B_OK;
+			break;
+		}
+		module = (struct module *)hash_next(sModulesHash, &iterator);
 	}
 
+	hash_close(sModulesHash, &iterator, false);
 	recursive_lock_unlock(&sModulesLock);
 
 	return status;
