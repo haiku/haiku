@@ -556,7 +556,10 @@ DragSortableListView::SetDropTargetRect(const BMessage* message, BPoint where)
 {
 	if (AcceptDragMessage(message)) {
 		bool copy = modifiers() & B_SHIFT_KEY;
-		bool replaceAll = !message->HasPointer("list") && !copy;
+		bool replaceAll = !message->HasPointer("list") && copy;
+			// when dragging something in from ie Tracker, the
+			// user has to hold shift down to replace everything
+			// (opposite meaning of the normal shift behaviour)
 		BRect r = Bounds();
 		if (replaceAll) {
 			r.bottom--;	// compensate for scrollbar offset
