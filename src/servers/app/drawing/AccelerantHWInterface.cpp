@@ -22,6 +22,8 @@
 #include "ServerProtocol.h"
 #include "SystemPalette.h"
 
+#include "safemode.h"
+
 #include <Accelerant.h>
 #include <Cursor.h>
 #include <FindDirectory.h>
@@ -47,12 +49,17 @@ using std::nothrow;
 #endif
 
 
-// This call updates the frame buffer used by the on-screen KDL
 #ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+// This call updates the frame buffer used by the on-screen KDL
 extern "C" status_t _kern_frame_buffer_update(void *baseAddress,
-						int32 width, int32 height,
-						int32 depth, int32 bytesPerRow);
+	int32 width, int32 height, int32 depth, int32 bytesPerRow);
+
+// This call retrieves the system's safemode options
+extern "C" status_t _kern_get_safemode_option(const char* parameter,
+	char* buffer, size_t* _size);
 #endif
+
+const int32 kDefaultParamsCount = 64;
 
 
 bool
@@ -61,9 +68,31 @@ operator==(const display_mode& a, const display_mode& b)
 	return memcmp(&a, &b, sizeof(display_mode)) == 0;
 }
 
-const int32 kDefaultParamsCount = 64;
 
-// constructor
+bool
+use_fail_safe_video_mode()
+{
+	char buffer[B_FILE_NAME_LENGTH];
+	size_t size = sizeof(buffer);
+
+	status_t status = _kern_get_safemode_option(
+		B_SAFEMODE_FAIL_SAFE_VIDEO_MODE, buffer, &size);
+	if (status == B_OK) {
+		if (!strncasecmp(buffer, "true", size)
+			|| !strncasecmp(buffer, "yes", size)
+			|| !strncasecmp(buffer, "on", size)
+			|| !strncasecmp(buffer, "enabled", size)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+//	#pragma mark -
+
+
 AccelerantHWInterface::AccelerantHWInterface()
 	:	HWInterface(),
 		fCardFD(-1),
@@ -185,35 +214,36 @@ AccelerantHWInterface::_OpenGraphicsDevice(int deviceNumber)
 	if (!directory)
 		return -1;
 
-	// ToDo: the former R5 "stub" driver is called "vesa" under Haiku; however,
-	//	we do not need to avoid this driver this way when is has been ported
-	//	to the new driver architecture - the special case here can then be
-	//	removed.
-	int count = 0;
-	struct dirent *entry;
 	int device = -1;
-	char path[PATH_MAX];
-	while (count < deviceNumber && (entry = readdir(directory)) != NULL) {
-		if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..") ||
-			!strcmp(entry->d_name, "stub") || !strcmp(entry->d_name, "vesa"))
-			continue;
+	int count = 0;
+	if (!use_fail_safe_video_mode()) {
+		// ToDo: the former R5 "stub" driver is called "vesa" under Haiku; however,
+		//	we do not need to avoid this driver this way when is has been ported
+		//	to the new driver architecture - the special case here can then be
+		//	removed.
+		struct dirent *entry;
+		char path[PATH_MAX];
+		while (count < deviceNumber && (entry = readdir(directory)) != NULL) {
+			if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..") ||
+				!strcmp(entry->d_name, "stub") || !strcmp(entry->d_name, "vesa"))
+				continue;
 
-		if (device >= 0) {
-			close(device);
-			device = -1;
+			if (device >= 0) {
+				close(device);
+				device = -1;
+			}
+
+			sprintf(path, "/dev/graphics/%s", entry->d_name);
+			device = open(path, B_READ_WRITE);
+			if (device >= 0)
+				count++;
 		}
-
-		sprintf(path, "/dev/graphics/%s", entry->d_name);
-		device = open(path, B_READ_WRITE);
-		if (device >= 0)
-			count++;
 	}
 
 	// Open VESA driver if we were not able to get a better one
 	if (count < deviceNumber) {
 		if (deviceNumber == 1) {
-			sprintf(path, "/dev/graphics/vesa");
-			device = open(path, B_READ_WRITE);
+			device = open("/dev/graphics/vesa", B_READ_WRITE);
 			fVGADevice = device;
 				// store the device, so that we can access the planar blitter
 		} else {

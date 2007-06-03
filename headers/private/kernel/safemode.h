@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_SAFEMODE_H
@@ -17,6 +17,7 @@
 #define B_SAFEMODE_DISABLE_ACPI				"disable_acpi"
 #define B_SAFEMODE_DISABLE_SMP				"disable_smp"
 #define B_SAFEMODE_DISABLE_HYPER_THREADING	"disable_hyperthreading"
+#define B_SAFEMODE_FAIL_SAFE_VIDEO_MODE		"fail_safe_video_mode"
 
 
 #ifdef __cplusplus

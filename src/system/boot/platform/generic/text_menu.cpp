@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -73,8 +73,10 @@ print_item_at(int32 line, MenuItem *item, bool clearHelp = true)
 	if (line < 0 || line >= menu_height())
 		return;
 
-	console_color background = selected ? kSelectedItemBackgroundColor : kItemBackgroundColor;
-	console_color foreground = selected ? kSelectedItemColor : kItemColor;
+	console_color background = selected
+		? kSelectedItemBackgroundColor : kItemBackgroundColor;
+	console_color foreground = selected
+		? kSelectedItemColor : kItemColor;
 
 	if (!item->IsEnabled())
 		foreground = kDisabledColor;
@@ -199,14 +201,15 @@ draw_menu(Menu *menu)
 	print_centered(2, "Haiku Boot Loader");
 
 	console_set_color(kCopyrightColor, kBackgroundColor);
-	print_centered(4, "Copyright 2004-2006 Haiku Inc.");
+	print_centered(4, "Copyright 2004-2007 Haiku Inc.");
 
 	if (menu->Title()) {
 		console_set_cursor(kOffsetX, kFirstLine - 2);
 		console_set_color(kTitleColor, kTitleBackgroundColor);
 
 		printf(" %s", menu->Title());
-		print_spacing(console_width() - 1 - strlen(menu->Title()) - 2*kOffsetX);
+		print_spacing(console_width() - 1
+			- strlen(menu->Title()) - 2 * kOffsetX);
 	}
 
 	MenuItemIterator iterator = menu->ItemIterator();
@@ -372,11 +375,13 @@ run_menu(Menu *menu)
 					break;
 				case TEXT_CONSOLE_KEY_PAGE_UP:
 				case TEXT_CONSOLE_KEY_LEFT:
-					selected = select_previous_valid_item(menu, selected - menu_height() + 1);
+					selected = select_previous_valid_item(menu,
+						selected - menu_height() + 1);
 					break;
 				case TEXT_CONSOLE_KEY_PAGE_DOWN:
 				case TEXT_CONSOLE_KEY_RIGHT:
-					selected = select_next_valid_item(menu, selected + menu_height() - 1);
+					selected = select_next_valid_item(menu,
+						selected + menu_height() - 1);
 					break;
 				case TEXT_CONSOLE_KEY_HOME:
 					selected = first_selectable_item(menu);
