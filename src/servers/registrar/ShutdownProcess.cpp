@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2007, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
 
@@ -232,8 +232,14 @@ public:
 
 	~ShutdownWindow()
 	{
-		for (int32 i = 0; AppInfo *info = (AppInfo*)fAppInfos.ItemAt(i); i++)
+		for (int32 i = 0; AppInfo *info = (AppInfo*)fAppInfos.ItemAt(i); i++) {
 			delete info;
+		}
+	}
+
+	virtual bool QuitRequested()
+	{
+		return false;
 	}
 
 	status_t Init(BMessenger target)
