@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -49,6 +49,7 @@ const struct supported_device {
 	{0x2592, INTEL_TYPE_9xx, "i915GM"},
 	{0x2772, INTEL_TYPE_9xx, "i945G"},
 	{0x27a2, INTEL_TYPE_9xx, "i945GM"},
+	{0x29a2, INTEL_TYPE_9xx | INTEL_TYPE_965, "i965G"}
 #endif
 };
 

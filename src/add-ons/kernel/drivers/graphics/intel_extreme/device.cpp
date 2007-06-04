@@ -57,12 +57,44 @@ device_hooks gDeviceHooks = {
 
 
 static status_t
-checkDeviceInfo(struct intel_info *info)
+check_device_info(struct intel_info *info)
 {
 	if (!info || info->cookie_magic != INTEL_COOKIE_MAGIC)
 		return B_BAD_VALUE;
 
 	return B_OK;
+}
+
+
+static int
+getset_register(int argc, char **argv)
+{
+	if (argc < 2 || argc > 3) {
+		kprintf("usage: %s <register> [set-to-value]\n", argv[0]);
+		return 0;
+	}
+
+	uint32 reg = parse_expression(argv[1]);
+	uint32 value = 0;
+	bool set = argc == 3;
+	if (set)
+		value = parse_expression(argv[2]);
+
+	kprintf("intel_extreme register %#lx\n", reg);
+
+	intel_info &info = *gDeviceInfo[0];
+	uint32 oldValue = read32(info.registers + reg);
+
+	kprintf("  %svalue: %#lx (%lu)\n", set ? "old " : "", oldValue, oldValue);
+
+	if (set) {
+		write32(info.registers + reg, value);
+
+		value = read32(info.registers + reg);
+		kprintf("  new value: %#lx (%lu)\n", value, value);
+	}
+
+	return 0;
 }
 
 
@@ -94,10 +126,15 @@ device_open(const char *name, uint32 /*flags*/, void **_cookie)
 
 	status_t status = B_OK;
 
+	// TODO: the second open will succeed even though the first one failed!
 	if (info->open_count++ == 0) {
 		// this device has been opened for the first time, so
 		// we allocate needed resources and initialize the structure
 		status = intel_extreme_init(*info);
+		if (status == B_OK) {
+			add_debugger_command("ie_reg", getset_register,
+				"dumps or sets the specified intel_extreme register");
+		}
 	}
 
 	release_lock(&gLock);
@@ -112,11 +149,10 @@ device_close(void *data)
 	TRACE((DEVICE_NAME ": close\n"));
 	struct intel_info *info;
 
-	if (checkDeviceInfo(info = (intel_info *)data) != B_OK)
+	if (check_device_info(info = (intel_info *)data) != B_OK)
 		return B_BAD_VALUE;
 
 	info->cookie_magic = INTEL_FREE_COOKIE_MAGIC;
-
 	return B_OK;
 }
 
@@ -135,6 +171,7 @@ device_free(void *data)
 	if (info->open_count-- == 1) {
 		// release info structure
 		info->cookie_magic = 0;
+		remove_debugger_command("ie_reg", getset_register);
 		intel_extreme_uninit(*info);
 	}
 
@@ -149,7 +186,7 @@ device_ioctl(void *data, uint32 op, void *buffer, size_t bufferLength)
 {
 	struct intel_info *info;
 
-	if (checkDeviceInfo(info = (intel_info *)data) != B_OK)
+	if (check_device_info(info = (intel_info *)data) != B_OK)
 		return B_BAD_VALUE;
 
 	switch (op) {

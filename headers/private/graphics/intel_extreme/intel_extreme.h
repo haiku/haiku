@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -24,9 +24,12 @@
 #define INTEL_TYPE_GROUP_MASK	0xf0
 #define INTEL_TYPE_7xx			0x01
 #define INTEL_TYPE_8xx			0x02
-#define INTEL_TYPE_9xx			0x03
+#define INTEL_TYPE_9xx			0x04
 #define INTEL_TYPE_83x			0x10
 #define INTEL_TYPE_85x			0x20
+#define INTEL_TYPE_915			0x10
+#define INTEL_TYPE_945			0x20
+#define INTEL_TYPE_965			0x40
 
 #define DEVICE_NAME				"intel_extreme"
 #define INTEL_ACCELERANT_NAME	"intel_extreme.accelerant"
@@ -220,9 +223,12 @@ struct intel_free_graphics_memory {
 #define DISPLAY_PLL_2X_CLOCK			(1UL << 30)
 #define DISPLAY_PLL_SYNC_LOCK_ENABLED	(1UL << 29)
 #define DISPLAY_PLL_NO_VGA_CONTROL		(1UL << 28)
+#define DISPLAY_PLL_MODE_ANALOG			(1UL << 26)
+#define DISPLAY_PLL_DIVIDE_HIGH			(1UL << 24)
 #define DISPLAY_PLL_DIVIDE_4X			(1UL << 23)
-#define DISPLAY_PLL_POST_DIVISOR_MASK	0x001f0000
-#define DISPLAY_PLL_POST_DIVISOR_SHIFT	16
+#define DISPLAY_PLL_POST1_DIVISOR_MASK	0x001f0000
+#define DISPLAY_PLL_9xx_POST1_DIVISOR_MASK	0x00ff0000
+#define DISPLAY_PLL_POST1_DIVISOR_SHIFT	16
 #define DISPLAY_PLL_DIVISOR_1			(1UL << 8)
 #define DISPLAY_PLL_N_DIVISOR_MASK		0x001f0000
 #define DISPLAY_PLL_M1_DIVISOR_MASK		0x00001f00
@@ -230,6 +236,7 @@ struct intel_free_graphics_memory {
 #define DISPLAY_PLL_N_DIVISOR_SHIFT		16
 #define DISPLAY_PLL_M1_DIVISOR_SHIFT	8
 #define DISPLAY_PLL_M2_DIVISOR_SHIFT	0
+#define DISPLAY_PLL_PULSE_PHASE_SHIFT	9
 
 #define INTEL_DISPLAY_A_ANALOG_PORT		0x61100
 #define DISPLAY_MONITOR_PORT_ENABLED	(1UL << 31)

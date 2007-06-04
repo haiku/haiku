@@ -1,6 +1,9 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Support for i915 chipset and up based on the X driver,
+ * Copyright 2006 Intel Corporation.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
@@ -11,6 +14,7 @@
 #include "accelerant.h"
 #include "utility.h"
 
+#include <stdio.h>
 #include <string.h>
 #include <math.h>
 
@@ -28,6 +32,40 @@ extern "C" void _sPrintf(const char *format, ...);
 #define MODE_FLAGS \
 	(B_8_BIT_DAC | B_HARDWARE_CURSOR | B_PARALLEL_ACCESS | B_DPMS | B_SUPPORTS_OVERLAYS)
 
+
+struct display_registers {
+	uint32	pll;
+	uint32	divisors;
+	uint32	control;
+	uint32	pipe_config;
+	uint32	horiz_total;
+	uint32	horiz_blank;
+	uint32	horiz_sync;
+	uint32	vert_total;
+	uint32	vert_blank;
+	uint32	vert_sync;
+	uint32	size;
+	uint32	stride;
+	uint32	position;
+	uint32	pipe_source;
+};
+
+struct pll_divisors {
+	uint32	post;
+	uint32	post1;
+	uint32	post2;
+	bool	post2_high;
+	uint32	n;
+	uint32	m;
+	uint32	m1;
+	uint32	m2;
+};
+
+struct pll_limits {
+	pll_divisors	min;
+	pll_divisors	max;
+	float			min_post2_frequency;
+};
 
 static const display_mode kBaseModeList[] = {
 	{{25175, 640, 656, 752, 800, 350, 387, 389, 449, B_POSITIVE_HSYNC}, B_CMAP8, 640, 350, 0, 0, MODE_FLAGS}, /* 640x350 - www.epanorama.net/documents/pc/vga_timing.html) */
@@ -69,10 +107,10 @@ static const uint32 kNumBaseModes = sizeof(kBaseModeList) / sizeof(display_mode)
 static const uint32 kMaxNumModes = kNumBaseModes * 4;
 
 
-/**	Creates the initial mode list of the primary accelerant.
- *	It's called from intel_init_accelerant().
- */
-
+/*!
+	Creates the initial mode list of the primary accelerant.
+	It's called from intel_init_accelerant().
+*/
 status_t
 create_mode_list(void)
 {
@@ -119,30 +157,95 @@ wait_for_vblank(void)
 
 
 static void
-compute_pll_divisors(const display_mode &current, uint32 &postDivisor,
-	uint32 &nDivisor, uint32 &m1Divisor, uint32 &m2Divisor)
+get_pll_limits(pll_limits &limits)
+{
+	// Note, the limits are taken from the X driver; they have not yet been tested
+
+	if ((gInfo->shared_info->device_type & INTEL_TYPE_9xx) != 0) {
+		// TODO: support LVDS output limits as well
+		static const pll_limits kLimits = {
+			// p, p1, p2, high,   n,   m, m1, m2
+			{  5,  1,  5, false,  5,  70, 12,  7},	// min
+			{ 80,  8, 10, true,  10, 120, 22, 11},	// max
+			200000
+		};
+		limits = kLimits;
+	} else {
+		// TODO: support LVDS output limits as well
+		static const pll_limits kLimits = {
+			// p, p1, p2, high,   n,   m, m1, m2
+			{  4,  2,  2, false,  5,  96, 20,  8},
+			{128, 33,  4, true,  18, 140, 28, 18},
+			165000
+		};
+		limits = kLimits;
+	}
+
+	TRACE(("PLL limits, min: p %lu (p1 %lu, p2 %lu), n %lu, m %lu (m1 %lu, m2 %lu)\n",
+		limits.min.post, limits.min.post1, limits.min.post2, limits.min.n,
+		limits.min.m, limits.min.m1, limits.min.m2));
+	TRACE(("PLL limits, max: p %lu (p1 %lu, p2 %lu), n %lu, m %lu (m1 %lu, m2 %lu)\n",
+		limits.max.post, limits.max.post1, limits.max.post2, limits.max.n,
+		limits.max.m, limits.max.m1, limits.max.m2));
+}
+
+
+static bool
+valid_pll_divisors(const pll_divisors& divisors, const pll_limits& limits)
+{
+	pll_info &info = gInfo->shared_info->pll_info;
+	uint32 vco = info.reference_frequency * divisors.m / divisors.n;
+	uint32 frequency = vco / divisors.post;
+
+	if (divisors.post < limits.min.post || divisors.post > limits.max.post
+		|| divisors.m < limits.min.m || divisors.m > limits.max.m
+		|| frequency < info.min_frequency || frequency > info.max_frequency)
+		return false;
+
+	return true;
+}
+
+
+static void
+compute_pll_divisors(const display_mode &current, pll_divisors& divisors)
 {
 	float requestedPixelClock = current.timing.pixel_clock / 1000.0f;
 	float referenceClock = gInfo->shared_info->pll_info.reference_frequency / 1000.0f;
+	pll_limits limits;
+	get_pll_limits(limits);
 
 	TRACE(("required MHz: %g\n", requestedPixelClock));
 
+	if (current.timing.pixel_clock < limits.min_post2_frequency) {
+	    divisors.post2 = limits.min.post2;
+	    divisors.post2_high = limits.min.post2_high;
+	} else {
+	    divisors.post2 = limits.max.post2;
+	    divisors.post2_high = limits.max.post2_high;
+	}
+
 	float best = requestedPixelClock;
-	uint32 bestP = 0, bestN = 0, bestM = 0;
+	pll_divisors bestDivisors;
 
-	// Note, the limits are taken from the X driver; they have not yet been tested
+	for (divisors.post1 = limits.min.post1; divisors.post1 <= limits.max.post1;
+			divisors.post1++) {
+		for (divisors.n = limits.min.n; divisors.n <= limits.max.n; divisors.n++) {
+			for (divisors.m1 = limits.min.m1; divisors.m1 <= limits.max.m1;
+					divisors.m1++) {
+				for (divisors.m2 = limits.min.m2; divisors.m2 < divisors.m1
+						&& divisors.m2 <= limits.max.m2; divisors.m2++) {
+					divisors.m = 5 * divisors.m1 + divisors.m2;
+					divisors.post = divisors.post1 * divisors.post2;
 
-	for (uint32 p = 3; p < 31; p++) {
-		for (uint32 n = 3; n < 16; n++) {
-			for (uint32 m1 = 6; m1 < 26; m1++) {
-				for (uint32 m2 = 6; m2 < 16; m2++) {
-					uint32 m = m1 * 5 + m2;
-					float error = fabs(requestedPixelClock - ((referenceClock * m) / n) / (p*4));
+					if (!valid_pll_divisors(divisors, limits))
+						continue;
+
+					float error = fabs(requestedPixelClock
+						- ((referenceClock * divisors.m) / divisors.n) / divisors.post);
 					if (error < best) {
 						best = error;
-						bestP = p;
-						bestN = n;
-						bestM = m;
+						bestDivisors = divisors;
+
 						if (error == 0)
 							break;
 					}
@@ -151,19 +254,12 @@ compute_pll_divisors(const display_mode &current, uint32 &postDivisor,
 		}
 	}
 
-	postDivisor = bestP;
-	nDivisor = bestN;
+	divisors = bestDivisors;
 
-	TRACE(("found: %g MHz (p = %lu, n = %lu, m = %lu (m1 = %lu, m2 = %lu)\n",
-		((referenceClock * bestM) / bestN) / (bestP*4), bestP, bestN, bestM,
-		m1Divisor, m2Divisor));
-
-	m1Divisor = bestM / 5;
-	m2Divisor = bestM % 5;
-	while (m2Divisor < 6) {
-		m1Divisor--;
-		m2Divisor += 5;
-	}
+	TRACE(("found: %g MHz, p = %lu (p1 = %lu, p2 = %lu), n = %lu, m = %lu (m1 = %lu, m2 = %lu)\n",
+		((referenceClock * divisors.m) / divisors.n) / divisors.post,
+		divisors.post, divisors.post1, divisors.post2, divisors.n,
+		divisors.m, divisors.m1, divisors.m2));
 }
 
 
@@ -216,7 +312,8 @@ status_t
 intel_get_mode_list(display_mode *modeList)
 {
 	TRACE(("intel_get_mode_info()\n"));
-	memcpy(modeList, gInfo->mode_list, gInfo->shared_info->mode_count * sizeof(display_mode));
+	memcpy(modeList, gInfo->mode_list,
+		gInfo->shared_info->mode_count * sizeof(display_mode));
 	return B_OK;
 }
 
@@ -256,13 +353,33 @@ intel_set_display_mode(display_mode *mode)
 	if (mode == NULL || intel_propose_display_mode(&target, mode, mode))
 		return B_BAD_VALUE;
 
+	uint32 colorMode, bytesPerRow, bitsPerPixel;
+	get_color_space_format(target, colorMode, bytesPerRow, bitsPerPixel);
+
+debug_printf("new resolution: %ux%ux%lu\n", target.timing.h_display, target.timing.v_display, bitsPerPixel);
+#if 0
+static bool first = true;
+if (first) {
+	int fd = open("/boot/home/ie_.regs", O_CREAT | O_WRONLY, 0644);
+	if (fd >= 0) {
+		for (int32 i = 0; i < 0x80000; i += 16) {
+			char line[512];
+			int length = sprintf(line, "%05lx: %08lx %08lx %08lx %08lx\n",
+				i, read32(i), read32(i + 4), read32(i + 8), read32(i + 12));
+			write(fd, line, length);
+		}
+		close(fd);
+		sync();
+	}
+	first = false;
+}
+#endif
+	//return B_ERROR;
+
 	intel_shared_info &sharedInfo = *gInfo->shared_info;
 	Autolock locker(sharedInfo.accelerant_lock);
 
 	set_display_power_mode(B_DPMS_OFF);
-
-	uint32 colorMode, bytesPerRow, bitsPerPixel;
-	get_color_space_format(target, colorMode, bytesPerRow, bitsPerPixel);
 
 	// free old and allocate new frame buffer in graphics memory
 
@@ -312,8 +429,8 @@ intel_set_display_mode(display_mode *mode)
 			| ((target.timing.flags & B_POSITIVE_HSYNC) != 0 ? DISPLAY_MONITOR_POSITIVE_HSYNC : 0)
 			| ((target.timing.flags & B_POSITIVE_VSYNC) != 0 ? DISPLAY_MONITOR_POSITIVE_VSYNC : 0));
 
-		uint32 postDivisor, nDivisor, m1Divisor, m2Divisor;
-		compute_pll_divisors(target, postDivisor, nDivisor, m1Divisor, m2Divisor);
+		pll_divisors divisors;
+		compute_pll_divisors(target, divisors);
 
 		// switch divisor register with every mode change (not required)
 		uint32 divisorRegister;
@@ -323,13 +440,41 @@ intel_set_display_mode(display_mode *mode)
 			divisorRegister = INTEL_DISPLAY_A_PLL_DIVISOR_0;
 
 		write32(divisorRegister,
-			(((nDivisor - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT) & DISPLAY_PLL_N_DIVISOR_MASK)
-			| (((m1Divisor - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT) & DISPLAY_PLL_M1_DIVISOR_MASK)
-			| (((m2Divisor - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT) & DISPLAY_PLL_M2_DIVISOR_MASK));
+			(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT) & DISPLAY_PLL_N_DIVISOR_MASK)
+			| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT) & DISPLAY_PLL_M1_DIVISOR_MASK)
+			| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT) & DISPLAY_PLL_M2_DIVISOR_MASK));
+
+		uint32 pll = DISPLAY_PLL_ENABLED | DISPLAY_PLL_NO_VGA_CONTROL;
+		if ((gInfo->shared_info->device_type & INTEL_TYPE_9xx) != 0) {
+//			pll |= ((1 << (divisors.post1 - 1)) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
+//				& DISPLAY_PLL_9xx_POST1_DIVISOR_MASK;
+			pll |= ((divisors.post1 - 1) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
+				& DISPLAY_PLL_9xx_POST1_DIVISOR_MASK;
+			if (divisors.post2_high)
+				pll |= DISPLAY_PLL_DIVIDE_HIGH;
+
+			pll |= DISPLAY_PLL_MODE_ANALOG;
+
+			if ((gInfo->shared_info->device_type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_965)
+				pll |= 6 << DISPLAY_PLL_PULSE_PHASE_SHIFT;
+		} else {
+			if (divisors.post2_high)
+				pll |= DISPLAY_PLL_DIVIDE_4X;
+			pll |= DISPLAY_PLL_2X_CLOCK;
+			pll |= (((divisors.post1 - 2) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
+				& DISPLAY_PLL_POST1_DIVISOR_MASK);
+		}
+
+		pll |= (divisorRegister == INTEL_DISPLAY_A_PLL_DIVISOR_1 ? DISPLAY_PLL_DIVISOR_1 : 0);
+
+		debug_printf("PLL is %#lx, write: %#lx\n", read32(INTEL_DISPLAY_A_PLL), pll);
+		write32(INTEL_DISPLAY_A_PLL, pll);
+#if 0
 		write32(INTEL_DISPLAY_A_PLL, DISPLAY_PLL_ENABLED | DISPLAY_PLL_2X_CLOCK
 			| DISPLAY_PLL_NO_VGA_CONTROL | DISPLAY_PLL_DIVIDE_4X
-			| (((postDivisor - 2) << DISPLAY_PLL_POST_DIVISOR_SHIFT) & DISPLAY_PLL_POST_DIVISOR_MASK)
+			| (((divisors.post1 - 2) << DISPLAY_PLL_POST1_DIVISOR_SHIFT) & DISPLAY_PLL_POST1_DIVISOR_MASK)
 			| (divisorRegister == INTEL_DISPLAY_A_PLL_DIVISOR_1 ? DISPLAY_PLL_DIVISOR_1 : 0));
+#endif
 	}
 
 	// These two have to be set for display B, too - this obviously means
@@ -366,20 +511,6 @@ intel_set_display_mode(display_mode *mode)
 	sharedInfo.current_mode = target;
 	sharedInfo.bits_per_pixel = bitsPerPixel;
 
-#if 0
-int fd = open("/boot/home/ie.regs", O_CREAT | O_WRONLY, 0644);
-if (fd >= 0) {
-	for (int32 i = 0; i < 0x80000; i += 16) {
-		char line[512];
-		int length = sprintf(line, "%05lx: %08lx %08lx %08lx %08lx\n",
-			i, read32(i), read32(i + 4), read32(i + 8), read32(i + 12));
-		write(fd, line, length);
-	}
-	close(fd);
-	sync();
-}
-#endif
-
 	return B_OK;
 }
 
@@ -388,7 +519,96 @@ status_t
 intel_get_display_mode(display_mode *_currentMode)
 {
 	TRACE(("intel_get_display_mode()\n"));
-	*_currentMode = gInfo->shared_info->current_mode;
+
+	display_mode &mode = *_currentMode;
+
+	uint32 pll = read32(INTEL_DISPLAY_A_PLL);
+	uint32 pllDivisor = read32((pll & DISPLAY_PLL_DIVISOR_1) != 0
+		? INTEL_DISPLAY_A_PLL_DIVISOR_1 : INTEL_DISPLAY_A_PLL_DIVISOR_0);
+
+	pll_divisors divisors;
+	divisors.m1 = (pllDivisor & DISPLAY_PLL_M1_DIVISOR_MASK)
+		>> DISPLAY_PLL_M1_DIVISOR_SHIFT;
+	divisors.m2 = (pllDivisor & DISPLAY_PLL_M2_DIVISOR_MASK)
+		>> DISPLAY_PLL_M2_DIVISOR_SHIFT;
+	divisors.n = (pllDivisor & DISPLAY_PLL_N_DIVISOR_MASK)
+		>> DISPLAY_PLL_N_DIVISOR_SHIFT;
+
+	pll_limits limits;
+	get_pll_limits(limits);
+
+	if ((gInfo->shared_info->device_type & INTEL_TYPE_9xx) != 0) {
+		divisors.post1 = (pll & DISPLAY_PLL_9xx_POST1_DIVISOR_MASK)
+			>> DISPLAY_PLL_POST1_DIVISOR_SHIFT;
+
+		if ((pll & DISPLAY_PLL_DIVIDE_HIGH) != 0)
+			divisors.post2 = limits.max.post2;
+		else
+			divisors.post2 = limits.min.post2;
+	} else {
+		// 8xx
+		divisors.post1 = (pll & DISPLAY_PLL_POST1_DIVISOR_MASK)
+			>> DISPLAY_PLL_POST1_DIVISOR_SHIFT;
+
+		if ((pll & DISPLAY_PLL_DIVIDE_4X) != 0)
+			divisors.post2 = limits.max.post2;
+		else
+			divisors.post2 = limits.min.post2;
+	}
+
+	divisors.m = 5 * divisors.m1 + divisors.m2;
+	divisors.post = divisors.post1 * divisors.post2;
+
+	float referenceClock = gInfo->shared_info->pll_info.reference_frequency / 1000.0f;
+	float pixelClock = ((referenceClock * divisors.m) / divisors.n) / divisors.post;
+
+	// timing
+
+	mode.timing.pixel_clock = uint32(pixelClock * 1000);
+	mode.timing.flags = 0;
+
+	uint32 value = read32(INTEL_DISPLAY_A_HTOTAL);
+	mode.timing.h_total = (value >> 16) + 1;
+	mode.timing.h_display = (value & 0xffff) + 1;
+
+	value = read32(INTEL_DISPLAY_A_HSYNC);
+	mode.timing.h_sync_end = (value >> 16) + 1;
+	mode.timing.h_sync_start = (value & 0xffff) + 1;
+
+	value = read32(INTEL_DISPLAY_A_VTOTAL);
+	mode.timing.v_total = (value >> 16) + 1;
+	mode.timing.v_display = (value & 0xffff) + 1;
+
+	value = read32(INTEL_DISPLAY_A_VSYNC);
+	mode.timing.v_sync_end = (value >> 16) + 1;
+	mode.timing.v_sync_start = (value & 0xffff) + 1;
+
+	// image size and color space
+
+	value = read32(INTEL_DISPLAY_A_IMAGE_SIZE);
+	mode.virtual_width = (value >> 16) + 1;
+	mode.virtual_height = (value & 0xffff) + 1;
+
+	value = read32(INTEL_DISPLAY_A_CONTROL);
+	switch (value & DISPLAY_CONTROL_COLOR_MASK) {
+		case DISPLAY_CONTROL_RGB32:
+		default:
+			mode.space = B_RGB32;
+			break;
+		case DISPLAY_CONTROL_RGB16:
+			mode.space = B_RGB16;
+			break;
+		case DISPLAY_CONTROL_RGB15:
+			mode.space = B_RGB15;
+			break;
+		case DISPLAY_CONTROL_CMAP8:
+			mode.space = B_CMAP8;
+			break;
+	}
+
+	mode.h_display_start = 0;
+	mode.v_display_start = 0;
+	mode.flags = 0;
 	return B_OK;
 }
 
