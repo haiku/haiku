@@ -82,7 +82,7 @@ static int32 sMessageRepeatCount = 0;
 static char sLineBuffer[HISTORY_SIZE][LINE_BUFFER_SIZE] = { "", };
 static char sParseLine[LINE_BUFFER_SIZE];
 static int32 sCurrentLine = 0;
-static char *args[MAX_ARGS] = { NULL, };
+static char *sArguments[MAX_ARGS] = { NULL, };
 
 #define distance(a, b) ((a) < (b) ? (b) - (a) : (a) - (b))
 
@@ -321,6 +321,7 @@ parse_line(const char *buffer, char **argv, int *_argc, int32 maxArgs)
 	return *_argc = index;
 }
 
+
 /*!	This function is a safe gate through which debugger commands are invoked.
 	It sets a fault handler before invoking the command, so that an invalid
 	memory access will not result in another KDL session on top of this one
@@ -328,15 +329,18 @@ parse_line(const char *buffer, char **argv, int *_argc, int32 maxArgs)
 	the stack after catching a fault.
  */
 static int
-invoke_command(int (*command)(int, char **), int argc, char** argv)
+invoke_command(struct debugger_command *command, int argc, char** argv)
 {
 	struct thread* thread = thread_get_current_thread();
 	addr_t oldFaultHandler = thread->fault_handler;
 
+	// replace argv[0] with the actual command name
+	argv[0] = (char *)command->name;
+
 	// Invoking the command directly might be useful when debugging debugger
 	// commands.
 	if (sInvokeCommandDirectly)
-		return command(argc, argv);
+		return command->func(argc, argv);
 
 	if (setjmp(sInvokeCommandEnv) == 0) {
 		int result;
@@ -346,7 +350,7 @@ invoke_command(int (*command)(int, char **), int argc, char** argv)
 		if (!thread)
 			goto error;
 
-		result = command(argc, argv);
+		result = command->func(argc, argv);
 		thread->fault_handler = oldFaultHandler;
 		return result;
 
@@ -377,7 +381,7 @@ kernel_debugger_loop(void)
 
 		kprintf("kdebug> ");
 		read_line(sLineBuffer[sCurrentLine], LINE_BUFFER_SIZE);
-		parse_line(sLineBuffer[sCurrentLine], args, &argc, MAX_ARGS);
+		parse_line(sLineBuffer[sCurrentLine], sArguments, &argc, MAX_ARGS);
 
 		// We support calling last executed command again if
 		// B_KDEDUG_CONT was returned last time, so cmd != NULL
@@ -387,12 +391,12 @@ kernel_debugger_loop(void)
 		sDebuggerOnCPU = smp_get_current_cpu();
 
 		if (argc > 0)
-			cmd = find_command(args[0], true);
+			cmd = find_command(sArguments[0], true);
 
 		if (cmd == NULL)
 			kprintf("unknown command, enter \"help\" to get a list of all supported commands\n");
 		else {
-			int rc = invoke_command(cmd->func, argc, args);
+			int rc = invoke_command(cmd, argc, sArguments);
 
 			if (rc == B_KDEBUG_QUIT)
 				break;	// okay, exit now.
