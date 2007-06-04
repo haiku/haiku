@@ -33,7 +33,8 @@ PlaylistWindow::PlaylistWindow(BRect frame, Playlist* playlist,
 	_CreateMenu(frame);
 
 	frame.right -= B_V_SCROLL_BAR_WIDTH;
-	fListView = new PlaylistListView(frame, playlist, controller);
+	fListView = new PlaylistListView(frame, playlist, controller,
+		fCommandStack);
 
 	BScrollView* scrollView = new BScrollView("playlist scrollview",
 		fListView, B_FOLLOW_ALL, 0, false, true, B_NO_BORDER);

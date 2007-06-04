@@ -10,6 +10,7 @@
 
 #include "ListViews.h"
 
+class CommandStack;
 class Controller;
 class ControllerObserver;
 class Playlist;
@@ -20,7 +21,8 @@ class PlaylistListView : public SimpleListView {
  public:
 								PlaylistListView(BRect frame,
 									Playlist* playlist,
-									Controller* controller);
+									Controller* controller,
+									CommandStack* stack);
 	virtual						~PlaylistListView();
 
 	// BView interface
@@ -55,6 +57,8 @@ class PlaylistListView : public SimpleListView {
 
 			Controller*			fController;
 			ControllerObserver*	fControllerObserver;
+
+			CommandStack*		fCommandStack;
 
 			int32				fCurrentPlaylistIndex;
 			uint32				fPlaybackState;

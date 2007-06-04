@@ -16,12 +16,17 @@
 #include <ScrollView.h>
 #include <Window.h>
 
+#include "CommandStack.h"
 #include "Controller.h"
 #include "ControllerObserver.h"
+#include "CopyPLItemsCommand.h"
+#include "ImportPLItemsCommand.h"
 #include "ListViews.h"
+#include "MovePLItemsCommand.h"
 #include "PlaybackState.h"
 #include "Playlist.h"
 #include "PlaylistObserver.h"
+#include "RemovePLItemsCommand.h"
 
 using std::nothrow;
 
@@ -169,7 +174,7 @@ PlaylistItem::Draw(BView* owner, BRect frame, const font_height& fh,
 
 
 PlaylistListView::PlaylistListView(BRect frame, Playlist* playlist,
-		Controller* controller)
+		Controller* controller, CommandStack* stack)
 	: SimpleListView(frame, "playlist listview", NULL)
 
 	, fPlaylist(playlist)
@@ -178,6 +183,8 @@ PlaylistListView::PlaylistListView(BRect frame, Playlist* playlist,
 	, fController(controller)
 	, fControllerObserver(new ControllerObserver(this,
 			OBSERVE_PLAYBACK_STATE_CHANGES))
+
+	, fCommandStack(stack)
 
 	, fCurrentPlaylistIndex(-1)
 	, fPlaybackState(PLAYBACK_STATE_STOPPED)
@@ -329,85 +336,24 @@ PlaylistListView::KeyDown(const char* bytes, int32 numBytes)
 void
 PlaylistListView::MoveItems(BList& indices, int32 toIndex)
 {
-	if (!fPlaylist->Lock())
-		return;
-
-	entry_ref currentRef;
-	bool adjustCurrentRef = fPlaylist->GetRefAt(fPlaylist->CurrentRefIndex(),
-		&currentRef) == B_OK;
-
-	int32 count = indices.CountItems();
-	entry_ref refs[count];
-	for (int32 i = 0; i < count; i++) {
-		int32 index = (int32)indices.ItemAtFast(i) - i;
-			// "-i" to account for items already removed in the
-			// target list
-		if (index < 0) {
-			// asynchronous message is out of date
-			return;
-		}
-		refs[i] = fPlaylist->RemoveRef(index, false);
-		if (index < toIndex)
-			toIndex --;
-	}
-
-	for (int32 i = 0; i < count; i++) {
-		fPlaylist->AddRef(refs[i], toIndex++);
-	}
-
-	if (adjustCurrentRef)
-		fPlaylist->SetCurrentRefIndex(fPlaylist->IndexOf(currentRef));
-
-	fPlaylist->Unlock();
+	fCommandStack->Perform(new (nothrow) MovePLItemsCommand(fPlaylist,
+		(int32*)indices.Items(), indices.CountItems(), toIndex));
 }
 
 
 void
 PlaylistListView::CopyItems(BList& indices, int32 toIndex)
 {
-	if (!fPlaylist->Lock())
-		return;
-
-	int32 count = indices.CountItems();
-	entry_ref refs[count];
-	for (int32 i = 0; i < count; i++) {
-		int32 index = (int32)indices.ItemAtFast(i);
-		if (index < 0) {
-			// asynchronous message is out of date
-			return;
-		}
-		if (fPlaylist->GetRefAt(index, &refs[i]) < B_OK)
-			return;
-	}
-
-	for (int32 i = 0; i < count; i++) {
-		fPlaylist->AddRef(refs[i], toIndex++);
-	}
-
-	fPlaylist->Unlock();
+	fCommandStack->Perform(new (nothrow) CopyPLItemsCommand(fPlaylist,
+		(int32*)indices.Items(), indices.CountItems(), toIndex));
 }
 
 
 void
 PlaylistListView::RemoveItemList(BList& indices)
 {
-	if (!fPlaylist->Lock())
-		return;
-
-	int32 count = indices.CountItems();
-	int32 lastRemovedIndex = -1;
-	for (int32 i = 0; i < count; i++) {
-		lastRemovedIndex = (int32)indices.ItemAtFast(i) - i;
-			// "-i" to account for items already removed in the
-			// target list
-		fPlaylist->RemoveRef(lastRemovedIndex);
-	}
-
-	// in case we removed the currently playing file
-	if (fPlaylist->CurrentRefIndex() == -1)
-		fPlaylist->SetCurrentRefIndex(lastRemovedIndex);
-
-	fPlaylist->Unlock();
+	fCommandStack->Perform(new (nothrow) RemovePLItemsCommand(fPlaylist,
+		(int32*)indices.Items(), indices.CountItems()));
 }
 
 
@@ -424,12 +370,8 @@ PlaylistListView::DrawListItem(BView* owner, int32 index, BRect frame) const
 void
 PlaylistListView::RefsReceived(BMessage* message, int32 appendIndex)
 {
-	if (!fPlaylist->Lock())
-		return;
-
-	fPlaylist->AppendRefs(message, appendIndex);
-
-	fPlaylist->Unlock();
+	fCommandStack->Perform(new (nothrow) ImportPLItemsCommand(fPlaylist,
+		message, appendIndex));
 }
 
 

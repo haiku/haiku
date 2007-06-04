@@ -260,7 +260,7 @@ Playlist::RemoveListener(Listener* listener)
 
 
 void
-Playlist::AppendRefs(BMessage* refsReceivedMessage, int32 appendIndex)
+Playlist::AppendRefs(const BMessage* refsReceivedMessage, int32 appendIndex)
 {
 	// the playlist ist replaced by the refs in the message
 	// or the refs are appended at the appendIndex

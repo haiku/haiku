@@ -6,6 +6,7 @@ AddSubDirSupportedPlatforms libbe_test ;
 
 # source directories
 local sourceDirs =
+	playlist
 	supplier
 	support
 ;
@@ -16,6 +17,17 @@ for sourceDir in $(sourceDirs) {
 }
 
 Application MediaPlayer :
+	# playlist
+	CopyPLItemsCommand.cpp
+	ImportPLItemsCommand.cpp
+	ListViews.cpp
+	MovePLItemsCommand.cpp
+	Playlist.cpp
+	PlaylistListView.cpp
+	PlaylistObserver.cpp
+	PlaylistWindow.cpp
+	RemovePLItemsCommand.cpp
+
 	# supplier
 	AudioSupplier.cpp
 	MediaTrackAudioSupplier.cpp
@@ -37,13 +49,8 @@ Application MediaPlayer :
 	ControllerView.cpp
 	DrawingTidbits.cpp
 	InfoWin.cpp
-	ListViews.cpp
 	MainApp.cpp
 	MainWin.cpp
-	Playlist.cpp
-	PlaylistListView.cpp
-	PlaylistObserver.cpp
-	PlaylistWindow.cpp
 	SoundOutput.cpp
 	TransportButton.cpp
 	TransportControlGroup.cpp

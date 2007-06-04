@@ -74,7 +74,7 @@ public:
 			void				RemoveListener(Listener* listener);
 
 			// support functions
-			void				AppendRefs(BMessage* refsReceivedMessage,
+			void				AppendRefs(const BMessage* refsReceivedMessage,
 									int32 appendIndex = -1);
 	static	void				AppendToPlaylistRecursive(const entry_ref& ref,
 									Playlist* playlist);
