@@ -312,6 +312,8 @@ Desktop::Desktop(uid_t userID)
 	fActiveScreen(NULL),
 	fWindowLock("window lock"),
 	fMouseEventWindow(NULL),
+	fWindowUnderMouse(NULL),
+	fViewUnderMouse(B_NULL_TOKEN),
 	fFocus(NULL),
 	fFront(NULL),
 	fBack(NULL)
