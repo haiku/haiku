@@ -12,6 +12,7 @@
 #include "Command.h"
 
 class Playlist;
+struct entry_ref;
 
 class MovePLItemsCommand : public Command {
  public:

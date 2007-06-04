@@ -13,6 +13,7 @@
 
 class BMessage;
 class Playlist;
+struct entry_ref;
 
 class ImportPLItemsCommand : public Command {
  public:
