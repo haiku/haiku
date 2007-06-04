@@ -34,9 +34,6 @@
 #define DEVICE_NAME				"intel_extreme"
 #define INTEL_ACCELERANT_NAME	"intel_extreme.accelerant"
 
-#define INTEL_COOKIE_MAGIC		'intl'
-#define INTEL_FREE_COOKIE_MAGIC 'itlf'
-
 // info about PLL on graphics card
 struct pll_info {
 	uint32			reference_frequency;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,6 +23,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+#define DEBUG_COMMANDS
 
 #define TRACE_DEVICE
 #ifdef TRACE_DEVICE
@@ -56,16 +58,7 @@ device_hooks gDeviceHooks = {
 };
 
 
-static status_t
-check_device_info(struct intel_info *info)
-{
-	if (!info || info->cookie_magic != INTEL_COOKIE_MAGIC)
-		return B_BAD_VALUE;
-
-	return B_OK;
-}
-
-
+#ifdef DEBUG_COMMANDS
 static int
 getset_register(int argc, char **argv)
 {
@@ -96,6 +89,7 @@ getset_register(int argc, char **argv)
 
 	return 0;
 }
+#endif	// DEBUG_COMMANDS
 
 
 //	#pragma mark - Device Hooks
@@ -119,40 +113,38 @@ device_open(const char *name, uint32 /*flags*/, void **_cookie)
 		if (!thisName)
 			return B_BAD_VALUE;
 	}
+
 	intel_info *info = gDeviceInfo[id];
-	*_cookie = info;
 
 	acquire_lock(&gLock);
 
-	status_t status = B_OK;
-
-	// TODO: the second open will succeed even though the first one failed!
-	if (info->open_count++ == 0) {
+	if (info->open_count == 0) {
 		// this device has been opened for the first time, so
 		// we allocate needed resources and initialize the structure
-		status = intel_extreme_init(*info);
-		if (status == B_OK) {
+		info->init_status = intel_extreme_init(*info);
+		if (info->init_status == B_OK) {
+#ifdef DEBUG_COMMANDS
 			add_debugger_command("ie_reg", getset_register,
 				"dumps or sets the specified intel_extreme register");
+#endif
+
+			info->open_count++;
 		}
 	}
 
 	release_lock(&gLock);
 
-	return status;
+	if (info->init_status == B_OK)
+		*_cookie = info;
+
+	return info->init_status;
 }
 
 
 static status_t
-device_close(void *data)
+device_close(void */*data*/)
 {
 	TRACE((DEVICE_NAME ": close\n"));
-	struct intel_info *info;
-
-	if (check_device_info(info = (intel_info *)data) != B_OK)
-		return B_BAD_VALUE;
-
-	info->cookie_magic = INTEL_FREE_COOKIE_MAGIC;
 	return B_OK;
 }
 
@@ -161,33 +153,29 @@ static status_t
 device_free(void *data)
 {
 	struct intel_info *info = (intel_info *)data;
-	status_t retval = B_NO_ERROR;
-
-	if (info == NULL || info->cookie_magic != INTEL_FREE_COOKIE_MAGIC)
-		retval = B_BAD_VALUE;
 
 	acquire_lock(&gLock);
 
 	if (info->open_count-- == 1) {
 		// release info structure
-		info->cookie_magic = 0;
-		remove_debugger_command("ie_reg", getset_register);
+		info->init_status = B_NO_INIT;
 		intel_extreme_uninit(*info);
+
+#ifdef DEBUG_COMMANDS
+		remove_debugger_command("ie_reg", getset_register);
+#endif
 	}
 
 	release_lock(&gLock);
 
-	return retval;
+	return B_OK;
 }
 
 
 static status_t
 device_ioctl(void *data, uint32 op, void *buffer, size_t bufferLength)
 {
-	struct intel_info *info;
-
-	if (check_device_info(info = (intel_info *)data) != B_OK)
-		return B_BAD_VALUE;
+	struct intel_info *info = (intel_info *)data;
 
 	switch (op) {
 		case B_GET_ACCELERANT_SIGNATURE:
@@ -210,7 +198,8 @@ device_ioctl(void *data, uint32 op, void *buffer, size_t bufferLength)
 		// needed for cloning
 		case INTEL_GET_DEVICE_NAME:
 #ifdef __HAIKU__
-			if (user_strlcpy((char *)buffer, gDeviceNames[info->id], B_PATH_NAME_LENGTH) < B_OK)
+			if (user_strlcpy((char *)buffer, gDeviceNames[info->id],
+					B_PATH_NAME_LENGTH) < B_OK)
 				return B_BAD_ADDRESS;
 #else
 			strncpy((char *)buffer, gDeviceNames[info->id], B_PATH_NAME_LENGTH);
@@ -223,7 +212,8 @@ device_ioctl(void *data, uint32 op, void *buffer, size_t bufferLength)
 		{
 			intel_allocate_graphics_memory allocMemory;
 #ifdef __HAIKU__
-			if (user_memcpy(&allocMemory, buffer, sizeof(intel_allocate_graphics_memory)) < B_OK)
+			if (user_memcpy(&allocMemory, buffer,
+					sizeof(intel_allocate_graphics_memory)) < B_OK)
 				return B_BAD_ADDRESS;
 #else
 			memcpy(&allocMemory, buffer, sizeof(intel_allocate_graphics_memory));
@@ -237,7 +227,8 @@ device_ioctl(void *data, uint32 op, void *buffer, size_t bufferLength)
 			if (status == B_OK) {
 				// copy result
 #ifdef __HAIKU__
-				if (user_memcpy(buffer, &allocMemory, sizeof(intel_allocate_graphics_memory)) < B_OK)
+				if (user_memcpy(buffer, &allocMemory,
+						sizeof(intel_allocate_graphics_memory)) < B_OK)
 					return B_BAD_ADDRESS;
 #else
 				memcpy(buffer, &allocMemory, sizeof(intel_allocate_graphics_memory));
@@ -250,7 +241,8 @@ device_ioctl(void *data, uint32 op, void *buffer, size_t bufferLength)
 		{
 			intel_free_graphics_memory freeMemory;
 #ifdef __HAIKU__
-			if (user_memcpy(&freeMemory, buffer, sizeof(intel_free_graphics_memory)) < B_OK)
+			if (user_memcpy(&freeMemory, buffer,
+					sizeof(intel_free_graphics_memory)) < B_OK)
 				return B_BAD_ADDRESS;
 #else
 			memcpy(&freeMemory, buffer, sizeof(intel_free_graphics_memory));

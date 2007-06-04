@@ -20,6 +20,14 @@
 #include <errno.h>
 
 
+#define TRACE_DEVICE
+#ifdef TRACE_DEVICE
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
 class AreaKeeper {
 	public:
 		AreaKeeper();
@@ -492,11 +500,7 @@ intel_extreme_init(intel_info &info)
 
 	init_interrupt_handler(info);
 
-	info.cookie_magic = INTEL_COOKIE_MAGIC;
-		// this makes the cookie valid to be used
-
-	dprintf(DEVICE_NAME "intel_extreme_init() completed successfully!\n");
-
+	TRACE((DEVICE_NAME "intel_extreme_init() completed successfully!\n"));
 	return B_OK;
 }
 
@@ -504,7 +508,7 @@ intel_extreme_init(intel_info &info)
 void
 intel_extreme_uninit(intel_info &info)
 {
-	dprintf(DEVICE_NAME": intel_extreme_uninit()\n");
+	TRACE((DEVICE_NAME": intel_extreme_uninit()\n"));
 
 	if (!info.fake_interrupts && info.shared_info->vblank_sem > 0) {
 		// disable interrupt generation

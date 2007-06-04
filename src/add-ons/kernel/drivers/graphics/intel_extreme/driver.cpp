@@ -76,7 +76,8 @@ get_next_intel_extreme(int32 *_cookie, pci_info &info, uint32 &type)
 			continue;
 
 		// check device
-		for (uint32 i = 0; i < sizeof(kSupportedDevices) / sizeof(kSupportedDevices[0]); i++) {
+		for (uint32 i = 0; i < sizeof(kSupportedDevices)
+				/ sizeof(kSupportedDevices[0]); i++) {
 			if (info.device_id == kSupportedDevices[i].device_id) {
 				type = i;
 				*_cookie = index + 1;
@@ -169,6 +170,7 @@ init_driver(void)
 		// initialize the structure for later use
 
 		memset(gDeviceInfo[found], 0, sizeof(intel_info));
+		gDeviceInfo[found]->init_status = B_NO_INIT;
 		gDeviceInfo[found]->id = found;
 		gDeviceInfo[found]->pci = info;
 		gDeviceInfo[found]->registers = (uint8 *)info->u.h0.base_registers[0];

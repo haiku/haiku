@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -17,8 +17,8 @@
 
 
 struct intel_info {
-	uint32			cookie_magic;
 	int32			open_count;
+	status_t		init_status;
 	int32			id;
 	pci_info		*pci;
 	uint8			*registers;
