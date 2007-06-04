@@ -58,7 +58,7 @@
 #define ROUNDOWN(a, b) (((a) / (b)) * (b))
 
 
-extern vm_address_space *kernel_aspace;
+extern vm_address_space *gKernelAddressSpace;
 
 #define REGION_HASH_TABLE_SIZE 1024
 static area_id sNextAreaID;
@@ -103,11 +103,9 @@ area_hash(void *_area, const void *key, uint32 range)
 static vm_area *
 vm_get_area(area_id id)
 {
-	vm_area *area;
-
 	acquire_sem_etc(sAreaHashLock, READ_COUNT, 0, 0);
 
-	area = (vm_area *)hash_lookup(sAreaHash, &id);
+	vm_area *area = (vm_area *)hash_lookup(sAreaHash, &id);
 	if (area != NULL)
 		atomic_add(&area->ref_count, 1);
 
@@ -138,14 +136,12 @@ static vm_area *
 create_area_struct(vm_address_space *addressSpace, const char *name,
 	uint32 wiring, uint32 protection)
 {
-	vm_area *area = NULL;
-
 	// restrict the area name to B_OS_NAME_LENGTH
 	size_t length = strlen(name) + 1;
 	if (length > B_OS_NAME_LENGTH)
 		length = B_OS_NAME_LENGTH;
 
-	area = (vm_area *)malloc(sizeof(vm_area));
+	vm_area *area = (vm_area *)malloc(sizeof(vm_area));
 	if (area == NULL)
 		return NULL;
 
@@ -1325,7 +1321,7 @@ vm_clone_area(team_id team, const char *name, void **address, uint32 addressSpec
 	//	have been adapted. Maybe it should be part of the kernel settings,
 	//	anyway (so that old drivers can always work).
 #if 0
-	if (sourceArea->aspace == kernel_aspace && addressSpace != kernel_aspace
+	if (sourceArea->aspace == gKernelAddressSpace && addressSpace != gKernelAddressSpace
 		&& !(sourceArea->protection & B_USER_CLONEABLE_AREA)) {
 		// kernel areas must not be cloned in userland, unless explicitly
 		// declared user-cloneable upon construction
@@ -2578,7 +2574,7 @@ unmap_and_free_physical_pages(vm_translation_map *map, addr_t start, addr_t end)
 void
 vm_free_unused_boot_loader_range(addr_t start, addr_t size)
 {
-	vm_translation_map *map = &kernel_aspace->translation_map;
+	vm_translation_map *map = &gKernelAddressSpace->translation_map;
 	addr_t end = start + size;
 	addr_t lastEnd = start;
 	vm_area *area;
@@ -2591,7 +2587,7 @@ vm_free_unused_boot_loader_range(addr_t start, addr_t size)
 
 	map->ops->lock(map);
 
-	for (area = kernel_aspace->areas; area; area = area->address_space_next) {
+	for (area = gKernelAddressSpace->areas; area; area = area->address_space_next) {
 		addr_t areaStart = area->base;
 		addr_t areaEnd = areaStart + area->size;
 
@@ -2985,7 +2981,7 @@ vm_init_post_sem(kernel_args *args)
 	arch_vm_translation_map_init_post_sem(args);
 	vm_address_space_init_post_sem();
 
-	for (area = kernel_aspace->areas; area; area = area->address_space_next) {
+	for (area = gKernelAddressSpace->areas; area; area = area->address_space_next) {
 		if (area->id == RESERVED_AREA_ID)
 			continue;
 
@@ -3621,14 +3617,14 @@ found:
 status_t
 vm_get_physical_page(addr_t paddr, addr_t *_vaddr, uint32 flags)
 {
-	return (*kernel_aspace->translation_map.ops->get_physical_page)(paddr, _vaddr, flags);
+	return (*gKernelAddressSpace->translation_map.ops->get_physical_page)(paddr, _vaddr, flags);
 }
 
 
 status_t
 vm_put_physical_page(addr_t vaddr)
 {
-	return (*kernel_aspace->translation_map.ops->put_physical_page)(vaddr);
+	return (*gKernelAddressSpace->translation_map.ops->put_physical_page)(vaddr);
 }
 
 
@@ -4038,13 +4034,12 @@ area_for(void *address)
 area_id
 find_area(const char *name)
 {
-	struct hash_iterator iterator;
-	vm_area *area;
-	area_id id = B_NAME_NOT_FOUND;
-
 	acquire_sem_etc(sAreaHashLock, READ_COUNT, 0, 0);
+	struct hash_iterator iterator;	
 	hash_open(sAreaHash, &iterator);
 
+	vm_area *area;	
+	area_id id = B_NAME_NOT_FOUND;	
 	while ((area = (vm_area *)hash_next(sAreaHash, &iterator)) != NULL) {
 		if (area->id == RESERVED_AREA_ID)
 			continue;
@@ -4065,12 +4060,10 @@ find_area(const char *name)
 status_t
 _get_area_info(area_id id, area_info *info, size_t size)
 {
-	vm_area *area;
-
 	if (size != sizeof(area_info) || info == NULL)
 		return B_BAD_VALUE;
 
-	area = vm_get_area(id);
+	vm_area *area = vm_get_area(id);
 	if (area == NULL)
 		return B_BAD_VALUE;
 
@@ -4085,8 +4078,6 @@ status_t
 _get_next_area_info(team_id team, int32 *cookie, area_info *info, size_t size)
 {
 	addr_t nextBase = *(addr_t *)cookie;
-	vm_address_space *addressSpace;
-	vm_area *area;
 
 	// we're already through the list
 	if (nextBase == (addr_t)-1)
@@ -4095,12 +4086,14 @@ _get_next_area_info(team_id team, int32 *cookie, area_info *info, size_t size)
 	if (team == B_CURRENT_TEAM)
 		team = team_get_current_team_id();
 
+	vm_address_space *addressSpace;
 	if (!team_is_valid(team)
 		|| team_get_address_space(team, &addressSpace) != B_OK)
 		return B_BAD_VALUE;
 
 	acquire_sem_etc(addressSpace->sem, READ_COUNT, 0, 0);
 
+	vm_area *area;
 	for (area = addressSpace->areas; area; area = area->address_space_next) {
 		if (area->id == RESERVED_AREA_ID)
 			continue;
@@ -4142,26 +4135,24 @@ set_area_protection(area_id area, uint32 newProtection)
 status_t
 resize_area(area_id areaID, size_t newSize)
 {
-	vm_cache_ref *cacheRef;
-	vm_area *area, *current;
-	status_t status = B_OK;
-	size_t oldSize;
+	vm_area *current;
 
 	// is newSize a multiple of B_PAGE_SIZE?
 	if (newSize & (B_PAGE_SIZE - 1))
 		return B_BAD_VALUE;
 
-	area = vm_get_area(areaID);
+	vm_area *area = vm_get_area(areaID);
 	if (area == NULL)
 		return B_BAD_VALUE;
 
-	cacheRef = area->cache_ref;
+	vm_cache_ref *cacheRef = area->cache_ref;
 	mutex_lock(&cacheRef->lock);
 
 	// Resize all areas of this area's cache
 
-	oldSize = area->size;
-
+	size_t oldSize = area->size;
+	status_t status = B_OK;
+	
 	// ToDo: we should only allow to resize anonymous memory areas!
 	if (!cacheRef->cache->temporary) {
 		status = B_NOT_ALLOWED;
@@ -4169,7 +4160,6 @@ resize_area(area_id areaID, size_t newSize)
 	}
 
 	// ToDo: we must lock all address spaces here!
-
 	if (oldSize < newSize) {
 		// We need to check if all areas of this cache can be resized
 
@@ -4250,19 +4240,16 @@ out:
 static status_t
 transfer_area(area_id id, void **_address, uint32 addressSpec, team_id target)
 {
-	vm_address_space *sourceAddressSpace, *targetAddressSpace;
-	vm_translation_map *map;
-	vm_area *area, *reserved;
-	void *reservedAddress;
-	status_t status;
-
-	area = vm_get_area(id);
+	vm_address_space *sourceAddressSpace;
+	vm_address_space *targetAddressSpace;
+	void *reservedAddress = NULL;
+	vm_area *reserved;
+	vm_area *area = vm_get_area(id);
 	if (area == NULL)
 		return B_BAD_VALUE;
 
 	// ToDo: check if the current team owns the area
-
-	status = team_get_address_space(target, &targetAddressSpace);
+	status_t status = team_get_address_space(target, &targetAddressSpace);
 	if (status != B_OK)
 		goto err1;
 
@@ -4271,7 +4258,6 @@ transfer_area(area_id id, void **_address, uint32 addressSpec, team_id target)
 	// transfer failed.
 
 	sourceAddressSpace = area->address_space;
-
 	reserved = create_reserved_area_struct(sourceAddressSpace, 0);
 	if (reserved == NULL) {
 		status = B_NO_MEMORY;
@@ -4470,13 +4456,11 @@ _user_find_area(const char *userName)
 status_t
 _user_get_area_info(area_id area, area_info *userInfo)
 {
-	area_info info;
-	status_t status;
-
 	if (!IS_USER_ADDRESS(userInfo))
 		return B_BAD_ADDRESS;
-
-	status = get_area_info(area, &info);
+	
+	area_info info;	
+	status_t status = get_area_info(area, &info);
 	if (status < B_OK)
 		return status;
 
@@ -4493,8 +4477,6 @@ _user_get_area_info(area_id area, area_info *userInfo)
 status_t
 _user_get_next_area_info(team_id team, int32 *userCookie, area_info *userInfo)
 {
-	status_t status;
-	area_info info;
 	int32 cookie;
 
 	if (!IS_USER_ADDRESS(userCookie)
@@ -4502,7 +4484,8 @@ _user_get_next_area_info(team_id team, int32 *userCookie, area_info *userInfo)
 		|| user_memcpy(&cookie, userCookie, sizeof(int32)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	status = _get_next_area_info(team, &cookie, &info, sizeof(area_info));
+	area_info info;
+	status_t status = _get_next_area_info(team, &cookie, &info, sizeof(area_info));
 	if (status != B_OK)
 		return status;
 
@@ -4541,9 +4524,6 @@ _user_resize_area(area_id area, size_t newSize)
 status_t
 _user_transfer_area(area_id area, void **userAddress, uint32 addressSpec, team_id target)
 {
-	status_t status;
-	void *address;
-
 	// filter out some unavailable values (for userland)
 	switch (addressSpec) {
 		case B_ANY_KERNEL_ADDRESS:
@@ -4551,11 +4531,12 @@ _user_transfer_area(area_id area, void **userAddress, uint32 addressSpec, team_i
 			return B_BAD_VALUE;
 	}
 
+	void *address;
 	if (!IS_USER_ADDRESS(userAddress)
 		|| user_memcpy(&address, userAddress, sizeof(address)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	status = transfer_area(area, &address, addressSpec, target);
+	status_t status = transfer_area(area, &address, addressSpec, target);
 	if (status < B_OK)
 		return status;
 
@@ -4572,8 +4553,7 @@ _user_clone_area(const char *userName, void **userAddress, uint32 addressSpec,
 {
 	char name[B_OS_NAME_LENGTH];
 	void *address;
-	area_id clonedArea;
-
+	
 	// filter out some unavailable values (for userland)
 	switch (addressSpec) {
 		case B_ANY_KERNEL_ADDRESS:
@@ -4591,7 +4571,7 @@ _user_clone_area(const char *userName, void **userAddress, uint32 addressSpec,
 
 	fix_protection(&protection);
 
-	clonedArea = vm_clone_area(vm_current_user_address_space_id(), name, &address,
+	area_id clonedArea = vm_clone_area(vm_current_user_address_space_id(), name, &address,
 		addressSpec, protection, REGION_NO_PRIVATE_MAP, sourceArea);
 	if (clonedArea < B_OK)
 		return clonedArea;
@@ -4610,7 +4590,6 @@ _user_create_area(const char *userName, void **userAddress, uint32 addressSpec,
 	size_t size, uint32 lock, uint32 protection)
 {
 	char name[B_OS_NAME_LENGTH];
-	area_id area;
 	void *address;
 
 	// filter out some unavailable values (for userland)
@@ -4634,7 +4613,7 @@ _user_create_area(const char *userName, void **userAddress, uint32 addressSpec,
 
 	fix_protection(&protection);
 
-	area = vm_create_anonymous_area(vm_current_user_address_space_id(),
+	area_id area = vm_create_anonymous_area(vm_current_user_address_space_id(),
 		(char *)name, &address, addressSpec, size, lock, protection);
 
 	if (area >= B_OK && user_memcpy(userAddress, &address, sizeof(address)) < B_OK) {
