@@ -1,14 +1,15 @@
 /*
- * Copyright 2001-2006, Haiku, Inc.
+ * Copyright 2001-2007, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
- *		Stefano Ceccherini (burton666@libero.it)
+ *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  */
 
 //!	BMenuWindow is a custom BWindow for BMenus.
 
+#include <Debug.h>
 #include <Menu.h>
 
 #include <MenuPrivate.h>
@@ -50,11 +51,13 @@ public:
 	virtual void Draw(BRect updateRect);
 };
 
+
 class LowerScroller : public BMenuScroller {
 public:
 	LowerScroller(BRect frame);
 	virtual void Draw(BRect updateRect);
 };
+
 
 }	// namespace BPrivate
 
@@ -142,7 +145,7 @@ LowerScroller::Draw(BRect updateRect)
 		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
 			B_DARKEN_2_TINT));
 
-	FillRect(Bounds(), B_SOLID_LOW);
+	FillRect(frame, B_SOLID_LOW);
 
 	float middle = Bounds().right / 2;
 
@@ -236,6 +239,7 @@ BMenuWindow::BMenuWindow(const char *name)
 
 BMenuWindow::~BMenuWindow()
 {
+	DetachMenu();
 }
 
 
@@ -274,6 +278,9 @@ BMenuWindow::AttachScrollers()
 	if (!fMenu || !fMenuFrame)
 		return;
  
+	if (fUpperScroller || fLowerScroller)
+		debugger("Scrollers are already attached!");
+
 	fMenu->MakeFocus(true);
 
 	BRect frame = Bounds();
@@ -298,7 +305,8 @@ BMenuWindow::DetachScrollers()
 {
 	// BeOS doesn't remember the position where the last scrolling ended,
 	// so we just scroll back to the beginning.
-	fMenu->ScrollTo(0, 0);
+	if (fMenu)	
+		fMenu->ScrollTo(0, 0);
 
 	if (fLowerScroller) {
 		RemoveChild(fLowerScroller);
@@ -317,7 +325,7 @@ BMenuWindow::DetachScrollers()
 bool
 BMenuWindow::CheckForScrolling(BPoint cursor)
 {
-	if (!fMenuFrame)
+	if (!fMenuFrame || !fUpperScroller || !fLowerScroller)
 		return false;
 	
 	return _Scroll(cursor);
@@ -327,16 +335,15 @@ BMenuWindow::CheckForScrolling(BPoint cursor)
 bool
 BMenuWindow::_Scroll(BPoint cursor)
 {
+	ASSERT((fLowerScroller != NULL));
+	ASSERT((fUpperScroller != NULL));
+	
 	ConvertFromScreen(&cursor);
 
-	BRect lowerFrame;
-	BRect upperFrame;
-	if (fLowerScroller)
-		lowerFrame = fLowerScroller->Frame();	
-	if (fUpperScroller)
-		upperFrame = fUpperScroller->Frame();
+	BRect lowerFrame = fLowerScroller->Frame();
+	BRect upperFrame = fUpperScroller->Frame();
 
-	if (fLowerScroller && fLowerScroller->IsEnabled() && lowerFrame.Contains(cursor)) {		
+	if (fLowerScroller->IsEnabled() && lowerFrame.Contains(cursor)) {		
 		if (fValue == 0) {
 			fUpperScroller->SetEnabled(true);
 			fUpperScroller->Invalidate();
@@ -354,7 +361,7 @@ BMenuWindow::_Scroll(BPoint cursor)
 			fMenu->ScrollBy(0, kScrollStep);
 			fValue += kScrollStep;
 		}
-	} else if (fUpperScroller && fUpperScroller->IsEnabled() && upperFrame.Contains(cursor)) {		
+	} else if (fUpperScroller->IsEnabled() && upperFrame.Contains(cursor)) {		
 		if (fValue == fLimit) {
 			fLowerScroller->SetEnabled(true);
 			fLowerScroller->Invalidate();
@@ -370,9 +377,8 @@ BMenuWindow::_Scroll(BPoint cursor)
 			fMenu->ScrollBy(0, -kScrollStep);
 			fValue -= kScrollStep;
 		}
-	} else {
+	} else
 		return false;
-	}
 
 	snooze(10000);
 
