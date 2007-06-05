@@ -162,7 +162,6 @@ BTrashWatcher::UpdateTrashIcons()
 		// apply them onto the trash directory node
 		size_t largeSize = 0;
 		size_t smallSize = 0;
-		size_t vectorSize = 0;
 		const void *largeData = GetTrackerResources()->LoadResource('ICON',
 			fTrashFull ? kResTrashFullIcon : kResTrashIcon, &largeSize);
 
@@ -170,6 +169,7 @@ BTrashWatcher::UpdateTrashIcons()
 			fTrashFull ? kResTrashFullIcon : kResTrashIcon,  &smallSize);
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		size_t vectorSize = 0;
 		const void *vectorData = GetTrackerResources()->LoadResource(
 			B_VECTOR_ICON_TYPE, fTrashFull ? kResTrashFullIcon : kResTrashIcon,
 			&vectorSize);
