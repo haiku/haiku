@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -132,7 +132,7 @@ RegistrarThreadManager::CleanupThreads()
 		} else {
 			OUT("WARNING: RegistrarThreadManager::CleanupThreads(): NULL mime_update_thread_shared_data "
 				"pointer found in and removed from RegistrarThreadManager::fThreads list\n");
-			i = fThreads.erase(i);
+			fThreads.erase(i);
 		}
 
 		i = next;	
@@ -168,7 +168,7 @@ RegistrarThreadManager::ShutdownThreads()
 		} else {
 			OUT("WARNING: RegistrarThreadManager::ShutdownThreads(): NULL mime_update_thread_shared_data "
 				"pointer found in and removed from RegistrarThreadManager::fThreads list\n");
-			i = fThreads.erase(i);
+			fThreads.erase(i);
 		}
 
 		i = next;

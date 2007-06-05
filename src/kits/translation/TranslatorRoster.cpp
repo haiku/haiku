@@ -838,14 +838,12 @@ BTranslatorRoster::Private::_CompareSupport(const void* _a, const void* _b)
 void
 BTranslatorRoster::Private::_RescanChanged()
 {
-	EntryRefSet::iterator iterator = fRescanEntries.begin();
-
-	while (iterator != fRescanEntries.end()) {
+	while (!fRescanEntries.empty()) {
+		EntryRefSet::iterator iterator = fRescanEntries.begin();
 		int32 count;
 		CreateTranslators(*iterator, count);
 
 		fRescanEntries.erase(iterator);
-		iterator++;
 	}
 }
 
@@ -1002,7 +1000,8 @@ BTranslatorRoster::Private::_IsKnownDirectory(const node_ref& nodeRef) const
 
 
 void
-BTranslatorRoster::Private::_RemoveTranslators(const node_ref* nodeRef, const entry_ref* ref)
+BTranslatorRoster::Private::_RemoveTranslators(const node_ref* nodeRef,
+	const entry_ref* ref)
 {
 	if (ref == NULL && nodeRef == NULL)
 		return;
@@ -1012,6 +1011,9 @@ BTranslatorRoster::Private::_RemoveTranslators(const node_ref* nodeRef, const en
 	image_id image = -1;
 
 	while (iterator != fTranslators.end()) {
+		TranslatorMap::iterator next = iterator;
+		next++;
+
 		const translator_item& item = iterator->second;
 		if ((ref != NULL && item.ref == *ref)
 			|| (nodeRef != NULL && item.ref.device == nodeRef->device
@@ -1026,7 +1028,7 @@ BTranslatorRoster::Private::_RemoveTranslators(const node_ref* nodeRef, const en
 			fTranslators.erase(iterator);
 		}
 
-		iterator++;
+		iterator = next;
 	}
 
 	// Unload image from the removed translator

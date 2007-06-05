@@ -690,7 +690,7 @@ ObserverList::_ValidateHandlers(uint32 what)
 		}
 
 		Add(target, what);
-		handlers.erase(iterator);	
+		iterator = handlers.erase(iterator);	
 	}
 }
 
@@ -707,7 +707,7 @@ ObserverList::_SendNotices(uint32 what, BMessage* message)
 
 	while (iterator != messengers.end()) {
 		if (!(*iterator).IsValid()) {
-			messengers.erase(iterator);
+			iterator = messengers.erase(iterator);
 			continue;
 		}
 
@@ -793,10 +793,10 @@ ObserverList::Remove(const BHandler *handler, uint32 what)
 
 	vector<const BHandler*> &handlers = fHandlerMap[what];
 
-	vector<const BHandler*>::iterator iter;
-	iter = find(handlers.begin(), handlers.end(), handler);
-	if (iter != handlers.end()) {
-		handlers.erase(iter);
+	vector<const BHandler*>::iterator iterator = find(handlers.begin(),
+		handlers.end(), handler);
+	if (iterator != handlers.end()) {
+		handlers.erase(iterator);
 		if (handlers.empty())
 			fHandlerMap.erase(what);
 
@@ -812,10 +812,10 @@ ObserverList::Remove(const BMessenger &messenger, uint32 what)
 {
 	vector<BMessenger> &messengers = fMessengerMap[what];
 
-	vector<BMessenger>::iterator iter;
-	iter = find(messengers.begin(), messengers.end(), messenger);
-	if (iter != messengers.end()) {
-		messengers.erase(iter);
+	vector<BMessenger>::iterator iterator = find(messengers.begin(),
+		messengers.end(), messenger);
+	if (iterator != messengers.end()) {
+		messengers.erase(iterator);
 		if (messengers.empty())
 			fMessengerMap.erase(what);
 

@@ -813,11 +813,11 @@ BPathMonitor::StopWatching(BMessenger target)
 		return B_BAD_VALUE;
 
 	struct watcher* watcher = iterator->second;
-	HandlerMap::iterator i = watcher->handlers.begin();
-	for (; i != watcher->handlers.end(); i++) {
+	while (!watcher->handlers.empty()) {
+		HandlerMap::iterator i = watcher->handlers.begin();
 		PathHandler* handler = i->second;
 		watcher->handlers.erase(i);
-		
+
 		if (handler->LockLooper())
 			handler->Quit();
 	}
