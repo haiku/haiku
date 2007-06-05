@@ -33,7 +33,7 @@ class PrintersApp;
 
 #include <Application.h>
 
-#define PRINTERS_SIGNATURE	"application/x-vnd.Be-PRNT2"
+#define PRINTERS_SIGNATURE	"application/x-vnd.Be-PRNT"
 
 class PrintersApp : public BApplication
 {
