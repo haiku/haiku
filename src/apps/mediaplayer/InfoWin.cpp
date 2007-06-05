@@ -19,22 +19,24 @@
  */
 #include "InfoWin.h"
 
-#include <View.h>
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
-#include <String.h>
+
 #include <Debug.h>
 #include <MediaDefs.h>
-#include <MediaFile.h>
-#include <MediaTrack.h>
+#include <String.h>
+#include <StringView.h>
 #include <TextView.h>
-#include <math.h>
-#include "MainWin.h"
+
+#include "Controller.h"
+#include "ControllerObserver.h"
+
 
 #define NAME "File Info"
 #define MIN_WIDTH 350
 
-#define BASE_HEIGHT (32+32)
+#define BASE_HEIGHT (32 + 32)
 
 //const rgb_color kGreen = { 152, 203, 152, 255 };
 const rgb_color kRed =   { 203, 152, 152, 255 };
@@ -47,7 +49,8 @@ const rgb_color kBlack = {   0,   0,   0, 255 };
 class InfoView : public BView {
 public:
 	InfoView(BRect frame, const char *name, float divider)
-		: BView(frame, name, B_FOLLOW_ALL, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
+		: BView(frame, name, B_FOLLOW_ALL,
+			B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
 		, fDivider(divider)
 		{ }
 	virtual ~InfoView()
@@ -70,27 +73,31 @@ InfoView::Draw(BRect updateRect)
 }
 
 
+// #pragma mark -
+
+
 InfoWin::InfoWin(BPoint leftTop, Controller* controller)
 	: BWindow(BRect(leftTop.x, leftTop.y, leftTop.x + MIN_WIDTH - 1,
 		leftTop.y + 250), NAME, B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE),
-	  fController(controller)
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE)
+	, fController(controller)
+	, fControllerObserver(new ControllerObserver(this,
+		OBSERVE_FILE_CHANGES | OBSERVE_TRACK_CHANGES | OBSERVE_STAT_CHANGES))
 {
 	BRect rect = Bounds();
 
 	// accomodate for big fonts
-	float div;
-	div = MAX(2*32, be_plain_font->StringWidth("Container") + 5);
+	float div = max_c(2 * 32, be_plain_font->StringWidth("Container") + 5);
 
 	fInfoView = new InfoView(rect, "background", div);
 	fInfoView->SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
 	AddChild(fInfoView);
 
 	BFont bigFont(be_plain_font);
-	bigFont.SetSize(bigFont.Size()+6);
+	bigFont.SetSize(bigFont.Size() + 6);
 	font_height fh;
 	bigFont.GetHeight(&fh);
-	fFilenameView = new BStringView(BRect(div+10, 20,
+	fFilenameView = new BStringView(BRect(div + 10, 20,
 										  rect.right - 10,
 										  20 + fh.ascent + 5),
 									"filename", "");
@@ -110,13 +117,13 @@ InfoWin::InfoWin(BPoint leftTop, Controller* controller)
 	lr.right = div - 1;
 	cr.left = div + 1;
 	BRect tr;
-	tr = lr.OffsetToCopy(0,0).InsetByCopy(1,1);
+	tr = lr.OffsetToCopy(0, 0).InsetByCopy(5, 1);
 	fLabelsView = new BTextView(lr, "labels", tr, B_FOLLOW_BOTTOM);
 	fLabelsView->SetViewColor(kGreen);
 	fLabelsView->SetAlignment(B_ALIGN_RIGHT);
 	fLabelsView->SetWordWrap(false);
 	AddChild(fLabelsView);
-	tr = cr.OffsetToCopy(0,0).InsetByCopy(1,1);
+	tr = cr.OffsetToCopy(0, 0).InsetByCopy(10, 1);
 	fContentsView = new BTextView(cr, "contents", tr, B_FOLLOW_BOTTOM);
 	fContentsView->SetWordWrap(false);
 	AddChild(fContentsView);
@@ -124,6 +131,8 @@ InfoWin::InfoWin(BPoint leftTop, Controller* controller)
 	fLabelsView->MakeSelectable();
 	fContentsView->MakeSelectable();
 
+	fController->AddListener(fControllerObserver);
+	Update();
 
 	Show();
 }
@@ -131,188 +140,46 @@ InfoWin::InfoWin(BPoint leftTop, Controller* controller)
 
 InfoWin::~InfoWin()
 {
-	printf("InfoWin::~InfoWin\n");
+	fController->RemoveListener(fControllerObserver);
+	delete fControllerObserver;
+
 	//fInfoListView->MakeEmpty();
 	//delete [] fInfoItems;
 }
 
 
+// #pragma mark -
+
+
 void
-InfoWin::ResizeToPreferred()
+InfoWin::FrameResized(float new_width, float new_height)
 {
-#if 0
-	int i;
-	float height = BASE_HEIGHT;
-	BListItem *li;
-	for (i = 0; (li = fInfoListView->ItemAt(i)); i++) {
-		height += li->Height();
-	}
-	ResizeTo(Bounds().Width(), height);
-#endif
 }
 
 
 void
-InfoWin::Update(uint32 which)
+InfoWin::MessageReceived(BMessage *msg)
 {
-//	status_t err;
-//	//char buf[256];
-//	printf("InfoWin::Update(0x%08lx)\n", which);
-//	rgb_color vFgCol = ui_color(B_DOCUMENT_TEXT_COLOR);
-//
-//	fLabelsView->SelectAll();
-//	fContentsView->SelectAll();
-//	fLabelsView->Clear();
-//	fContentsView->Clear();
-//	fLabelsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kBlue);
-//	fLabelsView->Insert("File Info\n");
-//	fContentsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &vFgCol);
-//	fContentsView->Insert("\n");
-//
-//	fLabelsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kRed);
-//	//fContentsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &vFgCol);
-//
-//	// lock the Main Window as we must access some fields there...
-//	if (fMainWin->LockWithTimeout(500000) < B_OK)
-//		return; // XXX: resend msg to ourselves ?
-//
-//	Controller *c = fMainWin->fController;
-//	BMediaFile *mf = c->fMediaFile;
-//	
-//	if (which & INFO_VIDEO && c->VideoTrackCount() > 0) {
-//		fLabelsView->Insert("Video\n\n");
-//		BString s;
-//		media_format fmt;
-//		media_raw_video_format vfmt;
-//		float fps;
-//		err = c->fVideoTrack->EncodedFormat(&fmt);
-//		//string_for_format(fmt, buf, sizeof(buf));
-//		//printf("%s\n", buf);
-//		if (err < 0) {
-//			s << "(" << strerror(err) << ")";
-//		} else if (fmt.type == B_MEDIA_ENCODED_VIDEO) {
-//			vfmt = fmt.u.encoded_video.output;
-//			media_codec_info mci;
-//			err = c->fVideoTrack->GetCodecInfo(&mci);
-//			if (err < 0)
-//				s << "(" << strerror(err) << ")";
-//			else
-//				s << mci.pretty_name; //<< "(" << mci.short_name << ")";
-//		} else if (fmt.type == B_MEDIA_RAW_VIDEO) {
-//			vfmt = fmt.u.raw_video;
-//			s << "raw video";
-//		} else
-//			s << "unknown format";
-//		s << "\n";
-//		s << fmt.Width() << " x " << fmt.Height();
-//		// encoded has output as 1st field...
-//		fps = vfmt.field_rate;
-//		s << ", " << fps << " fps";
-//		s << "\n";
-//		fContentsView->Insert(s.String());
-//	}
-//	if (which & INFO_AUDIO && c->AudioTrackCount() > 0) {
-//		fLabelsView->Insert("Sound\n\n");
-//		BString s;
-//		media_format fmt;
-//		media_raw_audio_format afmt;
-//		err = c->fAudioTrack->EncodedFormat(&fmt);
-//		//string_for_format(fmt, buf, sizeof(buf));
-//		//printf("%s\n", buf);
-//		if (err < 0) {
-//			s << "(" << strerror(err) << ")";
-//		} else if (fmt.type == B_MEDIA_ENCODED_AUDIO) {
-//			afmt = fmt.u.encoded_audio.output;
-//			media_codec_info mci;
-//			err = c->fAudioTrack->GetCodecInfo(&mci);
-//			if (err < 0)
-//				s << "(" << strerror(err) << ")";
-//			else
-//				s << mci.pretty_name; //<< "(" << mci.short_name << ")";
-//		} else if (fmt.type == B_MEDIA_RAW_AUDIO) {
-//			afmt = fmt.u.raw_audio;
-//			s << "raw audio";
-//		} else
-//			s << "unknown format";
-//		s << "\n";
-//		uint32 bitps = 8 * (afmt.format & media_raw_audio_format::B_AUDIO_SIZE_MASK);
-//		uint32 chans = afmt.channel_count;
-//		float sr = afmt.frame_rate;
-//
-//		if (bitps)
-//			s << bitps << " Bit ";
-//		if (chans == 1)
-//			s << "Mono";
-//		else if (chans == 2)
-//			s << "Stereo";
-//		else
-//			s << chans << "Channels";
-//		s << ", ";
-//		if (sr)
-//			s << sr/1000;
-//		else
-//			s << "?";
-//		s<< " kHz";
-//		s << "\n";
-//		fContentsView->Insert(s.String());
-//	}
-//	if (which & INFO_STATS && fMainWin->fHasFile) {
-//		// TODO: check for live streams (no duration)
-//		fLabelsView->Insert("Duration\n");
-//		BString s;
-//		bigtime_t d = c->Duration();
-//		bigtime_t v;
-//
-//		//s << d << "µs; ";
-//		
-//		d /= 1000;
-//		
-//		v = d / (3600 * 1000);
-//		d = d % (3600 * 1000);
-//		if (v)
-//			s << v << ":";
-//		v = d / (60 * 1000);
-//		d = d % (60 * 1000);
-//		s << v << ":";
-//		v = d / 1000;
-//		d = d % 1000;
-//		s << v;
-//		if (d)
-//			s << "." << d / 10;
-//		s << "\n";
-//		fContentsView->Insert(s.String());
-//		// TODO: demux/video/audio/... perfs (Kb/s)
-//	}
-//	if (which & INFO_TRANSPORT) {
-//	}
-//	if ((which & INFO_FILE) && fMainWin->fHasFile) {
-//		media_file_format ff;
-//		if (mf && (mf->GetFileFormatInfo(&ff) == B_OK)) {
-//			fLabelsView->Insert("Container\n");
-//			BString s;
-//			s << ff.pretty_name;
-//			s << "\n";
-//			fContentsView->Insert(s.String());
-//		}
-//		fLabelsView->Insert("Location\n");
-//		// TODO: make Controller save the entry_ref (url actually).
-//		fContentsView->Insert("file://\n");
-//		fFilenameView->SetText(c->fName.String());
-//	}
-//	if (which & INFO_COPYRIGHT && mf && mf->Copyright()) {
-//		
-//		fLabelsView->Insert("Copyright\n\n");
-//		BString s;
-//		s << mf->Copyright();
-//		s << "\n\n";
-//		fContentsView->Insert(s.String());
-//	}
-//
-//	// we can unlock the main window now and let it work
-//	fMainWin->Unlock();
-//	
-//	// now resize the window to the list view size...
-//	ResizeToPreferred();
+	switch (msg->what) {
+		case MSG_CONTROLLER_FILE_FINISHED:
+			break;
+		case MSG_CONTROLLER_FILE_CHANGED:
+			Update(INFO_ALL);
+			break;
+		case MSG_CONTROLLER_VIDEO_TRACK_CHANGED:
+			Update(/*INFO_VIDEO | INFO_STATS*/INFO_ALL);
+			break;
+		case MSG_CONTROLLER_AUDIO_TRACK_CHANGED:
+			Update(/*INFO_AUDIO | INFO_STATS*/INFO_ALL);
+			break;
+		case MSG_CONTROLLER_VIDEO_STATS_CHANGED:
+		case MSG_CONTROLLER_AUDIO_STATS_CHANGED:
+			Update(/*INFO_STATS*/INFO_ALL);
+			break;
+		default:
+			BWindow::MessageReceived(msg);
+			break;
+	}
 }
 
 
@@ -332,77 +199,188 @@ InfoWin::Pulse()
 	Update(INFO_STATS);
 }
 
+
+// #pragma mark -
+
+
 void
-InfoWin::FrameResized(float new_width, float new_height)
+InfoWin::ResizeToPreferred()
 {
 #if 0
-	if (new_width != Bounds().Width() || new_height != Bounds().Height()) {
-		debugger("size wrong\n");
+	float height = BASE_HEIGHT;
+	for (int i = 0; BListItem *li = fInfoListView->ItemAt(i); i++) {
+		height += li->Height();
 	}
-	
-	bool no_menu = fNoMenu || fIsFullscreen;
-	bool no_controls = fNoControls || fIsFullscreen;
-	
-	printf("FrameResized enter: new_width %.0f, new_height %.0f\n", new_width, new_height);
-	
-	int max_video_width  = int(new_width) + 1;
-	int max_video_height = int(new_height) + 1 - (no_menu  ? 0 : fMenuBarHeight) - (no_controls ? 0 : fControlsHeight);
-
-	ASSERT(max_video_height >= 0);
-	
-	int y = 0;
-	
-	if (no_menu) {
-		if (!fMenuBar->IsHidden())
-			fMenuBar->Hide();
-	} else {
-//		fMenuBar->MoveTo(0, y);
-		fMenuBar->ResizeTo(new_width, fMenuBarHeight - 1);
-		if (fMenuBar->IsHidden())
-			fMenuBar->Show();
-		y += fMenuBarHeight;
-	}
-	
-	if (max_video_height == 0) {
-		if (!fVideoView->IsHidden())
-			fVideoView->Hide();
-	} else {
-//		fVideoView->MoveTo(0, y);
-//		fVideoView->ResizeTo(max_video_width - 1, max_video_height - 1);
-		ResizeVideoView(0, y, max_video_width, max_video_height);
-		if (fVideoView->IsHidden())
-			fVideoView->Show();
-		y += max_video_height;
-	}
-	
-	if (no_controls) {
-		if (!fControls->IsHidden())
-			fControls->Hide();
-	} else {
-		fControls->MoveTo(0, y);
-		fControls->ResizeTo(new_width, fControlsHeight - 1);
-		if (fControls->IsHidden())
-			fControls->Show();
-//		y += fControlsHeight;
-	}
+	ResizeTo(Bounds().Width(), height);
 #endif
-	
-	printf("FrameResized leave\n");
 }
 
 
 void
-InfoWin::MessageReceived(BMessage *msg)
+InfoWin::Update(uint32 which)
 {
-	uint32 which;
-	switch (msg->what) {
-	case M_UPDATE_INFO:
-		if (msg->FindInt32("which", (int32 *)&which) < B_OK)
-			which = INFO_ALL;
-		Update(which);
-		break;
-	default:
-		BWindow::MessageReceived(msg);
-		break;
+printf("InfoWin::Update(0x%08lx)\n", which);
+	fLabelsView->SetText("");
+	fContentsView->SetText("");
+	fLabelsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kBlue);
+	fLabelsView->Insert("\n");
+	fContentsView->SetFontAndColor(be_plain_font, B_FONT_ALL);
+	fContentsView->Insert("\n");
+
+	fLabelsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kRed);
+
+	status_t err;
+	// video track format information
+	if ((which & INFO_VIDEO) && fController->VideoTrackCount() > 0) {
+		fLabelsView->Insert("Video\n\n\n");
+		BString s;
+		media_format format;
+		media_raw_video_format videoFormat;
+		err = fController->GetEncodedVideoFormat(&format);
+		if (err < B_OK) {
+			s << "(" << strerror(err) << ")";
+		} else if (format.type == B_MEDIA_ENCODED_VIDEO) {
+			videoFormat = format.u.encoded_video.output;
+			media_codec_info mci;
+			err = fController->GetVideoCodecInfo(&mci);
+			if (err < B_OK)
+				s << "(" << strerror(err) << ")";
+			else
+				s << mci.pretty_name; //<< "(" << mci.short_name << ")";
+		} else if (format.type == B_MEDIA_RAW_VIDEO) {
+			videoFormat = format.u.raw_video;
+			s << "raw video";
+		} else
+			s << "unknown format";
+		s << "\n";
+		s << format.Width() << " x " << format.Height();
+		// encoded has output as 1st field...
+		s << ", " << videoFormat.field_rate << " fps";
+		s << "\n\n";
+		fContentsView->Insert(s.String());
 	}
+
+	// audio track format information
+	if ((which & INFO_AUDIO) && fController->AudioTrackCount() > 0) {
+		fLabelsView->Insert("Audio\n\n\n");
+		BString s;
+		media_format format;
+		media_raw_audio_format audioFormat;
+		err = fController->GetEncodedAudioFormat(&format);
+		//string_for_format(format, buf, sizeof(buf));
+		//printf("%s\n", buf);
+		if (err < 0) {
+			s << "(" << strerror(err) << ")";
+		} else if (format.type == B_MEDIA_ENCODED_AUDIO) {
+			audioFormat = format.u.encoded_audio.output;
+			media_codec_info mci;
+			err = fController->GetAudioCodecInfo(&mci);
+			if (err < 0)
+				s << "(" << strerror(err) << ")";
+			else
+				s << mci.pretty_name; //<< "(" << mci.short_name << ")";
+		} else if (format.type == B_MEDIA_RAW_AUDIO) {
+			audioFormat = format.u.raw_audio;
+			s << "raw audio";
+		} else
+			s << "unknown format";
+		s << "\n";
+		uint32 bitsPerSample = 8 * (audioFormat.format
+			& media_raw_audio_format::B_AUDIO_SIZE_MASK);
+		uint32 channelCount = audioFormat.channel_count;
+		float sr = audioFormat.frame_rate;
+
+		if (bitsPerSample > 0)
+			s << bitsPerSample << " Bit ";
+		if (channelCount == 1)
+			s << "Mono";
+		else if (channelCount == 2)
+			s << "Stereo";
+		else
+			s << channelCount << "Channels";
+		s << ", ";
+		if (sr > 0.0)
+			s << sr / 1000;
+		else
+			s << "??";
+		s<< " kHz";
+		s << "\n\n";
+		fContentsView->Insert(s.String());
+	}
+
+	// statistics
+	if ((which & INFO_STATS) && fController->HasFile()) {
+		fLabelsView->Insert("Duration\n\n");
+		BString s;
+		bigtime_t d = fController->Duration();
+		bigtime_t v;
+
+		//s << d << "µs; ";
+		
+		d /= 1000;
+		
+		v = d / (3600 * 1000);
+		d = d % (3600 * 1000);
+		bool hours = v > 0;
+		if (hours)
+			s << v << ":";
+		v = d / (60 * 1000);
+		d = d % (60 * 1000);
+		s << v << ":";
+		v = d / 1000;
+		s << v;
+		if (hours)
+			s << " h";
+		else
+			s << " min";
+		s << "\n\n";
+		fContentsView->Insert(s.String());
+		// TODO: demux/video/audio/... perfs (Kb/s)
+	}
+
+	if (which & INFO_TRANSPORT) {
+		// what is "Transport"?
+	}
+
+	if (which & INFO_FILE) {
+		if (fController->HasFile()) {
+			media_file_format ff;
+			BString s;
+			if (fController->GetFileFormatInfo(&ff) == B_OK) {
+				fLabelsView->Insert("Container\n\n");
+				s << ff.pretty_name;
+				s << "\n\n";
+				fContentsView->Insert(s.String());
+			} else
+				fContentsView->Insert("\n\n");
+			fLabelsView->Insert("Location\n");
+			if (fController->GetLocation(&s) < B_OK)
+				s = "<unknown>";
+			s << "\n";
+			fContentsView->Insert(s.String());
+			if (fController->GetName(&s) < B_OK)
+				s = "<unnamed media>";
+			fFilenameView->SetText(s.String());
+		} else {
+			fFilenameView->SetText("<no media>");
+		}
+	}
+
+	if ((which & INFO_COPYRIGHT) && fController->HasFile()) {
+		
+		BString s;
+		if (fController->GetCopyright(&s) == B_OK && s.Length() > 0) {
+			fLabelsView->Insert("Copyright\n\n");
+			s << "\n\n";
+			fContentsView->Insert(s.String());
+		}
+	}
+
+	fController->Unlock();
+	
+	ResizeToPreferred();
 }
+
+
+
+

@@ -21,15 +21,11 @@
 #define __FILE_INFO_WIN_H
 
 #include <Window.h>
-#include <TextView.h>
-#include <StringView.h>
 
 
-class MainWin;
 class Controller;
+class ControllerObserver;
 class InfoView;
-
-#define M_UPDATE_INFO 'upda'
 
 #define INFO_STATS		0x00000001
 #define INFO_TRANSPORT	0x00000002
@@ -53,16 +49,16 @@ public:
 	virtual void				Pulse();
 
 			void				ResizeToPreferred();
-			void				Update(uint32 which=INFO_ALL); // threadsafe
+			void				Update(uint32 which = INFO_ALL);
 
 private:			
 			Controller*			fController;
+			ControllerObserver*	fControllerObserver;
 		
 			InfoView*			fInfoView;
 			BStringView*		fFilenameView;
 			BTextView*			fLabelsView;
 			BTextView*			fContentsView;
-	
 };
 
 #endif // __FILE_INFO_WIN_H

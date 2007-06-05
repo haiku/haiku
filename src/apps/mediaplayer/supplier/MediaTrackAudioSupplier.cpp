@@ -63,6 +63,24 @@ MediaTrackAudioSupplier::Format() const
 
 
 status_t
+MediaTrackAudioSupplier::GetEncodedFormat(media_format* format) const
+{
+	if (!fMediaTrack)
+		return B_NO_INIT;
+	return fMediaTrack->EncodedFormat(format);
+}
+
+
+status_t
+MediaTrackAudioSupplier::GetCodecInfo(media_codec_info* info) const
+{
+	if (!fMediaTrack)
+		return B_NO_INIT;
+	return fMediaTrack->GetCodecInfo(info);
+}
+
+
+status_t
 MediaTrackAudioSupplier::ReadFrames(void* buffer, int64* framesRead,
 	bigtime_t* performanceTime)
 {
@@ -75,6 +93,14 @@ MediaTrackAudioSupplier::ReadFrames(void* buffer, int64* framesRead,
 	status_t ret = fMediaTrack->ReadFrames(buffer, framesRead, &mediaHeader);
 
 	if (ret < B_OK) {
+		// further analyse the error
+		if (fDuration == 0 || (double)fPerformanceTime / fDuration > 0.95) {
+			// some codecs don't behave well, or maybe somes files are bad,
+			// they don't report the end of the stream correctly
+			// NOTE: "more than 95% of the stream" is of course pure guess,
+			// but it fixed the problem I had with some files
+			ret = B_LAST_BUFFER_ERROR;
+		}
 		printf("MediaTrackAudioSupplier::ReadFrame() - "
 			"error while reading frames: %s\n", strerror(ret));
 	} else {

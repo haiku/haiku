@@ -8,7 +8,9 @@
 #ifndef AUDIO_SUPPLIER_H
 #define AUDIO_SUPPLIER_H
 
+
 #include <MediaDefs.h>
+#include <MediaFormats.h>
 
 class AudioSupplier {
  public:
@@ -16,6 +18,10 @@ class AudioSupplier {
 	virtual						~AudioSupplier();
 
 	virtual	media_format		Format() const = 0;
+	virtual	status_t			GetEncodedFormat(media_format* format)
+									const = 0;
+	virtual	status_t			GetCodecInfo(media_codec_info* info) const = 0;
+
 	virtual	status_t			ReadFrames(void* buffer, int64* framesRead,
 									bigtime_t* performanceTime) = 0;
 	virtual	status_t			SeekToTime(bigtime_t* performanceTime) = 0;

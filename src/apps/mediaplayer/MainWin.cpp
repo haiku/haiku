@@ -680,12 +680,6 @@ MainWin::ShowFileInfo()
 			fInfoWin->Activate();
 		fInfoWin->Unlock();
 	}
-
-	BMessenger msgr(fInfoWin);
-	BMessage m(M_UPDATE_INFO);
-	m.AddInt32("which", INFO_ALL);
-	msgr.SendMessage(&m);
-	msgr.SendMessage(B_WINDOW_ACTIVATED);
 }
 
 

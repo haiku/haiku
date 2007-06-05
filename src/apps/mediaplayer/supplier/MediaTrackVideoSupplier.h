@@ -19,6 +19,9 @@ class MediaTrackVideoSupplier : public VideoSupplier {
 	virtual						~MediaTrackVideoSupplier();
 
 	virtual	media_format		Format() const;
+	virtual	status_t			GetEncodedFormat(media_format* format) const;
+	virtual	status_t			GetCodecInfo(media_codec_info* info) const;
+
 	virtual	status_t			ReadFrame(void* buffer,
 									bigtime_t* performanceTime);
 	virtual	status_t			SeekToTime(bigtime_t* performanceTime);

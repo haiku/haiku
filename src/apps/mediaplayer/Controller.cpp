@@ -29,6 +29,7 @@
 #include <Debug.h>
 #include <MediaFile.h>
 #include <MediaTrack.h>
+#include <Path.h>
 
 #include "ControllerView.h"
 #include "PlaybackState.h"
@@ -81,17 +82,12 @@ void Controller::Listener::VolumeChanged(float) {}
 
 Controller::Controller()
  :	fVideoView(NULL)
- ,	fName()
  ,	fPaused(false)
  ,	fStopped(true)
  ,	fVolume(1.0)
 
  ,	fRef()
  ,	fMediaFile(0)
-// TODO: remove, InfoWin depends on it but should be fixed
-,fAudioTrack(0)
-,fVideoTrack(0)
-// 
  ,	fDataLock("controller data lock")
 
  ,	fVideoSupplier(NULL)
@@ -225,7 +221,6 @@ Controller::SetTo(const entry_ref &ref)
 	fPauseAtEndOfStream = false;
 	fSeekToStartAfterPause = false;
 	fDuration = 0;
-	fName = ref.name;
 
 	_UpdatePosition(0);
 
@@ -292,19 +287,16 @@ Controller::SetTo(const entry_ref &ref)
 void
 Controller::GetSize(int *width, int *height)
 {
-	// you need to hole the data lock
+	BAutolock _(fVideoSupplierLock);
 
-	media_format format;
-	format.type = B_MEDIA_RAW_VIDEO;
-	format.u.raw_video = media_raw_video_format::wildcard;
-	format.u.raw_video.display.format = IsOverlayActive() ? B_YCbCr422 : B_RGB32;
-
-	if (!fVideoTrack || B_OK != fVideoTrack->DecodedFormat(&format)) {
-		*height = 480;
-		*width = 640;
-	} else {
+	if (fVideoSupplier) {
+		media_format format = fVideoSupplier->Format();
+		// TODO: take aspect ratio into account!
 		*height = format.u.raw_video.display.line_count;
 		*width = format.u.raw_video.display.line_width;
+	} else {
+		*height = 480;
+		*width = 640;
 	}
 }
 
@@ -312,7 +304,8 @@ Controller::GetSize(int *width, int *height)
 int
 Controller::AudioTrackCount()
 {
-	// you need to hole the data lock
+	BAutolock _(fDataLock);
+
 	return fAudioTrackList->CountItems();
 }
 
@@ -320,7 +313,8 @@ Controller::AudioTrackCount()
 int
 Controller::VideoTrackCount()
 {
-	// you need to hole the data lock
+	BAutolock _(fDataLock);
+
 	return fVideoTrackList->CountItems();
 }
 
@@ -334,7 +328,6 @@ Controller::SelectAudioTrack(int n)
 	if (!track)
 		return B_ERROR;
 
-fAudioTrack = track;
 	delete fAudioSupplier;
 	fAudioSupplier = new MediaTrackAudioSupplier(track);
 
@@ -356,7 +349,6 @@ Controller::SelectVideoTrack(int n)
 	if (!track)
 		return B_ERROR;
 
-fVideoTrack = track;
 	delete fVideoSupplier;
 	fVideoSupplier = new MediaTrackVideoSupplier(track,
 		IsOverlayActive() ? B_YCbCr422 : B_RGB32);
@@ -371,43 +363,6 @@ fVideoTrack = track;
 
 
 // #pragma mark -
-
-
-void
-Controller::SetVolume(float value)
-{
-	printf("Controller::SetVolume %.4f\n", value);
-	if (Lock()) {
-		fVolume = value;
-		if (fSoundOutput)
-			fSoundOutput->SetVolume(fVolume);
-		Unlock();
-	}
-}
-
-
-float
-Controller::Volume() const
-{
-	BAutolock _(fDataLock);
-
-	return fVolume;	
-}
-
-
-void
-Controller::SetPosition(float value)
-{
-	printf("Controller::SetPosition %.4f\n", value);
-
-	BAutolock _(fDataLock);
-
-	fSeekPosition = bigtime_t(value * Duration());
-	fSeekAudio = true;
-	fSeekVideo = true;
-
-	fSeekToStartAfterPause = false;
-}
 
 
 void
@@ -529,6 +484,142 @@ Controller::Position()
 	BAutolock _(fDataLock);
 
 	return fPosition;
+}
+
+
+void
+Controller::SetVolume(float value)
+{
+	printf("Controller::SetVolume %.4f\n", value);
+	if (Lock()) {
+		fVolume = value;
+		if (fSoundOutput)
+			fSoundOutput->SetVolume(fVolume);
+		Unlock();
+	}
+}
+
+
+float
+Controller::Volume() const
+{
+	BAutolock _(fDataLock);
+
+	return fVolume;	
+}
+
+
+void
+Controller::SetPosition(float value)
+{
+	printf("Controller::SetPosition %.4f\n", value);
+
+	BAutolock _(fDataLock);
+
+	fSeekPosition = bigtime_t(value * Duration());
+	fSeekAudio = true;
+	fSeekVideo = true;
+
+	fSeekToStartAfterPause = false;
+}
+
+
+// #pragma mark -
+
+
+bool
+Controller::HasFile()
+{
+	// you need to hold the data lock
+	return fMediaFile != NULL;
+}
+
+
+status_t
+Controller::GetFileFormatInfo(media_file_format* fileFormat)
+{
+	// you need to hold the data lock
+	if (!fMediaFile)
+		return B_NO_INIT;
+	return fMediaFile->GetFileFormatInfo(fileFormat);
+}
+
+
+status_t
+Controller::GetCopyright(BString* copyright)
+{
+	// you need to hold the data lock
+	if (!fMediaFile)
+		return B_NO_INIT;
+	*copyright = fMediaFile->Copyright();
+	return B_OK;
+}
+
+
+status_t
+Controller::GetLocation(BString* location)
+{
+	// you need to hold the data lock
+	if (!fMediaFile)
+		return B_NO_INIT;
+	BPath path(&fRef);
+	status_t ret = path.InitCheck();
+	if (ret < B_OK)
+		return ret;
+	*location = "";
+	*location << "file://" << path.Path();
+	return B_OK;
+}
+
+
+status_t
+Controller::GetName(BString* name)
+{
+	// you need to hold the data lock
+	if (!fMediaFile)
+		return B_NO_INIT;
+	*name = fRef.name;
+	return B_OK;
+}
+
+
+status_t
+Controller::GetEncodedVideoFormat(media_format* format)
+{
+	// you need to hold the data lock
+	if (fVideoSupplier)
+		return fVideoSupplier->GetEncodedFormat(format);
+	return B_NO_INIT;
+}
+
+
+status_t
+Controller::GetVideoCodecInfo(media_codec_info* info)
+{
+	// you need to hold the data lock
+	if (fVideoSupplier)
+		return fVideoSupplier->GetCodecInfo(info);
+	return B_NO_INIT;
+}
+
+
+status_t
+Controller::GetEncodedAudioFormat(media_format* format)
+{
+	// you need to hold the data lock
+	if (fAudioSupplier)
+		return fAudioSupplier->GetEncodedFormat(format);
+	return B_NO_INIT;
+}
+
+
+status_t
+Controller::GetAudioCodecInfo(media_codec_info* info)
+{
+	// you need to hold the data lock
+	if (fAudioSupplier)
+		return fAudioSupplier->GetCodecInfo(info);
+	return B_NO_INIT;
 }
 
 
@@ -735,7 +826,7 @@ printf("audio play start\n");
 			if (!fSoundOutput
 				|| !(fSoundOutput->Format() == buffer->mediaFormat.u.raw_audio)) {
 				delete fSoundOutput;
-				fSoundOutput = new (nothrow) SoundOutput(fName.String(),
+				fSoundOutput = new (nothrow) SoundOutput(fRef.name,
 					buffer->mediaFormat.u.raw_audio);
 				fSoundOutput->SetVolume(fVolume);
 bufferDuration = bigtime_t(1000000.0

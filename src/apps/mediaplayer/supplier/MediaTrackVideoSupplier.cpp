@@ -121,6 +121,24 @@ MediaTrackVideoSupplier::Format() const
 
 
 status_t
+MediaTrackVideoSupplier::GetEncodedFormat(media_format* format) const
+{
+	if (!fVideoTrack)
+		return B_NO_INIT;
+	return fVideoTrack->EncodedFormat(format);
+}
+
+
+status_t
+MediaTrackVideoSupplier::GetCodecInfo(media_codec_info* info) const
+{
+	if (!fVideoTrack)
+		return B_NO_INIT;
+	return fVideoTrack->GetCodecInfo(info);
+}
+
+
+status_t
 MediaTrackVideoSupplier::ReadFrame(void* buffer, bigtime_t* performanceTime)
 {
 	if (!fVideoTrack)

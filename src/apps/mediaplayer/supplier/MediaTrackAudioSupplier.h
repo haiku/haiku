@@ -18,6 +18,9 @@ class MediaTrackAudioSupplier : public AudioSupplier {
 	virtual						~MediaTrackAudioSupplier();
 
 	virtual	media_format		Format() const;
+	virtual	status_t			GetEncodedFormat(media_format* format) const;
+	virtual	status_t			GetCodecInfo(media_codec_info* info) const;
+
 	virtual	status_t			ReadFrames(void* buffer, int64* framesRead,
 									bigtime_t* performanceTime);
 	virtual	status_t			SeekToTime(bigtime_t* performanceTime);

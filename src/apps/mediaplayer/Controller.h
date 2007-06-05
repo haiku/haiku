@@ -23,6 +23,7 @@
 
 #include <Entry.h>
 #include <MediaDefs.h>
+#include <MediaFormats.h>
 #include <MediaNode.h>
 #include <List.h>
 #include <Locker.h>
@@ -89,6 +90,16 @@ public:
 	void					SetVolume(float value);
 	float					Volume() const;
 	void					SetPosition(float value);
+
+	bool					HasFile();
+	status_t				GetFileFormatInfo(media_file_format* fileFormat);
+	status_t				GetCopyright(BString* copyright);
+	status_t				GetLocation(BString* location);
+	status_t				GetName(BString* name);
+	status_t				GetEncodedVideoFormat(media_format* format);
+	status_t				GetVideoCodecInfo(media_codec_info* info);
+	status_t				GetEncodedAudioFormat(media_format* format);
+	status_t				GetAudioCodecInfo(media_codec_info* info);
 	
 	// video view
 	void					SetVideoView(VideoView *view);
@@ -155,15 +166,12 @@ private:
 	};
 
 	VideoView *				fVideoView;
-	BString					fName;
 	volatile bool			fPaused;
 	volatile bool			fStopped;
 	float					fVolume;
 
 	entry_ref				fRef;
 	BMediaFile *			fMediaFile;
-BMediaTrack *			fAudioTrack;
-BMediaTrack *			fVideoTrack;
 	mutable BLocker			fDataLock;
 
 	VideoSupplier*			fVideoSupplier;
