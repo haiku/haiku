@@ -682,14 +682,15 @@ ObserverList::_ValidateHandlers(uint32 what)
 	vector<const BHandler *>& handlers = fHandlerMap[what];
 	vector<const BHandler *>::iterator iterator = handlers.begin();
 
-	for (; iterator != handlers.end(); iterator++) {
+	while (iterator != handlers.end()) {
 		BMessenger target(*iterator);
-		if (!target.IsValid())
+		if (!target.IsValid()) {
+			iterator++;			
 			continue;
+		}
 
-		handlers.erase(iterator);
-		iterator--;
 		Add(target, what);
+		handlers.erase(iterator);	
 	}
 }
 
@@ -704,13 +705,14 @@ ObserverList::_SendNotices(uint32 what, BMessage* message)
 	vector<BMessenger>& messengers = fMessengerMap[what];
 	vector<BMessenger>::iterator iterator = messengers.begin();
 
-	for (; iterator != messengers.end(); iterator++) {
+	while (iterator != messengers.end()) {
 		if (!(*iterator).IsValid()) {
 			messengers.erase(iterator);
 			continue;
 		}
 
 		(*iterator).SendMessage(message);
+		iterator++;
 	}
 }
 
