@@ -43,7 +43,7 @@ BEOS_BIN = "[" addattr alert arp basename bc beep bzip2 cat cardctl catattr chgr
 	zipcloak zipgrep zipnote zipsplit zmore znew
 ;
 
-BEOS_APPS = Terminal Expander People ShowImage Pulse ProcessController
+BEOS_APPS = Terminal Expander People ShowImage ProcessController
 	SoundRecorder Magnify DiskProbe AboutSystem StyledEdit Installer Workspaces
 	$(X86_ONLY)Cortex MediaPlayer DeskCalc MidiPlayer
 	Icon-O-Matic Mail CDPlayer NetworkStatus TV
@@ -52,8 +52,8 @@ BEOS_PREFERENCES = Appearance Backgrounds DataTranslations E-mail FileTypes
 	Fonts Media Menu Mouse Keyboard Keymap Printers Screen ScreenSaver Sounds
 	Time VirtualMemory
 ;
-BEOS_DEMOS = BitmapDrawing Chart Clock FontDemo $(X86_ONLY)GLTeapot PictureTest
-	Playground Mandelbrot $(X86_ONLY)GLDirectMode
+BEOS_DEMOS = BitmapDrawing Chart Clock FontDemo $(X86_ONLY)GLDirectMode
+	$(X86_ONLY)GLTeapot Mandelbrot PictureTest Playground Pulse
 ;
 BEOS_SYSTEM_LIB = libbe.so $(HAIKU_LIBSTDC++) libmedia.so libtracker.so
 	libtranslation.so libnetwork.so libdebug.so libbsd.so libmail.so
