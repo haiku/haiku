@@ -35,8 +35,15 @@ class BMenuWindow : public BWindow {
 		bool CheckForScrolling(BPoint cursor);
 
 	private:
-		BMenuScroller *fScroller;
+		BMenu *fMenu;
 		BMenuFrame *fMenuFrame;
+		BMenuScroller *fUpperScroller;
+		BMenuScroller *fLowerScroller;
+		
+		float fValue;
+		float fLimit;
+		
+		bool _Scroll(BPoint cursor);
 };
 
 }	// namespace BPrivate

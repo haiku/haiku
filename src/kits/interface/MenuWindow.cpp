@@ -20,43 +20,44 @@ namespace BPrivate {
 
 class BMenuScroller : public BView {
 	public:
-		BMenuScroller(BRect frame, BMenu *menu);
-		virtual ~BMenuScroller();
-
-		virtual void Draw(BRect updateRect);
-		bool Scroll(BPoint cursor);
-
+		BMenuScroller(BRect frame);
+		
+		bool IsEnabled() const;
+		void SetEnabled(const bool &enabled);
 	private:
-		BMenu *fMenu;
-		BRect fUpperButton;
-		BRect fLowerButton;
-
-		float fValue;
-		float fLimit;
-
-		bool fUpperEnabled;
-		bool fLowerEnabled;
-
-		uint32 fButton;
-		BPoint fPosition;
+		bool fEnabled;
 };
+
 
 class BMenuFrame : public BView {
 	public:
 		BMenuFrame(BMenu *menu);
-		virtual ~BMenuFrame();
-
+		
 		virtual void AttachedToWindow();
 		virtual void DetachedFromWindow();
 		virtual void Draw(BRect updateRect);
-
-  private:
+		
+	private:
 		friend class BMenuWindow;
 
 		BMenu *fMenu;
 };
 
+
+class UpperScroller : public BMenuScroller {
+public:
+	UpperScroller(BRect frame);
+	virtual void Draw(BRect updateRect);
+};
+
+class LowerScroller : public BMenuScroller {
+public:
+	LowerScroller(BRect frame);
+	virtual void Draw(BRect updateRect);
+};
+
 }	// namespace BPrivate
+
 
 using namespace BPrivate;
 
@@ -65,113 +66,89 @@ const int kScrollerHeight = 10;
 const int kScrollStep = 19;
 
 
-BMenuScroller::BMenuScroller(BRect frame, BMenu *menu)
+BMenuScroller::BMenuScroller(BRect frame)
 	: BView(frame, "menu scroller", 0, B_WILL_DRAW | B_FRAME_EVENTS),
-	fMenu(menu),
-	fUpperButton(0, 0, frame.right, kScrollerHeight),
-	fLowerButton(0, frame.bottom - kScrollerHeight, frame.right, frame.bottom),
-	fValue(0),
-	fUpperEnabled(false),
-	fLowerEnabled(true)
+	fEnabled(false)
 {
-	if (!menu)
-		debugger("BMenuScroller(): Scroller not attached to a menu!");
-	SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));
-
-	fLimit = menu->Bounds().Height() - (frame.Height() - 2 * kScrollerHeight);
-}
-
-
-BMenuScroller::~BMenuScroller()
-{
+	SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));	
 }
 
 
 bool
-BMenuScroller::Scroll(BPoint cursor)
+BMenuScroller::IsEnabled() const
 {
-	ConvertFromScreen(&cursor);
-
-	if (fLowerEnabled && fLowerButton.Contains(cursor)) {
-		if (fValue == 0) {
-			fUpperEnabled = true;
-		
-			Invalidate(fUpperButton);
-		}
-
-		if (fValue + kScrollStep >= fLimit) {
-			// If we reached the limit, we don't want to scroll a whole
-			// 'step' if not needed.
-			fMenu->ScrollBy(0, fLimit - fValue);
-			fValue = fLimit;
-			fLowerEnabled = false;
-			Invalidate(fLowerButton);
-
-		} else {
-			fMenu->ScrollBy(0, kScrollStep);
-			fValue += kScrollStep;
-		}
-	} else if (fUpperEnabled && fUpperButton.Contains(cursor)) {
-		if (fValue == fLimit) {
-			fLowerEnabled = true;
-			Invalidate(fLowerButton);
-		}
-
-		if (fValue - kScrollStep <= 0) {
-			fMenu->ScrollBy(0, -fValue);
-			fValue = 0;
-			fUpperEnabled = false;
-			Invalidate(fUpperButton);
-
-		} else {
-			fMenu->ScrollBy(0, -kScrollStep);
-			fValue -= kScrollStep;
-		}
-	} else {
-		return false;
-	}
-
-	snooze(10000);
-
-	return true;
+	return fEnabled;
 }
 
 
 void
-BMenuScroller::Draw(BRect updateRect)
+BMenuScroller::SetEnabled(const bool &enabled)
+{
+	fEnabled = enabled;
+}
+
+
+//	#pragma mark -
+
+
+UpperScroller::UpperScroller(BRect frame)
+	:
+	BMenuScroller(frame)
+{
+}
+
+
+void
+UpperScroller::Draw(BRect updateRect)
 {
 	SetLowColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 	float middle = Bounds().right / 2;
 
 	// Draw the upper arrow.
-	if (updateRect.Intersects(fUpperButton)) {
-		if (fUpperEnabled)
-			SetHighColor(0, 0, 0);
-		else
-			SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), 
-						B_DARKEN_2_TINT));
+	if (IsEnabled())
+		SetHighColor(0, 0, 0);
+	else
+		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), 
+					B_DARKEN_2_TINT));
 
-		FillRect(fUpperButton, B_SOLID_LOW);
+	FillRect(Bounds(), B_SOLID_LOW);
 	
-		FillTriangle(BPoint(middle, (kScrollerHeight / 2) - 3),
-				BPoint(middle + 5, (kScrollerHeight / 2) + 2),
-				BPoint(middle - 5, (kScrollerHeight / 2) + 2));
-	}
+	FillTriangle(BPoint(middle, (kScrollerHeight / 2) - 3),
+			BPoint(middle + 5, (kScrollerHeight / 2) + 2),
+			BPoint(middle - 5, (kScrollerHeight / 2) + 2));
+}
 
+
+//	#pragma mark -
+
+
+LowerScroller::LowerScroller(BRect frame)
+	:
+	BMenuScroller(frame)
+{
+}
+
+
+void
+LowerScroller::Draw(BRect updateRect)
+{
+	SetLowColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_1_TINT));
+	
+	BRect frame = Bounds();
 	// Draw the lower arrow.
-	if (updateRect.Intersects(fLowerButton)) {
-		if (fLowerEnabled)
-			SetHighColor(0, 0, 0);
-		else
-			SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), 
-						B_DARKEN_2_TINT));
+	if (IsEnabled())
+		SetHighColor(0, 0, 0);
+	else
+		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
+			B_DARKEN_2_TINT));
 
-		FillRect(fLowerButton, B_SOLID_LOW);
+	FillRect(Bounds(), B_SOLID_LOW);
 
-		FillTriangle(BPoint(middle, fLowerButton.bottom - (kScrollerHeight / 2) + 3),
-				BPoint(middle + 5, fLowerButton.bottom - (kScrollerHeight / 2) - 2),
-				BPoint(middle - 5, fLowerButton.bottom - (kScrollerHeight / 2) - 2));
-	}
+	float middle = Bounds().right / 2;
+
+	FillTriangle(BPoint(middle, frame.bottom - (kScrollerHeight / 2) + 3),
+			BPoint(middle + 5, frame.bottom - (kScrollerHeight / 2) - 2),
+			BPoint(middle - 5, frame.bottom - (kScrollerHeight / 2) - 2));
 }
 
 
@@ -184,11 +161,6 @@ BMenuFrame::BMenuFrame(BMenu *menu)
 {
 }
 	
-
-BMenuFrame::~BMenuFrame()
-{
-}
-
 
 void
 BMenuFrame::AttachedToWindow()
@@ -246,6 +218,7 @@ BMenuFrame::Draw(BRect updateRect)
 }
 
 
+
 //	#pragma mark -
 
 
@@ -253,8 +226,10 @@ BMenuWindow::BMenuWindow(const char *name)
 	// The window will be resized by BMenu, so just pass a dummy rect
 	: BWindow(BRect(0, 0, 0, 0), name, B_BORDERED_WINDOW_LOOK, kMenuWindowFeel,
 			B_NOT_ZOOMABLE | B_AVOID_FOCUS),
-	fScroller(NULL),
-	fMenuFrame(NULL)
+	fMenu(NULL),	
+	fMenuFrame(NULL),
+	fUpperScroller(NULL),
+	fLowerScroller(NULL)
 {
 }
 
@@ -273,6 +248,7 @@ BMenuWindow::AttachMenu(BMenu *menu)
 		fMenuFrame = new BMenuFrame(menu);
 		AddChild(fMenuFrame);
 		menu->MakeFocus(true);
+		fMenu = menu;
 	}
 }
 
@@ -280,14 +256,12 @@ BMenuWindow::AttachMenu(BMenu *menu)
 void
 BMenuWindow::DetachMenu()
 {
+	DetachScrollers();	
 	if (fMenuFrame) {
-		if (fScroller) {
-			DetachScrollers();
-		} else {
-			RemoveChild(fMenuFrame);
-		}
+		RemoveChild(fMenuFrame);
 		delete fMenuFrame;
 		fMenuFrame = NULL;
+		fMenu = NULL;
 	}
 }
 
@@ -297,45 +271,112 @@ BMenuWindow::AttachScrollers()
 {
 	// We want to attach a scroller only if there's a menu frame already
 	// existing.
-	if (fScroller || !fMenuFrame)
+	if (!fMenu || !fMenuFrame)
 		return;
+ 
+	fMenu->MakeFocus(true);
 
-	RemoveChild(fMenuFrame);
-	fScroller = new BMenuScroller(Bounds(), fMenuFrame->fMenu);
-	fScroller->AddChild(fMenuFrame);
-	AddChild(fScroller);
-
-	fMenuFrame->fMenu->MakeFocus(true);
+	BRect frame = Bounds();
+	fUpperScroller = new UpperScroller(BRect(0, 0, frame.right, kScrollerHeight));
+	AddChild(fUpperScroller);
+	fLowerScroller = new LowerScroller(BRect(0, frame.bottom - kScrollerHeight, frame.right, frame.bottom));
+	AddChild(fLowerScroller);
+	
+	fUpperScroller->SetEnabled(false);
+	fLowerScroller->SetEnabled(true);
 
 	fMenuFrame->ResizeBy(0, -2 * kScrollerHeight);
 	fMenuFrame->MoveBy(0, kScrollerHeight);
+	
+	fMenuFrame->Bounds().PrintToStream();
+	fValue = 0;
+	fLimit = fMenu->Bounds().Height() - (frame.Height() - 2 * kScrollerHeight);
 }
 
 
 void
 BMenuWindow::DetachScrollers()
 {
-	if(!fScroller || !fMenuFrame)
-		return;
-
 	// BeOS doesn't remember the position where the last scrolling ended,
 	// so we just scroll back to the beginning.
-	fMenuFrame->fMenu->ScrollTo(0, 0);
+	fMenu->ScrollTo(0, 0);
 
-	fScroller->RemoveChild(fMenuFrame);
-	RemoveChild(fScroller);
+	if (fLowerScroller) {
+		RemoveChild(fLowerScroller);
+		delete fLowerScroller;
+		fLowerScroller = NULL;
+	}
 
-	delete fScroller;
-	fScroller = NULL;
+	if (fUpperScroller) {
+		RemoveChild(fUpperScroller);
+		delete fUpperScroller;
+		fUpperScroller = NULL;
+	}		
 }
 
 
 bool
 BMenuWindow::CheckForScrolling(BPoint cursor)
 {
-	if (!fScroller)
+	if (!fMenuFrame)
 		return false;
 	
-	return fScroller->Scroll(cursor);
+	return _Scroll(cursor);
+}
+
+
+bool
+BMenuWindow::_Scroll(BPoint cursor)
+{
+	ConvertFromScreen(&cursor);
+
+	BRect lowerFrame;
+	BRect upperFrame;
+	if (fLowerScroller)
+		lowerFrame = fLowerScroller->Frame();	
+	if (fUpperScroller)
+		upperFrame = fUpperScroller->Frame();
+
+	if (fLowerScroller && fLowerScroller->IsEnabled() && lowerFrame.Contains(cursor)) {		
+		if (fValue == 0) {
+			fUpperScroller->SetEnabled(true);
+			fUpperScroller->Invalidate();
+		}
+
+		if (fValue + kScrollStep >= fLimit) {
+			// If we reached the limit, we don't want to scroll a whole
+			// 'step' if not needed.
+			fMenu->ScrollBy(0, fLimit - fValue);
+			fValue = fLimit;
+			fLowerScroller->SetEnabled(false);
+			fLowerScroller->Invalidate();
+
+		} else {
+			fMenu->ScrollBy(0, kScrollStep);
+			fValue += kScrollStep;
+		}
+	} else if (fUpperScroller && fUpperScroller->IsEnabled() && upperFrame.Contains(cursor)) {		
+		if (fValue == fLimit) {
+			fLowerScroller->SetEnabled(true);
+			fLowerScroller->Invalidate();
+		}
+
+		if (fValue - kScrollStep <= 0) {
+			fMenu->ScrollBy(0, -fValue);
+			fValue = 0;
+			fUpperScroller->SetEnabled(false);
+			fUpperScroller->Invalidate();
+
+		} else {
+			fMenu->ScrollBy(0, -kScrollStep);
+			fValue -= kScrollStep;
+		}
+	} else {
+		return false;
+	}
+
+	snooze(10000);
+
+	return true;
 }
 
