@@ -285,10 +285,9 @@ BMenuWindow::AttachScrollers()
 	fUpperScroller->SetEnabled(false);
 	fLowerScroller->SetEnabled(true);
 
-	fMenuFrame->ResizeBy(0, -2 * kScrollerHeight);
+	fMenuFrame->ResizeBy(0, -2 * kScrollerHeight - 1);
 	fMenuFrame->MoveBy(0, kScrollerHeight);
 	
-	fMenuFrame->Bounds().PrintToStream();
 	fValue = 0;
 	fLimit = fMenu->Bounds().Height() - (frame.Height() - 2 * kScrollerHeight);
 }
