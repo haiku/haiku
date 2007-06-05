@@ -333,7 +333,7 @@ DraggableContainerIcon::DraggableContainerIcon(BRect rect, const char *name,
 void
 DraggableContainerIcon::AttachedToWindow()
 {
-	SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));
+	SetViewColor(Parent()->ViewColor());
 	FrameMoved(BPoint(0, 0));
 		// this decides whether to hide the icon or not
 }
@@ -503,7 +503,12 @@ DraggableContainerIcon::Draw(BRect /*updateRect*/)
 		return;
 
 	// Draw the icon, straddling the border
+#ifdef __HAIKU__
+	SetDrawingMode(B_OP_ALPHA);
+	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+#else
 	SetDrawingMode(B_OP_OVER);
+#endif
 	float iconOffset = (Bounds().Width() - B_MINI_ICON) / 2;
 	IconCache::sIconCache->Draw(window->TargetModel(), this,
 		BPoint(iconOffset, iconOffset), kNormalIcon, B_MINI_ICON, true);
