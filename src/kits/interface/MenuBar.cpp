@@ -7,6 +7,7 @@
  *		Stefano Ceccherini (burton666@libero.it)
  */
 
+#include <math.h>
 
 #include <MenuBar.h>
 
@@ -407,6 +408,17 @@ BMenuBar::TrackTask(void *arg)
 }
 
 
+// Note: since sqrt is slow, we don't use it and return the square of the distance
+// TODO: Move this to some common place, could be used in BMenu too.
+#define square(x) ((x) * (x))
+static float
+point_distance(const BPoint &pointA, const BPoint &pointB)
+{
+	return square(pointA.x - pointB.x) + square(pointA.y - pointB.y);
+}
+#undef square
+
+
 BMenuItem *
 BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 {	
@@ -482,8 +494,24 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 				buttons = 1;
 					// buttons must have been pressed in the meantime
 
+			// This code is needed to make menus
+			// that are children of BMenuFields "sticky" (see ticket #953)
 			if (localAction == MENU_STATE_CLOSED) {
-				if (fExtraRect != NULL && fExtraRect->Contains(where)) {
+				// The mouse could have meen moved since the last time we
+				// checked its position. Unfortunately our child menus don't tell
+				// us the new position.
+				// TODO: Maybe have a shared struct between all menus
+				// where to store the current mouse position ? 				
+				BPoint newWhere;
+				ulong newButtons;
+				if (window->Lock()) {
+					GetMouse(&newWhere, &newButtons);
+					window->Unlock();
+				}
+
+				if (fExtraRect != NULL && fExtraRect->Contains(where)
+					// 9 = 3 pixels ^ 2 (since point_distance() returns the square of the distance)					
+					&& point_distance(newWhere, where) < 9) {
 					SetStickyMode(true);
 					fExtraRect = NULL;				
 				} else
@@ -491,7 +519,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 			}
 			
 		} else if (menuItem == NULL && fSelected != NULL
-			&& !IsStickyMode() /*&& Bounds().Contains(where)*/ && fState != MENU_STATE_TRACKING_SUBMENU) {
+			&& !IsStickyMode() && fState != MENU_STATE_TRACKING_SUBMENU) {
 			_SelectItem(NULL);
 			fState = MENU_STATE_TRACKING;
 		}
