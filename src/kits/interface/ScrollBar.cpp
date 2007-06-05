@@ -9,16 +9,17 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+
+#include <ScrollBar.h>
 
 #include <Message.h>
 #include <OS.h>
 #include <Shape.h>
 #include <Window.h>
 
-#include <ScrollBar.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 //#define TEST_MODE
 
@@ -163,9 +164,13 @@ BScrollBar::Private::ButtonRepeaterThread()
 }
 
 
+//	#pragma mark -
+
+
 BScrollBar::BScrollBar(BRect frame, const char* name, BView *target,
-					   float min, float max, orientation direction)
- : BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
+		float min, float max, orientation direction)
+	: BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE
+		| B_FRAME_EVENTS),
 	fMin(min),
 	fMax(max),
 	fSmallStep(1),
@@ -177,18 +182,17 @@ BScrollBar::BScrollBar(BRect frame, const char* name, BView *target,
 	fTargetName(NULL)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
-	
+
 	fPrivateData = new BScrollBar::Private(this);
 
 	SetTarget(target);
 
 	_UpdateThumbFrame();
 	_UpdateArrowButtons();
-	
-	SetResizingMode((direction == B_VERTICAL) ?
-		B_FOLLOW_TOP_BOTTOM | B_FOLLOW_RIGHT : 
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM );
-	
+
+	SetResizingMode(direction == B_VERTICAL
+		? B_FOLLOW_TOP_BOTTOM | B_FOLLOW_RIGHT
+		: B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
 }
 
 
@@ -223,29 +227,29 @@ BScrollBar::Instantiate(BMessage *data)
 status_t
 BScrollBar::Archive(BMessage *data, bool deep) const
 {
-	status_t err = BView::Archive(data,deep);
+	status_t err = BView::Archive(data, deep);
 	if (err != B_OK)
 		return err;
-	err = data->AddFloat("_range",fMin);
+	err = data->AddFloat("_range", fMin);
 	if (err != B_OK)
 		return err;
-	err = data->AddFloat("_range",fMax);
+	err = data->AddFloat("_range", fMax);
 	if (err != B_OK)
 		return err;
-	err = data->AddFloat("_steps",fSmallStep);
+	err = data->AddFloat("_steps", fSmallStep);
 	if (err != B_OK)
 		return err;
-	err = data->AddFloat("_steps",fLargeStep);
+	err = data->AddFloat("_steps", fLargeStep);
 	if (err != B_OK)
 		return err;
-	err = data->AddFloat("_val",fValue);
+	err = data->AddFloat("_val", fValue);
 	if (err != B_OK)
 		return err;
-	err = data->AddInt32("_orient",(int32)fOrientation);
+	err = data->AddInt32("_orient", (int32)fOrientation);
 	if (err != B_OK)
 		return err;
-	err = data->AddInt32("_prop",(int32)fProportion);
-	
+	err = data->AddInt32("_prop", (int32)fProportion);
+
 	return err;
 }
 
@@ -253,7 +257,6 @@ BScrollBar::Archive(BMessage *data, bool deep) const
 void
 BScrollBar::AttachedToWindow()
 {
-	// R5's SB contacts the server if fValue!=0. I *think* we don't need to do anything here...
 }
 
 /*
@@ -291,15 +294,17 @@ an actual BView within the scroll bar's window.
 void
 BScrollBar::SetValue(float value)
 {
+	if (value > fMax)
+		value = fMax;
+	else if (value < fMin)
+		value = fMin;
+
+	value = roundf(value);
+
 	if (value == fValue)
 		return;
 
-	if (value > fMax)
-		value = fMax;
-	if (value < fMin)
-		value = fMin;
-
-	fValue = roundf(value);
+	fValue = value;
 
 	_UpdateThumbFrame();
 	_UpdateArrowButtons();
@@ -338,20 +343,19 @@ BScrollBar::ValueChanged(float newValue)
 void
 BScrollBar::SetProportion(float value)
 {
-	// NOTE: The Tracker depends on the broken
-	// behaviour to allow a proportion less than
-	// 0 or greater than 1
-/*	if (value < 0.0)
+	if (value < 0.0)
 		value = 0.0;
 	if (value > 1.0)
-		value = 1.0;*/
+		value = 1.0;
 
 	if (value != fProportion) {
-		bool oldEnabled = fPrivateData->fEnabled && fMin < fMax && fProportion < 1.0 && fProportion >= 0.0;
+		bool oldEnabled = fPrivateData->fEnabled && fMin < fMax
+			&& fProportion < 1.0 && fProportion >= 0.0;
 
 		fProportion = value;
 
-		bool newEnabled = fPrivateData->fEnabled && fMin < fMax && fProportion < 1.0 && fProportion >= 0.0;
+		bool newEnabled = fPrivateData->fEnabled && fMin < fMax
+			&& fProportion < 1.0 && fProportion >= 0.0;
 		
 		_UpdateThumbFrame();
 
@@ -641,7 +645,8 @@ BScrollBar::Draw(BRect updateRect)
 	StrokeRect(bounds);
 	bounds.InsetBy(1.0, 1.0);
 
-	bool enabled = fPrivateData->fEnabled && fMin < fMax && fProportion < 1.0 && fProportion >= 0.0;
+	bool enabled = fPrivateData->fEnabled && fMin < fMax
+		&& fProportion < 1.0 && fProportion >= 0.0;
 
 	rgb_color light, light1, dark, dark1, dark2, dark4;
 	if (enabled) {
@@ -1032,10 +1037,13 @@ BScrollBar::_DoubleArrows() const
 
 	// if there is not enough room, switch to single arrows even though
 	// double arrows is specified
-	if (fOrientation == B_HORIZONTAL)
-		return Bounds().Width() > (Bounds().Height() + 1) * 4 + fPrivateData->fScrollBarInfo.min_knob_size * 2;
-	else
-		return Bounds().Height() > (Bounds().Width() + 1) * 4 + fPrivateData->fScrollBarInfo.min_knob_size * 2;
+	if (fOrientation == B_HORIZONTAL) {
+		return Bounds().Width() > (Bounds().Height() + 1) * 4
+			+ fPrivateData->fScrollBarInfo.min_knob_size * 2;
+	} else {
+		return Bounds().Height() > (Bounds().Width() + 1) * 4
+			+ fPrivateData->fScrollBarInfo.min_knob_size * 2;
+	}
 }
 
 // _UpdateThumbFrame
@@ -1099,7 +1107,8 @@ BScrollBar::_UpdateThumbFrame()
 	}
 
 	if (Window()) {
-		BRect invalid = oldFrame.IsValid() ? oldFrame | fPrivateData->fThumbFrame : fPrivateData->fThumbFrame;
+		BRect invalid = oldFrame.IsValid() ? oldFrame | fPrivateData->fThumbFrame
+			: fPrivateData->fThumbFrame;
 		// account for those two dark lines
 		if (fOrientation == B_HORIZONTAL)
 			invalid.InsetBy(-2.0, 0.0);

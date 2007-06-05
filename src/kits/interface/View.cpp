@@ -1499,31 +1499,51 @@ BView::ScrollBar(orientation posture) const
 
 
 void
-BView::ScrollBy(float dh, float dv)
+BView::ScrollBy(float deltaX, float deltaY)
 {
-	// scrolling by fractional values is not supported, is it?
-	dh = roundf(dh);
-	dv = roundf(dv);
+	// scrolling by fractional values is not supported
+	deltaX = roundf(deltaX);
+	deltaY = roundf(deltaY);
 
 	// no reason to process this further if no scroll is intended.
-	if (dh == 0 && dv == 0)
+	if (deltaX == 0 && deltaY == 0)
 		return;
+
+	// make sure scrolling is within valid bounds
+	if (fHorScroller) {
+		float min, max;
+		fHorScroller->GetRange(&min, &max);
+
+		if (deltaX + fBounds.left < min)
+			deltaX = min - fBounds.left;
+		else if (deltaX + fBounds.left > max)
+			deltaX = max - fBounds.left;
+	}
+	if (fVerScroller) {
+		float min, max;
+		fVerScroller->GetRange(&min, &max);
+
+		if (deltaY + fBounds.top < min)
+			deltaY = min - fBounds.top;
+		else if (deltaY + fBounds.top > max)
+			deltaY = max - fBounds.top;
+	}
 
 	check_lock();
 
 	// if we're attached to a window tell app_server about this change
 	if (fOwner) {
 		fOwner->fLink->StartMessage(AS_LAYER_SCROLL);
-		fOwner->fLink->Attach<float>(dh);
-		fOwner->fLink->Attach<float>(dv);
+		fOwner->fLink->Attach<float>(deltaX);
+		fOwner->fLink->Attach<float>(deltaY);
 
 		fOwner->fLink->Flush();
 
 		fState->valid_flags &= ~(B_VIEW_FRAME_BIT | B_VIEW_ORIGIN_BIT);
 	}
 
-	// we modify our bounds rectangle by dh/dv coord units hor/ver.
-	fBounds.OffsetBy(dh, dv);
+	// we modify our bounds rectangle by deltaX/deltaY coord units hor/ver.
+	fBounds.OffsetBy(deltaX, deltaY);
 
 	// then set the new values of the scrollbars
 	if (fHorScroller)
