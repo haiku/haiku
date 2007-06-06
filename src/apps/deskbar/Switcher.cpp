@@ -1947,8 +1947,12 @@ TIconView::DrawTeams(BRect update)
 			continue;
 
 		if (rect.Intersects(update) && teamGroup) {
+#ifdef __HAIKU__
+			SetDrawingMode(B_OP_ALPHA);
+			SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+#else
 			SetDrawingMode(B_OP_OVER);
-
+#endif
 			teamGroup->Draw(this, rect, !fAutoScrolling && (i == mainIndex));
 
 			if (i == mainIndex) 
