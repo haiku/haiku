@@ -22,7 +22,8 @@
 #include "ServerProtocol.h"
 #include "SystemPalette.h"
 
-#include "safemode.h"
+#include <safemode.h>
+#include <syscalls.h>
 
 #include <Accelerant.h>
 #include <Cursor.h>
