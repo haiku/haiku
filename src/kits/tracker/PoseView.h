@@ -653,17 +653,17 @@ class BPoseView : public BView {
 		BRect fStartFrame;
 		BRect fSelectionRect;
 
-		static float fFontHeight;
-		static font_height fFontInfo;
-		static BFont fCurrentFont;
-		static bigtime_t fLastKeyTime;
-		static char fMatchString[B_FILE_NAME_LENGTH];
+		static float sFontHeight;
+		static font_height sFontInfo;
+		static BFont sCurrentFont;
+		static bigtime_t sLastKeyTime;
+		static char sMatchString[B_FILE_NAME_LENGTH];
 			// used for typeahead - should be replaced by a typeahead state
 
 		// TODO: Get rid of this.
-		static _BWidthBuffer_ *fWidthBuf;
+		static _BWidthBuffer_ *sWidthBuffer;
 
-		static OffscreenBitmap *fOffscreen;
+		static OffscreenBitmap *sOffscreen;
 
 		typedef BView _inherited;
 };
@@ -778,13 +778,13 @@ BPoseView::ViewMode() const
 inline font_height
 BPoseView::FontInfo() const
 {
-	return fFontInfo;
+	return sFontInfo;
 }
 
 inline float
 BPoseView::FontHeight() const
 {
-	return fFontHeight;
+	return sFontHeight;
 }
 
 inline BPose *

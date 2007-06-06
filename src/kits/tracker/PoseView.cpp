@@ -288,7 +288,7 @@ BPoseView::InitCommon()
 	PinPointToValidRange(origin);
 
 	// init things related to laying out items
-	fListElemHeight = ceilf(fFontHeight < 20 ? 20 : fFontHeight + 6);
+	fListElemHeight = ceilf(sFontHeight < 20 ? 20 : sFontHeight + 6);
 	SetIconPoseHeight();
 	GetLayoutInfo(ViewMode(), &fGrid, &fOffset);
 	ResetPosePlacementHint();
@@ -650,7 +650,7 @@ BPoseView::SaveState(BMessage &message) const
 float 
 BPoseView::StringWidth(const char *str) const
 {
-	return fWidthBuf->StringWidth(str, 0, (int32)strlen(str), &fCurrentFont);
+	return sWidthBuffer->StringWidth(str, 0, (int32)strlen(str), &sCurrentFont);
 }
 
 
@@ -658,7 +658,7 @@ float
 BPoseView::StringWidth(const char *str, int32 len) const
 {
 	ASSERT(strlen(str) == (uint32)len);
-	return fWidthBuf->StringWidth(str, 0, len, &fCurrentFont);
+	return sWidthBuffer->StringWidth(str, 0, len, &sCurrentFont);
 }
 
 
@@ -877,12 +877,12 @@ BPoseView::AttachedToWindow()
 	BFont font(be_plain_font);
 	font.SetSpacing(B_BITMAP_SPACING);
 	SetFont(&font);
-	GetFont(&fCurrentFont);
+	GetFont(&sCurrentFont);
 
 	// static - init just once
-	if (fFontHeight == -1) {
-		font.GetHeight(&fFontInfo);
-		fFontHeight = fFontInfo.ascent + fFontInfo.descent + fFontInfo.leading;
+	if (sFontHeight == -1) {
+		font.GetHeight(&sFontInfo);
+		sFontHeight = sFontInfo.ascent + sFontInfo.descent + sFontInfo.leading;
 	}
 
 	if (TTracker *app = dynamic_cast<TTracker*>(be_app)) {
@@ -906,17 +906,17 @@ BPoseView::SetIconPoseHeight()
 	switch (ViewMode()) {
 		case kIconMode:
 			fViewState->SetIconSize(B_LARGE_ICON);
-			fIconPoseHeight = ceilf(IconSizeInt() + fFontHeight + 1);
+			fIconPoseHeight = ceilf(IconSizeInt() + sFontHeight + 1);
 			break;
 		
 		case kMiniIconMode:
 			fViewState->SetIconSize(B_MINI_ICON);
-			fIconPoseHeight = ceilf(fFontHeight < IconSizeInt() ? IconSizeInt() : fFontHeight + 1);
+			fIconPoseHeight = ceilf(sFontHeight < IconSizeInt() ? IconSizeInt() : sFontHeight + 1);
 			break;
 		
 		case kScaleIconMode:
 			// IconSize should allready be set in MessageReceived()
-			fIconPoseHeight = ceilf(IconSizeInt() + fFontHeight + 1);
+			fIconPoseHeight = ceilf(IconSizeInt() + sFontHeight + 1);
 			break;
 		
 		default:
@@ -2270,9 +2270,9 @@ BPoseView::MessageReceived(BMessage *message)
 		{
 			bigtime_t doubleClickSpeed;
 			get_click_speed(&doubleClickSpeed);
-			if (system_time() - fLastKeyTime > (doubleClickSpeed * 2)) {
-				strcpy(fMatchString, "");
-				fCountView->SetTypeAhead(fMatchString);
+			if (system_time() - sLastKeyTime > (doubleClickSpeed * 2)) {
+				strcpy(sMatchString, "");
+				fCountView->SetTypeAhead(sMatchString);
 				delete fKeyRunner;
 				fKeyRunner = NULL;
 			}
@@ -5878,11 +5878,11 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 				_inherited::KeyDown(bytes, count);
 			else {
 				if (fSelectionList->IsEmpty())
-					fMatchString[0] = '\0';
+					sMatchString[0] = '\0';
 				else {
 					BPose *pose = fSelectionList->FirstItem();
-					strncpy(fMatchString, pose->TargetModel()->Name(), B_FILE_NAME_LENGTH - 1);
-					fMatchString[B_FILE_NAME_LENGTH - 1] = '\0';
+					strncpy(sMatchString, pose->TargetModel()->Name(), B_FILE_NAME_LENGTH - 1);
+					sMatchString[B_FILE_NAME_LENGTH - 1] = '\0';
 				}
 
 				bool reverse = (Window()->CurrentMessage()->FindInt32("modifiers")
@@ -5891,10 +5891,10 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 				BPose *pose = FindNextMatch(&index, reverse);
 				if (!pose) {		// wrap around
 					if (reverse) {
-						fMatchString[0] = (char)0xff;
-						fMatchString[1] = '\0';
+						sMatchString[0] = (char)0xff;
+						sMatchString[1] = '\0';
 					} else
-						fMatchString[0] = '\0';
+						sMatchString[0] = '\0';
 					pose = FindNextMatch(&index, reverse);
 				}
 
@@ -5922,18 +5922,18 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 
 		case B_BACKSPACE:
 			// remove last char from the typeahead buffer
-			if (strcmp(fMatchString, "") != 0) {
-				fMatchString[strlen(fMatchString) - 1] = '\0';
+			if (strcmp(sMatchString, "") != 0) {
+				sMatchString[strlen(sMatchString) - 1] = '\0';
 	
-				fLastKeyTime = system_time();				
+				sLastKeyTime = system_time();				
 
-				fCountView->SetTypeAhead(fMatchString);
+				fCountView->SetTypeAhead(sMatchString);
 
 				// select our new string	
 				int32 index;
 				BPose *pose = FindBestMatch(&index);
 				if (!pose) {		// wrap around
-					fMatchString[0] = '\0';
+					sMatchString[0] = '\0';
 					pose = FindBestMatch(&index);
 				}
 				SelectPose(pose, index);
@@ -5966,21 +5966,21 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 
 			// add char to existing matchString or start new match string
 			// make sure we don't overfill matchstring
-			if (eventTime - fLastKeyTime < (doubleClickSpeed * 2)) {
-				uint32 nchars = B_FILE_NAME_LENGTH - strlen(fMatchString);
-				strncat(fMatchString, searchChar, nchars);
+			if (eventTime - sLastKeyTime < (doubleClickSpeed * 2)) {
+				uint32 nchars = B_FILE_NAME_LENGTH - strlen(sMatchString);
+				strncat(sMatchString, searchChar, nchars);
 			} else {
-				strncpy(fMatchString, searchChar, B_FILE_NAME_LENGTH - 1);
+				strncpy(sMatchString, searchChar, B_FILE_NAME_LENGTH - 1);
 			} 
-			fMatchString[B_FILE_NAME_LENGTH - 1] = '\0';
-			fLastKeyTime = eventTime;
+			sMatchString[B_FILE_NAME_LENGTH - 1] = '\0';
+			sLastKeyTime = eventTime;
 
-			fCountView->SetTypeAhead(fMatchString);
+			fCountView->SetTypeAhead(sMatchString);
 
 			int32 index;
 			BPose *pose = FindBestMatch(&index);
 			if (!pose) {		// wrap around
-				fMatchString[0] = '\0';
+				sMatchString[0] = '\0';
 				pose = FindBestMatch(&index);
 			}
 			SelectPose(pose, index);
@@ -6002,14 +6002,14 @@ BPoseView::FindNextMatch(int32 *matchingIndex, bool reverse)
 		BPose *pose = fPoseList->ItemAt(index);
 
 		if (reverse) {
-			if (strcasecmp(pose->TargetModel()->Name(), fMatchString) < 0)
+			if (strcasecmp(pose->TargetModel()->Name(), sMatchString) < 0)
 				if (strcasecmp(pose->TargetModel()->Name(), bestSoFar) >= 0
 					|| !bestSoFar[0]) {
 					strcpy(bestSoFar, pose->TargetModel()->Name());
 					poseToSelect = pose;
 					*matchingIndex = index;
 				}
-		} else if (strcasecmp(pose->TargetModel()->Name(), fMatchString) > 0)
+		} else if (strcasecmp(pose->TargetModel()->Name(), sMatchString) > 0)
 			if (strcasecmp(pose->TargetModel()->Name(), bestSoFar) <= 0
 				|| !bestSoFar[0]) {
 				strcpy(bestSoFar, pose->TargetModel()->Name());
@@ -6047,7 +6047,7 @@ BPoseView::FindBestMatch(int32 *index)
 				text = pose->TargetModel()->Name();
 		}
 
-		if (strcasecmp(text, fMatchString) >= 0)
+		if (strcasecmp(text, sMatchString) >= 0)
 			if (strcasecmp(text, bestSoFar) <= 0 || !bestSoFar[0]) {
 				strcpy(bestSoFar, text);
 				poseToSelect = pose;
@@ -7564,7 +7564,7 @@ BPoseView::SwitchDir(const entry_ref *newDirRef, AttributeStreamNode *node)
 	ResetOrigin();
 	ResetPosePlacementHint();
 
-	fLastKeyTime = 0;
+	sLastKeyTime = 0;
 }
 
 
@@ -8217,8 +8217,8 @@ BPoseView::ColumnRedraw(BRect updateRect)
 	BPoint loc(0, startIndex * fListElemHeight);
 	BRect srcRect = fPoseList->ItemAt(0)->CalcRect(BPoint(0, 0), this, false);
 	srcRect.right += 1024;	// need this to erase correctly
-	fOffscreen->BeginUsing(srcRect);
-	BView *offscreenView = fOffscreen->View();
+	sOffscreen->BeginUsing(srcRect);
+	BView *offscreenView = sOffscreen->View();
 
 	BRegion updateRegion;
 	updateRegion.Set(updateRect);
@@ -8240,12 +8240,12 @@ BPoseView::ColumnRedraw(BRect updateRect)
 
 		offscreenView->Sync();
 		SetDrawingMode(B_OP_COPY);
-		DrawBitmap(fOffscreen->Bitmap(), srcRect, dstRect);
+		DrawBitmap(sOffscreen->Bitmap(), srcRect, dstRect);
 		loc.y += fListElemHeight;
 		if (loc.y > updateRect.bottom)
 			break;
 	}
-	fOffscreen->DoneUsing();
+	sOffscreen->DoneUsing();
 	ConstrainClippingRegion(0);
 }
 
@@ -9327,11 +9327,11 @@ TPoseViewFilter::Filter(BMessage *message, BHandler **)
 
 // static member initializations
 
-float BPoseView::fFontHeight = -1;
-font_height BPoseView::fFontInfo = { 0, 0, 0 };
-bigtime_t BPoseView::fLastKeyTime = 0;
-_BWidthBuffer_* BPoseView::fWidthBuf = new _BWidthBuffer_;
-BFont BPoseView::fCurrentFont;
-OffscreenBitmap *BPoseView::fOffscreen = new OffscreenBitmap;
-char BPoseView::fMatchString[] = "";
+float BPoseView::sFontHeight = -1;
+font_height BPoseView::sFontInfo = { 0, 0, 0 };
+bigtime_t BPoseView::sLastKeyTime = 0;
+_BWidthBuffer_* BPoseView::sWidthBuffer = new _BWidthBuffer_;
+BFont BPoseView::sCurrentFont;
+OffscreenBitmap *BPoseView::sOffscreen = new OffscreenBitmap;
+char BPoseView::sMatchString[] = "";
 
