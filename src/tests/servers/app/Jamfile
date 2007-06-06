@@ -6,7 +6,12 @@ SetSubDirSupportedPlatforms libbe_test ;
 if $(TARGET_PLATFORM) = libbe_test {
 
 UseLibraryHeaders agg png zlib ;
-UsePrivateHeaders app graphics input interface kernel shared storage ;
+UsePrivateHeaders app graphics input interface shared storage ;
+
+# headers/build/private/kernel is needed for safemode.h and syscalls.h.
+# headers/private/kernel for the util/* stuff.
+UseHeaders [ FDirName $(HAIKU_TOP) headers build private kernel ] : true ;
+UsePrivateHeaders kernel ;
 
 local appServerDir = [ FDirName $(HAIKU_TOP) src servers app ] ;
 

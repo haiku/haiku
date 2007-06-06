@@ -434,3 +434,11 @@ _kern_cancel_disk_device_job(disk_job_id id, bool reverse)
 	return B_ERROR;
 }
 
+// #pragma mark - other syscalls
+
+status_t
+_kern_get_safemode_option(const char *parameter, char *buffer,
+	size_t *_bufferSize)
+{
+	return B_ERROR;
+}
