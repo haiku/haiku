@@ -23,7 +23,6 @@
 #include "SystemPalette.h"
 
 #include <safemode.h>
-#include <syscalls.h>
 
 #include <Accelerant.h>
 #include <Cursor.h>
@@ -50,7 +49,6 @@ using std::nothrow;
 #endif
 
 
-#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 // This call updates the frame buffer used by the on-screen KDL
 extern "C" status_t _kern_frame_buffer_update(void *baseAddress,
 	int32 width, int32 height, int32 depth, int32 bytesPerRow);
@@ -58,7 +56,6 @@ extern "C" status_t _kern_frame_buffer_update(void *baseAddress,
 // This call retrieves the system's safemode options
 extern "C" status_t _kern_get_safemode_option(const char* parameter,
 	char* buffer, size_t* _size);
-#endif
 
 const int32 kDefaultParamsCount = 64;
 
