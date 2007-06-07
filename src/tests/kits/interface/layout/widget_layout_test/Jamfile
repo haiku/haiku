@@ -5,10 +5,12 @@ SetSubDirSupportedPlatforms haiku libbe_test ;
 SimpleTest WidgetLayoutTest :
 	WidgetLayoutTest.cpp
 
+	AbstractButton.cpp
 	BoxTest.cpp
 	ButtonTest.cpp
 	CheckBox.cpp
 	GroupView.cpp
+	RadioButton.cpp
 	StringView.cpp
 	Test.cpp
 	TwoDimensionalSliderView.cpp

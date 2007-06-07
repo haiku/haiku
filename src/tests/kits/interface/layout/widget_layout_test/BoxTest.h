@@ -10,7 +10,7 @@
 
 
 class BBox;
-class View;
+class RadioButtonGroup;
 
 
 class BoxTest : public Test {
@@ -21,8 +21,16 @@ public:
 	virtual	void				ActivateTest(View* controls);
 	virtual	void				DectivateTest();
 
+	virtual	void				MessageReceived(BMessage* message);
+
 private:
+			void				_UpdateBorderStyle();
+
+private:
+			class BorderStyleRadioButton;
+
 			BBox*				fBox;
+			RadioButtonGroup*	fBorderStyleRadioGroup;
 };
 
 
