@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004, Marcus Overhagen
+ * Copyright (c) 2004-2007, Marcus Overhagen
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -48,9 +48,9 @@ struct movie_chunk
 	uint32			size;
 };
 
-OpenDMLParser::OpenDMLParser()
- :	fSource(0),
- 	fSize(0),
+OpenDMLParser::OpenDMLParser(BPositionIO *source)
+ :	fSource(source),
+ 	fSize(source->Seek(0, SEEK_END)),
  	fMovieListStart(0),
  	fStandardIndexStart(0),
  	fStandardIndexSize(0),
@@ -78,7 +78,7 @@ const stream_info *
 OpenDMLParser::StreamInfo(int index)
 {
 	if (index < 0 || index >= fStreamCount)
-		return 0;
+		return NULL;
 	
 	stream_info *info = fStreams;
 	while (index--)
@@ -141,19 +141,18 @@ OpenDMLParser::CreateNewStreamInfo()
 	fCurrentStream = info;
 }
 
-// this function returns false to indicate that an error occured,
-// but the object is correctly initialized anyway.
-bool
-OpenDMLParser::Parse(BPositionIO *source)
+status_t
+OpenDMLParser::Parse()
 {
 	TRACE("OpenDMLParser::Parse\n");
-	
-	fSource = source;
-	fSize = source->Seek(0, SEEK_END);
-	
+
+	if (!fSource) {
+		ERROR("OpenDMLParser::Parse: no source\n");
+		return B_ERROR;
+	}
 	if (fSize < 32) {
 		ERROR("OpenDMLParser::Parse: file to small\n");
-		return false;
+		return B_ERROR;
 	}
 		
 	uint64 pos = 0;
@@ -168,12 +167,12 @@ OpenDMLParser::Parse(BPositionIO *source)
 		
 		if (maxsize < 13) {
 			ERROR("OpenDMLParser::Parse: remaining size too small for RIFF AVI chunk data at pos %lld\n", pos);
-			return false;
+			return B_ERROR;
 		}
 
 		if (sizeof(temp) != fSource->ReadAt(pos, &temp, sizeof(temp))) {
 			ERROR("OpenDMLParser::Parse: read error at pos %llu\n", pos);
-			return false;
+			return B_ERROR;
 		}
 		pos += 4;
 		maxsize -= 4;
@@ -181,7 +180,7 @@ OpenDMLParser::Parse(BPositionIO *source)
 
 		if (sizeof(temp) != fSource->ReadAt(pos, &temp, sizeof(temp))) {
 			ERROR("OpenDMLParser::Parse: read error at pos %llu\n", pos);
-			return false;
+			return B_ERROR;
 		}
 		pos += 4;
 		maxsize -= 4;
@@ -191,7 +190,7 @@ OpenDMLParser::Parse(BPositionIO *source)
 
 		if (size == 0) {
 			ERROR("OpenDMLParser::Parse: Error: chunk of size 0 found\n");
-			return false;
+			return B_ERROR;
 		}
 	
 		if (size > maxsize) {
@@ -208,7 +207,7 @@ OpenDMLParser::Parse(BPositionIO *source)
 		if (fourcc != FOURCC('R','I','F','F')) {
 			if (riff_chunk_number == 0) {
 				ERROR("OpenDMLParser::Parse: not a RIFF file\n");
-				return false;
+				return B_ERROR;
 			} else {
 				TRACE("OpenDMLParser::Parse: unknown chunk '"FOURCC_FORMAT"' (expected 'RIFF'), size = %lu ignored\n", FOURCC_PARAM(fourcc), size);
 				goto cont;
@@ -220,31 +219,32 @@ OpenDMLParser::Parse(BPositionIO *source)
 
 		if (sizeof(temp) != fSource->ReadAt(pos, &temp, sizeof(temp))) {
 			ERROR("OpenDMLParser::Parse: read error at pos %llu\n", pos);
-			return false;
+			return B_ERROR;
 		}
 		fourcc = AVI_UINT32(temp);
 
 		if (riff_chunk_number == 0 && fourcc != FOURCC('A','V','I',' ')) {
 			ERROR("OpenDMLParser::Parse: not a AVI file\n");
-			return false;
+			return B_ERROR;
 		}
 
 		if (fourcc != FOURCC('A','V','I',' ') && fourcc != FOURCC('A','V','I','X')) {
-			TRACE("OpenDMLParser::Parse: unknown RIFF subchunk '"FOURCC_FORMAT"' , size = %lu ignored, filepos %Ld, filesize %Ld\n", FOURCC_PARAM(fourcc), size, pos - 8, fSize);
+			TRACE("OpenDMLParser::Parse: unknown RIFF subchunk '"FOURCC_FORMAT"' , size = %lu ignored, filepos %Ld, filesize %Ld\n",
+				FOURCC_PARAM(fourcc), size, pos - 8, fSize);
 			goto cont;
 		}
 		
-		if (!ParseChunk_AVI(riff_chunk_number, pos + 4, size - 4))
-			return false;
+		if (ParseChunk_AVI(riff_chunk_number, pos + 4, size - 4) < B_OK)
+			return B_ERROR;
 
 cont:
 		pos += (size) + (size & 1);
 		riff_chunk_number++;
 	}
-	return true;
+	return B_OK;
 }
 
-bool
+status_t
 OpenDMLParser::ParseChunk_AVI(int number, uint64 start, uint32 size)
 {
 	TRACE("OpenDMLParser::ParseChunk_AVI\n");
@@ -253,7 +253,7 @@ OpenDMLParser::ParseChunk_AVI(int number, uint64 start, uint32 size)
 
 	if (size < 9) {
 		ERROR("OpenDMLParser::ParseChunk_AVI: chunk is to small at pos %llu\n", start);
-		return false;
+		return B_ERROR;
 	}
 
 	while (pos < end) {
@@ -263,14 +263,14 @@ OpenDMLParser::ParseChunk_AVI(int number, uint64 start, uint32 size)
 
 		if (sizeof(temp) != fSource->ReadAt(pos, &temp, sizeof(temp))) {
 			ERROR("OpenDMLParser::ParseChunk_AVI: read error at pos %llu\n",pos);
-			return false;
+			return B_ERROR;
 		}
 		pos += 4;
 		Chunkfcc = AVI_UINT32(temp);
 		
 		if (sizeof(temp) != fSource->ReadAt(pos, &temp, sizeof(temp))) {
 			ERROR("OpenDMLParser::ParseChunk_AVI: read error at pos %llu\n",pos);
-			return false;
+			return B_ERROR;
 		}
 		pos += 4;
 		Chunksize = AVI_UINT32(temp);
@@ -281,7 +281,7 @@ OpenDMLParser::ParseChunk_AVI(int number, uint64 start, uint32 size)
 
 		if (Chunksize == 0) {
 			ERROR("OpenDMLParser::ParseChunk_AVI: chunk '"FOURCC_FORMAT"' has size 0\n", FOURCC_PARAM(Chunkfcc));
-			return false;
+			return B_ERROR;
 		}
 
 		if (Chunksize > maxsize) {
@@ -290,11 +290,11 @@ OpenDMLParser::ParseChunk_AVI(int number, uint64 start, uint32 size)
 		}
 
 		if (Chunkfcc == FOURCC('L','I','S','T')) {
-			if (!ParseChunk_LIST(pos, Chunksize))
-				return false;
+			if (ParseChunk_LIST(pos, Chunksize) < B_OK)
+				return B_ERROR;
 		} else if (Chunkfcc == FOURCC('i','d','x','1')) {
-			if (!ParseChunk_idx1(pos, Chunksize))
-				return false;
+			if (ParseChunk_idx1(pos, Chunksize) < B_OK)
+				return B_ERROR;
 		} else if (Chunkfcc == FOURCC('J','U','N','K')) {
 			; // do nothing
 		} else {
@@ -304,10 +304,10 @@ OpenDMLParser::ParseChunk_AVI(int number, uint64 start, uint32 size)
 		pos += (Chunksize) + (Chunksize & 1);
 	}
 	
-	return true;
+	return B_OK;
 }
 
-bool
+status_t
 OpenDMLParser::ParseChunk_LIST(uint64 start, uint32 size)
 {
 	TRACE("OpenDMLParser::ParseChunk_LIST\n");
@@ -316,63 +316,58 @@ OpenDMLParser::ParseChunk_LIST(uint64 start, uint32 size)
 	
 	if (size < 5) {
 		ERROR("OpenDMLParser::ParseChunk_LIST: chunk is to small at pos %llu\n", start);
-		return false;
+		return B_ERROR;
 	}
 
 	if (sizeof(temp) != fSource->ReadAt(start, &temp, sizeof(temp))) {
 		ERROR("OpenDMLParser::ParseChunk_LIST: read error at pos %llu\n", start);
-		return false;
+		return B_ERROR;
 	}
 	fourcc = AVI_UINT32(temp);
 
 	TRACE("OpenDMLParser::ParseChunk_LIST: type '"FOURCC_FORMAT"'\n", FOURCC_PARAM(fourcc));
 	
 	if (fourcc == FOURCC('m','o','v','i')) {
-		if (!ParseList_movi(start + 4, size - 4))
-			return false;
+		return ParseList_movi(start + 4, size - 4);
 	} else if (fourcc == FOURCC('r','e','c',' ')) {
-		if (!ParseList_movi(start + 4, size - 4)) //XXX parse rec simliar to movi???
-			return false;
+		// XXX parse rec simliar to movi?
+		return ParseList_movi(start + 4, size - 4);
 	} else if (fourcc == FOURCC('h','d','r','l')) {
-		if (!ParseList_generic(start + 4, size - 4))
-			return false;
+		return ParseList_generic(start + 4, size - 4);
 	} else if (fourcc == FOURCC('s','t','r','l')) {
-		if (!ParseList_strl(start + 4, size - 4))
-			return false;
+		return ParseList_strl(start + 4, size - 4);
 	} else if (fourcc == FOURCC('o','d','m','l')) {
-		if (!ParseList_generic(start + 4, size - 4))
-			return false;
+		return ParseList_generic(start + 4, size - 4);
 	} else {
 		TRACE("OpenDMLParser::ParseChunk_LIST: unknown list type ignored\n");
+		return B_OK;
 	}
-
-	return true;
 }
 
-bool
+status_t
 OpenDMLParser::ParseChunk_idx1(uint64 start, uint32 size)
 {
 	TRACE("OpenDMLParser::ParseChunk_idx1\n");
 	
 	if (fStandardIndexSize != 0) {
 		TRACE("OpenDMLParser::ParseChunk_idx1: found a second chunk\n");
-		return true; // just ignore, no error
+		return B_OK; // just ignore, no error
 	}
 
 	fStandardIndexStart = start;
 	fStandardIndexSize = size;
 	
-	return true;
+	return B_OK;
 }
 
-bool
+status_t
 OpenDMLParser::ParseChunk_avih(uint64 start, uint32 size)
 {
 	TRACE("OpenDMLParser::ParseChunk_avih\n");
 
 	if (fAviMainHeaderValid) {
 		TRACE("OpenDMLParser::ParseChunk_avih: found a second chunk\n");
-		return true; // just ignore, no error
+		return B_OK; // just ignore, no error
 	}
 
 	if (size < sizeof(fAviMainHeader)) {
@@ -383,7 +378,7 @@ OpenDMLParser::ParseChunk_avih(uint64 start, uint32 size)
 	size = min_c(size, sizeof(fAviMainHeader));
 	if ((ssize_t)size != fSource->ReadAt(start, &fAviMainHeader, size)) {
 		ERROR("OpenDMLParser::ParseChunk_avih: read error at pos %llu\n", start);
-		return false;
+		return B_ERROR;
 	}
 	
 	#if B_HOST_IS_BENDIAN
@@ -413,22 +408,22 @@ OpenDMLParser::ParseChunk_avih(uint64 start, uint32 size)
 	TRACE("width                 = %lu\n", fAviMainHeader.width);
 	TRACE("height                = %lu\n", fAviMainHeader.height);
 	
-	return true;
+	return B_OK;
 }
 
-bool
+status_t
 OpenDMLParser::ParseChunk_strh(uint64 start, uint32 size)
 {
 	TRACE("OpenDMLParser::ParseChunk_strh\n");
 	
 	if (fCurrentStream == 0) {
 		ERROR("OpenDMLParser::ParseChunk_strh: error, no Stream info\n");
-		return false;
+		return B_ERROR;
 	}
 
 	if (fCurrentStream->stream_header_valid) {
 		TRACE("OpenDMLParser::ParseChunk_strh: error, already have stream header\n");
-		return true; // just ignore, no error
+		return B_OK; // just ignore, no error
 	}
 
 	if (size < sizeof(fCurrentStream->stream_header)) {
@@ -440,7 +435,7 @@ OpenDMLParser::ParseChunk_strh(uint64 start, uint32 size)
 	size = min_c(size, sizeof(fCurrentStream->stream_header));
 	if ((ssize_t)size != fSource->ReadAt(start, &fCurrentStream->stream_header, size)) {
 		ERROR("OpenDMLParser::ParseChunk_strh: read error at pos %llu\n", start);
-		return false;
+		return B_ERROR;
 	}
 
 	#if B_HOST_IS_BENDIAN
@@ -487,24 +482,24 @@ OpenDMLParser::ParseChunk_strh(uint64 start, uint32 size)
 	TRACE("rect_right            = %d\n", fCurrentStream->stream_header.rect_right );
 	TRACE("rect_bottom           = %d\n", fCurrentStream->stream_header.rect_bottom);
 	
-	return true;
+	return B_OK;
 }
 
-bool
+status_t
 OpenDMLParser::ParseChunk_strf(uint64 start, uint32 size)
 {
 	TRACE("OpenDMLParser::ParseChunk_strf, size %lu\n", size);
 
 	if (fCurrentStream == 0) {
 		ERROR("OpenDMLParser::ParseChunk_strf: error, no Stream info\n");
-		return false;
+		return B_ERROR;
 	}
 	
 	if (fCurrentStream->is_audio) {
 
 		if (fCurrentStream->audio_format) {
 			TRACE("OpenDMLParser::ParseChunk_strf: error, already have audio format header\n");
-			return true; // just ignore, no error
+			return B_OK; // just ignore, no error
 		}
 
 //		if (size < sizeof(fCurrentStream->audio_format)) {
@@ -522,7 +517,7 @@ OpenDMLParser::ParseChunk_strf(uint64 start, uint32 size)
 			delete [] fCurrentStream->audio_format;
 			fCurrentStream->audio_format_size = 0;
 			fCurrentStream->audio_format = 0;
-			return false;
+			return B_ERROR;
 		}
 		
 		#if B_HOST_IS_BENDIAN
@@ -550,7 +545,7 @@ OpenDMLParser::ParseChunk_strf(uint64 start, uint32 size)
 
 		if (fCurrentStream->video_format_valid) {
 			TRACE("OpenDMLParser::ParseChunk_strf: error, already have video format header\n");
-			return true; // just ignore, no error
+			return B_OK; // just ignore, no error
 		}
 	
 //		if (size < sizeof(fCurrentStream->video_format)) {
@@ -562,7 +557,7 @@ OpenDMLParser::ParseChunk_strf(uint64 start, uint32 size)
 		size = min_c(size, sizeof(fCurrentStream->video_format));
 		if ((ssize_t)size != fSource->ReadAt(start, &fCurrentStream->video_format, size)) {
 			ERROR("OpenDMLParser::ParseChunk_strf: read error at pos %llu\n", start);
-			return false;
+			return B_ERROR;
 		}
 		
 		#if B_HOST_IS_BENDIAN
@@ -598,33 +593,33 @@ OpenDMLParser::ParseChunk_strf(uint64 start, uint32 size)
 		ERROR("OpenDMLParser::ParseChunk_strf: error, unknown Stream type\n");
 	}
 	
-	return true;
+	return B_OK;
 }
 
-bool
+status_t
 OpenDMLParser::ParseChunk_indx(uint64 start, uint32 size)
 {
 	TRACE("OpenDMLParser::ParseChunk_indx\n");
 
 	if (fCurrentStream == 0) {
 		ERROR("OpenDMLParser::ParseChunk_indx: error, no stream info\n");
-		return false;
+		return B_ERROR;
 	}
 	// XXX
 	fCurrentStream->odml_index_start = start;
 	fCurrentStream->odml_index_size = size;
 	
-	return true;
+	return B_OK;
 }
 
-bool
+status_t
 OpenDMLParser::ParseChunk_dmlh(uint64 start, uint32 size)
 {
 	TRACE("OpenDMLParser::ParseChunk_dmlh\n");
 
 	if (fOdmlExtendedHeaderValid) {
 		TRACE("OpenDMLParser::ParseChunk_dmlh: found a second chunk\n");
-		return true; // just ignore it, no error
+		return B_OK; // just ignore it, no error
 	}
 
 	if (size < sizeof(fOdmlExtendedHeader)) {
@@ -635,7 +630,7 @@ OpenDMLParser::ParseChunk_dmlh(uint64 start, uint32 size)
 	size = min_c(size, sizeof(fOdmlExtendedHeader));
 	if ((ssize_t)size != fSource->ReadAt(start, &fOdmlExtendedHeader, size)) {
 		ERROR("OpenDMLParser::ParseChunk_dmlh: read error at pos %llu\n", start);
-		return false;
+		return B_ERROR;
 	}
 	
 	#if B_HOST_IS_BENDIAN
@@ -647,10 +642,10 @@ OpenDMLParser::ParseChunk_dmlh(uint64 start, uint32 size)
 	TRACE("fOdmlExtendedHeader:\n");
 	TRACE("total_frames   = %lu\n", fOdmlExtendedHeader.total_frames);
 
-	return true;
+	return B_OK;
 }
 
-bool
+status_t
 OpenDMLParser::ParseList_strl(uint64 start, uint32 size)
 {
 	TRACE("OpenDMLParser::ParseList_strl\n");
@@ -661,7 +656,7 @@ OpenDMLParser::ParseList_strl(uint64 start, uint32 size)
 	return ParseList_generic(start, size);
 }
 
-bool
+status_t
 OpenDMLParser::ParseList_generic(uint64 start, uint32 size)
 {
 	TRACE("OpenDMLParser::ParseList_generic\n");
@@ -670,7 +665,7 @@ OpenDMLParser::ParseList_generic(uint64 start, uint32 size)
 
 	if (size < 9) {
 		ERROR("OpenDMLParser::ParseList_generic: list too small at pos %llu\n",pos);
-		return false;
+		return B_ERROR;
 	}
 
 	while (pos < end) {
@@ -680,14 +675,14 @@ OpenDMLParser::ParseList_generic(uint64 start, uint32 size)
 
 		if (sizeof(temp) != fSource->ReadAt(pos, &temp, sizeof(temp))) {
 			ERROR("OpenDMLParser::ParseList_generic: read error at pos %llu\n",pos);
-			return false;
+			return B_ERROR;
 		}
 		pos += 4;
 		Chunkfcc = AVI_UINT32(temp);
 		
 		if (sizeof(temp) != fSource->ReadAt(pos, &temp, sizeof(temp))) {
 			ERROR("OpenDMLParser::ParseList_generic: read error at pos %llu\n",pos);
-			return false;
+			return B_ERROR;
 		}
 		pos += 4;
 		Chunksize = AVI_UINT32(temp);
@@ -698,7 +693,7 @@ OpenDMLParser::ParseList_generic(uint64 start, uint32 size)
 
 		if (Chunksize == 0) {
 			ERROR("OpenDMLParser::ParseList_generic: chunk '"FOURCC_FORMAT"' has size 0\n", FOURCC_PARAM(Chunkfcc));
-			return false;
+			return B_ERROR;
 		}
 
 		if (Chunksize > maxsize) {
@@ -707,35 +702,35 @@ OpenDMLParser::ParseList_generic(uint64 start, uint32 size)
 		}
 
 		if (Chunkfcc == FOURCC('a','v','i','h')) {
-			if (!ParseChunk_avih(pos, Chunksize))
-				return false;
+			if (ParseChunk_avih(pos, Chunksize) < B_OK)
+				return B_ERROR;
 		} else if (Chunkfcc == FOURCC('L','I','S','T')) {
-			if (!ParseChunk_LIST(pos, Chunksize))
-				return false;
+			if (ParseChunk_LIST(pos, Chunksize) < B_OK)
+				return B_ERROR;
 		} else if (Chunkfcc == FOURCC('s','t','r','h')) {
-			if (!ParseChunk_strh(pos, Chunksize))
-				return false;
+			if (ParseChunk_strh(pos, Chunksize) < B_OK)
+				return B_ERROR;
 		} else if (Chunkfcc == FOURCC('s','t','r','f')) {
-			if (!ParseChunk_strf(pos, Chunksize))
-				return false;
+			if (ParseChunk_strf(pos, Chunksize) < B_OK)
+				return B_ERROR;
 		} else if (Chunkfcc == FOURCC('i','n','d','x')) {
-			if (!ParseChunk_indx(pos, Chunksize))
-				return false;
+			if (ParseChunk_indx(pos, Chunksize) < B_OK)
+				return B_ERROR;
 		} else if (Chunkfcc == FOURCC('d','m','l','h')) {
-			if (!ParseChunk_dmlh(pos, Chunksize))
-				return false;
+			if (ParseChunk_dmlh(pos, Chunksize) < B_OK)
+				return B_ERROR;
 		} else if (Chunkfcc == FOURCC('J','U','N','K')) {
 			; // do nothing
 		} else {
 			TRACE("OpenDMLParser::ParseList_generic: unknown chunk ignored\n");
 		}
 
-		pos += (Chunksize) + (Chunksize & 1);
+		pos += Chunksize + (Chunksize & 1);
 	}
-	return true;
+	return B_OK;
 }
 
-bool
+status_t
 OpenDMLParser::ParseList_movi(uint64 start, uint32 size)
 {
 	TRACE("OpenDMLParser::ParseList_movi\n");
@@ -744,6 +739,6 @@ OpenDMLParser::ParseList_movi(uint64 start, uint32 size)
 		fMovieListStart = start;
 	
 	fMovieChunkCount++;
-	return true;
+	return B_OK;
 }
 

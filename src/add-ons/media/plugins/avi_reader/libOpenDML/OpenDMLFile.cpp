@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004, Marcus Overhagen
+ * Copyright (c) 2004-2007, Marcus Overhagen
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -90,11 +90,11 @@ OpenDMLFile::IsSupported(BPositionIO *source)
 status_t
 OpenDMLFile::SetTo(BPositionIO *source)
 {
-	delete fParser;
 	fSource = source;
-	fParser = new OpenDMLParser;
+	delete fParser;
+	fParser = new OpenDMLParser(fSource);
 
-	if (!fParser->Parse(source)) {
+	if (fParser->Parse() < B_OK) {
 		ERROR("OpenDMLFile::SetTo: warning, file parsing failed\n");		
 	}
 	
@@ -322,8 +322,8 @@ OpenDMLFile::OdmlGetNextChunkInfo(int stream_index, int64 *start, uint32 *size, 
 	
 	data->index_chunk_entry_pos++;
 	
-	printf("OpenDMLFile::GetNextChunkInfo: stream %d: start %15Ld, size %6ld%s\n",
-		stream_index, *start, *size, *keyframe ? ", keyframe" : "");
+//	TRACE("OpenDMLFile::OdmlGetNextChunkInfo: stream %d: start %15Ld, size %6ld%s\n",
+//		stream_index, *start, *size, *keyframe ? ", keyframe" : "");
 	return true;
 }
 
@@ -340,8 +340,8 @@ OpenDMLFile::AviGetNextChunkInfo(int stream_index, int64 *start, uint32 *size, b
 			data->index_chunk_entry_pos = 0;
 			uint32 start = data->index_entry_start + data->index_entry_pos * data->index_entry_size;
 			int size = data->index_chunk_entry_count * data->index_entry_size;
-			TRACE("OpenDMLFile::AviGetNextChunkInfo: stream %d, index_chunk_entry_count %d, size %d, start %lu\n",
-				stream_index, data->index_chunk_entry_count, size, start);
+//			TRACE("OpenDMLFile::AviGetNextChunkInfo: stream %d, index_chunk_entry_count %d, size %d, start %lu\n",
+//				stream_index, data->index_chunk_entry_count, size, start);
 			if (size != fSource->ReadAt(start, data->index_chunk, size)) {
 				ERROR("OpenDMLFile::AviGetNextChunkInfo: read error\n");
 				return false;
@@ -362,8 +362,8 @@ OpenDMLFile::AviGetNextChunkInfo(int stream_index, int64 *start, uint32 *size, b
 			 
 		if (real_stream_index == stream_index) {		
 
-			TRACE("OpenDMLFile::AviGetNextChunkInfo: stream %d, chunk_id "FOURCC_FORMAT" (0x%08x), flags 0x%08x, offset %lu, length %lu\n",
-				 stream_index, FOURCC_PARAM(entry->chunk_id), entry->chunk_id, entry->flags, entry->chunk_offset, entry->chunk_length);
+//			TRACE("OpenDMLFile::AviGetNextChunkInfo: stream %d, chunk_id "FOURCC_FORMAT" (0x%08x), flags 0x%08x, offset %lu, length %lu\n",
+//				 stream_index, FOURCC_PARAM(entry->chunk_id), entry->chunk_id, entry->flags, entry->chunk_offset, entry->chunk_length);
 
 			*keyframe = entry->flags & AVIIF_KEYFRAME;
 			*start = data->index_base_offset + entry->chunk_offset + 8;  // skip 8 bytes (chunk id + chunk size)

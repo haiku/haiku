@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004, Marcus Overhagen
+ * Copyright (c) 2004-2007, Marcus Overhagen
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,

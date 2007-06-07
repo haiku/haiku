@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004, Marcus Overhagen
+ * Copyright (c) 2004-2007, Marcus Overhagen
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -46,9 +46,10 @@ struct stream_info
 class OpenDMLParser
 {
 public:
-					OpenDMLParser();
+					OpenDMLParser(BPositionIO *source);
 					~OpenDMLParser();
-	bool	 		Parse(BPositionIO *source);
+
+	status_t 		Parse();
 	
 	int				StreamCount();
 
@@ -63,17 +64,17 @@ public:
 	const odml_extended_header * OdmlExtendedHeader();
 
 private:
-	bool	 		ParseChunk_AVI(int number, uint64 start, uint32 size);
-	bool	 		ParseChunk_LIST(uint64 start, uint32 size);
-	bool	 		ParseChunk_idx1(uint64 start, uint32 size);
-	bool	 		ParseChunk_indx(uint64 start, uint32 size);
-	bool	 		ParseChunk_avih(uint64 start, uint32 size);
-	bool	 		ParseChunk_strh(uint64 start, uint32 size);
-	bool	 		ParseChunk_strf(uint64 start, uint32 size);
-	bool	 		ParseChunk_dmlh(uint64 start, uint32 size);
-	bool	 		ParseList_movi(uint64 start, uint32 size);
-	bool	 		ParseList_generic(uint64 start, uint32 size);
-	bool	 		ParseList_strl(uint64 start, uint32 size);
+	status_t		ParseChunk_AVI(int number, uint64 start, uint32 size);
+	status_t		ParseChunk_LIST(uint64 start, uint32 size);
+	status_t		ParseChunk_idx1(uint64 start, uint32 size);
+	status_t		ParseChunk_indx(uint64 start, uint32 size);
+	status_t		ParseChunk_avih(uint64 start, uint32 size);
+	status_t		ParseChunk_strh(uint64 start, uint32 size);
+	status_t		ParseChunk_strf(uint64 start, uint32 size);
+	status_t		ParseChunk_dmlh(uint64 start, uint32 size);
+	status_t		ParseList_movi(uint64 start, uint32 size);
+	status_t		ParseList_generic(uint64 start, uint32 size);
+	status_t		ParseList_strl(uint64 start, uint32 size);
 
 private:
 	void			CreateNewStreamInfo();
