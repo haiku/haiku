@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include "OpenDMLFile.h"
 
-//#define TRACE_ODML_FILE
+#define TRACE_ODML_FILE
 #ifdef TRACE_ODML_FILE
   #define TRACE printf
 #else

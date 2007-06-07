@@ -71,9 +71,11 @@ private:
 	status_t		ParseChunk_avih(uint64 start, uint32 size);
 	status_t		ParseChunk_strh(uint64 start, uint32 size);
 	status_t		ParseChunk_strf(uint64 start, uint32 size);
+	status_t		ParseChunk_strn(uint64 start, uint32 size);
 	status_t		ParseChunk_dmlh(uint64 start, uint32 size);
 	status_t		ParseList_movi(uint64 start, uint32 size);
 	status_t		ParseList_generic(uint64 start, uint32 size);
+	status_t		ParseList_INFO(uint64 start, uint32 size);
 	status_t		ParseList_strl(uint64 start, uint32 size);
 
 private:
