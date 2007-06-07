@@ -134,7 +134,7 @@ struct driver_entry {
 static void get_device_name(struct devfs_vnode *vnode, char *buffer, size_t size);
 static status_t publish_device(struct devfs *fs, const char *path,
 					device_node_info *deviceNode, pnp_devfs_driver_info *info,
-					driver_entry *driver, device_hooks *ops);
+					driver_entry *driver, device_hooks *ops, int32 apiVersion);
 
 
 /* the one and only allowed devfs instance */
@@ -193,8 +193,27 @@ load_driver(driver_entry *driver)
 
 	// For a valid device driver the following exports are required
 
-	uint32 *api_version;
-	if (get_image_symbol(image, "api_version", B_SYMBOL_TYPE_DATA, (void **)&api_version) != B_OK)
+	int32 defaultApiVersion = 1;
+	int32 *apiVersion = &defaultApiVersion;
+	if (get_image_symbol(image, "api_version", B_SYMBOL_TYPE_DATA, (void **)&apiVersion) == B_OK) {
+		// According to Be newsletter, vol II, issue 36,
+		// version 2 added readv/writev, which we don't support, but also select/deselect.
+		// So we must make sure not to use invalid pointers in publish_device.
+#if B_CUR_DRIVER_API_VERSION != 2
+		// just in case someone decides to bump up the api version
+#error Add checks here for new vs old api version!
+#endif
+		if (*apiVersion > B_CUR_DRIVER_API_VERSION) {
+			dprintf("%s: api_version %ld not handled\n", name, *apiVersion);
+			status = B_BAD_VALUE;
+			goto error1;
+		}
+		if (*apiVersion < 1) {
+			dprintf("%s: api_version invalid\n", name);
+			status = B_BAD_VALUE;
+			goto error1;
+		}
+	} else
 		dprintf("%s: api_version missing\n", name);
 
 	device_hooks *(*find_device)(const char *);
@@ -243,7 +262,7 @@ load_driver(driver_entry *driver)
 
 		if (hooks != NULL
 			&& publish_device(sDeviceFileSystem, devicePaths[0],
-					NULL, NULL, driver, hooks) == B_OK)
+					NULL, NULL, driver, hooks, *apiVersion) == B_OK)
 			exported++;
 	}
 
@@ -594,7 +613,7 @@ translate_partition_access(devfs_partition *partition, off_t &offset, size_t &si
 
 
 static pnp_devfs_driver_info *
-create_new_driver_info(device_hooks *ops)
+create_new_driver_info(device_hooks *ops, int32 version)
 {
 	pnp_devfs_driver_info *info = (pnp_devfs_driver_info *)malloc(sizeof(pnp_devfs_driver_info));
 	if (info == NULL)
@@ -607,14 +626,24 @@ create_new_driver_info(device_hooks *ops)
 	info->close = ops->close;
 	info->free = ops->free;
 	info->control = ops->control;
-	info->select = ops->select;
-	info->deselect = ops->deselect;
 	info->read = ops->read;
 	info->write = ops->write;
+		// depends on api_version
+	info->select = NULL;
+	info->deselect = NULL;
 
 	info->read_pages = NULL;
 	info->write_pages = NULL;
-		// old devices can't know to do physical page access
+		// old devices can't know how to do physical page access
+	
+	if (version >= 2) {
+		info->select = ops->select;
+		info->deselect = ops->deselect;
+		
+		// ops->readv;
+		// ops->writev;
+		// we don't implement scatter-gather atm, so ignore those.
+	}
 
 	return info;
 }
@@ -817,10 +846,10 @@ out:
 
 static status_t
 publish_device(struct devfs *fs, const char *path, device_node_info *deviceNode,
-	pnp_devfs_driver_info *info, driver_entry *driver, device_hooks *ops)
+	pnp_devfs_driver_info *info, driver_entry *driver, device_hooks *ops, int32 apiVersion)
 {
-	TRACE(("publish_device(path = \"%s\", node = %p, info = %p, hooks = %p)\n",
-		path, deviceNode, info, ops));
+	TRACE(("publish_device(path = \"%s\", node = %p, info = %p, hooks = %p, apiVersion = %d)\n",
+		path, deviceNode, info, ops, apiVersion));
 
 	if (sDeviceFileSystem == NULL) {
 		panic("publish_device() called before devfs mounted\n");
@@ -858,7 +887,7 @@ publish_device(struct devfs *fs, const char *path, device_node_info *deviceNode,
 	if (deviceNode != NULL)
 		node->stream.u.dev.info = info;
 	else
-		node->stream.u.dev.info = create_new_driver_info(ops);
+		node->stream.u.dev.info = create_new_driver_info(ops, apiVersion);
 
 	node->stream.u.dev.node = deviceNode;
 	node->stream.u.dev.driver = driver;
@@ -2016,7 +2045,7 @@ pnp_devfs_register_device(device_node_handle parent)
 		goto err2;
 
 	//add_device(device);
-	status = publish_device(sDeviceFileSystem, filename, node, info, NULL, NULL);
+	status = publish_device(sDeviceFileSystem, filename, node, info, NULL, NULL, 0);
 	if (status != B_OK)
 		goto err3;
 	//nudge();
@@ -2267,7 +2296,8 @@ devfs_unpublish_device(const char *path, bool disconnect)
 extern "C" status_t
 devfs_publish_device(const char *path, void *obsolete, device_hooks *ops)
 {
-	return publish_device(sDeviceFileSystem, path, NULL, NULL, NULL, ops);
+	// post R5: assume version 2
+	return publish_device(sDeviceFileSystem, path, NULL, NULL, NULL, ops, 2);
 }
 
 
