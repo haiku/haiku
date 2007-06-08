@@ -3642,6 +3642,13 @@ BView::ResizeTo(float width, float height)
 }
 
 
+void
+BView::ResizeTo(BSize size)
+{
+	ResizeBy(size.width - fBounds.Width(), size.height - fBounds.Height());
+}
+
+
 //	#pragma mark -
 //	Inherited Methods (from BHandler)
 
@@ -4843,7 +4850,7 @@ extern "C" void _ReservedView6__5BView() {}
 extern "C" void _ReservedView7__5BView() {}
 extern "C" void _ReservedView8__5BView() {}
 extern "C" void _ReservedView9__5BView() {}
-void BView::_ReservedView10(){}
+extern "C" void _ReservedView10__5BView() {}
 void BView::_ReservedView11(){}
 void BView::_ReservedView12(){}
 void BView::_ReservedView13(){}
@@ -4871,25 +4878,25 @@ void
 BView::PrintToStream()
 {
 	printf("BView::PrintToStream()\n");
-	printf("\tName: %s\
-\tParent: %s\
-\tFirstChild: %s\
-\tNextSibling: %s\
-\tPrevSibling: %s\
-\tOwner(Window): %s\
-\tToken: %ld\
-\tFlags: %ld\
-\tView origin: (%f,%f)\
-\tView Bounds rectangle: (%f,%f,%f,%f)\
-\tShow level: %d\
-\tTopView?: %s\
-\tBPicture: %s\
-\tVertical Scrollbar %s\
-\tHorizontal Scrollbar %s\
-\tIs Printing?: %s\
-\tShelf?: %s\
-\tEventMask: %ld\
-\tEventOptions: %ld\n",
+	printf("\tName: %s\n"
+		"\tParent: %s\n"
+		"\tFirstChild: %s\n"
+		"\tNextSibling: %s\n"
+		"\tPrevSibling: %s\n"
+		"\tOwner(Window): %s\n"
+		"\tToken: %ld\n"
+		"\tFlags: %ld\n"
+		"\tView origin: (%f,%f)\n"
+		"\tView Bounds rectangle: (%f,%f,%f,%f)\n"
+		"\tShow level: %d\n"
+		"\tTopView?: %s\n"
+		"\tBPicture: %s\n"
+		"\tVertical Scrollbar %s\n"
+		"\tHorizontal Scrollbar %s\n"
+		"\tIs Printing?: %s\n"
+		"\tShelf?: %s\n"
+		"\tEventMask: %ld\n"
+		"\tEventOptions: %ld\n",
 	Name(),
 	fParent ? fParent->Name() : "NULL",
 	fFirstChild ? fFirstChild->Name() : "NULL",
@@ -4910,23 +4917,23 @@ BView::PrintToStream()
 	fEventMask,
 	fEventOptions);
 	
-	printf("\tState status:\
-\t\tLocalCoordianteSystem: (%f,%f)\
-\t\tPenLocation: (%f,%f)\
-\t\tPenSize: %f\
-\t\tHighColor: [%d,%d,%d,%d]\
-\t\tLowColor: [%d,%d,%d,%d]\
-\t\tViewColor: [%d,%d,%d,%d]\
-\t\tPattern: %llx\
-\t\tDrawingMode: %d\
-\t\tLineJoinMode: %d\
-\t\tLineCapMode: %d\
-\t\tMiterLimit: %f\
-\t\tAlphaSource: %d\
-\t\tAlphaFuntion: %d\
-\t\tScale: %f\
-\t\t(Print)FontAliasing: %s\
-\t\tFont Info:\n",
+	printf("\tState status:\n"
+		"\t\tLocalCoordianteSystem: (%f,%f)\n"
+		"\t\tPenLocation: (%f,%f)\n"
+		"\t\tPenSize: %f\n"
+		"\t\tHighColor: [%d,%d,%d,%d]\n"
+		"\t\tLowColor: [%d,%d,%d,%d]\n"
+		"\t\tViewColor: [%d,%d,%d,%d]\n"
+		"\t\tPattern: %llx\n"
+		"\t\tDrawingMode: %d\n"
+		"\t\tLineJoinMode: %d\n"
+		"\t\tLineCapMode: %d\n"
+		"\t\tMiterLimit: %f\n"
+		"\t\tAlphaSource: %d\n"
+		"\t\tAlphaFuntion: %d\n"
+		"\t\tScale: %f\n"
+		"\t\t(Print)FontAliasing: %s\n"
+		"\t\tFont Info:\n",
 	fState->origin.x, fState->origin.y,
 	fState->pen_location.x, fState->pen_location.y,
 	fState->pen_size,

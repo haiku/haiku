@@ -80,9 +80,7 @@ const uint32 _B_RESERVED7_ 				= 0x00200000UL;	/* 22 */
 const uint32 B_SUPPORTS_LAYOUT			= 0x00100000UL;	/* 21 */
 const uint32 B_INVALIDATE_AFTER_LAYOUT	= 0x00080000UL;	/* 20 */
 
-#define _RESIZE_MASK_ ~(B_FULL_UPDATE_ON_RESIZE | _B_RESERVED1_ | B_WILL_DRAW \
-	| B_PULSE_NEEDED | B_NAVIGABLE_JUMP | B_FRAME_EVENTS | B_NAVIGABLE \
-	| B_SUBPIXEL_PRECISE | B_DRAW_ON_CHILDREN | B_INPUT_METHOD_AWARE | _B_RESERVED7_)
+#define _RESIZE_MASK_ (0xffff)
 
 const uint32 _VIEW_TOP_ 	= 1UL;
 const uint32 _VIEW_LEFT_ 	= 2UL;
@@ -473,6 +471,7 @@ public:
 			void			MoveTo(float x, float y);
 			void			ResizeBy(float dh, float dv);
 			void			ResizeTo(float width, float height);
+			void			ResizeTo(BSize size);
 			void			ScrollBy(float dh, float dv);
 			void			ScrollTo(float x, float y);
 	virtual	void			ScrollTo(BPoint where);
@@ -533,7 +532,7 @@ public:
 	virtual	void			SetLayout(BLayout* layout);
 			BLayout*		GetLayout() const;
 
-			void			InvalidateLayout(bool descendants = false);
+	virtual	void			InvalidateLayout(bool descendants = false);
 			void			EnableLayoutInvalidation();
 			void			DisableLayoutInvalidation();
 			bool			IsLayoutValid() const;
@@ -560,7 +559,6 @@ private:
 	friend class BTabView;
 	friend class BWindow;
 
-	virtual	void			_ReservedView10();
 	virtual	void			_ReservedView11();
 	virtual	void			_ReservedView12();
 	virtual	void			_ReservedView13();
