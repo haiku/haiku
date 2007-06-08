@@ -55,8 +55,7 @@ static void TAG(triangle)(GLcontext *ctx, GLuint e0, GLuint e1, GLuint e2 )
       if (IND & (SS_TWOSIDE_BIT | SS_UNFILLED_BIT))
       {
 	 facing = (cc < 0.0) ^ ctx->Polygon._FrontBit;
-         if (ctx->Stencil.TestTwoSide)
-            ctx->_Facing = facing; /* for 2-sided stencil test */
+         ctx->_Facing = facing;
 
 	 if (IND & SS_UNFILLED_BIT)
 	    mode = facing ? ctx->Polygon.BackMode : ctx->Polygon.FrontMode;
@@ -64,22 +63,24 @@ static void TAG(triangle)(GLcontext *ctx, GLuint e0, GLuint e1, GLuint e2 )
 	 if (facing == 1) {
 	    if (IND & SS_TWOSIDE_BIT) {
 	       if (IND & SS_RGBA_BIT) {
-		  GLfloat (*vbcolor)[4] = VB->ColorPtr[1]->data;
+                  if (VB->ColorPtr[1]) {
+                     GLfloat (*vbcolor)[4] = VB->ColorPtr[1]->data;
 
-		  COPY_CHAN4(saved_color[0], v[0]->color);
-		  COPY_CHAN4(saved_color[1], v[1]->color);
-		  COPY_CHAN4(saved_color[2], v[2]->color);
+                     COPY_CHAN4(saved_color[0], v[0]->color);
+                     COPY_CHAN4(saved_color[1], v[1]->color);
+                     COPY_CHAN4(saved_color[2], v[2]->color);
 
-		  if (VB->ColorPtr[1]->stride) {
-		     SS_COLOR(v[0]->color, vbcolor[e0]);
-		     SS_COLOR(v[1]->color, vbcolor[e1]);
-		     SS_COLOR(v[2]->color, vbcolor[e2]);
-		  }
-		  else {
-		     SS_COLOR(v[0]->color, vbcolor[0]);
-		     SS_COLOR(v[1]->color, vbcolor[0]);
-		     SS_COLOR(v[2]->color, vbcolor[0]);
-		  }
+                     if (VB->ColorPtr[1]->stride) {
+                        SS_COLOR(v[0]->color, vbcolor[e0]);
+                        SS_COLOR(v[1]->color, vbcolor[e1]);
+                        SS_COLOR(v[2]->color, vbcolor[e2]);
+                     }
+                     else {
+                        SS_COLOR(v[0]->color, vbcolor[0]);
+                        SS_COLOR(v[1]->color, vbcolor[0]);
+                        SS_COLOR(v[2]->color, vbcolor[0]);
+                     }
+                  }
 
 		  if (VB->SecondaryColorPtr[1]) {
 		     GLfloat (*vbspec)[4] = VB->SecondaryColorPtr[1]->data;
@@ -168,9 +169,12 @@ static void TAG(triangle)(GLcontext *ctx, GLuint e0, GLuint e1, GLuint e2 )
    if (IND & SS_TWOSIDE_BIT) {
       if (facing == 1) {
 	 if (IND & SS_RGBA_BIT) {
-	    COPY_CHAN4(v[0]->color, saved_color[0]);
-	    COPY_CHAN4(v[1]->color, saved_color[1]);
-	    COPY_CHAN4(v[2]->color, saved_color[2]);
+            if (VB->ColorPtr[1]) {
+               COPY_CHAN4(v[0]->color, saved_color[0]);
+               COPY_CHAN4(v[1]->color, saved_color[1]);
+               COPY_CHAN4(v[2]->color, saved_color[2]);
+            }
+
 	    if (VB->SecondaryColorPtr[1]) {
 	       COPY_CHAN4(v[0]->specular, saved_spec[0]);
 	       COPY_CHAN4(v[1]->specular, saved_spec[1]);

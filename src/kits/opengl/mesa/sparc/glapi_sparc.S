@@ -1855,6 +1855,7 @@ _mesa_sparc_glapi_end:
 	.globl glBindProgramARB ; .type glBindProgramARB,#function ; glBindProgramARB = glBindProgramNV
 	.globl glDeleteProgramsARB ; .type glDeleteProgramsARB,#function ; glDeleteProgramsARB = glDeleteProgramsNV
 	.globl glGenProgramsARB ; .type glGenProgramsARB,#function ; glGenProgramsARB = glGenProgramsNV
+	.globl glGetVertexAttribPointerv ; .type glGetVertexAttribPointerv,#function ; glGetVertexAttribPointerv = glGetVertexAttribPointervNV
 	.globl glGetVertexAttribPointervARB ; .type glGetVertexAttribPointervARB,#function ; glGetVertexAttribPointervARB = glGetVertexAttribPointervNV
 	.globl glIsProgramARB ; .type glIsProgramARB,#function ; glIsProgramARB = glIsProgramNV
 	.globl glPointParameteri ; .type glPointParameteri,#function ; glPointParameteri = glPointParameteriNV

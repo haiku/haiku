@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5
+ * Version:  6.5.3
  *
- * Copyright (C) 1999-2005  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -36,12 +36,12 @@
  *    DO_RGBA      - if defined, compute RGBA values
  *    DO_INDEX     - if defined, compute color index values
  *    DO_SPEC      - if defined, compute specular RGB values
- *    DO_TEX       - if defined, compute unit 0 STRQ texcoords
- *    DO_MULTITEX  - if defined, compute all unit's STRQ texcoords
+ *    DO_ATTRIBS   - if defined, compute texcoords, varying, etc.
  */
 
 /*void triangle( GLcontext *ctx, GLuint v0, GLuint v1, GLuint v2, GLuint pv )*/
 {
+   const SWcontext *swrast = SWRAST_CONTEXT(ctx);
    const GLfloat *p0 = v0->win;
    const GLfloat *p1 = v1->win;
    const GLfloat *p2 = v2->win;
@@ -70,20 +70,18 @@
 #ifdef DO_SPEC
    GLfloat srPlane[4], sgPlane[4], sbPlane[4];
 #endif
-#ifdef DO_TEX
-   GLfloat sPlane[4], tPlane[4], uPlane[4], vPlane[4];
-   GLfloat texWidth, texHeight;
-#elif defined(DO_MULTITEX)
-   GLfloat sPlane[MAX_TEXTURE_COORD_UNITS][4];  /* texture S */
-   GLfloat tPlane[MAX_TEXTURE_COORD_UNITS][4];  /* texture T */
-   GLfloat uPlane[MAX_TEXTURE_COORD_UNITS][4];  /* texture R */
-   GLfloat vPlane[MAX_TEXTURE_COORD_UNITS][4];  /* texture Q */
-   GLfloat texWidth[MAX_TEXTURE_COORD_UNITS];
-   GLfloat texHeight[MAX_TEXTURE_COORD_UNITS];
+#if defined(DO_ATTRIBS)
+   GLfloat sPlane[FRAG_ATTRIB_MAX][4];  /* texture S */
+   GLfloat tPlane[FRAG_ATTRIB_MAX][4];  /* texture T */
+   GLfloat uPlane[FRAG_ATTRIB_MAX][4];  /* texture R */
+   GLfloat vPlane[FRAG_ATTRIB_MAX][4];  /* texture Q */
+   GLfloat texWidth[FRAG_ATTRIB_MAX];
+   GLfloat texHeight[FRAG_ATTRIB_MAX];
 #endif
    GLfloat bf = SWRAST_CONTEXT(ctx)->_BackfaceSign;
    
-   
+   (void) swrast;
+
    INIT_SPAN(span, GL_POLYGON, 0, 0, SPAN_COVERAGE);
 
    /* determine bottom to top order of vertices */
@@ -138,7 +136,11 @@
    span.arrayMask |= SPAN_Z;
 #endif
 #ifdef DO_FOG
-   compute_plane(p0, p1, p2, v0->fog, v1->fog, v2->fog, fogPlane);
+   compute_plane(p0, p1, p2,
+                 v0->attrib[FRAG_ATTRIB_FOGC][0],
+                 v1->attrib[FRAG_ATTRIB_FOGC][0],
+                 v2->attrib[FRAG_ATTRIB_FOGC][0],
+                 fogPlane);
    span.arrayMask |= SPAN_FOG;
 #endif
 #ifdef DO_RGBA
@@ -179,65 +181,41 @@
    }
    span.arrayMask |= SPAN_SPEC;
 #endif
-#ifdef DO_TEX
+#if defined(DO_ATTRIBS)
    {
-      const struct gl_texture_object *obj = ctx->Texture.Unit[0]._Current;
-      const struct gl_texture_image *texImage = obj->Image[0][obj->BaseLevel];
       const GLfloat invW0 = v0->win[3];
       const GLfloat invW1 = v1->win[3];
       const GLfloat invW2 = v2->win[3];
-      const GLfloat s0 = v0->texcoord[0][0] * invW0;
-      const GLfloat s1 = v1->texcoord[0][0] * invW1;
-      const GLfloat s2 = v2->texcoord[0][0] * invW2;
-      const GLfloat t0 = v0->texcoord[0][1] * invW0;
-      const GLfloat t1 = v1->texcoord[0][1] * invW1;
-      const GLfloat t2 = v2->texcoord[0][1] * invW2;
-      const GLfloat r0 = v0->texcoord[0][2] * invW0;
-      const GLfloat r1 = v1->texcoord[0][2] * invW1;
-      const GLfloat r2 = v2->texcoord[0][2] * invW2;
-      const GLfloat q0 = v0->texcoord[0][3] * invW0;
-      const GLfloat q1 = v1->texcoord[0][3] * invW1;
-      const GLfloat q2 = v2->texcoord[0][3] * invW2;
-      compute_plane(p0, p1, p2, s0, s1, s2, sPlane);
-      compute_plane(p0, p1, p2, t0, t1, t2, tPlane);
-      compute_plane(p0, p1, p2, r0, r1, r2, uPlane);
-      compute_plane(p0, p1, p2, q0, q1, q2, vPlane);
-      texWidth = (GLfloat) texImage->Width;
-      texHeight = (GLfloat) texImage->Height;
-   }
-   span.arrayMask |= (SPAN_TEXTURE | SPAN_LAMBDA);
-#elif defined(DO_MULTITEX)
-   {
-      GLuint u;
-      for (u = 0; u < ctx->Const.MaxTextureUnits; u++) {
-         if (ctx->Texture.Unit[u]._ReallyEnabled) {
+      ATTRIB_LOOP_BEGIN
+         const GLfloat s0 = v0->attrib[attr][0] * invW0;
+         const GLfloat s1 = v1->attrib[attr][0] * invW1;
+         const GLfloat s2 = v2->attrib[attr][0] * invW2;
+         const GLfloat t0 = v0->attrib[attr][1] * invW0;
+         const GLfloat t1 = v1->attrib[attr][1] * invW1;
+         const GLfloat t2 = v2->attrib[attr][1] * invW2;
+         const GLfloat r0 = v0->attrib[attr][2] * invW0;
+         const GLfloat r1 = v1->attrib[attr][2] * invW1;
+         const GLfloat r2 = v2->attrib[attr][2] * invW2;
+         const GLfloat q0 = v0->attrib[attr][3] * invW0;
+         const GLfloat q1 = v1->attrib[attr][3] * invW1;
+         const GLfloat q2 = v2->attrib[attr][3] * invW2;
+         compute_plane(p0, p1, p2, s0, s1, s2, sPlane[attr]);
+         compute_plane(p0, p1, p2, t0, t1, t2, tPlane[attr]);
+         compute_plane(p0, p1, p2, r0, r1, r2, uPlane[attr]);
+         compute_plane(p0, p1, p2, q0, q1, q2, vPlane[attr]);
+         if (attr < FRAG_ATTRIB_VAR0) {
+            const GLuint u = attr - FRAG_ATTRIB_TEX0;
             const struct gl_texture_object *obj = ctx->Texture.Unit[u]._Current;
             const struct gl_texture_image *texImage = obj->Image[0][obj->BaseLevel];
-            const GLfloat invW0 = v0->win[3];
-            const GLfloat invW1 = v1->win[3];
-            const GLfloat invW2 = v2->win[3];
-            const GLfloat s0 = v0->texcoord[u][0] * invW0;
-            const GLfloat s1 = v1->texcoord[u][0] * invW1;
-            const GLfloat s2 = v2->texcoord[u][0] * invW2;
-            const GLfloat t0 = v0->texcoord[u][1] * invW0;
-            const GLfloat t1 = v1->texcoord[u][1] * invW1;
-            const GLfloat t2 = v2->texcoord[u][1] * invW2;
-            const GLfloat r0 = v0->texcoord[u][2] * invW0;
-            const GLfloat r1 = v1->texcoord[u][2] * invW1;
-            const GLfloat r2 = v2->texcoord[u][2] * invW2;
-            const GLfloat q0 = v0->texcoord[u][3] * invW0;
-            const GLfloat q1 = v1->texcoord[u][3] * invW1;
-            const GLfloat q2 = v2->texcoord[u][3] * invW2;
-            compute_plane(p0, p1, p2, s0, s1, s2, sPlane[u]);
-            compute_plane(p0, p1, p2, t0, t1, t2, tPlane[u]);
-            compute_plane(p0, p1, p2, r0, r1, r2, uPlane[u]);
-            compute_plane(p0, p1, p2, q0, q1, q2, vPlane[u]);
-            texWidth[u]  = (GLfloat) texImage->Width;
-            texHeight[u] = (GLfloat) texImage->Height;
+            texWidth[attr]  = (GLfloat) texImage->Width;
+            texHeight[attr] = (GLfloat) texImage->Height;
          }
-      }
+         else {
+            texWidth[attr] = texHeight[attr] = 1.0;
+         }
+      ATTRIB_LOOP_END
    }
-   span.arrayMask |= (SPAN_TEXTURE | SPAN_LAMBDA);
+   span.arrayMask |= (SPAN_TEXTURE | SPAN_LAMBDA | SPAN_VARYING);
 #endif
 
    /* Begin bottom-to-top scan over the triangle.
@@ -289,7 +267,7 @@
             array->z[count] = (GLuint) solve_plane(cx, cy, zPlane);
 #endif
 #ifdef DO_FOG
-	    array->fog[count] = solve_plane(cx, cy, fogPlane);
+	    array->attribs[FRAG_ATTRIB_FOGC][count][0] = solve_plane(cx, cy, fogPlane);
 #endif
 #ifdef DO_RGBA
             array->rgba[count][RCOMP] = solve_plane_chan(cx, cy, rPlane);
@@ -305,31 +283,19 @@
             array->spec[count][GCOMP] = solve_plane_chan(cx, cy, sgPlane);
             array->spec[count][BCOMP] = solve_plane_chan(cx, cy, sbPlane);
 #endif
-#ifdef DO_TEX
-            {
-               const GLfloat invQ = solve_plane_recip(cx, cy, vPlane);
-               array->texcoords[0][count][0] = solve_plane(cx, cy, sPlane) * invQ;
-               array->texcoords[0][count][1] = solve_plane(cx, cy, tPlane) * invQ;
-               array->texcoords[0][count][2] = solve_plane(cx, cy, uPlane) * invQ;
-               array->lambda[0][count] = compute_lambda(sPlane, tPlane, vPlane,
-                                                      cx, cy, invQ,
-                                                      texWidth, texHeight);
-            }
-#elif defined(DO_MULTITEX)
-            {
-               GLuint unit;
-               for (unit = 0; unit < ctx->Const.MaxTextureUnits; unit++) {
-                  if (ctx->Texture.Unit[unit]._ReallyEnabled) {
-                     GLfloat invQ = solve_plane_recip(cx, cy, vPlane[unit]);
-                     array->texcoords[unit][count][0] = solve_plane(cx, cy, sPlane[unit]) * invQ;
-                     array->texcoords[unit][count][1] = solve_plane(cx, cy, tPlane[unit]) * invQ;
-                     array->texcoords[unit][count][2] = solve_plane(cx, cy, uPlane[unit]) * invQ;
-                     array->lambda[unit][count] = compute_lambda(sPlane[unit],
-                                      tPlane[unit], vPlane[unit], cx, cy, invQ,
-                                      texWidth[unit], texHeight[unit]);
-                  }
+#if defined(DO_ATTRIBS)
+            ATTRIB_LOOP_BEGIN
+               GLfloat invQ = solve_plane_recip(cx, cy, vPlane[attr]);
+               array->attribs[attr][count][0] = solve_plane(cx, cy, sPlane[attr]) * invQ;
+               array->attribs[attr][count][1] = solve_plane(cx, cy, tPlane[attr]) * invQ;
+               array->attribs[attr][count][2] = solve_plane(cx, cy, uPlane[attr]) * invQ;
+               if (attr < FRAG_ATTRIB_VAR0) {
+                  const GLuint unit = attr - FRAG_ATTRIB_TEX0;
+                  array->lambda[unit][count] = compute_lambda(sPlane[attr], tPlane[attr],
+                                                              vPlane[attr], cx, cy, invQ,
+                                                              texWidth[attr], texHeight[attr]);
                }
-            }
+            ATTRIB_LOOP_END
 #endif
             ix++;
             count++;
@@ -393,7 +359,7 @@
             array->z[ix] = (GLuint) solve_plane(cx, cy, zPlane);
 #endif
 #ifdef DO_FOG
-            array->fog[ix] = solve_plane(cx, cy, fogPlane);
+            array->attribs[FRAG_ATTRIB_FOGC][ix][0] = solve_plane(cx, cy, fogPlane);
 #endif
 #ifdef DO_RGBA
             array->rgba[ix][RCOMP] = solve_plane_chan(cx, cy, rPlane);
@@ -409,33 +375,22 @@
             array->spec[ix][GCOMP] = solve_plane_chan(cx, cy, sgPlane);
             array->spec[ix][BCOMP] = solve_plane_chan(cx, cy, sbPlane);
 #endif
-#ifdef DO_TEX
-            {
-               const GLfloat invQ = solve_plane_recip(cx, cy, vPlane);
-               array->texcoords[0][ix][0] = solve_plane(cx, cy, sPlane) * invQ;
-               array->texcoords[0][ix][1] = solve_plane(cx, cy, tPlane) * invQ;
-               array->texcoords[0][ix][2] = solve_plane(cx, cy, uPlane) * invQ;
-               array->lambda[0][ix] = compute_lambda(sPlane, tPlane, vPlane,
-                                          cx, cy, invQ, texWidth, texHeight);
-            }
-#elif defined(DO_MULTITEX)
-            {
-               GLuint unit;
-               for (unit = 0; unit < ctx->Const.MaxTextureUnits; unit++) {
-                  if (ctx->Texture.Unit[unit]._ReallyEnabled) {
-                     GLfloat invQ = solve_plane_recip(cx, cy, vPlane[unit]);
-                     array->texcoords[unit][ix][0] = solve_plane(cx, cy, sPlane[unit]) * invQ;
-                     array->texcoords[unit][ix][1] = solve_plane(cx, cy, tPlane[unit]) * invQ;
-                     array->texcoords[unit][ix][2] = solve_plane(cx, cy, uPlane[unit]) * invQ;
-                     array->lambda[unit][ix] = compute_lambda(sPlane[unit],
-                                                            tPlane[unit],
-                                                            vPlane[unit],
-                                                            cx, cy, invQ,
-                                                            texWidth[unit],
-                                                            texHeight[unit]);
-                  }
+#if defined(DO_ATTRIBS)
+            ATTRIB_LOOP_BEGIN
+               GLfloat invQ = solve_plane_recip(cx, cy, vPlane[attr]);
+               array->attribs[attr][ix][0] = solve_plane(cx, cy, sPlane[attr]) * invQ;
+               array->attribs[attr][ix][1] = solve_plane(cx, cy, tPlane[attr]) * invQ;
+               array->attribs[attr][ix][2] = solve_plane(cx, cy, uPlane[attr]) * invQ;
+               if (attr < FRAG_ATTRIB_VAR0) {
+                  const GLuint unit = attr - FRAG_ATTRIB_TEX0;
+                  array->lambda[unit][ix] = compute_lambda(sPlane[attr],
+                                                           tPlane[attr],
+                                                           vPlane[attr],
+                                                           cx, cy, invQ,
+                                                           texWidth[attr],
+                                                           texHeight[attr]);
                }
-            }
+            ATTRIB_LOOP_END
 #endif
             ix--;
             count++;
@@ -468,33 +423,28 @@
                array->z[j] = array->z[j + left];
 #endif
 #ifdef DO_FOG
-               array->fog[j] = array->fog[j + left];
+               array->attribs[FRAG_ATTRIB_FOGC][j][0]
+                  = array->attribs[FRAG_ATTRIB_FOGC][j + left][0];
 #endif
-#ifdef DO_TEX
-               COPY_4V(array->texcoords[0][j], array->texcoords[0][j + left]);
-#endif
-#if defined(DO_MULTITEX) || defined(DO_TEX)
+#if defined(DO_ATTRIBS)
                array->lambda[0][j] = array->lambda[0][j + left];
 #endif
                array->coverage[j] = array->coverage[j + left];
             }
          }
-#ifdef DO_MULTITEX
-         /* shift texcoords */
+#ifdef DO_ATTRIBS
+         /* shift texcoords, varying */
          {
             SWspanarrays *array = span.array;
-            GLuint unit;
-            for (unit = 0; unit < ctx->Const.MaxTextureUnits; unit++) {
-               if (ctx->Texture.Unit[unit]._ReallyEnabled) {
-                  GLint j;
-                  for (j = 0; j < (GLint) n; j++) {
-		     array->texcoords[unit][j][0] = array->texcoords[unit][j + left][0];
-                     array->texcoords[unit][j][1] = array->texcoords[unit][j + left][1];
-                     array->texcoords[unit][j][2] = array->texcoords[unit][j + left][2];
-                     array->lambda[unit][j] = array->lambda[unit][j + left];
-                  }
+            ATTRIB_LOOP_BEGIN
+               GLint j;
+               for (j = 0; j < (GLint) n; j++) {
+                  array->attribs[attr][j][0] = array->attribs[attr][j + left][0];
+                  array->attribs[attr][j][1] = array->attribs[attr][j + left][1];
+                  array->attribs[attr][j][2] = array->attribs[attr][j + left][2];
+                  /*array->lambda[unit][j] = array->lambda[unit][j + left];*/
                }
-            }
+            ATTRIB_LOOP_END
          }
 #endif
 
@@ -532,12 +482,8 @@
 #undef DO_SPEC
 #endif
 
-#ifdef DO_TEX
-#undef DO_TEX
-#endif
-
-#ifdef DO_MULTITEX
-#undef DO_MULTITEX
+#ifdef DO_ATTRIBS
+#undef DO_ATTRIBS
 #endif
 
 #ifdef DO_OCCLUSION_TEST

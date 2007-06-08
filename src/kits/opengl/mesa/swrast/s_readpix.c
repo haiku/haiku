@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.2
+ * Version:  6.5.3
  *
- * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -54,7 +54,8 @@ read_index_pixels( GLcontext *ctx,
    struct gl_renderbuffer *rb = ctx->ReadBuffer->_ColorReadBuffer;
    GLint i;
 
-   ASSERT(rb);
+   if (!rb)
+      return;
 
    /* width should never be > MAX_WIDTH since we did clipping earlier */
    ASSERT(width <= MAX_WIDTH);
@@ -91,15 +92,16 @@ read_depth_pixels( GLcontext *ctx,
    const GLboolean biasOrScale
       = ctx->Pixel.DepthScale != 1.0 || ctx->Pixel.DepthBias != 0.0;
 
+   if (!rb)
+      return;
+
    /* clipping should have been done already */
    ASSERT(x >= 0);
    ASSERT(y >= 0);
-   ASSERT(x + width <= rb->Width);
-   ASSERT(y + height <= rb->Height);
+   ASSERT(x + width <= (GLint) rb->Width);
+   ASSERT(y + height <= (GLint) rb->Height);
    /* width should never be > MAX_WIDTH since we did clipping earlier */
    ASSERT(width <= MAX_WIDTH);
-
-   ASSERT(rb);
 
    if (type == GL_UNSIGNED_SHORT && fb->Visual.depthBits == 16
        && !biasOrScale && !packing->SwapBytes) {
@@ -117,7 +119,7 @@ read_depth_pixels( GLcontext *ctx,
             && !biasOrScale && !packing->SwapBytes) {
       /* Special case: directly read 24-bit unsigned depth values. */
       GLint j;
-      ASSERT(rb->InternalFormat == GL_DEPTH_COMPONENT32);
+      ASSERT(rb->InternalFormat == GL_DEPTH_COMPONENT24);
       ASSERT(rb->DataType == GL_UNSIGNED_INT);
       for (j = 0; j < height; j++, y++) {
          GLuint *dest = (GLuint *)
@@ -171,7 +173,8 @@ read_stencil_pixels( GLcontext *ctx,
    struct gl_renderbuffer *rb = fb->_StencilBuffer;
    GLint j;
 
-   ASSERT(rb);
+   if (!rb)
+      return;
 
    /* width should never be > MAX_WIDTH since we did clipping earlier */
    ASSERT(width <= MAX_WIDTH);
@@ -195,6 +198,7 @@ read_stencil_pixels( GLcontext *ctx,
 /**
  * Optimized glReadPixels for particular pixel formats when pixel
  * scaling, biasing, mapping, etc. are disabled.
+ * \return GL_TRUE if success, GL_FALSE if unable to do the readpixels
  */
 static GLboolean
 fast_read_rgba_pixels( GLcontext *ctx,
@@ -207,11 +211,14 @@ fast_read_rgba_pixels( GLcontext *ctx,
 {
    struct gl_renderbuffer *rb = ctx->ReadBuffer->_ColorReadBuffer;
 
+   if (!rb)
+      return GL_FALSE;
+
    ASSERT(rb->_BaseFormat == GL_RGBA || rb->_BaseFormat == GL_RGB);
 
    /* clipping should have already been done */
-   ASSERT(x + width <= rb->Width);
-   ASSERT(y + height <= rb->Height);
+   ASSERT(x + width <= (GLint) rb->Width);
+   ASSERT(y + height <= (GLint) rb->Height);
 
    /* check for things we can't handle here */
    if (transferOps ||
@@ -223,8 +230,9 @@ fast_read_rgba_pixels( GLcontext *ctx,
    if (format == GL_RGBA && rb->DataType == type) {
       const GLint dstStride = _mesa_image_row_stride(packing, width,
                                                      format, type);
-      GLubyte *dest = _mesa_image_address2d(packing, pixels, width, height,
-                                            format, type, 0, 0);
+      GLubyte *dest
+         = (GLubyte *) _mesa_image_address2d(packing, pixels, width, height,
+                                             format, type, 0, 0);
       GLint row;
       ASSERT(rb->GetRow);
       for (row = 0; row < height; row++) {
@@ -239,8 +247,9 @@ fast_read_rgba_pixels( GLcontext *ctx,
        type == GL_UNSIGNED_BYTE) {
       const GLint dstStride = _mesa_image_row_stride(packing, width,
                                                      format, type);
-      GLubyte *dest = _mesa_image_address2d(packing, pixels, width, height,
-                                            format, type, 0, 0);
+      GLubyte *dest
+         = (GLubyte *) _mesa_image_address2d(packing, pixels, width, height,
+                                             format, type, 0, 0);
       GLint row;
       ASSERT(rb->GetRow);
       for (row = 0; row < height; row++) {
@@ -314,7 +323,8 @@ read_rgba_pixels( GLcontext *ctx,
    struct gl_framebuffer *fb = ctx->ReadBuffer;
    struct gl_renderbuffer *rb = fb->_ColorReadBuffer;
 
-   ASSERT(rb);
+   if (!rb)
+      return;
 
    if (type == GL_FLOAT && ((ctx->Color.ClampReadColor == GL_TRUE) ||
                             (ctx->Color.ClampReadColor == GL_FIXED_ONLY_ARB &&
@@ -394,10 +404,15 @@ read_rgba_pixels( GLcontext *ctx,
       /* no convolution */
       const GLint dstStride
          = _mesa_image_row_stride(packing, width, format, type);
-      GLfloat (*rgba)[4] = swrast->SpanArrays->color.sz4.rgba;
+      GLfloat (*rgba)[4] = swrast->SpanArrays->attribs[FRAG_ATTRIB_COL0];
       GLint row;
-      GLubyte *dst = _mesa_image_address2d(packing, pixels, width, height,
-                                           format, type, 0, 0);
+      GLubyte *dst
+         = (GLubyte *) _mesa_image_address2d(packing, pixels, width, height,
+                                             format, type, 0, 0);
+
+      /* make sure we don't apply 1D convolution */
+      transferOps &= ~(IMAGE_CONVOLUTION_BIT |
+                       IMAGE_POST_CONVOLUTION_SCALE_BIAS);
 
       for (row = 0; row < height; row++, y++) {
 
@@ -454,8 +469,8 @@ read_depth_stencil_pixels(GLcontext *ctx,
    depthRb = ctx->ReadBuffer->_DepthBuffer;
    stencilRb = ctx->ReadBuffer->_StencilBuffer;
 
-   ASSERT(depthRb);
-   ASSERT(stencilRb);
+   if (!depthRb || !stencilRb)
+      return;
 
    depthRb = ctx->ReadBuffer->Attachment[BUFFER_DEPTH].Renderbuffer;
    stencilRb = ctx->ReadBuffer->Attachment[BUFFER_STENCIL].Renderbuffer;

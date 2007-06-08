@@ -1003,7 +1003,7 @@ LONGSTRING static const char enum_string_table[] =
    "GL_NOTEQUAL\0"
    "GL_NO_ERROR\0"
    "GL_NUM_COMPRESSED_TEXTURE_FORMATS\0"
-   "GL_NUM_TEXTURE_COMPRESSED_FORMATS_ARB\0"
+   "GL_NUM_COMPRESSED_TEXTURE_FORMATS_ARB\0"
    "GL_OBJECT_ACTIVE_ATTRIBUTES_ARB\0"
    "GL_OBJECT_ACTIVE_ATTRIBUTE_MAX_LENGTH_ARB\0"
    "GL_OBJECT_ACTIVE_UNIFORMS_ARB\0"
@@ -2744,7 +2744,7 @@ static const enum_elt all_enums[1737] =
    { 20205, 0x00000205 }, /* GL_NOTEQUAL */
    { 20217, 0x00000000 }, /* GL_NO_ERROR */
    { 20229, 0x000086A2 }, /* GL_NUM_COMPRESSED_TEXTURE_FORMATS */
-   { 20263, 0x000086A2 }, /* GL_NUM_TEXTURE_COMPRESSED_FORMATS_ARB */
+   { 20263, 0x000086A2 }, /* GL_NUM_COMPRESSED_TEXTURE_FORMATS_ARB */
    { 20301, 0x00008B89 }, /* GL_OBJECT_ACTIVE_ATTRIBUTES_ARB */
    { 20333, 0x00008B8A }, /* GL_OBJECT_ACTIVE_ATTRIBUTE_MAX_LENGTH_ARB */
    { 20375, 0x00008B86 }, /* GL_OBJECT_ACTIVE_UNIFORMS_ARB */
@@ -3517,7 +3517,6 @@ static const enum_elt all_enums[1737] =
 
 static const unsigned reduced_enums[1277] =
 {
-        30, /* GL_ALL_CLIENT_ATTRIB_BITS */
        435, /* GL_FALSE */
        643, /* GL_LINES */
        645, /* GL_LINE_LOOP */
@@ -4794,6 +4793,7 @@ static const unsigned reduced_enums[1277] =
       1314, /* GL_SCISSOR_BIT */
         29, /* GL_ALL_ATTRIB_BITS */
        938, /* GL_MULTISAMPLE_BIT */
+        30, /* GL_ALL_CLIENT_ATTRIB_BITS */
 };
 
 #define Elements(x) sizeof(x)/sizeof(*x)

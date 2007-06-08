@@ -196,21 +196,19 @@
 /** For any program target/extension */
 /*@{*/
 #define MAX_PROGRAM_LOCAL_PARAMS 128 /* KW: power of two */
+#define MAX_PROGRAM_ENV_PARAMS 128
 #define MAX_PROGRAM_MATRICES 8
 #define MAX_PROGRAM_MATRIX_STACK_DEPTH 4
 #define MAX_PROGRAM_CALL_DEPTH 8
-/*@}*/
-
-/** For GL_ARB_fragment_shader */
-/*@{*/
-#define MAX_FRAGMENT_UNIFORM_COMPONENTS 64
+#define MAX_PROGRAM_TEMPS 128
+#define MAX_PROGRAM_ADDRESS_REGS 2
+#define MAX_UNIFORMS 128
+#define MAX_VARYING 8
 /*@}*/
 
 /** For GL_ARB_vertex_shader */
 /*@{*/
 #define MAX_VERTEX_ATTRIBS 16
-#define MAX_VERTEX_UNIFORM_COMPONENTS 512
-#define MAX_VARYING_FLOATS 32
 #define MAX_VERTEX_TEXTURE_IMAGE_UNITS 0
 #define MAX_COMBINED_TEXTURE_IMAGE_UNITS (MAX_TEXTURE_IMAGE_UNITS + MAX_VERTEX_TEXTURE_IMAGE_UNITS)
 /*@}*/
@@ -218,7 +216,7 @@
 
 /** For GL_ARB_draw_buffers */
 /*@{*/
-#define MAX_DRAW_BUFFERS 1
+#define MAX_DRAW_BUFFERS 4
 /*@}*/
 
 
@@ -302,6 +300,7 @@
 #define FEATURE_ARB_fragment_shader _HAVE_FULL_GL
 #define FEATURE_ARB_shader_objects (FEATURE_ARB_vertex_shader || FEATURE_ARB_fragment_shader)
 #define FEATURE_ARB_shading_language_100 FEATURE_ARB_shader_objects
+#define FEATURE_ARB_shading_language_120 FEATURE_ARB_shader_objects
 
 #define FEATURE_EXT_framebuffer_blit _HAVE_FULL_GL
 #define FEATURE_EXT_framebuffer_object _HAVE_FULL_GL

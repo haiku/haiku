@@ -146,7 +146,7 @@ static void GLAPIENTRY
 loopback_Color3iv_f( const GLint *v )
 {
    COLORF( INT_TO_FLOAT(v[0]), INT_TO_FLOAT(v[1]),
-	   INT_TO_FLOAT(v[2]), INT_TO_FLOAT(v[3]) );
+	   INT_TO_FLOAT(v[2]), 1.0 );
 }
 
 static void GLAPIENTRY

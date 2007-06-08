@@ -68,11 +68,14 @@ int main (int argc, char *argv[])
    grammar id;
 
    id = grammar_load_from_text ((const byte *) slang_shader_syn);
-   if (id == 0)
+   if (id == 0) {
+      fprintf(stderr, "Error loading grammar from text\n");
       return 1;
+   }
    grammar_set_reg8 (id, (const byte *) "parsing_builtin", 1);
    grammar_set_reg8 (id, (const byte *) "shader_type", atoi (argv[1]));
    if (gc_to_bin (id, argv[2], argv[3])) {
+      fprintf(stderr, "Error in gc_to_bin %s %s\n", argv[2], argv[3]);
       grammar_destroy (id);
       return 1;
    }

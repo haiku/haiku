@@ -138,13 +138,16 @@ typedef union { GLfloat f; GLint i; } fi_type;
 #define M_E (2.7182818284590452354)
 #endif
 
-#ifndef FLT_MAX_EXP
-#define FLT_MAX_EXP 128
+#ifndef ONE_DIV_LN2
+#define ONE_DIV_LN2 (1.442695040888963456)
 #endif
 
-/* XXX this is a bit of a hack needed for compilation within XFree86 */
-#ifndef FLT_MIN
-#define FLT_MIN (1.0e-37)
+#ifndef ONE_DIV_SQRT_LN2
+#define ONE_DIV_SQRT_LN2 (1.201122408786449815)
+#endif
+
+#ifndef FLT_MAX_EXP
+#define FLT_MAX_EXP 128
 #endif
 
 /* Degrees to radians conversion: */
@@ -173,8 +176,6 @@ typedef union { GLfloat f; GLint i; } fi_type;
  ***/
 #if 0 /* _mesa_sqrtf() not accurate enough - temporarily disabled */
 #  define SQRTF(X)  _mesa_sqrtf(X)
-#elif defined(XFree86LOADER) && defined(IN_MODULE) && !defined(NO_LIBCWRAPPER)
-#  define SQRTF(X)  (float) xf86sqrt((float) (X))
 #else
 #  define SQRTF(X)  (float) sqrt((float) (X))
 #endif
@@ -221,8 +222,6 @@ static INLINE GLfloat LOG2(GLfloat val)
    num.f = ((-1.0f/3) * num.f + 2) * num.f - 2.0f/3;
    return num.f + log_2;
 }
-#elif defined(XFree86LOADER) && defined(IN_MODULE) && !defined(NO_LIBCWRAPPER)
-#define LOG2(x) ((GLfloat) (xf86log(x) * 1.442695))
 #else
 /*
  * NOTE: log_base_2(x) = log(x) / log(2)
@@ -293,15 +292,7 @@ static INLINE int GET_FLOAT_BITS( float x )
  *** LDEXPF: multiply value by an integral power of two
  *** FREXPF: extract mantissa and exponent from value
  ***/
-#if defined(XFree86LOADER) && defined(IN_MODULE) && !defined(NO_LIBCWRAPPER)
-#define CEILF(x)   ((GLfloat) xf86ceil(x))
-#define FLOORF(x)  ((GLfloat) xf86floor(x))
-#define FABSF(x)   ((GLfloat) xf86fabs(x))
-#define LOGF(x)    ((GLfloat) xf86log(x))
-#define EXPF(x)    ((GLfloat) xf86exp(x))
-#define LDEXPF(x,y)   ((GLfloat) xf86ldexp(x,y))
-#define FREXPF(x,y)   ((GLfloat) xf86frexp(x,y))
-#elif defined(__gnu_linux__)
+#if defined(__gnu_linux__)
 /* C99 functions */
 #define CEILF(x)   ceilf(x)
 #define FLOORF(x)  floorf(x)
@@ -699,11 +690,17 @@ _mesa_sqrtf(float x);
 extern float
 _mesa_inv_sqrtf(float x);
 
+extern void
+_mesa_init_sqrt_table(void);
+
 extern double
 _mesa_pow(double x, double y);
 
 extern int
 _mesa_ffs(int i);
+
+extern int
+_mesa_ffsll(long long i);
 
 extern unsigned int
 _mesa_bitcount(unsigned int n);
@@ -776,10 +773,6 @@ _mesa_debug( const __GLcontext *ctx, const char *fmtString, ... );
 
 extern void 
 _mesa_exit( int status );
-
-
-extern void
-_mesa_init_default_imports( __GLimports *imports, void *driverCtx );
 
 
 #ifdef __cplusplus

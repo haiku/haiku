@@ -136,7 +136,9 @@ _swrast_clear_accum_buffer( GLcontext *ctx, struct gl_renderbuffer *rb )
       return;
    }
 
-   assert(rb);
+   if (!rb || !rb->Data)
+      return;
+
    assert(rb->_BaseFormat == GL_RGBA);
    /* add other types in future? */
    assert(rb->DataType == GL_SHORT || rb->DataType == GL_UNSIGNED_SHORT);

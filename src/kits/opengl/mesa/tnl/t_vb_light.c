@@ -203,10 +203,7 @@ static GLboolean run_lighting( GLcontext *ctx,
    GLvector4f *input = ctx->_NeedEyeCoords ? VB->EyePtr : VB->ObjPtr;
    GLuint idx;
 
-   if (ctx->ShaderObjects._VertexShaderPresent)
-      return GL_TRUE;
-
-   if (!ctx->Light.Enabled || ctx->VertexProgram._Enabled)
+   if (!ctx->Light.Enabled || ctx->VertexProgram._Current)
       return GL_TRUE;
 
    /* Make sure we can talk about position x,y and z:
@@ -264,10 +261,7 @@ static void validate_lighting( GLcontext *ctx,
 {
    light_func *tab;
 
-   if (ctx->ShaderObjects._VertexShaderPresent)
-      return;
-
-   if (!ctx->Light.Enabled || ctx->VertexProgram._Enabled)
+   if (!ctx->Light.Enabled || ctx->VertexProgram._Current)
       return;
 
    if (ctx->Visual.rgbMode) {

@@ -305,7 +305,7 @@ static GLboolean run_render( GLcontext *ctx,
 
       for (i = 0 ; i < VB->PrimitiveCount ; i++)
       {
-	 GLuint prim = VB->Primitive[i].mode;
+	 GLuint prim = _tnl_translate_prim(&VB->Primitive[i]);
 	 GLuint start = VB->Primitive[i].start;
 	 GLuint length = VB->Primitive[i].count;
 

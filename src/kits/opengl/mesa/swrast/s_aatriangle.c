@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.3
+ * Version:  6.5.3
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -408,7 +408,7 @@ tex_aa_tri(GLcontext *ctx,
 #define DO_Z
 #define DO_FOG
 #define DO_RGBA
-#define DO_TEX
+#define DO_ATTRIBS
 #include "s_aatritemp.h"
 }
 
@@ -422,38 +422,11 @@ spec_tex_aa_tri(GLcontext *ctx,
 #define DO_Z
 #define DO_FOG
 #define DO_RGBA
-#define DO_TEX
+#define DO_ATTRIBS
 #define DO_SPEC
 #include "s_aatritemp.h"
 }
 
-
-static void
-multitex_aa_tri(GLcontext *ctx,
-		const SWvertex *v0,
-		const SWvertex *v1,
-		const SWvertex *v2)
-{
-#define DO_Z
-#define DO_FOG
-#define DO_RGBA
-#define DO_MULTITEX
-#include "s_aatritemp.h"
-}
-
-static void
-spec_multitex_aa_tri(GLcontext *ctx,
-		     const SWvertex *v0,
-		     const SWvertex *v1,
-		     const SWvertex *v2)
-{
-#define DO_Z
-#define DO_FOG
-#define DO_RGBA
-#define DO_MULTITEX
-#define DO_SPEC
-#include "s_aatritemp.h"
-}
 
 
 /*
@@ -465,22 +438,13 @@ _swrast_set_aa_triangle_function(GLcontext *ctx)
 {
    ASSERT(ctx->Polygon.SmoothFlag);
 
-   if (ctx->Texture._EnabledCoordUnits != 0) {
+   if (ctx->Texture._EnabledCoordUnits != 0
+       || ctx->FragmentProgram._Current) {
       if (NEED_SECONDARY_COLOR(ctx)) {
-         if (ctx->Texture._EnabledCoordUnits > 1) {
-            SWRAST_CONTEXT(ctx)->Triangle = spec_multitex_aa_tri;
-         }
-         else {
-            SWRAST_CONTEXT(ctx)->Triangle = spec_tex_aa_tri;
-         }
+         SWRAST_CONTEXT(ctx)->Triangle = spec_tex_aa_tri;
       }
       else {
-         if (ctx->Texture._EnabledCoordUnits > 1) {
-            SWRAST_CONTEXT(ctx)->Triangle = multitex_aa_tri;
-         }
-         else {
-            SWRAST_CONTEXT(ctx)->Triangle = tex_aa_tri;
-         }
+         SWRAST_CONTEXT(ctx)->Triangle = tex_aa_tri;
       }
    }
    else if (ctx->Visual.rgbMode) {

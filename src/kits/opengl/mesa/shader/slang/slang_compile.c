@@ -29,10 +29,21 @@
  */
 
 #include "imports.h"
+#include "context.h"
+#include "program.h"
+#include "prog_parameter.h"
 #include "grammar_mesa.h"
+#include "slang_codegen.h"
 #include "slang_compile.h"
 #include "slang_preprocess.h"
 #include "slang_storage.h"
+#include "slang_emit.h"
+#include "slang_log.h"
+#include "slang_mem.h"
+#include "slang_vartable.h"
+#include "slang_simplify.h"
+
+#include "slang_print.h"
 
 /*
  * This is a straightforward implementation of the slang front-end
@@ -90,14 +101,8 @@ _slang_code_object_ctr(slang_code_object * self)
    for (i = 0; i < SLANG_BUILTIN_TOTAL; i++)
       _slang_code_unit_ctr(&self->builtin[i], self);
    _slang_code_unit_ctr(&self->unit, self);
-   _slang_assembly_file_ctr(&self->assembly);
-   slang_machine_ctr(&self->machine);
    self->varpool.next_addr = 0;
    slang_atom_pool_construct(&self->atompool);
-   slang_export_data_table_ctr(&self->expdata);
-   self->expdata.atoms = &self->atompool;
-   slang_export_code_table_ctr(&self->expcode);
-   self->expcode.atoms = &self->atompool;
 }
 
 GLvoid
@@ -108,113 +113,9 @@ _slang_code_object_dtr(slang_code_object * self)
    for (i = 0; i < SLANG_BUILTIN_TOTAL; i++)
       _slang_code_unit_dtr(&self->builtin[i]);
    _slang_code_unit_dtr(&self->unit);
-   slang_assembly_file_destruct(&self->assembly);
-   slang_machine_dtr(&self->machine);
    slang_atom_pool_destruct(&self->atompool);
-   slang_export_data_table_dtr(&self->expdata);
-   slang_export_code_table_ctr(&self->expcode);
 }
 
-/* slang_info_log */
-
-static char *out_of_memory = "Error: Out of memory.\n";
-
-void
-slang_info_log_construct(slang_info_log * log)
-{
-   log->text = NULL;
-   log->dont_free_text = 0;
-}
-
-void
-slang_info_log_destruct(slang_info_log * log)
-{
-   if (!log->dont_free_text)
-      slang_alloc_free(log->text);
-}
-
-static int
-slang_info_log_message(slang_info_log * log, const char *prefix,
-                       const char *msg)
-{
-   GLuint size;
-
-   if (log->dont_free_text)
-      return 0;
-   size = slang_string_length(msg) + 2;
-   if (prefix != NULL)
-      size += slang_string_length(prefix) + 2;
-   if (log->text != NULL) {
-      GLuint old_len = slang_string_length(log->text);
-      log->text = (char *)
-	 slang_alloc_realloc(log->text, old_len + 1, old_len + size);
-   }
-   else {
-      log->text = (char *) (slang_alloc_malloc(size));
-      if (log->text != NULL)
-         log->text[0] = '\0';
-   }
-   if (log->text == NULL)
-      return 0;
-   if (prefix != NULL) {
-      slang_string_concat(log->text, prefix);
-      slang_string_concat(log->text, ": ");
-   }
-   slang_string_concat(log->text, msg);
-   slang_string_concat(log->text, "\n");
-   return 1;
-}
-
-int
-slang_info_log_print(slang_info_log * log, const char *msg, ...)
-{
-   va_list va;
-   char buf[1024];
-
-   va_start(va, msg);
-   _mesa_vsprintf(buf, msg, va);
-   va_end(va);
-   return slang_info_log_message(log, NULL, buf);
-}
-
-int
-slang_info_log_error(slang_info_log * log, const char *msg, ...)
-{
-   va_list va;
-   char buf[1024];
-
-   va_start(va, msg);
-   _mesa_vsprintf(buf, msg, va);
-   va_end(va);
-   if (slang_info_log_message(log, "Error", buf))
-      return 1;
-   slang_info_log_memory(log);
-   return 0;
-}
-
-int
-slang_info_log_warning(slang_info_log * log, const char *msg, ...)
-{
-   va_list va;
-   char buf[1024];
-
-   va_start(va, msg);
-   _mesa_vsprintf(buf, msg, va);
-   va_end(va);
-   if (slang_info_log_message(log, "Warning", buf))
-      return 1;
-   slang_info_log_memory(log);
-   return 0;
-}
-
-void
-slang_info_log_memory(slang_info_log * log)
-{
-   if (!slang_info_log_message(log, "Error", "Out of memory.")) {
-      log->dont_free_text = 1;
-      log->text = out_of_memory;
-   }
-}
 
 /* slang_parse_ctx */
 
@@ -225,6 +126,7 @@ typedef struct slang_parse_ctx_
    int parsing_builtin;
    GLboolean global_scope;   /**< Is object being declared a global? */
    slang_atom_pool *atoms;
+   slang_unit_type type;     /**< Vertex vs. Fragment */
 } slang_parse_ctx;
 
 /* slang_output_ctx */
@@ -234,9 +136,9 @@ typedef struct slang_output_ctx_
    slang_variable_scope *vars;
    slang_function_scope *funs;
    slang_struct_scope *structs;
-   slang_assembly_file *assembly;
    slang_var_pool *global_pool;
-   slang_machine *machine;
+   struct gl_program *program;
+   slang_var_table *vartable;
 } slang_output_ctx;
 
 /* _slang_compile() */
@@ -292,9 +194,9 @@ parse_float(slang_parse_ctx * C, float *number)
    parse_identifier_str(C, &fractional);
    parse_identifier_str(C, &exponent);
 
-   whole = (char *) (slang_alloc_malloc((_mesa_strlen(integral) +
-                                         _mesa_strlen(fractional) +
-                                         _mesa_strlen(exponent) + 3) * sizeof(char)));
+   whole = (char *) _slang_alloc((_mesa_strlen(integral) +
+                                  _mesa_strlen(fractional) +
+                                  _mesa_strlen(exponent) + 3) * sizeof(char));
    if (whole == NULL) {
       slang_info_log_memory(C->L);
       return 0;
@@ -308,7 +210,8 @@ parse_float(slang_parse_ctx * C, float *number)
 
    *number = (float) (_mesa_strtod(whole, (char **) NULL));
 
-   slang_alloc_free(whole);
+   _slang_free(whole);
+
    return 1;
 }
 
@@ -337,7 +240,7 @@ static GLboolean
 parse_array_len(slang_parse_ctx * C, slang_output_ctx * O, GLuint * len)
 {
    slang_operation array_size;
-   slang_assembly_name_space space;
+   slang_name_space space;
    GLboolean result;
 
    if (!slang_operation_construct(&array_size))
@@ -350,8 +253,13 @@ parse_array_len(slang_parse_ctx * C, slang_output_ctx * O, GLuint * len)
    space.funcs = O->funs;
    space.structs = O->structs;
    space.vars = O->vars;
-   result = _slang_evaluate_int(O->assembly, O->machine, &space,
-                                &array_size, len, C->atoms);
+
+   /* evaluate compile-time expression which is array size */
+   _slang_simplify(&array_size, &space, C->atoms);
+   result = (array_size.type == SLANG_OPER_LITERAL_INT);
+
+   *len = (GLint) array_size.literal[0];
+
    slang_operation_destruct(&array_size);
    return result;
 }
@@ -365,8 +273,7 @@ calculate_var_size(slang_parse_ctx * C, slang_output_ctx * O,
    if (!slang_storage_aggregate_construct(&agg))
       return GL_FALSE;
    if (!_slang_aggregate_variable(&agg, &var->type.specifier, var->array_len,
-                                  O->funs, O->structs, O->vars, O->machine,
-                                  O->assembly, C->atoms)) {
+                                  O->funs, O->structs, O->vars, C->atoms)) {
       slang_storage_aggregate_destruct(&agg);
       return GL_FALSE;
    }
@@ -381,9 +288,9 @@ convert_to_array(slang_parse_ctx * C, slang_variable * var,
 {
    /* sized array - mark it as array, copy the specifier to the array element and
     * parse the expression */
-   var->type.specifier.type = slang_spec_array;
+   var->type.specifier.type = SLANG_SPEC_ARRAY;
    var->type.specifier._array = (slang_type_specifier *)
-      slang_alloc_malloc(sizeof(slang_type_specifier));
+      _slang_alloc(sizeof(slang_type_specifier));
    if (var->type.specifier._array == NULL) {
       slang_info_log_memory(C->L);
       return GL_FALSE;
@@ -466,13 +373,13 @@ parse_struct(slang_parse_ctx * C, slang_output_ctx * O, slang_struct ** st)
    }
 
    /* set-up a new struct */
-   *st = (slang_struct *) slang_alloc_malloc(sizeof(slang_struct));
+   *st = (slang_struct *) _slang_alloc(sizeof(slang_struct));
    if (*st == NULL) {
       slang_info_log_memory(C->L);
       return 0;
    }
    if (!slang_struct_construct(*st)) {
-      slang_alloc_free(*st);
+      _slang_free(*st);
       *st = NULL;
       slang_info_log_memory(C->L);
       return 0;
@@ -498,11 +405,11 @@ parse_struct(slang_parse_ctx * C, slang_output_ctx * O, slang_struct ** st)
       slang_struct *s;
 
       O->structs->structs =
-         (slang_struct *) slang_alloc_realloc(O->structs->structs,
-                                              O->structs->num_structs *
-                                              sizeof(slang_struct),
-                                              (O->structs->num_structs +
-                                               1) * sizeof(slang_struct));
+         (slang_struct *) _slang_realloc(O->structs->structs,
+                                         O->structs->num_structs
+                                         * sizeof(slang_struct),
+                                         (O->structs->num_structs + 1)
+                                         * sizeof(slang_struct));
       if (O->structs->structs == NULL) {
          slang_info_log_memory(C->L);
          return 0;
@@ -533,25 +440,25 @@ parse_type_qualifier(slang_parse_ctx * C, slang_type_qualifier * qual)
 {
    switch (*C->I++) {
    case TYPE_QUALIFIER_NONE:
-      *qual = slang_qual_none;
+      *qual = SLANG_QUAL_NONE;
       break;
    case TYPE_QUALIFIER_CONST:
-      *qual = slang_qual_const;
+      *qual = SLANG_QUAL_CONST;
       break;
    case TYPE_QUALIFIER_ATTRIBUTE:
-      *qual = slang_qual_attribute;
+      *qual = SLANG_QUAL_ATTRIBUTE;
       break;
    case TYPE_QUALIFIER_VARYING:
-      *qual = slang_qual_varying;
+      *qual = SLANG_QUAL_VARYING;
       break;
    case TYPE_QUALIFIER_UNIFORM:
-      *qual = slang_qual_uniform;
+      *qual = SLANG_QUAL_UNIFORM;
       break;
    case TYPE_QUALIFIER_FIXEDOUTPUT:
-      *qual = slang_qual_fixedoutput;
+      *qual = SLANG_QUAL_FIXEDOUTPUT;
       break;
    case TYPE_QUALIFIER_FIXEDINPUT:
-      *qual = slang_qual_fixedinput;
+      *qual = SLANG_QUAL_FIXEDINPUT;
       break;
    default:
       return 0;
@@ -582,8 +489,17 @@ parse_type_qualifier(slang_parse_ctx * C, slang_type_qualifier * qual)
 #define TYPE_SPECIFIER_SAMPLERCUBE 19
 #define TYPE_SPECIFIER_SAMPLER1DSHADOW 20
 #define TYPE_SPECIFIER_SAMPLER2DSHADOW 21
-#define TYPE_SPECIFIER_STRUCT 22
-#define TYPE_SPECIFIER_TYPENAME 23
+#define TYPE_SPECIFIER_SAMPLER2DRECT 22
+#define TYPE_SPECIFIER_SAMPLER2DRECTSHADOW 23
+#define TYPE_SPECIFIER_STRUCT 24
+#define TYPE_SPECIFIER_TYPENAME 25
+#define TYPE_SPECIFIER_MAT23 26
+#define TYPE_SPECIFIER_MAT32 27
+#define TYPE_SPECIFIER_MAT24 28
+#define TYPE_SPECIFIER_MAT42 29
+#define TYPE_SPECIFIER_MAT34 30
+#define TYPE_SPECIFIER_MAT43 31
+
 
 static int
 parse_type_specifier(slang_parse_ctx * C, slang_output_ctx * O,
@@ -591,78 +507,102 @@ parse_type_specifier(slang_parse_ctx * C, slang_output_ctx * O,
 {
    switch (*C->I++) {
    case TYPE_SPECIFIER_VOID:
-      spec->type = slang_spec_void;
+      spec->type = SLANG_SPEC_VOID;
       break;
    case TYPE_SPECIFIER_BOOL:
-      spec->type = slang_spec_bool;
+      spec->type = SLANG_SPEC_BOOL;
       break;
    case TYPE_SPECIFIER_BVEC2:
-      spec->type = slang_spec_bvec2;
+      spec->type = SLANG_SPEC_BVEC2;
       break;
    case TYPE_SPECIFIER_BVEC3:
-      spec->type = slang_spec_bvec3;
+      spec->type = SLANG_SPEC_BVEC3;
       break;
    case TYPE_SPECIFIER_BVEC4:
-      spec->type = slang_spec_bvec4;
+      spec->type = SLANG_SPEC_BVEC4;
       break;
    case TYPE_SPECIFIER_INT:
-      spec->type = slang_spec_int;
+      spec->type = SLANG_SPEC_INT;
       break;
    case TYPE_SPECIFIER_IVEC2:
-      spec->type = slang_spec_ivec2;
+      spec->type = SLANG_SPEC_IVEC2;
       break;
    case TYPE_SPECIFIER_IVEC3:
-      spec->type = slang_spec_ivec3;
+      spec->type = SLANG_SPEC_IVEC3;
       break;
    case TYPE_SPECIFIER_IVEC4:
-      spec->type = slang_spec_ivec4;
+      spec->type = SLANG_SPEC_IVEC4;
       break;
    case TYPE_SPECIFIER_FLOAT:
-      spec->type = slang_spec_float;
+      spec->type = SLANG_SPEC_FLOAT;
       break;
    case TYPE_SPECIFIER_VEC2:
-      spec->type = slang_spec_vec2;
+      spec->type = SLANG_SPEC_VEC2;
       break;
    case TYPE_SPECIFIER_VEC3:
-      spec->type = slang_spec_vec3;
+      spec->type = SLANG_SPEC_VEC3;
       break;
    case TYPE_SPECIFIER_VEC4:
-      spec->type = slang_spec_vec4;
+      spec->type = SLANG_SPEC_VEC4;
       break;
    case TYPE_SPECIFIER_MAT2:
-      spec->type = slang_spec_mat2;
+      spec->type = SLANG_SPEC_MAT2;
       break;
    case TYPE_SPECIFIER_MAT3:
-      spec->type = slang_spec_mat3;
+      spec->type = SLANG_SPEC_MAT3;
       break;
    case TYPE_SPECIFIER_MAT4:
-      spec->type = slang_spec_mat4;
+      spec->type = SLANG_SPEC_MAT4;
+      break;
+   case TYPE_SPECIFIER_MAT23:
+      spec->type = SLANG_SPEC_MAT23;
+      break;
+   case TYPE_SPECIFIER_MAT32:
+      spec->type = SLANG_SPEC_MAT32;
+      break;
+   case TYPE_SPECIFIER_MAT24:
+      spec->type = SLANG_SPEC_MAT24;
+      break;
+   case TYPE_SPECIFIER_MAT42:
+      spec->type = SLANG_SPEC_MAT42;
+      break;
+   case TYPE_SPECIFIER_MAT34:
+      spec->type = SLANG_SPEC_MAT34;
+      break;
+   case TYPE_SPECIFIER_MAT43:
+      spec->type = SLANG_SPEC_MAT43;
       break;
    case TYPE_SPECIFIER_SAMPLER1D:
-      spec->type = slang_spec_sampler1D;
+      spec->type = SLANG_SPEC_SAMPLER1D;
       break;
    case TYPE_SPECIFIER_SAMPLER2D:
-      spec->type = slang_spec_sampler2D;
+      spec->type = SLANG_SPEC_SAMPLER2D;
       break;
    case TYPE_SPECIFIER_SAMPLER3D:
-      spec->type = slang_spec_sampler3D;
+      spec->type = SLANG_SPEC_SAMPLER3D;
       break;
    case TYPE_SPECIFIER_SAMPLERCUBE:
-      spec->type = slang_spec_samplerCube;
+      spec->type = SLANG_SPEC_SAMPLERCUBE;
+      break;
+   case TYPE_SPECIFIER_SAMPLER2DRECT:
+      spec->type = SLANG_SPEC_SAMPLER2DRECT;
       break;
    case TYPE_SPECIFIER_SAMPLER1DSHADOW:
-      spec->type = slang_spec_sampler1DShadow;
+      spec->type = SLANG_SPEC_SAMPLER1DSHADOW;
       break;
    case TYPE_SPECIFIER_SAMPLER2DSHADOW:
-      spec->type = slang_spec_sampler2DShadow;
+      spec->type = SLANG_SPEC_SAMPLER2DSHADOW;
+      break;
+   case TYPE_SPECIFIER_SAMPLER2DRECTSHADOW:
+      spec->type = SLANG_SPEC_SAMPLER2DRECTSHADOW;
       break;
    case TYPE_SPECIFIER_STRUCT:
-      spec->type = slang_spec_struct;
+      spec->type = SLANG_SPEC_STRUCT;
       if (!parse_struct(C, O, &spec->_struct))
          return 0;
       break;
    case TYPE_SPECIFIER_TYPENAME:
-      spec->type = slang_spec_struct;
+      spec->type = SLANG_SPEC_STRUCT;
       {
          slang_atom a_name;
          slang_struct *stru;
@@ -673,19 +613,18 @@ parse_type_specifier(slang_parse_ctx * C, slang_output_ctx * O,
 
          stru = slang_struct_scope_find(O->structs, a_name, 1);
          if (stru == NULL) {
-            slang_info_log_error(C->L, "%s: undeclared type name.",
+            slang_info_log_error(C->L, "undeclared type name '%s'",
                                  slang_atom_pool_id(C->atoms, a_name));
             return 0;
          }
 
-         spec->_struct =
-            (slang_struct *) slang_alloc_malloc(sizeof(slang_struct));
+         spec->_struct = (slang_struct *) _slang_alloc(sizeof(slang_struct));
          if (spec->_struct == NULL) {
             slang_info_log_memory(C->L);
             return 0;
          }
          if (!slang_struct_construct(spec->_struct)) {
-            slang_alloc_free(spec->_struct);
+            _slang_free(spec->_struct);
             spec->_struct = NULL;
             return 0;
          }
@@ -705,7 +644,9 @@ parse_fully_specified_type(slang_parse_ctx * C, slang_output_ctx * O,
 {
    if (!parse_type_qualifier(C, &type->qualifier))
       return 0;
-   return parse_type_specifier(C, O, &type->specifier);
+   if (!parse_type_specifier(C, O, &type->specifier))
+      return 0;
+   return 1;
 }
 
 /* operation */
@@ -776,38 +717,23 @@ parse_fully_specified_type(slang_parse_ctx * C, slang_output_ctx * O,
 /**
  * When parsing a compound production, this function is used to parse the
  * children.
- * For example, a a while-loop compound will have two children, the
+ * For example, a while-loop compound will have two children, the
  * while condition expression and the loop body.  So, this function will
  * be called twice to parse those two sub-expressions.
  * \param C  the parsing context
  * \param O  the output context
  * \param oper  the operation we're parsing
- * \param statment  which child of the operation is being parsed
+ * \param statement  indicates whether parsing a statement, or expression
  * \return 1 if success, 0 if error
  */
 static int
 parse_child_operation(slang_parse_ctx * C, slang_output_ctx * O,
-                      slang_operation * oper, unsigned int statement)
+                      slang_operation * oper, GLboolean statement)
 {
    slang_operation *ch;
 
    /* grow child array */
-   oper->children = (slang_operation *)
-      slang_alloc_realloc(oper->children,
-                          oper->num_children * sizeof(slang_operation),
-                          (oper->num_children + 1) * sizeof(slang_operation));
-   if (oper->children == NULL) {
-      slang_info_log_memory(C->L);
-      return 0;
-   }
-
-   ch = &oper->children[oper->num_children];
-   if (!slang_operation_construct(ch)) {
-      slang_info_log_memory(C->L);
-      return 0;
-   }
-   oper->num_children++;
-   /* XXX I guess the 0th "statement" is not really a statement? */
+   ch = slang_operation_grow(&oper->num_children, &oper->children);
    if (statement)
       return parse_statement(C, O, ch);
    return parse_expression(C, O, ch);
@@ -823,7 +749,7 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
    switch (*C->I++) {
    case OP_BLOCK_BEGIN_NO_NEW_SCOPE:
       /* parse child statements, do not create new variable scope */
-      oper->type = slang_oper_block_no_new_scope;
+      oper->type = SLANG_OPER_BLOCK_NO_NEW_SCOPE;
       while (*C->I != OP_END)
          if (!parse_child_operation(C, O, oper, 1))
             return 0;
@@ -834,7 +760,7 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
       {
          slang_output_ctx o = *O;
 
-         oper->type = slang_oper_block_new_scope;
+         oper->type = SLANG_OPER_BLOCK_NEW_SCOPE;
          o.vars = oper->locals;
          while (*C->I != OP_END)
             if (!parse_child_operation(C, &o, oper, 1))
@@ -846,7 +772,7 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
       /* local variable declaration, individual declarators are stored as
        * children identifiers
        */
-      oper->type = slang_oper_variable_decl;
+      oper->type = SLANG_OPER_BLOCK_NO_NEW_SCOPE;
       {
          const unsigned int first_var = O->vars->num_variables;
 
@@ -858,26 +784,18 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
          if (first_var < O->vars->num_variables) {
             const unsigned int num_vars = O->vars->num_variables - first_var;
             unsigned int i;
-
-            oper->children = (slang_operation *)
-               slang_alloc_malloc(num_vars * sizeof(slang_operation));
+            assert(oper->num_children == 0);
+            oper->num_children = num_vars;
+            oper->children = slang_operation_new(num_vars);
             if (oper->children == NULL) {
                slang_info_log_memory(C->L);
                return 0;
             }
-            for (oper->num_children = 0; oper->num_children < num_vars;
-                 oper->num_children++) {
-               if (!slang_operation_construct
-                   (&oper->children[oper->num_children])) {
-                  slang_info_log_memory(C->L);
-                  return 0;
-               }
-            }
             for (i = first_var; i < O->vars->num_variables; i++) {
                slang_operation *o = &oper->children[i - first_var];
-               o->type = slang_oper_identifier;
+               o->type = SLANG_OPER_VARIABLE_DECL;
                o->locals->outer_scope = O->vars;
-               o->a_id = O->vars->variables[i].a_name;
+               o->a_id = O->vars->variables[i]->a_name;
             }
          }
       }
@@ -886,7 +804,7 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
       /* the __asm statement, parse the mnemonic and all its arguments
        * as expressions
        */
-      oper->type = slang_oper_asm;
+      oper->type = SLANG_OPER_ASM;
       oper->a_id = parse_identifier(C);
       if (oper->a_id == SLANG_ATOM_NULL)
          return 0;
@@ -897,26 +815,26 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
       C->I++;
       break;
    case OP_BREAK:
-      oper->type = slang_oper_break;
+      oper->type = SLANG_OPER_BREAK;
       break;
    case OP_CONTINUE:
-      oper->type = slang_oper_continue;
+      oper->type = SLANG_OPER_CONTINUE;
       break;
    case OP_DISCARD:
-      oper->type = slang_oper_discard;
+      oper->type = SLANG_OPER_DISCARD;
       break;
    case OP_RETURN:
-      oper->type = slang_oper_return;
+      oper->type = SLANG_OPER_RETURN;
       if (!parse_child_operation(C, O, oper, 0))
          return 0;
       break;
    case OP_EXPRESSION:
-      oper->type = slang_oper_expression;
+      oper->type = SLANG_OPER_EXPRESSION;
       if (!parse_child_operation(C, O, oper, 0))
          return 0;
       break;
    case OP_IF:
-      oper->type = slang_oper_if;
+      oper->type = SLANG_OPER_IF;
       if (!parse_child_operation(C, O, oper, 0))
          return 0;
       if (!parse_child_operation(C, O, oper, 1))
@@ -928,7 +846,7 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
       {
          slang_output_ctx o = *O;
 
-         oper->type = slang_oper_while;
+         oper->type = SLANG_OPER_WHILE;
          o.vars = oper->locals;
          if (!parse_child_operation(C, &o, oper, 1))
             return 0;
@@ -937,7 +855,7 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
       }
       break;
    case OP_DO:
-      oper->type = slang_oper_do;
+      oper->type = SLANG_OPER_DO;
       if (!parse_child_operation(C, O, oper, 1))
          return 0;
       if (!parse_child_operation(C, O, oper, 0))
@@ -947,7 +865,7 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
       {
          slang_output_ctx o = *O;
 
-         oper->type = slang_oper_for;
+         oper->type = SLANG_OPER_FOR;
          o.vars = oper->locals;
          if (!parse_child_operation(C, &o, oper, 1))
             return 0;
@@ -972,23 +890,25 @@ handle_nary_expression(slang_parse_ctx * C, slang_operation * op,
 {
    unsigned int i;
 
-   op->children =
-      (slang_operation *) slang_alloc_malloc(n * sizeof(slang_operation));
+   op->children = slang_operation_new(n);
    if (op->children == NULL) {
       slang_info_log_memory(C->L);
       return 0;
    }
    op->num_children = n;
 
-   for (i = 0; i < n; i++)
+   for (i = 0; i < n; i++) {
+      slang_operation_destruct(&op->children[i]);
       op->children[i] = (*ops)[*total_ops - (n + 1 - i)];
+   }
+
    (*ops)[*total_ops - (n + 1)] = (*ops)[*total_ops - 1];
    *total_ops -= n;
 
    *ops = (slang_operation *)
-      slang_alloc_realloc(*ops,
-                          (*total_ops + n) * sizeof(slang_operation),
-                          *total_ops * sizeof(slang_operation));
+      _slang_realloc(*ops,
+                     (*total_ops + n) * sizeof(slang_operation),
+                     *total_ops * sizeof(slang_operation));
    if (*ops == NULL) {
       slang_info_log_memory(C->L);
       return 0;
@@ -1000,7 +920,7 @@ static int
 is_constructor_name(const char *name, slang_atom a_name,
                     slang_struct_scope * structs)
 {
-   if (slang_type_specifier_type_from_string(name) != slang_spec_void)
+   if (slang_type_specifier_type_from_string(name) != SLANG_SPEC_VOID)
       return 1;
    return slang_struct_scope_find(structs, a_name, 1) != NULL;
 }
@@ -1019,9 +939,9 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 
       /* allocate default operation, becomes a no-op if not used  */
       ops = (slang_operation *)
-         slang_alloc_realloc(ops,
-                             num_ops * sizeof(slang_operation),
-                             (num_ops + 1) * sizeof(slang_operation));
+         _slang_realloc(ops,
+                        num_ops * sizeof(slang_operation),
+                        (num_ops + 1) * sizeof(slang_operation));
       if (ops == NULL) {
          slang_info_log_memory(C->L);
          return 0;
@@ -1036,58 +956,70 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 
       switch (op_code) {
       case OP_PUSH_VOID:
-         op->type = slang_oper_void;
+         op->type = SLANG_OPER_VOID;
          break;
       case OP_PUSH_BOOL:
-         op->type = slang_oper_literal_bool;
+         op->type = SLANG_OPER_LITERAL_BOOL;
          if (!parse_number(C, &number))
             return 0;
-         op->literal = (GLfloat) number;
+         op->literal[0] =
+         op->literal[1] =
+         op->literal[2] =
+         op->literal[3] = (GLfloat) number;
+         op->literal_size = 1;
          break;
       case OP_PUSH_INT:
-         op->type = slang_oper_literal_int;
+         op->type = SLANG_OPER_LITERAL_INT;
          if (!parse_number(C, &number))
             return 0;
-         op->literal = (GLfloat) number;
+         op->literal[0] =
+         op->literal[1] =
+         op->literal[2] =
+         op->literal[3] = (GLfloat) number;
+         op->literal_size = 1;
          break;
       case OP_PUSH_FLOAT:
-         op->type = slang_oper_literal_float;
-         if (!parse_float(C, &op->literal))
+         op->type = SLANG_OPER_LITERAL_FLOAT;
+         if (!parse_float(C, &op->literal[0]))
             return 0;
+         op->literal[1] =
+         op->literal[2] =
+         op->literal[3] = op->literal[0];
+         op->literal_size = 1;
          break;
       case OP_PUSH_IDENTIFIER:
-         op->type = slang_oper_identifier;
+         op->type = SLANG_OPER_IDENTIFIER;
          op->a_id = parse_identifier(C);
          if (op->a_id == SLANG_ATOM_NULL)
             return 0;
          break;
       case OP_SEQUENCE:
-         op->type = slang_oper_sequence;
+         op->type = SLANG_OPER_SEQUENCE;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
             return 0;
          break;
       case OP_ASSIGN:
-         op->type = slang_oper_assign;
+         op->type = SLANG_OPER_ASSIGN;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
             return 0;
          break;
       case OP_ADDASSIGN:
-         op->type = slang_oper_addassign;
+         op->type = SLANG_OPER_ADDASSIGN;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
             return 0;
          break;
       case OP_SUBASSIGN:
-         op->type = slang_oper_subassign;
+         op->type = SLANG_OPER_SUBASSIGN;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
             return 0;
          break;
       case OP_MULASSIGN:
-         op->type = slang_oper_mulassign;
+         op->type = SLANG_OPER_MULASSIGN;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
             return 0;
          break;
       case OP_DIVASSIGN:
-         op->type = slang_oper_divassign;
+         op->type = SLANG_OPER_DIVASSIGN;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
             return 0;
          break;
@@ -1098,22 +1030,22 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
          /*case OP_XORASSIGN: */
          /*case OP_ANDASSIGN: */
       case OP_SELECT:
-         op->type = slang_oper_select;
+         op->type = SLANG_OPER_SELECT;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 3))
             return 0;
          break;
       case OP_LOGICALOR:
-         op->type = slang_oper_logicalor;
+         op->type = SLANG_OPER_LOGICALOR;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
             return 0;
          break;
       case OP_LOGICALXOR:
-         op->type = slang_oper_logicalxor;
+         op->type = SLANG_OPER_LOGICALXOR;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
             return 0;
          break;
       case OP_LOGICALAND:
-         op->type = slang_oper_logicaland;
+         op->type = SLANG_OPER_LOGICALAND;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
             return 0;
          break;
@@ -1121,91 +1053,91 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
          /*case OP_BITXOR: */
          /*case OP_BITAND: */
       case OP_EQUAL:
-         op->type = slang_oper_equal;
+         op->type = SLANG_OPER_EQUAL;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
             return 0;
          break;
       case OP_NOTEQUAL:
-         op->type = slang_oper_notequal;
+         op->type = SLANG_OPER_NOTEQUAL;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
             return 0;
          break;
       case OP_LESS:
-         op->type = slang_oper_less;
+         op->type = SLANG_OPER_LESS;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
             return 0;
          break;
       case OP_GREATER:
-         op->type = slang_oper_greater;
+         op->type = SLANG_OPER_GREATER;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
             return 0;
          break;
       case OP_LESSEQUAL:
-         op->type = slang_oper_lessequal;
+         op->type = SLANG_OPER_LESSEQUAL;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
             return 0;
          break;
       case OP_GREATEREQUAL:
-         op->type = slang_oper_greaterequal;
+         op->type = SLANG_OPER_GREATEREQUAL;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
             return 0;
          break;
          /*case OP_LSHIFT: */
          /*case OP_RSHIFT: */
       case OP_ADD:
-         op->type = slang_oper_add;
+         op->type = SLANG_OPER_ADD;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
             return 0;
          break;
       case OP_SUBTRACT:
-         op->type = slang_oper_subtract;
+         op->type = SLANG_OPER_SUBTRACT;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
             return 0;
          break;
       case OP_MULTIPLY:
-         op->type = slang_oper_multiply;
+         op->type = SLANG_OPER_MULTIPLY;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
             return 0;
          break;
       case OP_DIVIDE:
-         op->type = slang_oper_divide;
+         op->type = SLANG_OPER_DIVIDE;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
             return 0;
          break;
          /*case OP_MODULUS: */
       case OP_PREINCREMENT:
-         op->type = slang_oper_preincrement;
+         op->type = SLANG_OPER_PREINCREMENT;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 1))
             return 0;
          break;
       case OP_PREDECREMENT:
-         op->type = slang_oper_predecrement;
+         op->type = SLANG_OPER_PREDECREMENT;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 1))
             return 0;
          break;
       case OP_PLUS:
-         op->type = slang_oper_plus;
+         op->type = SLANG_OPER_PLUS;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 1))
             return 0;
          break;
       case OP_MINUS:
-         op->type = slang_oper_minus;
+         op->type = SLANG_OPER_MINUS;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 1))
             return 0;
          break;
       case OP_NOT:
-         op->type = slang_oper_not;
+         op->type = SLANG_OPER_NOT;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 1))
             return 0;
          break;
          /*case OP_COMPLEMENT: */
       case OP_SUBSCRIPT:
-         op->type = slang_oper_subscript;
+         op->type = SLANG_OPER_SUBSCRIPT;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
             return 0;
          break;
       case OP_CALL:
-         op->type = slang_oper_call;
+         op->type = SLANG_OPER_CALL;
          op->a_id = parse_identifier(C);
          if (op->a_id == SLANG_ATOM_NULL)
             return 0;
@@ -1226,7 +1158,7 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
          }
          break;
       case OP_FIELD:
-         op->type = slang_oper_field;
+         op->type = SLANG_OPER_FIELD;
          op->a_id = parse_identifier(C);
          if (op->a_id == SLANG_ATOM_NULL)
             return 0;
@@ -1234,12 +1166,12 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
             return 0;
          break;
       case OP_POSTINCREMENT:
-         op->type = slang_oper_postincrement;
+         op->type = SLANG_OPER_POSTINCREMENT;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 1))
             return 0;
          break;
       case OP_POSTDECREMENT:
-         op->type = slang_oper_postdecrement;
+         op->type = SLANG_OPER_POSTDECREMENT;
          if (!handle_nary_expression(C, op, &ops, &num_ops, 1))
             return 0;
          break;
@@ -1249,8 +1181,9 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
    }
    C->I++;
 
-   *oper = *ops;
-   slang_alloc_free(ops);
+   slang_operation_destruct(oper);
+   *oper = *ops; /* struct copy */
+   _slang_free(ops);
 
    return 1;
 }
@@ -1275,23 +1208,23 @@ parse_parameter_declaration(slang_parse_ctx * C, slang_output_ctx * O,
       return 0;
    switch (*C->I++) {
    case PARAM_QUALIFIER_IN:
-      if (param->type.qualifier != slang_qual_const
-          && param->type.qualifier != slang_qual_none) {
+      if (param->type.qualifier != SLANG_QUAL_CONST
+          && param->type.qualifier != SLANG_QUAL_NONE) {
          slang_info_log_error(C->L, "Invalid type qualifier.");
          return 0;
       }
       break;
    case PARAM_QUALIFIER_OUT:
-      if (param->type.qualifier == slang_qual_none)
-         param->type.qualifier = slang_qual_out;
+      if (param->type.qualifier == SLANG_QUAL_NONE)
+         param->type.qualifier = SLANG_QUAL_OUT;
       else {
          slang_info_log_error(C->L, "Invalid type qualifier.");
          return 0;
       }
       break;
    case PARAM_QUALIFIER_INOUT:
-      if (param->type.qualifier == slang_qual_none)
-         param->type.qualifier = slang_qual_inout;
+      if (param->type.qualifier == SLANG_QUAL_NONE)
+         param->type.qualifier = SLANG_QUAL_INOUT;
       else {
          slang_info_log_error(C->L, "Invalid type qualifier.");
          return 0;
@@ -1441,14 +1374,14 @@ parse_function_prototype(slang_parse_ctx * C, slang_output_ctx * O,
       return 0;
    switch (*C->I++) {
    case FUNCTION_ORDINARY:
-      func->kind = slang_func_ordinary;
+      func->kind = SLANG_FUNC_ORDINARY;
       func->header.a_name = parse_identifier(C);
       if (func->header.a_name == SLANG_ATOM_NULL)
          return 0;
       break;
    case FUNCTION_CONSTRUCTOR:
-      func->kind = slang_func_constructor;
-      if (func->header.type.specifier.type == slang_spec_struct)
+      func->kind = SLANG_FUNC_CONSTRUCTOR;
+      if (func->header.type.specifier.type == SLANG_SPEC_STRUCT)
          return 0;
       func->header.a_name =
          slang_atom_pool_atom(C->atoms,
@@ -1460,7 +1393,7 @@ parse_function_prototype(slang_parse_ctx * C, slang_output_ctx * O,
       }
       break;
    case FUNCTION_OPERATOR:
-      func->kind = slang_func_operator;
+      func->kind = SLANG_FUNC_OPERATOR;
       func->header.a_name = parse_operator_name(C);
       if (func->header.a_name == SLANG_ATOM_NULL)
          return 0;
@@ -1480,6 +1413,18 @@ parse_function_prototype(slang_parse_ctx * C, slang_output_ctx * O,
          return 0;
    }
 
+   /* if the function returns a value, append a hidden __retVal 'out'
+    * parameter that corresponds to the return value.
+    */
+   if (_slang_function_has_return_value(func)) {
+      slang_variable *p = slang_variable_scope_grow(func->parameters);
+      slang_atom a_retVal = slang_atom_pool_atom(C->atoms, "__retVal");
+      assert(a_retVal);
+      p->a_name = a_retVal;
+      p->type = func->header.type;
+      p->type.qualifier = SLANG_QUAL_OUT;
+   }
+
    /* function formal parameters and local variables share the same
     * scope, so save the information about param count in a seperate
     * place also link the scope to the global variable scope so when a
@@ -1488,6 +1433,7 @@ parse_function_prototype(slang_parse_ctx * C, slang_output_ctx * O,
     */
    func->param_count = func->parameters->num_variables;
    func->parameters->outer_scope = O->vars;
+
    return 1;
 }
 
@@ -1501,14 +1447,13 @@ parse_function_definition(slang_parse_ctx * C, slang_output_ctx * O,
       return 0;
 
    /* create function's body operation */
-   func->body =
-      (slang_operation *) slang_alloc_malloc(sizeof(slang_operation));
+   func->body = (slang_operation *) _slang_alloc(sizeof(slang_operation));
    if (func->body == NULL) {
       slang_info_log_memory(C->L);
       return 0;
    }
    if (!slang_operation_construct(func->body)) {
-      slang_alloc_free(func->body);
+      _slang_free(func->body);
       func->body = NULL;
       slang_info_log_memory(C->L);
       return 0;
@@ -1529,44 +1474,24 @@ parse_function_definition(slang_parse_ctx * C, slang_output_ctx * O,
 static GLboolean
 initialize_global(slang_assemble_ctx * A, slang_variable * var)
 {
-   slang_assembly_file_restore_point point;
-   slang_machine mach;
-   slang_assembly_local_info save_local = A->local;
    slang_operation op_id, op_assign;
    GLboolean result;
-
-   /* save the current assembly */
-   if (!slang_assembly_file_restore_point_save(A->file, &point))
-      return GL_FALSE;
-
-   /* setup the machine */
-   mach = *A->mach;
-   mach.ip = A->file->count;
-
-   /* allocate local storage for expression */
-   A->local.ret_size = 0;
-   A->local.addr_tmp = 0;
-   A->local.swizzle_tmp = 4;
-   if (!slang_assembly_file_push_label(A->file, slang_asm_local_alloc, 20))
-      return GL_FALSE;
-   if (!slang_assembly_file_push_label(A->file, slang_asm_enter, 20))
-      return GL_FALSE;
 
    /* construct the left side of assignment */
    if (!slang_operation_construct(&op_id))
       return GL_FALSE;
-   op_id.type = slang_oper_identifier;
+   op_id.type = SLANG_OPER_IDENTIFIER;
    op_id.a_id = var->a_name;
 
    /* put the variable into operation's scope */
    op_id.locals->variables =
-      (slang_variable *) slang_alloc_malloc(sizeof(slang_variable));
+      (slang_variable **) _slang_alloc(sizeof(slang_variable *));
    if (op_id.locals->variables == NULL) {
       slang_operation_destruct(&op_id);
       return GL_FALSE;
    }
    op_id.locals->num_variables = 1;
-   op_id.locals->variables[0] = *var;
+   op_id.locals->variables[0] = var;
 
    /* construct the assignment expression */
    if (!slang_operation_construct(&op_assign)) {
@@ -1574,9 +1499,9 @@ initialize_global(slang_assemble_ctx * A, slang_variable * var)
       slang_operation_destruct(&op_id);
       return GL_FALSE;
    }
-   op_assign.type = slang_oper_assign;
+   op_assign.type = SLANG_OPER_ASSIGN;
    op_assign.children =
-      (slang_operation *) slang_alloc_malloc(2 * sizeof(slang_operation));
+      (slang_operation *) _slang_alloc(2 * sizeof(slang_operation));
    if (op_assign.children == NULL) {
       slang_operation_destruct(&op_assign);
       op_id.locals->num_variables = 0;
@@ -1587,12 +1512,11 @@ initialize_global(slang_assemble_ctx * A, slang_variable * var)
    op_assign.children[0] = op_id;
    op_assign.children[1] = *var->initializer;
 
-   /* insert the actual expression */
-   result = _slang_assemble_operation(A, &op_assign, slang_ref_forbid);
+   result = 1;
 
    /* carefully destroy the operations */
    op_assign.num_children = 0;
-   slang_alloc_free(op_assign.children);
+   _slang_free(op_assign.children);
    op_assign.children = NULL;
    slang_operation_destruct(&op_assign);
    op_id.locals->num_variables = 0;
@@ -1600,21 +1524,6 @@ initialize_global(slang_assemble_ctx * A, slang_variable * var)
 
    if (!result)
       return GL_FALSE;
-   if (!slang_assembly_file_push(A->file, slang_asm_exit))
-      return GL_FALSE;
-
-   /* execute the expression */
-   if (!_slang_execute2(A->file, &mach))
-      return GL_FALSE;
-
-   /* restore the old assembly */
-   if (!slang_assembly_file_restore_point_load(A->file, &point))
-      return GL_FALSE;
-   A->local = save_local;
-
-   /* now we copy the contents of the initialized variable back to the original machine */
-   _mesa_memcpy((GLubyte *) A->mach->mem + var->address,
-                (GLubyte *) mach.mem + var->address, var->size);
 
    return GL_TRUE;
 }
@@ -1652,7 +1561,6 @@ parse_init_declarator(slang_parse_ctx * C, slang_output_ctx * O,
    }
 
    /* copy the declarator qualifier type, parse the identifier */
-   var->global = C->global_scope;
    var->type.qualifier = type->qualifier;
    var->a_name = parse_identifier(C);
    if (var->a_name == SLANG_ATOM_NULL)
@@ -1669,13 +1577,13 @@ parse_init_declarator(slang_parse_ctx * C, slang_output_ctx * O,
       if (!slang_type_specifier_copy(&var->type.specifier, &type->specifier))
          return 0;
       var->initializer =
-         (slang_operation *) slang_alloc_malloc(sizeof(slang_operation));
+         (slang_operation *) _slang_alloc(sizeof(slang_operation));
       if (var->initializer == NULL) {
          slang_info_log_memory(C->L);
          return 0;
       }
       if (!slang_operation_construct(var->initializer)) {
-         slang_alloc_free(var->initializer);
+         _slang_free(var->initializer);
          var->initializer = NULL;
          slang_info_log_memory(C->L);
          return 0;
@@ -1683,7 +1591,6 @@ parse_init_declarator(slang_parse_ctx * C, slang_output_ctx * O,
       if (!parse_expression(C, O, var->initializer))
          return 0;
       break;
-#if 0
    case VARIABLE_ARRAY_UNKNOWN:
       /* unsized array - mark it as array and copy the specifier to
          the array element
@@ -1691,7 +1598,6 @@ parse_init_declarator(slang_parse_ctx * C, slang_output_ctx * O,
       if (!convert_to_array(C, var, &type->specifier))
          return GL_FALSE;
       break;
-#endif
    case VARIABLE_ARRAY_EXPLICIT:
       if (!convert_to_array(C, var, &type->specifier))
          return GL_FALSE;
@@ -1702,9 +1608,22 @@ parse_init_declarator(slang_parse_ctx * C, slang_output_ctx * O,
       return 0;
    }
 
+   /* emit code for global var decl */
+   if (C->global_scope) {
+      slang_assemble_ctx A;
+      A.atoms = C->atoms;
+      A.space.funcs = O->funs;
+      A.space.structs = O->structs;
+      A.space.vars = O->vars;
+      A.program = O->program;
+      A.vartable = O->vartable;
+      A.curFuncEndLabel = NULL;
+      _slang_codegen_global_variable(&A, var, C->type);
+   }
+
    /* allocate global address space for a variable with a known size */
    if (C->global_scope
-       && !(var->type.specifier.type == slang_spec_array
+       && !(var->type.specifier.type == SLANG_SPEC_ARRAY
             && var->array_len == 0)) {
       if (!calculate_var_size(C, O, var))
          return GL_FALSE;
@@ -1716,18 +1635,12 @@ parse_init_declarator(slang_parse_ctx * C, slang_output_ctx * O,
       if (var->initializer != NULL) {
          slang_assemble_ctx A;
 
-         A.file = O->assembly;
-         A.mach = O->machine;
          A.atoms = C->atoms;
          A.space.funcs = O->funs;
          A.space.structs = O->structs;
          A.space.vars = O->vars;
          if (!initialize_global(&A, var))
             return 0;
-      }
-      else {
-         _mesa_memset((GLubyte *) (O->machine->mem) + var->address, 0,
-                      var->size);
       }
    }
    return 1;
@@ -1770,9 +1683,9 @@ parse_init_declarator_list(slang_parse_ctx * C, slang_output_ctx * O)
  * \param O  output context
  * \param definition if non-zero expect a definition, else a declaration
  * \param parsed_func_ret  returns the parsed function
- * \return 1 if success, 0 if failure
+ * \return GL_TRUE if success, GL_FALSE if failure
  */
-static int
+static GLboolean
 parse_function(slang_parse_ctx * C, slang_output_ctx * O, int definition,
                slang_function ** parsed_func_ret)
 {
@@ -1780,17 +1693,17 @@ parse_function(slang_parse_ctx * C, slang_output_ctx * O, int definition,
 
    /* parse function definition/declaration */
    if (!slang_function_construct(&parsed_func))
-      return 0;
+      return GL_FALSE;
    if (definition) {
       if (!parse_function_definition(C, O, &parsed_func)) {
          slang_function_destruct(&parsed_func);
-         return 0;
+         return GL_FALSE;
       }
    }
    else {
       if (!parse_function_prototype(C, O, &parsed_func)) {
          slang_function_destruct(&parsed_func);
-         return 0;
+         return GL_FALSE;
       }
    }
 
@@ -1800,17 +1713,17 @@ parse_function(slang_parse_ctx * C, slang_output_ctx * O, int definition,
     */
    found_func = slang_function_scope_find(O->funs, &parsed_func, 0);
    if (found_func == NULL) {
-      /* add the parsed function to the function list */
+      /* New function, add it to the function list */
       O->funs->functions =
-         (slang_function *) slang_alloc_realloc(O->funs->functions,
-                                                O->funs->num_functions *
-                                                sizeof(slang_function),
-                                                (O->funs->num_functions +
-                                                 1) * sizeof(slang_function));
+         (slang_function *) _slang_realloc(O->funs->functions,
+                                           O->funs->num_functions
+                                           * sizeof(slang_function),
+                                           (O->funs->num_functions + 1)
+                                           * sizeof(slang_function));
       if (O->funs->functions == NULL) {
          slang_info_log_memory(C->L);
          slang_function_destruct(&parsed_func);
-         return 0;
+         return GL_FALSE;
       }
       O->funs->functions[O->funs->num_functions] = parsed_func;
       O->funs->num_functions++;
@@ -1819,6 +1732,7 @@ parse_function(slang_parse_ctx * C, slang_output_ctx * O, int definition,
       *parsed_func_ret = &O->funs->functions[O->funs->num_functions - 1];
    }
    else {
+      /* previously defined or declared */
       /* TODO: check function return type qualifiers and specifiers */
       if (definition) {
          if (found_func->body != NULL) {
@@ -1827,7 +1741,7 @@ parse_function(slang_parse_ctx * C, slang_output_ctx * O, int definition,
                                                     parsed_func.header.
                                                     a_name));
             slang_function_destruct(&parsed_func);
-            return 0;
+            return GL_FALSE;
          }
 
          /* destroy the existing function declaration and replace it
@@ -1851,16 +1765,17 @@ parse_function(slang_parse_ctx * C, slang_output_ctx * O, int definition,
    {
       slang_assemble_ctx A;
 
-      A.file = O->assembly;
-      A.mach = O->machine;
       A.atoms = C->atoms;
       A.space.funcs = O->funs;
       A.space.structs = O->structs;
       A.space.vars = O->vars;
-      if (!_slang_assemble_function(&A, *parsed_func_ret))
-         return 0;
+      A.program = O->program;
+      A.vartable = O->vartable;
+      A.log = C->L;
+
+      _slang_codegen_function(&A, *parsed_func_ret);
    }
-   return 1;
+   return GL_TRUE;
 }
 
 /* declaration */
@@ -1895,17 +1810,32 @@ parse_declaration(slang_parse_ctx * C, slang_output_ctx * O)
 #define EXTERNAL_DECLARATION 2
 
 static GLboolean
-parse_code_unit(slang_parse_ctx * C, slang_code_unit * unit)
+parse_code_unit(slang_parse_ctx * C, slang_code_unit * unit,
+                struct gl_program *program)
 {
+   GET_CURRENT_CONTEXT(ctx);
    slang_output_ctx o;
+   GLboolean success;
+   GLuint maxRegs;
+
+   if (unit->type == SLANG_UNIT_FRAGMENT_BUILTIN ||
+       unit->type == SLANG_UNIT_FRAGMENT_SHADER) {
+      maxRegs = ctx->Const.FragmentProgram.MaxTemps;
+   }
+   else {
+      assert(unit->type == SLANG_UNIT_VERTEX_BUILTIN ||
+             unit->type == SLANG_UNIT_VERTEX_SHADER);
+      maxRegs = ctx->Const.VertexProgram.MaxTemps;
+   }
 
    /* setup output context */
    o.funs = &unit->funs;
    o.structs = &unit->structs;
    o.vars = &unit->vars;
-   o.assembly = &unit->object->assembly;
    o.global_pool = &unit->object->varpool;
-   o.machine = &unit->object->machine;
+   o.program = program;
+   o.vartable = _slang_new_var_table(maxRegs);
+   _slang_push_var_table(o.vartable);
 
    /* parse individual functions and declarations */
    while (*C->I != EXTERNAL_NULL) {
@@ -1913,27 +1843,35 @@ parse_code_unit(slang_parse_ctx * C, slang_code_unit * unit)
       case EXTERNAL_FUNCTION_DEFINITION:
          {
             slang_function *func;
-
-            if (!parse_function(C, &o, 1, &func))
-               return 0;
+            success = parse_function(C, &o, 1, &func);
          }
          break;
       case EXTERNAL_DECLARATION:
-         if (!parse_declaration(C, &o))
-            return 0;
+         success = parse_declaration(C, &o);
          break;
       default:
-         return 0;
+         success = GL_FALSE;
+      }
+
+      if (!success) {
+         /* xxx free codegen */
+         _slang_pop_var_table(o.vartable);
+         return GL_FALSE;
       }
    }
    C->I++;
-   return 1;
+
+   _slang_pop_var_table(o.vartable);
+   _slang_delete_var_table(o.vartable);
+
+   return GL_TRUE;
 }
 
 static GLboolean
 compile_binary(const byte * prod, slang_code_unit * unit,
                slang_unit_type type, slang_info_log * infolog,
-               slang_code_unit * builtin, slang_code_unit * downlink)
+               slang_code_unit * builtin, slang_code_unit * downlink,
+               struct gl_program *program)
 {
    slang_parse_ctx C;
 
@@ -1945,6 +1883,7 @@ compile_binary(const byte * prod, slang_code_unit * unit,
    C.parsing_builtin = (builtin == NULL);
    C.global_scope = GL_TRUE;
    C.atoms = &unit->object->atompool;
+   C.type = type;
 
    if (!check_revision(&C))
       return GL_FALSE;
@@ -1956,25 +1895,34 @@ compile_binary(const byte * prod, slang_code_unit * unit,
    }
 
    /* parse translation unit */
-   return parse_code_unit(&C, unit);
+   return parse_code_unit(&C, unit, program);
 }
 
 static GLboolean
 compile_with_grammar(grammar id, const char *source, slang_code_unit * unit,
                      slang_unit_type type, slang_info_log * infolog,
-                     slang_code_unit * builtin)
+                     slang_code_unit * builtin,
+                     struct gl_program *program)
 {
    byte *prod;
    GLuint size, start, version;
    slang_string preprocessed;
+   int maxVersion;
+
+#if FEATURE_ARB_shading_language_120
+   maxVersion = 120;
+#else
+   maxVersion = 110;
+#endif
 
    /* First retrieve the version number. */
    if (!_slang_preprocess_version(source, &version, &start, infolog))
       return GL_FALSE;
 
-   if (version > 110) {
+   if (version > maxVersion) {
       slang_info_log_error(infolog,
-                           "language version specified is not supported.");
+                           "language version %.2f is not supported.",
+                           version * 0.01);
       return GL_FALSE;
    }
 
@@ -1987,23 +1935,34 @@ compile_with_grammar(grammar id, const char *source, slang_code_unit * unit,
    }
 
    /* Finally check the syntax and generate its binary representation. */
-   if (!grammar_fast_check
-       (id, (const byte *) (slang_string_cstr(&preprocessed)), &prod, &size,
-        65536)) {
+   if (!grammar_fast_check(id,
+                           (const byte *) (slang_string_cstr(&preprocessed)),
+                           &prod, &size, 65536)) {
       char buf[1024];
       GLint pos;
 
       slang_string_free(&preprocessed);
       grammar_get_last_error((byte *) (buf), sizeof(buf), &pos);
       slang_info_log_error(infolog, buf);
+      /* syntax error (possibly in library code) */
+#if 0
+      {
+         int line, col;
+         char *s;
+         s = (char *) _mesa_find_line_column((const GLubyte *) source,
+                                             (const GLubyte *) source + pos,
+                                             &line, &col);
+         printf("Error on line %d, col %d: %s\n", line, col, s);
+      }
+#endif
       return GL_FALSE;
    }
    slang_string_free(&preprocessed);
 
    /* Syntax is okay - translate it to internal representation. */
-   if (!compile_binary
-       (prod, unit, type, infolog, builtin,
-        &builtin[SLANG_BUILTIN_TOTAL - 1])) {
+   if (!compile_binary(prod, unit, type, infolog, builtin,
+                       &builtin[SLANG_BUILTIN_TOTAL - 1],
+                       program)) {
       grammar_alloc_free(prod);
       return GL_FALSE;
    }
@@ -2019,6 +1978,10 @@ static const byte slang_core_gc[] = {
 #include "library/slang_core_gc.h"
 };
 
+static const byte slang_120_core_gc[] = {
+#include "library/slang_120_core_gc.h"
+};
+
 static const byte slang_common_builtin_gc[] = {
 #include "library/slang_common_builtin_gc.h"
 };
@@ -2031,15 +1994,10 @@ static const byte slang_vertex_builtin_gc[] = {
 #include "library/slang_vertex_builtin_gc.h"
 };
 
-#if defined(USE_X86_ASM) || defined(SLANG_X86)
-static const byte slang_builtin_vec4_gc[] = {
-#include "library/slang_builtin_vec4_gc.h"
-};
-#endif
-
 static GLboolean
 compile_object(grammar * id, const char *source, slang_code_object * object,
-               slang_unit_type type, slang_info_log * infolog)
+               slang_unit_type type, slang_info_log * infolog,
+               struct gl_program *program)
 {
    slang_code_unit *builtins = NULL;
 
@@ -2055,8 +2013,8 @@ compile_object(grammar * id, const char *source, slang_code_object * object,
    }
 
    /* set shader type - the syntax is slightly different for different shaders */
-   if (type == slang_unit_fragment_shader
-       || type == slang_unit_fragment_builtin)
+   if (type == SLANG_UNIT_FRAGMENT_SHADER
+       || type == SLANG_UNIT_FRAGMENT_BUILTIN)
       grammar_set_reg8(*id, (const byte *) "shader_type", 1);
    else
       grammar_set_reg8(*id, (const byte *) "shader_type", 2);
@@ -2065,84 +2023,151 @@ compile_object(grammar * id, const char *source, slang_code_object * object,
    grammar_set_reg8(*id, (const byte *) "parsing_builtin", 1);
 
    /* if parsing user-specified shader, load built-in library */
-   if (type == slang_unit_fragment_shader || type == slang_unit_vertex_shader) {
+   if (type == SLANG_UNIT_FRAGMENT_SHADER || type == SLANG_UNIT_VERTEX_SHADER) {
       /* compile core functionality first */
-      if (!compile_binary(slang_core_gc, &object->builtin[SLANG_BUILTIN_CORE],
-                          slang_unit_fragment_builtin, infolog, NULL, NULL))
+      if (!compile_binary(slang_core_gc,
+                          &object->builtin[SLANG_BUILTIN_CORE],
+                          SLANG_UNIT_FRAGMENT_BUILTIN, infolog,
+                          NULL, NULL, NULL))
          return GL_FALSE;
 
-      /* compile common functions and variables, link to core */
-      if (!compile_binary
-          (slang_common_builtin_gc, &object->builtin[SLANG_BUILTIN_COMMON],
-           slang_unit_fragment_builtin, infolog, NULL,
-           &object->builtin[SLANG_BUILTIN_CORE]))
-         return GL_FALSE;
-
-      /* compile target-specific functions and variables, link to common */
-      if (type == slang_unit_fragment_shader) {
-         if (!compile_binary
-             (slang_fragment_builtin_gc,
-              &object->builtin[SLANG_BUILTIN_TARGET],
-              slang_unit_fragment_builtin, infolog, NULL,
-              &object->builtin[SLANG_BUILTIN_COMMON]))
-            return GL_FALSE;
-      }
-      else if (type == slang_unit_vertex_shader) {
-         if (!compile_binary
-             (slang_vertex_builtin_gc, &object->builtin[SLANG_BUILTIN_TARGET],
-              slang_unit_vertex_builtin, infolog, NULL,
-              &object->builtin[SLANG_BUILTIN_COMMON]))
-            return GL_FALSE;
-      }
-
-#if defined(USE_X86_ASM) || defined(SLANG_X86)
-      /* compile x86 4-component vector overrides, link to target */
-      if (!compile_binary
-          (slang_builtin_vec4_gc, &object->builtin[SLANG_BUILTIN_VEC4],
-           slang_unit_fragment_builtin, infolog, NULL,
-           &object->builtin[SLANG_BUILTIN_TARGET]))
+#if FEATURE_ARB_shading_language_120
+      if (!compile_binary(slang_120_core_gc,
+                          &object->builtin[SLANG_BUILTIN_120_CORE],
+                          SLANG_UNIT_FRAGMENT_BUILTIN, infolog,
+                          NULL, &object->builtin[SLANG_BUILTIN_CORE], NULL))
          return GL_FALSE;
 #endif
 
+      /* compile common functions and variables, link to core */
+      if (!compile_binary(slang_common_builtin_gc,
+                          &object->builtin[SLANG_BUILTIN_COMMON],
+                          SLANG_UNIT_FRAGMENT_BUILTIN, infolog, NULL,
+#if FEATURE_ARB_shading_language_120
+                          &object->builtin[SLANG_BUILTIN_120_CORE],
+#else
+                          &object->builtin[SLANG_BUILTIN_CORE],
+#endif
+                          NULL))
+         return GL_FALSE;
+
+      /* compile target-specific functions and variables, link to common */
+      if (type == SLANG_UNIT_FRAGMENT_SHADER) {
+         if (!compile_binary(slang_fragment_builtin_gc,
+                             &object->builtin[SLANG_BUILTIN_TARGET],
+                             SLANG_UNIT_FRAGMENT_BUILTIN, infolog, NULL,
+                             &object->builtin[SLANG_BUILTIN_COMMON], NULL))
+            return GL_FALSE;
+      }
+      else if (type == SLANG_UNIT_VERTEX_SHADER) {
+         if (!compile_binary(slang_vertex_builtin_gc,
+                             &object->builtin[SLANG_BUILTIN_TARGET],
+                             SLANG_UNIT_VERTEX_BUILTIN, infolog, NULL,
+                             &object->builtin[SLANG_BUILTIN_COMMON], NULL))
+            return GL_FALSE;
+      }
+
       /* disable language extensions */
+#if NEW_SLANG /* allow-built-ins */
+      grammar_set_reg8(*id, (const byte *) "parsing_builtin", 1);
+#else
       grammar_set_reg8(*id, (const byte *) "parsing_builtin", 0);
+#endif
       builtins = object->builtin;
    }
 
    /* compile the actual shader - pass-in built-in library for external shader */
    return compile_with_grammar(*id, source, &object->unit, type, infolog,
-                               builtins);
+                               builtins, program);
 }
 
-GLboolean
-_slang_compile(const char *source, slang_code_object * object,
-               slang_unit_type type, slang_info_log * infolog)
+
+static GLboolean
+compile_shader(GLcontext *ctx, slang_code_object * object,
+               slang_unit_type type, slang_info_log * infolog,
+               struct gl_shader *shader)
 {
+   struct gl_program *program = shader->Programs[0];
    GLboolean success;
    grammar id = 0;
+
+   assert(program);
 
    _slang_code_object_dtr(object);
    _slang_code_object_ctr(object);
 
-   success = compile_object(&id, source, object, type, infolog);
+   success = compile_object(&id, shader->Source, object, type, infolog, program);
    if (id != 0)
       grammar_destroy(id);
    if (!success)
       return GL_FALSE;
 
-   if (!_slang_build_export_data_table(&object->expdata, &object->unit.vars))
-      return GL_FALSE;
-   if (!_slang_build_export_code_table
-       (&object->expcode, &object->unit.funs, &object->unit))
-      return GL_FALSE;
-
-#if defined(USE_X86_ASM) || defined(SLANG_X86)
-   /* XXX: lookup the @main label */
-   if (!_slang_x86_codegen
-       (&object->machine, &object->assembly,
-        object->expcode.entries[0].address))
-      return GL_FALSE;
-#endif
-
    return GL_TRUE;
 }
+
+
+
+GLboolean
+_slang_compile(GLcontext *ctx, struct gl_shader *shader)
+{
+   GLboolean success;
+   slang_info_log info_log;
+   slang_code_object obj;
+   slang_unit_type type;
+
+   if (shader->Type == GL_VERTEX_SHADER) {
+      type = SLANG_UNIT_VERTEX_SHADER;
+   }
+   else {
+      assert(shader->Type == GL_FRAGMENT_SHADER);
+      type = SLANG_UNIT_FRAGMENT_SHADER;
+   }
+
+   ctx->Shader.MemPool = _slang_new_mempool(1024*1024);
+
+   /* XXX temporary hack */
+   if (!shader->Programs) {
+      GLenum progTarget;
+      if (shader->Type == GL_VERTEX_SHADER)
+         progTarget = GL_VERTEX_PROGRAM_ARB;
+      else
+         progTarget = GL_FRAGMENT_PROGRAM_ARB;
+      shader->Programs
+         = (struct gl_program **) malloc(sizeof(struct gl_program*));
+      shader->Programs[0] = _mesa_new_program(ctx, progTarget, 1);
+      shader->NumPrograms = 1;
+
+      shader->Programs[0]->Parameters = _mesa_new_parameter_list();
+      shader->Programs[0]->Varying = _mesa_new_parameter_list();
+      shader->Programs[0]->Attributes = _mesa_new_parameter_list();
+   }
+
+   slang_info_log_construct(&info_log);
+   _slang_code_object_ctr(&obj);
+
+   success = compile_shader(ctx, &obj, type, &info_log, shader);
+
+   /* free shader's prev info log */
+   if (shader->InfoLog) {
+      _mesa_free(shader->InfoLog);
+      shader->InfoLog = NULL;
+   }
+
+   if (info_log.text) {
+      /* copy info-log string to shader object */
+      shader->InfoLog = _mesa_strdup(info_log.text);
+   }
+
+   if (info_log.error_flag) {
+      success = GL_FALSE;
+   }
+
+   slang_info_log_destruct(&info_log);
+   _slang_code_object_dtr(&obj);
+
+   _slang_delete_mempool((slang_mempool *) ctx->Shader.MemPool);
+   ctx->Shader.MemPool = NULL;
+
+   return success;
+}
+

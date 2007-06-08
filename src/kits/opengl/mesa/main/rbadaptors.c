@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.1
+ * Version:  6.5.3
  *
- * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -45,7 +45,7 @@ Delete_wrapper(struct gl_renderbuffer *rb)
    /* Decrement reference count on the buffer we're wrapping and delete
     * it if refcount hits zero.
     */
-   _mesa_dereference_renderbuffer(&rb->Wrapped);
+   _mesa_reference_renderbuffer(&rb->Wrapped, NULL);
 
    /* delete myself */
    _mesa_delete_renderbuffer(rb);

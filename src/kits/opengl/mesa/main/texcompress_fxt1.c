@@ -752,44 +752,55 @@ fxt1_quantize_ALPHA1 (GLuint *cc,
    GLint minColL = 0, maxColL = 0;
    GLint minColR = 0, maxColR = 0;
    GLint sumL = 0, sumR = 0;
-
+   GLint nn_comp;
    /* Our solution here is to find the darkest and brightest colors in
     * the 4x4 tile and use those as the two representative colors.
     * There are probably better algorithms to use (histogram-based).
     */
-   minSum = 2000; /* big enough */
-   maxSum = -1; /* small enough */
-   for (k = 0; k < N_TEXELS / 2; k++) {
-      GLint sum = 0;
-      for (i = 0; i < n_comp; i++) {
-         sum += input[k][i];
-      }
-      if (minSum > sum) {
-         minSum = sum;
-         minColL = k;
-      }
-      if (maxSum < sum) {
-         maxSum = sum;
-         maxColL = k;
-      }
-      sumL += sum;
+   nn_comp = n_comp;
+   while ((minColL == maxColL) && nn_comp) {
+       minSum = 2000; /* big enough */
+       maxSum = -1; /* small enough */
+       for (k = 0; k < N_TEXELS / 2; k++) {
+           GLint sum = 0;
+           for (i = 0; i < nn_comp; i++) {
+               sum += input[k][i];
+           }
+           if (minSum > sum) {
+               minSum = sum;
+               minColL = k;
+           }
+           if (maxSum < sum) {
+               maxSum = sum;
+               maxColL = k;
+           }
+           sumL += sum;
+       }
+       
+       nn_comp--;
    }
-   minSum = 2000; /* big enough */
-   maxSum = -1; /* small enough */
-   for (; k < N_TEXELS; k++) {
-      GLint sum = 0;
-      for (i = 0; i < n_comp; i++) {
-         sum += input[k][i];
-      }
-      if (minSum > sum) {
-         minSum = sum;
-         minColR = k;
-      }
-      if (maxSum < sum) {
-         maxSum = sum;
-         maxColR = k;
-      }
-      sumR += sum;
+
+   nn_comp = n_comp;
+   while ((minColR == maxColR) && nn_comp) {
+       minSum = 2000; /* big enough */
+       maxSum = -1; /* small enough */
+       for (k = N_TEXELS / 2; k < N_TEXELS; k++) {
+           GLint sum = 0;
+           for (i = 0; i < nn_comp; i++) {
+               sum += input[k][i];
+           }
+           if (minSum > sum) {
+               minSum = sum;
+               minColR = k;
+           }
+           if (maxSum < sum) {
+               maxSum = sum;
+               maxColR = k;
+           }
+           sumR += sum;
+       }
+
+       nn_comp--;
    }
 
    /* choose the common vector (yuck!) */

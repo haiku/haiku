@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.2
+ * Version:  6.5.3
  *
- * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -252,85 +252,76 @@ _mesa_PixelStoref( GLenum pname, GLfloat param )
 /*****                         glPixelMap                         *****/
 /**********************************************************************/
 
+/**
+ * Return pointer to a pixelmap by name.
+ */
+static struct gl_pixelmap *
+get_pixelmap(GLcontext *ctx, GLenum map)
+{
+   switch (map) {
+   case GL_PIXEL_MAP_I_TO_I:
+      return &ctx->PixelMaps.ItoI;
+   case GL_PIXEL_MAP_S_TO_S:
+      return &ctx->PixelMaps.StoS;
+   case GL_PIXEL_MAP_I_TO_R:
+      return &ctx->PixelMaps.ItoR;
+   case GL_PIXEL_MAP_I_TO_G:
+      return &ctx->PixelMaps.ItoG;
+   case GL_PIXEL_MAP_I_TO_B:
+      return &ctx->PixelMaps.ItoB;
+   case GL_PIXEL_MAP_I_TO_A:
+      return &ctx->PixelMaps.ItoA;
+   case GL_PIXEL_MAP_R_TO_R:
+      return &ctx->PixelMaps.RtoR;
+   case GL_PIXEL_MAP_G_TO_G:
+      return &ctx->PixelMaps.GtoG;
+   case GL_PIXEL_MAP_B_TO_B:
+      return &ctx->PixelMaps.BtoB;
+   case GL_PIXEL_MAP_A_TO_A:
+      return &ctx->PixelMaps.AtoA;
+   default:
+      return NULL;
+   }
+}
+
 
 /**
  * Helper routine used by the other _mesa_PixelMap() functions.
  */
 static void
-pixelmap(GLcontext *ctx, GLenum map, GLsizei mapsize, const GLfloat *values)
+store_pixelmap(GLcontext *ctx, GLenum map, GLsizei mapsize,
+               const GLfloat *values)
 {
    GLint i;
+   struct gl_pixelmap *pm = get_pixelmap(ctx, map);
+   if (!pm) {
+      _mesa_error(ctx, GL_INVALID_ENUM, "glPixelMap(map)");
+      return;
+   }
+
    switch (map) {
-      case GL_PIXEL_MAP_S_TO_S:
-         ctx->Pixel.MapStoSsize = mapsize;
-         for (i = 0; i < mapsize; i++) {
-	    ctx->Pixel.MapStoS[i] = IROUND(values[i]);
-	 }
-	 break;
-      case GL_PIXEL_MAP_I_TO_I:
-         ctx->Pixel.MapItoIsize = mapsize;
-         for (i = 0; i < mapsize; i++) {
-	    ctx->Pixel.MapItoI[i] = values[i];
-	 }
-	 break;
-      case GL_PIXEL_MAP_I_TO_R:
-         ctx->Pixel.MapItoRsize = mapsize;
-         for (i = 0; i < mapsize; i++) {
-            GLfloat val = CLAMP( values[i], 0.0F, 1.0F );
-	    ctx->Pixel.MapItoR[i] = val;
-	    ctx->Pixel.MapItoR8[i] = (GLint) (val * 255.0F);
-	 }
-	 break;
-      case GL_PIXEL_MAP_I_TO_G:
-         ctx->Pixel.MapItoGsize = mapsize;
-         for (i = 0; i < mapsize; i++) {
-            GLfloat val = CLAMP( values[i], 0.0F, 1.0F );
-	    ctx->Pixel.MapItoG[i] = val;
-	    ctx->Pixel.MapItoG8[i] = (GLint) (val * 255.0F);
-	 }
-	 break;
-      case GL_PIXEL_MAP_I_TO_B:
-         ctx->Pixel.MapItoBsize = mapsize;
-         for (i = 0; i < mapsize; i++) {
-            GLfloat val = CLAMP( values[i], 0.0F, 1.0F );
-	    ctx->Pixel.MapItoB[i] = val;
-	    ctx->Pixel.MapItoB8[i] = (GLint) (val * 255.0F);
-	 }
-	 break;
-      case GL_PIXEL_MAP_I_TO_A:
-         ctx->Pixel.MapItoAsize = mapsize;
-         for (i = 0; i < mapsize; i++) {
-            GLfloat val = CLAMP( values[i], 0.0F, 1.0F );
-	    ctx->Pixel.MapItoA[i] = val;
-	    ctx->Pixel.MapItoA8[i] = (GLint) (val * 255.0F);
-	 }
-	 break;
-      case GL_PIXEL_MAP_R_TO_R:
-         ctx->Pixel.MapRtoRsize = mapsize;
-         for (i = 0; i < mapsize; i++) {
-	    ctx->Pixel.MapRtoR[i] = CLAMP( values[i], 0.0F, 1.0F );
-	 }
-	 break;
-      case GL_PIXEL_MAP_G_TO_G:
-         ctx->Pixel.MapGtoGsize = mapsize;
-         for (i = 0; i < mapsize; i++) {
-	    ctx->Pixel.MapGtoG[i] = CLAMP( values[i], 0.0F, 1.0F );
-	 }
-	 break;
-      case GL_PIXEL_MAP_B_TO_B:
-         ctx->Pixel.MapBtoBsize = mapsize;
-         for (i = 0; i < mapsize; i++) {
-	    ctx->Pixel.MapBtoB[i] = CLAMP( values[i], 0.0F, 1.0F );
-	 }
-	 break;
-      case GL_PIXEL_MAP_A_TO_A:
-         ctx->Pixel.MapAtoAsize = mapsize;
-         for (i = 0; i < mapsize; i++) {
-	    ctx->Pixel.MapAtoA[i] = CLAMP( values[i], 0.0F, 1.0F );
-	 }
-	 break;
-      default:
-         _mesa_error( ctx, GL_INVALID_ENUM, "glPixelMap(map)" );
+   case GL_PIXEL_MAP_S_TO_S:
+      /* special case */
+      ctx->PixelMaps.StoS.Size = mapsize;
+      for (i = 0; i < mapsize; i++) {
+         ctx->PixelMaps.StoS.Map[i] = IROUND(values[i]);
+      }
+      break;
+   case GL_PIXEL_MAP_I_TO_I:
+      /* special case */
+      ctx->PixelMaps.ItoI.Size = mapsize;
+      for (i = 0; i < mapsize; i++) {
+         ctx->PixelMaps.ItoI.Map[i] = values[i];
+      }
+      break;
+   default:
+      /* general case */
+      pm->Size = mapsize;
+      for (i = 0; i < mapsize; i++) {
+         GLfloat val = CLAMP(values[i], 0.0F, 1.0F);
+         pm->Map[i] = val;
+         pm->Map8[i] = (GLint) (val * 255.0F);
+      }
    }
 }
 
@@ -385,14 +376,13 @@ _mesa_PixelMapfv( GLenum map, GLsizei mapsize, const GLfloat *values )
       return;
    }
 
-   pixelmap(ctx, map, mapsize, values);
+   store_pixelmap(ctx, map, mapsize, values);
 
    if (ctx->Unpack.BufferObj->Name) {
       ctx->Driver.UnmapBuffer(ctx, GL_PIXEL_UNPACK_BUFFER_EXT,
                               ctx->Unpack.BufferObj);
    }
 }
-
 
 
 void GLAPIENTRY
@@ -464,9 +454,8 @@ _mesa_PixelMapuiv(GLenum map, GLsizei mapsize, const GLuint *values )
                               ctx->Unpack.BufferObj);
    }
 
-   pixelmap(ctx, map, mapsize, fvalues);
+   store_pixelmap(ctx, map, mapsize, fvalues);
 }
-
 
 
 void GLAPIENTRY
@@ -520,7 +509,7 @@ _mesa_PixelMapusv(GLenum map, GLsizei mapsize, const GLushort *values )
       return;
    }
 
-    /* convert to floats */
+   /* convert to floats */
    if (map == GL_PIXEL_MAP_I_TO_I || map == GL_PIXEL_MAP_S_TO_S) {
       GLint i;
       for (i = 0; i < mapsize; i++) {
@@ -539,40 +528,7 @@ _mesa_PixelMapusv(GLenum map, GLsizei mapsize, const GLushort *values )
                               ctx->Unpack.BufferObj);
    }
 
-   pixelmap(ctx, map, mapsize, fvalues);
-}
-
-
-/**
- * Return size of the named map.
- */
-static GLuint
-get_map_size(GLcontext *ctx, GLenum map)
-{
-   switch (map) {
-      case GL_PIXEL_MAP_I_TO_I:
-         return ctx->Pixel.MapItoIsize;
-      case GL_PIXEL_MAP_S_TO_S:
-         return ctx->Pixel.MapStoSsize;
-      case GL_PIXEL_MAP_I_TO_R:
-         return ctx->Pixel.MapItoRsize;
-      case GL_PIXEL_MAP_I_TO_G:
-         return ctx->Pixel.MapItoGsize;
-      case GL_PIXEL_MAP_I_TO_B:
-         return ctx->Pixel.MapItoBsize;
-      case GL_PIXEL_MAP_I_TO_A:
-         return ctx->Pixel.MapItoAsize;
-      case GL_PIXEL_MAP_R_TO_R:
-         return ctx->Pixel.MapRtoRsize;
-      case GL_PIXEL_MAP_G_TO_G:
-         return ctx->Pixel.MapGtoGsize;
-      case GL_PIXEL_MAP_B_TO_B:
-         return ctx->Pixel.MapBtoBsize;
-      case GL_PIXEL_MAP_A_TO_A:
-         return ctx->Pixel.MapAtoAsize;
-      default:
-         return 0;
-   }
+   store_pixelmap(ctx, map, mapsize, fvalues);
 }
 
 
@@ -581,9 +537,17 @@ _mesa_GetPixelMapfv( GLenum map, GLfloat *values )
 {
    GET_CURRENT_CONTEXT(ctx);
    GLuint mapsize, i;
+   const struct gl_pixelmap *pm;
+
    ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-   mapsize = get_map_size(ctx, map);
+   pm = get_pixelmap(ctx, map);
+   if (!pm) {
+      _mesa_error(ctx, GL_INVALID_ENUM, "glGetPixelMapfv(map)");
+      return;
+   }
+
+   mapsize = pm->Size;
 
    if (ctx->Pack.BufferObj->Name) {
       /* pack pixelmap into PBO */
@@ -613,41 +577,14 @@ _mesa_GetPixelMapfv( GLenum map, GLfloat *values )
       return;
    }
 
-   switch (map) {
-      case GL_PIXEL_MAP_I_TO_I:
-         MEMCPY(values, ctx->Pixel.MapItoI, mapsize * sizeof(GLfloat));
-	 break;
-      case GL_PIXEL_MAP_S_TO_S:
-         for (i = 0; i < mapsize; i++) {
-	    values[i] = (GLfloat) ctx->Pixel.MapStoS[i];
-	 }
-	 break;
-      case GL_PIXEL_MAP_I_TO_R:
-         MEMCPY(values, ctx->Pixel.MapItoR, mapsize * sizeof(GLfloat));
-	 break;
-      case GL_PIXEL_MAP_I_TO_G:
-         MEMCPY(values, ctx->Pixel.MapItoG, mapsize * sizeof(GLfloat));
-	 break;
-      case GL_PIXEL_MAP_I_TO_B:
-         MEMCPY(values, ctx->Pixel.MapItoB, mapsize * sizeof(GLfloat));
-	 break;
-      case GL_PIXEL_MAP_I_TO_A:
-         MEMCPY(values, ctx->Pixel.MapItoA, mapsize * sizeof(GLfloat));
-	 break;
-      case GL_PIXEL_MAP_R_TO_R:
-         MEMCPY(values, ctx->Pixel.MapRtoR, mapsize * sizeof(GLfloat));
-	 break;
-      case GL_PIXEL_MAP_G_TO_G:
-         MEMCPY(values, ctx->Pixel.MapGtoG, mapsize * sizeof(GLfloat));
-	 break;
-      case GL_PIXEL_MAP_B_TO_B:
-         MEMCPY(values, ctx->Pixel.MapBtoB, mapsize * sizeof(GLfloat));
-	 break;
-      case GL_PIXEL_MAP_A_TO_A:
-         MEMCPY(values, ctx->Pixel.MapAtoA, mapsize * sizeof(GLfloat));
-	 break;
-      default:
-         _mesa_error( ctx, GL_INVALID_ENUM, "glGetPixelMapfv" );
+   if (map == GL_PIXEL_MAP_S_TO_S) {
+      /* special case */
+      for (i = 0; i < mapsize; i++) {
+         values[i] = (GLfloat) ctx->PixelMaps.StoS.Map[i];
+      }
+   }
+   else {
+      MEMCPY(values, pm->Map, mapsize * sizeof(GLfloat));
    }
 
    if (ctx->Pack.BufferObj->Name) {
@@ -662,9 +599,16 @@ _mesa_GetPixelMapuiv( GLenum map, GLuint *values )
 {
    GET_CURRENT_CONTEXT(ctx);
    GLint mapsize, i;
+   const struct gl_pixelmap *pm;
+
    ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-   mapsize = get_map_size(ctx, map);
+   pm = get_pixelmap(ctx, map);
+   if (!pm) {
+      _mesa_error(ctx, GL_INVALID_ENUM, "glGetPixelMapuiv(map)");
+      return;
+   }
+   mapsize = pm->Size;
 
    if (ctx->Pack.BufferObj->Name) {
       /* pack pixelmap into PBO */
@@ -694,57 +638,14 @@ _mesa_GetPixelMapuiv( GLenum map, GLuint *values )
       return;
    }
 
-   switch (map) {
-      case GL_PIXEL_MAP_I_TO_I:
-	 for (i = 0; i < mapsize; i++) {
-	    values[i] = FLOAT_TO_UINT( ctx->Pixel.MapItoI[i] );
-	 }
-	 break;
-      case GL_PIXEL_MAP_S_TO_S:
-         MEMCPY(values, ctx->Pixel.MapStoS, mapsize * sizeof(GLint));
-	 break;
-      case GL_PIXEL_MAP_I_TO_R:
-	 for (i = 0; i < mapsize; i++) {
-	    values[i] = FLOAT_TO_UINT( ctx->Pixel.MapItoR[i] );
-	 }
-	 break;
-      case GL_PIXEL_MAP_I_TO_G:
-	 for (i = 0; i < mapsize; i++) {
-	    values[i] = FLOAT_TO_UINT( ctx->Pixel.MapItoG[i] );
-	 }
-	 break;
-      case GL_PIXEL_MAP_I_TO_B:
-	 for (i = 0; i < mapsize; i++) {
-	    values[i] = FLOAT_TO_UINT( ctx->Pixel.MapItoB[i] );
-	 }
-	 break;
-      case GL_PIXEL_MAP_I_TO_A:
-	 for (i = 0; i < mapsize; i++) {
-	    values[i] = FLOAT_TO_UINT( ctx->Pixel.MapItoA[i] );
-	 }
-	 break;
-      case GL_PIXEL_MAP_R_TO_R:
-	 for (i = 0; i < mapsize; i++) {
-	    values[i] = FLOAT_TO_UINT( ctx->Pixel.MapRtoR[i] );
-	 }
-	 break;
-      case GL_PIXEL_MAP_G_TO_G:
-	 for (i = 0; i < mapsize; i++) {
-	    values[i] = FLOAT_TO_UINT( ctx->Pixel.MapGtoG[i] );
-	 }
-	 break;
-      case GL_PIXEL_MAP_B_TO_B:
-	 for (i = 0; i < mapsize; i++) {
-	    values[i] = FLOAT_TO_UINT( ctx->Pixel.MapBtoB[i] );
-	 }
-	 break;
-      case GL_PIXEL_MAP_A_TO_A:
-	 for (i = 0; i < mapsize; i++) {
-	    values[i] = FLOAT_TO_UINT( ctx->Pixel.MapAtoA[i] );
-	 }
-	 break;
-      default:
-         _mesa_error( ctx, GL_INVALID_ENUM, "glGetPixelMapfv" );
+   if (map == GL_PIXEL_MAP_S_TO_S) {
+      /* special case */
+      MEMCPY(values, ctx->PixelMaps.StoS.Map, mapsize * sizeof(GLint));
+   }
+   else {
+      for (i = 0; i < mapsize; i++) {
+         values[i] = FLOAT_TO_UINT( pm->Map[i] );
+      }
    }
 
    if (ctx->Pack.BufferObj->Name) {
@@ -759,9 +660,16 @@ _mesa_GetPixelMapusv( GLenum map, GLushort *values )
 {
    GET_CURRENT_CONTEXT(ctx);
    GLint mapsize, i;
+   const struct gl_pixelmap *pm;
+
    ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-   mapsize = get_map_size(ctx, map);
+   pm = get_pixelmap(ctx, map);
+   if (!pm) {
+      _mesa_error(ctx, GL_INVALID_ENUM, "glGetPixelMapusv(map)");
+      return;
+   }
+   mapsize = pm ? pm->Size : 0;
 
    if (ctx->Pack.BufferObj->Name) {
       /* pack pixelmap into PBO */
@@ -793,58 +701,21 @@ _mesa_GetPixelMapusv( GLenum map, GLushort *values )
    }
 
    switch (map) {
-      case GL_PIXEL_MAP_I_TO_I:
-	 for (i = 0; i < mapsize; i++) {
-            values[i] = (GLushort) CLAMP(ctx->Pixel.MapItoI[i], 0.0, 65535.0);
-	 }
-	 break;
-      case GL_PIXEL_MAP_S_TO_S:
-	 for (i = 0; i < mapsize; i++) {
-            values[i] = (GLushort) CLAMP(ctx->Pixel.MapStoS[i], 0.0, 65535.0);
-	 }
-	 break;
-      case GL_PIXEL_MAP_I_TO_R:
-	 for (i = 0; i < mapsize; i++) {
-	    CLAMPED_FLOAT_TO_USHORT(values[i] , ctx->Pixel.MapItoR[i] );
-	 }
-	 break;
-      case GL_PIXEL_MAP_I_TO_G:
-	 for (i = 0; i < mapsize; i++) {
-	    CLAMPED_FLOAT_TO_USHORT(values[i] , ctx->Pixel.MapItoG[i] );
-	 }
-	 break;
-      case GL_PIXEL_MAP_I_TO_B:
-	 for (i = 0; i < mapsize; i++) {
-	    CLAMPED_FLOAT_TO_USHORT(values[i] , ctx->Pixel.MapItoB[i] );
-	 }
-	 break;
-      case GL_PIXEL_MAP_I_TO_A:
-	 for (i = 0; i < mapsize; i++) {
-	    CLAMPED_FLOAT_TO_USHORT(values[i] , ctx->Pixel.MapItoA[i] );
-	 }
-	 break;
-      case GL_PIXEL_MAP_R_TO_R:
-	 for (i = 0; i < mapsize; i++) {
-	    CLAMPED_FLOAT_TO_USHORT(values[i] , ctx->Pixel.MapRtoR[i] );
-	 }
-	 break;
-      case GL_PIXEL_MAP_G_TO_G:
-	 for (i = 0; i < mapsize; i++) {
-	    CLAMPED_FLOAT_TO_USHORT(values[i] , ctx->Pixel.MapGtoG[i] );
-	 }
-	 break;
-      case GL_PIXEL_MAP_B_TO_B:
-	 for (i = 0; i < mapsize; i++) {
-	    CLAMPED_FLOAT_TO_USHORT(values[i] , ctx->Pixel.MapBtoB[i] );
-	 }
-	 break;
-      case GL_PIXEL_MAP_A_TO_A:
-	 for (i = 0; i < mapsize; i++) {
-	    CLAMPED_FLOAT_TO_USHORT(values[i] , ctx->Pixel.MapAtoA[i] );
-	 }
-	 break;
-      default:
-         _mesa_error( ctx, GL_INVALID_ENUM, "glGetPixelMapfv" );
+   /* special cases */
+   case GL_PIXEL_MAP_I_TO_I:
+      for (i = 0; i < mapsize; i++) {
+         values[i] = (GLushort) CLAMP(ctx->PixelMaps.ItoI.Map[i], 0.0, 65535.);
+      }
+      break;
+   case GL_PIXEL_MAP_S_TO_S:
+      for (i = 0; i < mapsize; i++) {
+         values[i] = (GLushort) CLAMP(ctx->PixelMaps.StoS.Map[i], 0.0, 65535.);
+      }
+      break;
+   default:
+      for (i = 0; i < mapsize; i++) {
+         CLAMPED_FLOAT_TO_USHORT(values[i], pm->Map[i] );
+      }
    }
 
    if (ctx->Pack.BufferObj->Name) {
@@ -1040,16 +911,16 @@ _mesa_PixelTransferf( GLenum pname, GLfloat param )
          ctx->Pixel.PostConvolutionBias[2] = param;
 	 break;
       case GL_POST_CONVOLUTION_ALPHA_SCALE:
-         if (ctx->Pixel.PostConvolutionScale[2] == param)
+         if (ctx->Pixel.PostConvolutionScale[3] == param)
 	    return;
 	 FLUSH_VERTICES(ctx, _NEW_PIXEL);
-         ctx->Pixel.PostConvolutionScale[2] = param;
+         ctx->Pixel.PostConvolutionScale[3] = param;
 	 break;
       case GL_POST_CONVOLUTION_ALPHA_BIAS:
-         if (ctx->Pixel.PostConvolutionBias[2] == param)
+         if (ctx->Pixel.PostConvolutionBias[3] == param)
 	    return;
 	 FLUSH_VERTICES(ctx, _NEW_PIXEL);
-         ctx->Pixel.PostConvolutionBias[2] = param;
+         ctx->Pixel.PostConvolutionBias[3] = param;
 	 break;
       default:
          _mesa_error( ctx, GL_INVALID_ENUM, "glPixelTransfer(pname)" );
@@ -1113,14 +984,14 @@ _mesa_scale_and_bias_rgba(GLuint n, GLfloat rgba[][4],
 void
 _mesa_map_rgba( const GLcontext *ctx, GLuint n, GLfloat rgba[][4] )
 {
-   const GLfloat rscale = (GLfloat) (ctx->Pixel.MapRtoRsize - 1);
-   const GLfloat gscale = (GLfloat) (ctx->Pixel.MapGtoGsize - 1);
-   const GLfloat bscale = (GLfloat) (ctx->Pixel.MapBtoBsize - 1);
-   const GLfloat ascale = (GLfloat) (ctx->Pixel.MapAtoAsize - 1);
-   const GLfloat *rMap = ctx->Pixel.MapRtoR;
-   const GLfloat *gMap = ctx->Pixel.MapGtoG;
-   const GLfloat *bMap = ctx->Pixel.MapBtoB;
-   const GLfloat *aMap = ctx->Pixel.MapAtoA;
+   const GLfloat rscale = (GLfloat) (ctx->PixelMaps.RtoR.Size - 1);
+   const GLfloat gscale = (GLfloat) (ctx->PixelMaps.GtoG.Size - 1);
+   const GLfloat bscale = (GLfloat) (ctx->PixelMaps.BtoB.Size - 1);
+   const GLfloat ascale = (GLfloat) (ctx->PixelMaps.AtoA.Size - 1);
+   const GLfloat *rMap = ctx->PixelMaps.RtoR.Map;
+   const GLfloat *gMap = ctx->PixelMaps.GtoG.Map;
+   const GLfloat *bMap = ctx->PixelMaps.BtoB.Map;
+   const GLfloat *aMap = ctx->PixelMaps.AtoA.Map;
    GLuint i;
    for (i=0;i<n;i++) {
       GLfloat r = CLAMP(rgba[i][RCOMP], 0.0F, 1.0F);
@@ -1413,14 +1284,14 @@ void
 _mesa_map_ci_to_rgba( const GLcontext *ctx, GLuint n,
                       const GLuint index[], GLfloat rgba[][4] )
 {
-   GLuint rmask = ctx->Pixel.MapItoRsize - 1;
-   GLuint gmask = ctx->Pixel.MapItoGsize - 1;
-   GLuint bmask = ctx->Pixel.MapItoBsize - 1;
-   GLuint amask = ctx->Pixel.MapItoAsize - 1;
-   const GLfloat *rMap = ctx->Pixel.MapItoR;
-   const GLfloat *gMap = ctx->Pixel.MapItoG;
-   const GLfloat *bMap = ctx->Pixel.MapItoB;
-   const GLfloat *aMap = ctx->Pixel.MapItoA;
+   GLuint rmask = ctx->PixelMaps.ItoR.Size - 1;
+   GLuint gmask = ctx->PixelMaps.ItoG.Size - 1;
+   GLuint bmask = ctx->PixelMaps.ItoB.Size - 1;
+   GLuint amask = ctx->PixelMaps.ItoA.Size - 1;
+   const GLfloat *rMap = ctx->PixelMaps.ItoR.Map;
+   const GLfloat *gMap = ctx->PixelMaps.ItoG.Map;
+   const GLfloat *bMap = ctx->PixelMaps.ItoB.Map;
+   const GLfloat *aMap = ctx->PixelMaps.ItoA.Map;
    GLuint i;
    for (i=0;i<n;i++) {
       rgba[i][RCOMP] = rMap[index[i] & rmask];
@@ -1438,14 +1309,14 @@ void
 _mesa_map_ci8_to_rgba8(const GLcontext *ctx, GLuint n, const GLubyte index[],
                        GLubyte rgba[][4])
 {
-   GLuint rmask = ctx->Pixel.MapItoRsize - 1;
-   GLuint gmask = ctx->Pixel.MapItoGsize - 1;
-   GLuint bmask = ctx->Pixel.MapItoBsize - 1;
-   GLuint amask = ctx->Pixel.MapItoAsize - 1;
-   const GLubyte *rMap = ctx->Pixel.MapItoR8;
-   const GLubyte *gMap = ctx->Pixel.MapItoG8;
-   const GLubyte *bMap = ctx->Pixel.MapItoB8;
-   const GLubyte *aMap = ctx->Pixel.MapItoA8;
+   GLuint rmask = ctx->PixelMaps.ItoR.Size - 1;
+   GLuint gmask = ctx->PixelMaps.ItoG.Size - 1;
+   GLuint bmask = ctx->PixelMaps.ItoB.Size - 1;
+   GLuint amask = ctx->PixelMaps.ItoA.Size - 1;
+   const GLubyte *rMap = ctx->PixelMaps.ItoR.Map8;
+   const GLubyte *gMap = ctx->PixelMaps.ItoG.Map8;
+   const GLubyte *bMap = ctx->PixelMaps.ItoB.Map8;
+   const GLubyte *aMap = ctx->PixelMaps.ItoA.Map8;
    GLuint i;
    for (i=0;i<n;i++) {
       rgba[i][RCOMP] = rMap[index[i] & rmask];
@@ -1496,7 +1367,7 @@ update_image_transfer_state(GLcontext *ctx)
    if (ctx->Pixel.MapColorFlag)
       mask |= IMAGE_MAP_COLOR_BIT;
 
-   if (ctx->Pixel.ColorTableEnabled)
+   if (ctx->Pixel.ColorTableEnabled[COLORTABLE_PRECONVOLUTION])
       mask |= IMAGE_COLOR_TABLE_BIT;
 
    if (ctx->Pixel.Convolution1DEnabled ||
@@ -1515,7 +1386,7 @@ update_image_transfer_state(GLcontext *ctx)
       }
    }
 
-   if (ctx->Pixel.PostConvolutionColorTableEnabled)
+   if (ctx->Pixel.ColorTableEnabled[COLORTABLE_POSTCONVOLUTION])
       mask |= IMAGE_POST_CONVOLUTION_COLOR_TABLE_BIT;
 
    if (ctx->ColorMatrixStack.Top->type != MATRIX_IDENTITY ||
@@ -1529,7 +1400,7 @@ update_image_transfer_state(GLcontext *ctx)
        ctx->Pixel.PostColorMatrixBias[3]  != 0.0F)
       mask |= IMAGE_COLOR_MATRIX_BIT;
 
-   if (ctx->Pixel.PostColorMatrixColorTableEnabled)
+   if (ctx->Pixel.ColorTableEnabled[COLORTABLE_POSTCOLORMATRIX])
       mask |= IMAGE_POST_COLOR_MATRIX_COLOR_TABLE_BIT;
 
    if (ctx->Pixel.HistogramEnabled)
@@ -1558,6 +1429,14 @@ void _mesa_update_pixel( GLcontext *ctx, GLuint new_state )
 /*****                      Initialization                        *****/
 /**********************************************************************/
 
+static void
+init_pixelmap(struct gl_pixelmap *map)
+{
+   map->Size = 1;
+   map->Map[0] = 0.0;
+   map->Map8[0] = 0;
+}
+
 
 /**
  * Initialize the context's PIXEL attribute group.
@@ -1584,43 +1463,25 @@ _mesa_init_pixel( GLcontext *ctx )
    ctx->Pixel.ZoomY = 1.0;
    ctx->Pixel.MapColorFlag = GL_FALSE;
    ctx->Pixel.MapStencilFlag = GL_FALSE;
-   ctx->Pixel.MapStoSsize = 1;
-   ctx->Pixel.MapItoIsize = 1;
-   ctx->Pixel.MapItoRsize = 1;
-   ctx->Pixel.MapItoGsize = 1;
-   ctx->Pixel.MapItoBsize = 1;
-   ctx->Pixel.MapItoAsize = 1;
-   ctx->Pixel.MapRtoRsize = 1;
-   ctx->Pixel.MapGtoGsize = 1;
-   ctx->Pixel.MapBtoBsize = 1;
-   ctx->Pixel.MapAtoAsize = 1;
-   ctx->Pixel.MapStoS[0] = 0;
-   ctx->Pixel.MapItoI[0] = 0.0;
-   ctx->Pixel.MapItoR[0] = 0.0;
-   ctx->Pixel.MapItoG[0] = 0.0;
-   ctx->Pixel.MapItoB[0] = 0.0;
-   ctx->Pixel.MapItoA[0] = 0.0;
-   ctx->Pixel.MapItoR8[0] = 0;
-   ctx->Pixel.MapItoG8[0] = 0;
-   ctx->Pixel.MapItoB8[0] = 0;
-   ctx->Pixel.MapItoA8[0] = 0;
-   ctx->Pixel.MapRtoR[0] = 0.0;
-   ctx->Pixel.MapGtoG[0] = 0.0;
-   ctx->Pixel.MapBtoB[0] = 0.0;
-   ctx->Pixel.MapAtoA[0] = 0.0;
+   init_pixelmap(&ctx->PixelMaps.StoS);
+   init_pixelmap(&ctx->PixelMaps.ItoI);
+   init_pixelmap(&ctx->PixelMaps.ItoR);
+   init_pixelmap(&ctx->PixelMaps.ItoG);
+   init_pixelmap(&ctx->PixelMaps.ItoB);
+   init_pixelmap(&ctx->PixelMaps.ItoA);
+   init_pixelmap(&ctx->PixelMaps.RtoR);
+   init_pixelmap(&ctx->PixelMaps.GtoG);
+   init_pixelmap(&ctx->PixelMaps.BtoB);
+   init_pixelmap(&ctx->PixelMaps.AtoA);
    ctx->Pixel.HistogramEnabled = GL_FALSE;
    ctx->Pixel.MinMaxEnabled = GL_FALSE;
    ASSIGN_4V(ctx->Pixel.PostColorMatrixScale, 1.0, 1.0, 1.0, 1.0);
    ASSIGN_4V(ctx->Pixel.PostColorMatrixBias, 0.0, 0.0, 0.0, 0.0);
-   ASSIGN_4V(ctx->Pixel.ColorTableScale, 1.0, 1.0, 1.0, 1.0);
-   ASSIGN_4V(ctx->Pixel.ColorTableBias, 0.0, 0.0, 0.0, 0.0);
-   ASSIGN_4V(ctx->Pixel.PCCTscale, 1.0, 1.0, 1.0, 1.0);
-   ASSIGN_4V(ctx->Pixel.PCCTbias, 0.0, 0.0, 0.0, 0.0);
-   ASSIGN_4V(ctx->Pixel.PCMCTscale, 1.0, 1.0, 1.0, 1.0);
-   ASSIGN_4V(ctx->Pixel.PCMCTbias, 0.0, 0.0, 0.0, 0.0);
-   ctx->Pixel.ColorTableEnabled = GL_FALSE;
-   ctx->Pixel.PostConvolutionColorTableEnabled = GL_FALSE;
-   ctx->Pixel.PostColorMatrixColorTableEnabled = GL_FALSE;
+   for (i = 0; i < COLORTABLE_MAX; i++) {
+      ASSIGN_4V(ctx->Pixel.ColorTableScale[i], 1.0, 1.0, 1.0, 1.0);
+      ASSIGN_4V(ctx->Pixel.ColorTableBias[i], 0.0, 0.0, 0.0, 0.0);
+      ctx->Pixel.ColorTableEnabled[i] = GL_FALSE;
+   }
    ctx->Pixel.Convolution1DEnabled = GL_FALSE;
    ctx->Pixel.Convolution2DEnabled = GL_FALSE;
    ctx->Pixel.Separable2DEnabled = GL_FALSE;

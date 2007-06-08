@@ -76,7 +76,8 @@ update_array(GLcontext *ctx, struct gl_client_array *array,
     */
    if (ctx->Array.ArrayBufferObj->Name)
       array->_MaxElement = ((GLsizeiptrARB) ctx->Array.ArrayBufferObj->Size
-                            - (GLsizeiptrARB) array->Ptr) / array->StrideB;
+                            - (GLsizeiptrARB) array->Ptr + array->StrideB
+                            - elementSize) / array->StrideB;
    else
 #endif
       array->_MaxElement = 2 * 1000 * 1000 * 1000; /* just a big number */

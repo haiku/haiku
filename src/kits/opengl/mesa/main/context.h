@@ -138,46 +138,8 @@ _mesa_get_current_context(void);
 /*@}*/
 
 
-/** \name OpenGL SI-style export functions */
-/*@{*/
-
-extern GLboolean
-_mesa_destroyContext(__GLcontext *gc);
-
-extern GLboolean
-_mesa_loseCurrent(__GLcontext *gc);
-
-extern GLboolean
-_mesa_makeCurrent(__GLcontext *gc);
-
-extern GLboolean
-_mesa_shareContext(__GLcontext *gc, __GLcontext *gcShare);
-
-extern GLboolean
-_mesa_copyContext(__GLcontext *dst, const __GLcontext *src, GLuint mask);
-
-extern GLboolean
-_mesa_forceCurrent(__GLcontext *gc);
-
-extern GLboolean
-_mesa_notifyResize(__GLcontext *gc);
-
-extern void
-_mesa_notifyDestroy(__GLcontext *gc);
-
 extern void
 _mesa_notifySwapBuffers(__GLcontext *gc);
-
-extern struct __GLdispatchStateRec *
-_mesa_dispatchExec(__GLcontext *gc);
-
-extern void
-_mesa_beginDispatchOverride(__GLcontext *gc);
-
-extern void
-_mesa_endDispatchOverride(__GLcontext *gc);
-
-/*@}*/
 
 
 extern struct _glapi_table *

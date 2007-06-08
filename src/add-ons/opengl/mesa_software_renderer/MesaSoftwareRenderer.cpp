@@ -21,7 +21,6 @@
 #include <Screen.h>
 
 extern "C" {
-#include "array_cache/acache.h"
 #include "extensions.h"
 #include "drivers/common/driverfuncs.h"
 #include "main/colormac.h"
@@ -35,6 +34,7 @@ extern "C" {
 #include "tnl/tnl.h"
 #include "tnl/t_context.h"
 #include "tnl/t_pipeline.h"
+#include "vbo/vbo.h"
 
 
 #if defined(USE_X86_ASM)
@@ -55,11 +55,6 @@ extern const char * color_space_name(color_space space);
 #define BE_BCOMP 0
 #define BE_ACOMP 3
 
-#define PACK_B_RGBA32(color) (color[BCOMP] | (color[GCOMP] << 8) | \
-							(color[RCOMP] << 16) | (color[ACOMP] << 24))
-
-#define PACK_B_RGB32(color) (color[BCOMP] | (color[GCOMP] << 8) | \
-  							(color[RCOMP] << 16) | 0xFF000000)
 #else
 // Big Endian B_RGBA32 bitmap format
 #define BE_RCOMP 1
@@ -67,11 +62,6 @@ extern const char * color_space_name(color_space space);
 #define BE_BCOMP 3
 #define BE_ACOMP 0
 
-#define PACK_B_RGBA32(color) (color[ACOMP] | (color[RCOMP] << 8) | \
-							(color[GCOMP] << 16) | (color[BCOMP] << 24))
-
-#define PACK_B_RGB32(color) ((color[RCOMP] << 8) | (color[GCOMP] << 16) | \
-  							(color[BCOMP] << 24) | 0xFF000000)
 #endif
 
 /**********************************************************************/
@@ -213,7 +203,7 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView *view, ulong options, BGLDisp
 
 	/* Initialize the software rasterizer and helper modules. */
 	_swrast_CreateContext(fContext);
-	_ac_CreateContext(fContext);
+	_vbo_CreateContext(fContext);
 	_tnl_CreateContext(fContext);
 	_swsetup_CreateContext(fContext);
 	_swsetup_Wakeup(fContext);
@@ -310,7 +300,7 @@ MesaSoftwareRenderer::LockGL()
 					fRenderBuffer->PutMonoValues = put_mono_values_RGB16;
 					break;
 				default:
-					fprintf(stderr, "unsupported screen color space %ld\n", cs);
+					fprintf(stderr, "unsupported screen color space %d\n", cs);
 					debugger("unsupported OpenGL color space");
 					break;
 			}
@@ -347,9 +337,12 @@ void
 MesaSoftwareRenderer::SwapBuffers(bool VSync)
 {
 	CALLED();
-	_mesa_notifySwapBuffers(fContext);
-
+	
+	
 	if (fBitmap) {
+		if (fVisual->doubleBufferMode)
+			_mesa_notifySwapBuffers(fContext);
+
 		if (!fDirectModeEnabled || fInfo == NULL) {
 			GLView()->LockLooper();
 			GLView()->DrawBitmap(fBitmap);
@@ -627,7 +620,7 @@ MesaSoftwareRenderer::UpdateState(GLcontext *ctx, GLuint new_state)
 	CALLED();
 	_swrast_InvalidateState(ctx, new_state);
 	_swsetup_InvalidateState(ctx, new_state);
-	_ac_InvalidateState(ctx, new_state);
+	_vbo_InvalidateState(ctx, new_state);
 	_tnl_InvalidateState(ctx, new_state);
 }
 
@@ -636,6 +629,8 @@ GLboolean
 MesaSoftwareRenderer::RenderbufferStorage(GLcontext *ctx, struct gl_renderbuffer *render,
 	GLenum internalFormat, GLuint width, GLuint height)
 {
+	render->Width = width;
+	render->Height = height;
 	return GL_TRUE;
 }
 
@@ -652,3 +647,4 @@ MesaSoftwareRenderer::DirectConnected(direct_buffer_info *info)
 {
 	fInfo = info;
 }
+

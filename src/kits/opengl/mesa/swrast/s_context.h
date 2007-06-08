@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.2
+ * Version:  6.5.3
  *
- * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -45,204 +45,8 @@
 
 #include "mtypes.h"
 #include "swrast.h"
-
-
-/**
- * \defgroup SpanFlags SPAN_XXX-flags
- * Bitmasks to indicate which sw_span_arrays need to be computed
- * (sw_span::interpMask) or have already been filled in (sw_span::arrayMask)
- */
-/*@{*/
-#define SPAN_RGBA         0x001
-#define SPAN_SPEC         0x002
-#define SPAN_INDEX        0x004
-#define SPAN_Z            0x008
-#define SPAN_W            0x010
-#define SPAN_FOG          0x020
-#define SPAN_TEXTURE      0x040
-#define SPAN_INT_TEXTURE  0x080
-#define SPAN_LAMBDA       0x100
-#define SPAN_COVERAGE     0x200
-#define SPAN_FLAT         0x400  /**< flat shading? */
-#define SPAN_XY           0x800
-#define SPAN_MASK        0x1000
-#define SPAN_VARYING     0x2000
-/*@}*/
-
-#if 0
-/* alternate arrangement for code below */
-struct arrays2 {
-   union {
-      GLubyte  sz1[MAX_WIDTH][4]; /* primary color */
-      GLushort sz2[MAX_WIDTH][4];
-      GLfloat  sz4[MAX_WIDTH][4];
-   } rgba;
-   union {
-      GLubyte  sz1[MAX_WIDTH][4]; /* specular color and temp storage */
-      GLushort sz2[MAX_WIDTH][4];
-      GLfloat  sz4[MAX_WIDTH][4];
-   } spec;
-};
-#endif
-
-
-/**
- * \sw_span_arrays 
- * \brief Arrays of fragment values.
- *
- * These will either be computed from the x/xStep values above or
- * filled in by glDraw/CopyPixels, etc.
- * These arrays are separated out of sw_span to conserve memory.
- */
-typedef struct sw_span_arrays {
-   GLenum ChanType; /**< Color channel type, GL_UNSIGNED_BYTE, GL_FLOAT */
-   union {
-      struct {
-         GLubyte rgba[MAX_WIDTH][4]; /**< primary color */
-         GLubyte spec[MAX_WIDTH][4]; /**< specular color and temp storage */
-      } sz1;
-      struct {
-         GLushort rgba[MAX_WIDTH][4];
-         GLushort spec[MAX_WIDTH][4];
-      } sz2;
-      struct {
-         GLfloat rgba[MAX_WIDTH][4];
-         GLfloat spec[MAX_WIDTH][4];
-      } sz4;
-   } color;
-   /** XXX these are temporary fields, pointing into above color arrays */
-   GLchan (*rgba)[4];
-   GLchan (*spec)[4];
-
-   GLuint  index[MAX_WIDTH];
-   GLint   x[MAX_WIDTH];  /**< X/Y used for point/line rendering only */
-   GLint   y[MAX_WIDTH];  /**< X/Y used for point/line rendering only */
-   GLuint  z[MAX_WIDTH];
-   GLfloat fog[MAX_WIDTH];
-   GLfloat texcoords[MAX_TEXTURE_COORD_UNITS][MAX_WIDTH][4];
-   GLfloat lambda[MAX_TEXTURE_COORD_UNITS][MAX_WIDTH];
-   GLfloat coverage[MAX_WIDTH];
-   GLfloat varying[MAX_WIDTH][MAX_VARYING_VECTORS][VARYINGS_PER_VECTOR];
-
-   /** This mask indicates which fragments are alive or culled */
-   GLubyte mask[MAX_WIDTH];
-} SWspanarrays;
-
-
-/**
- * \SWspan
- * \brief Contains data for either a horizontal line or a set of
- * pixels that are passed through a pipeline of functions before being
- * drawn.
- *
- * The sw_span structure describes the colors, Z, fogcoord, texcoords,
- * etc for either a horizontal run or an array of independent pixels.
- * We can either specify a base/step to indicate interpolated values, or
- * fill in arrays of values.  The interpMask and arrayMask bitfields
- * indicate which are active.
- *
- * With this structure it's easy to hand-off span rasterization to
- * subroutines instead of doing it all inline in the triangle functions
- * like we used to do.
- * It also cleans up the local variable namespace a great deal.
- *
- * It would be interesting to experiment with multiprocessor rasterization
- * with this structure.  The triangle rasterizer could simply emit a
- * stream of these structures which would be consumed by one or more
- * span-processing threads which could run in parallel.
- */
-typedef struct sw_span {
-   GLint x, y;
-
-   /** Only need to process pixels between start <= i < end */
-   /** At this time, start is always zero. */
-   GLuint start, end;
-
-   /** This flag indicates that mask[] array is effectively filled with ones */
-   GLboolean writeAll;
-
-   /** either GL_POLYGON, GL_LINE, GL_POLYGON, GL_BITMAP */
-   GLenum primitive;
-
-   /** 0 = front-facing span, 1 = back-facing span (for two-sided stencil) */
-   GLuint facing;
-
-   /**
-    * This bitmask (of  \link SpanFlags SPAN_* flags\endlink) indicates
-    * which of the x/xStep variables are relevant.
-    */
-   GLbitfield interpMask;
-
-   /* For horizontal spans, step is the partial derivative wrt X.
-    * For lines, step is the delta from one fragment to the next.
-    */
-#if CHAN_TYPE == GL_FLOAT
-   GLfloat red, redStep;
-   GLfloat green, greenStep;
-   GLfloat blue, blueStep;
-   GLfloat alpha, alphaStep;
-   GLfloat specRed, specRedStep;
-   GLfloat specGreen, specGreenStep;
-   GLfloat specBlue, specBlueStep;
-#else /* CHAN_TYPE == GL_UNSIGNED_BYTE or GL_UNSIGNED_SHORT */
-   GLfixed red, redStep;
-   GLfixed green, greenStep;
-   GLfixed blue, blueStep;
-   GLfixed alpha, alphaStep;
-   GLfixed specRed, specRedStep;
-   GLfixed specGreen, specGreenStep;
-   GLfixed specBlue, specBlueStep;
-#endif
-   GLfixed index, indexStep;
-   GLfixed z, zStep;    /* XXX z should probably be GLuint */
-   GLfloat fog, fogStep;
-   GLfloat tex[MAX_TEXTURE_COORD_UNITS][4];  /* s, t, r, q */
-   GLfloat texStepX[MAX_TEXTURE_COORD_UNITS][4];
-   GLfloat texStepY[MAX_TEXTURE_COORD_UNITS][4];
-   GLfixed intTex[2], intTexStep[2];  /* s, t only */
-   GLfloat var[MAX_VARYING_VECTORS][VARYINGS_PER_VECTOR];
-   GLfloat varStepX[MAX_VARYING_VECTORS][VARYINGS_PER_VECTOR];
-   GLfloat varStepY[MAX_VARYING_VECTORS][VARYINGS_PER_VECTOR];
-
-   /* partial derivatives wrt X and Y. */
-   GLfloat dzdx, dzdy;
-   GLfloat w, dwdx, dwdy;
-   GLfloat drdx, drdy;
-   GLfloat dgdx, dgdy;
-   GLfloat dbdx, dbdy;
-   GLfloat dadx, dady;
-   GLfloat dsrdx, dsrdy;
-   GLfloat dsgdx, dsgdy;
-   GLfloat dsbdx, dsbdy;
-   GLfloat dfogdx, dfogdy;
-
-   /**
-    * This bitmask (of \link SpanFlags SPAN_* flags\endlink) indicates
-    * which of the fragment arrays in the span_arrays struct are relevant.
-    */
-   GLbitfield arrayMask;
-
-   /**
-    * We store the arrays of fragment values in a separate struct so
-    * that we can allocate sw_span structs on the stack without using
-    * a lot of memory.  The span_arrays struct is about 400KB while the
-    * sw_span struct is only about 512 bytes.
-    */
-   SWspanarrays *array;
-} SWspan;
-
-
-
-#define INIT_SPAN(S, PRIMITIVE, END, INTERP_MASK, ARRAY_MASK)	\
-do {								\
-   (S).primitive = (PRIMITIVE);					\
-   (S).interpMask = (INTERP_MASK);				\
-   (S).arrayMask = (ARRAY_MASK);				\
-   (S).start = 0;						\
-   (S).end = (END);						\
-   (S).facing = 0;						\
-   (S).array = SWRAST_CONTEXT(ctx)->SpanArrays;			\
-} while (0)
+#include "s_span.h"
+#include "prog_execute.h"
 
 
 typedef void (*texture_sample_func)(GLcontext *ctx,
@@ -269,7 +73,8 @@ typedef void (*validate_texture_image_func)(GLcontext *ctx,
                                             GLuint face, GLuint level);
 
 
-/** \defgroup Bitmasks
+/**
+ * \defgroup Bitmasks
  * Bitmasks to indicate which rasterization options are enabled
  * (RasterMask)
  */
@@ -328,6 +133,15 @@ typedef struct
    GLboolean _AnyTextureCombine;
    GLboolean _FogEnabled;
    GLenum _FogMode;  /* either GL_FOG_MODE or fragment program's fog mode */
+
+   /** Multiple render targets */
+   GLbitfield _ColorOutputsMask;
+   GLuint _NumColorOutputs;
+
+   /** List/array of the fragment attributes to interpolate */
+   GLuint _ActiveAttribs[FRAG_ATTRIB_MAX];
+   /** Number of fragment attributes to interpolate */
+   GLuint _NumActiveAttribs;
 
    /* Accum buffer temporaries.
     */
@@ -407,11 +221,17 @@ typedef struct
 
    validate_texture_image_func ValidateTextureImage;
 
+   /** State used during execution of fragment programs */
+   struct gl_program_machine FragProgMachine;
+
 } SWcontext;
 
 
 extern void
 _swrast_validate_derived( GLcontext *ctx );
+
+extern void
+_swrast_update_texture_samplers(GLcontext *ctx);
 
 
 #define SWRAST_CONTEXT(ctx) ((SWcontext *)ctx->swrast_context)
@@ -454,5 +274,20 @@ _swrast_validate_derived( GLcontext *ctx );
 #define ChanToFixed(X)  IntToFixed(X)
 #define FixedToChan(X)  FixedToInt(X)
 #endif
+
+
+/**
+ * For looping over fragment attributes in the pointe, line
+ * triangle rasterizers.
+ */
+#define ATTRIB_LOOP_BEGIN                                \
+   {                                                     \
+      GLuint a;                                          \
+      for (a = 0; a < swrast->_NumActiveAttribs; a++) {  \
+         const GLuint attr = swrast->_ActiveAttribs[a];
+
+#define ATTRIB_LOOP_END } }
+
+
 
 #endif

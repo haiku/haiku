@@ -25,8 +25,9 @@
 #if !defined SLANG_COMPILE_H
 #define SLANG_COMPILE_H
 
-#include "slang_export.h"
-#include "slang_execute.h"
+#include "imports.h"
+#include "mtypes.h"
+#include "slang_typeinfo.h"
 #include "slang_compile_variable.h"
 #include "slang_compile_struct.h"
 #include "slang_compile_operation.h"
@@ -38,16 +39,18 @@ extern "C" {
 
 typedef enum slang_unit_type_
 {
-	slang_unit_fragment_shader,
-	slang_unit_vertex_shader,
-	slang_unit_fragment_builtin,
-	slang_unit_vertex_builtin
+   SLANG_UNIT_FRAGMENT_SHADER,
+   SLANG_UNIT_VERTEX_SHADER,
+   SLANG_UNIT_FRAGMENT_BUILTIN,
+   SLANG_UNIT_VERTEX_BUILTIN
 } slang_unit_type;
+
 
 typedef struct slang_var_pool_
 {
-	GLuint next_addr;
+   GLuint next_addr;
 } slang_var_pool;
+
 
 typedef struct slang_code_unit_
 {
@@ -58,6 +61,7 @@ typedef struct slang_code_unit_
    struct slang_code_object_ *object;
 } slang_code_unit;
 
+
 extern GLvoid
 _slang_code_unit_ctr (slang_code_unit *, struct slang_code_object_ *);
 
@@ -65,26 +69,18 @@ extern GLvoid
 _slang_code_unit_dtr (slang_code_unit *);
 
 #define SLANG_BUILTIN_CORE   0
-#define SLANG_BUILTIN_COMMON 1
-#define SLANG_BUILTIN_TARGET 2
+#define SLANG_BUILTIN_120_CORE   1
+#define SLANG_BUILTIN_COMMON 2
+#define SLANG_BUILTIN_TARGET 3
 
-#if defined(USE_X86_ASM) || defined(SLANG_X86)
-#define SLANG_BUILTIN_VEC4   3
 #define SLANG_BUILTIN_TOTAL  4
-#else
-#define SLANG_BUILTIN_TOTAL  3
-#endif
 
 typedef struct slang_code_object_
 {
    slang_code_unit builtin[SLANG_BUILTIN_TOTAL];
    slang_code_unit unit;
-   slang_assembly_file assembly;
-   slang_machine machine;
    slang_var_pool varpool;
    slang_atom_pool atompool;
-   slang_export_data_table expdata;
-   slang_export_code_table expcode;
 } slang_code_object;
 
 extern GLvoid
@@ -93,21 +89,8 @@ _slang_code_object_ctr (slang_code_object *);
 extern GLvoid
 _slang_code_object_dtr (slang_code_object *);
 
-typedef struct slang_info_log_
-{
-	char *text;
-	int dont_free_text;
-} slang_info_log;
-
-void slang_info_log_construct (slang_info_log *);
-void slang_info_log_destruct (slang_info_log *);
-int slang_info_log_print (slang_info_log *, const char *, ...);
-int slang_info_log_error (slang_info_log *, const char *, ...);
-int slang_info_log_warning (slang_info_log *, const char *, ...);
-void slang_info_log_memory (slang_info_log *);
-
 extern GLboolean
-_slang_compile (const char *, slang_code_object *, slang_unit_type, slang_info_log *);
+_slang_compile (GLcontext *ctx, struct gl_shader *shader);
 
 #ifdef __cplusplus
 }

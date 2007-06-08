@@ -36,7 +36,7 @@
 
 /* XXX these includes should probably go into imports.h or glheader.h */
 #if defined(USE_SSE_ASM) && defined(__linux__)
-#include <signal.h>
+#include <linux/version.h>
 #endif
 #if defined(USE_SSE_ASM) && defined(__FreeBSD__)
 #include <sys/types.h>
@@ -63,68 +63,13 @@ extern GLuint	_ASMAPI _mesa_x86_cpuid_edx(GLuint op);
 /*
  * We must verify that the Streaming SIMD Extensions are truly supported
  * on this processor before we go ahead and hook out the optimized code.
- * Unfortunately, the CPUID bit isn't enough, as the OS must set the
- * OSFXSR bit in CR4 if it supports the extended FPU save and restore
- * required to use SSE.  Unfortunately, we can't just go ahead and read
- * this register, as only the kernel can do that.  Similarly, we must
- * verify that the OSXMMEXCPT bit in CR4 has been set by the OS,
- * signifying that it supports unmasked SIMD FPU exceptions.  If we take
- * an unmasked exception and the OS doesn't correctly support them, the
- * best we'll get is a SIGILL and the worst we'll get is an infinite
- * loop in the signal delivery from the kernel as we can't interact with
- * the SIMD FPU state to clear the exception bits.  Either way, this is
- * not good.
  *
  * However, I have been told by Alan Cox that all 2.4 (and later) Linux
  * kernels provide full SSE support on all processors that expose SSE via
- * the CPUID mechanism.  It just so happens that this is the exact set of
- * kernels supported DRI.  Therefore, when building for DRI the funky SSE
- * exception test is omitted.
+ * the CPUID mechanism.
  */
-
 extern void _mesa_test_os_sse_support( void );
 extern void _mesa_test_os_sse_exception_support( void );
-
-#if defined(__linux__) && defined(_POSIX_SOURCE) && defined(X86_FXSR_MAGIC) \
-   && !defined(IN_DRI_DRIVER)
-static void sigill_handler( int signal, struct sigcontext sc )
-{
-   /*message( "SIGILL, " );*/
-
-   /* Both the "xorps %%xmm0,%%xmm0" and "divps %xmm0,%%xmm1"
-    * instructions are 3 bytes long.  We must increment the instruction
-    * pointer manually to avoid repeated execution of the offending
-    * instruction.
-    *
-    * If the SIGILL is caused by a divide-by-zero when unmasked
-    * exceptions aren't supported, the SIMD FPU status and control
-    * word will be restored at the end of the test, so we don't need
-    * to worry about doing it here.  Besides, we may not be able to...
-    */
-   sc.eip += 3;
-
-   _mesa_x86_cpu_features &= ~(X86_FEATURE_XMM);
-}
-
-static void sigfpe_handler( int signal, struct sigcontext sc )
-{
-   /*message( "SIGFPE, " );*/
-
-   if ( sc.fpstate->magic != 0xffff ) {
-      /* Our signal context has the extended FPU state, so reset the
-       * divide-by-zero exception mask and clear the divide-by-zero
-       * exception bit.
-       */
-      sc.fpstate->mxcsr |= 0x00000200;
-      sc.fpstate->mxcsr &= 0xfffffffb;
-   } else {
-      /* If we ever get here, we're completely hosed.
-       */
-      /*message( "\n\n" );*/
-      _mesa_problem( NULL, "SSE enabling test failed badly!" );
-   }
-}
-#endif /* __linux__ && _POSIX_SOURCE && X86_FXSR_MAGIC */
 
 #if defined(WIN32)
 #ifndef STATUS_FLOAT_MULTIPLE_TRAPS
@@ -157,92 +102,13 @@ static LONG WINAPI ExceptionFilter(LPEXCEPTION_POINTERS exp)
 #endif /* WIN32 */
 
 
-/* If we're running on a processor that can do SSE, let's see if we
- * are allowed to or not.  This will catch 2.4.0 or later kernels that
- * haven't been configured for a Pentium III but are running on one,
- * and RedHat patched 2.2 kernels that have broken exception handling
- * support for user space apps that do SSE.
- *
- * GH: Isn't this just awful?
- */
 static void check_os_sse_support( void )
 {
-#if defined(__linux__) && !defined(IN_DRI_DRIVER)
-#if defined(_POSIX_SOURCE) && defined(X86_FXSR_MAGIC)
-   struct sigaction saved_sigill;
-   struct sigaction saved_sigfpe;
-
-   /* Save the original signal handlers.
-    */
-   sigaction( SIGILL, NULL, &saved_sigill );
-   sigaction( SIGFPE, NULL, &saved_sigfpe );
-
-   signal( SIGILL, (void (*)(int))sigill_handler );
-   signal( SIGFPE, (void (*)(int))sigfpe_handler );
-
-   /* Emulate test for OSFXSR in CR4.  The OS will set this bit if it
-    * supports the extended FPU save and restore required for SSE.  If
-    * we execute an SSE instruction on a PIII and get a SIGILL, the OS
-    * doesn't support Streaming SIMD Exceptions, even if the processor
-    * does.
-    */
-   if ( cpu_has_xmm ) {
-      _mesa_debug(NULL, "Testing OS support for SSE...\n");
-
-      _mesa_test_os_sse_support();
-
-      if ( cpu_has_xmm ) {
-	 _mesa_debug(NULL, "Yes\n");
-      } else {
-	 _mesa_debug(NULL, "No\n");
-      }
-   }
-
-   /* Emulate test for OSXMMEXCPT in CR4.  The OS will set this bit if
-    * it supports unmasked SIMD FPU exceptions.  If we unmask the
-    * exceptions, do a SIMD divide-by-zero and get a SIGILL, the OS
-    * doesn't support unmasked SIMD FPU exceptions.  If we get a SIGFPE
-    * as expected, we're okay but we need to clean up after it.
-    *
-    * Are we being too stringent in our requirement that the OS support
-    * unmasked exceptions?  Certain RedHat 2.2 kernels enable SSE by
-    * setting CR4.OSFXSR but don't support unmasked exceptions.  Win98
-    * doesn't even support them.  We at least know the user-space SSE
-    * support is good in kernels that do support unmasked exceptions,
-    * and therefore to be safe I'm going to leave this test in here.
-    */
-   if ( cpu_has_xmm ) {
-      _mesa_debug(NULL, "Testing OS support for SSE unmasked exceptions...\n");
-
-      _mesa_test_os_sse_exception_support();
-
-      if ( cpu_has_xmm ) {
-	 _mesa_debug(NULL, "Yes.\n");
-      } else {
-	 _mesa_debug(NULL, "No!\n");
-      }
-   }
-
-   /* Restore the original signal handlers.
-    */
-   sigaction( SIGILL, &saved_sigill, NULL );
-   sigaction( SIGFPE, &saved_sigfpe, NULL );
-
-   /* If we've gotten to here and the XMM CPUID bit is still set, we're
-    * safe to go ahead and hook out the SSE code throughout Mesa.
-    */
-   if ( cpu_has_xmm ) {
-      _mesa_debug(NULL, "Tests of OS support for SSE passed.\n");
-   } else {
-      _mesa_debug(NULL, "Tests of OS support for SSE failed!\n");
-   }
-#else
-   /* We can't use POSIX signal handling to test the availability of
-    * SSE, so we disable it by default.
-    */
-   _mesa_debug(NULL, "Cannot test OS support for SSE, disabling to be safe.\n");
+#if defined(__linux__)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,4,0)
+   _mesa_debug(NULL, "Cannot safely enable SSE on pre-2.4 kernels.\n");
    _mesa_x86_cpu_features &= ~(X86_FEATURE_XMM);
-#endif /* _POSIX_SOURCE && X86_FXSR_MAGIC */
+#endif
 #elif defined(__FreeBSD__)
    {
       int ret, enabled;

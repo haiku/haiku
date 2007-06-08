@@ -240,6 +240,7 @@ _glapi_check_multithread(void)
       else if (knownID != _glthread_GetID()) {
          ThreadSafe = GL_TRUE;
          _glapi_set_dispatch(NULL);
+         _glapi_set_context(NULL);
       }
    }
    else if (!_glapi_get_dispatch()) {
@@ -1003,7 +1004,6 @@ _glapi_check_table(const struct _glapi_table *table)
       GLuint offset = (secondaryColor3fFunc - (char *) table) / sizeof(void *);
       assert(secondaryColor3fOffset == _gloffset_SecondaryColor3fEXT);
       assert(secondaryColor3fOffset == offset);
-      assert(_glapi_get_proc_address("glSecondaryColor3fEXT") == (_glapi_proc) &glSecondaryColor3fEXT);
    }
    {
       GLuint pointParameterivOffset = _glapi_get_proc_offset("glPointParameterivNV");
@@ -1011,7 +1011,6 @@ _glapi_check_table(const struct _glapi_table *table)
       GLuint offset = (pointParameterivFunc - (char *) table) / sizeof(void *);
       assert(pointParameterivOffset == _gloffset_PointParameterivNV);
       assert(pointParameterivOffset == offset);
-      assert(_glapi_get_proc_address("glPointParameterivNV") == (_glapi_proc) &glPointParameterivNV);
    }
    {
       GLuint setFenceOffset = _glapi_get_proc_offset("glSetFenceNV");

@@ -1009,8 +1009,6 @@ stencil_and_ztest_pixels( GLcontext *ctx, SWspan *span, GLuint face )
 GLboolean
 _swrast_stencil_and_ztest_span(GLcontext *ctx, SWspan *span)
 {
-   /* span->facing can only be non-zero if using two-sided stencil */
-   ASSERT(ctx->Stencil._TestTwoSide || span->facing == 0);
    if (span->arrayMask & SPAN_XY)
       return stencil_and_ztest_pixels(ctx, span, span->facing);
    else
@@ -1062,7 +1060,8 @@ void
 _swrast_read_stencil_span(GLcontext *ctx, struct gl_renderbuffer *rb,
                           GLint n, GLint x, GLint y, GLstencil stencil[])
 {
-   if (y < 0 || y >= rb->Height || x + n <= 0 || x >= rb->Width) {
+   if (y < 0 || y >= (GLint) rb->Height ||
+       x + n <= 0 || x >= (GLint) rb->Width) {
       /* span is completely outside framebuffer */
       return; /* undefined values OK */
    }
@@ -1073,7 +1072,7 @@ _swrast_read_stencil_span(GLcontext *ctx, struct gl_renderbuffer *rb,
       n -= dx;
       stencil += dx;
    }
-   if (x + n > rb->Width) {
+   if (x + n > (GLint) rb->Width) {
       GLint dx = x + n - rb->Width;
       n -= dx;
    }
@@ -1103,7 +1102,8 @@ _swrast_write_stencil_span(GLcontext *ctx, GLint n, GLint x, GLint y,
    const GLuint stencilMax = (1 << fb->Visual.stencilBits) - 1;
    const GLuint stencilMask = ctx->Stencil.WriteMask[0];
 
-   if (y < 0 || y >= rb->Height || x + n <= 0 || x >= rb->Width) {
+   if (y < 0 || y >= (GLint) rb->Height ||
+       x + n <= 0 || x >= (GLint) rb->Width) {
       /* span is completely outside framebuffer */
       return; /* undefined values OK */
    }
@@ -1113,7 +1113,7 @@ _swrast_write_stencil_span(GLcontext *ctx, GLint n, GLint x, GLint y,
       n -= dx;
       stencil += dx;
    }
-   if (x + n > rb->Width) {
+   if (x + n > (GLint) rb->Width) {
       GLint dx = x + n - rb->Width;
       n -= dx;
    }
@@ -1191,7 +1191,7 @@ _swrast_clear_stencil_buffer( GLcontext *ctx, struct gl_renderbuffer *rb )
       }
       else {
          /* no bit masking */
-         if (width == rb->Width && rb->DataType == GL_UNSIGNED_BYTE) {
+         if (width == (GLint) rb->Width && rb->DataType == GL_UNSIGNED_BYTE) {
             /* optimized case */
             /* Note: bottom-to-top raster assumed! */
             GLubyte *stencil = (GLubyte *) rb->GetPointer(ctx, rb, x, y);

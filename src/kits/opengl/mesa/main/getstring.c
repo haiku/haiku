@@ -54,8 +54,8 @@ _mesa_GetString( GLenum name )
    static const char *version_1_3 = "1.3 Mesa " MESA_VERSION_STRING;
    static const char *version_1_4 = "1.4 Mesa " MESA_VERSION_STRING;
    static const char *version_1_5 = "1.5 Mesa " MESA_VERSION_STRING;
-   static const char *version_2_0 = "1.5 Mesa " MESA_VERSION_STRING;
-   static const char *version_2_1 = "1.5 Mesa " MESA_VERSION_STRING;
+   static const char *version_2_0 = "2.0 Mesa " MESA_VERSION_STRING;
+   static const char *version_2_1 = "2.1 Mesa " MESA_VERSION_STRING;
 
 #if FEATURE_ARB_shading_language_100
    static const char *sl_version_110 = "1.10 Mesa " MESA_VERSION_STRING;
@@ -114,7 +114,8 @@ _mesa_GetString( GLenum name )
                       ctx->Extensions.ARB_shader_objects &&
                       ctx->Extensions.ARB_vertex_shader &&
                       ctx->Extensions.ARB_fragment_shader &&
-                      ctx->Extensions.ARB_texture_non_power_of_two) {
+                      ctx->Extensions.ARB_texture_non_power_of_two &&
+                      ctx->Extensions.EXT_blend_equation_separate) {
                      if (ctx->Extensions.ARB_shading_language_120 &&
                          ctx->Extensions.EXT_pixel_buffer_object &&
                          ctx->Extensions.EXT_texture_sRGB) {

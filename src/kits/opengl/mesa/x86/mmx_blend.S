@@ -1,4 +1,4 @@
-
+	;
 /*
  * Written by José Fonseca <j_r_fonseca@yahoo.co.uk>
  */
@@ -240,7 +240,9 @@ TWO(PUNPCKHDQ  ( MA2, MA2 ))                    /*    pa2    |    pa2    |    pa
 ONE(MOVD       ( MSS, REGIND(rgba) ))		/*     |     |     |     | sa1 | sb1 | sg1 | sr1 */	;\
 TWO(MOVQ       ( MSS, REGIND(rgba) ))		/* sa2 | sb2 | sg2 | sr2 | sa1 | sb1 | sg1 | sr1 */
 
-
+/* Kevin F. Quinn <kevquinn@gentoo.org> 2 July 2006
+ * Replace data segment constants with text-segment
+ * constants (via pushl/movq)
     SEG_DATA
 
 ALIGNDATA8
@@ -249,6 +251,11 @@ const_0080:
 
 const_80:
     D_LONG 0x80808080, 0x80808080
+*/
+#define const_0080_l 0x00800080
+#define const_0080_h 0x00800080
+#define const_80_l 0x80808080
+#define const_80_h 0x80808080
 
     SEG_TEXT
 
@@ -302,8 +309,16 @@ TWO(MOVQ       ( MM1, REGIND(rgba) ))
 #define TAG(x) CONCAT(x,_min)
 #define LLTAG(x) LLBL2(x,_min)
 
+/* Kevin F. Quinn 2nd July 2006
+ * Replace data segment constants with text-segment instructions
 #define INIT \
-    MOVQ       ( CONTENT(const_80), MM7 )	/* 0x80| 0x80| 0x80| 0x80| 0x80| 0x80| 0x80| 0x80*/
+    MOVQ       ( CONTENT(const_80), MM7 )
+ */
+#define INIT \
+    PUSH_L     ( CONST(const_80_h) ) 		/* 0x80| 0x80| 0x80| 0x80| 0x80| 0x80| 0x80| 0x80*/	;\
+    PUSH_L     ( CONST(const_80_l) ) 									;\
+    MOVQ       ( REGIND(ESP), MM7 ) 									;\
+    ADD_L      ( CONST(8), ESP)
 
 #define MAIN( rgba, dest ) \
     GMB_LOAD( rgba, dest, MM1, MM2 )									;\
@@ -326,8 +341,16 @@ TWO(MOVQ       ( MM1, REGIND(rgba) ))
 #define TAG(x) CONCAT(x,_max)
 #define LLTAG(x) LLBL2(x,_max)
 
+/* Kevin F. Quinn 2nd July 2006
+ * Replace data segment constants with text-segment instructions
 #define INIT \
-    MOVQ       ( CONTENT(const_80), MM7 )	/* 0x80| 0x80| 0x80| 0x80| 0x80| 0x80| 0x80| 0x80*/
+    MOVQ       ( CONTENT(const_80), MM7 )
+ */
+#define INIT \
+    PUSH_L     ( CONST(const_80_l) ) 		/* 0x80| 0x80| 0x80| 0x80| 0x80| 0x80| 0x80| 0x80*/	;\
+    PUSH_L     ( CONST(const_80_h) ) 									;\
+    MOVQ       ( REGIND(ESP), MM7 ) 									;\
+    ADD_L      ( CONST(8), ESP)
 
 #define MAIN( rgba, dest ) \
     GMB_LOAD( rgba, dest, MM1, MM2 )									;\
@@ -350,9 +373,17 @@ TWO(MOVQ       ( MM1, REGIND(rgba) ))
 #define TAG(x) CONCAT(x,_modulate)
 #define LLTAG(x) LLBL2(x,_modulate)
 
+/* Kevin F. Quinn 2nd July 2006
+ * Replace data segment constants with text-segment instructions
+#define INIT \
+    MOVQ       ( CONTENT(const_0080), MM7 )
+ */
 #define INIT \
     PXOR       ( MM0, MM0 )			/*   0x0000  |   0x0000  |   0x0000  |   0x0000  */	;\
-    MOVQ       ( CONTENT(const_0080), MM7 )	/*   0x0080  |   0x0080  |   0x0080  |   0x0080  */
+    PUSH_L     ( CONST(const_0080_l) ) 	/*   0x0080  |   0x0080  |   0x0080  |   0x0080  */	;\
+    PUSH_L     ( CONST(const_0080_h) ) 								;\
+    MOVQ       ( REGIND(ESP), MM7 ) 									;\
+    ADD_L      ( CONST(8), ESP)
 
 #define MAIN( rgba, dest ) \
     GMB_LOAD( rgba, dest, MM1, MM2 )									;\

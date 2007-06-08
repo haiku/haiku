@@ -165,11 +165,7 @@ _mesa_remove_attachment(GLcontext *ctx, struct gl_renderbuffer_attachment *att)
    if (att->Type == GL_TEXTURE || att->Type == GL_RENDERBUFFER_EXT) {
       ASSERT(att->Renderbuffer);
       ASSERT(!att->Texture);
-      att->Renderbuffer->RefCount--;
-      if (att->Renderbuffer->RefCount == 0) {
-         att->Renderbuffer->Delete(att->Renderbuffer);
-      }
-      att->Renderbuffer = NULL;
+      _mesa_reference_renderbuffer(&att->Renderbuffer, NULL);
    }
    att->Type = GL_NONE;
    att->Complete = GL_TRUE;
@@ -228,10 +224,9 @@ _mesa_set_renderbuffer_attachment(GLcontext *ctx,
    /* XXX check if re-doing same attachment, exit early */
    _mesa_remove_attachment(ctx, att);
    att->Type = GL_RENDERBUFFER_EXT;
-   att->Renderbuffer = rb;
    att->Texture = NULL; /* just to be safe */
    att->Complete = GL_FALSE;
-   rb->RefCount++;
+   _mesa_reference_renderbuffer(&att->Renderbuffer, rb);
 }
 
 
@@ -246,12 +241,9 @@ _mesa_framebuffer_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
    struct gl_renderbuffer_attachment *att;
 
    _glthread_LOCK_MUTEX(fb->Mutex);
-   if (rb)
-      _glthread_LOCK_MUTEX(rb->Mutex);
 
    att = _mesa_get_attachment(ctx, fb, attachment);
    ASSERT(att);
-
    if (rb) {
       _mesa_set_renderbuffer_attachment(ctx, att, rb);
    }
@@ -259,8 +251,6 @@ _mesa_framebuffer_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
       _mesa_remove_attachment(ctx, att);
    }
 
-   if (rb)
-      _glthread_UNLOCK_MUTEX(rb->Mutex);
    _glthread_UNLOCK_MUTEX(fb->Mutex);
 }
 
@@ -559,7 +549,7 @@ _mesa_IsRenderbufferEXT(GLuint renderbuffer)
 void GLAPIENTRY
 _mesa_BindRenderbufferEXT(GLenum target, GLuint renderbuffer)
 {
-   struct gl_renderbuffer *newRb, *oldRb;
+   struct gl_renderbuffer *newRb;
    GET_CURRENT_CONTEXT(ctx);
 
    ASSERT_OUTSIDE_BEGIN_END(ctx);
@@ -593,21 +583,16 @@ _mesa_BindRenderbufferEXT(GLenum target, GLuint renderbuffer)
 	 }
          ASSERT(newRb->AllocStorage);
          _mesa_HashInsert(ctx->Shared->RenderBuffers, renderbuffer, newRb);
+         newRb->RefCount = 1; /* referenced by hash table */
       }
-      newRb->RefCount++;
    }
    else {
       newRb = NULL;
    }
 
-   oldRb = ctx->CurrentRenderbuffer;
-   if (oldRb) {
-      _mesa_dereference_renderbuffer(&oldRb);
-   }
-
    ASSERT(newRb != &DummyRenderbuffer);
 
-   ctx->CurrentRenderbuffer = newRb;
+   _mesa_reference_renderbuffer(&ctx->CurrentRenderbuffer, newRb);
 }
 
 
@@ -632,14 +617,15 @@ _mesa_DeleteRenderbuffersEXT(GLsizei n, const GLuint *renderbuffers)
                _mesa_BindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
             }
 
-	    /* remove from hash table immediately, to free the ID */
+	    /* Remove from hash table immediately, to free the ID.
+             * But the object will not be freed until it's no longer
+             * referenced anywhere else.
+             */
 	    _mesa_HashRemove(ctx->Shared->RenderBuffers, renderbuffers[i]);
 
             if (rb != &DummyRenderbuffer) {
-               /* But the object will not be freed until it's no longer
-                * bound in any context.
-                */
-               _mesa_dereference_renderbuffer(&rb);
+               /* no longer referenced by hash table */
+               _mesa_reference_renderbuffer(&rb, NULL);
 	    }
 	 }
       }
@@ -938,7 +924,7 @@ check_end_texture_render(GLcontext *ctx, struct gl_framebuffer *fb)
 void GLAPIENTRY
 _mesa_BindFramebufferEXT(GLenum target, GLuint framebuffer)
 {
-   struct gl_framebuffer *newFb, *oldFb;
+   struct gl_framebuffer *newFb;
    GLboolean bindReadBuf, bindDrawBuf;
    GET_CURRENT_CONTEXT(ctx);
 
@@ -998,12 +984,6 @@ _mesa_BindFramebufferEXT(GLenum target, GLuint framebuffer)
 	 }
          _mesa_HashInsert(ctx->Shared->FrameBuffers, framebuffer, newFb);
       }
-      _glthread_LOCK_MUTEX(newFb->Mutex);
-      if (bindReadBuf)
-         newFb->RefCount++;
-      if (bindDrawBuf)
-         newFb->RefCount++;
-      _glthread_UNLOCK_MUTEX(newFb->Mutex);
    }
    else {
       /* Binding the window system framebuffer (which was originally set
@@ -1020,22 +1000,14 @@ _mesa_BindFramebufferEXT(GLenum target, GLuint framebuffer)
     */
 
    if (bindReadBuf) {
-      oldFb = ctx->ReadBuffer;
-      if (oldFb && oldFb->Name != 0) {
-         _mesa_dereference_framebuffer(&oldFb);
-      }
-      ctx->ReadBuffer = newFb;
+      _mesa_reference_framebuffer(&ctx->ReadBuffer, newFb);
    }
 
    if (bindDrawBuf) {
-      oldFb = ctx->DrawBuffer;
-      if (oldFb && oldFb->Name != 0) {
-         /* check if old FB had any texture attachments */
-         check_end_texture_render(ctx, oldFb);
-         /* check if time to delete this framebuffer */
-         _mesa_dereference_framebuffer(&oldFb);
-      }
-      ctx->DrawBuffer = newFb;
+      /* check if old FB had any texture attachments */
+      check_end_texture_render(ctx, ctx->DrawBuffer);
+      /* check if time to delete this framebuffer */
+      _mesa_reference_framebuffer(&ctx->DrawBuffer, newFb);
       if (newFb->Name != 0) {
          /* check if newly bound framebuffer has any texture attachments */
          check_begin_texture_render(ctx, newFb);
@@ -1083,7 +1055,7 @@ _mesa_DeleteFramebuffersEXT(GLsizei n, const GLuint *framebuffers)
                /* But the object will not be freed until it's no longer
                 * bound in any context.
                 */
-               _mesa_dereference_framebuffer(&fb);
+               _mesa_unreference_framebuffer(&fb);
 	    }
 	 }
       }

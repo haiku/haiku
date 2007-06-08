@@ -85,6 +85,7 @@ _swrast_Bitmap( GLcontext *ctx, GLint px, GLint py,
    INIT_SPAN(span, GL_BITMAP, width, 0, SPAN_XY);
 
    _swrast_span_default_color(ctx, &span);
+   _swrast_span_default_secondary_color(ctx, &span);
    if (ctx->Depth.Test)
       _swrast_span_default_z(ctx, &span);
    if (swrast->_FogEnabled)

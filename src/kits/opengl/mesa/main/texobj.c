@@ -699,7 +699,7 @@ _mesa_DeleteTextures( GLsizei n, const GLuint *textures)
             = _mesa_lookup_texture(ctx, textures[i]);
 
          if (delObj) {
-	    GLboolean delete;
+	    GLboolean deleted;
 
 	    _mesa_lock_texture(ctx, delObj);
 
@@ -728,14 +728,14 @@ _mesa_DeleteTextures( GLsizei n, const GLuint *textures)
              * XXX all RefCount accesses should be protected by a mutex.
              */
             delObj->RefCount--;
-	    delete = (delObj->RefCount == 0);
+	    deleted = (delObj->RefCount == 0);
 	    _mesa_unlock_texture(ctx, delObj);
 
 	    /* We know that refcount went to zero above, so this is
 	     * the only pointer left to delObj, so we don't have to
 	     * worry about locking any more:
 	     */
-            if (delete) {
+            if (deleted) {
                ASSERT(delObj->Name != 0); /* Never delete default tex objs */
                ASSERT(ctx->Driver.DeleteTexture);
                (*ctx->Driver.DeleteTexture)(ctx, delObj);

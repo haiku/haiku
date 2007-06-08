@@ -46,10 +46,10 @@
 static void feedback_vertex( GLcontext *ctx,
                              const SWvertex *v, const SWvertex *pv )
 {
-   const GLuint texUnit = 0;  /* See section 5.3 of 1.2.1 spec */
    GLfloat win[4];
    GLfloat color[4];
    GLfloat tc[4];
+   const GLfloat *vtc = v->attrib[FRAG_ATTRIB_TEX0];
 
    win[0] = v->win[0];
    win[1] = v->win[1];
@@ -61,16 +61,15 @@ static void feedback_vertex( GLcontext *ctx,
    color[2] = CHAN_TO_FLOAT(pv->color[2]);
    color[3] = CHAN_TO_FLOAT(pv->color[3]);
 
-   if (v->texcoord[texUnit][3] != 1.0 &&
-       v->texcoord[texUnit][3] != 0.0) {
-      GLfloat invq = 1.0F / v->texcoord[texUnit][3];
-      tc[0] = v->texcoord[texUnit][0] * invq;
-      tc[1] = v->texcoord[texUnit][1] * invq;
-      tc[2] = v->texcoord[texUnit][2] * invq;
-      tc[3] = v->texcoord[texUnit][3];
+   if (vtc[3] != 1.0 && vtc[3] != 0.0) {
+      GLfloat invq = 1.0F / vtc[3];
+      tc[0] = vtc[0] * invq;
+      tc[1] = vtc[1] * invq;
+      tc[2] = vtc[2] * invq;
+      tc[3] = vtc[3];
    }
    else {
-      COPY_4V(tc, v->texcoord[texUnit]);
+      COPY_4V(tc, vtc);
    }
 
    _mesa_feedback_vertex( ctx, win, color, (GLfloat) v->index, tc );

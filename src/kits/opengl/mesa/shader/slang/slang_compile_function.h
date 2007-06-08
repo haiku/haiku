@@ -25,9 +25,6 @@
 #ifndef SLANG_COMPILE_FUNCTION_H
 #define SLANG_COMPILE_FUNCTION_H
 
-#if defined __cplusplus
-extern "C" {
-#endif
 
 struct slang_code_unit_;
 
@@ -36,9 +33,9 @@ struct slang_code_unit_;
  */
 typedef enum slang_function_kind_
 {
-   slang_func_ordinary,
-   slang_func_constructor,
-   slang_func_operator
+   SLANG_FUNC_ORDINARY,
+   SLANG_FUNC_CONSTRUCTOR,
+   SLANG_FUNC_OPERATOR
 } slang_function_kind;
 
 
@@ -92,20 +89,13 @@ _slang_function_scope_ctr(slang_function_scope *);
 extern void
 slang_function_scope_destruct(slang_function_scope *);
 
+extern GLboolean
+_slang_function_has_return_value(const slang_function *fun);
+
 extern int
 slang_function_scope_find_by_name(slang_function_scope *, slang_atom, int);
 
 extern slang_function *
 slang_function_scope_find(slang_function_scope *, slang_function *, int);
-
-extern GLboolean
-_slang_build_export_code_table(slang_export_code_table *,
-                               slang_function_scope *,
-                               struct slang_code_unit_ *);
-
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* SLANG_COMPILE_FUNCTION_H */

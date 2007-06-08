@@ -37,8 +37,9 @@
  * Compute the bounds of the region resulting from zooming a pixel span.
  * The resulting region will be entirely inside the window/scissor bounds
  * so no additional clipping is needed.
- * \param imageX, imageY  position of the overall image being drawn
+ * \param imageX, imageY  position of the mage being drawn (gl WindowPos)
  * \param spanX, spanY  position of span being drawing
+ * \param width  number of pixels in span
  * \param x0, x1  returned X bounds of zoomed region [x0, x1)
  * \param y0, y1  returned Y bounds of zoomed region [y0, y1)
  * \return GL_TRUE if any zoomed pixels visible, GL_FALSE if totally clipped
@@ -98,7 +99,11 @@ compute_zoomed_bounds(GLcontext *ctx, GLint imageX, GLint imageY,
 
 
 /**
- * Can use this for unzooming X or Y values.
+ * Convert a zoomed x image coordinate back to an unzoomed x coord.
+ * 'zx' is screen position of a pixel in the zoomed image, who's left edge
+ * is at 'imageX'.
+ * return corresponding x coord in the original, unzoomed image.
+ * This can use this for unzooming X or Y values.
  */
 static INLINE GLint
 unzoom_x(GLfloat zoomX, GLint imageX, GLint zx)
@@ -108,7 +113,10 @@ unzoom_x(GLfloat zoomX, GLint imageX, GLint zx)
    zx - imageX = (x - imageX) * zoomX;
    (zx - imageX) / zoomX = x - imageX;
    */
-   GLint x = imageX + (GLint) ((zx - imageX) / zoomX);
+   GLint x;
+   if (zoomX < 0.0)
+      zx++;
+   x = imageX + (GLint) ((zx - imageX) / zoomX);
    return x;
 }
 
@@ -153,14 +161,15 @@ zoom_span( GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
    zoomed_arrays.rgba = zoomed_arrays.color.sz2.rgba;
    zoomed_arrays.spec = zoomed_arrays.color.sz2.spec;
 #else
-   zoomed_arrays.rgba = zoomed_arrays.color.sz4.rgba;
-   zoomed_arrays.spec = zoomed_arrays.color.sz4.spec;
+   zoomed_arrays.rgba = zoomed_arrays.attribs[FRAG_ATTRIB_COL0];
+   zoomed_arrays.spec = zoomed_arrays.attribs[FRAG_ATTRIB_COL1];
 #endif
 
 
    /* copy fog interp info */
-   zoomed.fog = span->fog;
-   zoomed.fogStep = span->fogStep;
+   zoomed.attrStart[FRAG_ATTRIB_FOGC][0] = span->attrStart[FRAG_ATTRIB_FOGC][0];
+   zoomed.attrStepX[FRAG_ATTRIB_FOGC][0] = span->attrStepX[FRAG_ATTRIB_FOGC][0];
+   zoomed.attrStepY[FRAG_ATTRIB_FOGC][0] = span->attrStepY[FRAG_ATTRIB_FOGC][0];
    /* XXX copy texcoord info? */
 
    if (format == GL_RGBA || format == GL_RGB) {
@@ -209,7 +218,7 @@ zoom_span( GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
          for (i = 0; i < zoomedWidth; i++) {
             GLint j = unzoom_x(ctx->Pixel.ZoomX, imgX, x0 + i) - span->x;
             ASSERT(j >= 0);
-            ASSERT(j < span->end);
+            ASSERT(j < (GLint) span->end);
             COPY_4UBV(zoomed.array->color.sz1.rgba[i], rgba[j]);
          }
       }
@@ -219,7 +228,7 @@ zoom_span( GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
          for (i = 0; i < zoomedWidth; i++) {
             GLint j = unzoom_x(ctx->Pixel.ZoomX, imgX, x0 + i) - span->x;
             ASSERT(j >= 0);
-            ASSERT(j < span->end);
+            ASSERT(j < (GLint) span->end);
             COPY_4V(zoomed.array->color.sz2.rgba[i], rgba[j]);
          }
       }
@@ -230,7 +239,7 @@ zoom_span( GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
             GLint j = unzoom_x(ctx->Pixel.ZoomX, imgX, x0 + i) - span->x;
             ASSERT(j >= 0);
             ASSERT(j < span->end);
-            COPY_4V(zoomed.array->color.sz4.rgba[i], rgba[j]);
+            COPY_4V(zoomed.array->attribs[FRAG_ATTRIB_COL0][i], rgba[j]);
          }
       }
    }
@@ -241,7 +250,7 @@ zoom_span( GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
          for (i = 0; i < zoomedWidth; i++) {
             GLint j = unzoom_x(ctx->Pixel.ZoomX, imgX, x0 + i) - span->x;
             ASSERT(j >= 0);
-            ASSERT(j < span->end);
+            ASSERT(j < (GLint) span->end);
             zoomed.array->color.sz1.rgba[i][0] = rgb[j][0];
             zoomed.array->color.sz1.rgba[i][1] = rgb[j][1];
             zoomed.array->color.sz1.rgba[i][2] = rgb[j][2];
@@ -254,7 +263,7 @@ zoom_span( GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
          for (i = 0; i < zoomedWidth; i++) {
             GLint j = unzoom_x(ctx->Pixel.ZoomX, imgX, x0 + i) - span->x;
             ASSERT(j >= 0);
-            ASSERT(j < span->end);
+            ASSERT(j < (GLint) span->end);
             zoomed.array->color.sz2.rgba[i][0] = rgb[j][0];
             zoomed.array->color.sz2.rgba[i][1] = rgb[j][1];
             zoomed.array->color.sz2.rgba[i][2] = rgb[j][2];
@@ -268,10 +277,10 @@ zoom_span( GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
             GLint j = unzoom_x(ctx->Pixel.ZoomX, imgX, x0 + i) - span->x;
             ASSERT(j >= 0);
             ASSERT(j < span->end);
-            zoomed.array->color.sz4.rgba[i][0] = rgb[j][0];
-            zoomed.array->color.sz4.rgba[i][1] = rgb[j][1];
-            zoomed.array->color.sz4.rgba[i][2] = rgb[j][2];
-            zoomed.array->color.sz4.rgba[i][3] = 1.0F;
+            zoomed.array->attribs[FRAG_ATTRIB_COL0][i][0] = rgb[j][0];
+            zoomed.array->attribs[FRAG_ATTRIB_COL0][i][1] = rgb[j][1];
+            zoomed.array->attribs[FRAG_ATTRIB_COL0][i][2] = rgb[j][2];
+            zoomed.array->attribs[FRAG_ATTRIB_COL0][i][3] = 1.0F;
          }
       }
    }
@@ -281,7 +290,7 @@ zoom_span( GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
       for (i = 0; i < zoomedWidth; i++) {
          GLint j = unzoom_x(ctx->Pixel.ZoomX, imgX, x0 + i) - span->x;
          ASSERT(j >= 0);
-         ASSERT(j < span->end);
+         ASSERT(j < (GLint) span->end);
          zoomed.array->index[i] = indexes[j];
       }
    }
@@ -291,7 +300,7 @@ zoom_span( GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
       for (i = 0; i < zoomedWidth; i++) {
          GLint j = unzoom_x(ctx->Pixel.ZoomX, imgX, x0 + i) - span->x;
          ASSERT(j >= 0);
-         ASSERT(j < span->end);
+         ASSERT(j < (GLint) span->end);
          zoomed.array->z[i] = zValues[j];
       }
       /* Now, fall into either the RGB or COLOR_INDEX path below */

@@ -240,7 +240,7 @@ _swrast_logicop_rgba_span(GLcontext *ctx, struct gl_renderbuffer *rb,
    }
    else {
       logicop_uint4(ctx, 4 * span->end,
-                    (GLuint *) span->array->color.sz4.rgba,
+                    (GLuint *) span->array->attribs[FRAG_ATTRIB_COL0],
                     (const GLuint *) rbPixels, span->array->mask);
    }
 }

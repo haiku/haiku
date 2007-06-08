@@ -1192,18 +1192,22 @@ _mesa_soft_renderbuffer_storage(GLcontext *ctx, struct gl_renderbuffer *rb,
    ASSERT(rb->PutMonoValues);
 
    /* free old buffer storage */
-   if (rb->Data)
+   if (rb->Data) {
       _mesa_free(rb->Data);
+      rb->Data = NULL;
+   }
 
-   /* allocate new buffer storage */
-   rb->Data = _mesa_malloc(width * height * pixelSize);
-   if (rb->Data == NULL) {
-      rb->Width = 0;
-      rb->Height = 0;
-      _mesa_error(ctx, GL_OUT_OF_MEMORY,
-                  "software renderbuffer allocation (%d x %d x %d)",
-                  width, height, pixelSize);
-      return GL_FALSE;
+   if (width > 0 && height > 0) {
+      /* allocate new buffer storage */
+      rb->Data = _mesa_malloc(width * height * pixelSize);
+      if (rb->Data == NULL) {
+         rb->Width = 0;
+         rb->Height = 0;
+         _mesa_error(ctx, GL_OUT_OF_MEMORY,
+                     "software renderbuffer allocation (%d x %d x %d)",
+                     width, height, pixelSize);
+         return GL_FALSE;
+      }
    }
 
    rb->Width = width;
@@ -1431,6 +1435,17 @@ put_mono_values_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb,
 }
 
 
+static void
+copy_buffer_alpha8(struct gl_renderbuffer* dst, struct gl_renderbuffer* src)
+{
+   ASSERT(dst->_ActualFormat == GL_ALPHA8);
+   ASSERT(src->_ActualFormat == GL_ALPHA8);
+   ASSERT(dst->Width == src->Width);
+   ASSERT(dst->Height == src->Height);
+
+   _mesa_memcpy(dst->Data, src->Data, dst->Width * dst->Height * sizeof(GLubyte));
+}
+
 
 /**********************************************************************/
 /**********************************************************************/
@@ -1456,9 +1471,10 @@ _mesa_init_renderbuffer(struct gl_renderbuffer *rb, GLuint name)
 {
    _glthread_INIT_MUTEX(rb->Mutex);
 
+   rb->Magic = RB_MAGIC;
    rb->ClassID = 0;
    rb->Name = name;
-   rb->RefCount = 1;
+   rb->RefCount = 0;
    rb->Delete = _mesa_delete_renderbuffer;
 
    /* The rest of these should be set later by the caller of this function or
@@ -1758,6 +1774,27 @@ _mesa_add_alpha_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
    }
 
    return GL_TRUE;
+}
+
+
+/**
+ * For framebuffers that use a software alpha channel wrapper
+ * created by _mesa_add_alpha_renderbuffer or _mesa_add_soft_renderbuffers,
+ * copy the back buffer alpha channel into the front buffer alpha channel.
+ */
+void
+_mesa_copy_soft_alpha_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb)
+{
+   if (fb->Attachment[BUFFER_FRONT_LEFT].Renderbuffer &&
+       fb->Attachment[BUFFER_BACK_LEFT].Renderbuffer)
+      copy_buffer_alpha8(fb->Attachment[BUFFER_FRONT_LEFT].Renderbuffer,
+                         fb->Attachment[BUFFER_BACK_LEFT].Renderbuffer);
+
+
+   if (fb->Attachment[BUFFER_FRONT_RIGHT].Renderbuffer &&
+       fb->Attachment[BUFFER_BACK_RIGHT].Renderbuffer)
+      copy_buffer_alpha8(fb->Attachment[BUFFER_FRONT_RIGHT].Renderbuffer,
+                         fb->Attachment[BUFFER_BACK_RIGHT].Renderbuffer);
 }
 
 
@@ -2069,9 +2106,7 @@ _mesa_add_renderbuffer(struct gl_framebuffer *fb,
 
    fb->Attachment[bufferName].Type = GL_RENDERBUFFER_EXT;
    fb->Attachment[bufferName].Complete = GL_TRUE;
-   fb->Attachment[bufferName].Renderbuffer = rb;
-
-   rb->RefCount++;
+   _mesa_reference_renderbuffer(&fb->Attachment[bufferName].Renderbuffer, rb);
 }
 
 
@@ -2089,37 +2124,60 @@ _mesa_remove_renderbuffer(struct gl_framebuffer *fb, GLuint bufferName)
    if (!rb)
       return;
 
-   _mesa_dereference_renderbuffer(&rb);
+   _mesa_reference_renderbuffer(&rb, NULL);
 
    fb->Attachment[bufferName].Renderbuffer = NULL;
 }
 
 
 /**
- * Decrement the reference count on a renderbuffer and delete it when
- * the refcount hits zero.
- * Note: we pass the address of a pointer and set it to NULL if we delete it.
+ * Set *ptr to point to rb.  If *ptr points to another renderbuffer,
+ * dereference that buffer first.  The new renderbuffer's refcount will
+ * be incremented.  The old renderbuffer's refcount will be decremented.
  */
 void
-_mesa_dereference_renderbuffer(struct gl_renderbuffer **rb)
+_mesa_reference_renderbuffer(struct gl_renderbuffer **ptr,
+                             struct gl_renderbuffer *rb)
 {
-   GLboolean deleteFlag = GL_FALSE;
-
-   _glthread_LOCK_MUTEX((*rb)->Mutex);
-   {
-      ASSERT((*rb)->RefCount > 0);
-      (*rb)->RefCount--;
-      deleteFlag = ((*rb)->RefCount == 0);
+   assert(ptr);
+   if (*ptr == rb) {
+      /* no change */
+      return;
    }
-   _glthread_UNLOCK_MUTEX((*rb)->Mutex);
 
-   if (deleteFlag) {
-      (*rb)->Delete(*rb);
-      *rb = NULL;
+   if (*ptr) {
+      /* Unreference the old renderbuffer */
+      GLboolean deleteFlag = GL_FALSE;
+      struct gl_renderbuffer *oldRb = *ptr;
+
+      assert(oldRb->Magic == RB_MAGIC);
+      _glthread_LOCK_MUTEX(oldRb->Mutex);
+      assert(oldRb->Magic == RB_MAGIC);
+      ASSERT(oldRb->RefCount > 0);
+      oldRb->RefCount--;
+      /*printf("RB DECR %p (%d) to %d\n", (void*) oldRb, oldRb->Name, oldRb->RefCount);*/
+      deleteFlag = (oldRb->RefCount == 0);
+      _glthread_UNLOCK_MUTEX(oldRb->Mutex);
+
+      if (deleteFlag) {
+         oldRb->Magic = 0; /* now invalid memory! */
+         oldRb->Delete(oldRb);
+      }
+
+      *ptr = NULL;
+   }
+   assert(!*ptr);
+
+   if (rb) {
+      assert(rb->Magic == RB_MAGIC);
+      /* reference new renderbuffer */
+      _glthread_LOCK_MUTEX(rb->Mutex);
+      rb->RefCount++;
+      /*printf("RB INCR %p (%d) to %d\n", (void*) rb, rb->Name, rb->RefCount);*/
+      _glthread_UNLOCK_MUTEX(rb->Mutex);
+      *ptr = rb;
    }
 }
-
-
 
 
 /**
@@ -2143,4 +2201,3 @@ _mesa_new_depthstencil_renderbuffer(GLcontext *ctx, GLuint name)
 
    return dsrb;
 }
-

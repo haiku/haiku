@@ -5,8 +5,8 @@
  * This is the top-most include file of the Mesa sources.
  * It includes gl.h and all system headers which are needed.
  * Other Mesa source files should \e not directly include any system
- * headers.  This allows Mesa to be integrated into XFree86 and
- * allows system-dependent hacks/workarounds to be collected in one place.
+ * headers.  This allows system-dependent hacks/workarounds to be
+ * collected in one place.
  *
  * \note Actually, a lot of system-dependent stuff is now in imports.[ch].
  *
@@ -46,18 +46,15 @@
 #ifndef GLHEADER_H
 #define GLHEADER_H
 
+/* This allows Mesa to be integrated into XFree86 */
 #ifdef HAVE_DIX_CONFIG_H
 #include "dix-config.h"
 #endif
 
-#if defined(XFree86LOADER) && defined(IN_MODULE) && !defined(NO_LIBCWRAPPER)
-#include "xf86_ansic.h"
-#else
 #include <assert.h>
 #include <ctype.h>
-/* If we can use Compaq's Fast Math Library on Alpha */
 #if defined(__alpha__) && defined(CCPML)
-#include <cpml.h>
+#include <cpml.h> /* use Compaq's Fast Math Library on Alpha */
 #else
 #include <math.h>
 #endif
@@ -67,7 +64,6 @@
 #include <string.h>
 #if defined(__linux__) && defined(__i386__)
 #include <fpu_control.h>
-#endif
 #endif
 #include <float.h>
 #include <stdarg.h>

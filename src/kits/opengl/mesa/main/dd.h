@@ -570,9 +570,9 @@ struct dd_function_table {
    /** Notify driver that a program string has been specified. */
    void (*ProgramStringNotify)(GLcontext *ctx, GLenum target, 
 			       struct gl_program *prog);
-   /** Get value of a fragment program register during program execution. */
-   void (*GetFragmentProgramRegister)(GLcontext *ctx, enum register_file file,
-                                      GLuint index, GLfloat val[4]);
+   /** Get value of a program register during program execution. */
+   void (*GetProgramRegister)(GLcontext *ctx, enum register_file file,
+                              GLuint index, GLfloat val[4]);
 
    /** Query if program can be loaded onto hardware */
    GLboolean (*IsProgramNative)(GLcontext *ctx, GLenum target, 
@@ -819,6 +819,58 @@ struct dd_function_table {
    struct gl_array_object * (*NewArrayObject)(GLcontext *ctx, GLuint id);
    void (*DeleteArrayObject)(GLcontext *ctx, struct gl_array_object *obj);
    void (*BindArrayObject)(GLcontext *ctx, struct gl_array_object *obj);
+   /*@}*/
+
+   /**
+    * \name GLSL-related functions (ARB extensions and OpenGL 2.x)
+    */
+   /*@{*/
+   void (*AttachShader)(GLcontext *ctx, GLuint program, GLuint shader);
+   void (*BindAttribLocation)(GLcontext *ctx, GLuint program, GLuint index,
+                              const GLcharARB *name);
+   void (*CompileShader)(GLcontext *ctx, GLuint shader);
+   GLuint (*CreateShader)(GLcontext *ctx, GLenum type);
+   GLuint (*CreateProgram)(GLcontext *ctx);
+   void (*DeleteProgram2)(GLcontext *ctx, GLuint program);
+   void (*DeleteShader)(GLcontext *ctx, GLuint shader);
+   void (*DetachShader)(GLcontext *ctx, GLuint program, GLuint shader);
+   void (*GetActiveAttrib)(GLcontext *ctx, GLuint program, GLuint index,
+                           GLsizei maxLength, GLsizei * length, GLint * size,
+                           GLenum * type, GLcharARB * name);
+   void (*GetActiveUniform)(GLcontext *ctx, GLuint program, GLuint index,
+                            GLsizei maxLength, GLsizei *length, GLint *size,
+                            GLenum *type, GLcharARB *name);
+   void (*GetAttachedShaders)(GLcontext *ctx, GLuint program, GLsizei maxCount,
+                              GLsizei *count, GLuint *obj);
+   GLint (*GetAttribLocation)(GLcontext *ctx, GLuint program,
+                              const GLcharARB *name);
+   GLuint (*GetHandle)(GLcontext *ctx, GLenum pname);
+   void (*GetProgramiv)(GLcontext *ctx, GLuint program,
+                        GLenum pname, GLint *params);
+   void (*GetProgramInfoLog)(GLcontext *ctx, GLuint program, GLsizei bufSize,
+                             GLsizei *length, GLchar *infoLog);
+   void (*GetShaderiv)(GLcontext *ctx, GLuint shader,
+                       GLenum pname, GLint *params);
+   void (*GetShaderInfoLog)(GLcontext *ctx, GLuint shader, GLsizei bufSize,
+                            GLsizei *length, GLchar *infoLog);
+   void (*GetShaderSource)(GLcontext *ctx, GLuint shader, GLsizei maxLength,
+                           GLsizei *length, GLcharARB *sourceOut);
+   void (*GetUniformfv)(GLcontext *ctx, GLuint program, GLint location,
+                        GLfloat *params);
+   GLint (*GetUniformLocation)(GLcontext *ctx, GLuint program,
+                               const GLcharARB *name);
+   GLboolean (*IsProgram)(GLcontext *ctx, GLuint name);
+   GLboolean (*IsShader)(GLcontext *ctx, GLuint name);
+   void (*LinkProgram)(GLcontext *ctx, GLuint program);
+   void (*ShaderSource)(GLcontext *ctx, GLuint shader, const GLchar *source);
+   void (*Uniform)(GLcontext *ctx, GLint location, GLsizei count,
+                   const GLvoid *values, GLenum type);
+   void (*UniformMatrix)(GLcontext *ctx, GLint cols, GLint rows,
+                         GLenum matrixType, GLint location, GLsizei count,
+                         GLboolean transpose, const GLfloat *values);
+   void (*UseProgram)(GLcontext *ctx, GLuint program);
+   void (*ValidateProgram)(GLcontext *ctx, GLuint program);
+   /* XXX many more to come */
    /*@}*/
 
 

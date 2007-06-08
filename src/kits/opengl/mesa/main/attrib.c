@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.2
+ * Version:  6.5.3
  *
- * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -138,9 +138,9 @@ _mesa_PushAttrib(GLbitfield mask)
       attr->Blend = ctx->Color.BlendEnabled;
       attr->ClipPlanes = ctx->Transform.ClipPlanesEnabled;
       attr->ColorMaterial = ctx->Light.ColorMaterialEnabled;
-      attr->ColorTable = ctx->Pixel.ColorTableEnabled;
-      attr->PostColorMatrixColorTable = ctx->Pixel.PostColorMatrixColorTableEnabled;
-      attr->PostConvolutionColorTable = ctx->Pixel.PostConvolutionColorTableEnabled;
+      for (i = 0; i < COLORTABLE_MAX; i++) {
+         attr->ColorTable[i] = ctx->Pixel.ColorTableEnabled[i];
+      }
       attr->Convolution1D = ctx->Pixel.Convolution1DEnabled;
       attr->Convolution2D = ctx->Pixel.Convolution2DEnabled;
       attr->Separable2D = ctx->Pixel.Separable2DEnabled;
@@ -432,14 +432,15 @@ pop_enable_group(GLcontext *ctx, const struct gl_enable_attrib *enable)
 
    TEST_AND_UPDATE(ctx->Light.ColorMaterialEnabled, enable->ColorMaterial,
                    GL_COLOR_MATERIAL);
-   TEST_AND_UPDATE(ctx->Pixel.ColorTableEnabled, enable->ColorTable,
+   TEST_AND_UPDATE(ctx->Pixel.ColorTableEnabled[COLORTABLE_PRECONVOLUTION],
+                   enable->ColorTable[COLORTABLE_PRECONVOLUTION],
                    GL_COLOR_TABLE);
-   TEST_AND_UPDATE(ctx->Pixel.PostColorMatrixColorTableEnabled,
-                   enable->PostColorMatrixColorTable,
-                   GL_POST_COLOR_MATRIX_COLOR_TABLE);
-   TEST_AND_UPDATE(ctx->Pixel.PostConvolutionColorTableEnabled,
-                   enable->PostConvolutionColorTable,
+   TEST_AND_UPDATE(ctx->Pixel.ColorTableEnabled[COLORTABLE_POSTCONVOLUTION],
+                   enable->ColorTable[COLORTABLE_POSTCONVOLUTION],
                    GL_POST_CONVOLUTION_COLOR_TABLE);
+   TEST_AND_UPDATE(ctx->Pixel.ColorTableEnabled[COLORTABLE_POSTCOLORMATRIX],
+                   enable->ColorTable[COLORTABLE_POSTCOLORMATRIX],
+                   GL_POST_COLOR_MATRIX_COLOR_TABLE);
    TEST_AND_UPDATE(ctx->Polygon.CullFlag, enable->CullFace, GL_CULL_FACE);
    TEST_AND_UPDATE(ctx->Depth.Test, enable->DepthTest, GL_DEPTH_TEST);
    TEST_AND_UPDATE(ctx->Color.DitherFlag, enable->Dither, GL_DITHER);
@@ -764,7 +765,8 @@ pop_texture_group(GLcontext *ctx, const struct gl_texture_attrib *texAttrib)
          _mesa_TexParameterf(target, GL_TEXTURE_MIN_LOD, obj->MinLod);
          _mesa_TexParameterf(target, GL_TEXTURE_MAX_LOD, obj->MaxLod);
          _mesa_TexParameteri(target, GL_TEXTURE_BASE_LEVEL, obj->BaseLevel);
-         _mesa_TexParameteri(target, GL_TEXTURE_MAX_LEVEL, obj->MaxLevel);
+         if (target != GL_TEXTURE_RECTANGLE_ARB)
+            _mesa_TexParameteri(target, GL_TEXTURE_MAX_LEVEL, obj->MaxLevel);
          if (ctx->Extensions.EXT_texture_filter_anisotropic) {
             _mesa_TexParameterf(target, GL_TEXTURE_MAX_ANISOTROPY_EXT,
                                 obj->MaxAnisotropy);
@@ -1285,6 +1287,12 @@ _mesa_PushClientAttrib(GLbitfield mask)
       attr = MALLOC_STRUCT( gl_array_attrib );
       obj = MALLOC_STRUCT( gl_array_object );
 
+#if FEATURE_ARB_vertex_buffer_object
+      /* increment ref counts since we're copying pointers to these objects */
+      ctx->Array.ArrayBufferObj->RefCount++;
+      ctx->Array.ElementArrayBufferObj->RefCount++;
+#endif
+
       MEMCPY( attr, &ctx->Array, sizeof(struct gl_array_attrib) );
       MEMCPY( obj, ctx->Array.ArrayObj, sizeof(struct gl_array_object) );
 
@@ -1359,6 +1367,13 @@ _mesa_PopClientAttrib(void)
 
 	    _mesa_BindVertexArrayAPPLE( data->ArrayObj->Name );
 	    
+#if FEATURE_ARB_vertex_buffer_object
+            _mesa_BindBufferARB(GL_ARRAY_BUFFER_ARB,
+                                data->ArrayBufferObj->Name);
+            _mesa_BindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB,
+                                data->ElementArrayBufferObj->Name);
+#endif
+
 	    MEMCPY( ctx->Array.ArrayObj, data->ArrayObj,
 		    sizeof( struct gl_array_object ) );
 

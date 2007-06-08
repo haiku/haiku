@@ -135,51 +135,51 @@ void TAG(translate_vertex)(GLcontext *ctx,
       dst->specular[1] = src->v.specular.green;
       dst->specular[2] = src->v.specular.blue;
 
-      dst->fog = src->v.specular.alpha/255.0;
+      dst->attrib[FRAG_ATTRIB_FOGC][0] = src->v.specular.alpha/255.0;
 
       if (HAVE_PTEX_VERTICES &&
 	  ((HAVE_TEX2_VERTICES && format == PROJ_TEX3_VERTEX_FORMAT) ||
 	   (format == PROJ_TEX1_VERTEX_FORMAT))) {
 
-	 dst->texcoord[0][0] = src->pv.u0;
-	 dst->texcoord[0][1] = src->pv.v0;
-	 dst->texcoord[0][3] = src->pv.q0;
+	 dst->attrib[FRAG_ATTRIB_TEX0][0] = src->pv.u0;
+	 dst->attrib[FRAG_ATTRIB_TEX0][1] = src->pv.v0;
+	 dst->attrib[FRAG_ATTRIB_TEX0][3] = src->pv.q0;
 
-	 dst->texcoord[1][0] = src->pv.u1;
-	 dst->texcoord[1][1] = src->pv.v1;
-	 dst->texcoord[1][3] = src->pv.q1;
+	 dst->attrib[FRAG_ATTRIB_TEX1][0] = src->pv.u1;
+	 dst->attrib[FRAG_ATTRIB_TEX1][1] = src->pv.v1;
+	 dst->attrib[FRAG_ATTRIB_TEX1][3] = src->pv.q1;
 
 	 if (HAVE_TEX2_VERTICES) {
-	    dst->texcoord[2][0] = src->pv.u2;
-	    dst->texcoord[2][1] = src->pv.v2;
-	    dst->texcoord[2][3] = src->pv.q2;
+	    dst->attrib[FRAG_ATTRIB_TEX2][0] = src->pv.u2;
+	    dst->attrib[FRAG_ATTRIB_TEX2][1] = src->pv.v2;
+	    dst->attrib[FRAG_ATTRIB_TEX2][3] = src->pv.q2;
 	 }
 
 	 if (HAVE_TEX3_VERTICES) {
-	    dst->texcoord[3][0] = src->pv.u3;
-	    dst->texcoord[3][1] = src->pv.v3;
-	    dst->texcoord[3][3] = src->pv.q3;
+	    dst->attrib[FRAG_ATTRIB_TEX3][0] = src->pv.u3;
+	    dst->attrib[FRAG_ATTRIB_TEX3][1] = src->pv.v3;
+	    dst->attrib[FRAG_ATTRIB_TEX3][3] = src->pv.q3;
 	 }
       }
       else {
-	 dst->texcoord[0][0] = src->v.u0;
-	 dst->texcoord[0][1] = src->v.v0;
-	 dst->texcoord[0][3] = 1.0;
+	 dst->attrib[FRAG_ATTRIB_TEX0][0] = src->v.u0;
+	 dst->attrib[FRAG_ATTRIB_TEX0][1] = src->v.v0;
+	 dst->attrib[FRAG_ATTRIB_TEX0][3] = 1.0;
 
-	 dst->texcoord[1][0] = src->v.u1;
-	 dst->texcoord[1][1] = src->v.v1;
-	 dst->texcoord[1][3] = 1.0;
+	 dst->attrib[FRAG_ATTRIB_TEX1][0] = src->v.u1;
+	 dst->attrib[FRAG_ATTRIB_TEX1][1] = src->v.v1;
+	 dst->attrib[FRAG_ATTRIB_TEX1][3] = 1.0;
 
 	 if (HAVE_TEX2_VERTICES) {
-	    dst->texcoord[2][0] = src->v.u2;
-	    dst->texcoord[2][1] = src->v.v2;
-	    dst->texcoord[2][3] = 1.0;
+	    dst->attrib[FRAG_ATTRIB_TEX2][0] = src->v.u2;
+	    dst->attrib[FRAG_ATTRIB_TEX2][1] = src->v.v2;
+	    dst->attrib[FRAG_ATTRIB_TEX2][3] = 1.0;
 	 }
 
 	 if (HAVE_TEX3_VERTICES) {
-	    dst->texcoord[3][0] = src->v.u3;
-	    dst->texcoord[3][1] = src->v.v3;
-	    dst->texcoord[3][3] = 1.0;
+	    dst->attrib[FRAG_ATTRIB_TEX3][0] = src->v.u3;
+	    dst->attrib[FRAG_ATTRIB_TEX3][1] = src->v.v3;
+	    dst->attrib[FRAG_ATTRIB_TEX3][3] = 1.0;
 	 }
       }
    }

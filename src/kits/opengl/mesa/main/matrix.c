@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.3
+ * Version:  6.5.3
  *
- * Copyright (C) 1999-2005  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -230,7 +230,7 @@ void GLAPIENTRY
 _mesa_PushMatrix( void )
 {
    GET_CURRENT_CONTEXT(ctx);
-   struct matrix_stack *stack = ctx->CurrentStack;
+   struct gl_matrix_stack *stack = ctx->CurrentStack;
    ASSERT_OUTSIDE_BEGIN_END(ctx);
 
    if (MESA_VERBOSE&VERBOSE_API)
@@ -270,7 +270,7 @@ void GLAPIENTRY
 _mesa_PopMatrix( void )
 {
    GET_CURRENT_CONTEXT(ctx);
-   struct matrix_stack *stack = ctx->CurrentStack;
+   struct gl_matrix_stack *stack = ctx->CurrentStack;
    ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
 
    if (MESA_VERBOSE&VERBOSE_API)
@@ -427,7 +427,7 @@ _mesa_Scalef( GLfloat x, GLfloat y, GLfloat z )
 
 
 /**
- * Multiply the current matrix with a general scaling matrix.
+ * Multiply the current matrix with a translation matrix.
  *
  * \param x translation vector x coordinate.
  * \param y translation vector y coordinate.
@@ -766,7 +766,7 @@ void _mesa_update_modelview_project( GLcontext *ctx, GLuint new_state )
  * initialize it.
  */
 static void
-init_matrix_stack( struct matrix_stack *stack,
+init_matrix_stack( struct gl_matrix_stack *stack,
                    GLuint maxDepth, GLuint dirtyFlag )
 {
    GLuint i;
@@ -792,7 +792,7 @@ init_matrix_stack( struct matrix_stack *stack,
  * frees the array.
  */
 static void
-free_matrix_stack( struct matrix_stack *stack )
+free_matrix_stack( struct gl_matrix_stack *stack )
 {
    GLuint i;
    for (i = 0; i < stack->MaxDepth; i++) {

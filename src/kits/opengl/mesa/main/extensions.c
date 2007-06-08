@@ -136,6 +136,7 @@ static const struct {
    { OFF, "GL_ATI_texture_env_combine3",       F(ATI_texture_env_combine3)},
    { OFF, "GL_ATI_texture_mirror_once",        F(ATI_texture_mirror_once)},
    { OFF, "GL_ATI_fragment_shader",            F(ATI_fragment_shader)},
+   { OFF, "GL_ATI_separate_stencil",           F(ATI_separate_stencil)},
    { OFF, "GL_IBM_multimode_draw_arrays",      F(IBM_multimode_draw_arrays) },
    { ON,  "GL_IBM_rasterpos_clip",             F(IBM_rasterpos_clip) },
    { OFF, "GL_IBM_texture_mirrored_repeat",    F(ARB_texture_mirrored_repeat)},
@@ -199,6 +200,9 @@ _mesa_enable_sw_extensions(GLcontext *ctx)
 #if FEATURE_ARB_shading_language_100
    ctx->Extensions.ARB_shading_language_100 = GL_TRUE;
 #endif
+#if FEATURE_ARB_shading_language_120
+   ctx->Extensions.ARB_shading_language_120 = GL_TRUE;
+#endif
    ctx->Extensions.ARB_shadow = GL_TRUE;
    ctx->Extensions.ARB_texture_border_clamp = GL_TRUE;
    ctx->Extensions.ARB_texture_cube_map = GL_TRUE;
@@ -223,6 +227,7 @@ _mesa_enable_sw_extensions(GLcontext *ctx)
 #endif
    ctx->Extensions.ATI_texture_env_combine3 = GL_TRUE;
    ctx->Extensions.ATI_texture_mirror_once = GL_TRUE;
+   ctx->Extensions.ATI_separate_stencil = GL_TRUE;
    ctx->Extensions.EXT_blend_color = GL_TRUE;
    ctx->Extensions.EXT_blend_equation_separate = GL_TRUE;
    ctx->Extensions.EXT_blend_func_separate = GL_TRUE;
@@ -409,7 +414,9 @@ _mesa_enable_2_1_extensions(GLcontext *ctx)
 #if FEATURE_EXT_texture_sRGB
    ctx->Extensions.EXT_texture_sRGB = GL_TRUE;
 #endif
-   /* plus: shading language extensions, non-square uniform matrices */
+#ifdef FEATURE_ARB_shading_language_120
+   ctx->Extensions.ARB_shading_language_120 = GL_TRUE;
+#endif
 }
 
 

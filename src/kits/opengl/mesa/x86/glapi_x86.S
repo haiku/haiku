@@ -1246,6 +1246,7 @@ GLNAME(gl_dispatch_functions_start):
 	GL_STUB_ALIAS(BindProgramARB, _gloffset_BindProgramNV, BindProgramARB@8, BindProgramNV, BindProgramNV@8)
 	GL_STUB_ALIAS(DeleteProgramsARB, _gloffset_DeleteProgramsNV, DeleteProgramsARB@8, DeleteProgramsNV, DeleteProgramsNV@8)
 	GL_STUB_ALIAS(GenProgramsARB, _gloffset_GenProgramsNV, GenProgramsARB@8, GenProgramsNV, GenProgramsNV@8)
+	GL_STUB_ALIAS(GetVertexAttribPointerv, _gloffset_GetVertexAttribPointervNV, GetVertexAttribPointerv@12, GetVertexAttribPointervNV, GetVertexAttribPointervNV@12)
 	GL_STUB_ALIAS(GetVertexAttribPointervARB, _gloffset_GetVertexAttribPointervNV, GetVertexAttribPointervARB@12, GetVertexAttribPointervNV, GetVertexAttribPointervNV@12)
 	GL_STUB_ALIAS(IsProgramARB, _gloffset_IsProgramNV, IsProgramARB@4, IsProgramNV, IsProgramNV@4)
 	GL_STUB_ALIAS(PointParameteri, _gloffset_PointParameteriNV, PointParameteri@8, PointParameteriNV, PointParameteriNV@8)

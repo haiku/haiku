@@ -71,6 +71,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
    }
 
    INIT_SPAN(span, GL_BITMAP, 0, 0, SPAN_RGBA);
+   _swrast_span_default_secondary_color(ctx, &span);
    if (ctx->Depth.Test)
       _swrast_span_default_z(ctx, &span);
    if (swrast->_FogEnabled)
@@ -110,8 +111,9 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
     */
 
    if (format == GL_RGBA && type == rbType) {
-      const GLubyte *src = _mesa_image_address2d(&unpack, pixels, width,
-                                                 height, format, type, 0, 0);
+      const GLubyte *src
+         = (const GLubyte *) _mesa_image_address2d(&unpack, pixels, width,
+                                                   height, format, type, 0, 0);
       const GLint srcStride = _mesa_image_row_stride(&unpack, width,
                                                      format, type);
       if (simpleZoom) {
@@ -139,8 +141,9 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
    }
 
    if (format == GL_RGB && type == rbType) {
-      const GLubyte *src = _mesa_image_address2d(&unpack, pixels, width,
-                                                 height, format, type, 0, 0);
+      const GLubyte *src
+         = (const GLubyte *) _mesa_image_address2d(&unpack, pixels, width,
+                                                   height, format, type, 0, 0);
       const GLint srcStride = _mesa_image_row_stride(&unpack, width,
                                                      format, type);
       if (simpleZoom) {
@@ -439,7 +442,7 @@ draw_depth_pixels( GLcontext *ctx, GLint x, GLint y,
    INIT_SPAN(span, GL_BITMAP, 0, 0, SPAN_Z);
 
    _swrast_span_default_color(ctx, &span);
-
+   _swrast_span_default_secondary_color(ctx, &span);
    if (swrast->_FogEnabled)
       _swrast_span_default_fog(ctx, &span);
    if (ctx->Texture._EnabledCoordUnits)
@@ -450,7 +453,8 @@ draw_depth_pixels( GLcontext *ctx, GLint x, GLint y,
        && !scaleOrBias
        && !zoom
        && ctx->Visual.rgbMode
-       && width <= MAX_WIDTH) {
+       && width <= MAX_WIDTH
+       && !unpack->SwapBytes) {
       /* Special case: directly write 16-bit depth values */
       GLint row;
       for (row = 0; row < height; row++) {
@@ -470,7 +474,8 @@ draw_depth_pixels( GLcontext *ctx, GLint x, GLint y,
             && !scaleOrBias
             && !zoom
             && ctx->Visual.rgbMode
-            && width <= MAX_WIDTH) {
+            && width <= MAX_WIDTH
+            && !unpack->SwapBytes) {
       /* Special case: shift 32-bit values down to Visual.depthBits */
       const GLint shift = 32 - ctx->DrawBuffer->Visual.depthBits;
       GLint row;
@@ -558,6 +563,7 @@ draw_rgba_pixels( GLcontext *ctx, GLint x, GLint y,
       return;
 
    INIT_SPAN(span, GL_BITMAP, 0, 0, SPAN_RGBA);
+   _swrast_span_default_secondary_color(ctx, &span);
    if (ctx->Depth.Test)
       _swrast_span_default_z(ctx, &span);
    if (swrast->_FogEnabled)
@@ -615,6 +621,11 @@ draw_rgba_pixels( GLcontext *ctx, GLint x, GLint y,
       type = GL_FLOAT;
       transferOps &= IMAGE_POST_CONVOLUTION_BITS;
    }
+   else if (ctx->Pixel.Convolution1DEnabled) {
+      /* we only want to apply 1D convolution to glTexImage1D */
+      transferOps &= ~(IMAGE_CONVOLUTION_BIT |
+                       IMAGE_POST_CONVOLUTION_SCALE_BIAS);
+   }
 
    if (ctx->DrawBuffer->_NumColorDrawBuffers[0] > 0 &&
        ctx->DrawBuffer->_ColorDrawBuffers[0][0]->DataType != GL_FLOAT &&
@@ -635,13 +646,15 @@ draw_rgba_pixels( GLcontext *ctx, GLint x, GLint y,
          = _mesa_image_row_stride(unpack, width, format, type);
       GLint skipPixels = 0;
       /* use span array for temp color storage */
-      GLfloat *rgba = (GLfloat *) span.array->color.sz4.rgba;
+      GLfloat *rgba = (GLfloat *) span.array->attribs[FRAG_ATTRIB_COL0];
 
       /* if the span is wider than MAX_WIDTH we have to do it in chunks */
       while (skipPixels < width) {
          const GLint spanWidth = MIN2(width - skipPixels, MAX_WIDTH);
-         const GLubyte *source = _mesa_image_address2d(unpack, pixels,
-                               width, height, format, type, 0, skipPixels);
+         const GLubyte *source
+            = (const GLubyte *) _mesa_image_address2d(unpack, pixels,
+                                                      width, height, format,
+                                                      type, 0, skipPixels);
          GLint row;
 
          for (row = 0; row < height; row++) {

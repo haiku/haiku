@@ -29477,6 +29477,7 @@ GL_PREFIX(_dispatch_stub_771):
 	.globl GL_PREFIX(BindProgramARB) ; .set GL_PREFIX(BindProgramARB), GL_PREFIX(BindProgramNV)
 	.globl GL_PREFIX(DeleteProgramsARB) ; .set GL_PREFIX(DeleteProgramsARB), GL_PREFIX(DeleteProgramsNV)
 	.globl GL_PREFIX(GenProgramsARB) ; .set GL_PREFIX(GenProgramsARB), GL_PREFIX(GenProgramsNV)
+	.globl GL_PREFIX(GetVertexAttribPointerv) ; .set GL_PREFIX(GetVertexAttribPointerv), GL_PREFIX(GetVertexAttribPointervNV)
 	.globl GL_PREFIX(GetVertexAttribPointervARB) ; .set GL_PREFIX(GetVertexAttribPointervARB), GL_PREFIX(GetVertexAttribPointervNV)
 	.globl GL_PREFIX(IsProgramARB) ; .set GL_PREFIX(IsProgramARB), GL_PREFIX(IsProgramNV)
 	.globl GL_PREFIX(PointParameteri) ; .set GL_PREFIX(PointParameteri), GL_PREFIX(PointParameteriNV)

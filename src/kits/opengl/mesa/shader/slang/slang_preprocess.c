@@ -1138,10 +1138,12 @@ preprocess_source (slang_string *output, const char *source, grammar pid, gramma
       goto error;
    }
 
+   grammar_alloc_free(prod);
    pp_state_free (&state);
    return GL_TRUE;
 
 error:
+   grammar_alloc_free(prod);
    pp_state_free (&state);
    return GL_FALSE;
 }

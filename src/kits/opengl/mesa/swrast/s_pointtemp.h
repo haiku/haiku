@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.2
+ * Version:  6.5.3
  *
- * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -39,14 +39,14 @@
  *
  *   RGBA = do rgba instead of color index
  *   SMOOTH = do antialiasing
- *   TEXTURE = do texture coords
+ *   ATTRIBS = general attributes (texcoords, etc)
  *   SPECULAR = do separate specular color
  *   LARGE = do points with diameter > 1 pixel
  *   ATTENUATE = compute point size attenuation
  *   SPRITE = GL_ARB_point_sprite / GL_NV_point_sprite
  *
  * Notes: LARGE and ATTENUATE are exclusive of each other.
- *        TEXTURE requires RGBA
+ *        ATTRIBS requires RGBA
  */
 
 
@@ -61,7 +61,6 @@
  * else
  *    fragment has % coverage = (d - rmin2) / (rmax2 - rmin2)
  */
-
 
 
 static void
@@ -87,9 +86,8 @@ NAME ( GLcontext *ctx, const SWvertex *vert )
 #if FLAGS & INDEX
    const GLuint colorIndex = (GLuint) vert->index; /* XXX round? */
 #endif
-#if FLAGS & TEXTURE
-   GLfloat texcoord[MAX_TEXTURE_COORD_UNITS][4];
-   GLuint u;
+#if FLAGS & ATTRIBS
+   GLfloat attrib[FRAG_ATTRIB_MAX][4]; /* texture & varying */
 #endif
    SWcontext *swrast = SWRAST_CONTEXT(ctx);
    SWspan *span = &(swrast->PointSpan);
@@ -107,8 +105,9 @@ NAME ( GLcontext *ctx, const SWvertex *vert )
     */
    span->interpMask = SPAN_FOG;
    span->arrayMask = SPAN_XY | SPAN_Z;
-   span->fog = vert->fog;
-   span->fogStep = 0.0;
+   span->attrStart[FRAG_ATTRIB_FOGC][0] = vert->attrib[FRAG_ATTRIB_FOGC][0];
+   span->attrStepX[FRAG_ATTRIB_FOGC][0] = 0.0;
+   span->attrStepY[FRAG_ATTRIB_FOGC][0] = 0.0;
 #if FLAGS & RGBA
    span->arrayMask |= SPAN_RGBA;
 #endif
@@ -118,33 +117,29 @@ NAME ( GLcontext *ctx, const SWvertex *vert )
 #if FLAGS & INDEX
    span->arrayMask |= SPAN_INDEX;
 #endif
-#if FLAGS & TEXTURE
+#if FLAGS & ATTRIBS
    span->arrayMask |= (SPAN_TEXTURE | SPAN_LAMBDA);
    if (ctx->FragmentProgram._Active) {
       /* Don't divide texture s,t,r by q (use TXP to do that) */
-      for (u = 0; u < ctx->Const.MaxTextureUnits; u++) {
-         if (ctx->Texture._EnabledCoordUnits & (1 << u)) {
-            COPY_4V(texcoord[u], vert->texcoord[u]);
-         }
-      }
+      ATTRIB_LOOP_BEGIN
+         COPY_4V(attrib[attr], vert->attrib[attr]);
+      ATTRIB_LOOP_END
    }
    else {
       /* Divide texture s,t,r by q here */
-      for (u = 0; u < ctx->Const.MaxTextureUnits; u++) {
-         if (ctx->Texture._EnabledCoordUnits & (1 << u)) {
-            const GLfloat q = vert->texcoord[u][3];
-            const GLfloat invQ = (q == 0.0F || q == 1.0F) ? 1.0F : (1.0F / q);
-            texcoord[u][0] = vert->texcoord[u][0] * invQ;
-            texcoord[u][1] = vert->texcoord[u][1] * invQ;
-            texcoord[u][2] = vert->texcoord[u][2] * invQ;
-            texcoord[u][3] = q;
-         }
-      }
+      ATTRIB_LOOP_BEGIN
+         const GLfloat q = vert->attrib[attr][3];
+         const GLfloat invQ = (q == 0.0F || q == 1.0F) ? 1.0F : (1.0F / q);
+         attrib[attr][0] = vert->attrib[attr][0] * invQ;
+         attrib[attr][1] = vert->attrib[attr][1] * invQ;
+         attrib[attr][2] = vert->attrib[attr][2] * invQ;
+         attrib[attr][3] = q;
+      ATTRIB_LOOP_END
    }
    /* need these for fragment programs */
-   span->w = 1.0F;
-   span->dwdx = 0.0F;
-   span->dwdy = 0.0F;
+   span->attrStart[FRAG_ATTRIB_WPOS][3] = 1.0F;
+   span->attrStepX[FRAG_ATTRIB_WPOS][3] = 0.0F;
+   span->attrStepY[FRAG_ATTRIB_WPOS][3] = 0.0F;
 #endif
 #if FLAGS & SMOOTH
    span->arrayMask |= SPAN_COVERAGE;
@@ -194,7 +189,7 @@ NAME ( GLcontext *ctx, const SWvertex *vert )
    {{
       GLint x, y;
       const GLfloat radius = 0.5F * size;
-      const GLint z = (GLint) (vert->win[2] + 0.5F);
+      const GLuint z = (GLuint) (vert->win[2] + 0.5F);
       GLuint count;
 #if FLAGS & SMOOTH
       const GLfloat rmin = radius - 0.7071F;  /* 0.7071 = sqrt(2)/2 */
@@ -259,7 +254,7 @@ NAME ( GLcontext *ctx, const SWvertex *vert )
             count = span->end = 0;
          }
          for (x = xmin; x <= xmax; x++) {
-#if FLAGS & (SPRITE | TEXTURE)
+#if FLAGS & SPRITE
             GLuint u;
 #endif
 
@@ -277,13 +272,14 @@ NAME ( GLcontext *ctx, const SWvertex *vert )
 #if FLAGS & INDEX
             span->array->index[count] = colorIndex;
 #endif
-#if FLAGS & TEXTURE
-            for (u = 0; u < ctx->Const.MaxTextureUnits; u++) {
-               if (ctx->Texture._EnabledCoordUnits & (1 << u)) {
-                  COPY_4V(span->array->texcoords[u][count], texcoord[u]);
+#if FLAGS & ATTRIBS
+            ATTRIB_LOOP_BEGIN
+               COPY_4V(span->array->attribs[attr][count], attrib[attr]);
+               if (attr < FRAG_ATTRIB_VAR0) {
+                  const GLuint u = attr - FRAG_ATTRIB_TEX0;
                   span->array->lambda[u][count] = 0.0;
                }
-            }
+            ATTRIB_LOOP_END
 #endif
 
 #if FLAGS & SMOOTH
@@ -328,6 +324,7 @@ NAME ( GLcontext *ctx, const SWvertex *vert )
 
 #if FLAGS & SPRITE
             for (u = 0; u < ctx->Const.MaxTextureUnits; u++) {
+               GLuint attr = FRAG_ATTRIB_TEX0 + u;
                if (ctx->Texture.Unit[u]._ReallyEnabled) {
                   if (ctx->Point.CoordReplace[u]) {
                      GLfloat s = 0.5F + (x + 0.5F - vert->win[0]) / size;
@@ -339,17 +336,18 @@ NAME ( GLcontext *ctx, const SWvertex *vert )
                      if (ctx->Point.SpriteRMode == GL_ZERO)
                         r = 0.0F;
                      else if (ctx->Point.SpriteRMode == GL_S)
-                        r = vert->texcoord[u][0];
+                        r = vert->attrib[attr][0];
                      else /* GL_R */
-                        r = vert->texcoord[u][2];
-                     span->array->texcoords[u][count][0] = s;
-                     span->array->texcoords[u][count][1] = t;
-                     span->array->texcoords[u][count][2] = r;
-                     span->array->texcoords[u][count][3] = 1.0F;
+                        r = vert->attrib[attr][2];
+                     span->array->attribs[attr][count][0] = s;
+                     span->array->attribs[attr][count][1] = t;
+                     span->array->attribs[attr][count][2] = r;
+                     span->array->attribs[attr][count][3] = 1.0F;
                      span->array->lambda[u][count] = 0.0; /* XXX fix? */
                   }
                   else {
-                     COPY_4V(span->array->texcoords[u][count], vert->texcoord[u]);
+                     COPY_4V(span->array->attribs[attr][count],
+                             vert->attrib[attr]);
                   }
                }
             }
@@ -399,12 +397,10 @@ NAME ( GLcontext *ctx, const SWvertex *vert )
 #if FLAGS & INDEX
       span->array->index[count] = colorIndex;
 #endif
-#if FLAGS & TEXTURE
-      for (u = 0; u < ctx->Const.MaxTextureUnits; u++) {
-         if (ctx->Texture.Unit[u]._ReallyEnabled) {
-            COPY_4V(span->array->texcoords[u][count], texcoord[u]);
-         }
-      }
+#if FLAGS & ATTRIBS
+      ATTRIB_LOOP_BEGIN
+         COPY_4V(span->array->attribs[attr][count], attribs[attr]);
+      ATTRIB_LOOP_END
 #endif
 
       span->array->x[count] = (GLint) vert->win[0];

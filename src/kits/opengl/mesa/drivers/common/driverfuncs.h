@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.1
+ * Version:  6.5.3
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -28,5 +28,9 @@
 
 extern void
 _mesa_init_driver_functions(struct dd_function_table *driver);
+
+
+extern void
+_mesa_init_glsl_driver_functions(struct dd_function_table *driver);
 
 #endif

@@ -4865,14 +4865,19 @@ KEYWORD1 void KEYWORD2 NAME(GetTrackMatrixivNV)(GLenum target, GLuint address, G
    DISPATCH(GetTrackMatrixivNV, (target, address, pname, params), (F, "glGetTrackMatrixivNV(0x%x, %d, 0x%x, %p);\n", target, address, pname, (const void *) params));
 }
 
-KEYWORD1 void KEYWORD2 NAME(GetVertexAttribPointervARB)(GLuint index, GLenum pname, GLvoid ** params)
+KEYWORD1 void KEYWORD2 NAME(GetVertexAttribPointerv)(GLuint index, GLenum pname, GLvoid ** pointer)
 {
-   DISPATCH(GetVertexAttribPointervNV, (index, pname, params), (F, "glGetVertexAttribPointervARB(%d, 0x%x, %p);\n", index, pname, (const void *) params));
+   DISPATCH(GetVertexAttribPointervNV, (index, pname, pointer), (F, "glGetVertexAttribPointerv(%d, 0x%x, %p);\n", index, pname, (const void *) pointer));
 }
 
-KEYWORD1 void KEYWORD2 NAME(GetVertexAttribPointervNV)(GLuint index, GLenum pname, GLvoid ** params)
+KEYWORD1 void KEYWORD2 NAME(GetVertexAttribPointervARB)(GLuint index, GLenum pname, GLvoid ** pointer)
 {
-   DISPATCH(GetVertexAttribPointervNV, (index, pname, params), (F, "glGetVertexAttribPointervNV(%d, 0x%x, %p);\n", index, pname, (const void *) params));
+   DISPATCH(GetVertexAttribPointervNV, (index, pname, pointer), (F, "glGetVertexAttribPointervARB(%d, 0x%x, %p);\n", index, pname, (const void *) pointer));
+}
+
+KEYWORD1 void KEYWORD2 NAME(GetVertexAttribPointervNV)(GLuint index, GLenum pname, GLvoid ** pointer)
+{
+   DISPATCH(GetVertexAttribPointervNV, (index, pname, pointer), (F, "glGetVertexAttribPointervNV(%d, 0x%x, %p);\n", index, pname, (const void *) pointer));
 }
 
 KEYWORD1 void KEYWORD2 NAME(GetVertexAttribdvNV)(GLuint index, GLenum pname, GLdouble * params)
@@ -6577,6 +6582,7 @@ static _glapi_proc UNUSED_TABLE_NAME[] = {
    TABLE_ENTRY(BindProgramARB),
    TABLE_ENTRY(DeleteProgramsARB),
    TABLE_ENTRY(GenProgramsARB),
+   TABLE_ENTRY(GetVertexAttribPointerv),
    TABLE_ENTRY(GetVertexAttribPointervARB),
    TABLE_ENTRY(IsProgramARB),
    TABLE_ENTRY(PointParameteri),

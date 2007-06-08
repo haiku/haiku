@@ -325,7 +325,7 @@ wrap_texture(GLcontext *ctx, struct gl_renderbuffer_attachment *att)
    trb->Base.PutMonoValues = texture_put_mono_values;
 
    /* update attachment point */
-   att->Renderbuffer = &(trb->Base);
+   _mesa_reference_renderbuffer(&att->Renderbuffer, &(trb->Base));
 }
 
 

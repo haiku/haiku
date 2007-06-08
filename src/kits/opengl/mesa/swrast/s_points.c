@@ -38,7 +38,7 @@
 #define RGBA       0x1
 #define INDEX      0x2
 #define SMOOTH     0x4
-#define TEXTURE    0x8
+#define ATTRIBS    0x8
 #define SPECULAR  0x10
 #define LARGE     0x20
 #define ATTENUATE 0x40
@@ -104,7 +104,7 @@
 /*
  * Textured RGBA points.
  */
-#define FLAGS (RGBA | LARGE | TEXTURE | SPECULAR)
+#define FLAGS (RGBA | LARGE | ATTRIBS | SPECULAR)
 #define NAME textured_rgba_point
 #include "s_pointtemp.h"
 
@@ -112,7 +112,7 @@
 /*
  * Antialiased points with texture mapping.
  */
-#define FLAGS (RGBA | SMOOTH | TEXTURE | SPECULAR)
+#define FLAGS (RGBA | SMOOTH | ATTRIBS | SPECULAR)
 #define NAME antialiased_tex_rgba_point
 #include "s_pointtemp.h"
 
@@ -128,7 +128,7 @@
 /*
  * Distance attenuated, textured RGBA points.
  */
-#define FLAGS (RGBA | ATTENUATE | TEXTURE | SPECULAR)
+#define FLAGS (RGBA | ATTENUATE | ATTRIBS | SPECULAR)
 #define NAME atten_textured_rgba_point
 #include "s_pointtemp.h"
 
@@ -136,7 +136,7 @@
 /*
  * Distance attenuated, antialiased points with or without texture mapping.
  */
-#define FLAGS (RGBA | ATTENUATE | TEXTURE | SMOOTH)
+#define FLAGS (RGBA | ATTENUATE | ATTRIBS | SMOOTH)
 #define NAME atten_antialiased_rgba_point
 #include "s_pointtemp.h"
 

@@ -42,10 +42,9 @@
 #include "hash.h"
 #include "imports.h"
 #include "macros.h"
-#include "mtypes.h"
+#include "prog_parameter.h"
+#include "prog_instruction.h"
 #include "nvfragparse.h"
-#include "program_instruction.h"
-#include "nvvertexec.h"
 #include "nvvertparse.h"
 #include "nvprogram.h"
 #include "program.h"
@@ -77,7 +76,7 @@ _mesa_ExecuteProgramNV(GLenum target, GLuint id, const GLfloat *params)
       return;
    }
    
-   _mesa_exec_vertex_state_program(ctx, vprog, params);
+   _mesa_problem(ctx, "glExecuteProgramNV() not supported");
 }
 
 

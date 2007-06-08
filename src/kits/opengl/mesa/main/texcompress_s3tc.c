@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.2
+ * Version:  6.5.3
  *
- * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -91,7 +91,7 @@ _mesa_dlopen(const char *libname, int flags)
    return dlopen(libname, flags);
 #endif
 #else
-   return (GenericFunc) NULL;
+   return NULL;
 #endif /* USE_EXTERNAL_DXTN_LIB */
 }
 
@@ -245,7 +245,7 @@ texstore_rgb_dxt1(TEXSTORE_PARAMS)
                               dst, dstRowStride);
    }
    else {
-      _mesa_problem(ctx, "external dxt library not available");
+      _mesa_warning(ctx, "external dxt library not available");
    }
 
    if (tempImage)
@@ -307,7 +307,7 @@ texstore_rgba_dxt1(TEXSTORE_PARAMS)
                               dst, dstRowStride);
    }
    else {
-      _mesa_problem(ctx, "external dxt library not available");
+      _mesa_warning(ctx, "external dxt library not available");
    }
 
    if (tempImage)
@@ -368,7 +368,7 @@ texstore_rgba_dxt3(TEXSTORE_PARAMS)
                               dst, dstRowStride);
    }
    else {
-      _mesa_problem(ctx, "external dxt library not available");
+      _mesa_warning(ctx, "external dxt library not available");
    }
 
    if (tempImage)
@@ -429,7 +429,7 @@ texstore_rgba_dxt5(TEXSTORE_PARAMS)
                               dst, dstRowStride);
    }
    else {
-      _mesa_problem(ctx, "external dxt library not available");
+      _mesa_warning(ctx, "external dxt library not available");
    }
 
    if (tempImage)

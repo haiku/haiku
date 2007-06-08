@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.2
+ * Version:  6.5.3
  *
- * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -1196,7 +1196,9 @@ sample_linear_2d( GLcontext *ctx,
    GLuint i;
    struct gl_texture_image *image = tObj->Image[0][tObj->BaseLevel];
    (void) lambda;
-   if (tObj->WrapS == GL_REPEAT && tObj->WrapT == GL_REPEAT) {
+   if (tObj->WrapS == GL_REPEAT &&
+       tObj->WrapT == GL_REPEAT &&
+       image->_IsPowerOfTwo) {
       for (i=0;i<n;i++) {
          sample_2d_linear_repeat(ctx, tObj, image, texcoords[i], rgba[i]);
       }
@@ -2024,6 +2026,60 @@ sample_lambda_cube( GLcontext *ctx,
 /*               Texture Rectangle Sampling Functions                 */
 /**********************************************************************/
 
+
+/**
+ * Do clamp/wrap for a texture rectangle coord, GL_NEAREST filter mode.
+ */
+static INLINE GLint
+clamp_rect_coord_nearest(GLenum wrapMode, GLfloat coord, GLint max)
+{
+   if (wrapMode == GL_CLAMP) {
+      return IFLOOR( CLAMP(coord, 0.0F, max - 1) );
+   }
+   else if (wrapMode == GL_CLAMP_TO_EDGE) {
+      return IFLOOR( CLAMP(coord, 0.5F, max - 0.5F) );
+   }
+   else {
+      return IFLOOR( CLAMP(coord, -0.5F, max + 0.5F) );
+   }
+}
+
+
+/*
+ * As above, but GL_LINEAR filtering.
+ */
+static INLINE void
+clamp_rect_coord_linear(GLenum wrapMode, GLfloat coord, GLint max,
+                        GLint *i0out, GLint *i1out)
+{
+   GLfloat fcol;
+   GLint i0, i1;
+   if (wrapMode == GL_CLAMP) {
+      /* Not exactly what the spec says, but it matches NVIDIA output */
+      fcol = CLAMP(coord - 0.5F, 0.0, max-1);
+      i0 = IFLOOR(fcol);
+      i1 = i0 + 1;
+   }
+   else if (wrapMode == GL_CLAMP_TO_EDGE) {
+      fcol = CLAMP(coord, 0.5F, max - 0.5F);
+      fcol -= 0.5F;
+      i0 = IFLOOR(fcol);
+      i1 = i0 + 1;
+      if (i1 > max - 1)
+         i1 = max - 1;
+   }
+   else {
+      ASSERT(wrapMode == GL_CLAMP_TO_BORDER);
+      fcol = CLAMP(coord, -0.5F, max + 0.5F);
+      fcol -= 0.5F;
+      i0 = IFLOOR(fcol);
+      i1 = i0 + 1;
+   }
+   *i0out = i0;
+   *i1out = i1;
+}
+
+
 static void
 sample_nearest_rect(GLcontext *ctx,
 		    const struct gl_texture_object *tObj, GLuint n,
@@ -2048,29 +2104,10 @@ sample_nearest_rect(GLcontext *ctx,
           tObj->WrapT == GL_CLAMP_TO_BORDER);
    ASSERT(img->_BaseFormat != GL_COLOR_INDEX);
 
-   /* XXX move Wrap mode tests outside of loops for common cases */
    for (i = 0; i < n; i++) {
       GLint row, col;
-      /* NOTE: we DO NOT use [0, 1] texture coordinates! */
-      if (tObj->WrapS == GL_CLAMP) {
-         col = IFLOOR( CLAMP(texcoords[i][0], 0.0F, width - 1) );
-      }
-      else if (tObj->WrapS == GL_CLAMP_TO_EDGE) {
-         col = IFLOOR( CLAMP(texcoords[i][0], 0.5F, width - 0.5F) );
-      }
-      else {
-         col = IFLOOR( CLAMP(texcoords[i][0], -0.5F, width + 0.5F) );
-      }
-      if (tObj->WrapT == GL_CLAMP) {
-         row = IFLOOR( CLAMP(texcoords[i][1], 0.0F, height - 1) );
-      }
-      else if (tObj->WrapT == GL_CLAMP_TO_EDGE) {
-         row = IFLOOR( CLAMP(texcoords[i][1], 0.5F, height - 0.5F) );
-      }
-      else {
-         row = IFLOOR( CLAMP(texcoords[i][1], -0.5F, height + 0.5F) );
-      }
-
+      col = clamp_rect_coord_nearest(tObj->WrapS, texcoords[i][0], width);
+      row = clamp_rect_coord_nearest(tObj->WrapT, texcoords[i][1], height);
       if (col < 0 || col > width_minus_1 || row < 0 || row > height_minus_1)
          COPY_CHAN4(rgba[i], tObj->_BorderChan);
       else
@@ -2284,9 +2321,17 @@ sample_depth_texture( GLcontext *ctx,
       for (i = 0; i < n; i++) {
          GLfloat depthSample;
          GLint col, row;
-         /* XXX fix for texture rectangle! */
-         COMPUTE_NEAREST_TEXEL_LOCATION(tObj->WrapS, texcoords[i][0], width, col);
-         COMPUTE_NEAREST_TEXEL_LOCATION(tObj->WrapT, texcoords[i][1], height, row);
+
+         if (tObj->Target == GL_TEXTURE_RECTANGLE_ARB) {
+            col = clamp_rect_coord_nearest(tObj->WrapS, texcoords[i][0], width);
+            row = clamp_rect_coord_nearest(tObj->WrapT, texcoords[i][1], height);
+         }
+         else {
+            COMPUTE_NEAREST_TEXEL_LOCATION(tObj->WrapS, texcoords[i][0],
+                                           width, col);
+            COMPUTE_NEAREST_TEXEL_LOCATION(tObj->WrapT, texcoords[i][1],
+                                           height, row);
+         }
          if (col >= 0 && row >= 0 && col < width && row < height) {
             img->FetchTexelf(img, col, row, 0, &depthSample);
          }
@@ -2360,9 +2405,18 @@ sample_depth_texture( GLcontext *ctx,
          GLfloat u, v;
          GLuint useBorderTexel;
 
-         /* XXX fix for texture rectangle! */
-         COMPUTE_LINEAR_TEXEL_LOCATIONS(tObj->WrapS, texcoords[i][0], u, width, i0, i1);
-         COMPUTE_LINEAR_TEXEL_LOCATIONS(tObj->WrapT, texcoords[i][1], v, height,j0, j1);
+         if (tObj->Target == GL_TEXTURE_RECTANGLE_ARB) {
+            clamp_rect_coord_linear(tObj->WrapS, texcoords[i][0],
+                                    width, &i0, &i1);
+            clamp_rect_coord_linear(tObj->WrapT, texcoords[i][1],
+                                    height, &j0, &j1);
+         }
+         else {
+            COMPUTE_LINEAR_TEXEL_LOCATIONS(tObj->WrapS, texcoords[i][0],
+                                           u, width, i0, i1);
+            COMPUTE_LINEAR_TEXEL_LOCATIONS(tObj->WrapT, texcoords[i][1],
+                                           v, height,j0, j1);
+         }
 
          useBorderTexel = 0;
          if (img->Border) {
@@ -2725,7 +2779,10 @@ _swrast_choose_texture_sample_func( GLcontext *ctx,
             return &sample_nearest_cube;
          }
       case GL_TEXTURE_RECTANGLE_NV:
-         if (needLambda) {
+         if (format == GL_DEPTH_COMPONENT || format == GL_DEPTH_STENCIL_EXT) {
+            return &sample_depth_texture;
+         }
+         else if (needLambda) {
             return &sample_lambda_rect;
          }
          else if (t->MinFilter == GL_LINEAR) {

@@ -21,8 +21,8 @@ UseHeaders [ FDirName $(SUBDIR) shader grammar ] ;
 UseHeaders [ FDirName $(SUBDIR) shader slang ] ;
 UseHeaders [ FDirName $(SUBDIR) swrast ] ;
 UseHeaders [ FDirName $(SUBDIR) swrast_setup ] ;
+UseHeaders [ FDirName $(SUBDIR) vbo ] ;
 
-SEARCH_SOURCE += [ FDirName $(SUBDIR) array_cache ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) drivers common ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) glapi ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) main ] ;
@@ -33,6 +33,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) shader slang ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) swrast ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) swrast_setup ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) tnl ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) vbo ] ;
 
 {
 	local defines ;
@@ -83,11 +84,6 @@ if $(TARGET_ARCH) = x86 {
 		read_rgba_span_x86.S
 
 		t_vertex_sse.c
-		t_vb_arbprogram_sse.c
-		t_vtx_x86.c
-		t_vtx_x86_gcc.S
-
-		slang_execute_x86.c
 
 		x86sse.c
 		;
@@ -158,12 +154,13 @@ StaticLibrary libmesa.a :
 	lines.c
 	matrix.c
 	mipmap.c
-	occlude.c
 	pixel.c
 	points.c
 	polygon.c
+	queryobj.c
 	rastpos.c
 	renderbuffer.c
+	shaders.c
 	state.c
 	stencil.c
 	texcompress.c
@@ -189,20 +186,10 @@ StaticLibrary libmesa.a :
 	m_vector.c
 	m_xform.c
 
-	# array_cache
-	ac_context.c
-	ac_import.c
-
 	# tnl
-	t_array_api.c
-	t_array_import.c
 	t_context.c
+	t_draw.c
 	t_pipeline.c
-	t_save_api.c
-	t_save_loopback.c
-	t_save_playback.c
-	t_vb_arbprogram.c
-	t_vb_arbshader.c
 	t_vb_cull.c
 	t_vb_fog.c
 	t_vb_light.c
@@ -216,17 +203,12 @@ StaticLibrary libmesa.a :
 	t_vp_build.c
 	t_vertex.c
 	t_vertex_generic.c
-	t_vtx_api.c
-	t_vtx_generic.c
-	t_vtx_eval.c
-	t_vtx_exec.c 
 
 	# swrast
 	s_aaline.c
 	s_aatriangle.c
 	s_accum.c
 	s_alpha.c
-	s_arbshader.c
 	s_atifragshader.c
 	s_bitmap.c
 	s_blend.c
@@ -238,11 +220,11 @@ StaticLibrary libmesa.a :
 	s_drawpix.c
 	s_feedback.c
 	s_fog.c
+	s_fragprog.c
 	s_imaging.c
 	s_lines.c
 	s_logic.c
 	s_masking.c
-	s_nvfragprog.c
 	s_points.c
 	s_readpix.c
 	s_span.c
@@ -263,35 +245,56 @@ StaticLibrary libmesa.a :
 	atifragshader.c
 	nvfragparse.c
 	nvprogram.c
-	nvvertexec.c
 	nvvertparse.c
+	prog_execute.c
+	prog_instruction.c
+	prog_parameter.c
+	prog_print.c
+	prog_statevars.c
 	program.c
-	shaderobjects.c
-	shaderobjects_3dlabs.c
+	shader_api.c
 
 	# shader/grammar
 	grammar_mesa.c
 
 	# shader/slang
-	slang_analyse.c
-	slang_assemble.c
-	slang_assemble_assignment.c
-	slang_assemble_conditional.c
-	slang_assemble_constructor.c
-	slang_assemble_typeinfo.c
+	slang_builtin.c
+	slang_codegen.c
 	slang_compile.c
 	slang_compile_function.c
 	slang_compile_operation.c
 	slang_compile_struct.c
 	slang_compile_variable.c
-	slang_execute.c
-	slang_export.c
+	slang_emit.c
+	slang_ir.c
+	slang_label.c
 	slang_library_noise.c
-	slang_library_texsample.c
 	slang_link.c
+	slang_log.c
+	slang_mem.c
 	slang_preprocess.c
+	slang_print.c
+	slang_simplify.c
 	slang_storage.c
+	slang_typeinfo.c
 	slang_utility.c
+	slang_vartable.c
+
+	# vbo
+	vbo_context.c
+	vbo_exec.c
+	vbo_exec_api.c
+	vbo_exec_array.c
+	vbo_exec_draw.c
+	vbo_exec_eval.c
+	vbo_rebase.c
+	vbo_save.c
+	vbo_save_api.c
+	vbo_save_draw.c
+	vbo_save_loopback.c
+	vbo_split.c
+	vbo_split_copy.c
+	vbo_split_inplace.c
 
 	$(arch_sources)
 

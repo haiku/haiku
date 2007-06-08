@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5
+ * Version:  6.5.3
  *
- * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -39,14 +39,13 @@
 
 #include "s_atifragshader.h"
 #include "s_alpha.h"
-#include "s_arbshader.h"
 #include "s_blend.h"
 #include "s_context.h"
 #include "s_depth.h"
 #include "s_fog.h"
 #include "s_logic.h"
 #include "s_masking.h"
-#include "s_nvfragprog.h"
+#include "s_fragprog.h"
 #include "s_span.h"
 #include "s_stencil.h"
 #include "s_texcombine.h"
@@ -70,14 +69,25 @@ _swrast_span_default_z( GLcontext *ctx, SWspan *span )
 
 
 /**
- * Init span's fog interpolation values to the RasterPos fog.
+ * Init span's fogcoord interpolation values to the RasterPos fog.
  * Used during setup for glDraw/CopyPixels.
  */
 void
 _swrast_span_default_fog( GLcontext *ctx, SWspan *span )
 {
-   span->fog = _swrast_z_to_fogfactor(ctx, ctx->Current.RasterDistance);
-   span->fogStep = span->dfogdx = span->dfogdy = 0.0F;
+   const SWcontext *swrast = SWRAST_CONTEXT(ctx);
+   GLfloat fogVal; /* a coord or a blend factor */
+   if (swrast->_PreferPixelFog) {
+      /* fog blend factors will be computed from fog coordinates per pixel */
+      fogVal = ctx->Current.RasterDistance;
+   }
+   else {
+      /* fog blend factor should be computed from fogcoord now */
+      fogVal = _swrast_z_to_fogfactor(ctx, ctx->Current.RasterDistance);
+   }
+   span->attrStart[FRAG_ATTRIB_FOGC][0] = fogVal;
+   span->attrStepX[FRAG_ATTRIB_FOGC][0] = 0.0;
+   span->attrStepY[FRAG_ATTRIB_FOGC][0] = 0.0;
    span->interpMask |= SPAN_FOG;
 }
 
@@ -121,6 +131,40 @@ _swrast_span_default_color( GLcontext *ctx, SWspan *span )
 
 
 /**
+ * Set the span's secondary color info to the current raster position's
+ * secondary color, when needed (lighting enabled or colorsum enabled).
+ */
+void
+_swrast_span_default_secondary_color(GLcontext *ctx, SWspan *span)
+{
+   if (ctx->Visual.rgbMode && (ctx->Light.Enabled || ctx->Fog.ColorSumEnabled))
+   {
+      GLchan r, g, b, a;
+      UNCLAMPED_FLOAT_TO_CHAN(r, ctx->Current.RasterSecondaryColor[0]);
+      UNCLAMPED_FLOAT_TO_CHAN(g, ctx->Current.RasterSecondaryColor[1]);
+      UNCLAMPED_FLOAT_TO_CHAN(b, ctx->Current.RasterSecondaryColor[2]);
+      UNCLAMPED_FLOAT_TO_CHAN(a, ctx->Current.RasterSecondaryColor[3]);
+#if CHAN_TYPE == GL_FLOAT
+      span->specRed = r;
+      span->specGreen = g;
+      span->specBlue = b;
+      /*span->specAlpha = a;*/
+#else
+      span->specRed   = IntToFixed(r);
+      span->specGreen = IntToFixed(g);
+      span->specBlue  = IntToFixed(b);
+      /*span->specAlpha = IntToFixed(a);*/
+#endif
+      span->specRedStep = 0;
+      span->specGreenStep = 0;
+      span->specBlueStep = 0;
+      /*span->specAlphaStep = 0;*/
+      span->interpMask |= SPAN_SPEC;
+   }
+}
+
+
+/**
  * Init span's texcoord interpolation values to the RasterPos texcoords.
  * Used during setup for glDraw/CopyPixels.
  */
@@ -129,22 +173,23 @@ _swrast_span_default_texcoords( GLcontext *ctx, SWspan *span )
 {
    GLuint i;
    for (i = 0; i < ctx->Const.MaxTextureCoordUnits; i++) {
+      const GLuint attr = FRAG_ATTRIB_TEX0 + i;
       const GLfloat *tc = ctx->Current.RasterTexCoords[i];
-      if (ctx->FragmentProgram._Enabled || ctx->ATIFragmentShader._Enabled) {
-         COPY_4V(span->tex[i], tc);
+      if (ctx->FragmentProgram._Current || ctx->ATIFragmentShader._Enabled) {
+         COPY_4V(span->attrStart[attr], tc);
       }
       else if (tc[3] > 0.0F) {
          /* use (s/q, t/q, r/q, 1) */
-         span->tex[i][0] = tc[0] / tc[3];
-         span->tex[i][1] = tc[1] / tc[3];
-         span->tex[i][2] = tc[2] / tc[3];
-         span->tex[i][3] = 1.0;
+         span->attrStart[attr][0] = tc[0] / tc[3];
+         span->attrStart[attr][1] = tc[1] / tc[3];
+         span->attrStart[attr][2] = tc[2] / tc[3];
+         span->attrStart[attr][3] = 1.0;
       }
       else {
-         ASSIGN_4V(span->tex[i], 0.0F, 0.0F, 0.0F, 1.0F);
+         ASSIGN_4V(span->attrStart[attr], 0.0F, 0.0F, 0.0F, 1.0F);
       }
-      ASSIGN_4V(span->texStepX[i], 0.0F, 0.0F, 0.0F, 0.0F);
-      ASSIGN_4V(span->texStepY[i], 0.0F, 0.0F, 0.0F, 0.0F);
+      ASSIGN_4V(span->attrStepX[attr], 0.0F, 0.0F, 0.0F, 0.0F);
+      ASSIGN_4V(span->attrStepY[attr], 0.0F, 0.0F, 0.0F, 0.0F);
    }
    span->interpMask |= SPAN_TEXTURE;
 }
@@ -240,7 +285,7 @@ interpolate_colors(SWspan *span)
 #endif
    case GL_FLOAT:
       {
-         GLfloat (*rgba)[4] = span->array->color.sz4.rgba;
+         GLfloat (*rgba)[4] = span->array->attribs[FRAG_ATTRIB_COL0];
          GLfloat r, g, b, a, dr, dg, db, da;
          r = span->red;
          g = span->green;
@@ -352,7 +397,7 @@ interpolate_specular(SWspan *span)
 #endif
    case GL_FLOAT:
       {
-         GLfloat (*spec)[4] = span->array->color.sz4.spec;
+         GLfloat (*spec)[4] = span->array->attribs[FRAG_ATTRIB_COL1];
 #if CHAN_BITS <= 16
          GLfloat r = CHAN_TO_FLOAT(FixedToChan(span->specRed));
          GLfloat g = CHAN_TO_FLOAT(FixedToChan(span->specGreen));
@@ -431,15 +476,15 @@ interpolate_indexes(GLcontext *ctx, SWspan *span)
 static INLINE void
 interpolate_fog(const GLcontext *ctx, SWspan *span)
 {
-   GLfloat *fog = span->array->fog;
-   const GLfloat fogStep = span->fogStep;
-   GLfloat fogCoord = span->fog;
+   GLfloat (*fog)[4] = span->array->attribs[FRAG_ATTRIB_FOGC];
+   const GLfloat fogStep = span->attrStepX[FRAG_ATTRIB_FOGC][0];
+   GLfloat fogCoord = span->attrStart[FRAG_ATTRIB_FOGC][0];
    const GLuint haveW = (span->interpMask & SPAN_W);
-   const GLfloat wStep = haveW ? span->dwdx : 0.0F;
-   GLfloat w = haveW ? span->w : 1.0F;
+   const GLfloat wStep = haveW ? span->attrStepX[FRAG_ATTRIB_WPOS][3] : 0.0F;
+   GLfloat w = haveW ? span->attrStart[FRAG_ATTRIB_WPOS][3] : 1.0F;
    GLuint i;
    for (i = 0; i < span->end; i++) {
-      fog[i] = fogCoord / w;
+      fog[i][0] = fogCoord / w;
       fogCoord += fogStep;
       w += wStep;
    }
@@ -539,309 +584,188 @@ _swrast_compute_lambda(GLfloat dsdx, GLfloat dsdy, GLfloat dtdx, GLfloat dtdy,
 static void
 interpolate_texcoords(GLcontext *ctx, SWspan *span)
 {
+   const GLuint maxUnit
+      = (ctx->Texture._EnabledCoordUnits > 1) ? ctx->Const.MaxTextureUnits : 1;
+   GLuint u;
+
    ASSERT(span->interpMask & SPAN_TEXTURE);
    ASSERT(!(span->arrayMask & SPAN_TEXTURE));
 
-   if (ctx->Texture._EnabledCoordUnits > 1) {
-      /* multitexture */
-      GLuint u;
-      span->arrayMask |= SPAN_TEXTURE;
-      /* XXX CoordUnits vs. ImageUnits */
-      for (u = 0; u < ctx->Const.MaxTextureUnits; u++) {
-         if (ctx->Texture._EnabledCoordUnits & (1 << u)) {
-            const struct gl_texture_object *obj =ctx->Texture.Unit[u]._Current;
-            GLfloat texW, texH;
-            GLboolean needLambda;
-            if (obj) {
-               const struct gl_texture_image *img = obj->Image[0][obj->BaseLevel];
-               needLambda = (obj->MinFilter != obj->MagFilter)
-                  || ctx->FragmentProgram._Enabled;
-               texW = img->WidthScale;
-               texH = img->HeightScale;
-            }
-            else {
-               /* using a fragment program */
-               texW = 1.0;
-               texH = 1.0;
-               needLambda = GL_FALSE;
-            }
-            if (needLambda) {
-               GLfloat (*texcoord)[4] = span->array->texcoords[u];
-               GLfloat *lambda = span->array->lambda[u];
-               const GLfloat dsdx = span->texStepX[u][0];
-               const GLfloat dsdy = span->texStepY[u][0];
-               const GLfloat dtdx = span->texStepX[u][1];
-               const GLfloat dtdy = span->texStepY[u][1];
-               const GLfloat drdx = span->texStepX[u][2];
-               const GLfloat dqdx = span->texStepX[u][3];
-               const GLfloat dqdy = span->texStepY[u][3];
-               GLfloat s = span->tex[u][0];
-               GLfloat t = span->tex[u][1];
-               GLfloat r = span->tex[u][2];
-               GLfloat q = span->tex[u][3];
-               GLuint i;
-               if (ctx->FragmentProgram._Enabled || ctx->ATIFragmentShader._Enabled ||
-                   ctx->ShaderObjects._FragmentShaderPresent) {
-                  /* do perspective correction but don't divide s, t, r by q */
-                  const GLfloat dwdx = span->dwdx;
-                  GLfloat w = span->w;
-                  for (i = 0; i < span->end; i++) {
-                     const GLfloat invW = 1.0F / w;
-                     texcoord[i][0] = s * invW;
-                     texcoord[i][1] = t * invW;
-                     texcoord[i][2] = r * invW;
-                     texcoord[i][3] = q * invW;
-                     lambda[i] = _swrast_compute_lambda(dsdx, dsdy, dtdx, dtdy,
-                                                        dqdx, dqdy, texW, texH,
-                                                        s, t, q, invW);
-                     s += dsdx;
-                     t += dtdx;
-                     r += drdx;
-                     q += dqdx;
-                     w += dwdx;
-                  }
+   span->arrayMask |= SPAN_TEXTURE;
 
+   /* XXX CoordUnits vs. ImageUnits */
+   for (u = 0; u < maxUnit; u++) {
+      if (ctx->Texture._EnabledCoordUnits & (1 << u)) {
+         const GLuint attr = FRAG_ATTRIB_TEX0 + u;
+         const struct gl_texture_object *obj = ctx->Texture.Unit[u]._Current;
+         GLfloat texW, texH;
+         GLboolean needLambda;
+         GLfloat (*texcoord)[4] = span->array->attribs[attr];
+         GLfloat *lambda = span->array->lambda[u];
+         const GLfloat dsdx = span->attrStepX[attr][0];
+         const GLfloat dsdy = span->attrStepY[attr][0];
+         const GLfloat dtdx = span->attrStepX[attr][1];
+         const GLfloat dtdy = span->attrStepY[attr][1];
+         const GLfloat drdx = span->attrStepX[attr][2];
+         const GLfloat dqdx = span->attrStepX[attr][3];
+         const GLfloat dqdy = span->attrStepY[attr][3];
+         GLfloat s = span->attrStart[attr][0];
+         GLfloat t = span->attrStart[attr][1];
+         GLfloat r = span->attrStart[attr][2];
+         GLfloat q = span->attrStart[attr][3];
+
+         if (obj) {
+            const struct gl_texture_image *img = obj->Image[0][obj->BaseLevel];
+            needLambda = (obj->MinFilter != obj->MagFilter)
+               || ctx->FragmentProgram._Current;
+            texW = img->WidthScale;
+            texH = img->HeightScale;
+         }
+         else {
+            /* using a fragment program */
+            texW = 1.0;
+            texH = 1.0;
+            needLambda = GL_FALSE;
+         }
+
+         if (needLambda) {
+            GLuint i;
+            if (ctx->FragmentProgram._Current
+                || ctx->ATIFragmentShader._Enabled) {
+               /* do perspective correction but don't divide s, t, r by q */
+               const GLfloat dwdx = span->attrStepX[FRAG_ATTRIB_WPOS][3];
+               GLfloat w = span->attrStart[FRAG_ATTRIB_WPOS][3];
+               for (i = 0; i < span->end; i++) {
+                  const GLfloat invW = 1.0F / w;
+                  texcoord[i][0] = s * invW;
+                  texcoord[i][1] = t * invW;
+                  texcoord[i][2] = r * invW;
+                  texcoord[i][3] = q * invW;
+                  lambda[i] = _swrast_compute_lambda(dsdx, dsdy, dtdx, dtdy,
+                                                     dqdx, dqdy, texW, texH,
+                                                     s, t, q, invW);
+                  s += dsdx;
+                  t += dtdx;
+                  r += drdx;
+                  q += dqdx;
+                  w += dwdx;
                }
-               else {
-                  for (i = 0; i < span->end; i++) {
-                     const GLfloat invQ = (q == 0.0F) ? 1.0F : (1.0F / q);
-                     texcoord[i][0] = s * invQ;
-                     texcoord[i][1] = t * invQ;
-                     texcoord[i][2] = r * invQ;
-                     texcoord[i][3] = q;
-                     lambda[i] = _swrast_compute_lambda(dsdx, dsdy, dtdx, dtdy,
-                                                        dqdx, dqdy, texW, texH,
-                                                        s, t, q, invQ);
-                     s += dsdx;
-                     t += dtdx;
-                     r += drdx;
-                     q += dqdx;
-                  }
-               }
-               span->arrayMask |= SPAN_LAMBDA;
             }
             else {
-               GLfloat (*texcoord)[4] = span->array->texcoords[u];
-               GLfloat *lambda = span->array->lambda[u];
-               const GLfloat dsdx = span->texStepX[u][0];
-               const GLfloat dtdx = span->texStepX[u][1];
-               const GLfloat drdx = span->texStepX[u][2];
-               const GLfloat dqdx = span->texStepX[u][3];
-               GLfloat s = span->tex[u][0];
-               GLfloat t = span->tex[u][1];
-               GLfloat r = span->tex[u][2];
-               GLfloat q = span->tex[u][3];
-               GLuint i;
-               if (ctx->FragmentProgram._Enabled || ctx->ATIFragmentShader._Enabled ||
-                   ctx->ShaderObjects._FragmentShaderPresent) {
-                  /* do perspective correction but don't divide s, t, r by q */
-                  const GLfloat dwdx = span->dwdx;
-                  GLfloat w = span->w;
-                  for (i = 0; i < span->end; i++) {
-                     const GLfloat invW = 1.0F / w;
-                     texcoord[i][0] = s * invW;
-                     texcoord[i][1] = t * invW;
-                     texcoord[i][2] = r * invW;
-                     texcoord[i][3] = q * invW;
-                     lambda[i] = 0.0;
-                     s += dsdx;
-                     t += dtdx;
-                     r += drdx;
-                     q += dqdx;
-                     w += dwdx;
-                  }
-               }
-               else if (dqdx == 0.0F) {
-                  /* Ortho projection or polygon's parallel to window X axis */
+               for (i = 0; i < span->end; i++) {
                   const GLfloat invQ = (q == 0.0F) ? 1.0F : (1.0F / q);
-                  for (i = 0; i < span->end; i++) {
-                     texcoord[i][0] = s * invQ;
-                     texcoord[i][1] = t * invQ;
-                     texcoord[i][2] = r * invQ;
-                     texcoord[i][3] = q;
-                     lambda[i] = 0.0;
-                     s += dsdx;
-                     t += dtdx;
-                     r += drdx;
-                  }
+                  texcoord[i][0] = s * invQ;
+                  texcoord[i][1] = t * invQ;
+                  texcoord[i][2] = r * invQ;
+                  texcoord[i][3] = q;
+                  lambda[i] = _swrast_compute_lambda(dsdx, dsdy, dtdx, dtdy,
+                                                     dqdx, dqdy, texW, texH,
+                                                     s, t, q, invQ);
+                  s += dsdx;
+                  t += dtdx;
+                  r += drdx;
+                  q += dqdx;
                }
-               else {
-                  for (i = 0; i < span->end; i++) {
-                     const GLfloat invQ = (q == 0.0F) ? 1.0F : (1.0F / q);
-                     texcoord[i][0] = s * invQ;
-                     texcoord[i][1] = t * invQ;
-                     texcoord[i][2] = r * invQ;
-                     texcoord[i][3] = q;
-                     lambda[i] = 0.0;
-                     s += dsdx;
-                     t += dtdx;
-                     r += drdx;
-                     q += dqdx;
-                  }
-               }
-            } /* lambda */
-         } /* if */
-      } /* for */
-   }
-   else {
-      /* single texture */
-      const struct gl_texture_object *obj = ctx->Texture.Unit[0]._Current;
-      GLfloat texW, texH;
-      GLboolean needLambda;
-      if (obj) {
-         const struct gl_texture_image *img = obj->Image[0][obj->BaseLevel];
-         needLambda = (obj->MinFilter != obj->MagFilter)
-            || ctx->FragmentProgram._Enabled;
-         texW = (GLfloat) img->WidthScale;
-         texH = (GLfloat) img->HeightScale;
-      }
-      else {
-         needLambda = GL_FALSE;
-         texW = texH = 1.0;
-      }
-      span->arrayMask |= SPAN_TEXTURE;
-      if (needLambda) {
-         /* just texture unit 0, with lambda */
-         GLfloat (*texcoord)[4] = span->array->texcoords[0];
-         GLfloat *lambda = span->array->lambda[0];
-         const GLfloat dsdx = span->texStepX[0][0];
-         const GLfloat dsdy = span->texStepY[0][0];
-         const GLfloat dtdx = span->texStepX[0][1];
-         const GLfloat dtdy = span->texStepY[0][1];
-         const GLfloat drdx = span->texStepX[0][2];
-         const GLfloat dqdx = span->texStepX[0][3];
-         const GLfloat dqdy = span->texStepY[0][3];
-         GLfloat s = span->tex[0][0];
-         GLfloat t = span->tex[0][1];
-         GLfloat r = span->tex[0][2];
-         GLfloat q = span->tex[0][3];
-         GLuint i;
-         if (ctx->FragmentProgram._Enabled || ctx->ATIFragmentShader._Enabled ||
-             ctx->ShaderObjects._FragmentShaderPresent) {
-            /* do perspective correction but don't divide s, t, r by q */
-            const GLfloat dwdx = span->dwdx;
-            GLfloat w = span->w;
-            for (i = 0; i < span->end; i++) {
-               const GLfloat invW = 1.0F / w;
-               texcoord[i][0] = s * invW;
-               texcoord[i][1] = t * invW;
-               texcoord[i][2] = r * invW;
-               texcoord[i][3] = q * invW;
-               lambda[i] = _swrast_compute_lambda(dsdx, dsdy, dtdx, dtdy,
-                                                  dqdx, dqdy, texW, texH,
-                                                  s, t, q, invW);
-               s += dsdx;
-               t += dtdx;
-               r += drdx;
-               q += dqdx;
-               w += dwdx;
             }
+            span->arrayMask |= SPAN_LAMBDA;
          }
          else {
-            /* tex.c */
-            for (i = 0; i < span->end; i++) {
+            GLuint i;
+            if (ctx->FragmentProgram._Current ||
+                ctx->ATIFragmentShader._Enabled) {
+               /* do perspective correction but don't divide s, t, r by q */
+               const GLfloat dwdx = span->attrStepX[FRAG_ATTRIB_WPOS][3];
+               GLfloat w = span->attrStart[FRAG_ATTRIB_WPOS][3];
+               for (i = 0; i < span->end; i++) {
+                  const GLfloat invW = 1.0F / w;
+                  texcoord[i][0] = s * invW;
+                  texcoord[i][1] = t * invW;
+                  texcoord[i][2] = r * invW;
+                  texcoord[i][3] = q * invW;
+                  lambda[i] = 0.0;
+                  s += dsdx;
+                  t += dtdx;
+                  r += drdx;
+                  q += dqdx;
+                  w += dwdx;
+               }
+            }
+            else if (dqdx == 0.0F) {
+               /* Ortho projection or polygon's parallel to window X axis */
                const GLfloat invQ = (q == 0.0F) ? 1.0F : (1.0F / q);
-               lambda[i] = _swrast_compute_lambda(dsdx, dsdy, dtdx, dtdy,
-                                                dqdx, dqdy, texW, texH,
-                                                s, t, q, invQ);
-               texcoord[i][0] = s * invQ;
-               texcoord[i][1] = t * invQ;
-               texcoord[i][2] = r * invQ;
-               texcoord[i][3] = q;
-               s += dsdx;
-               t += dtdx;
-               r += drdx;
-               q += dqdx;
+               for (i = 0; i < span->end; i++) {
+                  texcoord[i][0] = s * invQ;
+                  texcoord[i][1] = t * invQ;
+                  texcoord[i][2] = r * invQ;
+                  texcoord[i][3] = q;
+                  lambda[i] = 0.0;
+                  s += dsdx;
+                  t += dtdx;
+                  r += drdx;
+               }
             }
-         }
-         span->arrayMask |= SPAN_LAMBDA;
-      }
-      else {
-         /* just texture 0, without lambda */
-         GLfloat (*texcoord)[4] = span->array->texcoords[0];
-         const GLfloat dsdx = span->texStepX[0][0];
-         const GLfloat dtdx = span->texStepX[0][1];
-         const GLfloat drdx = span->texStepX[0][2];
-         const GLfloat dqdx = span->texStepX[0][3];
-         GLfloat s = span->tex[0][0];
-         GLfloat t = span->tex[0][1];
-         GLfloat r = span->tex[0][2];
-         GLfloat q = span->tex[0][3];
-         GLuint i;
-         if (ctx->FragmentProgram._Enabled || ctx->ATIFragmentShader._Enabled ||
-             ctx->ShaderObjects._FragmentShaderPresent) {
-            /* do perspective correction but don't divide s, t, r by q */
-            const GLfloat dwdx = span->dwdx;
-            GLfloat w = span->w;
-            for (i = 0; i < span->end; i++) {
-               const GLfloat invW = 1.0F / w;
-               texcoord[i][0] = s * invW;
-               texcoord[i][1] = t * invW;
-               texcoord[i][2] = r * invW;
-               texcoord[i][3] = q * invW;
-               s += dsdx;
-               t += dtdx;
-               r += drdx;
-               q += dqdx;
-               w += dwdx;
+            else {
+               for (i = 0; i < span->end; i++) {
+                  const GLfloat invQ = (q == 0.0F) ? 1.0F : (1.0F / q);
+                  texcoord[i][0] = s * invQ;
+                  texcoord[i][1] = t * invQ;
+                  texcoord[i][2] = r * invQ;
+                  texcoord[i][3] = q;
+                  lambda[i] = 0.0;
+                  s += dsdx;
+                  t += dtdx;
+                  r += drdx;
+                  q += dqdx;
+               }
             }
-         }
-         else if (dqdx == 0.0F) {
-            /* Ortho projection or polygon's parallel to window X axis */
-            const GLfloat invQ = (q == 0.0F) ? 1.0F : (1.0F / q);
-            for (i = 0; i < span->end; i++) {
-               texcoord[i][0] = s * invQ;
-               texcoord[i][1] = t * invQ;
-               texcoord[i][2] = r * invQ;
-               texcoord[i][3] = q;
-               s += dsdx;
-               t += dtdx;
-               r += drdx;
-            }
-         }
-         else {
-            for (i = 0; i < span->end; i++) {
-               const GLfloat invQ = (q == 0.0F) ? 1.0F : (1.0F / q);
-               texcoord[i][0] = s * invQ;
-               texcoord[i][1] = t * invQ;
-               texcoord[i][2] = r * invQ;
-               texcoord[i][3] = q;
-               s += dsdx;
-               t += dtdx;
-               r += drdx;
-               q += dqdx;
-            }
-         }
-      }
-   }
+         } /* lambda */
+      } /* if */
+   } /* for */
 }
 
 
+
 /**
- * Fill in the span.varying array from the interpolation values.
+ * Fill in the arrays->attribs[FRAG_ATTRIB_VARx] arrays from the
+ * interpolation values.
+ * XXX since interpolants/arrays are getting uniformed, we might merge
+ * this with interpolate_texcoords(), interpolate_Fog(), etc. someday.
  */
 static INLINE void
 interpolate_varying(GLcontext *ctx, SWspan *span)
 {
-   GLuint i, j;
+   GLuint var;
+   const GLbitfield inputsUsed = ctx->FragmentProgram._Current->Base.InputsRead;
 
    ASSERT(span->interpMask & SPAN_VARYING);
    ASSERT(!(span->arrayMask & SPAN_VARYING));
 
    span->arrayMask |= SPAN_VARYING;
 
-   for (i = 0; i < MAX_VARYING_VECTORS; i++) {
-      for (j = 0; j < VARYINGS_PER_VECTOR; j++) {
-         const GLfloat dvdx = span->varStepX[i][j];
-         GLfloat v = span->var[i][j];
-         const GLfloat dwdx = span->dwdx;
-         GLfloat w = span->w;
+   for (var = 0; var < MAX_VARYING; var++) {
+      if (inputsUsed & FRAG_BIT_VAR(var)) {
+         const GLuint attr = FRAG_ATTRIB_VAR0 + var;
+         const GLfloat dwdx = span->attrStepX[FRAG_ATTRIB_WPOS][3];
+         GLfloat w = span->attrStart[FRAG_ATTRIB_WPOS][3];
+         const GLfloat dv0dx = span->attrStepX[attr][0];
+         const GLfloat dv1dx = span->attrStepX[attr][1];
+         const GLfloat dv2dx = span->attrStepX[attr][2];
+         const GLfloat dv3dx = span->attrStepX[attr][3];
+         GLfloat v0 = span->attrStart[attr][0];
+         GLfloat v1 = span->attrStart[attr][1];
+         GLfloat v2 = span->attrStart[attr][2];
+         GLfloat v3 = span->attrStart[attr][3];
          GLuint k;
-
          for (k = 0; k < span->end; k++) {
             GLfloat invW = 1.0f / w;
-            span->array->varying[k][i][j] = v * invW;
-            v += dvdx;
+            span->array->attribs[attr][k][0] = v0 * invW;
+            span->array->attribs[attr][k][1] = v1 * invW;
+            span->array->attribs[attr][k][2] = v2 * invW;
+            span->array->attribs[attr][k][3] = v3 * invW;
+            v0 += dv0dx;
+            v1 += dv1dx;
+            v2 += dv2dx;
+            v3 += dv3dx;
             w += dwdx;
          }
       }
@@ -850,28 +774,74 @@ interpolate_varying(GLcontext *ctx, SWspan *span)
 
 
 /**
+ * Fill in the arrays->attribs[FRAG_ATTRIB_WPOS] array.
+ */
+static INLINE void
+interpolate_wpos(GLcontext *ctx, SWspan *span)
+{
+   GLfloat (*wpos)[4] = span->array->attribs[FRAG_ATTRIB_WPOS];
+   GLuint i;
+   const GLfloat zScale = 1.0 / ctx->DrawBuffer->_DepthMaxF;
+   GLfloat w, dw;
+
+   if (span->arrayMask & SPAN_XY) {
+      for (i = 0; i < span->end; i++) {
+         wpos[i][0] = (GLfloat) span->array->x[i];
+         wpos[i][1] = (GLfloat) span->array->y[i];
+      }
+   }
+   else {
+      for (i = 0; i < span->end; i++) {
+         wpos[i][0] = (GLfloat) span->x + i;
+         wpos[i][1] = (GLfloat) span->y;
+      }
+   }
+
+   w = span->attrStart[FRAG_ATTRIB_WPOS][3];
+   dw = span->attrStepX[FRAG_ATTRIB_WPOS][3];
+   for (i = 0; i < span->end; i++) {
+      wpos[i][2] = (GLfloat) span->array->z[i] * zScale;
+      wpos[i][3] = w;
+      w += dw;
+   }
+}
+
+
+/**
  * Apply the current polygon stipple pattern to a span of pixels.
  */
 static INLINE void
-stipple_polygon_span( GLcontext *ctx, SWspan *span )
+stipple_polygon_span(GLcontext *ctx, SWspan *span)
 {
-   const GLuint highbit = 0x80000000;
-   const GLuint stipple = ctx->PolygonStipple[span->y % 32];
    GLubyte *mask = span->array->mask;
-   GLuint i, m;
 
    ASSERT(ctx->Polygon.StippleFlag);
-   ASSERT((span->arrayMask & SPAN_XY) == 0);
 
-   m = highbit >> (GLuint) (span->x % 32);
-
-   for (i = 0; i < span->end; i++) {
-      if ((m & stipple) == 0) {
-	 mask[i] = 0;
+   if (span->arrayMask & SPAN_XY) {
+      /* arrays of x/y pixel coords */
+      GLuint i;
+      for (i = 0; i < span->end; i++) {
+         const GLint col = span->array->x[i] % 32;
+         const GLint row = span->array->y[i] % 32;
+         const GLuint stipple = ctx->PolygonStipple[row];
+         if (((1 << col) & stipple) == 0) {
+            mask[i] = 0;
+         }
       }
-      m = m >> 1;
-      if (m == 0) {
-         m = highbit;
+   }
+   else {
+      /* horizontal span of pixels */
+      const GLuint highBit = 1 << 31;
+      const GLuint stipple = ctx->PolygonStipple[span->y % 32];
+      GLuint i, m = highBit >> (GLuint) (span->x % 32);
+      for (i = 0; i < span->end; i++) {
+         if ((m & stipple) == 0) {
+            mask[i] = 0;
+         }
+         m = m >> 1;
+         if (m == 0) {
+            m = highBit;
+         }
       }
    }
    span->writeAll = GL_FALSE;
@@ -1224,8 +1194,8 @@ add_specular(GLcontext *ctx, SWspan *span)
       break;
    case GL_FLOAT:
       {
-         GLfloat (*rgba)[4] = span->array->color.sz4.rgba;
-         GLfloat (*spec)[4] = span->array->color.sz4.spec;
+         GLfloat (*rgba)[4] = span->array->attribs[FRAG_ATTRIB_COL0];
+         GLfloat (*spec)[4] = span->array->attribs[FRAG_ATTRIB_COL1];
          GLuint i;
          for (i = 0; i < span->end; i++) {
             rgba[i][RCOMP] += spec[i][RCOMP];
@@ -1266,7 +1236,7 @@ apply_aa_coverage(SWspan *span)
       }
    }
    else {
-      GLfloat (*rgba)[4] = span->array->color.sz4.rgba;
+      GLfloat (*rgba)[4] = span->array->attribs[FRAG_ATTRIB_COL0];
       for (i = 0; i < span->end; i++) {
          rgba[i][ACOMP] = rgba[i][ACOMP] * coverage[i];
       }
@@ -1280,7 +1250,7 @@ apply_aa_coverage(SWspan *span)
 static INLINE void
 clamp_colors(SWspan *span)
 {
-   GLfloat (*rgba)[4] = span->array->color.sz4.rgba;
+   GLfloat (*rgba)[4] = span->array->attribs[FRAG_ATTRIB_COL0];
    GLuint i;
    ASSERT(span->array->ChanType == GL_FLOAT);
    for (i = 0; i < span->end; i++) {
@@ -1294,28 +1264,35 @@ clamp_colors(SWspan *span)
 
 /**
  * Convert the span's color arrays to the given type.
+ * The only way 'output' can be greater than one is when we have a fragment
+ * program that writes to gl_FragData[1] or higher.
+ * \param output  which fragment program color output is being processed
  */
 static INLINE void
-convert_color_type(GLcontext *ctx, SWspan *span, GLenum newType)
+convert_color_type(SWspan *span, GLenum newType, GLuint output)
 {
    GLvoid *src, *dst;
-   if (span->array->ChanType == GL_UNSIGNED_BYTE) {
-      src = span->array->color.sz1.rgba;
+
+   if (output > 0 || span->array->ChanType == GL_FLOAT) {
+      src = span->array->attribs[FRAG_ATTRIB_COL0 + output];
+      span->array->ChanType = GL_FLOAT;
    }
    else if (span->array->ChanType == GL_UNSIGNED_BYTE) {
-      src = span->array->color.sz2.rgba;
+      src = span->array->color.sz1.rgba;
    }
    else {
-      src = span->array->color.sz4.rgba;
+      ASSERT(span->array->ChanType == GL_UNSIGNED_SHORT);
+      src = span->array->color.sz2.rgba;
    }
+
    if (newType == GL_UNSIGNED_BYTE) {
       dst = span->array->color.sz1.rgba;
    }
-   else if (newType == GL_UNSIGNED_BYTE) {
+   else if (newType == GL_UNSIGNED_SHORT) {
       dst = span->array->color.sz2.rgba;
    }
    else {
-      dst = span->array->color.sz4.rgba;
+      dst = span->array->attribs[FRAG_ATTRIB_COL0];
    }
 
    _mesa_convert_colors(span->array->ChanType, src,
@@ -1333,46 +1310,58 @@ convert_color_type(GLcontext *ctx, SWspan *span, GLenum newType)
 static INLINE void
 shade_texture_span(GLcontext *ctx, SWspan *span)
 {
-   /* Now we need the rgba array, fill it in if needed */
-   if (span->interpMask & SPAN_RGBA)
+   GLbitfield inputsRead;
+
+   /* Determine which fragment attributes are actually needed */
+   if (ctx->FragmentProgram._Current) {
+      inputsRead = ctx->FragmentProgram._Current->Base.InputsRead;
+   }
+   else {
+      /* XXX we could be a bit smarter about this */
+      inputsRead = ~0;
+   }
+
+   if ((inputsRead & FRAG_BIT_COL0) && (span->interpMask & SPAN_RGBA))
       interpolate_colors(span);
 
    if (ctx->Texture._EnabledCoordUnits && (span->interpMask & SPAN_TEXTURE))
       interpolate_texcoords(ctx, span);
 
-   if (ctx->ShaderObjects._FragmentShaderPresent ||
-       ctx->FragmentProgram._Enabled ||
+   if (ctx->FragmentProgram._Current ||
        ctx->ATIFragmentShader._Enabled) {
-
       /* use float colors if running a fragment program or shader */
       const GLenum oldType = span->array->ChanType;
       const GLenum newType = GL_FLOAT;
-      if (oldType != newType) {
+
+      if ((inputsRead & FRAG_BIT_COL0) && (oldType != newType)) {
          GLvoid *src = (oldType == GL_UNSIGNED_BYTE)
             ? (GLvoid *) span->array->color.sz1.rgba
             : (GLvoid *) span->array->color.sz2.rgba;
+         assert(span->arrayMask & SPAN_RGBA);
          _mesa_convert_colors(oldType, src,
-                              newType, span->array->color.sz4.rgba,
+                              newType, span->array->attribs[FRAG_ATTRIB_COL0],
                               span->end, span->array->mask);
-         span->array->ChanType = newType;
       }
+      span->array->ChanType = newType;
 
       /* fragment programs/shaders may need specular, fog and Z coords */
-      if (span->interpMask & SPAN_SPEC)
+      if ((inputsRead & FRAG_BIT_COL1) && (span->interpMask & SPAN_SPEC))
          interpolate_specular(span);
 
-      if (span->interpMask & SPAN_FOG)
+      if ((inputsRead & FRAG_BIT_FOGC) && (span->interpMask & SPAN_FOG))
          interpolate_fog(ctx, span);
 
       if (span->interpMask & SPAN_Z)
          _swrast_span_interpolate_z (ctx, span);
 
-      /* Run fragment program/shader now */
-      if (ctx->ShaderObjects._FragmentShaderPresent) {
+      if ((inputsRead >= FRAG_BIT_VAR0) && (span->interpMask & SPAN_VARYING))
          interpolate_varying(ctx, span);
-         _swrast_exec_arbshader(ctx, span);
-      }
-      else if (ctx->FragmentProgram._Enabled) {
+
+      if (inputsRead & FRAG_BIT_WPOS)
+         interpolate_wpos(ctx, span);
+
+      /* Run fragment program/shader now */
+      if (ctx->FragmentProgram._Current) {
          _swrast_exec_fragment_program(ctx, span);
       }
       else {
@@ -1403,11 +1392,11 @@ _swrast_write_rgba_span( GLcontext *ctx, SWspan *span)
    const GLbitfield origInterpMask = span->interpMask;
    const GLbitfield origArrayMask = span->arrayMask;
    const GLenum chanType = span->array->ChanType;
-   const GLboolean shader
-      = ctx->FragmentProgram._Enabled
-      || ctx->ShaderObjects._FragmentShaderPresent
-      || ctx->ATIFragmentShader._Enabled;
+   const GLboolean shader = (ctx->FragmentProgram._Current
+                             || ctx->ATIFragmentShader._Enabled);
    const GLboolean shaderOrTexture = shader || ctx->Texture._EnabledUnits;
+   struct gl_framebuffer *fb = ctx->DrawBuffer;
+   GLuint output;
    GLboolean deferredTexture;
 
    /*
@@ -1423,25 +1412,28 @@ _swrast_write_rgba_span( GLcontext *ctx, SWspan *span)
    ASSERT((span->interpMask & span->arrayMask) == 0);
    ASSERT((span->interpMask & SPAN_RGBA) ^ (span->arrayMask & SPAN_RGBA));
 
-   /* check for conditions that prevent deferred shading */
+   /* check for conditions that prevent deferred shading (doing shading
+    * after stencil/ztest).
+    * XXX move this code into state validation.
+    */
    if (ctx->Color.AlphaEnabled) {
       /* alpha test depends on post-texture/shader colors */
       deferredTexture = GL_FALSE;
    }
    else if (shaderOrTexture) {
-      if (ctx->FragmentProgram._Enabled) {
-         if (ctx->FragmentProgram.Current->Base.OutputsWritten
+      if (ctx->FragmentProgram._Current) {
+         if (ctx->FragmentProgram._Current->Base.OutputsWritten
              & (1 << FRAG_RESULT_DEPR)) {
-            /* Z comes from fragment program */
+            /* Z comes from fragment program/shader */
+            deferredTexture = GL_FALSE;
+         }
+         else if (ctx->Query.CurrentOcclusionObject) {
+            /* occlusion query depends on shader discard/kill results */
             deferredTexture = GL_FALSE;
          }
          else {
             deferredTexture = GL_TRUE;
          }
-      }
-      else if (ctx->ShaderObjects._FragmentShaderPresent) {
-         /* XXX how do we test if Z is written by shader? */
-         deferredTexture = GL_FALSE; /* never defer to be safe */
       }
       else {
          /* ATI frag shader or conventional texturing */
@@ -1476,10 +1468,10 @@ _swrast_write_rgba_span( GLcontext *ctx, SWspan *span)
       GLuint i;
       for (i = 0; i < span->end; i++) {
          if (span->array->mask[i]) {
-            assert(span->array->x[i] >= ctx->DrawBuffer->_Xmin);
-            assert(span->array->x[i] < ctx->DrawBuffer->_Xmax);
-            assert(span->array->y[i] >= ctx->DrawBuffer->_Ymin);
-            assert(span->array->y[i] < ctx->DrawBuffer->_Ymax);
+            assert(span->array->x[i] >= fb->_Xmin);
+            assert(span->array->x[i] < fb->_Xmax);
+            assert(span->array->y[i] >= fb->_Ymin);
+            assert(span->array->y[i] < fb->_Ymax);
          }
       }
    }
@@ -1511,13 +1503,13 @@ _swrast_write_rgba_span( GLcontext *ctx, SWspan *span)
       if (span->interpMask & SPAN_Z)
          _swrast_span_interpolate_z(ctx, span);
 
-      if (ctx->Stencil.Enabled && ctx->DrawBuffer->Visual.stencilBits > 0) {
+      if (ctx->Stencil.Enabled && fb->Visual.stencilBits > 0) {
          /* Combined Z/stencil tests */
          if (!_swrast_stencil_and_ztest_span(ctx, span)) {
             goto end;
          }
       }
-      else if (ctx->DrawBuffer->Visual.depthBits > 0) {
+      else if (fb->Visual.depthBits > 0) {
          /* Just regular depth testing */
          ASSERT(ctx->Depth.Test);
          ASSERT(span->arrayMask & SPAN_Z);
@@ -1597,64 +1589,67 @@ _swrast_write_rgba_span( GLcontext *ctx, SWspan *span)
    /*
     * Write to renderbuffers
     */
-   {
-      struct gl_framebuffer *fb = ctx->DrawBuffer;
-      const GLuint output = 0; /* only frag progs can write to other outputs */
-      const GLuint numDrawBuffers = fb->_NumColorDrawBuffers[output];
-      GLchan rgbaSave[MAX_WIDTH][4];
-      GLuint buf;
+   /* Loop over color outputs (GL_ARB_draw_buffers) written by frag prog */
+   for (output = 0; output < swrast->_NumColorOutputs; output++) {
+      if (swrast->_ColorOutputsMask & (1 << output)) {
+        const GLuint numDrawBuffers = fb->_NumColorDrawBuffers[output];
+        GLchan rgbaSave[MAX_WIDTH][4];
+        GLuint buf;
 
-      if (numDrawBuffers > 0) {
-         if (fb->_ColorDrawBuffers[output][0]->DataType
-             != span->array->ChanType) {
-            convert_color_type(ctx, span,
-                               fb->_ColorDrawBuffers[output][0]->DataType);
-         }
-      }
+        ASSERT(numDrawBuffers > 0);
 
-      if (numDrawBuffers > 1) {
-         /* save colors for second, third renderbuffer writes */
-         _mesa_memcpy(rgbaSave, span->array->rgba,
-                      4 * span->end * sizeof(GLchan));
-      }
+        if (fb->_ColorDrawBuffers[output][0]->DataType
+            != span->array->ChanType || output > 0) {
+           convert_color_type(span,
+                              fb->_ColorDrawBuffers[output][0]->DataType,
+                              output);
+        }
 
-      for (buf = 0; buf < numDrawBuffers; buf++) {
-         struct gl_renderbuffer *rb = fb->_ColorDrawBuffers[output][buf];
-         ASSERT(rb->_BaseFormat == GL_RGBA || rb->_BaseFormat == GL_RGB);
+        if (numDrawBuffers > 1) {
+           /* save colors for second, third renderbuffer writes */
+           _mesa_memcpy(rgbaSave, span->array->rgba,
+                        4 * span->end * sizeof(GLchan));
+        }
 
-         if (ctx->Color._LogicOpEnabled) {
-            _swrast_logicop_rgba_span(ctx, rb, span);
-         }
-         else if (ctx->Color.BlendEnabled) {
-            _swrast_blend_span(ctx, rb, span);
-         }
+        /* Loop over renderbuffers (i.e. GL_FRONT_AND_BACK) */
+        for (buf = 0; buf < numDrawBuffers; buf++) {
+           struct gl_renderbuffer *rb = fb->_ColorDrawBuffers[output][buf];
+           ASSERT(rb->_BaseFormat == GL_RGBA || rb->_BaseFormat == GL_RGB);
 
-         if (colorMask != 0xffffffff) {
-            _swrast_mask_rgba_span(ctx, rb, span);
-         }
+           if (ctx->Color._LogicOpEnabled) {
+              _swrast_logicop_rgba_span(ctx, rb, span);
+           }
+           else if (ctx->Color.BlendEnabled) {
+              _swrast_blend_span(ctx, rb, span);
+           }
 
-         if (span->arrayMask & SPAN_XY) {
-            /* array of pixel coords */
-            ASSERT(rb->PutValues);
-            rb->PutValues(ctx, rb, span->end,
-                          span->array->x, span->array->y,
-                          span->array->rgba, span->array->mask);
-         }
-         else {
-            /* horizontal run of pixels */
-            ASSERT(rb->PutRow);
-            rb->PutRow(ctx, rb, span->end, span->x, span->y, span->array->rgba,
-                       span->writeAll ? NULL: span->array->mask);
-         }
+           if (colorMask != 0xffffffff) {
+              _swrast_mask_rgba_span(ctx, rb, span);
+           }
 
-         if (buf + 1 < numDrawBuffers) {
-            /* restore original span values */
-            _mesa_memcpy(span->array->rgba, rgbaSave,
-                         4 * span->end * sizeof(GLchan));
-         }
-      } /* for buf */
+           if (span->arrayMask & SPAN_XY) {
+              /* array of pixel coords */
+              ASSERT(rb->PutValues);
+              rb->PutValues(ctx, rb, span->end,
+                            span->array->x, span->array->y,
+                            span->array->rgba, span->array->mask);
+           }
+           else {
+              /* horizontal run of pixels */
+              ASSERT(rb->PutRow);
+              rb->PutRow(ctx, rb, span->end, span->x, span->y,
+                         span->array->rgba,
+                         span->writeAll ? NULL: span->array->mask);
+           }
 
-   }
+           if (buf + 1 < numDrawBuffers) {
+              /* restore original span values */
+              _mesa_memcpy(span->array->rgba, rgbaSave,
+                           4 * span->end * sizeof(GLchan));
+           }
+        } /* for buf */
+      } /* if output is written to */
+   } /* for output */
 
 end:
    /* restore these values before returning */
@@ -1665,9 +1660,9 @@ end:
 
 
 /**
- * Read RGBA pixels from frame buffer.  Clipping will be done to prevent
+ * Read RGBA pixels from a renderbuffer.  Clipping will be done to prevent
  * reading ouside the buffer's boundaries.
- * \param type  datatype for returned colors
+ * \param dstType  datatype for returned colors
  * \param rgba  the returned colors
  */
 void
@@ -1732,7 +1727,7 @@ _swrast_read_rgba_span( GLcontext *ctx, struct gl_renderbuffer *rb,
 
 
 /**
- * Read CI pixels from frame buffer.  Clipping will be done to prevent
+ * Read CI pixels from a renderbuffer.  Clipping will be done to prevent
  * reading ouside the buffer's boundaries.
  */
 void
@@ -1814,7 +1809,8 @@ _swrast_get_values(GLcontext *ctx, struct gl_renderbuffer *rb,
    GLuint i, inCount = 0, inStart = 0;
 
    for (i = 0; i < count; i++) {
-      if (x[i] >= 0 && y[i] >= 0 && x[i] < rb->Width && y[i] < rb->Height) {
+      if (x[i] >= 0 && y[i] >= 0 &&
+	  x[i] < (GLint) rb->Width && y[i] < (GLint) rb->Height) {
          /* inside */
          if (inCount == 0)
             inStart = i;
@@ -1848,13 +1844,13 @@ _swrast_put_row(GLcontext *ctx, struct gl_renderbuffer *rb,
 {
    GLint skip = 0;
 
-   if (y < 0 || y >= rb->Height)
+   if (y < 0 || y >= (GLint) rb->Height)
       return; /* above or below */
 
-   if (x + (GLint) count <= 0 || x >= rb->Width)
+   if (x + (GLint) count <= 0 || x >= (GLint) rb->Width)
       return; /* entirely left or right */
 
-   if (x + count > rb->Width) {
+   if ((GLint) (x + count) > (GLint) rb->Width) {
       /* right clip */
       GLint clip = x + count - rb->Width;
       count -= clip;
@@ -1883,10 +1879,10 @@ _swrast_get_row(GLcontext *ctx, struct gl_renderbuffer *rb,
 {
    GLint skip = 0;
 
-   if (y < 0 || y >= rb->Height)
+   if (y < 0 || y >= (GLint) rb->Height)
       return; /* above or below */
 
-   if (x + (GLint) count <= 0 || x >= rb->Width)
+   if (x + (GLint) count <= 0 || x >= (GLint) rb->Width)
       return; /* entirely left or right */
 
    if (x + count > rb->Width) {
@@ -1931,7 +1927,7 @@ _swrast_get_dest_rgba(GLcontext *ctx, struct gl_renderbuffer *rb,
       rbPixels = span->array->color.sz2.spec;
    }
    else {
-      rbPixels = span->array->color.sz4.spec;
+      rbPixels = span->array->attribs[FRAG_ATTRIB_COL1];
    }
 
    /* Get destination values from renderbuffer */

@@ -5,9 +5,9 @@
 
 /*
  * Mesa 3-D graphics library
- * Version:  6.3
+ * Version:  6.5.1
  *
- * Copyright (C) 1999-2004  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -167,13 +167,8 @@ _mesa_PolygonMode( GLenum face, GLenum mode )
       return;
    }
 
-   ctx->_TriangleCaps &= ~DD_TRI_UNFILLED;
-   if (ctx->Polygon.FrontMode!=GL_FILL || ctx->Polygon.BackMode!=GL_FILL)
-      ctx->_TriangleCaps |= DD_TRI_UNFILLED;
-
-   if (ctx->Driver.PolygonMode) {
-      (*ctx->Driver.PolygonMode)( ctx, face, mode );
-   }
+   if (ctx->Driver.PolygonMode)
+      ctx->Driver.PolygonMode(ctx, face, mode);
 }
 
 #if _HAVE_FULL_GL
@@ -318,32 +313,6 @@ _mesa_PolygonOffsetEXT( GLfloat factor, GLfloat bias )
 }
 
 #endif
-
-
-/**********************************************************************/
-/** \name State Management */
-/*@{*/
-
-/*
- * Check polygon state and set DD_TRI_CULL_FRONT_BACK and/or DD_TRI_OFFSET
- * in ctx->_TriangleCaps if needed.
- */
-void _mesa_update_polygon( GLcontext *ctx )
-{
-   ctx->_TriangleCaps &= ~(DD_TRI_CULL_FRONT_BACK | DD_TRI_OFFSET);
-
-   if (ctx->Polygon.CullFlag && ctx->Polygon.CullFaceMode == GL_FRONT_AND_BACK)
-      ctx->_TriangleCaps |= DD_TRI_CULL_FRONT_BACK;
-
-   /* Any Polygon offsets enabled? */
-   if (ctx->Polygon.OffsetPoint ||
-       ctx->Polygon.OffsetLine ||
-       ctx->Polygon.OffsetFill) {
-      ctx->_TriangleCaps |= DD_TRI_OFFSET;
-   }
-}
-
-/*@}*/
 
 
 /**********************************************************************/

@@ -50,9 +50,6 @@ _mesa_PointParameterfEXT( GLenum pname, GLfloat param );
 extern void GLAPIENTRY
 _mesa_PointParameterfvEXT( GLenum pname, const GLfloat *params );
 
-extern void
-_mesa_update_point(GLcontext *ctx);
-
 extern void 
 _mesa_init_point( GLcontext * ctx );
 

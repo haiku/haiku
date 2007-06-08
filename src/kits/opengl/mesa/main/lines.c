@@ -1,13 +1,8 @@
-/**
- * \file lines.c
- * Line operations.
- */
-
 /*
  * Mesa 3-D graphics library
- * Version:  5.1
+ * Version:  6.5.3
  *
- * Copyright (C) 1999-2003  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -43,12 +38,6 @@
  * \param width line width in pixels.
  *
  * \sa glLineWidth().
- *
- * Verifies the parameter and updates gl_line_attrib::Width. On a change,
- * flushes the vertices, updates the clamped line width and marks the
- * DD_LINE_WIDTH flag in __GLcontextRec::_TriangleCaps for the drivers if the
- * width is different from one. Notifies the driver via the
- * dd_function_table::LineWidth callback.
  */
 void GLAPIENTRY
 _mesa_LineWidth( GLfloat width )
@@ -70,14 +59,8 @@ _mesa_LineWidth( GLfloat width )
 			    ctx->Const.MinLineWidth,
 			    ctx->Const.MaxLineWidth);
 
-
-   if (width != 1.0)
-      ctx->_TriangleCaps |= DD_LINE_WIDTH;
-   else
-      ctx->_TriangleCaps &= ~DD_LINE_WIDTH;
-
    if (ctx->Driver.LineWidth)
-      (*ctx->Driver.LineWidth)(ctx, width);
+      ctx->Driver.LineWidth(ctx, width);
 }
 
 

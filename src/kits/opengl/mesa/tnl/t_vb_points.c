@@ -47,10 +47,7 @@ struct point_stage_data {
 static GLboolean
 run_point_stage(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 {
-   if (ctx->ShaderObjects._VertexShaderPresent)
-      return GL_TRUE;
-
-   if (ctx->Point._Attenuated && !ctx->VertexProgram._Enabled) {
+   if (ctx->Point._Attenuated && !ctx->VertexProgram._Current) {
       struct point_stage_data *store = POINT_STAGE_DATA(stage);
       struct vertex_buffer *VB = &TNL_CONTEXT(ctx)->vb;
       const GLfloat (*eye)[4] = (const GLfloat (*)[4]) VB->EyePtr->data;

@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.2
+ * Version:  6.5.3
  *
- * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -32,6 +32,12 @@ _mesa_insert_mvp_code(GLcontext *ctx, struct gl_vertex_program *vprog);
 
 extern void
 _mesa_append_fog_code(GLcontext *ctx, struct gl_fragment_program *fprog);
+
+extern void
+_mesa_count_texture_indirections(struct gl_program *prog);
+
+extern void
+_mesa_count_texture_instructions(struct gl_program *prog);
 
 
 #endif /* PROGRAMOPT_H */

@@ -123,7 +123,7 @@ _swrast_alpha_test(const GLcontext *ctx, SWspan *span)
          ALPHA_TEST(rgba[i][ACOMP], ;);
       }
       else {
-         GLfloat (*rgba)[4] = span->array->color.sz4.rgba;
+         GLfloat (*rgba)[4] = span->array->attribs[FRAG_ATTRIB_COL0];
          const GLfloat ref = ctx->Color.AlphaRef;
          ALPHA_TEST(rgba[i][ACOMP], ;);
       }

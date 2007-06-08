@@ -43,29 +43,6 @@
  * stages to the vertex_buffer TNLcontext::vb, where the vertex data
  * is stored. The last stage in the pipeline is the rasterizer.
  *
- * The initial vertex_buffer data may either come from an ::immediate
- * structure or client vertex_arrays or display lists:
- *
- *
- * - The ::immediate structure records all the GL commands issued between
- * glBegin and glEnd.  \n
- * The structure accumulates data, until it is either full or it is
- * flushed (usually by a state change). Before starting then the pipeline,
- * the collected vertex data in ::immediate has to be pushed into
- * TNLcontext::vb.
- * This happens in ::_tnl_vb_bind_immediate. The pipeline is then run by
- * calling tnl_device_driver::RunPipeline = ::_tnl_run_pipeline, which
- * is stored in TNLcontext::Driver.   \n
- * An ::immediate does (for performance reasons) usually not finish with a
- * glEnd, and hence it also does not need to start with a glBegin.
- * This means that the last vertices of one ::immediate may need to be
- * saved for the next one.
- *
- *
- * - NOT SURE ABOUT THIS: The vertex_arrays structure is used to handle
- * glDrawArrays etc.  \n
- * Here, the data of the vertex_arrays is copied by ::_tnl_vb_bind_arrays
- * into TNLcontext::vb, so that the pipeline can be started.
  */
 
 
@@ -79,6 +56,7 @@
 #include "math/m_vector.h"
 #include "math/m_xform.h"
 
+#include "vbo/vbo.h"
 
 #define MAX_PIPELINE_STAGES     30
 
@@ -106,7 +84,7 @@ enum {
 	_TNL_ATTRIB_COLOR1 = 4,
 	_TNL_ATTRIB_FOG = 5,
 	_TNL_ATTRIB_COLOR_INDEX = 6,
-	_TNL_ATTRIB_SEVEN = 7,
+	_TNL_ATTRIB_EDGEFLAG = 7,
 	_TNL_ATTRIB_TEX0 = 8,
 	_TNL_ATTRIB_TEX1 = 9,
 	_TNL_ATTRIB_TEX2 = 10,
@@ -115,7 +93,8 @@ enum {
 	_TNL_ATTRIB_TEX5 = 13,
 	_TNL_ATTRIB_TEX6 = 14,
 	_TNL_ATTRIB_TEX7 = 15,
-	_TNL_ATTRIB_GENERIC0 = 16,
+
+	_TNL_ATTRIB_GENERIC0 = 16, /* doesn't really exist! */
 	_TNL_ATTRIB_GENERIC1 = 17,
 	_TNL_ATTRIB_GENERIC2 = 18,
 	_TNL_ATTRIB_GENERIC3 = 19,
@@ -131,21 +110,36 @@ enum {
 	_TNL_ATTRIB_GENERIC13 = 29,
 	_TNL_ATTRIB_GENERIC14 = 30,
 	_TNL_ATTRIB_GENERIC15 = 31,
-	_TNL_ATTRIB_MAT_FRONT_AMBIENT = 32,
-	_TNL_ATTRIB_MAT_BACK_AMBIENT = 33,
-	_TNL_ATTRIB_MAT_FRONT_DIFFUSE = 34,
-	_TNL_ATTRIB_MAT_BACK_DIFFUSE = 35,
-	_TNL_ATTRIB_MAT_FRONT_SPECULAR = 36,
-	_TNL_ATTRIB_MAT_BACK_SPECULAR = 37,
-	_TNL_ATTRIB_MAT_FRONT_EMISSION = 38,
-	_TNL_ATTRIB_MAT_BACK_EMISSION = 39,
-	_TNL_ATTRIB_MAT_FRONT_SHININESS = 40,
-	_TNL_ATTRIB_MAT_BACK_SHININESS = 41,
-	_TNL_ATTRIB_MAT_FRONT_INDEXES = 42,
-	_TNL_ATTRIB_MAT_BACK_INDEXES = 43,
-	_TNL_ATTRIB_EDGEFLAG = 44,
-	_TNL_ATTRIB_POINTSIZE = 45,
-	_TNL_ATTRIB_MAX = 46
+
+	/* These alias with the generics, but they are not active
+	 * concurrently, so it's not a problem.  The TNL module
+	 * doesn't have to do anything about this as this is how they
+	 * are passed into the _draw_prims callback.
+	 *
+	 * When we generate fixed-function replacement programs (in
+	 * t_vp_build.c currently), they refer to the appropriate
+	 * generic attribute in order to pick up per-vertex material
+	 * data.
+	 */
+	_TNL_ATTRIB_MAT_FRONT_AMBIENT = 16,
+	_TNL_ATTRIB_MAT_BACK_AMBIENT = 17,
+	_TNL_ATTRIB_MAT_FRONT_DIFFUSE = 18,
+	_TNL_ATTRIB_MAT_BACK_DIFFUSE = 19,
+	_TNL_ATTRIB_MAT_FRONT_SPECULAR = 20,
+	_TNL_ATTRIB_MAT_BACK_SPECULAR = 21,
+	_TNL_ATTRIB_MAT_FRONT_EMISSION = 22,
+	_TNL_ATTRIB_MAT_BACK_EMISSION = 23,
+	_TNL_ATTRIB_MAT_FRONT_SHININESS = 24,
+	_TNL_ATTRIB_MAT_BACK_SHININESS = 25,
+	_TNL_ATTRIB_MAT_FRONT_INDEXES = 26,
+	_TNL_ATTRIB_MAT_BACK_INDEXES = 27,
+
+	/* This is really a VERT_RESULT, not an attrib.  Need to fix
+	 * tnl to understand the difference.
+	 */
+	_TNL_ATTRIB_POINTSIZE = 16,
+
+	_TNL_ATTRIB_MAX = 32
 } ;
 
 #define _TNL_ATTRIB_TEX(u)       (_TNL_ATTRIB_TEX0 + (u))
@@ -166,8 +160,8 @@ enum {
 #define _TNL_FIRST_GENERIC _TNL_ATTRIB_GENERIC0
 #define _TNL_LAST_GENERIC  _TNL_ATTRIB_GENERIC15
 
-#define _TNL_FIRST_MAT       _TNL_ATTRIB_MAT_FRONT_AMBIENT
-#define _TNL_LAST_MAT        _TNL_ATTRIB_MAT_BACK_INDEXES
+#define _TNL_FIRST_MAT       _TNL_ATTRIB_MAT_FRONT_AMBIENT /* GENERIC0 */
+#define _TNL_LAST_MAT        _TNL_ATTRIB_MAT_BACK_INDEXES  /* GENERIC11 */
 
 /* Number of available generic attributes */
 #define _TNL_NUM_GENERIC 16
@@ -175,220 +169,21 @@ enum {
 /* Number of attributes used for evaluators */
 #define _TNL_NUM_EVAL 16
 
+
 #define PRIM_BEGIN     0x10
 #define PRIM_END       0x20
-#define PRIM_WEAK      0x40
 #define PRIM_MODE_MASK 0x0f
 
-/* 
- */
-struct tnl_prim {
-   GLuint mode;
-   GLuint start;
-   GLuint count;
-};
-
-
-
-struct tnl_eval1_map {
-   struct gl_1d_map *map;
-   GLuint sz;
-};
-
-struct tnl_eval2_map {
-   struct gl_2d_map *map;
-   GLuint sz;
-};
-
-struct tnl_eval {
-   GLuint new_state;
-   struct tnl_eval1_map map1[_TNL_NUM_EVAL];
-   struct tnl_eval2_map map2[_TNL_NUM_EVAL];
-};
-
-
-#define TNL_MAX_PRIM 16
-#define TNL_MAX_COPIED_VERTS 3
-
-struct tnl_copied_vtx {
-   GLfloat buffer[_TNL_ATTRIB_MAX * 4 * TNL_MAX_COPIED_VERTS];
-   GLuint nr;
-};
-
-#define VERT_BUFFER_SIZE 2048	/* 8kbytes */
-
-
-typedef void (*tnl_attrfv_func)( const GLfloat * );
-
-struct _tnl_dynfn {
-   struct _tnl_dynfn *next, *prev;
-   GLuint key;
-   char *code;
-};
-
-struct _tnl_dynfn_lists {
-   struct _tnl_dynfn Vertex[4];
-   struct _tnl_dynfn Attribute[4];
-};
-
-struct _tnl_dynfn_generators {
-   struct _tnl_dynfn *(*Vertex[4])( GLcontext *ctx, int key );
-   struct _tnl_dynfn *(*Attribute[4])( GLcontext *ctx, int key );
-};
-
-#define _TNL_MAX_ATTR_CODEGEN 32
-
-
-/**
- * The assembly of vertices in immediate mode is separated from
- * display list compilation.  This allows a simpler immediate mode
- * treatment and a display list compiler better suited to
- * hardware-acceleration.
- */
-struct tnl_vtx {
-   GLfloat buffer[VERT_BUFFER_SIZE];
-   GLubyte attrsz[_TNL_ATTRIB_MAX];
-   GLubyte active_sz[_TNL_ATTRIB_MAX];
-   GLuint vertex_size;
-   struct tnl_prim prim[TNL_MAX_PRIM];
-   GLuint prim_count;
-   GLfloat *vbptr;		      /* cursor, points into buffer */
-   GLfloat vertex[_TNL_ATTRIB_MAX*4]; /* current vertex */
-   GLfloat *attrptr[_TNL_ATTRIB_MAX]; /* points into vertex */
-   GLfloat *current[_TNL_ATTRIB_MAX]; /* points into ctx->Current, etc */
-   GLfloat CurrentFloatEdgeFlag;
-   GLuint counter, initial_counter;
-   struct tnl_copied_vtx copied;
-
-   /** Note extra space for error handler: */
-   tnl_attrfv_func tabfv[_TNL_ATTRIB_ERROR+1][4];
-
-   struct _tnl_dynfn_lists cache;
-   struct _tnl_dynfn_generators gen;
-
-   struct tnl_eval eval;
-   GLboolean *edgeflag_tmp;
-   GLboolean have_materials;
-};
-
-
-
-
-/* For display lists, this structure holds a run of vertices of the
- * same format, and a strictly well-formed set of begin/end pairs,
- * starting on the first vertex and ending at the last.  Vertex
- * copying on buffer breaks is precomputed according to these
- * primitives, though there are situations where the copying will need
- * correction at execute-time, perhaps by replaying the list as
- * immediate mode commands.
- *
- * On executing this list, the 'current' values may be updated with
- * the values of the final vertex, and often no fixup of the start of
- * the vertex list is required.
- *
- * Eval and other commands that don't fit into these vertex lists are
- * compiled using the fallback opcode mechanism provided by dlist.c.
- */
-struct tnl_vertex_list {
-   GLubyte attrsz[_TNL_ATTRIB_MAX];
-   GLuint vertex_size;
-
-   GLfloat *buffer;
-   GLuint count;
-   GLuint wrap_count;		/* number of copied vertices at start */
-   GLboolean have_materials;	/* bit of a hack - quick check for materials */
-   GLboolean dangling_attr_ref;	/* current attr implicitly referenced 
-				   outside the list */
-
-   GLfloat *normal_lengths;
-   struct tnl_prim *prim;
-   GLuint prim_count;
-
-   struct tnl_vertex_store *vertex_store;
-   struct tnl_primitive_store *prim_store;
-};
-
-/* These buffers should be a reasonable size to support upload to
- * hardware?  Maybe drivers should stitch them back together, or
- * specify a desired size?
- */
-#define SAVE_BUFFER_SIZE (16*1024)
-#define SAVE_PRIM_SIZE   128
-
-/* Storage to be shared among several vertex_lists.
- */
-struct tnl_vertex_store {
-   GLfloat buffer[SAVE_BUFFER_SIZE];
-   GLuint used;
-   GLuint refcount;
-};
-
-struct tnl_primitive_store {
-   struct tnl_prim buffer[SAVE_PRIM_SIZE];
-   GLuint used;
-   GLuint refcount;
-};
-
-
-struct tnl_save {
-   GLubyte attrsz[_TNL_ATTRIB_MAX];
-   GLuint vertex_size;
-
-   GLfloat *buffer;
-   GLuint count;
-   GLuint wrap_count;
-   GLuint replay_flags;
-
-   struct tnl_prim *prim;
-   GLuint prim_count, prim_max;
-
-   struct tnl_vertex_store *vertex_store;
-   struct tnl_primitive_store *prim_store;
-
-   GLfloat *vbptr;		   /* cursor, points into buffer */
-   GLfloat vertex[_TNL_ATTRIB_MAX*4];	   /* current values */
-   GLfloat *attrptr[_TNL_ATTRIB_MAX];
-   GLuint counter, initial_counter;
-   GLboolean dangling_attr_ref;
-   GLboolean have_materials;
-
-   GLuint opcode_vertex_list;
-
-   struct tnl_copied_vtx copied;
-   
-   GLfloat CurrentFloatEdgeFlag;
-
-   GLfloat *current[_TNL_ATTRIB_MAX]; /* points into ctx->ListState */
-   GLubyte *currentsz[_TNL_ATTRIB_MAX];
-
-   void (*tabfv[_TNL_ATTRIB_MAX][4])( const GLfloat * );
-};
-
-
-/**
- * A collection of vertex arrays.
- */
-struct tnl_vertex_arrays
+static INLINE GLuint _tnl_translate_prim( const struct _mesa_prim *prim )
 {
-   /* Conventional vertex attribute arrays */
-   GLvector4f  Obj;
-   GLvector4f  Normal;
-   GLvector4f  Color;
-   GLvector4f  SecondaryColor;
-   GLvector4f  FogCoord;
-   GLvector4f  TexCoord[MAX_TEXTURE_COORD_UNITS];
-   GLvector4f  Index;
+   GLuint flag;
+   flag = prim->mode;
+   if (prim->begin) flag |= PRIM_BEGIN;
+   if (prim->end) flag |= PRIM_END;
+   return flag;
+}
 
-   GLubyte     *EdgeFlag;
-   GLuint      *Elt;
 
-   /* These attributes don't alias with the conventional attributes.
-    * The GL_NV_vertex_program extension defines 16 extra sets of vertex
-    * arrays which have precedent over the conventional arrays when enabled.
-    */
-   /* XXX I think the array size is wronge (47 vs. 16) */
-   GLvector4f  Attribs[_TNL_ATTRIB_MAX];
-};
 
 
 /**
@@ -422,13 +217,11 @@ struct vertex_buffer
    GLvector4f  *ColorPtr[2];	                /* _TNL_BIT_COLOR0 */
    GLvector4f  *SecondaryColorPtr[2];           /* _TNL_BIT_COLOR1 */
    GLvector4f  *FogCoordPtr;	                /* _TNL_BIT_FOG */
-   GLvector4f  *VaryingPtr[MAX_VARYING_VECTORS];
 
-   struct tnl_prim  *Primitive;	              
+   const struct _mesa_prim  *Primitive;	              
    GLuint      PrimitiveCount;	      
 
    /* Inputs to the vertex program stage */
-   /* XXX This array may be too large (47 vs. 16) */
    GLvector4f *AttribPtr[_TNL_ATTRIB_MAX];      /* GL_NV_vertex_program */
 };
 
@@ -626,12 +419,6 @@ struct tnl_device_driver
     * arrays.
     */
 
-   GLboolean (*NotifyBegin)(GLcontext *ctx, GLenum p);
-   /* Allow drivers to hook in optimized begin/end engines.
-    * Return value:  GL_TRUE - driver handled the begin
-    *                GL_FALSE - driver didn't handle the begin
-    */
-
    /***
     *** Rendering -- These functions called only from t_vb_render.c
     ***/
@@ -737,25 +524,10 @@ typedef struct
     */
    struct tnl_device_driver Driver;
 
-   /* Execute:
-    */
-   struct tnl_vtx vtx;
-   
-   /* Compile:
-    */
-   struct tnl_save save;
-
    /* Pipeline
     */
    struct tnl_pipeline pipeline;
    struct vertex_buffer vb;
-
-   /* GLvectors for binding to vb:
-    */
-   struct tnl_vertex_arrays vtx_inputs;
-   struct tnl_vertex_arrays save_inputs;
-   struct tnl_vertex_arrays current;
-   struct tnl_vertex_arrays array_inputs;
 
    /* Clipspace/ndc/window vertex managment:
     */
@@ -764,26 +536,21 @@ typedef struct
    /* Probably need a better configuration mechanism:
     */
    GLboolean NeedNdcCoords;
-   GLboolean LoopbackDListCassettes;
-   GLboolean CalcDListNormalLengths;
-   GLboolean IsolateMaterials;
    GLboolean AllowVertexFog;
    GLboolean AllowPixelFog;
-   GLboolean AllowCodegen;
-
    GLboolean _DoVertexFog;  /* eval fog function at each vertex? */
-
-   /* If True, it means we started a glBegin/End primtive with an invalid
-    * vertex/fragment program or incomplete framebuffer.  In that case,
-    * discard any buffered vertex data.
-    */
-   GLboolean DiscardPrimitive;
 
    DECLARE_RENDERINPUTS(render_inputs_bitset);
 
-   GLvertexformat exec_vtxfmt;
-   GLvertexformat save_vtxfmt;
+   GLvector4f tmp_inputs[VERT_ATTRIB_MAX];
 
+   /* Temp storage for t_draw.c: 
+    */
+   GLubyte *block[VERT_ATTRIB_MAX];
+   GLuint nr_blocks;
+
+   /* Cache of fixed-function-replacing vertex programs:
+    */
    struct tnl_cache *vp_cache;
 
 } TNLcontext;

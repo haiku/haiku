@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.1
+ * Version:  6.5.3
  *
- * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -31,7 +31,7 @@
 #include "context.h"
 #include "colormac.h"
 #include "mtypes.h"
-#include "program.h"
+#include "prog_statevars.h"
 #include "teximage.h"
 #include "swrast.h"
 #include "s_blend.h"
@@ -98,11 +98,7 @@ _swrast_update_rasterflags( GLcontext *ctx )
       rasterMask |= MULTI_DRAW_BIT; /* all color index bits disabled */
    }
 
-   if (ctx->FragmentProgram._Enabled) {
-      rasterMask |= FRAGPROG_BIT;
-   }
-
-   if (ctx->ShaderObjects._FragmentShaderPresent) {
+   if (ctx->FragmentProgram._Current) {
       rasterMask |= FRAGPROG_BIT;
    }
 
@@ -129,27 +125,28 @@ _swrast_update_rasterflags( GLcontext *ctx )
 static void
 _swrast_update_polygon( GLcontext *ctx )
 {
-   GLfloat backface_sign = 1;
+   GLfloat backface_sign;
 
    if (ctx->Polygon.CullFlag) {
-      backface_sign = 1;
-      switch(ctx->Polygon.CullFaceMode) {
+      backface_sign = 1.0;
+      switch (ctx->Polygon.CullFaceMode) {
       case GL_BACK:
-	 if(ctx->Polygon.FrontFace==GL_CCW)
-	    backface_sign = -1;
+	 if (ctx->Polygon.FrontFace == GL_CCW)
+	    backface_sign = -1.0;
 	 break;
       case GL_FRONT:
-	 if(ctx->Polygon.FrontFace!=GL_CCW)
-	    backface_sign = -1;
+	 if (ctx->Polygon.FrontFace != GL_CCW)
+	    backface_sign = -1.0;
 	 break;
-      default:
       case GL_FRONT_AND_BACK:
-	 backface_sign = 0;
+         /* fallthrough */
+      default:
+	 backface_sign = 0.0;
 	 break;
       }
    }
    else {
-      backface_sign = 0;
+      backface_sign = 0.0;
    }
 
    SWRAST_CONTEXT(ctx)->_BackfaceSign = backface_sign;
@@ -158,14 +155,14 @@ _swrast_update_polygon( GLcontext *ctx )
 
 /**
  * Update the _PreferPixelFog field to indicate if we need to compute
- * fog factors per-fragment.
+ * fog blend factors (from the fog coords) per-fragment.
  */
 static void
 _swrast_update_fog_hint( GLcontext *ctx )
 {
    SWcontext *swrast = SWRAST_CONTEXT(ctx);
    swrast->_PreferPixelFog = (!swrast->AllowVertexFog ||
-                              ctx->FragmentProgram._Enabled || /* not _Active! */
+                              ctx->FragmentProgram._Current ||
 			      (ctx->Hint.Fog == GL_NICEST &&
 			       swrast->AllowPixelFog));
 }
@@ -198,17 +195,14 @@ static void
 _swrast_update_fog_state( GLcontext *ctx )
 {
    SWcontext *swrast = SWRAST_CONTEXT(ctx);
+   const struct gl_fragment_program *fp = ctx->FragmentProgram._Current;
 
    /* determine if fog is needed, and if so, which fog mode */
    swrast->_FogEnabled = GL_FALSE;
-   if (ctx->FragmentProgram._Enabled) {
-      if (ctx->FragmentProgram._Current->Base.Target==GL_FRAGMENT_PROGRAM_ARB) {
-         const struct gl_fragment_program *fp
-            = ctx->FragmentProgram._Current;
-         if (fp->FogOption != GL_NONE) {
-            swrast->_FogEnabled = GL_TRUE;
-            swrast->_FogMode = fp->FogOption;
-         }
+   if (fp && fp->Base.Target == GL_FRAGMENT_PROGRAM_ARB) {
+      if (fp->FogOption != GL_NONE) {
+         swrast->_FogEnabled = GL_TRUE;
+         swrast->_FogMode = fp->FogOption;
       }
    }
    else if (ctx->Fog.Enabled) {
@@ -225,8 +219,8 @@ _swrast_update_fog_state( GLcontext *ctx )
 static void
 _swrast_update_fragment_program(GLcontext *ctx, GLbitfield newState)
 {
-   if (ctx->FragmentProgram._Enabled) {
-      const struct gl_fragment_program *fp = ctx->FragmentProgram._Current;
+   const struct gl_fragment_program *fp = ctx->FragmentProgram._Current;
+   if (fp) {
 #if 0
       /* XXX Need a way to trigger the initial loading of parameters
        * even when there's no recent state changes.
@@ -301,7 +295,7 @@ _swrast_validate_triangle( GLcontext *ctx,
 
    if (ctx->Texture._EnabledUnits == 0
        && NEED_SECONDARY_COLOR(ctx)
-       && !ctx->FragmentProgram._Enabled) {
+       && !ctx->FragmentProgram._Current) {
       /* separate specular color, but no texture */
       swrast->SpecTriangle = swrast->Triangle;
       swrast->Triangle = _swrast_add_spec_terms_triangle;
@@ -325,7 +319,7 @@ _swrast_validate_line( GLcontext *ctx, const SWvertex *v0, const SWvertex *v1 )
 
    if (ctx->Texture._EnabledUnits == 0
        && NEED_SECONDARY_COLOR(ctx)
-       && !ctx->FragmentProgram._Enabled) {
+       && !ctx->FragmentProgram._Current) {
       swrast->SpecLine = swrast->Line;
       swrast->Line = _swrast_add_spec_terms_line;
    }
@@ -348,7 +342,7 @@ _swrast_validate_point( GLcontext *ctx, const SWvertex *v0 )
 
    if (ctx->Texture._EnabledUnits == 0
        && NEED_SECONDARY_COLOR(ctx)
-       && !ctx->FragmentProgram._Enabled) {
+       && !ctx->FragmentProgram._Current) {
       swrast->SpecPoint = swrast->Point;
       swrast->Point = _swrast_add_spec_terms_point;
    }
@@ -398,7 +392,7 @@ _swrast_validate_texture_images(GLcontext *ctx)
             GLuint numFaces = (texObj->Target == GL_TEXTURE_CUBE_MAP) ? 6 : 1;
             GLuint face;
             for (face = 0; face < numFaces; face++) {
-               GLuint lvl;
+               GLint lvl;
                for (lvl = texObj->BaseLevel; lvl <= texObj->_MaxLevel; lvl++) {
                   struct gl_texture_image *texImg = texObj->Image[face][lvl];
                   if (texImg && !texImg->Data) {
@@ -436,7 +430,7 @@ _swrast_eject_texture_images(GLcontext *ctx)
             GLuint numFaces = (texObj->Target == GL_TEXTURE_CUBE_MAP) ? 6 : 1;
             GLuint face;
             for (face = 0; face < numFaces; face++) {
-               GLuint lvl;
+               GLint lvl;
                for (lvl = texObj->BaseLevel; lvl <= texObj->_MaxLevel; lvl++) {
                   struct gl_texture_image *texImg = texObj->Image[face][lvl];
                   if (texImg && texImg->Data) {
@@ -494,7 +488,7 @@ _swrast_invalidate_state( GLcontext *ctx, GLbitfield new_state )
 }
 
 
-static void
+void
 _swrast_update_texture_samplers(GLcontext *ctx)
 {
    SWcontext *swrast = SWRAST_CONTEXT(ctx);
@@ -502,9 +496,99 @@ _swrast_update_texture_samplers(GLcontext *ctx)
 
    for (u = 0; u < ctx->Const.MaxTextureImageUnits; u++) {
       const struct gl_texture_object *tObj = ctx->Texture.Unit[u]._Current;
-      if (tObj)
-         swrast->TextureSample[u] =
-            _swrast_choose_texture_sample_func(ctx, tObj);
+      /* Note: If tObj is NULL, the sample function will be a simple
+       * function that just returns opaque black (0,0,0,1).
+       */
+      swrast->TextureSample[u] = _swrast_choose_texture_sample_func(ctx, tObj);
+   }
+}
+
+
+/**
+ * Update swrast->_ActiveAttribs and swrast->_NumActiveAttribs
+ */
+static void
+_swrast_update_fragment_attribs(GLcontext *ctx)
+{
+   SWcontext *swrast = SWRAST_CONTEXT(ctx);
+   GLuint attribsMask;
+   
+   if (ctx->FragmentProgram._Current) {
+      attribsMask = ctx->FragmentProgram._Current->Base.InputsRead;
+   }
+   else {
+      GLuint u;
+      attribsMask = 0x0;
+
+#if 0 /* not yet */
+      if (ctx->Depth.Test)
+         attribsMask |= FRAG_BIT_WPOS;
+      if (NEED_SECONDARY_COLOR(ctx))
+         attribsMask |= FRAG_BIT_COL1;
+#endif
+      if (swrast->_FogEnabled)
+         attribsMask |= FRAG_BIT_FOGC;
+
+      for (u = 0; u < ctx->Const.MaxTextureUnits; u++) {
+         if (ctx->Texture.Unit[u]._ReallyEnabled) {
+            attribsMask |= FRAG_BIT_TEX(u);
+         }
+      }
+   }
+
+   /* don't want to interpolate these generic attribs just yet */
+   /* XXX temporary */
+   attribsMask &= ~(FRAG_BIT_WPOS |
+                    FRAG_BIT_COL0 |
+                    FRAG_BIT_COL1 |
+                    FRAG_BIT_FOGC);
+
+   /* Update _ActiveAttribs[] list */
+   {
+      GLuint i, num = 0;
+      for (i = 0; i < FRAG_ATTRIB_MAX; i++) {
+         if (attribsMask & (1 << i))
+            swrast->_ActiveAttribs[num++] = i;
+      }
+      swrast->_NumActiveAttribs = num;
+   }
+}
+
+
+/**
+ * Update the swrast->_ColorOutputsMask which indicates which color
+ * renderbuffers (aka rendertargets) are being written to by the current
+ * fragment program.
+ * We also take glDrawBuffers() into account to skip outputs that are
+ * set to GL_NONE.
+ */
+static void
+_swrast_update_color_outputs(GLcontext *ctx)
+{
+   SWcontext *swrast = SWRAST_CONTEXT(ctx);
+   const struct gl_framebuffer *fb = ctx->DrawBuffer;
+
+   swrast->_ColorOutputsMask = 0;
+   swrast->_NumColorOutputs = 0;
+
+   if (ctx->FragmentProgram._Current) {
+      const GLbitfield outputsWritten
+         = ctx->FragmentProgram._Current->Base.OutputsWritten;
+      GLuint output;
+      for (output = 0; output < ctx->Const.MaxDrawBuffers; output++) {
+         if ((outputsWritten & (1 << (FRAG_RESULT_DATA0 + output)))
+             && (fb->_NumColorDrawBuffers[output] > 0)) {
+            swrast->_ColorOutputsMask |= (1 << output);
+            swrast->_NumColorOutputs = output + 1;
+         }
+      }
+   }
+   if (swrast->_ColorOutputsMask == 0x0) {
+      /* no fragment program, or frag prog didn't write to gl_FragData[] */
+      if (fb->_NumColorDrawBuffers[0] > 0) {
+         swrast->_ColorOutputsMask = 0x1;
+         swrast->_NumColorOutputs = 1;
+      }
    }
 }
 
@@ -540,7 +624,7 @@ _swrast_validate_derived( GLcontext *ctx )
                               _NEW_PROGRAM))
 	 _swrast_update_fragment_program( ctx, swrast->NewState );
 
-      if (swrast->NewState & _NEW_TEXTURE)
+      if (swrast->NewState & (_NEW_TEXTURE | _NEW_PROGRAM))
          _swrast_update_texture_samplers( ctx );
 
       if (swrast->NewState & (_NEW_TEXTURE | _NEW_PROGRAM))
@@ -548,6 +632,15 @@ _swrast_validate_derived( GLcontext *ctx )
 
       if (swrast->NewState & _SWRAST_NEW_RASTERMASK)
  	 _swrast_update_rasterflags( ctx );
+
+      if (swrast->NewState & (_NEW_DEPTH |
+                              _NEW_FOG |
+                              _NEW_PROGRAM |
+                              _NEW_TEXTURE))
+         _swrast_update_fragment_attribs(ctx);
+
+      if (swrast->NewState & (_NEW_PROGRAM | _NEW_BUFFERS))
+         _swrast_update_color_outputs(ctx);
 
       swrast->NewState = 0;
       swrast->StateChanges = 0;
@@ -700,13 +793,12 @@ _swrast_CreateContext( GLcontext *ctx )
    swrast->SpanArrays->rgba = swrast->SpanArrays->color.sz2.rgba;
    swrast->SpanArrays->spec = swrast->SpanArrays->color.sz2.spec;
 #else
-   swrast->SpanArrays->rgba = swrast->SpanArrays->color.sz4.rgba;
-   swrast->SpanArrays->spec = swrast->SpanArrays->color.sz4.spec;
+   swrast->SpanArrays->rgba = swrast->SpanArrays->attribs[FRAG_ATTRIB_COL0];
+   swrast->SpanArrays->spec = swrast->SpanArrays->attribs[FRAG_ATTRIB_COL1];
 #endif
 
    /* init point span buffer */
    swrast->PointSpan.primitive = GL_POINT;
-   swrast->PointSpan.start = 0;
    swrast->PointSpan.end = 0;
    swrast->PointSpan.facing = 0;
    swrast->PointSpan.array = swrast->SpanArrays;
@@ -809,8 +901,10 @@ _swrast_print_vertex( GLcontext *ctx, const SWvertex *v )
       for (i = 0 ; i < ctx->Const.MaxTextureCoordUnits ; i++)
 	 if (ctx->Texture.Unit[i]._ReallyEnabled)
 	    _mesa_debug(ctx, "texcoord[%d] %f %f %f %f\n", i,
-                        v->texcoord[i][0], v->texcoord[i][1],
-                        v->texcoord[i][2], v->texcoord[i][3]);
+                        v->attrib[FRAG_ATTRIB_TEX0 + i][0],
+                        v->attrib[FRAG_ATTRIB_TEX0 + i][1],
+                        v->attrib[FRAG_ATTRIB_TEX0 + i][2],
+                        v->attrib[FRAG_ATTRIB_TEX0 + i][3]);
 
 #if CHAN_TYPE == GL_FLOAT
       _mesa_debug(ctx, "color %f %f %f %f\n",
@@ -825,7 +919,7 @@ _swrast_print_vertex( GLcontext *ctx, const SWvertex *v )
                   v->specular[0], v->specular[1],
                   v->specular[2], v->specular[3]);
 #endif
-      _mesa_debug(ctx, "fog %f\n", v->fog);
+      _mesa_debug(ctx, "fog %f\n", v->attrib[FRAG_ATTRIB_FOGC][0]);
       _mesa_debug(ctx, "index %d\n", v->index);
       _mesa_debug(ctx, "pointsize %f\n", v->pointSize);
       _mesa_debug(ctx, "\n");

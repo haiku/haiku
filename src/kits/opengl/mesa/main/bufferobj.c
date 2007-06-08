@@ -119,7 +119,7 @@ buffer_object_subdata_range_good( GLcontext * ctx, GLenum target,
       _mesa_error(ctx, GL_INVALID_OPERATION, "%s", caller);
       return NULL;
    }
-   if ((GLuint) (offset + size) > bufObj->Size) {
+   if (offset + size > bufObj->Size) {
       _mesa_error(ctx, GL_INVALID_VALUE,
 		  "%s(size + offset > buffer size)", caller);
       return NULL;
@@ -297,7 +297,7 @@ _mesa_buffer_subdata( GLcontext *ctx, GLenum target, GLintptrARB offset,
    (void) ctx; (void) target;
 
    /* this should have been caught in _mesa_BufferSubData() */
-   ASSERT((GLuint) (size + offset) <= bufObj->Size);
+   ASSERT(size + offset <= bufObj->Size);
 
    if (bufObj->Data) {
       _mesa_memcpy( (GLubyte *) bufObj->Data + offset, data, size );

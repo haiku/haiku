@@ -1086,6 +1086,7 @@ static const char gl_string_table[] =
     "glBindProgramARB\0"
     "glDeleteProgramsARB\0"
     "glGenProgramsARB\0"
+    "glGetVertexAttribPointerv\0"
     "glGetVertexAttribPointervARB\0"
     "glIsProgramARB\0"
     "glPointParameteri\0"
@@ -2229,11 +2230,12 @@ static const glprocs_table_t static_functions[] = {
     NAME_FUNC_OFFSET(18432, glDeleteProgramsNV, glDeleteProgramsNV, NULL, _gloffset_DeleteProgramsNV),
     NAME_FUNC_OFFSET(18452, glGenProgramsNV, glGenProgramsNV, NULL, _gloffset_GenProgramsNV),
     NAME_FUNC_OFFSET(18469, glGetVertexAttribPointervNV, glGetVertexAttribPointervNV, NULL, _gloffset_GetVertexAttribPointervNV),
-    NAME_FUNC_OFFSET(18498, glIsProgramNV, glIsProgramNV, NULL, _gloffset_IsProgramNV),
-    NAME_FUNC_OFFSET(18513, glPointParameteriNV, glPointParameteriNV, NULL, _gloffset_PointParameteriNV),
-    NAME_FUNC_OFFSET(18531, glPointParameterivNV, glPointParameterivNV, NULL, _gloffset_PointParameterivNV),
-    NAME_FUNC_OFFSET(18550, gl_dispatch_stub_749, gl_dispatch_stub_749, NULL, _gloffset_BlendEquationSeparateEXT),
-    NAME_FUNC_OFFSET(18574, gl_dispatch_stub_749, gl_dispatch_stub_749, NULL, _gloffset_BlendEquationSeparateEXT),
+    NAME_FUNC_OFFSET(18495, glGetVertexAttribPointervNV, glGetVertexAttribPointervNV, NULL, _gloffset_GetVertexAttribPointervNV),
+    NAME_FUNC_OFFSET(18524, glIsProgramNV, glIsProgramNV, NULL, _gloffset_IsProgramNV),
+    NAME_FUNC_OFFSET(18539, glPointParameteriNV, glPointParameteriNV, NULL, _gloffset_PointParameteriNV),
+    NAME_FUNC_OFFSET(18557, glPointParameterivNV, glPointParameterivNV, NULL, _gloffset_PointParameterivNV),
+    NAME_FUNC_OFFSET(18576, gl_dispatch_stub_749, gl_dispatch_stub_749, NULL, _gloffset_BlendEquationSeparateEXT),
+    NAME_FUNC_OFFSET(18600, gl_dispatch_stub_749, gl_dispatch_stub_749, NULL, _gloffset_BlendEquationSeparateEXT),
     NAME_FUNC_OFFSET(-1, NULL, NULL, NULL, 0)
 };
 

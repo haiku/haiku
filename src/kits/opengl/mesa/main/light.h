@@ -92,7 +92,8 @@ do {									\
    struct gl_shine_tab *_tab = table;					\
    float f = (dp * (SHINE_TABLE_SIZE-1));				\
    int k = (int) f;							\
-   if (k > SHINE_TABLE_SIZE-2) 						\
+   if (k < 0 /* gcc may cast an overflow float value to negative int value*/ \
+	|| k > SHINE_TABLE_SIZE-2)					\
       result = (GLfloat) _mesa_pow( dp, _tab->shininess );		\
    else									\
       result = _tab->tab[k] + (f-k)*(_tab->tab[k+1]-_tab->tab[k]);	\

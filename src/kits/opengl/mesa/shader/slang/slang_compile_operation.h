@@ -25,10 +25,6 @@
 #ifndef SLANG_COMPILE_OPERATION_H
 #define SLANG_COMPILE_OPERATION_H
 
-#if defined __cplusplus
-extern "C" {
-#endif
-
 
 /**
  * Types of slang operations.
@@ -37,68 +33,70 @@ extern "C" {
  */
 typedef enum slang_operation_type_
 {
-   slang_oper_none,
-   slang_oper_block_no_new_scope,       /* "{" sequence "}" */
-   slang_oper_block_new_scope,  /* "{" sequence "}" */
-   slang_oper_variable_decl,    /* [type] [var] or [var] = [expr] */
-   slang_oper_asm,
-   slang_oper_break,            /* "break" statement */
-   slang_oper_continue,         /* "continue" statement */
-   slang_oper_discard,          /* "discard" (kill fragment) statement */
-   slang_oper_return,           /* "return" [expr]  */
-   slang_oper_expression,       /* [expr] */
-   slang_oper_if,               /* "if" [0] then [1] else [2] */
-   slang_oper_while,            /* "while" [cond] [body] */
-   slang_oper_do,               /* "do" [body] "while" [cond] */
-   slang_oper_for,              /* "for" [init] [while] [incr] [body] */
-   slang_oper_void,             /* nop */
-   slang_oper_literal_bool,     /* "true" or "false" */
-   slang_oper_literal_int,      /* integer literal */
-   slang_oper_literal_float,    /* float literal */
-   slang_oper_identifier,       /* var name, func name, etc */
-   slang_oper_sequence,         /* [expr] "," [expr] "," etc */
-   slang_oper_assign,           /* [var] "=" [expr] */
-   slang_oper_addassign,        /* [var] "+=" [expr] */
-   slang_oper_subassign,        /* [var] "-=" [expr] */
-   slang_oper_mulassign,        /* [var] "*=" [expr] */
-   slang_oper_divassign,        /* [var] "/=" [expr] */
-   /*slang_oper_modassign, */
-   /*slang_oper_lshassign, */
-   /*slang_oper_rshassign, */
-   /*slang_oper_orassign, */
-   /*slang_oper_xorassign, */
-   /*slang_oper_andassign, */
-   slang_oper_select,           /* [expr] "?" [expr] ":" [expr] */
-   slang_oper_logicalor,        /* [expr] "||" [expr] */
-   slang_oper_logicalxor,       /* [expr] "^^" [expr] */
-   slang_oper_logicaland,       /* [expr] "&&" [expr] */
-   /*slang_oper_bitor, */
-   /*slang_oper_bitxor, */
-   /*slang_oper_bitand, */
-   slang_oper_equal,            /* [expr] "==" [expr] */
-   slang_oper_notequal,         /* [expr] "!=" [expr] */
-   slang_oper_less,             /* [expr] "<" [expr] */
-   slang_oper_greater,          /* [expr] ">" [expr] */
-   slang_oper_lessequal,        /* [expr] "<=" [expr] */
-   slang_oper_greaterequal,     /* [expr] ">=" [expr] */
-   /*slang_oper_lshift, */
-   /*slang_oper_rshift, */
-   slang_oper_add,              /* [expr] "+" [expr] */
-   slang_oper_subtract,         /* [expr] "-" [expr] */
-   slang_oper_multiply,         /* [expr] "*" [expr] */
-   slang_oper_divide,           /* [expr] "/" [expr] */
-   /*slang_oper_modulus, */
-   slang_oper_preincrement,     /* "++" [var] */
-   slang_oper_predecrement,     /* "--" [var] */
-   slang_oper_plus,             /* "-" [expr] */
-   slang_oper_minus,            /* "+" [expr] */
-   /*slang_oper_complement, */
-   slang_oper_not,              /* "!" [expr] */
-   slang_oper_subscript,        /* [expr] "[" [expr] "]" */
-   slang_oper_call,             /* [func name] [param] [param] [...] */
-   slang_oper_field,            /* i.e.: ".next" or ".xzy" or ".xxx" etc */
-   slang_oper_postincrement,    /* [var] "++" */
-   slang_oper_postdecrement     /* [var] "--" */
+   SLANG_OPER_NONE,
+   SLANG_OPER_BLOCK_NO_NEW_SCOPE,       /* "{" sequence "}" */
+   SLANG_OPER_BLOCK_NEW_SCOPE,  /* "{" sequence "}" */
+   SLANG_OPER_VARIABLE_DECL,    /* [type] [var] or [var] = [expr] */
+   SLANG_OPER_ASM,
+   SLANG_OPER_BREAK,            /* "break" statement */
+   SLANG_OPER_CONTINUE,         /* "continue" statement */
+   SLANG_OPER_DISCARD,          /* "discard" (kill fragment) statement */
+   SLANG_OPER_RETURN,           /* "return" [expr]  */
+   SLANG_OPER_LABEL,            /* a jump target */
+   SLANG_OPER_EXPRESSION,       /* [expr] */
+   SLANG_OPER_IF,               /* "if" [0] then [1] else [2] */
+   SLANG_OPER_WHILE,            /* "while" [cond] [body] */
+   SLANG_OPER_DO,               /* "do" [body] "while" [cond] */
+   SLANG_OPER_FOR,              /* "for" [init] [while] [incr] [body] */
+   SLANG_OPER_VOID,             /* nop */
+   SLANG_OPER_LITERAL_BOOL,     /* "true" or "false" */
+   SLANG_OPER_LITERAL_INT,      /* integer literal */
+   SLANG_OPER_LITERAL_FLOAT,    /* float literal */
+   SLANG_OPER_IDENTIFIER,       /* var name, func name, etc */
+   SLANG_OPER_SEQUENCE,         /* [expr] "," [expr] "," etc */
+   SLANG_OPER_ASSIGN,           /* [var] "=" [expr] */
+   SLANG_OPER_ADDASSIGN,        /* [var] "+=" [expr] */
+   SLANG_OPER_SUBASSIGN,        /* [var] "-=" [expr] */
+   SLANG_OPER_MULASSIGN,        /* [var] "*=" [expr] */
+   SLANG_OPER_DIVASSIGN,        /* [var] "/=" [expr] */
+   /*SLANG_OPER_MODASSIGN, */
+   /*SLANG_OPER_LSHASSIGN, */
+   /*SLANG_OPER_RSHASSIGN, */
+   /*SLANG_OPER_ORASSIGN, */
+   /*SLANG_OPER_XORASSIGN, */
+   /*SLANG_OPER_ANDASSIGN, */
+   SLANG_OPER_SELECT,           /* [expr] "?" [expr] ":" [expr] */
+   SLANG_OPER_LOGICALOR,        /* [expr] "||" [expr] */
+   SLANG_OPER_LOGICALXOR,       /* [expr] "^^" [expr] */
+   SLANG_OPER_LOGICALAND,       /* [expr] "&&" [expr] */
+   /*SLANG_OPER_BITOR, */
+   /*SLANG_OPER_BITXOR, */
+   /*SLANG_OPER_BITAND, */
+   SLANG_OPER_EQUAL,            /* [expr] "==" [expr] */
+   SLANG_OPER_NOTEQUAL,         /* [expr] "!=" [expr] */
+   SLANG_OPER_LESS,             /* [expr] "<" [expr] */
+   SLANG_OPER_GREATER,          /* [expr] ">" [expr] */
+   SLANG_OPER_LESSEQUAL,        /* [expr] "<=" [expr] */
+   SLANG_OPER_GREATEREQUAL,     /* [expr] ">=" [expr] */
+   /*SLANG_OPER_LSHIFT, */
+   /*SLANG_OPER_RSHIFT, */
+   SLANG_OPER_ADD,              /* [expr] "+" [expr] */
+   SLANG_OPER_SUBTRACT,         /* [expr] "-" [expr] */
+   SLANG_OPER_MULTIPLY,         /* [expr] "*" [expr] */
+   SLANG_OPER_DIVIDE,           /* [expr] "/" [expr] */
+   /*SLANG_OPER_MODULUS, */
+   SLANG_OPER_PREINCREMENT,     /* "++" [var] */
+   SLANG_OPER_PREDECREMENT,     /* "--" [var] */
+   SLANG_OPER_PLUS,             /* "-" [expr] */
+   SLANG_OPER_MINUS,            /* "+" [expr] */
+   /*SLANG_OPER_COMPLEMENT, */
+   SLANG_OPER_NOT,              /* "!" [expr] */
+   SLANG_OPER_SUBSCRIPT,        /* [expr] "[" [expr] "]" */
+   SLANG_OPER_CALL,             /* [func name] [param] [param] [...] */
+   SLANG_OPER_INLINED_CALL,     /* inlined function call */
+   SLANG_OPER_FIELD,            /* i.e.: ".next" or ".xzy" or ".xxx" etc */
+   SLANG_OPER_POSTINCREMENT,    /* [var] "++" */
+   SLANG_OPER_POSTDECREMENT     /* [var] "--" */
 } slang_operation_type;
 
 
@@ -114,9 +112,13 @@ typedef struct slang_operation_
    slang_operation_type type;
    struct slang_operation_ *children;
    GLuint num_children;
-   GLfloat literal;            /**< Used for float, int and bool values */
-   slang_atom a_id;            /**< type: asm, identifier, call, field */
-   slang_variable_scope *locals;       /**< local vars for scope */
+   GLfloat literal[4];           /**< Used for float, int and bool values */
+   GLuint literal_size;          /**< 1, 2, 3, or 4 */
+   slang_atom a_id;              /**< type: asm, identifier, call, field */
+   slang_variable_scope *locals; /**< local vars for scope */
+   struct slang_function_ *fun;  /**< If type == SLANG_OPER_CALL */
+   struct slang_variable_ *var;  /**< If type == slang_oper_identier */
+   struct slang_label_ *label;   /**< If type == SLANG_OPER_LABEL */
 } slang_operation;
 
 
@@ -132,9 +134,18 @@ slang_operation_copy(slang_operation *, const slang_operation *);
 extern slang_operation *
 slang_operation_new(GLuint count);
 
+extern void
+slang_operation_delete(slang_operation *oper);
 
-#ifdef __cplusplus
-}
-#endif
+extern slang_operation *
+slang_operation_grow(GLuint *numChildren, slang_operation **children);
+
+extern slang_operation *
+slang_operation_insert(GLuint *numChildren, slang_operation **children,
+                       GLuint pos);
+
+extern void
+_slang_operation_swap(slang_operation *oper0, slang_operation *oper1);
+
 
 #endif /* SLANG_COMPILE_OPERATION_H */

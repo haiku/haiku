@@ -2061,12 +2061,6 @@ copytexsubimage_error_check2( GLcontext *ctx, GLuint dimensions,
    }
 
    if (teximage->IsCompressed) {
-      if (!_mesa_source_buffer_exists(ctx, teximage->_BaseFormat)) {
-         _mesa_error(ctx, GL_INVALID_OPERATION,
-                     "glCopyTexSubImage%dD(missing readbuffer)", dimensions);
-         return GL_TRUE;
-      }
-
       if (target != GL_TEXTURE_2D) {
          _mesa_error(ctx, GL_INVALID_ENUM,
                      "glCopyTexSubImage%d(target)", dimensions);
@@ -2093,6 +2087,12 @@ copytexsubimage_error_check2( GLcontext *ctx, GLuint dimensions,
 
    if (teximage->InternalFormat == GL_YCBCR_MESA) {
       _mesa_error(ctx, GL_INVALID_OPERATION, "glCopyTexSubImage2D");
+      return GL_TRUE;
+   }
+
+   if (!_mesa_source_buffer_exists(ctx, teximage->_BaseFormat)) {
+      _mesa_error(ctx, GL_INVALID_OPERATION,
+               "glCopyTexSubImage%dD(missing readbuffer)", dimensions);
       return GL_TRUE;
    }
 

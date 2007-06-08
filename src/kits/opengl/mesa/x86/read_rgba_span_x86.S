@@ -32,6 +32,8 @@
 
 	.file	"read_rgba_span_x86.S"
 #if !defined(__DJGPP__) && !defined(__MINGW32__) /* this one cries for assyntax.h */
+/* Kevin F. Quinn 2nd July 2006
+ * Replace data segment constants with text-segment instructions
 	.section	.rodata
 	.align 16
 	.type	mask, @object
@@ -45,6 +47,19 @@ mask:
 	.long	0x00ff0000
 	.long	0x00ff0000
 	.long	0x00ff0000
+ */
+#define	LOAD_MASK(mvins,m1,m2) \
+   	pushl	$0xff00ff00 ;\
+   	pushl	$0xff00ff00 ;\
+   	pushl	$0xff00ff00 ;\
+   	pushl	$0xff00ff00 ;\
+	mvins	(%esp), m1	;\
+   	pushl	$0x00ff0000 ;\
+   	pushl	$0x00ff0000 ;\
+   	pushl	$0x00ff0000 ;\
+   	pushl	$0x00ff0000 ;\
+	mvins	(%esp), m2	;\
+	addl	$32, %esp
 
 
 /* I implemented these as macros because the appear in quite a few places,
@@ -84,8 +99,12 @@ _generic_read_RGBA_span_BGRA8888_REV_MMX:
 #ifdef USE_INNER_EMMS
 	emms
 #endif
+/* Kevin F. Quinn 2nd July 2006
+ * Replace data segment constants with text-segment instructions
 	movq	mask, %mm1
 	movq	mask+16, %mm2
+ */
+	LOAD_MASK(movq,%mm1,%mm2)
 
 	movl	8(%esp), %ebx	/* source pointer */
 	movl	16(%esp), %edx	/* number of pixels to copy */
@@ -182,8 +201,12 @@ _generic_read_RGBA_span_BGRA8888_REV_SSE:
 #ifdef USE_INNER_EMMS
 	emms
 #endif
+/* Kevin F. Quinn 2nd July 2006
+ * Replace data segment constants with text-segment instructions
 	movq	mask, %mm1
 	movq	mask+16, %mm2
+ */
+	LOAD_MASK(movq,%mm1,%mm2)
 
 	movl	16(%esp), %ebx	/* source pointer */
 	movl	24(%esp), %edx	/* number of pixels to copy */
@@ -341,8 +364,12 @@ _generic_read_RGBA_span_BGRA8888_REV_SSE2:
 	pushl	%esi
 	pushl	%ebx
 
+/* Kevin F. Quinn 2nd July 2006
+ * Replace data segment constants with text-segment instructions
 	movdqa	mask, %xmm1
 	movdqa	mask+16, %xmm2
+ */
+	LOAD_MASK(movdqu,%xmm1,%xmm2)
 
 	movl	12(%esp), %ebx	/* source pointer */
 	movl	20(%esp), %edx	/* number of pixels to copy */
@@ -464,6 +491,10 @@ _generic_read_RGBA_span_BGRA8888_REV_SSE2:
 
 
 
+/* Kevin F. Quinn 2nd July 2006
+ * Replace data segment constants with text-segment instructions
+ */
+#if 0
 	.section	.rodata
 
 	.align	16
@@ -510,6 +541,26 @@ scale:
 
 alpha:	.long	0x00000000
 	.long	0x00ff0000
+#endif
+
+#define MASK_565_L	0x07e0f800
+#define MASK_565_H	0x0000001f
+#define SCALE_ADJUST	5
+#if SCALE_ADJUST == 5
+#define PRESCALE_L 0x00100001
+#define PRESCALE_H 0x00000200
+#define SCALE_L 0x40C620E8
+#define SCALE_H 0x0000839d
+#elif SCALE_ADJUST == 0
+#define PRESCALE_L 0x00200001
+#define PRESCALE_H 0x00000800
+#define SCALE_L 0x01040108
+#define SCALE_H 0x00000108
+#else
+#error SCALE_ADJUST must either be 5 or 0.
+#endif
+#define ALPHA_L 0x00000000
+#define ALPHA_H 0x00ff0000
 
 /**
  * MMX optimized version of the RGB565 to RGBA copy routine.
@@ -530,9 +581,25 @@ _generic_read_RGBA_span_RGB565_MMX:
 	movl	8(%esp), %edx	/* destination pointer */
 	movl	12(%esp), %ecx	/* number of pixels to copy */
 
+/* Kevin F. Quinn 2nd July 2006
+ * Replace data segment constants with text-segment instructions
 	movq	mask_565, %mm5
 	movq	prescale, %mm6
 	movq	scale, %mm7
+ */
+ 	pushl	MASK_565_H
+ 	pushl	MASK_565_L
+	movq	(%esp), %mm5
+ 	pushl	PRESCALE_H
+ 	pushl	PRESCALE_L
+	movq	(%esp), %mm6
+ 	pushl	SCALE_H
+ 	pushl	SCALE_L
+	movq	(%esp), %mm7
+ 	pushl	ALPHA_H
+ 	pushl	ALPHA_L
+	movq	(%esp), %mm3
+	addl	$32,%esp
 
 	sarl	$2, %ecx
 	jle	.L01		/* Bail early if the count is negative. */
@@ -581,8 +648,13 @@ _generic_read_RGBA_span_RGB565_MMX:
 	/* Always set the alpha value to 0xff.
 	 */
 
+/* Kevin F. Quinn 2nd July 2006
+ * Replace data segment constants with text-segment instructions
 	por	alpha, %mm0
 	por	alpha, %mm2
+ */
+ 	por %mm3, %mm0
+ 	por %mm3, %mm2
 
 
 	/* Pack the 16-bit values to 8-bit values and store the converted
@@ -609,8 +681,13 @@ _generic_read_RGBA_span_RGB565_MMX:
 	pmulhuw	%mm7, %mm0
 	pmulhuw	%mm7, %mm2
 
+/* Kevin F. Quinn 2nd July 2006
+ * Replace data segment constants with text-segment instructions
 	por	alpha, %mm0
 	por	alpha, %mm2
+ */
+ 	por %mm3, %mm0
+ 	por %mm3, %mm2
 
 	packuswb	%mm2, %mm0
 
@@ -647,8 +724,13 @@ _generic_read_RGBA_span_RGB565_MMX:
 	pmulhuw	%mm7, %mm0
 	pmulhuw	%mm7, %mm2
 
+/* Kevin F. Quinn 2nd July 2006
+ * Replace data segment constants with text-segment instructions
 	por	alpha, %mm0
 	por	alpha, %mm2
+ */
+ 	por %mm3, %mm0
+ 	por %mm3, %mm2
 
 	packuswb	%mm2, %mm0
 
@@ -675,7 +757,11 @@ _generic_read_RGBA_span_RGB565_MMX:
 #endif
 	pmulhuw	%mm7, %mm0
 
+/* Kevin F. Quinn 2nd July 2006
+ * Replace data segment constants with text-segment instructions
 	por	alpha, %mm0
+ */
+ 	por %mm3, %mm0
 
 	packuswb	%mm0, %mm0
 

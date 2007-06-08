@@ -677,12 +677,30 @@ ATTRS( 13 )
 ATTRS( 14 )
 ATTRS( 15 )
 
+ATTRS( 16 )
+ATTRS( 17 )
+ATTRS( 18 )
+ATTRS( 19 )
+ATTRS( 20 )
+ATTRS( 21 )
+ATTRS( 22 )
+ATTRS( 23 )
+ATTRS( 24 )
+ATTRS( 25 )
+ATTRS( 26 )
+ATTRS( 27 )
+ATTRS( 28 )
+ATTRS( 29 )
+ATTRS( 30 )
+ATTRS( 31 )
+
 
 static void _save_reset_vertex( GLcontext *ctx )
 {
    TNLcontext *tnl = TNL_CONTEXT(ctx);
    GLuint i;
 
+   /* conventional attributes */
    save_init_0( tnl );
    save_init_1( tnl );
    save_init_2( tnl );
@@ -699,6 +717,24 @@ static void _save_reset_vertex( GLcontext *ctx )
    save_init_13( tnl );
    save_init_14( tnl );
    save_init_15( tnl );
+
+   /* generic attributes */
+   save_init_16( tnl );
+   save_init_17( tnl );
+   save_init_18( tnl );
+   save_init_19( tnl );
+   save_init_20( tnl );
+   save_init_21( tnl );
+   save_init_22( tnl );
+   save_init_23( tnl );
+   save_init_24( tnl );
+   save_init_25( tnl );
+   save_init_26( tnl );
+   save_init_27( tnl );
+   save_init_28( tnl );
+   save_init_29( tnl );
+   save_init_30( tnl );
+   save_init_31( tnl );
       
    for (i = 0 ; i < _TNL_ATTRIB_MAX ; i++)
       tnl->save.attrsz[i] = 0;
@@ -935,141 +971,198 @@ static void GLAPIENTRY _save_MultiTexCoord4fv( GLenum target, const GLfloat *v )
    DISPATCH_ATTR4FV( attr, v );
 }
 
-static void GLAPIENTRY _save_VertexAttrib1fNV( GLuint index, GLfloat x )
-{
-   if (index < MAX_VERTEX_PROGRAM_ATTRIBS)
-      DISPATCH_ATTR1F( index, x );
-   else
-      enum_error(); 
-}
-
-static void GLAPIENTRY _save_VertexAttrib1fvNV( GLuint index, const GLfloat *v )
-{
-   if (index < MAX_VERTEX_PROGRAM_ATTRIBS)
-      DISPATCH_ATTR1FV( index, v );
-   else
-      enum_error();
-}
-
-static void GLAPIENTRY _save_VertexAttrib2fNV( GLuint index, GLfloat x, GLfloat y )
-{
-   if (index < MAX_VERTEX_PROGRAM_ATTRIBS)
-      DISPATCH_ATTR2F( index, x, y );
-   else
-      enum_error();
-}
-
-static void GLAPIENTRY _save_VertexAttrib2fvNV( GLuint index, const GLfloat *v )
-{
-   if (index < MAX_VERTEX_PROGRAM_ATTRIBS)
-      DISPATCH_ATTR2FV( index, v );
-   else
-      enum_error();
-}
-
-static void GLAPIENTRY _save_VertexAttrib3fNV( GLuint index, GLfloat x, GLfloat y, 
-				  GLfloat z )
-{
-   if (index < MAX_VERTEX_PROGRAM_ATTRIBS)
-      DISPATCH_ATTR3F( index, x, y, z );
-   else
-      enum_error();
-}
-
-static void GLAPIENTRY _save_VertexAttrib3fvNV( GLuint index, const GLfloat *v )
-{
-   if (index < MAX_VERTEX_PROGRAM_ATTRIBS)
-      DISPATCH_ATTR3FV( index, v );
-   else
-      enum_error();
-}
-
-static void GLAPIENTRY _save_VertexAttrib4fNV( GLuint index, GLfloat x, GLfloat y,
-				  GLfloat z, GLfloat w )
-{
-   if (index < MAX_VERTEX_PROGRAM_ATTRIBS)
-      DISPATCH_ATTR4F( index, x, y, z, w );
-   else
-      enum_error();
-}
-
-static void GLAPIENTRY _save_VertexAttrib4fvNV( GLuint index, const GLfloat *v )
-{
-   if (index < MAX_VERTEX_PROGRAM_ATTRIBS)
-      DISPATCH_ATTR4FV( index, v );
-   else
-      enum_error();
-}
 
 
 static void GLAPIENTRY
-_save_VertexAttrib1fARB( GLuint index, GLfloat x )
+_save_VertexAttrib1fNV(GLuint index, GLfloat x)
 {
-   if (index < MAX_VERTEX_ATTRIBS)
+   if (index < MAX_VERTEX_PROGRAM_ATTRIBS) {
+      if (index > 0)
+         index += VERT_ATTRIB_GENERIC0;
       DISPATCH_ATTR1F( index, x );
+   }
    else
       enum_error(); 
 }
 
 static void GLAPIENTRY
-_save_VertexAttrib1fvARB( GLuint index, const GLfloat *v )
+_save_VertexAttrib1fvNV(GLuint index, const GLfloat *v)
 {
-   if (index < MAX_VERTEX_ATTRIBS)
+   if (index < MAX_VERTEX_PROGRAM_ATTRIBS) {
+      if (index > 0)
+         index += VERT_ATTRIB_GENERIC0;
       DISPATCH_ATTR1FV( index, v );
+   }
    else
       enum_error();
 }
 
 static void GLAPIENTRY
-_save_VertexAttrib2fARB( GLuint index, GLfloat x, GLfloat y )
+_save_VertexAttrib2fNV(GLuint index, GLfloat x, GLfloat y)
 {
-   if (index < MAX_VERTEX_ATTRIBS)
+   if (index < MAX_VERTEX_PROGRAM_ATTRIBS) {
+      if (index > 0)
+         index += VERT_ATTRIB_GENERIC0;
       DISPATCH_ATTR2F( index, x, y );
+   }
    else
       enum_error();
 }
 
 static void GLAPIENTRY
-_save_VertexAttrib2fvARB( GLuint index, const GLfloat *v )
+_save_VertexAttrib2fvNV(GLuint index, const GLfloat *v)
 {
-   if (index < MAX_VERTEX_ATTRIBS)
+   if (index < MAX_VERTEX_PROGRAM_ATTRIBS) {
+      if (index > 0)
+         index += VERT_ATTRIB_GENERIC0;
       DISPATCH_ATTR2FV( index, v );
+   }
    else
       enum_error();
 }
 
 static void GLAPIENTRY
-_save_VertexAttrib3fARB( GLuint index, GLfloat x, GLfloat y, GLfloat z )
+_save_VertexAttrib3fNV(GLuint index, GLfloat x, GLfloat y, GLfloat z)
 {
-   if (index < MAX_VERTEX_ATTRIBS)
+   if (index < MAX_VERTEX_PROGRAM_ATTRIBS) {
+      if (index > 0)
+         index += VERT_ATTRIB_GENERIC0;
       DISPATCH_ATTR3F( index, x, y, z );
+   }
    else
       enum_error();
 }
 
 static void GLAPIENTRY
-_save_VertexAttrib3fvARB( GLuint index, const GLfloat *v )
+_save_VertexAttrib3fvNV(GLuint index, const GLfloat *v)
 {
-   if (index < MAX_VERTEX_ATTRIBS)
+   if (index < MAX_VERTEX_PROGRAM_ATTRIBS) {
+      if (index > 0)
+         index += VERT_ATTRIB_GENERIC0;
       DISPATCH_ATTR3FV( index, v );
+   }
    else
       enum_error();
 }
 
 static void GLAPIENTRY
-_save_VertexAttrib4fARB( GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w )
+_save_VertexAttrib4fNV(GLuint index, GLfloat x, GLfloat y,
+                       GLfloat z, GLfloat w)
 {
-   if (index < MAX_VERTEX_ATTRIBS)
+   if (index < MAX_VERTEX_PROGRAM_ATTRIBS) {
+      if (index > 0)
+         index += VERT_ATTRIB_GENERIC0;
       DISPATCH_ATTR4F( index, x, y, z, w );
+   }
    else
       enum_error();
 }
 
 static void GLAPIENTRY
-_save_VertexAttrib4fvARB( GLuint index, const GLfloat *v )
+_save_VertexAttrib4fvNV(GLuint index, const GLfloat *v)
 {
-   if (index < MAX_VERTEX_ATTRIBS)
+   if (index < MAX_VERTEX_PROGRAM_ATTRIBS) {
+      if (index > 0)
+         index += VERT_ATTRIB_GENERIC0;
       DISPATCH_ATTR4FV( index, v );
+   }
+   else
+      enum_error();
+}
+
+static void GLAPIENTRY
+_save_VertexAttrib1fARB(GLuint index, GLfloat x)
+{
+   if (index < MAX_VERTEX_ATTRIBS) {
+      if (index > 0)
+         index += VERT_ATTRIB_GENERIC0;
+      DISPATCH_ATTR1F( index, x );
+   }
+   else
+      enum_error(); 
+}
+
+static void GLAPIENTRY
+_save_VertexAttrib1fvARB(GLuint index, const GLfloat *v)
+{
+   if (index < MAX_VERTEX_ATTRIBS) {
+      if (index > 0)
+         index += VERT_ATTRIB_GENERIC0;
+      DISPATCH_ATTR1FV( index, v );
+   }
+   else
+      enum_error();
+}
+
+static void GLAPIENTRY
+_save_VertexAttrib2fARB(GLuint index, GLfloat x, GLfloat y)
+{
+   if (index < MAX_VERTEX_ATTRIBS) {
+      if (index > 0)
+         index += VERT_ATTRIB_GENERIC0;
+      DISPATCH_ATTR2F( index, x, y );
+   }
+   else
+      enum_error();
+}
+
+static void GLAPIENTRY
+_save_VertexAttrib2fvARB(GLuint index, const GLfloat *v)
+{
+   if (index < MAX_VERTEX_ATTRIBS) {
+      if (index > 0)
+         index += VERT_ATTRIB_GENERIC0;
+      DISPATCH_ATTR2FV( index, v );
+   }
+   else
+      enum_error();
+}
+
+static void GLAPIENTRY
+_save_VertexAttrib3fARB(GLuint index, GLfloat x, GLfloat y, GLfloat z)
+{
+   if (index < MAX_VERTEX_ATTRIBS) {
+      if (index > 0)
+         index += VERT_ATTRIB_GENERIC0;
+      DISPATCH_ATTR3F( index, x, y, z );
+   }
+   else
+      enum_error();
+}
+
+static void GLAPIENTRY
+_save_VertexAttrib3fvARB(GLuint index, const GLfloat *v)
+{
+   if (index < MAX_VERTEX_ATTRIBS) {
+      if (index > 0)
+         index += VERT_ATTRIB_GENERIC0;
+      DISPATCH_ATTR3FV( index, v );
+   }
+   else
+      enum_error();
+}
+
+static void GLAPIENTRY
+_save_VertexAttrib4fARB(GLuint index, GLfloat x, GLfloat y,
+                        GLfloat z, GLfloat w)
+{
+   if (index < MAX_VERTEX_ATTRIBS) {
+      if (index > 0)
+         index += VERT_ATTRIB_GENERIC0;
+      DISPATCH_ATTR4F( index, x, y, z, w );
+   }
+   else
+      enum_error();
+}
+
+static void GLAPIENTRY
+_save_VertexAttrib4fvARB(GLuint index, const GLfloat *v)
+{
+   if (index < MAX_VERTEX_ATTRIBS) {
+      if (index > 0)
+         index += VERT_ATTRIB_GENERIC0;
+      DISPATCH_ATTR4FV( index, v );
+   }
    else
       enum_error();
 }

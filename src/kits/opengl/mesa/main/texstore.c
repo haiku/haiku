@@ -808,7 +808,8 @@ _mesa_swizzle_ubyte_image(GLcontext *ctx,
 
 /*    _mesa_printf("map %d %d %d %d\n", map[0], map[1], map[2], map[3]);  */
 
-   if (srcRowStride == srcWidth * srcComponents &&
+   if (srcRowStride == dstRowStride &&
+       srcRowStride == srcWidth * srcComponents &&
        dimensions < 3) {
       /* 1 and 2D images only */
       GLubyte *dstImage = (GLubyte *) dstAddr
@@ -2770,8 +2771,8 @@ fetch_texel_chan_to_float(const struct gl_texture_image *texImage,
 /**
  * Initialize the texture image's FetchTexelc and FetchTexelf methods.
  */
-static void
-set_fetch_functions(struct gl_texture_image *texImage, GLuint dims)
+void
+_mesa_set_fetch_functions(struct gl_texture_image *texImage, GLuint dims)
 {
    ASSERT(dims == 1 || dims == 2 || dims == 3);
    ASSERT(texImage->TexFormat);
@@ -2831,7 +2832,7 @@ choose_texture_format(GLcontext *ctx, struct gl_texture_image *texImage,
 
    ASSERT(texImage->TexFormat);
 
-   set_fetch_functions(texImage, dims);
+   _mesa_set_fetch_functions(texImage, dims);
 
    if (texImage->TexFormat->TexelBytes == 0) {
       /* must be a compressed format */
@@ -3607,6 +3608,25 @@ _mesa_get_teximage(GLcontext *ctx, GLenum target, GLint level,
                GLint col;
                for (col = 0; col < width; col++) {
                   (*texImage->FetchTexelf)(texImage, col, row, img, rgba[col]);
+                  if (texImage->TexFormat->BaseFormat == GL_ALPHA) {
+                     rgba[col][RCOMP] = 0.0;
+                     rgba[col][GCOMP] = 0.0;
+                     rgba[col][BCOMP] = 0.0;
+                  }
+                  else if (texImage->TexFormat->BaseFormat == GL_LUMINANCE) {
+                     rgba[col][GCOMP] = 0.0;
+                     rgba[col][BCOMP] = 0.0;
+                     rgba[col][ACOMP] = 1.0;
+                  }
+                  else if (texImage->TexFormat->BaseFormat == GL_LUMINANCE_ALPHA) {
+                     rgba[col][GCOMP] = 0.0;
+                     rgba[col][BCOMP] = 0.0;
+                  }
+                  else if (texImage->TexFormat->BaseFormat == GL_INTENSITY) {
+                     rgba[col][GCOMP] = 0.0;
+                     rgba[col][BCOMP] = 0.0;
+                     rgba[col][ACOMP] = 1.0;
+                  }
                }
                _mesa_pack_rgba_span_float(ctx, width, (GLfloat (*)[4]) rgba,
                                           format, type, dest,

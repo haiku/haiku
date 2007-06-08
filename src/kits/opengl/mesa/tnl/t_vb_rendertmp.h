@@ -45,8 +45,8 @@
 #endif
 
 #ifndef TEST_PRIM_END
-#define TEST_PRIM_END(flags) (flags & PRIM_END)
-#define TEST_PRIM_BEGIN(flags) (flags & PRIM_BEGIN)
+#define TEST_PRIM_END(prim) (flags & PRIM_END)
+#define TEST_PRIM_BEGIN(prim) (flags & PRIM_BEGIN)
 #endif
 
 #ifndef ELT

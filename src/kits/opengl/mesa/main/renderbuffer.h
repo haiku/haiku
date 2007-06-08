@@ -64,6 +64,9 @@ _mesa_add_alpha_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
                               GLboolean frontLeft, GLboolean backLeft,
                               GLboolean frontRight, GLboolean backRight);
 
+extern void
+_mesa_copy_soft_alpha_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb);
+
 extern GLboolean
 _mesa_add_depth_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
                              GLuint depthBits);
@@ -99,7 +102,8 @@ extern void
 _mesa_remove_renderbuffer(struct gl_framebuffer *fb, GLuint bufferName);
 
 extern void
-_mesa_dereference_renderbuffer(struct gl_renderbuffer **rb);
+_mesa_reference_renderbuffer(struct gl_renderbuffer **ptr,
+                             struct gl_renderbuffer *rb);
 
 extern struct gl_renderbuffer *
 _mesa_new_depthstencil_renderbuffer(GLcontext *ctx, GLuint name);

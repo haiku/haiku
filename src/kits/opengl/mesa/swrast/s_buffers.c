@@ -80,7 +80,10 @@ clear_rgba_buffer_with_masking(GLcontext *ctx, struct gl_renderbuffer *rb)
    else {
       ASSERT(span.array->ChanType == GL_FLOAT);
       for (i = 0; i < width; i++) {
-         COPY_4V(span.array->rgba[i], ctx->Color.ClearColor);
+         CLAMPED_FLOAT_TO_CHAN(span.array->rgba[i][0], ctx->Color.ClearColor[0]);
+         CLAMPED_FLOAT_TO_CHAN(span.array->rgba[i][1], ctx->Color.ClearColor[1]);
+         CLAMPED_FLOAT_TO_CHAN(span.array->rgba[i][2], ctx->Color.ClearColor[2]);
+         CLAMPED_FLOAT_TO_CHAN(span.array->rgba[i][3], ctx->Color.ClearColor[3]);
       }
    }
 

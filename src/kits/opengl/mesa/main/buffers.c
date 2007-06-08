@@ -140,6 +140,9 @@ _mesa_Clear( GLbitfield mask )
       return;
    }
 
+   if (ctx->DrawBuffer->Width == 0 || ctx->DrawBuffer->Height == 0)
+      return;
+
    if (ctx->RenderMode == GL_RENDER) {
       GLbitfield bufferMask;
 

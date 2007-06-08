@@ -67,13 +67,11 @@ typedef struct {
     * that clip{XYZ} were multiplied by to get ndc{XYZ}.
     */
    GLfloat win[4];
-   GLfloat texcoord[MAX_TEXTURE_COORD_UNITS][4];
    GLchan color[4];
    GLchan specular[4];
-   GLfloat fog;
    GLfloat index;
    GLfloat pointSize;
-   GLfloat attribute[MAX_VERTEX_ATTRIBS][4];
+   GLfloat attrib[FRAG_ATTRIB_MAX][4]; /**< texcoords & varying, more to come */
 } SWvertex;
 
 

@@ -114,40 +114,34 @@ _mesa_initialize_array_object( GLcontext *ctx,
    obj->Vertex.StrideB = 0;
    obj->Vertex.Ptr = NULL;
    obj->Vertex.Enabled = GL_FALSE;
-   obj->Vertex.Flags = CA_CLIENT_DATA;
    obj->Normal.Type = GL_FLOAT;
    obj->Normal.Stride = 0;
    obj->Normal.StrideB = 0;
    obj->Normal.Ptr = NULL;
    obj->Normal.Enabled = GL_FALSE;
-   obj->Normal.Flags = CA_CLIENT_DATA;
    obj->Color.Size = 4;
    obj->Color.Type = GL_FLOAT;
    obj->Color.Stride = 0;
    obj->Color.StrideB = 0;
    obj->Color.Ptr = NULL;
    obj->Color.Enabled = GL_FALSE;
-   obj->Color.Flags = CA_CLIENT_DATA;
    obj->SecondaryColor.Size = 4;
    obj->SecondaryColor.Type = GL_FLOAT;
    obj->SecondaryColor.Stride = 0;
    obj->SecondaryColor.StrideB = 0;
    obj->SecondaryColor.Ptr = NULL;
    obj->SecondaryColor.Enabled = GL_FALSE;
-   obj->SecondaryColor.Flags = CA_CLIENT_DATA;
    obj->FogCoord.Size = 1;
    obj->FogCoord.Type = GL_FLOAT;
    obj->FogCoord.Stride = 0;
    obj->FogCoord.StrideB = 0;
    obj->FogCoord.Ptr = NULL;
    obj->FogCoord.Enabled = GL_FALSE;
-   obj->FogCoord.Flags = CA_CLIENT_DATA;
    obj->Index.Type = GL_FLOAT;
    obj->Index.Stride = 0;
    obj->Index.StrideB = 0;
    obj->Index.Ptr = NULL;
    obj->Index.Enabled = GL_FALSE;
-   obj->Index.Flags = CA_CLIENT_DATA;
    for (i = 0; i < MAX_TEXTURE_UNITS; i++) {
       obj->TexCoord[i].Size = 4;
       obj->TexCoord[i].Type = GL_FLOAT;
@@ -155,13 +149,11 @@ _mesa_initialize_array_object( GLcontext *ctx,
       obj->TexCoord[i].StrideB = 0;
       obj->TexCoord[i].Ptr = NULL;
       obj->TexCoord[i].Enabled = GL_FALSE;
-      obj->TexCoord[i].Flags = CA_CLIENT_DATA;
    }
    obj->EdgeFlag.Stride = 0;
    obj->EdgeFlag.StrideB = 0;
    obj->EdgeFlag.Ptr = NULL;
    obj->EdgeFlag.Enabled = GL_FALSE;
-   obj->EdgeFlag.Flags = CA_CLIENT_DATA;
    for (i = 0; i < VERT_ATTRIB_MAX; i++) {
       obj->VertexAttrib[i].Size = 4;
       obj->VertexAttrib[i].Type = GL_FLOAT;
@@ -170,7 +162,6 @@ _mesa_initialize_array_object( GLcontext *ctx,
       obj->VertexAttrib[i].Ptr = NULL;
       obj->VertexAttrib[i].Enabled = GL_FALSE;
       obj->VertexAttrib[i].Normalized = GL_FALSE;
-      obj->VertexAttrib[i].Flags = CA_CLIENT_DATA;
    }
 
 #if FEATURE_ARB_vertex_buffer_object

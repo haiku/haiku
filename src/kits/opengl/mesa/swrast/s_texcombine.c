@@ -1094,6 +1094,9 @@ _swrast_texture_span( GLcontext *ctx, SWspan *span )
     */
    for (unit = 0; unit < ctx->Const.MaxTextureUnits; unit++) {
       if (ctx->Texture.Unit[unit]._ReallyEnabled) {
+         const GLfloat (*texcoords)[4]
+            = (const GLfloat (*)[4])
+            span->array->attribs[FRAG_ATTRIB_TEX0 + unit];
          const struct gl_texture_unit *texUnit = &ctx->Texture.Unit[unit];
          const struct gl_texture_object *curObj = texUnit->_Current;
          GLfloat *lambda = span->array->lambda[unit];
@@ -1127,8 +1130,7 @@ _swrast_texture_span( GLcontext *ctx, SWspan *span )
 
          /* Sample the texture (span->end = number of fragments) */
          swrast->TextureSample[unit]( ctx, texUnit->_Current, span->end,
-                         (const GLfloat (*)[4]) span->array->texcoords[unit],
-                         lambda, texels );
+                                      texcoords, lambda, texels );
 
          /* GL_SGI_texture_color_table */
          if (texUnit->ColorTableEnabled) {
