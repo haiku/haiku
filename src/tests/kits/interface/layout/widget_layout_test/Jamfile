@@ -13,6 +13,7 @@ SimpleTest WidgetLayoutTest :
 	RadioButton.cpp
 	StringView.cpp
 	Test.cpp
+	TestView.cpp
 	TwoDimensionalSliderView.cpp
 	View.cpp
 	ViewContainer.cpp
