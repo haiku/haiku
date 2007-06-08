@@ -69,7 +69,7 @@ public:
 		// slider view
 		fSliderView = new TwoDimensionalSliderView(
 			new BMessage(MSG_2D_SLIDER_VALUE_CHANGED), this);
-		fSliderView->SetLocationRange(BPoint(30, 40), BPoint(150, 130));
+		fSliderView->SetLocationRange(BPoint(0, 0), BPoint(0, 0));
 		view->AddChild(fSliderView);
 
 		_UpdateSliderConstraints();

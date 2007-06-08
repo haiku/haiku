@@ -16,7 +16,7 @@ TwoDimensionalSliderView::TwoDimensionalSliderView(BMessage* message,
 	  fMaxLocation(0, 0),
 	  fDragging(false)
 {
-	SetViewColor((rgb_color){0, 120, 0, 255});
+	SetViewColor((rgb_color){255, 0, 0, 255});
 }
 
 
