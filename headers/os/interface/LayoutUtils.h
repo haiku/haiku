@@ -22,6 +22,11 @@ public:
 //	static	float				SubtractSizesFloat(float a, float b);
 	static	int32				SubtractSizesInt32(int32 a, int32 b);
 	static	float				SubtractDistances(float a, float b);
+
+	static	void				FixSizeConstraints(float& min, float& max,
+									float& preferred);
+	static	void				FixSizeConstraints(BSize& min, BSize& max,
+									BSize& preferred);
 	
 	static	BSize				ComposeSize(BSize size, BSize layoutSize);
 	static	BAlignment			ComposeAlignment(BAlignment alignment,
