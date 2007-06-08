@@ -2,8 +2,8 @@
  * Copyright 2007, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-#ifndef WIDGET_LAYOUT_TEST_CHECK_BOX_H
-#define WIDGET_LAYOUT_TEST_CHECK_BOX_H
+#ifndef WIDGET_LAYOUT_TEST_RADIO_BUTTON_H
+#define WIDGET_LAYOUT_TEST_RADIO_BUTTON_H
 
 
 #include <Invoker.h>
@@ -76,4 +76,4 @@ private:
 };
 
 
-#endif	// WIDGET_LAYOUT_TEST_CHECK_BOX_H
+#endif	// WIDGET_LAYOUT_TEST_RADIO_BUTTON_H
