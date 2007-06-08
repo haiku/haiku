@@ -28,6 +28,7 @@ public:
 	inline	float				Width() const;
 	inline	float				Height() const;
 
+	inline	void				Set(float width, float height);
 	inline	void				SetWidth(float width);
 	inline	void				SetHeight(float height);
 
@@ -84,6 +85,15 @@ inline float
 BSize::Height() const
 {
 	return height;
+}
+
+
+// Set
+inline void
+BSize::Set(float width, float height)
+{
+	this->width = width;
+	this->height = height;
 }
 
 
