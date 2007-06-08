@@ -157,6 +157,7 @@ MergeObject posix_gnu_arch_$(TARGET_ARCH)_s.o :
 	s_sin.S s_sinf.S s_sinl.S
 	s_sincos.S s_sincosf.S s_sincosl.S
 	s_tan.S s_tanf.S s_tanl.S
+	s_trunc.S s_truncf.S s_truncl.S
 ;
 
 MergeObject posix_gnu_arch_$(TARGET_ARCH)_generic.o :

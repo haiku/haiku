@@ -88,6 +88,7 @@ local genericSources =
 	s_sincos.c s_sincosf.c
 	s_tan.c s_tanf.c
 	s_tanh.c s_tanhf.c
+	s_trunc.c s_truncf.c
 	t_exp.c
 	w_acos.c w_acosf.c # w_acosl.c
 	w_acosh.c w_acoshf.c # w_acoshl.c
