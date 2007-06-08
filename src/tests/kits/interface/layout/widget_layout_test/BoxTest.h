@@ -10,6 +10,7 @@
 
 
 class BBox;
+class LabeledCheckBox;
 class RadioButtonGroup;
 
 
@@ -25,12 +26,20 @@ public:
 
 private:
 			void				_UpdateBorderStyle();
+			void				_UpdateLabel();
+			void				_UpdateLongLabel();
+			void				_UpdateChild();
 
 private:
 			class BorderStyleRadioButton;
+			class LabelRadioButton;
 
 			BBox*				fBox;
+			BView*				fChild;
 			RadioButtonGroup*	fBorderStyleRadioGroup;
+			RadioButtonGroup*	fLabelRadioGroup;
+			LabeledCheckBox*	fLongLabelCheckBox;
+			LabeledCheckBox*	fChildCheckBox;
 };
 
 
