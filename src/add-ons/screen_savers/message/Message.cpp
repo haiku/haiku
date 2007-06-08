@@ -52,6 +52,39 @@ BString *get_message()
 }
 
 
+int get_lines(BString *message, BString*** result, int *longestLine)
+{
+	// First count how many newlines there are
+	int count = 0;
+	int start = 0;
+	while ((start = message->FindFirst('\n', start)) != B_ERROR) {
+		start++; // To move past the new line
+		count++;
+	}
+
+	// Now break the string up and put in result
+	BString **lines = new BString*[count];
+	start = 0;
+	int end = 0;
+	int maxLength = 0;
+	for (int i = 0; ((end = message->FindFirst('\n', start)) != B_ERROR) && i < count; i++) {
+		lines[i] = new BString();
+		message->CopyInto(*lines[i], start, end - start);
+		// Convert tabs to 4 spaces
+		lines[i]->ReplaceAll("\t", "    ");
+		// Look for longest line
+		if (lines[i]->Length() > maxLength) {
+			maxLength = lines[i]->Length();
+			*longestLine = i;
+		}
+		start = end + 1;
+	}
+	*result = lines;
+
+	return count;
+}
+
+
 // Inspired by the classic BeOS screensaver, of course.
 // Thanks to Jon Watte for writing the original.
 class Message : public BScreenSaver
@@ -66,6 +99,7 @@ class Message : public BScreenSaver
 	private:
 		BList			*fFontFamilies;
 		float			fScaleFactor;
+		bool			fPreview;
 };
 
 
@@ -105,6 +139,7 @@ Message::StartConfig(BView *view)
 status_t 
 Message::StartSaver(BView *view, bool preview)
 {
+	fPreview = preview;
 	// Scale factor is based on the system I developed this on, in
 	// other words other factors below depend on this.
 	fScaleFactor = view->Bounds().Height() / 1024;
@@ -168,17 +203,17 @@ Message::Draw(BView *view, int32 frame)
 	offscreen.SetFont(&font);
 
 	// Get the message
-	// TODO: Display the whole message at the bottom of the screen 
-	// in a translucent rect
 	BString *message = get_message();
+	BString *origMessage = new BString();
+	message->CopyInto(*origMessage, 0, message->Length());
 	// Replace newlines and tabs with spaces
 	message->ReplaceSet("\n\t", ' ');
 
 	int height = (int) offscreen.Bounds().Height();
 	int width = (int) offscreen.Bounds().Width();
 
-	// From 8 to 16 iterations
-	int32 iterations = (rand() % 9) + 8;
+	// From 14 to 22 iterations
+	int32 iterations = (rand() % 8) + 14;
 	for (int32 i = 0; i < iterations; i++) {
 		// Randomly set font size and shear
 		BFont font;
@@ -193,9 +228,8 @@ Message::Draw(BView *view, int32 frame)
 		offscreen.SetFont(&font);
 
 		// Randomly set drawing location
-		// TODO: Improve this
 		int x = (rand() % width) - (rand() % width/((rand() % 8)+1));
-		int y = (rand() % height) - (rand() % height/((rand() % 8)+1));
+		int y = rand() % height;
 
 		// Draw new text
 		offscreen.SetHighColor(colors[rand() % 8]);
@@ -214,6 +248,42 @@ Message::Draw(BView *view, int32 frame)
 		offscreen.DrawString(toDraw, BPoint(x, y));
 		delete toDraw;
 	}
+
+	// Now draw the full message in a nice translucent box, but only
+	// if this isn't preview mode
+	if (!fPreview) {
+		BFont font(be_fixed_font); 
+		font.SetSize(14.0); 
+		offscreen.SetFont(&font);
+		font_height fontHeight;
+		font.GetHeight(&fontHeight);
+		float lineHeight = fontHeight.ascent + fontHeight.descent + fontHeight.leading;
+		
+		BString **result = NULL;
+		int longestLine = 0;
+		int count = get_lines(origMessage, &result, &longestLine);
+		float stringWidth = font.StringWidth(result[longestLine]->String());
+		BRect box(0, 0, stringWidth + 20, (lineHeight * count) + 20);
+		box.OffsetTo((width - box.Width()) / 2, height - box.Height() - 40);
+
+		offscreen.SetDrawingMode(B_OP_ALPHA);
+		base_color.alpha = 128;
+		offscreen.SetHighColor(base_color);
+		offscreen.FillRoundRect(box, 8, 8);
+		offscreen.SetHighColor(205, 205, 205);
+		BPoint start = box.LeftTop();
+		start.x += 10;
+		start.y += 10 + fontHeight.ascent + fontHeight.leading;
+		for (int i = 0; i < count; i++) {
+			offscreen.DrawString(result[i]->String(), start);
+			start.y += lineHeight;
+			delete result[i];
+		}
+		delete[] result;
+	}
+
+	delete origMessage;
+	delete message;
 
 	offscreen.Sync();
 	buffer.Unlock();
