@@ -12,10 +12,17 @@
 class BBox : public BView {
 	public:
 							BBox(BRect frame, const char *name = NULL,
-								uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
+								uint32 resizingMode = B_FOLLOW_LEFT
+									| B_FOLLOW_TOP,
 								uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS
 									| B_NAVIGABLE_JUMP,
 								border_style border = B_FANCY_BORDER);
+							BBox(const char* name,
+								uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS
+									| B_NAVIGABLE_JUMP,
+								border_style border = B_FANCY_BORDER,
+								BView* child = NULL);
+							BBox(border_style border, BView* child);
 		virtual				~BBox();
 
 		/* Archiving */
@@ -60,7 +67,16 @@ class BBox : public BView {
 
 		virtual status_t	Perform(perform_code d, void* arg);
 
+		virtual	BSize		MinSize();
+		virtual	BSize		MaxSize();
+		virtual	BSize		PreferredSize();
+
+		virtual	void		InvalidateLayout(bool descendants = false);
+		virtual	void		DoLayout();
+
 	private:
+		struct LayoutData;
+
 		virtual	void		_ReservedBox1();
 		virtual	void		_ReservedBox2();
 
@@ -71,11 +87,14 @@ class BBox : public BView {
 		void				_DrawFancy(BRect labelBox);
 		void				_ClearLabel();
 
+		BView*				_Child() const;
+		void				_ValidateLayoutData();
+
 		char*				fLabel;
 		BRect				fBounds;
 		border_style		fStyle;
 		BView*				fLabelView;
-		BRect*				fLabelBox;
+		LayoutData*			fLayoutData;
 };
 
 #endif	// _BOX_H

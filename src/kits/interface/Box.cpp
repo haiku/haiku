@@ -11,23 +11,72 @@
 
 
 #include <Box.h>
-#include <Message.h>
-#include <Region.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include <Layout.h>
+#include <LayoutUtils.h>
+#include <Message.h>
+#include <Region.h>
+
+
+struct BBox::LayoutData {
+	LayoutData()
+		: valid(false)
+	{
+	}
+
+	BRect	label_box;		// label box (label string or label view); in case
+							// of a label string not including descent
+	BRect	insets;			// insets induced by border and label
+	BSize	min;
+	BSize	max;
+	BSize	preferred;
+	bool	valid;			// validity the other fields
+};
+
 
 BBox::BBox(BRect frame, const char *name, uint32 resizingMode, uint32 flags,
 		border_style border)
-	: BView(frame, name, resizingMode, flags | B_FRAME_EVENTS),
-	fStyle(border)
+	: BView(frame, name, resizingMode, flags  | B_WILL_DRAW | B_FRAME_EVENTS),
+	  fStyle(border)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	_InitObject();
+}
+
+
+BBox::BBox(const char* name, uint32 flags, border_style border, BView* child)
+	: BView(BRect(0, 0, -1, -1), name, B_FOLLOW_NONE,
+		flags | B_WILL_DRAW | B_FRAME_EVENTS | B_SUPPORTS_LAYOUT),
+	  fStyle(border)
+{
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	_InitObject();
+
+	if (child)
+		AddChild(child);
+}
+
+
+BBox::BBox(border_style border, BView* child)
+	: BView(BRect(0, 0, -1, -1), NULL, B_FOLLOW_NONE,
+		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP | B_SUPPORTS_LAYOUT),
+	  fStyle(border)
+{
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	_InitObject();
+
+	if (child)
+		AddChild(child);
 }
 
 
@@ -41,6 +90,8 @@ BBox::BBox(BMessage *archive)
 BBox::~BBox()
 {
 	_ClearLabel();
+
+	delete fLayoutData;
 }
 
 
@@ -75,7 +126,12 @@ BBox::Archive(BMessage *archive, bool deep) const
 void
 BBox::SetBorder(border_style border)
 {
+	if (border == fStyle)
+		return;
+
 	fStyle = border;
+
+	InvalidateLayout();
 
 	if (Window() != NULL && LockLooper()) {
 		Invalidate();
@@ -95,14 +151,12 @@ BBox::Border() const
 float
 BBox::TopBorderOffset()
 {
-	float labelHeight = 0;
+	_ValidateLayoutData();
 
-	if (fLabel != NULL)
-		labelHeight = fLabelBox->Height();
-	else if (fLabelView != NULL)
-		labelHeight = fLabelView->Bounds().Height();
+	if (fLabel != NULL || fLabelView != NULL)
+		return fLayoutData->label_box.Height() / 2;
 
-	return ceilf(labelHeight / 2.0f);
+	return 0;
 }
 
 
@@ -110,24 +164,15 @@ BBox::TopBorderOffset()
 BRect
 BBox::InnerFrame()
 {
-	float borderSize = Border() == B_FANCY_BORDER ? 2.0f
-		: Border() == B_PLAIN_BORDER ? 1.0f : 0.0f;
-	float labelHeight = 0.0f;
+	_ValidateLayoutData();
 
-	if (fLabel != NULL) {
-		// fLabelBox doesn't contain the font's descent, but we want it here
-		font_height fontHeight;
-		GetFontHeight(&fontHeight);
+	BRect frame(Bounds());
+	frame.left += fLayoutData->insets.left;
+	frame.top += fLayoutData->insets.top;
+	frame.right -= fLayoutData->insets.right;
+	frame.bottom -= fLayoutData->insets.bottom;
 
-		labelHeight = ceilf(fontHeight.ascent + fontHeight.descent);
-	} else if (fLabelView != NULL)
-		labelHeight = fLabelView->Bounds().Height();
-
-	BRect rect = Bounds().InsetByCopy(borderSize, borderSize);
-	if (labelHeight)
-		rect.top = Bounds().top + labelHeight;
-
-	return rect;
+	return frame;
 }
 
 
@@ -136,17 +181,10 @@ BBox::SetLabel(const char *string)
 { 
 	_ClearLabel();
 
-	if (string) {
-		font_height fontHeight;
-		GetFontHeight(&fontHeight);
-
+	if (string)
 		fLabel = strdup(string);
 
-		// leave 6 pixels of the frame, and have a gap of 4 pixels between
-		// the frame and the text on both sides
-		fLabelBox = new BRect(6.0f, 0, StringWidth(string) + 14.0f,
-			ceilf(fontHeight.ascent));
-	}
+	InvalidateLayout();
 
 	if (Window())
 		Invalidate();
@@ -163,6 +201,8 @@ BBox::SetLabel(BView *viewLabel)
 		fLabelView->MoveTo(10.0f, 0.0f);
 		AddChild(fLabelView, ChildAt(0));
 	}
+
+	InvalidateLayout();
 
 	if (Window())
 		Invalidate();
@@ -188,11 +228,13 @@ BBox::LabelView() const
 void
 BBox::Draw(BRect updateRect)
 {
+	_ValidateLayoutData();
+
 	PushState();
 
 	BRect labelBox = BRect(0, 0, 0, 0);
 	if (fLabel != NULL) {
-		labelBox = *fLabelBox;
+		labelBox = fLayoutData->label_box;
 		BRegion update(updateRect);
 		update.Exclude(labelBox);
 
@@ -376,54 +418,12 @@ BBox::ResizeToPreferred()
 void
 BBox::GetPreferredSize(float *_width, float *_height)
 {
-	float width, height;
-	bool label = true;
-
-	// acount for label
-	if (fLabelView) {
-		fLabelView->GetPreferredSize(&width, &height);
-		width += 10.0;
-			// the label view is placed 10 pixels from the left
-	} else if (fLabel) {
-		font_height fh;
-		GetFontHeight(&fh);
-		width += ceilf(StringWidth(fLabel));
-		height += ceilf(fh.ascent + fh.descent);
-	} else {
-		label = false;
-		width = 0;
-		height = 0;
-	}
-
-	// acount for border
-	switch (fStyle) {
-		case B_NO_BORDER:
-			break;
-		case B_PLAIN_BORDER:
-			// label: (1 pixel for border + 1 pixel for padding) * 2
-			// no label: (1 pixel for border) * 2 + 1 pixel for padding
-			width += label ? 4 : 3;
-			// label: 1 pixel for bottom border + 1 pixel for padding
-			// no label: (1 pixel for border) * 2 + 1 pixel for padding
-			height += label ? 2 : 3;
-			break;
-		case B_FANCY_BORDER:
-			// label: (2 pixel for border + 1 pixel for padding) * 2
-			// no label: (2 pixel for border) * 2 + 1 pixel for padding
-			width += label ? 6 : 5;
-			// label: 2 pixel for bottom border + 1 pixel for padding
-			// no label: (2 pixel for border) * 2 + 1 pixel for padding
-			height += label ? 3 : 5;
-			break;
-	}
-	// NOTE: children are ignored, you can use BBox::GetPreferredSize()
-	// to get the minimum size of this object, then add the size
-	// of your child(ren) plus inner padding for the final size
+	_ValidateLayoutData();
 
 	if (_width)
-		*_width = width;
+		*_width = fLayoutData->preferred.width;
 	if (_height)
-		*_height = height;
+		*_height = fLayoutData->preferred.height;
 }
 
 
@@ -448,6 +448,80 @@ BBox::Perform(perform_code d, void *arg)
 }
 
 
+BSize
+BBox::MinSize()
+{
+	_ValidateLayoutData();
+
+	BSize size = (GetLayout() ? GetLayout()->MinSize() : fLayoutData->min);
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
+}
+
+
+BSize
+BBox::MaxSize()
+{
+	_ValidateLayoutData();
+
+	BSize size = (GetLayout() ? GetLayout()->MaxSize() : fLayoutData->max);
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
+}
+
+
+BSize
+BBox::PreferredSize()
+{
+	_ValidateLayoutData();
+
+	BSize size = (GetLayout() ? GetLayout()->PreferredSize()
+		: fLayoutData->preferred);
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), size);
+}
+
+
+void
+BBox::InvalidateLayout(bool descendants)
+{
+	fLayoutData->valid = false;
+	BView::InvalidateLayout(descendants);
+}
+
+
+void
+BBox::DoLayout()
+{
+	// Bail out, if we shan't do layout.
+	if (!(Flags() & B_SUPPORTS_LAYOUT))
+		return;
+
+	// If the user set a layout, we let the base class version call its
+	// hook.
+	if (GetLayout()) {
+		BView::DoLayout();
+		return;
+	}
+
+	_ValidateLayoutData();
+
+	// layout the label view
+	if (fLabelView) {
+		fLabelView->MoveTo(fLayoutData->label_box.LeftTop());
+		fLabelView->ResizeTo(fLayoutData->label_box.Size());
+	}
+
+	// layout the child
+	if (BView* child = _Child()) {
+		BRect frame(Bounds());
+		frame.left += fLayoutData->insets.left;
+		frame.top += fLayoutData->insets.top;
+		frame.right -= fLayoutData->insets.right;
+		frame.bottom -= fLayoutData->insets.bottom;
+
+		BLayoutUtils::AlignInFrame(child, frame);
+	}
+}
+
+
 void BBox::_ReservedBox1() {}
 void BBox::_ReservedBox2() {}
 
@@ -466,7 +540,7 @@ BBox::_InitObject(BMessage* archive)
 
 	fLabel = NULL;
 	fLabelView = NULL;
-	fLabelBox = NULL;
+	fLayoutData = new LayoutData;
 
 	int32 flags = 0;
 
@@ -588,13 +662,110 @@ BBox::_ClearLabel()
 	fBounds.top = 0;
 
 	if (fLabel) {
-		delete fLabelBox;
 		free(fLabel);
 		fLabel = NULL;
-		fLabelBox = NULL;
 	} else if (fLabelView) {
 		fLabelView->RemoveSelf();
 		delete fLabelView;
 		fLabelView = NULL;
 	}
 }
+
+
+BView*
+BBox::_Child() const
+{
+	for (int32 i = 0; BView* view = ChildAt(i); i++) {
+		if (view != fLabelView)
+			return view;
+	}
+
+	return NULL;
+}
+
+
+void
+BBox::_ValidateLayoutData()
+{
+	if (fLayoutData->valid)
+		return;
+
+	// compute the label box, width and height
+	bool label = true;
+	float labelHeight = 0;	// height of the label (pixel count)
+	if (fLabel) {
+		// leave 6 pixels of the frame, and have a gap of 4 pixels between
+		// the frame and the text on either side
+		font_height fontHeight;
+		GetFontHeight(&fontHeight);
+		fLayoutData->label_box.Set(6.0f, 0, 14.0f + StringWidth(fLabel),
+			ceilf(fontHeight.ascent));
+		labelHeight = ceilf(fontHeight.ascent + fontHeight.descent) + 1;
+	} else if (fLabelView) {
+		// the label view is placed at (0, 10) at its preferred size
+		BSize size = fLabelView->PreferredSize();
+		fLayoutData->label_box.Set(10, 0, 10 + size.width, size.height);
+		labelHeight = size.height + 1;
+	} else {
+		label = false;
+	}
+
+	// border
+	switch (fStyle) {
+		case B_PLAIN_BORDER:
+			fLayoutData->insets.Set(1, 1, 1, 1);
+			break;
+		case B_FANCY_BORDER:
+			fLayoutData->insets.Set(2, 2, 2, 2);
+			break;
+		case B_NO_BORDER:
+		default:
+			fLayoutData->insets.Set(0, 0, 0, 0);
+			break;
+	}
+
+	// if there's a label, the top inset will be dictated by the label
+	if (label && labelHeight > fLayoutData->insets.top)
+		fLayoutData->insets.top = labelHeight;
+
+	// total number of pixel the border adds
+	float addWidth = fLayoutData->insets.left + fLayoutData->insets.right;
+	float addHeight = fLayoutData->insets.top + fLayoutData->insets.bottom; 
+
+	// compute the minimal width induced by the label
+	float minWidth;
+	if (label)
+		minWidth = fLayoutData->label_box.right + fLayoutData->insets.right;
+	else
+		minWidth = addWidth - 1;
+
+	// finally consider the child constraints, if we shall support layout
+	BView* child = _Child();
+	if (child && (Flags() & B_SUPPORTS_LAYOUT)) {
+		BSize min = child->MinSize();
+		BSize max = child->MaxSize();
+		BSize preferred = child->PreferredSize();
+
+		min.width += addWidth;
+		min.height += addHeight;
+		preferred.width += addWidth;
+		preferred.height += addHeight;
+		max.width = BLayoutUtils::AddDistances(max.width, addWidth - 1);
+		max.height = BLayoutUtils::AddDistances(max.height, addHeight - 1);
+
+		if (min.width < minWidth)
+			min.width = minWidth;
+		BLayoutUtils::FixSizeConstraints(min, max, preferred);
+
+		fLayoutData->min = min;
+		fLayoutData->max = max;
+		fLayoutData->preferred = preferred;
+	} else {
+		fLayoutData->min.Set(minWidth, addHeight - 1);
+		fLayoutData->max.Set(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED);
+		fLayoutData->preferred = fLayoutData->min;
+	}
+
+	fLayoutData->valid = true;
+}
+
