@@ -259,10 +259,11 @@ Message::Draw(BView *view, int32 frame)
 		font.GetHeight(&fontHeight);
 		float lineHeight = fontHeight.ascent + fontHeight.descent + fontHeight.leading;
 		
-		BString **result = NULL;
+		BString **lines = NULL;
 		int longestLine = 0;
-		int count = get_lines(origMessage, &result, &longestLine);
-		float stringWidth = font.StringWidth(result[longestLine]->String());
+		int count = get_lines(origMessage, &lines, &longestLine);
+
+		float stringWidth = font.StringWidth(lines[longestLine]->String());
 		BRect box(0, 0, stringWidth + 20, (lineHeight * count) + 20);
 		box.OffsetTo((width - box.Width()) / 2, height - box.Height() - 40);
 
@@ -275,11 +276,11 @@ Message::Draw(BView *view, int32 frame)
 		start.x += 10;
 		start.y += 10 + fontHeight.ascent + fontHeight.leading;
 		for (int i = 0; i < count; i++) {
-			offscreen.DrawString(result[i]->String(), start);
+			offscreen.DrawString(lines[i]->String(), start);
 			start.y += lineHeight;
-			delete result[i];
+			delete lines[i];
 		}
-		delete[] result;
+		delete[] lines;
 	}
 
 	delete origMessage;
