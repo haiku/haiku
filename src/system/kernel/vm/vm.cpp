@@ -58,8 +58,6 @@
 #define ROUNDOWN(a, b) (((a) / (b)) * (b))
 
 
-extern vm_address_space *gKernelAddressSpace;
-
 #define REGION_HASH_TABLE_SIZE 1024
 static area_id sNextAreaID;
 static hash_table *sAreaHash;
@@ -1321,7 +1319,7 @@ vm_clone_area(team_id team, const char *name, void **address, uint32 addressSpec
 	//	have been adapted. Maybe it should be part of the kernel settings,
 	//	anyway (so that old drivers can always work).
 #if 0
-	if (sourceArea->aspace == gKernelAddressSpace && addressSpace != gKernelAddressSpace
+	if (sourceArea->aspace == vm_kernel_address_space() && addressSpace != vm_kernel_address_space()
 		&& !(sourceArea->protection & B_USER_CLONEABLE_AREA)) {
 		// kernel areas must not be cloned in userland, unless explicitly
 		// declared user-cloneable upon construction
@@ -2574,7 +2572,7 @@ unmap_and_free_physical_pages(vm_translation_map *map, addr_t start, addr_t end)
 void
 vm_free_unused_boot_loader_range(addr_t start, addr_t size)
 {
-	vm_translation_map *map = &gKernelAddressSpace->translation_map;
+	vm_translation_map *map = &vm_kernel_address_space()->translation_map;
 	addr_t end = start + size;
 	addr_t lastEnd = start;
 	vm_area *area;
@@ -2587,7 +2585,7 @@ vm_free_unused_boot_loader_range(addr_t start, addr_t size)
 
 	map->ops->lock(map);
 
-	for (area = gKernelAddressSpace->areas; area; area = area->address_space_next) {
+	for (area = vm_kernel_address_space()->areas; area; area = area->address_space_next) {
 		addr_t areaStart = area->base;
 		addr_t areaEnd = areaStart + area->size;
 
@@ -2981,7 +2979,7 @@ vm_init_post_sem(kernel_args *args)
 	arch_vm_translation_map_init_post_sem(args);
 	vm_address_space_init_post_sem();
 
-	for (area = gKernelAddressSpace->areas; area; area = area->address_space_next) {
+	for (area = vm_kernel_address_space()->areas; area; area = area->address_space_next) {
 		if (area->id == RESERVED_AREA_ID)
 			continue;
 
@@ -3617,14 +3615,14 @@ found:
 status_t
 vm_get_physical_page(addr_t paddr, addr_t *_vaddr, uint32 flags)
 {
-	return (*gKernelAddressSpace->translation_map.ops->get_physical_page)(paddr, _vaddr, flags);
+	return (*vm_kernel_address_space()->translation_map.ops->get_physical_page)(paddr, _vaddr, flags);
 }
 
 
 status_t
 vm_put_physical_page(addr_t vaddr)
 {
-	return (*gKernelAddressSpace->translation_map.ops->put_physical_page)(vaddr);
+	return (*vm_kernel_address_space()->translation_map.ops->put_physical_page)(vaddr);
 }
 
 

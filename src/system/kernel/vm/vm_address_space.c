@@ -26,7 +26,8 @@
 #	define TRACE(x) ;
 #endif
 
-vm_address_space *gKernelAddressSpace;
+
+static vm_address_space *sKernelAddressSpace;
 
 #define ASPACE_HASH_TABLE_SIZE 1024
 static void *sAddressSpaceTable;
@@ -140,7 +141,7 @@ delete_address_space(vm_address_space *addressSpace)
 {
 	TRACE(("delete_address_space: called on aspace 0x%lx\n", addressSpace->id));
 
-	if (addressSpace == gKernelAddressSpace)
+	if (addressSpace == sKernelAddressSpace)
 		panic("tried to delete the kernel aspace!\n");
 
 	// put this aspace in the deletion state
@@ -178,22 +179,22 @@ vm_address_space *
 vm_get_kernel_address_space(void)
 {
 	/* we can treat this one a little differently since it can't be deleted */
-	atomic_add(&gKernelAddressSpace->ref_count, 1);
-	return gKernelAddressSpace;
+	atomic_add(&sKernelAddressSpace->ref_count, 1);
+	return sKernelAddressSpace;
 }
 
 
 vm_address_space *
 vm_kernel_address_space(void)
 {
-	return gKernelAddressSpace;
+	return sKernelAddressSpace;
 }
 
 
 team_id
 vm_kernel_address_space_id(void)
 {
-	return gKernelAddressSpace->id;
+	return sKernelAddressSpace->id;
 }
 
 
@@ -354,11 +355,11 @@ vm_address_space_init(void)
 			panic("vm_init: error creating aspace hash table\n");
 	}
 
-	gKernelAddressSpace = NULL;
+	sKernelAddressSpace = NULL;
 
 	// create the initial kernel address space
 	if (vm_create_address_space(1, KERNEL_BASE, KERNEL_SIZE,
-			true, &gKernelAddressSpace) != B_OK)
+			true, &sKernelAddressSpace) != B_OK)
 		panic("vm_init: error creating kernel address space!\n");
 
 	add_debugger_command("aspaces", &dump_aspace_list, "Dump a list of all address spaces");
@@ -371,11 +372,11 @@ vm_address_space_init(void)
 status_t
 vm_address_space_init_post_sem(void)
 {
-	status_t status = arch_vm_translation_map_init_kernel_map_post_sem(&gKernelAddressSpace->translation_map);
+	status_t status = arch_vm_translation_map_init_kernel_map_post_sem(&sKernelAddressSpace->translation_map);
 	if (status < B_OK)
 		return status;
 
-	status = gKernelAddressSpace->sem = create_sem(WRITE_COUNT, "kernel_aspacelock");
+	status = sKernelAddressSpace->sem = create_sem(WRITE_COUNT, "kernel_aspacelock");
 	if (status < B_OK)
 		return status;
 
