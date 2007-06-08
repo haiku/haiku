@@ -28,6 +28,8 @@ public:
 	virtual	void				MouseMoved(BPoint where, uint32 code,
 									const BMessage* message);
 
+	virtual	void				InvalidateLayout(bool descendants);
+
 	// View hooks
 
 	virtual	void				InvalidateLayout();

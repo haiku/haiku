@@ -119,6 +119,13 @@ ViewContainer::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 
 
 void
+ViewContainer::InvalidateLayout(bool descendants)
+{
+	BView::InvalidateLayout(descendants);
+}
+
+
+void
 ViewContainer::InvalidateLayout()
 {
 	if (View::IsLayoutValid()) {
