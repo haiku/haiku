@@ -16,6 +16,7 @@
 #include <Button.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <Font.h>
 #include <IconUtils.h>
 #include <Invoker.h>
 #include <Looper.h>
@@ -61,8 +62,16 @@ static const int kWindowOffsetMinWidth = 335;
 
 static const int kIconStripeWidth = 30;
 
-static const int kTextIconOffset = kWindowIconOffset + kIconStripeWidth - 2;
 static const int kTextButtonOffset = 10;
+
+static inline int32
+icon_layout_scale()
+{
+#ifdef __HAIKU__
+	return max_c(1, ((int32)be_plain_font->Size() + 15) / 16);
+#endif
+	return 1;	
+}
 
 
 class TAlertView : public BView {
@@ -498,11 +507,12 @@ BAlert::_InitObject(const char* text, const char* button0, const char* button1,
 
 	// Adjust the window's width, if necessary
 
+	int32 iconLayoutScale = icon_layout_scale();
 	float totalWidth = kRightOffset + fButtons[buttonCount - 1]->Frame().right
 		- defaultButtonFrameWidth - fButtons[0]->Frame().left;
-	if (view->Bitmap())
-		totalWidth += kIconStripeWidth + kWindowIconOffset;
-	else
+	if (view->Bitmap()) {
+		totalWidth += (kIconStripeWidth + kWindowIconOffset) * iconLayoutScale;
+	} else
 		totalWidth += kWindowMinOffset;
 
 	float width = (spacing == B_OFFSET_SPACING
@@ -516,7 +526,8 @@ BAlert::_InitObject(const char* text, const char* button0, const char* button1,
 		Bounds().right - kRightOffset,
 		fButtons[0]->Frame().top - kTextButtonOffset);
 	if (view->Bitmap())
-		textViewRect.left = kTextIconOffset;
+		textViewRect.left = (kWindowIconOffset
+			+ kIconStripeWidth) * iconLayoutScale - 2;
 
 	fTextView = new BTextView(textViewRect, "_tv_",
 		textViewRect.OffsetByCopy(B_ORIGIN),
@@ -600,8 +611,7 @@ BAlert::_InitIcon()
 			return NULL;
 	}
 
-	int32 iconSize = 32;
-
+	int32 iconSize = 32 * icon_layout_scale();
 	// Allocate the icon bitmap
 	icon = new (std::nothrow) BBitmap(BRect(0, 0, iconSize - 1, iconSize - 1),
 		0, B_RGBA32);
@@ -732,17 +742,21 @@ TAlertView::Archive(BMessage* archive, bool deep) const
 void
 TAlertView::Draw(BRect updateRect)
 {
-	// Here's the fun stuff
-	if (fIconBitmap) {
-		BRect stripeRect = Bounds();
-		stripeRect.right = kIconStripeWidth;
-		SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
-		FillRect(stripeRect);
+	if (!fIconBitmap)
+		return;
 
-		SetDrawingMode(B_OP_ALPHA);
-		SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-		DrawBitmapAsync(fIconBitmap, BPoint(18, 6));
-	}
+	// Here's the fun stuff
+	BRect stripeRect = Bounds();
+	int32 iconLayoutScale = icon_layout_scale();
+	stripeRect.right = kIconStripeWidth * iconLayoutScale;
+	SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
+	FillRect(stripeRect);
+
+	SetDrawingMode(B_OP_ALPHA);
+	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+	DrawBitmapAsync(fIconBitmap, BPoint(18 * iconLayoutScale,
+		6 * iconLayoutScale));
+
 }
 
 
