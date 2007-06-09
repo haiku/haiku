@@ -10,13 +10,16 @@
 
 
 #include <CheckBox.h>
+
+#include <LayoutUtils.h>
 #include <Window.h>
 
 
 BCheckBox::BCheckBox(BRect frame, const char *name, const char *label,
 		BMessage *message, uint32 resizingMode, uint32 flags)
 	: BControl(frame, name, label, message, resizingMode, flags),
-	fOutlined(false)
+	  fPreferredSize(-1, -1),
+	  fOutlined(false)
 {
 	// Resize to minimum height if needed
 	font_height fontHeight;
@@ -25,6 +28,23 @@ BCheckBox::BCheckBox(BRect frame, const char *name, const char *label,
 		+ fontHeight.descent);
 	if (Bounds().Height() < minHeight)
 		ResizeTo(Bounds().Width(), minHeight);
+}
+
+
+BCheckBox::BCheckBox(const char *name, const char *label, BMessage *message,
+	uint32 flags)
+	: BControl(name, label, message, flags | B_WILL_DRAW | B_NAVIGABLE),
+	  fPreferredSize(-1, -1),
+	  fOutlined(false)
+{
+}
+
+
+BCheckBox::BCheckBox(const char *label, BMessage *message)
+	: BControl(NULL, label, message, B_WILL_DRAW | B_NAVIGABLE),
+	  fPreferredSize(-1, -1),
+	  fOutlined(false)
+{
 }
 
 
@@ -434,6 +454,40 @@ BCheckBox::Perform(perform_code d, void *arg)
 }
 
 
+void
+BCheckBox::InvalidateLayout(bool descendants)
+{
+	// invalidate cached preferred size
+	fPreferredSize.Set(-1, -1);
+
+	BControl::InvalidateLayout(descendants);
+}
+
+
+BSize
+BCheckBox::MinSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(),
+		_ValidatePreferredSize());
+}
+
+
+BSize
+BCheckBox::MaxSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
+		BSize(B_SIZE_UNLIMITED, _ValidatePreferredSize().height));
+}
+
+
+BSize
+BCheckBox::PreferredSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(),
+		_ValidatePreferredSize());
+}
+
+
 void BCheckBox::_ReservedCheckBox1() {}
 void BCheckBox::_ReservedCheckBox2() {}
 void BCheckBox::_ReservedCheckBox3() {}
@@ -454,4 +508,26 @@ BCheckBox::_CheckBoxFrame() const
 
 	return BRect(1.0f, 3.0f, ceilf(3.0f + fontHeight.ascent),
 		ceilf(5.0f + fontHeight.ascent));
+}
+
+
+BSize
+BCheckBox::_ValidatePreferredSize()
+{
+	if (fPreferredSize.width < 0) {
+		font_height fontHeight;
+		GetFontHeight(&fontHeight);
+
+		float width = 12.0f + fontHeight.ascent;
+
+		if (Label())
+			width += StringWidth(Label());
+
+		fPreferredSize.width = (float)ceil(width);
+
+		fPreferredSize.height = (float)ceil(6.0f + fontHeight.ascent
+			+ fontHeight.descent);
+	}
+
+	return fPreferredSize;
 }

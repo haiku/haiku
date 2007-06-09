@@ -51,6 +51,12 @@ public:
 							BMessage *message,
 							uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 							uint32 flags = B_WILL_DRAW | B_NAVIGABLE); 
+					BCheckBox(const char *name,
+							const char *label,
+							BMessage *message,
+							uint32 flags = B_WILL_DRAW | B_NAVIGABLE); 
+					BCheckBox(const char *label,
+							BMessage *message = NULL); 
 virtual				~BCheckBox();
 
 /* Archiving */
@@ -88,6 +94,12 @@ virtual void		AllDetached();
 
 virtual status_t	Perform(perform_code d, void *arg);
 
+virtual	void		InvalidateLayout(bool descendants = false);
+
+virtual	BSize		MinSize();
+virtual	BSize		MaxSize();
+virtual	BSize		PreferredSize();
+
 private:
 
 virtual	void		_ReservedCheckBox1();
@@ -95,11 +107,12 @@ virtual	void		_ReservedCheckBox2();
 virtual	void		_ReservedCheckBox3();
 
 		BRect		_CheckBoxFrame() const;
+		BSize		_ValidatePreferredSize();
 
 		BCheckBox	&operator=(const BCheckBox &);
 
+		BSize		fPreferredSize;
 		bool		fOutlined;
-		uint32		_reserved[2];
 };
 //------------------------------------------------------------------------------
 
