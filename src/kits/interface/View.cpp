@@ -3605,13 +3605,6 @@ BView::ResizeBy(float deltaWidth, float deltaHeight)
 {
 	// TODO: this doesn't look like it would work correctly with scrolled views
 
-	// NOTE: I think this check makes sense, but I didn't
-	// test what R5 does.
-	if (fBounds.right + deltaWidth < 0)
-		deltaWidth = -fBounds.right;
-	if (fBounds.bottom + deltaHeight < 0)
-		deltaHeight = -fBounds.bottom;
-
 	// BeBook says we should do this. And it makes sense.
 	deltaWidth = roundf(deltaWidth);
 	deltaHeight = roundf(deltaHeight);
