@@ -51,6 +51,7 @@ class ProgressWindow : public BWindow {
 const uint32 kMsgTypeSelected = 'typs';
 const uint32 kMsgTypeInvoked = 'typi';
 const uint32 kMsgRemoveUninstalled = 'runs';
+const uint32 kMsgEdit = 'edit';
 
 
 const char*
@@ -267,7 +268,7 @@ ApplicationTypesWindow::ApplicationTypesWindow(const BMessage &settings)
 	rect = box->Frame();
 	rect.top = rect.bottom + 8.0f;
 	rect.bottom = rect.top + 20.0f;
-	fTrackerButton = new BButton(rect, "tracker", "Open In Tracker" B_UTF8_ELLIPSIS, NULL,
+	fTrackerButton = new BButton(rect, "tracker", "Show In Tracker" B_UTF8_ELLIPSIS, NULL,
 		B_FOLLOW_RIGHT);
 	fTrackerButton->ResizeToPreferred();
 	fTrackerButton->MoveTo(rect.right - fTrackerButton->Bounds().Width(), rect.top);
@@ -279,9 +280,16 @@ ApplicationTypesWindow::ApplicationTypesWindow(const BMessage &settings)
 	fLaunchButton->MoveTo(fTrackerButton->Frame().left - 6.0f
 		- fLaunchButton->Bounds().Width(), rect.top);
 	topView->AddChild(fLaunchButton);
+	
+	fEditButton = new BButton(rect, "edit", "Edit" B_UTF8_ELLIPSIS, new BMessage(kMsgEdit),
+		B_FOLLOW_RIGHT);
+	fEditButton->ResizeToPreferred();
+	fEditButton->MoveTo(fLaunchButton->Frame().left - 6.0f
+		- fEditButton->Bounds().Width(), rect.top);
+	topView->AddChild(fEditButton);
 
 	SetSizeLimits(scrollView->Frame().right + 22.0f + fTrackerButton->Frame().Width()
-		+ fLaunchButton->Frame().Width(), 32767.0f,
+		+ fLaunchButton->Frame().Width() + 6 + fEditButton->Frame().Width(), 32767.0f,
 		fTrackerButton->Frame().bottom + 8.0f, 32767.0f);
 
 	BMimeType::StartWatching(this);
@@ -417,7 +425,7 @@ ApplicationTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 			path.GetParent(&path);
 			fPathView->SetText(path.Path());
 
-			// Set "Open In Tracker" message
+			// Set "Show In Tracker" message
 			BEntry entry(path.Path());
 			entry_ref directoryRef;
 			if (entry.GetRef(&directoryRef) == B_OK) {
@@ -456,7 +464,7 @@ ApplicationTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 		}
 	} else {
 		fNameView->SetText(NULL);
-		fNameView->SetText(NULL);
+		fSignatureView->SetText(NULL);
 		fPathView->SetText(NULL);
 
 		fVersionView->SetText(NULL);
@@ -472,6 +480,7 @@ ApplicationTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 
 	fTrackerButton->SetEnabled(enabled && appFound);
 	fLaunchButton->SetEnabled(enabled && appFound);
+	fEditButton->SetEnabled(enabled && appFound);
 }
 
 
@@ -519,7 +528,13 @@ ApplicationTypesWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		}
-
+		
+		case kMsgEdit:
+		{
+			fTypeListView->Invoke();
+			break;
+		}
+		
 		case kMsgRemoveUninstalled:
 			_RemoveUninstalled();
 			break;

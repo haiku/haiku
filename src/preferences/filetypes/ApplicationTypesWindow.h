@@ -53,6 +53,7 @@ class ApplicationTypesWindow : public BWindow {
 
 		BButton*		fTrackerButton;
 		BButton*		fLaunchButton;
+		BButton*		fEditButton;
 };
 
 #endif	// APPLICATION_TYPES_WINDOW_H
