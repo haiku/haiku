@@ -57,7 +57,7 @@ public:
 							BMessage *message,
 							uint32 flags = B_WILL_DRAW | B_NAVIGABLE
 								| B_FULL_UPDATE_ON_RESIZE);
-					BButton(const char* label, BMessage *message);
+					BButton(const char* label, BMessage *message = NULL);
 	
 virtual				~BButton();
 
@@ -98,10 +98,15 @@ virtual BHandler	*ResolveSpecifier(BMessage *message,
 virtual	status_t	GetSupportedSuites(BMessage *message);
 virtual status_t	Perform(perform_code d, void *arg);
 
+virtual	void		InvalidateLayout(bool descendants = false);
+
+virtual	BSize		MinSize();
 virtual	BSize		MaxSize();
+virtual	BSize		PreferredSize();
 
 
 private:
+		BSize		_ValidatePreferredSize();
 	
 virtual	void		_ReservedButton1();
 virtual	void		_ReservedButton2();
@@ -115,9 +120,9 @@ virtual	void		_ReservedButton3();
 			 
 		status_t	Execute ();
 
-		float		fCachedWidth;
+		BSize		fPreferredSize;
 		bool		fDrawAsDefault;
-		uint32		_reserved[3];
+		uint32		_reserved[2];
 };
 //------------------------------------------------------------------------------
 

@@ -23,6 +23,7 @@ BButton::BButton(BRect frame, const char *name, const char *label, BMessage *mes
 				  uint32 resizingMode, uint32 flags)
 	:	BControl(frame, name, label, message, resizingMode,
 			flags | B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
+		fPreferredSize(-1, -1),
 		fDrawAsDefault(false)
 {
 	// Resize to minimum height if needed
@@ -36,31 +37,20 @@ BButton::BButton(BRect frame, const char *name, const char *label, BMessage *mes
 
 BButton::BButton(const char* name, const char* label, BMessage *message,
 				 uint32 flags)
-	:	BControl(BRect(0, 0, -1, -1), name, label, message, B_FOLLOW_NONE,
-			flags | B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_SUPPORTS_LAYOUT),
+	:	BControl(name, label, message,
+			flags | B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
+		fPreferredSize(-1, -1),
 		fDrawAsDefault(false)
 {
-	// Resize to minimum height if needed
-	font_height fh;
-	GetFontHeight(&fh);
-	float minHeight = 12.0f + (float)ceil(fh.ascent + fh.descent);
-	if (Bounds().Height() < minHeight)
-		ResizeTo(Bounds().Width(), minHeight);
 }
 
 
 BButton::BButton(const char* label, BMessage *message)
-	:	BControl(BRect(0, 0, -1, -1), NULL, label, message, B_FOLLOW_NONE,
-			B_WILL_DRAW | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE
-			| B_SUPPORTS_LAYOUT),
+	:	BControl(NULL, label, message,
+			B_WILL_DRAW | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE),
+		fPreferredSize(-1, -1),
 		fDrawAsDefault(false)
 {
-	// Resize to minimum height if needed
-	font_height fh;
-	GetFontHeight(&fh);
-	float minHeight = 12.0f + (float)ceil(fh.ascent + fh.descent);
-	if (Bounds().Height() < minHeight)
-		ResizeTo(Bounds().Width(), minHeight);
 }
 
 
@@ -622,25 +612,13 @@ BButton::SetValue(int32 value)
 void
 BButton::GetPreferredSize(float *_width, float *_height)
 {
-	if (_height) {
-		font_height fontHeight;
-		GetFontHeight(&fontHeight);
+	_ValidatePreferredSize();
 
-//		*_height = 12.0f + ceilf(fontHeight.ascent + fontHeight.descent)
-		*_height = ceilf((fontHeight.ascent + fontHeight.descent) * 1.8)
-			+ (fDrawAsDefault ? 6.0f : 0);
-	}
+	if (_width)
+		*_width = fPreferredSize.width;
 
-	if (_width) {
-		float width = 20.0f + (float)ceil(StringWidth(Label()));
-		if (width < 75.0f)
-			width = 75.0f;
-
-		if (fDrawAsDefault)
-			width += 6.0f;
-
-		*_width = width;
-	}
+	if (_height)
+		*_height = fPreferredSize.height;
 }
 
 
@@ -723,13 +701,37 @@ BButton::Perform(perform_code d, void *arg)
 }
 
 
+void
+BButton::InvalidateLayout(bool descendants)
+{
+	// invalidate cached preferred size
+	fPreferredSize.Set(-1, -1);
+
+	BControl::InvalidateLayout(descendants);
+}
+
+
+BSize
+BButton::MinSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(),
+		_ValidatePreferredSize());
+}
+
+
 BSize
 BButton::MaxSize()
 {
-	float width, height;
-	GetPreferredSize(&width, &height);
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
+		_ValidatePreferredSize());
+}
 
-	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), BSize(width, height));
+
+BSize
+BButton::PreferredSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(),
+		_ValidatePreferredSize());
 }
 
 
@@ -844,3 +846,31 @@ BButton::DrawFocusLine(float x, float y, float width, bool visible)
 	// White Line
 	StrokeLine(BPoint(x, y + 1.0f), BPoint(x + width, y + 1.0f));
 }
+
+
+BSize
+BButton::_ValidatePreferredSize()
+{
+	if (fPreferredSize.width < 0) {
+		// width
+		float width = 20.0f + (float)ceil(StringWidth(Label()));
+		if (width < 75.0f)
+			width = 75.0f;
+
+		if (fDrawAsDefault)
+			width += 6.0f;
+
+		fPreferredSize.width = width;
+
+		// height
+		font_height fontHeight;
+		GetFontHeight(&fontHeight);
+	
+		fPreferredSize.height
+			= ceilf((fontHeight.ascent + fontHeight.descent) * 1.8)
+				+ (fDrawAsDefault ? 6.0f : 0);
+	}
+
+	return fPreferredSize;
+}
+
