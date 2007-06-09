@@ -9,6 +9,8 @@ SimpleTest WidgetLayoutTest :
 	BoxTest.cpp
 	ButtonTest.cpp
 	CheckBox.cpp
+	CheckBoxTest.cpp
+	ControlTest.cpp
 	GroupView.cpp
 	RadioButton.cpp
 	StringView.cpp

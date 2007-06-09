@@ -11,6 +11,7 @@
 #include "BoxTest.h"
 #include "ButtonTest.h"
 #include "CheckBox.h"
+#include "CheckBoxTest.h"
 #include "GroupView.h"
 #include "StringView.h"
 #include "Test.h"
@@ -273,6 +274,8 @@ main(int argc, const char* const* argv)
 		test = new BoxTest;
 	} else if (strcmp(testName, "button") == 0) {
 		test = new ButtonTest;
+	} else if (strcmp(testName, "checkbox") == 0) {
+		test = new CheckBoxTest;
 	} else {
 		fprintf(stderr, "Error: Invalid test name: \"%s\"\n", testName);
 		exit(1);

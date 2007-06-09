@@ -24,7 +24,7 @@ public:
 			const char*			Description() const;
 
 	virtual	BView*				GetView() const;
-			void				SetView(BView* view);
+	virtual	void				SetView(BView* view);
 
 	virtual	void				ActivateTest(View* controls);
 	virtual	void				DectivateTest();
