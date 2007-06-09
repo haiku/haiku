@@ -1,0 +1,22 @@
+SubDir HAIKU_TOP src apps launchbox ;
+
+AddSubDirSupportedPlatforms libbe_test ;
+
+Application LaunchBox :
+	App.cpp
+	IconButton.cpp
+	LaunchButton.cpp
+	main.cpp
+	MainWindow.cpp
+	NamePanel.cpp
+	PadView.cpp
+	Panel.cpp
+	support.cpp
+	: be translation
+	: LaunchBox.rdef
+;
+
+if $(TARGET_PLATFORM) = libbe_test {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : LaunchBox
+		: tests!apps ;
+}
