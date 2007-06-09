@@ -60,6 +60,10 @@ public:
 						BMessage *message,
 						uint32 resizingMode,
 						uint32 flags);
+					BControl(const char *name,
+						const char *label,
+						BMessage *message,
+						uint32 flags);
 virtual				~BControl();
 
 					BControl(BMessage *archive);
@@ -131,10 +135,3 @@ virtual	void		_ReservedControl4();
 //------------------------------------------------------------------------------
 
 #endif // _CONTROL_H
-
-/*
- * $Log $
- *
- * $Id  $
- *
- */

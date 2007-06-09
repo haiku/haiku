@@ -54,6 +54,17 @@ BControl::BControl(BRect frame, const char *name, const char *label,
 }
 
 
+BControl::BControl(const char *name, const char *label, BMessage *message,
+	uint32 flags)
+	: BView(name, flags)
+{
+	InitData(NULL);
+
+	SetLabel(label);
+	SetMessage(message);
+}
+
+
 BControl::~BControl()
 {
 	free(fLabel);
