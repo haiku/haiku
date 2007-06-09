@@ -1,9 +1,9 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.2.11 - June 7, 2004
+ * Last changed in libpng 1.2.17 May 15, 2007
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2006 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -28,6 +28,7 @@ void PNGAPI
 png_process_data(png_structp png_ptr, png_infop info_ptr,
    png_bytep buffer, png_size_t buffer_size)
 {
+   if(png_ptr == NULL) return;
    png_push_restore_buffer(png_ptr, buffer, buffer_size);
 
    while (png_ptr->buffer_size)
@@ -42,6 +43,7 @@ png_process_data(png_structp png_ptr, png_infop info_ptr,
 void /* PRIVATE */
 png_process_some_data(png_structp png_ptr, png_infop info_ptr)
 {
+   if(png_ptr == NULL) return;
    switch (png_ptr->process_mode)
    {
       case PNG_READ_SIG_MODE:
@@ -561,6 +563,7 @@ png_push_fill_buffer(png_structp png_ptr, png_bytep buffer, png_size_t length)
 {
    png_bytep ptr;
 
+   if(png_ptr == NULL) return;
    ptr = buffer;
    if (png_ptr->save_buffer_size)
    {
@@ -1485,8 +1488,6 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32
 #if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
    if (png_ptr->flags & PNG_FLAG_KEEP_UNKNOWN_CHUNKS)
    {
-       png_unknown_chunk chunk;
-
 #ifdef PNG_MAX_MALLOC_64K
        if (length > (png_uint_32)65535L)
        {
@@ -1495,28 +1496,35 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32
            length = (png_uint_32)65535L;
        }
 #endif
-
-       png_strcpy((png_charp)chunk.name, (png_charp)png_ptr->chunk_name);
-       chunk.data = (png_bytep)png_malloc(png_ptr, length);
-       png_crc_read(png_ptr, chunk.data, length);
-       chunk.size = length;
+       png_strcpy((png_charp)png_ptr->unknown_chunk.name,
+         (png_charp)png_ptr->chunk_name);
+       png_ptr->unknown_chunk.data = (png_bytep)png_malloc(png_ptr, length);
+       png_ptr->unknown_chunk.size = (png_size_t)length;
+       png_crc_read(png_ptr, (png_bytep)png_ptr->unknown_chunk.data, length);
 #if defined(PNG_READ_USER_CHUNKS_SUPPORTED)
        if(png_ptr->read_user_chunk_fn != NULL)
        {
           /* callback to user unknown chunk handler */
-          if ((*(png_ptr->read_user_chunk_fn)) (png_ptr, &chunk) <= 0)
+          int ret;
+          ret = (*(png_ptr->read_user_chunk_fn))
+            (png_ptr, &png_ptr->unknown_chunk);
+          if (ret < 0)
+             png_chunk_error(png_ptr, "error in user chunk");
+          if (ret == 0)
           {
              if (!(png_ptr->chunk_name[0] & 0x20))
                 if(png_handle_as_unknown(png_ptr, png_ptr->chunk_name) !=
                      PNG_HANDLE_CHUNK_ALWAYS)
                    png_chunk_error(png_ptr, "unknown critical chunk");
+                png_set_unknown_chunks(png_ptr, info_ptr,
+                   &png_ptr->unknown_chunk, 1);
           }
-             png_set_unknown_chunks(png_ptr, info_ptr, &chunk, 1);
        }
-       else
+#else
+       png_set_unknown_chunks(png_ptr, info_ptr, &png_ptr->unknown_chunk, 1);
 #endif
-          png_set_unknown_chunks(png_ptr, info_ptr, &chunk, 1);
-       png_free(png_ptr, chunk.data);
+       png_free(png_ptr, png_ptr->unknown_chunk.data);
+       png_ptr->unknown_chunk.data = NULL;
    }
    else
 #endif
@@ -1554,6 +1562,7 @@ png_progressive_combine_row (png_structp png_ptr,
    const int FARDATA png_pass_dsp_mask[7] =
       {0xff, 0x0f, 0xff, 0x33, 0xff, 0x55, 0xff};
 #endif
+   if(png_ptr == NULL) return;
    if (new_row != NULL)    /* new_row must == png_ptr->row_buf here. */
       png_combine_row(png_ptr, old_row, png_pass_dsp_mask[png_ptr->pass]);
 }
@@ -1563,6 +1572,7 @@ png_set_progressive_read_fn(png_structp png_ptr, png_voidp progressive_ptr,
    png_progressive_info_ptr info_fn, png_progressive_row_ptr row_fn,
    png_progressive_end_ptr end_fn)
 {
+   if(png_ptr == NULL) return;
    png_ptr->info_fn = info_fn;
    png_ptr->row_fn = row_fn;
    png_ptr->end_fn = end_fn;
@@ -1573,6 +1583,7 @@ png_set_progressive_read_fn(png_structp png_ptr, png_voidp progressive_ptr,
 png_voidp PNGAPI
 png_get_progressive_ptr(png_structp png_ptr)
 {
+   if(png_ptr == NULL) return (NULL);
    return png_ptr->io_ptr;
 }
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED */

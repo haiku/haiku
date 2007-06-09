@@ -1,9 +1,9 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.12 - June 27, 2006
+ * libpng version 1.2.18 - May 15, 2007
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2005 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2007 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -721,10 +721,21 @@
 #endif
 
 /* PNG_ASSEMBLER_CODE was enabled by default in version 1.2.0 
-   even when PNG_USE_PNGVCRD or PNG_USE_PNGGCCRD is not defined */
+ * even when PNG_USE_PNGVCRD or PNG_USE_PNGGCCRD is not defined.
+ *
+ * PNG_NO_ASSEMBLER_CODE disables use of all assembler code and optimized C,
+ * and removes or includes several functions in the API.
+ *
+ * PNG_NO_MMX_CODE disables the use of MMX code without changing the API.
+ * When MMX code is off, then optimized C replacement functions are used.
+*/
 #if defined(PNG_READ_SUPPORTED) && !defined(PNG_NO_ASSEMBLER_CODE)
 #  ifndef PNG_ASSEMBLER_CODE_SUPPORTED
 #    define PNG_ASSEMBLER_CODE_SUPPORTED
+#  endif
+#  if defined(XP_MACOSX) && !defined(PNG_NO_MMX_CODE)
+     /* work around Intel-Mac compiler bug */
+#    define PNG_NO_MMX_CODE
 #  endif
 #  if !defined(PNG_MMX_CODE_SUPPORTED) && !defined(PNG_NO_MMX_CODE) && \
      defined(__MMX__)
@@ -1447,9 +1458,9 @@ typedef z_stream FAR *  png_zstreamp;
  * MMX will be detected at run time and used if present.
  */
 #ifdef PNG_USE_PNGVCRD
-#  define PNG_HAVE_ASSEMBLER_COMBINE_ROW
-#  define PNG_HAVE_ASSEMBLER_READ_INTERLACE
-#  define PNG_HAVE_ASSEMBLER_READ_FILTER_ROW
+#  define PNG_HAVE_MMX_COMBINE_ROW
+#  define PNG_HAVE_MMX_READ_INTERLACE
+#  define PNG_HAVE_MMX_READ_FILTER_ROW
 #endif
 
 /* Set this in the makefile for gcc/as on Pentium, not here. */
@@ -1457,9 +1468,9 @@ typedef z_stream FAR *  png_zstreamp;
  * MMX will be detected at run time and used if present.
  */
 #ifdef PNG_USE_PNGGCCRD
-#  define PNG_HAVE_ASSEMBLER_COMBINE_ROW
-#  define PNG_HAVE_ASSEMBLER_READ_INTERLACE
-#  define PNG_HAVE_ASSEMBLER_READ_FILTER_ROW
+#  define PNG_HAVE_MMX_COMBINE_ROW
+#  define PNG_HAVE_MMX_READ_INTERLACE
+#  define PNG_HAVE_MMX_READ_FILTER_ROW
 #endif
 /* - see pnggccrd.c for info about what is currently enabled */
 
