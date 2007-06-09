@@ -18,9 +18,9 @@
 <para>Haiku is an operating system which is known for its speed and being easy for anyone to use. This is partly because good programmers try to design their apps for more than just themselves. We are going to examine how you can also make your program more appealing. The reason is easy: easier to use means more people using your program. Writing good software can be hard, but it is worth the time and effort.</para>
 
 <sect1>
-<title>Who Ya Writin' It Fer?</title>
+<title>Who's Gonna Use It?</title>
 
-<para>You probably already know what kind of program you are going to write. If not, put this book away and do some thinking first -- without a clear idea of what you want, it's hard to do something about it. Once you know what general kind of program you would like to create, you also need to figure out who the program is meant for. This can be something as general as 'desktop users' to something as specific as 'Haiku Web Developers'. When you know who the main users of your program will be, you can make certain assumptions about what your users know. You can't necessarily expect a musician to understand how to effectively use a 3D modelling program as advanced as, say, 3D Studio Max.</para>
+<para>You probably already know what kind of program you are going to write. If not, put this book away and do some thinking first. Without a clear idea of what you want, it's hard to do something about it. Once you know what general kind of program you would like to create, you also need to figure out who the program is meant for. This can be something as general as 'desktop users' to something as specific as 'Haiku Web Developers'. When you know who the main users of your program will be, you can make certain assumptions about what your users know. You can't necessarily expect a musician to understand how to effectively use a 3D modelling program as advanced as, say, 3D Studio Max, but you can expect them to have skills which lend themselves to using a program for writing music.</para>
 
 <para>Depending on how concerned you are about details, you may even want to create a user profile -- a fictional idea of an example user. This can consist of just one or two sentences or can be several paragraphs. A short user profile contains the person's first name, occupation, level of expertise, and what kinds of things they want to be able to do with their computer. One thing to be sure of is to make the user profile believable -- like a person you might know. In fact, when you design your app, it may be helpful if you know someone who fits into the target audience. You don't want to design you app for that person specifically, but, rather, someone just like them.</para>
 </sect1>
@@ -46,7 +46,7 @@
 <sect1>
 <title>Summary</title>
 
-<para>Careful planning is the key to writing excellent software, regardless of what stage of development a project may be in. In order to be easy, good software only has what is really needed. It also helps the user do his work wherever possible.   Only by thoroughly understanding what the work is, how it is to be done, and who is doing it can a program provide the best experience possible.</para>
+<para>Careful planning is the key to writing excellent software, regardless of what stage of development a project may be in. In order to be easy, good software only has what is really needed. It also helps the user do his work wherever possible. Only by thoroughly understanding what the work is, how it is to be done, and who is doing it can a program provide the best experience possible.</para>
 </sect1>
 
 </chapter>
@@ -69,13 +69,13 @@
 
 <para>Jobs in the Information Technology industry are almost always professional positions. One aspect which makes IT a profession is that it has its own body of knowledge and terminology to go with it. Most people have only a rudimentary 'computerese' vocabulary. The thing that they look at when they use a computer is called a monitor or just 'the screen'; the little arrow on the screen is called the cursor, and the thing they type with is called a keyboard. Few users know (or care) what a 'file format' is and fewer still do not know what an 'invalid sector' on a floppy disk might be.</para>
 
-<para>Good programs use regular language instead of technical terms. For file management software, 'volumes' are really disks -- even though the term isn't quite accurate, a normal person thinks a disk is a storage container and that volume is what you have up too high at really good parties. Images are 'pictures'. A person doesn't 'kill' a application that has 'hung' -- he 'forces a frozen program to quit'. Details like this may seem minor, but many small improvements in a program's usability can have a profound effect overall. Of course, if your target audience is IT professionals, these kinds of terms are perfectly acceptable. Be sure that you match the everyday language of your audience.</para>
+<para>Good programs use language appropriate for the audience. The problem is that quite a lot of software intended for the general desktop user reads like Yiddish for Joe User. In such cases, regular, everyday language should be used as much as is possible. For file management software, 'volumes' are really disks -- even though the term isn't quite accurate, a normal person thinks a disk is a storage container and that volume is what you have up too high at really good parties. Images are 'pictures'. A person doesn't 'kill' a application that has 'hung' -- he 'forces a frozen program to quit'. Details like this may seem minor, but many small improvements in a program's usability can have a profound effect overall. Of course, if your target audience is IT professionals, these kinds of terms are perfectly acceptable. Be sure that you match the everyday language of your audience and when in doubt, err toward using less technical language.</para>
 </sect1>
 
 <sect1>
 <title>Good Software Does Not Expose Its Implementation</title>
 
-<para>Good software works a certain way because it is the best way to be done, not because the code was written in a certain way or because it was dictated by an underlying API. An example of this would be if a music composition program has an easily-reached maximum song size because the code monkey who wrote it used a 16-bit variable instead of a 32-bit one. While there are sometimes limitations that cannot be overcome, the actual code written and the architecture used when it was written should have as little effect as possible on what the user sees and works with when using your software.</para>
+<para>Good software works a certain way because it is the best way to be done or close to it, not because the code was written in a certain way or because it was dictated by an underlying API. An example of this would be if a music composition program has an easily-reached maximum song size because the code monkey who wrote it used a 16-bit variable instead of a 32-bit one. While there are sometimes limitations that cannot be overcome, the actual code written and the architecture used when it was written should have as little effect as possible on what the user sees and works with when using your software.</para>
 </sect1>
  
 <sect1>
@@ -93,7 +93,7 @@
 <sect1>
 <title>Good Software Gives Plenty of Feedback</title>
 
-<para>Imagine for a moment that you have just started converting a movie file to another format. You hit the button marked 'Go' and wait. Then you wait some more. You go to the restroom, brew a new pot of coffee, get the mail from the box, and come back to wait some more. You're sure you clicked the button, but nothing seems to be happening. Did something go wrong? Only after some snooping around with a file manager do you find out that everything is OK. You didn't know what was happening because the program didn't tell you what it was doing.</para>
+<para>Imagine for a moment that you have just started converting a movie file to another format. You hit the button marked 'Go' and wait. Then you wait some more. You go to the restroom, brew a new pot of coffee, get the mail from the box, confirm that mullets are still out-of-style, and come back to wait some more. You're sure you clicked the button, but nothing seems to be happening. Did something go wrong? Only after some snooping around with a file manager do you find out that everything is OK. You didn't know what was happening because the program didn't tell you what it was doing.</para>
 
 <para>Good software keep the lines of communication open. Good feedback just means making sure that the user knows what your program is doing at any given time, especially if the program is busy doing something which makes him wait. CD and DVD burning programs tell the user how much is left before they are finished making a CD or DVD. File management programs tell how many files are left to copy or move. Web browsers animate a little icon while they download a web page. Users have a natural tendency to think that if nothing seems to be happening, then the program is probably frozen. Making sure that the user knows your program is hard at work puts his mind at ease.</para>
 
@@ -102,13 +102,13 @@
 <sect1>
 <title>Good Software Makes Errors Hard</title>
 	 
-<para>It has been said that nothing can be made foolproof because fools are so ingenious. Even so, make it tough for the user to make a mistake. If, for example, the user needs to enter in some text and certain characters are not allowed, then disable those characters for the text box it needs to be entered in. If resizing a window horizontally should not be done for some reason, don't let the user do it. Does your program require a selection from a list before the user clicks OK? Tell the user that -- nicely, of course -- and then disable the OK button until a selection is made. An even better solution would be to select a good default choice for the user and give him the option to change it. Build constraints into your application which prevent errors. This would be why 3.5" floppy disks have a notch in one side -- it can be inserted into a drive only one way. Constraints are also good for lazy developers because then their software crashes less and they don't need to write as much error-handling code.</para>
+<para>It has been said that nothing can be made foolproof because fools are so ingenious. Even so, make it tough for the user to make a mistake. If, for example, the user needs to enter in some text and certain characters are not allowed, then disable those characters for the text box it needs to be entered in instead of nagging the user with a message box. If resizing a window horizontally should not be done for some reason, don't let the user do it. Does your program require a selection from a list before the user clicks OK? Tell the user that -- nicely, of course -- and then disable the OK button until a selection is made. An even better solution would be to select a good default choice for the user and give him the option to change it. Build constraints into your application which prevent errors. This would be why 3.5" floppy disks have a notch in one side -- it can be inserted into a drive only one way. Constraints are also good for lazy developers because then their software crashes less and they don't need to write as much error-handling code.</para>
 </sect1>
 
 <sect1>
 <title>Good Applications Handle Errors Gracefully</title>
 
-<para>Even if you make it hard for a user to make a mistake, expect your program to have to deal with errors. It is possible for a program to handle errors in a way that doesn't leave the user wondering what happened. When code is written, errors of all sorts need to be anticipated and handled, such as lack of memory, lack of disk space, permissions errors, corrupted files, and loss of network connectivity. As Murphy's Law states, if something can go wrong in a given situation, it probably will. Hope for the best but prepare for the worst: within reason, handle every error that is likely to occur. Doing so greatly improves the perception of your software by the outside world. Crashes are unacceptable in all cases. Period. Error messages, for example, need to describe at the user's level of expertise what happened and suggest what the user can do to remedy the situation. In the worst case, the program needs to provide an easy way for the user to send technical information about the problem back to you via e-mail or some other means. In all cases, the user's data is to be preserved.</para>
+<para>Even if you make it hard for a user to make a mistake, expect your program to have to deal with errors. It is possible for a program to handle errors in a way that doesn't leave the user wondering what happened. When code is written, errors of all sorts need to be anticipated and handled, such as lack of memory, lack of disk space, permissions errors, corrupted files, and loss of network connectivity. As Murphy's Law states, if something can go wrong in a given situation, it probably will. Hope for the best but prepare for the worst: without bordering on the completely ridiculous, handle every error that is likely to occur. Doing so greatly improves the perception of your software by the outside world. Crashes are unacceptable in all cases. Period. Error messages, for example, need to describe at the user's level of expertise what happened and suggest what the user can do to remedy the situation. In the worst case, the program needs to provide an easy way for the user to send technical information about the problem back to you via e-mail or some other means. In all cases, the user's data is to be preserved.</para>
 
 <para>One way that you can see how well your program handles errors is to deliberately try to break it in every way possible. Feed the entire text of your Aunt May's quiche recipe into a text box all at once. Try to open files it has no business being given. Take a valid document, back it up, open it in DiskProbe, enter as much junk data into it as you like, and then try to open it. Break your Internet connection while it's in the middle of an update. Try to using filenames with really wonky filenames. Be creative and ridiculous and, most of all, have fun breaking things!</para>
 </sect1>
@@ -116,7 +116,7 @@
 <sect1>
 <title>Good Software is Forgiving</title>
 
-<para>Computers are excellent tools for people because they are good at many things that people are not. From a perspective which focuses on technology, humans are imprecise, illogical, disorganized, and make mistakes frequently. They are, however, excellent at forming habits and matching patterns, two things computers have a difficult time doing. Make commands undoable whenever possible and when it is not possible, be sure to inform the user that such is the case. Utilize a computer's strengths to make up for a person's inherent weaknesses.</para>
+<para>Computers are excellent tools for people because they are good at many things that people are not. From a perspective which focuses on technology, humans are imprecise, illogical, disorganized, and make mistakes frequently. They are, however, excellent at forming habits and matching patterns, two things computers have a difficult time doing. Make commands undoable whenever possible and when it is not possible, be sure to inform the user that such is the case. Capitalize on a computer's strengths to make up for a person's inherent weaknesses.</para>
 </sect1>
 
 <sect1>
@@ -148,19 +148,19 @@
 <sect1>
 <title>Avoid Hardcoded File Paths</title>
 
-<para>Whenever your program needs to specify a particular area on the system, use of the find_directory() function to generate it. If and when the day comes that Haiku supports multiple users, your application will make a smooth transition to the new architecture. This will also allow for backward compatibility with older versions of BeOS, such as the change in locations for B_COMMON_FONTS_DIRECTORY being in a different place for Haiku than on R5. find_directory() is supported in both C and C++ environments.</para>
+<para>Whenever your program needs to specify a particular location on the system, use of the find_directory() function to generate it. If and when the day comes that Haiku supports multiple users, your application will make a smooth transition to the new architecture. This will also allow for backward compatibility with older versions of BeOS, such as the change in locations for B_COMMON_FONTS_DIRECTORY being in a different place for Haiku than on R5. find_directory() is supported in both C and C++ environments.</para>
 </sect1>
 
 <sect1>
 <title>Make Your App's Look Fits in with Others</title>
 
-<para>Certain function calls have been provided in the API to aid in making sure that your software shares the same general look as other applications and allow the user to make customizations to the system at the same time. Unless there is a very good reason for it, get colors for your program with ui_color() and the constants which go with it. Determine the size of your controls dynamically - use the ResizeToPreferred and GetPreferredSize for system controls and calculate the size of your own controls based on font sizes obtained from the system instead of hardcoded values. All of this will allow better ease-of-use for the user who prefers tiny fonts to increase use of desktop real estate and also for older users who need larger font sizes to accommodate weaker visual acuity. Graphics are an important part of a program's look, but don't reimplement the look of the buttons and other standard controls just to make your application stand out from the rest. By keeping visual consistency with the rest of the operating system, you avoid confusing the user with buttons that do not look like you can click on them, strange-acting menus, and so forth.</para>
+<para>Certain function calls have been provided in the API to aid in making sure that your software shares the same general look as other applications and allow the user to make customizations to the system at the same time. Unless there is a very good reason for it, get colors for your program with ui_color() and the constants which go with it. Determine the size of your controls dynamically - use the ResizeToPreferred and GetPreferredSize for system controls and calculate the size of your own controls based on font sizes obtained from the system instead of hardcoded values. If you're writing code specifically for Haiku and don't care about compatibility with other BeOS flavors, use the new layout API. All of this will allow better ease-of-use for the user who prefers tiny fonts to increase use of desktop real estate and also for older users who need larger font sizes to accommodate weaker visual acuity. Graphics are an important part of a program's look, but don't reimplement the look of the buttons and other standard controls just to make your application stand out from the rest. By keeping visual consistency with the rest of the operating system, you avoid confusing the user with buttons that do not look like you can click on them, strange-acting menus, and so forth.</para>
 </sect1>
 
 <sect1>
 <title>Live Updates</title>
 
-<para>One way to make sure that your application communicates effectively with the user is to provide "live" updates to information in it. This mostly relates to files in the system. A good example is an address book program which automatically removes and adds entries when new People files are added to the People folder. The information doesn't even have to be data that is outside your program. It could just be as simple as updating an entry in a list of items as the user types makes changes to it in a form in a different part of the GUI. Responsiveness like this in a program helps the user feel more in control of the work he is doing.</para>
+<para>One way to make sure that your application communicates effectively with the user is to provide "live" updates to information in it. This mostly relates to files in the system. A good example is an address book program which automatically removes and adds entries when new People files are added to the People folder. The information doesn't even have to be data that is outside your program. It could just be as simple as updating an entry in a list of items as the user types makes changes to it in a form in a different part of the GUI. Responsiveness like this in a program helps the user feel more in control of the work he is doing and prevents possible loss of data.</para>
 </sect1>
 
 <sect1>
@@ -172,7 +172,7 @@
 <title>Formats to prefer:</title>
 <varlistentry><term>Image</term><listitem>JPEG or PNG</listitem></varlistentry>
 <varlistentry><term>Sound</term><listitem>WAV or Ogg Vorbis</listitem></varlistentry>
-<varlistentry><term>Movie</term><listitem>MPEG4 or AVI</listitem></varlistentry>
+<varlistentry><term>Movie</term><listitem>Ogg Theora or AVI</listitem></varlistentry>
 </variablelist>
 </sect1>
 
@@ -181,11 +181,11 @@
 
 <para>The filesystem that Be created was nothing short of amazing in the 1990s. Even with the gradual evolution of other operating systems having progressed since then, it is still one of the most powerful around. Attributes are a powerful tool which allow you to store data about a file without being part of the file. This kind of power is easily put to use with audio files, such as FLAC, Ogg Vorbis, and the ubiquitous MP3. By attaching attributes to audio files, you can search for them with a query. Queries also leverage the filesystem's power. As long as the attribute you are querying for is indexed in the filesystem, there is no place a file with that attribute can hide. To top it all off, they are also a fast way of search for files meeting a certain criteria.</para>
 
-<para>Although both attributes and queries are very powerful, use good sense in utilizing them. It takes quite a while to read a large number of attributes from a file, so you may wish to cache them if you are writing a program which will need to read more than just a few of them. Queries can only make use of attributes which are indexed, and their speed goes down as more and more attributes are indexed, so use good sense, as well.</para>
+<para>Although both attributes and queries are very powerful, use good sense. It takes quite a while to read a large number of attributes from a file, so you may wish to cache them if you are writing a program which will need to read more than just a few of them. Queries can only make use of attributes which are indexed, and their speed goes down as more and more attributes are indexed.</para>
 </sect1>
 
 <sect1>
-<title>The System Tray: It's Not Just for Dinner</title>
+<title>The System Tray: It's Not Just for Dinner Anymore</title>
 
 <para>Because it can very easily become cluttered, install icons in the Deskbar's shelf only when it provides information that is updated often or if it provides functionality which will be frequently accessed by the user. Examples of these kinds of situations would be monitoring memory and processor load, checking mail, or quick access to features provided by a personal information management program. If it is unlikely that the user will need to access the information or functionality less than once per session, don't use the Deskbar -- accessing your program through the Be menu or an icon on the desktop should be sufficient.</para>
 </sect1>
@@ -205,7 +205,7 @@
 
 
 <sect1>
-<title>Mouse Vocabulary, AKA "You Want Me to What?!"</title>
+<title>Mouse Vocabulary, AKA "What's This Button Do?"</title>
 
 <para>The mouse, while the favorite rodent of most users, is not a very intuitive device: mouse skills must be learned. Most of the time, mouse skills are not an issue because the user is clicking on buttons, menus, and so forth, but sometimes a program must deal directly with mouse clicks and moves. Mouse operations fall into one of three categories.</para>
 
@@ -242,6 +242,7 @@
 	<listitem>More than 3 consecutive clicks (quadruple clicking or more)</listitem>
 	<listitem>Drag with tertiary mouse button</listitem>
 	<listitem>Drag with modifier keys</listitem>
+	<listitem>Secondary/Tertiary click with modifier keys</listitem>
 </itemizedlist>
 </para>
 </varlistentry>
@@ -305,9 +306,9 @@
 
 </sect1>
 <sect1>
-<title>Design without Throwing Fitts</title>
+<title>Design to Prevent Fitts</title>
 
-<para>According to Mr. Fitts, when using a mouse or other pointing device, the amount of time it takes to point to something is proportional to how far away that something is and how big it is. While it might seem obvious, this is often overlooked when a program is designed. The easiest places for a user to click are the four corners of the screen and the pixel directly under the cursor. The reason for this is because the mouse need not be moved for to click on the pixel under it and the user does not have to think much when moving the cursor to a corner because as soon as it reaches an edge, it can go no farther in that direction regardless of how much the mouse is moved. For this reason the Deskbar is in one corner of the screen.</para>
+<para>According to Mr. Fitts, when using a mouse or other pointing device, the amount of time it takes to point to something is proportional to how far away that something is and how big it is. While it might seem obvious, this is often overlooked when a program is designed. The easiest places for a user to click are the four corners of the screen and the pixel directly under the cursor. The reason for this is because the mouse need not be moved for to click on the pixel under it and the user does not have to think much when moving the cursor to a corner because as soon as it reaches an edge, it can go no farther in that direction regardless of how much the mouse is moved. The Deskbar is in one corner of the screen for this reason.</para>
 
 <para>When you design the graphical interface for your program, make controls easy to click on. Toolbars that have a text label as part of each button are inherently easier to click because the labels add to the size of the buttons. A number of existing image editing programs use the secondary mouse button for a pop-up menu to access common features because the mouse doesn't have to move in order to bring the menu up. Researchers have even experimented with circular menus -- called pie menus -- which capitalize on Fitts' Law in order to make a menu as fast as possible. Your program need not go to such measures, but do keep in mind that teeny controls slow users down.</para>
 
@@ -330,9 +331,9 @@
 <para>A feature which is very helpful to a user is drop feedback. Any time the user is dragging something and the cursor passes over your program's window, it can react in a way to show the user that your program will accept the dragged object. Drop feedback can take a variety of forms:
 
 <itemizedlist>
-<listitem>A list control could draw a line in between two items to show where the item would go.</listitem>
+<listitem>A list control could draw a line in between two items to show where the dragged item would be placed if the user released the button.</listitem>
 
-<listitem>BTextView controls show a line where dragged text would be placed.</listitem>
+<listitem>BTextView controls show a line where dragged text would be placed if dropped.</listitem>
 
 <listitem>If the user drags an entry over a folder, Tracker shades it slightly.</listitem>
 
@@ -398,7 +399,7 @@ There are other possible ways, but these should be enough for you to get the ide
 <sect1>
 <title>Replicants</title>
 
-<para>Replicants are neat. Replicants are neat. Replicants are ... *thump* .... Sorry - I got carried away, so to speak. :^) As cool as replicant technology is, it is only an emerging technology in other operating systems and is unfamiliar to most users in general. As such, it is best left as an extra feature and not the primary mode of operation for a program. There are some guidelines for using them, however.
+<para>Replicants take their cue from Dolly the sheep in allowing a BView to be closned and allow you to do Really Neat Things(TM). As cool as replicant technology is, it is only an emerging technology in other operating systems and is unfamiliar to most users in general. As such, it is best left as an extra feature and not the primary mode of operation for a program. Here are some guidelines for using them, however.
 
 <orderedlist>
 <listitem>It is appropriate for program to be a replicant if it is a lightweight program which provides information or a feature which the user will want to be able to access frequently.</listitem>
@@ -407,7 +408,7 @@ There are other possible ways, but these should be enough for you to get the ide
 
 <listitem>Be sure it is big enough to not get lost when placed on a busy desktop background. At the same time, do not take over the user's desktop unless he wants this to happen. 32 pixels square is a good minimum size, for example.</listitem>
 
-<listitem>Provide a reliable way for the user to control your replicant. Do not rely on the menu provided by the dragger handle it does not have a menu bar of its own because the handle may have been hidden. Instead, provide another means which is immediately obvious or, at the very least, show a pop-up menu if the user clicks on it (with either button) and there are no other clickable controls.</listitem>
+<listitem>Provide a reliable way for the user to control your replicant. Do not rely on the menu provided by the dragger handle because the handle itself may have been hidden. Instead, provide another means which is immediately obvious or, at the very least, show a pop-up menu if the user clicks on it (with either button) and there are no other clickable controls.</listitem>
 
 <listitem>Place a frame around the replicant's border so that it stands out from its surroundings</listitem>
 
@@ -421,21 +422,21 @@ There are other possible ways, but these should be enough for you to get the ide
 <chapter id="chapter6">
 <title>Use of Text in the GUI</title>
 
-<para>Almost without exception, if you are writing a program, you will need to pay at least a little attention to how it uses text. There is, believe it or not, are right ways and wrong ways, and while most of the guidelines for text might seem trivial, paying attention to what seem like niggling little details is what makes a good program into a great one.</para>
+<para>Almost without exception, if you are writing a program, you will need to pay at least a little attention to how it uses text. There are, believe it or not, right ways and wrong ways, and while most of the guidelines for text might seem trivial, paying attention to what seem like niggling little details is what sets a good program apart from the rest.</para>
 
-<para>Above all else mentioned in this chapter, use everyday language -- not technical terms-- and be both clear and concise.</para>
+<para>Above all else mentioned in this chapter, use language appropriate for your audience -- most of the time, this means avoiding technical terms -- and be both clear and concise.</para>
 
 <sect1>
-<title>Error Messages, or, "I'm sorry Dave. I'm afraid I can't do that"</title>
+<title>Error Messages, or, "I'm sorry Dave, I'm afraid I can't do that"</title>
 
-<para>Perhaps the place where you should use text the most is in error messages. They should appear as seldom as possible because you anticipated and handled as many error conditions as possible and tried to blow it up real good, right? ;) When your program can't handle a particular error, the error message given to the user should do the following:
+<para>Perhaps the place where you should use text the most is in error messages. They should appear as seldom as possible because you anticipated and handled as many error conditions as possible and then tried to blow it up real good, right? ;) When your program can't handle a particular error, the error message given to the user should do the following:
 
 <orderedlist>
 <listitem>Explain what happened in everyday words.</listitem>
 
 <listitem>Provide enough information to know what happened without providing details which could confuse the user. For example, if a mail client sends a request to a server for e-mail and the server fails to respond, a way to explain this might be something like "MyMailApp could not check your e-mail. The mail server did not respond when contacted."</listitem>
 
-<listitem>Offer suggestions to help the user fix the problem, if possible. Using the above example, one possible suggestion might be "Try checking your Internet connection with your web browser. If that works, the mail server might not be working correctly and you may want to try again later."</listitem>
+<listitem>Offer suggestions to help the user fix the problem, if possible. Using the above example, one possible suggestion might be "Try checking your Internet connection with your web browser. If your web browser works, the mail server might not be working correctly and you may want to try again later."</listitem>
 </orderedlist>
 </para>
 </sect1>
@@ -443,7 +444,7 @@ There are other possible ways, but these should be enough for you to get the ide
 <sect1>
 <title>...Ellipses...</title>
 
-<para>An ellipsis is a series of 3 dots (...) used to tell the user that a control, often a menu item or button, will open a window. For example, a menu item named "New..." will display a window which has the title "New". However, if creating a new document does not require showing a window, then an ellipsis should not be used. Please be sure to use the B_UTF8_ELLIPSIS character instead of 3 periods. Many keymaps allow you to type in an ellipsis with the Option + period keyboard shortcut.</para>
+<para>An ellipsis is a series of 3 dots (...) used to tell the user that a control, often a menu item or button, will open a window. For example, a menu item named "New..." will display a window which has the title "New". However, if creating a new document does not require showing a window, then an ellipsis should not be used. Please be sure to use the B_UTF8_ELLIPSIS character instead of 3 periods. Some BeOS keymaps, such as the US QWERTY keymap, allow you to type in an ellipsis with the Option + period keyboard shortcut.</para>
 </sect1>
 
 <sect1>
@@ -451,12 +452,12 @@ There are other possible ways, but these should be enough for you to get the ide
 
 <para>Sometimes space is at a premium. Abbreviations, acronyms, and contractions can come in very handy in these instances, but they can also be confusing. Whenever possible, avoid using them. Many times the reason there is not enough space is it isn't being used as efficiently as possible. When you use an abbreviation, please be sure that it is absolutely necessary, that it is both common and clear, and that it is appropriate for your program's target audience. For example, using the octothorpe (# symbol) is an abbreviation for the word 'number' in the English language which fits these criteria in most cases. These same guidelines also apply to acronyms. For example, the acronym CMYK (Cyan, Magenta, Yellow, Black) is acceptable in a color picker for an image processing application designed for graphics professionals, but not in one meant for children. Menus and button labels should never be abbreviated or contain an acronym.</para>
 
-<para>Special care must be used with contractions. They can be a pitfall for users who are not using a program which is in their native language. Because they require more advanced command of the language, avoid using them in a place where their role is crucial in conveying the meaning of a message. For example, a checkbox for a message dialog with a checkbox marked "Don't show this message again" which is unchecked by default should be reworded "Always show this message" and have the checkbox checked by default.</para>
+<para>Special care must be used with contractions. They can be a pitfall for users who are not using a program in their native language. Because they require a more advanced command of a language, avoid using them in a place where their role is crucial in conveying the meaning of a message. For example, a checkbox for a message dialog with a checkbox marked "Don't show this message again" which is unchecked by default should be reworded "Always show this message" and have the checkbox checked by default.</para>
 
 </sect1>
 
 <sect1>
-<title>cApItAlIzAtIoN and Speling</title>
+<title>Capitalization and Spelling</title>
 
 <para>Nothing is more unprofessional than spelling and capitalization errors. If spelling is not your strong suit, consult a spell checker, dictionary, or at least a friend. This is particularly important if you are working with a language which is not your native one. Use title capitalization in all places except where full sentences are used. This means that all "important" words and the last word in a phrase -- regardless of importance -- are capitalized. Prepositions, definite articles, and conjunctions (as, for, to, the, and, etc.) are generally not capitalized except when they are the first or last word in the phrase, such as in "Save As...".</para>
 
@@ -464,7 +465,7 @@ There are other possible ways, but these should be enough for you to get the ide
 <sect1>
 <title>Use of Fonts</title>
 
-<para>Good use of fonts can way make your program more visually appealing, but when not used well, can make it ugly, hard to read, or worse. Stick to the plain, bold, and fixed system fonts to maintain some general visual consistency across the operating system. It is perfectly acceptable to use a different font size, but do it only when you need a heading or something similar and try to limit the number of different sizes to just a few. A window which has lots of different font styles and sizes is harder to read and looks unprofessional. Control labels should always be in the system plain font and size specified by the system.</para>
+<para>Good use of fonts can way make your program more visually appealing, but when not used well, can make it ugly, hard to read, or worse. Stick to the plain, bold, and fixed system fonts to maintain some general visual consistency across the operating system. It is perfectly acceptable to use different font sizes, but do it only when you need a heading or something similar and try to limit the number of different sizes to just a few. A window which has lots of different font styles and sizes is harder to read and looks unprofessional. Control labels should always be in the system plain font and size specified by the system.</para>
 
 <para>When calculating the layout for the controls, be sure that you do not depend on the system font being set to a particular font size. Most BControl-derived controls implement the methods GetPreferredSize and ResizeToPreferred to take font size into account. A basic idea of the line height for a font can be calculated by calling BFont::GetHeight() and adding together the values of the font_height structure.</para>
 
@@ -473,15 +474,15 @@ There are other possible ways, but these should be enough for you to get the ide
 <sect1>
 <title>Special Case: The Command Line</title>
 
-<para>When designing a program to work in a command-line environment there are some special considerations which must be addressed. Interaction with other programs, use in shell scripts, and a generally consistent interface for command-line programs are just some of the things you will need to keep in mind. The major design decisions you should make are how your program will get its data, what options are available, and what feedback the user will be given.</para>
+<para>When designing a program to work in a command-line environment there are some special considerations which must be addressed. Interaction with other programs, use in shell scripts, and a generally consistent interface for command-line programs are just some of the things you will need to keep in mind. The major design decisions you should make are how your program will get its data, what options will be available, and what feedback the user will be given.</para>
 
-<para>Spend some time thinking about how your program should interact with the shell and with other programs. Most of the time, this will boil down to whether your program is file-oriented or stream-oriented. Stream-oriented programs like grep and less work more or less like filters, getting data from stdin and dumping data to stdout. File-oriented programs like zip and bzip2 are given a list of files which the program then operates on. Your program can certainly do both, but choose a primary method because it will influence design decisions later on. Seriously consider handling wildcards instead of relying on the shell to do it if your program is file-oriented. This does mean more work for you as a developer, but it also reduces typing and, thus, typing errors for the user. Of course, if it doesn't make sense to support wildcards, then don't do it.</para>
+<para>Spend some time thinking about how your program should interact with the shell and with other programs. Most of the time, this will boil down to whether your program is file-oriented or stream-oriented. Stream-oriented programs like grep and less work pretty much like filters, getting data from stdin and dumping data to stdout. File-oriented programs like zip and bzip2 are given a list of files which the program then operates on. Your program can certainly do both, but choose a primary method because it will influence design decisions later on. Seriously consider handling wildcards instead of relying on the shell to do it for you if your program is file-oriented. This does mean more work for you as a developer, but it also reduces typing and, thus, typing errors for the user. Of course, if it doesn't make sense to support wildcards, then don't do it.</para>
 
-<para>Choose options which are going to be accessible by command-line switches carefully. Make each one available only if it fills a reasonably common task. From the perspective of the user, adding an option is adding a feature, which will, int turn, increase the complexity of your program. Provide GNU-style (double dash + long name) switches for all options. The most commonly-used options should also have a corresponding short (single-dash + single letter) one. The switches --help and -h are reserved for showing help information. Only standard UNIX applications (ls, tar, df, etc.) are not required to follow the standard for -h in order to avoid breaking backward compatibility. All new command-line programs need to follow this.</para>
+<para>Choose options which are going to be accessible by command-line switches carefully. Make each one available only if it fills a reasonably common task. From the perspective of the user, adding an option is adding a feature, which will, in turn, increase the complexity of your program. Provide GNU-style (double dash + long name) switches for all options. The most commonly-used options should also have a short (single-dash + single letter) counterpart. The switches --help and -h are reserved for showing help information. Only standard UNIX applications (ls, tar, df, etc.) are not required to follow the standard for -h in order to avoid breaking backward compatibility. All new command-line programs need to follow this. Also, if your program requires one or more parameters, do the user a favor and show the help message if there are no extra parameters instead of telling the user to retype the command with the help switch.</para>
 
-<para>When an option requires a particular value, there is also a standard for how the user is to provide the information. GNU-style command options should follow the format --option=value with the option to enclose the value in quotes. Multiple values for a switch should be comma-separated. Short-style command options should place a space between each value that follows it like this: -t value1 value2 value2 ... As mentioned above, wildcards should be handled by the program except when it does not make sense. If your program does something which modifies data, make sure that your program requires some sort of parameter -- a switch, a file, or whatever -- so that data is not lost if the user invokes your program without knowing what it does. You can assume that the user is sharper than a bowling ball, but do not expect the user to have expert knowledge of the operating system or, for that matter, your program. Programs which merely report information, ls and df come to mind, are not required to do this as long as the information displayed gives the user an idea of what the program does.</para>
+<para>When an option requires a particular value, there is also a standard for how the user is to provide the information. GNU-style command options should follow the format --option=value with the option to enclose the value in quotes. Multiple values for a switch should be comma-separated. Short-style command options should place a space between each value that follows it like this: -t value1 value2 value3 ... As mentioned above, wildcards should be handled by the program except when it does not make sense. If your program does something which modifies data, make sure that your program requires some sort of parameter -- a switch, a file, or whatever -- so that data is not lost if the user invokes your program without knowing what it does. You can assume that the user is sharper than a bowling ball, but do not expect the user to have expert knowledge of the operating system or, for that matter, your program. Programs which merely report information -- ls and df come to mind -- are not required to do this as long as the information displayed gives the user an idea of what the program does.</para>
 
-<para>Be sure to give enough feedback when your program does its thing. Like graphical programs, long tasks should inform the user of progress. This may be something as complex as a full-fledged progress meter drawn with text, a simple series of periods, a listing each file operated on, or something else. *All* programs should provide some sort of feedback -- the only time a program may print nothing is if there is a "quiet" option which the user has specified. The feedback your program gives doesn't even have to be excessive; you can just give general details. A "verbose" option should provide more detail than the program does by default. As explained earlier in this chapter, error messages should be no more technical than absolutely necessary and should be helpful whenever possible. If your program requires a parameter of some sort and isn't given any, show either the same message as for the help option or an abbreviated version which is still reasonably informative along with something to point the user to the help option for more detailed information.</para>
+<para>Be sure to give enough feedback when your program does its thing. Like graphical programs, long tasks should inform the user of progress. This may be something as complex as a full-fledged progress meter drawn with text, a simple series of periods, a listing each file operated on, or something else. *All* programs should provide some sort of feedback; the only time a program may print nothing is if there is a "quiet" option which the user has specified. The feedback your program gives doesn't even have to be excessive; you can just give general details. A "verbose" option should provide more detail than the program does by default. As explained earlier in this chapter, error messages should be no more technical than absolutely necessary and should be helpful whenever possible. If your program requires a parameter of some sort and isn't given any, show either the same message as for the help option or an abbreviated version which is still reasonably informative along with something to point the user to the help option for more detailed information.</para>
 
 </sect1>
 </chapter>
@@ -494,7 +495,7 @@ There are other possible ways, but these should be enough for you to get the ide
 <sect1>
 <title>Program Icons</title>
 
-<para>Your program's icon is one easy way to set it apart from the rest of the pack. BeOS-style icons follow one of two perspectives - flat and isometric. Flat icons look like a head-on view. Isometric icons "look down" on the icon from a point above and to the right of the object with angled lines being about 30 degrees from horizontal. A good icon can give your program a favorable and professional impression to people who otherwise doesn't know a thing about you or your program. Take some time to create or find a good-looking icon. Whatever you do, don't just slap together a shabby-looking icon. It would be better not provide an icon at all and rely on the system to show the default application icon than to have one which reflects poorly on your program's reputation.
+<para>Your program's icon is one easy way to set it apart from the rest of the pack. BeOS-style icons follow one of two perspectives - flat and isometric. Flat icons look like a head-on view. Isometric icons "look down" on the icon from a point above and to the right of the object with angled lines being about 30 degrees from horizontal. A good icon can give your program a favorable and professional impression to people who otherwise doesn't know a thing about you or your program. Take some time to create or find a good-looking icon. Whatever you do, don't just slap together a shabby-looking icon. It would be better not provide an icon at all and rely on the system to show the default application icon than to have one which reflects poorly on your program's reputation. For more details on icon creation, consult the Haiku Icon Guidelines.
 </para>
 
 <variablelist>
@@ -512,7 +513,7 @@ There are other possible ways, but these should be enough for you to get the ide
 <sect1>
 <title>About Windows... Doorways to Creative Expression</title>
 
-<para>Give yourself some credit in your program: make an About window. They don't need to be especially fancy, but they can be if you are so inclined. It should contain the title of your program, the version, you and any other authors or the name of your company, and copyright information. If nothing else, write a few lines of code to show a BAlert with this information and you'll have enough. If there is a lot of information to show, using a marquee effect to automatically scroll the information or at least a read-only text view with a scroll bar. Do not include information about the computer itself, such as the amount of RAM or processor speed -- it doesn't belong here. While you certainly may show something short about the licensing of your program like "Distributed under the terms of the GNU Public License," the full text of the license belongs elsewhere. The window should not have a tab and should either have a button marked 'Close' or simply disappear when clicked. It should also respond to the Command + W keyboard shortcut.</para>
+<para>Give yourself some credit in your program: make an About window. They don't need to be especially fancy, but they can be if you are so inclined. It should contain the title of your program, the version, you and any other authors or the name of your company, and copyright information. If nothing else, write a few lines of code to show a BAlert with this information and you'll have enough. If there is a lot of information to show, using a marquee effect to automatically scroll the information or at least a read-only text view with a scroll bar. Do not include information about the computer itself, such as the amount of RAM or processor speed; it doesn't belong here. While you certainly may show something short about the licensing of your program like "Distributed under the terms of the GNU Public License," the full text of the license belongs elsewhere. The window should not have a tab and should either have a button marked 'Close' or simply disappear when clicked. It should also respond to the Command + W keyboard shortcut.</para>
 
 </sect1>
 <sect1>
@@ -542,7 +543,7 @@ There are other possible ways, but these should be enough for you to get the ide
 <sect1>
 <title>Making Your Own Cursors</title>
 
-<para>You can very easily make your own cursors for your own purposes, but do it only if a different cursor will dramatically improve how well the user can work with your program. At the moment cursors can only be 16 pixels square and be black, white, or transparent. Be sure that the hot spot -- the actual location passed to applications when a mouse button is pressed -- is very obvious. Good hot spots are the tip of the hand cursor, the point of an arrow, or the center of a crosshairs. Use the full dimensions available to increase the cursor's visibility at high screen resolutions.</para>
+<para>You can very easily make your own cursors for your own purposes, but do it only if a different cursor will dramatically improve how well the user can work with your program. At the moment, cursors can only be 16 pixels square and be black, white, or transparent. Be sure that the hot spot -- the actual location passed to applications when a mouse button is pressed -- is very obvious. Good hot spots are the tip of the hand cursor, the point of an arrow, or the center of a crosshairs. Use the full dimensions available to increase the cursor's visibility at high screen resolutions.</para>
 
 <para><emphasis>NOTE:</emphasis> There is not nor will there ever be a busy cursor in BeOS-based operating systems. This is a deliberate design decision. If you have a need for a busy cursor, you need to make your program more responsive. Often you can use multiple threads to eliminate the need for a busy cursor.</para>
 </sect1>
@@ -595,7 +596,6 @@ There are other possible ways, but these should be enough for you to get the ide
 
 <literallayout>
 <emphasis>Examples of Good Dynamic Menu Item Usage</emphasis>
-
 |Window|
 -----------------
 Show Tool Window
