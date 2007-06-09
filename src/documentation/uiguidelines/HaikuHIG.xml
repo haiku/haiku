@@ -663,10 +663,10 @@ New (Command + N) </term><listitem><para>Create a new document. This item should
 Open... (Command + O) </term><listitem><para>Open a document from disk.</para></listitem></varlistentry>
 
 <varlistentry><term>
-Open Recent </term><listitem><para>This is a submenu in the File menu to allow fast access to recent documents. It should not open a window of any kind. The number of recent items should be limited to no more than 5 items.</para></listitem></varlistentry>
+Open Recent </term><listitem><para>This is a submenu in the File menu to allow fast access to recent documents. It should not open a window of any kind except if your program uses a one-window-per-document architecture. The number of recent items should be limited to no more than 5 items.</para></listitem></varlistentry>
 
 <varlistentry><term>
-Close (Command + W) </term><listitem><para>The function of this item depends on the program architecture. In a program which has one document per window, this closes the window. If there is only one open window, this quits the program. Although it is not recommended, if   a program allows for multiple documents to be shown in the same window, this item closes one document.</para></listitem></varlistentry>
+Close (Command + W) </term><listitem><para>The function of this item depends on the program architecture. In a program which has one document per window, this closes the window. If there is only one open window, this quits the program. Although it is not recommended, if a program allows for multiple documents to be shown in the same window, this item closes one document.</para></listitem></varlistentry>
 
 <varlistentry><term>
 Save (Command + S) </term><listitem><para>Save the current document. This should not show a window unless it is a new document that has not yet been saved. It does not normally show a window, so no ellipsis is necessary.</para></listitem></varlistentry>
@@ -686,10 +686,10 @@ Save All </term><listitem><para>This item executes a Save command for all docume
 </para></listitem></varlistentry>
 
 <varlistentry><term>
-Revert </term><listitem><para>Undoes all changes to the document.</para></listitem></varlistentry>
+Revert </term><listitem><para>Undoes all changes made to the document since the last save.</para></listitem></varlistentry>
 
 <varlistentry><term>
-Import From... </term><listitem><para>Import data from another file into the current document. Like Open, this always shows a window.</para></listitem></varlistentry>
+Import From... </term><listitem><para>Import data from another file format into a new document. Like Open, this always shows a window.</para></listitem></varlistentry>
 
 <varlistentry><term>
 Export To... </term><listitem><para>Convert the data in the current document to another format. Like Save As, this always shows a window.</para></listitem></varlistentry>
@@ -775,10 +775,10 @@ Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default we
 <seglistitem><seg>Normal</seg><seg>General purpose</seg></seglistitem>
 <seglistitem><seg>Modal:Subset</seg><seg>Only when you need to block all windows in a subset</seg></seglistitem>
 <seglistitem><seg>Modal:App</seg><seg>When a user decision is required to continue with the rest of the program</seg></seglistitem>
-<seglistitem><seg>Modal:All</seg><seg>When the user needs to make a system-critical decision, such as system shutdown confirmation.</seg></seglistitem>
+<seglistitem><seg>Modal:All</seg><seg>When the user needs to make a system-critical decision, such as system shutdown confirmation. Use this feel only when you absolutely have to.</seg></seglistitem>
 <seglistitem><seg>Floating:Subset</seg><seg>When a subset window needs to take priority in its subset.</seg></seglistitem>
 <seglistitem><seg>Floating:App</seg><seg>Tool and utility windows</seg></seglistitem>
-<seglistitem><seg>Floating:All</seg><seg>System monitors and other windows which the user will always want to have visible.</seg></seglistitem>
+<seglistitem><seg>Floating:All</seg><seg>System monitors and other windows which the user will always want to have visible. Like Modal:All, use this only when absolutely necessary.</seg></seglistitem>
 </segmentedlist>
 
 <segmentedlist>
@@ -798,28 +798,28 @@ Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default we
 
 <para>Merely knowing what kind of window look and feel to use in a given situation is not enough: you also have to be aware of resizing, zooming, moving, closing, and minimizing because they affect your program in different ways. Once you know what kind of window you need, you should also figure out what its initial size and location are going to be. You also should not restrict the other actions a user can perform on a window unless you have a good reason that does not include "I don't want to write code to handle this."</para>
 
-<para>Care should be given to what name is used for a window. The main window of your program should use your program's name. Windows which were opened from a menu item should have the same name as that of the menu item without the ellipsis. Document windows should use the document's name. New documents should use the name "Untitled" with subsequent new documents appending a number. The first untitled document should not have a number. A titled window should never have an empty title bar.</para>
+<para>Care should be given to what name is used for a window. The main window of your program should include your program's name. Windows which were opened from a menu item should have the same name as that of the menu item without the ellipsis. Document windows should include the document's name. The first new document in the application should use the name "Untitled" with subsequent new documents appending a number. A titled window should never have an empty title bar.</para>
 
-<para>The size of a window depends on a number of factors. An application window should have an initial size which is the  minimum needed to see all controls in it without overcrowding. Controls should never overlap. This initial size should also be the minimum size for the window which is passed to SetSizeLimits. The initial size for a document window should be large enough to see the entire document or at least a significant portion of the document if it is larger than the screen. Do not arbitrarily restrict resizing unless it does not make sense to allow resizing in a particular direction. If a window allows resizing, its size should generally be saved when closed or the program quits and restored to that size when shown again.</para>
+<para>The size of a window depends on a number of factors. An application window should have an initial size which is the minimum needed to see all controls in it without overcrowding. Controls should never overlap. This initial size should also be the minimum size for the window which is passed to SetSizeLimits. The initial size for a document window should be large enough to see the entire document or at least a significant portion of the document if it is larger than the screen. Do not arbitrarily restrict resizing unless it does not make sense to allow resizing in a particular direction. If a window allows resizing, its size should generally be saved when closed or the program quits and restored to that size when shown again.</para>
 
-<para>Zooming is similar to resizing, but there are differences in which should permit zooming and how it should be done. Utility windows, for example, are not intended to be the main focus of the program, so they should not allow zooming even though they should allow resizing except where inappropriate. Document windows should expand to fill the largest sensible space to allow editing. Often times this is the entire screen, but it may not be. Word processors will probably move to the top of the screen, resize the width to the maximum width of the current document's view, and resize the height to the bottom of the screen.</para>
+<para>Zooming is similar to resizing, but there are differences in which should permit zooming and how it should be done. Utility windows, for example, are not intended to be the main focus of the program, so they should not allow zooming even though they should allow resizing except where inappropriate. Document windows should expand to fill the largest sensible space to allow editing. Often times this is the entire screen, but some for some programs, this doesn't make sense. Word processors, for example, will probably move the document window to the top of the screen, resize the width to the maximum width of the current document's view, and resize the height to the bottom of the screen.</para>
 
 <para>The placement of a window on the screen also varies depending on its usage. Program windows should initially either show themselves in the center of the screen or just a little above it. The same goes for the initial placement of a document window. Additional document windows should duplicate the most recent document window's frame offset by 15 pixels in both directions. As with size, a program should generally remember the screen placement of the windows and movement should not be restricted unless there is a good reason for it.</para>
 
 <para>A window need not always be visible. Duh. Considering that it can be hidden or closed altogether may be a bit confusing. Generally, a document should allow minimizing to make it possible for the user to get the document "out of the way" for a moment without having to close it entirely. Utility windows and program windows which are not the main window should normally not permit minimizing and just allow closing. The main window should allow minimizing. Note that when a program is not the focus, utility windows with the Floating:Subset and Floating:App behaviors will be hidden. Windows should normally be allowed to close unless there is a very good reason for it.</para>
 
-<para>A number of times it has been mentioned that you should not prevent something unless there is sufficient reason to do so. Particularly on other platforms, developers have been known to just disallow resizing because they didn't want to bother themselves with writing handler code. There are other instances where, for example, a window could not be closed because the code had a design flaw which would cause a crash if the window were closed. Remember: the more work you do in making your program helpful means the less work the user has to do which means that your program is easier to use.</para>
+<para>A number of times in this document it has been mentioned that you should not prevent something unless there is sufficient reason to do so. Particularly on other platforms, developers have been known to just disallow resizing because they didn't want to bother themselves with writing handler code. There are other instances where, for example, a window could not be closed because the code had a design flaw which would cause a crash if the window were closed. Remember: the more work you do in making your program helpful means the less work the user has to do, which means that your program is easier to use.</para>
 
 </sect1>
 <sect1>
 <title>B_ACCEPTS_FIRST_CLICK</title>
 
-<para>In MacOS X, the feature this flag enables is called click-through. It means that clicking on the window passes the click through to the control the mouse was under at the time even when the window does not have the focus. As a rule, this behavior should not be used, but there are times when it is quite useful, such as for system monitor programs, the Deskbar, and so forth.</para>
+<para>In MacOS X, the feature this flag enables is called click-through. It means that clicking on the window passes the click through to the control the mouse was under at the time even when the window does not have the focus. As a rule, this behavior should not be used, but there are times when it is quite useful, such as for system monitor programs, the Deskbar, and so forth. Typically, this flag is used for "helper" applications and utility windows.</para>
 </sect1>
 <sect1>
 <title>Modality</title>
 
-<para>By default, windows in BeOS operating systems are modeless, meaning that you can click on other windows besides the one with the focus. Occasionally, there is a need to force the user to make a decision before moving on. This is an appropriate time to use a modal window. The need is far less often than what most would believe, however. Most of the time the only reason to use a modal window would be if not doing so would make potential for the user to lose data and there is nothing that can be done to the code architecture to prevent it. This follows the "no restrictions for no good reason" way of thinking mentioned above -- modal windows place restrictions on what windows he can or can't click on. </para>
+<para>By default, windows in BeOS operating systems are modeless, meaning that you can click on other windows besides the one with the focus. Occasionally, there is a need to force the user to make a decision before moving on. This is an appropriate time to use a modal window. The need is far less often than what many would believe, however. Most of the time the only reason to use a modal window would be if not doing so would make potential for the user to lose data and there is nothing that can be done to the code architecture to prevent it. This follows the "no restrictions for no good reason" way of thinking mentioned above -- modal windows place restrictions on what windows he can or can't click on. </para>
 </sect1>
 </chapter>
 
@@ -829,9 +829,9 @@ Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default we
 <sect1>
 <title>Alert Windows</title>
 
-<para>Alert windows are the single easiest way to make usability mistakes. Most often, they are used to show error messages. The problem is that they are used *far* more often than they should be and the error messages that are used in them are too technical for a regular user to understand. They are also used to ask the user a question. More often than not, the question that is asked could have just as easily been answered by the developer had he thought ahead a bit. Do just about whatever it takes to gracefully handle errors without bothering the user. Only when all other options have been exhausted should you show an error message. For help on writing good error messages, see Chapter 6.</para>
+<para>Alert windows are the single easiest way to make usability mistakes. Most often, they are used to show error messages. The problem is that they are used *far* more often than they should be and the error messages that are used in them are too technical for a regular user to understand or are just plain useless. They are also used to ask the user a question. More often than not, the question that is asked could have just as easily been answered by the developer, had he thought ahead a bit. Do just about whatever it takes to gracefully handle errors without bothering the user. Only when all other options have been exhausted should you show an error message. For help on writing good error messages, see Chapter 6.</para>
 
-<para>Before you ask the user a question, be sure that it is one which you honestly can't answer yourself or can't do without possibly disturbing the way the user works. For example, it is good courtesy to ask the user if he would like your program to be the default handler for a particular kind of file when your program is installed. It is *never* acceptable to ask the user "Are you sure you want to quit?" If your program is asked to quit, handle unsaved documents and quit. "Are you sure..." questions should be asked only if the action involves the undoable destruction of data, such as deleting a file instead of moving it to the Trash. Avoiding these kinds of situations entirely is a better solution - if the confirmation is asked too often, the user will develop the habit of confirming it without a second thought.</para>
+<para>Before you ask the user a question, be sure that it is one which you honestly can't answer yourself or can't do without possibly disturbing the way the user works. For example, it is good courtesy to ask the user if he would like your program to be the default handler for a particular kind of file when your program is installed. It is *never* acceptable to ask the user "Are you sure you want to quit?" If your program is asked to quit, handle unsaved documents and quit. "Are you sure..." questions should be asked only if the action involves the undoable destruction of data, such as deleting a file instead of moving it to the Trash. Avoiding these kinds of situations entirely is a better solution. If the confirmation is asked too often, the user will develop the habit of confirming it without a second thought and your asking the question will be rendered moot.</para>
 
 <para>When you do use an alert window, please follow these guidelines:
 
@@ -847,22 +847,22 @@ Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default we
 <sect1>
 <title>Find Windows</title>
 
-<para>Windows used to search for data in a document are not very different from others, but how they are used can help or hinder the user when searching. It only needs to be shown when the user needs to set the search characteristics. Once they are set, the window should itself disappear and the search should be performed. A find window which stays visible clutters the screen and often obscures part of the current document. It also places the program in a separate mode, which should generally be avoided. The search itself should default to case-insensitive searches with an option to allow case sensitivity. Search by regular expression is an option that should be limited to programs which have programmers as the intended audience.</para>
+<para>Windows used to search for data in a document are not very different from others, but how they are used can help, hinder, or annoy the user when searching. It only needs to be shown when the user needs to set the search terms. Once they are set, the window should itself disappear and the search should be performed. A find window which stays visible clutters the screen and often obscures part of the current document, even the result of the search. It also places the program in a separate mode, which should generally be avoided. The search itself should default to case-insensitive searches with an option to allow case sensitivity. Search by regular expression is an option that should normally be limited to programs which have programmers as the intended audience.</para>
 
 </sect1>
 <sect1>
 <title>Options Window Design</title>
 
-<para>Windows to allow the user to change various program options are another place where developers commonly commit a usability faux pas or two. The most common mistakes are poorly-chosen defaults, technical terminology, and too many choices. Here are some guidelines for making a good one:
+<para>Windows to allow the user to change various program options are another place where developers commonly commit a usability faux pas or two. The most common mistakes are poorly-chosen defaults, inappropriate language for the target audience, and too many choices. Here are some guidelines for making a good one:
 
 <itemizedlist>
 <listitem><para>Choose defaults which fit the most number of people.</para></listitem>
 
 <listitem><para>When possible, have changes take place immediately instead of requiring the user to click OK. If you do this, provide buttons to revert changes and also to set the default values.</para></listitem>
 
-<listitem><para>Provide options for significant features. This would include things like default file format for CD ripper, European vs American date format, or the default account in a mail client. Frivolous options include "Use Ins key for paste" and "Confirm Program Quit".</para></listitem>
+<listitem><para>Provide options for significant features. This would include things like default file format for CD ripper, European vs American date format, or the default account in a mail client. Unncessary options include "Use Ins key for paste" and "Confirm Program Quit".</para></listitem>
 
-<listitem><para>Use everyday language. For example, the web browser option "Move system caret with focus/selection changes" requires some technical knowledge. A better way to label such an option would be "Allow text to be selected with the keyboard." Both refer to the same option. The difference is how many people can understand what it does.</para></listitem>
+<listitem><para>Use language appropriate for the target audience as mentioned in Chapter 2. For example, the web browser option "Move system caret with focus/selection changes" requires some technical knowledge. A better way to label such an option would be "Allow text to be selected with the keyboard." Both refer to the same option. The difference is how many people can understand what it does.</para></listitem>
 </itemizedlist>
 
 </para>
@@ -870,7 +870,7 @@ Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default we
 <sect1>
 <title>Open and Save Panels</title>
 
-<para>BFilePanel is used for both opening and saving files, but there is more to using them well than merely showing a list of files. Remember the location the user was viewing, and if it is inaccessible for some reason, show the Home folder. When possible, make use of file filters to eliminate files your program does not handle. By filtering out "bad" files, you eliminate errors and at the same time reduce the amount of time the user needs to find the file he wants. Offering a possible file name when saving a new document is another way to help the user. The title of the panel needs to match the task, whether it is Import, Export As, Save As, Save, Open, or something else.</para>
+<para>BFilePanel is used for both opening and saving files, but there is more to using them well than merely showing a list of files. Remember the location the user was viewing, and if it is inaccessible for some reason, show the Home folder. When possible, make use of file filters to eliminate files your program does not handle. By filtering out "bad" files, you eliminate errors and at the same time reduce the amount of time the user needs to find the file he wants by reducing the number of options. Offering a possible file name when saving a new document is another way to help the user. The title of the panel needs to match the task, whether it is Import, Export As, Save As, Save, Open, or something else.</para>
 </sect1>
 </chapter>
 
@@ -902,10 +902,11 @@ Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default we
 </entry>
 <entry>
 <itemizedlist>
-<listitem>Make them too small or ridiculously large -- like 100 pixels square for the word 'OK'</listitem>
+<listitem>Make them too small or ridiculously large -- like 100 pixels square for the word 'OK' when the font size is 10 point.</listitem>
 <listitem>Leave them blank</listitem>
 <listitem>Show a menu with one</listitem>
 <listitem>Use them for labels</listitem>
+<listitem>Change the label font</listitem>
 </itemizedlist>
 </entry>
 </row></tbody>
@@ -931,6 +932,7 @@ Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default we
 <itemizedlist>
 <listitem>Label checkboxes so that the user understands ahead of time what clicking on it will do.</listitem>
 <listitem>Use care in calculating bounding boxes</listitem>
+<listitem>Carefully choose label text</listitem>
 </itemizedlist>
 </entry>
 <entry>
@@ -965,12 +967,13 @@ Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default we
 <listitem>Label radio buttons so that the user understands ahead of time what clicking on one will do.</listitem>
 <listitem>Use care in calculating bounding boxes</listitem>
 <listitem>Set a default value</listitem>
+<listitem>Carefully choose label text</listitem>
 </itemizedlist>
 </entry>
 <entry>
 <itemizedlist>
 <listitem>Use them individually or use them the same way as checkboxes</listitem>
-<listitem>Use more than 5 in a group</listitem>
+<listitem>Use more than 5 or 6 in a group</listitem>
 </itemizedlist>
 </entry>
 </row></tbody>
@@ -1033,12 +1036,13 @@ Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default we
 <listitem>Show tick marks for each value if your slider has distinct increments</listitem>
 <listitem>Place the largest value at the right or top</listitem>
 <listitem>Use the appropriate orientation</listitem>
+<listitem>Label each slider position when the increment size changes, such as logarithmically</listitem>
 </itemizedlist>
 </entry>
 <entry>
 <itemizedlist>
 <listitem>Use a slider for a progress indicator or scrollbar</listitem>
-<listitem>Label each slider position</listitem>
+<listitem>Label each slider position for sliders with fixed increment sizes</listitem>
 </itemizedlist>
 </entry>
 </row></tbody>
@@ -1065,12 +1069,13 @@ Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default we
 <itemizedlist>
 <listitem>Label controls</listitem>
 <listitem>Use a separate label when layout makes it hard to use a control's built-in label.</listitem>
-<listitem>Associate labels with their controls via proximity</listitem>
+<listitem>Use proximity to associate labels with their controls</listitem>
 </itemizedlist>
 </entry>
 <entry>
 <itemizedlist>
 <listitem>Use a label for large amounts of static text</listitem>
+<listitem>Use a separate label object for controls which have label functions built-in</listitem>
 </itemizedlist>
 </entry>
 </row></tbody>
@@ -1106,6 +1111,7 @@ Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default we
 <listitem>Use a text control for a label</listitem>
 <listitem>Make them too small</listitem>
 <listitem>Use them for static text</listitem>
+<listitem>Arbitrarily limit the number of characters without a very good reason</listitem>
 </itemizedlist>
 </entry>
 </row></tbody>
@@ -1205,13 +1211,13 @@ Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default we
 <listitem>Use tabs to select a particular mode</listitem>
 <listitem>Nest tab views</listitem>
 <listitem>Use so many tabs that a scrolling is needed to see them all</listitem>
-<listitem>Place confirm / cancel buttons in tabs</listitem>
+<listitem>Place confirm / cancel buttons inside tabs</listitem>
 <listitem>Overlay toolbars by using tabs</listitem>
 <listitem>Use vertical text with vertical tabs</listitem>
 <listitem>Use tabs on more than one side at once</listitem>
 <listitem>Use one tab all by itself</listitem>
-<listitem>Just use icons to label tabs</listitem>
-<listitem>Use a scrollbar on a form in a tab</listitem>
+<listitem>Use unlabelled icons for tab titles</listitem>
+<listitem>Use a scrollbar to scroll a form inside a tab</listitem>
 </itemizedlist>
 </entry>
 </row></tbody>
@@ -1300,7 +1306,7 @@ Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default we
 <tbody><row>
 <entry>
 <itemizedlist>
-<listitem>Allow the user to let go of the mouse button and still have them menu stay visible</listitem>
+<listitem>Make pop-up menus sticky</listitem>
 <listitem>Use pop-up menus for context menus</listitem>
 </itemizedlist>
 </entry>
@@ -1367,7 +1373,7 @@ Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default we
 <entry>
 <itemizedlist>
 <listitem>Use them to speed up access to common functions</listitem>
-<listitem>Be conservative in button colors</listitem>
+<listitem>Avoid bright colors</listitem>
 <listitem>Make the function of each button obvious from the icons used</listitem>
 <listitem>Make toolbar buttons look like buttons and look clickable</listitem>
 </itemizedlist>
@@ -1392,7 +1398,7 @@ Go to (MyApp or MyCompany)'s Website </term><listitem><para>Opens the default we
 <chapter id="chapter13">
 <title>Installation and Updates</title>
 
-<para>It is easy to get so wrapped up in developing great software that you forget about getting it onto a user's computer. It pays to pay attention to detail in the installation of your software -- if a user can't get your program to work on his machine, you've just managed to both hurt your reputation as a developer and probably lose a user at the same time. Installation is one of those elements of software development that is given little, if any, attention when it works well but is quickly noticed when something goes wrong. As of this writing, there are two main methods of packaging and installing software on BeOS-based operating systems: zip files and Software Valet packages. </para>
+<para>It is easy to get so wrapped up in developing great software that you forget about getting it onto a user's computer. It pays to pay attention to detail in the installation of your software -- if a user can't get your program to work on his machine, you've just managed to both hurt your reputation as a developer and lost a user at the same time. Installation is one of those elements of software development that is given little, if any, attention when it works well but is quickly noticed when something goes wrong. As of this writing, there are two main methods of packaging and installing software on BeOS-based operating systems: zip files and Software Valet packages. </para>
 
 <sect1>
 Zip Files
@@ -1410,7 +1416,7 @@ Zip Files
 <sect1>
 <title>Getting Program Updates</title>
 
-<para>While there is no official support from the operating system, a conscientious developer will make a way for the user to easily update your program. Ideally, your program should automatically check for updates, ask the user if he would like to download them, download them in the background, and then install the updates when your program closes. Providing a way to roll back the updates in case of something going seriously wrong is also a very good idea. The only problem with this kind of setup is that it is a *lot* of work.</para>
+<para>While there is no official support from the operating system, a conscientious developer will make a way for the user to easily update his program. Ideally, your program should automatically check for updates, ask the user if he would like to download them, download them in the background, and then install the updates when your program starts up. Providing a way to roll back the updates in case of something going seriously wrong is also a very good idea. The only problem with this kind of setup is that it is a *lot* of work.</para>
 
 <para>Because of the popularity of BeOS download sites such as BeBits, it is relatively simple to post updates merely by releasing the new version on such sites. It places the check-download-install responsibility on the user, though. More motivated users will update their software; a great many users will not, so keep this in mind if this is the route you would choose to go.</para>
 </sect1>
