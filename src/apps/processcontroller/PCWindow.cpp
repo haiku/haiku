@@ -71,6 +71,7 @@ bool
 PCWindow::QuitRequested()
 {
 	GebsPreferences tPreferences(kPreferencesFileName);
+	tPreferences.SaveInt32(kCurrentVersion, kVersionName);
 	tPreferences.SaveWindowPosition(this, kPosPrefName);
 
 	be_app->PostMessage(B_QUIT_REQUESTED);
