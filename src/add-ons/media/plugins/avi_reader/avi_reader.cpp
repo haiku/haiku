@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004, Marcus Overhagen
+ * Copyright (c) 2004-2007, Marcus Overhagen
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -32,7 +32,7 @@
 #include "RawFormats.h"
 #include "avi_reader.h"
 
-//#define TRACE_AVI_READER
+#define TRACE_AVI_READER
 #ifdef TRACE_AVI_READER
   #define TRACE printf
 #else
@@ -71,7 +71,7 @@ struct avi_cookie
 
 
 aviReader::aviReader()
- :	fFile(0)
+ :	fFile(NULL)
 {
 	TRACE("aviReader::aviReader\n");
 }
@@ -110,8 +110,8 @@ aviReader::Sniff(int32 *streamCount)
 	
 	TRACE("aviReader::Sniff: this stream seems to be supported\n");
 	
-	fFile = new OpenDMLFile();
-	if (B_OK != fFile->SetTo(pos_io_source)) {
+	fFile = new OpenDMLFile(pos_io_source);
+	if (B_OK != fFile->Init()) {
 		ERROR("aviReader::Sniff: can't setup OpenDMLFile\n");
 		return B_ERROR;
 	}
@@ -169,24 +169,24 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		
 		if (audio_format->format_tag == 0x0001) {// PCM
 			cookie->frame_count = stream_header->length / ((stream_header->sample_size + 7) / 8);
-			TRACE("frame_count %Ld (is PCM)\n", cookie->frame_count);
+			TRACE("audio frame_count %Ld (is PCM)\n", cookie->frame_count);
 		} else if (stream_header->rate) { // not PCM
 			cookie->frame_count = (stream_header->length * (int64)audio_format->frames_per_sec) / stream_header->rate;
-			TRACE("frame_count %Ld (using rate)\n", cookie->frame_count);
+			TRACE("audio frame_count %Ld (using rate)\n", cookie->frame_count);
 		} else { // not PCM
 			cookie->frame_count = (stream_header->length * (int64)audio_format->frames_per_sec) / (stream_header->sample_size * audio_format->avg_bytes_per_sec);
-			TRACE("frame_count %Ld (using fallback)\n", cookie->frame_count);
+			TRACE("audio frame_count %Ld (using fallback)\n", cookie->frame_count);
 		}
 
 		if (stream_header->rate && stream_header->scale) {
 			cookie->duration = (1000000LL * (int64)stream_header->length * (int64)stream_header->scale) / stream_header->rate;
-			TRACE("duration %.6f (%Ld) (using scale & rate)\n", cookie->duration / 1E6, cookie->duration);
+			TRACE("audio duration %.6f (%Ld) (using scale & rate)\n", cookie->duration / 1E6, cookie->duration);
 		} else if (stream_header->rate) {
 			cookie->duration = (1000000LL * (int64)stream_header->length) / stream_header->rate;
-			TRACE("duration %.6f (%Ld) (using rate)\n", cookie->duration / 1E6, cookie->duration);
+			TRACE("audio duration %.6f (%Ld) (using rate)\n", cookie->duration / 1E6, cookie->duration);
 		} else {
 			cookie->duration = fFile->Duration();
-			TRACE("duration %.6f (%Ld) (using fallback)\n", cookie->duration / 1E6, cookie->duration);
+			TRACE("audio duration %.6f (%Ld) (using fallback)\n", cookie->duration / 1E6, cookie->duration);
 		}
 		
 		cookie->audio = true;
@@ -195,19 +195,19 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		if (stream_header->scale && stream_header->rate && stream_header->sample_size) {
 			cookie->bytes_per_sec_rate = stream_header->rate * stream_header->sample_size;
 			cookie->bytes_per_sec_scale = stream_header->scale;
-			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using both)\n", cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
+			TRACE("audio bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using both)\n", cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
 		} else if (audio_format->avg_bytes_per_sec) {
 			cookie->bytes_per_sec_rate = audio_format->avg_bytes_per_sec;
 			cookie->bytes_per_sec_scale = 1;
-			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using avg_bytes_per_sec)\n", cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
+			TRACE("audio bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using avg_bytes_per_sec)\n", cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
 		} else if (stream_header->rate) {
 			cookie->bytes_per_sec_rate = stream_header->rate;
 			cookie->bytes_per_sec_scale = 1;
-			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using rate)\n", cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
+			TRACE("audio bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using rate)\n", cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
 		} else {
 			cookie->bytes_per_sec_rate = 128000;
 			cookie->bytes_per_sec_scale = 8;
-			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using fallback)\n", cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
+			TRACE("audio bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using fallback)\n", cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
 		}
 
 		if (audio_format->format_tag == 0x0001) {
@@ -291,8 +291,8 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		cookie->frame_count = stream_header->length;
 		cookie->duration = (cookie->frame_count * (int64)cookie->frames_per_sec_scale * 1000000LL) / cookie->frames_per_sec_rate;
 		
-		TRACE("frame_count %Ld\n", cookie->frame_count);
-		TRACE("duration %.6f (%Ld)\n", cookie->duration / 1E6, cookie->duration);
+		TRACE("video frame_count %Ld\n", cookie->frame_count);
+		TRACE("video duration %.6f (%Ld)\n", cookie->duration / 1E6, cookie->duration);
 
 		description.family = B_AVI_FORMAT_FAMILY;
 		if (stream_header->fourcc_handler == 'ekaf' || stream_header->fourcc_handler == 0) // 'fake' or 0 fourcc => used compression id
@@ -383,8 +383,13 @@ aviReader::GetNextChunk(void *_cookie,
 	avi_cookie *cookie = (avi_cookie *)_cookie;
 
 	int64 start; uint32 size; bool keyframe;
-	if (!fFile->GetNextChunkInfo(cookie->stream, &start, &size, &keyframe))
+	if (fFile->GetNextChunkInfo(cookie->stream, &start, &size, &keyframe) < B_OK)
 		return B_LAST_BUFFER_ERROR;
+
+	if (size > 0x200000) { // 2 MB
+		ERROR("stream %d: frame too big: %u byte\n", size);
+		return B_NO_MEMORY;
+	}
 
 	if (cookie->buffer_size < size) {
 		delete [] cookie->buffer;

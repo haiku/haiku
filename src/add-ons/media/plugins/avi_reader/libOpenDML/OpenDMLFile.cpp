@@ -24,6 +24,9 @@
  */
 #include <stdio.h>
 #include "OpenDMLFile.h"
+#include "OpenDMLIndex.h"
+#include "StandardIndex.h"
+#include "FallbackIndex.h"
 
 #define TRACE_ODML_FILE
 #ifdef TRACE_ODML_FILE
@@ -34,6 +37,7 @@
 
 #define ERROR(a...) fprintf(stderr, a)
 
+#if 0
 #define INDEX_CHUNK_SIZE 32768
 
 struct OpenDMLFile::stream_data
@@ -62,19 +66,19 @@ struct OpenDMLFile::stream_data
 	int		index_chunk_entry_count;
 	int		index_chunk_entry_pos;
 };
+#endif
 
-OpenDMLFile::OpenDMLFile()
- : 	fSource(0),
-	fParser(0),
- 	fStreamCount(0),
- 	fStreamData(0)
+OpenDMLFile::OpenDMLFile(BPositionIO *source)
+ : 	fSource(source)
+ ,	fParser(NULL)
+ ,	fIndex(NULL)
 {
 }
 
 OpenDMLFile::~OpenDMLFile()
 {
 	delete fParser;
-	delete [] fStreamData;
+	delete fIndex;
 }
 
 /* static */ bool
@@ -88,10 +92,8 @@ OpenDMLFile::IsSupported(BPositionIO *source)
 }
 
 status_t
-OpenDMLFile::SetTo(BPositionIO *source)
+OpenDMLFile::Init()
 {
-	fSource = source;
-	delete fParser;
 	fParser = new OpenDMLParser(fSource);
 
 	if (fParser->Parse() < B_OK) {
@@ -103,28 +105,40 @@ OpenDMLFile::SetTo(BPositionIO *source)
 		return B_ERROR;
 	}
 	
-	if (fParser->StreamCount() != 0 && fParser->StandardIndexSize() == 0) {
-		TRACE("OpenDMLFile::SetTo file has no standard avi index\n");
-		bool found_odml_index = false;
-		for (int i = 0; i < fParser->StreamCount(); i++) {
-			if (fParser->StreamInfo(i)->odml_index_size != 0) {
-				found_odml_index = true;
-				break;
-			}
+	if (fParser->StreamCount() == 0) {
+		ERROR("OpenDMLFile::SetTo: no streams found\n");
+	}
+
+	if (fParser->StreamInfo(0)->odml_index_size != 0) {
+		fIndex = new OpenDMLIndex(fSource, fParser);
+		if (fIndex->Init() < B_OK) {
+			delete fIndex;
+			fIndex = NULL;
 		}
-		if (!found_odml_index) {
-			ERROR("OpenDMLFile::SetTo file has no standard avi index, and no OpenDML track index found\n");
+	}
+	if (!fIndex && fParser->StandardIndexSize() != 0) {
+		fIndex = new StandardIndex(fSource, fParser);
+		if (fIndex->Init() < B_OK) {
+			delete fIndex;
+			fIndex = NULL;
+		}
+	}
+	if (!fIndex) {
+		fIndex = new FallbackIndex(fSource, fParser);
+		if (fIndex->Init() < B_OK) {
+			delete fIndex;
+			fIndex = NULL;
+			TRACE("OpenDMLFile::SetTo: init of fallback index failed!\n");
 			return B_ERROR;
 		}
 	}
 	
 	TRACE("OpenDMLFile::SetTo: this is a %s AVI file with %d streams\n", fParser->OdmlExtendedHeader() ? "OpenDML" : "standard", fParser->StreamCount());
 
-	InitData();
-
 	return B_OK;
 }
 
+#if 0
 void
 OpenDMLFile::InitData()
 {
@@ -375,22 +389,18 @@ OpenDMLFile::AviGetNextChunkInfo(int stream_index, int64 *start, uint32 *size, b
 	TRACE("OpenDMLFile::AviGetNextChunkInfo: index end reached\n");
 	return false;
 }
+#endif
 
-bool
+status_t
 OpenDMLFile::GetNextChunkInfo(int stream_index, int64 *start, uint32 *size, bool *keyframe)
 {
-	stream_data *data = &fStreamData[stream_index];
-	if (data->has_standard_index)
-		return AviGetNextChunkInfo(stream_index, start, size, keyframe);
-	if (data->has_odml_index)
-		return OdmlGetNextChunkInfo(stream_index, start, size, keyframe);
-	return false;
+	return fIndex->GetNextChunkInfo(stream_index, start, size, keyframe);
 }
 
 int
 OpenDMLFile::StreamCount()
 {
-	return fStreamCount;
+	return fParser->StreamCount();
 }
 
 bigtime_t
@@ -416,13 +426,13 @@ OpenDMLFile::FrameCount()
 bool
 OpenDMLFile::IsVideo(int stream_index)
 {
-	return fStreamData[stream_index].info->is_video;
+	return fParser->StreamInfo(stream_index)->is_video;
 }
 
 bool
 OpenDMLFile::IsAudio(int stream_index)
 {
-	return fStreamData[stream_index].info->is_audio;
+	return fParser->StreamInfo(stream_index)->is_audio;
 }
 
 const avi_main_header *
@@ -434,25 +444,25 @@ OpenDMLFile::AviMainHeader()
 const wave_format_ex *
 OpenDMLFile::AudioFormat(int stream_index, size_t *size /* = 0*/)
 {
-	if (!fStreamData[stream_index].info->is_audio)
+	if (!fParser->StreamInfo(stream_index)->is_audio)
 		return 0;
-	if (!fStreamData[stream_index].info->audio_format)
+	if (!fParser->StreamInfo(stream_index)->audio_format)
 		return 0;
 	if (size)
-		*size = fStreamData[stream_index].info->audio_format_size;
-	return fStreamData[stream_index].info->audio_format;
+		*size = fParser->StreamInfo(stream_index)->audio_format_size;
+	return fParser->StreamInfo(stream_index)->audio_format;
 }
 
 const bitmap_info_header *
 OpenDMLFile::VideoFormat(int stream_index)
 {
-	return (fStreamData[stream_index].info->is_video && fStreamData[stream_index].info->video_format_valid) ?
-		&fStreamData[stream_index].info->video_format : 0;
+	return (fParser->StreamInfo(stream_index)->is_video && fParser->StreamInfo(stream_index)->video_format_valid) ?
+		&fParser->StreamInfo(stream_index)->video_format : 0;
 }
 
 const avi_stream_header *
 OpenDMLFile::StreamFormat(int stream_index)
 {
-	return (fStreamData[stream_index].info->stream_header_valid) ?
-		&fStreamData[stream_index].info->stream_header : 0;
+	return (fParser->StreamInfo(stream_index)->stream_header_valid) ?
+		&fParser->StreamInfo(stream_index)->stream_header : 0;
 }

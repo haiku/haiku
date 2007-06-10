@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004-2007, Marcus Overhagen
+ * Copyright (c) 2007, Marcus Overhagen
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -22,48 +22,25 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef _AVI_READER_H
-#define _AVI_READER_H
+#ifndef _INDEX_H
+#define _INDEX_H
 
-#include "ReaderPlugin.h"
-#include "OpenDMLFile.h"
+class OpenDMLParser;
 
-class aviReader : public Reader
+class Index
 {
 public:
-				aviReader();
-				~aviReader();
-	
-	const char *Copyright();
-	
-	status_t	Sniff(int32 *streamCount);
+						Index(BPositionIO *source, OpenDMLParser *parser);
+	virtual				~Index();
 
-	void		GetFileFormatInfo(media_file_format *mff);
+	virtual status_t	Init() = 0;
 
-	status_t	AllocateCookie(int32 streamNumber, void **cookie);
-	status_t	FreeCookie(void *cookie);
-	
-	status_t	GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
-							  media_format *format, const void **infoBuffer, size_t *infoSize);
+	virtual status_t	GetNextChunkInfo(int stream_index, int64 *start, uint32 *size, bool *keyframe) = 0;
+	virtual status_t	Seek(int stream_index, uint32 seekTo, int64 *frame, bigtime_t *time) = 0;
 
-	status_t	Seek(void *cookie,
-					 uint32 seekTo,
-					 int64 *frame, bigtime_t *time);
-
-	status_t	GetNextChunk(void *cookie,
-							 const void **chunkBuffer, size_t *chunkSize,
-							 media_header *mediaHeader);
-private:
-	OpenDMLFile	*fFile;
+protected:
+	BPositionIO *		fSource;
+	OpenDMLParser *		fParser;
 };
-
-
-class aviReaderPlugin : public ReaderPlugin
-{
-public:
-	Reader *NewReader();
-};
-
-MediaPlugin *instantiate_plugin();
 
 #endif
