@@ -62,6 +62,7 @@ class MainWindow : public BWindow {
  private:
  			void				_GetLocation();
 			void				_AdjustLocation(BRect frame);
+			void				_AddDefaultButtons();
 
 	BMessage*					fSettings;
 	PadView*					fPadView;

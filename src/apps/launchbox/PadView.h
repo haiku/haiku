@@ -11,6 +11,7 @@
 
 #include <View.h>
 
+class BGroupLayout;
 class LaunchButton;
 
 class PadView : public BView {
@@ -35,10 +36,14 @@ class PadView : public BView {
 			void				DisplayMenu(BPoint where,
 											LaunchButton* button = NULL) const;
 
+			void				SetOrientation(enum orientation orientation);
+			enum orientation	Orientation() const;
+
  private:
 			BPoint				fDragOffset;
 			bool				fDragging;
 			bigtime_t			fClickTime;
+			BGroupLayout*		fButtonLayout;
 };
 
 #endif // PAD_VIEW_H
