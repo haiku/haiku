@@ -55,12 +55,9 @@
 const char* kDeskbarItemName = "ProcessController";
 const char* kClassName = "ProcessController";
 
-const char* kMimicPulsePref = "mimic_pulse";
 const char* kFrameColorPref = "deskbar_frame_color";
 const char* kIdleColorPref = "deskbar_idle_color";
 const char* kActiveColorPref = "deskbar_active_color";
-
-const char* kPuseSettings = "Pulse_settings";
 
 const rgb_color kKernelBlue = {20, 20, 231,	255};
 const rgb_color kIdleGreen = {110, 190,110,	255};
@@ -80,7 +77,6 @@ rgb_color gMenuBackColor;
 rgb_color gWhiteSelected;
 ThreadBarMenu* gCurrentThreadBarMenu;
 bool gInDeskbar = false;
-int32 gMimicPulse = 0;
 
 #define addtopbottom(x) if (top) popup->AddItem(x); else popup->AddItem(x, 0)
 
@@ -358,15 +354,6 @@ ProcessController::MessageReceived(BMessage *message)
 			break;
 		}
 
-		case 'Colo':
-		{
-			GebsPreferences tPreferences(kPreferencesFileName);
-			gMimicPulse = (gMimicPulse == 0);
-			tPreferences.SaveInt32(gMimicPulse, kMimicPulsePref);
-			DefaultColors();
-			break;
-		}
-
 		case B_ABOUT_REQUESTED:
 			AboutRequested();
 			break;
@@ -380,18 +367,18 @@ ProcessController::MessageReceived(BMessage *message)
 void
 ProcessController::AboutRequested()
 {
-	BAlert *alert = new BAlert("about", "ProcessController\n"
-		"\tCopyright 1997-2001,\n"
-		"\t\tGeorges-Edouard Berenger.\n\n"
-		"\tCopyright 2006, Haiku, Inc.\n\n", "Ok");
+	BAlert *alert = new BAlert("about", "ProcessController\n\n"
+		"Copyright 1997-2001,\n"
+		"Georges-Edouard Berenger.\n\n"
+		"Copyright " B_UTF8_COPYRIGHT " 2007 Haiku, Inc.\n", "Close");
 	BTextView *view = alert->TextView();
 	BFont font;
 
 	view->SetStylable(true);
 
 	view->GetFont(&font);
-	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE); 			
+	font.SetSize(font.Size() * 1.5);
+	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, 17, &font);
 
 	alert->Go();
@@ -406,50 +393,6 @@ ProcessController::DefaultColors()
 	swap_color.blue = 0;
 	swap_color.alpha = 255;
 	bool set = false;
-
-	if (gMimicPulse) {
-		// TODO: remove this?
-		BPath prefpath;
-		if (find_directory(B_USER_SETTINGS_DIRECTORY, &prefpath) == B_OK) {
-			BDirectory prefdir(prefpath.Path ());
-			BEntry entry;
-			prefdir.FindEntry (kPuseSettings, &entry);
-			BFile file(&entry, B_READ_ONLY);
-			if (file.InitCheck() == B_OK) {
-				int32	f, i, a;
-				if (file.ReadAttr(kFrameColorPref, B_INT32_TYPE, 0, &f, 4) == 4
-					&& file.ReadAttr(kActiveColorPref, B_INT32_TYPE, 0, &a, 4) == 4
-					&& file.ReadAttr(kIdleColorPref, B_INT32_TYPE, 0, &i, 4) == 4) {
-					active_color.red = (a & 0xff000000) >> 24;
-					active_color.green = (a & 0x00ff0000) >> 16;
-					active_color.blue = (a & 0x0000ff00) >> 8;
-					active_color.alpha = 255;
-
-					idle_color.red = (i & 0xff000000) >> 24;
-					idle_color.green = (i & 0x00ff0000) >> 16;
-					idle_color.blue = (i & 0x0000ff00) >> 8;
-					idle_color.alpha = 255;
-
-					frame_color.red = (f & 0xff000000) >> 24;
-					frame_color.green = (f & 0x00ff0000) >> 16;
-					frame_color.blue = (f & 0x0000ff00) >> 8;
-					frame_color.alpha = 255;
-
-					mix_colors (memory_color, active_color, swap_color, 0.8);
-
-					set = true;
-				} else {
-					BAlert * alert = new BAlert("", "I couldn't read Pulse's preferences...",
-						"Sorry!", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-					alert->Go ();
-				}
-			} else {
-				BAlert * alert = new BAlert("", "I couldn't find Pulse's preferences...",
-					"Sorry!", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-				alert->Go ();
-			}
-		}
-	}
 
 	if (!set) {
 		active_color = kKernelBlue;
@@ -474,7 +417,6 @@ ProcessController::AttachedToWindow()
 		SetViewColor(kBlack);
 
 	GebsPreferences tPreferences(kPreferencesFileName, NULL, false);
-	tPreferences.ReadInt32(gMimicPulse, kMimicPulsePref);
 	DefaultColors();
 
 	system_info info;
@@ -740,12 +682,12 @@ thread_popup(void *arg)
 	}
 
 	if (!be_roster->IsRunning(kTrackerSig)) {
-		item = new IconMenuItem(gPCView->fTrackerIcon, "Launch Tracker", new BMessage('Trac'));
+		item = new IconMenuItem(gPCView->fTrackerIcon, "Restart Tracker", new BMessage('Trac'));
 		item->SetTarget(gPCView);
 		addtopbottom(item);
 	}
 	if (!be_roster->IsRunning(kDeskbarSig)) {
-		item = new IconMenuItem(gPCView->fDeskbarIcon, "Launch Deskbar", new BMessage('Dbar'));
+		item = new IconMenuItem(gPCView->fDeskbarIcon, "Restart Deskbar", new BMessage('Dbar'));
 		item->SetTarget(gPCView);
 		addtopbottom(item);
 	}
@@ -764,13 +706,6 @@ thread_popup(void *arg)
 		addtopbottom(item);
 		addtopbottom(new BSeparatorItem ());
 	}
-
-#if 0
-	item = new BMenuItem("Use Pulse's Settings for Colors", new BMessage ('Colo'));
-	item->SetTarget (gPCView);
-	item->SetMarked (gMimicPulse);
-	addtopbottom (item);
-#endif
 
 	item = new IconMenuItem(gPCView->fProcessControllerIcon, "About ProcessController" B_UTF8_ELLIPSIS,
 		new BMessage(B_ABOUT_REQUESTED));

@@ -86,7 +86,6 @@ extern	ThreadBarMenu*		gCurrentThreadBarMenu;
 extern	thread_id			gPopupThreadID;
 extern	const char*			kDeskbarItemName;
 extern	bool				gInDeskbar;
-extern	int32				gMimicPulse;
 
 #define kBarWidth 100
 #define kMargin	12
