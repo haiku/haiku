@@ -35,10 +35,10 @@ struct test_info {
 };
 
 const test_info kTestInfos[] = {
-	{ "box",		BoxTest::CreateTest },
-	{ "button",		ButtonTest::CreateTest },
-	{ "checkbox",	CheckBoxTest::CreateTest },
-	{ "listview",	ListViewTest::CreateTest },
+	{ "BBox",			BoxTest::CreateTest },
+	{ "BButton",		ButtonTest::CreateTest },
+	{ "BCheckBox",		CheckBoxTest::CreateTest },
+	{ "BListView",		ListViewTest::CreateTest },
 	{ NULL, NULL }
 };
 
