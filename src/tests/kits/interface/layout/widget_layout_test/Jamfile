@@ -2,17 +2,14 @@ SubDir HAIKU_TOP src tests kits interface layout widget_layout_test ;
 
 SetSubDirSupportedPlatforms haiku libbe_test ;
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) tests ] ;
+
 SimpleTest WidgetLayoutTest :
 	WidgetLayoutTest.cpp
 
 	AbstractButton.cpp
-	BoxTest.cpp
-	ButtonTest.cpp
 	CheckBox.cpp
-	CheckBoxTest.cpp
-	ControlTest.cpp
 	GroupView.cpp
-	ListViewTest.cpp
 	RadioButton.cpp
 	StringView.cpp
 	Test.cpp
@@ -21,6 +18,12 @@ SimpleTest WidgetLayoutTest :
 	View.cpp
 	ViewContainer.cpp
 	WrapperView.cpp
+
+	BoxTest.cpp
+	ButtonTest.cpp
+	CheckBoxTest.cpp
+	ControlTest.cpp
+	ListViewTest.cpp
 	:
 	be
 ;
