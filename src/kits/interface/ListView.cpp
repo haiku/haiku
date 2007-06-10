@@ -72,6 +72,20 @@ BListView::BListView(BRect frame, const char* name, list_view_type type,
 }
 
 
+BListView::BListView(const char* name, list_view_type type, uint32 flags)
+	: BView(name, flags)
+{
+	_InitObject(type);
+}
+
+
+BListView::BListView(list_view_type type)
+	: BView(NULL, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE)
+{
+	_InitObject(type);
+}
+
+
 BListView::BListView(BMessage* archive)
 	: BView(archive)
 {
@@ -1099,6 +1113,13 @@ BListView::MinSize()
 	// We need a stable min size: the BView implementation uses
 	// GetPreferredSize(), which by default just returns the current size.
 	return BLayoutUtils::ComposeSize(ExplicitMinSize(), BSize(10, 10));
+}
+
+
+BSize
+BListView::MaxSize()
+{
+	return BView::MaxSize();
 }
 
 

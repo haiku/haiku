@@ -26,6 +26,10 @@ class BListView : public BView, public BInvoker {
 			list_view_type type = B_SINGLE_SELECTION_LIST,
 			uint32 resizeMask = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
+		BListView(const char* name,
+			list_view_type type = B_SINGLE_SELECTION_LIST,
+			uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
+		BListView(list_view_type type = B_SINGLE_SELECTION_LIST);
 		BListView(BMessage* data);
 
 		virtual ~BListView() ;
@@ -119,6 +123,7 @@ class BListView : public BView, public BInvoker {
 		virtual void		AllDetached();
 
 		virtual	BSize		MinSize();
+		virtual	BSize		MaxSize();
 		virtual	BSize		PreferredSize();
 
 	protected:
