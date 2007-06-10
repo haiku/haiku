@@ -24,21 +24,22 @@ constrain(float& value, float min, float max)
 // constrain_int32_0_255_asm
 inline int32
 constrain_int32_0_255_asm(int32 value) {
-    asm("movl  $0,    %%ecx;
-         movl  $255,  %%edx;
-         cmpl  %%ecx, %%eax;
-         cmovl %%ecx, %%eax;
-         cmpl  %%edx, %%eax;
-         cmovg %%edx, %%eax"
-       : "=a" (value)
-       : "a" (value) 
-       : "%ecx", "%edx" );
-    return value;
+	asm("movl  $0,    %%ecx\n\t"
+		"movl  $255,  %%edx\n\t"
+		"cmpl  %%ecx, %%eax\n\t"
+		"cmovl %%ecx, %%eax\n\t"
+		"cmpl  %%edx, %%eax\n\t"
+		"cmovg %%edx, %%eax"
+		: "=a" (value)
+		: "a" (value) 
+		: "%ecx", "%edx" );
+	return value;
 }
 
 inline int32
-constrain_int32_0_255_c(int32 value) {
-    return max_c(0, min_c(255, value));
+constrain_int32_0_255_c(int32 value)
+{
+	return max_c(0, min_c(255, value));
 }
 
 #define constrain_int32_0_255 constrain_int32_0_255_asm
