@@ -13,6 +13,7 @@
 #include "CheckBox.h"
 #include "CheckBoxTest.h"
 #include "GroupView.h"
+#include "ListViewTest.h"
 #include "StringView.h"
 #include "Test.h"
 #include "TwoDimensionalSliderView.h"
@@ -276,6 +277,8 @@ main(int argc, const char* const* argv)
 		test = new ButtonTest;
 	} else if (strcmp(testName, "checkbox") == 0) {
 		test = new CheckBoxTest;
+	} else if (strcmp(testName, "listview") == 0) {
+		test = new ListViewTest;
 	} else {
 		fprintf(stderr, "Error: Invalid test name: \"%s\"\n", testName);
 		exit(1);
