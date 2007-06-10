@@ -27,6 +27,14 @@ ButtonTest::~ButtonTest()
 }
 
 
+// CreateTest
+Test*
+ButtonTest::CreateTest()
+{
+	return new ButtonTest;
+}
+
+
 // ActivateTest
 void
 ButtonTest::ActivateTest(View* controls)

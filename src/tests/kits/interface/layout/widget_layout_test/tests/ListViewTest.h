@@ -16,6 +16,8 @@ class ListViewTest : public Test {
 public:
 								ListViewTest();
 
+	static	Test*				CreateTest();
+
 private:
 			BListView*			fListView;
 };

@@ -27,6 +27,14 @@ CheckBoxTest::~CheckBoxTest()
 }
 
 
+// CreateTest
+Test*
+CheckBoxTest::CreateTest()
+{
+	return new CheckBoxTest;
+}
+
+
 // ActivateTest
 void
 CheckBoxTest::ActivateTest(View* controls)

@@ -29,6 +29,20 @@ enum {
 };
 
 
+struct test_info {
+	const char*	name;
+	Test*		(*create)();
+};
+
+const test_info kTestInfos[] = {
+	{ "box",		BoxTest::CreateTest },
+	{ "button",		ButtonTest::CreateTest },
+	{ "checkbox",	CheckBoxTest::CreateTest },
+	{ "listview",	ListViewTest::CreateTest },
+	{ NULL, NULL }
+};
+
+
 // helpful operator
 BPoint
 operator+(const BPoint& p, const BSize& size)
@@ -258,29 +272,45 @@ private:
 };
 
 
+static void
+print_test_list(bool error)
+{
+	FILE* out = (error ? stderr : stdout);
+
+	fprintf(out, "available tests:\n");
+
+	for (int32 i = 0; kTestInfos[i].name; i++)
+		fprintf(out, "  %s\n", kTestInfos[i].name);
+}
+
+
 int
 main(int argc, const char* const* argv)
 {
 	// get test name
-	const char* testName = "button";
-	if (argc >= 2)
-		testName = argv[1];
+	const char* testName;
+	if (argc < 2) {
+		fprintf(stderr, "Usage: %s <test name>\n", argv[0]);
+		print_test_list(true);
+		exit(1);
+	}
+	testName = argv[1];
 
 	// create app
 	BApplication app("application/x-vnd.haiku.widget-layout-test");
 
-	// create test
-	Test* test;
-	if (strcmp(testName, "box") == 0) {
-		test = new BoxTest;
-	} else if (strcmp(testName, "button") == 0) {
-		test = new ButtonTest;
-	} else if (strcmp(testName, "checkbox") == 0) {
-		test = new CheckBoxTest;
-	} else if (strcmp(testName, "listview") == 0) {
-		test = new ListViewTest;
-	} else {
+	// find and create the test
+	Test* test = NULL;
+	for (int32 i = 0; kTestInfos[i].name; i++) {
+		if (strcmp(testName, kTestInfos[i].name) == 0) {
+			test = (kTestInfos[i].create)();
+			break;
+		}
+	}
+
+	if (!test) {
 		fprintf(stderr, "Error: Invalid test name: \"%s\"\n", testName);
+		print_test_list(true);
 		exit(1);
 	}
 

@@ -22,3 +22,12 @@ ListViewTest::ListViewTest()
 		fListView->AddItem(new BStringItem(itemText.String()));
 	}
 }
+
+
+Test*
+ListViewTest::CreateTest()
+{
+	return new ListViewTest;
+}
+
+

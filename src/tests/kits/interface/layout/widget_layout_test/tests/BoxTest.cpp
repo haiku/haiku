@@ -77,6 +77,14 @@ BoxTest::~BoxTest()
 }
 
 
+// CreateTest
+Test*
+BoxTest::CreateTest()
+{
+	return new BoxTest;
+}
+
+
 // ActivateTest
 void
 BoxTest::ActivateTest(View* controls)

@@ -17,6 +17,7 @@ public:
 								ButtonTest();
 	virtual						~ButtonTest();
 
+	static	Test*				CreateTest();
 	virtual	void				ActivateTest(View* controls);
 	virtual	void				DectivateTest();
 

@@ -17,6 +17,8 @@ public:
 								CheckBoxTest();
 	virtual						~CheckBoxTest();
 
+	static	Test*				CreateTest();
+
 	virtual	void				ActivateTest(View* controls);
 	virtual	void				DectivateTest();
 
