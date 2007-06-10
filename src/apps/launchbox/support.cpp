@@ -85,7 +85,7 @@ stroke_frame(BView* v, BRect r, rgb_color left, rgb_color top,
 
 // make_sure_frame_is_on_screen
 bool
-make_sure_frame_is_on_screen(BRect& frame, BWindow* window = NULL)
+make_sure_frame_is_on_screen(BRect& frame, BWindow* window)
 {
 	BScreen* screen = window ? new BScreen(window) : new BScreen(B_MAIN_SCREEN_ID);
 	bool success = false;
