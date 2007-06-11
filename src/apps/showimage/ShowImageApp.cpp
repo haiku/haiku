@@ -14,6 +14,9 @@
 #include "ShowImageConstants.h"
 #include "ShowImageWindow.h"
 
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+#include <AboutWindow.h>
+#endif
 #include <Alert.h>
 #include <Clipboard.h>
 #include <FilePanel.h>
@@ -44,9 +47,20 @@ ShowImageApp::~ShowImageApp()
 void
 ShowImageApp::AboutRequested()
 {
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	const char *authors[] = {
+		"Fernando F. Oliveira",
+		"Michael Wilber",
+		"Michael Pfeiffer",
+		"Ryan Leavengood"
+	};
+	BAboutWindow about("ShowImage", 2003, 4, authors);
+	about.Show();
+#else
 	BAlert* alert = new BAlert("About ShowImage",
 		"Haiku ShowImage\n\nby Fernando F. Oliveira, Michael Wilber, Michael Pfeiffer and Ryan Leavengood", "OK");
 	alert->Go();
+#endif
 }
 
 

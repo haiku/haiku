@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src apps showimage ;
 
-UsePrivateHeaders tracker ;
+UsePrivateHeaders tracker interface ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 

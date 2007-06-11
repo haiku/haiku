@@ -37,6 +37,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) textview_support ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) layouter ] ;
 
 MergeObject <libbe>interface_kit.o :
+	AboutWindow.cpp
 	AbstractLayoutItem.cpp
 	Alert.cpp
 	Alignment.cpp
