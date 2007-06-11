@@ -1,7 +1,6 @@
 /*
 	Copyright (c) 2002-2004, Thomas Kurschel
 	
-
 	Part of Radeon accelerant
 		
 	Hardware access routines for overlays
@@ -620,7 +619,6 @@ static status_t Radeon_ShowOverlay(
 	dest_right -= vc->mode.h_display_start + crtc->rel_x;
 	dest_bottom -= vc->mode.v_display_start + crtc->rel_y;
 
-	
 	// clip to visible area
 	if( dest_left < 0 ) {
 		src_left += -dest_left * src_h_inc;
@@ -889,7 +887,7 @@ static status_t Radeon_ShowOverlay(
 	scale_ctrl = RADEON_SCALER_ENABLE | 
 		RADEON_SCALER_DOUBLE_BUFFER | 
 		(node->ati_space << 8) | 
-		RADEON_SCALER_ADAPTIVE_DEINT |
+		/* RADEON_SCALER_ADAPTIVE_DEINT | */
 		RADEON_SCALER_BURST_PER_PLANE |
 		(crtc->crtc_idx == 0 ? 0 : RADEON_SCALER_CRTC_SEL );
 		
