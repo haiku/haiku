@@ -160,6 +160,7 @@ BMenu::BMenu(const char *name, menu_layout layout)
 		fMaxContentWidth(0.0f),
 		fInitMatrixSize(NULL),
 		fExtraMenuData(NULL),
+		fSubmenus(0),
 		fTrigger(0),
 		fResizeToFit(true),
 		fUseCachedMenuLayout(false),
@@ -193,6 +194,7 @@ BMenu::BMenu(const char *name, float width, float height)
 		fMaxContentWidth(0.0f),
 		fInitMatrixSize(NULL),
 		fExtraMenuData(NULL),
+		fSubmenus(0),
 		fTrigger(0),
 		fResizeToFit(true),
 		fUseCachedMenuLayout(false),
@@ -238,6 +240,7 @@ BMenu::BMenu(BMessage *archive)
 		fMaxContentWidth(0.0f),
 		fInitMatrixSize(NULL),
 		fExtraMenuData(NULL),
+		fSubmenus(0),
 		fTrigger(0),
 		fResizeToFit(true),
 		fUseCachedMenuLayout(false),
@@ -983,6 +986,7 @@ BMenu::BMenu(BRect frame, const char *name, uint32 resizingMode, uint32 flags,
 		fMaxContentWidth(0.0f),
 		fInitMatrixSize(NULL),
 		fExtraMenuData(NULL),
+		fSubmenus(0),
 		fTrigger(0),
 		fResizeToFit(resizeToFit),
 		fUseCachedMenuLayout(false),
@@ -1594,7 +1598,7 @@ BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems, BRect &fr
 			item->fBounds.top = frame.bottom;
 			item->fBounds.bottom = item->fBounds.top + iHeight + fPad.top + fPad.bottom;
 
-			if (item->fSubmenu != NULL)
+			if (fSubmenus)
 				iWidth += item->Frame().Height();
 
 			frame.right = max_c(frame.right, iWidth + fPad.left + fPad.right);

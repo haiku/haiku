@@ -649,11 +649,16 @@ BMenuItem::SetSuper(BMenu *super)
 {
 	if (fSuper != NULL && super != NULL)
 		debugger("Error - can't add menu or menu item to more than 1 container (either menu or menubar).");
-				
-	fSuper = super;
 
-	if (fSubmenu != NULL)
+	if (fSubmenu != NULL) {
+		if (super)
+			super->fSubmenus++;
+		else if (fSuper)
+			fSuper->fSubmenus--;	
 		fSubmenu->fSuper = super;
+	}
+		
+	fSuper = super;
 }
 
 
@@ -708,12 +713,13 @@ BMenuItem::_DrawMarkSymbol(rgb_color bgColor)
 void
 BMenuItem::_DrawShortcutSymbol()
 {
+	BMenu *menu = Menu();
 	BFont font;
-	Menu()->GetFont(&font);
+	menu->GetFont(&font);
 	BPoint where = ContentLocation();
-	where.x += fBounds.Width() - 28;	
-	if (fSubmenu)
-		where.x -= fBounds.Height();
+	where.x = fBounds.right - font.Size();	
+	if (menu->fSubmenus)
+		where.x -= fBounds.Height() - 4;
 
 	switch (fShortcutChar) {
 		case B_DOWN_ARROW:
@@ -730,8 +736,8 @@ BMenuItem::_DrawShortcutSymbol()
 	}
 
 	where.y += (fBounds.Height() - 11) / 2 - 1;
-	where.x -= 5;
-
+	where.x -= 4;	
+	
 	if (fModifiers & B_COMMAND_KEY) {
 		BRect rect(0,0,16,10);
 		BBitmap control(rect, B_CMAP8);
@@ -775,6 +781,7 @@ BMenuItem::_DrawSubmenuSymbol(rgb_color bgColor)
 	BRect r(fBounds);
 	r.left = r.right - r.Height();
 	r.InsetBy(2.0, 2.0);
+	//r.OffsetBy(2.0, 0.0);
 
 	fSuper->SetHighColor(tint_color(bgColor, kLightBGTint));
 	fSuper->FillRect(r);

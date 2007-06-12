@@ -292,7 +292,9 @@ static	bool		sAltAsCommandKey;
 		BPoint		*fInitMatrixSize;
 		_ExtraMenuData_	*fExtraMenuData;
 
-		uint32		_reserved[2];
+		uint32		_reserved[1];
+
+		int32		fSubmenus;
 
 		char		fTrigger;
 		bool		fResizeToFit;
