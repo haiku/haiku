@@ -82,6 +82,10 @@ CDPlayer::CDPlayer(BRect frame, const char *name, uint32 resizeMask, uint32 flag
 	
 	fWindowState = fCDDrive.GetState();
 	fVolumeSlider->SetValue(fCDDrive.GetVolume());
+	if (fVolumeSlider->Value() <= 2) {
+		fCDDrive.SetVolume(255);
+		fVolumeSlider->SetValue(255);
+	}
 	WatchCDState();
 }
 
@@ -131,9 +135,11 @@ CDPlayer::BuildGUI(void)
 	
 	r.OffsetTo(box->Bounds().right / 2, r.top);
 	fDiscTime = new BStringView(r,"DiscTime","Disc: --:-- / --:--",B_FOLLOW_RIGHT);
+	fDiscTime->ResizeToPreferred();
+	fDiscTime->ResizeBy(10,0);
 	box->AddChild(fDiscTime);
 	
-	box->ResizeTo(box->Bounds().Width(), fDiscTime->Frame().bottom + 10);
+	box->ResizeTo(fCDTitle->Frame().right + 5, fDiscTime->Frame().bottom + 10);
 	
 	fStop = new DrawButton(BRect(0,0,1,1), "Stop",
 							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"stop_up"),
@@ -150,7 +156,7 @@ CDPlayer::BuildGUI(void)
 								BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_up"),
 								BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_down"), 
 								BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_up_on"),
-								BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_down_on"), 
+								BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_down"), 
 								new BMessage(M_PLAY), B_FOLLOW_NONE, B_WILL_DRAW);
 
 	fPlay->ResizeToPreferred();
@@ -160,35 +166,35 @@ CDPlayer::BuildGUI(void)
 	fPrevTrack = new DrawButton(BRect(0,0,1,1), "PrevTrack",
 								BTranslationUtils::GetBitmap(B_PNG_FORMAT,"prev_up"),
 								BTranslationUtils::GetBitmap(B_PNG_FORMAT,"prev_down"),
-								new BMessage(M_PREV_TRACK), B_FOLLOW_BOTTOM,
+								new BMessage(M_PREV_TRACK), 0,
 								B_WILL_DRAW);
 	fPrevTrack->ResizeToPreferred();
-	fPrevTrack->MoveTo(fPlay->Frame().right + 10, stopTop);
+	fPrevTrack->MoveTo(fPlay->Frame().right + 20, stopTop);
 	AddChild(fPrevTrack);
 	
 	fNextTrack = new DrawButton(BRect(0,0,1,1), "NextTrack",
 								BTranslationUtils::GetBitmap(B_PNG_FORMAT,"next_up"),
 								BTranslationUtils::GetBitmap(B_PNG_FORMAT,"next_down"),
-								new BMessage(M_NEXT_TRACK), B_FOLLOW_BOTTOM,
+								new BMessage(M_NEXT_TRACK), 0,
 								B_WILL_DRAW);
 	fNextTrack->ResizeToPreferred();
-	fNextTrack->MoveTo(fPrevTrack->Frame().right + 2, stopTop);
+	fNextTrack->MoveTo(fPrevTrack->Frame().right + 1, stopTop);
 	AddChild(fNextTrack);
 	
 	fRewind = new DoubleShotDrawButton(BRect(0,0,1,1), "Rewind", 
 								BTranslationUtils::GetBitmap(B_PNG_FORMAT,"rew_up"),
 								BTranslationUtils::GetBitmap(B_PNG_FORMAT,"rew_down"),
-								new BMessage(M_REWIND), B_FOLLOW_BOTTOM, B_WILL_DRAW);
+								new BMessage(M_REWIND), 0, B_WILL_DRAW);
 	fRewind->ResizeToPreferred();
-	fRewind->MoveTo(fNextTrack->Frame().right + 10, stopTop);
+	fRewind->MoveTo(fNextTrack->Frame().right + 20, stopTop);
 	AddChild(fRewind);
 	
 	fFastFwd = new DoubleShotDrawButton(BRect(0,0,1,1), "FastFwd", 
 								BTranslationUtils::GetBitmap(B_PNG_FORMAT,"ffwd_up"),
 								BTranslationUtils::GetBitmap(B_PNG_FORMAT,"ffwd_down"),
-								new BMessage(M_FFWD), B_FOLLOW_BOTTOM, B_WILL_DRAW);
+								new BMessage(M_FFWD), 0, B_WILL_DRAW);
 	fFastFwd->ResizeToPreferred();
-	fFastFwd->MoveTo(fRewind->Frame().right + 2, stopTop);
+	fFastFwd->MoveTo(fRewind->Frame().right + 1, stopTop);
 	AddChild(fFastFwd);
 	
 	r.left = 10;
@@ -201,10 +207,10 @@ CDPlayer::BuildGUI(void)
 	AddChild(fVolumeSlider);
 	
 	fRepeat = new TwoStateDrawButton( BRect(0,0,1,1), "Repeat", 
-							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"repeat_up"),
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"repeat_up_off"),
 							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"repeat_down"), 
 							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"repeat_up_on"),
-							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"repeat_down_on"), 
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"repeat_down"), 
 							new BMessage(M_REPEAT), B_FOLLOW_NONE, B_WILL_DRAW);
 	fRepeat->ResizeToPreferred();
 	fRepeat->MoveTo(fPrevTrack->Frame().left,
@@ -213,24 +219,25 @@ CDPlayer::BuildGUI(void)
 	AddChild(fRepeat);
 	
 	fShuffle = new TwoStateDrawButton(BRect(0,0,1,1), "Shuffle", 
-							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"shuffle_up"),
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"shuffle_up_off"),
 							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"shuffle_down"), 
 							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"shuffle_up_on"),
-							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"shuffle_down_on"), 
+							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"shuffle_down"), 
 							new BMessage(M_SHUFFLE), B_FOLLOW_NONE, B_WILL_DRAW);
 	fShuffle->ResizeToPreferred();
-	fShuffle->MoveTo(fNextTrack->Frame().left + 2,fRepeat->Frame().top);
+	fShuffle->MoveTo(fRepeat->Frame().right + 2,fRepeat->Frame().top);
 	AddChild(fShuffle);
 	
 	fEject = new DrawButton(BRect(0,0,1,1), "Eject",
 							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"eject_up"),
 							BTranslationUtils::GetBitmap(B_PNG_FORMAT,"eject_down"),
-							new BMessage(M_EJECT), B_FOLLOW_BOTTOM, B_WILL_DRAW);
+							new BMessage(M_EJECT), 0, B_WILL_DRAW);
 	fEject->ResizeToPreferred();
 	fEject->MoveTo(fFastFwd->Frame().left, fShuffle->Frame().top);
 	AddChild(fEject);
 	
-	ResizeTo(fFastFwd->Frame().right + 10, fVolumeSlider->Frame().bottom + 10);
+	ResizeTo(box->Frame().right + 10, fVolumeSlider->Frame().bottom + 10);
+	
 }
 
 
@@ -259,7 +266,7 @@ CDPlayer::MessageReceived(BMessage *msg)
 				fWindowState = kPaused;
 				fCDDrive.Pause();
 				fPlay->SetBitmaps(0, BTranslationUtils::GetBitmap(B_PNG_FORMAT,"paused_up"),
-									BTranslationUtils::GetBitmap(B_PNG_FORMAT,"paused_down"));
+									BTranslationUtils::GetBitmap(B_PNG_FORMAT,"play_down"));
 			} else if (fWindowState == kPaused) {
 				fWindowState = kPlaying;
 				fCDDrive.Resume();
