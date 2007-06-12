@@ -593,6 +593,7 @@ ShowImageView::SetImage(const entry_ref *ref)
 		fCaption << ", " << fDocumentIndex << "/" << fDocumentCount;
 
 	fCaption << ", " << fImageType;
+	fZoom = 1.0;
 
 	AddToRecentDocuments();
 
@@ -1001,6 +1002,7 @@ ShowImageView::Draw(BRect updateRect)
 		}
 		DrawSelectionBox();
 	}
+	printf("fZoom is %f\n", fZoom);
 }
 
 
