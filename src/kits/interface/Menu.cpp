@@ -1578,6 +1578,9 @@ BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems, BRect &fr
 {
 	BFont font;
 	GetFont(&font);
+	bool command = false;
+	bool control = false;
+	bool shift = false;
 	for (int32 i = 0; i < fItems.CountItems(); i++) {
 		BMenuItem *item = ItemAt(i);	
 		if (item != NULL) {
@@ -1587,11 +1590,11 @@ BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems, BRect &fr
 			if (item->fModifiers && item->fShortcutChar) {
 				iWidth += font.Size();
 				if (item->fModifiers & B_COMMAND_KEY)
-					iWidth += 15;
+					command = true;
 				if (item->fModifiers & B_CONTROL_KEY)
-					iWidth += 15;
+					control = true;
 				if (item->fModifiers & B_SHIFT_KEY)
-					iWidth += 20;				
+					shift = true;				
 			}
 
 			item->fBounds.left = 0.0f;
@@ -1600,11 +1603,19 @@ BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems, BRect &fr
 
 			if (fSubmenus)
 				iWidth += item->Frame().Height();
-
+			
 			frame.right = max_c(frame.right, iWidth + fPad.left + fPad.right);
 			frame.bottom = item->fBounds.bottom + 1.0f;
 		}
 	}
+	
+	if (command)
+		frame.right += 17;
+	if (control)
+		frame.right += 17;
+	if (shift)
+		frame.right += 22;				
+			
 	if (fMaxContentWidth > 0)
 		frame.right = min_c(frame.right, fMaxContentWidth);
 

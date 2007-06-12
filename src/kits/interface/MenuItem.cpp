@@ -781,7 +781,6 @@ BMenuItem::_DrawSubmenuSymbol(rgb_color bgColor)
 	BRect r(fBounds);
 	r.left = r.right - r.Height();
 	r.InsetBy(2.0, 2.0);
-	//r.OffsetBy(2.0, 0.0);
 
 	fSuper->SetHighColor(tint_color(bgColor, kLightBGTint));
 	fSuper->FillRect(r);
