@@ -1,11 +1,11 @@
 /*
- * Copyright 2001-2006, Haiku, Inc.
+ * Copyright 2001-2007, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
  *		Bill Hayden (haydentech@users.sourceforge.net)
- *		Stefano Ceccherini (burton666@libero.it)
+ *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  *		Olivier Milla
  */
 
@@ -19,7 +19,6 @@
 
 #include <string.h>
 #include <stdlib.h>
-
 
 const uint32 kCtrlLength = 20*11;
 const unsigned char kCtrlBits[] = {
@@ -709,11 +708,12 @@ BMenuItem::_DrawMarkSymbol(rgb_color bgColor)
 void
 BMenuItem::_DrawShortcutSymbol()
 {
-	// TODO: Review this
+	BFont font;
+	Menu()->GetFont(&font);
 	BPoint where = ContentLocation();
-	where.x += fBounds.Width() - 28;
+	where.x += fBounds.Width() - 28;	
 	if (fSubmenu)
-		where.x -= 12;
+		where.x -= fBounds.Height();
 
 	switch (fShortcutChar) {
 		case B_DOWN_ARROW:
@@ -729,7 +729,8 @@ BMenuItem::_DrawShortcutSymbol()
 			break;
 	}
 
-	where -= BPoint(20, -1);
+	where.y += (fBounds.Height() - 11) / 2 - 1;
+	where.x -= 5;
 
 	if (fModifiers & B_COMMAND_KEY) {
 		BRect rect(0,0,16,10);
@@ -739,9 +740,9 @@ BMenuItem::_DrawShortcutSymbol()
 			control.SetBits(kAltBits, kAltLength, 0, B_CMAP8);
 		else
 			control.SetBits(kCtrlBits, kCtrlLength, 0, B_CMAP8);
-		fSuper->DrawBitmap(&control, where);
-
+		
 		where.x -= rect.Width() + 1;
+		fSuper->DrawBitmap(&control, where);
 	}
 
 	if (fModifiers & B_CONTROL_KEY) {
@@ -752,16 +753,16 @@ BMenuItem::_DrawShortcutSymbol()
 			control.SetBits(kCtrlBits, kCtrlLength, 0, B_CMAP8);
 		else	
 			control.SetBits(kAltBits, kAltLength, 0, B_CMAP8);
-		fSuper->DrawBitmap(&control, where);
-
 		where.x -= rect.Width() + 1;
+		fSuper->DrawBitmap(&control, where);
 	}
 
 	if (fModifiers & B_SHIFT_KEY) {
 		BRect rect(0,0,21,10);
 		BBitmap shift(rect, B_CMAP8);
 		shift.SetBits(kShiftBits, kShiftLength, 0, B_CMAP8);
-		fSuper->DrawBitmap(&shift, where - BPoint(6, 0));
+		where.x -= rect.Width() + 1;
+		fSuper->DrawBitmap(&shift, where);
 	}
 }
 

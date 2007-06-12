@@ -17,7 +17,7 @@
 #include <View.h>
 
 /*----------------------------------------------------------------*/
-/*----- Menu decalrations and structures -------------------------*/
+/*----- Menu declarations and structures -------------------------*/
 
 class BMenuItem;
 class BMenuBar;
@@ -204,6 +204,10 @@ virtual	void			_ReservedMenu6();
 		void		LayoutItems(int32 index);
 		void		ComputeLayout(int32 index, bool bestFit, bool moveItems,
 								  float* width, float* height);
+		void		_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems, BRect &outRect);
+		void		_ComputeRowLayout(int32 index, bool bestFit, bool moveItems, BRect &outRect);		
+		void		_ComputeMatrixLayout(BRect &outRect);
+
 		BRect		Bump(BRect current, BPoint extent, int32 index) const;
 		BPoint		ItemLocInRect(BRect frame) const;
 		BRect		CalcFrame(BPoint where, bool *scrollOn);

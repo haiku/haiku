@@ -16,7 +16,6 @@
 
 #include <new>
 
-using std::nothrow;
 
 struct popup_menu_data {
 	BPopUpMenu *object;
@@ -267,7 +266,7 @@ BMenuItem *
 BPopUpMenu::_Go(BPoint where, bool autoInvoke, bool startOpened,
 		BRect *_specialRect, bool async)
 {
-	popup_menu_data *data = new (nothrow) popup_menu_data;
+	popup_menu_data *data = new (std::nothrow) popup_menu_data;
 	if (!data)
 		return NULL;
 

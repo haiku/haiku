@@ -1530,90 +1530,19 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 	// Recalculate only the needed items,
 	// not the whole layout every time
 
-	BRect frame(0, 0, 0, 0);
-	float iWidth, iHeight;
-	BMenuItem *item = NULL;
-	
-	BFont font;
-	GetFont(&font);
+	BRect frame(0, 0, 0, 0);	
 	switch (fLayout) {
 		case B_ITEMS_IN_COLUMN:
-		{
-			for (int32 i = 0; i < fItems.CountItems(); i++) {
-				item = ItemAt(i);	
-				if (item != NULL) {
-					item->GetContentSize(&iWidth, &iHeight);
-
-					if (item->fModifiers && item->fShortcutChar)
-						iWidth += 2 * font.Size();
-					if (item->fSubmenu != NULL)
-						iWidth += 2 * font.Size();
-
-					item->fBounds.left = 0.0f;
-					item->fBounds.top = frame.bottom;
-					item->fBounds.bottom = item->fBounds.top + iHeight + fPad.top + fPad.bottom;
-
-					frame.right = max_c(frame.right, iWidth + fPad.left + fPad.right);
-					frame.bottom = item->fBounds.bottom + 1.0f;
-				}
-			}
-			if (fMaxContentWidth > 0)
-				frame.right = min_c(frame.right, fMaxContentWidth);
-
-			if (moveItems) {
-				for (int32 i = 0; i < fItems.CountItems(); i++)
-					ItemAt(i)->fBounds.right = frame.right;
-			}
-			frame.right = ceilf(frame.right);
-			frame.bottom--;
+			_ComputeColumnLayout(index, bestFit, moveItems, frame);
 			break;
-		}
 
 		case B_ITEMS_IN_ROW:
-		{
-			font_height fh;
-			GetFontHeight(&fh);
-			frame = BRect(0.0f, 0.0f, 0.0f,	ceilf(fh.ascent + fh.descent + fPad.top + fPad.bottom));	
-
-			for (int32 i = 0; i < fItems.CountItems(); i++) {
-				item = ItemAt(i);
-				if (item != NULL) {
-					item->GetContentSize(&iWidth, &iHeight);
-
-					item->fBounds.left = frame.right;
-					item->fBounds.top = 0.0f;
-					item->fBounds.right = item->fBounds.left + iWidth + fPad.left + fPad.right;
-
-					frame.right = item->Frame().right + 1.0f;
-					frame.bottom = max_c(frame.bottom, iHeight + fPad.top + fPad.bottom);
-				}
-			}
-			
-			if (moveItems) {
-				for (int32 i = 0; i < fItems.CountItems(); i++)
-					ItemAt(i)->fBounds.bottom = frame.bottom;			
-			}
-			
-			if (bestFit)
-				frame.right = ceilf(frame.right);
-			else
-				frame.right = Bounds().right;
+			_ComputeRowLayout(index, bestFit, moveItems, frame);
 			break;
-		}
 
 		case B_ITEMS_IN_MATRIX:
-		{
-			for (int32 i = 0; i < CountItems(); i++) {
-				item = ItemAt(i);
-				if (item != NULL) {
-					frame.left = min_c(frame.left, item->Frame().left);
-					frame.right = max_c(frame.right, item->Frame().right);
-					frame.top = min_c(frame.top, item->Frame().top);
-					frame.bottom = max_c(frame.bottom, item->Frame().bottom);
-				}			
-			}		
+			_ComputeMatrixLayout(frame);	
 			break;
-		}
 
 		default:
 			break;
@@ -1637,6 +1566,99 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 	
 	if (moveItems)
 		fUseCachedMenuLayout = true;
+}
+
+
+void
+BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems, BRect &frame)
+{
+	BFont font;
+	GetFont(&font);
+	for (int32 i = 0; i < fItems.CountItems(); i++) {
+		BMenuItem *item = ItemAt(i);	
+		if (item != NULL) {
+			float iWidth, iHeight;			
+			item->GetContentSize(&iWidth, &iHeight);
+
+			if (item->fModifiers && item->fShortcutChar) {
+				iWidth += font.Size();
+				if (item->fModifiers & B_COMMAND_KEY)
+					iWidth += 15;
+				if (item->fModifiers & B_CONTROL_KEY)
+					iWidth += 15;
+				if (item->fModifiers & B_SHIFT_KEY)
+					iWidth += 20;				
+			}
+
+			item->fBounds.left = 0.0f;
+			item->fBounds.top = frame.bottom;
+			item->fBounds.bottom = item->fBounds.top + iHeight + fPad.top + fPad.bottom;
+
+			if (item->fSubmenu != NULL)
+				iWidth += item->Frame().Height();
+
+			frame.right = max_c(frame.right, iWidth + fPad.left + fPad.right);
+			frame.bottom = item->fBounds.bottom + 1.0f;
+		}
+	}
+	if (fMaxContentWidth > 0)
+		frame.right = min_c(frame.right, fMaxContentWidth);
+
+	if (moveItems) {
+		for (int32 i = 0; i < fItems.CountItems(); i++)
+			ItemAt(i)->fBounds.right = frame.right;
+	}
+	frame.right = ceilf(frame.right);
+	frame.bottom--;	
+}
+
+
+void
+BMenu::_ComputeRowLayout(int32 index, bool bestFit, bool moveItems, BRect &frame)
+{
+	font_height fh;
+	GetFontHeight(&fh);
+	frame = BRect(0.0f, 0.0f, 0.0f,	ceilf(fh.ascent + fh.descent + fPad.top + fPad.bottom));	
+
+	for (int32 i = 0; i < fItems.CountItems(); i++) {
+		BMenuItem *item = ItemAt(i);
+		float iWidth, iHeight;
+		if (item != NULL) {
+			item->GetContentSize(&iWidth, &iHeight);
+
+			item->fBounds.left = frame.right;
+			item->fBounds.top = 0.0f;
+			item->fBounds.right = item->fBounds.left + iWidth + fPad.left + fPad.right;
+
+			frame.right = item->Frame().right + 1.0f;
+			frame.bottom = max_c(frame.bottom, iHeight + fPad.top + fPad.bottom);
+		}
+	}
+	
+	if (moveItems) {
+		for (int32 i = 0; i < fItems.CountItems(); i++)
+			ItemAt(i)->fBounds.bottom = frame.bottom;			
+	}
+	
+	if (bestFit)
+		frame.right = ceilf(frame.right);
+	else
+		frame.right = Bounds().right;
+}
+
+
+void
+BMenu::_ComputeMatrixLayout(BRect &frame)
+{
+	for (int32 i = 0; i < CountItems(); i++) {
+		BMenuItem *item = ItemAt(i);
+		if (item != NULL) {
+			frame.left = min_c(frame.left, item->Frame().left);
+			frame.right = max_c(frame.right, item->Frame().right);
+			frame.top = min_c(frame.top, item->Frame().top);
+			frame.bottom = max_c(frame.bottom, item->Frame().bottom);
+		}			
+	}		
 }
 
 
