@@ -1002,7 +1002,6 @@ ShowImageView::Draw(BRect updateRect)
 		}
 		DrawSelectionBox();
 	}
-	printf("fZoom is %f\n", fZoom);
 }
 
 
