@@ -15,7 +15,7 @@
 class BAboutWindow {
 	public:
 		BAboutWindow(char *appName, int32 firstCopyrightYear,
-			int32 numAuthors, const char **authors, char *extraInfo = NULL);
+			const char **authors, char *extraInfo = NULL);
 		virtual ~BAboutWindow();
 
 		void Show();

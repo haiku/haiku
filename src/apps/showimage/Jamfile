@@ -1,10 +1,13 @@
 SubDir HAIKU_TOP src apps showimage ;
 
-UsePrivateHeaders tracker interface ;
+UsePrivateHeaders tracker ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+UseSharedSource AboutWindow.cpp ;
+
 Application ShowImage :
+	AboutWindow.cpp
 	ShowImageApp.cpp
 	ShowImageSettings.cpp
 	ShowImageStatusView.cpp

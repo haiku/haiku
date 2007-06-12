@@ -6,17 +6,19 @@
  *		Ryan Leavengood, leavengood@gmail.com
  */
 
-#include <AboutWindow.h>
+#include "AboutWindow.h"
+
 #include <Alert.h>
 #include <Font.h>
 #include <String.h>
 #include <TextView.h>
 
+#include <stdarg.h>
 #include <time.h>
 
 
 BAboutWindow::BAboutWindow(char *appName, int32 firstCopyrightYear,
-	int32 numAuthors, const char **authors, char *extraInfo)
+	const char **authors, char *extraInfo)
 {
 	fAppName = new BString(appName);
 	fText = new BString();
@@ -32,12 +34,15 @@ BAboutWindow::BAboutWindow(char *appName, int32 firstCopyrightYear,
 	text << "\n\nCopyright " B_UTF8_COPYRIGHT " ";
 	text << firstCopyrightYear << "-" << currentYear << " Haiku, Inc.\n\n";
 	text << "Written by:\n";
-	for (int32 i = 0; i < numAuthors; i++) {
+	for (int32 i = 0; authors[i]; i++) {
 		text << "    " << authors[i] << "\n";
 	}
+	
+	// The extra information is optional
 	if (extraInfo != NULL) {
 		text << "\n" << extraInfo << "\n";
 	}
+
 	fText->Adopt(text);
 }
 

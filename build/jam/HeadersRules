@@ -338,6 +338,11 @@ rule UseLegacyObjectHeaders
 	SourceSysHdrs $(1) : [ FDirName $(HAIKU_TOP) headers legacy ] : $(2) ;
 }
 
+rule UseSharedHeaders
+{
+	UseHeaders [ FDirName $(HAIKU_TOP) headers shared ] ;
+}
+
 rule FStandardOSHeaders
 {
 	local osIncludes = add-ons add-ons/file_system add-ons/graphics
