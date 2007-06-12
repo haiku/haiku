@@ -96,17 +96,9 @@ OpenDMLFile::Init()
 {
 	fParser = new OpenDMLParser(fSource);
 
-	if (fParser->Parse() < B_OK) {
-		ERROR("OpenDMLFile::SetTo: warning, file parsing failed\n");		
-	}
-	
-	if (!fParser->AviMainHeader()) {
-		ERROR("OpenDMLFile::SetTo: avi main header not found\n");
+	if (fParser->Init() < B_OK) {
+		ERROR("OpenDMLFile::SetTo: parser init failed\n");
 		return B_ERROR;
-	}
-	
-	if (fParser->StreamCount() == 0) {
-		ERROR("OpenDMLFile::SetTo: no streams found\n");
 	}
 
 	if (fParser->StreamInfo(0)->odml_index_size != 0) {
@@ -391,10 +383,17 @@ OpenDMLFile::AviGetNextChunkInfo(int stream_index, int64 *start, uint32 *size, b
 }
 #endif
 
+
 status_t
 OpenDMLFile::GetNextChunkInfo(int stream_index, int64 *start, uint32 *size, bool *keyframe)
 {
 	return fIndex->GetNextChunkInfo(stream_index, start, size, keyframe);
+}
+
+status_t
+OpenDMLFile::Seek(int stream_index, uint32 seekTo, int64 *frame, bigtime_t *time)
+{
+	return fIndex->Seek(stream_index, seekTo, frame, time);
 }
 
 int
@@ -403,6 +402,7 @@ OpenDMLFile::StreamCount()
 	return fParser->StreamCount();
 }
 
+/*
 bigtime_t
 OpenDMLFile::Duration()
 {
@@ -422,7 +422,8 @@ OpenDMLFile::FrameCount()
 		return fParser->AviMainHeader()->total_frames;
 	return 0;
 }
-	
+*/
+
 bool
 OpenDMLFile::IsVideo(int stream_index)
 {
@@ -465,4 +466,10 @@ OpenDMLFile::StreamFormat(int stream_index)
 {
 	return (fParser->StreamInfo(stream_index)->stream_header_valid) ?
 		&fParser->StreamInfo(stream_index)->stream_header : 0;
+}
+
+const stream_info *
+OpenDMLFile::StreamInfo(int index)
+{
+	return fParser->StreamInfo(index);
 }

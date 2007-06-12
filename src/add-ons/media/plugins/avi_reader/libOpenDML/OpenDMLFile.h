@@ -40,10 +40,14 @@ public:
 	status_t			Init();
 	
 	int					StreamCount();
+
+	const stream_info * StreamInfo(int index);
 	
+/*
 	bigtime_t			Duration();
 	uint32				FrameCount();
-	
+*/
+
 	bool				IsVideo(int stream_index);
 	bool				IsAudio(int stream_index);
 
@@ -54,6 +58,7 @@ public:
 	const avi_stream_header *	StreamFormat(int stream_index);
 	
 	status_t			GetNextChunkInfo(int stream_index, int64 *start, uint32 *size, bool *keyframe);
+	status_t			Seek(int stream_index, uint32 seekTo, int64 *frame, bigtime_t *time);
 	
 	BPositionIO *Source() { return fSource; }
 		

@@ -30,7 +30,7 @@
 
 struct stream_info
 {
-	stream_info *		next;
+	stream_info *		next; // TODO: replace with a vector<>
 	bool				is_audio;
 	bool				is_video;
 	bool				stream_header_valid;
@@ -41,6 +41,11 @@ struct stream_info
 	bitmap_info_header	video_format;
 	int64				odml_index_start;
 	uint32				odml_index_size;
+	
+	bigtime_t 			duration;
+	int64				frame_count;
+	uint32				frames_per_sec_rate;
+	uint32				frames_per_sec_scale;
 };
 
 class OpenDMLParser
@@ -49,7 +54,7 @@ public:
 					OpenDMLParser(BPositionIO *source);
 					~OpenDMLParser();
 
-	status_t 		Parse();
+	status_t 		Init();
 	
 	int				StreamCount();
 
@@ -64,6 +69,7 @@ public:
 	const odml_extended_header * OdmlExtendedHeader();
 
 private:
+	status_t 		Parse();
 	status_t		ParseChunk_AVI(int number, uint64 start, uint32 size);
 	status_t		ParseChunk_LIST(uint64 start, uint32 size);
 	status_t		ParseChunk_idx1(uint64 start, uint32 size);
@@ -78,8 +84,12 @@ private:
 	status_t		ParseList_INFO(uint64 start, uint32 size);
 	status_t		ParseList_strl(uint64 start, uint32 size);
 
-private:
 	void			CreateNewStreamInfo();
+	void			SetupStreamLength(stream_info *stream);
+	void			SetupAudioStreamLength(stream_info *stream);
+	void			SetupVideoStreamLength(stream_info *stream);
+
+private:
 
 	BPositionIO *	fSource;
 	int64 			fSize;
