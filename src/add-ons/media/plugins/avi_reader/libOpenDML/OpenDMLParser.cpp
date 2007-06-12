@@ -158,7 +158,7 @@ OpenDMLParser::Parse()
 	uint64 pos = 0;
 	int riff_chunk_number = 0;
 	while (pos < (uint64)fSize) {
-		uint32 temp;
+		uint32 dword;
 		uint32 fourcc;
 		uint32 size;
 		uint64 maxsize;
@@ -170,21 +170,21 @@ OpenDMLParser::Parse()
 			return B_ERROR;
 		}
 
-		if (sizeof(temp) != fSource->ReadAt(pos, &temp, sizeof(temp))) {
+		if (fSource->ReadAt(pos, &dword, 4) != 4) {
 			ERROR("OpenDMLParser::Parse: read error at pos %llu\n", pos);
 			return B_ERROR;
 		}
 		pos += 4;
 		maxsize -= 4;
-		fourcc = AVI_UINT32(temp);
+		fourcc = AVI_UINT32(dword);
 
-		if (sizeof(temp) != fSource->ReadAt(pos, &temp, sizeof(temp))) {
+		if (fSource->ReadAt(pos, &dword, 4) != 4) {
 			ERROR("OpenDMLParser::Parse: read error at pos %llu\n", pos);
 			return B_ERROR;
 		}
 		pos += 4;
 		maxsize -= 4;
-		size = AVI_UINT32(temp);
+		size = AVI_UINT32(dword);
 
 		TRACE("OpenDMLParser::Parse: chunk '"FOURCC_FORMAT"', size = %lu, maxsize %Ld\n", FOURCC_PARAM(fourcc), size, maxsize);
 
@@ -217,11 +217,11 @@ OpenDMLParser::Parse()
 
 		TRACE("OpenDMLParser::Parse: it's a RIFF chunk!\n");
 
-		if (sizeof(temp) != fSource->ReadAt(pos, &temp, sizeof(temp))) {
+		if (fSource->ReadAt(pos, &dword, 4) != 4) {
 			ERROR("OpenDMLParser::Parse: read error at pos %llu\n", pos);
 			return B_ERROR;
 		}
-		fourcc = AVI_UINT32(temp);
+		fourcc = AVI_UINT32(dword);
 
 		if (riff_chunk_number == 0 && fourcc != FOURCC('A','V','I',' ')) {
 			ERROR("OpenDMLParser::Parse: not a AVI file\n");
@@ -257,23 +257,23 @@ OpenDMLParser::ParseChunk_AVI(int number, uint64 start, uint32 size)
 	}
 
 	while (pos < end) {
-		uint32 temp;
+		uint32 dword;
 		uint32 Chunkfcc;
 		uint32 Chunksize;
 
-		if (sizeof(temp) != fSource->ReadAt(pos, &temp, sizeof(temp))) {
+		if (fSource->ReadAt(pos, &dword, 4) != 4) {
 			ERROR("OpenDMLParser::ParseChunk_AVI: read error at pos %llu\n",pos);
 			return B_ERROR;
 		}
 		pos += 4;
-		Chunkfcc = AVI_UINT32(temp);
+		Chunkfcc = AVI_UINT32(dword);
 		
-		if (sizeof(temp) != fSource->ReadAt(pos, &temp, sizeof(temp))) {
+		if (fSource->ReadAt(pos, &dword, 4) != 4) {
 			ERROR("OpenDMLParser::ParseChunk_AVI: read error at pos %llu\n",pos);
 			return B_ERROR;
 		}
 		pos += 4;
-		Chunksize = AVI_UINT32(temp);
+		Chunksize = AVI_UINT32(dword);
 
 		uint32 maxsize = end - pos;
 
@@ -311,7 +311,7 @@ status_t
 OpenDMLParser::ParseChunk_LIST(uint64 start, uint32 size)
 {
 	TRACE("OpenDMLParser::ParseChunk_LIST\n");
-	uint32 temp;
+	uint32 dword;
 	uint32 fourcc;
 	
 	if (size < 5) {
@@ -319,11 +319,11 @@ OpenDMLParser::ParseChunk_LIST(uint64 start, uint32 size)
 		return B_ERROR;
 	}
 
-	if (sizeof(temp) != fSource->ReadAt(start, &temp, sizeof(temp))) {
+	if (fSource->ReadAt(start, &dword, 4) != 4) {
 		ERROR("OpenDMLParser::ParseChunk_LIST: read error at pos %llu\n", start);
 		return B_ERROR;
 	}
-	fourcc = AVI_UINT32(temp);
+	fourcc = AVI_UINT32(dword);
 
 	TRACE("OpenDMLParser::ParseChunk_LIST: type '"FOURCC_FORMAT"'\n", FOURCC_PARAM(fourcc));
 	
@@ -378,7 +378,7 @@ OpenDMLParser::ParseChunk_avih(uint64 start, uint32 size)
 
 	memset(&fAviMainHeader, 0, sizeof(fAviMainHeader));
 	size = min_c(size, sizeof(fAviMainHeader));
-	if ((ssize_t)size != fSource->ReadAt(start, &fAviMainHeader, size)) {
+	if (fSource->ReadAt(start, &fAviMainHeader, size) != (ssize_t)size) {
 		ERROR("OpenDMLParser::ParseChunk_avih: read error at pos %llu\n", start);
 		return B_ERROR;
 	}
@@ -435,7 +435,7 @@ OpenDMLParser::ParseChunk_strh(uint64 start, uint32 size)
 	memset(&fCurrentStream->stream_header, 0, sizeof(fCurrentStream->stream_header));
 
 	size = min_c(size, sizeof(fCurrentStream->stream_header));
-	if ((ssize_t)size != fSource->ReadAt(start, &fCurrentStream->stream_header, size)) {
+	if (fSource->ReadAt(start, &fCurrentStream->stream_header, size) != (ssize_t)size) {
 		ERROR("OpenDMLParser::ParseChunk_strh: read error at pos %llu\n", start);
 		return B_ERROR;
 	}
@@ -519,7 +519,7 @@ OpenDMLParser::ParseChunk_strf(uint64 start, uint32 size)
 		fCurrentStream->audio_format = (wave_format_ex *) new char[fCurrentStream->audio_format_size];
 		memset(size + (char *)fCurrentStream->audio_format, 0, fCurrentStream->audio_format_size - size);
 
-		if ((ssize_t)size != fSource->ReadAt(start, fCurrentStream->audio_format, size)) {
+		if (fSource->ReadAt(start, fCurrentStream->audio_format, size) != (ssize_t)size) {
 			ERROR("OpenDMLParser::ParseChunk_strf: read error at pos %llu\n", start);
 			delete [] fCurrentStream->audio_format;
 			fCurrentStream->audio_format_size = 0;
@@ -562,7 +562,7 @@ OpenDMLParser::ParseChunk_strf(uint64 start, uint32 size)
 		memset(&fCurrentStream->video_format, 0, sizeof(fCurrentStream->video_format));
 	
 		size = min_c(size, sizeof(fCurrentStream->video_format));
-		if ((ssize_t)size != fSource->ReadAt(start, &fCurrentStream->video_format, size)) {
+		if (fSource->ReadAt(start, &fCurrentStream->video_format, size) != (ssize_t)size) {
 			ERROR("OpenDMLParser::ParseChunk_strf: read error at pos %llu\n", start);
 			return B_ERROR;
 		}
@@ -651,7 +651,7 @@ OpenDMLParser::ParseChunk_dmlh(uint64 start, uint32 size)
 
 	memset(&fOdmlExtendedHeader, 0, sizeof(fOdmlExtendedHeader));
 	size = min_c(size, sizeof(fOdmlExtendedHeader));
-	if ((ssize_t)size != fSource->ReadAt(start, &fOdmlExtendedHeader, size)) {
+	if (fSource->ReadAt(start, &fOdmlExtendedHeader, size) != (ssize_t)size) {
 		ERROR("OpenDMLParser::ParseChunk_dmlh: read error at pos %llu\n", start);
 		return B_ERROR;
 	}
@@ -687,28 +687,28 @@ OpenDMLParser::ParseList_generic(uint64 start, uint32 size)
 	uint64 end = start + size;
 
 	if (size < 9) {
-		ERROR("OpenDMLParser::ParseList_generic: list too small at pos %llu\n",pos);
+		ERROR("OpenDMLParser::ParseList_generic: list too small at pos %llu\n", pos);
 		return B_ERROR;
 	}
 
 	while (pos < end) {
-		uint32 temp;
+		uint32 dword;
 		uint32 Chunkfcc;
 		uint32 Chunksize;
 
-		if (sizeof(temp) != fSource->ReadAt(pos, &temp, sizeof(temp))) {
-			ERROR("OpenDMLParser::ParseList_generic: read error at pos %llu\n",pos);
+		if (fSource->ReadAt(pos, &dword, 4) != 4) {
+			ERROR("OpenDMLParser::ParseList_generic: read error at pos %llu\n", pos);
 			return B_ERROR;
 		}
 		pos += 4;
-		Chunkfcc = AVI_UINT32(temp);
+		Chunkfcc = AVI_UINT32(dword);
 		
-		if (sizeof(temp) != fSource->ReadAt(pos, &temp, sizeof(temp))) {
-			ERROR("OpenDMLParser::ParseList_generic: read error at pos %llu\n",pos);
+		if (fSource->ReadAt(pos, &dword, 4) != 4) {
+			ERROR("OpenDMLParser::ParseList_generic: read error at pos %llu\n", pos);
 			return B_ERROR;
 		}
 		pos += 4;
-		Chunksize = AVI_UINT32(temp);
+		Chunksize = AVI_UINT32(dword);
 		
 		uint32 maxsize = end - pos;
 

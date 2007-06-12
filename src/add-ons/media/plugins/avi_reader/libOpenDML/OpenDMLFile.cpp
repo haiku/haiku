@@ -85,7 +85,7 @@ OpenDMLFile::~OpenDMLFile()
 OpenDMLFile::IsSupported(BPositionIO *source)
 {
 	uint8 h[12];
-	if (12 != source->ReadAt(0, h, 12))
+	if (source->ReadAt(0, h, 12) != 12)
 		return false;
 	return h[0] == 'R' && h[1] == 'I' && h[2] == 'F' && h[3] == 'F' &&
 		   h[8] == 'A' && h[9] == 'V' && h[10] == 'I' && h[11] == ' ';
