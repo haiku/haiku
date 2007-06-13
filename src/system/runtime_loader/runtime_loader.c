@@ -49,14 +49,17 @@ search_path_for_type(image_type type)
 			return NULL;
 	}
 
-	// ToDo: for now, if the variable was not set, return default paths
 	if (path != NULL)
 		return path;
 
+	// The environment variables may not have been set yet - in that case,
+	// we're returning some useful defaults.
+	// Since the kernel does not set any variables, this is also needed
+	// to start the root shell.
+
 	switch (type) {
 		case B_APP_IMAGE:
-			return "/boot/home/config/bin:"
-				"/bin:"
+			return "/bin:"
 				"/boot/apps:"
 				"/boot/preferences:"
 				"/boot/beos/apps:"
@@ -64,11 +67,10 @@ search_path_for_type(image_type type)
 				"/boot/develop/tools/gnupro/bin";
 
 		case B_LIBRARY_IMAGE:
-			return "%A/lib:/boot/home/config/lib:/boot/beos/system/lib";
+			return "%A/lib:/boot/beos/system/lib";
 
 		case B_ADD_ON_IMAGE:
 			return "%A/add-ons"
-				":/boot/home/config/add-ons"
 				":/boot/beos/system/add-ons";
 
 		default:

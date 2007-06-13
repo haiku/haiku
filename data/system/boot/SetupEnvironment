@@ -42,13 +42,13 @@ export BE_LINKER=ld
 export BE_DEFAULT_C_FLAGS=""
 export BE_DEFAULT_CPLUS_FLAGS=""
 
-export PATH=.:$HOME/config/bin:/bin:/boot/apps:/boot/preferences:/boot/beos/apps:/boot/beos/preferences:$BETOOLS
-
 if [ "$SAFEMODE" != "yes" ]
 then
+	export PATH=.:$HOME/config/bin:/bin:/boot/apps:/boot/preferences:/boot/beos/apps:/boot/beos/preferences:$BETOOLS
 	export LIBRARY_PATH="%A/lib:$HOME/config/lib:/boot/beos/system/lib"
 	export ADDON_PATH="%A/add-ons:$HOME/config/add-ons:/boot/beos/system/add-ons"
 else
+	export PATH=.:/bin:/boot/apps:/boot/preferences:/boot/beos/apps:/boot/beos/preferences:$BETOOLS
 	export LIBRARY_PATH="%A/lib:/boot/beos/system/lib"
 	export ADDON_PATH="%A/add-ons:/boot/beos/system/add-ons"
 fi
