@@ -1,0 +1,7 @@
+SubDir HAIKU_TOP src shared ;
+
+UsePrivateHeaders shared ;
+
+StaticLibrary libshared.a :
+	AboutWindow.cpp
+;
