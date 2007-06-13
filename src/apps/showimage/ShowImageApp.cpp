@@ -10,11 +10,11 @@
  */
 
 
-#include "AboutWindow.h" // Shared source
 #include "ShowImageApp.h"
 #include "ShowImageConstants.h"
 #include "ShowImageWindow.h"
 
+#include <AboutWindow.h>
 #include <Alert.h>
 #include <Clipboard.h>
 #include <FilePanel.h>

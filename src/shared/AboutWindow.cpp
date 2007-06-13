@@ -6,8 +6,7 @@
  *		Ryan Leavengood, leavengood@gmail.com
  */
 
-#include "AboutWindow.h"
-
+#include <AboutWindow.h>
 #include <Alert.h>
 #include <Font.h>
 #include <String.h>

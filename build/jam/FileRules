@@ -250,14 +250,3 @@ actions CopySetHaikuRevision1
 	$(2[2]) $(1) ${revision}
 }
 
-rule UseSharedSource
-{
-	UseSharedHeaders ;
-
-	for file in $(1) {
-		local gristed_file = [ FGristFiles $(file) ] ;
-		SEARCH on $(gristed_file) = [ FDirName $(HAIKU_TOP) src shared ] ;
-		LOCATE on $(gristed_file) = [ FDirName $(HAIKU_TOP) src shared ] ;
-		SEARCH_SOURCE on $(gristed_file) = [ FDirName $(HAIKU_TOP) src shared ] ;
-	}
-}
