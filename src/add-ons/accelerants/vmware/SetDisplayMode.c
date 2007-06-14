@@ -63,7 +63,17 @@ MOVE_DISPLAY(uint16 hDisplayStart, uint16 vDisplayStart)
 void
 SET_INDEXED_COLORS(uint count, uint8 first, uint8 *color_data, uint32 flags)
 {
+	// TODO: Take first and count into account.
+	// Currently we always pass 256 colors (random, most of the times) to the driver. Cool!
+	uint8 colors[256];
+	uint32 i;	
 	TRACE("SET_INDEXED_COLORS\n");
+
+	for (i = 0; i < count; i++) {
+		colors[i + first] = color_data[i];
+	}
+ 
+	ioctl(gFd, VMWARE_SET_PALETTE, colors, sizeof(count));
 }
 
 

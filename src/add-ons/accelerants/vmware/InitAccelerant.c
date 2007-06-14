@@ -28,7 +28,7 @@ status_t InitCommon(int fd)
 	gFd = fd;
 
 	/* Contact driver and get a pointer to the registers and shared data */
-	if ((ret = ioctl(fd, VMWARE_GET_PRIVATE_DATA, &gSharedArea,
+	if ((ret = ioctl(gFd, VMWARE_GET_PRIVATE_DATA, &gSharedArea,
 			sizeof(area_id))) != B_OK) {
 		TRACE("VMWARE_GET_PRIVATE_DATA failed (%d\n", ret);
 		return ret;
@@ -76,22 +76,50 @@ INIT_ACCELERANT(int fd)
 ssize_t
 ACCELERANT_CLONE_INFO_SIZE()
 {
-	return MAX_SAMPLE_DEVICE_NAME_LENGTH;
+	return B_PATH_NAME_LENGTH;
 }
 
 
 void
 GET_ACCELERANT_CLONE_INFO(void *data)
 {
-	/* TODO */
+	TRACE("GET_ACCELERANT_CLONE_INFO (%d)\n", gFd);
+
+	// TODO: I have no idea why this doesn't work: gFd is 0 here !?!?
+	//ioctl(gFd, VMWARE_GET_DEVICE_NAME, data, B_PATH_NAME_LENGTH);
+	strlcpy(data, "graphics/vmware", B_PATH_NAME_LENGTH);	
+	
 }
 
 
 status_t
 CLONE_ACCELERANT(void *data)
 {
-	/* TODO */
-	return B_ERROR;
+	int fd;
+	char path[B_PATH_NAME_LENGTH];
+	status_t ret;
+
+	// create full device name
+	strcpy(path, "/dev/");
+	strlcat(path, (const char *)data, sizeof(path));
+
+	TRACE("CLONE_ACCELERANT: %s\n", (const char *)path);
+
+	fd = open(path, B_READ_WRITE);
+	if (fd < 0)
+		return fd;
+
+	gAccelerantIsClone = 1;
+
+	/* Common initialization for the primary accelerant and clones */
+	if ((ret = InitCommon(fd)) == B_OK) {
+		/* Init semaphores */
+		INIT_BEN(gSi->engineLock);
+		INIT_BEN(gSi->fifoLock);
+	}
+
+	TRACE("CLONE_ACCELERANT: %d\n", ret);
+	return ret;
 }
 
 

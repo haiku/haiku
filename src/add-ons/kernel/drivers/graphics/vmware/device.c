@@ -299,6 +299,26 @@ ControlHook(void *dev, uint32 msg, void *buf, size_t len)
 			WriteReg(SVGA_REG_BITS_PER_PIXEL, BppForSpace(dm->space));
 			si->fbOffset = ReadReg(SVGA_REG_FB_OFFSET);
 			si->bytesPerRow = ReadReg(SVGA_REG_BYTES_PER_LINE);
+			ReadReg(SVGA_REG_DEPTH);
+			ReadReg(SVGA_REG_PSEUDOCOLOR);
+			ReadReg(SVGA_REG_RED_MASK);
+			ReadReg(SVGA_REG_GREEN_MASK);
+			ReadReg(SVGA_REG_BLUE_MASK);
+			return B_OK;
+		}
+
+		case VMWARE_SET_PALETTE:
+		{
+			uint8 *color = (uint8 *)buf;
+			uint32 i;
+			if (ReadReg(SVGA_REG_PSEUDOCOLOR) != 1)
+				return B_ERROR;
+
+			for (i = 0; i < 256; i++) {
+				WriteReg(SVGA_PALETTE_BASE + 3 * i, *color++);
+				WriteReg(SVGA_PALETTE_BASE + 3 * i + 1, *color++);
+				WriteReg(SVGA_PALETTE_BASE + 3 * i + 2, *color++);	
+			}		
 			return B_OK;
 		}
 
@@ -318,6 +338,14 @@ ControlHook(void *dev, uint32 msg, void *buf, size_t len)
 				SVGA_CURSOR_ON_SHOW);
 			return B_OK;
 		}
+		
+		case VMWARE_GET_DEVICE_NAME:
+			dprintf("device: VMWARE_GET_DEVICE_NAME %s\n", gPd->names[0]);
+			if (user_strlcpy((char *)buf, gPd->names[0],
+					B_PATH_NAME_LENGTH) < B_OK)
+				return B_BAD_ADDRESS;
+			return B_OK;
+			
 	}
 
 	TRACE("ioctl: %ld, %p, %ld\n", msg, buf, len);

@@ -16,6 +16,7 @@
 
 static const display_mode kModeList[] =
 { { { 19660,  640,  672,  744,  776,  480,  490,  494,  505,  0 }, B_RGB32_LITTLE, 640,  480,  0, 0, MODE_FLAGS }, /* 640x480@50Hz */
+  { { 19660,  640,  672,  744,  776,  480,  490,  494,  505,  0 }, B_CMAP8,	   640,  480,  0, 0, MODE_FLAGS }, /* 640x480@50Hz */
   { { 25250,  800,  832,  920,  952,  500,  511,  515,  526,  0 }, B_RGB32_LITTLE, 800,  500,  0, 0, MODE_FLAGS }, /* 800x500@50Hz */
   { { 30970,  800,  832,  944,  976,  600,  613,  618,  631,  0 }, B_RGB32_LITTLE, 800,  600,  0, 0, MODE_FLAGS }, /* 800x600@50Hz */
   { { 41980,  1024, 1056, 1208, 1240, 640,  653,  659,  673,  0 }, B_RGB32_LITTLE, 1024, 640,  0, 0, MODE_FLAGS }, /* 1024x640@50Hz */
@@ -49,9 +50,6 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low,
 
 	if (target->virtual_width > gSi->maxWidth ||
 		target->virtual_height > gSi->maxHeight)
-		return B_ERROR;
-
-	if (target->space != B_RGB32_LITTLE)
 		return B_ERROR;
 
 	/* Any such mode is OK, even if it isn't in our propose list */
