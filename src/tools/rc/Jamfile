@@ -13,12 +13,16 @@ SubDirC++Flags -include $(r5Compatibility) ;
 BuildPlatformStaticLibrary <build>librdef.a :
 	compile.cpp decompile.cpp lexer.l parser.y rdef.cpp ;
 
+# these platforms do not need a second copy of the strl routines
+if $(HOST_PLATFORM) != darwin && $(HOST_PLATFORM) != linux && $(HOST_PLATFORM) != freebsd {
+STRLSRC = strlcpy.c strlcat.c ;
+}
+
 BuildPlatformMain <build>rc :
 	rc.cpp
 
 	# these two are needed for R5 only
-	strlcpy.c
-	strlcat.c
+	$(STRLSRC)
 ;
 LinkAgainst <build>rc
 	: <build>librdef.a $(HOST_LIBSTDC++) $(HOST_LIBBE) $(HOST_LIBSUPC++) ;
