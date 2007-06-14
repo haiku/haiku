@@ -3,7 +3,7 @@
 #ifndef NET_FS_INSECURE_CONNECTION_H
 #define NET_FS_INSECURE_CONNECTION_H
 
-#if B_BEOS_VERSION <= B_BEOS_VERSION_5
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
 #	include <socket.h>
 #else
 #	include <netinet/in.h>

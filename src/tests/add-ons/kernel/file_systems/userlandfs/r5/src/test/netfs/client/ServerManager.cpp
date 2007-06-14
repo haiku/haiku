@@ -3,7 +3,7 @@
 #include <errno.h>
 #include <unistd.h>
 
-#if B_BEOS_VERSION <= B_BEOS_VERSION_5
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
 #	include <socket.h>
 #else
 #	include <netinet/in.h>
@@ -293,7 +293,7 @@ ServerManager::_BroadcastListener()
 		sockaddr_in addr;
 		addr.sin_family = AF_INET;
 		addr.sin_port = htons(kDefaultBroadcastPort);
-		addr.sin_addr.s_addr = INADDR_BROADCAST;
+		addr.sin_addr.s_addr = INADDR_ANY;
 		int addrSize = sizeof(addr);
 		BroadcastMessage message;
 //PRINT(("ServerManager::_BroadcastListener(): recvfrom()...\n"));

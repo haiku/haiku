@@ -3,9 +3,10 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#if B_BEOS_VERSION <= B_BEOS_VERSION_5
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
 #	include <socket.h>
 #else
+#	include <sys/socket.h>
 #	include <unistd.h>
 #endif
 
@@ -26,8 +27,12 @@ void
 safe_closesocket(vint32& socketVar)
 {
 	int32 socket = atomic_or(&socketVar, -1);
-	if (socket >= 0)
+	if (socket >= 0) {
+#ifndef HAIKU_TARGET_PLATFORM_BEOS
+		shutdown(socket, SHUTDOWN_BOTH);
+#endif
 		closesocket(socket);
+	}
 }
 
 #endif	// UTILS_H

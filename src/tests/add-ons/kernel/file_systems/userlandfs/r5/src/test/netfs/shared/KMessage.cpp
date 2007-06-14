@@ -21,9 +21,6 @@
 static const uint32 kMessageHeaderMagic = 'kMsG';
 static const int32 kMessageReallocChunkSize = 64;
 
-#if B_BEOS_VERSION <= B_BEOS_VERSION_5
-//#	define B_BAD_DATA -2147483632L
-#endif
 #ifndef B_BUFFER_OVERFLOW
 #	define B_BUFFER_OVERFLOW	EOVERFLOW
 #endif

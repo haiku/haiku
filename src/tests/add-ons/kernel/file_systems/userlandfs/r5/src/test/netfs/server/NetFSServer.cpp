@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#if B_BEOS_VERSION <= B_BEOS_VERSION_5
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
 #	include <socket.h>
 #else
 #	include <unistd.h>
@@ -1172,7 +1172,7 @@ NetFSServer::_Broadcaster()
 	}
 
 	// set the socket broadcast option
-	#if B_BEOS_VERSION > B_BEOS_VERSION_5
+	#ifndef HAIKU_TARGET_PLATFORM_BEOS
 		int soBroadcastValue = 1;
 		if (setsockopt(fBroadcastingSocket, SOL_SOCKET, SO_BROADCAST,
 			&soBroadcastValue, sizeof(soBroadcastValue)) < 0) {

@@ -423,10 +423,10 @@ SecurityContext::SecurityContext(BMessage* archive)
 	BMessage permissionsArchive;
 	if (archive->FindMessage("permissions", &permissionsArchive) != B_OK)
 		return;
-	#if B_BEOS_VERSION <= B_BEOS_VERSION_5
-		char* userName;
-	#else
+	#ifdef HAIKU_TARGET_PLATFORM_DANO
 		const char* userName;
+	#else
+		char* userName;
 	#endif
 	type_code type;
 	for (int32 userIndex = 0; 
@@ -442,10 +442,10 @@ SecurityContext::SecurityContext(BMessage* archive)
 			return;
 
 		// got a user: iterate through its permissions
-		#if B_BEOS_VERSION <= B_BEOS_VERSION_5
-			char* path;
-		#else
+		#ifdef HAIKU_TARGET_PLATFORM_DANO
 			const char* path;
+		#else
+			char* path;
 		#endif
 		for (int32 i = 0; 
 			 userArchive.GetInfo(B_INT32_TYPE, i, &path, &type) == B_OK;

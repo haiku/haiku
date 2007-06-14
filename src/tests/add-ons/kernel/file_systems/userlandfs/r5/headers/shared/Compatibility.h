@@ -30,7 +30,7 @@
 
 #include <BeBuild.h>
 
-#if B_BEOS_VERSION <= B_BEOS_VERSION_5
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
 //#	define B_BAD_DATA -2147483632L
 #else
 #	ifndef closesocket

@@ -2,7 +2,7 @@
 
 #include <errno.h>
 
-#if B_BEOS_VERSION <= B_BEOS_VERSION_5
+#ifdef HAIKU_TARGET_PLATFORM_BEOS
 #	include <socket.h>
 #else
 #	include <unistd.h>
@@ -30,7 +30,7 @@ InsecureChannel::InsecureChannel(int socket)
 		int dontBlock = 0;
 		setsockopt(fSocket, SOL_SOCKET, SO_NONBLOCK, &dontBlock, sizeof(int));
 
-#if B_BEOS_VERSION > B_BEOS_VERSION_5
+#ifndef HAIKU_TARGET_PLATFORM_BEOS
 		int txLowWater = 1;
 		setsockopt(fSocket, SOL_SOCKET, SO_SNDLOWAT, &txLowWater, sizeof(int));
 		setsockopt(fSocket, SOL_SOCKET, SO_RCVLOWAT, &txLowWater, sizeof(int));
