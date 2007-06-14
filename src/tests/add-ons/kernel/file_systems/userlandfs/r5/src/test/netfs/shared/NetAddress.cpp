@@ -90,7 +90,7 @@ NetAddress::IsLocal() const
 		return false;
 	}
 	// create a socket and try to bind it to a port of this address
-	int fd = socket(AF_INET, SOCK_STREAM, 0);
+	int fd = socket(AF_INET, SOCK_DGRAM, 0);
 	if (fd < 0)
 		return false;
 #if defined(HAIKU_TARGET_PLATFORM_DANO) || defined(HAIKU_TARGET_PLATFORM_DANO)
