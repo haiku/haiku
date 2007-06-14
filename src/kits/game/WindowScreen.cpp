@@ -1006,23 +1006,36 @@ BWindowScreen::_InitClone()
 		return status;
 	}
 	
+	accelerant_clone_info_size clone_info_size;
+	get_accelerant_clone_info clone_info;
+	clone_accelerant clone;
+	clone_info_size = (accelerant_clone_info_size)fGetAccelerantHook(B_ACCELERANT_CLONE_INFO_SIZE, NULL);
+	clone_info = (get_accelerant_clone_info)fGetAccelerantHook(B_GET_ACCELERANT_CLONE_INFO, NULL);
+	clone = (clone_accelerant)fGetAccelerantHook(B_CLONE_ACCELERANT, NULL);
+
 	status = B_ERROR;
-	clone_accelerant clone = (clone_accelerant)fGetAccelerantHook(B_CLONE_ACCELERANT, 0);
-	if (clone == NULL) {
+	if (!clone_info_size || !clone_info || !clone) {
 		printf("InitClone: cannot get clone hook\n");
 		unload_add_on(fAddonImage);
 		fAddonImage = -1;
 		return status;
 	}
 
-	link.StartMessage(AS_GET_DRIVER_PATH);
-	link.Attach<int32>(fWorkspaceIndex);
-	if (link.FlushWithReply(status) == B_OK && status == B_OK) {
-		BString driverPath;
-		link.ReadString(driverPath);
-		status = clone((void *)driverPath.String());
+	ssize_t cloneInfoSize = clone_info_size();
+	void *cloneInfo = malloc(cloneInfoSize);
+	if (!cloneInfo) {
+		unload_add_on(fAddonImage);
+		fAddonImage = -1;
+		return B_NO_MEMORY;
 	}
+
+	clone_info(cloneInfo);
+		// no way to see if this call fails
+
+	status = clone(cloneInfo);
 	
+	free(cloneInfo);
+
 	if (status < B_OK) {
 		printf("InitClone: cannot clone accelerant\n");
 		unload_add_on(fAddonImage);
