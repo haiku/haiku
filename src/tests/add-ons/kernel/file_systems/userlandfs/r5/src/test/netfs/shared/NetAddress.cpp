@@ -5,6 +5,12 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#if defined(HAIKU_TARGET_PLATFORM_DANO) || defined(HAIKU_TARGET_PLATFORM_DANO)
+#	include <net/route.h>
+#	include <sys/sockio.h>
+#	include <stdlib.h>
+#endif
+
 #include "AutoLocker.h"
 #include "Compatibility.h"
 #include "Locker.h"
@@ -87,11 +93,42 @@ NetAddress::IsLocal() const
 	int fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (fd < 0)
 		return false;
+#if defined(HAIKU_TARGET_PLATFORM_DANO) || defined(HAIKU_TARGET_PLATFORM_DANO)
+	// BONE does allow you to bind to any address!
+	// Therefore, we iterate over all routes, and see if there are any local
+	// ones for this address.
+
+	bool result = false;
+	uint32 count;
+	if (ioctl(fd, SIOCGRTSIZE, &count) == 0) {
+		route_req_t* routes = (route_req_t*)malloc(count * sizeof(route_req_t));
+		if (routes != NULL) {
+			route_table_req table;
+			table.rrtp = routes;
+			table.len = count * sizeof(route_req_t);
+			table.cnt = count;
+			if (ioctl(fd, SIOCGRTTABLE, &table) == 0) {
+				for (uint32 i = 0; i < table.cnt; i++) {
+					if ((routes[i].flags & RTF_LOCAL) == 0)
+						continue;
+					if (((sockaddr_in*)&routes[i].dst)->sin_addr.s_addr
+							== fAddress.sin_addr.s_addr) {
+						result = true;
+						break;
+					}
+				}
+			}
+			free(routes);
+		}
+	}
+#else
 	// bind it to a port
 	sockaddr_in addr = fAddress;
 	addr.sin_port = 0;
 	bool result = (bind(fd, (sockaddr*)&addr, sizeof(addr)) == 0);
+#endif
 	closesocket(fd);
+
 	return result;
 }
 
