@@ -869,18 +869,9 @@ fssh_get_driver_settings(void *handle)
 	return &((settings_handle *)handle)->settings;
 }
 
-#ifndef HAIKU_HOST_PLATFORM_DARWIN
-// this creates an alias of the above function
-// unload_driver_settings() is the same as delete_driver_settings()
-extern "C" __typeof(fssh_unload_driver_settings) fssh_delete_driver_settings
-	__attribute__ ((alias ("fssh_unload_driver_settings")));
-#else
-// can't use weak aliases on darwin apparently
+
 fssh_status_t
 fssh_delete_driver_settings(void *handle)
 {
 	return fssh_unload_driver_settings(handle);
 }
-#endif
-
-
