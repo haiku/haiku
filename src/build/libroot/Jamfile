@@ -22,8 +22,9 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers build private kernel ] : true ;
 MakeLocate libroot_build.so : $(HOST_BUILD_COMPATIBILITY_LIB_DIR) ;
 
 # darwin already has strlcpy and strlcat in libSystem
+local strlSources ;
 if $(HOST_PLATFORM) != darwin {
-STRLSRC = strlcpy.c strlcat.c ;
+	strlSources = strlcpy.c strlcat.c ;
 }
 
 BuildPlatformSharedLibrary libroot_build.so :
@@ -37,12 +38,12 @@ BuildPlatformSharedLibrary libroot_build.so :
 	sem.cpp
 	thread.cpp
 
-	$(STRLSRC)
+	$(strlSources)
 	strnlen.c
 
 	:
 	$(HOST_LIBSTDC++)
 ;
 
-SEARCH on [ FGristFiles strlcat.c strlcpy.c strnlen.c ]
+SEARCH on [ FGristFiles $(strlSources) strnlen.c ]
 	= [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
