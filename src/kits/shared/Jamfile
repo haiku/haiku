@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src shared ;
+SubDir HAIKU_TOP src kits shared ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 

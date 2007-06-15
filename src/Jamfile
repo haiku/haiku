@@ -10,7 +10,6 @@ SubInclude HAIKU_TOP src kits ;
 SubInclude HAIKU_TOP src libs ;
 SubInclude HAIKU_TOP src preferences ;
 SubInclude HAIKU_TOP src servers ;
-SubInclude HAIKU_TOP src shared ;
 SubInclude HAIKU_TOP src system ;
 SubInclude HAIKU_TOP src tests ;
 SubInclude HAIKU_TOP src tools ;
