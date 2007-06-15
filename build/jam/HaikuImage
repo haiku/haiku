@@ -171,6 +171,8 @@ AddSymlinkToHaikuImage beos system lib : libnetwork.so : libbind.so ;
 AddSymlinkToHaikuImage beos system lib : libnetwork.so : libnet.so ;
 AddSymlinkToHaikuImage beos system lib : libnetwork.so : libnetapi.so ;
 AddSymlinkToHaikuImage beos system lib : libnetwork.so : libbnetapi.so ;
+# libGL.so have GLUT built-in
+AddSymlinkToHaikuImage beos system lib : $(X86_ONLY)libGL.so : libglut.so ;
 
 # servers
 AddFilesToHaikuImage beos system servers : $(BEOS_SYSTEM_SERVERS) ;
