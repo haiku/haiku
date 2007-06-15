@@ -25,7 +25,11 @@ IconView::IconView(const BRect &frame, const char *name,
 		
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
+#if __HAIKU__
+	fIconBitmap = new BBitmap(BRect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1), B_RGBA32);
+#else
 	fIconBitmap = new BBitmap(BRect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1), B_CMAP8);
+#endif
 }
 
 IconView::~IconView()
@@ -65,7 +69,15 @@ IconView::DrawIcon(bool draw)
 void
 IconView::Draw(BRect area)
 {
+#if __HAIKU__
+	SetDrawingMode(B_OP_ALPHA);
+	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+#else
+	SetDrawingMode(B_OP_OVER);
+#endif
 	if (fDrawIcon)
 		DrawBitmap(fIconBitmap);
+
+	SetDrawingMode(B_OP_COPY);
 }
 
