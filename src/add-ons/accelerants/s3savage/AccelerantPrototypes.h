@@ -2,12 +2,11 @@
 	Copyright 1999, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
-#ifndef GENERIC_H
-#define GENERIC_H
 
+#ifndef ACCELERANT_PROTOTYPES_H
+#define ACCELERANT_PROTOTYPES_H
 
 #include <Accelerant.h>
-
 
 status_t INIT_ACCELERANT(int fd);
 ssize_t ACCELERANT_CLONE_INFO_SIZE(void);
@@ -48,5 +47,10 @@ void FILL_RECTANGLE(engine_token *et, uint32 color, fill_rect_params *list, uint
 void INVERT_RECTANGLE(engine_token *et, fill_rect_params *list, uint32 count);
 
 void FILL_SPAN(engine_token *et, uint32 color, uint16 *list, uint32 count);
+
+// Prototype for other functions that are called from source files
+// other than where they are defined.
+
+status_t create_mode_list(void);
 
 #endif

@@ -10,15 +10,17 @@ Addon s3savage.accelerant :
 	Cursor.c
 	EngineManagement.c
 	GetAccelerantHook.c
+	GetDeviceInfo.c
 	GetModeInfo.c
 	GlobalData.c
 	InitAccelerant.c
 	ProposeDisplayMode.c
 	SetDisplayMode.c
-
-	s3accel.c
-	s3drv.c
-	s3vga.c
+	
+	savage_accel.c
+	savage_cursor.c
+	savage_dpms.c
+	savage_driver.c
 
 	: be
 ;

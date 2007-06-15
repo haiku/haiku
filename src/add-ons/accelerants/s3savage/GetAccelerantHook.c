@@ -1,12 +1,12 @@
 /*
 	Copyright 1999, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
-*/
-/*
- * Copyright 1999  Erdi Chen
- */
 
-#include "generic.h"
+	Other authors:
+	Gerald Zajac 2006-2007
+*/
+
+#include "AccelerantPrototypes.h"
 
 /*
 
@@ -19,20 +19,24 @@ is available.  Any extra information available to choose the function will be
 noted on a case by case below.
 
 */
-void *	get_accelerant_hook(uint32 feature, void *data) {
+void *	
+get_accelerant_hook(uint32 feature, void *data)
+{
+	(void)data;		// avoid compiler warning for unused arg
+
 	switch (feature) {
-/*
-These definitions are out of pure lazyness.
-*/
+		/*
+		These definitions are out of pure lazyness.
+		*/
 #define HOOK(x) case B_##x: return (void *)x
 #define ZERO(x) case B_##x: return (void *)0
 
-/*
-One of either B_INIT_ACCELERANT or B_CLONE_ACCELERANT will be requested and
-subsequently called before any other hook is requested.  All other feature
-hook selections can be predicated on variables assigned during the accelerant
-initialization process.
-*/
+		/*
+		One of either B_INIT_ACCELERANT or B_CLONE_ACCELERANT will be requested and
+		subsequently called before any other hook is requested.  All other feature
+		hook selections can be predicated on variables assigned during the accelerant
+		initialization process.
+		*/
 		/* initialization */
 		HOOK(INIT_ACCELERANT);
 		HOOK(CLONE_ACCELERANT);
@@ -53,7 +57,7 @@ initialization process.
 		HOOK(GET_PIXEL_CLOCK_LIMITS);
 		HOOK(MOVE_DISPLAY);
 		HOOK(SET_INDEXED_COLORS);
-		HOOK(GET_TIMING_CONSTRAINTS);
+		//HOOK(GET_TIMING_CONSTRAINTS);
 
 		HOOK(DPMS_CAPABILITIES);
 		HOOK(DPMS_MODE);
@@ -72,13 +76,13 @@ initialization process.
 		HOOK(GET_SYNC_TOKEN);
 		HOOK(SYNC_TO_TOKEN);
 
-/*
-When requesting an acceleration hook, the calling application provides a
-pointer to the display_mode for which the acceleration function will be used.
-Depending on the engine architecture, you may choose to provide a different
-function to be used with each bit-depth.  In the sample driver we return
-the same function all the time.
-*/
+		/*
+		When requesting an acceleration hook, the calling application provides a
+		pointer to the display_mode for which the acceleration function will be used.
+		Depending on the engine architecture, you may choose to provide a different
+		function to be used with each bit-depth.  In the sample driver we return
+		the same function all the time.
+		*/
 		/* 2D acceleration */
 		HOOK(SCREEN_TO_SCREEN_BLIT);
 		HOOK(FILL_RECTANGLE);
@@ -86,9 +90,11 @@ the same function all the time.
 		HOOK(FILL_SPAN);
 #undef HOOK
 #undef ZERO
+
 	}
-/*
-Return a null pointer for any feature we don't understand.
-*/
+	/*
+	Return a null pointer for any feature we don't understand.
+	*/
 	return 0;
 }
+
