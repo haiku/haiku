@@ -9,7 +9,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) mime ] ;
 
 USES_BE_API on <libbe_build>storage_kit.o = true ;
 
-BuildPlatformMergeObject <libbe_build>storage_kit.o :
+BuildPlatformMergeObjectPIC <libbe_build>storage_kit.o :
 	AppFileInfo.cpp
 	Directory.cpp
 	Entry.cpp

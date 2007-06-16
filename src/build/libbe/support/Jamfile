@@ -5,7 +5,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers build private app ] : true ;
 
 USES_BE_API on <libbe_build>support_kit.o = true ;
 
-BuildPlatformMergeObject <libbe_build>support_kit.o :
+BuildPlatformMergeObjectPIC <libbe_build>support_kit.o :
 	Archivable.cpp
 	BlockCache.cpp
 	ByteOrder.cpp

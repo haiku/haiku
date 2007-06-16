@@ -387,6 +387,9 @@ HOST_ASFLAGS = ;
 HOST_CCFLAGS += -Wno-multichar ;
 HOST_C++FLAGS += -Wno-multichar ;
 
+HOST_PIC_CCFLAGS += -fPIC ;
+HOST_PIC_C++FLAGS += -fPIC ;
+
 HOST_KERNEL_CCFLAGS += -finline -fno-builtin
 	-DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) -D_KERNEL_MODE ;
 HOST_KERNEL_C++FLAGS += -finline -fno-builtin -fno-exceptions
