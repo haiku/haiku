@@ -206,7 +206,7 @@ dump_bplustree_node(const bplustree_node *node, const bplustree_header *header,
 		buffer[length] = '\0';
 
 		off_t *value = node->Values() + i;
-		if ((uint32)value < (uint32)node || (uint32)value > (uint32)node + header->node_size)
+		if ((addr_t)value < (addr_t)node || (addr_t)value > (addr_t)node + header->node_size)
 			Print("  %2d. Invalid Offset!!\n", (int)i);
 		else {
 			Print("  %2d. ", (int)i);
