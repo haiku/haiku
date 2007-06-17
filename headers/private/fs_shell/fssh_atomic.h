@@ -23,6 +23,13 @@ int32_t	fssh_atomic_and(vint32_t *value, int32_t andValue);
 int32_t	fssh_atomic_or(vint32_t *value, int32_t orValue);	
 int32_t	fssh_atomic_get(vint32_t *value);
 
+int64_t	fssh_atomic_set64(vint64_t *value, int64_t newValue);
+int64_t	fssh_atomic_test_and_set64(vint64_t *value, int64_t newValue,
+			int64_t testAgainst);
+int64_t	fssh_atomic_add64(vint64_t *value, int64_t addValue);
+int64_t	fssh_atomic_and64(vint64_t *value, int64_t andValue);
+int64_t	fssh_atomic_or64(vint64_t *value, int64_t orValue);	
+int64_t	fssh_atomic_get64(vint64_t *value);
 
 #ifdef __cplusplus
 }

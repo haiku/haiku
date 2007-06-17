@@ -50,3 +50,46 @@ fssh_atomic_get(vint32_t *value)
 {
 	return atomic_get((vint32*)value);
 }
+
+
+int64_t
+fssh_atomic_set64(vint64_t *value, int64_t newValue)
+{
+	return atomic_set64((vint64*)value, newValue);
+}
+
+
+int64_t
+fssh_atomic_test_and_set64(vint64_t *value, int64_t newValue, int64_t testAgainst)
+{
+	return atomic_test_and_set64((vint64 *)value, newValue, testAgainst);
+}
+
+
+int64_t
+fssh_atomic_add64(vint64_t *value, int64_t addValue)
+{
+	return atomic_add64((vint64*)value, addValue);
+}
+
+
+int64_t
+fssh_atomic_and64(vint64_t *value, int64_t andValue)
+{
+	return atomic_and64((vint64*)value, andValue);
+}
+
+
+int64_t
+fssh_atomic_or64(vint64_t *value, int64_t orValue)	
+{
+	return atomic_or64((vint64*)value, orValue);
+}
+
+
+int64_t
+fssh_atomic_get64(vint64_t *value)
+{
+	return atomic_get64((vint64*)value);
+}
+

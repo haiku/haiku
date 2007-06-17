@@ -3222,8 +3222,13 @@ common_unlock_node(int fd, bool kernel)
 
 	// We need to set the locking atomically - someone
 	// else might set one at the same time
+#ifdef __x86_64__
+	if (fssh_atomic_test_and_set64((vint64_t *)&vnode->mandatory_locked_by,
+			0, (fssh_addr_t)descriptor) != (int64_t)descriptor)
+#else
 	if (fssh_atomic_test_and_set((vint32_t *)&vnode->mandatory_locked_by,
 			0, (fssh_addr_t)descriptor) != (int32_t)descriptor)
+#endif
 		status = FSSH_B_BAD_VALUE;
 
 	put_fd(descriptor);

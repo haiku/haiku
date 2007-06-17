@@ -20,7 +20,7 @@ private:
 	static void CleanupRegionHorizontal(BRegion &region);
 	
 	static void SortRects(clipping_rect *rects, long count);
-	static void SortTrans(long *lptr1, long *lptr2, long count);	
+	static void SortTrans(int32 *lptr1, int32 *lptr2, long count);	
 	
 	static void CopyRegionMore(const BRegion &, BRegion &, long);
 	

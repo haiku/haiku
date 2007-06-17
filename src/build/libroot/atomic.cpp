@@ -57,3 +57,52 @@ atomic_get(vint32 *value)
 {
 	return *value;
 }
+
+
+int64
+atomic_set64(vint64 *value, int64 newValue)
+{
+	int64 oldValue = *value;
+	*value = newValue;
+	return oldValue;
+}
+
+int64
+atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst)
+{
+	int64 oldValue = *value;
+	if (oldValue == testAgainst)
+		*value = newValue;
+	return oldValue;
+}
+
+int64
+atomic_add64(vint64 *value, int64 addValue)
+{
+	int64 oldValue = *value;
+	*value += addValue;
+	return oldValue;
+}
+
+int64
+atomic_and64(vint64 *value, int64 andValue)
+{
+	int64 oldValue = *value;
+	*value &= andValue;
+	return oldValue;
+}
+
+int64
+atomic_or64(vint64 *value, int64 orValue)
+{
+	int64 oldValue = *value;
+	*value |= orValue;
+	return oldValue;
+}
+
+int64
+atomic_get64(vint64 *value)
+{
+	return *value;
+}
+

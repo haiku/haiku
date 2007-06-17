@@ -351,7 +351,7 @@ BRegion::Support::SortRects(clipping_rect *rects, long count)
 
 // Helper methods to swap transition points in two given arrays
 static inline void
-SwapTrans(long *leftPoints, long *rightPoints, long index1, long index2)
+SwapTrans(int32 *leftPoints, int32 *rightPoints, long index1, long index2)
 {
 	// First, swap the left points
 	long tmp = leftPoints[index1];
@@ -366,7 +366,7 @@ SwapTrans(long *leftPoints, long *rightPoints, long index1, long index2)
 
 
 void
-BRegion::Support::SortTrans(long *lptr1, long *lptr2, long count)
+BRegion::Support::SortTrans(int32 *lptr1, int32 *lptr2, long count)
 {
 	CALLED();
 	
@@ -779,9 +779,9 @@ BRegion::Support::SubRegionComplex(const BRegion &first, const BRegion &second,
 	// TODO: Find a better name for this function
 */
 static void
-InvertRectangles(long *lefts, long *rights, long count)
+InvertRectangles(int32 *lefts, int32 *rights, long count)
 {
-	long tmpLeft, tmpRight = kMaxNegative;
+	int32 tmpLeft, tmpRight = kMaxNegative;
 	
 	for (int i = 0; i <= count; i++) {	
 		tmpLeft = lefts[i] - 1;

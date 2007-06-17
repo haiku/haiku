@@ -5,8 +5,13 @@
 
 typedef uint32_t			fssh_ulong;
 typedef volatile int32_t	vint32_t;
+typedef volatile int64_t	vint64_t;
 
+#ifdef __x86_64__
+typedef uint64_t	fssh_addr_t;
+#else
 typedef uint32_t	fssh_addr_t;
+#endif
 
 typedef int32_t		fssh_dev_t;
 typedef int64_t		fssh_ino_t;
