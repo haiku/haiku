@@ -18,7 +18,7 @@
 BCheckBox::BCheckBox(BRect frame, const char *name, const char *label,
 		BMessage *message, uint32 resizingMode, uint32 flags)
 	: BControl(frame, name, label, message, resizingMode, flags),
-	  fPreferredSize(-1, -1),
+	  fPreferredSize(),
 	  fOutlined(false)
 {
 	// Resize to minimum height if needed
@@ -34,7 +34,7 @@ BCheckBox::BCheckBox(BRect frame, const char *name, const char *label,
 BCheckBox::BCheckBox(const char *name, const char *label, BMessage *message,
 	uint32 flags)
 	: BControl(name, label, message, flags | B_WILL_DRAW | B_NAVIGABLE),
-	  fPreferredSize(-1, -1),
+	  fPreferredSize(),
 	  fOutlined(false)
 {
 }
@@ -42,7 +42,7 @@ BCheckBox::BCheckBox(const char *name, const char *label, BMessage *message,
 
 BCheckBox::BCheckBox(const char *label, BMessage *message)
 	: BControl(NULL, label, message, B_WILL_DRAW | B_NAVIGABLE),
-	  fPreferredSize(-1, -1),
+	  fPreferredSize(),
 	  fOutlined(false)
 {
 }
@@ -458,7 +458,7 @@ void
 BCheckBox::InvalidateLayout(bool descendants)
 {
 	// invalidate cached preferred size
-	fPreferredSize.Set(-1, -1);
+	fPreferredSize.Set(B_SIZE_UNSET, B_SIZE_UNSET);
 
 	BControl::InvalidateLayout(descendants);
 }
@@ -514,7 +514,7 @@ BCheckBox::_CheckBoxFrame() const
 BSize
 BCheckBox::_ValidatePreferredSize()
 {
-	if (fPreferredSize.width < 0) {
+	if (!fPreferredSize.IsWidthSet()) {
 		font_height fontHeight;
 		GetFontHeight(&fontHeight);
 
