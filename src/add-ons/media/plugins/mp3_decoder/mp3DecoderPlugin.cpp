@@ -99,7 +99,7 @@ mp3Decoder::mp3Decoder()
 	fBitRate = 0;
 	fChannelCount = 0;
 	fOutputBufferSize = 0;
-	fNeedSync = false;
+	fNeedSync = true; // some files start with garbage
 	fDecodingError = false;
 }
 
