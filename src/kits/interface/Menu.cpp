@@ -2246,7 +2246,7 @@ BMenu::UpdateWindowViewSize(bool upWind)
 	if (dynamic_cast<BMenuBar *>(this) != NULL)
 		return;
 
-	if (fResizeToFit)
+	if (!fResizeToFit)
 		return;
 
 	bool scroll;
