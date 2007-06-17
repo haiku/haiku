@@ -189,7 +189,8 @@ private:
 	sem_id					fVideoDecodeSem;
 	sem_id					fAudioPlaySem;
 	sem_id					fVideoPlaySem;
-	sem_id					fThreadWaitSem;
+	sem_id					fAudioWaitSem;
+	sem_id					fVideoWaitSem;
 	thread_id				fAudioDecodeThread;
 	thread_id				fVideoDecodeThread;
 	thread_id				fAudioPlayThread;

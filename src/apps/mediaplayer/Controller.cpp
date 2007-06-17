@@ -521,6 +521,9 @@ Controller::SetPosition(float value)
 	fSeekVideo = true;
 
 	fSeekToStartAfterPause = false;
+
+	release_sem(fAudioWaitSem);
+	release_sem(fVideoWaitSem);
 }
 
 
@@ -792,8 +795,8 @@ printf("audio play start\n");
 		wait:
 		if (fPaused || fStopped) {
 //printf("waiting..\n");	
-			status = acquire_sem_etc(fThreadWaitSem, 1, B_RELATIVE_TIMEOUT, 50000);
-			if (status != B_TIMED_OUT)
+			status = acquire_sem_etc(fVideoWaitSem, 1, B_RELATIVE_TIMEOUT, 50000);
+			if (status != B_OK && status != B_TIMED_OUT)
 				break;
 			goto wait;
 		}
@@ -976,8 +979,8 @@ printf("video decode start\n");
 		wait:
 		if (fPaused || fStopped) {
 //printf("waiting..\n");	
-			status = acquire_sem_etc(fThreadWaitSem, 1, B_RELATIVE_TIMEOUT, 50000);
-			if (status != B_TIMED_OUT)
+			status = acquire_sem_etc(fVideoWaitSem, 1, B_RELATIVE_TIMEOUT, 50000);
+			if (status != B_OK && status != B_TIMED_OUT)
 				break;
 			goto wait;
 		}
@@ -1007,7 +1010,11 @@ printf("video decode start\n");
 		waituntil = fTimeSourceSysTime - fTimeSourcePerfTime + buffer->startTime;
 #endif
 
-		status = acquire_sem_etc(fThreadWaitSem, 1, B_ABSOLUTE_TIMEOUT, waituntil);
+		status = acquire_sem_etc(fVideoWaitSem, 1, B_ABSOLUTE_TIMEOUT, waituntil);
+		if (status == B_OK) { // interrupted by seeking
+			printf("video: video wait interruped\n");
+			continue;
+		}
 		if (status != B_TIMED_OUT)
 			break;
 
@@ -1045,7 +1052,7 @@ printf("video decode start\n");
 		release_sem(fVideoDecodeSem);
 	}
 		
-//		status_t status = acquire_sem_etc(fThreadWaitSem, 1, B_ABSOLUTE_TIMEOUT, buffer->startTime);
+//		status_t status = acquire_sem_etc(fVideoWaitSem, 1, B_ABSOLUTE_TIMEOUT, buffer->startTime);
 //		if (status != B_TIMED_OUT)
 //			return;
 }
@@ -1068,7 +1075,8 @@ Controller::_StartThreads()
 	fVideoDecodeSem = create_sem(fVideoBufferCount - 2, "video decode sem");
 	fAudioPlaySem = create_sem(0, "audio play sem");
 	fVideoPlaySem = create_sem(0, "video play sem");
-	fThreadWaitSem = create_sem(0, "thread wait sem");
+	fAudioWaitSem = create_sem(0, "audio wait sem");
+	fVideoWaitSem = create_sem(0, "video wait sem");
 	fAudioDecodeThread = spawn_thread(_AudioDecodeThreadEntry, "audio decode", AUDIO_DECODE_PRIORITY, this);
 	fVideoDecodeThread = spawn_thread(_VideoDecodeThreadEntry, "video decode", VIDEO_DECODE_PRIORITY, this);
 	fAudioPlayThread = spawn_thread(_AudioPlayThreadEntry, "audio play", AUDIO_PLAY_PRIORITY, this);
@@ -1090,7 +1098,8 @@ Controller::_StopThreads()
 	delete_sem(fVideoDecodeSem);
 	delete_sem(fAudioPlaySem);
 	delete_sem(fVideoPlaySem);
-	delete_sem(fThreadWaitSem);
+	delete_sem(fAudioWaitSem);
+	delete_sem(fVideoWaitSem);
 
 	status_t dummy;
 	wait_for_thread(fAudioDecodeThread, &dummy);
@@ -1101,7 +1110,8 @@ Controller::_StopThreads()
 	fVideoDecodeThread = -1;
 	fAudioPlayThread = -1;
 	fVideoPlayThread = -1;
-	fThreadWaitSem = -1;
+	fAudioWaitSem = -1;
+	fVideoWaitSem = -1;
 	fAudioDecodeSem = -1;
 	fVideoDecodeSem = -1;
 	fAudioPlaySem = -1;
