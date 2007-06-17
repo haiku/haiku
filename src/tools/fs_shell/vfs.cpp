@@ -3199,7 +3199,7 @@ common_lock_node(int fd, bool kernel)
 
 	// We need to set the locking atomically - someone
 	// else might set one at the same time
-#ifdef HAIKU_HOST_PLATFORM_64_BIT
+#ifdef __x86_64__
 	if (fssh_atomic_test_and_set64((vint64_t *)&vnode->mandatory_locked_by,
 			(fssh_addr_t)descriptor, 0) != 0)
 #else
@@ -3227,7 +3227,7 @@ common_unlock_node(int fd, bool kernel)
 
 	// We need to set the locking atomically - someone
 	// else might set one at the same time
-#ifdef HAIKU_HOST_PLATFORM_64_BIT
+#ifdef __x86_64__
 	if (fssh_atomic_test_and_set64((vint64_t *)&vnode->mandatory_locked_by,
 			0, (fssh_addr_t)descriptor) != (int64_t)descriptor)
 #else
