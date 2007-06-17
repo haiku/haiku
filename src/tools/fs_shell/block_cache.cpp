@@ -951,7 +951,7 @@ fssh_cache_next_block_in_transaction(void *_cache, int32_t id, uint32_t *_cookie
 	if (_unchangedData)
 		*_unchangedData = block->original_data;
 
-	*_cookie = (uint32_t)block;
+	*_cookie = (fssh_addr_t)block;
 	return FSSH_B_OK;	
 }
 
