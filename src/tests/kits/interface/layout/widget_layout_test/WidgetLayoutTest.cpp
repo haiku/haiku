@@ -14,6 +14,8 @@
 #include "CheckBoxTest.h"
 #include "GroupView.h"
 #include "ListViewTest.h"
+#include "MenuBarTest.h"
+#include "MenuTest.h"
 #include "StringView.h"
 #include "Test.h"
 #include "TwoDimensionalSliderView.h"
@@ -39,6 +41,8 @@ const test_info kTestInfos[] = {
 	{ "BButton",		ButtonTest::CreateTest },
 	{ "BCheckBox",		CheckBoxTest::CreateTest },
 	{ "BListView",		ListViewTest::CreateTest },
+	{ "BMenu",			MenuTest::CreateTest },
+	{ "BMenuBar",		MenuBarTest::CreateTest },
 	{ NULL, NULL }
 };
 
