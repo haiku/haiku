@@ -29,7 +29,7 @@
 #include <MediaRoster.h>
 #include "mp3DecoderPlugin.h"
 
-//#define TRACE_MP3_DECODER
+#define TRACE_MP3_DECODER
 #ifdef TRACE_MP3_DECODER
   #define TRACE printf
 #else
@@ -182,11 +182,7 @@ mp3Decoder::Seek(uint32 seekTo,
 				 int64 seekFrame, int64 *frame,
 				 bigtime_t seekTime, bigtime_t *time)
 {
-	ExitMP3(&fMpgLibPrivate);
-	InitMP3(&fMpgLibPrivate);
-	fResidualBytes = 0;
 	fNeedSync = true;
-	fDecodingError = false;
 	return B_OK;
 }
 
@@ -199,14 +195,25 @@ mp3Decoder::Decode(void *buffer, int64 *frameCount,
 	uint8 * out_buffer = static_cast<uint8 *>(buffer);
 	int32	out_bytes_needed = fOutputBufferSize;
 	int32	out_bytes = 0;
-	
-	if (fDecodingError)
-		return B_ERROR;
-	
+
 	mediaHeader->start_time = fStartTime;
 	//TRACE("mp3Decoder: Decoding start time %.6f\n", fStartTime / 1000000.0);
-	
+
 	while (out_bytes_needed > 0) {
+
+		if (fNeedSync) {
+			TRACE("mp3Decoder::Decode: syncing...\n");
+			ExitMP3(&fMpgLibPrivate);
+			InitMP3(&fMpgLibPrivate);
+			fDecodingError = false;
+			fResidualBytes = 0;
+			mediaHeader->start_time = -1;
+			// fNeedSync is reset in DecodeNextChunk
+		}
+
+		if (fDecodingError)
+			return B_ERROR;
+
 		if (fResidualBytes) {
 			int32 bytes = min_c(fResidualBytes, out_bytes_needed);
 			memcpy(out_buffer, fResidualBuffer, bytes);
@@ -227,6 +234,8 @@ mp3Decoder::Decode(void *buffer, int64 *frameCount,
 			fDecodingError = true;
 			break;
 		}
+		if (mediaHeader->start_time == -1)
+			mediaHeader->start_time = fStartTime;
 	}
 
 	*frameCount = out_bytes / fFrameSize;
@@ -253,43 +262,57 @@ mp3Decoder::DecodeNextChunk()
 	}
 	
 	// get another chunk and push it to the decoder
-
 	err = GetNextChunk(&chunkBuffer, &chunkSize, &mh);
 	if (err != B_OK)
 		return err;
 
+	fStartTime = mh.start_time;
+//	TRACE("mp3Decoder: fStartTime reset to %.6f\n", fStartTime / 1000000.0);
+
 	// resync after a seek		
 	if (fNeedSync) {
+		TRACE("mp3Decoder::DecodeNextChunk: Syncing...\n");
 		if (chunkSize < 4) {
-			TRACE("mp3Decoder::Decode: Sync failed, frame too small\n");
+			TRACE("mp3Decoder::DecodeNextChunk: Sync failed, frame too small\n");
 			return B_ERROR;
 		}
 		int len = GetFrameLength(chunkBuffer);
-		// len = -1 when not at frame start
+		TRACE("mp3Decoder::DecodeNextChunk: chunkSize %d, first frame length %d\n", chunkSize, len);
+		// len == -1 when not at frame start
 		// len == chunkSize for mp3 reader (delivers single frames)
-		if (len < chunkSize) {
-			while (chunkSize > 100) {
-				if (IsValidStream((uint8 *)chunkBuffer, chunkSize))
+		if (len < (int)chunkSize) {
+//			FIXME: join a few chunks to create a larger (2k) buffer, and use:
+//			while (chunkSize > 100) {
+//				if (IsValidStream((uint8 *)chunkBuffer, chunkSize))
+			while (chunkSize >= 4) {
+				if (GetFrameLength(chunkBuffer) > 0)
 					break;
 				chunkBuffer = (uint8 *)chunkBuffer + 1;
 				chunkSize--;
 			}
-			if (chunkSize <= 100) {
-				TRACE("mp3Decoder::Decode: Sync failed\n");
+//			if (chunkSize <= 100) {
+			if (chunkSize == 3) {	
+				TRACE("mp3Decoder::DecodeNextChunk: Sync failed\n");
 				return B_ERROR;
 			}
+			TRACE("mp3Decoder::DecodeNextChunk: new chunkSize %d, first frame length %d\n", chunkSize, GetFrameLength(chunkBuffer));
 		}
 		fNeedSync = false;
 	}
 	
-	fStartTime = mh.start_time;
-
-	//TRACE("mp3Decoder: fStartTime reset to %.6f\n", fStartTime / 1000000.0);
-
 	result = decodeMP3(&fMpgLibPrivate, (char *)chunkBuffer, chunkSize, (char *)fDecodeBuffer, DECODE_BUFFER_SIZE, &outsize);
-	if (result == MP3_ERR) {
-		TRACE("mp3Decoder::Decode: decodeMP3 returned MP3_ERR\n");
+	if (result == MP3_NEED_MORE) {
+		TRACE("mp3Decoder::DecodeNextChunk: decodeMP3 returned MP3_NEED_MORE\n");
+		fResidualBuffer = NULL;
+		fResidualBytes = 0;
+		return B_OK;
+	} else if (result != MP3_OK) {
+		TRACE("mp3Decoder::DecodeNextChunk: decodeMP3 returned error %d\n", result);
 		return B_ERROR;
+//		fNeedSync = true;
+//		fResidualBuffer = NULL;
+//		fResidualBytes = 0;
+//		return B_OK;
 	}
 		
 	//printf("mp3Decoder::Decode: decoded %d bytes into %d bytes\n",chunkSize, outsize);
