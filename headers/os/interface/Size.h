@@ -11,7 +11,7 @@
 
 
 enum {
-	B_SIZE_UNSET		= -1,
+	B_SIZE_UNSET		= -2,
 	B_SIZE_UNLIMITED	= 1024 * 1024 * 1024,
 };
 
