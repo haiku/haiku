@@ -113,11 +113,16 @@ virtual void			SetMaxContentWidth(float max);
 virtual void			MessageReceived(BMessage *msg);
 virtual	void			KeyDown(const char *bytes, int32 numBytes);
 virtual void			Draw(BRect updateRect);
+virtual	BSize			MinSize();
+virtual	BSize			MaxSize();
+virtual	BSize			PreferredSize();
 virtual void			GetPreferredSize(float *width, float *height);
 virtual void			ResizeToPreferred();
+virtual	void			DoLayout();
 virtual	void			FrameMoved(BPoint new_position);
 virtual	void			FrameResized(float new_width, float new_height);
 		void			InvalidateLayout();
+virtual	void			InvalidateLayout(bool descendants);
 	
 virtual BHandler		*ResolveSpecifier(BMessage *msg,
 										int32 index,
@@ -180,6 +185,8 @@ friend status_t _init_interface_kit_();
 friend status_t	set_menu_info(menu_info *);
 friend status_t	get_menu_info(menu_info *);
 
+struct LayoutData;
+
 virtual	void			_ReservedMenu3();
 virtual	void			_ReservedMenu4();
 virtual	void			_ReservedMenu5();
@@ -202,6 +209,7 @@ virtual	void			_ReservedMenu6();
 								bool del = false);
 		bool		RelayoutIfNeeded();
 		void		LayoutItems(int32 index);
+		BSize		_ValidatePreferredSize();
 		void		ComputeLayout(int32 index, bool bestFit, bool moveItems,
 								  float* width, float* height);
 		void		_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems, BRect &outRect);
@@ -292,7 +300,7 @@ static	bool		sAltAsCommandKey;
 		BPoint		*fInitMatrixSize;
 		_ExtraMenuData_	*fExtraMenuData;
 
-		uint32		_reserved[1];
+		LayoutData*	fLayoutData;
 
 		int32		fSubmenus;
 

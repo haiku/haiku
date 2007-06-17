@@ -14,6 +14,8 @@
 #include <Debug.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <Layout.h>
+#include <LayoutUtils.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -143,6 +145,11 @@ sPropList[] = {
 const char *kEmptyMenuLabel = "<empty>";
 
 
+struct BMenu::LayoutData {
+	BSize	preferred;
+};
+
+
 BMenu::BMenu(const char *name, menu_layout layout)
 	:	BView(BRect(0, 0, 0, 0), name, 0, B_WILL_DRAW),
 		fChosenItem(NULL),
@@ -220,6 +227,7 @@ BMenu::~BMenu()
 		
 	delete fInitMatrixSize;
 	delete fExtraMenuData;
+	delete fLayoutData;
 }
 
 
@@ -840,10 +848,48 @@ BMenu::Draw(BRect updateRect)
 }
 
 
+BSize
+BMenu::MinSize()
+{
+	_ValidatePreferredSize();
+
+	BSize size = (GetLayout() ? GetLayout()->MinSize()
+		: fLayoutData->preferred);
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
+}
+
+
+BSize
+BMenu::MaxSize()
+{
+	_ValidatePreferredSize();
+
+	BSize size = (GetLayout() ? GetLayout()->MaxSize()
+		: fLayoutData->preferred);
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
+}
+
+
+BSize
+BMenu::PreferredSize()
+{
+	_ValidatePreferredSize();
+
+	BSize size = (GetLayout() ? GetLayout()->PreferredSize()
+		: fLayoutData->preferred);
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), size);
+}
+
+
 void
 BMenu::GetPreferredSize(float *_width, float *_height)
 {
-	ComputeLayout(0, true, false, _width, _height);
+	_ValidatePreferredSize();
+
+	if (_width)
+		*_width = fLayoutData->preferred.width;
+	if (_height)
+		*_height = fLayoutData->preferred.height;
 }
 
 
@@ -851,6 +897,21 @@ void
 BMenu::ResizeToPreferred()
 {
 	BView::ResizeToPreferred();
+}
+
+
+void
+BMenu::DoLayout()
+{
+	// If the user set a layout, we let the base class version call its
+	// hook.
+	if (GetLayout()) {
+		BView::DoLayout();
+		return;
+	}
+
+	if (RelayoutIfNeeded())
+		Invalidate();
 }
 
 
@@ -871,7 +932,17 @@ BMenu::FrameResized(float new_width, float new_height)
 void
 BMenu::InvalidateLayout()
 {
+	InvalidateLayout(false);
+}
+
+
+void
+BMenu::InvalidateLayout(bool descendants)
+{
 	fUseCachedMenuLayout = false;
+	fLayoutData->preferred.Set(B_SIZE_UNSET, B_SIZE_UNSET);
+
+	BView::InvalidateLayout(descendants);
 }
 
 
@@ -1127,10 +1198,12 @@ BMenu::InitData(BMessage *data)
 	font.SetFamilyAndStyle(sMenuInfo.f_family, sMenuInfo.f_style);
 	font.SetSize(sMenuInfo.font_size);
 	SetFont(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE);
-	
+
+	fLayoutData = new LayoutData;
+
 	SetLowColor(sMenuInfo.background_color);
 	SetViewColor(sMenuInfo.background_color);
-				
+
 	if (data != NULL) {
 		data->FindInt32("_layout", (int32 *)&fLayout);
 		data->FindBool("_rsize_to_fit", &fResizeToFit);
@@ -1488,10 +1561,13 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool deleteItems)
 		}
 	}
 
-	if (invalidateLayout && locked && window != NULL) {
-		LayoutItems(0);
-		UpdateWindowViewSize(false);
-		Invalidate();
+	if (invalidateLayout) {
+		InvalidateLayout();
+		if (locked && window != NULL) {
+			LayoutItems(0);
+			UpdateWindowViewSize(false);
+			Invalidate();
+		}
 	}
 
 	if (locked)
@@ -1522,7 +1598,18 @@ BMenu::LayoutItems(int32 index)
 	float width, height;
 	ComputeLayout(index, fResizeToFit, true, &width, &height);
 
-	ResizeTo(width, height);
+	if (fResizeToFit)
+		ResizeTo(width, height);
+}
+
+
+BSize
+BMenu::_ValidatePreferredSize()
+{
+	if (!fLayoutData->preferred.IsWidthSet())
+		ComputeLayout(0, true, false, NULL, NULL);
+
+	return fLayoutData->preferred;
 }
 
 
@@ -1552,21 +1639,28 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 			break;
 	}
 
-	if (_width) {
-		// change width depending on resize mode
-		if ((ResizingMode() & B_FOLLOW_LEFT_RIGHT) == B_FOLLOW_LEFT_RIGHT) {
-			if (Parent())
-				*_width = Parent()->Frame().Width() + 1;
-			else if (Window())
-				*_width = Window()->Frame().Width() + 1;
-			else
-				*_width = Bounds().Width();
-		} else
-			*_width = frame.Width();
-	}
+	// change width depending on resize mode
+	BSize size;
+	if ((ResizingMode() & B_FOLLOW_LEFT_RIGHT) == B_FOLLOW_LEFT_RIGHT) {
+		if (Parent())
+			size.width = Parent()->Frame().Width() + 1;
+		else if (Window())
+			size.width = Window()->Frame().Width() + 1;
+		else
+			size.width = Bounds().Width();
+	} else
+		size.width = frame.Width();
+
+	size.height = frame.Height();
+
+	if (_width)
+		*_width = size.width;
 
 	if (_height)
-		*_height = frame.Height();
+		*_height = size.height;
+
+	if (bestFit)
+		fLayoutData->preferred = size;
 	
 	if (moveItems)
 		fUseCachedMenuLayout = true;
@@ -2150,6 +2244,9 @@ BMenu::UpdateWindowViewSize(bool upWind)
 		return;
 
 	if (dynamic_cast<BMenuBar *>(this) != NULL)
+		return;
+
+	if (fResizeToFit)
 		return;
 
 	bool scroll;
