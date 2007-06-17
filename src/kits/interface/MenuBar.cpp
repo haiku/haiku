@@ -51,6 +51,21 @@ BMenuBar::BMenuBar(BRect frame, const char *title, uint32 resizeMask,
 }
 
 
+BMenuBar::BMenuBar(const char *title, menu_layout layout, uint32 flags)
+	: BMenu(BRect(), title, B_FOLLOW_NONE,
+		flags | B_WILL_DRAW | B_FRAME_EVENTS | B_SUPPORTS_LAYOUT,
+		layout, false),
+	fBorder(B_BORDER_FRAME),
+	fTrackingPID(-1),
+	fPrevFocusToken(-1),
+	fMenuSem(-1),
+	fLastBounds(NULL),
+	fTracking(false)
+{
+	InitData(layout);
+}
+
+
 BMenuBar::BMenuBar(BMessage *data)
 	: BMenu(data),
 	fBorder(B_BORDER_FRAME),
@@ -222,11 +237,21 @@ BMenuBar::FrameMoved(BPoint newPosition)
 void 
 BMenuBar::FrameResized(float newWidth, float newHeight)
 {
-	BRect bounds(Bounds());
-	BRect rect(fLastBounds->right - 12, fLastBounds->top, bounds.right, bounds.bottom);
+	// invalidate right border
+	if (newWidth != fLastBounds->Width()) {
+		BRect rect(min_c(fLastBounds->right, newWidth), 0,
+			max_c(fLastBounds->right, newWidth), newHeight);
+		Invalidate(rect);
+	}
+
+	// invalidate bottom border
+	if (newHeight != fLastBounds->Height()) {
+		BRect rect(0, min_c(fLastBounds->bottom, newHeight) - 1,
+			newWidth, max_c(fLastBounds->bottom, newHeight));
+		Invalidate(rect);
+	}
+
 	fLastBounds->Set(0, 0, newWidth, newHeight);
-	
-	Invalidate(rect);
 
 	BMenu::FrameResized(newWidth, newHeight);
 }

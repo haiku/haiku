@@ -36,12 +36,15 @@ class BMenuField;
 class BMenuBar : public BMenu
 {
 public:
-							BMenuBar(	BRect frame,
-										const char *title,
-										uint32 resizeMask =
-											B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
-										menu_layout layout = B_ITEMS_IN_ROW,
-										bool resizeToFit = true);
+							BMenuBar(BRect frame,
+								const char *title,
+								uint32 resizeMask =
+									B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+								menu_layout layout = B_ITEMS_IN_ROW,
+								bool resizeToFit = true);
+							BMenuBar(const char *title,
+								menu_layout layout = B_ITEMS_IN_ROW,
+								uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS);
 							BMenuBar(BMessage *data);
 	virtual					~BMenuBar();
 	static	BArchivable		*Instantiate(BMessage *data);
