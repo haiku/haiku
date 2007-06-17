@@ -11,11 +11,11 @@
 
 ListViewTest::ListViewTest()
 	: Test("ListView", NULL),
-	  fListView(new BListView(BRect(0, 0, -1, -1), NULL))
+	  fListView(new BListView())
 {
 	SetView(fListView);
 
-	// add a view items
+	// add a few items
 	for (int32 i = 0; i < 15; i++) {
 		BString itemText("list item ");
 		itemText << i;
