@@ -260,10 +260,14 @@ mp3Decoder::DecodeNextChunk()
 
 	// resync after a seek		
 	if (fNeedSync) {
-		if (chunkSize > 4 && GetFrameLength(chunkBuffer) > 0) {
-		} else
-		if (chunkSize > 5200) { // mp3 reader always delivers synced frames smaller than 5200 bytes
-			// wav reader and others don't do that
+		if (chunkSize < 4) {
+			TRACE("mp3Decoder::Decode: Sync failed, frame too small\n");
+			return B_ERROR;
+		}
+		int len = GetFrameLength(chunkBuffer);
+		// len = -1 when not at frame start
+		// len == chunkSize for mp3 reader (delivers single frames)
+		if (len < chunkSize) {
 			while (chunkSize > 100) {
 				if (IsValidStream((uint8 *)chunkBuffer, chunkSize))
 					break;
