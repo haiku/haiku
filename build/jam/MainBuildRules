@@ -497,7 +497,7 @@ rule BuildPlatformMergeObject
 	MergeObject $(target) : $(sources) : $(otherObjects) ;
 }
 
-rule BuildPlatformMergeObjectPIC
+rule BuildPlatformMergeObjectPIC target : sources : otherObjects
 {
 	# BuildPlatformMergeObjectPIC <name> : <sources> : <other objects> ;
 	# Compiles source files and merges the object files to an object file.
@@ -508,13 +508,8 @@ rule BuildPlatformMergeObjectPIC
 	# <other objects>: Object files or static libraries to be merged. No grist
 	#                  will be added.
 	#
-	local target = $(1) ;
-	local sources = $(2) ;
-	local otherObjects = $(3) ;
-
-	local objects = [ FGristFiles $(sources:S=$(SUFOBJ)) ] ;
-	CCFLAGS on $(objects) += $(HOST_PIC_CCFLAGS) ; 
-	C++FLAGS on $(objects) += $(HOST_PIC_C++FLAGS) ; 
+	ObjectCcFlags $(sources) : $(HOST_PIC_CCFLAGS) ;
+	ObjectC++Flags $(sources) : $(HOST_PIC_C++FLAGS) ;
 
 	BuildPlatformMergeObject $(target) : $(sources) : $(otherObjects) ;
 }
