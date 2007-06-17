@@ -522,8 +522,8 @@ Controller::SetPosition(float value)
 
 	fSeekToStartAfterPause = false;
 
-	release_sem(fAudioWaitSem);
-	release_sem(fVideoWaitSem);
+//	release_sem(fAudioWaitSem);
+//	release_sem(fVideoWaitSem);
 }
 
 
