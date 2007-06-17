@@ -21,6 +21,8 @@ constrain(float& value, float min, float max)
 		value = max;
 }
 
+#ifdef __INTEL__
+
 // constrain_int32_0_255_asm
 inline int32
 constrain_int32_0_255_asm(int32 value) {
@@ -36,13 +38,19 @@ constrain_int32_0_255_asm(int32 value) {
 	return value;
 }
 
+#define constrain_int32_0_255 constrain_int32_0_255_asm
+
+#else
+
 inline int32
 constrain_int32_0_255_c(int32 value)
 {
 	return max_c(0, min_c(255, value));
 }
 
-#define constrain_int32_0_255 constrain_int32_0_255_asm
+#define constrain_int32_0_255 constrain_int32_0_255_c
+
+#endif
 
 // rect_to_int
 inline void
