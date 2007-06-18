@@ -23,9 +23,12 @@
 #include <Window.h>
 
 
+class BStringView;
+class BTextView;
 class Controller;
 class ControllerObserver;
 class InfoView;
+ 
 
 #define INFO_STATS		0x00000001
 #define INFO_TRANSPORT	0x00000002
