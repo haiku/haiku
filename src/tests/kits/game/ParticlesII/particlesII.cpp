@@ -93,7 +93,7 @@ void NApplication::ReadyToRun()
 	NWindowScreen *ws = new NWindowScreen(&ret);
 	PRINT(("WindowScreen ctor returned. ret = %s\n", strerror(ret)));
 	// exit if constructing the WindowScreen failed.
-	if((ws == NULL) || (ret < B_OK) || !ws->CanControlFrameBuffer())
+	if((ws == NULL) || (ret < B_OK))
 	{
 		//printf("the window screen was NULL, or there was an error\n");
 		PostMessage(B_QUIT_REQUESTED);
@@ -171,7 +171,8 @@ void NWindowScreen::ScreenConnected(bool connected)
 			memset(frame_buffer,0,480*line_length);
 			// spawn the rendering thread. exit if an error occurs.
 			PRINT(("spawning the render thread.\n"));
-			if(resume_thread((tid = spawn_thread(Entry,"rendering thread", B_URGENT_DISPLAY_PRIORITY,this))) < B_OK)
+			tid = spawn_thread(Entry,"rendering thread", B_URGENT_DISPLAY_PRIORITY,this);
+			if(resume_thread(tid) < B_OK)
 			{
 				be_app->PostMessage(B_QUIT_REQUESTED);
 				return;
@@ -214,7 +215,7 @@ void NWindowScreen::ScreenConnected(bool connected)
 			}
 			if((i>=192) && (i<256))
 			{
-				c1.red = 0; // blues
+				c1.red = 0i; // blues
 				c1.green = 0;
 				c1.blue = j*4;
 				c1.alpha = 255;
