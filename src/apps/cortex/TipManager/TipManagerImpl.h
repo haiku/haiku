@@ -149,7 +149,7 @@ public:													// *** interface
 		BPoint											screenPoint);
 
 	// retrieve current frame rect (in parent view's coordinates)
-	BRect frame();
+	BRect Frame();
 		
 	BView* target() const { return m_target; }
 	_ViewEntry* parent() const { return m_parent; }

@@ -171,16 +171,16 @@ void DormantNodeView::MouseMoved(
 		if (item && r.Contains(point)) {
 			if (item != last) {
 				if (last)
-					last->mouseOver(this, point, B_EXITED_VIEW);
-				item->mouseOver(this, point, B_ENTERED_VIEW);
+					last->MouseOver(this, point, B_EXITED_VIEW);
+				item->MouseOver(this, point, B_ENTERED_VIEW);
 				m_lastItemUnder = item;
 			}
 			else {
-				item->mouseOver(this, point, B_INSIDE_VIEW);
+				item->MouseOver(this, point, B_INSIDE_VIEW);
 			}
 		}
 		else if (last) {
-			last->mouseOver(this, point, B_EXITED_VIEW);
+			last->MouseOver(this, point, B_EXITED_VIEW);
 		}
 	}
 	

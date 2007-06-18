@@ -79,12 +79,12 @@ void MediaWire::detachedFromDiagram()
 
 	// make sure we're no longer displaying a tooltip
 	TipManager *tips = TipManager::Instance();
-	tips->hideTip(view()->ConvertToScreen(frame()));
+	tips->hideTip(view()->ConvertToScreen(Frame()));
 }
 
-BRect MediaWire::frame() const
+BRect MediaWire::Frame() const
 {
-	D_DRAW(("MediaWire::frame()\n"));
+	D_DRAW(("MediaWire::Frame()\n"));
 	return m_frame;
 }
 
@@ -92,7 +92,7 @@ float MediaWire::howCloseTo(
 	BPoint point) const
 {
 	D_MOUSE(("MediaWire::howCloseTo()\n"));
-	if (frame().Contains(point))
+	if (Frame().Contains(point))
 	{
 		BPoint sp = m_startPoint;
 		BPoint ep = m_endPoint;
@@ -144,13 +144,13 @@ void MediaWire::drawWire()
 	view()->EndLineArray();
 }
 
-void MediaWire::mouseDown(
+void MediaWire::MouseDown(
 	BPoint point,
 	uint32 buttons,
 	uint32 clicks)
 {
-	D_MOUSE(("MediaWire::mouseDown()\n"));
-	_inherited::mouseDown(point, buttons, clicks);
+	D_MOUSE(("MediaWire::MouseDown()\n"));
+	_inherited::MouseDown(point, buttons, clicks);
 
 	switch (buttons)
 	{
@@ -164,11 +164,11 @@ void MediaWire::mouseDown(
 	}
 }
 
-void MediaWire::mouseOver(
+void MediaWire::MouseOver(
 	BPoint point,
 	uint32 transit)
 {
-	D_MOUSE(("MediaWire::mouseOver()\n"));
+	D_MOUSE(("MediaWire::MouseOver()\n"));
 
 	if (isDragging())
 	{
@@ -180,7 +180,7 @@ void MediaWire::mouseOver(
 		{
 			TipManager *tips = TipManager::Instance();
 			BString tipText = MediaString::getStringFor(connection.format(), false);
-			tips->showTip(tipText.String(), view()->ConvertToScreen(frame()), 
+			tips->showTip(tipText.String(), view()->ConvertToScreen(Frame()), 
 						  TipManager::LEFT_OFFSET_FROM_POINTER, BPoint(12.0, 8.0));
 			be_app->SetCursor(M_CABLE_CURSOR);
 			break;
@@ -189,7 +189,7 @@ void MediaWire::mouseOver(
 		{
 			be_app->SetCursor(B_HAND_CURSOR);
 			TipManager *tips = TipManager::Instance();
-			tips->hideTip(view()->ConvertToScreen(frame()));
+			tips->hideTip(view()->ConvertToScreen(Frame()));
 			break;
 		}
 	}

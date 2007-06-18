@@ -42,7 +42,7 @@ DiagramEndPoint::~DiagramEndPoint()
 BPoint DiagramEndPoint::connectionPoint() const
 {
 	D_METHOD(("DiagramEndPoint::connectionPoint()\n"));
-	return BPoint(frame().left + frame().Height() / 2.0, frame().top + frame().Width() / 2.0);
+	return BPoint(Frame().left + Frame().Height() / 2.0, Frame().top + Frame().Width() / 2.0);
 }
 
 bool DiagramEndPoint::connectionRequested(
@@ -60,16 +60,16 @@ bool DiagramEndPoint::connectionRequested(
 // *** derived from DiagramItem
 // -------------------------------------------------------- //
 
-void DiagramEndPoint::draw(
+void DiagramEndPoint::Draw(
 	BRect updateRect)
 {
-	D_METHOD(("DiagramEndPoint::draw()\n"));
+	D_METHOD(("DiagramEndPoint::Draw()\n"));
 	if (view())
 	{
 		view()->PushState();
 		{
 			BRegion region;
-			region.Include(frame() & updateRect);
+			region.Include(Frame() & updateRect);
 			view()->ConstrainClippingRegion(&region);
 			drawEndPoint();
 		}
@@ -77,12 +77,12 @@ void DiagramEndPoint::draw(
 	}
 }
 
-void DiagramEndPoint::mouseDown(
+void DiagramEndPoint::MouseDown(
 	BPoint point,
 	uint32 buttons,
 	uint32 clicks)
 {
-	D_MOUSE(("DiagramEndPoint::mouseDown()\n"));
+	D_MOUSE(("DiagramEndPoint::MouseDown()\n"));
 	if (clicks == 1)
 	{
 		if (isSelectable())
@@ -105,22 +105,22 @@ void DiagramEndPoint::mouseDown(
 			BMessage dragMsg(M_WIRE_DRAGGED);
 			dragMsg.AddPointer("from", static_cast<void *>(this));
 			view()->DragMessage(&dragMsg, BRect(0.0, 0.0, -1.0, -1.0), view());
-			view()->messageDragged(point, B_INSIDE_VIEW, &dragMsg);
+			view()->MessageDragged(point, B_INSIDE_VIEW, &dragMsg);
 		}
 	}
 }
 
-void DiagramEndPoint::messageDragged(
+void DiagramEndPoint::MessageDragged(
 	BPoint point,
 	uint32 transit,
 	const BMessage *message)
 {
-	D_MOUSE(("DiagramEndPoint::messageDragged()\n"));
+	D_MOUSE(("DiagramEndPoint::MessageDragged()\n"));
 	switch (message->what)
 	{
 		case M_WIRE_DRAGGED:
 		{
-			D_MESSAGE(("DiagramEndPoint::messageDragged(M_WIRE_DRAGGED)\n"));
+			D_MESSAGE(("DiagramEndPoint::MessageDragged(M_WIRE_DRAGGED)\n"));
 			switch (transit)
 			{
 				case B_INSIDE_VIEW:
@@ -186,21 +186,21 @@ void DiagramEndPoint::messageDragged(
 		}
 		default:
 		{
-			DiagramItem::messageDragged(point, transit, message);
+			DiagramItem::MessageDragged(point, transit, message);
 		}
 	}
 }
 
-void DiagramEndPoint::messageDropped(
+void DiagramEndPoint::MessageDropped(
 	BPoint point,
 	BMessage *message)
 {
-	D_MESSAGE(("DiagramEndPoint::messageDropped()\n"));
+	D_MESSAGE(("DiagramEndPoint::MessageDropped()\n"));
 	switch (message->what)
 	{
 		case M_WIRE_DRAGGED:
 		{
-			D_MESSAGE(("DiagramEndPoint::messageDropped(M_WIRE_DRAGGED)\n"));
+			D_MESSAGE(("DiagramEndPoint::MessageDropped(M_WIRE_DRAGGED)\n"));
 			DiagramEndPoint *endPoint;
 			if ((message->FindPointer("from", reinterpret_cast<void **>(&endPoint)) == B_OK)
 			 && (endPoint != this))
@@ -222,7 +222,7 @@ void DiagramEndPoint::messageDropped(
 		}
 		default:
 		{
-			DiagramItem::messageDropped(point, message);
+			DiagramItem::MessageDropped(point, message);
 		}
 	}
 }
@@ -231,18 +231,18 @@ void DiagramEndPoint::messageDropped(
 // *** frame related operations
 // -------------------------------------------------------- //
 
-void DiagramEndPoint::moveBy(
+void DiagramEndPoint::MoveBy(
 	float x,
 	float y,
 	BRegion *updateRegion)
 {
-	D_METHOD(("DiagramEndPoint::moveBy()\n"));
+	D_METHOD(("DiagramEndPoint::MoveBy()\n"));
 	if (isConnected() && m_wire && updateRegion)
 	{	
-		updateRegion->Include(m_wire->frame());
+		updateRegion->Include(m_wire->Frame());
 		m_frame.OffsetBy(x, y);
 		m_wire->endPointMoved(this);
-		updateRegion->Include(m_wire->frame());
+		updateRegion->Include(m_wire->Frame());
 	}
 	else
 	{
@@ -254,11 +254,11 @@ void DiagramEndPoint::moveBy(
 	}
 }
 
-void DiagramEndPoint::resizeBy(
+void DiagramEndPoint::ResizeBy(
 	float horizontal,
 	float vertical)
 {
-	D_METHOD(("DiagramEndPoint::resizeBy()\n"));
+	D_METHOD(("DiagramEndPoint::ResizeBy()\n"));
 	m_frame.right += horizontal;
 	m_frame.bottom += vertical;
 }

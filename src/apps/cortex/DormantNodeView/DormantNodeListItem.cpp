@@ -135,11 +135,11 @@ void DormantNodeListItem::Update(
 // BListItem impl.
 // -------------------------------------------------------- //
 
-void DormantNodeListItem::mouseOver(
+void DormantNodeListItem::MouseOver(
 	BView *owner,
 	BPoint point,
 	uint32 transit) {
-	D_OPERATION(("DormantNodeListItem::mouseOver()\n"));
+	D_OPERATION(("DormantNodeListItem::MouseOver()\n"));
 
 	switch (transit) {
 		case B_ENTERED_VIEW: {

@@ -59,7 +59,7 @@ public:					// *** derived from DiagramWire/Item
 	virtual void		detachedFromDiagram();
 
 	// calculates and returns the frame rectangle of the wire
-	virtual BRect		frame() const;
+	virtual BRect		Frame() const;
 
 	// returns a value > 0.5 for points pretty much close to the
 	// wire
@@ -70,13 +70,13 @@ public:					// *** derived from DiagramWire/Item
 	virtual void		drawWire();
 
 	// displays the context-menu for right-clicks
-	virtual void		mouseDown(
+	virtual void		MouseDown(
 							BPoint point,
 							uint32 buttons,
 							uint32 clicks);	
 
 	// changes the mouse cursor and starts a tooltip
-	virtual void		mouseOver(
+	virtual void		MouseOver(
 							BPoint point,
 							uint32 transit);
 

@@ -65,7 +65,7 @@ public:					// *** accessors
 
 public:					// *** hook functions
 
-	// is called from draw() to do the actual drawing
+	// is called from Draw() to do the actual drawing
 	virtual void		drawWire() = 0;
 
 	// is called by the connected diagramEndPoints whenever one is moved
@@ -77,7 +77,7 @@ public:					// *** hook functions
 public:					//  *** derived from DiagramItem
 
 	// returns the area in which the wire displays
-	virtual BRect		frame() const
+	virtual BRect		Frame() const
 						{ return BRect(startConnectionPoint(), endConnectionPoint()); }
 
 	// returns how close a given point is to the wire; the current
@@ -88,19 +88,19 @@ public:					//  *** derived from DiagramItem
 
 	// prepares the drawing stack and clipping region, then
 	// calls drawWire
-	void				draw(
+	void				Draw(
 							BRect updateRect);
 
 	// is called from the parent DiagramViews MouseDown() implementation 
 	// if the Wire was hit; this version initiates selection and dragging
-	virtual void		mouseDown(
+	virtual void		MouseDown(
 							BPoint point,
 							uint32 buttons,
 							uint32 clicks);
 
 	// is called from the DiagramViews MouseMoved() when no message is being 
 	// dragged, but the mouse has moved above the wire
-	virtual void		mouseOver(
+	virtual void		MouseOver(
 							BPoint point,
 							uint32 transit)
 						{ /* does nothing */ }
@@ -108,14 +108,14 @@ public:					//  *** derived from DiagramItem
 
 	// is called from the DiagramViews MouseMoved() when a message is being 
 	// dragged over the DiagramWire
-	virtual void		messageDragged(
+	virtual void		MessageDragged(
 							BPoint point,
 							uint32 transit,
 							const BMessage *message);
 
 	// is called from the DiagramViews MessageReceived() function when a 
 	// message has been dropped on the DiagramWire
-	virtual void		messageDropped(
+	virtual void		MessageDropped(
 							BPoint point,
 							BMessage *message)
 						{ /* does nothing */ }

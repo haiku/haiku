@@ -194,56 +194,48 @@ DiagramWire *MediaRoutingView::createWire(
 	return 0;
 }
 
-void MediaRoutingView::mouseDown(
-	BPoint point,
-	uint32 buttons,
+
+void
+MediaRoutingView::BackgroundMouseDown(BPoint point, uint32 buttons,
 	uint32 clicks)
 {
-	D_MOUSE(("MediaRoutingView::mouseDown()\n"));
+	D_MOUSE(("MediaRoutingView::BackgroundMouseDown()\n"));
 
 	if ((buttons == B_SECONDARY_MOUSE_BUTTON)
-	 || (modifiers() & B_CONTROL_KEY))
-	{
+	 || (modifiers() & B_CONTROL_KEY)) {
 		EndRectTracking();
 		showContextMenu(point);
 	}
 }
 
-void MediaRoutingView::messageDropped(
-	BPoint point,
-	BMessage *message)
-{
-	D_METHOD(("MediaRoutingView::messageDropped()\n"));
 
-	switch (message->what)
-	{
+void
+MediaRoutingView::MessageDropped(BPoint point, BMessage *message)
+{
+	D_METHOD(("MediaRoutingView::MessageDropped()\n"));
+
+	switch (message->what) {
 		case DormantNodeView::M_INSTANTIATE_NODE:
 		{
-			D_MESSAGE(("MediaRoutingView::messageDropped(DormantNodeView::M_INSTANTIATE_NODE)\n"));
+			D_MESSAGE(("MediaRoutingView::MessageDropped(DormantNodeView::M_INSTANTIATE_NODE)\n"));
 			type_code type;
 			int32 count;
-			if (message->GetInfo("which", &type, &count) == B_OK)
-			{
-				for (int32 n = 0; n < count; n++)
-				{
+			if (message->GetInfo("which", &type, &count) == B_OK) {
+				for (int32 n = 0; n < count; n++) {
 					dormant_node_info info;
 					const void *data;
 					ssize_t dataSize;
-					if (message->FindData("which", B_RAW_TYPE, &data, &dataSize) == B_OK)
-					{
+					if (message->FindData("which", B_RAW_TYPE, &data, &dataSize) == B_OK) {
 						memcpy(reinterpret_cast<void *>(&info), data, dataSize);
 						NodeRef* droppedNode;
 						status_t error;
 						error = manager->instantiate(info, &droppedNode);
-						if (!error)
-						{
+						if (!error) {
 							m_lastDroppedNode = droppedNode->id();
 							BPoint dropPoint, dropOffset;
 							dropPoint = message->DropPoint(&dropOffset);
 							m_lastDropPoint = Align(ConvertFromScreen(dropPoint - dropOffset));
-						}
-						else
-						{
+						} else {
 							BString s;
 							s << "Could not instantiate '" << info.name << "'";
 							showErrorMessage(s, error);
@@ -253,36 +245,36 @@ void MediaRoutingView::messageDropped(
 			}
 			break;
 		}
+
 		case B_SIMPLE_DATA:
 		{
-			D_MESSAGE(("MediaRoutingView::messageDropped(B_SIMPLE_DATA)\n"));
+			D_MESSAGE(("MediaRoutingView::MessageDropped(B_SIMPLE_DATA)\n"));
 			entry_ref fileRef;
 			if (message->FindRef("refs", &fileRef) == B_OK)
-			{
 				_checkDroppedFile(&fileRef, ConvertFromScreen(message->DropPoint()));
-			}
 			break;
 		}
+
 		case B_PASTE:
 		{
-			D_MESSAGE(("MediaRoutingView::messageDropped(B_PASTE)\n"));
+			D_MESSAGE(("MediaRoutingView::MessageDropped(B_PASTE)\n"));
 			ssize_t size;
 			const rgb_color *color; // [e.moon 21nov99] fixed const error
-			if (message->FindData("RGBColor", B_RGB_COLOR_TYPE, reinterpret_cast<const void **>(&color), &size) == B_OK)
-			{
+			if (message->FindData("RGBColor", B_RGB_COLOR_TYPE,
+				reinterpret_cast<const void **>(&color), &size) == B_OK)
 				_changeBackground(*color);
-			}
 			break;
 		}
+
 		default:
-		{
-			DiagramView::messageDropped(point, message);
-		}
+			DiagramView::MessageDropped(point, message);
 	}
 }
 
-void MediaRoutingView::selectionChanged() {
 
+void
+MediaRoutingView::selectionChanged()
+{
 	D_METHOD(("MediaRoutingView::selectionChanged()\n"));
 	_broadcastSelection();
 }
@@ -723,7 +715,7 @@ BPoint MediaRoutingView::findFreePositionFor(
 				float bottom = 0.0;
 				for (uint32 i = 0; i < CountItems(DiagramItem::M_BOX); i++)
 				{
-					BRect r = ItemAt(i, DiagramItem::M_BOX)->frame();
+					BRect r = ItemAt(i, DiagramItem::M_BOX)->Frame();
 					if ((r.left >= p.x)
 					 && (r.left <= p.x + MediaNodePanel::M_DEFAULT_WIDTH))
 					{
@@ -752,7 +744,7 @@ BPoint MediaRoutingView::findFreePositionFor(
 				float right = 0.0;
 				for (uint32 i = 0; i < CountItems(DiagramItem::M_BOX); i++)
 				{
-					BRect r = ItemAt(i, DiagramItem::M_BOX)->frame();
+					BRect r = ItemAt(i, DiagramItem::M_BOX)->Frame();
 					if ((r.top >= p.y)
 					 && (r.top <= p.y + MediaNodePanel::M_DEFAULT_HEIGHT))
 					{
@@ -1244,7 +1236,7 @@ status_t MediaRoutingView::_addPanelFor(
 				BPoint p = findFreePositionFor(panel);
 				panel->moveTo(p);
 			}
-			Invalidate(panel->frame());
+			Invalidate(panel->Frame());
 		}
 	}
 	updateDataRect();
@@ -1283,7 +1275,7 @@ status_t MediaRoutingView::_removePanelFor(
 		if (RemoveItem(panel))
 		{
 			remove_observer(this, panel->ref);
-			Invalidate(panel->frame());
+			Invalidate(panel->Frame());
 			delete panel;
 			return B_OK;
 		}
@@ -1331,9 +1323,9 @@ status_t MediaRoutingView::_addWireFor(
 		// [e.moon 21nov99] group creation/merging now performed by
 		// RouteAppNodeManager
 
-		Invalidate(source->frame());
-		Invalidate(destination->frame());
-		Invalidate(wire->frame());
+		Invalidate(source->Frame());
+		Invalidate(destination->Frame());
+		Invalidate(wire->Frame());
 		return B_OK;
 	}
 	else
@@ -1372,19 +1364,19 @@ status_t MediaRoutingView::_removeWireFor(
 		_findPanelFor(wire->connection.sourceNode(), &source);
 		_findPanelFor(wire->connection.destinationNode(), &destination);
 		RemoveItem(wire);
-		Invalidate(wire->frame());
+		Invalidate(wire->Frame());
 		delete wire;
 		if (source)
 		{
 			source->updateIOJacks();
 			source->arrangeIOJacks();
-			Invalidate(source->frame());
+			Invalidate(source->Frame());
 		}
 		if (destination)
 		{
 			destination->updateIOJacks();
 			destination->arrangeIOJacks();
-			Invalidate(destination->frame());
+			Invalidate(destination->Frame());
 		}	
 		
 		// [e.moon 21nov99] group split/remove now performed by

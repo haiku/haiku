@@ -61,18 +61,18 @@ public:					// *** derived from DiagramItem
 	
 	virtual void		detachedFromDiagram();
 
-	virtual void		drawBox();
+	virtual void		DrawBox();
 	
-	virtual void		mouseDown(
+	virtual void		MouseDown(
 							BPoint point,
 							uint32 buttons,
 							uint32 clicks);
 
-	virtual void		mouseOver(
+	virtual void		MouseOver(
 							BPoint point,
 							uint32 transit);
 
-	virtual void		messageDropped(
+	virtual void		MessageDropped(
 							BPoint point,
 							BMessage *message);
 

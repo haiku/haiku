@@ -139,7 +139,7 @@ void MediaJack::detachedFromDiagram()
 	
 	// make sure we're no longer displaying a tooltip
 	TipManager *tips = TipManager::Instance();
-	tips->hideTip(view()->ConvertToScreen(frame()));
+	tips->hideTip(view()->ConvertToScreen(Frame()));
 }
 
 void MediaJack::drawEndPoint()
@@ -148,7 +148,7 @@ void MediaJack::drawEndPoint()
 
 	if (m_bitmap)
 	{
-		view()->DrawBitmap(m_bitmap, frame().LeftTop());
+		view()->DrawBitmap(m_bitmap, Frame().LeftTop());
 	}
 }
 
@@ -162,11 +162,11 @@ BPoint MediaJack::connectionPoint() const
 		{
 			if (isInput())
 			{
-				return BPoint(frame().left - 1.0, frame().top + frame().Height() / 2.0);
+				return BPoint(Frame().left - 1.0, Frame().top + Frame().Height() / 2.0);
 			}
 			else if (isOutput())
 			{
-				return BPoint(frame().right + 1.0, frame().top + frame().Height() / 2.0);
+				return BPoint(Frame().right + 1.0, Frame().top + Frame().Height() / 2.0);
 			}
 			break;
 		}
@@ -174,11 +174,11 @@ BPoint MediaJack::connectionPoint() const
 		{
 			if (isInput())
 			{
-				return BPoint(frame().left + frame().Width() / 2.0, frame().top - 1.0);
+				return BPoint(Frame().left + Frame().Width() / 2.0, Frame().top - 1.0);
 			}
 			else if (isOutput())
 			{
-				return BPoint(frame().left + frame().Width() / 2.0, frame().bottom + 1.0);
+				return BPoint(Frame().left + Frame().Width() / 2.0, Frame().bottom + 1.0);
 			}
 			break;
 		}
@@ -199,17 +199,17 @@ bool MediaJack::connectionRequested(
 	return false;
 }
 
-void MediaJack::mouseDown(
+void MediaJack::MouseDown(
 	BPoint point,
 	uint32 buttons,
 	uint32 clicks)
 {
-	D_MOUSE(("MediaJack::mouseOver()\n"));
+	D_MOUSE(("MediaJack::MouseOver()\n"));
 
 	// if connected, redirect to the wire
 	if (isConnected())
 	{
-		dynamic_cast<MediaWire *>(wire())->mouseDown(point, buttons, clicks);
+		dynamic_cast<MediaWire *>(wire())->MouseDown(point, buttons, clicks);
 		return;
 	}
 
@@ -223,16 +223,16 @@ void MediaJack::mouseDown(
 		}
 		default:
 		{
-			DiagramEndPoint::mouseDown(point, buttons, clicks);
+			DiagramEndPoint::MouseDown(point, buttons, clicks);
 		}
 	}
 }
 
-void MediaJack::mouseOver(
+void MediaJack::MouseOver(
 	BPoint point,
 	uint32 transit)
 {
-	D_MOUSE(("MediaJack::mouseOver()\n"));
+	D_MOUSE(("MediaJack::MouseOver()\n"));
 	switch (transit)
 	{
 		case B_ENTERED_VIEW:
@@ -241,7 +241,7 @@ void MediaJack::mouseOver(
 			TipManager *tips = TipManager::Instance();
 			BString tipText = m_label.String();
 			tipText << " (" << MediaString::getStringFor(m_format.type) << ")";
-			tips->showTip(tipText.String(),view()->ConvertToScreen(frame()), 
+			tips->showTip(tipText.String(),view()->ConvertToScreen(Frame()), 
 						  TipManager::LEFT_OFFSET_FROM_POINTER, BPoint(12.0, 8.0));
 			break;
 		}
@@ -256,12 +256,12 @@ void MediaJack::mouseOver(
 	}
 }
 
-void MediaJack::messageDragged(
+void MediaJack::MessageDragged(
 	BPoint point,
 	uint32 transit,
 	const BMessage *message)
 {
-	D_MOUSE(("MediaJack::messageDragged()\n"));
+	D_MOUSE(("MediaJack::MessageDragged()\n"));
 	switch (transit)
 	{
 		case B_ENTERED_VIEW:
@@ -278,35 +278,35 @@ void MediaJack::messageDragged(
 			break;
 		}
 	}
-	DiagramEndPoint::messageDragged(point, transit, message);
+	DiagramEndPoint::MessageDragged(point, transit, message);
 }
 
 void MediaJack::selected()
 {
 	D_METHOD(("MediaJack::selected()\n"));
 	_updateBitmap();
-	view()->Invalidate(frame());
+	view()->Invalidate(Frame());
 }
 
 void MediaJack::deselected()
 {
 	D_METHOD(("MediaJack::deselected()\n"));
 	_updateBitmap();
-	view()->Invalidate(frame());
+	view()->Invalidate(Frame());
 }
 
 void MediaJack::connected()
 {
 	D_METHOD(("MediaJack::connected()\n"));
 	_updateBitmap();
-	view()->Invalidate(frame());
+	view()->Invalidate(Frame());
 }
 
 void MediaJack::disconnected()
 {
 	D_METHOD(("MediaJack::disconnected()\n"));
 	_updateBitmap();
-	view()->Invalidate(frame());
+	view()->Invalidate(Frame());
 }
 
 // -------------------------------------------------------- //
@@ -338,7 +338,7 @@ void MediaJack::setPosition(
 			}
 			else if (isOutput())
 			{
-				moveTo(BPoint(rightBottomBoundary - frame().Width(), offset), updateRegion);
+				moveTo(BPoint(rightBottomBoundary - Frame().Width(), offset), updateRegion);
 			}
 			break;
 		}
@@ -350,7 +350,7 @@ void MediaJack::setPosition(
 			}
 			else if (isOutput())
 			{
-				moveTo(BPoint(offset, rightBottomBoundary - frame().Height()), updateRegion);
+				moveTo(BPoint(offset, rightBottomBoundary - Frame().Height()), updateRegion);
 			}
 			break;
 		}
@@ -369,7 +369,7 @@ void MediaJack::_updateBitmap()
 	{
 		delete m_bitmap;
 	}
-	BBitmap *tempBitmap = new BBitmap(frame().OffsetToCopy(0.0, 0.0), B_CMAP8, true);
+	BBitmap *tempBitmap = new BBitmap(Frame().OffsetToCopy(0.0, 0.0), B_CMAP8, true);
 	tempBitmap->Lock();
 	{
 		BView *tempView = new BView(tempBitmap->Bounds(), "", B_FOLLOW_NONE, 0);
@@ -413,7 +413,7 @@ void MediaJack::_drawInto(
 
 				// draw connection point
 				r = targetRect;
-				p.Set(0.0, frame().Height() / 2.0 - 2.0);
+				p.Set(0.0, Frame().Height() / 2.0 - 2.0);
 				target->BeginLineArray(4);
 				{
 					target->AddLine(r.LeftTop(),
@@ -470,7 +470,7 @@ void MediaJack::_drawInto(
 				font.SetSize(font.Size() - 2.0);
 				font.GetHeight(&fh);
 				p.x += 7.0;
-				p.y = (frame().Height() / 2.0) + (fh.ascent / 2.0);
+				p.y = (Frame().Height() / 2.0) + (fh.ascent / 2.0);
 				target->SetFont(&font);
 				target->SetDrawingMode(B_OP_OVER);
 				target->SetHighColor((isConnected() || isConnecting()) ?
@@ -491,7 +491,7 @@ void MediaJack::_drawInto(
 
 				// draw connection point
 				r = targetRect;
-				p.Set(targetRect.right - 4.0, frame().Height() / 2.0 - 2.0);
+				p.Set(targetRect.right - 4.0, Frame().Height() / 2.0 - 2.0);
 				target->BeginLineArray(4);
 				{
 					target->AddLine(r.RightTop(),
@@ -544,7 +544,7 @@ void MediaJack::_drawInto(
 				font.SetSize(font.Size() - 2.0);
 				font.GetHeight(&fh);
 				p.x -= font.StringWidth(m_abbreviation.String()) + 2.0;
-				p.y = (frame().Height() / 2.0) + (fh.ascent / 2.0);
+				p.y = (Frame().Height() / 2.0) + (fh.ascent / 2.0);
 				target->SetFont(&font);
 				target->SetDrawingMode(B_OP_OVER);
 				target->SetHighColor((isConnected() || isConnecting()) ?
@@ -569,7 +569,7 @@ void MediaJack::_drawInto(
 
 				// draw connection point
 				r = targetRect;
-				p.Set(frame().Width() / 2.0 - 2.0, 0.0);
+				p.Set(Frame().Width() / 2.0 - 2.0, 0.0);
 				target->BeginLineArray(4);
 				{
 					target->AddLine(r.LeftTop(),
@@ -628,7 +628,7 @@ void MediaJack::_drawInto(
 
 				// draw connection point
 				r = targetRect;
-				p.Set(frame().Width() / 2.0 - 2.0, targetRect.bottom - 4.0);
+				p.Set(Frame().Width() / 2.0 - 2.0, targetRect.bottom - 4.0);
 				target->BeginLineArray(4);
 				{
 					target->AddLine(r.LeftBottom(),

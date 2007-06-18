@@ -227,7 +227,7 @@ pair<BView*, const tip_entry*> _ViewEntry::match(
 	BPoint point, BPoint screenPoint) {
 
 	// fetch this view's current frame rect
-	BRect f = frame();
+	BRect f = Frame();
 	
 	// check for a full-frame tip:
 	
@@ -277,7 +277,7 @@ pair<BView*, const tip_entry*> _ViewEntry::match(
 }
 
 // get frame rect (in parent view's coordinates)
-BRect _ViewEntry::frame() {
+BRect _ViewEntry::Frame() {
 	ASSERT(m_target);
 //	ASSERT(m_target->Parent());
 

@@ -68,8 +68,8 @@ public:					// *** hook functions
 	virtual DiagramWire *createWire(
 							DiagramEndPoint *fromWhich) = 0;
 					
-	// hook called from MouseDown() if the background was hit
-	virtual void		mouseDown(
+	// hook called from BackgroundMouseDown() if the background was hit
+	virtual void		BackgroundMouseDown(
 							BPoint point,
 							uint32 buttons,
 							uint32 clicks)
@@ -77,21 +77,21 @@ public:					// *** hook functions
 
 	// hook called from MouseMoved() if the mouse is floating over
 	// the background (i.e. with no message attached)
-	virtual void		mouseOver(
+	virtual void		MouseOver(
 							BPoint point,
 							uint32 transit)
 						{ /* does nothing */ }
 
 	// hook called from MouseMoved() if a message is being dragged
 	// over the background
-	virtual void		messageDragged(
+	virtual void		MessageDragged(
 							BPoint point,
 							uint32 transit,
 							const BMessage *message);
 
 	// hook called from MessageReceived() if a message has been
 	// dropped over the background
-	virtual void		messageDropped(
+	virtual void		MessageDropped(
 							BPoint point,
 							BMessage *message);
 
@@ -125,14 +125,14 @@ public:					// derived from BView
 							int32 numBytes);
 
 	// if an item is located at the click point, this function calls
-	// that items mouseDown() method; else a deselectAll() command is
+	// that items MouseDown() method; else a deselectAll() command is
 	// made and rect-tracking is initiated
 	virtual void		MouseDown(
 							BPoint point);
 
 	// if an item is located under the given point, this function
-	// calls that items messageDragged() hook if a message is being
-	// dragged, and mouseOver() if not
+	// calls that items MessageDragged() hook if a message is being
+	// dragged, and MouseOver() if not
 	virtual void		MouseMoved(
 							BPoint point,
 							uint32 transit,

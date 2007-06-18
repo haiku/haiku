@@ -50,7 +50,7 @@ void DiagramItem::select()
 		m_lastSelectionTime = m_selectionTime = system_time();
 		m_countSelected = 1;
 		selected();
-		view()->Invalidate(frame());
+		view()->Invalidate(Frame());
 	}
 }
 
@@ -62,7 +62,7 @@ void DiagramItem::selectAdding()
 		m_selected = true;
 		m_selectionTime = m_lastSelectionTime - m_countSelected++;
 		selected();
-		view()->Invalidate(frame());
+		view()->Invalidate(Frame());
 	}
 }
 
@@ -73,7 +73,7 @@ void DiagramItem::deselect()
 	{
 		m_selected = false;
 		deselected();
-		view()->Invalidate(frame());
+		view()->Invalidate(Frame());
 	}
 }
 
@@ -85,7 +85,7 @@ float DiagramItem::howCloseTo(
 	BPoint point) const
 {
 	D_METHOD(("DiagramItem::howCloseTo()\n"));
-	if (frame().Contains(point))
+	if (Frame().Contains(point))
 	{
 		return 1.0;
 	}

@@ -54,7 +54,7 @@ public:					// *** accessors
 
 public:					// *** operations
 
-	void				mouseOver(
+	void				MouseOver(
 							BView *owner,
 							BPoint point,
 							uint32 transit);

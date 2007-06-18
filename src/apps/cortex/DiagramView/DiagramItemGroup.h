@@ -24,19 +24,21 @@ class DiagramItemGroup {
 		DiagramItemGroup(uint32 acceptedTypes, bool multiSelection = true);
 		virtual ~DiagramItemGroup();
 
-	public: // hook functions
+		// hook function
 		// is called whenever the current selection has changed
 		virtual void SelectionChanged()
 		{
 		}
 
-	public: // item accessors
+		// item accessors
+
 		uint32 CountItems(uint32 whichType = DiagramItem::M_ANY) const;
 		DiagramItem* ItemAt(uint32 index,
 			uint32 whichType = DiagramItem::M_ANY) const;
 		DiagramItem* ItemUnder(BPoint point);
 
-	public: // item operations
+		// item operations
+
 		virtual bool AddItem(DiagramItem* item);
 		bool RemoveItem(DiagramItem* item);
 		void SortItems(uint32 itemType,
@@ -45,7 +47,8 @@ class DiagramItemGroup {
 			BRegion *updateRegion = 0);
 		bool GetClippingAbove(DiagramItem* which, BRegion* outRegion);
 
-	public: // selection accessors
+		// selection accessors
+
 		uint32 SelectedType() const;
 		uint32 CountSelectedItems() const;
 		DiagramItem* SelectedItemAt(uint32 index) const;
@@ -57,7 +60,8 @@ class DiagramItemGroup {
 			return fMultiSelection;
 		}						
 
-	public: // selection related operations
+		// selection related operations
+
 		bool SelectItem(DiagramItem* which, bool deselectOthers = true);
 		bool DeselectItem(DiagramItem *which);
 		void SortSelectedItems(int (*compareFunc)(const void *, const void *));
@@ -66,7 +70,7 @@ class DiagramItemGroup {
 		void DragSelectionBy(float x, float y, BRegion *updateRegion);
 		void RemoveSelection();
 
-	public: // alignment related
+		// alignment related
 
 		// set/get the 'item alignment' grid size; this is used when
 		// items are being dragged and inserted

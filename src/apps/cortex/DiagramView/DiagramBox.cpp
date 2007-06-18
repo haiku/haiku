@@ -1,5 +1,11 @@
 // DiagramBox.cpp
 
+/*! \class DiagramBox
+	DiagramItem subclass providing a basic framework for
+	boxes in diagrams, i.e. objects that can contain various
+	endpoints
+*/
+
 #include "DiagramBox.h"
 #include "DiagramDefs.h"
 #include "DiagramEndPoint.h"
@@ -23,8 +29,8 @@ __USE_CORTEX_NAMESPACE
 DiagramBox::DiagramBox(BRect frame, uint32 flags)
 	: DiagramItem(DiagramItem::M_BOX),
 	DiagramItemGroup(DiagramItem::M_ENDPOINT),
-	m_frame(frame),
-	m_flags(flags)
+	fFrame(frame),
+	fFlags(flags)
 {
 	D_METHOD(("DiagramBox::DiagramBox()\n"));
 	makeDraggable(true);
@@ -37,7 +43,13 @@ DiagramBox::~DiagramBox()
 }
 
 
-// derived from DiagramItemGroup (public)
+//	#pragma mark -  derived from DiagramItemGroup (public)
+
+
+/*! Extends the DiagramItemGroup implementation by setting
+	the items owner and calling the attachedToDiagram() hook
+	on it
+*/
 bool
 DiagramBox::AddItem(DiagramItem *item)
 {
@@ -45,7 +57,7 @@ DiagramBox::AddItem(DiagramItem *item)
 	if (item) {
 		if (DiagramItemGroup::AddItem(item)) {
 			if (m_view) {
-				item->_setOwner(m_view);
+				item->_SetOwner(m_view);
 				item->attachedToDiagram();
 			}
 			return true;
@@ -55,6 +67,9 @@ DiagramBox::AddItem(DiagramItem *item)
 }
 
 
+/*! Extends the DiagramItemGroup implementation by calling 
+	the detachedToDiagram() hook on the \a item
+*/
 bool
 DiagramBox::RemoveItem(DiagramItem *item)
 {
@@ -62,7 +77,7 @@ DiagramBox::RemoveItem(DiagramItem *item)
 	if (item) {
 		item->detachedFromDiagram();
 		if (DiagramItemGroup::RemoveItem(item)) {
-			item->_setOwner(0);
+			item->_SetOwner(0);
 			return true;
 		}
 	}
@@ -70,41 +85,46 @@ DiagramBox::RemoveItem(DiagramItem *item)
 }
 
 
-// derived from DiagramItem (public)
+//	#pragma mark -   derived from DiagramItem (public)
+
+
+/*! Prepares the drawing stack and clipping region, then
+	calls drawBox
+*/
 void
-DiagramBox::draw(BRect updateRect)
+DiagramBox::Draw(BRect updateRect)
 {
-	D_DRAW(("DiagramBox::draw()\n"));
+	D_DRAW(("DiagramBox::Draw()\n"));
 	if (view()) {
 		view()->PushState();
 		{
-			if (m_flags & M_DRAW_UNDER_ENDPOINTS) {
+			if (fFlags & M_DRAW_UNDER_ENDPOINTS) {
 				BRegion region, clipping;
-				region.Include(frame());
+				region.Include(Frame());
 				if (group()->GetClippingAbove(this, &clipping))
 					region.Exclude(&clipping);
 				view()->ConstrainClippingRegion(&region);
-				drawBox();
+				DrawBox();
 				for (uint32 i = 0; i < CountItems(); i++) {
 					DiagramItem *item = ItemAt(i);
-					if (region.Intersects(item->frame()))
-						item->draw(item->frame());
+					if (region.Intersects(item->Frame()))
+						item->Draw(item->Frame());
 				}
 			} else {
 				BRegion region, clipping;
-				region.Include(frame());
+				region.Include(Frame());
 				if (view()->GetClippingAbove(this, &clipping))
 					region.Exclude(&clipping);
 				for (uint32 i = 0; i < CountItems(); i++) {
 					DiagramItem *item = ItemAt(i);
 					BRect r;
-					if (region.Intersects(r = item->frame())) {
-						item->draw(r);
+					if (region.Intersects(r = item->Frame())) {
+						item->Draw(r);
 						region.Exclude(r);
 					}
 				}
 				view()->ConstrainClippingRegion(&region);
-				drawBox();
+				DrawBox();
 			}
 		}
 		view()->PopState();
@@ -112,13 +132,16 @@ DiagramBox::draw(BRect updateRect)
 }
 
 
+/*! Is called from the parent DiagramViews MouseDown() implementation 
+	if the Box was hit; this version initiates selection and dragging
+*/
 void
-DiagramBox::mouseDown(BPoint point, uint32 buttons, uint32 clicks)
+DiagramBox::MouseDown(BPoint point, uint32 buttons, uint32 clicks)
 {
-	D_MOUSE(("DiagramBox::mouseDown()\n"));
+	D_MOUSE(("DiagramBox::MouseDown()\n"));
 	DiagramItem *item = ItemUnder(point);
 	if (item)
-		item->mouseDown(point, buttons, clicks);
+		item->MouseDown(point, buttons, clicks);
 	else if (clicks == 1) {
 		if (isSelectable()) {
 			BMessage selectMsg(M_SELECTION_CHANGED);
@@ -133,119 +156,138 @@ DiagramBox::mouseDown(BPoint point, uint32 buttons, uint32 clicks)
 		if (isDraggable() && (buttons == B_PRIMARY_MOUSE_BUTTON)) {
 			BMessage dragMsg(M_BOX_DRAGGED);
 			dragMsg.AddPointer("item", static_cast<void *>(this));
-			dragMsg.AddPoint("offset", point - frame().LeftTop());
+			dragMsg.AddPoint("offset", point - Frame().LeftTop());
 			view()->DragMessage(&dragMsg, BRect(0.0, 0.0, -1.0, -1.0), view());
 		}
 	}
 }
 
 
+
+/*!	Is called from the DiagramViews MouseMoved() when no message is being 
+	dragged, but the mouse has moved above the box
+*/
 void
-DiagramBox::mouseOver(BPoint point, uint32 transit)
+DiagramBox::MouseOver(BPoint point, uint32 transit)
 {
-	D_MOUSE(("DiagramBox::mouseOver()\n"));
+	D_MOUSE(("DiagramBox::MouseOver()\n"));
 	DiagramItem *last = _LastItemUnder();
 	if (last && (transit == B_EXITED_VIEW)) {
-		last->mouseOver(point, B_EXITED_VIEW);
+		last->MouseOver(point, B_EXITED_VIEW);
 		_ResetItemUnder();
 	} else {
 		DiagramItem *item = ItemUnder(point);
 		if (item) {
 			if (item != last) {
 				if (last)
-					last->mouseOver(point, B_EXITED_VIEW);
-				item->mouseOver(point, B_ENTERED_VIEW);
+					last->MouseOver(point, B_EXITED_VIEW);
+				item->MouseOver(point, B_ENTERED_VIEW);
 			} else
-				item->mouseOver(point, B_INSIDE_VIEW);
+				item->MouseOver(point, B_INSIDE_VIEW);
 		}
 		else if (last)
-			last->mouseOver(point, B_EXITED_VIEW);
+			last->MouseOver(point, B_EXITED_VIEW);
 	}
 }
 
 
+/*!	Is called from the DiagramViews MouseMoved() when a message is being 
+	dragged over the DiagramBox
+*/
 void
-DiagramBox::messageDragged(BPoint point, uint32 transit, const BMessage *message)
+DiagramBox::MessageDragged(BPoint point, uint32 transit, const BMessage *message)
 {
-	D_MOUSE(("DiagramBox::messageDragged()\n"));
+	D_MOUSE(("DiagramBox::MessageDragged()\n"));
 	DiagramItem *last = _LastItemUnder();
 	if (last && (transit == B_EXITED_VIEW)) {
-		last->messageDragged(point, B_EXITED_VIEW, message);
+		last->MessageDragged(point, B_EXITED_VIEW, message);
 		_ResetItemUnder();
 	} else {
 		DiagramItem *item = ItemUnder(point);
 		if (item) {
 			if (item != last) {
 				if (last)
-					last->messageDragged(point, B_EXITED_VIEW, message);
-				item->messageDragged(point, B_ENTERED_VIEW, message);
+					last->MessageDragged(point, B_EXITED_VIEW, message);
+				item->MessageDragged(point, B_ENTERED_VIEW, message);
 			} else
-				item->messageDragged(point, B_INSIDE_VIEW, message);
+				item->MessageDragged(point, B_INSIDE_VIEW, message);
 			return;
 		} else if (last)
-			last->messageDragged(point, B_EXITED_VIEW, message);
+			last->MessageDragged(point, B_EXITED_VIEW, message);
 		if (message->what == M_WIRE_DRAGGED)
 			view()->trackWire(point);
 	}
 }
 
 
+/*!	Is called from the DiagramViews MessageReceived() function when a 
+	message has been dropped on the DiagramBox
+*/
 void
-DiagramBox::messageDropped(BPoint point, BMessage *message)
+DiagramBox::MessageDropped(BPoint point, BMessage *message)
 {
-	D_METHOD(("DiagramBox::messageDropped()\n"));
+	D_METHOD(("DiagramBox::MessageDropped()\n"));
 	DiagramItem *item = ItemUnder(point);
 	if (item) {
-		item->messageDropped(point, message);
+		item->MessageDropped(point, message);
 		return;
 	}
 }
 
 
-// operations (public)
+//	#pragma mark - operations (public)
+
+
+/*!	Moves the box by a given amount, and returns in updateRegion the
+	frames of wires impacted by the move
+*/
 void
-DiagramBox::moveBy(float x, float y, BRegion *wireRegion)
+DiagramBox::MoveBy(float x, float y, BRegion *wireRegion)
 {
-	D_METHOD(("DiagramBox::moveBy()\n"));
+	D_METHOD(("DiagramBox::MoveBy()\n"));
 	if (view()) {
 		view()->PushState();
 		{
 			for (uint32 i = 0; i < CountItems(); i++) {
 				DiagramEndPoint *endPoint = dynamic_cast<DiagramEndPoint *>(ItemAt(i));
 				if (endPoint)
-					endPoint->moveBy(x, y, wireRegion);
+					endPoint->MoveBy(x, y, wireRegion);
 			}
 			if (wireRegion) {
-				wireRegion->Include(m_frame);
-				m_frame.OffsetBy(x, y);
-				wireRegion->Include(m_frame);
+				wireRegion->Include(fFrame);
+				fFrame.OffsetBy(x, y);
+				wireRegion->Include(fFrame);
 			}
 			else
-				m_frame.OffsetBy(x, y);
+				fFrame.OffsetBy(x, y);
 		}
 		view()->PopState();
 	}
 }
 
 
+//! Resizes the boxes frame without doing any updating
 void
-DiagramBox::resizeBy(float horizontal, float vertical)
+DiagramBox::ResizeBy(float horizontal, float vertical)
 {
-	D_METHOD(("DiagramBox::resizeBy()\n"));
-	m_frame.right += horizontal;
-	m_frame.bottom += vertical;
+	D_METHOD(("DiagramBox::ResizeBy()\n"));
+	fFrame.right += horizontal;
+	fFrame.bottom += vertical;
 }
 
 
-// internal operations (private)
+//	#pragma mark - internal operations (private)
+
+
+//!	Is called by the DiagramView when added
 void
-DiagramBox::_setOwner(DiagramView *owner)
+DiagramBox::_SetOwner(DiagramView *owner)
 {
-	D_METHOD(("DiagramBox::_setOwner()\n"));
+	D_METHOD(("DiagramBox::_SetOwner()\n"));
 	m_view = owner;
 	for (uint32 i = 0; i < CountItems(DiagramItem::M_ENDPOINT); i++) {
 		DiagramItem *item = ItemAt(i);
-		item->_setOwner(m_view);
+		item->_SetOwner(m_view);
 		if (m_view)
 			item->attachedToDiagram();
 	}

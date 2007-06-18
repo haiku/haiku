@@ -89,19 +89,19 @@ public:					// *** operations
 	// state has actually changed
 	void				deselect();
 
-	// moves the items frame to a given point by calling moveBy with the 
+	// moves the items frame to a given point by calling MoveBy with the 
 	// absolute coords translated into relative shift amount
 	void				moveTo(
 							BPoint point,
 							BRegion *updateRegion = 0)
-						{ moveBy(point.x - frame().left, point.y - frame().top, updateRegion); }
+						{ MoveBy(point.x - Frame().left, point.y - Frame().top, updateRegion); }
 
-	// resizes the items frame to given dimensions; simply calls the resizeBy
+	// resizes the items frame to given dimensions; simply calls the ResizeBy
 	// implementation
 	void				resizeTo(
 							float width,
 							float height)
-						{ resizeBy(width - frame().Width(), height - frame().Height()); }
+						{ ResizeBy(width - Frame().Width(), height - Frame().Height()); }
 
 public:					// *** hook functions
 
@@ -117,7 +117,7 @@ public:					// *** hook functions
 	
 	// is called from the DiagramViews MouseDown() function after
 	// finding out the mouse buttons and clicks quantity.
-	virtual void		mouseDown(
+	virtual void		MouseDown(
 							BPoint point,
 							uint32 buttons,
 							uint32 clicks)
@@ -125,14 +125,14 @@ public:					// *** hook functions
 
 	// is called from the DiagramViews MouseMoved() when *no* message is being 
 	// dragged, i.e. the mouse is simply floating above the item
-	virtual void		mouseOver(
+	virtual void		MouseOver(
 							BPoint point,
 							uint32 transit)
 						{/* does nothing */}
 
 	// is called from the DiagramViews MouseMoved() when a message is being
 	// dragged; always call the base class version when overriding!
-	virtual void		messageDragged(
+	virtual void		MessageDragged(
 							BPoint point,
 							uint32 transit,
 							const BMessage *message)
@@ -141,7 +141,7 @@ public:					// *** hook functions
 	// is called from the DiagramViews MessageReceived() function when an 
 	// message has been received through Drag&Drop; always call the base
 	// class version when overriding!
-	virtual void		messageDropped(
+	virtual void		MessageDropped(
 							BPoint point,
 							BMessage *message)
 						{/* does nothing */}
@@ -156,7 +156,7 @@ public:					// *** interface definition
 
 	// this function must be implemented by derived classes to return the
 	// items frame rectangle in the DiagramViews coordinates
-	virtual BRect		frame() const = 0;
+	virtual BRect		Frame() const = 0;
 	
 	// this function should be implemented for non-rectangular subclasses
 	// (like wires) to estimate how close a given point is to the object;
@@ -166,8 +166,8 @@ public:					// *** interface definition
 							BPoint point) const;
 
 	// this is the hook function called by DiagramView when it's time to
-	// draw the object
-	virtual void		draw(
+	// Draw the object
+	virtual void		Draw(
 							BRect updateRect) = 0;
 
 	// should move the items frame by the specified amount and do the
@@ -175,14 +175,14 @@ public:					// *** interface definition
 	// caller supplied a BRegion pointer in updateRegion, this method
 	// should add other areas affected by the move to it (e.g. wire
 	// frames)
-	virtual void		moveBy(
+	virtual void		MoveBy(
 							float x,
 							float y,
 							BRegion *updateRegion = 0)
 						{ /* does nothing */ }
 
 	// should resize the items frame by the specified amount
-	virtual void		resizeBy(
+	virtual void		ResizeBy(
 							float horizontal,
 							float vertical)
 						{ /* does nothing */ }
@@ -215,7 +215,7 @@ protected:				// *** internal methods
 
 	// called only by DiagramItemGroup objects in the method
 	// addItem()
-	virtual void		_setOwner(
+	virtual void		_SetOwner(
 							DiagramView *owner) 
 						{ m_view = owner; }
 

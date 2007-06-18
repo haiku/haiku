@@ -118,16 +118,16 @@ float DiagramWire::howCloseTo(
 	return result;
 }
 
-void DiagramWire::draw(
+void DiagramWire::Draw(
 	BRect updateRect)
 {
-	D_METHOD(("DiagramWire::draw()\n"));
+	D_METHOD(("DiagramWire::Draw()\n"));
 	if (view())
 	{
 		view()->PushState();
 		{
 			BRegion region, clipping;
-			region.Include(frame() & updateRect);
+			region.Include(Frame() & updateRect);
 			if (view()->GetClippingAbove(this, &clipping))
 				region.Exclude(&clipping);
 			view()->ConstrainClippingRegion(&region);
@@ -137,12 +137,12 @@ void DiagramWire::draw(
 	}
 }
 
-void DiagramWire::mouseDown(
+void DiagramWire::MouseDown(
 	BPoint point,
 	uint32 buttons,
 	uint32 clicks)
 {
-	D_METHOD(("DiagramWire::mouseDown()\n"));
+	D_METHOD(("DiagramWire::MouseDown()\n"));
 	if (clicks == 1)
 	{
 		if (isSelectable())
@@ -163,12 +163,12 @@ void DiagramWire::mouseDown(
 	}
 }
 
-void DiagramWire::messageDragged(
+void DiagramWire::MessageDragged(
 	BPoint point,
 	uint32 transit,
 	const BMessage *message)
 {
-	D_METHOD(("DiagramWire::messageDragged()\n"));
+	D_METHOD(("DiagramWire::MessageDragged()\n"));
 	switch (message->what)
 	{
 		case M_WIRE_DRAGGED:
@@ -178,7 +178,7 @@ void DiagramWire::messageDragged(
 		}
 		default:
 		{
-			DiagramItem::messageDragged(point, transit, message);
+			DiagramItem::MessageDragged(point, transit, message);
 		}
 	}
 }

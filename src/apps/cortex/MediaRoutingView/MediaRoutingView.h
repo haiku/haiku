@@ -172,12 +172,12 @@ public:						// *** DiagramView impl
 	DiagramWire			   *createWire(
 								DiagramEndPoint *fromWhich);
 
-	virtual void			mouseDown(
+	virtual void			BackgroundMouseDown(
 								BPoint point,
 								uint32 buttons,
 								uint32 clicks);
 
-	virtual void			messageDropped(
+	virtual void			MessageDropped(
 								BPoint point,
 								BMessage *message);
 

@@ -20,7 +20,7 @@ __USE_CORTEX_NAMESPACE
 
 
 DiagramItemGroup::DiagramItemGroup(uint32 acceptedTypes, bool multiSelection)
-	: fBoxes(0),
+	:fBoxes(0),
 	fWires(0),
 	fEndPoints(0),
 	fSelection(0),
@@ -74,8 +74,9 @@ DiagramItemGroup::~DiagramItemGroup()
 //	#pragma mark - item accessors
 
 
-//! Returns the number of items in the group (optionally only those
-//	of the given type \param whichType)
+/*! Returns the number of items in the group (optionally only those
+	of the given type \param whichType)
+*/
 uint32
 DiagramItemGroup::CountItems(uint32 whichType) const
 {
@@ -149,7 +150,7 @@ DiagramItemGroup::ItemUnder(BPoint point)
 	if (fTypes & DiagramItem::M_BOX) {
 		for (uint32 i = 0; i < CountItems(DiagramItem::M_BOX); i++) {
 			DiagramItem *item = ItemAt(i, DiagramItem::M_BOX);
-			if (item->frame().Contains(point) && (item->howCloseTo(point) == 1.0)) {
+			if (item->Frame().Contains(point) && (item->howCloseTo(point) == 1.0)) {
 				// DiagramItemGroup *group = dynamic_cast<DiagramItemGroup *>(item);
 				return (fLastItemUnder = item);
 			}
@@ -161,7 +162,7 @@ DiagramItemGroup::ItemUnder(BPoint point)
 		DiagramItem *closestItem = 0;
 		for (uint32 i = 0; i < CountItems(DiagramItem::M_WIRE); i++) {
 			DiagramItem *item = ItemAt(i, DiagramItem::M_WIRE);
-			if (item->frame().Contains(point)) {
+			if (item->Frame().Contains(point)) {
 				float howClose = item->howCloseTo(point);
 				if (howClose > closest) {
 					closestItem = item;
@@ -179,7 +180,7 @@ DiagramItemGroup::ItemUnder(BPoint point)
 	if (fTypes & DiagramItem::M_ENDPOINT) {
 		for (uint32 i = 0; i < CountItems(DiagramItem::M_ENDPOINT); i++) {
 			DiagramItem *item = ItemAt(i, DiagramItem::M_ENDPOINT);
-			if (item->frame().Contains(point) && (item->howCloseTo(point) == 1.0))
+			if (item->Frame().Contains(point) && (item->howCloseTo(point) == 1.0))
 				return (fLastItemUnder = item);
 		}
 	}
@@ -295,7 +296,7 @@ DiagramItemGroup::SortItems(uint32 whichType,
 }
 
 
-/*! Fires a draw() command at all items of a specific type that
+/*! Fires a Draw() command at all items of a specific type that
 	intersect with the \param updateRect;
 	items are drawn in reverse order; they should be sorted by
 	selection time before this function gets called, so that
@@ -308,18 +309,18 @@ DiagramItemGroup::DrawItems(BRect updateRect, uint32 whichType, BRegion* updateR
 	if (whichType & DiagramItem::M_WIRE) {
 		for (int32 i = CountItems(DiagramItem::M_WIRE) - 1; i >= 0; i--) {
 			DiagramItem *item = ItemAt(i, DiagramItem::M_WIRE);
-			if (item->frame().Intersects(updateRect))
-				item->draw(updateRect);
+			if (item->Frame().Intersects(updateRect))
+				item->Draw(updateRect);
 		}
 	}
 
 	if (whichType & DiagramItem::M_BOX) {
 		for (int32 i = CountItems(DiagramItem::M_BOX) - 1; i >= 0; i--) {
 			DiagramItem *item = ItemAt(i, DiagramItem::M_BOX);
-			if (item && item->frame().Intersects(updateRect)) {	
-				item->draw(updateRect);
+			if (item && item->Frame().Intersects(updateRect)) {	
+				item->Draw(updateRect);
 				if (updateRegion)
-					updateRegion->Exclude(item->frame());
+					updateRegion->Exclude(item->Frame());
 			}
 		}
 	}
@@ -327,8 +328,8 @@ DiagramItemGroup::DrawItems(BRect updateRect, uint32 whichType, BRegion* updateR
 	if (whichType & DiagramItem::M_ENDPOINT) {
 		for (int32 i = CountItems(DiagramItem::M_ENDPOINT) - 1; i >= 0; i--) {
 			DiagramItem *item = ItemAt(i, DiagramItem::M_ENDPOINT);
-			if (item && item->frame().Intersects(updateRect))
-				item->draw(updateRect);
+			if (item && item->Frame().Intersects(updateRect))
+				item->Draw(updateRect);
 		}
 	}
 }
@@ -349,11 +350,11 @@ DiagramItemGroup::GetClippingAbove(DiagramItem *which, BRegion *region)
 			{
 				int32 index = fBoxes->IndexOf(which);
 				if (index >= 0) { // the item was found
-					BRect r = which->frame();
+					BRect r = which->Frame();
 					for (int32 i = 0; i < index; i++) {
 						DiagramItem *item = ItemAt(i, DiagramItem::M_BOX);
-						if (item && item->frame().Intersects(r)) {
-							region->Include(item->frame() & r);
+						if (item && item->Frame().Intersects(r)) {
+							region->Include(item->Frame() & r);
 							found = true;
 						}
 					}
@@ -363,11 +364,11 @@ DiagramItemGroup::GetClippingAbove(DiagramItem *which, BRegion *region)
 
 			case DiagramItem::M_WIRE:
 			{
-				BRect r = which->frame();
+				BRect r = which->Frame();
 				for (uint32 i = 0; i < CountItems(DiagramItem::M_BOX); i++) {
 					DiagramItem *item = ItemAt(i, DiagramItem::M_BOX);
-					if (item && item->frame().Intersects(r)) {
-						region->Include(item->frame() & r);
+					if (item && item->Frame().Intersects(r)) {
+						region->Include(item->Frame() & r);
 						found = true;
 					}
 				}
@@ -549,7 +550,7 @@ DiagramItemGroup::DragSelectionBy(float x, float y, BRegion* updateRegion)
 			for (int32 i = CountSelectedItems() - 1; i >= 0; i--) {
 				DiagramItem *item = dynamic_cast<DiagramItem *>(SelectedItemAt(i));
 				if (item->isDraggable())
-					item->moveBy(x, y, updateRegion);
+					item->MoveBy(x, y, updateRegion);
 			}
 		}
 	}

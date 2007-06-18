@@ -103,18 +103,18 @@ public:					// *** derived from DiagramEndPoint/Item
 							DiagramEndPoint *which);
 
 	// displays the context menu for right-clicks
-	virtual void		mouseDown(
+	virtual void		MouseDown(
 							BPoint point,
 							uint32 buttons,
 							uint32 clicks);
 
 	// changes the mouse cursor and prepares a tooltip
-	virtual void		mouseOver(
+	virtual void		MouseOver(
 							BPoint point,
 							uint32 transit);
 
 	// changes the mouse cursor
-	virtual void		messageDragged(
+	virtual void		MessageDragged(
 							BPoint point,
 							uint32 transit,
 							const BMessage *message);

@@ -1,10 +1,5 @@
 // DiagramBox.h (Cortex/DiagramView.h)
 //
-// * PURPOSE
-//   DiagramItem subclass providing a basic framework for
-//   boxes in diagrams, i.e. objects that can contain various
-//   endpoints
-//
 // * HISTORY
 //   c.lenz		25sep99		Begun
 //
@@ -23,80 +18,55 @@ __BEGIN_CORTEX_NAMESPACE
 
 
 class DiagramBox : public DiagramItem, public DiagramItemGroup {
-	public:	// flags
-
-		enum flag_t {
-			M_DRAW_UNDER_ENDPOINTS = 0x1
-		};
-
 	public:
 		DiagramBox(BRect frame, uint32 flags = 0);
 		virtual ~DiagramBox();
 
-	public:	// hook functions
-		// is called from draw() to do the actual drawing
-		virtual void drawBox() = 0;
+		virtual void DrawBox() = 0;
+			// a hook functions that
+			// is called from Draw() to do the actual drawing
 
-	public:	// derived from DiagramItemGroup
+		// derived from DiagramItemGroup
 
-		// extends the DiagramItemGroup implementation by setting
-		// the items owner and calling the attachedToDiagram() hook
-		// on it
 		virtual bool AddItem(DiagramItem *item);
-
-		// extends the DiagramItemGroup implementation by calling 
-		// the detachedToDiagram() hook on the item
 		virtual bool RemoveItem(DiagramItem *item);
 
-	public:	// derived from DiagramItem
+		// derived from DiagramItem
 
 		// returns the Boxes frame rectangle
-		BRect frame() const { return m_frame; }
+		BRect Frame() const
+		{
+			return fFrame;
+		}
 
-		// prepares the drawing stack and clipping region, then
-		// calls drawBox
-		void draw(BRect updateRect);
+		void Draw(BRect updateRect);
 
-		// is called from the parent DiagramViews MouseDown() implementation 
-		// if the Box was hit; this version initiates selection and dragging
-		virtual void mouseDown(BPoint point, uint32 buttons, uint32 clicks);
-
-		// is called from the DiagramViews MouseMoved() when no message is being 
-		// dragged, but the mouse has moved above the box
-		virtual void mouseOver(BPoint point, uint32 transit);
+		virtual void MouseDown(BPoint point, uint32 buttons, uint32 clicks);
+		virtual void MouseOver(BPoint point, uint32 transit);
 		
-		// is called from the DiagramViews MouseMoved() when a message is being 
-		// dragged over the DiagramBox
-		virtual void messageDragged(BPoint point, uint32 transit, const BMessage *message);
+		virtual void MessageDragged(BPoint point, uint32 transit, const BMessage *message);
+		virtual void MessageDropped(BPoint point, BMessage *message);
 
-		// is called from the DiagramViews MessageReceived() function when a 
-		// message has been dropped on the DiagramBox
-		virtual void messageDropped(BPoint point, BMessage *message);
-
-	public:	// operations
-
-		// moves the box by a given amount, and returns in updateRegion the
-		// frames of wires impacted by the move
-		void moveBy(float x, float y, BRegion *updateRegion);
-
-		// resizes the boxes frame without doing any updating		
-		virtual void resizeBy(float horizontal, float vertical);
-
-	private:// internal methods
-
-		// is called by the DiagramView when added
-		void _setOwner(DiagramView *owner);
+		void MoveBy(float x, float y, BRegion *updateRegion);
+		virtual void ResizeBy(float horizontal, float vertical);
+		
+		enum flag_t {
+			M_DRAW_UNDER_ENDPOINTS = 0x1
+		};
 
 	private:
-	
-		// the boxes' frame rectangle
-		BRect m_frame;
+		void _SetOwner(DiagramView *owner);
+
+	private:
+		BRect fFrame;
+			// the boxes' frame rectangle
 
 		// flags:
 		// 	M_DRAW_UNDER_ENDPOINTS -  don't remove EndPoint frames from
 		//							the clipping region
-		uint32 m_flags;
+		uint32 fFlags;
 };
 
 __END_CORTEX_NAMESPACE
+
 #endif	// DIAGRAM_BOX_H

@@ -107,7 +107,7 @@ void MediaNodePanel::detachedFromDiagram()
 {
 	D_METHOD(("MediaNodePanel::detachedFromDiagram()\n"));
 
-	BRect labelRect = m_labelRect.OffsetByCopy(frame().LeftTop());
+	BRect labelRect = m_labelRect.OffsetByCopy(Frame().LeftTop());
 	if (m_mouseOverLabel && m_labelTruncated)
 	{
 		TipManager *tips = TipManager::Instance();
@@ -117,27 +117,27 @@ void MediaNodePanel::detachedFromDiagram()
 	view()->Looper()->RemoveHandler(this);
 }
 
-void MediaNodePanel::drawBox()
+void MediaNodePanel::DrawBox()
 {
-	D_DRAW(("MediaNodePanel::drawBox()\n"));
+	D_DRAW(("MediaNodePanel::DrawBox()\n"));
 	if (m_bitmap)
 	{
-		view()->DrawBitmap(m_bitmap, frame().LeftTop());
+		view()->DrawBitmap(m_bitmap, Frame().LeftTop());
 	}
 }
 
-void MediaNodePanel::mouseDown(
+void MediaNodePanel::MouseDown(
 	BPoint point,
 	uint32 buttons,
 	uint32 clicks)
 {
-	D_METHOD(("MediaNodePanel::mouseDown()\n"));
+	D_METHOD(("MediaNodePanel::MouseDown()\n"));
 
-	_inherited::mouseDown(point, buttons, clicks);
+	_inherited::MouseDown(point, buttons, clicks);
 
 	// +++ REALLY BAD WORKAROUND
 	MediaJack *jack = dynamic_cast<MediaJack *>(_LastItemUnder());
-	if (jack && jack->frame().Contains(point))
+	if (jack && jack->Frame().Contains(point))
 	{
 		return;
 	}
@@ -164,12 +164,12 @@ void MediaNodePanel::mouseDown(
 	}
 }
 
-void MediaNodePanel::mouseOver(
+void MediaNodePanel::MouseOver(
 	BPoint point,
 	uint32 transit)
 {
-	D_METHOD(("MediaNodePanel::mouseOver()\n"));
-	_inherited::mouseOver(point, transit);
+	D_METHOD(("MediaNodePanel::MouseOver()\n"));
+	_inherited::MouseOver(point, transit);
 
 	switch (transit)
 	{
@@ -179,7 +179,7 @@ void MediaNodePanel::mouseOver(
 		}
 		case B_INSIDE_VIEW:
 		{
-			BRect labelRect = m_labelRect.OffsetByCopy(frame().LeftTop());
+			BRect labelRect = m_labelRect.OffsetByCopy(Frame().LeftTop());
 			if (labelRect.Contains(point))
 			{
 				if (!m_mouseOverLabel && m_labelTruncated)
@@ -203,17 +203,17 @@ void MediaNodePanel::mouseOver(
 	}
 }
 
-void MediaNodePanel::messageDropped(
+void MediaNodePanel::MessageDropped(
 	BPoint point,
 	BMessage *message)
 {
-	D_METHOD(("MediaNodePanel::messageDropped()\n"));
+	D_METHOD(("MediaNodePanel::MessageDropped()\n"));
 
 	// +++ REALLY BAD WORKAROUND
 	MediaJack *jack = dynamic_cast<MediaJack *>(ItemUnder(point));
 	if (jack)
 	{
-		jack->messageDropped(point, message);
+		jack->MessageDropped(point, message);
 		return;
 	}
 	else
@@ -243,7 +243,7 @@ void MediaNodePanel::layoutChanged(
 {
 	D_METHOD(("MediaNodePanel::layoutChanged()\n"));
 
-	BPoint p = frame().LeftTop();
+	BPoint p = Frame().LeftTop();
 	if (m_alternatePosition == s_invalidPosition)
 	{
 		m_alternatePosition = dynamic_cast<MediaRoutingView *>
@@ -367,13 +367,13 @@ void MediaNodePanel::arrangeIOJacks()
 			minHeight += m_labelRect.Height();
 			minHeight += 2 * MediaJack::M_DEFAULT_GAP;
 			minHeight = ((int)minHeight / (int)align) * align + align;
-			if ((frame().Height() < minHeight)
-			 || ((frame().Height() > minHeight)
+			if ((Frame().Height() < minHeight)
+			 || ((Frame().Height() > minHeight)
 			 && (minHeight >= MediaNodePanel::M_DEFAULT_HEIGHT)))
 			{
-				updateRegion.Include(frame());
-				resizeTo(frame().Width(), minHeight);
-				updateRegion.Include(frame());
+				updateRegion.Include(Frame());
+				resizeTo(Frame().Width(), minHeight);
+				updateRegion.Include(Frame());
 				_prepareLabel();		
 			}
 
@@ -381,7 +381,7 @@ void MediaNodePanel::arrangeIOJacks()
 			BRect r = m_bodyRect;
 			r.bottom -= M_BODY_V_MARGIN;
 			float inputOffset = 0.0, outputOffset = 0.0;
-			float center = frame().top + r.top + (r.Height() / 2.0);
+			float center = Frame().top + r.top + (r.Height() / 2.0);
 			center += MediaJack::M_DEFAULT_GAP - (MediaJack::M_DEFAULT_HEIGHT / 2.0);
 			center = ((int)center / (int)align) * align;
 			if (numInputs)
@@ -413,13 +413,13 @@ void MediaNodePanel::arrangeIOJacks()
 				{
 					if (jack->isInput())
 					{
-						jack->setPosition(inputOffset, frame().left, frame().right, &updateRegion);
-						inputOffset += jack->frame().Height() + MediaJack::M_DEFAULT_GAP;
+						jack->setPosition(inputOffset, Frame().left, Frame().right, &updateRegion);
+						inputOffset += jack->Frame().Height() + MediaJack::M_DEFAULT_GAP;
 					}
 					if (jack->isOutput())
 					{
-						jack->setPosition(outputOffset, frame().left, frame().right, &updateRegion);
-						outputOffset += jack->frame().Height() + MediaJack::M_DEFAULT_GAP;
+						jack->setPosition(outputOffset, Frame().left, Frame().right, &updateRegion);
+						outputOffset += jack->Frame().Height() + MediaJack::M_DEFAULT_GAP;
 					}
 				}
 			}
@@ -457,18 +457,18 @@ void MediaNodePanel::arrangeIOJacks()
 			minWidth += m_bodyRect.Width();
 			minWidth += 2 * MediaJack::M_DEFAULT_GAP;
 			minWidth = ((int)minWidth / (int)align) * align + align;
-			if ((frame().Width() < minWidth)
-			 || ((frame().Width() > minWidth)
+			if ((Frame().Width() < minWidth)
+			 || ((Frame().Width() > minWidth)
 			 && (minWidth >= MediaNodePanel::M_DEFAULT_WIDTH)))
 			{
-				updateRegion.Include(frame());
-				resizeTo(minWidth, frame().Height());
-				updateRegion.Include(frame());
+				updateRegion.Include(Frame());
+				resizeTo(minWidth, Frame().Height());
+				updateRegion.Include(Frame());
 				_prepareLabel();
 			}
 			// adjust the placement of the jacks
 			float inputOffset = 0.0, outputOffset = 0.0;
-			float center = frame().left + m_labelRect.left + (m_labelRect.Width() / 2.0);
+			float center = Frame().left + m_labelRect.left + (m_labelRect.Width() / 2.0);
 			center += MediaJack::M_DEFAULT_GAP - (MediaJack::M_DEFAULT_WIDTH / 2.0);
 			center = ((int)center / (int)align) * align;
 			if (numInputs)
@@ -500,13 +500,13 @@ void MediaNodePanel::arrangeIOJacks()
 				{
 					if (jack->isInput())
 					{
-						jack->setPosition(inputOffset, frame().top, frame().bottom, &updateRegion);
-						inputOffset += jack->frame().Width() + MediaJack::M_DEFAULT_GAP;
+						jack->setPosition(inputOffset, Frame().top, Frame().bottom, &updateRegion);
+						inputOffset += jack->Frame().Width() + MediaJack::M_DEFAULT_GAP;
 					}
 					if (jack->isOutput())
 					{
-						jack->setPosition(outputOffset, frame().top, frame().bottom, &updateRegion);
-						outputOffset += jack->frame().Width() + MediaJack::M_DEFAULT_GAP;
+						jack->setPosition(outputOffset, Frame().top, Frame().bottom, &updateRegion);
+						outputOffset += jack->Frame().Width() + MediaJack::M_DEFAULT_GAP;
 					}
 				}
 			}
@@ -719,12 +719,12 @@ status_t MediaNodePanel::exportState(
 	MediaRoutingView::layout_t layoutMode = v->getLayout();
 	switch(layoutMode) {
 		case MediaRoutingView::M_ICON_VIEW:
-			iconPos = frame().LeftTop();
+			iconPos = Frame().LeftTop();
 			miniIconPos = m_alternatePosition;
 			break;
 
 		case MediaRoutingView::M_MINI_ICON_VIEW:
-			miniIconPos = frame().LeftTop();
+			miniIconPos = Frame().LeftTop();
 			iconPos = m_alternatePosition;
 			break;
 	}
@@ -793,14 +793,14 @@ void MediaNodePanel::_prepareLabel()
 	{
 		case MediaRoutingView::M_ICON_VIEW:
 		{
-			m_labelRect = frame();
+			m_labelRect = Frame();
 			m_labelRect.OffsetTo(0.0, 0.0);
 			m_labelRect.bottom = 2 * M_LABEL_V_MARGIN + (fh.ascent + fh.descent + fh.leading) + 1.0;
 			break;
 		}
 		case MediaRoutingView::M_MINI_ICON_VIEW:
 		{
-			m_labelRect = frame();
+			m_labelRect = Frame();
 			m_labelRect.OffsetTo(0.0, 0.0);
 			m_labelRect.left = M_BODY_H_MARGIN + B_MINI_ICON;
 			m_labelRect.top += MediaJack::M_DEFAULT_HEIGHT;
@@ -840,14 +840,14 @@ void MediaNodePanel::_prepareLabel()
 	{
 		case MediaRoutingView::M_ICON_VIEW:
 		{
-			m_bodyRect = frame();
+			m_bodyRect = Frame();
 			m_bodyRect.OffsetTo(0.0, 0.0);
 			m_bodyRect.top = m_labelRect.bottom;
 			break;
 		}
 		case MediaRoutingView::M_MINI_ICON_VIEW:
 		{
-			m_bodyRect = frame();
+			m_bodyRect = Frame();
 			m_bodyRect.OffsetTo(0.0, 0.0);
 			m_bodyRect.right = m_labelRect.left;
 			break;
@@ -861,7 +861,7 @@ void MediaNodePanel::_updateBitmap()
 	{
 		delete m_bitmap;
 	}
-	BBitmap *tempBitmap = new BBitmap(frame().OffsetToCopy(0.0, 0.0), B_CMAP8, true);
+	BBitmap *tempBitmap = new BBitmap(Frame().OffsetToCopy(0.0, 0.0), B_CMAP8, true);
 	tempBitmap->Lock();
 	{
 		BView *tempView = new BView(tempBitmap->Bounds(), "", B_FOLLOW_NONE, 0);

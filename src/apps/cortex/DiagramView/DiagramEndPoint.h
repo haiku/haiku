@@ -38,7 +38,7 @@ public:					// *** accessors
 
 public:					// *** hook functions
 
-	// is called from draw() to do the actual drawing
+	// is called from Draw() to do the actual drawing
 	virtual void		drawEndPoint() = 0;
 
 	// should return the BPoint that a connected wire uses as
@@ -46,7 +46,7 @@ public:					// *** hook functions
 	// point of the EndPoint
 	virtual BPoint		connectionPoint() const;
 
-	// is called from messageDragged() and messageDropped() to 
+	// is called from MessageDragged() and MessageDropped() to 
 	// let you verify that a connection is okay
 	virtual bool		connectionRequested(
 							DiagramEndPoint *fromWhich);
@@ -64,42 +64,42 @@ public:					// *** hook functions
 public:					// *** derived from DiagramItem
 
 	// returns the EndPoints frame rectangle
-	BRect				frame() const
+	BRect				Frame() const
 						{ return m_frame; }
 
 	// prepares the drawing stack and clipping region, then
 	// calls drawEndPoint
-	void				draw(
+	void				Draw(
 							BRect updateRect);
 
-	// is called from the parent DiagramBox's mouseDown() 
+	// is called from the parent DiagramBox's MouseDown() 
 	// implementation if the EndPoint was hit; this version
 	// initiates selection and dragging (i.e. connecting)
-	virtual void		mouseDown(
+	virtual void		MouseDown(
 							BPoint point,
 							uint32 buttons,
 							uint32 clicks);
 
-	// is called from the parent DiagramBox's mouseOver()
+	// is called from the parent DiagramBox's MouseOver()
 	// implementation if the mouse is over the EndPoint
-	virtual void		mouseOver(
+	virtual void		MouseOver(
 							BPoint point,
 							uint32 transit)
 						{ /* does nothing */ }
 
-	// is called from the parent DiagramBox's messageDragged()
+	// is called from the parent DiagramBox's MessageDragged()
 	// implementation of a message is being dragged of the
 	// EndPoint; this implementation handles only wire drags
 	// (i.e. M_WIRE_DRAGGED messages)
-	virtual void		messageDragged(
+	virtual void		MessageDragged(
 							BPoint point,
 							uint32 transit,
 							const BMessage *message);
 							
-	// is called from the parent DiagramBox's messageDropped()
+	// is called from the parent DiagramBox's MessageDropped()
 	// implementation if the message was dropped on the EndPoint;
 	// this version handles wire dropping (connecting)
-	virtual void		messageDropped(
+	virtual void		MessageDropped(
 							BPoint point,
 							BMessage *message);
 								
@@ -107,13 +107,13 @@ public:					// *** derived from DiagramItem
 	// updateRegion the frames of connected wires if there are any
 	// NOTE: no drawing/refreshing is done in this method, that's
 	// up to the parent
-	void				moveBy(
+	void				MoveBy(
 							float x,
 							float y,
 							BRegion *updateRegion);
 		
 	// resize the EndPoints frame rectangle without redraw
-	virtual void		resizeBy(
+	virtual void		ResizeBy(
 							float horizontal,
 							float vertical);
 
