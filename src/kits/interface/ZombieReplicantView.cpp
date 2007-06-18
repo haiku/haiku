@@ -10,15 +10,13 @@
 #include <Message.h>
 #include <MimeType.h>
 
-#include <ZombieReplicantView.h>
+#include "ZombieReplicantView.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <new>
 
-
-const static rgb_color kZombieColor = {220, 220, 220, 255};
 
 
 _BZombieReplicantView_::_BZombieReplicantView_(BRect frame, status_t error)

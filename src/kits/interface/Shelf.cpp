@@ -26,7 +26,8 @@
 #include <View.h>
 
 #include <ViewPrivate.h>
-#include <ZombieReplicantView.h>
+
+#include "ZombieReplicantView.h"
 
 #include <stdio.h>
 #include <string.h>

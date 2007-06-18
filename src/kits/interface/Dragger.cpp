@@ -24,6 +24,8 @@
 #include <Shelf.h>
 #include <Window.h>
 
+#include "ZombieReplicantView.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -33,7 +35,6 @@ bool BDragger::sVisibleInitialized;
 BLocker BDragger::sLock("BDragger static");
 BList BDragger::sList;
 
-const static rgb_color kZombieColor = {220, 220, 220, 255};
 
 const unsigned char
 kHandBitmap[] = {
