@@ -78,6 +78,8 @@ class BWindowScreen : public BWindow {
 							BWindowScreen &operator=(BWindowScreen& other);
 
 		status_t			_InitData(uint32 space, uint32 attributes);
+		void				_DisposeData();
+
 		status_t			_SetActiveState(int32 state);
 		status_t			_SetupAccelerantHooks(bool enable);
 		status_t			_GetCardInfo();

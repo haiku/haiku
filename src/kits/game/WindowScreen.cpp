@@ -1,8 +1,8 @@
 /*
- * Copyright 2002-2006, Haiku. All Rights Reserved.
+ * Copyright 2002-2007, Haiku. All Rights Reserved.
  * Copyright 2002-2005,
  *		Marcus Overhagen, 
- *		Stefano Ceccherini (burton666@libero.it),
+ *		Stefano Ceccherini (stefano.ceccherini@gmail.com),
  *		Carwyn Jones (turok2@currantbun.com)
  *		All rights reserved.
  *
@@ -19,6 +19,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <new>
+
 #include <input_globals.h>
 #include <InputServerTypes.h> // For IS_SET_MOUSE_POSITION
 #include <WindowPrivate.h>
@@ -29,7 +31,7 @@
 using BPrivate::AppServerLink;
 
 
-#define TRACE_WINDOWSCREEN 1
+#define TRACE_WINDOWSCREEN 0
 #if TRACE_WINDOWSCREEN
 #define CALLED() printf("%s\n", __PRETTY_FUNCTION__);
 #else
@@ -312,19 +314,7 @@ BWindowScreen::BWindowScreen(const char *title, uint32 space,
 BWindowScreen::~BWindowScreen()
 {
 	CALLED();
-	Disconnect();
-	if (fAddonImage >= 0)
-		unload_add_on(fAddonImage);
-	
-	delete_sem(fActivateSem);
-	delete_sem(fDebugSem);
-	
-	if (fDebugState)
-		activate_workspace(fDebugWorkspace);
-	
-	free(fDisplayMode);
-	free(fOriginalDisplayMode);
-	free(fModeList);
+	_DisposeData();
 }
 
 
@@ -679,51 +669,96 @@ BWindowScreen::_InitData(uint32 space, uint32 attributes)
 	fAttributes = attributes;
 		// TODO: not really used right now, but should probably be known by the app_server
 
-	fWorkspaceIndex = fDebugWorkspace = current_workspace();
+	fWorkspaceIndex = current_workspace();
+	fDebugWorkspace = fWorkspaceIndex > 0 ? fWorkspaceIndex - 1 : 1;
 	fLockState = 0;
 	fAddonImage = -1;
 	fWindowState = 0;
-
-	// TODO: free resources upon failure!
-
-	BScreen screen(this);
-	status_t status = screen.GetModeList(&fModeList, &fModeCount);
-	if (status < B_OK)
-		return status;
-
-	fDisplayMode = (display_mode *)malloc(sizeof(display_mode));
-	if (fDisplayMode == NULL)
-		return B_NO_MEMORY;
-
-	status = _GetModeFromSpace(space, fDisplayMode);
-	if (status < B_OK)
-		return status;
-
-	memcpy(fPalette, screen.ColorMap()->color_list, 256);
-
-	status = _GetCardInfo();
-	if (status < B_OK)
-		return status;
-
-	fActivateSem = create_sem(0, "WindowScreen start lock");
-	if (fActivateSem < B_OK)
-		return fActivateSem;
-
+	fOriginalDisplayMode = NULL;
+	fDisplayMode = NULL;
+	fModeList = NULL;
+	fModeCount = 0;
+	fActivateSem = -1;
+	fDebugSem = -1;
 	fActivateState = 0;
+	fWorkState = 0;
 
-	fDebugSem = create_sem(1, "WindowScreen debug sem");
-	if (fDebugSem < B_OK)
-		return fDebugSem;
+	status_t status = B_ERROR;
+	try {
+		fOriginalDisplayMode = new display_mode;
+		fDisplayMode = new display_mode;
 
-	fWorkState = 1;
+		BScreen screen(this);
+		status = screen.GetMode(fOriginalDisplayMode);
+		if (status < B_OK)
+			throw status;
 		
-	fOriginalDisplayMode = (display_mode *)malloc(sizeof(display_mode));
-	if (fOriginalDisplayMode == NULL)
-		return B_NO_MEMORY;
+		status = screen.GetModeList(&fModeList, &fModeCount);
+		if (status < B_OK)
+			throw status;
 
-	screen.GetMode(fOriginalDisplayMode);
+		status = _GetModeFromSpace(space, fDisplayMode);
+		if (status < B_OK)
+			throw status;
 
-	return B_OK;
+		status = _GetCardInfo();
+		if (status < B_OK)
+			throw status;
+
+		fActivateSem = create_sem(0, "WindowScreen start lock");
+		if (fActivateSem < B_OK)
+			throw fActivateSem;
+
+		fDebugSem = create_sem(1, "WindowScreen debug sem");
+		if (fDebugSem < B_OK)
+			throw fDebugSem;
+
+		memcpy(fPalette, screen.ColorMap()->color_list, 256);
+		fActivateState = 0;
+		fWorkState = 1;
+		
+	} catch (std::bad_alloc) {
+		status = B_NO_MEMORY;	
+	} catch (int error) {
+		status = error;
+	} catch (...) {
+		status = B_ERROR;	
+	}
+
+	if (status != B_OK)
+		_DisposeData();
+
+	return status;
+}
+
+
+void
+BWindowScreen::_DisposeData()
+{
+	CALLED();
+	Disconnect();
+	if (fAddonImage >= 0) {
+		unload_add_on(fAddonImage);
+		fAddonImage = -1;	
+	}
+	
+	delete_sem(fActivateSem);
+	fActivateSem = -1;
+	delete_sem(fDebugSem);
+	fDebugSem = -1;	
+
+	if (fDebugState)
+		activate_workspace(fDebugWorkspace);
+	
+	delete fDisplayMode;
+	fDisplayMode = NULL;
+	delete fOriginalDisplayMode;
+	fOriginalDisplayMode = NULL;
+	delete fModeList;
+	fModeList = NULL;
+	fModeCount = 0;
+	
+	fLockState = 0;
 }
 
 
@@ -733,7 +768,6 @@ BWindowScreen::_SetActiveState(int32 state)
 	CALLED();
 	status_t status = B_ERROR;
 	if (state == 1) {
-		//be_app->HideCursor();
 		status = _AssertDisplayMode(fDisplayMode);
 		if (status == B_OK && (status = _SetupAccelerantHooks(true)) == B_OK) {			
 			if (!fActivateState) {
@@ -993,35 +1027,35 @@ BWindowScreen::_InitClone()
 	link.ReadString(accelerantPath);
 	fAddonImage = load_add_on(accelerantPath.String()); 
 	if (fAddonImage < B_OK) {
-		printf("InitClone: cannot load accelerant image\n");
+		fprintf(stderr, "InitClone: cannot load accelerant image\n");
 		return fAddonImage;
 	}
 
 	status = get_image_symbol(fAddonImage, B_ACCELERANT_ENTRY_POINT,
 		B_SYMBOL_TYPE_TEXT, (void **)&fGetAccelerantHook);
 	if (status < B_OK) {
-		printf("InitClone: cannot get accelerant entry point\n");
+		fprintf(stderr, "InitClone: cannot get accelerant entry point\n");
 		unload_add_on(fAddonImage);
 		fAddonImage = -1;
 		return status;
 	}
 	
-	accelerant_clone_info_size clone_info_size;
-	get_accelerant_clone_info clone_info;
-	clone_accelerant clone;
-	clone_info_size = (accelerant_clone_info_size)fGetAccelerantHook(B_ACCELERANT_CLONE_INFO_SIZE, NULL);
-	clone_info = (get_accelerant_clone_info)fGetAccelerantHook(B_GET_ACCELERANT_CLONE_INFO, NULL);
-	clone = (clone_accelerant)fGetAccelerantHook(B_CLONE_ACCELERANT, NULL);
+	accelerant_clone_info_size cloneInfoSizeHook;
+	get_accelerant_clone_info cloneInfoHook;
+	clone_accelerant cloneHook;
+	cloneInfoSizeHook = (accelerant_clone_info_size)fGetAccelerantHook(B_ACCELERANT_CLONE_INFO_SIZE, NULL);
+	cloneInfoHook = (get_accelerant_clone_info)fGetAccelerantHook(B_GET_ACCELERANT_CLONE_INFO, NULL);
+	cloneHook = (clone_accelerant)fGetAccelerantHook(B_CLONE_ACCELERANT, NULL);
 
 	status = B_ERROR;
-	if (!clone_info_size || !clone_info || !clone) {
-		printf("InitClone: cannot get clone hook\n");
+	if (!cloneInfoSizeHook || !cloneInfoHook || !cloneHook) {
+		fprintf(stderr, "InitClone: cannot get clone hook\n");
 		unload_add_on(fAddonImage);
 		fAddonImage = -1;
 		return status;
 	}
 
-	ssize_t cloneInfoSize = clone_info_size();
+	ssize_t cloneInfoSize = cloneInfoSizeHook();
 	void *cloneInfo = malloc(cloneInfoSize);
 	if (!cloneInfo) {
 		unload_add_on(fAddonImage);
@@ -1029,15 +1063,15 @@ BWindowScreen::_InitClone()
 		return B_NO_MEMORY;
 	}
 
-	clone_info(cloneInfo);
+	cloneInfoHook(cloneInfo);
 		// no way to see if this call fails
 
-	status = clone(cloneInfo);
+	status = cloneHook(cloneInfo);
 	
 	free(cloneInfo);
 
 	if (status < B_OK) {
-		printf("InitClone: cannot clone accelerant\n");
+		fprintf(stderr, "InitClone: cannot clone accelerant\n");
 		unload_add_on(fAddonImage);
 		fAddonImage = -1;
 	}
