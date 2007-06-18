@@ -97,7 +97,7 @@ typedef DoublyLinkedList<block_range,
 	DoublyLinkedListMemberGetLink<block_range,
 		&block_range::link> > range_list;
 
-struct block_cache {
+struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
 	hash_table	*hash;
 	benaphore	lock;
 	int			fd;

@@ -39,6 +39,8 @@
 #	define TRACE(x) ;
 #endif
 
+#define DEBUG_BLOCK_CACHE
+
 // This macro is used for fatal situations that are acceptable in a running
 // system, like out of memory situations - should only panic for debugging.
 #define FATAL(x) panic x
@@ -60,6 +62,12 @@ struct cache_transaction {
 
 static status_t write_cached_block(block_cache *cache, cached_block *block,
 	bool deleteTransaction = true);
+
+
+#ifdef DEBUG_BLOCK_CACHE
+static DoublyLinkedList<block_cache> sCaches;
+static mutex sCachesLock;
+#endif
 
 
 //	#pragma mark - private transaction
@@ -161,6 +169,12 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 	ranges_hash(NULL),
 	read_only(readOnly)
 {
+#ifdef DEBUG_BLOCK_CACHE
+	mutex_lock(&sCachesLock);
+	sCaches.Add(this);
+	mutex_unlock(&sCachesLock);
+#endif
+
 	hash = hash_init(32, 0, &cached_block::Compare, &cached_block::Hash);
 	if (hash == NULL)
 		return;
@@ -188,6 +202,12 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 
 block_cache::~block_cache()
 {
+#ifdef DEBUG_BLOCK_CACHE
+	mutex_lock(&sCachesLock);
+	sCaches.Remove(this);
+	mutex_unlock(&sCachesLock);
+#endif
+
 	unregister_low_memory_handler(&block_cache::LowMemoryHandler, this);
 
 	benaphore_destroy(&lock);
@@ -431,6 +451,8 @@ put_cached_block(block_cache *cache, cached_block *block)
 		&& block->previous_transaction == NULL) {
 		// put this block in the list of unused blocks
 		block->unused = true;
+if (block->original_data != NULL || block->parent_data != NULL)
+	panic("put_cached_block(): %p (%Ld): %p, %p\n", block, block->block_number, block->original_data, block->parent_data);
 		cache->unused_blocks.Add(block);
 //		block->current_data = cache->allocator->Release(block->current_data);
 	}
@@ -697,9 +719,94 @@ write_cached_block(block_cache *cache, cached_block *block,
 }
 
 
+#ifdef DEBUG_BLOCK_CACHE
+static int
+dump_cache(int argc, char **argv)
+{
+	if (argc < 2) {
+		kprintf("usage: %s [-b] <address>\n", argv[0]);
+		return 0;
+	}
+
+	bool showBlocks = false;
+	int32 i = 1;
+	if (!strcmp(argv[1], "-b")) {
+		showBlocks = true;
+		i++;
+	}
+
+	block_cache *cache = (struct block_cache *)strtoul(argv[i], NULL, 0);
+	if (cache == NULL) {
+		kprintf("invalid cache address\n");
+		return 0;
+	}
+
+	kprintf("BLOCK CACHE: %p\n", cache);
+
+	kprintf(" fd:         %d\n", cache->fd);
+	kprintf(" max_blocks: %Ld\n", cache->max_blocks);
+	kprintf(" block_size: %lu\n", cache->block_size);
+	kprintf(" next_transaction_id: %ld\n", cache->next_transaction_id);
+	kprintf(" chunks_per_range: %lu\n", cache->chunks_per_range);
+	kprintf(" chunks_size: %lu\n", cache->chunk_size);
+	kprintf(" range_mask: %lu\n", cache->range_mask);
+	kprintf(" chunks_mask: %lu\n", cache->chunk_mask);
+
+	if (showBlocks) {
+		kprintf(" blocks:\n");
+		kprintf("address  block no. current  original parent    refs access flags transact prev. trans\n");
+	}
+
+	uint32 count = 0;
+	hash_iterator iterator;
+	hash_open(cache->hash, &iterator);
+	cached_block *block;
+	while ((block = (cached_block *)hash_next(cache->hash, &iterator)) != NULL) {
+		if (showBlocks) {
+			kprintf("%08lx %9Ld %08lx %08lx %08lx %5ld %6ld %c%c%c%c%c %08lx %08lx\n",
+				(addr_t)block, block->block_number, (addr_t)block->current_data,
+				(addr_t)block->original_data, (addr_t)block->parent_data,
+				block->ref_count, block->accessed, block->busy ? 'B' : '-',
+				block->is_writing ? 'W' : '-', block->is_dirty ? 'B' : '-',
+				block->unused ? 'U' : '-', block->unmapped ? 'M' : '-',
+				(addr_t)block->transaction, (addr_t)block->previous_transaction);
+		}
+		count++;
+	}
+
+	kprintf(" %ld blocks.\n", count);
+
+	hash_close(cache->hash, &iterator, false);
+	return 0;
+}
+
+
+static int
+dump_caches(int argc, char **argv)
+{
+	kprintf("Block caches:\n");
+	DoublyLinkedList<block_cache>::Iterator i = sCaches.GetIterator();
+	while (i.HasNext()) {
+		kprintf("  %p\n", i.Next());
+	}
+
+	return 0;
+}
+#endif	// DEBUG_BLOCK_CACHE
+
+
 extern "C" status_t
 block_cache_init(void)
 {
+#ifdef DEBUG_BLOCK_CACHE
+	mutex_init(&sCachesLock, "block caches");
+	new (&sCaches) DoublyLinkedList<block_cache>;
+		// manually call constructor
+
+	add_debugger_command("block_caches", &dump_caches, "dumps all block caches");
+	add_debugger_command("block_cache", &dump_cache, "dumps a specific block cache");
+#endif
+
 	return init_block_allocator();
 }
 
