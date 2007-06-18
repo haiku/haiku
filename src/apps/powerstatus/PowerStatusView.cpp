@@ -10,10 +10,12 @@
 #include "PowerStatusView.h"
 #include "PowerStatus.h"
 
-#include <arch/x86/apm.h>
-#include <generic_syscall.h>
-#include <syscalls.h>
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+#	include <arch/x86/apm.h>
+#	include <generic_syscall.h>
+#	include <syscalls.h>
 	// temporary, as long as there is no real power state API
+#endif
 
 #include <Alert.h>
 #include <Application.h>
