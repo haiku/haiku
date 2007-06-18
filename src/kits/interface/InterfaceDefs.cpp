@@ -10,8 +10,9 @@
 
 /**	Global functions and variables for the Interface Kit */
 
-#include "truncate_string.h"
-#include "utf8_functions.h"
+#include <interface_misc.h>
+#include <truncate_string.h>
+#include <utf8_functions.h>
 
 #include <ApplicationPrivate.h>
 #include <AppServerLink.h>
@@ -91,114 +92,100 @@ static const rgb_color _kDefaultColors[kNumColors] = {
 const rgb_color* BPrivate::kDefaultColors = &_kDefaultColors[0];
 
 
-static status_t
-mode2parms(uint32 space, uint32 *out_space, int32 *width, int32 *height)
+/*!
+	Fills the \a width, \a height, and \a colorSpace parameters according
+	to the window screen's mode.
+	Returns \c true if the mode is known.
+*/
+bool
+get_mode_parameter(uint32 mode, int32& width, int32& height, uint32& colorSpace)
 {
-	status_t status = B_OK;
-	
-	switch (space) {
+	switch (mode) {
 		case B_8_BIT_640x480:
-			*out_space = B_CMAP8;
-			*width = 640; *height = 480;
-			break;
 		case B_8_BIT_800x600:
-			*out_space = B_CMAP8;
-			*width = 800; *height = 600;
-			break;
 		case B_8_BIT_1024x768:
-			*out_space = B_CMAP8;
-			*width = 1024; *height = 768;
-			break;
+   		case B_8_BIT_1152x900:
 		case B_8_BIT_1280x1024:
-			*out_space = B_CMAP8;
-			*width = 1280; *height = 1024;
-			break;
 		case B_8_BIT_1600x1200:
-			*out_space = B_CMAP8;
-			*width = 1600; *height = 1200;
+			colorSpace = B_CMAP8;
 			break;
-		case B_16_BIT_640x480:
-			*out_space = B_RGB16;
-			*width = 640; *height = 480;
-			break;
-		case B_16_BIT_800x600:
-			*out_space = B_RGB16;
-			*width = 800; *height = 600;
-			break;
-		case B_16_BIT_1024x768:
-			*out_space = B_RGB16;
-			*width = 1024; *height = 768;
-			break;
-		case B_16_BIT_1280x1024:
-			*out_space = B_RGB16;
-			*width = 1280; *height = 1024;
-			break;
-		case B_16_BIT_1600x1200:
-			*out_space = B_RGB16;
-			*width = 1600; *height = 1200;
-			break;
-		case B_32_BIT_640x480:
-			*out_space = B_RGB32;
-			*width = 640; *height = 480;
-			break;
-		case B_32_BIT_800x600:
-			*out_space = B_RGB32;
-			*width = 800; *height = 600;
-			break;
-		case B_32_BIT_1024x768:
-			*out_space = B_RGB32;
-			*width = 1024; *height = 768;
-			break;
-		case B_32_BIT_1280x1024:
-			*out_space = B_RGB32;
-			*width = 1280; *height = 1024;
-			break;
-		case B_32_BIT_1600x1200:
-			*out_space = B_RGB32;
-			*width = 1600; *height = 1200;
-			break;
-    		case B_8_BIT_1152x900:
-    			*out_space = B_CMAP8;
-    			*width = 1152; *height = 900;
-    			break;
-    		case B_16_BIT_1152x900:
-    			*out_space = B_RGB16;
-    			*width = 1152; *height = 900;
-    			break;
-    		case B_32_BIT_1152x900:
-    			*out_space = B_RGB32;
-    			*width = 1152; *height = 900;
-    			break;
+
 		case B_15_BIT_640x480:
-			*out_space = B_RGB15;
-			*width = 640; *height = 480;
-			break;
 		case B_15_BIT_800x600:
-			*out_space = B_RGB15;
-			*width = 800; *height = 600;
-			break;
 		case B_15_BIT_1024x768:
-			*out_space = B_RGB15;
-			*width = 1024; *height = 768;
-			break;
+   		case B_15_BIT_1152x900:
 		case B_15_BIT_1280x1024:
-			*out_space = B_RGB15;
-			*width = 1280; *height = 1024;
-			break;
 		case B_15_BIT_1600x1200:
-			*out_space = B_RGB15;
-			*width = 1600; *height = 1200;
+   			colorSpace = B_RGB15;
+   			break;
+
+		case B_16_BIT_640x480:
+		case B_16_BIT_800x600:
+		case B_16_BIT_1024x768:
+   		case B_16_BIT_1152x900:
+		case B_16_BIT_1280x1024:
+		case B_16_BIT_1600x1200:
+			colorSpace = B_RGB16;
 			break;
-    		case B_15_BIT_1152x900:
-    			*out_space = B_RGB15;
-    			*width = 1152; *height = 900;
-    			break;
-    		default:
-    			status = B_BAD_VALUE;
-    			break;
+
+		case B_32_BIT_640x480:
+		case B_32_BIT_800x600:
+		case B_32_BIT_1024x768:
+   		case B_32_BIT_1152x900:
+		case B_32_BIT_1280x1024:
+		case B_32_BIT_1600x1200:
+			colorSpace = B_RGB32;
+			break;
+
+		default:
+			return false;
 	}
-	
-	return status;
+
+	switch (mode) {
+		case B_8_BIT_640x480:
+		case B_15_BIT_640x480:
+		case B_16_BIT_640x480:
+		case B_32_BIT_640x480:
+			width = 640; height = 480;
+			break;
+
+		case B_8_BIT_800x600:
+		case B_15_BIT_800x600:
+		case B_16_BIT_800x600:
+		case B_32_BIT_800x600:
+			width = 800; height = 600;
+			break;
+
+		case B_8_BIT_1024x768:
+		case B_15_BIT_1024x768:
+		case B_16_BIT_1024x768:
+		case B_32_BIT_1024x768:
+			width = 1024; height = 768;
+			break;
+
+   		case B_8_BIT_1152x900:
+   		case B_15_BIT_1152x900:
+   		case B_16_BIT_1152x900:
+   		case B_32_BIT_1152x900:
+   			width = 1152; height = 900;
+   			break;
+
+		case B_8_BIT_1280x1024:
+		case B_15_BIT_1280x1024:
+		case B_16_BIT_1280x1024:
+		case B_32_BIT_1280x1024:
+			width = 1280; height = 1024;
+			break;
+
+		case B_8_BIT_1600x1200:
+		case B_15_BIT_1600x1200:
+		case B_16_BIT_1600x1200:
+		case B_32_BIT_1600x1200:
+			width = 1600; height = 1200;
+			break;
+	}
+
+	return true;
 }
 
 
@@ -215,10 +202,8 @@ set_screen_space(int32 index, uint32 space, bool stick)
 	int32 width;
 	int32 height;
 	uint32 depth;
-	
-	status_t status = mode2parms(space, &depth, &width, &height);
-	if (status < B_OK)
-		return status;
+	if (!get_mode_parameter(space, width, height, depth))
+		return B_BAD_VALUE;
 		
 	BScreen screen(B_MAIN_SCREEN_ID);
 	display_mode mode;
@@ -226,7 +211,7 @@ set_screen_space(int32 index, uint32 space, bool stick)
 	// TODO: What about refresh rate ?
 	// currently we get it from the current video mode, but
 	// this might be not so wise.
-	status = screen.GetMode(index, &mode);
+	status_t status = screen.GetMode(index, &mode);
 	if (status < B_OK)
 		return status;
 	

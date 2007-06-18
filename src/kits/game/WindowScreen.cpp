@@ -23,6 +23,7 @@
 
 #include <input_globals.h>
 #include <InputServerTypes.h> // For IS_SET_MOUSE_POSITION
+#include <interface_misc.h>
 #include <WindowPrivate.h>
 
 #include <AppServerLink.h>
@@ -164,103 +165,6 @@ draw_rect_32(int32 sx, int32 sy, int32 sw, int32 sh, uint32 color)
 	sFillRectHook(sEngineToken, color, &param, 1);
 	sReleaseEngineHook(sEngineToken, NULL);
 	return 0;
-}
-
-
-/*!
-	Fills the \a width, \a height, and \a colorSpace parameters according
-	to the window screen's mode.
-	Returns \c true if the mode is known.
-*/
-static bool
-get_mode_parameter(uint32 mode, int32& width, int32& height, uint32& colorSpace)
-{
-	switch (mode) {
-		case B_8_BIT_640x480:
-		case B_8_BIT_800x600:
-		case B_8_BIT_1024x768:
-   		case B_8_BIT_1152x900:
-		case B_8_BIT_1280x1024:
-		case B_8_BIT_1600x1200:
-			colorSpace = B_CMAP8;
-			break;
-
-		case B_15_BIT_640x480:
-		case B_15_BIT_800x600:
-		case B_15_BIT_1024x768:
-   		case B_15_BIT_1152x900:
-		case B_15_BIT_1280x1024:
-		case B_15_BIT_1600x1200:
-   			colorSpace = B_RGB15;
-   			break;
-
-		case B_16_BIT_640x480:
-		case B_16_BIT_800x600:
-		case B_16_BIT_1024x768:
-   		case B_16_BIT_1152x900:
-		case B_16_BIT_1280x1024:
-		case B_16_BIT_1600x1200:
-			colorSpace = B_RGB16;
-			break;
-
-		case B_32_BIT_640x480:
-		case B_32_BIT_800x600:
-		case B_32_BIT_1024x768:
-   		case B_32_BIT_1152x900:
-		case B_32_BIT_1280x1024:
-		case B_32_BIT_1600x1200:
-			colorSpace = B_RGB32;
-			break;
-
-		default:
-			return false;
-	}
-
-	switch (mode) {
-		case B_8_BIT_640x480:
-		case B_15_BIT_640x480:
-		case B_16_BIT_640x480:
-		case B_32_BIT_640x480:
-			width = 640; height = 480;
-			break;
-
-		case B_8_BIT_800x600:
-		case B_15_BIT_800x600:
-		case B_16_BIT_800x600:
-		case B_32_BIT_800x600:
-			width = 800; height = 600;
-			break;
-
-		case B_8_BIT_1024x768:
-		case B_15_BIT_1024x768:
-		case B_16_BIT_1024x768:
-		case B_32_BIT_1024x768:
-			width = 1024; height = 768;
-			break;
-
-   		case B_8_BIT_1152x900:
-   		case B_15_BIT_1152x900:
-   		case B_16_BIT_1152x900:
-   		case B_32_BIT_1152x900:
-   			width = 1152; height = 900;
-   			break;
-
-		case B_8_BIT_1280x1024:
-		case B_15_BIT_1280x1024:
-		case B_16_BIT_1280x1024:
-		case B_32_BIT_1280x1024:
-			width = 1280; height = 1024;
-			break;
-
-		case B_8_BIT_1600x1200:
-		case B_15_BIT_1600x1200:
-		case B_16_BIT_1600x1200:
-		case B_32_BIT_1600x1200:
-			width = 1600; height = 1200;
-			break;
-	}
-
-	return true;
 }
 
 
