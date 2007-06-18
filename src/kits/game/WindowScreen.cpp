@@ -31,7 +31,7 @@
 using BPrivate::AppServerLink;
 
 
-#define TRACE_WINDOWSCREEN 0
+//#define TRACE_WINDOWSCREEN 1
 #if TRACE_WINDOWSCREEN
 #define CALLED() printf("%s\n", __PRETTY_FUNCTION__);
 #else
@@ -669,8 +669,7 @@ BWindowScreen::_InitData(uint32 space, uint32 attributes)
 	fAttributes = attributes;
 		// TODO: not really used right now, but should probably be known by the app_server
 
-	fWorkspaceIndex = current_workspace();
-	fDebugWorkspace = fWorkspaceIndex > 0 ? fWorkspaceIndex - 1 : 1;
+	fWorkspaceIndex = fDebugWorkspace = current_workspace();
 	fLockState = 0;
 	fAddonImage = -1;
 	fWindowState = 0;
@@ -713,10 +712,12 @@ BWindowScreen::_InitData(uint32 space, uint32 attributes)
 		if (fDebugSem < B_OK)
 			throw fDebugSem;
 
-		memcpy(fPalette, screen.ColorMap()->color_list, 256);
+		memcpy(fPalette, screen.ColorMap()->color_list, sizeof(fPalette));
 		fActivateState = 0;
 		fWorkState = 1;
 		
+		status = B_OK;
+
 	} catch (std::bad_alloc) {
 		status = B_NO_MEMORY;	
 	} catch (int error) {
@@ -725,7 +726,7 @@ BWindowScreen::_InitData(uint32 space, uint32 attributes)
 		status = B_ERROR;	
 	}
 
-	if (status != B_OK)
+	if (status < B_OK)
 		_DisposeData();
 
 	return status;
@@ -754,7 +755,7 @@ BWindowScreen::_DisposeData()
 	fDisplayMode = NULL;
 	delete fOriginalDisplayMode;
 	fOriginalDisplayMode = NULL;
-	delete fModeList;
+	free(fModeList);
 	fModeList = NULL;
 	fModeCount = 0;
 	
@@ -1098,7 +1099,7 @@ BWindowScreen::_AssertDisplayMode(display_mode* displayMode)
 		|| currentMode.flags != displayMode->flags) {
 		status = screen.SetMode(displayMode);
 		if (status < B_OK) {
-			printf("AssertDisplayMode: Setting mode failed: %s\n", strerror(status));
+			fprintf(stderr, "AssertDisplayMode: Setting mode failed: %s\n", strerror(status));
 			return status;
 		}
 
