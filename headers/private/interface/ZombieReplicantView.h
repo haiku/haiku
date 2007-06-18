@@ -31,6 +31,9 @@
 #include <Box.h>
 
 
+const static rgb_color kZombieColor = {220, 220, 220, 255};
+
+
 // _BZombieReplicantView_ class ------------------------------------------------
 class _BZombieReplicantView_ : public BBox {
 
