@@ -80,7 +80,9 @@ class BWindowScreen : public BWindow {
 		status_t			_InitData(uint32 space, uint32 attributes);
 		void				_DisposeData();
 
-		status_t			_SetActiveState(int32 state);
+		status_t			_Activate();
+		status_t			_Deactivate();
+
 		status_t			_SetupAccelerantHooks(bool enable);
 		status_t			_GetCardInfo();
 		void				_Suspend();

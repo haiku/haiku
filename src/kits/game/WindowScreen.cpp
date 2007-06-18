@@ -341,7 +341,7 @@ BWindowScreen::Disconnect()
 	if (fLockState == 1) {
 		if (fDebugState)
 			fDebugFirst = true;
-		_SetActiveState(0);
+		_Deactivate();
 	}
 
 	be_app->ShowCursor();
@@ -354,7 +354,7 @@ BWindowScreen::WindowActivated(bool active)
 	CALLED();
 	fWindowState = active;
 	if (active && fLockState == 0 && fWorkState)
-		_SetActiveState(1);
+		_Activate();
 }
 
 
@@ -365,14 +365,14 @@ BWindowScreen::WorkspaceActivated(int32 ws, bool state)
 	fWorkState = state;
 	if (state) {
 		if (fLockState == 0 && fWindowState) {
-			_SetActiveState(1);
+			_Activate();			
 			if (!IsHidden()) {
 				Activate(true);
 				WindowActivated(true);
 			}
 		}
 	} else if (fLockState)
-		_SetActiveState(0);
+		_Deactivate();
 }
 
 
@@ -763,51 +763,56 @@ BWindowScreen::_DisposeData()
 }
 
 
+
 status_t
-BWindowScreen::_SetActiveState(int32 state)
+BWindowScreen::_Activate()
 {
-	CALLED();
-	status_t status = B_ERROR;
-	if (state == 1) {
-		status = _AssertDisplayMode(fDisplayMode);
-		if (status == B_OK && (status = _SetupAccelerantHooks(true)) == B_OK) {			
-			if (!fActivateState) {
-				do {
-					status = acquire_sem(fActivateSem);
-				} while (status == B_INTERRUPTED);
+	status_t status = _AssertDisplayMode(fDisplayMode);
+	if (status < B_OK)
+		return status;
 
-				if (status < B_OK)
-					return status;
-			}
+	status = _SetupAccelerantHooks(true);
+	if (status < B_OK)
+		return status;
+		
+	if (!fActivateState) {
+		do {
+			status = acquire_sem(fActivateSem);
+		} while (status == B_INTERRUPTED);
 
-			SetColorList(fPalette);
-			if (fDebugState && !fDebugFirst) {
-				SuspensionHook(true);
-				_Resume();					
-			} else {
-				fDebugFirst = true;
-				ScreenConnected(true);
-			}
+		if (status < B_OK)
+			return status;
+	}
 
-			if (status == B_OK)
-				return status;
-		} else
-			_SetupAccelerantHooks(false);	
+	SetColorList(fPalette);
+	if (fDebugState && !fDebugFirst) {
+		SuspensionHook(true);
+		_Resume();					
 	} else {
-		_AssertDisplayMode(fOriginalDisplayMode);
+		fDebugFirst = true;
+		ScreenConnected(true);
+	}
 
-		if (fDebugState && !fDebugFirst) {
-			_Suspend();
-			SuspensionHook(false);
-		} else
-			ScreenConnected(false);
+	return B_OK;	
+}
 
-		status = _SetupAccelerantHooks(false);
-		if (status == B_OK) {				
-			be_app->ShowCursor();				
-			if (fActivateState) {
-				// TODO: Set palette
-			}
+
+status_t
+BWindowScreen::_Deactivate()
+{
+	_AssertDisplayMode(fOriginalDisplayMode);
+
+	if (fDebugState && !fDebugFirst) {
+		_Suspend();
+		SuspensionHook(false);
+	} else
+		ScreenConnected(false);
+
+	status_t status = _SetupAccelerantHooks(false);
+	if (status == B_OK) {				
+		be_app->ShowCursor();				
+		if (fActivateState) {
+			// TODO: reset palette
 		}
 	}
 
