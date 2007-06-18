@@ -17,8 +17,10 @@
 #include <Resources.h>
 #include "ResourceRoster.h"
 
-class ResView : public BView
-{
+
+class BMenuBar;
+
+class ResView : public BView {
 public:
 					ResView(const BRect &frame, const char *name,
 							const int32 &resize, const int32 &flags,
