@@ -26,12 +26,14 @@
 
 #include "cm_wrapper.h"
 
+class BMenuField;
+class BStringView;
+
 #define MODEM_ADDED 'moad'
 
 void CenterWindowOnScreen(BWindow* w);
 
-class ResourceUsageWindow : public BWindow
-{
+class ResourceUsageWindow : public BWindow {
 	public:
     	ResourceUsageWindow(BRect frame, BList &);
 	    ~ResourceUsageWindow();
@@ -42,8 +44,7 @@ class ResourceUsageWindow : public BWindow
 };
 
 
-class ModemWindow : public BWindow
-{
+class ModemWindow : public BWindow {
 	public:
     	ModemWindow(BRect frame, BMessenger);
 	    ~ModemWindow();
@@ -53,8 +54,7 @@ class ModemWindow : public BWindow
 	    BMessenger fMessenger;
 };
 
-class ConfigurationWindow : public BWindow
-{
+class ConfigurationWindow : public BWindow {
 	public:
 		ConfigurationWindow(BRect frame, DeviceItem *item);
 	    ~ConfigurationWindow();
@@ -72,8 +72,7 @@ class ConfigurationWindow : public BWindow
 };
 
 
-class DevicesWindow : public BWindow
-{
+class DevicesWindow : public BWindow {
 	public:
     	DevicesWindow(BRect frame);
 	    ~DevicesWindow();
