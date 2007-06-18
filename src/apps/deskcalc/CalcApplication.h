@@ -7,14 +7,15 @@
  *		Timothy Wayper <timmy@wunderbear.com>
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef _CALC_APPLICATION_H
 #define _CALC_APPLICATION_H
 
 #include <Application.h>
 
+
 extern const char* kAppSig;
 
+class BFile;
 class CalcWindow;
 
 class CalcApplication : public BApplication {

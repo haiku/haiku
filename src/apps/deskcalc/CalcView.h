@@ -15,6 +15,7 @@
 
 class BString;
 class BMenuItem;
+class BPopUpMenu;
 class CalcOptions;
 class CalcOptionsWindow;
 class ExpressionTextView;
