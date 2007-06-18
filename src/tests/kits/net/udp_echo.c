@@ -24,6 +24,8 @@
 typedef int socklen_t;
 #endif
 
+extern const char* __progname;
+
 
 static void
 udp_echo_client(int sockFD, const struct sockaddr_in* serverAddr)
@@ -134,16 +136,16 @@ main(int argc, char** argv)
 	unsigned short bindPort = 0;
 
 	if (argc < 2) {
-		printf("usage: %s client <IP-address> <port> [local-port]\n", argv[0]);
-		printf("or     %s broadcast <port> <local-port>\n", argv[0]);
-		printf("or     %s server <local-port>\n", argv[0]);
+		printf("usage: %s client <IP-address> <port> [local-port]\n", __progname);
+		printf("or     %s broadcast <port> <local-port>\n", __progname);
+		printf("or     %s server <local-port>\n", __progname);
 		exit(5);
 	}
 
 	if (!strcmp(argv[1], "client")) {
 		mode = CLIENT_MODE;
 		if (argc < 4) {
-			printf("usage: %s client <IP-address> <port> [local-port]\n", argv[0]);
+			printf("usage: %s client <IP-address> <port> [local-port]\n", __progname);
 			exit(5);
 		}
 		memset(&serverAddr, 0, sizeof(struct sockaddr_in));
@@ -157,7 +159,7 @@ main(int argc, char** argv)
 	} else if (!strcmp(argv[1], "broadcast")) {
 		mode = BROADCAST_MODE;
 		if (argc < 3) {
-			printf("usage: %s broadcast <port> [local-port]\n", argv[0]);
+			printf("usage: %s broadcast <port> [local-port]\n", __progname);
 			exit(5);
 		}
 
