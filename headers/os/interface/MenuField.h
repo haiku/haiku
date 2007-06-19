@@ -28,7 +28,7 @@ class BMenuField : public BView {
 								BMessage* message,
 								uint32 flags = B_WILL_DRAW | B_NAVIGABLE); 
 							BMenuField(const char* label,
-								BMenu* menu, BMessage* message); 
+								BMenu* menu, BMessage* message = NULL); 
 							BMenuField(BMessage* data);
 	virtual					~BMenuField();
 
@@ -77,20 +77,31 @@ class BMenuField : public BView {
 	virtual void			ResizeToPreferred();
 	virtual void			GetPreferredSize(float* width, float* height);
 
-				BLayoutItem* CreateLabelLayoutItem();
-				BLayoutItem* CreateMenuBarLayoutItem();
+	virtual	BSize			MinSize();
+	virtual	BSize			MaxSize();
+	virtual	BSize			PreferredSize();
+
+	virtual	void			InvalidateLayout(bool descendants = false);
+
+			BLayoutItem*	CreateLabelLayoutItem();
+			BLayoutItem*	CreateMenuBarLayoutItem();
 
 	
 	/*----- Private or reserved -----------------------------------------*/
 	virtual status_t		Perform(perform_code d, void* arg);
 
+protected:
+	virtual	void			DoLayout();
+
  private:
 			class LabelLayoutItem;
 			class MenuBarLayoutItem;
+ 			struct LayoutData;
 
 			friend class _BMCMenuBar_;
 			friend class LabelLayoutItem;
 			friend class MenuBarLayoutItem;
+			friend class LayoutData;
 
 	virtual	void			_ReservedMenuField1();
 	virtual	void			_ReservedMenuField2();
@@ -108,22 +119,22 @@ class BMenuField : public BView {
 			void			_InitMenuBar(BMenu* menu,
 								BRect frame, bool fixedSize);
 
+			void			_ValidateLayoutData();
+
 			char*			fLabel;
 			BMenu*			fMenu;
 			BMenuBar*		fMenuBar;
 			alignment		fAlign;
 			float			fDivider;
-			float			fStringWidth;
 			bool			fEnabled;
 			bool			fSelected;
 			bool			fTransition;
 			bool			fFixedSizeMB;
 			thread_id		fMenuTaskID;
 
-			BLayoutItem*	fLabelLayoutItem;
-			BLayoutItem*	fMenuBarLayoutItem;
+			LayoutData*		fLayoutData;
 
-			uint32			_reserved[1];
+			uint32			_reserved[3];
 };
 
 #endif // _MENU_FIELD_H

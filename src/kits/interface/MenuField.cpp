@@ -66,6 +66,28 @@ private:
 };
 
 
+struct BMenuField::LayoutData {
+	LayoutData()
+		: label_layout_item(NULL),
+		  menu_bar_layout_item(NULL),
+		  previous_height(-1),
+		  valid(false)
+	{
+	}
+
+	LabelLayoutItem*	label_layout_item;
+	MenuBarLayoutItem*	menu_bar_layout_item;
+	float				previous_height;	// used in FrameResized() for
+											// invalidation
+	font_height			font_info;
+	float				label_width;
+	float				label_height;
+	BSize				min;
+	BSize				menu_bar_min;
+	bool				valid;
+};
+
+
 // #pragma mark -
 
 
@@ -168,6 +190,8 @@ BMenuField::~BMenuField()
 	status_t dummy;
 	if (fMenuTaskID >= 0)
 		wait_for_thread(fMenuTaskID, &dummy);
+
+	delete fLayoutData;
 }
 
 
@@ -258,9 +282,6 @@ BMenuField::AttachedToWindow()
 		SetViewColor(Parent()->ViewColor());
 		SetLowColor(Parent()->ViewColor());
 	}
-
-	if (fLabel)
-		fStringWidth = StringWidth(fLabel);
 }
 
 
@@ -327,7 +348,7 @@ BMenuField::MakeFocus(bool state)
 	BView::MakeFocus(state);
 
 	if (Window())
-		Invalidate(); // TODO: use fStringWidth
+		Invalidate(); // TODO: use fLayoutData->label_width
 }
 
 
@@ -387,6 +408,15 @@ void
 BMenuField::FrameResized(float newWidth, float newHeight)
 {
 	BView::FrameResized(newWidth, newHeight);
+
+	if (newHeight != fLayoutData->previous_height && Label()) {
+		// The height changed, which means the label has to move and we
+		// probably also invalidate a part of the borders around the menu bar.
+		// So don't be shy and invalidate the whole thing.
+		Invalidate();
+	}
+
+	fLayoutData->previous_height = newHeight;
 }
 
 
@@ -423,11 +453,8 @@ BMenuField::SetLabel(const char *label)
 
 	fLabel = strdup(label);
 
-	if (Window()) {
+	if (Window())
 		Invalidate();
-		if (fLabel)
-			fStringWidth = StringWidth(fLabel);
-	}
 
 	InvalidateLayout();
 }
@@ -489,23 +516,25 @@ BMenuField::SetDivider(float divider)
 
 	fDivider = divider;
 
-	BRect dirty(fMenuBar->Frame());
+	if (Flags() & B_SUPPORTS_LAYOUT) {
+		// We should never get here, since layout support means, we also
+		// layout the divider, and don't use this method at all.
+		Relayout();
+	} else {
+		BRect dirty(fMenuBar->Frame());
 
-	fMenuBar->MoveTo(fDivider + 1, kVMargin);
+		fMenuBar->MoveTo(fDivider + 1, kVMargin);
 
-	if (fFixedSizeMB) {
-		fMenuBar->ResizeTo(Bounds().Width() - fDivider + 1 - 2,
-						   dirty.Height());
+		if (fFixedSizeMB) {
+			fMenuBar->ResizeTo(Bounds().Width() - fDivider + 1 - 2,
+							   dirty.Height());
+		}
+
+		dirty = dirty | fMenuBar->Frame();
+		dirty.InsetBy(-kVMargin, -kVMargin);
+
+		Invalidate(dirty);
 	}
-
-	dirty = dirty | fMenuBar->Frame();
-
-	dirty.left -= 1;
-	dirty.top -= 1;
-	dirty.right += 2;
-	dirty.bottom += 2;
-
-	Invalidate(dirty);
 }
 
 
@@ -563,57 +592,64 @@ BMenuField::ResizeToPreferred()
 void
 BMenuField::GetPreferredSize(float *_width, float *_height)
 {
-	fMenuBar->GetPreferredSize(_width, _height);
+	_ValidateLayoutData();
 
-	if (_width) {
-		// the width is already the menu bars preferred width
-		// add the room we need to draw the shadow and stuff
-		*_width += 2 * kVMargin;
+	if (_width)
+		*_width = fLayoutData->min.width;
 
-		// add the room needed for the label
-		float labelWidth = fDivider;
-		if (Label()) {
-			labelWidth = ceilf(StringWidth(Label()));
-			if (labelWidth > 0.0) {
-				// add some room between label and menu bar
-				labelWidth += 5.0;
-			}
+	if (_height)
+		*_height = fLayoutData->min.height;
+}
 
-			// have divider override the calculated label width
-			labelWidth = max_c(labelWidth, fDivider);
-		}
 
-		*_width += labelWidth;
-	}
+BSize
+BMenuField::MinSize()
+{
+	_ValidateLayoutData();
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), fLayoutData->min);
+}
 
-	if (_height) {
-		// the height is already the menu bars preferred height
-		// add the room we need to draw the shadow and stuff
-		*_height += 2 * kVMargin;
 
-		// see if our label would fit vertically
-		font_height fh;
-		GetFontHeight(&fh);
-		*_height = max_c(*_height, ceilf(fh.ascent + fh.descent));
-	}
+BSize
+BMenuField::MaxSize()
+{
+	_ValidateLayoutData();
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), fLayoutData->min);
+}
+
+
+BSize
+BMenuField::PreferredSize()
+{
+	_ValidateLayoutData();
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), fLayoutData->min);
+}
+
+
+void
+BMenuField::InvalidateLayout(bool descendants)
+{
+	fLayoutData->valid = false;
+
+	BView::InvalidateLayout(descendants);
 }
 
 
 BLayoutItem*
 BMenuField::CreateLabelLayoutItem()
 {
-	if (!fLabelLayoutItem)
-		fLabelLayoutItem = new LabelLayoutItem(this);
-	return fLabelLayoutItem;
+	if (!fLayoutData->label_layout_item)
+		fLayoutData->label_layout_item = new LabelLayoutItem(this);
+	return fLayoutData->label_layout_item;
 }
 
 
 BLayoutItem*
 BMenuField::CreateMenuBarLayoutItem()
 {
-	if (!fMenuBarLayoutItem)
-		fMenuBarLayoutItem = new MenuBarLayoutItem(this);
-	return fMenuBarLayoutItem;
+	if (!fLayoutData->menu_bar_layout_item)
+		fLayoutData->menu_bar_layout_item = new MenuBarLayoutItem(this);
+	return fLayoutData->menu_bar_layout_item;
 }
 
 
@@ -621,6 +657,58 @@ status_t
 BMenuField::Perform(perform_code d, void *arg)
 {
 	return BView::Perform(d, arg);
+}
+
+
+void
+BMenuField::DoLayout()
+{
+	// Bail out, if we shan't do layout.
+	if (!(Flags() & B_SUPPORTS_LAYOUT))
+		return;
+
+	// If the user set a layout, we let the base class version call its
+	// hook.
+	if (GetLayout()) {
+		BView::DoLayout();
+		return;
+	}
+
+	_ValidateLayoutData();
+
+	// validate current size
+	BSize size(Bounds().Size());
+	if (size.width < fLayoutData->min.width)
+		size.width = fLayoutData->min.width;
+	if (size.height < fLayoutData->min.height)
+		size.height = fLayoutData->min.height;
+
+	// divider
+	float divider = 0;
+	if (fLayoutData->label_layout_item && fLayoutData->menu_bar_layout_item) {
+		// We have layout items. They define the divider location.
+		divider = fLayoutData->menu_bar_layout_item->Frame().left
+			- fLayoutData->label_layout_item->Frame().left;
+	} else {
+		if (fLayoutData->label_width > 0)
+			divider = fLayoutData->label_width + 5;
+	}
+
+	// menu bar
+	BRect dirty(fMenuBar->Frame());
+	BRect menuBarFrame(divider + 1, kVMargin, size.width - 2,
+		size.height - kVMargin);
+
+	// place the menu bar and set the divider
+	BLayoutUtils::AlignInFrame(fMenuBar, menuBarFrame);
+
+	fDivider = divider;
+
+	// invalidate dirty region
+	dirty = dirty | fMenuBar->Frame();
+	dirty.InsetBy(-kVMargin, -kVMargin);
+
+	Invalidate(dirty);
 }
 
 
@@ -643,14 +731,12 @@ BMenuField::InitObject(const char *label)
 	fMenu = NULL;
 	fMenuBar = NULL;
 	fAlign = B_ALIGN_LEFT;
-	fStringWidth = 0;
 	fEnabled = true;
 	fSelected = false;
 	fTransition = false;
 	fFixedSizeMB = false;
 	fMenuTaskID = -1;
-	fLabelLayoutItem = NULL;
-	fMenuBarLayoutItem = NULL;
+	fLayoutData = new LayoutData;
 
 	SetLabel(label);
 
@@ -658,6 +744,9 @@ BMenuField::InitObject(const char *label)
 		fDivider = (float)floor(Frame().Width() / 2.0f);
 	else
 		fDivider = 0;
+
+	// default to unlimited maximum width
+	SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 }
 
 
@@ -679,28 +768,30 @@ BMenuField::InitObject2()
 void
 BMenuField::DrawLabel(BRect bounds, BRect update)
 {
-	font_height fh;
-	GetFontHeight(&fh);
+	_ValidateLayoutData();
+	font_height& fh = fLayoutData->font_info;
 
 	if (Label()) {
 		SetLowColor(ViewColor());
 
-		float y = (float)ceil(fh.ascent + fh.descent + fh.leading) + 2.0f;
+		// horizontal alignment
 		float x;
-
 		switch (fAlign) {
 			case B_ALIGN_RIGHT:
-				x = fDivider - StringWidth(Label()) - 3.0f;
+				x = fDivider - fLayoutData->label_width - 3.0f;
 				break;
 
 			case B_ALIGN_CENTER:
-				x = fDivider - StringWidth(Label()) / 2.0f;
+				x = fDivider - fLayoutData->label_width / 2.0f;
 				break;
 
 			default:
 				x = 3.0f;
 				break;
 		}
+
+		// vertical alignment -- center the ascent
+		float y = floor((Bounds().Height() + fh.ascent) / 2);
 
 		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 			IsEnabled() ? B_DARKEN_MAX_TINT : B_DISABLED_LABEL_TINT));
@@ -760,13 +851,24 @@ BMenuField::MenuTask(void *arg)
 void
 BMenuField::_UpdateFrame()
 {
-	if (fLabelLayoutItem && fMenuBarLayoutItem) {
-		BRect labelFrame = fLabelLayoutItem->Frame();
-		BRect menuFrame = fMenuBarLayoutItem->Frame();
+	if (fLayoutData->label_layout_item && fLayoutData->menu_bar_layout_item) {
+		BRect labelFrame = fLayoutData->label_layout_item->Frame();
+		BRect menuFrame = fLayoutData->menu_bar_layout_item->Frame();
+
+		// update divider
+		fDivider = menuFrame.left - labelFrame.left;
+
+		// update our frame
 		MoveTo(labelFrame.left, labelFrame.top);
+		BSize oldSize = Bounds().Size();
 		ResizeTo(menuFrame.left + menuFrame.Width() - labelFrame.left,
 			menuFrame.top + menuFrame.Height() - labelFrame.top);
-		SetDivider(menuFrame.left - labelFrame.left);
+		BSize newSize = Bounds().Size();
+
+		// If the size changes, ResizeTo() will trigger a relayout, otherwise
+		// we need to do that explicitly.
+		if (newSize != oldSize)
+			Relayout();
 	}
 }
 
@@ -781,10 +883,61 @@ BMenuField::_InitMenuBar(BMenu* menu, BRect frame, bool fixedSize)
 		frame.top + kVMargin, frame.right, frame.bottom - kVMargin),
 		fixedSize, this);
 
+	// by default align the menu bar left in the available space
+	fMenuBar->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
+
 	AddChild(fMenuBar);
 	fMenuBar->AddItem(menu);
 
 	fMenuBar->SetFont(be_plain_font);
+}
+
+
+void
+BMenuField::_ValidateLayoutData()
+{
+	if (fLayoutData->valid)
+		return;
+
+	// cache font height
+	font_height& fh = fLayoutData->font_info;
+	GetFontHeight(&fh);
+
+	fLayoutData->label_width = (Label() ? ceilf(StringWidth(Label())) : 0);
+	fLayoutData->label_height = ceilf(fh.ascent + fh.descent);
+
+	// compute the minimal divider
+	float divider = 0;
+	if (fLayoutData->label_width > 0)
+		divider = fLayoutData->label_width + 5;
+
+	// If we shan't do real layout, we let the current divider take influence.
+	if (!(Flags() & B_SUPPORTS_LAYOUT))
+		divider = max_c(divider, fDivider);
+
+	// get the minimal (== preferred) menu bar size
+	fLayoutData->menu_bar_min = fMenuBar->MinSize();
+
+	// compute our minimal (== preferred) size
+	// TODO: The layout is a bit broken. A one pixel wide border is draw around
+	// the menu bar to give it it's look. When the view has the focus,
+	// additionally a one pixel wide blue frame is drawn around it. In order
+	// to be able to easily visually align the menu bar with the text view of
+	// a text control, the divider must ignore the focus frame, though. Hence
+	// we add one less pixel to our width.
+	BSize min(fLayoutData->menu_bar_min);
+	min.width += 2 * kVMargin - 1;
+	min.height += 2 * kVMargin;
+
+	if (fLayoutData->label_width > 0)
+		min.width += fLayoutData->label_width + 5;
+	if (fLayoutData->label_height > min.height)
+		min.height = fLayoutData->label_height;
+
+	fLayoutData->min = min;
+
+	fLayoutData->valid = true;
 }
 
 
@@ -837,17 +990,13 @@ BMenuField::LabelLayoutItem::View()
 BSize
 BMenuField::LabelLayoutItem::BaseMinSize()
 {
-// TODO: Cache the info. Might be too expensive for this call.
-	const char* label = fParent->Label();
-	if (!label)
+	fParent->_ValidateLayoutData();
+
+	if (!fParent->Label())
 		return BSize(-1, -1);
 
-	BSize size;
-	fParent->GetPreferredSize(NULL, &size.height);
-
-	size.width = fParent->StringWidth(label) + 2 * 3 - 1;
-
-	return size;
+	return BSize(fParent->fLayoutData->label_width + 5,
+		fParent->fLayoutData->label_height);
 }
 
 
@@ -879,6 +1028,9 @@ BMenuField::MenuBarLayoutItem::MenuBarLayoutItem(BMenuField* parent)
 	: fParent(parent),
 	  fFrame()
 {
+	// by default the part left of the divider shall have an unlimited maximum
+	// width
+	SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 }
 
 
@@ -921,14 +1073,12 @@ BMenuField::MenuBarLayoutItem::View()
 BSize
 BMenuField::MenuBarLayoutItem::BaseMinSize()
 {
-// TODO: Cache the info. Might be too expensive for this call.
-	BSize size;
-	fParent->fMenuBar->GetPreferredSize(&size.width, &size.height);
+	fParent->_ValidateLayoutData();
 
-	// BMenuField draws additional lines around BMenuBar,
-	// one line on left and top side, two on right and bottom
-	size.width += 3;
-	size.height += 3;
+	// TODO: Cf. the TODO in _ValidateLayoutData().
+	BSize size = fParent->fLayoutData->menu_bar_min;
+	size.width += 2 * kVMargin - 1;
+	size.height += 2 * kVMargin;
 
 	return size;
 }
@@ -937,19 +1087,14 @@ BMenuField::MenuBarLayoutItem::BaseMinSize()
 BSize
 BMenuField::MenuBarLayoutItem::BaseMaxSize()
 {
-	BSize size(BaseMinSize());
-	size.width = B_SIZE_UNLIMITED;
-	return size;
+	return BaseMinSize();
 }
 
 
 BSize
 BMenuField::MenuBarLayoutItem::BasePreferredSize()
 {
-	BSize size(BaseMinSize());
-	// puh, no idea...
-	size.width = 100;
-	return size;
+	return BaseMinSize();
 }
 
 
