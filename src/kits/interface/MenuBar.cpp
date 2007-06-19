@@ -328,14 +328,25 @@ BMenuBar::Perform(perform_code d, void *arg)
 
 
 BSize
+BMenuBar::MinSize()
+{
+	return BMenu::MinSize();
+}
+
+
+BSize
 BMenuBar::MaxSize()
 {
-	// TODO: cache the result
-	float width, height;
-	GetPreferredSize(&width, &height);
-
+	BSize size = BMenu::MaxSize();
 	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
-		BSize(B_SIZE_UNLIMITED, height));
+		BSize(B_SIZE_UNLIMITED, size.height));
+}
+
+
+BSize
+BMenuBar::PreferredSize()
+{
+	return BMenu::PreferredSize();
 }
 
 

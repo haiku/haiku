@@ -81,7 +81,9 @@ public:
 
 
 			// layout related
+	virtual	BSize			MinSize();
 	virtual	BSize			MaxSize();
+	virtual	BSize			PreferredSize();
 
 /*----- Private or reserved -----------------------------------------*/
 	virtual status_t		Perform(perform_code d, void *arg);
