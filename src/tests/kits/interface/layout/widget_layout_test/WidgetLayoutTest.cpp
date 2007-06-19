@@ -15,6 +15,7 @@
 #include "GroupView.h"
 #include "ListViewTest.h"
 #include "MenuBarTest.h"
+#include "MenuFieldTest.h"
 #include "MenuTest.h"
 #include "StringView.h"
 #include "Test.h"
@@ -43,6 +44,7 @@ const test_info kTestInfos[] = {
 	{ "BListView",		ListViewTest::CreateTest },
 	{ "BMenu",			MenuTest::CreateTest },
 	{ "BMenuBar",		MenuBarTest::CreateTest },
+	{ "BMenuField",		MenuFieldTest::CreateTest },
 	{ NULL, NULL }
 };
 

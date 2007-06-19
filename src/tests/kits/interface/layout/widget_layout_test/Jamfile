@@ -25,6 +25,7 @@ SimpleTest WidgetLayoutTest :
 	ControlTest.cpp
 	ListViewTest.cpp
 	MenuBarTest.cpp
+	MenuFieldTest.cpp
 	MenuTest.cpp
 	:
 	be
