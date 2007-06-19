@@ -10,6 +10,7 @@
 #include <stdio.h>
 
 #include <BMCPrivate.h>
+#include <LayoutUtils.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Message.h>
@@ -318,6 +319,17 @@ _BMCMenuBar_::MakeFocus(bool focused)
 
 	fMenuField->Invalidate(BRect(bounds.left, bounds.top, fMenuField->fDivider,
 		bounds.bottom));
+}
+
+
+BSize
+_BMCMenuBar_::MaxSize()
+{
+	// The maximum width of a normal BMenuBar is unlimited, but we want it
+	// limited.
+	BSize size;
+	BMenuBar::GetPreferredSize(&size.width, &size.height);
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
 }
 
 

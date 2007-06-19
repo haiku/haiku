@@ -45,9 +45,11 @@ virtual	void		FrameResized(float width, float height);
 virtual	void		MessageReceived(BMessage* msg);
 virtual	void		MakeFocus(bool focused = true);
 
-	void		TogglePopUpMarker(bool show) { fShowPopUpMarker = show; }
-	bool		IsPopUpMarkerShown() const { return fShowPopUpMarker; }
-	
+		void		TogglePopUpMarker(bool show) { fShowPopUpMarker = show; }
+		bool		IsPopUpMarkerShown() const { return fShowPopUpMarker; }
+
+virtual	BSize		MaxSize();
+
 private:
 		_BMCMenuBar_&operator=(const _BMCMenuBar_ &);
 		
