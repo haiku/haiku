@@ -1072,9 +1072,7 @@ SpaceBarSettingsView::MessageReceived(BMessage *message)
 		{
 			settings.SetShowVolumeSpaceBar(fSpaceBarShowCheckBox->Value() == 1);
 			Window()->PostMessage(kSettingsContentsModified);
-			BMessage notificationMessage;
-			notificationMessage.AddBool("ShowVolumeSpaceBar", settings.ShowVolumeSpaceBar());
-			tracker->SendNotices(kShowVolumeSpaceBar, &notificationMessage);
+			tracker->PostMessage(kShowVolumeSpaceBar);
 			break;
 		}
 
@@ -1094,6 +1092,7 @@ SpaceBarSettingsView::MessageReceived(BMessage *message)
 			}
 			break;
 		}
+
 		case kSpaceBarColorChanged:
 		{
 			switch (fCurrentColor) {
@@ -1109,8 +1108,7 @@ SpaceBarSettingsView::MessageReceived(BMessage *message)
 			}
 
 			Window()->PostMessage(kSettingsContentsModified);
-			BMessage notificationMessage;
-			tracker->SendNotices(kSpaceBarColorChanged, &notificationMessage);
+			tracker->PostMessage(kSpaceBarColorChanged);
 			break;
 		}
 

@@ -64,7 +64,6 @@ public:
 	BPose *DeepFindPose(const node_ref *node, int32 *index = NULL) const;
 		// same as FindPose, node can be a target of the actual
 		// pose if the pose is a symlink
-	BPose *FindVolumePose(const dev_t device, int32 *index = NULL) const;
 };
 
 // iteration glue, add permutations as needed

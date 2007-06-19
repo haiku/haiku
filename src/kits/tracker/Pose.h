@@ -96,7 +96,7 @@ class BPose {
 		void UpdateAllWidgets(int32 poseIndex, BPoint poseLoc, BPoseView *);
 		void UpdateWidgetAndModel(Model *resolvedModel, const char *attrName,
 				uint32 attrType, int32 poseIndex, BPoint poseLoc, BPoseView *view);
-		bool UpdateVolumeSpaceBar(bool enabled);
+		bool UpdateVolumeSpaceBar(BVolume *volume);
 		void UpdateIcon(BPoint poseLoc, BPoseView *);
 
 		//void UpdateFixedSymlink(BPoint poseLoc, BPoseView *);	
@@ -126,6 +126,7 @@ class BPose {
 #endif
 
 	private:
+		static bool _PeriodicUpdateCallback(BPose *pose, void *cookie);
 		void EditPreviousNextWidgetCommon(BPoseView *poseView, bool next);
 		void CreateWidgets(BPoseView *);
 		bool TestLargeIconPixel(BPoint) const;

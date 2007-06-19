@@ -803,9 +803,6 @@ BPoseView::DetachedFromWindow()
 		app->StopWatching(this, kShowSelectionWhenInactiveChanged);
 		app->StopWatching(this, kTransparentSelectionChanged);
 		app->StopWatching(this, kSortFolderNamesFirstChanged);
-		app->StopWatching(this, kShowVolumeSpaceBar);
-		app->StopWatching(this, kSpaceBarColorChanged);
-		app->StopWatching(this, kUpdateVolumeSpaceBar);
 		app->Unlock();
 	}
 
@@ -890,9 +887,6 @@ BPoseView::AttachedToWindow()
 		app->StartWatching(this, kShowSelectionWhenInactiveChanged);
 		app->StartWatching(this, kTransparentSelectionChanged);
 		app->StartWatching(this, kSortFolderNamesFirstChanged);
-		app->StartWatching(this, kShowVolumeSpaceBar);
-		app->StartWatching(this, kSpaceBarColorChanged);
-		app->StartWatching(this, kUpdateVolumeSpaceBar);
 		app->Unlock();
 	}
 
@@ -2330,20 +2324,6 @@ BPoseView::MessageReceived(BMessage *message)
 							SortPoses();
 							Invalidate();
 						}
-						break;
-
-					case kShowVolumeSpaceBar:
-						bool enabled;
-						if (message->FindBool("ShowVolumeSpaceBar", &enabled) == B_OK)
-							TrackerSettings().SetShowVolumeSpaceBar(enabled);
-						// supposed to fall through
-					case kSpaceBarColorChanged:
-						UpdateVolumeIcons();
-						break;
-					case kUpdateVolumeSpaceBar:
-						dev_t device;
-						message->FindInt32("device", (int32 *)&device);
-						UpdateVolumeIcon(device);	
 						break;
 				}
 			}
@@ -5214,34 +5194,21 @@ BPoseView::AttributeChanged(const BMessage *message)
 
 
 void 
-BPoseView::UpdateVolumeIcon(dev_t device, bool forceUpdate)
+BPoseView::UpdateIcon(BPose *pose)
 {
-	int32 index;
-	BPose *pose = fPoseList->FindVolumePose(device,&index);
-	if (pose == NULL)
-		return;
-
-	if (pose->UpdateVolumeSpaceBar(TrackerSettings().ShowVolumeSpaceBar()) || forceUpdate) {
-		BPoint loc(0, index * fListElemHeight);
-		pose->UpdateIcon(loc, this);
+	BPoint location;
+	if (ViewMode() == kListMode) {
+		// need to find the index of the pose in the pose list
+		int32 count = fPoseList->CountItems();
+		for (int32 index = 0; index < count; index++) {
+			if (fPoseList->ItemAt(index) == pose) {
+				location.Set(0, index * fListElemHeight);
+				break;
+			}
+		}
 	}
-}
 
-
-void 
-BPoseView::UpdateVolumeIcons()
-{
-	BVolumeRoster roster;
-
-	BVolume volume;
-	while(roster.GetNextVolume(&volume) == B_NO_ERROR) {
-		BDirectory dir;
-		volume.GetRootDirectory(&dir);
-		node_ref nodeRef;
-		dir.GetNodeRef(&nodeRef);
-
-		UpdateVolumeIcon(nodeRef.device, true);
-	}
+	pose->UpdateIcon(location, this);
 }
 
 

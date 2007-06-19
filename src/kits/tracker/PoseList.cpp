@@ -105,20 +105,3 @@ PoseList::DeepFindPose(const node_ref *node, int32 *resultingIndex) const
 
 	return NULL;
 }
-
-BPose *
-PoseList::FindVolumePose(const dev_t device, int32 *resultingIndex) const
-{
-	int32 count = CountItems();
-	for (int32 index = 0; index < count; index++) {
-		BPose *pose = ItemAt(index);
-		Model *model = pose->TargetModel();
-		ASSERT(model);
-		if (model->IsVolume() && model->NodeRef()->device == device) {
-			if (resultingIndex)
-				*resultingIndex = index;
-			return pose;
-		}
-	}
-	return NULL;
-}

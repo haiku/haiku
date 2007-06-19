@@ -35,6 +35,7 @@ All rights reserved.
 #include "Attributes.h"
 #include "MimeTypes.h"
 #include "Model.h"
+#include "PoseView.h"
 #include "Utilities.h"
 #include "ContainerWindow.h"
 
@@ -158,7 +159,81 @@ DisallowMetaKeys(BTextView *textView)
 	textView->DisallowChar(B_PAGE_DOWN);
 	textView->DisallowChar(B_FUNCTION_KEY);
 }
- 
+
+
+PeriodicUpdatePoses::PeriodicUpdatePoses()
+	:	fPoseList(20, true)
+{
+	fLock = new Benaphore("PeriodicUpdatePoses");
+}
+
+
+PeriodicUpdatePoses::~PeriodicUpdatePoses()
+{
+	fLock->Lock();
+	fPoseList.MakeEmpty();
+	delete fLock;
+}
+
+
+void
+PeriodicUpdatePoses::AddPose(BPose *pose, BPoseView *poseView,
+	PeriodicUpdateCallback callback, void *cookie)
+{
+	periodic_pose *periodic = new periodic_pose;
+	periodic->pose = pose;
+	periodic->pose_view = poseView;
+	periodic->callback = callback;
+	periodic->cookie = cookie;
+	fPoseList.AddItem(periodic);
+}
+
+
+bool
+PeriodicUpdatePoses::RemovePose(BPose *pose, void **cookie)
+{
+	int32 count = fPoseList.CountItems();
+	for (int32 index = 0; index < count; index++) {
+		if (fPoseList.ItemAt(index)->pose == pose) {
+			if (!fLock->Lock())
+				return false;
+
+			periodic_pose *periodic = fPoseList.RemoveItemAt(index);
+			if (cookie)
+				*cookie = periodic->cookie;
+			delete periodic;
+			fLock->Unlock();
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+void
+PeriodicUpdatePoses::DoPeriodicUpdate(bool forceRedraw)
+{
+	if (!fLock->Lock())
+		return;
+
+	int32 count = fPoseList.CountItems();
+	for (int32 index = 0; index < count; index++) {
+		periodic_pose *periodic = fPoseList.ItemAt(index);
+		if (periodic->callback(periodic->pose, periodic->cookie)
+			|| forceRedraw) {
+			periodic->pose_view->LockLooper();
+			periodic->pose_view->UpdateIcon(periodic->pose);
+			periodic->pose_view->UnlockLooper();
+		}
+	}
+
+	fLock->Unlock();
+}
+
+
+static PeriodicUpdatePoses gPeriodicUpdatePoses;
+
 }	// namespace BPrivate
 
 

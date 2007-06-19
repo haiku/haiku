@@ -483,6 +483,12 @@ TTracker::MessageReceived(BMessage *message)
 			break;
 		}
 
+		case kShowVolumeSpaceBar:
+		case kSpaceBarColorChanged: {
+			gPeriodicUpdatePoses.DoPeriodicUpdate(true);
+			break;
+		}
+
 		default:
 			_inherited::MessageReceived(message);
 			break;
@@ -497,20 +503,7 @@ TTracker::Pulse()
 		return;
 
 	// update the volume icon's free space bars
-	BVolumeRoster roster;
-
- 	BVolume volume;
-	while (roster.GetNextVolume(&volume) == B_OK) {
-		BDirectory dir;
-		volume.GetRootDirectory(&dir);
-		node_ref nodeRef;
-		dir.GetNodeRef(&nodeRef);
-
-		BMessage notificationMessage;
-		notificationMessage.AddInt32("device", *(int32 *)&nodeRef.device);
-
-		SendNotices(kUpdateVolumeSpaceBar, &notificationMessage);
-	}
+	gPeriodicUpdatePoses.DoPeriodicUpdate(false);
 }
 
 

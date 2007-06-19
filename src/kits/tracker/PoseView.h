@@ -159,8 +159,7 @@ class BPoseView : public BView {
 		void SetAutoScroll(bool);
 		void SetPoseEditing(bool);
 
-		void UpdateVolumeIcon(dev_t device, bool forceUpdate = false);
-		void UpdateVolumeIcons();
+		void UpdateIcon(BPose *pose);
 
 		// file change notification handler
 		virtual bool FSNotification(const BMessage *);

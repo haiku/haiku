@@ -49,32 +49,15 @@ All rights reserved.
 
 
 int32
-CalcFreeSpace(dev_t device)
+CalcFreeSpace(BVolume *volume)
 {
-	BVolume volume(device);
-	fs_info info;
-	if (volume.InitCheck() == B_OK && fs_stat_dev(device,&info) == B_OK) {
-		// Philosophy here:
-		// Bars go on all drives with read/write capabilities
-		// Exceptions: Not on CDDA, but on NTFS/Ext2
-		// Also note that some volumes may return 0 when
-		// BVolume::Capacity() is called (believe-me... That *DOES*
-		// happen) so we also check for that.
-		off_t capacity = volume.Capacity();
-		if (((!volume.IsReadOnly() && strcmp(info.fsh_name,"cdda"))
-			|| !strcmp(info.fsh_name,"ntfs")
-			|| !strcmp(info.fsh_name,"ext2"))
-			&& (capacity > 0)) {
-			int32 percent = static_cast<int32>(volume.FreeBytes() / (capacity / 100));
+	off_t capacity = volume->Capacity();
+	int32 percent = static_cast<int32>(volume->FreeBytes() / (capacity / 100));
 
-			// warn below 20 MB of free space (if this is less than 10% of free space)
-			if (volume.FreeBytes() < 20 * 1024 * 1024 && percent < 10)
-				return -2 - percent;
-
-			return percent;
-		}
-	}
-	return -1;
+	// warn below 20 MB of free space (if this is less than 10% of free space)
+	if (volume->FreeBytes() < 20 * 1024 * 1024 && percent < 10)
+		return -2 - percent;
+	return percent;
 }
 
 
@@ -98,9 +81,32 @@ BPose::BPose(Model *model, BPoseView *view, bool selected)
 {
 	CreateWidgets(view);
 
-	if (model->IsVolume() && TrackerSettings().ShowVolumeSpaceBar()) {
+	if (model->IsVolume()) {
+		fs_info info;
 		dev_t device = model->NodeRef()->device;
-		fPercent = CalcFreeSpace(device);
+		BVolume *volume = new BVolume(device);
+		if (volume->InitCheck() == B_OK
+			&& fs_stat_dev(device, &info) == B_OK) {
+			// Philosophy here:
+			// Bars go on all drives with read/write capabilities
+			// Exceptions: Not on CDDA, but on NTFS/Ext2
+			// Also note that some volumes may return 0 when
+			// BVolume::Capacity() is called (believe-me... That *DOES*
+			// happen) so we also check for that.
+			off_t capacity = volume->Capacity();
+			if (((!volume->IsReadOnly() && strcmp(info.fsh_name,"cdda"))
+				|| !strcmp(info.fsh_name,"ntfs")
+				|| !strcmp(info.fsh_name,"ext2"))
+				&& capacity > 0) {
+				// The volume is ok and we want space bars on it
+				gPeriodicUpdatePoses.AddPose(this, view,
+					_PeriodicUpdateCallback, volume);
+				if (TrackerSettings().ShowVolumeSpaceBar())
+					fPercent = CalcFreeSpace(volume);
+			} else
+				delete volume;
+		} else
+			delete volume;
 	}
 
 	if ((fClipboardMode = FSClipboardFindNodeMode(model,true)) != 0
@@ -112,6 +118,13 @@ BPose::BPose(Model *model, BPoseView *view, bool selected)
 
 BPose::~BPose()
 {
+	if (fModel->IsVolume()) {
+		// we might be registered for periodic updates
+		BVolume *volume = NULL;
+		if (gPeriodicUpdatePoses.RemovePose(this, (void **)&volume))
+			delete volume;
+	}
+
 	delete fModel;
 }
 
@@ -285,8 +298,16 @@ BPose::UpdateWidgetAndModel(Model *resolvedModel, const char *attrName,
 
 
 bool
-BPose::UpdateVolumeSpaceBar(bool enabled)
+BPose::_PeriodicUpdateCallback(BPose *pose, void *cookie)
 {
+	return pose->UpdateVolumeSpaceBar((BVolume *)cookie);
+}
+
+
+bool
+BPose::UpdateVolumeSpaceBar(BVolume *volume)
+{
+	bool enabled = TrackerSettings().ShowVolumeSpaceBar();
 	if (!enabled) {
 		if (fPercent == -1)
 			return false;
@@ -295,9 +316,7 @@ BPose::UpdateVolumeSpaceBar(bool enabled)
 		return true;
 	}
 
-	dev_t device = TargetModel()->NodeRef()->device;
-	int32 percent = CalcFreeSpace(device);
-
+	int32 percent = CalcFreeSpace(volume);
 	if (fPercent != percent) {
 		if (percent > 100)
 			fPercent = 100;
