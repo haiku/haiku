@@ -122,4 +122,4 @@ typedef struct partition_module_info {
 	Returns B_OK, if everything went fine, an error code otherwise.
 */
 
-#endif _PARTSCAN_PARTITION_H
+#endif // _PARTSCAN_PARTITION_H

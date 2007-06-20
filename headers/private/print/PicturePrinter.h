@@ -121,4 +121,4 @@ private:
 	PicturePrinter* fPrinter;
 };
 
-#endif _PICTURE_PRINTER_H
+#endif // _PICTURE_PRINTER_H

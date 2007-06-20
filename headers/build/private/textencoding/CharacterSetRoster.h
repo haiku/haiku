@@ -88,4 +88,4 @@ private:
 
 }
 
-#endif CHARACTER_SET_ROSTER_H
+#endif // CHARACTER_SET_ROSTER_H
