@@ -152,4 +152,4 @@ extern "C" status_t get_webcam_addon(WebCamMediaAddOn* webcam, CamDeviceAddon **
 #define B_WEBCAM_ADDON_INSTANTIATION_FUNC_NAME "get_webcam_addon"
 
 
-#endif _CAM_DEVICE_H
+#endif // _CAM_DEVICE_H
