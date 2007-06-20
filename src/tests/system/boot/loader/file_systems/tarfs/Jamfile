@@ -2,8 +2,9 @@ SubDir HAIKU_TOP src tests system boot loader file_systems tarfs ;
 
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders kernel shared storage ;
-SubDirHdrs $(HAIKU_TOP) src tests system boot loader ;
+SubDirSysHdrs $(HAIKU_TOP) src tests system boot loader ;
 SubDirSysHdrs $(HAIKU_TOP) headers libs zlib ;
+SubDirHdrs $(HAIKU_TOP) src system boot loader file_systems tarfs ;
 
 ObjectDefines 
 	tarfs.cpp

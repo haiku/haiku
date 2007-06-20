@@ -12,6 +12,7 @@
 
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 
 const char *kNormalColor = "\33[0m";

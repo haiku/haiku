@@ -4,8 +4,12 @@ UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName storage ] ;
 UsePrivateHeaders [ FDirName shared ] ;
-SubDirHdrs $(HAIKU_TOP) headers private kernel arch $(TARGET_ARCH) ;
+SubDirSysHdrs $(HAIKU_TOP) headers private kernel arch $(TARGET_ARCH) ;
+SubDirSysHdrs $(HAIKU_TOP) src tests system boot loader ;
 SubDirHdrs $(HAIKU_TOP) src system boot loader ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems amiga ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems apple ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems intel ;
 
 # we need to redefine certain calls in the boot loader so that
 # they will really be used instead of their POSIX counterparts

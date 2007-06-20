@@ -3,7 +3,8 @@ SubDir HAIKU_TOP src tests system boot loader file_systems amiga_ffs ;
 UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName storage ] ;
-SubDirHdrs $(HAIKU_TOP) src tests system boot loader ;
+SubDirSysHdrs $(HAIKU_TOP) src tests system boot loader ;
+SubDirHdrs $(HAIKU_TOP) src system boot loader file_systems amiga_ffs ;
 
 ObjectDefines 
 	amiga_ffs.cpp

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -132,16 +132,24 @@ get_next_device(int32 *cookie)
 //	#pragma mark -
 
 
-status_t 
-platform_get_boot_device(struct stage2_args *args, Node **_device)
+status_t
+platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 {
 	// we accept a boot device from the command line
+	status_t status = B_ERROR;
+	Node *device;
+
 	int32 cookie = 0;
 	char *path = get_next_device(&cookie);
 	if (path != NULL)
-		return get_device(path, _device);
+		status = get_device(path, &device);
+	else
+		status = get_device("/boot/home/test-file-device", &device);
 
-	return get_device("/boot/home/test-file-device", _device);
+	if (status == B_OK)
+		devicesList->Add(device);
+
+	return status;
 }
 
 
