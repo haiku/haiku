@@ -232,7 +232,7 @@ PeriodicUpdatePoses::DoPeriodicUpdate(bool forceRedraw)
 }
 
 
-static PeriodicUpdatePoses gPeriodicUpdatePoses;
+PeriodicUpdatePoses gPeriodicUpdatePoses;
 
 }	// namespace BPrivate
 
