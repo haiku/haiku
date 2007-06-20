@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -407,7 +407,8 @@ add_boot_volume_menu(Directory *bootVolume)
 	menu->AddSeparatorItem();
 
 	menu->AddItem(item = new(nothrow) MenuItem("Rescan volumes"));
-	item->SetHelpText("Please insert a Haiku CD-ROM or attach a USB disk - depending on your system, you can then boot from them.");
+	item->SetHelpText("Please insert a Haiku CD-ROM or attach a USB disk - "
+		"depending on your system, you can then boot from them.");
 	item->SetType(MENU_ITEM_NO_CHOICE);
 	if (count == 0)
 		item->Select(true);
@@ -492,14 +493,16 @@ status_t
 user_menu(Directory **_bootVolume)
 {
 	Menu *menu = new(nothrow) Menu(MAIN_MENU);
-	Menu *safeModeMenu;
+	Menu *safeModeMenu = NULL;
 	MenuItem *item;
 
 	// Add boot volume
-	menu->AddItem(item = new(nothrow) MenuItem("Select boot volume", add_boot_volume_menu(*_bootVolume)));
+	menu->AddItem(item = new(nothrow) MenuItem("Select boot volume",
+		add_boot_volume_menu(*_bootVolume)));
 
 	// Add safe mode
-	menu->AddItem(item = new(nothrow) MenuItem("Select safe mode options", safeModeMenu = add_safe_mode_menu()));
+	menu->AddItem(item = new(nothrow) MenuItem("Select safe mode options",
+		safeModeMenu = add_safe_mode_menu()));
 
 	// Add platform dependent menus
 	platform_add_menus(menu);
