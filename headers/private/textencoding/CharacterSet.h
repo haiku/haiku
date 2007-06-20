@@ -86,4 +86,4 @@ private:
 
 }
 
-#endif CHARACTER_SET_H
+#endif // CHARACTER_SET_H
