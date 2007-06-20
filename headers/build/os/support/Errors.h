@@ -18,7 +18,7 @@
 /*-------------------------------------------------------------*/
 /*----- Error baselines ---------------------------------------*/
 
-#define B_GENERAL_ERROR_BASE		LONG_MIN
+#define B_GENERAL_ERROR_BASE		INT_MIN
 #define B_OS_ERROR_BASE				B_GENERAL_ERROR_BASE + 0x1000
 #define B_APP_ERROR_BASE			B_GENERAL_ERROR_BASE + 0x2000
 #define B_INTERFACE_ERROR_BASE		B_GENERAL_ERROR_BASE + 0x3000
