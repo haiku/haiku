@@ -391,6 +391,7 @@ AboutView::AboutView(const BRect &rect)
 		"Carwyn Jones\n"
 		"Vasilis Kaoutsis\n"
 		"Euan Kirkhope\n"
+		"Jan Klötzke\n"
 		"Marcin Konicki\n"
 		"Kurtis Kopf\n"
 		"Thomas Kurschel\n"
@@ -431,6 +432,7 @@ AboutView::AboutView(const BRect &rect)
 		"Michael Wilber\n"
 		"Ulrich Wimboeck\n"
 		"Gabe Yoder\n"
+		"Gerald Zajac\n"
 		"Łukasz Zemczak\n"
 		"\n" B_UTF8_ELLIPSIS " and probably some more we forgot to mention (sorry!)"
 		"\n\n");
