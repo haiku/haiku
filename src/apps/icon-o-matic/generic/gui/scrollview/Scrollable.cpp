@@ -211,8 +211,8 @@ Scrollable::ScrollSourceChanged(Scroller* /*oldSource*/,
 BPoint
 Scrollable::_ValidScrollOffsetFor(BPoint offset) const
 {
-	float maxX = max(fDataRect.left, fDataRect.Width() - fVisibleWidth);
-	float maxY = max(fDataRect.top, fDataRect.Height() - fVisibleHeight);
+	float maxX = max(fDataRect.left, fDataRect.right - fVisibleWidth);
+	float maxY = max(fDataRect.top, fDataRect.bottom - fVisibleHeight);
 	// adjust the offset to be valid
 	if (offset.x < fDataRect.left)
 		offset.x = fDataRect.left;

@@ -662,11 +662,11 @@ ScrollView::_UpdateScrollBars()
 	float hProportion = min(1.0f, (visibleBounds.Width() + 1.0f) /
 								  (dataRect.Width() + 1.0f));
 	float hMaxValue = max(dataRect.left,
-						  dataRect.Width() - visibleBounds.Width());
+						  dataRect.right - visibleBounds.Width());
 	float vProportion = min(1.0f, (visibleBounds.Height() + 1.0f) /
 								  (dataRect.Height() + 1.0f));
 	float vMaxValue = max(dataRect.top,
-						  dataRect.Height() - visibleBounds.Height());
+						  dataRect.bottom - visibleBounds.Height());
 	// update horizontal scroll bar
 	if (fHScrollBar) {
 		fHScrollBar->SetProportion(hProportion);
