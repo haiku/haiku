@@ -472,7 +472,6 @@ TTracker::InstallTemporaryBackgroundImages()
 	if (FSGetBootDeskDir(&dir) == B_OK) {
 		attr_info info;
 		if (dir.GetAttrInfo(kBackgroundImageInfo, &info) != B_OK) {
-
 			BMessage message;
 			AddTemporaryBackgroundImages(&message,
 				(BString(defaultFolderPath) << "bgdefault.tga").String(),

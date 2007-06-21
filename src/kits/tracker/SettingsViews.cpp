@@ -308,7 +308,7 @@ DesktopSettingsView::SetDefaults()
 
 	settings.SetShowDisksIcon(false);
 	settings.SetMountVolumesOntoDesktop(true);
-	settings.SetMountSharedVolumesOntoDesktop(false);
+	settings.SetMountSharedVolumesOntoDesktop(true);
 	settings.SetIntegrateNonBootBeOSDesktops(false);
 	settings.SetEjectWhenUnmounting(true);
 

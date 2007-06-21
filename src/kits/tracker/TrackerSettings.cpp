@@ -167,10 +167,12 @@ TTrackerState::LoadSettingsIfNeeded()
 	if (fSettingsLoaded)
 		return;
 
+	// Set default settings before reading from disk
+
 	Add(fShowDisksIcon = new BooleanValueSetting("ShowDisksIcon", false));
 	Add(fMountVolumesOntoDesktop = new BooleanValueSetting("MountVolumesOntoDesktop", true));
 	Add(fMountSharedVolumesOntoDesktop =
-		new BooleanValueSetting("MountSharedVolumesOntoDesktop", false));
+		new BooleanValueSetting("MountSharedVolumesOntoDesktop", true));
 	Add(fIntegrateNonBootBeOSDesktops = new BooleanValueSetting
 		("IntegrateNonBootBeOSDesktops", true));
 	Add(fIntegrateAllNonBootDesktops = new BooleanValueSetting
