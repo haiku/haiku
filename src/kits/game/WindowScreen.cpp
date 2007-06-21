@@ -610,11 +610,11 @@ BWindowScreen::_InitData(uint32 space, uint32 attributes)
 
 		fActivateSem = create_sem(0, "WindowScreen start lock");
 		if (fActivateSem < B_OK)
-			throw fActivateSem;
+			throw (status_t)fActivateSem;
 
 		fDebugSem = create_sem(1, "WindowScreen debug sem");
 		if (fDebugSem < B_OK)
-			throw fDebugSem;
+			throw (status_t)fDebugSem;
 
 		memcpy(fPalette, screen.ColorMap()->color_list, sizeof(fPalette));
 		fActivateState = 0;
@@ -624,7 +624,7 @@ BWindowScreen::_InitData(uint32 space, uint32 attributes)
 
 	} catch (std::bad_alloc) {
 		status = B_NO_MEMORY;	
-	} catch (int error) {
+	} catch (status_t error) {
 		status = error;
 	} catch (...) {
 		status = B_ERROR;	
