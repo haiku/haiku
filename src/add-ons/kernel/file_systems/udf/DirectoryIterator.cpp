@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  This software is part of the Haiku distribution and is covered 
+//  by the MIT license.
 //
 //  Copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
 //---------------------------------------------------------------------
@@ -21,7 +21,7 @@
 using namespace Udf;
 
 status_t
-DirectoryIterator::GetNextEntry(char *name, uint32 *length, vnode_id *id)
+DirectoryIterator::GetNextEntry(char *name, uint32 *length, ino_t *id)
 {
 	DEBUG_INIT_ETC("DirectoryIterator",
 	               ("name: %p, length: %p, id: %p", name, length, id));

@@ -6,7 +6,8 @@
  * Distributed under the terms of the NewOS License.
  */
 
-/* Virtual File System and File System Interface Layer */
+/*! Virtual File System and File System Interface Layer */
+
 
 #include <OS.h>
 #include <StorageDefs.h>
@@ -65,10 +66,10 @@ const static uint32 kMaxUnusedVnodes = 8192;
 struct vnode {
 	struct vnode	*next;
 	vm_cache_ref	*cache;
-	mount_id		device;
+	dev_t			device;
 	list_link		mount_link;
 	list_link		unused_link;
-	vnode_id		id;
+	ino_t			id;
 	fs_vnode		private_node;
 	struct fs_mount	*mount;
 	struct vnode	*covered_by;
@@ -81,8 +82,8 @@ struct vnode {
 };
 
 struct vnode_hash_key {
-	mount_id	device;
-	vnode_id	vnode;
+	dev_t	device;
+	ino_t	vnode;
 };
 
 #define FS_CALL(vnode, op) (vnode->mount->fs->op)
@@ -103,7 +104,7 @@ struct vnode_hash_key {
 struct fs_mount {
 	struct fs_mount	*next;
 	file_system_module_info *fs;
-	mount_id		id;
+	dev_t			id;
 	void			*cookie;
 	char			*device_name;
 	char			*fs_name;
@@ -186,7 +187,7 @@ static struct vnode *sRoot;
 
 #define MOUNTS_HASH_TABLE_SIZE 16
 static hash_table *sMountsTable;
-static mount_id sNextMountID = 1;
+static dev_t sNextMountID = 1;
 
 mode_t __gUmask = 022;
 
@@ -232,10 +233,10 @@ static status_t common_read_stat(struct file_descriptor *, struct stat *);
 static status_t common_write_stat(struct file_descriptor *, const struct stat *, int statMask);
 
 static status_t vnode_path_to_vnode(struct vnode *vnode, char *path,
-	bool traverseLeafLink, int count, struct vnode **_vnode, vnode_id *_parentID, int *_type);
+	bool traverseLeafLink, int count, struct vnode **_vnode, ino_t *_parentID, int *_type);
 static status_t dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize);
 static status_t fd_and_path_to_vnode(int fd, char *path, bool traverseLeafLink,
-	struct vnode **_vnode, vnode_id *_parentID, bool kernel);
+	struct vnode **_vnode, ino_t *_parentID, bool kernel);
 static void inc_vnode_ref_count(struct vnode *vnode);
 static status_t dec_vnode_ref_count(struct vnode *vnode, bool reenter);
 static inline void put_vnode(struct vnode *vnode);
@@ -430,7 +431,7 @@ static int
 mount_compare(void *_m, const void *_key)
 {
 	struct fs_mount *mount = (fs_mount *)_m;
-	const mount_id *id = (mount_id *)_key;
+	const dev_t *id = (dev_t *)_key;
 
 	if (mount->id == *id)
 		return 0;
@@ -443,7 +444,7 @@ static uint32
 mount_hash(void *_m, const void *_key, uint32 range)
 {
 	struct fs_mount *mount = (fs_mount *)_m;
-	const mount_id *id = (mount_id *)_key;
+	const dev_t *id = (dev_t *)_key;
 
 	if (mount)
 		return mount->id % range;
@@ -457,7 +458,7 @@ mount_hash(void *_m, const void *_key, uint32 range)
  */
 
 static struct fs_mount *
-find_mount(mount_id id)
+find_mount(dev_t id)
 {
 	ASSERT_LOCKED_MUTEX(&sMountMutex);
 
@@ -466,7 +467,7 @@ find_mount(mount_id id)
 
 
 static status_t
-get_mount(mount_id id, struct fs_mount **_mount)
+get_mount(dev_t id, struct fs_mount **_mount)
 {
 	struct fs_mount *mount;
 	status_t status;
@@ -626,7 +627,7 @@ remove_vnode_from_mount_list(struct vnode *vnode, struct fs_mount *mount)
 
 
 static status_t
-create_new_vnode(struct vnode **_vnode, mount_id mountID, vnode_id vnodeID)
+create_new_vnode(struct vnode **_vnode, dev_t mountID, ino_t vnodeID)
 {
 	FUNCTION(("create_new_vnode()\n"));
 
@@ -787,7 +788,7 @@ inc_vnode_ref_count(struct vnode *vnode)
  */
 
 static struct vnode *
-lookup_vnode(mount_id mountID, vnode_id vnodeID)
+lookup_vnode(dev_t mountID, ino_t vnodeID)
 {
 	struct vnode_hash_key key;
 
@@ -814,7 +815,7 @@ lookup_vnode(mount_id mountID, vnode_id vnodeID)
  */
 
 static status_t
-get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter)
+get_vnode(dev_t mountID, ino_t vnodeID, struct vnode **_vnode, int reenter)
 {
 	FUNCTION(("get_vnode: mountid %ld vnid 0x%Lx %p\n", mountID, vnodeID, _vnode));
 
@@ -1413,8 +1414,8 @@ resolve_mount_point_to_volume_root(struct vnode *vnode)
  */
 
 status_t
-resolve_mount_point_to_volume_root(mount_id mountID, vnode_id nodeID,
-	mount_id *resolvedMountID, vnode_id *resolvedNodeID)
+resolve_mount_point_to_volume_root(dev_t mountID, ino_t nodeID,
+	dev_t *resolvedMountID, ino_t *resolvedNodeID)
 {
 	// get the node
 	struct vnode *node;
@@ -1518,7 +1519,7 @@ get_dir_path_and_leaf(char *path, char *filename)
 
 
 static status_t
-entry_ref_to_vnode(mount_id mountID, vnode_id directoryID, const char *name, struct vnode **_vnode)
+entry_ref_to_vnode(dev_t mountID, ino_t directoryID, const char *name, struct vnode **_vnode)
 {
 	char clonedName[B_FILE_NAME_LENGTH + 1];
 	if (strlcpy(clonedName, name, B_FILE_NAME_LENGTH) >= B_FILE_NAME_LENGTH)
@@ -1545,10 +1546,10 @@ entry_ref_to_vnode(mount_id mountID, vnode_id directoryID, const char *name, str
 
 static status_t
 vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
-	int count, struct vnode **_vnode, vnode_id *_parentID, int *_type)
+	int count, struct vnode **_vnode, ino_t *_parentID, int *_type)
 {
 	status_t status = 0;
-	vnode_id lastParentID = vnode->id;
+	ino_t lastParentID = vnode->id;
 	int type = 0;
 
 	FUNCTION(("vnode_path_to_vnode(vnode = %p, path = %s)\n", vnode, path));
@@ -1560,7 +1561,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 
 	while (true) {
 		struct vnode *nextVnode;
-		vnode_id vnodeID;
+		ino_t vnodeID;
 		char *nextPath;
 
 		TRACE(("vnode_path_to_vnode: top of loop. p = %p, p = '%s'\n", path, path));
@@ -1715,7 +1716,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 
 static status_t
 path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode,
-	vnode_id *_parentID, bool kernel)
+	ino_t *_parentID, bool kernel)
 {
 	struct vnode *start = NULL;
 
@@ -1943,7 +1944,7 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 		char nameBuffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
 		char *name = &((struct dirent *)nameBuffer)->d_name[0];
 		struct vnode *parentVnode;
-		vnode_id parentID;
+		ino_t parentID;
 		int type;
 
 		// lookup the parent vnode
@@ -2121,7 +2122,7 @@ get_vnode_from_fd(int fd, bool kernel)
 
 static status_t
 fd_and_path_to_vnode(int fd, char *path, bool traverseLeafLink,
-	struct vnode **_vnode, vnode_id *_parentID, bool kernel)
+	struct vnode **_vnode, ino_t *_parentID, bool kernel)
 {
 	if (fd < 0 && !path)
 		return B_BAD_VALUE;
@@ -2288,7 +2289,7 @@ dump_mount(int argc, char **argv)
 			return 0;
 		}
 	} else {
-		mount_id id = atoll(argv[1]);
+		dev_t id = atoll(argv[1]);
 		mount = (fs_mount *)hash_lookup(sMountsTable, (void *)&id);
 		if (mount == NULL) {
 			kprintf("fs_mount not found\n");
@@ -2342,8 +2343,8 @@ dump_vnode(int argc, char **argv)
 	}
 
 	struct hash_iterator iterator;
-	mount_id device = -1;
-	vnode_id id;
+	dev_t device = -1;
+	ino_t id;
 	if (argc > 2) {
 		device = atoi(argv[1]);
 		id = atoll(argv[2]);
@@ -2367,7 +2368,7 @@ static int
 dump_vnodes(int argc, char **argv)
 {
 	// restrict dumped nodes to a certain device if requested
-	mount_id device = -1;
+	dev_t device = -1;
 	if (argc > 1)
 		device = atoi(argv[1]);
 
@@ -2399,7 +2400,7 @@ dump_vnode_caches(int argc, char **argv)
 	struct vnode *vnode;
 	
 	// restrict dumped nodes to a certain device if requested
-	mount_id device = -1;
+	dev_t device = -1;
 	if (argc > 1)
 		device = atoi(argv[1]);
 
@@ -2506,7 +2507,7 @@ dump_vnode_usage(int argc, char **argv)
 
 
 extern "C" status_t
-new_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode)
+new_vnode(dev_t mountID, ino_t vnodeID, fs_vnode privateNode)
 {
 	FUNCTION(("new_vnode(mountID = %ld, vnodeID = %Ld, node = %p)\n",
 		mountID, vnodeID, privateNode));
@@ -2541,7 +2542,7 @@ new_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode)
 
 
 extern "C" status_t
-publish_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode)
+publish_vnode(dev_t mountID, ino_t vnodeID, fs_vnode privateNode)
 {
 	FUNCTION(("publish_vnode()\n"));
 
@@ -2569,7 +2570,7 @@ publish_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode)
 
 
 extern "C" status_t
-get_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode *_fsNode)
+get_vnode(dev_t mountID, ino_t vnodeID, fs_vnode *_fsNode)
 {
 	struct vnode *vnode;
 
@@ -2583,7 +2584,7 @@ get_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode *_fsNode)
 
 
 extern "C" status_t
-put_vnode(mount_id mountID, vnode_id vnodeID)
+put_vnode(dev_t mountID, ino_t vnodeID)
 {
 	struct vnode *vnode;
 
@@ -2599,7 +2600,7 @@ put_vnode(mount_id mountID, vnode_id vnodeID)
 
 
 extern "C" status_t
-remove_vnode(mount_id mountID, vnode_id vnodeID)
+remove_vnode(dev_t mountID, ino_t vnodeID)
 {
 	struct vnode *vnode;
 	bool remove = false;
@@ -2635,7 +2636,7 @@ remove_vnode(mount_id mountID, vnode_id vnodeID)
 
 
 extern "C" status_t 
-unremove_vnode(mount_id mountID, vnode_id vnodeID)
+unremove_vnode(dev_t mountID, ino_t vnodeID)
 {
 	struct vnode *vnode;
 
@@ -2651,7 +2652,7 @@ unremove_vnode(mount_id mountID, vnode_id vnodeID)
 
 
 extern "C" status_t 
-get_vnode_removed(mount_id mountID, vnode_id vnodeID, bool* removed)
+get_vnode_removed(dev_t mountID, ino_t vnodeID, bool* removed)
 {
 	mutex_lock(&sVnodeMutex);
 
@@ -2741,7 +2742,7 @@ vfs_get_vnode_from_path(const char *path, bool kernel, void **_vnode)
 
 
 extern "C" status_t
-vfs_get_vnode(mount_id mountID, vnode_id vnodeID, void **_vnode)
+vfs_get_vnode(dev_t mountID, ino_t vnodeID, void **_vnode)
 {
 	struct vnode *vnode;
 
@@ -2755,7 +2756,7 @@ vfs_get_vnode(mount_id mountID, vnode_id vnodeID, void **_vnode)
 
 
 extern "C" status_t
-vfs_entry_ref_to_vnode(mount_id mountID, vnode_id directoryID,
+vfs_entry_ref_to_vnode(dev_t mountID, ino_t directoryID,
 	const char *name, void **_vnode)
 {
 	return entry_ref_to_vnode(mountID, directoryID, name, (struct vnode **)_vnode);
@@ -2763,7 +2764,7 @@ vfs_entry_ref_to_vnode(mount_id mountID, vnode_id directoryID,
 
 
 extern "C" void
-vfs_vnode_to_node_ref(void *_vnode, mount_id *_mountID, vnode_id *_vnodeID)
+vfs_vnode_to_node_ref(void *_vnode, dev_t *_mountID, ino_t *_vnodeID)
 {
 	struct vnode *vnode = (struct vnode *)_vnode;
 
@@ -2779,7 +2780,7 @@ vfs_vnode_to_node_ref(void *_vnode, mount_id *_mountID, vnode_id *_vnodeID)
  */
 
 extern "C" status_t
-vfs_lookup_vnode(mount_id mountID, vnode_id vnodeID, void **_vnode)
+vfs_lookup_vnode(dev_t mountID, ino_t vnodeID, void **_vnode)
 {
 	mutex_lock(&sVnodeMutex);
 	struct vnode *vnode = lookup_vnode(mountID, vnodeID);
@@ -2794,7 +2795,7 @@ vfs_lookup_vnode(mount_id mountID, vnode_id vnodeID, void **_vnode)
 
 
 extern "C" status_t
-vfs_get_fs_node_from_path(mount_id mountID, const char *path, bool kernel, void **_node)
+vfs_get_fs_node_from_path(dev_t mountID, const char *path, bool kernel, void **_node)
 {
 	TRACE(("vfs_get_fs_node_from_path(mountID = %ld, path = \"%s\", kernel %d)\n",
 		mountID, path, kernel));
@@ -3018,7 +3019,7 @@ vfs_put_vnode(void *_vnode)
 
 
 extern "C" status_t
-vfs_get_cwd(mount_id *_mountID, vnode_id *_vnodeID)
+vfs_get_cwd(dev_t *_mountID, ino_t *_vnodeID)
 {
 	// Get current working directory from io context
 	struct io_context *context = get_current_io_context(false);
@@ -3038,7 +3039,7 @@ vfs_get_cwd(mount_id *_mountID, vnode_id *_vnodeID)
 
 
 extern "C" status_t
-vfs_disconnect_vnode(mount_id mountID, vnode_id vnodeID)
+vfs_disconnect_vnode(dev_t mountID, ino_t vnodeID)
 {
 	struct vnode *vnode;
 
@@ -3563,7 +3564,7 @@ create_vnode(struct vnode *directory, const char *name, int openMode,
 {
 	struct vnode *vnode;
 	fs_cookie cookie;
-	vnode_id newID;
+	ino_t newID;
 	int status;
 
 	if (FS_CALL(directory, create) == NULL)
@@ -3679,7 +3680,8 @@ open_attr_dir_vnode(struct vnode *vnode, bool kernel)
 
 
 static int
-file_create_entry_ref(mount_id mountID, vnode_id directoryID, const char *name, int openMode, int perms, bool kernel)
+file_create_entry_ref(dev_t mountID, ino_t directoryID, const char *name,
+	int openMode, int perms, bool kernel)
 {
 	struct vnode *directory;
 	int status;
@@ -3720,7 +3722,7 @@ file_create(int fd, char *path, int openMode, int perms, bool kernel)
 
 
 static int
-file_open_entry_ref(mount_id mountID, vnode_id directoryID, const char *name, int openMode, bool kernel)
+file_open_entry_ref(dev_t mountID, ino_t directoryID, const char *name, int openMode, bool kernel)
 {
 	struct vnode *vnode;
 	int status;
@@ -3756,7 +3758,7 @@ file_open(int fd, char *path, int openMode, bool kernel)
 
 	// get the vnode matching the vnode + path combination
 	struct vnode *vnode = NULL;
-	vnode_id parentID;
+	ino_t parentID;
 	status = fd_and_path_to_vnode(fd, path, traverse, &vnode, &parentID, kernel);
 	if (status != B_OK)
 		return status;
@@ -3905,10 +3907,10 @@ file_deselect(struct file_descriptor *descriptor, uint8 event,
 
 
 static status_t
-dir_create_entry_ref(mount_id mountID, vnode_id parentID, const char *name, int perms, bool kernel)
+dir_create_entry_ref(dev_t mountID, ino_t parentID, const char *name, int perms, bool kernel)
 {
 	struct vnode *vnode;
-	vnode_id newID;
+	ino_t newID;
 	status_t status;
 
 	if (name == NULL || *name == '\0')
@@ -3935,7 +3937,7 @@ dir_create(int fd, char *path, int perms, bool kernel)
 {
 	char filename[B_FILE_NAME_LENGTH];
 	struct vnode *vnode;
-	vnode_id newID;
+	ino_t newID;
 	status_t status;
 
 	FUNCTION(("dir_create: path '%s', perms %d, kernel %d\n", path, perms, kernel));
@@ -3955,7 +3957,7 @@ dir_create(int fd, char *path, int perms, bool kernel)
 
 
 static int
-dir_open_entry_ref(mount_id mountID, vnode_id parentID, const char *name, bool kernel)
+dir_open_entry_ref(dev_t mountID, ino_t parentID, const char *name, bool kernel)
 {
 	struct vnode *vnode;
 	int status;
@@ -3991,7 +3993,7 @@ dir_open(int fd, char *path, bool kernel)
 
 	// get the vnode matching the vnode + path combination
 	struct vnode *vnode = NULL;
-	vnode_id parentID;
+	ino_t parentID;
 	status = fd_and_path_to_vnode(fd, path, true, &vnode, &parentID, kernel);
 	if (status != B_OK)
 		return status;
@@ -4956,7 +4958,7 @@ err:
 
 
 static status_t
-index_dir_open(mount_id mountID, bool kernel)
+index_dir_open(dev_t mountID, bool kernel)
 {
 	struct fs_mount *mount;
 	fs_cookie cookie;
@@ -5043,7 +5045,7 @@ index_dir_rewind(struct file_descriptor *descriptor)
 
 
 static status_t
-index_create(mount_id mountID, const char *name, uint32 type, uint32 flags, bool kernel)
+index_create(dev_t mountID, const char *name, uint32 type, uint32 flags, bool kernel)
 {
 	FUNCTION(("index_create(mountID = %ld, name = %s, kernel = %d)\n", mountID, name, kernel));
 
@@ -5095,7 +5097,7 @@ index_free_fd(struct file_descriptor *descriptor)
 
 
 static status_t
-index_name_read_stat(mount_id mountID, const char *name, struct stat *stat, bool kernel)
+index_name_read_stat(dev_t mountID, const char *name, struct stat *stat, bool kernel)
 {
 	FUNCTION(("index_remove(mountID = %ld, name = %s, kernel = %d)\n", mountID, name, kernel));
 
@@ -5118,7 +5120,7 @@ out:
 
 
 static status_t
-index_remove(mount_id mountID, const char *name, bool kernel)
+index_remove(dev_t mountID, const char *name, bool kernel)
 {
 	FUNCTION(("index_remove(mountID = %ld, name = %s, kernel = %d)\n", mountID, name, kernel));
 
@@ -5396,7 +5398,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 	hash_insert(sMountsTable, mount);
 	mutex_unlock(&sMountMutex);
 
-	vnode_id rootID;
+	ino_t rootID;
 
 	if (!sRoot) {
 		// we haven't mounted anything yet
@@ -5693,7 +5695,7 @@ fs_sync(dev_t device)
 		struct vnode *vnode = (struct vnode *)list_get_next_item(&mount->vnodes,
 			previousVnode);
 
-		vnode_id id = -1;
+		ino_t id = -1;
 		if (vnode != NULL)
 			id = vnode->id;
 

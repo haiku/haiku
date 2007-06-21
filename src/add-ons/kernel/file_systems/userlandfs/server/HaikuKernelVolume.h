@@ -12,13 +12,13 @@ namespace UserlandFS {
 class HaikuKernelVolume : public Volume {
 public:
 								HaikuKernelVolume(FileSystem* fileSystem,
-									mount_id id,
+									dev_t id,
 									file_system_module_info* fsModule);
 	virtual						~HaikuKernelVolume();
 
 	// FS
 	virtual	status_t			Mount(const char* device, uint32 flags,
-									const char* parameters, vnode_id* rootID);
+									const char* parameters, ino_t* rootID);
 	virtual	status_t			Unmount();
 	virtual	status_t			Sync();
 	virtual	status_t			ReadFSInfo(fs_info* info);
@@ -32,10 +32,10 @@ public:
 
 	// vnodes
 	virtual	status_t			Lookup(fs_vnode dir, const char* entryName,
-									vnode_id* vnid, int* type);
+									ino_t* vnid, int* type);
 	virtual	status_t			GetVNodeName(fs_vnode node, char* buffer,
 									size_t bufferSize);
-	virtual	status_t			ReadVNode(vnode_id vnid, bool reenter,
+	virtual	status_t			ReadVNode(ino_t vnid, bool reenter,
 									fs_vnode* node);
 	virtual	status_t			WriteVNode(fs_vnode node, bool reenter);
 	virtual	status_t			RemoveVNode(fs_vnode node, bool reenter);
@@ -71,7 +71,7 @@ public:
 	// files
 	virtual	status_t			Create(fs_vnode dir, const char* name,
 									int openMode, int mode, fs_cookie* cookie,
-									vnode_id* vnid);
+									ino_t* vnid);
 	virtual	status_t			Open(fs_vnode node, int openMode,
 									fs_cookie* cookie);
 	virtual	status_t			Close(fs_vnode node, fs_cookie cookie);
@@ -85,7 +85,7 @@ public:
 
 	// directories
 	virtual	status_t			CreateDir(fs_vnode dir, const char* name,
-									int mode, vnode_id *newDir);
+									int mode, ino_t *newDir);
 	virtual	status_t			RemoveDir(fs_vnode dir, const char* name);
 	virtual	status_t			OpenDir(fs_vnode node, fs_cookie* cookie);
 	virtual	status_t			CloseDir(fs_vnode node, fs_vnode cookie);

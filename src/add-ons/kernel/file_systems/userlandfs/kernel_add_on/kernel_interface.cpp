@@ -64,8 +64,8 @@ parse_parameters(const char *parameters, String &fsName,
 
 // userlandfs_mount
 static status_t
-userlandfs_mount(mount_id id, const char *device, uint32 flags, 
-	const char *args, fs_volume *fsCookie, vnode_id *rootVnodeID)
+userlandfs_mount(dev_t id, const char *device, uint32 flags, 
+	const char *args, fs_volume *fsCookie, ino_t *rootVnodeID)
 {
 	PRINT(("userlandfs_mount(%ld, %s, 0x%lx, %s, %p, %p)\n", id, device, flags,
 		args, fsCookie, rootVnodeID));
@@ -165,7 +165,7 @@ userlandfs_write_fs_info(fs_volume fs, const struct fs_info *info, uint32 mask)
 // userlandfs_lookup
 static status_t
 userlandfs_lookup(fs_volume fs, fs_vnode dir, const char *entryName,
-	vnode_id *vnid, int *type)
+	ino_t *vnid, int *type)
 {
 	Volume* volume = (Volume*)fs;
 	PRINT(("userlandfs_lookup(%p, %p, `%s', %p, %p)\n", fs, dir,
@@ -192,7 +192,7 @@ userlandfs_get_vnode_name(fs_volume fs, fs_vnode node, char *buffer,
 
 // userlandfs_get_vnode
 static status_t
-userlandfs_get_vnode(fs_volume fs, vnode_id vnid, fs_vnode *node, bool reenter)
+userlandfs_get_vnode(fs_volume fs, ino_t vnid, fs_vnode *node, bool reenter)
 {
 	Volume* volume = (Volume*)fs;
 	PRINT(("userlandfs_get_vnode(%p, %lld, %p, %d)\n", fs, vnid, node,
@@ -413,7 +413,7 @@ userlandfs_write_stat(fs_volume fs, fs_vnode node, const struct stat *st,
 // userlandfs_create
 static status_t
 userlandfs_create(fs_volume fs, fs_vnode dir, const char *name, int openMode,
-	int perms, fs_cookie *cookie, vnode_id *vnid)
+	int perms, fs_cookie *cookie, ino_t *vnid)
 {
 	Volume* volume = (Volume*)fs;
 	PRINT(("userlandfs_create(%p, %p, `%s', %d, %d, %p, %p)\n", fs, dir,
@@ -491,7 +491,7 @@ userlandfs_write(fs_volume fs, fs_vnode node, fs_cookie cookie, off_t pos,
 // userlandfs_create_dir
 static status_t
 userlandfs_create_dir(fs_volume fs, fs_vnode parent, const char *name,
-	int perms, vnode_id *newDir)
+	int perms, ino_t *newDir)
 {
 	Volume* volume = (Volume*)fs;
 	PRINT(("userlandfs_create_dir(%p, %p, `%s', %d, %p)\n", fs, parent, name,

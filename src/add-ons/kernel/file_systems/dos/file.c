@@ -2,6 +2,7 @@
 	Copyright 1999-2001, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
+
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -125,7 +126,7 @@ dosfs_release_vnode(void *_vol, void *_node, bool reenter)
 		return EINVAL;
 	}
 
-	DPRINTF(0, ("dosfs_write_vnode (vnode_id %Lx)\n", ((vnode *)_node)->vnid));
+	DPRINTF(0, ("dosfs_write_vnode (ino_t %Lx)\n", ((vnode *)_node)->vnid));
 	
 	if ((vol->fs_flags & FS_FLAGS_OP_SYNC) && node->dirty) {
 		LOCK_VOL(vol);
@@ -758,7 +759,7 @@ dosfs_free_cookie(void *_vol, void *_node, void *_cookie)
 
 status_t 
 dosfs_create(void *_vol, void *_dir, const char *name, int omode,
-	int perms, void **_cookie, vnode_id *vnid)
+	int perms, void **_cookie, ino_t *vnid)
 {
 	nspace *vol = (nspace *)_vol;
 	vnode *dir = (vnode *)_dir, *file;
@@ -907,7 +908,7 @@ bi:	if (result != B_OK) free(cookie);
 
 
 status_t 
-dosfs_mkdir(void *_vol, void *_dir, const char *name, int perms, vnode_id *_vnid)
+dosfs_mkdir(void *_vol, void *_dir, const char *name, int perms, ino_t *_vnid)
 {
 	nspace *vol = (nspace *)_vol;
 	vnode *dir = (vnode *)_dir, dummy;
@@ -1121,10 +1122,10 @@ dosfs_rename(void *_vol, void *_odir, const char *oldname,
 
 	// don't move a directory into one of its children
 	if (file->mode & FAT_SUBDIR) {
-		vnode_id vnid = ndir->vnid;
+		ino_t vnid = ndir->vnid;
 		while (1) {
 			vnode *dir;
-			vnode_id parent;
+			ino_t parent;
 
 			if (vnid == file->vnid) {
 				result = EINVAL;
@@ -1347,7 +1348,7 @@ do_unlink(void *_vol, void *_dir, const char *name, bool is_file)
 	status_t result = EINVAL;
 	nspace *vol = (nspace *)_vol;
 	vnode *dir = (vnode *)_dir, *file;
-	vnode_id vnid;
+	ino_t vnid;
 
 	if (!strcmp(name, "."))
 		return EPERM;

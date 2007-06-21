@@ -66,7 +66,7 @@ struct fs_node
 	struct fs_file_cookie *opened; /* opened on this node */
 	
 	char name[GOOGLEFS_NAME_LEN];
-	vnode_id vnid;
+	ino_t vnid;
 	lock l;
 	
 	int is_perm:1;	/* don't delete on last close */
@@ -87,7 +87,7 @@ struct vnidpool;
 struct fs_nspace
 {
 	nspace_id nsid;
-	vnode_id rootid;
+	ino_t rootid;
 	struct vnidpool *vnids;
 	struct fs_node *root; /* fast access for stat time change */
 	struct fs_node *nodes;
@@ -118,7 +118,7 @@ typedef struct fs_file_cookie fs_file_cookie;
 #define fs_attr_dir_cookie fs_file_cookie
 #define fs_query_cookie fs_file_cookie
 
-vnode_id new_vnid(fs_nspace *ns);
+ino_t new_vnid(fs_nspace *ns);
 int googlefs_free_vnode(fs_nspace *ns, fs_node *node);
 
 int googlefs_event(fs_nspace *ns, fs_node *node, int flags);

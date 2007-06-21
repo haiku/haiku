@@ -32,12 +32,12 @@
 static const bigtime_t kUserlandServerlandPortTimeout = 10000000;	// 10s
 
 // MountVNodeMap
-struct Volume::MountVNodeMap : public HashMap<HashKey64<vnode_id>, void*> {
+struct Volume::MountVNodeMap : public HashMap<HashKey64<ino_t>, void*> {
 };
 
 // VNodeCountMap
 struct Volume::VNodeCountMap
-	: public SynchronizedHashMap<HashKey64<vnode_id>, int32*> {
+	: public SynchronizedHashMap<HashKey64<ino_t>, int32*> {
 };
 
 // AutoIncrementer
@@ -66,7 +66,7 @@ private:
 };
 
 // constructor
-Volume::Volume(FileSystem* fileSystem, mount_id id)
+Volume::Volume(FileSystem* fileSystem, dev_t id)
 	: Referencable(true),
 	  fFileSystem(fileSystem),
 	  fID(id),
@@ -98,7 +98,7 @@ Volume::GetFileSystem() const
 }
 
 // GetID
-mount_id
+dev_t
 Volume::GetID() const
 {
 	return fID;
@@ -112,7 +112,7 @@ Volume::GetUserlandVolume() const
 }
 
 // GetRootID
-vnode_id
+ino_t
 Volume::GetRootID() const
 {
 	return fRootID;
@@ -130,7 +130,7 @@ Volume::IsMounting() const
 
 // GetVNode
 status_t
-Volume::GetVNode(vnode_id vnid, fs_vnode* node)
+Volume::GetVNode(ino_t vnid, fs_vnode* node)
 {
 PRINT(("get_vnode(%ld, %lld)\n", fID, vnid));
 	if (IsMounting() && !fMountVNodes->ContainsKey(vnid)) {
@@ -145,7 +145,7 @@ PRINT(("get_vnode(%ld, %lld)\n", fID, vnid));
 
 // PutVNode
 status_t
-Volume::PutVNode(vnode_id vnid)
+Volume::PutVNode(ino_t vnid)
 {
 PRINT(("put_vnode(%ld, %lld)\n", fID, vnid));
 	status_t error = put_vnode(fID, vnid);
@@ -156,7 +156,7 @@ PRINT(("put_vnode(%ld, %lld)\n", fID, vnid));
 
 // NewVNode
 status_t
-Volume::NewVNode(vnode_id vnid, fs_vnode node)
+Volume::NewVNode(ino_t vnid, fs_vnode node)
 {
 PRINT(("new_vnode(%ld, %lld)\n", fID, vnid));
 	status_t error = new_vnode(fID, vnid, node);
@@ -179,7 +179,7 @@ PRINT(("new_vnode(%ld, %lld)\n", fID, vnid));
 
 // PublishVNode
 status_t
-Volume::PublishVNode(vnode_id vnid, fs_vnode node)
+Volume::PublishVNode(ino_t vnid, fs_vnode node)
 {
 PRINT(("publish_vnode(%ld, %lld, %p)\n", fID, vnid, node));
 	status_t error = publish_vnode(fID, vnid, node);
@@ -200,7 +200,7 @@ PRINT(("publish_vnode(%ld, %lld, %p)\n", fID, vnid, node));
 
 // RemoveVNode
 status_t
-Volume::RemoveVNode(vnode_id vnid)
+Volume::RemoveVNode(ino_t vnid)
 {
 PRINT(("remove_vnode(%ld, %lld)\n", fID, vnid));
 	return remove_vnode(fID, vnid);
@@ -208,7 +208,7 @@ PRINT(("remove_vnode(%ld, %lld)\n", fID, vnid));
 
 // UnremoveVNode
 status_t
-Volume::UnremoveVNode(vnode_id vnid)
+Volume::UnremoveVNode(ino_t vnid)
 {
 PRINT(("unremove_vnode(%ld, %lld)\n", fID, vnid));
 	return unremove_vnode(fID, vnid);
@@ -216,7 +216,7 @@ PRINT(("unremove_vnode(%ld, %lld)\n", fID, vnid));
 
 // GetVNodeRemoved
 status_t
-Volume::GetVNodeRemoved(vnode_id vnid, bool* removed)
+Volume::GetVNodeRemoved(ino_t vnid, bool* removed)
 {
 PRINT(("get_vnode_removed(%ld, %lld, %p)\n", fID, vnid, removed));
 	return get_vnode_removed(fID, vnid, removed);
@@ -230,7 +230,7 @@ PRINT(("get_vnode_removed(%ld, %lld, %p)\n", fID, vnid, removed));
 status_t
 Volume::Mount(const char* device, uint32 flags, const char* parameters)
 {
-	// Create a map that holds vnode_id->void* mappings of all vnodes
+	// Create a map that holds ino_t->void* mappings of all vnodes
 	// created while mounting. We need it to get the root node.
 	MountVNodeMap vnodeMap;
 	status_t error = vnodeMap.InitCheck();
@@ -384,7 +384,7 @@ Volume::WriteFSInfo(const struct fs_info *info, uint32 mask)
 
 // Lookup
 status_t
-Volume::Lookup(fs_vnode dir, const char* entryName, vnode_id* vnid, int* type)
+Volume::Lookup(fs_vnode dir, const char* entryName, ino_t* vnid, int* type)
 {
 	// When the connection to the userland server is lost, we serve
 	// lookup(fRootNode, `.') requests manually to allow clean unmounting.
@@ -455,7 +455,7 @@ Volume::GetVNodeName(fs_vnode node, char* buffer, size_t bufferSize)
 
 // ReadVNode
 status_t
-Volume::ReadVNode(vnode_id vnid, bool reenter, fs_vnode* node)
+Volume::ReadVNode(ino_t vnid, bool reenter, fs_vnode* node)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
@@ -1210,7 +1210,7 @@ Volume::WriteStat(fs_vnode node, const struct stat* st, uint32 mask)
 // Create
 status_t
 Volume::Create(fs_vnode dir, const char* name, int openMode, int mode,
-	void** cookie, vnode_id* vnid)
+	void** cookie, ino_t* vnid)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_CREATE))
@@ -1439,7 +1439,7 @@ Volume::Write(fs_vnode node, fs_cookie cookie, off_t pos, const void* buffer,
 
 // CreateDir
 status_t
-Volume::CreateDir(fs_vnode dir, const char* name, int mode, vnode_id *newDir)
+Volume::CreateDir(fs_vnode dir, const char* name, int mode, ino_t *newDir)
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_CREATE_DIR))
@@ -2894,7 +2894,7 @@ Volume::_ReadFSInfo(fs_info* info)
 
 // _Lookup
 status_t
-Volume::_Lookup(fs_vnode dir, const char* entryName, vnode_id* vnid, int* type)
+Volume::_Lookup(fs_vnode dir, const char* entryName, ino_t* vnid, int* type)
 {
 	// get a free port
 	RequestPort* port = fFileSystem->GetPortPool()->AcquirePort();
@@ -3501,7 +3501,7 @@ Volume::_SendReceiptAck(RequestPort* port)
 
 // _IncrementVNodeCount
 void
-Volume::_IncrementVNodeCount(vnode_id vnid)
+Volume::_IncrementVNodeCount(ino_t vnid)
 {
 	if (!fVNodeCountingEnabled)
 		return;
@@ -3534,7 +3534,7 @@ Volume::_IncrementVNodeCount(vnode_id vnid)
 
 // _DecrementVNodeCount
 void
-Volume::_DecrementVNodeCount(vnode_id vnid)
+Volume::_DecrementVNodeCount(ino_t vnid)
 {
 	if (!fVNodeCountingEnabled)
 		return;

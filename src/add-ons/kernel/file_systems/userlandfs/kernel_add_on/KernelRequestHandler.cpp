@@ -458,7 +458,7 @@ KernelRequestHandler::_HandleRequest(GetVNodeRemovedRequest* request)
 
 // _GetVolume
 status_t
-KernelRequestHandler::_GetVolume(mount_id id, Volume** volume)
+KernelRequestHandler::_GetVolume(dev_t id, Volume** volume)
 {
 	if (fVolume) {
 		if (fVolume->GetID() != id) {

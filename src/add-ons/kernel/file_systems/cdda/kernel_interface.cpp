@@ -76,24 +76,24 @@ enum attr_mode {
 
 class Volume {
 	public:
-		Volume(mount_id id);
+		Volume(dev_t id);
 		~Volume();
 
 		status_t	InitCheck();
-		mount_id	ID() const { return fID; }
+		dev_t		ID() const { return fID; }
 		uint32		DiscID() const { return fDiscID; }
 		Inode		&RootNode() const { return *fRootNode; }
 
 		status_t	Mount(const char* device);
 		int			Device() const { return fDevice; }
-		vnode_id	GetNextNodeID() { return fNextID++; }
+		ino_t		GetNextNodeID() { return fNextID++; }
 
 		const char	*Name() const { return fName; }
 		status_t	SetName(const char *name);
 
 		Semaphore	&Lock();
 
-		Inode		*Find(vnode_id id);
+		Inode		*Find(ino_t id);
 		Inode		*Find(const char *name);
 
 		Inode		*FirstEntry() const { return fFirstEntry; }
@@ -116,10 +116,10 @@ class Volume {
 
 		Semaphore	fLock;
 		int			fDevice;
-		mount_id	fID;
+		dev_t		fID;
 		uint32		fDiscID;
 		Inode 		*fRootNode;
-		vnode_id	fNextID;
+		ino_t		fNextID;
 		char		*fName;
 		off_t		fNumBlocks;
 
@@ -160,7 +160,7 @@ class Inode {
 		~Inode();
 
 		status_t	InitCheck();
-		vnode_id	ID() const { return fID; }
+		ino_t		ID() const { return fID; }
 
 		const char	*Name() const { return fName; }
 		status_t	SetName(const char* name);
@@ -206,7 +206,7 @@ class Inode {
 
 	private:
 		Inode		*fNext;
-		vnode_id	fID;
+		ino_t		fID;
 		int32		fType;
 		char		*fName;
 		gid_t		fGroupID;
@@ -447,7 +447,7 @@ fill_stat_buffer(Volume *volume, Inode *inode, Attribute *attribute,
 //	#pragma mark - Volume class
 
 
-Volume::Volume(mount_id id)
+Volume::Volume(dev_t id)
 	:
 	fLock("cdda"),
 	fDevice(-1),
@@ -655,7 +655,7 @@ Volume::_CreateNode(Inode *parent, const char *name, off_t start, off_t frames,
 
 
 Inode *
-Volume::Find(vnode_id id)
+Volume::Find(ino_t id)
 {
 	for (Inode *inode = fFirstEntry; inode != NULL; inode = inode->Next()) {
 		if (inode->ID() == id)
@@ -1268,8 +1268,8 @@ cdda_free_identify_partition_cookie(partition_data *partition, void *_cookie)
 
 
 static status_t
-cdda_mount(mount_id id, const char *device, uint32 flags, const char *args,
-	fs_volume *_volume, vnode_id *_rootVnodeID)
+cdda_mount(dev_t id, const char *device, uint32 flags, const char *args,
+	fs_volume *_volume, ino_t *_rootVnodeID)
 {
 	TRACE(("cdda_mount: entry\n"));
 
@@ -1355,7 +1355,7 @@ cdda_sync(fs_volume fs)
 
 
 static status_t
-cdda_lookup(fs_volume _volume, fs_vnode _dir, const char *name, vnode_id *_id, int *_type)
+cdda_lookup(fs_volume _volume, fs_vnode _dir, const char *name, ino_t *_id, int *_type)
 {
 	Volume *volume = (Volume *)_volume;
 	status_t status;
@@ -1398,7 +1398,7 @@ cdda_get_vnode_name(fs_volume _volume, fs_vnode _node, char *buffer, size_t buff
 
 
 static status_t
-cdda_get_vnode(fs_volume _volume, vnode_id id, fs_vnode *_inode, bool reenter)
+cdda_get_vnode(fs_volume _volume, ino_t id, fs_vnode *_inode, bool reenter)
 {
 	Volume *volume = (Volume *)_volume;
 	Inode *inode;

@@ -94,17 +94,17 @@ typedef DoublyLinkedList<ReadRequest> RequestList;
 
 class Volume {
 	public:
-		Volume(mount_id id);
+		Volume(dev_t id);
 		~Volume();
 
 		status_t		InitCheck();
-		mount_id		ID() const { return fID; }
+		dev_t			ID() const { return fID; }
 		Inode			&RootNode() const { return *fRootNode; }
 
 		void			Lock();
 		void			Unlock();
 
-		Inode			*Lookup(vnode_id id);
+		Inode			*Lookup(ino_t id);
 		Inode			*Lookup(const char *name);
 		Inode			*CreateNode(Inode *parent, const char *name,
 							int32 type);
@@ -112,7 +112,7 @@ class Volume {
 		status_t		RemoveNode(Inode *directory, const char *name);
 		status_t		RemoveNode(Inode *inode);
 
-		vnode_id		GetNextNodeID() { return fNextNodeID++; }
+		ino_t			GetNextNodeID() { return fNextNodeID++; }
 
 		Inode			*FirstEntry() const { return fFirstEntry; }
 
@@ -127,9 +127,9 @@ class Volume {
 		status_t		_InsertNode(Inode *inode);
 
 		mutex			fLock;
-		mount_id		fID;
+		dev_t			fID;
 		Inode 			*fRootNode;
-		vnode_id		fNextNodeID;
+		ino_t			fNextNodeID;
 		hash_table		*fNodeHash;
 		hash_table		*fNameHash;
 
@@ -145,7 +145,7 @@ class Inode {
 		~Inode();
 
 		status_t	InitCheck();
-		vnode_id	ID() const { return fID; }
+		ino_t		ID() const { return fID; }
 		const char	*Name() const { return fName; }
 
 		int32		Type() const { return fType; }
@@ -200,7 +200,7 @@ class Inode {
 		Inode		*fNext;
 		Inode		*fHashNext;
 		Inode		*fNameHashNext;
-		vnode_id	fID;
+		ino_t		fID;
 		int32		fType;
 		const char	*fName;
 		gid_t		fGroupID;
@@ -302,7 +302,7 @@ RingBuffer::Writable() const
 //	#pragma mark -
 
 
-Volume::Volume(mount_id id)
+Volume::Volume(dev_t id)
 	:
 	fID(id),
 	fRootNode(NULL),
@@ -464,7 +464,7 @@ Volume::_UpdateDirCookies(Inode *inode)
 
 
 Inode *
-Volume::Lookup(vnode_id id)
+Volume::Lookup(ino_t id)
 {
 	return (Inode *)hash_lookup(fNodeHash, &id);
 }
@@ -847,7 +847,7 @@ uint32
 Inode::hash_func(void *_node, const void *_key, uint32 range)
 {
 	Inode *inode = (Inode *)_node;
-	const vnode_id *key = (const vnode_id *)_key;
+	const ino_t *key = (const ino_t *)_key;
 
 	if (inode != NULL)
 		return inode->ID() % range;
@@ -860,7 +860,7 @@ int
 Inode::compare_func(void *_node, const void *_key)
 {
 	Inode *inode = (Inode *)_node;
-	const vnode_id *key = (const vnode_id *)_key;
+	const ino_t *key = (const ino_t *)_key;
 
 	if (inode->ID() == *key)
 		return 0;
@@ -1059,8 +1059,8 @@ ReadRequest::PutData(const void **_buffer, size_t *_bytesLeft)
 
 
 static status_t
-pipefs_mount(mount_id id, const char *device, uint32 flags, const char *args,
-	fs_volume *_volume, vnode_id *_rootVnodeID)
+pipefs_mount(dev_t id, const char *device, uint32 flags, const char *args,
+	fs_volume *_volume, ino_t *_rootVnodeID)
 {
 	TRACE(("pipefs_mount: entry\n"));
 
@@ -1104,7 +1104,7 @@ pipefs_sync(fs_volume fs)
 
 static status_t
 pipefs_lookup(fs_volume _volume, fs_vnode _dir, const char *name,
-	vnode_id *_id, int *_type)
+	ino_t *_id, int *_type)
 {
 	Volume *volume = (Volume *)_volume;
 	status_t status;
@@ -1153,7 +1153,7 @@ pipefs_get_vnode_name(fs_volume _volume, fs_vnode _node, char *buffer,
 
 
 static status_t
-pipefs_get_vnode(fs_volume _volume, vnode_id id, fs_vnode *_inode,
+pipefs_get_vnode(fs_volume _volume, ino_t id, fs_vnode *_inode,
 	bool reenter)
 {
 	Volume *volume = (Volume *)_volume;
@@ -1221,7 +1221,7 @@ pipefs_remove_vnode(fs_volume _volume, fs_vnode _node, bool reenter)
 
 static status_t
 pipefs_create(fs_volume _volume, fs_vnode _dir, const char *name, int openMode,
-	int mode, fs_cookie *_cookie, vnode_id *_newVnodeID)
+	int mode, fs_cookie *_cookie, ino_t *_newVnodeID)
 {
 	Volume *volume = (Volume *)_volume;
 	bool wasCreated = true;
@@ -1434,7 +1434,7 @@ pipefs_write(fs_volume _volume, fs_vnode _node, fs_cookie _cookie,
 
 static status_t
 pipefs_create_dir(fs_volume _volume, fs_vnode _dir, const char *name,
-	int perms, vnode_id *_newID)
+	int perms, ino_t *_newID)
 {
 	TRACE(("pipefs: create directory \"%s\" requested...\n", name));
 	return B_NOT_SUPPORTED;

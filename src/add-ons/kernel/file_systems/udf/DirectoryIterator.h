@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  This software is part of the Haiku distribution and is covered 
+//  by the MIT license.
 //
 //  Copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
 //---------------------------------------------------------------------
@@ -31,7 +31,7 @@ class Icb;
 class DirectoryIterator {
 public:
 
-	status_t GetNextEntry(char *name, uint32 *length, vnode_id *id);
+	status_t GetNextEntry(char *name, uint32 *length, ino_t *id);
 	void Rewind();
 	
 	Icb* Parent() { return fParent; }

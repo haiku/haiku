@@ -1,10 +1,11 @@
+/*
+ * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de
+ * This file may be used under the terms of the MIT License.
+ */
 #ifndef BFS_CONTROL_H
 #define BFS_CONTROL_H
-/* bfs_control - additional functionality exported via ioctl()
-**
-** Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the OpenBeOS License.
-*/
+
+//! additional functionality exported via ioctl()
 
 
 #include "system_dependencies.h"
@@ -29,7 +30,7 @@ struct check_control {
 	uint32		magic;
 	uint32		flags;
 	char		name[B_FILE_NAME_LENGTH];
-	vnode_id	inode;
+	ino_t		inode;
 	uint32		mode;
 	uint32		errors;
 	struct {

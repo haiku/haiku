@@ -187,7 +187,7 @@ static status_t vfs_write_pages(int fd, off_t pos, const iovec *vecs,
 static status_t vfs_get_file_map(file_cache_ref *cache, off_t offset,
 	size_t size, struct file_io_vec *vecs, size_t *_count);
 
-static HaikuKernelVolume* file_cache_get_volume(mount_id mountID);
+static HaikuKernelVolume* file_cache_get_volume(dev_t mountID);
 
 static status_t pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs,
 	size_t count, size_t *_numBytes, bool doWrite);
@@ -203,8 +203,8 @@ typedef DoublyLinkedList<vm_page,
 
 struct file_cache_ref {
 	mutex						lock;
-	mount_id					mountID;
-	vnode_id					nodeID;
+	dev_t						mountID;
+	ino_t						nodeID;
 	fs_vnode					nodeHandle;
 	int							deviceFD;
 	off_t						virtual_size;
@@ -217,7 +217,7 @@ struct file_cache_ref {
 
 struct page_hash_key {
 	page_hash_key() {}
-	page_hash_key(int fd, vnode_id id, off_t offset)
+	page_hash_key(int fd, ino_t id, off_t offset)
 		: deviceFD(fd),
 		  nodeID(id),
 		  offset(offset)
@@ -225,7 +225,7 @@ struct page_hash_key {
 	}
 
 	int				deviceFD;
-	vnode_id		nodeID;
+	ino_t			nodeID;
 	off_t			offset;
 };
 
@@ -341,7 +341,7 @@ vm_page::Hash(void *_cacheEntry, const void *_key, uint32 range)
 	const page_hash_key *key = (const page_hash_key *)_key;
 
 	int fd = (page ? page->cache->deviceFD : key->deviceFD);
-	vnode_id id = (page ? page->cache->nodeID : key->nodeID);
+	ino_t id = (page ? page->cache->nodeID : key->nodeID);
 	off_t offset = (page ? page->offset : key->offset);
 
 	uint32 value = fd;
@@ -925,7 +925,7 @@ file_cache_unregister_volume(HaikuKernelVolume* volume)
 
 
 static HaikuKernelVolume*
-file_cache_get_volume(mount_id mountID)
+file_cache_get_volume(dev_t mountID)
 {
 	MutexLocker _(sVolumeListLock);
 
@@ -1818,7 +1818,7 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size, bool doWri
 
 
 void *
-file_cache_create(mount_id mountID, vnode_id vnodeID, off_t size, int fd)
+file_cache_create(dev_t mountID, ino_t vnodeID, off_t size, int fd)
 {
 	TRACE(("file_cache_create(mountID = %ld, vnodeID = %Ld, size = %Ld, fd = %d)\n", mountID, vnodeID, size, fd));
 

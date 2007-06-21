@@ -57,7 +57,7 @@ extern status_t block_cache_set_dirty(void *_cache, off_t blockNumber,
 extern void block_cache_put(void *_cache, off_t blockNumber);
 
 /* file cache */
-extern void *file_cache_create(mount_id mountID, vnode_id vnodeID, off_t size,
+extern void *file_cache_create(dev_t mountID, ino_t vnodeID, off_t size,
 					int fd);
 extern void file_cache_delete(void *_cacheRef);
 extern status_t file_cache_set_size(void *_cacheRef, off_t size);

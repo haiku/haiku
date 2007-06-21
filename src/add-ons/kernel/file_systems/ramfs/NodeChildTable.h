@@ -21,7 +21,7 @@ public:
 		fNext = -1;
 	}
 
-	static inline uint32 HashFor(vnode_id id, const char *name)
+	static inline uint32 HashFor(ino_t id, const char *name)
 	{
 		return node_child_hash(id, name);
 	}
@@ -36,7 +36,7 @@ public:
 		return HashFor(fID, fChild->GetName());
 	}
 
-	inline bool Equals(vnode_id id, const char *name)
+	inline bool Equals(ino_t id, const char *name)
 	{
 		return (fID == id && !strcmp(fChild->GetName(), name));
 	}
@@ -53,7 +53,7 @@ public:
 		fChild = element.fChild;
 	}
 
-	vnode_id	fID;
+	ino_t		fID;
 	NodeChild	*fChild;
 };
 
@@ -67,17 +67,17 @@ public:
 	status_t InitCheck() const;
 
 	status_t AddNodeChild(ParentNode *node, NodeChild *child);
-	status_t AddNodeChild(vnode_id, NodeChild *child);
+	status_t AddNodeChild(ino_t, NodeChild *child);
 	status_t RemoveNodeChild(ParentNode *node, NodeChild *child);
-	status_t RemoveNodeChild(vnode_id id, NodeChild *child);
-	status_t RemoveNodeChild(vnode_id id, const char *name);
-	NodeChild *GetNodeChild(vnode_id id, const char *name);
+	status_t RemoveNodeChild(ino_t id, NodeChild *child);
+	status_t RemoveNodeChild(ino_t id, const char *name);
+	NodeChild *GetNodeChild(ino_t id, const char *name);
 
 protected:
 	typedef NodeChildHashElement<ParentNode, NodeChild>	Element;
 
 private:
-	Element *_FindElement(vnode_id id, const char *name) const;
+	Element *_FindElement(ino_t id, const char *name) const;
 
 protected:
 	OpenHashElementArray<Element>							fElementArray;
@@ -157,7 +157,7 @@ NodeChildTable<ParentNode, NodeChild>::AddNodeChild(ParentNode *node,
 // AddNodeChild
 template<typename ParentNode, typename NodeChild>
 status_t
-NodeChildTable<ParentNode, NodeChild>::AddNodeChild(vnode_id id,
+NodeChildTable<ParentNode, NodeChild>::AddNodeChild(ino_t id,
 													NodeChild *child)
 {
 	status_t error = (child ? B_OK : B_BAD_VALUE);
@@ -187,7 +187,7 @@ NodeChildTable<ParentNode, NodeChild>::RemoveNodeChild(ParentNode *node,
 // RemoveNodeChild
 template<typename ParentNode, typename NodeChild>
 status_t
-NodeChildTable<ParentNode, NodeChild>::RemoveNodeChild(vnode_id id,
+NodeChildTable<ParentNode, NodeChild>::RemoveNodeChild(ino_t id,
 													   NodeChild *child)
 {
 	status_t error = (child ? B_OK : B_BAD_VALUE);
@@ -199,7 +199,7 @@ NodeChildTable<ParentNode, NodeChild>::RemoveNodeChild(vnode_id id,
 // RemoveNodeChild
 template<typename ParentNode, typename NodeChild>
 status_t
-NodeChildTable<ParentNode, NodeChild>::RemoveNodeChild(vnode_id id,
+NodeChildTable<ParentNode, NodeChild>::RemoveNodeChild(ino_t id,
 													   const char *name)
 {
 	status_t error = B_OK;
@@ -213,7 +213,7 @@ NodeChildTable<ParentNode, NodeChild>::RemoveNodeChild(vnode_id id,
 // GetNodeChild
 template<typename ParentNode, typename NodeChild>
 NodeChild *
-NodeChildTable<ParentNode, NodeChild>::GetNodeChild(vnode_id id,
+NodeChildTable<ParentNode, NodeChild>::GetNodeChild(ino_t id,
 													const char *name)
 {
 	NodeChild *child = NULL;
@@ -225,7 +225,7 @@ NodeChildTable<ParentNode, NodeChild>::GetNodeChild(vnode_id id,
 // _FindElement
 template<typename ParentNode, typename NodeChild>
 typename NodeChildTable<ParentNode, NodeChild>::Element *
-NodeChildTable<ParentNode, NodeChild>::_FindElement(vnode_id id,
+NodeChildTable<ParentNode, NodeChild>::_FindElement(ino_t id,
 													const char *name) const
 {
 	Element *element = fTable.FindFirst(Element::HashFor(id, name));

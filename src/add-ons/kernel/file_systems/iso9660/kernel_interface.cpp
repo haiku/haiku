@@ -1,12 +1,15 @@
 /*
-**		Copyright 1999, Be Incorporated.   All Rights Reserved.
-**		This file may be used under the terms of the Be Sample Code License.
-**
-**		Copyright 2001, pinc Software.  All Rights Reserved.
-**
-**		iso9960/multi-session, 1.0.0
-**			2001-03-11: added multi-session support, axeld.
-*/
+ * Copyright 1999, Be Incorporated.   All Rights Reserved.
+ * This file may be used under the terms of the Be Sample Code License.
+ *
+ * Copyright 2001, pinc Software.  All Rights Reserved.
+ *
+ * iso9960/multi-session, 1.0.0
+ */
+
+
+#include "iso.h"
+#include "iso9660.h"
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -33,9 +36,6 @@
 
 #include <util/kernel_cpp.h>
 
-#include "iso.h"
-#include "iso9660.h"
-
 //#define TRACE_ISO9660 1
 #if TRACE_ISO9660
 #	define TRACE(x) dprintf x
@@ -45,51 +45,51 @@
 
 
 /*  Start of fundamental (read-only) required functions */
-static status_t		fs_mount(mount_id mountID, const char *device, uint32 flags, 
-				const char *args, void **_data, vnode_id *_rootID);
-static status_t		fs_unmount(void *ns);
+static status_t	fs_mount(dev_t mountID, const char *device, uint32 flags, 
+					const char *args, void **_data, ino_t *_rootID);
+static status_t	fs_unmount(void *ns);
 
-static status_t		fs_get_vnode_name(void *_ns, void *_node, 
-				char *buffer, size_t bufferSize);
-static status_t		fs_walk(void *_ns, void *_base, const char *file, 
-				vnode_id *_vnodeID, int *_type);
+static status_t	fs_get_vnode_name(void *_ns, void *_node, 
+					char *buffer, size_t bufferSize);
+static status_t	fs_walk(void *_ns, void *_base, const char *file, 
+					ino_t *_vnodeID, int *_type);
 
-static status_t		fs_read_vnode(void *_ns, vnode_id vnid, void **node, bool reenter);
-static status_t		fs_release_vnode(void *_ns, void *_node, bool reenter);
-static status_t		fs_get_file_map(fs_volume _fs, fs_vnode _node, off_t offset, size_t size,
-				struct file_io_vec *vecs, size_t *_count);
-static status_t		fs_read_stat(void *_ns, void *_node, struct stat *st);
-static status_t		fs_open(void *_ns, void *_node, int omode, void **cookie);
-static status_t		fs_read(void *_ns, void *_node, void *cookie, off_t pos,
-				void *buf, size_t *len);
+static status_t	fs_read_vnode(void *_ns, ino_t vnid, void **node, bool reenter);
+static status_t	fs_release_vnode(void *_ns, void *_node, bool reenter);
+static status_t	fs_get_file_map(fs_volume _fs, fs_vnode _node, off_t offset, size_t size,
+					struct file_io_vec *vecs, size_t *_count);
+static status_t	fs_read_stat(void *_ns, void *_node, struct stat *st);
+static status_t	fs_open(void *_ns, void *_node, int omode, void **cookie);
+static status_t	fs_read(void *_ns, void *_node, void *cookie, off_t pos,
+					void *buf, size_t *len);
 /// fs_free_cookie - free cookie for file created in open.
-static status_t		fs_free_cookie(void *ns, void *node, void *cookie);
-static status_t		fs_close(void *ns, void *node, void *cookie);
+static status_t	fs_free_cookie(void *ns, void *node, void *cookie);
+static status_t	fs_close(void *ns, void *node, void *cookie);
 
 // fs_access - checks permissions for access.
-static status_t		fs_access(void *_ns, void *_node, int mode);
+static status_t	fs_access(void *_ns, void *_node, int mode);
 
 // fs_opendir - creates fs-specific "cookie" struct that can tell where
 //					we are at in the directory list.
-static status_t		fs_open_dir(void* _ns, void* _node, void** cookie);
+static status_t	fs_open_dir(void* _ns, void* _node, void** cookie);
 // fs_readdir - read 1 or more dirents, keep state in cookie, return
 //					0 when no more entries.
-static status_t		fs_read_dir(void *_ns, void *_node, void *cookie, struct dirent *buf,
-				size_t bufsize, uint32 *_num);
+static status_t	fs_read_dir(void *_ns, void *_node, void *cookie, struct dirent *buf,
+					size_t bufsize, uint32 *_num);
 // fs_rewinddir - set cookie to represent beginning of directory, so
 //					later fs_readdir calls start at beginning.
-static status_t		fs_rewind_dir(void *_ns, void *_node, void *cookie);
+static status_t	fs_rewind_dir(void *_ns, void *_node, void *cookie);
 // fs_closedir - Do whatever you need to to close a directory (sometimes
 //					nothing), but DON'T free the cookie!
-static status_t		fs_close_dir(void *_ns, void *_node, void *cookie);
+static status_t	fs_close_dir(void *_ns, void *_node, void *cookie);
 // fs_free_dircookie - Free the fs-specific cookie struct
-static status_t		fs_free_dir_cookie(void *_ns, void *_node, void *cookie);
+static status_t	fs_free_dir_cookie(void *_ns, void *_node, void *cookie);
 
 // fs_rfsstat - Fill in fs_info struct for device.
-static status_t		fs_read_fs_stat(void *_ns, struct fs_info *);
+static status_t	fs_read_fs_stat(void *_ns, struct fs_info *);
 
 // fs_readlink - Read in the name of a symbolic link.
-static status_t 	fs_read_link(void *_ns, void *_node, char *buf, size_t *bufsize);
+static status_t fs_read_link(void *_ns, void *_node, char *buf, size_t *bufsize);
 
 
 //	#pragma mark - Scanning
@@ -142,8 +142,8 @@ fs_free_identify_partition_cookie(partition_data *partition, void *_cookie)
 
 
 static status_t
-fs_mount(mount_id mountID, const char *device, uint32 flags,
-	const char *args, void **_data, vnode_id *_rootID)
+fs_mount(dev_t mountID, const char *device, uint32 flags,
+	const char *args, void **_data, ino_t *_rootID)
 {
 	/*
 	Kernel passes in nspace_id, (representing a disk or partition?)
@@ -191,7 +191,7 @@ fs_mount(mount_id mountID, const char *device, uint32 flags,
 
 	// If it is ISO …
 	if (result == B_NO_ERROR) {
-		//vnode_id rootID = vol->rootDirRec.startLBN[FS_DATA_FORMAT];
+		//ino_t rootID = vol->rootDirRec.startLBN[FS_DATA_FORMAT];
 		//*vnid = rootID;
 		*_rootID = ISO_ROOTNODE_ID;
 		*_data = (void*)vol;
@@ -299,7 +299,7 @@ fs_get_vnode_name(void *ns, void *_node, char *buffer, size_t bufferSize)
 	it for the kernel.
 */
 static status_t
-fs_walk(void *_ns, void *base, const char *file, vnode_id *_vnodeID, int *_type)
+fs_walk(void *_ns, void *base, const char *file, ino_t *_vnodeID, int *_type)
 {
 	/* Starting at the base, find file in the subdir, and return path
 		string and vnode id of file. */
@@ -420,7 +420,7 @@ fs_walk(void *_ns, void *base, const char *file, vnode_id *_vnodeID, int *_type)
 
 
 static status_t
-fs_read_vnode(void *_ns, vnode_id vnid, void **node, bool reenter)
+fs_read_vnode(void *_ns, ino_t vnid, void **node, bool reenter)
 {
 	uint32 block, pos;
 	nspace *ns = (nspace*)_ns;

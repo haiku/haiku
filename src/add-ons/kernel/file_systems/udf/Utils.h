@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  This software is part of the Haiku distribution and is covered 
+//  by the MIT license.
 //
 //  Copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
 //---------------------------------------------------------------------
@@ -27,9 +27,9 @@ extern "C" {
 
 namespace Udf {
 
-long_address to_long_address(vnode_id id, uint32 length = 0);
+long_address to_long_address(ino_t id, uint32 length = 0);
 
-vnode_id to_vnode_id(long_address address);
+ino_t to_vnode_id(long_address address);
 
 time_t make_time(timestamp &timestamp);
 

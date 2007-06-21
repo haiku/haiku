@@ -17,7 +17,7 @@ public:
 								FileSystem();
 	virtual						~FileSystem();
 
-	virtual	status_t			CreateVolume(Volume** volume, mount_id id) = 0;
+	virtual	status_t			CreateVolume(Volume** volume, dev_t id) = 0;
 	virtual	status_t			DeleteVolume(Volume* volume) = 0;
 
 			void				GetCapabilities(

@@ -1,6 +1,5 @@
-/* Volume - BFS super block, mounting, etc.
- *
- * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef VOLUME_H
@@ -27,7 +26,7 @@ enum volume_initialize_flags {
 
 class Volume {
 	public:
-		Volume(mount_id id);
+		Volume(dev_t id);
 		~Volume();
 
 		status_t			Mount(const char *device, uint32 flags);
@@ -49,7 +48,7 @@ class Volume {
 		vint32				&LogEnd() { return fLogEnd; }
 		int					Device() const { return fDevice; }
 
-		mount_id			ID() const { return fID; }
+		dev_t				ID() const { return fID; }
 		const char			*Name() const { return fSuperBlock.name; }
 
 		off_t				NumBlocks() const { return fSuperBlock.NumBlocks(); }
@@ -70,7 +69,7 @@ class Volume {
 
 		off_t				ToVnode(block_run run) const { return ToBlock(run); }
 		off_t				ToVnode(off_t block) const { return block; }
-		off_t				VnodeToBlock(vnode_id id) const { return (off_t)id; }
+		off_t				VnodeToBlock(ino_t id) const { return (off_t)id; }
 
 		status_t			CreateIndicesRoot(Transaction &transaction);
 
@@ -106,7 +105,7 @@ class Volume {
 		static status_t		Identify(int fd, disk_super_block *superBlock);
 
 	protected:
-		mount_id			fID;
+		dev_t				fID;
 		int					fDevice;
 		disk_super_block	fSuperBlock;
 

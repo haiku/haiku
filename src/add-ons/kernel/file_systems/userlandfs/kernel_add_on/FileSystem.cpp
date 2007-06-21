@@ -179,7 +179,7 @@ FileSystem::GetPortPool()
 
 // Mount
 status_t
-FileSystem::Mount(mount_id id, const char* device, uint32 flags,
+FileSystem::Mount(dev_t id, const char* device, uint32 flags,
 	const char* parameters, Volume** _volume)
 {
 	// check initialization and parameters
@@ -257,7 +257,7 @@ FileSystem::VolumeUnmounted(Volume* volume)
 
 // GetVolume
 Volume*
-FileSystem::GetVolume(mount_id id)
+FileSystem::GetVolume(dev_t id)
 {
 	AutoLocker<Locker> _(fVolumeLock);
 	for (Vector<Volume*>::Iterator it = fVolumes.Begin();

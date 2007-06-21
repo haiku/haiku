@@ -39,8 +39,8 @@ free_path(char *p)
 
 // notify_listener
 int
-notify_listener(int op, nspace_id nsid, vnode_id vnida,	vnode_id vnidb,
-	vnode_id vnidc, const char *name)
+notify_listener(int op, nspace_id nsid, ino_t vnida, ino_t vnidb,
+	ino_t vnidc, const char *name)
 {
 	switch (op) {
 		case B_ENTRY_CREATED:
@@ -88,8 +88,8 @@ notify_select_event(selectsync *sync, uint32 ref)
 // send_notification
 int
 send_notification(port_id port, long token, ulong what, long op,
-	nspace_id nsida, nspace_id /*nsidb*/, vnode_id vnida, vnode_id vnidb,
-	vnode_id vnidc, const char *name)
+	nspace_id nsida, nspace_id /*nsidb*/, ino_t vnida, ino_t vnidb,
+	ino_t vnidc, const char *name)
 {
 	if (what != B_QUERY_UPDATE)
 		return B_BAD_VALUE;
@@ -127,21 +127,21 @@ send_notification(port_id port, long token, ulong what, long op,
 
 // get_vnode
 int
-get_vnode(nspace_id nsid, vnode_id vnid, void **data)
+get_vnode(nspace_id nsid, ino_t vnid, void **data)
 {
 	return UserlandFS::KernelEmu::get_vnode(nsid, vnid, data);
 }
 
 // put_vnode
 int
-put_vnode(nspace_id nsid, vnode_id vnid)
+put_vnode(nspace_id nsid, ino_t vnid)
 {
 	return UserlandFS::KernelEmu::put_vnode(nsid, vnid);
 }
 
 // new_vnode
 int
-new_vnode(nspace_id nsid, vnode_id vnid, void *data)
+new_vnode(nspace_id nsid, ino_t vnid, void *data)
 {
 	// The semantics of new_vnode() has changed. The new publish_vnode()
 	// should work like the former new_vnode().
@@ -150,21 +150,21 @@ new_vnode(nspace_id nsid, vnode_id vnid, void *data)
 
 // remove_vnode
 int
-remove_vnode(nspace_id nsid, vnode_id vnid)
+remove_vnode(nspace_id nsid, ino_t vnid)
 {
 	return UserlandFS::KernelEmu::remove_vnode(nsid, vnid);
 }
 
 // unremove_vnode
 int
-unremove_vnode(nspace_id nsid, vnode_id vnid)
+unremove_vnode(nspace_id nsid, ino_t vnid)
 {
 	return UserlandFS::KernelEmu::unremove_vnode(nsid, vnid);
 }
 
 // is_vnode_removed
 int
-is_vnode_removed(nspace_id nsid, vnode_id vnid)
+is_vnode_removed(nspace_id nsid, ino_t vnid)
 {
 	bool removed;
 	status_t error = UserlandFS::KernelEmu::get_vnode_removed(nsid, vnid,

@@ -234,7 +234,7 @@ UserlandRequestHandler::_HandleRequest(MountVolumeRequest* request)
 		result = fFileSystem->CreateVolume(&volume, request->nsid);
 
 	// mount it
-	vnode_id rootID;
+	ino_t rootID;
 	if (result == B_OK) {
 		RequestThreadContext context(volume);
 		result = volume->Mount(device, request->flags,
@@ -377,7 +377,7 @@ UserlandRequestHandler::_HandleRequest(LookupRequest* request)
 	if (!volume)
 		result = B_BAD_VALUE;
 
-	vnode_id vnid = 0;
+	ino_t vnid = 0;
 	int type = 0;
 	if (result == B_OK) {
 		RequestThreadContext context(volume);
@@ -959,7 +959,7 @@ UserlandRequestHandler::_HandleRequest(CreateRequest* request)
 	if (!volume)
 		result = B_BAD_VALUE;
 
-	vnode_id vnid;
+	ino_t vnid;
 	fs_cookie fileCookie;
 	if (result == B_OK) {
 		RequestThreadContext context(volume);
@@ -1159,7 +1159,7 @@ UserlandRequestHandler::_HandleRequest(CreateDirRequest* request)
 	if (!volume)
 		result = B_BAD_VALUE;
 
-	vnode_id newDir = 0;
+	ino_t newDir = 0;
 	if (result == B_OK) {
 		RequestThreadContext context(volume);
 		result = volume->CreateDir(request->node,

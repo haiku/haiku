@@ -15,7 +15,7 @@ public:
 		fNext = -1;
 	}
 
-	static inline uint32 HashForID(vnode_id id)
+	static inline uint32 HashForID(ino_t id)
 	{
 		return uint32(id & 0xffffffff);
 	}
@@ -53,14 +53,14 @@ public:
 
 	status_t AddNode(Node *node);
 	status_t RemoveNode(Node *node);
-	status_t RemoveNode(vnode_id id);
-	Node *GetNode(vnode_id id);
+	status_t RemoveNode(ino_t id);
+	Node *GetNode(ino_t id);
 
 	// debugging
 	void GetAllocationInfo(AllocationInfo &info);
 
 private:
-	NodeHashElement *_FindElement(vnode_id id) const;
+	NodeHashElement *_FindElement(ino_t id) const;
 
 private:
 	OpenHashElementArray<NodeHashElement>	fElementArray;

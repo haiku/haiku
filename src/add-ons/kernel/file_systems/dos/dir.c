@@ -39,7 +39,7 @@ typedef struct dircookie {
 
 static CHECK_MAGIC(dircookie,struct dircookie, DIRCOOKIE_MAGIC)
 static status_t	findfile(nspace *vol, vnode *dir, const char *file,
-				vnode_id *vnid, vnode **node, bool check_case,
+				ino_t *vnid, vnode **node, bool check_case,
 				bool check_dups, bool *dups_exist);
 
 // private structure for returning data from _next_dirent_()
@@ -205,7 +205,7 @@ _next_dirent_(struct diri *iter, struct _dirent_info_ *oinfo, char *filename,
 
 
 static status_t
-get_next_dirent(nspace *vol, vnode *dir, struct diri *iter, vnode_id *vnid,
+get_next_dirent(nspace *vol, vnode *dir, struct diri *iter, ino_t *vnid,
 	char *filename, int len)
 {
 	struct _dirent_info_ info;
@@ -229,7 +229,7 @@ get_next_dirent(nspace *vol, vnode *dir, struct diri *iter, vnode_id *vnid,
 		if (vnid) *vnid = dir->dir_vnid;
 	} else {
 		if (vnid) {
-			vnode_id loc = (IS_DATA_CLUSTER(info.cluster))
+			ino_t loc = (IS_DATA_CLUSTER(info.cluster))
 				? GENERATE_DIR_CLUSTER_VNID(dir->vnid, info.cluster)
 				: GENERATE_DIR_INDEX_VNID(dir->vnid, info.sindex);
 			bool added_to_vcache = false;
@@ -320,7 +320,7 @@ check_dir_empty(nspace *vol, vnode *dir)
 
 
 status_t
-findfile_case(nspace *vol, vnode *dir, const char *file, vnode_id *vnid,
+findfile_case(nspace *vol, vnode *dir, const char *file, ino_t *vnid,
 	vnode **node)
 {
 	return findfile(vol, dir, file, vnid, node, true, false, NULL);
@@ -328,7 +328,7 @@ findfile_case(nspace *vol, vnode *dir, const char *file, vnode_id *vnid,
 
 
 status_t
-findfile_nocase(nspace *vol, vnode *dir, const char *file, vnode_id *vnid,
+findfile_nocase(nspace *vol, vnode *dir, const char *file, ino_t *vnid,
 	vnode **node)
 {
 	return findfile(vol, dir, file, vnid, node, false, false, NULL);
@@ -337,7 +337,7 @@ findfile_nocase(nspace *vol, vnode *dir, const char *file, vnode_id *vnid,
 
 status_t
 findfile_nocase_duplicates(nspace *vol, vnode *dir, const char *file,
-	vnode_id *vnid, vnode **node, bool *dups_exist)
+	ino_t *vnid, vnode **node, bool *dups_exist)
 {
 	return findfile(vol, dir, file, vnid, node, false, true, dups_exist);
 }
@@ -345,14 +345,14 @@ findfile_nocase_duplicates(nspace *vol, vnode *dir, const char *file,
 
 status_t
 findfile_case_duplicates(nspace *vol, vnode *dir, const char *file,
-	vnode_id *vnid, vnode **node, bool *dups_exist)
+	ino_t *vnid, vnode **node, bool *dups_exist)
 {
 	return findfile(vol, dir, file, vnid, node, true, true, dups_exist);
 }
 
 
 static status_t
-findfile(nspace *vol, vnode *dir, const char *file, vnode_id *vnid,
+findfile(nspace *vol, vnode *dir, const char *file, ino_t *vnid,
 	vnode **node, bool check_case, bool check_dups, bool *dups_exist)
 {
 	/* Starting at the base, find the file in the subdir
@@ -366,7 +366,7 @@ findfile(nspace *vol, vnode *dir, const char *file, vnode_id *vnid,
 	   any other case-insensitive matches. If there are, the
 	   dups_exist flag is set to true. */
 	int		result = 0;
-	vnode_id	found_vnid = 0;
+	ino_t	found_vnid = 0;
 	bool found_file = false;
 
 //	dprintf("findfile: %s in %Lx, case %d dups %d\n", file, dir->vnid, check_case, check_dups);
@@ -400,7 +400,7 @@ findfile(nspace *vol, vnode *dir, const char *file, vnode_id *vnid,
 
 		while (1) {
 			char filename[512];
-			vnode_id _vnid;
+			ino_t _vnid;
 
 			result = get_next_dirent(vol, dir, &diri, &_vnid, filename, 512);
 			if (result != B_NO_ERROR)
@@ -922,11 +922,11 @@ create_dir_entry(nspace *vol, vnode *dir, vnode *node, const char *name,
 
 
 status_t 
-dosfs_read_vnode(void *_vol, vnode_id vnid, void **_node, bool reenter)
+dosfs_read_vnode(void *_vol, ino_t vnid, void **_node, bool reenter)
 {
 	nspace *vol = (nspace*)_vol;
 	int result = B_NO_ERROR;
-	vnode_id loc, dir_vnid;
+	ino_t loc, dir_vnid;
 	vnode *entry;
 	struct _dirent_info_ info;
 	struct diri iter;
@@ -1027,11 +1027,11 @@ dosfs_read_vnode(void *_vol, vnode_id vnid, void **_node, bool reenter)
 		entry->st_size = count_clusters(vol,entry->cluster)
 			* vol->sectors_per_cluster * vol->bytes_per_sector;
 	}
-	if (entry->cluster)
+	if (entry->cluster) {
 		entry->end_cluster = get_nth_fat_entry(vol, info.cluster, 
-				(entry->st_size + vol->bytes_per_sector * vol->sectors_per_cluster - 1) /
-				vol->bytes_per_sector / vol->sectors_per_cluster - 1);
-	else
+			(entry->st_size + vol->bytes_per_sector * vol->sectors_per_cluster - 1) /
+			vol->bytes_per_sector / vol->sectors_per_cluster - 1);
+	} else
 		entry->end_cluster = 0;
 	entry->st_time = dos2time_t(info.time);
 #if TRACK_FILENAME
@@ -1044,17 +1044,21 @@ dosfs_read_vnode(void *_vol, vnode_id vnid, void **_node, bool reenter)
 
 	*_node = entry;
 
-bi2:diri_free(&iter);
-bi:	if (!reenter) UNLOCK_VOL(vol);
+bi2:
+	diri_free(&iter);
+bi:
+	if (!reenter)
+		UNLOCK_VOL(vol);
 
-	if (result != B_OK) DPRINTF(0, ("dosfs_read_vnode (%s)\n", strerror(result)));
+	if (result != B_OK)
+		DPRINTF(0, ("dosfs_read_vnode (%s)\n", strerror(result)));
 
 	return result;
 }
 
 
 status_t 
-dosfs_walk(void *_vol, void *_dir, const char *file, vnode_id *_vnid, int *_type)
+dosfs_walk(void *_vol, void *_dir, const char *file, ino_t *_vnid, int *_type)
 {
 	/* Starting at the base, find file in the subdir, and return path
 		string and vnode id of file. */

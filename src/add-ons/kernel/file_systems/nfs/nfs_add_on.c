@@ -747,7 +747,7 @@ status_t map_nfs_to_system_error (status_t nfsstatus)
 }
 
 extern nfs_fhandle 
-handle_from_vnid(fs_nspace *ns, vnode_id vnid)
+handle_from_vnid(fs_nspace *ns, ino_t vnid)
 {
 	fs_node *current;
 	
@@ -787,7 +787,7 @@ void insert_node (fs_nspace *ns, fs_node *node)
 	while (release_sem (ns->sem)==B_INTERRUPTED);
 }
 
-void remove_node (fs_nspace *ns, vnode_id vnid)
+void remove_node (fs_nspace *ns, ino_t vnid)
 {
 	fs_node *current;
 	fs_node *previous;
@@ -818,9 +818,9 @@ void remove_node (fs_nspace *ns, vnode_id vnid)
 
 extern int 
 #ifdef __HAIKU__
-fs_read_vnode(fs_nspace *ns, vnode_id vnid, fs_node **node, char r)
+fs_read_vnode(fs_nspace *ns, ino_t vnid, fs_node **node, char r)
 #else
-fs_read_vnode(fs_nspace *ns, vnode_id vnid, char r, fs_node **node)
+fs_read_vnode(fs_nspace *ns, ino_t vnid, char r, fs_node **node)
 #endif
 {
 	fs_node *current;
@@ -875,9 +875,9 @@ fs_get_vnode_name(fs_nspace *ns, fs_node *node, char *buffer, size_t len)
 
 extern int 
 #ifdef __HAIKU__
-fs_walk(fs_nspace *ns, fs_node *base, const char *file, vnode_id *vnid, int *type)
+fs_walk(fs_nspace *ns, fs_node *base, const char *file, ino_t *vnid, int *type)
 #else
-fs_walk(fs_nspace *ns, fs_node *base, const char *file, char **newpath, vnode_id *vnid)
+fs_walk(fs_nspace *ns, fs_node *base, const char *file, char **newpath, ino_t *vnid)
 #endif
 {
 	bool isLink;
@@ -1000,7 +1000,7 @@ fs_readdir(fs_nspace *ns, fs_node *node, nfs_cookie *cookie, long *num, struct d
 
 	do
 	{
-		vnode_id vnid;
+		ino_t vnid;
 		char *filename;
 		uint8 *replyBuf;
 		struct XDROutPacket call;
@@ -1241,9 +1241,9 @@ dprintf("nfs:gid!\n");
 
 extern int 
 #ifdef __HAIKU__
-fs_mount(nspace_id nsid, const char *devname, uint32 flags, const char *_parms, fs_nspace **data, vnode_id *vnid)
+fs_mount(nspace_id nsid, const char *devname, uint32 flags, const char *_parms, fs_nspace **data, ino_t *vnid)
 #else
-fs_mount(nspace_id nsid, const char *devname, ulong flags, const char *_parms, size_t len, fs_nspace **data, vnode_id *vnid)
+fs_mount(nspace_id nsid, const char *devname, ulong flags, const char *_parms, size_t len, fs_nspace **data, ino_t *vnid)
 #endif
 {
 #ifndef PARAMS_AS_STRING
@@ -1742,9 +1742,9 @@ fs_wfsstat(fs_nspace *ns, struct fs_info *info, long mask)
 
 extern int 
 #ifdef __HAIKU__
-fs_create(fs_nspace *ns, fs_node *dir, const char *name, int omode, int perms, fs_file_cookie **cookie, vnode_id *vnid)
+fs_create(fs_nspace *ns, fs_node *dir, const char *name, int omode, int perms, fs_file_cookie **cookie, ino_t *vnid)
 #else
-fs_create(fs_nspace *ns, fs_node *dir, const char *name, int omode, int perms, vnode_id *vnid, fs_file_cookie **cookie)
+fs_create(fs_nspace *ns, fs_node *dir, const char *name, int omode, int perms, ino_t *vnid, fs_file_cookie **cookie)
 #endif
 {
 	nfs_fhandle fhandle;

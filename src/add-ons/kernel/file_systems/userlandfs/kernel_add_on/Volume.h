@@ -27,24 +27,24 @@ class FileSystem;
 
 class Volume : public Referencable {
 public:
-								Volume(FileSystem* fileSystem, mount_id id);
+								Volume(FileSystem* fileSystem, dev_t id);
 								~Volume();
 
 			FileSystem*			GetFileSystem() const;
-			mount_id			GetID() const;
+			dev_t				GetID() const;
 
 			void*				GetUserlandVolume() const;
-			vnode_id			GetRootID() const;
+			ino_t				GetRootID() const;
 			bool				IsMounting() const;
 
 			// client methods
-			status_t			GetVNode(vnode_id vnid, fs_vnode* node);
-			status_t			PutVNode(vnode_id vnid);
-			status_t			NewVNode(vnode_id vnid, fs_vnode node);
-			status_t			PublishVNode(vnode_id vnid, fs_vnode node);
-			status_t			RemoveVNode(vnode_id vnid);
-			status_t			UnremoveVNode(vnode_id vnid);
-			status_t			GetVNodeRemoved(vnode_id vnid, bool* removed);
+			status_t			GetVNode(ino_t vnid, fs_vnode* node);
+			status_t			PutVNode(ino_t vnid);
+			status_t			NewVNode(ino_t vnid, fs_vnode node);
+			status_t			PublishVNode(ino_t vnid, fs_vnode node);
+			status_t			RemoveVNode(ino_t vnid);
+			status_t			UnremoveVNode(ino_t vnid);
+			status_t			GetVNodeRemoved(ino_t vnid, bool* removed);
 
 			// FS
 			status_t			Mount(const char* device, uint32 flags,
@@ -57,10 +57,10 @@ public:
 
 			// vnodes
 			status_t			Lookup(fs_vnode dir, const char* entryName,
-									vnode_id* vnid, int* type);
+									ino_t* vnid, int* type);
 			status_t			GetVNodeName(fs_vnode node, char* buffer,
 									size_t bufferSize);
-			status_t			ReadVNode(vnode_id vnid, bool reenter,
+			status_t			ReadVNode(ino_t vnid, bool reenter,
 									fs_vnode* node);
 			status_t			WriteVNode(fs_vnode node, bool reenter);
 			status_t			RemoveVNode(fs_vnode node, bool reenter);
@@ -96,7 +96,7 @@ public:
 			// files
 			status_t			Create(fs_vnode dir, const char* name,
 									int openMode, int mode, fs_cookie* cookie,
-									vnode_id* vnid);
+									ino_t* vnid);
 			status_t			Open(fs_vnode node, int openMode,
 									fs_cookie* cookie);
 			status_t			Close(fs_vnode node, fs_cookie cookie);
@@ -110,7 +110,7 @@ public:
 
 			// directories
 			status_t			CreateDir(fs_vnode dir, const char* name,
-									int mode, vnode_id *newDir);
+									int mode, ino_t *newDir);
 			status_t			RemoveDir(fs_vnode dir, const char* name);
 			status_t			OpenDir(fs_vnode node, fs_cookie* cookie);
 			status_t			CloseDir(fs_vnode node, fs_vnode cookie);
@@ -184,7 +184,7 @@ private:
 			status_t			_Unmount();
 			status_t			_ReadFSInfo(fs_info* info);
 			status_t			_Lookup(fs_vnode dir, const char* entryName,
-									vnode_id* vnid, int* type);
+									ino_t* vnid, int* type);
 			status_t			_WriteVNode(fs_vnode node, bool reenter);
 			status_t			_ReadStat(fs_vnode node, struct stat* st);
 			status_t			_Close(fs_vnode node, fs_cookie cookie);
@@ -207,8 +207,8 @@ private:
 									RequestHandler* handler, Request** reply);
 			status_t			_SendReceiptAck(RequestPort* port);
 
-			void				_IncrementVNodeCount(vnode_id vnid);
-			void				_DecrementVNodeCount(vnode_id vnid);
+			void				_IncrementVNodeCount(ino_t vnid);
+			void				_DecrementVNodeCount(ino_t vnid);
 
 			status_t			_InternalIOCtl(userlandfs_ioctl* buffer,
 									int32 bufferSize);
@@ -221,9 +221,9 @@ private:
 			class AutoIncrementer;
 
 			FileSystem*			fFileSystem;
-			mount_id			fID;
+			dev_t				fID;
 			void*				fUserlandVolume;
-			vnode_id			fRootID;
+			ino_t				fRootID;
 			fs_vnode			fRootNode;
 			MountVNodeMap*		fMountVNodes;
 			vint32				fOpenFiles;

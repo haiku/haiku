@@ -17,7 +17,7 @@ public:
 
 			status_t			Init();
 
-	virtual	status_t			CreateVolume(Volume** volume, mount_id id);
+	virtual	status_t			CreateVolume(Volume** volume, dev_t id);
 	virtual	status_t			DeleteVolume(Volume* volume);
 
 private:

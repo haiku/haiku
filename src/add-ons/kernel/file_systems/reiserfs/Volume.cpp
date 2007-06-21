@@ -84,7 +84,7 @@ Volume::~Volume()
 
 // Mount
 status_t
-Volume::Mount(mount_id id, const char *path)
+Volume::Mount(dev_t id, const char *path)
 {
 	Unmount();
 	status_t error = (path ? B_OK : B_BAD_VALUE);
@@ -255,20 +255,20 @@ Volume::GetKeyOffsetForName(const char *name, int len, uint64 *result)
 
 // GetVNode
 status_t
-Volume::GetVNode(vnode_id id, VNode **node)
+Volume::GetVNode(ino_t id, VNode **node)
 {
 	return get_vnode(GetID(), id, (void**)node);
 }
 
 // PutVNode
 status_t
-Volume::PutVNode(vnode_id id)
+Volume::PutVNode(ino_t id)
 {
 	return put_vnode(GetID(), id);
 }
 
 // FindVNode
-/*!	\brief Finds the node identified by a vnode_id.
+/*!	\brief Finds the node identified by a ino_t.
 
 	\note The method does not initialize the parent ID for non-directory nodes.
 
@@ -278,7 +278,7 @@ Volume::PutVNode(vnode_id id)
 	\return \c B_OK, if everything went fine.
 */
 status_t
-Volume::FindVNode(vnode_id id, VNode *node)
+Volume::FindVNode(ino_t id, VNode *node)
 {
 	return FindVNode(VNode::GetDirIDFor(id), VNode::GetObjectIDFor(id), node);
 }
@@ -460,7 +460,7 @@ PRINT(("Volume::FindEntry(`%s') done: %s\n", path, strerror(error)));
 
 // IsNegativeEntry
 bool
-Volume::IsNegativeEntry(vnode_id id)
+Volume::IsNegativeEntry(ino_t id)
 {
 	for (int32 i = fNegativeEntries.CountItems() - 1; i >= 0; i--) {
 		if (fNegativeEntries.ItemAt(i) == id)

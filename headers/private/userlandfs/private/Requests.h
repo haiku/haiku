@@ -326,7 +326,7 @@ public:
 	MountVolumeRequest() : Request(MOUNT_VOLUME_REQUEST) {}
 	status_t GetAddressInfos(AddressInfo* infos, int32* count);
 
-	mount_id	nsid;
+	dev_t		nsid;
 	Address		cwd;			// current working dir of the mount() caller
 	Address		device;
 	uint32		flags;
@@ -338,7 +338,7 @@ class MountVolumeReply : public ReplyRequest {
 public:
 	MountVolumeReply() : ReplyRequest(MOUNT_VOLUME_REPLY) {}
 
-	vnode_id	rootID;
+	ino_t		rootID;
 	fs_volume	volume;
 };
 
@@ -430,7 +430,7 @@ class LookupReply : public ReplyRequest {
 public:
 	LookupReply() : ReplyRequest(LOOKUP_REPLY) {}
 
-	vnode_id	vnid;
+	ino_t		vnid;
 	int			type;
 };
 
@@ -456,7 +456,7 @@ class ReadVNodeRequest : public VolumeRequest {
 public:
 	ReadVNodeRequest() : VolumeRequest(READ_VNODE_REQUEST) {}
 
-	vnode_id	vnid;
+	ino_t		vnid;
 	bool		reenter;
 };
 
@@ -731,7 +731,7 @@ class CreateReply : public ReplyRequest {
 public:
 	CreateReply() : ReplyRequest(CREATE_REPLY) {}
 
-	vnode_id	vnid;
+	ino_t		vnid;
 	fs_cookie	fileCookie;
 };
 
@@ -831,7 +831,7 @@ class CreateDirReply : public ReplyRequest {
 public:
 	CreateDirReply() : ReplyRequest(CREATE_DIR_REPLY) {}
 
-	vnode_id	newDir;
+	ino_t		newDir;
 };
 
 // RemoveDirRequest
@@ -1374,10 +1374,10 @@ public:
 	int32		operation;
 	uint32		details;			// for B_STAT_CHANGED:statFields
 									// and B_ATTRIBUTE_CHANGED:cause
-	mount_id	device;
-	vnode_id	oldDirectory;
-	vnode_id	directory;
-	vnode_id	node;
+	dev_t		device;
+	ino_t		oldDirectory;
+	ino_t		directory;
+	ino_t		node;
 	Address		oldName;
 	Address		name;
 };
@@ -1414,9 +1414,9 @@ public:
 	port_id		port;
 	int32		token;
 	int32		operation;			// B_ENTRY_{CREATED,REMOVED}
-	mount_id	device;
-	vnode_id	directory;
-	vnode_id	node;
+	dev_t		device;
+	ino_t		directory;
+	ino_t		node;
 	Address		name;
 };
 
@@ -1435,8 +1435,8 @@ class GetVNodeRequest : public Request {
 public:
 	GetVNodeRequest() : Request(GET_VNODE_REQUEST) {}
 
-	mount_id	nsid;
-	vnode_id	vnid;
+	dev_t		nsid;
+	ino_t		vnid;
 };
 
 // GetVNodeReply
@@ -1452,8 +1452,8 @@ class PutVNodeRequest : public Request {
 public:
 	PutVNodeRequest() : Request(PUT_VNODE_REQUEST) {}
 
-	mount_id	nsid;
-	vnode_id	vnid;
+	dev_t		nsid;
+	ino_t		vnid;
 };
 
 // PutVNodeReply
@@ -1467,8 +1467,8 @@ class NewVNodeRequest : public Request {
 public:
 	NewVNodeRequest() : Request(NEW_VNODE_REQUEST) {}
 
-	mount_id	nsid;
-	vnode_id	vnid;
+	dev_t		nsid;
+	ino_t		vnid;
 	fs_vnode	node;
 };
 
@@ -1483,8 +1483,8 @@ class PublishVNodeRequest : public Request {
 public:
 	PublishVNodeRequest() : Request(PUBLISH_VNODE_REQUEST) {}
 
-	mount_id	nsid;
-	vnode_id	vnid;
+	dev_t		nsid;
+	ino_t		vnid;
 	fs_vnode	node;
 };
 
@@ -1499,8 +1499,8 @@ class RemoveVNodeRequest : public Request {
 public:
 	RemoveVNodeRequest() : Request(REMOVE_VNODE_REQUEST) {}
 
-	mount_id	nsid;
-	vnode_id	vnid;
+	dev_t		nsid;
+	ino_t		vnid;
 };
 
 // RemoveVNodeReply
@@ -1514,8 +1514,8 @@ class UnremoveVNodeRequest : public Request {
 public:
 	UnremoveVNodeRequest() : Request(UNREMOVE_VNODE_REQUEST) {}
 
-	mount_id	nsid;
-	vnode_id	vnid;
+	dev_t		nsid;
+	ino_t		vnid;
 };
 
 // UnremoveVNodeReply
@@ -1529,8 +1529,8 @@ class GetVNodeRemovedRequest : public Request {
 public:
 	GetVNodeRemovedRequest() : Request(GET_VNODE_REMOVED_REQUEST) {}
 
-	mount_id	nsid;
-	vnode_id	vnid;
+	dev_t		nsid;
+	ino_t		vnid;
 };
 
 // GetVNodeRemovedReply

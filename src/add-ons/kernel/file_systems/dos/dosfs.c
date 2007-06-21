@@ -144,7 +144,7 @@ static int lock_removable_device(int fd, bool state)
 	return ioctl(fd, B_SCSI_PREVENT_ALLOW, &state, sizeof(state));
 }
 
-static status_t mount_fat_disk(const char *path, mount_id nsid,
+static status_t mount_fat_disk(const char *path, dev_t nsid,
 		const int flags, nspace** newVol, int fs_flags, int op_sync_mode)
 {
 	nspace		*vol = NULL;
@@ -665,8 +665,8 @@ dosfs_free_identify_partition_cookie(partition_data *partition, void *_cookie)
 
 
 static status_t
-dosfs_mount(mount_id nsid, const char *device, uint32 flags,
-		const char *args, void **_data, vnode_id *_rootID)
+dosfs_mount(dev_t nsid, const char *device, uint32 flags,
+	const char *args, void **_data, ino_t *_rootID)
 {
 	int	result;
 	nspace	*vol;

@@ -51,7 +51,7 @@ NodeTable::RemoveNode(Node *node)
 
 // RemoveNode
 status_t
-NodeTable::RemoveNode(vnode_id id)
+NodeTable::RemoveNode(ino_t id)
 {
 	status_t error = B_OK;
 	if (NodeHashElement *element = _FindElement(id))
@@ -63,7 +63,7 @@ NodeTable::RemoveNode(vnode_id id)
 
 // GetNode
 Node *
-NodeTable::GetNode(vnode_id id)
+NodeTable::GetNode(ino_t id)
 {
 	Node *node = NULL;
 	if (NodeHashElement *element = _FindElement(id))
@@ -82,7 +82,7 @@ NodeTable::GetAllocationInfo(AllocationInfo &info)
 
 // _FindElement
 NodeHashElement *
-NodeTable::_FindElement(vnode_id id) const
+NodeTable::_FindElement(ino_t id) const
 {
 	NodeHashElement *element
 		= fNodes.FindFirst(NodeHashElement::HashForID(id));

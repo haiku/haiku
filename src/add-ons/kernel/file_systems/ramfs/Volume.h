@@ -52,7 +52,7 @@ class NodeListenerTree;
 class NodeTable;
 class SizeIndex;
 
-const vnode_id kRootParentID = 0;
+const ino_t kRootParentID = 0;
 
 // NodeListenerValue
 class NodeListenerValue {
@@ -93,10 +93,10 @@ public:
 	Volume();
 	~Volume();
 
-	status_t Mount(mount_id nsid);
+	status_t Mount(dev_t nsid);
 	status_t Unmount();
 
-	mount_id GetID() const { return fID; }
+	dev_t GetID() const { return fID; }
 
 	off_t GetBlockSize() const;
 	off_t CountBlocks() const;
@@ -109,9 +109,9 @@ public:
 
 	status_t NewVNode(Node *node);
 	status_t PublishVNode(Node *node);
-	status_t GetVNode(vnode_id id, Node **node);
+	status_t GetVNode(ino_t id, Node **node);
 	status_t GetVNode(Node *node);
-	status_t PutVNode(vnode_id id);
+	status_t PutVNode(ino_t id);
 	status_t PutVNode(Node *node);
 	status_t RemoveVNode(Node *node);
 	status_t UnremoveVNode(Node *node);
@@ -119,23 +119,23 @@ public:
 	// node table and listeners
 	status_t NodeAdded(Node *node);
 	status_t NodeRemoved(Node *node);
-	status_t FindNode(vnode_id id, Node **node);
+	status_t FindNode(ino_t id, Node **node);
 	status_t AddNodeListener(NodeListener *listener, Node *node,
 							 uint32 flags);
 	status_t RemoveNodeListener(NodeListener *listener, Node *node);
 
 	// entry table and listeners
-	status_t EntryAdded(vnode_id id, Entry *entry);
-	status_t EntryRemoved(vnode_id id, Entry *entry);
-	status_t FindEntry(vnode_id id, const char *name, Entry **entry);
+	status_t EntryAdded(ino_t id, Entry *entry);
+	status_t EntryRemoved(ino_t id, Entry *entry);
+	status_t FindEntry(ino_t id, const char *name, Entry **entry);
 	status_t AddEntryListener(EntryListener *listener, Entry *entry,
 							  uint32 flags);
 	status_t RemoveEntryListener(EntryListener *listener, Entry *entry);
 
 	// node attribute table
-	status_t NodeAttributeAdded(vnode_id id, Attribute *attribute);
-	status_t NodeAttributeRemoved(vnode_id id, Attribute *attribute);
-	status_t FindNodeAttribute(vnode_id id, const char *name,
+	status_t NodeAttributeAdded(ino_t id, Attribute *attribute);
+	status_t NodeAttributeRemoved(ino_t id, Attribute *attribute);
+	status_t FindNodeAttribute(ino_t id, const char *name,
 							   Attribute **attribute);
 
 	// indices
@@ -153,7 +153,7 @@ public:
 			int32 type, const uint8 *oldKey, size_t oldLength,
 			const uint8 *newKey, size_t newLength);
 
-	vnode_id NextNodeID() { return fNextNodeID++; }
+	ino_t NextNodeID() { return fNextNodeID++; }
 
 	status_t AllocateBlock(size_t size, BlockReference **block);
 	void FreeBlock(BlockReference *block);
@@ -176,8 +176,8 @@ public:
 private:
 	typedef DLList<Query>	QueryList;
 
-	mount_id				fID;
-	vnode_id				fNextNodeID;
+	dev_t					fID;
+	ino_t					fNextNodeID;
 	NodeTable				*fNodeTable;
 	DirectoryEntryTable		*fDirectoryEntryTable;
 	NodeAttributeTable		*fNodeAttributeTable;

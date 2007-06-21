@@ -124,8 +124,8 @@ get_port_and_fs(RequestPort** port, FileSystem** fileSystem)
 // notify_listener
 status_t
 UserlandFS::KernelEmu::notify_listener(int32 operation, uint32 details,
-	mount_id device, vnode_id oldDirectory, vnode_id directory,
-	vnode_id node, const char* oldName, const char* name)
+	dev_t device, ino_t oldDirectory, ino_t directory,
+	ino_t node, const char* oldName, const char* name)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -209,8 +209,8 @@ UserlandFS::KernelEmu::notify_select_event(selectsync *sync, uint32 ref,
 // send_notification
 status_t
 UserlandFS::KernelEmu::notify_query(port_id targetPort, int32 token,
-	int32 operation, mount_id device, vnode_id directory, const char* name,
-	vnode_id node)
+	int32 operation, dev_t device, ino_t directory, const char* name,
+	ino_t node)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -256,7 +256,7 @@ UserlandFS::KernelEmu::notify_query(port_id targetPort, int32 token,
 
 // get_vnode
 status_t
-UserlandFS::KernelEmu::get_vnode(mount_id nsid, vnode_id vnid, fs_vnode* data)
+UserlandFS::KernelEmu::get_vnode(dev_t nsid, ino_t vnid, fs_vnode* data)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -292,7 +292,7 @@ UserlandFS::KernelEmu::get_vnode(mount_id nsid, vnode_id vnid, fs_vnode* data)
 
 // put_vnode
 status_t
-UserlandFS::KernelEmu::put_vnode(mount_id nsid, vnode_id vnid)
+UserlandFS::KernelEmu::put_vnode(dev_t nsid, ino_t vnid)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -327,7 +327,7 @@ UserlandFS::KernelEmu::put_vnode(mount_id nsid, vnode_id vnid)
 
 // new_vnode
 status_t
-UserlandFS::KernelEmu::new_vnode(mount_id nsid, vnode_id vnid, fs_vnode data)
+UserlandFS::KernelEmu::new_vnode(dev_t nsid, ino_t vnid, fs_vnode data)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -363,7 +363,7 @@ UserlandFS::KernelEmu::new_vnode(mount_id nsid, vnode_id vnid, fs_vnode data)
 
 // publish_vnode
 status_t
-UserlandFS::KernelEmu::publish_vnode(mount_id nsid, vnode_id vnid,
+UserlandFS::KernelEmu::publish_vnode(dev_t nsid, ino_t vnid,
 	fs_vnode data)
 {
 	// get the request port and the file system
@@ -400,7 +400,7 @@ UserlandFS::KernelEmu::publish_vnode(mount_id nsid, vnode_id vnid,
 
 // remove_vnode
 status_t
-UserlandFS::KernelEmu::remove_vnode(mount_id nsid, vnode_id vnid)
+UserlandFS::KernelEmu::remove_vnode(dev_t nsid, ino_t vnid)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -435,7 +435,7 @@ UserlandFS::KernelEmu::remove_vnode(mount_id nsid, vnode_id vnid)
 
 // unremove_vnode
 status_t
-UserlandFS::KernelEmu::unremove_vnode(mount_id nsid, vnode_id vnid)
+UserlandFS::KernelEmu::unremove_vnode(dev_t nsid, ino_t vnid)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -470,7 +470,7 @@ UserlandFS::KernelEmu::unremove_vnode(mount_id nsid, vnode_id vnid)
 
 // get_vnode_removed
 status_t
-UserlandFS::KernelEmu::get_vnode_removed(mount_id nsid, vnode_id vnid,
+UserlandFS::KernelEmu::get_vnode_removed(dev_t nsid, ino_t vnid,
 	bool* removed)
 {
 	// get the request port and the file system

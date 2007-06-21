@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  This software is part of the Haiku distribution and is covered 
+//  by the MIT license.
 //
 //  Copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
 //---------------------------------------------------------------------
@@ -136,7 +136,7 @@ Icb::GetDirectoryIterator(DirectoryIterator **iterator)
 }
 
 status_t
-Icb::Find(const char *filename, vnode_id *id)
+Icb::Find(const char *filename, ino_t *id)
 {
 	DEBUG_INIT_ETC("Icb",
 	               ("filename: `%s', id: %p", filename, id));
@@ -147,7 +147,7 @@ Icb::Find(const char *filename, vnode_id *id)
 	DirectoryIterator *i;
 	status_t error = GetDirectoryIterator(&i);
 	if (!error) {
-		vnode_id entryId;
+		ino_t entryId;
 		uint32 length = B_FILE_NAME_LENGTH;
 		char name[B_FILE_NAME_LENGTH];
 		

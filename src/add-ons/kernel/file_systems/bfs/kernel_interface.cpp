@@ -104,8 +104,8 @@ bfs_free_identify_partition_cookie(partition_data *partition, void *_cookie)
 
 
 static status_t
-bfs_mount(mount_id mountID, const char *device, uint32 flags, const char *args,
-	void **_data, vnode_id *_rootID)
+bfs_mount(dev_t mountID, const char *device, uint32 flags, const char *args,
+	void **_data, ino_t *_rootID)
 {
 	FUNCTION();
 
@@ -229,9 +229,9 @@ bfs_sync(void *_ns)
  */
 
 static status_t
-bfs_read_vnode(void *_ns, vnode_id id, void **_node, bool reenter)
+bfs_read_vnode(void *_ns, ino_t id, void **_node, bool reenter)
 {
-	//FUNCTION_START(("vnode_id = %Ld\n", id));
+	//FUNCTION_START(("ino_t = %Ld\n", id));
 	Volume *volume = (Volume *)_ns;
 
 	// first inode may be after the log area, we don't go through
@@ -444,7 +444,7 @@ bfs_get_file_map(fs_volume _fs, fs_vnode _node, off_t offset, size_t size,
 
 
 static status_t
-bfs_lookup(void *_ns, void *_directory, const char *file, vnode_id *_vnodeID, int *_type)
+bfs_lookup(void *_ns, void *_directory, const char *file, ino_t *_vnodeID, int *_type)
 {
 	//FUNCTION_START(("file = %s\n", file));
 	if (_ns == NULL || _directory == NULL || file == NULL || _vnodeID == NULL)
@@ -740,7 +740,7 @@ bfs_write_stat(void *_ns, void *_node, const struct stat *stat, uint32 mask)
 
 status_t 
 bfs_create(void *_ns, void *_directory, const char *name, int openMode, int mode,
-	void **_cookie, vnode_id *_vnodeID)
+	void **_cookie, ino_t *_vnodeID)
 {
 	FUNCTION_START(("name = \"%s\", perms = %d, openMode = %d\n", name, mode, openMode));
 
@@ -942,8 +942,8 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 	// If we meet our inode on that way, we have to bail out.
 
 	if (oldDirectory != newDirectory) {
-		vnode_id parent = volume->ToVnode(newDirectory->Parent());
-		vnode_id root = volume->RootNode()->ID();
+		ino_t parent = volume->ToVnode(newDirectory->Parent());
+		ino_t root = volume->RootNode()->ID();
 
 		while (true) {
 			if (parent == id)
@@ -1357,7 +1357,7 @@ bfs_read_link(void *_ns, void *_node, char *buffer, size_t *_bufferSize)
 
 static status_t
 bfs_create_dir(void *_ns, void *_directory, const char *name, int mode,
-	vnode_id *_newVnodeID)
+	ino_t *_newVnodeID)
 {
 	FUNCTION_START(("name = \"%s\", perms = %d\n", name, mode));
 
@@ -1466,7 +1466,7 @@ bfs_read_dir(void *_ns, void *_node, void *_cookie, struct dirent *dirent,
 		RETURN_ERROR(B_BAD_VALUE);
 
 	uint16 length;
-	vnode_id id;
+	ino_t id;
 	status_t status = iterator->GetNextEntry(dirent->d_name, &length, bufferSize, &id);
 	if (status == B_ENTRY_NOT_FOUND) {
 		*_num = 0;

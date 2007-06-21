@@ -81,7 +81,7 @@ struct devfs_stream {
 
 struct devfs_vnode {
 	struct devfs_vnode *all_next;
-	vnode_id	id;
+	ino_t		id;
 	char		*name;
 	time_t		modification_time;
 	time_t		creation_time;
@@ -95,7 +95,7 @@ struct devfs_vnode {
 #define DEVFS_HASH_SIZE 16
 
 struct devfs {
-	mount_id	id;
+	dev_t		id;
 	recursive_lock lock;
 	int32		next_vnode_id;
 	hash_table	*vnode_hash;
@@ -124,8 +124,8 @@ enum {
 struct driver_entry {
 	driver_entry	*next;
 	const char		*path;
-	mount_id		device;
-	vnode_id		node;
+	dev_t			device;
+	ino_t			node;
 	time_t			last_modified;
 	image_id		image;
 };
@@ -148,7 +148,7 @@ static uint32
 driver_entry_hash(void *_driver, const void *_key, uint32 range)
 {
 	driver_entry *driver = (driver_entry *)_driver;
-	const vnode_id *key = (const vnode_id *)_key;
+	const ino_t *key = (const ino_t *)_key;
 
 	if (driver != NULL)
 		return driver->node % range;
@@ -161,7 +161,7 @@ static int
 driver_entry_compare(void *_driver, const void *_key)
 {
 	driver_entry *driver = (driver_entry *)_driver;
-	const vnode_id *key = (const vnode_id *)_key;
+	const ino_t *key = (const ino_t *)_key;
 
 	if (driver->node == *key)
 		return 0;
@@ -349,7 +349,7 @@ static uint32
 devfs_vnode_hash(void *_vnode, const void *_key, uint32 range)
 {
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
-	const vnode_id *key = (const vnode_id *)_key;
+	const ino_t *key = (const ino_t *)_key;
 
 	if (vnode != NULL)
 		return vnode->id % range;
@@ -362,7 +362,7 @@ static int
 devfs_vnode_compare(void *_vnode, const void *_key)
 {
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
-	const vnode_id *key = (const vnode_id *)_key;
+	const ino_t *key = (const ino_t *)_key;
 
 	if (vnode->id == *key)
 		return 0;
@@ -968,8 +968,8 @@ dump_node(int argc, char **argv)
 
 
 static status_t
-devfs_mount(mount_id id, const char *devfs, uint32 flags, const char *args,
-	fs_volume *_fs, vnode_id *root_vnid)
+devfs_mount(dev_t id, const char *devfs, uint32 flags, const char *args,
+	fs_volume *_fs, ino_t *root_vnid)
 {
 	struct devfs_vnode *vnode;
 	struct devfs *fs;
@@ -1087,7 +1087,7 @@ devfs_sync(fs_volume fs)
 
 
 static status_t
-devfs_lookup(fs_volume _fs, fs_vnode _dir, const char *name, vnode_id *_id, int *_type)
+devfs_lookup(fs_volume _fs, fs_vnode _dir, const char *name, ino_t *_id, int *_type)
 {
 	struct devfs *fs = (struct devfs *)_fs;
 	struct devfs_vnode *dir = (struct devfs_vnode *)_dir;
@@ -1159,7 +1159,7 @@ devfs_get_vnode_name(fs_volume _fs, fs_vnode _vnode, char *buffer, size_t buffer
 
 
 static status_t
-devfs_get_vnode(fs_volume _fs, vnode_id id, fs_vnode *_vnode, bool reenter)
+devfs_get_vnode(fs_volume _fs, ino_t id, fs_vnode *_vnode, bool reenter)
 {
 	struct devfs *fs = (struct devfs *)_fs;
 	struct devfs_vnode *vnode;
@@ -1220,7 +1220,7 @@ devfs_remove_vnode(fs_volume _fs, fs_vnode _v, bool reenter)
 
 static status_t
 devfs_create(fs_volume _fs, fs_vnode _dir, const char *name, int openMode, int perms,
-	fs_cookie *_cookie, vnode_id *_newVnodeID)
+	fs_cookie *_cookie, ino_t *_newVnodeID)
 {
 	struct devfs_vnode *dir = (struct devfs_vnode *)_dir;
 	struct devfs *fs = (struct devfs *)_fs;
@@ -1449,7 +1449,7 @@ devfs_write(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 
 static status_t
 devfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name,
-	int perms, vnode_id *_newVnodeID)
+	int perms, ino_t *_newVnodeID)
 {
 	struct devfs *fs = (struct devfs *)_fs;
 	struct devfs_vnode *dir = (struct devfs_vnode *)_dir;

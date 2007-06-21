@@ -27,7 +27,7 @@
 
 	This class bundles all information relevant to a vnode, i.e. its ID,
 	the ID of its parent node and its stat data (for fast and convenient
-	access). VNode knows how to convert between the VFS vnode_id
+	access). VNode knows how to convert between the VFS ino_t
 	and the object+dir ID representation in ReiserFS.
 */
 
@@ -51,7 +51,7 @@ VNode::VNode(const VNode &node)
 }
 
 // constructor
-VNode::VNode(vnode_id id)
+VNode::VNode(ino_t id)
 	: fParentID(0),
 	  fDirID(GetDirIDFor(id)),
 	  fObjectID(GetObjectIDFor(id)),
@@ -75,7 +75,7 @@ VNode::~VNode()
 
 // SetTo
 status_t
-VNode::SetTo(vnode_id id)
+VNode::SetTo(ino_t id)
 {
 	return SetTo(GetDirIDFor(id), GetObjectIDFor(id));
 }
@@ -92,7 +92,7 @@ VNode::SetTo(uint32 dirID, uint32 objectID)
 }
 
 // GetID
-vnode_id
+ino_t
 VNode::GetID() const
 {
 	return GetIDFor(fDirID, fObjectID);

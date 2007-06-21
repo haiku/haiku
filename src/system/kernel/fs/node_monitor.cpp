@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -50,14 +50,14 @@ struct monitor_listener {
 
 struct node_monitor {
 	node_monitor		*next;
-	mount_id			device;
-	vnode_id			node;
+	dev_t				device;
+	ino_t				node;
 	struct list			listeners;
 };
 
 struct monitor_hash_key {
-	mount_id	device;
-	vnode_id	node;
+	dev_t	device;
+	ino_t	node;
 };
 
 struct interested_monitor_listener_list {
@@ -106,7 +106,7 @@ monitor_hash(void *_monitor, const void *_key, uint32 range)
  */
 
 static node_monitor *
-get_monitor_for(mount_id device, vnode_id node)
+get_monitor_for(dev_t device, ino_t node)
 {
 	struct monitor_hash_key key;
 	key.device = device;
@@ -171,7 +171,7 @@ remove_listener(monitor_listener *listener)
 
 
 static status_t
-add_node_monitor(io_context *context, mount_id device, vnode_id node,
+add_node_monitor(io_context *context, dev_t device, ino_t node,
 	uint32 flags, port_id port, uint32 token)
 {
 	monitor_listener *listener;
@@ -255,7 +255,7 @@ out:
 
 
 static status_t
-remove_node_monitor(struct io_context *context, mount_id device, vnode_id node,
+remove_node_monitor(struct io_context *context, dev_t device, ino_t node,
 	uint32 flags, port_id port, uint32 token)
 {
 	monitor_listener *listener;
@@ -348,7 +348,7 @@ remove_node_monitors_by_target(struct io_context *context, port_id port, uint32 
  */
 
 static void
-get_interested_monitor_listeners(mount_id device, vnode_id node,
+get_interested_monitor_listeners(dev_t device, ino_t node,
 	uint32 flags, interested_monitor_listener_list *interestedListeners,
 	int32 &interestedListenerCount)
 {
@@ -443,8 +443,8 @@ send_notification_message(KMessage &message,
  */
 
 static status_t
-notify_entry_created_or_removed(int32 opcode, mount_id device,
-	vnode_id directory, const char *name, vnode_id node)
+notify_entry_created_or_removed(int32 opcode, dev_t device,
+	ino_t directory, const char *name, ino_t node)
 {
 	if (!name)
 		return B_BAD_VALUE;
@@ -497,7 +497,7 @@ notify_entry_created_or_removed(int32 opcode, mount_id device,
 
 static status_t
 notify_query_entry_created_or_removed(int32 opcode, port_id port, int32 token,
-	mount_id device, vnode_id directory, const char *name, vnode_id node)
+	dev_t device, ino_t directory, const char *name, ino_t node)
 {
 	if (!name)
 		return B_BAD_VALUE;
@@ -554,7 +554,7 @@ node_monitor_init(void)
 
 
 status_t
-notify_unmount(mount_id device)
+notify_unmount(dev_t device)
 {
 	TRACE(("unmounted device: %ld\n", device));
 
@@ -584,7 +584,7 @@ notify_unmount(mount_id device)
 
 
 status_t
-notify_mount(mount_id device, mount_id parentDevice, vnode_id parentDirectory)
+notify_mount(dev_t device, dev_t parentDevice, ino_t parentDirectory)
 {
 	TRACE(("mounted device: %ld, parent %ld:%Ld\n", device, parentDevice,
 		parentDirectory));
@@ -684,8 +684,8 @@ stop_notifying(port_id port, uint32 token)
 
 
 status_t
-notify_listener(int op, mount_id device, vnode_id parentNode, vnode_id toParentNode,
-	vnode_id node, const char *name)
+notify_listener(int op, dev_t device, ino_t parentNode, ino_t toParentNode,
+	ino_t node, const char *name)
 {
 	TRACE(("notify_listener(op = %d, device = %ld, node = %Ld, parent = %Ld, toParent = %Ld"
 		", name = \"%s\"\n", op, device, node, parentNode, toParentNode, name));
@@ -732,8 +732,8 @@ notify_listener(int op, mount_id device, vnode_id parentNode, vnode_id toParentN
  */
 
 status_t
-notify_entry_created(mount_id device, vnode_id directory, const char *name,
-	vnode_id node)
+notify_entry_created(dev_t device, ino_t directory, const char *name,
+	ino_t node)
 {
 	return notify_entry_created_or_removed(B_ENTRY_CREATED, device,
 		directory, name, node);
@@ -751,8 +751,8 @@ notify_entry_created(mount_id device, vnode_id directory, const char *name,
  */
 
 status_t
-notify_entry_removed(mount_id device, vnode_id directory, const char *name,
-	vnode_id node)
+notify_entry_removed(dev_t device, ino_t directory, const char *name,
+	ino_t node)
 {
 	return notify_entry_created_or_removed(B_ENTRY_REMOVED, device,
 		directory, name, node);
@@ -772,16 +772,16 @@ notify_entry_removed(mount_id device, vnode_id directory, const char *name,
  */
 
 status_t
-notify_entry_moved(mount_id device, vnode_id fromDirectory,
-	const char *fromName, vnode_id toDirectory, const char *toName,
-	vnode_id node)
+notify_entry_moved(dev_t device, ino_t fromDirectory,
+	const char *fromName, ino_t toDirectory, const char *toName,
+	ino_t node)
 {
 	if (!fromName || !toName)
 		return B_BAD_VALUE;
 
 	// If node is a mount point, we need to resolve it to the mounted
 	// volume's root node.
-	mount_id nodeDevice = device;
+	dev_t nodeDevice = device;
 	resolve_mount_point_to_volume_root(device, node, &nodeDevice, &node);
 
 	MutexLocker locker(gMonitorMutex);
@@ -835,7 +835,7 @@ notify_entry_moved(mount_id device, vnode_id fromDirectory,
  */
 
 status_t
-notify_stat_changed(mount_id device, vnode_id node, uint32 statFields)
+notify_stat_changed(dev_t device, ino_t node, uint32 statFields)
 {
 	MutexLocker locker(gMonitorMutex);
 
@@ -875,7 +875,7 @@ notify_stat_changed(mount_id device, vnode_id node, uint32 statFields)
  */
 
 status_t
-notify_attribute_changed(mount_id device, vnode_id node, const char *attribute,
+notify_attribute_changed(dev_t device, ino_t node, const char *attribute,
 	int32 cause)
 {
 	if (!attribute)
@@ -922,8 +922,8 @@ notify_attribute_changed(mount_id device, vnode_id node, const char *attribute,
  */
 
 status_t
-notify_query_entry_created(port_id port, int32 token, mount_id device,
-	vnode_id directory, const char *name, vnode_id node)
+notify_query_entry_created(port_id port, int32 token, dev_t device,
+	ino_t directory, const char *name, ino_t node)
 {
 	return notify_query_entry_created_or_removed(B_ENTRY_CREATED, port, token,
 		device, directory, name, node);
@@ -944,8 +944,8 @@ notify_query_entry_created(port_id port, int32 token, mount_id device,
  */
 
 status_t
-notify_query_entry_removed(port_id port, int32 token,
-	mount_id device, vnode_id directory, const char *name, vnode_id node)
+notify_query_entry_removed(port_id port, int32 token, dev_t device,
+	ino_t directory, const char *name, ino_t node)
 {
 	return notify_query_entry_created_or_removed(B_ENTRY_REMOVED, port, token,
 		device, directory, name, node);

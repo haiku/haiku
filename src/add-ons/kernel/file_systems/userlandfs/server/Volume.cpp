@@ -9,7 +9,7 @@
 #include "kernel_emu.h"
 
 // constructor
-Volume::Volume(FileSystem* fileSystem, mount_id id)
+Volume::Volume(FileSystem* fileSystem, dev_t id)
 	: fFileSystem(fileSystem),
 	  fID(id)
 {
@@ -28,7 +28,7 @@ Volume::GetFileSystem() const
 }
 
 // GetID
-mount_id
+dev_t
 Volume::GetID() const
 {
 	return fID;
@@ -41,7 +41,7 @@ Volume::GetID() const
 // Mount
 status_t
 Volume::Mount(const char* device, uint32 flags, const char* parameters,
-	vnode_id* rootID)
+	ino_t* rootID)
 {
 	return B_BAD_VALUE;
 }
@@ -80,14 +80,14 @@ Volume::WriteFSInfo(const struct fs_info* info, uint32 mask)
 
 // Lookup
 status_t
-Volume::Lookup(fs_vnode dir, const char* entryName, vnode_id* vnid, int* type)
+Volume::Lookup(fs_vnode dir, const char* entryName, ino_t* vnid, int* type)
 {
 	return B_BAD_VALUE;
 }
 
 // LookupNoType
 status_t
-Volume::LookupNoType(fs_vnode dir, const char* entryName, vnode_id* vnid)
+Volume::LookupNoType(fs_vnode dir, const char* entryName, ino_t* vnid)
 {
 	int type;
 	return Lookup(dir, entryName, vnid, &type);
@@ -104,7 +104,7 @@ Volume::GetVNodeName(fs_vnode node, char* buffer, size_t bufferSize)
 		return error;
 
 	// look up the parent directory
-	vnode_id parentID;
+	ino_t parentID;
 	error = LookupNoType(node, "..", &parentID);
 	if (error != B_OK)
 		return error;
@@ -163,7 +163,7 @@ Volume::GetVNodeName(fs_vnode node, char* buffer, size_t bufferSize)
 
 // ReadVNode
 status_t
-Volume::ReadVNode(vnode_id vnid, bool reenter, fs_vnode* node)
+Volume::ReadVNode(ino_t vnid, bool reenter, fs_vnode* node)
 {
 	return B_BAD_VALUE;
 }
@@ -289,7 +289,7 @@ Volume::WriteStat(fs_vnode node, const struct stat *st, uint32 mask)
 // Create
 status_t
 Volume::Create(fs_vnode dir, const char* name, int openMode, int mode,
-	fs_cookie* cookie, vnode_id* vnid)
+	fs_cookie* cookie, ino_t* vnid)
 {
 	return B_BAD_VALUE;
 }
@@ -337,7 +337,7 @@ Volume::Write(fs_vnode node, fs_cookie cookie, off_t pos, const void* buffer,
 
 // CreateDir
 status_t
-Volume::CreateDir(fs_vnode dir, const char* name, int mode, vnode_id *newDir)
+Volume::CreateDir(fs_vnode dir, const char* name, int mode, ino_t *newDir)
 {
 	return B_BAD_VALUE;
 }

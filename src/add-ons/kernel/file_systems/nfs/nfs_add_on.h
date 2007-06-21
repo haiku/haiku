@@ -44,7 +44,7 @@ struct mount_nfs_params
 
 struct fs_node
 {
-	vnode_id vnid;
+	ino_t vnid;
 	struct nfs_fhandle fhandle;
 	struct fs_node *next;
 };
@@ -62,7 +62,7 @@ struct fs_nspace
 
 	int32 xid;	
 
-	vnode_id rootid;
+	ino_t rootid;
 	
 	sem_id sem;
 	struct fs_node *first;
@@ -90,11 +90,11 @@ typedef struct fs_file_cookie fs_file_cookie;
 typedef struct nfs_fhandle nfs_fhandle;
 
 #if 0
-int	fs_read_vnode(fs_nspace *ns, vnode_id vnid, char r, fs_node **node);
+int	fs_read_vnode(fs_nspace *ns, ino_t vnid, char r, fs_node **node);
 int	fs_write_vnode(fs_nspace *ns, fs_node *node, char r);
 
 int	fs_walk(fs_nspace *ns, fs_node *base, const char *file, char **newpath,
-					vnode_id *vnid);
+					ino_t *vnid);
 
 int fs_opendir(fs_nspace *ns, fs_node *node, nfs_cookie **cookie);
 int	fs_closedir(fs_nspace *ns, fs_node *node, nfs_cookie *cookie);
@@ -105,7 +105,7 @@ int	fs_readdir(fs_nspace *ns, fs_node *node, nfs_cookie *cookie, long *num,
 int fs_free_dircookie(fs_nspace *ns, fs_node *node, nfs_cookie *cookie);
 int	fs_rstat(fs_nspace *ns, fs_node *node, struct stat *);
 int	fs_mount(nspace_id nsid, const char *devname, ulong flags,
-					struct mount_nfs_params *parms, size_t len, fs_nspace **data, vnode_id *vnid);
+					struct mount_nfs_params *parms, size_t len, fs_nspace **data, ino_t *vnid);
 int	fs_unmount(fs_nspace *ns);
 int fs_rfsstat(fs_nspace *ns, struct fs_info *);
 
@@ -121,7 +121,7 @@ int fs_write(fs_nspace *ns, fs_node *node, fs_file_cookie *cookie, off_t pos,
 int fs_wstat(fs_nspace *ns, fs_node *node, struct stat *, long mask);
 int fs_wfsstat(fs_nspace *ns, struct fs_info *, long mask);
 int	fs_create(fs_nspace *ns, fs_node *dir, const char *name,
-					int omode, int perms, vnode_id *vnid, fs_file_cookie **cookie);
+					int omode, int perms, ino_t *vnid, fs_file_cookie **cookie);
 
 int	fs_unlink(fs_nspace *ns, fs_node *dir, const char *name);
 int	fs_remove_vnode(fs_nspace *ns, fs_node *node, char r);
@@ -153,11 +153,11 @@ extern void get_nfs_attr(struct XDRInPacket *reply, struct stat *st);
 extern status_t nfs_lookup(fs_nspace *ns, const nfs_fhandle *dir, const char *filename, nfs_fhandle *fhandle, struct stat *st);
 extern status_t nfs_truncate_file(fs_nspace *ns, const nfs_fhandle *fhandle, struct stat *st);
 
-nfs_fhandle handle_from_vnid (fs_nspace *ns, vnode_id vnid);
+nfs_fhandle handle_from_vnid (fs_nspace *ns, ino_t vnid);
 
 extern status_t nfs_getattr(fs_nspace *ns, const nfs_fhandle *fhandle, struct stat *st);
 extern void insert_node(fs_nspace *ns, fs_node *node);
-extern void remove_node(fs_nspace *ns, vnode_id vnid);
+extern void remove_node(fs_nspace *ns, ino_t vnid);
 
 extern int fs_access(void *ns, void *node, int mode);
 

@@ -35,13 +35,15 @@ TODO:
 	#define DLIST_ENTRY_QUANTUM 0x20
 #endif
 
-status_t dlist_init(nspace *vol)
+
+status_t
+dlist_init(nspace *vol)
 {
 	DPRINTF(0, ("dlist_init called\n"));
 
 	vol->dlist.entries = 0;
 	vol->dlist.allocated = DLIST_ENTRY_QUANTUM;
-	vol->dlist.vnid_list = malloc(sizeof(vnode_id) * vol->dlist.allocated);
+	vol->dlist.vnid_list = malloc(sizeof(ino_t) * vol->dlist.allocated);
 	if (vol->dlist.vnid_list == NULL) {
 		vol->dlist.allocated = 0;
 		dprintf("dlist_init: out of core\n");
@@ -51,7 +53,9 @@ status_t dlist_init(nspace *vol)
 	return B_OK;
 }
 
-status_t dlist_uninit(nspace *vol)
+
+status_t
+dlist_uninit(nspace *vol)
 {
 	DPRINTF(0, ("dlist_uninit called\n"));
 
@@ -63,22 +67,24 @@ status_t dlist_uninit(nspace *vol)
 	return B_OK;
 }
 
-static status_t dlist_realloc(nspace *vol, uint32 allocate)
+
+static status_t
+dlist_realloc(nspace *vol, uint32 allocate)
 {
-	vnode_id *vnid_list;
+	ino_t *vnid_list;
 
 	DPRINTF(0, ("dlist_realloc %lx -> %lx\n", vol->dlist.allocated, allocate));
 
 	ASSERT(allocate != vol->dlist.allocated);
 	ASSERT(allocate > vol->dlist.entries);
 
-	vnid_list = malloc(sizeof(vnode_id) * allocate);
+	vnid_list = malloc(sizeof(ino_t) * allocate);
 	if (vnid_list == NULL) {
 		dprintf("dlist_realloc: out of core\n");
 		return ENOMEM;
 	}
 
-	memcpy(vnid_list, vol->dlist.vnid_list, sizeof(vnode_id) * vol->dlist.entries);
+	memcpy(vnid_list, vol->dlist.vnid_list, sizeof(ino_t) * vol->dlist.entries);
 	free(vol->dlist.vnid_list);
 	vol->dlist.vnid_list = vnid_list;
 	vol->dlist.allocated = allocate;
@@ -86,7 +92,9 @@ static status_t dlist_realloc(nspace *vol, uint32 allocate)
 	return B_OK;
 }
 
-status_t dlist_add(nspace *vol, vnode_id vnid)
+
+status_t
+dlist_add(nspace *vol, ino_t vnid)
 {
 	DPRINTF(0, ("dlist_add vnid %Lx\n", vnid));
 
@@ -103,7 +111,9 @@ status_t dlist_add(nspace *vol, vnode_id vnid)
 	return B_OK;
 }
 
-status_t dlist_remove(nspace *vol, vnode_id vnid)
+
+status_t
+dlist_remove(nspace *vol, ino_t vnid)
 {
 	uint32 i;
 
@@ -125,7 +135,9 @@ status_t dlist_remove(nspace *vol, vnode_id vnid)
 	return B_OK;
 }
 
-vnode_id dlist_find(nspace *vol, uint32 cluster)
+
+ino_t
+dlist_find(nspace *vol, uint32 cluster)
 {
 	uint32 i;
 
@@ -133,8 +145,8 @@ vnode_id dlist_find(nspace *vol, uint32 cluster)
 
 	ASSERT(((cluster >= 2) && (cluster < vol->total_clusters + 2)) || (cluster == 1));
 
-	for (i=0;i<vol->dlist.entries;i++) {
-		vnode_id loc;
+	for (i = 0; i < vol->dlist.entries; i++) {
+		ino_t loc;
 
 		if (vcache_vnid_to_loc(vol, vol->dlist.vnid_list[i], &loc) < B_OK)
 			loc = vol->dlist.vnid_list[i];
@@ -148,14 +160,16 @@ vnode_id dlist_find(nspace *vol, uint32 cluster)
 	return -1LL;
 }
 
-void dlist_dump(nspace *vol)
+
+void
+dlist_dump(nspace *vol)
 {
 	uint32 i;
 
 	dprintf("%lx/%lx dlist entries filled, QUANTUM = %x\n",
 		vol->dlist.entries, vol->dlist.allocated, DLIST_ENTRY_QUANTUM);
 
-	for (i=0;i<vol->dlist.entries;i++)
+	for (i = 0; i < vol->dlist.entries; i++)
 		dprintf("%s %Lx", ((i == 0) ? "entries:" : ","), vol->dlist.vnid_list[i]);
 
 	dprintf("\n");

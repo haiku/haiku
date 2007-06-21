@@ -79,8 +79,8 @@ notify_if_stat_changed(Volume *volume, Node *node)
 
 // ramfs_mount
 static status_t
-ramfs_mount(mount_id nsid, const char* /*device*/, uint32 flags, 
-	const char* /*args*/, fs_volume* _volume, vnode_id* rootID)
+ramfs_mount(dev_t nsid, const char* /*device*/, uint32 flags, 
+	const char* /*args*/, fs_volume* _volume, ino_t* rootID)
 {
 	FUNCTION_START();
 	// parameters are ignored for now
@@ -176,7 +176,7 @@ ramfs_sync(fs_volume /*fs*/)
 
 // ramfs_lookup
 static status_t
-ramfs_lookup(fs_volume fs, fs_vnode _dir, const char *entryName, vnode_id *vnid,
+ramfs_lookup(fs_volume fs, fs_vnode _dir, const char *entryName, ino_t *vnid,
 	int *type)
 {
 //	FUNCTION_START();
@@ -223,7 +223,7 @@ SET_ERROR(error, error);
 
 // ramfs_read_vnode
 static status_t
-ramfs_read_vnode(fs_volume fs, vnode_id vnid, fs_vnode *node, bool reenter)
+ramfs_read_vnode(fs_volume fs, ino_t vnid, fs_vnode *node, bool reenter)
 {
 //	FUNCTION_START();
 FUNCTION(("node: %Ld\n", vnid));
@@ -489,7 +489,7 @@ ramfs_unlink(fs_volume fs, fs_vnode _dir, const char *name)
 		NodeMTimeUpdater mTimeUpdater(dir);
 		// check directory write permissions
 		error = dir->CheckPermissions(ACCESS_W);
-		vnode_id nodeID = -1;
+		ino_t nodeID = -1;
 		if (error == B_OK) {
 			// check if entry exists
 			Node *node = NULL;
@@ -761,7 +761,7 @@ private:
 // ramfs_create
 static status_t
 ramfs_create(fs_volume fs, fs_vnode _dir, const char *name, int openMode,
-	int mode, fs_cookie *_cookie, vnode_id *vnid)
+	int mode, fs_cookie *_cookie, ino_t *vnid)
 {
 //	FUNCTION_START();
 	FUNCTION(("name: `%s', open mode: %x, mode: %x\n", name, openMode, mode));
@@ -1075,7 +1075,7 @@ vint32 DirectoryCookie::fNextIteratorID = 0;
 // ramfs_create_dir
 static status_t
 ramfs_create_dir(fs_volume fs, fs_vnode _dir, const char *name,
-	int mode, vnode_id *_vnid)
+	int mode, ino_t *_vnid)
 {
 	FUNCTION(("name: `%s', mode: %x\n", name, mode));
 	Volume *volume = (Volume*)fs;
@@ -1147,7 +1147,7 @@ ramfs_remove_dir(fs_volume fs, fs_vnode _dir, const char *name)
 		NodeMTimeUpdater mTimeUpdater(dir);
 		// check directory write permissions
 		error = dir->CheckPermissions(ACCESS_W);
-		vnode_id nodeID = -1;
+		ino_t nodeID = -1;
 		if (error == B_OK) {
 			// check if entry exists
 			Node *node = NULL;

@@ -165,7 +165,7 @@ bfs_inode::InitCheck(Volume *volume)
 //	#pragma mark - Inode
 
 
-Inode::Inode(Volume *volume, vnode_id id)
+Inode::Inode(Volume *volume, ino_t id)
 	:
 	fVolume(volume),
 	fID(id),
@@ -194,7 +194,8 @@ Inode::Inode(Volume *volume, vnode_id id)
 }
 
 
-Inode::Inode(Volume *volume, Transaction &transaction, vnode_id id, mode_t mode, block_run &run)
+Inode::Inode(Volume *volume, Transaction &transaction, ino_t id, mode_t mode,
+		block_run &run)
 	:
 	fVolume(volume),
 	fID(id),
@@ -1002,7 +1003,7 @@ Inode::GetAttribute(const char *name, Inode **_attribute)
 	BPlusTree *tree;
 	status_t status = attributes->GetTree(&tree);
 	if (status == B_OK) {
-		vnode_id id;
+		ino_t id;
 		status = tree->Find((uint8 *)name, (uint16)strlen(name), &id);
 		if (status == B_OK) {
 			Vnode vnode(fVolume, id);
@@ -1090,7 +1091,7 @@ Inode::IsEmpty()
 	uint32 count = 0;
 	char name[BPLUSTREE_MAX_KEY_LENGTH];
 	uint16 length;
-	vnode_id id;
+	ino_t id;
 	while (iterator.GetNextEntry(name, &length, B_FILE_NAME_LENGTH,
 			&id) == B_OK) {
 		if (Mode() & (S_ATTR_DIR | S_INDEX_DIR))
@@ -2011,7 +2012,7 @@ Inode::Free(Transaction &transaction)
 		char name[B_FILE_NAME_LENGTH];
 		uint32 type;
 		size_t length;
-		vnode_id id;
+		ino_t id;
 		while ((status = iterator.GetNext(name, &length, &type, &id)) == B_OK) {
 			RemoveAttribute(transaction, name);
 		}
@@ -2123,7 +2124,7 @@ Inode::Sync()
 
 
 status_t
-Inode::Remove(Transaction &transaction, const char *name, vnode_id *_id,
+Inode::Remove(Transaction &transaction, const char *name, ino_t *_id,
 	bool isDirectory)
 {
 	BPlusTree *tree;
@@ -2220,7 +2221,7 @@ Inode::Remove(Transaction &transaction, const char *name, vnode_id *_id,
 */
 status_t
 Inode::Create(Transaction &transaction, Inode *parent, const char *name,
-	int32 mode, int openMode, uint32 type, bool *_created, vnode_id *_id,
+	int32 mode, int openMode, uint32 type, bool *_created, ino_t *_id,
 	Inode **_inode)
 {
 	FUNCTION_START(("name = %s, mode = %ld\n", name, mode));
@@ -2456,7 +2457,7 @@ AttributeIterator::Rewind()
 
 status_t
 AttributeIterator::GetNext(char *name, size_t *_length, uint32 *_type,
-	vnode_id *_id)
+	ino_t *_id)
 {
 	// read attributes out of the small data section
 
@@ -2484,7 +2485,7 @@ AttributeIterator::GetNext(char *name, size_t *_length, uint32 *_type,
 			strncpy(name, item->Name(), B_FILE_NAME_LENGTH);
 			*_type = item->Type();
 			*_length = item->NameSize();
-			*_id = (vnode_id)fCurrentSmallData;
+			*_id = (ino_t)fCurrentSmallData;
 
 			fCurrentSmallData = i;
 		}
@@ -2510,7 +2511,7 @@ AttributeIterator::GetNext(char *name, size_t *_length, uint32 *_type,
 	if (fAttributes == NULL) {
 		if (get_vnode(volume->ID(), volume->ToVnode(fInode->Attributes()),
 				(void **)&fAttributes) != B_OK) {
-			FATAL(("get_vnode() failed in AttributeIterator::GetNext(vnode_id"
+			FATAL(("get_vnode() failed in AttributeIterator::GetNext(ino_t"
 				" = %Ld,name = \"%s\")\n",fInode->ID(),name));
 			return B_ENTRY_NOT_FOUND;
 		}
@@ -2518,14 +2519,14 @@ AttributeIterator::GetNext(char *name, size_t *_length, uint32 *_type,
 		BPlusTree *tree;
 		if (fAttributes->GetTree(&tree) < B_OK
 			|| (fIterator = new TreeIterator(tree)) == NULL) {
-			FATAL(("could not get tree in AttributeIterator::GetNext(vnode_id"
+			FATAL(("could not get tree in AttributeIterator::GetNext(ino_t"
 				" = %Ld,name = \"%s\")\n",fInode->ID(),name));
 			return B_ENTRY_NOT_FOUND;
 		}
 	}
 
 	uint16 length;
-	vnode_id id;
+	ino_t id;
 	status_t status = fIterator->GetNextEntry(name, &length,
 		B_FILE_NAME_LENGTH, &id);
 	if (status < B_OK)

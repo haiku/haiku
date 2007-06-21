@@ -79,7 +79,7 @@ Index::SetTo(const char *name)
 	if (indices->GetTree(&tree) != B_OK)
 		return B_BAD_VALUE;
 
-	vnode_id id;
+	ino_t id;
 	status_t status = tree->Find((uint8 *)name, (uint16)strlen(name), &id);
 	if (status != B_OK)
 		return status;

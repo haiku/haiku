@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  This software is part of the Haiku distribution and is covered 
+//  by the MIT license.
 //
 //  Copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
 //---------------------------------------------------------------------
@@ -67,7 +67,7 @@ class Icb {
 public:
 	Icb(Volume *volume, long_address address);
 	status_t InitCheck();
-	vnode_id Id() { return fId; }
+	ino_t Id() { return fId; }
 	
 	// categorization
 	uint8 Type() { return IcbTag().file_type(); }
@@ -90,7 +90,7 @@ public:
 	
 	// for directories only
 	status_t GetDirectoryIterator(DirectoryIterator **iterator);
-	status_t Find(const char *filename, vnode_id *id);
+	status_t Find(const char *filename, ino_t *id);
 	
 	Volume* GetVolume() const { return fVolume; }
 	
@@ -118,7 +118,7 @@ private:
 	Volume *fVolume;
 	CachedBlock fData;
 	status_t fInitStatus;
-	vnode_id fId;
+	ino_t fId;
 	SinglyLinkedList<DirectoryIterator*> fIteratorList;
 	/* [zooey]: gcc-2.95.3 requires the explicit namespace here, otherwise
 	   it complains about a syntax error(!). This is most probably a bug. */

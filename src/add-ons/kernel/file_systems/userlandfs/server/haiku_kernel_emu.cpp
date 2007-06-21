@@ -19,8 +19,8 @@
 
 // notify_entry_created
 status_t
-notify_entry_created(mount_id device, vnode_id directory, const char *name,
-	vnode_id node)
+notify_entry_created(dev_t device, ino_t directory, const char *name,
+	ino_t node)
 {
 	if (!name)
 		return B_BAD_VALUE;
@@ -31,8 +31,8 @@ notify_entry_created(mount_id device, vnode_id directory, const char *name,
 
 // notify_entry_removed
 status_t
-notify_entry_removed(mount_id device, vnode_id directory, const char *name,
-	vnode_id node)
+notify_entry_removed(dev_t device, ino_t directory, const char *name,
+	ino_t node)
 {
 	if (!name)
 		return B_BAD_VALUE;
@@ -43,9 +43,9 @@ notify_entry_removed(mount_id device, vnode_id directory, const char *name,
 
 // notify_entry_moved
 status_t
-notify_entry_moved(mount_id device, vnode_id fromDirectory,
-	const char *fromName, vnode_id toDirectory, const char *toName,
-	vnode_id node)
+notify_entry_moved(dev_t device, ino_t fromDirectory,
+	const char *fromName, ino_t toDirectory, const char *toName,
+	ino_t node)
 {
 	if (!fromName || !toName)
 		return B_BAD_VALUE;
@@ -56,7 +56,7 @@ notify_entry_moved(mount_id device, vnode_id fromDirectory,
 
 // notify_stat_changed
 status_t
-notify_stat_changed(mount_id device, vnode_id node, uint32 statFields)
+notify_stat_changed(dev_t device, ino_t node, uint32 statFields)
 {
 	return UserlandFS::KernelEmu::notify_listener(B_STAT_CHANGED, statFields,
 		device, 0, 0, node, NULL, NULL);
@@ -64,7 +64,7 @@ notify_stat_changed(mount_id device, vnode_id node, uint32 statFields)
 
 // notify_attribute_changed
 status_t
-notify_attribute_changed(mount_id device, vnode_id node, const char *attribute,
+notify_attribute_changed(dev_t device, ino_t node, const char *attribute,
 	int32 cause)
 {
 	if (!attribute)
@@ -83,8 +83,8 @@ notify_select_event(selectsync *sync, uint32 ref, uint8 event)
 
 // notify_query_entry_created
 status_t
-notify_query_entry_created(port_id port, int32 token, mount_id device,
-	vnode_id directory, const char *name, vnode_id node)
+notify_query_entry_created(port_id port, int32 token, dev_t device,
+	ino_t directory, const char *name, ino_t node)
 {
 	if (!name)
 		return B_BAD_VALUE;
@@ -95,8 +95,8 @@ notify_query_entry_created(port_id port, int32 token, mount_id device,
 
 // notify_query_entry_removed
 status_t
-notify_query_entry_removed(port_id port, int32 token, mount_id device,
-	vnode_id directory, const char *name, vnode_id node)
+notify_query_entry_removed(port_id port, int32 token, dev_t device,
+	ino_t directory, const char *name, ino_t node)
 {
 	if (!name)
 		return B_BAD_VALUE;
@@ -111,49 +111,49 @@ notify_query_entry_removed(port_id port, int32 token, mount_id device,
 
 // new_vnode
 status_t
-new_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode)
+new_vnode(dev_t mountID, ino_t vnodeID, fs_vnode privateNode)
 {
 	return UserlandFS::KernelEmu::publish_vnode(mountID, vnodeID, privateNode);
 }
 
 // publish_vnode
 status_t
-publish_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode)
+publish_vnode(dev_t mountID, ino_t vnodeID, fs_vnode privateNode)
 {
 	return UserlandFS::KernelEmu::publish_vnode(mountID, vnodeID, privateNode);
 }
 
 // get_vnode
 status_t
-get_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode *privateNode)
+get_vnode(dev_t mountID, ino_t vnodeID, fs_vnode *privateNode)
 {
 	return UserlandFS::KernelEmu::get_vnode(mountID, vnodeID, privateNode);
 }
 
 // put_vnode
 status_t
-put_vnode(mount_id mountID, vnode_id vnodeID)
+put_vnode(dev_t mountID, ino_t vnodeID)
 {
 	return UserlandFS::KernelEmu::put_vnode(mountID, vnodeID);
 }
 
 // remove_vnode
 status_t
-remove_vnode(mount_id mountID, vnode_id vnodeID)
+remove_vnode(dev_t mountID, ino_t vnodeID)
 {
 	return UserlandFS::KernelEmu::remove_vnode(mountID, vnodeID);
 }
 
 // unremove_vnode
 status_t
-unremove_vnode(mount_id mountID, vnode_id vnodeID)
+unremove_vnode(dev_t mountID, ino_t vnodeID)
 {
 	return UserlandFS::KernelEmu::unremove_vnode(mountID, vnodeID);
 }
 
 // get_vnode_removed
 status_t
-get_vnode_removed(mount_id mountID, vnode_id vnodeID, bool* removed)
+get_vnode_removed(dev_t mountID, ino_t vnodeID, bool* removed)
 {
 	return UserlandFS::KernelEmu::get_vnode_removed(mountID, vnodeID, removed);
 }
@@ -342,7 +342,7 @@ block_cache_put(void *_cache, off_t blockNumber)
 
 // file_cache_create
 void *
-file_cache_create(mount_id mountID, vnode_id vnodeID, off_t size, int fd)
+file_cache_create(dev_t mountID, ino_t vnodeID, off_t size, int fd)
 {
 	return UserlandFS::HaikuKernelEmu::file_cache_create(mountID, vnodeID,
 		size, fd);

@@ -19,9 +19,9 @@ typedef recursive_lock lock;
 /* for multiple reader/single writer locks */
 #define READERS 100000
 
-/* Unfortunately, vnode_id's are defined as signed. This causes problems with
- * programs (notably cp) that use the modulo of a vnode_id (or ino_t) as a
- * hash function to index an array. This means the high bit of every vnode_id
+/* Unfortunately, ino_t's are defined as signed. This causes problems with
+ * programs (notably cp) that use the modulo of a ino_t as a
+ * hash function to index an array. This means the high bit of every ino_t
  * is off-limits. Luckily, FAT32 is actually FAT28, so dosfs can make do with
  * only 63 bits.
  */
@@ -46,10 +46,10 @@ typedef recursive_lock lock;
 	 ((vnid) & INVALID_VNID_BITS_MASK))
 
 #define GENERATE_DIR_INDEX_VNID(dircluster, index) \
-	(DIR_INDEX_VNID_BITS | ((vnode_id)(dircluster) << 32) | (index))
+	(DIR_INDEX_VNID_BITS | ((ino_t)(dircluster) << 32) | (index))
 
 #define GENERATE_DIR_CLUSTER_VNID(dircluster, filecluster) \
-	(DIR_CLUSTER_VNID_BITS | ((vnode_id)(dircluster) << 32) | (filecluster))
+	(DIR_CLUSTER_VNID_BITS | ((ino_t)(dircluster) << 32) | (filecluster))
 
 #define CLUSTER_OF_DIR_CLUSTER_VNID(vnid) \
 	((uint32)((vnid) & 0xffffffff))
@@ -68,8 +68,8 @@ typedef recursive_lock lock;
 typedef struct vnode
 {
 	uint32		magic;
-	vnode_id	vnid; 			// self id
-	vnode_id 	dir_vnid;		// parent vnode id (directory containing entry)
+	ino_t		vnid; 			// self id
+	ino_t	 	dir_vnid;		// parent vnode id (directory containing entry)
 	void		*cache;			// for file cache
 
 	uint32		disk_image;		// 0 = no, 1 = BEOS, 2 = IMAGE.BE
@@ -116,7 +116,7 @@ struct vcache_entry;
 typedef struct _nspace
 {
 	uint32	magic;
-	mount_id		id;				// ID passed in to fs_mount
+	dev_t			id;				// ID passed in to fs_mount
 	int				fd;				// File descriptor
 	char			device[256];
 	uint32			flags;			// see <fcntl.be.h> for modes
@@ -148,7 +148,7 @@ typedef struct _nspace
 	uint32	data_start;
 	uint32  last_allocated;			// last allocated cluster
 
-	vnode_id beos_vnid;				// vnid of \BEOS directory
+	ino_t	beos_vnid;				// vnid of \BEOS directory
 	bool	respect_disk_image;
 
 	int		fs_flags;				// flags for this mount
@@ -157,16 +157,16 @@ typedef struct _nspace
 
 	// vcache state
 	struct {
-		sem_id vc_sem;
-		vnode_id cur_vnid;
-		uint32 cache_size;
+		sem_id	vc_sem;
+		ino_t	cur_vnid;
+		uint32	cache_size;
 		struct vcache_entry **by_vnid, **by_loc;
 	} vcache;
 
 	struct {
 		uint32	entries;
 		uint32	allocated;
-		vnode_id *vnid_list;
+		ino_t	*vnid_list;
 	} dlist;
 } nspace;
 

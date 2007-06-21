@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1142,7 +1142,7 @@ out:
 
 
 extern "C" void
-cache_prefetch(mount_id mountID, vnode_id vnodeID, off_t offset, size_t size)
+cache_prefetch(dev_t mountID, ino_t vnodeID, off_t offset, size_t size)
 {
 	void *vnode;
 
@@ -1160,8 +1160,8 @@ cache_prefetch(mount_id mountID, vnode_id vnodeID, off_t offset, size_t size)
 
 
 extern "C" void
-cache_node_opened(void *vnode, int32 fdType, vm_cache_ref *cache, mount_id mountID,
-	vnode_id parentID, vnode_id vnodeID, const char *name)
+cache_node_opened(void *vnode, int32 fdType, vm_cache_ref *cache, dev_t mountID,
+	ino_t parentID, ino_t vnodeID, const char *name)
 {
 	if (sCacheModule == NULL || sCacheModule->node_opened == NULL)
 		return;
@@ -1179,7 +1179,7 @@ cache_node_opened(void *vnode, int32 fdType, vm_cache_ref *cache, mount_id mount
 
 extern "C" void
 cache_node_closed(void *vnode, int32 fdType, vm_cache_ref *cache,
-	mount_id mountID, vnode_id vnodeID)
+	dev_t mountID, ino_t vnodeID)
 {
 	if (sCacheModule == NULL || sCacheModule->node_closed == NULL)
 		return;
@@ -1229,7 +1229,7 @@ file_cache_init(void)
 
 
 extern "C" void *
-file_cache_create(mount_id mountID, vnode_id vnodeID, off_t size, int fd)
+file_cache_create(dev_t mountID, ino_t vnodeID, off_t size, int fd)
 {
 	TRACE(("file_cache_create(mountID = %ld, vnodeID = %Ld, size = %Ld, fd = %d)\n", mountID, vnodeID, size, fd));
 

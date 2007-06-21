@@ -112,7 +112,7 @@ typedef struct nspace
 	ntfs_volume	*ntvol;
 	char		devicePath[MAX_PATH];
 #ifdef __HAIKU__
-	mount_id	id;
+	dev_t		id;
 #else
 	nspace_id	id;
 #endif

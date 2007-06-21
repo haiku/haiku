@@ -74,18 +74,18 @@ typedef struct beos_index_info {
 
 // FS interface hook types
 
-typedef int	beos_op_read_vnode(void *ns, vnode_id vnid, char r, void **node);
+typedef int	beos_op_read_vnode(void *ns, ino_t vnid, char r, void **node);
 typedef int	beos_op_write_vnode(void *ns, void *node, char r);
 typedef int	beos_op_remove_vnode(void *ns, void *node, char r);
 typedef int	beos_op_secure_vnode(void *ns, void *node);
 
 typedef int	beos_op_walk(void *ns, void *base, const char *file, char **newpath,
-					vnode_id *vnid);
+					ino_t *vnid);
 
 typedef int	beos_op_access(void *ns, void *node, int mode);
 
 typedef int	beos_op_create(void *ns, void *dir, const char *name,
-					int omode, int perms, vnode_id *vnid, void **cookie);
+					int omode, int perms, ino_t *vnid, void **cookie);
 typedef int	beos_op_mkdir(void *ns, void *dir, const char *name, int perms);
 typedef int	beos_op_symlink(void *ns, void *dir, const char *name,
 					const char *path);
@@ -130,8 +130,8 @@ typedef int	beos_op_deselect(void *ns, void *node, void *cookie, uint8 event,
 					selectsync *sync);
 
 typedef int	beos_op_initialize(const char *devname, void *parms, size_t len);
-typedef int	beos_op_mount(mount_id nsid, const char *devname, ulong flags,
-					void *parms, size_t len, void **data, vnode_id *vnid);
+typedef int	beos_op_mount(dev_t nsid, const char *devname, ulong flags,
+					void *parms, size_t len, void **data, ino_t *vnid);
 typedef int	beos_op_unmount(void *ns);
 typedef int	beos_op_sync(void *ns);
 typedef int beos_op_rfsstat(void *ns, struct beos_fs_info *);

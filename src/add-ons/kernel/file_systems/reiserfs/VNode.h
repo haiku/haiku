@@ -30,11 +30,11 @@ class VNode {
 public:
 	VNode();
 	VNode(const VNode &node);
-	VNode(vnode_id id);
+	VNode(ino_t id);
 	VNode(uint32 dirID, uint32 objectID);
 	~VNode();
 
-	status_t SetTo(vnode_id id);
+	status_t SetTo(ino_t id);
 	status_t SetTo(uint32 dirID, uint32 objectID);
 
 //	void SetParentDirID(uint32 id)		{ fParentDirID = id; }
@@ -46,11 +46,11 @@ public:
 	void SetObjectID(uint32 id)			{ fObjectID = id; }
 	uint32 GetObjectID() const			{ return fObjectID; }
 
-	vnode_id GetID() const;
+	ino_t GetID() const;
 	void SetParentID(uint32 dirID, uint32 objectID);
-	void SetParentID(vnode_id id)		{ fParentID = id; }
+	void SetParentID(ino_t id)		{ fParentID = id; }
 	// only valid for dirs!
-	vnode_id GetParentID() const		{ return fParentID; }
+	ino_t GetParentID() const		{ return fParentID; }
 
 	StatData *GetStatData() { return &fStatData; }
 	const StatData *GetStatData() const { return &fStatData; }
@@ -61,16 +61,16 @@ public:
 	bool IsEsoteric() const { return fStatData.IsEsoteric(); }
 
 	// vnode ID <-> dir,object ID conversion
-	static vnode_id GetIDFor(uint32 dirID, uint32 objectID)
-		{ return (vnode_id)((uint64)dirID << 32 | (uint64)objectID); }
-	static uint32 GetDirIDFor(vnode_id id) { return uint32((uint64)id >> 32); }
-	static uint32 GetObjectIDFor(vnode_id id)
+	static ino_t GetIDFor(uint32 dirID, uint32 objectID)
+		{ return (ino_t)((uint64)dirID << 32 | (uint64)objectID); }
+	static uint32 GetDirIDFor(ino_t id) { return uint32((uint64)id >> 32); }
+	static uint32 GetObjectIDFor(ino_t id)
 		{ return uint32((uint64)id & 0xffffffffULL); }
 
 	VNode &operator=(const VNode &node);
 
 private:
-	vnode_id	fParentID;
+	ino_t		fParentID;
 	uint32		fDirID;
 	uint32		fObjectID;
 	StatData	fStatData;

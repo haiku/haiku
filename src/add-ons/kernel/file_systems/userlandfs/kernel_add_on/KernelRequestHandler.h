@@ -60,7 +60,7 @@ private:
 			status_t			_HandleRequest(UnremoveVNodeRequest* request);
 			status_t			_HandleRequest(GetVNodeRemovedRequest* request);
 
-			status_t			_GetVolume(mount_id id, Volume** volume);
+			status_t			_GetVolume(dev_t id, Volume** volume);
 
 private:
 			FileSystem*			fFileSystem;

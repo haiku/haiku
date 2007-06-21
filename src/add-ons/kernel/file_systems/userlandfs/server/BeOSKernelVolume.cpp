@@ -39,7 +39,7 @@ public:
 
 
 // constructor
-BeOSKernelVolume::BeOSKernelVolume(FileSystem* fileSystem, mount_id id,
+BeOSKernelVolume::BeOSKernelVolume(FileSystem* fileSystem, dev_t id,
 	beos_vnode_ops* fsOps)
 	: Volume(fileSystem, id),
 	  fFSOps(fsOps),
@@ -58,7 +58,7 @@ BeOSKernelVolume::~BeOSKernelVolume()
 // Mount
 status_t
 BeOSKernelVolume::Mount(const char* device, uint32 flags,
-	const char* parameters, vnode_id* rootID)
+	const char* parameters, ino_t* rootID)
 {
 	if (!fFSOps->mount)
 		return B_BAD_VALUE;
@@ -114,7 +114,7 @@ BeOSKernelVolume::WriteFSInfo(const struct fs_info* info, uint32 mask)
 
 // Lookup
 status_t
-BeOSKernelVolume::Lookup(fs_vnode dir, const char* entryName, vnode_id* vnid,
+BeOSKernelVolume::Lookup(fs_vnode dir, const char* entryName, ino_t* vnid,
 	int* type)
 {
 	if (!fFSOps->walk)
@@ -160,7 +160,7 @@ BeOSKernelVolume::Lookup(fs_vnode dir, const char* entryName, vnode_id* vnid,
 // LookupNoType
 status_t
 BeOSKernelVolume::LookupNoType(fs_vnode dir, const char* entryName,
-	vnode_id* vnid)
+	ino_t* vnid)
 {
 	if (!fFSOps->walk)
 		return B_BAD_VALUE;
@@ -169,7 +169,7 @@ BeOSKernelVolume::LookupNoType(fs_vnode dir, const char* entryName,
 
 // ReadVNode
 status_t
-BeOSKernelVolume::ReadVNode(vnode_id vnid, bool reenter, fs_vnode* node)
+BeOSKernelVolume::ReadVNode(ino_t vnid, bool reenter, fs_vnode* node)
 {
 	if (!fFSOps->read_vnode)
 		return B_BAD_VALUE;
@@ -340,7 +340,7 @@ BeOSKernelVolume::WriteStat(fs_vnode node, const struct stat *st, uint32 mask)
 // Create
 status_t
 BeOSKernelVolume::Create(fs_vnode dir, const char* name, int openMode, int mode,
-	fs_cookie* cookie, vnode_id* vnid)
+	fs_cookie* cookie, ino_t* vnid)
 {
 	if (!fFSOps->create)
 		return B_BAD_VALUE;
@@ -405,7 +405,7 @@ BeOSKernelVolume::Write(fs_vnode node, fs_cookie cookie, off_t pos,
 // CreateDir
 status_t
 BeOSKernelVolume::CreateDir(fs_vnode dir, const char* name, int mode,
-	vnode_id *newDir)
+	ino_t *newDir)
 {
 	if (!fFSOps->mkdir || !fFSOps->walk)	// we need walk() too
 		return B_BAD_VALUE;
@@ -415,7 +415,7 @@ BeOSKernelVolume::CreateDir(fs_vnode dir, const char* name, int mode,
 		return error;
 
 	// we need to get the node ID by invoking walk()
-	vnode_id id;
+	ino_t id;
 	error = fFSOps->walk(fVolumeCookie, dir, name, NULL, &id);
 	if (error != B_OK)
 		return error;

@@ -24,7 +24,7 @@ BeOSKernelFileSystem::~BeOSKernelFileSystem()
 
 // CreateVolume
 status_t
-BeOSKernelFileSystem::CreateVolume(Volume** volume, mount_id id)
+BeOSKernelFileSystem::CreateVolume(Volume** volume, dev_t id)
 {
 	// check initialization and parameters
 	if (!fFSOps || !volume)

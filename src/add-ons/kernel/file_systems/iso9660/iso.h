@@ -1,21 +1,23 @@
 /*
-**	Copyright 1999, Be Incorporated.   All Rights Reserved.
-**	This file may be used under the terms of the Be Sample Code License.
-**
-**	Copyright 2001, pinc Software.  All Rights Reserved.
-*/
-
+ * Copyright 1999, Be Incorporated.   All Rights Reserved.
+ * This file may be used under the terms of the Be Sample Code License.
+ *
+ * Copyright 2001, pinc Software.  All Rights Reserved.
+ */
 #ifndef _ISO_H
 #define _ISO_H
 
+
+#include "lock.h"
+
+#include <fs_interface.h>
+#include <SupportDefs.h>
+
 #include <stdio.h>
 #include <sys/types.h>
-#include <fs_interface.h>
-#include "lock.h"
 #include <time.h>
 #include <endian.h>
 
-#include <SupportDefs.h>
 
 // Size of primary volume descriptor for ISO9660
 #define ISO_PVD_SIZE 882
@@ -23,8 +25,7 @@
 // ISO structure has both msb and lsb first data. These let you do a 
 // compile-time switch for different platforms.
 
-enum
-{
+enum {
 	LSB_DATA = 0,
 	MSB_DATA
 };
@@ -32,16 +33,15 @@ enum
 // This defines the data format for the platform we are compiling
 // for.
 #if BYTE_ORDER == __LITTLE_ENDIAN
-#define FS_DATA_FORMAT LSB_DATA
+#	define FS_DATA_FORMAT LSB_DATA
 #else
-#define FS_DATA_FORMAT MSB_DATA
+#	define FS_DATA_FORMAT MSB_DATA
 #endif
 
 // ISO pdf file spec I read appears to be WRONG about the date format. See
 // www.alumni.caltech.edu/~pje/iso9660.html, definition there seems
 // to match.
-typedef struct ISOVolDate
-{
+typedef struct ISOVolDate {
  	char	year[5];
  	char	month[3];
  	char	day[3];
@@ -52,8 +52,7 @@ typedef struct ISOVolDate
  	int8	offsetGMT;
 } ISOVolDate;
 
-typedef struct ISORecDate
-{
+typedef struct ISORecDate {
 	uint8	year;			// Year - 1900
 	uint8	month;
 	uint8	date;
@@ -64,8 +63,7 @@ typedef struct ISORecDate
 } ISORecDate;
 
 /* This next section is data structure to hold the data found in the rock ridge extensions. */
-typedef struct RRAttr
-{
+typedef struct RRAttr {
 	char*			slName;
 	struct stat		stat[2];
 	uint8			nmVer;
@@ -84,11 +82,10 @@ typedef struct RRAttr
 	fs_write_vnode (somewhat of a misnomer) where you should deallocate the struct.
 */
 
-typedef struct vnode
-{
+typedef struct vnode {
 	/* Most drivers will probably want the first things defined here. */
-	vnode_id	id; 
-	vnode_id 	parID;		// parent vnode ID.
+	ino_t		id; 
+	ino_t	 	parID;		// parent vnode ID.
 	void		*cache;		// for file cache
 	
 	// End of members other drivers will definitely want.
@@ -124,8 +121,7 @@ typedef struct vnode
 } vnode;
 
 // These go with the flags member of the nspace struct.
-enum
-{
+enum {
 	ISO_ISHIDDEN = 0,
 	ISO_ISDIR		= 2,
 	ISO_ISASSOCFILE = 4,
@@ -144,8 +140,7 @@ enum
  	need to determine where you are at in reading the directory 
  	entries, incremented every time readdir is called, until finally
  	the end is reached, when readdir returns NULL. */
-typedef struct dircookie
-{
+typedef struct dircookie {
 	off_t startBlock;
 	off_t block;			// Current block
 	off_t pos;				// Position within block.
@@ -158,8 +153,7 @@ typedef struct dircookie
 	cookie function is called. For ISO, we didn't need one.
 */
 
-typedef struct attrfilemap
-{
+typedef struct attrfilemap {
 	char  *name;
 	off_t offset;
 } attrfilemap;
@@ -169,10 +163,9 @@ typedef struct attrfilemap
 	global information you need. You'll need to change this struct to suit your purposes.
 */
 
-typedef struct nspace
-{
+typedef struct nspace {
 	// Start of members other drivers will definitely want.
-	mount_id		id;				// ID passed in to fs_mount
+	dev_t			id;				// ID passed in to fs_mount
 	int				fd;				// File descriptor
 	int				fdOfSession;	// File descriptor of the (mounted) session
 	//unsigned int 	blockSize;  	// usually need this, but it's part of ISO
@@ -186,7 +179,7 @@ typedef struct nspace
 	// attribute extensions
 	int32			readAttributes;
 	attrfilemap 	*attrFileMap;
-	vnode_id		attributesID;
+	ino_t			attributesID;
 
 	// JOLIET extension: joliet_level for this volume
 	uint8			joliet_level;
@@ -240,4 +233,4 @@ int			ConvertRecDate(ISORecDate* inDate, time_t* outDate);
 }
 #endif 
 
-#endif
+#endif	/* _ISO_H */

@@ -52,7 +52,7 @@ status_t vnidpool_free(struct vnidpool *pool) {
 	return B_OK;
 }
 
-status_t vnidpool_get(struct vnidpool *pool, vnode_id *vnid)
+status_t vnidpool_get(struct vnidpool *pool, ino_t *vnid)
 {
 	status_t err = B_ERROR;
 	uint32 i;
@@ -76,7 +76,7 @@ status_t vnidpool_get(struct vnidpool *pool, vnode_id *vnid)
 	return err;
 }
 
-status_t vnidpool_put(struct vnidpool *pool, vnode_id vnid)
+status_t vnidpool_put(struct vnidpool *pool, ino_t vnid)
 {
 	status_t err = B_ERROR;
 	uint32 i;

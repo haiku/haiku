@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -44,7 +44,7 @@ struct rootfs_stream {
 
 struct rootfs_vnode {
 	struct rootfs_vnode *all_next;
-	vnode_id	id;
+	ino_t		id;
 	char		*name;
 	time_t		modification_time;
 	time_t		creation_time;
@@ -56,9 +56,9 @@ struct rootfs_vnode {
 };
 
 struct rootfs {
-	mount_id id;
-	mutex lock;
-	vnode_id next_vnode_id;
+	dev_t		id;
+	mutex		lock;
+	ino_t		next_vnode_id;
 	hash_table *vnode_list_hash;
 	struct rootfs_vnode *root_vnode;
 };
@@ -85,7 +85,7 @@ static uint32
 rootfs_vnode_hash_func(void *_v, const void *_key, uint32 range)
 {
 	struct rootfs_vnode *vnode = _v;
-	const vnode_id *key = _key;
+	const ino_t *key = _key;
 
 	if (vnode != NULL)
 		return vnode->id % range;
@@ -98,7 +98,7 @@ static int
 rootfs_vnode_compare_func(void *_v, const void *_key)
 {
 	struct rootfs_vnode *v = _v;
-	const vnode_id *key = _key;
+	const ino_t *key = _key;
 
 	if (v->id == *key)
 		return 0;
@@ -303,8 +303,8 @@ err:
 
 
 static status_t
-rootfs_mount(mount_id id, const char *device, uint32 flags, const char *args,
-	fs_volume *_fs, vnode_id *root_vnid)
+rootfs_mount(dev_t id, const char *device, uint32 flags, const char *args,
+	fs_volume *_fs, ino_t *root_vnid)
 {
 	struct rootfs *fs;
 	struct rootfs_vnode *vnode;
@@ -395,7 +395,7 @@ rootfs_sync(fs_volume fs)
 
 
 static status_t
-rootfs_lookup(fs_volume _fs, fs_vnode _dir, const char *name, vnode_id *_id, int *_type)
+rootfs_lookup(fs_volume _fs, fs_vnode _dir, const char *name, ino_t *_id, int *_type)
 {
 	struct rootfs *fs = (struct rootfs *)_fs;
 	struct rootfs_vnode *dir = (struct rootfs_vnode *)_dir;
@@ -442,7 +442,7 @@ rootfs_get_vnode_name(fs_volume _fs, fs_vnode _vnode, char *buffer, size_t buffe
 
 
 static status_t
-rootfs_get_vnode(fs_volume _fs, vnode_id id, fs_vnode *_vnode, bool reenter)
+rootfs_get_vnode(fs_volume _fs, ino_t id, fs_vnode *_vnode, bool reenter)
 {
 	struct rootfs *fs = (struct rootfs *)_fs;
 	struct rootfs_vnode *vnode;
@@ -505,7 +505,8 @@ rootfs_remove_vnode(fs_volume _fs, fs_vnode _vnode, bool reenter)
 
 
 static status_t
-rootfs_create(fs_volume _fs, fs_vnode _dir, const char *name, int omode, int perms, fs_cookie *_cookie, vnode_id *new_vnid)
+rootfs_create(fs_volume _fs, fs_vnode _dir, const char *name, int omode,
+	int perms, fs_cookie *_cookie, ino_t *new_vnid)
 {
 	return B_BAD_VALUE;
 }
@@ -568,7 +569,8 @@ rootfs_write(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
 
 
 static status_t
-rootfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name, int mode, vnode_id *_newID)
+rootfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name, int mode,
+	ino_t *_newID)
 {
 	struct rootfs *fs = _fs;
 	struct rootfs_vnode *dir = _dir;

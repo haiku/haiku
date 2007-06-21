@@ -1,12 +1,12 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
 
-/* This is main - initializes processors and starts init */
+/*! This is main - initializes processors and starts init */
 
 
 #include <OS.h>
@@ -42,7 +42,7 @@
 
 #define TRACE_BOOT
 #ifdef TRACE_BOOT
-#	define TRACE(x...) dprintf("INIT : " x)
+#	define TRACE(x...) dprintf("INIT: " x)
 #else
 #	define TRACE(x...) ;
 #endif
@@ -55,6 +55,7 @@ static uint32 sCpuRendezvous2;
 
 static int32 main2(void *);
 int _start(kernel_args *bootKernelArgs, int cpu);	/* keep compiler happy */
+
 
 int
 _start(kernel_args *bootKernelArgs, int currentCPU)

@@ -55,8 +55,8 @@ inline static bool is_user_in_group(gid_t gid);
 
 // reiserfs_mount
 static status_t
-reiserfs_mount(mount_id nsid, const char *device, uint32 flags,
-	const char *parameters, fs_volume *data, vnode_id *rootID)
+reiserfs_mount(dev_t nsid, const char *device, uint32 flags,
+	const char *parameters, fs_volume *data, ino_t *rootID)
 {
 	TOUCH(flags); TOUCH(parameters);
 	FUNCTION_START();
@@ -118,7 +118,7 @@ reiserfs_read_fs_info(fs_volume fs, struct fs_info *info)
 // reiserfs_lookup
 static status_t
 reiserfs_lookup(fs_volume fs, fs_vnode _dir, const char *entryName,
-	vnode_id *vnid, int *type)
+	ino_t *vnid, int *type)
 {
 //	FUNCTION_START();
 	Volume *volume = (Volume*)fs;
@@ -170,7 +170,7 @@ FUNCTION(("dir: (%Ld: %lu, %lu), entry: `%s'\n", dir->GetID(), dir->GetDirID(),
 
 // reiserfs_read_vnode
 static status_t
-reiserfs_read_vnode(fs_volume fs, vnode_id vnid, fs_vnode *node, bool reenter)
+reiserfs_read_vnode(fs_volume fs, ino_t vnid, fs_vnode *node, bool reenter)
 {
 	TOUCH(reenter);
 //	FUNCTION_START();

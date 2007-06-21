@@ -39,7 +39,7 @@ public:
 	inline void SetVolume(Volume *volume)	{ fVolume = volume; }
 	inline Volume *GetVolume() const		{ return fVolume; }
 
-	inline vnode_id GetID() const	{ return fID; }
+	inline ino_t GetID() const	{ return fID; }
 
 	status_t AddReference();
 	void RemoveReference();
@@ -108,7 +108,7 @@ public:
 
 private:
 	Volume					*fVolume;
-	vnode_id				fID;
+	ino_t					fID;
 	int32					fRefCount;
 	mode_t					fMode;
 	uid_t					fUID;

@@ -242,7 +242,7 @@ disk_super_block::Initialize(const char *diskName, off_t numBlocks, uint32 block
 //	#pragma mark -
 
 
-Volume::Volume(mount_id id)
+Volume::Volume(dev_t id)
 	:
 	fID(id),
 	fBlockAllocator(this),

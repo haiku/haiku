@@ -121,10 +121,10 @@ fs_free_identify_partition_cookie(partition_data *partition, void *_cookie)
 
 #ifdef __HAIKU__
 status_t 
-fs_mount( mount_id nsid, const char *device, ulong flags, const char *args, void **data, vnode_id *vnid )
+fs_mount(dev_t nsid, const char *device, ulong flags, const char *args, void **data, ino_t *vnid)
 #else
 int 
-fs_mount(nspace_id nsid, const char *device, ulong flags, void *parms, size_t len, void **data, vnode_id *vnid)
+fs_mount(nspace_id nsid, const char *device, ulong flags, void *parms, size_t len, void **data, ino_t *vnid)
 #endif
 {
 	nspace		*ns;
@@ -141,8 +141,7 @@ fs_mount(nspace_id nsid, const char *device, ulong flags, void *parms, size_t le
 		result = ENOMEM;
 		goto	exit;
 	}
-		
-			
+
 	*ns = (nspace) {
 		.state = NF_FreeClustersOutdate | NF_FreeMFTOutdate,
 		.show_sys_files = false,
@@ -326,10 +325,10 @@ exit:
 
 #ifdef __HAIKU__
 status_t
-fs_walk(void *_ns, void *_base, const char *file, vnode_id *vnid,int *_type)
+fs_walk(void *_ns, void *_base, const char *file, ino_t *vnid,int *_type)
 #else
 int
-fs_walk(void *_ns, void *_base, const char *file, char **newpath, vnode_id *vnid)
+fs_walk(void *_ns, void *_base, const char *file, char **newpath, ino_t *vnid)
 #endif
 {
 	nspace		*ns = (nspace*)_ns;
@@ -441,10 +440,10 @@ exit:
 
 #ifdef __HAIKU__
 status_t 
-fs_read_vnode(void *_ns, vnode_id vnid, void **node, bool reenter)
+fs_read_vnode(void *_ns, ino_t vnid, void **node, bool reenter)
 #else
 int
-fs_read_vnode(void *_ns, vnode_id vnid, char reenter, void **node)
+fs_read_vnode(void *_ns, ino_t vnid, char reenter, void **node)
 #endif
 {
 	nspace		*ns = (nspace*)_ns;
@@ -876,10 +875,10 @@ exit:
 
 #ifdef __HAIKU__
 status_t   
-fs_create(void *_ns, void *_dir, const char *name, int omode, int perms, void **_cookie, vnode_id *_vnid)
+fs_create(void *_ns, void *_dir, const char *name, int omode, int perms, void **_cookie, ino_t *_vnid)
 #else
 int
-fs_create(void *_ns, void *_dir, const char *name, int omode, int perms, vnode_id *_vnid, void **_cookie)
+fs_create(void *_ns, void *_dir, const char *name, int omode, int perms, ino_t *_vnid, void **_cookie)
 #endif
 {
 	nspace		*ns = (nspace*)_ns;
@@ -1427,7 +1426,7 @@ exit:
 
 #ifdef __HAIKU__
 status_t
-fs_mkdir(void *_ns, void *_node, const char *name,	int perms, vnode_id *_vnid)
+fs_mkdir(void *_ns, void *_node, const char *name,	int perms, ino_t *_vnid)
 #else
 int
 fs_mkdir(void *_ns, void *_node, const char *name,	int perms)
@@ -1484,7 +1483,7 @@ fs_mkdir(void *_ns, void *_node, const char *name,	int perms)
 	ni = ntfs_create(bi, uname, uname_len, S_IFDIR);
 		
 	if (ni)	{
-		vnode_id vnid = MREF( ni->mft_no );		
+		ino_t vnid = MREF( ni->mft_no );		
 
 		newNode = (vnode*)ntfs_calloc( sizeof(vnode) );
 		if(newNode==NULL) {
@@ -1544,7 +1543,7 @@ fs_rename(void *_ns, void *_odir, const char *oldname, void *_ndir, const char *
 	vnode		*onode = NULL;
 	vnode		*nnode = NULL;
 	
-	vnode_id	ovnid,nvnid;
+	ino_t	ovnid,nvnid;
 	
 	ntfs_inode	*oi  = NULL;				
 	ntfs_inode	*ndi = NULL; 
@@ -1733,7 +1732,7 @@ exit:
 status_t
 do_unlink(nspace *vol, vnode *dir, const char *name, bool	isdir)
 {
-	vnode_id 	vnid;
+	ino_t 	vnid;
 	vnode 		*node = NULL;
 	ntfs_inode	*ni = NULL;
 	ntfs_inode 	*bi = NULL;

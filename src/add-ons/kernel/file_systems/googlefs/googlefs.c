@@ -50,9 +50,9 @@ extern struct attr_entry mailto_me_bookmark_attrs[];
 
 extern char *readmestr;
 
-static int googlefs_create_gen(fs_nspace *ns, fs_node *dir, const char *name, int omode, int perms, vnode_id *vnid, fs_node **node, struct attr_entry *iattrs, bool mkdir, bool uniq);
+static int googlefs_create_gen(fs_nspace *ns, fs_node *dir, const char *name, int omode, int perms, ino_t *vnid, fs_node **node, struct attr_entry *iattrs, bool mkdir, bool uniq);
 
-static void fill_default_stat(struct stat *st, nspace_id nsid, vnode_id vnid, mode_t mode)
+static void fill_default_stat(struct stat *st, nspace_id nsid, ino_t vnid, mode_t mode)
 {
 	time_t tm = time(NULL);
 	st->st_dev = nsid;
@@ -109,10 +109,10 @@ err:
 
 #ifdef __HAIKU__
 int googlefs_mount(nspace_id nsid, const char *devname, uint32 flags,
-		const char *parms, fs_nspace **data, vnode_id *vnid)
+		const char *parms, fs_nspace **data, ino_t *vnid)
 #else
 int googlefs_mount(nspace_id nsid, const char *devname, ulong flags,
-		const char *parms, size_t len, fs_nspace **data, vnode_id *vnid)
+		const char *parms, size_t len, fs_nspace **data, ino_t *vnid)
 #endif
 {
 	fs_nspace *ns;
@@ -214,7 +214,7 @@ int googlefs_unmount(fs_nspace *ns)
 	return B_OK;
 }
 
-static int compare_fs_node_by_vnid(fs_node *node, vnode_id *id)
+static int compare_fs_node_by_vnid(fs_node *node, ino_t *id)
 {
 	return !(node->vnid == *id);
 }
@@ -262,9 +262,9 @@ int googlefs_remove_vnode(fs_nspace *ns, fs_node *node, char r)
 }
 
 #ifdef __HAIKU__
-int googlefs_read_vnode(fs_nspace *ns, vnode_id vnid, fs_node **node, char r)
+int googlefs_read_vnode(fs_nspace *ns, ino_t vnid, fs_node **node, char r)
 #else
-int googlefs_read_vnode(fs_nspace *ns, vnode_id vnid, char r, fs_node **node)
+int googlefs_read_vnode(fs_nspace *ns, ino_t vnid, char r, fs_node **node)
 #endif
 {
 	fs_node *n;
@@ -321,9 +321,9 @@ int googlefs_get_vnode_name(fs_nspace *ns, fs_node *node, char *buffer, size_t l
 #endif
 
 #ifdef __HAIKU__
-int googlefs_walk(fs_nspace *ns, fs_node *base, const char *file, vnode_id *vnid, int *type)
+int googlefs_walk(fs_nspace *ns, fs_node *base, const char *file, ino_t *vnid, int *type)
 #else
-int googlefs_walk(fs_nspace *ns, fs_node *base, const char *file, char **newpath, vnode_id *vnid)
+int googlefs_walk(fs_nspace *ns, fs_node *base, const char *file, char **newpath, ino_t *vnid)
 #endif
 {
 	fs_node *n, *dummy;
@@ -658,7 +658,7 @@ int googlefs_wfsstat(fs_nspace *ns, struct fs_info *info, long mask)
  * @param mkdir create a directory instead of a file
  * @param uniq choose an unique name, appending a number if required
  */
-static int googlefs_create_gen(fs_nspace *ns, fs_node *dir, const char *name, int omode, int perms, vnode_id *vnid, fs_node **node, struct attr_entry *iattrs, bool mkdir, bool uniq)
+static int googlefs_create_gen(fs_nspace *ns, fs_node *dir, const char *name, int omode, int perms, ino_t *vnid, fs_node **node, struct attr_entry *iattrs, bool mkdir, bool uniq)
 {
 	char newname[GOOGLEFS_NAME_LEN];
 	status_t err;
@@ -760,7 +760,7 @@ done:
 	return err;
 }
 
-int googlefs_create(fs_nspace *ns, fs_node *dir, const char *name, int omode, int perms, vnode_id *vnid, fs_file_cookie **cookie)
+int googlefs_create(fs_nspace *ns, fs_node *dir, const char *name, int omode, int perms, ino_t *vnid, fs_file_cookie **cookie)
 {
 	status_t err;
 	fs_node *n;

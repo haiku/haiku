@@ -1,30 +1,28 @@
 /*
-**		Copyright 1999, Be Incorporated.   All Rights Reserved.
-**		This file may be used under the terms of the Be Sample Code License.
-**
-**		Copyright 2001, pinc Software.  All Rights Reserved.
-**
-**		iso9960/multi-session
-**			2001-03-11: added multi-session support, axeld.
-*/
+ * Copyright 1999, Be Incorporated.   All Rights Reserved.
+ * This file may be used under the terms of the Be Sample Code License.
+ *
+ * Copyright 2001, pinc Software.  All Rights Reserved.
+ */
 
-#include <malloc.h>
-#include <SupportDefs.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <Drivers.h>
-#include <OS.h>
-#include <KernelExport.h> 
-#include <string.h>
-#include <dirent.h>
-#include <time.h>
-#include <malloc.h>
-#include <ByteOrder.h>
-#include <fs_cache.h>
 
 #include "rock.h"
 #include "iso.h"
+
+#include <ByteOrder.h>
+#include <Drivers.h>
+#include <KernelExport.h> 
+#include <OS.h>
+#include <SupportDefs.h>
+#include <fs_cache.h>
+
+#include <dirent.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <unistd.h>
 
 //#define TRACE_ISO9660 1
 #if TRACE_ISO9660

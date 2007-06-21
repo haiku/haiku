@@ -38,7 +38,7 @@ HaikuKernelFileSystem::Init()
 
 // CreateVolume
 status_t
-HaikuKernelFileSystem::CreateVolume(Volume** volume, mount_id id)
+HaikuKernelFileSystem::CreateVolume(Volume** volume, dev_t id)
 {
 	// check initialization and parameters
 	if (!fFSModule || !volume)

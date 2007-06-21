@@ -62,8 +62,8 @@ purpose.
 #include "util.h"
 
 struct vcache_entry {
-	vnode_id	vnid;		/* originally reported vnid */
-	vnode_id	loc;		/* where the file is now */
+	ino_t	vnid;		/* originally reported vnid */
+	ino_t	loc;		/* where the file is now */
 	struct vcache_entry *next_vnid; /* next entry in vnid hash table */
 	struct vcache_entry *next_loc;  /* next entry in location hash table */
 };
@@ -147,7 +147,7 @@ status_t uninit_vcache(nspace *vol)
 	return 0;
 }
 
-vnode_id generate_unique_vnid(nspace *vol)
+ino_t generate_unique_vnid(nspace *vol)
 {
 	DPRINTF(0, ("generate_unique_vnid\n"));
 	/* only one thread per volume will be in here at any given time anyway
@@ -155,7 +155,7 @@ vnode_id generate_unique_vnid(nspace *vol)
 	return vol->vcache.cur_vnid++;
 }
 
-static status_t _add_to_vcache_(nspace *vol, vnode_id vnid, vnode_id loc)
+static status_t _add_to_vcache_(nspace *vol, ino_t vnid, ino_t loc)
 {
 	int hash1 = hash(vnid), hash2 = hash(loc);
 	struct vcache_entry *e, *c, *p;
@@ -205,7 +205,7 @@ static status_t _add_to_vcache_(nspace *vol, vnode_id vnid, vnode_id loc)
 	return B_OK;
 }
 
-static status_t _remove_from_vcache_(nspace *vol, vnode_id vnid)
+static status_t _remove_from_vcache_(nspace *vol, ino_t vnid)
 {
 	int hash1 = hash(vnid), hash2;
 	struct vcache_entry *c, *p, *e;
@@ -252,7 +252,7 @@ static status_t _remove_from_vcache_(nspace *vol, vnode_id vnid)
 	return 0;
 }
 
-static struct vcache_entry *_find_vnid_in_vcache_(nspace *vol, vnode_id vnid)
+static struct vcache_entry *_find_vnid_in_vcache_(nspace *vol, ino_t vnid)
 {
 	int hash1 = hash(vnid);
 	struct vcache_entry *c;
@@ -268,7 +268,7 @@ static struct vcache_entry *_find_vnid_in_vcache_(nspace *vol, vnode_id vnid)
 	return c;
 }
 
-static struct vcache_entry *_find_loc_in_vcache_(nspace *vol, vnode_id loc)
+static struct vcache_entry *_find_loc_in_vcache_(nspace *vol, ino_t loc)
 {
 	int hash2 = hash(loc);
 	struct vcache_entry *c;
@@ -284,7 +284,7 @@ static struct vcache_entry *_find_loc_in_vcache_(nspace *vol, vnode_id loc)
 	return c;
 }
 
-status_t add_to_vcache(nspace *vol, vnode_id vnid, vnode_id loc)
+status_t add_to_vcache(nspace *vol, ino_t vnid, ino_t loc)
 {
 	status_t result;
 
@@ -297,7 +297,7 @@ status_t add_to_vcache(nspace *vol, vnode_id vnid, vnode_id loc)
 }
 
 /* XXX: do this in a smarter fashion */
-static status_t _update_loc_in_vcache_(nspace *vol, vnode_id vnid, vnode_id loc)
+static status_t _update_loc_in_vcache_(nspace *vol, ino_t vnid, ino_t loc)
 {
 	status_t result;
 
@@ -308,7 +308,7 @@ static status_t _update_loc_in_vcache_(nspace *vol, vnode_id vnid, vnode_id loc)
 	return result;
 }
 
-status_t remove_from_vcache(nspace *vol, vnode_id vnid)
+status_t remove_from_vcache(nspace *vol, ino_t vnid)
 {
 	status_t result;
 
@@ -320,7 +320,7 @@ status_t remove_from_vcache(nspace *vol, vnode_id vnid)
 	return result;
 }
 
-status_t vcache_vnid_to_loc(nspace *vol, vnode_id vnid, vnode_id *loc)
+status_t vcache_vnid_to_loc(nspace *vol, ino_t vnid, ino_t *loc)
 {
 	struct vcache_entry *e;
 
@@ -335,7 +335,7 @@ status_t vcache_vnid_to_loc(nspace *vol, vnode_id vnid, vnode_id *loc)
 	return (e) ? B_OK : ENOENT;
 }
 
-status_t vcache_loc_to_vnid(nspace *vol, vnode_id loc, vnode_id *vnid)
+status_t vcache_loc_to_vnid(nspace *vol, ino_t loc, ino_t *vnid)
 {
 	struct vcache_entry *e;
 
@@ -350,7 +350,7 @@ status_t vcache_loc_to_vnid(nspace *vol, vnode_id loc, vnode_id *vnid)
 	return (e) ? B_OK : ENOENT;
 }
 
-status_t vcache_set_entry(nspace *vol, vnode_id vnid, vnode_id loc)
+status_t vcache_set_entry(nspace *vol, ino_t vnid, ino_t loc)
 {
 	struct vcache_entry *e;
 	status_t result = B_OK;
@@ -400,7 +400,7 @@ int debug_dfvnid(int argc, char **argv)
 		return B_OK;
 
 	for (i=2;i<argc;i++) {
-		vnode_id vnid = strtoull(argv[i], NULL, 0);
+		ino_t vnid = strtoull(argv[i], NULL, 0);
 		struct vcache_entry *e;
 		if ((e = _find_vnid_in_vcache_(vol, vnid)) != NULL) {
 			kprintf("vnid %Lx -> loc %Lx @ %p\n", vnid, e->loc, e);
@@ -412,7 +412,9 @@ int debug_dfvnid(int argc, char **argv)
 	return B_OK;
 }
 
-int debug_dfloc(int argc, char **argv)
+
+int
+debug_dfloc(int argc, char **argv)
 {
 	int i;
 	nspace *vol;
@@ -426,8 +428,8 @@ int debug_dfloc(int argc, char **argv)
 	if (vol == NULL)
 		return B_OK;
 
-	for (i=2;i<argc;i++) {
-		vnode_id loc = strtoull(argv[i], NULL, 0);
+	for (i = 2; i < argc; i++) {
+		ino_t loc = strtoull(argv[i], NULL, 0);
 		struct vcache_entry *e;
 		if ((e = _find_loc_in_vcache_(vol, loc)) != NULL) {
 			kprintf("loc %Lx -> vnid %Lx @ %p\n", loc, e->vnid, e);

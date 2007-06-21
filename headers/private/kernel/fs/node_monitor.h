@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_NODE_MONITOR_H
@@ -18,9 +18,9 @@ extern "C" {
 // private kernel API
 extern status_t remove_node_monitors(struct io_context *context);
 extern status_t node_monitor_init(void);
-extern status_t notify_unmount(mount_id device);
-extern status_t notify_mount(mount_id device, mount_id parentDevice,
-					vnode_id parentDirectory);
+extern status_t notify_unmount(dev_t device);
+extern status_t notify_mount(dev_t device, dev_t parentDevice,
+					ino_t parentDirectory);
 
 // user-space exported calls
 extern status_t _user_stop_notifying(port_id port, uint32 token);

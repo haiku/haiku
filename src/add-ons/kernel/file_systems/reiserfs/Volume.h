@@ -41,10 +41,10 @@ public:
 	Volume();
 	~Volume();
 
-	status_t Mount(mount_id nsid, const char *path);
+	status_t Mount(dev_t nsid, const char *path);
 	status_t Unmount();
 
-	mount_id GetID() const { return fID; }
+	dev_t GetID() const { return fID; }
 
 	off_t GetBlockSize() const;
 	off_t CountBlocks() const;
@@ -60,10 +60,10 @@ public:
 
 	VNode *GetRootVNode() const			{ return fRootVNode; }
 
-	status_t GetVNode(vnode_id id, VNode **node);
-	status_t PutVNode(vnode_id id);
+	status_t GetVNode(ino_t id, VNode **node);
+	status_t PutVNode(ino_t id);
 
-	status_t FindVNode(vnode_id id, VNode *node);
+	status_t FindVNode(ino_t id, VNode *node);
 	status_t FindVNode(uint32 dirID, uint32 objectID, VNode *node);
 
 	status_t FindDirEntry(VNode *dir, const char *entryName,
@@ -76,7 +76,7 @@ public:
 	status_t FindEntry(const VNode *rootDir, const char *path,
 					   VNode *foundNode);
 
-	bool IsNegativeEntry(vnode_id id);
+	bool IsNegativeEntry(ino_t id);
 	bool IsNegativeEntry(uint32 dirID, uint32 objectID);
 
 	bool GetHideEsoteric() const;
@@ -89,7 +89,7 @@ private:
 	void _InitNegativeEntries();
 
 private:
-	mount_id				fID;
+	dev_t					fID;
 	int						fDevice;
 	BlockCache				*fBlockCache;
 	Tree					*fTree;
@@ -98,7 +98,7 @@ private:
 	VNode					*fRootVNode;
 	char					*fDeviceName;
 	Settings				*fSettings;
-	List<vnode_id>			fNegativeEntries;
+	List<ino_t>				fNegativeEntries;
 };
 
 #endif	// VOLUME_H

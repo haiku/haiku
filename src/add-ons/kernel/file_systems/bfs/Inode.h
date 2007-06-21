@@ -35,14 +35,14 @@ enum inode_type {
 
 class Inode {
 	public:
-		Inode(Volume *volume, vnode_id id);
-		Inode(Volume *volume, Transaction &transaction, vnode_id id,
+		Inode(Volume *volume, ino_t id);
+		Inode(Volume *volume, Transaction &transaction, ino_t id,
 			mode_t mode, block_run &run);
 		//Inode(CachedBlock *cached);
 		~Inode();
 
 		//bfs_inode *Node() const { return (bfs_inode *)fBlock; }
-		vnode_id ID() const { return fID; }
+		ino_t ID() const { return fID; }
 		off_t BlockNumber() const { return fVolume->VnodeToBlock(fID); }
 
 		ReadWriteLock &Lock() { return fLock; }
@@ -138,10 +138,10 @@ class Inode {
 
 		// create/remove inodes
 		status_t Remove(Transaction &transaction, const char *name,
-			vnode_id *_id = NULL, bool isDirectory = false);
+			ino_t *_id = NULL, bool isDirectory = false);
 		static status_t Create(Transaction &transaction, Inode *parent,
 			const char *name, int32 mode, int openMode, uint32 type,
-			bool *_created = NULL, vnode_id *_id = NULL, Inode **_inode = NULL);
+			bool *_created = NULL, ino_t *_id = NULL, Inode **_inode = NULL);
 
 		// index maintaining helper
 		void UpdateOldSize()
@@ -194,7 +194,7 @@ class Inode {
 	private:
 		ReadWriteLock	fLock;
 		Volume			*fVolume;
-		vnode_id		fID;
+		ino_t			fID;
 		BPlusTree		*fTree;
 		Inode			*fAttributes;
 		void			*fCache;
@@ -251,7 +251,7 @@ class NodeGetter : public CachedBlock {
 
 class Vnode {
 	public:
-		Vnode(Volume *volume, vnode_id id)
+		Vnode(Volume *volume, ino_t id)
 			:
 			fVolume(volume),
 			fID(id)
@@ -290,7 +290,7 @@ class Vnode {
 
 	private:
 		Volume		*fVolume;
-		vnode_id	fID;
+		ino_t		fID;
 };
 
 
@@ -300,7 +300,7 @@ class AttributeIterator {
 		~AttributeIterator();
 		
 		status_t Rewind();
-		status_t GetNext(char *name, size_t *length, uint32 *type, vnode_id *id);
+		status_t GetNext(char *name, size_t *length, uint32 *type, ino_t *id);
 
 	private:
 		friend class Chain<AttributeIterator>;

@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  This software is part of the Haiku distribution and is covered 
+//  by the MIT license.
 //
 //  Copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
 //  Mucho respecto to Axel Dörfler and his BFS implementation, from
@@ -47,7 +47,7 @@ extern "C" {
 extern "C" {
 	// general/volume stuff
 	static int udf_mount(nspace_id nsid, const char *device, ulong flags,
-					void *parms, size_t len, void **data, vnode_id *vnid);
+					void *parms, size_t len, void **data, ino_t *vnid);
 	static int udf_unmount(void *_ns);
 	static int udf_read_fs_stat(void *_ns, struct fs_info *);
 	static int udf_write_fs_stat(void *ns, struct fs_info *, long mode);
@@ -55,12 +55,12 @@ extern "C" {
 
 	static int udf_sync(void *ns);
 
-	static int udf_read_vnode(void *_ns, vnode_id vnid, char r, void **node);
+	static int udf_read_vnode(void *_ns, ino_t vnid, char r, void **node);
 	static int udf_release_vnode(void *_ns, void *_node, char r);
 	static int udf_remove_vnode(void *ns, void *node, char r);
 
 	static int udf_walk(void *_ns, void *_base, const char *file,
-					char **newpath, vnode_id *vnid);
+					char **newpath, ino_t *vnid);
 	
 	static int udf_ioctl(void *ns, void *node, void *cookie, int cmd, void *buf,size_t len);
 	static int udf_setflags(void *ns, void *node, void *cookie, int flags);
@@ -73,7 +73,7 @@ extern "C" {
 
 	// file stuff
 	static int udf_create(void *ns, void *dir, const char *name,
-					int perms, int omode, vnode_id *vnid, void **cookie);
+					int perms, int omode, ino_t *vnid, void **cookie);
 	static int udf_symlink(void *ns, void *dir, const char *name,
 					const char *path);
 	static int udf_link(void *ns, void *dir, const char *name, void *node);
@@ -239,7 +239,7 @@ int32 api_version = B_CUR_FS_API_VERSION;
 */
 int
 udf_mount(nspace_id nsid, const char *name, ulong flags, void *parms,
-		size_t parmsLength, void **volumeCookie, vnode_id *rootID)
+		size_t parmsLength, void **volumeCookie, ino_t *rootID)
 {
 	INITIALIZE_DEBUGGING_OUTPUT_FILE("/boot/home/Desktop/udf_debug.txt");
 	DEBUG_INIT_ETC(NULL, ("name: `%s'", name));
@@ -397,7 +397,7 @@ udf_sync(void *ns)
 
 
 int
-udf_read_vnode(void *ns, vnode_id id, char reenter, void **node)
+udf_read_vnode(void *ns, ino_t id, char reenter, void **node)
 {
 	DEBUG_INIT_ETC(NULL, ("id: %Ld, reenter: %s", id, (reenter ? "true" : "false")));
 	
@@ -467,7 +467,7 @@ udf_suspend_vnode(void *ns, void *node)
 
 
 int
-udf_walk(void *ns, void *_dir, const char *filename, char **resolvedPath, vnode_id *vnodeId)
+udf_walk(void *ns, void *_dir, const char *filename, char **resolvedPath, ino_t *vnodeId)
 {
 	DEBUG_INIT_ETC(NULL, ("dir: %p, filename = `%s'", _dir, filename));
 	
@@ -591,7 +591,7 @@ udf_write_stat(void *ns, void *node, struct stat *stat, long mask)
 
 int 
 udf_create(void *ns, void *dir, const char *name, int omode, int mode,
-	vnode_id *newID, void **newNode)
+	ino_t *newID, void **newNode)
 {
 	DEBUG_INIT(NULL);
 	// FUNCTION_START(("name: `%s\', perms: %d, omode: %d\n", name, mode, omode));

@@ -977,7 +977,7 @@ BlockAllocator::CheckNextNode(check_control *control)
 
 		char name[B_FILE_NAME_LENGTH];
 		uint16 length;
-		vnode_id id;
+		ino_t id;
 
 		status_t status = cookie->iterator->GetNextEntry(name, &length, B_FILE_NAME_LENGTH, &id);
 		if (status == B_ENTRY_NOT_FOUND) {

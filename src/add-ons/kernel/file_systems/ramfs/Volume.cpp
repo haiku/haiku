@@ -164,7 +164,7 @@ Volume::~Volume()
 
 // Mount
 status_t
-Volume::Mount(mount_id id)
+Volume::Mount(dev_t id)
 {
 	Unmount();
 
@@ -369,7 +369,7 @@ Volume::PublishVNode(Node *node)
 
 // GetVNode
 status_t
-Volume::GetVNode(vnode_id id, Node **node)
+Volume::GetVNode(ino_t id, Node **node)
 {
 	return (fMounted ? get_vnode(GetID(), id, (void**)node) : B_BAD_VALUE);
 }
@@ -391,7 +391,7 @@ Volume::GetVNode(Node *node)
 
 // PutVNode
 status_t
-Volume::PutVNode(vnode_id id)
+Volume::PutVNode(ino_t id)
 {
 	return (fMounted ? put_vnode(GetID(), id) : B_BAD_VALUE);
 }
@@ -485,7 +485,7 @@ Volume::NodeRemoved(Node *node)
 }
 
 // FindNode
-/*!	\brief Finds the node identified by a vnode_id.
+/*!	\brief Finds the node identified by a ino_t.
 
 	\note The method does not initialize the parent ID for non-directory nodes.
 
@@ -494,7 +494,7 @@ Volume::NodeRemoved(Node *node)
 	\return \c B_OK, if everything went fine.
 */
 status_t
-Volume::FindNode(vnode_id id, Node **node)
+Volume::FindNode(ino_t id, Node **node)
 {
 	status_t error = (node ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
@@ -544,7 +544,7 @@ Volume::RemoveNodeListener(NodeListener *listener, Node *node)
 
 // EntryAdded
 status_t
-Volume::EntryAdded(vnode_id id, Entry *entry)
+Volume::EntryAdded(ino_t id, Entry *entry)
 {
 	status_t error = (entry ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
@@ -575,7 +575,7 @@ Volume::EntryAdded(vnode_id id, Entry *entry)
 
 // EntryRemoved
 status_t
-Volume::EntryRemoved(vnode_id id, Entry *entry)
+Volume::EntryRemoved(ino_t id, Entry *entry)
 {
 	status_t error = (entry ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
@@ -606,7 +606,7 @@ Volume::EntryRemoved(vnode_id id, Entry *entry)
 
 // FindEntry
 status_t
-Volume::FindEntry(vnode_id id, const char *name, Entry **entry)
+Volume::FindEntry(ino_t id, const char *name, Entry **entry)
 {
 	status_t error = (entry ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
@@ -656,7 +656,7 @@ Volume::RemoveEntryListener(EntryListener *listener, Entry *entry)
 
 // NodeAttributeAdded
 status_t
-Volume::NodeAttributeAdded(vnode_id id, Attribute *attribute)
+Volume::NodeAttributeAdded(ino_t id, Attribute *attribute)
 {
 	status_t error = (attribute ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
@@ -674,7 +674,7 @@ Volume::NodeAttributeAdded(vnode_id id, Attribute *attribute)
 
 // NodeAttributeRemoved
 status_t
-Volume::NodeAttributeRemoved(vnode_id id, Attribute *attribute)
+Volume::NodeAttributeRemoved(ino_t id, Attribute *attribute)
 {
 	status_t error = (attribute ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
@@ -701,7 +701,7 @@ Volume::NodeAttributeRemoved(vnode_id id, Attribute *attribute)
 
 // FindNodeAttribute
 status_t
-Volume::FindNodeAttribute(vnode_id id, const char *name, Attribute **attribute)
+Volume::FindNodeAttribute(ino_t id, const char *name, Attribute **attribute)
 {
 	status_t error = (attribute ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {

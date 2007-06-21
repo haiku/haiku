@@ -14,7 +14,6 @@
 #include <BeBuild.h>
 
 typedef dev_t		nspace_id;
-typedef ino_t		vnode_id;
 
 /* UGLY UGLY UGLY */
 #ifndef _DRIVERS_H
@@ -63,18 +62,18 @@ typedef struct selectsync selectsync;
 struct attr_info;
 struct index_info;
 
-typedef int	op_read_vnode(void *ns, vnode_id vnid, char r, void **node);
+typedef int	op_read_vnode(void *ns, ino_t vnid, char r, void **node);
 typedef int	op_write_vnode(void *ns, void *node, char r);
 typedef int	op_remove_vnode(void *ns, void *node, char r);
 typedef int	op_secure_vnode(void *ns, void *node);
 
 typedef int	op_walk(void *ns, void *base, const char *file, char **newpath,
-					vnode_id *vnid);
+					ino_t *vnid);
 
 typedef int	op_access(void *ns, void *node, int mode);
 
 typedef int	op_create(void *ns, void *dir, const char *name,
-					int omode, int perms, vnode_id *vnid, void **cookie);
+					int omode, int perms, ino_t *vnid, void **cookie);
 typedef int	op_mkdir(void *ns, void *dir, const char *name,	int perms);
 typedef int	op_symlink(void *ns, void *dir, const char *name,
 					const char *path);
@@ -119,7 +118,7 @@ typedef int	op_deselect(void *ns, void *node, void *cookie, uint8 event,
 
 typedef int	op_initialize(const char *devname, void *parms, size_t len);
 typedef int	op_mount(nspace_id nsid, const char *devname, ulong flags,
-					void *parms, size_t len, void **data, vnode_id *vnid);
+					void *parms, size_t len, void **data, ino_t *vnid);
 typedef int	op_unmount(void *ns);
 typedef int	op_sync(void *ns);
 typedef int op_rfsstat(void *ns, struct fs_info *);
@@ -228,20 +227,20 @@ extern _IMPEXP_KERNEL int	new_path(const char *path, char **copy);
 extern _IMPEXP_KERNEL void	free_path(char *p);
 
 extern _IMPEXP_KERNEL int	notify_listener(int op, nspace_id nsid,
-									vnode_id vnida,	vnode_id vnidb,
-									vnode_id vnidc, const char *name);
+									ino_t vnida,	ino_t vnidb,
+									ino_t vnidc, const char *name);
 extern _IMPEXP_KERNEL void	notify_select_event(selectsync *sync, uint32 ref);
 extern _IMPEXP_KERNEL int	send_notification(port_id port, long token,
 									ulong what, long op, nspace_id nsida,
-									nspace_id nsidb, vnode_id vnida,
-									vnode_id vnidb, vnode_id vnidc,
+									nspace_id nsidb, ino_t vnida,
+									ino_t vnidb, ino_t vnidc,
 									const char *name);
-extern _IMPEXP_KERNEL int	get_vnode(nspace_id nsid, vnode_id vnid, void **data);
-extern _IMPEXP_KERNEL int	put_vnode(nspace_id nsid, vnode_id vnid);
-extern _IMPEXP_KERNEL int	new_vnode(nspace_id nsid, vnode_id vnid, void *data);
-extern _IMPEXP_KERNEL int	remove_vnode(nspace_id nsid, vnode_id vnid);
-extern _IMPEXP_KERNEL int	unremove_vnode(nspace_id nsid, vnode_id vnid);
-extern _IMPEXP_KERNEL int	is_vnode_removed(nspace_id nsid, vnode_id vnid);
+extern _IMPEXP_KERNEL int	get_vnode(nspace_id nsid, ino_t vnid, void **data);
+extern _IMPEXP_KERNEL int	put_vnode(nspace_id nsid, ino_t vnid);
+extern _IMPEXP_KERNEL int	new_vnode(nspace_id nsid, ino_t vnid, void *data);
+extern _IMPEXP_KERNEL int	remove_vnode(nspace_id nsid, ino_t vnid);
+extern _IMPEXP_KERNEL int	unremove_vnode(nspace_id nsid, ino_t vnid);
+extern _IMPEXP_KERNEL int	is_vnode_removed(nspace_id nsid, ino_t vnid);
 
 
 extern _EXPORT vnode_ops	fs_entry;

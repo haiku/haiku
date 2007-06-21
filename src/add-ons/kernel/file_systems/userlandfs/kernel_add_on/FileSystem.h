@@ -35,14 +35,14 @@ public:
 
 			RequestPortPool*	GetPortPool();
 
-			status_t			Mount(mount_id id, const char* device,
+			status_t			Mount(dev_t id, const char* device,
 									ulong flags, const char* parameters,
 									Volume** volume);
 //			status_t		 	Initialize(const char* deviceName,
 //									const char* parameters, size_t len);
 			void				VolumeUnmounted(Volume* volume);
 
-			Volume*				GetVolume(mount_id id);
+			Volume*				GetVolume(dev_t id);
 
 			const IOCtlInfo*	GetIOCtlInfo(int command) const;
 

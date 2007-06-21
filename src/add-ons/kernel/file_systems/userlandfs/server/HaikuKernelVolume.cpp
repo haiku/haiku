@@ -13,7 +13,7 @@
 
 
 // constructor
-HaikuKernelVolume::HaikuKernelVolume(FileSystem* fileSystem, mount_id id,
+HaikuKernelVolume::HaikuKernelVolume(FileSystem* fileSystem, dev_t id,
 	file_system_module_info* fsModule)
 	: Volume(fileSystem, id),
 	  fFSModule(fsModule),
@@ -32,7 +32,7 @@ HaikuKernelVolume::~HaikuKernelVolume()
 // Mount
 status_t
 HaikuKernelVolume::Mount(const char* device, uint32 flags,
-	const char* parameters, vnode_id* rootID)
+	const char* parameters, ino_t* rootID)
 {
 	if (!fFSModule->mount)
 		return B_BAD_VALUE;
@@ -118,7 +118,7 @@ HaikuKernelVolume::GetFileMap(fs_vnode node, off_t offset, size_t size,
 
 // Lookup
 status_t
-HaikuKernelVolume::Lookup(fs_vnode dir, const char* entryName, vnode_id* vnid,
+HaikuKernelVolume::Lookup(fs_vnode dir, const char* entryName, ino_t* vnid,
 	int* type)
 {
 	if (!fFSModule->lookup)
@@ -139,7 +139,7 @@ HaikuKernelVolume::GetVNodeName(fs_vnode node, char* buffer, size_t bufferSize)
 
 // ReadVNode
 status_t
-HaikuKernelVolume::ReadVNode(vnode_id vnid, bool reenter, fs_vnode* node)
+HaikuKernelVolume::ReadVNode(ino_t vnid, bool reenter, fs_vnode* node)
 {
 	if (!fFSModule->get_vnode)
 		return B_BAD_VALUE;
@@ -304,7 +304,7 @@ HaikuKernelVolume::WriteStat(fs_vnode node, const struct stat *st, uint32 mask)
 // Create
 status_t
 HaikuKernelVolume::Create(fs_vnode dir, const char* name, int openMode, int mode,
-	fs_cookie* cookie, vnode_id* vnid)
+	fs_cookie* cookie, ino_t* vnid)
 {
 	if (!fFSModule->create)
 		return B_BAD_VALUE;
@@ -373,7 +373,7 @@ HaikuKernelVolume::Write(fs_vnode node, fs_cookie cookie, off_t pos,
 // CreateDir
 status_t
 HaikuKernelVolume::CreateDir(fs_vnode dir, const char* name, int mode,
-	vnode_id *newDir)
+	ino_t *newDir)
 {
 	if (!fFSModule->create_dir)
 		return B_BAD_VALUE;

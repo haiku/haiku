@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  This software is part of the Haiku distribution and is covered 
+//  by the MIT license.
 //
 //  Copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
 //---------------------------------------------------------------------
@@ -24,9 +24,9 @@ extern "C" {
 namespace Udf {
 
 long_address
-to_long_address(vnode_id id, uint32 length)
+to_long_address(ino_t id, uint32 length)
 {
-	DEBUG_INIT_ETC(NULL, ("vnode_id: %Ld (0x%Lx), length: %ld", id, id, length));
+	DEBUG_INIT_ETC(NULL, ("ino_t: %Ld (0x%Lx), length: %ld", id, id, length));
 	long_address result;
 	result.set_block((id >> 16) & 0xffffffff);
 	result.set_partition(id & 0xffff);
@@ -35,17 +35,17 @@ to_long_address(vnode_id id, uint32 length)
 	return result;
 }
 
-vnode_id
+ino_t
 to_vnode_id(long_address address)
 {
 	DEBUG_INIT(NULL);
-	vnode_id result = address.block();
+	ino_t result = address.block();
 	result <<= 16;
 	result |= address.partition();
 	PRINT(("block:     %ld, 0x%lx\n", address.block(), address.block())); 
 	PRINT(("partition: %d, 0x%x\n", address.partition(), address.partition())); 
 	PRINT(("length:    %ld, 0x%lx\n", address.length(), address.length()));
-	PRINT(("vnode_id:  %Ld, 0x%Lx\n", result, result));
+	PRINT(("ino_t:     %Ld, 0x%Lx\n", result, result));
 	return result;
 }
 
