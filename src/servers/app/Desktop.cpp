@@ -1490,6 +1490,7 @@ Desktop::ShowWindow(WindowLayer* window)
 		ActivateWindow(window);
 	} else {
 		// then we don't need to send the fake mouse event either
+		_WindowChanged(window);
 		UnlockAllWindows();
 		return;
 	}
@@ -1527,7 +1528,8 @@ Desktop::HideWindow(WindowLayer* window)
 
 		if (FocusWindow() == window)
 			SetFocusWindow(_CurrentWindows().LastWindow());
-	}
+	} else
+		_WindowChanged(window);
 
 	if (fWorkspacesLayer != NULL)
 		fWorkspacesLayer->WindowRemoved(window);
