@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src apps mediaconverter ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+Application MediaConverter :
+	MediaConverterApp.cpp
+	MediaConverterWindow.cpp
+	MediaEncoderWindow.cpp
+	MediaFileInfoView.cpp
+	MediaFileListView.cpp
+	StatusView.cpp
+
+	: be media tracker
+	: MediaConverter.rdef
+;
