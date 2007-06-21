@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright 2007 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
@@ -12,18 +12,22 @@
 /*!
   \file fs_interface.h
   \ingroup drivers
+  \brief Provides an interface for file system modules.
+  
+  See the \ref fs_modules "introduction to file system modules" for a guide on
+  how to get started with writing file system modules.
 */
 
 ///// Typedefs /////
 
 /*!
   \typedef typedef dev_t mount_id
-  \brief A \c mount_id refers to a specific mounted (virtual) volume.
+  \brief A \c mount_id refers to a mounted volume.
 */
 
 /*!
   \typedef typedef ino_t vnode_id
-  \brief A \c vnode_id refers to one of the available virtual nodes.
+  \brief A \c vnode_id refers to one of the available vnodes.
 */
 
 /*! 
@@ -69,7 +73,9 @@
 
 /*!
   \var write_stat_mask::FS_WRITE_STAT_SIZE
-  \brief The size field should be updated.
+  \brief The size field should be updated. If the actual size is less than the
+    new provided file size, the file should be set to the new size and the
+    extra space should be filled with zeros. 
 */
 
 /*!
@@ -125,6 +131,9 @@
 /*!
   \struct file_system_module_info
   \brief Kernel module interface for file systems.
+  
+  See the \ref fs_modules "introduction to file system modules" for an
+  introduction to writing file systems.
 */
 
 /*!
@@ -153,22 +162,22 @@
 
 /*!
   \fn float (*file_system_module_info::identify_partition)(int fd, partition_data *partition, void **cookie)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 /*!
   \fn status_t (*file_system_module_info::scan_partition)(int fd, partition_data *partition, void *cookie)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 /*!
   \fn void (*file_system_module_info::free_identify_partition_cookie)(partition_data *partition, void *cookie)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 /*!
   \fn void (*file_system_module_info::free_partition_content_cookie)(partition_data *partition)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 //! @}
@@ -269,9 +278,7 @@
   Currently, the only possible mask is solely the \c FS_WRITE_FSINFO_NAME,
   which asks you to update the volume name represented by the value
   \c volume_name in the \c fs_info struct.
-  
-  TODO: ANY OTHERS?
-  
+
   \param fs The cookie your filesystem supplied to the volume that should be
     updated.
   \param info The structure that contains the new data.
@@ -333,9 +340,16 @@
 */
 
 /*!
-  \fn status_t (*file_system_module_info::get_vnode_name)(fs_volume fs, fs_vnode vnode, char *buffer,
-				size_t bufferSize)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::get_vnode_name)(fs_volume fs,
+    fs_vnode vnode, char *buffer, size_t bufferSize)
+  \brief Return the file name of a vnode.
+  
+  \param fs The file system provided cookie associated with this volume.
+  \param vnode The file system provided cookie associated with this vnode.
+  \param buffer The buffer that the name can be copied into.
+  \param bufferSize The size of the buffer.
+  \retval B_OK You successfully copied the file name into the \a buffer.
+  \retval "other errors" There was some error looking up or copying the name.
 */
 
 /*!
@@ -395,7 +409,7 @@
 
 /*!
   \fn bool (*file_system_module_info::can_page)(fs_volume fs, fs_vnode vnode, fs_cookie cookie)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
   
   TODO: In both the dos and the bfs implementations this thing simply returns
   false... Is there anything more to it?
@@ -405,14 +419,14 @@
   \fn status_t (*file_system_module_info::read_pages)(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
 				off_t pos, const iovec *vecs, size_t count, size_t *_numBytes,
 				bool reenter)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 /*!
   \fn status_t (*file_system_module_info::write_pages)(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
 				off_t pos, const iovec *vecs, size_t count, size_t *_numBytes,
 				bool reenter)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 //! @}
@@ -426,7 +440,7 @@
 /*!
   \fn status_t (*file_system_module_info::get_file_map)(fs_volume fs, fs_vnode vnode, off_t offset,
 				size_t size, struct file_io_vec *vecs, size_t *_count)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 //! @}
@@ -477,13 +491,17 @@
 /*!
   \fn status_t (*file_system_module_info::select)(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
 				uint8 event, uint32 ref, selectsync *sync)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
+  
+  TODO: What should this do?
 */
 
 /*!
   \fn status_t (*file_system_module_info::deselect)(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
 				uint8 event, selectsync *sync)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
+  
+  TODO: What should this do?
 */
 
 /*!
@@ -536,20 +554,67 @@
 */
 
 /*!
-  \fn status_t (*file_system_module_info::link)(fs_volume fs, fs_vnode dir, const char *name,
-				fs_vnode vnode)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::link)(fs_volume fs, fs_vnode dir, 
+    const char *name, fs_vnode vnode)
+  \brief Create a new hard link.
+  
+  You should make sure the user has the proper permissions.
+  
+  The virtual file system will request the creation of symbolic links with
+  create_symlink().
+  
+  \param fs The file system provided cookie associated with this volume.
+  \param dir The cookie associated to the directory where the link should be
+    saved.
+  \param name The name the link should have.
+  \param vnode The vnode the new link should resolve to.
+  \retval B_OK The hard link is properly created.
+  \retval B_NOT_ALLOWED The user does not have the proper permissions.
+  \retval "other errors" Another error occured.
 */
 
 /*!
-  \fn status_t (*file_system_module_info::unlink)(fs_volume fs, fs_vnode dir, const char *name)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::unlink)(fs_volume fs, fs_vnode dir,
+    const char *name)
+  \brief Remove a node or directory.
+  
+  You should make sure the user has the proper permissions.
+  
+  \param fs The file system provided cookie associated with this volume.
+  \param dir The parent directory of the node that should be removed.
+  \param name The name of the node that should be deleted.
+  \retval B_OK Removal succeeded.
+  \retval B_ENTRY_NOT_FOUND The entry does not exist.
+  \retval B_NOT_ALLOWED The user does not have the proper permissions.
+  \retval B_DIRECTORY_NOT_EMPTY The \a name refers to a directory. The virtual
+    file system expects directories to be emptied before they can be unlinked.
+  \retval "other errors" Another error occured.
 */
 
 /*!
-  \fn status_t (*file_system_module_info::rename)(fs_volume fs, fs_vnode fromDir, const char *fromName,
-				fs_vnode toDir, const char *toName)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::rename)(fs_volume fs, fs_vnode 
+    fromDir, const char *fromName, fs_vnode toDir, const char *toName)
+  \brief Rename and/or relocate a vnode.
+  
+  The virtual file system merely relays the request, so make sure the user is
+  not changing the file name to something like '.', '..' or anything starting
+  with '/'. 
+  
+  This also means that it if the node is a directory, that it should not be
+  moved into one of its own children.
+  
+  You should also make sure the user has the proper permissions.
+  
+  \param fs The file system provided cookie associated with this volume.
+  \param fromDir The cookie of the parent directory the vnode should be moved
+    from.
+  \param fromName The old name of the node.
+  \param toDir The cookie of the parent directory the vnode should be moved to.
+  \param toName The new name of the node.
+  \retval B_OK The renaming and relocating succeeded.
+  \retval B_BAD_VALUE One of the supplied parameters were invalid.
+  \retval B_NOT_ALLOWED The user does not have the proper permissions.
+  \retval "other errors" Another error condition was encountered.
 */
 
 /*!
@@ -603,9 +668,21 @@
 */
 
 /*!
-  \fn status_t (*file_system_module_info::write_stat)(fs_volume fs, fs_vnode vnode,
-				const struct stat *stat, uint32 statMask)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::write_stat)(fs_volume fs, fs_vnode 
+    vnode, const struct stat *stat, uint32 statMask)
+  \brief Update the stats for a vnode.
+  
+  You should make sure that the new values are valid and that the user has the
+  proper permissions to update the stats.
+  
+  \param fs The file system provided cookie to the volume.
+  \param vnode The cookie to the vnode.
+  \param stat The structure with the updated values.
+  \param statMask One of the #write_stat_mask enumeration, which forms a mask
+    of which of the values in \a stat should actually be updated.
+  \retval B_OK The update succeeded.
+  \retval B_NOT_ALLOWED The user does not have the proper permissions.
+  \retval "other errors" Another error condition occured.
 */
 
 //! @}
@@ -920,30 +997,64 @@
 //! @{
 
 /*!
-  \fn status_t (*file_system_module_info::open_attr_dir)(fs_volume fs, fs_vnode vnode, fs_cookie *_cookie)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::open_attr_dir)(fs_volume fs, fs_vnode
+    vnode, fs_cookie *_cookie)
+  \brief Open a 'directory' of attributes for a \a vnode.
+  
+  See \ref concepts "Generic Concepts" on directories and iterators. Basically,
+  the VFS uses the same way of traversing through attributes as it traverses
+  through a directory. 
+  
+  \param fs The file system provided cookie to the volume.
+  \param vnode The vnode on which the file system wants to read the attributes.
+  \param[out] _cookie Pointer where the file system can store a directory
+    cookie if the attribute directory is succesfully opened.
+  \return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-  \fn status_t (*file_system_module_info::close_attr_dir)(fs_volume fs, fs_vnode vnode, fs_cookie cookie)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::close_attr_dir)(fs_volume fs,
+    fs_vnode vnode, fs_cookie cookie)
+  \brief Close a 'directory' of attributes for a \a vnode.
+  
+  Note that you should free the cookie in the free_attr_dir_cookie() call.
+  
+  \param fs The file system provided cookie to the volume.
+  \param vnode The vnode on which the 'directory' was opened.
+  \param cookie The cookie associated with this 'directory'.
+  \return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-  \fn status_t (*file_system_module_info::free_attr_dir_cookie)(fs_volume fs, fs_vnode vnode,
-				fs_cookie cookie)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::free_attr_dir_cookie)(fs_volume fs,
+    fs_vnode vnode, fs_cookie cookie)
+  \brief Free the \a cookie to an attribute 'directory'. 
+  
+  \param fs The file system provided cookie to the volume.
+  \param vnode The vnode on which the 'directory' was opened.
+  \param cookie The cookie associated that should be freed.
+  \return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-  \fn status_t (*file_system_module_info::read_attr_dir)(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
-				struct dirent *buffer, size_t bufferSize, uint32 *_num)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::read_attr_dir)(fs_volume fs, fs_vnode
+    vnode, fs_cookie cookie, struct dirent *buffer, size_t bufferSize,
+    uint32 *_num)
+  \brief Read the next one or more attribute directory entries.
+  
+  This method should perform the same tasks as read_dir(), except that the '.'
+  and '..' entries do not have to be present. 
 */
 
 /*!
-  \fn status_t (*file_system_module_info::rewind_attr_dir)(fs_volume fs, fs_vnode vnode, fs_cookie cookie)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::rewind_attr_dir)(fs_volume fs,
+    fs_vnode vnode, fs_cookie cookie)
+  \brief Rewind the attribute directory iterator to the first entry.
+  
+  \param fs The file system provided cookie to the volume.
+  \param vnode The vnode on which the 'directory' was opened.
+  \param cookie The cookie associated with this 'directory'.
+  \return \c B_OK if everything went fine, another error code otherwise.
 */
 
 //! @}
@@ -955,61 +1066,154 @@
 //! @{
 
 /*!
-  \fn status_t (*file_system_module_info::create_attr)(fs_volume fs, fs_vnode vnode, const char *name,
-				uint32 type, int openMode, fs_cookie *_cookie)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::create_attr)(fs_volume fs, fs_vnode
+    vnode, const char *name, uint32 type, int openMode, fs_cookie *_cookie)
+  \brief Create a new attribute. 
+  
+  If the attribute already exists, you should open it in truncated mode. 
+  
+  \param fs The file system provided cookie to the volume.
+  \param vnode The file system provided cookie to the vnode.
+  \param name The name of the attribute.
+  \param type The \c type_code of the attribute.
+  \param openMode The openMode of the associated attribute.
+  \param[out] _cookie A pointer where you can store an associated file system
+    cookie.
+  \return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-  \fn status_t (*file_system_module_info::open_attr)(fs_volume fs, fs_vnode vnode, const char *name,
-				int openMode, fs_cookie *_cookie)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::open_attr)(fs_volume fs, fs_vnode
+    vnode, const char *name, int openMode, fs_cookie *_cookie)
+  \brief Open an existing attribute.
+  
+  \param fs The file system provided cookie to the volume.
+  \param vnode The file system provided cookie to the vnode.
+  \param name The name of the attribute.
+  \param openMode The mode in which you want to open the attribute data.
+  \param[out] _cookie A pointer where you can store an associated file system
+    cookie.
+  \return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-  \fn status_t (*file_system_module_info::close_attr)(fs_volume fs, fs_vnode vnode, fs_cookie cookie)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::close_attr)(fs_volume fs, fs_vnode
+    vnode, fs_cookie cookie)
+  \brief Close access to an attribute.
+  
+  Note that you should not delete the cookie yet, you should do that when the
+  VFS calls free_attr_cookie(). 
+
+  \param fs The file system provided cookie to the volume.
+  \param vnode The file system provided cookie to the vnode.
+  \param cookie The cookie you associated to this attribute.
+  \return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-  \fn status_t (*file_system_module_info::free_attr_cookie)(fs_volume fs, fs_vnode vnode,
-				fs_cookie cookie)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::free_attr_cookie)(fs_volume fs,
+    fs_vnode vnode, fs_cookie cookie)
+  \brief Free the cookie of an attribute.
+  
+  The VFS calls this hook when all operations on the attribute have ceased.
+  
+  \param fs The file system provided cookie to the volume.
+  \param vnode The file system provided cookie to the vnode.
+  \param cookie The cookie to the attribute that should be freed.
+  \return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-  \fn status_t (*file_system_module_info::read_attr)(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
-				off_t pos, void *buffer, size_t *length)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::read_attr)(fs_volume fs, fs_vnode
+    vnode, fs_cookie cookie, off_t pos, void *buffer, size_t *length)
+  \brief Read attribute data associated with \a cookie.
+  
+  Read until the \a buffer with size \a length is full, or until you are out of
+  data, in which case you should update \a length.
+  
+  \param fs The file system provided cookie to the volume.
+  \param vnode The file system provided cookie to the vnode.
+  \param cookie The cookie you associated to this attribute.
+  \param pos The position to start reading from.
+  \param buffer The buffer the data should be copied in.
+  \param length The length of the buffer. Update this variable to the actual
+    amount of bytes read.
+  \return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-  \fn status_t (*file_system_module_info::write_attr)(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
-				off_t pos, const void *buffer, size_t *length)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::write_attr)(fs_volume fs, fs_vnode
+    vnode, fs_cookie cookie, off_t pos, const void *buffer, size_t *length)
+  \brief Write attribute data associated with \a cookie.
+
+  \param fs The file system provided cookie to the volume.
+  \param vnode The file system provided cookie to the vnode.
+  \param cookie The cookie you associated with this attribute.
+  \param pos The position to start writing to.
+  \param buffer The buffer the data should be copied from.
+  \param length The size of the buffer. Update this variable to the actual
+    amount of bytes written.
+  \return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-  \fn status_t (*file_system_module_info::read_attr_stat)(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
-				struct stat *stat)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::read_attr_stat)(fs_volume fs,
+    fs_vnode vnode, fs_cookie cookie, struct stat *stat)
+  \brief Get the stats for an attribute.
+  
+  \param fs The file system provided cookie to the volume.
+  \param vnode The file system provided cookie to the vnode.
+  \param cookie The cookie you associated with this attribute.
+  \param stat A pointer to a stat structure you should fill.
+  \return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-  \fn status_t (*file_system_module_info::write_attr_stat)(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
-				const struct stat *stat, int statMask)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::write_attr_stat)(fs_volume fs,
+    fs_vnode vnode, fs_cookie cookie, const struct stat *stat, int statMask)
+  \brief Update the stats of an attribute.
+  
+  \param fs The file system provided cookie to the volume.
+  \param vnode The file system provided cookie to the vnode.
+  \param cookie The cookie you associated with this attribute.
+  \param stat A pointer to the new stats you should write.
+  \param statMask One or more of the values of #write_stat_mask that tell you
+    which fields of \a stat are to be updated.
+  \return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-  \fn status_t (*file_system_module_info::rename_attr)(fs_volume fs, fs_vnode fromVnode,
-				const char *fromName, fs_vnode toVnode, const char *toName)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::rename_attr)(fs_volume fs,
+    fs_vnode fromVnode, const char *fromName, fs_vnode toVnode,
+    const char *toName)
+  \brief Rename and/or relocate an attribute.
+  
+  You should make sure the user has the proper permissions.
+  
+  \param fs The file system provided cookie associated with this volume.
+  \param fromVnode The cookie associated with the vnode the attribute currently
+    is related to.
+  \param fromName The old name of the attribute.
+  \param toVnode The cookie associated with the vnode the attribute should be
+    moved to. This can be the same as \a fromVnode, in which case it only means
+    the attribute should be renamed.
+  \param toName The new name of the attribute.This can be the same as
+    \a fromName, in which case it only means the attribute should be relocated.
+  \retval B_OK The renaming and/or relocating succeeded.
+  \retval B_BAD_VALUE One of the supplied parameters were invalid.
+  \retval B_NOT_ALLOWED The user does not have the proper permissions.
+  \retval "other errors" Another error condition was encountered.
 */
 
 /*!
-  \fn status_t (*file_system_module_info::remove_attr)(fs_volume fs, fs_vnode vnode, const char *name)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::remove_attr)(fs_volume fs,
+    fs_vnode vnode, const char *name)
+  \brief Remove an attribute.
+  
+  \param fs The file system provided cookie to the volume.
+  \param vnode The file system provided cookie to the vnode.
+  \param name The name of the attribute.
+  \return \c B_OK if everything went fine, another error code otherwise.
 */
 
 //! @}
@@ -1021,46 +1225,104 @@
 //! @{
 
 /*!
-  \fn status_t (*file_system_module_info::open_index_dir)(fs_volume fs, fs_cookie *cookie)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::open_index_dir)(fs_volume fs,
+    fs_cookie *_cookie)
+  \brief Open the list of an indeces as a directory. 
+  
+  See \ref concepts "Generic Concepts" on directories and iterators. Basically,
+  the VFS uses the same way of traversing through indeces as it traverses
+  through a directory. 
+  
+  \param fs The file system provided cookie to the volume.
+  \param[out] _cookie Pointer where the file system can store a directory
+    cookie if the index directory is succesfully opened.
+  \return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-  \fn status_t (*file_system_module_info::close_index_dir)(fs_volume fs, fs_cookie cookie)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::close_index_dir)(fs_volume fs,
+    fs_cookie cookie)
+  \brief Close a 'directory' of indeces.
+
+  Note that you should free the cookie in the free_index_dir_cookie() call.:
+    
+  \param fs The file system provided cookie to the volume.
+ 	\param cookie The cookie associated with this 'directory'.
+  \return B_OK if everything went fine, another error code otherwise. 
 */
 
 /*!
-  \fn status_t (*file_system_module_info::free_index_dir_cookie)(fs_volume fs, fs_cookie cookie)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::free_index_dir_cookie)(fs_volume fs,
+    fs_cookie cookie)
+  \brief Free the \a cookie to the index 'directory'.
+  
+  \param fs The file system provided cookie for the volume.
+  \param cookie The cookie that should be freed.
+  \return B_OK if everything went fine, another error code otherwise. 
 */
 
 /*!
-  \fn status_t (*file_system_module_info::read_index_dir)(fs_volume fs, fs_cookie cookie,
-				struct dirent *buffer, size_t bufferSize, uint32 *_num)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::read_index_dir)(fs_volume fs,
+    fs_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_num)
+  \brief Read the next one or more index entries.
+  
+  This method should perform the same task as read_dir(), except that the '.'
+  and the '..' entries don't have to be present.
 */
 
 /*!
-  \fn status_t (*file_system_module_info::rewind_index_dir)(fs_volume fs, fs_cookie cookie)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::rewind_index_dir)(fs_volume fs,
+    fs_cookie cookie)
+  \brief Reset the index directory cookie to the first entry of the directory.
+  
+  \param fs The file system provided handle to the volume.
+  \param cookie The directory cookie as returned by open_index_dir(). 
+  \return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-  \fn status_t (*file_system_module_info::create_index)(fs_volume fs, const char *name, uint32 type,
-				uint32 flags)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::create_index)(fs_volume fs,
+    const char *name, uint32 type, uint32 flags)
+  \brief Create a new index.
+  
+  \param fs The file system provided handle to the volume.
+  \param name The name of the new index.
+  \param type The type of index. BFS implements the following types:
+    - \c B_INT32_TYPE
+    - \c B_UINT32_TYPE
+    - \c B_INT64_TYPE
+    - \c B_UINT64_TYPE
+    - \c B_FLOAT_TYPE
+    - \c B_DOUBLE_TYPE
+    - \c B_STRING_TYPE
+    - \c B_MIME_STRING_TYPE
+  \param flags There are currently no extra flags specified. This parameter can
+    be ignored.
+  \return You should return \c B_OK if the creation succeeded, or return an
+    error otherwise.
 */
 
 /*!
-  \fn status_t (*file_system_module_info::remove_index)(fs_volume fs, const char *name)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::remove_index)(fs_volume fs,
+    const char *name)
+  \brief Remove the index with \a name.
+  
+  \param fs The file system provided handle to the volume.
+  \param name The name of the index to be removed.
+  \return You should return \c B_OK if the creation succeeded, or return an
+    error otherwise.
 */
 
 /*!
-  \fn status_t (*file_system_module_info::read_index_stat)(fs_volume fs, const char *name,
-				struct stat *stat)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::read_index_stat)(fs_volume fs,
+    const char *name, struct stat *stat)
+  \brief Read the \a stat of the index with a name.
+  
+  \param fs The file system provided handle to the volume.
+  \param name The name of the index to be queried.
+  \param stat A pointer to a structure where you should store the values.
+  \return You should return \c B_OK if the creation succeeded, or return an
+    error otherwise.
 */
 
 //! @}
@@ -1072,25 +1334,68 @@
 //! @{
 
 /*!
-  \fn status_t (*file_system_module_info::open_query)(fs_volume fs, const char *query, uint32 flags,
-				port_id port, uint32 token, fs_cookie *_cookie)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::open_query)(fs_volume fs,
+    const char *query, uint32 flags, port_id port, uint32 token,
+    fs_cookie *_cookie)
+  \brief Open a query as a 'directory'.
+  
+  TODO: query expressions should be documented and also the format for sending
+  query updates over the port should be updated.
+  
+  See \ref concepts "Generic Concepts" on directories and iterators. Basically,
+  the VFS uses the same way of traversing through indeces as it traverses
+  through a directory. 
+  
+  \param fs The file system provided cookie to the volume.
+  \param query The string that represents a query.
+  \param flags Either one of these flags:
+    - \c #B_LIVE_QUERY The query is live. When a query is live, it is
+      constantly updated using the \a port. In this case the file system should
+      be pro-active.
+    - \c #B_QUERY_NON_INDEXED When this parameter is provided, the query
+      should be carried out over the whole file system. This parameter is
+      provided with the idea that sometimes the indeces can be out of date. If
+      the requestor for this query requires absolutely everything to be
+      queried, it will pass this parameter. Of course, if your indeces are
+      always up to date, you can ignore this parameter.
+  \param port The id of the port where updates need to be sent to in case the
+    query is live.
+  \param token A token that should be attached to the messages sent over the
+    \a port.
+  \param[out] _cookie The cookie that will be used as 'directory' to traverse
+    through the results of the query.
+  \return You should return \c B_OK if the creation succeeded, or return an
+    error otherwise.
 */
 
 /*!
-  \fn status_t (*file_system_module_info::close_query)(fs_volume fs, fs_cookie cookie)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::close_query)(fs_volume fs,
+    fs_cookie cookie)
+  \brief Close a 'directory' of a query.
+  
+  Note that you should free the cookie in the free_query_cookie() call.
+  
+  \param fs The file system provided cookie to the volume.
+  \param cookie The cookie that refers to this query.
+  \return You should return \c B_OK if the creation succeeded, or return an
+    error otherwise.
 */
 
 /*!
-  \fn status_t (*file_system_module_info::free_query_cookie)(fs_volume fs, fs_cookie cookie)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::free_query_cookie)(fs_volume fs,
+    fs_cookie cookie)
+  \brief Free a cookie of a query.
+  
+  \param fs The file system provided cookie to the volume.
+  \param cookie The cookie that should be freed.
+  \return You should return \c B_OK if the creation succeeded, or return an
+    error otherwise.
 */
 
 /*!
   \fn status_t (*file_system_module_info::read_query)(fs_volume fs,
     fs_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_num)
-  \brief Reads the next one or more entries matching the query.
+  \brief Read the next one or more entries matching the query.
 
   This hook function works pretty much the same way as read_dir(), with the
   difference that it doesn't read the entries of a directory, but the entries
@@ -1108,8 +1413,13 @@
 */
 
 /*!
-  \fn status_t (*file_system_module_info::rewind_query)(fs_volume fs, fs_cookie cookie)
-  \brief Undocumented.
+  \fn status_t (*file_system_module_info::rewind_query)(fs_volume fs,
+    fs_cookie cookie)
+  \brief Reset the query cookie to the first entry of the results.
+
+  \param fs The file system provided handle to the volume.
+  \param cookie The query cookie as returned by open_query().
+  \return \c B_OK if everything went fine, another error code otherwise. 
 */
 
 //! @}
@@ -1121,71 +1431,71 @@
 //! @{
 
 /*!
-  \fn bool (*file_system_module_info::supports_defragmenting)(partition_data *partition,
-				bool *whileMounted)
-  \brief Undocumented.
+  \fn bool (*file_system_module_info::supports_defragmenting)(partition_data
+    *partition, bool *whileMounted)
+  \brief Undocumented. TODO.
 */
 
 /*!
   \fn bool (*file_system_module_info::supports_repairing)(partition_data *partition,
 				bool checkOnly, bool *whileMounted)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 /*!
   \fn bool (*file_system_module_info::supports_resizing)(partition_data *partition,
 				bool *whileMounted)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 /*!
   \fn bool (*file_system_module_info::supports_moving)(partition_data *partition, bool *isNoOp)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 /*!
   \fn bool (*file_system_module_info::supports_setting_content_name)(partition_data *partition,
 				bool *whileMounted)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 /*!
   \fn bool (*file_system_module_info::supports_setting_content_parameters)(partition_data *partition, 
 				bool *whileMounted)
-  \brief Undocumented.
+  \brief Undocumented. TODO. 
 */
 
 /*!
   \fn bool (*file_system_module_info::supports_initializing)(partition_data *partition)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 /*!
   \fn bool (*file_system_module_info::validate_resize)(partition_data *partition, off_t *size)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 /*!
   \fn bool (*file_system_module_info::validate_move)(partition_data *partition, off_t *start)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 /*!
   \fn bool (*file_system_module_info::validate_set_content_name)(partition_data *partition,
 				char *name)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 /*!
   \fn bool (*file_system_module_info::validate_set_content_parameters)(partition_data *partition,
 				const char *parameters)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 /*!
   \fn bool (*file_system_module_info::validate_initialize)(partition_data *partition, char *name,
 				const char *parameters)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 //! @}
@@ -1199,7 +1509,7 @@
 /*!
   \fn status_t (*file_system_module_info::shadow_changed)(partition_data *partition,
 				uint32 operation)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 //! @}
@@ -1213,43 +1523,43 @@
 /*!
   \fn status_t (*file_system_module_info::defragment)(int fd, partition_id partition,
 				disk_job_id job)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 /*!
   \fn status_t (*file_system_module_info::repair)(int fd, partition_id partition, bool checkOnly,
 				disk_job_id job)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 /*!
   \fn status_t (*file_system_module_info::resize)(int fd, partition_id partition, off_t size,
 				disk_job_id job)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 /*!
   \fn status_t (*file_system_module_info::move)(int fd, partition_id partition, off_t offset,
 				disk_job_id job)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 /*!
   \fn status_t (*file_system_module_info::set_content_name)(int fd, partition_id partition,
 				const char *name, disk_job_id job)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 /*!
   \fn status_t (*file_system_module_info::set_content_parameters)(int fd, partition_id partition,
 				const char *parameters, disk_job_id job)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 /*!
   \fn status_t (*file_system_module_info::initialize)(const char *partition, const char *name,
 				const char *parameters, disk_job_id job)
-  \brief Undocumented.
+  \brief Undocumented. TODO.
 */
 
 //! @}
@@ -1259,7 +1569,7 @@
 /*!
   \fn status_t new_vnode(mount_id mountID, vnode_id vnodeID,
     fs_vnode privateNode)
-  \brief Creates the vnode with ID \a vnodeID and associates it with the
+  \brief Create the vnode with ID \a vnodeID and associates it with the
     private data handle \a privateNode, but leaves is in an unpublished state.
 
   The effect of the function is similar to publish_vnode(), but the vnode
