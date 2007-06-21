@@ -446,6 +446,11 @@ put_cached_block(block_cache *cache, cached_block *block)
 	}
 #endif
 
+	if (block->ref_count < 1) {
+		panic("Invalid ref_count for block %p, cache %p\n", block, cache);
+		return;
+	}
+
 	if (--block->ref_count == 0
 		&& block->transaction == NULL
 		&& block->previous_transaction == NULL) {
