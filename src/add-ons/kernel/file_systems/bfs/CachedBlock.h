@@ -1,10 +1,11 @@
-/* CachedBlock - interface for the block cache
- *
- * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef CACHED_BLOCK_H
 #define CACHED_BLOCK_H
+
+//!	interface for the block cache
 
 
 #include "system_dependencies.h"
@@ -35,9 +36,12 @@ class CachedBlock {
 		inline const uint8 *SetTo(off_t block, off_t base, size_t length);
 		inline const uint8 *SetTo(off_t block);
 		inline const uint8 *SetTo(block_run run);
-		inline uint8 *SetToWritable(Transaction &transaction, off_t block, off_t base, size_t length, bool empty = false);
-		inline uint8 *SetToWritable(Transaction &transaction, off_t block, bool empty = false);
-		inline uint8 *SetToWritable(Transaction &transaction, block_run run, bool empty = false);
+		inline uint8 *SetToWritable(Transaction &transaction, off_t block,
+			off_t base, size_t length, bool empty = false);
+		inline uint8 *SetToWritable(Transaction &transaction, off_t block,
+			bool empty = false);
+		inline uint8 *SetToWritable(Transaction &transaction, block_run run,
+			bool empty = false);
 		inline status_t MakeWritable(Transaction &transaction);
 
 		const uint8 *Block() const { return fBlock; }
@@ -57,7 +61,6 @@ class CachedBlock {
 };
 
 
-//--------------------------------------
 // inlines
 
 
@@ -121,8 +124,10 @@ CachedBlock::Keep()
 inline void
 CachedBlock::Unset()
 {
-	if (fBlock != NULL)
+	if (fBlock != NULL) {
 		block_cache_put(fVolume->BlockCache(), fBlockNumber);
+		fBlock = NULL;
+	}
 }
 
 
@@ -131,7 +136,8 @@ CachedBlock::SetTo(off_t block, off_t base, size_t length)
 {
 	Unset();
 	fBlockNumber = block;
-	return fBlock = (uint8 *)block_cache_get_etc(fVolume->BlockCache(), block, base, length);
+	return fBlock = (uint8 *)block_cache_get_etc(fVolume->BlockCache(),
+		block, base, length);
 }
 
 
@@ -150,16 +156,21 @@ CachedBlock::SetTo(block_run run)
 
 
 inline uint8 *
-CachedBlock::SetToWritable(Transaction &transaction, off_t block, off_t base, size_t length, bool empty)
+CachedBlock::SetToWritable(Transaction &transaction, off_t block, off_t base,
+	size_t length, bool empty)
 {
 	Unset();
 	fBlockNumber = block;
 	
-	if (empty)
-		return fBlock = (uint8 *)block_cache_get_empty(fVolume->BlockCache(), block, transaction.ID());
+	if (empty) {
+		fBlock = (uint8 *)block_cache_get_empty(fVolume->BlockCache(),
+			block, transaction.ID());
+	} else {
+		fBlock = (uint8 *)block_cache_get_writable_etc(fVolume->BlockCache(),
+			block, base, length, transaction.ID());
+	}
 
-	return fBlock = (uint8 *)block_cache_get_writable_etc(fVolume->BlockCache(),
-		block, base, length, transaction.ID());
+	return fBlock;
 }
 
 
@@ -183,7 +194,8 @@ CachedBlock::MakeWritable(Transaction &transaction)
 	if (fBlock == NULL)
 		return B_NO_INIT;
 
-	return block_cache_make_writable(fVolume->BlockCache(), fBlockNumber, transaction.ID());
+	return block_cache_make_writable(fVolume->BlockCache(), fBlockNumber,
+		transaction.ID());
 }
 
 
