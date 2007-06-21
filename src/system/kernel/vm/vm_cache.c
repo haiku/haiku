@@ -119,7 +119,7 @@ vm_cache_create(vm_store *store)
 
 
 status_t
-vm_cache_ref_create(vm_cache *cache)
+vm_cache_ref_create(vm_cache *cache, bool acquireLock)
 {
 	vm_cache_ref *ref;
 	status_t status;
@@ -135,6 +135,9 @@ vm_cache_ref_create(vm_cache *cache)
 		free(ref);
 		return status;
 	}
+
+	if (acquireLock)
+		mutex_lock(&ref->lock);
 
 	ref->areas = NULL;
 	ref->ref_count = 1;
@@ -536,16 +539,33 @@ vm_cache_remove_consumer(vm_cache_ref *cacheRef, vm_cache *consumer)
 				if (consumerPage == NULL) {
 					// the page already is not yet in the consumer cache - move
 					// it upwards
+#if 0
+if (consumer->virtual_base == 0x11000)
+	dprintf("%ld: move page %p offset %ld from cache %p to cache %p\n",
+		find_thread(NULL), page, page->cache_offset, cache, consumer);
+#endif
 					vm_cache_remove_page(cacheRef, page);
 					vm_cache_insert_page(consumerRef, page,
 						(off_t)page->cache_offset << PAGE_SHIFT);
-#if 0
-				} else if (consumerPage->state != PAGE_STATE_BUSY
-					&& (page->mappings != 0 || page->wired_count != 0)) {
-					panic("page %p has still mappings (consumer cache %p)!",
-						page, consumerRef);
-#endif
+				} else if (consumerPage->state == PAGE_STATE_BUSY
+					&& consumerPage->type == PAGE_TYPE_DUMMY
+					&& !consumerPage->busy_writing) {
+					// the page is currently busy taking a read fault - IOW,
+					// vm_soft_fault() has mapped our page so we can just
+					// move it up
+//dprintf("%ld: merged busy page %p, cache %p, offset %ld\n", find_thread(NULL), page, cacheRef->cache, page->cache_offset);
+					vm_cache_remove_page(cacheRef, consumerPage);
+					consumerPage->state = PAGE_STATE_INACTIVE;
+
+					vm_cache_remove_page(cacheRef, page);
+					vm_cache_insert_page(consumerRef, page,
+						(off_t)page->cache_offset << PAGE_SHIFT);
 				}
+#if 0
+else if (consumer->virtual_base == 0x11000)
+	dprintf("%ld: did not move page %p offset %ld from cache %p to cache %p because there is page %p\n",
+		find_thread(NULL), page, page->cache_offset, cache, consumer, consumerPage);
+#endif
 			}
 
 			newSource = cache->source;

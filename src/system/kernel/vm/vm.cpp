@@ -532,7 +532,7 @@ map_backing_store(vm_address_space *addressSpace, vm_cache_ref *cacheRef,
 			newStore->ops->destroy(newStore);
 			goto err1;
 		}
-		status = vm_cache_ref_create(newCache);
+		status = vm_cache_ref_create(newCache, false);
 		if (status < B_OK) {
 			newStore->ops->destroy(newStore);
 			free(newCache);
@@ -802,7 +802,7 @@ vm_create_anonymous_area(team_id aid, const char *name, void **address,
 		status = B_NO_MEMORY;
 		goto err2;
 	}
-	status = vm_cache_ref_create(cache);
+	status = vm_cache_ref_create(cache, false);
 	if (status < B_OK)
 		goto err3;
 
@@ -1022,7 +1022,7 @@ vm_map_physical_memory(team_id aspaceID, const char *name, void **_address,
 		status = B_NO_MEMORY;
 		goto err2;
 	}
-	status = vm_cache_ref_create(cache);
+	status = vm_cache_ref_create(cache, false);
 	if (status < B_OK)
 		goto err3;
 
@@ -1110,7 +1110,7 @@ vm_create_null_area(team_id team, const char *name, void **address,
 		status = B_NO_MEMORY;
 		goto err2;
 	}
-	status = vm_cache_ref_create(cache);
+	status = vm_cache_ref_create(cache, false);
 	if (status < B_OK)
 		goto err3;
 
@@ -1166,7 +1166,7 @@ vm_create_vnode_cache(void *vnode, struct vm_cache_ref **_cacheRef)
 		status = B_NO_MEMORY;
 		goto err1;
 	}
-	status = vm_cache_ref_create(cache);
+	status = vm_cache_ref_create(cache, false);
 	if (status < B_OK)
 		goto err2;
 
@@ -1568,7 +1568,8 @@ vm_copy_on_write_area(vm_area *area)
 		goto err2;
 	}
 
-	status = vm_cache_ref_create(lowerCache);
+	// we need to hold the cache_ref lock when we want to switch its cache
+	status = vm_cache_ref_create(lowerCache, true);
 	if (status < B_OK)
 		goto err3;
 
@@ -1578,9 +1579,6 @@ vm_copy_on_write_area(vm_area *area)
 	protection = B_KERNEL_READ_AREA;
 	if (area->protection & B_READ_AREA)
 		protection |= B_READ_AREA;
-
-	// we need to hold the cache_ref lock when we want to switch its cache
-	mutex_lock(&lowerCacheRef->lock);
 
 	upperCache->type = CACHE_TYPE_RAM;
 	upperCache->temporary = 1;
@@ -1600,7 +1598,8 @@ vm_copy_on_write_area(vm_area *area)
 				&lowerCache->consumers, consumer)) != NULL) {
 			count++;
 		}
-		lowerCacheRef->ref_count = count;
+
+		atomic_add(&lowerCacheRef->ref_count, count);
 		atomic_add(&upperCacheRef->ref_count, -count);
 	}
 
@@ -1627,6 +1626,8 @@ vm_copy_on_write_area(vm_area *area)
 
 	mutex_unlock(&lowerCacheRef->lock);
 	mutex_unlock(&upperCacheRef->lock);
+
+	vm_cache_release_ref(lowerCacheRef);
 
 	return B_OK;
 
@@ -1962,25 +1963,27 @@ vm_unmap_pages(vm_area *area, addr_t base, size_t size)
 	map->ops->unmap(map, base, end);
 
 	if (area->wiring == B_NO_LOCK) {
+		uint32 startOffset = (area->cache_offset + base - area->base)
+			>> PAGE_SHIFT;
+		uint32 endOffset = startOffset + (size >> PAGE_SHIFT);
+		vm_page_mapping *mapping;
 		vm_area_mappings queue;
-		uint32 count = 0;
 
 		cpu_status state = disable_interrupts();
 		acquire_spinlock(&sMappingLock);
 
-		vm_page_mapping *mapping;
-		while ((mapping = area->mappings.RemoveHead()) != NULL) {
+		vm_area_mappings::Iterator iterator = area->mappings.GetIterator();
+		while (iterator.HasNext()) {
+			mapping = iterator.Next();
+
+			vm_page *page = mapping->page;
+			if (page->cache_offset < startOffset || page->cache_offset >= endOffset)
+				continue;
+
 			mapping->page->mappings.Remove(mapping);
+			iterator.Remove();
+
 			queue.Add(mapping);
-
-			// temporary unlock to handle interrupts and let others play as well
-			if ((++count % 256) == 0) {
-				release_spinlock(&sMappingLock);
-				restore_interrupts(state);
-
-				state = disable_interrupts();
-				acquire_spinlock(&sMappingLock);
-			}
 		}
 
 		release_spinlock(&sMappingLock);
@@ -3179,14 +3182,15 @@ fault_remove_dummy_page(vm_page &dummyPage, bool isLocked)
 	if (!isLocked)
 		mutex_lock(&cacheRef->lock);
 
-	vm_cache_remove_page(cacheRef, &dummyPage);
+	if (dummyPage.state == PAGE_STATE_BUSY) {
+		vm_cache_remove_page(cacheRef, &dummyPage);
+		dummyPage.state = PAGE_STATE_INACTIVE;
+	}
 
 	if (!isLocked)
 		mutex_unlock(&cacheRef->lock);
 
 	vm_cache_release_ref(cacheRef);
-
-	dummyPage.state = PAGE_STATE_INACTIVE;
 }
 
 
@@ -3250,22 +3254,27 @@ fault_find_page(vm_translation_map *map, vm_cache_ref *topCacheRef,
 			size_t bytesRead;
 			iovec vec;
 
-			vec.iov_len = bytesRead = B_PAGE_SIZE;
+			page = vm_page_allocate_page(PAGE_STATE_FREE);
+
+			// we mark that page busy reading, so that the file cache can
+			// ignore us in case it works on the very same page
+			// (this is actually only needed if this is the topRefCache, but we
+			// do it anyway for simplicity's sake)
+			dummyPage.queue_next = page;
+			dummyPage.busy_reading = true;
 
 			mutex_unlock(&cacheRef->lock);
 
-			page = vm_page_allocate_page(PAGE_STATE_FREE);
+			map->ops->get_physical_page(page->physical_page_number * B_PAGE_SIZE,
+				(addr_t *)&vec.iov_base, PHYSICAL_PAGE_CAN_WAIT);
+			vec.iov_len = bytesRead = B_PAGE_SIZE;
 
-			dummyPage.queue_next = page;
-			dummyPage.busy_reading = true;
-				// we mark that page busy reading, so that the file cache can ignore
-				// us in case it works on the very same page
-
-			map->ops->get_physical_page(page->physical_page_number * B_PAGE_SIZE, (addr_t *)&vec.iov_base, PHYSICAL_PAGE_CAN_WAIT);
-			status_t status = store->ops->read(store, cacheOffset, &vec, 1, &bytesRead, false);
+			status_t status = store->ops->read(store, cacheOffset, &vec, 1,
+				&bytesRead, false);
 			if (status < B_OK) {
 				// TODO: real error handling!
-				panic("reading from store %p (cacheRef %p) returned: %s!\n", store, cacheRef, strerror(status));
+				panic("reading from store %p (cacheRef %p) returned: %s!\n",
+					store, cacheRef, strerror(status));
 			}
 			map->ops->put_physical_page((addr_t)vec.iov_base);
 
@@ -3337,7 +3346,8 @@ fault_find_page(vm_translation_map *map, vm_cache_ref *topCacheRef,
 */
 static inline vm_page *
 fault_get_page(vm_translation_map *map, vm_cache_ref *topCacheRef,
-	off_t cacheOffset, bool isWrite, vm_page &dummyPage, vm_cache_ref **_sourceRef)
+	off_t cacheOffset, bool isWrite, vm_page &dummyPage, vm_cache_ref **_sourceRef,
+	vm_cache_ref **_copiedSourceRef)
 {
 	vm_cache_ref *cacheRef;
 	vm_page *page = fault_find_page(map, topCacheRef, cacheOffset, isWrite,
@@ -3375,6 +3385,11 @@ fault_get_page(vm_translation_map *map, vm_cache_ref *topCacheRef,
 		//	from our source cache - if possible, that is
 		FTRACE(("get new page, copy it, and put it into the topmost cache\n"));
 		page = vm_page_allocate_page(PAGE_STATE_FREE);
+#if 0
+if (cacheOffset == 0x12000)
+	dprintf("%ld: copy page %p to page %p from cache %p to cache %p\n", find_thread(NULL),
+		sourcePage, page, sourcePage->cache, topCacheRef->cache);
+#endif
 
 		// try to get a mapping for the src and dest page so we can copy it
 		for (;;) {
@@ -3413,7 +3428,7 @@ fault_get_page(vm_translation_map *map, vm_cache_ref *topCacheRef,
 			fault_remove_dummy_page(dummyPage, false);
 		}
 
-		vm_cache_release_ref(cacheRef);
+		*_copiedSourceRef = cacheRef;
 
 		cacheRef = topCacheRef;
 		vm_cache_acquire_ref(cacheRef);
@@ -3523,11 +3538,13 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	dummyPage.cache = NULL;
 	dummyPage.state = PAGE_STATE_INACTIVE;
 	dummyPage.type = PAGE_TYPE_DUMMY;
+	dummyPage.busy_writing = isWrite;
 	dummyPage.wired_count = 0;
 
+	vm_cache_ref *copiedPageSourceRef = NULL;
 	vm_cache_ref *pageSourceRef;
 	vm_page *page = fault_get_page(map, topCacheRef, cacheOffset, isWrite,
-		dummyPage, &pageSourceRef);
+		dummyPage, &pageSourceRef, &copiedPageSourceRef);
 
 	status_t status = B_OK;
 
@@ -3566,6 +3583,8 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 
 	mutex_unlock(&pageSourceRef->lock);
 	vm_cache_release_ref(pageSourceRef);
+	if (copiedPageSourceRef)
+		vm_cache_release_ref(copiedPageSourceRef);
 
 	if (dummyPage.state == PAGE_STATE_BUSY) {
 		// We still have the dummy page in the cache - that happens if we didn't need
