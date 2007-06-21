@@ -359,15 +359,21 @@ get_module_image(const char *path, module_image **_image)
 
 	TRACE(("get_module_image(path = \"%s\", _image = %p)\n", path, _image));
 
+	recursive_lock_lock(&sModulesLock);
+
 	image = (module_image *)hash_lookup(sModuleImagesHash, path);
 	if (image == NULL) {
 		status_t status = load_module_image(path, &image);
-		if (status < B_OK)
+		if (status < B_OK) {
+			recursive_lock_unlock(&sModulesLock);
 			return status;
+		}
 	}
 
 	atomic_add(&image->ref_count, 1);
 	*_image = image;
+
+	recursive_lock_unlock(&sModulesLock);
 
 	return B_OK;
 }
@@ -446,9 +452,8 @@ check_module_image(const char *path, const char *searchedName)
 	int index = 0, match = B_ENTRY_NOT_FOUND;
 
 	TRACE(("check_module_image(path = \"%s\", searchedName = \"%s\")\n", path, searchedName));
-	ASSERT(hash_lookup(sModuleImagesHash, path) == NULL);
 
-	if (load_module_image(path, &image) < B_OK)
+	if (get_module_image(path, &image) < B_OK)
 		return B_ENTRY_NOT_FOUND;
 
 	for (info = image->info; *info; info++) {
@@ -466,6 +471,9 @@ check_module_image(const char *path, const char *searchedName)
 		TRACE(("check_module_file: unloading module file \"%s\" (not used yet)\n", path));
 		unload_module_image(image, path);
 	}
+
+	// decrement the ref we got in get_module_image
+	put_module_image(image);
 
 	return match;
 }
