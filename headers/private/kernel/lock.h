@@ -39,11 +39,14 @@ typedef struct rw_lock {
 
 #define RW_MAX_READERS 1000000
 
-#ifdef DEBUG
+#if 0 && KDEBUG // XXX disable this for now, it causes problems when including thread.h here
 #	include <thread.h>
-#endif
 #define ASSERT_LOCKED_RECURSIVE(r) { ASSERT(thread_get_current_thread_id() == (r)->holder); }
 #define ASSERT_LOCKED_MUTEX(m) { ASSERT(thread_get_current_thread_id() == (m)->holder); }
+#else
+#define ASSERT_LOCKED_RECURSIVE(r)
+#define ASSERT_LOCKED_MUTEX(m)
+#endif
 
 
 #ifdef __cplusplus

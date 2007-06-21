@@ -28,7 +28,7 @@
 #endif
 
 /* prevent freeing pointers that were not allocated by kmalloc or are already freeed */
-#ifdef DEBUG
+#if KDEBUG > 1
 #	define PARANOID_POINTER_CHECK 1
 #else
 #	define PARANOID_POINTER_CHECK 0
@@ -125,7 +125,7 @@ struct list sWalls;
 
 #if PARANOID_POINTER_CHECK
 
-#define PTRCHECKLIST_ENTRIES 8192
+#define PTRCHECKLIST_ENTRIES 32768
 static void *ptrchecklist[PTRCHECKLIST_ENTRIES]; /* automatically initialized to zero */
 
 static void

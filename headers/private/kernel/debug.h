@@ -11,22 +11,33 @@
 
 #include <OS.h>
 
-struct kernel_args;
-
+//#define DEBUG 1
 
 #if DEBUG
-#	define ASSERT(x) \
-	if (x) {} else { panic("ASSERT FAILED (%s:%d): %s\n", __FILE__, __LINE__, #x); }
+/* 
+ * The kernel debug level. 
+ * Level 1 is usual asserts, > 1 should be used for very expensive runtime checks
+ */
+#define KDEBUG 1
+#endif
+
+#define ASSERT_ALWAYS(x) \
+	do { if (!(x)) { panic("ASSERT FAILED (%s:%d): %s\n", __FILE__, __LINE__, #x); } } while (0)
+
+#if KDEBUG
+#define ASSERT(x) ASSERT_ALWAYS(x)
 #else 
-#	define ASSERT(x) 
+#define ASSERT(x) \
+	do { } while(0)
 #endif
 
 extern int dbg_register_file[B_MAX_CPU_COUNT][14];
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+struct kernel_args;
 
 extern status_t debug_init(struct kernel_args *args);
 extern status_t	debug_init_post_vm(struct kernel_args *args);
