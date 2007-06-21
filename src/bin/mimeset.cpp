@@ -39,7 +39,7 @@ usage(int status)
 }
 
 
-void
+status_t
 process_file(const char *path)
 {
 	status_t status = B_OK;
@@ -57,6 +57,7 @@ process_file(const char *path)
 		fprintf(stderr, "%s: \"%s\": %s\n",
 			sProgramName, path, strerror(status));
 	}
+	return status;
 }
 
 
@@ -94,6 +95,7 @@ main(int argc, char **argv)
 
 	BApplication app("application/x-vnd.haiku.mimeset");
 
+	int err = 0;
 	while (*argv) {
 		char *arg = *argv++;
 
@@ -103,10 +105,15 @@ main(int argc, char **argv)
 			while (fgets(name, sizeof(name), stdin) != NULL) {
 				name[strlen(name) - 1] = '\0';
 					// remove trailing '\n'
-				process_file(name);
+				err = process_file(name);
+				if (err)
+					exit(err);
 			}
-		} else
-			process_file(arg);
+		} else {
+			err = process_file(arg);
+			if (err)
+				exit(err);
+		}
 	}
 
 	return 0;
