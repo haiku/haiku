@@ -23,10 +23,10 @@ extern bool			 bAccelerantIsClone;// true if this is a cloned accelerant
 
 void TraceLog(const char* fmt, ...);
 
-#ifdef DEBUG
-#define TRACE(a)	TraceLog a
+#ifdef TRACE_S3SAVAGE
+#	define TRACE(a)	TraceLog a
 #else
-#define TRACE(a)
+#	define TRACE(a)
 #endif
 
 #endif	// GLOBALDATA_H

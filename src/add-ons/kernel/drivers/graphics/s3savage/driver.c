@@ -20,11 +20,10 @@
 #include <graphic_driver.h>
 
 
-
-#ifdef DEBUG
-#define TRACE(a)	TraceLog a
+#ifdef TRACE_S3SAVAGE
+#	define TRACE(a)	TraceLog a
 #else
-#define TRACE(a)
+#	define TRACE(a)
 #endif
 
 
@@ -46,8 +45,7 @@ int32	api_version = B_CUR_DRIVER_API_VERSION;
 
 /* these structures are private to the kernel driver */
 
-typedef struct
-{
+typedef struct {
 	uint16	chipID;			// PCI device id of the chipset
 	uint16	chipset;		// assigned chipset family identifier
 	char*	chipName;		// user recognizable name for chipset (must be < 32 chars)
@@ -55,8 +53,7 @@ typedef struct
 
 /* This table maps a PCI device ID to a chipset family identifier and the chipset
    name. */
-static ChipInfo SavageChipTable[] =
-{
+static ChipInfo SavageChipTable[] = {
 	{ 0x8a20, S3_SAVAGE3D,		"Savage3D"				},
 	{ 0x8a21, S3_SAVAGE3D,		"Savage3D-MV" 			},
 	{ 0x8a22, S3_SAVAGE4,		"Savage4"				},
@@ -86,19 +83,16 @@ static ChipInfo SavageChipTable[] =
 
 #define VENDOR_ID_SAVAGE 0x5333		/* S3 Savage vendor ID */
 
-static struct
-{
+static struct {
 	uint16		vendorID;
 	ChipInfo*	devices;
-} SupportedDevices[] =
-{
+} SupportedDevices[] = {
 	{ VENDOR_ID_SAVAGE, SavageChipTable },
 	{ 0x0000, NULL }
 };
 
 
-typedef struct
-{
+typedef struct {
 	uint32		is_open;		/* a count of how many times the devices has been opened */
 	area_id 	sharedArea;		/* the area shared between the driver and all of the accelerants */
 	SharedInfo *si;				/* a pointer to the shared area, for convenience */
@@ -109,8 +103,7 @@ typedef struct
 } DeviceInfo;
 
 
-typedef struct
-{
+typedef struct {
 	uint32		count;				/* number of devices actually found */
 	benaphore	kernel; 			/* for serializing opens/closes */
 	char		*deviceNames[MAX_DEVICES+1];	/* device name pointer storage */
@@ -146,11 +139,11 @@ static device_hooks		graphics_device_hooks =
 	NULL
 };
 
-#ifdef DEBUG
+#ifdef TRACE_S3SAVAGE
 static void 
 TraceLog(const char *fmt, ...)
 {
-	char	string[1024];
+	char string[1024];
 	va_list	args;
 
 	strcpy(string, "savage: ");
@@ -521,8 +514,11 @@ exit0:
 }
 
 
+//	#pragma mark - Device Hooks
+
+
 static status_t 
-open_hook (const char* name, uint32 flags, void** cookie)
+open_hook(const char* name, uint32 flags, void** cookie)
 {
 	int32 index = 0;
 	DeviceInfo *di;
@@ -642,9 +638,6 @@ done:
 }
 
 
-/* ----------
-	read_hook - does nothing, gracefully
------ */
 static status_t 
 read_hook(void* dev, off_t pos, void* buf, size_t* len)
 {
@@ -658,10 +651,6 @@ read_hook(void* dev, off_t pos, void* buf, size_t* len)
 }
 
 
-
-/* ----------
-	write_hook - does nothing, gracefully
------ */
 static status_t 
 write_hook(void* dev, off_t pos, const void* buf, size_t* len)
 {
@@ -675,9 +664,6 @@ write_hook(void* dev, off_t pos, const void* buf, size_t* len)
 }
 
 
-/* ----------
-	close_hook - does nothing, gracefully
------ */
 static status_t 
 close_hook(void* dev)
 {
@@ -689,9 +675,6 @@ close_hook(void* dev)
 }
 
 
-/* -----------
-	free_hook - close down the device
------------ */
 static status_t 
 free_hook(void* dev)
 {
@@ -738,11 +721,8 @@ unlock_and_exit:
 }
 
 
-/* -----------
-	control_hook - where the real work is done
------------ */
 static status_t 
-control_hook (void* dev, uint32 msg, void *buf, size_t len)
+control_hook(void* dev, uint32 msg, void *buf, size_t len)
 {
 	DeviceInfo *di = (DeviceInfo *)dev;
 	status_t result = B_DEV_INVALID_IOCTL;
@@ -753,53 +733,59 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len)
 
 	switch (msg) {
 		/* the only PUBLIC ioctl */
-	case B_GET_ACCELERANT_SIGNATURE: {
+		case B_GET_ACCELERANT_SIGNATURE:
+		{
 			char *sig = (char *)buf;
-			strcpy(sig, "savage.accelerant");
+			strcpy(sig, "s3savage.accelerant");
 			result = B_OK;
+			break;
 		}
-		break;
 
 		/* PRIVATE ioctl from here on */
-	case SAVAGE_GET_PRIVATE_DATA: {
+		case SAVAGE_GET_PRIVATE_DATA:
+		{
 			SavageGetPrivateData *gpd = (SavageGetPrivateData *)buf;
 			if (gpd->magic == SAVAGE_PRIVATE_DATA_MAGIC) {
 				gpd->sharedInfoArea = di->sharedArea;
 				result = B_OK;
 			}
+			break;
 		}
-		break;
 
-	case SAVAGE_GET_PCI: {
+		case SAVAGE_GET_PCI:
+		{
 			SavageGetSetPci *gsp = (SavageGetSetPci *)buf;
 			if (gsp->magic == SAVAGE_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
 				gsp->value = get_pci(gsp->offset, gsp->size);
 				result = B_OK;
 			}
+			break;
 		}
-		break;
 
-	case SAVAGE_SET_PCI: {
+		case SAVAGE_SET_PCI:
+		{
 			SavageGetSetPci *gsp = (SavageGetSetPci *)buf;
 			if (gsp->magic == SAVAGE_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
 				set_pci(gsp->offset, gsp->size, gsp->value);
 				result = B_OK;
 			}
+			break;
 		}
-		break;
 
-	case SAVAGE_DEVICE_NAME: {
+		case SAVAGE_DEVICE_NAME:
+		{
 			SavageDeviceName *dn = (SavageDeviceName *)buf;
 			if (dn->magic == SAVAGE_PRIVATE_DATA_MAGIC) {
 				strcpy(dn->name, di->name);
 				result = B_OK;
 			}
+			break;
 		}
-		break;
 
-	case SAVAGE_RUN_INTERRUPTS: {
+		case SAVAGE_RUN_INTERRUPTS:
+		{
 			SavageSetBoolState *ri = (SavageSetBoolState *)buf;
 			if (ri->magic == SAVAGE_PRIVATE_DATA_MAGIC) {
 				if (ri->bEnable) {
@@ -809,8 +795,8 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len)
 				}
 			}
 			result = B_OK;
+			break;
 		}
-		break;
 	}
 	return result;
 }

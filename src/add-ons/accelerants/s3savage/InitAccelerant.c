@@ -269,7 +269,6 @@ UNINIT_ACCELERANT(void)
 }
 
 
-
 // Kernel function dprintf() is not available in user space; however,
 // _sPrintf performs the same function in user space but is undefined
 // in the OS header files.  Thus, it is defined here.

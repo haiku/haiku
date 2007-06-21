@@ -5,9 +5,9 @@
 	Other authors:
 	Gerald Zajac 2006-2007
 */
-
 #ifndef DRIVERINTERFACE_H
 #define DRIVERINTERFACE_H
+
 
 #include <Accelerant.h>
 #include <GraphicsDefs.h>
@@ -23,11 +23,14 @@
 extern "C" {
 #endif
 
+#if 1 /* DEBUG */
+#	define TRACE_S3SAVAGE
+	// turns on debug output
+#endif
 
 #define NUM_ELEMENTS(a) ((int)(sizeof(a) / sizeof(a[0]))) 	// for computing number of elements in an array
 
-typedef struct
-{
+typedef struct {
 	sem_id	sem;
 	int32	ben;
 } benaphore;
@@ -41,8 +44,7 @@ typedef struct
 #define SAVAGE_PRIVATE_DATA_MAGIC	 0x5791 // a private driver rev, of sorts
 
 
-enum
-{
+enum {
 	SAVAGE_GET_PRIVATE_DATA = B_DEVICE_OP_CODES_END + 1,
 	SAVAGE_GET_PCI,
 	SAVAGE_SET_PCI,
@@ -54,8 +56,7 @@ enum
 // Chip tags.  These are used to group the adapters into related
 // families.  See table SavageChipsetTable in driver.c
 
-enum S3ChipTags
-{
+enum S3ChipTags {
 	S3_UNKNOWN = 0,
 	S3_SAVAGE3D,
 	S3_SAVAGE_MX,
@@ -111,9 +112,7 @@ typedef union _BMPDESC {
 } BMPDESC;
 
 
-
-typedef struct
-{
+typedef struct {
 	// Device ID info.
 	uint16	vendorID;			// PCI vendor ID, from pci_info
 	uint16	deviceID;			// PCI device ID, from pci_info
@@ -147,8 +146,7 @@ typedef struct
 	int32	flags;
 
 	// Cursor info.
-	struct
-	{
+	struct {
 		uint16	hot_x;			// Cursor hot spot. The top left corner of the cursor
 		uint16	hot_y;			// is 0,0
 		uint16	x;				// The location of the cursor hot spot on the
@@ -164,8 +162,7 @@ typedef struct
 	frame_buffer_config fbc;	// frame buffer addresses and bytes_per_row
 
 	// Acceleration engine.
-	struct
-	{
+	struct {
 		uint64		count;		// last fifo slot used
 		uint64		lastIdle;	// last fifo slot we *know* the engine was idle after
 		benaphore	lock;	 	// for serializing access to the acceleration engine
@@ -202,8 +199,7 @@ typedef struct
 
 
 // Read or write a value in PCI configuration space
-typedef struct
-{
+typedef struct {
 	uint32	  magic;	// magic number to make sure the caller groks us
 	uint32	  offset;	// Offset to read/write
 	uint32	  size;		// Number of bytes to transfer
@@ -212,16 +208,14 @@ typedef struct
 
 
 // Set some boolean condition (like enabling or disabling interrupts)
-typedef struct
-{
+typedef struct {
 	uint32	magic;		// magic number to make sure the caller groks us
 	bool	bEnable;	// state to set
 } SavageSetBoolState;
 
 
 // Retrieve the area_id of the kernel/accelerant shared info
-typedef struct
-{
+typedef struct {
 	uint32	magic;		// magic number to make sure the caller groks us
 	area_id sharedInfoArea;	// ID of area containing shared information
 } SavageGetPrivateData;
@@ -229,8 +223,7 @@ typedef struct
 
 // Retrieve the device name.  Usefull for when we have a file handle, but want
 // to know the device name (like when we are cloning the accelerant)
-typedef struct
-{
+typedef struct {
 	uint32	magic;		// magic number to make sure the caller groks us
 	char	*name;		// The name of the device, less the /dev root
 } SavageDeviceName;
@@ -240,5 +233,4 @@ typedef struct
 }
 #endif
 
-
-#endif
+#endif	/* DRIVERINTERFACE_H */
