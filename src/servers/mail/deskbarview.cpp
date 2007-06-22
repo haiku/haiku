@@ -1,7 +1,7 @@
 /* DeskbarView - main_daemon's deskbar menu and view
-**
-** Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
-*/
+ *
+ * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
+ */
 
 
 #include <PopUpMenu.h>
@@ -279,23 +279,25 @@ DeskbarView::MessageReceived(BMessage *message)
 	}
 }
 
-void DeskbarView::ChangeIcon(int32 icon)
+
+void
+DeskbarView::ChangeIcon(int32 icon)
 {
-	if(fCurrentIconState == icon)
+	if (fCurrentIconState == icon)
 		return;
-		
+
 	BBitmap *newIcon(NULL);
 
 	image_info info;
-	if (our_image(&info) == B_OK)
-	{
-		BFile file(info.name,B_READ_ONLY);
+	if (our_image(&info) == B_OK) {
+		BFile file(info.name, B_READ_ONLY);
 		if (file.InitCheck() < B_OK)
 			goto err;
 
 		BResources rsrc(&file);
 		size_t len;
-		const void *data = rsrc.LoadResource('BBMP',icon == NEW_MAIL ? "New" : "Read",&len);
+		const void *data = rsrc.LoadResource('BBMP', icon == NEW_MAIL
+			? "New" : "Read",&len);
 		if (len == 0)
 			goto err;
 
@@ -305,8 +307,7 @@ void DeskbarView::ChangeIcon(int32 icon)
 		if (archive.Unflatten(&stream) != B_OK)
 			goto err;
 		newIcon = new BBitmap(&archive);
-	}
-	else
+	} else
 		fputs("no image!", stderr);
 
 err:
@@ -316,12 +317,16 @@ err:
 	Invalidate();
 }
 
-void DeskbarView::Pulse()
+
+void
+DeskbarView::Pulse()
 {
-	// Check if mail_daemon is still running
+	// TODO: Check if mail_daemon is still running
 }
 
-void DeskbarView::MouseUp(BPoint pos)
+
+void
+DeskbarView::MouseUp(BPoint pos)
 {
 	if (fLastButtons & B_PRIMARY_MOUSE_BUTTON) {
 		if (OpenFolder("mail/mailbox") != B_OK)
@@ -334,22 +339,27 @@ void DeskbarView::MouseUp(BPoint pos)
 		BMailDaemon::CheckMail(true);
 }
 
-void DeskbarView::MouseDown(BPoint pos)
+
+void
+DeskbarView::MouseDown(BPoint pos)
 {
 	Looper()->CurrentMessage()->FindInt32("buttons",&fLastButtons);
 	Looper()->CurrentMessage()->PrintToStream();
 
-	if (fLastButtons & B_SECONDARY_MOUSE_BUTTON)
-	{
+	if (fLastButtons & B_SECONDARY_MOUSE_BUTTON) {
 		ConvertToScreen(&pos);
-		
+
 		BPopUpMenu *menu = BuildMenu();
-		if (menu)
-			menu->Go(pos,true,true,BRect(pos.x - 2, pos.y - 2, pos.x + 2, pos.y + 2),true);
+		if (menu) {
+			menu->Go(pos, true, true, BRect(pos.x - 2, pos.y - 2,
+				pos.x + 2, pos.y + 2), true);
+		}
 	}
 }
 
-bool DeskbarView::CreateMenuLinks(BDirectory &directory,BPath &path)
+
+bool
+DeskbarView::CreateMenuLinks(BDirectory &directory,BPath &path)
 {
 	status_t status = directory.SetTo(path.Path());
 	if (status == B_OK)
@@ -366,23 +376,23 @@ bool DeskbarView::CreateMenuLinks(BDirectory &directory,BPath &path)
 		|| directory.CreateDirectory(path.Leaf(), NULL) < B_OK
 		|| directory.SetTo(path.Path()) < B_OK)
 		return false;
-	
+
 	BPath targetPath;
 	find_directory(B_USER_DIRECTORY, &targetPath);
 	targetPath.Append("mail/in");
-	
-	directory.CreateSymLink("Open Inbox Folder",targetPath.Path(),NULL);
+
+	directory.CreateSymLink("Open Inbox Folder", targetPath.Path(), NULL);
 	targetPath.GetParent(&targetPath);
-	directory.CreateSymLink("Open Mail Folder",targetPath.Path(),NULL);
+	directory.CreateSymLink("Open Mail Folder", targetPath.Path(), NULL);
 
 	// create the draft query
-	
+
 	BFile file;
-	if (directory.CreateFile("Open Draft",&file) < B_OK)
+	if (directory.CreateFile("Open Draft", &file) < B_OK)
 		return true;
 
 	BString string("MAIL:draft==1");
-	file.WriteAttrString("_trk/qrystr",&string);
+	file.WriteAttrString("_trk/qrystr", &string);
 	string = "E-mail";
 	file.WriteAttrString("_trk/qryinitmime", &string);
 	BNodeInfo(&file).SetType("application/x-vnd.Be-query");
@@ -390,14 +400,17 @@ bool DeskbarView::CreateMenuLinks(BDirectory &directory,BPath &path)
 	return true;
 }
 
-void DeskbarView::CreateNewMailQuery(BEntry &query)
+
+void
+DeskbarView::CreateNewMailQuery(BEntry &query)
 {
 	BFile file(&query, B_READ_WRITE | B_CREATE_FILE);
-	if(file.InitCheck() != B_OK)
+	if (file.InitCheck() != B_OK)
 		return;
 
-	BString string("((" B_MAIL_ATTR_STATUS "==\"[nN][eE][wW]\")&&((BEOS:TYPE==\"text/x-email\")||(BEOS:TYPE==\"text/x-partial-email\")))");
-	file.WriteAttrString("_trk/qrystr",&string);
+	BString string("((" B_MAIL_ATTR_STATUS "==\"[nN][eE][wW]\")&&((BEOS:TYPE=="
+		"\"text/x-email\")||(BEOS:TYPE==\"text/x-partial-email\")))");
+	file.WriteAttrString("_trk/qrystr", &string);
 	string = "E-mail";
 	file.WriteAttrString("_trk/qryinitmime", &string);
 	BNodeInfo(&file).SetType("application/x-vnd.Be-query");
@@ -407,9 +420,9 @@ void DeskbarView::CreateNewMailQuery(BEntry &query)
 BPopUpMenu *
 DeskbarView::BuildMenu()
 {
-	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING,false,false);
+	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
 	menu->SetFont(be_plain_font);
-	
+
 	menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE (
 		"Create New Message","N) 新規メッセージ作成")B_UTF8_ELLIPSIS,
 		new BMessage(MD_OPEN_NEW)));
@@ -424,14 +437,12 @@ DeskbarView::BuildMenu()
 	BPath path;
 	find_directory(B_USER_SETTINGS_DIRECTORY, &path);
 	path.Append("Mail/Menu Links");
-	
+
 	BDirectory directory;
-	if (CreateMenuLinks(directory,path))
-	{
+	if (CreateMenuLinks(directory, path)) {
 		int32 count = 0;
 
-		while (directory.GetNextRef(&ref) == B_OK)
-		{
+		while (directory.GetNextRef(&ref) == B_OK) {
 			count++;
 
 			path.SetTo(&ref);
@@ -442,12 +453,10 @@ DeskbarView::BuildMenu()
 			// we are using the NavMenu only for directories and queries
 			bool useNavMenu = false;
 
-			if (entry.InitCheck() == B_OK)
-			{
+			if (entry.InitCheck() == B_OK) {
 				if (entry.IsDirectory())
 					useNavMenu = true;
-				else if (entry.IsFile())
-				{
+				else if (entry.IsFile()) {
 					// Files should use the BMenuItem unless they are queries
 					char mimeString[B_MIME_TYPE_LENGTH];
 					BNode node(&entry);
@@ -456,20 +465,19 @@ DeskbarView::BuildMenu()
 						&& strcmp(mimeString, "application/x-vnd.Be-query") == 0)
 						useNavMenu = true;
 				}
-				//clobber the existing ref only if the symlink derefernces completely, 
-				//otherwise we'll stick with what we have
+				// clobber the existing ref only if the symlink derefernces completely, 
+				// otherwise we'll stick with what we have
 				entry.GetRef(&ref);
 			}
 
 			msg = new BMessage(B_REFS_RECEIVED);
 			msg->AddRef("refs", &ref);
-			
-			if (useNavMenu)
-			{
-				item = new BMenuItem(navMenu = new BNavMenu(path.Leaf(),B_REFS_RECEIVED,tracker), msg);
+
+			if (useNavMenu) {
+				item = new BMenuItem(navMenu = new BNavMenu(path.Leaf(),
+					B_REFS_RECEIVED, tracker), msg);
 				navMenu->SetNavDir(&ref);
-			}
-			else
+			} else
 				item = new BMenuItem(path.Leaf(), msg);
 
 			menu->AddItem(item);
@@ -490,12 +498,12 @@ DeskbarView::BuildMenu()
 
 	// The New E-mail query
 
-	if (fNewMessages > 0)
-	{
+	if (fNewMessages > 0) {
 		BString string;
-		MDR_DIALECT_CHOICE (
-		string << fNewMessages << " new message" << ((fNewMessages != 1) ? "s" : B_EMPTY_STRING),
-		string << fNewMessages << " 通の未読メッセージ");
+		MDR_DIALECT_CHOICE(
+			string << fNewMessages << " new message"
+				<< (fNewMessages != 1 ? "s" : B_EMPTY_STRING),
+			string << fNewMessages << " 通の未読メッセージ");
 
 		find_directory(B_USER_SETTINGS_DIRECTORY, &path);
 		path.Append("Mail/New E-mail");
@@ -505,75 +513,76 @@ DeskbarView::BuildMenu()
 			CreateNewMailQuery(query);
 		query.GetRef(&ref);
 
-		item = new BMenuItem(
-			navMenu = new BNavMenu(string.String(),B_REFS_RECEIVED,BMessenger(kTrackerSignature)),
+		item = new BMenuItem(navMenu = new BNavMenu(string.String(),
+			B_REFS_RECEIVED, BMessenger(kTrackerSignature)),
 			msg = new BMessage(B_REFS_RECEIVED));
 		msg->AddRef("refs", &ref);
 		navMenu->SetNavDir(&ref);
 
 		menu->AddItem(item);
-	}
-	else
-	{
+	} else {
 		menu->AddItem(item = new BMenuItem(
 			MDR_DIALECT_CHOICE ("No new messages","未読メッセージなし"), NULL));
 		item->SetEnabled(false);
 	}
-	
-	if (modifiers() & B_SHIFT_KEY)
-	{
-		BList list;
-		GetInboundMailChains(&list);
 
+	BList list;
+	GetInboundMailChains(&list);
+
+	if (modifiers() & B_SHIFT_KEY) {
 		BMenu *chainMenu = new BMenu(
 			MDR_DIALECT_CHOICE ("Check For Mails Only","R) メール受信のみ"));
 		BFont font;
 		menu->GetFont(&font);
 		chainMenu->SetFont(&font);
 
-		for (int32 i = 0;i < list.CountItems();i++) {
+		for (int32 i = 0; i < list.CountItems(); i++) {
 			BMailChain *chain = (BMailChain *)list.ItemAt(i);
 
 			BMessage *message = new BMessage(MD_CHECK_FOR_MAILS);
-			message->AddString("account",chain->Name());
+			message->AddString("account", chain->Name());
 
-			chainMenu->AddItem(new BMenuItem(chain->Name(),message));
+			chainMenu->AddItem(new BMenuItem(chain->Name(), message));
 			delete chain;
 		}
+		if (list.IsEmpty()) {
+			item = new BMenuItem("<no accounts>", NULL);
+			item->SetEnabled(false);
+			chainMenu->AddItem(item);
+		}
 		chainMenu->SetTargetForItems(this);
-		menu->AddItem(new BMenuItem(chainMenu,new BMessage(MD_CHECK_FOR_MAILS)));
+		menu->AddItem(new BMenuItem(chainMenu, new BMessage(MD_CHECK_FOR_MAILS)));
 
 		// Not used:
 		// menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE (
 		// "Check For Mails Only","メール受信のみ"), new BMessage(MD_CHECK_FOR_MAILS)));
 		menu->AddItem(new BMenuItem(
-			MDR_DIALECT_CHOICE ("Send Pending Mails","M) 保留メールを送信"),
+			MDR_DIALECT_CHOICE ("Send Pending Mails", "M) 保留メールを送信"),
 		new BMessage(MD_SEND_MAILS)));
-	}
-	else
-		menu->AddItem(new BMenuItem(
-			MDR_DIALECT_CHOICE ("Check For Mail Now","C) メールチェック"),
+	} else {
+		menu->AddItem(item = new BMenuItem(
+			MDR_DIALECT_CHOICE ("Check For Mail Now", "C) メールチェック"),
 			new BMessage(MD_CHECK_SEND_NOW)));
+		if (list.IsEmpty())
+			item->SetEnabled(false);
+	}
 
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(
 		MDR_DIALECT_CHOICE ("Edit Preferences","P) メール環境設定") B_UTF8_ELLIPSIS,
 		new BMessage(MD_OPEN_PREFS)));
 
-	if (modifiers() & B_SHIFT_KEY)
-	{
+	if (modifiers() & B_SHIFT_KEY) {
 		menu->AddItem(new BMenuItem(
 			MDR_DIALECT_CHOICE ("Shutdown Mail Services","Q) 終了"),
 			new BMessage(B_QUIT_REQUESTED)));
 	}
-	
+
 	// Reset Item Targets (only those which aren't already set)
 
-	for (int32 i = menu->CountItems();i-- > 0;)
-	{
+	for (int32 i = menu->CountItems(); i-- > 0;) {
 		item = menu->ItemAt(i);
-		if (item && (msg = item->Message()) != NULL)
-		{
+		if (item && (msg = item->Message()) != NULL) {
 			if (msg->what == B_REFS_RECEIVED)
 				item->SetTarget(tracker);
 			else

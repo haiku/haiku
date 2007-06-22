@@ -1,15 +1,18 @@
+/*
+ * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
+ * Copyright 2004-2007, Haiku Inc. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef ZOIDBERG_STATUS_WINDOW_H
 #define ZOIDBERG_STATUS_WINDOW_H
-/* StatusWindow - the status window while fetching/sending mails
-**
-** Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
-*/
 
 
-#include <Window.h>
+#include <Alert.h>
 #include <Box.h>
 #include <List.h>
-#include <Alert.h>
+#include <Node.h>
+#include <Window.h>
 
 class BStatusBar;
 class BStringView;
@@ -17,7 +20,7 @@ class BMailStatusView;
 
 class BMailStatusWindow : public BWindow {
 	public:
-		BMailStatusWindow(BRect rect, const char *name, uint32 show_when);
+		BMailStatusWindow(BRect rect, const char *name, uint32 showMode);
 		~BMailStatusWindow();
 
 		virtual	void FrameMoved(BPoint origin);
@@ -35,9 +38,12 @@ class BMailStatusWindow : public BWindow {
 	private:
 		friend class BMailStatusView;
 
+		void	_CheckChains();
 		void	SetBorderStyle(int32 look);
 		void	ActuallyAddStatusView(BMailStatusView *status);
 
+		node_ref	fChainDirectory;
+		BButton*	fCheckNowButton;
 		BList		fStatusViews;
 		uint32		fShowMode;
 		BView		*fDefaultView;
@@ -47,7 +53,7 @@ class BMailStatusWindow : public BWindow {
 		int32		fWindowMoved;
 		int32		fLastWorkspace;
 		BRect		fFrame;
-		
+
 		uint32		_reserved[5];
 };
 

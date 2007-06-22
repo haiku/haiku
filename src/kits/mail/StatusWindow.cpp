@@ -1,58 +1,58 @@
-/* BMailStatusWindow - the status window while fetching/sending mails
-**
-** Copyright (c) 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
-*/
+/*
+ * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
+ * Copyright 2004-2007, Haiku Inc. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
+//! The status window while fetching/sending mails
 
-#include <Application.h>
-#include <Box.h>
-#include <Button.h>
-#include <StringView.h>
-#include <Screen.h>
-#include <String.h>
-#include <StatusBar.h>
-#include <Roster.h>
-#include <Locker.h>
-#include <E-mail.h>
-
-#include <stdio.h>
-#include <assert.h>
-
-class _EXPORT BMailStatusWindow;
-class _EXPORT BMailStatusView;
 
 #include "status.h"
 #include "MailSettings.h"
 
 #include <MDRLanguage.h>
 
-/*------------------------------------------------
+#include <Application.h>
+#include <Box.h>
+#include <Button.h>
+#include <Directory.h>
+#include <E-mail.h>
+#include <FindDirectory.h>
+#include <Locker.h>
+#include <NodeMonitor.h>
+#include <Path.h>
+#include <Roster.h>
+#include <Screen.h>
+#include <StatusBar.h>
+#include <String.h>
+#include <StringView.h>
 
-BMailStatusWindow
+#include <stdio.h>
+#include <assert.h>
 
-------------------------------------------------*/
 
 static BLocker sLock;
 
 
-BMailStatusWindow::BMailStatusWindow(BRect rect, const char *name, uint32 s)
+BMailStatusWindow::BMailStatusWindow(BRect rect, const char *name, uint32 showMode)
 	: BWindow(rect, name, B_MODAL_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-          B_NOT_CLOSABLE | B_NO_WORKSPACE_ACTIVATION | B_NOT_V_RESIZABLE | B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE),
-	fShowMode(s),
+          B_NOT_CLOSABLE | B_NO_WORKSPACE_ACTIVATION | B_NOT_V_RESIZABLE
+          | B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE),
+	fShowMode(showMode),
 	fWindowMoved(0L)
 {
 	BRect frame(Bounds());
 	frame.InsetBy(90.0 + 5.0, 5.0);
 
-	BButton *button = new BButton(frame, "check_mail",
-							MDR_DIALECT_CHOICE ("Check Mail Now","メールチェック"),
-							new BMessage('mbth'), B_FOLLOW_LEFT_RIGHT,
-							B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_NAVIGABLE);
-	button->ResizeToPreferred();
-	frame = button->Frame();
+	fCheckNowButton = new BButton(frame, "check_mail",
+		MDR_DIALECT_CHOICE ("Check Mail Now","メールチェック"),
+		new BMessage('mbth'), B_FOLLOW_LEFT_RIGHT,
+		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_NAVIGABLE);
+	fCheckNowButton->ResizeToPreferred();
+	frame = fCheckNowButton->Frame();
 
-	button->ResizeTo(button->Bounds().Width(),25);
-	button->SetTarget(be_app_messenger);
+	fCheckNowButton->SetTarget(be_app_messenger);
 
 	frame.OffsetBy(0.0, frame.Height());
 	frame.InsetBy(-90.0, 0.0);
@@ -63,17 +63,17 @@ BMailStatusWindow::BMailStatusWindow(BRect rect, const char *name, uint32 s)
 	fMessageView->SetText(MDR_DIALECT_CHOICE ("No new messages.","未読メッセージはありません"));
 	float framewidth = frame.Width();
 	fMessageView->ResizeToPreferred();
-	fMessageView->ResizeTo(framewidth,fMessageView->Bounds().Height());
+	fMessageView->ResizeTo(framewidth, fMessageView->Bounds().Height());
 	frame = fMessageView->Frame();
 
 	frame.InsetBy(-5.0, -5.0);
 	frame.top = 0.0;
 
-	fDefaultView = new BBox(frame, "default_view", B_FOLLOW_LEFT_RIGHT,
-							B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE_JUMP, B_PLAIN_BORDER);
+	fDefaultView = new BView(frame, "default_view", B_FOLLOW_LEFT_RIGHT,
+		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP);
 	fDefaultView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	fDefaultView->AddChild(button);
+	fDefaultView->AddChild(fCheckNowButton);
 	fDefaultView->AddChild(fMessageView);
 
 	fMinWidth = fDefaultView->Bounds().Width();
@@ -95,7 +95,7 @@ BMailStatusWindow::BMailStatusWindow(BRect rect, const char *name, uint32 s)
 
 				ResizeBy(x_off_set, y_off_set);
 				fDefaultView->ResizeBy(x_off_set, y_off_set);
-				button->ResizeBy(x_off_set, y_off_set);
+				fCheckNowButton->ResizeBy(x_off_set, y_off_set);
 				fMessageView->ResizeBy(x_off_set, y_off_set);
 			}
 		}
@@ -115,8 +115,22 @@ BMailStatusWindow::BMailStatusWindow(BRect rect, const char *name, uint32 s)
 
 	fFrame = Frame();
 
+	BPath path;
+	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+	if (status == B_OK) {
+		path.Append("Mail/chains/inbound");
+		create_directory(path.Path(), 0755);
+		BDirectory chainDirectory(path.Path());
+		if (chainDirectory.GetNodeRef(&fChainDirectory) == B_OK) {
+			// Watch this directory for changes
+			watch_node(&fChainDirectory, B_WATCH_DIRECTORY, this);
+			_CheckChains();
+		}
+	}
+
 	if (fShowMode != B_MAIL_SHOW_STATUS_WINDOW_ALWAYS)
 		Hide();
+
 	Show();
 }
 
@@ -134,6 +148,21 @@ BMailStatusWindow::~BMailStatusWindow()
 		general.SetStatusWindowWorkspaces((int32)Workspaces());
 		general.Save();
 	}
+
+	stop_watching(this);
+}
+
+
+//! Activate the "Check Now" button only if there are inbound accounts
+void
+BMailStatusWindow::_CheckChains()
+{
+	BDirectory directory(&fChainDirectory);
+
+	entry_ref ref;
+	bool isEmpty = directory.GetNextRef(&ref) != B_OK;
+
+	fCheckNowButton->SetEnabled(!isEmpty);
 }
 
 
@@ -188,6 +217,10 @@ BMailStatusWindow::MessageReceived(BMessage *msg)
 		case 'DATA':
 			msg->what = B_REFS_RECEIVED;
 			be_roster->Launch(B_MAIL_TYPE, msg);
+			break;
+
+		case B_NODE_MONITOR:
+			_CheckChains();
 			break;
 
 		default:
