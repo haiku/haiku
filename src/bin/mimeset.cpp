@@ -67,7 +67,7 @@ main(int argc, char **argv)
 	// parse arguments
 
 	if (argc < 2)
-		usage(-1);
+		usage(1);
 
 	while (*++argv) {
 		char *arg = *argv;
@@ -87,7 +87,7 @@ main(int argc, char **argv)
 			usage(0);
 		else {
 			fprintf(stderr, "unknown  option \"%s\"\n", arg);
-			usage(-1);
+			usage(1);
 		}
 	}
 
@@ -95,7 +95,6 @@ main(int argc, char **argv)
 
 	BApplication app("application/x-vnd.haiku.mimeset");
 
-	int err = 0;
 	while (*argv) {
 		char *arg = *argv++;
 
@@ -105,14 +104,12 @@ main(int argc, char **argv)
 			while (fgets(name, sizeof(name), stdin) != NULL) {
 				name[strlen(name) - 1] = '\0';
 					// remove trailing '\n'
-				err = process_file(name);
-				if (err)
-					exit(err);
+				if (process_file(name) != B_OK)
+					exit(1);
 			}
 		} else {
-			err = process_file(arg);
-			if (err)
-				exit(err);
+			if (process_file(arg) != B_OK)
+				exit(1);
 		}
 	}
 
