@@ -790,8 +790,11 @@ BMenuField::DrawLabel(BRect bounds, BRect update)
 				break;
 		}
 
-		// vertical alignment -- center the ascent
-		float y = floor((Bounds().Height() + fh.ascent) / 2);
+		// vertical alignment
+		float y = Bounds().top
+			+ (Bounds().Height() + 1 - fh.ascent - fh.descent) / 2
+			+ fh.ascent;
+		y = floor(y + 0.5);
 
 		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 			IsEnabled() ? B_DARKEN_MAX_TINT : B_DISABLED_LABEL_TINT));
@@ -905,7 +908,7 @@ BMenuField::_ValidateLayoutData()
 	GetFontHeight(&fh);
 
 	fLayoutData->label_width = (Label() ? ceilf(StringWidth(Label())) : 0);
-	fLayoutData->label_height = ceilf(fh.ascent + fh.descent);
+	fLayoutData->label_height = ceilf(fh.ascent) + ceilf(fh.descent);
 
 	// compute the minimal divider
 	float divider = 0;
