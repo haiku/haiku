@@ -385,9 +385,9 @@ aviReader::GetNextChunk(void *_cookie,
 		return B_BAD_VALUE;
 	}
 	
-	TRACE("stream %d (%s): start_time %.6f, pos %.3f %%\n", 
-		cookie->stream, cookie->is_audio ? "A" : cookie->is_video ? "V" : "?", 
-		mediaHeader->start_time / 1000000.0, cookie->frame_pos * 100.0 / cookie->frame_count);
+//	TRACE("stream %d (%s): start_time %.6f, pos %.3f %%\n", 
+//		cookie->stream, cookie->is_audio ? "A" : cookie->is_video ? "V" : "?", 
+//		mediaHeader->start_time / 1000000.0, cookie->frame_pos * 100.0 / cookie->frame_count);
 
 	*chunkBuffer = cookie->buffer;
 	*chunkSize = size;
