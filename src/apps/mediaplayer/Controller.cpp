@@ -30,6 +30,7 @@
 #include <MediaFile.h>
 #include <MediaTrack.h>
 #include <Path.h>
+#include <Window.h> // for debugging only
 
 #include "ControllerView.h"
 #include "PlaybackState.h"
@@ -220,6 +221,8 @@ Controller::SetTo(const entry_ref &ref)
 	fStopped = fAutoplay ? false : true;
 	fPauseAtEndOfStream = false;
 	fSeekToStartAfterPause = false;
+	fTimeSourceSysTime = system_time();
+	fTimeSourcePerfTime = 0;
 	fDuration = 0;
 
 	_UpdatePosition(0);
@@ -804,14 +807,6 @@ printf("audio play start\n");
 		if (!fDataLock.Lock())
 			return;
 
-		// TODO: fix performance time update (in case no audio)
-		if (fTimeSourceLock.Lock()) {
-			fTimeSourceSysTime = system_time() + audioLatency - bufferDuration;
-			fTimeSourceLock.Unlock();
-		}
-//		printf("timesource: sys: %Ld perf: %Ld\n", fTimeSourceSysTime,
-//			fTimeSourcePerfTime);
-
 		if (buffer->sizeUsed == 0) {
 			bool pause = fPauseAtEndOfStream && buffer->endOfStream;
 			fDataLock.Unlock();
@@ -841,11 +836,21 @@ printf("audio format changed, new buffer duration %Ld\n", bufferDuration);
 			}
 		}
 
+		// TODO: fix performance time update (in case no audio)
+		if (fTimeSourceLock.Lock()) {
+			audioLatency = fSoundOutput->Latency();
+			fTimeSourceSysTime = system_time() + audioLatency - bufferDuration;
+			fTimeSourcePerfTime = buffer->startTime;
+			fTimeSourceLock.Unlock();
+		}
+//		printf("timesource: sys: %Ld perf: %Ld\n", fTimeSourceSysTime,
+//			fTimeSourcePerfTime);
+
 		if (fSoundOutput) {
 			fSoundOutput->Play(buffer->buffer, buffer->sizeUsed);
-			audioLatency = fSoundOutput->Latency();
 			_UpdatePosition(buffer->startTime);
 		}
+
 
 		fDataLock.Unlock();
 
@@ -985,29 +990,47 @@ printf("video decode start\n");
 			goto wait;
 		}
 
-#if 0
 		bigtime_t waituntil;
 		bigtime_t waitdelta;
-		char test[100];
-		{
-			BAutolock lock(fTimeSourceLock);
-
-			waituntil = fTimeSourceSysTime - fTimeSourcePerfTime + buffer->startTime;
-			waitdelta = waituntil - system_time();
-			sprintf(test, "sys %.6f perf %.6f, vid %.6f, waituntil %.6f, waitdelta %.6f",
-			 fTimeSourceSysTime / 1000000.0f,
-			 fTimeSourcePerfTime / 1000000.0f,
-			 buffer->startTime / 1000000.0f,
-			 waituntil / 1000000.0f,
-			 waitdelta / 1000000.0f);
+		bigtime_t now;
+		if (fTimeSourceLock.Lock()) {
+			now = system_time();
+			waituntil = fTimeSourceSysTime - fTimeSourcePerfTime + buffer->startTime - 1000;
+			waitdelta = waituntil - now;
+			fTimeSourceLock.Unlock();
+		} else {
+			// puhh...
 		}
+
+#if 0
+		char test[100];
+		sprintf(test, "sys %.6f perf %.6f, vid %.6f, now %.6f, waituntil %.6f, waitdelta %.6f",
+				fTimeSourceSysTime / 1E6, fTimeSourcePerfTime / 1E6,
+				buffer->startTime / 1E6, now / 1E6,
+				waituntil / 1E6, waitdelta / 1E6);
 		if (fVideoView->LockLooperWithTimeout(5000) == B_OK) {
 			fVideoView->Window()->SetTitle(test);
 			fVideoView->UnlockLooper();
 		}
-#else
-		bigtime_t waituntil;
-		waituntil = fTimeSourceSysTime - fTimeSourcePerfTime + buffer->startTime;
+#endif
+
+		if (fAudioSupplierLock.Lock()) {
+			if (!fAudioSupplier) {
+				fTimeSourceSysTime = system_time();
+				fTimeSourcePerfTime = buffer->startTime;
+			}
+			fAudioSupplierLock.Unlock();
+		} else {
+			// puhh...
+		}
+
+
+#if 1
+		if (waitdelta < -150000) {
+			printf("video: frame %.6f too late, dropped\n", waitdelta  / -1E6);
+			release_sem(fVideoDecodeSem);
+			continue;
+		}
 #endif
 
 		status = acquire_sem_etc(fVideoWaitSem, 1, B_ABSOLUTE_TIMEOUT, waituntil);
@@ -1039,8 +1062,9 @@ printf("video decode start\n");
 					fPauseAtEndOfStream = false;
 					fSeekToStartAfterPause = true;
 					Pause();
-				} else
-					snooze(25000);
+				} 
+//else
+//					snooze(25000);
 				continue;
 			}
 		} else
@@ -1051,7 +1075,7 @@ printf("video decode start\n");
 	//	snooze(60000);
 		release_sem(fVideoDecodeSem);
 	}
-		
+
 //		status_t status = acquire_sem_etc(fVideoWaitSem, 1, B_ABSOLUTE_TIMEOUT, buffer->startTime);
 //		if (status != B_TIMED_OUT)
 //			return;
@@ -1151,8 +1175,8 @@ Controller::_UpdatePosition(bigtime_t position, bool isVideoPosition, bool force
 	if (isVideoPosition && fAudioSupplier)
 		return;
 
-	BAutolock _(fTimeSourceLock);
-	fTimeSourcePerfTime = position;
+//	BAutolock _(fTimeSourceLock);
+//	fTimeSourcePerfTime = position;
 
 	fPosition = position;
 	float scale = fDuration > 0 ? (float)fPosition / fDuration : 0.0;
