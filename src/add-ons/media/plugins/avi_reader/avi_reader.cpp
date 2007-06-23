@@ -29,6 +29,7 @@
 #include <ByteOrder.h>
 #include <InterfaceDefs.h>
 #include <MediaFormats.h>
+#include <new>
 #include "RawFormats.h"
 #include "avi_reader.h"
 
@@ -107,7 +108,11 @@ aviReader::Sniff(int32 *streamCount)
 	
 	TRACE("aviReader::Sniff: this stream seems to be supported\n");
 	
-	fFile = new OpenDMLFile(pos_io_source);
+	fFile = new(std::nothrow) OpenDMLFile(pos_io_source);
+	if (!fFile) {
+		ERROR("aviReader::Sniff: out of memory\n");
+		return B_NO_MEMORY;
+	}
 	if (fFile->Init() < B_OK) {
 		ERROR("aviReader::Sniff: can't setup OpenDMLFile\n");
 		return B_ERROR;
@@ -135,7 +140,9 @@ aviReader::GetFileFormatInfo(media_file_format *mff)
 status_t
 aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 {
-	avi_cookie *cookie = new avi_cookie;
+	avi_cookie *cookie = new(std::nothrow) avi_cookie;
+	if (!cookie)
+		return B_NO_MEMORY;
 	*_cookie = cookie;
 	
 	cookie->stream = streamNumber;
@@ -173,8 +180,7 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		cookie->frames_per_sec_rate = fFile->StreamInfo(streamNumber)->frames_per_sec_rate;
 		cookie->frames_per_sec_scale = fFile->StreamInfo(streamNumber)->frames_per_sec_scale;
 
-		TRACE("audio frame_count %Ld\n", cookie->frame_count);
-		TRACE("audio duration %.6f (%Ld)\n", cookie->duration / 1E6, cookie->duration);
+		TRACE("audio frame_count %Ld, duration %.6f\n", cookie->frame_count, cookie->duration / 1E6);
 
 		if (audio_format->format_tag == 0x0001) {
 			// a raw PCM format
@@ -206,9 +212,12 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 			if (formats.GetFormatFor(description, format) < B_OK)
 				format->type = B_MEDIA_ENCODED_AUDIO;
 			format->u.encoded_audio.bit_rate = 8 * audio_format->avg_bytes_per_sec;
-			TRACE("bit_rate %.3f\n", format->u.encoded_audio.bit_rate);
 			format->u.encoded_audio.output.frame_rate = audio_format->frames_per_sec;
 			format->u.encoded_audio.output.channel_count = audio_format->channels;
+			TRACE("audio: bit_rate %.3f, frame_rate %.1f, channel_count %lu\n",
+				  format->u.encoded_audio.bit_rate,
+				  format->u.encoded_audio.output.frame_rate,
+				  format->u.encoded_audio.output.channel_count);
 		}
 		// TODO: this doesn't seem to work (it's not even a fourcc)
 		format->user_data_type = B_CODEC_TYPE_INFO;
@@ -244,8 +253,7 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		cookie->frames_per_sec_scale =  fFile->StreamInfo(streamNumber)->frames_per_sec_scale;
 		cookie->line_count = fFile->AviMainHeader()->height;
 		
-		TRACE("video frame_count %Ld\n", cookie->frame_count);
-		TRACE("video duration %.6f (%Ld)\n", cookie->duration / 1E6, cookie->duration);
+		TRACE("video frame_count %Ld, duration %.6f\n", cookie->frame_count, cookie->duration / 1E6);
 
 		description.family = B_AVI_FORMAT_FAMILY;
 		if (stream_header->fourcc_handler == 'ekaf' || stream_header->fourcc_handler == 0) // 'fake' or 0 fourcc => used compression id
@@ -347,14 +355,18 @@ aviReader::GetNextChunk(void *_cookie,
 		return B_LAST_BUFFER_ERROR;
 
 	if (size > 0x200000) { // 2 MB
-		ERROR("stream %d: frame too big: %u byte\n", size);
+		ERROR("stream %u: frame too big: %u byte\n", cookie->stream, size);
 		return B_NO_MEMORY;
 	}
 
 	if (cookie->buffer_size < size) {
 		delete [] cookie->buffer;
 		cookie->buffer_size = (size + 15) & ~15;
-		cookie->buffer = new char [cookie->buffer_size];
+		cookie->buffer = new(std::nothrow) char [cookie->buffer_size];
+		if (!cookie->buffer) {
+			cookie->buffer_size = 0;
+			return B_NO_MEMORY;
+		}
 	}
 
 	mediaHeader->start_time = (cookie->frame_pos * 1000000 * cookie->frames_per_sec_scale) / cookie->frames_per_sec_rate;
@@ -386,11 +398,11 @@ aviReader::GetNextChunk(void *_cookie,
 Reader *
 aviReaderPlugin::NewReader()
 {
-	return new aviReader;
+	return new(std::nothrow) aviReader;
 }
 
 
 MediaPlugin *instantiate_plugin()
 {
-	return new aviReaderPlugin;
+	return new(std::nothrow) aviReaderPlugin;
 }
