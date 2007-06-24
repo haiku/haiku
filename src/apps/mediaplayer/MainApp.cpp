@@ -30,8 +30,8 @@ MainApp *gMainApp;
 
 MainApp::MainApp()
 	: BApplication("application/x-vnd.Haiku-MediaPlayer"),
-	fFirstWindow(NewWindow()),
-	fPlayerCount(1)
+	fPlayerCount(0),
+	fFirstWindow(NewWindow())
 {
 }
 
@@ -129,17 +129,11 @@ MainApp::AboutRequested()
 }
 
 
-bool
-MainApp::QuitRequested()
-{
-	return true;
-}
-
-
 int 
 main()
 {
 	gMainApp = new MainApp;
 	gMainApp->Run();
+	delete gMainApp;
 	return 0;
 }

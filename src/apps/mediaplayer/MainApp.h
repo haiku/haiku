@@ -23,31 +23,28 @@
 #include <Application.h>
 #include "MainWin.h"
 
-enum 
-{
+enum  {
 	M_PLAYER_QUIT = 'plqt',
 };
 
-class MainApp : public BApplication
-{
+class MainApp : public BApplication {
 public:
-					MainApp();
-					~MainApp();
+								MainApp();
+	virtual						~MainApp();
 
-	BWindow *		NewWindow();
-
-private:
-	void			RefsReceived(BMessage *msg);
-	void			ArgvReceived(int32 argc, char **argv);
-	void			MessageReceived(BMessage *msg);
-	void			AboutRequested();
-	bool			QuitRequested();
+			BWindow*			NewWindow();
 
 private:
-	BWindow *		fFirstWindow;
-	int32			fPlayerCount;
+	virtual	void				RefsReceived(BMessage* message);
+	virtual	void				ArgvReceived(int32 argc, char** argv);
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	void				AboutRequested();
+
+private:
+			int32				fPlayerCount;
+			BWindow*			fFirstWindow;
 };
 
-extern MainApp *gMainApp;
+extern MainApp* gMainApp;
 
 #endif
