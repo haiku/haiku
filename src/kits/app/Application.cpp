@@ -1349,11 +1349,19 @@ BApplication::_WindowQuitLoop(bool quitFilePanels, bool force)
 		BWindow *window = (BWindow*)looperList.ItemAt(i);
 
 		// don't quit file panels if we haven't been asked for it
+		// NOTE: the window pointer will be NULL if the looper was not
+		// a BWindow or if the thread wasn't running, see above
 		if (window == NULL || (!quitFilePanels && window->IsFilePanel()))
 			continue;
 
+		// NOTE: the window pointer might be stale, in case the looper
+		// was already quit by quitting an earlier looper... but fortunately,
+		// we can still call Lock() on the invalid pointer, and it
+		// will return false...
 		if (window->Lock()) {
-			if (!force && !window->QuitRequested()
+			// never ask hidden windows if they want to quit, ignore
+			// them if force == false, just quit them if force == true
+			if (!force && !window->IsHidden() && !window->QuitRequested()
 				&& !(quitFilePanels && window->IsFilePanel())) {
 				// the window does not want to quit, so we don't either
 				window->Unlock();
