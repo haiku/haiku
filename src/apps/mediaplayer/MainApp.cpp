@@ -129,6 +129,13 @@ MainApp::AboutRequested()
 }
 
 
+bool
+MainApp::QuitRequested()
+{
+	return true;
+}
+
+
 int 
 main()
 {

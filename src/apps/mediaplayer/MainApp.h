@@ -41,6 +41,7 @@ private:
 	void			ArgvReceived(int32 argc, char **argv);
 	void			MessageReceived(BMessage *msg);
 	void			AboutRequested();
+	bool			QuitRequested();
 
 private:
 	BWindow *		fFirstWindow;
