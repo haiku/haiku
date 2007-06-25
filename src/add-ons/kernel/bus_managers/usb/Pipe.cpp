@@ -198,7 +198,32 @@ IsochronousPipe::QueueIsochronous(void *data, size_t dataLength,
 	uint32 *startingFrameNumber, uint32 flags, usb_callback_func callback,
 	void *callbackCookie)
 {
-	return B_ERROR;
+	// TODO: Check if values of input parameters are set correctely
+	usb_isochronous_data *isochronousData
+		= new(std::nothrow) usb_isochronous_data;
+
+	if (!isochronousData)
+		return B_NO_MEMORY;
+
+	isochronousData->packet_descriptors = packetDesc;
+	isochronousData->packet_count = packetCount;
+	isochronousData->starting_frame_number = startingFrameNumber;
+	isochronousData->flags = flags;
+
+	Transfer *transfer = new(std::nothrow) Transfer(this);
+	if (!transfer) {
+		delete isochronousData;
+		return B_NO_MEMORY;
+	}
+
+	transfer->SetData((uint8 *)data, dataLength);
+	transfer->SetCallback(callback, callbackCookie);
+	transfer->SetIsochronousData(isochronousData);
+
+	status_t result = GetBusManager()->SubmitTransfer(transfer);
+	if (result < B_OK)
+		delete transfer;
+	return result;
 }
 
 
@@ -259,7 +284,9 @@ ControlPipe::SendRequest(uint8 requestType, uint8 request, uint16 value,
 	uint16 index, uint16 length, void *data, size_t dataLength,
 	size_t *actualLength)
 {
-	transfer_result_data *transferResult = (transfer_result_data *)malloc(sizeof(transfer_result_data));
+	transfer_result_data *transferResult
+		= new(std::nothrow) transfer_result_data;
+
 	transferResult->notify_sem = create_sem(0, "usb send request notify");
 	if (transferResult->notify_sem < B_OK)
 		return B_NO_MORE_SEMS;
@@ -290,7 +317,7 @@ ControlPipe::SendRequest(uint8 requestType, uint8 request, uint16 value,
 		*actualLength = transferResult->actual_length;
 
 	result = transferResult->status;
-	free(transferResult);
+	delete transferResult;
 	return result;
 }
 
@@ -304,7 +331,7 @@ ControlPipe::SendRequestCallback(void *cookie, status_t status, void *data,
 	transferResult->actual_length = actualLength;
 	if (release_sem(transferResult->notify_sem) < B_OK) {
 		// the request has timed out already - cleanup after us
-		free(transferResult);
+		delete transferResult;
 	}
 }
 

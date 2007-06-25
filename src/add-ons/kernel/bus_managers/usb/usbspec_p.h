@@ -16,6 +16,7 @@
 #include <util/kernel_cpp.h>
 
 #define USB_MAX_AREAS					8
+#define USB_MAX_FRAGMENT_SIZE			B_PAGE_SIZE * 96
 
 #define USB_DELAY_BUS_RESET				100000
 #define USB_DELAY_DEVICE_POWER_UP		300000
@@ -27,6 +28,11 @@
 #define USB_DELAY_SET_CONFIGURATION		50000
 #define USB_DELAY_FIRST_EXPLORE			5000000
 #define USB_DELAY_HUB_EXPLORE			1000000
+
+// For bandwidth calculation
+#define	USB_BW_HOST_DELAY					1000
+#define	USB_BW_SETUP_LOW_SPEED_PORT_DELAY	333
+
 
 /*
 	Important data from the USB spec (not interesting for drivers)
@@ -46,6 +52,14 @@ struct usb_request_data
 	uint16  Value;
 	uint16  Index;
 	uint16  Length;
+};
+
+
+struct usb_isochronous_data {
+	usb_iso_packet_descriptor *packet_descriptors;
+	uint32 packet_count;
+	uint32 *starting_frame_number;
+	uint32 flags;
 };
 
 

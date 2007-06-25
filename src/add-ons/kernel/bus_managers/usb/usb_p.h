@@ -85,7 +85,6 @@ typedef enum {
 #define USB_OBJECT_DEVICE				0x00000040
 #define USB_OBJECT_HUB					0x00000080
 
-#define USB_MAX_FRAGMENT_SIZE			B_PAGE_SIZE * 96
 
 class Stack {
 public:
@@ -521,6 +520,9 @@ public:
 		void						SetRequestData(usb_request_data *data);
 		usb_request_data			*RequestData() { return fRequestData; };
 
+		void						SetIsochronousData(usb_isochronous_data *data);
+		usb_isochronous_data		*IsochronousData() { return fIsochronousData; };
+
 		void						SetData(uint8 *buffer, size_t length);
 		uint8						*Data() { return (uint8 *)fData.iov_base; };
 		size_t						DataLength() { return fData.iov_len; };
@@ -529,6 +531,8 @@ public:
 		iovec						*Vector() { return fVector; };
 		size_t						VectorCount() { return fVectorCount; };
 		size_t						VectorLength();
+
+		uint16						Bandwidth() { return fBandwidth; };
 
 		bool						IsFragmented() { return fFragmented; };
 		void						AdvanceByFragment(size_t actualLength);
@@ -542,6 +546,8 @@ public:
 		void						Finished(uint32 status, size_t actualLength);
 
 private:
+		status_t					_CalculateBandwidth();
+
 		// Data that is related to the transfer
 		Pipe						*fPipe;
 		iovec						fData;
@@ -558,6 +564,15 @@ private:
 
 		// For control transfers
 		usb_request_data			*fRequestData;
+
+		// For isochronous transfers
+		usb_isochronous_data		*fIsochronousData;
+
+		// For bandwidth management.
+		// It contains the bandwidth necessary in microseconds
+		// for either isochronous, interrupt or control transfers.
+		// Not used for bulk transactions.
+		uint16						fBandwidth;
 };
 
 #endif

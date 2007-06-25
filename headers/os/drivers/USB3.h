@@ -74,10 +74,13 @@ struct usb_configuration_info {
 };
 
 typedef struct {
-	int16						req_len;
-	int16						act_len;
+	int16						request_length;
+	int16						actual_length;
 	status_t					status;
 } usb_iso_packet_descriptor;
+
+// Flags for queue_isochronous
+#define	USB_ISO_ASAP	0x01
 
 typedef void (*usb_callback_func)(void *cookie, status_t status, void *data,
 	size_t actualLength);

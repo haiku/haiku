@@ -6,7 +6,6 @@
  *		Michael Lotz <mmlr@mlotz.ch>
  *		Niels S. Reedijk
  */
-
 #include "usb_p.h"
 
 
@@ -21,7 +20,9 @@ Transfer::Transfer(Pipe *pipe)
 		fClonedArea(-1),
 		fCallback(NULL),
 		fCallbackCookie(NULL),
-		fRequestData(NULL)
+		fRequestData(NULL),
+		fIsochronousData(NULL),
+		fBandwidth(0)
 {
 }
 
@@ -48,6 +49,13 @@ Transfer::SetRequestData(usb_request_data *data)
 
 
 void
+Transfer::SetIsochronousData(usb_isochronous_data *data)
+{
+	fIsochronousData = data;
+}
+
+
+void
 Transfer::SetData(uint8 *data, size_t dataLength)
 {
 	fBaseAddress = data;
@@ -56,6 +64,12 @@ Transfer::SetData(uint8 *data, size_t dataLength)
 
 	if (data && dataLength > 0)
 		fVectorCount = 1;
+
+	// Calculate the bandwidth (only if it is not a bulk transfer)
+	if (!(fPipe->Type() & USB_OBJECT_BULK_PIPE)) {
+		if (_CalculateBandwidth() < B_OK)
+			TRACE_ERROR(("USB Transfer: can't calculate bandwidth\n"));
+	}
 }
 
 
@@ -186,4 +200,76 @@ Transfer::Finished(uint32 status, size_t actualLength)
 	if (fCallback)
 		fCallback(fCallbackCookie, status, fBaseAddress,
 			fActualLength + actualLength);
+}
+
+
+/*
+ * USB 2.0 Spec function, pag 64.
+ * This function sets fBandwidth in microsecond
+ * to the bandwidth needed to transfer fData.iov_len bytes.
+ * The calculation is based on
+ * 1. Speed of the transfer
+ * 2. Pipe direction
+ * 3. Type of pipe
+ * 4. Number of bytes to transfer
+ */
+status_t
+Transfer::_CalculateBandwidth()
+{
+	uint16 bandwidthNS;
+	uint32 type = fPipe->Type();
+
+	switch (fPipe->Speed()) {
+		case USB_SPEED_HIGHSPEED:
+		{
+			// Direction doesn't matter for highspeed
+			if (type & USB_OBJECT_ISO_PIPE)
+				bandwidthNS = (uint16)((38 * 8 * 2.083)
+					+ (2.083 * ((uint32)(3.167 * (1.1667 * 8 * fData.iov_len))))
+					+ USB_BW_HOST_DELAY);
+			else
+				bandwidthNS = (uint16)((55 * 8 * 2.083)
+					+ (2.083 * ((uint32)(3.167 * (1.1667 * 8 * fData.iov_len))))
+					+ USB_BW_HOST_DELAY);
+			break;
+		}
+		case USB_SPEED_FULLSPEED:
+		{
+			// Direction does matter this time for isochronous
+			if (type & USB_OBJECT_ISO_PIPE)
+				bandwidthNS = (uint16)
+					(((fPipe->Direction() == Pipe::In) ? 7268 : 6265)
+					+ (83.54 * ((uint32)(3.167 + (1.1667 * 8 * fData.iov_len))))
+					+ USB_BW_HOST_DELAY);
+			else
+				bandwidthNS = (uint16)(9107
+					+ (83.54 * ((uint32)(3.167 + (1.1667 * 8 * fData.iov_len))))
+					+ USB_BW_HOST_DELAY);
+			break;
+		}
+		case USB_SPEED_LOWSPEED:
+		{
+			if (fPipe->Direction() == Pipe::In)
+				bandwidthNS = (uint16) (64060 + (2 * USB_BW_SETUP_LOW_SPEED_PORT_DELAY)
+					+ (676.67 * ((uint32)(3.167 + (1.1667 * 8 * fData.iov_len))))
+					+ USB_BW_HOST_DELAY);
+			else
+				bandwidthNS = (uint16)(64107 + (2 * USB_BW_SETUP_LOW_SPEED_PORT_DELAY)
+					+ (667.0 * ((uint32)(3.167 + (1.1667 * 8 * fData.iov_len))))
+					+ USB_BW_HOST_DELAY);
+			break;
+		}
+
+		default:
+			// We should never get here
+			TRACE(("USB Transfer: speed unknown"));
+			return B_ERROR;
+	}
+
+	// Round up and set the value in microseconds
+	fBandwidth = (bandwidthNS + 500) / 1000;
+
+	// For debugging purposes
+	TRACE(("USB Transfer: bandwidth neded %d\n", fBandwidth));
+	return B_OK;
 }

@@ -5,6 +5,7 @@
  * Authors:
  *		Michael Lotz <mmlr@mlotz.ch>
  *		Niels S. Reedijk
+ *		Salvatore Benedetto <salvatore.benedetto@gmail.com>
  */
 
 #ifndef UHCI_H
@@ -61,10 +62,25 @@ typedef struct transfer_data_s {
 	uhci_qh			*transfer_queue;
 	uhci_td			*first_descriptor;
 	uhci_td			*data_descriptor;
-	area_id			user_area;
 	bool			incoming;
 	transfer_data_s	*link;
 } transfer_data;
+
+
+// This structure is used to create a list of
+// descriptors per isochronous transfer
+typedef struct isochronous_transfer_data_s {
+	Transfer					*transfer;
+	// The next field is used to keep track
+	// of every isochronous descriptor as they are NOT
+	// linked to each other in a queue like in every other
+	// transfer type
+	uhci_td						**descriptors;
+	uint16						last_to_process;
+	bool						incoming;
+	bool						is_active;
+	isochronous_transfer_data_s	*link;
+} isochronous_transfer_data;
 
 
 class UHCI : public BusManager {
@@ -75,6 +91,7 @@ public:
 		status_t					Start();
 virtual	status_t					SubmitTransfer(Transfer *transfer);
 virtual status_t					CancelQueuedTransfers(Pipe *pipe);
+		status_t					CancelQueuedIsochronousTransfers(Pipe *pipe);
 		status_t					SubmitRequest(Transfer *transfer);
 		status_t					SubmitIsochronous(Transfer *transfer);
 
@@ -103,6 +120,11 @@ static	int32						InterruptHandler(void *data);
 										uhci_td *firstDescriptor,
 										uhci_td *dataDescriptor,
 										bool directionIn);
+		status_t					AddPendingIsochronousTransfer(
+										Transfer *transfer,
+										uhci_td **isoRequest,
+										bool directionIn);
+
 static	int32						FinishThread(void *data);
 		void						FinishTransfers();
 
@@ -110,9 +132,24 @@ static	int32						FinishThread(void *data);
 										uhci_td **_firstDescriptor,
 										uhci_qh **_transferQueue);
 
+		// Isochronous transfer functions
+static	int32						FinishIsochronousThread(void *data);
+		void						FinishIsochronousTransfers();
+		isochronous_transfer_data	*FindIsochronousTransfer(uhci_td *descriptor);
+
+		void						LinkIsochronousDescriptor(
+										uhci_td *descriptor,
+										uint16 frame);
+		void						UnlinkIsochronousDescriptor(
+										uhci_td *descriptor,
+										uint16 frame);
+
 		// Transfer queue functions
 		uhci_qh						*CreateTransferQueue(uhci_td *descriptor);
 		void						FreeTransferQueue(uhci_qh *queueHead);
+
+		bool						LockIsochronous();
+		void						UnlockIsochronous();
 
 		// Descriptor functions
 		uhci_td						*CreateDescriptor(Pipe *pipe,
@@ -137,6 +174,9 @@ static	int32						FinishThread(void *data);
 										uint8 *lastDataToggle);
 		size_t						ReadActualLength(uhci_td *topDescriptor,
 										uint8 *lastDataToggle);
+		void						ReadIsochronousDescriptorChain(
+										isochronous_transfer_data *transfer,
+										iovec *vector);
 
 		// Register functions
 inline	void						WriteReg8(uint32 reg, uint8 value);
@@ -154,11 +194,17 @@ static	pci_module_info				*sPCIModule;
 
 		// Frame list memory
 		area_id						fFrameArea;
-		addr_t						*fFrameList;
+		uint32						*fFrameList;
 
-		// fFrameBandwidth[n] holds the available bandwidth 
+		// fFrameBandwidth[n] holds the available bandwidth
 		// of the nth frame in microseconds
-		int32						*fFrameBandwidth;
+		uint16						*fFrameBandwidth;
+
+		// fFirstIsochronousTransfer[n] and fLastIsochronousDescriptor[n]
+		// keeps track of the first and last isochronous transfer descriptor
+		// in the nth frame
+		uhci_td						**fFirstIsochronousDescriptor;
+		uhci_td						**fLastIsochronousDescriptor;
 
 		// Queues
 		int32						fQueueCount;
@@ -170,6 +216,13 @@ static	pci_module_info				*sPCIModule;
 		sem_id						fFinishTransfersSem;
 		thread_id					fFinishThread;
 		bool						fStopFinishThread;
+
+		// Maintain a linked list of isochronous transfers
+		isochronous_transfer_data	*fFirstIsochronousTransfer;
+		isochronous_transfer_data	*fLastIsochronousTransfer;
+		thread_id					fFinishIsochronousThread;
+		benaphore					fIsochronousLock;
+		bool						fStopFinishIsochronousThread;
 
 		// Root hub
 		UHCIRootHub					*fRootHub;
