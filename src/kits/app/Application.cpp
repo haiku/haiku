@@ -1065,78 +1065,85 @@ BApplication::ScriptReceived(BMessage *message, int32 index,
 				}
 			} else if (strcmp("Window", property) == 0) {
 				switch (what) {
-				case B_INDEX_SPECIFIER:
-				case B_REVERSE_INDEX_SPECIFIER: {
-					int32 ind = -1;
-					err = specifier->FindInt32("index", &ind);
-					if (err != B_OK)
-						break;
-					if (what == B_REVERSE_INDEX_SPECIFIER)
-						ind = CountWindows() - ind;
-					err = B_BAD_INDEX;
-					BWindow *win = WindowAt(ind);
-					if (!win)
-						break;
-					BMessenger messenger(win);
-					err = reply.AddMessenger("result", messenger);
-					break;
-				}
-				case B_NAME_SPECIFIER: {
-					const char *name;
-					err = specifier->FindString("name", &name);
-					if (err != B_OK)
-						break;
-					err = B_NAME_NOT_FOUND;
-					for (int32 i=0; i<CountWindows(); i++) {
-						BWindow *win = WindowAt(i);
-						if (win && win->Name() && strlen(win->Name()) == strlen(name)
-							&& !strcmp(win->Name(), name)) {
-							BMessenger messenger(win);
-							err = reply.AddMessenger("result", messenger);
+					case B_INDEX_SPECIFIER:
+					case B_REVERSE_INDEX_SPECIFIER:
+					{
+						int32 index = -1;
+						err = specifier->FindInt32("index", &index);
+						if (err != B_OK)
 							break;
-						}
+						if (what == B_REVERSE_INDEX_SPECIFIER)
+							index = CountWindows() - index;
+						err = B_BAD_INDEX;
+						BWindow *win = WindowAt(index);
+						if (!win)
+							break;
+						BMessenger messenger(win);
+						err = reply.AddMessenger("result", messenger);
+						break;
 					}
-				}
+					case B_NAME_SPECIFIER:
+					{
+						const char *name;
+						err = specifier->FindString("name", &name);
+						if (err != B_OK)
+							break;
+						err = B_NAME_NOT_FOUND;
+						for (int32 i = 0; i < CountWindows(); i++) {
+							BWindow* window = WindowAt(i);
+							if (window && window->Name() != NULL
+								&& !strcmp(window->Name(), name)) {
+								BMessenger messenger(window);
+								err = reply.AddMessenger("result", messenger);
+								break;
+							}
+						}
+						break;
+					}
 				}
 			} else if (strcmp("Looper", property) == 0) {
 				switch (what) {
-				case B_INDEX_SPECIFIER:
-				case B_REVERSE_INDEX_SPECIFIER: {
-					int32 ind = -1;
-					err = specifier->FindInt32("index", &ind);
-					if (err != B_OK)
-						break;
-					if (what == B_REVERSE_INDEX_SPECIFIER)
-						ind = CountLoopers() - ind;
-					err = B_BAD_INDEX;
-					BLooper *looper = LooperAt(ind);
-					if (!looper)
-						break;
-					BMessenger messenger(looper);
-					err = reply.AddMessenger("result", messenger);
-					break;
-				}
-				case B_NAME_SPECIFIER: {
-					const char *name;
-					err = specifier->FindString("name", &name);
-					if (err != B_OK)
-						break;
-					err = B_NAME_NOT_FOUND;
-					for (int32 i=0; i<CountLoopers(); i++) {
-						BLooper *looper = LooperAt(i);
-						if (looper && looper->Name() && strlen(looper->Name()) == strlen(name)
-							&& !strcmp(looper->Name(), name)) {
-							BMessenger messenger(looper);
-							err = reply.AddMessenger("result", messenger);
+					case B_INDEX_SPECIFIER:
+					case B_REVERSE_INDEX_SPECIFIER:
+					{
+						int32 index = -1;
+						err = specifier->FindInt32("index", &index);
+						if (err != B_OK)
 							break;
-						}
+						if (what == B_REVERSE_INDEX_SPECIFIER)
+							index = CountLoopers() - index;
+						err = B_BAD_INDEX;
+						BLooper *looper = LooperAt(index);
+						if (!looper)
+							break;
+						BMessenger messenger(looper);
+						err = reply.AddMessenger("result", messenger);
+						break;
 					}
-					break;
-				}
-				case B_ID_SPECIFIER: {
-					// TODO
-					break;
-				}
+					case B_NAME_SPECIFIER:
+					{
+						const char *name;
+						err = specifier->FindString("name", &name);
+						if (err != B_OK)
+							break;
+						err = B_NAME_NOT_FOUND;
+						for (int32 i = 0; i < CountLoopers(); i++) {
+							BLooper *looper = LooperAt(i);
+							if (looper && looper->Name()
+								&& !strcmp(looper->Name(), name)) {
+								BMessenger messenger(looper);
+								err = reply.AddMessenger("result", messenger);
+								break;
+							}
+						}
+						break;
+					}
+					case B_ID_SPECIFIER:
+					{
+						// TODO
+						debug_printf("Looper's ID specifier used but not implemented.\n");
+						break;
+					}
 				}
 			} else if (strcmp("Name", property) == 0) {
 				err = reply.AddString("result", Name());	
@@ -1150,13 +1157,13 @@ BApplication::ScriptReceived(BMessage *message, int32 index,
 			}
 			break;
 	}
-	if (err == B_BAD_SCRIPT_SYNTAX) {
+	if (err == B_BAD_SCRIPT_SYNTAX)
 		return false;
-	}
+
 	if (err < B_OK) {
-                reply.what = B_MESSAGE_NOT_UNDERSTOOD;
-                reply.AddString("message", strerror(err));
-        }
+		reply.what = B_MESSAGE_NOT_UNDERSTOOD;
+		reply.AddString("message", strerror(err));
+	}
 	reply.AddInt32("error", err);
 	message->SendReply(&reply);
 	return true;
@@ -1322,58 +1329,42 @@ BApplication::write_drag(_BSession_ *session, BMessage *message)
 bool
 BApplication::_WindowQuitLoop(bool quitFilePanels, bool force)
 {
-	BList looperList;
-	{
-		AutoLocker<BLooperList> listLock(gLooperList);
-		if (listLock.IsLocked()) {
-			gLooperList.GetLooperList(&looperList);
-
-			// Filter the list: We replace the BLooper pointers by BWindow
-			// pointers (dynamic_cast<>() on unlocked loopers is only safe as
-			// long as the looper list is locked!). Furthermore we filter out
-			// windows, that have not been run yet -- those belong to their
-			// creator yet (which also has a lock) and we must not try to
-			// delete them.
-			int32 count = looperList.CountItems();
-			for (int32 i = 0; i < count; i++) {
-				BWindow *window
-					= dynamic_cast<BWindow*>((BLooper*)looperList.ItemAt(i));
-				if (window && window->Thread() < 0)
-					window = NULL;
-				looperList.ReplaceItem(i, window);
-			}
-		}
-	}
-
-	for (int32 i = looperList.CountItems(); i-- > 0; ) {
-		BWindow *window = (BWindow*)looperList.ItemAt(i);
-
-		// don't quit file panels if we haven't been asked for it
-		// NOTE: the window pointer will be NULL if the looper was not
-		// a BWindow or if the thread wasn't running, see above
-		if (window == NULL || (!quitFilePanels && window->IsFilePanel()))
-			continue;
+	int32 index = 0;
+	while (true) {
+		 BWindow *window = WindowAt(index);
+		 if (window == NULL)
+		 	break;
 
 		// NOTE: the window pointer might be stale, in case the looper
 		// was already quit by quitting an earlier looper... but fortunately,
 		// we can still call Lock() on the invalid pointer, and it
 		// will return false...
-		if (window->Lock()) {
-			// never ask hidden windows if they want to quit, ignore
-			// them if force == false, just quit them if force == true
-			if (!force && !window->IsHidden() && !window->QuitRequested()
-				&& !(quitFilePanels && window->IsFilePanel())) {
-				// the window does not want to quit, so we don't either
-				window->Unlock();
-				return false;
-			}
+		if (!window->Lock())
+			continue;
 
-			// Re-lock, just to make sure that the user hasn't done nasty
-			// things in QuitRequested(). Quit() unlocks fully, thus
-			// double-locking is harmless.
-			if (window->Lock())
-				window->Quit();
+		// don't quit file panels if we haven't been asked for it
+		if (!quitFilePanels && window->IsFilePanel()) {
+			window->Unlock();
+			index++;
+			continue;
 		}
+
+		if (!force && !window->QuitRequested()
+			&& !(quitFilePanels && window->IsFilePanel())) {
+			// the window does not want to quit, so we don't either
+			window->Unlock();
+			return false;
+		}
+
+		// Re-lock, just to make sure that the user hasn't done nasty
+		// things in QuitRequested(). Quit() unlocks fully, thus
+		// double-locking is harmless.
+		if (window->Lock())
+			window->Quit();
+
+		index = 0;
+			// we need to continue at the start of the list again - it
+			// might have changed
 	}
 	return true;
 }
@@ -1447,10 +1438,14 @@ BApplication::InitialWorkspace()
 int32
 BApplication::_CountWindows(bool includeMenus) const
 {
-	int32 count = 0;
-	BList windowList;
-	if (_GetWindowList(&windowList, includeMenus) == B_OK)
-		count = windowList.CountItems();
+	uint32 count = 0;
+	for (int32 i = 0; i < gLooperList.CountLoopers(); i++) {
+		BWindow* window = dynamic_cast<BWindow*>(gLooperList.LooperAt(i));
+		if (window == NULL || (!includeMenus
+				&& dynamic_cast<BMenuWindow *>(window) == NULL)) {
+			count++;
+		}
+	}
 
 	return count;
 }
@@ -1459,38 +1454,24 @@ BApplication::_CountWindows(bool includeMenus) const
 BWindow *
 BApplication::_WindowAt(uint32 index, bool includeMenus) const
 {
-	BList windowList;
-	BWindow *window = NULL;
-	if (_GetWindowList(&windowList, includeMenus) == B_OK) {
-		if ((int32)index < windowList.CountItems())
-			window = static_cast<BWindow *>(windowList.ItemAt(index));
-	}
-
-	return window;	
-}
-
-
-status_t
-BApplication::_GetWindowList(BList *list, bool includeMenus) const
-{
-	ASSERT(list);
-
-	// Windows are BLoopers, so we can just check each BLooper to see if it's
-	// a BWindow (or BMenuWindow)
 	AutoLocker<BLooperList> listLock(gLooperList);
 	if (!listLock.IsLocked())
-		return B_ERROR;
+		return NULL;
 
-	BLooper *looper = NULL;
-	for (int32 i = 0; i < gLooperList.CountLoopers(); i++) {
-		looper = gLooperList.LooperAt(i);
-		if (dynamic_cast<BWindow *>(looper)) {
-			if (includeMenus || dynamic_cast<BMenuWindow *>(looper) == NULL)
-				list->AddItem(looper);
+	uint32 count = gLooperList.CountLoopers();
+	for (uint32 i = 0; i < count && index < count; i++) {
+		BWindow* window = dynamic_cast<BWindow*>(gLooperList.LooperAt(i));
+		if (window == NULL || (!includeMenus
+				&& dynamic_cast<BMenuWindow *>(window) == NULL)) {
+			index++;
+			continue;
 		}
+
+		if (i == index)
+			return window;
 	}
 
-	return B_OK;
+	return NULL;
 }
 
 

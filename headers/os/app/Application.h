@@ -141,7 +141,6 @@ private:
 			uint32			InitialWorkspace();
 			int32			_CountWindows(bool includeMenus) const;
 			BWindow*		_WindowAt(uint32 index, bool includeMenus) const;
-			status_t		_GetWindowList(BList* list, bool includeMenus) const;
 
 	static	BResources*		sAppResources;
 	static	BLocker			sAppResourcesLock;
