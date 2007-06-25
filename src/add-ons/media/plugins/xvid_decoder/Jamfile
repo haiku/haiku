@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src add-ons media plugins xvid_decoder ;
+
+UsePrivateHeaders media ;
+
+#SubDirHdrs [ FDirName $(SUBDIR) libxvid ] ;
+
+Addon xvid.decoder :
+	XvidDecoder.cpp
+	supported_codecs.cpp
+	:  
+	libxvid.a
+	be
+	libmedia.so
+;
+
+#SubInclude HAIKU_TOP src add-ons media plugins xvid_decoder libxvid ;
