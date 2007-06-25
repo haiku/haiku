@@ -1441,8 +1441,8 @@ BApplication::_CountWindows(bool includeMenus) const
 	uint32 count = 0;
 	for (int32 i = 0; i < gLooperList.CountLoopers(); i++) {
 		BWindow* window = dynamic_cast<BWindow*>(gLooperList.LooperAt(i));
-		if (window == NULL || (!includeMenus
-				&& dynamic_cast<BMenuWindow *>(window) == NULL)) {
+		if (window != NULL && (includeMenus
+				|| dynamic_cast<BMenuWindow *>(window) == NULL)) {
 			count++;
 		}
 	}
