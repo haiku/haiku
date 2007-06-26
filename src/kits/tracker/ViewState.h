@@ -41,17 +41,20 @@ All rights reserved.
 
 namespace BPrivate {
 
-const int32 kColumnStateArchiveVersion = 21;
+const int32 kColumnStateArchiveVersion = 22;
 	// bump version when layout or size changes
 
 class BColumn {
 	public:
 		BColumn(const char *title, float offset, float width,
 			alignment align, const char *attributeName, uint32 attrType,
+			const char* displayAs, bool statField, bool editable);
+		BColumn(const char *title, float offset, float width,
+			alignment align, const char *attributeName, uint32 attrType,
 			bool statField, bool editable);
 		~BColumn();
 
-		BColumn(BMallocIO *stream, bool endianSwap = false);
+		BColumn(BMallocIO *stream, int32 version, bool endianSwap = false);
 		BColumn(const BMessage &, int32 index = 0);
 		static BColumn *InstantiateFromStream(BMallocIO *stream,
 			bool endianSwap = false);
@@ -60,12 +63,13 @@ class BColumn {
 		void ArchiveToStream(BMallocIO *stream) const;
 		void ArchiveToMessage(BMessage &) const;
 
-		const char *Title() const;
+		const char* Title() const;
 		float Offset() const;
 		float Width() const;
 		alignment Alignment() const;
-		const char *AttrName() const;
+		const char* AttrName() const;
 		uint32 AttrType() const;
+		const char* DisplayAs() const;
 		uint32 AttrHash() const;
 		bool StatField() const;
 		bool Editable() const;
@@ -74,13 +78,17 @@ class BColumn {
 		void SetWidth(float);
 
 	private:
-		static BColumn *_Sanitize(BColumn *column);
+		void _Init(const char *title, float offset, float width,
+			alignment align, const char *attributeName, uint32 attrType,
+			const char* displayAs, bool statField, bool editable);
+		static BColumn* _Sanitize(BColumn* column);
 
 		BString fTitle;
 		float fOffset;
 		float fWidth;
 		alignment fAlignment;
 		BString fAttrName;
+		BString fDisplayAs;
 		uint32 fAttrHash;
 		uint32 fAttrType;
 		bool fStatField;
@@ -184,6 +192,12 @@ inline uint32
 BColumn::AttrType() const
 {
 	return fAttrType;
+}
+
+inline const char *
+BColumn::DisplayAs() const
+{
+	return fDisplayAs.String();
 }
 
 inline bool

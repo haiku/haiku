@@ -1808,7 +1808,7 @@ BPoseView::RefreshMimeTypeList()
 		if (pose->TargetModel()) 
 			AddMimeType(pose->TargetModel()->MimeType()); 
 	}
-} 
+}
 
 
 void
@@ -2505,8 +2505,11 @@ BPoseView::HandleAttrMenuItemSelected(BMessage *message)
 		if (message->FindBool("attr_statfield", &isStatfield) != B_OK)
 			return;
 
+		const char* displayAs;
+		message->FindString("attr_display_as", &displayAs);
+
 		column = new BColumn(item->Label(), 0, attrWidth, attrAlign,
-			attrName, attrType, isStatfield, isEditable);
+			attrName, attrType, displayAs, isStatfield, isEditable);
 		AddColumn(column);
 		if (item->Menu()->Supermenu() == NULL)
 			delete item->Menu(); 

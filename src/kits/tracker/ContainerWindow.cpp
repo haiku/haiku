@@ -78,6 +78,7 @@ All rights reserved.
 #include "Navigator.h"
 #include "NavMenu.h"
 #include "PoseView.h"
+#include "QueryContainerWindow.h"
 #include "SelectionWindow.h"
 #include "TitleView.h"
 #include "Tracker.h"
@@ -2966,18 +2967,30 @@ BContainerWindow::LoadAddOn(BMessage *message)
 }
 
 
-BMenuItem * 
-BContainerWindow::NewAttributeMenuItem(const char *label, const char *attrName, 
-	int32 attrType, float attrWidth, int32 attrAlign, bool attrEditable, bool attrStatField)
+BMenuItem *
+BContainerWindow::NewAttributeMenuItem(const char *label, const char *name, 
+	int32 type, float width, int32 align, bool editable, bool statField)
+{
+	return NewAttributeMenuItem(label, name, type, NULL, width, align,
+		editable, statField);
+}
+
+
+BMenuItem *
+BContainerWindow::NewAttributeMenuItem(const char *label, const char *name, 
+	int32 type, const char* displayAs, float width, int32 align,
+	bool editable, bool statField)
 {
 	BMessage *message = new BMessage(kAttributeItem);
-	message->AddString("attr_name", attrName);
-	message->AddInt32("attr_type", attrType);
-	message->AddInt32("attr_hash", (int32)AttrHashString(attrName, (uint32)attrType));
-	message->AddFloat("attr_width", attrWidth);
-	message->AddInt32("attr_align", attrAlign);
-	message->AddBool("attr_editable", attrEditable);
-	message->AddBool("attr_statfield", attrStatField);
+	message->AddString("attr_name", name);
+	message->AddInt32("attr_type", type);
+	message->AddInt32("attr_hash", (int32)AttrHashString(name, (uint32)type));
+	message->AddFloat("attr_width", width);
+	message->AddInt32("attr_align", align);
+	if (displayAs != NULL)
+		message->AddString("attr_display_as", displayAs);
+	message->AddBool("attr_editable", editable);
+	message->AddBool("attr_statfield", statField);
 
 	BMenuItem *menuItem = new BMenuItem(label, message);
 	menuItem->SetTarget(PoseView());
@@ -3110,21 +3123,33 @@ BContainerWindow::AddMimeTypesToMenu(BMenu *menu)
 			break;
 	}
 
- 	// Remove old mime menu:
- 	int32 removeIndex = count - 1;
- 	while (menu->ItemAt(removeIndex)->Submenu() != NULL) {
+	// Remove old mime menu:
+	int32 removeIndex = count - 1;
+	while (menu->ItemAt(removeIndex)->Submenu() != NULL) {
 		delete menu->RemoveItem(removeIndex);
- 		removeIndex--;
- 	}
- 
- 	// Add a separator item if there is none yet
- 	if (dynamic_cast<BSeparatorItem *>(menu->ItemAt(removeIndex)) == NULL)
+		removeIndex--;
+	}
+
+	// Add a separator item if there is none yet
+	if (dynamic_cast<BSeparatorItem *>(menu->ItemAt(removeIndex)) == NULL)
 		menu->AddSeparatorItem(); 		
+
+	// Add MIME type in case we're a default query type window
+	BPath path;
+	if (TargetModel() != NULL) {
+		TargetModel()->GetPath(&path);
+		if (strstr(path.Path(), "/" kQueryTemplates "/") != NULL) {
+			// demangle MIME type name
+			BString name(TargetModel()->Name());
+			name.ReplaceFirst('_', '/');
+
+			PoseView()->AddMimeType(name.String());
+		}
+	}
 
 	int32 typeCount = PoseView()->CountMimeTypes();
 
 	for (int32 index = 0; index < typeCount; index++) {
-
 		bool shouldAdd = true;
 		const char *signature = PoseView()->MimeTypeAt(index);
 
@@ -3144,8 +3169,8 @@ BContainerWindow::AddMimeTypesToMenu(BMenu *menu)
 		}
 
 		if (shouldAdd) {
-			BMessage attr_msg;
-			char desc[B_MIME_TYPE_LENGTH];
+			BMessage attrInfo;
+			char description[B_MIME_TYPE_LENGTH];
 			const char *nameToAdd = signature;
 
 			BMimeType mimetype(signature);
@@ -3154,43 +3179,39 @@ BContainerWindow::AddMimeTypesToMenu(BMenu *menu)
 				continue;
 
 			// only add things to menu which have "user-visible" data
-			if (mimetype.GetAttrInfo(&attr_msg) != B_OK) 
+			if (mimetype.GetAttrInfo(&attrInfo) != B_OK) 
 				continue;
 
-			if (mimetype.GetShortDescription(desc) == B_OK && desc[0])
-				nameToAdd = desc;
+			if (mimetype.GetShortDescription(description) == B_OK
+				&& description[0])
+				nameToAdd = description;
 
-					// go through each field in meta mime and add it to a menu
+			// go through each field in meta mime and add it to a menu
 			BMenu *localMenu = 0;
 			int32 index = -1;
 			const char *str;
 
-			while (attr_msg.FindString("attr:public_name", ++index, &str) == B_OK) {
-				if (!attr_msg.FindBool("attr:viewable", index))
+			while (attrInfo.FindString("attr:public_name", ++index, &str) == B_OK) {
+				if (!attrInfo.FindBool("attr:viewable", index)) {
 					// don't add if attribute not viewable
 					continue;
-					
+				}
+
 				int32 type;
 				int32 align;
 				int32 width;
 				bool editable;
-				
 				const char *attrName;
-				
-				if (attr_msg.FindString("attr:name", index, &attrName) != B_OK)
+
+				if (attrInfo.FindString("attr:name", index, &attrName) != B_OK
+					|| attrInfo.FindInt32("attr:type", index, &type) != B_OK
+					|| attrInfo.FindBool("attr:editable", index, &editable) != B_OK
+					|| attrInfo.FindInt32("attr:width", index, &width) != B_OK
+					|| attrInfo.FindInt32("attr:alignment", index, &align) != B_OK)
 					continue;
 
-				if (attr_msg.FindInt32("attr:type", index, &type) != B_OK)
-					continue;
-
-				if (attr_msg.FindBool("attr:editable", index, &editable) != B_OK)
-					continue;
-
-				if (attr_msg.FindInt32("attr:width", index, &width) != B_OK)
-					continue;
-
-				if (attr_msg.FindInt32("attr:alignment", index, &align) != B_OK)
-					continue;
+				BString displayAs;
+				attrInfo.FindString("attr:display_as", index, &displayAs);
 
 				if (!localMenu) {
 					// do a lazy allocation of the menu
@@ -3199,8 +3220,8 @@ BContainerWindow::AddMimeTypesToMenu(BMenu *menu)
 					menu->GetFont(&font);
 					localMenu->SetFont(&font);
 				}
-				localMenu->AddItem(NewAttributeMenuItem (str, attrName, type,
-					width, align, editable, false));
+				localMenu->AddItem(NewAttributeMenuItem(str, attrName, type,
+					displayAs.String(), width, align, editable, false));
 			}
 			if (localMenu) {
 				BMessage *message = new BMessage(kMIMETypeItem);
@@ -3279,7 +3300,6 @@ BContainerWindow::DefaultStateSourceNode(const char *name, BNode *result,
 	BPath path(settingsPath);
 	path.Append(name);
 	if (!BEntry(path.Path()).Exists()) {
-
 		if (!createNew)
 			return false;
 	
@@ -3289,22 +3309,20 @@ BContainerWindow::DefaultStateSourceNode(const char *name, BNode *result,
 			const char *nextSlash = strchr(name, '/');
 			if (!nextSlash)
 				break;
-			
+
 			BString tmp;
 			tmp.SetTo(name, nextSlash - name);
 			tmpPath.Append(tmp.String());
 
-
 			mkdir(tmpPath.Path(), 0777);
-	
+
 			name = nextSlash + 1;
 			if (!name[0]) {
 				// can't deal with a slash at end
-
 				return false;
 			}
 		}
-		
+
 		if (createFolder) {
 			if (mkdir(path.Path(), 0777) < 0)
 				return false;
@@ -3314,7 +3332,7 @@ BContainerWindow::DefaultStateSourceNode(const char *name, BNode *result,
 				return false;
 		}
 	}
-	
+
 // 	PRINT(("using default state from %s\n", path.Path()));
 	result->SetTo(path.Path());
 	return result->InitCheck() == B_OK;

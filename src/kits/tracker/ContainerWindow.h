@@ -150,8 +150,11 @@ class BContainerWindow : public BWindow {
 		void AddMimeTypesToMenu();
 		virtual	void MarkAttributeMenu(BMenu *);
 		void MarkAttributeMenu();
-		BMenuItem *NewAttributeMenuItem (const char *label, const char *attrName, int32 attrType,
-			float attrWidth, int32 attrAlign, bool attrEditable, bool attrStatField);
+		BMenuItem *NewAttributeMenuItem(const char *label, const char *name, 
+			int32 type, float width, int32 align, bool editable, bool statField);
+		BMenuItem *NewAttributeMenuItem(const char *label, const char *name, 
+			int32 type, const char* displayAs, float width, int32 align,
+			bool editable, bool statField);
 		virtual	void NewAttributeMenu(BMenu *);
 
 		void HideAttributeMenu();

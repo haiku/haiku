@@ -127,14 +127,14 @@ AttrHashString(const char *string, uint32 type)
 bool
 ValidateStream(BMallocIO *stream, uint32 key, int32 version)
 {
-	uint32 test_key;
-	int32 test_version;
+	uint32 testKey;
+	int32 testVersion;
 
-	if (stream->Read(&test_key, sizeof(uint32)) <= 0
-		|| stream->Read(&test_version, sizeof(int32)) <=0) 
+	if (stream->Read(&testKey, sizeof(uint32)) <= 0
+		|| stream->Read(&testVersion, sizeof(int32)) <=0) 
 		return false;
 
-	return test_key == key && test_version == version;
+	return testKey == key && testVersion == version;
 }
 
 
@@ -1075,14 +1075,13 @@ StringFromStream(BString *string, BMallocIO *stream, bool endianSwap)
 	if (endianSwap)
 		length = SwapInt32(length);
 
-	if (length <= 0 || length > 10000) {
-		// ToDo:
-		// should fail here
+	if (length < 0 || length > 10000) {
+		// TODO: should fail here
 		PRINT(("problems instatiating a string, length probably wrong %d\n", length));
 		return;
-	}	
+	}
 
-	char *buffer = string->LockBuffer(length);
+	char *buffer = string->LockBuffer(length + 1);
 	stream->Read(buffer, (size_t)length + 1);
 	string->UnlockBuffer(length);
 }

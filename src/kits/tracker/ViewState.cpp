@@ -55,6 +55,7 @@ const char *kColumnAlignmentName = "BColumn:fAlignment";
 const char *kColumnAttrName = "BColumn:fAttrName";
 const char *kColumnAttrHashName = "BColumn:fAttrHash";
 const char *kColumnAttrTypeName = "BColumn:fAttrType";
+const char *kColumnDisplayAsName = "BColumn:fDisplayAs";
 const char *kColumnStatFieldName = "BColumn:fStatField";
 const char *kColumnEditableName = "BColumn:fEditable";
 
@@ -71,20 +72,25 @@ const char *kViewStateReverseSortName = "ViewState:fReverseSort";
 const char *kViewStateIconSizeName = "ViewState:fIconSize";
 
 
-BColumn::BColumn(const char *title, float offset, float width, alignment align,
-		const char *attributeName, uint32 attrType, bool statField,
-		bool editable)
-	:
-	fTitle(title),
-	fAttrName(attributeName)
+static const int32 kColumnStateMinArchiveVersion = 21;
+	// bump version when layout changes
+
+
+BColumn::BColumn(const char *title, float offset, float width,
+	alignment align, const char *attributeName, uint32 attrType,
+	const char* displayAs, bool statField, bool editable)
 {
-	fOffset = offset;
-	fWidth = width;
-	fAlignment = align;
-	fAttrHash = AttrHashString(attributeName, attrType);
-	fAttrType = attrType;
-	fStatField = statField;
-	fEditable = editable;
+	_Init(title, offset, width, align, attributeName, attrType, displayAs,
+		statField, editable);
+}
+
+
+BColumn::BColumn(const char *title, float offset, float width,
+	alignment align, const char *attributeName, uint32 attrType,
+	bool statField, bool editable)
+{
+	_Init(title, offset, width, align, attributeName, attrType, NULL,
+		statField, editable);
 }
 
 
@@ -93,7 +99,7 @@ BColumn::~BColumn()
 }
 
 
-BColumn::BColumn(BMallocIO *stream, bool endianSwap)
+BColumn::BColumn(BMallocIO *stream, int32 version, bool endianSwap)
 {
 	StringFromStream(&fTitle, stream, endianSwap);
 	stream->Read(&fOffset, sizeof(float));
@@ -104,7 +110,9 @@ BColumn::BColumn(BMallocIO *stream, bool endianSwap)
 	stream->Read(&fAttrType, sizeof(uint32));
 	stream->Read(&fStatField, sizeof(bool));
 	stream->Read(&fEditable, sizeof(bool));
-	
+	if (version == kColumnStateArchiveVersion)
+		StringFromStream(&fDisplayAs, stream, endianSwap);
+
 	if (endianSwap) {
 		PRINT(("endian swapping column\n"));
 		fOffset = B_SWAP_FLOAT(fOffset);
@@ -126,8 +134,27 @@ BColumn::BColumn(const BMessage &message, int32 index)
 	message.FindString(kColumnAttrName, index, &fAttrName);
 	message.FindInt32(kColumnAttrHashName, index, (int32 *)&fAttrHash);
 	message.FindInt32(kColumnAttrTypeName, index, (int32 *)&fAttrType);
+	message.FindString(kColumnDisplayAsName, index, &fDisplayAs);
 	message.FindBool(kColumnStatFieldName, index, &fStatField);
 	message.FindBool(kColumnEditableName, index, &fEditable);
+}
+
+
+void
+BColumn::_Init(const char *title, float offset, float width,
+	alignment align, const char *attributeName, uint32 attrType,
+	const char* displayAs, bool statField, bool editable)
+{
+	fTitle = title;
+	fAttrName = attributeName;
+	fDisplayAs = displayAs;
+	fOffset = offset;
+	fWidth = width;
+	fAlignment = align;
+	fAttrHash = AttrHashString(attributeName, attrType);
+	fAttrType = attrType;
+	fStatField = statField;
+	fEditable = editable;
 }
 
 
@@ -135,20 +162,25 @@ BColumn *
 BColumn::InstantiateFromStream(BMallocIO *stream, bool endianSwap)
 {
 	// compare stream header in canonical form
-	uint32 key = AttrHashString("BColumn", B_OBJECT_TYPE);
-	int32 version = kColumnStateArchiveVersion;
+
+	// we can't use ValidateStream(), as we preserve backwards compatibility
+	int32 version;
+	uint32 key;
+	if (stream->Read(&key, sizeof(uint32)) <= 0
+		|| stream->Read(&version, sizeof(int32)) <=0) 
+		return 0;
 
 	if (endianSwap) {
 		key = SwapUInt32(key);
 		version = SwapInt32(version);
 	}
 
-//	PRINT(("validating key %x, version %d\n", key, version));
-	if (!ValidateStream(stream, key, version)) 
+	if (key != AttrHashString("BColumn", B_OBJECT_TYPE)
+		|| version < kColumnStateMinArchiveVersion)
 		return 0;
 
 //	PRINT(("instantiating column, %s\n", endianSwap ? "endian swapping," : ""));
-	return _Sanitize(new (std::nothrow) BColumn(stream, endianSwap));
+	return _Sanitize(new (std::nothrow) BColumn(stream, version, endianSwap));
 }
 
 
@@ -188,6 +220,7 @@ BColumn::ArchiveToStream(BMallocIO *stream) const
 	stream->Write(&fAttrType, sizeof(uint32));
 	stream->Write(&fStatField, sizeof(bool));
 	stream->Write(&fEditable, sizeof(bool));
+	StringToStream(&fDisplayAs, stream);
 }
 
 
@@ -203,6 +236,8 @@ BColumn::ArchiveToMessage(BMessage &message) const
 	message.AddString(kColumnAttrName, fAttrName);
 	message.AddInt32(kColumnAttrHashName, static_cast<int32>(fAttrHash));
 	message.AddInt32(kColumnAttrTypeName, static_cast<int32>(fAttrType));
+	if (fDisplayAs.Length() > 0)
+		message.AddString(kColumnDisplayAsName, fDisplayAs.String());
 	message.AddBool(kColumnStatFieldName, fStatField);
 	message.AddBool(kColumnEditableName, fEditable);
 }

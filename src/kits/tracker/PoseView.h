@@ -315,7 +315,8 @@ class BPoseView : public BView {
 		BRefFilter *RefFilter() const;
 
 		// access for mime types represented in the pose view
-		const char *MimeTypeAt(int32);
+		void AddMimeType(const char* mimeType);
+		const char *MimeTypeAt(int32 index);
 		int32 CountMimeTypes();
 	 	void RefreshMimeTypeList();
 
@@ -553,7 +554,6 @@ class BPoseView : public BView {
 		virtual void EditQueries();
 		virtual void AddCountView();
 
-		void AddMimeType(const char *);
 		void HandleAttrMenuItemSelected(BMessage *);
 		void TryUpdatingBrokenLinks();
 			// ran a little after a volume gets mounted
