@@ -3,15 +3,17 @@
  * Distributed under the terms of the MIT license.
  *
  * Author:
- *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		DarkWyrm, bpmagic@columbus.rr.com
  */
+
+
 #include "TwoStateDrawButton.h"
 
+
 TwoStateDrawButton::TwoStateDrawButton(BRect frame, const char *name, BBitmap *upone, 
-										BBitmap *downone, BBitmap *uptwo, 
-										BBitmap *downtwo, BMessage *msg, 
-										const int32 &resize, const int32 &flags)
- :	BButton(frame, name, "", msg, resize, flags),
+	BBitmap *downone, BBitmap *uptwo, BBitmap *downtwo, BMessage *msg, 
+	const int32 &resize, const int32 &flags)
+	: BButton(frame, name, "", msg, resize, flags),
  	fUpOne(upone),
 	fDownOne(downone),
 	fUpTwo(uptwo),
@@ -25,7 +27,7 @@ TwoStateDrawButton::TwoStateDrawButton(BRect frame, const char *name, BBitmap *u
 }
 
 
-TwoStateDrawButton::~TwoStateDrawButton(void)
+TwoStateDrawButton::~TwoStateDrawButton()
 {
 	delete fUpOne;
 	delete fDownOne;
@@ -37,37 +39,32 @@ TwoStateDrawButton::~TwoStateDrawButton(void)
 
 
 void
-TwoStateDrawButton::ResizeToPreferred(void)
+TwoStateDrawButton::ResizeToPreferred()
 {
-	if(fUpOne)
-		ResizeTo(fUpOne->Bounds().Width(),fUpOne->Bounds().Height());
-	else
-	if(fDownOne)
-		ResizeTo(fDownOne->Bounds().Width(),fDownOne->Bounds().Height());
-	else
-	if(fUpTwo)
+	if (fUpOne)
+		ResizeTo(fUpOne->Bounds().Width(), fUpOne->Bounds().Height());
+	else if (fDownOne)
+		ResizeTo(fDownOne->Bounds().Width(), fDownOne->Bounds().Height());
+	else if (fUpTwo)
 		ResizeTo(fUpTwo->Bounds().Width(),fUpTwo->Bounds().Height());
-	else
-	if(fDownTwo)
-		ResizeTo(fDownTwo->Bounds().Width(),fDownTwo->Bounds().Height());
-	else
-	if(fDisabledOne)
-		ResizeTo(fDisabledOne->Bounds().Width(),fDisabledOne->Bounds().Height());
-	else
-	if(fDisabledTwo)
-		ResizeTo(fDisabledTwo->Bounds().Width(),fDisabledTwo->Bounds().Height());
+	else if (fDownTwo)
+		ResizeTo(fDownTwo->Bounds().Width(), fDownTwo->Bounds().Height());
+	else if (fDisabledOne)
+		ResizeTo(fDisabledOne->Bounds().Width(), fDisabledOne->Bounds().Height());
+	else if(fDisabledTwo)
+		ResizeTo(fDisabledTwo->Bounds().Width(), fDisabledTwo->Bounds().Height());
 }
 
 
 void
 TwoStateDrawButton::SetBitmaps(BBitmap *upone, BBitmap *downone, BBitmap *uptwo, 
-								BBitmap *downtwo)
+	BBitmap *downtwo)
 {	
 	delete fUpOne;
 	delete fDownOne;
 	delete fUpTwo;
 	delete fDownTwo;
-	
+
 	fUpOne = upone;
 	fDownOne = downone;
 	fUpTwo = uptwo;
@@ -115,7 +112,7 @@ TwoStateDrawButton::MouseUp(BPoint pt)
 void
 TwoStateDrawButton::SetState(int32 value)
 {
-	if(fButtonState != value) {
+	if (fButtonState != value) {
 		fButtonState = (value == 0) ? false : true;
 		Invalidate();
 	}
@@ -125,46 +122,45 @@ TwoStateDrawButton::SetState(int32 value)
 void
 TwoStateDrawButton::Draw(BRect update)
 {
-	if(fButtonState) {
-		if(!IsEnabled()) {
-			if(fDisabledTwo)
+	if (fButtonState) {
+		if (!IsEnabled()) {
+			if (fDisabledTwo)
 				DrawBitmap(fDisabledTwo, BPoint(0,0));
 			else
 				StrokeRect(Bounds());
 			return;
 		}
 		
-		if(Value() == B_CONTROL_ON) {
-			if(fDownTwo)
+		if (Value() == B_CONTROL_ON) {
+			if (fDownTwo)
 				DrawBitmap(fDownTwo, BPoint(0,0));
 			else
 				StrokeRect(Bounds());
 		} else {
-			if(fUpTwo)
+			if (fUpTwo)
 				DrawBitmap(fUpTwo, BPoint(0,0));
 			else
 				StrokeRect(Bounds());
 		}
 	} else {
-		if(!IsEnabled()) {
-			if(fDisabledOne)
+		if (!IsEnabled()) {
+			if (fDisabledOne)
 				DrawBitmap(fDisabledOne, BPoint(0,0));
 			else
 				StrokeRect(Bounds());
 			return;
 		}
-		
-		if(Value() == B_CONTROL_ON) {
-			if(fDownOne)
+
+		if (Value() == B_CONTROL_ON) {
+			if (fDownOne)
 				DrawBitmap(fDownOne, BPoint(0,0));
 			else
 				StrokeRect(Bounds());
-		} else 	{
-			if(fUpOne)
+		} else {
+			if (fUpOne)
 				DrawBitmap(fUpOne, BPoint(0,0));
 			else
 				StrokeRect(Bounds());
 		}
 	}
 }
-
