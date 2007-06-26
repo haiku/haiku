@@ -409,6 +409,9 @@ BBitmap::IsValid() const
 status_t
 BBitmap::LockBits(uint32 *state)
 {
+	// TODO: how do we fill the "state"?
+	//	It would be more or less useful to report what kind of bitmap
+	//	we got (ie. overlay, placeholder, or non-overlay)
 	if (fFlags & B_BITMAP_WILL_OVERLAY) {
 		overlay_client_data* data = (overlay_client_data*)fBasePointer;
 
@@ -424,7 +427,7 @@ BBitmap::LockBits(uint32 *state)
 	// drawing the bitmap yet?
 	// axeld: you mean for non overlays?
 
-	return B_ERROR;
+	return B_OK;
 }
 
 
@@ -442,7 +445,7 @@ BBitmap::UnlockBits()
 	release_sem(data->lock);
 }
 
-// Area
+
 /*! \brief Returns the ID of the area the bitmap data reside in.
 	\return The ID of the area the bitmap data reside in.
 */
