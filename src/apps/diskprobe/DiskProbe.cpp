@@ -298,7 +298,6 @@ void
 DiskProbe::RefsReceived(BMessage *message)
 {
 	bool traverseLinks = (modifiers() & B_SHIFT_KEY) == 0;
-	int32 directories = 0;
 
 	int32 index = 0;
 	entry_ref ref;
@@ -309,15 +308,6 @@ DiskProbe::RefsReceived(BMessage *message)
 
 		BEntry entry;
 		status_t status = entry.SetTo(&ref, traverseLinks);
-
-		// If it's a directory, we won't handle it, but we would accept a volume
-		if (status == B_OK && traverseLinks && entry.IsDirectory()) {
-			BDirectory directory(&entry);
-			if (directory.InitCheck() != B_OK || !directory.IsRootDirectory()) {
-				directories++;
-				continue;
-			}
-		}
 
 		if (status == B_OK)
 			status = Probe(entry, attribute);
@@ -333,12 +323,6 @@ DiskProbe::RefsReceived(BMessage *message)
 				buffer, "Ok", NULL, NULL,
 				B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 		}
-	}
-
-	if (directories > 0) {
-		(new BAlert("DiskProbe request",
-			"Sorry, only regular files and volumes can be opened.\n", "Ok", NULL, NULL,
-			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 	}
 }
 
