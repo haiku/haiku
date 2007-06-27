@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku Inc.
+ * Copyright 2001-2007, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -420,6 +420,12 @@ BBitmap::LockBits(uint32 *state)
 			status = acquire_sem(data->lock);
 		} while (status == B_INTERRUPTED);
 
+		if (data->buffer == NULL) {
+			// the app_server does not grant us access to the frame buffer
+			// right now - let's release the lock and fail
+			release_sem_etc(data->lock, 1, B_DO_NOT_RESCHEDULE);
+			return B_BUSY;
+		}
 		return status;
 	}
 
@@ -442,7 +448,7 @@ BBitmap::UnlockBits()
 		return;
 
 	overlay_client_data* data = (overlay_client_data*)fBasePointer;
-	release_sem(data->lock);
+	release_sem_etc(data->lock, 1, B_DO_NOT_RESCHEDULE);
 }
 
 
