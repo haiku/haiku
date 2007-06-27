@@ -16,6 +16,7 @@ class BMessage;
 namespace BPrivate {
 
 class KMessageField;
+class MessageAdapter;
 
 // KMessage
 class KMessage {
@@ -102,6 +103,7 @@ public:
 
 private:
 	friend class KMessageField;
+	friend class MessageAdapter;
 	friend class ::BMessage;		// not so nice, but makes things easier
 
 	struct Header {

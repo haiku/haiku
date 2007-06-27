@@ -30,7 +30,6 @@ MergeObject <libbe>app_kit.o :
 	AreaLink.cpp
 	Cursor.cpp
 	Clipboard.cpp
-	dano_message.cpp
 	DesktopLink.cpp
 	DirectMessageTarget.cpp
 	Handler.cpp
@@ -41,6 +40,7 @@ MergeObject <libbe>app_kit.o :
 	Looper.cpp
 	LooperList.cpp
 	Message.cpp
+	MessageAdapter.cpp
 	MessageFilter.cpp
 	MessageQueue.cpp
 	MessageRunner.cpp
@@ -48,7 +48,6 @@ MergeObject <libbe>app_kit.o :
 	MessageUtils.cpp
 	PropertyInfo.cpp
 	PortLink.cpp
-	r5_message.cpp
 	RegistrarDefs.cpp
 	RegistrarThread.cpp
 	RegistrarThreadManager.cpp

@@ -5,12 +5,8 @@
  * Authors:
  *		Michael Lotz <mmlr@mlotz.ch>
  */
-
-
-#include "dano_message.h"
-#include "r5_message.h"
-
 #include <Message.h>
+#include <MessageAdapter.h>
 #include <MessagePrivate.h>
 #include <MessageUtils.h>
 
@@ -41,14 +37,6 @@
 #define DEBUG_FUNCTION_ENTER2	//debug_printf("thread: 0x%x;                                                                             line: %04ld: func: %s\n", find_thread(NULL), __LINE__, __PRETTY_FUNCTION__);
 
 
-static const uint32 kMessageMagicR5 = 'FOB1';
-static const uint32 kMessageMagicR5Swapped = '1BOF';
-static const uint32 kMessageMagicDano = 'FOB2';
-static const uint32 kMessageMagicDanoSwapped = '2BOF';
-static const uint32 kMessageMagicHaiku = '1FMH';
-static const uint32 kMessageMagicHaikuSwapped = 'HMF1';
-
-
 const char *B_SPECIFIER_ENTRY = "specifiers";
 const char *B_PROPERTY_ENTRY = "property";
 const char *B_PROPERTY_NAME_ENTRY = "name";
@@ -56,8 +44,6 @@ const char *B_PROPERTY_NAME_ENTRY = "name";
 
 static status_t		handle_reply(port_id replyPort, int32 *pCode,
 						bigtime_t timeout, BMessage *reply);
-static status_t		convert_message(const KMessage *fromMessage,
-						BMessage *toMessage);
 
 extern "C" {
 		// private os function to set the owning team of an area
@@ -77,12 +63,14 @@ BMessage::BMessage()
 	_InitCommon();
 }
 
+
 BMessage::BMessage(BMessage *other)
 {
 	DEBUG_FUNCTION_ENTER;
 	_InitCommon();
 	*this = *other;
 }
+
 
 BMessage::BMessage(uint32 _what)
 {
@@ -195,7 +183,7 @@ BMessage::_InitHeader()
 	fHeader = (message_header *)malloc(sizeof(message_header));
 	memset(fHeader, 0, sizeof(message_header) - sizeof(fHeader->hash_table));
 
-	fHeader->format = kMessageMagicHaiku;
+	fHeader->format = MESSAGE_FORMAT_HAIKU;
 	fHeader->flags = MESSAGE_FLAG_VALID;
 	fHeader->what = what;
 	fHeader->current_specifier = -1;
@@ -379,10 +367,10 @@ BMessage::IsReply() const
 }
 
 
-template<typename Type> static uint8 * 
+template<typename Type> static uint8 *
 print_to_stream_type(uint8* pointer)
 {
-	Type *item = (Type *)pointer; 
+	Type *item = (Type *)pointer;
 	item->PrintToStream();
 	return (uint8 *)(item+1);
 }
@@ -417,7 +405,7 @@ BMessage::_PrintToStream(const char* indent) const
 	} else
 		printf("0x%lx", what);
 	printf(") {\n");
-	
+
 	field_header *field = fFields;
 	for (int32 i = 0; i < fHeader->field_count; i++, field++) {
 		value = B_BENDIAN_TO_HOST_INT32(field->type);
@@ -473,7 +461,7 @@ BMessage::_PrintToStream(const char* indent) const
 					printf("bool(%s)\n", *((bool *)pointer)!= 0 ? "true" : "false");
 					pointer += sizeof(bool);
 					break;
-	
+
 				case B_FLOAT_TYPE:
 					pointer = print_type<float>("float(%.4f)\n", pointer);
 					break;
@@ -481,27 +469,27 @@ BMessage::_PrintToStream(const char* indent) const
 				case B_DOUBLE_TYPE:
 					pointer = print_type<double>("double(%.8f)\n", pointer);
 					break;
-	
+
 				case B_REF_TYPE: {
 					ssize_t size = *(ssize_t *)pointer;
 					pointer += sizeof(ssize_t);
 					entry_ref ref;
 					BPrivate::entry_ref_unflatten(&ref, (char *)pointer, size);
-	
+
 					printf("entry_ref(device=%ld, directory=%lld, name=\"%s\", ",
 							ref.device, ref.directory, ref.name);
-	
+
 					BPath path(&ref);
 					printf("path=\"%s\")\n", path.Path());
 					pointer += size;
 					break;
 				}
-				
+
 				case B_MESSAGE_TYPE:
 				{
 					char buffer[1024];
 					sprintf(buffer, "%s        ", indent);
-	
+
 					BMessage message;
 					const ssize_t size = *(const ssize_t *)pointer;
 					pointer += sizeof(ssize_t);
@@ -514,7 +502,7 @@ BMessage::_PrintToStream(const char* indent) const
 					pointer += size;
 					break;
 				}
-				
+
 				default: {
 					printf("(type = '%.4s')(size = %ld)\n", (char *)&value, size);
 				}
@@ -761,7 +749,7 @@ ssize_t
 BMessage::FlattenedSize() const
 {
 	DEBUG_FUNCTION_ENTER;
-	return BPrivate::r5_message_flattened_size(this);
+	return BPrivate::MessageAdapter::FlattenedSize(MESSAGE_FORMAT_R5, this);
 }
 
 
@@ -769,7 +757,8 @@ status_t
 BMessage::Flatten(char *buffer, ssize_t size) const
 {
 	DEBUG_FUNCTION_ENTER;
-	return BPrivate::flatten_r5_message(this, buffer, size);
+	return BPrivate::MessageAdapter::Flatten(MESSAGE_FORMAT_R5, this, buffer,
+		&size);
 }
 
 
@@ -777,7 +766,8 @@ status_t
 BMessage::Flatten(BDataIO *stream, ssize_t *size) const
 {
 	DEBUG_FUNCTION_ENTER;
-	return BPrivate::flatten_r5_message(this, stream, size);
+	return BPrivate::MessageAdapter::Flatten(MESSAGE_FORMAT_R5, this, stream,
+		size);
 }
 
 
@@ -801,8 +791,6 @@ BMessage::_NativeFlatten(char *buffer, ssize_t size) const
 
 	/* we have to sync the what code as it is a public member */
 	fHeader->what = what;
-	//fHeader->fields_checksum = BPrivate::CalculateChecksum((uint8 *)fFields, fHeader->fields_size);
-	//fHeader->data_checksum = BPrivate::CalculateChecksum((uint8 *)fData, fHeader->data_size);
 
 	memcpy(buffer, fHeader, min_c(sizeof(message_header), (size_t)size));
 	buffer += sizeof(message_header);
@@ -832,8 +820,6 @@ BMessage::_NativeFlatten(BDataIO *stream, ssize_t *size) const
 
 	/* we have to sync the what code as it is a public member */
 	fHeader->what = what;
-	//fHeader->fields_checksum = BPrivate::CalculateChecksum((uint8 *)fFields, fHeader->fields_size);
-	//fHeader->data_checksum = BPrivate::CalculateChecksum((uint8 *)fData, fHeader->data_size);
 
 	ssize_t result1 = stream->Write(fHeader, sizeof(message_header));
 	if (result1 != sizeof(message_header))
@@ -962,6 +948,15 @@ BMessage::_Reference(message_header *header)
 	fFields = (field_header *)address;
 	address += fHeader->fields_size;
 	fData = address;
+
+	if (fHeader->fields_checksum != BPrivate::CalculateChecksum((uint8 *)fFields, fHeader->fields_size)
+		|| fHeader->data_checksum != BPrivate::CalculateChecksum((uint8 *)fData, fHeader->data_size)) {
+		debug_printf("checksum mismatch\n");
+		_Clear();
+		_InitHeader();
+		return B_BAD_VALUE;
+	}
+
 	return B_OK;
 }
 
@@ -1017,33 +1012,8 @@ BMessage::Unflatten(const char *flatBuffer)
 		return B_BAD_VALUE;
 
 	uint32 format = *(uint32 *)flatBuffer;
-	if (format != kMessageMagicHaiku) {
-		if (format == KMessage::kMessageHeaderMagic) {
-			KMessage message;
-			status_t result = message.SetTo(flatBuffer,
-				((KMessage::Header*)flatBuffer)->size);
-			if (result != B_OK)
-				return result;
-
-			return convert_message(&message, this);
-		}
-
-		try {
-			if (format == kMessageMagicR5 || format == kMessageMagicR5Swapped)
-				return BPrivate::unflatten_r5_message(format, this, flatBuffer);
-
-			if (format == kMessageMagicDano || format == kMessageMagicDanoSwapped) {
-				BMemoryIO stream(flatBuffer + sizeof(uint32),
-					BPrivate::dano_message_flattened_size(flatBuffer));
-				return BPrivate::unflatten_dano_message(format, stream, *this);
-			}
-		} catch (status_t error) {
-			MakeEmpty();
-			return error;
-		}
-
-		return B_NOT_A_MESSAGE;
-	}
+	if (format != MESSAGE_FORMAT_HAIKU)
+		return BPrivate::MessageAdapter::Unflatten(format, this, flatBuffer);
 
 	// native message unflattening
 
@@ -1056,7 +1026,7 @@ BMessage::Unflatten(const char *flatBuffer)
 	memcpy(fHeader, flatBuffer, sizeof(message_header));
 	flatBuffer += sizeof(message_header);
 
-	if (fHeader->format != kMessageMagicHaiku
+	if (fHeader->format != MESSAGE_FORMAT_HAIKU
 		|| !(fHeader->flags & MESSAGE_FLAG_VALID)) {
 		free(fHeader);
 		fHeader = NULL;
@@ -1093,14 +1063,6 @@ BMessage::Unflatten(const char *flatBuffer)
 		}
 	}
 
-	/*if (fHeader->fields_checksum != BPrivate::CalculateChecksum((uint8 *)fFields, fHeader->fields_size)
-		|| fHeader->data_checksum != BPrivate::CalculateChecksum((uint8 *)fData, fHeader->data_size)) {
-		debug_printf("checksum mismatch 1\n");
-		_Clear();
-		_InitHeader();
-		return B_BAD_VALUE;
-	}*/
-
 	return B_OK;
 }
 
@@ -1114,20 +1076,8 @@ BMessage::Unflatten(BDataIO *stream)
 
 	uint32 format = 0;
 	stream->Read(&format, sizeof(uint32));
-	if (format != kMessageMagicHaiku) {
-		try {
-			if (format == kMessageMagicR5 || format == kMessageMagicR5Swapped)
-				return BPrivate::unflatten_r5_message(format, this, stream);
-
-			if (format == kMessageMagicDano || format == kMessageMagicDanoSwapped)
-				return BPrivate::unflatten_dano_message(format, *stream, *this);
-		} catch (status_t error) {
-			MakeEmpty();
-			return error;
-		}
-
-		return B_NOT_A_MESSAGE;
-	}
+	if (format != MESSAGE_FORMAT_HAIKU)
+		return BPrivate::MessageAdapter::Unflatten(format, this, stream);
 
 	// native message unflattening
 
@@ -1143,7 +1093,7 @@ BMessage::Unflatten(BDataIO *stream)
 		sizeof(message_header) - sizeof(uint32));
 	result -= sizeof(message_header) - sizeof(uint32);
 
-	if (result != B_OK || fHeader->format != kMessageMagicHaiku
+	if (result != B_OK || fHeader->format != MESSAGE_FORMAT_HAIKU
 		|| !(fHeader->flags & MESSAGE_FLAG_VALID)) {
 		free(fHeader);
 		fHeader = NULL;
@@ -1183,14 +1133,6 @@ BMessage::Unflatten(BDataIO *stream)
 		if (result < B_OK)
 			return B_BAD_VALUE;
 	}
-
-	/*if (fHeader->fields_checksum != BPrivate::CalculateChecksum((uint8 *)fFields, fHeader->fields_size)
-		|| fHeader->data_checksum != BPrivate::CalculateChecksum((uint8 *)fData, fHeader->data_size)) {
-		debug_printf("checksum mismatch 2\n");
-		_Clear();
-		_InitHeader();
-		return B_BAD_VALUE;
-	}*/
 
 	return B_OK;
 }
@@ -1329,7 +1271,7 @@ BMessage::GetCurrentSpecifier(int32 *index, BMessage *specifier, int32 *what,
 		}
 	}
 
-	return B_OK;		
+	return B_OK;
 }
 
 
@@ -1887,7 +1829,7 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 		port_info info;
 		get_port_info(port, &info);
 		void *address = NULL;
-		_kern_transfer_area(header->shared_area, &address, B_ANY_ADDRESS, 
+		_kern_transfer_area(header->shared_area, &address, B_ANY_ADDRESS,
 			info.team);
 #endif
 	} else {
@@ -2075,11 +2017,11 @@ BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 
 	uint32 magic = *(uint32 *)data;
 
-	if (magic == kMessageMagicHaiku || magic == kMessageMagicHaikuSwapped) {
+	if (magic == MESSAGE_FORMAT_HAIKU || magic == MESSAGE_FORMAT_HAIKU_SWAPPED) {
 		message_header *header = (message_header *)data;
 		header->target = token;
 		header->flags |= MESSAGE_FLAG_WAS_DELIVERED;
-	} else if (magic == kMessageMagicR5) {
+	} else if (magic == MESSAGE_FORMAT_R5) {
 		uint8 *header = (uint8 *)data;
 		header += sizeof(uint32) /* magic */ + sizeof(uint32) /* checksum */
 			+ sizeof(ssize_t) /* flattenedSize */ + sizeof(int32) /* what */
@@ -2131,63 +2073,6 @@ handle_reply(port_id replyPort, int32 *_code, bigtime_t timeout,
 	result = reply->Unflatten(buffer);
 	free(buffer);
 	return result;
-}
-
-
-static status_t
-convert_message(const KMessage *fromMessage, BMessage *toMessage)
-{
-	DEBUG_FUNCTION_ENTER2;
-	if (!fromMessage || !toMessage)
-		return B_BAD_VALUE;
-
-	// make empty and init what of the target message
-	toMessage->MakeEmpty();
-	toMessage->what = fromMessage->What();
-
-	BMessage::Private toPrivate(toMessage);
-	toPrivate.SetTarget(fromMessage->TargetToken());
-	toPrivate.SetReply(B_SYSTEM_TEAM, fromMessage->ReplyPort(),
-		fromMessage->ReplyToken());
-
-	// iterate through the fields and import them in the target message
-	KMessageField field;
-	while (fromMessage->GetNextField(&field) == B_OK) {
-		int32 elementCount = field.CountElements();
-		if (elementCount > 0) {
-			for (int32 i = 0; i < elementCount; i++) {
-				int32 size;
-				const void *data = field.ElementAt(i, &size);
-				status_t result;
-
-				if (field.TypeCode() == B_MESSAGE_TYPE) {
-					// message type: if it's a KMessage, convert it
-					KMessage message;
-					if (message.SetTo(data, size) == B_OK) {
-						BMessage bMessage;
-						result = convert_message(&message, &bMessage);
-						if (result < B_OK)
-							return result;
-
-						result = toMessage->AddMessage(field.Name(), &bMessage);
-					} else {
-						// just add it
-						result = toMessage->AddData(field.Name(),
-							field.TypeCode(), data, size,
-							field.HasFixedElementSize(), 1);
-					}
-				} else {
-					result = toMessage->AddData(field.Name(), field.TypeCode(),
-						data, size, field.HasFixedElementSize(), 1);
-				}
-
-				if (result < B_OK)
-					return result;
-			}
-		}
-	}
-
-	return B_OK;
 }
 
 
