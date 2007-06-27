@@ -396,17 +396,19 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	// Create the array that will keep bandwidth information
 	fFrameBandwidth = new(std::nothrow) uint16[NUMBER_OF_FRAMES];
 
+	// Create lists for managing isochronous transfer descriptors
+	fFirstIsochronousDescriptor = new(std::nothrow) uhci_td *[NUMBER_OF_FRAMES];
+	fLastIsochronousDescriptor = new(std::nothrow) uhci_td *[NUMBER_OF_FRAMES];
+
 	for (int32 i = 0; i < NUMBER_OF_FRAMES; i++) {
 		fFrameList[i] =	fQueues[UHCI_INTERRUPT_QUEUE]->PhysicalAddress()
 			| FRAMELIST_NEXT_IS_QH;
 		fFrameBandwidth[i] = MAX_AVAILABLE_BANDWIDTH;
+		fFirstIsochronousDescriptor[i] = NULL;
+		fLastIsochronousDescriptor[i] = NULL;
 	}
 
-	// create lists for managing isochronous transfer descriptors
-	fFirstIsochronousDescriptor = new(std::nothrow) uhci_td *[NUMBER_OF_FRAMES];
-	fLastIsochronousDescriptor = new(std::nothrow) uhci_td *[NUMBER_OF_FRAMES];
-
-	// create semaphore the finisher thread will wait for
+	// Create semaphore the finisher thread will wait for
 	fFinishTransfersSem = create_sem(0, "UHCI Finish Transfers");
 	if (fFinishTransfersSem < B_OK) {
 		TRACE_ERROR(("usb_uhci: failed to create semaphore\n"));
