@@ -1368,18 +1368,21 @@ BTextView::Select(int32 startOffset, int32 endOffset)
 	// a negative selection?
 	if (startOffset > endOffset)
 		return;
-		
+	
+	// pin offsets at reasonable values
+	if (startOffset < 0)
+		startOffset = 0;
+	if (endOffset < 0)
+		endOffset = 0;
+	else if (endOffset > fText->Length())
+		endOffset = fText->Length();
+	
 	// is the new selection any different from the current selection?
 	if (startOffset == fSelStart && endOffset == fSelEnd)
 		return;
 		
 	fStyles->InvalidateNullStyle();
 	
-	// pin offsets at reasonable values
-	startOffset = (startOffset < 0) ? 0 : startOffset;
-	endOffset = (endOffset < 0) ? 0 : endOffset;
-	endOffset = (endOffset > fText->Length()) ? fText->Length() : endOffset;
-
 	// hide the caret
 	if (fCaretVisible)
 		InvertCaret();
@@ -4030,6 +4033,11 @@ BTextView::PerformAutoScrolling()
 	// TODO: Refine this, I can't even remember how beos works here
 	scrollBy.y = lineHeight > 0 ? lineHeight * (int32)(floorf(vertDiff) / lineHeight) : 0;
 	
+	if (bounds.bottom + scrollBy.y > fTextRect.Height())
+		scrollBy.y = fTextRect.Height() - bounds.bottom;
+	else if (bounds.top + scrollBy.y < 0)
+		scrollBy.y = -bounds.top;
+
 	if (scrollBy != B_ORIGIN)
 		ScrollBy(scrollBy.x, scrollBy.y);
 }
