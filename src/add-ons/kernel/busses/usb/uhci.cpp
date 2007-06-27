@@ -180,9 +180,9 @@ Queue::TerminateByStrayDescriptor()
 	fStrayDescriptor->status = 0;
 	fStrayDescriptor->this_phy = (addr_t)physicalAddress;
 	fStrayDescriptor->link_phy = TD_TERMINATE;
-	fStrayDescriptor->link_log = 0;
+	fStrayDescriptor->link_log = NULL;
 	fStrayDescriptor->buffer_phy = 0;
-	fStrayDescriptor->buffer_log = 0;
+	fStrayDescriptor->buffer_log = NULL;
 	fStrayDescriptor->buffer_size = 0;
 	fStrayDescriptor->token = TD_TOKEN_NULL_DATA
 		| (0x7f << TD_TOKEN_DEVADDR_SHIFT) | TD_TOKEN_IN;
@@ -304,8 +304,6 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 		fStopFinishThread(false),
 		fFirstIsochronousTransfer(NULL),
 		fLastIsochronousTransfer(NULL),
-		fFinishIsochronousThread(-1),
-		fStopFinishIsochronousThread(false),
 		fRootHub(NULL),
 		fRootHubAddress(0),
 		fPortResetChange(0)
@@ -426,12 +424,6 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 		return;
 	}
 
-	// Create the isochronous finisher service thread
-	fFinishIsochronousThread = spawn_kernel_thread(FinishIsochronousThread,
-		"uhci isochronous finish thread", B_URGENT_DISPLAY_PRIORITY,
-		(void *)this);
-	resume_thread(fFinishIsochronousThread);
-
 	// Install the interrupt handler
 	TRACE(("usb_uhci: installing interrupt handler\n"));
 	install_io_interrupt_handler(fPCIInfo->u.h0.interrupt_line,
@@ -450,10 +442,8 @@ UHCI::~UHCI()
 {
 	int32 result = 0;
 	fStopFinishThread = true;
-	fStopFinishIsochronousThread = true;
 	delete_sem(fFinishTransfersSem);
 	wait_for_thread(fFinishThread, &result);
-	wait_for_thread(fFinishIsochronousThread, &result);
 
 	LockIsochronous();
 	isochronous_transfer_data *isoTransfer = fFirstIsochronousTransfer;
@@ -635,7 +625,7 @@ UHCI::CancelQueuedIsochronousTransfers(Pipe *pipe)
 			// Set the active bit off on every descriptor in order to prevent
 			// the controller from processing them. Then set off the is_active
 			// field of the transfer in order to make the finisher thread skip
-			// the transfer. The FinishIsochronousThread will do the rest.
+			// the transfer. FinishIsochronousTransfers will do the rest.
 			for (int32 i = 0; i < packetCount; i++)
 				current->descriptors[i]->status &= ~TD_STATUS_ACTIVE;
 			current->is_active = false;
@@ -999,6 +989,9 @@ UHCI::FinishTransfers()
 		if (semCount > 0)
 			acquire_sem_etc(fFinishTransfersSem, semCount, B_RELATIVE_TIMEOUT, 0);
 
+		// give the isochronous transfers a chance
+		FinishIsochronousTransfers();
+
 		if (!Lock())
 			continue;
 
@@ -1160,89 +1153,82 @@ UHCI::FinishTransfers()
 }
 
 
-int32
-UHCI::FinishIsochronousThread(void *data)
-{
-	((UHCI *)data)->FinishIsochronousTransfers();
-	return B_OK;
-}
-
-
 void
 UHCI::FinishIsochronousTransfers()
 {
-	/* This thread stays one position behind the controller and processes every
-	 * isochronous descriptor. Once it finds the last isochronous descriptor
-	 * of a transfer, it processes the entire transfer.
-	 */
-	uint16 currentFrame = ReadReg16(UHCI_FRNUM);
+	if (!LockIsochronous())
+		return;
 
-	while (!fStopFinishIsochronousThread) {
-		// wait 1ms in order to be sure to be one position behind
-		// the controller
-		if (currentFrame == ReadReg16(UHCI_FRNUM))
-			snooze(1000);
+	for (uint16 frame = 0; frame < NUMBER_OF_FRAMES; frame++) {
+		uhci_td *current = fFirstIsochronousDescriptor[frame];
 
-		// Process the frame till it has isochronous descriptors in it.
-		while (!(fFrameList[currentFrame] & FRAMELIST_NEXT_IS_QH)) {
-			uhci_td *current = fFirstIsochronousDescriptor[currentFrame];
-			UnlinkIsochronousDescriptor(current, currentFrame);
+		while (current) {
+			if (current->status & TD_STATUS_ACTIVE) {
+				// The transfer descriptor is still active
+				current = (uhci_td *)current->link_log;
+				continue;
+			}
+
+			UnlinkIsochronousDescriptor(current, frame);
+			if (!(current->status & TD_CONTROL_IOC)) {
+				current = (uhci_td *)current->link_log;
+				continue;
+			}
 
 			// Process the transfer if we found the last descriptor
-			if (current->status & TD_CONTROL_IOC) {
-				isochronous_transfer_data *transfer
-					= FindIsochronousTransfer(current);
+			isochronous_transfer_data *transfer
+				= FindIsochronousTransfer(current);
 
-				// The following should NEVER happen
-				if (!transfer)
-					TRACE_ERROR(("usb_uhci: Isochronous transfer not found in"
-						" the finisher thread!\n"));
+			// The following should NEVER happen
+			if (!transfer) {
+				TRACE_ERROR(("usb_uhci: Isochronous transfer not found in"
+					" the finisher thread!\n"));
+				return;
+			} else if (transfer->is_active
+				&& (current->status & TD_TOKEN_IN)) {
+				// Process the descriptors only if it is still active and
+				// belongs to an inbound transfer. If the transfer is not
+				// active, it means the request has been removed, so simply
+				// remove the descriptors.
+				iovec *vector = transfer->transfer->Vector();
+				transfer->transfer->PrepareKernelAccess();
+				ReadIsochronousDescriptorChain(transfer, vector);
 
-				// Process the transfer only if it is still active and belongs
-				// to an INPUT transfer. If the transfer is not active, it
-				// means the request has been removed, so simply remove the
-				// descriptors.
-				else if (transfer->is_active && (current->status & TD_TOKEN_IN)) {
-					iovec *vector = transfer->transfer->Vector();
-					transfer->transfer->PrepareKernelAccess();
-					ReadIsochronousDescriptorChain(transfer, vector);
+				// Remove the transfer
+				if (transfer == fFirstIsochronousTransfer) {
+					fFirstIsochronousTransfer = transfer->link;
+				} else {
+					isochronous_transfer_data *temp
+						= fFirstIsochronousTransfer;
+					while (transfer != temp->link)
+						temp = temp->link;
 
-					// Remove the transfer
-					if (LockIsochronous()) {
-						if (transfer == fFirstIsochronousTransfer)
-							fFirstIsochronousTransfer = transfer->link;
-						else {
-							isochronous_transfer_data *temp
-								= fFirstIsochronousTransfer;
-							while (transfer != temp->link)
-								temp = temp->link;
-
-							if (transfer == fLastIsochronousTransfer)
-								fLastIsochronousTransfer = temp;
-							temp->link = temp->link->link;
-						}
-
-						UnlockIsochronous();
-					}
-
-					transfer->transfer->Finished(B_OK, 0);
+					if (transfer == fLastIsochronousTransfer)
+						fLastIsochronousTransfer = temp;
+					temp->link = temp->link->link;
 				}
 
-				uint32 packetCount =
-					transfer->transfer->IsochronousData()->packet_count;
-				for (uint32 i = 0; i < packetCount; i++)
-					FreeDescriptor(transfer->descriptors[i]);
+				transfer->transfer->Finished(B_OK, 0);
+			} else if (!transfer->is_active)
+				transfer->transfer->Finished(B_CANCELED, 0);
 
-				delete [] transfer->descriptors;
-				delete transfer->transfer;
-				delete transfer;
-			}
+			uint32 packetCount =
+				transfer->transfer->IsochronousData()->packet_count;
+			for (uint32 i = 0; i < packetCount; i++)
+				FreeDescriptor(transfer->descriptors[i]);
+
+			uint16 bandwidth = transfer->transfer->Bandwidth() / packetCount;
+			fFrameBandwidth[frame] += bandwidth;
+
+			delete [] transfer->descriptors;
+			delete transfer->transfer;
+			delete transfer;
+
+			current = (uhci_td *)current->link_log;
 		}
-
-		// Make sure to reset the frame bandwidth
-		fFrameBandwidth[currentFrame] = MAX_AVAILABLE_BANDWIDTH;
-		currentFrame = (currentFrame + 1) % NUMBER_OF_FRAMES;
 	}
+
+	UnlockIsochronous();
 }
 
 
@@ -1578,7 +1564,7 @@ UHCI::CreateFilledTransfer(Transfer *transfer, uhci_td **_firstDescriptor,
 
 	lastDescriptor->status |= TD_CONTROL_IOC;
 	lastDescriptor->link_phy = TD_TERMINATE;
-	lastDescriptor->link_log = 0;
+	lastDescriptor->link_log = NULL;
 
 	if (!directionIn) {
 		WriteDescriptorChain(firstDescriptor, transfer->Vector(),

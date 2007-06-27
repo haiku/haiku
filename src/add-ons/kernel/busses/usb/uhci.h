@@ -133,7 +133,6 @@ static	int32						FinishThread(void *data);
 										uhci_qh **_transferQueue);
 
 		// Isochronous transfer functions
-static	int32						FinishIsochronousThread(void *data);
 		void						FinishIsochronousTransfers();
 		isochronous_transfer_data	*FindIsochronousTransfer(uhci_td *descriptor);
 
@@ -220,9 +219,7 @@ static	pci_module_info				*sPCIModule;
 		// Maintain a linked list of isochronous transfers
 		isochronous_transfer_data	*fFirstIsochronousTransfer;
 		isochronous_transfer_data	*fLastIsochronousTransfer;
-		thread_id					fFinishIsochronousThread;
 		benaphore					fIsochronousLock;
-		bool						fStopFinishIsochronousThread;
 
 		// Root hub
 		UHCIRootHub					*fRootHub;
