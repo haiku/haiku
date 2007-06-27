@@ -49,7 +49,7 @@ process_file(const char *path)
 		status = B_ENTRY_NOT_FOUND;
 
 	if (gFiles && status >= B_OK)
-		status = update_mime_info(path, true, true, gForce);
+		update_mime_info(path, true, true, gForce);
 	if (gApps && status >= B_OK)
 		create_app_meta_mime(path, true, true, gForce);
 
