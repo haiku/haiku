@@ -9,8 +9,7 @@ BuildPlatformMergeObjectPIC <libbe_build>app_kit.o :
  	Application.cpp
  	AppMisc.cpp
 	Message.cpp
-	MessageBody.cpp
-	MessageField.cpp
+	MessageAdapter.cpp
  	Messenger.cpp
  	MessageUtils.cpp
  	TypeConstants.cpp 

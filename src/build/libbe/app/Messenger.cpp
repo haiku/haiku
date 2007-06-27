@@ -41,6 +41,7 @@
 #include <LooperList.h>
 #include <Message.h>
 #include <Messenger.h>
+#include <MessengerPrivate.h>
 #include <OS.h>
 #include <Roster.h>
 #include <TokenSpace.h>
