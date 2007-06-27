@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc.
+ * Copyright 2006-2007, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -15,18 +15,22 @@
 
 
 class HWInterface;
+class ServerBitmap;
 struct overlay_client_data;
 
 
 class Overlay {
 	public:
-		Overlay(HWInterface& interface);
+		Overlay(HWInterface& interface, ServerBitmap* bitmap,
+			overlay_token token);
 		~Overlay();
 
 		status_t InitCheck() const;
 
-		void SetOverlayData(const overlay_buffer* overlayBuffer,
-			overlay_token token, overlay_client_data* clientData);
+		status_t Suspend(ServerBitmap* bitmap, bool needTemporary);
+		status_t Resume(ServerBitmap* bitmap);
+
+		void SetClientData(overlay_client_data* clientData);
 		void SetFlags(uint32 flags);
 		void TakeOverToken(Overlay* other);
 
@@ -51,6 +55,9 @@ class Overlay {
 		void Hide();
 
 	private:
+		void _FreeBuffer();
+		status_t _AllocateBuffer(ServerBitmap* bitmap);
+
 		HWInterface&			fHWInterface;
 		const overlay_buffer*	fOverlayBuffer;
 		overlay_client_data*	fClientData;

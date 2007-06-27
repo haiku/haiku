@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,8 +31,12 @@ class BitmapManager {
 							uint8* _allocationFlags = NULL);
 		void			DeleteBitmap(ServerBitmap* bitmap);
 
+		void			SuspendOverlays();
+		void			ResumeOverlays();
+
 	protected:
 		BList			fBitmapList;
+		BList			fOverlays;
 		BLocker			fLock;
 };
 

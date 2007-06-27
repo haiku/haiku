@@ -624,6 +624,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				Signature(), frame.Width() + 1, frame.Height() + 1));
 
 			if (bitmap != NULL && fBitmapList.AddItem(bitmap)) {
+				bitmap->SetOwner(this);
+
 				fLink.StartMessage(B_OK);
 				fLink.Attach<int32>(bitmap->Token());
 				fLink.Attach<uint8>(allocationFlags);
@@ -633,8 +635,12 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 				if (allocationFlags & kFramebuffer)
 					fLink.Attach<int32>(bitmap->BytesPerRow());
-			} else
+			} else {
+				if (bitmap != NULL)
+					gBitmapManager->DeleteBitmap(bitmap);
+
 				fLink.StartMessage(B_NO_MEMORY);
+			}
 
 			fLink.Flush();
 			break;

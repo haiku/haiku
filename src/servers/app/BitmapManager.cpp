@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -19,15 +19,19 @@
 #include "ClientMemoryAllocator.h"
 #include "HWInterface.h"
 #include "Overlay.h"
+#include "ServerApp.h"
 #include "ServerBitmap.h"
 #include "ServerProtocol.h"
 #include "ServerTokenSpace.h"
 
 #include <BitmapPrivate.h>
+#include <ObjectList.h>
 #include <video_overlay.h>
 
+#include <AppDefs.h>
 #include <Autolock.h>
 #include <Bitmap.h>
+#include <Message.h>
 
 #include <new>
 #include <stdio.h>
@@ -36,11 +40,18 @@
 using std::nothrow;
 
 
-//! The bitmap allocator for the server. Memory is allocated/freed by the AppServer class
+//! The one and only bitmap manager for the server, created by the AppServer
 BitmapManager *gBitmapManager = NULL;
 
-//! Number of bytes to allocate to each area used for bitmap storage
-#define BITMAP_AREA_SIZE	B_PAGE_SIZE * 16
+
+int
+compare_app_pointer(const ServerApp* a, const ServerApp* b)
+{
+	return (addr_t)b - (addr_t)b;
+}
+
+
+//	#pragma mark -
 
 
 //! Sets up stuff to be ready to allocate space for bitmaps
@@ -77,9 +88,9 @@ BitmapManager::~BitmapManager()
 	\return A new ServerBitmap or NULL if unable to allocate one.
 */
 ServerBitmap*
-BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator, HWInterface& hwInterface,
-	BRect bounds, color_space space, int32 flags, int32 bytesPerRow, screen_id screen,
-	uint8* _allocationFlags)
+BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator,
+	HWInterface& hwInterface, BRect bounds, color_space space, int32 flags,
+	int32 bytesPerRow, screen_id screen, uint8* _allocationFlags)
 {
 	BAutolock locker(fLock);
 
@@ -100,7 +111,8 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator, HWInterface& hwInt
 		}
 	}
 
-	ServerBitmap* bitmap = new(nothrow) ServerBitmap(bounds, space, flags, bytesPerRow);
+	ServerBitmap* bitmap = new(nothrow) ServerBitmap(bounds, space, flags,
+		bytesPerRow);
 	if (bitmap == NULL) {
 		if (overlayToken != NULL)
 			hwInterface.ReleaseOverlayChannel(overlayToken);
@@ -112,7 +124,8 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator, HWInterface& hwInt
 	uint8* buffer = NULL;
 
 	if (flags & B_BITMAP_WILL_OVERLAY) {
-		Overlay* overlay = new (std::nothrow) Overlay(hwInterface);
+		Overlay* overlay = new (std::nothrow) Overlay(hwInterface, bitmap,
+			overlayToken);
 
 		const overlay_buffer* overlayBuffer = NULL;
 		overlay_client_data* clientData = NULL;
@@ -123,25 +136,20 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator, HWInterface& hwInt
 			// and buffer location to the BBitmap
 			cookie = allocator->Allocate(sizeof(overlay_client_data),
 				(void**)&clientData, newArea);
-			if (cookie != NULL) {
-				overlayBuffer = hwInterface.AllocateOverlayBuffer(bitmap->Width(),
-					bitmap->Height(), space);
-			}
 		}
 
-		if (overlayBuffer != NULL) {
-			overlay->SetOverlayData(overlayBuffer, overlayToken, clientData);
+		if (cookie != NULL) {
+			overlay->SetClientData(clientData);
 
 			bitmap->fAllocator = allocator;
 			bitmap->fAllocationCookie = cookie;
 			bitmap->SetOverlay(overlay);
 			bitmap->fBytesPerRow = overlayBuffer->bytes_per_row;
 
-			buffer = (uint8*)overlayBuffer->buffer;
+			buffer = (uint8*)overlay->OverlayBuffer()->buffer;
 			if (_allocationFlags)
 				*_allocationFlags = kFramebuffer | (newArea ? kNewAllocatorArea : 0);
 		} else {
-			hwInterface.ReleaseOverlayChannel(overlayToken);			
 			delete overlay;
 			allocator->Free(cookie);
 		}
@@ -168,7 +176,17 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator, HWInterface& hwInt
 		}
 	}
 
-	if (buffer && fBitmapList.AddItem(bitmap)) {
+	bool success = false;
+	if (buffer != NULL) {
+		success = fBitmapList.AddItem(bitmap);
+		if (success && bitmap->Overlay() != NULL) {
+			success = fOverlays.AddItem(bitmap);
+			if (!success)
+				fBitmapList.RemoveItem(bitmap);
+		}
+	}
+
+	if (success) {
 		bitmap->fBuffer = buffer;
 		bitmap->fToken = gTokenSpace.NewToken(kBitmapToken, bitmap);
 
@@ -207,6 +225,68 @@ BitmapManager::DeleteBitmap(ServerBitmap* bitmap)
 	if (!locker.IsLocked())
 		return;
 
+	if (bitmap->Overlay() != NULL)
+		fOverlays.AddItem(bitmap);
+
 	if (fBitmapList.RemoveItem(bitmap))
 		delete bitmap;
 }
+
+
+void
+BitmapManager::SuspendOverlays()
+{
+	BAutolock locker(fLock);
+	if (!locker.IsLocked())
+		return;
+
+	// first, tell all applications owning an overlay to release their locks
+
+	BObjectList<ServerApp> apps;
+	for (int32 i = 0; i < fOverlays.CountItems(); i++) {
+		ServerBitmap* bitmap = (ServerBitmap*)fOverlays.ItemAt(i);
+		apps.BinaryInsert(bitmap->Owner(), &compare_app_pointer);
+	}
+	for (int32 i = 0; i < apps.CountItems(); i++) {
+		BMessage notify(B_RELEASE_OVERLAY_LOCK);
+		apps.ItemAt(i)->SendMessageToClient(&notify);
+	}
+
+	// suspend overlays
+
+	for (int32 i = 0; i < fOverlays.CountItems(); i++) {
+		ServerBitmap* bitmap = (ServerBitmap*)fOverlays.ItemAt(i);
+		bitmap->Overlay()->Suspend(bitmap, false);
+	}	
+}
+
+
+void
+BitmapManager::ResumeOverlays()
+{
+	BAutolock locker(fLock);
+	if (!locker.IsLocked())
+		return;
+
+	// first, tell all applications owning an overlay that
+	// they can reacquire their locks
+
+	BObjectList<ServerApp> apps;
+	for (int32 i = 0; i < fOverlays.CountItems(); i++) {
+		ServerBitmap* bitmap = (ServerBitmap*)fOverlays.ItemAt(i);
+		apps.BinaryInsert(bitmap->Owner(), &compare_app_pointer);
+	}
+	for (int32 i = 0; i < apps.CountItems(); i++) {
+		BMessage notify(B_RELEASE_OVERLAY_LOCK);
+		apps.ItemAt(i)->SendMessageToClient(&notify);
+	}
+
+	// resume overlays
+
+	for (int32 i = 0; i < fOverlays.CountItems(); i++) {
+		ServerBitmap* bitmap = (ServerBitmap*)fOverlays.ItemAt(i);
+
+		bitmap->Overlay()->Resume(bitmap);
+	}	
+}
+

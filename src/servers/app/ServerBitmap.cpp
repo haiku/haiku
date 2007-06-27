@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -68,7 +68,8 @@ ServerBitmap::ServerBitmap(BRect rect, color_space space,
 	fBytesPerRow(0),
 	fSpace(space),
 	fFlags(flags),
-	fBitsPerPixel(0)
+	fBitsPerPixel(0),
+	fOwner(NULL)
 	// fToken is initialized (if used) by the BitmapManager
 {
 	_HandleSpace(space, bytesPerRow);
@@ -76,7 +77,7 @@ ServerBitmap::ServerBitmap(BRect rect, color_space space,
 
 
 //! Copy constructor does not copy the buffer.
-ServerBitmap::ServerBitmap(const ServerBitmap* bmp)
+ServerBitmap::ServerBitmap(const ServerBitmap* bitmap)
 	:
 	fAllocator(NULL),
 	fAllocationCookie(NULL),
@@ -84,13 +85,14 @@ ServerBitmap::ServerBitmap(const ServerBitmap* bmp)
 	fBuffer(NULL),
 	fReferenceCount(1)
 {
-	if (bmp) {
-		fWidth			= bmp->fWidth;
-		fHeight			= bmp->fHeight;
-		fBytesPerRow	= bmp->fBytesPerRow;
-		fSpace			= bmp->fSpace;
-		fFlags			= bmp->fFlags;
-		fBitsPerPixel	= bmp->fBitsPerPixel;
+	if (bitmap) {
+		fWidth			= bitmap->fWidth;
+		fHeight			= bitmap->fHeight;
+		fBytesPerRow	= bitmap->fBytesPerRow;
+		fSpace			= bitmap->fSpace;
+		fFlags			= bitmap->fFlags;
+		fBitsPerPixel	= bitmap->fBitsPerPixel;
+		fOwner			= bitmap->fOwner;
 	} else {
 		fWidth			= 0;
 		fHeight			= 0;
@@ -98,6 +100,7 @@ ServerBitmap::ServerBitmap(const ServerBitmap* bmp)
 		fSpace			= B_NO_COLOR_SPACE;
 		fFlags			= 0;
 		fBitsPerPixel	= 0;
+		fOwner			= NULL;
 	}
 }
 
@@ -305,9 +308,9 @@ ServerBitmap::AreaOffset() const
 
 
 void
-ServerBitmap::SetOverlay(::Overlay* cookie)
+ServerBitmap::SetOverlay(::Overlay* overlay)
 {
-	fOverlay = cookie;
+	fOverlay = overlay;
 }
 
 
@@ -315,6 +318,20 @@ ServerBitmap::SetOverlay(::Overlay* cookie)
 ServerBitmap::Overlay() const
 {
 	return fOverlay;
+}
+
+
+void
+ServerBitmap::SetOwner(ServerApp* owner)
+{
+	fOwner = owner;
+}
+
+
+ServerApp*
+ServerBitmap::Owner() const
+{
+	return fOwner;
 }
 
 

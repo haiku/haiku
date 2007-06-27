@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -20,6 +20,7 @@ class BitmapManager;
 class ClientMemoryAllocator;
 class HWInterface;
 class Overlay;
+class ServerApp;
 
 
 /*!
@@ -66,8 +67,11 @@ class ServerBitmap {
 			area_id			Area() const;
 			uint32			AreaOffset() const;
 
-			void			SetOverlay(::Overlay* cookie);
+			void			SetOverlay(::Overlay* overlay);
 			::Overlay*		Overlay() const;
+
+			void			SetOwner(ServerApp* owner);
+			ServerApp*		Owner() const;
 
 	//! Does a shallow copy of the bitmap passed to it
 	inline	void			ShallowCopy(const ServerBitmap *from);
@@ -116,6 +120,8 @@ protected:
 			color_space		fSpace;
 			int32			fFlags;
 			int				fBitsPerPixel;
+
+			ServerApp*		fOwner;
 			int32			fToken;
 };
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc.
+ * Copyright 2006-2007, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,15 +7,54 @@
  */
 
 
-#include "HWInterface.h"
 #include "Overlay.h"
+
+#include "HWInterface.h"
+#include "ServerBitmap.h"
 
 #include <BitmapPrivate.h>
 
 #include <InterfaceDefs.h>
 
 
-Overlay::Overlay(HWInterface& interface)
+const static bigtime_t kOverlayTimeout = 1000000LL;
+	// after 1 second, the team holding the lock will be killed
+
+class SemaphoreLocker {
+	public:
+		SemaphoreLocker(sem_id semaphore,
+				bigtime_t timeout = B_INFINITE_TIMEOUT)
+			: fSemaphore(semaphore)
+		{
+			do {
+				fStatus = acquire_sem_etc(fSemaphore, 1, B_RELATIVE_TIMEOUT,
+					timeout);
+			} while (fStatus == B_INTERRUPTED);
+		}
+
+		~SemaphoreLocker()
+		{
+			if (fStatus == B_OK)
+				release_sem_etc(fSemaphore, 1, B_DO_NOT_RESCHEDULE);
+		}
+
+		status_t
+		LockStatus()
+		{
+			return fStatus;
+		}
+
+	private:
+		sem_id		fSemaphore;
+		status_t	fStatus;
+};
+
+
+//	#pragma mark -
+
+
+Overlay::Overlay(HWInterface& interface, ServerBitmap* bitmap,
+		overlay_token token)
 	:
 	fHWInterface(interface),
 	fOverlayBuffer(NULL),
@@ -32,13 +71,15 @@ Overlay::Overlay(HWInterface& interface)
 	fWindow.offset_bottom = 0;
 
 	fWindow.flags = B_OVERLAY_COLOR_KEY;
+
+	_AllocateBuffer(bitmap);
 }
 
 
 Overlay::~Overlay()
 {
 	fHWInterface.ReleaseOverlayChannel(fOverlayToken);
-	fHWInterface.FreeOverlayBuffer(fOverlayBuffer);
+	_FreeBuffer();
 
 	delete_sem(fSemaphore);
 }
@@ -47,17 +88,71 @@ Overlay::~Overlay()
 status_t
 Overlay::InitCheck() const
 {
-	return fSemaphore >= B_OK ? B_OK : fSemaphore;
+	if (fSemaphore < B_OK)
+		return fSemaphore;
+
+	if (fOverlayBuffer == NULL)
+		return B_NO_MEMORY;
+
+	return B_OK;
+}
+
+
+status_t
+Overlay::Resume(ServerBitmap* bitmap)
+{
+	SemaphoreLocker locker(fSemaphore, kOverlayTimeout);
+	if (locker.LockStatus() == B_TIMED_OUT) {
+		// TODO: kill app!
+	}
+
+	status_t status = _AllocateBuffer(bitmap);
+	if (status < B_OK)
+		return status;
+
+	fClientData->buffer = (uint8*)fOverlayBuffer->buffer;
+	return B_OK;
+}
+
+
+status_t
+Overlay::Suspend(ServerBitmap* bitmap, bool needTemporary)
+{
+	SemaphoreLocker locker(fSemaphore, kOverlayTimeout);
+	if (locker.LockStatus() == B_TIMED_OUT) {
+		// TODO: kill app!
+	}
+
+	_FreeBuffer();
+	fClientData->buffer = NULL;
+
+	return B_OK;
 }
 
 
 void
-Overlay::SetOverlayData(const overlay_buffer* overlayBuffer,
-	overlay_token token, overlay_client_data* clientData)
+Overlay::_FreeBuffer()
 {
-	fOverlayBuffer = overlayBuffer;
-	fOverlayToken = token;
+	fHWInterface.FreeOverlayBuffer(fOverlayBuffer);
+	fOverlayBuffer = NULL;
+}
 
+
+status_t
+Overlay::_AllocateBuffer(ServerBitmap* bitmap)
+{
+	fOverlayBuffer = fHWInterface.AllocateOverlayBuffer(bitmap->Width(),
+		bitmap->Height(), bitmap->ColorSpace());
+	if (fOverlayBuffer == NULL)
+		return B_NO_MEMORY;
+
+	return B_OK;
+}
+
+
+void
+Overlay::SetClientData(overlay_client_data* clientData)
+{
 	fClientData = clientData;
 	fClientData->lock = fSemaphore;
 	fClientData->buffer = (uint8*)fOverlayBuffer->buffer;

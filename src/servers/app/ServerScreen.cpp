@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2006, Haiku, Inc.
+ * Copyright (c) 2001-2007, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -9,17 +9,18 @@
  */
 
 
+#include "ServerScreen.h"
+
+#include "BitmapManager.h"
+#include "DrawingEngine.h"
+#include "HWInterface.h"
+
 #include <Accelerant.h>
 #include <Point.h>
 #include <GraphicsDefs.h>
 
 #include <stdlib.h>
 #include <stdio.h>
-
-#include "DrawingEngine.h"
-#include "HWInterface.h"
-
-#include "ServerScreen.h"
 
 
 static float
@@ -87,8 +88,12 @@ Screen::Shutdown()
 status_t
 Screen::SetMode(display_mode mode, bool makeDefault)
 {
+	gBitmapManager->SuspendOverlays();
+
 	status_t status = fHWInterface->SetMode(mode);
 		// any attached DrawingEngines will be notified
+
+	gBitmapManager->ResumeOverlays();
 
 	if (status >= B_OK)
 		fIsDefault = makeDefault;
