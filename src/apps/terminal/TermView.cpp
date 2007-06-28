@@ -94,7 +94,6 @@ TermView::TermView(BRect frame, CodeConv *inCodeConv, int fd)
 	fScrBot(fTermRows - 1),
 	fScrBufSize(gTermPref->getInt32(PREF_HISTORY_SIZE)),
 	fScrRegionSet(0),
-	fSelected(false),
 	fMouseTracking(false),
 	fViewThread(-1),
 	fMouseThread(-1),
@@ -851,7 +850,7 @@ TermView::MouseTracking(void *data)
 		if (!has_data(find_thread(NULL))) {
 			BRect r;
 			
-			if (theObj->fSelected
+			if (theObj->HasSelection()
 				&& ( gTermPref->getInt32(PREF_DRAGN_COPY)
 						|| modifiers() & B_CONTROL_KEY)) {
 			
@@ -886,7 +885,7 @@ TermView::MouseTracking(void *data)
 	if (code != MOUSE_THR_CODE)
 		continue;
 
-	selected = theObj->fSelected;
+	selected = theObj->HasSelection();
 	edpoint.Set(-1, -1);
 	
 	stpos = theObj->BPointToCurPos(stpoint);
@@ -1099,7 +1098,7 @@ void
 TermView::UpdateSIGWINCH()
 {
 	if (fFrameResized) {
-		if (fSelected)
+		if (HasSelection())
 			TermDrawSelectedRegion(fSelStart, fSelEnd);
 		ScrollTo(0, fTop);
 		ResizeScrBarRange();
@@ -1575,7 +1574,7 @@ TermView::DoFileDrop(entry_ref &ref)
 void 
 TermView::DoCopy()
 {
-	if (!fSelected)
+	if (!HasSelection())
 		return;
 
 	BString copyStr;
@@ -1667,10 +1666,7 @@ TermView::DoClearAll(void)
 	
 	// reset cursor pos
 	SetCurPos(0, 0);
-	
-	// reset selection.
-	fSelected = false;
-	
+		
 	fScrollBar->SetRange(0, 0);
 	fScrollBar->SetProportion(1);
 }
@@ -1702,7 +1698,7 @@ TermView::MouseDown(BPoint where)
 
 	// paste button
 	if ((buttons & (B_SECONDARY_MOUSE_BUTTON | B_TERTIARY_MOUSE_BUTTON)) != 0) {
-		if (fSelected) {
+		if (HasSelection()) {
 			// copy text from region
 			BString copy;
 			fTextBuffer->GetStringFromRegion(copy);
@@ -1720,7 +1716,7 @@ TermView::MouseDown(BPoint where)
 		Window()->CurrentMessage()->FindInt32("modifiers", &mod);
 		Window()->CurrentMessage()->FindInt32("clicks", &clicks);
 
-		if (fSelected) {
+		if (HasSelection()) {
 			CurPos inPos, stPos, edPos;
 			if (fSelStart < fSelEnd) {
 				stPos = fSelStart;
@@ -1855,7 +1851,6 @@ TermView::Select(CurPos start, CurPos end)
 	
 	fTextBuffer->Select(fSelStart, fSelEnd);
 	TermDrawSelectedRegion(fSelStart, fSelEnd);
-	fSelected = true;
 }
 
 // Add select region(shift + mouse click)
@@ -1866,7 +1861,7 @@ TermView::AddSelectRegion(CurPos pos)
 	ushort attr;
 	CurPos start, end, inPos;
 	
-	if (!fSelected)
+	if (!HasSelection())
 		return;
 	
 	// error check, and if mouse point to a plase full width character,
@@ -1979,7 +1974,7 @@ TermView::DeSelect(void)
 {
 	CurPos start, end;
 	
-	if (!fSelected)
+	if (!HasSelection())
 		return;
 	
 	fTextBuffer->DeSelect();
@@ -1991,9 +1986,15 @@ TermView::DeSelect(void)
 	fSelEnd.Set(-1, -1);
 	
 	TermDrawSelectedRegion(start, end);
-	
-	fSelected = false;
 }
+
+
+bool
+TermView::HasSelection() const
+{
+	return fSelStart != fSelEnd;
+}
+
 
 void
 TermView::SelectWord(BPoint where, int mod)

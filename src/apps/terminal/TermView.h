@@ -208,11 +208,12 @@ class TermView : public BView {
 		int32 GetWidthFromUTF8String (const char *);
 
 		// Mouse select
-		void  Select(CurPos start, CurPos end);
-		void  AddSelectRegion(CurPos);
-		void  ResizeSelectRegion(CurPos);
+		void	Select(CurPos start, CurPos end);
+		void	AddSelectRegion(CurPos);
+		void	ResizeSelectRegion(CurPos);
 
-		void  DeSelect();
+		void	DeSelect();
+		bool	HasSelection() const;
 
 		// select word function
 		void  SelectWord(BPoint where, int mod); 
@@ -307,7 +308,6 @@ class TermView : public BView {
 		// view selection
 		CurPos fSelStart;
 		CurPos fSelEnd;
-		bool fSelected;
 		bool fMouseTracking;
 
 		// thread ID / flags.
