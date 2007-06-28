@@ -127,7 +127,6 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator,
 		Overlay* overlay = new (std::nothrow) Overlay(hwInterface, bitmap,
 			overlayToken);
 
-		const overlay_buffer* overlayBuffer = NULL;
 		overlay_client_data* clientData = NULL;
 		bool newArea = false;
 
@@ -144,7 +143,7 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator,
 			bitmap->fAllocator = allocator;
 			bitmap->fAllocationCookie = cookie;
 			bitmap->SetOverlay(overlay);
-			bitmap->fBytesPerRow = overlayBuffer->bytes_per_row;
+			bitmap->fBytesPerRow = overlay->OverlayBuffer()->bytes_per_row;
 
 			buffer = (uint8*)overlay->OverlayBuffer()->buffer;
 			if (_allocationFlags)

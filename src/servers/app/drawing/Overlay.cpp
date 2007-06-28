@@ -59,7 +59,7 @@ Overlay::Overlay(HWInterface& interface, ServerBitmap* bitmap,
 	fHWInterface(interface),
 	fOverlayBuffer(NULL),
 	fClientData(NULL),
-	fOverlayToken(NULL)
+	fOverlayToken(token)
 {
 	fSemaphore = create_sem(1, "overlay lock");
 	fColor.SetColor(21, 16, 21, 16);
