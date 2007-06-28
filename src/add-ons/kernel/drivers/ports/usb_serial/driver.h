@@ -144,6 +144,8 @@ struct _s_usb_serial_device{
       uint8 status_msr;
       uint8 status_lsr;
     }ftdi;
+    struct _spec_klsi{ /* KLSI/PalmConnect */
+    }klsi;
   }spec;
 }; /*already typedef-ed - see comment above! */
 /* high-level of abstraction of the device*/

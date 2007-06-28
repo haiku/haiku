@@ -12,6 +12,7 @@ KernelAddon usb_serial :
 	acm.c
 	prolific.c
 	ftdi.c
+	klsi.c
 ;
 
 AddResources usb_serial : usb_serial.rdef ;

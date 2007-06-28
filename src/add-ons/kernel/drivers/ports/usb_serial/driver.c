@@ -17,6 +17,7 @@
 #include "acm.h"
 #include "prolific.h"
 #include "ftdi.h"
+#include "klsi.h"
  
 /* driver callbacks forward declarations */
 static status_t usb_serial_open (const char *name, uint32 flags, void** cookie);
@@ -132,6 +133,18 @@ usb_serial_hw usb_serial_hw_devices[] = {
            set_line_coding_ftdi, set_control_line_state_ftdi,
            on_read_ftdi, on_write_ftdi, on_close_ftdi,
            "FTDI 8U232AM serial converter"}, 
+
+  {VND_PALM,   PROD_PALM_CONNECT,
+           add_klsi_device, reset_klsi_device,
+           set_line_coding_klsi, set_control_line_state_klsi, 
+           on_read_klsi, on_write_klsi, on_close_klsi,
+           "PalmConnect RS232"}, 
+  {VND_KLSI,   PROD_KLSI_KL5KUSB105D,
+           add_klsi_device, reset_klsi_device,
+           set_line_coding_klsi, set_control_line_state_klsi, 
+           on_read_klsi, on_write_klsi, on_close_klsi,
+           "KLSI KL5KUSB105D"}, 
+
 };
 /* supported devices*/
 usb_support_descriptor *supported_devices;
