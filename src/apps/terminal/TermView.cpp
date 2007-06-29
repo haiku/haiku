@@ -762,7 +762,7 @@ TermView::ViewThread(void *data)
 	int width, height;
 	sDrawRect pos;
 
-//#define INVALIDATE
+#define INVALIDATE
 #ifndef INVALIDATE
 	int i, j, count;
 	int m_flag;
@@ -1578,7 +1578,7 @@ TermView::DoCopy()
 		return;
 
 	BString copyStr;
-	fTextBuffer->GetStringFromRegion(copyStr);
+	fTextBuffer->GetStringFromRegion(copyStr, fSelStart, fSelEnd);
 
 	if (be_clipboard->Lock()) {
 		BMessage *clipMsg = NULL;
@@ -1701,7 +1701,7 @@ TermView::MouseDown(BPoint where)
 		if (HasSelection()) {
 			// copy text from region
 			BString copy;
-			fTextBuffer->GetStringFromRegion(copy);
+			fTextBuffer->GetStringFromRegion(copy, fSelStart, fSelEnd);
 			WritePTY((uchar *)copy.String(), copy.Length());
 		} else {
 			// copy text from clipboard.
@@ -1747,7 +1747,7 @@ TermView::MouseDown(BPoint where)
 						&& abs((int)(where.y - p.y)) < 4);
 				
 					BString copyStr("");
-					fTextBuffer->GetStringFromRegion(copyStr);
+					fTextBuffer->GetStringFromRegion(copyStr, fSelStart, fSelEnd);
 				
 					BMessage msg(B_MIME_TYPE);
 					msg.AddData("text/plain", B_MIME_TYPE, copyStr.String(), copyStr.Length());
@@ -2004,7 +2004,8 @@ TermView::SelectWord(BPoint where, int mod)
 	
 	pos = BPointToCurPos(where);
 	flag = fTextBuffer->FindWord(pos, &start, &end);
-	
+	fTextBuffer->Select(start, end);
+
 	if (mod & B_SHIFT_KEY) {
 	
 		if (flag) {
@@ -2122,8 +2123,8 @@ TermView::Find(const BString &str, bool forwardSearch, bool matchCase, bool matc
 	BString buffer;	
 	fTextBuffer->ToString(buffer);
 
-	CurPos selectionstart = fTextBuffer->GetSelectionStart();
-	CurPos selectionend = fTextBuffer->GetSelectionEnd();
+	CurPos selectionstart = fSelStart;
+	CurPos selectionend = fSelEnd;
 
 	int offset = 0;
 	if (selectionstart.x >= 0 || selectionstart.y >= 0) {
@@ -2205,7 +2206,7 @@ void
 TermView::GetSelection(BString &str)
 {
 	str.SetTo("");
-	fTextBuffer->GetStringFromRegion(str);
+	fTextBuffer->GetStringFromRegion(str, fSelStart, fSelEnd);
 }
 
 

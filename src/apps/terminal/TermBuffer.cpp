@@ -294,7 +294,7 @@ TermBuffer::EraseBelow(const CurPos &pos)
 	memset(fBuffer[ROW(row)] + col, 0, (fColumnSize - col ) * sizeof(term_buffer));
 
 	for (int i = row; i < fRowSize; i++) {
-		EraseLine(i);
+		_EraseLine(i);
 	}
 }
 
@@ -312,7 +312,7 @@ TermBuffer::ScrollRegion(int top, int bot, int dir, int num)
 			}
 
 			fBuffer[ROW(bot)] = ptr;
-			EraseLine(bot);
+			_EraseLine(bot);
 		}
 	} else {
 		// scroll up
@@ -324,7 +324,7 @@ TermBuffer::ScrollRegion(int top, int bot, int dir, int num)
 			}
 
 			fBuffer[ROW(top)] = ptr;
-			EraseLine(top);
+			_EraseLine(top);
 		}
 	}
 }
@@ -335,7 +335,7 @@ void
 TermBuffer::ScrollLine()
 {
 	for (int i = fRowSize; i < fRowSize * 2; i++) {
-		EraseLine(i);
+		_EraseLine(i);
 	}
 
 	fRowOffset++;
@@ -359,10 +359,10 @@ TermBuffer::ResizeTo(int newRows, int newCols, int offset)
 
 	if (newRows <= fRowSize) {
 		for (i = newRows; i <= fRowSize; i++)
-			EraseLine(i);
+			_EraseLine(i);
 	} else {
 		for (i = fRowSize; i <= newRows * 2; i++)
-			EraseLine(i);
+			_EraseLine(i);
 	}
 
 	fCurrentColumnSize = newCols;
@@ -380,7 +380,7 @@ TermBuffer::Size() const
 
 
 void
-TermBuffer::EraseLine(int row)
+TermBuffer::_EraseLine(int row)
 {
 	memset(fBuffer[ROW(row)], 0, fColumnSize * sizeof(term_buffer));
 }
@@ -422,13 +422,6 @@ TermBuffer::DeSelect()
 }
 
 
-//! Check cursor position which be including selected area.
-int
-TermBuffer::CheckSelectedRegion (const CurPos &pos)
-{
-	return fSelStart.y == pos.y || fSelEnd.y == pos.y;
-}
-
 
 bool
 TermBuffer::FindWord(const CurPos &pos, CurPos *start, CurPos *end)
@@ -459,11 +452,9 @@ TermBuffer::FindWord(const CurPos &pos, CurPos *start, CurPos *end)
 	if (start_x > x)
 		return false;
 
-	fSelStart.Set(start_x, y);
 	if (start != NULL)
 		start->Set(start_x, y);
 
-	fSelEnd.Set(x, y);
 	if (end != NULL)
 		end->Set(x, y);
 
@@ -520,33 +511,33 @@ start:
 }
 
 
-//! Get a string from selected region.
+//! Get a string from the given region.
 void
-TermBuffer::GetStringFromRegion(BString &str)
+TermBuffer::GetStringFromRegion(BString &str, const CurPos &start, const CurPos &end)
 {
 	int y;
 
-	if (fSelStart.y == fSelEnd.y) {
-		y = fSelStart.y;
-		for (int x = fSelStart.x ; x <= fSelEnd.x; x++) {
+	if (start.y == end.y) {
+		y = start.y;
+		for (int x = start.x ; x <= end.x; x++) {
 			GetCharFromRegion(x, y, str);
 		}
 	} else {
-		y = fSelStart.y;
-		for (int x = fSelStart.x ; x < fCurrentColumnSize; x++) {
+		y = start.y;
+		for (int x = start.x ; x < fCurrentColumnSize; x++) {
 			GetCharFromRegion(x, y, str);
 		}
 		AvoidWaste(str);
 
-		for (y = fSelStart.y + 1 ; y < fSelEnd.y; y++) {
+		for (y = start.y + 1 ; y < end.y; y++) {
 			for (int x = 0 ; x < fCurrentColumnSize; x++) {
 				GetCharFromRegion(x, y, str);
 			}
 			AvoidWaste(str);
 		}
 
-		y = fSelEnd.y;
-		for (int x = 0 ; x <= fSelEnd.x; x++) {
+		y = end.y;
+		for (int x = 0 ; x <= end.x; x++) {
 			GetCharFromRegion(x, y, str);
 		}
 	}

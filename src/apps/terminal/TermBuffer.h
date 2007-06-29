@@ -60,7 +60,7 @@ public:
 	//
 	int	GetChar(int row, int col, uchar *u, ushort *attr);
 	int	GetString(int row, int col, int num, uchar *u, ushort *attr);
-	void 	GetStringFromRegion (BString &copyStr);  
+	void 	GetStringFromRegion(BString &copyStr, const CurPos &start, const CurPos &end);  
 
 	void	WriteChar(const CurPos &pos, const uchar *u, ushort attr);
 	void	WriteCR(const CurPos &pos);
@@ -96,13 +96,11 @@ public:
 	
 	const CurPos &GetSelectionStart() { return fSelStart; };
 	const CurPos &GetSelectionEnd()   { return fSelEnd; };
-
-	int	CheckSelectedRegion (const CurPos &pos);
 	  
 	//
 	// Other methods
 	//
-	bool	FindWord (const CurPos &pos, CurPos *start, CurPos *end);
+	bool	FindWord(const CurPos &pos, CurPos *start, CurPos *end);
 
 	void	GetCharFromRegion (int x, int y, BString &str);
 static	void	AvoidWaste (BString &str);
@@ -112,7 +110,7 @@ static	void	AvoidWaste (BString &str);
 	int32	Size() const;
 	  
 private:
-	void	EraseLine(int line);
+	void	_EraseLine(int line);
 
 	term_buffer 	**fBuffer;
 	int		fBufferSize;
