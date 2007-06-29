@@ -1651,7 +1651,7 @@ void
 TermView::DoClearAll(void)
 {
 	DeSelect();
-	fTextBuffer->ClearAll();
+	fTextBuffer->Clear();
 	
 	fTop = 0;
 	ScrollTo(0, 0);

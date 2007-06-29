@@ -27,122 +27,103 @@
  * THE SOFTWARE.
  *
  */
-#ifndef TERMBUFFER_H_INCLUDED
-#define TERMBUFFER_H_INCLUDED
+#ifndef _TERMBUFFER_H
+#define _TERMBUFFER_H
 
 #include <SupportDefs.h>
 #include "TermConst.h"
 #include "CurPos.h"
 
-// Scroll direction
-const int array_up = 0;
-const int array_down = 1;
-
-#define ARRAY_SIZE 512
 
 #define MIN_COLS 10
 #define MAX_COLS 256
 
-#define ROW(x) (((x) + mRowOffset) % buffer_size)
 
-typedef struct term_buffer
+struct term_buffer
 {
-  uchar code[4];
-  int16 attr;
-  int16 status;
-} term_buffer;
+	uchar code[4];
+	int16 attr;
+	int16 status;
+};
+
 
 class CurPos;
 class BString;
 
-class TermBuffer
-{
+class TermBuffer {
 public:
-  TermBuffer(int row, int col);
-  ~TermBuffer();
+	TermBuffer(int row, int col);
+	~TermBuffer();
 
-  //
-  // Get and Put charactor.
-  //
-  int	GetChar (int row, int col, uchar *u, ushort *attr);
+	//
+	// Get and Put charactor.
+	//
+	int	GetChar(int row, int col, uchar *u, ushort *attr);
+	int	GetString(int row, int col, int num, uchar *u, ushort *attr);
+	void 	GetStringFromRegion (BString &copyStr);  
 
-  int	GetString (int row, int col, int num, uchar *u, ushort *attr);
-  void  GetStringFromRegion (BString &copyStr);  
+	void	WriteChar(const CurPos &pos, const uchar *u, ushort attr);
+	void	WriteCR(const CurPos &pos);
+	void	InsertSpace(const CurPos &pos, int num);
 
-  void	WriteChar (const CurPos &pos, const uchar *u, ushort attr);
-  void	WriteCR (const CurPos &pos);
-  void	InsertSpace (const CurPos &pos, int num);
+	//
+	// Delete Character.
+	//
+	void	DeleteChar(const CurPos &pos, int num);
+	void	EraseBelow(const CurPos &pos);
 
-  //
-  // Delete Charactor.
-  //
-  void	DeleteChar (const CurPos &pos, int num);
-  void	EraseBelow (const CurPos &pos);
+	//
+	// Movement and Scroll buffer.
+	//
+	void	ScrollRegion(int top, int bot, int dir, int num);
+	void	ScrollLine();
+		
+	//
+	// Resize buffer.
+	//
+	void	ResizeTo(int newRows, int newCols, int offset);
 
-  //
-  // Movement and Scroll buffer.
-  //
-  void	ScrollRegion (int top, int bot, int dir, int num);
-  void	ScrollLine (void);
+	//
+	// Clear contents of TermBuffer.
+	//
+	void	Clear();
 	
-  //
-  // Resize buffer.
-  //
-  void	ResizeTo(int newRows, int newCols, int offset);
+	//
+	// Selection Methods
+	//
+	void	Select(const CurPos &start, const CurPos &end);
+	void	DeSelect();
+	
+	const CurPos &GetSelectionStart() { return fSelStart; };
+	const CurPos &GetSelectionEnd()   { return fSelEnd; };
 
-  //
-  // Clear contents of TermBuffer.
-  //
-  void	ClearAll (void);
+	int	CheckSelectedRegion (const CurPos &pos);
+	  
+	//
+	// Other methods
+	//
+	bool	FindWord (const CurPos &pos, CurPos *start, CurPos *end);
 
-  //
-  // Selection Methods
-  //
-  void	Select (const CurPos &start, const CurPos &end);
-  void	DeSelect (void);
-  
-  const CurPos &GetSelectionStart (void) { return mSelStart; };
-  const CurPos &GetSelectionEnd (void)   { return mSelEnd; };
+	void	GetCharFromRegion (int x, int y, BString &str);
+static	void	AvoidWaste (BString &str);
+	 
+	void	ToString(BString &str);
 
-  int	CheckSelectedRegion (const CurPos &pos);
-  
-  //
-  // Other methods
-  //
-  bool	FindWord (const CurPos &pos, CurPos *start, CurPos *end);
-
-  void	GetCharFromRegion (int x, int y, BString &str);
-  void	AvoidWaste (BString &str);
-  
-  void  ToString (BString &str);
-
-  int32 GetArraySize (void);
-  
-  /*
-   * PRIVATE MEMBER FUNCTIONS.
-   */
+	int32	Size() const;
+	  
 private:
+	void	EraseLine(int line);
 
-  //
-  // Erase 1 column.
-  //
-  void	EraseLine (int row);
+	term_buffer 	**fBuffer;
+	int		fBufferSize;
 
-  /*
-   * DATA MEMBER.
-   */
-  term_buffer 	**mBase;
-  
-  int		mColSize;
-  int		mRowSize;
-  int		mNowColSize;
-  int		mRowOffset;
+	int		fColumnSize;
+	int		fRowSize;
+	int		fCurrentColumnSize;
+	int		fRowOffset;
 
-  CurPos	mSelStart;
-  CurPos	mSelEnd;
-
-  int		buffer_size;
-	
+	CurPos		fSelStart;
+	CurPos		fSelEnd;	
 };
 
-#endif //TERMARAY_H_INCLUDED
+#endif // _TERMBUFFER_H

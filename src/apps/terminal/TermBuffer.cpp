@@ -86,6 +86,10 @@ but it font is full width font on preference panel.
 #include "CurPos.h"
 #include "PrefHandler.h"
 
+#define ARRAY_SIZE 512
+#define ROW(x) (((x) + fRowOffset) % fBufferSize)
+
+
 extern PrefHandler *gTermPref;
 
 
@@ -98,35 +102,35 @@ TermBuffer::TermBuffer(int rows, int cols)
 	else if (cols > MAX_COLS)
 		cols = MAX_COLS;
 
-	mColSize = MAX_COLS;
-	mNowColSize = cols;
-	mRowSize = rows;
+	fColumnSize = MAX_COLS;
+	fCurrentColumnSize = cols;
+	fRowSize = rows;
 
-	mRowOffset = 0;
+	fRowOffset = 0;
 	
-	mSelStart.Set(-1,-1);
-	mSelEnd.Set(-1,-1);
+	fSelStart.Set(-1,-1);
+	fSelEnd.Set(-1,-1);
 
-	buffer_size = gTermPref->getInt32(PREF_HISTORY_SIZE);
-	if (buffer_size < 1000)
-		buffer_size = 1000;
+	fBufferSize = gTermPref->getInt32(PREF_HISTORY_SIZE);
+	if (fBufferSize < 1000)
+		fBufferSize = 1000;
 
 	// Allocate buffer
-	mBase = (term_buffer**)malloc(sizeof(term_buffer*) * buffer_size);
+	fBuffer = (term_buffer**)malloc(sizeof(term_buffer*) * fBufferSize);
 
-	for (int i = 0; i < buffer_size; i++) {
-		mBase[i] = (term_buffer *)calloc(mColSize + 1, sizeof(term_buffer));
+	for (int i = 0; i < fBufferSize; i++) {
+		fBuffer[i] = (term_buffer *)calloc(fColumnSize + 1, sizeof(term_buffer));
 	}
 }
 
 
 TermBuffer::~TermBuffer()
 {
-	for (int i = 0; i < buffer_size; i++) {
-		free(mBase[i]);
+	for (int i = 0; i < fBufferSize; i++) {
+		free(fBuffer[i]);
 	}
 
-	free(mBase);
+	free(fBuffer);
 }
 
 
@@ -137,7 +141,7 @@ TermBuffer::GetChar(int row, int col, uchar *buf, ushort *attr)
 	if (row < 0 || col < 0)
 		return -1;
 
-	term_buffer *ptr = (mBase[row % buffer_size] + col);
+	term_buffer *ptr = (fBuffer[row % fBufferSize] + col);
 
 	if (ptr->status == A_CHAR)
 		memcpy(buf, (char *)(ptr->code), 4);
@@ -156,14 +160,14 @@ TermBuffer::GetString(int row, int col, int num, uchar *buf,
 	int count = 0, all_count = 0;
 	term_buffer *ptr;
 
-	ptr = (mBase[row % buffer_size]);
+	ptr = (fBuffer[row % fBufferSize]);
 	ptr += col;
 	*attr = ptr->attr;
 
 	if (ptr->status == NO_CHAR) {
 		// Buffer is empty and No selected by mouse.
 		do {
-			if (col >= mNowColSize)
+			if (col >= fCurrentColumnSize)
 				return -1;
 
 			col++;
@@ -172,13 +176,13 @@ TermBuffer::GetString(int row, int col, int num, uchar *buf,
 			if (ptr->status == A_CHAR)
 				return count;
 
-			if (mSelStart.y == row) {
-				if (col == mSelStart.x)
+			if (fSelStart.y == row) {
+				if (col == fSelStart.x)
 					return count;
 			}
 
-			if (mSelEnd.y == row) {
-				if (col - 1 == mSelEnd.x)
+			if (fSelEnd.y == row) {
+				if (col - 1 == fSelEnd.x)
 					return count;
 			}
 		} while (col <= num);
@@ -204,12 +208,12 @@ TermBuffer::GetString(int row, int col, int num, uchar *buf,
 		ptr++;
 		col++;
 
-		if (mSelStart.y == row) {
-			if (col == mSelStart.x)
+		if (fSelStart.y == row) {
+			if (col == fSelStart.x)
 				return all_count;
 		}
-		if (mSelEnd.y == row) {
-			if (col - 1 == mSelEnd.x)
+		if (fSelEnd.y == row) {
+			if (col - 1 == fSelEnd.x)
 				return all_count;
 		}
 	}
@@ -227,7 +231,7 @@ TermBuffer::WriteChar(const CurPos &pos, const uchar *u, ushort attr)
 	const int row = pos.y;
 	const int col = pos.x;
 
-	ptr = (mBase[ROW(row)] + col);
+	ptr = (fBuffer[ROW(row)] + col);
 	memcpy ((char *)ptr->code, u, 4);
 
 	if (IS_WIDTH(attr))
@@ -245,7 +249,7 @@ TermBuffer::WriteCR(const CurPos &pos)
 	int row = pos.y;
 	int col = pos.x;
 
-	term_buffer *ptr = (mBase[ROW(row)] + col);
+	term_buffer *ptr = (fBuffer[ROW(row)] + col);
 	ptr->attr |= DUMPCR;
 }
 
@@ -257,11 +261,11 @@ TermBuffer::InsertSpace(const CurPos &pos, int num)
 	const int row = pos.y;
 	const int col = pos.x;
 
-	for (int i = mNowColSize - num; i >= col; i--) {
-		*(mBase[ROW(row)] + i + num) = *(mBase[ROW(row)] + i);
+	for (int i = fCurrentColumnSize - num; i >= col; i--) {
+		*(fBuffer[ROW(row)] + i + num) = *(fBuffer[ROW(row)] + i);
 	}
 
-	memset(mBase[ROW(row)] + col, 0, num * sizeof(term_buffer));
+	memset(fBuffer[ROW(row)] + col, 0, num * sizeof(term_buffer));
 }
 
 
@@ -272,11 +276,11 @@ TermBuffer::DeleteChar(const CurPos &pos, int num)
 	const int row = pos.y;
 	const int col = pos.x;
 
-	term_buffer *ptr = mBase[ROW(row)];
-	size_t movesize = mNowColSize - (col + num);
+	term_buffer *ptr = fBuffer[ROW(row)];
+	size_t movesize = fCurrentColumnSize - (col + num);
 
 	memmove(ptr + col, ptr + col + num, movesize * sizeof(term_buffer));
-	memset(ptr + (mNowColSize - num), 0, num * sizeof(term_buffer));
+	memset(ptr + (fCurrentColumnSize - num), 0, num * sizeof(term_buffer));
 }
 
 
@@ -287,9 +291,9 @@ TermBuffer::EraseBelow(const CurPos &pos)
 	const int row = pos.y;
 	const int col = pos.x;
 
-	memset(mBase[ROW(row)] + col, 0, (mColSize - col ) * sizeof(term_buffer));
+	memset(fBuffer[ROW(row)] + col, 0, (fColumnSize - col ) * sizeof(term_buffer));
 
-	for (int i = row; i < mRowSize; i++) {
+	for (int i = row; i < fRowSize; i++) {
 		EraseLine(i);
 	}
 }
@@ -301,25 +305,25 @@ TermBuffer::ScrollRegion(int top, int bot, int dir, int num)
 {
 	if (dir == SCRUP) {
 		for (int i = 0; i < num; i++) {
-			term_buffer *ptr = mBase[ROW(top)];
+			term_buffer *ptr = fBuffer[ROW(top)];
 
 			for (int j = top; j < bot; j++) {
-				mBase[ROW(j)] = mBase[ROW(j+1)];
+				fBuffer[ROW(j)] = fBuffer[ROW(j+1)];
 			}
 
-			mBase[ROW(bot)] = ptr;
+			fBuffer[ROW(bot)] = ptr;
 			EraseLine(bot);
 		}
 	} else {
 		// scroll up
 		for (int i = 0; i < num; i++) {
-			term_buffer *ptr = mBase[ROW(bot)];
+			term_buffer *ptr = fBuffer[ROW(bot)];
 
 			for (int j = bot; j > top; j--) {
-				mBase[ROW(j)] = mBase[ROW(j-1)];
+				fBuffer[ROW(j)] = fBuffer[ROW(j-1)];
 			}
 
-			mBase[ROW(top)] = ptr;
+			fBuffer[ROW(top)] = ptr;
 			EraseLine(top);
 		}
 	}
@@ -330,11 +334,11 @@ TermBuffer::ScrollRegion(int top, int bot, int dir, int num)
 void
 TermBuffer::ScrollLine()
 {
-	for (int i = mRowSize; i < mRowSize * 2; i++) {
+	for (int i = fRowSize; i < fRowSize * 2; i++) {
 		EraseLine(i);
 	}
 
-	mRowOffset++;
+	fRowOffset++;
 }
 
 
@@ -353,44 +357,44 @@ TermBuffer::ResizeTo(int newRows, int newCols, int offset)
 	else if (newCols > MAX_COLS)
 		newCols = MAX_COLS;
 
-	if (newRows <= mRowSize) {
-		for (i = newRows; i <= mRowSize; i++)
+	if (newRows <= fRowSize) {
+		for (i = newRows; i <= fRowSize; i++)
 			EraseLine(i);
 	} else {
-		for (i = mRowSize; i <= newRows * 2; i++)
+		for (i = fRowSize; i <= newRows * 2; i++)
 			EraseLine(i);
 	}
 
-	mNowColSize = newCols;
-	mRowOffset += offset;
-	mRowSize = newRows;
+	fCurrentColumnSize = newCols;
+	fRowOffset += offset;
+	fRowSize = newRows;
 }
 
 
 //! Get the buffer's size.
 int32
-TermBuffer::GetArraySize()
+TermBuffer::Size() const
 {
-	return buffer_size;
+	return fBufferSize;
 }
 
 
 void
 TermBuffer::EraseLine(int row)
 {
-	memset(mBase[ROW(row)], 0, mColSize * sizeof(term_buffer));
+	memset(fBuffer[ROW(row)], 0, fColumnSize * sizeof(term_buffer));
 }
 
 
 //! Clear the contents of the TermBuffer.
 void
-TermBuffer::ClearAll()
+TermBuffer::Clear()
 {
-	for (int i = 0; i < buffer_size; i++) {
-		memset(mBase[i], 0, mColSize * sizeof(term_buffer));
+	for (int i = 0; i < fBufferSize; i++) {
+		memset(fBuffer[i], 0, fColumnSize * sizeof(term_buffer));
 	}
 
-	mRowOffset = 0;
+	fRowOffset = 0;
 	DeSelect();
 }
 
@@ -400,11 +404,11 @@ void
 TermBuffer::Select(const CurPos &start, const CurPos &end)
 {
 	if (end < start) {
-		mSelStart = end;
-		mSelEnd = start;
+		fSelStart = end;
+		fSelEnd = start;
 	} else {
-		mSelStart = start;
-		mSelEnd = end;
+		fSelStart = start;
+		fSelEnd = end;
 	}
 }
 
@@ -413,8 +417,8 @@ TermBuffer::Select(const CurPos &start, const CurPos &end)
 void
 TermBuffer::DeSelect()
 {
-	mSelStart.Set(-1, -1);
-	mSelEnd.Set(-1, -1);
+	fSelStart.Set(-1, -1);
+	fSelEnd.Set(-1, -1);
 }
 
 
@@ -422,7 +426,7 @@ TermBuffer::DeSelect()
 int
 TermBuffer::CheckSelectedRegion (const CurPos &pos)
 {
-	return mSelStart.y == pos.y || mSelEnd.y == pos.y;
+	return fSelStart.y == pos.y || fSelEnd.y == pos.y;
 }
 
 
@@ -445,7 +449,7 @@ TermBuffer::FindWord(const CurPos &pos, CurPos *start, CurPos *end)
 	start_x = x;
 
 	// Search end point
-	for (x = pos.x; x < mColSize; x++) {
+	for (x = pos.x; x < fColumnSize; x++) {
 		if (GetChar(y, x, buf, &attr) == NO_CHAR || *buf == ' ') {
 			--x;
 			break;
@@ -455,11 +459,11 @@ TermBuffer::FindWord(const CurPos &pos, CurPos *start, CurPos *end)
 	if (start_x > x)
 		return false;
 
-	mSelStart.Set(start_x, y);
+	fSelStart.Set(start_x, y);
 	if (start != NULL)
 		start->Set(start_x, y);
 
-	mSelEnd.Set(x, y);
+	fSelEnd.Set(x, y);
 	if (end != NULL)
 		end->Set(x, y);
 
@@ -496,6 +500,7 @@ TermBuffer::GetCharFromRegion(int x, int y, BString &str)
 
 
 //! Delete useless char at end of line and convert LF code.
+/* static */
 inline void
 TermBuffer::AvoidWaste(BString &str)
 {
@@ -521,27 +526,27 @@ TermBuffer::GetStringFromRegion(BString &str)
 {
 	int y;
 
-	if (mSelStart.y == mSelEnd.y) {
-		y = mSelStart.y;
-		for (int x = mSelStart.x ; x <= mSelEnd.x; x++) {
+	if (fSelStart.y == fSelEnd.y) {
+		y = fSelStart.y;
+		for (int x = fSelStart.x ; x <= fSelEnd.x; x++) {
 			GetCharFromRegion(x, y, str);
 		}
 	} else {
-		y = mSelStart.y;
-		for (int x = mSelStart.x ; x < mNowColSize; x++) {
+		y = fSelStart.y;
+		for (int x = fSelStart.x ; x < fCurrentColumnSize; x++) {
 			GetCharFromRegion(x, y, str);
 		}
 		AvoidWaste(str);
 
-		for (y = mSelStart.y + 1 ; y < mSelEnd.y; y++) {
-			for (int x = 0 ; x < mNowColSize; x++) {
+		for (y = fSelStart.y + 1 ; y < fSelEnd.y; y++) {
+			for (int x = 0 ; x < fCurrentColumnSize; x++) {
 				GetCharFromRegion(x, y, str);
 			}
 			AvoidWaste(str);
 		}
 
-		y = mSelEnd.y;
-		for (int x = 0 ; x <= mSelEnd.x; x++) {
+		y = fSelEnd.y;
+		for (int x = 0 ; x <= fSelEnd.x; x++) {
 			GetCharFromRegion(x, y, str);
 		}
 	}
@@ -551,8 +556,8 @@ TermBuffer::GetStringFromRegion(BString &str)
 void
 TermBuffer::ToString(BString &str)
 {
-	for (int y = 0; y < mRowSize; y++) {
-		for (int x = 0; x < mNowColSize; x++) {
+	for (int y = 0; y < fRowSize; y++) {
+		for (int x = 0; x < fCurrentColumnSize; x++) {
 			GetCharFromRegion(x, y, str);
 		}
 	}
