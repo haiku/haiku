@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku. All rights reserved.
+ * Copyright 2003-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors in chronological order:
@@ -27,6 +27,7 @@ class DeskButton : public BView {
 		virtual	status_t Archive(BMessage *data, bool deep = true) const;
 
 		// misc BView overrides
+		virtual void AttachedToWindow();
 		virtual void MouseDown(BPoint);
 		virtual void Draw(BRect updateRect);
 		virtual void MessageReceived(BMessage* message);

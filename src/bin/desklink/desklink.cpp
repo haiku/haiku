@@ -1,11 +1,12 @@
 /*
- * Copyright 2003-2006, Haiku. All rights reserved.
+ * Copyright 2003-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors in chronological order:
  *		Jérôme Duval
  *		François Revol
  *		Marcus Overhagen
+ *		Jonas Sundström
  */
 
 //! VolumeControl and link items in Deskbar
@@ -43,7 +44,7 @@
 #define VOLUME_CTL_NAME "MediaReplicant"
 	/* R5 name needed, Media prefs manel removes by name */
 
-#define SETTINGS_FILE "x-vnd.OBOS.DeskbarVolumeControlSettings"
+#define SETTINGS_FILE "x-vnd.Haiku-desklink"
 
 const char *kAppSignature = "application/x-vnd.Haiku-desklink";
 	// the application signature used by the replicant to find the
@@ -66,6 +67,7 @@ public:
 	virtual	status_t Archive(BMessage *data, bool deep = true) const;
 
 	// misc BView overrides
+	virtual void AttachedToWindow();
 	virtual void MouseDown(BPoint);
 	virtual void MouseUp(BPoint);
 	virtual void Draw(BRect updateRect);
@@ -106,16 +108,6 @@ MediaReplicant::MediaReplicant(BRect frame, const char *name,
 	// Background Bitmap
 	fSegments = new BBitmap(BRect(0, 0, kSpeakerWidth - 1, kSpeakerHeight - 1), B_CMAP8);
 	fSegments->SetBits(kSpeakerBits, kSpeakerWidth*kSpeakerHeight, 0, B_CMAP8);
-	// Background Color
-	SetViewColor(184,184,184);
-
-	//add dragger
-	BRect rect(Bounds());
-	rect.left = rect.right-7.0; 
-	rect.top = rect.bottom-7.0;
-	BDragger *dragger = new BDragger(rect, this, B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	AddChild(dragger);
-	dragger->SetViewColor(B_TRANSPARENT_32_BIT);
 	LoadSettings();
 }
 
@@ -166,7 +158,7 @@ MediaReplicant::MessageReceived(BMessage *message)
 	case B_ABOUT_REQUESTED:
 		(new BAlert("About Volume Control", "Volume Control (Replicant)\n"
 			    "  Brought to you by Jérôme DUVAL.\n\n"
-			    "Copyright " B_UTF8_COPYRIGHT "2003-2006, Haiku","OK"))->Go();
+			    "Copyright " B_UTF8_COPYRIGHT "2003-2007, Haiku","OK"))->Go();
 		break;
 	case OPEN_MEDIA_PLAYER:
 		// launch the media player app
@@ -248,6 +240,17 @@ MediaReplicant::LaunchBySig(const char *sig)
 }
 
 
+void
+MediaReplicant::AttachedToWindow()
+{
+	BView *parent = Parent();
+	if (parent)
+		SetViewColor(parent->ViewColor());
+
+	BView::AttachedToWindow();
+}
+
+
 void 
 MediaReplicant::Draw(BRect rect)
 {
@@ -270,8 +273,8 @@ MediaReplicant::MouseDown(BPoint point)
 	if (mouseButtons & B_SECONDARY_MOUSE_BUTTON) {
 		BPopUpMenu *menu = new BPopUpMenu("", false, false);
 		menu->SetFont(be_plain_font);
-		menu->AddItem(new BMenuItem("Media Settings...", new BMessage(MEDIA_SETTINGS)));
-		menu->AddItem(new BMenuItem("Sound Settings...", new BMessage(SOUND_SETTINGS)));
+		menu->AddItem(new BMenuItem("Media Preferences" B_UTF8_ELLIPSIS, new BMessage(MEDIA_SETTINGS)));
+		menu->AddItem(new BMenuItem("Sound Preferences" B_UTF8_ELLIPSIS, new BMessage(SOUND_SETTINGS)));
 		menu->AddSeparatorItem();
 		menu->AddItem(new BMenuItem("Open MediaPlayer", new BMessage(OPEN_MEDIA_PLAYER)));
 		menu->AddSeparatorItem();
@@ -362,6 +365,9 @@ main(int, char **argv)
 	BList actionList;
 
 	for (int32 i = 1; argv[i]!=NULL; i++) {
+		if (strcmp(argv[i], "--help") == 0)
+			break;
+		
 		if (strcmp(argv[i], "--list") == 0) {
 			BDeskbar db;
 			int32 i, found = 0, count;

@@ -1,9 +1,10 @@
 /*
- * Copyright 2003-2006, Haiku. All rights reserved.
+ * Copyright 2003-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors in chronological order:
  *		Jérôme Duval
+ *		Jonas Sundström
  */
 
 
@@ -35,18 +36,11 @@ DeskButton::DeskButton(BRect frame, entry_ref* ref, const char* name,
 	fActionList(actions),
 	fTitleList(titles)
 {
-	// Background Color
-	SetViewColor(184, 184, 184);
-
-	//add dragger
-	BRect rect(Bounds());
-	rect.left = rect.right - 7.0; 
-	rect.top = rect.bottom - 7.0;
-	BDragger *dragger = new BDragger(rect, this, B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	AddChild(dragger);
-	dragger->SetViewColor(B_TRANSPARENT_32_BIT);
-
+#ifdef __HAIKU__
+	fSegments = new BBitmap(BRect(0,0,15,15), B_RGBA32);
+#else
 	fSegments = new BBitmap(BRect(0,0,15,15), B_CMAP8);
+#endif
 	BNodeInfo::GetTrackerIcon(&fRef, fSegments, B_MINI_ICON);
 }
 
@@ -65,7 +59,11 @@ DeskButton::DeskButton(BMessage *message)
 		index++;
 	}
 	
+#ifdef __HAIKU__
+	fSegments = new BBitmap(BRect(0,0,15,15), B_RGBA32);
+#else
 	fSegments = new BBitmap(BRect(0,0,15,15), B_CMAP8);
+#endif
 	BNodeInfo::GetTrackerIcon(&fRef, fSegments, B_MINI_ICON);
 }
 
@@ -112,7 +110,7 @@ DeskButton::MessageReceived(BMessage *message)
 		case B_ABOUT_REQUESTED:
 			(new BAlert("About Desklink", "Desklink (Replicant)\n"
 				"  Brought to you by Jérôme DUVAL.\n\n"
-				"Copyright " B_UTF8_COPYRIGHT "2003-2006, Haiku","OK"))->Go();
+				"Copyright " B_UTF8_COPYRIGHT "2003-2007, Haiku","OK"))->Go();
 			break;
 		case OPEN_REF:
 			be_roster->Launch(&fRef);
@@ -133,12 +131,28 @@ DeskButton::MessageReceived(BMessage *message)
 }
 
 
+void
+DeskButton::AttachedToWindow()
+{
+	BView *parent = Parent();
+	if (parent)
+		SetViewColor(parent->ViewColor());
+
+	BView::AttachedToWindow();
+}
+
+
 void 
 DeskButton::Draw(BRect rect)
 {
 	BView::Draw(rect);
 
+#ifdef __HAIKU__
+	SetDrawingMode(B_OP_ALPHA);
+	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+#else
 	SetDrawingMode(B_OP_OVER);
+#endif
 	DrawBitmap(fSegments);
 }
 
