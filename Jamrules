@@ -45,6 +45,3 @@ include [ FDirName $(HAIKU_BUILD_RULES_DIR) BuildSetup ] ;
 }
 
 PrepareConfigVariables ;
-
-# specify the Haiku image contents
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuImage ] ;

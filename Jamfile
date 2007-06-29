@@ -142,5 +142,8 @@ if $(HAIKU_DONT_INCLUDE_SRC) {
 	SubInclude HAIKU_TOP src ;
 }
 
+# specify the Haiku image contents
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuImage ] ;
+
 # Perform deferred SubIncludes.
 ExecuteDeferredSubIncludes ;

@@ -236,6 +236,9 @@ rule CopySetHaikuRevision target : source
 		Depends $(target) : $(svnEntries) ;
 	}
 
+	HAIKU_INCLUDE_IN_IMAGE on $(target)
+		= [ on $(source) return $(HAIKU_INCLUDE_IN_IMAGE) ] ;
+
 	Depends $(target) : <build>copyattr <build>set_haiku_revision $(source) ;
 	CopySetHaikuRevision1 $(target)
 		: <build>copyattr <build>set_haiku_revision $(source) ;
