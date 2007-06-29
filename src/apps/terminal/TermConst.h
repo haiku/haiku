@@ -189,11 +189,5 @@ const float VIEW_OFFSET = 3;
 // TypeDefs
 typedef unsigned short ushort;
 
-typedef struct {
-  int x1;
-  int y1;
-  int x2;
-  int y2;
-} sDrawRect;
 
 #endif	// TERMCONST_H_INCLUDED

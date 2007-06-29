@@ -180,10 +180,9 @@ class TermView : public BView {
 		virtual void	MessageReceived(BMessage* message);
 
 	private:
-		static int32	ViewThread(void *);
 		static int32	MouseTracking(void *);
 
-		thread_id		_InitViewThread(void);
+		status_t	_InitMouseThread(void);
 		void DrawLines(int , int, ushort, uchar *, int, int, int, BView *);
 		void DoPrint(BRect updateRect);
 		void ResizeScrBarRange (void);
@@ -224,7 +223,7 @@ class TermView : public BView {
 		BPoint  CurPosToBPoint(const CurPos &pos);
 
 		bool	CheckSelectedRegion(const CurPos &pos);
-		inline void SendDataToDrawEngine(int, int, int, int);
+		inline void Redraw(int, int, int, int);
 
 		int fTerminalFd;
 
@@ -311,14 +310,8 @@ class TermView : public BView {
 		bool fMouseTracking;
 
 		// thread ID / flags.
-		thread_id fViewThread;
 		thread_id fMouseThread;
 		bool fQuitting;
-
-		// DrawEngine parameter.
-		sem_id fDrawRectSem;
-		sDrawRect fDrawRectBuffer[RECT_BUF_SIZE];
-		int fDrawRect_p;
 
 		// Input Method parameter.
 		int fIMViewPtr;

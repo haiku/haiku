@@ -95,11 +95,8 @@ TermView::TermView(BRect frame, CodeConv *inCodeConv, int fd)
 	fScrBufSize(gTermPref->getInt32(PREF_HISTORY_SIZE)),
 	fScrRegionSet(0),
 	fMouseTracking(false),
-	fViewThread(-1),
 	fMouseThread(-1),
 	fQuitting(false),
-	fDrawRectSem(-1),
-	fDrawRect_p(0),
 	fIMflag(false)
 {
 	// Reset cursor
@@ -114,7 +111,7 @@ TermView::TermView(BRect frame, CodeConv *inCodeConv, int fd)
 	SetTermFont(be_plain_font, be_plain_font);	
 	//SetIMAware(gTermPref->getInt32(PREF_IM_AWARE));
 
-	_InitViewThread();
+	_InitMouseThread();
 }
 
 
@@ -122,9 +119,7 @@ TermView::~TermView()
 {
 	delete fTextBuffer;
 	fQuitting = true;
-	kill_thread(fViewThread);
 	kill_thread(fMouseThread);
-	delete_sem(fDrawRectSem);
 }
 
 
@@ -343,7 +338,7 @@ TermView::TermDraw(const CurPos &start, const CurPos &end)
 	int y2 = end.y;
 
 	// Send Draw Rectangle data to Draw Engine thread.
-	SendDataToDrawEngine(x1, y1 + fTop / fFontHeight,
+	Redraw(x1, y1 + fTop / fFontHeight,
 		x2, y2 + fTop / fFontHeight);
 	return 0;
 }
@@ -362,16 +357,16 @@ TermView::TermDrawSelectedRegion(CurPos start, CurPos end)
 	}
 
 	if (start.y == end.y) {
-		SendDataToDrawEngine(start.x, start.y,
+		Redraw(start.x, start.y,
 		end.x, end.y);
 	} else {
-		SendDataToDrawEngine(start.x, start.y,
+		Redraw(start.x, start.y,
 		fTermColumns, start.y);
 
 		if (end.y - start.y > 0)
-			SendDataToDrawEngine(0, start.y + 1, fTermColumns, end.y - 1);
+			Redraw(0, start.y + 1, fTermColumns, end.y - 1);
 
-		SendDataToDrawEngine(0, end.y, end.x, end.y);
+		Redraw(0, end.y, end.x, end.y);
 	}
 
 	return 0;
@@ -395,17 +390,17 @@ TermView::TermDrawRegion(CurPos start, CurPos end)
 	end.y += top;
 
 	if (start.y == end.y) {
-		SendDataToDrawEngine(start.x, start.y,
+		Redraw(start.x, start.y,
 		end.x, end.y);
 	} else {
-		SendDataToDrawEngine(start.x, start.y,
+		Redraw(start.x, start.y,
 		fTermColumns - 1, start.y);
 
 		if (end.y - start.y > 0) {
-			SendDataToDrawEngine(0, start.y + 1,
+			Redraw(0, start.y + 1,
 			fTermColumns - 1, end.y - 1);
 		}
-		SendDataToDrawEngine(0, end.y,
+		Redraw(0, end.y,
 		end.x, end.y);
 	}
 
@@ -729,19 +724,9 @@ TermView::ScrollAtCursor()
 }
 
 
-thread_id
-TermView::_InitViewThread()
+status_t
+TermView::_InitMouseThread()
 {
-	// spwan Draw Engine thread.
-	if (fViewThread < 0) {
-		fViewThread = spawn_thread(ViewThread, "DrawEngine",
-			B_DISPLAY_PRIORITY, this);
-	} else
-		return B_BAD_THREAD_ID;
-
-	fDrawRectSem = create_sem(0, "draw_engine_sem");
-	resume_thread(fViewThread);
-
 	// spawn Mouse Tracking thread.
 	if (fMouseThread < 0) {
 		fMouseThread = spawn_thread(MouseTracking, "MouseTracking",
@@ -749,84 +734,7 @@ TermView::_InitViewThread()
 	} else
 		return B_BAD_THREAD_ID;
 
-	resume_thread(fMouseThread);
-
-	return B_OK;
-}
-
-
-//! Thread of Draw Character to View.
-int32
-TermView::ViewThread(void *data)
-{
-	int width, height;
-	sDrawRect pos;
-
-#define INVALIDATE
-#ifndef INVALIDATE
-	int i, j, count;
-	int m_flag;
-	ushort attr;
-	uchar buf[256];
-	BRect eraseRect;
-#endif
-
-	int inDrawRect_p = 0;
-
-	TermView *theObj =(TermView *)data;
-
-	while (!theObj->fQuitting) {
-		// Wait semaphore
-		acquire_sem(theObj->fDrawRectSem);
-
-		pos = theObj->fDrawRectBuffer[inDrawRect_p];
-		inDrawRect_p++;
-		inDrawRect_p %= RECT_BUF_SIZE;
-
-		width = theObj->fFontWidth;
-		height = theObj->fFontHeight;
-
-#ifdef INVALIDATE
-		BRect r(pos.x1 * width, pos.y1 * height,
-		(pos.x2 + 1) * width -1,(pos.y2 + 1) * height -1);
-		
-		if (theObj->LockLooper()) {
-			theObj->Invalidate(r);
-			theObj->UnlockLooper();
-		}
-#else
-		
-		if (theObj->LockLooper()) {
-			for (j = pos.y1; j <= pos.y2; j++) {
-				for (i = pos.x1; i <= pos.x2;) {
-					count = theObj->fTextBuffer->GetString(j, i, pos.x2, buf, &attr);
-					m_flag = theObj->CheckSelectedRegion(CurPos(i, j));
-
-					if (count < 0) {
-						eraseRect.Set(width * i, height * j,
-							width  *(i - count) - 1, height *(j + 1) - 1);
-
-						if (m_flag)
-							theObj->SetHighColor(theObj->fSelectBackColor);
-						else
-							theObj->SetHighColor(theObj->fTextBackColor);
-
-						theObj->FillRect(eraseRect);
-						count = -count;
-					} else {
-						theObj->DrawLines(width * i, height * j,
-							attr, buf, count, m_flag, false, theObj);
-					}
-					i += count;
-				}
-			}
-			theObj->UnlockLooper();
-		}
-#endif
-	}
-
-	exit_thread(B_OK);
-	return 0;
+	return resume_thread(fMouseThread);
 }
 
 
@@ -2210,30 +2118,16 @@ TermView::GetSelection(BString &str)
 }
 
 
-// Send DrawRect data to Draw Engine thread.
+
 inline void
-TermView::SendDataToDrawEngine(int x1, int y1, int x2, int y2)
+TermView::Redraw(int x1, int y1, int x2, int y2)
 {
-	sem_info info;
-	
-	for (;;) {
-		get_sem_info(fDrawRectSem, &info);
-	
-		if ((RECT_BUF_SIZE - info.count) < 2) {
-			snooze(10 * 1000);
-			continue;
-		} else
-			break;
-	}
-	
-	fDrawRectBuffer[fDrawRect_p].x1 = x1;
-	fDrawRectBuffer[fDrawRect_p].x2 = x2;
-	fDrawRectBuffer[fDrawRect_p].y1 = y1;
-	fDrawRectBuffer[fDrawRect_p].y2 = y2;
-	
-	fDrawRect_p++;
-	fDrawRect_p %= RECT_BUF_SIZE;
-	
-	release_sem(fDrawRectSem);
+	BRect rect(x1 * fFontWidth, y1 * fFontHeight,
+		(x2 + 1) * fFontWidth -1, (y2 + 1) * fFontHeight -1);
+
+	if (LockLooper()) {
+		Invalidate(rect);
+		UnlockLooper();
+	}	
 }
 
