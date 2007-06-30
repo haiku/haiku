@@ -341,9 +341,13 @@ ControlHook(void *dev, uint32 msg, void *buf, size_t len)
 		
 		case VMWARE_GET_DEVICE_NAME:
 			dprintf("device: VMWARE_GET_DEVICE_NAME %s\n", gPd->names[0]);
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 			if (user_strlcpy((char *)buf, gPd->names[0],
 					B_PATH_NAME_LENGTH) < B_OK)
 				return B_BAD_ADDRESS;
+#else
+			strlcpy((char *)buf, gPd->names[0], B_PATH_NAME_LENGTH);
+#endif
 			return B_OK;
 			
 	}

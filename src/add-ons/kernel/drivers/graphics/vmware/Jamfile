@@ -11,6 +11,10 @@ KernelAddon vmware :
 	device.c
 ;
 
+if $(TARGET_PLATFORM) != haiku {
+	LinkAgainst vmware : $(TARGET_HAIKU_COMPATIBILITY_LIBS) ;
+}
+
 Package haiku-vmware-video-svn :
 	vmware : 
 	boot home config add-ons kernel drivers bin ;
