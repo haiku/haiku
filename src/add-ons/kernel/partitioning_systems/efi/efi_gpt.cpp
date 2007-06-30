@@ -187,7 +187,7 @@ efi_gpt_scan_partition(int fd, partition_data *partition, void *_cookie)
 
 	// scan all children
 
-	status_t status;
+	status_t status = B_ERROR;
 	if (status == B_ENTRY_NOT_FOUND)
 		return B_OK;
 

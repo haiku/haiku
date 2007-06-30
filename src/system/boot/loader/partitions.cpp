@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -32,6 +32,9 @@ using namespace boot;
 static const partition_module_info *sPartitionModules[] = {
 #ifdef BOOT_SUPPORT_PARTITION_AMIGA
 	&gAmigaPartitionModule,
+#endif
+#ifdef BOOT_SUPPORT_PARTITION_EFI
+	&gEFIPartitionModule,
 #endif
 #ifdef BOOT_SUPPORT_PARTITION_INTEL
 	&gIntelPartitionMapModule,

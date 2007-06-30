@@ -9,6 +9,7 @@ SubDirSysHdrs $(HAIKU_TOP) src tests system boot loader ;
 SubDirHdrs $(HAIKU_TOP) src system boot loader ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems amiga ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems apple ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems efi ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems intel ;
 
 # we need to redefine certain calls in the boot loader so that
@@ -34,6 +35,7 @@ ObjectDefines
 	# partitions
 	amiga_rdb.cpp
 	apple.cpp
+	efi_gpt.cpp
 	intel.cpp
 	PartitionMap.cpp
 	PartitionMapParser.cpp
@@ -91,6 +93,7 @@ SimpleTest BootLoaderTest :
 	# partitioning systems
 	amiga_rdb.cpp
 	apple.cpp
+	efi_gpt.cpp
 	intel.cpp
 	PartitionMap.cpp
 	PartitionMapParser.cpp
@@ -129,6 +132,9 @@ SEARCH on [ FGristFiles amiga_rdb.cpp ]
 
 SEARCH on [ FGristFiles apple.cpp ]
 	= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems apple ] ;
+
+SEARCH on [ FGristFiles efi_gpt.cpp ]
+	= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems efi ] ;
 
 SEARCH on [ FGristFiles intel.cpp PartitionMap.cpp PartitionMapParser.cpp ]
 	= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems intel ] ;

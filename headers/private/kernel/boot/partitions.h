@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef KERNEL_BOOT_PARTITIONS_H
@@ -76,9 +76,10 @@ class Partition : public Node, public partition_data {
 // structure definitions as used in the boot loader
 struct partition_module_info;
 extern partition_module_info gAmigaPartitionModule;
+extern partition_module_info gApplePartitionModule;
+extern partition_module_info gEFIPartitionModule;
 extern partition_module_info gIntelPartitionMapModule;
 extern partition_module_info gIntelExtendedPartitionModule;
-extern partition_module_info gApplePartitionModule;
 
 // the file system module info is not a standard module info;
 // their modules are specifically written for the boot loader,
