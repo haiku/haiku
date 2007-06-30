@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -163,6 +163,7 @@ arch_vm_init(kernel_args *args)
 }
 
 
+/*!	Marks DMA region as in-use, and maps it into the kernel space */
 status_t
 arch_vm_init_post_area(kernel_args *args)
 {
@@ -186,13 +187,15 @@ arch_vm_init_post_area(kernel_args *args)
 }
 
 
+/*!	Gets rid of all yet unmapped (and therefore now unused) page tables */
 status_t
 arch_vm_init_end(kernel_args *args)
 {
 	TRACE(("arch_vm_init_endvm: entry\n"));
 
 	// throw away anything in the kernel_args.pgtable[] that's not yet mapped
-	vm_free_unused_boot_loader_range(KERNEL_BASE, 0x400000 * args->arch_args.num_pgtables);
+	vm_free_unused_boot_loader_range(KERNEL_BASE,
+		0x400000 * args->arch_args.num_pgtables);
 
 	return B_OK;
 }

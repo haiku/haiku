@@ -183,6 +183,9 @@ early_query(addr_t va, addr_t *_physicalAddress)
 }
 
 
+/*!	Acquires the map's recursive lock, and resets the invalidate pages counter
+	in case it's the first locking recursion.
+*/
 static status_t
 lock_tmap(vm_translation_map *map)
 {
@@ -199,6 +202,10 @@ lock_tmap(vm_translation_map *map)
 }
 
 
+/*!	Unlocks the map, and, if we'll actually losing the recursive lock,
+	flush all pending changes of this map (ie. flush TLB caches as
+	needed).
+*/
 static status_t
 unlock_tmap(vm_translation_map *map)
 {
