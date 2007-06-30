@@ -213,6 +213,7 @@ find_reserved_area(vm_address_space *addressSpace, addr_t start,
 		if (size == next->size) {
 			// the new area fully covers the reversed range
 			area->address_space_next = next->address_space_next;
+			vm_put_address_space(addressSpace);
 			free(next);
 		} else {
 			// resize the reserved range behind the area
@@ -543,6 +544,8 @@ map_backing_store(vm_address_space *addressSpace, vm_cache_ref *cacheRef,
 		newCache->type = CACHE_TYPE_RAM;
 		newCache->temporary = 1;
 		newCache->scan_skip = cache->scan_skip;
+		newCache->virtual_base = offset;
+		newCache->virtual_size = offset + size;
 
 		vm_cache_add_consumer_locked(cacheRef, newCache);
 
@@ -550,10 +553,8 @@ map_backing_store(vm_address_space *addressSpace, vm_cache_ref *cacheRef,
 		mutex_lock(&newCacheRef->lock);
 
 		cache = newCache;
-		cacheRef = newCache->ref;
+		cacheRef = newCacheRef;
 		store = newStore;
-		cache->virtual_base = offset;
-		cache->virtual_size = offset + size;
 	}
 
 	status = vm_cache_set_minimal_commitment_locked(cacheRef, offset + size);
@@ -649,6 +650,7 @@ vm_unreserve_address_range(team_id team, void *address, addr_t size)
 				addressSpace->areas = reserved->address_space_next;
 
 			area = reserved->address_space_next;
+			vm_put_address_space(addressSpace);
 			free(reserved);
 			continue;
 		}
@@ -3738,7 +3740,7 @@ fill_area_info(struct vm_area *area, area_info *info, size_t size)
 	needs any kind of locking, and actually exists.
 	Used by both lock_memory() and unlock_memory().
 */
-status_t
+static status_t
 test_lock_memory(vm_address_space *addressSpace, addr_t address,
 	bool &needsLocking)
 {

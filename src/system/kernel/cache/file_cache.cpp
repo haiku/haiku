@@ -1292,6 +1292,7 @@ file_cache_delete(void *_cacheRef)
 
 	TRACE(("file_cache_delete(ref = %p)\n", ref));
 
+	vm_cache_release_ref(ref->cache);
 	vfs_put_vnode(ref->device);
 	delete ref;
 }
