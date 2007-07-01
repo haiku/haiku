@@ -1536,6 +1536,9 @@ BTranslatorRoster::Translate(translator_id id, BPositionIO* source,
 	if (source == NULL || destination == NULL)
 		return B_BAD_VALUE;
 
+	if (!fPrivate->Lock())
+		return B_ERROR;
+
 	BTranslator* translator = fPrivate->FindTranslator(id);
 	if (translator != NULL) {
 		translator->Acquire();
