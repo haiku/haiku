@@ -370,6 +370,8 @@ convert_from_24_to_24(uint8* in, uint8* out, int32 inRowBytes)
 inline void
 convert_from_32_to_24(uint8* in, uint8* out, int32 inRowBytes)
 {
+	inRowBytes /= 4;
+
 	for (int32 i = 0; i < inRowBytes; i++) {
 		out[0] = in[2];
 		out[1] = in[1];
@@ -384,10 +386,12 @@ convert_from_32_to_24(uint8* in, uint8* out, int32 inRowBytes)
 inline void
 convert_from_32b_to_24(uint8* in, uint8* out, int32 inRowBytes)
 {
+	inRowBytes /= 4;
+
 	for (int32 i = 0; i < inRowBytes; i++) {
-		out[1] = in[0];
-		out[2] = in[1];
-		out[3] = in[2];
+		out[0] = in[1];
+		out[1] = in[2];
+		out[2] = in[3];
 
 		in += 4;
 		out += 3;
