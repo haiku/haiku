@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel drivers audio ;
 
 SubInclude HAIKU_TOP src add-ons kernel drivers audio ac97 ;
+SubInclude HAIKU_TOP src add-ons kernel drivers audio cmedia ;
 SubInclude HAIKU_TOP src add-ons kernel drivers audio echo ;
 SubInclude HAIKU_TOP src add-ons kernel drivers audio emuxki ;
 SubInclude HAIKU_TOP src add-ons kernel drivers audio hda ;

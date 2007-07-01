@@ -1,0 +1,22 @@
+SubDir HAIKU_TOP src add-ons kernel drivers audio cmedia ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders audio ;
+
+KernelAddon cmedia :
+	cm.c
+	joy.c
+	midi.c
+	mixer.c
+	mux.c
+	pcm.c
+;
+
+Package haiku-cmedia-cvs
+	:
+	cmedia
+	:
+	boot home config add-ons kernel drivers bin ;
+
+PackageDriverSymLink haiku-cmedia-cvs : audio cmedia ;
