@@ -1082,7 +1082,8 @@ FrameMoved(origin);
 
 		case _UPDATE_:
 		{
-			//bigtime_t now = system_time();
+//bigtime_t now = system_time();
+//bigtime_t drawTime = 0;
 			STRACE(("info:BWindow handling _UPDATE_.\n"));
 			BRect updateRect;
 
@@ -1136,23 +1137,26 @@ FrameMoved(origin);
 				// draw
 				int32 count = tokens.CountItems();
 				for (int32 i = 0; i < count; i++) {
+//bigtime_t drawStart = system_time();
 					if (BView* view = _FindView((int32)tokens.ItemAtFast(i)))
 						view->_Draw(updateRect);
 					else
 						printf("_UPDATE_ - didn't find view by token: %ld\n", (int32)tokens.ItemAtFast(i));
+//drawTime += system_time() - drawStart;
 				}
 				// TODO: the tokens are actually hirachically sorted,
 				// so traversing the list in revers and calling
 				// child->DrawAfterChildren would actually work correctly,
 				// only that drawing outside a view is not yet supported
 				// in the app_server.
+//printf("  %ld views drawn, total Draw() time: %lld\n", count, drawTime);
 			}
 
 			fLink->StartMessage(AS_END_UPDATE);
 			fLink->Flush();
 			fInTransaction = false;
 
-			//printf("BWindow(%s) - UPDATE took %lld usecs\n", Title(), system_time() - now);
+//printf("BWindow(%s) - UPDATE took %lld usecs\n", Title(), system_time() - now);
 			break;
 		}
 
@@ -1658,6 +1662,8 @@ BView *
 BWindow::FindView(BPoint point) const
 {
 	BAutolock _(const_cast<BWindow*>(this));
+	// point is assumed to be in window coordinates,
+	// fTopView has same bounds as window
 	return _FindView(fTopView, point);
 }
 
@@ -3274,20 +3280,20 @@ BWindow::_FindView(int32 token)
 }
 
 
-BView *
-BWindow::_FindView(BView *view, BPoint point) const
+BView*
+BWindow::_FindView(BView* view, BPoint point) const
 {
-	// TODO: this is totally broken (bounds vs. frame) - since
-	//	BView::Bounds() potentially queries the app_server
-	//	anyway, we could just let the app_server answer this
-	//	query directly.
+	// point is assumed to be already in view's coordinates
+	// TODO: since BView::Bounds() potentially queries the app_server anyway,
+	// we could just let the app_server answer this query directly.
 	if (view->Bounds().Contains(point) && !view->fFirstChild)
 		return view;
 
-	BView *child = view->fFirstChild;
+	BView* child = view->fFirstChild;
 
 	while (child != NULL) {
-		if ((view = _FindView(child, point)) != NULL)
+		BPoint childPoint = point - child->LeftTop();
+		if ((view = _FindView(child, childPoint)) != NULL)
 			return view;
 
 		child = child->fNextSibling;
@@ -3297,7 +3303,7 @@ BWindow::_FindView(BView *view, BPoint point) const
 }
 
 
-BView *
+BView*
 BWindow::_FindNextNavigable(BView* focus, uint32 flags)
 {
 	if (focus == NULL)
