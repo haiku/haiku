@@ -135,7 +135,7 @@ TermApp::Quit()
 	if (!gUsageRequested){
 		int status;
 
-		kill(-sh_pid, SIGHUP);
+		kill(-gShPid, SIGHUP);
 		wait(&status);
 
 		_UnregisterTerminal();

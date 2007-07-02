@@ -112,7 +112,7 @@ typedef struct
 
 /* global variables */
 
-pid_t sh_pid;
+pid_t gShPid;
 
 
 static status_t
@@ -184,12 +184,12 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 	thread_id terminalThread = find_thread(NULL);
 
 	/* Fork a child process. */
-	if ((sh_pid = fork()) < 0) {
+	if ((gShPid = fork()) < 0) {
 		close(master);
 		return -1;
 	}
 
-	if (sh_pid == 0) {
+	if (gShPid == 0) {
 	    // Now in child process.
 
 		/*
@@ -442,7 +442,7 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 				handshake.row = row;
 				handshake.col = col;
 				handshake.status = PTY_WS;
-				send_handshake_message(sh_pid, handshake);
+				send_handshake_message(gShPid, handshake);
 				break;
 		}
 	}

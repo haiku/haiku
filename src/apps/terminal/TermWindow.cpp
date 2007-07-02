@@ -311,7 +311,7 @@ TermWindow::MessageReceived(BMessage *message)
 			
 			// try launching two different ways to work around possible problems
 			if (be_roster->Launch(&info.ref)!=B_OK)
-			be_roster->Launch(TERM_SIGNATURE);
+				be_roster->Launch(TERM_SIGNATURE);
 			break;
 		}
 		case MENU_PREF_OPEN: {
@@ -546,9 +546,9 @@ TermWindow::MessageReceived(BMessage *message)
 			break;	
 		}
 		case MSG_FONT_CHANGED: {
-	    	gTermPref->setString (PREF_HALF_FONT_FAMILY, fNewFontMenu->FindMarked()->Label());
-	    	this->PostMessage (MSG_HALF_FONT_CHANGED);
-		    break;
+	    		gTermPref->setString (PREF_HALF_FONT_FAMILY, fNewFontMenu->FindMarked()->Label());
+	    		PostMessage (MSG_HALF_FONT_CHANGED);
+			break;
 		}
 		case MSG_COLOR_CHANGED: {
 			fBaseView->SetViewColor (gTermPref->getRGB (PREF_TEXT_BACK_COLOR));
@@ -604,19 +604,6 @@ TermWindow::QuitRequested()
 }
 
 
-//!	Get Machine Timezone.
-int
-TermWindow::GetTimeZone()
-{
-	struct timeval tv;
-	struct timezone tm;
-	
-	gettimeofday (&tv, &tm);
-	
-	return -tm.tz_minuteswest / 60;
-}
-
-
 void
 TermWindow::TermWinActivate()
 {
@@ -635,27 +622,30 @@ TermWindow::TermWinActivate()
 status_t
 TermWindow::GetSupportedSuites(BMessage *msg) 
 { 
-  static property_info prop_list[] = { 
-     { "encode",
-       {B_GET_PROPERTY, 0},
-       {B_DIRECT_SPECIFIER, 0},
-       "get muterminal encode"}, 
-     { "encode",
-       {B_SET_PROPERTY, 0},
-       {B_DIRECT_SPECIFIER, 0},
-       "set muterminal encode"}, 
-     { "tty",
-       {B_GET_PROPERTY, 0},
-       {B_DIRECT_SPECIFIER, 0},
-       "get tty_name."}, 
-     { 0  }
-     
-  };
-  msg->AddString("suites", "suite/vnd.naan-termwindow"); 
-  BPropertyInfo prop_info(prop_list); 
-  msg->AddFlat("messages", &prop_info); 
-  return BWindow::GetSupportedSuites(msg); 
+	static property_info propList[] = { 
+		{ "encode",
+		{B_GET_PROPERTY, 0},
+		{B_DIRECT_SPECIFIER, 0},
+		"get muterminal encode"}, 
+		{ "encode",
+		{B_SET_PROPERTY, 0},
+		{B_DIRECT_SPECIFIER, 0},
+		"set muterminal encode"}, 
+		{ "tty",
+		{B_GET_PROPERTY, 0},
+		{B_DIRECT_SPECIFIER, 0},
+		"get tty_name."}, 
+		{ 0  }
+		     
+	};
+
+	msg->AddString("suites", "suite/vnd.naan-termwindow"); 
+	BPropertyInfo propInfo(propList); 
+	msg->AddFlat("messages", &propInfo); 
+	return BWindow::GetSupportedSuites(msg); 
 }
+
+
 ////////////////////////////////////////////////////////////////////////////
 // ResolveSpecifier
 //
@@ -665,28 +655,26 @@ TermWindow::ResolveSpecifier(BMessage *msg, int32 index,
            BMessage *specifier, int32 form,
            const char *property)
 {
-  if ( (strcmp(property, "encode") == 0) 
-    && ((msg->what == B_SET_PROPERTY) || (msg->what == B_GET_PROPERTY) )) 
-      return this;
-  else if ( (strcmp(property, "tty") == 0) 
-    &&  (msg->what == B_GET_PROPERTY) ) 
-      return this;
+	if (((strcmp(property, "encode") == 0) 
+		&& ((msg->what == B_SET_PROPERTY) || (msg->what == B_GET_PROPERTY))) 
+		|| ((strcmp(property, "tty") == 0) &&  (msg->what == B_GET_PROPERTY))) 
+	return this;
 
-  return BWindow::ResolveSpecifier(msg, index, specifier, form, property);
+	return BWindow::ResolveSpecifier(msg, index, specifier, form, property);
 }
+
 
 ////////////////////////////////////////////////////////////////////////////
 // SetCoding
 //  Set coding utility functions.
 ////////////////////////////////////////////////////////////////////////////
-void SetCoding (int coding)
+void
+SetCoding(int coding)
 {
-  const etable *p = encoding_table;
-  p += coding;
+	const etable *p = encoding_table;
+	p += coding;
   
-  gNowCoding = coding;
-    
-  return;
+	gNowCoding = coding;
 }
 
 

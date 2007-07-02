@@ -1015,7 +1015,7 @@ TermView::UpdateSIGWINCH()
 		ws.ws_row = fTermRows;
 		ws.ws_col = fTermColumns;
 		ioctl(fTerminalFd, TIOCSWINSZ, &ws);
-		kill(-sh_pid, SIGWINCH);
+		kill(-gShPid, SIGWINCH);
 
 		fFrameResized = 0;
 		if (fScrRegionSet == 0)
@@ -1214,7 +1214,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 	tcgetattr(fTerminalFd, &tio);
 	if (*bytes == tio.c_cc[VINTR]) {
 		if (tio.c_lflag & ISIG)
-			kill(-sh_pid, SIGINT);
+			kill(-gShPid, SIGINT);
 	}
 
 	// Terminal changes RET, ENTER, F1...F12, and ARROW key code.

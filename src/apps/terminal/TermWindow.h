@@ -68,7 +68,6 @@ class TermWindow : public BWindow {
 	private:
 		void			InitWindow();
 		void			SetupMenu();
-		int				GetTimeZone();
 		status_t		DoPageSetup();
 		void			DoPrint();
 

@@ -87,8 +87,7 @@
 int spawn_shell (int, int, const char *, const char *);
 void Setenv (const char *, const char *);
 
-extern pid_t sh_pid;	/* shell process ID */
-extern int gPfd_num;	/* number of gPfd */
+extern pid_t gShPid;	/* shell process ID */
 
 
 #endif /* SPAWN_H */
