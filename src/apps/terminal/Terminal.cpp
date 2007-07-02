@@ -31,10 +31,6 @@
 #include <stdio.h>
 
 #include "TermApp.h"
-#include "PrefHandler.h"
-
-
-PrefHandler *gTermPref;		/* Preference temporary */
 
 
 int

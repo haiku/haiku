@@ -32,8 +32,8 @@
 #include <unistd.h>
 
 
-// Preference temporary
-extern PrefHandler *gTermPref;
+// Globals
+PrefHandler *gTermPref;
 extern char gWindowName[];
 
 bool gUsageRequested = false;
@@ -101,6 +101,7 @@ TermApp::TermApp()
 
 TermApp::~TermApp()
 {
+	delete gTermPref;
 }
 
 
@@ -140,7 +141,6 @@ TermApp::Quit()
 		_UnregisterTerminal();
 	}
 
-	delete gTermPref;
 	BApplication::Quit();
 }
 
