@@ -55,7 +55,7 @@ struct efi_table_header {
 		{ return B_LENDIAN_TO_HOST_INT32(entry_size); }
 	uint32 EntriesCRC() const
 		{ return B_LENDIAN_TO_HOST_INT32(entries_crc); }
-};
+} _PACKED;
 
 #define EFI_PARTITION_HEADER		"EFI PART"
 #define EFI_HEADER_LOCATION			1
@@ -65,11 +65,18 @@ struct efi_table_header {
 struct efi_partition_entry {
 	guid_t	partition_type;
 	guid_t	unique_guid;
-	uint64	start_lba;
-	uint64	end_lba;
+	uint64	start_block;
+	uint64	end_block;
 	uint64	attributes;
 	uint16	name[EFI_PARTITION_NAME_LENGTH];
-};
+
+	uint64 StartBlock() const
+		{ return B_LENDIAN_TO_HOST_INT64(start_block); }
+	uint64 EndBlock() const
+		{ return B_LENDIAN_TO_HOST_INT64(end_block); }
+	uint64 Attributes() const
+		{ return B_LENDIAN_TO_HOST_INT64(attributes); }
+} _PACKED;
 
 #endif	/* EFI_GPT_H */
 
