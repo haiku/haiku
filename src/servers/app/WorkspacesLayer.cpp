@@ -410,11 +410,11 @@ WorkspacesLayer::MouseDown(BMessage* message, BPoint where)
 	}
 
 	// If this window is movable, we keep it selected
+	// (we prevent our own window from being moved, too)
 
 	if (fSelectedWindow != NULL && (fSelectedWindow->Flags() & B_NOT_MOVABLE) != 0
 		|| fSelectedWindow == Window()) {
 		fSelectedWindow = NULL;
-		index = -1;
 	}
 
 	fLeftTopOffset = where - windowFrame.LeftTop();
