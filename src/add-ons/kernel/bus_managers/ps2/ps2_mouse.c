@@ -125,15 +125,16 @@ ps2_packet_to_movement(mouse_cookie *cookie, uint8 packet[], mouse_movement *pos
 	bigtime_t currentTime = system_time();
 	int8 wheel_ydelta = 0;
 	int8 wheel_xdelta = 0;
-	
+
 	if (buttons != 0 && cookie->buttons_state == 0) {
 		if (cookie->click_last_time + cookie->click_speed > currentTime)
 			cookie->click_count++;
 		else
 			cookie->click_count = 1;
+
+		cookie->click_last_time = currentTime;
 	}
 
-	cookie->click_last_time = currentTime;
 	cookie->buttons_state = buttons;
 
 	if (cookie->packet_size == PS2_PACKET_INTELLIMOUSE) { 
