@@ -311,6 +311,7 @@ enum {
 	#undef ELOOP
 	#undef ENOEXEC
 	#undef EPIPE
+	#undef ENOATTR
 	
 	#define E2BIG HAIKU_E2BIG
 	#define ECHILD HAIKU_ECHILD
