@@ -28,6 +28,7 @@ MergeObject <libbe>storage_kit.o :
 	NodeMonitor.cpp
 	OffsetFile.cpp
 	Path.cpp
+	PathMonitor.cpp
 	Query.cpp
 	QueryPredicate.cpp
 	ResourceFile.cpp

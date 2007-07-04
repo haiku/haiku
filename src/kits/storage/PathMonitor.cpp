@@ -24,6 +24,14 @@
 #include <map>
 #include <set>
 
+#undef TRACE
+//#define TRACE_PATH_MONITOR
+#ifdef TRACE_PATH_MONITOR
+#	define TRACE(x) printf x
+#else
+#	define TRACE(x) ;
+#endif
+
 using namespace BPrivate;
 using namespace std;
 
@@ -57,7 +65,9 @@ class PathHandler : public BHandler {
 		void Quit();
 
 		virtual void MessageReceived(BMessage* message);
+#ifdef TRACE_PATH_MONITOR
 		void Dump();
+#endif
 
 	private:
 		status_t _GetClosest(const char* path, bool updatePath,
@@ -166,6 +176,11 @@ PathHandler::PathHandler(const char* path, uint32 flags, BMessenger target)
 	looper->Unlock();
 
 	fStatus = _AddDirectory(nodeRef);
+
+	// TODO: work-around for existing files (should not watch the directory in this case)
+	BEntry entry(path);
+	if (entry.Exists() && !entry.IsDirectory())
+		_AddFile(entry);
 }
 
 
@@ -189,6 +204,7 @@ PathHandler::Quit()
 }
 
 
+#ifdef TRACE_PATH_MONITOR
 void
 PathHandler::Dump()
 {
@@ -205,6 +221,7 @@ PathHandler::Dump()
 		printf("  %ld:%Ld\n", j->device, j->node);
 	}
 }
+#endif
 
 
 status_t
@@ -282,8 +299,8 @@ PathHandler::_EntryCreated(BMessage* message)
 		// ignore the directory if it's already known
 		if (entry.GetNodeRef(&nodeRef) == B_OK
 			&& _HasDirectory(nodeRef)) {
-			printf("    WE ALREADY HAVE DIR %s, %ld:%Ld\n",
-				name, nodeRef.device, nodeRef.node);
+			TRACE(("    WE ALREADY HAVE DIR %s, %ld:%Ld\n",
+				name, nodeRef.device, nodeRef.node));
 			return;
 		}
 
@@ -294,7 +311,7 @@ PathHandler::_EntryCreated(BMessage* message)
 			|| _WatchFilesOnly())
 			notify = parentContained;
 	} else if (entryContained) {
-		printf("  NEW ENTRY PARENT CONTAINED: %d\n", parentContained);
+		TRACE(("  NEW ENTRY PARENT CONTAINED: %d\n", parentContained));
 		_AddFile(entry);
 	}
 
@@ -364,9 +381,9 @@ PathHandler::_EntryMoved(BMessage* message)
 		// something has been added to our watched directories
 
 		nodeRef.node = node;
-printf("    ADDED TO PARENT (%d), has entry %d/%d, entry %d %d\n",
-parentContained, _HasDirectory(nodeRef), _HasFile(nodeRef),
-entryContained, _CloserToPath(entry));
+		TRACE(("    ADDED TO PARENT (%d), has entry %d/%d, entry %d %d\n",
+			parentContained, _HasDirectory(nodeRef), _HasFile(nodeRef),
+			entryContained, _CloserToPath(entry)));
 
 		if (entry.IsDirectory()) {
 			if (!_HasDirectory(nodeRef)
@@ -468,7 +485,9 @@ PathHandler::MessageReceived(BMessage* message)
 			break;
 	}
 
+#ifdef TRACE_PATH_MONITOR
 	Dump();
+#endif
 }
 
 
@@ -538,6 +557,8 @@ PathHandler::_NotifyTarget(BMessage* message) const
 {
 	BMessage update(*message);
 	update.what = B_PATH_MONITOR;
+	update.AddString("path", fPath.Path());
+
 	fTarget.SendMessage(&update);
 }
 
@@ -550,13 +571,13 @@ PathHandler::_AddDirectory(BEntry& entry)
 	if (status != B_OK)
 		return status;
 
-//#ifdef TRACE_MONITOR
+#ifdef TRACE_PATH_MONITOR
 {
 	BPath path(&entry);
 	printf("  ADD DIRECTORY %s, %ld:%Ld\n",
 		path.Path(), directory.node.device, directory.node.node);
 }
-//#endif
+#endif
 
 	// check if we are already know this directory
 
@@ -607,7 +628,7 @@ PathHandler::_AddDirectory(node_ref& nodeRef)
 status_t
 PathHandler::_RemoveDirectory(const node_ref& nodeRef, ino_t directoryNode)
 {
-	printf("  REMOVE DIRECTORY %ld:%Ld\n", nodeRef.device, nodeRef.node);
+	TRACE(("  REMOVE DIRECTORY %ld:%Ld\n", nodeRef.device, nodeRef.node));
 
 	watched_directory directory;
 	directory.node = nodeRef;
@@ -661,10 +682,12 @@ PathHandler::_AddFile(BEntry& entry)
 	if ((fFlags & (WATCH_NODE_FLAG_MASK & ~B_WATCH_DIRECTORY)) == 0)
 		return B_OK;
 
+#ifdef TRACE_PATH_MONITOR
 {
 	BPath path(&entry);
 	printf("  ADD FILE %s\n", path.Path());
 }
+#endif
 
 	node_ref nodeRef;
 	status_t status = entry.GetNodeRef(&nodeRef);
@@ -688,7 +711,7 @@ PathHandler::_AddFile(BEntry& entry)
 status_t
 PathHandler::_RemoveFile(const node_ref& nodeRef)
 {
-	printf("  REMOVE FILE %ld:%Ld\n", nodeRef.device, nodeRef.node);
+	TRACE(("  REMOVE FILE %ld:%Ld\n", nodeRef.device, nodeRef.node));
 
 	FileSet::iterator iterator = fFiles.find(nodeRef);
 	if (iterator == fFiles.end())
