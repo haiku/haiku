@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -126,8 +126,6 @@ Services::Services(const BMessage& services)
 	fUpdate(0),
 	fMaxSocket(0)
 {
-	_Update(services);
-
 	// setup pipe to communicate with the listener thread - as the listener
 	// blocks on select(), we need a mechanism to interrupt it
 	if (pipe(&fReadPipe) < 0) {
@@ -143,6 +141,8 @@ Services::Services(const BMessage& services)
 
 	fMinSocket = fWritePipe + 1;
 	fMaxSocket = fWritePipe + 1;
+
+	_Update(services);
 
 	fListener = spawn_thread(_Listener, "services listener", B_NORMAL_PRIORITY, this);
 	if (fListener >= B_OK)
@@ -237,7 +237,7 @@ Services::_StartService(struct service& service)
 	}
 
 	_NotifyListener();
-printf("Starting service '%s'\n", service.name.c_str());
+	printf("Starting service '%s'\n", service.name.c_str());
 	return B_OK;
 }
 
@@ -256,7 +256,8 @@ Services::_StopService(struct service& service)
 		for (; iterator != service.addresses.end(); iterator++) {
 			const service_address& address = *iterator;
 
-			ServiceSocketMap::iterator socketIterator = fSocketMap.find(address.socket);
+			ServiceSocketMap::iterator socketIterator
+				= fSocketMap.find(address.socket);
 			if (socketIterator != fSocketMap.end())
 				fSocketMap.erase(socketIterator);
 
@@ -440,7 +441,8 @@ Services::_LaunchService(struct service& service, int socket)
 	pid_t child = fork();
 	if (child == 0) {
 		setsid();
-			// make sure we're in our own session, and don't accidently quit the net_server
+			// make sure we're in our own session, and don't accidently quit
+			// the net_server
 
 		// We're the child, replace standard input/output
 		dup2(socket, STDIN_FILENO);
@@ -480,7 +482,6 @@ Services::_Listener()
 			snooze(1000000LL);
 		}
 
-printf("select returned!\n");
 		if (FD_ISSET(fReadPipe, &set)) {
 			char command;
 			if (read(fReadPipe, &command, 1) == 1 && command == 'q')
