@@ -42,8 +42,6 @@ extern int eigtable[];		/* ESC ignore table */
 extern int mbcstable[];		/* ESC $ */
 
 
-// MuTerminal coding system (global varriable)
-int gNowCoding = M_UTF8;
 
 #define DEFAULT -1
 #define NPARAM 10		// Max parameters
@@ -271,11 +269,11 @@ TermParse::EscParse()
 		if (GetReaderBuf(c) < B_OK)
 			break;
 
-		if (now_coding != gNowCoding) {
+		if (now_coding != GetEncoding()) {
 			/*
 			 * Change coding, change parse table.
 			 */
-			switch (gNowCoding) {
+			switch (GetEncoding()) {
 				case M_UTF8:
 					groundtable = utf8_groundtable;
 					break;
@@ -301,7 +299,7 @@ TermParse::EscParse()
 					break;
 			}
 			parsestate = groundtable;
-			now_coding = gNowCoding;
+			now_coding = GetEncoding();
     		}
 
 		switch (parsestate[c]) {

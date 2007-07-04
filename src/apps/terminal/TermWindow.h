@@ -49,7 +49,7 @@ class FindWindow;
 
 class TermWindow : public BWindow {
 	public:
-		TermWindow(BRect frame, const char* title, int gPfd);
+		TermWindow(BRect frame, const char* title, int fd);
 		virtual ~TermWindow();
 
 		void			TermWinActivate();

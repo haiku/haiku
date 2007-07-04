@@ -7,6 +7,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src kits tracker ] ;
 Application Terminal : 
 	AppearPrefView.cpp
 	CodeConv.cpp
+	Coding.cpp
 	CurPos.cpp
 	FindWindow.cpp
 	MenuUtil.cpp

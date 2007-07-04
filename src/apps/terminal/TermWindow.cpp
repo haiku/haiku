@@ -53,10 +53,6 @@ extern PrefHandler *gTermPref;
 //#define GPL_FILE  "/gpl.html"
 //#define CHLP_FILE   "file:///boot/beos/documentation/Shell%20Tools/index.html"
 
-extern int gNowCoding;  /* defined TermParce.cpp */
-
-void SetCoding(int);
-
 
 TermWindow::TermWindow(BRect frame, const char* title, int fd)
 	: BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE|B_QUIT_ON_WINDOW_CLOSE),
@@ -180,7 +176,7 @@ TermWindow::InitWindow(void)
 	fEditmenu->SetTargetForItems(fTermView);
 
 	// Initialize TermParse
-	gNowCoding = longname2op(gTermPref->getString(PREF_TEXT_ENCODING));
+	SetEncoding(longname2id(gTermPref->getString(PREF_TEXT_ENCODING)));
 	fTermParse = new TermParse(fPfd, this, fTermView, fCodeConv);
 	if (fTermParse->StartThreads() < B_OK)
 		return;
@@ -203,7 +199,7 @@ void
 TermWindow::MenusBeginning(void)
 {
 	// Syncronize Encode Menu Pop-up menu and Preference.
-	(fEncodingmenu->FindItem(op2longname(gNowCoding)))->SetMarked(true);
+	(fEncodingmenu->FindItem(id2longname(GetEncoding())))->SetMarked(true);
 	BWindow::MenusBeginning();
 }
 
@@ -277,7 +273,7 @@ TermWindow::SetupMenu(void)
 
 	fEncodingmenu = new BMenu("Font Encoding");
 	fEncodingmenu->SetRadioMode(true);
-	MakeEncodingMenu(fEncodingmenu, gNowCoding, true);
+	MakeEncodingMenu(fEncodingmenu, GetEncoding(), true);
 	fHelpmenu->AddItem(fWindowSizeMenu);  
 	fHelpmenu->AddItem(fEncodingmenu);
 //  fHelpmenu->AddItem(fNewFontMenu);
@@ -398,8 +394,7 @@ TermWindow::MessageReceived(BMessage *message)
 
 		case MENU_ENCODING: {
 			message->FindInt32 ("op", &coding_id);
-			gNowCoding = coding_id;
-			SetCoding(coding_id);
+			SetEncoding(coding_id);
 			break;
 		}
 		// Extended B_SET_PROPERTY. Dispatch this message,
@@ -410,8 +405,7 @@ TermWindow::MessageReceived(BMessage *message)
 			message->GetCurrentSpecifier(&i, &spe);
 			if (!strcmp("encode", spe.FindString("property", i))){
 				message->FindInt32 ("data",  &coding_id);
-				gNowCoding = coding_id;
-				SetCoding (coding_id);
+				SetEncoding (coding_id);
 			
 				message->SendReply(B_REPLY);
 			} else {
@@ -427,7 +421,7 @@ TermWindow::MessageReceived(BMessage *message)
 			message->GetCurrentSpecifier(&i, &spe);
 			if (!strcmp("encode", spe.FindString("property", i))){
 				BMessage reply(B_REPLY);
-				reply.AddInt32("result", gNowCoding);
+				reply.AddInt32("result", GetEncoding());
 				message->SendReply(&reply);
 			}
 			else if (!strcmp("tty", spe.FindString("property", i))) {
@@ -661,20 +655,6 @@ TermWindow::ResolveSpecifier(BMessage *msg, int32 index,
 	return this;
 
 	return BWindow::ResolveSpecifier(msg, index, specifier, form, property);
-}
-
-
-////////////////////////////////////////////////////////////////////////////
-// SetCoding
-//  Set coding utility functions.
-////////////////////////////////////////////////////////////////////////////
-void
-SetCoding(int coding)
-{
-	const etable *p = encoding_table;
-	p += coding;
-  
-	gNowCoding = coding;
 }
 
 

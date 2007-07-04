@@ -34,7 +34,6 @@
 
 // Globals
 PrefHandler *gTermPref;
-extern char gWindowName[];
 
 bool gUsageRequested = false;
 bool gGeometryRequested = false;
@@ -336,18 +335,6 @@ TermApp::RefsReceived(BMessage* message)
 status_t
 TermApp::_MakeTermWindow(BRect &frame)
 {
-	const char *encoding = gTermPref->getString(PREF_TEXT_ENCODING);
-	
-	// Get encoding name (setenv TTYPE in spawn_shell functions)
-	const etable *p = encoding_table;
-	while (p->name) {
-		if (!strcmp(p->name, encoding)) {
-			encoding = p->shortname;
-			break;
-		}
-		p++;
-	}
-	
 	const char *command = NULL;
 	if (CommandLine.Length() > 0)
 		command = CommandLine.String();
@@ -362,6 +349,8 @@ TermApp::_MakeTermWindow(BRect &frame)
 	if (cols < MIN_COLS)
 		gTermPref->setInt32(PREF_COLS, cols = MIN_COLS);
 
+	// Get encoding name (setenv TTYPE in spawn_shell functions)
+	const char *encoding = longname2shortname(gTermPref->getString(PREF_TEXT_ENCODING));
 	int pfd = spawn_shell(rows, cols, command, encoding);
 	if (pfd < 0)
 		return pfd;

@@ -40,44 +40,24 @@ MakeMenu(ulong msg, const char **items, const char *defaultItemName)
 	return menu;
 }
 
-int
-longname2op(const char *longname)
-{
-	int op = M_UTF8;
-	const etable *s = encoding_table;
-	
-	for (int i = 0; s->name; s++, i++) {
-		if (!strcmp(s->name, longname)) {
-			op = s->op;
-			break;
-		}
-	}
-	return op;
-}
 
-const char *
-op2longname(int op)
-{
-	return encoding_table[op].name;
-}
 
 void
-MakeEncodingMenu(BMenu *eMenu, int coding, bool flag)
+MakeEncodingMenu(BMenu *eMenu, int marked, bool flag)
 {
-	const etable *e = encoding_table;
+	int encoding;
 	int i = 0;
-	while (e->name) {
+	while (get_nth_encoding(i, &encoding) == B_OK) {
 		BMessage *msg = new BMessage(MENU_ENCODING);
-		msg->AddInt32("op", (int32)e->op);
+		msg->AddInt32("op", (int32)encoding);
 		if (flag)
-			eMenu->AddItem(new BMenuItem(e->name, msg, e->shortcut));
+			eMenu->AddItem(new BMenuItem(id2longname(encoding), msg, id2shortcut(encoding)));
 		else 
-			eMenu->AddItem(new BMenuItem(e->name, msg));
+			eMenu->AddItem(new BMenuItem(id2longname(encoding), msg));
 		
-		if (i == coding)
+		if (i == marked)
 			eMenu->ItemAt(i)->SetMarked(true);
 		
-		e++;
 		i++;
 	}
 }

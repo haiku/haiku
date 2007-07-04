@@ -373,7 +373,7 @@ PrefHandler::_LoadFromFile(const char* path)
 	setRGB(PREF_CURSOR_FORE_COLOR, prefs.curfg);
 	setRGB(PREF_SELECT_BACK_COLOR, prefs.selbg);
 	setRGB(PREF_SELECT_FORE_COLOR, prefs.selfg);
-	setString(PREF_TEXT_ENCODING, encoding_table[prefs.encoding].name);
+	setString(PREF_TEXT_ENCODING, id2longname(prefs.encoding));
 
 	return B_OK;
 }

@@ -28,7 +28,6 @@
  *
  */
 
-#include <stdio.h>
 
 #include "TermApp.h"
 

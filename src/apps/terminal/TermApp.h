@@ -36,9 +36,6 @@
 #include <String.h>
 
 
-extern int gPfd;
-extern char *ptyname;
-
 class TermWindow;
 class TermParse;
 class BRect;

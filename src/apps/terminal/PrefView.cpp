@@ -58,9 +58,10 @@
 PrefView::PrefView (BRect frame, const char *name)
   :BView (frame, name, B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
 {
-  SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-  fLabel.SetTo(name);
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fLabel.SetTo(name);
 }
+
 
 ////////////////////////////////////////////////////////////////////////////
 // ~PrefView ()
@@ -68,13 +69,16 @@ PrefView::PrefView (BRect frame, const char *name)
 ////////////////////////////////////////////////////////////////////////////
 PrefView::~PrefView()
 {
-
 }
+
+
 const char *
 PrefView::ViewLabel (void) const
 {
   return fLabel.String();
 }
+
+
 ////////////////////////////////////////////////////////////////////////////
 // CanApply()
 // Determines whether view can respont Apply command or not.
@@ -82,17 +86,17 @@ PrefView::ViewLabel (void) const
 bool
 PrefView::CanApply ()
 {
-  return true;
+	return true;
 }
+
 
 void
 PrefView::MessageReceived(BMessage* msg)
 {
-	BControl *control;
-
- 	switch (msg->what) {
+	switch (msg->what) {
 		case MSG_TEXT_MODIFIED: {
 			TTextControl* textControl;
+			BControl *control;
 			if (msg->FindPointer("source", (void**)&control) >= B_OK
 				&& (textControl = dynamic_cast<TTextControl*>(control))) {
 				textControl->ModifiedText(true);
@@ -106,8 +110,6 @@ PrefView::MessageReceived(BMessage* msg)
 }
 
 
-
-
 //////////////////////////////////////////////////////////////////////////////
 // SetupBColorControl
 // Make BColorControl.
@@ -115,10 +117,8 @@ PrefView::MessageReceived(BMessage* msg)
 BColorControl *
 PrefView::SetupBColorControl(BPoint p, color_control_layout layout, float cell_size, ulong msg)
 {
-  BColorControl *col;
-  
-  col = new BColorControl( p, layout, cell_size, "", new BMessage(msg));
-  AddChild(col);
-  return col;
+	BColorControl *col = new BColorControl( p, layout, cell_size, "", new BMessage(msg));
+	AddChild(col);
+	return col;
 }
 

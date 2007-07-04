@@ -49,7 +49,6 @@ using std::nothrow;
 extern int function_keycode_table[];
 extern char *function_key_char_table[];
 
-extern int gNowCoding;	// defined in TermParse.cpp
 extern PrefHandler *gTermPref; // Global Preference Handler
 
 const static rgb_color kTermColorTable[16] = {
@@ -1339,9 +1338,9 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 	} else {
 		// input multibyte character
 
-		if (gNowCoding != M_UTF8) {
+		if (GetEncoding() != M_UTF8) {
 			int cnum = fCodeConv->ConvertFromInternal(bytes, numBytes,
-				(char *)dstbuf, gNowCoding);
+				(char *)dstbuf, GetEncoding());
 			write(fTerminalFd, dstbuf, cnum);
 			return;
 		}
@@ -1586,10 +1585,10 @@ TermView::DoClearAll(void)
 void
 TermView::WritePTY(const uchar *text, int numBytes)
 {
-	if (gNowCoding != M_UTF8) {
+	if (GetEncoding() != M_UTF8) {
 		uchar *destBuffer = (uchar *)malloc(numBytes * 3);
 		numBytes = fCodeConv->ConvertFromInternal((char*)text, numBytes,
-			(char*)destBuffer, gNowCoding);
+			(char*)destBuffer, GetEncoding());
 		write(fTerminalFd, destBuffer, numBytes);
 		free(destBuffer);
 	} else {

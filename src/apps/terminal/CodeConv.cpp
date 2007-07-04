@@ -61,10 +61,6 @@ CodeConv::UTF8GetFontWidth(const char *string)
 int32
 CodeConv::ConvertFromInternal(const char *src, int32 srclen, char *dst, int coding)
 {
-	int32 dstlen = 0;
-	long state = 0;
-	int theCoding;
-
 	if (srclen == -1)
 		srclen = strlen(src);
 
@@ -74,11 +70,10 @@ CodeConv::ConvertFromInternal(const char *src, int32 srclen, char *dst, int codi
 		return srclen;
 	}
 
-	theCoding = coding_translation_table[coding];
+	int theCoding = coding_translation_table[coding];
 
-
-	dstlen = srclen * 256;
-
+	int32 dstlen = srclen * 256;
+	long state = 0;
 	convert_from_utf8(theCoding, (char *)src, &srclen,
 		(char *)dst, &dstlen, &state, '?');
 
@@ -97,10 +92,6 @@ CodeConv::ConvertFromInternal(const char *src, int32 srclen, char *dst, int codi
 int32
 CodeConv::ConvertToInternal(const char *src, int32 srclen, char *dst, int coding)
 {
-	int32 dstlen = 4;
-	long state = 0;
-	int theCoding;
-
 	if (srclen == -1)
 		srclen = strlen(src);
 
@@ -126,8 +117,9 @@ CodeConv::ConvertToInternal(const char *src, int32 srclen, char *dst, int coding
 #endif  
 #endif
 
-	theCoding = coding_translation_table[coding];
-
+	int theCoding = coding_translation_table[coding];
+	int32 dstlen = 4;
+	long state = 0;
 	convert_to_utf8(theCoding, (char *)src, &srclen,
 		(char *)dst, &dstlen, &state, '?');
 

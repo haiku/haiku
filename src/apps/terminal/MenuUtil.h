@@ -12,9 +12,6 @@
 
 #include <SupportDefs.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 class BPopUpMenu;
 class BMenu;
@@ -22,13 +19,10 @@ class PrefHandler;
   
 BPopUpMenu *	MakeMenu(ulong msg, const char **items, 
   						const char *defaultItemName);
-int				longname2op(const char *longname);
-const char *	op2longname(int op);
+
 void			MakeEncodingMenu(BMenu *eMenu, int coding, bool flag);
 void			LoadLocaleFile (PrefHandler *);
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
