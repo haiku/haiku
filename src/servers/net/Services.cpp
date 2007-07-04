@@ -30,6 +30,8 @@ struct service_address {
 	int		type;
 	int		protocol;
 	sockaddr address;
+
+	bool operator==(const struct service_address& other) const;
 };
 
 typedef vector<service_address> AddressList;
@@ -42,8 +44,8 @@ struct service {
 	AddressList addresses;
 
 	~service();
-	bool operator!=(const struct service& other);
-	bool operator==(const struct service& other);
+	bool operator!=(const struct service& other) const;
+	bool operator==(const struct service& other) const;
 };
 
 
@@ -86,6 +88,20 @@ type_for_protocol(int protocol)
 //	#pragma mark -
 
 
+bool
+service_address::operator==(const struct service_address& other) const
+{
+	return family == other.family
+		&& type == other.type
+		&& protocol == other.protocol
+		&& address.sa_len == other.address.sa_len
+		&& !memcmp(&address, &other.address, address.sa_len);
+}
+
+
+//	#pragma mark -
+
+
 service::~service()
 {
 	// close all open sockets
@@ -99,20 +115,38 @@ service::~service()
 
 
 bool
-service::operator!=(const struct service& other)
+service::operator!=(const struct service& other) const
 {
 	return !(*this == other);
 }
 
 
 bool
-service::operator==(const struct service& other)
+service::operator==(const struct service& other) const
 {
 	if (name != other.name
-		|| launch != other.launch)
+		|| launch != other.launch
+		|| addresses.size() != other.addresses.size())
 		return false;
 
-	// TODO: compare addresses!
+	// compare addresses
+
+	AddressList::const_iterator iterator = addresses.begin();
+	for (; iterator != addresses.end(); iterator++) {
+		const service_address& address = *iterator;
+
+		// find address in other addresses
+
+		AddressList::const_iterator otherIterator = other.addresses.begin();
+		for (; otherIterator != other.addresses.end(); otherIterator++) {
+			if (address == *otherIterator)
+				break;
+		}
+
+		if (otherIterator == other.addresses.end())
+			return false;
+	}
+
 	return true;
 }
 
@@ -419,7 +453,7 @@ Services::_Update(const BMessage& services)
 		} else {
 			// this service does already exist - check for any changes
 
-			if (service != iterator->second) {
+			if (*service != *iterator->second) {
 				_StopService(*iterator->second);
 				_StartService(*service);
 			}

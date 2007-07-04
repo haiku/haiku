@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src servers net ;
 
-UsePrivateHeaders app net ;
+UsePrivateHeaders app net storage ;
 
 #UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libppp headers ] ;
 #UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;

@@ -16,8 +16,8 @@
 #include <Deskbar.h>
 #include <Directory.h>
 #include <Entry.h>
-#include <NodeMonitor.h>
 #include <Path.h>
+#include <PathMonitor.h>
 #include <Roster.h>
 #include <Server.h>
 #include <TextView.h>
@@ -278,7 +278,7 @@ void
 NetServer::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case B_NODE_MONITOR:
+		case B_PATH_MONITOR:
 			fSettings.Update(message);
 			break;
 

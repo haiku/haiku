@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,8 +11,9 @@
 
 #include <Directory.h>
 #include <FindDirectory.h>
-#include <NodeMonitor.h>
+#include <fs_interface.h>
 #include <Path.h>
+#include <PathMonitor.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -158,7 +159,8 @@ Settings::_ConvertFromDriverParameter(const driver_parameter& parameter,
 		}
 	}
 
-	if (settingsTemplate->type == B_MESSAGE_TYPE && parameter.parameter_count > 0) {
+	if (settingsTemplate->type == B_MESSAGE_TYPE
+		&& parameter.parameter_count > 0) {
 		status_t status = B_OK;
 		BMessage subMessage;
 		for (int32 j = 0; j < parameter.parameter_count; j++) {
@@ -248,17 +250,7 @@ Settings::_StartWatching(const char* name, const BMessenger& target)
 	if (status < B_OK)
 		return status;
 
-	BNode node;
-	status = node.SetTo(path.Path());
-	if (status < B_OK)
-		return status;
-
-	node_ref ref;
-	status = node.GetNodeRef(&ref);
-	if (status < B_OK)
-		return status;
-
-	return watch_node(&ref, name != NULL ? B_WATCH_STAT : B_WATCH_DIRECTORY,
+	return BPrivate::BPathMonitor::StartWatching(path.Path(), B_WATCH_STAT,
 		target);
 }
 
@@ -273,9 +265,7 @@ Settings::StartMonitoring(const BMessenger& target)
 
 	fListener = target;
 
-	status_t status = _StartWatching(NULL, target);
-	if (status == B_OK)
-		status = _StartWatching("interfaces", target);
+	status_t status = _StartWatching("interfaces", target);
 	if (status == B_OK)
 		status = _StartWatching("services", target);
 
@@ -288,24 +278,37 @@ Settings::StopMonitoring(const BMessenger& target)
 {
 	// TODO: this needs to be changed in case the server will watch
 	//	anything else but settings
-	return stop_watching(target);
+	return BPrivate::BPathMonitor::StopWatching(target);
 }
 
 
 status_t
 Settings::Update(BMessage* message)
 {
-	const char* name;
+	message->PrintToStream();
+	const char* pathName;
 	int32 opcode;
 	if (message->FindInt32("opcode", &opcode) < B_OK
-		|| message->FindString("name", &name) < B_OK)
+		|| message->FindString("path", &pathName) < B_OK)
 		return B_BAD_VALUE;
 
-	if (opcode == B_ENTRY_REMOVED)
+	if (message->FindBool("removed")) {
+		// for now, we only consider existing settings files
+		// (ie. deleting "services" won't stop any)
 		return B_OK;
+	}
 
+	int32 fields;
+	if (opcode == B_STAT_CHANGED
+		&& message->FindInt32("fields", &fields) == B_OK
+		&& (fields & FS_WRITE_STAT_MTIME) == 0) {
+		// only update when the modified time has changed
+		return B_OK;
+	}
+
+	BPath path(pathName);
 	uint32 type;
-	if (_Load(name, &type) == B_OK) {
+	if (_Load(path.Leaf(), &type) == B_OK) {
 		BMessage update(type);
 		fListener.SendMessage(&update);
 	}
