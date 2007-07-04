@@ -9,12 +9,29 @@ if $(TARGET_PLATFORM) = libbe_test {
 	libbeTestSources = misc.cpp syscalls.cpp ;
 }
 
+# TODO: This is a temporary kludge. We should actually build libbe_build.so
+# and use it for the build tools even on BeOS compatible platforms. For the
+# time being we build the classes we need (BAppFileInfo and its dependencies)
+# into libhaikucompat_build.a.
+local libbePatchSources ;
+if $(HOST_PLATFORM) in r5 bone dano {
+	libbePatchSources += AppFileInfo.cpp Bitmap.cpp GraphicsDefs.cpp ;
+	ObjectSysHdrs $(libbePatchSources)
+		: [ FDirName $(HAIKU_TOP) headers build os app ] ;
+	ObjectSysHdrs $(libbePatchSources)
+		: [ FDirName $(HAIKU_TOP) headers build os interface ] ;
+	ObjectSysHdrs $(libbePatchSources)
+		: [ FDirName $(HAIKU_TOP) headers build os storage ] ;
+}
+
 BuildPlatformStaticLibrary libhaikucompat_build.a :
 	atomic.S
 	strcasestr.c
 	strlcat.c
 	strlcpy.c
 	strnlen.c
+
+	$(libbePatchSources)
 ;	
 
 StaticLibrary libhaikucompat.a :
@@ -30,3 +47,7 @@ SEARCH on [ FGristFiles strcasestr.c strlcat.c strlcpy.c strnlen.c ]
 	= [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
 SEARCH on [ FGristFiles atomic.S ]
 	= [ FDirName $(HAIKU_TOP) src system libroot os arch $(HOST_ARCH) ] ;
+SEARCH on [ FGristFiles Bitmap.cpp GraphicsDefs.cpp ]
+	= [ FDirName $(HAIKU_TOP) src build libbe interface ] ;
+SEARCH on [ FGristFiles AppFileInfo.cpp ]
+	= [ FDirName $(HAIKU_TOP) src build libbe storage ] ;

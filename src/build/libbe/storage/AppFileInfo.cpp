@@ -16,7 +16,6 @@
 #include <File.h>
 #include <fs_attr.h>
 #include <MimeType.h>
-#include <RegistrarDefs.h>
 #include <Resources.h>
 #include <Roster.h>
 #include <String.h>

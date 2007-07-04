@@ -19,6 +19,12 @@ local tools =
 
 USES_BE_API on $(tools) = true ;
 
+# TODO: temporary kludge
+local libHaikuCompat ;
+if $(HOST_PLATFORM) in r5 bone dano {
+	libHaikuCompat = libhaikucompat_build.a ;
+}
+
 BuildPlatformMain <build>catattr : catattr.cpp : $(HOST_LIBBE) ;
 
 BuildPlatformMain <build>copyattr : copyattr.cpp
@@ -35,7 +41,7 @@ BuildPlatformMain <build>mimeset :
 	database_support.cpp
 	UpdateMimeInfoThread.cpp
 	MimeUpdateThread.cpp
-	: $(HOST_LIBBE) $(HOST_LIBSTDC++) $(HOST_LIBSUPC++)
+	: $(HOST_LIBBE) $(HOST_LIBSTDC++) $(HOST_LIBSUPC++) $(libHaikuCompat)
 ;
 
 BuildPlatformMain <build>mkindex : mkindex.cpp : $(HOST_LIBBE) ;
@@ -49,7 +55,7 @@ BuildPlatformMain <build>settype : settype.cpp : $(HOST_LIBBE)
 	$(HOST_LIBSTDC++) $(HOST_LIBSUPC++) ;
 
 BuildPlatformMain <build>setversion : setversion.cpp : $(HOST_LIBBE)
-	$(HOST_LIBSTDC++) $(HOST_LIBSUPC++) ;
+	$(HOST_LIBSTDC++) $(HOST_LIBSUPC++) $(libHaikuCompat) ;
 
 BuildPlatformMain <build>xres : xres.cpp : $(HOST_LIBBE) $(HOST_LIBSTDC++)
 	$(HOST_LIBSUPC++) ;
