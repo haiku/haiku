@@ -20,10 +20,17 @@
 #include <string.h>
 
 
+struct settings_template {
+	uint32		type;
+	const char*	name;
+	const settings_template* sub_template;
+	bool		parent_value;
+};
+
 // Interface templates
 
 const static settings_template kInterfaceAddressTemplate[] = {
-	{B_STRING_TYPE, "family", NULL},
+	{B_STRING_TYPE, "family", NULL, true},
 	{B_STRING_TYPE, "address", NULL},
 	{B_STRING_TYPE, "mask", NULL},
 	{B_STRING_TYPE, "peer", NULL},
@@ -34,7 +41,7 @@ const static settings_template kInterfaceAddressTemplate[] = {
 };
 
 const static settings_template kInterfaceTemplate[] = {
-	{B_STRING_TYPE, "device", NULL},
+	{B_STRING_TYPE, "device", NULL, true},
 	{B_MESSAGE_TYPE, "address", kInterfaceAddressTemplate},
 	{B_INT32_TYPE, "flags", NULL},
 	{B_INT32_TYPE, "metric", NULL},
@@ -50,7 +57,7 @@ const static settings_template kInterfacesTemplate[] = {
 // Service templates
 
 const static settings_template kServiceAddressTemplate[] = {
-	{B_STRING_TYPE, "family", NULL},
+	{B_STRING_TYPE, "family", NULL, true},
 	{B_STRING_TYPE, "type", NULL},
 	{B_STRING_TYPE, "protocol", NULL},
 	{B_STRING_TYPE, "address", NULL},
@@ -59,7 +66,7 @@ const static settings_template kServiceAddressTemplate[] = {
 };
 
 const static settings_template kServiceTemplate[] = {
-	{B_STRING_TYPE, "name", NULL},
+	{B_STRING_TYPE, "name", NULL, true},
 	{B_MESSAGE_TYPE, "address", kServiceAddressTemplate},
 	{B_STRING_TYPE, "user", NULL},
 	{B_STRING_TYPE, "group", NULL},
@@ -129,6 +136,52 @@ Settings::_FindSettingsTemplate(const settings_template* settingsTemplate,
 }
 
 
+const settings_template*
+Settings::_FindParentValueTemplate(const settings_template* settingsTemplate)
+{
+	settingsTemplate = settingsTemplate->sub_template;
+	if (settingsTemplate == NULL)
+		return NULL;
+
+	while (settingsTemplate->name != NULL) {
+		if (settingsTemplate->parent_value)
+			return settingsTemplate;
+
+		settingsTemplate++;
+	}
+
+	return NULL;
+}
+
+
+status_t
+Settings::_AddParameter(const driver_parameter& parameter, const char* name,
+	uint32 type, BMessage& message)
+{
+	for (int32 i = 0; i < parameter.value_count; i++) {
+		switch (type) {
+			case B_STRING_TYPE:
+				message.AddString(name, parameter.values[i]);
+				break;
+			case B_INT32_TYPE:
+				message.AddInt32(name, atoi(parameter.values[i]));
+				break;
+			case B_BOOL_TYPE:
+				if (!strcasecmp(parameter.values[i], "true")
+					|| !strcasecmp(parameter.values[i], "on")
+					|| !strcasecmp(parameter.values[i], "enabled")
+					|| !strcasecmp(parameter.values[i], "1"))
+					message.AddBool(name, true);
+				else
+					message.AddBool(name, false);
+				break;
+		}
+	}
+
+	return B_OK;
+}
+
+
 status_t
 Settings::_ConvertFromDriverParameter(const driver_parameter& parameter,
 	const settings_template* settingsTemplate, BMessage& message)
@@ -139,25 +192,7 @@ Settings::_ConvertFromDriverParameter(const driver_parameter& parameter,
 		return B_BAD_VALUE;
 	}
 
-	for (int32 i = 0; i < parameter.value_count; i++) {
-		switch (settingsTemplate->type) {
-			case B_STRING_TYPE:
-				message.AddString(parameter.name, parameter.values[i]);
-				break;
-			case B_INT32_TYPE:
-				message.AddInt32(parameter.name, atoi(parameter.values[i]));
-				break;
-			case B_BOOL_TYPE:
-				if (!strcasecmp(parameter.values[i], "true")
-					|| !strcasecmp(parameter.values[i], "on")
-					|| !strcasecmp(parameter.values[i], "enabled")
-					|| !strcasecmp(parameter.values[i], "1"))
-					message.AddBool(parameter.name, true);
-				else
-					message.AddBool(parameter.name, false);
-				break;
-		}
-	}
+	_AddParameter(parameter, parameter.name, settingsTemplate->type, message);
 
 	if (settingsTemplate->type == B_MESSAGE_TYPE
 		&& parameter.parameter_count > 0) {
@@ -168,6 +203,13 @@ Settings::_ConvertFromDriverParameter(const driver_parameter& parameter,
 				settingsTemplate->sub_template, subMessage);
 			if (status < B_OK)
 				break;
+
+			const settings_template* parentValueTemplate
+				= _FindParentValueTemplate(settingsTemplate);
+			if (parentValueTemplate != NULL) {
+				_AddParameter(parameter, parentValueTemplate->name,
+					parentValueTemplate->type, subMessage);
+			}
 		}
 		if (status == B_OK)
 			message.AddMessage(parameter.name, &subMessage);

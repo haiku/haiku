@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,14 +13,9 @@
 #include <Message.h>
 #include <Messenger.h>
 
+
 class BPath;
-
-
-struct settings_template {
-	uint32		type;
-	const char*	name;
-	const settings_template* sub_template;
-};
+struct settings_template;
 
 
 class Settings {
@@ -42,8 +37,13 @@ class Settings {
 		status_t _GetPath(const char* name, BPath& path);
 
 		status_t _StartWatching(const char* name, const BMessenger& target);
-		const settings_template* _FindSettingsTemplate(const settings_template* settingsTemplate,
-			const char* name);
+		const settings_template* _FindSettingsTemplate(
+			const settings_template* settingsTemplate, const char* name);
+		const settings_template* _FindParentValueTemplate(
+			const settings_template* settingsTemplate);
+		status_t _AddParameter(const driver_parameter& parameter,
+			const char* name, uint32 type, BMessage& message);
+
 		status_t _ConvertFromDriverParameter(const driver_parameter& parameter,
 			const settings_template* settingsTemplate, BMessage& message);
 		status_t _ConvertFromDriverSettings(const driver_settings& settings,
