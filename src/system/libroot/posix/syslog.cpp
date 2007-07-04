@@ -1,7 +1,7 @@
-/* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <syslog_daemon.h>
@@ -43,15 +43,14 @@ allocate_context()
 }
 
 
-/** This function returns the current syslog context structure.
- *	If there is none for the current thread, it will create one
- *	that inherits the context attributes from the team and put it
- *	into TLS.
- *	If it could not allocate a thread context, it will return the
- *	team context; this function is guaranteed to return a valid
- *	syslog context.
- */
-
+/*! This function returns the current syslog context structure.
+	If there is none for the current thread, it will create one
+	that inherits the context attributes from the team and put it
+	into TLS.
+	If it could not allocate a thread context, it will return the
+	team context; this function is guaranteed to return a valid
+	syslog context.
+*/
 static syslog_context *
 get_context()
 {
@@ -91,14 +90,28 @@ get_context()
 }
 
 
-/** Creates the message from the given context and sends it to the syslog
- *	daemon, if the priority mask matches.
- *	If the message couldn't be delivered, and LOG_CONS was set, it will
- *	redirect the message to stderr.
- */
-
+//! Prints simplified syslog message to stderr.
 static void
-send_syslog_message(syslog_context *context, int priority, const char *text, va_list args)
+message_to_console(syslog_context *context, const char *text, va_list args)
+{
+	if (context->ident[0])
+		fprintf(stderr, "'%s' ", context->ident);
+	if (context->options & LOG_PID)
+		fprintf(stderr, "[%ld] ", find_thread(NULL));
+
+	vfprintf(stderr, text, args);
+	fputc('\n', stderr);
+}
+
+
+/*!	Creates the message from the given context and sends it to the syslog
+	daemon, if the priority mask matches.
+	If the message couldn't be delivered, and LOG_CONS was set, it will
+	redirect the message to stderr.
+*/
+static void
+send_syslog_message(syslog_context *context, int priority, const char *text,
+	va_list args)
 {
 	int options = context->options;
 
@@ -107,17 +120,10 @@ send_syslog_message(syslog_context *context, int priority, const char *text, va_
 		return;
 
 	port_id port = find_port(SYSLOG_PORT_NAME);
-
 	if ((options & LOG_PERROR) != 0
 		|| ((options & LOG_CONS) != 0 && port < B_OK)) {
 		// if asked for, print out the (simplified) message on stderr
-		if (context->ident[0])
-			fprintf(stderr, "'%s' ", context->ident);
-		if (context->options & LOG_PID)
-			fprintf(stderr, "[%ld] ", find_thread(NULL));
-
-		vfprintf(stderr, text, args);
-		fputc('\n', stderr);
+		message_to_console(context, text, args);
 	}
 	if (port < B_OK) {
 		// apparently, there is no syslog daemon running;
@@ -137,17 +143,26 @@ send_syslog_message(syslog_context *context, int priority, const char *text, va_
 	message.priority = priority;
 	strcpy(message.ident, context->ident);
 
-	int length = vsnprintf(message.message, sizeof(buffer) - sizeof(syslog_message), text, args);
+	int length = vsnprintf(message.message, sizeof(buffer)
+		- sizeof(syslog_message), text, args);
 
-	while (write_port(port, SYSLOG_MESSAGE, &message, sizeof(syslog_message) + length) == B_INTERRUPTED);
+	status_t status;
+	do {
 		// make sure the message gets send (if there is a valid port)
+		status = write_port(port, SYSLOG_MESSAGE, &message,
+			sizeof(syslog_message) + length);
+	} while (status == B_INTERRUPTED);
 
-	// ToDo: if write_port() returns an error, LOG_CONS is not respected
+	if (status < B_OK && (options & LOG_CONS) != 0
+		&& (options & LOG_PERROR) == 0) {
+		// LOG_CONS redirects all output to the console in case contacting
+		// the syslog daemon failed
+		message_to_console(context, text, args);
+	}
 }
 
 
-//	#pragma mark -
-//	public Be API
+//	#pragma mark - public Be API
 // ToDo: it would probably be better to export these symbols as weak symbols only
 
 
@@ -240,8 +255,7 @@ log_thread(int priority, const char *message, ...)
 }
 
 
-//	#pragma mark -
-//	POSIX API - just uses the thread syslog functions
+//	#pragma mark - POSIX API
 
 
 void 
