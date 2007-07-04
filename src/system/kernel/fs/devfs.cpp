@@ -131,10 +131,11 @@ struct driver_entry {
 };
 
 
-static void get_device_name(struct devfs_vnode *vnode, char *buffer, size_t size);
+static void get_device_name(struct devfs_vnode *vnode, char *buffer,
+	size_t size);
 static status_t publish_device(struct devfs *fs, const char *path,
-					device_node_info *deviceNode, pnp_devfs_driver_info *info,
-					driver_entry *driver, device_hooks *ops, int32 apiVersion);
+	device_node_info *deviceNode, pnp_devfs_driver_info *info,
+	driver_entry *driver, device_hooks *ops, int32 apiVersion);
 
 
 /* the one and only allowed devfs instance */
@@ -195,10 +196,8 @@ load_driver(driver_entry *driver)
 
 	int32 defaultApiVersion = 1;
 	int32 *apiVersion = &defaultApiVersion;
-	if (get_image_symbol(image, "api_version", B_SYMBOL_TYPE_DATA, (void **)&apiVersion) == B_OK) {
-		// According to Be newsletter, vol II, issue 36,
-		// version 2 added readv/writev, which we don't support, but also select/deselect.
-		// So we must make sure not to use invalid pointers in publish_device.
+	if (get_image_symbol(image, "api_version", B_SYMBOL_TYPE_DATA,
+			(void **)&apiVersion) == B_OK) {
 #if B_CUR_DRIVER_API_VERSION != 2
 		// just in case someone decides to bump up the api version
 #error Add checks here for new vs old api version!
@@ -218,8 +217,10 @@ load_driver(driver_entry *driver)
 
 	device_hooks *(*find_device)(const char *);
 	const char **(*publish_devices)(void);
-	if (get_image_symbol(image, "publish_devices", B_SYMBOL_TYPE_TEXT, (void **)&publish_devices) != B_OK
-		|| get_image_symbol(image, "find_device", B_SYMBOL_TYPE_TEXT, (void **)&find_device) != B_OK) {
+	if (get_image_symbol(image, "publish_devices", B_SYMBOL_TYPE_TEXT,
+				(void **)&publish_devices) != B_OK
+		|| get_image_symbol(image, "find_device", B_SYMBOL_TYPE_TEXT,
+				(void **)&find_device) != B_OK) {
 		dprintf("%s: mandatory driver symbol(s) missing!\n", name);
 		status = B_BAD_VALUE;
 		goto error1;
@@ -298,13 +299,14 @@ error1:
 }
 
 
-/** This is no longer part of the public kernel API, so we just export the symbol */
-
+/*!	This is no longer part of the public kernel API, so we just export the
+	symbol
+*/
 status_t load_driver_symbols(const char *driverName);
 status_t
 load_driver_symbols(const char *driverName)
 {
-	// This will be globally done for the whole kernel via the settings file.
+	// This is done globally for the whole kernel via the settings file.
 	// We don't have to do anything here.
 
 	return B_OK;
@@ -399,7 +401,8 @@ devfs_create_vnode(struct devfs *fs, devfs_vnode *parent, const char *name)
 
 
 static status_t
-devfs_delete_vnode(struct devfs *fs, struct devfs_vnode *vnode, bool force_delete)
+devfs_delete_vnode(struct devfs *fs, struct devfs_vnode *vnode,
+	bool force_delete)
 {
 	// cant delete it if it's in a directory or is a directory
 	// and has children
@@ -437,7 +440,8 @@ update_dir_cookies(struct devfs_vnode *dir, struct devfs_vnode *vnode)
 {
 	struct devfs_dir_cookie *cookie = NULL;
 
-	while ((cookie = (devfs_dir_cookie *)list_get_next_item(&dir->stream.u.dir.cookies, cookie)) != NULL) {
+	while ((cookie = (devfs_dir_cookie *)list_get_next_item(
+			&dir->stream.u.dir.cookies, cookie)) != NULL) {
 		if (cookie->current == vnode)
 			cookie->current = vnode->dir_next;
 	}
@@ -494,8 +498,10 @@ devfs_insert_in_dir(struct devfs_vnode *dir, struct devfs_vnode *vnode)
 	vnode->parent = dir;
 	dir->modification_time = time(NULL);
 
-	notify_entry_created(sDeviceFileSystem->id, dir->id, vnode->name, vnode->id);
-	notify_stat_changed(sDeviceFileSystem->id, dir->id, B_STAT_MODIFICATION_TIME);
+	notify_entry_created(sDeviceFileSystem->id, dir->id, vnode->name,
+		vnode->id);
+	notify_stat_changed(sDeviceFileSystem->id, dir->id,
+		B_STAT_MODIFICATION_TIME);
 
 	return B_OK;
 }
@@ -519,8 +525,10 @@ devfs_remove_from_dir(struct devfs_vnode *dir, struct devfs_vnode *removeNode)
 			vnode->dir_next = NULL;
 			dir->modification_time = time(NULL);
 
-			notify_entry_removed(sDeviceFileSystem->id, dir->id, vnode->name, vnode->id);
-			notify_stat_changed(sDeviceFileSystem->id, dir->id, B_STAT_MODIFICATION_TIME);
+			notify_entry_removed(sDeviceFileSystem->id, dir->id, vnode->name,
+				vnode->id);
+			notify_stat_changed(sDeviceFileSystem->id, dir->id,
+				B_STAT_MODIFICATION_TIME);
 			return B_OK;
 		}
 	}
@@ -547,7 +555,8 @@ add_partition(struct devfs *fs, struct devfs_vnode *device,
 		return B_BAD_VALUE;
 
 	// create partition
-	struct devfs_partition *partition = (struct devfs_partition *)malloc(sizeof(struct devfs_partition));
+	struct devfs_partition *partition = (struct devfs_partition *)malloc(
+		sizeof(struct devfs_partition));
 	if (partition == NULL)
 		return B_NO_MEMORY;
 
@@ -597,7 +606,8 @@ err1:
 
 
 static inline void
-translate_partition_access(devfs_partition *partition, off_t &offset, size_t &size)
+translate_partition_access(devfs_partition *partition, off_t &offset,
+	size_t &size)
 {
 	if (offset < 0)
 		offset = 0;
@@ -615,7 +625,8 @@ translate_partition_access(devfs_partition *partition, off_t &offset, size_t &si
 static pnp_devfs_driver_info *
 create_new_driver_info(device_hooks *ops, int32 version)
 {
-	pnp_devfs_driver_info *info = (pnp_devfs_driver_info *)malloc(sizeof(pnp_devfs_driver_info));
+	pnp_devfs_driver_info *info = (pnp_devfs_driver_info *)malloc(
+		sizeof(pnp_devfs_driver_info));
 	if (info == NULL)
 		return NULL;
 
@@ -637,9 +648,12 @@ create_new_driver_info(device_hooks *ops, int32 version)
 		// old devices can't know how to do physical page access
 	
 	if (version >= 2) {
+		// According to Be newsletter, vol II, issue 36,
+		// version 2 added readv/writev, which we don't support, but also
+		// select/deselect.
 		info->select = ops->select;
 		info->deselect = ops->deselect;
-		
+
 		// ops->readv;
 		// ops->writev;
 		// we don't implement scatter-gather atm, so ignore those.
@@ -650,7 +664,8 @@ create_new_driver_info(device_hooks *ops, int32 version)
 
 
 static status_t
-get_node_for_path(struct devfs *fs, const char *path, struct devfs_vnode **_node)
+get_node_for_path(struct devfs *fs, const char *path,
+	struct devfs_vnode **_node)
 {
 	return vfs_get_fs_node_from_path(fs->id, path, true, (void **)_node);
 }
@@ -846,9 +861,10 @@ out:
 
 static status_t
 publish_device(struct devfs *fs, const char *path, device_node_info *deviceNode,
-	pnp_devfs_driver_info *info, driver_entry *driver, device_hooks *ops, int32 apiVersion)
+	pnp_devfs_driver_info *info, driver_entry *driver, device_hooks *ops,
+	int32 apiVersion)
 {
-	TRACE(("publish_device(path = \"%s\", node = %p, info = %p, hooks = %p, apiVersion = %d)\n",
+	TRACE(("publish_device(path = \"%s\", node = %p, info = %p, hooks = %p, apiVersion = %ld)\n",
 		path, deviceNode, info, ops, apiVersion));
 
 	if (sDeviceFileSystem == NULL) {
@@ -1539,7 +1555,8 @@ devfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie,
 	struct devfs_vnode *nextChildNode = NULL;
 	int32 nextState = cookie->state;
 
-	TRACE(("devfs_read_dir: vnode %p, cookie %p, buffer %p, size %ld\n", _vnode, cookie, dirent, bufferSize));
+	TRACE(("devfs_read_dir: vnode %p, cookie %p, buffer %p, size %ld\n",
+		_vnode, cookie, dirent, bufferSize));
 
 	if (!S_ISDIR(vnode->stream.type))
 		return B_BAD_VALUE;
@@ -1613,10 +1630,9 @@ devfs_rewind_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie)
 }
 
 
-/**	Forwards the opcode to the device driver, but also handles some devfs specific
- *	functionality, like partitions.
- */
-
+/*!	Forwards the opcode to the device driver, but also handles some devfs
+	specific functionality, like partitions.
+*/
 static status_t
 devfs_ioctl(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, ulong op,
 	void *buffer, size_t length)
@@ -1628,13 +1644,14 @@ devfs_ioctl(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, ulong op,
 	TRACE(("devfs_ioctl: vnode %p, cookie %p, op %ld, buf %p, len %ld\n",
 		_vnode, _cookie, op, buffer, length));
 
-	// we are actually checking for a *device* here, we don't make the distinction
-	// between char and block devices
+	// we are actually checking for a *device* here, we don't make the
+	// distinction between char and block devices
 	if (S_ISCHR(vnode->stream.type)) {
 		switch (op) {
 			case B_GET_GEOMETRY:
 			{
-				struct devfs_partition *partition = vnode->stream.u.dev.partition;
+				struct devfs_partition *partition
+					= vnode->stream.u.dev.partition;
 				if (partition == NULL)
 					break;
 
@@ -1670,13 +1687,15 @@ devfs_ioctl(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, ulong op,
 
 			case B_GET_PARTITION_INFO:
 			{
-				struct devfs_partition *partition = vnode->stream.u.dev.partition;
+				struct devfs_partition *partition
+					= vnode->stream.u.dev.partition;
 				if (!S_ISCHR(vnode->stream.type)
 					|| partition == NULL
 					|| length != sizeof(partition_info))
 					return B_BAD_VALUE;
 
-				return user_memcpy(buffer, &partition->info, sizeof(partition_info));
+				return user_memcpy(buffer, &partition->info,
+					sizeof(partition_info));
 			}
 
 			case B_SET_PARTITION:
@@ -1730,8 +1749,8 @@ devfs_set_flags(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, int flags)
 	if (!S_ISCHR(vnode->stream.type))
 		return B_NOT_ALLOWED;
 
-	return vnode->stream.u.dev.info->control(cookie->device_cookie, flags & O_NONBLOCK ?
-		B_SET_NONBLOCKING_IO : B_SET_BLOCKING_IO, NULL, 0);
+	return vnode->stream.u.dev.info->control(cookie->device_cookie,
+		flags & O_NONBLOCK ? B_SET_NONBLOCKING_IO : B_SET_BLOCKING_IO, NULL, 0);
 }
 
 
@@ -1803,10 +1822,13 @@ devfs_read_pages(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 		|| cookie == NULL)
 		return B_NOT_ALLOWED;
 
-	if (vnode->stream.u.dev.partition)
-		translate_partition_access(vnode->stream.u.dev.partition, pos, *_numBytes);
+	if (vnode->stream.u.dev.partition) {
+		translate_partition_access(vnode->stream.u.dev.partition, pos,
+			*_numBytes);
+	}
 
-	return vnode->stream.u.dev.info->read_pages(cookie->device_cookie, pos, vecs, count, _numBytes);
+	return vnode->stream.u.dev.info->read_pages(cookie->device_cookie, pos,
+		vecs, count, _numBytes);
 }
 
 
@@ -1824,10 +1846,13 @@ devfs_write_pages(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 		|| cookie == NULL)
 		return B_NOT_ALLOWED;
 
-	if (vnode->stream.u.dev.partition)
-		translate_partition_access(vnode->stream.u.dev.partition, pos, *_numBytes);
+	if (vnode->stream.u.dev.partition) {
+		translate_partition_access(vnode->stream.u.dev.partition, pos,
+			*_numBytes);
+	}
 
-	return vnode->stream.u.dev.info->write_pages(cookie->device_cookie, pos, vecs, count, _numBytes);
+	return vnode->stream.u.dev.info->write_pages(cookie->device_cookie, pos,
+		vecs, count, _numBytes);
 }
 
 
@@ -1836,7 +1861,8 @@ devfs_read_stat(fs_volume _fs, fs_vnode _vnode, struct stat *stat)
 {
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
 
-	TRACE(("devfs_read_stat: vnode %p (%Ld), stat %p\n", vnode, vnode->id, stat));
+	TRACE(("devfs_read_stat: vnode %p (%Ld), stat %p\n", vnode, vnode->id,
+		stat));
 
 	stat->st_ino = vnode->id;
 	stat->st_size = 0;
@@ -1878,12 +1904,14 @@ devfs_read_stat(fs_volume _fs, fs_vnode _vnode, struct stat *stat)
 
 
 static status_t
-devfs_write_stat(fs_volume _fs, fs_vnode _vnode, const struct stat *stat, uint32 statMask)
+devfs_write_stat(fs_volume _fs, fs_vnode _vnode, const struct stat *stat,
+	uint32 statMask)
 {
 	struct devfs *fs = (struct devfs *)_fs;
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
 
-	TRACE(("devfs_write_stat: vnode %p (0x%Lx), stat %p\n", vnode, vnode->id, stat));
+	TRACE(("devfs_write_stat: vnode %p (0x%Lx), stat %p\n", vnode, vnode->id,
+		stat));
 
 	// we cannot change the size of anything
 	if (statMask & FS_WRITE_STAT_SIZE)
@@ -1891,8 +1919,10 @@ devfs_write_stat(fs_volume _fs, fs_vnode _vnode, const struct stat *stat, uint32
 
 	RecursiveLocker locker(&fs->lock);
 
-	if (statMask & FS_WRITE_STAT_MODE)
-		vnode->stream.type = (vnode->stream.type & ~S_IUMSK) | (stat->st_mode & S_IUMSK);
+	if (statMask & FS_WRITE_STAT_MODE) {
+		vnode->stream.type = (vnode->stream.type & ~S_IUMSK)
+			| (stat->st_mode & S_IUMSK);
+	}
 
 	if (statMask & FS_WRITE_STAT_UID)
 		vnode->uid = stat->st_uid;
@@ -1990,7 +2020,8 @@ file_system_module_info gDeviceFileSystem = {
 	&devfs_create_dir,
 	NULL,	// remove_dir
 	&devfs_open_dir,
-	&devfs_close,			// same as for files - it does nothing for directories, anyway
+	&devfs_close,
+		// same as for files - it does nothing for directories, anyway
 	&devfs_free_dir_cookie,
 	&devfs_read_dir,
 	&devfs_rewind_dir,
@@ -2024,7 +2055,8 @@ pnp_devfs_register_device(device_node_handle parent)
 
 	TRACE(("pnp_devfs_probe()\n"));
 
-	if (sDeviceManager->get_attr_string(parent, PNP_DEVFS_FILENAME, &filename, true) != B_OK) {
+	if (sDeviceManager->get_attr_string(parent, PNP_DEVFS_FILENAME,
+			&filename, true) != B_OK) {
 		dprintf("devfs: Item containing file name is missing\n");
 		status = B_ERROR;
 		goto err1;
@@ -2032,20 +2064,24 @@ pnp_devfs_register_device(device_node_handle parent)
 
 	TRACE(("Adding %s\n", filename));
 
-	status = sDeviceManager->register_device(parent, pnp_devfs_attrs, NULL, &node);
+	status = sDeviceManager->register_device(parent, pnp_devfs_attrs, NULL,
+		&node);
 	if (status != B_OK || node == NULL)
 		goto err1;
 
-	// ToDo: this is a hack to get things working (init_driver() only works for registered nodes)
+	// ToDo: this is a hack to get things working (init_driver() only
+	// works for registered nodes)
 	parent->registered = true;
 
 	pnp_devfs_driver_info *info;
-	status = sDeviceManager->init_driver(parent, NULL, (driver_module_info **)&info, NULL);
+	status = sDeviceManager->init_driver(parent, NULL,
+		(driver_module_info **)&info, NULL);
 	if (status != B_OK)
 		goto err2;
 
 	//add_device(device);
-	status = publish_device(sDeviceFileSystem, filename, node, info, NULL, NULL, 0);
+	status = publish_device(sDeviceFileSystem, filename, node, info, NULL,
+		NULL, 0);
 	if (status != B_OK)
 		goto err3;
 	//nudge();
@@ -2127,7 +2163,8 @@ pnp_devfs_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
-			return get_module(B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&sDeviceManager);
+			return get_module(B_DEVICE_MANAGER_MODULE_NAME,
+				(module_info **)&sDeviceManager);
 
 		case B_MODULE_UNINIT:
 			put_module(B_DEVICE_MANAGER_MODULE_NAME);
@@ -2264,7 +2301,8 @@ devfs_publish_partition(const char *path, const partition_info *info)
 		return B_BAD_VALUE;
 
 	devfs_vnode *device;
-	status_t status = get_node_for_path(sDeviceFileSystem, info->device, &device);
+	status_t status = get_node_for_path(sDeviceFileSystem, info->device,
+		&device);
 	if (status != B_OK)
 		return status;
 
