@@ -315,6 +315,11 @@ SEARCH on $(driverSettingsFiles)
 AddFilesToHaikuImage home config settings kernel drivers
 	: $(driverSettingsFiles) ;
 
+local networkSettingsFiles = <network-settings>services ;
+SEARCH on $(networkSettingsFiles)
+	= [ FDirName $(HAIKU_TOP) data settings network ] ;
+AddFilesToHaikuImage common config settings network : $(networkSettingsFiles) ;
+
 AddSymlinkToHaikuImage home config settings
 	: /boot/beos/etc/timezones/Europe/Paris : timezone ;
 
