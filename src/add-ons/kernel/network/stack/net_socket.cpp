@@ -39,7 +39,9 @@ struct net_socket_private : net_socket {
 
 
 void socket_delete(net_socket *socket);
-int socket_bind(net_socket *socket, const struct sockaddr *address, socklen_t addressLength);
+int socket_bind(net_socket *socket, const struct sockaddr *address,
+	socklen_t addressLength);
+
 
 struct list sSocketList;
 benaphore sSocketLock;
@@ -69,8 +71,10 @@ create_socket(int family, int type, int protocol, net_socket_private **_socket)
 	socket->receive.low_water_mark = 1;
 	socket->receive.timeout = B_INFINITE_TIMEOUT;
 
-	list_init_etc(&socket->pending_children, offsetof(net_socket_private, link));
-	list_init_etc(&socket->connected_children, offsetof(net_socket_private, link));
+	list_init_etc(&socket->pending_children, offsetof(net_socket_private,
+		link));
+	list_init_etc(&socket->connected_children, offsetof(net_socket_private,
+		link));
 
 	status = get_domain_protocols(socket);
 	if (status < B_OK)
@@ -142,14 +146,16 @@ socket_free(net_socket *socket)
 
 
 status_t
-socket_readv(net_socket *socket, const iovec *vecs, size_t vecCount, size_t *_length)
+socket_readv(net_socket *socket, const iovec *vecs, size_t vecCount,
+	size_t *_length)
 {
 	return -1;
 }
 
 
 status_t
-socket_writev(net_socket *socket, const iovec *vecs, size_t vecCount, size_t *_length)
+socket_writev(net_socket *socket, const iovec *vecs, size_t vecCount,
+	size_t *_length)
 {
 	if (socket->peer.ss_len == 0)
 		return ECONNRESET;
@@ -253,7 +259,8 @@ socket_get_next_stat(uint32 *_cookie, int family, struct net_stat *stat)
 	net_socket_private *socket = NULL;
 	uint32 cookie = *_cookie;
 	uint32 count = 0;
-	while ((socket = (net_socket_private *)list_get_next_item(&sSocketList, socket)) != NULL) {
+	while ((socket = (net_socket_private *)list_get_next_item(&sSocketList,
+			socket)) != NULL) {
 		// TODO: also traverse the pending connections
 		if (count == cookie)
 			break;
@@ -303,8 +310,8 @@ socket_spawn_pending(net_socket *_parent, net_socket **_socket)
 		return ENOBUFS;
 
 	net_socket_private *socket;
-	status_t status = create_socket(parent->family, parent->type, parent->protocol,
-		&socket);
+	status_t status = create_socket(parent->family, parent->type,
+		parent->protocol, &socket);
 	if (status < B_OK)
 		return status;
 
@@ -381,10 +388,12 @@ socket_count_connected(net_socket *_parent)
 
 	BenaphoreLocker _(parent->lock);
 
-	int count = 0;
-	for (void *it = list_get_first_item(&parent->connected_children);
-			it != NULL; it = list_get_next_item(&parent->connected_children, it))
+	ssize_t count = 0;
+	void *item = NULL;
+	while ((item = list_get_next_item(&parent->connected_children,
+			item)) != NULL) {
 		count++;
+	}
 
 	return count;
 }
@@ -401,15 +410,18 @@ socket_set_max_backlog(net_socket *_socket, uint32 backlog)
 
 	benaphore_lock(&socket->lock);
 
-	// first remove the pending connections, then the already connected ones as needed	
+	// first remove the pending connections, then the already connected
+	// ones as needed	
 	net_socket_private *child;
 	while (socket->child_count > backlog
-		&& (child = (net_socket_private *)list_remove_tail_item(&socket->pending_children)) != NULL) {
+		&& (child = (net_socket_private *)list_remove_tail_item(
+				&socket->pending_children)) != NULL) {
 		child->parent = NULL;
 		socket->child_count--;
 	}
 	while (socket->child_count > backlog
-		&& (child = (net_socket_private *)list_remove_tail_item(&socket->connected_children)) != NULL) {
+		&& (child = (net_socket_private *)list_remove_tail_item(
+				&socket->connected_children)) != NULL) {
 		child->parent = NULL;
 		socket_delete(child);
 		socket->child_count--;
@@ -472,14 +484,16 @@ socket_request_notification(net_socket *_socket, uint8 event, uint32 ref,
 		case B_SELECT_READ:
 		{
 			ssize_t available = socket_read_avail(socket);
-			if ((ssize_t)socket->receive.low_water_mark <= available || available < B_OK)
+			if ((ssize_t)socket->receive.low_water_mark <= available
+				|| available < B_OK)
 				notify_select_event(sync, ref, event);
 			break;
 		}
 		case B_SELECT_WRITE:
 		{
 			ssize_t available = socket_send_avail(socket);
-			if ((ssize_t)socket->send.low_water_mark <= available || available < B_OK)
+			if ((ssize_t)socket->send.low_water_mark <= available
+				|| available < B_OK)
 				notify_select_event(sync, ref, event);
 			break;
 		}
@@ -515,12 +529,14 @@ socket_notify(net_socket *_socket, uint8 event, int32 value)
 
 	switch (event) {
 		case B_SELECT_READ:
-			if ((ssize_t)socket->receive.low_water_mark > value && value >= B_OK)
+			if ((ssize_t)socket->receive.low_water_mark > value
+				&& value >= B_OK)
 				notify = false;
 			break;
 
 		case B_SELECT_WRITE:
-			if ((ssize_t)socket->send.low_water_mark > value && value >= B_OK)
+			if ((ssize_t)socket->send.low_water_mark > value
+				&& value >= B_OK)
 				notify = false;
 			break;
 
@@ -543,8 +559,8 @@ socket_notify(net_socket *_socket, uint8 event, int32 value)
 
 
 int
-socket_accept(net_socket *socket, struct sockaddr *address, socklen_t *_addressLength,
-	net_socket **_acceptedSocket)
+socket_accept(net_socket *socket, struct sockaddr *address,
+	socklen_t *_addressLength, net_socket **_acceptedSocket)
 {
 	if ((socket->options & SO_ACCEPTCONN) == 0)
 		return B_BAD_VALUE;
@@ -567,7 +583,8 @@ socket_accept(net_socket *socket, struct sockaddr *address, socklen_t *_addressL
 
 
 int
-socket_bind(net_socket *socket, const struct sockaddr *address, socklen_t addressLength)
+socket_bind(net_socket *socket, const struct sockaddr *address,
+	socklen_t addressLength)
 {
 	sockaddr empty;
 	if (address == NULL) {
@@ -601,7 +618,8 @@ socket_bind(net_socket *socket, const struct sockaddr *address, socklen_t addres
 
 
 int
-socket_connect(net_socket *socket, const struct sockaddr *address, socklen_t addressLength)
+socket_connect(net_socket *socket, const struct sockaddr *address,
+	socklen_t addressLength)
 {
 	if (address == NULL || addressLength == 0)
 		return ENETUNREACH;
@@ -618,7 +636,8 @@ socket_connect(net_socket *socket, const struct sockaddr *address, socklen_t add
 
 
 int
-socket_getpeername(net_socket *socket, struct sockaddr *address, socklen_t *_addressLength)
+socket_getpeername(net_socket *socket, struct sockaddr *address,
+	socklen_t *_addressLength)
 {
 	if (socket->peer.ss_len == 0)
 		return ENOTCONN;
@@ -630,12 +649,14 @@ socket_getpeername(net_socket *socket, struct sockaddr *address, socklen_t *_add
 
 
 int
-socket_getsockname(net_socket *socket, struct sockaddr *address, socklen_t *_addressLength)
+socket_getsockname(net_socket *socket, struct sockaddr *address,
+	socklen_t *_addressLength)
 {
 	if (socket->address.ss_len == 0)
 		return ENOTCONN;
 
-	memcpy(address, &socket->address, min_c(*_addressLength, socket->address.ss_len));
+	memcpy(address, &socket->address, min_c(*_addressLength,
+		socket->address.ss_len));
 	*_addressLength = socket->address.ss_len;
 	return B_OK;
 }
@@ -759,7 +780,8 @@ socket_getsockopt(net_socket *socket, int level, int option, void *value,
 int
 socket_listen(net_socket *socket, int backlog)
 {
-	status_t status = socket->first_info->listen(socket->first_protocol, backlog);
+	status_t status = socket->first_info->listen(socket->first_protocol,
+		backlog);
 	if (status == B_OK)
 		socket->options |= SO_ACCEPTCONN;
 
@@ -917,14 +939,16 @@ socket_send(net_socket *socket, msghdr *header, const void *data,
 	if (header) {
 		// copy additional data into buffer
 		for (int i = 1; i < header->msg_iovlen; i++) {
-			iovec tmp;
-			if (user_memcpy(&tmp, header->msg_iov + i, sizeof(iovec)) < B_OK ||
-				gNetBufferModule.append(buffer, tmp.iov_base, tmp.iov_len) < B_OK) {
+			iovec vec;
+			if (user_memcpy(&vec, header->msg_iov + i, sizeof(iovec)) < B_OK)
+				return B_BAD_ADDRESS;
+			if (gNetBufferModule.append(buffer, vec.iov_base,
+					vec.iov_len) < B_OK) {
 				gNetBufferModule.free(buffer);
 				return ENOBUFS;
 			}
 
-			length += tmp.iov_len;
+			length += vec.iov_len;
 		}
 	}
 
@@ -938,7 +962,8 @@ socket_send(net_socket *socket, msghdr *header, const void *data,
 		size_t size = buffer->size;
 		gNetBufferModule.free(buffer);
 
-		if (size != length && (status == B_INTERRUPTED || status == B_WOULD_BLOCK)) {
+		if (size != length
+			&& (status == B_INTERRUPTED || status == B_WOULD_BLOCK)) {
 			// this appears to be a partial write
 			return length - size;
 		}
