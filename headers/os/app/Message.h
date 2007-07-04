@@ -8,6 +8,7 @@
 #ifndef _MESSAGE_H
 #define _MESSAGE_H
 
+
 #include <BeBuild.h>
 #include <DataIO.h>
 #include <Flattenable.h>
@@ -21,6 +22,7 @@ class BBlockCache;
 class BMessenger;
 class BHandler;
 class BString;
+struct entry_ref;
 
 
 // Name lengths and Scripting specifiers

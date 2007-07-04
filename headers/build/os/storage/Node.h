@@ -1,24 +1,14 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
-/*!
-	\file Node.h
-	BNode and node_ref interface declarations.
-*/
-
+/*
+ * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _NODE_H
 #define _NODE_H
 
+
 #include <Statable.h>
 
-#ifdef USE_OPENBEOS_NAMESPACE
-namespace OpenBeOS {
-#endif
-
-//---------------------------------------------------------------
-// node_ref
-//---------------------------------------------------------------
+class BDirectory;
 
 //! Reference structure to a particular vnode on a particular device
 /*! <b>node_ref</b> - A node reference.
@@ -30,7 +20,7 @@ namespace OpenBeOS {
 struct node_ref {
 	node_ref();	
 	node_ref(const node_ref &ref);
-	
+
 	bool operator==(const node_ref &ref) const;
 	bool operator!=(const node_ref &ref) const;
 	node_ref& operator=(const node_ref &ref);
@@ -40,15 +30,11 @@ struct node_ref {
 		return (device < ref.device
 			|| device == ref.device && node < ref.node);
 	}
-	
+
 	dev_t device;
 	ino_t node;
 };
 
-
-//---------------------------------------------------------------
-// BNode
-//---------------------------------------------------------------
 
 //! A BNode represents a chunk of data in the filesystem.
 /*! The BNode class provides an interface for manipulating the data and attributes
@@ -63,7 +49,6 @@ struct node_ref {
 */
 class BNode : public BStatable {
 public:
-
 	BNode();
 	BNode(const entry_ref *ref);
 	BNode(const BEntry *entry);
@@ -136,12 +121,4 @@ private:
 	status_t InitAttrDir();
 };
 
-
-
-#ifdef USE_OPENBEOS_NAMESPACE
-};		// namespace OpenBeOS
-#endif
-
 #endif	// _NODE_H
-
-
