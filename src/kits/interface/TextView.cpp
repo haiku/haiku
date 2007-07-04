@@ -467,9 +467,7 @@ BTextView::MouseDown(BPoint where)
 	if (!IsFocus())
 		MakeFocus();
 	
-	// hide the caret if it's visible	
-	if (fCaretVisible)
-		InvertCaret();
+	_HideCaret();
 	
 	StopMouseTracking();
 	
@@ -669,8 +667,7 @@ BTextView::KeyDown(const char *bytes, int32 numBytes)
 
 	// hide the cursor and caret
 	be_app->ObscureCursor();
-	if (fCaretVisible)
-		InvertCaret();
+	_HideCaret();
 
 	switch (keyPressed) {
 		case B_BACKSPACE:
@@ -715,10 +712,8 @@ BTextView::KeyDown(const char *bytes, int32 numBytes)
 	}
 
 	// draw the caret
-	if (fSelStart == fSelEnd) {
-		if (!fCaretVisible)
-			InvertCaret();
-	}
+	if (fSelStart == fSelEnd)
+		_ShowCaret();
 }
 
 
@@ -994,8 +989,7 @@ BTextView::SetText(const char *inText, int32 inLength, const text_run_array *inR
 		if (fSelStart != fSelEnd)
 			Highlight(fSelStart, fSelEnd);
 		else {
-			if (fCaretVisible)
-				InvertCaret();
+			_HideCaret();
 		}
 	}
 	
@@ -1012,10 +1006,8 @@ BTextView::SetText(const char *inText, int32 inLength, const text_run_array *inR
 	ScrollToOffset(fSelStart);
 
 	// draw the caret
-	if (fActive) {
-		if (!fCaretVisible)
-			InvertCaret();
-	}
+	if (fActive)
+		_ShowCaret();
 }
 
 
@@ -1056,10 +1048,8 @@ BTextView::SetText(BFile *inFile, int32 inOffset, int32 inLength,
 	ScrollToOffset(fSelStart);
 
 	// draw the caret
-	if (fActive) {
-		if (!fCaretVisible)
-			InvertCaret();
-	}
+	if (fActive)
+		_ShowCaret();
 }
 
 
@@ -1120,10 +1110,8 @@ BTextView::Delete(int32 startOffset, int32 endOffset)
 	if (fActive) {
 		if (fSelStart != fSelEnd)
 			Highlight(fSelStart, fSelEnd);
-		else {
-			if (fCaretVisible)
-				InvertCaret();
-		}
+		else
+			_HideCaret();
 	}
 	// remove data from buffer
 	DeleteText(startOffset, endOffset);
@@ -1140,10 +1128,8 @@ BTextView::Delete(int32 startOffset, int32 endOffset)
 	Refresh(startOffset, endOffset, true, true);
 	
 	// draw the caret
-	if (fActive) {
-		if (!fCaretVisible)
-			InvertCaret();
-	}
+	if (fActive)
+		_ShowCaret();
 }
 
 
@@ -1383,9 +1369,7 @@ BTextView::Select(int32 startOffset, int32 endOffset)
 		
 	fStyles->InvalidateNullStyle();
 	
-	// hide the caret
-	if (fCaretVisible)
-		InvertCaret();
+	_HideCaret();
 	
 	if (startOffset == endOffset) {
 		if (fSelStart != fSelEnd) {
@@ -2137,8 +2121,7 @@ BTextView::MakeEditable(bool editable)
 		fStyles->InvalidateNullStyle();
 	if (Window() != NULL && fActive) {	
 		if (!fEditable) {
-			if (fCaretVisible)
-				InvertCaret();
+			_HideCaret();
 			CancelInputMethod();
 		} 	
 	}
@@ -2171,8 +2154,7 @@ BTextView::SetWordWrap(bool wrap)
 			if (fSelStart != fSelEnd)
 				Highlight(fSelStart, fSelEnd);
 			else {
-				if (fCaretVisible)
-					InvertCaret();
+				_HideCaret();
 			}
 		}
 		
@@ -2183,10 +2165,8 @@ BTextView::SetWordWrap(bool wrap)
 			// show the caret, hilite the selection
 			if (fSelStart != fSelEnd && fSelectable)
 				Highlight(fSelStart, fSelEnd);
-			else {
-				if (!fCaretVisible)
-					InvertCaret();
-			}
+			else
+				_ShowCaret();
 		}
 	}
 }
@@ -2352,8 +2332,8 @@ BTextView::MakeResizable(bool resize, BView *resizeView)
 				if (fSelStart != fSelEnd && fSelectable)
 					Highlight(fSelStart, fSelEnd);
 
-				else if (fCaretVisible)
-					InvertCaret();
+				else 
+					_HideCaret();
 			}
 		}
 	} else {
@@ -3751,6 +3731,22 @@ BTextView::DrawCaret(int32 offset)
 }
 
 
+inline void
+BTextView::_ShowCaret()
+{	
+	if (!fCaretVisible)
+		InvertCaret();
+}
+
+
+inline void
+BTextView::_HideCaret()
+{
+	if (fCaretVisible)
+		InvertCaret();
+}
+
+
 /*! \brief Inverts the blinking caret status.
 	Hides the caret if it is being shown, and if it's hidden, shows it.
 */
@@ -4170,7 +4166,7 @@ BTextView::Activate()
 			Highlight(fSelStart, fSelEnd);
 	} else {
 		if (fEditable)
-			InvertCaret();
+			_ShowCaret();
 	}
 	
 	BPoint where;
@@ -4194,10 +4190,8 @@ BTextView::Deactivate()
 	if (fSelStart != fSelEnd) {
 		if (fSelectable)
 			Highlight(fSelStart, fSelEnd);
-	} else {
-		if (fCaretVisible)
-			InvertCaret();
-	}
+	} else
+		_HideCaret();
 	
 	BPoint where;
 	ulong buttons;

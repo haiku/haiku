@@ -337,6 +337,8 @@ virtual void			_ReservedTextView12();
 							  	  int32	startOffset = -1, 
 								  bool	erase = false);
 		void			DrawCaret(int32 offset);
+		void			_ShowCaret();
+		void			_HideCaret();		
 		void			InvertCaret();
 		void			DragCaret(int32 offset);
 		
