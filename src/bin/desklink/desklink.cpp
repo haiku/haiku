@@ -42,7 +42,7 @@
 #define SET_VOLUME_WHICH 'svwh'
 
 #define VOLUME_CTL_NAME "MediaReplicant"
-	/* R5 name needed, Media prefs manel removes by name */
+	// R5 name needed, Media prefs manel removes by name
 
 #define SETTINGS_FILE "x-vnd.Haiku-desklink"
 
@@ -82,9 +82,9 @@ private:
 	BBitmap*		fSegments;
 	VolumeSlider*	fVolumeSlider;
 	bool 			fDontBeep;
-		/* don't beep on volume change */
+		// don't beep on volume change
 	int32 			fVolumeWhich;
-		/* which volume parameter to act on (Mixer/Phys.Output) */
+		// which volume parameter to act on (Mixer/Phys.Output)
 };
 
 //
@@ -312,7 +312,7 @@ MediaReplicant::MouseDown(BPoint point)
 void
 MediaReplicant::MouseUp(BPoint point)
 {
-	/* don't Quit() ! thanks for FFM users */
+	// don't Quit() ! thanks for FFM users
 }
 
 
@@ -363,40 +363,44 @@ main(int, char **argv)
 	bool atLeastOnePath = false;
 	BList titleList;
 	BList actionList;
+	BDeskbar deskbar;
+	status_t err = B_OK;
 
 	for (int32 i = 1; argv[i]!=NULL; i++) {
 		if (strcmp(argv[i], "--help") == 0)
 			break;
 		
 		if (strcmp(argv[i], "--list") == 0) {
-			BDeskbar db;
 			int32 i, found = 0, count;
-			count = db.CountItems();
+			count = deskbar.CountItems();
 			printf("Deskbar items:\n");
-			/* the API is doomed, so don't try to enum for too long */
+			// the API is doomed, so don't try to enum for too long
 			for (i = 0; (found < count) && (i >= 0) && (i < 5000); i++) {
-				const char scratch[2] = ""; /* BDeskbar is buggy */
+				const char scratch[2] = ""; // BDeskbar is buggy
 				const char *name=scratch;
-				if (db.GetItemInfo(i, &name) >= B_OK) {
+				if (deskbar.GetItemInfo(i, &name) >= B_OK) {
 					found++;
 					printf("Item %ld: '%s'\n", i, name);
-					free((void *)name); /* INTENDED */
+					free((void *)name); // INTENDED
 				}
 			}
 			return 0;
 		}
 
 		if (strcmp(argv[i], "--remove") == 0) {
-			BDeskbar db;
 			int32 found = 0;
-			uint32 count = db.CountItems();
-			/* BDeskbar is definitely doomed ! */
-			while ((db.RemoveItem("DeskButton") == B_OK) && (db.CountItems() < count)) {
-				count = db.CountItems();
+			int32 found_id;
+			while (deskbar.GetItemInfo("DeskButton", &found_id) == B_OK) {
+				err = deskbar.RemoveItem(found_id);
+				if (err != B_OK) {
+					printf("desklink: Error removing replicant id %ld: %s\n",
+						found_id, strerror(err));
+					break;
+				}
 				found++;
 			}
-			printf("removed %ld items.\n", found);
-			return 0;
+			printf("Removed %ld items.\n", found);
+			return err;
 		}
 
 		if (strncmp(argv[i], "cmd=", 4) == 0) {
@@ -425,7 +429,7 @@ main(int, char **argv)
 		entry_ref ref;
 		entry.GetRef(&ref);
 
-		status_t err = BDeskbar().AddItem(new DeskButton(BRect(0, 0, 15, 15),
+		err = deskbar.AddItem(new DeskButton(BRect(0, 0, 15, 15),
 			&ref, "DeskButton", titleList, actionList));
 		if (err != B_OK) {
 			printf("desklink: Deskbar refuses link to '%s': %s\n", argv[i], strerror(err));	
@@ -436,7 +440,6 @@ main(int, char **argv)
 	}
 
 	if (!atLeastOnePath) {
-		// print a simple usage string
 		printf(	"usage: desklink { [ --list|--remove|[cmd=title:action ... ] path ] } ...\n"
 			"--list: list all Deskbar addons.\n"
 			"--remove: delete all desklink addons.\n");
