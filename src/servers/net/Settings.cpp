@@ -327,7 +327,6 @@ Settings::StopMonitoring(const BMessenger& target)
 status_t
 Settings::Update(BMessage* message)
 {
-	message->PrintToStream();
 	const char* pathName;
 	int32 opcode;
 	if (message->FindInt32("opcode", &opcode) < B_OK
