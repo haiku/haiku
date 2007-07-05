@@ -424,16 +424,14 @@ main(int, char **argv)
 		BEntry entry(argv[i], true);
 		entry_ref ref;
 		
-		if(entry.Exists()) {
+		if (entry.Exists()) {
 			entry.GetRef(&ref);
-		}
-		else if (BMimeType::IsValid(argv[i])) {
+		} else if (BMimeType::IsValid(argv[i])) {
 			if (be_roster->FindApp(argv[i], &ref) != B_OK) {
 				printf("desklink: cannot find '%s'\n", argv[i]);
 				return 1;
 			}
-		}
-		else {
+		} else {
 			printf("desklink: cannot find '%s'\n", argv[i]);
 			return 1;
 		}
