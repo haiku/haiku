@@ -1292,6 +1292,9 @@ peek_next_thread_id(void)
 void
 thread_yield(void)
 {
+	// snooze for roughly 3 thread quantums
+	snooze_etc(9000, B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT);
+#if 0
 	cpu_status state;
 
 	struct thread *thread = thread_get_current_thread();
@@ -1308,6 +1311,7 @@ thread_yield(void)
 
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
+#endif
 }
 
 
