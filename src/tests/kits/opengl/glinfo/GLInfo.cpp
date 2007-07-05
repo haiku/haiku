@@ -84,13 +84,16 @@ GLInfoWindow::GLInfoWindow(BRect frame)
 	LockLooper();
 	
 	gl->LockGL();
+
+	// ---- OpenGL info
 	
-	// list->AddItem(new BStringItem("OpenGL", 0));
 	AddItem(list, 0, "OpenGL");
 	AddItem(list, 1, "Version: %s", glGetString(GL_VERSION));
 	AddItem(list, 1, "Vendor Name: %s", glGetString(GL_VENDOR));
 	AddItem(list, 1, "Renderer Name: %s", glGetString(GL_RENDERER));
 
+	// Renderer capabilities
+	
 	int lights = 0;
 	int clipping_planes = 0;
 	int model_stack = 0;
@@ -127,27 +130,30 @@ GLInfoWindow::GLInfoWindow(BRect frame)
 	glGetIntegerv (GL_MAX_ELEMENTS_VERTICES, &max_vertex);
 	glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &texture_units);
 
-	AddItem(list, 1, "Auxiliary buffer(s): %d", buffers);
+	AddItem(list, 1, "Capabilities");
 
-	AddItem(list, 1, "Model stack size: %d", model_stack);
-	AddItem(list, 1, "Projection stack size: %d", projection_stack);
-	AddItem(list, 1, "Texture stack size: %d", texture_stack);
-	AddItem(list, 1, "Name stack size: %d", name_stack);
-	AddItem(list, 1, "List stack size: %d", list_stack);
-	AddItem(list, 1, "Attributes stack size: %d", attrib_stack);
+	AddItem(list, 2, "Auxiliary buffer(s): %d", buffers);
 
-	AddItem(list, 1, "Maximum 3D texture size: %d", max_tex3d);
-	AddItem(list, 1, "Maximum 2D texture size: %d", max_tex2d);
-	AddItem(list, 1, "Maximum texture units: %d", texture_units);
+	AddItem(list, 2, "Model stack size: %d", model_stack);
+	AddItem(list, 2, "Projection stack size: %d", projection_stack);
+	AddItem(list, 2, "Texture stack size: %d", texture_stack);
+	AddItem(list, 2, "Name stack size: %d", name_stack);
+	AddItem(list, 2, "List stack size: %d", list_stack);
+	AddItem(list, 2, "Attributes stack size: %d", attrib_stack);
 
-	AddItem(list, 1, "Maximum lights: %d", lights);
-	AddItem(list, 1, "Maximum clipping planes: %d", clipping_planes);
-	AddItem(list, 1, "Maximum evaluators equation order: %d", max_poly);
-	AddItem(list, 1, "Maximum convolution: %d x %d",
+	AddItem(list, 2, "Maximum 3D texture size: %d", max_tex3d);
+	AddItem(list, 2, "Maximum 2D texture size: %d", max_tex2d);
+	AddItem(list, 2, "Maximum texture units: %d", texture_units);
+
+	AddItem(list, 2, "Maximum lights: %d", lights);
+	AddItem(list, 2, "Maximum clipping planes: %d", clipping_planes);
+	AddItem(list, 2, "Maximum evaluators equation order: %d", max_poly);
+	AddItem(list, 2, "Maximum convolution: %d x %d",
 		convolution_width, convolution_height);
-	AddItem(list, 1, "Maximum recommended index elements: %d", max_index);
-	AddItem(list, 1, "Maximum recommended vertex elements: %d", max_vertex);
+	AddItem(list, 2, "Maximum recommended index elements: %d", max_index);
+	AddItem(list, 2, "Maximum recommended vertex elements: %d", max_vertex);
 
+	// Renderer supported extensions
 	string = (char *) glGetString(GL_EXTENSIONS);
 	if (string) {
 		AddItem(list, 1, "Extensions");
@@ -162,6 +168,8 @@ GLInfoWindow::GLInfoWindow(BRect frame)
 			string += (n + 1);	// next !
 		}
 	}
+
+	// ---- GLU info
 
 	AddItem(list, 0, "GLU");
 	AddItem(list, 1, "Version: %s", gluGetString(GLU_VERSION));
@@ -182,6 +190,7 @@ GLInfoWindow::GLInfoWindow(BRect frame)
 	}
 
 #ifdef GLUT_INFO
+	// ---- GLUT Info
 	AddItem(list, 0, "GLUT");
 	AddItem(list, 1, "API version: %d", GLUT_API_VERSION);
 #endif
