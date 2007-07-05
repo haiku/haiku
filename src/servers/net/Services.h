@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -48,7 +48,7 @@ class Services : public BHandler {
 		BLocker		fLock;
 		ServiceNameMap fNameMap;
 		ServiceSocketMap fSocketMap;
-		int32		fUpdate;
+		uint32		fUpdate;
 		int			fReadPipe;
 		int			fWritePipe;
 		int			fMinSocket;

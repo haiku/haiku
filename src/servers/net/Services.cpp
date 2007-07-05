@@ -37,11 +37,12 @@ struct service_address {
 typedef vector<service_address> AddressList;
 
 struct service {
-	std::string name;
+	std::string	name;
 	std::string	launch;
-	uid_t	user;
-	gid_t	group;
-	AddressList addresses;
+	uid_t		user;
+	gid_t		group;
+	AddressList	addresses;
+	uint32		update;
 
 	~service();
 	bool operator!=(const struct service& other) const;
@@ -187,6 +188,15 @@ Services::Services(const BMessage& services)
 Services::~Services()
 {
 	wait_for_thread(fListener, NULL);
+
+	close(fReadPipe);
+	close(fWritePipe);
+
+	// stop all services
+
+	while (!fNameMap.empty()) {
+		_StopService(*fNameMap.begin()->second);
+	}
 }
 
 
@@ -260,6 +270,7 @@ Services::_StartService(struct service& service)
 	// add service to maps and activate it
 
 	fNameMap[service.name] = &service;
+	service.update = fUpdate;
 
 	iterator = service.addresses.begin();
 	for (; iterator != service.addresses.end(); iterator++) {
@@ -456,7 +467,21 @@ Services::_Update(const BMessage& services)
 			if (*service != *iterator->second) {
 				_StopService(*iterator->second);
 				_StartService(*service);
-			}
+			} else
+				service->update = fUpdate;
+		}
+	}
+
+	// stop all services that are not part of the update message
+
+	ServiceNameMap::iterator iterator = fNameMap.begin();
+	while (iterator != fNameMap.end()) {
+		struct service* service = iterator->second;
+		iterator++;
+
+		if (service->update != fUpdate) {
+			// this service has to be removed
+			_StopService(*service);
 		}
 	}
 }
