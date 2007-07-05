@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
+ * Copyright 2005-2007, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -83,7 +83,33 @@ print_usage_and_exit(bool error)
 	exit(error ? 0 : 1);
 }
 
-// MountVisitor
+static const char *
+size_string(int64 size)
+{
+	double blocks = size;
+	static char string[64];
+
+	if (size < 1024)
+		sprintf(string, "%Ld", size);
+	else {
+		char *units[] = {"K", "M", "G", NULL};
+		int32 i = -1;
+
+		do {
+			blocks /= 1024.0;
+			i++;
+		} while (blocks >= 1024 && units[i + 1]);
+
+		snprintf(string, sizeof(string), "%.1f%s", blocks, units[i]);
+	}
+
+	return string;
+}
+
+
+//	#pragma mark -
+
+
 struct MountVisitor : public BDiskDeviceVisitor {
 	MountVisitor()
 		: silent(false),
@@ -219,12 +245,28 @@ struct PrintPartitionsVisitor : public BDiskDeviceVisitor {
 		if (type == NULL)
 			type = "<unknown>";
 
-		BPath path;
-		if (partition->IsMounted())
-			partition->GetMountPoint(&path);
+		// shorten known types for display
+		if (!strcmp(type, kPartitionTypeMultisession))
+			type = "Multisession";
+		else if (!strcmp(type, kPartitionTypeIntelExtended))
+			type = "Intel Extended";
 
-		printf("%-16s %-20s %s\n",
-			name, type, partition->IsMounted() ? path.Path() : "");
+		BPath path;
+		partition->GetPath(&path);
+		
+		// cut off beginning of the device path (if /dev/disk/)
+		int32 skip = strlen("/dev/disk/");
+		if (strncmp(path.Path(), "/dev/disk/", skip))
+			skip = 0;
+
+		BPath mountPoint;
+		if (partition->IsMounted())
+			partition->GetMountPoint(&mountPoint);
+
+		printf("%-14s %-20s %8s %s  (%s)\n",
+			name, type, size_string(partition->Size()),
+			partition->IsMounted() ? mountPoint.Path() : "",
+			path.Path() + skip);
 		return false;
 	}
 
@@ -233,7 +275,9 @@ struct PrintPartitionsVisitor : public BDiskDeviceVisitor {
 };
 
 
-// main
+//	#pragma mark -
+
+
 int
 main(int argc, char **argv)
 {
@@ -328,8 +372,8 @@ main(int argc, char **argv)
 	}
 
 	if (printPartitionsVisitor.IsUsed()) {
-		puts("Volume           File System          Mounted At");
-		puts("----------------------------------------------------------");
+		puts("Volume         File System              Size Mounted At (Device)");
+		puts("---------------------------------------------------------------------");
 
 		if (printPartitionsVisitor.listAllPartitions)
 			deviceList.VisitEachPartition(&printPartitionsVisitor);
