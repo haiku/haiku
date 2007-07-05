@@ -22,6 +22,9 @@ if $(HOST_PLATFORM) in r5 bone dano {
 		: [ FDirName $(HAIKU_TOP) headers build os interface ] ;
 	ObjectSysHdrs $(libbePatchSources)
 		: [ FDirName $(HAIKU_TOP) headers build os storage ] ;
+	if $(HOST_PLATFORM) = dano {
+		ObjectDefines $(libbePatchSources) : _IMPEXP_BE= ;
+	}
 }
 
 BuildPlatformStaticLibrary libhaikucompat_build.a :
