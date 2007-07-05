@@ -1,10 +1,11 @@
-/* File System Interface Layer Definition
- *
- * Copyright 2004-2006, Haiku Inc. All Rights Reserved.
+/*
+ * Copyright 2004-2007, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FS_INTERFACE_H
 #define _FS_INTERFACE_H
+
+/*! File System Interface Layer Definition */
 
 
 #include <OS.h>
@@ -19,9 +20,6 @@ struct dirent;
 struct stat;
 struct fs_info;
 struct select_sync;
-
-typedef dev_t mount_id;
-typedef ino_t vnode_id;
 
 /* the file system's private data structures */
 typedef void *fs_volume;
@@ -69,8 +67,8 @@ typedef struct file_system_module_info {
 	void (*free_partition_content_cookie)(partition_data *partition);
 
 	/* general operations */
-	status_t (*mount)(mount_id id, const char *device, uint32 flags, 
-				const char *args, fs_volume *_fs, vnode_id *_rootVnodeID);
+	status_t (*mount)(dev_t id, const char *device, uint32 flags, 
+				const char *args, fs_volume *_fs, ino_t *_rootVnodeID);
 	status_t (*unmount)(fs_volume fs);
 
 	status_t (*read_fs_info)(fs_volume fs, struct fs_info *info);
@@ -80,11 +78,11 @@ typedef struct file_system_module_info {
 
 	/* vnode operations */
 	status_t (*lookup)(fs_volume fs, fs_vnode dir, const char *name,
-				vnode_id *_id, int *_type);
+				ino_t *_id, int *_type);
 	status_t (*get_vnode_name)(fs_volume fs, fs_vnode vnode, char *buffer,
 				size_t bufferSize);
 
-	status_t (*get_vnode)(fs_volume fs, vnode_id id, fs_vnode *_vnode,
+	status_t (*get_vnode)(fs_volume fs, ino_t id, fs_vnode *_vnode,
 				bool reenter);
 	status_t (*put_vnode)(fs_volume fs, fs_vnode vnode, bool reenter);
 	status_t (*remove_vnode)(fs_volume fs, fs_vnode vnode, bool reenter);
@@ -132,7 +130,7 @@ typedef struct file_system_module_info {
 	/* file operations */
 	status_t (*create)(fs_volume fs, fs_vnode dir, const char *name,
 				int openMode, int perms, fs_cookie *_cookie,
-				vnode_id *_newVnodeID);
+				ino_t *_newVnodeID);
 	status_t (*open)(fs_volume fs, fs_vnode vnode, int openMode,
 				fs_cookie *_cookie);
 	status_t (*close)(fs_volume fs, fs_vnode vnode, fs_cookie cookie);
@@ -144,7 +142,7 @@ typedef struct file_system_module_info {
 
 	/* directory operations */
 	status_t (*create_dir)(fs_volume fs, fs_vnode parent, const char *name,
-				int perms, vnode_id *_newVnodeID);
+				int perms, ino_t *_newVnodeID);
 	status_t (*remove_dir)(fs_volume fs, fs_vnode parent, const char *name);
 	status_t (*open_dir)(fs_volume fs, fs_vnode vnode, fs_cookie *_cookie);
 	status_t (*close_dir)(fs_volume fs, fs_vnode vnode, fs_cookie cookie);
@@ -255,40 +253,40 @@ typedef struct file_system_module_info {
 
 
 /* file system add-ons only prototypes */
-extern status_t new_vnode(mount_id mountID, vnode_id vnodeID,
+extern status_t new_vnode(dev_t mountID, ino_t vnodeID,
 					fs_vnode privateNode);
-extern status_t publish_vnode(mount_id mountID, vnode_id vnodeID,
+extern status_t publish_vnode(dev_t mountID, ino_t vnodeID,
 					fs_vnode privateNode);
-extern status_t get_vnode(mount_id mountID, vnode_id vnodeID,
+extern status_t get_vnode(dev_t mountID, ino_t vnodeID,
 					fs_vnode *_privateNode);
-extern status_t put_vnode(mount_id mountID, vnode_id vnodeID);
-extern status_t remove_vnode(mount_id mountID, vnode_id vnodeID);
-extern status_t unremove_vnode(mount_id mountID, vnode_id vnodeID);
-extern status_t get_vnode_removed(mount_id mountID, vnode_id vnodeID,
+extern status_t put_vnode(dev_t mountID, ino_t vnodeID);
+extern status_t remove_vnode(dev_t mountID, ino_t vnodeID);
+extern status_t unremove_vnode(dev_t mountID, ino_t vnodeID);
+extern status_t get_vnode_removed(dev_t mountID, ino_t vnodeID,
 					bool* removed);
 
 // Deprecated! Will disappear soon!
-extern status_t notify_listener(int op, mount_id device, vnode_id parentNode,
-					vnode_id toParentNode, vnode_id node, const char *name);
+extern status_t notify_listener(int op, dev_t device, ino_t parentNode,
+					ino_t toParentNode, ino_t node, const char *name);
 
-extern status_t notify_entry_created(mount_id device, vnode_id directory,
-					const char *name, vnode_id node);
-extern status_t notify_entry_removed(mount_id device, vnode_id directory,
-					const char *name, vnode_id node);
-extern status_t notify_entry_moved(mount_id device, vnode_id fromDirectory,
-					const char *fromName, vnode_id toDirectory,
-					const char *toName, vnode_id node);
-extern status_t notify_stat_changed(mount_id device, vnode_id node,
+extern status_t notify_entry_created(dev_t device, ino_t directory,
+					const char *name, ino_t node);
+extern status_t notify_entry_removed(dev_t device, ino_t directory,
+					const char *name, ino_t node);
+extern status_t notify_entry_moved(dev_t device, ino_t fromDirectory,
+					const char *fromName, ino_t toDirectory,
+					const char *toName, ino_t node);
+extern status_t notify_stat_changed(dev_t device, ino_t node,
 					uint32 statFields);
-extern status_t notify_attribute_changed(mount_id device, vnode_id node,
+extern status_t notify_attribute_changed(dev_t device, ino_t node,
 					const char *attribute, int32 cause);
 
 extern status_t notify_query_entry_created(port_id port, int32 token,
-					mount_id device, vnode_id directory, const char *name,
-					vnode_id node);
+					dev_t device, ino_t directory, const char *name,
+					ino_t node);
 extern status_t notify_query_entry_removed(port_id port, int32 token,
-					mount_id device, vnode_id directory, const char *name,
-					vnode_id node);
+					dev_t device, ino_t directory, const char *name,
+					ino_t node);
 
 #ifdef __cplusplus
 }
