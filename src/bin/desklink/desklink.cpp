@@ -26,6 +26,7 @@
 #include <List.h>
 #include <MenuItem.h>
 #include <Message.h>
+#include <MimeType.h>
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Roster.h>
@@ -421,18 +422,30 @@ main(int, char **argv)
 		atLeastOnePath = true;
 
 		BEntry entry(argv[i], true);
-		if(!entry.Exists()) {
+		entry_ref ref;
+		
+		if(entry.Exists()) {
+			entry.GetRef(&ref);
+		}
+		else if (BMimeType::IsValid(argv[i])) {
+			if (be_roster->FindApp(argv[i], &ref) != B_OK) {
+				printf("desklink: cannot find '%s'\n", argv[i]);
+				return 1;
+			}
+		}
+		else {
 			printf("desklink: cannot find '%s'\n", argv[i]);
 			return 1;
 		}
-
-		entry_ref ref;
-		entry.GetRef(&ref);
-
-		err = deskbar.AddItem(new DeskButton(BRect(0, 0, 15, 15),
-			&ref, "DeskButton", titleList, actionList));
+		
+		err = deskbar.AddItem(&ref);
 		if (err != B_OK) {
-			printf("desklink: Deskbar refuses link to '%s': %s\n", argv[i], strerror(err));	
+			err = deskbar.AddItem(new DeskButton(BRect(0, 0, 15, 15),
+				&ref, "DeskButton", titleList, actionList));
+			if (err != B_OK) {
+				printf("desklink: Deskbar refuses link to '%s': %s\n", argv[i], strerror(err));
+				return 1;
+			}
 		}
 
 		titleList.MakeEmpty();
@@ -440,7 +453,7 @@ main(int, char **argv)
 	}
 
 	if (!atLeastOnePath) {
-		printf(	"usage: desklink { [ --list|--remove|[cmd=title:action ... ] path ] } ...\n"
+		printf(	"usage: desklink { [ --list|--remove|[cmd=title:action ... ] [ path|signature ] } ...\n"
 			"--list: list all Deskbar addons.\n"
 			"--remove: delete all desklink addons.\n");
 		return 1;
