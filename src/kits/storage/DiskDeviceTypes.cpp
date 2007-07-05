@@ -1,9 +1,14 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered 
-//  by the MIT license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2003-2007, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Akidau
+ */
+
 
 #include <DiskDeviceTypes.h>
+
 
 // Device Types
 
@@ -22,6 +27,7 @@ const char *kPartitionTypeDataSession	= "Data Session";
 
 const char *kPartitionTypeAmiga			= "Amiga Partition Map";
 const char *kPartitionTypeApple			= "Apple Partition Map";
+const char *kPartitionTypeEFI			= "EFI GUID Partition Map";
 const char *kPartitionTypeIntel			= "Intel Partition Map";
 
 const char *kPartitionTypeIntelPrimary	= "Intel Primary Partition";
