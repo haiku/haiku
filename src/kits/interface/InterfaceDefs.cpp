@@ -1319,6 +1319,7 @@ truncate_string(const char* string, uint32 mode, float width,
 			// TODO: implement, though it was never implemented on R5
 			// FALL THROUGH (at least do something)
 		case B_TRUNCATE_MIDDLE:
+		default:
 			truncated = truncate_middle(source, dest, numChars, escapementArray,
 				width, ellipsisWidth, fontSize);
 			break;
