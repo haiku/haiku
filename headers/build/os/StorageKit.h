@@ -2,7 +2,6 @@
  * Master include file for the Storage Kit.
  *
  */
-#include <Alias.h>
 #include <AppFileInfo.h>
 #include <Directory.h>
 #include <Entry.h>
