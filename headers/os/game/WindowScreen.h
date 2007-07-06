@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_WINDOW_SCREEN_H
@@ -14,7 +14,7 @@
 #include <kernel/image.h>
 
 
-_IMPEXP_GAME void set_mouse_position(int32 x, int32 y);
+void set_mouse_position(int32 x, int32 y);
 	// Controls the mouse cursor position on screen
 
 

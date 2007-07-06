@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -73,7 +73,7 @@ private:
 	int32	_reserved[3];
 };
 
-_IMPEXP_BE bool operator<(const BMessenger &a, const BMessenger &b);
-_IMPEXP_BE bool operator!=(const BMessenger &a, const BMessenger &b);
+bool operator<(const BMessenger &a, const BMessenger &b);
+bool operator!=(const BMessenger &a, const BMessenger &b);
 
 #endif	// _MESSENGER_H

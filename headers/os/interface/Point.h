@@ -8,6 +8,7 @@
 #ifndef	_POINT_H
 #define	_POINT_H
 
+
 #include <BeBuild.h>
 #include <SupportDefs.h>
 
@@ -39,7 +40,9 @@ public:
 	bool	operator==(const BPoint &p) const;
 };
 
-extern _IMPEXP_BE const BPoint B_ORIGIN;	// returns (0,0)
+
+extern const BPoint B_ORIGIN;
+	// returns (0,0)
 
 
 inline
