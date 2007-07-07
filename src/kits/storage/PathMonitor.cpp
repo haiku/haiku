@@ -526,7 +526,7 @@ PathHandler::_IsContained(BEntry& entry) const
 
 
 bool
-PathHandler::_HasDirectory(const node_ref& nodeRef, bool* _contained = NULL) const
+PathHandler::_HasDirectory(const node_ref& nodeRef, bool* _contained /* = NULL */) const
 {
 	watched_directory directory;
 	directory.node = nodeRef;
