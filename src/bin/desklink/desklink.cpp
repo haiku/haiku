@@ -388,10 +388,19 @@ main(int, char **argv)
 			return 0;
 		}
 
-		if (strcmp(argv[i], "--remove") == 0) {
+		if (strncmp(argv[i], "--remove", 8) == 0) {
+			BString replicant = "DeskButton";
+			if (strncmp(argv[i] + 8, "=", 1) == 0) {
+				if (strlen(argv[i] + 9) > 0) {
+					replicant = argv[i] + 9;
+				} else {
+					printf("desklink: Missing replicant name.\n");
+					return 1;
+				}
+			}
 			int32 found = 0;
 			int32 found_id;
-			while (deskbar.GetItemInfo("DeskButton", &found_id) == B_OK) {
+			while (deskbar.GetItemInfo(replicant.String(), &found_id) == B_OK) {
 				err = deskbar.RemoveItem(found_id);
 				if (err != B_OK) {
 					printf("desklink: Error removing replicant id %ld: %s\n",
@@ -453,7 +462,8 @@ main(int, char **argv)
 	if (!atLeastOnePath) {
 		printf(	"usage: desklink { [ --list|--remove|[cmd=title:action ... ] [ path|signature ] } ...\n"
 			"--list: list all Deskbar addons.\n"
-			"--remove: delete all desklink addons.\n");
+			"--remove: remove all desklink addons.\n"
+			"--remove=name: remove all 'name' addons.\n");
 		return 1;
 	}
 
