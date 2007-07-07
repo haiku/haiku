@@ -72,6 +72,11 @@ public:
 		SetTo(NULL);
 	}
 
+	inline C *Get() const
+	{
+		return fObject;
+	}
+
 	inline C *Detach()
 	{
 		C *object = fObject;
