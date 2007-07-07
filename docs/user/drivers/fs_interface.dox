@@ -6,7 +6,7 @@
  *   Ingo Weinhold 
  *   Niels Sascha Reedijk <niels.reedijk@gmail.com>
  * Corresponds to:
- *   /trunk/headers/os/drivers/fs_interface.h rev 20724
+ *   /trunk/headers/os/drivers/fs_interface.h rev 21568
  */
 
 /*!
@@ -19,16 +19,6 @@
 */
 
 ///// Typedefs /////
-
-/*!
-  \typedef typedef dev_t mount_id
-  \brief A \c mount_id refers to a mounted volume.
-*/
-
-/*!
-  \typedef typedef ino_t vnode_id
-  \brief A \c vnode_id refers to one of the available vnodes.
-*/
 
 /*! 
   \typedef typedef void *fs_volume
@@ -189,8 +179,8 @@
 //! @{
 
 /*!
-  \fn status_t (*file_system_module_info::mount)(mount_id id, const char *device,
-    uint32 flags, const char *args, fs_volume *_fs, vnode_id *_rootVnodeID)
+  \fn status_t (*file_system_module_info::mount)(ino_t id, const char *device,
+    uint32 flags, const char *args, fs_volume *_fs, ino_t *_rootVnodeID)
   \brief Mount a volume according to the specified parameters.
 
   Invoked by the VFS when it has been requested to mount the volume. The FS is
@@ -309,7 +299,7 @@
 
 /*!
   \fn status_t (*file_system_module_info::lookup)(fs_volume fs, fs_vnode dir,
-    const char *name, vnode_id *_id, int *_type)
+    const char *name, ino_t *_id, int *_type)
   \brief Looks up the node a directory entry refers to.
 
   The VFS uses this hook to resolve path names to vnodes. It is used quite
@@ -353,7 +343,7 @@
 */
 
 /*!
-  \fn status_t (*file_system_module_info::get_vnode)(fs_volume fs, vnode_id id,
+  \fn status_t (*file_system_module_info::get_vnode)(fs_volume fs, ino_t id,
     fs_vnode *_vnode, bool reenter)
   \brief Creates the private data handle to be associated with the node
     referred to by \a id.
@@ -696,7 +686,7 @@
 /*!
   \fn status_t (*file_system_module_info::create)(fs_volume fs, fs_vnode dir,
     const char *name, int openMode, int perms, fs_cookie *_cookie, 
-    vnode_id *_newVnodeID)
+    ino_t *_newVnodeID)
   \brief Create a new file.
   
   Your implementation shall check whether it is possible to create the node.
@@ -843,7 +833,7 @@
 
 /*!
   \fn status_t (*file_system_module_info::create_dir)(fs_volume fs, fs_vnode
-    parent, const char *name, int perms, vnode_id *_newVnodeID)
+    parent, const char *name, int perms, ino_t *_newVnodeID)
   \brief Create a new directory.
   
   Your implementation should make sure that the directory actually can be
@@ -1567,7 +1557,7 @@
 ///// Global Functions /////
 
 /*!
-  \fn status_t new_vnode(mount_id mountID, vnode_id vnodeID,
+  \fn status_t new_vnode(dev_t mountID, ino_t vnodeID,
     fs_vnode privateNode)
   \brief Create the vnode with ID \a vnodeID and associates it with the
     private data handle \a privateNode, but leaves is in an unpublished state.
@@ -1591,7 +1581,7 @@
 */
 
 /*!
-  \fn status_t publish_vnode(mount_id mountID, vnode_id vnodeID,
+  \fn status_t publish_vnode(dev_t mountID, ino_t vnodeID,
     fs_vnode privateNode)
   \brief Creates the vnode with ID \a vnodeID and associates it with the
     private data handle \a privateNode or just marks it published.
@@ -1612,7 +1602,7 @@
 */
 
 /*!
-  \fn status_t get_vnode(mount_id mountID, vnode_id vnodeID,
+  \fn status_t get_vnode(dev_t mountID, ino_t vnodeID,
     fs_vnode *_privateNode)
   \brief Retrieves the private data handle for the node with the given ID.
 
@@ -1627,7 +1617,7 @@
 */
 
 /*!
-  \fn status_t put_vnode(mount_id mountID, vnode_id vnodeID)
+  \fn status_t put_vnode(dev_t mountID, ino_t vnodeID)
   \brief Surrenders a reference to the specified vnode.
   \param mountID The ID of the volume.
   \param vnodeID The ID of the node.
@@ -1635,7 +1625,7 @@
 */
 
 /*!
-  \fn status_t remove_vnode(mount_id mountID, vnode_id vnodeID)
+  \fn status_t remove_vnode(dev_t mountID, ino_t vnodeID)
   \brief Marks the specified vnode removed.
 
   The caller must own a reference to the vnode or at least ensure that a
@@ -1653,7 +1643,7 @@
 */
 
 /*!
-  \fn status_t unremove_vnode(mount_id mountID, vnode_id vnodeID);
+  \fn status_t unremove_vnode(dev_t mountID, ino_t vnodeID);
   \brief Clears the "removed" mark of the specified vnode.
 
   The caller must own a reference to the vnode or at least ensure that a
@@ -1669,7 +1659,7 @@
 */
 
 /*!
-  \fn status_t get_vnode_removed(mount_id mountID, vnode_id vnodeID,
+  \fn status_t get_vnode_removed(dev_t mountID, ino_t vnodeID,
     bool* removed);
   \brief Returns whether the specified vnode is marked removed.
 
@@ -1695,53 +1685,53 @@
 //! @{
 
 /*!
-  \fn status_t notify_listener(int op, mount_id device, vnode_id parentNode,
-					vnode_id toParentNode, vnode_id node, const char *name)
+  \fn status_t notify_listener(int op, dev_t device, ino_t parentNode,
+					ino_t toParentNode, ino_t node, const char *name)
   \brief Deprecated. This feature will be removed in future versions.
 */
 
 /*!
-  \fn status_t notify_entry_created(mount_id device, vnode_id directory,
-					const char *name, vnode_id node)
+  \fn status_t notify_entry_created(dev_t device, ino_t directory,
+					const char *name, ino_t node)
   \brief Deprecated. This feature will be removed in future versions.
 */
 
 /*!
-  \fn status_t notify_entry_removed(mount_id device, vnode_id directory,
-					const char *name, vnode_id node)
+  \fn status_t notify_entry_removed(dev_t device, ino_t directory,
+					const char *name, ino_t node)
   \brief Deprecated. This feature will be removed in future versions.
 */
 
 /*!
-  \fn status_t notify_entry_moved(mount_id device, vnode_id fromDirectory,
-					const char *fromName, vnode_id toDirectory,
-					const char *toName, vnode_id node)
+  \fn status_t notify_entry_moved(dev_t device, ino_t fromDirectory,
+					const char *fromName, ino_t toDirectory,
+					const char *toName, ino_t node)
   \brief Deprecated. This feature will be removed in future versions.
 */
 
 /*!
-  \fn status_t notify_stat_changed(mount_id device, vnode_id node,
+  \fn status_t notify_stat_changed(dev_t device, ino_t node,
 					uint32 statFields)
   \brief Deprecated. This feature will be removed in future versions.
 */
 
 /*!
-  \fn status_t notify_attribute_changed(mount_id device, vnode_id node,
+  \fn status_t notify_attribute_changed(dev_t device, ino_t node,
 					const char *attribute, int32 cause)
   \brief Deprecated. This feature will be removed in future versions.
 */
 
 /*!
   \fn status_t notify_query_entry_created(port_id port, int32 token,
-					mount_id device, vnode_id directory, const char *name,
-					vnode_id node)
+					dev_t device, ino_t directory, const char *name,
+					ino_t node)
   \brief Deprecated. This feature will be removed in future versions.
 */
 
 /*!
   \fn status_t notify_query_entry_removed(port_id port, int32 token,
-					mount_id device, vnode_id directory, const char *name,
-					vnode_id node)
+					dev_t device, ino_t directory, const char *name,
+					ino_t node)
   \brief Deprecated. This feature will be removed in future versions.
 */
 
