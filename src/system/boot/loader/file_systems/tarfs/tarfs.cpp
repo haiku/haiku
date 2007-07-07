@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Ingo Weinhold, bonefish@cs.tu-berlin.de. All rights reserved.
+ * Copyright 2005-2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
  * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -33,8 +33,8 @@
 #endif
 
 
-static const uint32 kCompressedArchiveOffset = 192 * 1024;	// at 192 kB
-static const size_t kTarRegionSize = 4 * 1024 * 1024;		// 4 MB
+static const uint32 kFloppyArchiveOffset = 192 * 1024;	// at 192 kB
+static const size_t kTarRegionSize = 32 * 1024 * 1024;		// 32 MB
 
 namespace TarFS {
 
@@ -126,6 +126,31 @@ class Directory : public ::Directory, public Entry {
 		EntryList	fEntries;
 };
 
+
+class Symlink : public ::Node, public Entry {
+	public:
+		Symlink(tar_header *header, const char *name);
+		virtual ~Symlink();
+
+		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer,
+			size_t bufferSize);
+		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer,
+			size_t bufferSize);
+
+		virtual status_t GetName(char *nameBuffer, size_t bufferSize) const;
+
+		virtual int32 Type() const;
+		virtual off_t Size() const;
+		virtual ino_t Inode() const;
+
+		virtual ::Node *ToNode() { return this; }
+
+	private:
+		tar_header	*fHeader;
+		size_t		fSize;
+};
+
+
 class Volume : public TarFS::Directory {
 	public:
 		Volume();
@@ -134,6 +159,11 @@ class Volume : public TarFS::Directory {
 		status_t			Init(boot::Partition *partition);
 
 		TarFS::Directory	*Root() { return this; }
+
+	private:
+		status_t			_Inflate(boot::Partition *partition, void* cookie,
+								off_t offset, RegionDeleter& regionDeleter,
+								size_t* inflatedBytes);
 };
 
 }	// namespace TarFS
@@ -453,12 +483,19 @@ TarFS::Directory::AddFile(tar_header *header)
 			return error;
 	}
 
-	// create the file
-	TarFS::File *file = new(nothrow) TarFS::File(header, leaf);
-	if (!file)
+	// create the entry
+	TarFS::Entry *entry;
+	if (header->type == TAR_FILE || header->type == TAR_FILE2)
+		entry = new(nothrow) TarFS::File(header, leaf);
+	else if (header->type == TAR_SYMLINK)
+		entry = new(nothrow) TarFS::Symlink(header, leaf);
+	else
+		return B_BAD_VALUE;
+
+	if (!entry)
 		return B_NO_MEMORY;
 
-	dir->fEntries.Add(file);
+	dir->fEntries.Add(entry);
 
 	return B_OK;
 }
@@ -473,6 +510,83 @@ TarFS::Directory::IsEmpty()
 
 ino_t
 TarFS::Directory::Inode() const
+{
+	return fID;
+}
+
+
+// #pragma mark -
+
+
+TarFS::Symlink::Symlink(tar_header *header, const char *name)
+	: TarFS::Entry(name),
+	fHeader(header)
+{
+	fSize = strnlen(header->linkname, sizeof(header->linkname));
+	// null-terminate for sure (might overwrite a byte of the magic)
+	header->linkname[fSize++] = '\0';
+}
+
+
+TarFS::Symlink::~Symlink()
+{
+}
+
+
+ssize_t
+TarFS::Symlink::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
+{
+	TRACE(("tarfs: symlink read at %Ld, %lu bytes, fSize = %Ld\n", pos,
+		bufferSize, fSize));
+
+	if (pos < 0 || !buffer)
+		return B_BAD_VALUE;
+
+	if (pos >= fSize || bufferSize == 0)
+		return 0;
+
+	size_t toRead = fSize - pos;
+	if (toRead > bufferSize)
+		toRead = bufferSize;
+
+	memcpy(buffer, fHeader->linkname + pos, toRead);
+
+	return toRead;
+}
+
+
+ssize_t
+TarFS::Symlink::WriteAt(void *cookie, off_t pos, const void *buffer,
+	size_t bufferSize)
+{
+	return B_NOT_ALLOWED;
+}
+
+
+status_t
+TarFS::Symlink::GetName(char *nameBuffer, size_t bufferSize) const
+{
+	return strlcpy(nameBuffer, Name(), bufferSize) >= bufferSize
+		? B_BUFFER_OVERFLOW : B_OK;
+}
+
+
+int32
+TarFS::Symlink::Type() const
+{
+	return S_IFLNK;
+}
+
+
+off_t
+TarFS::Symlink::Size() const
+{
+	return fSize;
+}
+
+
+ino_t
+TarFS::Symlink::Inode() const
 {
 	return fID;
 }
@@ -516,79 +630,22 @@ TarFS::Volume::Init(boot::Partition *partition)
 		}
 	} _(partition, cookie);
 
+	// inflate the tar file -- try offset 0 and the archive offset on a floppy
+	// disk
 	RegionDeleter regionDeleter;
-
-	char *out = NULL;
-
-	char in[2048];
-	z_stream zStream = {
-		(Bytef*)in,		// next in
-		sizeof(in),		// avail in
-		0,				// total in
-		NULL,			// next out
-		0,				// avail out
-		0,				// total out
-		0,				// msg
-		0,				// state
-		Z_NULL,			// zalloc
-		Z_NULL,			// zfree
-		Z_NULL,			// opaque
-		0,				// data type
-		0,				// adler
-		0,				// reserved
-	};
-
-	int status;
-	uint32 offset = kCompressedArchiveOffset;
-
-	do {
-		if (partition->ReadAt(cookie, offset, in, sizeof(in)) != sizeof(in)) {
-			status = Z_STREAM_ERROR;
-			break;
-		}
-
-		zStream.avail_in = sizeof(in);
-		zStream.next_in = (Bytef *)in;
-
-		if (offset == kCompressedArchiveOffset) {
-			// check and skip gzip header
-			if (!skip_gzip_header(&zStream))
-				return B_BAD_DATA;
-
-			if (platform_allocate_region((void **)&out, kTarRegionSize,
-					B_READ_AREA | B_WRITE_AREA, false) != B_OK) {
-				TRACE(("tarfs: allocating region failed!\n"));
-				return B_NO_MEMORY;
-			}
-
-			regionDeleter.SetTo(out);
-			zStream.avail_out = kTarRegionSize;
-			zStream.next_out = (Bytef *)out;
-
-			status = inflateInit2(&zStream, -15);
-			if (status != Z_OK)
-				return B_ERROR;
-		}
-
-		status = inflate(&zStream, Z_SYNC_FLUSH);
-		offset += sizeof(in);
-
-		if (zStream.avail_in != 0 && status != Z_STREAM_END)
-			dprintf("tarfs: didn't read whole block!\n");
-	} while (status == Z_OK);
-
-	inflateEnd(&zStream);
-
-	if (status != Z_STREAM_END) {
-		TRACE(("tarfs: inflating failed: %d!\n", status));
-		return B_BAD_DATA;
+	size_t inflatedBytes;
+	status_t status = _Inflate(partition, cookie, 0, regionDeleter,
+		&inflatedBytes);
+	if (status != B_OK) {
+		status = _Inflate(partition, cookie, kFloppyArchiveOffset,
+			regionDeleter, &inflatedBytes);
 	}
-
-	status = B_OK;
+	if (status != B_OK)
+		return status;
 
 	// parse the tar file
-	char *block = out;
-	int blockCount = zStream.total_out / BLOCK_SIZE;
+	char *block = (char*)regionDeleter.Get();
+	int blockCount = inflatedBytes / BLOCK_SIZE;
 	int blockIndex = 0;
 
 	while (blockIndex < blockCount) {
@@ -615,6 +672,7 @@ TarFS::Volume::Init(boot::Partition *partition)
 		switch (header->type) {
 			case TAR_FILE:
 			case TAR_FILE2:
+			case TAR_SYMLINK:
 				status = AddFile(header);
 				break;
 
@@ -626,6 +684,7 @@ TarFS::Volume::Init(boot::Partition *partition)
 				// this is a long file name
 				// TODO: read long name
 			default:
+				dprintf("tarfs: unsupported file type: %d ('%c')\n", header->type, header->type);
 				// unsupported type
 				status = B_ERROR;
 				break;
@@ -644,6 +703,89 @@ TarFS::Volume::Init(boot::Partition *partition)
 	regionDeleter.Detach();
 	return B_OK;
 }
+
+
+status_t
+TarFS::Volume::_Inflate(boot::Partition *partition, void* cookie, off_t offset,
+	RegionDeleter& regionDeleter, size_t* inflatedBytes)
+{
+	char in[2048];
+	z_stream zStream = {
+		(Bytef*)in,		// next in
+		sizeof(in),		// avail in
+		0,				// total in
+		NULL,			// next out
+		0,				// avail out
+		0,				// total out
+		0,				// msg
+		0,				// state
+		Z_NULL,			// zalloc
+		Z_NULL,			// zfree
+		Z_NULL,			// opaque
+		0,				// data type
+		0,				// adler
+		0,				// reserved
+	};
+
+	int status;
+	char* out = (char*)regionDeleter.Get();
+	bool headerRead = false;
+
+	do {
+		ssize_t bytesRead = partition->ReadAt(cookie, offset, in, sizeof(in));
+		if (bytesRead != (ssize_t)sizeof(in)) {
+			if (bytesRead <= 0) {
+				status = Z_STREAM_ERROR;
+				break;
+			}
+		}
+
+		zStream.avail_in = bytesRead;
+		zStream.next_in = (Bytef *)in;
+
+		if (!headerRead) {
+			// check and skip gzip header
+			if (!skip_gzip_header(&zStream))
+				return B_BAD_DATA;
+			headerRead = true;
+
+			if (!out) {
+				// allocate memory for the uncompressed data
+				if (platform_allocate_region((void **)&out, kTarRegionSize,
+						B_READ_AREA | B_WRITE_AREA, false) != B_OK) {
+					TRACE(("tarfs: allocating region failed!\n"));
+					return B_NO_MEMORY;
+				}
+				regionDeleter.SetTo(out);
+			}
+
+			zStream.avail_out = kTarRegionSize;
+			zStream.next_out = (Bytef *)out;
+
+			status = inflateInit2(&zStream, -15);
+			if (status != Z_OK)
+				return B_ERROR;
+		}
+
+		status = inflate(&zStream, Z_SYNC_FLUSH);
+		offset += bytesRead;
+
+		if (zStream.avail_in != 0 && status != Z_STREAM_END)
+			dprintf("tarfs: didn't read whole block!\n");
+	} while (status == Z_OK);
+
+	inflateEnd(&zStream);
+
+	if (status != Z_STREAM_END) {
+		TRACE(("tarfs: inflating failed: %d!\n", status));
+		return B_BAD_DATA;
+	}
+
+	*inflatedBytes = zStream.total_out;
+
+	return B_OK;
+}
+
 
 
 //	#pragma mark -

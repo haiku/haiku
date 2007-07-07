@@ -38,6 +38,7 @@ static const char *kOldTarHeaderMagic = "ustar  ";
 enum {
 	TAR_FILE		= '0',
 	TAR_FILE2		= '\0',
+	TAR_SYMLINK		= '2',
 	TAR_DIRECTORY	= '5',
 	TAR_LONG_NAME	= 'L',
 };
