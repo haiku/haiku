@@ -1,4 +1,5 @@
 #include "Coding.h"
+#include <string.h>
 
 struct etable {
 	const char *name;     	// long name for menu item.
