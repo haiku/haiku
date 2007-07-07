@@ -15,6 +15,7 @@
 #include <boot/platform.h>
 
 #include <string.h>
+#include <unistd.h>
 
 
 static status_t

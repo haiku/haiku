@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src libs zlib ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 UseLibraryHeaders zlib ;
 
 local shared_files =
