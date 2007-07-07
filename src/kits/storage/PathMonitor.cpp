@@ -40,12 +40,27 @@ using namespace std;
 
 namespace BPrivate {
 
+#if __GNUC__ > 3
+	bool operator<(const node_ref& a, const node_ref& b);
+	class node_ref_less : public binary_function<node_ref, node_ref, bool> 
+	{
+		public:
+		bool operator() (const node_ref& a, const node_ref& b) const
+		{
+			return a < b;
+		}
+	};
+	typedef set<node_ref,node_ref_less> FileSet;
+#else
+	typedef set<node_ref> FileSet;
+#endif
+
 struct watched_directory {
 	node_ref	node;
 	bool		contained;
 };
 typedef set<watched_directory> DirectorySet;
-typedef set<node_ref> FileSet;
+
 
 class PathHandler;
 typedef map<BString, PathHandler*> HandlerMap;
