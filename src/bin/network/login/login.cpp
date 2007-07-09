@@ -201,7 +201,7 @@ main(int argc, char *argv[])
 				if (geteuid() != 0) {
 					fprintf(stderr, "%s: %s\n", kProgramName,
 						strerror(B_NOT_ALLOWED));
-					exit(-1);
+					exit(1);
 				}
 
 				fromHost = optarg;
@@ -250,7 +250,7 @@ main(int argc, char *argv[])
 		// login failure
 		syslog(LOG_NOTICE, "login%s failed for \"%s\"", get_from(fromHost),
 			passwd->pw_name);
-		exit(-1);
+		exit(1);
 	}
 
 	// setup environment for the user
@@ -262,7 +262,7 @@ main(int argc, char *argv[])
 			kProgramName, strerror(status));
 		syslog(LOG_NOTICE, "login%s refused for \"%s\"", get_from(fromHost),
 			passwd->pw_name);
-		exit(-1);
+		exit(1);
 	}
 
 	syslog(LOG_INFO, "login%s as \"%s\"", get_from(fromHost), passwd->pw_name);
@@ -279,6 +279,6 @@ main(int argc, char *argv[])
 	fprintf(stderr, "%s: starting the shell failed: %s", kProgramName,
 		strerror(errno));
 
-	return -1;
+	return 1;
 }
 
