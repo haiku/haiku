@@ -2,8 +2,8 @@
  * lcnalloc.c - Cluster (de)allocation code. Originated from the Linux-NTFS project.
  *
  * Copyright (c) 2002-2004 Anton Altaparmakov
- * Copyright (c) 2004-2007 Szabolcs Szakacsits
  * Copyright (c) 2004 Yura Pakhuchiy
+ * Copyright (c) 2004-2007 Szabolcs Szakacsits
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -45,56 +45,91 @@
 #include "logging.h"
 #include "misc.h"
 
-#define NTFS_LCNALLOC_BSIZE  512
+/*
+ * Plenty possibilities for big optimizations all over in the cluster
+ * allocation, however at the moment the dominant bottleneck (~ 90%) is 
+ * the update of the mapping pairs which converges to the cubic Faulhaber's
+ * formula as the function of the number of extents (fragments, runs).
+ */
+#define NTFS_LCNALLOC_BSIZE 1024
+#define NTFS_LCNALLOC_SKIP  NTFS_LCNALLOC_BSIZE
 
-#define NTFS_LCNALLOC_SKIP  4096
-
-static void ntfs_cluster_set_zone_pos(LCN zone_start, LCN zone_end, 
-			LCN *zone_pos, LCN tc, LCN bmp_initial_pos)
+static void ntfs_cluster_set_zone_pos(LCN start, LCN end, LCN *pos, LCN tc)
 {
-	ntfs_log_trace("Before: zone_pos: %lld\n", (long long)*zone_pos);
+	ntfs_log_trace("pos: %lld  tc: %lld\n", (long long)*pos, tc);
 
-	if (tc >= zone_end) {
-		*zone_pos = zone_start;
-		// FIXME: seems to be bogus and only MFT zone used it
-		if (!zone_end)
-			*zone_pos = 0;
-	} else if ((bmp_initial_pos >= *zone_pos || tc > *zone_pos) && 
-		   tc >= zone_start)
-		*zone_pos = tc;
-
-	ntfs_log_trace("After: zone_pos: %lld\n", (long long)*zone_pos);
+	if (tc >= end)
+		*pos = start;
+	else if (tc >= start)
+		*pos = tc;
 }
 
-static int ntfs_cluster_update_zone_pos(ntfs_volume *vol, u8 zone, LCN tc,
-					LCN bmp_initial_pos)
+static void ntfs_cluster_update_zone_pos(ntfs_volume *vol, u8 zone, LCN tc)
 {
 	ntfs_log_trace("tc = %lld, zone = %d\n", (long long)tc, zone);
 	
-	switch (zone) {
-	case 1:
-		ntfs_cluster_set_zone_pos(vol->mft_lcn, 
-					  vol->mft_zone_end,
-					  &vol->mft_zone_pos, 
-					  tc, bmp_initial_pos);
-		break;
-	case 2:
-		ntfs_cluster_set_zone_pos(vol->mft_zone_end, 
-					  vol->nr_clusters, 
-					  &vol->data1_zone_pos,
-					  tc, bmp_initial_pos);
-		break;
-	case 4:
-		ntfs_cluster_set_zone_pos(0, 
-					  vol->mft_zone_start, 
-					  &vol->data2_zone_pos, 
-					  tc, bmp_initial_pos);
-		break;
-	default:
-		ntfs_log_error("Invalid zone: %d\n", zone);
-		return -1;
+	if (zone == 1)
+		ntfs_cluster_set_zone_pos(vol->mft_lcn, vol->mft_zone_end,
+					  &vol->mft_zone_pos, tc);
+	else if (zone == 2)
+		ntfs_cluster_set_zone_pos(vol->mft_zone_end, vol->nr_clusters,
+					  &vol->data1_zone_pos, tc);
+	else /* zone == 4 */
+		ntfs_cluster_set_zone_pos(0, vol->mft_zone_start, 
+					  &vol->data2_zone_pos, tc);
+}
+
+static s64 max_empty_bit_range(unsigned char *buf, int size)
+{
+	int i, j, run = 0;
+	int max_range = 0;
+	s64 start_pos = -1;
+	
+	ntfs_log_trace("Entering");
+	
+	for (i = 0; i < size; i++, buf++) {
+		
+		for (j = 0; j < 8; j++) {
+			
+			int bit = *buf & (1 << j);
+		
+			if (bit) {
+				if (run > max_range) {
+					max_range = run;
+					start_pos = i * 8 + j - run;
+				}
+				run = 0;
+			} else 
+				run++;
+		}		
 	}
 	
+	if (run > max_range)
+		start_pos = i * 8 - run;
+	
+	return start_pos;
+}
+
+static int bitmap_writeback(ntfs_volume *vol, s64 pos, s64 size, void *b, 
+			    u8 *writeback)
+{
+	s64 written;
+	
+	ntfs_log_trace("Entering");
+	
+	if (!*writeback)
+		return 0;
+	
+	*writeback = 0;
+	
+	written = ntfs_attr_pwrite(vol->lcnbmp_na, pos, size, b);
+	if (written != size) {
+		if (!written)
+			errno = EIO;
+		ntfs_log_perror("Bitmap write error (%lld, %lld)", pos, size);
+		return -1;
+	}
+
 	return 0;
 }
 
@@ -126,45 +161,33 @@ static int ntfs_cluster_update_zone_pos(ntfs_volume *vol, u8 zone, LCN tc,
  * expanded to cover the start of the volume in order to reserve space for the
  * mft bitmap attribute.
  *
- * This is not the prettiest function but the complexity stems from the need of
- * implementing the mft vs data zoned approach and from the fact that we have
- * access to the lcn bitmap via up to NTFS_LCNALLOC_BSIZE bytes at a time, so we
- * need to cope with crossing over boundaries of two buffers. Further, the fact
- * that the allocator allows for caller supplied hints as to the location of
- * where allocation should begin and the fact that the allocator keeps track of
- * where in the data zones the next natural allocation should occur, contribute
- * to the complexity of the function. But it should all be worthwhile, because
- * this allocator should: 1) be a full implementation of the MFT zone approach
- * used by Windows, 2) cause reduction in fragmentation as much as possible,
- * and 3) be speedy in allocations (the code is not optimized for speed, but
- * the algorithm is, so further speed improvements are probably possible).
- *
- * FIXME: We should be monitoring cluster allocation and increment the MFT zone
- * size dynamically but this is something for the future. We will just cause
- * heavier fragmentation by not doing it and I am not even sure Windows would
- * grow the MFT zone dynamically, so it might even be correct not to do this.
- * The overhead in doing dynamic MFT zone expansion would be very large and
- * unlikely worth the effort. (AIA)
- *
- * TODO: I have added in double the required zone position pointer wrap around
- * logic which can be optimized to having only one of the two logic sets.
- * However, having the double logic will work fine, but if we have only one of
- * the sets and we get it wrong somewhere, then we get into trouble, so
- * removing the duplicate logic requires _very_ careful consideration of _all_
- * possible code paths. So at least for now, I am leaving the double logic -
- * better safe than sorry... (AIA)
+ * The complexity stems from the need of implementing the mft vs data zoned 
+ * approach and from the fact that we have access to the lcn bitmap via up to 
+ * NTFS_LCNALLOC_BSIZE bytes at a time, so we need to cope with crossing over 
+ * boundaries of two buffers. Further, the fact that the allocator allows for 
+ * caller supplied hints as to the location of where allocation should begin 
+ * and the fact that the allocator keeps track of where in the data zones the 
+ * next natural allocation should occur, contribute to the complexity of the 
+ * function. But it should all be worthwhile, because this allocator: 
+ *   1) implements MFT zone reservation
+ *   2) causes reduction in fragmentation. 
+ * The code is not optimized for speed.
  */
 runlist *ntfs_cluster_alloc(ntfs_volume *vol, VCN start_vcn, s64 count,
 		LCN start_lcn, const NTFS_CLUSTER_ALLOCATION_ZONES zone)
 {
-	LCN zone_start, zone_end, bmp_pos, bmp_initial_pos, last_read_pos, lcn;
-	LCN prev_lcn = 0, prev_run_len = 0, mft_zone_size;
+	LCN zone_start, zone_end;  /* current search range */
+	LCN last_read_pos, lcn;
+	LCN bmp_pos;		/* current bit position inside the bitmap */
+	LCN prev_lcn = 0, prev_run_len = 0;
 	s64 clusters, br;
 	runlist *rl = NULL, *trl;
-	u8 *buf, *byte;
+	u8 *buf, *byte, bit, writeback;
+	u8 pass = 1; 	/* 1: inside zone;  2: start of zone */
+	u8 search_zone; /* 4: data2 (start) 1: mft (middle) 2: data1 (end) */
+	u8 done_zones = 0;
+	u8 has_guess, used_zone_pos;
 	int err = 0, rlpos, rlsize, buf_size;
-	u8 pass, done_zones, search_zone, need_writeback, bit;
-	u8 first_try = 1;
 
 	ntfs_log_trace("Entering with count = 0x%llx, start_lcn = 0x%llx, "
 		       "zone = %s_ZONE.\n", (long long)count, (long long)
@@ -181,490 +204,280 @@ runlist *ntfs_cluster_alloc(ntfs_volume *vol, VCN start_vcn, s64 count,
 	/* Return empty runlist if @count == 0 */
 	if (!count) {
 		rl = ntfs_malloc(0x1000);
-		if (!rl)
-			return NULL;
-		rl[0].vcn = start_vcn;
-		rl[0].lcn = LCN_RL_NOT_MAPPED;
-		rl[0].length = 0;
+		if (rl) {
+			rl[0].vcn = start_vcn;
+			rl[0].lcn = LCN_RL_NOT_MAPPED;
+			rl[0].length = 0;
+		}
 		return rl;
 	}
 
-	/* Allocate memory. */
 	buf = ntfs_malloc(NTFS_LCNALLOC_BSIZE);
 	if (!buf)
 		return NULL;
 	/*
-	 * If no specific @start_lcn was requested, use the current data zone
-	 * position, otherwise use the requested @start_lcn but make sure it
-	 * lies outside the mft zone. Also set done_zones to 0 (no zones done)
-	 * and pass depending on whether we are starting inside a zone (1) or
-	 * at the beginning of a zone (2). If requesting from the MFT_ZONE,
-	 * we either start at the current position within the mft zone or at
-	 * the specified position. If the latter is out of bounds then we start
-	 * at the beginning of the MFT_ZONE.
+	 * If no @start_lcn was requested, use the current zone
+	 * position otherwise use the requested @start_lcn.
 	 */
-	done_zones = 0;
-	pass = 1;
-	/*
-	 * zone_start and zone_end are the current search range. search_zone
-	 * is 1 for mft zone, 2 for data zone 1 (end of mft zone till end of
-	 * volume) and 4 for data zone 2 (start of volume till start of mft
-	 * zone).
-	 */
+	has_guess = 1;
 	zone_start = start_lcn;
+	
 	if (zone_start < 0) {
 		if (zone == DATA_ZONE)
 			zone_start = vol->data1_zone_pos;
 		else
 			zone_start = vol->mft_zone_pos;
-		if (!zone_start) {
-			/*
-			 * Zone starts at beginning of volume which means a
-			 * single pass is sufficient.
-			 */
-			pass = 2;
-		}
-	} else if (zone == DATA_ZONE && zone_start >= vol->mft_zone_start &&
-			zone_start < vol->mft_zone_end) {
-		zone_start = vol->mft_zone_end;
-		/*
-		 * Starting at beginning of data1_zone which means a single
-		 * pass in this zone is sufficient.
-		 */
-		pass = 2;
-	} else if (zone == MFT_ZONE && (zone_start < vol->mft_zone_start ||
-			zone_start >= vol->mft_zone_end)) {
-		zone_start = vol->mft_lcn;
-		if (!vol->mft_zone_end)
-			zone_start = 0;
-		/*
-		 * Starting at beginning of volume which means a single pass
-		 * is sufficient.
-		 */
-		pass = 2;
+		has_guess = 0;
 	}
-	if (zone == MFT_ZONE) {
+	
+	used_zone_pos = has_guess ? 0 : 1;
+	
+	if (!zone_start || zone_start == vol->mft_zone_start ||
+			zone_start == vol->mft_zone_end)
+		pass = 2;
+		
+	if (zone_start < vol->mft_zone_start) {
+		zone_end = vol->mft_zone_start;
+		search_zone = 4;
+	} else if (zone_start < vol->mft_zone_end) {
 		zone_end = vol->mft_zone_end;
 		search_zone = 1;
-	} else /* if (zone == DATA_ZONE) */ {
-		/* Skip searching the mft zone. */
-		done_zones |= 1;
-		if (zone_start >= vol->mft_zone_end) {
-			zone_end = vol->nr_clusters;
-			search_zone = 2;
-		} else {
-			zone_end = vol->mft_zone_start;
-			search_zone = 4;
-		}
+	} else {
+		zone_end = vol->nr_clusters;
+		search_zone = 2;
 	}
-	/*
-	 * bmp_pos is the current bit position inside the bitmap. We use
-	 * bmp_initial_pos to determine whether or not to do a zone switch.
-	 */
-	bmp_pos = bmp_initial_pos = zone_start;
+	
+	bmp_pos = zone_start;
 
-	/* Loop until all clusters are allocated, i.e. clusters == 0. */
+	/* Loop until all clusters are allocated. */
 	clusters = count;
 	rlpos = rlsize = 0;
 	while (1) {
-		ntfs_log_trace("Start of outer while loop: done_zones = 0x%x, "
-				"search_zone = %i, pass = %i, zone_start = "
-				"0x%llx, zone_end = 0x%llx, bmp_initial_pos = "
-				"0x%llx, bmp_pos = 0x%llx, rlpos = %i, rlsize = "
-				"%i.\n", done_zones, search_zone, pass,
-				(long long)zone_start, (long long)zone_end,
-				(long long)bmp_initial_pos, (long long)bmp_pos,
-				rlpos, rlsize);
-		/* Loop until we run out of free clusters. */
 		last_read_pos = bmp_pos >> 3;
-		ntfs_log_trace("last_read_pos = 0x%llx.\n", (long long)last_read_pos);
-		br = ntfs_attr_pread(vol->lcnbmp_na, last_read_pos, NTFS_LCNALLOC_BSIZE, buf);
+		br = ntfs_attr_pread(vol->lcnbmp_na, last_read_pos, 
+				     NTFS_LCNALLOC_BSIZE, buf);
 		if (br <= 0) {
-			if (!br) {
-				/* Reached end of attribute. */
-				ntfs_log_trace("End of attribute reached. Skipping "
-						"to zone_pass_done.\n");
+			if (!br)
 				goto zone_pass_done;
-			}
 			err = errno;
-			ntfs_log_perror("ntfs_attr_pread() failed");
+			ntfs_log_perror("Reading $BITMAP failed");
 			goto err_ret;
 		}
 		/*
-		 * We might have read less than NTFS_LCNALLOC_BSIZE bytes if we are close to
-		 * the end of the attribute.
+		 * We might have read less than NTFS_LCNALLOC_BSIZE bytes
+		 * if we are close to the end of the attribute.
 		 */
 		buf_size = (int)br << 3;
 		lcn = bmp_pos & 7;
 		bmp_pos &= ~7;
-		need_writeback = 0;
-		ntfs_log_trace("Before inner while loop: buf_size = %i, lcn = "
-				"0x%llx, bmp_pos = 0x%llx, need_writeback = %i.\n",
-				buf_size, (long long)lcn, (long long)bmp_pos,
-				need_writeback);
-		while (lcn < buf_size && lcn + bmp_pos < zone_end) {
+		writeback = 0;
+		
+		while (1) {
 			byte = buf + (lcn >> 3);
-			ntfs_log_trace("In inner while loop: buf_size = %i, lcn = "
-					"0x%llx, bmp_pos = 0x%llx, "
-					"need_writeback = %i, byte ofs = 0x%x, "
-					"*byte = 0x%x.\n", buf_size,
-					(long long)lcn, (long long)bmp_pos,
-					need_writeback, (unsigned int)(lcn >> 3),
-					(unsigned int)*byte);
-			/* Skip full bytes. */
-			if (*byte == 0xff) {
-				lcn = (lcn + 8) & ~7;
-				ntfs_log_trace("continuing while loop 1.\n");
-				if (first_try) {
-					first_try = 0;
-					lcn += NTFS_LCNALLOC_SKIP;
-				}
-				continue;
-			}
 			bit = 1 << (lcn & 7);
-			ntfs_log_trace("bit = %i.\n", bit);
-			/* If the bit is already set, go onto the next one. */
-			if (*byte & bit) {
-				lcn++;
-				ntfs_log_trace("continuing while loop 2.\n");
-				if (first_try) {
-					first_try = 0;
-					lcn += NTFS_LCNALLOC_SKIP;
+			if (has_guess) {
+				if (*byte & bit) {
+					has_guess = 0;
+					break;
 				}
+			} else {
+				lcn = max_empty_bit_range(buf, br);
+				if (lcn < 0)
+					break;
+				has_guess = 1;
 				continue;
 			}
+
+			/* First free bit is at lcn + bmp_pos. */
+			 
 			/* Reallocate memory if necessary. */
 			if ((rlpos + 2) * (int)sizeof(runlist) >= rlsize) {
-				ntfs_log_trace("Reallocating space.\n");
-				if (!rl)
-					ntfs_log_trace("First free bit is at LCN = "
-						"0x%llx.\n", (long long)(lcn + bmp_pos));
 				rlsize += 4096;
-				trl = (runlist*)realloc(rl, rlsize);
+				trl = realloc(rl, rlsize);
 				if (!trl) {
 					err = ENOMEM;
-					ntfs_log_perror("Failed to allocate memory");
+					ntfs_log_perror("realloc() failed");
 					goto wb_err_ret;
 				}
 				rl = trl;
-				ntfs_log_trace("Reallocated memory, rlsize = "
-						"0x%x.\n", rlsize);
 			}
+			
 			/* Allocate the bitmap bit. */
 			*byte |= bit;
-			/* We need to write this bitmap buffer back to disk! */
-			need_writeback = 1;
-			ntfs_log_trace("*byte = 0x%x, need_writeback is set.\n",
-					(unsigned int)*byte);
+			writeback = 1;
+			
 			/*
 			 * Coalesce with previous run if adjacent LCNs.
 			 * Otherwise, append a new run.
 			 */
-			ntfs_log_trace("Adding run (lcn 0x%llx, len 0x%llx), "
-					"prev_lcn = 0x%llx, lcn = 0x%llx, "
-					"bmp_pos = 0x%llx, prev_run_len = "
-					"0x%llx, rlpos = %i.\n",
-					(long long)(lcn + bmp_pos), 1LL,
-					(long long)prev_lcn, (long long)lcn,
-					(long long)bmp_pos,
-					(long long)prev_run_len, rlpos);
-			if (prev_lcn == lcn + bmp_pos - prev_run_len && rlpos) {
-				ntfs_log_trace("Coalescing to run (lcn 0x%llx, len "
-						"0x%llx).\n",
-						(long long)rl[rlpos - 1].lcn,
-						(long long) rl[rlpos - 1].length);
+			if (prev_lcn == lcn + bmp_pos - prev_run_len && rlpos)
 				rl[rlpos - 1].length = ++prev_run_len;
-				ntfs_log_trace("Run now (lcn 0x%llx, len 0x%llx), "
-						"prev_run_len = 0x%llx.\n",
-						(long long)rl[rlpos - 1].lcn,
-						(long long)rl[rlpos - 1].length,
-						(long long)prev_run_len);
-			} else {
-				if (rlpos) {
-					ntfs_log_trace("Adding new run, (previous "
-						"run lcn 0x%llx, len 0x%llx).\n",
-						(long long) rl[rlpos - 1].lcn,
-						(long long) rl[rlpos - 1].length);
+			else {
+				if (rlpos)
 					rl[rlpos].vcn = rl[rlpos - 1].vcn +
 							prev_run_len;
-				} else {
-					ntfs_log_trace("Adding new run, is first run.\n");
+				else
 					rl[rlpos].vcn = start_vcn;
-				}
+				
 				rl[rlpos].lcn = prev_lcn = lcn + bmp_pos;
 				rl[rlpos].length = prev_run_len = 1;
 				rlpos++;
 			}
+			
 			/* Done? */
 			if (!--clusters) {
-				if (ntfs_cluster_update_zone_pos(vol,
-						search_zone, lcn + bmp_pos + 1 
-							+ NTFS_LCNALLOC_SKIP,
-						bmp_initial_pos)) {
-					free(rl);
-					free(buf);
-					return NULL;
-				}
+				if (used_zone_pos)
+					ntfs_cluster_update_zone_pos(vol, 
+						search_zone, lcn + bmp_pos + 1 +
+							NTFS_LCNALLOC_SKIP);
 				goto done_ret;
 			}
+			
 			lcn++;
 		}
-		bmp_pos += buf_size;
-		ntfs_log_trace("After inner while loop: buf_size = 0x%x, lcn = "
-				"0x%llx, bmp_pos = 0x%llx, need_writeback = %i.\n",
-				buf_size, (long long)lcn,
-				(long long)bmp_pos, need_writeback);
-		if (need_writeback) {
-			s64 bw;
-			ntfs_log_trace("Writing back.\n");
-			need_writeback = 0;
-			bw = ntfs_attr_pwrite(vol->lcnbmp_na, last_read_pos,
-					br, buf);
-			if (bw != br) {
-				if (bw == -1)
-					err = errno;
-				else
-					err = EIO;
-				ntfs_log_perror("Bitmap writeback failed in "
-						"read next buffer code path");
-				goto err_ret;
-			}
+		
+		if (bitmap_writeback(vol, last_read_pos, br, buf, &writeback)) {
+			err = errno;
+			goto err_ret;
 		}
-		if (bmp_pos < zone_end) {
-			ntfs_log_trace("Continuing outer while loop, bmp_pos = "
-					"0x%llx, zone_end = 0x%llx.\n",
-					(long long)bmp_pos,
-					(long long)zone_end);
+		
+		if (!used_zone_pos) {
+			
+			used_zone_pos = 1;
+			
+			if (search_zone == 1)
+				zone_start = vol->mft_zone_pos;
+			else if (search_zone == 2)
+				zone_start = vol->data1_zone_pos;
+			else
+				zone_start = vol->data2_zone_pos;
+			
+			if (!zone_start || zone_start == vol->mft_zone_start ||
+					zone_start == vol->mft_zone_end)
+				pass = 2;
+			bmp_pos = zone_start;
+		} else
+			bmp_pos += buf_size;
+		
+		if (bmp_pos < zone_end)
 			continue;
-		}
-zone_pass_done:	/* Finished with the current zone pass. */
-		ntfs_log_trace("At zone_pass_done, pass = %i.\n", pass);
+
+zone_pass_done:
+		ntfs_log_trace("Finished current zone pass(%i).\n", pass);
 		if (pass == 1) {
-			/*
-			 * Now do pass 2, scanning the first part of the zone
-			 * we omitted in pass 1.
-			 */
+			
 			pass = 2;
 			zone_end = zone_start;
-			switch (search_zone) {
-			case 1: /* mft_zone */
+			
+			if (search_zone == 1)
 				zone_start = vol->mft_zone_start;
-				break;
-			case 2: /* data1_zone */
+			else if (search_zone == 2)
 				zone_start = vol->mft_zone_end;
-				break;
-			case 4: /* data2_zone */
+			else
 				zone_start = 0;
-				break;
-			default:
-				NTFS_BUG("switch (search_zone) 2");
-			}
+			
 			/* Sanity check. */
 			if (zone_end < zone_start)
 				zone_end = zone_start;
+			
 			bmp_pos = zone_start;
-			ntfs_log_trace("Continuing outer while loop, pass = 2, "
-					"zone_start = 0x%llx, zone_end = "
-					"0x%llx, bmp_pos = 0x%llx.\n",
-					zone_start, zone_end, bmp_pos);
+			
 			continue;
-		} /* pass == 2 */
+		} 
+		/* pass == 2 */
 done_zones_check:
-		ntfs_log_trace("At done_zones_check, search_zone = %i, done_zones "
-				"before = 0x%x, done_zones after = 0x%x.\n",
-				search_zone, done_zones, done_zones | search_zone);
 		done_zones |= search_zone;
 		if (done_zones < 7) {
 			ntfs_log_trace("Switching zone.\n");
-			/* Now switch to the next zone we haven't done yet. */
 			pass = 1;
 			if (rlpos) {
-				LCN tc;
-					
-				tc = rl[rlpos - 1].lcn + rl[rlpos - 1].length 
-					+ NTFS_LCNALLOC_SKIP;
+				LCN tc = tc = rl[rlpos - 1].lcn + 
+				      rl[rlpos - 1].length + NTFS_LCNALLOC_SKIP;
 				
-				if (ntfs_cluster_update_zone_pos(vol, 
-						search_zone, tc, bmp_initial_pos))
-					return NULL;
+				if (used_zone_pos)
+					ntfs_cluster_update_zone_pos(vol, 
+						search_zone, tc);
 			}
 			
 			switch (search_zone) {
 			case 1:
 				ntfs_log_trace("Zone switch: mft -> data1\n");
 switch_to_data1_zone:		search_zone = 2;
-				zone_start = bmp_initial_pos =
-						vol->data1_zone_pos;
+				zone_start = vol->data1_zone_pos;
 				zone_end = vol->nr_clusters;
 				if (zone_start == vol->mft_zone_end)
 					pass = 2;
-				if (zone_start >= zone_end) {
-					vol->data1_zone_pos = zone_start =
-							vol->mft_zone_end;
-					pass = 2;
-				}
 				break;
 			case 2:
 				ntfs_log_trace("Zone switch: data1 -> data2\n");
 				search_zone = 4;
-				zone_start = bmp_initial_pos =
-						vol->data2_zone_pos;
+				zone_start = vol->data2_zone_pos;
 				zone_end = vol->mft_zone_start;
 				if (!zone_start)
 					pass = 2;
-				if (zone_start >= zone_end) {
-					vol->data2_zone_pos = zone_start =
-							bmp_initial_pos = 0;
-					pass = 2;
-				}
 				break;
 			case 4:
-				ntfs_log_trace("Zone switch: data2 -> data1\n");
-				goto switch_to_data1_zone; /* See above. */
-			default:
-				NTFS_BUG("switch (search_zone) 3");
+				if (!(done_zones & 2)) {
+					ntfs_log_trace("data2 -> data1\n");
+					goto switch_to_data1_zone;
+				}
+				ntfs_log_trace("Zone switch: data2 -> mft\n");
+				search_zone = 1;
+				zone_start = vol->mft_zone_pos;
+				zone_end = vol->mft_zone_end;
+				if (!zone_start == vol->mft_zone_start)
+					pass = 2;
+				break;
 			}
-			ntfs_log_trace("After zone switch, search_zone = %i, pass = "
-					"%i, bmp_initial_pos = 0x%llx, "
-					"zone_start = 0x%llx, zone_end = "
-					"0x%llx.\n", search_zone, pass,
-					(long long)bmp_initial_pos,
-					(long long)zone_start,
-					(long long)zone_end);
+			
 			bmp_pos = zone_start;
+			
 			if (zone_start == zone_end) {
-				ntfs_log_trace("Empty zone, going to "
-						"done_zones_check.\n");
-				/* Empty zone. Don't bother searching it. */
+				ntfs_log_trace("Empty zone, skipped.\n");
 				goto done_zones_check;
 			}
-			ntfs_log_trace("Continuing outer while loop.\n");
+			
 			continue;
-		} /* done_zones == 7 */
-		ntfs_log_trace("All zones are finished.\n");
-		/*
-		 * All zones are finished! If DATA_ZONE, shrink mft zone. If
-		 * MFT_ZONE, we have really run out of space.
-		 */
-		mft_zone_size = vol->mft_zone_end - vol->mft_zone_start;
-		ntfs_log_trace("vol->mft_zone_start = 0x%llx, vol->mft_zone_end = "
-				"0x%llx, mft_zone_size = 0x%llx.\n",
-				(long long)vol->mft_zone_start,
-				(long long)vol->mft_zone_end,
-				(long long)mft_zone_size);
-		if (zone == MFT_ZONE || mft_zone_size <= 0) {
-			ntfs_log_trace("No free clusters left, going to err_ret.\n");
-			/* Really no more space left on device. */
-			err = ENOSPC;
-			goto err_ret;
-		} /* zone == DATA_ZONE && mft_zone_size > 0 */
-		ntfs_log_trace("Shrinking mft zone.\n");
-		zone_end = vol->mft_zone_end;
-		mft_zone_size >>= 1;
-		if (mft_zone_size > 0)
-			vol->mft_zone_end = vol->mft_zone_start + mft_zone_size;
-		else /* mft zone and data2 zone no longer exist. */
-			vol->data2_zone_pos = vol->mft_zone_start =
-					vol->mft_zone_end = 0;
-		if (vol->mft_zone_pos >= vol->mft_zone_end) {
-			vol->mft_zone_pos = vol->mft_lcn;
-			if (!vol->mft_zone_end)
-				vol->mft_zone_pos = 0;
 		}
-		bmp_pos = zone_start = bmp_initial_pos =
-				vol->data1_zone_pos = vol->mft_zone_end;
-		search_zone = 2;
-		pass = 2;
-		done_zones &= ~2;
-		ntfs_log_trace("After shrinking mft zone, mft_zone_size = 0x%llx, "
-				"vol->mft_zone_start = 0x%llx, "
-				"vol->mft_zone_end = 0x%llx, vol->mft_zone_pos "
-				"= 0x%llx, search_zone = 2, pass = 2, "
-				"dones_zones = 0x%x, zone_start = 0x%llx, "
-				"zone_end = 0x%llx, vol->data1_zone_pos = "
-				"0x%llx, continuing outer while loop.\n",
-				(long long)mft_zone_size,
-				(long long)vol->mft_zone_start,
-				(long long)vol->mft_zone_end,
-				(long long)vol->mft_zone_pos,
-				done_zones,
-				(long long)zone_start,
-				(long long)zone_end,
-				(long long)vol->data1_zone_pos);
+		
+		ntfs_log_trace("All zones are finished, no space on device.\n");
+		err = ENOSPC;
+		goto err_ret;
 	}
-	ntfs_log_debug("After outer while loop.\n");
 done_ret:
 	ntfs_log_debug("At done_ret.\n");
 	/* Add runlist terminator element. */
 	rl[rlpos].vcn = rl[rlpos - 1].vcn + rl[rlpos - 1].length;
 	rl[rlpos].lcn = LCN_RL_NOT_MAPPED;
 	rl[rlpos].length = 0;
-	if (need_writeback) {
-		s64 bw;
-		ntfs_log_trace("Writing back.\n");
-		need_writeback = 0;
-		bw = ntfs_attr_pwrite(vol->lcnbmp_na, last_read_pos, br, buf);
-		if (bw != br) {
-			if (bw < 0)
-				err = errno;
-			else
-				err = EIO;
-			ntfs_log_perror("Bitmap writeback failed");
-			goto err_ret;
-		}
+	if (bitmap_writeback(vol, last_read_pos, br, buf, &writeback)) {
+		err = errno;
+		goto err_ret;
 	}
 done_err_ret:
 	ntfs_log_debug("At done_err_ret (follows done_ret).\n");
 	free(buf);
-	/* Done! */
 	if (!err)
 		return rl;
-	ntfs_log_perror("Failed to allocate clusters");
+	ntfs_log_trace("Failed to allocate clusters (%d)", errno);
 	errno = err;
 	return NULL;
+
 wb_err_ret:
 	ntfs_log_trace("At wb_err_ret.\n");
-	if (need_writeback) {
-		s64 bw;
-		ntfs_log_trace("Writing back.\n");
-		need_writeback = 0;
-		bw = ntfs_attr_pwrite(vol->lcnbmp_na, last_read_pos, br, buf);
-		if (bw != br) {
-			if (bw < 0)
-				err = errno;
-			else
-				err = EIO;
-			ntfs_log_trace("Bitmap writeback failed in error code path "
-					"with error code %i.\n", err);
-		}
-	}
+	if (bitmap_writeback(vol, last_read_pos, br, buf, &writeback))
+		err = errno;
 err_ret:
 	ntfs_log_trace("At err_ret.\n");
 	if (rl) {
-		if (err == ENOSPC) {
-			ntfs_log_trace("err = ENOSPC, first free lcn = 0x%llx, could "
-					"allocate up to = 0x%llx clusters.\n",
-					(long long)rl[0].lcn,
-					(long long)count - clusters);
-		}
 		/* Add runlist terminator element. */
 		rl[rlpos].vcn = rl[rlpos - 1].vcn + rl[rlpos - 1].length;
 		rl[rlpos].lcn = LCN_RL_NOT_MAPPED;
 		rl[rlpos].length = 0;
-		/* Deallocate all allocated clusters. */
-		ntfs_log_trace("Deallocating allocated clusters.\n");
 		ntfs_cluster_free_from_rl(vol, rl);
-		/* Free the runlist. */
 		free(rl);
 		rl = NULL;
-	} else {
-		if (err == ENOSPC) {
-			ntfs_log_trace("No space left at all, err = ENOSPC, first "
-					"free lcn = 0x%llx.\n",
-					(long long)vol->data1_zone_pos);
-		}
 	}
-	ntfs_log_trace("rl = NULL, going to done_err_ret.\n");
 	goto done_err_ret;
 }
 

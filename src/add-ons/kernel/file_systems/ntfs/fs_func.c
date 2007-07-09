@@ -92,7 +92,7 @@ fs_identify_partition(int fd, partition_data *partition, void **_cookie)
 		if(strlen(ntVolume->vol_name)>0)
 			strcpy(cookie->label,ntVolume->vol_name);		
 	
-	ntfs_device_umount( ntVolume, true );
+	ntfs_umount( ntVolume, true );
 
 	*_cookie = cookie;
 
@@ -230,7 +230,7 @@ fs_unmount(void *_ns)
 	
 	ERRPRINT("fs_unmount - ENTER\n");
 	
-	ntfs_device_umount( ns->ntvol, true );
+	ntfs_umount( ns->ntvol, true );
 
 #ifdef __HAIKU__	
 	recursive_lock_destroy(&(ns->vlock));

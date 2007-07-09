@@ -63,6 +63,10 @@
 
 #define MS_EXCLUSIVE 0x08000000
 
+#ifndef MS_FORCE
+#define MS_FORCE     0x10000000
+#endif
+
 /* Forward declaration */
 typedef struct _ntfs_volume ntfs_volume;
 
@@ -221,7 +225,6 @@ extern ntfs_volume *ntfs_volume_startup(struct ntfs_device *dev,
 
 extern ntfs_volume *ntfs_device_mount(struct ntfs_device *dev,
 		unsigned long flags);
-extern int ntfs_device_umount(ntfs_volume *vol, const BOOL force);
 
 extern ntfs_volume *ntfs_mount(const char *name, unsigned long flags);
 extern int ntfs_umount(ntfs_volume *vol, const BOOL force);

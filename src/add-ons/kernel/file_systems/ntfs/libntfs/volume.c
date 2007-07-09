@@ -79,6 +79,35 @@ ntfs_volume *ntfs_volume_alloc(void)
 	return calloc(1, sizeof(ntfs_volume));
 }
 
+
+static void ntfs_attr_free(ntfs_attr **na)
+{
+	if (na && *na) {
+		ntfs_attr_close(*na);
+		*na = NULL;
+	} else
+		ntfs_log_error("Tried to free NULL attribute pointer (%p)\n", na);
+}
+
+static int ntfs_inode_free(ntfs_inode **ni)
+{
+	int ret = -1;
+
+	if (ni && *ni) {
+		ret = ntfs_inode_close(*ni);
+		*ni = NULL;
+	} else
+		ntfs_log_error("Tried to free NULL inode pointer (%p)\n", ni);
+	
+	return ret;
+}
+
+static void ntfs_error_set(int *err)
+{
+	if (!*err)
+		*err = errno;
+}
+
 /**
  * __ntfs_volume_release - Destroy an NTFS volume object
  * @v:
@@ -87,41 +116,51 @@ ntfs_volume *ntfs_volume_alloc(void)
  *
  * Returns:
  */
-static void __ntfs_volume_release(ntfs_volume *v)
+static int __ntfs_volume_release(ntfs_volume *v)
 {
+	int err = 0;
+
+	if (ntfs_inode_free(&v->vol_ni))
+		ntfs_error_set(&err);
+	/* 
+	 * FIXME: Inodes must be synced before closing
+	 * attributes, otherwise unmount could fail.
+	 */
 	if (v->lcnbmp_ni && NInoDirty(v->lcnbmp_ni))
 		ntfs_inode_sync(v->lcnbmp_ni);
-	if (v->vol_ni)
-		ntfs_inode_close(v->vol_ni);
-	if (v->lcnbmp_na)
-		ntfs_attr_close(v->lcnbmp_na);
-	if (v->lcnbmp_ni)
-		ntfs_inode_close(v->lcnbmp_ni);
+	ntfs_attr_free(&v->lcnbmp_na);
+	if (ntfs_inode_free(&v->lcnbmp_ni))
+		ntfs_error_set(&err);
+	
 	if (v->mft_ni && NInoDirty(v->mft_ni))
 		ntfs_inode_sync(v->mft_ni);
-	if (v->mftbmp_na)
-		ntfs_attr_close(v->mftbmp_na);
-	if (v->mft_na)
-		ntfs_attr_close(v->mft_na);
-	if (v->mft_ni)
-		ntfs_inode_close(v->mft_ni);
+	ntfs_attr_free(&v->mftbmp_na);
+	ntfs_attr_free(&v->mft_na);
+	if (ntfs_inode_free(&v->mft_ni))
+		ntfs_error_set(&err);
+	
 	if (v->mftmirr_ni && NInoDirty(v->mftmirr_ni))
 		ntfs_inode_sync(v->mftmirr_ni);
-	if (v->mftmirr_na)
-		ntfs_attr_close(v->mftmirr_na);
-	if (v->mftmirr_ni)
-		ntfs_inode_close(v->mftmirr_ni);
+	ntfs_attr_free(&v->mftmirr_na);
+	if (ntfs_inode_free(&v->mftmirr_ni))
+		ntfs_error_set(&err);
+	
 	if (v->dev) {
 		struct ntfs_device *dev = v->dev;
 
-		dev->d_ops->sync(dev);
+		if (dev->d_ops->sync(dev))
+			ntfs_error_set(&err);
 		if (dev->d_ops->close(dev))
-			ntfs_log_perror("Failed to close the device");
+			ntfs_error_set(&err);
 	}
+
 	free(v->vol_name);
 	free(v->upcase);
 	free(v->attrdef);
 	free(v);
+
+	errno = err;
+	return errno ? -1 : 0;
 }
 
 static void ntfs_attr_setup_flag(ntfs_inode *ni)
@@ -457,32 +496,11 @@ ntfs_volume *ntfs_volume_startup(struct ntfs_device *dev, unsigned long flags)
 				"sector size.  This may affect performance "
 				"but should be harmless otherwise.  Error: "
 				"%s\n", strerror(errno));
-	/*
-	 * We now initialize the cluster allocator.
-	 *
-	 * FIXME: Move this to its own function? (AIA)
-	 */
+	
+	/* We now initialize the cluster allocator. */
 
-	// TODO: Make this tunable at mount time. (AIA)
-	vol->mft_zone_multiplier = 1;
-
-	/* Determine the size of the MFT zone. */
-	mft_zone_size = vol->nr_clusters;
-	switch (vol->mft_zone_multiplier) {  /* % of volume size in clusters */
-	case 4:
-		mft_zone_size >>= 1;			/* 50%   */
-		break;
-	case 3:
-		mft_zone_size = mft_zone_size * 3 >> 3;	/* 37.5% */
-		break;
-	case 2:
-		mft_zone_size >>= 2;			/* 25%   */
-		break;
-	/* case 1: */
-	default:
-		mft_zone_size >>= 3;			/* 12.5% */
-		break;
-	}
+	mft_zone_size = min(vol->nr_clusters >> 3,      /* 12.5% */
+			    200 * 1000 * 1024 >> vol->cluster_size_bits);
 
 	/* Setup the mft zone. */
 	vol->mft_zone_start = vol->mft_zone_pos = vol->mft_lcn;
@@ -573,23 +591,27 @@ static int ntfs_volume_check_logfile(ntfs_volume *vol)
 	RESTART_PAGE_HEADER *rp = NULL;
 	int err = 0;
 
-	if ((ni = ntfs_inode_open(vol, FILE_LogFile)) == NULL) {
+	ni = ntfs_inode_open(vol, FILE_LogFile);
+	if (!ni) {
 		ntfs_log_perror("Failed to open inode FILE_LogFile");
 		errno = EIO;
 		return -1;
 	}
-	if ((na = ntfs_attr_open(ni, AT_DATA, AT_UNNAMED, 0)) == NULL) {
+	
+	na = ntfs_attr_open(ni, AT_DATA, AT_UNNAMED, 0);
+	if (!na) {
 		ntfs_log_perror("Failed to open $FILE_LogFile/$DATA");
 		err = EIO;
-		goto exit;
+		goto out;
 	}
+	
 	if (!ntfs_check_logfile(na, &rp) || !ntfs_is_logfile_clean(na, rp))
 		err = EOPNOTSUPP;
 	free(rp);
-exit:
-	if (na)
-		ntfs_attr_close(na);
-	ntfs_inode_close(ni);
+	ntfs_attr_close(na);
+out:	
+	if (ntfs_inode_close(ni))
+		ntfs_error_set(&err);
 	if (err) {
 		errno = err;
 		return -1;
@@ -643,7 +665,10 @@ static ntfs_inode *ntfs_hiberfile_open(ntfs_volume *vol)
 		goto out;
 	}
 out:
-	ntfs_inode_close(ni_root);
+	if (ntfs_inode_close(ni_root)) {
+		ntfs_inode_close(ni_hibr);
+		ni_hibr = NULL;
+	}
 	free(unicode);
 	return ni_hibr;
 }
@@ -663,7 +688,7 @@ static int ntfs_volume_check_hiberfile(ntfs_volume *vol)
 {
 	ntfs_inode *ni;
 	ntfs_attr *na = NULL;
-	int i, bytes_read, ret = -1;
+	int i, bytes_read, err;
 	char *buf = NULL;
 
 	ni = ntfs_hiberfile_open(vol);
@@ -707,13 +732,16 @@ static int ntfs_volume_check_hiberfile(ntfs_volume *vol)
 		}
 	}
         /* All right, all header bytes are zero */
-	ret = 0;
+	errno = 0;
 out:
 	if (na)
 		ntfs_attr_close(na);
 	free(buf);
-	ntfs_inode_close(ni);
-	return ret;
+	err = errno;
+	if (ntfs_inode_close(ni))
+		ntfs_error_set(&err);
+	errno = err;
+	return errno ? -1 : 0;
 }
 
 /**
@@ -785,20 +813,11 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 	l = ntfs_attr_mst_pread(vol->mftmirr_na, 0, vol->mftmirr_size,
 			vol->mft_record_size, m2);
 	if (l != vol->mftmirr_size) {
-		if (l == 4)
-			vol->mftmirr_size = 4;
-		else {
-			if (l == -1)
-				ntfs_log_perror("Failed to read $MFTMirr");
-			else {
-				ntfs_log_error("Failed to read $MFTMirr "
-					       "unexpected length (%d != %lld)."
-					       "\n", vol->mftmirr_size,
-					       (long long)l);
-				errno = EIO;
-			}
+		if (l == -1) {
+			ntfs_log_perror("Failed to read $MFTMirr");
 			goto error_exit;
 		}
+		vol->mftmirr_size = l;
 	}
 	ntfs_log_debug("Comparing $MFTMirr to $MFT... ");
 	for (i = 0; i < vol->mftmirr_size; ++i) {
@@ -929,8 +948,10 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 	/* Done with the $UpCase mft record. */
 	ntfs_log_debug(OK);
 	ntfs_attr_close(na);
-	if (ntfs_inode_close(ni))
-		ntfs_log_perror("Failed to close inode, leaking memory");
+	if (ntfs_inode_close(ni)) {
+		ntfs_log_perror("Failed to close $UpCase");
+		goto error_exit;
+	}
 
 	/*
 	 * Now load $Volume and set the version information and flags in the
@@ -1089,17 +1110,24 @@ ntfs_volume *ntfs_device_mount(struct ntfs_device *dev, unsigned long flags)
 	/* Done with the $AttrDef mft record. */
 	ntfs_log_debug(OK);
 	ntfs_attr_close(na);
-	if (ntfs_inode_close(ni))
-		ntfs_log_perror("Failed to close inode, leaking memory");
+	if (ntfs_inode_close(ni)) {
+		ntfs_log_perror("Failed to close $AttrDef");
+		goto error_exit;
+	}
 	/*
 	 * Check for dirty logfile and hibernated Windows.
 	 * We care only about read-write mounts.
 	 */
 	if (!(flags & MS_RDONLY)) {
-		if (ntfs_volume_check_logfile(vol) < 0)
-			goto error_exit;
 		if (ntfs_volume_check_hiberfile(vol) < 0)
 			goto error_exit;
+		if (ntfs_volume_check_logfile(vol) < 0) {
+			if (!(flags & MS_FORCE))
+				goto error_exit;
+			ntfs_log_info("WARNING: Forced mount, reset $LogFile.\n");
+			if (ntfs_logfile_reset(vol))
+				goto error_exit;
+		}
 	}
 
 	return vol;
@@ -1173,42 +1201,6 @@ ntfs_volume *ntfs_mount(const char *name __attribute__((unused)),
 }
 
 /**
- * ntfs_device_umount - close ntfs volume
- * @vol: address of ntfs_volume structure of volume to close
- * @force: if true force close the volume even if it is busy
- *
- * Deallocate all structures (including @vol itself) associated with the ntfs
- * volume @vol.
- *
- * Note it is up to the caller to destroy the device associated with the volume
- * being unmounted after this function returns.
- *
- * Return 0 on success. On error return -1 with errno set appropriately
- * (most likely to one of EAGAIN, EBUSY or EINVAL). The EAGAIN error means that
- * an operation is in progress and if you try the close later the operation
- * might be completed and the close succeed.
- *
- * If @force is true (i.e. not zero) this function will close the volume even
- * if this means that data might be lost.
- *
- * @vol must have previously been returned by a call to ntfs_device_mount().
- *
- * @vol itself is deallocated and should no longer be dereferenced after this
- * function returns success. If it returns an error then nothing has been done
- * so it is safe to continue using @vol.
- */
-int ntfs_device_umount(ntfs_volume *vol,
-		const BOOL force __attribute__((unused)))
-{
-	if (!vol) {
-		errno = EINVAL;
-		return -1;
-	}
-	__ntfs_volume_release(vol);
-	return 0;
-}
-
-/**
  * ntfs_umount - close ntfs volume
  * @vol: address of ntfs_volume structure of volume to close
  * @force: if true force close the volume even if it is busy
@@ -1230,19 +1222,19 @@ int ntfs_device_umount(ntfs_volume *vol,
  * function returns success. If it returns an error then nothing has been done
  * so it is safe to continue using @vol.
  */
-int ntfs_umount(ntfs_volume *vol,
-		const BOOL force __attribute__((unused)))
+int ntfs_umount(ntfs_volume *vol, const BOOL force __attribute__((unused)))
 {
 	struct ntfs_device *dev;
+	int ret;
 
 	if (!vol) {
 		errno = EINVAL;
 		return -1;
 	}
 	dev = vol->dev;
-	__ntfs_volume_release(vol);
+	ret = __ntfs_volume_release(vol);
 	ntfs_device_free(dev);
-	return 0;
+	return ret;
 }
 
 #ifdef HAVE_MNTENT_H
@@ -1420,12 +1412,14 @@ int ntfs_logfile_reset(ntfs_volume *vol)
 		return -1;
 	}
 
-	if ((ni = ntfs_inode_open(vol, FILE_LogFile)) == NULL) {
-		ntfs_log_perror("Failed to open inode FILE_LogFile.");
+	ni = ntfs_inode_open(vol, FILE_LogFile);
+	if (!ni) {
+		ntfs_log_perror("Failed to open inode FILE_LogFile");
 		return -1;
 	}
 
-	if ((na = ntfs_attr_open(ni, AT_DATA, AT_UNNAMED, 0)) == NULL) {
+	na = ntfs_attr_open(ni, AT_DATA, AT_UNNAMED, 0);
+	if (!na) {
 		eo = errno;
 		ntfs_log_perror("Failed to open $FILE_LogFile/$DATA");
 		goto error_exit;
@@ -1433,10 +1427,10 @@ int ntfs_logfile_reset(ntfs_volume *vol)
 
 	if (ntfs_empty_logfile(na)) {
 		eo = errno;
-		ntfs_log_perror("Failed to empty $FILE_LogFile/$DATA");
 		ntfs_attr_close(na);
 		goto error_exit;
 	}
+	
 	ntfs_attr_close(na);
 	return ntfs_inode_close(ni);
 

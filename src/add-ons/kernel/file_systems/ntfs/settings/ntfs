@@ -1,4 +1,4 @@
-# Sample settings file for the ntfs plugin
+# Sample settings file for the ntfs addon
 #
 # This file should be moved to the directory
 # /boot/home/config/settings/kernel/drivers/

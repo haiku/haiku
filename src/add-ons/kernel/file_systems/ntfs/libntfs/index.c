@@ -1417,6 +1417,7 @@ static int ntfs_ie_add(ntfs_index_context *icx, INDEX_ENTRY *ie)
 	
 	fn = ntfs_ie_filename_get(ie);
 	ntfs_log_trace("file: '%s'\n", fn);
+	ntfs_attr_name_free(&fn);
 	
 	while (1) {
 				
@@ -1461,7 +1462,6 @@ static int ntfs_ie_add(ntfs_index_context *icx, INDEX_ENTRY *ie)
 	
 	ret = STATUS_OK;
 err_out:
-	ntfs_attr_name_free(&fn);
 	ntfs_log_trace("%s\n", ret ? "Failed" : "Done");
 	return ret;
 }

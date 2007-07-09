@@ -1007,8 +1007,7 @@ static int ntfs_mft_data_extend_allocation(ntfs_volume *vol)
 		// this extent is not required to find the mft record in
 		// question.
 		errno = EOPNOTSUPP;
-		ntfs_log_perror("Not enough space to extended mft data "
-				"attribute.\n");
+		ntfs_log_perror("Not enough space to extended mft data");
 		goto undo_alloc;
 	}
 	mp_rebuilt = TRUE;
@@ -1098,6 +1097,115 @@ undo_alloc:
 	return -1;
 }
 
+
+static int ntfs_mft_record_init(ntfs_volume *vol, s64 size)
+{
+	int ret = -1;
+	ntfs_attr *mft_na, *mftbmp_na;
+	s64 old_data_initialized, old_data_size;
+	ntfs_attr_search_ctx *ctx;
+	
+	ntfs_log_trace("Entering\n");
+	
+	/* NOTE: Caller must sanity check vol, vol->mft_na and vol->mftbmp_na */
+	
+	mft_na = vol->mft_na;
+	mftbmp_na = vol->mftbmp_na;
+	
+	/*
+	 * The mft record is outside the initialized data. Extend the mft data
+	 * attribute until it covers the allocated record. The loop is only
+	 * actually traversed more than once when a freshly formatted volume
+	 * is first written to so it optimizes away nicely in the common case.
+	 */
+	ntfs_log_debug("Status of mft data before extension: "
+			"allocated_size 0x%llx, data_size 0x%llx, "
+			"initialized_size 0x%llx.\n",
+			(long long)mft_na->allocated_size,
+			(long long)mft_na->data_size,
+			(long long)mft_na->initialized_size);
+	while (size > mft_na->allocated_size) {
+		if (ntfs_mft_data_extend_allocation(vol))
+			goto out;
+		ntfs_log_debug("Status of mft data after allocation extension: "
+				"allocated_size 0x%llx, data_size 0x%llx, "
+				"initialized_size 0x%llx.\n",
+				(long long)mft_na->allocated_size,
+				(long long)mft_na->data_size,
+				(long long)mft_na->initialized_size);
+	}
+	
+	old_data_initialized = mft_na->initialized_size;
+	old_data_size = mft_na->data_size;
+	
+	/*
+	 * Extend mft data initialized size (and data size of course) to reach
+	 * the allocated mft record, formatting the mft records along the way.
+	 * Note: We only modify the ntfs_attr structure as that is all that is
+	 * needed by ntfs_mft_record_format().  We will update the attribute
+	 * record itself in one fell swoop later on.
+	 */
+	while (size > mft_na->initialized_size) {
+		s64 ll2 = mft_na->initialized_size >> vol->mft_record_size_bits;
+		mft_na->initialized_size += vol->mft_record_size;
+		if (mft_na->initialized_size > mft_na->data_size)
+			mft_na->data_size = mft_na->initialized_size;
+		ntfs_log_debug("Initializing mft record 0x%llx.\n", (long long)ll2);
+		if (ntfs_mft_record_format(vol, ll2) < 0) {
+			ntfs_log_error("Failed to format mft record.\n");
+			goto undo_data_init;
+		}
+	}
+	
+	/* Update the mft data attribute record to reflect the new sizes. */
+	ctx = ntfs_attr_get_search_ctx(mft_na->ni, NULL);
+	if (!ctx) {
+		ntfs_log_error("Failed to get search context.\n");
+		goto undo_data_init;
+	}
+	if (ntfs_attr_lookup(mft_na->type, mft_na->name, mft_na->name_len, 0,
+			0, NULL, 0, ctx)) {
+		ntfs_log_error("Failed to find first attribute extent of "
+				"mft data attribute.\n");
+		ntfs_attr_put_search_ctx(ctx);
+		goto undo_data_init;
+	}
+	ctx->attr->initialized_size = cpu_to_sle64(mft_na->initialized_size);
+	ctx->attr->data_size = cpu_to_sle64(mft_na->data_size);
+	
+	/* Ensure the changes make it to disk. */
+	ntfs_inode_mark_dirty(ctx->ntfs_ino);
+	ntfs_attr_put_search_ctx(ctx);
+	ntfs_log_debug("Status of mft data after mft record initialization: "
+			"allocated_size 0x%llx, data_size 0x%llx, "
+			"initialized_size 0x%llx.\n",
+			(long long)mft_na->allocated_size,
+			(long long)mft_na->data_size,
+			(long long)mft_na->initialized_size);
+	
+	/* Sanity checks. */
+	if (mft_na->data_size > mft_na->allocated_size ||
+	    mft_na->initialized_size > mft_na->data_size)
+		NTFS_BUG("mft_na sanity checks failed");
+	// BUG_ON(mft_na->initialized_size > mft_na->data_size);
+	// BUG_ON(mft_na->data_size > mft_na->allocated_size);
+	
+	/* Sync MFT to minimize data loss if there won't be clean unmount. */
+	if (ntfs_inode_sync(mft_na->ni)) {
+		ntfs_log_error("Failed to sync $MFT.");
+		goto undo_data_init;
+	}
+	
+	ret = 0;
+out:	
+	return ret;
+	
+undo_data_init:
+	mft_na->initialized_size = old_data_initialized;
+	mft_na->data_size = old_data_size;
+	goto out;
+}
+
 /**
  * ntfs_mft_record_alloc - allocate an mft record on an ntfs volume
  * @vol:	volume on which to allocate the mft record
@@ -1183,11 +1291,9 @@ undo_alloc:
  */
 ntfs_inode *ntfs_mft_record_alloc(ntfs_volume *vol, ntfs_inode *base_ni)
 {
-	s64 ll, bit, old_data_initialized, old_data_size;
+	s64 ll, bit;
 	ntfs_attr *mft_na, *mftbmp_na;
-	ntfs_attr_search_ctx *ctx;
 	MFT_RECORD *m;
-	ATTR_RECORD *a;
 	ntfs_inode *ni;
 	int err;
 	u16 seq_no, usn;
@@ -1202,8 +1308,10 @@ ntfs_inode *ntfs_mft_record_alloc(ntfs_volume *vol, ntfs_inode *base_ni)
 		errno = EINVAL;
 		return NULL;
 	}
+	
 	mft_na = vol->mft_na;
 	mftbmp_na = vol->mftbmp_na;
+retry:	
 	bit = ntfs_mft_bitmap_find_free_rec(vol, base_ni);
 	if (bit >= 0) {
 		ntfs_log_debug("Found free record (#1), bit 0x%llx.\n",
@@ -1269,99 +1377,18 @@ ntfs_inode *ntfs_mft_record_alloc(ntfs_volume *vol, ntfs_inode *base_ni)
 	ntfs_log_debug("Found free record (#3), bit 0x%llx.\n", (long long)bit);
 found_free_rec:
 	/* @bit is the found free mft record, allocate it in the mft bitmap. */
-	ntfs_log_debug("At found_free_rec.\n");
 	if (ntfs_bitmap_set_bit(mftbmp_na, bit)) {
 		ntfs_log_error("Failed to allocate bit in mft bitmap.\n");
 		goto err_out;
 	}
 	ntfs_log_debug("Set bit 0x%llx in mft bitmap.\n", (long long)bit);
+	
 	/* The mft bitmap is now uptodate.  Deal with mft data attribute now. */
 	ll = (bit + 1) << vol->mft_record_size_bits;
-	if (ll <= mft_na->initialized_size) {
-		ntfs_log_debug("Allocated mft record already initialized.\n");
-		goto mft_rec_already_initialized;
-	}
-	ntfs_log_debug("Initializing allocated mft record.\n");
-	/*
-	 * The mft record is outside the initialized data.  Extend the mft data
-	 * attribute until it covers the allocated record.  The loop is only
-	 * actually traversed more than once when a freshly formatted volume is
-	 * first written to so it optimizes away nicely in the common case.
-	 */
-	ntfs_log_debug("Status of mft data before extension: "
-			"allocated_size 0x%llx, data_size 0x%llx, "
-			"initialized_size 0x%llx.\n",
-			(long long)mft_na->allocated_size,
-			(long long)mft_na->data_size,
-			(long long)mft_na->initialized_size);
-	while (ll > mft_na->allocated_size) {
-		if (ntfs_mft_data_extend_allocation(vol))
+	if (ll > mft_na->initialized_size)
+		if (ntfs_mft_record_init(vol, ll) < 0)
 			goto undo_mftbmp_alloc;
-		ntfs_log_debug("Status of mft data after allocation extension: "
-				"allocated_size 0x%llx, data_size 0x%llx, "
-				"initialized_size 0x%llx.\n",
-				(long long)mft_na->allocated_size,
-				(long long)mft_na->data_size,
-				(long long)mft_na->initialized_size);
-	}
-	old_data_initialized = mft_na->initialized_size;
-	old_data_size = mft_na->data_size;
-	/*
-	 * Extend mft data initialized size (and data size of course) to reach
-	 * the allocated mft record, formatting the mft records along the way.
-	 * Note: We only modify the ntfs_attr structure as that is all that is
-	 * needed by ntfs_mft_record_format().  We will update the attribute
-	 * record itself in one fell swoop later on.
-	 */
-	while (ll > mft_na->initialized_size) {
-		s64 ll2 = mft_na->initialized_size >> vol->mft_record_size_bits;
-		mft_na->initialized_size += vol->mft_record_size;
-		if (mft_na->initialized_size > mft_na->data_size)
-			mft_na->data_size = mft_na->initialized_size;
-		ntfs_log_debug("Initializing mft record 0x%llx.\n", (long long)ll2);
-		err = ntfs_mft_record_format(vol, ll2);
-		if (err) {
-			ntfs_log_error("Failed to format mft record.\n");
-			goto undo_data_init;
-		}
-	}
-	/* Update the mft data attribute record to reflect the new sizes. */
-	ctx = ntfs_attr_get_search_ctx(mft_na->ni, NULL);
-	if (!ctx) {
-		ntfs_log_error("Failed to get search context.\n");
-		goto undo_data_init;
-	}
-	if (ntfs_attr_lookup(mft_na->type, mft_na->name, mft_na->name_len, 0,
-			0, NULL, 0, ctx)) {
-		ntfs_log_error("Failed to find first attribute extent of "
-				"mft data attribute.\n");
-		ntfs_attr_put_search_ctx(ctx);
-		goto undo_data_init;
-	}
-	a = ctx->attr;
-	a->initialized_size = cpu_to_sle64(mft_na->initialized_size);
-	a->data_size = cpu_to_sle64(mft_na->data_size);
-	/* Ensure the changes make it to disk. */
-	ntfs_inode_mark_dirty(ctx->ntfs_ino);
-	ntfs_attr_put_search_ctx(ctx);
-	ntfs_log_debug("Status of mft data after mft record initialization: "
-			"allocated_size 0x%llx, data_size 0x%llx, "
-			"initialized_size 0x%llx.\n",
-			(long long)mft_na->allocated_size,
-			(long long)mft_na->data_size,
-			(long long)mft_na->initialized_size);
-	/* Sanity checks. */
-	if (mft_na->data_size > mft_na->allocated_size ||
-			mft_na->initialized_size > mft_na->data_size)
-		NTFS_BUG("mft_na sanity checks failed");
-	// BUG_ON(mft_na->initialized_size > mft_na->data_size);
-	// BUG_ON(mft_na->data_size > mft_na->allocated_size);
-	/* Sync MFT to minimize data loss if there won't be clean unmount. */
-	if (ntfs_inode_sync(mft_na->ni)) {
-		ntfs_log_error("Failed to sync $MFT.");
-		goto undo_data_init;
-	}
-mft_rec_already_initialized:
+
 	/*
 	 * We now have allocated and initialized the mft record.  Need to read
 	 * it from disk and re-format it, preserving the sequence number if it
@@ -1373,29 +1400,22 @@ mft_rec_already_initialized:
 		goto undo_mftbmp_alloc;
 	
 	if (ntfs_mft_record_read(vol, bit, m)) {
-		err = errno;
-		ntfs_log_error("Failed to read mft record.\n");
+		ntfs_log_perror("Error reading mft %lld", (long long)bit);
 		free(m);
-		errno = err;
 		goto undo_mftbmp_alloc;
 	}
 	/* Sanity check that the mft record is really not in use. */
 	if (ntfs_is_file_record(m->magic) && (m->flags & MFT_RECORD_IN_USE)) {
-		ntfs_log_error("Mft record 0x%llx was marked unused in "
-				"mft bitmap but is marked used itself.  "
-				"Corrupt filesystem or library bug!  "
-				"Run chkdsk immediately!\n", (long long)bit);
+		ntfs_log_error("Inode %lld is used but it wasn't marked in "
+			       "$MFT bitmap. Fixed.\n", (long long)bit);
 		free(m);
-		errno = EIO;
-		goto undo_mftbmp_alloc;
+		goto retry;
 	}
 	seq_no = m->sequence_number;
 	usn = *(u16*)((u8*)m + le16_to_cpu(m->usa_ofs));
 	if (ntfs_mft_record_layout(vol, bit, m)) {
-		err = errno;
 		ntfs_log_error("Failed to re-format mft record.\n");
 		free(m);
-		errno = err;
 		goto undo_mftbmp_alloc;
 	}
 	if (le16_to_cpu(seq_no))
@@ -1408,10 +1428,8 @@ mft_rec_already_initialized:
 	/* Now need to open an ntfs inode for the mft record. */
 	ni = ntfs_inode_allocate(vol);
 	if (!ni) {
-		err = errno;
 		ntfs_log_error("Failed to allocate buffer for inode.\n");
 		free(m);
-		errno = err;
 		goto undo_mftbmp_alloc;
 	}
 	ni->mft_no = bit;
@@ -1465,9 +1483,7 @@ mft_rec_already_initialized:
 	ntfs_log_debug("Returning opened, allocated %sinode 0x%llx.\n",
 			base_ni ? "extent " : "", (long long)bit);
 	return ni;
-undo_data_init:
-	mft_na->initialized_size = old_data_initialized;
-	mft_na->data_size = old_data_size;
+
 undo_mftbmp_alloc:
 	err = errno;
 	if (ntfs_bitmap_clear_bit(mftbmp_na, bit))

@@ -544,8 +544,9 @@ int ntfs_attr_map_whole_runlist(ntfs_attr *na)
 		if (!next_vcn) {
 			 if (a->lowest_vcn) {
 				 errno = EIO;
-				 ntfs_log_perror("Attribute first extent has "
-						 "non-zero lowest_vcn");
+				 ntfs_log_perror("First extent of inode %llu "
+					"attribute has non-zero lowest_vcn",
+					(unsigned long long)na->ni->mft_no);
 				 goto err_out;
 			}
 			/* Get the last vcn in the attribute. */
@@ -566,7 +567,8 @@ int ntfs_attr_map_whole_runlist(ntfs_attr *na)
 		/* Avoid endless loops due to corruption. */
 		if (next_vcn < sle64_to_cpu(a->lowest_vcn)) {
 			errno = EIO;
-			ntfs_log_perror("Inode has corrupt attribute list");
+			ntfs_log_perror("Inode %llu has corrupt attribute list",
+					(unsigned long long)na->ni->mft_no);
 			goto err_out;
 		}
 	}
@@ -576,8 +578,9 @@ int ntfs_attr_map_whole_runlist(ntfs_attr *na)
 	}
 	if (highest_vcn && highest_vcn != last_vcn - 1) {
 		errno = EIO;
-		ntfs_log_perror("Couldn't load full runlist: "
-				"highest_vcn = 0x%llx, last_vcn = 0x%llx",
+		ntfs_log_perror("Failed to load full runlist: inode: %llu "
+				"highest_vcn: 0x%llx last_vcn: 0x%llx",
+				(unsigned long long)na->ni->mft_no, 
 				(long long)highest_vcn, (long long)last_vcn);
 		goto err_out;
 	}
@@ -988,10 +991,8 @@ static int ntfs_attr_fill_hole(ntfs_attr *na, s64 count, s64 *ofs,
 				((*ofs + to_write - 1) >> vol->cluster_size_bits)
 				 + 1 + (*rl)->vcn - from_vcn, 
 				 lcn_seek_from, DATA_ZONE);
-	if (!rlc) {
-		ntfs_log_perror("Hole filling cluster allocation failed");
+	if (!rlc)
 		goto err_out;
-	}
 	
 	*rl = ntfs_runlists_merge(na->rl, rlc);
 	if (!*rl) {

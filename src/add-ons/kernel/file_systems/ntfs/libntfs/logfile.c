@@ -699,55 +699,31 @@ BOOL ntfs_is_logfile_clean(ntfs_attr *log_na, RESTART_PAGE_HEADER *rp)
  */
 int ntfs_empty_logfile(ntfs_attr *na)
 {
-	s64 len, pos, count;
+	s64 pos, count;
 	char buf[NTFS_BUF_SIZE];
 
 	ntfs_log_trace("Entering.\n");
+	
 	if (NVolLogFileEmpty(na->ni->vol))
 		return 0;
 
-	/* The $DATA attribute of the $LogFile has to be non-resident. */
 	if (!NAttrNonResident(na)) {
 		errno = EIO;
-		ntfs_log_perror("$LogFile $DATA attribute is resident!?!\n");
+		ntfs_log_perror("Resident $LogFile $DATA attribute");
 		return -1;
 	}
 
-	/* Get length of $LogFile contents. */
-	len = na->data_size;
-	if (!len) {
-		ntfs_log_debug("$LogFile has zero length, no disk write "
-				"needed.\n");
-		return 0;
-	}
-
-	/* Read $LogFile until its end. We do this as a check for correct
-	   length thus making sure we are decompressing the mapping pairs
-	   array correctly and hence writing below is safe as well. */
-	pos = 0;
-	while ((count = ntfs_attr_pread(na, pos, NTFS_BUF_SIZE, buf)) > 0)
-		pos += count;
-
-	if (count == -1 || pos != len) {
-		ntfs_log_error("Amount of $LogFile data read does not "
-				"correspond to expected length!\n");
-		if (count != -1)
-			errno = EIO;
-		return -1;
-	}
-
-	/* Fill the buffer with 0xff's. */
 	memset(buf, -1, NTFS_BUF_SIZE);
 
-	/* Set the $DATA attribute. */
 	pos = 0;
-	while ((count = len - pos) > 0) {
+	while ((count = na->data_size - pos) > 0) {
+		
 		if (count > NTFS_BUF_SIZE)
 			count = NTFS_BUF_SIZE;
 
-		if ((count = ntfs_attr_pwrite(na, pos, count, buf)) <= 0) {
-			ntfs_log_perror("Failed to set the $LogFile attribute "
-					"value.\n");
+		count = ntfs_attr_pwrite(na, pos, count, buf);
+		if (count <= 0) {
+			ntfs_log_perror("Failed to reset $LogFile");
 			if (count != -1)
 				errno = EIO;
 			return -1;
@@ -755,7 +731,7 @@ int ntfs_empty_logfile(ntfs_attr *na)
 		pos += count;
 	}
 
-	/* Set the flag so we do not have to do it again on remount. */
 	NVolSetLogFileEmpty(na->ni->vol);
+	
 	return 0;
 }

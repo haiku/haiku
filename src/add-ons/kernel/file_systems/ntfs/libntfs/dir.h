@@ -40,6 +40,7 @@
 #define S_IFSOCK 0140000
 #endif
 #endif
+
 /*
  * We do not have these under DJGPP, so define our version that do not conflict
  * with other S_IFs defined under DJGPP.

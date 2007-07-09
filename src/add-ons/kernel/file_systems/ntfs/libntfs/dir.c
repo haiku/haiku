@@ -466,10 +466,13 @@ ntfs_inode *ntfs_pathname_to_inode(ntfs_volume *vol, ntfs_inode *parent,
 			q++;
 		}
 
-		len = ntfs_mbstoucs(p, &unicode, NTFS_MAX_NAME_LEN);
+		len = ntfs_mbstoucs(p, &unicode, MAX_PATH);
 		if (len < 0) {
 			ntfs_log_debug("Couldn't convert name to Unicode: %s.\n", p);
 			err = errno;
+			goto close;
+		} else if (len > NTFS_MAX_NAME_LEN) {
+			err = ENAMETOOLONG;
 			goto close;
 		}
 
@@ -482,7 +485,10 @@ ntfs_inode *ntfs_pathname_to_inode(ntfs_volume *vol, ntfs_inode *parent,
 		}
 
 		if (ni != parent)
-			ntfs_inode_close(ni);
+			if (ntfs_inode_close(ni)) {
+				err = errno;
+				goto out;
+			}
 
 		inum = MREF(inum);
 		ni = ntfs_inode_open(vol, inum);
@@ -502,7 +508,9 @@ ntfs_inode *ntfs_pathname_to_inode(ntfs_volume *vol, ntfs_inode *parent,
 	ni = NULL;
 close:
 	if (ni && (ni != parent))
-		ntfs_inode_close(ni);
+		if (ntfs_inode_close(ni) && !err)
+			err = errno;
+out:
 	free(ascii);
 	free(unicode);
 	if (err)
@@ -1045,12 +1053,15 @@ static ntfs_inode *__ntfs_create(ntfs_inode *dir_ni,
 		errno = EINVAL;
 		return NULL;
 	}
-	/* Allocate MFT record for new file. */
-	ni = ntfs_mft_record_alloc(dir_ni->vol, NULL);
-	if (!ni) {
-		ntfs_log_perror("Could not allocate new MFT record");
+	
+	if (dir_ni->flags & FILE_ATTR_REPARSE_POINT) {
+		errno = EOPNOTSUPP;
 		return NULL;
 	}
+	
+	ni = ntfs_mft_record_alloc(dir_ni->vol, NULL);
+	if (!ni)
+		return NULL;
 	/*
 	 * Create STANDARD_INFORMATION attribute. Write STANDARD_INFORMATION
 	 * version 1.2, windows will upgrade it to version 3 if needed.
@@ -1299,7 +1310,7 @@ int ntfs_check_empty_dir(ntfs_inode *ni)
 	}
 	
 	/* Non-empty directory? */
-	if ((na->data_size != sizeof(INDEX_ROOT) + sizeof(INDEX_ENTRY_HEADER))) {
+	if ((na->data_size != sizeof(INDEX_ROOT) + sizeof(INDEX_ENTRY_HEADER))){
 		/* Both ENOTEMPTY and EEXIST are ok. We use the more common. */
 		errno = EEXIST;
 		ntfs_log_debug("Directory is not empty\n");
@@ -1416,7 +1427,7 @@ search:
 		
 		if (ntfs_names_are_equal(fn->file_name, fn->file_name_length,
 					 name, name_len, case_sensitive, 
-					 ni->vol->upcase, ni->vol->upcase_len)) {
+					 ni->vol->upcase, ni->vol->upcase_len)){
 			
 			if (fn->file_name_type == FILE_NAME_WIN32) {
 				looking_for_dos_name = TRUE;
@@ -1525,8 +1536,8 @@ out:
 		ntfs_attr_put_search_ctx(actx);
 	if (ictx)
 		ntfs_index_ctx_put(ictx);
-	if (ni)
-		ntfs_inode_close(ni);
+	if (ni && ntfs_inode_close(ni) && !err)
+		err = errno;
 	if (err) {
 		errno = err;
 		ntfs_log_debug("Could not delete file: %s\n", strerror(errno));
@@ -1567,6 +1578,12 @@ int ntfs_link(ntfs_inode *ni, ntfs_inode *dir_ni, ntfschar *name, u8 name_len)
 		ntfs_log_perror("ntfs_link wrong arguments");
 		goto err_out;
 	}
+	
+	if (ni->flags & FILE_ATTR_REPARSE_POINT) {
+		err = EOPNOTSUPP;
+		goto err_out;
+	}
+	
 	/* Create FILE_NAME attribute. */
 	fn_len = sizeof(FILE_NAME_ATTR) + name_len * sizeof(ntfschar);
 	fn = ntfs_calloc(fn_len);
@@ -1628,7 +1645,6 @@ rollback_failed:
 err_out:
 	free(fn);
 	errno = err;
-	ntfs_log_perror("Hard link failed");
 	return -1;
 }
 

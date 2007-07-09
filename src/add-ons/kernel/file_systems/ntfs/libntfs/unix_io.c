@@ -113,7 +113,7 @@ static int ntfs_device_unix_io_open(struct ntfs_device *dev, int flags)
 		NDevSetReadOnly(dev);
 
 /* locking not implemented in BeOS */
-#if !defined(__BEOS__) && !defined(__HAIKU__)	
+#if !defined(__BEOS__) && !defined(__HAIKU__)		
 	memset(&flk, 0, sizeof(flk));
 	if (NDevReadOnly(dev))
 		flk.l_type = F_RDLCK;
@@ -153,25 +153,27 @@ static int ntfs_device_unix_io_close(struct ntfs_device *dev)
 
 	if (!NDevOpen(dev)) {
 		errno = EBADF;
+		ntfs_log_perror("Device %s is not open", dev->d_name);
 		return -1;
 	}
 	if (NDevDirty(dev))
-		fsync(DEV_FD(dev));
-
+		if (fsync(DEV_FD(dev))) {
+			ntfs_log_perror("Failed to fsync device %s", dev->d_name);
+			return -1;
+		}
 /* locking not implemented in BeOS */
-#if !defined(__BEOS__) && !defined(__HAIKU__)		
-	/* Release exclusive (mandatory) lock on the whole device. */	
+#if !defined(__BEOS__) && !defined(__HAIKU__)				
 	memset(&flk, 0, sizeof(flk));
 	flk.l_type = F_UNLCK;
 	flk.l_whence = SEEK_SET;
 	flk.l_start = flk.l_len = 0LL;
 	if (fcntl(DEV_FD(dev), F_SETLK, &flk))
-		ntfs_log_perror("ntfs_device_unix_io_close: Warning: Could not "
-				"unlock %s", dev->d_name);
-#endif				
-	/* Close the file descriptor and clear our open flag. */
-	if (close(DEV_FD(dev)))
+		ntfs_log_perror("Could not unlock %s", dev->d_name);
+#endif		
+	if (close(DEV_FD(dev))) {
+		ntfs_log_perror("Failed to close device %s", dev->d_name);
 		return -1;
+	}
 	NDevClearOpen(dev);
 	free(dev->d_private);
 	dev->d_private = NULL;
@@ -288,13 +290,16 @@ static s64 ntfs_device_unix_io_pwrite(struct ntfs_device *dev, const void *buf,
  */
 static int ntfs_device_unix_io_sync(struct ntfs_device *dev)
 {
+	int res = 0;
+	
 	if (!NDevReadOnly(dev)) {
-		int res = fsync(DEV_FD(dev));
-		if (!res)
+		res = fsync(DEV_FD(dev));
+		if (res)
+			ntfs_log_perror("Failed to sync device %s", dev->d_name);
+		else
 			NDevClearDirty(dev);
-		return res;
 	}
-	return 0;
+	return res;
 }
 
 /**
