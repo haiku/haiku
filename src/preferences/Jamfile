@@ -15,7 +15,7 @@ SubInclude HAIKU_TOP src preferences mail ;
 SubInclude HAIKU_TOP src preferences media ;
 SubInclude HAIKU_TOP src preferences menu ;
 SubInclude HAIKU_TOP src preferences mouse ;
-SubInclude HAIKU_TOP src preferences network ;
+#SubInclude HAIKU_TOP src preferences network ;
 SubInclude HAIKU_TOP src preferences print ;
 SubInclude HAIKU_TOP src preferences screen ;
 SubInclude HAIKU_TOP src preferences screensaver ;
