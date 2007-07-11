@@ -67,10 +67,16 @@ acpi_device_init_driver(device_node_handle node, void *user_cookie, void **cooki
 	device->path = path;
 	device->type = type;
 	device->node = node;
-	
+
+#ifdef __HAIKU__
 	snprintf(device->name, sizeof(device->name), "acpi_device %s", 
 		path);
-
+#else
+	strncpy(device->name, "acpi_device ", sizeof(device->name) - 1);
+	strncat(device->name, path, sizeof(device->name) - 1);
+	device->name[sizeof(device->name) - 1] = '\0';
+#endif
+	
 	*cookie = device;
 
 	return status;
