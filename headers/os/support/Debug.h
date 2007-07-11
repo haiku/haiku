@@ -23,8 +23,13 @@ extern "C" {
 	_IMPEXP_ROOT bool _debugFlag(void);
 	_IMPEXP_ROOT bool _setDebugFlag(bool);
 
-	_IMPEXP_ROOT int _debugPrintf(const char *, ...);
-	_IMPEXP_ROOT int _sPrintf(const char *, ...);
+#if __GNUC__
+	int _debugPrintf(const char *, ...) __attribute__ ((format (__printf__, 1, 2)));
+	int _sPrintf(const char *, ...) __attribute__ ((format (__printf__, 1, 2)));
+#else
+	int _debugPrintf(const char *, ...);
+	int _sPrintf(const char *, ...);
+#endif
 	_IMPEXP_ROOT int _xdebugPrintf(const char *, ...);
 	_IMPEXP_ROOT int _debuggerAssert(const char *, int, char *);
 #ifdef __cplusplus
