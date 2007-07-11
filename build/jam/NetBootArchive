@@ -1,0 +1,133 @@
+# This file defines what ends up in the network boot archive and it executes the
+# rules building the archive.
+
+local X86_ONLY = ;
+local PPC_ONLY = ;
+if $(TARGET_ARCH) = x86 {
+	X86_ONLY = "" ;
+} else if $(TARGET_ARCH) = ppc {
+	X86_ONLY = ;
+}
+
+local GPL_ONLY = ;
+if $(INCLUDE_GPL_ADDONS) = 1 {
+	GPL_ONLY = "" ;
+}
+
+BEOS_NETWORK_DEVICES = ethernet loopback ;
+BEOS_NETWORK_DATALINK_PROTOCOLS = ethernet_frame <module>arp loopback_frame
+	ipv4_datagram ;
+BEOS_NETWORK_PROTOCOLS = ipv4 tcp udp icmp ;
+
+BEOS_ADD_ONS_DRIVERS_NET = etherpci ipro1000 rtl8139 rtl8169 sis900
+	via-rhine wb840 net_stack vlance
+	$(GPL_ONLY)bcm440x $(GPL_ONLY)bcm570x
+;
+BEOS_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)ps2 $(X86_ONLY)isa ide scsi
+	config_manager $(X86_ONLY)agp
+;
+BEOS_ADD_ONS_FILE_SYSTEMS = bfs cdda dos googlefs iso9660 nfs ;
+
+
+# modules
+AddFilesToNetBootArchive beos system add-ons kernel bus_managers
+	: $(BEOS_ADD_ONS_BUS_MANAGERS) ;
+AddFilesToNetBootArchive beos system add-ons kernel busses ide
+	: ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 ;
+AddFilesToNetBootArchive beos system add-ons kernel console : vga_text ;
+AddFilesToNetBootArchive beos system add-ons kernel file_systems
+	: $(BEOS_ADD_ONS_FILE_SYSTEMS) ;
+AddFilesToNetBootArchive beos system add-ons kernel generic
+	: block_io fast_log ide_adapter locked_pool mpu401 scsi_periph ;
+AddFilesToNetBootArchive beos system add-ons kernel partitioning_systems
+	: intel session ;
+AddFilesToNetBootArchive beos system add-ons kernel interrupt_controllers
+	: $(PPC_ONLY)openpic ;
+
+if $(TARGET_ARCH) = x86 {
+	AddFilesToNetBootArchive beos system add-ons kernel cpu : generic_x86 ;
+}
+
+# drivers
+AddDriversToNetBootArchive				: console dprintf $(X86_ONLY)keyboard
+										  null random <driver>tty zero ;
+AddDriversToNetBootArchive disk scsi	: scsi_cd scsi_dsk ;
+AddDriversToNetBootArchive disk virtual	: nbd ;
+AddDriversToNetBootArchive net			: $(BEOS_ADD_ONS_DRIVERS_NET) ;
+
+# kernel
+AddFilesToNetBootArchive beos system : <revisioned>kernel_$(TARGET_ARCH) ;
+
+# scripts and data files
+
+local driverSettingsFiles = <driver-settings>kernel ;
+SEARCH on $(driverSettingsFiles)
+	= [ FDirName $(HAIKU_TOP) data settings kernel drivers ] ;
+AddFilesToNetBootArchive home config settings kernel drivers
+	: $(driverSettingsFiles) ;
+
+# boot module links
+#AddBootModuleSymlinksToNetBootArchive config_manager bfs block_io fast_log
+#	generic_ide_pci $(X86_ONLY)isa ide ide_adapter $(X86_ONLY)ide_isa intel
+#	locked_pool $(PPC_ONLY)openpic pci scsi scsi_cd scsi_dsk scsi_periph
+#	ahci silicon_image_3112
+#;
+
+# add-ons
+AddFilesToNetBootArchive beos system add-ons kernel network
+	: stack socket ;
+AddFilesToNetBootArchive beos system add-ons kernel network devices
+	: $(BEOS_NETWORK_DEVICES) ;
+AddFilesToNetBootArchive beos system add-ons kernel network datalink_protocols
+	: $(BEOS_NETWORK_DATALINK_PROTOCOLS) ;
+AddFilesToNetBootArchive beos system add-ons kernel network ppp
+	: $(BEOS_NETWORK_PPP) ;
+AddFilesToNetBootArchive beos system add-ons kernel network protocols
+	: $(BEOS_NETWORK_PROTOCOLS) ;
+
+
+#pragma mark - Build The Archive
+
+# archive target
+HAIKU_NET_BOOT_ARCHIVE = haiku-netboot.tgz ;
+MakeLocate $(haiku-netboot-archive) : $(HAIKU_OUTPUT_DIR) ;
+
+# the pseudo target all archive contents is attached to
+NotFile $(HAIKU_NET_BOOT_ARCHIVE_CONTAINER_NAME) ;
+
+# prepare the script that initializes the shell variables
+local initVarsScript = <NetBootArchive>haiku-netboot-init-vars ;
+local script = $(initVarsScript) ;
+MakeLocate $(script) : $(HAIKU_OUTPUT_DIR) ;
+Always $(script) ;
+
+AddVariableToScript $(script) : tmpDir : $(HAIKU_TMP_DIR) ;
+AddVariableToScript $(script) : addBuildCompatibilityLibDir
+	: $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ;
+AddTargetVariableToScript $(script) : <build>copyattr ;
+
+# create the other scripts
+local makeDirsScript = <NetBootArchive>haiku-netboot-make-dirs ;
+local copyFilesScript = <NetBootArchive>haiku-netboot-copy-files ;
+MakeLocate $(makeDirsScript) $(copyFilesScript) : $(HAIKU_OUTPUT_DIR) ;
+
+CreateNetBootArchiveMakeDirectoriesScript $(makeDirsScript) ;
+CreateNetBootArchiveCopyFilesScript $(copyFilesScript) ;
+
+# build the archive
+
+BuildNetBootArchive $(HAIKU_NET_BOOT_ARCHIVE) :
+	$(initVarsScript)
+	$(makeDirsScript)
+	$(copyFilesScript)
+;
+
+# remove the scripts we have generated
+RmTemps $(HAIKU_NET_BOOT_ARCHIVE) :
+	$(initVarsScript)
+	$(makeDirsScript)
+	$(copyFilesScript)
+;
+
+NotFile haiku-netboot-archive ;
+Depends haiku-netboot-archive : $(HAIKU_NET_BOOT_ARCHIVE) ;

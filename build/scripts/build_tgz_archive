@@ -1,0 +1,53 @@
+#!/bin/sh
+
+if [ $# -lt 2 ]; then
+	echo "Usage: $0 <archive> <scripts> ..."
+fi
+
+# get the archive name
+archive=$1
+shift
+
+# The second argument is the shell script that initializes the variables:
+# tmpDir
+# addBuildCompatibilityLibDir
+# 
+# copyattr
+#
+. $1
+shift
+
+outputDir=$tmpDir/archive
+
+# this adds the build library dir to LD_LIBRARY_PATH
+eval "$addBuildCompatibilityLibDir"
+
+# map the shell commands
+sPrefix=
+tPrefix="$outputDir/"
+cd=cd
+scd=:
+cp="$copyattr -d"
+ln=ln
+mkdir=mkdir
+rm=rm
+
+# clear output dir
+$rm -rf $outputDir
+$mkdir $outputDir
+
+# populate output dir
+echo "Preparing contents of archive $archive ..."
+while [ $# -gt 0 ]; do
+	. $1
+	shift
+done
+
+# build the archive
+echo "Building archive $archive ..."
+$rm -f $archive
+contents=$(cd $outputDir; ls)
+tar -C $outputDir -czf $archive $contents || exit 1
+
+# clean up
+$rm -rf $outputDir

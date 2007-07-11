@@ -33,7 +33,7 @@ if $(JAM_TARGETS) {
 	} else if $(JAM_TARGETS[1]) = update-image
 		|| $(JAM_TARGETS[1]) = update-vmware-image
 		|| $(JAM_TARGETS[1]) = update-install {
-		HAIKU_IMAGE_UPDATE_ONLY = 1 ;
+		SetUpdateHaikuImageOnly 1 ;
 		HAIKU_INCLUDE_IN_IMAGE on $(JAM_TARGETS[2-]) = 1 ;
 
 		if $(JAM_TARGETS[1]) = update-image {
@@ -722,6 +722,25 @@ if $(TARGET_PLATFORM) = libbe_test {
 	TARGET_LIBRARY_NAME_MAP = LIBBE_LIBRARY_NAME_MAP ;
 	LIBBE_LIBRARY_NAME_MAP_be = libbe_haiku.so ;
 }
+
+
+#pragma mark - container settings
+
+# Haiku image
+HAIKU_IMAGE_CONTAINER_NAME = haiku-image-container ;
+HAIKU_CONTAINER_GRIST on $(HAIKU_IMAGE_CONTAINER_NAME) = HaikuImage ;
+HAIKU_INCLUDE_IN_CONTAINER_VAR on $(HAIKU_IMAGE_CONTAINER_NAME)
+	= HAIKU_INCLUDE_IN_IMAGE ;
+HAIKU_INSTALL_TARGETS_VAR on $(HAIKU_IMAGE_CONTAINER_NAME)
+	= HAIKU_IMAGE_INSTALL_TARGETS ;
+
+# network boot archive
+HAIKU_NET_BOOT_ARCHIVE_CONTAINER_NAME = haiku-netboot-archive-container ;
+HAIKU_CONTAINER_GRIST on $(HAIKU_NET_BOOT_ARCHIVE_CONTAINER_NAME)
+	= NetBootArchive ;
+# HAIKU_INCLUDE_IN_CONTAINER_VAR -- update only mode not supported
+HAIKU_INSTALL_TARGETS_VAR on $(HAIKU_NET_BOOT_ARCHIVE_CONTAINER_NAME)
+	= HAIKU_NET_BOOT_ARCHIVE_INSTALL_TARGETS ;
 
 
 #pragma mark -

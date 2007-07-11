@@ -38,13 +38,14 @@ HAIKU_INSTALL_DIR = /Haiku ;
 # Affects the haiku-image, haiku-vmware-image, and install-haiku targets. Only
 # targets on which the HAIKU_INCLUDE_IN_IMAGE variable has been set will be
 # updated in the image file/installation directory.
-# The update-image, update-vmware-image, and update-install targets always set
-# this variable, so one likely doesn't ever need to set it manually.
-HAIKU_IMAGE_UPDATE_ONLY = 1 ;
+# The update-image, update-vmware-image, and update-install targets always invoke
+# this rule, so one likely doesn't ever need to do it manually.
+SetUpdateHaikuImageOnly 1 ;
 
 # libbe.so and the kernel will be updated on image updates. Note that this
-# doesn't work for pseudo targets like "kernel".
-HAIKU_INCLUDE_IN_IMAGE on libbe.so kernel_x86 = 1 ;
+# generally doesn't work for pseudo targets (it does where special support
+# has been added, like for "kernel").
+HAIKU_INCLUDE_IN_IMAGE on libbe.so kernel = 1 ;
 
 # Add "crashing_app" to the beos/bin directory of the Haiku image/installation.
 # Note, that this also makes the image depend on the target, i.e. it is

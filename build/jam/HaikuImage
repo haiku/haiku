@@ -1,3 +1,6 @@
+# This file defines what ends up on the Haiku image (respectively in the Haiku
+# installation directory) and it executes the rules building the image
+# (respectively installing the files in the installation directory).
 
 # create directories that will remain empty
 AddDirectoryToHaikuImage home Desktop ;
@@ -6,18 +9,17 @@ AddDirectoryToHaikuImage home config lib ;
 AddDirectoryToHaikuImage var log ;
 AddDirectoryToHaikuImage var tmp ;
 
+local X86_ONLY = ;
+local PPC_ONLY = ;
 if $(TARGET_ARCH) = x86 {
 	X86_ONLY = "" ;
-	PPC_ONLY = ;
 } else if $(TARGET_ARCH) = ppc {
 	X86_ONLY = ;
-	PPC_ONLY = "" ;
 }
 
+local GPL_ONLY = ;
 if $(INCLUDE_GPL_ADDONS) = 1 {
 	GPL_ONLY = "" ;
-} else {
-	GPL_ONLY = ;
 }
 
 BEOS_BIN = "[" addattr alert arp basename bc beep bzip2 cat cardctl catattr chgrp
@@ -329,9 +331,9 @@ AddFilesToHaikuImage home config settings : <keymap>US-International : Key_map ;
 AddFilesToHaikuImage beos system : zbeos ;
 
 # boot module links
-AddBootModuleSymlinks config_manager bfs block_io fast_log generic_ide_pci
-	$(X86_ONLY)isa ide ide_adapter $(X86_ONLY)ide_isa intel locked_pool
-	$(PPC_ONLY)openpic pci scsi scsi_cd scsi_dsk scsi_periph
+AddBootModuleSymlinksToHaikuImage config_manager bfs block_io fast_log
+	generic_ide_pci $(X86_ONLY)isa ide ide_adapter $(X86_ONLY)ide_isa intel
+	locked_pool $(PPC_ONLY)openpic pci scsi scsi_cd scsi_dsk scsi_periph
 	ahci silicon_image_3112
 ;
 
@@ -395,7 +397,7 @@ MakeLocate $(HAIKU_IMAGE) : $(HAIKU_IMAGE_DIR) ;
 HAIKU_INSTALL_DIR ?= /Haiku ;
 
 # the pseudo target all image contents is attached to
-NotFile haiku-image-contents ;
+NotFile $(HAIKU_IMAGE_CONTAINER_NAME) ;
 
 # prepare the script that initializes the shell variables
 HAIKU_IMAGE_INIT_VARIABLES_SCRIPT = <HaikuImage>haiku.image-init-vars ;

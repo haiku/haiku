@@ -95,15 +95,18 @@ actions AddTargetVariableToScript1
 }
 
 
-rule AddDirectoryToHaikuImage directoryTokens
-{
-	# AddDirectoryToHaikuImage <directoryTokens>
+#pragma mark -
 
+rule AddDirectoryToContainer container : directoryTokens
+{
+	# AddDirectoryToContainer <container> : <directoryTokens>
+
+	local containerGrist = [ on $(container) return $(HAIKU_CONTAINER_GRIST) ] ;
 	local directory = [ FDirName $(directoryTokens) ] ;
-	directory = $(directory:G=HaikuImage) ;
+	directory = $(directory:G=$(containerGrist)) ;
 
 	if ! [ on $(directory) return $(__is_on_image) ] {
-		INSTALL_DIRECTORIES on haiku-image-contents += $(directory) ;
+		HAIKU_INSTALL_DIRECTORIES on $(container) += $(directory) ;
 		__is_on_image on $(directory) = true ;
 		NotFile $(directory) ;
 	
@@ -112,7 +115,7 @@ rule AddDirectoryToHaikuImage directoryTokens
 		parent = [ FReverse $(parent[2-]) ] ;
 		if $(parent) {
 			parent = [ FDirName $(parent) ] ;
-			parent = $(parent:G=HaikuImage) ;
+			parent = $(parent:G=$(containerGrist)) ;
 			DONT_CREATE on $(parent) = true ;
 		}
 	}
@@ -120,35 +123,43 @@ rule AddDirectoryToHaikuImage directoryTokens
 	return $(directory) ;
 }
 
-rule FilterImageUpdateTargets targets
+rule FilterContainerUpdateTargets targets : filterVariable
 {
-	# FilterImageUpdateTargets targets
+	# FilterContainerUpdateTargets targets : filterVariable
 
 	local filteredTargets ;
 	local target ;
 	for target in $(targets) {
-		if [ on $(target) return $(HAIKU_INCLUDE_IN_IMAGE) ] {
+		if [ on $(target) return $($(filterVariable)) ] {
 			filteredTargets += $(target) ;
 		}
 	}
 	return $(filteredTargets) ;
 }
 
-rule AddFilesToHaikuImage
+rule AddFilesToContainer container : directoryTokens : targets : destName
 {
-	# AddFilesToHaikuImage <directory> : <targets> [ : dest name ]
+	# AddFilesToContainer <container> : <directoryTokens> : <targets>
+	#	[ : dest name ]
 	#
-	local directory = [ AddDirectoryToHaikuImage $(1) ] ;
-	local targets = $(2) ;
-	local destName = $(3) ;
+	local directory = [ AddDirectoryToContainer $(container)
+		: $(directoryTokens) ] ;
+	local containerGrist = [ on $(container) return $(HAIKU_CONTAINER_GRIST) ] ;
 
 	# If the image shall only be updated, we filter out all targets not marked
 	# accordingly.
-	if $(HAIKU_IMAGE_UPDATE_ONLY) {
-		targets = [ FilterImageUpdateTargets $(targets) ] ;
+	if [ on $(container) return $(HAIKU_CONTAINER_UPDATE_ONLY) ] {
+		local filterVar
+			= [ on $(container) return $(HAIKU_INCLUDE_IN_CONTAINER_VAR) ] ;
+		if $(filterVar) {
+			targets = [ FilterContainerUpdateTargets $(targets)
+				: $(filterVar) ] ;
+		}
 	}
 
 	# We create a unique dummy target per target to install.
+	local installTargetsVar
+		= [ on $(container) return $(HAIKU_INSTALL_TARGETS_VAR) ] ;
 	local target ;
 	for target in $(targets) {
 		local name ;
@@ -158,25 +169,27 @@ rule AddFilesToHaikuImage
 			name = $(target:G=:D=) ;
 		}
 
-		local destTarget = $(name:G=HaikuImage__$(directory:G=)) ;
+		local destTarget = $(name:G=$(containerGrist)__$(directory:G=)) ;
 		TARGET on $(destTarget) = $(target) ;
 		INSTALL_DIR on $(destTarget) = $(directory) ;
-		INSTALL_TARGETS on $(target) += $(destTarget) ;
+		$(installTargetsVar) on $(target) += $(destTarget) ;
 		TARGETS_TO_INSTALL on $(directory) += $(destTarget) ;
 	}
 }
 
-rule AddSymlinkToHaikuImage directoryTokens : linkTarget : linkName
+rule AddSymlinkToContainer container : directoryTokens : linkTarget : linkName
 {
-	# AddSymlinkToHaikuImage <directory> : <link target> [ : <link name> ] ;
+	# AddSymlinkToContainer <container> : <directory> : <link target>
+	#	[ : <link name> ] ;
 	#
 
 	# If the image shall only be updated, we don't add any symlinks.
-	if $(HAIKU_IMAGE_UPDATE_ONLY) {
+	if [ on $(container) return $(HAIKU_CONTAINER_UPDATE_ONLY) ] {
 		return ;
 	}
 
-	local directory = [ AddDirectoryToHaikuImage $(directoryTokens) ] ;
+	local directory = [ AddDirectoryToContainer $(container)
+		: $(directoryTokens) ] ;
 
 	if ! $(linkName) {
 		local path = [ FReverse [ FSplitPath $(linkTarget) ] ] ;
@@ -188,30 +201,18 @@ rule AddSymlinkToHaikuImage directoryTokens : linkTarget : linkName
 	SYMLINKS_TO_INSTALL on $(directory) += $(link) ;
 }
 
-rule AddSourceDirectoryToHaikuImage dirTokens : alwaysUpdate
+rule AddDriversToContainer container : relativeDirectoryTokens : targets
 {
-	# AddSourceDirectoryToHaikuImage <dirTokens> : <alwaysUpdate> ;
-
-	# If the image shall only be updated, we update sources only, if explicitely
-	# requested.
-	if ! $(HAIKU_IMAGE_UPDATE_ONLY) || $(alwaysUpdate) {
-		HAIKU_INSTALL_SOURCE_DIRS += [ FDirName $(HAIKU_TOP) $(dirTokens) ] ;
-	}
-}
-
-rule AddDriversToHaikuImage
-{
-	# AddDriversToHaikuImage <relative directory> : <targets> ;
+	# AddDriversToContainer <container> : <relative directory> : <targets> ;
 	#
-	local relativeDirectoryTokens = $(1) ;
-	local targets = $(2) ;
 	local directoryTokens = beos system add-ons kernel drivers dev
 		$(relativeDirectoryTokens) ;
 
-	AddFilesToHaikuImage beos system add-ons kernel drivers bin : $(targets) ;
+	AddFilesToContainer $(container) : beos system add-ons kernel drivers bin
+		: $(targets) ;
 
 	# If the image shall only be updated, we don't add any symlinks.
-	if $(HAIKU_IMAGE_UPDATE_ONLY) {
+	if [ on $(container) return $(HAIKU_CONTAINER_UPDATE_ONLY) ] {
 		return ;
 	}
 
@@ -225,18 +226,17 @@ rule AddDriversToHaikuImage
 	# add the symlinks
 	local name ;
 	for name in $(targets:BS) {
-		AddSymlinkToHaikuImage $(directoryTokens)
+		AddSymlinkToContainer $(container) : $(directoryTokens)
 			: [ FDirName $(linkPrefix) $(name) ] : $(name) ;
 	}
 }
 
-rule AddDriverRegistrationToHaikuImage
+rule AddDriverRegistrationToContainer container : relativeDirectoryTokens
+	: target : links
 {
-	# AddDriverRegistrationToHaikuImage <directory> : <link target> : <link names> ] ;
+	# AddDriverRegistrationToContainer <container> : <directory>
+	#	: <link target> : <link names> ] ;
 	#
-	local relativeDirectoryTokens = $(1) ;
-	local target = $(2) ;
-	local links = $(3) ;
 	local directoryTokens = beos system add-ons kernel registration
 		$(relativeDirectoryTokens) ;
 
@@ -248,44 +248,46 @@ rule AddDriverRegistrationToHaikuImage
 	linkPrefix += .. drivers bin ;
 
 	# add the symlink
-	AddSymlinkToHaikuImage $(directoryTokens)
+	AddSymlinkToContainer $(container) : $(directoryTokens)
 		: [ FDirName $(linkPrefix) $(target:BS) ] : $(links) ;
 }
 
-rule AddBootModuleSymlinks targets
+rule AddBootModuleSymlinksToContainer container : targets
 {
-	# AddBootModuleSymlinks <targets> ;
+	# AddBootModuleSymlinksToContainer <container> : <targets> ;
 	#
 
 	# If the image shall only be updated, we don't add any symlinks.
-	if $(HAIKU_IMAGE_UPDATE_ONLY) {
+	if [ on $(container) return $(HAIKU_CONTAINER_UPDATE_ONLY) ] {
 		return ;
 	}
 
 	# add the symlinks
+	local installTargetsVar
+		= [ on $(container) return $(HAIKU_INSTALL_TARGETS_VAR) ] ;
 	local target ;
 	for target in $(targets) {
 		# Symlink to the first place where the target has been installed.
-		local destTarget = [ on $(target) return $(INSTALL_TARGETS[1]) ] ;
+		local destTarget = [ on $(target) return $($(installTargetsVar)[1]) ] ;
 		local installDir = [ on $(destTarget) return $(INSTALL_DIR) ] ;
 
 		if ! $(installDir) {
-			Echo "ERROR: AddBootModuleSymlinks: Can't create a symlink to"
-				"target" \"$(target)"\"." ;
-			Exit "ERROR: Add*ToHaikuImage has not been invoked for it yet." ;
+			Echo "ERROR: AddBootModuleSymlinksToContainer: Can't create a "
+				"symlink to target" \"$(target)"\"." ;
+			Exit "ERROR: Add*ToContainer has not been invoked for it yet." ;
 		}
 
 		local name = $(target:BS) ;
 		local linkTarget = [ FDirName /boot $(installDir:G=) $(name) ] ; 
 
-		AddSymlinkToHaikuImage beos system add-ons kernel boot
+		AddSymlinkToContainer $(container) : beos system add-ons kernel boot
 			: $(linkTarget) : $(name) ;
 	}
 }
 
-rule CreateHaikuImageMakeDirectoriesScript
+
+rule CreateContainerMakeDirectoriesScript container : script
 {
-	local script = $(1) ;
 	MakeLocate $(script) : $(HAIKU_OUTPUT_DIR) ;
 	Always $(script) ;
 
@@ -299,7 +301,7 @@ rule CreateHaikuImageMakeDirectoriesScript
 	
 	local dirsToCreate ;
 	local dir ;
-	for dir in [ on haiku-image-contents return $(INSTALL_DIRECTORIES) ] {
+	for dir in [ on $(container) return $(HAIKU_INSTALL_DIRECTORIES) ] {
 		if ! [ on $(dir) return $(DONT_CREATE) ] {
 			dirsToCreate += $(dir) ;
 		}
@@ -307,19 +309,19 @@ rule CreateHaikuImageMakeDirectoriesScript
 
 	Depends $(scriptBody) : $(dirsToCreate) ;
 	# If the image shall only be updated, we don't create directories.
-	if $(dirsToCreate) && ! $(HAIKU_IMAGE_UPDATE_ONLY) {
-		CreateHaikuImageMakeDirectoriesScript1 $(scriptBody) : $(dirsToCreate) ;
+	if $(dirsToCreate)
+		&& ! [ on $(container) return $(HAIKU_CONTAINER_UPDATE_ONLY) ] {
+		CreateContainerMakeDirectoriesScript1 $(scriptBody) : $(dirsToCreate) ;
 	}
 }
 
-actions piecemeal CreateHaikuImageMakeDirectoriesScript1
+actions piecemeal CreateContainerMakeDirectoriesScript1
 {
 	echo \$mkdir -p "\"\${tPrefix}$(2:G=)\"" >> $(1)
 }
 
-rule CreateHaikuImageCopyFilesScript
+rule CreateContainerCopyFilesScript container : script
 {
-	local script = $(1) ;
 	MakeLocate $(script) : $(HAIKU_OUTPUT_DIR) ;
 	Always $(script) ;
 
@@ -332,7 +334,7 @@ rule CreateHaikuImageCopyFilesScript
 	Depends $(script) : $(scriptBody) ;
 
 	local dir ;
-	for dir in [ on haiku-image-contents return $(INSTALL_DIRECTORIES) ] {
+	for dir in [ on $(container) return $(HAIKU_INSTALL_DIRECTORIES) ] {
 		# filter the targets that shall be renamed; they have to be copied
 		# individually
 		local destTargets = [ on $(dir) return $(TARGETS_TO_INSTALL) ] ;
@@ -352,7 +354,7 @@ rule CreateHaikuImageCopyFilesScript
 				Depends $(dummyTarget) : $(initScript) $(target) ;
 				Depends $(script) : $(dummyTarget) ;
 
-				AppendToHaikuImageCopyFilesScriptSingleFile $(dummyTarget)
+				AppendToContainerCopyFilesScriptSingleFile $(dummyTarget)
 					: $(initScript) $(target) ;
 			} else {
 				remainingTargets += $(target) ;
@@ -371,7 +373,7 @@ rule CreateHaikuImageCopyFilesScript
 			Depends $(script) : $(dummyTarget) ;
 
 			OUTPUT_SCRIPT on $(dummyTarget) = $(initScript) ;
-			AppendToHaikuImageCopyFilesScript $(dummyTarget) : $(targets) ;
+			AppendToContainerCopyFilesScript $(dummyTarget) : $(targets) ;
 		}
 	
 		local symlinks = [ on $(dir) return $(SYMLINKS_TO_INSTALL) ] ;
@@ -382,34 +384,108 @@ rule CreateHaikuImageCopyFilesScript
 			Depends $(script) : $(symlink) ;
 			Depends $(symlink) : $(initScript) ;
 
-			AddSymlinkToHaikuImageCopyFilesScript $(symlink) : $(initScript) ;
+			AddSymlinkToContainerCopyFilesScript $(symlink) : $(initScript) ;
 		}
 	}
 }
 
-actions piecemeal AppendToHaikuImageCopyFilesScript bind OUTPUT_SCRIPT
+actions piecemeal AppendToContainerCopyFilesScript bind OUTPUT_SCRIPT
 {
 	echo \$cp "\"\${sPrefix}$(2)\"" "\"\${tPrefix}$(TARGET_DIR)\"" >> $(OUTPUT_SCRIPT)
 }
 
-actions AppendToHaikuImageCopyFilesScriptSingleFile
+actions AppendToContainerCopyFilesScriptSingleFile
 {
 	echo \$cp "\"\${sPrefix}$(2[2])\"" \
 		"\"\${tPrefix}$(TARGET_DIR)/$(INSTALL_TARGET_NAME)\"" >> $(2[1])
 }
 
-actions AddSymlinkToHaikuImageCopyFilesScript
+actions AddSymlinkToContainerCopyFilesScript
 {
 	echo \$ln -sfn "\"$(SYMLINK_TARGET)\"" "\"\${tPrefix}$(1:G=)\"" >> $(2[1])
 }
 
-rule BuildHaikuImage
+
+#pragma mark - Haiku Image rules
+
+rule SetUpdateHaikuImageOnly flag
+{
+	HAIKU_CONTAINER_UPDATE_ONLY on $(HAIKU_IMAGE_CONTAINER_NAME) = $(flag) ;
+}
+
+rule AddDirectoryToHaikuImage directoryTokens
+{
+	# AddDirectoryToHaikuImage <directoryTokens>
+
+	return [ AddDirectoryToContainer $(HAIKU_IMAGE_CONTAINER_NAME)
+		: $(directoryTokens) ] ;
+}
+
+rule AddFilesToHaikuImage directory : targets : destName
+{
+	# AddFilesToHaikuImage <directory> : <targets> [ : dest name ]
+
+	AddFilesToContainer $(HAIKU_IMAGE_CONTAINER_NAME) : $(directory)
+		: $(targets) : $(destName) ;
+}
+
+rule AddSymlinkToHaikuImage directoryTokens : linkTarget : linkName
+{
+	# AddSymlinkToHaikuImage <directory> : <link target> [ : <link name> ] ;
+
+	AddSymlinkToContainer $(HAIKU_IMAGE_CONTAINER_NAME) : $(directoryTokens)
+		: $(linkTarget) : $(linkName) ;
+}
+
+rule AddSourceDirectoryToHaikuImage dirTokens : alwaysUpdate
+{
+	# AddSourceDirectoryToHaikuImage <dirTokens> : <alwaysUpdate> ;
+
+	# If the image shall only be updated, we update sources only, if explicitely
+	# requested.
+	if ! $(HAIKU_IMAGE_UPDATE_ONLY) || $(alwaysUpdate) {
+		HAIKU_INSTALL_SOURCE_DIRS += [ FDirName $(HAIKU_TOP) $(dirTokens) ] ;
+	}
+}
+
+rule AddDriversToHaikuImage relativeDirectoryTokens : targets
+{
+	# AddDriversToHaikuImage <relative directory> : <targets> ;
+
+	AddDriversToContainer $(HAIKU_IMAGE_CONTAINER_NAME)
+		: $(relativeDirectoryTokens) : $(targets) ;
+}
+
+rule AddDriverRegistrationToHaikuImage relativeDirectoryTokens : target : links
+{
+	# AddDriverRegistrationToHaikuImage <directory> : <link target> : <link names> ] ;
+
+	AddDriverRegistrationToContainer $(HAIKU_IMAGE_CONTAINER_NAME)
+		: $(relativeDirectoryTokens) : $(target) : $(links) ;
+}
+
+rule AddBootModuleSymlinksToHaikuImage targets
+{
+	# AddBootModuleSymlinksToHaikuImage <targets> ;
+
+	AddBootModuleSymlinksToContainer $(HAIKU_IMAGE_CONTAINER_NAME)
+		: $(targets) ;
+}
+
+rule CreateHaikuImageMakeDirectoriesScript script
+{
+	CreateContainerMakeDirectoriesScript $(HAIKU_IMAGE_CONTAINER_NAME)
+		: $(script) ;
+}
+
+rule CreateHaikuImageCopyFilesScript script
+{
+	CreateContainerCopyFilesScript $(HAIKU_IMAGE_CONTAINER_NAME) : $(script) ;
+}
+
+rule BuildHaikuImage haikuImage : scripts : isImage
 {
 	# BuildHaikuImage <haiku image> : <scripts> : <is image> ;
-	#
-	local haikuImage = $(1) ;
-	local scripts = $(2) ;
-	local isImage = $(3) ;
 
 	if $(isImage) = 1 || $(isImage) = true {
 		IS_IMAGE on $(haikuImage) = 1 ;
@@ -445,4 +521,85 @@ actions BuildVMWareImage1
 	rm -f $(1)
 	$(2[1]) -h 64k -i$(IMAGE_SIZE)M $(1) &&
 	cat $(2[2]) >> $(1)
+}
+
+
+#pragma mark - Network Boot Archive rules
+
+rule AddDirectoryToNetBootArchive directoryTokens
+{
+	# AddDirectoryToNetBootArchive <directoryTokens>
+
+	return [ AddDirectoryToContainer $(HAIKU_NET_BOOT_ARCHIVE_CONTAINER_NAME)
+		: $(directoryTokens) ] ;
+}
+
+rule AddFilesToNetBootArchive directory : targets : destName
+{
+	# AddFilesToNetBootArchive <directory> : <targets> [ : dest name ]
+
+	AddFilesToContainer $(HAIKU_NET_BOOT_ARCHIVE_CONTAINER_NAME) : $(directory)
+		: $(targets) : $(destName) ;
+}
+
+rule AddSymlinkToNetBootArchive directoryTokens : linkTarget : linkName
+{
+	# AddSymlinkToNetBootArchive <directory> : <link target> [ : <link name> ] ;
+
+	AddSymlinkToContainer $(HAIKU_NET_BOOT_ARCHIVE_CONTAINER_NAME)
+		: $(directoryTokens) : $(linkTarget) : $(linkName) ;
+}
+
+rule AddDriversToNetBootArchive relativeDirectoryTokens : targets
+{
+	# AddDriversToNetBootArchive <relative directory> : <targets> ;
+
+	AddDriversToContainer $(HAIKU_NET_BOOT_ARCHIVE_CONTAINER_NAME)
+		: $(relativeDirectoryTokens) : $(targets) ;
+}
+
+rule AddDriverRegistrationToNetBootArchive relativeDirectoryTokens : target
+	: links
+{
+	# AddDriverRegistrationToNetBootArchive <directory> : <link target>
+	#	: <link names> ] ;
+
+	AddDriverRegistrationToContainer $(HAIKU_NET_BOOT_ARCHIVE_CONTAINER_NAME)
+		: $(relativeDirectoryTokens) : $(target) : $(links) ;
+}
+
+rule AddBootModuleSymlinksToNetBootArchive targets
+{
+	# AddBootModuleSymlinksToNetBootArchive <targets> ;
+
+	AddBootModuleSymlinksToContainer $(HAIKU_NET_BOOT_ARCHIVE_CONTAINER_NAME)
+		: $(targets) ;
+}
+
+rule CreateNetBootArchiveMakeDirectoriesScript script
+{
+	CreateContainerMakeDirectoriesScript
+		$(HAIKU_NET_BOOT_ARCHIVE_CONTAINER_NAME) : $(script) ;
+}
+
+rule CreateNetBootArchiveCopyFilesScript script
+{
+	CreateContainerCopyFilesScript $(HAIKU_NET_BOOT_ARCHIVE_CONTAINER_NAME)
+		: $(script) ;
+}
+
+rule BuildNetBootArchive archive : scripts
+{
+	# BuildHNetBootArchive <archive> : <scripts>  ;
+
+	local mainScript = build_tgz_archive ;
+	SEARCH on $(mainScript) = [ FDirName $(HAIKU_TOP) build scripts ] ;
+
+	Depends $(archive) : $(mainScript) $(scripts) ;
+	BuildNetBootArchive1 $(archive) : $(mainScript) $(scripts) ;
+}
+
+actions BuildNetBootArchive1
+{
+	$(2[1]) $(1) $(2[2-])
 }

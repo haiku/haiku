@@ -142,8 +142,9 @@ if $(HAIKU_DONT_INCLUDE_SRC) {
 	SubInclude HAIKU_TOP src ;
 }
 
-# specify the Haiku image contents
+# specify the Haiku image and network boot archive contents
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuImage ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) NetBootArchive ] ;
 
 # Perform deferred SubIncludes.
 ExecuteDeferredSubIncludes ;
