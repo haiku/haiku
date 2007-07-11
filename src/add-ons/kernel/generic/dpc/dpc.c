@@ -89,12 +89,13 @@ new_dpc_queue(const char *name, long priority, int queue_size)
 	queue->count = 0;
 	queue->lock = 0;	// Init the spinlock
 
-#ifdef COMPILE_FOR_R5
+#ifdef __HAIKU__
+	snprintf(str, sizeof(str), "%.*s_wakeup_sem", 
+		(int) sizeof(str) - 11, name);
+#else
 	strncpy(str, name, sizeof(str) - 1);
 	strncat(str, "_wakeup_sem", sizeof(str) - 1);
 	str[sizeof(str) - 1] = '\0';
-#else
-	snprintf(str, sizeof(str), "%.*s_wakeup_sem", (int) sizeof(str) - 11, name);
 #endif
 
 	queue->wakeup_sem = create_sem(0, str);
