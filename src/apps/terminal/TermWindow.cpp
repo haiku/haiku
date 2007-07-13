@@ -54,15 +54,53 @@ extern PrefHandler *gTermPref;
 //#define CHLP_FILE   "file:///boot/beos/documentation/Shell%20Tools/index.html"
 
 
-TermWindow::TermWindow(BRect frame, const char* title, int fd)
+TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	: BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE|B_QUIT_ON_WINDOW_CLOSE),
-	fPfd(fd)
+	fPfd(-1),
+	fTermParse(NULL),
+	fMenubar(NULL),
+	fFilemenu(NULL),
+	fEditmenu(NULL),
+	fEncodingmenu(NULL),
+	fHelpmenu(NULL),
+	fFontMenu(NULL),
+	fWindowSizeMenu(NULL),
+	fNewFontMenu(NULL),
+	fTermView(NULL),
+	fBaseView(NULL),
+	fCodeConv(NULL),
+	fPrintSettings(NULL),
+	fPrefWindow(NULL),
+	fFindPanel(NULL),
+	fWindowUpdate(NULL),
+	fSavedFrame(0, 0, 0, 0),
+	fFindString(""),
+	fFindForwardMenuItem(NULL),
+	fFindBackwardMenuItem(NULL),
+	fFindSelection(false),
+	fForwardSearch(false),
+	fMatchCase(false),
+	fMatchWord(false)
 {
-	InitWindow();
+	int rows = gTermPref->getInt32(PREF_ROWS);
+	if (rows < 1) {
+		rows = 1;
+		gTermPref->setInt32(PREF_ROWS, rows);
+	}
 
-	fPrintSettings = NULL;
-	fPrefWindow = NULL;
-	fFindPanel = NULL;
+	int cols = gTermPref->getInt32(PREF_COLS);
+	if (cols < MIN_COLS) {
+		cols = MIN_COLS;
+		gTermPref->setInt32(PREF_COLS, cols);
+	}
+
+	// Get encoding name (setenv TTYPE in spawn_shell functions)
+	const char *encoding = longname2shortname(gTermPref->getString(PREF_TEXT_ENCODING));
+	fPfd = spawn_shell(rows, cols, command, encoding);	
+	if (fPfd < 0)
+		throw fPfd;
+
+	InitWindow();
 }
 
 
@@ -87,9 +125,8 @@ TermWindow::~TermWindow()
 
 
 /** Initialize Window object. */
-
 void
-TermWindow::InitWindow(void)
+TermWindow::InitWindow()
 {
 	// make menu bar
 	SetupMenu();
@@ -584,7 +621,7 @@ TermWindow::MessageReceived(BMessage *message)
 //  Dispatch Mesasge.
 ////////////////////////////////////////////////////////////////////////////
 void
-TermWindow::WindowActivated (bool )
+TermWindow::WindowActivated(bool)
 {
 
 }

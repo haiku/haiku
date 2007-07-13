@@ -37,7 +37,6 @@ PrefHandler *gTermPref;
 
 static bool sUsageRequested = false;
 static bool sGeometryRequested = false;
-static bool sColorRequested = false;
 
 struct standard_args {
 	char *name;
@@ -102,6 +101,7 @@ TermApp::ReadyToRun()
 	status_t status = _MakeTermWindow(fTermFrame);
 
 	// failed spawn, print stdout and open alert panel
+	// TODO: This alert does never show up.
 	if (status < B_OK) {
 		(new BAlert("alert", "Terminal couldn't start the shell. Sorry.",
 			"ok", NULL, NULL, B_WIDTH_FROM_LABEL,
@@ -298,22 +298,15 @@ TermApp::_MakeTermWindow(BRect &frame)
 		command = fCommandLine.String();
 	else
 		command = gTermPref->getString(PREF_SHELL);
-	
-	int rows = gTermPref->getInt32(PREF_ROWS);
-	if (rows < 1)
-		gTermPref->setInt32(PREF_ROWS, rows = 1);
 
-	int cols = gTermPref->getInt32(PREF_COLS);
-	if (cols < MIN_COLS)
-		gTermPref->setInt32(PREF_COLS, cols = MIN_COLS);
+	try {
+		fTermWindow = new TermWindow(frame, fWindowTitle.String(), command);
+	} catch (int error) {
+		return (status_t)error;	
+	} catch (...) {
+		return B_ERROR;
+	}
 
-	// Get encoding name (setenv TTYPE in spawn_shell functions)
-	const char *encoding = longname2shortname(gTermPref->getString(PREF_TEXT_ENCODING));
-	int pfd = spawn_shell(rows, cols, command, encoding);
-	if (pfd < 0)
-		return pfd;
-
-	fTermWindow = new TermWindow(frame, fWindowTitle.String(), pfd);
 	fTermWindow->Show();
 	
 	return B_OK;
