@@ -7,6 +7,7 @@
 
 #include <ACPI.h>
 #include <dpc.h>
+#include <PCI.h>
 #include <KernelExport.h>
 
 #include <malloc.h>
@@ -26,6 +27,8 @@ status_t acpi_rescan_stub(void);
 
 extern dpc_module_info *gDPC;
 void *gDPChandle = NULL;
+
+extern pci_module_info *gPCIManager;
 
 struct acpi_module_info acpi_module = {
 	{
@@ -85,6 +88,20 @@ acpi_std_ops(int32 op,...)
 				return ENOSYS;
 			}
 			
+			#ifndef __HAIKU__
+			{
+				// Once upon a time, there was no module(s) dependency(ies) automatic loading feature.
+				// Let's do it the old way
+				status_t status;
+				
+				status = get_module(B_DPC_MODULE_NAME, (module_info **) &gDPC);
+				if (status != B_OK) return status;
+				
+				status = get_module(B_PCI_MODULE_NAME, (module_info **) &gPCIManager);
+				if (status != B_OK) return status;
+			}
+			#endif
+			
 			gDPChandle = gDPC->new_dpc_queue("acpi_task", B_NORMAL_PRIORITY, 10);
 
 			#ifdef ACPI_DEBUG_OUTPUT
@@ -130,6 +147,13 @@ acpi_std_ops(int32 op,...)
 				gDPC->delete_dpc_queue(gDPChandle);
 				gDPChandle = NULL;
 			}
+
+			#ifndef __HAIKU__
+			// Once upon a time, there was no module(s) dependency(ies) automatic UNloading feature.
+			// Let's do it the old way
+			put_module(B_DPC_MODULE_NAME);
+			put_module(B_PCI_MODULE_NAME);
+			#endif
 
 			break;
 		default:
