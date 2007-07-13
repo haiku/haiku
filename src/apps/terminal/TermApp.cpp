@@ -35,9 +35,9 @@
 // Globals
 PrefHandler *gTermPref;
 
-bool gUsageRequested = false;
-bool gGeometryRequested = false;
-bool gColorRequested = false;
+static bool sUsageRequested = false;
+static bool sGeometryRequested = false;
+static bool sColorRequested = false;
 
 struct standard_args {
 	char *name;
@@ -53,22 +53,10 @@ struct standard_args standard_args[] = {
 	{ "-p", "--preference", 80, 1, NULL },
 	{ "-t", "--title", 70, 1, NULL },
 	{ "-geom", "--geometry", 50, 1, NULL },
-#if 0
-	{ "-fg", "--text-fore-color", 40, 1, PREF_TEXT_FORE_COLOR },
-	{ "-bg", "--text-back-color", 35, 1, PREF_TEXT_BACK_COLOR },
-	{ "-curfg", "--cursor-fore-color", 30, 1, PREF_CURSOR_FORE_COLOR },
-	{ "-curbg", "--cursor-back-color", 25, 1, PREF_CURSOR_BACK_COLOR },
-	{ "-selfg", "--select-fore-color", 20, 1, PREF_SELECT_FORE_COLOR },
-	{ "-selbg", "--select-back-color", 15, 1, PREF_SELECT_BACK_COLOR },
-	{ "-imfg", "--im-fore-color", 10, 1, PREF_IM_FORE_COLOR },
-	{ "-imbg", "--im-back-color", 5, 1, PREF_IM_BACK_COLOR },
-	{ "-imsel", "--im-select-color", 0, 1, PREF_IM_SELECT_COLOR },
-#endif
 };
 
 int argmatch(char **, int, char *, char *, int, char **, int *);
 void sort_args(int, char **);
-int text_to_rgb(char *, rgb_color *, char *);
 
 
 const ulong MSG_ACTIVATE_TERM = 'msat';
@@ -108,7 +96,7 @@ void
 TermApp::ReadyToRun()
 {
 	// Prevent opeing window when option -h is given.
-	if (gUsageRequested)
+	if (sUsageRequested)
 		return;
 
 	status_t status = _MakeTermWindow(fTermFrame);
@@ -131,7 +119,7 @@ TermApp::ReadyToRun()
 void
 TermApp::Quit()
 {
-	if (!gUsageRequested){
+	if (!sUsageRequested){
 		int status;
 
 		kill(-gShPid, SIGHUP);
@@ -209,7 +197,7 @@ TermApp::ArgvReceived(int32 argc, char **argv)
 	// Print usage
 	if (argmatch(argv, argc, "-help", "--help", 3, NULL, &skip_args)) {
 		_Usage(argv[0]);
-		gUsageRequested = true;
+		sUsageRequested = true;
 		PostMessage(B_QUIT_REQUESTED);
 	}
 
@@ -225,8 +213,8 @@ TermApp::ArgvReceived(int32 argc, char **argv)
 	if (argmatch(argv ,argc, "-t", "--title", 3, &value, &skip_args))
 		fWindowTitle = value;
 
-    // Set window geometry
-    if (argmatch(argv, argc, "-geom", "--geometry", 4, &value, &skip_args)) {
+    	// Set window geometry
+    	if (argmatch(argv, argc, "-geom", "--geometry", 4, &value, &skip_args)) {
 		int width, height, xpos, ypos;
 
 		sscanf(value, "%dx%d+%d+%d", &width, &height, &xpos, &ypos);
@@ -234,46 +222,16 @@ TermApp::ArgvReceived(int32 argc, char **argv)
 			|| width >= 256 || height >= 256 || xpos >= 2048 || ypos >= 2048) {
 			fprintf(stderr, "%s: invalid geometry format or value.\n", argv[0]);
 			fprintf(stderr, "Try `%s --help' for more information.\n", argv[0]);
-			gUsageRequested = true;
+			sUsageRequested = true;
 			PostMessage(B_QUIT_REQUESTED);
 		}
 		gTermPref->setInt32(PREF_COLS, width);
 		gTermPref->setInt32(PREF_ROWS, height);
 
 		fTermFrame.Set(xpos, ypos, xpos + 50, ypos + 50);
-		gGeometryRequested = true;
-    }
+		sGeometryRequested = true;
+   	 }
 
-#if 0
-	// Open '/etc/rgb.txt' file
-	BFile inFile;
-	off_t size = 0;
-
-	status_t status = inFile.SetTo("/etc/rgb.txt", B_READ_ONLY);
-	if (status != B_OK) {
-		fprintf(stderr, "%s: Can't open /etc/rgb.txt file.\n", argv[0]);
-		gUsageRequested = true;
-		PostMessage(B_QUIT_REQUESTED);
-	}
-
-	inFile.GetSize(&size);
-	char *buffer = new char [size];
-	inFile.Read(buffer, size);
-
-	// Set window, cursor, area and IM color
-	for (int i = 4; i < 13; i++) {
-		if (argmatch(argv, argc, standard_args[i].name, standard_args[i].longname,
-				9, &value, &skip_args)) {
-			rgb_color color;
-			if (text_to_rgb(value, &color, buffer))
-				gTermPref->setRGB(standard_args[i].prefname, color);
-			else
-				fprintf(stderr, "%s: invalid color string -- %s\n", argv[0], value);
-		}
-	}
-
-	delete[] buffer;
-#endif
 	skip_args++;
 
 	if (skip_args < argc) {
@@ -282,14 +240,14 @@ TermApp::ArgvReceived(int32 argc, char **argv)
 		if (*argv[skip_args] == '-') {
 			fprintf(stderr, "%s: invalid option `%s'\n", argv[0], argv[skip_args]);
 			fprintf(stderr, "Try `%s --help' for more information.\n", argv[0]);
-			gUsageRequested = true;
+			sUsageRequested = true;
 			PostMessage(B_QUIT_REQUESTED);
 		}
 
-		CommandLine += argv[skip_args++];
+		fCommandLine += argv[skip_args++];
 		while (skip_args < argc) {
-			CommandLine += ' ';
-			CommandLine += argv[skip_args++];
+			fCommandLine += ' ';
+			fCommandLine += argv[skip_args++];
 		}
 	}
 }
@@ -336,8 +294,8 @@ status_t
 TermApp::_MakeTermWindow(BRect &frame)
 {
 	const char *command = NULL;
-	if (CommandLine.Length() > 0)
-		command = CommandLine.String();
+	if (fCommandLine.Length() > 0)
+		command = fCommandLine.String();
 	else
 		command = gTermPref->getString(PREF_SHELL);
 	
@@ -625,54 +583,9 @@ TermApp::_Usage(char *name)
 		"  -t,     --title              set window title\n"
 		"  -geom,  --geometry           set window geometry\n"
 		"                               An example of geometry is \"80x25+100+100\"\n");
-#if 0
-	fprintf(stderr, "  -fg,    --text-fore-color    set window foreground color\n"
-		"  -bg,    --text-back-color    set window background color\n"
-		"  -curfg, --cursor-fore-color  set cursor foreground color\n"
-		"  -curbg, --cursor-back-color  set cursor background color\n"
-		"  -selfg, --select-fore-color  set selection area foreground color\n"
-		"  -selbg, --select-back-color  set selection area background color\n"
-		"                               Examples of color are \"#FF00FF\" and \"purple\"\n");
-#endif
 }
 
 
-int
-text_to_rgb(char *name, rgb_color *color, char *buffer)
-{
-	if (name[0] != '#') {
-		// Convert from /etc/rgb.txt.
-		BString inStr(buffer);
-		int32 point, offset = 0;
-
-		// Search color name
-		do {
-			point = inStr.FindFirst(name, offset);
-			if (point < 0)
-				return false;
-			offset = point + 1;
-		} while(*(buffer + point -1) != '\t');
-
-		char *p = buffer + point;
-		while (*p != '\n')
-			p--;
-		p++;
-
-		if (sscanf(p, "%d %d %d", (int *)&color->red, (int *)&color->green,
-				(int *)&color->blue) == EOF)
-			return false;
-
-		color->alpha = 0;
-	} else if (name[0] == '#') {
-		// Convert from #RRGGBB format
-		sscanf(name, "#%2x%2x%2x", (int *)&color->red, (int *)&color->green,
-			(int *)&color->blue);
-		color->alpha = 0;
-	} else
-		return false;
-
-	return true;
-}
 
 // This routine copy from GNU Emacs.
 // TODO: This might be a GPL licensing issue here. Investigate.

@@ -11,8 +11,6 @@
 #include <SupportDefs.h>
 #include "Coding.h"
 
-#define BEGINS_CHAR(byte) ((byte & 0xc0) >= 0x80)
-
 class CodeConv {
 	public:
 		CodeConv();

@@ -39,7 +39,6 @@
 class TermWindow;
 class TermParse;
 class BRect;
-class AboutDlg;
 
 class TermApp : public BApplication {
 	public:
@@ -68,17 +67,13 @@ class TermApp : public BApplication {
 
 		void _Usage(char *name);
 
-		port_id		fRegistrationPort;
-		int32		fRows, fCols, fXpos, fYpos;
 		bool		fStartFullscreen;
 		BString		fWindowTitle;
 		int32		fWindowNumber;
-		rgb_color	fFg, fBg, fCurFg, fCurBg, fSelFg, fSelbg;
-		rgb_color	fImfg, fImbg, fImSel;
+		
 		TermWindow*	fTermWindow;
-		TermParse*	fTermParse;
 		BRect		fTermFrame;
-		BString		CommandLine;
+		BString		fCommandLine;
 };
 
 #endif	// TERM_APP_H

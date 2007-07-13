@@ -27,6 +27,9 @@ UTF8
 
 #include "CodeConv.h"
 
+#define BEGINS_CHAR(byte) ((byte & 0xc0) >= 0x80)
+
+
 extern char utf8_width_table[]; /* define UTF8WidthTbl.c */
 
 

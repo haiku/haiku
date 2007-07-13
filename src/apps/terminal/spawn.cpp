@@ -76,7 +76,7 @@ setenv(const char *var, const char *value, bool overwrite)
 			/* found it */
 			if (overwrite) {
 				environ[envindex] = (char *)malloc((unsigned)len + val_len + 2);
-				sprintf(environ[envindex], "%s=%s", var, value);
+				snprintf(environ[envindex], "%s=%s", var, value);
 			}
 			return 0;
 		}
@@ -133,10 +133,6 @@ receive_handshake_message(handshake_t& handshake)
 int
 spawn_shell(int row, int col, const char *command, const char *coding)
 {
-	struct winsize ws;
-  	
-	handshake_t handshake;
-
 	signal(SIGTTOU, SIG_IGN);
 	
 	/*
@@ -144,7 +140,7 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 	 * directory. The oparationg system will not allow us to open a master
 	 * which is already in use, so we simply go until the open succeeds.
 	 */
-	char tty_name[B_PATH_NAME_LENGTH];
+	char ttyName[B_PATH_NAME_LENGTH];
 	int master = -1;	
 	DIR *dir = opendir("/dev/pt/");
 	if (dir != NULL) {
@@ -155,12 +151,12 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 				continue;
 
 			char ptyName[B_PATH_NAME_LENGTH];
-			sprintf(ptyName, "/dev/pt/%s", dirEntry->d_name);
+			snprintf(ptyName, sizeof(ptyName), "/dev/pt/%s", dirEntry->d_name);
 
 			master = open(ptyName, O_RDWR);
 			if (master >= 0) {
 				// Set the tty that corresponds to the pty we found
-				sprintf(tty_name, "/dev/tt/%s", dirEntry->d_name);
+				snprintf(ttyName, sizeof(ttyName), "/dev/tt/%s", dirEntry->d_name);
 				break;
 			} else {
 				// B_BUSY is a normal case
@@ -172,8 +168,8 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 	}
 
 	if (master < 0) {
-    	printf("didn't find any available pesudo ttys.");
-    	return -1;
+    		printf("didn't find any available pseudo ttys.");
+    		return -1;
 	}
 
    /*
@@ -188,6 +184,9 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 		close(master);
 		return -1;
 	}
+
+
+	handshake_t handshake;
 
 	if (gShPid == 0) {
 	    // Now in child process.
@@ -207,15 +206,15 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 		}
 
 		/* change pty owner and access mode. */
-		chown(tty_name, getuid(), getgid());
-		chmod(tty_name, S_IRUSR | S_IWUSR);
+		chown(ttyName, getuid(), getgid());
+		chmod(ttyName, S_IRUSR | S_IWUSR);
 
 		/* open slave pty */
 		int slave = -1;
-		if ((slave = open(tty_name, O_RDWR)) < 0) {
+		if ((slave = open(ttyName, O_RDWR)) < 0) {
 			handshake.status = PTY_NG;
 			snprintf(handshake.msg, sizeof(handshake.msg),
-				"can't open tty (%s).", tty_name);
+				"can't open tty (%s).", ttyName);
 			send_handshake_message(terminalThread, handshake);
 			exit(1);
 		}
@@ -323,6 +322,8 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 			exit(1);
 		}
 
+		struct winsize ws;
+  	
 		ws.ws_row = handshake.row;
 		ws.ws_col = handshake.col;
 
@@ -351,7 +352,7 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 		 * setenv TERM and TTY.
 		 */
 		setenv("TERM", "beterm", true);
-		setenv("TTY", tty_name, true);
+		setenv("TTY", ttyName, true);
 		setenv("TTYPE", coding, true);
 
 		/*
