@@ -191,6 +191,8 @@ AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
 # Deskbar Application links
 AddDirectoryToHaikuImage home config be Applications ;
 AddSymlinkToHaikuImage home config be Applications
+					: /boot/beos/apps/CodyCam : CodyCam ;
+AddSymlinkToHaikuImage home config be Applications
 					: /boot/beos/apps/CDPlayer : CDPlayer ;
 AddSymlinkToHaikuImage home config be Applications
 					: /boot/beos/apps/DeskCalc : DeskCalc ;
