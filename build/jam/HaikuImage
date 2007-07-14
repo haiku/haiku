@@ -46,7 +46,7 @@ BEOS_BIN = "[" addattr alert arp basename bc beep bzip2 cat cardctl catattr chgr
 ;
 
 	
-BEOS_APPS = AboutSystem DeskCalc DiskProbe CDPlayer Expander Icon-O-Matic
+BEOS_APPS = AboutSystem CodyCam DeskCalc DiskProbe CDPlayer Expander Icon-O-Matic
 	Installer LaunchBox Magnify Mail MediaPlayer MidiPlayer NetworkStatus
 	People PowerStatus ProcessController ShowImage SoundRecorder StyledEdit
 	Terminal TV Workspaces
