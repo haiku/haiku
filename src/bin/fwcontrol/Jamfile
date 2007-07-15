@@ -1,0 +1,13 @@
+SubDir HAIKU_TOP src bin fwcontrol ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
+UsePrivateHeaders firewire ;
+
+BinCommand fwcontrol :
+	eui64.c
+	fwcrom.c
+	fwdv.c
+	fwmpegts.c
+	fwcontrol.c
+	: libbsd.so
+;
