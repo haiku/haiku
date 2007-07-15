@@ -428,14 +428,15 @@ mmu_init_for_kernel(void)
 
 		TRACE(("idt at %p\n", idt));
 
-		// clear it out
-		for (int32 i = 0; i < IDT_LIMIT / 4; i++) {
-			idt[i] = 0;
-		}
-
 		// map the idt into virtual space
 		gKernelArgs.arch_args.vir_idt = (uint32)get_next_virtual_page();
 		map_page(gKernelArgs.arch_args.vir_idt, (uint32)idt, kDefaultPageFlags);
+
+		// clear it out
+		uint32* virtualIDT = (uint32*)gKernelArgs.arch_args.vir_idt;
+		for (int32 i = 0; i < IDT_LIMIT / 4; i++) {
+			virtualIDT[i] = 0;
+		}
 
 		// load the idt
 		idtDescriptor.limit = IDT_LIMIT - 1;
@@ -458,24 +459,33 @@ mmu_init_for_kernel(void)
 
 		TRACE(("gdt at %p\n", gdt));
 
-		// put standard segment descriptors in it
-		clear_segment_descriptor(&gdt[0]);
-		set_segment_descriptor(&gdt[1], 0, 0xffffffff, DT_CODE_READABLE, DPL_KERNEL);
-			// seg 0x08 - kernel 4GB code
-		set_segment_descriptor(&gdt[2], 0, 0xffffffff, DT_DATA_WRITEABLE, DPL_KERNEL);
-			// seg 0x10 - kernel 4GB data
-
-		set_segment_descriptor(&gdt[3], 0, 0xffffffff, DT_CODE_READABLE, DPL_USER);
-			// seg 0x1b - ring 3 user 4GB code
-		set_segment_descriptor(&gdt[4], 0, 0xffffffff, DT_DATA_WRITEABLE, DPL_USER);
-			// seg 0x23 - ring 3 user 4GB data
-
-		// gdt[5] and above will be filled later by the kernel
-		// to contain the TSS descriptors, and for TLS (one for every CPU)
-
 		// map the gdt into virtual space
 		gKernelArgs.arch_args.vir_gdt = (uint32)get_next_virtual_page();
 		map_page(gKernelArgs.arch_args.vir_gdt, (uint32)gdt, kDefaultPageFlags);
+
+		// put standard segment descriptors in it
+		segment_descriptor* virtualGDT
+			= (segment_descriptor*)gKernelArgs.arch_args.vir_gdt;
+		clear_segment_descriptor(&virtualGDT[0]);
+
+		// seg 0x08 - kernel 4GB code
+		set_segment_descriptor(&virtualGDT[1], 0, 0xffffffff, DT_CODE_READABLE,
+			DPL_KERNEL);
+
+		// seg 0x10 - kernel 4GB data
+		set_segment_descriptor(&virtualGDT[2], 0, 0xffffffff, DT_DATA_WRITEABLE,
+			DPL_KERNEL);
+		
+		// seg 0x1b - ring 3 user 4GB code
+		set_segment_descriptor(&virtualGDT[3], 0, 0xffffffff, DT_CODE_READABLE,
+			DPL_USER);
+
+		// seg 0x23 - ring 3 user 4GB data
+		set_segment_descriptor(&virtualGDT[4], 0, 0xffffffff, DT_DATA_WRITEABLE,
+			DPL_USER);
+
+		// virtualGDT[5] and above will be filled later by the kernel
+		// to contain the TSS descriptors, and for TLS (one for every CPU)
 
 		// load the GDT
 		gdtDescriptor.limit = GDT_LIMIT - 1;
