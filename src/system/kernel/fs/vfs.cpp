@@ -2631,11 +2631,11 @@ remove_vnode(dev_t mountID, ino_t vnodeID)
 		free_vnode(vnode, true);
 	}
 
-	return B_OK;
+	return vnode != NULL ? B_OK : B_ENTRY_NOT_FOUND;
 }
 
 
-extern "C" status_t 
+extern "C" status_t
 unremove_vnode(dev_t mountID, ino_t vnodeID)
 {
 	struct vnode *vnode;
@@ -2651,7 +2651,7 @@ unremove_vnode(dev_t mountID, ino_t vnodeID)
 }
 
 
-extern "C" status_t 
+extern "C" status_t
 get_vnode_removed(dev_t mountID, ino_t vnodeID, bool* removed)
 {
 	mutex_lock(&sVnodeMutex);
