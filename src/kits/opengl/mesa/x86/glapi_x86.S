@@ -58,12 +58,18 @@
 
 #ifdef GLX_USE_TLS
 
+#ifdef GLX_X86_READONLY_TEXT
+# define CTX_INSNS MOV_L(GS:(EAX), EAX)
+#else
+# define CTX_INSNS NOP /* Pad for init_glapi_relocs() */
+#endif
+
 #  define GL_STUB(fn,off,fn_alt)			\
 ALIGNTEXT16;						\
 GLOBL_FN(GL_PREFIX(fn, fn_alt));			\
 GL_PREFIX(fn, fn_alt):					\
 	CALL(_x86_get_dispatch) ;			\
-	NOP ;						\
+	CTX_INSNS ;					\
 	JMP(GL_OFFSET(off))
 
 #elif defined(PTHREADS)
@@ -114,7 +120,10 @@ SEG_TEXT
 	HIDDEN(GLNAME(_x86_get_dispatch))
 ALIGNTEXT16
 GLNAME(_x86_get_dispatch):
-	movl	%gs:_glapi_tls_Dispatch@NTPOFF, %eax
+	call	1f
+1:	popl	%eax
+	addl	$_GLOBAL_OFFSET_TABLE_+[.-1b], %eax
+	movl	_glapi_tls_Dispatch@GOTNTPOFF(%eax), %eax
 	ret
 
 #elif defined(PTHREADS)
@@ -133,7 +142,7 @@ GLNAME(_x86_get_dispatch):
 EXTERN GLNAME(_glapi_get_dispatch)
 #endif
 
-#if defined( GLX_USE_TLS )
+#if defined( GLX_USE_TLS ) && !defined( GLX_X86_READONLY_TEXT )
 		.section	wtext, "awx", @progbits
 #endif /* defined( GLX_USE_TLS ) */
 

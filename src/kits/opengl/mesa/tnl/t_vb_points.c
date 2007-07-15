@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5
+ * Version:  7.0
  *
- * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -50,7 +50,8 @@ run_point_stage(GLcontext *ctx, struct tnl_pipeline_stage *stage)
    if (ctx->Point._Attenuated && !ctx->VertexProgram._Current) {
       struct point_stage_data *store = POINT_STAGE_DATA(stage);
       struct vertex_buffer *VB = &TNL_CONTEXT(ctx)->vb;
-      const GLfloat (*eye)[4] = (const GLfloat (*)[4]) VB->EyePtr->data;
+      const GLfloat *eyeCoord = (GLfloat *) VB->EyePtr->data + 2;
+      const GLint eyeCoordStride = VB->EyePtr->stride / sizeof(GLfloat);
       const GLfloat p0 = ctx->Point.Params[0];
       const GLfloat p1 = ctx->Point.Params[1];
       const GLfloat p2 = ctx->Point.Params[2];
@@ -59,10 +60,11 @@ run_point_stage(GLcontext *ctx, struct tnl_pipeline_stage *stage)
       GLuint i;
 
       for (i = 0; i < VB->Count; i++) {
-         const GLfloat dist = FABSF(eye[i][2]);
+         const GLfloat dist = FABSF(*eyeCoord);
          const GLfloat q = p0 + dist * (p1 + dist * p2);
          const GLfloat atten = (q != 0.0) ? SQRTF(1.0 / q) : 1.0;
          size[i][0] = pointSize * atten; /* clamping done in rasterization */
+         eyeCoord += eyeCoordStride;
       }
 
       VB->AttribPtr[_TNL_ATTRIB_POINTSIZE] = &store->PointSize;

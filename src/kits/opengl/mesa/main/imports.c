@@ -20,9 +20,9 @@
 
 /*
  * Mesa 3-D graphics library
- * Version:  6.5
+ * Version:  7.0
  *
- * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -921,14 +921,11 @@ _mesa_vsprintf( char *str, const char *fmt, va_list args )
 /*@{*/
 
 /**
- * Display a warning.
+ * Report a warning (a recoverable error condition) to stderr if
+ * either DEBUG is defined or the MESA_DEBUG env var is set.
  *
  * \param ctx GL context.
  * \param fmtString printf() alike format string.
- * 
- * If debugging is enabled (either at compile-time via the DEBUG macro, or
- * run-time via the MESA_DEBUG environment variable), prints the warning to
- * stderr via fprintf().
  */
 void
 _mesa_warning( GLcontext *ctx, const char *fmtString, ... )
@@ -951,13 +948,11 @@ _mesa_warning( GLcontext *ctx, const char *fmtString, ... )
 }
 
 /**
- * This function is called when the Mesa user has stumbled into a code
- * path which may not be implemented fully or correctly.
+ * Report an internla implementation problem.
+ * Prints the message to stderr via fprintf().
  *
  * \param ctx GL context.
  * \param s problem description string.
- *
- * Prints the message to stderr via fprintf().
  */
 void
 _mesa_problem( const GLcontext *ctx, const char *fmtString, ... )
@@ -975,18 +970,16 @@ _mesa_problem( const GLcontext *ctx, const char *fmtString, ... )
 }
 
 /**
- * Display an error message.
+ * Record an OpenGL state error.  These usually occur when the users
+ * passes invalid parameters to a GL function.
  *
- * If in debug mode, print error message.
- * Also, record the error code by calling _mesa_record_error().
+ * If debugging is enabled (either at compile-time via the DEBUG macro, or
+ * run-time via the MESA_DEBUG environment variable), report the error with
+ * _mesa_debug().
  * 
  * \param ctx the GL context.
  * \param error the error value.
  * \param fmtString printf() style format string, followed by optional args
- *         
- * If debugging is enabled (either at compile-time via the DEBUG macro, or
- * run-time via the MESA_DEBUG environment variable), interperts the error code and 
- * prints the error message via _mesa_debug().
  */
 void
 _mesa_error( GLcontext *ctx, GLenum error, const char *fmtString, ... )
@@ -1056,12 +1049,11 @@ _mesa_error( GLcontext *ctx, GLenum error, const char *fmtString, ... )
 }  
 
 /**
- * Report debug information.
+ * Report debug information.  Print error message to stderr via fprintf().
+ * No-op if DEBUG mode not enabled.
  * 
  * \param ctx GL context.
- * \param fmtString printf() alike format string.
- * 
- * Prints the message to stderr via fprintf().
+ * \param fmtString printf()-style format string, followed by optional args.
  */
 void
 _mesa_debug( const GLcontext *ctx, const char *fmtString, ... )

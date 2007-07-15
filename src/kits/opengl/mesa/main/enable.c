@@ -190,6 +190,25 @@ _mesa_DisableClientState( GLenum cap )
    }
 
 
+/**
+ * Helper function to enable or disable a texture target.
+ */
+static GLboolean
+enable_texture(GLcontext *ctx, GLboolean state, GLbitfield bit)
+{
+   const GLuint curr = ctx->Texture.CurrentUnit;
+   struct gl_texture_unit *texUnit = &ctx->Texture.Unit[curr];
+   const GLuint newenabled = (!state)
+       ? (texUnit->Enabled & ~bit) :  (texUnit->Enabled | bit);
+
+   if (!ctx->DrawBuffer->Visual.rgbMode || texUnit->Enabled == newenabled)
+       return GL_FALSE;
+
+   FLUSH_VERTICES(ctx, _NEW_TEXTURE);
+   texUnit->Enabled = newenabled;
+   return GL_TRUE;
+}
+
 
 /**
  * Helper function to enable or disable state.
@@ -558,45 +577,21 @@ _mesa_set_enable(GLcontext *ctx, GLenum cap, GLboolean state)
          FLUSH_VERTICES(ctx, _NEW_STENCIL);
          ctx->Stencil.Enabled = state;
          break;
-      case GL_TEXTURE_1D: {
-         const GLuint curr = ctx->Texture.CurrentUnit;
-         struct gl_texture_unit *texUnit = &ctx->Texture.Unit[curr];
-         GLuint newenabled = texUnit->Enabled & ~TEXTURE_1D_BIT;
-         if (state)
-            newenabled |= TEXTURE_1D_BIT;
-         if (!ctx->DrawBuffer->Visual.rgbMode
-             || texUnit->Enabled == newenabled)
+      case GL_TEXTURE_1D:
+         if (!enable_texture(ctx, state, TEXTURE_1D_BIT)) {
             return;
-         FLUSH_VERTICES(ctx, _NEW_TEXTURE);
-         texUnit->Enabled = newenabled;
+         }
          break;
-      }
-      case GL_TEXTURE_2D: {
-         const GLuint curr = ctx->Texture.CurrentUnit;
-         struct gl_texture_unit *texUnit = &ctx->Texture.Unit[curr];
-         GLuint newenabled = texUnit->Enabled & ~TEXTURE_2D_BIT;
-         if (state)
-            newenabled |= TEXTURE_2D_BIT;
-         if (!ctx->DrawBuffer->Visual.rgbMode
-             || texUnit->Enabled == newenabled)
+      case GL_TEXTURE_2D:
+         if (!enable_texture(ctx, state, TEXTURE_2D_BIT)) {
             return;
-         FLUSH_VERTICES(ctx, _NEW_TEXTURE);
-         texUnit->Enabled = newenabled;
+         }
          break;
-      }
-      case GL_TEXTURE_3D: {
-         const GLuint curr = ctx->Texture.CurrentUnit;
-         struct gl_texture_unit *texUnit = &ctx->Texture.Unit[curr];
-         GLuint newenabled = texUnit->Enabled & ~TEXTURE_3D_BIT;
-         if (state)
-            newenabled |= TEXTURE_3D_BIT;
-         if (!ctx->DrawBuffer->Visual.rgbMode
-             || texUnit->Enabled == newenabled)
+      case GL_TEXTURE_3D:
+         if (!enable_texture(ctx, state, TEXTURE_3D_BIT)) {
             return;
-         FLUSH_VERTICES(ctx, _NEW_TEXTURE);
-         texUnit->Enabled = newenabled;
+         }
          break;
-      }
       case GL_TEXTURE_GEN_Q: {
          GLuint unit = ctx->Texture.CurrentUnit;
          struct gl_texture_unit *texUnit = &ctx->Texture.Unit[unit];
@@ -715,18 +710,9 @@ _mesa_set_enable(GLcontext *ctx, GLenum cap, GLboolean state)
 
       /* GL_ARB_texture_cube_map */
       case GL_TEXTURE_CUBE_MAP_ARB:
-         {
-            const GLuint curr = ctx->Texture.CurrentUnit;
-            struct gl_texture_unit *texUnit = &ctx->Texture.Unit[curr];
-            GLuint newenabled = texUnit->Enabled & ~TEXTURE_CUBE_BIT;
-            CHECK_EXTENSION(ARB_texture_cube_map, cap);
-            if (state)
-               newenabled |= TEXTURE_CUBE_BIT;
-            if (!ctx->DrawBuffer->Visual.rgbMode
-                || texUnit->Enabled == newenabled)
-               return;
-            FLUSH_VERTICES(ctx, _NEW_TEXTURE);
-            texUnit->Enabled = newenabled;
+         CHECK_EXTENSION(ARB_texture_cube_map, cap);
+         if (!enable_texture(ctx, state, TEXTURE_CUBE_BIT)) {
+            return;
          }
          break;
 
@@ -879,18 +865,8 @@ _mesa_set_enable(GLcontext *ctx, GLenum cap, GLboolean state)
       /* GL_NV_texture_rectangle */
       case GL_TEXTURE_RECTANGLE_NV:
          CHECK_EXTENSION(NV_texture_rectangle, cap);
-         {
-            const GLuint curr = ctx->Texture.CurrentUnit;
-            struct gl_texture_unit *texUnit = &ctx->Texture.Unit[curr];
-            GLuint newenabled = texUnit->Enabled & ~TEXTURE_RECT_BIT;
-            CHECK_EXTENSION(NV_texture_rectangle, cap);
-            if (state)
-               newenabled |= TEXTURE_RECT_BIT;
-            if (!ctx->DrawBuffer->Visual.rgbMode
-                || texUnit->Enabled == newenabled)
-               return;
-            FLUSH_VERTICES(ctx, _NEW_TEXTURE);
-            texUnit->Enabled = newenabled;
+         if (!enable_texture(ctx, state, TEXTURE_RECT_BIT)) {
+            return;
          }
          break;
 
@@ -999,6 +975,18 @@ _mesa_Disable( GLenum cap )
       _mesa_error(ctx, GL_INVALID_ENUM, "glIsEnabled");		\
       return GL_FALSE;						\
    }
+
+
+/**
+ * Helper function to determine whether a texture target is enabled.
+ */
+static GLboolean
+is_texture_enabled(GLcontext *ctx, GLbitfield bit)
+{
+   const struct gl_texture_unit *const texUnit =
+       &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
+   return (texUnit->Enabled & bit) ? GL_TRUE : GL_FALSE;
+}
 
 
 /**
@@ -1117,23 +1105,11 @@ _mesa_IsEnabled( GLenum cap )
       case GL_STENCIL_TEST:
 	 return ctx->Stencil.Enabled;
       case GL_TEXTURE_1D:
-         {
-            const struct gl_texture_unit *texUnit;
-            texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
-            return (texUnit->Enabled & TEXTURE_1D_BIT) ? GL_TRUE : GL_FALSE;
-         }
+         return is_texture_enabled(ctx, TEXTURE_1D_BIT);
       case GL_TEXTURE_2D:
-         {
-            const struct gl_texture_unit *texUnit;
-            texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
-            return (texUnit->Enabled & TEXTURE_2D_BIT) ? GL_TRUE : GL_FALSE;
-         }
+         return is_texture_enabled(ctx, TEXTURE_2D_BIT);
       case GL_TEXTURE_3D:
-         {
-            const struct gl_texture_unit *texUnit;
-            texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
-            return (texUnit->Enabled & TEXTURE_3D_BIT) ? GL_TRUE : GL_FALSE;
-         }
+         return is_texture_enabled(ctx, TEXTURE_3D_BIT);
       case GL_TEXTURE_GEN_Q:
          {
             const struct gl_texture_unit *texUnit;
@@ -1219,11 +1195,7 @@ _mesa_IsEnabled( GLenum cap )
       /* GL_ARB_texture_cube_map */
       case GL_TEXTURE_CUBE_MAP_ARB:
          CHECK_EXTENSION(ARB_texture_cube_map);
-         {
-            const struct gl_texture_unit *texUnit;
-            texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
-            return (texUnit->Enabled & TEXTURE_CUBE_BIT) ? GL_TRUE : GL_FALSE;
-         }
+         return is_texture_enabled(ctx, TEXTURE_CUBE_BIT);
 
       /* GL_EXT_secondary_color */
       case GL_COLOR_SUM_EXT:
@@ -1343,11 +1315,7 @@ _mesa_IsEnabled( GLenum cap )
       /* GL_NV_texture_rectangle */
       case GL_TEXTURE_RECTANGLE_NV:
          CHECK_EXTENSION(NV_texture_rectangle);
-         {
-            const struct gl_texture_unit *texUnit;
-            texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
-            return (texUnit->Enabled & TEXTURE_RECT_BIT) ? GL_TRUE : GL_FALSE;
-         }
+         return is_texture_enabled(ctx, TEXTURE_RECT_BIT);
 
       /* GL_EXT_stencil_two_side */
       case GL_STENCIL_TEST_TWO_SIDE_EXT:

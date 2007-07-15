@@ -700,37 +700,6 @@ _slang_find_node_type(slang_operation *oper, slang_operation_type type)
 }
 
 
-/**
- * Produce inline code for a call to an assembly instruction.
- * XXX Note: children are passed as asm args in-order, not by name!
- */
-static slang_operation *
-slang_inline_asm_function(slang_assemble_ctx *A,
-                          slang_function *fun, slang_operation *oper)
-{
-   const GLuint numArgs = oper->num_children;
-   const slang_operation *args = oper->children;
-   GLuint i;
-   slang_operation *inlined = slang_operation_new(1);
-
-   /*assert(oper->type == SLANG_OPER_CALL);  or vec4_add, etc */
-   /*
-   printf("Inline asm %s\n", (char*) fun->header.a_name);
-   */
-   inlined->type = fun->body->children[0].type;
-   inlined->a_id = fun->body->children[0].a_id;
-   inlined->num_children = numArgs;
-   inlined->children = slang_operation_new(numArgs);
-   inlined->locals->outer_scope = oper->locals->outer_scope;
-
-   for (i = 0; i < numArgs; i++) {
-      slang_operation_copy(inlined->children + i, args + i);
-   }
-
-   return inlined;
-}
-
-
 static void
 slang_resolve_variable(slang_operation *oper)
 {
@@ -889,6 +858,70 @@ slang_substitute(slang_assemble_ctx *A, slang_operation *oper,
    }
 }
 
+
+
+/**
+ * Produce inline code for a call to an assembly instruction.
+ * This is typically used to compile a call to a built-in function like this:
+ *
+ * vec4 mix(const vec4 x, const vec4 y, const vec4 a)
+ * {
+ *    __asm vec4_lrp __retVal, a, y, x;
+ * }
+ *
+ * We basically translate a SLANG_OPER_CALL into a SLANG_OPER_ASM.
+ */
+static slang_operation *
+slang_inline_asm_function(slang_assemble_ctx *A,
+                          slang_function *fun, slang_operation *oper)
+{
+   const GLuint numArgs = oper->num_children;
+   GLuint i;
+   slang_operation *inlined;
+   const GLboolean haveRetValue = _slang_function_has_return_value(fun);
+   slang_variable **substOld;
+   slang_operation **substNew;
+
+   ASSERT(slang_is_asm_function(fun));
+   ASSERT(fun->param_count == numArgs + haveRetValue);
+
+   /*
+   printf("Inline %s as %s\n",
+          (char*) fun->header.a_name,
+          (char*) fun->body->children[0].a_id);
+   */
+
+   /*
+    * We'll substitute formal params with actual args in the asm call.
+    */
+   substOld = (slang_variable **)
+      _slang_alloc(numArgs * sizeof(slang_variable *));
+   substNew = (slang_operation **)
+      _slang_alloc(numArgs * sizeof(slang_operation *));
+   for (i = 0; i < numArgs; i++) {
+      substOld[i] = fun->parameters->variables[i];
+      substNew[i] = oper->children + i;
+   }
+
+   /* make a copy of the code to inline */
+   inlined = slang_operation_new(1);
+   slang_operation_copy(inlined, &fun->body->children[0]);
+   if (haveRetValue) {
+      /* get rid of the __retVal child */
+      for (i = 0; i < numArgs; i++) {
+         inlined->children[i] = inlined->children[i + 1];
+      }
+      inlined->num_children--;
+   }
+
+   /* now do formal->actual substitutions */
+   slang_substitute(A, inlined, numArgs, substOld, substNew, GL_FALSE);
+
+   _slang_free(substOld);
+   _slang_free(substNew);
+
+   return inlined;
+}
 
 
 /**
@@ -2830,9 +2863,35 @@ _slang_codegen_global_variable(slang_assemble_ctx *A, slang_variable *var,
                          * MAX2(var->array_len, 1);
       if (prog) {
          /* user-defined uniform */
-         GLint uniformLoc = _mesa_add_uniform(prog->Parameters, varName,
-                                              size, datatype);
-         store = _slang_new_ir_storage(PROGRAM_UNIFORM, uniformLoc, size);
+         if (datatype == GL_NONE) {
+            if (var->type.specifier.type == SLANG_SPEC_STRUCT) {
+               _mesa_problem(NULL, "user-declared uniform structs not supported yet");
+               /* XXX what we need to do is unroll the struct into its
+                * basic types, creating a uniform variable for each.
+                * For example:
+                * struct foo {
+                *   vec3 a;
+                *   vec4 b;
+                * };
+                * uniform foo f;
+                *
+                * Should produce uniforms:
+                * "f.a"  (GL_FLOAT_VEC3)
+                * "f.b"  (GL_FLOAT_VEC4)
+                */
+            }
+            else {
+               slang_info_log_error(A->log,
+                                    "invalid datatype for uniform variable %s",
+                                    (char *) var->a_name);
+            }
+            return GL_FALSE;
+         }
+         else {
+            GLint uniformLoc = _mesa_add_uniform(prog->Parameters, varName,
+                                                 size, datatype);
+            store = _slang_new_ir_storage(PROGRAM_UNIFORM, uniformLoc, size);
+         }
       }
       else {
          /* pre-defined uniform, like gl_ModelviewMatrix */

@@ -48,6 +48,9 @@ struct gl_program_machine
 
    /** Fragment Input attributes */
    GLfloat (*Attribs)[MAX_WIDTH][4];
+   GLfloat (*DerivX)[4];
+   GLfloat (*DerivY)[4];
+   GLuint NumDeriv; /**< Max index into DerivX/Y arrays */
    GLuint CurElement; /**< Index into Attribs arrays */
 
    /** Vertex Input attribs */

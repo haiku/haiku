@@ -5,9 +5,9 @@
 
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.2
+ * Version:  7.0
  *
- * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -240,10 +240,7 @@
 
 
 /**
- * Bits per depth buffer value.  
- *
- * Any reasonable value up to 31 will work.  32 doesn't work because of integer
- * overflow problems in the rasterizer code.
+ * Bits per depth buffer value (max is 32).
  */
 #ifndef DEFAULT_SOFTWARE_DEPTH_BITS
 #define DEFAULT_SOFTWARE_DEPTH_BITS 16

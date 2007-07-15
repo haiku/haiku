@@ -63,7 +63,7 @@ static const slang_ir_info IrInfo[] = {
    { IR_ABS, "IR_ABS", OPCODE_ABS, 4, 1 },
    { IR_NEG, "IR_NEG", OPCODE_NOP, 4, 1 }, /* special case: emit_negation() */
    { IR_DDX, "IR_DDX", OPCODE_DDX, 4, 1 },
-   { IR_DDX, "IR_DDY", OPCODE_DDX, 4, 1 },
+   { IR_DDY, "IR_DDY", OPCODE_DDY, 4, 1 },
    { IR_SIN, "IR_SIN", OPCODE_SIN, 1, 1 },
    { IR_COS, "IR_COS", OPCODE_COS, 1, 1 },
    { IR_NOISE1, "IR_NOISE1", OPCODE_NOISE1, 1, 1 },

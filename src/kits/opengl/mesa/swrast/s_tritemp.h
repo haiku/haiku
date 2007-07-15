@@ -1,6 +1,6 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.3
+ * Version:  7.0
  *
  * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
@@ -499,7 +499,7 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
 #  endif /* GL_FLOAT */
 #  ifdef INTERP_ALPHA
          span.attrStepX[FRAG_ATTRIB_COL0][3] = oneOverArea * (eMaj_da * eBot.dy - eMaj.dy * eBot_da);
-         span.attrStepX[FRAG_ATTRIB_COL0][3] = oneOverArea * (eMaj.dx * eBot_da - eMaj_da * eBot.dx);
+         span.attrStepY[FRAG_ATTRIB_COL0][3] = oneOverArea * (eMaj.dx * eBot_da - eMaj_da * eBot.dx);
 #    if CHAN_TYPE == GL_FLOAT
          span.alphaStep = span.attrStepX[FRAG_ATTRIB_COL0][3];
 #    else
@@ -523,7 +523,7 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
 	 span.blueStep  = 0;
 #    endif /* GL_FLOAT */
 #  ifdef INTERP_ALPHA
-         span.attrStepX[FRAG_ATTRIB_COL0][3] = span.attrStepX[FRAG_ATTRIB_COL0][3] = 0.0F;
+         span.attrStepX[FRAG_ATTRIB_COL0][3] = span.attrStepY[FRAG_ATTRIB_COL0][3] = 0.0F;
 #    if CHAN_TYPE == GL_FLOAT
 	 span.alphaStep = 0.0F;
 #    else
@@ -893,11 +893,11 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
 #  endif
 #  ifdef INTERP_ALPHA
 #    if CHAN_TYPE == GL_FLOAT
-                  aLeft = vLower->color[ACOMP] + (span.attrStepX[FRAG_ATTRIB_COL0][3] * adjx + span.attrStepX[FRAG_ATTRIB_COL0][3] * adjy) * (1.0F / FIXED_SCALE);
-                  fdaOuter = span.attrStepX[FRAG_ATTRIB_COL0][3] + dxOuter * span.attrStepX[FRAG_ATTRIB_COL0][3];
+                  aLeft = vLower->color[ACOMP] + (span.attrStepX[FRAG_ATTRIB_COL0][3] * adjx + span.attrStepY[FRAG_ATTRIB_COL0][3] * adjy) * (1.0F / FIXED_SCALE);
+                  fdaOuter = span.attrStepY[FRAG_ATTRIB_COL0][3] + dxOuter * span.attrStepX[FRAG_ATTRIB_COL0][3];
 #    else
                   aLeft = (GLint)(ChanToFixed(vLower->color[ACOMP]) + span.attrStepX[FRAG_ATTRIB_COL0][3] * adjx + span.attrStepX[FRAG_ATTRIB_COL0][3] * adjy) + FIXED_HALF;
-                  fdaOuter = SignedFloatToFixed(span.attrStepX[FRAG_ATTRIB_COL0][3] + dxOuter * span.attrStepX[FRAG_ATTRIB_COL0][3]);
+                  fdaOuter = SignedFloatToFixed(span.attrStepY[FRAG_ATTRIB_COL0][3] + dxOuter * span.attrStepX[FRAG_ATTRIB_COL0][3]);
 #    endif
 #  endif
                }

@@ -275,7 +275,7 @@ NAME ( GLcontext *ctx, const SWvertex *vert )
 #if FLAGS & ATTRIBS
             ATTRIB_LOOP_BEGIN
                COPY_4V(span->array->attribs[attr][count], attrib[attr]);
-               if (attr < FRAG_ATTRIB_VAR0) {
+               if (attr < FRAG_ATTRIB_VAR0 && attr >= FRAG_ATTRIB_TEX0) {
                   const GLuint u = attr - FRAG_ATTRIB_TEX0;
                   span->array->lambda[u][count] = 0.0;
                }

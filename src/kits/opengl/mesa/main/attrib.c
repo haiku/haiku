@@ -764,6 +764,7 @@ pop_texture_group(GLcontext *ctx, const struct gl_texture_attrib *texAttrib)
          _mesa_TexParameteri(target, GL_TEXTURE_MAG_FILTER, obj->MagFilter);
          _mesa_TexParameterf(target, GL_TEXTURE_MIN_LOD, obj->MinLod);
          _mesa_TexParameterf(target, GL_TEXTURE_MAX_LOD, obj->MaxLod);
+         _mesa_TexParameterf(target, GL_TEXTURE_LOD_BIAS, obj->LodBias);
          _mesa_TexParameteri(target, GL_TEXTURE_BASE_LEVEL, obj->BaseLevel);
          if (target != GL_TEXTURE_RECTANGLE_ARB)
             _mesa_TexParameteri(target, GL_TEXTURE_MAX_LEVEL, obj->MaxLevel);

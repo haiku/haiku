@@ -849,108 +849,48 @@ _mesa_GetTexEnvfv( GLenum target, GLenum pname, GLfloat *params )
             }
             break;
          case GL_SOURCE0_RGB:
-            if (ctx->Extensions.EXT_texture_env_combine ||
-                ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLfloat) texUnit->Combine.SourceRGB[0];
-            }
-            else {
-               _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnvfv(pname)");
-            }
-            break;
          case GL_SOURCE1_RGB:
-            if (ctx->Extensions.EXT_texture_env_combine ||
-                ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLfloat) texUnit->Combine.SourceRGB[1];
-            }
-            else {
-               _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnvfv(pname)");
-            }
-            break;
          case GL_SOURCE2_RGB:
             if (ctx->Extensions.EXT_texture_env_combine ||
                 ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLfloat) texUnit->Combine.SourceRGB[2];
+	       const unsigned rgb_idx = pname - GL_SOURCE0_RGB;
+               *params = (GLfloat) texUnit->Combine.SourceRGB[rgb_idx];
             }
             else {
                _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnvfv(pname)");
             }
             break;
          case GL_SOURCE0_ALPHA:
-            if (ctx->Extensions.EXT_texture_env_combine ||
-                ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLfloat) texUnit->Combine.SourceA[0];
-            }
-            else {
-               _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnvfv(pname)");
-            }
-            break;
          case GL_SOURCE1_ALPHA:
-            if (ctx->Extensions.EXT_texture_env_combine ||
-                ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLfloat) texUnit->Combine.SourceA[1];
-            }
-            else {
-               _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnvfv(pname)");
-            }
-            break;
          case GL_SOURCE2_ALPHA:
             if (ctx->Extensions.EXT_texture_env_combine ||
                 ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLfloat) texUnit->Combine.SourceA[2];
+	       const unsigned alpha_idx = pname - GL_SOURCE0_ALPHA;
+               *params = (GLfloat) texUnit->Combine.SourceA[alpha_idx];
             }
             else {
                _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnvfv(pname)");
             }
             break;
          case GL_OPERAND0_RGB:
-            if (ctx->Extensions.EXT_texture_env_combine ||
-                ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLfloat) texUnit->Combine.OperandRGB[0];
-            }
-            else {
-               _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnvfv(pname)");
-            }
-            break;
          case GL_OPERAND1_RGB:
-            if (ctx->Extensions.EXT_texture_env_combine ||
-                ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLfloat) texUnit->Combine.OperandRGB[1];
-            }
-            else {
-               _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnvfv(pname)");
-            }
-            break;
          case GL_OPERAND2_RGB:
             if (ctx->Extensions.EXT_texture_env_combine ||
                 ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLfloat) texUnit->Combine.OperandRGB[2];
+	       const unsigned op_rgb = pname - GL_OPERAND0_RGB;
+               *params = (GLfloat) texUnit->Combine.OperandRGB[op_rgb];
             }
             else {
                _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnvfv(pname)");
             }
             break;
          case GL_OPERAND0_ALPHA:
-            if (ctx->Extensions.EXT_texture_env_combine ||
-                ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLfloat) texUnit->Combine.OperandA[0];
-            }
-            else {
-               _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnvfv(pname)");
-            }
-            break;
          case GL_OPERAND1_ALPHA:
-            if (ctx->Extensions.EXT_texture_env_combine ||
-                ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLfloat) texUnit->Combine.OperandA[1];
-            }
-            else {
-               _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnvfv(pname)");
-            }
-            break;
          case GL_OPERAND2_ALPHA:
             if (ctx->Extensions.EXT_texture_env_combine ||
                 ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLfloat) texUnit->Combine.OperandA[2];
+	       const unsigned op_alpha = pname - GL_OPERAND0_ALPHA;
+               *params = (GLfloat) texUnit->Combine.OperandA[op_alpha];
             }
             else {
                _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnvfv(pname)");
@@ -1073,108 +1013,48 @@ _mesa_GetTexEnviv( GLenum target, GLenum pname, GLint *params )
             }
             break;
          case GL_SOURCE0_RGB:
-            if (ctx->Extensions.EXT_texture_env_combine ||
-                ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLint) texUnit->Combine.SourceRGB[0];
-            }
-            else {
-               _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnviv(pname)");
-            }
-            break;
          case GL_SOURCE1_RGB:
-            if (ctx->Extensions.EXT_texture_env_combine ||
-                ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLint) texUnit->Combine.SourceRGB[1];
-            }
-            else {
-               _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnviv(pname)");
-            }
-            break;
          case GL_SOURCE2_RGB:
             if (ctx->Extensions.EXT_texture_env_combine ||
                 ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLint) texUnit->Combine.SourceRGB[2];
+	       const unsigned rgb_idx = pname - GL_SOURCE0_RGB;
+               *params = (GLint) texUnit->Combine.SourceRGB[rgb_idx];
             }
             else {
                _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnviv(pname)");
             }
             break;
          case GL_SOURCE0_ALPHA:
-            if (ctx->Extensions.EXT_texture_env_combine ||
-                ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLint) texUnit->Combine.SourceA[0];
-            }
-            else {
-               _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnviv(pname)");
-            }
-            break;
          case GL_SOURCE1_ALPHA:
-            if (ctx->Extensions.EXT_texture_env_combine ||
-                ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLint) texUnit->Combine.SourceA[1];
-            }
-            else {
-               _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnviv(pname)");
-            }
-            break;
          case GL_SOURCE2_ALPHA:
             if (ctx->Extensions.EXT_texture_env_combine ||
                 ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLint) texUnit->Combine.SourceA[2];
+	       const unsigned alpha_idx = pname - GL_SOURCE0_ALPHA;
+               *params = (GLint) texUnit->Combine.SourceA[alpha_idx];
             }
             else {
                _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnviv(pname)");
             }
             break;
          case GL_OPERAND0_RGB:
-            if (ctx->Extensions.EXT_texture_env_combine ||
-                ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLint) texUnit->Combine.OperandRGB[0];
-            }
-            else {
-               _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnviv(pname)");
-            }
-            break;
          case GL_OPERAND1_RGB:
-            if (ctx->Extensions.EXT_texture_env_combine ||
-                ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLint) texUnit->Combine.OperandRGB[1];
-            }
-            else {
-               _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnviv(pname)");
-            }
-            break;
          case GL_OPERAND2_RGB:
             if (ctx->Extensions.EXT_texture_env_combine ||
                 ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLint) texUnit->Combine.OperandRGB[2];
+	       const unsigned op_rgb = pname - GL_OPERAND0_RGB;
+               *params = (GLint) texUnit->Combine.OperandRGB[op_rgb];
             }
             else {
                _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnviv(pname)");
             }
             break;
          case GL_OPERAND0_ALPHA:
-            if (ctx->Extensions.EXT_texture_env_combine ||
-                ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLint) texUnit->Combine.OperandA[0];
-            }
-            else {
-               _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnviv(pname)");
-            }
-            break;
          case GL_OPERAND1_ALPHA:
-            if (ctx->Extensions.EXT_texture_env_combine ||
-                ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLint) texUnit->Combine.OperandA[1];
-            }
-            else {
-               _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnviv(pname)");
-            }
-            break;
          case GL_OPERAND2_ALPHA:
             if (ctx->Extensions.EXT_texture_env_combine ||
                 ctx->Extensions.ARB_texture_env_combine) {
-               *params = (GLint) texUnit->Combine.OperandA[2];
+	       const unsigned op_alpha = pname - GL_OPERAND0_ALPHA;
+               *params = (GLint) texUnit->Combine.OperandA[op_alpha];
             }
             else {
                _mesa_error(ctx, GL_INVALID_ENUM, "glGetTexEnviv(pname)");

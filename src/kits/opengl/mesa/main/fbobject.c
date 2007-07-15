@@ -1144,20 +1144,19 @@ _mesa_CheckFramebufferStatusEXT(GLenum target)
  * Common code called by glFramebufferTexture1D/2D/3DEXT().
  */
 static void
-framebuffer_texture(GLuint dims, GLenum target, GLenum attachment,
-                    GLenum textarget, GLuint texture,
+framebuffer_texture(GLcontext *ctx, const char *caller, GLenum target, 
+                    GLenum attachment, GLenum textarget, GLuint texture,
                     GLint level, GLint zoffset)
 {
    struct gl_renderbuffer_attachment *att;
    struct gl_texture_object *texObj = NULL;
    struct gl_framebuffer *fb;
-   GET_CURRENT_CONTEXT(ctx);
 
    ASSERT_OUTSIDE_BEGIN_END(ctx);
 
    if (target != GL_FRAMEBUFFER_EXT) {
       _mesa_error(ctx, GL_INVALID_ENUM,
-                  "glFramebufferTexture%dDEXT(target)", dims);
+                  "glFramebufferTexture%sEXT(target)", caller);
       return;
    }
 
@@ -1167,83 +1166,53 @@ framebuffer_texture(GLuint dims, GLenum target, GLenum attachment,
    /* check framebuffer binding */
    if (fb->Name == 0) {
       _mesa_error(ctx, GL_INVALID_OPERATION,
-                  "glFramebufferTexture%dDEXT", dims);
+                  "glFramebufferTexture%sEXT", caller);
       return;
    }
 
-   if (texture) {
-      texObj = _mesa_lookup_texture(ctx, texture);
-   }
 
-   /* Check dimension-dependent things */
-   switch (dims) {
-   case 1:
-      if (textarget != GL_TEXTURE_1D) {
-         _mesa_error(ctx, GL_INVALID_ENUM,
-                     "glFramebufferTexture1DEXT(textarget)");
-         return;
+   /* The textarget, level, and zoffset parameters are only validated if
+    * texture is non-zero.
+    */
+   if (texture) {
+      GLboolean err = GL_TRUE;
+
+      texObj = _mesa_lookup_texture(ctx, texture);
+      if (texObj != NULL) {
+         err = (texObj->Target == GL_TEXTURE_CUBE_MAP)
+             ? !IS_CUBE_FACE(textarget)
+             : (texObj->Target != textarget);
       }
-      if (texObj && texObj->Target != GL_TEXTURE_1D) {
+
+      if (err) {
          _mesa_error(ctx, GL_INVALID_OPERATION,
-                     "glFramebufferTexture1DEXT(texture target mismatch)");
+                     "glFramebufferTexture%sEXT(texture target mismatch)",
+                     caller);
          return;
       }
-      break;
-   case 2:
-      if (textarget != GL_TEXTURE_2D &&
-          textarget != GL_TEXTURE_RECTANGLE_ARB &&
-          !IS_CUBE_FACE(textarget)) {
-         _mesa_error(ctx, GL_INVALID_ENUM,
-                     "glFramebufferTexture2DEXT(textarget)");
-         return;
-      }
-      if (texObj) {
-         if ((texObj->Target == GL_TEXTURE_2D && textarget != GL_TEXTURE_2D) ||
-             (texObj->Target == GL_TEXTURE_RECTANGLE_ARB
-              && textarget != GL_TEXTURE_RECTANGLE_ARB) ||
-             (texObj->Target == GL_TEXTURE_CUBE_MAP
-              && !IS_CUBE_FACE(textarget))) {
-            _mesa_error(ctx, GL_INVALID_OPERATION,
-                        "glFramebufferTexture1DEXT(texture target mismatch)");
-            return;
-         }
-      }
-      break;
-   case 3:
-      if (textarget != GL_TEXTURE_3D) {
-         _mesa_error(ctx, GL_INVALID_ENUM,
-                     "glFramebufferTexture3DEXT(textarget)");
-         return;
-      }
-      if (texObj && texObj->Target != GL_TEXTURE_3D) {
-         _mesa_error(ctx, GL_INVALID_OPERATION,
-                     "glFramebufferTexture3DEXT(texture target mismatch)");
-         return;
-      }
-      {
+
+      if (texObj->Target == GL_TEXTURE_3D) {
          const GLint maxSize = 1 << (ctx->Const.Max3DTextureLevels - 1);
          if (zoffset < 0 || zoffset >= maxSize) {
             _mesa_error(ctx, GL_INVALID_VALUE,
-                        "glFramebufferTexture3DEXT(zoffset)");
+                        "glFramebufferTexture%sEXT(zoffset)", 
+                        caller);
             return;
          }
       }
-      break;
-   default:
-      _mesa_problem(ctx, "Unexpected dims in error_check_framebuffer_texture");
-      return;
-   }
 
-   if ((level < 0) || level >= _mesa_max_texture_levels(ctx, textarget)) {
-      _mesa_error(ctx, GL_INVALID_VALUE,
-                  "glFramebufferTexture%dDEXT(level)", dims);
-      return;
+      if ((level < 0) || 
+          (level >= _mesa_max_texture_levels(ctx, texObj->Target))) {
+         _mesa_error(ctx, GL_INVALID_VALUE,
+                     "glFramebufferTexture%sEXT(level)", caller);
+         return;
+      }
    }
 
    att = _mesa_get_attachment(ctx, fb, attachment);
    if (att == NULL) {
       _mesa_error(ctx, GL_INVALID_ENUM,
-		  "glFramebufferTexture%dDEXT(attachment)", dims);
+                  "glFramebufferTexture%sEXT(attachment)", caller);
       return;
    }
 
@@ -1271,9 +1240,16 @@ void GLAPIENTRY
 _mesa_FramebufferTexture1DEXT(GLenum target, GLenum attachment,
                               GLenum textarget, GLuint texture, GLint level)
 {
-   const GLint zoffset = 0;
-   framebuffer_texture(1, target, attachment, textarget, texture,
-                       level, zoffset);
+   GET_CURRENT_CONTEXT(ctx);
+
+   if ((texture != 0) && (textarget != GL_TEXTURE_1D)) {
+      _mesa_error(ctx, GL_INVALID_ENUM,
+                  "glFramebufferTexture1DEXT(textarget)");
+      return;
+   }
+
+   framebuffer_texture(ctx, "1D", target, attachment, textarget, texture,
+                       level, 0);
 }
 
 
@@ -1281,9 +1257,19 @@ void GLAPIENTRY
 _mesa_FramebufferTexture2DEXT(GLenum target, GLenum attachment,
                               GLenum textarget, GLuint texture, GLint level)
 {
-   const GLint zoffset = 0;
-   framebuffer_texture(2, target, attachment, textarget, texture,
-                       level, zoffset);
+   GET_CURRENT_CONTEXT(ctx);
+
+   if ((texture != 0) &&
+       (textarget != GL_TEXTURE_2D) &&
+       (textarget != GL_TEXTURE_RECTANGLE_ARB) &&
+       (!IS_CUBE_FACE(textarget))) {
+      _mesa_error(ctx, GL_INVALID_OPERATION,
+                  "glFramebufferTexture2DEXT(textarget)");
+      return;
+   }
+
+   framebuffer_texture(ctx, "2D", target, attachment, textarget, texture,
+                       level, 0);
 }
 
 
@@ -1292,10 +1278,17 @@ _mesa_FramebufferTexture3DEXT(GLenum target, GLenum attachment,
                               GLenum textarget, GLuint texture,
                               GLint level, GLint zoffset)
 {
-   framebuffer_texture(3, target, attachment, textarget, texture,
+   GET_CURRENT_CONTEXT(ctx);
+
+   if ((texture != 0) && (textarget != GL_TEXTURE_3D)) {
+      _mesa_error(ctx, GL_INVALID_ENUM,
+                  "glFramebufferTexture3DEXT(textarget)");
+      return;
+   }
+
+   framebuffer_texture(ctx, "3D", target, attachment, textarget, texture,
                        level, zoffset);
 }
-
 
 
 void GLAPIENTRY

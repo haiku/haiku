@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.3
+ * Version:  7.0
  *
- * Copyright (C) 1999-2005  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -1116,6 +1116,13 @@ compute_light_positions( GLcontext *ctx )
 	    NORMALIZE_3FV( light->_h_inf_norm );
 	 }
 	 light->_VP_inf_spot_attenuation = 1.0;
+      }
+      else {
+         /* positional light w/ homogeneous coordinate, divide by W */
+         GLfloat wInv = 1.0 / light->_Position[3];
+         light->_Position[0] *= wInv;
+         light->_Position[1] *= wInv;
+         light->_Position[2] *= wInv;
       }
 
       if (light->_Flags & LIGHT_SPOT) {

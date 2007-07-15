@@ -93,7 +93,7 @@ NAME(plot)(GLcontext *ctx, struct LineInfo *line, int ix, int iy)
       attribArray[i][0] = solve_plane(fx, fy, line->sPlane[attr]) * invQ;
       attribArray[i][1] = solve_plane(fx, fy, line->tPlane[attr]) * invQ;
       attribArray[i][2] = solve_plane(fx, fy, line->uPlane[attr]) * invQ;
-      if (attr < FRAG_ATTRIB_VAR0) {
+      if (attr < FRAG_ATTRIB_VAR0 && attr >= FRAG_ATTRIB_TEX0) {
          const GLuint unit = attr - FRAG_ATTRIB_TEX0;
          line->span.array->lambda[unit][i]
             = compute_lambda(line->sPlane[attr],
@@ -220,7 +220,7 @@ NAME(line)(GLcontext *ctx, const SWvertex *v0, const SWvertex *v1)
          compute_plane(line.x0, line.y0, line.x1, line.y1, t0, t1, line.tPlane[attr]);
          compute_plane(line.x0, line.y0, line.x1, line.y1, r0, r1, line.uPlane[attr]);
          compute_plane(line.x0, line.y0, line.x1, line.y1, q0, q1, line.vPlane[attr]);
-         if (attr < FRAG_ATTRIB_VAR0) {
+         if (attr < FRAG_ATTRIB_VAR0 && attr >= FRAG_ATTRIB_TEX0) {
             const GLuint u = attr - FRAG_ATTRIB_TEX0;
             const struct gl_texture_object *obj = ctx->Texture.Unit[u]._Current;
             const struct gl_texture_image *texImage = obj->Image[0][obj->BaseLevel];

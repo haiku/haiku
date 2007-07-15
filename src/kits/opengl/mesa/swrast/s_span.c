@@ -1357,7 +1357,11 @@ shade_texture_span(GLcontext *ctx, SWspan *span)
       if ((inputsRead >= FRAG_BIT_VAR0) && (span->interpMask & SPAN_VARYING))
          interpolate_varying(ctx, span);
 
+#if 0
       if (inputsRead & FRAG_BIT_WPOS)
+#else
+      /* XXX always interpolate wpos so that DDX/DDY work */
+#endif
          interpolate_wpos(ctx, span);
 
       /* Run fragment program/shader now */

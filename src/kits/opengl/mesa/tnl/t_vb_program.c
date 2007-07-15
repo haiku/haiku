@@ -126,6 +126,8 @@ init_machine(GLcontext *ctx, struct gl_program_machine *machine)
       }
    }
 
+   machine->NumDeriv = 0;
+
    /* init condition codes */
    machine->CondCodes[0] = COND_EQ;
    machine->CondCodes[1] = COND_EQ;

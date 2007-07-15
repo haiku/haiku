@@ -131,8 +131,10 @@ setup_vertex_format(GLcontext *ctx)
       if (RENDERINPUTS_TEST( index_bitset, _TNL_ATTRIB_COLOR_INDEX ))
          EMIT_ATTR( _TNL_ATTRIB_COLOR_INDEX, EMIT_1F, index );
 
-      if (RENDERINPUTS_TEST( index_bitset, _TNL_ATTRIB_FOG ))
-         EMIT_ATTR( _TNL_ATTRIB_FOG, EMIT_1F, attrib[FRAG_ATTRIB_FOGC]);
+      if (RENDERINPUTS_TEST( index_bitset, _TNL_ATTRIB_FOG )) {
+         const GLint emit = ctx->FragmentProgram._Current ? EMIT_4F : EMIT_1F;
+         EMIT_ATTR( _TNL_ATTRIB_FOG, emit, attrib[FRAG_ATTRIB_FOGC]);
+      }
 
       if (RENDERINPUTS_TEST_RANGE(index_bitset, _TNL_FIRST_TEX, _TNL_LAST_TEX))
       {
@@ -261,7 +263,7 @@ _swsetup_Translate( GLcontext *ctx, const void *vertex, SWvertex *dest )
    dest->win[2] = m[10] * tmp[2] + m[14];
    dest->win[3] =         tmp[3];
 
-
+   /** XXX try to limit these loops someday */
    for (i = 0 ; i < ctx->Const.MaxTextureCoordUnits ; i++)
       _tnl_get_attr( ctx, vertex, _TNL_ATTRIB_TEX0+i,
                      dest->attrib[FRAG_ATTRIB_TEX0 + i] );
@@ -282,6 +284,7 @@ _swsetup_Translate( GLcontext *ctx, const void *vertex, SWvertex *dest )
    _tnl_get_attr( ctx, vertex, _TNL_ATTRIB_COLOR_INDEX, tmp );
    dest->index = tmp[0];
 
+   /* XXX See _tnl_get_attr about pointsize ... */
    _tnl_get_attr( ctx, vertex, _TNL_ATTRIB_POINTSIZE, tmp );
    dest->pointSize = tmp[0];
 }

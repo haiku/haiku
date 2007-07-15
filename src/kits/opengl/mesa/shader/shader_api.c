@@ -1,6 +1,6 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.3
+ * Version:  7.0
  *
  * Copyright (C) 2004-2007  Brian Paul   All Rights Reserved.
  *
@@ -1072,10 +1072,18 @@ _mesa_uniform(GLcontext *ctx, GLint location, GLsizei count,
     * If we're setting a sampler, we must use glUniformi1()!
     */
    if (shProg->Uniforms->Parameters[location].Type == PROGRAM_SAMPLER) {
+      GLint unit;
       if (type != GL_INT || count != 1) {
          _mesa_error(ctx, GL_INVALID_OPERATION,
                      "glUniform(only glUniform1i can be used "
                      "to set sampler uniforms)");
+         return;
+      }
+      /* check that the sampler (tex unit index) is legal */
+      unit = ((GLint *) values)[0];
+      if (unit >= ctx->Const.MaxTextureImageUnits) {
+         _mesa_error(ctx, GL_INVALID_VALUE,
+                     "glUniform1(invalid sampler/tex unit index)");
          return;
       }
    }

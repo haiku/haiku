@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.2
+ * Version:  7.0
  *
- * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -703,10 +703,18 @@ _mesa_GetProgramivARB(GLenum target, GLenum pname, GLint *params)
           * The spec says that even if this query returns true, there's
           * no guarantee that the program will run in hardware.
           */
-	 if (ctx->Driver.IsProgramNative) 
+         if (prog->Id == 0) {
+            /* default/null program */
+            *params = GL_FALSE;
+         }
+	 else if (ctx->Driver.IsProgramNative) {
+            /* ask the driver */
 	    *params = ctx->Driver.IsProgramNative( ctx, target, prog );
-	 else
+         }
+	 else {
+            /* probably running in software */
 	    *params = GL_TRUE;
+         }
          return;
       default:
          /* continue with fragment-program only queries below */

@@ -1300,6 +1300,20 @@ _mesa_test_proxy_teximage(GLcontext *ctx, GLenum target, GLint level,
 
 
 /**
+ * Helper function to determine whether a target supports compressed textures
+ */
+static GLboolean
+target_can_be_compressed(GLcontext *ctx, GLenum target)
+{
+   return (((target == GL_TEXTURE_2D || target == GL_PROXY_TEXTURE_2D))
+           || ((ctx->Extensions.ARB_texture_cube_map &&
+                (target == GL_PROXY_TEXTURE_CUBE_MAP ||
+                 (target >= GL_TEXTURE_CUBE_MAP_POSITIVE_X &&
+                  target <= GL_TEXTURE_CUBE_MAP_NEGATIVE_Z)))));
+}
+
+
+/**
  * Test the glTexImage[123]D() parameters for errors.
  * 
  * \param ctx GL context.
@@ -1329,8 +1343,9 @@ texture_error_check( GLcontext *ctx, GLenum target,
                      GLint depth, GLint border )
 {
    const GLboolean isProxy = _mesa_is_proxy_texture(target);
-   GLboolean sizeOK;
+   GLboolean sizeOK = GL_TRUE;
    GLboolean colorFormat, indexFormat;
+   GLenum proxy_target;
 
    /* Basic level check (more checking in ctx->Driver.TestProxyTexImage) */
    if (level < 0 || level >= MAX_TEXTURE_LEVELS) {
@@ -1365,10 +1380,9 @@ texture_error_check( GLcontext *ctx, GLenum target,
     */
    if (dimensions == 1) {
       if (target == GL_PROXY_TEXTURE_1D || target == GL_TEXTURE_1D) {
-         sizeOK = ctx->Driver.TestProxyTexImage(ctx, GL_PROXY_TEXTURE_1D,
-                                                level, internalFormat,
-                                                format, type,
-                                                width, 1, 1, border);
+         proxy_target = GL_PROXY_TEXTURE_1D;
+         height = 1;
+         width = 1;
       }
       else {
          _mesa_error( ctx, GL_INVALID_ENUM, "glTexImage1D(target)" );
@@ -1376,11 +1390,9 @@ texture_error_check( GLcontext *ctx, GLenum target,
       }
    }
    else if (dimensions == 2) {
+      depth = 1;
       if (target == GL_PROXY_TEXTURE_2D || target == GL_TEXTURE_2D) {
-         sizeOK = ctx->Driver.TestProxyTexImage(ctx, GL_PROXY_TEXTURE_2D,
-                                                level, internalFormat,
-                                                format, type,
-                                                width, height, 1, border);
+         proxy_target = GL_PROXY_TEXTURE_2D;
       }
       else if (target == GL_PROXY_TEXTURE_CUBE_MAP_ARB ||
                (target >= GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB &&
@@ -1389,10 +1401,8 @@ texture_error_check( GLcontext *ctx, GLenum target,
             _mesa_error(ctx, GL_INVALID_ENUM, "glTexImage2D(target)");
             return GL_TRUE;
          }
-         sizeOK = (width == height) &&
-            ctx->Driver.TestProxyTexImage(ctx, GL_PROXY_TEXTURE_CUBE_MAP_ARB,
-                                          level, internalFormat, format, type,
-                                          width, height, 1, border);
+         proxy_target = GL_PROXY_TEXTURE_CUBE_MAP_ARB;
+         sizeOK = (width == height);
       }
       else if (target == GL_PROXY_TEXTURE_RECTANGLE_NV ||
                target == GL_TEXTURE_RECTANGLE_NV) {
@@ -1400,11 +1410,7 @@ texture_error_check( GLcontext *ctx, GLenum target,
             _mesa_error(ctx, GL_INVALID_ENUM, "glTexImage2D(target)");
             return GL_TRUE;
          }
-         sizeOK = ctx->Driver.TestProxyTexImage(ctx,
-                                                GL_PROXY_TEXTURE_RECTANGLE_NV,
-                                                level, internalFormat,
-                                                format, type,
-                                                width, height, 1, border);
+         proxy_target = GL_PROXY_TEXTURE_RECTANGLE_NV;
       }
       else {
          _mesa_error(ctx, GL_INVALID_ENUM, "glTexImage2D(target)");
@@ -1413,10 +1419,7 @@ texture_error_check( GLcontext *ctx, GLenum target,
    }
    else if (dimensions == 3) {
       if (target == GL_PROXY_TEXTURE_3D || target == GL_TEXTURE_3D) {
-         sizeOK = ctx->Driver.TestProxyTexImage(ctx, GL_PROXY_TEXTURE_3D,
-                                                level, internalFormat,
-                                                format, type,
-                                                width, height, depth, border);
+         proxy_target = GL_PROXY_TEXTURE_3D;
       }
       else {
          _mesa_error( ctx, GL_INVALID_ENUM, "glTexImage3D(target)" );
@@ -1428,6 +1431,10 @@ texture_error_check( GLcontext *ctx, GLenum target,
       return GL_TRUE;
    }
 
+   sizeOK = sizeOK && ctx->Driver.TestProxyTexImage(ctx, proxy_target, level,
+                                                    internalFormat, format,
+                                                    type, width, height,
+                                                    depth, border);
    if (!sizeOK) {
       if (!isProxy) {
          _mesa_error(ctx, GL_INVALID_VALUE,
@@ -1522,21 +1529,10 @@ texture_error_check( GLcontext *ctx, GLenum target,
 
    /* additional checks for compressed textures */
    if (is_compressed_format(ctx, internalFormat)) {
-      if (target == GL_TEXTURE_2D || target == GL_PROXY_TEXTURE_2D) {
-         /* OK */
-      }
-      else if (ctx->Extensions.ARB_texture_cube_map &&
-               (target == GL_PROXY_TEXTURE_CUBE_MAP ||
-                (target >= GL_TEXTURE_CUBE_MAP_POSITIVE_X &&
-                 target <= GL_TEXTURE_CUBE_MAP_NEGATIVE_Z))) {
-         /* OK */
-      }
-      else {
-         if (!isProxy) {
-            _mesa_error(ctx, GL_INVALID_ENUM,
-                        "glTexImage%d(target)", dimensions);
-            return GL_TRUE;
-         }
+      if (!target_can_be_compressed(ctx, target) && !isProxy) {
+         _mesa_error(ctx, GL_INVALID_ENUM,
+                     "glTexImage%d(target)", dimensions);
+         return GL_TRUE;
       }
       if (border != 0) {
          if (!isProxy) {
@@ -1711,16 +1707,7 @@ subtexture_error_check2( GLcontext *ctx, GLuint dimensions,
 #endif
 
    if (destTex->IsCompressed) {
-      if (target == GL_TEXTURE_2D || target == GL_PROXY_TEXTURE_2D) {
-         /* OK */
-      }
-      else if (ctx->Extensions.ARB_texture_cube_map &&
-               (target == GL_PROXY_TEXTURE_CUBE_MAP ||
-                (target >= GL_TEXTURE_CUBE_MAP_POSITIVE_X &&
-                 target <= GL_TEXTURE_CUBE_MAP_NEGATIVE_Z))) {
-         /* OK */
-      }
-      else {
+      if (!target_can_be_compressed(ctx, target)) {
          _mesa_error(ctx, GL_INVALID_ENUM,
                      "glTexSubImage%D(target)", dimensions);
          return GL_TRUE;

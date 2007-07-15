@@ -229,7 +229,15 @@ void _tnl_get_attr( GLcontext *ctx, const void *vin,
 
    /* Else return the value from ctx->Current.
     */
-   _mesa_memcpy( dest, ctx->Current.Attrib[attr], 4*sizeof(GLfloat));
+   if (attr == _TNL_ATTRIB_POINTSIZE) {
+      /* If the hardware vertex doesn't have point size then use size from
+       * GLcontext.  XXX this will be wrong if drawing attenuated points!
+       */
+      dest[0] = ctx->Point._Size;
+   }
+   else {
+      _mesa_memcpy( dest, ctx->Current.Attrib[attr], 4*sizeof(GLfloat));
+   }
 }
 
 

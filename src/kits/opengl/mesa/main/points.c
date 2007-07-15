@@ -5,9 +5,9 @@
 
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.1
+ * Version:  7.0
  *
- * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -60,10 +60,6 @@ _mesa_PointSize( GLfloat size )
    ctx->Point._Size = CLAMP(ctx->Point.Size,
 			    ctx->Point.MinSize,
 			    ctx->Point.MaxSize);
-
-   ctx->Point._Attenuated = (ctx->Point.Params[0] != 1.0 ||
-                             ctx->Point.Params[1] != 0.0 ||
-                             ctx->Point.Params[2] != 0.0);
 
    if (ctx->Driver.PointSize)
       ctx->Driver.PointSize(ctx, size);
@@ -122,6 +118,9 @@ _mesa_PointParameterfvEXT( GLenum pname, const GLfloat *params)
 	       return;
 	    FLUSH_VERTICES(ctx, _NEW_POINT);
             COPY_3V(ctx->Point.Params, params);
+            ctx->Point._Attenuated = (ctx->Point.Params[0] != 1.0 ||
+                                      ctx->Point.Params[1] != 0.0 ||
+                                      ctx->Point.Params[2] != 0.0);
          }
          else {
             _mesa_error(ctx, GL_INVALID_ENUM,

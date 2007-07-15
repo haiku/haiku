@@ -218,120 +218,64 @@ fetch_vector4(const struct prog_src_register *source,
    }
 }
 
-#if 0
+
 /**
- * Fetch the derivative with respect to X for the given register.
- * \return GL_TRUE if it was easily computed or GL_FALSE if we
- * need to execute another instance of the program (ugh)!
+ * Fetch the derivative with respect to X or Y for the given register.
+ * XXX this currently only works for fragment program input attribs.
  */
-static GLboolean
+static void
 fetch_vector4_deriv(GLcontext * ctx,
                     const struct prog_src_register *source,
-                    const SWspan * span,
-                    char xOrY, GLint column, GLfloat result[4])
+                    const struct gl_program_machine *machine,
+                    char xOrY, GLfloat result[4])
 {
-   GLfloat src[4];
+   if (source->File == PROGRAM_INPUT && source->Index < machine->NumDeriv) {
+      const GLint col = machine->CurElement;
+      const GLfloat w = machine->Attribs[FRAG_ATTRIB_WPOS][col][3];
+      const GLfloat invQ = 1.0f / w;
+      GLfloat deriv[4];
 
-   ASSERT(xOrY == 'X' || xOrY == 'Y');
-
-   switch (source->Index) {
-   case FRAG_ATTRIB_WPOS:
       if (xOrY == 'X') {
-         src[0] = 1.0;
-         src[1] = 0.0;
-         src[2] = span->attrStepX[FRAG_ATTRIB_WPOS][2]
-            / ctx->DrawBuffer->_DepthMaxF;
-         src[3] = span->attrStepX[FRAG_ATTRIB_WPOS][3];
+         deriv[0] = machine->DerivX[source->Index][0] * invQ;
+         deriv[1] = machine->DerivX[source->Index][1] * invQ;
+         deriv[2] = machine->DerivX[source->Index][2] * invQ;
+         deriv[3] = machine->DerivX[source->Index][3] * invQ;
       }
       else {
-         src[0] = 0.0;
-         src[1] = 1.0;
-         src[2] = span->attrStepY[FRAG_ATTRIB_WPOS][2]
-            / ctx->DrawBuffer->_DepthMaxF;
-         src[3] = span->attrStepY[FRAG_ATTRIB_WPOS][3];
+         deriv[0] = machine->DerivY[source->Index][0] * invQ;
+         deriv[1] = machine->DerivY[source->Index][1] * invQ;
+         deriv[2] = machine->DerivY[source->Index][2] * invQ;
+         deriv[3] = machine->DerivY[source->Index][3] * invQ;
       }
-      break;
-   case FRAG_ATTRIB_COL0:
-   case FRAG_ATTRIB_COL1:
-      if (xOrY == 'X') {
-         src[0] = span->attrStepX[source->Index][0] * (1.0F / CHAN_MAXF);
-         src[1] = span->attrStepX[source->Index][1] * (1.0F / CHAN_MAXF);
-         src[2] = span->attrStepX[source->Index][2] * (1.0F / CHAN_MAXF);
-         src[3] = span->attrStepX[source->Index][3] * (1.0F / CHAN_MAXF);
-      }
-      else {
-         src[0] = span->attrStepY[source->Index][0] * (1.0F / CHAN_MAXF);
-         src[1] = span->attrStepY[source->Index][1] * (1.0F / CHAN_MAXF);
-         src[2] = span->attrStepY[source->Index][2] * (1.0F / CHAN_MAXF);
-         src[3] = span->attrStepY[source->Index][3] * (1.0F / CHAN_MAXF);
-      }
-      break;
-   case FRAG_ATTRIB_FOGC:
-      if (xOrY == 'X') {
-         src[0] = span->attrStepX[FRAG_ATTRIB_FOGC][0] * (1.0F / CHAN_MAXF);
-         src[1] = 0.0;
-         src[2] = 0.0;
-         src[3] = 0.0;
-      }
-      else {
-         src[0] = span->attrStepY[FRAG_ATTRIB_FOGC][0] * (1.0F / CHAN_MAXF);
-         src[1] = 0.0;
-         src[2] = 0.0;
-         src[3] = 0.0;
-      }
-      break;
-   default:
-      assert(source->Index < FRAG_ATTRIB_MAX);
-      /* texcoord or varying */
-      if (xOrY == 'X') {
-         /* this is a little tricky - I think I've got it right */
-         const GLfloat invQ = 1.0f / (span->attrStart[source->Index][3]
-                                      +
-                                      span->attrStepX[source->Index][3] *
-                                      column);
-         src[0] = span->attrStepX[source->Index][0] * invQ;
-         src[1] = span->attrStepX[source->Index][1] * invQ;
-         src[2] = span->attrStepX[source->Index][2] * invQ;
-         src[3] = span->attrStepX[source->Index][3] * invQ;
-      }
-      else {
-         /* Tricky, as above, but in Y direction */
-         const GLfloat invQ = 1.0f / (span->attrStart[source->Index][3]
-                                      + span->attrStepY[source->Index][3]);
-         src[0] = span->attrStepY[source->Index][0] * invQ;
-         src[1] = span->attrStepY[source->Index][1] * invQ;
-         src[2] = span->attrStepY[source->Index][2] * invQ;
-         src[3] = span->attrStepY[source->Index][3] * invQ;
-      }
-      break;
-   }
 
-   result[0] = src[GET_SWZ(source->Swizzle, 0)];
-   result[1] = src[GET_SWZ(source->Swizzle, 1)];
-   result[2] = src[GET_SWZ(source->Swizzle, 2)];
-   result[3] = src[GET_SWZ(source->Swizzle, 3)];
-
-   if (source->NegateBase) {
-      result[0] = -result[0];
-      result[1] = -result[1];
-      result[2] = -result[2];
-      result[3] = -result[3];
+      result[0] = deriv[GET_SWZ(source->Swizzle, 0)];
+      result[1] = deriv[GET_SWZ(source->Swizzle, 1)];
+      result[2] = deriv[GET_SWZ(source->Swizzle, 2)];
+      result[3] = deriv[GET_SWZ(source->Swizzle, 3)];
+      
+      if (source->NegateBase) {
+         result[0] = -result[0];
+         result[1] = -result[1];
+         result[2] = -result[2];
+         result[3] = -result[3];
+      }
+      if (source->Abs) {
+         result[0] = FABSF(result[0]);
+         result[1] = FABSF(result[1]);
+         result[2] = FABSF(result[2]);
+         result[3] = FABSF(result[3]);
+      }
+      if (source->NegateAbs) {
+         result[0] = -result[0];
+         result[1] = -result[1];
+         result[2] = -result[2];
+         result[3] = -result[3];
+      }
    }
-   if (source->Abs) {
-      result[0] = FABSF(result[0]);
-      result[1] = FABSF(result[1]);
-      result[2] = FABSF(result[2]);
-      result[3] = FABSF(result[3]);
+   else {
+      ASSIGN_4V(result, 0.0, 0.0, 0.0, 0.0);
    }
-   if (source->NegateAbs) {
-      result[0] = -result[0];
-      result[1] = -result[1];
-      result[2] = -result[2];
-      result[3] = -result[3];
-   }
-   return GL_TRUE;
 }
-#endif
 
 
 /**
@@ -519,106 +463,6 @@ store_vector4(const struct prog_instruction *inst,
 }
 
 
-#if 0
-/**
- * Initialize a new machine state instance from an existing one, adding
- * the partial derivatives onto the input registers.
- * Used to implement DDX and DDY instructions in non-trivial cases.
- */
-static void
-init_machine_deriv(GLcontext * ctx,
-                   const struct gl_program_machine *machine,
-                   const struct gl_fragment_program *program,
-                   const SWspan * span, char xOrY,
-                   struct gl_program_machine *dMachine)
-{
-   GLuint attr;
-
-   ASSERT(xOrY == 'X' || xOrY == 'Y');
-
-   /* copy existing machine */
-   _mesa_memcpy(dMachine, machine, sizeof(struct gl_program_machine));
-
-   if (program->Base.Target == GL_FRAGMENT_PROGRAM_NV) {
-      /* XXX also need to do this when using valgrind */
-      /* Clear temporary registers (undefined for ARB_f_p) */
-      _mesa_bzero((void *) machine->Temporaries,
-                  MAX_PROGRAM_TEMPS * 4 * sizeof(GLfloat));
-   }
-
-   /* Add derivatives */
-   if (program->Base.InputsRead & FRAG_BIT_WPOS) {
-      GLfloat *wpos = machine->Attribs[FRAG_ATTRIB_WPOS][machine->CurElement];
-      if (xOrY == 'X') {
-         wpos[0] += 1.0F;
-         wpos[1] += 0.0F;
-         wpos[2] += span->attrStepX[FRAG_ATTRIB_WPOS][2];
-         wpos[3] += span->attrStepX[FRAG_ATTRIB_WPOS][3];
-      }
-      else {
-         wpos[0] += 0.0F;
-         wpos[1] += 1.0F;
-         wpos[2] += span->attrStepY[FRAG_ATTRIB_WPOS][2];
-         wpos[3] += span->attrStepY[FRAG_ATTRIB_WPOS][3];
-      }
-   }
-
-   /* primary, secondary colors */
-   for (attr = FRAG_ATTRIB_COL0; attr <= FRAG_ATTRIB_COL1; attr++) {
-      if (program->Base.InputsRead & (1 << attr)) {
-         GLfloat *col = machine->Attribs[attr][machine->CurElement];
-         if (xOrY == 'X') {
-            col[0] += span->attrStepX[attr][0] * (1.0F / CHAN_MAXF);
-            col[1] += span->attrStepX[attr][1] * (1.0F / CHAN_MAXF);
-            col[2] += span->attrStepX[attr][2] * (1.0F / CHAN_MAXF);
-            col[3] += span->attrStepX[attr][3] * (1.0F / CHAN_MAXF);
-         }
-         else {
-            col[0] += span->attrStepY[attr][0] * (1.0F / CHAN_MAXF);
-            col[1] += span->attrStepY[attr][1] * (1.0F / CHAN_MAXF);
-            col[2] += span->attrStepY[attr][2] * (1.0F / CHAN_MAXF);
-            col[3] += span->attrStepY[attr][3] * (1.0F / CHAN_MAXF);
-         }
-      }
-   }
-   if (program->Base.InputsRead & FRAG_BIT_FOGC) {
-      GLfloat *fogc = machine->Attribs[FRAG_ATTRIB_FOGC][machine->CurElement];
-      if (xOrY == 'X') {
-         fogc[0] += span->attrStepX[FRAG_ATTRIB_FOGC][0];
-      }
-      else {
-         fogc[0] += span->attrStepY[FRAG_ATTRIB_FOGC][0];
-      }
-   }
-   /* texcoord and varying vars */
-   for (attr = FRAG_ATTRIB_TEX0; attr < FRAG_ATTRIB_MAX; attr++) {
-      if (program->Base.InputsRead & (1 << attr)) {
-         GLfloat *val = machine->Attribs[attr][machine->CurElement];
-         /* XXX perspective-correct interpolation */
-         if (xOrY == 'X') {
-            val[0] += span->attrStepX[attr][0];
-            val[1] += span->attrStepX[attr][1];
-            val[2] += span->attrStepX[attr][2];
-            val[3] += span->attrStepX[attr][3];
-         }
-         else {
-            val[0] += span->attrStepY[attr][0];
-            val[1] += span->attrStepY[attr][1];
-            val[2] += span->attrStepY[attr][2];
-            val[3] += span->attrStepY[attr][3];
-         }
-      }
-   }
-
-   /* init condition codes */
-   dMachine->CondCodes[0] = COND_EQ;
-   dMachine->CondCodes[1] = COND_EQ;
-   dMachine->CondCodes[2] = COND_EQ;
-   dMachine->CondCodes[3] = COND_EQ;
-}
-#endif
-
-
 /**
  * Execute the given vertex/fragment program.
  *
@@ -762,57 +606,18 @@ _mesa_execute_program(GLcontext * ctx,
          break;
       case OPCODE_DDX:         /* Partial derivative with respect to X */
          {
-#if 0
-            GLfloat a[4], aNext[4], result[4];
-            struct gl_program_machine dMachine;
-            if (!fetch_vector4_deriv(ctx, &inst->SrcReg[0], span, 'X',
-                                     column, result)) {
-               /* This is tricky.  Make a copy of the current machine state,
-                * increment the input registers by the dx or dy partial
-                * derivatives, then re-execute the program up to the
-                * preceeding instruction, then fetch the source register.
-                * Finally, find the difference in the register values for
-                * the original and derivative runs.
-                */
-               fetch_vector4(&inst->SrcReg[0], machine, program, a);
-               init_machine_deriv(ctx, machine, program, span,
-                                  'X', &dMachine);
-               execute_program(ctx, program, pc, &dMachine, span, column);
-               fetch_vector4(&inst->SrcReg[0], &dMachine, program,
-                             aNext);
-               result[0] = aNext[0] - a[0];
-               result[1] = aNext[1] - a[1];
-               result[2] = aNext[2] - a[2];
-               result[3] = aNext[3] - a[3];
-            }
+            GLfloat result[4];
+            fetch_vector4_deriv(ctx, &inst->SrcReg[0], machine,
+                                'X', result);
             store_vector4(inst, machine, result);
-#else
-            store_vector4(inst, machine, ZeroVec);
-#endif
          }
          break;
       case OPCODE_DDY:         /* Partial derivative with respect to Y */
          {
-#if 0
-            GLfloat a[4], aNext[4], result[4];
-            struct gl_program_machine dMachine;
-            if (!fetch_vector4_deriv(ctx, &inst->SrcReg[0], span, 'Y',
-                                     column, result)) {
-               init_machine_deriv(ctx, machine, program, span,
-                                  'Y', &dMachine);
-               fetch_vector4(&inst->SrcReg[0], machine, program, a);
-               execute_program(ctx, program, pc, &dMachine, span, column);
-               fetch_vector4(&inst->SrcReg[0], &dMachine, program,
-                             aNext);
-               result[0] = aNext[0] - a[0];
-               result[1] = aNext[1] - a[1];
-               result[2] = aNext[2] - a[2];
-               result[3] = aNext[3] - a[3];
-            }
+            GLfloat result[4];
+            fetch_vector4_deriv(ctx, &inst->SrcReg[0], machine,
+                                'Y', result);
             store_vector4(inst, machine, result);
-#else
-            store_vector4(inst, machine, ZeroVec);
-#endif
          }
          break;
       case OPCODE_DP3:

@@ -6,9 +6,9 @@
 
 /*
  * Mesa 3-D graphics library
- * Version:  6.5
+ * Version:  7.0
  *
- * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -1382,8 +1382,11 @@ check_compatible(const GLcontext *ctx, const GLframebuffer *buffer)
       return GL_FALSE;
    if (ctxvis->blueMask && ctxvis->blueMask != bufvis->blueMask)
       return GL_FALSE;
+#if 0
+   /* disabled (see bug 11161) */
    if (ctxvis->depthBits && ctxvis->depthBits != bufvis->depthBits)
       return GL_FALSE;
+#endif
    if (ctxvis->stencilBits && ctxvis->stencilBits != bufvis->stencilBits)
       return GL_FALSE;
 
