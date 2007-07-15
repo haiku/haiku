@@ -1,179 +1,168 @@
-﻿/*
+/*
  * Copyright 2007 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *   Ingo Weinhold 
- *   Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ *		Ingo Weinhold 
+ *		Niels Sascha Reedijk <niels.reedijk@gmail.com>
+ *		Axel Dörfler, axeld@pinc-software.de
+ *
  * Corresponds to:
- *   /trunk/headers/os/drivers/fs_interface.h rev 21568
+ *		/trunk/headers/os/drivers/fs_interface.h rev 21568
  */
 
 /*!
-  \file fs_interface.h
-  \ingroup drivers
-  \brief Provides an interface for file system modules.
-  
-  See the \ref fs_modules "introduction to file system modules" for a guide on
-  how to get started with writing file system modules.
-*/
+	\file fs_interface.h
+	\ingroup drivers
+	\brief Provides an interface for file system modules.
 
-///// Typedefs /////
-
-/*! 
-  \typedef typedef void *fs_volume
-  \brief Private data structure for the filesystem to store data associated
-    with volumes.
-*/
-
-/*!
-  \typedef typedef void *fs_cookie
-  \brief Private data structure that is passed to the filesystem when it is
-    called.
-*/
-
-/*!
-  \typedef typedef void *fs_vnode
-  \brief Private data structure that is passed to the filesystem when it is
-    operating on vnodes.
+	See the \ref fs_modules "introduction to file system modules" for a guide on
+	how to get started with writing file system modules.
 */
 
 ///// write_stat_mask //////
 
 /*!
-  \enum write_stat_mask
-  \brief This mask is used in file_system_module_info::write_stat() to
-    determine which values need to be written.
+	\enum write_stat_mask
+	\brief This mask is used in file_system_module_info::write_stat() to
+		determine which values need to be written.
 */
 
 /*!
-  \var write_stat_mask::FS_WRITE_STAT_MODE
-  \brief The mode parameter should be updated.
+	\var write_stat_mask::FS_WRITE_STAT_MODE
+	\brief The mode parameter should be updated.
 */
 
 /*!
-  \var write_stat_mask::FS_WRITE_STAT_UID
-  \brief The UID field should be updated.
+	\var write_stat_mask::FS_WRITE_STAT_UID
+	\brief The UID field should be updated.
 */
 
 /*!
-  \var write_stat_mask::FS_WRITE_STAT_GID
-  \brief The GID field should be updated.
+	\var write_stat_mask::FS_WRITE_STAT_GID
+	\brief The GID field should be updated.
 */
 
 /*!
-  \var write_stat_mask::FS_WRITE_STAT_SIZE
-  \brief The size field should be updated. If the actual size is less than the
-    new provided file size, the file should be set to the new size and the
-    extra space should be filled with zeros. 
+	\var write_stat_mask::FS_WRITE_STAT_SIZE
+	\brief The size field should be updated. If the actual size is less than the
+		new provided file size, the file should be set to the new size and the
+		extra space should be filled with zeros. 
 */
 
 /*!
-  \var write_stat_mask::FS_WRITE_STAT_ATIME
-  \brief The access time should be updated.
+	\var write_stat_mask::FS_WRITE_STAT_ATIME
+	\brief The access time should be updated.
 */
 
 /*!
-  \var write_stat_mask::FS_WRITE_STAT_MTIME
-  \brief The 'last modified' field should be updated.
+	\var write_stat_mask::FS_WRITE_STAT_MTIME
+	\brief The 'last modified' field should be updated.
 */
 
 /*!
-  \var write_stat_mask::FS_WRITE_STAT_CRTIME
-  \brief The 'creation time' should be updated.
+	\var write_stat_mask::FS_WRITE_STAT_CRTIME
+	\brief The 'creation time' should be updated.
 */
 
 ///// FS_WRITE_FSINFO_NAME /////
 
 /*!
-  \def FS_WRITE_FSINFO_NAME
-  \brief Passed to file_system_module_info::write_fs_info().
+	\def FS_WRITE_FSINFO_NAME
+	\brief Passed to file_system_module_info::write_fs_info().
 */
 
 ///// file_io_vec /////
 
 /*!
-  \struct file_io_vec
-  \brief Structure that describes the io vector of a file.
+	\struct file_io_vec
+	\brief Structure that describes the io vector of a file.
 */
 
 /*!
-  \var off_t file_io_vec::offset
-  \brief The offset within the file.
+	\var off_t file_io_vec::offset
+	\brief The offset within the file.
 */
 
 /*!
-  \var off_t file_io_vec::length
-  \brief The length of the vector.
+	\var off_t file_io_vec::length
+	\brief The length of the vector.
 */
 
 ///// B_CURRENT_FS_API_VERSION /////
 
 /*!
-  \def B_CURRENT_FS_API_VERSION
-  \brief Constant that defines the version of the filesystem API that your
-    filesystem conforms to.
+	\def B_CURRENT_FS_API_VERSION
+	\brief Constant that defines the version of the file system API that your
+		filesystem conforms to.
+	
+	The module name that exports the interface to your file system has to
+	end with this constant as in:
+	\code "file_systems/myfs" B_CURRENT_FS_API_VERSION
 */
 
 ///// file_system_module_info /////
 
 
 /*!
-  \struct file_system_module_info
-  \brief Kernel module interface for file systems.
+	\struct file_system_module_info
+	\brief Kernel module interface for file systems.
   
-  See the \ref fs_modules "introduction to file system modules" for an
-  introduction to writing file systems.
+	See the \ref fs_modules "introduction to file system modules" for an
+	introduction to writing file systems.
 */
 
 /*!
-  \name Data members
-*/
-
-//! @{
-
-/*!
-  \var module_info file_system_module_info::info
-  \brief Your module_info object which is required for all modules.
-*/
-
-/*!
-  \var const char *file_system_module_info::pretty_name
-  \brief A NULL-terminated string with a 'pretty' name for you file system.
-*/
-
-//! @}
-
-/*!
-  \name Scanning
+	\name Data members
 */
 
 //! @{
 
 /*!
-  \fn float (*file_system_module_info::identify_partition)(int fd, partition_data *partition, void **cookie)
-  \brief Undocumented. TODO.
+	\var module_info file_system_module_info::info
+	\brief Your module_info object which is required for all modules.
 */
 
 /*!
-  \fn status_t (*file_system_module_info::scan_partition)(int fd, partition_data *partition, void *cookie)
-  \brief Undocumented. TODO.
-*/
+	\var const char *file_system_module_info::pretty_name
+	\brief A NULL-terminated string with a 'pretty' name for you file system.
 
-/*!
-  \fn void (*file_system_module_info::free_identify_partition_cookie)(partition_data *partition, void *cookie)
-  \brief Undocumented. TODO.
-*/
-
-/*!
-  \fn void (*file_system_module_info::free_partition_content_cookie)(partition_data *partition)
-  \brief Undocumented. TODO.
+	Note, if a system wide disk device type constant exists for your file system,
+	it should equal this identifier.
 */
 
 //! @}
 
 /*!
-  \name General Operations
+	\name Scanning
+*/
+
+//! @{
+
+/*!
+	\fn float (*file_system_module_info::identify_partition)(int fd, partition_data *partition, void **cookie)
+	\brief Undocumented. TODO.
+*/
+
+/*!
+	\fn status_t (*file_system_module_info::scan_partition)(int fd, partition_data *partition, void *cookie)
+	\brief Undocumented. TODO.
+*/
+
+/*!
+	\fn void (*file_system_module_info::free_identify_partition_cookie)(partition_data *partition, void *cookie)
+	\brief Undocumented. TODO.
+*/
+
+/*!
+	\fn void (*file_system_module_info::free_partition_content_cookie)(partition_data *partition)
+	\brief Undocumented. TODO.
+*/
+
+//! @}
+
+/*!
+	\name General Operations
 */
 
 //! @{
@@ -1554,185 +1543,190 @@
 
 //! @}
 
-///// Global Functions /////
+///// Vnode functions /////
 
 /*!
-  \fn status_t new_vnode(dev_t mountID, ino_t vnodeID,
-    fs_vnode privateNode)
-  \brief Create the vnode with ID \a vnodeID and associates it with the
-    private data handle \a privateNode, but leaves is in an unpublished state.
+	\fn status_t new_vnode(dev_t mountID, ino_t vnodeID,
+		fs_vnode privateNode)
+	\brief Create the vnode with ID \a vnodeID and associates it with the
+		private data handle \a privateNode, but leaves is in an unpublished state.
 
-  The effect of the function is similar to publish_vnode(), but the vnode
-  remains in an unpublished state, with the effect that a subsequent
-  remove_vnode() will just delete the vnode and not invoke the file system's
-  \link file_system_module_info::remove_vnode remove_vnode() \endlink is not
-  invoked.
+	The effect of the function is similar to publish_vnode(), but the vnode
+	remains in an unpublished state, with the effect that a subsequent
+	remove_vnode() will just delete the vnode and not invoke the file system's
+	\link file_system_module_info::remove_vnode remove_vnode() \endlink when
+	the final reference is put down.
 
-  If the vnode shall be kept, publish_vnode() has to be invoked afterwards to
-  mark the vnode published. The combined effect is the same as only invoking
-  publish_vnode().
+	If the vnode shall be kept, publish_vnode() has to be invoked afterwards to
+	mark the vnode published. The combined effect is the same as only invoking
+	publish_vnode().
 
-  The function fails, if the vnode does already exist.
+	You'll usually use this function to secure a vnode ID from being reused
+	while you are in the process of creating the entry. Note that this function
+	will panic in case you call it for an existing vnode ID. 
 
-  \param mountID The ID of the volume.
-  \param vnodeID The ID of the node.
-  \param privateNode The private data handle to be associated with the node.
-  \return \c B_OK if everything went fine, another error code otherwise.
+	The function fails, if the vnode does already exist.
+
+	\param mountID The ID of the volume.
+	\param vnodeID The ID of the node.
+	\param privateNode The private data handle to be associated with the node.
+	\return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-  \fn status_t publish_vnode(dev_t mountID, ino_t vnodeID,
-    fs_vnode privateNode)
-  \brief Creates the vnode with ID \a vnodeID and associates it with the
-    private data handle \a privateNode or just marks it published.
+	\fn status_t publish_vnode(dev_t mountID, ino_t vnodeID,
+		fs_vnode privateNode)
+	\brief Creates the vnode with ID \a vnodeID and associates it with the
+		private data handle \a privateNode or just marks it published.
 
-  If the vnode does already exist and has been published, the function fails.
-  If it has not been published yet (i.e. after a successful new_vnode()), the
-  function just marks the vnode published. If the vnode did not exist at all
-  before, it is created and published.
+	If the vnode does already exist and has been published, the function fails.
+	If it has not been published yet (i.e. after a successful new_vnode()), the
+	function just marks the vnode published. If the vnode did not exist at all
+	before, it is created and published.
 
-  If the function is successful, the caller owns a reference to the vnode. A
-  sequence of new_vnode() and publish_vnode() results in just one reference as
-  well. The reference can be surrendered by calling put_vnode().
+	If the function is successful, the caller owns a reference to the vnode. A
+	sequence of new_vnode() and publish_vnode() results in just one reference as
+	well. The reference can be surrendered by calling put_vnode().
 
-  \param mountID The ID of the volume.
-  \param vnodeID The ID of the node.
-  \param privateNode The private data handle to be associated with the node.
-  \return \c B_OK if everything went fine, another error code otherwise.
+	This call is equivalent to the former R5 new_vnode() function.
+
+	\param mountID The ID of the volume.
+	\param vnodeID The ID of the node.
+	\param privateNode The private data handle to be associated with the node.
+	\return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-  \fn status_t get_vnode(dev_t mountID, ino_t vnodeID,
-    fs_vnode *_privateNode)
-  \brief Retrieves the private data handle for the node with the given ID.
+	\fn status_t get_vnode(dev_t mountID, ino_t vnodeID,
+		fs_vnode *_privateNode)
+	\brief Retrieves the private data handle for the node with the given ID.
 
-  If the function is successful, the caller owns a reference to the vnode. The
-  reference can be surrendered by calling put_vnode().
+	If the function is successful, the caller owns a reference to the vnode. The
+	reference can be surrendered by calling put_vnode().
 
-  \param mountID The ID of the volume.
-  \param vnodeID The ID of the node.
-  \param _privateNode Pointer to a pre-allocated variable the private data
-    handle shall be written to.
-  \return \c B_OK if everything went fine, another error code otherwise.
+	\param mountID The ID of the volume.
+	\param vnodeID The ID of the node.
+	\param _privateNode Pointer to a pre-allocated variable the private data
+		handle shall be written to.
+	\return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-  \fn status_t put_vnode(dev_t mountID, ino_t vnodeID)
-  \brief Surrenders a reference to the specified vnode.
-  \param mountID The ID of the volume.
-  \param vnodeID The ID of the node.
-  \return \c B_OK if everything went fine, another error code otherwise.
+	\fn status_t put_vnode(dev_t mountID, ino_t vnodeID)
+	\brief Surrenders a reference to the specified vnode.
+	\param mountID The ID of the volume.
+	\param vnodeID The ID of the node.
+	\return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-  \fn status_t remove_vnode(dev_t mountID, ino_t vnodeID)
-  \brief Marks the specified vnode removed.
+	\fn status_t remove_vnode(dev_t mountID, ino_t vnodeID)
+	\brief Marks the specified vnode removed.
 
-  The caller must own a reference to the vnode or at least ensure that a
-  reference to the vnode exists. The function does not surrender a reference,
-  though.
+	The caller must own a reference to the vnode or at least ensure that a
+	reference to the vnode exists. The function does not surrender a reference,
+	though.
 
-  As soon as the last reference to the vnode has been surrendered, the VFS
-  invokes the file system's 
-  \link file_system_module_info::remove_vnode remove_vnode() \endlink
-  hook.
+	As soon as the last reference to the vnode has been surrendered, the VFS
+	invokes the file system's 
+	\link file_system_module_info::remove_vnode remove_vnode() \endlink
+	hook.
 
-  \param mountID The ID of the volume.
-  \param vnodeID The ID of the node.
-  \return \c B_OK if everything went fine, another error code otherwise.
+	\param mountID The ID of the volume.
+	\param vnodeID The ID of the node.
+	\return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-  \fn status_t unremove_vnode(dev_t mountID, ino_t vnodeID);
-  \brief Clears the "removed" mark of the specified vnode.
+	\fn status_t unremove_vnode(dev_t mountID, ino_t vnodeID);
+	\brief Clears the "removed" mark of the specified vnode.
 
-  The caller must own a reference to the vnode or at least ensure that a
-  reference to the vnode exists.
+	The caller must own a reference to the vnode or at least ensure that a
+	reference to the vnode exists.
 
-  The function is usually called when the caller, who has invoked
-  remove_vnode() before realizes that it is not possible to remove the node
-  (e.g. due to an error).
+	The function is usually called when the caller, who has invoked
+	remove_vnode() before realizes that it is not possible to remove the node
+	(e.g. due to an error).
 
-  \param mountID The ID of the volume.
-  \param vnodeID The ID of the node.
-  \return \c B_OK if everything went fine, another error code otherwise.
+	\param mountID The ID of the volume.
+	\param vnodeID The ID of the node.
+	\return \c B_OK if everything went fine, another error code otherwise.
 */
 
 /*!
-  \fn status_t get_vnode_removed(dev_t mountID, ino_t vnodeID,
-    bool* removed);
-  \brief Returns whether the specified vnode is marked removed.
+	\fn status_t get_vnode_removed(dev_t mountID, ino_t vnodeID,
+		bool* removed);
+	\brief Returns whether the specified vnode is marked removed.
 
-  The caller must own a reference to the vnode or at least ensure that a
-  reference to the vnode exists.
+	The caller must own a reference to the vnode or at least ensure that a
+	reference to the vnode exists.
 
-  \param mountID The ID of the volume.
-  \param vnodeID The ID of the node.
-  \param removed Pointer to a pre-allocated variable set to \c true, if the
-    node is marked removed, to \c false otherwise.
-  \return \c B_OK if everything went fine, another error code otherwise.
+	\param mountID The ID of the volume.
+	\param vnodeID The ID of the node.
+	\param removed Pointer to a pre-allocated variable set to \c true, if the
+		node is marked removed, to \c false otherwise.
+	\return \c B_OK if everything went fine, another error code otherwise.
 */
 
-///// Deprecated Global Functions
+///// Notification Functions
 
 /*!
-  \name Deprecated functions
-  
-  The following list of functions should not be used, and could be removed even
-  before the release of Haiku R1.
-*/
+	\name Notification Functions
 
-//! @{
+	The following functions are used to implement the node monitor functionality
+	in your file system. Whenever one of the below mentioned events occur, you
+	have to call them.
 
-/*!
-  \fn status_t notify_listener(int op, dev_t device, ino_t parentNode,
-					ino_t toParentNode, ino_t node, const char *name)
-  \brief Deprecated. This feature will be removed in future versions.
-*/
+	The node monitor will then notify all registered listeners for the nodes
+	that changed.
+*/ 
 
 /*!
-  \fn status_t notify_entry_created(dev_t device, ino_t directory,
+	\fn status_t notify_entry_created(dev_t device, ino_t directory,
 					const char *name, ino_t node)
-  \brief Deprecated. This feature will be removed in future versions.
+	\brief Notifies listeners that a file system entry has been created.
 */
 
 /*!
-  \fn status_t notify_entry_removed(dev_t device, ino_t directory,
+	\fn status_t notify_entry_removed(dev_t device, ino_t directory,
 					const char *name, ino_t node)
-  \brief Deprecated. This feature will be removed in future versions.
+	\brief Notifies listeners that a file system entry has been removed.
 */
 
 /*!
-  \fn status_t notify_entry_moved(dev_t device, ino_t fromDirectory,
+	\fn status_t notify_entry_moved(dev_t device, ino_t fromDirectory,
 					const char *fromName, ino_t toDirectory,
 					const char *toName, ino_t node)
-  \brief Deprecated. This feature will be removed in future versions.
+	\brief Notifies listeners that a file system entry has been moved to
+		another directory.
 */
 
 /*!
-  \fn status_t notify_stat_changed(dev_t device, ino_t node,
+	\fn status_t notify_stat_changed(dev_t device, ino_t node,
 					uint32 statFields)
-  \brief Deprecated. This feature will be removed in future versions.
+	\brief Notifies listeners that certain \a statFields of a file system entry
+		were updated.
 */
 
 /*!
-  \fn status_t notify_attribute_changed(dev_t device, ino_t node,
+	\fn status_t notify_attribute_changed(dev_t device, ino_t node,
 					const char *attribute, int32 cause)
-  \brief Deprecated. This feature will be removed in future versions.
+	\brief Notifies listeners that an attribute of a file system entry has been
+		changed.
 */
 
 /*!
-  \fn status_t notify_query_entry_created(port_id port, int32 token,
+	\fn status_t notify_query_entry_created(port_id port, int32 token,
 					dev_t device, ino_t directory, const char *name,
 					ino_t node)
-  \brief Deprecated. This feature will be removed in future versions.
+	\brief Notifies listeners that an entry has entered the result set of a live query.
 */
 
 /*!
-  \fn status_t notify_query_entry_removed(port_id port, int32 token,
+	\fn status_t notify_query_entry_removed(port_id port, int32 token,
 					dev_t device, ino_t directory, const char *name,
 					ino_t node)
-  \brief Deprecated. This feature will be removed in future versions.
+	\brief Notifies listeners that an entry has left the result set of a live query.
 */
 
 //! @}
