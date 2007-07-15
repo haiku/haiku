@@ -41,11 +41,11 @@ void arch_check_syscall_restart(struct thread *t);
 void arch_store_fork_frame(struct arch_fork_arg *arg);
 void arch_restore_fork_frame(struct arch_fork_arg *arg);
 
-// for any inline overrides
-#include <arch_thread.h>
-
 #ifdef __cplusplus
 }
 #endif
+
+// for any inline overrides
+#include <arch_thread.h>
 
 #endif	/* KERNEL_ARCH_THREAD_H */
