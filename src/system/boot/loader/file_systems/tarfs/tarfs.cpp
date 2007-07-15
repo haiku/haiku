@@ -34,7 +34,7 @@
 
 
 static const uint32 kFloppyArchiveOffset = 192 * 1024;	// at 192 kB
-static const size_t kTarRegionSize = 32 * 1024 * 1024;		// 32 MB
+static const size_t kTarRegionSize = 16 * 1024 * 1024;	// 16 MB
 
 namespace TarFS {
 
@@ -142,6 +142,8 @@ class Symlink : public ::Node, public Entry {
 		virtual int32 Type() const;
 		virtual off_t Size() const;
 		virtual ino_t Inode() const;
+
+		const char* LinkPath() const	{ return fHeader->linkname; }
 
 		virtual ::Node *ToNode() { return this; }
 
@@ -367,15 +369,29 @@ TarFS::Directory::LookupEntry(const char *name)
 
 
 ::Node *
-TarFS::Directory::Lookup(const char *name, bool /*traverseLinks*/)
+TarFS::Directory::Lookup(const char *name, bool traverseLinks)
 {
-	if (TarFS::Entry *entry = LookupEntry(name)) {
-		entry->ToNode()->Acquire();
-			// our entries are not supposed to be deleted after use
-		return entry->ToNode();
+	TarFS::Entry *entry = LookupEntry(name);
+	if (!entry)
+		return NULL;
+
+	Node* node = entry->ToNode();
+
+	if (traverseLinks) {
+		if (S_ISLNK(node->Type())) {
+			Symlink* symlink = static_cast<Symlink*>(node);
+			int fd = open_from(this, symlink->LinkPath(), O_RDONLY);
+			if (fd >= 0) {
+				node = get_node_from(fd);
+				close(fd);
+			}
+		}
 	}
 
-	return NULL;
+	if (node)
+		node->Acquire();
+
+	return node;
 }
 
 
@@ -536,22 +552,7 @@ TarFS::Symlink::~Symlink()
 ssize_t
 TarFS::Symlink::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
-	TRACE(("tarfs: symlink read at %Ld, %lu bytes, fSize = %Ld\n", pos,
-		bufferSize, fSize));
-
-	if (pos < 0 || !buffer)
-		return B_BAD_VALUE;
-
-	if (pos >= fSize || bufferSize == 0)
-		return 0;
-
-	size_t toRead = fSize - pos;
-	if (toRead > bufferSize)
-		toRead = bufferSize;
-
-	memcpy(buffer, fHeader->linkname + pos, toRead);
-
-	return toRead;
+	return B_NOT_ALLOWED;
 }
 
 
