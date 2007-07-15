@@ -1,7 +1,9 @@
 /* 
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2005-2007, Ingo Weinhold, bonefish@users.sf.net.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
+
+#include "KMessage.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -10,7 +12,13 @@
 #include <KernelExport.h>
 #include <TypeConstants.h>
 
-#include "KMessage.h"
+#if defined(_BOOT_MODE)
+#	include <util/kernel_cpp.h>
+#else
+#	include <new>
+#endif
+
+using std::nothrow;
 
 // TODO: Add a field index using a hash map, so that lookup improves to O(1)
 // (is now O(n)).
@@ -141,21 +149,33 @@ status_t
 KMessage::SetTo(void *buffer, int32 bufferSize, uint32 what, uint32 flags)
 {
 	Unset();
-	if (!buffer || bufferSize < (int)sizeof(Header))
+
+	if (!buffer)
 		return B_BAD_VALUE;
+
+	if (bufferSize < 0) {
+		if (!(flags & KMESSAGE_INIT_FROM_BUFFER))
+			return B_BAD_VALUE;
+	} else if (bufferSize < (int)sizeof(Header))
+		return B_BAD_VALUE;
+
 	// if read-only, we need to init from the buffer, too
 	if (flags & KMESSAGE_READ_ONLY && !(flags & KMESSAGE_INIT_FROM_BUFFER))
 		return B_BAD_VALUE;
+
 	fBuffer = buffer;
 	fBufferCapacity = bufferSize;
 	fFlags = flags;
+
 	status_t error = B_OK;
 	if (flags & KMESSAGE_INIT_FROM_BUFFER)
-		error = _InitFromBuffer();
+		error = _InitFromBuffer(bufferSize < 0);
 	else
 		_InitBuffer(what);
+
 	if (error != B_OK)
 		Unset();
+
 	return error;
 }
 
@@ -325,6 +345,42 @@ KMessage::AddArray(const char *name, type_code type, const void *data,
 	return _AddFieldData(&field, data, elementSize, elementCount);
 }
 
+
+// SetData
+status_t
+KMessage::SetData(const char* name, type_code type, const void* data,
+	int32 numBytes)
+{
+	if (fBuffer != &fHeader && (fFlags & KMESSAGE_READ_ONLY))
+		return B_NOT_ALLOWED;
+
+	KMessageField field;
+
+	if (FindField(name, &field) == B_OK) {
+		// field already known
+		if (field.TypeCode() != type || !field.HasFixedElementSize()
+			|| field.ElementSize() != numBytes) {
+			return B_BAD_VALUE;
+		}
+
+		// if it has an element, just replace its value
+		if (field.CountElements() > 0) {
+			const void* element = field.ElementAt(0);
+			memcpy(const_cast<void*>(element), data, numBytes);
+			return B_OK;
+		}
+	} else {
+		// no such field yet -- add it
+		status_t error = _AddField(name, type, numBytes, &field);
+		if (error != B_OK)
+			return error;
+	}
+
+	// we've got an empty field -- add the element
+	return _AddFieldData(&field, data, numBytes, 1);
+}
+
+
 // FindData
 status_t
 KMessage::FindData(const char *name, type_code type, const void **data,
@@ -379,6 +435,9 @@ KMessage::ReplyToken() const
 {
 	return _Header()->replyToken;
 }
+
+
+#ifndef KMESSAGE_CONTAINER_ONLY
 
 // SendTo
 status_t
@@ -512,6 +571,9 @@ KMessage::ReceiveFrom(port_id fromPort, bigtime_t timeout)
 		KMESSAGE_OWNS_BUFFER | KMESSAGE_INIT_FROM_BUFFER);
 }
 
+#endif	// !KMESSAGE_CONTAINER_ONLY
+
+
 // _Header
 KMessage::Header *
 KMessage::_Header() const
@@ -631,18 +693,24 @@ KMessage::_AddFieldData(KMessageField *field, const void *data,
 
 // _InitFromBuffer
 status_t
-KMessage::_InitFromBuffer()
+KMessage::_InitFromBuffer(bool sizeFromBuffer)
 {
-	if (!fBuffer || fBufferCapacity < (int)sizeof(Header)
-		|| _Align(fBuffer) != fBuffer) {
+	if (!fBuffer || _Align(fBuffer) != fBuffer)
 		return B_BAD_DATA;
-	}
-	// check header
 	Header *header = _Header();
+
+	if (sizeFromBuffer)
+		fBufferCapacity = header->size;
+
+	if (fBufferCapacity < (int)sizeof(Header))
+		return B_BAD_DATA;
+
+	// check header
 	if (header->magic != kMessageHeaderMagic)
 		return B_BAD_DATA;
 	if (header->size < (int)sizeof(Header) || header->size > fBufferCapacity)
 		return B_BAD_DATA;
+
 	// check the fields
 	FieldHeader *fieldHeader = NULL;
 	uint8 *data = (uint8*)_FirstFieldHeader();
@@ -721,7 +789,7 @@ void
 KMessage::_CheckBuffer()
 {
 	int32 lastFieldOffset = fLastFieldOffset;
-	if (_InitFromBuffer() != B_OK) {
+	if (_InitFromBuffer(false) != B_OK) {
 		PANIC("internal data mangled");
 	}
 	if (fLastFieldOffset != lastFieldOffset) {
@@ -777,24 +845,6 @@ KMessage::_CapacityFor(int32 size)
 {
 	return (size + kMessageReallocChunkSize - 1) / kMessageReallocChunkSize
 		* kMessageReallocChunkSize;
-}
-
-// _FindType
-template<typename T>
-inline
-status_t
-KMessage::_FindType(const char* name, type_code type, int32 index,
-	T *value) const
-{
-	const void *data;
-	int32 size;
-	status_t error = FindData(name, type, index, &data, &size);
-	if (error != B_OK)
-		return error;
-	if (size != sizeof(T))
-		return B_BAD_DATA;
-	*value = *(T*)data;
-	return B_OK;
 }
 
 
