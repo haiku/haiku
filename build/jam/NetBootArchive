@@ -23,7 +23,7 @@ BEOS_ADD_ONS_DRIVERS_NET = etherpci ipro1000 rtl8139 rtl8169 sis900
 	via-rhine wb840 net_stack vlance
 	$(GPL_ONLY)bcm440x $(GPL_ONLY)bcm570x
 ;
-BEOS_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)ps2 $(X86_ONLY)isa ide scsi
+BEOS_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)isa ide scsi
 	config_manager $(X86_ONLY)agp
 ;
 BEOS_ADD_ONS_FILE_SYSTEMS = bfs cdda dos googlefs iso9660 nfs ;
@@ -49,10 +49,9 @@ if $(TARGET_ARCH) = x86 {
 }
 
 # drivers
-AddDriversToNetBootArchive				: console dprintf $(X86_ONLY)keyboard
-										  null random <driver>tty zero ;
 AddDriversToNetBootArchive disk scsi	: scsi_cd scsi_dsk ;
-AddDriversToNetBootArchive disk virtual	: nbd ;
+#AddDriversToNetBootArchive disk virtual	: nbd ;
+AddDriversToNetBootArchive disk virtual	: remote_disk ;
 AddDriversToNetBootArchive net			: $(BEOS_ADD_ONS_DRIVERS_NET) ;
 
 # kernel
@@ -66,13 +65,6 @@ SEARCH on $(driverSettingsFiles)
 AddFilesToNetBootArchive home config settings kernel drivers
 	: $(driverSettingsFiles) ;
 
-# boot module links
-#AddBootModuleSymlinksToNetBootArchive config_manager bfs block_io fast_log
-#	generic_ide_pci $(X86_ONLY)isa ide ide_adapter $(X86_ONLY)ide_isa intel
-#	locked_pool $(PPC_ONLY)openpic pci scsi scsi_cd scsi_dsk scsi_periph
-#	ahci silicon_image_3112
-#;
-
 # add-ons
 AddFilesToNetBootArchive beos system add-ons kernel network
 	: stack socket ;
@@ -84,6 +76,25 @@ AddFilesToNetBootArchive beos system add-ons kernel network ppp
 	: $(BEOS_NETWORK_PPP) ;
 AddFilesToNetBootArchive beos system add-ons kernel network protocols
 	: $(BEOS_NETWORK_PROTOCOLS) ;
+
+# boot module links
+AddBootModuleSymlinksToNetBootArchive
+	$(BEOS_ADD_ONS_BUS_MANAGERS)
+	ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112
+	$(BEOS_ADD_ONS_FILE_SYSTEMS)
+	block_io fast_log ide_adapter locked_pool mpu401 scsi_periph
+	intel session
+	$(PPC_ONLY)openpic
+	$(X86_ONLY)generic_x86
+#	nbd
+	remote_disk
+	$(BEOS_ADD_ONS_DRIVERS_NET)
+	stack socket
+	$(BEOS_NETWORK_DEVICES)
+	$(BEOS_NETWORK_DATALINK_PROTOCOLS) 
+	$(BEOS_NETWORK_PPP)
+	$(BEOS_NETWORK_PROTOCOLS)
+;
 
 
 #pragma mark - Build The Archive
