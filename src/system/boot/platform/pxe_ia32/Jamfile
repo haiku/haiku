@@ -48,7 +48,7 @@ KernelMergeObject boot_platform_pxe_ia32.o :
 	pxe_undi.cpp
 	$(bios_ia32_src)
 	$(bios_ia32_edid_src)
-	
+
 	# generic
 	text_menu.cpp
 	: -fno-pic

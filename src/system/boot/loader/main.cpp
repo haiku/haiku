@@ -35,6 +35,9 @@ main(stage2_args *args)
 
 	TRACE(("boot(): heap initialized...\n"));
 
+	// construct boot_volume KMessage explicitely
+	new(&gKernelArgs.boot_volume) KMessage;
+
 	platform_init_video();
 
 	// the main platform dependent initialisation
@@ -106,6 +109,20 @@ main(stage2_args *args)
 			// set up kernel args version info
 			gKernelArgs.kernel_args_size = sizeof(kernel_args);
 			gKernelArgs.version = CURRENT_KERNEL_ARGS_VERSION;
+
+			// clone the boot_volume KMessage into kernel accessible memory
+			// note, that we need to 4 byte align the buffer and thus allocate
+			// 3 more bytes
+			KMessage& bootVolume = gKernelArgs.boot_volume;
+			void* buffer = kernel_args_malloc(bootVolume.ContentSize() + 3);
+			if (!buffer) {
+				panic("Could not allocate memory for the boot volume kernel "
+					"arguments");
+			}
+
+			buffer = (void*)(((addr_t)buffer + 3) & ~(addr_t)0x3);
+			memcpy(buffer, bootVolume.Buffer(), bootVolume.ContentSize());
+			bootVolume.SetTo(buffer, bootVolume.ContentSize());
 
 			// ToDo: cleanup, heap_release() etc.
 			platform_start_kernel();

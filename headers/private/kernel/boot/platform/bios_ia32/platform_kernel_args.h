@@ -25,7 +25,6 @@
 typedef struct {
 	uint16		serial_base_ports[MAX_SERIAL_PORTS];
 
-	uint16		boot_drive_number;
 	bios_drive	*drives;	// this does not contain the boot drive
 
 	apm_info	apm;

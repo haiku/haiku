@@ -73,6 +73,26 @@ class ConsoleNode : public Node {
 		virtual ssize_t Write(const void *buffer, size_t bufferSize);
 };
 
+
+class MemoryDisk : public Node {
+	public:
+		MemoryDisk(const uint8* data, size_t size, const char* name);
+
+		virtual ssize_t ReadAt(void* cookie, off_t pos, void* buffer,
+			size_t bufferSize);
+		virtual ssize_t WriteAt(void* cookie, off_t pos, const void* buffer,
+			size_t bufferSize);
+
+		virtual off_t Size() const;
+		virtual status_t GetName(char *nameBuffer, size_t bufferSize) const;
+
+	private:
+		const uint8*	fData;
+		size_t			fSize;
+		char			fName[64];
+};
+
+
 /* function prototypes */
 
 extern status_t vfs_init(stage2_args *args);

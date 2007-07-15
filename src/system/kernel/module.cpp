@@ -909,6 +909,8 @@ register_preloaded_module_image(struct preloaded_image *image)
 
 	TRACE(("register_preloaded_module_image(image = \"%s\")\n", image->name));
 
+	image->is_module = false;
+
 	if (image->id < 0)
 		return B_BAD_VALUE;
 
@@ -921,6 +923,8 @@ register_preloaded_module_image(struct preloaded_image *image)
 		status = B_BAD_TYPE;
 		goto error;
 	}
+
+	image->is_module = true;
 
 	moduleImage->dependencies = NULL;
 	get_image_symbol(image->id, "module_dependencies", B_SYMBOL_TYPE_DATA,
@@ -966,8 +970,10 @@ register_preloaded_module_image(struct preloaded_image *image)
 error:
 	free(moduleImage);
 	
-	// we don't need this image anymore
-	unload_kernel_add_on(image->id);
+	// We don't need this image anymore. We keep it, if it doesn't look like
+	// a module at all. It might be an old-style driver.
+	if (image->is_module)
+		unload_kernel_add_on(image->id);
 
 	return status;
 }

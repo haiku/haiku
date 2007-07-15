@@ -210,8 +210,10 @@ Partition::_Mount(file_system_module_info *module, Directory **_fileSystem)
 status_t
 Partition::Mount(Directory **_fileSystem, bool isBootDevice)
 {
-	if (isBootDevice && gKernelArgs.boot_disk.booted_from_image)
+	if (isBootDevice && gKernelArgs.boot_volume.GetBool(
+			BOOT_VOLUME_BOOTED_FROM_IMAGE, false)) {
 		return _Mount(&gTarFileSystemModule, _fileSystem);
+	}
 
 	for (int32 i = 0; i < sNumFileSystemModules; i++) {
 		status_t status = _Mount(sFileSystemModules[i], _fileSystem);
@@ -233,8 +235,10 @@ Partition::Scan(bool mountFileSystems, bool isBootDevice)
 	// if we were not booted from the real boot device, we won't scan
 	// the device we were booted from (which is likely to be a slow
 	// floppy or CD)
-	if (isBootDevice && gKernelArgs.boot_disk.booted_from_image)
+	if (isBootDevice && gKernelArgs.boot_volume.GetBool(
+			BOOT_VOLUME_BOOTED_FROM_IMAGE, false)) {
 		return B_ENTRY_NOT_FOUND;
+	}
 
 	const partition_module_info *bestModule = NULL;
 	void *bestCookie = NULL;

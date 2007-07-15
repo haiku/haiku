@@ -198,6 +198,58 @@ Directory::Type() const
 //	#pragma mark -
 
 
+MemoryDisk::MemoryDisk(const uint8* data, size_t size, const char* name)
+	: Node(),
+	  fData(data),
+	  fSize(size)
+{
+	strlcpy(fName, name, sizeof(fName));
+}
+
+
+ssize_t
+MemoryDisk::ReadAt(void* cookie, off_t pos, void* buffer, size_t bufferSize)
+{
+	if (pos >= fSize)
+		return 0;
+
+	if (pos + bufferSize > fSize)
+		bufferSize = fSize - pos;
+
+	memcpy(buffer, fData + pos, bufferSize);
+	return bufferSize;
+}
+
+
+ssize_t
+MemoryDisk::WriteAt(void* cookie, off_t pos, const void* buffer,
+	size_t bufferSize)
+{
+	return B_NOT_ALLOWED;
+}
+
+
+off_t
+MemoryDisk::Size() const
+{
+	return fSize;
+}
+
+
+status_t
+MemoryDisk::GetName(char *nameBuffer, size_t bufferSize) const
+{
+	if (!nameBuffer)
+		return B_BAD_VALUE;
+
+	strlcpy(nameBuffer, fName, bufferSize);
+	return B_OK;
+}
+
+
+//	#pragma mark -
+
+
 Descriptor::Descriptor(Node *node, void *cookie)
 	:
 	fNode(node),
@@ -307,7 +359,8 @@ register_boot_file_system(Directory *volume)
 		return status;
 	}
 
-	gKernelArgs.boot_disk.partition_offset = partition->offset;
+	gKernelArgs.boot_volume.SetInt64(BOOT_VOLUME_PARTITION_OFFSET,
+		partition->offset);
 
 	Node *device = get_node_from(partition->FD());
 	if (device == NULL) {

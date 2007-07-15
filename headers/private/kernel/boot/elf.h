@@ -35,6 +35,8 @@ struct preloaded_image {
 	ino_t		inode;
 	image_id	id;
 		// the ID field will be filled out in the kernel
+	bool		is_module;
+		// set by the module initialization code
 };
 
 #ifdef __cplusplus

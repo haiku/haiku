@@ -17,6 +17,7 @@
 #include <cpu.h>
 #include <debug.h>
 #include <elf.h>
+#include <fs/devfs.h>
 #include <int.h>
 #include <kdevice_manager.h>
 #include <kdriver_settings.h>
@@ -242,6 +243,9 @@ main2(void *unused)
 
 	TRACE("Init Device Manager\n");
 	device_manager_init(&sKernelArgs);
+
+	TRACE("Add preloaded old-style drivers\n");
+	devfs_add_preloaded_drivers(&sKernelArgs);
 
 	// ToDo: device manager starts here, bus_init()/dev_init() won't be necessary anymore,
 	//	but instead, the hardware and drivers are rescanned then.

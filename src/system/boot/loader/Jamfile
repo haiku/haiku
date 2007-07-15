@@ -22,7 +22,9 @@ UsePrivateHeaders kernel shared storage ;
 		BOOT_SUPPORT_FILE_SYSTEM_BFS
 		BOOT_SUPPORT_FILE_SYSTEM_AMIGA_FFS
 		BOOT_SUPPORT_FILE_SYSTEM_TARFS
-		;
+
+		KMESSAGE_CONTAINER_ONLY
+	;
 
 	defines = [ FDefines $(defines) ] ;
 	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
@@ -46,8 +48,9 @@ KernelStaticLibrary boot_loader :
 	driver_settings.c
 
 	# utils
-	list.c
 	kernel_cpp.cpp
+	KMessage.cpp
+	list.c
 
 	: -fno-pic
 	;
@@ -68,6 +71,9 @@ KernelStaticLibrary boot_partitions :
 # Tell Jam where to find the utility sources
 SEARCH on [ FGristFiles kernel_cpp.cpp list.c ]
     = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
+
+SEARCH on [ FGristFiles KMessage.cpp ]
+    = [ FDirName $(HAIKU_TOP) src system kernel messaging ] ;
 
 SEARCH on [ FGristFiles driver_settings.c ]
     = [ FDirName $(HAIKU_TOP) src system libroot os ] ;

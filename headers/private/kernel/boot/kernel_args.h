@@ -18,9 +18,26 @@
 #include <platform_kernel_args.h>
 #include <arch_kernel_args.h>
 
+#include <util/KMessage.h>
 
 #define CURRENT_KERNEL_ARGS_VERSION	1
-#define MAX_KERNEL_ARGS_RANGE		16
+#define MAX_KERNEL_ARGS_RANGE		32
+
+// names of common boot_volume fields
+#define BOOT_METHOD						"boot method"
+#define BOOT_VOLUME_USER_SELECTED		"user selected"
+#define BOOT_VOLUME_BOOTED_FROM_IMAGE	"booted from image"
+#define BOOT_VOLUME_PARTITION_OFFSET	"partition offset"
+#define BOOT_VOLUME_DISK_IDENTIFIER		"disk identifier"
+
+// boot methods
+enum {
+	BOOT_METHOD_HARD_DISK	= 0,
+	BOOT_METHOD_CD			= 1,
+	BOOT_METHOD_NET			= 2,
+
+	BOOT_METHOD_DEFAULT		= BOOT_METHOD_HARD_DISK
+};
 
 typedef struct kernel_args {
 	uint32		kernel_args_size;
@@ -41,14 +58,7 @@ typedef struct kernel_args {
 	uint32		num_cpus;
 	addr_range	cpu_kstack[MAX_BOOT_CPUS];
 
-	struct {
-		disk_identifier identifier;
-		off_t	partition_offset;
-		bool	user_selected;
-		bool	booted_from_image;
-		bool	booted_from_network;
-		bool	cd;
-	} boot_disk;
+	KMessage	boot_volume;
 
 	struct driver_settings_file *driver_settings;
 

@@ -11,6 +11,8 @@
 
 #include <KernelExport.h>
 
+#include <boot/platform.h>
+
 #include "network.h"
 #include "pxe_undi.h"
 
@@ -49,18 +51,110 @@ hex_dump(const void *_data, int length)
 #endif	// !TRACE_NETWORK
 
 
-UNDI::UNDI()
- :	fMACAddress()
- ,	fRxFinished(true)
- ,	fPxeData(NULL)
-{
-	TRACE("UNDI::UNDI\n");
+// #pragma mark - PXEService
 
+
+PXEService::PXEService()
+	: fPxeData(NULL),
+	  fClientIP(0),
+	  fServerIP(0),
+	  fRootPath(NULL)
+{
+}
+
+
+PXEService::~PXEService()
+{
+	free(fRootPath);
+}
+
+
+status_t
+PXEService::Init()
+{
+	// get !PXE struct
 	fPxeData = pxe_undi_find_data();
-	if (!fPxeData)
+	if (!fPxeData) {
 		panic("can't find !PXE structure");
+		return B_ERROR;
+	}
 
 	dprintf("PXE API entrypoint at %04x:%04x\n", fPxeData->EntryPointSP.seg, fPxeData->EntryPointSP.ofs);
+
+	// get cached info
+	PXENV_GET_CACHED_INFO cached_info;
+	cached_info.PacketType = PXENV_PACKET_TYPE_CACHED_REPLY;
+	cached_info.BufferSize = 0;
+	cached_info.BufferLimit = 0;
+	cached_info.Buffer.seg = 0;
+	cached_info.Buffer.ofs = 0;
+	uint16 res = call_pxe_bios(fPxeData, GET_CACHED_INFO, &cached_info);
+	if (res != 0 || cached_info.Status != 0) {
+		char s[100];
+		snprintf(s, sizeof(s), "Can't determine IP address! PXENV_GET_CACHED_INFO res %x, status %x\n", res, cached_info.Status);
+		panic(s);
+		return B_ERROR;
+	}
+
+	char *buf = (char *)(cached_info.Buffer.seg * 16 + cached_info.Buffer.ofs);
+	fClientIP = ntohl(*(ip_addr_t *)(buf + 16));
+	fServerIP = ntohl(*(ip_addr_t *)(buf + 20));
+	fMACAddress = mac_addr_t((uint8*)(buf + 28));
+
+	uint8* options = (uint8*)buf + 236;
+	int optionsLen = int(cached_info.BufferSize) - 236;
+
+	// check magic
+	if (optionsLen < 4 || options[0] != 0x63 || options[1] != 0x82
+		|| options[2] != 0x53 || options[3] != 0x63) {
+		return B_OK;
+	}
+	options += 4;
+	optionsLen -= 4;
+
+	// parse DHCP options
+	while (optionsLen > 0) {
+		int option = *(options++);
+		optionsLen--;
+
+		// check end or pad option
+		if (option == 0xff || optionsLen < 0)
+			break;
+		if (option == 0x00)
+			continue;
+
+		// other options have a len field
+		int len = *(options++);
+		optionsLen--;
+		if (len > optionsLen)
+			break;
+
+		// root path option
+		if (option == 17) {
+			dprintf("root path option: \"%.*s\"\n", len, (char*)options);
+			free(fRootPath);
+			fRootPath = (char*)malloc(len + 1);
+			if (!fRootPath)
+				return B_NO_MEMORY;
+			memcpy(fRootPath, options, len);
+			fRootPath[len] = '\0';
+		}
+
+		options += len;
+		optionsLen -= len;
+	}
+
+	return B_OK;
+}
+
+
+// #pragma mark - UNDI
+
+
+UNDI::UNDI()
+ :	fRxFinished(true)
+{
+	TRACE("UNDI::UNDI\n");
 }
 
 
@@ -75,33 +169,20 @@ UNDI::Init()
 {
 	TRACE("UNDI::Init\n");
 	
-	PXENV_GET_CACHED_INFO cached_info;
 	PXENV_UNDI_GET_INFORMATION get_info;
 	PXENV_UNDI_GET_STATE get_state;
 	PXENV_UNDI_OPEN undi_open;
 	uint16 res;
 
-	cached_info.PacketType = PXENV_PACKET_TYPE_CACHED_REPLY;
-	cached_info.BufferSize = 0;
-	cached_info.BufferLimit = 0;
-	cached_info.Buffer.seg = 0;
-	cached_info.Buffer.ofs = 0;
-	res = call_pxe_bios(fPxeData, GET_CACHED_INFO, &cached_info);
-	if (res != 0 || cached_info.Status != 0) {
-		char s[100];
-		snprintf(s, sizeof(s), "Can't determine IP address! PXENV_GET_CACHED_INFO res %x, status %x\n", res, cached_info.Status);
-		panic(s);
-	}
+	status_t error = PXEService::Init();
+	if (error != B_OK)
+		return error;
 	
-	char *buf = (char *)(cached_info.Buffer.seg * 16 + cached_info.Buffer.ofs);
-	ip_addr_t ipClient = ntohl(*(ip_addr_t *)(buf + 16));
-	ip_addr_t ipServer = ntohl(*(ip_addr_t *)(buf + 20));
-
 	dprintf("client-ip: %lu.%lu.%lu.%lu, server-ip: %lu.%lu.%lu.%lu\n", 
-		(ipClient >> 24) & 0xff, (ipClient >> 16) & 0xff, (ipClient >> 8) & 0xff, ipClient & 0xff,
-		(ipServer >> 24) & 0xff, (ipServer >> 16) & 0xff, (ipServer >> 8) & 0xff, ipServer & 0xff);
+		(fClientIP >> 24) & 0xff, (fClientIP >> 16) & 0xff, (fClientIP >> 8) & 0xff, fClientIP & 0xff,
+		(fServerIP >> 24) & 0xff, (fServerIP >> 16) & 0xff, (fServerIP >> 8) & 0xff, fServerIP & 0xff);
 
-	SetIPAddress(ipClient);
+	SetIPAddress(fClientIP);
 
 	undi_open.OpenFlag = 0;
 	undi_open.PktFilter = FLTR_DIRECTED | FLTR_BRDCST | FLTR_PRMSCS;
@@ -295,6 +376,159 @@ UNDI::Receive(void *buffer, size_t size)
 			return -1;
 	}
 }
+
+
+// #pragma mark - TFTP
+
+TFTP::TFTP()
+{
+}
+
+
+TFTP::~TFTP()
+{
+}
+
+
+status_t
+TFTP::Init()
+{
+	status_t error = PXEService::Init();
+	if (error != B_OK)
+		return error;
+
+
+
+	return B_OK;
+}
+
+
+uint16
+TFTP::ServerPort() const
+{
+	return 69;
+}
+
+
+status_t
+TFTP::ReceiveFile(const char* fileName, uint8** data, size_t* size)
+{
+	// get file size
+	pxenv_tftp_get_fsize getFileSize;
+	getFileSize.server_ip.num = htonl(fServerIP);
+	getFileSize.gateway_ip.num = 0;
+	strlcpy(getFileSize.file_name, fileName, sizeof(getFileSize.file_name));
+
+	uint16 res = call_pxe_bios(fPxeData, TFTP_GET_FILE_SIZE, &getFileSize);
+	if (res != 0 || getFileSize.status != 0) {
+		dprintf("TFTP_GET_FILE_SIZE failed, res %x, status %x\n", res,
+			getFileSize.status);
+
+		return B_ERROR;
+	}
+
+	uint32 fileSize = getFileSize.file_size;
+	dprintf("size of boot archive \"%s\": %lu\n", fileName, fileSize);
+
+	// allocate memory for the data
+	uint8* fileData = NULL;
+	if (platform_allocate_region((void**)&fileData, fileSize,
+			B_READ_AREA | B_WRITE_AREA, false) != B_OK) {
+		TRACE(("TFTP: allocating memory for file data failed\n"));
+		return B_NO_MEMORY;
+	}
+
+	// open TFTP connection
+	pxenv_tftp_open openConnection;
+	openConnection.server_ip.num = htonl(fServerIP);
+	openConnection.gateway_ip.num = 0;
+	strlcpy(openConnection.file_name, fileName, sizeof(getFileSize.file_name));
+	openConnection.port = htons(ServerPort());
+	openConnection.packet_size = 1456;
+
+	res = call_pxe_bios(fPxeData, TFTP_OPEN, &openConnection);
+	if (res != 0 || openConnection.status != 0) {
+		dprintf("TFTP_OPEN failed, res %x, status %x\n", res,
+			openConnection.status);
+
+		platform_free_region(fileData, fileSize);
+		return B_ERROR;
+	}
+
+	uint16 packetSize = openConnection.packet_size;
+	dprintf("successfully opened TFTP connection, packet size %u\n",
+		packetSize);
+
+	// check, if the file is too big for the TFTP protocol
+	if (fileSize > 0xffff * (uint32)packetSize) {
+		dprintf("TFTP: File is too big to be transferred via TFTP\n");
+		_Close();
+		platform_free_region(fileData, fileSize);
+		return B_ERROR;
+	}
+
+	// transfer the file
+	status_t error = B_OK;
+	uint32 remainingBytes = fileSize;
+	uint8* buffer = fileData;
+	while (remainingBytes > 0) {
+		void* scratchBuffer = (void*)0x07C00;
+		pxenv_tftp_read readPacket;
+		readPacket.buffer.seg = SEG(scratchBuffer);
+		readPacket.buffer.ofs = OFS(scratchBuffer);
+
+		res = call_pxe_bios(fPxeData, TFTP_READ, &readPacket);
+		if (res != 0 || readPacket.status != 0) {
+			dprintf("TFTP_READ failed, res %x, status %x\n", res,
+				readPacket.status);
+			error = B_ERROR;
+			break;
+		}
+
+		uint32 bytesRead = readPacket.buffer_size;
+		if (bytesRead > remainingBytes) {
+			dprintf("TFTP: Read more bytes than should be remaining!");
+			error = B_ERROR;
+			break;
+		}
+
+		memcpy(buffer, scratchBuffer, bytesRead);
+		buffer += bytesRead;
+		remainingBytes -= bytesRead;
+	}
+
+	// close TFTP connection
+	_Close();
+
+	if (error == B_OK) {
+		dprintf("TFTP: Successfully received file\n");
+		*data = fileData;
+		*size = fileSize;
+	} else {
+		platform_free_region(fileData, fileSize);
+	}
+
+	return error;
+}
+
+status_t
+TFTP::_Close()
+{
+	// close TFTP connection
+	pxenv_tftp_close closeConnection;
+	uint16 res = call_pxe_bios(fPxeData, TFTP_CLOSE, &closeConnection);
+	if (res != 0 || closeConnection.status != 0) {
+		dprintf("TFTP_CLOSE failed, res %x, status %x\n", res,
+			closeConnection.status);
+		return B_ERROR;
+	}
+
+	return B_OK;
+}
+
+
+
+// #pragma mark -
 
 
 status_t

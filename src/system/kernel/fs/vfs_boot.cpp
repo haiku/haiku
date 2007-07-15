@@ -1,4 +1,5 @@
 /*
+ * Copyright 2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
  * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -6,6 +7,9 @@
  * Distributed under the terms of the NewOS License.
  */
 
+#include "vfs_boot.h"
+
+#include <stdio.h>
 
 #include <OS.h>
 #include <fs_info.h>
@@ -20,9 +24,10 @@
 #include <KPath.h>
 #include <syscalls.h>
 #include <boot/kernel_args.h>
+#include <util/KMessage.h>
 #include <util/Stack.h>
 
-#include <stdio.h>
+#include "vfs_net_boot.h"
 
 
 //#define TRACE_VFS
@@ -53,8 +58,7 @@ dev_t gBootDevice = -1;
 
 /**	No image was chosen - prefer disks with names like "Haiku", or "System"
  */
-
-static int
+int
 compare_image_boot(const void *_a, const void *_b)
 {
 	KPartition *a = *(KPartition **)_a;
@@ -89,7 +93,6 @@ compare_image_boot(const void *_a, const void *_b)
  *	is no CD, fall back to the standard mechanism (as implemented by
  *	compare_image_boot().
  */
-
 static int
 compare_cd_boot(const void *_a, const void *_b)
 {
@@ -113,7 +116,6 @@ compare_cd_boot(const void *_a, const void *_b)
  *	Note, this must use the same method as the one used in
  *	boot/platform/bios_ia32/devices.cpp (or similar solutions).
  */
-
 static uint32
 compute_check_sum(KDiskDevice *device, off_t offset)
 {
@@ -136,19 +138,59 @@ compute_check_sum(KDiskDevice *device, off_t offset)
 }
 
 
-/**	Checks if the device matches the boot device as specified by the
- *	boot loader.
- */
+// #pragma mark - BootMethod
 
-static bool
-is_boot_device(kernel_args *args, KDiskDevice *device, bool strict)
+
+BootMethod::BootMethod(const KMessage& bootVolume, int32 method)
+	: fBootVolume(bootVolume),
+		fMethod(method)
 {
-	disk_identifier &disk = args->boot_disk.identifier;
+}
 
-	TRACE(("boot device: bus %ld, device %ld\n", disk.bus_type,
-		disk.device_type));
 
-	switch (disk.bus_type) {
+BootMethod::~BootMethod()
+{
+}
+
+
+status_t
+BootMethod::Init()
+{
+	return B_OK;
+}
+
+
+// #pragma mark - DiskBootMethod
+
+
+class DiskBootMethod : public BootMethod {
+public:
+	DiskBootMethod(const KMessage& bootVolume, int32 method)
+		: BootMethod(bootVolume, method)
+	{
+	}
+
+	virtual bool IsBootDevice(KDiskDevice* device, bool strict);
+	virtual bool IsBootPartition(KPartition* partition, bool& foundForSure);
+	virtual void SortPartitions(KPartition** partitions, int32 count);
+};
+
+
+bool
+DiskBootMethod::IsBootDevice(KDiskDevice* device, bool strict)
+{
+	disk_identifier *disk;
+	int32 diskIdentifierSize;
+	if (fBootVolume.FindData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE,
+			(const void**)&disk, &diskIdentifierSize) != B_OK) {
+		dprintf("DiskBootMethod::IsBootDevice(): no disk identifier!\n");
+		return false;
+	}
+
+	TRACE(("boot device: bus %ld, device %ld\n", disk->bus_type,
+		disk->device_type));
+
+	switch (disk->bus_type) {
 		case PCI_BUS:
 		case LEGACY_BUS:
 			// TODO: implement this! (and then enable this feature in the boot loader)
@@ -160,21 +202,23 @@ is_boot_device(kernel_args *args, KDiskDevice *device, bool strict)
 			break;
 	}
 
-	switch (disk.device_type) {
+	switch (disk->device_type) {
 		case UNKNOWN_DEVICE:
 			// test if the size of the device matches
 			// (the BIOS might have given us the wrong value here, though)
-			if (strict && device->Size() != disk.device.unknown.size)
+			if (strict && device->Size() != disk->device.unknown.size)
 				return false;
 
 			// check if the check sums match, too
 			for (int32 i = 0; i < NUM_DISK_CHECK_SUMS; i++) {
-				if (disk.device.unknown.check_sums[i].offset == -1)
+				if (disk->device.unknown.check_sums[i].offset == -1)
 					continue;
 
-				if (compute_check_sum(device, disk.device.unknown.check_sums[i].offset)
-						!= disk.device.unknown.check_sums[i].sum)
+				if (compute_check_sum(device,
+						disk->device.unknown.check_sums[i].offset)
+							!= disk->device.unknown.check_sums[i].sum) {
 					return false;
+				}
 			}
 			break;
 
@@ -184,7 +228,6 @@ is_boot_device(kernel_args *args, KDiskDevice *device, bool strict)
 		case USB_DEVICE:
 		case FIREWIRE_DEVICE:
 		case FIBRE_DEVICE:
-		case NETWORK_DEVICE:
 			// TODO: implement me!
 			break;
 	}
@@ -193,63 +236,162 @@ is_boot_device(kernel_args *args, KDiskDevice *device, bool strict)
 }
 
 
+bool
+DiskBootMethod::IsBootPartition(KPartition* partition, bool& foundForSure)
+{
+	if (!fBootVolume.GetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, false)) {
+		// the simple case: we can just boot from the selected boot
+		// device
+		if (partition->Offset() == fBootVolume.GetBool(
+				BOOT_VOLUME_PARTITION_OFFSET, 0)) {
+			foundForSure = true;
+			return true;
+		}
+	} else {
+		// for now, we will just collect all BFS volumes
+		if (fMethod == BOOT_METHOD_CD
+			&& fBootVolume.GetBool(BOOT_VOLUME_USER_SELECTED, false)
+			&& partition->Type() != NULL
+			&& strcmp(partition->Type(), kPartitionTypeDataSession)) {
+			return false;
+		}
+
+		if (partition->ContentType() != NULL
+			&& !strcmp(partition->ContentType(), "Be File System")) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+void
+DiskBootMethod::SortPartitions(KPartition** partitions, int32 count)
+{
+	qsort(partitions, count, sizeof(KPartition *),
+		fMethod == BOOT_METHOD_CD ? compare_cd_boot : compare_image_boot);
+}
+
+
+// #pragma mark -
+
+
 /**	Make the boot partition (and probably others) available. 
  *	The partitions that are a boot candidate a put into the /a partitions
  *	stack. If the user selected a boot device, there is will only be one
  *	entry in this stack; if not, the most likely is put up first.
  *	The boot code should then just try them one by one.
  */
-
 static status_t
 get_boot_partitions(kernel_args *args, PartitionStack &partitions)
 {
+	const KMessage& bootVolume = args->boot_volume;
+
+	dprintf("get_boot_partitions(): boot volume message:\n");
+	KMessageField field;
+	while (bootVolume.GetNextField(&field) == B_OK) {
+		type_code type = field.TypeCode();
+		uint32 bigEndianType = B_HOST_TO_BENDIAN_INT32(type);
+		dprintf("field: \"%s\", type: %.4s (0x%lx):\n", field.Name(),
+			(char*)&bigEndianType, type);
+
+		if (field.CountElements() == 0)
+			dprintf("\n");
+
+		int32 size;
+		for (int i = 0; const void* data = field.ElementAt(i, &size); i++) {
+			dprintf("  [%2d] ", i);
+			bool isIntType = false;
+			int64 intData = 0;
+			switch (type) {
+				case B_BOOL_TYPE:
+					dprintf("%s\n", (*(bool*)data ? "true" : "false"));
+					break;
+				case B_INT8_TYPE:
+					isIntType = true;
+					intData = *(int8*)data;
+					break;
+				case B_INT16_TYPE:
+					isIntType = true;
+					intData = *(int16*)data;
+					break;
+				case B_INT32_TYPE:
+					isIntType = true;
+					intData = *(int32*)data;
+					break;
+				case B_INT64_TYPE:
+					isIntType = true;
+					intData = *(int64*)data;
+					break;
+				case B_STRING_TYPE:
+					dprintf("\"%s\"\n", (char*)data);
+					break;
+				default:
+					dprintf("data: \"%p\", %ld bytes\n", (char*)data, size);
+					break;
+			}
+			if (isIntType)
+				dprintf("%lld (0x%llx)\n", intData, intData);
+		}
+	}
+
+
+	// create boot method
+	int32 bootMethodType = bootVolume.GetInt32(BOOT_METHOD,
+		BOOT_METHOD_DEFAULT);
+dprintf("get_boot_partitions(): boot method type: %ld\n", bootMethodType);
+	BootMethod* bootMethod = NULL;
+	switch (bootMethodType) {
+		case BOOT_METHOD_NET:
+			bootMethod = new(nothrow) NetBootMethod(bootVolume, bootMethodType);
+			break;
+
+		case BOOT_METHOD_HARD_DISK:
+		case BOOT_METHOD_CD:
+		default:
+			bootMethod = new(nothrow) DiskBootMethod(bootVolume,
+				bootMethodType);
+			break;
+	}
+
+	status_t status = bootMethod->Init();
+	if (status != B_OK)
+		return status;
+
 	KDiskDeviceManager::CreateDefault();
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 
-	status_t status = manager->InitialDeviceScan();
+	status = manager->InitialDeviceScan();
 	if (status != B_OK) {
 		dprintf("KDiskDeviceManager::InitialDeviceScan() failed: %s\n", strerror(status));
 		return status;
 	}
 
-	if (args->boot_disk.booted_from_network) {
-		panic("get_boot_partitions: boot from network, server %08lx, client %08lx\n",
-			args->boot_disk.identifier.device.network.server_ip,
-			args->boot_disk.identifier.device.network.client_ip);
-	}
-
 	struct BootPartitionVisitor : KPartitionVisitor {
-		BootPartitionVisitor(kernel_args &args, PartitionStack &stack)
-			: fArgs(args), fPartitions(stack) {}
+		BootPartitionVisitor(BootMethod* bootMethod, PartitionStack &stack)
+			: fPartitions(stack),
+			  fBootMethod(bootMethod)
+		{
+		}
 
 		virtual bool VisitPre(KPartition *partition)
 		{
 			if (!partition->ContainsFileSystem())
 				return false;
 
-			if (!fArgs.boot_disk.booted_from_image) {
-				// the simple case: we can just boot from the selected boot device
-				if (partition->Offset() == fArgs.boot_disk.partition_offset) {
-					fPartitions.Push(partition);
-					return true;
-				}
-			} else {
-				// for now, we will just collect all BFS volumes
-				if (fArgs.boot_disk.cd && fArgs.boot_disk.user_selected
-					&& partition->Type() != NULL
-					&& strcmp(partition->Type(), kPartitionTypeDataSession))
-					return false;
+			bool foundForSure = false;
+			if (fBootMethod->IsBootPartition(partition, foundForSure))
+				fPartitions.Push(partition);
 
-				if (partition->ContentType() != NULL
-					&& !strcmp(partition->ContentType(), "Be File System"))
-					fPartitions.Push(partition);
-			}
-			return false;
+			// if found for sure, we can terminate the search
+			return foundForSure;
 		}
+
 		private:
-			kernel_args		&fArgs;
 			PartitionStack	&fPartitions;
-	} visitor(*args, partitions);
+			BootMethod*		fBootMethod;
+	} visitor(bootMethod, partitions);
 
 	bool strict = true;
 
@@ -257,7 +399,7 @@ get_boot_partitions(kernel_args *args, PartitionStack &partitions)
 		KDiskDevice *device;
 		int32 cookie = 0;
 		while ((device = manager->NextDevice(&cookie)) != NULL) {
-			if (!is_boot_device(args, device, strict))
+			if (!bootMethod->IsBootDevice(device, strict))
 				continue;
 
 			if (device->VisitEachDescendant(&visitor) != NULL)
@@ -271,11 +413,10 @@ get_boot_partitions(kernel_args *args, PartitionStack &partitions)
 		strict = false;
 	}
 
-	if (!args->boot_disk.user_selected) {
-		// sort partition list (ie. when booting from CD, CDs should come first in the list)
-		qsort(partitions.Array(), partitions.CountItems(), sizeof(KPartition *),
-			args->boot_disk.cd ? compare_cd_boot : compare_image_boot);
-	}
+	// sort partition list (e.g.. when booting from CD, CDs should come first in
+	// the list)
+	if (!args->boot_volume.GetBool(BOOT_VOLUME_USER_SELECTED, false))
+		bootMethod->SortPartitions(partitions.Array(), partitions.CountItems());
 
 	return B_OK;
 }

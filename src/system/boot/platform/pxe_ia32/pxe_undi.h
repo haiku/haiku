@@ -14,6 +14,11 @@ extern "C" uint16 call_pxe_bios(void *pxe, uint16 opcode, void *param);
 #define UNDI_ISR				0x0014
 #define UNDI_GET_STATE			0x0015
 
+#define	TFTP_OPEN				0x0020
+#define	TFTP_CLOSE				0x0021
+#define	TFTP_READ				0x0022
+#define	TFTP_GET_FILE_SIZE		0x0025
+
 #define GET_CACHED_INFO			0x0071
 
 #define SEG(ptr)	((uint16)(((uint32)(ptr)) >> 4))
@@ -182,6 +187,41 @@ struct PXENV_UNDI_ISR
 #define PXENV_UNDI_ISR_OUT_TRANSMIT  2
 #define PXENV_UNDI_ISR_OUT_RECEIVE   3
 #define PXENV_UNDI_ISR_OUT_BUSY      4
+
+
+typedef union {
+	uint32	num;
+	uint8	array[4];
+} pxenv_ip4;
+
+struct pxenv_tftp_open {
+	uint16		status;
+	pxenv_ip4	server_ip;
+	pxenv_ip4	gateway_ip;
+	char		file_name[128];
+	uint16		port;
+	uint16		packet_size;
+} __attribute__((packed));
+
+struct pxenv_tftp_close {
+	uint16		status;
+} __attribute__((packed));
+
+struct pxenv_tftp_read {
+	uint16		status;
+	uint16		packet_number;
+	uint16		buffer_size;
+	SEGOFF16	buffer;
+} __attribute__((packed));
+
+struct pxenv_tftp_get_fsize {
+	uint16		status;
+	pxenv_ip4	server_ip;
+	pxenv_ip4	gateway_ip;
+	char		file_name[128];
+	uint32		file_size;
+} __attribute__((packed));
+
 
 PXE_STRUCT * pxe_undi_find_data();
 

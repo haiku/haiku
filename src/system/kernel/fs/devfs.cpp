@@ -25,6 +25,7 @@
 #include <lock.h>
 #include <vm.h>
 #include <arch/cpu.h>
+#include <boot/kernel_args.h>
 
 #include <devfs.h>
 
@@ -181,9 +182,12 @@ load_driver(driver_entry *driver)
 	status_t status;
 
 	// load the module
-	image_id image = load_kernel_add_on(driver->path);
-	if (image < B_OK)
-		return image;
+	image_id image = driver->image;
+	if (image < 0) {
+		image = load_kernel_add_on(driver->path);
+		if (image < 0)
+			return image;
+	}
 
 	// for prettier debug output
 	const char *name = strrchr(driver->path, '/');
@@ -292,10 +296,68 @@ error2:
 	}
 
 error1:
-	unload_kernel_add_on(image);
-	driver->image = status;
+	if (driver->image < 0) {
+		unload_kernel_add_on(image);
+		driver->image = status;
+	}
 
 	return status;
+}
+
+
+static  status_t
+add_driver(const char *path, image_id image)
+{
+	// see if we already know this driver
+
+	struct stat stat;
+	if (image >= 0) {
+		// TODO: Unfortunately only the node ID is the key for the hash table.
+		// The image ID should be a small number and hopefully the boot FS
+		// doesn't use small negative values -- if it is inode based, we should
+		// be relatively safe.
+		stat.st_dev = -1;
+		stat.st_ino = -image;
+	} else {
+		if (::stat(path, &stat) != 0)
+			return errno;
+	}
+
+	RecursiveLocker locker(&sDeviceFileSystem->lock);
+
+	driver_entry *driver = (driver_entry *)hash_lookup(
+		sDeviceFileSystem->driver_hash, &stat.st_ino);
+	if (driver != NULL) {
+		// we know this driver
+		// ToDo: test for changes here? Although node monitoring should be enough.
+		if (driver->image < B_OK)
+			return driver->image;
+
+		return B_OK;
+	}
+
+	// we don't know this driver, create a new entry for it
+
+	driver = (driver_entry *)malloc(sizeof(driver_entry));
+	if (driver == NULL)
+		return B_NO_MEMORY;
+
+	driver->path = strdup(path);
+	if (driver->path == NULL) {
+		free(driver);
+		return B_NO_MEMORY;
+	}
+
+	driver->device = stat.st_dev;
+	driver->node = stat.st_ino;
+	driver->image = image;
+	driver->last_modified = stat.st_mtime;
+
+	hash_insert(sDeviceFileSystem->driver_hash, driver);
+
+	// Even if loading the driver fails - its entry will stay with us
+	// so that we don't have to go through it again
+	return load_driver(driver);
 }
 
 
@@ -900,11 +962,13 @@ publish_device(struct devfs *fs, const char *path, device_node_info *deviceNode,
 	// all went fine, let's initialize the node
 	node->stream.type = S_IFCHR | 0644;
 
-	if (deviceNode != NULL)
-		node->stream.u.dev.info = info;
-	else
-		node->stream.u.dev.info = create_new_driver_info(ops, apiVersion);
+	if (deviceNode == NULL) {
+		info = create_new_driver_info(ops, apiVersion);
+		if (!info)
+			return B_NO_MEMORY;
+	}
 
+	node->stream.u.dev.info = info;
 	node->stream.u.dev.node = deviceNode;
 	node->stream.u.dev.driver = driver;
 	node->stream.u.dev.ops = ops;
@@ -1804,7 +1868,8 @@ devfs_can_page(fs_volume _fs, fs_vnode _vnode, fs_cookie cookie)
 		|| cookie == NULL)
 		return false;
 
-	return vnode->stream.u.dev.info->read_pages != NULL;
+	return vnode->stream.u.dev.info->read_pages != NULL
+		|| vnode->stream.u.dev.info->read != NULL;
 }
 
 
@@ -1818,7 +1883,8 @@ devfs_read_pages(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 	//TRACE(("devfs_read_pages: vnode %p, vecs %p, count = %lu, pos = %Ld, size = %lu\n", vnode, vecs, count, pos, *_numBytes));
 
 	if (!S_ISCHR(vnode->stream.type)
-		|| vnode->stream.u.dev.info->read_pages == NULL
+		|| (vnode->stream.u.dev.info->read_pages == NULL
+			&& vnode->stream.u.dev.info->read == NULL)
 		|| cookie == NULL)
 		return B_NOT_ALLOWED;
 
@@ -1827,8 +1893,37 @@ devfs_read_pages(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 			*_numBytes);
 	}
 
-	return vnode->stream.u.dev.info->read_pages(cookie->device_cookie, pos,
-		vecs, count, _numBytes);
+	if (vnode->stream.u.dev.info->read_pages) {
+		return vnode->stream.u.dev.info->read_pages(cookie->device_cookie, pos,
+			vecs, count, _numBytes);
+	}
+
+	// emulate read_pages() using read()
+
+	status_t error = B_OK;
+	size_t bytesTransferred = 0;
+
+	size_t remainingBytes = *_numBytes;
+	for (size_t i = 0; i < count && remainingBytes > 0; i++) {
+		size_t toRead = min_c(vecs[i].iov_len, remainingBytes);
+		size_t length = toRead;
+
+		error = vnode->stream.u.dev.info->read(cookie->device_cookie, pos,
+			vecs[i].iov_base, &length);
+		if (error != B_OK)
+			break;
+
+		pos += length;
+		bytesTransferred += length;
+		remainingBytes -= length;
+
+		if (length < toRead)
+			break;
+	}
+
+	*_numBytes = bytesTransferred;
+
+	return (bytesTransferred > 0 ? B_OK : error);
 }
 
 
@@ -2196,49 +2291,33 @@ driver_module_info gDeviceForDriversModule = {
 //	#pragma mark - kernel private API
 
 
+extern "C" void
+devfs_add_preloaded_drivers(kernel_args* args)
+{
+	struct preloaded_image* image;
+	for (image = args->preloaded_images; image != NULL; image = image->next) {
+		if (!image->is_module && image->id >= 0) {
+			// fake an absolute path
+			char path[B_PATH_NAME_LENGTH];
+			strlcpy(path, "/boot/beos/system/add-ons/kernel/", sizeof(path));
+			strlcat(path, image->name, sizeof(path));
+
+			// try to add the driver
+			status_t error = add_driver(path, image->id);
+			if (error != B_OK) {
+				dprintf("devfs_add_preloaded_drivers: Failed to add \"%s\"\n",
+					image->name);
+				unload_kernel_add_on(image->id);
+			}
+		}
+	}
+}
+
+
 extern "C" status_t
 devfs_add_driver(const char *path)
 {
-	// see if we already know this driver
-
-	struct stat stat;
-	if (::stat(path, &stat) != 0)
-		return errno;
-
-	RecursiveLocker locker(&sDeviceFileSystem->lock);
-
-	driver_entry *driver = (driver_entry *)hash_lookup(
-		sDeviceFileSystem->driver_hash, &stat.st_ino);
-	if (driver != NULL) {
-		// we know this driver
-		// ToDo: test for changes here? Although node monitoring should be enough.
-		if (driver->image < B_OK)
-			return driver->image;
-
-		return B_OK;
-	}
-
-	// we don't know this driver, create a new entry for it
-
-	driver = (driver_entry *)malloc(sizeof(driver_entry));
-	if (driver == NULL)
-		return B_NO_MEMORY;
-
-	driver->path = strdup(path);
-	if (driver->path == NULL) {
-		free(driver);
-		return B_NO_MEMORY;
-	}
-
-	driver->device = stat.st_dev;
-	driver->node = stat.st_ino;
-	driver->last_modified = stat.st_mtime;
-
-	hash_insert(sDeviceFileSystem->driver_hash, driver);
-
-	// Even if loading the driver fails - its entry will stay with us
-	// so that we don't have to go through it again
-	return load_driver(driver);
+	return add_driver(path, -1);
 }
 
 
