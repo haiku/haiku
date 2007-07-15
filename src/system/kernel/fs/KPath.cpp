@@ -202,6 +202,24 @@ KPath::ReplaceLeaf(const char *newLeaf)
 }
 
 
+bool
+KPath::RemoveLeaf()
+{
+	// get the leaf -- bail out, if not initialized or only the "/" is left
+	const char *leaf = Leaf();
+	if (!leaf || leaf == fBuffer)
+		return false;
+
+	// chop off the leaf
+	int32 leafIndex = leaf - fBuffer;
+	fBuffer[leafIndex] = '\0';
+	fPathLength = leafIndex;
+	_ChopTrailingSlashes();
+
+	return true;
+}
+
+
 status_t
 KPath::Append(const char *component, bool isComponent)
 {

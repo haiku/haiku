@@ -35,6 +35,8 @@ class KPath {
 
 		const char *Leaf() const;
 		status_t ReplaceLeaf(const char *newLeaf);
+		bool RemoveLeaf();
+			// returns false, if nothing could be removed anymore
 
 		status_t Append(const char *toAppend, bool isComponent = true);
 
