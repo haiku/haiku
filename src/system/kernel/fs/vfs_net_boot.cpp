@@ -48,10 +48,10 @@ compare_partitions_net_devices(const void *_a, const void *_b)
 	KPartition* a = *(KPartition**)_a;
 	KPartition* b = *(KPartition**)_b;
 
-	bool aIsCD = is_net_device(a->Device());
-	bool bIsCD = is_net_device(b->Device());
+	bool aIsNetDevice = is_net_device(a->Device());
+	bool bIsNetDevice = is_net_device(b->Device());
 
-	int compare = (int)aIsCD - (int)bIsCD;
+	int compare = (int)aIsNetDevice - (int)bIsNetDevice;
 	if (compare != 0)
 		return compare;
 

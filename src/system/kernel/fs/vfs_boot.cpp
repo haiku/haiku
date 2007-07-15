@@ -1,23 +1,15 @@
 /*
  * Copyright 2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
 
+
 #include "vfs_boot.h"
-
-#include <stdio.h>
-
-#include <OS.h>
-#include <fs_info.h>
-
-#include <disk_device_manager/KDiskDevice.h>
-#include <disk_device_manager/KDiskDeviceManager.h>
-#include <disk_device_manager/KPartitionVisitor.h>
-#include <DiskDeviceTypes.h>
+#include "vfs_net_boot.h"
 
 #include <vfs.h>
 #include <file_cache.h>
@@ -27,7 +19,15 @@
 #include <util/KMessage.h>
 #include <util/Stack.h>
 
-#include "vfs_net_boot.h"
+#include <disk_device_manager/KDiskDevice.h>
+#include <disk_device_manager/KDiskDeviceManager.h>
+#include <disk_device_manager/KPartitionVisitor.h>
+#include <DiskDeviceTypes.h>
+
+#include <OS.h>
+#include <fs_info.h>
+
+#include <stdio.h>
 
 
 //#define TRACE_VFS
@@ -56,7 +56,7 @@ static struct {
 dev_t gBootDevice = -1;
 
 
-/**	No image was chosen - prefer disks with names like "Haiku", or "System"
+/*!	No image was chosen - prefer disks with names like "Haiku", or "System"
  */
 int
 compare_image_boot(const void *_a, const void *_b)
@@ -89,10 +89,10 @@ compare_image_boot(const void *_a, const void *_b)
 }
 
 
-/**	The system was booted from CD - prefer CDs over other entries. If there
- *	is no CD, fall back to the standard mechanism (as implemented by
- *	compare_image_boot().
- */
+/*!	The system was booted from CD - prefer CDs over other entries. If there
+	is no CD, fall back to the standard mechanism (as implemented by
+	compare_image_boot().
+*/
 static int
 compare_cd_boot(const void *_a, const void *_b)
 {
@@ -110,12 +110,12 @@ compare_cd_boot(const void *_a, const void *_b)
 }
 
 
-/**	Computes a check sum for the specified block.
- *	The check sum is the sum of all data in that block interpreted as an
- *	array of uint32 values.
- *	Note, this must use the same method as the one used in
- *	boot/platform/bios_ia32/devices.cpp (or similar solutions).
- */
+/*!	Computes a check sum for the specified block.
+	The check sum is the sum of all data in that block interpreted as an
+	array of uint32 values.
+	Note, this must use the same method as the one used in
+	boot/platform/bios_ia32/devices.cpp (or similar solutions).
+*/
 static uint32
 compute_check_sum(KDiskDevice *device, off_t offset)
 {
@@ -142,8 +142,9 @@ compute_check_sum(KDiskDevice *device, off_t offset)
 
 
 BootMethod::BootMethod(const KMessage& bootVolume, int32 method)
-	: fBootVolume(bootVolume),
-		fMethod(method)
+	:
+	fBootVolume(bootVolume),
+	fMethod(method)
 {
 }
 
@@ -277,12 +278,12 @@ DiskBootMethod::SortPartitions(KPartition** partitions, int32 count)
 // #pragma mark -
 
 
-/**	Make the boot partition (and probably others) available. 
- *	The partitions that are a boot candidate a put into the /a partitions
- *	stack. If the user selected a boot device, there is will only be one
- *	entry in this stack; if not, the most likely is put up first.
- *	The boot code should then just try them one by one.
- */
+/*!	Make the boot partition (and probably others) available. 
+	The partitions that are a boot candidate a put into the /a partitions
+	stack. If the user selected a boot device, there is will only be one
+	entry in this stack; if not, the most likely is put up first.
+	The boot code should then just try them one by one.
+*/
 static status_t
 get_boot_partitions(kernel_args *args, PartitionStack &partitions)
 {
@@ -355,7 +356,7 @@ dprintf("get_boot_partitions(): boot method type: %ld\n", bootMethodType);
 			break;
 	}
 
-	status_t status = bootMethod->Init();
+	status_t status = bootMethod != NULL ? bootMethod->Init() : B_NO_MEMORY;
 	if (status != B_OK)
 		return status;
 
@@ -364,7 +365,8 @@ dprintf("get_boot_partitions(): boot method type: %ld\n", bootMethodType);
 
 	status = manager->InitialDeviceScan();
 	if (status != B_OK) {
-		dprintf("KDiskDeviceManager::InitialDeviceScan() failed: %s\n", strerror(status));
+		dprintf("KDiskDeviceManager::InitialDeviceScan() failed: %s\n",
+			strerror(status));
 		return status;
 	}
 
