@@ -895,8 +895,10 @@ get_loaded_modules(struct list *modules, const char *bus, const char *device)
 
 		driver_module_info *info;
 		if (get_module(name, (module_info **)&info) == B_OK) {
-			if (info->get_supported_paths == NULL)
+			if (info->get_supported_paths == NULL) {
+				put_module(name);
 				continue;
+			}
 
 			const char **busses, **devices;
 			info->get_supported_paths(&busses, &devices);
