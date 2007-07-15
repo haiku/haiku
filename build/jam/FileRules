@@ -253,3 +253,23 @@ actions CopySetHaikuRevision1
 	$(2[2]) $(1) ${revision}
 }
 
+rule DataFileToSourceFile sourceFile : dataFile : dataVariable : sizeVariable
+{
+	sourceFile = [ FGristFiles $(sourceFile) ] ;
+	MakeLocateCommonPlatform $(sourceFile) ;
+
+	sizeVariable ?= $(dataVariable)Size ;
+
+	DATA_VARIABLE on $(sourceFile) = $(dataVariable) ;
+	SIZE_VARIABLE on $(sourceFile) = $(sizeVariable) ;
+
+	Depends $(sourceFile) : <build>data_to_source $(dataFile) ;
+	DataFileToSourceFile1 $(sourceFile) : <build>data_to_source $(dataFile) ;
+	LocalClean clean : $(sourceFile) ;
+}
+
+actions DataFileToSourceFile1
+{
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(2[1]) $(DATA_VARIABLE) $(SIZE_VARIABLE) $(2[2]) $(1)
+}
