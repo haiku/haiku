@@ -815,7 +815,7 @@ UdpEndpoint::Open()
 {
 	TRACE_EP("Open()");
 
-	BenaphoreLocker _(fLock);
+	AutoLocker _(fLock);
 
 	status_t status = ProtocolSocket::Open();
 	if (status < B_OK)
