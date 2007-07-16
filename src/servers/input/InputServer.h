@@ -171,6 +171,7 @@ class InputServer : public BApplication {
 
 		status_t _LoadKeymap();
 		status_t _LoadSystemKeymap();
+		status_t _SaveKeymap();
 		void _InitKeyboardMouseStates();
 
 		status_t _StartEventLoop();

@@ -322,6 +322,13 @@ InputServer::_LoadSystemKeymap()
 	memcpy(fChars, kSystemKeyChars, fCharsSize);
 
 	// TODO: why are we doing this?
+	return _SaveKeymap();
+}
+
+
+status_t
+InputServer::_SaveKeymap()
+{
 	// we save this keymap to file
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
@@ -585,6 +592,10 @@ InputServer::MessageReceived(BMessage* message)
 			fMouseSettings.SaveSettings();
 			return;
 
+		case IS_SAVE_KEYMAP:
+			_SaveKeymap();
+			return;
+
 		case B_SOME_APP_LAUNCHED:
 		{
 			const char *signature;
@@ -738,6 +749,8 @@ InputServer::HandleSetModifierKey(BMessage* message, BMessage* reply)
 
 		// TODO: unmap the key ?
 
+		be_app_messenger.SendMessage(IS_SAVE_KEYMAP);
+
 		BMessage msg(IS_CONTROL_DEVICES);
 		msg.AddInt32("type", B_KEYBOARD_DEVICE);
 		msg.AddInt32("code", B_KEY_MAP_CHANGED);
@@ -752,6 +765,8 @@ status_t
 InputServer::HandleSetKeyboardLocks(BMessage* message, BMessage* reply)
 {
 	if (message->FindInt32("locks", (int32*)&fKeys.lock_settings) == B_OK) {
+		be_app_messenger.SendMessage(IS_SAVE_KEYMAP);
+		
 		BMessage msg(IS_CONTROL_DEVICES);
 		msg.AddInt32("type", B_KEYBOARD_DEVICE);
 		msg.AddInt32("code", B_KEY_LOCKS_CHANGED);

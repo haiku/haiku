@@ -40,6 +40,7 @@
 #define SYSTEM_SHUTTING_DOWN			'SSDn'
 
 #define IS_SAVE_SETTINGS			'Isst'
+#define IS_SAVE_KEYMAP				'Iskp'
 
 // app_server communication
 #define IS_ACQUIRE_INPUT				'Iaqi'
