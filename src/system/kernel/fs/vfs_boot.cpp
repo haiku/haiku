@@ -243,7 +243,7 @@ DiskBootMethod::IsBootPartition(KPartition* partition, bool& foundForSure)
 	if (!fBootVolume.GetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, false)) {
 		// the simple case: we can just boot from the selected boot
 		// device
-		if (partition->Offset() == fBootVolume.GetBool(
+		if (partition->Offset() == fBootVolume.GetInt64(
 				BOOT_VOLUME_PARTITION_OFFSET, 0)) {
 			foundForSure = true;
 			return true;
