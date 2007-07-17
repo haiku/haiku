@@ -47,12 +47,10 @@ extern int mbcstable[];		/* ESC $ */
 #define NPARAM 10		// Max parameters
 
 
-TermParse::TermParse(int fd, TermWindow *inWinObj, TermView *inViewObj,
-		CodeConv *inConvObj)
+TermParse::TermParse(int fd, TermView *inViewObj, CodeConv *inConvObj)
 	:
 	fFd(fd),
 	fViewObj(inViewObj),
-	fWinObj(inWinObj),
 	fConvObj(inConvObj),
 	fParseThread(-1),
 	fParseSem(-1),
@@ -807,7 +805,7 @@ TermParse::EscParse()
 						switch (mode_char) {
 							case '0':
 							case '2':
-								fWinObj->SetTitle(string);
+								fViewObj->Window()->SetTitle(string);
 								break;
 							case '1':
 								break;

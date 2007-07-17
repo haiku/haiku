@@ -11,7 +11,7 @@
 
 #include "CodeConv.h"
 #include "PrefHandler.h"
-#include "spawn.h"
+//#include "spawn.h"
 #include "TermBuffer.h"
 #include "TermWindow.h"
 #include "TermConst.h"
@@ -25,11 +25,10 @@
 #include <String.h>
 #include <TextView.h>
 
-#include <signal.h>
+//#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/wait.h>
-#include <unistd.h>
+
 
 
 // Globals
@@ -119,14 +118,8 @@ TermApp::ReadyToRun()
 void
 TermApp::Quit()
 {
-	if (!sUsageRequested){
-		int status;
-
-		kill(-gShPid, SIGHUP);
-		wait(&status);
-
+	if (!sUsageRequested)
 		_UnregisterTerminal();
-	}
 
 	BApplication::Quit();
 }

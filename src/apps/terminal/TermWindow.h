@@ -45,7 +45,7 @@ class TermParse;
 class CodeConv;
 class PrefWindow;
 class FindWindow;
-
+class Shell;
 
 class TermWindow : public BWindow {
 	public:
@@ -74,7 +74,7 @@ class TermWindow : public BWindow {
   /*
    * data member
    */
-  int		fPfd;
+  Shell		*fShell;
   TermParse	*fTermParse;
   BMenuBar	*fMenubar;
   BMenu		*fFilemenu, *fEditmenu, *fEncodingmenu, *fHelpmenu, *fFontMenu, *fWindowSizeMenu, *fNewFontMenu; 

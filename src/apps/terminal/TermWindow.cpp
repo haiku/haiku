@@ -56,7 +56,7 @@ extern PrefHandler *gTermPref;
 
 TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	: BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE|B_QUIT_ON_WINDOW_CLOSE),
-	fPfd(-1),
+	fShell(NULL),
 	fTermParse(NULL),
 	fMenubar(NULL),
 	fFilemenu(NULL),
@@ -96,9 +96,10 @@ TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 
 	// Get encoding name (setenv TTYPE in spawn_shell functions)
 	const char *encoding = longname2shortname(gTermPref->getString(PREF_TEXT_ENCODING));
-	fPfd = spawn_shell(rows, cols, command, encoding);	
-	if (fPfd < 0)
-		throw fPfd;
+	fShell = new Shell();	
+	status_t status = fShell->Open(rows, cols, command, encoding);	
+	if (status < 0)
+		throw status;
 
 	InitWindow();
 }
@@ -106,7 +107,9 @@ TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 
 TermWindow::~TermWindow()
 {
-	close(fPfd);
+	fTermView->DetachShell();
+
+	delete fShell;
 	delete fTermParse;
 	delete fCodeConv;
 	if (fPrefWindow) 
@@ -159,7 +162,9 @@ TermWindow::InitWindow()
 	textframe.top = fMenubar->Bounds().bottom + 1.0;
 
 	fCodeConv = new CodeConv();
-	fTermView = new TermView(Bounds(), fCodeConv, fPfd);
+	fTermView = new TermView(Bounds(), fCodeConv);
+
+	fTermView->AttachShell(fShell);
 
 	/*
 	 * MuTerm has two views. BaseView is window base view.
@@ -214,7 +219,7 @@ TermWindow::InitWindow()
 
 	// Initialize TermParse
 	SetEncoding(longname2id(gTermPref->getString(PREF_TEXT_ENCODING)));
-	fTermParse = new TermParse(fPfd, this, fTermView, fCodeConv);
+	fTermParse = new TermParse(fShell->FD(), fTermView, fCodeConv);
 	if (fTermParse->StartThreads() < B_OK)
 		return;
 
@@ -463,7 +468,7 @@ TermWindow::MessageReceived(BMessage *message)
 			}
 			else if (!strcmp("tty", spe.FindString("property", i))) {
 				BMessage reply(B_REPLY);
-				reply.AddString("result", ttyname(fPfd));
+				reply.AddString("result", fShell->TTYName());
 				message->SendReply(&reply);
 			} else {
 				BWindow::MessageReceived(message);

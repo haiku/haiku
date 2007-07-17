@@ -39,14 +39,13 @@
 
 class TermView;
 class CodeConv;
-class TermWindow;
  
 //PtyReader buffer size.
 #define READ_BUF_SIZE 2048
 
 class TermParse : public BHandler {
 public:
-	TermParse(int fd, TermWindow *inWinObj, TermView *inViewObj, CodeConv *inConvObj);
+	TermParse(int fd, TermView *inViewObj, CodeConv *inConvObj);
 	~TermParse();
 
 	status_t StartThreads();
@@ -72,7 +71,6 @@ private:
 	int fFd;
 
 	TermView *fViewObj;
-	TermWindow *fWinObj;
 	CodeConv *fConvObj;
   
 	thread_id fParseThread;

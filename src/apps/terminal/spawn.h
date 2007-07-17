@@ -80,14 +80,30 @@
 #define	APC	0x9F
 #define	RDEL	0xFF
 
-/*
- *  Prototype:
- */
 
-int spawn_shell (int, int, const char *, const char *);
-void Setenv (const char *, const char *);
+class Shell {
+public:
+			Shell();
+			~Shell();
 
-extern pid_t gShPid;	/* shell process ID */
+	status_t	Open(int row, int col, const char *command, const char *coding);
+	void		Close();
+	
+	const char *	TTYName() const;
 
+	ssize_t		Read(void *buffer, size_t numBytes);
+	ssize_t		Write(const void *buffer, size_t numBytes);
+
+	void		UpdateWindowSize(int row, int columns);
+	void		Signal(int signal);
+
+	status_t	GetAttr(struct termios &attr);
+	status_t	SetAttr(struct termios &attr);
+
+	int		FD() const;	
+	
+private:
+	int fFd;	
+};
 
 #endif /* SPAWN_H */

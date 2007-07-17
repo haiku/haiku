@@ -44,7 +44,6 @@
 #define CUROFF 0
 #define CURON  1
 
-#define VIEW_THR_CODE 'vtcd'
 #define MOUSE_THR_CODE 'mtcd'
 #define RECT_BUF_SIZE 32
 
@@ -95,11 +94,15 @@ class CodeConv;
 class BPopUpMenu;
 class BScrollBar;
 class BString;
+class Shell;
 
 class TermView : public BView {
 	public:
-		TermView(BRect frame, CodeConv *inCodeConv, int fd);
+		TermView(BRect frame, CodeConv *inCodeConv);
 		~TermView();
+
+		status_t AttachShell(Shell *shell);
+		void	DetachShell();
 
 		void	SetTermFont(const BFont *halfFont, const BFont *fullFont);
 		void	GetFontSize(int *width, int *height);
@@ -225,7 +228,7 @@ class TermView : public BView {
 		bool	CheckSelectedRegion(const CurPos &pos);
 		inline void Redraw(int, int, int, int);
 
-		int fTerminalFd;
+		Shell *fShell;
 
 		// Font and Width
 		BFont fHalfFont;

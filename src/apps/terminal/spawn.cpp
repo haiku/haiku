@@ -30,20 +30,21 @@
  */
 
 #include <dirent.h>
-#include <sys/param.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <signal.h>
 #include <string.h>
+#include <stdlib.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <signal.h>
-#include <errno.h>
-#include <termios.h>
-#include <fcntl.h>
+#include <sys/param.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
+#include <termios.h>
 #include <time.h>
-#include <kernel/OS.h>
+#include <unistd.h>
+
+#include <OS.h>
 
 #include "TermConst.h"
 #include "spawn.h"
@@ -53,18 +54,20 @@ extern PrefHandler *gTermPref;
 
 /* default shell command and options. */
 #define SHELL_COMMAND "/bin/sh -login"
-extern char **environ;
 
-const char *kSpawnAlertMessage = "alert --stop " "'Cannot execute \"%s\":\n"
+
+const static char *kSpawnAlertMessage = "alert --stop " "'Cannot execute \"%s\":\n"
 	"\t%s\n'"
 	"'Use Default Shell' 'Abort'";
 
 /*
- * Set environment varriable.
+ * Set environment variable.
  */
-
 #if !defined(__HAIKU__) || defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
-int
+
+extern char **environ;
+
+static int
 setenv(const char *var, const char *value, bool overwrite)
 {
 	int envindex = 0;
@@ -110,9 +113,9 @@ typedef struct
 #define PTY_NG	1	/* pty open or set termios NG */
 #define PTY_WS	2	/* pty need WINSIZE (row and col ) */
 
-/* global variables */
 
-pid_t gShPid;
+
+static pid_t sShPid;
 
 
 static status_t
@@ -130,7 +133,7 @@ receive_handshake_message(handshake_t& handshake)
 }
 
 
-int
+static int
 spawn_shell(int row, int col, const char *command, const char *coding)
 {
 	signal(SIGTTOU, SIG_IGN);
@@ -180,7 +183,7 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 	thread_id terminalThread = find_thread(NULL);
 
 	/* Fork a child process. */
-	if ((gShPid = fork()) < 0) {
+	if ((sShPid = fork()) < 0) {
 		close(master);
 		return -1;
 	}
@@ -188,7 +191,7 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 
 	handshake_t handshake;
 
-	if (gShPid == 0) {
+	if (sShPid == 0) {
 	    // Now in child process.
 
 		/*
@@ -443,11 +446,124 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 				handshake.row = row;
 				handshake.col = col;
 				handshake.status = PTY_WS;
-				send_handshake_message(gShPid, handshake);
+				send_handshake_message(sShPid, handshake);
 				break;
 		}
 	}
   
 	return (done > 0) ? master : -1;
+}
+
+
+static void
+close_shell(int fd)
+{
+	if (fd < 0)
+		return;
+
+	close(fd);
+	
+	int status;
+	kill(-sShPid, SIGHUP);
+	wait(&status);	
+}
+
+
+Shell::Shell()
+	:fFd(-1)
+{
+}
+
+
+Shell::~Shell()
+{
+	Close();
+}
+
+
+status_t
+Shell::Open(int row, int col, const char *command, const char *coding)
+{
+	fFd = spawn_shell(row, col, command, coding);
+	if (fFd < 0)
+		return fFd;
+
+	return B_OK;
+}
+
+
+void
+Shell::Close()
+{
+	if (fFd >= 0) {
+		close_shell(fFd);
+		fFd = -1;	
+	}
+}
+
+
+const char *
+Shell::TTYName() const
+{
+	return ttyname(fFd);
+}
+
+
+ssize_t
+Shell::Read(void *buffer, size_t numBytes)
+{
+	if (fFd < 0)
+		return B_NO_INIT;
+	
+	return read(fFd, buffer, numBytes);
+}
+
+
+ssize_t
+Shell::Write(const void *buffer, size_t numBytes)
+{
+	if (fFd < 0)
+		return B_NO_INIT;
+	
+	return write(fFd, buffer, numBytes);
+}
+
+
+void
+Shell::UpdateWindowSize(int rows, int columns)
+{
+	struct winsize winSize;
+	winSize.ws_row = rows;
+	winSize.ws_col = columns;
+	ioctl(fFd, TIOCSWINSZ, &winSize);
+	Signal(SIGWINCH);
+}
+
+
+void
+Shell::Signal(int signal)
+{
+	kill(-sShPid, signal);
+}
+
+
+status_t
+Shell::GetAttr(struct termios &attr)
+{
+	return tcgetattr(fFd, &attr);
+}
+
+
+status_t
+Shell::SetAttr(struct termios &attr)
+{
+	return tcsetattr(fFd, TCSANOW, &attr);
+}
+
+
+int
+Shell::FD() const
+{
+	return fFd;
 }
 
