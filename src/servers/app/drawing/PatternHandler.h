@@ -1,33 +1,15 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		PatternHandler.h
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//					Stephan Aßmus <superstippi@gmx.de>
-//	Description:	Class for easy calculation and use of patterns
-//  
-//------------------------------------------------------------------------------
+/*
+ * Copyright (c) 2001-2007, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Author:	DarkWyrm <bpmagic@columbus.rr.com>
+ *			Stephan Aßmus <superstippi@gmx.de>
+ */
+
 #ifndef PATTERNHANDLER_H
 #define PATTERNHANDLER_H
 
+#include <stdio.h>
 #include <string.h>
 #include <GraphicsDefs.h>
 #include "RGBColor.h"
@@ -146,10 +128,16 @@ class PatternHandler {
 									{ return (const pattern*)fPattern.GetInt8(); }
 			const Pattern&		GetPattern(void) const
 									{ return fPattern; }
+
+			void				SetOffsets(int32 x, int32 y);
+
  private:
 			Pattern				fPattern;
 			RGBColor			fHighColor;
 			RGBColor			fLowColor;
+
+			uint16				fXOffset;
+			uint16				fYOffset;
 };
 
 /*!
@@ -181,16 +169,16 @@ PatternHandler::R5ColorAt(int x, int y) const
 	\param pt Coordinates to get the value for
 	\return Value for the coordinates - true if high, false if low.
 */
+
 inline	bool
 PatternHandler::IsHighColor(int x, int y) const
 {
-	// TODO: Does this work correctly for
-	// negative coordinates?!?
+	x -= fXOffset;
+	y -= fYOffset;
 	const int8* ptr = fPattern.GetInt8();
-	int32 value = ptr[y % 8] & (1 << (7 - (x % 8)) );
+	int32 value = ptr[y & 7] & (1 << (7 - (x & 7)) );
 	
-	return (value == 0) ? false : true;
-	
+	return value != 0;
 }
 
 #endif
