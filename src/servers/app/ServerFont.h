@@ -113,7 +113,8 @@ class ServerFont {
 									{ return fStyle->CharMapCount(); }
 
 
-			FT_Face				GetTransformedFace(bool rotate, bool shear) const;
+			FT_Face				GetTransformedFace(bool rotate,
+									bool shear) const;
 			void				PutTransformedFace(FT_Face face) const;
 
 			status_t			GetGlyphShapes(const char charArray[],
@@ -122,8 +123,8 @@ class ServerFont {
 			status_t			GetHasGlyphs(const char charArray[], 
 									int32 numChars, bool hasArray[]) const;
 			
-			status_t			GetEdges(const char charArray[], 
-									int32 numChars, edge_info edgeArray[]) const;
+			status_t			GetEdges(const char charArray[], int32 numChars,
+									edge_info edgeArray[]) const;
 
 			status_t			GetEscapements(const char charArray[],
 									int32 numChars, escapement_delta delta,
@@ -136,7 +137,8 @@ class ServerFont {
 
 			status_t			GetBoundingBoxesAsString(const char charArray[],
 									int32 numChars, BRect rectArray[],
-									bool stringEscapement, font_metric_mode mode,
+									bool stringEscapement,
+									font_metric_mode mode,
 									escapement_delta delta);
 
 			status_t			GetBoundingBoxesForStrings(char *charArray[],
@@ -144,7 +146,8 @@ class ServerFont {
 									BRect rectArray[], font_metric_mode mode,
 									escapement_delta deltaArray[]);
 
-			float				StringWidth(const char *string, int32 numChars) const;
+			float				StringWidth(const char *string,
+									int32 numChars) const;
 
 			bool				Lock() const { return fStyle->Lock(); }
 			void				Unlock() const { fStyle->Unlock(); }
