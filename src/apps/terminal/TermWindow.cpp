@@ -40,7 +40,7 @@
 #include "TermView.h"
 #include "TermWindow.h"
 #include "TermConst.h"
-#include "spawn.h"
+#include "Shell.h"
 
 
 // Global Preference Handler

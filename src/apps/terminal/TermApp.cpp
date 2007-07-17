@@ -11,7 +11,6 @@
 
 #include "CodeConv.h"
 #include "PrefHandler.h"
-//#include "spawn.h"
 #include "TermBuffer.h"
 #include "TermWindow.h"
 #include "TermConst.h"
@@ -25,7 +24,6 @@
 #include <String.h>
 #include <TextView.h>
 
-//#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 

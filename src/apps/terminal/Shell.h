@@ -29,8 +29,8 @@
  *
  */
 
-#ifndef SPAWN_H
-#define SPAWN_H
+#ifndef _SHELL_H
+#define _SHELL_H
 
 #define MAXPTTYS 16 * 4
 
@@ -106,4 +106,4 @@ private:
 	int fFd;	
 };
 
-#endif /* SPAWN_H */
+#endif // _SHELL_H

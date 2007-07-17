@@ -22,7 +22,7 @@
 #include "PrefHandler.h"
 #include "MenuUtil.h"
 #include "PrefView.h"
-#include "spawn.h"
+#include "Shell.h"
 
 #include <Autolock.h>
 #include <Beep.h>

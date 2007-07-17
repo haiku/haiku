@@ -11,7 +11,7 @@
 #include "PrefHandler.h"
 #include "PrefWindow.h"
 #include "PrefView.h"
-#include "spawn.h"
+#include "Shell.h"
 #include "TermConst.h"
 
 #include <Alert.h>

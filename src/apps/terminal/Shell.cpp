@@ -47,7 +47,7 @@
 #include <OS.h>
 
 #include "TermConst.h"
-#include "spawn.h"
+#include "Shell.h"
 #include "PrefHandler.h"
 
 extern PrefHandler *gTermPref;
