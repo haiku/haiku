@@ -64,6 +64,9 @@ static const pref_defaults kTermDefaults[] = {
 };
 
 
+PrefHandler *PrefHandler::sPrefHandler = NULL;
+
+
 PrefHandler::PrefHandler()
 	:
 	fContainer('Pref')
@@ -87,6 +90,34 @@ PrefHandler::PrefHandler(const PrefHandler* p)
 
 PrefHandler::~PrefHandler()
 {
+}
+
+
+/* static */
+PrefHandler *
+PrefHandler::Default()
+{
+	if (sPrefHandler == NULL)
+		sPrefHandler = new PrefHandler();
+	return sPrefHandler;
+}
+
+
+/* static */
+void
+PrefHandler::DeleteDefault()
+{
+	delete sPrefHandler;
+	sPrefHandler = NULL;
+}
+
+
+/* static */
+void
+PrefHandler::SetDefault(PrefHandler *prefHandler)
+{
+	DeleteDefault();
+	sPrefHandler = prefHandler;
 }
 
 

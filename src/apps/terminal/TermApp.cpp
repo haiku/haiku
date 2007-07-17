@@ -28,10 +28,6 @@
 #include <stdlib.h>
 
 
-
-// Globals
-PrefHandler *gTermPref;
-
 static bool sUsageRequested = false;
 static bool sGeometryRequested = false;
 
@@ -77,14 +73,11 @@ TermApp::TermApp()
 	int l = (j * 16)  + 50;
 
 	fTermFrame.Set(k, l, k + 50, k + 50);
-
-	gTermPref = new PrefHandler();
 }
 
 
 TermApp::~TermApp()
 {
-	delete gTermPref;
 }
 
 
@@ -198,7 +191,7 @@ TermApp::ArgvReceived(int32 argc, char **argv)
 
 	// Load preference file
 	if (argmatch(argv, argc, "-p", "--preference", 4, &value, &skip_args))
-		gTermPref->Open(value);
+		PrefHandler::Default()->Open(value);
 
 	// Set window title
 	if (argmatch(argv ,argc, "-t", "--title", 3, &value, &skip_args))
@@ -216,8 +209,8 @@ TermApp::ArgvReceived(int32 argc, char **argv)
 			sUsageRequested = true;
 			PostMessage(B_QUIT_REQUESTED);
 		}
-		gTermPref->setInt32(PREF_COLS, width);
-		gTermPref->setInt32(PREF_ROWS, height);
+		PrefHandler::Default()->setInt32(PREF_COLS, width);
+		PrefHandler::Default()->setInt32(PREF_ROWS, height);
 
 		fTermFrame.Set(xpos, ypos, xpos + 50, ypos + 50);
 		sGeometryRequested = true;
@@ -268,7 +261,7 @@ TermApp::RefsReceived(BMessage* message)
 	
 		BEntry ent(&ref);
 		BPath path(&ent);
-		gTermPref->OpenText(path.Path());
+		PrefHandler::Default()->OpenText(path.Path());
 		return;
 	}
 
@@ -288,7 +281,7 @@ TermApp::_MakeTermWindow(BRect &frame)
 	if (fCommandLine.Length() > 0)
 		command = fCommandLine.String();
 	else
-		command = gTermPref->getString(PREF_SHELL);
+		command = PrefHandler::Default()->getString(PREF_SHELL);
 
 	try {
 		fTermWindow = new TermWindow(frame, fWindowTitle.String(), command);

@@ -19,8 +19,6 @@
 #include "PrefHandler.h"
 #include "Coding.h"
 
-extern PrefHandler *gTermPref;
-
 //#define LOCALE_FILE_DIR PREF_FOLDER"menu/"
 
 BPopUpMenu *
@@ -68,7 +66,7 @@ LoadLocaleFile(PrefHandler *pref)
 	char name[B_PATH_NAME_LENGTH];
 	const char *locale;
 	
-	locale = gTermPref->getString(PREF_GUI_LANGUAGE);
+	locale = PrefHandler::Default()->getString(PREF_GUI_LANGUAGE);
 	// TODO: this effectively disables any locale support - which is okay for now
 	sprintf(name, "%s%s", /*LOCALE_FILE_DIR*/"", locale);
 

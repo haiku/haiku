@@ -32,8 +32,6 @@
 #define TERMWIN_H
 
 
-#include "PrefHandler.h"
-
 #include <Menu.h>
 #include <Window.h>
 #include <MessageRunner.h>

@@ -24,14 +24,11 @@
 #include <stdio.h>
 
 
-extern PrefHandler *gTermPref;
-	// Global Preference Handler
-
 PrefWindow::PrefWindow(BMessenger messenger)
 	: BWindow(_CenteredRect(BRect(0, 0, 350, 215)), "Terminal Settings",
 		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_NOT_RESIZABLE|B_NOT_ZOOMABLE),
-	fPrefTemp(new PrefHandler(gTermPref)),
+	fPrefTemp(new PrefHandler(PrefHandler::Default())),
 	fSavePanel(NULL),
 	fDirty(false),
 	fPrefDlgMessenger(messenger)
@@ -140,7 +137,7 @@ PrefWindow::_SaveRequested(BMessage *msg)
 	BDirectory dir(&dirref);
 	BPath path(&dir, filename);
 
-	gTermPref->SaveAsText(path.Path(), PREFFILE_MIMETYPE, TERM_SIGNATURE);
+	PrefHandler::Default()->SaveAsText(path.Path(), PREFFILE_MIMETYPE, TERM_SIGNATURE);
 }
 
 
@@ -148,11 +145,11 @@ void
 PrefWindow::_Save()
 {
 	delete fPrefTemp;
-	fPrefTemp = new PrefHandler(gTermPref);
+	fPrefTemp = new PrefHandler(PrefHandler::Default());
 
 	BPath path;
 	if (PrefHandler::GetDefaultPath(path) == B_OK) {
-		gTermPref->SaveAsText(path.Path(), PREFFILE_MIMETYPE);
+		PrefHandler::Default()->SaveAsText(path.Path(), PREFFILE_MIMETYPE);
 		fDirty = false;
 	}
 }
@@ -161,8 +158,7 @@ PrefWindow::_Save()
 void
 PrefWindow::_Revert()
 {
-	delete gTermPref;
-	gTermPref = new PrefHandler(fPrefTemp);
+	PrefHandler::SetDefault(new PrefHandler(fPrefTemp));
 
 	fPrefDlgMessenger.SendMessage(MSG_HALF_FONT_CHANGED);
 	fPrefDlgMessenger.SendMessage(MSG_COLOR_CHANGED);

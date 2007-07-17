@@ -43,8 +43,6 @@
 #include "Shell.h"
 
 
-// Global Preference Handler
-extern PrefHandler *gTermPref;
 //
 // help and GPL URL
 //
@@ -82,20 +80,20 @@ TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	fMatchCase(false),
 	fMatchWord(false)
 {
-	int rows = gTermPref->getInt32(PREF_ROWS);
+	int rows = PrefHandler::Default()->getInt32(PREF_ROWS);
 	if (rows < 1) {
 		rows = 1;
-		gTermPref->setInt32(PREF_ROWS, rows);
+		PrefHandler::Default()->setInt32(PREF_ROWS, rows);
 	}
 
-	int cols = gTermPref->getInt32(PREF_COLS);
+	int cols = PrefHandler::Default()->getInt32(PREF_COLS);
 	if (cols < MIN_COLS) {
 		cols = MIN_COLS;
-		gTermPref->setInt32(PREF_COLS, cols);
+		PrefHandler::Default()->setInt32(PREF_COLS, cols);
 	}
 
 	// Get encoding name (setenv TTYPE in spawn_shell functions)
-	const char *encoding = longname2shortname(gTermPref->getString(PREF_TEXT_ENCODING));
+	const char *encoding = longname2shortname(PrefHandler::Default()->getString(PREF_TEXT_ENCODING));
 	fShell = new Shell();	
 	status_t status = fShell->Open(rows, cols, command, encoding);	
 	if (status < 0)
@@ -120,6 +118,8 @@ TermWindow::~TermWindow()
 		fFindPanel = NULL;
 	}
 	
+	PrefHandler::DeleteDefault();
+
 	delete fWindowUpdate;
 }
 
@@ -136,21 +136,21 @@ TermWindow::InitWindow()
 
 	// Setup font.
 
-	const char *family = gTermPref->getString(PREF_HALF_FONT_FAMILY);
+	const char *family = PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY);
 
 	BFont halfFont;
 	halfFont.SetFamilyAndStyle(family, NULL);
-	float size = gTermPref->getFloat(PREF_HALF_FONT_SIZE);
+	float size = PrefHandler::Default()->getFloat(PREF_HALF_FONT_SIZE);
 	if (size < 6.0f)
 		size = 6.0f;
 	halfFont.SetSize(size);
 	halfFont.SetSpacing(B_FIXED_SPACING);
 
-	family = gTermPref->getString(PREF_FULL_FONT_FAMILY);
+	family = PrefHandler::Default()->getString(PREF_FULL_FONT_FAMILY);
 
 	BFont fullFont;
 	fullFont.SetFamilyAndStyle(family, NULL);
-	size = gTermPref->getFloat(PREF_FULL_FONT_SIZE);
+	size = PrefHandler::Default()->getFloat(PREF_FULL_FONT_SIZE);
 	if (size < 6.0f)
 		size = 6.0f;
 	fullFont.SetSize(size);
@@ -177,8 +177,8 @@ TermWindow::InitWindow()
 
 	fTermView->SetTermFont(&halfFont, &fullFont);
 	
-	BRect rect = fTermView->SetTermSize(gTermPref->getInt32(PREF_ROWS),
-		gTermPref->getInt32(PREF_COLS), 1);
+	BRect rect = fTermView->SetTermSize(PrefHandler::Default()->getInt32(PREF_ROWS),
+		PrefHandler::Default()->getInt32(PREF_COLS), 1);
 
 	int width, height;
 	fTermView->GetFontSize(&width, &height);
@@ -186,7 +186,7 @@ TermWindow::InitWindow()
 		MIN_COLS * height, MAX_COLS * height);
 
 	fTermView->SetTermColor();
-	fBaseView->SetViewColor(gTermPref->getRGB(PREF_TEXT_BACK_COLOR));
+	fBaseView->SetViewColor(PrefHandler::Default()->getRGB(PREF_TEXT_BACK_COLOR));
 
 	// Add offset to baseview.
 	rect.InsetBy(-VIEW_OFFSET, -VIEW_OFFSET);
@@ -218,7 +218,7 @@ TermWindow::InitWindow()
 	fEditmenu->SetTargetForItems(fTermView);
 
 	// Initialize TermParse
-	SetEncoding(longname2id(gTermPref->getString(PREF_TEXT_ENCODING)));
+	SetEncoding(longname2id(PrefHandler::Default()->getString(PREF_TEXT_ENCODING)));
 	fTermParse = new TermParse(fShell->FD(), fTermView, fCodeConv);
 	if (fTermParse->StartThreads() < B_OK)
 		return;
@@ -310,7 +310,7 @@ TermWindow::SetupMenu(void)
 			//	if (0 ==i) item->SetMarked(true); 
 			}
 		}
-  fNewFontMenu->FindItem (gTermPref->getString(PREF_HALF_FONT_FAMILY))->SetMarked(true);
+  fNewFontMenu->FindItem (PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY))->SetMarked(true);
 */
 
 	fEncodingmenu = new BMenu("Font Encoding");
@@ -479,15 +479,15 @@ TermWindow::MessageReceived(BMessage *message)
 		// Message from Preference panel.
 		case MSG_ROWS_CHANGED:
 		case MSG_COLS_CHANGED: {
-			r = fTermView->SetTermSize (gTermPref->getInt32 (PREF_ROWS),
-										gTermPref->getInt32 (PREF_COLS), 0);
+			r = fTermView->SetTermSize (PrefHandler::Default()->getInt32 (PREF_ROWS),
+										PrefHandler::Default()->getInt32 (PREF_COLS), 0);
 		
 			ResizeTo (r.Width()+ B_V_SCROLL_BAR_WIDTH + VIEW_OFFSET * 2,
 			r.Height()+fMenubar->Bounds().Height() + VIEW_OFFSET *2);
 		
 			BPath path;
 			if (PrefHandler::GetDefaultPath(path) == B_OK)
-				gTermPref->SaveAsText(path.Path(), PREFFILE_MIMETYPE);
+				PrefHandler::Default()->SaveAsText(path.Path(), PREFFILE_MIMETYPE);
 			break;
 		}
 		case MSG_HALF_FONT_CHANGED:
@@ -495,12 +495,12 @@ TermWindow::MessageReceived(BMessage *message)
 		case MSG_HALF_SIZE_CHANGED:
 		case MSG_FULL_SIZE_CHANGED: {
 	
-			halfFont.SetFamilyAndStyle (gTermPref->getString(PREF_HALF_FONT_FAMILY),NULL);
-			halfFont.SetSize (gTermPref->getFloat(PREF_HALF_FONT_SIZE));
+			halfFont.SetFamilyAndStyle (PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY),NULL);
+			halfFont.SetSize (PrefHandler::Default()->getFloat(PREF_HALF_FONT_SIZE));
 			halfFont.SetSpacing (B_FIXED_SPACING);
 			
-			fullFont.SetFamilyAndStyle (gTermPref->getString(PREF_FULL_FONT_FAMILY),NULL);
-			fullFont.SetSize (gTermPref->getFloat(PREF_FULL_FONT_SIZE));
+			fullFont.SetFamilyAndStyle (PrefHandler::Default()->getString(PREF_FULL_FONT_FAMILY),NULL);
+			fullFont.SetSize (PrefHandler::Default()->getFloat(PREF_FULL_FONT_SIZE));
 			fullFont.SetSpacing (B_FIXED_SPACING);
 			
 			fTermView->SetTermFont (&halfFont, &fullFont);
@@ -520,36 +520,36 @@ TermWindow::MessageReceived(BMessage *message)
 		    break;
 		}
 		case EIGHTYTWENTYFOUR: {
-			gTermPref->setString(PREF_COLS, "80");
-			gTermPref->setString(PREF_ROWS, "24");
+			PrefHandler::Default()->setString(PREF_COLS, "80");
+			PrefHandler::Default()->setString(PREF_ROWS, "24");
 		   	this->PostMessage (MSG_ROWS_CHANGED);
 			this->PostMessage (MSG_COLS_CHANGED);
 			break;
 		}
 		case EIGHTYTWENTYFIVE: {
-			gTermPref->setString(PREF_COLS, "80");
-			gTermPref->setString(PREF_ROWS, "25");
+			PrefHandler::Default()->setString(PREF_COLS, "80");
+			PrefHandler::Default()->setString(PREF_ROWS, "25");
 		   	this->PostMessage (MSG_ROWS_CHANGED);
 		   	this->PostMessage (MSG_COLS_CHANGED);
 			break;		
 		}
 		case EIGHTYFORTY: {
-			gTermPref->setString(PREF_COLS, "80");
-			gTermPref->setString(PREF_ROWS, "40");
+			PrefHandler::Default()->setString(PREF_COLS, "80");
+			PrefHandler::Default()->setString(PREF_ROWS, "40");
 		   	this->PostMessage (MSG_ROWS_CHANGED);
 		   	this->PostMessage (MSG_COLS_CHANGED);
 			break;	
 		}
 		case ONETHREETWOTWENTYFOUR: {
-			gTermPref->setString(PREF_COLS, "132");
-			gTermPref->setString(PREF_ROWS, "24");
+			PrefHandler::Default()->setString(PREF_COLS, "132");
+			PrefHandler::Default()->setString(PREF_ROWS, "24");
 		   	this->PostMessage (MSG_ROWS_CHANGED);
 		   	this->PostMessage (MSG_COLS_CHANGED);
 			break;	
 		}
 		case ONETHREETWOTWENTYFIVE: {
-			gTermPref->setString(PREF_COLS, "132");
-			gTermPref->setString(PREF_ROWS, "25");
+			PrefHandler::Default()->setString(PREF_COLS, "132");
+			PrefHandler::Default()->setString(PREF_ROWS, "25");
 		   	this->PostMessage (MSG_ROWS_CHANGED);
 		   	this->PostMessage (MSG_COLS_CHANGED);
 			break;	
@@ -582,12 +582,12 @@ TermWindow::MessageReceived(BMessage *message)
 			break;	
 		}
 		case MSG_FONT_CHANGED: {
-	    		gTermPref->setString (PREF_HALF_FONT_FAMILY, fNewFontMenu->FindMarked()->Label());
+	    		PrefHandler::Default()->setString (PREF_HALF_FONT_FAMILY, fNewFontMenu->FindMarked()->Label());
 	    		PostMessage (MSG_HALF_FONT_CHANGED);
 			break;
 		}
 		case MSG_COLOR_CHANGED: {
-			fBaseView->SetViewColor (gTermPref->getRGB (PREF_TEXT_BACK_COLOR));
+			fBaseView->SetViewColor (PrefHandler::Default()->getRGB (PREF_TEXT_BACK_COLOR));
 			fTermView->SetTermColor ();
 			fBaseView->Invalidate();
 			fTermView->Invalidate();
@@ -596,7 +596,7 @@ TermWindow::MessageReceived(BMessage *message)
 		case SAVE_AS_DEFAULT: {
 			BPath path;
 			if (PrefHandler::GetDefaultPath(path) == B_OK)
-				gTermPref->SaveAsText(path.Path(), PREFFILE_MIMETYPE);
+				PrefHandler::Default()->SaveAsText(path.Path(), PREFFILE_MIMETYPE);
 			break;
 		}
 		case MENU_PAGE_SETUP: {

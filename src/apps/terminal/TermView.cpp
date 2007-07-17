@@ -49,8 +49,6 @@ using std::nothrow;
 extern int function_keycode_table[];
 extern char *function_key_char_table[];
 
-extern PrefHandler *gTermPref; // Global Preference Handler
-
 const static rgb_color kTermColorTable[16] = {
 	{  0,   0,   0, 0},
 	{255,   0,   0, 0},
@@ -83,15 +81,15 @@ TermView::TermView(BRect frame, CodeConv *inCodeConv)
 	fBoldFlag(0),
 	fUnderlineFlag(0),
 	fBufferStartPos(-1),
-	fTermRows(gTermPref->getInt32(PREF_ROWS)),
-	fTermColumns(gTermPref->getInt32(PREF_COLS)),
+	fTermRows(PrefHandler::Default()->getInt32(PREF_ROWS)),
+	fTermColumns(PrefHandler::Default()->getInt32(PREF_COLS)),
 	fTop(0),	
 	fTextBuffer(new (nothrow) TermBuffer(fTermRows, fTermColumns)),
 	fCodeConv(inCodeConv),
 	fScrollBar(NULL),
 	fScrTop(0),
 	fScrBot(fTermRows - 1),
-	fScrBufSize(gTermPref->getInt32(PREF_HISTORY_SIZE)),
+	fScrBufSize(PrefHandler::Default()->getInt32(PREF_HISTORY_SIZE)),
 	fScrRegionSet(0),
 	fMouseTracking(false),
 	fMouseThread(-1),
@@ -108,7 +106,7 @@ TermView::TermView(BRect frame, CodeConv *inCodeConv)
 	SetMouseCursor();	
 
 	SetTermFont(be_plain_font, be_plain_font);	
-	//SetIMAware(gTermPref->getInt32(PREF_IM_AWARE));
+	//SetIMAware(PrefHandler::Default()->getInt32(PREF_IM_AWARE));
 
 	_InitMouseThread();
 }
@@ -179,7 +177,7 @@ TermView::SetTermSize(int rows, int cols, bool resize)
 void
 TermView::SetMouseCursor()
 {
-	if (!strcmp(gTermPref->getString(PREF_MOUSE_IMAGE), "Hand cursor"))
+	if (!strcmp(PrefHandler::Default()->getString(PREF_MOUSE_IMAGE), "Hand cursor"))
 		fMouseImage = false;
 	else
 		fMouseImage = true;
@@ -190,12 +188,12 @@ TermView::SetMouseCursor()
 void
 TermView::SetTermColor()
 {
-	fTextForeColor = gTermPref->getRGB(PREF_TEXT_FORE_COLOR);
-	fTextBackColor = gTermPref->getRGB(PREF_TEXT_BACK_COLOR);
-	fSelectForeColor = gTermPref->getRGB(PREF_SELECT_FORE_COLOR);
-	fSelectBackColor = gTermPref->getRGB(PREF_SELECT_BACK_COLOR);
-	fCursorForeColor = gTermPref->getRGB(PREF_CURSOR_FORE_COLOR);
-	fCursorBackColor = gTermPref->getRGB(PREF_CURSOR_BACK_COLOR);
+	fTextForeColor = PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR);
+	fTextBackColor = PrefHandler::Default()->getRGB(PREF_TEXT_BACK_COLOR);
+	fSelectForeColor = PrefHandler::Default()->getRGB(PREF_SELECT_FORE_COLOR);
+	fSelectBackColor = PrefHandler::Default()->getRGB(PREF_SELECT_BACK_COLOR);
+	fCursorForeColor = PrefHandler::Default()->getRGB(PREF_CURSOR_FORE_COLOR);
+	fCursorBackColor = PrefHandler::Default()->getRGB(PREF_CURSOR_BACK_COLOR);
 
 	SetLowColor(fTextBackColor);
 	SetViewColor(fTextBackColor);
@@ -777,7 +775,7 @@ TermView::MouseTracking(void *data)
 			BRect r;
 			
 			if (theObj->HasSelection()
-				&& ( gTermPref->getInt32(PREF_DRAGN_COPY)
+				&& ( PrefHandler::Default()->getInt32(PREF_DRAGN_COPY)
 						|| modifiers() & B_CONTROL_KEY)) {
 			
 			if (theObj->LockLooper()) {
@@ -1652,7 +1650,7 @@ TermView::MouseDown(BPoint where)
 
 			// If mouse pointer is avove selected Region, start Drag'n Copy.
 			if (inPos > stPos && inPos < edPos) {
-				if (mod & B_CONTROL_KEY || gTermPref->getInt32(PREF_DRAGN_COPY)) {
+				if (mod & B_CONTROL_KEY || PrefHandler::Default()->getInt32(PREF_DRAGN_COPY)) {
 					BPoint p;
 					uint32 bt;
 					do {

@@ -90,9 +90,6 @@ but it font is full width font on preference panel.
 #define ROW(x) (((x) + fRowOffset) % fBufferSize)
 
 
-extern PrefHandler *gTermPref;
-
-
 TermBuffer::TermBuffer(int rows, int cols)
 {
 	if (rows < 1)
@@ -111,7 +108,7 @@ TermBuffer::TermBuffer(int rows, int cols)
 	fSelStart.Set(-1,-1);
 	fSelEnd.Set(-1,-1);
 
-	fBufferSize = gTermPref->getInt32(PREF_HISTORY_SIZE);
+	fBufferSize = PrefHandler::Default()->getInt32(PREF_HISTORY_SIZE);
 	if (fBufferSize < 1000)
 		fBufferSize = 1000;
 

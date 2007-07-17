@@ -27,13 +27,13 @@ AppearancePrefView::AppearancePrefView(BRect frame, const char *name,
 	fAppearancePrefViewMessenger(messenger)
 {
   	const char *color_tbl[] = {
-    	PREF_TEXT_FORE_COLOR,
-    	PREF_TEXT_BACK_COLOR,
-    	PREF_CURSOR_FORE_COLOR,
-    	PREF_CURSOR_BACK_COLOR,
-    	PREF_SELECT_FORE_COLOR,
-    	PREF_SELECT_BACK_COLOR,
-    	NULL
+	    	PREF_TEXT_FORE_COLOR,
+	    	PREF_TEXT_BACK_COLOR,
+	    	PREF_CURSOR_FORE_COLOR,
+	    	PREF_CURSOR_BACK_COLOR,
+	    	PREF_SELECT_FORE_COLOR,
+	    	PREF_SELECT_BACK_COLOR,
+	    	NULL
   	};
 
 	float fontDividerSize = StringWidth("Font:") + 8.0;
@@ -42,13 +42,14 @@ AppearancePrefView::AppearancePrefView(BRect frame, const char *name,
 	BRect r(5, 5, 225, 25);
 
 	BMenu *menu = _MakeFontMenu(MSG_HALF_FONT_CHANGED,
-		gTermPref->getString(PREF_HALF_FONT_FAMILY));
+		PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY));
 	fFont = new BMenuField(r, "font", "Font:", menu, B_WILL_DRAW);
 	fFont->SetDivider(fontDividerSize);
 	AddChild(fFont);
 
 	r.OffsetBy(r.Width() + 10, 0);
-	menu = _MakeSizeMenu(MSG_HALF_SIZE_CHANGED, 12);
+	menu = _MakeSizeMenu(MSG_HALF_SIZE_CHANGED,
+		atoi(PrefHandler::Default()->getString(PREF_HALF_FONT_SIZE)));
 	fFontSize = new BMenuField(r, "size", "Size:", menu, B_WILL_DRAW);
 	fFontSize->SetDivider(sizeDividerSize);
 	AddChild(fFontSize);
@@ -61,7 +62,7 @@ AppearancePrefView::AppearancePrefView(BRect frame, const char *name,
 
   	fColorControl = SetupBColorControl(BPoint(r.left, r.bottom + 10),
   		B_CELLS_32x8, 6, MSG_COLOR_CHANGED);
-  	fColorControl->SetValue(gTermPref->getRGB(PREF_TEXT_FORE_COLOR));
+  	fColorControl->SetValue(PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR));
 }
 
 
@@ -80,10 +81,10 @@ void
 AppearancePrefView::Revert()
 {
 	fColorField->Menu()->ItemAt(0)->SetMarked(true);
-	fColorControl->SetValue(gTermPref->getRGB(PREF_TEXT_FORE_COLOR));
+	fColorControl->SetValue(PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR));
 	
-	fFont->Menu()->FindItem(gTermPref->getString(PREF_HALF_FONT_FAMILY))->SetMarked(true);
-	fFontSize->Menu()->FindItem(gTermPref->getString(PREF_HALF_FONT_FAMILY))->SetMarked(true);
+	fFont->Menu()->FindItem(PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY))->SetMarked(true);
+	fFontSize->Menu()->FindItem(PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY))->SetMarked(true);
 }
 
 
@@ -105,25 +106,25 @@ AppearancePrefView::MessageReceived(BMessage *msg)
 
 	switch (msg->what) { 
 		case MSG_HALF_FONT_CHANGED:
-			gTermPref->setString (PREF_HALF_FONT_FAMILY,
+			PrefHandler::Default()->setString (PREF_HALF_FONT_FAMILY,
 				fFont->Menu()->FindMarked()->Label());
 			modified = true;
 			break;
 
 		case MSG_HALF_SIZE_CHANGED:
-			gTermPref->setString(PREF_HALF_FONT_SIZE,
+			PrefHandler::Default()->setString(PREF_HALF_FONT_SIZE,
 				fFontSize->Menu()->FindMarked()->Label());
 			modified = true;
 			break;
 
 		case MSG_COLOR_CHANGED:
-			gTermPref->setRGB(fColorField->Menu()->FindMarked()->Label(),
+			PrefHandler::Default()->setRGB(fColorField->Menu()->FindMarked()->Label(),
 				fColorControl->ValueAsColor());    
 			modified = true;
 			break;
 
 		case MSG_COLOR_FIELD_CHANGED:
-			fColorControl->SetValue(gTermPref->getRGB(
+			fColorControl->SetValue(PrefHandler::Default()->getRGB(
 				fColorField->Menu()->FindMarked()->Label()));
 			break;
 

@@ -61,6 +61,10 @@ class PrefHandler {
 		PrefHandler();
 		~PrefHandler();
 
+	static	PrefHandler *Default();
+	static	void DeleteDefault();
+	static	void SetDefault(PrefHandler *handler);
+
 		status_t    Open(const char *name);
 		status_t    OpenText(const char *path);
 		status_t    Save(const char *name);
@@ -90,6 +94,8 @@ class PrefHandler {
 		status_t    _LoadFromTextFile(const char * path);
 
 		BMessage    fContainer;
+	
+	static	PrefHandler *sPrefHandler;
 };
 
 #endif	// PREF_HANDLER_H

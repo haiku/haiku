@@ -25,7 +25,7 @@
 #include "TTextControl.h"
 
 
-extern PrefHandler *gTermPref;
+extern PrefHandler *PrefHandler::Default();
 
 
 ShellPrefView::ShellPrefView(BRect frame, const char *name,
@@ -37,26 +37,26 @@ ShellPrefView::ShellPrefView(BRect frame, const char *name,
 	mCols = new TTextControl(BRect(0, 0, 160, 20), "cols", "Columns", "",
 		new BMessage(MSG_COLS_CHANGED));
 	AddChild(mCols);
-	mCols->SetText(gTermPref->getString(PREF_COLS));
+	mCols->SetText(PrefHandler::Default()->getString(PREF_COLS));
 
 	mRows = new TTextControl(BRect(0, 30, 160, 50), "rows", "Rows", "",
 		new BMessage(MSG_ROWS_CHANGED));
 	AddChild(mRows);
-	mRows->SetText(gTermPref->getString(PREF_ROWS));
+	mRows->SetText(PrefHandler::Default()->getString(PREF_ROWS));
 
 	mHistory = new TTextControl(BRect(0, 60, 160, 80), "history", "History", "",
 		new BMessage(MSG_HISTORY_CHANGED));
 	AddChild(mHistory);
-	mHistory->SetText(gTermPref->getString(PREF_HISTORY_SIZE));
+	mHistory->SetText(PrefHandler::Default()->getString(PREF_HISTORY_SIZE));
 }
 
 
 void
 ShellPrefView::Revert()
 {
-	mCols->SetText(gTermPref->getString(PREF_COLS));
-	mRows->SetText(gTermPref->getString(PREF_ROWS));
-	mHistory->SetText(gTermPref->getString(PREF_HISTORY_SIZE));
+	mCols->SetText(PrefHandler::Default()->getString(PREF_COLS));
+	mRows->SetText(PrefHandler::Default()->getString(PREF_ROWS));
+	mHistory->SetText(PrefHandler::Default()->getString(PREF_HISTORY_SIZE));
 }
 
 
@@ -66,17 +66,17 @@ ShellPrefView::SaveIfModified()
 	BMessenger messenger(fTermWindow);
 
 	if (mCols->IsModified()) {
-		gTermPref->setString(PREF_COLS, mCols->Text());
+		PrefHandler::Default()->setString(PREF_COLS, mCols->Text());
 		messenger.SendMessage(MSG_COLS_CHANGED);
 		mCols->ModifiedText(false);
 	}
 	if (mRows->IsModified()) {
-		gTermPref->setString(PREF_ROWS, mRows->Text());
+		PrefHandler::Default()->setString(PREF_ROWS, mRows->Text());
 		messenger.SendMessage(MSG_ROWS_CHANGED);
 		mRows->ModifiedText(false);
 	}
 	//if (mShell->IsModified())
-	//	gTermPref->setString (PREF_SHELL, mShell->Text());
+	//	PrefHandler::Default()->setString (PREF_SHELL, mShell->Text());
 
 	if (mHistory->IsModified()) {
 		int size = atoi(mHistory->Text());
@@ -85,7 +85,7 @@ ShellPrefView::SaveIfModified()
 		if (size > 1048575)
 			mHistory->SetText("1048575");
 
-		gTermPref->setString (PREF_HISTORY_SIZE, mHistory->Text());
+		PrefHandler::Default()->setString (PREF_HISTORY_SIZE, mHistory->Text());
 	}
 }
 
@@ -120,10 +120,10 @@ ShellPrefView::MessageReceived(BMessage *msg)
 		case MSG_COLS_CHANGED:
 			size = atoi (mCols->Text());
 			if (size >= MAX_COLS || size < MIN_COLS) {
-				mCols->SetText (gTermPref->getString (PREF_COLS));
+				mCols->SetText (PrefHandler::Default()->getString (PREF_COLS));
 				beep ();
 			} else {
-				gTermPref->setString (PREF_COLS, mCols->Text());
+				PrefHandler::Default()->setString (PREF_COLS, mCols->Text());
 				modified = true;
 			}
 			break;
@@ -131,16 +131,16 @@ ShellPrefView::MessageReceived(BMessage *msg)
 		case MSG_ROWS_CHANGED:
 			size = atoi (mRows->Text());
 			if (size >= MAX_COLS || size < MIN_COLS) {
-				mRows->SetText(gTermPref->getString(PREF_ROWS));
+				mRows->SetText(PrefHandler::Default()->getString(PREF_ROWS));
 				beep ();
 			} else {
-				gTermPref->setString(PREF_ROWS, mRows->Text());
+				PrefHandler::Default()->setString(PREF_ROWS, mRows->Text());
 				modified = true;
 			}
 			break;
 
 //		case MSG_SHELL_CHANGED:
-//			gTermPref->setString (PREF_SHELL, mShell->Text());
+//			PrefHandler::Default()->setString (PREF_SHELL, mShell->Text());
 //			Window()->PostMessage(MSG_PREF_MODIFIED);
 //			break;
 
@@ -148,10 +148,10 @@ ShellPrefView::MessageReceived(BMessage *msg)
 			size = atoi(mHistory->Text());
 			
 			if (size < 512 || size > 1048575) {
-				mHistory->SetText(gTermPref->getString(PREF_HISTORY_SIZE));
+				mHistory->SetText(PrefHandler::Default()->getString(PREF_HISTORY_SIZE));
 				beep ();
 			} else {
-				gTermPref->setString(PREF_HISTORY_SIZE, mHistory->Text());
+				PrefHandler::Default()->setString(PREF_HISTORY_SIZE, mHistory->Text());
 				Window()->PostMessage(MSG_PREF_MODIFIED);
 			}
 			break;

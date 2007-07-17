@@ -50,8 +50,6 @@
 #include "Shell.h"
 #include "PrefHandler.h"
 
-extern PrefHandler *gTermPref;
-
 /* default shell command and options. */
 #define SHELL_COMMAND "/bin/sh -login"
 

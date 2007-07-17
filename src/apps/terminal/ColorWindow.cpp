@@ -110,7 +110,7 @@ colWindow::colWindow(const char *)
   BColorControl* controller = new BColorControl(BPoint(10, 45), B_CELLS_32x8, 6, "Terminal Color Controller", new BMessage(MSG_COLOR_CHANGED));
   
   icon->AddChild(controller);
-  controller->SetValue(gTermPref->getRGB(PREF_TEXT_FORE_COLOR));
+  controller->SetValue(PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR));
 
 
 
@@ -138,14 +138,14 @@ colWindow::MessageReceived(BMessage* msg)
 	{
 
 	case MSG_COLOR_CHANGED:
-    gTermPref->setRGB(workspaceMenuField->Menu()->FindMarked()->Label(),
+    PrefHandler::Default()->setRGB(workspaceMenuField->Menu()->FindMarked()->Label(),
 		      controller->ValueAsColor());
 	modified = true;
     break;
 
   case MSG_COLOR_FIELD_CHANGED:
     controller->SetValue
-      (gTermPref->getRGB (workspaceMenuField->Menu()->FindMarked()->Label()));
+      (PrefHandler::Default()->getRGB (workspaceMenuField->Menu()->FindMarked()->Label()));
     break;
 	
 	
