@@ -141,8 +141,10 @@ mutex_lock(mutex *mutex)
 	if (status < B_OK)
 		return status;
 
-	if (me == mutex->holder)
-		panic("mutex_lock failure: mutex %p (sem = 0x%lx) acquired twice by thread 0x%lx\n", mutex, mutex->sem, me);
+	if (me == mutex->holder) {
+		panic("mutex_lock failure: mutex %p (sem = 0x%lx) acquired twice by"
+			" thread 0x%lx\n", mutex, mutex->sem, me);
+	}
 
 	mutex->holder = me;
 	return B_OK;
@@ -158,8 +160,8 @@ mutex_unlock(mutex *mutex)
 		return;
 
 	if (me != mutex->holder) {
-		panic("mutex_unlock failure: thread 0x%lx is trying to release mutex %p (current holder 0x%lx)\n",
-			me, mutex, mutex->holder);
+		panic("mutex_unlock failure: thread 0x%lx is trying to release mutex %p"
+			" (current holder 0x%lx)\n", me, mutex, mutex->holder);
 	}
 
 	mutex->holder = -1;
