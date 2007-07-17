@@ -413,6 +413,11 @@ rule SetUpdateHaikuImageOnly flag
 	HAIKU_CONTAINER_UPDATE_ONLY on $(HAIKU_IMAGE_CONTAINER_NAME) = $(flag) ;
 }
 
+rule IsUpdateHaikuImageOnly
+{
+	on $(HAIKU_IMAGE_CONTAINER_NAME) return $(HAIKU_CONTAINER_UPDATE_ONLY) ;
+}
+
 rule AddDirectoryToHaikuImage directoryTokens
 {
 	# AddDirectoryToHaikuImage <directoryTokens>
