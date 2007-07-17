@@ -133,6 +133,7 @@ static	int32						FinishThread(void *data);
 										uhci_qh **_transferQueue);
 
 		// Isochronous transfer functions
+static int32						FinishIsochronousThread(void *data);
 		void						FinishIsochronousTransfers();
 		isochronous_transfer_data	*FindIsochronousTransfer(uhci_td *descriptor);
 
@@ -173,6 +174,10 @@ static	int32						FinishThread(void *data);
 										uint8 *lastDataToggle);
 		size_t						ReadActualLength(uhci_td *topDescriptor,
 										uint8 *lastDataToggle);
+		void						WriteIsochronousDescriptorChain(
+										uhci_td **isoRequest,
+										uint32 packetCount,
+										iovec *vector);
 		void						ReadIsochronousDescriptorChain(
 										isochronous_transfer_data *transfer,
 										iovec *vector);
@@ -219,7 +224,10 @@ static	pci_module_info				*sPCIModule;
 		// Maintain a linked list of isochronous transfers
 		isochronous_transfer_data	*fFirstIsochronousTransfer;
 		isochronous_transfer_data	*fLastIsochronousTransfer;
+		sem_id						fFinishIsochronousTransfersSem;
+		thread_id					fFinishIsochronousThread;
 		benaphore					fIsochronousLock;
+		bool						fStopFinishIsochronousThread;
 
 		// Root hub
 		UHCIRootHub					*fRootHub;

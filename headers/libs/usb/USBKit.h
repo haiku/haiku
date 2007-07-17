@@ -10,6 +10,7 @@
 #define _USBKIT_H
 
 #include <SupportDefs.h>
+#include <USB3.h>
 #include <USB_spec.h>
 
 
@@ -257,7 +258,7 @@ mutable	char						*fInterfaceString;
 
 
 /*	The BUSBEndpoint represent a device endpoint that can be used to send or
-	receive data. It also alows to query endpoint characteristics like
+	receive data. It also allows to query endpoint characteristics like
 	endpoint type or direction. */
 class BUSBEndpoint {
 public:
@@ -299,6 +300,10 @@ public:
 										size_t length) const;
 		ssize_t						BulkTransfer(void *data,
 										size_t length) const;
+		ssize_t						IsochronousTransfer(void *data,
+										size_t length,
+										usb_iso_packet_descriptor *packetDescriptors,
+										uint32 packetCount)	const;
 
 private:
 friend	class BUSBInterface;

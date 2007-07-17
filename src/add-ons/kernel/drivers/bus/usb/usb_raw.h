@@ -32,7 +32,8 @@ typedef enum {
 
 	RAW_COMMAND_CONTROL_TRANSFER = 0x4000,
 	RAW_COMMAND_INTERRUPT_TRANSFER,
-	RAW_COMMAND_BULK_TRANSFER
+	RAW_COMMAND_BULK_TRANSFER,
+	RAW_COMMAND_ISOCHRONOUS_TRANSFER
 } raw_command_id;
 
 
@@ -127,6 +128,16 @@ typedef union {
 		void							*data;
 		size_t							length;
 	} transfer;
+
+	struct {
+		status_t						status;
+		uint32							interface;
+		uint32							endpoint;
+		void							*data;
+		size_t							length;
+		usb_iso_packet_descriptor		*packet_descriptors;
+		uint32							packet_count;
+	} isochronous;
 } raw_command;
 
 

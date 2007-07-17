@@ -189,3 +189,27 @@ BUSBEndpoint::BulkTransfer(void *data, size_t length) const
 
 	return command.transfer.length;
 }
+
+
+ssize_t
+BUSBEndpoint::IsochronousTransfer(void *data, size_t length,
+	usb_iso_packet_descriptor *packetDescriptors, uint32 packetCount) const
+{
+	if (length > 0 && data == NULL)
+		return B_BAD_VALUE;
+
+	raw_command command;
+	command.isochronous.interface = fInterface->Index();
+	command.isochronous.endpoint = fIndex;
+	command.isochronous.data = data;
+	command.isochronous.length = length;
+	command.isochronous.packet_descriptors = packetDescriptors;
+	command.isochronous.packet_count = packetCount;
+
+	if (ioctl(fRawFD, RAW_COMMAND_ISOCHRONOUS_TRANSFER, &command, sizeof(command))
+		|| command.isochronous.status != RAW_STATUS_SUCCESS) {
+		return B_ERROR;
+	}
+
+	return command.isochronous.length;
+}

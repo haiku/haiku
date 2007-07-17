@@ -467,7 +467,8 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		}
 
 		case RAW_COMMAND_INTERRUPT_TRANSFER:
-		case RAW_COMMAND_BULK_TRANSFER: {
+		case RAW_COMMAND_BULK_TRANSFER:
+		case RAW_COMMAND_ISOCHRONOUS_TRANSFER: {
 			const usb_configuration_info *configurationInfo =
 				gUSBModule->get_configuration(device->device);
 			if (!configurationInfo) {
@@ -506,9 +507,15 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 				status = gUSBModule->queue_interrupt(endpointInfo->handle,
 					command->transfer.data, command->transfer.length,
 					usb_raw_callback, device);
-			} else {
+			} else if (op == RAW_COMMAND_BULK_TRANSFER) {
 				status = gUSBModule->queue_bulk(endpointInfo->handle,
 					command->transfer.data, command->transfer.length,
+					usb_raw_callback, device);
+			} else {
+				status = gUSBModule->queue_isochronous(endpointInfo->handle,
+					command->isochronous.data, command->isochronous.length,
+					command->isochronous.packet_descriptors,
+					command->isochronous.packet_count, NULL, 0,
 					usb_raw_callback, device);
 			}
 
