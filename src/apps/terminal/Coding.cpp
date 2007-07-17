@@ -51,7 +51,7 @@ get_nth_encoding(int i, int *id)
 	if (id == NULL)
 		return B_BAD_VALUE;
 	
-	if (i < 0 || i >= sizeof(kEncodingTable) / sizeof(etable))
+	if (i < 0 || i >= (int)(sizeof(kEncodingTable) / sizeof(etable)))
 		return B_BAD_INDEX;
 
 	*id = kEncodingTable[i].id;
