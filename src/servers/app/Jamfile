@@ -4,6 +4,7 @@ UseLibraryHeaders png zlib ;
 UsePrivateHeaders app graphics input interface kernel shared storage ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
 UseFreeTypeHeaders ;
 
 
@@ -27,6 +28,7 @@ Server app_server :
 	EventStream.cpp
 	FontFamily.cpp
 	FontManager.cpp
+	FontStyle.cpp
 	HashTable.cpp
 	InputManager.cpp
 	IntPoint.cpp

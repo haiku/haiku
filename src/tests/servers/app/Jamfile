@@ -65,6 +65,7 @@ SharedLibrary libhaikuappserver.so :
 	DrawState.cpp
 	FontFamily.cpp
 	FontManager.cpp
+	FontStyle.cpp
 	HashTable.cpp
 	IntPoint.cpp
 	IntRect.cpp
