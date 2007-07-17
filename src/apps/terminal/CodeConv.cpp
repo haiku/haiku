@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2005, Haiku, Inc.
+ * Copyright (c) 2001-2007, Haiku, Inc.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
  * Distributed under the terms of the MIT license.
@@ -30,7 +30,7 @@ UTF8
 #define BEGINS_CHAR(byte) ((byte & 0xc0) >= 0x80)
 
 
-extern char utf8_width_table[]; /* define UTF8WidthTbl.c */
+extern char gUTF8WidthTable[]; // defined in UTF8WidthTbl.c
 
 
 CodeConv::CodeConv()
@@ -51,7 +51,7 @@ CodeConv::UTF8GetFontWidth(const char *string)
 	ushort unicode, offset;
 
 	offset = unicode = UTF8toUnicode(string);
-	width = utf8_width_table[unicode >> 3];
+	width = gUTF8WidthTable[unicode >> 3];
 	offset = offset & 0x07;
 
 	point = 0x80 >> offset;

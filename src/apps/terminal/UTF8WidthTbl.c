@@ -1,4 +1,5 @@
 /*
+ * Copyright 2007 Haiku, Inc.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
  *
@@ -28,9 +29,12 @@
  *
  */
 
-typedef unsigned char uchar;
+#ifndef __UTF8WIDTHTBL_H
+#define __UTF8WIDTHTBL_H
 
-uchar utf8_width_table[] =
+#include <SupportDefs.h>
+
+uchar gUTF8WidthTable[] =
 {
 0,
 0,
@@ -8224,5 +8228,7 @@ uchar utf8_width_table[] =
 0,
 0,
 0,
-}
-;
+};
+
+#endif // __UTF8WIDTHTBL_H
+
