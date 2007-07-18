@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src system kernel vm ;
 KernelMergeObject kernel_vm.o :
 	vm.cpp
 	vm_address_space.c
-	vm_cache.c
+	vm_cache.cpp
 	vm_daemons.c
 	vm_low_memory.cpp
 	vm_page.c

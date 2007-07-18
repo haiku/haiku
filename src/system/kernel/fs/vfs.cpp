@@ -65,7 +65,7 @@ const static uint32 kMaxUnusedVnodes = 8192;
 
 struct vnode {
 	struct vnode	*next;
-	vm_cache_ref	*cache;
+	vm_cache		*cache;
 	dev_t			device;
 	list_link		mount_link;
 	list_link		unused_link;
@@ -2415,13 +2415,14 @@ dump_vnode_caches(int argc, char **argv)
 
 		// count pages in cache
 		size_t numPages = 0;
-		for (struct vm_page *page = vnode->cache->cache->page_list;
+		for (struct vm_page *page = vnode->cache->page_list;
 				page != NULL; page = page->cache_next) {
 			numPages++;
 		}
 
-		kprintf("%p%4ld%10Ld %p %8Ld%8ld\n", vnode, vnode->device, vnode->id, vnode->cache,
-			(vnode->cache->cache->virtual_size + B_PAGE_SIZE - 1) / B_PAGE_SIZE, numPages);
+		kprintf("%p%4ld%10Ld %p %8Ld%8ld\n", vnode, vnode->device, vnode->id,
+			vnode->cache, (vnode->cache->virtual_size + B_PAGE_SIZE - 1)
+				/ B_PAGE_SIZE, numPages);
 	}
 
 	hash_close(sVnodeTable, &iterator, false);
@@ -3106,7 +3107,7 @@ vfs_write_pages(void *_vnode, void *cookie, off_t pos, const iovec *vecs, size_t
  */
 
 extern "C" status_t
-vfs_get_vnode_cache(void *_vnode, vm_cache_ref **_cache, bool allocate)
+vfs_get_vnode_cache(void *_vnode, vm_cache **_cache, bool allocate)
 {
 	struct vnode *vnode = (struct vnode *)_vnode;
 

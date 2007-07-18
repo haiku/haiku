@@ -663,7 +663,6 @@ status_t
 vm_page_write_modified(vm_cache *cache, bool fsReenter)
 {
 	vm_page *page = cache->page_list;
-	vm_cache_ref *ref = cache->ref;
 
 	// ToDo: join adjacent pages into one vec list
 
@@ -697,7 +696,7 @@ vm_page_write_modified(vm_cache *cache, bool fsReenter)
 
 		pageOffset = (off_t)page->cache_offset << PAGE_SHIFT;
 
-		for (area = ref->areas; area; area = area->cache_next) {
+		for (area = cache->areas; area; area = area->cache_next) {
 			if (pageOffset >= area->cache_offset
 				&& pageOffset < area->cache_offset + area->size) {
 				vm_translation_map *map = &area->address_space->translation_map;
@@ -726,12 +725,11 @@ vm_page_write_modified(vm_cache *cache, bool fsReenter)
 		if (!gotPage)
 			continue;
 
-		mutex_unlock(&ref->lock);
+		mutex_unlock(&cache->lock);
 
 		status = write_page(page, fsReenter);
 
-		mutex_lock(&ref->lock);
-		cache = ref->cache;
+		mutex_lock(&cache->lock);
 
 		if (status == B_OK) {
 			if (dequeuedPage) {

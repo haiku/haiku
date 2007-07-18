@@ -60,7 +60,7 @@ struct file_map {
 };
 
 struct file_cache_ref {
-	vm_cache_ref	*cache;
+	vm_cache		*cache;
 	void			*vnode;
 	void			*device;
 	void			*cookie;
@@ -520,7 +520,7 @@ read_chunk_into_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 	TRACE(("read_chunk(offset = %Ld, size = %lu, pageOffset = %ld, buffer = %#lx, bufferSize = %lu\n",
 		offset, size, pageOffset, buffer, bufferSize));
 
-	vm_cache_ref *cache = ref->cache;
+	vm_cache *cache = ref->cache;
 
 	iovec vecs[MAX_IO_VECS];
 	int32 vecCount = 0;
@@ -713,9 +713,10 @@ write_chunk_to_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 		addr_t last = (addr_t)vecs[vecCount - 1].iov_base
 			+ vecs[vecCount - 1].iov_len - B_PAGE_SIZE;
 
-		if (offset + pageOffset + bufferSize == ref->cache->cache->virtual_size) {
+		if (offset + pageOffset + bufferSize == ref->cache->virtual_size) {
 			// the space in the page after this write action needs to be cleaned
-			memset((void *)(last + lastPageOffset), 0, B_PAGE_SIZE - lastPageOffset);
+			memset((void *)(last + lastPageOffset), 0,
+				B_PAGE_SIZE - lastPageOffset);
 		} else if (vecCount > 1) {
 			// the end of this write does not happen on a page boundary, so we
 			// need to fetch the last page before we can update it
@@ -842,8 +843,8 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size, bool doWri
 		panic("cache_io() called with NULL ref!\n");
 
 	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
-	vm_cache_ref *cache = ref->cache;
-	off_t fileSize = cache->cache->virtual_size;
+	vm_cache *cache = ref->cache;
+	off_t fileSize = cache->virtual_size;
 
 	TRACE(("cache_io(ref = %p, offset = %Ld, buffer = %p, size = %lu, %s)\n",
 		ref, offset, (void *)buffer, *_size, doWrite ? "write" : "read"));
@@ -1084,12 +1085,13 @@ file_cache_control(const char *subsystem, uint32 function, void *buffer, size_t 
 extern "C" void
 cache_prefetch_vnode(void *vnode, off_t offset, size_t size)
 {
-	vm_cache_ref *cache;
+	vm_cache *cache;
 	if (vfs_get_vnode_cache(vnode, &cache, false) != B_OK)
 		return;
 
-	file_cache_ref *ref = (struct file_cache_ref *)((vnode_store *)cache->cache->store)->file_cache_ref;
-	off_t fileSize = cache->cache->virtual_size;
+	file_cache_ref *ref = (struct file_cache_ref *)
+		((vnode_store *)cache->store)->file_cache_ref;
+	off_t fileSize = cache->virtual_size;
 
 	if (size > fileSize)
 		size = fileSize;
@@ -1160,7 +1162,7 @@ cache_prefetch(dev_t mountID, ino_t vnodeID, off_t offset, size_t size)
 
 
 extern "C" void
-cache_node_opened(void *vnode, int32 fdType, vm_cache_ref *cache, dev_t mountID,
+cache_node_opened(void *vnode, int32 fdType, vm_cache *cache, dev_t mountID,
 	ino_t parentID, ino_t vnodeID, const char *name)
 {
 	if (sCacheModule == NULL || sCacheModule->node_opened == NULL)
@@ -1168,9 +1170,10 @@ cache_node_opened(void *vnode, int32 fdType, vm_cache_ref *cache, dev_t mountID,
 
 	off_t size = -1;
 	if (cache != NULL) {
-		file_cache_ref *ref = (file_cache_ref *)((vnode_store *)cache->cache->store)->file_cache_ref;
+		file_cache_ref *ref = (file_cache_ref *)
+			((vnode_store *)cache->store)->file_cache_ref;
 		if (ref != NULL)
-			size = ref->cache->cache->virtual_size;
+			size = cache->virtual_size;
 	}
 
 	sCacheModule->node_opened(vnode, fdType, mountID, parentID, vnodeID, name, size);
@@ -1178,7 +1181,7 @@ cache_node_opened(void *vnode, int32 fdType, vm_cache_ref *cache, dev_t mountID,
 
 
 extern "C" void
-cache_node_closed(void *vnode, int32 fdType, vm_cache_ref *cache,
+cache_node_closed(void *vnode, int32 fdType, vm_cache *cache,
 	dev_t mountID, ino_t vnodeID)
 {
 	if (sCacheModule == NULL || sCacheModule->node_closed == NULL)
@@ -1237,7 +1240,7 @@ file_cache_create(dev_t mountID, ino_t vnodeID, off_t size, int fd)
 	if (ref == NULL)
 		return NULL;
 
-	// TODO: delay vm_cache/vm_cache_ref creation until data is
+	// TODO: delay vm_cache creation until data is
 	//	requested/written for the first time? Listing lots of
 	//	files in Tracker (and elsewhere) could be slowed down.
 	//	Since the file_cache_ref itself doesn't have a lock,
@@ -1255,7 +1258,8 @@ file_cache_create(dev_t mountID, ino_t vnodeID, off_t size, int fd)
 	if (vfs_get_cookie_from_fd(fd, &ref->cookie) != B_OK)
 		goto err2;
 
-	// Get the vnode for the object (note, this does not grab a reference to the node)
+	// Get the vnode for the object
+	// (note, this does not grab a reference to the node)
 	if (vfs_lookup_vnode(mountID, vnodeID, &ref->vnode) != B_OK)
 		goto err2;
 
@@ -1270,8 +1274,8 @@ file_cache_create(dev_t mountID, ino_t vnodeID, off_t size, int fd)
 	// we don't grab an extra reference).
 	vfs_put_vnode(ref->vnode);
 
-	ref->cache->cache->virtual_size = size;
-	((vnode_store *)ref->cache->cache->store)->file_cache_ref = ref;
+	ref->cache->virtual_size = size;
+	((vnode_store *)ref->cache->store)->file_cache_ref = ref;
 	return ref;
 
 err2:

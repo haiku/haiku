@@ -37,9 +37,9 @@ struct cache_module_info {
 extern "C" {
 #endif
 
-extern void cache_node_opened(void *vnode, int32 fdType, vm_cache_ref *cache,
+extern void cache_node_opened(void *vnode, int32 fdType, vm_cache *cache,
 				dev_t mountID, ino_t parentID, ino_t vnodeID, const char *name);
-extern void cache_node_closed(void *vnode, int32 fdType, vm_cache_ref *cache,
+extern void cache_node_closed(void *vnode, int32 fdType, vm_cache *cache,
 				dev_t mountID, ino_t vnodeID);
 extern void cache_node_launched(size_t argCount, char * const *args);
 extern void cache_prefetch_vnode(void *vnode, off_t offset, size_t size);

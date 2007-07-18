@@ -125,23 +125,15 @@ enum {
 	CACHE_TYPE_NULL
 };
 
-// vm_cache_ref
-typedef struct vm_cache_ref {
-	struct vm_cache		*cache;
-	mutex				lock;
-
-	struct vm_area		*areas;
-
-	vint32				ref_count;
-} vm_cache_ref;
-
 // vm_cache
 typedef struct vm_cache {
+	mutex				lock;
+	struct vm_area		*areas;
+	vint32				ref_count;
 	struct list_link	consumer_link;
 	struct list			consumers;
 		// list of caches that use this cache as a source
 	vm_page				*page_list;
-	vm_cache_ref		*ref;
 	struct vm_cache		*source;
 	struct vm_store		*store;
 	off_t				virtual_base;
@@ -165,7 +157,8 @@ typedef struct vm_area {
 	uint16				memory_type;
 	vint32				ref_count;
 
-	struct vm_cache_ref	*cache_ref;
+	struct vm_cache		*cache;
+	vint32				no_cache_change;
 	off_t				cache_offset;
 	uint32				cache_type;
 	vm_area_mappings	mappings;

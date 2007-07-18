@@ -27,7 +27,7 @@
 #define MAX_NODE_MONITORS		65536
 
 struct kernel_args;
-struct vm_cache_ref;
+struct vm_cache;
 struct file_descriptor;
 struct selectsync;
 struct pollfd;
@@ -91,7 +91,7 @@ status_t vfs_read_pages(void *vnode, void *cookie, off_t pos,
 			const iovec *vecs, size_t count, size_t *_numBytes, bool fsReenter);
 status_t vfs_write_pages(void *vnode, void *cookie, off_t pos,
 			const iovec *vecs, size_t count, size_t *_numBytes, bool fsReenter);
-status_t vfs_get_vnode_cache(void *vnode, struct vm_cache_ref **_cache, bool allocate);
+status_t vfs_get_vnode_cache(void *vnode, struct vm_cache **_cache, bool allocate);
 status_t vfs_get_file_map( void *_vnode, off_t offset, size_t size,
 			struct file_io_vec *vecs, size_t *_count);
 status_t vfs_get_fs_node_from_path(dev_t mountID, const char *path,

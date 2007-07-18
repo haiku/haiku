@@ -55,6 +55,8 @@ area_id vm_map_physical_memory(team_id team, const char *name, void **address,
 area_id vm_map_file(team_id aid, const char *name, void **address, 
 			uint32 addressSpec, addr_t size, uint32 protection, uint32 mapping, 
 			const char *path, off_t offset);
+vm_cache *vm_area_get_locked_cache(vm_area *area);
+void vm_area_put_locked_cache(vm_cache *cache);
 area_id vm_create_null_area(team_id team, const char *name, void **address, 
 			uint32 addressSpec, addr_t size);
 area_id vm_copy_area(team_id team, const char *name, void **_address, 
@@ -63,7 +65,7 @@ area_id vm_clone_area(team_id team, const char *name, void **address,
 			uint32 addressSpec, uint32 protection, uint32 mapping, 
 			area_id sourceArea);
 status_t vm_delete_area(team_id aid, area_id id);
-status_t vm_create_vnode_cache(void *vnode, vm_cache_ref **_cacheRef);
+status_t vm_create_vnode_cache(void *vnode, vm_cache **_cache);
 vm_area *vm_area_lookup(vm_address_space *addressSpace, addr_t address);
 status_t vm_set_area_memory_type(area_id id, addr_t physicalBase, uint32 type);
 status_t vm_get_page_mapping(team_id team, addr_t vaddr, addr_t *paddr);
