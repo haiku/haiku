@@ -38,6 +38,7 @@ Server app_server :
 	OffscreenServerWindow.cpp
 	OffscreenWindowLayer.cpp
 	PNGDump.cpp
+	ProfileMessageSupport.cpp
 	RAMLinkMsgReader.cpp
 	RGBColor.cpp
 	RegionPool.cpp

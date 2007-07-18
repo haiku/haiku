@@ -246,6 +246,8 @@ Painter::ConstrainClipping(const BRegion* region)
 void
 Painter::SetHighColor(const rgb_color& color)
 {
+	if (fPatternHandler->HighColor().GetColor32() == color)
+		return;
 	fPatternHandler->SetHighColor(color);
 	if (*(fPatternHandler->GetR5Pattern()) == B_SOLID_HIGH)
 		_SetRendererColor(color);
@@ -1254,7 +1256,6 @@ Painter::_SetRendererColor(const rgb_color& color) const
 //									  color.green / 255.0,
 //									  color.blue / 255.0,
 //									  color.alpha / 255.0));
-
 }
 
 // #pragma mark -

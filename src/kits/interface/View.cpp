@@ -2248,15 +2248,7 @@ BView::GetClippingRegion(BRegion* region) const
  		int32 code;
  		if (fOwner->fLink->FlushWithReply(code) == B_OK
  			&& code == B_OK) {
-			int32 count;
-			fOwner->fLink->Read<int32>(&count);
-
-			for (int32 i = 0; i < count; i++) {
-				BRect rect;
-				fOwner->fLink->Read<BRect>(&rect);
-
-				region->Include(rect);
-			}
+			fOwner->fLink->ReadRegion(region);
 			fState->valid_flags |= B_VIEW_CLIP_REGION_BIT;
 		}
 	}
@@ -2273,8 +2265,7 @@ BView::ConstrainClippingRegion(BRegion* region)
 		if (region) {
 			int32 count = region->CountRects();
 			fOwner->fLink->Attach<int32>(count);
-			for (int32 i = 0; i < count; i++)
-				fOwner->fLink->Attach<clipping_rect>(region->RectAtInt(i));
+			fOwner->fLink->AttachRegion(*region);
 		} else {
 			fOwner->fLink->Attach<int32>(-1);
 			// '-1' means that in the app_server, there won't be any 'local'
@@ -3318,21 +3309,15 @@ BView::Invalidate(BRect invalRect)
 
 
 void
-BView::Invalidate(const BRegion *invalRegion)
+BView::Invalidate(const BRegion* region)
 {
-	if (invalRegion == NULL || fOwner == NULL)
+	if (region == NULL || fOwner == NULL)
 		return;
 
 	check_lock();
 
-	int32 count = 0;
-	count = const_cast<BRegion*>(invalRegion)->CountRects();
-
 	fOwner->fLink->StartMessage(AS_LAYER_INVALIDATE_REGION);
-	fOwner->fLink->Attach<int32>(count);
-
-	for (int32 i = 0; i < count; i++)
-		fOwner->fLink->Attach<BRect>( const_cast<BRegion *>(invalRegion)->RectAt(i));
+	fOwner->fLink->AttachRegion(*region);
 
 	fOwner->fLink->Flush();
 }

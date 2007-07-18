@@ -1460,13 +1460,22 @@ ViewLayer::RebuildClipping(bool deep)
 	// the clipping spans over the bounds area
 	fLocalClipping.Set((clipping_rect)Bounds());
 
-	// exclude all childs from the clipping
-	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
-		if (child->IsVisible())
-			fLocalClipping.Exclude((clipping_rect)child->Frame());
-
-		if (deep)
-			child->RebuildClipping(deep);
+	if (ViewLayer* child = FirstChild()) {
+		BRegion* childrenRegion = fWindow->GetRegion();
+		if (!childrenRegion)
+			return;
+	
+		// exclude all children from the clipping
+		for (; child; child = child->NextSibling()) {
+			if (child->IsVisible())
+				childrenRegion->Include((clipping_rect)child->Frame());
+	
+			if (deep)
+				child->RebuildClipping(deep);
+		}
+	
+		fLocalClipping.Exclude(childrenRegion);
+		fWindow->RecycleRegion(childrenRegion);
 	}
 
 	// add the user clipping in case there is one

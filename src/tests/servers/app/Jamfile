@@ -92,11 +92,12 @@ Server haiku_app_server :
 	# Misc. Sources
 	Decorator.cpp
 	DebugInfoManager.cpp
-	PNGDump.cpp
-	RAMLinkMsgReader.cpp
-	MessageLooper.cpp
+	ProfileMessageSupport.cpp
 	EventDispatcher.cpp
 	EventStream.cpp
+	MessageLooper.cpp
+	PNGDump.cpp
+	RAMLinkMsgReader.cpp
 
 	# Manager Classes
 	BitmapManager.cpp

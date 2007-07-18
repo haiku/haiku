@@ -29,6 +29,7 @@
 #include "DrawingEngine.h"
 #include "HWInterface.h"
 #include "Overlay.h"
+#include "ProfileMessageSupport.h"
 #include "RAMLinkMsgReader.h"
 #include "RenderingBuffer.h"
 #include "ServerApp.h"
@@ -58,7 +59,7 @@ using std::nothrow;
 
 //#define TRACE_SERVER_WINDOW
 //#define TRACE_SERVER_WINDOW_MESSAGES
-//#define PROFILE_MESSAGE_LOOP
+#define PROFILE_MESSAGE_LOOP
 
 
 #ifdef TRACE_SERVER_WINDOW
@@ -76,7 +77,10 @@ using std::nothrow;
 #endif
 
 #ifdef PROFILE_MESSAGE_LOOP
-static struct profile { int32 count; bigtime_t time; } sMessageProfile[AS_LAST_CODE];
+struct profile { int32 code; int32 count; bigtime_t time; };
+static profile sMessageProfile[AS_LAST_CODE];
+static profile sRedrawProcessingTime;
+//static profile sNextMessageTime;
 #endif
 
 
@@ -183,6 +187,20 @@ ServerWindow::ServerWindow(const char *title, ServerApp *app,
 	fDeathSemaphore = create_sem(0, "window death");
 }
 
+#ifdef PROFILE_MESSAGE_LOOP
+static int
+compare_message_profiles(const void* _a, const void* _b)
+{
+	profile* a = (profile*)*(void**)_a;
+	profile* b = (profile*)*(void**)_b;
+	if (a->time < b->time)
+		return 1;
+	if (a->time > b->time)
+		return -1;
+	return 0;
+}
+#endif
+
 
 //! Tears down all connections the main app_server objects, and deletes some internals.
 ServerWindow::~ServerWindow()
@@ -210,13 +228,35 @@ ServerWindow::~ServerWindow()
 	delete_sem(fDeathSemaphore);
 
 #ifdef PROFILE_MESSAGE_LOOP
+	BList profiles;
 	for (int32 i = 0; i < AS_LAST_CODE; i++) {
 		if (sMessageProfile[i].count == 0)
 			continue;
-		printf("[%ld] called %ld times, %g secs (%Ld usecs per call)\n",
-			i, sMessageProfile[i].count, sMessageProfile[i].time / 1000000.0,
-			sMessageProfile[i].time / sMessageProfile[i].count);
+		sMessageProfile[i].code = i;
+		profiles.AddItem(&sMessageProfile[i]);
 	}
+
+	profiles.SortItems(compare_message_profiles);
+
+	BString codeName;
+	int32 count = profiles.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		profile* p = (profile*)profiles.ItemAtFast(i);
+		string_for_message_code(p->code, codeName);
+		printf("[%s] called %ld times, %g secs (%Ld usecs per call)\n",
+			codeName.String(), p->count, p->time / 1000000.0,
+			p->time / p->count);
+	}
+	if (sRedrawProcessingTime.count > 0) {
+		printf("average redraw processing time: %g secs, count: %ld (%lld usecs per call)\n",
+			sRedrawProcessingTime.time / 1000000.0, sRedrawProcessingTime.count,
+			sRedrawProcessingTime.time / sRedrawProcessingTime.count);
+	}
+//	if (sNextMessageTime.count > 0) {
+//		printf("average NextMessage() time: %g secs, count: %ld (%lld usecs per call)\n",
+//			sNextMessageTime.time / 1000000.0, sNextMessageTime.count,
+//			sNextMessageTime.time / sNextMessageTime.count);
+//	}
 #endif
 }
 
@@ -1711,23 +1751,15 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_CLIP_REGION: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
 			
 			// if this ViewLayer is hidden, it is clear that its visible region is void.
+			fLink.StartMessage(B_OK);
 			if (fCurrentLayer->IsHidden()) {
-				fLink.StartMessage(B_OK);
-				fLink.Attach<int32>(0L);
-				fLink.Flush();
+				BRegion empty;
+				fLink.AttachRegion(empty);
 			} else {
 				BRegion drawingRegion = fCurrentLayer->LocalClipping();
-				int32 rectCount = drawingRegion.CountRects();
-
-				fLink.StartMessage(B_OK);
-				fLink.Attach<int32>(rectCount);
-
-				for (int32 i = 0; i < rectCount; i++) {
-					fLink.Attach<BRect>(drawingRegion.RectAt(i));
-				}
-
-				fLink.Flush();
+				fLink.AttachRegion(drawingRegion);
 			}
+			fLink.Flush();
 
 			break;
 		}
@@ -1741,24 +1773,20 @@ ServerWindow::_DispatchViewMessage(int32 code,
 				// region for the current draw state,
 				// but an *empty* region is actually valid!
 				// even if it means no drawing is allowed
-			BRegion region;
-			if (status == B_OK && rectCount >= 0) {
-				for (int32 i = 0; i < rectCount; i++) {
-					clipping_rect r;
-					status = link.Read<clipping_rect>(&r);
-					if (status < B_OK)
-						break;
-					// TODO: optimize (use AttachRegion()+ReadRegion())
-					region.Include(r);
-				}
-			} else
-				status = B_ERROR;
 
-			if (status == B_OK) {
+			if (status < B_OK)
+				break;
+
+			if (rectCount >= 0) {
+				// we are supposed to set the clipping region
+				BRegion region;
+				if (link.ReadRegion(&region) < B_OK)
+					break;
 				fCurrentLayer->SetUserClipping(&region);
 			} else {
-				// passing NULL sets this states region
-				// to that of the previous state
+				// we are supposed to unset the clipping region
+				// passing NULL sets this states region to that
+				// of the previous state
 				fCurrentLayer->SetUserClipping(NULL);
 			}
 
@@ -1784,18 +1812,11 @@ ServerWindow::_DispatchViewMessage(int32 code,
 
 			// NOTE: looks like this call is NOT affected by origin and scale on R5
 			// so this implementation is "correct"
-			BRegion dirty;
-			int32 rectCount;
-			BRect rect;
+			BRegion region;
+			if (link.ReadRegion(&region) < B_OK)
+				break;
 
-			link.Read<int32>(&rectCount);
-
-			for (int i = 0; i < rectCount; i++) {
-				link.Read<BRect>(&rect);
-				dirty.Include(rect);
-			}
-
-			fWindowLayer->InvalidateView(fCurrentLayer, dirty);
+			fWindowLayer->InvalidateView(fCurrentLayer, region);
 			break;
 		}
 
@@ -2677,14 +2698,32 @@ ServerWindow::_MessageLooper()
 				lockedDesktop = true;
 			}
 
-			if (atomic_and(&fRedrawRequested, 0) != 0)
+			if (atomic_and(&fRedrawRequested, 0) != 0) {
+#ifdef PROFILE_MESSAGE_LOOP
+				bigtime_t redrawStart = system_time();
+#endif
 				fWindowLayer->RedrawDirtyRegion();
+#ifdef PROFILE_MESSAGE_LOOP
+				diff = system_time() - redrawStart;
+				atomic_add(&sRedrawProcessingTime.count, 1);
+# ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+				atomic_add64(&sRedrawProcessingTime.time, diff);
+# else
+				sRedrawProcessingTime.time += diff;
+# endif
+#endif
+			}
+		
 
+
+#ifdef PROFILE_MESSAGE_LOOP
+			bigtime_t dispatchStart = system_time();
+#endif
 			_DispatchMessage(code, receiver);
 
 #ifdef PROFILE_MESSAGE_LOOP
 			if (code >= 0 && code < AS_LAST_CODE) {
-				diff = system_time() - start;
+				diff = system_time() - dispatchStart;
 				atomic_add(&sMessageProfile[code].count, 1);
 #ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 				atomic_add64(&sMessageProfile[code].time, diff);
@@ -2702,6 +2741,7 @@ ServerWindow::_MessageLooper()
 				break;
 			}
 
+			// next message
 			status_t status = receiver.GetNextMessage(code);
 			if (status < B_OK) {
 				// that shouldn't happen, it's our port
