@@ -46,38 +46,20 @@
 #include "Painter.h"
 
 
-#if ALIASED_DRAWING
-// in this case, we _cannot_ use the outline rasterizer.
-# define USE_OUTLINE_RASTERIZER 0
-#else
-// in this case, we can optionally use the outline rasterizer (faster).
-// NOTE: The outline rasterizer is different from the "general purpose"
-// rasterizer and can speed up the stroking of lines. It has some problems
-// though, for example the butts of the lines are not anti-aliased. So we
-// use the much more powerfull general purpose rasterizer, and live with the
-// performance hit for now. See _StrokePath().
-// NOTE: The outline rasterizer will still be used for lines with 1 pixel width!
-# define USE_OUTLINE_RASTERIZER 0
-#endif
-
-
 #define CHECK_CLIPPING	if (!fValidClipping) return BRect(0, 0, -1, -1);
 
 
 // constructor
 Painter::Painter()
-	: fBuffer(NULL),
-	  fPixelFormat(NULL),
-	  fBaseRenderer(NULL),
-	  fOutlineRenderer(NULL),
-	  fOutlineRasterizer(NULL),
-	  fUnpackedScanline(NULL),
-	  fPackedScanline(NULL),
-	  fRasterizer(NULL),
-	  fRenderer(NULL),
-	  fRendererBin(NULL),
+	: fBuffer(),
+	  fPixelFormat(fBuffer, &fPatternHandler),
+	  fBaseRenderer(fPixelFormat),
+	  fUnpackedScanline(),
+	  fPackedScanline(),
+	  fRasterizer(),
+	  fRenderer(fBaseRenderer),
+	  fRendererBin(fBaseRenderer),
 
-	  fLineProfile(),
 	  fPath(),
 	  fCurve(fPath),
 
@@ -95,26 +77,25 @@ Painter::Painter()
 	  fLineJoinMode(B_MITER_JOIN),
 	  fMiterLimit(B_DEFAULT_MITER_LIMIT),
 
-	  fPatternHandler(new PatternHandler()),
+	  fPatternHandler(),
 	  fTextRenderer(AGGTextRenderer::Default())
 {
+	fPixelFormat.SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode, false);
+
 	// Usually, the drawing engine will lock the font for us when
 	// needed - unfortunately, it can't know we need it here
 	fFont.Lock();
 	_UpdateFont();
 	fFont.Unlock();
 
-#if USE_OUTLINE_RASTERIZER
-	_UpdateLineWidth();
+#if ALIASED_DRAWING
+	fRasterizer.gamma(agg::gamma_threshold(0.5));
 #endif
 }
 
 // destructor
 Painter::~Painter()
 {
-	_MakeEmpty();
-
-	delete fPatternHandler;
 }
 
 // #pragma mark -
@@ -126,49 +107,14 @@ Painter::AttachToBuffer(RenderingBuffer* buffer)
 	if (buffer && buffer->InitCheck() >= B_OK &&
 		// TODO: implement drawing on B_RGB24, B_RGB15, B_RGB16, B_CMAP8 and B_GRAY8 :-[
 		(buffer->ColorSpace() == B_RGBA32 || buffer->ColorSpace() == B_RGB32)) {
-		// clean up previous stuff
-		_MakeEmpty();
+		fBuffer.attach((uint8*)buffer->Bits(),
+			buffer->Width(), buffer->Height(), buffer->BytesPerRow());
 
-		fBuffer = new agg::rendering_buffer();
-		fBuffer->attach((uint8*)buffer->Bits(),
-						buffer->Width(),
-						buffer->Height(),
-						buffer->BytesPerRow());
-
-		fPixelFormat = new pixfmt(*fBuffer, fPatternHandler);
-		fPixelFormat->SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode, false);
-
-		fBaseRenderer = new renderer_base(*fPixelFormat);
 
 		// These are the AGG renderes and rasterizes which
 		// will be used for stroking paths
-#if USE_OUTLINE_RASTERIZER
-#if ALIASED_DRAWING
-		fOutlineRenderer = new outline_renderer_type(*fBaseRenderer);
-		fOutlineRasterizer = new outline_rasterizer_type(*fOutlineRenderer);
-#else
-		fOutlineRenderer = new outline_renderer_type(*fBaseRenderer, fLineProfile);
-		fOutlineRasterizer = new outline_rasterizer_type(*fOutlineRenderer);
 
-		// attach our line profile to the renderer, it keeps a pointer
-		fOutlineRenderer->profile(fLineProfile);
-#endif // ALIASED_DRAWING
-#endif // USE_OUTLINE_RASTERIZER
-		// the renderer used for filling paths
-		fRenderer = new renderer_type(*fBaseRenderer);
-		fRasterizer = new rasterizer_type();
-		fUnpackedScanline = new scanline_unpacked_type();
-		fPackedScanline = new scanline_packed_type();
-
-#if ALIASED_DRAWING
-		fRasterizer->gamma(agg::gamma_threshold(0.5));
-#endif
-
-		// possibly needed for drawing text (if the font is
-		// a one bit bitmap font, which is currently not supported yet)
-		fRendererBin = new renderer_bin_type(*fBaseRenderer);
-
-		_SetRendererColor(fPatternHandler->HighColor().GetColor32());
+		_SetRendererColor(fPatternHandler.HighColor().GetColor32());
 	}
 }
 
@@ -176,7 +122,6 @@ Painter::AttachToBuffer(RenderingBuffer* buffer)
 void
 Painter::DetachFromBuffer()
 {
-	_MakeEmpty();
 }
 
 // #pragma mark -
@@ -203,7 +148,7 @@ Painter::SetDrawState(const DrawState* data, bool updateFont,
 
 	// any of these conditions means we need to use a different drawing
 	// mode instance
-	bool updateDrawingMode = !(data->GetPattern() == fPatternHandler->GetPattern()) ||
+	bool updateDrawingMode = !(data->GetPattern() == fPatternHandler.GetPattern()) ||
 		data->GetDrawingMode() != fDrawingMode ||
 		(data->GetDrawingMode() == B_OP_ALPHA && (data->AlphaSrcMode() != fAlphaSrcMode ||
 												  data->AlphaFncMode() != fAlphaFncMode));
@@ -211,8 +156,8 @@ Painter::SetDrawState(const DrawState* data, bool updateFont,
 	fDrawingMode	= data->GetDrawingMode();
 	fAlphaSrcMode	= data->AlphaSrcMode();
 	fAlphaFncMode	= data->AlphaFncMode();
-	fPatternHandler->SetPattern(data->GetPattern());
-	fPatternHandler->SetOffsets(xOffset, yOffset);
+	fPatternHandler.SetPattern(data->GetPattern());
+	fPatternHandler.SetOffsets(xOffset, yOffset);
 	fLineCapMode	= data->LineCapMode();
 	fLineJoinMode	= data->LineJoinMode();
 	fMiterLimit		= data->MiterLimit();
@@ -222,7 +167,7 @@ Painter::SetDrawState(const DrawState* data, bool updateFont,
 	SetHighColor(data->HighColor().GetColor32());
 	SetLowColor(data->LowColor().GetColor32());
 
-	if (updateDrawingMode || fPixelFormat->UsesOpCopyForText())
+	if (updateDrawingMode || fPixelFormat.UsesOpCopyForText())
 		_UpdateDrawingMode();
 }
 
@@ -233,12 +178,12 @@ void
 Painter::ConstrainClipping(const BRegion* region)
 {
 	fClippingRegion = region;
-	fBaseRenderer->set_clipping_region(const_cast<BRegion*>(region));
+	fBaseRenderer.set_clipping_region(const_cast<BRegion*>(region));
 	fValidClipping = region->Frame().IsValid();
 
 	if (fValidClipping) {
 		clipping_rect cb = fClippingRegion->FrameInt();
-		fRasterizer->clip_box(cb.left, cb.top, cb.right + 1, cb.bottom + 1);
+		fRasterizer.clip_box(cb.left, cb.top, cb.right + 1, cb.bottom + 1);
 	}
 }
 
@@ -246,10 +191,10 @@ Painter::ConstrainClipping(const BRegion* region)
 void
 Painter::SetHighColor(const rgb_color& color)
 {
-	if (fPatternHandler->HighColor().GetColor32() == color)
+	if (fPatternHandler.HighColor().GetColor32() == color)
 		return;
-	fPatternHandler->SetHighColor(color);
-	if (*(fPatternHandler->GetR5Pattern()) == B_SOLID_HIGH)
+	fPatternHandler.SetHighColor(color);
+	if (*(fPatternHandler.GetR5Pattern()) == B_SOLID_HIGH)
 		_SetRendererColor(color);
 }
 
@@ -257,8 +202,8 @@ Painter::SetHighColor(const rgb_color& color)
 void
 Painter::SetLowColor(const rgb_color& color)
 {
-	fPatternHandler->SetLowColor(color);
-	if (*(fPatternHandler->GetR5Pattern()) == B_SOLID_LOW)
+	fPatternHandler.SetLowColor(color);
+	if (*(fPatternHandler.GetR5Pattern()) == B_SOLID_LOW)
 		_SetRendererColor(color);
 }
 
@@ -278,11 +223,6 @@ Painter::SetPenSize(float size)
 {
 	if (fPenSize != size) {
 		fPenSize = size;
-#if USE_OUTLINE_RASTERIZER
-// NOTE: _UpdateLineWidth() updates the line profile which is quite a heavy resource!
-// fortunately, we don't need it when using the general purpose rasterizer
-		_UpdateLineWidth();
-#endif
 	}
 }
 
@@ -290,18 +230,18 @@ Painter::SetPenSize(float size)
 void
 Painter::SetPattern(const pattern& p, bool drawingText)
 {
-	if (!(p == *fPatternHandler->GetR5Pattern()) || drawingText != fDrawingText) {
-		fPatternHandler->SetPattern(p);
+	if (!(p == *fPatternHandler.GetR5Pattern()) || drawingText != fDrawingText) {
+		fPatternHandler.SetPattern(p);
 		fDrawingText = drawingText;
 		_UpdateDrawingMode(fDrawingText);
 
 		// update renderer color if necessary
-		if (fPatternHandler->IsSolidHigh()) {
+		if (fPatternHandler.IsSolidHigh()) {
 			// pattern was not solid high before
-			_SetRendererColor(fPatternHandler->HighColor().GetColor32());
-		} else if (fPatternHandler->IsSolidLow()) {
+			_SetRendererColor(fPatternHandler.HighColor().GetColor32());
+		} else if (fPatternHandler.IsSolidLow()) {
 			// pattern was not solid low before
-			_SetRendererColor(fPatternHandler->LowColor().GetColor32());
+			_SetRendererColor(fPatternHandler.LowColor().GetColor32());
 		}
 	}
 }
@@ -351,12 +291,12 @@ Painter::StrokeLine(BPoint a, BPoint b)
 	// first, try an optimized version
 	if (fPenSize == 1.0 &&
 		(fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)) {
-		pattern pat = *fPatternHandler->GetR5Pattern();
+		pattern pat = *fPatternHandler.GetR5Pattern();
 		if (pat == B_SOLID_HIGH &&
-			StraightLine(a, b, fPatternHandler->HighColor().GetColor32())) {
+			StraightLine(a, b, fPatternHandler.HighColor().GetColor32())) {
 			return _Clipped(touched);
 		} else if (pat == B_SOLID_LOW &&
-			StraightLine(a, b, fPatternHandler->LowColor().GetColor32())) {
+			StraightLine(a, b, fPatternHandler.LowColor().GetColor32())) {
 			return _Clipped(touched);
 		}
 	}
@@ -393,64 +333,65 @@ Painter::StrokeLine(BPoint a, BPoint b)
 bool
 Painter::StraightLine(BPoint a, BPoint b, const rgb_color& c) const
 {
-	if (fBuffer && fValidClipping) {
-		if (a.x == b.x) {
-			// vertical
-			uint8* dst = fBuffer->row_ptr(0);
-			uint32 bpr = fBuffer->stride();
-			int32 x = (int32)a.x;
-			dst += x * 4;
-			int32 y1 = (int32)min_c(a.y, b.y);
-			int32 y2 = (int32)max_c(a.y, b.y);
-			pixel32 color;
-			color.data8[0] = c.blue;
-			color.data8[1] = c.green;
-			color.data8[2] = c.red;
-			color.data8[3] = 255;
-			// draw a line, iterate over clipping boxes
-			fBaseRenderer->first_clip_box();
-			do {
-				if (fBaseRenderer->xmin() <= x &&
-					fBaseRenderer->xmax() >= x) {
-					int32 i = max_c(fBaseRenderer->ymin(), y1);
-					int32 end = min_c(fBaseRenderer->ymax(), y2);
-					uint8* handle = dst + i * bpr;
-					for (; i <= end; i++) {
-						*(uint32*)handle = color.data32;
-						handle += bpr;
-					}
+	if (!fValidClipping)
+		return false;
+
+	if (a.x == b.x) {
+		// vertical
+		uint8* dst = fBuffer.row_ptr(0);
+		uint32 bpr = fBuffer.stride();
+		int32 x = (int32)a.x;
+		dst += x * 4;
+		int32 y1 = (int32)min_c(a.y, b.y);
+		int32 y2 = (int32)max_c(a.y, b.y);
+		pixel32 color;
+		color.data8[0] = c.blue;
+		color.data8[1] = c.green;
+		color.data8[2] = c.red;
+		color.data8[3] = 255;
+		// draw a line, iterate over clipping boxes
+		fBaseRenderer.first_clip_box();
+		do {
+			if (fBaseRenderer.xmin() <= x &&
+				fBaseRenderer.xmax() >= x) {
+				int32 i = max_c(fBaseRenderer.ymin(), y1);
+				int32 end = min_c(fBaseRenderer.ymax(), y2);
+				uint8* handle = dst + i * bpr;
+				for (; i <= end; i++) {
+					*(uint32*)handle = color.data32;
+					handle += bpr;
 				}
-			} while (fBaseRenderer->next_clip_box());
-	
-			return true;
-	
-		} else if (a.y == b.y) {
-			// horizontal
-			int32 y = (int32)a.y;
-			uint8* dst = fBuffer->row_ptr(y);
-			int32 x1 = (int32)min_c(a.x, b.x);
-			int32 x2 = (int32)max_c(a.x, b.x);
-			pixel32 color;
-			color.data8[0] = c.blue;
-			color.data8[1] = c.green;
-			color.data8[2] = c.red;
-			color.data8[3] = 255;
-			// draw a line, iterate over clipping boxes
-			fBaseRenderer->first_clip_box();
-			do {
-				if (fBaseRenderer->ymin() <= y &&
-					fBaseRenderer->ymax() >= y) {
-					int32 i = max_c(fBaseRenderer->xmin(), x1);
-					int32 end = min_c(fBaseRenderer->xmax(), x2);
-					uint32* handle = (uint32*)(dst + i * 4);
-					for (; i <= end; i++) {
-						*handle++ = color.data32;
-					}
+			}
+		} while (fBaseRenderer.next_clip_box());
+
+		return true;
+
+	} else if (a.y == b.y) {
+		// horizontal
+		int32 y = (int32)a.y;
+		uint8* dst = fBuffer.row_ptr(y);
+		int32 x1 = (int32)min_c(a.x, b.x);
+		int32 x2 = (int32)max_c(a.x, b.x);
+		pixel32 color;
+		color.data8[0] = c.blue;
+		color.data8[1] = c.green;
+		color.data8[2] = c.red;
+		color.data8[3] = 255;
+		// draw a line, iterate over clipping boxes
+		fBaseRenderer.first_clip_box();
+		do {
+			if (fBaseRenderer.ymin() <= y &&
+				fBaseRenderer.ymax() >= y) {
+				int32 i = max_c(fBaseRenderer.xmin(), x1);
+				int32 end = min_c(fBaseRenderer.xmax(), x2);
+				uint32* handle = (uint32*)(dst + i * 4);
+				for (; i <= end; i++) {
+					*handle++ = color.data32;
 				}
-			} while (fBaseRenderer->next_clip_box());
-	
-			return true;
-		}
+			}
+		} while (fBaseRenderer.next_clip_box());
+
+		return true;
 	}
 	return false;
 }
@@ -594,16 +535,16 @@ Painter::StrokeRect(const BRect& r) const
 	// first, try an optimized version
 	if (fPenSize == 1.0 &&
 		(fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)) {
-		pattern p = *fPatternHandler->GetR5Pattern();
+		pattern p = *fPatternHandler.GetR5Pattern();
 		if (p == B_SOLID_HIGH) {
 			BRect rect(a, b);
 			StrokeRect(rect,
-					   fPatternHandler->HighColor().GetColor32());
+					   fPatternHandler.HighColor().GetColor32());
 			return _Clipped(rect);
 		} else if (p == B_SOLID_LOW) {
 			BRect rect(a, b);
 			StrokeRect(rect,
-					   fPatternHandler->LowColor().GetColor32());
+					   fPatternHandler.LowColor().GetColor32());
 			return _Clipped(rect);
 		}
 	}
@@ -659,27 +600,27 @@ Painter::FillRect(const BRect& r) const
 
 	// first, try an optimized version
 	if (fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER) {
-		pattern p = *fPatternHandler->GetR5Pattern();
+		pattern p = *fPatternHandler.GetR5Pattern();
 		if (p == B_SOLID_HIGH) {
 			BRect rect(a, b);
-			FillRect(rect, fPatternHandler->HighColor().GetColor32());
+			FillRect(rect, fPatternHandler.HighColor().GetColor32());
 			return _Clipped(rect);
 		} else if (p == B_SOLID_LOW) {
 			BRect rect(a, b);
-			FillRect(rect, fPatternHandler->LowColor().GetColor32());
+			FillRect(rect, fPatternHandler.LowColor().GetColor32());
 			return _Clipped(rect);
 		}
 	}
 	if (fDrawingMode == B_OP_ALPHA && fAlphaFncMode == B_ALPHA_OVERLAY) {
-		pattern p = *fPatternHandler->GetR5Pattern();
+		pattern p = *fPatternHandler.GetR5Pattern();
 		if (p == B_SOLID_HIGH) {
 			BRect rect(a, b);
-			_BlendRect32(rect, fPatternHandler->HighColor().GetColor32());
+			_BlendRect32(rect, fPatternHandler.HighColor().GetColor32());
 			return _Clipped(rect);
 		} else if (p == B_SOLID_LOW) {
-			rgb_color c = fPatternHandler->LowColor().GetColor32();
+			rgb_color c = fPatternHandler.LowColor().GetColor32();
 			if (fAlphaSrcMode == B_CONSTANT_ALPHA)
-				c.alpha = fPatternHandler->HighColor().GetColor32().alpha;
+				c.alpha = fPatternHandler.HighColor().GetColor32().alpha;
 			BRect rect(a, b);
 			_BlendRect32(rect, c);
 			return _Clipped(rect);
@@ -707,70 +648,69 @@ Painter::FillRect(const BRect& r) const
 void
 Painter::FillRect(const BRect& r, const rgb_color& c) const
 {
-	if (fBuffer && fValidClipping) {
-		uint8* dst = fBuffer->row_ptr(0);
-		uint32 bpr = fBuffer->stride();
-		int32 left = (int32)r.left;
-		int32 top = (int32)r.top;
-		int32 right = (int32)r.right;
-		int32 bottom = (int32)r.bottom;
-		// get a 32 bit pixel ready with the color
-		pixel32 color;
-		color.data8[0] = c.blue;
-		color.data8[1] = c.green;
-		color.data8[2] = c.red;
-		color.data8[3] = c.alpha;
-		// fill rects, iterate over clipping boxes
-		fBaseRenderer->first_clip_box();
-		do {
-			int32 x1 = max_c(fBaseRenderer->xmin(), left);
-			int32 x2 = min_c(fBaseRenderer->xmax(), right);
-			if (x1 <= x2) {
-				int32 y1 = max_c(fBaseRenderer->ymin(), top);
-				int32 y2 = min_c(fBaseRenderer->ymax(), bottom);
-				uint8* offset = dst + x1 * 4;
-				for (; y1 <= y2; y1++) {
+	if (!fValidClipping)
+		return;
+
+	uint8* dst = fBuffer.row_ptr(0);
+	uint32 bpr = fBuffer.stride();
+	int32 left = (int32)r.left;
+	int32 top = (int32)r.top;
+	int32 right = (int32)r.right;
+	int32 bottom = (int32)r.bottom;
+	// get a 32 bit pixel ready with the color
+	pixel32 color;
+	color.data8[0] = c.blue;
+	color.data8[1] = c.green;
+	color.data8[2] = c.red;
+	color.data8[3] = c.alpha;
+	// fill rects, iterate over clipping boxes
+	fBaseRenderer.first_clip_box();
+	do {
+		int32 x1 = max_c(fBaseRenderer.xmin(), left);
+		int32 x2 = min_c(fBaseRenderer.xmax(), right);
+		if (x1 <= x2) {
+			int32 y1 = max_c(fBaseRenderer.ymin(), top);
+			int32 y2 = min_c(fBaseRenderer.ymax(), bottom);
+			uint8* offset = dst + x1 * 4;
+			for (; y1 <= y2; y1++) {
 //					uint32* handle = (uint32*)(offset + y1 * bpr);
 //					for (int32 x = x1; x <= x2; x++) {
 //						*handle++ = color.data32;
 //					}
 gfxset32(offset + y1 * bpr, color.data32, (x2 - x1 + 1) * 4);
-				}
 			}
-		} while (fBaseRenderer->next_clip_box());
-	}
+		}
+	} while (fBaseRenderer.next_clip_box());
 }
 
 // FillRectNoClipping
 void
 Painter::FillRectNoClipping(const BRect& r, const rgb_color& c) const
 {
-	if (fBuffer) {
-		int32 left = (int32)r.left;
-		int32 y = (int32)r.top;
-		int32 right = (int32)r.right;
-		int32 bottom = (int32)r.bottom;
+	int32 left = (int32)r.left;
+	int32 y = (int32)r.top;
+	int32 right = (int32)r.right;
+	int32 bottom = (int32)r.bottom;
 
-		uint8* dst = fBuffer->row_ptr(y);
-		uint32 bpr = fBuffer->stride();
+	uint8* dst = fBuffer.row_ptr(y);
+	uint32 bpr = fBuffer.stride();
 
-		// get a 32 bit pixel ready with the color
-		pixel32 color;
-		color.data8[0] = c.blue;
-		color.data8[1] = c.green;
-		color.data8[2] = c.red;
-		color.data8[3] = c.alpha;
+	// get a 32 bit pixel ready with the color
+	pixel32 color;
+	color.data8[0] = c.blue;
+	color.data8[1] = c.green;
+	color.data8[2] = c.red;
+	color.data8[3] = c.alpha;
 
-		dst += left * 4;
+	dst += left * 4;
 
-		for (; y <= bottom; y++) {
+	for (; y <= bottom; y++) {
 //			uint32* handle = (uint32*)dst;
 //			for (int32 x = left; x <= right; x++) {
 //				*handle++ = color.data32;
 //			}
 gfxset32(dst, color.data32, (right - left + 1) * 4);
-			dst += bpr;
-		}
+		dst += bpr;
 	}
 }
 
@@ -809,8 +749,8 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 		outer.rect(lt.x, lt.y, rb.x, rb.y);
 		outer.radius(xRadius, yRadius);
 
-		fRasterizer->reset();
-		fRasterizer->add_path(outer);
+		fRasterizer.reset();
+		fRasterizer.add_path(outer);
 
 		// don't add an inner hole if the "size is negative", this avoids some
 		// defects that can be observed on R5 and could be regarded as a bug.
@@ -819,19 +759,19 @@ Painter::StrokeRoundRect(const BRect& r, float xRadius, float yRadius) const
 			inner.rect(lt.x + fPenSize, lt.y + fPenSize, rb.x - fPenSize, rb.y - fPenSize);
 			inner.radius(max_c(0.0, xRadius - fPenSize), max_c(0.0, yRadius - fPenSize));
 		
-			fRasterizer->add_path(inner);
+			fRasterizer.add_path(inner);
 		}
 	
 		// make the inner rect work as a hole
-		fRasterizer->filling_rule(agg::fill_even_odd);
+		fRasterizer.filling_rule(agg::fill_even_odd);
 
 		if (fPenSize > 2)
-			agg::render_scanlines(*fRasterizer, *fPackedScanline, *fRenderer);
+			agg::render_scanlines(fRasterizer, fPackedScanline, fRenderer);
 		else
-			agg::render_scanlines(*fRasterizer, *fUnpackedScanline, *fRenderer);
+			agg::render_scanlines(fRasterizer, fUnpackedScanline, fRenderer);
 	
 		// reset to default
-		fRasterizer->filling_rule(agg::fill_non_zero);
+		fRasterizer.filling_rule(agg::fill_non_zero);
 	
 		return _Clipped(_BoundingBox(outer));
 	}
@@ -915,20 +855,20 @@ Painter::DrawEllipse(BRect r, bool fill) const
 						   yRadius + inset,
 						   divisions);
 
-		fRasterizer->reset();
-		fRasterizer->add_path(outer);
-		fRasterizer->add_path(inner);
+		fRasterizer.reset();
+		fRasterizer.add_path(outer);
+		fRasterizer.add_path(inner);
 
 		// make the inner ellipse work as a hole
-		fRasterizer->filling_rule(agg::fill_even_odd);
+		fRasterizer.filling_rule(agg::fill_even_odd);
 
 		if (fPenSize > 4)
-			agg::render_scanlines(*fRasterizer, *fPackedScanline, *fRenderer);
+			agg::render_scanlines(fRasterizer, fPackedScanline, fRenderer);
 		else
-			agg::render_scanlines(*fRasterizer, *fUnpackedScanline, *fRenderer);
+			agg::render_scanlines(fRasterizer, fUnpackedScanline, fRenderer);
 
 		// reset to default
-		fRasterizer->filling_rule(agg::fill_non_zero);
+		fRasterizer.filling_rule(agg::fill_non_zero);
 
 		return _Clipped(_BoundingBox(outer));
 	}
@@ -1008,17 +948,16 @@ Painter::DrawString(const char* utf8String, uint32 length,
 
 	SetPattern(B_SOLID_HIGH, true);
 
-	if (fBuffer) {
-		bounds = fTextRenderer->RenderString(utf8String,
-											 length,
-											 fRenderer,
-											 fRendererBin,
-											 baseLine,
-											 fClippingRegion->Frame(),
-											 false,
-											 &fPenLocation, 
-											 delta);
-	}
+	bounds = fTextRenderer->RenderString(utf8String,
+										 length,
+										 &fRenderer,
+										 &fRendererBin,
+										 baseLine,
+										 fClippingRegion->Frame(),
+										 false,
+										 &fPenLocation, 
+										 delta);
+
 	return _Clipped(bounds);
 }
 
@@ -1036,8 +975,8 @@ Painter::BoundingBox(const char* utf8String, uint32 length,
 	static BRect dummy;
 	return fTextRenderer->RenderString(utf8String,
 									   length,
-									   fRenderer,
-									   fRendererBin,
+									   &fRenderer,
+									   &fRendererBin,
 									   baseLine, dummy, true, penLocation,
 									   delta);
 }
@@ -1113,42 +1052,6 @@ Painter::InvertRect(const BRect& r) const
 
 // #pragma mark - private
 
-// _MakeEmpty
-void
-Painter::_MakeEmpty()
-{
-	delete fBuffer;
-	fBuffer = NULL;
-
-	delete fPixelFormat;
-	fPixelFormat = NULL;
-
-	delete fBaseRenderer;
-	fBaseRenderer = NULL;
-
-#if USE_OUTLINE_RASTERIZER
-	delete fOutlineRenderer;
-	fOutlineRenderer = NULL;
-
-	delete fOutlineRasterizer;
-	fOutlineRasterizer = NULL;
-#endif
-
-	delete fUnpackedScanline;
-	fUnpackedScanline = NULL;
-	delete fPackedScanline;
-	fPackedScanline = NULL;
-
-	delete fRasterizer;
-	fRasterizer = NULL;
-
-	delete fRenderer;
-	fRenderer = NULL;
-
-	delete fRendererBin;
-	fRendererBin = NULL;
-}
-
 // _Transform
 void
 Painter::_Transform(BPoint* point, bool centerOffset) const
@@ -1194,13 +1097,6 @@ Painter::_UpdateFont()
 	fTextRenderer->SetFont(fFont);
 }
 
-// _UpdateLineWidth
-void
-Painter::_UpdateLineWidth()
-{
-	fLineProfile.width(fPenSize);	
-}
-
 // _UpdateDrawingMode
 void
 Painter::_UpdateDrawingMode(bool drawingText)
@@ -1223,39 +1119,23 @@ Painter::_UpdateDrawingMode(bool drawingText)
 	// When a solid pattern is used, _SetRendererColor()
 	// has to be called so that all internal colors in the renderes
 	// are up to date for use by the solid drawing mode version.
-	fPixelFormat->SetDrawingMode(fDrawingMode, fAlphaSrcMode,
-								 fAlphaFncMode, drawingText);
+	fPixelFormat.SetDrawingMode(fDrawingMode, fAlphaSrcMode,
+								fAlphaFncMode, drawingText);
 }
 
 // _SetRendererColor
 void
 Painter::_SetRendererColor(const rgb_color& color) const
 {
-#if USE_OUTLINE_RASTERIZER
-	if (fOutlineRenderer)
-#if ALIASED_DRAWING
-		fOutlineRenderer->line_color(agg::rgba(color.red / 255.0,
-											   color.green / 255.0,
-											   color.blue / 255.0,
-											   color.alpha / 255.0));
-#else
-		fOutlineRenderer->color(agg::rgba(color.red / 255.0,
-										  color.green / 255.0,
-										  color.blue / 255.0,
-										  color.alpha / 255.0));
-#endif // ALIASED_DRAWING
-#endif // USE_OUTLINE_RASTERIZER
-	if (fRenderer)
-		fRenderer->color(agg::rgba(color.red / 255.0,
-								   color.green / 255.0,
-								   color.blue / 255.0,
-								   color.alpha / 255.0));
+	fRenderer.color(agg::rgba(color.red / 255.0,
+							  color.green / 255.0,
+							  color.blue / 255.0,
+							  color.alpha / 255.0));
 // TODO: bitmap fonts not yet correctly setup in AGGTextRenderer
-//	if (fRendererBin)
-//		fRendererBin->color(agg::rgba(color.red / 255.0,
-//									  color.green / 255.0,
-//									  color.blue / 255.0,
-//									  color.alpha / 255.0));
+//	fRendererBin.color(agg::rgba(color.red / 255.0,
+//								 color.green / 255.0,
+//								 color.blue / 255.0,
+//								 color.alpha / 255.0));
 }
 
 // #pragma mark -
@@ -1351,7 +1231,7 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 					 BRect actualBitmapRect, BRect bitmapRect,
 					 BRect viewRect) const
 {
-	if (!fBuffer || !fValidClipping
+	if (!fValidClipping
 		|| !bitmapRect.IsValid() || !bitmapRect.Intersects(actualBitmapRect)
 		|| !viewRect.IsValid()) {
 		return;
@@ -1474,8 +1354,8 @@ Painter::_DrawBitmapNoScale32(F copyRowFunction, uint32 bytesPerSourcePixel,
 {
 	// NOTE: this would crash if viewRect was large enough to read outside the
 	// bitmap, so make sure this is not the case before calling this function!
-	uint8* dst = fBuffer->row_ptr(0);
-	uint32 dstBPR = fBuffer->stride();
+	uint8* dst = fBuffer.row_ptr(0);
+	uint32 dstBPR = fBuffer.stride();
 
 	const uint8* src = srcBuffer.row_ptr(0);
 	uint32 srcBPR = srcBuffer.stride();
@@ -1503,13 +1383,13 @@ if (left - xOffset < 0 || left - xOffset >= (int32)srcBuffer.width() ||
 	const rgb_color* colorMap = SystemPalette();
 
 	// copy rects, iterate over clipping boxes
-	fBaseRenderer->first_clip_box();
+	fBaseRenderer.first_clip_box();
 	do {
-		int32 x1 = max_c(fBaseRenderer->xmin(), left);
-		int32 x2 = min_c(fBaseRenderer->xmax(), right);
+		int32 x1 = max_c(fBaseRenderer.xmin(), left);
+		int32 x2 = min_c(fBaseRenderer.xmax(), right);
 		if (x1 <= x2) {
-			int32 y1 = max_c(fBaseRenderer->ymin(), top);
-			int32 y2 = min_c(fBaseRenderer->ymax(), bottom);
+			int32 y1 = max_c(fBaseRenderer.ymin(), top);
+			int32 y2 = min_c(fBaseRenderer.ymax(), bottom);
 			if (y1 <= y2) {
 				uint8* dstHandle = dst + y1 * dstBPR + x1 * 4;
 				const uint8* srcHandle = src + (y1 - yOffset) * srcBPR
@@ -1524,7 +1404,7 @@ if (left - xOffset < 0 || left - xOffset >= (int32)srcBuffer.width() ||
 				}
 			}
 		}
-	} while (fBaseRenderer->next_clip_box());
+	} while (fBaseRenderer.next_clip_box());
 }
 
 // _DrawBitmapGeneric32
@@ -1582,13 +1462,13 @@ Painter::_DrawBitmapGeneric32(agg::rendering_buffer& srcBuffer,
 	fPath.close_polygon();
 
 	agg::conv_transform<agg::path_storage> transformedPath(fPath, srcMatrix);
-	fRasterizer->reset();
-	fRasterizer->add_path(transformedPath);
+	fRasterizer.reset();
+	fRasterizer.add_path(transformedPath);
 
 	// render the path with the bitmap as scanline fill
-	agg::render_scanlines_aa(*fRasterizer,
-							 *fUnpackedScanline,
-							 *fBaseRenderer,
+	agg::render_scanlines_aa(fRasterizer,
+							 fUnpackedScanline,
+							 fBaseRenderer,
 							 spanAllocator,
 							 spanGenerator);
 }
@@ -1597,17 +1477,15 @@ Painter::_DrawBitmapGeneric32(agg::rendering_buffer& srcBuffer,
 void
 Painter::_InvertRect32(BRect r) const
 {
-	if (fBuffer) {
-		int32 width = r.IntegerWidth() + 1;
-		for (int32 y = (int32)r.top; y <= (int32)r.bottom; y++) {
-			uint8* dst = fBuffer->row_ptr(y);
-			dst += (int32)r.left * 4;
-			for (int32 i = 0; i < width; i++) {
-				dst[0] = 255 - dst[0];
-				dst[1] = 255 - dst[1];
-				dst[2] = 255 - dst[2];
-				dst += 4;
-			}
+	int32 width = r.IntegerWidth() + 1;
+	for (int32 y = (int32)r.top; y <= (int32)r.bottom; y++) {
+		uint8* dst = fBuffer.row_ptr(y);
+		dst += (int32)r.left * 4;
+		for (int32 i = 0; i < width; i++) {
+			dst[0] = 255 - dst[0];
+			dst[1] = 255 - dst[1];
+			dst[2] = 255 - dst[2];
+			dst += 4;
 		}
 	}
 }
@@ -1616,32 +1494,33 @@ Painter::_InvertRect32(BRect r) const
 void
 Painter::_BlendRect32(const BRect& r, const rgb_color& c) const
 {
-	if (fBuffer && fValidClipping) {
-		uint8* dst = fBuffer->row_ptr(0);
-		uint32 bpr = fBuffer->stride();
+	if (!fValidClipping)
+		return;
 
-		int32 left = (int32)r.left;
-		int32 top = (int32)r.top;
-		int32 right = (int32)r.right;
-		int32 bottom = (int32)r.bottom;
+	uint8* dst = fBuffer.row_ptr(0);
+	uint32 bpr = fBuffer.stride();
 
-		// fill rects, iterate over clipping boxes
-		fBaseRenderer->first_clip_box();
-		do {
-			int32 x1 = max_c(fBaseRenderer->xmin(), left);
-			int32 x2 = min_c(fBaseRenderer->xmax(), right);
-			if (x1 <= x2) {
-				int32 y1 = max_c(fBaseRenderer->ymin(), top);
-				int32 y2 = min_c(fBaseRenderer->ymax(), bottom);
+	int32 left = (int32)r.left;
+	int32 top = (int32)r.top;
+	int32 right = (int32)r.right;
+	int32 bottom = (int32)r.bottom;
 
-				uint8* offset = dst + x1 * 4 + y1 * bpr;
-				for (; y1 <= y2; y1++) {
-					blend_line32(offset, x2 - x1 + 1, c.red, c.green, c.blue, c.alpha);
-					offset += bpr;
-				}
+	// fill rects, iterate over clipping boxes
+	fBaseRenderer.first_clip_box();
+	do {
+		int32 x1 = max_c(fBaseRenderer.xmin(), left);
+		int32 x2 = min_c(fBaseRenderer.xmax(), right);
+		if (x1 <= x2) {
+			int32 y1 = max_c(fBaseRenderer.ymin(), top);
+			int32 y2 = min_c(fBaseRenderer.ymax(), bottom);
+
+			uint8* offset = dst + x1 * 4 + y1 * bpr;
+			for (; y1 <= y2; y1++) {
+				blend_line32(offset, x2 - x1 + 1, c.red, c.green, c.blue, c.alpha);
+				offset += bpr;
 			}
-		} while (fBaseRenderer->next_clip_box());
-	}
+		}
+	} while (fBaseRenderer.next_clip_box());
 }
 
 // #pragma mark -
@@ -1697,34 +1576,24 @@ template<class VertexSource>
 BRect
 Painter::_StrokePath(VertexSource& path) const
 {
-#if USE_OUTLINE_RASTERIZER
-	fOutlineRasterizer->add_path(path);
-#else
-//	if (fPenSize > 1.0) {
-		agg::conv_stroke<VertexSource> stroke(path);
-		stroke.width(fPenSize);
+	agg::conv_stroke<VertexSource> stroke(path);
+	stroke.width(fPenSize);
 
-		// special case line width = 1 with square caps
-		// this has a couple of advantages and it looks
-		// like this is also the R5 behaviour.
-		if (fPenSize == 1.0 && fLineCapMode == B_BUTT_CAP) {
-			stroke.line_cap(agg::square_cap);
-		} else {
-			stroke.line_cap(agg_line_cap_mode_for(fLineCapMode));
-		}
-		stroke.line_join(agg_line_join_mode_for(fLineJoinMode));
-		stroke.miter_limit(fMiterLimit);
+	// special case line width = 1 with square caps
+	// this has a couple of advantages and it looks
+	// like this is also the R5 behaviour.
+	if (fPenSize == 1.0 && fLineCapMode == B_BUTT_CAP) {
+		stroke.line_cap(agg::square_cap);
+	} else {
+		stroke.line_cap(agg_line_cap_mode_for(fLineCapMode));
+	}
+	stroke.line_join(agg_line_join_mode_for(fLineJoinMode));
+	stroke.miter_limit(fMiterLimit);
 
-		fRasterizer->reset();
-		fRasterizer->add_path(stroke);
+	fRasterizer.reset();
+	fRasterizer.add_path(stroke);
 
-		agg::render_scanlines(*fRasterizer, *fPackedScanline, *fRenderer);
-//	} else {
-	// TODO: update to AGG 2.3 to get rid of the remaining problems:
-	// rects which are 2 or 1 pixel high/wide don't render at all.
-//		fOutlineRasterizer->add_path(path);
-//	}
-#endif
+	agg::render_scanlines(fRasterizer, fPackedScanline, fRenderer);
 
 	BRect touched = _BoundingBox(path);
 	float penSize = ceilf(fPenSize / 2.0);
@@ -1738,9 +1607,9 @@ template<class VertexSource>
 BRect
 Painter::_FillPath(VertexSource& path) const
 {
-	fRasterizer->reset();
-	fRasterizer->add_path(path);
-	agg::render_scanlines(*fRasterizer, *fPackedScanline, *fRenderer);
+	fRasterizer.reset();
+	fRasterizer.add_path(path);
+	agg::render_scanlines(fRasterizer, fPackedScanline, fRenderer);
 
 	return _Clipped(_BoundingBox(path));
 }

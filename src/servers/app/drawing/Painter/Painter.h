@@ -32,24 +32,6 @@ class ServerBitmap;
 class ServerFont;
 class Transformable;
 
-// TODO: API transition:
-// * most all functions should take a DrawState* context parameter instead
-//   of the current pattern argument, that way, each function can
-//	 decide for itself, which pieces of information in DrawState it
-//   needs -> well I'm not so sure about this, there could also
-//   be a DrawState member in Painter fGraphicsState or something...
-// * Painter itself should be made thread safe. Because no
-//   ServerWindow is supposed to draw outside of its clipping region,
-//   there is actually no reason to lock the DisplayDriver. Multiple
-//   threads drawing in the frame buffer at the same time is actually
-//   only bad if their drawing could overlap, but this is already
-//   prevented by the clipping regions (access to those needs to be
-//   locked).
-//   Making Painter thread safe could introduce some overhead, since
-//   some of the current members of Painter would need to be created
-//   on the stack... I'll have to see about that... On multiple CPU
-//   machines though, there would be quite an improvement. In two
-//   years from now, most systems will be at least dual CPU
 
 class Painter {
  public:
@@ -75,7 +57,7 @@ class Painter {
 	inline	void				SetHighColor(const RGBColor& color)
 									{ SetHighColor(color.GetColor32()); }
 	inline	rgb_color			HighColor() const
-									{ return fPatternHandler->
+									{ return fPatternHandler.
 										HighColor().GetColor32(); }
 
 			void				SetLowColor(const rgb_color& color);
@@ -209,8 +191,6 @@ class Painter {
 									{ return _Clipped(rect); }
 
  private:
-			void				_MakeEmpty();
-
 			void				_Transform(BPoint* point,
 										   bool centerOffset = true) const;
 			BPoint				_Transform(const BPoint& point,
@@ -259,22 +239,18 @@ class Painter {
 			template<class VertexSource>
 			BRect				_FillPath(VertexSource& path) const;
 
-	agg::rendering_buffer*		fBuffer;
+mutable agg::rendering_buffer	fBuffer;
 
 	// AGG rendering and rasterization classes
-	pixfmt*						fPixelFormat;
-	renderer_base*				fBaseRenderer;
+	pixfmt						fPixelFormat;
+mutable renderer_base			fBaseRenderer;
 
-	outline_renderer_type*		fOutlineRenderer;
-	outline_rasterizer_type*	fOutlineRasterizer;
+mutable scanline_unpacked_type	fUnpackedScanline;
+mutable scanline_packed_type	fPackedScanline;
+mutable rasterizer_type			fRasterizer;
+mutable renderer_type			fRenderer;
+mutable renderer_bin_type		fRendererBin;
 
-	scanline_unpacked_type*		fUnpackedScanline;
-	scanline_packed_type*		fPackedScanline;
-	rasterizer_type*			fRasterizer;
-	renderer_type*				fRenderer;
-	renderer_bin_type*			fRendererBin;
-
-	agg::line_profile_aa		fLineProfile;
 mutable agg::path_storage		fPath;
 mutable agg::conv_curve<agg::path_storage> fCurve;
 
@@ -293,7 +269,7 @@ mutable agg::conv_curve<agg::path_storage> fCurve;
 	join_mode					fLineJoinMode;
 	float						fMiterLimit;
 
-	PatternHandler*				fPatternHandler;
+	PatternHandler				fPatternHandler;
 
 	ServerFont					fFont;
 	// a class handling rendering and caching of glyphs
