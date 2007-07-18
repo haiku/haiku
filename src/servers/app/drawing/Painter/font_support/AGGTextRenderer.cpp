@@ -177,7 +177,7 @@ AGGTextRenderer::RenderString(const char* string,
 	// "bounds" will track the bounding box arround all glyphs that are actually drawn
 	// it will be calculated in untransformed coordinates within the loop and then
 	// it is transformed to the real location at the exit of the function.
-	BRect bounds(0.0, 0.0, -1.0, -1.0);
+	BRect bounds(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN);
 
 	Transformable transform(fEmbeddedTransformation);
 	transform.TranslateBy(baseLine);
@@ -249,7 +249,7 @@ AGGTextRenderer::RenderString(const char* string,
 
 		// track bounding box
 		if (glyphBounds.IsValid())
-			bounds = bounds.IsValid() ? bounds | glyphBounds : glyphBounds;
+			bounds = bounds | glyphBounds;
 
 		// render the glyph if this is not a dry run
 		if (!dryRun) {
