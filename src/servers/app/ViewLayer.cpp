@@ -270,7 +270,7 @@ ViewLayer::RemoveChild(ViewLayer* layer)
 	layer->fNextSibling = NULL;
 
 	if (layer->IsVisible()) {
-		Overlay* overlay = _Overlay();
+		Overlay* overlay = layer->_Overlay();
 		if (overlay != NULL)
 			overlay->Hide();
 
