@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku, Inc.
+ * Copyright 2001-2007, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -179,6 +179,53 @@ DrawingEngine::ConstrainClippingRegion(const BRegion* region)
 
 	fPainter->ConstrainClipping(region);
 }
+
+
+void
+DrawingEngine::SetDrawState(const DrawState* state, int32 xOffset, int32 yOffset)
+{
+	fPainter->SetDrawState(state, false, xOffset, yOffset);	
+}
+
+
+void
+DrawingEngine::SetHighColor(const rgb_color& color)
+{
+	fPainter->SetHighColor(color);	
+}
+
+
+void
+DrawingEngine::SetLowColor(const rgb_color& color)
+{
+	fPainter->SetLowColor(color);	
+}
+
+
+void
+DrawingEngine::SetPenSize(float size)
+{
+	fPainter->SetPenSize(size);	
+}
+
+
+void
+DrawingEngine::SetPattern(const struct pattern& pattern)
+{
+	// TODO: doing it like this prevents an optimization
+	// for font rendering (special "solid" drawing mode)
+	fPainter->SetPattern(pattern, false);	
+}
+
+
+void
+DrawingEngine::SetDrawingMode(drawing_mode mode)
+{
+	fPainter->SetDrawingMode(mode);	
+}
+
+
+// #pragma mark -
 
 
 void
@@ -467,7 +514,7 @@ DrawingEngine::DrawBitmap(ServerBitmap *bitmap,
 	if (clipped.IsValid()) {
 		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
 
-		fPainter->SetDrawState(d);
+//		fPainter->SetDrawState(d);
 		fPainter->DrawBitmap(bitmap, source, dest);
 
 		fGraphicsCard->Invalidate(clipped);
@@ -492,7 +539,7 @@ DrawingEngine::DrawArc(BRect r, const float &angle,
 	if (clipped.IsValid()) {
 		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
 
-		fPainter->SetDrawState(d);
+//		fPainter->SetDrawState(d);
 
 		float xRadius = r.Width() / 2.0;
 		float yRadius = r.Height() / 2.0;
@@ -519,7 +566,7 @@ DrawingEngine::DrawBezier(BPoint *pts, const DrawState *d, bool filled)
 	// TODO: figure out bounds and hide cursor depending on that
 	fGraphicsCard->HideSoftwareCursor();
 
-	fPainter->SetDrawState(d);
+//	fPainter->SetDrawState(d);
 	BRect touched = fPainter->DrawBezier(pts, filled);
 
 	fGraphicsCard->Invalidate(touched);
@@ -549,7 +596,7 @@ DrawingEngine::DrawEllipse(BRect r, const DrawState *d, bool filled)
 	if (clipped.IsValid()) {
 		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
 
-		fPainter->SetDrawState(d);
+//		fPainter->SetDrawState(d);
 		fPainter->DrawEllipse(r, filled);
 
 		fGraphicsCard->Invalidate(clipped);
@@ -573,7 +620,7 @@ DrawingEngine::DrawPolygon(BPoint* ptlist, int32 numpts,
 	if (bounds.IsValid()) {
 		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(bounds);
 
-		fPainter->SetDrawState(d);
+//		fPainter->SetDrawState(d);
 		fPainter->DrawPolygon(ptlist, numpts, filled, closed);
 
 		fGraphicsCard->Invalidate(bounds);
@@ -606,10 +653,15 @@ DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end,
 	bool cursorTouched = fGraphicsCard->HideSoftwareCursor(touched);
 
 	if (!fPainter->StraightLine(start, end, color.GetColor32())) {
-		DrawState context;
-		context.SetHighColor(color);
-		context.SetDrawingMode(B_OP_OVER);
-		StrokeLine(start, end, &context);
+		// TODO: all this is quite expensive, but it is currently
+		// used only for the "gradient" decorator tab buttons
+		rgb_color previousColor = fPainter->HighColor();
+		drawing_mode previousMode = fPainter->DrawingMode();
+		fPainter->SetHighColor(color);
+		fPainter->SetDrawingMode(B_OP_OVER);
+		fPainter->StrokeLine(start, end);
+		fPainter->SetHighColor(previousColor);
+		fPainter->SetDrawingMode(previousMode);
 	} else {
 		fGraphicsCard->Invalidate(touched);
 	}
@@ -717,7 +769,7 @@ DrawingEngine::StrokeRect(BRect r, const DrawState *d)
 
 		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
 
-		fPainter->SetDrawState(d);
+//		fPainter->SetDrawState(d);
 		fPainter->StrokeRect(r);
 
 		fGraphicsCard->Invalidate(clipped);
@@ -763,7 +815,7 @@ DrawingEngine::FillRect(BRect r, const DrawState *d)
 			}
 		}
 		if (doInSoftware) {
-			fPainter->SetDrawState(d);
+//			fPainter->SetDrawState(d);
 			fPainter->FillRect(r);
 
 			fGraphicsCard->Invalidate(r);
@@ -806,7 +858,7 @@ DrawingEngine::FillRegion(BRegion& r, const DrawState *d)
 		}
 
 		if (doInSoftware) {
-			fPainter->SetDrawState(d);
+//			fPainter->SetDrawState(d);
 
 			BRect touched = fPainter->FillRect(r.RectAt(0));
 
@@ -843,7 +895,7 @@ DrawingEngine::DrawRoundRect(BRect r, float xrad, float yrad,
 	if (clipped.IsValid()) {
 		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
 
-		fPainter->SetDrawState(d);
+//		fPainter->SetDrawState(d);
 		BRect touched = filled ? fPainter->FillRoundRect(r, xrad, yrad)
 							   : fPainter->StrokeRoundRect(r, xrad, yrad);
 
@@ -865,7 +917,7 @@ DrawingEngine::DrawShape(const BRect& bounds, int32 opCount,
 	// shape is drawn on screen, TODO: optimize
 	fGraphicsCard->HideSoftwareCursor();
 
-	fPainter->SetDrawState(d);
+//	fPainter->SetDrawState(d);
 	BRect touched = fPainter->DrawShape(opCount, opList,
 										ptCount, ptList,
 										filled);
@@ -888,7 +940,7 @@ DrawingEngine::DrawTriangle(BPoint* pts, const BRect& bounds,
 	if (clipped.IsValid()) {
 		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
 
-		fPainter->SetDrawState(d);
+//		fPainter->SetDrawState(d);
 		if (filled)
 			fPainter->FillTriangle(pts[0], pts[1], pts[2]);
 		else
@@ -913,7 +965,7 @@ DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end, DrawState* con
 	if (touched.IsValid()) {
 		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(touched);
 
-		fPainter->SetDrawState(context);
+//		fPainter->SetDrawState(context);
 		fPainter->StrokeLine(start, end);
 
 		fGraphicsCard->Invalidate(touched);
@@ -954,15 +1006,7 @@ DrawingEngine::StrokeLineArray(int32 numLines,
 
 		data = (const LineArrayData *)&(linedata[0]);
 
-		DrawState context;
-		context.SetDrawingMode(d->GetDrawingMode());
-		context.SetLowColor(d->LowColor());
-		context.SetHighColor(data->color);
-		context.SetPenSize(d->PenSize());
-			// pen size is already correctly scaled
-
-		fPainter->SetDrawState(&context);
-
+		fPainter->SetHighColor(data->color);
 		fPainter->StrokeLine(data->pt1, data->pt2);
 
 		for (int32 i = 1; i < numLines; i++) {
@@ -970,6 +1014,9 @@ DrawingEngine::StrokeLineArray(int32 numLines,
 			fPainter->SetHighColor(data->color);
 			fPainter->StrokeLine(data->pt1, data->pt2);
 		}
+
+		// restore correct drawing state highcolor
+		fPainter->SetHighColor(d->HighColor());
 
 		fGraphicsCard->Invalidate(touched);
 		if (cursorTouched)
@@ -992,6 +1039,11 @@ DrawingEngine::DrawString(const char* string, int32 length,
 	BPoint penLocation = pt;
 
 	fPainter->SetDrawState(d, true);
+		// TODO: this will reset the scrolling offsets used for
+		// pattern drawing again, it is really necessary to change
+		// the whole graphics state synchronization between DrawState
+		// and Painter, and remove any individual SetDrawState() calls
+		// like here
 //bigtime_t now = system_time();
 // TODO: BoundingBox is quite slow!! Optimizing it will be beneficial.
 // Cursiously, the DrawString after it is actually faster!?!

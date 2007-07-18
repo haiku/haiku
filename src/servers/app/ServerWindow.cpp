@@ -407,7 +407,8 @@ fDesktop->LockSingleWindow();
 void
 ServerWindow::NotifyQuitRequested()
 {
-	// NOTE: if you do something else, other than sending a port message, PLEASE lock
+	// NOTE: if you do something else, other than sending a port message,
+	// PLEASE lock
 	STRACE(("ServerWindow %s: Quit\n", fTitle));
 
 	BMessage msg(B_QUIT_REQUESTED);
@@ -435,7 +436,8 @@ ServerWindow::NotifyMinimize(bool minimize)
 void
 ServerWindow::NotifyZoom()
 {
-	// NOTE: if you do something else, other than sending a port message, PLEASE lock
+	// NOTE: if you do something else, other than sending a port message,
+	// PLEASE lock
 	BMessage msg(B_ZOOM);
 	SendMessageToClient(&msg);
 }
@@ -462,6 +464,13 @@ ServerWindow::GetInfo(window_info& info)
 
 	info.show_hide_level = fWindowLayer->IsHidden() ? 1 : 0; // ???
 	info.is_mini = fWindowLayer->IsMinimized();
+}
+
+
+void
+ServerWindow::ResyncDrawState()
+{
+	_UpdateDrawState(fCurrentLayer);
 }
 
 
@@ -1194,12 +1203,15 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			fCurrentLayer->CurrentState()->ReadFromLink(link);
 			// TODO: When is this used?!?
 			fCurrentLayer->RebuildClipping(true);
+			_UpdateDrawState(fCurrentLayer);
+
 			break;
 		}
 		case AS_LAYER_SET_FONT_STATE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: ViewLayer name: %s\n", fTitle, fCurrentLayer->Name()));
 			fCurrentLayer->CurrentState()->ReadFontFromLink(link);
+			_UpdateDrawState(fCurrentLayer);
 			break;
 		}
 		case AS_LAYER_GET_STATE:
@@ -1323,6 +1335,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			link.Read<float>(&y);
 			
 			fCurrentLayer->SetDrawingOrigin(BPoint(x, y));
+			_UpdateDrawState(fCurrentLayer);
 			break;
 		}
 		case AS_LAYER_GET_ORIGIN:
@@ -1382,6 +1395,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			uint32 flags;
 			link.Read<uint32>(&flags);
 			fCurrentLayer->SetFlags(flags);
+			_UpdateDrawState(fCurrentLayer);
 
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FLAGS: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
 			break;
@@ -1411,7 +1425,9 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			fCurrentLayer->CurrentState()->SetLineCapMode((cap_mode)lineCap);
 			fCurrentLayer->CurrentState()->SetLineJoinMode((join_mode)lineJoin);
 			fCurrentLayer->CurrentState()->SetMiterLimit(miterLimit);
-		
+
+			_UpdateDrawState(fCurrentLayer);
+
 			break;
 		}
 		case AS_LAYER_GET_LINE_MODE:
@@ -1430,7 +1446,8 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			DTRACE(("ServerWindow %s: Message AS_LAYER_PUSH_STATE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
 			
 			fCurrentLayer->PushState();
-
+			// TODO: is this necessary?
+			_UpdateDrawState(fCurrentLayer);
 			break;
 		}
 		case AS_LAYER_POP_STATE:
@@ -1438,7 +1455,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			DTRACE(("ServerWindow %s: Message AS_LAYER_POP_STATE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
 			
 			fCurrentLayer->PopState();
-
+			_UpdateDrawState(fCurrentLayer);
 			break;
 		}
 		case AS_LAYER_SET_SCALE:
@@ -1448,6 +1465,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			link.Read<float>(&scale);
 
 			fCurrentLayer->SetScale(scale);
+			_UpdateDrawState(fCurrentLayer);
 			break;
 		}
 		case AS_LAYER_GET_SCALE:
@@ -1468,6 +1486,8 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			link.Read<float>(&y);
 
 			fCurrentLayer->CurrentState()->SetPenLocation(BPoint(x, y));
+			// TODO: is this necessary?
+			_UpdateDrawState(fCurrentLayer);
 			break;
 		}
 		case AS_LAYER_GET_PEN_LOC:
@@ -1484,8 +1504,10 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
 			float penSize;
 			link.Read<float>(&penSize);
+
 			fCurrentLayer->CurrentState()->SetPenSize(penSize);
-		
+			//_UpdateDrawState(fCurrentLayer);
+			fWindowLayer->GetDrawingEngine()->SetPenSize(penSize);
 			break;
 		}
 		case AS_LAYER_GET_PEN_SIZE:
@@ -1545,7 +1567,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			
 			fCurrentLayer->CurrentState()->SetBlendingMode((source_alpha)srcAlpha,
 											(alpha_function)alphaFunc);
-
+			_UpdateDrawState(fCurrentLayer);
 			break;
 		}
 		case AS_LAYER_GET_BLENDING_MODE:
@@ -1566,7 +1588,8 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			link.Read<int8>(&drawingMode);
 			
 			fCurrentLayer->CurrentState()->SetDrawingMode((drawing_mode)drawingMode);
-			
+			//_UpdateDrawState(fCurrentLayer);
+			fWindowLayer->GetDrawingEngine()->SetDrawingMode((drawing_mode)drawingMode);
 			break;
 		}
 		case AS_LAYER_GET_DRAWING_MODE:
@@ -1633,8 +1656,10 @@ ServerWindow::_DispatchViewMessage(int32 code,
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
 			bool fontAliasing;
-			if (link.Read<bool>(&fontAliasing) == B_OK)
+			if (link.Read<bool>(&fontAliasing) == B_OK) {
 				fCurrentLayer->CurrentState()->SetForceFontAliasing(fontAliasing);	
+				_UpdateDrawState(fCurrentLayer);
+			}
 			break;
 		}
 		case AS_LAYER_CLIP_TO_PICTURE:
@@ -1782,6 +1807,8 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			link.Read(&c, sizeof(rgb_color));
 			
 			fCurrentLayer->CurrentState()->SetHighColor(RGBColor(c));
+//			_UpdateDrawState(fCurrentLayer);
+			fWindowLayer->GetDrawingEngine()->SetHighColor(c);
 			break;
 		}
 		case AS_LAYER_SET_LOW_COLOR:
@@ -1792,6 +1819,8 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			link.Read(&c, sizeof(rgb_color));
 
 			fCurrentLayer->CurrentState()->SetLowColor(RGBColor(c));
+//			_UpdateDrawState(fCurrentLayer);
+			fWindowLayer->GetDrawingEngine()->SetLowColor(c);
 			break;
 		}
 		case AS_LAYER_SET_PATTERN:
@@ -1802,6 +1831,8 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			link.Read(&pat, sizeof(pattern));
 
 			fCurrentLayer->CurrentState()->SetPattern(Pattern(pat));
+//			_UpdateDrawState(fCurrentLayer);
+			fWindowLayer->GetDrawingEngine()->SetPattern(pat);
 			break;
 		}
 		case AS_SET_FONT:
@@ -1819,7 +1850,11 @@ ServerWindow::_DispatchViewMessage(int32 code,
 		}
 		case AS_SYNC:
 		{
-			// TODO: AS_SYNC is a no-op for now, just to get things working
+			// the synchronisation works by the fact that the client
+			// window is waiting for this reply, after having received it,
+			// client and server queues are in sync (earlier, the client
+			// may have pushed drawing commands at the server and now it
+			// knows they have all been carried out)
 			fLink.StartMessage(B_OK);
 			fLink.Flush();
 			break;
@@ -1974,7 +2009,9 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 	}
 
 	drawingEngine->LockParallelAccess();
-	// TODO: avoid setting the region each time
+	// NOTE: the region is not copied, Painter keeps a pointer,
+	// that's why you need to use the clipping only for as long
+	// as you have it locked
 	drawingEngine->ConstrainClippingRegion(&fCurrentDrawingRegion);
 
 	switch (code) {
@@ -2258,6 +2295,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 
 			fCurrentLayer->ConvertFromScreenForDrawing(&penLocation);
 			fCurrentLayer->CurrentState()->SetPenLocation(penLocation);
+			// TODO: optimize with flags
+			_UpdateDrawState(fCurrentLayer);
 
 			free(string);
 			break;
@@ -2837,29 +2876,49 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 void
 ServerWindow::_SetCurrentLayer(ViewLayer* layer)
 {
-	if (fCurrentLayer != layer) {
-		fCurrentLayer = layer;
-		fCurrentDrawingRegionValid = false;
+	if (fCurrentLayer == layer)
+		return;
+
+	fCurrentLayer = layer;
+	fCurrentDrawingRegionValid = false;
+	_UpdateDrawState(fCurrentLayer);
+
 #if 0
 #if DELAYED_BACKGROUND_CLEARING
-		if (fCurrentLayer && fCurrentLayer->IsBackgroundDirty() && fWindowLayer->InUpdate()) {
-			DrawingEngine* drawingEngine = fWindowLayer->GetDrawingEngine();
-			if (drawingEngine->LockParallelAccess()) {
-		
-				fWindowLayer->GetEffectiveDrawingRegion(fCurrentLayer, fCurrentDrawingRegion);
-				fCurrentDrawingRegionValid = true;
-				BRegion dirty(fCurrentDrawingRegion);
-
-				BRegion content;
-				fWindowLayer->GetContentRegion(&content);
-
-				fCurrentLayer->Draw(drawingEngine, &dirty, &content, false);
+	if (fCurrentLayer && fCurrentLayer->IsBackgroundDirty()
+		&& fWindowLayer->InUpdate()) {
+		DrawingEngine* drawingEngine = fWindowLayer->GetDrawingEngine();
+		if (drawingEngine->LockParallelAccess()) {
 	
-				drawingEngine->UnlockParallelAccess();
-			}
+			fWindowLayer->GetEffectiveDrawingRegion(fCurrentLayer, fCurrentDrawingRegion);
+			fCurrentDrawingRegionValid = true;
+			BRegion dirty(fCurrentDrawingRegion);
+
+			BRegion content;
+			fWindowLayer->GetContentRegion(&content);
+
+			fCurrentLayer->Draw(drawingEngine, &dirty, &content, false);
+
+			drawingEngine->UnlockParallelAccess();
 		}
+	}
 #endif
 #endif // 0
+}
+
+
+void
+ServerWindow::_UpdateDrawState(ViewLayer* layer)
+{
+	// switch the drawing state
+	// TODO: is it possible to scroll a view while it
+	// is being drawn? probably not... otherwise the
+	// "offsets" passed below would need to be updated again
+	DrawingEngine* drawingEngine = fWindowLayer->GetDrawingEngine();
+	if (layer && drawingEngine) {
+		IntPoint p = layer->ScrollingOffset();
+		p += IntPoint(layer->CurrentState()->Origin());
+		drawingEngine->SetDrawState(layer->CurrentState(), p.x, p.y);
 	}
 }
 

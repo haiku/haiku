@@ -101,6 +101,8 @@ public:
 
 			void				GetInfo(window_info& info);
 
+			void				ResyncDrawState();
+
 private:
 			ViewLayer*			_CreateLayerTree(BPrivate::LinkReceiver &link,
 									ViewLayer **_parent);
@@ -123,6 +125,7 @@ private:
 			status_t			_EnableDirectWindowMode();
 
 			void				_SetCurrentLayer(ViewLayer* view);
+			void				_UpdateDrawState(ViewLayer* view);
 
 			// TODO: Move me elsewhere
 			status_t			PictureToRegion(ServerPicture *picture,

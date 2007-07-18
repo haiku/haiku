@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku, Inc.
+ * Copyright 2001-2007, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -65,6 +65,15 @@ public:
 			// clipping for all drawing functions, passing a NULL region
 			// will remove any clipping (drawing allowed everywhere)
 			void			ConstrainClippingRegion(const BRegion* region);
+
+			void			SetDrawState(const DrawState* state,
+								int32 xOffset = 0, int32 yOffset = 0);
+
+			void			SetHighColor(const rgb_color& color);
+			void			SetLowColor(const rgb_color& color);
+			void			SetPenSize(float size);
+			void			SetPattern(const struct pattern& pattern);
+			void			SetDrawingMode(drawing_mode mode);
 
 			void			SuspendAutoSync();
 			void			Sync();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
+ * Copyright 2005-2007, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * API to the Anti-Grain Geometry based "Painter" drawing backend. Manages
@@ -183,7 +183,8 @@ Painter::DetachFromBuffer()
 
 // SetDrawState
 void
-Painter::SetDrawState(const DrawState* data, bool updateFont)
+Painter::SetDrawState(const DrawState* data, bool updateFont,
+					  int32 xOffset, int32 yOffset)
 {
 	// NOTE: The custom clipping in "data" is ignored, because it has already been
 	// taken into account elsewhere
@@ -211,6 +212,7 @@ Painter::SetDrawState(const DrawState* data, bool updateFont)
 	fAlphaSrcMode	= data->AlphaSrcMode();
 	fAlphaFncMode	= data->AlphaFncMode();
 	fPatternHandler->SetPattern(data->GetPattern());
+	fPatternHandler->SetOffsets(xOffset, yOffset);
 	fLineCapMode	= data->LineCapMode();
 	fLineJoinMode	= data->LineJoinMode();
 	fMiterLimit		= data->MiterLimit();
@@ -256,6 +258,16 @@ Painter::SetLowColor(const rgb_color& color)
 	fPatternHandler->SetLowColor(color);
 	if (*(fPatternHandler->GetR5Pattern()) == B_SOLID_LOW)
 		_SetRendererColor(color);
+}
+
+// SetDrawingMode
+void
+Painter::SetDrawingMode(drawing_mode mode)
+{
+	if (fDrawingMode != mode) {
+		fDrawingMode = mode;
+		_UpdateDrawingMode();
+	}
 }
 
 // SetPenSize

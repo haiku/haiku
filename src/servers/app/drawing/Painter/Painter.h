@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
+ * Copyright 2005-2007, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * API to the Anti-Grain Geometry based "Painter" drawing backend. Manages
@@ -10,6 +10,7 @@
 #define PAINTER_H
 
 #include "FontManager.h"
+#include "PatternHandler.h"
 #include "RGBColor.h"
 #include "ServerFont.h"
 
@@ -26,7 +27,6 @@ class AGGTextRenderer;
 class BBitmap;
 class BRegion;
 class DrawState;
-class PatternHandler;
 class RenderingBuffer;
 class ServerBitmap;
 class ServerFont;
@@ -65,13 +65,19 @@ class Painter {
 									{ return fClippingRegion; }
 
 			void				SetDrawState(const DrawState* data,
-											 bool updateFont = false);
+											 bool updateFont = false,
+											 int32 xOffset = 0,
+											 int32 yOffset = 0);
 
 								// object settings
 			void				SetHighColor(const rgb_color& color);
 	inline	void				SetHighColor(uint8 r, uint8 g, uint8 b, uint8 a = 255);
 	inline	void				SetHighColor(const RGBColor& color)
 									{ SetHighColor(color.GetColor32()); }
+	inline	rgb_color			HighColor() const
+									{ return fPatternHandler->
+										HighColor().GetColor32(); }
+
 			void				SetLowColor(const rgb_color& color);
 	inline	void				SetLowColor(uint8 r, uint8 g, uint8 b, uint8 a = 255);
 	inline	void				SetLowColor(const RGBColor& color)
@@ -80,6 +86,9 @@ class Painter {
 			void				SetPenSize(float size);
 			void				SetPattern(const pattern& p,
 										   bool drawingText = false);
+			void				SetDrawingMode(drawing_mode mode);
+	inline	drawing_mode		DrawingMode() const
+									{ return fDrawingMode; }
 
 			void				SetPenLocation(const BPoint& location);
 			BPoint				PenLocation() const

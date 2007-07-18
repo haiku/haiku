@@ -1784,6 +1784,14 @@ WindowLayer::_DrawBorder()
 		engine->ConstrainClippingRegion(dirtyBorderRegion);
 		fDecorator->Draw(dirtyBorderRegion->Frame());
 
+// TODO: remove this once the DrawState stuff is handled
+// more cleanly. The reason why this is needed is that
+// when the decorator draws strings, a draw state is set
+// on the Painter object, and this is were it might get
+// out of sync with what the ServerWindow things is the
+// current DrawState set on the Painter
+fWindow->ResyncDrawState();
+
 		engine->UnlockParallelAccess();
 	}
 	fRegionPool.Recycle(dirtyBorderRegion);
