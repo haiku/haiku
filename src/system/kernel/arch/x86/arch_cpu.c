@@ -209,12 +209,13 @@ init_double_fault(int cpuNum)
 {
 	/* set up the double fault tss */
 	/* TODO: Axel - fix SMP support */
-	struct tss *tss = &gCPU[cpuNum].arch.tss;
+	struct tss *tss = &gCPU[cpuNum].arch.double_fault_tss;
 	
 	memset(tss, 0, sizeof(struct tss));
 	tss->sp0 = (uint32)sDoubleFaultStack + sizeof(sDoubleFaultStack);
 	tss->ss0 = KERNEL_DATA_SEG;
-	read_cr3(tss->cr3); // copy the current cr3 to the double fault cr3
+	read_cr3(tss->cr3);
+		// copy the current cr3 to the double fault cr3
 	tss->eip = (uint32)&double_fault;
 	tss->es = KERNEL_DATA_SEG;
 	tss->cs = KERNEL_CODE_SEG;
@@ -226,12 +227,13 @@ init_double_fault(int cpuNum)
 	tss->ldt_seg_selector = 0;
 
 	// add TSS descriptor for this new TSS
-	set_tss_descriptor(&gGDT[DOUBLE_FAULT_TSS_BASE_SEGMENT + cpuNum], (addr_t)tss, sizeof(struct tss));
-
-//	set_tss_descriptor(&gGDT[DOUBLE_FAULT_TSS_SEGMENT + cpuNum], (addr_t)sDoubleFaultTSS[cpuNum], sizeof(struct tss));
+	set_tss_descriptor(&gGDT[DOUBLE_FAULT_TSS_BASE_SEGMENT + cpuNum],
+		(addr_t)tss, sizeof(struct tss));
 }
 
-static void make_feature_string(cpu_ent *cpu, char *str, size_t strlen)
+
+static void
+make_feature_string(cpu_ent *cpu, char *str, size_t strlen)
 {
 	str[0] = 0;
 
@@ -321,7 +323,9 @@ static void make_feature_string(cpu_ent *cpu, char *str, size_t strlen)
 		strlcat(str, "3dnow ", strlen);
 }
 
-static int detect_cpu(int curr_cpu) 
+
+static int
+detect_cpu(int curr_cpu) 
 {
 	cpuid_info cpuid;
 	unsigned int data[4];
@@ -414,7 +418,9 @@ static int detect_cpu(int curr_cpu)
 	return 0;
 }
 
-bool x86_check_feature(uint32 feature, enum x86_feature_type type)
+
+bool
+x86_check_feature(uint32 feature, enum x86_feature_type type)
 {
 	cpu_ent *cpu = get_cpu_struct();
 
@@ -429,7 +435,9 @@ bool x86_check_feature(uint32 feature, enum x86_feature_type type)
 	return (cpu->arch.feature[type] & feature) ? TRUE : FALSE;
 }
 
+
 //	#pragma mark -
+
 
 status_t
 arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
@@ -471,8 +479,8 @@ arch_cpu_init_post_vm(kernel_args *args)
 	// account for the segment descriptors
 
 	gGDT = (segment_descriptor *)args->arch_args.vir_gdt;
-	create_area("gdt", (void **)&gGDT, B_EXACT_ADDRESS, B_PAGE_SIZE, B_ALREADY_WIRED,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	create_area("gdt", (void **)&gGDT, B_EXACT_ADDRESS, B_PAGE_SIZE,
+		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	// currently taken out of the build, because it's not yet used (and assumes
 	// (a fixed number of used GDT entries)
@@ -480,12 +488,14 @@ arch_cpu_init_post_vm(kernel_args *args)
 
 	// setup task-state segments
 	for (i = 0; i < args->num_cpus; i++) {
-		// initialize the regular and double fault tss stored in the per-cpu structure
+		// initialize the regular and double fault tss stored in the per-cpu
+		// structure
 		memset(&gCPU[i].arch.tss, 0, sizeof(struct tss));
 		gCPU[i].arch.tss.ss0 = KERNEL_DATA_SEG;
 
 		// add TSS descriptor for this new TSS
-		set_tss_descriptor(&gGDT[TSS_BASE_SEGMENT + i], (addr_t)&gCPU[i].arch.tss, sizeof(struct tss));
+		set_tss_descriptor(&gGDT[TSS_BASE_SEGMENT + i],
+			(addr_t)&gCPU[i].arch.tss, sizeof(struct tss));
 
 		// initialize the double fault tss
 		init_double_fault(i);
