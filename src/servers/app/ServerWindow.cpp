@@ -59,7 +59,7 @@ using std::nothrow;
 
 //#define TRACE_SERVER_WINDOW
 //#define TRACE_SERVER_WINDOW_MESSAGES
-#define PROFILE_MESSAGE_LOOP
+//#define PROFILE_MESSAGE_LOOP
 
 
 #ifdef TRACE_SERVER_WINDOW
