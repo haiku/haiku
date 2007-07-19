@@ -269,8 +269,12 @@ dump_page(int argc, char **argv)
 	kprintf("wired_count:     %u\n", page->wired_count);
 	kprintf("usage_count:     %u\n", page->usage_count);
 	#ifdef DEBUG_PAGE_QUEUE
-	kprintf("queue:           %p\n", page->queue);
+		kprintf("queue:           %p\n", page->queue);
 	#endif
+	#ifdef DEBUG_PAGE_CACHE_TRANSITIONS
+		kprintf("debug_flags:     0x%lx\n", page->debug_flags);
+		kprintf("collided page:   %p\n", page->collided_page);
+	#endif	// DEBUG_PAGE_CACHE_TRANSITIONS
 	kprintf("area mappings:\n");
 
 	mapping = page->mappings;
@@ -831,6 +835,10 @@ vm_page_init(kernel_args *args)
 		#ifdef DEBUG_PAGE_QUEUE
 			sPages[i].queue = NULL;
 		#endif
+		#ifdef DEBUG_PAGE_CACHE_TRANSITIONS
+			sPages[i].debug_flags = 0;
+			sPages[i].collided_page = NULL;
+		#endif	// DEBUG_PAGE_CACHE_TRANSITIONS
 		enqueue_page(&page_free_queue, &sPages[i]);
 	}
 

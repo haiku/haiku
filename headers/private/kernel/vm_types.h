@@ -21,6 +21,9 @@
 // be in.
 //#define DEBUG_PAGE_QUEUE	1
 
+// Enables extra debug fields in the vm_page used to track page transitions
+// between caches.
+//#define DEBUG_PAGE_CACHE_TRANSITIONS	1
 
 #ifdef __cplusplus
 struct vm_page_mapping;
@@ -90,6 +93,11 @@ typedef struct vm_page {
 
 	#ifdef DEBUG_PAGE_QUEUE
 	void*				queue;
+	#endif
+
+	#ifdef DEBUG_PAGE_CACHE_TRANSITIONS
+	uint32	debug_flags;
+	struct vm_page *collided_page;
 	#endif
 
 	uint8				type : 2;

@@ -2195,8 +2195,29 @@ page_state_to_string(int state)
 }
 
 
+static void
+dump_cache_tree_recursively(vm_cache* cache, int level,
+	vm_cache* highlightCache)
+{
+	// print this cache
+	for (int i = 0; i < level; i++)
+		kprintf("  ");
+	if (cache == highlightCache)
+		kprintf("%p <--\n", cache);
+	else
+		kprintf("%p\n", cache);
+
+	// recursively print its consumers
+	vm_cache* consumer = NULL;
+	while ((consumer = (vm_cache *)list_get_next_item(&cache->consumers,
+			consumer)) != NULL) {
+		dump_cache_tree_recursively(consumer, level + 1, highlightCache);
+	}
+}
+
+
 static int
-dump_cache_chain(int argc, char **argv)
+dump_cache_tree(int argc, char **argv)
 {
 	if (argc < 2 || strlen(argv[1]) < 2
 		|| argv[1][0] != '0'
@@ -2210,10 +2231,13 @@ dump_cache_chain(int argc, char **argv)
 		return 0;
 
 	vm_cache *cache = (vm_cache *)address;
-	while (cache != NULL) {
-		dprintf("%p\n", cache);
-		cache = cache->source;
-	}
+	vm_cache *root = cache;
+
+	// find the root cache (the transitive source)
+	while (root->source != NULL)
+		root = root->source;
+
+	dump_cache_tree_recursively(root, 0, cache);
 
 	return 0;
 }
@@ -2914,7 +2938,7 @@ vm_init(kernel_args *args)
 	add_debugger_command("areas", &dump_area_list, "Dump a list of all areas");
 	add_debugger_command("area", &dump_area, "Dump info about a particular area");
 	add_debugger_command("cache", &dump_cache, "Dump vm_cache");
-	add_debugger_command("cache_chain", &dump_cache_chain, "Dump vm_cache chain");
+	add_debugger_command("cache_tree", &dump_cache_tree, "Dump vm_cache tree");
 	add_debugger_command("avail", &dump_available_memory, "Dump available memory");
 	add_debugger_command("dl", &display_mem, "dump memory long words (64-bit)");
 	add_debugger_command("dw", &display_mem, "dump memory words (32-bit)");
@@ -3197,8 +3221,22 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 			// page must be busy
 			// ToDo: don't wait forever!
 			mutex_unlock(&cache->lock);
-			snooze(20000);
+			thread_yield();
 			mutex_lock(&cache->lock);
+
+			if (cache->busy) {
+				// The cache became busy, which means, it is about to be
+				// removed by vm_cache_remove_consumer(). We start again with
+				// the top cache.
+				mutex_unlock(&cache->lock);
+				vm_cache_release_ref(cache);
+
+				cache = topCache;
+				lastCache = cache;
+				
+				vm_cache_acquire_ref(cache);
+				mutex_lock(&cache->lock);
+			}
 		}
 
 		if (page != NULL && page != &dummyPage)
@@ -3267,6 +3305,9 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 			// upwards, too, we try this cache again
 			mutex_unlock(&cache->lock);
 			mutex_lock(&cache->lock);
+			if (cache->busy)
+				panic("fault_find_page(): cache became busy: %p\n", cache);
+					// TODO: Don't panic()!
 			lastCache = NULL;
 			continue;
 		} else if (status < B_OK)
@@ -3288,6 +3329,9 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 				// top most cache may have direct write access.
 			vm_cache_acquire_ref(cache);
 			mutex_lock(&cache->lock);
+			if (cache->busy)
+				panic("fault_find_page(): 2. cache became busy: %p\n", cache);
+					// TOOD: Don't panic()!
 		}
 
 		// release the reference of the last vm_cache we still have from the loop above
@@ -3324,12 +3368,29 @@ fault_get_page(vm_translation_map *map, vm_cache *topCache,
 		// Insert the new page into our cache, and replace it with the dummy page if necessary
 
 		// if we inserted a dummy page into this cache, we have to remove it now
-		if (dummyPage.state == PAGE_STATE_BUSY && dummyPage.cache == cache)
+		if (dummyPage.state == PAGE_STATE_BUSY && dummyPage.cache == cache) {
+#ifdef DEBUG_PAGE_CACHE_TRANSITIONS
+			page->debug_flags = dummyPage.debug_flags | 0x8;
+			if (dummyPage.collided_page != NULL) {
+				dummyPage.collided_page->collided_page = page;
+				page->collided_page = dummyPage.collided_page;
+			}
+#endif	// DEBUG_PAGE_CACHE_TRANSITIONS
+
 			fault_remove_dummy_page(dummyPage, true);
+		}
 
 		vm_cache_insert_page(cache, page, cacheOffset);
 
 		if (dummyPage.state == PAGE_STATE_BUSY) {
+#ifdef DEBUG_PAGE_CACHE_TRANSITIONS
+			page->debug_flags = dummyPage.debug_flags | 0x10;
+			if (dummyPage.collided_page != NULL) {
+				dummyPage.collided_page->collided_page = page;
+				page->collided_page = dummyPage.collided_page;
+			}
+#endif	// DEBUG_PAGE_CACHE_TRANSITIONS
+
 			// we had inserted the dummy cache in another cache, so let's remove it from there
 			fault_remove_dummy_page(dummyPage, false);
 		}
@@ -3502,6 +3563,10 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	dummyPage.type = PAGE_TYPE_DUMMY;
 	dummyPage.busy_writing = isWrite;
 	dummyPage.wired_count = 0;
+#ifdef DEBUG_PAGE_CACHE_TRANSITIONS
+	dummyPage.debug_flags = 0;
+	dummyPage.collided_page = NULL;
+#endif	// DEBUG_PAGE_CACHE_TRANSITIONS
 
 	vm_cache *copiedPageSource = NULL;
 	vm_cache *pageSource;

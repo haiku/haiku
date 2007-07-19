@@ -314,8 +314,10 @@ vm_cache_remove_page(vm_cache *cache, vm_page *page)
 	TRACE(("vm_cache_remove_page: cache %p, page %p\n", cache, page));
 	ASSERT_LOCKED_MUTEX(&cache->lock);
 
-	if (page->cache != cache)
-		panic("remove page from %p: page cache is set to %p\n", cache, page->cache);
+	if (page->cache != cache) {
+		panic("remove page %p from cache %p: page cache is set to %p\n", page,
+			cache, page->cache);
+	}
 
 	state = disable_interrupts();
 	acquire_spinlock(&sPageCacheTableLock);
@@ -478,6 +480,8 @@ vm_cache_remove_consumer(vm_cache *cache, vm_cache *consumer)
 				|| list_is_empty(&cache->consumers)
 				|| cache->consumers.link.next != cache->consumers.link.prev
 				|| consumer != list_get_first_item(&cache->consumers)) {
+				dprintf("vm_cache_remove_consumer(): cache %p was modified; "
+					"not merging it\n");
 				merge = false;
 				cache->busy = false;
 				mutex_unlock(&consumer->lock);
@@ -512,18 +516,29 @@ if (consumer->virtual_base == 0x11000)
 					vm_cache_insert_page(consumer, page,
 						(off_t)page->cache_offset << PAGE_SHIFT);
 				} else if (consumerPage->state == PAGE_STATE_BUSY
-					&& consumerPage->type == PAGE_TYPE_DUMMY
-					&& !consumerPage->busy_writing) {
+					&& consumerPage->type == PAGE_TYPE_DUMMY) {
 					// the page is currently busy taking a read fault - IOW,
 					// vm_soft_fault() has mapped our page so we can just
 					// move it up
 //dprintf("%ld: merged busy page %p, cache %p, offset %ld\n", find_thread(NULL), page, cacheRef->cache, page->cache_offset);
-					vm_cache_remove_page(cache, consumerPage);
+					vm_cache_remove_page(consumer, consumerPage);
 					consumerPage->state = PAGE_STATE_INACTIVE;
 
 					vm_cache_remove_page(cache, page);
 					vm_cache_insert_page(consumer, page,
 						(off_t)page->cache_offset << PAGE_SHIFT);
+#ifdef DEBUG_PAGE_CACHE_TRANSITIONS
+				} else {
+					page->debug_flags = 0;
+					if (consumerPage->state == PAGE_STATE_BUSY)
+						page->debug_flags |= 0x1;
+					if (consumerPage->type == PAGE_TYPE_DUMMY)
+						page->debug_flags |= 0x2;
+					if (!consumerPage->busy_writing)
+						page->debug_flags |= 0x4;
+					page->collided_page = consumerPage;
+					consumerPage->collided_page = page;
+#endif	// DEBUG_PAGE_CACHE_TRANSITIONS
 				}
 #if 0
 else if (consumer->virtual_base == 0x11000)
