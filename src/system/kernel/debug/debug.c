@@ -49,6 +49,7 @@ int dbg_register_file[B_MAX_CPU_COUNT][14];
 static bool sSerialDebugEnabled = true;
 static bool sSyslogOutputEnabled = true;
 static bool sBlueScreenEnabled = false;
+	// must always be false on startup
 static bool sDebugScreenEnabled = false;
 static bool sBlueScreenOutput = true;
 static spinlock sSpinlock = 0;
@@ -719,9 +720,9 @@ debug_init_post_vm(kernel_args *args)
 	handle = load_driver_settings("kernel");
 	if (handle != NULL) {
 		sSerialDebugEnabled = get_driver_boolean_parameter(handle,
-			"serial_debug_output", true, true);
+			"serial_debug_output", sSerialDebugEnabled, sSerialDebugEnabled);
 		sSyslogOutputEnabled = get_driver_boolean_parameter(handle,
-			"syslog_debug_output", true, true);
+			"syslog_debug_output", sSyslogOutputEnabled, sSyslogOutputEnabled);
 		sBlueScreenOutput = get_driver_boolean_parameter(handle,
 			"bluescreen", true, true);
 
