@@ -139,7 +139,7 @@ arp_entry::Hash(void *_entry, const void *_key, uint32 range)
 // TODO: check if this makes a good hash...
 #define HASH(o) ((((o) >> 24) ^ ((o) >> 16) ^ ((o) >> 8) ^ (o)) % range)
 
-#ifdef TRACE_ARP
+#if 0
 	in_addr_t a = entry ? entry->protocol_address : *key; 
 	dprintf("%ld.%ld.%ld.%ld: Hash: %lu\n", a >> 24, (a >> 16) & 0xff,
 		(a >> 8) & 0xff, a & 0xff, HASH(a));
