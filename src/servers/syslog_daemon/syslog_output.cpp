@@ -184,7 +184,7 @@ syslog_output(syslog_message &message)
 			if (prepare_output() < B_OK
 				|| write_to_log(buffer, length) < B_OK) {
 				// cannot write to syslog!
-				fputs(buffer, stderr);
+				break;
 			}
 
 			// save this message to suppress repeated messages
