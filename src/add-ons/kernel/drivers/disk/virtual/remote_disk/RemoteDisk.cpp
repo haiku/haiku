@@ -30,8 +30,9 @@
 #endif
 
 
-static const bigtime_t kReceiveTimeout = 2000000LL;
-static const bigtime_t kRequestTimeout = 6000000LL;
+static const int kMaxRequestResendCount = 5;
+static const bigtime_t kReceiveTimeout = 800000LL;
+static const bigtime_t kRequestTimeout = 5000000LL;
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 
@@ -405,18 +406,23 @@ RemoteDisk::_SendRequest(remote_disk_header *request, size_t size,
 	request->request_id = fRequestID++;
 	request->port = fSocketAddress.sin_port;
 
-	// try sending the request 3 times at most
-	for (int i = 0; i < 3; i++) {
+	// try sending the request kMaxRequestResendCount times at most
+	for (int i = 0; i < kMaxRequestResendCount; i++) {
 		// send request
-		ssize_t bytesSent = fSocketModule->sendto(fSocket, request, size,
-        	0, (sockaddr*)&fServerAddress, sizeof(fServerAddress));
+		ssize_t bytesSent;
+		do {
+			bytesSent = fSocketModule->sendto(fSocket, request, size,
+        		0, (sockaddr*)&fServerAddress, sizeof(fServerAddress));
+		} while (bytesSent < 0 && errno == B_INTERRUPTED);
+
 		if (bytesSent < 0) {
 			dprintf("RemoteDisk::_SendRequest(): failed to send packet: %s\n",
 				strerror(errno));
 			return errno;
 		}
 		if (bytesSent != (ssize_t)size) {
-			dprintf("RemoteDisk::_SendRequest(): sent less bytes than desired\n");
+			dprintf("RemoteDisk::_SendRequest(): sent less bytes than "
+				"desired\n");
 			return B_ERROR;
 		}
 
@@ -430,8 +436,12 @@ RemoteDisk::_SendRequest(remote_disk_header *request, size_t size,
 				(peerAddress ? &addrSize : 0));
 			if (bytesReceived < 0) {
 				status_t error = errno;
-				if (error != B_TIMED_OUT && error != B_WOULD_BLOCK)
+				if (error != B_TIMED_OUT && error != B_WOULD_BLOCK
+						&& error != B_INTERRUPTED) {
+					dprintf("RemoteDisk::_SendRequest(): recvfrom() failed: "
+						"%s\n", strerror(error));
 					return error;
+				}
 				continue;
 			}
 
