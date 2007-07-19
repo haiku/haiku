@@ -6,6 +6,7 @@
  * Distributed under the terms of the NewOS License.
  */
 
+#include <cpu.h>
 #include <int.h>
 #include <kscheduler.h>
 #include <ksyscalls.h>
@@ -386,17 +387,31 @@ i386_handle_trap(struct iframe frame)
 
 		case 8:		// Double Fault Exception (#DF)
 		{
-#if 0
-			// XXX what is this supposed to do?
-			struct tss *tss = x86_get_main_tss();
-			
-			frame.cs = tss->cs;
-			frame.eip = tss->eip;
-			frame.esp = tss->esp;
-			frame.flags = tss->eflags;
-#endif
+			// The double fault iframe contains no useful information (as
+			// per Intel's architecture spec). Thus we simply save the
+			// information from the (unhandable) exception which caused the
+			// double in our iframe. This will result even in useful stack
+			// traces. Only problem is that we trust that at least the
+			// TSS is still accessible.
+			struct tss *tss = &gCPU[smp_get_current_cpu()].arch.tss;
 
-			panic("double fault! errorcode = 0x%lx\n", frame.error_code);
+			frame.cs = tss->cs;
+			frame.es = tss->es;
+			frame.ds = tss->ds;
+			frame.fs = tss->fs;
+			frame.gs = tss->gs;
+			frame.eip = tss->eip;
+			frame.ebp = tss->ebp;
+			frame.esp = tss->esp;
+			frame.eax = tss->eax;
+			frame.ebx = tss->ebx;
+			frame.ecx = tss->ecx;
+			frame.edx = tss->edx;
+			frame.esi = tss->esi;
+			frame.edi = tss->edi;
+			frame.flags = tss->eflags;
+
+			panic("double fault!\n");
 
 			break;
 		}
