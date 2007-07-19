@@ -101,10 +101,11 @@ AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable,
 	class InitialMountVisitor : public BDiskDeviceVisitor {
 		public:
 			InitialMountVisitor(mount_mode normalMode, mount_mode removableMode,
-					BMessage& previous)
+					bool initialRescan, BMessage& previous)
 				:
 				fNormalMode(normalMode),
 				fRemovableMode(removableMode),
+				fInitialRescan(initialRescan),
 				fPrevious(previous)
 			{
 			}
@@ -145,11 +146,13 @@ AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable,
 						return false;
 				}
 
-				if (partition->Mount() == B_OK) {
+				BPath path;
+				if (partition->Mount() == B_OK
+					&& partition->GetMountPoint(&path) == B_OK) {
 					// notify Tracker that a new volume has been started
 					BMessage note(kVolumeMounted);
-					note.AddString("path", partition->MountedAt());
-					note.AddBool("initial rescan", sInitialRescan);
+					note.AddString("path", path.Path());
+					note.AddBool("initial rescan", fInitialRescan);
 					be_app->PostMessage(&note);
 				}
 				return false;
@@ -158,8 +161,9 @@ AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable,
 		private:
 			mount_mode	fNormalMode;
 			mount_mode	fRemovableMode;
+			bool		fInitialRescan;
 			BMessage&	fPrevious;
-	} visitor(normal, removable, fSettings);
+	} visitor(normal, removable, initialRescan, fSettings);
 
 	BDiskDeviceList devices;
 	status_t status = devices.Fetch();
