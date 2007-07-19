@@ -63,6 +63,10 @@ KScanPartitionJob::_ScanPartition(KPartition *partition)
 	// the partition's device must be write-locked
 	if (!partition)
 		return B_BAD_VALUE;
+	if (partition->DiskSystem() != NULL) {
+		// TODO: this is more or less a hack to prevent rescanning a partition
+		return B_OK;
+	}
 
 	DBG(
 		KPath partitionPath;

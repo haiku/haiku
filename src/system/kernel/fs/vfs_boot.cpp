@@ -508,5 +508,8 @@ vfs_mount_boot_file_system(kernel_args *args)
 	// search for other disk systems
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	manager->RescanDiskSystems();
+	manager->InitialDeviceScan();
+		// TODO: later, the DDM should notice when there are new
+		// partitions/devices available
 }
 

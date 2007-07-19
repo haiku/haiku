@@ -131,34 +131,7 @@ KDiskDeviceManager::KDiskDeviceManager()
 	if (InitCheck() != B_OK)
 		return;
 
-	// We are in early boot mode, so open_module_list() won't find what
-	// we're looking for; we need to use get_next_loaded_module_name()
-	// instead.
-
-	uint32 cookie = 0;
-	size_t partitioningPrefixLength = strlen(kPartitioningSystemPrefix);
-	size_t filePrefixLength = strlen(kFileSystemPrefix);
-
-	while (true) {
-		KPath name;
-		if (name.InitCheck() != B_OK)
-			break;
-		size_t nameLength = name.BufferSize();
-		if (get_next_loaded_module_name(&cookie, name.LockBuffer(),
-			&nameLength) != B_OK) {
-			break;
-		}
-		name.UnlockBuffer();
-
-		if (!strncmp(name.Path(), kPartitioningSystemPrefix,
-				partitioningPrefixLength)) {
-			DBG(OUT("partitioning system: %s\n", name.Path()));
-			_AddPartitioningSystem(name.Path());
-		} else if (!strncmp(name.Path(), kFileSystemPrefix, filePrefixLength)) {
-			DBG(OUT("file system: %s\n", name.Path()));
-			_AddFileSystem(name.Path());
-		}
-	}
+	RescanDiskSystems();
 
 	DBG(OUT("number of disk systems: %ld\n", CountDiskSystems()));
 	// TODO: Watch the disk systems and the relevant directories.
@@ -929,27 +902,49 @@ KDiskDeviceManager::InitialDeviceScan()
 	return error;
 }
 
-//RescanDiskSystems
+// _RescanDiskSystems
+status_t
+KDiskDeviceManager::_RescanDiskSystems(bool fileSystems)
+{
+	void *cookie = open_module_list(fileSystems
+		? kFileSystemPrefix : kPartitioningSystemPrefix);
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+
+	while (true) {
+		KPath name;
+		if (name.InitCheck() != B_OK)
+			break;
+		size_t nameLength = name.BufferSize();
+		if (read_next_module_name(cookie, name.LockBuffer(),
+				&nameLength) != B_OK) {
+			break;
+		}
+		name.UnlockBuffer();
+	
+		if (FindDiskSystem(name.Path()))
+			continue;
+
+		if (fileSystems) {
+			DBG(OUT("file system: %s\n", name.Path()));
+			_AddFileSystem(name.Path());
+		} else {
+			DBG(OUT("partitioning system: %s\n", name.Path()));
+			_AddPartitioningSystem(name.Path());
+		}
+	}
+
+	close_module_list(cookie);
+	return B_OK;
+}
+
+// RescanDiskSystems
 status_t
 KDiskDeviceManager::RescanDiskSystems()
 {
-	// load file systems list
-	void *cookie = open_module_list(kFileSystemPrefix);
-	
-	while (true) {
-		char name[B_FILE_NAME_LENGTH];
-		size_t nameLength = sizeof(name);
-		module_info *module;
-
-		if (read_next_module_name(cookie, name, &nameLength) != B_OK)
-			break;
-		if (FindDiskSystem(name))
-			continue;
-		_AddFileSystem(name);
-        }
-        close_module_list(cookie);
-
-	// TODO rescan partition tree for unrecognized partitions
+	// rescan for partitioning and file systems
+	_RescanDiskSystems(false);
+	_RescanDiskSystems(true);
 
 	return B_OK;
 }
@@ -1161,6 +1156,11 @@ DBG(OUT("KDiskDeviceManager::_Scan(%s)\n", path));
 		int32 leafLen = strlen("/raw");
 		if (len <= leafLen || strcmp(path + len - leafLen, "/raw"))
 			return B_ERROR;
+		if (FindDevice(path) != NULL) {
+			// we already know this device
+			return B_OK;
+		}
+
 DBG(OUT("  found device: %s\n", path));
 		// create a KDiskDevice for it
 		KDiskDevice *device = new(nothrow) KDiskDevice;
