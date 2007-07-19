@@ -1,90 +1,50 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2003-2005, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Region.cpp
-//	Author:			Stefano Ceccherini (burton666@libero.it)
-//	Description:	Region class consisting of multiple rectangles
-//
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2003-2007, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ *	Authors:
+ *		Stefano Ceccherini (burton666@libero.it)
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
 
-//	Notes: As now, memory is always allocated and never freed (except on destruction,
-//	or sometimes when a copy is made).
-//  This let us be a bit faster since we don't do many reallocations.
-//	But that means that even an empty region could "waste" much space, if it contained
-//	many rects before being emptied.
-//	I.E: a region which contains 24 rects allocates more than 24 * 4 * sizeof(int32)
-//  = 96 * sizeof(int32) bytes. If we call MakeEmpty(), that region will contain no rects,
-//  but it will still keep the allocated memory.
-//	This shouldnt' be an issue, since usually BRegions are just used for calculations, 
-//	and don't last so long.
-//	Anyway, we can change that behaviour if we want, but BeOS's BRegion seems to behave exactly
-//	like this.
 
-#include <cstdlib>
-#include <cstring>
-
-#include <Debug.h>
 #include <Region.h>
 
-#include <clipping.h>
-#include <RegionSupport.h>
+#include <malloc.h>
+#include <string.h>
+
+#include <Debug.h>
+
+#include "clipping.h"
+#include "RegionSupport.h"
 
 
-const static int32 kInitialDataSize = 8;
+const static int32 kDataBlockSize = 8;
 
 
 /*! \brief Initializes a region. The region will have no rects,
-	and its bound will be invalid.
+	and its fBounds will be invalid.
 */
 BRegion::BRegion()
-	:
-	data_size(0),
-	data(NULL)	
+	: fCount(0)
+	, fDataSize(0)
+	, fBounds((clipping_rect){ 0, 0, 0, 0 })
+	, fData(NULL)
 {
-	data = (clipping_rect *)malloc(kInitialDataSize * sizeof(clipping_rect));
-	if (data != NULL)
-		data_size = kInitialDataSize;
-	
-	Support::ZeroRegion(*this);
+	_SetSize(kDataBlockSize);
 }
 
 
 /*! \brief Initializes a region to be a copy of another.
 	\param region The region to copy.
 */
-BRegion::BRegion(const BRegion &region)
-	:
-	data_size(0),
-	data(NULL)
+BRegion::BRegion(const BRegion& region)
+	: fCount(0)
+	, fDataSize(0)
+	, fBounds((clipping_rect){ 0, 0, 0, 0 })
+	, fData(NULL)
 {
-	const int32 size = region.data_size > 0 ? region.data_size : 1;
-		
-	data = (clipping_rect *)malloc(size * sizeof(clipping_rect));
-	if (data != NULL) {
-		data_size = size;
-		bound = region.bound;
-		count = region.count;
-		memcpy(data, region.data, count * sizeof(clipping_rect));
-	} else
-		Support::ZeroRegion(*this);
+	*this = region;
 }
 
 
@@ -92,16 +52,28 @@ BRegion::BRegion(const BRegion &region)
 	\param rect The BRect to set the region to.
 */
 BRegion::BRegion(const BRect rect)
-	:
-	data_size(0),
-	data(NULL)	
+	: fCount(0)
+	, fDataSize(1)
+	, fBounds((clipping_rect){ 0, 0, 0, 0 })
+	, fData(&fBounds)
 {
-	data = (clipping_rect *)malloc(kInitialDataSize * sizeof(clipping_rect));
-	if (data != NULL) {
-		data_size = kInitialDataSize;
-		Set(rect);	
-	} else
-		Support::ZeroRegion(*this);
+	if (!rect.IsValid())
+		return;
+
+	fBounds = _ConvertToInternal(rect);
+	fCount = 1;
+}
+
+// NOTE: private constructor
+/*!	\brief Initializes a region to contain a clipping_rect.
+	\param rect The BRect to set the region to.
+*/
+BRegion::BRegion(const clipping_rect& rect)
+	: fCount(1)
+	, fDataSize(1)
+	, fBounds(rect)
+	, fData(&fBounds)
+{
 }
 
 
@@ -109,68 +81,34 @@ BRegion::BRegion(const BRect rect)
 */
 BRegion::~BRegion()
 {
-	free(data);
+	if (fData != &fBounds)
+		free(fData);
 }
 
 
-/*! \brief Returns the bounds of the region.
-	\return A BRect which represents the bounds of the region.
+// #pragma mark -
+
+
+/*!	\brief Modifies the region to be a copy of the given BRegion.
+	\param region the BRegion to copy.
+	\return This function always returns \c *this.
 */
-BRect
-BRegion::Frame() const
+BRegion &
+BRegion::operator=(const BRegion &region)
 {
-	return to_BRect(bound);
-}
+	if (&region == this)
+		return *this;
 
+	// handle reallocation if we're too small to contain
+	// the other region
+	if (_SetSize(region.fDataSize)) {
+		memcpy(fData, region.fData, region.fCount * sizeof(clipping_rect));
 
-/*! \brief Returns the bounds of the region as a clipping_rect (which has integer coordinates).
-	\return A clipping_rect which represents the bounds of the region.
-*/
-clipping_rect
-BRegion::FrameInt() const
-{
-	return bound;
-}
-
-
-/*! \brief Returns the regions's BRect at the given index.
-	\param index The index (zero based) of the wanted rectangle.
-	\return If the given index is valid, it returns the BRect at that index,
-		otherwise, it returns an invalid BRect.
-*/
-BRect
-BRegion::RectAt(int32 index)
-{
-	if (index >= 0 && index < count)
-		return to_BRect(data[index]);
+		fBounds = region.fBounds;
+		fCount = region.fCount;
+	}
 	
-	return BRect(); //An invalid BRect
-}
-
-
-/*! \brief Returns the regions's clipping_rect at the given index.
-	\param index The index (zero based) of the wanted rectangle.
-	\return If the given index is valid, it returns the clipping_rect at that index,
-		otherwise, it returns an invalid clipping_rect.
-*/
-clipping_rect
-BRegion::RectAtInt(int32 index)
-{
-	if (index >= 0 && index < count)
-		return data[index];
-
-	clipping_rect rect = { 1, 1, 0, 0 };
-	return rect;
-}
-
-
-/*!	\brief Counts the region rects.
-	\return An int32 which is the total number of rects in the region.
-*/
-int32
-BRegion::CountRects()
-{
-	return count;
+	return *this;
 }
 
 
@@ -180,7 +118,7 @@ BRegion::CountRects()
 void
 BRegion::Set(BRect newBounds)
 {
-	Set(to_clipping_rect(newBounds));
+	Set(_Convert(newBounds));
 }
 
 
@@ -190,15 +128,91 @@ BRegion::Set(BRect newBounds)
 void
 BRegion::Set(clipping_rect newBounds)
 {
-	ASSERT(data_size > 0);
+	_SetSize(1);
 
-	if (valid_rect(newBounds)) {
-		count = 1;
-		data[0] = newBounds;
-		bound = newBounds;
+	if (valid_rect(newBounds) && fData) {
+		fCount = 1;
+		// cheap convert to internal rect format
+		newBounds.right++;
+		newBounds.bottom++;
+		fData[0] = fBounds = newBounds;
 	} else
-		Support::ZeroRegion(*this);	
+		MakeEmpty();
 }
+
+
+// #pragma mark -
+
+
+/*! \brief Returns the bounds of the region.
+	\return A BRect which represents the bounds of the region.
+*/
+BRect
+BRegion::Frame() const
+{
+	return BRect(fBounds.left, fBounds.top,
+		fBounds.right - 1, fBounds.bottom - 1);
+}
+
+
+/*! \brief Returns the bounds of the region as a clipping_rect (which has integer coordinates).
+	\return A clipping_rect which represents the bounds of the region.
+*/
+clipping_rect
+BRegion::FrameInt() const
+{
+	return (clipping_rect){ fBounds.left, fBounds.top,
+		fBounds.right - 1, fBounds.bottom - 1 };
+}
+
+
+/*! \brief Returns the regions's BRect at the given index.
+	\param index The index (zero based) of the wanted rectangle.
+	\return If the given index is valid, it returns the BRect at that index,
+		otherwise, it returns an invalid BRect.
+*/
+BRect
+BRegion::RectAt(int32 index) /*const*/
+{
+	if (index >= 0 && index < fCount) {
+		const clipping_rect& r = fData[index];
+		return BRect(r.left, r.top, r.right - 1, r.bottom - 1);
+	}
+	
+	return BRect();
+		// an invalid BRect
+}
+
+
+/*! \brief Returns the regions's clipping_rect at the given index.
+	\param index The index (zero based) of the wanted rectangle.
+	\return If the given index is valid, it returns the clipping_rect at that index,
+		otherwise, it returns an invalid clipping_rect.
+*/
+clipping_rect
+BRegion::RectAtInt(int32 index) /*const*/
+{
+	if (index >= 0 && index < fCount) {
+		const clipping_rect& r = fData[index];
+		return (clipping_rect){ r.left, r.top, r.right - 1, r.bottom - 1 };
+	}
+
+	return (clipping_rect){ 1, 1, 0, 0 };
+		// an invalid clipping_rect
+}
+
+
+/*!	\brief Counts the region rects.
+	\return An int32 which is the total number of rects in the region.
+*/
+int32
+BRegion::CountRects() /*const*/
+{
+	return fCount;
+}
+
+
+// #pragma mark -
 
 
 /*!	\brief Check if the region has any area in common with the given BRect.
@@ -208,7 +222,7 @@ BRegion::Set(clipping_rect newBounds)
 bool
 BRegion::Intersects(BRect rect) const
 {
-	return Intersects(to_clipping_rect(rect));
+	return Intersects(_Convert(rect));
 }
 
 
@@ -219,15 +233,13 @@ BRegion::Intersects(BRect rect) const
 bool
 BRegion::Intersects(clipping_rect rect) const
 {
-	if (!rects_intersect(rect, bound))
-		return false;
+	// cheap convert to internal rect format
+	rect.right ++;
+	rect.bottom ++;
 
-	for (long c = 0; c < count; c++) {
-		if (rects_intersect(data[c], rect))
-			return true;
-	}
-	
-	return false;	
+	int result = Support::XRectInRegion(this, rect);
+
+	return result > Support::RectangleOut;
 }
 
 
@@ -236,18 +248,9 @@ BRegion::Intersects(clipping_rect rect) const
 	\return \ctrue if the region contains the BPoint, \cfalse if not.
 */
 bool
-BRegion::Contains(BPoint pt) const
+BRegion::Contains(BPoint point) const
 {
-	// If the point doesn't lie within the region's bounds,
-	// don't even try it against the region's rects.
-	if (!point_in(bound, pt))
-		return false;
-
-	for (long c = 0; c < count; c++) {
-		if (point_in(data[c], pt))
-			return true;
-	}
-	return false;
+	return Support::XPointInRegion(this, (int)point.x, (int)point.y);
 }
 
 
@@ -257,17 +260,9 @@ BRegion::Contains(BPoint pt) const
 	\return \ctrue if the region contains the point, \cfalse if not.
 */
 bool
-BRegion::Contains(int32 x, int32 y)
+BRegion::Contains(int32 x, int32 y) /*const*/
 {
-	// see above
-	if (!point_in(bound, x, y))
-		return false;
-
-	for (long c = 0; c < count; c++) {
-		if (point_in(data[c], x, y))
-			return true;
-	}
-	return false;
+	return Support::XPointInRegion(this, x, y);
 }
 
 
@@ -277,13 +272,16 @@ void
 BRegion::PrintToStream() const
 {
 	Frame().PrintToStream();
-	
-	for (long c = 0; c < count; c++) {
-		clipping_rect *rect = &data[c];
-		printf("data = BRect(l:%ld.0, t:%ld.0, r:%ld.0, b:%ld.0)\n",
-			rect->left, rect->top, rect->right, rect->bottom);
-	}	
+
+	for (long i = 0; i < fCount; i++) {
+		clipping_rect *rect = &fData[i];
+		printf("data[%ld] = BRect(l:%ld.0, t:%ld.0, r:%ld.0, b:%ld.0)\n",
+			i, rect->left, rect->top, rect->right - 1, rect->bottom - 1);
+	}
 }
+
+
+// #pragma mark -
 
 
 /*!	\brief Offsets all region's rects, and bounds by the given values.
@@ -291,16 +289,18 @@ BRegion::PrintToStream() const
 	\param dv The vertical offset.
 */
 void
-BRegion::OffsetBy(int32 dh, int32 dv)
+BRegion::OffsetBy(int32 x, int32 y)
 {
-	if (dh == 0 && dv == 0)
+	if (x == 0 && y == 0)
 		return;
 
-	if (count > 0) {
-		for (long c = 0; c < count; c++)
-			offset_rect(data[c], dh, dv);
+	if (fCount > 0) {
+		if (fData != &fBounds) {
+			for (long i = 0; i < fCount; i++)
+				offset_rect(fData[i], x, y);
+		}
 
-		offset_rect(bound, dh, dv);	
+		offset_rect(fBounds, x, y);
 	}
 }
 
@@ -310,8 +310,12 @@ BRegion::OffsetBy(int32 dh, int32 dv)
 void
 BRegion::MakeEmpty()
 {
-	Support::ZeroRegion(*this);
+	fBounds= (clipping_rect){ 0, 0, 0, 0 };
+	fCount = 0;
 }
+
+
+// #pragma mark -
 
 
 /*!	\brief Modifies the region, so that it includes the given BRect.
@@ -320,7 +324,7 @@ BRegion::MakeEmpty()
 void
 BRegion::Include(BRect rect)
 {
-	Include(to_clipping_rect(rect));
+	Include(_Convert(rect));
 }
 
 
@@ -330,13 +334,17 @@ BRegion::Include(BRect rect)
 void
 BRegion::Include(clipping_rect rect)
 {
-	BRegion region;
-	BRegion newRegion;	
+	// convert to internal rect format
+	rect.right ++;
+	rect.bottom ++;
 
-	region.Set(rect);
-	
-	Support::OrRegion(*this, region, newRegion);
-	Support::CopyRegion(newRegion, *this);
+	// use private clipping_rect constructor which avoids malloc()
+	BRegion t(rect);
+
+	BRegion result;
+	Support::XUnionRegion(this, &t, &result);
+
+	_AdoptRegionData(result);
 }
 
 
@@ -344,13 +352,16 @@ BRegion::Include(clipping_rect rect)
 	\param region The region to be included.
 */
 void
-BRegion::Include(const BRegion *region)
+BRegion::Include(const BRegion* region)
 {
-	BRegion newRegion;
-	
-	Support::OrRegion(*this, *region, newRegion);
-	Support::CopyRegion(newRegion, *this);
+	BRegion result;
+	Support::XUnionRegion(this, region, &result);
+
+	_AdoptRegionData(result);
 }
+
+
+// #pragma mark -
 
 
 /*!	\brief Modifies the region, excluding the area represented by the given BRect.
@@ -359,7 +370,7 @@ BRegion::Include(const BRegion *region)
 void
 BRegion::Exclude(BRect rect)
 {
-	Exclude(to_clipping_rect(rect));
+	Exclude(_Convert(rect));
 }
 
 
@@ -369,152 +380,125 @@ BRegion::Exclude(BRect rect)
 void
 BRegion::Exclude(clipping_rect rect)
 {
-	BRegion region;
-	BRegion newRegion;
-	
-	region.Set(rect);
+	// convert to internal rect format
+	rect.right ++;
+	rect.bottom ++;
 
-	Support::SubRegion(*this, region, newRegion);
-	Support::CopyRegion(newRegion, *this);
+	// use private clipping_rect constructor which avoids malloc()
+	BRegion t(rect);
+
+	BRegion result;
+	Support::XSubtractRegion(this, &t, &result);
+
+	_AdoptRegionData(result);
 }
 
 
-/*!	\brief Modifies the region, excluding the area contained in the given BRegion.
+/*!	\brief Modifies the region, excluding the area contained in the given
+		BRegion.
 	\param region The BRegion to be excluded.
 */
 void
-BRegion::Exclude(const BRegion *region)
+BRegion::Exclude(const BRegion* region)
 {
-	BRegion newRegion;
-	
-	Support::SubRegion(*this, *region, newRegion);
-	Support::CopyRegion(newRegion, *this);
+	BRegion result;
+	Support::XSubtractRegion(this, region, &result);
+
+	_AdoptRegionData(result);
 }
 
 
-/*!	\brief Modifies the region, so that it will contain just the area in common with the given BRegion.
+// #pragma mark -
+
+
+/*!	\brief Modifies the region, so that it will contain just the area
+		in common with the given BRegion.
 	\param region the BRegion to intersect to.
 */
 void
-BRegion::IntersectWith(const BRegion *region)
+BRegion::IntersectWith(const BRegion* region)
 {
-	BRegion newRegion;
-	
-	Support::AndRegion(*this, *region, newRegion);
-	Support::CopyRegion(newRegion, *this);
+	BRegion result;
+	Support::XIntersectRegion(this, region, &result);
+
+	_AdoptRegionData(result);
 }
 
 
-/*!	\brief Modifies the region to be a copy of the given BRegion.
-	\param region the BRegion to copy.
-	\return This function always returns \c *this.
-*/
-BRegion &
-BRegion::operator=(const BRegion &region)
-{
-	if (&region != this) {
-		bound = region.bound;
-		count = region.count;
-
-		// handle reallocation if we're too small to contain
-		// the other region
-		set_size(region.data_size);
-
-		// TODO: what is this supposed to do??
-		if (data_size <= 0)
-			data_size = 1;
-			
-		if (data)
-			memcpy(data, region.data, count * sizeof(clipping_rect));
-	}
-	
-	return *this;
-}
+// #pragma mark -
 
 
-/*!	\brief Adds a rect to the region.
-	\param rect The clipping_rect to be added.
-	
-	Adds the given rect to the region, merging it with another already contained in the region,
-	if possible. Recalculate the region's bounds if needed.
+/*!	\brief Takes over the data of a region and marks that region empty.
+	\param region The region to adopt the data from.
 */
 void
-BRegion::_AddRect(clipping_rect rect)
+BRegion::_AdoptRegionData(BRegion& region)
 {
-	ASSERT(count >= 0);
-	ASSERT(data_size >= 0);
-	ASSERT(valid_rect(rect));
+	fCount = region.fCount;
+	fDataSize = region.fDataSize;
+	fBounds = region.fBounds;
+	if (fData != &fBounds)
+		free(fData);
+	if (region.fData != &region.fBounds)
+		fData = region.fData;
+	else
+		fData = &fBounds;
 
-	// Should we just reallocate the memory and
-	// copy the rect ?
-	bool addRect = true; 
-		
-	if (count > 0) {
-		// Wait! We could merge the rect with one of the
-		// existing rectangles, if it's adiacent.
-		// We just check it against the last rectangle, since
-		// we are keeping them sorted by their "top" coordinates.
-		long last = count - 1;
-		if (rect.left == data[last].left && rect.right == data[last].right
-				&& rect.top == data[last].bottom + 1) {
-		 
-			data[last].bottom = rect.bottom;
-			addRect = false;
-		
-		} else if (rect.top == data[last].top && rect.bottom == data[last].bottom) {			
-			if (rect.left == data[last].right + 1) {
-
-				data[last].right = rect.right;
-				addRect = false;
-
-			} else if (rect.right == data[last].left - 1) {
-
-				data[last].left = rect.left;
-				addRect = false;
-			}	
-		}
-	}		
-	
-	// We weren't lucky.... just add the rect as a new one
-	if (addRect) {
-		if (data_size <= count)
-			set_size(count + 16);
-			
-		data[count] = rect;
-		
-		count++;
-	}
-	
-	// Recalculate bounds
-	if (rect.top < bound.top)
-		bound.top = rect.top;
-
-	if (rect.left < bound.left)
-		bound.left = rect.left;
- 
-	if (rect.right > bound.right)
-		bound.right = rect.right;
- 
-	if (rect.bottom > bound.bottom)
-		bound.bottom = rect.bottom;
+	// NOTE: MakeEmpty() is not called since _AdoptRegionData is only
+	// called with internally allocated regions, so they don't need to
+	// be left in a valid state.
+	region.fData = NULL;
+//	region.MakeEmpty();
 }
 
 
 /*!	\brief Reallocate the memory in the region.
-	\param new_size The amount of rectangles that the region could contain.
+	\param newSize The amount of rectangles that the region should be
+		able to hold.
 */
-void
-BRegion::set_size(long new_size)
+bool
+BRegion::_SetSize(long newSize)
 {
-	if (new_size <= 0)
-		new_size = data_size + 16;
+	// we never shrink the size
+	newSize = max_c(fDataSize, newSize);
+	if (newSize == fDataSize)
+		return true;
+
+	// align newSize to multiple of kDataBlockSize
+	newSize = ((newSize + kDataBlockSize - 1) / kDataBlockSize) * kDataBlockSize;
+
+	if (newSize > 0) {
+		if (fData == &fBounds) {
+			fData = (clipping_rect*)malloc(newSize * sizeof(clipping_rect));
+			fData[0] = fBounds;
+		} else if (fData)
+			fData = (clipping_rect*)realloc(fData, newSize * sizeof(clipping_rect));
+		else
+			fData = (clipping_rect*)malloc(newSize * sizeof(clipping_rect));
+	}
 	
-	data = (clipping_rect *)realloc(data, new_size * sizeof(clipping_rect));
-	
-	if (data == NULL)
-		debugger("BRegion::set_size realloc error\n");
-	
-	data_size = new_size;
-	
-	ASSERT(count <= data_size);		
+	if (!fData || newSize <= 0) {
+		fDataSize = 0;
+		MakeEmpty();
+		return false;
+	}
+
+	fDataSize = newSize;
+	return true;
 }
+
+clipping_rect
+BRegion::_Convert(const BRect& rect) const
+{
+	return (clipping_rect){ (int)floorf(rect.left), (int)floorf(rect.top),
+		(int)ceilf(rect.right), (int)ceilf(rect.bottom) };
+}
+
+
+clipping_rect
+BRegion::_ConvertToInternal(const BRect& rect) const
+{
+	return (clipping_rect){ (int)floorf(rect.left), (int)floorf(rect.top),
+		(int)ceilf(rect.right) + 1, (int)ceilf(rect.bottom) + 1 };
+}
+

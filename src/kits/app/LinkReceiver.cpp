@@ -402,12 +402,16 @@ err:
 status_t
 LinkReceiver::ReadRegion(BRegion* region)
 {
-	status_t status = Read(&region->count, sizeof(int32));
+	status_t status = Read(&region->fCount, sizeof(int32));
 	if (status >= B_OK)
-		status = Read(&region->bound, sizeof(clipping_rect));
+		status = Read(&region->fBounds, sizeof(clipping_rect));
 	if (status >= B_OK) {
-		region->set_size(region->count);
-		status = Read(region->data, region->count * sizeof(clipping_rect));
+		if (!region->_SetSize(region->fCount))
+			status = B_NO_MEMORY;
+		else {
+			status = Read(region->fData,
+				region->fCount * sizeof(clipping_rect));
+		}
 		if (status < B_OK)
 			region->MakeEmpty();
 	}

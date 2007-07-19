@@ -288,7 +288,7 @@ WorkspacesLayer::_DarkenColor(RGBColor& color) const
 void
 WorkspacesLayer::_Invalidate() const
 {
-	BRegion region(Frame());
+	BRegion region((BRect)Frame());
 	Window()->MarkContentDirty(region);
 }
 

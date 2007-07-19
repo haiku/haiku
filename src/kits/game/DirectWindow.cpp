@@ -303,11 +303,14 @@ BDirectWindow::GetClippingRegion(BRegion *region, BPoint *origin) const
 	// Otherwise, we would need to call BRegion::Include(clipping_rect)
 	// for every clipping_rect in our clip_list, and that would be much
 	// more overkill than this (tested ).
-	region->set_size(fBufferDesc->clip_list_count);
-	region->count = fBufferDesc->clip_list_count;		
-	region->bound = fBufferDesc->clip_bounds;
+	if (!region->_SetSize(fBufferDesc->clip_list_count)) {
+		UnlockDirect();
+		return B_NO_MEMORY;
+	}
+	region->fCount = fBufferDesc->clip_list_count;		
+	region->fBounds = fBufferDesc->clip_bounds;
 	for (uint32 c = 0; c < fBufferDesc->clip_list_count; c++)
-		region->data[c] = fBufferDesc->clip_list[c];
+		region->fData[c] = fBufferDesc->clip_list[c];
 
 	// adjust bounds by the given origin point 
 	region->OffsetBy(-originX, -originY);		

@@ -1671,7 +1671,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 
 					// invalidate view - but only if this is a non-overlay switch
 					if (bitmap == NULL || bitmap->Overlay() == NULL || !wasOverlay) {
-						BRegion dirty(fCurrentLayer->Bounds());
+						BRegion dirty((BRect)fCurrentLayer->Bounds());
 						fWindowLayer->InvalidateView(fCurrentLayer, dirty);
 					}
 

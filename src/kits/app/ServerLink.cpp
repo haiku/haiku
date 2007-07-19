@@ -34,19 +34,22 @@ ServerLink::~ServerLink()
 status_t
 ServerLink::ReadRegion(BRegion *region)
 {
-	fReceiver->Read(&region->count, sizeof(long));
-	fReceiver->Read(&region->bound, sizeof(clipping_rect));
-	region->set_size(region->count + 1);
-	return fReceiver->Read(region->data, region->count * sizeof(clipping_rect));
+	fReceiver->Read(&region->fCount, sizeof(long));
+	fReceiver->Read(&region->fBounds, sizeof(clipping_rect));
+	if (!region->_SetSize(region->fCount))
+		return B_NO_MEMORY;
+	return fReceiver->Read(region->fData,
+		region->fCount * sizeof(clipping_rect));
 }
 
 
 status_t
 ServerLink::AttachRegion(const BRegion &region)
 {
-	fSender->Attach(&region.count, sizeof(long));
-	fSender->Attach(&region.bound, sizeof(clipping_rect));
-	return fSender->Attach(region.data, region.count * sizeof(clipping_rect));
+	fSender->Attach(&region.fCount, sizeof(long));
+	fSender->Attach(&region.fBounds, sizeof(clipping_rect));
+	return fSender->Attach(region.fData,
+		region.fCount * sizeof(clipping_rect));
 }
 
 

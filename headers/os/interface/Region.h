@@ -1,13 +1,7 @@
-/*******************************************************************************
-/
-/	File:			Region.h
-/
-/   Description:    BRegion represents an area that's composed of individual
-/                   rectangles.
-/
-/	Copyright 1992-98, Be Incorporated, All Rights Reserved
-/
-*******************************************************************************/
+/*
+ * Copyright 2007, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 #ifndef	_REGION_H
 #define	_REGION_H
@@ -30,57 +24,70 @@ typedef struct {
 } clipping_rect;
 
 
-/*----- BRegion class --------------------------------------------*/
-
 class BRegion {
-public:
-				BRegion();
-				BRegion(const BRegion &region);
-				BRegion(const BRect rect);
-virtual			~BRegion();	
+ public:
+								BRegion();
+								BRegion(const BRegion& region);
+								BRegion(const BRect rect);
+	virtual						~BRegion();	
 
-		BRegion	&operator=(const BRegion &from);
+			BRegion			&operator=(const BRegion &from);
 
-		BRect	Frame() const;
-clipping_rect	FrameInt() const;
-		BRect	RectAt(int32 index);
-clipping_rect	RectAtInt(int32 index);
-		int32	CountRects();
-		void	Set(BRect newBounds);
-		void	Set(clipping_rect newBounds);
-		bool	Intersects(BRect r) const;
-		bool	Intersects(clipping_rect r) const;
-		bool	Contains(BPoint pt) const;
-		bool	Contains(int32 x, int32 y);
-		void	PrintToStream() const;
-		void	OffsetBy(int32 dh, int32 dv);
-		void	MakeEmpty();
-		void	Include(BRect r);
-		void	Include(clipping_rect r);
-		void	Include(const BRegion*);
-		void	Exclude(BRect r);
-		void	Exclude(clipping_rect r);
-		void	Exclude(const BRegion*);
-		void	IntersectWith(const BRegion*);
+			void				Set(BRect newBounds);
+			void				Set(clipping_rect newBounds);
 
-/*----- Private or reserved -----------------------------------------*/
-		class Support;
+			BRect				Frame() const;
+			clipping_rect		FrameInt() const;
 
-private:
-	friend class BView;
+			BRect				RectAt(int32 index) /*const*/;
+			clipping_rect		RectAtInt(int32 index) /*const*/;
+
+			int32				CountRects() /*const*/;
+
+			bool				Intersects(BRect rect) const;
+			bool				Intersects(clipping_rect rect) const;
+
+			bool				Contains(BPoint point) const;
+			bool				Contains(int32 x, int32 y) /*const*/;
+
+			void				PrintToStream() const;
+
+			void				OffsetBy(int32 x, int32 y);
+
+			void				MakeEmpty();
+
+			void				Include(BRect rect);
+			void				Include(clipping_rect rect);
+			void				Include(const BRegion*);
+
+			void				Exclude(BRect r);
+			void				Exclude(clipping_rect r);
+			void				Exclude(const BRegion* region);
+
+			void				IntersectWith(const BRegion* region);
+
+ private:
 	friend class BDirectWindow;
-	friend class Support;
 	friend class BPrivate::ServerLink;
 	friend class BPrivate::LinkReceiver;
 
-		void	_AddRect(clipping_rect r);
-		void	set_size(long new_size);
+	class Support;
+	friend class Support;
 
-private:
-		long	count;
-		long	data_size;
-		clipping_rect	bound;
-		clipping_rect	*data;
+ private:
+								BRegion(const clipping_rect& rect);
+
+			void				_AdoptRegionData(BRegion& region);
+			bool				_SetSize(long newSize);
+
+			clipping_rect		_Convert(const BRect& rect) const;
+			clipping_rect		_ConvertToInternal(const BRect& rect) const;
+
+ private:
+			long				fCount;
+			long				fDataSize;
+			clipping_rect		fBounds;
+			clipping_rect*		fData;
 };
 
-#endif /* _REGION_H */
+#endif // _REGION_H

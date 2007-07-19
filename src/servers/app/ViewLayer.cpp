@@ -107,7 +107,7 @@ ViewLayer::ViewLayer(IntRect frame, IntPoint scrollingOffset, const char* name,
 	fCursor(NULL),
 	fPicture(NULL),
 
-	fLocalClipping(Bounds()),
+	fLocalClipping((BRect)Bounds()),
 	fScreenClipping(),
 	fScreenClippingValid(false)
 {
