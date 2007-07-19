@@ -345,13 +345,13 @@ NetBootMethod::Init()
 		if (IN_CLASSA(net)
 			|| (ntohl(net) >> IN_CLASSA_NSHIFT) == IN_LOOPBACKNET) {
 			// class A, or loopback
-			netMask = IN_CLASSA_NET;
+			netMask = ntohl(IN_CLASSA_NET);
 		} else if (IN_CLASSB(net)) {
 			// class B
-			netMask = IN_CLASSB_NET;
+			netMask = ntohl(IN_CLASSB_NET);
 		} else {
 			// class C and rest
-			netMask = IN_CLASSC_NET;
+			netMask = ntohl(IN_CLASSC_NET);
 		}
 	}
 
