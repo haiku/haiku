@@ -123,6 +123,8 @@ public:
 	status_t RescanDiskSystems();
 
 private:
+	status_t _RescanDiskSystems(bool fileSystems);
+
 	status_t _AddPartitioningSystem(const char *name);
 	status_t _AddFileSystem(const char *name);
 	status_t _AddDiskSystem(KDiskSystem *diskSystem);
