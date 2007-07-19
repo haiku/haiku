@@ -30,8 +30,8 @@
 #endif
 
 
-static const bigtime_t kReceiveTimeout = 30000LL;
-static const bigtime_t kRequestTimeout = 100000LL;
+static const bigtime_t kReceiveTimeout = 2000000LL;
+static const bigtime_t kRequestTimeout = 6000000LL;
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 
@@ -101,6 +101,7 @@ RemoteDisk::Init(uint32 serverAddress, uint16 serverPort, off_t imageSize)
 	fServerAddress.sin_family = AF_INET;
 	fServerAddress.sin_port = htons(serverPort);
 	fServerAddress.sin_addr.s_addr = htonl(serverAddress);
+	fServerAddress.sin_len = sizeof(sockaddr_in);
 
 	fImageSize = imageSize;
 
@@ -124,6 +125,7 @@ RemoteDisk::FindAnyRemoteDisk()
 	fServerAddress.sin_family = AF_INET;
 	fServerAddress.sin_port = htons(REMOTE_DISK_SERVER_PORT);
 	fServerAddress.sin_addr.s_addr = htonl(INADDR_BROADCAST);
+	fServerAddress.sin_len = sizeof(sockaddr_in);
 
 	// set SO_BROADCAST on socket
 	int soBroadcastValue = 1;
@@ -138,7 +140,8 @@ RemoteDisk::FindAnyRemoteDisk()
 	error = _SendRequest(&request, sizeof(request), REMOTE_DISK_HELLO_REPLY,
 		&serverAddress);
 	if (error != B_OK) {
-		dprintf("RemoteDisk::FindAnyRemoteDisk(): Got no server reply.\n");
+		dprintf("RemoteDisk::FindAnyRemoteDisk(): Got no server reply: %s\n",
+			strerror(error));
 		return error;
 	}
 	remote_disk_header* reply = (remote_disk_header*)fPacket;
@@ -225,10 +228,63 @@ RemoteDisk::ReadAt(off_t pos, void *_buffer, size_t bufferSize)
 
 // WriteAt
 ssize_t
-RemoteDisk::WriteAt(off_t pos, const void *buffer, size_t bufferSize)
+RemoteDisk::WriteAt(off_t pos, const void *_buffer, size_t bufferSize)
 {
-	// TODO: Implement!
-	return B_PERMISSION_DENIED;
+	if (fSocket < 0)
+		return B_NO_INIT;
+
+	const uint8 *buffer = (const uint8*)_buffer;
+	if (!buffer || pos < 0)
+		return B_BAD_VALUE;
+
+	if (bufferSize == 0)
+		return 0;
+
+	status_t error = B_OK;
+	size_t bytesWritten = 0;
+	while (bufferSize > 0) {
+		// prepare request
+		remote_disk_header* request = (remote_disk_header*)fPacket;
+		request->offset = htonll(pos);
+		uint32 toWrite = min_c(bufferSize, REMOTE_DISK_BLOCK_SIZE);
+		request->size = htons(toWrite);
+		request->command = REMOTE_DISK_WRITE_REQUEST;
+
+		// copy to packet buffer
+		if (IS_USER_ADDRESS(buffer)) {
+			status_t error = user_memcpy(request->data, buffer, toWrite);
+			if (error != B_OK)
+				return error;
+		} else
+			memcpy(request->data, buffer, toWrite);
+
+		// send request
+		size_t requestSize = request->data + toWrite - (uint8_t*)request;
+		remote_disk_header reply;
+		int32 replySize;
+		error = _SendRequest(request, requestSize, REMOTE_DISK_WRITE_REPLY,
+			NULL, &reply, sizeof(reply), &replySize);
+		if (error != B_OK)
+			break;
+
+		// check for errors
+		int16 packetSize = ntohs(reply.size);
+		if (packetSize < 0) {
+			if (packetSize == REMOTE_DISK_IO_ERROR)
+				error = B_IO_ERROR;
+			else if (packetSize == REMOTE_DISK_BAD_REQUEST)
+				error = B_BAD_VALUE;
+			break;
+		}
+
+		bytesWritten += toWrite;
+		pos += toWrite;
+		buffer += toWrite;
+		bufferSize -= toWrite;
+	}
+
+	// only return an error, when we were not able to write anything at all
+	return (bytesWritten == 0 ? error : bytesWritten);
 }
 
 
@@ -257,6 +313,7 @@ RemoteDisk::_Init()
 	fSocketAddress.sin_family = AF_INET;
 	fSocketAddress.sin_port = 0;
 	fSocketAddress.sin_addr.s_addr = INADDR_ANY;
+	fSocketAddress.sin_len = sizeof(sockaddr_in);
 	if (fSocketModule->bind(fSocket, (sockaddr*)&fSocketAddress,
 			sizeof(fSocketAddress)) < 0) {
 		dprintf("RemoteDisk::Init(): Failed to bind socket: %s\n",
@@ -335,49 +392,43 @@ status_t
 RemoteDisk::_SendRequest(remote_disk_header* request, size_t size,
 	uint8 expectedReply, sockaddr_in* peerAddress)
 {
+	return _SendRequest(request, size, expectedReply, peerAddress, fPacket,
+		BUFFER_SIZE, &fPacketSize);
+}
+
+
+status_t
+RemoteDisk::_SendRequest(remote_disk_header *request, size_t size,
+	uint8 expectedReply, sockaddr_in* peerAddress, void* receiveBuffer,
+	size_t receiveBufferSize, int32* _bytesReceived)
+{
 	request->request_id = fRequestID++;
 	request->port = fSocketAddress.sin_port;
 
 	// try sending the request 3 times at most
 	for (int i = 0; i < 3; i++) {
 		// send request
-//bool debug = false;
-//{
-//thread_info threadInfo;
-//get_thread_info(find_thread(NULL), &threadInfo);
-////debug = (strcmp(threadInfo.name, "AddOnMonitor") == 0);
-//debug = (find_thread(NULL) >= 60);
-//if (debug) {
-////panic("RemoteDisk::_SendRequest(): AddOnMonitor\n");
-//TRACE(("[%ld: %s] RemoteDisk::_SendRequest(): sendto(%d, %p, %lu, 0, %p, %lu)\n",
-//find_thread(NULL), threadInfo.name, fSocket, request, size, (sockaddr*)&fServerAddress, sizeof(fServerAddress)));
-//}
-//}
 		ssize_t bytesSent = fSocketModule->sendto(fSocket, request, size,
         	0, (sockaddr*)&fServerAddress, sizeof(fServerAddress));
-		if (bytesSent < 0)
+		if (bytesSent < 0) {
+			dprintf("RemoteDisk::_SendRequest(): failed to send packet: %s\n",
+				strerror(errno));
 			return errno;
+		}
 		if (bytesSent != (ssize_t)size) {
-			dprintf("RemoteDisk::_SendRequest(): sent less bytes than desired");
+			dprintf("RemoteDisk::_SendRequest(): sent less bytes than desired\n");
 			return B_ERROR;
 		}
 
 		// receive reply
 		bigtime_t timeout = system_time() + kRequestTimeout;
 		do {
-			fPacketSize = 0;
+			*_bytesReceived = 0;
 			socklen_t addrSize = sizeof(sockaddr_in);
-//if (debug) {
-//TRACE(("[%ld] RemoteDisk::_SendRequest(): recvfrom(%d, %p, %u, 0, %p, %p)\n",
-//find_thread(NULL), fSocket, fPacket, BUFFER_SIZE, (sockaddr*)&peerAddress, (peerAddress ? &addrSize : 0)));
-//}
 			ssize_t bytesReceived = fSocketModule->recvfrom(fSocket,
-				fPacket, BUFFER_SIZE, 0, (sockaddr*)peerAddress,
+				receiveBuffer, receiveBufferSize, 0, (sockaddr*)peerAddress,
 				(peerAddress ? &addrSize : 0));
 			if (bytesReceived < 0) {
-//if (debug) {
-//TRACE(("[%ld] RemoteDisk::_SendRequest(): recvfrom() failed: %s\n", find_thread(NULL), strerror(errno)));
-//}
 				status_t error = errno;
 				if (error != B_TIMED_OUT && error != B_WOULD_BLOCK)
 					return error;
@@ -386,13 +437,10 @@ RemoteDisk::_SendRequest(remote_disk_header* request, size_t size,
 
 			// got something; check, if it is looks good
 			if (bytesReceived >= (ssize_t)sizeof(remote_disk_header)) {
-				remote_disk_header* reply = (remote_disk_header*)fPacket;
+				remote_disk_header* reply = (remote_disk_header*)receiveBuffer;
 				if (reply->request_id == request->request_id
 					&& reply->command == expectedReply) {
-					fPacketSize = bytesReceived;
-//if (debug) {
-//TRACE(("[%ld] RemoteDisk::_SendRequest(): done: packet size: %ld\n", find_thread(NULL), bytesReceived));
-//}
+					*_bytesReceived = bytesReceived;
 					return B_OK;
 				}
 			}
@@ -400,5 +448,5 @@ RemoteDisk::_SendRequest(remote_disk_header* request, size_t size,
 	}
 
 	// no reply
-	return B_ERROR;
+	return B_TIMED_OUT;
 }

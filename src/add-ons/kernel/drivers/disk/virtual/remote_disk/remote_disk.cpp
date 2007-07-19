@@ -173,12 +173,12 @@ remote_disk_read(void* cookie, off_t position, void* buffer, size_t* numBytes)
 	ssize_t bytesRead = device->remoteDisk->ReadAt(position, buffer, *numBytes);
 	if (bytesRead < 0) {
 		*numBytes = 0;
-TRACE(("remote_disk_read() failed: %s\n", strerror(bytesRead)));
+		TRACE(("remote_disk_read() failed: %s\n", strerror(bytesRead)));
 		return bytesRead;
 	}
 
 	*numBytes = bytesRead;
-TRACE(("remote_disk_read() done: %ld\n", bytesRead));
+	TRACE(("remote_disk_read() done: %ld\n", bytesRead));
 	return B_OK;
 }
 
@@ -197,10 +197,12 @@ remote_disk_write(void* cookie, off_t position, const void* buffer,
 		*numBytes);
 	if (bytesWritten < 0) {
 		*numBytes = 0;
+		TRACE(("remote_disk_write() failed: %s\n", strerror(bytesRead)));
 		return bytesWritten;
 	}
 
 	*numBytes = bytesWritten;
+	TRACE(("remote_disk_written() done: %ld\n", bytesWritten));
 	return B_OK;
 }
 

@@ -34,7 +34,7 @@ public:
 									{ return fImageSize; }
 
 			bool				IsReadOnly() const
-									{ return true; }	// TODO:...
+									{ return false; }
 
 // 			uint32				ServerIPAddress() const
 // 									{ return fServerAddress; }
@@ -50,6 +50,12 @@ private:
 			status_t			_SendRequest(remote_disk_header *request,
 									size_t size, uint8 expectedReply,
 									sockaddr_in* peerAddress = NULL);
+			status_t			_SendRequest(remote_disk_header *request,
+									size_t size, uint8 expectedReply,
+									sockaddr_in* peerAddress,
+									void* receiveBuffer,
+									size_t receiveBufferSize,
+									int32* bytesReceived);
 
 private:
 			socket_module_info*	fSocketModule;
