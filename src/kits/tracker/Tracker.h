@@ -198,6 +198,7 @@ class TTracker : public BApplication {
 				OpenSelector openSelector = kOpen, uint32 openFlags = 0,
 				bool checkAlreadyOpen = true, const BMessage *stateMessage = NULL);
 			// pass either a Model or a list of entries to open
+		void _OpenPreviouslyOpenedWindows(const char* pathFilter = NULL);
 
 		void SetDefaultPrinter(const BMessage *);
 		void EditQueries(const BMessage *);

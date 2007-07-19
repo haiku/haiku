@@ -82,8 +82,7 @@ AutoMounter::AutoMounter()
 		fRemovableMode = kNoVolumes;
 	}
 
-	if (PostMessage(kMsgInitialScan) != B_OK)
-		debug_printf("AutoMounter: OH NO!\n");
+	PostMessage(kMsgInitialScan);
 }
 
 
@@ -93,7 +92,8 @@ AutoMounter::~AutoMounter()
 
 
 void
-AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable)
+AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable,
+	bool initialRescan)
 {
 	if (normal == kNoVolumes && removable == kNoVolumes)
 		return;
@@ -145,7 +145,13 @@ AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable)
 						return false;
 				}
 
-				partition->Mount();
+				if (partition->Mount() == B_OK) {
+					// notify Tracker that a new volume has been started
+					BMessage note(kVolumeMounted);
+					note.AddString("path", partition->MountedAt());
+					note.AddBool("initial rescan", sInitialRescan);
+					be_app->PostMessage(&note);
+				}
 				return false;
 			}
 
@@ -445,7 +451,7 @@ AutoMounter::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case kMsgInitialScan:
-			_MountVolumes(fNormalMode, fRemovableMode);
+			_MountVolumes(fNormalMode, fRemovableMode, true);
 			break;
 
 		case kMountVolume:
@@ -466,12 +472,12 @@ AutoMounter::MessageReceived(BMessage *message)
 			_WriteSettings();
 
 			if (rescanNow)
-				_MountVolumes(fNormalMode, fRemovableMode);
+				_MountVolumes(fNormalMode, fRemovableMode, false);
 			break;
 		}
 
 		case kMountAllNow:
-			_MountVolumes(kAllVolumes, kAllVolumes);
+			_MountVolumes(kAllVolumes, kAllVolumes, false);
 			break;
 
 #if 0
@@ -588,6 +594,7 @@ static const uint32 kStartPolling = 'strp';
 
 static BMessage gSettingsMessage;
 static bool gSilentAutoMounter;
+static bool sInitialRescan;
 
 struct OneMountFloppyParams {
 	status_t result;
@@ -651,6 +658,13 @@ MountAndWatch(Partition *partition)
 		PRINT(("Couldn't get mount point node ref: %s\n", strerror(status)));
 		return status;
 	}
+
+
+	// notify Tracker that a new volume has been started
+	BMessage note(kVolumeMounted);
+	note.AddString("path", partition->MountedAt());
+	note.AddBool("initial rescan", sInitialRescan);
+	be_app->PostMessage(&note);
 
 	return AutoMounterWatchNode(&nodeToWatch, B_WATCH_NAME);
 }
@@ -965,6 +979,7 @@ AutoMounter::AutoMounter(bool checkRemovableOnly, bool checkCDs,
 
 	if (!BootedInSafeMode()) {
 		ReadSettings();
+		sInitialRescan = true;
 		thread_id rescan = spawn_thread(AutoMounter::InitialRescanBinder, 
 			"AutomountInitialScan", B_DISPLAY_PRIORITY, this);
 		resume_thread(rescan);
@@ -1462,6 +1477,8 @@ AutoMounter::InitialRescan()
 //+		PRINT(("restoring all volumes\n"));
 		fList.EachMountablePartition(TryMountingRestoreOne, NULL);
 	}
+	
+	sInitialRescan = false;
 }
 
 

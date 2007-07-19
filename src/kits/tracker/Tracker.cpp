@@ -390,9 +390,9 @@ TTracker::MessageReceived(BMessage *message)
 			break;
 
 		case kUnmountVolume:
-			//	When the user attempts to unmount a volume from the mount
-			//	context menu, this is where the message gets received.  Save
-			//	pose locations and forward this to the automounter
+			// When the user attempts to unmount a volume from the mount
+			// context menu, this is where the message gets received.
+			// Save pose locations and forward this to the automounter
 			SaveAllPoseLocations();
 			fAutoMounter->PostMessage(message);
 			break;
@@ -401,16 +401,26 @@ TTracker::MessageReceived(BMessage *message)
 			AutomountSettingsDialog::RunAutomountSettings(fAutoMounter);
 			break;
 
-		case kShowSplash:
-			{
-				// The AboutWindow was moved out of the Tracker in preparation
-				// for when we open source it. The AboutBox contains important
-				// credit and license issues that shouldn't be modified, and
-				// therefore shouldn't be open sourced. However, there is a public
-				// API for 3rd party apps to tell the Tracker to open the AboutBox.
-				run_be_about();
+		case kVolumeMounted:
+		{
+			// This is sent to us by the AutoMounter whenever it mounts
+			// a new volume - we use it to restore the previously opened
+			// windows from that volume in case it has been mounted
+			// during the AutoMounter's initial rescan
+			const char* path;
+			bool initial;
+			if (message->FindBool("initial rescan", &initial) != B_OK
+				|| message->FindString("path", &path) != B_OK
+				|| !initial)
 				break;
-			}
+
+			_OpenPreviouslyOpenedWindows(path);
+			break;
+		}
+
+		case kShowSplash:
+			run_be_about();
+			break;
 
 		case kAddPrinter:
 			// show the addprinter window
@@ -1186,6 +1196,84 @@ TTracker::CloseAllWindows()
 
 
 void
+TTracker::_OpenPreviouslyOpenedWindows(const char* pathFilter)
+{
+	size_t filterLength = 0;
+	if (pathFilter != NULL)
+		filterLength = strlen(pathFilter);
+
+	BVolume	bootVolume;
+	BVolumeRoster().GetBootVolume(&bootVolume);
+	BDirectory deskDir;
+	attr_info attrInfo;
+	if (FSGetDeskDir(&deskDir, bootVolume.Device()) != B_OK
+		|| deskDir.GetAttrInfo(kAttrOpenWindows, &attrInfo) != B_OK)
+		return;
+
+	char *buffer = (char *)malloc((size_t)attrInfo.size);
+	BMessage message;
+	if (deskDir.ReadAttr(kAttrOpenWindows, B_MESSAGE_TYPE, 0, buffer,
+		(size_t)attrInfo.size) != attrInfo.size
+		|| message.Unflatten(buffer) != B_OK) {
+		free(buffer);
+		return;
+	}
+
+	free(buffer);
+
+	node_ref nodeRef;
+	deskDir.GetNodeRef(&nodeRef);
+
+	int32 stateMessageCounter = 0;
+	const char *path;
+	for (int32 i = 0; message.FindString("paths", i, &path) == B_OK; i++) {
+		if (strncmp(path, pathFilter, filterLength))
+			continue;
+
+		BEntry entry(path, true);
+		if (entry.InitCheck() != B_OK)
+			continue;
+
+		int8 flags = 0;
+		for (int32 j = 0; message.FindInt8(path, j, &flags) == B_OK; j++) {
+			Model *model = new Model(&entry);
+			if (model->InitCheck() == B_OK && model->IsContainer()) {
+				BMessage state;
+				bool restoreStateFromMessage = false;
+				if ((flags & kOpenWindowHasState) != 0
+					&& message.FindMessage("window state", stateMessageCounter++,
+							&state) == B_OK)
+					restoreStateFromMessage = true;
+
+				if (restoreStateFromMessage) {
+					OpenContainerWindow(model, 0, kOpen, kRestoreWorkspace
+						| (flags & kOpenWindowMinimized ? kIsHidden : 0U)
+						| kRestoreDecor, false, &state);
+				} else {
+					OpenContainerWindow(model, 0, kOpen, kRestoreWorkspace
+						| (flags & kOpenWindowMinimized ? kIsHidden : 0U)
+						| kRestoreDecor);
+				}
+			} else
+				delete model;
+		}
+	}
+
+	// Open disks window if needed
+
+	if (pathFilter == NULL && TrackerSettings().ShowDisksIcon()
+		&& message.HasBool("open_disks_window")) {
+		BEntry entry("/");
+		Model* model = new Model(&entry);
+		if (model->InitCheck() == B_OK)
+			OpenContainerWindow(model, 0, kOpen, kRestoreWorkspace);
+		else
+			delete model;
+	}
+}
+
+
+void
 TTracker::ReadyToRun()
 {
 	gStatusWindow = new BStatusWindow();
@@ -1206,14 +1294,12 @@ TTracker::ReadyToRun()
 	
 	fTaskLoop = new StandAloneTaskLoop(true);
 
-	bool openDisksWindow = false;
-
 	// open desktop window 
 	BContainerWindow *deskWindow = NULL;
-	BVolume	bootVol;
-	BVolumeRoster().GetBootVolume(&bootVol);
+	BVolume	bootVolume;
+	BVolumeRoster().GetBootVolume(&bootVolume);
 	BDirectory deskDir;
-	if (FSGetDeskDir(&deskDir, bootVol.Device()) == B_OK) {
+	if (FSGetDeskDir(&deskDir, bootVolume.Device()) == B_OK) {
 		// create desktop
 		BEntry entry;
 		deskDir.GetEntry(&entry);
@@ -1224,86 +1310,38 @@ TTracker::ReadyToRun()
 			AutoLock<BWindow> windowLock(deskWindow);
 			deskWindow->CreatePoseView(model);
 			deskWindow->Init();
+
+			if (TrackerSettings().ShowDisksIcon()) {
+				// create model for root of everything
+				BEntry entry("/");
+				Model model(&entry);
+				if (model.InitCheck() == B_OK) {
+					// add the root icon to desktop window
+					BMessage message;
+					message.what = B_NODE_MONITOR;
+					message.AddInt32("opcode", B_ENTRY_CREATED);
+					message.AddInt32("device", model.NodeRef()->device);
+					message.AddInt64("node", model.NodeRef()->node);
+					message.AddInt64("directory", model.EntryRef()->directory);
+					message.AddString("name", model.EntryRef()->name);
+					deskWindow->PostMessage(&message, deskWindow->PoseView());
+				}
+			}
 		} else
 			delete model;
 
 		// open previously open windows
-		attr_info attrInfo;
-		if (!BootedInSafeMode()
-			&& deskDir.GetAttrInfo(kAttrOpenWindows, &attrInfo) == B_OK) {
-			char *buffer = (char *)malloc((size_t)attrInfo.size);
-			BMessage message;
-			if (deskDir.ReadAttr(kAttrOpenWindows, B_MESSAGE_TYPE, 0, buffer, (size_t)attrInfo.size)
-				== attrInfo.size
-				&& message.Unflatten(buffer) == B_OK) {
-
-				node_ref nodeRef;
-				deskDir.GetNodeRef(&nodeRef);
-	
-				int32 stateMessageCounter = 0;
-				const char *path;
-				for (int32 outer = 0;message.FindString("paths", outer, &path) == B_OK;outer++) {
-					int8 flags = 0;
-					for (int32 inner = 0;message.FindInt8(path, inner, &flags) == B_OK;inner++) {
-						BEntry entry(path, true);
-						if (entry.InitCheck() == B_OK) {
-							Model *model = new Model(&entry);
-							if (model->InitCheck() == B_OK && model->IsContainer()) {
-								BMessage state;
-								bool restoreStateFromMessage = false;
-								if ((flags & kOpenWindowHasState) != 0
-									&& message.FindMessage("window state", stateMessageCounter++, &state) == B_OK)
-									restoreStateFromMessage = true;
-
-								if (restoreStateFromMessage)
-									OpenContainerWindow(model, 0, kOpen, 
-										kRestoreWorkspace | (flags & kOpenWindowMinimized ? kIsHidden : 0U) | kRestoreDecor,
-										false, &state);
-								else
-									OpenContainerWindow(model, 0, kOpen, 
-										kRestoreWorkspace | (flags & kOpenWindowMinimized ? kIsHidden : 0U) | kRestoreDecor);
-							} else
-								delete model;
-						}
-					}
-				}
-	
-				if (message.HasBool("open_disks_window"))
-					openDisksWindow = true;
-			}
-			free(buffer);
-		}
-	}
-
-	// create model for root of everything
-	if (deskWindow) {
-		BEntry entry("/");
-		Model model(&entry);
-		if (model.InitCheck() == B_OK) {
-
-			if (TrackerSettings().ShowDisksIcon()) {
-				// add the root icon to desktop window
-				BMessage message;
-				message.what = B_NODE_MONITOR;
-				message.AddInt32("opcode", B_ENTRY_CREATED);
-				message.AddInt32("device", model.NodeRef()->device);
-				message.AddInt64("node", model.NodeRef()->node);
-				message.AddInt64("directory", model.EntryRef()->directory);
-				message.AddString("name", model.EntryRef()->name);
-				deskWindow->PostMessage(&message, deskWindow->PoseView());
-			}
-			
-			if (openDisksWindow)
-				OpenContainerWindow(new Model(model), 0, kOpen, kRestoreWorkspace);
-		}
+		if (!BootedInSafeMode())
+			_OpenPreviouslyOpenedWindows();
 	}
 
 	// kick off building the mime type list for find panels, etc.
 	fMimeTypeList = new MimeTypeList();
 
-	if (!BootedInSafeMode())
+	if (!BootedInSafeMode()) {
 		// kick of transient query killer
 		DeleteTransientQueriesTask::StartUpTransientQueryCleaner();
+	}
 }
 
 MimeTypeList *

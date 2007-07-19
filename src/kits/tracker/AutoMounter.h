@@ -48,6 +48,7 @@ namespace BPrivate {
 const uint32 kMountVolume 				= 'mntv';
 const uint32 kMountAllNow				= 'mntn';
 const uint32 kSetAutomounterParams 		= 'pmst';
+const uint32 kVolumeMounted				= 'vmtd';
 
 #ifdef __HAIKU__
 //	#pragma mark - Haiku Disk Device API
@@ -69,7 +70,8 @@ class AutoMounter : public BLooper {
 			kRestorePreviousVolumes
 		};
 
-		void _MountVolumes(mount_mode normal, mount_mode removable);
+		void _MountVolumes(mount_mode normal, mount_mode removable,
+			bool initialRescan);
 		void _MountVolume(BMessage* message);
 		bool _ForceUnmount(const char* name, status_t error);
 		void _ReportUnmountError(const char* name, status_t error);
