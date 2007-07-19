@@ -1401,8 +1401,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			int32 lengthArray[numStrings];
 			char *stringArray[numStrings];
 			for (int32 i = 0; i < numStrings; i++) {
-// TODO: who allocates the strings?!? If the link does it then we are leaking
-// everywhere else!!
+				// This version of ReadString allocates the strings, we free them below
 				link.ReadString(&stringArray[i], (size_t *)&lengthArray[i]);
 			}
 
@@ -1982,9 +1981,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			char *stringArray[numStrings];
 			int32 lengthArray[numStrings];
 			for(int32 i=0; i<numStrings; i++) {
-				link.Read<int32>(&lengthArray[i]);
+				// This version of ReadString allocates the strings, we free them below
+				link.ReadString(&stringArray[i], (size_t *)&lengthArray[i]);
 				link.Read<escapement_delta>(&deltaArray[i]);
-				link.ReadString(&stringArray[i]);
 			}
 
 			BRect rectArray[numStrings];
@@ -1999,7 +1998,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				font.SetSpacing(spacing);
 				font.SetFlags(flags);
 
-				// TODO implement for real
 				if (font.GetBoundingBoxesForStrings(stringArray, lengthArray,
 					numStrings, rectArray, mode, deltaArray) == B_OK) {
 					fLink.StartMessage(B_OK);

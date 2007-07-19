@@ -24,6 +24,8 @@
 #include <String.h>
 #include <UTF8.h>
 
+#include <stdio.h>
+#include <string.h>
 
 // functions needed to convert a freetype vector graphics to a BShape
 inline BPoint
@@ -496,6 +498,7 @@ ServerFont::GetBoundingBoxesAsString(const char charArray[], int32 numChars,
 	BRect rectArray[], bool stringEscapement, font_metric_mode mode,
 	escapement_delta delta)
 {
+	// TODO: The mode is never used
 	if (!charArray || numChars <= 0 || !rectArray)
 		return B_BAD_DATA;
 
@@ -519,12 +522,12 @@ ServerFont::GetBoundingBoxesAsString(const char charArray[], int32 numChars,
 				+ face->glyph->metrics.horiAdvance / 64.0;
 		}
 
-		rectArray[i].left += float(face->glyph->metrics.horiBearingX) /64.0;
+		rectArray[i].left += float(face->glyph->metrics.horiBearingX) / 64.0;
 		rectArray[i].right += float(face->glyph->metrics.horiBearingX
 			+ face->glyph->metrics.width) / 64.0;
 		rectArray[i].top = -float(face->glyph->metrics.horiBearingY) / 64.0;
 		rectArray[i].bottom = float(face->glyph->metrics.height
-			- face->glyph->metrics.horiBearingY) /64.0;
+			- face->glyph->metrics.horiBearingY) / 64.0;
 	}
 
 	PutTransformedFace(face);
@@ -536,6 +539,7 @@ status_t
 ServerFont::GetBoundingBoxesForStrings(char *charArray[], int32 lengthArray[], 
 	int32 numStrings, BRect rectArray[], font_metric_mode mode, escapement_delta deltaArray[])
 {
+	// TODO: The mode is never used
 	if (!charArray || !lengthArray|| numStrings <= 0 || !rectArray || !deltaArray)
 		return B_BAD_DATA;
 
@@ -544,7 +548,28 @@ ServerFont::GetBoundingBoxesForStrings(char *charArray[], int32 lengthArray[],
 		return B_ERROR;
 
 	for (int32 i = 0; i < numStrings; i++) {
-		// TODO: ...
+		int32 numChars = lengthArray[i];
+		const char *string = charArray[i];
+		escapement_delta delta = deltaArray[i];
+
+		rectArray[i].left = 0.0;
+		for (int32 j = 0; j < numChars; j++) {
+			uint32 charCode = UTF8ToCharCode(&string);
+			FT_Load_Char(face, charCode, FT_LOAD_NO_BITMAP);
+
+			// TODO: In my testing the width doesn't seem quite right (a
+			// little too long), though I need to do more comparisions with BeOS
+			rectArray[i].right += (face->glyph->advance.x >> 6);
+			rectArray[i].right += is_white_space(charCode) ? delta.space : delta.nonspace;
+
+			float top = -(face->glyph->metrics.horiBearingY >> 6);
+			if (top < rectArray[i].top)
+				rectArray[i].top = top;
+			float bottom = (face->glyph->metrics.height
+				- face->glyph->metrics.horiBearingY) >> 6;
+			if (bottom > rectArray[i].bottom)
+				rectArray[i].bottom = bottom;
+		}
 	}
 
 	PutTransformedFace(face);
