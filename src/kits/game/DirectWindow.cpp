@@ -307,10 +307,12 @@ BDirectWindow::GetClippingRegion(BRegion *region, BPoint *origin) const
 		UnlockDirect();
 		return B_NO_MEMORY;
 	}
-	region->fCount = fBufferDesc->clip_list_count;		
-	region->fBounds = fBufferDesc->clip_bounds;
-	for (uint32 c = 0; c < fBufferDesc->clip_list_count; c++)
-		region->fData[c] = fBufferDesc->clip_list[c];
+	region->fCount = fBufferDesc->clip_list_count;
+	region->fBounds = region->_ConvertToInternal(fBufferDesc->clip_bounds);
+	for (uint32 c = 0; c < fBufferDesc->clip_list_count; c++) {
+		region->fData[c] = region->_ConvertToInternal(
+			fBufferDesc->clip_list[c]);
+	}
 
 	// adjust bounds by the given origin point 
 	region->OffsetBy(-originX, -originY);		

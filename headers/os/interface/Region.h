@@ -82,6 +82,8 @@ class BRegion {
 
 			clipping_rect		_Convert(const BRect& rect) const;
 			clipping_rect		_ConvertToInternal(const BRect& rect) const;
+			clipping_rect		_ConvertToInternal(
+									const clipping_rect& rect) const;
 
  private:
 			long				fCount;

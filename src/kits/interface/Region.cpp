@@ -502,3 +502,11 @@ BRegion::_ConvertToInternal(const BRect& rect) const
 		(int)ceilf(rect.right) + 1, (int)ceilf(rect.bottom) + 1 };
 }
 
+
+clipping_rect
+BRegion::_ConvertToInternal(const clipping_rect& rect) const
+{
+	return (clipping_rect){ rect.left, rect.top,
+		rect.right + 1, rect.bottom + 1 };
+}
+
