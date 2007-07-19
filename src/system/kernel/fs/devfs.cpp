@@ -1937,7 +1937,8 @@ devfs_write_pages(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 	//TRACE(("devfs_write_pages: vnode %p, vecs %p, count = %lu, pos = %Ld, size = %lu\n", vnode, vecs, count, pos, *_numBytes));
 
 	if (!S_ISCHR(vnode->stream.type)
-		|| vnode->stream.u.dev.info->write_pages == NULL
+		|| (vnode->stream.u.dev.info->write_pages == NULL
+			&& vnode->stream.u.dev.info->write == NULL)
 		|| cookie == NULL)
 		return B_NOT_ALLOWED;
 
@@ -1946,8 +1947,37 @@ devfs_write_pages(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 			*_numBytes);
 	}
 
-	return vnode->stream.u.dev.info->write_pages(cookie->device_cookie, pos,
-		vecs, count, _numBytes);
+	if (vnode->stream.u.dev.info->write_pages) {
+		return vnode->stream.u.dev.info->write_pages(cookie->device_cookie, pos,
+			vecs, count, _numBytes);
+	}
+
+	// emulate write_pages() using write()
+
+	status_t error = B_OK;
+	size_t bytesTransferred = 0;
+
+	size_t remainingBytes = *_numBytes;
+	for (size_t i = 0; i < count && remainingBytes > 0; i++) {
+		size_t toWrite = min_c(vecs[i].iov_len, remainingBytes);
+		size_t length = toWrite;
+
+		error = vnode->stream.u.dev.info->write(cookie->device_cookie, pos,
+			vecs[i].iov_base, &length);
+		if (error != B_OK)
+			break;
+
+		pos += length;
+		bytesTransferred += length;
+		remainingBytes -= length;
+
+		if (length < toWrite)
+			break;
+	}
+
+	*_numBytes = bytesTransferred;
+
+	return (bytesTransferred > 0 ? B_OK : error);
 }
 
 
