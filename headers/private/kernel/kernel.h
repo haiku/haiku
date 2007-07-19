@@ -28,9 +28,9 @@
 
 /** Size of the kernel stack */
 #ifndef DEBUG_KERNEL_STACKS
-#	define KERNEL_STACK_SIZE		(B_PAGE_SIZE * 2)	// 8 kB
+#	define KERNEL_STACK_SIZE		(B_PAGE_SIZE * 3)	// 12 kB
 #else
-#	define KERNEL_STACK_SIZE		(B_PAGE_SIZE * 3)	// 8 kB + one guard page
+#	define KERNEL_STACK_SIZE		(B_PAGE_SIZE * 4)	// 12 kB + one guard page
 #endif
 #define KERNEL_STACK_GUARD_PAGES	1
 
