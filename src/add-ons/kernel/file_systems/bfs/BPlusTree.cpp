@@ -1189,8 +1189,12 @@ BPlusTree::_SplitNode(bplustree_node *node, off_t nodeOffset,
 	// move the keys in the old node: the order is important here,
 	// because we don't want to overwrite any contents
 
-	keys = keyIndex <= skip ? out : keyIndex - skip;
+	keys = keyIndex <= skip ? out - 1 : keyIndex - skip;
 	keyIndex -= skip;
+	in = out - keyIndex - 1;
+		// Note: keyIndex and in will contain invalid values when the new key
+		// went to the other node. But in this case bytes and bytesAfter are
+		// 0 and subsequently we never use keyIndex and in.
 
 	if (bytesBefore)
 		memmove(inKeys, inKeys + total, bytesBefore);
@@ -1201,8 +1205,8 @@ BPlusTree::_SplitNode(bplustree_node *node, off_t nodeOffset,
 
 	if (bytesBefore)
 		memmove(outKeyLengths, inKeyLengths + skip, keys * sizeof(uint16));
-	in = out - keyIndex - 1;
 	if (bytesAfter) {
+		// if byteAfter is > 0, keyIndex is larger than skip
 		memmove(outKeyLengths + keyIndex + 1, inKeyLengths + skip + keyIndex,
 			in * sizeof(uint16));
 	}
