@@ -234,7 +234,7 @@ private:
 		int16_t size = ntohs(fRequest->size);
 		int16_t result = 0;
 
-		printf("READ request: offset: %llu, %hd bytes\n", offset, size);
+		printf("WRITE request: offset: %llu, %hd bytes\n", offset, size);
 
 		if (size < 0
 			|| (uint32_t)size > fRequestSize - sizeof(remote_disk_header)
