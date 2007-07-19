@@ -552,11 +552,13 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool *_allocated,
 	if (*_allocated && readBlock) {
 		int32 blockSize = cache->block_size;
 
-		if (read_pos(cache->fd, blockNumber * blockSize, block->current_data,
-				blockSize) < blockSize) {
+		ssize_t bytesRead = read_pos(cache->fd, blockNumber * blockSize,
+			block->current_data, blockSize);
+		if (bytesRead < blockSize) {
 			hash_remove(cache->hash, block);
 			cache->FreeBlock(block);
-			FATAL(("could not read block %Ld\n", blockNumber));
+			FATAL(("could not read block %Ld: bytesRead: %ld, error: %s\n",
+				blockNumber, bytesRead, strerror(errno)));
 			return NULL;
 		}
 	}
