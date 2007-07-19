@@ -132,13 +132,13 @@ bool JoyWin::QuitRequested()
 /* Initialization */
 status_t JoyWin::AddDevices()
 {
-	char buf[256];
+	char buf[BEOS_NAME_LENGTH];
 	int devId = 0;
 	MessagedItem* device;
 	BMessage*	 message;
 	BString		 str;
 	 
-	while (!fJoystick.GetDeviceName(devId, buf, 256)) {
+	while (!fJoystick.GetDeviceName(devId, buf, BEOS_NAME_LENGTH)) {
 		 message = new BMessage(PORT_SELECTED);
 		 message->AddString("devname", buf);
 		 // NOTE: Adding the index in the list might be useful.
