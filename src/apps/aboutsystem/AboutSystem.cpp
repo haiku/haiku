@@ -529,6 +529,15 @@ AboutView::AboutView(const BRect &rect)
 		"Copyright " B_UTF8_COPYRIGHT " 1997 Be Inc.\n"
 		"Copyright " B_UTF8_COPYRIGHT " 1999 Jake Hamby. \n\n");
 
+	// OpenGroup & DEC (BRegion backend) copyright
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
+	fCreditsView->Insert("BRegion backend (XFree86)\n");
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
+	fCreditsView->Insert(
+		"Copyright " B_UTF8_COPYRIGHT " 1987, 1988, 1998  The Open Group.\n"
+		"Copyright " B_UTF8_COPYRIGHT " 1987, 1988 Digital Equipment Corporation, Maynard, Massachusetts.\n"
+		"All rights reserved.\n\n");
+
 	// Konatu font
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
 	fCreditsView->Insert("Konatu font\n");
