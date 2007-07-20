@@ -130,21 +130,22 @@ bool JoyWin::QuitRequested()
 
 
 /* Initialization */
-status_t JoyWin::AddDevices()
+status_t
+JoyWin::AddDevices()
 {
-	char buf[BEOS_NAME_LENGTH];
+	char name[B_FILE_NAME_LENGTH];
 	int devId = 0;
 	MessagedItem* device;
-	BMessage*	 message;
-	BString		 str;
+	BMessage* message;
+	BString str;
 	 
-	while (!fJoystick.GetDeviceName(devId, buf, BEOS_NAME_LENGTH)) {
+	while (!fJoystick.GetDeviceName(devId, name, sizeof(name))) {
 		 message = new BMessage(PORT_SELECTED);
-		 message->AddString("devname", buf);
+		 message->AddString("devname", name);
 		 // NOTE: Adding the index in the list might be useful.
 	
 		// TODO: Change it with leaf path
-		str.SetTo(buf);
+		str.SetTo(name);
 		//str = str.Remove(0, str.FindLast('/') );
 	
 		device = new MessagedItem(str.String(), message);
