@@ -2536,7 +2536,7 @@ AttributeIterator::GetNext(char *name, size_t *_length, uint32 *_type,
 	Inode *attribute;
 	if ((status = vnode.Get(&attribute)) == B_OK) {
 		*_type = attribute->Type();
-		*_length = attribute->Size();
+		*_length = length;
 		*_id = id;
 	}
 
