@@ -171,7 +171,7 @@ TermWindow::InitWindow()
 	 * TermView is character Terminal view on BaseView. It has paste
 	 * on BaseView shift as VIEW_OFFSET.
 	 */
-	//fBaseView = new TermBaseView(textframe, fTermView);
+	fBaseView = new TermBaseView(textframe, fTermView);
 
 	// Initialize TermView. (font, size and color)
 
@@ -186,7 +186,7 @@ TermWindow::InitWindow()
 		MIN_COLS * height, MAX_COLS * height);
 
 	fTermView->SetTermColor();
-	//fBaseView->SetViewColor(PrefHandler::Default()->getRGB(PREF_TEXT_BACK_COLOR));
+	fBaseView->SetViewColor(PrefHandler::Default()->getRGB(PREF_TEXT_BACK_COLOR));
 
 	// Add offset to baseview.
 	rect.InsetBy(-VIEW_OFFSET, -VIEW_OFFSET);
@@ -196,9 +196,9 @@ TermWindow::InitWindow()
 	ResizeTo(rect.Width()+ B_V_SCROLL_BAR_WIDTH,
 		rect.Height() + fMenubar->Bounds().Height());
 
-	//fBaseView->ResizeTo(rect.Width(), rect.Height());
-	//fBaseView->AddChild(fTermView);
-	//fTermView->MoveBy(VIEW_OFFSET, VIEW_OFFSET);
+	fBaseView->ResizeTo(rect.Width(), rect.Height());
+	fBaseView->AddChild(fTermView);
+	fTermView->MoveBy(VIEW_OFFSET, VIEW_OFFSET);
 
 	// Make Scroll Bar.
 
@@ -212,9 +212,8 @@ TermWindow::InitWindow()
 	fTermView->SetScrollBar(scrollBar);
 	
 	AddChild(scrollBar);
-	//AddChild(fBaseView);
-	AddChild(fTermView);
-
+	AddChild(fBaseView);
+	
 	// Set fEditmenu's target to fTermView. (Oh!...)
 	fEditmenu->SetTargetForItems(fTermView);
 
@@ -554,8 +553,8 @@ TermWindow::MessageReceived(BMessage *message)
 				BScreen screen(this);
 				fTermView->ScrollBar()->Hide();
 				fMenubar->Hide();
-				fTermView->MoveTo(0,0);
-				fTermView->ResizeBy(B_V_SCROLL_BAR_WIDTH, mbHeight);
+				fBaseView->MoveTo(0,0);
+				fBaseView->ResizeBy(B_V_SCROLL_BAR_WIDTH, mbHeight);
 				fSavedLook = Look();
 				// done before ResizeTo to work around a Dano bug (not erasing the decor)
 				SetLook(B_NO_BORDER_WINDOW_LOOK);
@@ -567,8 +566,8 @@ TermWindow::MessageReceived(BMessage *message)
 				fTermView->ScrollBar()->Show();
 				ResizeTo(fSavedFrame.Width(), fSavedFrame.Height());
 				MoveTo(fSavedFrame.left, fSavedFrame.top);
-				fTermView->ResizeBy(-B_V_SCROLL_BAR_WIDTH, -mbHeight);
-				fTermView->MoveTo(0,mbHeight);
+				fBaseView->ResizeBy(-B_V_SCROLL_BAR_WIDTH, -mbHeight);
+				fBaseView->MoveTo(0,mbHeight);
 				SetLook(fSavedLook);
 				fSavedFrame = BRect(0,0,-1,-1);
 			}
@@ -580,9 +579,9 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 		}
 		case MSG_COLOR_CHANGED: {
-			//fBaseView->SetViewColor (PrefHandler::Default()->getRGB (PREF_TEXT_BACK_COLOR));
+			fBaseView->SetViewColor (PrefHandler::Default()->getRGB (PREF_TEXT_BACK_COLOR));
 			fTermView->SetTermColor();
-			//fBaseView->Invalidate();
+			fBaseView->Invalidate();
 			fTermView->Invalidate();
 			break;
 		}
