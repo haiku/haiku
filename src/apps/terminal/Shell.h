@@ -103,7 +103,9 @@ public:
 	int		FD() const;	
 	
 private:
-	int fFd;	
+	int fFd;
+
+	status_t	_Spawn(int row, int col, const char *command, const char *coding);
 };
 
 #endif // _SHELL_H

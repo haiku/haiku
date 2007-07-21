@@ -1,4 +1,5 @@
 /*
+ * Copyright 2007 Haiku, Inc.
  * Copyright (c) 2003-2004 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
@@ -10,6 +11,7 @@
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
+#include <MessageRunner.h>
 #include <Path.h>
 #include <PrintJob.h>
 #include <PropertyInfo.h>
@@ -20,7 +22,6 @@
 #include <TextControl.h>
 #include <WindowScreen.h>
 
-#include <float.h>
 #include <stdio.h>
 #include <string>
 #include <sys/time.h>
@@ -33,7 +34,6 @@
 #include "PrefWindow.h"
 #include "PrefView.h"
 #include "PrefHandler.h"
-#include "TermApp.h"
 #include "TermBaseView.h"
 #include "TermBuffer.h"
 #include "TermParse.h"
@@ -171,7 +171,7 @@ TermWindow::InitWindow()
 	 * TermView is character Terminal view on BaseView. It has paste
 	 * on BaseView shift as VIEW_OFFSET.
 	 */
-	fBaseView = new TermBaseView(textframe, fTermView);
+	//fBaseView = new TermBaseView(textframe, fTermView);
 
 	// Initialize TermView. (font, size and color)
 
@@ -186,7 +186,7 @@ TermWindow::InitWindow()
 		MIN_COLS * height, MAX_COLS * height);
 
 	fTermView->SetTermColor();
-	fBaseView->SetViewColor(PrefHandler::Default()->getRGB(PREF_TEXT_BACK_COLOR));
+	//fBaseView->SetViewColor(PrefHandler::Default()->getRGB(PREF_TEXT_BACK_COLOR));
 
 	// Add offset to baseview.
 	rect.InsetBy(-VIEW_OFFSET, -VIEW_OFFSET);
@@ -196,9 +196,9 @@ TermWindow::InitWindow()
 	ResizeTo(rect.Width()+ B_V_SCROLL_BAR_WIDTH,
 		rect.Height() + fMenubar->Bounds().Height());
 
-	fBaseView->ResizeTo(rect.Width(), rect.Height());
-	fBaseView->AddChild(fTermView);
-	fTermView->MoveBy(VIEW_OFFSET, VIEW_OFFSET);
+	//fBaseView->ResizeTo(rect.Width(), rect.Height());
+	//fBaseView->AddChild(fTermView);
+	//fTermView->MoveBy(VIEW_OFFSET, VIEW_OFFSET);
 
 	// Make Scroll Bar.
 
@@ -212,7 +212,8 @@ TermWindow::InitWindow()
 	fTermView->SetScrollBar(scrollBar);
 	
 	AddChild(scrollBar);
-	AddChild(fBaseView);
+	//AddChild(fBaseView);
+	AddChild(fTermView);
 
 	// Set fEditmenu's target to fTermView. (Oh!...)
 	fEditmenu->SetTargetForItems(fTermView);
@@ -223,14 +224,6 @@ TermWindow::InitWindow()
 	if (fTermParse->StartThreads() < B_OK)
 		return;
 
-	// Set Coding.
-	
-	// Init find parameters
-	fMatchCase = false;
-	fMatchWord = false;
-	fFindSelection = false;
-	fForwardSearch = false;
-
 	// Initialize MessageRunner.
 	fWindowUpdate = new BMessageRunner(BMessenger(this),
 		new BMessage (MSGRUN_WINDOW), 500000);
@@ -238,7 +231,7 @@ TermWindow::InitWindow()
 
 
 void
-TermWindow::MenusBeginning(void)
+TermWindow::MenusBeginning()
 {
 	// Syncronize Encode Menu Pop-up menu and Preference.
 	(fEncodingmenu->FindItem(id2longname(GetEncoding())))->SetMarked(true);
@@ -247,7 +240,7 @@ TermWindow::MenusBeginning(void)
 
 
 void
-TermWindow::SetupMenu(void)
+TermWindow::SetupMenu()
 {
 	PrefHandler menuText;
 	
@@ -561,8 +554,8 @@ TermWindow::MessageReceived(BMessage *message)
 				BScreen screen(this);
 				fTermView->ScrollBar()->Hide();
 				fMenubar->Hide();
-				fBaseView->MoveTo(0,0);
-				fBaseView->ResizeBy(B_V_SCROLL_BAR_WIDTH, mbHeight);
+				fTermView->MoveTo(0,0);
+				fTermView->ResizeBy(B_V_SCROLL_BAR_WIDTH, mbHeight);
 				fSavedLook = Look();
 				// done before ResizeTo to work around a Dano bug (not erasing the decor)
 				SetLook(B_NO_BORDER_WINDOW_LOOK);
@@ -574,8 +567,8 @@ TermWindow::MessageReceived(BMessage *message)
 				fTermView->ScrollBar()->Show();
 				ResizeTo(fSavedFrame.Width(), fSavedFrame.Height());
 				MoveTo(fSavedFrame.left, fSavedFrame.top);
-				fBaseView->ResizeBy(-B_V_SCROLL_BAR_WIDTH, -mbHeight);
-				fBaseView->MoveTo(0,mbHeight);
+				fTermView->ResizeBy(-B_V_SCROLL_BAR_WIDTH, -mbHeight);
+				fTermView->MoveTo(0,mbHeight);
 				SetLook(fSavedLook);
 				fSavedFrame = BRect(0,0,-1,-1);
 			}
@@ -587,9 +580,9 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 		}
 		case MSG_COLOR_CHANGED: {
-			fBaseView->SetViewColor (PrefHandler::Default()->getRGB (PREF_TEXT_BACK_COLOR));
-			fTermView->SetTermColor ();
-			fBaseView->Invalidate();
+			//fBaseView->SetViewColor (PrefHandler::Default()->getRGB (PREF_TEXT_BACK_COLOR));
+			fTermView->SetTermColor();
+			//fBaseView->Invalidate();
 			fTermView->Invalidate();
 			break;
 		}

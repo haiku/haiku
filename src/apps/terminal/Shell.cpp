@@ -1,4 +1,5 @@
 /*
+ * Copyright 2007 Haiku, inc.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
@@ -54,10 +55,6 @@
 #define SHELL_COMMAND "/bin/sh -login"
 
 
-const static char *kSpawnAlertMessage = "alert --stop " "'Cannot execute \"%s\":\n"
-	"\t%s\n'"
-	"'Use Default Shell' 'Abort'";
-
 /*
  * Set environment variable.
  */
@@ -92,11 +89,6 @@ setenv(const char *var, const char *value, bool overwrite)
 #endif
 
 
-/*
- *  spawn_shell(): spawn child process, create pty master/slave device and
- *  execute SHELL program.
- */
-
 /* handshake interface */
 typedef struct 
 {
@@ -112,10 +104,111 @@ typedef struct
 #define PTY_WS	2	/* pty need WINSIZE (row and col ) */
 
 
-
 static pid_t sShPid;
 
 
+Shell::Shell()
+	:fFd(-1)
+{
+}
+
+
+Shell::~Shell()
+{
+	Close();
+}
+
+
+status_t
+Shell::Open(int row, int col, const char *command, const char *coding)
+{
+	if (fFd >= 0)
+		return B_ERROR;
+
+	return _Spawn(row, col, command, coding);
+}
+
+
+void
+Shell::Close()
+{
+	if (fFd >= 0) {
+		close(fFd);
+		kill(-sShPid, SIGHUP);
+		int status;
+		wait(&status);	
+		fFd = -1;	
+	}
+}
+
+
+const char *
+Shell::TTYName() const
+{
+	return ttyname(fFd);
+}
+
+
+ssize_t
+Shell::Read(void *buffer, size_t numBytes)
+{
+	if (fFd < 0)
+		return B_NO_INIT;
+	
+	return read(fFd, buffer, numBytes);
+}
+
+
+ssize_t
+Shell::Write(const void *buffer, size_t numBytes)
+{
+	if (fFd < 0)
+		return B_NO_INIT;
+	
+	return write(fFd, buffer, numBytes);
+}
+
+
+void
+Shell::UpdateWindowSize(int rows, int columns)
+{
+	struct winsize winSize;
+	winSize.ws_row = rows;
+	winSize.ws_col = columns;
+	ioctl(fFd, TIOCSWINSZ, &winSize);
+	Signal(SIGWINCH);
+}
+
+
+void
+Shell::Signal(int signal)
+{
+	kill(-sShPid, signal);
+}
+
+
+status_t
+Shell::GetAttr(struct termios &attr)
+{
+	return tcgetattr(fFd, &attr);
+}
+
+
+status_t
+Shell::SetAttr(struct termios &attr)
+{
+	return tcsetattr(fFd, TCSANOW, &attr);
+}
+
+
+int
+Shell::FD() const
+{
+	return fFd;
+}
+
+
+// private
 static status_t
 send_handshake_message(thread_id target, const handshake_t& handshake)
 {
@@ -131,14 +224,14 @@ receive_handshake_message(handshake_t& handshake)
 }
 
 
-static int
-spawn_shell(int row, int col, const char *command, const char *coding)
+status_t
+Shell::_Spawn(int row, int col, const char *command, const char *coding)
 {
 	signal(SIGTTOU, SIG_IGN);
 	
 	/*
 	 * Get a pseudo-tty. We do this by cycling through files in the
-	 * directory. The oparationg system will not allow us to open a master
+	 * directory. The operationg system will not allow us to open a master
 	 * which is already in use, so we simply go until the open succeeds.
 	 */
 	char ttyName[B_PATH_NAME_LENGTH];
@@ -170,27 +263,27 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 
 	if (master < 0) {
     		printf("didn't find any available pseudo ttys.");
-    		return -1;
+    		return B_ERROR;
 	}
 
-   /*
-	* Get the modes of the current terminal. We will duplicates these
-	* on the pseudo terminal.
-	*/
+       	/*
+	 * Get the modes of the current terminal. We will duplicates these
+	 * on the pseudo terminal.
+	 */
 
 	thread_id terminalThread = find_thread(NULL);
 
 	/* Fork a child process. */
 	if ((sShPid = fork()) < 0) {
 		close(master);
-		return -1;
+		return B_ERROR;
 	}
 
 
 	handshake_t handshake;
 
 	if (sShPid == 0) {
-	    // Now in child process.
+		// Now in child process.
 
 		/*
 		 * Make our controlling tty the pseudo tty. This hapens because
@@ -408,8 +501,12 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 		 * Exec failed.
 		 */
 		sleep(1);
+		const char *spawnAlertMessage = "alert --stop "
+						"'Cannot execute \"%s\":\n"
+						"\t%s\n'"
+						"'Use Default Shell' 'Abort'";
 		char errorMessage[256];
-		snprintf(errorMessage, sizeof(errorMessage), kSpawnAlertMessage, commandLine, strerror(errno));
+		snprintf(errorMessage, sizeof(errorMessage), spawnAlertMessage, commandLine, strerror(errno));
 
 		if (system(errorMessage) == 0)
 			execl("/bin/sh", "/bin/sh", "-login", NULL);
@@ -449,119 +546,11 @@ spawn_shell(int row, int col, const char *command, const char *coding)
 		}
 	}
   
-	return (done > 0) ? master : -1;
-}
+	if (done <= 0)
+		return B_ERROR;
 
-
-static void
-close_shell(int fd)
-{
-	if (fd < 0)
-		return;
-
-	close(fd);
-	
-	int status;
-	kill(-sShPid, SIGHUP);
-	wait(&status);	
-}
-
-
-Shell::Shell()
-	:fFd(-1)
-{
-}
-
-
-Shell::~Shell()
-{
-	Close();
-}
-
-
-status_t
-Shell::Open(int row, int col, const char *command, const char *coding)
-{
-	fFd = spawn_shell(row, col, command, coding);
-	if (fFd < 0)
-		return fFd;
+	fFd = master;
 
 	return B_OK;
-}
-
-
-void
-Shell::Close()
-{
-	if (fFd >= 0) {
-		close_shell(fFd);
-		fFd = -1;	
-	}
-}
-
-
-const char *
-Shell::TTYName() const
-{
-	return ttyname(fFd);
-}
-
-
-ssize_t
-Shell::Read(void *buffer, size_t numBytes)
-{
-	if (fFd < 0)
-		return B_NO_INIT;
-	
-	return read(fFd, buffer, numBytes);
-}
-
-
-ssize_t
-Shell::Write(const void *buffer, size_t numBytes)
-{
-	if (fFd < 0)
-		return B_NO_INIT;
-	
-	return write(fFd, buffer, numBytes);
-}
-
-
-void
-Shell::UpdateWindowSize(int rows, int columns)
-{
-	struct winsize winSize;
-	winSize.ws_row = rows;
-	winSize.ws_col = columns;
-	ioctl(fFd, TIOCSWINSZ, &winSize);
-	Signal(SIGWINCH);
-}
-
-
-void
-Shell::Signal(int signal)
-{
-	kill(-sShPid, signal);
-}
-
-
-status_t
-Shell::GetAttr(struct termios &attr)
-{
-	return tcgetattr(fFd, &attr);
-}
-
-
-status_t
-Shell::SetAttr(struct termios &attr)
-{
-	return tcsetattr(fFd, TCSANOW, &attr);
-}
-
-
-int
-Shell::FD() const
-{
-	return fFd;
 }
 

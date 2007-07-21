@@ -28,72 +28,74 @@
  * THE SOFTWARE.
  *
  */
-#ifndef TERMWIN_H
-#define TERMWIN_H
+#ifndef __TERMWINDOW_H
+#define __TERMWINDOW_H
 
-
-#include <Menu.h>
-#include <Window.h>
-#include <MessageRunner.h>
 #include <String.h>
+#include <Window.h>
 
-class BFont;
-class TermView;
-class TermParse;
+class BMenu;
+class BMenuBar;
+class BMessageRunner;
 class CodeConv;
-class PrefWindow;
 class FindWindow;
+class PrefWindow;
 class Shell;
+class TermParse;
+class TermView;
 
 class TermWindow : public BWindow {
-	public:
-		TermWindow(BRect frame, const char* title, const char *command);
-		virtual ~TermWindow();
+public:
+	TermWindow(BRect frame, const char* title, const char *command);
+	virtual ~TermWindow();
 
-		void			TermWinActivate();
+	void		TermWinActivate();
 
-	protected:
-		virtual void	MessageReceived(BMessage *message);
-		virtual void	WindowActivated(bool);
-		virtual void	MenusBeginning(void);
-		virtual bool	QuitRequested();
+protected:
+	virtual void	MessageReceived(BMessage *message);
+	virtual void	WindowActivated(bool);
+	virtual void	MenusBeginning();
+	virtual bool	QuitRequested();
 
-		status_t		GetSupportedSuites(BMessage *msg);
-		BHandler*		ResolveSpecifier(BMessage *msg, int32 index,
-							BMessage *specifier, int32 form,
-							const char *property);
+	status_t	GetSupportedSuites(BMessage *msg);
+	BHandler*	ResolveSpecifier(BMessage *msg, int32 index,
+					BMessage *specifier, int32 form,
+					const char *property);
 
-	private:
-		void			InitWindow();
-		void			SetupMenu();
-		status_t		DoPageSetup();
-		void			DoPrint();
+private:
+	void		InitWindow();
+	void		SetupMenu();
+	status_t	DoPageSetup();
+	void		DoPrint();
 
-  /*
-   * data member
-   */
-  Shell		*fShell;
-  TermParse	*fTermParse;
-  BMenuBar	*fMenubar;
-  BMenu		*fFilemenu, *fEditmenu, *fEncodingmenu, *fHelpmenu, *fFontMenu, *fWindowSizeMenu, *fNewFontMenu; 
-  TermView	*fTermView;
-  BView		*fBaseView;
-  CodeConv	*fCodeConv;
-  BMessage	*fPrintSettings;
-  PrefWindow	*fPrefWindow;
-  FindWindow	*fFindPanel;
-  BMessageRunner *fWindowUpdate;
-
-  BRect		fSavedFrame;
-  window_look	fSavedLook;
-  //Saved search parameters
-  BString	fFindString;
-  BMenuItem	*fFindForwardMenuItem;
-  BMenuItem 	*fFindBackwardMenuItem;
-  bool		fFindSelection;
-  bool		fForwardSearch;
-  bool		fMatchCase;
-  bool		fMatchWord;
+	Shell		*fShell;
+	TermParse	*fTermParse;
+	BMenuBar	*fMenubar;
+	BMenu		*fFilemenu,
+			*fEditmenu,
+			*fEncodingmenu,
+			*fHelpmenu,
+			*fFontMenu,
+			*fWindowSizeMenu,
+			*fNewFontMenu; 
+	TermView	*fTermView;
+	BView		*fBaseView;
+	CodeConv	*fCodeConv;
+	BMessage	*fPrintSettings;
+	PrefWindow	*fPrefWindow;
+	FindWindow	*fFindPanel;
+	BMessageRunner 	*fWindowUpdate;
+	BRect		fSavedFrame;
+	window_look	fSavedLook;
+	
+	//Saved search parameters
+	BString	fFindString;
+	BMenuItem	*fFindForwardMenuItem;
+	BMenuItem 	*fFindBackwardMenuItem;
+	bool		fFindSelection;
+	bool		fForwardSearch;
+	bool		fMatchCase;
+	bool		fMatchWord;
 };
 
-#endif // TERMWIN_H
+#endif // __TERMWINDOW_H

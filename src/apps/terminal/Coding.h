@@ -83,7 +83,7 @@ const uint32 coding_translation_table[] = {
 };
 
 
-status_t	get_nth_encoding(int i, int *op);
+status_t	get_nth_encoding(int i, int *id);
 
 int 		longname2id(const char *longname);
 const char *	longname2shortname(const char *longname);
@@ -92,6 +92,5 @@ const char 	id2shortcut(int op);
 
 void		SetEncoding(int encoding);
 int		GetEncoding();
-
 
 #endif /* _CODING_H_ */
