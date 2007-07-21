@@ -289,8 +289,9 @@ Painter::StrokeLine(BPoint a, BPoint b)
 	}
 
 	// first, try an optimized version
-	if (fPenSize == 1.0 &&
-		(fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)) {
+	if (fPenSize == 1.0
+		&& (fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)) {
+
 		pattern pat = *fPatternHandler.GetR5Pattern();
 		if (pat == B_SOLID_HIGH &&
 			StraightLine(a, b, fPatternHandler.HighColor().GetColor32())) {
@@ -305,19 +306,59 @@ Painter::StrokeLine(BPoint a, BPoint b)
 
 	if (a == b) {
 		// special case dots
-		fPath.move_to(a.x, a.y);
-		fPath.line_to(a.x + 1, a.y);
-		fPath.line_to(a.x + 1, a.y + 1);
-		fPath.line_to(a.x, a.y + 1);
+		if (fPenSize == 1.0 && !fSubpixelPrecise) {
+			if (fClippingRegion->Contains(a)) {
+				agg::rgba8 dummyColor;
+				fPixelFormat.blend_pixel(a.x, a.y, dummyColor, 255);
+			}
+		} else {
+			fPath.move_to(a.x, a.y);
+			fPath.line_to(a.x + 1, a.y);
+			fPath.line_to(a.x + 1, a.y + 1);
+			fPath.line_to(a.x, a.y + 1);
 
-		touched = _FillPath(fPath);
+			touched = _FillPath(fPath);
+		}
 	} else {
 		// do the pixel center offset here
-		if (!fSubpixelPrecise && fmodf(fPenSize, 2.0) != 0.0) {
-			a.x += 0.5;
-			a.y += 0.5;
-			b.x += 0.5;
-			b.y += 0.5;
+		// tweak ends to "include" the pixel at the index,
+		// we need to do this in order to produce results like R5,
+		// where coordinates were inclusive
+		if (!fSubpixelPrecise) {
+			bool centerOnLine = fmodf(fPenSize, 2.0) != 0.0;
+			if (a.x == b.x) {
+				// shift to pixel center vertically
+				if (centerOnLine) {
+					a.x += 0.5;
+					b.x += 0.5;
+				}
+				// extend on bottom end
+				if (a.y < b.y)
+					b.y++;
+				else
+					a.y++;
+			} else if (a.y == b.y) {
+				if (centerOnLine) {
+					// shift to pixel center horizontally
+					a.y += 0.5;
+					b.y += 0.5;
+				}
+				// extend on right end
+				if (a.x < b.x)
+					b.x++;
+				else
+					a.x++;
+			} else {
+				// do this regardless of pensize
+				if (a.x < b.x)
+					b.x++;
+				else
+					a.x++;
+				if (a.y < b.y)
+					b.y++;
+				else
+					a.y++;
+			}
 		}
 	
 		fPath.move_to(a.x, a.y);
@@ -1053,14 +1094,14 @@ Painter::InvertRect(const BRect& r) const
 // #pragma mark - private
 
 // _Transform
-void
+inline void
 Painter::_Transform(BPoint* point, bool centerOffset) const
 {
 	// rounding
 	if (!fSubpixelPrecise) {
 		// TODO: validate usage of floor() for values < 0
-		point->x = floorf(point->x);
-		point->y = floorf(point->y);
+		point->x = (int32)point->x;
+		point->y = (int32)point->y;
 	}
 	// this code is supposed to move coordinates to the center of pixels,
 	// as AGG considers (0,0) to be the "upper left corner" of a pixel,
@@ -1072,7 +1113,7 @@ Painter::_Transform(BPoint* point, bool centerOffset) const
 }
 
 // _Transform
-BPoint
+inline BPoint
 Painter::_Transform(const BPoint& point, bool centerOffset) const
 {
 	BPoint ret = point;
@@ -1579,14 +1620,7 @@ Painter::_StrokePath(VertexSource& path) const
 	agg::conv_stroke<VertexSource> stroke(path);
 	stroke.width(fPenSize);
 
-	// special case line width = 1 with square caps
-	// this has a couple of advantages and it looks
-	// like this is also the R5 behaviour.
-	if (fPenSize == 1.0 && fLineCapMode == B_BUTT_CAP) {
-		stroke.line_cap(agg::square_cap);
-	} else {
-		stroke.line_cap(agg_line_cap_mode_for(fLineCapMode));
-	}
+	stroke.line_cap(agg_line_cap_mode_for(fLineCapMode));
 	stroke.line_join(agg_line_join_mode_for(fLineJoinMode));
 	stroke.miter_limit(fMiterLimit);
 
