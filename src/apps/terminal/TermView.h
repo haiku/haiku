@@ -90,7 +90,6 @@ const unsigned char M_ADD_CURSOR [] = {
 };
 
 class TermBuffer;
-class CodeConv;
 class BPopUpMenu;
 class BScrollBar;
 class BString;
@@ -98,7 +97,7 @@ class Shell;
 
 class TermView : public BView {
 	public:
-		TermView(BRect frame, CodeConv *inCodeConv);
+		TermView(BRect frame);
 		~TermView();
 
 		status_t AttachShell(Shell *shell);
@@ -282,7 +281,6 @@ class TermView : public BView {
 		// Object pointer.
 
 		TermBuffer	*fTextBuffer;
-		CodeConv	*fCodeConv;
 		BScrollBar	*fScrollBar;
 
 		// Offscreen Bitmap and View.

@@ -33,17 +33,8 @@ UTF8
 extern char gUTF8WidthTable[]; // defined in UTF8WidthTbl.c
 
 
-CodeConv::CodeConv()
-{
-}
-
-
-CodeConv::~CodeConv()
-{
-}
-
-
 //! get font width in coding.
+/* static */
 int32
 CodeConv::UTF8GetFontWidth(const char *string)
 {
@@ -61,6 +52,7 @@ CodeConv::UTF8GetFontWidth(const char *string)
 
 
 //!	Convert internal coding from src coding.
+/* static */
 int32
 CodeConv::ConvertFromInternal(const char *src, int32 srclen, char *dst, int coding)
 {
@@ -92,6 +84,7 @@ CodeConv::ConvertFromInternal(const char *src, int32 srclen, char *dst, int codi
 
 
 //! Convert internal coding to src coding.
+/* static */
 int32
 CodeConv::ConvertToInternal(const char *src, int32 srclen, char *dst, int coding)
 {
@@ -131,6 +124,7 @@ CodeConv::ConvertToInternal(const char *src, int32 srclen, char *dst, int coding
 }
 
 
+/* static */
 unsigned short
 CodeConv::UTF8toUnicode(const char *utf8)
 {
@@ -157,6 +151,7 @@ CodeConv::UTF8toUnicode(const char *utf8)
 }
 
 
+/* static */
 void
 CodeConv::euc_to_sjis(uchar *buf)
 {

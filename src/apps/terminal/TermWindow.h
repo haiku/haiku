@@ -37,7 +37,6 @@
 class BMenu;
 class BMenuBar;
 class BMessageRunner;
-class CodeConv;
 class FindWindow;
 class PrefWindow;
 class Shell;
@@ -79,7 +78,6 @@ private:
 			*fWindowSizeMenu,
 			*fNewFontMenu; 
 	TermView	*fTermView;
-	CodeConv	*fCodeConv;
 	BMessage	*fPrintSettings;
 	PrefWindow	*fPrefWindow;
 	FindWindow	*fFindPanel;

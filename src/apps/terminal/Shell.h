@@ -81,10 +81,13 @@
 #define	RDEL	0xFF
 
 
+// TODO: Maybe merge TermParse and Shell classes ?
+class TermParse;
+class TermView;
 class Shell {
 public:
 			Shell();
-			~Shell();
+	virtual		~Shell();
 
 	status_t	Open(int row, int col, const char *command, const char *coding);
 	void		Close();
@@ -101,9 +104,14 @@ public:
 	status_t	SetAttr(struct termios &attr);
 
 	int		FD() const;	
+
+	virtual	void	ViewAttached(TermView *view);
+	virtual void	ViewDetached();
 	
 private:
-	int fFd;
+	int		fFd;
+	TermParse	*fTermParse;
+	bool		fAttached;
 
 	status_t	_Spawn(int row, int col, const char *command, const char *coding);
 };

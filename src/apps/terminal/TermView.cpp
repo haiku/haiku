@@ -61,7 +61,7 @@ const static rgb_color kTermColorTable[16] = {
 };
 
 
-TermView::TermView(BRect frame, CodeConv *inCodeConv)
+TermView::TermView(BRect frame)
 	: BView(frame, "termview", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS),
 	fShell(NULL),
 	fFontWidth(0),
@@ -85,7 +85,6 @@ TermView::TermView(BRect frame, CodeConv *inCodeConv)
 	fTermColumns(PrefHandler::Default()->getInt32(PREF_COLS)),
 	fTop(0),	
 	fTextBuffer(new (nothrow) TermBuffer(fTermRows, fTermColumns)),
-	fCodeConv(inCodeConv),
 	fScrollBar(NULL),
 	fScrTop(0),
 	fScrBot(fTermRows - 1),
@@ -127,7 +126,8 @@ TermView::AttachShell(Shell *shell)
 		return B_BAD_VALUE;
 	
 	fShell = shell;
-	
+	fShell->ViewAttached(this);	
+
 	return B_OK;
 }
 
@@ -135,6 +135,7 @@ TermView::AttachShell(Shell *shell)
 void
 TermView::DetachShell()
 {
+	fShell->ViewDetached();
 	fShell = NULL;
 }
 
@@ -1352,7 +1353,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 		// input multibyte character
 
 		if (GetEncoding() != M_UTF8) {
-			int cnum = fCodeConv->ConvertFromInternal(bytes, numBytes,
+			int cnum = CodeConv::ConvertFromInternal(bytes, numBytes,
 				(char *)dstbuf, GetEncoding());
 			fShell->Write(dstbuf, cnum);
 			return;
@@ -1600,7 +1601,7 @@ TermView::WritePTY(const uchar *text, int numBytes)
 {
 	if (GetEncoding() != M_UTF8) {
 		uchar *destBuffer = (uchar *)malloc(numBytes * 3);
-		numBytes = fCodeConv->ConvertFromInternal((char*)text, numBytes,
+		numBytes = CodeConv::ConvertFromInternal((char*)text, numBytes,
 			(char*)destBuffer, GetEncoding());
 		fShell->Write(destBuffer, numBytes);
 		free(destBuffer);

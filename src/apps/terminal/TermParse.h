@@ -34,21 +34,20 @@
 #include "TermConst.h"
 
 #include <OS.h>
+#include <Handler.h>
 #include <MessageRunner.h>
 
-
-class TermView;
-class CodeConv;
- 
 //PtyReader buffer size.
 #define READ_BUF_SIZE 2048
 
+class TermView;
 class TermParse : public BHandler {
 public:
-	TermParse(int fd, TermView *inViewObj, CodeConv *inConvObj);
+	TermParse(int fd);
 	~TermParse();
 
-	status_t StartThreads();
+	status_t StartThreads(TermView *view);
+	status_t StopThreads();
   
 private:
 	// Initialize TermParse and PtyReader thread.
@@ -71,7 +70,6 @@ private:
 	int fFd;
 
 	TermView *fViewObj;
-	CodeConv *fConvObj;
   
 	thread_id fParseThread;
 	sem_id fParseSem;

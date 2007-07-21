@@ -33,6 +33,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <new>
 #include <signal.h>
 #include <string.h>
 #include <stdlib.h>
@@ -48,6 +49,8 @@
 #include <OS.h>
 
 #include "TermConst.h"
+#include "TermParse.h"
+#include "TermView.h"
 #include "Shell.h"
 #include "PrefHandler.h"
 
@@ -108,7 +111,10 @@ static pid_t sShPid;
 
 
 Shell::Shell()
-	:fFd(-1)
+	:
+	fFd(-1),
+	fTermParse(NULL),
+	fAttached(false)
 {
 }
 
@@ -125,13 +131,25 @@ Shell::Open(int row, int col, const char *command, const char *coding)
 	if (fFd >= 0)
 		return B_ERROR;
 
-	return _Spawn(row, col, command, coding);
+	status_t status = _Spawn(row, col, command, coding);
+	if (status < B_OK)
+		return status;
+
+	fTermParse = new (std::nothrow) TermParse(fFd);
+	if (fTermParse == NULL) {
+		Close();
+		return B_NO_MEMORY;	
+	}
+	
+	return B_OK;
 }
 
 
 void
 Shell::Close()
 {
+	delete fTermParse;
+	
 	if (fFd >= 0) {
 		close(fFd);
 		kill(-sShPid, SIGHUP);
@@ -205,6 +223,30 @@ int
 Shell::FD() const
 {
 	return fFd;
+}
+
+
+void
+Shell::ViewAttached(TermView *view)
+{
+	if (fAttached)
+		return;
+
+	status_t status = fTermParse->StartThreads(view);
+	if (status < B_OK) {
+		// TODO: What can we do here ?
+		fprintf(stderr, "Shell:ViewAttached():"
+				" cannot start parser threads: %s",
+				strerror(status));
+	}
+}
+
+
+void
+Shell::ViewDetached()
+{
+	if (fAttached)
+		fTermParse->StopThreads();
 }
 
 

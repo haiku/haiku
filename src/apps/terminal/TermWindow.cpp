@@ -27,7 +27,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#include "CodeConv.h"
+#include "Coding.h"
 #include "ColorWindow.h"
 #include "MenuUtil.h"
 #include "FindWindow.h"
@@ -54,7 +54,6 @@
 TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	: BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE|B_QUIT_ON_WINDOW_CLOSE),
 	fShell(NULL),
-	fTermParse(NULL),
 	fMenubar(NULL),
 	fFilemenu(NULL),
 	fEditmenu(NULL),
@@ -64,7 +63,6 @@ TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	fWindowSizeMenu(NULL),
 	fNewFontMenu(NULL),
 	fTermView(NULL),
-	fCodeConv(NULL),
 	fPrintSettings(NULL),
 	fPrefWindow(NULL),
 	fFindPanel(NULL),
@@ -106,8 +104,6 @@ TermWindow::~TermWindow()
 	fTermView->DetachShell();
 
 	delete fShell;
-	delete fTermParse;
-	delete fCodeConv;
 	if (fPrefWindow) 
 		fPrefWindow->PostMessage(B_QUIT_REQUESTED);
 
@@ -159,13 +155,11 @@ TermWindow::InitWindow()
 	BRect textframe = Bounds();
 	textframe.top = fMenubar->Bounds().bottom + 1.0;
 
-	fCodeConv = new CodeConv();
-	fTermView = new TermView(textframe, fCodeConv);
+	fTermView = new TermView(textframe);
 
 	fTermView->AttachShell(fShell);
 
 	// Initialize TermView. (font, size and color)
-
 	fTermView->SetTermFont(&halfFont, &fullFont);
 	
 	BRect rect = fTermView->SetTermSize(PrefHandler::Default()->getInt32(PREF_ROWS),
@@ -205,9 +199,6 @@ TermWindow::InitWindow()
 
 	// Initialize TermParse
 	SetEncoding(longname2id(PrefHandler::Default()->getString(PREF_TEXT_ENCODING)));
-	fTermParse = new TermParse(fShell->FD(), fTermView, fCodeConv);
-	if (fTermParse->StartThreads() < B_OK)
-		return;
 
 	// Initialize MessageRunner.
 	fWindowUpdate = new BMessageRunner(BMessenger(this),

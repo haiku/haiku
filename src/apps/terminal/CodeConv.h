@@ -13,23 +13,17 @@
 
 class CodeConv {
 	public:
-		CodeConv();
-		~CodeConv();
-
-		int32 UTF8GetFontWidth(const char *string);
+		static int32 UTF8GetFontWidth(const char *string);
 
 		/* internal(UTF8) -> coding */
-		int32 ConvertFromInternal(const char *src, int32 bytes, char *dst, int coding);
+		static int32 ConvertFromInternal(const char *src, int32 bytes, char *dst, int coding);
 
 		/* coding -> internal(UTF8) */
-		int32 ConvertToInternal(const char *src, int32 bytes, char *dst, int coding);
+		static int32 ConvertToInternal(const char *src, int32 bytes, char *dst, int coding);
 
 	private:		
-		void euc_to_sjis(uchar *buf);
-
-		unsigned short UTF8toUnicode(const char *utf8);
-
-		int fNowCoding;
+		static void euc_to_sjis(uchar *buf);
+		static unsigned short UTF8toUnicode(const char *utf8);
 };
 
 #endif /* CODECONV_H */

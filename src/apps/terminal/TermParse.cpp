@@ -47,11 +47,10 @@ extern int mbcstable[];		/* ESC $ */
 #define NPARAM 10		// Max parameters
 
 
-TermParse::TermParse(int fd, TermView *inViewObj, CodeConv *inConvObj)
+TermParse::TermParse(int fd)
 	:
 	fFd(fd),
-	fViewObj(inViewObj),
-	fConvObj(inConvObj),
+	fViewObj(NULL),
 	fParseThread(-1),
 	fParseSem(-1),
 	fReaderThread(-1),
@@ -67,6 +66,33 @@ TermParse::TermParse(int fd, TermView *inViewObj, CodeConv *inConvObj)
 
 TermParse::~TermParse()
 {
+	StopThreads();
+}
+
+
+status_t
+TermParse::StartThreads(TermView *view)
+{
+	fViewObj = view;
+
+	status_t status = InitPtyReader();
+
+	if (status < B_OK)
+		return status;
+
+	status = InitTermParse();
+	if (status < B_OK) {
+		//AbortPtyReader();
+		return status;		
+	}
+	
+	return B_OK;
+}
+
+
+status_t
+TermParse::StopThreads()
+{
 	fQuitting = true;
 
 	delete_sem(fReaderSem);
@@ -78,22 +104,8 @@ TermParse::~TermParse()
 	status_t dummy;
 	wait_for_thread(fReaderThread, &dummy);	
 	wait_for_thread(fParseThread, &dummy);
-}
 
-
-status_t
-TermParse::StartThreads()
-{
-	status_t status = InitPtyReader();
-
-	if (status < B_OK)
-		return status;
-
-	status = InitTermParse();
-	if (status < B_OK) {
-		//AbortPtyReader();
-		return status;		
-	}
+	fViewObj = NULL;
 	
 	return B_OK;
 }
@@ -241,10 +253,7 @@ TermParse::EscParse()
 	int top, bot;
 	int cs96;
 	uchar curess = 0;
-
-	TermView *viewObj = fViewObj;
-	CodeConv *convObj = fConvObj;
-
+	
 	uchar cbuf[4], dstbuf[4];
 	uchar *ptr;
 
@@ -305,7 +314,7 @@ TermParse::EscParse()
 				cbuf[0] = c;
 				cbuf[1] = '\0';
 				width = HALF_WIDTH;
-				viewObj->PutChar(cbuf, attr, width);
+				fViewObj->PutChar(cbuf, attr, width);
 				break;
 
 			case CASE_PRINT_GR:
@@ -346,11 +355,11 @@ TermParse::EscParse()
 				}
 
 				if (now_coding != M_ISO_2022_JP)
-					convObj->ConvertToInternal((char*)cbuf, -1, (char*)dstbuf, now_coding);
+					CodeConv::ConvertToInternal((char*)cbuf, -1, (char*)dstbuf, now_coding);
 				else
-					convObj->ConvertToInternal((char*)cbuf, -1, (char*)dstbuf, M_EUC_JP);
+					CodeConv::ConvertToInternal((char*)cbuf, -1, (char*)dstbuf, M_EUC_JP);
 
-				viewObj->PutChar(dstbuf, attr, width);
+				fViewObj->PutChar(dstbuf, attr, width);
 				break;
 
 			case CASE_PRINT_CS96:
@@ -359,33 +368,33 @@ TermParse::EscParse()
 				cbuf[1] |= 0x80;
 				cbuf[2] = 0;
 				width = 2;
-				convObj->ConvertToInternal((char*)cbuf, 2, (char*)dstbuf, M_EUC_JP);
-				viewObj->PutChar(dstbuf, attr, width);
+				CodeConv::ConvertToInternal((char*)cbuf, 2, (char*)dstbuf, M_EUC_JP);
+				fViewObj->PutChar(dstbuf, attr, width);
 				break;
 
 			case CASE_LF:
-				viewObj->PutLF();
+				fViewObj->PutLF();
 				break;
 
 			case CASE_CR:
-				viewObj->PutCR();
+				fViewObj->PutCR();
 				break;
 
 			case CASE_SJIS_KANA:
 				cbuf[0] = (uchar)c;
 				cbuf[1] = '\0';
-				convObj->ConvertToInternal((char*)cbuf, 1, (char*)dstbuf, now_coding);
+				CodeConv::ConvertToInternal((char*)cbuf, 1, (char*)dstbuf, now_coding);
 				width = 1;
-				viewObj->PutChar(dstbuf, attr, width);
+				fViewObj->PutChar(dstbuf, attr, width);
 				break;
 
 			case CASE_SJIS_INSTRING:
 				cbuf[0] = (uchar)c;
 				GetReaderBuf(cbuf[1]);
 				cbuf[2] = '\0';
-				convObj->ConvertToInternal((char*)cbuf, 2, (char*)dstbuf, now_coding);
+				CodeConv::ConvertToInternal((char*)cbuf, 2, (char*)dstbuf, now_coding);
 				width = 2;
-				viewObj->PutChar(dstbuf, attr, width);
+				fViewObj->PutChar(dstbuf, attr, width);
 				break;
 
 			case CASE_UTF8_2BYTE:
@@ -395,8 +404,8 @@ TermParse::EscParse()
 					break;
 				cbuf[1] = (uchar)c;
 				cbuf[2] = '\0';
-				width = convObj->UTF8GetFontWidth((char*)cbuf);
-				viewObj->PutChar(cbuf, attr, width);
+				width = CodeConv::UTF8GetFontWidth((char*)cbuf);
+				fViewObj->PutChar(cbuf, attr, width);
 				break;
 
 			case CASE_UTF8_3BYTE:
@@ -411,8 +420,8 @@ TermParse::EscParse()
 					break;
 				cbuf[2] = c;
 				cbuf[3] = '\0';
-				width = convObj->UTF8GetFontWidth((char*)cbuf);
-				viewObj->PutChar (cbuf, attr, width);
+				width = CodeConv::UTF8GetFontWidth((char*)cbuf);
+				fViewObj->PutChar (cbuf, attr, width);
 				break;
 
 			case CASE_MBCS:
@@ -444,13 +453,13 @@ TermParse::EscParse()
 				break;
 
 			case CASE_BS:
-				viewObj->MoveCurLeft(1);
+				fViewObj->MoveCurLeft(1);
 				break;
 
 			case CASE_TAB:
-				tmp = viewObj->GetCurX();
+				tmp = fViewObj->GetCurX();
 				tmp %= 8;
-				viewObj->MoveCurRight(8 - tmp);
+				fViewObj->MoveCurRight(8 - tmp);
 				break;
 
 			case CASE_ESC:
@@ -510,7 +519,7 @@ TermParse::EscParse()
 				/* ICH */
 				if ((row = param[0]) < 1)
 					row = 1;
-				viewObj->InsertSpace(row);
+				fViewObj->InsertSpace(row);
 				parsestate = groundtable;
 				break;
 
@@ -518,7 +527,7 @@ TermParse::EscParse()
 				/* CUU */
 				if ((row = param[0]) < 1)
 					row = 1;
-				viewObj->MoveCurUp(row);
+				fViewObj->MoveCurUp(row);
 				parsestate = groundtable;
 				break;
 
@@ -526,7 +535,7 @@ TermParse::EscParse()
 				/* CUD */
 				if ((row = param[0]) < 1)
 					row = 1;
-				viewObj->MoveCurDown(row);
+				fViewObj->MoveCurDown(row);
 				parsestate = groundtable;
 				break;
 
@@ -534,7 +543,7 @@ TermParse::EscParse()
 				/* CUF */
 				if ((row = param[0]) < 1)
 					row = 1;
-				viewObj->MoveCurRight(row);
+				fViewObj->MoveCurRight(row);
 				parsestate = groundtable;
 				break;
 
@@ -542,7 +551,7 @@ TermParse::EscParse()
 				/* CUB */
 				if ((row = param[0]) < 1)
 					row = 1;
-				viewObj->MoveCurLeft(row);
+				fViewObj->MoveCurLeft(row);
 				parsestate = groundtable;
 				break;
 
@@ -553,7 +562,7 @@ TermParse::EscParse()
 				if (nparam < 2 || (col = param[1]) < 1)
 					col = 1;
 
-				viewObj->SetCurPos(col - 1, row - 1 );
+				fViewObj->SetCurPos(col - 1, row - 1 );
 				parsestate = groundtable;
 				break;
 
@@ -562,15 +571,15 @@ TermParse::EscParse()
 				switch (param[0]) {
 					case DEFAULT:
 					case 0:
-						viewObj->EraseBelow();
+						fViewObj->EraseBelow();
 						break;
 
 					case 1:
 						break;
 
 					case 2:
-						viewObj->SetCurPos(0, 0);
-						viewObj->EraseBelow();
+						fViewObj->SetCurPos(0, 0);
+						fViewObj->EraseBelow();
 						break;
 				}
 				parsestate = groundtable;
@@ -578,7 +587,7 @@ TermParse::EscParse()
 
 			case CASE_EL:		// delete line
 				/* EL */
-				viewObj->DeleteColumns();
+				fViewObj->DeleteColumns();
 				parsestate = groundtable;
 				break;
 
@@ -586,7 +595,7 @@ TermParse::EscParse()
 				/* IL */
 				if ((row = param[0]) < 1)
 					row = 1;
-				viewObj->PutNL(row);
+				fViewObj->PutNL(row);
 				parsestate = groundtable;
 				break;
 
@@ -594,7 +603,7 @@ TermParse::EscParse()
 				/* DL */
 				if ((row = param[0]) < 1)
 					row = 1;
-				viewObj->DeleteLine(row);
+				fViewObj->DeleteLine(row);
 				parsestate = groundtable;
 				break;
 
@@ -602,19 +611,19 @@ TermParse::EscParse()
 				/* DCH */
 				if ((row = param[0]) < 1)
 					row = 1;
-				viewObj->DeleteChar(row);
+				fViewObj->DeleteChar(row);
 				parsestate = groundtable;
 				break;
 
 			case CASE_SET:
 				/* SET */
-				viewObj->SetInsertMode(MODE_INSERT);
+				fViewObj->SetInsertMode(MODE_INSERT);
 				parsestate = groundtable;
 				break;
 
 			case CASE_RST:
 				/* RST */
-				viewObj->SetInsertMode(MODE_OVER);
+				fViewObj->SetInsertMode(MODE_OVER);
 				parsestate = groundtable;
 				break;
 
@@ -681,7 +690,7 @@ TermParse::EscParse()
 				case CASE_CPR:
 					// Q & D hack by Y.Hayakawa (hida@sawada.riec.tohoku.ac.jp)
 					// 21-JUL-99
-					viewObj->DeviceStatusReport(param[0]);
+					fViewObj->DeviceStatusReport(param[0]);
 					parsestate = groundtable;
 					break;
 
@@ -700,7 +709,7 @@ TermParse::EscParse()
 					bot--;
 
 					if (bot > top)
-						viewObj->SetScrollRegion(top, bot);
+						fViewObj->SetScrollRegion(top, bot);
 
 					parsestate = groundtable;
 					break;
@@ -737,13 +746,13 @@ TermParse::EscParse()
 
 				case CASE_DECSC:
 					/* DECSC */
-					viewObj->SaveCursor();
+					fViewObj->SaveCursor();
 					parsestate = groundtable;
 					break;
 
 				case CASE_DECRC:
 					/* DECRC */
-					viewObj->RestoreCursor();
+					fViewObj->RestoreCursor();
 					parsestate = groundtable;
 					break;
 
@@ -755,7 +764,7 @@ TermParse::EscParse()
 
 				case CASE_RI:
 					/* RI */
-					viewObj->ScrollRegion(-1, -1, SCRDOWN, 1);
+					fViewObj->ScrollRegion(-1, -1, SCRDOWN, 1);
 					parsestate = groundtable;
 					break;
 
