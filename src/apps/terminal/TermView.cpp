@@ -62,7 +62,7 @@ const static rgb_color kTermColorTable[16] = {
 
 
 TermView::TermView(BRect frame, CodeConv *inCodeConv)
-	: BView(frame, "termview", B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS),
+	: BView(frame, "termview", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS),
 	fShell(NULL),
 	fFontWidth(0),
 	fFontHeight(0),

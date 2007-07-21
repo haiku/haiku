@@ -34,7 +34,6 @@
 #include "PrefWindow.h"
 #include "PrefView.h"
 #include "PrefHandler.h"
-#include "TermBaseView.h"
 #include "TermBuffer.h"
 #include "TermParse.h"
 #include "TermView.h"
@@ -65,7 +64,6 @@ TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	fWindowSizeMenu(NULL),
 	fNewFontMenu(NULL),
 	fTermView(NULL),
-	fBaseView(NULL),
 	fCodeConv(NULL),
 	fPrintSettings(NULL),
 	fPrefWindow(NULL),
@@ -162,16 +160,9 @@ TermWindow::InitWindow()
 	textframe.top = fMenubar->Bounds().bottom + 1.0;
 
 	fCodeConv = new CodeConv();
-	fTermView = new TermView(Bounds(), fCodeConv);
+	fTermView = new TermView(textframe, fCodeConv);
 
 	fTermView->AttachShell(fShell);
-
-	/*
-	 * MuTerm has two views. BaseView is window base view.
-	 * TermView is character Terminal view on BaseView. It has paste
-	 * on BaseView shift as VIEW_OFFSET.
-	 */
-	fBaseView = new TermBaseView(textframe, fTermView);
 
 	// Initialize TermView. (font, size and color)
 
@@ -186,20 +177,16 @@ TermWindow::InitWindow()
 		MIN_COLS * height, MAX_COLS * height);
 
 	fTermView->SetTermColor();
-	fBaseView->SetViewColor(PrefHandler::Default()->getRGB(PREF_TEXT_BACK_COLOR));
-
+	
 	// Add offset to baseview.
 	rect.InsetBy(-VIEW_OFFSET, -VIEW_OFFSET);
 
 	// Resize Window
-
 	ResizeTo(rect.Width()+ B_V_SCROLL_BAR_WIDTH,
 		rect.Height() + fMenubar->Bounds().Height());
 
-	fBaseView->ResizeTo(rect.Width(), rect.Height());
-	fBaseView->AddChild(fTermView);
-	fTermView->MoveBy(VIEW_OFFSET, VIEW_OFFSET);
-
+	fTermView->ResizeTo(rect.Width(), rect.Height());
+	
 	// Make Scroll Bar.
 
 	BRect scrollRect(0, 0, B_V_SCROLL_BAR_WIDTH,
@@ -212,9 +199,8 @@ TermWindow::InitWindow()
 	fTermView->SetScrollBar(scrollBar);
 	
 	AddChild(scrollBar);
-	AddChild(fBaseView);
-	
-	// Set fEditmenu's target to fTermView. (Oh!...)
+	AddChild(fTermView);
+
 	fEditmenu->SetTargetForItems(fTermView);
 
 	// Initialize TermParse
@@ -553,8 +539,8 @@ TermWindow::MessageReceived(BMessage *message)
 				BScreen screen(this);
 				fTermView->ScrollBar()->Hide();
 				fMenubar->Hide();
-				fBaseView->MoveTo(0,0);
-				fBaseView->ResizeBy(B_V_SCROLL_BAR_WIDTH, mbHeight);
+				//fTermView->MoveTo(0,0);
+				fTermView->ResizeBy(B_V_SCROLL_BAR_WIDTH, mbHeight);
 				fSavedLook = Look();
 				// done before ResizeTo to work around a Dano bug (not erasing the decor)
 				SetLook(B_NO_BORDER_WINDOW_LOOK);
@@ -566,8 +552,8 @@ TermWindow::MessageReceived(BMessage *message)
 				fTermView->ScrollBar()->Show();
 				ResizeTo(fSavedFrame.Width(), fSavedFrame.Height());
 				MoveTo(fSavedFrame.left, fSavedFrame.top);
-				fBaseView->ResizeBy(-B_V_SCROLL_BAR_WIDTH, -mbHeight);
-				fBaseView->MoveTo(0,mbHeight);
+				fTermView->ResizeBy(-B_V_SCROLL_BAR_WIDTH, -mbHeight);
+				//fTermView->MoveTo(0,mbHeight);
 				SetLook(fSavedLook);
 				fSavedFrame = BRect(0,0,-1,-1);
 			}
@@ -579,9 +565,7 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 		}
 		case MSG_COLOR_CHANGED: {
-			fBaseView->SetViewColor (PrefHandler::Default()->getRGB (PREF_TEXT_BACK_COLOR));
 			fTermView->SetTermColor();
-			fBaseView->Invalidate();
 			fTermView->Invalidate();
 			break;
 		}

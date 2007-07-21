@@ -17,7 +17,6 @@ Application Terminal :
 	PrefWindow.cpp
 	Shell.cpp
 	TermApp.cpp
-	TermBaseView.cpp
 	TermBuffer.cpp
 	TermParse.cpp
 	TermView.cpp

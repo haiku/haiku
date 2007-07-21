@@ -79,7 +79,6 @@ private:
 			*fWindowSizeMenu,
 			*fNewFontMenu; 
 	TermView	*fTermView;
-	BView		*fBaseView;
 	CodeConv	*fCodeConv;
 	BMessage	*fPrintSettings;
 	PrefWindow	*fPrefWindow;
