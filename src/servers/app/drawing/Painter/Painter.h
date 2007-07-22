@@ -65,22 +65,36 @@ class Painter {
 	inline	void				SetLowColor(const RGBColor& color)
 									{ SetLowColor(color.GetColor32()); }
 
+	inline	rgb_color			LowColor() const
+									{ return fPatternHandler.
+										LowColor().GetColor32(); }
+
 			void				SetPenSize(float size);
+	inline	float				PenSize() const
+									{ return fPenSize; }
+			void				SetStrokeMode(cap_mode lineCap,
+									join_mode joinMode, float miterLimit);
 			void				SetPattern(const pattern& p,
 										   bool drawingText = false);
+	inline	pattern				Pattern() const
+									{ return *fPatternHandler.GetR5Pattern(); }
 			void				SetDrawingMode(drawing_mode mode);
 	inline	drawing_mode		DrawingMode() const
 									{ return fDrawingMode; }
+			void				SetBlendingMode(source_alpha srcAlpha,
+									alpha_function alphaFunc);
 
 			void				SetPenLocation(const BPoint& location);
-			BPoint				PenLocation() const
+	inline	BPoint				PenLocation() const
 									{ return fPenLocation; }
 			void				SetFont(const ServerFont& font);
+	inline	const ServerFont&	Font() const
+									{ return fFont; }
 
 								// painting functions
 
 								// lines
-			BRect				StrokeLine(		BPoint a,
+			void				StrokeLine(		BPoint a,
 												BPoint b);
 
 			// returns true if the line was either vertical or horizontal
@@ -174,7 +188,7 @@ class Painter {
 
 			float				StringWidth(	const char* utf8String,
 												uint32 length,
-												const DrawState* context);
+												const escapement_delta* delta = NULL);
 
 
 								// bitmaps
@@ -197,7 +211,7 @@ class Painter {
 										   bool centerOffset = true) const;
 			BRect				_Clipped(const BRect& rect) const;
 
-			void				_UpdateFont();
+			void				_UpdateFont() const;
 			void				_UpdateLineWidth();
 			void				_UpdateDrawingMode(bool drawingText = false);
 			void				_SetRendererColor(const rgb_color& color) const;

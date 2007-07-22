@@ -166,6 +166,7 @@ AGGTextRenderer::RenderString(const char* string,
 							  uint32 length,
 							  renderer_type* solidRenderer,
 							  renderer_bin_type* binRenderer,
+							  scanline_unpacked_type& scanline,
 							  const BPoint& baseLine,
 							  const BRect& clippingFrame,
 							  bool dryRun,
@@ -295,8 +296,6 @@ AGGTextRenderer::RenderString(const char* string,
 					case agg::glyph_data_outline: {
 						fRasterizer.reset();
 
-// TODO: this currently falls into an endless loop - this is a quick fix to keep the
-// app_server running - instead of the characters, their bounding boxes will be shown
 						if (fContour.width() == 0.0) {
 							fRasterizer.add_path(transformedOutline);
 						} else {
@@ -314,7 +313,8 @@ AGGTextRenderer::RenderString(const char* string,
 	fRasterizer.add_path(ps);
 #endif
 
-						agg::render_scanlines(fRasterizer, fScanline, *solidRenderer);
+						agg::render_scanlines(fRasterizer, scanline,
+							*solidRenderer);
 						break;
 					}
 					default:
@@ -344,7 +344,8 @@ AGGTextRenderer::RenderString(const char* string,
 
 
 double
-AGGTextRenderer::StringWidth(const char* string, uint32 length)
+AGGTextRenderer::StringWidth(const char* string, uint32 length,
+	const escapement_delta* delta)
 {
 	// NOTE: The implementation does not take font rotation (or shear)
 	// into account. Just like on R5. Should it ever be desirable to
@@ -370,6 +371,11 @@ AGGTextRenderer::StringWidth(const char* string, uint32 length)
 			if (!firstLoop && fKerning)
 				fFontCache.add_kerning(&width, &y);
 			width += glyph->advance_x;
+
+			if (delta) {
+				width += is_white_space(charCode) ?
+					delta->space : delta->nonspace;
+			}
 		}
 
 		firstLoop = false;

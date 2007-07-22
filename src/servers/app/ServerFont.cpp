@@ -339,6 +339,7 @@ ServerFont::GetTransformedFace(bool rotate, bool shear) const
 		FT_Set_Transform(face, &smatrix, NULL);
 	}
 
+	// fStyle will be unlocked in PutTransformedFace()
 	return face;
 }
 
@@ -433,7 +434,8 @@ ServerFont::GetEdges(const char charArray[], int32 numChars,
 
 status_t
 ServerFont::GetEscapements(const char charArray[], int32 numChars,
-	escapement_delta delta, BPoint escapementArray[], BPoint offsetArray[]) const
+	escapement_delta delta, BPoint escapementArray[],
+	BPoint offsetArray[]) const
 {
 	if (!charArray || numChars <= 0 || !escapementArray)
 		return B_BAD_DATA;

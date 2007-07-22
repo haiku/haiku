@@ -53,6 +53,10 @@ class RGBColor {
 			bool				operator==(const RGBColor& color) const;
 			bool				operator!=(const rgb_color& color) const;
 			bool				operator!=(const RGBColor& color) const;
+
+			// conversion to rgb_color
+								operator rgb_color() const
+									{ return fColor32; }
 	
 			bool				IsTransparentMagic() const;
 	

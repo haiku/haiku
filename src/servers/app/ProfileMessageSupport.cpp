@@ -200,8 +200,6 @@ string_for_message_code(uint32 code, BString& string)
 		case AS_FILL_TRIANGLE: string = "AS_FILL_TRIANGLE"; break;
 
 		case AS_DRAW_STRING: string = "AS_DRAW_STRING"; break;
-		case AS_SET_FONT: string = "AS_SET_FONT"; break;
-		case AS_SET_FONT_SIZE: string = "AS_SET_FONT_SIZE"; break;
 
 		case AS_SYNC: string = "AS_SYNC"; break;
 

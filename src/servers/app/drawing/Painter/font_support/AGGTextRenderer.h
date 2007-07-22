@@ -48,6 +48,7 @@ class AGGTextRenderer {
 											 uint32 length,
 											 renderer_type* solidRenderer,
 											 renderer_bin_type* binRenderer,
+											 scanline_unpacked_type& scanline,
 											 const BPoint& baseLine,
 											 const BRect& clippingFrame,
 											 bool dryRun = false,
@@ -55,7 +56,8 @@ class AGGTextRenderer {
 											 const escapement_delta* delta = NULL);
 
 			double				StringWidth(const char* utf8String,
-											uint32 length);
+											uint32 length,
+											const escapement_delta* delta = NULL);
 
  private:
 
@@ -72,10 +74,10 @@ class AGGTextRenderer {
 	conv_font_curve_type		fCurves;
 	conv_font_contour_type		fContour;
 
-	scanline_unpacked_type		fScanline;
 	rasterizer_type				fRasterizer;
-		// TODO: both of these are actually in Painter already
-		// and could be reused by this object
+		// NOTE: the object has it's own rasterizer object
+		// since it might be using a different gamma setting
+		// to support non-anti-aliased text rendering
 
 	char*						fUnicodeBuffer;
 	int32						fUnicodeBufferSize;

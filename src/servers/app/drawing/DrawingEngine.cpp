@@ -13,6 +13,7 @@
 #include <algo.h>
 #include <stack.h>
 
+#include "AGGTextRenderer.h"
 #include "DrawState.h"
 #include "Painter.h"
 #include "PNGDump.h"
@@ -46,10 +47,10 @@ make_rect_valid(BRect& rect)
 
 // extend_by_stroke_width
 static inline void
-extend_by_stroke_width(BRect& rect, const DrawState* context)
+extend_by_stroke_width(BRect& rect, float penSize)
 {
 	// "- 0.5" because if stroke width == 1, we don't need to extend
-	float inset = -ceilf(context->PenSize() / 2.0 - 0.5);
+	float inset = -ceilf(penSize / 2.0 - 0.5);
 	rect.InsetBy(inset, inset);
 }
 
@@ -184,7 +185,7 @@ DrawingEngine::ConstrainClippingRegion(const BRegion* region)
 void
 DrawingEngine::SetDrawState(const DrawState* state, int32 xOffset, int32 yOffset)
 {
-	fPainter->SetDrawState(state, false, xOffset, yOffset);	
+	fPainter->SetDrawState(state, true, xOffset, yOffset);	
 }
 
 
@@ -210,10 +211,23 @@ DrawingEngine::SetPenSize(float size)
 
 
 void
+DrawingEngine::SetStrokeMode(cap_mode lineCap, join_mode joinMode,
+								float miterLimit)
+{
+	fPainter->SetStrokeMode(lineCap, joinMode, miterLimit);	
+}
+
+
+void
+DrawingEngine::SetBlendingMode(source_alpha srcAlpha, alpha_function alphaFunc)
+{
+	fPainter->SetBlendingMode(srcAlpha, alphaFunc);	
+}
+
+
+void
 DrawingEngine::SetPattern(const struct pattern& pattern)
 {
-	// TODO: doing it like this prevents an optimization
-	// for font rendering (special "solid" drawing mode)
 	fPainter->SetPattern(pattern, false);	
 }
 
@@ -222,6 +236,13 @@ void
 DrawingEngine::SetDrawingMode(drawing_mode mode)
 {
 	fPainter->SetDrawingMode(mode);	
+}
+
+
+void
+DrawingEngine::SetFont(const ServerFont& font)
+{
+	fPainter->SetFont(font);	
 }
 
 
@@ -505,8 +526,7 @@ DrawingEngine::InvertRect(BRect r)
 // DrawBitmap
 void
 DrawingEngine::DrawBitmap(ServerBitmap *bitmap,
-						  const BRect &source, const BRect &dest,
-						  const DrawState *d)
+						  const BRect &source, const BRect &dest)
 {
 	CRASH_IF_NOT_LOCKED
 
@@ -514,7 +534,6 @@ DrawingEngine::DrawBitmap(ServerBitmap *bitmap,
 	if (clipped.IsValid()) {
 		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
 
-//		fPainter->SetDrawState(d);
 		fPainter->DrawBitmap(bitmap, source, dest);
 
 		fGraphicsCard->Invalidate(clipped);
@@ -526,20 +545,17 @@ DrawingEngine::DrawBitmap(ServerBitmap *bitmap,
 // DrawArc
 void
 DrawingEngine::DrawArc(BRect r, const float &angle,
-					   const float &span, const DrawState *d,
-					   bool filled)
+					   const float &span, bool filled)
 {
 	CRASH_IF_NOT_LOCKED
 
 	make_rect_valid(r);
 	BRect clipped(r);
 	if (!filled)
-		extend_by_stroke_width(clipped, d);
+		extend_by_stroke_width(clipped, fPainter->PenSize());
 	clipped = fPainter->ClipRect(r);
 	if (clipped.IsValid()) {
 		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
-
-//		fPainter->SetDrawState(d);
 
 		float xRadius = r.Width() / 2.0;
 		float yRadius = r.Height() / 2.0;
@@ -559,14 +575,13 @@ DrawingEngine::DrawArc(BRect r, const float &angle,
 
 // DrawBezier
 void
-DrawingEngine::DrawBezier(BPoint *pts, const DrawState *d, bool filled)
+DrawingEngine::DrawBezier(BPoint *pts, bool filled)
 {
 	CRASH_IF_NOT_LOCKED
 
 	// TODO: figure out bounds and hide cursor depending on that
 	fGraphicsCard->HideSoftwareCursor();
 
-//	fPainter->SetDrawState(d);
 	BRect touched = fPainter->DrawBezier(pts, filled);
 
 	fGraphicsCard->Invalidate(touched);
@@ -575,7 +590,7 @@ DrawingEngine::DrawBezier(BPoint *pts, const DrawState *d, bool filled)
 
 // DrawEllipse
 void
-DrawingEngine::DrawEllipse(BRect r, const DrawState *d, bool filled)
+DrawingEngine::DrawEllipse(BRect r, bool filled)
 {
 	CRASH_IF_NOT_LOCKED
 
@@ -584,7 +599,7 @@ DrawingEngine::DrawEllipse(BRect r, const DrawState *d, bool filled)
 	fPainter->AlignEllipseRect(&clipped, filled);
 
 	if (!filled)
-		extend_by_stroke_width(clipped, d);
+		extend_by_stroke_width(clipped, fPainter->PenSize());
 
 	clipped.left = floorf(clipped.left);
 	clipped.top = floorf(clipped.top);
@@ -596,7 +611,6 @@ DrawingEngine::DrawEllipse(BRect r, const DrawState *d, bool filled)
 	if (clipped.IsValid()) {
 		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
 
-//		fPainter->SetDrawState(d);
 		fPainter->DrawEllipse(r, filled);
 
 		fGraphicsCard->Invalidate(clipped);
@@ -608,19 +622,17 @@ DrawingEngine::DrawEllipse(BRect r, const DrawState *d, bool filled)
 // DrawPolygon
 void
 DrawingEngine::DrawPolygon(BPoint* ptlist, int32 numpts,
-						   BRect bounds, const DrawState* d,
-						   bool filled, bool closed)
+						   BRect bounds, bool filled, bool closed)
 {
 	CRASH_IF_NOT_LOCKED
 
 	make_rect_valid(bounds);
 	if (!filled)
-		extend_by_stroke_width(bounds, d);
+		extend_by_stroke_width(bounds, fPainter->PenSize());
 	bounds = fPainter->ClipRect(bounds);
 	if (bounds.IsValid()) {
 		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(bounds);
 
-//		fPainter->SetDrawState(d);
 		fPainter->DrawPolygon(ptlist, numpts, filled, closed);
 
 		fGraphicsCard->Invalidate(bounds);
@@ -756,20 +768,19 @@ DrawingEngine::FillRegion(BRegion& r, const RGBColor& color)
 // #pragma mark - DrawState
 
 void
-DrawingEngine::StrokeRect(BRect r, const DrawState *d)
+DrawingEngine::StrokeRect(BRect r)
 {
 	CRASH_IF_NOT_LOCKED
 
 	// support invalid rects
 	make_rect_valid(r);
 	BRect clipped(r);
-	extend_by_stroke_width(clipped, d);
+	extend_by_stroke_width(clipped, fPainter->PenSize());
 	clipped = fPainter->ClipRect(clipped);
 	if (clipped.IsValid()) {
 
 		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
 
-//		fPainter->SetDrawState(d);
 		fPainter->StrokeRect(r);
 
 		fGraphicsCard->Invalidate(clipped);
@@ -780,7 +791,7 @@ DrawingEngine::StrokeRect(BRect r, const DrawState *d)
 
 
 void
-DrawingEngine::FillRect(BRect r, const DrawState *d)
+DrawingEngine::FillRect(BRect r)
 {
 	CRASH_IF_NOT_LOCKED
 
@@ -794,20 +805,20 @@ DrawingEngine::FillRect(BRect r, const DrawState *d)
 			// try hardware optimized version first
 			// if the rect is large enough
 			if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0) {
-				if (d->GetPattern() == B_SOLID_HIGH
-					&& (d->GetDrawingMode() == B_OP_COPY
-						|| d->GetDrawingMode() == B_OP_OVER)) {
+				if (fPainter->Pattern() == B_SOLID_HIGH
+					&& (fPainter->DrawingMode() == B_OP_COPY
+						|| fPainter->DrawingMode() == B_OP_OVER)) {
 					BRegion region(r);
 					region.IntersectWith(fPainter->ClippingRegion());
-					fGraphicsCard->FillRegion(region, d->HighColor(),
+					fGraphicsCard->FillRegion(region, fPainter->HighColor(),
 											  fSuspendSyncLevel == 0
 											  || cursorTouched);
 					doInSoftware = false;
-				} else if (d->GetPattern() == B_SOLID_LOW
-						   && d->GetDrawingMode() == B_OP_COPY) {
+				} else if (fPainter->Pattern() == B_SOLID_LOW
+						   && fPainter->DrawingMode() == B_OP_COPY) {
 					BRegion region(r);
 					region.IntersectWith(fPainter->ClippingRegion());
-					fGraphicsCard->FillRegion(region, d->LowColor(),
+					fGraphicsCard->FillRegion(region, fPainter->LowColor(),
 											  fSuspendSyncLevel == 0
 											  || cursorTouched);
 					doInSoftware = false;
@@ -815,7 +826,6 @@ DrawingEngine::FillRect(BRect r, const DrawState *d)
 			}
 		}
 		if (doInSoftware) {
-//			fPainter->SetDrawState(d);
 			fPainter->FillRect(r);
 
 			fGraphicsCard->Invalidate(r);
@@ -828,7 +838,7 @@ DrawingEngine::FillRect(BRect r, const DrawState *d)
 
 
 void
-DrawingEngine::FillRegion(BRegion& r, const DrawState *d)
+DrawingEngine::FillRegion(BRegion& r)
 {
 	CRASH_IF_NOT_LOCKED
 
@@ -839,18 +849,18 @@ DrawingEngine::FillRegion(BRegion& r, const DrawState *d)
 		bool doInSoftware = true;
 		// try hardware optimized version first
 		if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0) {
-			if (d->GetPattern() == B_SOLID_HIGH
-				&& (d->GetDrawingMode() == B_OP_COPY
-					|| d->GetDrawingMode() == B_OP_OVER)) {
+			if (fPainter->Pattern() == B_SOLID_HIGH
+				&& (fPainter->DrawingMode() == B_OP_COPY
+					|| fPainter->DrawingMode() == B_OP_OVER)) {
 				r.IntersectWith(fPainter->ClippingRegion());
-				fGraphicsCard->FillRegion(r, d->HighColor(),
+				fGraphicsCard->FillRegion(r, fPainter->HighColor(),
 										  fSuspendSyncLevel == 0
 										  || cursorTouched);
 				doInSoftware = false;
-			} else if (d->GetPattern() == B_SOLID_LOW
-					   && d->GetDrawingMode() == B_OP_COPY) {
+			} else if (fPainter->Pattern() == B_SOLID_LOW
+					   && fPainter->DrawingMode() == B_OP_COPY) {
 				r.IntersectWith(fPainter->ClippingRegion());
-				fGraphicsCard->FillRegion(r, d->LowColor(),
+				fGraphicsCard->FillRegion(r, fPainter->LowColor(),
 										  fSuspendSyncLevel == 0
 										  || cursorTouched);
 				doInSoftware = false;
@@ -858,7 +868,6 @@ DrawingEngine::FillRegion(BRegion& r, const DrawState *d)
 		}
 
 		if (doInSoftware) {
-//			fPainter->SetDrawState(d);
 
 			BRect touched = fPainter->FillRect(r.RectAt(0));
 
@@ -877,8 +886,7 @@ DrawingEngine::FillRegion(BRegion& r, const DrawState *d)
 
 
 void
-DrawingEngine::DrawRoundRect(BRect r, float xrad, float yrad,
-	const DrawState* d, bool filled)
+DrawingEngine::DrawRoundRect(BRect r, float xrad, float yrad, bool filled)
 {
 	CRASH_IF_NOT_LOCKED
 
@@ -895,7 +903,6 @@ DrawingEngine::DrawRoundRect(BRect r, float xrad, float yrad,
 	if (clipped.IsValid()) {
 		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
 
-//		fPainter->SetDrawState(d);
 		BRect touched = filled ? fPainter->FillRoundRect(r, xrad, yrad)
 							   : fPainter->StrokeRoundRect(r, xrad, yrad);
 
@@ -908,8 +915,7 @@ DrawingEngine::DrawRoundRect(BRect r, float xrad, float yrad,
 
 void
 DrawingEngine::DrawShape(const BRect& bounds, int32 opCount,
-	const uint32* opList, int32 ptCount, const BPoint* ptList,
-	const DrawState* d, bool filled)
+	const uint32* opList, int32 ptCount, const BPoint* ptList, bool filled)
 {
 	CRASH_IF_NOT_LOCKED
 
@@ -917,7 +923,6 @@ DrawingEngine::DrawShape(const BRect& bounds, int32 opCount,
 	// shape is drawn on screen, TODO: optimize
 	fGraphicsCard->HideSoftwareCursor();
 
-//	fPainter->SetDrawState(d);
 	BRect touched = fPainter->DrawShape(opCount, opList,
 										ptCount, ptList,
 										filled);
@@ -928,19 +933,17 @@ DrawingEngine::DrawShape(const BRect& bounds, int32 opCount,
 
 
 void
-DrawingEngine::DrawTriangle(BPoint* pts, const BRect& bounds,
-	const DrawState* d, bool filled)
+DrawingEngine::DrawTriangle(BPoint* pts, const BRect& bounds, bool filled)
 {
 	CRASH_IF_NOT_LOCKED
 
 	BRect clipped(bounds);
 	if (!filled)
-		extend_by_stroke_width(clipped, d);
+		extend_by_stroke_width(clipped, fPainter->PenSize());
 	clipped = fPainter->ClipRect(clipped);
 	if (clipped.IsValid()) {
 		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
 
-//		fPainter->SetDrawState(d);
 		if (filled)
 			fPainter->FillTriangle(pts[0], pts[1], pts[2]);
 		else
@@ -954,18 +957,17 @@ DrawingEngine::DrawTriangle(BPoint* pts, const BRect& bounds,
 
 // StrokeLine
 void
-DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end, DrawState* context)
+DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end)
 {
 	CRASH_IF_NOT_LOCKED
 
 	BRect touched(start, end);
 	make_rect_valid(touched);
-	extend_by_stroke_width(touched, context);
+	extend_by_stroke_width(touched, fPainter->PenSize());
 	touched = fPainter->ClipRect(touched);
 	if (touched.IsValid()) {
 		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(touched);
 
-//		fPainter->SetDrawState(context);
 		fPainter->StrokeLine(start, end);
 
 		fGraphicsCard->Invalidate(touched);
@@ -977,11 +979,11 @@ DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end, DrawState* con
 // StrokeLineArray
 void
 DrawingEngine::StrokeLineArray(int32 numLines,
-	const LineArrayData *linedata, const DrawState *d)
+	const LineArrayData *linedata)
 {
 	CRASH_IF_NOT_LOCKED
 
-	if (!d || !linedata || numLines <= 0)
+	if (!linedata || numLines <= 0)
 		return;
 
 	// figure out bounding box for line array
@@ -999,13 +1001,14 @@ DrawingEngine::StrokeLineArray(int32 numLines,
 				  max_c(data->pt1.y, data->pt2.y));
 		touched = touched | box;
 	}
-	extend_by_stroke_width(touched, d);
+	extend_by_stroke_width(touched, fPainter->PenSize());
 	touched = fPainter->ClipRect(touched);
 	if (touched.IsValid()) {
 		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(touched);
 
 		data = (const LineArrayData *)&(linedata[0]);
 
+		rgb_color oldColor = fPainter->HighColor();
 		fPainter->SetHighColor(data->color);
 		fPainter->StrokeLine(data->pt1, data->pt2);
 
@@ -1016,7 +1019,7 @@ DrawingEngine::StrokeLineArray(int32 numLines,
 		}
 
 		// restore correct drawing state highcolor
-		fPainter->SetHighColor(d->HighColor());
+		fPainter->SetHighColor(oldColor);
 
 		fGraphicsCard->Invalidate(touched);
 		if (cursorTouched)
@@ -1028,22 +1031,14 @@ DrawingEngine::StrokeLineArray(int32 numLines,
 
 BPoint
 DrawingEngine::DrawString(const char* string, int32 length,
-						  const BPoint& pt, DrawState* d,
-						  escapement_delta* delta)
+						  const BPoint& pt, escapement_delta* delta)
 {
 	CRASH_IF_NOT_LOCKED
 
-// TODO: use delta
-	FontLocker locker(d);
+	FontLocker locker(&fPainter->Font());
 
 	BPoint penLocation = pt;
 
-	fPainter->SetDrawState(d, true);
-		// TODO: this will reset the scrolling offsets used for
-		// pattern drawing again, it is really necessary to change
-		// the whole graphics state synchronization between DrawState
-		// and Painter, and remove any individual SetDrawState() calls
-		// like here
 //bigtime_t now = system_time();
 // TODO: BoundingBox is quite slow!! Optimizing it will be beneficial.
 // Cursiously, the DrawString after it is actually faster!?!
@@ -1074,10 +1069,9 @@ DrawingEngine::DrawString(const char* string, int32 length,
 // StringWidth
 float
 DrawingEngine::StringWidth(const char* string, int32 length,
-						   const DrawState* d, escapement_delta* delta)
+						   escapement_delta* delta)
 {
-// TODO: use delta
-	FontLocker locker(d);
+	FontLocker locker(&fPainter->Font());
 
 	float width = 0.0;
 // NOTE: For now it is enough to block on the
@@ -1086,7 +1080,7 @@ DrawingEngine::StringWidth(const char* string, int32 length,
 // deadlock in case another thread holds the font
 // lock already and then tries to lock the drawing
 // engine after it is already locked here (race condition)
-	width = fPainter->StringWidth(string, length, d);
+	width = fPainter->StringWidth(string, length, delta);
 	return width;
 }
 
@@ -1095,30 +1089,12 @@ float
 DrawingEngine::StringWidth(const char* string, int32 length,
 						   const ServerFont& font, escapement_delta* delta)
 {
-	DrawState d;
-	d.SetFont(font);
-	return StringWidth(string, length, &d, delta);
-}
+	FontLocker locker(&font);
 
-// StringHeight
-float
-DrawingEngine::StringHeight(const char *string, int32 length,
-							const DrawState *d)
-{
-	FontLocker locker(d);
+	AGGTextRenderer* renderer = AGGTextRenderer::Default();
+	renderer->SetFont(font);
 
-	float height = 0.0;
-// NOTE: For now it is enough to block on the
-// font style lock, this already prevents multiple
-// threads from executing this code and avoids a
-// deadlock in case another thread holds the font
-// lock already and then tries to lock the drawing
-// engine after it is already locked here (race condition)
-	fPainter->SetDrawState(d, true);
-	BPoint dummy1(0.0, 0.0);
-	BPoint dummy2(0.0, 0.0);
-	height = fPainter->BoundingBox(string, length, dummy1, &dummy2).Height();
-	return height;
+	return renderer->StringWidth(string, length, delta);
 }
 
 // #pragma mark -

@@ -1212,16 +1212,14 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 			if (rect.IsValid()/* && drawingEngine->Lock()*/) {
 				drawingEngine->ConstrainClippingRegion(redraw);
 
-				DrawState defaultDrawState;
-
 				if (fBitmapOptions & B_TILE_BITMAP) {
 					// tile across entire view
 
 					float start = rect.left;
 					while (rect.top < redraw->Frame().bottom) {
 						while (rect.left < redraw->Frame().right) {
-							drawingEngine->DrawBitmap(fViewBitmap, fBitmapSource,
-								rect, &defaultDrawState);
+							drawingEngine->DrawBitmap(fViewBitmap,
+								fBitmapSource, rect);
 							rect.OffsetBy(rect.Width() + 1, 0.0);
 						}
 						rect.OffsetBy(start - rect.left, rect.Height() + 1);
@@ -1233,7 +1231,7 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 
 					while (rect.left < redraw->Frame().right) {
 						drawingEngine->DrawBitmap(fViewBitmap, fBitmapSource,
-							rect, &defaultDrawState);
+							rect);
 						rect.OffsetBy(rect.Width() + 1, 0.0);
 					}
 					// remove horizontal stripe from clipping
@@ -1245,7 +1243,7 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 
 					while (rect.top < redraw->Frame().bottom) {
 						drawingEngine->DrawBitmap(fViewBitmap, fBitmapSource,
-							rect, &defaultDrawState);
+							rect);
 						rect.OffsetBy(0.0, rect.Height() + 1);
 					}
 					// remove vertical stripe from clipping
@@ -1256,7 +1254,7 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 					// no tiling at all
 
 					drawingEngine->DrawBitmap(fViewBitmap, fBitmapSource,
-						rect, &defaultDrawState);
+						rect);
 					redraw->Exclude(rect);
 				}
 

@@ -131,7 +131,7 @@ ShapePainter::Draw(ViewLayer *view, BRect frame, bool filled)
 		}
 
 		view->Window()->GetDrawingEngine()->DrawShape(frame, opCount, opList, ptCount, ptList,
-				view->CurrentState(), filled);
+				filled);
 	}
 }
 
@@ -182,7 +182,7 @@ stroke_line(ViewLayer *view, BPoint start, BPoint end)
 {
 	view->ConvertToScreenForDrawing(&start);
 	view->ConvertToScreenForDrawing(&end);	
-	view->Window()->GetDrawingEngine()->StrokeLine(start, end, view->CurrentState());
+	view->Window()->GetDrawingEngine()->StrokeLine(start, end);
 }
 
 
@@ -190,7 +190,7 @@ static void
 stroke_rect(ViewLayer *view, BRect rect)
 {
 	view->ConvertToScreenForDrawing(&rect);	
-	view->Window()->GetDrawingEngine()->StrokeRect(rect, view->CurrentState());
+	view->Window()->GetDrawingEngine()->StrokeRect(rect);
 }
 
 
@@ -198,7 +198,7 @@ static void
 fill_rect(ViewLayer *view, BRect rect)
 {
 	view->ConvertToScreenForDrawing(&rect);			
-	view->Window()->GetDrawingEngine()->FillRect(rect, view->CurrentState());
+	view->Window()->GetDrawingEngine()->FillRect(rect);
 }
 
 
@@ -206,7 +206,8 @@ static void
 stroke_round_rect(ViewLayer *view, BRect rect, BPoint radii)
 {
 	view->ConvertToScreenForDrawing(&rect);	
-	view->Window()->GetDrawingEngine()->DrawRoundRect(rect, radii.x, radii.y, view->CurrentState(), false);
+	view->Window()->GetDrawingEngine()->DrawRoundRect(rect, radii.x, radii.y,
+		false);
 }
 
 
@@ -214,7 +215,8 @@ static void
 fill_round_rect(ViewLayer *view, BRect rect, BPoint radii)
 {
 	view->ConvertToScreenForDrawing(&rect);	
-	view->Window()->GetDrawingEngine()->DrawRoundRect(rect, radii.x, radii.y, view->CurrentState(), true);
+	view->Window()->GetDrawingEngine()->DrawRoundRect(rect, radii.x, radii.y,
+		true);
 }
 
 
@@ -224,7 +226,7 @@ stroke_bezier(ViewLayer *view, const BPoint *viewPoints)
 	BPoint points[4];
 	view->ConvertToScreenForDrawing(points, viewPoints, 4);
 
-	view->Window()->GetDrawingEngine()->DrawBezier(points, view->CurrentState(), false);
+	view->Window()->GetDrawingEngine()->DrawBezier(points, false);
 }
 
 
@@ -234,7 +236,7 @@ fill_bezier(ViewLayer *view, const BPoint *viewPoints)
 	BPoint points[4];
 	view->ConvertToScreenForDrawing(points, viewPoints, 4);
 
-	view->Window()->GetDrawingEngine()->DrawBezier(points, view->CurrentState(), true);
+	view->Window()->GetDrawingEngine()->DrawBezier(points, true);
 }
 
 
@@ -245,7 +247,7 @@ stroke_arc(ViewLayer *view, BPoint center, BPoint radii, float startTheta,
 	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x,
 			center.y + radii.y);
 	view->ConvertToScreenForDrawing(&rect);
-	view->Window()->GetDrawingEngine()->DrawArc(rect, startTheta, arcTheta, view->CurrentState(), false);
+	view->Window()->GetDrawingEngine()->DrawArc(rect, startTheta, arcTheta, false);
 }
 
 
@@ -256,7 +258,7 @@ fill_arc(ViewLayer *view, BPoint center, BPoint radii, float startTheta,
 	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x,
 			center.y + radii.y);
 	view->ConvertToScreenForDrawing(&rect);
-	view->Window()->GetDrawingEngine()->DrawArc(rect, startTheta, arcTheta, view->CurrentState(), true);
+	view->Window()->GetDrawingEngine()->DrawArc(rect, startTheta, arcTheta, true);
 }
 
 
@@ -266,7 +268,7 @@ stroke_ellipse(ViewLayer *view, BPoint center, BPoint radii)
 	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x,
 			center.y + radii.y);
 	view->ConvertToScreenForDrawing(&rect);
-	view->Window()->GetDrawingEngine()->DrawEllipse(rect, view->CurrentState(), false);
+	view->Window()->GetDrawingEngine()->DrawEllipse(rect, false);
 }
 
 
@@ -276,7 +278,7 @@ fill_ellipse(ViewLayer *view, BPoint center, BPoint radii)
 	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x,
 			center.y + radii.y);
 	view->ConvertToScreenForDrawing(&rect);
-	view->Window()->GetDrawingEngine()->DrawEllipse(rect, view->CurrentState(), true);
+	view->Window()->GetDrawingEngine()->DrawEllipse(rect, true);
 }
 
 
@@ -295,9 +297,8 @@ stroke_polygon(ViewLayer *view, int32 numPoints, const BPoint *viewPoints, bool 
 		BRect polyFrame;
 		get_polygon_frame(points, numPoints, &polyFrame);
 
-		view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame, 
-														view->CurrentState(), false,
-														isClosed && numPoints > 2);
+		view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame,
+			false, isClosed && numPoints > 2);
 	} else {
 		 // avoid constructor/destructor calls by using malloc instead of new []
 		BPoint *points = (BPoint *)malloc(numPoints * sizeof(BPoint));
@@ -310,8 +311,7 @@ stroke_polygon(ViewLayer *view, int32 numPoints, const BPoint *viewPoints, bool 
 		get_polygon_frame(points, numPoints, &polyFrame);
 
 		view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame, 
-														view->CurrentState(), false,
-														isClosed && numPoints > 2);
+			false, isClosed && numPoints > 2);
 		free(points);
 	}
 }
@@ -333,7 +333,7 @@ fill_polygon(ViewLayer *view, int32 numPoints, const BPoint *viewPoints)
 		get_polygon_frame(points, numPoints, &polyFrame);
 
 		view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame, 
-														view->CurrentState(), true, true);
+			true, true);
 	} else {
 		 // avoid constructor/destructor calls by using malloc instead of new []
 		BPoint *points = (BPoint *)malloc(numPoints * sizeof(BPoint)); 
@@ -346,7 +346,7 @@ fill_polygon(ViewLayer *view, int32 numPoints, const BPoint *viewPoints)
 		get_polygon_frame(points, numPoints, &polyFrame);
 
 		view->Window()->GetDrawingEngine()->DrawPolygon(points, numPoints, polyFrame, 
-														view->CurrentState(), true, true);
+			true, true);
 		free(points);
 	}
 }
@@ -373,13 +373,14 @@ fill_shape(ViewLayer *view, const BShape *shape)
 
 
 static void
-draw_string(ViewLayer *view, const char *string, float deltaSpace, float deltaNonSpace)
+draw_string(ViewLayer *view, const char *string, float deltaSpace,
+	float deltaNonSpace)
 {
 	BPoint location = view->CurrentState()->PenLocation();
 	escapement_delta delta = {deltaSpace, deltaNonSpace };
 	view->ConvertToScreenForDrawing(&location);
-	view->Window()->GetDrawingEngine()->DrawString(string, strlen(string), location,
-		view->CurrentState(), &delta);
+	view->Window()->GetDrawingEngine()->DrawString(string, strlen(string),
+		location, &delta);
 	// TODO: Update pen location ?
 	
 }
@@ -399,7 +400,7 @@ draw_pixels(ViewLayer *view, BRect src, BRect dest, int32 width, int32 height,
 
 	view->ConvertToScreenForDrawing(&dest);
 	
-	view->Window()->GetDrawingEngine()->DrawBitmap(&bitmap, src, dest, view->CurrentState());
+	view->Window()->GetDrawingEngine()->DrawBitmap(&bitmap, src, dest);
 }
 
 
@@ -434,6 +435,11 @@ static void
 pop_state(ViewLayer *view)
 {
 	view->PopState();
+
+	IntPoint p = view->ScrollingOffset();
+	p += IntPoint(view->CurrentState()->Origin());
+	view->Window()->GetDrawingEngine()->SetDrawState(
+		view->CurrentState(), p.x, p.y);
 }
 
 
@@ -476,6 +482,12 @@ static void
 set_pen_location(ViewLayer *view, BPoint pt)
 {
 	view->CurrentState()->SetPenLocation(pt);
+
+	// TODO: faster version
+	IntPoint p = view->ScrollingOffset();
+	p += IntPoint(view->CurrentState()->Origin());
+	view->Window()->GetDrawingEngine()->SetDrawState(
+		view->CurrentState(), p.x, p.y);
 }
 
 
@@ -483,6 +495,7 @@ static void
 set_drawing_mode(ViewLayer *view, drawing_mode mode)
 {
 	view->CurrentState()->SetDrawingMode(mode);
+	view->Window()->GetDrawingEngine()->SetDrawingMode(mode);
 }
 
 
@@ -493,6 +506,7 @@ set_line_mode(ViewLayer *view, cap_mode capMode, join_mode joinMode, float miter
 	state->SetLineCapMode(capMode);
 	state->SetLineJoinMode(joinMode);
 	state->SetMiterLimit(miterLimit);
+	view->Window()->GetDrawingEngine()->SetStrokeMode(capMode, joinMode, miterLimit);
 }
 
 
@@ -500,6 +514,7 @@ static void
 set_pen_size(ViewLayer *view, float size)
 {
 	view->CurrentState()->SetPenSize(size);
+	view->Window()->GetDrawingEngine()->SetPenSize(size);
 }
 
 
@@ -507,6 +522,7 @@ static void
 set_fore_color(ViewLayer *view, rgb_color color)
 {
 	view->CurrentState()->SetHighColor(RGBColor(color));
+	view->Window()->GetDrawingEngine()->SetHighColor(color);
 }
 
 
@@ -514,13 +530,15 @@ static void
 set_back_color(ViewLayer *view, rgb_color color)
 {
 	view->CurrentState()->SetLowColor(RGBColor(color));
+	view->Window()->GetDrawingEngine()->SetLowColor(color);
 }
 
 
 static void
 set_stipple_pattern(ViewLayer *view, pattern p)
 {
-	printf("SetStipplePattern\n");
+	view->CurrentState()->SetPattern(Pattern(p));
+	view->Window()->GetDrawingEngine()->SetPattern(p);
 }
 
 
@@ -558,13 +576,17 @@ set_font_size(ViewLayer *view, float size)
 	ServerFont font;
 	font.SetSize(size);
 	view->CurrentState()->SetFont(font, B_FONT_SIZE);
+	view->Window()->GetDrawingEngine()->SetFont(view->CurrentState()->Font());
 }
 
 
 static void
 set_font_rotate(ViewLayer *view, float rotation)
 {
-	printf("SetFontRotate(%.2f)\n", rotation);
+	ServerFont font;
+	font.SetRotation(rotation);
+	view->CurrentState()->SetFont(font, B_FONT_ROTATION);
+	view->Window()->GetDrawingEngine()->SetFont(view->CurrentState()->Font());
 }
 
 

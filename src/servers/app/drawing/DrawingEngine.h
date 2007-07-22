@@ -72,8 +72,13 @@ public:
 			void			SetHighColor(const rgb_color& color);
 			void			SetLowColor(const rgb_color& color);
 			void			SetPenSize(float size);
+			void			SetStrokeMode(cap_mode lineCap, join_mode joinMode,
+								float miterLimit);
 			void			SetPattern(const struct pattern& pattern);
 			void			SetDrawingMode(drawing_mode mode);
+			void			SetBlendingMode(source_alpha srcAlpha,
+								alpha_function alphaFunc);
+			void			SetFont(const ServerFont& font);
 
 			void			SuspendAutoSync();
 			void			Sync();
@@ -85,24 +90,18 @@ public:
 			void			InvertRect(BRect r);
 
 			void			DrawBitmap(ServerBitmap *bitmap,
-								const BRect &source, const BRect &dest,
-								const DrawState *d);
+								const BRect &source, const BRect &dest);
 			// drawing primitives
 
 			void			DrawArc(BRect r, const float &angle,
-								const float &span,
-								const DrawState *d,
-								bool filled);
+								const float &span, bool filled);
 
-			void			DrawBezier(BPoint *pts, const DrawState *d,
-								bool filled);
+			void			DrawBezier(BPoint *pts, bool filled);
 
-			void			DrawEllipse(BRect r, const DrawState *d,
-								bool filled);
+			void			DrawEllipse(BRect r, bool filled);
 
 			void			DrawPolygon(BPoint *ptlist, int32 numpts,
-								BRect bounds, const DrawState *d,
-								bool filled, bool closed);
+								BRect bounds, bool filled, bool closed);
 
 			// these RGBColor versions are used internally by the server
 			void			StrokePoint(const BPoint& pt,
@@ -111,52 +110,48 @@ public:
 			void			FillRect(BRect r, const RGBColor &color);
 			void			FillRegion(BRegion& r, const RGBColor& color);
 
-			void			StrokeRect(BRect r, const DrawState *d);
-			void			FillRect(BRect r, const DrawState *d);
+			void			StrokeRect(BRect r);
+			void			FillRect(BRect r);
 
-			void			FillRegion(BRegion& r, const DrawState *d);
+			void			FillRegion(BRegion& r);
 
 			void			DrawRoundRect(BRect r, float xrad,
-								float yrad, const DrawState *d,
-								bool filled);
+								float yrad, bool filled);
 
 			void			DrawShape(const BRect& bounds,
 								int32 opcount, const uint32* oplist, 
 								int32 ptcount, const BPoint* ptlist,
-								const DrawState* d, bool filled);
+								bool filled);
 
 			void			DrawTriangle(BPoint* pts, const BRect& bounds,
-								const DrawState* d, bool filled);
+								bool filled);
 
 			// this version used by Decorator
 			void			StrokeLine(const BPoint& start,
 								const BPoint& end, const RGBColor& color);
 
 			void			StrokeLine(const BPoint& start,
-								const BPoint& end, DrawState* d);
+								const BPoint& end);
 
 			void			StrokeLineArray(int32 numlines,
-								const LineArrayData* data,
-								const DrawState* d);
+								const LineArrayData* data);
 
 			// -------- text related calls
 
-			// DrawState is NOT const because this call updates the
-			// pen position in the passed DrawState
+			// returns the pen position behind the (virtually) drawn
+			// string
 			BPoint			DrawString(const char* string, int32 length,
-								const BPoint& pt, DrawState* d,
+								const BPoint& pt,
 								escapement_delta* delta = NULL);
 
 			float			StringWidth(const char* string, int32 length,
-								const DrawState* d,
 								escapement_delta* delta = NULL);
 
+			// convenience function which is independent of graphics
+			// state (to be used by Decorator or ServerApp etc)
 			float			StringWidth(const char* string,
 								int32 length, const ServerFont& font,
 								escapement_delta* delta = NULL);
-
-			float			StringHeight(const char* string,
-								int32 length, const DrawState* d);
 
  private:
 			BRect			_CopyRect(BRect r, int32 xOffset,

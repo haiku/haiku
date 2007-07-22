@@ -84,7 +84,6 @@ class WindowLayer {
 			ViewLayer*			TopLayer() const { return fTopLayer; }
 				// TODO: only used for WorkspacesLayer, can go away if we do
 				//	this differently one day
-
 			ViewLayer*			ViewAt(const BPoint& where);
 
 	virtual	bool				IsOffscreenWindow() const { return false; }

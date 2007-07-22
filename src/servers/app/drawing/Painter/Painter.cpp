@@ -47,6 +47,7 @@
 
 
 #define CHECK_CLIPPING	if (!fValidClipping) return BRect(0, 0, -1, -1);
+#define CHECK_CLIPPING_NO_RETURN	if (!fValidClipping) return;
 
 
 // constructor
@@ -81,12 +82,6 @@ Painter::Painter()
 	  fTextRenderer(AGGTextRenderer::Default())
 {
 	fPixelFormat.SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode, false);
-
-	// Usually, the drawing engine will lock the font for us when
-	// needed - unfortunately, it can't know we need it here
-	fFont.Lock();
-	_UpdateFont();
-	fFont.Unlock();
 
 #if ALIASED_DRAWING
 	fRasterizer.gamma(agg::gamma_threshold(0.5));
@@ -217,13 +212,32 @@ Painter::SetDrawingMode(drawing_mode mode)
 	}
 }
 
+// SetBlendingMode
+void
+Painter::SetBlendingMode(source_alpha srcAlpha, alpha_function alphaFunc)
+{
+	if (fAlphaSrcMode != srcAlpha || fAlphaFncMode != alphaFunc) {
+		fAlphaSrcMode = srcAlpha;
+		fAlphaFncMode = alphaFunc;
+		if (fDrawingMode == B_OP_ALPHA)
+			_UpdateDrawingMode();
+	}
+}
+
 // SetPenSize
 void
 Painter::SetPenSize(float size)
 {
-	if (fPenSize != size) {
-		fPenSize = size;
-	}
+	fPenSize = size;
+}
+
+// SetStrokeMode
+void
+Painter::SetStrokeMode(cap_mode lineCap, join_mode joinMode, float miterLimit)
+{
+	fLineCapMode = lineCap;
+	fLineJoinMode = joinMode;
+	fMiterLimit = miterLimit;
 }
 
 // SetPattern
@@ -258,35 +272,20 @@ void
 Painter::SetFont(const ServerFont& font)
 {
 	fFont = font;
-	_UpdateFont();
 }
 
 // #pragma mark - drawing
 
 // StrokeLine
-BRect
+void
 Painter::StrokeLine(BPoint a, BPoint b)
 {
-	CHECK_CLIPPING
+	CHECK_CLIPPING_NO_RETURN
 
 	// "false" means not to do the pixel center offset,
 	// because it would mess up our optimized versions
 	_Transform(&a, false);
 	_Transform(&b, false);
-
-	BRect touched(min_c(a.x, b.x), min_c(a.y, b.y),
-				  max_c(a.x, b.x), max_c(a.y, b.y));
-
-	// This is supposed to stop right here if we can see
-	// that we're definitaly outside the clipping reagion.
-	// Extending by penSize like that is not really correct, 
-	// but fast and only triggers unnecessary calculation
-	// in a few edge cases
-	touched.InsetBy(-(fPenSize - 1), -(fPenSize - 1));
-	if (!touched.Intersects(fClippingRegion->Frame())) {
-		touched.Set(0.0, 0.0, -1.0, -1.0);
-		return touched;
-	}
 
 	// first, try an optimized version
 	if (fPenSize == 1.0
@@ -295,10 +294,8 @@ Painter::StrokeLine(BPoint a, BPoint b)
 		pattern pat = *fPatternHandler.GetR5Pattern();
 		if (pat == B_SOLID_HIGH &&
 			StraightLine(a, b, fPatternHandler.HighColor().GetColor32())) {
-			return _Clipped(touched);
 		} else if (pat == B_SOLID_LOW &&
 			StraightLine(a, b, fPatternHandler.LowColor().GetColor32())) {
-			return _Clipped(touched);
 		}
 	}
 	
@@ -317,7 +314,7 @@ Painter::StrokeLine(BPoint a, BPoint b)
 			fPath.line_to(a.x + 1, a.y + 1);
 			fPath.line_to(a.x, a.y + 1);
 
-			touched = _FillPath(fPath);
+			_FillPath(fPath);
 		}
 	} else {
 		// do the pixel center offset here
@@ -364,10 +361,8 @@ Painter::StrokeLine(BPoint a, BPoint b)
 		fPath.move_to(a.x, a.y);
 		fPath.line_to(b.x, b.y);
 
-		touched = _StrokePath(fPath);
+		_StrokePath(fPath);
 	}
-
-	return _Clipped(touched);
 }
 
 // StraightLine
@@ -987,17 +982,26 @@ Painter::DrawString(const char* utf8String, uint32 length,
 
 	BRect bounds(0.0, 0.0, -1.0, -1.0);
 
+	// text is not rendered with patterns, but we need to
+	// make sure that the previous pattern is restored
+	pattern oldPattern = *fPatternHandler.GetR5Pattern();
 	SetPattern(B_SOLID_HIGH, true);
+	// make sure the text renderer is using our font (the global
+	// instance of the text renderer is used by everyone)
+	_UpdateFont();
 
 	bounds = fTextRenderer->RenderString(utf8String,
 										 length,
 										 &fRenderer,
 										 &fRendererBin,
+										 fUnpackedScanline,
 										 baseLine,
 										 fClippingRegion->Frame(),
 										 false,
 										 &fPenLocation, 
 										 delta);
+
+	SetPattern(oldPattern);
 
 	return _Clipped(bounds);
 }
@@ -1013,21 +1017,30 @@ Painter::BoundingBox(const char* utf8String, uint32 length,
 		baseLine.y = roundf(baseLine.y);
 	}
 
+	// make sure the text renderer is using our font (the global
+	// instance of the text renderer is used by everyone)
+	_UpdateFont();
+
 	static BRect dummy;
 	return fTextRenderer->RenderString(utf8String,
 									   length,
 									   &fRenderer,
 									   &fRendererBin,
+									   fUnpackedScanline,
 									   baseLine, dummy, true, penLocation,
 									   delta);
 }
 
 // StringWidth
 float
-Painter::StringWidth(const char* utf8String, uint32 length, const DrawState* context)
+Painter::StringWidth(const char* utf8String, uint32 length,
+	const escapement_delta* delta)
 {
-	SetFont(context->Font());
-	return fTextRenderer->StringWidth(utf8String, length);
+	// make sure the text renderer is using our font (the global
+	// instance of the text renderer is used by everyone)
+	_UpdateFont();
+
+	return fTextRenderer->StringWidth(utf8String, length, delta);
 }
 
 // #pragma mark -
@@ -1133,7 +1146,7 @@ Painter::_Clipped(const BRect& rect) const
 
 // _UpdateFont
 void
-Painter::_UpdateFont()
+Painter::_UpdateFont() const
 {
 	fTextRenderer->SetFont(fFont);
 }

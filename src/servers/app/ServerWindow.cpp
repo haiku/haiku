@@ -1034,6 +1034,16 @@ fDesktop->LockSingleWindow();
 			// at the fRedrawRequested member variable in _MessageLooper().
 			break;
 
+		case AS_SYNC:
+			// the synchronisation works by the fact that the client
+			// window is waiting for this reply, after having received it,
+			// client and server queues are in sync (earlier, the client
+			// may have pushed drawing commands at the server and now it
+			// knows they have all been carried out)
+			fLink.StartMessage(B_OK);
+			fLink.Flush();
+			break;
+
 		case AS_BEGIN_UPDATE:
 			DTRACE(("ServerWindowo %s: AS_BEGIN_UPDATE\n", Title()));
 			fWindowLayer->BeginUpdate(fLink);
@@ -1161,7 +1171,15 @@ fDesktop->LockSingleWindow();
 			// and take appropriate actions, then checking for fCurrentLayer->CurrentState()
 			// is unnecessary
 			if (fCurrentLayer == NULL || fCurrentLayer->CurrentState() == NULL) {
-				printf("ServerWindow %s received unexpected code - message offset %ld before top_view attached.\n", Title(), code - B_OK);
+				BString codeName;
+				string_for_message_code(code, codeName);
+				printf("ServerWindow %s received unexpected code - "
+					"message '%s' before top_view attached.\n",
+					Title(), codeName.String());
+				if (link.NeedsReply()) {
+					fLink.StartMessage(B_ERROR);
+					fLink.Flush();
+				}
 				return;
 			}
 
@@ -1231,8 +1249,10 @@ ServerWindow::_DispatchViewMessage(int32 code,
 						fDesktop->EventDispatcher().RemoveListener(EventTarget(),
 							token);
 					}
+					if (fCurrentLayer == view)
+						_SetCurrentLayer(parent);
 					delete view;
-				}
+				} // else we don't delete the root view
 			}
 			break;
 		}
@@ -1251,7 +1271,9 @@ ServerWindow::_DispatchViewMessage(int32 code,
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: ViewLayer name: %s\n", fTitle, fCurrentLayer->Name()));
 			fCurrentLayer->CurrentState()->ReadFontFromLink(link);
-			_UpdateDrawState(fCurrentLayer);
+//			_UpdateDrawState(fCurrentLayer);
+			fWindowLayer->GetDrawingEngine()->SetFont(
+				fCurrentLayer->CurrentState()->Font());
 			break;
 		}
 		case AS_LAYER_GET_STATE:
@@ -1466,7 +1488,9 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			fCurrentLayer->CurrentState()->SetLineJoinMode((join_mode)lineJoin);
 			fCurrentLayer->CurrentState()->SetMiterLimit(miterLimit);
 
-			_UpdateDrawState(fCurrentLayer);
+			fWindowLayer->GetDrawingEngine()->SetStrokeMode((cap_mode)lineCap,
+				(join_mode)lineJoin, miterLimit);
+//			_UpdateDrawState(fCurrentLayer);
 
 			break;
 		}
@@ -1606,8 +1630,10 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			link.Read<int8>(&alphaFunc);
 			
 			fCurrentLayer->CurrentState()->SetBlendingMode((source_alpha)srcAlpha,
-											(alpha_function)alphaFunc);
-			_UpdateDrawState(fCurrentLayer);
+				(alpha_function)alphaFunc);
+			//_UpdateDrawState(fCurrentLayer);
+			fWindowLayer->GetDrawingEngine()->SetBlendingMode((source_alpha)srcAlpha,
+				(alpha_function)alphaFunc);
 			break;
 		}
 		case AS_LAYER_GET_BLENDING_MODE:
@@ -1856,30 +1882,6 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			fWindowLayer->GetDrawingEngine()->SetPattern(pat);
 			break;
 		}
-		case AS_SET_FONT:
-		{
-			DTRACE(("ServerWindow %s: Message AS_SET_FONT\n", Title()));
-			// TODO: Implement AS_SET_FONT?
-			// Confusing!! But it works already!
-			break;
-		}
-		case AS_SET_FONT_SIZE:
-		{
-			DTRACE(("ServerWindow %s: Message AS_SET_FONT_SIZE\n", Title()));
-			// TODO: Implement AS_SET_FONT_SIZE?
-			break;
-		}
-		case AS_SYNC:
-		{
-			// the synchronisation works by the fact that the client
-			// window is waiting for this reply, after having received it,
-			// client and server queues are in sync (earlier, the client
-			// may have pushed drawing commands at the server and now it
-			// knows they have all been carried out)
-			fLink.StartMessage(B_OK);
-			fLink.Flush();
-			break;
-		}
 		case AS_LAYER_DRAG_IMAGE:
 		{
 			// TODO: flesh out AS_LAYER_DRAG_IMAGE
@@ -2052,7 +2054,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			BPoint penPos = p2;
 			fCurrentLayer->ConvertToScreenForDrawing(&p1);
 			fCurrentLayer->ConvertToScreenForDrawing(&p2);
-			drawingEngine->StrokeLine(p1, p2, fCurrentLayer->CurrentState());
+			drawingEngine->StrokeLine(p1, p2);
 			
 			// We update the pen here because many DrawingEngine calls which do not update the
 			// pen position actually call StrokeLine
@@ -2086,7 +2088,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			BRect rect(left,top,right,bottom);
 
 			fCurrentLayer->ConvertToScreenForDrawing(&rect);
-			drawingEngine->StrokeRect(rect, fCurrentLayer->CurrentState());
+			drawingEngine->StrokeRect(rect);
 			break;
 		}
 		case AS_FILL_RECT:
@@ -2097,7 +2099,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			link.Read<BRect>(&rect);
 
 			fCurrentLayer->ConvertToScreenForDrawing(&rect);
-			drawingEngine->FillRect(rect, fCurrentLayer->CurrentState());
+			drawingEngine->FillRect(rect);
 			break;
 		}
 		case AS_LAYER_DRAW_BITMAP:
@@ -2114,7 +2116,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			if (bitmap) {
 				fCurrentLayer->ConvertToScreenForDrawing(&dstRect);
 
-				drawingEngine->DrawBitmap(bitmap, srcRect, dstRect, fCurrentLayer->CurrentState());
+				drawingEngine->DrawBitmap(bitmap, srcRect, dstRect);
 			}
 
 			break;
@@ -2132,8 +2134,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			link.Read<float>(&span);
 
 			fCurrentLayer->ConvertToScreenForDrawing(&r);
-			drawingEngine->DrawArc(r, angle, span, fCurrentLayer->CurrentState(),
-								   code == AS_FILL_ARC);
+			drawingEngine->DrawArc(r, angle, span, code == AS_FILL_ARC);
 			break;
 		}
 		case AS_STROKE_BEZIER:
@@ -2147,8 +2148,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 				fCurrentLayer->ConvertToScreenForDrawing(&pts[i]);
 			}
 
-			drawingEngine->DrawBezier(pts, fCurrentLayer->CurrentState(),
-									  code == AS_FILL_BEZIER);
+			drawingEngine->DrawBezier(pts, code == AS_FILL_BEZIER);
 			break;
 		}
 		case AS_STROKE_ELLIPSE:
@@ -2160,7 +2160,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			link.Read<BRect>(&rect);
 
 			fCurrentLayer->ConvertToScreenForDrawing(&rect);
-			drawingEngine->DrawEllipse(rect, fCurrentLayer->CurrentState(), code == AS_FILL_ELLIPSE);
+			drawingEngine->DrawEllipse(rect, code == AS_FILL_ELLIPSE);
 			break;
 		}
 		case AS_STROKE_ROUNDRECT:
@@ -2175,7 +2175,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			link.Read<float>(&yrad);
 
 			fCurrentLayer->ConvertToScreenForDrawing(&rect);
-			drawingEngine->DrawRoundRect(rect, xrad, yrad, fCurrentLayer->CurrentState(), code == AS_FILL_ROUNDRECT);
+			drawingEngine->DrawRoundRect(rect, xrad, yrad, code == AS_FILL_ROUNDRECT);
 			break;
 		}
 		case AS_STROKE_TRIANGLE:
@@ -2194,7 +2194,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			link.Read<BRect>(&rect);
 
 			fCurrentLayer->ConvertToScreenForDrawing(&rect);
-			drawingEngine->DrawTriangle(pts, rect, fCurrentLayer->CurrentState(), code == AS_FILL_TRIANGLE);
+			drawingEngine->DrawTriangle(pts, rect, code == AS_FILL_TRIANGLE);
 			break;
 		}
 		case AS_STROKE_POLYGON:
@@ -2218,8 +2218,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 				fCurrentLayer->ConvertToScreenForDrawing(&polyFrame);
 
 				drawingEngine->DrawPolygon(pointList, pointCount, polyFrame,
-					fCurrentLayer->CurrentState(), code == AS_FILL_POLYGON,
-					isClosed && pointCount > 2);
+					code == AS_FILL_POLYGON, isClosed && pointCount > 2);
 			}
 			delete[] pointList;
 			break;
@@ -2246,7 +2245,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 					fCurrentLayer->ConvertToScreenForDrawing(&ptList[i]);
 
 				drawingEngine->DrawShape(shapeFrame, opCount, opList, ptCount, ptList,
-					fCurrentLayer->CurrentState(), code == AS_FILL_SHAPE);
+					code == AS_FILL_SHAPE);
 			}
 
 			delete[] opList;
@@ -2262,7 +2261,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 				break;
 
 			fCurrentLayer->ConvertToScreenForDrawing(&region);
-			drawingEngine->FillRegion(region, fCurrentLayer->CurrentState());
+			drawingEngine->FillRegion(region);
 
 			break;
 		}
@@ -2292,8 +2291,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 					fCurrentLayer->ConvertToScreenForDrawing(&index->pt1);
 					fCurrentLayer->ConvertToScreenForDrawing(&index->pt2);
 				}
-				drawingEngine->StrokeLineArray(lineCount, lineData,
-					fCurrentLayer->CurrentState());
+				drawingEngine->StrokeLineArray(lineCount, lineData);
 			}
 			break;
 		}
@@ -2311,11 +2309,12 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			link.ReadString(&string);
 
 			fCurrentLayer->ConvertToScreenForDrawing(&location);
-			BPoint penLocation = drawingEngine->DrawString(string, length, location,
-				fCurrentLayer->CurrentState(), &delta);
+			BPoint penLocation = drawingEngine->DrawString(string, length,
+				location, &delta);
 
 			fCurrentLayer->ConvertFromScreenForDrawing(&penLocation);
 			fCurrentLayer->CurrentState()->SetPenLocation(penLocation);
+			// pen location has changed, update DrawingEngine
 			// TODO: optimize with flags
 			_UpdateDrawState(fCurrentLayer);
 
