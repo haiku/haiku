@@ -292,10 +292,12 @@ Painter::StrokeLine(BPoint a, BPoint b)
 		&& (fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)) {
 
 		pattern pat = *fPatternHandler.GetR5Pattern();
-		if (pat == B_SOLID_HIGH &&
-			StraightLine(a, b, fPatternHandler.HighColor().GetColor32())) {
-		} else if (pat == B_SOLID_LOW &&
-			StraightLine(a, b, fPatternHandler.LowColor().GetColor32())) {
+		if (pat == B_SOLID_HIGH
+			&& StraightLine(a, b, fPatternHandler.HighColor().GetColor32())) {
+			return;
+		} else if (pat == B_SOLID_LOW
+			&& StraightLine(a, b, fPatternHandler.LowColor().GetColor32())) {
+			return;
 		}
 	}
 	
