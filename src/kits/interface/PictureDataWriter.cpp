@@ -6,14 +6,15 @@
  *		Stefano Ceccherini (burton666@libero.it)
  */
 
+#include <PictureDataWriter.h>
+
+#include <stdio.h>
+
 #include <DataIO.h>
 #include <Point.h>
 #include <Rect.h>
 
-#include <PictureDataWriter.h>
 #include <PictureProtocol.h>
-
-#include <stdio.h>
 
 #define THROW_ERROR(error) throw (status_t)(error)
 
