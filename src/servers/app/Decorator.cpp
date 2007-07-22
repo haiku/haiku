@@ -496,25 +496,6 @@ Decorator::UIColor(color_which which)
 	\param width Maximum number of pixels the title can be
 	\return the number of characters that will fit in the given width
 */
-int32
-Decorator::_ClipTitle(float width)
-{
-	// TODO: eventually, use ServerFont::TruncateString()
-	// when it exists (if it doesn't already)
-	if (fDrawingEngine) {
-		int32 strlength = fTitle.CountChars();
-		float pixwidth=fDrawingEngine->StringWidth(fTitle.String(),strlength,&fDrawState);
-
-		while (strlength >= 0) {
-			if (pixwidth < width)
-				return strlength;
-
-			strlength--;
-			pixwidth=fDrawingEngine->StringWidth(fTitle.String(), strlength, &fDrawState);
-		}
-	}
-	return 0;
-}
 
 //! Function for calculating layout for the decorator
 void

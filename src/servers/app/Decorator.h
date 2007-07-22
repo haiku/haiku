@@ -119,12 +119,6 @@ class Decorator {
 			RGBColor			UIColor(color_which which);
 
  protected:
-			int32				_ClipTitle(float width);
-
-	/*!
-		\brief Returns the number of characters in the title
-		\return The title character count
-	*/
 			int32				_TitleWidth() const
 									{ return fTitle.CountChars(); }
 
