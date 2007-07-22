@@ -475,9 +475,14 @@ BRegion::_SetSize(long newSize)
 			fData = (clipping_rect*)realloc(fData, newSize * sizeof(clipping_rect));
 		else
 			fData = (clipping_rect*)malloc(newSize * sizeof(clipping_rect));
+	} else {
+		// just an empty region, but no error
+		MakeEmpty();
+		return true;
 	}
 	
-	if (!fData || newSize <= 0) {
+	if (!fData) {
+		// allocation actually failed
 		fDataSize = 0;
 		MakeEmpty();
 		return false;
