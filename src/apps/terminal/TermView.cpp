@@ -61,7 +61,7 @@ const static rgb_color kTermColorTable[16] = {
 };
 
 
-TermView::TermView(BRect frame)
+TermView::TermView(BRect frame, const char *command)
 	: BView(frame, "termview", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS),
 	fShell(NULL),
 	fFontWidth(0),
@@ -107,13 +107,28 @@ TermView::TermView(BRect frame)
 	SetTermFont(be_plain_font, be_plain_font);	
 	//SetIMAware(PrefHandler::Default()->getInt32(PREF_IM_AWARE));
 
+	// Get encoding name (setenv TTYPE in spawn_shell functions)
+	const char *encoding = longname2shortname(PrefHandler::Default()->getString(PREF_TEXT_ENCODING));
+	fShell = new Shell();	
+	status_t status = fShell->Open(fTermRows, fTermColumns, command, encoding);	
+	if (status < B_OK)
+		throw status;
+
+	status = AttachShell(fShell);
+	if (status < B_OK)
+		throw status;
+
 	_InitMouseThread();
 }
 
 
 TermView::~TermView()
 {
+	DetachShell();
+	
 	delete fTextBuffer;
+	delete fShell;
+
 	fQuitting = true;
 	kill_thread(fMouseThread);
 }
@@ -137,6 +152,16 @@ TermView::DetachShell()
 {
 	fShell->ViewDetached();
 	fShell = NULL;
+}
+
+
+const char *
+TermView::TerminalName() const
+{
+	if (fShell == NULL)
+		return NULL;
+
+	return fShell->TTYName();
 }
 
 
@@ -1030,7 +1055,7 @@ TermView::UpdateSIGWINCH()
 
 		fShell->UpdateWindowSize(fTermRows, fTermColumns);
 
-		fFrameResized = 0;
+		fFrameResized = false;
 		if (fScrRegionSet == 0)
 			fScrBot = fTermRows - 1;
 	}
@@ -1381,7 +1406,7 @@ TermView::FrameResized(float width, float height)
 	fTermRows = rows;
 	fTermColumns = cols;
 
-	fFrameResized = 1;
+	fFrameResized = true;
 }
 
 

@@ -89,19 +89,21 @@ const unsigned char M_ADD_CURSOR [] = {
 	0x00, 0x10,
 };
 
-class TermBuffer;
+
 class BPopUpMenu;
 class BScrollBar;
 class BString;
 class Shell;
-
+class TermBuffer;
 class TermView : public BView {
 	public:
-		TermView(BRect frame);
+		TermView(BRect frame, const char *command);
 		~TermView();
 
 		status_t AttachShell(Shell *shell);
 		void	DetachShell();
+
+		const char *TerminalName() const;
 
 		void	SetTermFont(const BFont *halfFont, const BFont *fullFont);
 		void	GetFontSize(int *width, int *height);

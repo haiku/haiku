@@ -38,14 +38,11 @@ extern char gUTF8WidthTable[]; // defined in UTF8WidthTbl.c
 int32
 CodeConv::UTF8GetFontWidth(const char *string)
 {
-	uchar width, point;
-	ushort unicode, offset;
+	ushort unicode = UTF8toUnicode(string);
+	uchar width = gUTF8WidthTable[unicode >> 3];
+	ushort offset = unicode & 0x07;
 
-	offset = unicode = UTF8toUnicode(string);
-	width = gUTF8WidthTable[unicode >> 3];
-	offset = offset & 0x07;
-
-	point = 0x80 >> offset;
+	uchar point = 0x80 >> offset;
 
 	return (width & point) > 0 ? 2 : 1;
 }
@@ -72,6 +69,9 @@ CodeConv::ConvertFromInternal(const char *src, int32 srclen, char *dst, int codi
 	convert_from_utf8(theCoding, (char *)src, &srclen,
 		(char *)dst, &dstlen, &state, '?');
 
+	// TODO: Apart from this particular case, looks like we could use the
+	// system api for code conversion... check if this (which looks a lot like a workaround)
+	// applies to haiku, and if not, get rid of this class and just use the system api directly.
 	if (coding == M_ISO_2022_JP && state != 0) {
 		const char *end_of_jis = "(B";
 		strncpy((char *)dst + dstlen, end_of_jis, 3);

@@ -39,8 +39,6 @@ class BMenuBar;
 class BMessageRunner;
 class FindWindow;
 class PrefWindow;
-class Shell;
-class TermParse;
 class TermView;
 
 class TermWindow : public BWindow {
@@ -62,13 +60,11 @@ protected:
 					const char *property);
 
 private:
-	void		InitWindow();
-	void		SetupMenu();
-	status_t	DoPageSetup();
-	void		DoPrint();
+	void		_InitWindow(const char *command);
+	void		_SetupMenu();
+	status_t	_DoPageSetup();
+	void		_DoPrint();
 
-	Shell		*fShell;
-	TermParse	*fTermParse;
 	BMenuBar	*fMenubar;
 	BMenu		*fFilemenu,
 			*fEditmenu,

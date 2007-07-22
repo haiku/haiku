@@ -39,7 +39,6 @@
 #include "TermView.h"
 #include "TermWindow.h"
 #include "TermConst.h"
-#include "Shell.h"
 
 
 //
@@ -53,7 +52,6 @@
 
 TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	: BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE|B_QUIT_ON_WINDOW_CLOSE),
-	fShell(NULL),
 	fMenubar(NULL),
 	fFilemenu(NULL),
 	fEditmenu(NULL),
@@ -67,7 +65,7 @@ TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	fPrefWindow(NULL),
 	fFindPanel(NULL),
 	fWindowUpdate(NULL),
-	fSavedFrame(0, 0, 0, 0),
+	fSavedFrame(0, 0, -1, -1),
 	fFindString(""),
 	fFindForwardMenuItem(NULL),
 	fFindBackwardMenuItem(NULL),
@@ -76,34 +74,12 @@ TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	fMatchCase(false),
 	fMatchWord(false)
 {
-	int rows = PrefHandler::Default()->getInt32(PREF_ROWS);
-	if (rows < 1) {
-		rows = 1;
-		PrefHandler::Default()->setInt32(PREF_ROWS, rows);
-	}
-
-	int cols = PrefHandler::Default()->getInt32(PREF_COLS);
-	if (cols < MIN_COLS) {
-		cols = MIN_COLS;
-		PrefHandler::Default()->setInt32(PREF_COLS, cols);
-	}
-
-	// Get encoding name (setenv TTYPE in spawn_shell functions)
-	const char *encoding = longname2shortname(PrefHandler::Default()->getString(PREF_TEXT_ENCODING));
-	fShell = new Shell();	
-	status_t status = fShell->Open(rows, cols, command, encoding);	
-	if (status < 0)
-		throw status;
-
-	InitWindow();
+	_InitWindow(command);
 }
 
 
 TermWindow::~TermWindow()
 {
-	fTermView->DetachShell();
-
-	delete fShell;
 	if (fPrefWindow) 
 		fPrefWindow->PostMessage(B_QUIT_REQUESTED);
 
@@ -123,10 +99,10 @@ TermWindow::~TermWindow()
 
 /** Initialize Window object. */
 void
-TermWindow::InitWindow()
+TermWindow::_InitWindow(const char *command)
 {
 	// make menu bar
-	SetupMenu();
+	_SetupMenu();
 
 	// Setup font.
 
@@ -155,9 +131,7 @@ TermWindow::InitWindow()
 	BRect textframe = Bounds();
 	textframe.top = fMenubar->Bounds().bottom + 1.0;
 
-	fTermView = new TermView(textframe);
-
-	fTermView->AttachShell(fShell);
+	fTermView = new TermView(textframe, command);
 
 	// Initialize TermView. (font, size and color)
 	fTermView->SetTermFont(&halfFont, &fullFont);
@@ -216,7 +190,7 @@ TermWindow::MenusBeginning()
 
 
 void
-TermWindow::SetupMenu()
+TermWindow::_SetupMenu()
 {
 	PrefHandler menuText;
 	
@@ -437,7 +411,7 @@ TermWindow::MessageReceived(BMessage *message)
 			}
 			else if (!strcmp("tty", spe.FindString("property", i))) {
 				BMessage reply(B_REPLY);
-				reply.AddString("result", fShell->TTYName());
+				reply.AddString("result", fTermView->TerminalName());
 				message->SendReply(&reply);
 			} else {
 				BWindow::MessageReceived(message);
@@ -486,7 +460,7 @@ TermWindow::MessageReceived(BMessage *message)
 			r.Height()+fMenubar->Bounds().Height() + VIEW_OFFSET * 2);
 			
 			fTermView->Invalidate();
-		    break;
+			break;
 		}
 		case EIGHTYTWENTYFOUR: {
 			PrefHandler::Default()->setString(PREF_COLS, "80");
@@ -530,7 +504,6 @@ TermWindow::MessageReceived(BMessage *message)
 				BScreen screen(this);
 				fTermView->ScrollBar()->Hide();
 				fMenubar->Hide();
-				//fTermView->MoveTo(0,0);
 				fTermView->ResizeBy(B_V_SCROLL_BAR_WIDTH, mbHeight);
 				fSavedLook = Look();
 				// done before ResizeTo to work around a Dano bug (not erasing the decor)
@@ -544,7 +517,6 @@ TermWindow::MessageReceived(BMessage *message)
 				ResizeTo(fSavedFrame.Width(), fSavedFrame.Height());
 				MoveTo(fSavedFrame.left, fSavedFrame.top);
 				fTermView->ResizeBy(-B_V_SCROLL_BAR_WIDTH, -mbHeight);
-				//fTermView->MoveTo(0,mbHeight);
 				SetLook(fSavedLook);
 				fSavedFrame = BRect(0,0,-1,-1);
 			}
@@ -552,7 +524,7 @@ TermWindow::MessageReceived(BMessage *message)
 		}
 		case MSG_FONT_CHANGED: {
 	    		PrefHandler::Default()->setString (PREF_HALF_FONT_FAMILY, fNewFontMenu->FindMarked()->Label());
-	    		PostMessage (MSG_HALF_FONT_CHANGED);
+	    		PostMessage(MSG_HALF_FONT_CHANGED);
 			break;
 		}
 		case MSG_COLOR_CHANGED: {
@@ -567,15 +539,15 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 		}
 		case MENU_PAGE_SETUP: {
-			DoPageSetup ();
+			_DoPageSetup();
 			break;
 		}
 		case MENU_PRINT: {
-			DoPrint ();
+			_DoPrint();
 			break;
 		}
 		case MSGRUN_WINDOW: {
-			fTermView->UpdateSIGWINCH ();
+			fTermView->UpdateSIGWINCH();
 			break;
 		}
 		case B_ABOUT_REQUESTED: {
@@ -668,7 +640,7 @@ TermWindow::ResolveSpecifier(BMessage *msg, int32 index,
 
 
 status_t
-TermWindow::DoPageSetup() 
+TermWindow::_DoPageSetup() 
 { 
 	BPrintJob job("PageSetup");
 
@@ -683,9 +655,9 @@ TermWindow::DoPageSetup()
   
 
 void
-TermWindow::DoPrint()
+TermWindow::_DoPrint()
 {
-	if (!fPrintSettings || (DoPageSetup() != B_NO_ERROR)) {
+	if (!fPrintSettings || (_DoPageSetup() != B_OK)) {
 		(new BAlert("Cancel", "Print cancelled.", "OK"))->Go();
 		return;
 	}
