@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,6 +42,24 @@ ClientMemoryAllocator::ClientMemoryAllocator(ServerApp* application)
 
 ClientMemoryAllocator::~ClientMemoryAllocator()
 {
+	// delete all areas and chunks/blocks that are still allocated
+
+	while (true) {
+		struct block* block = fFreeBlocks.RemoveHead();
+		if (block == NULL)
+			break;
+
+		free(block);
+	}
+
+	while (true) {
+		struct chunk* chunk = fChunks.RemoveHead();
+		if (chunk == NULL)
+			break;
+
+		delete_area(chunk->area);
+		free(chunk);
+	}
 }
 
 
