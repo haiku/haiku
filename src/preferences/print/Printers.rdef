@@ -15,7 +15,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Printers",
-	long_info = "Printers ©2001-2006 Haiku"
+	long_info = "Printers ©2001-2007 Haiku"
 };
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
