@@ -1,6 +1,14 @@
 #ifndef HAIKU_BUILD_COMPATIBILITY_H
 #define HAIKU_BUILD_COMPATIBILITY_H
 
+/*!
+	This header is automatically included in all Haiku applications
+	that are built for BeOS.
+	It will make BeOS a bit more Haiku compatible, and slightly more
+	POSIX compatible, too. It is supposed to keep the BeOS compatibility
+	kludges in our source files at a minimum.
+*/
+
 #include <sys/types.h>
 #include <SupportDefs.h>
 
@@ -15,6 +23,8 @@
 // no addr_t under standard BeOS
 typedef unsigned long haiku_build_addr_t;
 #define addr_t haiku_build_addr_t
+
+typedef int socklen_t;
 
 #ifndef DEFFILEMODE
 #	define	DEFFILEMODE	(S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)
