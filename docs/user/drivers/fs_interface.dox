@@ -5,7 +5,7 @@
  * Authors:
  *		Ingo Weinhold
  *		Niels Sascha Reedijk <niels.reedijk@gmail.com>
- *		Axel Dörfler, axeld@pinc-software.de
+ *		Axel Dörfler <axeld@pinc-software.de>
  *
  * Corresponds to:
  *		/trunk/headers/os/drivers/fs_interface.h rev 21568
@@ -98,7 +98,7 @@
 
 	The module name that exports the interface to your file system has to
 	end with this constant as in:
-	\code "file_systems/myfs" B_CURRENT_FS_API_VERSION
+	\code "file_systems/myfs" B_CURRENT_FS_API_VERSION \endcode
 */
 
 ///// file_system_module_info /////
