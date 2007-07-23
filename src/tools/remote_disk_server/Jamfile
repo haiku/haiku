@@ -4,5 +4,5 @@ UsePrivateHeaders kernel ;
 
 BuildPlatformMain remote_disk_server
 	: remote_disk_server.cpp
-	: $(HOST_LIBSUPC++)
+	: $(HOST_LIBSUPC++) $(NETWORK_LIBS)
 ;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
+ * Copyright 2005-2007, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -8,7 +8,6 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <string.h>
 #include <unistd.h>
 #include <netinet/in.h>
@@ -16,6 +15,13 @@
 #include <sys/stat.h>
 
 #include <boot/net/RemoteDiskDefs.h>
+
+#if defined(__BEOS__) && !defined(__HAIKU__)
+#	include <limits.h>
+typedef int socklen_t;
+#else
+#	include <stdint.h>
+#endif
 
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
