@@ -481,7 +481,7 @@ vm_cache_remove_consumer(vm_cache *cache, vm_cache *consumer)
 				|| cache->consumers.link.next != cache->consumers.link.prev
 				|| consumer != list_get_first_item(&cache->consumers)) {
 				dprintf("vm_cache_remove_consumer(): cache %p was modified; "
-					"not merging it\n");
+					"not merging it\n", cache);
 				merge = false;
 				cache->busy = false;
 				mutex_unlock(&consumer->lock);
