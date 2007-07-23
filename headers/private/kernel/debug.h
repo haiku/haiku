@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de
  * Distributed under the terms of the Haiku License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -11,7 +11,7 @@
 
 #include <OS.h>
 
-//#define DEBUG 1
+#define KDEBUG 1
 
 #if DEBUG
 /* 
