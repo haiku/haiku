@@ -215,9 +215,36 @@ PrinterItem::PrinterItem(PrintersWindow* window, const BDirectory& node)
 	}
 
 	if (sSelectedIcon == NULL) {
-		sSelectedIcon = new BBitmap(BRect(0,0,B_LARGE_ICON-1,B_LARGE_ICON-1), B_CMAP8);
-		BMimeType type(PRNT_SIGNATURE_TYPE);
-		type.GetIcon(sSelectedIcon, B_LARGE_ICON);
+		BBitmap *checkMark = LoadBitmap("check_mark_icon", 'BBMP');
+		if (checkMark == NULL) {
+			BAlert *alert = new BAlert("Error", 
+				"Fatal error: Check mark icon could not be loaded from resources!", 
+				"Bye");
+			alert->Go();
+			exit(1);
+		}
+
+		// draw check mark at bottom left over printer icon
+		sSelectedIcon = new BBitmap(sIcon->Bounds(), B_RGBA32, true);
+		if (!sSelectedIcon->IsValid()) {
+			BAlert *alert = new BAlert("Error", 
+				"Fatal error: Bitmap could not be created for selected printer icon!", 
+				"Bye");
+			alert->Go();
+			exit(1);
+		}
+		BView *view = new BView(sIcon->Bounds(), "offscreen", B_FOLLOW_ALL, B_WILL_DRAW);
+		float y = sIcon->Bounds().Height() - checkMark->Bounds().Height();
+		sSelectedIcon->Lock();
+		sSelectedIcon->AddChild(view);
+		view->DrawBitmap(sIcon);
+		view->SetDrawingMode(B_OP_ALPHA);
+		view->DrawBitmap(checkMark, BPoint(0, y));
+		view->Sync();
+		view->RemoveSelf();
+		sSelectedIcon->Unlock();
+		delete view;
+		delete checkMark;
 	}
 
 	// Get Name of printer
