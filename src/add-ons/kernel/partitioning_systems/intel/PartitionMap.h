@@ -8,6 +8,7 @@
 
 /*!
 	\file PartitionMap.h
+	\ingroup intel_module
 	\brief Definitions for "intel" style partitions and interface definitions
 		   for related classes.
 */
@@ -45,12 +46,22 @@ is_extended_type(uint8 type)
 	return (type == 0x05 || type == 0x0f || type == 0x85);
 }
 
+// fill_buffer
+static inline
+void
+fill_buffer(char *buffer, uint32 length, char ch)
+{
+	for (uint32 i = 0; i < length; i++)
+		buffer[i] = ch;
+}
+
 void get_partition_type_string(uint8 type, char *buffer);
 
 // chs
 struct chs {
 	uint8	cylinder;
 	uint16	head_sector;	// head[15:10], sector[9:0]
+	void Unset() { cylinder = 0; head_sector = 0; }
 } _PACKED;
 
 // partition_descriptor
@@ -71,6 +82,7 @@ struct partition_table_sector {
 	char					pad1[446];
 	partition_descriptor	table[4];
 	uint16					signature;
+	void clear_code_area()		{ fill_buffer(pad1, 446, '\0'); }
 } _PACKED;
 
 static const uint16 kPartitionTableSectorSignature = 0xaa55;
@@ -78,6 +90,68 @@ static const uint16 kPartitionTableSectorSignature = 0xaa55;
 class Partition;
 class PrimaryPartition;
 class LogicalPartition;
+
+// PartitionType
+/*!
+  \brief Class for validating partition types.
+
+  To this class we can set partition type and then we can check whether
+  this type is valid, empty or if it represents extended partition.
+  We can also retrieve the name of that partition type or find next
+  supported type.
+*/
+class PartitionType {
+public:
+	PartitionType();
+
+	/*!
+	  \brief Sets the \a type via its ID.
+	  \param type ID of the partition type, it is in the range [0..255].
+	*/
+	void SetType(uint8 type);
+	/*!
+	  \brief Sets the type via its string name.
+	  \param type_name Name of the partition type.
+	*/
+	void SetType(const char *type_name);
+	/*!
+	  \brief Converts content type to the partition type that fits best.
+	  \param content_type Name of the content type, it is standardized by system.
+	*/
+	void SetContentType(const char *content_type);
+
+	/*!
+	  \brief Check whether the current type is valid.
+	*/
+	bool IsValid() const	{ return valid_; }
+	/*!
+	  \brief Check whether the current type describes empty type.
+	*/
+	bool IsEmpty() const	{ return is_empty_type(type_); }
+	/*!
+	  \brief Check whether the current type describes extended partition type.
+	*/
+	bool IsExtended() const	{ return is_extended_type(type_); }
+
+	/*!
+	  \brief Returns ID of the current type.
+	*/
+	uint8 Type() const		{ return type_; }
+	/*!
+	  \brief Finds next supported partition.
+	 */
+	void FindNext();
+	/*!
+	  \brief Returns string name of the current type.
+	  \param buffer Buffer where the name is stored, has to be allocated with
+	    sufficient length.
+	*/
+	void GetTypeString(char *buffer) const
+		{ get_partition_type_string(type_, buffer); }
+private:
+	uint8	type_;
+	bool	valid_;
+};
 
 // Partition
 class Partition {
@@ -100,6 +174,8 @@ public:
 	bool Active() const		{ return fActive; }
 	void GetTypeString(char *buffer) const
 		{ get_partition_type_string(fType, buffer); }
+	void GetPartitionDescriptor(partition_descriptor *descriptor,
+								off_t baseOffset, int32 blockSize) const;
 
 	void SetPTSOffset(off_t offset)	{ fPTSOffset = offset; }
 	void SetOffset(off_t offset)	{ fOffset = offset; }
@@ -135,6 +211,7 @@ public:
 	int32 CountLogicalPartitions() const { return fLogicalPartitionCount; }
 	LogicalPartition *LogicalPartitionAt(int32 index) const;
 	void AddLogicalPartition(LogicalPartition *partition);
+	void RemoveLogicalPartition(LogicalPartition *partition);
 
 private:
 	LogicalPartition	*fHead;
@@ -159,9 +236,13 @@ public:
 	void SetNext(LogicalPartition *next) { fNext = next; }
 	LogicalPartition *Next() const { return fNext; }
 
+	void SetPrevious(LogicalPartition *previous) { fPrevious = previous; }
+	LogicalPartition *Previous() const { return fPrevious; }
+
 private:
 	PrimaryPartition	*fPrimary;
 	LogicalPartition	*fNext;
+	LogicalPartition	*fPrevious;
 };
 
 // PartitionMap

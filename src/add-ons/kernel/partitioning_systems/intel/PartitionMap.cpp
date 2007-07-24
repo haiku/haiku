@@ -79,8 +79,24 @@ static const struct partition_type kPartitionTypes[] = {
 	{ 0xa8, "MacOS X" },
 	{ 0xa9, "NetBSD" },
 	{ 0xab, "MacOS X boot" },
+	{ 0xaf, "MacOS X HFS" },
 	{ 0xbe, "Solaris 8 boot" },
 	{ 0xeb, /*"BeOS"*/ BFS_NAME },
+	{ 0, NULL }
+};
+
+static const struct partition_type kPartitionContentTypes[] = {
+#ifndef _USER_MODE
+	{ 0x01, kPartitionTypeFAT12 },
+	{ 0x0c, kPartitionTypeFAT32 },
+	{ 0x0f, kPartitionTypeIntelExtended },
+	{ 0x83, kPartitionTypeEXT2 },
+	{ 0x83, kPartitionTypeEXT3 },
+	{ 0x83, kPartitionTypeReiser },
+	{ 0xaf, kPartitionTypeHFS },
+	{ 0xaf, kPartitionTypeHFSPlus },
+	{ 0xeb, kPartitionTypeBFS },
+#endif
 	{ 0, NULL }
 };
 
@@ -109,6 +125,7 @@ get_partition_type_string(uint8 type, char *buffer)
 			sprintf(buffer, "Unrecognized Type 0x%x", type);
 	}
 }
+
 
 
 static int
@@ -161,6 +178,67 @@ is_inside_partitions(off_t location, const Partition **partitions, int32 count)
 }
 
 
+//	#pragma mark - PartitionType
+
+
+// constructor
+PartitionType::PartitionType()
+	: type_(0),
+	  valid_(false)
+{
+}
+
+// SetType
+void
+PartitionType::SetType(uint8 type)
+{
+	type_ = type;
+	valid_ = partition_type_string(type);
+}
+
+// SetType
+void
+PartitionType::SetType(const char *type_name)
+{
+	for (int32 i = 0; kPartitionTypes[i].name ; i++) {
+		if (!strcmp(type_name, kPartitionTypes[i].name)) {
+			type_ = kPartitionTypes[i].type;
+			valid_ = true;
+			return;
+		}
+	}
+	valid_ = false;
+}
+
+// SetContentType
+void
+PartitionType::SetContentType(const char *content_type)
+{
+	for (int32 i = 0; kPartitionContentTypes[i].name ; i++) {
+		if (!strcmp(content_type, kPartitionContentTypes[i].name)) {
+			type_ = kPartitionContentTypes[i].type;
+			valid_ = true;
+			return;
+		}
+	}
+	valid_ = false;
+}
+
+// FindNext
+void
+PartitionType::FindNext()
+{
+	for (int32 i = 0; kPartitionTypes[i].name; i++) {
+		if (type_ < kPartitionTypes[i].type) {
+			type_ = kPartitionTypes[i].type;
+			valid_ = true;
+			return;
+		}
+	}
+	valid_ = false;
+}
+
+
 //	#pragma mark - Partition
 
 
@@ -210,6 +288,19 @@ Partition::Unset()
 	fSize = 0;
 	fType = 0;
 	fActive = false;
+}
+
+// GetPartitionDescriptor
+void
+Partition::GetPartitionDescriptor(partition_descriptor *descriptor,
+								  off_t baseOffset, int32 blockSize) const
+{
+	descriptor->start = (fOffset - baseOffset) / blockSize;
+	descriptor->size = fSize / blockSize;
+	descriptor->type = fType;
+	descriptor->active = fActive ? 0x80 : 0x00;
+	descriptor->begin.Unset();
+	descriptor->end.Unset();
 }
 
 
@@ -303,6 +394,7 @@ PrimaryPartition::AddLogicalPartition(LogicalPartition *partition)
 {
 	if (partition) {
 		partition->SetPrimaryPartition(this);
+		partition->SetPrevious(fTail);
 		if (fTail) {
 			fTail->SetNext(partition);
 			fTail = partition;
@@ -313,6 +405,30 @@ PrimaryPartition::AddLogicalPartition(LogicalPartition *partition)
 	}
 }
 
+// RemoveLogicalPartition
+void
+PrimaryPartition::RemoveLogicalPartition(LogicalPartition *partition)
+{
+	if (!partition || partition->GetPrimaryPartition() != this)
+		return;
+	LogicalPartition *prev = partition->Previous();
+	LogicalPartition *next = partition->Next();
+
+	if (prev)
+		prev->SetNext(next);
+	else
+		fHead = next;
+	if (next)
+		next->SetPrevious(prev);
+	else
+		fTail = prev;
+	fLogicalPartitionCount--;
+
+	partition->SetNext(NULL);
+	partition->SetPrevious(NULL);
+	partition->SetPrimaryPartition(NULL);
+}
+
 
 //	#pragma mark - LogicalPartition
 
@@ -321,7 +437,8 @@ PrimaryPartition::AddLogicalPartition(LogicalPartition *partition)
 LogicalPartition::LogicalPartition()
 	: Partition(),
 	  fPrimary(NULL),
-	  fNext(NULL)
+	  fNext(NULL),
+	  fPrevious(NULL)
 {
 }
 
@@ -331,7 +448,8 @@ LogicalPartition::LogicalPartition(const partition_descriptor *descriptor,
 								   PrimaryPartition *primary)
 	: Partition(),
 	  fPrimary(NULL),
-	  fNext(NULL)
+	  fNext(NULL),
+	  fPrevious(NULL)
 {
 	SetTo(descriptor, ptsOffset, blockSize, primary);
 }
@@ -357,6 +475,7 @@ LogicalPartition::Unset()
 {
 	fPrimary = NULL;
 	fNext = NULL;
+	fPrevious = NULL;
 	Partition::Unset();
 }
 

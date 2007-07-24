@@ -5,6 +5,15 @@
  * Authors:
  *		Ingo Weinhold, bonefish@cs.tu-berlin.de
  */
+
+/*!
+	\file PartitionMapParser.h
+	\brief Implementation of disk parser for "intel" style partitions.
+
+	Parser reads primary and logical partitions from the disk (according to
+	Master Boot and Extended Boot Records) and fills \c PartitionMap structure
+	with partition representation.
+*/
 #ifndef PARTITION_MAP_PARSER_H
 #define PARTITION_MAP_PARSER_H
 
