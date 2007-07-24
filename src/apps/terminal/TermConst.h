@@ -40,6 +40,9 @@
 
 // Message constants for menu items
 
+#include <SupportDefs.h>
+
+
 // Menu Message
 const uint32 MENU_SWITCH_TERM   = 'MSWT';
 const uint32 MENU_NEW_TERM      = 'MNTE';
@@ -59,7 +62,6 @@ const uint32 MENU_SHOW_COLOR	= 'Mcol';
 const uint32 M_GET_DEVICE_NUM	= 'Mgdn';
 
 // Message Runner
-const uint32 MSGRUN_CURSOR	= 'Rcur';
 const uint32 MSGRUN_WINDOW	= 'Rwin';
 
 // Preference Message
@@ -144,14 +146,6 @@ enum{
 #define MODE_OVER 0
 #define MODE_INSERT 1
 
-const float VIEW_OFFSET = 3;
-
-#define CURSOR_RECT \
-	BRect r (fFontWidth * fCurPos.x, \
-		 fFontHeight * fCurPos.y + fTop, \
-		 fFontWidth * (fCurPos.x + 1) - 1, \
-		 fFontHeight * fCurPos.y + fTop + fCursorHeight - 1)
-
 // Define TermBuffer internal code
 #define NO_CHAR 0x00
 #define A_CHAR 0x01
@@ -185,9 +179,6 @@ const float VIEW_OFFSET = 3;
 
 #define FORECOLORED(x) ((x) << 3)
 #define BACKCOLORED(x) ((x) << 0)
-
-// TypeDefs
-typedef unsigned short ushort;
 
 
 #endif	// TERMCONST_H_INCLUDED

@@ -1,4 +1,5 @@
 /*
+ * Copyright 2007 Haiku
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
  *
@@ -28,35 +29,23 @@
  *
  */
 
-#include <Box.h>
-#include <Button.h>
-#include <RadioButton.h>
-#include <ColorControl.h>
-#include <StringView.h>
-#include <TextControl.h>
-#include <CheckBox.h>
-#include <MenuField.h>
-#include <Message.h>
-#include <String.h>
-#include <Window.h>
+#include "PrefView.h"
 
 #include "PrefHandler.h"
 #include "TermConst.h"
-#include "PrefView.h"
 #include "TTextControl.h"
 
-/************************************************************************
- *
- * PUBLIC MEMBER FUNCTIONS.
- *
- ***********************************************************************/
+#include <ColorControl.h>
+#include <Message.h>
+#include <String.h>
+
 
 ////////////////////////////////////////////////////////////////////////////
 // PrefView ()
 //	Constructor.
 ////////////////////////////////////////////////////////////////////////////
-PrefView::PrefView (BRect frame, const char *name)
-  :BView (frame, name, B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
+PrefView::PrefView(BRect frame, const char *name)
+	:BView(frame, name, B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fLabel.SetTo(name);
@@ -73,18 +62,18 @@ PrefView::~PrefView()
 
 
 const char *
-PrefView::ViewLabel (void) const
+PrefView::ViewLabel() const
 {
-  return fLabel.String();
+	return fLabel.String();
 }
 
 
 ////////////////////////////////////////////////////////////////////////////
 // CanApply()
-// Determines whether view can respont Apply command or not.
+// Determines whether view can reply to Apply command or not.
 ////////////////////////////////////////////////////////////////////////////
 bool
-PrefView::CanApply ()
+PrefView::CanApply()
 {
 	return true;
 }
@@ -115,10 +104,10 @@ PrefView::MessageReceived(BMessage* msg)
 // Make BColorControl.
 //////////////////////////////////////////////////////////////////////////////
 BColorControl *
-PrefView::SetupBColorControl(BPoint p, color_control_layout layout, float cell_size, ulong msg)
+PrefView::SetupBColorControl(BPoint point, color_control_layout layout, float cellSize, ulong message)
 {
-	BColorControl *col = new BColorControl( p, layout, cell_size, "", new BMessage(msg));
-	AddChild(col);
-	return col;
+	BColorControl *control = new BColorControl(point, layout, cellSize, "", new BMessage(message));
+	AddChild(control);
+	return control;
 }
 

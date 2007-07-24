@@ -50,6 +50,9 @@
 //#define CHLP_FILE   "file:///boot/beos/documentation/Shell%20Tools/index.html"
 
 
+const static float kViewOffset = 3;
+
+
 TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	: BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE|B_QUIT_ON_WINDOW_CLOSE),
 	fMenubar(NULL),
@@ -147,7 +150,7 @@ TermWindow::_InitWindow(const char *command)
 	fTermView->SetTermColor();
 	
 	// Add offset to baseview.
-	rect.InsetBy(-VIEW_OFFSET, -VIEW_OFFSET);
+	rect.InsetBy(-kViewOffset, -kViewOffset);
 
 	// Resize Window
 	ResizeTo(rect.Width()+ B_V_SCROLL_BAR_WIDTH,
@@ -425,8 +428,8 @@ TermWindow::MessageReceived(BMessage *message)
 			r = fTermView->SetTermSize (PrefHandler::Default()->getInt32 (PREF_ROWS),
 										PrefHandler::Default()->getInt32 (PREF_COLS), 0);
 		
-			ResizeTo (r.Width()+ B_V_SCROLL_BAR_WIDTH + VIEW_OFFSET * 2,
-			r.Height()+fMenubar->Bounds().Height() + VIEW_OFFSET *2);
+			ResizeTo (r.Width()+ B_V_SCROLL_BAR_WIDTH + kViewOffset * 2,
+			r.Height()+fMenubar->Bounds().Height() + kViewOffset *2);
 		
 			BPath path;
 			if (PrefHandler::GetDefaultPath(path) == B_OK)
@@ -456,8 +459,8 @@ TermWindow::MessageReceived(BMessage *message)
 			SetSizeLimits (MIN_COLS * width, MAX_COLS * width,
 							MIN_COLS * height, MAX_COLS * height);
 			
-			ResizeTo (r.Width()+ B_V_SCROLL_BAR_WIDTH + VIEW_OFFSET * 2,
-			r.Height()+fMenubar->Bounds().Height() + VIEW_OFFSET * 2);
+			ResizeTo (r.Width()+ B_V_SCROLL_BAR_WIDTH + kViewOffset * 2,
+			r.Height()+fMenubar->Bounds().Height() + kViewOffset * 2);
 			
 			fTermView->Invalidate();
 			break;

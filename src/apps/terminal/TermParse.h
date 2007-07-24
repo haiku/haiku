@@ -33,9 +33,9 @@
 
 #include "TermConst.h"
 
-#include <OS.h>
 #include <Handler.h>
-#include <MessageRunner.h>
+#include <OS.h>
+
 
 //PtyReader buffer size.
 #define READ_BUF_SIZE 2048
@@ -54,10 +54,6 @@ private:
 	status_t InitTermParse();
 	status_t InitPtyReader();
 
-	// Delete TermParse and PtyReader thread.
-	status_t AbortTermParse();
-	status_t AbortPtyReader();
-
 	int32 EscParse();
 	int32 PtyReader();
 
@@ -69,23 +65,19 @@ private:
   
 	int fFd;
 
-	TermView *fViewObj;
-  
 	thread_id fParseThread;
-	sem_id fParseSem;
-
 	thread_id fReaderThread;
 	sem_id fReaderSem;
 	sem_id fReaderLocker;
 
-	BMessageRunner *fCursorUpdate;
+	uint fBufferPosition;
+	uchar fReadBuffer[READ_BUF_SIZE];
+	
+	int fLockFlag;
 
-	uint fParser_p;	/* EscParse reading buffer pointer */
-	int fLockFlag;	/* PtyReader lock flag */
-
-	bool fQuitting;
+	TermView *fView;
   
-	uchar fReadBuf[READ_BUF_SIZE]; /* Reading buffer */
+	bool fQuitting;	
 };
 
 #endif // TERMPARSE_H

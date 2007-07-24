@@ -97,8 +97,8 @@ public:
 	ssize_t		Read(void *buffer, size_t numBytes);
 	ssize_t		Write(const void *buffer, size_t numBytes);
 
-	void		UpdateWindowSize(int row, int columns);
-	void		Signal(int signal);
+	status_t	UpdateWindowSize(int row, int columns);
+	status_t	Signal(int signal);
 
 	status_t	GetAttr(struct termios &attr);
 	status_t	SetAttr(struct termios &attr);
@@ -110,6 +110,7 @@ public:
 	
 private:
 	int		fFd;
+	pid_t		fProcessID;
 	TermParse	*fTermParse;
 	bool		fAttached;
 

@@ -12,17 +12,17 @@
 
 #include "TermView.h"
 
-#include "TermWindow.h"
-#include "TermApp.h"
-#include "TermParse.h"
-#include "TermBuffer.h"
 #include "CodeConv.h"
-#include "VTkeymap.h"
-#include "TermConst.h"
-#include "PrefHandler.h"
 #include "MenuUtil.h"
+#include "PrefHandler.h"
 #include "PrefView.h"
 #include "Shell.h"
+#include "TermApp.h"
+#include "TermBuffer.h"
+#include "TermConst.h"
+#include "TermParse.h"
+#include "TermWindow.h"
+#include "VTkeymap.h"
 
 #include <Autolock.h>
 #include <Beep.h>
@@ -61,8 +61,54 @@ const static rgb_color kTermColorTable[16] = {
 };
 
 
+const unsigned char M_ADD_CURSOR[] = {
+	16,	// Size
+	1,	// Color depth
+	0,	// Hot spot y
+	1,	// Hot spot x
+
+	// Cursor image
+	0x70, 0x00,
+	0x48, 0x00,
+	0x48, 0x00,
+	0x27, 0xc0,
+	0x24, 0xb8,
+	0x12, 0x54,
+	0x10, 0x02,
+	0x78, 0x02,
+	0x98, 0x02,
+	0x84, 0x02,
+	0x60, 0x02,
+	0x18, 0x12,
+	0x04, 0x10,
+	0x02, 0x7c,
+	0x00, 0x10,
+	0x00, 0x10,
+	// Mask image
+	0x70, 0x00,
+	0x78, 0x00,
+	0x78, 0x00,
+	0x3f, 0xc0,
+	0x3f, 0xf8,
+	0x1f, 0xfc,
+	0x1f, 0xfe,
+	0x7f, 0xfe,
+	0xff, 0xfe,
+	0xff, 0xfe,
+	0x7f, 0xfe,
+	0x1f, 0xfe,
+	0x07, 0xfc,
+	0x03, 0xfc,
+	0x00, 0x10,
+	0x00, 0x10,
+};
+
+
+
+#define MOUSE_THR_CODE 'mtcd'
+
 TermView::TermView(BRect frame, const char *command)
-	: BView(frame, "termview", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS),
+	: BView(frame, "termview", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS | B_PULSE_NEEDED),
 	fShell(NULL),
 	fFontWidth(0),
 	fFontHeight(0),
@@ -72,6 +118,7 @@ TermView::TermView(BRect frame, const char *command)
 	fScrollUpCount(0),
 	fScrollBarRange(0),
 	fFrameResized(false),
+	fLastCursorTime(0),
 	fCursorDrawFlag(CURON),
 	fCursorStatus(CURON),
 	fCursorBlinkingFlag(CURON),
@@ -379,9 +426,9 @@ TermView::TermDraw(const CurPos &start, const CurPos &end)
 	int x2 = end.x;
 	int y2 = end.y;
 
-	// Send Draw Rectangle data to Draw Engine thread.
 	Redraw(x1, y1 + fTop / fFontHeight,
 		x2, y2 + fTop / fFontHeight);
+	
 	return 0;
 }
 
@@ -442,8 +489,7 @@ TermView::TermDrawRegion(CurPos start, CurPos end)
 			Redraw(0, start.y + 1,
 			fTermColumns - 1, end.y - 1);
 		}
-		Redraw(0, end.y,
-		end.x, end.y);
+		Redraw(0, end.y, end.x, end.y);
 	}
 
 	return 0;
@@ -624,18 +670,18 @@ TermView::MoveCurDown(int num)
 }
 
 
+// TODO: Cleanup the next 3 functions!!!
 void
 TermView::DrawCursor()
 {
-	CURSOR_RECT;
+	BRect rect(fFontWidth * fCurPos.x, fFontHeight * fCurPos.y + fTop,
+		fFontWidth * (fCurPos.x + 1) - 1, fFontHeight * fCurPos.y + fTop + fCursorHeight - 1);
+
 	uchar buf[4];
 	ushort attr;
 
 	int top = fTop / fFontHeight;
-	int m_flag = false;
-
-	m_flag = CheckSelectedRegion(CurPos(fCurPos.x,
-	fCurPos.y + fTop / fFontHeight));
+	bool m_flag = CheckSelectedRegion(CurPos(fCurPos.x, fCurPos.y + fTop / fFontHeight));
 	if (fTextBuffer->GetChar(fCurPos.y + top, fCurPos.x, buf, &attr) == A_CHAR) {
 		int width;
 		if (IS_WIDTH(attr))
@@ -652,7 +698,7 @@ TermView::DrawCursor()
 		else
 			SetHighColor(fCursorBackColor);
 
-		FillRect(r);
+		FillRect(rect);
 	}
 
 	Sync();
@@ -671,6 +717,7 @@ TermView::BlinkCursor()
 			DrawCursor();
 
 		fCursorStatus = fCursorStatus == CURON ? CUROFF : CURON;
+		fLastCursorTime = system_time();
 	}
 }
 
@@ -1107,6 +1154,16 @@ TermView::AttachedToWindow()
 	SetFont(&fHalfFont);
 	MakeFocus(true);
 	fScrollBar->SetSteps(fFontHeight, fFontHeight * fTermRows);
+	
+	Window()->SetPulseRate(1000000);
+}
+
+
+void
+TermView::Pulse()
+{
+	//if (system_time() > fLastCursorTime + 1000000)
+		BlinkCursor();
 }
 
 
@@ -1470,9 +1527,6 @@ TermView::MessageReceived(BMessage *msg)
 			fShell->Write(ctrl_l, 1);
 			break;
 
-		case MSGRUN_CURSOR:
-			BlinkCursor();
-			break;
 		
 //  case B_INPUT_METHOD_EVENT:
 //    {

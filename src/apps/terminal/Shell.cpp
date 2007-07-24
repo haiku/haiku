@@ -107,12 +107,10 @@ typedef struct
 #define PTY_WS	2	/* pty need WINSIZE (row and col ) */
 
 
-static pid_t sShPid;
-
-
 Shell::Shell()
 	:
 	fFd(-1),
+	fProcessID(-1),
 	fTermParse(NULL),
 	fAttached(false)
 {
@@ -152,7 +150,8 @@ Shell::Close()
 	
 	if (fFd >= 0) {
 		close(fFd);
-		kill(-sShPid, SIGHUP);
+		kill(-fProcessID, SIGHUP);
+		fProcessID = -1;
 		int status;
 		wait(&status);	
 		fFd = -1;	
@@ -187,21 +186,21 @@ Shell::Write(const void *buffer, size_t numBytes)
 }
 
 
-void
+status_t
 Shell::UpdateWindowSize(int rows, int columns)
 {
 	struct winsize winSize;
 	winSize.ws_row = rows;
 	winSize.ws_col = columns;
 	ioctl(fFd, TIOCSWINSZ, &winSize);
-	Signal(SIGWINCH);
+	return Signal(SIGWINCH);
 }
 
 
-void
+status_t
 Shell::Signal(int signal)
 {
-	kill(-sShPid, signal);
+	return send_signal(-fProcessID, signal);
 }
 
 
@@ -316,7 +315,7 @@ Shell::_Spawn(int row, int col, const char *command, const char *coding)
 	thread_id terminalThread = find_thread(NULL);
 
 	/* Fork a child process. */
-	if ((sShPid = fork()) < 0) {
+	if ((fProcessID = fork()) < 0) {
 		close(master);
 		return B_ERROR;
 	}
@@ -324,7 +323,7 @@ Shell::_Spawn(int row, int col, const char *command, const char *coding)
 
 	handshake_t handshake;
 
-	if (sShPid == 0) {
+	if (fProcessID == 0) {
 		// Now in child process.
 
 		/*
@@ -583,7 +582,7 @@ Shell::_Spawn(int row, int col, const char *command, const char *coding)
 				handshake.row = row;
 				handshake.col = col;
 				handshake.status = PTY_WS;
-				send_handshake_message(sShPid, handshake);
+				send_handshake_message(fProcessID, handshake);
 				break;
 		}
 	}
