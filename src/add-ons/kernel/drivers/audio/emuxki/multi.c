@@ -1262,6 +1262,11 @@ emuxki_free(void* cookie)
 	while(!LIST_EMPTY(&card->streams)) {
 		emuxki_stream_delete(LIST_FIRST(&card->streams));
 	}
+
+	card->pstream = NULL;
+	card->pstream2 = NULL;
+	card->rstream = NULL;
+	card->rstream2 = NULL;
 	
 	return B_OK;
 }

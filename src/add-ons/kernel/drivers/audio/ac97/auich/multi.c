@@ -1090,6 +1090,9 @@ auich_free(void* cookie)
 	while(!LIST_EMPTY(&card->streams)) {
 		auich_stream_delete(LIST_FIRST(&card->streams));
 	}
+
+	card->pstream = NULL;
+	card->rstream = NULL;
 	
 	return B_OK;
 }
