@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-#define B_DPC_MODULE_NAME "generic/dpc/v1"
+#define B_DPC_MODULE_NAME "generic/dpc/haiku/v1"
 
 typedef void (*dpc_func) (void *arg);
 
