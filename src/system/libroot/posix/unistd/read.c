@@ -34,7 +34,12 @@ read(int fd, void *buffer, size_t bufferSize)
 ssize_t
 read_pos(int fd, off_t pos, void *buffer, size_t bufferSize)
 {
-	ssize_t status = _kern_read(fd, pos, buffer, bufferSize);
+	ssize_t status;
+	if (pos < 0) {
+		errno = B_BAD_VALUE;
+		return -1;
+	}
+	status = _kern_read(fd, pos, buffer, bufferSize);
 
 	RETURN_AND_SET_ERRNO(status);
 }
@@ -43,7 +48,12 @@ read_pos(int fd, off_t pos, void *buffer, size_t bufferSize)
 ssize_t
 pread(int fd, void *buffer, size_t bufferSize, off_t pos)
 {
-	ssize_t status = _kern_read(fd, pos, buffer, bufferSize);
+	ssize_t status;
+	if (pos < 0) {
+		errno = B_BAD_VALUE;
+		return -1;
+	}
+	status = _kern_read(fd, pos, buffer, bufferSize);
 
 	RETURN_AND_SET_ERRNO(status);
 }
