@@ -128,9 +128,8 @@ TermView::TermView(BRect frame, const char *command)
 	fCursorBlinkingFlag(CURON),
 	fCursorRedrawFlag(CURON),
 	fCursorHeight(0),
-	fInverseFlag(0),
-	fBoldFlag(0),
-	fUnderlineFlag(0),
+	fCurPos(0, 0),
+	fCurStack(0, 0),
 	fBufferStartPos(-1),
 	fTermRows(PrefHandler::Default()->getInt32(PREF_ROWS)),
 	fTermColumns(PrefHandler::Default()->getInt32(PREF_COLS)),
@@ -141,20 +140,23 @@ TermView::TermView(BRect frame, const char *command)
 	fScrBot(fTermRows - 1),
 	fScrBufSize(PrefHandler::Default()->getInt32(PREF_HISTORY_SIZE)),
 	fScrRegionSet(0),
+	fMouseImage(false),
+	fPreviousMousePoint(0, 0),
+	fSelStart(-1, -1),
+	fSelEnd(-1, -1),
 	fMouseTracking(false),
 	fMouseThread(-1),
 	fQuitting(false),
-	fIMflag(false)
+	fIMflag(false)	
+{	
+	_InitObject(command);
+}
+
+
+void
+TermView::_InitObject(const char *command)
 {
-	// Reset cursor
-	fCurPos.Set(0, 0);
-	fCurStack.Set(0, 0);
-	fPreviousMousePoint.Set(0, 0);
-	fSelStart.Set(-1, -1);
-	fSelEnd.Set(-1, -1);
-
 	SetMouseCursor();	
-
 	SetTermFont(be_fixed_font, be_fixed_font);
 	SetTermColor();
 	
@@ -468,11 +470,9 @@ TermView::TermDrawSelectedRegion(CurPos start, CurPos end)
 	}
 
 	if (start.y == end.y) {
-		Redraw(start.x, start.y,
-		end.x, end.y);
+		Redraw(start.x, start.y, end.x, end.y);
 	} else {
-		Redraw(start.x, start.y,
-		fTermColumns, start.y);
+		Redraw(start.x, start.y, fTermColumns, start.y);
 
 		if (end.y - start.y > 0)
 			Redraw(0, start.y + 1, fTermColumns, end.y - 1);
@@ -501,15 +501,12 @@ TermView::TermDrawRegion(CurPos start, CurPos end)
 	end.y += top;
 
 	if (start.y == end.y) {
-		Redraw(start.x, start.y,
-		end.x, end.y);
+		Redraw(start.x, start.y, end.x, end.y);
 	} else {
-		Redraw(start.x, start.y,
-		fTermColumns - 1, start.y);
+		Redraw(start.x, start.y, fTermColumns - 1, start.y);
 
 		if (end.y - start.y > 0) {
-			Redraw(0, start.y + 1,
-			fTermColumns - 1, end.y - 1);
+			Redraw(0, start.y + 1, fTermColumns - 1, end.y - 1);
 		}
 		Redraw(0, end.y, end.x, end.y);
 	}

@@ -34,6 +34,7 @@
 #include <String.h>
 #include <Window.h>
 
+
 class BMenu;
 class BMenuBar;
 class FindWindow;
@@ -62,6 +63,7 @@ private:
 	status_t	_DoPageSetup();
 	void		_DoPrint();
 
+	TermView	*fTermView;
 	BMenuBar	*fMenubar;
 	BMenu		*fFilemenu,
 			*fEditmenu,
@@ -70,7 +72,7 @@ private:
 			*fFontMenu,
 			*fWindowSizeMenu,
 			*fNewFontMenu; 
-	TermView	*fTermView;
+
 	BMessage	*fPrintSettings;
 	PrefWindow	*fPrefWindow;
 	FindWindow	*fFindPanel;

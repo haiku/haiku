@@ -58,12 +58,17 @@ TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 {
 	fTermView = new TermView(Bounds(), command);
 	AddChild(fTermView);
+
+	float width, height;
+	fTermView->GetPreferredSize(&width, &height);
+	ResizeTo(width, height);
 }
 
 #else
 
 TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	: BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE|B_QUIT_ON_WINDOW_CLOSE),
+	fTermView(NULL),	
 	fMenubar(NULL),
 	fFilemenu(NULL),
 	fEditmenu(NULL),
@@ -72,7 +77,6 @@ TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	fFontMenu(NULL),
 	fWindowSizeMenu(NULL),
 	fNewFontMenu(NULL),
-	fTermView(NULL),
 	fPrintSettings(NULL),
 	fPrefWindow(NULL),
 	fFindPanel(NULL),
@@ -87,7 +91,7 @@ TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 {
 	_InitWindow(command);
 }
-#endif
+
 
 TermWindow::~TermWindow()
 {
@@ -145,7 +149,7 @@ TermWindow::_InitWindow(const char *command)
 	fTermView->SetTermFont(&halfFont, &fullFont);
 	
 	BRect rect = fTermView->SetTermSize(PrefHandler::Default()->getInt32(PREF_ROWS),
-		PrefHandler::Default()->getInt32(PREF_COLS), 1);
+		PrefHandler::Default()->getInt32(PREF_COLS), true);
 
 	int width, height;
 	fTermView->GetFontSize(&width, &height);
@@ -677,4 +681,5 @@ TermWindow::_DoPrint()
 	
 	job.CommitJob(); 
 }
+#endif
 

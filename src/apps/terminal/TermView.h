@@ -140,6 +140,8 @@ protected:
 	virtual void	MessageReceived(BMessage* message);
 
 private:
+	void _InitObject(const char *command);
+
 	static int32	MouseTracking(void *);
 
 	status_t	_InitMouseThread(void);
@@ -221,13 +223,7 @@ private:
 	bool fCursorStatus;
 	bool fCursorBlinkingFlag;
 	bool fCursorRedrawFlag;
-
 	int fCursorHeight;
-
-	// terminal text attribute flag.
-	bool fInverseFlag;
-	bool fBoldFlag;
-	bool fUnderlineFlag;
 
 	// Cursor position.
 	CurPos fCurPos;
@@ -246,11 +242,6 @@ private:
 
 	TermBuffer	*fTextBuffer;
 	BScrollBar	*fScrollBar;
-
-	// Offscreen Bitmap and View.
-
-	BRect fSrcRect;
-	BRect fDstRect;
 
 	// Color and Attribute.
 
@@ -285,7 +276,6 @@ private:
 	BString fIMString;
 	bool fIMflag;
 	BMessenger fIMMessenger;
-
 	int32 fImCodeState;
 };
 
