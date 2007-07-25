@@ -61,8 +61,6 @@ const uint32 MENU_SHOW_COLOR	= 'Mcol';
 
 const uint32 M_GET_DEVICE_NUM	= 'Mgdn';
 
-// Message Runner
-const uint32 MSGRUN_WINDOW	= 'Rwin';
 
 // Preference Message
 const ulong PSET__COLS		= 'pcol';

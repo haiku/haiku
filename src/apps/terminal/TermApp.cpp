@@ -146,7 +146,7 @@ TermApp::MessageReceived(BMessage* msg)
 			break;
 
 		case MSG_ACTIVATE_TERM:
-			fTermWindow->TermWinActivate();
+			fTermWindow->Activate();
 			break;
 
 		case MSG_TERM_IS_MINIMIZE:

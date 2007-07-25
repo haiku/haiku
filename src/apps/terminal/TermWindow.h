@@ -36,7 +36,6 @@
 
 class BMenu;
 class BMenuBar;
-class BMessageRunner;
 class FindWindow;
 class PrefWindow;
 class TermView;
@@ -45,8 +44,6 @@ class TermWindow : public BWindow {
 public:
 	TermWindow(BRect frame, const char* title, const char *command);
 	virtual ~TermWindow();
-
-	void		TermWinActivate();
 
 protected:
 	virtual void	MessageReceived(BMessage *message);
@@ -77,7 +74,6 @@ private:
 	BMessage	*fPrintSettings;
 	PrefWindow	*fPrefWindow;
 	FindWindow	*fFindPanel;
-	BMessageRunner 	*fWindowUpdate;
 	BRect		fSavedFrame;
 	window_look	fSavedLook;
 	

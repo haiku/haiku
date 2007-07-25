@@ -44,6 +44,7 @@
 #define CUROFF 0
 #define CURON  1
 
+class BMessageRunner;
 class BPopUpMenu;
 class BScrollBar;
 class BString;
@@ -54,6 +55,8 @@ public:
 	TermView(BRect frame, const char *command);
 	~TermView();
 
+	virtual void GetPreferredSize(float *width, float *height);
+
 	status_t AttachShell(Shell *shell);
 	void	DetachShell();
 
@@ -61,8 +64,10 @@ public:
 
 	void	SetTermFont(const BFont *halfFont, const BFont *fullFont);
 	void	GetFontSize(int *width, int *height);
+
 	BRect	SetTermSize(int rows, int cols, bool flag);
 	void	SetTermColor();
+
 	void	SetMouseCursor();
 	// void  SetIMAware (bool);
 	void	SetScrollBar(BScrollBar *scrbar);
@@ -124,6 +129,7 @@ public:
 
 protected:
 	virtual void	AttachedToWindow();
+	virtual void	DetachedFromWindow();
 	virtual void	Pulse();
 	virtual void	Draw(BRect updateRect);
 	virtual void	WindowActivated(bool active);
@@ -180,7 +186,11 @@ private:
 	bool	CheckSelectedRegion(const CurPos &pos);
 	inline void Redraw(int, int, int, int);
 
+	static void _FixFontAttributes(BFont &font);
+
 	Shell *fShell;
+
+	BMessageRunner *fWinchRunner;
 
 	// Font and Width
 	BFont fHalfFont;

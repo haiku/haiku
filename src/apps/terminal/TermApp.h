@@ -35,11 +35,8 @@
 #include <Application.h>
 #include <String.h>
 
-
-class TermWindow;
-class TermParse;
 class BRect;
-
+class BWindow;
 class TermApp : public BApplication {
 	public:
 		TermApp();
@@ -71,7 +68,7 @@ class TermApp : public BApplication {
 		BString		fWindowTitle;
 		int32		fWindowNumber;
 		
-		TermWindow*	fTermWindow;
+		BWindow*	fTermWindow;
 		BRect		fTermFrame;
 		BString		fCommandLine;
 };

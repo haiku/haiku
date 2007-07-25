@@ -25,8 +25,6 @@
 #include "TTextControl.h"
 
 
-extern PrefHandler *PrefHandler::Default();
-
 
 ShellPrefView::ShellPrefView(BRect frame, const char *name,
 	TermWindow *window)

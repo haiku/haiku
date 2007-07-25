@@ -11,7 +11,6 @@
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
-#include <MessageRunner.h>
 #include <Path.h>
 #include <PrintJob.h>
 #include <PropertyInfo.h>
@@ -52,6 +51,16 @@
 
 const static float kViewOffset = 3;
 
+#if 0
+TermWindow::TermWindow(BRect frame, const char* title, const char *command)
+	:
+	BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE|B_QUIT_ON_WINDOW_CLOSE)
+{
+	fTermView = new TermView(Bounds(), command);
+	AddChild(fTermView);
+}
+
+#else
 
 TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	: BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE|B_QUIT_ON_WINDOW_CLOSE),
@@ -67,7 +76,6 @@ TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	fPrintSettings(NULL),
 	fPrefWindow(NULL),
 	fFindPanel(NULL),
-	fWindowUpdate(NULL),
 	fSavedFrame(0, 0, -1, -1),
 	fFindString(""),
 	fFindForwardMenuItem(NULL),
@@ -79,7 +87,7 @@ TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 {
 	_InitWindow(command);
 }
-
+#endif
 
 TermWindow::~TermWindow()
 {
@@ -92,8 +100,6 @@ TermWindow::~TermWindow()
 	}
 	
 	PrefHandler::DeleteDefault();
-
-	delete fWindowUpdate;
 }
 
 
@@ -117,8 +123,7 @@ TermWindow::_InitWindow(const char *command)
 	if (size < 6.0f)
 		size = 6.0f;
 	halfFont.SetSize(size);
-	halfFont.SetSpacing(B_FIXED_SPACING);
-
+	
 	family = PrefHandler::Default()->getString(PREF_FULL_FONT_FAMILY);
 
 	BFont fullFont;
@@ -146,8 +151,6 @@ TermWindow::_InitWindow(const char *command)
 	fTermView->GetFontSize(&width, &height);
 	SetSizeLimits(MIN_COLS * width, MAX_COLS * width,
 		MIN_COLS * height, MAX_COLS * height);
-
-	fTermView->SetTermColor();
 	
 	// Add offset to baseview.
 	rect.InsetBy(-kViewOffset, -kViewOffset);
@@ -173,13 +176,6 @@ TermWindow::_InitWindow(const char *command)
 	AddChild(fTermView);
 
 	fEditmenu->SetTargetForItems(fTermView);
-
-	// Initialize TermParse
-	SetEncoding(longname2id(PrefHandler::Default()->getString(PREF_TEXT_ENCODING)));
-
-	// Initialize MessageRunner.
-	fWindowUpdate = new BMessageRunner(BMessenger(this),
-		new BMessage (MSGRUN_WINDOW), 500000);
 }
 
 
@@ -429,7 +425,7 @@ TermWindow::MessageReceived(BMessage *message)
 										PrefHandler::Default()->getInt32 (PREF_COLS), 0);
 		
 			ResizeTo (r.Width()+ B_V_SCROLL_BAR_WIDTH + kViewOffset * 2,
-			r.Height()+fMenubar->Bounds().Height() + kViewOffset *2);
+				r.Height()+fMenubar->Bounds().Height() + kViewOffset *2);
 		
 			BPath path;
 			if (PrefHandler::GetDefaultPath(path) == B_OK)
@@ -468,36 +464,31 @@ TermWindow::MessageReceived(BMessage *message)
 		case EIGHTYTWENTYFOUR: {
 			PrefHandler::Default()->setString(PREF_COLS, "80");
 			PrefHandler::Default()->setString(PREF_ROWS, "24");
-		   	this->PostMessage (MSG_ROWS_CHANGED);
-			this->PostMessage (MSG_COLS_CHANGED);
+		   	PostMessage (MSG_COLS_CHANGED);
 			break;
 		}
 		case EIGHTYTWENTYFIVE: {
 			PrefHandler::Default()->setString(PREF_COLS, "80");
 			PrefHandler::Default()->setString(PREF_ROWS, "25");
-		   	this->PostMessage (MSG_ROWS_CHANGED);
-		   	this->PostMessage (MSG_COLS_CHANGED);
+		   	PostMessage (MSG_COLS_CHANGED);
 			break;		
 		}
 		case EIGHTYFORTY: {
 			PrefHandler::Default()->setString(PREF_COLS, "80");
 			PrefHandler::Default()->setString(PREF_ROWS, "40");
-		   	this->PostMessage (MSG_ROWS_CHANGED);
-		   	this->PostMessage (MSG_COLS_CHANGED);
+		   	PostMessage (MSG_COLS_CHANGED);
 			break;	
 		}
 		case ONETHREETWOTWENTYFOUR: {
 			PrefHandler::Default()->setString(PREF_COLS, "132");
 			PrefHandler::Default()->setString(PREF_ROWS, "24");
-		   	this->PostMessage (MSG_ROWS_CHANGED);
-		   	this->PostMessage (MSG_COLS_CHANGED);
+		   	PostMessage (MSG_COLS_CHANGED);
 			break;	
 		}
 		case ONETHREETWOTWENTYFIVE: {
 			PrefHandler::Default()->setString(PREF_COLS, "132");
 			PrefHandler::Default()->setString(PREF_ROWS, "25");
-		   	this->PostMessage (MSG_ROWS_CHANGED);
-		   	this->PostMessage (MSG_COLS_CHANGED);
+		   	PostMessage (MSG_COLS_CHANGED);
 			break;	
 		}
 		case FULLSCREEN: {
@@ -549,10 +540,7 @@ TermWindow::MessageReceived(BMessage *message)
 			_DoPrint();
 			break;
 		}
-		case MSGRUN_WINDOW: {
-			fTermView->UpdateSIGWINCH();
-			break;
-		}
+
 		case B_ABOUT_REQUESTED: {
 			be_app->PostMessage(B_ABOUT_REQUESTED);
 			break;
@@ -563,14 +551,18 @@ TermWindow::MessageReceived(BMessage *message)
 		}
 	}
 }
-////////////////////////////////////////////////////////////////////////////
-// WindowActivated (bool)
-//  Dispatch Mesasge.
-////////////////////////////////////////////////////////////////////////////
+
+
 void
 TermWindow::WindowActivated(bool)
 {
-
+#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+	if (focus_follows_mouse()) {
+		BPoint aMouseLoc = Frame().LeftTop();
+		set_mouse_position(int32(aMouseLoc.x + 16), int32(aMouseLoc.y + 2));
+		be_app->SetCursor(B_HAND_CURSOR);
+	}
+#endif
 }
 
 
@@ -579,21 +571,6 @@ TermWindow::QuitRequested()
 {
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
-}
-
-
-void
-TermWindow::TermWinActivate()
-{
-	Activate();
-
-#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
-	if (focus_follows_mouse()) {
-		BPoint aMouseLoc = Frame().LeftTop();
-		set_mouse_position(int32(aMouseLoc.x + 16), int32(aMouseLoc.y + 2));
-		be_app->SetCursor(B_HAND_CURSOR);
-	}
-#endif
 }
 
 

@@ -17,18 +17,19 @@
 #include "PrefHandler.h"
 #include "PrefView.h"
 #include "Shell.h"
-#include "TermApp.h"
 #include "TermBuffer.h"
 #include "TermConst.h"
 #include "TermParse.h"
-#include "TermWindow.h"
 #include "VTkeymap.h"
 
+#include <Application.h>
 #include <Autolock.h>
 #include <Beep.h>
 #include <Clipboard.h>
 #include <Debug.h>
 #include <Input.h>
+#include <Message.h>
+#include <MessageRunner.h>
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Roster.h>
@@ -107,6 +108,9 @@ const unsigned char M_ADD_CURSOR[] = {
 
 #define MOUSE_THR_CODE 'mtcd'
 
+const static uint32 kUpdateSigWinch = 'Rwin';
+
+
 TermView::TermView(BRect frame, const char *command)
 	: BView(frame, "termview", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS | B_PULSE_NEEDED),
 	fShell(NULL),
@@ -151,19 +155,24 @@ TermView::TermView(BRect frame, const char *command)
 
 	SetMouseCursor();	
 
-	SetTermFont(be_plain_font, be_plain_font);	
+	SetTermFont(be_plain_font, be_plain_font);
+	SetTermColor();
+	
 	//SetIMAware(PrefHandler::Default()->getInt32(PREF_IM_AWARE));
 
-	// Get encoding name (setenv TTYPE in spawn_shell functions)
-	const char *encoding = longname2shortname(PrefHandler::Default()->getString(PREF_TEXT_ENCODING));
+	const char *encoding = PrefHandler::Default()->getString(PREF_TEXT_ENCODING);
+	SetEncoding(longname2id(encoding));
+
 	fShell = new Shell();	
-	status_t status = fShell->Open(fTermRows, fTermColumns, command, encoding);	
+	status_t status = fShell->Open(fTermRows, fTermColumns, command, longname2shortname(encoding));	
 	if (status < B_OK)
 		throw status;
 
 	status = AttachShell(fShell);
 	if (status < B_OK)
 		throw status;
+
+	SetTermSize(fTermColumns, fTermRows, false);
 
 	_InitMouseThread();
 }
@@ -178,6 +187,16 @@ TermView::~TermView()
 
 	fQuitting = true;
 	kill_thread(fMouseThread);
+}
+
+
+void
+TermView::GetPreferredSize(float *width, float *height)
+{
+	if (width)
+		*width = fTermColumns * fFontWidth;
+	if (height)
+		*height = fTermRows * fFontHeight;
 }
 
 
@@ -240,7 +259,7 @@ TermView::SetTermSize(int rows, int cols, bool resize)
 	if (resize)
 		ResizeTo(fTermColumns * fFontWidth - 1, fTermRows * fFontHeight -1);
 
-	Invalidate(Frame());
+	Invalidate();
 
 	return rect;
 }
@@ -282,6 +301,9 @@ TermView::SetTermFont(const BFont *halfFont, const BFont *fullFont)
 
 	fHalfFont = halfFont;
 	fFullFont = fullFont;
+
+	_FixFontAttributes(fHalfFont);
+	_FixFontAttributes(fFullFont);
 
 	// calculate half font's max width
 	// Not Bounding, check only A-Z(For case of fHalfFont is KanjiFont. )
@@ -929,8 +951,7 @@ TermView::MouseTracking(void *data)
 				}
 				
 				// Scroll check
-				if (theObj->LockLooper()) {
-					
+				if (theObj->fScrollBar != NULL && theObj->LockLooper()) {
 					// Get now scroll point
 					theObj->fScrollBar->GetRange(&scr_start, &scr_end);
 					scr_pos = theObj->fScrollBar->Value();
@@ -1039,10 +1060,11 @@ TermView::DrawLines(int x1, int y1, ushort attr, uchar *buf,
 void
 TermView::ResizeScrBarRange()
 {
-	float viewheight, start_pos; 
+	if (fScrollBar == NULL)
+		return;
 
-	viewheight = fTermRows * fFontHeight;
-	start_pos = fTop -(fScrBufSize - fTermRows *2) * fFontHeight;
+	float viewheight = fTermRows * fFontHeight;
+	float start_pos = fTop -(fScrBufSize - fTermRows *2) * fFontHeight;
 
 	if (start_pos > 0) {
 		fScrollBar->SetRange(start_pos, viewheight + fTop - fFontHeight);
@@ -1153,9 +1175,21 @@ TermView::AttachedToWindow()
 {
 	SetFont(&fHalfFont);
 	MakeFocus(true);
-	fScrollBar->SetSteps(fFontHeight, fFontHeight * fTermRows);
+	if (fScrollBar)
+		fScrollBar->SetSteps(fFontHeight, fFontHeight * fTermRows);
 	
+	BMessage message(kUpdateSigWinch);
+	fWinchRunner = new (std::nothrow) BMessageRunner(BMessenger(this), &message, 500000);
+
 	Window()->SetPulseRate(1000000);
+}
+
+
+void
+TermView::DetachedFromWindow()
+{
+	delete fWinchRunner;
+	fWinchRunner = NULL;
 }
 
 
@@ -1293,11 +1327,7 @@ TermView::WindowActivated(bool active)
 void
 TermView::KeyDown(const char *bytes, int32 numBytes)
 {
-	char c;
-	struct termios tio;
 	int32 key, mod;
-
-	uchar dstbuf[1024];
 	Looper()->CurrentMessage()->FindInt32("modifiers", &mod);
 	Looper()->CurrentMessage()->FindInt32("key", &key);
 
@@ -1306,6 +1336,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 
 	// If bytes[0] equal intr charactor,
 	// send signal to shell process group.
+	struct termios tio;
 	fShell->GetAttr(tio);
 	if (*bytes == tio.c_cc[VINTR]) {
 		if (tio.c_lflag & ISIG)
@@ -1315,31 +1346,19 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 	// Terminal changes RET, ENTER, F1...F12, and ARROW key code.
 
 	if (numBytes == 1) {
-	
 		switch (*bytes) {
 			case B_RETURN:
-				c = 0x0d;
-				if (key == RETURN_KEY || key == ENTER_KEY) {
-					fShell->Write(&c, 1);
-					return;
-				} else {
-					fShell->Write(bytes, numBytes);
-					return;
-				}
+			{
+				char c = 0x0d;
+				fShell->Write(&c, 1);
 				break;
-
+			}
 			case B_LEFT_ARROW:
-				if (key == LEFT_ARROW_KEY) {
-					fShell->Write(LEFT_ARROW_KEY_CODE, sizeof(LEFT_ARROW_KEY_CODE)-1);
-					return;
-				}
+				fShell->Write(LEFT_ARROW_KEY_CODE, sizeof(LEFT_ARROW_KEY_CODE)-1);
 				break;
 
 			case B_RIGHT_ARROW:
-				if (key == RIGHT_ARROW_KEY) {
-					fShell->Write(RIGHT_ARROW_KEY_CODE, sizeof(RIGHT_ARROW_KEY_CODE)-1);
-					return;
-				}
+				fShell->Write(RIGHT_ARROW_KEY_CODE, sizeof(RIGHT_ARROW_KEY_CODE)-1);
 				break;
 
 			case B_UP_ARROW:
@@ -1351,10 +1370,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 					return;
 				}
 
-				if (key == UP_ARROW_KEY) {
-					fShell->Write(UP_ARROW_KEY_CODE, sizeof(UP_ARROW_KEY_CODE)-1);
-					return;
-				}
+				fShell->Write(UP_ARROW_KEY_CODE, sizeof(UP_ARROW_KEY_CODE)-1);
 				break;
 
 			case B_DOWN_ARROW:
@@ -1364,24 +1380,15 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 					return;
 				}
 
-				if (key == DOWN_ARROW_KEY) {
-					fShell->Write(DOWN_ARROW_KEY_CODE, sizeof(DOWN_ARROW_KEY_CODE)-1);
-					return;
-				}
+				fShell->Write(DOWN_ARROW_KEY_CODE, sizeof(DOWN_ARROW_KEY_CODE)-1);
 				break;
 
 			case B_INSERT:
-				if (key == INSERT_KEY) {
-					fShell->Write(INSERT_KEY_CODE, sizeof(INSERT_KEY_CODE)-1);
-					return;
-				}
+				fShell->Write(INSERT_KEY_CODE, sizeof(INSERT_KEY_CODE)-1);
 				break;
 
 			case B_HOME:
-				if (key == HOME_KEY) {
-					fShell->Write(HOME_KEY_CODE, sizeof(HOME_KEY_CODE)-1);
-					return;
-				}
+				fShell->Write(HOME_KEY_CODE, sizeof(HOME_KEY_CODE)-1);
 				break;
 
 			case B_PAGE_UP:
@@ -1393,10 +1400,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 					return;
 				}
 
-				if (key == PAGE_UP_KEY) {
-					fShell->Write(PAGE_UP_KEY_CODE, sizeof(PAGE_UP_KEY_CODE)-1);
-					return;
-				}
+				fShell->Write(PAGE_UP_KEY_CODE, sizeof(PAGE_UP_KEY_CODE)-1);
 				break;
 
 			case B_PAGE_DOWN:
@@ -1406,21 +1410,15 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 					return;
 				}
 
-				if (key == PAGE_DOWN_KEY) {
-					fShell->Write(PAGE_DOWN_KEY_CODE, sizeof(PAGE_DOWN_KEY_CODE)-1);
-					return;
-				}
+				fShell->Write(PAGE_DOWN_KEY_CODE, sizeof(PAGE_DOWN_KEY_CODE)-1);
 				break;
 
 			case B_END:
-				if (key == END_KEY) {
-					fShell->Write(END_KEY_CODE, sizeof(END_KEY_CODE)-1);
-					return;
-				}
+				fShell->Write(END_KEY_CODE, sizeof(END_KEY_CODE)-1);
 				break;
 
 			case B_FUNCTION_KEY:
-				for (c = 0; c < 12; c++) {
+				for (int32 c = 0; c < 12; c++) {
 					if (key == function_keycode_table[c]) {
 						fShell->Write(function_key_char_table[c], 5);
 						return;
@@ -1429,33 +1427,31 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 				break;
 
 			default:
+				fShell->Write(bytes, numBytes);
 				break;
 		}
 	} else {
 		// input multibyte character
-
 		if (GetEncoding() != M_UTF8) {
+			uchar dstbuf[1024];
 			int cnum = CodeConv::ConvertFromInternal(bytes, numBytes,
 				(char *)dstbuf, GetEncoding());
 			fShell->Write(dstbuf, cnum);
-			return;
 		}
 	}
-
-	fShell->Write(bytes, numBytes);
 }
 
 
 void
 TermView::FrameResized(float width, float height)
 {
-	const int cols =((int)width + 1) / fFontWidth;
-	const int rows =((int)height + 1) / fFontHeight;
+	const int cols = ((int)width + 1) / fFontWidth;
+	const int rows = ((int)height + 1) / fFontHeight;
 
 	int offset = 0;
 
 	if (rows < fCurPos.y + 1) {
-		fTop +=(fCurPos.y  + 1 - rows) * fFontHeight;
+		fTop += (fCurPos.y  + 1 - rows) * fFontHeight;
 		offset = fCurPos.y + 1 - rows;
 		fCurPos.y = rows - 1;
 	}
@@ -1464,6 +1460,9 @@ TermView::FrameResized(float width, float height)
 	fTermColumns = cols;
 
 	fFrameResized = true;
+	
+	// TODO: Fix this	
+	Invalidate();
 }
 
 
@@ -1550,6 +1549,9 @@ TermView::MessageReceived(BMessage *msg)
 //	break;
     //  }
    // }
+		case kUpdateSigWinch:
+			UpdateSIGWINCH();
+			break;
 		default:
 			BView::MessageReceived(msg);
 			break;
@@ -1666,9 +1668,11 @@ TermView::DoClearAll(void)
 	
 	// reset cursor pos
 	SetCurPos(0, 0);
-		
-	fScrollBar->SetRange(0, 0);
-	fScrollBar->SetProportion(1);
+	
+	if (fScrollBar) {	
+		fScrollBar->SetRange(0, 0);
+		fScrollBar->SetProportion(1);
+	}
 }
 
 
@@ -2223,3 +2227,12 @@ TermView::Redraw(int x1, int y1, int x2, int y2)
 	}	
 }
 
+
+/* static */
+void
+TermView::_FixFontAttributes(BFont &font)
+{
+	font.SetSpacing(B_FIXED_SPACING);
+}
+
+ 
