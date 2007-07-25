@@ -155,7 +155,7 @@ TermView::TermView(BRect frame, const char *command)
 
 	SetMouseCursor();	
 
-	SetTermFont(be_plain_font, be_plain_font);
+	SetTermFont(be_fixed_font, be_fixed_font);
 	SetTermColor();
 	
 	//SetIMAware(PrefHandler::Default()->getInt32(PREF_IM_AWARE));
@@ -172,7 +172,7 @@ TermView::TermView(BRect frame, const char *command)
 	if (status < B_OK)
 		throw status;
 
-	SetTermSize(fTermColumns, fTermRows, false);
+	SetTermSize(fTermRows, fTermColumns, false);
 
 	_InitMouseThread();
 }
@@ -1114,7 +1114,7 @@ TermView::ScrollScreenDraw()
 
 //!	Handler for SIGWINCH
 void
-TermView::UpdateSIGWINCH()
+TermView::_UpdateSIGWINCH()
 {
 	if (fFrameResized) {
 		if (HasSelection())
@@ -1550,7 +1550,7 @@ TermView::MessageReceived(BMessage *msg)
     //  }
    // }
 		case kUpdateSigWinch:
-			UpdateSIGWINCH();
+			_UpdateSIGWINCH();
 			break;
 		default:
 			BView::MessageReceived(msg);

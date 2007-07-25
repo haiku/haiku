@@ -117,7 +117,6 @@ public:
 	void	ScrollAtCursor();
 
 	// Other
-	void	UpdateSIGWINCH();
 	void	DeviceStatusReport(int);
 	void	UpdateLine();
 	void	ScrollScreen();
@@ -186,6 +185,7 @@ private:
 	bool	CheckSelectedRegion(const CurPos &pos);
 	inline void Redraw(int, int, int, int);
 
+	void _UpdateSIGWINCH();
 	static void _FixFontAttributes(BFont &font);
 
 	Shell *fShell;
