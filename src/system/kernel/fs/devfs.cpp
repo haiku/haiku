@@ -671,13 +671,8 @@ static inline void
 translate_partition_access(devfs_partition *partition, off_t &offset,
 	size_t &size)
 {
-	if (offset < 0)
-		offset = 0;
-
-	if (offset > partition->info.size) {
-		size = 0;
-		return;
-	}
+	ASSERT(offset >= 0);
+	ASSERT(offset < partition->info.size);
 
 	size = min_c(size, partition->info.size - offset);
 	offset += partition->info.offset;
@@ -1472,8 +1467,15 @@ devfs_read(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 	if (!S_ISCHR(vnode->stream.type))
 		return B_BAD_VALUE;
 
-	if (vnode->stream.u.dev.partition)
-		translate_partition_access(vnode->stream.u.dev.partition, pos, *_length);
+	if (pos < 0)
+		return B_BAD_VALUE;
+
+	if (vnode->stream.u.dev.partition) {
+		if (pos >= vnode->stream.u.dev.partition->info.size)
+			return B_BAD_VALUE;
+		translate_partition_access(vnode->stream.u.dev.partition, pos,
+			*_length);
+	}
 
 	if (*_length == 0)
 		return B_OK;
@@ -1507,8 +1509,15 @@ devfs_write(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 	if (!S_ISCHR(vnode->stream.type))
 		return B_BAD_VALUE;
 
-	if (vnode->stream.u.dev.partition)
-		translate_partition_access(vnode->stream.u.dev.partition, pos, *_length);
+	if (pos < 0)
+		return B_BAD_VALUE;
+
+	if (vnode->stream.u.dev.partition) {
+		if (pos >= vnode->stream.u.dev.partition->info.size)
+			return B_BAD_VALUE;
+		translate_partition_access(vnode->stream.u.dev.partition, pos,
+			*_length);
+	}
 
 	if (*_length == 0)
 		return B_OK;
@@ -1888,7 +1897,12 @@ devfs_read_pages(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 		|| cookie == NULL)
 		return B_NOT_ALLOWED;
 
+	if (pos < 0)
+		return B_BAD_VALUE;
+
 	if (vnode->stream.u.dev.partition) {
+		if (pos >= vnode->stream.u.dev.partition->info.size)
+			return B_BAD_VALUE;
 		translate_partition_access(vnode->stream.u.dev.partition, pos,
 			*_numBytes);
 	}
@@ -1942,7 +1956,12 @@ devfs_write_pages(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 		|| cookie == NULL)
 		return B_NOT_ALLOWED;
 
+	if (pos < 0)
+		return B_BAD_VALUE;
+
 	if (vnode->stream.u.dev.partition) {
+		if (pos >= vnode->stream.u.dev.partition->info.size)
+			return B_BAD_VALUE;
 		translate_partition_access(vnode->stream.u.dev.partition, pos,
 			*_numBytes);
 	}
