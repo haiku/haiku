@@ -108,6 +108,7 @@ rule AddDirectoryToContainer container : directoryTokens
 	if ! [ on $(directory) return $(__is_on_image) ] {
 		HAIKU_INSTALL_DIRECTORIES on $(container) += $(directory) ;
 		__is_on_image on $(directory) = true ;
+		DIRECTORY_TOKENS on $(directory) = $(directoryTokens) ;
 		NotFile $(directory) ;
 	
 		# mark the parent dir as not to be created
@@ -298,26 +299,60 @@ rule CreateContainerMakeDirectoriesScript container : script
 	LOCATE on $(scriptBody) = [ on $(script) return $(LOCATE) ] ;
 	Depends $(scriptBody) : $(initScript) ;
 	Depends $(script) : $(scriptBody) ;
-	
+
+	# collect the directories to create
 	local dirsToCreate ;
+	local directories = [ on $(container) return $(HAIKU_INSTALL_DIRECTORIES) ] ;
 	local dir ;
-	for dir in [ on $(container) return $(HAIKU_INSTALL_DIRECTORIES) ] {
+	for dir in $(directories) {
 		if ! [ on $(dir) return $(DONT_CREATE) ] {
 			dirsToCreate += $(dir) ;
 		}
 	}
 
-	Depends $(scriptBody) : $(dirsToCreate) ;
 	# If the image shall only be updated, we don't create directories.
 	if $(dirsToCreate)
 		&& ! [ on $(container) return $(HAIKU_CONTAINER_UPDATE_ONLY) ] {
+		Depends $(scriptBody) : $(dirsToCreate) ;
 		CreateContainerMakeDirectoriesScript1 $(scriptBody) : $(dirsToCreate) ;
+
+		# For directories with attributes, we convert those the specified
+		# resource files to files with attributes and add commands to the script
+		# adding the attributes to the directories.
+		for dir in $(directories) {
+			local resourceFiles = [ on $(dir) return $(ATTRIBUTE_FILES) ] ;
+			if $(resourceFiles) {
+				local dirTokens = [ on $(dir) return $(DIRECTORY_TOKENS) ] ;
+	
+				# translate resources file to file with attributes
+				local attributeFile = $(script)-attributes-$(dirTokens:J=-) ;
+				ResAttr $(attributeFile) : $(resourceFiles) ;
+	
+				# use a unique dummy target for this file, on which we
+				# can define the TARGET_DIR variable
+				local dummyTarget = $(script)-attributes-dummy-$(dir:G=) ;
+				NotFile $(dummyTarget) ;
+				TARGET_DIR on $(dummyTarget) = $(dir:G=) ;
+	
+				Depends $(dummyTarget) : $(initScript) $(attributeFile) ;
+				Depends $(script) : $(dummyTarget) ;
+	
+				AppendToContainerMakeDirectoriesScriptAttributes $(dummyTarget)
+					: $(initScript) $(attributeFile) ;
+			}
+		}
 	}
 }
 
 actions piecemeal CreateContainerMakeDirectoriesScript1
 {
 	echo \$mkdir -p "\"\${tPrefix}$(2:G=)\"" >> $(1)
+}
+
+actions AppendToContainerMakeDirectoriesScriptAttributes
+{
+	echo \$copyAttrs "\"\${sPrefix}$(2[2])\"" \
+		"\"\${tPrefix}$(TARGET_DIR)\"" >> $(2[1])
 }
 
 rule CreateContainerCopyFilesScript container : script
@@ -418,12 +453,20 @@ rule IsUpdateHaikuImageOnly
 	on $(HAIKU_IMAGE_CONTAINER_NAME) return $(HAIKU_CONTAINER_UPDATE_ONLY) ;
 }
 
-rule AddDirectoryToHaikuImage directoryTokens
+rule AddDirectoryToHaikuImage directoryTokens : attributeFiles
 {
 	# AddDirectoryToHaikuImage <directoryTokens>
 
-	return [ AddDirectoryToContainer $(HAIKU_IMAGE_CONTAINER_NAME)
+	local dir = [ AddDirectoryToContainer $(HAIKU_IMAGE_CONTAINER_NAME)
 		: $(directoryTokens) ] ;
+
+	if $(attributeFiles) {
+		SEARCH on $(attributeFiles)
+			+= [ FDirName $(HAIKU_TOP) data image_directories ] ;
+		ATTRIBUTE_FILES on $(dir) += $(attributeFiles) ;
+	}
+
+	return $(dir) ;
 }
 
 rule AddFilesToHaikuImage directory : targets : destName

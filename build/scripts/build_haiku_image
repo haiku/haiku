@@ -34,6 +34,7 @@ if [ $isImage ]; then
 	cd="$fsShellCommand cd"
 	scd="$fsShellCommand cd"
 	cp="$fsShellCommand cp"
+	copyAttrs="$fsShellCommand cp -a"
 	ln="$fsShellCommand ln"
 	mkdir="$fsShellCommand mkdir"
 	rm="$fsShellCommand rm"
@@ -45,6 +46,7 @@ else
 	cd=cd
 	scd=:
 	cp="$copyattr -d"
+	copyAttrs="$copyattr"
 	ln=ln
 	mkdir=mkdir
 	rm=rm
