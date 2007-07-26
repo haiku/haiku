@@ -22,7 +22,7 @@ UTF8
 
 ************************************************************************/
 
-#include <support/UTF8.h>
+#include <UTF8.h>
 #include <string.h>
 
 #include "CodeConv.h"
@@ -62,17 +62,15 @@ CodeConv::ConvertFromInternal(const char *src, int32 srclen, char *dst, int codi
 		return srclen;
 	}
 
-	int theCoding = coding_translation_table[coding];
-
 	int32 dstlen = srclen * 256;
 	long state = 0;
-	convert_from_utf8(theCoding, (char *)src, &srclen,
+	convert_from_utf8(coding, (char *)src, &srclen,
 		(char *)dst, &dstlen, &state, '?');
 
 	// TODO: Apart from this particular case, looks like we could use the
 	// system api for code conversion... check if this (which looks a lot like a workaround)
 	// applies to haiku, and if not, get rid of this class and just use the system api directly.
-	if (coding == M_ISO_2022_JP && state != 0) {
+	if (coding == B_EUC_CONVERSION && state != 0) {
 		const char *end_of_jis = "(B";
 		strncpy((char *)dst + dstlen, end_of_jis, 3);
 		dstlen += 3;
@@ -113,10 +111,9 @@ CodeConv::ConvertToInternal(const char *src, int32 srclen, char *dst, int coding
 #endif  
 #endif
 
-	int theCoding = coding_translation_table[coding];
 	int32 dstlen = 4;
 	long state = 0;
-	convert_to_utf8(theCoding, (char *)src, &srclen,
+	convert_to_utf8(coding, (char *)src, &srclen,
 		(char *)dst, &dstlen, &state, '?');
 
 	dst[dstlen] = '\0';

@@ -68,6 +68,9 @@ public:
 	BRect	SetTermSize(int rows, int cols, bool flag);
 	void	SetTermColor();
 
+	int	Encoding() const;
+	void	SetEncoding(int encoding);
+
 	void	SetMouseCursor();
 	// void  SetIMAware (bool);
 	void	SetScrollBar(BScrollBar *scrbar);
@@ -234,6 +237,8 @@ private:
 	// Terminal rows and columns.
 	int fTermRows;
 	int fTermColumns;
+
+	int fEncoding;
 
 	// Terminal view pointer.
 	int fTop;

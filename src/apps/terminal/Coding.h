@@ -32,56 +32,10 @@
 #ifndef _CODING__H_
 #define _CODING__H_
 
+#include <SupportDefs.h>
 #include <UTF8.h>
 
-enum {
-  M_UTF8,	  /* UTF-8 */
-  M_ISO_8859_1,  /* ISO-8859 */
-  M_ISO_8859_2,
-  M_ISO_8859_3,
-  M_ISO_8859_4,
-  M_ISO_8859_5,
-  M_ISO_8859_6,
-  M_ISO_8859_7,
-  M_ISO_8859_8,
-  M_ISO_8859_9,
-  M_ISO_8859_10,
-
-  M_MAC_ROMAN,  /* Macintosh Roman */
-
-  M_ISO_2022_JP,
-  M_SJIS,	/* Japanese */
-  M_EUC_JP,
-  M_EUC_KR
-  
-  //  M_EUC_TW,	/* Chinese */
-  //  M_BIG5,
-  //  M_ISO_2022_CN,
-
-  //  M_EUC_KR,	/* Koeran */
-  //  M_ISO_2022_KR,
-
-};
-
-const uint32 coding_translation_table[] = {
-  0,
-  B_ISO1_CONVERSION,				/* ISO 8859-1 */
-  B_ISO2_CONVERSION,				/* ISO 8859-2 */
-  B_ISO3_CONVERSION,				/* ISO 8859-3 */
-  B_ISO4_CONVERSION,				/* ISO 8859-4 */
-  B_ISO5_CONVERSION,				/* ISO 8859-5 */
-  B_ISO6_CONVERSION,				/* ISO 8859-6 */
-  B_ISO7_CONVERSION,				/* ISO 8859-7 */
-  B_ISO8_CONVERSION,				/* ISO 8859-8 */
-  B_ISO9_CONVERSION,				/* ISO 8859-9 */
-  B_ISO10_CONVERSION,				/* ISO 8859-10 */
-  B_MAC_ROMAN_CONVERSION,			/* Macintosh Roman */
-  B_JIS_CONVERSION,				/* JIS X 0208-1990 */
-  B_SJIS_CONVERSION,				/* Shift-JIS */
-  B_EUC_CONVERSION,				/* EUC Packed Japanese */
-  B_EUC_KR_CONVERSION				/* EUC Korean */
-};
-
+#define M_UTF8 (uint32)(-1)
 
 status_t	get_nth_encoding(int i, int *id);
 
@@ -90,7 +44,5 @@ const char *	longname2shortname(const char *longname);
 const char *	id2longname(int op);
 const char 	id2shortcut(int op);
 
-void		SetEncoding(int encoding);
-int		GetEncoding();
 
 #endif /* _CODING_H_ */

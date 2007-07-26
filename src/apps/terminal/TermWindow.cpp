@@ -144,6 +144,7 @@ TermWindow::_InitWindow(const char *command)
 	textframe.top = fMenubar->Bounds().bottom + 1.0;
 
 	fTermView = new TermView(textframe, command);
+	fTermView->SetEncoding(longname2id(PrefHandler::Default()->getString(PREF_TEXT_ENCODING)));
 
 	// Initialize TermView. (font, size and color)
 	fTermView->SetTermFont(&halfFont, &fullFont);
@@ -187,7 +188,9 @@ void
 TermWindow::MenusBeginning()
 {
 	// Syncronize Encode Menu Pop-up menu and Preference.
-	(fEncodingmenu->FindItem(id2longname(GetEncoding())))->SetMarked(true);
+	BMenuItem *item = fEncodingmenu->FindItem(id2longname(fTermView->Encoding()));
+	if (item != NULL)
+		item->SetMarked(true);
 	BWindow::MenusBeginning();
 }
 
@@ -261,7 +264,7 @@ TermWindow::_SetupMenu()
 
 	fEncodingmenu = new BMenu("Font Encoding");
 	fEncodingmenu->SetRadioMode(true);
-	MakeEncodingMenu(fEncodingmenu, GetEncoding(), true);
+	MakeEncodingMenu(fEncodingmenu, true);
 	fHelpmenu->AddItem(fWindowSizeMenu);  
 	fHelpmenu->AddItem(fEncodingmenu);
 //  fHelpmenu->AddItem(fNewFontMenu);
@@ -382,7 +385,7 @@ TermWindow::MessageReceived(BMessage *message)
 
 		case MENU_ENCODING: {
 			message->FindInt32 ("op", &coding_id);
-			SetEncoding(coding_id);
+			fTermView->SetEncoding(coding_id);
 			break;
 		}
 		// Extended B_SET_PROPERTY. Dispatch this message,
@@ -393,7 +396,7 @@ TermWindow::MessageReceived(BMessage *message)
 			message->GetCurrentSpecifier(&i, &spe);
 			if (!strcmp("encode", spe.FindString("property", i))){
 				message->FindInt32 ("data",  &coding_id);
-				SetEncoding (coding_id);
+				fTermView->SetEncoding (coding_id);
 			
 				message->SendReply(B_REPLY);
 			} else {
@@ -409,7 +412,7 @@ TermWindow::MessageReceived(BMessage *message)
 			message->GetCurrentSpecifier(&i, &spe);
 			if (!strcmp("encode", spe.FindString("property", i))){
 				BMessage reply(B_REPLY);
-				reply.AddInt32("result", GetEncoding());
+				reply.AddInt32("result", fTermView->Encoding());
 				message->SendReply(&reply);
 			}
 			else if (!strcmp("tty", spe.FindString("property", i))) {

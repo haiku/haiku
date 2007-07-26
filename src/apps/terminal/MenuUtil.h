@@ -20,7 +20,7 @@ class PrefHandler;
 BPopUpMenu *	MakeMenu(ulong msg, const char **items, 
   						const char *defaultItemName);
 
-void			MakeEncodingMenu(BMenu *eMenu, int coding, bool flag);
+void			MakeEncodingMenu(BMenu *eMenu, bool flag);
 void			LoadLocaleFile (PrefHandler *);
 
 

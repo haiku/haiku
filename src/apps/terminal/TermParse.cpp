@@ -288,37 +288,38 @@ TermParse::EscParse()
 		if (GetReaderBuf(c) < B_OK)
 			break;
 
-		if (now_coding != GetEncoding()) {
+		if (now_coding != fView->Encoding()) {
 			/*
 			 * Change coding, change parse table.
 			 */
-			switch (GetEncoding()) {
-				case M_UTF8:
-					groundtable = utf8_groundtable;
-					break;
-				case M_ISO_8859_1:
-				case M_ISO_8859_2:
-				case M_ISO_8859_3:
-				case M_ISO_8859_4:
-				case M_ISO_8859_5:
-				case M_ISO_8859_6:
-				case M_ISO_8859_7:
-				case M_ISO_8859_8:
-				case M_ISO_8859_9:
-				case M_ISO_8859_10:
+			switch (fView->Encoding()) {
+				case B_ISO1_CONVERSION:
+				case B_ISO2_CONVERSION:
+				case B_ISO3_CONVERSION:
+				case B_ISO4_CONVERSION:
+				case B_ISO5_CONVERSION:
+				case B_ISO6_CONVERSION:
+				case B_ISO7_CONVERSION:
+				case B_ISO8_CONVERSION:
+				case B_ISO9_CONVERSION:
+				case B_ISO10_CONVERSION:
 					groundtable = iso8859_groundtable;
 					break;
-				case M_SJIS:
+				case B_SJIS_CONVERSION:
 					groundtable = sjis_groundtable;
 					break;
-				case M_EUC_JP:
-				case M_EUC_KR:
-				case M_ISO_2022_JP:
+				case B_EUC_CONVERSION:
+				case B_EUC_KR_CONVERSION:
+				case B_JIS_CONVERSION:
 					groundtable = iso8859_groundtable;
+					break;
+				case M_UTF8:
+				default:
+					groundtable = utf8_groundtable;
 					break;
 			}
 			parsestate = groundtable;
-			now_coding = GetEncoding();
+			now_coding = fView->Encoding();
     		}
 
 		switch (parsestate[c]) {
@@ -332,8 +333,8 @@ TermParse::EscParse()
 			case CASE_PRINT_GR:
 				/* case iso8859 gr character, or euc */
 				ptr = cbuf;
-				if (now_coding == M_EUC_JP || now_coding == M_EUC_KR
-					|| now_coding == M_ISO_2022_JP) {
+				if (now_coding == B_EUC_CONVERSION || now_coding == B_EUC_KR_CONVERSION
+					|| now_coding == B_JIS_CONVERSION) {
 					switch (parsestate[curess]) {
 						case CASE_SS2:		/* JIS X 0201 */
 							*ptr++ = curess;
@@ -366,10 +367,10 @@ TermParse::EscParse()
 					width = 1;
 				}
 
-				if (now_coding != M_ISO_2022_JP)
+				if (now_coding != B_JIS_CONVERSION)
 					CodeConv::ConvertToInternal((char*)cbuf, -1, (char*)dstbuf, now_coding);
 				else
-					CodeConv::ConvertToInternal((char*)cbuf, -1, (char*)dstbuf, M_EUC_JP);
+					CodeConv::ConvertToInternal((char*)cbuf, -1, (char*)dstbuf, B_EUC_CONVERSION);
 
 				fView->PutChar(dstbuf, attr, width);
 				break;
@@ -380,7 +381,7 @@ TermParse::EscParse()
 				cbuf[1] |= 0x80;
 				cbuf[2] = 0;
 				width = 2;
-				CodeConv::ConvertToInternal((char*)cbuf, 2, (char*)dstbuf, M_EUC_JP);
+				CodeConv::ConvertToInternal((char*)cbuf, 2, (char*)dstbuf, B_EUC_CONVERSION);
 				fView->PutChar(dstbuf, attr, width);
 				break;
 

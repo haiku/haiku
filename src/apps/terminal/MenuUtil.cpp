@@ -41,7 +41,7 @@ MakeMenu(ulong msg, const char **items, const char *defaultItemName)
 
 
 void
-MakeEncodingMenu(BMenu *eMenu, int marked, bool flag)
+MakeEncodingMenu(BMenu *eMenu, bool flag)
 {
 	int encoding;
 	int i = 0;
@@ -52,9 +52,6 @@ MakeEncodingMenu(BMenu *eMenu, int marked, bool flag)
 			eMenu->AddItem(new BMenuItem(id2longname(encoding), msg, id2shortcut(encoding)));
 		else 
 			eMenu->AddItem(new BMenuItem(id2longname(encoding), msg));
-		
-		if (i == marked)
-			eMenu->ItemAt(i)->SetMarked(true);
 		
 		i++;
 	}

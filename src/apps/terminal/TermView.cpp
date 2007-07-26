@@ -133,6 +133,7 @@ TermView::TermView(BRect frame, const char *command)
 	fBufferStartPos(-1),
 	fTermRows(PrefHandler::Default()->getInt32(PREF_ROWS)),
 	fTermColumns(PrefHandler::Default()->getInt32(PREF_COLS)),
+	fEncoding(M_UTF8),
 	fTop(0),	
 	fTextBuffer(new (nothrow) TermBuffer(fTermRows, fTermColumns)),
 	fScrollBar(NULL),
@@ -291,6 +292,20 @@ TermView::SetTermColor()
 
 	SetLowColor(fTextBackColor);
 	SetViewColor(fTextBackColor);
+}
+
+
+int
+TermView::Encoding() const
+{
+	return fEncoding;
+}
+
+
+void
+TermView::SetEncoding(int encoding)
+{
+	fEncoding = encoding;
 }
 
 
@@ -1429,10 +1444,10 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 		}
 	} else {
 		// input multibyte character
-		if (GetEncoding() != M_UTF8) {
+		if (fEncoding != M_UTF8) {
 			uchar dstbuf[1024];
 			int cnum = CodeConv::ConvertFromInternal(bytes, numBytes,
-				(char *)dstbuf, GetEncoding());
+				(char *)dstbuf, fEncoding);
 			fShell->Write(dstbuf, cnum);
 		}
 	}
@@ -1679,10 +1694,10 @@ TermView::DoClearAll(void)
 void
 TermView::WritePTY(const uchar *text, int numBytes)
 {
-	if (GetEncoding() != M_UTF8) {
+	if (fEncoding != M_UTF8) {
 		uchar *destBuffer = (uchar *)malloc(numBytes * 3);
 		numBytes = CodeConv::ConvertFromInternal((char*)text, numBytes,
-			(char*)destBuffer, GetEncoding());
+			(char*)destBuffer, fEncoding);
 		fShell->Write(destBuffer, numBytes);
 		free(destBuffer);
 	} else {
@@ -1839,12 +1854,14 @@ TermView::Select(CurPos start, CurPos end)
 	
 	if (fTextBuffer->GetChar(start.y, start.x, buf, &attr) == IN_STRING) {
 		start.x--;
-		if (start.x < 0) start.x = 0;
+		if (start.x < 0)
+			start.x = 0;
 	}
 	
 	if (fTextBuffer->GetChar(end.y, end.x, buf, &attr) == IN_STRING) {
 		end.x++;
-		if (end.x >= fTermColumns) end.x = fTermColumns;
+		if (end.x >= fTermColumns)
+			end.x = fTermColumns;
 	}
 	
 	fSelStart = start;
