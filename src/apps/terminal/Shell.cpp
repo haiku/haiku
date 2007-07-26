@@ -30,6 +30,14 @@
  *
  */
 
+
+#include "Shell.h"
+
+#include "TermConst.h"
+#include "TermParse.h"
+
+#include <OS.h>
+
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -46,13 +54,53 @@
 #include <time.h>
 #include <unistd.h>
 
-#include <OS.h>
+#define MAXPTTYS 16 * 4
 
-#include "TermConst.h"
-#include "TermParse.h"
-#include "TermView.h"
-#include "Shell.h"
-#include "PrefHandler.h"
+#ifndef CEOF
+#define CEOF ('D'&037)
+#endif
+#ifndef CSUSP
+#define CSUSP ('@'&037)
+#endif
+#ifndef CQUIT
+#define CQUIT ('\\'&037)
+#endif
+#ifndef CEOL
+#define CEOL 0
+#endif
+#ifndef CSTOP
+#define CSTOP ('Q'&037)
+#endif
+#ifndef CSTART
+#define CSTART ('S'&037)
+#endif
+#ifndef CSWTCH
+#define CSWTCH 0
+#endif
+
+/*
+ * ANSI emulation.
+ */
+#define INQ	0x05
+#define	FF	0x0C			/* C0, C1 control names		*/
+#define	LS1	0x0E
+#define	LS0	0x0F
+#define	CAN	0x18
+#define	SUB	0x1A
+#define	ESC	0x1B
+#define US	0x1F
+#define	DEL	0x7F
+#define HTS     ('H'+0x40)
+#define	SS2	0x8E
+#define	SS3	0x8F
+#define	DCS	0x90
+#define	OLDID	0x9A			/* ESC Z			*/
+#define	CSI	0x9B
+#define	ST	0x9C
+#define	OSC	0x9D
+#define	PM	0x9E
+#define	APC	0x9F
+#define	RDEL	0xFF
 
 /* default shell command and options. */
 #define SHELL_COMMAND "/bin/sh -login"

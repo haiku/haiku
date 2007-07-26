@@ -19,7 +19,6 @@
 #include "Shell.h"
 #include "TermBuffer.h"
 #include "TermConst.h"
-#include "TermParse.h"
 #include "VTkeymap.h"
 
 #include <Application.h>

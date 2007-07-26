@@ -1,4 +1,5 @@
 /*
+ * Copyright 2007 Haiku, Inc.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
@@ -32,54 +33,7 @@
 #ifndef _SHELL_H
 #define _SHELL_H
 
-#define MAXPTTYS 16 * 4
-
-#ifndef CEOF
-#define CEOF ('D'&037)
-#endif
-#ifndef CSUSP
-#define CSUSP ('@'&037)
-#endif
-#ifndef CQUIT
-#define CQUIT ('\\'&037)
-#endif
-#ifndef CEOL
-#define CEOL 0
-#endif
-#ifndef CSTOP
-#define CSTOP ('Q'&037)
-#endif
-#ifndef CSTART
-#define CSTART ('S'&037)
-#endif
-#ifndef CSWTCH
-#define CSWTCH 0
-#endif
-
-/*
- * ANSI emulation.
- */
-#define INQ	0x05
-#define	FF	0x0C			/* C0, C1 control names		*/
-#define	LS1	0x0E
-#define	LS0	0x0F
-#define	CAN	0x18
-#define	SUB	0x1A
-#define	ESC	0x1B
-#define US	0x1F
-#define	DEL	0x7F
-#define HTS     ('H'+0x40)
-#define	SS2	0x8E
-#define	SS3	0x8F
-#define	DCS	0x90
-#define	OLDID	0x9A			/* ESC Z			*/
-#define	CSI	0x9B
-#define	ST	0x9C
-#define	OSC	0x9D
-#define	PM	0x9E
-#define	APC	0x9F
-#define	RDEL	0xFF
-
+#include <SupportDefs.h>
 
 // TODO: Maybe merge TermParse and Shell classes ?
 class TermParse;
