@@ -36,12 +36,14 @@ static const int sCopyBufferSize = 64 * 1024;	// 64 KB
 
 struct Options {
 	Options()
-		: dereference(true),
+		: attributesOnly(false),
+		  dereference(true),
 		  force(false),
 		  recursive(false)
 	{
 	}
 
+	bool	attributesOnly;
 	bool	dereference;
 	bool	force;
 	bool	recursive;
@@ -1200,6 +1202,8 @@ command_cp(int argc, const char* const* argv)
 
 			for (int i = 1; arg[i]; i++) {
 				switch (arg[i]) {
+					case 'a':
+						options.attributesOnly = true;
 					case 'd':
 						options.dereference = false;
 						break;
@@ -1239,7 +1243,11 @@ command_cp(int argc, const char* const* argv)
 		NodeDeleter targetDeleter(targetNode);
 		targetExists = true;
 
-		if (targetNode->IsDirectory()) {
+		if (options.attributesOnly) {
+			// That's how it should be; we don't care whether the target is
+			// a directory or not. We append the attributes to that node in
+			// either case.
+		} else if (targetNode->IsDirectory()) {
 			targetIsDir = true;
 		} else {
 			if (sourceCount > 1) {
@@ -1249,7 +1257,12 @@ command_cp(int argc, const char* const* argv)
 			}
 		}
 	} else {
-		if (sourceCount > 1) {
+		if (options.attributesOnly) {
+			fprintf(stderr, "Error: Failed to open target `%s' (it must exist "
+				"in attributes only mode): `%s'\n", target,
+				fssh_strerror(error));
+			return error;
+		} else if (sourceCount > 1) {
 			fprintf(stderr, "Error: Failed to open destination directory `%s':"
 				" `%s'\n", target, fssh_strerror(error));
 			return error;
@@ -1264,12 +1277,42 @@ command_cp(int argc, const char* const* argv)
 	}
 	MemoryDeleter copyBufferDeleter(sCopyBuffer);
 
+	// open the target node for attributes only mode
+	NodeDeleter targetDeleter;
+	if (options.attributesOnly) {
+		error = targetDomain->Open(target, FSSH_O_WRONLY, targetNode);
+		if (error != FSSH_B_OK) {
+			fprintf(stderr, "Error: Failed to open target `%s' for writing: "
+				"`%s'\n", target, fssh_strerror(error));
+			return error;
+		}
+
+		targetDeleter.SetTo(targetNode);
+	}
+
 	// the copy loop
 	for (int i = 0; i < sourceCount; i++) {
 		const char *source = sources[i];
 		FSDomain *sourceDomain = get_file_domain(source, source);
 		DomainDeleter sourceDomainDeleter(sourceDomain);
-		if (targetExists && targetIsDir) {
+		if (options.attributesOnly) {
+			// 0. copy attributes only
+			// open the source node
+			Node *sourceNode;
+			error = sourceDomain->Open(source,
+				FSSH_O_RDONLY | (options.dereference ? 0 : FSSH_O_NOTRAVERSE),
+				sourceNode);
+			if (error != FSSH_B_OK) {
+				fprintf(stderr, "Error: Failed to open `%s': %s.\n", source,
+					fssh_strerror(error));
+				return error;
+			}
+			NodeDeleter sourceDeleter(sourceNode);
+
+			// copy the attributes
+			error = copy_attributes(source, sourceNode, target, targetNode);
+
+		} else if (targetExists && targetIsDir) {
 			// 1. target exists:
 			// 1.1. target is a dir:
 			// get the source leaf name
