@@ -100,7 +100,7 @@ write_attributes(BNode &out, const char *inFileName, BResources &resources,
 			// should not happen
 			fprintf(stderr, "Failed to get resource `%s', type: %lx, id: %ld "
 				"from input file `%s'\n", name, type, id, inFileName);
-			continue;
+			exit(1);
 		}
 
 		// construct a name, if the resource doesn't have one
@@ -134,7 +134,7 @@ write_resources(BResources &resources, const char *inFileName, BNode &in,
 		if (error != B_OK) {
 			fprintf(stderr, "Failed to get info for attribute `%s' of input "
 				"file `%s': %s\n", name, inFileName, strerror(error));
-			continue;
+			exit(1);
 		}
 
 		// read attribute
@@ -145,7 +145,7 @@ write_resources(BResources &resources, const char *inFileName, BNode &in,
 			fprintf(stderr, "Failed to read attribute `%s' of input "
 				"file `%s': %s\n", name, inFileName, strerror(bytesRead));
 			delete[] data;
-			continue;
+			exit(1);
 		}
 
 		// find unique ID
@@ -202,7 +202,7 @@ resources_to_attributes(const char *outputFile, const char **inputFiles,
 		if (error != B_OK) {
 			fprintf(stderr, "Failed to open input file `%s': %s\n",
 				inputFiles[i], strerror(error));
-			continue;
+			exit(1);
 		}
 
 		// open resources
@@ -211,7 +211,7 @@ resources_to_attributes(const char *outputFile, const char **inputFiles,
 		if (error != B_OK) {
 			fprintf(stderr, "Failed to read resources of input file `%s': %s\n",
 				inputFiles[i], strerror(error));
-			continue;
+			exit(1);
 		}
 
 		// add the attributes
@@ -253,7 +253,7 @@ attributes_to_resources(const char *outputFile, const char **inputFiles,
 		if (error != B_OK) {
 			fprintf(stderr, "Failed to open input file `%s': %s\n",
 				inputFiles[i], strerror(error));
-			continue;
+			exit(1);
 		}
 
 		// add the resources
