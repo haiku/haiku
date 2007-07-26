@@ -35,7 +35,7 @@
 #include <SupportDefs.h>
 #include <UTF8.h>
 
-#define M_UTF8 (uint32)(-1)
+#define M_UTF8 (-1)
 
 status_t	get_nth_encoding(int i, int *id);
 

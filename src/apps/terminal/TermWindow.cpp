@@ -6,6 +6,19 @@
  *
  * Distributed unter the terms of the MIT license.
  */
+
+#include "TermWindow.h"
+
+#include "Coding.h"
+#include "ColorWindow.h"
+#include "MenuUtil.h"
+#include "FindWindow.h"
+#include "PrefWindow.h"
+#include "PrefView.h"
+#include "PrefHandler.h"
+#include "TermConst.h"
+#include "TermView.h"
+
 #include <Alert.h>
 #include <Application.h>
 #include <Menu.h>
@@ -22,23 +35,8 @@
 #include <WindowScreen.h>
 
 #include <stdio.h>
-#include <string>
-#include <sys/time.h>
-#include <unistd.h>
-
-#include "Coding.h"
-#include "ColorWindow.h"
-#include "MenuUtil.h"
-#include "FindWindow.h"
-#include "PrefWindow.h"
-#include "PrefView.h"
-#include "PrefHandler.h"
-#include "TermBuffer.h"
-#include "TermParse.h"
-#include "TermView.h"
-#include "TermWindow.h"
-#include "TermConst.h"
-
+#include <string.h>
+#include <time.h>
 
 //
 // help and GPL URL

@@ -73,18 +73,19 @@ but it font is full width font on preference panel.
 
 ************************************************************************/
 
+#include "TermBuffer.h"
+
+#include "CurPos.h"
+#include "PrefHandler.h"
+#include "TermConst.h"
+
 #include <SupportDefs.h>
 #include <String.h>
 
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
-#include <bsd_mem.h>
 
-#include "TermBuffer.h"
-#include "TermConst.h"
-#include "CurPos.h"
-#include "PrefHandler.h"
 
 #define ARRAY_SIZE 512
 #define ROW(x) (((x) + fRowOffset) % fBufferSize)
@@ -223,12 +224,10 @@ TermBuffer::GetString(int row, int col, int num, uchar *buf,
 void
 TermBuffer::WriteChar(const CurPos &pos, const uchar *u, ushort attr)
 {
-	term_buffer *ptr;
-
 	const int row = pos.y;
 	const int col = pos.x;
 
-	ptr = (fBuffer[ROW(row)] + col);
+	term_buffer *ptr = (fBuffer[ROW(row)] + col);
 	memcpy ((char *)ptr->code, u, 4);
 
 	if (IS_WIDTH(attr))

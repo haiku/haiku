@@ -35,9 +35,6 @@
 #include "CurPos.h"
 
 
-#define MIN_COLS 10
-#define MAX_COLS 256
-
 
 struct term_buffer
 {

@@ -5,7 +5,7 @@ struct etable {
 	const char *name;     	// long name for menu item.
 	const char *shortname;	// short name (use for command-line etc.)
 	const char shortcut;	// short cut key code
-	const uint32 id;      	// encoding id 
+	const int32 id;      	// encoding id 
 };
 
 
@@ -32,7 +32,7 @@ const static etable kEncodingTable[] =
 	{"EUC-kr", "EUCK", 'K', B_EUC_KR_CONVERSION},
 
 
-	/* Not Implement.
+	/* Not Implemented.
 	{"EUC-tw", "EUCT", "T", M_EUC_TW},
 	{"Big5", "Big5", 'B', M_BIG5},
 	{"ISO-2022-cn", "ISOC", 'C', M_ISO_2022_CN},
@@ -102,6 +102,8 @@ id2longname(int id)
 			return p->name;
 		p++;
 	}
+
+	return kEncodingTable[0].name;
 }
 
 
@@ -114,5 +116,6 @@ id2shortcut(int id)
 			return p->shortcut;
 		p++;
 	}
+	return kEncodingTable[0].shortcut;
 }
 

@@ -140,6 +140,9 @@ enum{
   SCRDOWN
 };
 
+#define MIN_COLS 10
+#define MAX_COLS 256
+
 // Insert mode flag
 #define MODE_OVER 0
 #define MODE_INSERT 1
