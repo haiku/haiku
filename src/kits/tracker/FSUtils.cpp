@@ -2968,7 +2968,6 @@ LoaderErrorDetails(const entry_ref *app, BString &details)
 	if (result != B_OK)
 		return result;
 
-	message.PrintToStream();
 	const char* library;
 	for (int32 i = 0; message.FindString("missing library", i,
 			&library) == B_OK; i++) {
