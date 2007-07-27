@@ -30,10 +30,10 @@
 #ifndef _TERMBUFFER_H
 #define _TERMBUFFER_H
 
-#include <SupportDefs.h>
-#include "TermConst.h"
 #include "CurPos.h"
+#include "TermConst.h"
 
+#include <SupportDefs.h>
 
 
 struct term_buffer
@@ -49,7 +49,7 @@ class BString;
 
 class TermBuffer {
 public:
-	TermBuffer(int row, int col);
+	TermBuffer(int row, int col, int bufferSize = 1000);
 	~TermBuffer();
 
 	//

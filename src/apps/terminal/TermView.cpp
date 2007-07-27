@@ -31,9 +31,11 @@
 #include <MessageRunner.h>
 #include <Path.h>
 #include <PopUpMenu.h>
+#include <PropertyInfo.h>
 #include <Roster.h>
 #include <ScrollBar.h>
 #include <String.h>
+#include <Window.h>
 
 #include <ctype.h>
 #include <signal.h>
@@ -134,7 +136,7 @@ TermView::TermView(BRect frame, const char *command)
 	fTermColumns(PrefHandler::Default()->getInt32(PREF_COLS)),
 	fEncoding(M_UTF8),
 	fTop(0),	
-	fTextBuffer(new (nothrow) TermBuffer(fTermRows, fTermColumns)),
+	fTextBuffer(NULL),
 	fScrollBar(NULL),
 	fScrTop(0),
 	fScrBot(fTermRows - 1),
@@ -156,17 +158,17 @@ TermView::TermView(BRect frame, const char *command)
 void
 TermView::_InitObject(const char *command)
 {
+	fTextBuffer = new TermBuffer(fTermRows, fTermColumns, fScrBufSize);
+
 	SetMouseCursor();	
 	SetTermFont(be_fixed_font, be_fixed_font);
 	SetTermColor();
 	
 	//SetIMAware(PrefHandler::Default()->getInt32(PREF_IM_AWARE));
 
-	const char *encoding = PrefHandler::Default()->getString(PREF_TEXT_ENCODING);
-	SetEncoding(longname2id(encoding));
-
 	fShell = new Shell();	
-	status_t status = fShell->Open(fTermRows, fTermColumns, command, longname2shortname(encoding));	
+	status_t status = fShell->Open(fTermRows, fTermColumns,
+					command, longname2shortname(id2longname(fEncoding)));	
 	if (status < B_OK)
 		throw status;
 
@@ -1531,7 +1533,41 @@ TermView::MessageReceived(BMessage *msg)
 		case B_SELECT_ALL:
 			DoSelectAll();
 			break;
+		
+		case B_SET_PROPERTY: {
+			int32 i;
+			int32 encodingID;
+			BMessage spe;
+			msg->GetCurrentSpecifier(&i, &spe);
+			if (!strcmp("encoding", spe.FindString("property", i))){
+				msg->FindInt32 ("data",  &encodingID);
+				SetEncoding(encodingID);
+				msg->SendReply(B_REPLY);
+			} else {
+				BView::MessageReceived(msg);
+			}
+			break;
+		}
 
+		case B_GET_PROPERTY: {
+			int32 i;
+			BMessage spe;
+			msg->GetCurrentSpecifier(&i, &spe);
+			if (!strcmp("encoding", spe.FindString("property", i))){
+				BMessage reply(B_REPLY);
+				reply.AddInt32("result", Encoding());
+				msg->SendReply(&reply);
+			}
+			else if (!strcmp("tty", spe.FindString("property", i))) {
+				BMessage reply(B_REPLY);
+				reply.AddString("result", TerminalName());
+				msg->SendReply(&reply);
+			} else {
+				BView::MessageReceived(msg);
+			}
+			break;
+		}
+	
 		case MENU_CLEAR_ALL:
 			DoClearAll();
 			fShell->Write(ctrl_l, 1);
@@ -1568,6 +1604,46 @@ TermView::MessageReceived(BMessage *msg)
 			break;
 	}
 }  
+
+
+status_t
+TermView::GetSupportedSuites(BMessage *message) 
+{ 
+	static property_info propList[] = { 
+		{ "encoding",
+		{B_GET_PROPERTY, 0},
+		{B_DIRECT_SPECIFIER, 0},
+		"get muterminal encoding"}, 
+		{ "encoding",
+		{B_SET_PROPERTY, 0},
+		{B_DIRECT_SPECIFIER, 0},
+		"set muterminal encoding"}, 
+		{ "tty",
+		{B_GET_PROPERTY, 0},
+		{B_DIRECT_SPECIFIER, 0},
+		"get tty_name."}, 
+		{ 0  }
+		     
+	};
+
+	message->AddString("suites", "suite/vnd.naan-termview"); 
+	BPropertyInfo propInfo(propList); 
+	message->AddFlat("messages", &propInfo); 
+	return BView::GetSupportedSuites(message); 
+}
+
+
+BHandler*
+TermView::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
+				int32 form, const char *property)
+{
+	if (((strcmp(property, "encode") == 0) 
+		&& ((msg->what == B_SET_PROPERTY) || (msg->what == B_GET_PROPERTY))) 
+		|| ((strcmp(property, "tty") == 0) &&  (msg->what == B_GET_PROPERTY))) 
+	return this;
+
+	return BView::ResolveSpecifier(msg, index, specifier, form, property);
+}
 
 
 //! Gets dropped file full path and display it at cursor position.

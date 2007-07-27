@@ -40,7 +40,7 @@ class BMenuBar;
 class FindWindow;
 class PrefWindow;
 class TermView;
-
+class SmartTabView;
 class TermWindow : public BWindow {
 public:
 	TermWindow(BRect frame, const char* title, const char *command);
@@ -52,17 +52,15 @@ protected:
 	virtual void	MenusBeginning();
 	virtual bool	QuitRequested();
 
-	status_t	GetSupportedSuites(BMessage *msg);
-	BHandler*	ResolveSpecifier(BMessage *msg, int32 index,
-					BMessage *specifier, int32 form,
-					const char *property);
 
 private:
 	void		_InitWindow(const char *command);
 	void		_SetupMenu();
 	status_t	_DoPageSetup();
 	void		_DoPrint();
-
+	void		_NewTab(const char *command);
+	
+	SmartTabView	*fTabView;
 	TermView	*fTermView;
 	BMenuBar	*fMenubar;
 	BMenu		*fFilemenu,

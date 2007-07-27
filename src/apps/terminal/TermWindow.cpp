@@ -16,6 +16,7 @@
 #include "PrefWindow.h"
 #include "PrefView.h"
 #include "PrefHandler.h"
+#include "SmartTabView.h"
 #include "TermConst.h"
 #include "TermView.h"
 
@@ -26,7 +27,6 @@
 #include <MenuItem.h>
 #include <Path.h>
 #include <PrintJob.h>
-#include <PropertyInfo.h>
 #include <Roster.h>
 #include <Screen.h>
 #include <ScrollBar.h>
@@ -52,14 +52,14 @@ const static float kViewOffset = 3;
 #if 0
 TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	:
-	BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE|B_QUIT_ON_WINDOW_CLOSE)
+	BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE|B_QUIT_ON_WINDOW_CLOSE),
+	fTabView(NULL)
 {
-	fTermView = new TermView(Bounds(), command);
-	AddChild(fTermView);
-
-	float width, height;
-	fTermView->GetPreferredSize(&width, &height);
-	ResizeTo(width, height);
+	fTabView = new SmartTabView(Bounds(), "Tab view");
+	AddChild(fTabView);
+	
+	_NewTab(command);
+	_NewTab(NULL);
 }
 
 #else
@@ -386,43 +386,7 @@ TermWindow::MessageReceived(BMessage *message)
 			fTermView->SetEncoding(coding_id);
 			break;
 		}
-		// Extended B_SET_PROPERTY. Dispatch this message,
-		// Set coding ID.
-		case B_SET_PROPERTY: {
-			int32 i;
-			BMessage spe;
-			message->GetCurrentSpecifier(&i, &spe);
-			if (!strcmp("encode", spe.FindString("property", i))){
-				message->FindInt32 ("data",  &coding_id);
-				fTermView->SetEncoding (coding_id);
-			
-				message->SendReply(B_REPLY);
-			} else {
-				BWindow::MessageReceived(message);
-			}
-			break;
-		}
-
-		// Extended B_GET_PROPERTY. Dispatch this message, reply now coding ID.
-		case B_GET_PROPERTY: {
-			int32 i;
-			BMessage spe;
-			message->GetCurrentSpecifier(&i, &spe);
-			if (!strcmp("encode", spe.FindString("property", i))){
-				BMessage reply(B_REPLY);
-				reply.AddInt32("result", fTermView->Encoding());
-				message->SendReply(&reply);
-			}
-			else if (!strcmp("tty", spe.FindString("property", i))) {
-				BMessage reply(B_REPLY);
-				reply.AddString("result", fTermView->TerminalName());
-				message->SendReply(&reply);
-			} else {
-				BWindow::MessageReceived(message);
-			}
-			break;
-		}
-	
+		
 		// Message from Preference panel.
 		case MSG_ROWS_CHANGED:
 		case MSG_COLS_CHANGED: {
@@ -580,51 +544,6 @@ TermWindow::QuitRequested()
 
 
 status_t
-TermWindow::GetSupportedSuites(BMessage *msg) 
-{ 
-	static property_info propList[] = { 
-		{ "encode",
-		{B_GET_PROPERTY, 0},
-		{B_DIRECT_SPECIFIER, 0},
-		"get muterminal encode"}, 
-		{ "encode",
-		{B_SET_PROPERTY, 0},
-		{B_DIRECT_SPECIFIER, 0},
-		"set muterminal encode"}, 
-		{ "tty",
-		{B_GET_PROPERTY, 0},
-		{B_DIRECT_SPECIFIER, 0},
-		"get tty_name."}, 
-		{ 0  }
-		     
-	};
-
-	msg->AddString("suites", "suite/vnd.naan-termwindow"); 
-	BPropertyInfo propInfo(propList); 
-	msg->AddFlat("messages", &propInfo); 
-	return BWindow::GetSupportedSuites(msg); 
-}
-
-
-////////////////////////////////////////////////////////////////////////////
-// ResolveSpecifier
-//
-////////////////////////////////////////////////////////////////////////////
-BHandler*
-TermWindow::ResolveSpecifier(BMessage *msg, int32 index,
-           BMessage *specifier, int32 form,
-           const char *property)
-{
-	if (((strcmp(property, "encode") == 0) 
-		&& ((msg->what == B_SET_PROPERTY) || (msg->what == B_GET_PROPERTY))) 
-		|| ((strcmp(property, "tty") == 0) &&  (msg->what == B_GET_PROPERTY))) 
-	return this;
-
-	return BWindow::ResolveSpecifier(msg, index, specifier, form, property);
-}
-
-
-status_t
 TermWindow::_DoPageSetup() 
 { 
 	BPrintJob job("PageSetup");
@@ -683,4 +602,13 @@ TermWindow::_DoPrint()
 	job.CommitJob(); 
 }
 #endif
+
+void
+TermWindow::_NewTab(const char *command)
+{
+	TermView *view = new TermView(Bounds(), command);
+	fTabView->AddTab(view);
+}
+
+
 

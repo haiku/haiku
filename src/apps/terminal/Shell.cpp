@@ -172,12 +172,12 @@ Shell::~Shell()
 
 
 status_t
-Shell::Open(int row, int col, const char *command, const char *coding)
+Shell::Open(int row, int col, const char *command, const char *encoding)
 {
 	if (fFd >= 0)
 		return B_ERROR;
 
-	status_t status = _Spawn(row, col, command, coding);
+	status_t status = _Spawn(row, col, command, encoding);
 	if (status < B_OK)
 		return status;
 
@@ -314,7 +314,7 @@ receive_handshake_message(handshake_t& handshake)
 
 
 status_t
-Shell::_Spawn(int row, int col, const char *command, const char *coding)
+Shell::_Spawn(int row, int col, const char *command, const char *encoding)
 {
 	signal(SIGTTOU, SIG_IGN);
 	
@@ -536,7 +536,7 @@ Shell::_Spawn(int row, int col, const char *command, const char *coding)
 		 */
 		setenv("TERM", "beterm", true);
 		setenv("TTY", ttyName, true);
-		setenv("TTYPE", coding, true);
+		setenv("TTYPE", encoding, true);
 
 		/*
 		 * If don't set command args, exec SHELL_COMMAND.

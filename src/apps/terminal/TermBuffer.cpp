@@ -87,11 +87,10 @@ but it font is full width font on preference panel.
 #include <string.h>
 
 
-#define ARRAY_SIZE 512
 #define ROW(x) (((x) + fRowOffset) % fBufferSize)
 
 
-TermBuffer::TermBuffer(int rows, int cols)
+TermBuffer::TermBuffer(int rows, int cols, int bufferSize)
 {
 	if (rows < 1)
 		rows = 1;
@@ -109,7 +108,7 @@ TermBuffer::TermBuffer(int rows, int cols)
 	fSelStart.Set(-1,-1);
 	fSelEnd.Set(-1,-1);
 
-	fBufferSize = PrefHandler::Default()->getInt32(PREF_HISTORY_SIZE);
+	fBufferSize = bufferSize;
 	if (fBufferSize < 1000)
 		fBufferSize = 1000;
 

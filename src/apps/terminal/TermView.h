@@ -33,8 +33,6 @@
 
 
 #include "CurPos.h"
-#include "TermConst.h"
-#include "TermWindow.h"
 
 #include <Messenger.h>
 #include <String.h>
@@ -52,7 +50,7 @@ class Shell;
 class TermBuffer;
 class TermView : public BView {
 public:
-	TermView(BRect frame, const char *command);
+	TermView(BRect frame, const char *command = NULL);
 	~TermView();
 
 	virtual void GetPreferredSize(float *width, float *height);
@@ -141,6 +139,11 @@ protected:
 
 	virtual void	FrameResized(float width, float height);
 	virtual void	MessageReceived(BMessage* message);
+
+	virtual status_t GetSupportedSuites(BMessage *msg);
+	virtual BHandler* ResolveSpecifier(BMessage *msg, int32 index,
+						BMessage *specifier, int32 form,
+						const char *property);
 
 private:
 	void _InitObject(const char *command);
