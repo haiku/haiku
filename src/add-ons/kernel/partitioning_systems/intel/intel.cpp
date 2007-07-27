@@ -41,11 +41,6 @@
 //#define TRACE(x) ;
 #define TRACE(x) dprintf x
 
-
-// this macro is just for testing purpose
-// keep it undefined, if you are not testing !!!
-// #define TESTING_INTEL_MODULE
-
 // module names
 #define INTEL_PARTITION_MODULE_NAME "partitioning_systems/intel/map/v1"
 #define INTEL_EXTENDED_PARTITION_MODULE_NAME "partitioning_systems/intel/extended/v1"
@@ -77,36 +72,29 @@ static const int32 MAX_MOVE_BUFFER = 2 * 1024 * 4;
 
 // for logical partitions in Intel Extended Partition
 // Count of free sectors after Partition Table Sector (at logical partition).
-static const uint32 FREE_SEKTORS_AFTER_PTS = 0;
+static const uint32 FREE_SECTORS_AFTER_PTS = 0;
 // Count of free sectors after Master Boot Record.
-static const uint32 FREE_SEKTORS_AFTER_MBR = 0;
+static const uint32 FREE_SECTORS_AFTER_MBR = 0;
 // size of logical partition header in blocks
-static const uint32 PTS_OFFSET = FREE_SEKTORS_AFTER_PTS + 1;
-static const uint32 MBR_OFFSET = FREE_SEKTORS_AFTER_MBR + 1;
+static const uint32 PTS_OFFSET = FREE_SECTORS_AFTER_PTS + 1;
+static const uint32 MBR_OFFSET = FREE_SECTORS_AFTER_MBR + 1;
 
 
 typedef partitionable_space_data PartitionPosition;
 
 typedef void (*fc_get_sibling_partitions)(partition_data *partition,
-		partition_data *child, off_t child_offset, partition_data **prec,
+		partition_data *child, off_t childOffset, partition_data **prec,
 		partition_data **follow, off_t *prec_offset, off_t *prec_size,
 		off_t *follow_offset, off_t *follow_size);
 
 typedef int32 (*fc_fill_partitionable_spaces_buffer)(partition_data *partition,
-		PartitionPosition *p_positions);
+		PartitionPosition *positions);
 
 
-#endif	//_BOOT_MODE
+#endif	//!_BOOT_MODE
 
 
-
-
-//////////////////////////////////////////
-//     Intel Partition Map Module       //
-//////////////////////////////////////////
-
-
-
+// #pragma mark - Intel Partition Map Module
 
 
 // module
@@ -262,16 +250,7 @@ static partition_module_info intel_partition_map_module =
 };
 
 
-
-
-
-
-///////////////////////////////////////////////
-//      Intel Extended Partition Module      //
-///////////////////////////////////////////////
-
-
-
+// #pragma mark - Intel Extended Partition Module
 
 
 // module
@@ -420,7 +399,7 @@ static partition_module_info intel_extended_partition_module =
 	ep_initialize,						// initialize
 	ep_create_child,					// create_child
 	ep_delete_child,					// delete_child
-#else
+#else	// _BOOT_MODE
 	NULL
 #endif	// _BOOT_MODE
 };
@@ -437,22 +416,11 @@ _EXPORT partition_module_info *modules[] =
 #endif
 
 
-
-
-
-
-
-//////////////////////////////////////////
-//     Intel Partition Map Module       //
-//////////////////////////////////////////
-
-
-
+// #pragma mark - Intel Partition Map Module
 
 
 // pm_std_ops
-static
-status_t
+static status_t
 pm_std_ops(int32 op, ...)
 {
 	TRACE(("intel: pm_std_ops(0x%lx)\n", op));
@@ -466,8 +434,7 @@ pm_std_ops(int32 op, ...)
 
 
 // pm_identify_partition
-static
-float
+static float
 pm_identify_partition(int fd, partition_data *partition, void **cookie)
 {
 	// check parameters
@@ -487,7 +454,7 @@ pm_identify_partition(int fd, partition_data *partition, void **cookie)
 	uint32 blockSize = partition->block_size;
 	if (blockSize < sizeof(partition_table_sector)) {
 		TRACE(("intel: read_partition_map: bad block size: %ld, should be "
-			   ">= %ld\n", blockSize, sizeof(partition_table_sector)));
+			">= %ld\n", blockSize, sizeof(partition_table_sector)));
 		return -1;
 	}
 
@@ -511,8 +478,7 @@ pm_identify_partition(int fd, partition_data *partition, void **cookie)
 }
 
 // pm_scan_partition
-static
-status_t
+static status_t
 pm_scan_partition(int fd, partition_data *partition, void *cookie)
 {
 	// check parameters
@@ -583,8 +549,7 @@ pm_scan_partition(int fd, partition_data *partition, void *cookie)
 }
 
 // pm_free_identify_partition_cookie
-static
-void
+static void
 pm_free_identify_partition_cookie(partition_data */*partition*/, void *cookie)
 {
 	if (cookie) {
@@ -595,8 +560,7 @@ pm_free_identify_partition_cookie(partition_data */*partition*/, void *cookie)
 }
 
 // pm_free_partition_cookie
-static
-void
+static void
 pm_free_partition_cookie(partition_data *partition)
 {
 	// called for the primary partitions: the PrimaryPartition is allocated
@@ -606,8 +570,7 @@ pm_free_partition_cookie(partition_data *partition)
 }
 
 // pm_free_partition_content_cookie
-static
-void
+static void
 pm_free_partition_content_cookie(partition_data *partition)
 {
 	if (partition && partition->content_cookie) {
@@ -619,158 +582,137 @@ pm_free_partition_content_cookie(partition_data *partition)
 #ifndef _BOOT_MODE
 
 
-
-
-
-/////////////////////////////////////////////
-// Intel Partition Map - support functions //
-/////////////////////////////////////////////
-
-
+// #pragma mark - Intel Partition Map - support functions
 
 
 // pm_supports_resizing
-static
-bool
+static bool
 pm_supports_resizing(partition_data *partition)
 {
 	TRACE(("intel: pm_supports_resizing(%ld: %lld, %lld, %ld, %s)\n",
-		   partition->id, partition->offset, partition->size,
-		   partition->block_size, partition->content_type));
+		partition->id, partition->offset, partition->size,
+		partition->block_size, partition->content_type));
 	
 	return (partition && partition->content_type
-			&& !strcmp(partition->content_type, kPartitionTypeIntel));
+		&& !strcmp(partition->content_type, kPartitionTypeIntel));
 }
 
 // pm_supports_resizing_child
-static
-bool
+static bool
 pm_supports_resizing_child(partition_data *partition, partition_data *child)
 {
 	TRACE(("intel: pm_supports_resizing_child(%ld: %lld, %lld, %ld, %s)\n",
-		   partition->id, partition->offset, partition->size,
-		   partition->block_size, partition->content_type));
+		partition->id, partition->offset, partition->size,
+		partition->block_size, partition->content_type));
 	
 	return (partition && child && partition->content_type
 			&& !strcmp(partition->content_type, kPartitionTypeIntel));
 }
 
 // pm_supports_moving
-static
-bool
+static bool
 pm_supports_moving(partition_data *partition, bool *isNoOp)
 {
 	TRACE(("intel: pm_supports_moving(%ld: %lld, %lld, %ld, %s)\n",
-		   partition->id, partition->offset, partition->size,
-		   partition->block_size, partition->content_type));
+		partition->id, partition->offset, partition->size,
+		partition->block_size, partition->content_type));
 	
 	*isNoOp = true;
 	return (partition && partition->content_type
-			&& !strcmp(partition->content_type, kPartitionTypeIntel));
+		&& !strcmp(partition->content_type, kPartitionTypeIntel));
 }
 
 // pm_supports_moving_child
-static
-bool
+static bool
 pm_supports_moving_child(partition_data *partition, partition_data *child)
 {
 	TRACE(("intel: pm_supports_moving_child(%ld: %lld, %lld, %ld, %s)\n",
-		   partition->id, partition->offset, partition->size,
-		   partition->block_size, partition->content_type));
+		partition->id, partition->offset, partition->size,
+		partition->block_size, partition->content_type));
 	
 	return (partition && child && partition->content_type
-			&& !strcmp(partition->content_type, kPartitionTypeIntel));
+		&& !strcmp(partition->content_type, kPartitionTypeIntel));
 }
 
 // pm_supports_setting_name
-static
-bool
+static bool
 pm_supports_setting_name(partition_data *partition)
 {
 	return false;
 }
 
 // pm_supports_setting_content_name
-static
-bool
+static bool
 pm_supports_setting_content_name(partition_data *partition)
 {
 	return false;
 }
 
 // pm_supports_setting_type
-static
-bool
+static bool
 pm_supports_setting_type(partition_data *partition)
 {
 	TRACE(("intel: pm_supports_setting_type(%ld: %lld, %lld, %ld)\n",
-		   partition->id, partition->offset, partition->size,
-		   partition->block_size));
+		partition->id, partition->offset, partition->size,
+		partition->block_size));
 	
 	// partition should be child of "Intel Partition Map"
 	partition_data *parent;
 	return (partition
-			&& (parent = get_parent_partition(partition->id))
-			&& parent->content_type
-			&& !strcmp(parent->content_type, kPartitionTypeIntel)
-		   );
+		&& (parent = get_parent_partition(partition->id))
+		&& parent->content_type
+		&& !strcmp(parent->content_type, kPartitionTypeIntel));
 }
 
 // pm_supports_initializing
-static
-bool
+static bool
 pm_supports_initializing(partition_data *partition)
 {
 	TRACE(("intel: pm_supports_initializing(%ld: %lld, %lld, %ld, %s, %d, %d)\n",
-		   partition->id, partition->offset, partition->size,
-		   partition->block_size, partition->content_type,
-		   partition->child_count == 0,
-		   partition->content_cookie == NULL));
+		partition->id, partition->offset, partition->size,
+		partition->block_size, partition->content_type,
+		partition->child_count == 0,
+		partition->content_cookie == NULL));
 
 	return (partition
-			&& !partition->content_type
-			&& partition->child_count == 0
-			&& partition->content_cookie == NULL
-		   );
+		&& !partition->content_type
+		&& partition->child_count == 0
+		&& partition->content_cookie == NULL);
 }
 
 // pm_supports_creating_child
-static
-bool
+static bool
 pm_supports_creating_child(partition_data *partition)
 {
-	TRACE(("intel: pm_supports_creating_child(%ld: %lld, %lld, %ld, %s, %d)\n",
-		   partition->id, partition->offset, partition->size,
-		   partition->block_size, partition->content_type,
-		   partition->child_count));
+	TRACE(("intel: pm_supports_creating_child(%ld: %lld, %lld, %ld, %s, %ld)\n",
+		partition->id, partition->offset, partition->size,
+		partition->block_size, partition->content_type,
+		partition->child_count));
 
 	int32 count_spaces = 0;
 	return (partition && partition->content_type
-			&& !strcmp(partition->content_type, kPartitionTypeIntel)
-			&& partition->child_count < 4
-			// free space check
-			&& pm_get_partitionable_spaces(partition, NULL, 0,
-										   &count_spaces) == B_OK
-			&& count_spaces
-		   );
+		&& !strcmp(partition->content_type, kPartitionTypeIntel)
+		&& partition->child_count < 4
+		// free space check
+		&& pm_get_partitionable_spaces(partition, NULL, 0, &count_spaces)
+			== B_OK
+		&& count_spaces);
 }
 
 // pm_supports_deleting_child
-static
-bool
+static bool
 pm_supports_deleting_child(partition_data *partition, partition_data *child)
 {
 	TRACE(("intel: pm_supports_deleting_child(%ld: %lld, %lld, %ld, %s)\n",
-		   partition->id, partition->offset, partition->size,
-		   partition->block_size, partition->content_type));
+		partition->id, partition->offset, partition->size,
+		partition->block_size, partition->content_type));
 	
 	return (partition && child && partition->content_type
-			&& !strcmp(partition->content_type, kPartitionTypeIntel));
+		&& !strcmp(partition->content_type, kPartitionTypeIntel));
 }
 
 // pm_is_sub_system_for
-static
-bool
+static bool
 pm_is_sub_system_for(partition_data *partition)
 {
 	// primary partition map doesn't naturally live in any other child partition
@@ -778,19 +720,7 @@ pm_is_sub_system_for(partition_data *partition)
 }
 
 
-
-
-
-
-//////////////////////////////////////////////
-// Intel Partition Map - validate functions //
-//////////////////////////////////////////////
-
-
-
-
-
-
+// #pragma mark - Intel Partition Map - validate functions
 
 
 // block_align (auxiliary function)
@@ -810,8 +740,7 @@ block_align_up(off_t offset, uint32 block_size)
 }
 
 // validate_resize (auxiliary function)
-static
-bool
+static bool
 validate_resize(partition_data *partition, off_t *size)
 {
 	off_t new_size = *size;
@@ -847,8 +776,7 @@ validate_resize(partition_data *partition, off_t *size)
 }
 
 // pm_validate_resize
-static
-bool
+static bool
 pm_validate_resize(partition_data *partition, off_t *size)
 {
 	TRACE(("intel: pm_validate_resize\n"));
@@ -860,8 +788,7 @@ pm_validate_resize(partition_data *partition, off_t *size)
 }
 
 // get_offset_ep (auxiliary function)
-static inline
-off_t
+static inline off_t
 get_offset_ep(const partition_data *partition)
 {
 	LogicalPartition *logical = (LogicalPartition *)partition->cookie;
@@ -870,8 +797,7 @@ get_offset_ep(const partition_data *partition)
 }
 
 // get_size_ep (auxiliary function)
-static inline
-off_t
+static inline off_t
 get_size_ep(const partition_data *partition)
 {
 	LogicalPartition *logical = (LogicalPartition *)partition->cookie;
@@ -881,95 +807,94 @@ get_size_ep(const partition_data *partition)
 
 
 // get_sibling_partitions_pm (auxiliary function)
-static
-void
+/*!
+	according to childOffset returns previous and next sibling or NULL
+	precious, next output parameters
+	partition - Intel Partition Map
+*/
+static void
 get_sibling_partitions_pm(partition_data *partition,
-						  partition_data *child, off_t child_offset,
-						  partition_data **prec, partition_data **follow,
-						  off_t *prec_offset, off_t *prec_size,
-						  off_t *follow_offset, off_t *follow_size)
-// according to child_offset returns preceding and following sibling or NULL
-// prec, follow output parameters
-// partition - Intel Partition Map
+	partition_data *child, off_t childOffset, partition_data **previous,
+	partition_data **next, off_t *previousOffset, off_t *previousSize,
+	off_t *nextOffset, off_t *nextSize)
 {
 	// finding out sibling partitions
-	partition_data *prec_sibling = NULL;
-	partition_data *follow_sibling = NULL;
+	partition_data *previousSibling = NULL;
+	partition_data *nextSibling = NULL;
 	for (int32 i = 0; i < partition->child_count; i++) {
 		partition_data *sibling = get_child_partition(partition->id, i);
 		if (sibling && sibling != child)
-			if (sibling->offset <= child_offset) {
-				if (!prec_sibling || prec_sibling->offset < sibling->offset)
-					prec_sibling = sibling;
+			if (sibling->offset <= childOffset) {
+				if (!previousSibling || previousSibling->offset < sibling->offset)
+					previousSibling = sibling;
 			} else {
-				// sibling->offset > child_offset
-				if (!follow_sibling || follow_sibling->offset > sibling->offset)
-					follow_sibling = sibling;
+				// sibling->offset > childOffset
+				if (!nextSibling || nextSibling->offset > sibling->offset)
+					nextSibling = sibling;
 			}
 	}
-	*prec = prec_sibling;
-	*follow = follow_sibling;
-	if (prec_sibling) {
-		*prec_offset = prec_sibling->offset;
-		*prec_size = prec_sibling->size;
+	*previous = previousSibling;
+	*next = nextSibling;
+	if (previousSibling) {
+		*previousOffset = previousSibling->offset;
+		*previousSize = previousSibling->size;
 	}
-	if (follow_sibling) {
-		*follow_offset = follow_sibling->offset;
-		*follow_size = follow_sibling->size;
+	if (nextSibling) {
+		*nextOffset = nextSibling->offset;
+		*nextSize = nextSibling->size;
 	}
 }
 
 // get_sibling_partitions_ep (auxiliary function)
-static
-void
+/*!
+	according to childOffset returns previous and next sibling or NULL
+	previous, next output parameters
+	partition - Intel Extended Partition
+*/
+static void
 get_sibling_partitions_ep(partition_data *partition,
-						  partition_data *child, off_t child_offset,
-						  partition_data **prec, partition_data **follow,
-						  off_t *prec_offset, off_t *prec_size,
-						  off_t *follow_offset, off_t *follow_size)
-// according to child_offset returns preceding and following sibling or NULL
-// prec, follow output parameters
-// partition - Intel Extended Partition
+	partition_data *child, off_t childOffset, partition_data **previous,
+	partition_data **next, off_t *previousOffset, off_t *previousSize,
+	off_t *nextOffset, off_t *nextSize)
 {
 	// finding out sibling partitions
-	partition_data *prec_sibling = NULL;
-	partition_data *follow_sibling = NULL;
+	partition_data *previousSibling = NULL;
+	partition_data *nextSibling = NULL;
 	for (int32 i = 0; i < partition->child_count; i++) {
 		partition_data *sibling = get_child_partition(partition->id, i);
 		if (sibling && sibling != child)
-			if (get_offset_ep(sibling) <= child_offset) {
-				if (!prec_sibling || prec_sibling->offset < sibling->offset)
-					prec_sibling = sibling;
+			if (get_offset_ep(sibling) <= childOffset) {
+				if (!previousSibling || previousSibling->offset < sibling->offset)
+					previousSibling = sibling;
 			} else {
-				// get_offset_ep(sibling) > child_offset
-				if (!follow_sibling || follow_sibling->offset > sibling->offset)
-					follow_sibling = sibling;
+				// get_offset_ep(sibling) > childOffset
+				if (!nextSibling || nextSibling->offset > sibling->offset)
+					nextSibling = sibling;
 			}
 	}
-	*prec = prec_sibling;
-	*follow = follow_sibling;
-	if (prec_sibling) {
-		*prec_offset = get_offset_ep(prec_sibling);
-		*prec_size = get_size_ep(prec_sibling);
+	*previous = previousSibling;
+	*next = nextSibling;
+	if (previousSibling) {
+		*previousOffset = get_offset_ep(previousSibling);
+		*previousSize = get_size_ep(previousSibling);
 	}
-	if (follow_sibling) {
-		*follow_offset = get_offset_ep(follow_sibling);
-		*follow_size = get_size_ep(follow_sibling);
+	if (nextSibling) {
+		*nextOffset = get_offset_ep(nextSibling);
+		*nextSize = get_size_ep(nextSibling);
 	}
 }
 
 // validate_resize_child (auxiliary function)
-static
-bool
+static bool
 validate_resize_child(partition_data *partition, partition_data *child,
-					  off_t child_offset, off_t child_size, off_t *size,
-					  fc_get_sibling_partitions get_sibling_partitions)
+	off_t childOffset, off_t childSize, off_t *size,
+	fc_get_sibling_partitions getSiblingPartitions)
 {
 	// size remains the same?
-	if (*size == child_size)
+	if (*size == childSize)
 		return true;
 	// shrink partition?
-	if (*size < child_size) {
+	if (*size < childSize) {
 		if (*size < 0)
 			*size = 0;
 		// make the size a multiple of the block size
@@ -978,44 +903,42 @@ validate_resize_child(partition_data *partition, partition_data *child,
 	}
 	// grow partition
 	// child must completely lie within the parent partition
-	if (child_offset + *size > partition->offset + partition->size)
-		*size = partition->offset + partition->size - child_offset;
+	if (childOffset + *size > partition->offset + partition->size)
+		*size = partition->offset + partition->size - childOffset;
 
 	// child must not intersect with sibling partitions
 	// finding out sibling partitions
-	partition_data *prec_sibling = NULL;
-	partition_data *follow_sibling = NULL;
-	off_t prec_offset = 0, prec_size = 0, follow_offset = 0, follow_size = 0;
+	partition_data *previousSibling = NULL;
+	partition_data *nextSibling = NULL;
+	off_t previousOffset = 0, previousSize = 0, nextOffset = 0, nextSize = 0;
 
-	get_sibling_partitions(partition, child, child_offset, &prec_sibling,
-						   &follow_sibling, &prec_offset, &prec_size,
-						   &follow_offset, &follow_size);
+	getSiblingPartitions(partition, child, childOffset, &previousSibling,
+		&nextSibling, &previousOffset, &previousSize, &nextOffset, &nextSize);
 
-	if (follow_sibling && (follow_offset < child_offset + *size))
-		*size = follow_offset - child_offset;
+	if (nextSibling && (nextOffset < childOffset + *size))
+		*size = nextOffset - childOffset;
 	*size = block_align(*size, partition->block_size);
 	return true;
 }
 
 // pm_validate_resize_child
-static
-bool
+static bool
 pm_validate_resize_child(partition_data *partition, partition_data *child,
-						 off_t *size)
+	off_t *size)
 {
 	TRACE(("intel: pm_validate_resize_child\n"));
 	
 	if (!partition || !child || !size
-		|| !pm_supports_resizing_child(partition, child))
+		|| !pm_supports_resizing_child(partition, child)) {
 		return false;
+	}
 
 	return validate_resize_child(partition, child, child->offset,
-					child->size, size, get_sibling_partitions_pm);
+		child->size, size, get_sibling_partitions_pm);
 }
 
 // pm_validate_move
-static
-bool
+static bool
 pm_validate_move(partition_data *partition, off_t *start)
 {
 	TRACE(("intel: pm_validate_move\n"));
@@ -1028,54 +951,51 @@ pm_validate_move(partition_data *partition, off_t *start)
 }
 
 // validate_move_child (auxiliary function)
-static
-bool
+static bool
 validate_move_child(partition_data *partition, partition_data *child,
-					off_t child_offset, off_t child_size, off_t *start,
-					fc_get_sibling_partitions get_sibling_partitions)
+	off_t childOffset, off_t childSize, off_t *_start,
+	fc_get_sibling_partitions getSiblingPartitions)
 {
-	off_t start_ = *start;
+	off_t start = *_start;
 
-	if (start_ < 0)
-		start_ = 0;
-	else if (start_ + child_size > partition->size)
-		start_ = partition->size - child_size;
+	if (start < 0)
+		start = 0;
+	else if (start + childSize > partition->size)
+		start = partition->size - childSize;
 
-	start_ = block_align(start_, partition->block_size);
+	start = block_align(start, partition->block_size);
 
 	// finding out sibling partitions
-	partition_data *prec_sibling = NULL;
-	partition_data *follow_sibling = NULL;
-	off_t prec_offset = 0, prec_size = 0, follow_offset = 0, follow_size = 0;
+	partition_data *previousSibling = NULL;
+	partition_data *nextSibling = NULL;
+	off_t previousOffset = 0, previousSize = 0, nextOffset = 0, nextSize = 0;
 
-	get_sibling_partitions(partition, child, child_offset, &prec_sibling,
-						   &follow_sibling, &prec_offset, &prec_size,
-						   &follow_offset, &follow_size);
+	getSiblingPartitions(partition, child, childOffset, &previousSibling,
+		&nextSibling, &previousOffset, &previousSize, &nextOffset, &nextSize);
 
 	// we cannot move child over sibling partition
-	if (start_ < child_offset) {
+	if (start < childOffset) {
 		// moving left
-		if (prec_sibling && prec_offset + prec_size > start_) {
-			start_ = prec_offset + prec_size;
-			start_ = block_align_up(start_, partition->block_size);
+		if (previousSibling && previousOffset + previousSize > start) {
+			start = previousOffset + previousSize;
+			start = block_align_up(start, partition->block_size);
 		}
 	} else {
 		// moving right
-		if (follow_sibling && follow_offset < start_ + child_size) {
-			start_ = follow_offset - child_size;
-			start_ = block_align(start_, partition->block_size);
+		if (nextSibling && nextOffset < start + childSize) {
+			start = nextOffset - childSize;
+			start = block_align(start, partition->block_size);
 		}
 	}
-	*start = start_;
+	*_start = start;
 	return true;
 }
 
 
 // pm_validate_move_child
-static
-bool
+static bool
 pm_validate_move_child(partition_data *partition, partition_data *child,
-					   off_t *start)
+	off_t *start)
 {
 	TRACE(("intel: pm_validate_move_child\n"));
 	
@@ -1086,16 +1006,18 @@ pm_validate_move_child(partition_data *partition, partition_data *child,
 		return true;
 
 	return validate_move_child(partition, child, child->offset,
-						child->size, start, get_sibling_partitions_pm);
+		child->size, start, get_sibling_partitions_pm);
 }
 
 // is_type_valid_pm (auxiliary function)
-static
-bool
-is_type_valid_pm(const char *type, partition_data *partition, PrimaryPartition *child = NULL)
-// type has to be known, only one extended partition is allowed
-// partition - intel partition map
-// child can be NULL
+/*!
+	type has to be known, only one extended partition is allowed
+	partition - intel partition map
+	child can be NULL
+*/
+static bool
+is_type_valid_pm(const char *type, partition_data *partition,
+	PrimaryPartition *child = NULL)
 {
 	// validity check of the type
 	PartitionType ptype;
@@ -1118,8 +1040,7 @@ is_type_valid_pm(const char *type, partition_data *partition, PrimaryPartition *
 }
 
 // pm_validate_set_type
-static
-bool
+static bool
 pm_validate_set_type(partition_data *partition, const char *type)
 {
 	TRACE(("intel: pm_validate_set_type\n"));
@@ -1139,9 +1060,9 @@ pm_validate_set_type(partition_data *partition, const char *type)
 }
 
 // pm_validate_initialize
-static
-bool
-pm_validate_initialize(partition_data *partition, char *name, const char *parameters)
+static bool
+pm_validate_initialize(partition_data *partition, char *name,
+	const char *parameters)
 {
 	TRACE(("intel: pm_validate_initialize\n"));
 	
@@ -1153,11 +1074,10 @@ pm_validate_initialize(partition_data *partition, char *name, const char *parame
 	return true;
 }
 
-// validate_create_child_part (auxiliary function)
-static
-bool
-validate_create_child_part(partition_data *partition, off_t *start, off_t *size,
-		fc_get_sibling_partitions get_sibling_partitions)
+// validate_create_child_partition (auxiliary function)
+static bool
+validate_create_child_partition(partition_data *partition, off_t *start,
+	off_t *size, fc_get_sibling_partitions getSiblingPartitions)
 {
 	// make the start and size a multiple of the block size
 	*start = block_align(*start, partition->block_size);
@@ -1174,23 +1094,21 @@ validate_create_child_part(partition_data *partition, off_t *start, off_t *size,
 
 	// new child must not intersect with sibling partitions
 	// finding out sibling partitions
-	partition_data *prec_sibling = NULL;
-	partition_data *follow_sibling = NULL;
-	off_t prec_offset = 0, prec_size = 0, follow_offset = 0, follow_size = 0;
+	partition_data *previousSibling = NULL;
+	partition_data *nextSibling = NULL;
+	off_t previousOffset = 0, previousSize = 0, nextOffset = 0, nextSize = 0;
 
-	get_sibling_partitions(partition, NULL, *start, &prec_sibling,
-						   &follow_sibling, &prec_offset, &prec_size,
-						   &follow_offset, &follow_size);
-
+	getSiblingPartitions(partition, NULL, *start, &previousSibling,
+		&nextSibling, &previousOffset, &previousSize, &nextOffset, &nextSize);
 	
 	// position check of the new partition
-	if (prec_sibling && (prec_offset + prec_size > *start)) {
-		*start = prec_offset + prec_size;
+	if (previousSibling && (previousOffset + previousSize > *start)) {
+		*start = previousOffset + previousSize;
 		*start = block_align_up(*start, partition->block_size);
 	}
 	
-	if (follow_sibling && (follow_offset < *start + *size))
-		*size = follow_offset - *start;
+	if (nextSibling && (nextOffset < *start + *size))
+		*size = nextOffset - *start;
 	*size = block_align(*size, partition->block_size);
 	if (*size == 0)
 		return false;
@@ -1199,11 +1117,12 @@ validate_create_child_part(partition_data *partition, off_t *start, off_t *size,
 }
 
 // pm_validate_create_child
-static
-bool
+/*!
+	index - returns position of the new partition (first free record in MBR)
+*/
+static bool
 pm_validate_create_child(partition_data *partition, off_t *start, off_t *size,
-						 const char *type, const char *parameters, int32 *index)
-	// index - returns position of the new partition (first free record in MBR)
+	const char *type, const char *parameters, int32 *index)
 {
 	TRACE(("intel: pm_validate_create_child\n"));
 	
@@ -1222,31 +1141,30 @@ pm_validate_create_child(partition_data *partition, off_t *start, off_t *size,
 	PartitionMap *map = (PartitionMap*)partition->content_cookie;
 	if (!map)
 		return false;
-	int32 new_index = -1;
+	int32 newIndex = -1;
 	for (int32 i = 0; i < 4; i++) {
 		PrimaryPartition *primary = map->PrimaryPartitionAt(i);
 		if (primary->IsEmpty()) {
-			new_index = i;
+			newIndex = i;
 			break;
 		}
 	}
 	// this cannot happen
-	if (new_index < 0)
+	if (newIndex < 0)
 		return false;
-	*index = new_index;
+	*index = newIndex;
 
 	if (*start < partition->offset + MBR_OFFSET * partition->block_size) {
 		*start = partition->offset + MBR_OFFSET * partition->block_size;
 		*start = block_align_up(*start, partition->block_size);
 	}
 
-	return validate_create_child_part(partition, start, size,
-									  get_sibling_partitions_pm);
+	return validate_create_child_partition(partition, start, size,
+		get_sibling_partitions_pm);
 }
 
 // cmp_partition_position
-static
-int
+static int
 cmp_partition_position(const void *o1, const void *o2) {
 	off_t offset1 = ((PartitionPosition*)o1)->offset;
 	off_t offset2 = ((PartitionPosition*)o2)->offset;
@@ -1257,21 +1175,21 @@ cmp_partition_position(const void *o1, const void *o2) {
 	return 0;
 }
 
-
 // fill_partitionable_spaces_buffer_pm
-static
-int32
+/*!
+	positions - output buffer with sufficient size
+	returns partition count
+*/
+static int32
 fill_partitionable_spaces_buffer_pm(partition_data *partition,
-									PartitionPosition *p_positions)
-// p_positions - output buffer with sufficient size
-// returns partition count
+	PartitionPosition *positions)
 {
 	int32 partition_count = 0;
 	for (int32 i = 0; i < partition->child_count; i++) {
 		const partition_data *child = get_child_partition(partition->id, i);
 		if (child) {
-			p_positions[partition_count].offset = child->offset;
-			p_positions[partition_count].size = child->size;
+			positions[partition_count].offset = child->offset;
+			positions[partition_count].size = child->size;
 			partition_count++;
 		}
 	}
@@ -1279,19 +1197,20 @@ fill_partitionable_spaces_buffer_pm(partition_data *partition,
 }
 
 // fill_partitionable_spaces_buffer_ep
-static
-int32
+/*!
+	positions - output buffer with sufficient size
+	returns partition count
+*/
+static int32
 fill_partitionable_spaces_buffer_ep(partition_data *partition,
-									PartitionPosition *p_positions)
-// p_positions - output buffer with sufficient size
-// returns partition count
+	PartitionPosition *positions)
 {
 	int32 partition_count = 0;
 	for (int32 i = 0; i < partition->child_count; i++) {
 		const partition_data *child = get_child_partition(partition->id, i);
 		if (child) {
-			p_positions[partition_count].offset = get_offset_ep(child);
-			p_positions[partition_count].size = get_size_ep(child);
+			positions[partition_count].offset = get_offset_ep(child);
+			positions[partition_count].size = get_size_ep(child);
 			partition_count++;
 		}
 	}
@@ -1299,95 +1218,95 @@ fill_partitionable_spaces_buffer_ep(partition_data *partition,
 }
 
 // get_partitionable_spaces (auxiliary function)
-static
-status_t
+static status_t
 get_partitionable_spaces(partition_data *partition,
-		partitionable_space_data *buffer, int32 count, int32 *actualCount,
-		fc_fill_partitionable_spaces_buffer fill_buffer,
-		off_t start_offset, off_t limit_size = 0, off_t header_size = 0)
+	partitionable_space_data *buffer, int32 count, int32 *_actualCount,
+	fc_fill_partitionable_spaces_buffer fillBuffer, off_t startOffset,
+	off_t limitSize = 0, off_t headerSize = 0)
 {
-	PartitionPosition *p_positions = new(nothrow) PartitionPosition[partition->child_count];
-	if (!p_positions)
+	PartitionPosition *positions
+		= new(nothrow) PartitionPosition[partition->child_count];
+	if (!positions)
 		return B_NO_MEMORY;
 	// fill the array
-	int32 partition_count = fill_buffer(partition, p_positions);
+	int32 partition_count = fillBuffer(partition, positions);
 	// sort the array
-	qsort(p_positions, partition_count, sizeof(PartitionPosition), cmp_partition_position);
+	qsort(positions, partition_count, sizeof(PartitionPosition),
+		cmp_partition_position);
 	
 	// first sektor is MBR or EBR
-	off_t offset = start_offset + header_size;
+	off_t offset = startOffset + headerSize;
 	off_t size = 0;
-	int32 actual_count = 0;
+	int32 actualCount = 0;
 
 	// offset alignment (to upper bound)
 	offset = block_align_up(offset, partition->block_size);
 
 	// finding out all partitionable spaces
 	for (int32 i = 0; i < partition_count; i++) {
-		size = p_positions[i].offset - offset;
+		size = positions[i].offset - offset;
 		size = block_align(size, partition->block_size);
-		if (size > limit_size) {
-			if (actual_count < count) {
-				buffer[actual_count].offset = offset;
-				buffer[actual_count].size = size;
+		if (size > limitSize) {
+			if (actualCount < count) {
+				buffer[actualCount].offset = offset;
+				buffer[actualCount].size = size;
 			}
-			actual_count++;
+			actualCount++;
 		}
-		offset = p_positions[i].offset + p_positions[i].size + header_size;
+		offset = positions[i].offset + positions[i].size + headerSize;
 		offset = block_align_up(offset, partition->block_size);
 	}
 	// space in the end of partition
 	size = partition->offset + partition->size - offset;
 	size = block_align(size, partition->block_size);
 	if (size > 0) {
-		if (actual_count < count) {
-			buffer[actual_count].offset = offset;
-			buffer[actual_count].size = size;
+		if (actualCount < count) {
+			buffer[actualCount].offset = offset;
+			buffer[actualCount].size = size;
 		}
-		actual_count++;
+		actualCount++;
 	}
 
 	// cleanup
-	if (p_positions)
-		delete[] p_positions;
+	if (positions)
+		delete[] positions;
 
-	*actualCount = actual_count;
-	TRACE(("intel: get_partitionable_spaces - found: %d\n", actual_count));
+	*_actualCount = actualCount;
+	TRACE(("intel: get_partitionable_spaces - found: %ld\n", actualCount));
 	return B_OK;
 }
 
 // pm_get_partitionable_spaces
-static
-status_t
+static status_t
 pm_get_partitionable_spaces(partition_data *partition,
-							partitionable_space_data *buffer, int32 count,
-							int32 *actualCount)
+	partitionable_space_data *buffer, int32 count, int32 *actualCount)
 {
 	TRACE(("intel: pm_get_partitionable_spaces\n"));
 	
 	if (!partition || !partition->content_type
-			|| strcmp(partition->content_type, kPartitionTypeIntel)
-			|| !actualCount)
+		|| strcmp(partition->content_type, kPartitionTypeIntel)
+		|| !actualCount) {
 		return B_BAD_VALUE;
+	}
 	if (count > 0 && !buffer)
 		return B_BAD_VALUE;
 
 	return get_partitionable_spaces(partition, buffer, count, actualCount,
-									fill_partitionable_spaces_buffer_pm,
-									MBR_OFFSET * partition->block_size, 0, 0);
+		fill_partitionable_spaces_buffer_pm, MBR_OFFSET * partition->block_size,
+		0, 0);
 }
 
 // pm_get_next_supported_type
-static
-status_t
+static status_t
 pm_get_next_supported_type(partition_data *partition, int32 *cookie, char *type)
 {
 	TRACE(("intel: pm_get_next_supported_type\n"));
 	
 	if (!partition || !partition->content_type
-			|| strcmp(partition->content_type, kPartitionTypeIntel)
-			|| !cookie || !type)
+		|| strcmp(partition->content_type, kPartitionTypeIntel)
+		|| !cookie || !type) {
 		return B_BAD_VALUE;
+	}
 
 	if (*cookie < 1)
 		*cookie = 1;
@@ -1408,8 +1327,7 @@ pm_get_next_supported_type(partition_data *partition, int32 *cookie, char *type)
 }
 
 // get_type_for_content_type (for both pm_* and ep_*)
-static
-status_t
+static status_t
 get_type_for_content_type(const char *contentType, char *type)
 {
 	TRACE(("intel: get_type_for_content_type(%s)\n",
@@ -1428,8 +1346,7 @@ get_type_for_content_type(const char *contentType, char *type)
 }
 
 // pm_shadow_changed
-static
-status_t
+static status_t
 pm_shadow_changed(partition_data *partition, uint32 operation)
 {
 	TRACE(("intel: pm_shadow_changed\n"));
@@ -1442,24 +1359,11 @@ pm_shadow_changed(partition_data *partition, uint32 operation)
 }
 
 
-
-
-
-
-
-/////////////////////////////////////////////
-// Intel Partition Map - writing functions //
-/////////////////////////////////////////////
-
-
-
-
-
+// #pragma mark - Intel Partition Map - writing functions
 
 
 // pm_resize
-static
-status_t
+static status_t
 pm_resize(int fd, partition_id partitionID, off_t size, disk_job_id job)
 {
 	TRACE(("intel: pm_resize\n"));
@@ -1477,13 +1381,15 @@ pm_resize(int fd, partition_id partitionID, off_t size, disk_job_id job)
 		return B_BAD_VALUE;
 
 	// validate the new size
+// TODO: The parameter has already been checked and must not be altered!
 	off_t validatedSize = size;
 	if (!pm_validate_resize(partition, &validatedSize))
 		return B_BAD_VALUE;
 
 	// update data stuctures
 	update_disk_device_job_progress(job, 0.0);
-	
+
+// TODO: partition->size is not supposed to be touched.
 	partition->size = validatedSize;
 	partition->content_size = validatedSize;
 
@@ -1494,8 +1400,7 @@ pm_resize(int fd, partition_id partitionID, off_t size, disk_job_id job)
 }
 
 // pm_resize_child
-static
-status_t
+static status_t
 pm_resize_child(int fd, partition_id partitionID, off_t size, disk_job_id job)
 {
 	TRACE(("intel: pm_resize_child\n"));
@@ -1504,10 +1409,8 @@ pm_resize_child(int fd, partition_id partitionID, off_t size, disk_job_id job)
 		return B_ERROR;
 
 	PartitionWriteLocker locker(partitionID);
-#ifndef TESTING_INTEL_MODULE
 	if (!locker.IsLocked())
 		return B_ERROR;
-#endif
 
 	// get out partition, child and partition map structure
 	partition_data *partition = get_parent_partition(partitionID);
@@ -1520,6 +1423,7 @@ pm_resize_child(int fd, partition_id partitionID, off_t size, disk_job_id job)
 		return B_BAD_VALUE;
 
 	// validate the new size
+// TODO: The parameter has already been checked and must not be altered!
 	off_t validatedSize = size;
 	if (!pm_validate_resize_child(partition, child, &validatedSize))
 		return B_BAD_VALUE;
@@ -1530,6 +1434,7 @@ pm_resize_child(int fd, partition_id partitionID, off_t size, disk_job_id job)
 	update_disk_device_job_progress(job, 0.0);
 	primary->SetSize(validatedSize);
 
+// TODO: The partition is not supposed to be locked here!
 	PartitionMapWriter writer(fd, 0, partition->size, partition->block_size);
 	status_t error = writer.WriteMBR(NULL, map);
 	if (error != B_OK) {
@@ -1547,14 +1452,15 @@ pm_resize_child(int fd, partition_id partitionID, off_t size, disk_job_id job)
 }
 
 // pm_move
-static
-status_t
+static status_t
 pm_move(int fd, partition_id partitionID, off_t offset, disk_job_id job)
 {
 	TRACE(("intel: pm_move\n"));
 	
 	if (fd < 0)
 		return B_ERROR;
+
+// TODO: Should be a no-op!
 
 	PartitionWriteLocker locker(partitionID);
 	if (!locker.IsLocked())
@@ -1574,17 +1480,18 @@ pm_move(int fd, partition_id partitionID, off_t offset, disk_job_id job)
 }
 
 // allocate_buffer (auxiliary function)
-static
-uint8*
-allocate_buffer(uint32 block_size, int32 try_alloc, int32 *allocated)
-// tries to allocate buffer with the size: block_size * try_alloc
-// if it's not possible, tries smaller buffer (until the size: block_size * 1)
-// returns pointer to the buffer (it's size is: block_size * allocated)
-// or returns NULL - B_NO_MEMORY
+/*!
+	tries to allocate buffer with the size: blockSize * tryAlloc
+	if it's not possible, tries smaller buffer (until the size: blockSize * 1)
+	returns pointer to the buffer (it's size is: blockSize * allocated)
+	or returns NULL - B_NO_MEMORY
+*/
+static uint8*
+allocate_buffer(uint32 blockSize, int32 tryAlloc, int32 *allocated)
 {
 	uint8* buffer = NULL;
-	for (int32 i = try_alloc; i > 1; i /= 2) {
-		buffer = new(nothrow) uint8[i * block_size];
+	for (int32 i = tryAlloc; i > 1; i /= 2) {
+		buffer = new(nothrow) uint8[i * blockSize];
 		if (buffer) {
 			*allocated = i;
 			return buffer;
@@ -1595,13 +1502,12 @@ allocate_buffer(uint32 block_size, int32 try_alloc, int32 *allocated)
 }
 
 // move_block (auxiliary function)
-static
-status_t
-move_block(int fd, off_t from_offset, off_t to_offset, uint8 *buffer, int32 size)
+static status_t
+move_block(int fd, off_t fromOffset, off_t toOffset, uint8 *buffer, int32 size)
 {
 	status_t error = B_OK;
 	// read block to buffer
-	if (read_pos(fd, from_offset, buffer, size) != size) {
+	if (read_pos(fd, fromOffset, buffer, size) != size) {
 		error = errno;
 		if (error == B_OK)
 			error = B_IO_ERROR;
@@ -1610,7 +1516,7 @@ move_block(int fd, off_t from_offset, off_t to_offset, uint8 *buffer, int32 size
 	}
 
 	// write block from buffer
-	if (write_pos(fd, to_offset, buffer, size) != size) {
+	if (write_pos(fd, toOffset, buffer, size) != size) {
 		error = errno;
 		if (error == B_OK)
 			error = B_IO_ERROR;
@@ -1621,35 +1527,33 @@ move_block(int fd, off_t from_offset, off_t to_offset, uint8 *buffer, int32 size
 }
 
 // move_partition (auxiliary function)
-static
-status_t
-move_partition(int fd, off_t from_offset, off_t to_offset, off_t size,
-			   uint8 *buffer, int32 buffer_size, disk_job_id job)
+static status_t
+move_partition(int fd, off_t fromOffset, off_t toOffset, off_t size,
+	uint8 *buffer, int32 buffer_size, disk_job_id job)
 {
+// TODO: This should be a service function of the DDM!
 	status_t error = B_OK;
-	off_t cycle_count = size / buffer_size;
-	int32 rest_size = size - cycle_count * buffer_size;
+	off_t cycleCount = size / buffer_size;
+	int32 remainingSize = size - cycleCount * buffer_size;
 	update_disk_device_job_progress(job, 0.0);
-	for (off_t i = 0; i < cycle_count; i++) {
-		error = move_block(fd, from_offset, to_offset, buffer, buffer_size);
+	for (off_t i = 0; i < cycleCount; i++) {
+		error = move_block(fd, fromOffset, toOffset, buffer, buffer_size);
 		if (error != B_OK)
 			return error;
-		from_offset += buffer_size;
-		to_offset += buffer_size;
-		update_disk_device_job_progress(job, (float)i / cycle_count);
+		fromOffset += buffer_size;
+		toOffset += buffer_size;
+		update_disk_device_job_progress(job, (float)i / cycleCount);
 	}
-	if (rest_size)
-		error = move_block(fd, from_offset, to_offset, buffer, rest_size);
+	if (remainingSize)
+		error = move_block(fd, fromOffset, toOffset, buffer, remainingSize);
 	update_disk_device_job_progress(job, 1.0);
 	return error;
 }
 
 // pm_move_child
-static
-status_t
-pm_move_child(int fd, partition_id partitionID, partition_id childID, off_t offset,
-			  disk_job_id job)
-// move child to the position offset
+static status_t
+pm_move_child(int fd, partition_id partitionID, partition_id childID,
+	off_t offset, disk_job_id job)
 {
 	TRACE(("intel: pm_move_child\n"));
 	
@@ -1657,10 +1561,8 @@ pm_move_child(int fd, partition_id partitionID, partition_id childID, off_t offs
 		return B_ERROR;
 
 	PartitionWriteLocker locker(partitionID);
-#ifndef TESTING_INTEL_MODULE
 	if (!locker.IsLocked())
 		return B_ERROR;
-#endif
 
 	// get partition, child and partition map structure
 	partition_data *partition = get_partition(partitionID);
@@ -1672,6 +1574,7 @@ pm_move_child(int fd, partition_id partitionID, partition_id childID, off_t offs
 	if (!map || !primary)
 		return B_BAD_VALUE;
 
+// TODO: The parameter has already been checked and must not be altered!
 	off_t validatedOffset = offset;
 	if (!pm_validate_move_child(partition, child, &validatedOffset))
 		return B_BAD_VALUE;
@@ -1682,15 +1585,17 @@ pm_move_child(int fd, partition_id partitionID, partition_id childID, off_t offs
 
 	// buffer allocation
 	int32 allocated;
-	uint8 *buffer = allocate_buffer(partition->block_size, MAX_MOVE_BUFFER, &allocated);
+	uint8 *buffer = allocate_buffer(partition->block_size, MAX_MOVE_BUFFER,
+		&allocated);
 	if (!buffer)
 		return B_NO_MEMORY;
 
 	// partition moving
+// TODO: The partition is not supposed to be locked at this point!
 	update_disk_device_job_progress(job, 0.0);
 	status_t error = B_OK;
 	error = move_partition(fd, child->offset, validatedOffset, child->size,
-						   buffer, allocated * partition->block_size, job);
+		buffer, allocated * partition->block_size, job);
 	delete[] buffer;
 	if (error != B_OK)
 		return error;
@@ -1714,8 +1619,7 @@ pm_move_child(int fd, partition_id partitionID, partition_id childID, off_t offs
 }
 
 // pm_set_type
-static
-status_t
+static status_t
 pm_set_type(int fd, partition_id partitionID, const char *type, disk_job_id job)
 {
 	TRACE(("intel: pm_set_type\n"));
@@ -1724,10 +1628,8 @@ pm_set_type(int fd, partition_id partitionID, const char *type, disk_job_id job)
 		return B_BAD_VALUE;
 
 	PartitionWriteLocker locker(partitionID);
-#ifndef TESTING_INTEL_MODULE
 	if (!locker.IsLocked())
 		return B_ERROR;
-#endif	//TESTING_INTEL_MODULE
 
 	// get parent partition, child and partition map structure
 	partition_data *partition = get_parent_partition(partitionID);
@@ -1739,6 +1641,7 @@ pm_set_type(int fd, partition_id partitionID, const char *type, disk_job_id job)
 	if (!map || !primary)
 		return B_BAD_VALUE;
 
+// TODO: The parameter has already been checked and must not be altered!
 	if (!pm_validate_set_type(child, type))
 		return B_BAD_VALUE;
 
@@ -1751,17 +1654,19 @@ pm_set_type(int fd, partition_id partitionID, const char *type, disk_job_id job)
 	// this is impossible
 	if (!ptype.IsValid() || ptype.IsEmpty())
 		return false;
+// TODO: Incompatible return value!
 
 	// setting type to the partition
 	update_disk_device_job_progress(job, 0.0);
-	uint8 old_type = primary->Type();
+	uint8 oldType = primary->Type();
 	primary->SetType(ptype.Type());
 
+// TODO: The partition is not supposed to be locked at this point!
 	PartitionMapWriter writer(fd, 0, partition->size, partition->block_size);
 	status_t error = writer.WriteMBR(NULL, map);
 	if (error != B_OK) {
 		// something went wrong - putting into previous state
-		primary->SetType(old_type);
+		primary->SetType(oldType);
 		return error;
 	}
 
@@ -1777,18 +1682,10 @@ pm_set_type(int fd, partition_id partitionID, const char *type, disk_job_id job)
 }
 
 
-#ifdef TESTING_INTEL_MODULE
-	// for testing purpose only
-static void perform_test(int fd, partition_id partitionID);
-#endif	// TESTING_INTEL_MODULE
-
-
-
 // pm_initialize
-static
-status_t
+static status_t
 pm_initialize(int fd, partition_id partitionID, const char *name,
-			  const char *parameters, disk_job_id job)
+	const char *parameters, disk_job_id job)
 {
 	TRACE(("intel: pm_initialize\n"));
 	
@@ -1805,6 +1702,7 @@ pm_initialize(int fd, partition_id partitionID, const char *name,
 		return B_BAD_VALUE;
 
 	// name is ignored - we cannot set it to the intel partitioning map
+// TODO: The parameter has already been checked and must not be altered!
 	if (!pm_validate_initialize(partition, NULL, parameters))
 		return B_BAD_VALUE;
 
@@ -1829,10 +1727,12 @@ pm_initialize(int fd, partition_id partitionID, const char *name,
 	}
 	
 	// we delete code area in MBR, if there is any
+// TODO: Huh?!
 	partition_table_sector pts;
 	pts.clear_code_area();
 
 	PartitionMapWriter writer(fd, 0, partition->size, partition->block_size);
+// TODO: The partition is not supposed to be locked at this point!
 	status_t error = writer.WriteMBR((uint8*)&pts, map);
 	if (error != B_OK)
 		return error;
@@ -1840,19 +1740,14 @@ pm_initialize(int fd, partition_id partitionID, const char *name,
 	// all changes applied
 	update_disk_device_job_progress(job, 1.0);
 	partition_modified(partitionID);
-#ifdef TESTING_INTEL_MODULE
-	// for testing purpose only
-	perform_test(fd, partitionID);
-#endif	// TESTING_INTEL_MODULE
 	return B_OK;
 }
 
 // pm_create_child
-static
-status_t
+static status_t
 pm_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
-				const char *type, const char *parameters, disk_job_id job,
-				partition_id *childID)
+	const char *type, const char *parameters, disk_job_id job,
+	partition_id *childID)
 	// childID is used for the return value, but is also an optional input
 	// parameter -- -1 to be ignored
 {
@@ -1874,22 +1769,26 @@ pm_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 		return B_BAD_VALUE;
 
 	// validate the offset, size and get index of the new partition
+// TODO: The parameters have already been checked and must not be altered!
 	off_t validatedOffset = offset;
 	off_t validatedSize = size;
 	int32 index = 0;
 	
 	if (!pm_validate_create_child(partition, &validatedOffset, &validatedSize,
-								  type, parameters, &index))
+			type, parameters, &index)) {
 		return B_BAD_VALUE;
+	}
 
-	// finding out free primary partition in the map (index from pm_validate_create_child)
+	// finding out free primary partition in the map (index from
+	// pm_validate_create_child)
 	PrimaryPartition *primary = map->PrimaryPartitionAt(index);
 	if (!primary->IsEmpty())
 		return B_BAD_DATA;
 
 	// creating partition
 	update_disk_device_job_progress(job, 0.0);
-	partition_data *child = create_child_partition(partition->id, index, *childID);
+	partition_data *child = create_child_partition(partition->id, index,
+		*childID);
 	if (!child)
 		return B_ERROR;
 
@@ -1905,6 +1804,7 @@ pm_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	
 	// write changes to disk
 	PartitionMapWriter writer(fd, 0, partition->size, partition->block_size);
+// TODO: The partition is not supposed to be locked at this point!
 	status_t error = writer.WriteMBR(NULL, map);
 	if (error != B_OK) {
 		// putting into previous state
@@ -1934,9 +1834,9 @@ pm_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 }
 
 // pm_delete_child
-static
-status_t
-pm_delete_child(int fd, partition_id partitionID, partition_id childID, disk_job_id job)
+static status_t
+pm_delete_child(int fd, partition_id partitionID, partition_id childID,
+	disk_job_id job)
 {
 	TRACE(("intel: pm_delete_child\n"));
 	
@@ -1968,6 +1868,7 @@ pm_delete_child(int fd, partition_id partitionID, partition_id childID, disk_job
 
 	// write changes to disk
 	PartitionMapWriter writer(fd, 0, partition->size, partition->block_size);
+// TODO: The partition is not supposed to be locked at this point!
 	status_t error = writer.WriteMBR(NULL, map);
 	if (error != B_OK)
 		return error;
@@ -1978,32 +1879,14 @@ pm_delete_child(int fd, partition_id partitionID, partition_id childID, disk_job
 	return B_OK;
 }
 
-#endif	// _BOOT_MODE
+#endif	// !_BOOT_MODE
 
 
-
-
-
-
-
-
-
-
-///////////////////////////////////////////////
-//      Intel Extended Partition Module      //
-///////////////////////////////////////////////
-
-
-
-
-
-
-
+// #pragma mark - Intel Extended Partition Module
 
 
 // ep_std_ops
-static
-status_t
+static status_t
 ep_std_ops(int32 op, ...)
 {
 	TRACE(("intel: ep_std_ops(0x%lx)\n", op));
@@ -2016,8 +1899,7 @@ ep_std_ops(int32 op, ...)
 }
 
 // ep_identify_partition
-static
-float
+static float
 ep_identify_partition(int fd, partition_data *partition, void **cookie)
 {
 	// check parameters
@@ -2044,8 +1926,7 @@ ep_identify_partition(int fd, partition_data *partition, void **cookie)
 }
 
 // ep_scan_partition
-static
-status_t
+static status_t
 ep_scan_partition(int fd, partition_data *partition, void *cookie)
 {
 	// check parameters
@@ -2053,7 +1934,7 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 		return B_ERROR;
 
 	TRACE(("intel: ep_scan_partition(%d, %lld, %lld, %ld)\n", fd,
-		   partition->offset, partition->size, partition->block_size));
+		partition->offset, partition->size, partition->block_size));
 
 	partition_data *parent = get_parent_partition(partition->id);
 	if (!parent)
@@ -2093,7 +1974,7 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 		// parameters
 		char buffer[128];
 		sprintf(buffer, "type = %u ; active = %d", logical->Type(),
-				logical->Active());
+			logical->Active());
 		child->parameters = strdup(buffer);
 		child->cookie = logical;
 		// check for allocation problems
@@ -2116,16 +1997,14 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 }
 
 // ep_free_identify_partition_cookie
-static
-void
+static void
 ep_free_identify_partition_cookie(partition_data *partition, void *cookie)
 {
 	// nothing to do
 }
 
 // ep_free_partition_cookie
-static
-void
+static void
 ep_free_partition_cookie(partition_data *partition)
 {
 	// the logical partition's cookie belongs to the partition map partition
@@ -2134,8 +2013,7 @@ ep_free_partition_cookie(partition_data *partition)
 }
 
 // ep_free_partition_content_cookie
-static
-void
+static void
 ep_free_partition_content_cookie(partition_data *partition)
 {
 	// the extended partition's cookie belongs to the partition map partition
@@ -2147,183 +2025,158 @@ ep_free_partition_content_cookie(partition_data *partition)
 #ifndef _BOOT_MODE
 
 
-
-//////////////////////////////////////////////////
-// Intel Extended Partition - support functions //
-//////////////////////////////////////////////////
-
+// #pragma mark - Intel Extended Partition - support functions
 
 
 // ep_supports_resizing
-static
-bool
+static bool
 ep_supports_resizing(partition_data *partition)
 {
 	TRACE(("intel: ep_supports_resizing(%ld: %lld, %lld, %ld, %s)\n",
-		   partition->id, partition->offset, partition->size,
-		   partition->block_size, partition->content_type));
+		partition->id, partition->offset, partition->size,
+		partition->block_size, partition->content_type));
 	
 	
 	return (partition && partition->content_type
-			&& !strcmp(partition->content_type, kPartitionTypeIntelExtended));
+		&& !strcmp(partition->content_type, kPartitionTypeIntelExtended));
 }
 
 // ep_supports_resizing_child
-static
-bool
+static bool
 ep_supports_resizing_child(partition_data *partition, partition_data *child)
 {
 	TRACE(("intel: ep_supports_resizing_child(%ld: %lld, %lld, %ld, %s)\n",
-		   partition->id, partition->offset, partition->size,
-		   partition->block_size, partition->content_type));
+		partition->id, partition->offset, partition->size,
+		partition->block_size, partition->content_type));
 	
 	
 	return (partition && child && partition->content_type
-			&& !strcmp(partition->content_type, kPartitionTypeIntelExtended));
+		&& !strcmp(partition->content_type, kPartitionTypeIntelExtended));
 }
 
 // ep_supports_moving
-static
-bool
+static bool
 ep_supports_moving(partition_data *partition, bool *isNoOp)
 {
 	TRACE(("intel: ep_supports_moving(%ld: %lld, %lld, %ld, %s)\n",
-		   partition->id, partition->offset, partition->size,
-		   partition->block_size, partition->content_type));
+		partition->id, partition->offset, partition->size,
+		partition->block_size, partition->content_type));
 	
 	
 	*isNoOp = true;
 	return (partition && partition->content_type
-			&& !strcmp(partition->content_type, kPartitionTypeIntelExtended));
+		&& !strcmp(partition->content_type, kPartitionTypeIntelExtended));
 }
 
 // ep_supports_moving_child
-static
-bool
+static bool
 ep_supports_moving_child(partition_data *partition, partition_data *child)
 {
 	TRACE(("intel: ep_supports_moving_child(%ld: %lld, %lld, %ld, %s)\n",
-		   partition->id, partition->offset, partition->size,
-		   partition->block_size, partition->content_type));
+		partition->id, partition->offset, partition->size,
+		partition->block_size, partition->content_type));
 	
 	
 	return (partition && child && partition->content_type
-			&& !strcmp(partition->content_type, kPartitionTypeIntelExtended));
+		&& !strcmp(partition->content_type, kPartitionTypeIntelExtended));
 }
 
 // ep_supports_setting_name
-static
-bool
+static bool
 ep_supports_setting_name(partition_data *partition)
 {
 	return false;
 }
 
 // ep_supports_setting_content_name
-static
-bool
+static bool
 ep_supports_setting_content_name(partition_data *partition)
 {
 	return false;
 }
 
 // ep_supports_setting_type
-static
-bool
+static bool
 ep_supports_setting_type(partition_data *partition)
 {
 	TRACE(("intel: ep_supports_setting_type(%ld: %lld, %lld, %ld)\n",
-		   partition->id, partition->offset, partition->size,
-		   partition->block_size));
-	
+		partition->id, partition->offset, partition->size,
+		partition->block_size));
 	
 	// partition should be child of "Intel Extended Partition"
 	partition_data *parent;
 	return (partition
-			&& (parent = get_parent_partition(partition->id))
-			&& parent->content_type
-			&& !strcmp(parent->content_type, kPartitionTypeIntelExtended)
-		   );
+		&& (parent = get_parent_partition(partition->id))
+		&& parent->content_type
+		&& !strcmp(parent->content_type, kPartitionTypeIntelExtended));
 }
 
 // ep_supports_initializing
-static
-bool
+static bool
 ep_supports_initializing(partition_data *partition)
 {
 	TRACE(("intel: ep_supports_initializing(%ld: %lld, %lld, %ld, %s)\n",
-		   partition->id, partition->offset, partition->size,
-		   partition->block_size, partition->content_type));
+		partition->id, partition->offset, partition->size,
+		partition->block_size, partition->content_type));
 	
 	return (partition
-			&& !partition->content_type
-			&& partition->child_count == 0
-			&& partition->content_cookie == NULL
-		   );
+		&& !partition->content_type
+		&& partition->child_count == 0
+		&& partition->content_cookie == NULL);
 }
 
 // ep_supports_creating_child
-static
-bool
+static bool
 ep_supports_creating_child(partition_data *partition)
 {
 	TRACE(("intel: ep_supports_creating_child(%ld: %lld, %lld, %ld, %s)\n",
-		   partition->id, partition->offset, partition->size,
-		   partition->block_size, partition->content_type));
+		partition->id, partition->offset, partition->size,
+		partition->block_size, partition->content_type));
 	
 	
-	int32 count_spaces = 0;
+	int32 countSpaces = 0;
 	return (partition && partition->content_type
-			&& !strcmp(partition->content_type, kPartitionTypeIntelExtended)
-			// free space check
-			&& ep_get_partitionable_spaces(partition, NULL, 0,
-										   &count_spaces) == B_OK
-			&& count_spaces
-		   );
+		&& !strcmp(partition->content_type, kPartitionTypeIntelExtended)
+		// free space check
+		&& ep_get_partitionable_spaces(partition, NULL, 0, &countSpaces)
+			== B_OK
+		&& countSpaces);
 }
 
 // ep_supports_deleting_child
-static
-bool
+static bool
 ep_supports_deleting_child(partition_data *partition, partition_data *child)
 {
 	TRACE(("intel: ep_supports_deleting_child(%ld: %lld, %lld, %ld, %s)\n",
-		   partition->id, partition->offset, partition->size,
-		   partition->block_size, partition->content_type));
+		partition->id, partition->offset, partition->size,
+		partition->block_size, partition->content_type));
 	
 	
 	return (partition && child && partition->content_type
-			&& !strcmp(partition->content_type, kPartitionTypeIntelExtended));
+		&& !strcmp(partition->content_type, kPartitionTypeIntelExtended));
 }
 
 // ep_is_sub_system_for
-static
-bool
+static bool
 ep_is_sub_system_for(partition_data *partition)
 {
 	TRACE(("intel: ep_is_sub_system_for(%ld: %lld, %lld, %ld, %s)\n",
-		   partition->id, partition->offset, partition->size,
-		   partition->block_size, partition->content_type));
+		partition->id, partition->offset, partition->size,
+		partition->block_size, partition->content_type));
 	
 	
-	// Intel Extended Partition can live in child partition of Intel Partition Map
+	// Intel Extended Partition can live in child partition of Intel Partition
+	// Map
 	return (partition && partition->content_type
-			&& !strcmp(partition->content_type, kPartitionTypeIntel));
+		&& !strcmp(partition->content_type, kPartitionTypeIntel));
 }
 
 
-
-
-///////////////////////////////////////////////////
-// Intel Extended Partition - validate functions //
-///////////////////////////////////////////////////
-
-
+// #pragma mark - Intel Extended Partition - validate functions
 
 
 // ep_validate_resize
-static
-bool
+static bool
 ep_validate_resize(partition_data *partition, off_t *size)
 {
 	TRACE(("intel: ep_validate_resize\n"));
@@ -2335,30 +2188,28 @@ ep_validate_resize(partition_data *partition, off_t *size)
 }
 
 // ep_validate_resize_child
-static
-bool
+static bool
 ep_validate_resize_child(partition_data *partition, partition_data *child,
-						 off_t *size)
+	off_t *_size)
 {
 	TRACE(("intel: ep_validate_resize_child\n"));
 	
-	if (!partition || !child || !size
+	if (!partition || !child || !_size
 		|| !ep_supports_resizing_child(partition, child))
 		return false;
 
 	// validate position
 	off_t diff_offset = child->offset - get_offset_ep(child);
-	off_t size_ = *size + diff_offset;
+	off_t size = *_size + diff_offset;
 	if (!validate_resize_child(partition, child, get_offset_ep(child),
-		 get_size_ep(child), &size_, get_sibling_partitions_ep))
+		 get_size_ep(child), &size, get_sibling_partitions_ep))
 		return false;
-	*size = size_ - diff_offset;
+	*_size = size - diff_offset;
 	return true;
 }
 
 // ep_validate_move
-static
-bool
+static bool
 ep_validate_move(partition_data *partition, off_t *start)
 {
 	TRACE(("intel: ep_validate_move\n"));
@@ -2371,32 +2222,30 @@ ep_validate_move(partition_data *partition, off_t *start)
 }
 
 // ep_validate_move_child
-static
-bool
+static bool
 ep_validate_move_child(partition_data *partition, partition_data *child,
-					   off_t *start)
+					   off_t *_start)
 {
 	TRACE(("intel: ep_validate_move_child\n"));
 	
-	if (!partition || !child || !start
+	if (!partition || !child || !_start
 		|| !ep_supports_moving_child(partition, child))
 		return false;
-	if (*start == child->offset)
+	if (*_start == child->offset)
 		return true;
 
 	// validate position
 	off_t diff_offset = child->offset - get_offset_ep(child);
-	off_t start_ = *start - diff_offset;
+	off_t start = *_start - diff_offset;
 	if (!validate_move_child(partition, child, get_offset_ep(child),
-		 get_size_ep(child), &start_, get_sibling_partitions_ep))
+		 get_size_ep(child), &start, get_sibling_partitions_ep))
 		return false;
-	*start = start_ + diff_offset;
+	*_start = start + diff_offset;
 	return true;
 }
 
 // is_type_valid_ep (auxiliary function)
-static inline
-bool
+static inline bool
 is_type_valid_ep(const char *type)
 {
 	// validity check of the type - it has to be known
@@ -2406,8 +2255,7 @@ is_type_valid_ep(const char *type)
 }
 
 // ep_validate_set_type
-static
-bool
+static bool
 ep_validate_set_type(partition_data *partition, const char *type)
 {
 	TRACE(("intel: ep_validate_set_type\n"));
@@ -2420,9 +2268,9 @@ ep_validate_set_type(partition_data *partition, const char *type)
 }
 
 // ep_validate_initialize
-static
-bool
-ep_validate_initialize(partition_data *partition, char *name, const char *parameters)
+static bool
+ep_validate_initialize(partition_data *partition, char *name,
+	const char *parameters)
 {
 	TRACE(("intel: ep_validate_initialize\n"));
 	
@@ -2435,16 +2283,15 @@ ep_validate_initialize(partition_data *partition, char *name, const char *parame
 }
 
 // ep_validate_create_child
-static
-bool
-ep_validate_create_child(partition_data *partition, off_t *start, off_t *size,
-						 const char *type, const char *parameters, int32 *index)
+static bool
+ep_validate_create_child(partition_data *partition, off_t *_start, off_t *_size,
+	const char *type, const char *parameters, int32 *index)
 	// index - returns position of the new partition (the last one)
 {
 	TRACE(("intel: ep_validate_create_child\n"));
 	
 	if (!partition || !ep_supports_creating_child(partition)
-			|| !start || !size || !type || !index) {
+		|| !_start || !_size || !type || !index) {
 		return false;
 	}
 
@@ -2457,57 +2304,57 @@ ep_validate_create_child(partition_data *partition, off_t *start, off_t *size,
 	*index = partition->child_count;
 
 	// validate position
-	off_t diff_offset = PTS_OFFSET * partition->block_size;
-	off_t start_ = *start - diff_offset;
-	off_t size_ = *size + diff_offset;
-	if (start_ < partition->offset + PTS_OFFSET * partition->block_size) {
-		start_ = partition->offset + PTS_OFFSET * partition->block_size;
-		start_ = block_align_up(start_, partition->block_size);
+	off_t diffOffset = PTS_OFFSET * partition->block_size;
+	off_t start = *_start - diffOffset;
+	off_t size = *_size + diffOffset;
+	if (start < partition->offset + PTS_OFFSET * partition->block_size) {
+		start = partition->offset + PTS_OFFSET * partition->block_size;
+		start = block_align_up(start, partition->block_size);
 	}
-	if (!validate_create_child_part(partition, &start_, &size_,
-									get_sibling_partitions_ep))
+	if (!validate_create_child_partition(partition, &start, &size,
+			get_sibling_partitions_ep)) {
 		return false;
-	*start = start_ + diff_offset;
-	*size = size_ - diff_offset;
-	if (*size == 0)
+	}
+	*_start = start + diffOffset;
+	*_size = size - diffOffset;
+	if (*_size == 0)
 		return false;
 	return true;
 }
 
 // ep_get_partitionable_spaces
-static
-status_t
+static status_t
 ep_get_partitionable_spaces(partition_data *partition,
-							partitionable_space_data *buffer, int32 count,
-							int32 *actualCount)
+	partitionable_space_data *buffer, int32 count, int32 *actualCount)
 {
 	TRACE(("intel: ep_get_partitionable_spaces\n"));
 	
 	if (!partition || !partition->content_type
-			|| strcmp(partition->content_type, kPartitionTypeIntelExtended)
-			|| !actualCount)
+		|| strcmp(partition->content_type, kPartitionTypeIntelExtended)
+		|| !actualCount) {
 		return B_BAD_VALUE;
+	}
 	if (count > 0 && !buffer)
 		return B_BAD_VALUE;
 
 	return get_partitionable_spaces(partition, buffer, count, actualCount,
-									fill_partitionable_spaces_buffer_ep,
-									partition->offset + PTS_OFFSET * partition->block_size,
-									PTS_OFFSET * partition->block_size,
-									PTS_OFFSET * partition->block_size);
+		fill_partitionable_spaces_buffer_ep,
+		partition->offset + PTS_OFFSET * partition->block_size,
+		PTS_OFFSET * partition->block_size,
+		PTS_OFFSET * partition->block_size);
 }
 
 // ep_get_next_supported_type
-static
-status_t
+static status_t
 ep_get_next_supported_type(partition_data *partition, int32 *cookie, char *type)
 {
 	TRACE(("intel: ep_get_next_supported_type\n"));
 	
 	if (!partition || !partition->content_type
-			|| strcmp(partition->content_type, kPartitionTypeIntelExtended)
-			|| !cookie || !type)
+		|| strcmp(partition->content_type, kPartitionTypeIntelExtended)
+		|| !cookie || !type) {
 		return B_BAD_VALUE;
+	}
 
 	if (*cookie < 1)
 		*cookie = 1;
@@ -2530,8 +2377,7 @@ ep_get_next_supported_type(partition_data *partition, int32 *cookie, char *type)
 }
 
 // ep_shadow_changed
-static
-status_t
+static status_t
 ep_shadow_changed(partition_data *partition, uint32 operation)
 {
 	TRACE(("intel: ep_shadow_changed\n"));
@@ -2544,20 +2390,11 @@ ep_shadow_changed(partition_data *partition, uint32 operation)
 }
 
 
-
-
-
-////////////////////////////////////////////////
-// Intel Extended Partition - write functions //
-////////////////////////////////////////////////
-
-
-
+// #pragma mark - Intel Extended Partition - write functions
 
 
 // ep_resize
-static
-status_t
+static status_t
 ep_resize(int fd, partition_id partitionID, off_t size, disk_job_id job)
 {
 	TRACE(("intel: ep_resize\n"));
@@ -2566,10 +2403,8 @@ ep_resize(int fd, partition_id partitionID, off_t size, disk_job_id job)
 		return B_ERROR;
 
 	PartitionWriteLocker locker(partitionID);
-#ifndef TESTING_INTEL_MODULE
 	if (!locker.IsLocked())
 		return B_ERROR;
-#endif
 	
 	// get out partition
 	partition_data *partition = get_partition(partitionID);
@@ -2577,6 +2412,7 @@ ep_resize(int fd, partition_id partitionID, off_t size, disk_job_id job)
 		return B_BAD_VALUE;
 
 	// validate the new size
+// TODO: The parameter has already been checked and must not be altered!
 	off_t validatedSize = size;
 	if (!ep_validate_resize(partition, &validatedSize))
 		return B_BAD_VALUE;
@@ -2584,6 +2420,7 @@ ep_resize(int fd, partition_id partitionID, off_t size, disk_job_id job)
 	// update data stuctures
 	update_disk_device_job_progress(job, 0.0);
 	
+// TODO: partition->size is not supposed to be touched.
 	partition->size = validatedSize;
 	partition->content_size = validatedSize;
 
@@ -2594,8 +2431,7 @@ ep_resize(int fd, partition_id partitionID, off_t size, disk_job_id job)
 }
 
 // ep_resize_child
-static
-status_t
+static status_t
 ep_resize_child(int fd, partition_id partitionID, off_t size, disk_job_id job)
 {
 	TRACE(("intel: ep_resize_child\n"));
@@ -2604,10 +2440,8 @@ ep_resize_child(int fd, partition_id partitionID, off_t size, disk_job_id job)
 		return B_ERROR;
 
 	PartitionWriteLocker locker(partitionID);
-#ifndef TESTING_INTEL_MODULE
 	if (!locker.IsLocked())
 		return B_ERROR;
-#endif
 
 	// get out partition, child and LogicalPartition structure
 	partition_data *partition = get_parent_partition(partitionID);
@@ -2619,6 +2453,7 @@ ep_resize_child(int fd, partition_id partitionID, off_t size, disk_job_id job)
 		return B_BAD_VALUE;
 
 	// validate the new size
+// TODO: The parameter has already been checked and must not be altered!
 	off_t validatedSize = size;
 	if (!ep_validate_resize_child(partition, child, &validatedSize))
 		return B_BAD_VALUE;
@@ -2630,6 +2465,7 @@ ep_resize_child(int fd, partition_id partitionID, off_t size, disk_job_id job)
 	logical->SetSize(validatedSize);
 
 	PartitionMapWriter writer(fd, partition->offset, partition->size, partition->block_size);
+// TODO: The partition is not supposed to be locked here!
 	status_t error = writer.WriteLogical(NULL, logical);
 	if (error != B_OK) {
 		// putting into previous state
@@ -2652,8 +2488,7 @@ ep_resize_child(int fd, partition_id partitionID, off_t size, disk_job_id job)
 }
 
 // ep_move
-static
-status_t
+static status_t
 ep_move(int fd, partition_id partitionID, off_t offset, disk_job_id job)
 {
 	TRACE(("intel: ep_move\n"));
@@ -2662,10 +2497,8 @@ ep_move(int fd, partition_id partitionID, off_t offset, disk_job_id job)
 		return B_ERROR;
 
 	PartitionWriteLocker locker(partitionID);
-#ifndef TESTING_INTEL_MODULE
 	if (!locker.IsLocked())
 		return B_ERROR;
-#endif
 
 	// get out partition
 	partition_data *partition = get_partition(partitionID);
@@ -2673,6 +2506,7 @@ ep_move(int fd, partition_id partitionID, off_t offset, disk_job_id job)
 		return B_BAD_VALUE;
 
 	// validate the new start
+// TODO: The parameter has already been checked and must not be altered!
 	if (!ep_validate_move(partition, &offset))
 		return B_BAD_VALUE;
 
@@ -2681,11 +2515,9 @@ ep_move(int fd, partition_id partitionID, off_t offset, disk_job_id job)
 }
 
 // ep_move_child
-static
-status_t
-ep_move_child(int fd, partition_id partitionID, partition_id childID, off_t offset,
-			  disk_job_id job)
-// move child to the position offset
+static status_t
+ep_move_child(int fd, partition_id partitionID, partition_id childID,
+	off_t offset, disk_job_id job)
 {
 	TRACE(("intel: ep_move_child\n"));
 	
@@ -2693,10 +2525,8 @@ ep_move_child(int fd, partition_id partitionID, partition_id childID, off_t offs
 		return B_ERROR;
 
 	PartitionWriteLocker locker(partitionID);
-#ifndef TESTING_INTEL_MODULE
 	if (!locker.IsLocked())
 		return B_ERROR;
-#endif
 
 	// get partition, child and LogicalPartition structure
 	partition_data *partition = get_partition(partitionID);
@@ -2707,6 +2537,7 @@ ep_move_child(int fd, partition_id partitionID, partition_id childID, off_t offs
 	if (!logical)
 		return B_BAD_VALUE;
 
+// TODO: The parameter has already been checked and must not be altered!
 	off_t validatedOffset = offset;
 	if (!ep_validate_move_child(partition, child, &validatedOffset))
 		return B_BAD_VALUE;
@@ -2715,7 +2546,7 @@ ep_move_child(int fd, partition_id partitionID, partition_id childID, off_t offs
 	if (child->offset == validatedOffset)
 		return B_OK;
 
-	off_t diff_offset = validatedOffset - child->offset;
+	off_t diffOffset = validatedOffset - child->offset;
 
 	// buffer allocation
 	int32 allocated;
@@ -2738,10 +2569,11 @@ ep_move_child(int fd, partition_id partitionID, partition_id childID, off_t offs
 	// partition moved
 	// updating data structure
 	child->offset = validatedOffset;
-	logical->SetOffset(logical->Offset() + diff_offset);
-	logical->SetPTSOffset(logical->PTSOffset() + diff_offset);
+	logical->SetOffset(logical->Offset() + diffOffset);
+	logical->SetPTSOffset(logical->PTSOffset() + diffOffset);
 
 	PartitionMapWriter writer(fd, partition->offset, partition->size, partition->block_size);
+// TODO: The partition is not supposed to be locked here!
 	error = writer.WriteLogical(NULL, logical);
 	if (error != B_OK)
 		// something went wrong - this is fatal (partition has been moved)
@@ -2761,8 +2593,7 @@ ep_move_child(int fd, partition_id partitionID, partition_id childID, off_t offs
 }
 
 // ep_set_type
-static
-status_t
+static status_t
 ep_set_type(int fd, partition_id partitionID, const char *type, disk_job_id job)
 {
 	TRACE(("intel: ep_set_type\n"));
@@ -2771,10 +2602,8 @@ ep_set_type(int fd, partition_id partitionID, const char *type, disk_job_id job)
 		return B_BAD_VALUE;
 
 	PartitionWriteLocker locker(partitionID);
-#ifndef TESTING_INTEL_MODULE
 	if (!locker.IsLocked())
 		return B_ERROR;
-#endif
 
 	// get partition, child and LogicalPartition structure
 	partition_data *partition = get_parent_partition(partitionID);
@@ -2785,6 +2614,7 @@ ep_set_type(int fd, partition_id partitionID, const char *type, disk_job_id job)
 	if (!logical)
 		return B_BAD_VALUE;
 
+// TODO: The parameter has already been checked and must not be altered!
 	if (!ep_validate_set_type(child, type))
 		return B_BAD_VALUE;
 
@@ -2800,14 +2630,16 @@ ep_set_type(int fd, partition_id partitionID, const char *type, disk_job_id job)
 
 	// setting type to the partition
 	update_disk_device_job_progress(job, 0.0);
-	uint8 old_type = logical->Type();
+	uint8 oldType = logical->Type();
 	logical->SetType(ptype.Type());
 
-	PartitionMapWriter writer(fd, partition->offset, partition->size, partition->block_size);
+	PartitionMapWriter writer(fd, partition->offset, partition->size,
+		partition->block_size);
+// TODO: The partition is not supposed to be locked here!
 	status_t error = writer.WriteLogical(NULL, logical);
 	if (error != B_OK) {
 		// something went wrong - putting into previous state
-		logical->SetType(old_type);
+		logical->SetType(oldType);
 		return error;
 	}
 
@@ -2823,8 +2655,7 @@ ep_set_type(int fd, partition_id partitionID, const char *type, disk_job_id job)
 }
 
 // ep_initialize
-static
-status_t
+static status_t
 ep_initialize(int fd, partition_id partitionID, const char *name,
 			  const char *parameters, disk_job_id job)
 {
@@ -2834,10 +2665,8 @@ ep_initialize(int fd, partition_id partitionID, const char *name,
 		return B_ERROR;
 
 	PartitionWriteLocker locker(partitionID);
-#ifndef TESTING_INTEL_MODULE
 	if (!locker.IsLocked())
 		return B_ERROR;
-#endif
 
 	// get partition
 	partition_data *partition = get_partition(partitionID);
@@ -2845,6 +2674,7 @@ ep_initialize(int fd, partition_id partitionID, const char *name,
 		return B_BAD_VALUE;
 
 	// name is ignored - we cannot set it to the Intel Extended Partition
+// TODO: The parameter has already been checked and must not be altered!
 	if (!ep_validate_initialize(partition, NULL, parameters))
 		return B_BAD_VALUE;
 
@@ -2864,6 +2694,7 @@ ep_initialize(int fd, partition_id partitionID, const char *name,
 	pts.clear_code_area();
 
 	PartitionMapWriter writer(fd, partition->offset, partition->size, partition->block_size);
+// TODO: The partition is not supposed to be locked here!
 	status_t error = writer.WriteExtendedHead((uint8*)&pts, NULL);
 	if (error != B_OK)
 		return error;
@@ -2875,13 +2706,14 @@ ep_initialize(int fd, partition_id partitionID, const char *name,
 }
 
 // ep_create_child
-static
-status_t
+/*!
+	childID is used for the return value, but is also an optional input
+	parameter -- -1 to be ignored
+*/
+static status_t
 ep_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
-				const char *type, const char *parameters, disk_job_id job,
-				partition_id *childID)
-	// childID is used for the return value, but is also an optional input
-	// parameter -- -1 to be ignored
+	const char *type, const char *parameters, disk_job_id job,
+	partition_id *childID)
 {
 	TRACE(("intel: ep_create_child\n"));
 	
@@ -2889,10 +2721,8 @@ ep_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 		return B_BAD_VALUE;
 
 	PartitionWriteLocker locker(partitionID);
-#ifndef TESTING_INTEL_MODULE
 	if (!locker.IsLocked())
 		return B_ERROR;
-#endif
 
 	// get parent, partition and PrimaryPartition structure
 	partition_data *parent = get_parent_partition(partitionID);
@@ -2904,13 +2734,15 @@ ep_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 		return B_BAD_VALUE;
 
 	// validate the offset, size and get index of the new partition
+// TODO: The parameter has already been checked and must not be altered!
 	off_t validatedOffset = offset;
 	off_t validatedSize = size;
 	int32 index = 0;
 	
 	if (!ep_validate_create_child(partition, &validatedOffset, &validatedSize,
-								  type, parameters, &index))
+			type, parameters, &index)) {
 		return B_BAD_VALUE;
+	}
 
 	LogicalPartition *logical = new(nothrow) LogicalPartition;
 	if (!logical)
@@ -2918,14 +2750,16 @@ ep_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 
 	// creating partition
 	update_disk_device_job_progress(job, 0.0);
-	partition_data *child = create_child_partition(partition->id, index, *childID);
+	partition_data *child = create_child_partition(partition->id, index,
+		*childID);
 	if (!child)
 		return B_ERROR;
 
 	PartitionType ptype;
 	ptype.SetType(type);
 
-	logical->SetPTSOffset(validatedOffset - PTS_OFFSET * partition->block_size - partition->offset);
+	logical->SetPTSOffset(validatedOffset - PTS_OFFSET * partition->block_size
+		- partition->offset);
 	logical->SetOffset(validatedOffset - partition->offset);
 	logical->SetSize(validatedSize);
 	logical->SetType(ptype.Type());
@@ -2937,7 +2771,9 @@ ep_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	pts.clear_code_area();
 
 	// write changes to disk
-	PartitionMapWriter writer(fd, partition->offset, partition->size, partition->block_size);
+	PartitionMapWriter writer(fd, partition->offset, partition->size,
+		partition->block_size);
+// TODO: The partition is not supposed to be locked here!
 	status_t error = writer.WriteLogical((uint8*)&pts, logical);
 	if (error != B_OK) {
 		// putting into previous state
@@ -2949,7 +2785,7 @@ ep_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	primary->AddLogicalPartition(logical);
 	LogicalPartition *prev = logical->Previous();
 	error = prev ? writer.WriteLogical(NULL, prev)
-				 : writer.WriteExtendedHead(NULL, logical);
+		: writer.WriteExtendedHead(NULL, logical);
 	if (error != B_OK) {
 		// putting into previous state
 		delete_partition(child->id);
@@ -2979,9 +2815,9 @@ ep_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 }
 
 // ep_delete_child
-static
-status_t
-ep_delete_child(int fd, partition_id partitionID, partition_id childID, disk_job_id job)
+static status_t
+ep_delete_child(int fd, partition_id partitionID, partition_id childID,
+	disk_job_id job)
 {
 	TRACE(("intel: ep_delete_child\n"));
 	
@@ -2989,10 +2825,8 @@ ep_delete_child(int fd, partition_id partitionID, partition_id childID, disk_job
 		return B_ERROR;
 
 	PartitionWriteLocker locker(partitionID);
-#ifndef TESTING_INTEL_MODULE
 	if (!locker.IsLocked())
 		return B_ERROR;
-#endif
 
 	partition_data *partition = get_partition(partitionID);
 	partition_data *child = get_partition(childID);
@@ -3019,8 +2853,9 @@ ep_delete_child(int fd, partition_id partitionID, partition_id childID, disk_job
 
 	// write changes to disk
 	PartitionMapWriter writer(fd, partition->offset, partition->size, partition->block_size);
+// TODO: The partition is not supposed to be locked here!
 	status_t error = prev_logical ? writer.WriteLogical(NULL, prev_logical)
-								  : writer.WriteExtendedHead(NULL, next_logical);
+		: writer.WriteExtendedHead(NULL, next_logical);
 	if (error != B_OK)
 		return error;
 
@@ -3030,197 +2865,4 @@ ep_delete_child(int fd, partition_id partitionID, partition_id childID, disk_job
 	return B_OK;
 }
 
-
-
-
-#ifdef TESTING_INTEL_MODULE
-//////////////////////////////////////////////////
-// for testing purpose only
-//////////////////////////////////////////////////
-
-static
-void
-perform_test(int fd, partition_id partitionID) {
-	TRACE(("\nintel: function testing\n\n"));
-
-	bool sup_init = false, val_init = false, b_sup = false, b_val = false;
-	status_t result = B_OK;
-
-	partition_data *partition = get_partition(partitionID);
-	
-	TRACE(("content_type: %s\n", partition->content_type));
-	partition->content_type = kPartitionTypeIntel;
-
-	TRACE(("deleting children\n"));
-	for (int32 i = 5; i >= 0; i--) {
-		partition_data *child = get_child_partition(partition->id, i);
-		TRACE(("get_child_partition (index: %d): %d\n", i, child != NULL ));
-		if (child) {
-			b_sup = pm_supports_deleting_child(partition, child);
-			TRACE(("pm_supports_deleting_child: %d\n", b_sup));
-			result = pm_delete_child(fd, partition->id, child->id, 1);
-			TRACE(("pm_delete_child: %d\n", result == B_OK));
-		}
-	}
-
-	partitionable_space_data child_buf[] = {
-		{ 1024 * 1024 * 12, 1024 * 1024 * 3 },
-		{ 0, 1024 * 1024 * 10 },
-		{ 1024 * 1024 * 15, 1024 * 1024 * 10 },
-	};
-
-	for (int32 j = 0; j < 3; j++ ) {
-		TRACE(("\nchild: %i;\toffset: %lld;\tsize: %lld\n", j, child_buf[j].offset, child_buf[j].size));
-
-		partitionable_space_data buffer[10];
-		int32 actualCount = 0;
-		result = pm_get_partitionable_spaces(partition, buffer, 10, &actualCount);
-		TRACE(("pm_get_partitionable_spaces: %d\n\toffset\t\tsize\n", result == B_OK));
-		for (int32 i = 0; i < actualCount; i++) {
-			TRACE(("\t%lld\t\t%lld\n", buffer[i].offset, buffer[i].size));
-		}
-		sup_init = pm_supports_creating_child(partition);
-		TRACE(("pm_supports_creating_child: %d\n", sup_init));
-		off_t start = child_buf[j].offset, size = child_buf[j].size;
-		int32 index = 0;
-		char *type = "FAT 32-bit, LBA-mapped";
-		char *parameters = "active = 0";
-		val_init = pm_validate_create_child(partition, &start, &size,
-											type, parameters,
-											&index);
-		TRACE(("pm_validate_create_child: %d\tstart: %lld;\tsize: %lld;\tindex: %i\n",
-			   val_init, start, size, index));
-		partition_id childID = -1;
-		result = pm_create_child(fd, partition->id, start, size, type, parameters, 1,
-								 &childID);
-		TRACE(("pm_create_child: %d;\tchildID: %i\n", result == B_OK, childID));
-
-	}
-
-	partition_data *child = get_child_partition(partition->id, 1);
-	b_sup = pm_supports_setting_type(child);
-	TRACE(("pm_supports_setting_type: %d\n", b_sup));
-	char *type_e = "Intel Extended Partition";
-	b_val = pm_validate_set_type(child, type_e);
-	TRACE(("pm_validate_set_type (%s): %d\n", type_e, b_val));
-	result = pm_set_type(fd, child->id, type_e, 1);
-	TRACE(("pm_set_type: %d\n", result == B_OK));
-
-	sup_init = ep_supports_initializing(child);
-	TRACE(("ep_supports_initializing: %d\n", sup_init));
-	val_init = ep_validate_initialize(child, "nazev", "active = 0");
-	TRACE(("ep_validate_initialize: %d\n", val_init));
-	result = ep_initialize(fd, child->id, "nazev", "active = 0", 1);
-	TRACE(("ep_initialize: %d\n", result == B_OK));
-	TRACE(("content_type: %s\n", child->content_type));
-	child->content_type = kPartitionTypeIntelExtended;
-
-	partitionable_space_data ex_child_buf[] = {
-		{ 1024 * 1024 * 0, 1024 * 1024 * 3 },
-		{ 1024 * 1024 * 5, 1024 * 1024 * 2 },
-		{ 1024 * 1024 * 7, 1024 * 1024 * 3 },
-	};
-
-	for (int32 j = 0; j < 3; j++ ) {
-		TRACE(("\nchild: %i;\toffset: %lld;\tsize: %lld\n", j, ex_child_buf[j].offset, ex_child_buf[j].size));
-
-		partitionable_space_data buffer[10];
-		int32 actualCount = 0;
-		result = ep_get_partitionable_spaces(child, buffer, 10, &actualCount);
-		TRACE(("ep_get_partitionable_spaces: %d\n\toffset\t\tsize\n", result == B_OK));
-		for (int32 i = 0; i < actualCount; i++) {
-			TRACE(("\t%lld\t\t%lld\n", buffer[i].offset, buffer[i].size));
-		}
-		sup_init = ep_supports_creating_child(child);
-		TRACE(("ep_supports_creating_child: %d\n", sup_init));
-		off_t start = ex_child_buf[j].offset, size = ex_child_buf[j].size;
-		int32 index = 0;
-		char *type = "FAT 32-bit, LBA-mapped";
-		char *parameters = "active = 0";
-		val_init = ep_validate_create_child(child, &start, &size,
-											type, parameters,
-											&index);
-		TRACE(("ep_validate_create_child: %d\tstart: %lld;\tsize: %lld;\tindex: %i\n",
-			   val_init, start, size, index));
-		partition_id childID = -1;
-		result = ep_create_child(fd, child->id, start, size, type, parameters, 1,
-								 &childID);
-		TRACE(("ep_create_child: %d;\tchildID: %i\n", result == B_OK, childID));
-
-	}
-
-	
-	child = get_child_partition(partition->id, 2);
-	b_sup = pm_supports_resizing_child(partition, child);
-	TRACE(("pm_supports_resizing_child: %d\n", b_sup));
-	off_t val_size = 20 * 1024 * 1024;
-	b_val = pm_validate_resize_child(partition, child, &val_size);
-	TRACE(("pm_validate_resize_child: %lld\n", val_size));
-	result = pm_resize_child(fd, child->id, val_size, 1);
-	TRACE(("pm_resize_child: %d\n", result == B_OK));
-
-	child = get_child_partition(partition->id, 1);
-	partition_data *ex_child = get_child_partition(child->id, 0);
-	b_sup = ep_supports_resizing_child(child, ex_child);
-	TRACE(("ep_supports_resizing_child: %d\n", b_sup));
-	val_size = 20 * 1024 * 1024;
-	b_val = ep_validate_resize_child(child, ex_child, &val_size);
-	TRACE(("ep_validate_resize_child: %lld\n", val_size));
-	result = ep_resize_child(fd, ex_child->id, val_size, 1);
-	TRACE(("ep_resize_child: %d\n", result == B_OK));
-
-	child = get_child_partition(partition->id, 0);
-	b_sup = pm_supports_resizing_child(partition, child);
-	TRACE(("pm_supports_resizing_child: %d\n", b_sup));
-	val_size = 1 * 1024 * 1024;
-	b_val = pm_validate_resize_child(partition, child, &val_size);
-	TRACE(("pm_validate_resize_child: %lld\n", val_size));
-	result = pm_resize_child(fd, child->id, val_size, 0);
-	TRACE(("pm_resize_child: %d\n", result == B_OK));
-
-	child = get_child_partition(partition->id, 0);
-	b_sup = pm_supports_moving_child(partition, child);
-	TRACE(("pm_supports_moving_child: %d\n", b_sup));
-	off_t val_start = 13000000;
-	b_val = pm_validate_move_child(partition, child, &val_start);
-	TRACE(("pm_validate_move_child: %lld\n", val_start));
-	result = pm_move_child(fd, partition->id, child->id, val_start, 1);
-	TRACE(("pm_move_child: %d\n", result == B_OK));
-
-	child = get_child_partition(partition->id, 1);
-	ex_child = get_child_partition(child->id, 0);
-	b_sup = ep_supports_resizing_child(child, ex_child);
-	TRACE(("ep_supports_resizing_child: %d\n", b_sup));
-	val_size = 1 * 1024 * 1024;
-	b_val = ep_validate_resize_child(child, ex_child, &val_size);
-	TRACE(("ep_validate_resize_child: %lld\n", val_size));
-	result = ep_resize_child(fd, ex_child->id, val_size, 1);
-	TRACE(("ep_resize_child: %d\n", result == B_OK));
-
-	b_sup = ep_supports_moving_child(child, ex_child);
-	TRACE(("ep_supports_moving_child: %d\n", b_sup));
-	val_start = 4 * 1024 * 1024;
-	b_val = ep_validate_move_child(child, ex_child, &val_start);
-	TRACE(("ep_validate_move_child: %lld\n", val_start));
-	result = ep_move_child(fd, child->id, ex_child->id, val_start, 1);
-	TRACE(("ep_move_child: %d\n", result == B_OK));
-
-/*	child = get_child_partition(partition->id, 1);
-	partition_data *ex_child = get_child_partition(child->id, 0);
-	b_sup = ep_supports_deleting_child(child, ex_child);
-	TRACE(("ep_supports_deleting_child: %d\n", b_sup));
-	result = ep_delete_child(fd, child->id, ex_child->id, 1);
-	TRACE(("ep_delete_child: %d\n", result == B_OK));
-	ex_child = get_child_partition(child->id, 1);
-	b_sup = ep_supports_deleting_child(child, ex_child);
-	TRACE(("ep_supports_deleting_child: %d\n", b_sup));
-	result = ep_delete_child(fd, child->id, ex_child->id, 1);
-	TRACE(("ep_delete_child: %d\n", result == B_OK));*/
-
-
-	
-	TRACE(("\nintel: end of function testing\n\n"));
-}
-#endif // TESTING_INTEL_MODULE
-
-#endif	// _BOOT_MODE
+#endif	// !_BOOT_MODE

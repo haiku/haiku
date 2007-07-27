@@ -12,8 +12,8 @@
 
 // constructor
 PartitionLocker::PartitionLocker(partition_id partitionID)
-	: device_(NULL),
-	  partitionID_(partitionID)
+	: fDevice(NULL),
+	  fPartitionID(partitionID)
 {	
 }
 
@@ -26,14 +26,14 @@ PartitionLocker::~PartitionLocker()
 bool
 PartitionLocker::IsLocked() const
 {
-	return device_;
+	return fDevice;
 }
 
 // PartitionId
 partition_id
 PartitionLocker::PartitionId() const
 {
-	return partitionID_;
+	return fPartitionID;
 }
 
 
@@ -44,7 +44,7 @@ PartitionLocker::PartitionId() const
 PartitionReadLocker::PartitionReadLocker(partition_id partitionID)
 	: PartitionLocker(partitionID)
 {
-	device_ = read_lock_disk_device(partitionID);
+	fDevice = read_lock_disk_device(partitionID);
 }
 
 // destructor
@@ -62,7 +62,7 @@ PartitionReadLocker::~PartitionReadLocker()
 PartitionWriteLocker::PartitionWriteLocker(partition_id partitionID)
 	: PartitionLocker(partitionID)
 {
-	device_ = write_lock_disk_device(partitionID);
+	fDevice = write_lock_disk_device(partitionID);
 }
 
 // destructor

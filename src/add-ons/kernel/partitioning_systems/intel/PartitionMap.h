@@ -31,24 +31,21 @@
 
 
 // is_empty_type
-static inline
-bool
+static inline bool
 is_empty_type(uint8 type)
 {
 	return (type == 0x00);
 }
 
 // is_extended_type
-static inline
-bool
+static inline bool
 is_extended_type(uint8 type)
 {
 	return (type == 0x05 || type == 0x0f || type == 0x85);
 }
 
 // fill_buffer
-static inline
-void
+static inline void
 fill_buffer(char *buffer, uint32 length, char ch)
 {
 	for (uint32 i = 0; i < length; i++)
@@ -104,53 +101,21 @@ class PartitionType {
 public:
 	PartitionType();
 
-	/*!
-	  \brief Sets the \a type via its ID.
-	  \param type ID of the partition type, it is in the range [0..255].
-	*/
 	void SetType(uint8 type);
-	/*!
-	  \brief Sets the type via its string name.
-	  \param type_name Name of the partition type.
-	*/
-	void SetType(const char *type_name);
-	/*!
-	  \brief Converts content type to the partition type that fits best.
-	  \param content_type Name of the content type, it is standardized by system.
-	*/
-	void SetContentType(const char *content_type);
+	void SetType(const char *typeName);
+	void SetContentType(const char *contentType);
 
-	/*!
-	  \brief Check whether the current type is valid.
-	*/
-	bool IsValid() const	{ return valid_; }
-	/*!
-	  \brief Check whether the current type describes empty type.
-	*/
-	bool IsEmpty() const	{ return is_empty_type(type_); }
-	/*!
-	  \brief Check whether the current type describes extended partition type.
-	*/
-	bool IsExtended() const	{ return is_extended_type(type_); }
+	bool IsValid() const	{ return fValid; }
+	bool IsEmpty() const	{ return is_empty_type(fType); }
+	bool IsExtended() const	{ return is_extended_type(fType); }
 
-	/*!
-	  \brief Returns ID of the current type.
-	*/
-	uint8 Type() const		{ return type_; }
-	/*!
-	  \brief Finds next supported partition.
-	 */
+	uint8 Type() const		{ return fType; }
 	void FindNext();
-	/*!
-	  \brief Returns string name of the current type.
-	  \param buffer Buffer where the name is stored, has to be allocated with
-	    sufficient length.
-	*/
 	void GetTypeString(char *buffer) const
-		{ get_partition_type_string(type_, buffer); }
+		{ get_partition_type_string(fType, buffer); }
 private:
-	uint8	type_;
-	bool	valid_;
+	uint8	fType;
+	bool	fValid;
 };
 
 // Partition
@@ -158,10 +123,10 @@ class Partition {
 public:
 	Partition();
 	Partition(const partition_descriptor *descriptor, off_t ptsOffset,
-			  off_t baseOffset, int32 blockSize);
+		off_t baseOffset, int32 blockSize);
 
 	void SetTo(const partition_descriptor *descriptor, off_t ptsOffset,
-			   off_t baseOffset, int32 blockSize);
+		off_t baseOffset, int32 blockSize);
 	void Unset();
 
 	bool IsEmpty() const	{ return is_empty_type(fType); }
@@ -201,10 +166,10 @@ class PrimaryPartition : public Partition {
 public:
 	PrimaryPartition();
 	PrimaryPartition(const partition_descriptor *descriptor, off_t ptsOffset,
-					 int32 blockSize);
+		int32 blockSize);
 
 	void SetTo(const partition_descriptor *descriptor, off_t ptsOffset,
-			   int32 blockSize);
+		int32 blockSize);
 	void Unset();
 
 	// only if extended
@@ -224,10 +189,10 @@ class LogicalPartition : public Partition {
 public:
 	LogicalPartition();
 	LogicalPartition(const partition_descriptor *descriptor, off_t ptsOffset,
-					 int32 blockSize, PrimaryPartition *primary);
+		int32 blockSize, PrimaryPartition *primary);
 
 	void SetTo(const partition_descriptor *descriptor, off_t ptsOffset,
-			   int32 blockSize, PrimaryPartition *primary);
+		int32 blockSize, PrimaryPartition *primary);
 	void Unset();
 
 	void SetPrimaryPartition(PrimaryPartition *primary) { fPrimary = primary; }

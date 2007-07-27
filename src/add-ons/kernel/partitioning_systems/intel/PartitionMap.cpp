@@ -183,60 +183,103 @@ is_inside_partitions(off_t location, const Partition **partitions, int32 count)
 
 // constructor
 PartitionType::PartitionType()
-	: type_(0),
-	  valid_(false)
+	: fType(0),
+	  fValid(false)
 {
 }
 
 // SetType
+/*!
+	\brief Sets the \a type via its ID.
+	\param type ID of the partition type, it is in the range [0..255].
+*/
 void
 PartitionType::SetType(uint8 type)
 {
-	type_ = type;
-	valid_ = partition_type_string(type);
+	fType = type;
+	fValid = partition_type_string(type);
 }
 
 // SetType
+/*!
+	\brief Sets the type via its string name.
+	\param typeName Name of the partition type.
+*/
 void
-PartitionType::SetType(const char *type_name)
+PartitionType::SetType(const char *typeName)
 {
 	for (int32 i = 0; kPartitionTypes[i].name ; i++) {
-		if (!strcmp(type_name, kPartitionTypes[i].name)) {
-			type_ = kPartitionTypes[i].type;
-			valid_ = true;
+		if (!strcmp(typeName, kPartitionTypes[i].name)) {
+			fType = kPartitionTypes[i].type;
+			fValid = true;
 			return;
 		}
 	}
-	valid_ = false;
+	fValid = false;
 }
 
 // SetContentType
+/*!
+	\brief Converts content type to the partition type that fits best.
+	\param content_type Name of the content type, it is standardized by system.
+*/
 void
-PartitionType::SetContentType(const char *content_type)
+PartitionType::SetContentType(const char *contentType)
 {
 	for (int32 i = 0; kPartitionContentTypes[i].name ; i++) {
-		if (!strcmp(content_type, kPartitionContentTypes[i].name)) {
-			type_ = kPartitionContentTypes[i].type;
-			valid_ = true;
+		if (!strcmp(contentType, kPartitionContentTypes[i].name)) {
+			fType = kPartitionContentTypes[i].type;
+			fValid = true;
 			return;
 		}
 	}
-	valid_ = false;
+	fValid = false;
 }
 
 // FindNext
+/*!
+	\brief Finds next supported partition.
+*/
 void
 PartitionType::FindNext()
 {
 	for (int32 i = 0; kPartitionTypes[i].name; i++) {
-		if (type_ < kPartitionTypes[i].type) {
-			type_ = kPartitionTypes[i].type;
-			valid_ = true;
+		if (fType < kPartitionTypes[i].type) {
+			fType = kPartitionTypes[i].type;
+			fValid = true;
 			return;
 		}
 	}
-	valid_ = false;
+	fValid = false;
 }
+
+
+/*!
+	\fn bool PartitionType::IsValid() const
+	\brief Check whether the current type is valid.
+*/
+
+/*!
+	\fn bool PartitionType::IsEmpty() const
+	\brief Check whether the current type describes empty type.
+*/
+
+/*!
+	\fn bool PartitionType::IsExtended() const
+	\brief Check whether the current type describes extended partition type.
+*/
+
+/*!
+	\fn uint8 PartitionType::Type() const
+	\brief Returns ID of the current type.
+*/
+
+/*!
+	\fn void PartitionType::GetTypeString(char *buffer) const
+	\brief Returns string name of the current type.
+	\param buffer Buffer where the name is stored, has to be allocated with
+	sufficient length.
+*/
 
 
 //	#pragma mark - Partition

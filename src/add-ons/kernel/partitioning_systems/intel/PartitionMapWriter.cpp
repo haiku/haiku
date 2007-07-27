@@ -33,8 +33,16 @@
 using std::nothrow;
 
 // constructor
+/*!
+	\brief Creates the writer.
+
+	\param deviceFD File descriptor.
+	\param sessionOffset Disk offset of the partition with partitioning system.
+	\param sessionSize Size of the partition with partitioning system.
+	\param blockSize Size of the sector on given disk.
+*/
 PartitionMapWriter::PartitionMapWriter(int deviceFD, off_t sessionOffset,
-									   off_t sessionSize, int32 blockSize)
+		off_t sessionSize, int32 blockSize)
 	: fDeviceFD(deviceFD),
 	  fSessionOffset(sessionOffset),
 	  fSessionSize(sessionSize),
@@ -50,6 +58,15 @@ PartitionMapWriter::~PartitionMapWriter()
 }
 
 // WriteMBR
+/*!
+	\brief Writes Master Boot Record to the first sector of the disk.
+
+	If a \a block is not specified, the sector is firstly read from the disk
+	and after changing relevant items it is written back to the disk.
+	This allows to keep code area in MBR intact.
+	\param block Pointer to \c partition_table_sector.
+	\param map Pointer to the PartitionMap structure describing disk partitions.
+*/
 status_t
 PartitionMapWriter::WriteMBR(uint8 *block, const PartitionMap *map)
 {
@@ -78,8 +95,21 @@ PartitionMapWriter::WriteMBR(uint8 *block, const PartitionMap *map)
 }
 
 // WriteLogical
+/*!
+	\brief Writes Partition Table Sector of the logical \a partition to the
+		disk.
+
+	This function ensures that the connection of the following linked list
+	of logical partitions will be correct. It do nothing with the connection of
+	previous logical partitions (call this function on previous logical
+	partition to ensure it).
+
+	\param block Pointer to \c partition_table_sector.
+	\param partition Pointer to the logical partition.
+*/
 status_t
-PartitionMapWriter::WriteLogical(uint8 *block, const LogicalPartition *partition)
+PartitionMapWriter::WriteLogical(uint8 *block,
+	const LogicalPartition *partition)
 {
 	status_t error = (partition ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
@@ -103,9 +133,21 @@ PartitionMapWriter::WriteLogical(uint8 *block, const LogicalPartition *partition
 }
 
 // WriteExtendedHead
+/*!
+	\brief Writes Extended Boot Record to the first sector of Extended
+		Partition.
+
+	Writes the head of linked list describing logical partitions.
+
+	If the \a first_partition is not specified, it only initializes EBR and the
+	linked list contains no logical partitions.
+
+	\param block Pointer to \c partition_table_sector.
+	\param first_partition Pointer to the first logical partition.
+*/
 status_t
 PartitionMapWriter::WriteExtendedHead(uint8 *block,
-									  const LogicalPartition *first_partition)
+	const LogicalPartition *first_partition)
 {
 	LogicalPartition partition;
 	if (first_partition)
@@ -160,8 +202,7 @@ PartitionMapWriter::_WritePrimary(partition_table_sector *pts)
 // _WriteExtended
 status_t
 PartitionMapWriter::_WriteExtended(partition_table_sector *pts,
-								   const LogicalPartition *partition,
-								   const LogicalPartition *next)
+	const LogicalPartition *partition, const LogicalPartition *next)
 {
 	if (!pts || !partition)
 		return B_BAD_VALUE;
@@ -172,7 +213,8 @@ PartitionMapWriter::_WriteExtended(partition_table_sector *pts,
 	// check the partition's location
 	if (!partition->CheckLocation(fSessionSize, fBlockSize)) {
 		TRACE(("intel: _WriteExtended(): Invalid partition "
-			"location: pts: %lld, offset: %lld, size: %lld, fSessionSize: %lld\n",
+			"location: pts: %lld, offset: %lld, size: %lld, "
+			"fSessionSize: %lld\n",
 			partition->PTSOffset(), partition->Offset(),
 			partition->Size(), fSessionSize));
 		return B_BAD_DATA;
@@ -180,7 +222,8 @@ PartitionMapWriter::_WriteExtended(partition_table_sector *pts,
 
 	// write the table
 	partition_descriptor *descriptor = &(pts->table[0]);
-	partition->GetPartitionDescriptor(descriptor, partition->PTSOffset(), fBlockSize);
+	partition->GetPartitionDescriptor(descriptor, partition->PTSOffset(),
+		fBlockSize);
 
 	// setting offset and size of the next partition in the linked list
 	descriptor = &(pts->table[1]);
@@ -205,9 +248,10 @@ PartitionMapWriter::_WriteExtended(partition_table_sector *pts,
 }
 
 // _ReadPTS
+/*! \brief Reads the sector from the disk.
+*/
 status_t
 PartitionMapWriter::_ReadPTS(off_t offset, partition_table_sector *pts)
-// reads the sector from the disk
 {
 	status_t error = B_OK;
 	if (!pts)
@@ -233,9 +277,10 @@ PartitionMapWriter::_ReadPTS(off_t offset, partition_table_sector *pts)
 }
 
 // _WritePTS
+/*! \brief Writes the sector to the disk.
+*/
 status_t
 PartitionMapWriter::_WritePTS(off_t offset, const partition_table_sector *pts)
-// writes the sector to the disk
 {
 	status_t error = B_OK;
 	if (!pts)
