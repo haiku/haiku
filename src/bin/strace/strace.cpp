@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2007, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
 
@@ -194,7 +194,7 @@ load_program(const char *const *args, int32 argCount, bool traceLoading)
 	// load the program
 	error = _kern_load_image(argCount, mutableArgs, envCount,
 		(const char**)environ, B_NORMAL_PRIORITY,
-		(traceLoading ? 0 : B_WAIT_TILL_LOADED));
+		(traceLoading ? 0 : B_WAIT_TILL_LOADED), -1, 0);
 
 	delete[] mutableArgs;
 
