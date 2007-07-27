@@ -1,4 +1,10 @@
-// KResizeJob.cpp
+/*
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ */
 
 #include <stdio.h>
 
@@ -14,30 +20,42 @@
 #include "ddm_operation_validation.h"
 #include "KResizeJob.h"
 
+
 // debugging
 //#define DBG(x)
 #define DBG(x) x
 #define OUT dprintf
 
+
 // constructor
+/**
+	Creates the job.
+
+	\param parentID the device whose child should be resized
+	\param partitionID the partition which should be resized
+	\param size new size for the partition 
+*/
 KResizeJob::KResizeJob(partition_id parentID, partition_id partitionID,
-					   off_t size)
+		off_t size)
 	: KDiskDeviceJob(B_DISK_DEVICE_JOB_RESIZE, partitionID, parentID),
 	  fSize(size)
 {
 	SetDescription("resizing partition");
 }
 
+
 // destructor
 KResizeJob::~KResizeJob()
 {
 }
+
 
 // Do
 status_t
 KResizeJob::Do()
 {
 	DBG(OUT("KResizeJob::Do(%ld)\n", PartitionID()));
+
 	// get the partition
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	KPartition *partition = manager->WriteLockPartition(PartitionID());
@@ -45,14 +63,17 @@ KResizeJob::Do()
 		PartitionRegistrar registrar(partition, true);
 		PartitionRegistrar deviceRegistrar(partition->Device(), true);
 		DeviceWriteLocker locker(partition->Device(), true);
+
 		// basic checks
 		if (!partition->ParentDiskSystem()) {
 			SetErrorMessage("Partition has no parent disk system!");
 			return B_BAD_VALUE;
 		}
+
 		// if size remains the same, then nothing's to do
 		if (partition->Size() == fSize)
 			return B_OK;
+
 		// check new size
 		off_t size = fSize;
 		off_t contentSize = fSize;
@@ -66,6 +87,7 @@ KResizeJob::Do()
 			SetErrorMessage("Requested size is not valid.");
 			return B_ERROR;
 		}
+
 		// all descendants should be marked busy/descendant busy
 		struct IsNotBusyVisitor : KPartitionVisitor {
 			virtual bool VisitPre(KPartition *partition)
@@ -77,6 +99,7 @@ KResizeJob::Do()
 			SetErrorMessage("Can't resize non-busy partition!");
 			return B_ERROR;
 		}
+
 		// things look good: get all infos needed for resizing
 		KDiskSystem *parentDiskSystem = partition->ParentDiskSystem();
 		KDiskSystem *childDiskSystem = partition->DiskSystem();
@@ -84,34 +107,39 @@ KResizeJob::Do()
 		DiskSystemLoader loader2(childDiskSystem);
 		off_t oldSize = partition->Size();
 		off_t oldContentSize = partition->ContentSize();
+
 		// unlock the device and resize the beast
 		locker.Unset();
+
 		// if growing, resize partition first
 		if (oldSize < fSize) {
 			status_t error = parentDiskSystem->ResizeChild(partition, fSize,
-														   this);
+				this);
 			if (error != B_OK)
 				return error;
 		}
+
 		// resize contents
 		if (childDiskSystem && oldContentSize != contentSize) {
 			status_t error = childDiskSystem->Resize(partition, contentSize,
-													 this);
+				this);
 			if (error != B_OK)
 				return error;
 		}
+
 		// if shrinking, resize partition last
 		if (oldSize > fSize) {
 			status_t error = parentDiskSystem->ResizeChild(partition, fSize,
-														   this);
+				this);
 			if (error != B_OK)
 				return error;
 		}
+
+		return B_OK;
+
 	} else {
 		SetErrorMessage("Couldn't find partition.");
 		return B_ENTRY_NOT_FOUND;
 	}
-	// cannot come here
-	return B_ERROR;
 }
 

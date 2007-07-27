@@ -1,5 +1,10 @@
-// KScanPartitionJob.h
-
+/*
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ */
 #ifndef _K_DISK_DEVICE_SCAN_PARTITION_JOB_H
 #define _K_DISK_DEVICE_SCAN_PARTITION_JOB_H
 
@@ -15,20 +20,12 @@ class KPartition;
  */
 class KScanPartitionJob : public KDiskDeviceJob {
 public:
-	/**
-	 * Creates the job.
-	 * 
-	 * \param partitionID the partition to scan
-	 */
 	KScanPartitionJob(partition_id partitionID);
 	virtual ~KScanPartitionJob();
 
 	virtual status_t Do();
 
 private:
-	/**
-	 * Do the actual scan.
-	 */
 	status_t _ScanPartition(KPartition *partition);
 };
 

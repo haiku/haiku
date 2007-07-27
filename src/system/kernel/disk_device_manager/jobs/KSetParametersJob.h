@@ -1,5 +1,11 @@
-// KSetParametersJob.h
-
+/*
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ *		Lubos Kulic <lubos@radical.ed>
+ */
 #ifndef _K_DISK_DEVICE_SET_PARAMETERS_JOB_H
 #define _K_DISK_DEVICE_SET_PARAMETERS_JOB_H
 
@@ -17,13 +23,6 @@ namespace DiskDevice {
  */
 class KSetParametersJob : public KDiskDeviceJob {
 public:
-	/**
-	 * Creates the job.
-	 * 
-	 * \param partition the partition whose params (or content params) should be set
-	 * \param parameters the new parameters for the partition
-	 * \param contentParameters the new parameters for partition's content
-	 */
 	KSetParametersJob(partition_id parent, partition_id partition,
 					  const char *parameters, const char *contentParameters);
 	virtual ~KSetParametersJob();

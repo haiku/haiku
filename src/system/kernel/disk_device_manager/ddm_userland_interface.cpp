@@ -973,7 +973,7 @@ _user_validate_initialize_partition(partition_id partitionID,
 											  diskSystemName, name, parameters);
 	}
 	if (!error) 
-		error = ddm_strlcpy(name, _name, B_DISK_DEVICE_NAME_LENGTH);
+		error = ddm_strlcpy(_name, name, B_DISK_DEVICE_NAME_LENGTH);
 	free(parameters);
 	return error;
 }

@@ -1,8 +1,13 @@
-// KFileSystem.h
-//
-// KFileSystem implements the KDiskSystem interface for file systems.
-// It works with the FS API.
-
+/*
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ *
+ * KFileSystem implements the KDiskSystem interface for file systems.
+ * It works with the FS API.
+ */
 #ifndef _K_FILE_DISK_DEVICE_SYSTEM_H
 #define _K_FILE_DISK_DEVICE_SYSTEM_H
 
@@ -13,7 +18,7 @@ struct file_system_module_info;
 namespace BPrivate {
 namespace DiskDevice {
 
-///	\brief Wrapper for the C interface of a filesystem add-on.
+//!	\brief Wrapper for the C interface of a filesystem add-on.
 class KFileSystem : public KDiskSystem {
 public:
 	KFileSystem(const char *name);

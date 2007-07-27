@@ -1,5 +1,10 @@
-// KInitializeJob.h
-
+/*
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ */
 #ifndef _K_DISK_DEVICE_UNINITIALIZE_JOB_H
 #define _K_DISK_DEVICE_UNINITIALIZE_JOB_H
 
@@ -13,9 +18,6 @@ namespace DiskDevice {
  */
 class KUninitializeJob : public KDiskDeviceJob {
 public:
-	/**
-	 * Creates the job
-	 */
 	KUninitializeJob(partition_id partitionID);
 	virtual ~KUninitializeJob();
 

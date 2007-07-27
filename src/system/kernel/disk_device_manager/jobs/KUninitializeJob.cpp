@@ -1,4 +1,10 @@
-// KInitializeJob.cpp
+/*
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ */
 
 #include <stdio.h>
 

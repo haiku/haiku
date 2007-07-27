@@ -1,5 +1,10 @@
-// KPartition.h
-
+/*
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ */
 #ifndef _K_DISK_DEVICE_PHYSICAL_PARTITION_H
 #define _K_DISK_DEVICE_PHYSICAL_PARTITION_H
 
@@ -12,7 +17,7 @@ class KDiskDevice;
 class KDiskSystem;
 class KShadowPartition;
 
-/// \brief Class representing an existing partition.
+//! \brief Class representing an existing partition.
 class KPhysicalPartition : public KPartition {
 public:
 	KPhysicalPartition(partition_id id = -1);

@@ -1,3 +1,10 @@
+/*
+ * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Lubos Kulic <lubos@radical.ed>
+ */
 #ifndef _K_DISK_DEVICE_SET_NAME_JOB_H
 #define _K_DISK_DEVICE_SET_NAME_JOB_H
 
@@ -14,32 +21,20 @@ namespace DiskDevice {
  * 	it's possible to create it with only one of these name parameters and so 
  * 	set only one of the names
  */
-class KSetNameJob : public KDiskDeviceJob
-{
+class KSetNameJob : public KDiskDeviceJob {
 public:
-	/**
-	 * Creates the job.
-	 * 	 
-	 * 
-	 * \param partitionID the partition/device whose name should be set
-	 * \param name the new name for \c partitionID
-	 * \param contentName the new name for the content of \c partitionID
-	 */
-    KSetNameJob(partition_id parentID, partition_id partitionID, const char * name, 
-			   const char * contentName);
-
+    KSetNameJob(partition_id parentID, partition_id partitionID,
+		const char* name,  const char* contentName);
     virtual ~KSetNameJob();
 	
 	virtual status_t Do();
 	
 private:
-	char * fName, *fContentName; 
-		
-
+	char*	fName;
+	char*	fContentName; 
 };
 
 }
-
 }
 
 using BPrivate::DiskDevice::KSetNameJob;

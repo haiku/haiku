@@ -1,5 +1,11 @@
-// KInitializeJob.h
-
+/*
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ *		Lubos Kulic <lubos@radical.ed>
+ */
 #ifndef _K_DISK_DEVICE_INITIALIZE_JOB_H
 #define _K_DISK_DEVICE_INITIALIZE_JOB_H
 
@@ -13,13 +19,6 @@ namespace DiskDevice {
  */
 class KInitializeJob : public KDiskDeviceJob {
 public:
-	/**
-	 * Creates the job.
-	 * 
-	 * \param partition the partition to initialize
-	 * \param diskSystemID which disk system the partition should be initialized with
-	 * \param parameters additional parameters for the operation
-	 */
 	KInitializeJob(partition_id partition, disk_system_id diskSystemID,
 				   const char *name, const char *parameters);
 	virtual ~KInitializeJob();

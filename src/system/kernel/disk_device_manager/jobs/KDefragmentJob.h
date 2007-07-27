@@ -1,5 +1,11 @@
-// KDefragmentJob.h
-
+/*
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ *		Lubos Kulic <lubos@radical.ed>
+ */
 #ifndef _K_DISK_DEVICE_DEFRAGMENT_JOB_H
 #define _K_DISK_DEVICE_DEFRAGMENT_JOB_H
 
@@ -13,12 +19,6 @@ namespace DiskDevice {
  */
 class KDefragmentJob : public KDiskDeviceJob {
 public:
-	/**
-	 * Creates the job
-	 * 
-	 * \param partition which device should we defragment
-	 */
-	
 	KDefragmentJob(partition_id partition);
 	virtual ~KDefragmentJob();
 

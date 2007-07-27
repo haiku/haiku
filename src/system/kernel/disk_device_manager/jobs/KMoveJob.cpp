@@ -1,4 +1,12 @@
-// KMoveJob.cpp
+/*
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ *		Lubos Kulic <lubos@radical.ed>
+ */
+
 #include "KMoveJob.h"
 
 #include <stdio.h>
@@ -15,84 +23,95 @@
 #include "ddm_operation_validation.h"
 
 
-
 // debugging
 //#define DBG(x)
 #define DBG(x) x
 #define OUT dprintf
 
-KMoveJob::KMoveJob(partition_id parentID, partition_id partitionID, off_t offset)
-	: KDiskDeviceJob(B_DISK_DEVICE_JOB_MOVE, partitionID, parentID ),
-	fNewOffset(offset)
+
+/**
+	Creates the job.
+
+	\param parentID the device whose child should be moved
+	\param partitionID the child to move
+	\param offset where to move
+*/
+KMoveJob::KMoveJob(partition_id parentID, partition_id partitionID,
+		off_t offset)
+	: KDiskDeviceJob(B_DISK_DEVICE_JOB_MOVE, partitionID, parentID),
+	  fNewOffset(offset)
 {
-	SetDescription( "moving partition" );	
+	SetDescription("moving partition");	
 }
 
-KMoveJob::~KMoveJob() {}
+KMoveJob::~KMoveJob()
+{
+}
 
 
-status_t KMoveJob::Do() {
-	
+status_t
+KMoveJob::Do()
+{
 	DBG(OUT( "KMoveJob::Do(%ld)\n", PartitionID() ));
-	
-	//get the partition
-	KDiskDeviceManager * manager = KDiskDeviceManager::Default();
+
+	// get the partition
+	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
 	KPartition *partition = manager->WriteLockPartition(PartitionID());
 	if (partition) {
-		//OK, we have the partition, do some checks
+		// OK, we have the partition, do some checks
 		PartitionRegistrar registrar(partition, true);
 		PartitionRegistrar deviceRegistrar(partition->Device(), true);
-		
+
 		DeviceWriteLocker locker(partition->Device(), true);
-		
+
 		// basic checks
 		if (!partition->ParentDiskSystem()) {
 			SetErrorMessage("Partition has no parent disk system!");
 			return B_BAD_VALUE;
 		}
-		
-		if(partition->Offset() == fNewOffset ) {
-			//we are already on the right place -> nothing to do...
+
+		if (partition->Offset() == fNewOffset) {
+			// we are already on the right place -> nothing to do...
 			return B_OK;
 		}
-		
-		off_t new_offset = fNewOffset;
-		
-		status_t validate_result = validate_move_partition(partition, partition->ChangeCounter(),
-				&new_offset, true, false ); //TODO posledni 2 parametry????
-		if( validate_result != B_OK ) {
-			SetErrorMessage( "Validation of the new partition offset failed." );
-			return validate_result;
+
+		off_t newOffset = fNewOffset;
+
+		status_t validateResult = validate_move_partition(partition,
+			partition->ChangeCounter(), &newOffset, true, false);
+				// TODO posledni 2 parametry????
+					// TODO: Huh?
+		if (validateResult != B_OK) {
+			SetErrorMessage("Validation of the new partition offset failed.");
+			return validateResult;
 		}
-		
-		if( new_offset != fNewOffset ) {
-			SetErrorMessage( "Requested partition offset not valid." );
+
+		if (newOffset != fNewOffset) {
+			SetErrorMessage("Requested partition offset not valid.");
 			return B_ERROR;
 		}
-		
+
 		// all descendants should be marked busy/descendant busy
-		if ( isPartitionNotBusy( partition ) ) {
+		if (IsPartitionNotBusy(partition)) {
 			SetErrorMessage("Can't move non-busy partition!");
 			return B_ERROR;
 		}
-		
-		//get all necessary objects
+
+		// get all necessary objects
 		KDiskSystem *parentDiskSystem = partition->ParentDiskSystem();
 		KDiskSystem *childDiskSystem = partition->DiskSystem();
-				
-		
+
 		locker.Unlock();
-		
-		status_t move_result = parentDiskSystem->Move( partition, fNewOffset, this );
-		if( move_result != B_OK ) {
-			SetErrorMessage( "Moving of partition failed." );
+
+		status_t moveResult = parentDiskSystem->Move(partition, fNewOffset,
+			this);
+		if (moveResult != B_OK) {
+			SetErrorMessage("Moving of partition failed.");
 		}
-		return move_result;
-	//do the move
-		
+		return moveResult;
+
 	} else {
 		SetErrorMessage("Couldn't find partition.");
 		return B_ENTRY_NOT_FOUND;
 	}
-	return B_ERROR;
 }

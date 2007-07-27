@@ -1,4 +1,10 @@
-// KScanPartitionJob.cpp
+/*
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ */
 
 #include <KernelExport.h>
 
@@ -18,6 +24,11 @@
 #define OUT dprintf
 
 
+/**
+	Creates the job.
+
+	\param partitionID the partition to scan
+*/
 KScanPartitionJob::KScanPartitionJob(partition_id partitionID)
 	: KDiskDeviceJob(B_DISK_DEVICE_JOB_SCAN, partitionID)
 {
@@ -33,12 +44,6 @@ KScanPartitionJob::~KScanPartitionJob()
 status_t
 KScanPartitionJob::Do()
 {
-/*#ifdef _BOOT_MODE
-	OUT( "\nScanJob boot mode\n\n" );
-#else 
-	OUT( "\nScanJob NOT boot mode\n\n" );
-#endif*/
-	
 	// get the partition
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	KPartition *partition = manager->WriteLockPartition(PartitionID());

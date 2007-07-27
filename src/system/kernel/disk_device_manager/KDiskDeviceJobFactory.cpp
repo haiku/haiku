@@ -1,10 +1,11 @@
 /*
- * Copyright 2004-2006, Haiku, Inc. All rights reserved.
- * Copyright 2003-2004, Ingo Weinhold, bonefish@cs.tu-berlin.de. All rights reserved.
- *
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ *		Lubos Kulic <lubos@radical.ed>
  */
-
 
 #include <util/kernel_cpp.h>
 
@@ -23,6 +24,7 @@
 #include "KSetParametersJob.h"
 #include "KSetTypeJob.h"
 #include "KUninitializeJob.h"
+
 
 using namespace std;
 
@@ -61,8 +63,9 @@ KDiskDeviceJobFactory::CreateResizeJob(partition_id parentID,
 
 
 KDiskDeviceJob *
-KDiskDeviceJobFactory::CreateMoveJob(partition_id parentID, partition_id partitionID,
-	off_t offset, const partition_id *contentsToMove, int32 contentsToMoveCount)
+KDiskDeviceJobFactory::CreateMoveJob(partition_id parentID,
+	partition_id partitionID, off_t offset, const partition_id *contentsToMove,
+	int32 contentsToMoveCount)
 {
 	// TODO: this is wierd, what in hell are contentsToMove etc?
 	return new(nothrow) KMoveJob(parentID, partitionID, offset);
@@ -113,7 +116,8 @@ KDiskDeviceJob *
 KDiskDeviceJobFactory::CreateInitializeJob(partition_id partitionID,
 	disk_system_id diskSystemID, const char *name, const char *parameters)
 {
-	return new(nothrow) KInitializeJob(partitionID, diskSystemID, name, parameters);
+	return new(nothrow) KInitializeJob(partitionID, diskSystemID, name,
+		parameters);
 }
 
 
@@ -129,7 +133,8 @@ KDiskDeviceJobFactory::CreateCreateChildJob(partition_id partitionID,
 	partition_id childID, off_t offset, off_t size, const char *type,
 	const char *parameters)
 {
-	return new(nothrow) KCreateChildJob(partitionID, childID, offset, size, type, parameters);
+	return new(nothrow) KCreateChildJob(partitionID, childID, offset, size,
+		type, parameters);
 }
 
 

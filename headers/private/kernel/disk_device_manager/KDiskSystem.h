@@ -1,5 +1,10 @@
-// KDiskSystem.h
-
+/*
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ */
 #ifndef _K_DISK_DEVICE_SYSTEM_H
 #define _K_DISK_DEVICE_SYSTEM_H
 
@@ -13,7 +18,7 @@ namespace DiskDevice {
 class KDiskDeviceJob;
 class KPartition;
 
-///	\brief Common ancestor for disk system add-on wrappers
+//!	\brief Common ancestor for disk system add-on wrappers
 class KDiskSystem {
 public:
 	KDiskSystem(const char *name);

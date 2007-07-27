@@ -1,5 +1,10 @@
-// KPartition.h
-
+/*
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ */
 #ifndef _K_DISK_DEVICE_SHADOW_PARTITION_H
 #define _K_DISK_DEVICE_SHADOW_PARTITION_H
 
@@ -11,9 +16,10 @@ namespace DiskDevice {
 
 class KPhysicalPartition;
 
-///	\brief Class representing a shadow of an existing partition.
-///
-///	See \ref path_kernel_structures for more information.
+/*!	\brief Class representing a shadow of an existing partition.
+
+	See \ref path_kernel_structures for more information.
+*/
 class KShadowPartition : public KPartition, private KPartitionListener {
 public:
 	KShadowPartition(KPhysicalPartition *physicalPartition);
