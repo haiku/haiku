@@ -1829,7 +1829,6 @@ BContainerWindow::AddFileMenu(BMenu *menu)
 	menu->AddItem(new BMenuItem("Edit Name", new BMessage(kEditItem), 'E'));
 
 	if (IsTrash() || InTrash()) {
-		menu->AddItem(new BMenuItem("Delete", new BMessage(kDelete)));
 		menu->AddItem(new BMenuItem("Restore", new BMessage(kRestoreFromTrash)));
 		if (IsTrash()) {
 			// add as first item in menu
