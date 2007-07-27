@@ -12,6 +12,7 @@ class KDiskDevice;
 class KDiskSystem;
 class KShadowPartition;
 
+/// \brief Class representing an existing partition.
 class KPhysicalPartition : public KPartition {
 public:
 	KPhysicalPartition(partition_id id = -1);

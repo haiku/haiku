@@ -13,6 +13,7 @@ namespace DiskDevice {
 class KDiskDeviceJob;
 class KPartition;
 
+///	\brief Common ancestor for disk system add-on wrappers
 class KDiskSystem {
 public:
 	KDiskSystem(const char *name);

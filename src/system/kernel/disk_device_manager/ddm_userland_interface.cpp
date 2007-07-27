@@ -1,4 +1,7 @@
-// ddm_userland_interface.cpp
+/** 	\file ddm_userland_interface.cpp
+ *
+ * 	\brief Interface for userspace calls.
+ */
 
 #include <stdlib.h>
 
@@ -721,7 +724,7 @@ _user_supports_initializing_partition(partition_id partitionID,
 									  int32 changeCounter,
 									  const char *_diskSystemName)
 {
-	if (_diskSystemName)
+	if (!_diskSystemName)
 		return false;
 	char diskSystemName[B_DISK_SYSTEM_NAME_LENGTH];
 	status_t error = ddm_strlcpy(diskSystemName, _diskSystemName, B_DISK_SYSTEM_NAME_LENGTH);
@@ -969,10 +972,10 @@ _user_validate_initialize_partition(partition_id partitionID,
 		error = validate_initialize_partition(partition, changeCounter,
 											  diskSystemName, name, parameters);
 	}
-	if (!error)
-		error = ddm_strlcpy(_name, name, B_DISK_DEVICE_NAME_LENGTH);
+	if (!error) 
+		error = ddm_strlcpy(name, _name, B_DISK_DEVICE_NAME_LENGTH);
 	free(parameters);
-	return error;											  
+	return error;
 }
 
 // _user_validate_create_child_partition
@@ -1548,6 +1551,7 @@ _user_initialize_partition(partition_id partitionID, int32 changeCounter,
 			}
 			if (!error) {
 				partition->Changed(B_PARTITION_CHANGED_CONTENT_PARAMETERS);
+				partition->Changed(B_PARTITION_CHANGED_INITIALIZATION);
 				// implicit content disk system changes
 				error = partition->DiskSystem()->ShadowPartitionChanged(
 					partition, B_PARTITION_INITIALIZE);

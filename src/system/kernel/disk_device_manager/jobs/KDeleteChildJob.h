@@ -8,8 +8,17 @@
 namespace BPrivate {
 namespace DiskDevice {
 
+/**
+ * Deletes specific child of a partition/device
+ */
 class KDeleteChildJob : public KDiskDeviceJob {
 public:
+	/**
+	 * Creates the job
+	 * 
+	 * \param parent device of the deleted partition
+	 * \param partition partition supposed to be removed
+	 */
 	KDeleteChildJob(partition_id parent, partition_id partition);
 	virtual ~KDeleteChildJob();
 

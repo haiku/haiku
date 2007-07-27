@@ -8,8 +8,14 @@
 namespace BPrivate {
 namespace DiskDevice {
 
+/**
+ * Uninitializes the partition/device
+ */
 class KUninitializeJob : public KDiskDeviceJob {
 public:
+	/**
+	 * Creates the job
+	 */
 	KUninitializeJob(partition_id partitionID);
 	virtual ~KUninitializeJob();
 

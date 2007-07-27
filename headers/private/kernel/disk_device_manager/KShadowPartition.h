@@ -11,6 +11,9 @@ namespace DiskDevice {
 
 class KPhysicalPartition;
 
+///	\brief Class representing a shadow of an existing partition.
+///
+///	See \ref path_kernel_structures for more information.
 class KShadowPartition : public KPartition, private KPartitionListener {
 public:
 	KShadowPartition(KPhysicalPartition *physicalPartition);

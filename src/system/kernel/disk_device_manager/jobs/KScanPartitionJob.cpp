@@ -33,6 +33,12 @@ KScanPartitionJob::~KScanPartitionJob()
 status_t
 KScanPartitionJob::Do()
 {
+/*#ifdef _BOOT_MODE
+	OUT( "\nScanJob boot mode\n\n" );
+#else 
+	OUT( "\nScanJob NOT boot mode\n\n" );
+#endif*/
+	
 	// get the partition
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	KPartition *partition = manager->WriteLockPartition(PartitionID());

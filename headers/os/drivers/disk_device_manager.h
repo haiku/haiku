@@ -14,9 +14,11 @@
 extern "C" {
 #endif
 
-// C API partition representation
-// Fields marked [sys] are set by the system and are not to be changed by
-// the disk system modules.
+/** 	\brief C API partition representation
+ *
+ * 	Fields marked [sys] are set by the system and are not to be changed by
+ * 	the disk system modules.
+ */
 typedef struct partition_data {
 	partition_id	id;				// [sys]
 	off_t			offset;

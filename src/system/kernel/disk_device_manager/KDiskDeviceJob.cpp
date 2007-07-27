@@ -243,3 +243,17 @@ KDiskDeviceJob::_NextID()
 // fNextID
 disk_job_id KDiskDeviceJob::fNextID = 0;
 
+
+// IsNotBusyVisitor
+bool KDiskDeviceJob::IsNotBusyVisitor::VisitPre( KPartition * partition ) {
+	return !(partition->IsBusy() || partition->IsDescendantBusy());
+}
+
+
+bool KDiskDeviceJob::isPartitionNotBusy( KPartition * partition ) {
+	if( !partition ) {
+		return false; 
+	}
+	
+	return partition->VisitEachDescendant(&fNotBusyVisitor);
+}

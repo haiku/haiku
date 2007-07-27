@@ -13,6 +13,7 @@ struct file_system_module_info;
 namespace BPrivate {
 namespace DiskDevice {
 
+///	\brief Wrapper for the C interface of a filesystem add-on.
 class KFileSystem : public KDiskSystem {
 public:
 	KFileSystem(const char *name);

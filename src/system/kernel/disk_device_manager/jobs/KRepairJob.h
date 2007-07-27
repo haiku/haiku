@@ -8,12 +8,25 @@
 namespace BPrivate {
 namespace DiskDevice {
 
+/**
+ * Repair partition (or check for repairs)
+ */
 class KRepairJob : public KDiskDeviceJob {
 public:
-	KRepairJob(partition_id partition);
+	/**
+	 * Creates the job.
+	 * 
+	 * \param partition the partition which should be repared
+	 * \param checkOnly when true, the partition is only checked, but no actual
+	 * 		repairs are proceeded
+	 */
+	KRepairJob(partition_id partition, bool checkOnly);
 	virtual ~KRepairJob();
 
 	virtual status_t Do();
+	
+private:
+	bool fCheckOnly;
 };
 
 } // namespace DiskDevice

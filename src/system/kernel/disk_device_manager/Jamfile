@@ -42,7 +42,9 @@ KernelMergeObject kernel_disk_device_manager.o :
 	KRepairJob.cpp
 	KResizeJob.cpp
 	KScanPartitionJob.cpp
+	KSetNameJob.cpp
 	KSetParametersJob.cpp
+	KSetTypeJob.cpp
 	KUninitializeJob.cpp
 
 	# utilities

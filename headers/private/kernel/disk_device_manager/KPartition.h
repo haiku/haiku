@@ -21,6 +21,7 @@ class KPath;
 class KPhysicalPartition;
 class KShadowPartition;
 
+///	\brief Class representing a single partition.
 class KPartition {
 public:
 	KPartition(partition_id id = -1);

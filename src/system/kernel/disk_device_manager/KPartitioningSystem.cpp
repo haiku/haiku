@@ -1,4 +1,7 @@
-// KPartitioningSystem.cpp
+/**	\file KPartitioningSystem.cpp
+ *
+ * 	\brief Implementation of \ref KPartitioningSystem class
+ */
 
 #include <fcntl.h>
 #include <stdlib.h>
@@ -499,17 +502,17 @@ KPartitioningSystem::Resize(KPartition *partition, off_t size,
 		return B_ENTRY_NOT_FOUND;
 	// lock partition and open partition device
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	KPartition *_partition = manager->ReadLockPartition(partition->ID());
+	KPartition *_partition = manager->WriteLockPartition(partition->ID());
 	if (!_partition)
 		return B_ERROR;
 	int fd = -1;
 	{
 		PartitionRegistrar registrar(_partition, true);
 		PartitionRegistrar deviceRegistrar(_partition->Device(), true);
-		DeviceReadLocker locker(_partition->Device(), true);
+		DeviceWriteLocker locker(_partition->Device(), true);
 		if (partition != _partition)
 			return B_ERROR;
-		status_t result = partition->Open(O_RDONLY, &fd);
+		status_t result = partition->Open(O_RDWR, &fd);
 		if (result != B_OK)
 			return result;
 	}
@@ -526,25 +529,24 @@ KPartitioningSystem::ResizeChild(KPartition *child, off_t size,
 								 KDiskDeviceJob *job)
 {
 	// check parameters
-	if (!child || !job || size < 0)
+	if (!child || !job || !child->Parent() || size < 0)
 		return B_BAD_VALUE;
 	if (!fModule->resize_child)
 		return B_ENTRY_NOT_FOUND;
 	// lock partition and open (parent) partition device
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	KPartition *_partition = manager->ReadLockPartition(child->ID());
+	KPartition *_partition = manager->WriteLockPartition(child->ID());
+	KPartition *_parent = manager->WriteLockPartition(child->Parent()->ID());
 	if (!_partition)
 		return B_ERROR;
 	int fd = -1;
 	{
 		PartitionRegistrar registrar(_partition, true);
 		PartitionRegistrar deviceRegistrar(_partition->Device(), true);
-		DeviceReadLocker locker(_partition->Device(), true);
+		DeviceWriteLocker locker(_partition->Device(), true);
 		if (child != _partition)
 			return B_ERROR;
-		if (!child->Parent())
-			return B_BAD_VALUE;
-		status_t result = child->Parent()->Open(O_RDONLY, &fd);
+		status_t result = child->Parent()->Open(O_RDWR, &fd);
 		if (result != B_OK)
 			return result;
 	}
@@ -560,8 +562,32 @@ status_t
 KPartitioningSystem::Move(KPartition *partition, off_t offset,
 						  KDiskDeviceJob *job)
 {
-	// to be implemented
-	return B_ERROR;
+	// check parameters
+	if (!partition || !job)
+		return B_BAD_VALUE;
+	if (!fModule->move)
+		return B_ENTRY_NOT_FOUND;
+	// lock partition and open partition device
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	KPartition *_partition = manager->WriteLockPartition(partition->ID());
+	if (!_partition)
+		return B_ERROR;
+	int fd = -1;
+	{
+		PartitionRegistrar registrar(_partition, true);
+		PartitionRegistrar deviceRegistrar(_partition->Device(), true);
+		DeviceWriteLocker locker(_partition->Device(), true);
+		if (partition != _partition)
+			return B_ERROR;
+		status_t result = partition->Open(O_RDWR, &fd);
+		if (result != B_OK)
+			return result;
+	}
+	// let the module do its job
+	status_t result = fModule->move(fd, partition->ID(), offset, job->ID());
+	// cleanup and return
+	close(fd);
+	return result;
 }
 
 // MoveChild
@@ -569,8 +595,33 @@ status_t
 KPartitioningSystem::MoveChild(KPartition *child, off_t offset,
 							   KDiskDeviceJob *job)
 {
-	// to be implemented
-	return B_ERROR;
+	// check parameters
+	if (!child || !job || !child->Parent())
+		return B_BAD_VALUE;
+	if (!fModule->move_child)
+		return B_ENTRY_NOT_FOUND;
+	// lock partition and open (parent) partition device
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	KPartition *_partition = manager->WriteLockPartition(child->ID());
+	KPartition *_parent = manager->WriteLockPartition(child->Parent()->ID());
+	if (!_partition)
+		return B_ERROR;
+	int fd = -1;
+	{
+		PartitionRegistrar registrar(_partition, true);
+		PartitionRegistrar deviceRegistrar(_partition->Device(), true);
+		DeviceWriteLocker locker(_partition->Device(), true);
+		if (child != _partition)
+			return B_ERROR;
+		status_t result = child->Parent()->Open(O_RDWR, &fd);
+		if (result != B_OK)
+			return result;
+	}
+	// let the module do its job
+	status_t result = fModule->move_child(fd, child->Parent()->ID(), child->ID(), offset, job->ID());
+	// cleanup and return
+	close(fd);
+	return result;
 }
 
 // SetName
@@ -578,8 +629,32 @@ status_t
 KPartitioningSystem::SetName(KPartition *partition, char *name,
 							 KDiskDeviceJob *job)
 {
-	// to be implemented
-	return B_ERROR;
+	// check parameters
+	if (!partition || !job || !name)
+		return B_BAD_VALUE;
+	if (!fModule->set_name)
+		return B_ENTRY_NOT_FOUND;
+	// lock partition and open partition device
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	KPartition *_partition = manager->WriteLockPartition(partition->ID());
+	if (!_partition)
+		return B_ERROR;
+	int fd = -1;
+	{
+		PartitionRegistrar registrar(_partition, true);
+		PartitionRegistrar deviceRegistrar(_partition->Device(), true);
+		DeviceWriteLocker locker(_partition->Device(), true);
+		if (partition != _partition)
+			return B_ERROR;
+		status_t result = partition->Open(O_RDWR, &fd);
+		if (result != B_OK)
+			return result;
+	}
+	// let the module do its job
+	status_t result = fModule->set_name(fd, partition->ID(), name, job->ID());
+	// cleanup and return
+	close(fd);
+	return result;
 }
 
 // SetContentName
@@ -587,8 +662,32 @@ status_t
 KPartitioningSystem::SetContentName(KPartition *partition, char *name,
 									KDiskDeviceJob *job)
 {
-	// to be implemented
-	return B_ERROR;
+	// check parameters
+	if (!partition || !job || !name)
+		return B_BAD_VALUE;
+	if (!fModule->set_content_name)
+		return B_ENTRY_NOT_FOUND;
+	// lock partition and open partition device
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	KPartition *_partition = manager->WriteLockPartition(partition->ID());
+	if (!_partition)
+		return B_ERROR;
+	int fd = -1;
+	{
+		PartitionRegistrar registrar(_partition, true);
+		PartitionRegistrar deviceRegistrar(_partition->Device(), true);
+		DeviceWriteLocker locker(_partition->Device(), true);
+		if (partition != _partition)
+			return B_ERROR;
+		status_t result = partition->Open(O_RDWR, &fd);
+		if (result != B_OK)
+			return result;
+	}
+	// let the module do its job
+	status_t result = fModule->set_content_name(fd, partition->ID(), name, job->ID());
+	// cleanup and return
+	close(fd);
+	return result;
 }
 
 // SetType
@@ -596,8 +695,32 @@ status_t
 KPartitioningSystem::SetType(KPartition *partition, char *type,
 							 KDiskDeviceJob *job)
 {
-	// to be implemented
-	return B_ERROR;
+	// check parameters
+	if (!partition || !job || !type)
+		return B_BAD_VALUE;
+	if (!fModule->set_type)
+		return B_ENTRY_NOT_FOUND;
+	// lock partition and open partition device
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	KPartition *_partition = manager->WriteLockPartition(partition->ID());
+	if (!_partition)
+		return B_ERROR;
+	int fd = -1;
+	{
+		PartitionRegistrar registrar(_partition, true);
+		PartitionRegistrar deviceRegistrar(_partition->Device(), true);
+		DeviceWriteLocker locker(_partition->Device(), true);
+		if (partition != _partition)
+			return B_ERROR;
+		status_t result = partition->Open(O_RDWR, &fd);
+		if (result != B_OK)
+			return result;
+	}
+	// let the module do its job
+	status_t result = fModule->set_type(fd, partition->ID(), type, job->ID());
+	// cleanup and return
+	close(fd);
+	return result;
 }
 
 // SetParameters
@@ -605,8 +728,32 @@ status_t
 KPartitioningSystem::SetParameters(KPartition *partition,
 								   const char *parameters, KDiskDeviceJob *job)
 {
-	// to be implemented
-	return B_ERROR;
+	// check parameters
+	if (!partition || !job || !parameters)
+		return B_BAD_VALUE;
+	if (!fModule->set_parameters)
+		return B_ENTRY_NOT_FOUND;
+	// lock partition and open partition device
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	KPartition *_partition = manager->WriteLockPartition(partition->ID());
+	if (!_partition)
+		return B_ERROR;
+	int fd = -1;
+	{
+		PartitionRegistrar registrar(_partition, true);
+		PartitionRegistrar deviceRegistrar(_partition->Device(), true);
+		DeviceWriteLocker locker(_partition->Device(), true);
+		if (partition != _partition)
+			return B_ERROR;
+		status_t result = partition->Open(O_RDWR, &fd);
+		if (result != B_OK)
+			return result;
+	}
+	// let the module do its job
+	status_t result = fModule->set_parameters(fd, partition->ID(), parameters, job->ID());
+	// cleanup and return
+	close(fd);
+	return result;
 }
 
 // SetContentParameters
@@ -615,8 +762,32 @@ KPartitioningSystem::SetContentParameters(KPartition *partition,
 										  const char *parameters,
 										  KDiskDeviceJob *job)
 {
-	// to be implemented
-	return B_ERROR;
+	// check parameters
+	if (!partition || !job || !parameters)
+		return B_BAD_VALUE;
+	if (!fModule->set_content_parameters)
+		return B_ENTRY_NOT_FOUND;
+	// lock partition and open partition device
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	KPartition *_partition = manager->WriteLockPartition(partition->ID());
+	if (!_partition)
+		return B_ERROR;
+	int fd = -1;
+	{
+		PartitionRegistrar registrar(_partition, true);
+		PartitionRegistrar deviceRegistrar(_partition->Device(), true);
+		DeviceWriteLocker locker(_partition->Device(), true);
+		if (partition != _partition)
+			return B_ERROR;
+		status_t result = partition->Open(O_RDWR, &fd);
+		if (result != B_OK)
+			return result;
+	}
+	// let the module do its job
+	status_t result = fModule->set_content_parameters(fd, partition->ID(), parameters, job->ID());
+	// cleanup and return
+	close(fd);
+	return result;
 }
 
 // Initialize
@@ -624,8 +795,32 @@ status_t
 KPartitioningSystem::Initialize(KPartition *partition, const char *name,
 								const char *parameters, KDiskDeviceJob *job)
 {
-	// to be implemented
-	return B_ERROR;
+	// check parameters
+	if (!partition || !job || !name /*|| !parameters*/)
+		return B_BAD_VALUE;
+	if (!fModule->initialize)
+		return B_ENTRY_NOT_FOUND;
+	// lock partition and open partition device
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	KPartition *_partition = manager->WriteLockPartition(partition->ID());
+	if (!_partition)
+		return B_ERROR;
+	int fd = -1;
+	{
+		PartitionRegistrar registrar(_partition, true);
+		PartitionRegistrar deviceRegistrar(_partition->Device(), true);
+		DeviceWriteLocker locker(_partition->Device(), true);
+		if (partition != _partition)
+			return B_ERROR;
+		status_t result = partition->Open(O_RDWR, &fd);
+		if (result != B_OK)
+			return result;
+	}
+	// let the module do its job
+	status_t result = fModule->initialize(fd, partition->ID(), name, parameters, job->ID());
+	// cleanup and return
+	close(fd);
+	return result;
 }
 
 // CreateChild
@@ -635,8 +830,37 @@ KPartitioningSystem::CreateChild(KPartition *partition, off_t offset,
 								 const char *parameters, KDiskDeviceJob *job,
 								 KPartition **child, partition_id childID)
 {
-	// to be implemented
-	return B_ERROR;
+	// check parameters
+	if (!partition || !job || !type /*|| !parameters*/ || !child)
+		return B_BAD_VALUE;
+	if (!fModule->create_child)
+		return B_ENTRY_NOT_FOUND;
+	// lock partition and open partition device
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	KPartition *_partition = manager->WriteLockPartition(partition->ID());
+	if (!_partition)
+		return B_ERROR;
+	int fd = -1;
+	{
+		PartitionRegistrar registrar(_partition, true);
+		PartitionRegistrar deviceRegistrar(_partition->Device(), true);
+		DeviceWriteLocker locker(_partition->Device(), true);
+		if (partition != _partition)
+			return B_ERROR;
+		status_t result = partition->Open(O_RDWR, &fd);
+		if (result != B_OK)
+			return result;
+	}
+	// let the module do its job
+	status_t result = fModule->create_child(fd, partition->ID(), offset, size,
+														type, parameters, job->ID(), &childID);
+
+	// find and return the child
+	*child = manager->FindPartition(childID, false);
+
+	// cleanup and return
+	close(fd);
+	return result;
 }
 
 // DeleteChild

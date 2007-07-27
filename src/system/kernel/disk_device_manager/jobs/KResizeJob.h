@@ -8,8 +8,18 @@
 namespace BPrivate {
 namespace DiskDevice {
 
+/**
+ * Resizes a partition.
+ */
 class KResizeJob : public KDiskDeviceJob {
 public:
+	/**
+	 * Creates the job.
+	 * 
+	 * \param parentID the device whose child should be resized
+	 * \param partitionID the partition which should be resized
+	 * \param size new size for the partition 
+	 */
 	KResizeJob(partition_id parentID, partition_id partitionID, off_t size);
 	virtual ~KResizeJob();
 
