@@ -41,6 +41,7 @@ BDiskDevice::BDiskDevice()
 */
 BDiskDevice::~BDiskDevice()
 {
+	CancelModifications();
 }
 
 // HasMedia
@@ -179,6 +180,14 @@ BDiskDevice::IsModified() const
 }
 
 // PrepareModifications
+/*!	\brief Initializes the partition hierarchy for modifications.
+ * 	
+ * 	Subsequent modifications are performed on so-called \a shadow structure
+ * 	and not written to device until \ref CommitModifications is called.
+ *
+ * 	\note This call locks the device. You need to call \ref CommitModifications
+ * 		or \ref CancelModifications to unlock it.
+ */
 status_t
 BDiskDevice::PrepareModifications()
 {
@@ -202,6 +211,12 @@ BDiskDevice::PrepareModifications()
 }
 
 // CommitModifications
+/*!	\brief Commits modifications to device.
+ *
+ * 	Creates a set of jobs that perform all the changes done after
+ * 	\ref PrepareModifications. The changes are then written to device.
+ * 	Unlocks the device for further use.
+ */
 status_t
 BDiskDevice::CommitModifications(bool synchronously,
 								 BMessenger progressMessenger,
@@ -223,6 +238,10 @@ BDiskDevice::CommitModifications(bool synchronously,
 }
 
 // CancelModifications
+/*!	\brief Cancels all modifications performed on the device.
+ *
+ * 	Nothing is written on the device and it is unlocked for further use.
+ */
 status_t
 BDiskDevice::CancelModifications()
 {
