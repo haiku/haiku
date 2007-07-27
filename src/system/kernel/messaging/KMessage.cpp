@@ -3,7 +3,7 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-#include "KMessage.h"
+#include <util/KMessage.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -12,7 +12,7 @@
 #include <KernelExport.h>
 #include <TypeConstants.h>
 
-#if defined(_BOOT_MODE)
+#if defined(_BOOT_MODE) || defined(_LOADER_MODE)
 #	include <util/kernel_cpp.h>
 #else
 #	include <new>
@@ -30,6 +30,21 @@ using std::nothrow;
 #	else
 #		define PANIC(str)	debugger(str)
 #	endif
+#endif
+
+#ifdef _LOADER_MODE
+#	include <syscalls.h>
+
+#	define KMESSAGE_NO_RECEIVE
+
+#	define create_port(capacity, name) _kern_create_port(capacity, name)
+#	define delete_port(port) _kern_delete_port(port)
+#	define write_port(port, code, buffer, bufferSize) \
+		_kern_write_port_etc(port, code, buffer, bufferSize, 0, 0)
+#	define write_port_etc(port, code, buffer, bufferSize, flags, timeout) \
+		_kern_write_port_etc(port, code, buffer, bufferSize, flags, timeout)
+#	define set_port_owner(port, team) _kern_set_port_owner(port, team)
+#	define _get_port_info(port, info, size) _kern_get_port_info(port, info)
 #endif
 
 static const int32 kMessageReallocChunkSize = 64;
@@ -546,6 +561,9 @@ KMessage::SendReply(KMessage* message, KMessage* reply,
 status_t
 KMessage::ReceiveFrom(port_id fromPort, bigtime_t timeout)
 {
+#ifdef KMESSAGE_NO_RECEIVE
+	return B_NOT_SUPPORTED;
+#else
 	// get the port buffer size
 	ssize_t size;
 	if (timeout < 0)
@@ -569,6 +587,7 @@ KMessage::ReceiveFrom(port_id fromPort, bigtime_t timeout)
 	// init the message
 	return SetTo(buffer, size, 0,
 		KMESSAGE_OWNS_BUFFER | KMESSAGE_INIT_FROM_BUFFER);
+#endif	// !KMESSAGE_NO_RECEIVE
 }
 
 #endif	// !KMESSAGE_CONTAINER_ONLY
@@ -804,6 +823,7 @@ KMessage::_AllocateSpace(int32 size, bool alignAddress, bool alignSize,
 {
 	if (fBuffer != &fHeader && (fFlags & KMESSAGE_READ_ONLY))
 		return B_NOT_ALLOWED;
+
 	int32 offset = ContentSize();
 	if (alignAddress)
 		offset = _Align(offset);

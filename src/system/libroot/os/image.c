@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -44,7 +44,7 @@ load_image(int32 argCount, const char **args, const char **environ)
 		envCount++;
 
 	thread = _kern_load_image(argCount, args, envCount, environ,
-		B_NORMAL_PRIORITY, B_WAIT_TILL_LOADED);
+		B_NORMAL_PRIORITY, B_WAIT_TILL_LOADED, -1, 0);
 
 	free(newArgs);
 	return thread;

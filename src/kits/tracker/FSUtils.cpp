@@ -2890,12 +2890,19 @@ _TrackerLaunchAppWithDocuments(const entry_ref *appRef, const BMessage *refs, bo
 }
 
 extern "C" char** environ;
+
+#ifdef __HAIKU__
+extern "C" status_t _kern_load_image(int32 argCount, const char **args,
+	int32 envCount, const char **env, int32 priority, uint32 flags,
+	port_id errorPort, uint32 errorToken);
+#else
 extern "C"
-#if !B_BEOS_VERSION_DANO
+#	if !B_BEOS_VERSION_DANO
 _IMPEXP_ROOT
-#endif
+#	endif
 status_t _kload_image_etc_(int argc, char **argv, char **envp,
 	char *buf, int bufsize);
+#endif
 
 
 static status_t
@@ -2903,17 +2910,74 @@ LoaderErrorDetails(const entry_ref *app, BString &details)
 {
 	BPath path;
 	BEntry appEntry(app, true);
+
 	status_t result = appEntry.GetPath(&path);
-	
 	if (result != B_OK)
 		return result;
-	
+
 	char *argv[2] = { const_cast<char *>(path.Path()), 0};
 
 #ifdef __HAIKU__
-	// ToDo: do this correctly!
-	result = load_image(1, (const char **)argv, (const char **)environ);
-	details.SetTo("ToDo: this is missing from Haiku");
+	port_id errorPort = create_port(1, "Tracker loader error");
+
+	// count environment variables
+	uint32 envCount = 0;
+	while (environ[envCount] != NULL)
+		envCount++;
+
+	result = _kern_load_image(1, (const char **)argv, envCount,
+		(const char **)environ, B_NORMAL_PRIORITY, B_WAIT_TILL_LOADED,
+		errorPort, 0);
+	if (result == B_OK) {
+		// we weren't supposed to be able to start the application...
+		return B_ERROR;
+	}
+
+	// read error message from port and construct details string
+
+	ssize_t bufferSize;
+
+	do {
+		bufferSize = port_buffer_size_etc(errorPort, B_RELATIVE_TIMEOUT, 0);
+	} while (bufferSize == B_INTERRUPTED);
+
+	if (bufferSize <= B_OK) {
+		delete_port(errorPort);
+		return bufferSize;
+	}
+
+	uint8 *buffer = (uint8 *)malloc(bufferSize);
+	if (buffer == NULL) {
+		delete_port(errorPort);
+		return B_NO_MEMORY;
+	}
+
+	bufferSize = read_port_etc(errorPort, NULL, buffer, bufferSize,
+		B_RELATIVE_TIMEOUT, 0);
+	delete_port(errorPort);
+
+	if (bufferSize < B_OK) {
+		free(buffer);
+		return bufferSize;
+	}
+
+	BMessage message;
+	result = message.Unflatten((const char *)buffer);
+	free(buffer);
+
+	if (result != B_OK)
+		return result;
+
+	message.PrintToStream();
+	const char* library;
+	for (int32 i = 0; message.FindString("missing library", i,
+			&library) == B_OK; i++) {
+		if (i > 0)
+			details += ", ";
+		details += library;
+	}
+
+	return B_OK;
 #else
 	result = _kload_image_etc_(1, argv, environ, details.LockBuffer(1024), 1024);
 	details.UnlockBuffer();
@@ -3048,7 +3112,7 @@ _TrackerLaunchDocuments(const entry_ref */*doNotUse*/, const BMessage *refs,
 			alertString << "Could not open \"" << documentRef.name << "\" ";
 			if (openedDocuments)
 				alertString << "with application \"" << app.name << "\" ";
-			alertString << "(Missing library: " << loaderErrorString << "). \n";
+			alertString << "(Missing libraries: " << loaderErrorString << "). \n";
 			alternative = kFindAlternativeStr;
 		} else {
 			alertString << "Could not open \"" << documentRef.name

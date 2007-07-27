@@ -17,8 +17,8 @@ if $(RUN_WITHOUT_APP_SERVER) != 0 {
 	SubDirC++Flags $(defines) ;
 }
 
-UsePrivateHeaders [ FDirName kernel util ] ;  # For KMessage.h
-UsePrivateHeaders syslog_daemon ;             # For syslog.cpp
+UsePrivateHeaders [ FDirName kernel ]	# For KMessage.h
+UsePrivateHeaders syslog_daemon ;		# For syslog.cpp
 
 # Build our libbe.so
 

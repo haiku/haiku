@@ -9,11 +9,15 @@ SubDirCcFlags -fno-builtin ;
 SubDirC++Flags -fno-builtin -fno-exceptions ;
 
 # default to BeOS style symbol resolution
-DEFINES += BEOS_STYLE_SYMBOLS_RESOLUTION ;
+DEFINES += BEOS_STYLE_SYMBOLS_RESOLUTION
+	_LOADER_MODE
+;
 
 # needed for "runtime_loader" only
 StaticLibrary libruntime_loader.a :
 	kernel_vsprintf.c
+	kernel_cpp.cpp
+	KMessage.cpp
 	:
 	<src!system!libroot!os>syscalls.o
 	<src!system!libroot!os>sem.o
@@ -54,8 +58,12 @@ StaticLibrary libruntime_loader.a :
 	[ FGristFiles kernel_vsprintf.o ]
 ;
 
+SEARCH on [ FGristFiles kernel_cpp.cpp ]
+	= [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 SEARCH on [ FGristFiles kernel_vsprintf.c ]
 	= [ FDirName $(HAIKU_TOP) src system kernel lib ] ;
+SEARCH on [ FGristFiles KMessage.cpp ]
+	= [ FDirName $(HAIKU_TOP) src system kernel messaging ] ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) arch $(TARGET_ARCH) ] ;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Manuel J. Petit. All rights reserved.
@@ -13,7 +13,7 @@
 #include <runtime_loader.h>
 
 
-extern struct uspace_program_args *gProgramArgs;
+extern struct user_space_program_args *gProgramArgs;
 extern struct rld_export gRuntimeLoader;
 extern char *(*gGetEnv)(const char *name);
 

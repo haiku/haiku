@@ -50,6 +50,8 @@ struct team_arg {
 	char	**args;
 	uint32	env_count;
 	char	**env;
+	port_id	error_port;
+	uint32	error_token;
 };
 
 struct fork_arg {
@@ -610,7 +612,7 @@ get_arguments_data_size(char **args, int32 argc)
 	for (count = 0; count < argc; count++)
 		size += strlen(args[count]) + 1;
 
-	return size + (argc + 1) * sizeof(char *) + sizeof(struct uspace_program_args);
+	return size + (argc + 1) * sizeof(char *) + sizeof(struct user_space_program_args);
 }
 
 
@@ -626,7 +628,7 @@ free_team_arg(struct team_arg *teamArg)
 
 static status_t
 create_team_arg(struct team_arg **_teamArg, int32 argCount, char * const *args,
-	int32 envCount, char * const *env, bool kernel)
+	int32 envCount, char * const *env, port_id port, uint32 token, bool kernel)
 {
 	status_t status;
 	char **argsCopy;
@@ -652,6 +654,8 @@ create_team_arg(struct team_arg **_teamArg, int32 argCount, char * const *args,
 	teamArg->args = argsCopy;
 	teamArg->env_count = envCount;
 	teamArg->env = envCopy;
+	teamArg->error_port = port;
+	teamArg->error_token = token;
 
 	*_teamArg = teamArg;
 	return B_OK;
@@ -669,10 +673,10 @@ team_create_thread_start(void *args)
 	addr_t entry;
 	char ustack_name[128];
 	uint32 sizeLeft;
-	char **uargs;
-	char **uenv;
-	char *udest;
-	struct uspace_program_args *uspa;
+	char **userArgs;
+	char **userEnv;
+	char *userDest;
+	struct user_space_program_args *programArgs;
 	uint32 argCount, envCount, i;
 
 	t = thread_get_current_thread();
@@ -717,32 +721,32 @@ team_create_thread_start(void *args)
 	argCount = teamArgs->arg_count;
 	envCount = teamArgs->env_count;
 
-	uspa = (struct uspace_program_args *)(t->user_stack_base + t->user_stack_size
-		+ TLS_SIZE + ENV_SIZE);
-	uargs = (char **)(uspa + 1);
-	udest = (char *)(uargs + argCount + 1);
+	programArgs = (struct user_space_program_args *)(t->user_stack_base
+		+ t->user_stack_size + TLS_SIZE + ENV_SIZE);
+	userArgs = (char **)(programArgs + 1);
+	userDest = (char *)(userArgs + argCount + 1);
 
-	TRACE(("addr: stack base = 0x%lx, uargs = %p, udest = %p, sizeLeft = %lu\n",
-		t->user_stack_base, uargs, udest, sizeLeft));
+	TRACE(("addr: stack base = 0x%lx, userArgs = %p, userDest = %p, sizeLeft = %lu\n",
+		t->user_stack_base, userArgs, userDest, sizeLeft));
 
-	sizeLeft = t->user_stack_base + sizeLeft - (addr_t)udest;
+	sizeLeft = t->user_stack_base + sizeLeft - (addr_t)userDest;
 
 	for (i = 0; i < argCount; i++) {
-		ssize_t length = user_strlcpy(udest, teamArgs->args[i], sizeLeft);
+		ssize_t length = user_strlcpy(userDest, teamArgs->args[i], sizeLeft);
 		if (length < B_OK) {
 			argCount = 0;
 			break;
 		}
 
-		uargs[i] = udest;
-		udest += ++length;
+		userArgs[i] = userDest;
+		userDest += ++length;
 		sizeLeft -= length;
 	}
-	uargs[argCount] = NULL;
+	userArgs[argCount] = NULL;
 
-	uenv = (char **)(t->user_stack_base + t->user_stack_size + TLS_SIZE);
+	userEnv = (char **)(t->user_stack_base + t->user_stack_size + TLS_SIZE);
 	sizeLeft = ENV_SIZE;
-	udest = (char *)uenv + ENV_SIZE - 1;
+	userDest = (char *)userEnv + ENV_SIZE - 1;
 		// the environment variables are copied from back to front
 
 	TRACE(("team_create_thread_start: envc: %ld, env: %p\n",
@@ -750,29 +754,37 @@ team_create_thread_start(void *args)
 
 	for (i = 0; i < envCount; i++) {
 		ssize_t length = strlen(teamArgs->env[i]) + 1;
-		udest -= length;
-		if (udest < (char *)&uenv[envCount]) {
+		userDest -= length;
+		if (userDest < (char *)&userEnv[envCount]) {
 			envCount = i;
 			break;
 		}
 
-		uenv[i] = udest;
+		userEnv[i] = userDest;
 
-		if (user_memcpy(udest, teamArgs->env[i], length) < B_OK) {
+		if (user_memcpy(userDest, teamArgs->env[i], length) < B_OK) {
 			envCount = 0;
 			break;
 		}
 
 		sizeLeft -= length;
 	}
-	uenv[envCount] = NULL;
+	userEnv[envCount] = NULL;
 
 	path = teamArgs->args[0];
-	user_memcpy(uspa->program_path, path, sizeof(uspa->program_path));
-	uspa->argc = argCount;
-	uspa->argv = uargs;
-	uspa->envc = envCount;
-	uspa->envp = uenv;
+	if (user_memcpy(programArgs->program_path, path,
+				sizeof(programArgs->program_path)) < B_OK
+		|| user_memcpy(&programArgs->arg_count, &argCount, sizeof(int32)) < B_OK
+		|| user_memcpy(&programArgs->args, &userArgs, sizeof(char **)) < B_OK
+		|| user_memcpy(&programArgs->env_count, &envCount, sizeof(int32)) < B_OK
+		|| user_memcpy(&programArgs->env, &userEnv, sizeof(char **)) < B_OK
+		|| user_memcpy(&programArgs->error_port, &teamArgs->error_port,
+				sizeof(port_id)) < B_OK
+		|| user_memcpy(&programArgs->error_token, &teamArgs->error_token,
+				sizeof(uint32)) < B_OK) {
+		// the team deletion process will clean this mess
+		return B_BAD_ADDRESS;
+	}
 
 	TRACE(("team_create_thread_start: loading elf binary '%s'\n", path));
 
@@ -801,7 +813,7 @@ team_create_thread_start(void *args)
 	team->state = TEAM_STATE_NORMAL;
 
 	// jump to the entry point in user space
-	return arch_thread_enter_userspace(t, entry, uspa, NULL);
+	return arch_thread_enter_userspace(t, entry, programArgs, NULL);
 		// only returns in case of error
 }
 
@@ -811,8 +823,9 @@ team_create_thread_start(void *args)
  */
 
 static thread_id
-load_image_etc(int32 argCount, char * const *args, int32 envCount, char * const *env,
-	int32 priority, uint32 flags, bool kernel)
+load_image_etc(int32 argCount, char * const *args, int32 envCount,
+	char * const *env, int32 priority, uint32 flags,
+	port_id errorPort, uint32 errorToken, bool kernel)
 {
 	struct process_group *group;
 	struct team *team, *parent;
@@ -853,7 +866,8 @@ load_image_etc(int32 argCount, char * const *args, int32 envCount, char * const 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 
-	status = create_team_arg(&teamArgs, argCount, args, envCount, env, kernel);
+	status = create_team_arg(&teamArgs, argCount, args, envCount, env,
+		errorPort, errorToken, kernel);
 	if (status != B_OK)
 		goto err1;
 
@@ -879,8 +893,8 @@ load_image_etc(int32 argCount, char * const *args, int32 envCount, char * const 
 
 	// Create a kernel thread, but under the context of the new team
 	// The new thread will take over ownership of teamArgs
-	thread = spawn_kernel_thread_etc(team_create_thread_start, threadName, B_NORMAL_PRIORITY,
-				teamArgs, team->id, team->id);
+	thread = spawn_kernel_thread_etc(team_create_thread_start, threadName,
+		B_NORMAL_PRIORITY, teamArgs, team->id, team->id);
 	if (thread < 0) {
 		status = thread;
 		goto err4;
@@ -1007,9 +1021,8 @@ exec_team(const char *path, int32 argCount, char * const *args,
 	if (status != B_OK)
 		return status;
 
-	// ToDo: maybe we should make sure upfront that the target path is an app?
-
-	status = create_team_arg(&teamArgs, argCount, args, envCount, env, false);
+	status = create_team_arg(&teamArgs, argCount, args, envCount, env,
+		-1, 0, false);
 	if (status != B_OK)
 		return status;
 
@@ -1857,7 +1870,8 @@ load_image(int32 argCount, const char **args, const char **env)
 		envCount++;
 
 	return load_image_etc(argCount, (char * const *)args, envCount,
-		(char * const *)env, B_NORMAL_PRIORITY, B_WAIT_TILL_LOADED, true);
+		(char * const *)env, B_NORMAL_PRIORITY, B_WAIT_TILL_LOADED,
+		-1, 0, true);
 }
 
 
@@ -2393,7 +2407,8 @@ _user_wait_for_team(team_id id, status_t *_userReturnCode)
 
 team_id
 _user_load_image(int32 argCount, const char **userArgs, int32 envCount,
-	const char **userEnv, int32 priority, uint32 flags)
+	const char **userEnv, int32 priority, uint32 flags, port_id errorPort,
+	uint32 errorToken)
 {
 	TRACE(("_user_load_image_etc: argc = %ld\n", argCount));
 
@@ -2404,7 +2419,8 @@ _user_load_image(int32 argCount, const char **userArgs, int32 envCount,
 		return B_BAD_ADDRESS;
 
 	return load_image_etc(argCount, (char * const *)userArgs,
-		envCount, (char * const *)userEnv, priority, flags, false);
+		envCount, (char * const *)userEnv, priority, flags, errorPort,
+		errorToken, false);
 }
 
 

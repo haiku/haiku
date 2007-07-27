@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Haiku Inc. All rights reserved.
+ * Copyright 2004-2007, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_SYSCALLS_H
@@ -73,7 +73,7 @@ extern status_t		_kern_set_sem_owner(sem_id id, team_id proc);
 
 extern thread_id	_kern_load_image(int32 argCount, const char **args,
 						int32 envCount, const char **envp, int32 priority,
-						uint32 flags);
+						uint32 flags, port_id errorPort, uint32 errorToken);
 extern void			_kern_exit_team(status_t returnValue);
 extern status_t		_kern_kill_team(team_id team);
 extern team_id		_kern_get_current_team();

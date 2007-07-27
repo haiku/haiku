@@ -76,6 +76,7 @@ static image_queue_t sLoadedImages = {0, 0};
 static image_queue_t sDisposableImages = {0, 0};
 static uint32 sLoadedImageCount = 0;
 static image_t *sProgramImage;
+static KMessage sErrorMessage;
 
 #ifdef BEOS_STYLE_SYMBOLS_RESOLUTION
 static bool sResolveSymbolsBeOSStyle = true;
@@ -1096,8 +1097,8 @@ static status_t
 load_dependencies(image_t *image)
 {
 	struct Elf32_Dyn *d = (struct Elf32_Dyn *)image->dynamic_ptr;
-	int neededOffset;
-	status_t status;
+	bool reportErrors = gProgramArgs->error_port >= 0;
+	status_t status = B_OK;
 	uint32 i, j;
 	const char *rpath;
 
@@ -1121,21 +1122,39 @@ load_dependencies(image_t *image)
 	for (i = 0, j = 0; d[i].d_tag != DT_NULL; i++) {
 		switch (d[i].d_tag) {
 			case DT_NEEDED:
-				neededOffset = d[i].d_un.d_val;
+			{
+				int32 neededOffset = d[i].d_un.d_val;
+				const char *name = STRING(image, neededOffset);
 
-				status = load_container(STRING(image, neededOffset),
-					B_LIBRARY_IMAGE, rpath, &image->needed[j]);
-				if (status < B_OK)
-					return status;
+				status_t loadStatus = load_container(name, B_LIBRARY_IMAGE,
+					rpath, &image->needed[j]);
+				if (loadStatus < B_OK) {
+					status = loadStatus;
+					// correct error code in case the file could not been found
+					if (status == B_ENTRY_NOT_FOUND) {
+						status = B_MISSING_LIBRARY;
+
+						if (reportErrors)
+							sErrorMessage.AddString("missing library", name);
+					}
+
+					// Collect all missing libraries in case we report back
+					if (!reportErrors)
+						return status;
+				}
 
 				j += 1;
 				break;
+			}
 
 			default:
 				// ignore any other tag
 				continue;
 		}
 	}
+
+	if (status < B_OK)
+		return status;
 
 	if (j != image->num_needed) {
 		FATAL("Internal error at load_dependencies()");
@@ -1255,8 +1274,7 @@ put_image(image_t *image)
 }
 
 
-//	#pragma mark -
-//	Exported functions (to libroot.so)
+//	#pragma mark - libroot.so exported functions
 
 
 image_id
@@ -1271,11 +1289,8 @@ load_program(char const *path, void **_entry)
 	TRACE(("rld: load %s\n", path));
 
 	status = load_container(path, B_APP_IMAGE, NULL, &sProgramImage);
-	if (status < B_OK) {
-		_kern_loading_app_failed(status);
-		rld_unlock();
-		return status;
-	}
+	if (status < B_OK)
+		goto err;
 
 	for (image = sLoadedImages.head; image != NULL; image = image->next) {
 		status = load_dependencies(image);
@@ -1322,9 +1337,16 @@ load_program(char const *path, void **_entry)
 	return sProgramImage->id;
 
 err:
-	_kern_loading_app_failed(status);
 	delete_image(sProgramImage);
+
+	if (gProgramArgs->error_port >= 0) {
+		sErrorMessage.AddInt32("error", status);
+		sErrorMessage.SendTo(gProgramArgs->error_port, gProgramArgs->error_token,
+			-1, 0, 0, find_thread(NULL));
+	}
+	_kern_loading_app_failed(status);
 	rld_unlock();
+
 	return status;
 }
 
@@ -1563,7 +1585,7 @@ get_next_image_dependency(image_id id, uint32 *cookie, const char **_name)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - runtime_loader private exports
 
 
 /** Read and verify the ELF header */
@@ -1626,5 +1648,14 @@ rldelf_init(void)
 		}
 
 		area->loaded_images = &sLoadedImages;
+	}
+
+	// initialize error message if needed
+	if (gProgramArgs->error_port >= 0) {
+		void *buffer = malloc(1024);
+		if (buffer == NULL)
+			return;
+
+		sErrorMessage.SetTo(buffer, 1024, 'Rler');
 	}
 }

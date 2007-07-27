@@ -24,12 +24,12 @@ extern "C" char *
 getenv(const char *name)
 {
 	if (gGetEnv != NULL) {
-		// Use libroot's getenv() as soon as it is available to us - the environment
-		// in gProgramArgs is static.
+		// Use libroot's getenv() as soon as it is available to us - the
+		// environment in gProgramArgs is static.
 		return gGetEnv(name);
 	}
 
-	char **environ = gProgramArgs->envp;
+	char **environ = gProgramArgs->env;
 	int32 length = strlen(name);
 	int32 i;
 
@@ -55,4 +55,24 @@ printf(const char *format, ...)
 	_kern_write(STDERR_FILENO, 0, buffer, length);
 
 	return length;
+}
+
+
+// Copied from libroot/os/thread.c:
+
+
+extern "C" status_t
+_get_thread_info(thread_id thread, thread_info *info, size_t size)
+{
+	if (info == NULL || size != sizeof(thread_info))
+		return B_BAD_VALUE;
+
+	return _kern_get_thread_info(thread, info);
+}
+
+
+status_t
+snooze(bigtime_t timeout)
+{
+	return B_ERROR;
 }

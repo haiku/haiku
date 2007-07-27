@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Manuel J. Petit. All rights reserved.
@@ -15,13 +15,15 @@
 
 #define MAGIC_APP_NAME	"_APP_"
 
-struct uspace_program_args {
-	char program_name[B_OS_NAME_LENGTH];
-	char program_path[B_PATH_NAME_LENGTH];
-	int  argc;
-	int  envc;
-	char **argv;
-	char **envp;
+struct user_space_program_args {
+	char	program_name[B_OS_NAME_LENGTH];
+	char	program_path[B_PATH_NAME_LENGTH];
+	port_id	error_port;
+	uint32	error_token;
+	int		arg_count;
+	int		env_count;
+	char	**args;
+	char	**env;
 };
 
 struct rld_export {
@@ -37,7 +39,7 @@ struct rld_export {
 	status_t (*get_next_image_dependency)(image_id id, uint32 *cookie,
 		const char **_name);
 
-	const struct uspace_program_args *program_args;
+	const struct user_space_program_args *program_args;
 };
 
 extern struct rld_export *__gRuntimeLoader;

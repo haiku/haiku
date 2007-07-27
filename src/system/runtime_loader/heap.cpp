@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -234,6 +234,14 @@ dump_chunks(void)
 	}
 }
 #endif
+
+
+void *
+realloc(void *buffer, size_t newSize)
+{
+	// not implemented
+	return NULL;
+}
 
 
 void *

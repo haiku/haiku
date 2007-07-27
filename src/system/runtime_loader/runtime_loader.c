@@ -26,7 +26,7 @@
 #endif
 
 
-struct uspace_program_args *gProgramArgs;
+struct user_space_program_args *gProgramArgs;
 
 
 static const char *
@@ -254,12 +254,12 @@ open_executable(char *name, image_type type, const char *rpath)
 }
 
 
-/** Tests if there is an executable file at the provided path. It will
- *	also test if the file has a valid ELF header or is a shell script.
- *	Even if the runtime loader does not need to be able to deal with
- *	both types, the caller will give scripts a proper treatment.
- */
-
+/*!
+	Tests if there is an executable file at the provided path. It will
+	also test if the file has a valid ELF header or is a shell script.
+	Even if the runtime loader does not need to be able to deal with
+	both types, the caller will give scripts a proper treatment.
+*/
 status_t
 test_executable(const char *name, uid_t user, gid_t group, char *invoker)
 {
@@ -339,17 +339,17 @@ out:
 }
 
 
-/** This is the main entry point of the runtime loader as
- *	specified by its ld-script.
- */
-
+/*!
+	This is the main entry point of the runtime loader as
+	specified by its ld-script.
+*/
 int
 runtime_loader(void *_args)
 {
 	void *entry = NULL;
 	int returnCode;
 
-	gProgramArgs = (struct uspace_program_args *)_args;
+	gProgramArgs = (struct user_space_program_args *)_args;
 
 #if DEBUG_RLD
 	close(0); open("/dev/console", 0); /* stdin   */
@@ -369,8 +369,8 @@ runtime_loader(void *_args)
 		return -1;
 
 	// call the program entry point (usually _start())
-	returnCode = ((int (*)(int, void *, void *))entry)(gProgramArgs->argc,
-		gProgramArgs->argv, gProgramArgs->envp);
+	returnCode = ((int (*)(int, void *, void *))entry)(gProgramArgs->arg_count,
+		gProgramArgs->args, gProgramArgs->env);
 
 	terminate_program();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -37,7 +37,7 @@ int _data_offset_main_;
 void
 initialize_before(image_id imageID)
 {
-	char *programPath = __gRuntimeLoader->program_args->argv[0];
+	char *programPath = __gRuntimeLoader->program_args->args[0];
 	if (programPath) {
 		if ((__progname = strrchr(programPath, '/')) == NULL)
 			__progname = programPath;
@@ -45,8 +45,8 @@ initialize_before(image_id imageID)
 			__progname++;
 	}
 
-	__libc_argc = __gRuntimeLoader->program_args->argc;
-	__libc_argv = __gRuntimeLoader->program_args->argv;
+	__libc_argc = __gRuntimeLoader->program_args->arg_count;
+	__libc_argv = __gRuntimeLoader->program_args->args;
 
 	__init_time();
 	__init_fork();

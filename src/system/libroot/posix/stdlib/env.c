@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -148,12 +148,12 @@ environ_fork_hook(void)
 
 
 void 
-__init_env(const struct uspace_program_args *args)
+__init_env(const struct user_space_program_args *args)
 {
 	// Following POSIX, there is no need to make any of the
 	// environment functions thread-safe - but we do it anyway
 	sEnvLock = create_sem(1, "env lock");
-	environ = args->envp;
+	environ = args->env;
 
 	atfork(environ_fork_hook);
 }
