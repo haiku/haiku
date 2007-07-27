@@ -155,6 +155,13 @@ TermView::TermView(BRect frame, const char *command)
 }
 
 
+TermView::TermView(BMessage *archive)
+	:
+	BView(archive)
+{
+}
+
+
 void
 TermView::_InitObject(const char *command)
 {
@@ -191,6 +198,23 @@ TermView::~TermView()
 
 	fQuitting = true;
 	kill_thread(fMouseThread);
+}
+
+
+/* static */
+BArchivable *
+TermView::Instantiate(BMessage* data)
+{
+	if (validate_instantiation(data, "TermView"))
+		return new TermView(data);
+	return NULL;
+}
+
+
+status_t
+TermView::Archive(BMessage* data, bool deep) const
+{
+	return BView::Archive(data, deep);
 }
 
 

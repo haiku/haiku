@@ -51,8 +51,11 @@ class TermBuffer;
 class TermView : public BView {
 public:
 	TermView(BRect frame, const char *command = NULL);
+	TermView(BMessage *archive);	
 	~TermView();
 
+	static	BArchivable* Instantiate(BMessage* data);
+	virtual status_t Archive(BMessage* data, bool deep = true) const;
 	virtual void GetPreferredSize(float *width, float *height);
 
 	status_t AttachShell(Shell *shell);

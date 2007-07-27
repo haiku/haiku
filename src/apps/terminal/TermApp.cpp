@@ -11,7 +11,6 @@
 
 #include "CodeConv.h"
 #include "PrefHandler.h"
-#include "TermBuffer.h"
 #include "TermWindow.h"
 #include "TermConst.h"
 
