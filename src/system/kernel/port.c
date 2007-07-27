@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Mark-Jan Bastian. All rights reserved.
@@ -927,8 +927,7 @@ read_port_etc(port_id id, int32 *_msgCode, void *msgBuffer, size_t bufferSize,
 	if (!sPortsActive || id < 0)
 		return B_BAD_PORT_ID;
 
-	if (_msgCode == NULL
-		|| (msgBuffer == NULL && bufferSize > 0)
+	if ((msgBuffer == NULL && bufferSize > 0)
 		|| timeout < 0)
 		return B_BAD_VALUE;
 
@@ -998,7 +997,8 @@ read_port_etc(port_id id, int32 *_msgCode, void *msgBuffer, size_t bufferSize,
 	size = min(bufferSize, msg->size);
 
 	// copy message
-	*_msgCode = msg->code;
+	if (_msgCode != NULL)
+		*_msgCode = msg->code;
 	if (size > 0) {
 		if (userCopy) {
 			if ((status = cbuf_user_memcpy_from_chain(msgBuffer, msg->buffer_chain, 0, size) < B_OK)) {
@@ -1318,20 +1318,22 @@ _user_read_port_etc(port_id port, int32 *userCode, void *userBuffer,
 	size_t bufferSize, uint32 flags, bigtime_t timeout)
 {
 	int32 messageCode;
-	ssize_t	status;
+	ssize_t	bytesRead;
 
-	if (userCode == NULL || (userBuffer == NULL && bufferSize != 0))
+	if (userBuffer == NULL && bufferSize != 0)
 		return B_BAD_VALUE;
-	if (!IS_USER_ADDRESS(userCode) || (userBuffer != NULL && !IS_USER_ADDRESS(userBuffer)))
+	if ((userCode != NULL && !IS_USER_ADDRESS(userCode))
+		|| (userBuffer != NULL && !IS_USER_ADDRESS(userBuffer)))
 		return B_BAD_ADDRESS;
 
-	status = read_port_etc(port, &messageCode, userBuffer, bufferSize,
-				flags | PORT_FLAG_USE_USER_MEMCPY | B_CAN_INTERRUPT, timeout);
+	bytesRead = read_port_etc(port, &messageCode, userBuffer, bufferSize,
+		flags | PORT_FLAG_USE_USER_MEMCPY | B_CAN_INTERRUPT, timeout);
 
-	if (status >= 0 && user_memcpy(userCode, &messageCode, sizeof(int32)) < B_OK)
+	if (bytesRead >= 0 && userCode != NULL
+		&& user_memcpy(userCode, &messageCode, sizeof(int32)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	return status;
+	return bytesRead;
 }
 
 
