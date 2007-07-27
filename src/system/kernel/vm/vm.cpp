@@ -3338,7 +3338,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 		if (lastCache != NULL)
 			vm_cache_release_ref(lastCache);
 	} else {
-		// we still own a reference to the cacheRef
+		// we still own a reference to the cache
 	}
 
 	*_pageCache = cache;
@@ -3348,7 +3348,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 
 /*!
 	Returns the page that should be mapped into the area that got the fault.
-	It returns the owner of the page in \a sourceRef - it keeps a reference
+	It returns the owner of the page in \a sourceCache - it keeps a reference
 	to it, and has also locked it on exit.
 */
 static inline vm_page *
