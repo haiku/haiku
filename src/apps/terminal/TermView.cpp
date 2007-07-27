@@ -157,8 +157,53 @@ TermView::TermView(BRect frame, const char *command)
 
 TermView::TermView(BMessage *archive)
 	:
-	BView(archive)
+	BView(archive),
+	fShell(NULL),
+	fFontWidth(0),
+	fFontHeight(0),
+	fFontAscent(0),
+	fUpdateFlag(false),
+	fInsertModeFlag(MODE_OVER),
+	fScrollUpCount(0),
+	fScrollBarRange(0),
+	fFrameResized(false),
+	fLastCursorTime(0),
+	fCursorDrawFlag(CURON),
+	fCursorStatus(CURON),
+	fCursorBlinkingFlag(CURON),
+	fCursorRedrawFlag(CURON),
+	fCursorHeight(0),
+	fCurPos(0, 0),
+	fCurStack(0, 0),
+	fBufferStartPos(-1),
+	fTermRows(25),
+	fTermColumns(80),
+	fEncoding(M_UTF8),
+	fTop(0),	
+	fTextBuffer(NULL),
+	fScrollBar(NULL),
+	fScrTop(0),
+	fScrBot(fTermRows - 1),
+	fScrBufSize(1000),
+	fScrRegionSet(0),
+	fMouseImage(false),
+	fPreviousMousePoint(0, 0),
+	fSelStart(-1, -1),
+	fSelEnd(-1, -1),
+	fMouseTracking(false),
+	fMouseThread(-1),
+	fQuitting(false),
+	fIMflag(false)	
 {
+	if (archive->FindInt32("encoding", (int32 *)&fEncoding) < B_OK)
+		fEncoding = M_UTF8;
+	if (archive->FindInt32("columns", (int32 *)&fTermColumns) < B_OK)
+		fTermColumns = 80;
+	if (archive->FindInt32("rows", (int32 *)&fTermRows) < B_OK)
+		fTermRows = 25;
+	
+	// TODO: Retrieve command from archive
+	_InitObject(NULL);
 }
 
 
@@ -214,7 +259,18 @@ TermView::Instantiate(BMessage* data)
 status_t
 TermView::Archive(BMessage* data, bool deep) const
 {
-	return BView::Archive(data, deep);
+	status_t status = BView::Archive(data, deep);
+	if (status < B_OK)
+		return status;
+	status = data->AddInt32("encoding", (int32)fEncoding);
+	if (status < B_OK)
+		return status;
+	status = data->AddInt32("columns", (int32)fTermColumns);
+	if (status < B_OK)
+		return status;
+	status = data->AddInt32("rows", (int32)fTermRows);
+	
+	return status;
 }
 
 
