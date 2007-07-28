@@ -1,0 +1,9 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be.printer";
+
+resource(1, "Printer Name") "Preview";
+resource(2, "Driver Name") "Preview";
+resource(3, "transport") "";
+resource(4, "transport_address") "";
+resource(5, "connection") "Local";
+resource(6, "state") "free";

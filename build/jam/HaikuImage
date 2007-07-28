@@ -385,6 +385,13 @@ AddDirectoryToHaikuImage beos system add-ons input_server methods ;
 #optional
 AddFilesToHaikuImage optional beos system add-ons input_server methods : canna ;
 
+# printers
+AddDirectoryToHaikuImage home config settings printers Preview
+      : home-config-settings-printers-preview.rdef ;
+AddDirectoryToHaikuImage home config settings printers "Save-as-PDF"
+      : home-config-settings-printers-save-as-pdf.rdef ;
+
+
 
 #pragma mark - Build The Image
 
