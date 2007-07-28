@@ -18,6 +18,15 @@ BDiskSystem::BDiskSystem()
 {
 }
 
+// copy constructor
+BDiskSystem::BDiskSystem(const BDiskSystem& other)
+	: fID(other.fID),
+	  fName(other.fName),
+	  fPrettyName(other.fPrettyName),
+	  fFlags(other.fFlags)
+{
+}
+
 // destructor
 BDiskSystem::~BDiskSystem()
 {
@@ -265,6 +274,18 @@ BDiskSystem::IsSubSystemFor(BPartition *parent) const
 			&& parent && parent->_IsShadow()
 			&& _kern_is_sub_disk_system_for(fID, parent->_ShadowID(),
 											parent->_ChangeCounter()));
+}
+
+// =
+BDiskSystem&
+BDiskSystem::operator=(const BDiskSystem& other)
+{
+	fID = other.fID;
+	fName = other.fName;
+	fPrettyName = other.fPrettyName;
+	fFlags = other.fFlags;
+
+	return *this;
 }
 
 // _SetTo

@@ -15,6 +15,7 @@ struct user_disk_system_info;
 class BDiskSystem {
 public:
 	BDiskSystem();
+	BDiskSystem(const BDiskSystem& other);
 	~BDiskSystem();
 
 	status_t InitCheck() const;
@@ -46,6 +47,8 @@ public:
 	bool IsPartitioningSystem() const;
 	bool IsFileSystem() const;
 	bool IsSubSystemFor(BPartition *parent) const;
+
+	BDiskSystem& operator=(const BDiskSystem& other);
 
 private:
 	status_t _SetTo(disk_system_id id);
