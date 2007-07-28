@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src tests apps ;
 
-SubInclude HAIKU_TOP src tests apps miniterminal ;
 SubInclude HAIKU_TOP src tests apps fake_app_server ;
 SubInclude HAIKU_TOP src tests apps installer ;
+SubInclude HAIKU_TOP src tests apps miniterminal ;
+SubInclude HAIKU_TOP src tests apps partitioner ;
+
