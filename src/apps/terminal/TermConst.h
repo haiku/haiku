@@ -103,13 +103,11 @@ const char* const PREF_CURSOR_BACK_COLOR = "Cursor Background Color";
 const char* const PREF_IM_FORE_COLOR = "IM Foreground Color";
 const char* const PREF_IM_BACK_COLOR = "IM Background Color";
 const char* const PREF_IM_SELECT_COLOR = "IM Selection Color";
-const char* const PREF_DRAGN_COPY = "Drag'n Copy";
 
 const char* const PREF_HISTORY_SIZE = "Histry Size";
 const char* const PREF_CURSOR_BLINKING = "Cursor Blinking rate";
 
 const char* const PREF_IM_AWARE = "Input Method Aware";
-const char* const PREF_MOUSE_IMAGE = "Cursor Image";
 
 const char* const PREF_COLS = "Cols";
 const char* const PREF_ROWS = "Rows";

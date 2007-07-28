@@ -5,6 +5,7 @@
  * All rights reserved. Distributed under the terms of the MIT license.
  *
  * Authors:
+ *		Stefano Ceccherini <stefano.ceccherini@gmail.com>
  *		Kian Duffy, myob@users.sourceforge.net
  *		Y.Hayakawa, hida@sawada.riec.tohoku.ac.jp
  */
@@ -13,8 +14,6 @@
 #include "TermView.h"
 
 #include "CodeConv.h"
-#include "MenuUtil.h"
-#include "PrefHandler.h"
 #include "PrefView.h"
 #include "Shell.h"
 #include "TermBuffer.h"
@@ -108,11 +107,16 @@ const unsigned char M_ADD_CURSOR[] = {
 
 
 #define MOUSE_THR_CODE 'mtcd'
+#define ROWS_DEFAULT 25
+#define COLUMNS_DEFAULT 80
 
 const static uint32 kUpdateSigWinch = 'Rwin';
 
+const static rgb_color kBlackColor = { 0, 0, 0, 255 };
+const static rgb_color kWhiteColor = { 255, 255, 255, 255 };
 
-TermView::TermView(BRect frame, const char *command)
+
+TermView::TermView(BRect frame, const char *command, int32 historySize)
 	: BView(frame, "termview", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS | B_PULSE_NEEDED),
 	fShell(NULL),
 	fFontWidth(0),
@@ -132,17 +136,22 @@ TermView::TermView(BRect frame, const char *command)
 	fCurPos(0, 0),
 	fCurStack(0, 0),
 	fBufferStartPos(-1),
-	fTermRows(PrefHandler::Default()->getInt32(PREF_ROWS)),
-	fTermColumns(PrefHandler::Default()->getInt32(PREF_COLS)),
+	fTermRows(ROWS_DEFAULT),
+	fTermColumns(COLUMNS_DEFAULT),
 	fEncoding(M_UTF8),
 	fTop(0),	
 	fTextBuffer(NULL),
 	fScrollBar(NULL),
+	fTextForeColor(kBlackColor),
+	fTextBackColor(kWhiteColor),
+	fCursorForeColor(kWhiteColor),
+	fCursorBackColor(kBlackColor),
+	fSelectForeColor(kWhiteColor),
+	fSelectBackColor(kBlackColor),
 	fScrTop(0),
 	fScrBot(fTermRows - 1),
-	fScrBufSize(PrefHandler::Default()->getInt32(PREF_HISTORY_SIZE)),
+	fScrBufSize(historySize),
 	fScrRegionSet(0),
-	fMouseImage(false),
 	fPreviousMousePoint(0, 0),
 	fSelStart(-1, -1),
 	fSelEnd(-1, -1),
@@ -176,17 +185,22 @@ TermView::TermView(BMessage *archive)
 	fCurPos(0, 0),
 	fCurStack(0, 0),
 	fBufferStartPos(-1),
-	fTermRows(25),
-	fTermColumns(80),
+	fTermRows(ROWS_DEFAULT),
+	fTermColumns(COLUMNS_DEFAULT),
 	fEncoding(M_UTF8),
 	fTop(0),	
 	fTextBuffer(NULL),
 	fScrollBar(NULL),
+	fTextForeColor(kBlackColor),
+	fTextBackColor(kWhiteColor),
+	fCursorForeColor(kWhiteColor),
+	fCursorBackColor(kBlackColor),
+	fSelectForeColor(kWhiteColor),
+	fSelectBackColor(kBlackColor),
 	fScrTop(0),
 	fScrBot(fTermRows - 1),
 	fScrBufSize(1000),
 	fScrRegionSet(0),
-	fMouseImage(false),
 	fPreviousMousePoint(0, 0),
 	fSelStart(-1, -1),
 	fSelEnd(-1, -1),
@@ -202,7 +216,7 @@ TermView::TermView(BMessage *archive)
 	if (archive->FindInt32("rows", (int32 *)&fTermRows) < B_OK)
 		fTermRows = 25;
 	
-	// TODO: Retrieve command from archive
+	// TODO: Retrieve command, colors, history size, etc. from archive
 	_InitObject(NULL);
 }
 
@@ -212,11 +226,9 @@ TermView::_InitObject(const char *command)
 {
 	fTextBuffer = new TermBuffer(fTermRows, fTermColumns, fScrBufSize);
 
-	SetMouseCursor();	
 	SetTermFont(be_fixed_font, be_fixed_font);
-	SetTermColor();
 	
-	//SetIMAware(PrefHandler::Default()->getInt32(PREF_IM_AWARE));
+	//SetIMAware(false);
 
 	fShell = new Shell();	
 	status_t status = fShell->Open(fTermRows, fTermColumns,
@@ -349,30 +361,30 @@ TermView::SetTermSize(int rows, int cols, bool resize)
 }
 
 
-//! Sets the mouse cursor image
 void
-TermView::SetMouseCursor()
+TermView::SetTextColor(rgb_color fore, rgb_color back)
 {
-	if (!strcmp(PrefHandler::Default()->getString(PREF_MOUSE_IMAGE), "Hand cursor"))
-		fMouseImage = false;
-	else
-		fMouseImage = true;
-}
-
-
-//! Sets colors for the terminal
-void
-TermView::SetTermColor()
-{
-	fTextForeColor = PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR);
-	fTextBackColor = PrefHandler::Default()->getRGB(PREF_TEXT_BACK_COLOR);
-	fSelectForeColor = PrefHandler::Default()->getRGB(PREF_SELECT_FORE_COLOR);
-	fSelectBackColor = PrefHandler::Default()->getRGB(PREF_SELECT_BACK_COLOR);
-	fCursorForeColor = PrefHandler::Default()->getRGB(PREF_CURSOR_FORE_COLOR);
-	fCursorBackColor = PrefHandler::Default()->getRGB(PREF_CURSOR_BACK_COLOR);
+	fTextForeColor = fore;
+	fTextBackColor = back;
 
 	SetLowColor(fTextBackColor);
 	SetViewColor(fTextBackColor);
+}
+
+
+void
+TermView::SetSelectColor(rgb_color fore, rgb_color back)
+{
+	fSelectForeColor = fore;
+	fSelectBackColor = back;
+}
+
+
+void
+TermView::SetCursorColor(rgb_color fore, rgb_color back)
+{
+	fCursorForeColor = fore;
+	fCursorBackColor = back;
 }
 
 
@@ -386,6 +398,9 @@ TermView::Encoding() const
 void
 TermView::SetEncoding(int encoding)
 {
+	// TODO: Shell::_Spawn() sets the "TTYPE" environment variable using
+	// the string value of encoding. But when this function is called and 
+	// the encoding changes, the new value is never passed to Shell.
 	fEncoding = encoding;
 }
 
@@ -963,8 +978,7 @@ TermView::MouseTracking(void *data)
 			BRect r;
 			
 			if (theObj->HasSelection()
-				&& ( PrefHandler::Default()->getInt32(PREF_DRAGN_COPY)
-						|| modifiers() & B_CONTROL_KEY)) {
+				&& (modifiers() & B_CONTROL_KEY)) {
 			
 			if (theObj->LockLooper()) {
 				theObj->GetMouse(&stpoint, &button);
@@ -1411,9 +1425,6 @@ TermView::WindowActivated(bool active)
 	if (active == false) {
 		// DoIMConfirm();
 	}
-
-	if (active && fMouseImage)
-		be_app->SetCursor(B_I_BEAM_CURSOR);
 }
 
 
@@ -1901,7 +1912,7 @@ TermView::MouseDown(BPoint where)
 
 			// If mouse pointer is avove selected Region, start Drag'n Copy.
 			if (inPos > stPos && inPos < edPos) {
-				if (mod & B_CONTROL_KEY || PrefHandler::Default()->getInt32(PREF_DRAGN_COPY)) {
+				if (mod & B_CONTROL_KEY) {
 					BPoint p;
 					uint32 bt;
 					do {
@@ -1984,14 +1995,9 @@ TermView::MouseDown(BPoint where)
 }
 
 void
-TermView::MouseMoved(BPoint where, uint32 transit, const BMessage *)
+TermView::MouseMoved(BPoint where, uint32 transit, const BMessage *message)
 {
-	if (fMouseImage && Window()->IsActive()) {
-		if (transit == B_ENTERED_VIEW)
-			be_app->SetCursor(B_I_BEAM_CURSOR);
-		if (transit == B_EXITED_VIEW)
-			be_app->SetCursor(B_HAND_CURSOR);
-	}
+	BView::MouseMoved(where, transit, message);
 }
 
 

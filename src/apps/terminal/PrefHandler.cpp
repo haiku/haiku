@@ -55,9 +55,6 @@ static const pref_defaults kTermDefaults[] = {
 
 	{ PREF_TEXT_ENCODING,		"UTF-8" },
 
-	{ PREF_MOUSE_IMAGE,			"Hand cursor"},
-	{ PREF_DRAGN_COPY,			"0"},
-
 	{ PREF_GUI_LANGUAGE,		"English"},
 	{ PREF_IM_AWARE,			"0"},
 	{ NULL, NULL},

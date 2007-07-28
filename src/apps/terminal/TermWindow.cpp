@@ -1,10 +1,10 @@
 /*
  * Copyright 2007 Haiku, Inc.
+ * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Copyright (c) 2003-2004 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
- * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  *
- * Distributed unter the terms of the MIT license.
+ * Distributed under the terms of the MIT license.
  */
 
 #include "TermWindow.h"
@@ -22,6 +22,7 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Dragger.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -53,7 +54,27 @@ const static float kViewOffset = 3;
 TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	:
 	BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE|B_QUIT_ON_WINDOW_CLOSE),
-	fTabView(NULL)
+	fTabView(NULL),
+	fTermView(NULL),	
+	fMenubar(NULL),
+	fFilemenu(NULL),
+	fEditmenu(NULL),
+	fEncodingmenu(NULL),
+	fHelpmenu(NULL),
+	fFontMenu(NULL),
+	fWindowSizeMenu(NULL),
+	fNewFontMenu(NULL),
+	fPrintSettings(NULL),
+	fPrefWindow(NULL),
+	fFindPanel(NULL),
+	fSavedFrame(0, 0, -1, -1),
+	fFindString(""),
+	fFindForwardMenuItem(NULL),
+	fFindBackwardMenuItem(NULL),
+	fFindSelection(false),
+	fForwardSearch(false),
+	fMatchCase(false),
+	fMatchWord(false)
 {
 	fTabView = new SmartTabView(Bounds(), "Tab view");
 	AddChild(fTabView);
@@ -61,11 +82,12 @@ TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	_NewTab(command);
 	_NewTab(NULL);
 }
+#endif
 
-#else
 
 TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	: BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE|B_QUIT_ON_WINDOW_CLOSE),
+	fTabView(NULL),
 	fTermView(NULL),	
 	fMenubar(NULL),
 	fFilemenu(NULL),
@@ -147,8 +169,9 @@ TermWindow::_InitWindow(const char *command)
 	// Initialize TermView. (font, size and color)
 	fTermView->SetTermFont(&halfFont, &fullFont);
 	
+	_SetTermColors();
 	BRect rect = fTermView->SetTermSize(PrefHandler::Default()->getInt32(PREF_ROWS),
-		PrefHandler::Default()->getInt32(PREF_COLS), true);
+					PrefHandler::Default()->getInt32(PREF_COLS), true);
 
 	int width, height;
 	fTermView->GetFontSize(&width, &height);
@@ -491,7 +514,7 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 		}
 		case MSG_COLOR_CHANGED: {
-			fTermView->SetTermColor();
+			_SetTermColors();
 			fTermView->Invalidate();
 			break;
 		}
@@ -534,6 +557,20 @@ TermWindow::QuitRequested()
 {
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
+}
+
+
+void
+TermWindow::_SetTermColors()
+{
+	fTermView->SetTextColor(PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR),
+				PrefHandler::Default()->getRGB(PREF_TEXT_BACK_COLOR));
+
+	fTermView->SetSelectColor(PrefHandler::Default()->getRGB(PREF_SELECT_FORE_COLOR),
+				PrefHandler::Default()->getRGB(PREF_SELECT_BACK_COLOR));
+	
+	fTermView->SetCursorColor(PrefHandler::Default()->getRGB(PREF_CURSOR_FORE_COLOR),
+				PrefHandler::Default()->getRGB(PREF_CURSOR_BACK_COLOR));
 }
 
 
@@ -595,7 +632,7 @@ TermWindow::_DoPrint()
 	
 	job.CommitJob(); 
 }
-#endif
+
 
 void
 TermWindow::_NewTab(const char *command)

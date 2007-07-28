@@ -76,7 +76,6 @@ but it font is full width font on preference panel.
 #include "TermBuffer.h"
 
 #include "CurPos.h"
-#include "PrefHandler.h"
 #include "TermConst.h"
 
 #include <SupportDefs.h>
