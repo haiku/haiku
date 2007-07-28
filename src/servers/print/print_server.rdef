@@ -10,7 +10,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "print_server",
-	long_info = "print_server ©2001-2006 Haiku"
+	long_info = "print_server ©2001-2007 Haiku"
 };
 
 resource app_flags B_EXCLUSIVE_LAUNCH | B_BACKGROUND_APP;
