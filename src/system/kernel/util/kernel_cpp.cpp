@@ -31,7 +31,11 @@
 
 // ... it doesn't seem to work with this symbol at least.
 #ifndef USING_LIBGCC
+#	if __GNUC__ >= 3
+const std::nothrow_t std::nothrow = {};
+#	else
 const nothrow_t std::nothrow = {};
+#	endif
 #endif
 
 #if __GNUC__ == 2
@@ -92,6 +96,7 @@ fputc(int c, FILE *stream)
 	return 0;
 }
 
+#ifndef _LOADER_MODE
 extern "C"
 int
 printf(const char *format, ...)
@@ -100,6 +105,7 @@ printf(const char *format, ...)
 	dprintf("printf(`%s',...)\n", format);
 	return 0;
 }
+#endif
 
 extern "C"
 int
