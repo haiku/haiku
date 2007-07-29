@@ -15,6 +15,7 @@
 #ifndef BUTTON_BITMAPS_H
 #define BUTTON_BITMAPS_H
 
+#include <SupportDefs.h>
 
 // #pragma mark play
 
