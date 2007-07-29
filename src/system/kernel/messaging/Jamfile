@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src system kernel messaging ;
 
 UsePrivateHeaders [ FDirName kernel ] ;
+UsePrivateHeaders [ FDirName kernel util ] ;
 #UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 #UsePrivateHeaders [ FDirName kernel fs ] ;
 UsePrivateHeaders shared ;
