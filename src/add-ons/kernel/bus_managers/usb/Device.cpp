@@ -330,41 +330,43 @@ Device::SetConfigurationAt(uint8 index)
 	fCurrentConfiguration = &fConfigurations[index];
 
 	// Initialize all the endpoints that are now active
-	usb_interface_info *interfaceInfo = fCurrentConfiguration->interface[0].active;
-	for (size_t i = 0; i < interfaceInfo->endpoint_count; i++) {
-		usb_endpoint_info *endpoint = &interfaceInfo->endpoint[i];
-		Pipe *pipe = NULL;
+	for (size_t j = 0; j < fCurrentConfiguration->interface_count; j++) {
+		usb_interface_info *interfaceInfo = fCurrentConfiguration->interface[j].active;
+		for (size_t i = 0; i < interfaceInfo->endpoint_count; i++) {
+			usb_endpoint_info *endpoint = &interfaceInfo->endpoint[i];
+			Pipe *pipe = NULL;
 
-		switch (endpoint->descr->attributes & 0x03) {
-			case 0x00: /* Control Endpoint */
-				pipe = new(std::nothrow) ControlPipe(this, fDeviceAddress,
-					endpoint->descr->endpoint_address & 0x0f, fSpeed,
-					endpoint->descr->max_packet_size);
-				break;
+			switch (endpoint->descr->attributes & 0x03) {
+				case 0x00: /* Control Endpoint */
+					pipe = new(std::nothrow) ControlPipe(this, fDeviceAddress,
+						endpoint->descr->endpoint_address & 0x0f, fSpeed,
+						endpoint->descr->max_packet_size);
+					break;
 
-			case 0x01: /* Isochronous Endpoint */
-				pipe = new(std::nothrow) IsochronousPipe(this, fDeviceAddress,
-					endpoint->descr->endpoint_address & 0x0f,
-					(endpoint->descr->endpoint_address & 0x80) > 0 ? Pipe::In : Pipe::Out,
-					fSpeed, endpoint->descr->max_packet_size);
-				break;
+				case 0x01: /* Isochronous Endpoint */
+					pipe = new(std::nothrow) IsochronousPipe(this, fDeviceAddress,
+						endpoint->descr->endpoint_address & 0x0f,
+						(endpoint->descr->endpoint_address & 0x80) > 0 ? Pipe::In : Pipe::Out,
+						fSpeed, endpoint->descr->max_packet_size);
+					break;
 
-			case 0x02: /* Bulk Endpoint */
-				pipe = new(std::nothrow) BulkPipe(this, fDeviceAddress,
-					endpoint->descr->endpoint_address & 0x0f,
-					(endpoint->descr->endpoint_address & 0x80) > 0 ? Pipe::In : Pipe::Out,
-					fSpeed, endpoint->descr->max_packet_size);
-				break;
+				case 0x02: /* Bulk Endpoint */
+					pipe = new(std::nothrow) BulkPipe(this, fDeviceAddress,
+						endpoint->descr->endpoint_address & 0x0f,
+						(endpoint->descr->endpoint_address & 0x80) > 0 ? Pipe::In : Pipe::Out,
+						fSpeed, endpoint->descr->max_packet_size);
+					break;
 
-			case 0x03: /* Interrupt Endpoint */
-				pipe = new(std::nothrow) InterruptPipe(this, fDeviceAddress,
-					endpoint->descr->endpoint_address & 0x0f,
-					(endpoint->descr->endpoint_address & 0x80) > 0 ? Pipe::In : Pipe::Out,
-					fSpeed, endpoint->descr->max_packet_size);
-				break;
+				case 0x03: /* Interrupt Endpoint */
+					pipe = new(std::nothrow) InterruptPipe(this, fDeviceAddress,
+						endpoint->descr->endpoint_address & 0x0f,
+						(endpoint->descr->endpoint_address & 0x80) > 0 ? Pipe::In : Pipe::Out,
+						fSpeed, endpoint->descr->max_packet_size);
+					break;
+			}
+
+			endpoint->handle = pipe->USBID();
 		}
-
-		endpoint->handle = pipe->USBID();
 	}
 
 	// Wait some for the configuration being finished
@@ -400,11 +402,13 @@ Device::Unconfigure(bool atDeviceLevel)
 	if (!fCurrentConfiguration)
 		return B_OK;
 
-	usb_interface_info *interfaceInfo = fCurrentConfiguration->interface[0].active;
-	for (size_t i = 0; i < interfaceInfo->endpoint_count; i++) {
-		usb_endpoint_info *endpoint = &interfaceInfo->endpoint[i];
-		delete (Pipe *)GetStack()->GetObject(endpoint->handle);
-		endpoint->handle = 0;
+	for (size_t j = 0; j < fCurrentConfiguration->interface_count; j++) {
+		usb_interface_info *interfaceInfo = fCurrentConfiguration->interface[j].active;
+		for (size_t i = 0; i < interfaceInfo->endpoint_count; i++) {
+			usb_endpoint_info *endpoint = &interfaceInfo->endpoint[i];
+			delete (Pipe *)GetStack()->GetObject(endpoint->handle);
+			endpoint->handle = 0;
+		}
 	}
 
 	fCurrentConfiguration = NULL;
