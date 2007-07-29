@@ -183,6 +183,13 @@ elf_hash(const uint8 *name)
 }
 
 
+static inline bool
+report_errors()
+{
+	return gProgramArgs->error_port >= 0;
+}
+
+
 static image_t *
 find_image_in_queue(image_queue_t *queue, const char *name, bool isPath,
 	uint32 typeMask)
@@ -1097,7 +1104,7 @@ static status_t
 load_dependencies(image_t *image)
 {
 	struct Elf32_Dyn *d = (struct Elf32_Dyn *)image->dynamic_ptr;
-	bool reportErrors = gProgramArgs->error_port >= 0;
+	bool reportErrors = report_errors();
 	status_t status = B_OK;
 	uint32 i, j;
 	const char *rpath;
@@ -1339,10 +1346,14 @@ load_program(char const *path, void **_entry)
 err:
 	delete_image(sProgramImage);
 
-	if (gProgramArgs->error_port >= 0) {
+	if (report_errors()) {
+		// send error message
 		sErrorMessage.AddInt32("error", status);
-		sErrorMessage.SendTo(gProgramArgs->error_port, gProgramArgs->error_token,
-			-1, 0, 0, find_thread(NULL));
+		sErrorMessage.SetDeliveryInfo(gProgramArgs->error_token,
+			-1, 0, find_thread(NULL));
+
+		_kern_write_port_etc(gProgramArgs->error_port, 'KMSG',
+			sErrorMessage.Buffer(), sErrorMessage.ContentSize(), 0, 0);
 	}
 	_kern_loading_app_failed(status);
 	rld_unlock();
@@ -1651,7 +1662,7 @@ rldelf_init(void)
 	}
 
 	// initialize error message if needed
-	if (gProgramArgs->error_port >= 0) {
+	if (report_errors()) {
 		void *buffer = malloc(1024);
 		if (buffer == NULL)
 			return;

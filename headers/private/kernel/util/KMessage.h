@@ -1,8 +1,7 @@
 /* 
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
+ * Copyright 2005-2007, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef KMESSAGE_H
 #define KMESSAGE_H
 
@@ -118,6 +117,9 @@ public:
 	int32 TargetToken() const;
 	port_id ReplyPort() const;
 	int32 ReplyToken() const;
+
+	void SetDeliveryInfo(int32 targetToken, port_id replyPort,
+		int32 replyToken, team_id senderTeam);
 
 	status_t SendTo(port_id targetPort, int32 targetToken = -1,
 		port_id replyPort = -1, int32 replyToken = -1, bigtime_t timeout = -1,

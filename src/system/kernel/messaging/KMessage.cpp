@@ -32,21 +32,6 @@ using std::nothrow;
 #	endif
 #endif
 
-#ifdef _LOADER_MODE
-#	include <syscalls.h>
-
-#	define KMESSAGE_NO_RECEIVE
-
-#	define create_port(capacity, name) _kern_create_port(capacity, name)
-#	define delete_port(port) _kern_delete_port(port)
-#	define write_port(port, code, buffer, bufferSize) \
-		_kern_write_port_etc(port, code, buffer, bufferSize, 0, 0)
-#	define write_port_etc(port, code, buffer, bufferSize, flags, timeout) \
-		_kern_write_port_etc(port, code, buffer, bufferSize, flags, timeout)
-#	define set_port_owner(port, team) _kern_set_port_owner(port, team)
-#	define _get_port_info(port, info, size) _kern_get_port_info(port, info)
-#endif
-
 static const int32 kMessageReallocChunkSize = 64;
 
 // kMessageHeaderMagic
@@ -451,6 +436,18 @@ KMessage::ReplyToken() const
 	return _Header()->replyToken;
 }
 
+// SetDeliveryInfo
+void
+KMessage::SetDeliveryInfo(int32 targetToken, port_id replyPort,
+	int32 replyToken, team_id senderTeam)
+{
+	Header* header = _Header();
+	header->sender = senderTeam;
+	header->targetToken = targetToken;
+	header->replyPort = replyPort;
+	header->replyToken = replyToken;
+	header->sender = senderTeam;
+}
 
 #ifndef KMESSAGE_CONTAINER_ONLY
 
@@ -459,23 +456,22 @@ status_t
 KMessage::SendTo(port_id targetPort, int32 targetToken, port_id replyPort,
 	int32 replyToken, bigtime_t timeout, team_id senderTeam)
 {
-	// set the deliver info
-	Header* header = _Header();
-	header->sender = senderTeam;
-	header->targetToken = targetToken;
-	header->replyPort = replyPort;
-	header->replyToken = replyToken;
 	// get the sender team
-	if (senderTeam >= 0) {
+	if (senderTeam < 0) {
 		thread_info info;
 		status_t error = get_thread_info(find_thread(NULL), &info);
 		if (error != B_OK)
 			return error;
-		header->sender = info.team;
+
+		senderTeam = info.team;
 	}
+
+	SetDeliveryInfo(targetToken, replyPort, replyToken, senderTeam);
+
 	// send the message
 	if (timeout < 0)
 		return write_port(targetPort, 'KMSG', fBuffer, ContentSize());
+
 	return write_port_etc(targetPort, 'KMSG', fBuffer, ContentSize(),
 		B_RELATIVE_TIMEOUT, timeout);
 }
@@ -561,9 +557,6 @@ KMessage::SendReply(KMessage* message, KMessage* reply,
 status_t
 KMessage::ReceiveFrom(port_id fromPort, bigtime_t timeout)
 {
-#ifdef KMESSAGE_NO_RECEIVE
-	return B_NOT_SUPPORTED;
-#else
 	// get the port buffer size
 	ssize_t size;
 	if (timeout < 0)
@@ -587,7 +580,6 @@ KMessage::ReceiveFrom(port_id fromPort, bigtime_t timeout)
 	// init the message
 	return SetTo(buffer, size, 0,
 		KMESSAGE_OWNS_BUFFER | KMESSAGE_INIT_FROM_BUFFER);
-#endif	// !KMESSAGE_NO_RECEIVE
 }
 
 #endif	// !KMESSAGE_CONTAINER_ONLY
