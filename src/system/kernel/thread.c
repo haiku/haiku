@@ -528,6 +528,38 @@ make_thread_unreal(int argc, char **argv)
 }
 
 
+static int
+make_thread_suspended(int argc, char **argv)
+{
+	struct thread *thread;
+	struct hash_iterator i;
+	int32 id;
+
+	if (argc != 2) {
+		kprintf("usage: suspend [thread-id]\n");
+		return 0;
+	}
+
+	id = strtoul(argv[1], NULL, 0);
+
+	hash_open(sThreadHash, &i);
+
+	while ((thread = hash_next(sThreadHash, &i)) != NULL) {
+		if (thread->id != id)
+			continue;
+
+		thread->state = thread->next_state = B_THREAD_SUSPENDED;
+		kprintf("thread 0x%lx suspended\n", thread->id);
+		break;
+	}
+	if (!thread)
+		kprintf("thread 0x%lx not found\n", thread->id);
+
+	hash_close(sThreadHash, &i, false);
+	return 0;
+}
+
+
 static const char *
 state_to_text(struct thread *thread, int32 state)
 {
@@ -1537,6 +1569,7 @@ thread_init(kernel_args *args)
 	add_debugger_command("next_all", &dump_next_thread_in_all_list, "dump the next thread in the global list of the last thread viewed");
 	add_debugger_command("next_team", &dump_next_thread_in_team, "dump the next thread in the team of the last thread viewed");
 	add_debugger_command("unreal", &make_thread_unreal, "set realtime priority threads to normal priority");
+	add_debugger_command("suspend", &make_thread_suspended, "suspend a thread");
 
 	return B_OK;
 }
