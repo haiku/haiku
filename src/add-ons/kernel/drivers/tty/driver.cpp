@@ -102,8 +102,9 @@ init_driver(void)
 		if (++digit > 15)
 			digit = 0, letter++;
 
-		reset_tty(&gMasterTTYs[i], i);
-		reset_tty(&gSlaveTTYs[i], i);
+		reset_tty(&gMasterTTYs[i], i, true);
+		reset_tty(&gSlaveTTYs[i], i, false);
+		reset_tty_settings(&gTTYSettings[i], i);
 
 		if (!sDeviceNames[i] || !sDeviceNames[i + kNumTTYs]) {
 			uninit_driver();

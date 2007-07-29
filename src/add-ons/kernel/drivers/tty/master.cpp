@@ -173,7 +173,7 @@ master_write(void *_cookie, off_t offset, const void *buffer, size_t *_length)
 	TRACE(("master_write: cookie %p, offset %Ld, buffer %p, length %lu\n",
 		_cookie, offset, buffer, *_length));
 
-	status_t result = tty_write_to_tty(cookie, buffer, _length, true);
+	status_t result = tty_write_to_tty_master(cookie, buffer, _length);
 
 	TRACE(("master_write done: cookie %p, result: %lx, length %lu\n", _cookie,
 		result, *_length));

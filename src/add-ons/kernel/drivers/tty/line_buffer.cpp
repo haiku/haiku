@@ -57,7 +57,8 @@ line_buffer_writable(struct line_buffer &buffer)
 
 
 ssize_t
-line_buffer_user_read(struct line_buffer &buffer, char *data, size_t length)
+line_buffer_user_read(struct line_buffer &buffer, char *data, size_t length,
+	char eof, bool* hitEOF)
 {
 	size_t available = buffer.in;
 
@@ -66,6 +67,19 @@ line_buffer_user_read(struct line_buffer &buffer, char *data, size_t length)
 
 	if (length == 0)
 		return 0;
+
+	// check for EOF, if the caller asked us to
+	if (hitEOF) {
+		*hitEOF = false;
+		for (size_t i = 0; i < available; i++) {
+			char c = buffer.buffer[(buffer.first + i) % buffer.size];
+			if (c == eof) {
+				*hitEOF = true;
+				length = i;
+				break;
+			}
+		}
+	}
 
 	ssize_t bytesRead = length;
 
@@ -86,6 +100,12 @@ line_buffer_user_read(struct line_buffer &buffer, char *data, size_t length)
 	if (bytesRead > 0) {
 		buffer.first = (buffer.first + bytesRead) % buffer.size;
 		buffer.in -= bytesRead;
+	}
+
+	// dispose of EOF char
+	if (hitEOF && *hitEOF) {
+		buffer.first = (buffer.first + 1) % buffer.size;
+		buffer.in--;
 	}
 
 	return bytesRead;
@@ -116,3 +136,14 @@ line_buffer_ungetc(struct line_buffer &buffer, char *c)
 }
 
 #endif
+
+
+bool
+line_buffer_tail_getc(struct line_buffer &buffer, char *c)
+{
+	if (buffer.in == 0)
+		return false;
+
+	*c = buffer.buffer[(buffer.first + --buffer.in) % buffer.size];
+	return true;	
+}

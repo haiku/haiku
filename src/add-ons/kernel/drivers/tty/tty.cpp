@@ -1,4 +1,5 @@
 /*
+ * Copyright 2007, Ingo Weinhold, bonefish@cs.tu-berlin.de. All rights reserved.
  * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -8,10 +9,12 @@
 // tailored for pseudo-TTYs. Have a look at Be's TTY includes (drivers/tty/*)
 
 
-#include <util/AutoLock.h>
-#include <util/kernel_cpp.h>
+#include <ctype.h>
 #include <signal.h>
 #include <string.h>
+
+#include <util/AutoLock.h>
+#include <util/kernel_cpp.h>
 
 #include "SemaphorePool.h"
 #include "tty_private.h"
@@ -45,13 +48,13 @@
 	operations are done at a certain point when closing a cookie
 	(cf. tty_close_cookie() and TTYReference).
 
-	tty::lock: Guards the access to tty::{input_buffer,termios,window_size,
-	pgrp_id}. Moreover when held guarantees that tty::open_count won't drop
-	to zero (both gGlobalTTYLock and tty::lock must be held to decrement
-	it). A tty and the tty connected to it (master and slave) share the same
-	lock. tty::lock is only valid when tty::open_count is > 0. So before
-	accessing tty::lock, it must be made sure that it is still valid. Given
-	a tty_cookie, TTYReference can be used to do that, or otherwise
+	tty::lock: Guards the access to tty::{input_buffer,settings::{termios,
+	window_size,pgrp_id}}. Moreover when held guarantees that tty::open_count
+	won't drop to zero (both gGlobalTTYLock and tty::lock must be held to
+	decrement it). A tty and the tty connected to it (master and slave) share
+	the same lock. tty::lock is only valid when tty::open_count is > 0. So
+	before accessing tty::lock, it must be made sure that it is still valid.
+	Given a tty_cookie, TTYReference can be used to do that, or otherwise
 	gGlobalTTYLock can be acquired and tty::open_count be checked.
 
 	gTTYRequestLock: Guards access to tty::{reader,writer}_queue (most
@@ -77,6 +80,9 @@
 	caller should terminate -- or bytes are available for reading/space for
 	writing (cf. AvailableBytes()).
 */
+
+
+tty_settings gTTYSettings[kNumTTYs];
 
 
 static void tty_notify_select_event(struct tty *tty, uint8 event);
@@ -252,6 +258,7 @@ RequestQueue::NotifyFirst(size_t bytesAvailable)
 		first->Notify(bytesAvailable);
 }
 
+
 void
 RequestQueue::NotifyError(status_t error)
 {
@@ -262,6 +269,7 @@ RequestQueue::NotifyError(status_t error)
 		request->NotifyError(error);
 	}
 }
+
 
 void
 RequestQueue::NotifyError(tty_cookie *cookie, status_t error)
@@ -369,7 +377,7 @@ RequestOwner::Wait(bool interruptable, Semaphore *sem)
 
 	// check, if already done
 	if (fError == B_OK 
-		&& (!fRequests[0].WasNotified() || !fRequests[0].WasNotified())) {
+		&& (!fRequests[0].WasNotified() || !fRequests[1].WasNotified())) {
 		// not yet done
 
 		// set the semaphore
@@ -478,7 +486,8 @@ WriterLocker::WriterLocker(tty_cookie *sourceCookie)
 		// tty_close_cookie() pseudo request).
 
 		// get the echo mode
-		fEcho = (fTarget->termios.c_lflag & ECHO) != 0;
+		fEcho = (fSource->is_master
+			&& fSource->settings->termios.c_lflag & ECHO) != 0;
 
 		// enqueue ourselves in the respective request queues
 		RecursiveLocker locker(gTTYRequestLock);
@@ -542,7 +551,7 @@ WriterLocker::AcquireWriter(bool dontBlock, size_t bytesNeeded)
 			return B_OK;
 	}
 
-	// We are not the first in queue or currently there's nothing to read:
+	// We are not the first in queue or currently there's no space to write:
 	// bail out, if we shall not block.
 	if (dontBlock)
 		return B_WOULD_BLOCK;
@@ -665,7 +674,7 @@ get_tty_index(const char *name)
 }
 
 
-void
+static void
 reset_termios(struct termios &termios)
 {
 	memset(&termios, 0, sizeof(struct termios));
@@ -682,6 +691,8 @@ reset_termios(struct termios &termios)
 	termios.c_cc[VERASE] = CTRL('H');
 	termios.c_cc[VKILL] = CTRL('U');
 	termios.c_cc[VEOF] = CTRL('D');
+	termios.c_cc[VEOL] = '\0';
+	termios.c_cc[VEOL2] = '\0';
 	termios.c_cc[VSTART] = CTRL('S');
 	termios.c_cc[VSTOP] = CTRL('Q');
 	termios.c_cc[VSUSP] = CTRL('Z');
@@ -689,22 +700,30 @@ reset_termios(struct termios &termios)
 
 
 void
-reset_tty(struct tty *tty, int32 index)
+reset_tty_settings(tty_settings *settings, int32 index)
 {
-	reset_termios(tty->termios);
+	reset_termios(settings->termios);
 
-	tty->open_count = 0;
-	tty->index = index;
-	tty->lock = NULL;
-
-	tty->pgrp_id = 0;
+	settings->pgrp_id = 0;
 		// this value prevents any signal of being sent
 
 	// some initial window size - the TTY in question should set these values
-	tty->window_size.ws_col = 80;
-	tty->window_size.ws_row = 25;
-	tty->window_size.ws_xpixel = tty->window_size.ws_col * 8;
-	tty->window_size.ws_ypixel = tty->window_size.ws_row * 8;
+	settings->window_size.ws_col = 80;
+	settings->window_size.ws_row = 25;
+	settings->window_size.ws_xpixel = settings->window_size.ws_col * 8;
+	settings->window_size.ws_ypixel = settings->window_size.ws_row * 8;
+}
+
+
+void
+reset_tty(struct tty *tty, int32 index, bool isMaster)
+{
+	tty->open_count = 0;
+	tty->index = index;
+	tty->lock = NULL;
+	tty->settings = &gTTYSettings[index];
+	tty->is_master = isMaster;
+	tty->pending_eof = 0;
 }
 
 
@@ -719,63 +738,75 @@ tty_output_getc(struct tty *tty, int *_c)
  *	Depending on the termios flags set, signals may be sent, the input
  *	character changed or removed, etc.
  */
-
 static void
 tty_input_putc_locked(struct tty *tty, int c)
 {
-	tcflag_t flags = tty->termios.c_iflag;
-
 	// process signals if needed
 
-	if ((tty->termios.c_lflag & ISIG) != 0) {
+	if ((tty->settings->termios.c_lflag & ISIG) != 0) {
 		// enable signals, process INTR, QUIT, and SUSP
 		int signal = -1;
 
-		if (c == tty->termios.c_cc[VINTR])
+		if (c == tty->settings->termios.c_cc[VINTR])
 			signal = SIGINT;
-		else if (c == tty->termios.c_cc[VQUIT])
+		else if (c == tty->settings->termios.c_cc[VQUIT])
 			signal = SIGQUIT;
-		else if (c == tty->termios.c_cc[VSUSP])
+		else if (c == tty->settings->termios.c_cc[VSUSP])
 			// ToDo: what to do here?
 			signal = -1;
 
 		// do we need to deliver a signal?
 		if (signal != -1) {
 			// we may have to flush the input buffer
-			if ((tty->termios.c_lflag & NOFLSH) == 0)
+			if ((tty->settings->termios.c_lflag & NOFLSH) == 0)
 				clear_line_buffer(tty->input_buffer);
 
-			if (tty->pgrp_id != 0)
-				send_signal(-tty->pgrp_id, signal);
+			if (tty->settings->pgrp_id != 0)
+				send_signal(-tty->settings->pgrp_id, signal);
 			return;
 		}
 	}
 
 	// process special canonical input characters
 
-	if ((tty->termios.c_lflag & ICANON) != 0) {
+	if ((tty->settings->termios.c_lflag & ICANON) != 0) {
 		// canonical mode, process ERASE and KILL
-		if (c == tty->termios.c_cc[VERASE]) {
-			// ToDo: erase one character
+		cc_t* controlChars = tty->settings->termios.c_cc;
+
+		if (c == controlChars[VERASE]) {
+			// erase one character
+			char lastChar;
+			if (line_buffer_tail_getc(tty->input_buffer, &lastChar)) {
+				if (lastChar == controlChars[VEOF]
+					|| lastChar == controlChars[VEOL]
+					|| lastChar == '\n' || lastChar == '\r') {
+					// EOF or end of line -- put it back
+					line_buffer_putc(tty->input_buffer, lastChar);
+				}
+			}
 			return;
-		} else if (c == tty->termios.c_cc[VKILL]) {
-			// ToDo: erase line
+		} else if (c == controlChars[VKILL]) {
+			// erase line
+			char lastChar;
+			while (line_buffer_tail_getc(tty->input_buffer, &lastChar)) {
+				if (lastChar == controlChars[VEOF]
+					|| lastChar == controlChars[VEOL]
+					|| lastChar == '\n' || lastChar == '\r') {
+					// EOF or end of line -- put it back
+					line_buffer_putc(tty->input_buffer, lastChar);
+					break;
+				}
+			}
 			return;
+		} else if (c == controlChars[VEOF]) {
+			// we still write the EOF to the stream -- tty_input_read() needs
+			// to recognize it
+			tty->pending_eof++;
 		}
 	}
 
-	// character conversions
-
-	if (c == '\n' && (flags & INLCR) != 0) {
-		// map NL to CR
-		c = '\r';
-	} else if (c == '\r') {
-		if (flags & IGNCR)	// ignore CR
-			return;
-		if (flags & ICRNL)	// map CR to NL
-			c = '\n';
-	} if (flags & ISTRIP)	// strip the highest bit
-		c &= 0x7f;
+	// Input character conversions have already been done. What reaches this
+	// point can directly be written to the line buffer.
 
 	line_buffer_putc(tty->input_buffer, c);
 }
@@ -1033,6 +1064,130 @@ tty_notify_if_available(struct tty *tty, struct tty *otherTTY,
 }
 
 
+/*!
+	\brief Performs input character conversion and writes the result to
+		\a buffer.
+	\param tty The master tty.
+	\param c The input character.
+	\param buffer The buffer to which to write the converted character.
+	\param _bytesNeeded The number of bytes needed in the target tty's
+		line buffer.
+	\return \c true, if the character shall be processed further, \c false, if
+		it shall be skipped.
+*/
+static bool
+process_input_char(struct tty* tty, char c, char* buffer,
+	size_t* _bytesNeeded)
+{
+	tcflag_t flags = tty->settings->termios.c_iflag;
+
+	// signals
+	if (tty->settings->termios.c_lflag & ISIG) {
+		if (c == tty->settings->termios.c_cc[VINTR]
+			|| c == tty->settings->termios.c_cc[VQUIT]
+			|| c == tty->settings->termios.c_cc[VSUSP]) {
+			*buffer = c;
+			*_bytesNeeded = 0;
+			return true;
+		}
+	}
+
+	// canonical input characters
+	if (tty->settings->termios.c_lflag & ICANON) {
+		if (c == tty->settings->termios.c_cc[VERASE]
+			|| c == tty->settings->termios.c_cc[VKILL]) {
+			*buffer = c;
+			*_bytesNeeded = 0;
+			return true;
+		}
+	}
+
+	// convert chars
+	if (c == '\r') {
+		if (flags & IGNCR)		// ignore CR
+			return false;
+		if (flags & ICRNL)		// CR -> NL
+			c = '\n';
+	} else if (c == '\n') {
+		if (flags & INLCR)		// NL -> CR
+			c = '\r';
+	} else if (flags & ISTRIP)	// strip of eighth bit
+		c &= 0x7f;
+
+	*buffer = c;
+	*_bytesNeeded = 1;
+	return true;
+}
+
+/*!
+	\brief Performs output character conversion and writes the result to
+		\a buffer.
+	\param tty The master tty.
+	\param c The output character.
+	\param buffer The buffer to which to write the converted character(s).
+	\param _bytesWritten The number of bytes written to the output buffer
+		(max 3).
+	\param echoed \c true if the output char to be processed has been echoed
+		from the input.
+*/
+static void
+process_output_char(struct tty* tty, char c, char* buffer,
+	size_t *_bytesWritten, bool echoed)
+{
+	tcflag_t flags = tty->settings->termios.c_oflag;
+
+	if (flags & OPOST) {
+		if (echoed && c == tty->settings->termios.c_cc[VERASE]) {
+			if (tty->settings->termios.c_lflag & ECHOE) {
+				// ERASE -> ERASE SPACE ERASE
+				buffer[0] = tty->settings->termios.c_cc[VERASE];
+				buffer[1] = ' ';
+				buffer[2] = tty->settings->termios.c_cc[VERASE];
+				*_bytesWritten = 3;
+				return;
+			}
+		} else if (echoed && c == tty->settings->termios.c_cc[VKILL]) {
+			if (!(tty->settings->termios.c_lflag & ECHOK)) {
+				// don't echo KILL
+				*_bytesWritten = 0;
+				return;
+			}
+		} else if (echoed && c == tty->settings->termios.c_cc[VEOF]) {
+			// don't echo EOF
+			*_bytesWritten = 0;
+			return;
+		} else if (c == '\n') {
+			if (echoed && !(tty->settings->termios.c_lflag & ECHONL)) {
+				// don't echo NL
+				*_bytesWritten = 0;
+				return;
+			}
+			if (flags & ONLCR) {			// NL -> CR-NL
+				buffer[0] = '\r';
+				buffer[1] = '\n';
+				*_bytesWritten = 2;
+				return;
+			}
+		} else if (c == '\r') {
+			if (flags & OCRNL) {			// CR -> NL
+				c = '\n';
+			} else if (flags & ONLRET) {	// NL also does RET, ignore CR
+				*_bytesWritten = 0;
+				return;
+			} else if (flags & ONOCR) {		// don't output CR at column 0
+				// TODO: We can't decide that here.
+			}
+		} else {
+			if (flags & OLCUC)				// lower case -> upper case
+				c = toupper(c);
+		}
+	}
+
+	*buffer = c;
+	*_bytesWritten = 1;
+}
+
+
 //	#pragma mark -
 //	device functions
 
@@ -1096,44 +1251,54 @@ tty_ioctl(tty_cookie *cookie, uint32 op, void *buffer, size_t length)
 
 		case TCGETA:
 			TRACE(("tty: get attributes\n"));
-			return user_memcpy(buffer, &tty->termios, sizeof(struct termios));
+			return user_memcpy(buffer, &tty->settings->termios,
+				sizeof(struct termios));
 
 		case TCSETA:
 		case TCSETAW:
 		case TCSETAF:
-			TRACE(("tty: set attributes (iflag = %lx, oflag = %lx, cflag = %lx, lflag = %lx)\n",
-				tty->termios.c_iflag, tty->termios.c_oflag, tty->termios.c_cflag, tty->termios.c_lflag));
+			TRACE(("tty: set attributes (iflag = %lx, oflag = %lx, "
+				"cflag = %lx, lflag = %lx)\n", tty->settings->termios.c_iflag,
+				tty->settings->termios.c_oflag, tty->settings->termios.c_cflag,
+				tty->settings->termios.c_lflag));
 
-			return user_memcpy(&tty->termios, buffer, sizeof(struct termios));
+			return user_memcpy(&tty->settings->termios, buffer,
+				sizeof(struct termios));
 
 		/* get and set process group ID */
 
 		case TIOCGPGRP:
 			TRACE(("tty: get pgrp_id\n"));
-			return user_memcpy(buffer, &tty->pgrp_id, sizeof(pid_t));
+			return user_memcpy(buffer, &tty->settings->pgrp_id, sizeof(pid_t));
 		case TIOCSPGRP:
 		case 'pgid':
 			TRACE(("tty: set pgrp_id\n"));
-			return user_memcpy(&tty->pgrp_id, buffer, sizeof(pid_t));
+			return user_memcpy(&tty->settings->pgrp_id, buffer, sizeof(pid_t));
 
 		/* get and set window size */
 
 		case TIOCGWINSZ:
 			TRACE(("tty: set window size\n"));
-			return user_memcpy(buffer, &tty->window_size, sizeof(struct winsize));
+			return user_memcpy(buffer, &tty->settings->window_size,
+				sizeof(struct winsize));
 
 		case TIOCSWINSZ:
 		{
-			uint16 oldColumns = tty->window_size.ws_col, oldRows = tty->window_size.ws_row;
+			uint16 oldColumns = tty->settings->window_size.ws_col;
+			uint16 oldRows = tty->settings->window_size.ws_row;
 
 			TRACE(("tty: set window size\n"));
-			if (user_memcpy(&tty->window_size, buffer, sizeof(struct winsize)) < B_OK)
+			if (user_memcpy(&tty->settings->window_size, buffer,
+					sizeof(struct winsize)) < B_OK) {
 				return B_BAD_ADDRESS;
+			}
 
 			// send a signal only if the window size has changed
-			if ((oldColumns != tty->window_size.ws_col || oldRows != tty->window_size.ws_row)
-				&& tty->pgrp_id != 0)
-				send_signal(-tty->pgrp_id, SIGWINCH);
+			if ((oldColumns != tty->settings->window_size.ws_col
+					|| oldRows != tty->settings->window_size.ws_row)
+				&& tty->settings->pgrp_id != 0) {
+				send_signal(-tty->settings->pgrp_id, SIGWINCH);
+			}
 
 			return B_OK;
 		}
@@ -1172,13 +1337,20 @@ tty_input_read(tty_cookie *cookie, void *buffer, size_t *_length)
 			return status;
 		}
 
-		// ToDo: add support for ICANON mode
+		bool _hitEOF = false;
+		bool* hitEOF = (tty->pending_eof > 0 ? &_hitEOF : NULL);
 
 		bytesRead = line_buffer_user_read(tty->input_buffer, (char *)buffer,
-			length);
+			length, tty->settings->termios.c_cc[VEOF], hitEOF);
 		if (bytesRead < B_OK) {
 			*_length = 0;
 			return bytesRead;
+		}
+
+		// we hit an EOF char -- bail out, whatever amount of data we have
+		if (hitEOF && *hitEOF) {
+			tty->pending_eof--;
+			break;
 		}
 	}
 
@@ -1187,13 +1359,12 @@ tty_input_read(tty_cookie *cookie, void *buffer, size_t *_length)
 }
 
 
-status_t
-tty_write_to_tty(tty_cookie *sourceCookie, const void *buffer, size_t *_length,
-	bool sourceIsMaster)
+static status_t
+tty_write_to_tty_master_unsafe(tty_cookie *sourceCookie, const char *data,
+	size_t *_length)
 {
 	struct tty *source = sourceCookie->tty;
 	struct tty *target = sourceCookie->other_tty;
-	const char *data = (const char *)buffer;
 	size_t length = *_length;
 	size_t bytesWritten = 0;
 	uint32 mode = sourceCookie->open_mode;
@@ -1213,72 +1384,207 @@ tty_write_to_tty(tty_cookie *sourceCookie, const void *buffer, size_t *_length,
 	if (target->open_count <= 0)
 		return B_FILE_ERROR;
 
-	bool echo = (target->termios.c_lflag & ECHO) != 0;
-		// Confusingly enough, we need to echo when the target's ECHO flag is
-		// set. That's because our target is supposed to echo back at us, not
-		// to itself.
+	bool echo = (source->settings->termios.c_lflag & ECHO) != 0;
 
-	TRACE(("tty_write_to_tty(source = %p, target = %p, length = %lu, %s%s)\n", source, target, length,
-		sourceIsMaster ? "master" : "slave", echo ? ", echo mode" : ""));
+	TRACE(("tty_write_to_tty_master(source = %p, target = %p, "
+		"length = %lu%s)\n", source, target, length,
+		(echo ? ", echo mode" : "")));
 
-	// ToDo: "buffer" is not yet copied or accessed in a safe way!
-
-	size_t bytesNeeded = 1;
+	status_t status = locker.AcquireWriter(dontBlock, 0);
+	if (status != B_OK) {
+		*_length = 0;
+		return status;
+	}
+	size_t writable = locker.AvailableBytes();
 
 	while (bytesWritten < length) {
-		status_t status = locker.AcquireWriter(dontBlock, bytesNeeded);
-		if (status != B_OK) {
-			*_length = bytesWritten;
-			return status;
-		}
-
-		bytesNeeded = 1;	// reset
-
-		size_t writable = locker.AvailableBytes();
-		if (writable == 0) {
-			// should never happen
+		// fetch next char and do input processing
+		char c;
+		size_t bytesNeeded;
+		if (!process_input_char(source, *data, &c, &bytesNeeded)) {
+			// input char shall be skipped
+			data++;
+			bytesWritten++;
 			continue;
 		}
 
-		while (writable > 0 && bytesWritten < length) {
-			char c = data[0];
+		// If in echo mode, we do the output conversion and need to update
+		// the needed bytes count.
+		char echoBuffer[3];
+		size_t echoBytes;
+		if (echo) {
+			process_output_char(source, c, echoBuffer, &echoBytes, true);
+			if (echoBytes > bytesNeeded)
+				bytesNeeded = echoBytes;
+		}
 
-			if (c == '\n' && (source->termios.c_oflag & (OPOST | ONLCR)) == OPOST | ONLCR) {
-				// post-process output and transfrom '\n' to '\r\n'
-
-				// If we can't write both '\r' and '\n', we won't write either,
-				// or we would write the '\r' again.
-				if (writable < 2) {
-					// try acquiring the writer again, when enough space is available
-					bytesNeeded = 2;
-					writable = 0;
-						// make sure we're breaking out of this loop
-					continue;
-				}
-
-#if 1
-	// ToDo: this doesn't fix the bug that is responsible for the doubled shell prompt
-	//		and it's all wrong, too - but it cures the symptoms, and that's good enough
-	//		for now :)
-	//		Apparently, the shell reads only single bytes and handles both, '\r' and '\n'
-	//		as a newline.
-				if (!sourceIsMaster)
-#endif
-				tty_input_putc_locked(target, '\r');
-			 	if (echo)
-					tty_input_putc_locked(source, '\r');
-
-				if (--writable == 0)
-					continue;
+		// If there's not enough space to write what we have, we need to wait
+		// until it is available.
+		if (writable < bytesNeeded) {
+			status = locker.AcquireWriter(dontBlock, bytesNeeded);
+			if (status != B_OK) {
+				*_length = bytesWritten;
+				return status;
 			}
 
-			tty_input_putc_locked(target, c);
-			if (echo)
-				tty_input_putc_locked(source, c);
+			writable = locker.AvailableBytes();
 
-			data++;
-			bytesWritten++;
+			// We need to restart the loop, since the termios flags might have
+			// changed in the meantime (while we've unlocked the tty). Note,
+			// that we don't re-get "echo" -- maybe we should.
+			continue;
 		}
+
+		// write the bytes
+		tty_input_putc_locked(target, c);
+
+		if (echo) {
+			for (size_t i = 0; i < echoBytes; i++)
+				line_buffer_putc(source->input_buffer, echoBuffer[i]);
+		}
+
+		writable -= bytesNeeded;
+		data++;
+		bytesWritten++;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+tty_write_to_tty_master(tty_cookie *sourceCookie, const void *_buffer,
+	size_t *_length)
+{
+	const char* buffer = (const char*)_buffer;
+	size_t bytesRemaining = *_length;
+	*_length = 0;
+
+	while (bytesRemaining > 0) {
+		// copy data to stack
+		char safeBuffer[256];
+		size_t toWrite = min_c(sizeof(safeBuffer), bytesRemaining);
+		status_t error = user_memcpy(safeBuffer, buffer, toWrite);
+		if (error != B_OK)
+			return error;
+
+		// write them
+		size_t written = toWrite;
+		error = tty_write_to_tty_master_unsafe(sourceCookie, safeBuffer,
+			&written);
+		if (error != B_OK)
+			return error;
+
+		buffer += written;
+		bytesRemaining -= written;
+		*_length += written;
+
+		if (written < toWrite)
+			return B_OK;
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+tty_write_to_tty_slave_unsafe(tty_cookie *sourceCookie, const char *data,
+	size_t *_length)
+{
+	struct tty *target = sourceCookie->other_tty;
+	size_t length = *_length;
+	size_t bytesWritten = 0;
+	uint32 mode = sourceCookie->open_mode;
+	bool dontBlock = (mode & O_NONBLOCK) != 0;
+
+	// bail out, if source is already closed
+	TTYReference sourceTTYReference(sourceCookie);
+	if (!sourceTTYReference.IsLocked())
+		return B_FILE_ERROR;
+
+	if (length == 0)
+		return B_OK;
+
+	WriterLocker locker(sourceCookie);
+
+	// if the target is not open, fail now
+	if (target->open_count <= 0)
+		return B_FILE_ERROR;
+
+	TRACE(("tty_write_to_tty_slave(source = %p, target = %p, length = %lu)\n",
+		sourceCookie->tty, target, length));
+
+	status_t status = locker.AcquireWriter(dontBlock, 0);
+	if (status != B_OK) {
+		*_length = 0;
+		return status;
+	}
+	size_t writable = locker.AvailableBytes();
+
+	while (bytesWritten < length) {
+		// fetch next char and do output processing
+		char buffer[3];
+		size_t bytesNeeded;
+		process_output_char(target, *data, buffer, &bytesNeeded, false);
+
+		// If there's not enough space to write what we have, we need to wait
+		// until it is available.
+		if (writable < bytesNeeded) {
+			status = locker.AcquireWriter(dontBlock, bytesNeeded);
+			if (status != B_OK) {
+				*_length = bytesWritten;
+				return status;
+			}
+
+			writable = locker.AvailableBytes();
+
+			// We need to restart the loop, since the termios flags might have
+			// changed in the meantime (while we've unlocked the tty).
+			continue;
+		}
+
+		// write the bytes
+		for (size_t i = 0; i < bytesNeeded; i++)
+			tty_input_putc_locked(target, buffer[i]);
+
+		writable -= bytesNeeded;
+		data++;
+		bytesWritten++;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+tty_write_to_tty_slave(tty_cookie *sourceCookie, const void *_buffer,
+	size_t *_length)
+{
+	const char* buffer = (const char*)_buffer;
+	size_t bytesRemaining = *_length;
+	*_length = 0;
+
+	while (bytesRemaining > 0) {
+		// copy data to stack
+		char safeBuffer[256];
+		size_t toWrite = min_c(sizeof(safeBuffer), bytesRemaining);
+		status_t error = user_memcpy(safeBuffer, buffer, toWrite);
+		if (error != B_OK)
+			return error;
+
+		// write them
+		size_t written = toWrite;
+		error = tty_write_to_tty_slave_unsafe(sourceCookie, safeBuffer,
+			&written);
+		if (error != B_OK)
+			return error;
+
+		buffer += written;
+		bytesRemaining -= written;
+		*_length += written;
+
+		if (written < toWrite)
+			return B_OK;
 	}
 
 	return B_OK;
@@ -1346,9 +1652,10 @@ tty_select(tty_cookie *cookie, uint8 event, uint32 ref, selectsync *sync)
 				break;
 			}
 
-			// In case the other TTY echos, we have to check, whether we can
+			// In case input is echoed, we have to check, whether we can
 			// currently can write to our TTY as well.
-			bool echo = (otherTTY->termios.c_lflag & ECHO);
+			bool echo = (tty->is_master
+				&& tty->settings->termios.c_lflag & ECHO);
 
 			if (otherTTY->writer_queue.IsEmpty()
 				&& line_buffer_writable(otherTTY->input_buffer) > 0) {

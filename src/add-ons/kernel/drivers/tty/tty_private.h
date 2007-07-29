@@ -118,24 +118,31 @@ struct tty_cookie : DoublyLinkedListLinkImpl<tty_cookie> {
 
 typedef DoublyLinkedList<tty_cookie> TTYCookieList;
 
+struct tty_settings {
+	pid_t				pgrp_id;
+	struct termios		termios;
+	struct winsize		window_size;
+};
+
 struct tty {
 	int32				open_count;
 	int32				index;
-	struct mutex		*lock;
+	struct mutex*		lock;
+	tty_settings*		settings;
 	RequestQueue		reader_queue;
 	RequestQueue		writer_queue;
 	TTYCookieList		cookies;
-	pid_t				pgrp_id;
 	line_buffer			input_buffer;
 	tty_service_func	service_func;
-	struct termios		termios;
-	struct winsize		window_size;
+	uint32				pending_eof;
+	bool				is_master;
 };
 
 static const uint32 kNumTTYs = 64;
 
 extern tty gMasterTTYs[kNumTTYs];
 extern tty gSlaveTTYs[kNumTTYs];
+extern tty_settings gTTYSettings[kNumTTYs];
 
 extern device_hooks gMasterTTYHooks;
 extern device_hooks gSlaveTTYHooks;
@@ -149,13 +156,16 @@ extern SemaphorePool *gSemaphorePool;
 // functions available for master/slave TTYs
 
 extern int32 get_tty_index(const char *name);
-extern void reset_tty(struct tty *tty, int32 index);
+extern void reset_tty(struct tty *tty, int32 index, bool isMaster);
+extern void reset_tty_settings(tty_settings *settings, int32 index);
 //extern status_t tty_input_putc(struct tty *tty, int c);
 extern status_t tty_input_read(tty_cookie *cookie, void *buffer,
 					size_t *_length);
 extern status_t tty_output_getc(struct tty *tty, int *_c);
-extern status_t tty_write_to_tty(tty_cookie *sourceCookie, const void *buffer,
-					size_t *_length, bool sourceIsMaster);
+extern status_t tty_write_to_tty_master(tty_cookie *sourceCookie,
+					const void *buffer, size_t *_length);
+extern status_t tty_write_to_tty_slave(tty_cookie *sourceCookie,
+					const void *buffer, size_t *_length);
 
 extern status_t init_tty_cookie(tty_cookie *cookie, struct tty *tty,
 					struct tty *otherTTY, uint32 openMode);
