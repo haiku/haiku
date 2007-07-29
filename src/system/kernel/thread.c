@@ -535,12 +535,15 @@ make_thread_suspended(int argc, char **argv)
 	struct hash_iterator i;
 	int32 id;
 
-	if (argc != 2) {
+	if (argc > 2) {
 		kprintf("usage: suspend [thread-id]\n");
 		return 0;
 	}
 
-	id = strtoul(argv[1], NULL, 0);
+	if (argc == 1)
+		id = thread_get_current_thread()->id;
+	else
+		id = strtoul(argv[1], NULL, 0);
 
 	hash_open(sThreadHash, &i);
 
@@ -549,13 +552,76 @@ make_thread_suspended(int argc, char **argv)
 			continue;
 
 		thread->state = thread->next_state = B_THREAD_SUSPENDED;
-		kprintf("thread 0x%lx suspended\n", thread->id);
+		kprintf("thread 0x%lx suspended\n", id);
 		break;
 	}
 	if (!thread)
-		kprintf("thread 0x%lx not found\n", thread->id);
+		kprintf("thread 0x%lx not found\n", id);
 
 	hash_close(sThreadHash, &i, false);
+	return 0;
+}
+
+
+static int
+make_thread_resumed(int argc, char **argv)
+{
+	struct thread *thread;
+	struct hash_iterator i;
+	int32 id;
+
+	if (argc != 2) {
+		kprintf("usage: resume <thread-id>\n");
+		return 0;
+	}
+
+	// force user to enter a thread id, as using
+	// the current thread is usually not intended
+	id = strtoul(argv[1], NULL, 0);
+
+	hash_open(sThreadHash, &i);
+
+	while ((thread = hash_next(sThreadHash, &i)) != NULL) {
+		if (thread->id != id)
+			continue;
+
+		if (thread->state == B_THREAD_SUSPENDED) {
+			thread->state = thread->next_state = B_THREAD_READY;
+			scheduler_enqueue_in_run_queue(thread);
+			kprintf("thread 0x%lx resumed\n", thread->id);
+		}
+		break;
+	}
+	if (!thread)
+		kprintf("thread 0x%lx not found\n", id);
+
+	hash_close(sThreadHash, &i, false);
+	return 0;
+}
+
+
+static int
+drop_into_debugger(int argc, char **argv)
+{
+	status_t err;
+	int32 id;
+
+	if (argc > 2) {
+		kprintf("usage: drop [thread-id]\n");
+		return 0;
+	}
+
+	if (argc == 1)
+		id = thread_get_current_thread()->id;
+	else
+		id = strtoul(argv[1], NULL, 0);
+
+	err = _user_debug_thread(id);
+	if (err)
+		kprintf("drop failed\n");
+	else
+		kprintf("thread 0x%lx dropped into user debugger\n", id);
+	
 	return 0;
 }
 
@@ -1570,6 +1636,8 @@ thread_init(kernel_args *args)
 	add_debugger_command("next_team", &dump_next_thread_in_team, "dump the next thread in the team of the last thread viewed");
 	add_debugger_command("unreal", &make_thread_unreal, "set realtime priority threads to normal priority");
 	add_debugger_command("suspend", &make_thread_suspended, "suspend a thread");
+	add_debugger_command("resume", &make_thread_resumed, "resume a thread");
+	add_debugger_command("drop", &drop_into_debugger, "drop a thread into the user-debugger");
 
 	return B_OK;
 }
