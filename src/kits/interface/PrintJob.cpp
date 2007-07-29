@@ -412,8 +412,8 @@ BPrintJob::BeginJob()
 	}
 	
 	// add printer settings message
-	fSetupMessage->RemoveName(PSRV_FIELD_CURRENT_PRINTER);
-	fSetupMessage->AddString(PSRV_FIELD_CURRENT_PRINTER, printer);
+	if (!fSetupMessage->HasString(PSRV_FIELD_CURRENT_PRINTER))
+		fSetupMessage->AddString(PSRV_FIELD_CURRENT_PRINTER, printer);
 	AddSetupSpec();
 
 	// prepare page header 
