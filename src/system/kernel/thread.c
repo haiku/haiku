@@ -529,6 +529,47 @@ make_thread_unreal(int argc, char **argv)
 
 
 static int
+set_thread_prio(int argc, char **argv)
+{
+	struct thread *thread;
+	struct hash_iterator i;
+	int32 id;
+	int32 prio;
+
+	if (argc > 3 || argc < 2) {
+		kprintf("usage: priority <priority> [thread-id]\n");
+		return 0;
+	}
+
+	prio = strtoul(argv[1], NULL, 0);
+	if (prio > B_MAX_PRIORITY)
+		prio = B_MAX_PRIORITY;
+	if (prio < B_MIN_PRIORITY)
+		prio = B_MIN_PRIORITY;
+
+	if (argc > 2)
+		id = strtoul(argv[2], NULL, 0);
+	else
+		id = thread_get_current_thread()->id;
+
+	hash_open(sThreadHash, &i);
+
+	while ((thread = hash_next(sThreadHash, &i)) != NULL) {
+		if (thread->id != id)
+			continue;
+		thread->priority = thread->next_priority = prio;
+		kprintf("thread 0x%lx set to priority %ld\n", id, prio);
+		break;
+	}
+	if (!thread)
+		kprintf("thread 0x%lx not found\n", id);
+
+	hash_close(sThreadHash, &i, false);
+	return 0;
+}
+
+
+static int
 make_thread_suspended(int argc, char **argv)
 {
 	struct thread *thread;
@@ -1638,6 +1679,7 @@ thread_init(kernel_args *args)
 	add_debugger_command("suspend", &make_thread_suspended, "suspend a thread");
 	add_debugger_command("resume", &make_thread_resumed, "resume a thread");
 	add_debugger_command("drop", &drop_into_debugger, "drop a thread into the user-debugger");
+	add_debugger_command("priority", &set_thread_prio, "set a thread priority");
 
 	return B_OK;
 }
