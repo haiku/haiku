@@ -50,7 +50,7 @@
 
 const static float kViewOffset = 3;
 
-#if 0
+/*
 TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	:
 	BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE|B_QUIT_ON_WINDOW_CLOSE),
@@ -76,13 +76,22 @@ TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	fMatchCase(false),
 	fMatchWord(false)
 {
+	
 	fTabView = new SmartTabView(Bounds(), "Tab view");
 	AddChild(fTabView);
 	
 	_NewTab(command);
 	_NewTab(NULL);
+
+	BView *view = new TermView(Bounds());
+	AddChild(view);
+	BRect draggerFrame(0, 0, 16, 16);
+	draggerFrame.OffsetTo(Bounds().RightBottom() - BPoint(16, 16));
+	BDragger *dragger = new BDragger(draggerFrame, view, B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM, B_WILL_DRAW);
+		
+	view->AddChild(dragger);
 }
-#endif
+*/
 
 
 TermWindow::TermWindow(BRect frame, const char* title, const char *command)

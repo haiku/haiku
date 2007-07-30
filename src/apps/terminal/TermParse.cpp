@@ -435,7 +435,7 @@ TermParse::EscParse()
 				cbuf[2] = c;
 				cbuf[3] = '\0';
 				width = CodeConv::UTF8GetFontWidth((char*)cbuf);
-				fView->PutChar (cbuf, attr, width);
+				fView->PutChar(cbuf, attr, width);
 				break;
 
 			case CASE_MBCS:

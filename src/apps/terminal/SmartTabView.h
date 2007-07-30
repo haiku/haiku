@@ -20,7 +20,11 @@ public:
 					B_WILL_DRAW | B_NAVIGABLE_JUMP |
 					B_FRAME_EVENTS | B_NAVIGABLE);
 	virtual ~SmartTabView();
-	virtual	void Select(int32 tab);	
+	virtual	void Select(int32 tab);
+	/*
+	virtual	void AddTab(BView *target, BTab *tab = NULL);
+	virtual BTab* RemoveTab(int32 index);
+	virtual BRect DrawTabs();*/
 
 };
 

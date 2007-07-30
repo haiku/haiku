@@ -44,8 +44,6 @@
 
 #include <new>
 
-using std::nothrow;
-
 // defined VTKeyTbl.c
 extern int function_keycode_table[];
 extern char *function_key_char_table[];
@@ -209,6 +207,7 @@ TermView::TermView(BMessage *archive)
 	fQuitting(false),
 	fIMflag(false)	
 {
+	printf("TermView(BMessage *)\n");
 	if (archive->FindInt32("encoding", (int32 *)&fEncoding) < B_OK)
 		fEncoding = M_UTF8;
 	if (archive->FindInt32("columns", (int32 *)&fTermColumns) < B_OK)
@@ -217,32 +216,38 @@ TermView::TermView(BMessage *archive)
 		fTermRows = 25;
 	
 	// TODO: Retrieve command, colors, history size, etc. from archive
-	_InitObject(NULL);
+	printf("_InitObject() returned %s\n", strerror(_InitObject(NULL)));
 }
 
 
-void
+status_t
 TermView::_InitObject(const char *command)
 {
-	fTextBuffer = new TermBuffer(fTermRows, fTermColumns, fScrBufSize);
-
 	SetTermFont(be_fixed_font, be_fixed_font);
-	
-	//SetIMAware(false);
 
-	fShell = new Shell();	
+	fTextBuffer = new (std::nothrow) TermBuffer(fTermRows, fTermColumns, fScrBufSize);
+	if (fTextBuffer == NULL)
+		return B_NO_MEMORY;
+
+	fShell = new (std::nothrow) Shell();
+	if (fShell == NULL)
+		return B_NO_MEMORY;
+	
 	status_t status = fShell->Open(fTermRows, fTermColumns,
 					command, longname2shortname(id2longname(fEncoding)));	
 	if (status < B_OK)
-		throw status;
+		return status;
 
 	status = AttachShell(fShell);
 	if (status < B_OK)
-		throw status;
+		return status;
 
 	SetTermSize(fTermRows, fTermColumns, false);
+	//SetIMAware(false);
 
 	_InitMouseThread();
+	
+	return B_OK;
 }
 
 
@@ -262,8 +267,11 @@ TermView::~TermView()
 BArchivable *
 TermView::Instantiate(BMessage* data)
 {
+	printf("TermView::Instantiate()\n");
 	if (validate_instantiation(data, "TermView"))
-		return new TermView(data);
+		return new (std::nothrow) TermView(data);
+	
+	printf("Returned NULL\n");	
 	return NULL;
 }
 
@@ -271,17 +279,15 @@ TermView::Instantiate(BMessage* data)
 status_t
 TermView::Archive(BMessage* data, bool deep) const
 {
+	printf("TermView::Archive()\n");
 	status_t status = BView::Archive(data, deep);
-	if (status < B_OK)
-		return status;
-	status = data->AddInt32("encoding", (int32)fEncoding);
-	if (status < B_OK)
-		return status;
-	status = data->AddInt32("columns", (int32)fTermColumns);
-	if (status < B_OK)
-		return status;
-	status = data->AddInt32("rows", (int32)fTermRows);
-	
+	if (status == B_OK)
+		status = data->AddInt32("encoding", (int32)fEncoding);
+	if (status == B_OK)
+		status = data->AddInt32("columns", (int32)fTermColumns);
+	if (status == B_OK)
+		status = data->AddInt32("rows", (int32)fTermRows);
+	printf("Archive() returned %s\n", strerror(status));
 	return status;
 }
 
@@ -1438,7 +1444,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 	if (fIMflag)
 		return;
 
-	// If bytes[0] equal intr charactor,
+	// If bytes[0] equal intr character,
 	// send signal to shell process group.
 	struct termios tio;
 	fShell->GetAttr(tio);
@@ -1448,9 +1454,8 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 	}
 
 	// Terminal changes RET, ENTER, F1...F12, and ARROW key code.
-
 	if (numBytes == 1) {
-		switch (*bytes) {
+		switch (bytes[0]) {
 			case B_RETURN:
 			{
 				char c = 0x0d;
@@ -1537,10 +1542,11 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 	} else {
 		// input multibyte character
 		if (fEncoding != M_UTF8) {
-			uchar dstbuf[1024];
+			uchar destBuffer[1024];
 			int cnum = CodeConv::ConvertFromInternal(bytes, numBytes,
-				(char *)dstbuf, fEncoding);
-			fShell->Write(dstbuf, cnum);
+				(char *)destBuffer, fEncoding);
+			fShell->Write(destBuffer, cnum);
+			destBuffer[cnum] = 0;			
 		}
 	}
 }

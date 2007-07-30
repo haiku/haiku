@@ -32,4 +32,39 @@ SmartTabView::Select(int32 index)
 			view->ResizeTo(Bounds().Width(), Bounds().Height());
 	}
 }
+
+/*
+void
+SmartTabView::AddTab(BView *target, BTab *tab)
+{
+	if (target == NULL)
+		return;
+
+	if (CountTabs() == 1) {
+		
+	} 
+	AddTab(target, tab);
+}
+
+
+BTab *
+SmartTabView::RemoveTab(int32 index)
+{
+	BTab *oldTab = RemoveTab(index);
+	if (CountTabs() == 1) {
+			
+	}
+	return oldTab;
+}
+
+
+BRect
+SmartTabView::DrawTabs()
+{
+	//if (CountTabs() > 1)
+		return BTabView::DrawTabs();
+	//return BRect(0, 0, -1, -1);		
+}
+*/
+
 	

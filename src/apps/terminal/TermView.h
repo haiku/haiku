@@ -66,9 +66,7 @@ public:
 	void	PutNL(int num);
 	void	SetInsertMode(int flag);
 	void	InsertSpace(int num);
-	int	TermDraw(const CurPos &start, const CurPos &end);
-	int	TermDrawRegion(CurPos start, CurPos end);
-	int	TermDrawSelectedRegion(CurPos start, CurPos end);
+	
 		// Delete Charactor
 	void	EraseBelow();
 	void	DeleteChar(int num);
@@ -131,12 +129,16 @@ protected:
 						const char *property);
 
 private:
-	void _InitObject(const char *command);
+	status_t _InitObject(const char *command);
 
 	static int32	MouseTracking(void *);
 
 	status_t	_InitMouseThread(void);
 	void DrawLines(int , int, ushort, uchar *, int, int, int, BView *);
+	int TermDraw(const CurPos &start, const CurPos &end);
+	int TermDrawRegion(CurPos start, CurPos end);
+	int TermDrawSelectedRegion(CurPos start, CurPos end);	
+		
 	void DoPrint(BRect updateRect);
 	void ResizeScrBarRange (void);
 	void DoFileDrop(entry_ref &ref);
@@ -147,7 +149,7 @@ private:
 	void DoSelectAll();
 	void DoClearAll();
 
-	void WritePTY (const uchar *text, int num_byteses);
+	void WritePTY(const uchar *text, int num_byteses);
 
 	// Comunicate Input Method 
 	//  void DoIMStart (BMessage* message);
