@@ -174,7 +174,9 @@ AddSymlinkToHaikuImage beos system lib : libnetwork.so : libnet.so ;
 AddSymlinkToHaikuImage beos system lib : libnetwork.so : libnetapi.so ;
 AddSymlinkToHaikuImage beos system lib : libnetwork.so : libbnetapi.so ;
 # libGL.so have GLUT built-in
+if $(TARGET_ARCH) = x86 {
 AddSymlinkToHaikuImage beos system lib : $(X86_ONLY)libGL.so : libglut.so ;
+}
 
 # servers
 AddFilesToHaikuImage beos system servers : $(BEOS_SYSTEM_SERVERS) ;
@@ -306,6 +308,9 @@ local keymapFiles = [ GLOB [ FDirName $(HAIKU_TOP) src data etc keymaps ]
 	: *.keymap ] ;
 keymapFiles = $(keymapFiles:BG=keymap) ;
 AddFilesToHaikuImage beos etc Keymap : $(keymapFiles) ;
+AddSymlinkToHaikuImage beos etc Keymap : Swedish : Finnish ;
+AddSymlinkToHaikuImage beos etc Keymap : Slovene : Croatian ;
+AddSymlinkToHaikuImage beos etc Keymap : US-International : Brazilian ;
 
 local timezones = [ FTimeZoneBinaries $(HAIKU_TIME_ZONE_SOURCES) : : true ] ;
 for timezone in $(timezones) {

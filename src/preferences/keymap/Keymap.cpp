@@ -86,21 +86,28 @@ status_t
 Keymap::Load(entry_ref &ref)
 {
 	status_t err;
-	
-	BFile file(&ref, B_READ_ONLY);
-	if ((err = file.InitCheck()) != B_OK) {
-		printf("error %s\n", strerror(err));
+	BEntry entry(&ref, true);
+	if ((err = entry.InitCheck()) != B_OK) {
+		fprintf(stderr, "error loading keymap: %s\n", strerror(err));
 		return err;
 	}
 	
-	if (file.Read(&fKeys, sizeof(fKeys)) < (ssize_t)sizeof(fKeys)) {
+	BFile file(&entry, B_READ_ONLY);
+	if ((err = file.InitCheck()) != B_OK) {
+		fprintf(stderr, "error loading keymap: %s\n", strerror(err));
+		return err;
+	}
+	
+	if ((err = file.Read(&fKeys, sizeof(fKeys))) < (ssize_t)sizeof(fKeys)) {
+		fprintf(stderr, "error reading keymap keys: %s\n", strerror(err));
 		return B_BAD_VALUE;
 	}
 	
 	for (uint32 i=0; i<sizeof(fKeys)/4; i++)
 		((uint32*)&fKeys)[i] = B_BENDIAN_TO_HOST_INT32(((uint32*)&fKeys)[i]);
 	
-	if (file.Read(&fCharsSize, sizeof(uint32)) < (ssize_t)sizeof(uint32)) {
+	if ((err = file.Read(&fCharsSize, sizeof(uint32))) < (ssize_t)sizeof(uint32)) {
+		fprintf(stderr, "error reading keymap size: %s\n", strerror(err));
 		return B_BAD_VALUE;
 	}
 	
@@ -109,8 +116,10 @@ Keymap::Load(entry_ref &ref)
 		delete[] fChars;
 	fChars = new char[fCharsSize];
 	err = file.Read(fChars, fCharsSize);
-	
-	return B_OK;
+	if (err < B_OK) {
+		fprintf(stderr, "error reading keymap chars: %s\n", strerror(err));
+	}
+	return err;
 }
 
 
