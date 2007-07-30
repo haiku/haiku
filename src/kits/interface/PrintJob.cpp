@@ -525,6 +525,9 @@ BPrintJob::CanContinue()
 void
 BPrintJob::DrawView(BView *view, BRect rect, BPoint where)
 {
+	if (fSpoolFile == NULL)
+		return;
+
 	if (view == NULL)
 		return;
 	
@@ -718,6 +721,10 @@ BPrintJob::NewPage()
 	// write page header
 	fCurrentPageHeaderOffset = fSpoolFile->Position();
 	fSpoolFile->Write(fCurrentPageHeader, sizeof(*fCurrentPageHeader));
+
+	if (fPageNumber == 1)
+		fCurrentHeader.first_page = fCurrentPageHeaderOffset;
+
 	fPageNumber ++;	
 }
 
@@ -727,8 +734,6 @@ BPrintJob::EndLastPage()
 {
 	fSpoolFile->Seek(0, SEEK_SET);
 	fCurrentHeader.page_count = fPageNumber;
-	// TODO set first_page correctly
-	// fCurrentHeader.first_page = 0;
 	fSpoolFile->Write(&fCurrentHeader, sizeof(fCurrentHeader));}
 
 
