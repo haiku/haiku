@@ -206,7 +206,6 @@ TermView::TermView(BMessage *archive)
 	fQuitting(false),
 	fIMflag(false)	
 {
-	printf("TermView(BMessage *)\n");
 	if (archive->FindInt32("encoding", (int32 *)&fEncoding) < B_OK)
 		fEncoding = M_UTF8;
 	if (archive->FindInt32("columns", (int32 *)&fTermColumns) < B_OK)
@@ -215,7 +214,7 @@ TermView::TermView(BMessage *archive)
 		fTermRows = 25;
 	
 	// TODO: Retrieve command, colors, history size, etc. from archive
-	printf("_InitObject() returned %s\n", strerror(_InitObject(NULL)));
+	_InitObject(NULL);
 }
 
 
@@ -266,11 +265,9 @@ TermView::~TermView()
 BArchivable *
 TermView::Instantiate(BMessage* data)
 {
-	printf("TermView::Instantiate()\n");
 	if (validate_instantiation(data, "TermView"))
 		return new (std::nothrow) TermView(data);
 	
-	printf("Returned NULL\n");	
 	return NULL;
 }
 
@@ -278,15 +275,16 @@ TermView::Instantiate(BMessage* data)
 status_t
 TermView::Archive(BMessage* data, bool deep) const
 {
-	printf("TermView::Archive()\n");
 	status_t status = BView::Archive(data, deep);
+	if (status == B_OK)
+		status = data->AddString("add_on", TERM_SIGNATURE);	
 	if (status == B_OK)
 		status = data->AddInt32("encoding", (int32)fEncoding);
 	if (status == B_OK)
 		status = data->AddInt32("columns", (int32)fTermColumns);
 	if (status == B_OK)
 		status = data->AddInt32("rows", (int32)fTermRows);
-	printf("Archive() returned %s\n", strerror(status));
+	
 	return status;
 }
 

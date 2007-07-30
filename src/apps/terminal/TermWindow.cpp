@@ -50,51 +50,6 @@
 
 const static float kViewOffset = 3;
 
-#if 0
-TermWindow::TermWindow(BRect frame, const char* title, const char *command)
-	:
-	BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE|B_QUIT_ON_WINDOW_CLOSE),
-	fTabView(NULL),
-	fTermView(NULL),	
-	fMenubar(NULL),
-	fFilemenu(NULL),
-	fEditmenu(NULL),
-	fEncodingmenu(NULL),
-	fHelpmenu(NULL),
-	fFontMenu(NULL),
-	fWindowSizeMenu(NULL),
-	fNewFontMenu(NULL),
-	fPrintSettings(NULL),
-	fPrefWindow(NULL),
-	fFindPanel(NULL),
-	fSavedFrame(0, 0, -1, -1),
-	fFindString(""),
-	fFindForwardMenuItem(NULL),
-	fFindBackwardMenuItem(NULL),
-	fFindSelection(false),
-	fForwardSearch(false),
-	fMatchCase(false),
-	fMatchWord(false)
-{
-	
-	fTabView = new SmartTabView(Bounds(), "Tab view");
-	AddChild(fTabView);
-	
-	_NewTab(command);
-	_NewTab(NULL);
-	fTabView->Select(0);
-/*
-	BView *view = new TermView(Bounds());
-	AddChild(view);
-	BRect _WritePTYdraggerFrame(0, 0, 16, 16);
-	draggerFrame.OffsetTo(Bounds().RightBottom() - BPoint(16, 16));
-	BDragger *dragger = new BDragger(draggerFrame, view, B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM, B_WILL_DRAW);
-		
-	view->AddChild(dragger);*/
-}
-#endif
-
-
 TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	: BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE|B_QUIT_ON_WINDOW_CLOSE),
 	fTabView(NULL),
@@ -120,6 +75,14 @@ TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	fMatchWord(false)
 {
 	_InitWindow(command);
+	/*BView *view = new TermView(Bounds());
+	
+	AddChild(view);
+	BRect draggerFrame(0, 0, 16, 16);
+	draggerFrame.OffsetTo(Bounds().RightBottom() - BPoint(16, 16));
+	BDragger *dragger = new BDragger(draggerFrame, view, B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM, B_WILL_DRAW);
+		
+	view->AddChild(dragger);*/
 }
 
 

@@ -149,9 +149,8 @@ TermParse::PtyReader()
 		uchar buf[READ_BUF_SIZE];
 		int nread = read(fFd, buf, READ_BUF_SIZE - (read_p - fBufferPosition));
 		if (nread <= 0) {
-			// TODO: errno ? (Jerome ?) :)
-			fView->NotifyQuit(nread);			
-			exit_thread(B_ERROR);
+			fView->NotifyQuit(errno);			
+			exit_thread(errno);
 		}
 
 		// Copy read string to PtyBuffer.
