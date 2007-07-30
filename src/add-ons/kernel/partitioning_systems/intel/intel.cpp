@@ -1542,7 +1542,7 @@ move_partition(int fd, off_t fromOffset, off_t toOffset, off_t size,
 			return error;
 		fromOffset += buffer_size;
 		toOffset += buffer_size;
-		update_disk_device_job_progress(job, (float)i / cycleCount);
+		update_disk_device_job_progress(job, i * 1.0 / cycleCount);
 	}
 	if (remainingSize)
 		error = move_block(fd, fromOffset, toOffset, buffer, remainingSize);
