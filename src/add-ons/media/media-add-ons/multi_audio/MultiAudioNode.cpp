@@ -1241,7 +1241,7 @@ MultiAudioNode::GetParameterValue(int32 id, bigtime_t* last_change, void* value,
 				}
 				
 				for(uint32 i=0; i < (*ioSize/sizeof(float)); i++) {
-					PRINT(("B_CONTINUOUS_PARAMETER value[%i] : %f\n", i, ((float*)value)[i]));
+					PRINT(("GetParameterValue B_CONTINUOUS_PARAMETER value[%i] : %f\n", i, ((float*)value)[i]));
 				}
 			} else if(parameter->Type() == BParameter::B_DISCRETE_PARAMETER) {
 			
@@ -1254,7 +1254,7 @@ MultiAudioNode::GetParameterValue(int32 id, bigtime_t* last_change, void* value,
 				*ioSize = sizeof(int32);
 				
 				for(uint32 i=0; i < (*ioSize/sizeof(int32)); i++) {
-					PRINT(("B_DISCRETE_PARAMETER value[%i] : %i\n", i, ((int32*)value)[i]));
+					PRINT(("GetParameterValue B_DISCRETE_PARAMETER value[%i] : %i\n", i, ((int32*)value)[i]));
 				}
 			}
 		
@@ -1284,7 +1284,7 @@ MultiAudioNode::SetParameterValue(int32 id, bigtime_t performance_time, const vo
 		
 		if(parameter->Type() == BParameter::B_CONTINUOUS_PARAMETER) {
 			for(uint32 i=0; i < (size/sizeof(float)); i++) {
-				PRINT(("B_CONTINUOUS_PARAMETER value[%i] : %f\n", i, ((float*)value)[i]));
+				PRINT(("SetParameterValue B_CONTINUOUS_PARAMETER value[%i] : %f\n", i, ((float*)value)[i]));
 			}
 			MMVI.item_count = 1;
 			MMV[0].id = id;
@@ -1298,7 +1298,7 @@ MultiAudioNode::SetParameterValue(int32 id, bigtime_t performance_time, const vo
 			
 		} else if(parameter->Type() == BParameter::B_DISCRETE_PARAMETER) {
 			for(uint32 i=0; i < (size/sizeof(int32)); i++) {
-				PRINT(("B_DISCRETE_PARAMETER value[%i] : %i\n", i, ((int32*)value)[i]));
+				PRINT(("SetParameterValue B_DISCRETE_PARAMETER value[%i] : %i\n", i, ((int32*)value)[i]));
 			}
 			BDiscreteParameter *dparameter = (BDiscreteParameter*) parameter;
 			
@@ -1445,10 +1445,12 @@ int32
 MultiAudioNode::RunThread()
 {
 	CALLED();
-	multi_buffer_info		MBI;//, oldMBI;
+	multi_buffer_info		MBI;
 	MBI.info_size = sizeof(MBI);
 	MBI._reserved_0 = 0;
 	MBI._reserved_1 = 2;
+	MBI.playback_buffer_cycle = 0;
+	MBI.record_buffer_cycle = 0;
 	
 	while ( 1 ) {
 		//acquire buffer if any
@@ -1456,8 +1458,6 @@ MultiAudioNode::RunThread()
 			return B_OK;
 		}
 				
-		//oldMBI = MBI;
-		
 		//send buffer
 		fDevice->DoBufferExchange(&MBI);
 		
@@ -1471,11 +1471,13 @@ MultiAudioNode::RunThread()
 		for(int32 i=0; i<fInputs.CountItems(); i++) {
 			input = (node_input *)fInputs.ItemAt(i);
 			
-			if((MBI._reserved_0 == input->fChannelId)
+			if ((MBI._reserved_0 == input->fChannelId)
+				&& MBI.playback_buffer_cycle >= 0
+				&& MBI.playback_buffer_cycle < fDevice->MBL.return_playback_buffers
 				&& (input->fOldMBI.playback_buffer_cycle != MBI.playback_buffer_cycle 
-				|| fDevice->MBL.return_playback_buffers == 1)
+					|| fDevice->MBL.return_playback_buffers == 1)
 				&& (input->fInput.source != media_source::null 
-				|| input->fChannelId == 0)) {
+					|| input->fChannelId == 0)) {
 				
 				//PRINT(("playback_buffer_cycle ok input : %i %d\n", i, MBI.playback_buffer_cycle));
 				
@@ -1491,8 +1493,6 @@ MultiAudioNode::RunThread()
 				input->fOldMBI = MBI;
 				
 				if(input->fBuffer!=NULL) {
-					/*memcpy( fDevice->MBL.playback_buffers[input->fBufferCycle][input->fChannelId].base, 
-						input->fBuffer->Data(), input->fBuffer->SizeUsed() );*/
 					FillNextBuffer(*input, input->fBuffer);
 					input->fBuffer->Recycle();
 					input->fBuffer = NULL;
@@ -1516,7 +1516,9 @@ MultiAudioNode::RunThread()
 			
 			// make sure we're both started *and* connected before delivering a buffer		
 			if ((RunState() == BMediaEventLooper::B_STARTED) && (output->fOutput.destination != media_destination::null)) {
-				if((MBI._reserved_1 == output->fChannelId)
+				if ((MBI._reserved_1 == output->fChannelId)
+					&& MBI.record_buffer_cycle >= 0
+					&& MBI.record_buffer_cycle < fDevice->MBL.return_record_buffers
 					&& (output->fOldMBI.record_buffer_cycle != MBI.record_buffer_cycle 
 					|| fDevice->MBL.return_record_buffers == 1)) {
 					//PRINT(("record_buffer_cycle ok\n"));
