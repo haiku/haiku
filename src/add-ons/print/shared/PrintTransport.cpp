@@ -129,5 +129,5 @@ bool PrintTransport::IsPrintToFileCanceled() const
 	// The BeOS "Print To File" transport add-on returns a non-NULL BDataIO *
 	// even after user filepanel cancellation!
 	BFile* file = dynamic_cast<BFile*>(fDataIO);
-	return file != NULL && file->InitCheck() != B_OK;
+	return fDataIO == NULL || file != NULL && file->InitCheck() != B_OK;
 }
