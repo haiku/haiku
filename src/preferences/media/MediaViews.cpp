@@ -231,6 +231,16 @@ SettingsItem::SettingsItem(dormant_node_info *info, BMessage *message,
 	
 }
 
+
+status_t
+SettingsItem::Invoke(BMessage *message)
+{
+	if (IsMarked())
+		return B_OK;
+	return BMenuItem::Invoke(message);
+}
+
+
 Settings2Item::Settings2Item(dormant_node_info *info, media_input *input, BMessage *message, 
 			char shortcut, uint32 modifiers)
 	: BMenuItem(input->name, message, shortcut, modifiers),
@@ -240,8 +250,18 @@ Settings2Item::Settings2Item(dormant_node_info *info, media_input *input, BMessa
 	
 }
 
+
 Settings2Item::~Settings2Item()
 {
 	delete fInput;
+}
+
+
+status_t
+Settings2Item::Invoke(BMessage *message)
+{
+	if (IsMarked())
+		return B_OK;
+	return BMenuItem::Invoke(message);
 }
 

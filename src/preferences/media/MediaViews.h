@@ -41,6 +41,7 @@ class SettingsItem : public BMenuItem
 		SettingsItem(dormant_node_info *info, BMessage *message, 
 			char shortcut = 0, uint32 modifiers = 0);
 		dormant_node_info *fInfo;
+		virtual status_t Invoke(BMessage *message = NULL);
 };
 
 class Settings2Item : public BMenuItem
@@ -48,7 +49,8 @@ class Settings2Item : public BMenuItem
 	public:
 		Settings2Item(dormant_node_info *info, media_input *input, BMessage *message, 
 			char shortcut = 0, uint32 modifiers = 0);
-		~Settings2Item();
+		virtual ~Settings2Item();
+		virtual status_t Invoke(BMessage *message = NULL);
 		dormant_node_info *fInfo;
 		media_input *fInput;
 };
