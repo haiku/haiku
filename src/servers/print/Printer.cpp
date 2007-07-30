@@ -463,33 +463,20 @@ bool Printer::HasCurrentPrinter(BString& name) {
 // Try to move job to another printer folder.
 //
 // Parameters:
-//    name - the printer name.
+//    name - the printer folder name.
 //
 // Returns:
 //    true if successful.
 // ---------------------------------------------------------------
 bool Printer::MoveJob(const BString& name) {
+	BPath file(&fJob->EntryRef());
 	BPath path;
-	if (::find_directory(B_USER_PRINTERS_DIRECTORY, &path) != B_OK) 
-		return false;
-			
-	// search printer folder with given name
-	BDirectory printersFolder(path.Path());
-	BEntry printerEntry;
-	while (printersFolder.GetNextEntry(&printerEntry) == B_OK) {
-		BNode printerNode(&printerEntry);
-		BString printerName;
-		if (printerNode.ReadAttrString(PSRV_PRINTER_ATTR_PRT_NAME, &printerName) != B_OK)
-			continue;
-		if (name != printerName)
-			continue;
-
-		BEntry jobEntry(&fJob->EntryRef());
-		BDirectory printerDirectory(&printerEntry);
-		return jobEntry.MoveTo(&printerDirectory) == B_OK;
-			// try to move job file to proper directory
-	}
-	return false;
+	file.GetParent(&path);
+	path.Append(".."); path.Append(name.String());
+	BDirectory dir(path.Path());
+	BEntry entry(&fJob->EntryRef());
+		// try to move job file to proper directory
+	return entry.MoveTo(&dir) == B_OK;
 }
 
 // ---------------------------------------------------------------
