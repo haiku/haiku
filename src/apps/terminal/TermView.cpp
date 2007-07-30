@@ -213,8 +213,11 @@ TermView::TermView(BMessage *archive)
 	if (archive->FindInt32("rows", (int32 *)&fTermRows) < B_OK)
 		fTermRows = 25;
 	
-	// TODO: Retrieve command, colors, history size, etc. from archive
-	_InitObject(NULL);
+	const char *command = NULL;
+	archive->FindString("command", &command);
+
+	// TODO: Retrieve colors, history size, etc. from archive
+	_InitObject(command);
 }
 
 
@@ -1882,6 +1885,11 @@ TermView::_WritePTY(const uchar *text, int numBytes)
 void
 TermView::MouseDown(BPoint where)
 {
+	// TODO: Get rid of the extra thread for mouse tracking,
+	// and implement it using something like BTextView uses.
+	if (!IsFocus())
+		MakeFocus();
+
 	int32 buttons;
 	Window()->CurrentMessage()->FindInt32("buttons", &buttons); 
 
