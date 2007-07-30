@@ -43,17 +43,21 @@ _BZombieReplicantView_::MessageReceived(BMessage *msg)
 		case B_ABOUT_REQUESTED:
 		{
 			const char *addOn = NULL;
-			char description[B_MIME_TYPE_LENGTH] = { '\0' };
+			char error[1024];
 			if (fArchive->FindString("add_on", &addOn) == B_OK) {
+				char description[B_MIME_TYPE_LENGTH] = "";				
 				BMimeType type(addOn);
 				type.GetShortDescription(description);
+				snprintf(error, sizeof(error),
+					"Cannot create the replicant for \"%s\". (%s)",
+				description, strerror(fError));
+			} else {
+				snprintf(error, sizeof(error),
+					"Cannot locate the application for the replicant. "
+					"No application signature supplied. (%s)", strerror(fError));
 			}
 
-			char error[1024];
-			snprintf(error, sizeof(error),
-				"Can't create the \"%s\" replicant because the library is in the Trash. (%s)",
-				description, strerror(fError));
-			
+						
 			BAlert *alert = new (std::nothrow) BAlert("Error", error, "OK", NULL, NULL,
 								B_WIDTH_AS_USUAL, B_STOP_ALERT);
 			if (alert != NULL)
