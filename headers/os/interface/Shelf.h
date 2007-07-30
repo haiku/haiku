@@ -99,6 +99,8 @@ class BShelf : public BHandler {
 		status_t			_AddReplicant(BMessage* data,
 								BPoint* location, uint32 uniqueID);
 		status_t			_GetProperty(BMessage* message, BMessage* reply);
+		
+		static BArchivable*		_InstantiateObject(BMessage *archive, image_id *image);
 
 	private:
 		BView*				fContainerView;

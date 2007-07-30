@@ -1140,7 +1140,7 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 	
 	// Instantiate the object, if this fails we have a zombie
 	image_id image;
-	BArchivable *archivable = instantiate_object(data, &image);
+	BArchivable *archivable = _InstantiateObject(data, &image);
 	if (archivable) {
 		BView *view = dynamic_cast<BView*>(archivable);
 		BPoint point;
@@ -1157,7 +1157,7 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 		if (data->FindMessage("__widget", &widget) == B_OK) {
 			image_id draggerImage = B_ERROR;
 			replicant = view;
-			dragger = dynamic_cast<BDragger*>(instantiate_object(&widget, &draggerImage));
+			dragger = dynamic_cast<BDragger*>(_InstantiateObject(&widget, &draggerImage));
 			if (dragger != NULL) {
 				// Replicant is either a sibling or unknown
 				dragger->_SetViewToDrag(replicant);
@@ -1325,3 +1325,19 @@ BShelf::_GetProperty(BMessage *msg, BMessage *reply)
 
 	return err;
 }
+
+
+/* static */
+BArchivable *
+BShelf::_InstantiateObject(BMessage *archive, image_id *image)
+{
+	// Stay on the safe side. The constructor called by instantiate_object
+	// could throw an exception, which we catch here. Otherwise our calling app
+	// could die without notice.
+	try {
+		return instantiate_object(archive, image);
+	} catch (...) {
+		return NULL;
+	}
+}
+
