@@ -1,0 +1,9 @@
+# Settings file for the es1370 driver 
+#
+# This file should be moved to the directory
+# ~/config/settings/kernel/drivers/
+#
+
+#sample_rate	48000
+#buffer_frames	512
+#buffer_count	2

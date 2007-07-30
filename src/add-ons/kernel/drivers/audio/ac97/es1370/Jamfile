@@ -1,0 +1,14 @@
+SubDir HAIKU_TOP src add-ons kernel drivers audio ac97 es1370 ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders media ;
+
+KernelAddon es1370 :
+	debug.c
+	es1370.c
+	io.c
+	multi.c
+	util.c
+;
+
