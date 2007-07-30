@@ -17,7 +17,6 @@
 #include <signal.h>
 #include <unistd.h>
 
-#include <Application.h>
 #include <Beep.h>
 #include <Message.h>
 #include <Window.h>
@@ -150,7 +149,8 @@ TermParse::PtyReader()
 		uchar buf[READ_BUF_SIZE];
 		int nread = read(fFd, buf, READ_BUF_SIZE - (read_p - fBufferPosition));
 		if (nread <= 0) {
-			be_app->PostMessage(B_QUIT_REQUESTED);
+			// TODO: errno ? (Jerome ?) :)
+			fView->NotifyQuit(nread);			
 			exit_thread(B_ERROR);
 		}
 

@@ -50,7 +50,7 @@
 
 const static float kViewOffset = 3;
 
-/*
+#if 0
 TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	:
 	BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE|B_QUIT_ON_WINDOW_CLOSE),
@@ -82,16 +82,17 @@ TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	
 	_NewTab(command);
 	_NewTab(NULL);
-
+	fTabView->Select(0);
+/*
 	BView *view = new TermView(Bounds());
 	AddChild(view);
-	BRect draggerFrame(0, 0, 16, 16);
+	BRect _WritePTYdraggerFrame(0, 0, 16, 16);
 	draggerFrame.OffsetTo(Bounds().RightBottom() - BPoint(16, 16));
 	BDragger *dragger = new BDragger(draggerFrame, view, B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM, B_WILL_DRAW);
 		
-	view->AddChild(dragger);
+	view->AddChild(dragger);*/
 }
-*/
+#endif
 
 
 TermWindow::TermWindow(BRect frame, const char* title, const char *command)

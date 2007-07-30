@@ -110,6 +110,8 @@ public:
 	bool	Find(const BString &str, bool forwardSearch, bool matchCase, bool matchWord);
 	void	GetSelection(BString &str);
 
+	void	NotifyQuit(int32 reason);
+
 protected:
 	virtual void	AttachedToWindow();
 	virtual void	DetachedFromWindow();
@@ -130,58 +132,58 @@ protected:
 
 private:
 	status_t _InitObject(const char *command);
-
-	static int32	MouseTracking(void *);
-
-	status_t	_InitMouseThread(void);
-	void DrawLines(int , int, ushort, uchar *, int, int, int, BView *);
-	int TermDraw(const CurPos &start, const CurPos &end);
-	int TermDrawRegion(CurPos start, CurPos end);
-	int TermDrawSelectedRegion(CurPos start, CurPos end);	
+	status_t _InitMouseThread(void);
+	void _DrawLines(int , int, ushort, uchar *, int, int, int, BView *);
+	int _TermDraw(const CurPos &start, const CurPos &end);
+	int _TermDrawRegion(CurPos start, CurPos end);
+	int _TermDrawSelectedRegion(CurPos start, CurPos end);	
 		
-	void DoPrint(BRect updateRect);
-	void ResizeScrBarRange (void);
-	void DoFileDrop(entry_ref &ref);
+	void _DoPrint(BRect updateRect);
+	void _ResizeScrBarRange (void);
+	void _DoFileDrop(entry_ref &ref);
 
 	// edit menu function.
-	void DoCopy();
-	void DoPaste();
-	void DoSelectAll();
-	void DoClearAll();
+	void _DoCopy();
+	void _DoPaste();
+	void _DoSelectAll();
+	void _DoClearAll();
 
-	void WritePTY(const uchar *text, int num_byteses);
+	void _WritePTY(const uchar *text, int num_byteses);
 
 	// Comunicate Input Method 
-	//  void DoIMStart (BMessage* message);
-	//  void DoIMStop (BMessage* message);
-	//  void DoIMChange (BMessage* message);
-	//  void DoIMLocation (BMessage* message);
-	//  void DoIMConfirm (void);
-	void ConfirmString (const char *, int32);
-	int32 GetCharFromUTF8String (const char *, char *);
-	int32 GetWidthFromUTF8String (const char *);
+	//  void _DoIMStart (BMessage* message);
+	//  void _DoIMStop (BMessage* message);
+	//  void _DoIMChange (BMessage* message);
+	//  void _DoIMLocation (BMessage* message);
+	//  void _DoIMConfirm (void);
+	void _ConfirmString (const char *, int32);
+	int32 _GetCharFromUTF8String (const char *, char *);
+	int32 _GetWidthFromUTF8String (const char *);
 
 	// Mouse select
-	void	Select(CurPos start, CurPos end);
-	void	AddSelectRegion(CurPos);
-	void	ResizeSelectRegion(CurPos);
+	void _Select(CurPos start, CurPos end);
+	void _AddSelectRegion(CurPos);
+	void _ResizeSelectRegion(CurPos);
 
-	void	DeSelect();
-	bool	HasSelection() const;
+	void _DeSelect();
+	bool _HasSelection() const;
 
 	// select word function
-	void  SelectWord(BPoint where, int mod); 
-	void  SelectLine(BPoint where, int mod);
+	void _SelectWord(BPoint where, int mod); 
+	void _SelectLine(BPoint where, int mod);
 
 	// point and text offset conversion.
-	CurPos  BPointToCurPos(const BPoint &p);
-	BPoint  CurPosToBPoint(const CurPos &pos);
+	CurPos _BPointToCurPos(const BPoint &p);
+	BPoint _CurPosToBPoint(const CurPos &pos);
 
-	bool	CheckSelectedRegion(const CurPos &pos);
-	inline void Redraw(int, int, int, int);
+	bool _CheckSelectedRegion(const CurPos &pos);
+	inline void _Redraw(int, int, int, int);
 
 	void _UpdateSIGWINCH();
 	static void _FixFontAttributes(BFont &font);
+
+	static int32 _MouseTrackingEntryFunction(void *);
+	int32 _MouseTracking();
 
 	Shell *fShell;
 
