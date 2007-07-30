@@ -339,6 +339,7 @@ create_device(const usb_device *dev, const usb_interface_info *ii,
 	device->open = 0;
 	device->open_fds = NULL;
 	device->active = true;
+	device->unplugged = false;
 	device->insns = NULL;
 	device->num_insns = 0;
 	device->flags = 0;
@@ -584,7 +585,7 @@ usb_callback(void *cookie, uint32 busStatus,
 	hid_device_info *device = cookie;
 	status_t status;
 
-	if (device == NULL)
+	if (device == NULL || device->unplugged)
 		return;
 
 	acquire_sem(device->sem_lock);
@@ -849,6 +850,8 @@ hid_device_removed(void *cookie)
 	assert (cookie != NULL);
 
 	DPRINTF_INFO((MY_ID "device_removed(%s)\n", device->name));
+	
+	device->unplugged = true;
 	usb->cancel_queued_transfers (device->ept->handle);
 	remove_device_info(device);
 

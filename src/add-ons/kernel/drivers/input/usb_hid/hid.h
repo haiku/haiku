@@ -68,6 +68,7 @@ typedef struct hid_device_info {
 	struct ring_buffer *rbuf;
 
 	bool active;
+	bool unplugged;
 	int open;
 	struct driver_cookie *open_fds;
 
