@@ -1432,6 +1432,7 @@ TermView::_DoPrint(BRect updateRect)
 void
 TermView::WindowActivated(bool active)
 {
+	BView::WindowActivated(active);
 	if (active == false) {
 		// DoIMConfirm();
 	}
@@ -1457,35 +1458,49 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 			fShell->Signal(SIGINT);
 	}
 
-	// Terminal changes RET, ENTER, F1...F12, and ARROW key code.
+	// Terminal filters RET, ENTER, F1...F12, and ARROW key code.
+	// TODO: Cleanup
 	if (numBytes == 1) {
-		switch (bytes[0]) {
+		switch (*bytes) {
 			case B_RETURN:
-			{
-				char c = 0x0d;
-				fShell->Write(&c, 1);
+				if (key == RETURN_KEY || key == ENTER_KEY) {
+					char c = 0x0d;
+					fShell->Write(&c, 1);
+					return;
+				} else {
+					fShell->Write(bytes, numBytes);
+					return;
+				}
 				break;
-			}
+			
 			case B_LEFT_ARROW:
-				fShell->Write(LEFT_ARROW_KEY_CODE, sizeof(LEFT_ARROW_KEY_CODE)-1);
+				if (key == LEFT_ARROW_KEY) {
+					fShell->Write(LEFT_ARROW_KEY_CODE, sizeof(LEFT_ARROW_KEY_CODE) - 1);
+					return;
+				}
 				break;
 
 			case B_RIGHT_ARROW:
-				fShell->Write(RIGHT_ARROW_KEY_CODE, sizeof(RIGHT_ARROW_KEY_CODE)-1);
+				if (key == RIGHT_ARROW_KEY) {
+					fShell->Write(RIGHT_ARROW_KEY_CODE, sizeof(RIGHT_ARROW_KEY_CODE) - 1);
+					return;
+				}
 				break;
 
 			case B_UP_ARROW:
 				if (mod & B_SHIFT_KEY) {
-					if (Bounds().top <= 0)
-						return;
-					ScrollBy(0, -fFontHeight);
-					Window()->UpdateIfNeeded();
+					if (Bounds().top > 0) {
+						ScrollBy(0, -fFontHeight);
+						Window()->UpdateIfNeeded();
+					}
 					return;
 				}
-
-				fShell->Write(UP_ARROW_KEY_CODE, sizeof(UP_ARROW_KEY_CODE)-1);
+				if (key == UP_ARROW_KEY) {
+					fShell->Write(UP_ARROW_KEY_CODE, sizeof(UP_ARROW_KEY_CODE) - 1);
+					return;
+				}
 				break;
-
+	 
 			case B_DOWN_ARROW:
 				if (mod & B_SHIFT_KEY) {
 					ScrollBy(0, fFontHeight);
@@ -1493,27 +1508,45 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 					return;
 				}
 
-				fShell->Write(DOWN_ARROW_KEY_CODE, sizeof(DOWN_ARROW_KEY_CODE)-1);
+				if (key == DOWN_ARROW_KEY) {
+					fShell->Write(DOWN_ARROW_KEY_CODE, sizeof(DOWN_ARROW_KEY_CODE) - 1);
+					return;
+				}
 				break;
 
 			case B_INSERT:
-				fShell->Write(INSERT_KEY_CODE, sizeof(INSERT_KEY_CODE)-1);
+				if (key == INSERT_KEY) {
+					fShell->Write(INSERT_KEY_CODE, sizeof(INSERT_KEY_CODE) - 1);
+					return;
+				}
 				break;
 
 			case B_HOME:
-				fShell->Write(HOME_KEY_CODE, sizeof(HOME_KEY_CODE)-1);
+				if (key == HOME_KEY) {
+					fShell->Write(HOME_KEY_CODE, sizeof(HOME_KEY_CODE) - 1);
+					return;
+				}
+				break;
+
+			case B_END:
+				if (key == END_KEY) {
+					fShell->Write(END_KEY_CODE, sizeof(END_KEY_CODE) - 1);
+					return;
+				}
 				break;
 
 			case B_PAGE_UP:
 				if (mod & B_SHIFT_KEY) {
-					if (Bounds().top <= 0)
-						return;
-					ScrollBy(0, -fFontHeight * fTermRows );
-					Window()->UpdateIfNeeded();
+					if (Bounds().top > 0) {
+						ScrollBy(0, -fFontHeight * fTermRows );
+						Window()->UpdateIfNeeded();
+					}					
 					return;
 				}
-
-				fShell->Write(PAGE_UP_KEY_CODE, sizeof(PAGE_UP_KEY_CODE)-1);
+				if (key == PAGE_UP_KEY) {
+					fShell->Write(PAGE_UP_KEY_CODE, sizeof(PAGE_UP_KEY_CODE) - 1);
+					return;
+				}
 				break;
 
 			case B_PAGE_DOWN:
@@ -1522,37 +1555,37 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 					Window()->UpdateIfNeeded();
 					return;
 				}
-
-				fShell->Write(PAGE_DOWN_KEY_CODE, sizeof(PAGE_DOWN_KEY_CODE)-1);
-				break;
-
-			case B_END:
-				fShell->Write(END_KEY_CODE, sizeof(END_KEY_CODE)-1);
+	 
+				if (key == PAGE_DOWN_KEY) {
+					fShell->Write(PAGE_DOWN_KEY_CODE, sizeof(PAGE_DOWN_KEY_CODE) - 1);
+					return;
+				}
 				break;
 
 			case B_FUNCTION_KEY:
-				for (int32 c = 0; c < 12; c++) {
-					if (key == function_keycode_table[c]) {
-						fShell->Write(function_key_char_table[c], 5);
+				// TODO: Why not just fShell->Write(key) ?
+				for (int32 i = 0; i < 12; i++) {
+					if (key == function_keycode_table[i]) {
+						fShell->Write(function_key_char_table[i], 5);
 						return;
 					}
 				}
 				break;
-
 			default:
-				fShell->Write(bytes, numBytes);
 				break;
 		}
 	} else {
 		// input multibyte character
 		if (fEncoding != M_UTF8) {
-			uchar destBuffer[1024];
+			char destBuffer[16];
 			int cnum = CodeConv::ConvertFromInternal(bytes, numBytes,
 				(char *)destBuffer, fEncoding);
 			fShell->Write(destBuffer, cnum);
-			destBuffer[cnum] = 0;			
+			return;
 		}
 	}
+
+	fShell->Write(bytes, numBytes);
 }
 
 
