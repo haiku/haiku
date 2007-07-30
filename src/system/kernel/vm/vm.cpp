@@ -4073,7 +4073,17 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table, long 
 area_id
 area_for(void *address)
 {
-	return vm_area_for(vm_kernel_address_space_id(), (addr_t)address);
+	team_id space;
+
+	if (IS_USER_ADDRESS(address)) {
+		// we try the user team address space, if any
+		space = vm_current_user_address_space_id();
+		if (space < B_OK)
+			return space;
+	} else
+		space = vm_kernel_address_space_id();
+
+	return vm_area_for(space, (addr_t)address);
 }
 
 
