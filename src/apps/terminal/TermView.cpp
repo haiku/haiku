@@ -20,7 +20,7 @@
 #include "VTkeymap.h"
 
 #include <Application.h>
-#include <Autolock.h>
+#include <Alert.h>
 #include <Beep.h>
 #include <Clipboard.h>
 #include <Debug.h>
@@ -1620,6 +1620,11 @@ TermView::MessageReceived(BMessage *msg)
 	char *ctrl_l = "";
 
 	switch (msg->what){
+		case B_ABOUT_REQUESTED:
+			// (replicant) about box requested 
+			_AboutRequested();
+			break;
+
 		case B_SIMPLE_DATA:
 		{
 			int32 i = 0;
@@ -2473,4 +2478,17 @@ TermView::_FixFontAttributes(BFont &font)
 	font.SetSpacing(B_FIXED_SPACING);
 }
 
- 
+
+void
+TermView::_AboutRequested()
+{
+	BAlert *alert = new (std::nothrow) BAlert("about",
+					"Terminal\n"
+					"\twritten by Kazuho Okui and Takashi Murai\n"
+					"\tupdated by Kian Duffy and others\n\n"
+					"\tCopyright " B_UTF8_COPYRIGHT "2003-2007, Haiku.\n", "Ok");
+	if (alert != NULL)
+		alert->Go();
+}
+
+

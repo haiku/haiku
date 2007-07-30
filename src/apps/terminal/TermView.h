@@ -23,6 +23,7 @@
 #define CUROFF 0
 #define CURON  1
 
+
 class BMessageRunner;
 class BPopUpMenu;
 class BScrollBar;
@@ -133,11 +134,15 @@ protected:
 private:
 	status_t _InitObject(const char *command);
 	status_t _InitMouseThread(void);
+
+	void _AboutRequested();
+
 	void _DrawLines(int , int, ushort, uchar *, int, int, int, BView *);
 	int _TermDraw(const CurPos &start, const CurPos &end);
 	int _TermDrawRegion(CurPos start, CurPos end);
 	int _TermDrawSelectedRegion(CurPos start, CurPos end);	
-		
+	inline void _Redraw(int, int, int, int);
+	
 	void _DoPrint(BRect updateRect);
 	void _ResizeScrBarRange (void);
 	void _DoFileDrop(entry_ref &ref);
@@ -177,11 +182,12 @@ private:
 	BPoint _CurPosToBPoint(const CurPos &pos);
 
 	bool _CheckSelectedRegion(const CurPos &pos);
-	inline void _Redraw(int, int, int, int);
+	
 
 	void _UpdateSIGWINCH();
-	static void _FixFontAttributes(BFont &font);
 
+	static void _FixFontAttributes(BFont &font);
+	
 	static int32 _MouseTrackingEntryFunction(void *);
 	int32 _MouseTracking();
 
