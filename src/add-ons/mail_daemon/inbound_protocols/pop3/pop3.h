@@ -27,26 +27,27 @@ class POP3Protocol : public SimpleMailProtocol {
 	size_t MailDropSize(void);
 
 protected:
-	status_t RetrieveInternal(const char *command,int32 message, BPositionIO *write_to, bool show_progress);
-	
+	status_t RetrieveInternal(const char *command, int32 message,
+		BPositionIO *writeTo, bool showProgress);
+
 	int32 ReceiveLine(BString &line);
 	status_t SendCommand(const char* cmd);
-	void MD5Digest (unsigned char *in, char *out); // MD5 Digest
-	
+	void MD5Digest(unsigned char *in, char *out);
+
 private:
-	int				conn;
+	int				fSocket;
 	BString			fLog;
 	int32			fNumMessages;
 	size_t			fMailDropSize;
-	BList			sizes;
-        
-        #ifdef USESSL
-                SSL_CTX *ctx;
-                SSL *ssl;
-                BIO *sbio;
-                
-                bool use_ssl;
-        #endif
+	BList			fSizes;
+
+#ifdef USESSL
+	SSL_CTX*		fSSLContext;
+	SSL*			fSSL;
+	BIO*			fSSLBio;
+
+	bool			fUseSSL;
+#endif
 };
 
 #endif	/* ZOIDBERG_POP3_H */

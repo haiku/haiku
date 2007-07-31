@@ -1,7 +1,11 @@
-/* POP3Protocol - implementation of the POP3 protocol
-**
-** Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
-*/
+/* 
+ * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
+ * Copyright 2007, Haiku Inc. All Rights Reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
+
+//! POP3Protocol - implementation of the POP3 protocol
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -35,19 +39,18 @@
 
 #include "pop3.h"
 
-#define POP3_RETRIEVAL_TIMEOUT 60000000
+#define POP3_RETRIEVAL_TIMEOUT 30000000
 #define CRLF	"\r\n"
 
-#define pop3_error(string) runner->ShowError(string)
 
 POP3Protocol::POP3Protocol(BMessage *settings, BMailChainRunner *status)
 	: SimpleMailProtocol(settings,status),
 	fNumMessages(-1),
 	fMailDropSize(0)
 {
-    #ifdef USESSL
-		use_ssl = (settings->FindInt32("flavor") == 1);
-	#endif
+#ifdef USESSL
+	fUseSSL = (settings->FindInt32("flavor") == 1);
+#endif
 	Init();
 }
 
@@ -55,25 +58,23 @@ POP3Protocol::POP3Protocol(BMessage *settings, BMailChainRunner *status)
 POP3Protocol::~POP3Protocol()
 {
 #ifdef USESSL
-	if( (use_ssl && ssl) || !use_ssl)
-		SendCommand("QUIT" CRLF);
-#else
-	SendCommand("QUIT" CRLF);
+	if (!fUseSSL || fSSL)
 #endif
+	SendCommand("QUIT" CRLF);
 
 #ifdef USESSL
-	if(use_ssl) {
-		if(ssl)
-			SSL_shutdown(ssl);
-		if(ctx)
-			SSL_CTX_free(ctx);
+	if (fUseSSL) {
+		if (fSSL)
+			SSL_shutdown(fSSL);
+		if (fSSLContext)
+			SSL_CTX_free(fSSLContext);
 	}
 #endif
 
 #ifndef HAIKU_TARGET_PLATFORM_BEOS
-	close(conn);
+	close(fSocket);
 #else	
-	closesocket(conn);
+	closesocket(fSocket);
 #endif
 }
 
@@ -81,14 +82,16 @@ POP3Protocol::~POP3Protocol()
 status_t
 POP3Protocol::Open(const char *server, int port, int)
 {
-	runner->ReportProgress(0,0,MDR_DIALECT_CHOICE ("Connecting to POP3 Server...","POP3サーバに接続しています..."));
+	runner->ReportProgress(0, 0, MDR_DIALECT_CHOICE("Connecting to POP3 Server...",
+		"POP3サーバに接続しています..."));
 
-	if (port <= 0)
-		#ifdef USESSL
-			port = use_ssl ? 995 : 110;
-		#else
-			port = 110;
-		#endif
+	if (port <= 0) {
+#ifdef USESSL
+		port = fUseSSL ? 995 : 110;
+#else
+		port = 110;
+#endif
+	}
 
 	fLog = "";
 
@@ -106,74 +109,73 @@ POP3Protocol::Open(const char *server, int port, int)
 
 	if (hostIP == 0) {
 		error_msg << MDR_DIALECT_CHOICE (": Connection refused or host not found",": ：接続が拒否されたかサーバーが見つかりません");
-		pop3_error(error_msg.String());
+		runner->ShowError(error_msg.String());
 
 		return B_NAME_NOT_FOUND;
 	}
 	
 #ifndef HAIKU_TARGET_PLATFORM_BEOS
-	conn = socket(AF_INET, SOCK_STREAM, 0);
+	fSocket = socket(AF_INET, SOCK_STREAM, 0);
 #else
-	conn = socket(AF_INET, 2, 0);
+	fSocket = socket(AF_INET, 2, 0);
 #endif
-	if (conn >= 0) {
+	if (fSocket >= 0) {
 		struct sockaddr_in saAddr;
 		memset(&saAddr, 0, sizeof(saAddr));
-		saAddr.sin_family      = AF_INET;
-		saAddr.sin_port        = htons(port);
+		saAddr.sin_family = AF_INET;
+		saAddr.sin_port = htons(port);
 		saAddr.sin_addr.s_addr = hostIP;
-		int result = connect(conn, (struct sockaddr *) &saAddr, sizeof(saAddr));
+		int result = connect(fSocket, (struct sockaddr *) &saAddr, sizeof(saAddr));
 		if (result < 0) {
 #ifndef HAIKU_TARGET_PLATFORM_BEOS
-			close(conn);
+			close(fSocket);
 #else
-			closesocket(conn);
+			closesocket(fSocket);
 #endif
-			conn = -1;
+			fSocket = -1;
 			error_msg << ": " << strerror(errno);
-			pop3_error(error_msg.String());
+			runner->ShowError(error_msg.String());
 			return errno;
 		}
 	} else {
 		error_msg << ": Could not allocate socket.";
-		pop3_error(error_msg.String());
+		runner->ShowError(error_msg.String());
 		return B_ERROR;
 	}
 
-    #ifdef USESSL
-	if (use_ssl) {
+#ifdef USESSL
+	if (fUseSSL) {
 		SSL_library_init();
-    	SSL_load_error_strings();
-    	RAND_seed(this,sizeof(POP3Protocol));
-    	/*--- Because we're an add-on loaded at an unpredictable time, all
-    	      the memory addresses and things contained in ourself are
-    	      esssentially random. */
-    	
-    	ctx = SSL_CTX_new(SSLv23_method());
-    	ssl = SSL_new(ctx);
-    	sbio=BIO_new_socket(conn,BIO_NOCLOSE);
-    	SSL_set_bio(ssl,sbio,sbio);
-    	
-    	if (SSL_connect(ssl) <= 0) {
-    		BString error;
-			error << "Could not connect to POP3 server " << settings->FindString("server");
+		SSL_load_error_strings();
+		RAND_seed(this,sizeof(POP3Protocol));
+		/*--- Because we're an add-on loaded at an unpredictable time, all
+			the memory addresses and things contained in ourself are
+			esssentially random. */
+
+		fSSLContext = SSL_CTX_new(SSLv23_method());
+		fSSL = SSL_new(fSSLContext);
+		fSSLBio = BIO_new_socket(fSocket, BIO_NOCLOSE);
+		SSL_set_bio(fSSL, fSSLBio, fSSLBio);
+
+		if (SSL_connect(fSSL) <= 0) {
+			BString error;
+			error << "Could not connect to POP3 server "
+				<< settings->FindString("server");
 			if (port != 995)
 				error << ":" << port;
 			error << ". (SSL Connection Error)";
 			runner->ShowError(error.String());
-			SSL_CTX_free(ctx);
-			#ifndef HAIKU_TARGET_PLATFORM_BEOS
-				close(conn);
-			#else
-				closesocket(conn);
-			#endif
+			SSL_CTX_free(fSSLContext);
+#ifndef HAIKU_TARGET_PLATFORM_BEOS
+			close(fSocket);
+#else
+			closesocket(fSocket);
+#endif
 			runner->Stop(true);
 			return B_ERROR;
-		
 		}
 	}
-	
-    #endif
+#endif
 
 	BString line;
 	status_t err;
@@ -186,47 +188,48 @@ POP3Protocol::Open(const char *server, int port, int)
 
 	if (err < 0) {
 #ifndef HAIKU_TARGET_PLATFORM_BEOS
-		close(conn);
+		close(fSocket);
 #else
-		closesocket(conn);
+		closesocket(fSocket);
 #endif
-		conn = -1;
+		fSocket = -1;
 		error_msg << ": " << strerror(err);
-		pop3_error(error_msg.String());
-
+		runner->ShowError(error_msg.String());
 		return B_ERROR;
 	}
 
 	if (strncmp(line.String(), "+OK", 3) != 0) {
-		error_msg << MDR_DIALECT_CHOICE (". The server said:\n","サーバのメッセージです\n") << line.String();
-		pop3_error(error_msg.String());
-
+		error_msg << MDR_DIALECT_CHOICE(". The server said:\n",
+			"サーバのメッセージです\n") << line.String();
+		runner->ShowError(error_msg.String());
 		return B_ERROR;
 	}
 
 	fLog = line;
-
 	return B_OK;
 }
 
 
-status_t POP3Protocol::Login(const char *uid, const char *password, int method)
+status_t
+POP3Protocol::Login(const char *uid, const char *password, int method)
 {
 	status_t err;
 
 	BString error_msg;
-	error_msg << MDR_DIALECT_CHOICE ("Error while authenticating user ","ユーザー認証中にエラーが発生しました ") << uid;
+	error_msg << MDR_DIALECT_CHOICE("Error while authenticating user ",
+		"ユーザー認証中にエラーが発生しました ") << uid;
 
 	if (method == 1) {	//APOP
 		int32 index = fLog.FindFirst("<");
 		if(index != B_ERROR) {
-			runner->ReportProgress(0,0,MDR_DIALECT_CHOICE ("Sending APOP authentication...","APOP認証情報を送信中..."));
+			runner->ReportProgress(0, 0, MDR_DIALECT_CHOICE(
+				"Sending APOP authentication...", "APOP認証情報を送信中..."));
 			int32 end = fLog.FindFirst(">",index);
 			BString timestamp("");
-			fLog.CopyInto(timestamp,index,end-index+1);
+			fLog.CopyInto(timestamp, index, end - index + 1);
 			timestamp += password;
 			char md5sum[33];
-			MD5Digest((unsigned char*)timestamp.String(),md5sum);
+			MD5Digest((unsigned char*)timestamp.String(), md5sum);
 			BString cmd = "APOP ";
 			cmd += uid;
 			cmd += " ";
@@ -235,20 +238,22 @@ status_t POP3Protocol::Login(const char *uid, const char *password, int method)
 
 			err = SendCommand(cmd.String());
 			if (err != B_OK) {
-				error_msg << MDR_DIALECT_CHOICE (". The server said:\n","サーバのメッセージです\n") << fLog;
-				pop3_error(error_msg.String());
-
+				error_msg << MDR_DIALECT_CHOICE(". The server said:\n",
+					"サーバのメッセージです\n") << fLog;
+				runner->ShowError(error_msg.String());
 				return err;
 			}
 
 			return B_OK;
 		} else {
-			error_msg << MDR_DIALECT_CHOICE (": The server does not support APOP.","サーバはAPOPをサポートしていません");
-			pop3_error(error_msg.String());
+			error_msg << MDR_DIALECT_CHOICE(": The server does not support APOP.",
+				"サーバはAPOPをサポートしていません");
+			runner->ShowError(error_msg.String());
 			return B_NOT_ALLOWED;
 		}
 	}
-	runner->ReportProgress(0,0,MDR_DIALECT_CHOICE ("Sending username...","ユーザーID送信中..."));
+	runner->ReportProgress(0, 0, MDR_DIALECT_CHOICE("Sending username...",
+		"ユーザーID送信中..."));
 
 	BString cmd = "USER ";
 	cmd += uid;
@@ -256,22 +261,23 @@ status_t POP3Protocol::Login(const char *uid, const char *password, int method)
 
 	err = SendCommand(cmd.String());
 	if (err != B_OK) {
-		error_msg << MDR_DIALECT_CHOICE (". The server said:\n","サーバのメッセージです\n") << fLog;
-		pop3_error(error_msg.String());
-
+		error_msg << MDR_DIALECT_CHOICE(". The server said:\n",
+			"サーバのメッセージです\n") << fLog;
+		runner->ShowError(error_msg.String());
 		return err;
 	}
 
-	runner->ReportProgress(0,0,MDR_DIALECT_CHOICE ("Sending password...","パスワード送信中..."));
+	runner->ReportProgress(0, 0, MDR_DIALECT_CHOICE("Sending password...",
+		"パスワード送信中..."));
 	cmd = "PASS ";
 	cmd += password;
 	cmd += CRLF;
 
 	err = SendCommand(cmd.String());
 	if (err != B_OK) {
-		error_msg << MDR_DIALECT_CHOICE (". The server said:\n","サーバのメッセージです\n") << fLog;
-		pop3_error(error_msg.String());
-
+		error_msg << MDR_DIALECT_CHOICE(". The server said:\n",
+			"サーバのメッセージです\n") << fLog;
+		runner->ShowError(error_msg.String());
 		return err;
 	}
 
@@ -279,15 +285,17 @@ status_t POP3Protocol::Login(const char *uid, const char *password, int method)
 }
 
 
-status_t POP3Protocol::Stat()
+status_t
+POP3Protocol::Stat()
 {
-	runner->ReportProgress(0,0,MDR_DIALECT_CHOICE ("Getting mailbox size...","メールボックスのサイズを取得しています..."));
+	runner->ReportProgress(0, 0, MDR_DIALECT_CHOICE("Getting mailbox size...",
+		"メールボックスのサイズを取得しています..."));
 
 	if (SendCommand("STAT" CRLF) < B_OK)
 		return B_ERROR;
 
 	int32 messages,dropSize;
-	if (sscanf(fLog.String(),"+OK %ld %ld",&messages,&dropSize) < 2)
+	if (sscanf(fLog.String(), "+OK %ld %ld", &messages, &dropSize) < 2)
 		return B_ERROR;
 
 	fNumMessages = messages;
@@ -297,7 +305,8 @@ status_t POP3Protocol::Stat()
 }
 
 
-int32 POP3Protocol::Messages()
+int32
+POP3Protocol::Messages()
 {
 	if (fNumMessages < 0)
 		Stat();
@@ -306,7 +315,8 @@ int32 POP3Protocol::Messages()
 }
 
 
-size_t POP3Protocol::MailDropSize()
+size_t
+POP3Protocol::MailDropSize()
 {
 	if (fNumMessages < 0)
 		Stat();
@@ -315,7 +325,8 @@ size_t POP3Protocol::MailDropSize()
 }
 
 
-status_t POP3Protocol::Retrieve(int32 message, BPositionIO *write_to)
+status_t
+POP3Protocol::Retrieve(int32 message, BPositionIO *write_to)
 {
 	status_t returnCode;
 	BString cmd;
@@ -339,7 +350,8 @@ status_t POP3Protocol::Retrieve(int32 message, BPositionIO *write_to)
 }
 
 
-status_t POP3Protocol::GetHeader(int32 message, BPositionIO *write_to)
+status_t
+POP3Protocol::GetHeader(int32 message, BPositionIO *write_to)
 {
 	BString cmd;
 	cmd << "TOP " << message + 1 << " 0" << CRLF;
@@ -347,7 +359,8 @@ status_t POP3Protocol::GetHeader(int32 message, BPositionIO *write_to)
 }
 
 
-status_t POP3Protocol::RetrieveInternal(const char *command, int32 message,
+status_t
+POP3Protocol::RetrieveInternal(const char *command, int32 message,
 	BPositionIO *write_to, bool post_progress)
 {
 	const int bufSize = 1024 * 30;
@@ -375,26 +388,22 @@ status_t POP3Protocol::RetrieveInternal(const char *command, int32 message,
 		return B_ERROR;
 	
 	struct timeval tv;
-	struct fd_set fds;
+	tv.tv_sec = POP3_RETRIEVAL_TIMEOUT / 1000000;
+	tv.tv_usec = POP3_RETRIEVAL_TIMEOUT % 1000000;
 
-	tv.tv_sec = long(POP3_RETRIEVAL_TIMEOUT / 1e6);
-	tv.tv_usec = long(POP3_RETRIEVAL_TIMEOUT-(tv.tv_sec * 1e6));
-	
-	/* Initialize (clear) the socket mask. */
-	FD_ZERO(&fds);
-	
-	/* Set the socket in the mask. */
-	FD_SET(conn, &fds);
-	
+	struct fd_set readSet;
+	FD_ZERO(&readSet);
+	FD_SET(fSocket, &readSet);
+
 	while (cont) {
-                int result = 0;
+		int result = 0;
 
-            #ifdef USESSL
-                if ((use_ssl) && (SSL_pending(ssl)))
-                    result = 1;
-                else
-            #endif
-                result = select(32, &fds, NULL, NULL, &tv);
+#ifdef USESSL
+		if (fUseSSL && SSL_pending(fSSL))
+			result = 1;
+		else
+#endif
+		result = select(fSocket + 1, &readSet, NULL, NULL, &tv);
 		if (result == 0) {
 			// No data available, even after waiting a minute.
 			fLog = "POP3 timeout - no data received after a long wait.";
@@ -403,21 +412,22 @@ status_t POP3Protocol::RetrieveInternal(const char *command, int32 message,
 		}
 		if (amountToReceive > bufSize - 1 - amountInBuffer)
 			amountToReceive = bufSize - 1 - amountInBuffer;
-            #ifdef USESSL
-                if (use_ssl)
-                    amountReceived = SSL_read(ssl,buf + amountInBuffer, amountToReceive);
-                else
-            #endif
-		amountReceived = recv(conn,buf + amountInBuffer, amountToReceive,0);
-
+#ifdef USESSL
+		if (fUseSSL) {
+			amountReceived = SSL_read(fSSL, buf + amountInBuffer,
+				amountToReceive);
+		} else
+#endif
+		amountReceived = recv(fSocket, buf + amountInBuffer, amountToReceive, 0);
 		if (amountReceived < 0) {
 			fLog = strerror(errno);
 			return errno;
 		}
 		if (amountReceived == 0) {
 			fLog = "POP3 data supposedly ready to receive but not received!";
-			return B_ERROR; // Shouldn't happen, but...
+			return B_ERROR;
 		}
+
 		amountToReceive = bufSize - 1; // For next time, read a full buffer.
 		amountInBuffer += amountReceived;
 		buf[amountInBuffer] = 0; // NUL stops tests past the end of buffer.
@@ -490,12 +500,16 @@ status_t POP3Protocol::RetrieveInternal(const char *command, int32 message,
 }
 
 
-status_t POP3Protocol::UniqueIDs() {
+status_t
+POP3Protocol::UniqueIDs()
+{
 	status_t ret = B_OK;
-	runner->ReportProgress(0,0,MDR_DIALECT_CHOICE ("Getting UniqueIDs...","固有のIDを取得中..."));
+	runner->ReportProgress(0, 0, MDR_DIALECT_CHOICE("Getting UniqueIDs...",
+		"固有のIDを取得中..."));
 
 	ret = SendCommand("UIDL" CRLF);
-	if (ret != B_OK) return ret;
+	if (ret != B_OK)
+		return ret;
 
 	BString result;
 	int32 uid_offset;
@@ -508,7 +522,7 @@ status_t POP3Protocol::UniqueIDs() {
 		unique_ids->AddItem(result.String());
 	}
 
-	if (SendCommand("LIST"CRLF) != B_OK)
+	if (SendCommand("LIST" CRLF) != B_OK)
 		return B_ERROR;
 
 	int32 b;
@@ -521,73 +535,73 @@ status_t POP3Protocol::UniqueIDs() {
 			b = atol(&(result.String()[b]));
 		else
 			b = 0;
-		sizes.AddItem((void *)(b));
+		fSizes.AddItem((void *)(b));
 	}
 
 	return ret;
 }
 
 
-void POP3Protocol::Delete(int32 num) {
+void
+POP3Protocol::Delete(int32 num)
+{
 	BString cmd = "DELE ";
 	cmd << (num+1) << CRLF;
 	if (SendCommand(cmd.String()) != B_OK) {
 		// Error
 	}
-	#if DEBUG
-	 puts(fLog.String());
-	#endif
+#if DEBUG
+	puts(fLog.String());
+#endif
 }
 
 
-size_t POP3Protocol::MessageSize(int32 index) {
-	return (size_t)(sizes.ItemAt(index));
+size_t
+POP3Protocol::MessageSize(int32 index)
+{
+	return (size_t)fSizes.ItemAt(index);
 }
 
 
 int32
 POP3Protocol::ReceiveLine(BString &line)
 {
-	int32 len = 0, rcv;
-	int8 c = 0;
+	int32 len = 0;
 	bool flag = false;
 
 	line = "";
-	
-	struct timeval tv;
-	struct fd_set fds;
 
-	tv.tv_sec = long(POP3_RETRIEVAL_TIMEOUT / 1e6);
-	tv.tv_usec = long(POP3_RETRIEVAL_TIMEOUT-(tv.tv_sec * 1e6));
-	
-	/* Initialize (clear) the socket mask. */
-	FD_ZERO(&fds);
-	
-	/* Set the socket in the mask. */
-	FD_SET(conn, &fds);
-	int result = -1;
-    #ifdef USESSL
-        if ((use_ssl) && (SSL_pending(ssl)))
-            result = 1;
-        else
-    #endif
-            result = select(32, &fds, NULL, NULL, &tv);
-	
-	if (result < 0)
-		return B_TIMEOUT;
-	
+	struct timeval tv;
+	tv.tv_sec = POP3_RETRIEVAL_TIMEOUT / 1000000;
+	tv.tv_usec = POP3_RETRIEVAL_TIMEOUT % 1000000;
+
+	struct fd_set readSet;
+	FD_ZERO(&readSet);
+	FD_SET(fSocket, &readSet);
+
+	int result;
+#ifdef USESSL
+	if (fUseSSL && SSL_pending(fSSL))
+		result = 1;
+	else
+#endif
+	result = select(fSocket + 1, &readSet, NULL, NULL, &tv);
+
 	if (result > 0) {
-		while (true) { // Hope there's an end of line out there else this gets stuck.
-                  #ifdef USESSL
-			if (use_ssl)
-				rcv = SSL_read(ssl,&c,1);
+		while (true) {
+			// Hope there's an end of line out there else this gets stuck.
+			int32 bytesReceived;
+			uint8 c = 0;
+#ifdef USESSL
+			if (fUseSSL)
+				bytesReceived = SSL_read(fSSL, (char*)&c, 1);
 			else
-		  #endif
-			rcv = recv(conn, &c, 1, 0);
-			if (rcv < 0)
-				return errno; //--An error!
-				//putchar(c);
-			if ((c == '\n') || (rcv == 0 /* EOF */))
+#endif
+			bytesReceived = recv(fSocket, &c, 1, 0);
+			if (bytesReceived < 0)
+				return errno;
+
+			if (c == '\n' || bytesReceived == 0 /* EOF */)
 				break;
 
 			if (c == '\r') {
@@ -603,68 +617,72 @@ POP3Protocol::ReceiveLine(BString &line)
 			}
 		}
 	} else {
-		fLog = "POP3 socket timeout.";
+		status_t error = errno;
+		fLog = "POP3 ";
+		fLog << strerror(error) << ".";
+
 		runner->Stop(true);
+		return error;
 	}
+
 	return len;
 }
 
-status_t
 
+status_t
 POP3Protocol::SendCommand(const char *cmd)
 {
-	if (conn < 0 || conn > FD_SETSIZE)
+	if (fSocket < 0 || fSocket > FD_SETSIZE)
 		return B_FILE_ERROR;
+
 	//printf(cmd);
 	// Flush any accumulated garbage data before we send our command, so we
 	// don't misinterrpret responses from previous commands (that got left over
 	// due to bugs) as being from this command.
 	
 	struct timeval tv;
-	tv.tv_sec = long(1000 / 1e6);
-	tv.tv_usec = long(1000-(tv.tv_sec * 1e6));  /* very short timeout, hangs with 0 in R5 */
+	tv.tv_sec = 0;
+	tv.tv_usec = 1000;
+		/* very short timeout, hangs with 0 in R5 */
 
-	struct fd_set fds;
-
-	/* Initialize (clear) the socket mask. */
-	FD_ZERO(&fds);
-
-	/* Set the socket in the mask. */
-	FD_SET(conn, &fds);
-        int result;
-        #ifdef USESSL
-                if ((use_ssl) && (SSL_pending(ssl)))
-                        result = 1;
-                else
-        #endif
-        result = select(32, &fds, NULL, NULL, &tv);
+	struct fd_set readSet;
+	FD_ZERO(&readSet);
+	FD_SET(fSocket, &readSet);
+	int result;
+#ifdef USESSL
+	if (fUseSSL && SSL_pending(fSSL))
+		result = 1;
+	else
+#endif
+	result = select(fSocket + 1, &readSet, NULL, NULL, &tv);
 
 	if (result > 0) {
 		int amountReceived;
 		char tempString [1025];
-            #ifdef USESSL
-                if (use_ssl)
-                        amountReceived = SSL_read(ssl,tempString, sizeof (tempString) - 1);
-                else
-            #endif
-		amountReceived = recv (conn,tempString, sizeof (tempString) - 1,0);
+#ifdef USESSL
+		if (fUseSSL)
+			amountReceived = SSL_read(fSSL, tempString, sizeof(tempString) - 1);
+		else
+#endif
+		amountReceived = recv(fSocket, tempString, sizeof(tempString) - 1, 0);
 		if (amountReceived < 0)
 			return errno;
+
 		tempString [amountReceived] = 0;
 		printf ("POP3Protocol::SendCommand Bug!  Had to flush %d bytes: %s\n",
 			amountReceived, tempString);
 		//if (amountReceived == 0)
 		//	break;
 	}
+
 #ifdef USESSL
-	if (use_ssl) {
-		SSL_write(ssl,cmd,::strlen(cmd));
-		//SSL_write(ssl,"\r\n",2);
+	if (fUseSSL) {
+		SSL_write(fSSL, cmd,::strlen(cmd));
 	} else
 #endif
-	if (send(conn, cmd, ::strlen(cmd), 0) < 0) {
+	if (send(fSocket, cmd, ::strlen(cmd), 0) < 0) {
 		fLog = strerror(errno);
-		printf ("POP3Protocol::SendCommand Send \"%s\" failed, code %d: %s\n",
+		printf("POP3Protocol::SendCommand Send \"%s\" failed, code %d: %s\n",
 			cmd, errno, fLog.String());
 		return errno;
 	}
@@ -685,7 +703,9 @@ POP3Protocol::SendCommand(const char *cmd)
 		} else {
 			printf("POP3Protocol::SendCommand \"%s\" got nonsense message "
 				"from server: %s\n", cmd, fLog.String());
-			err = B_BAD_VALUE; //-------If it's not +OK, and it's not -ERR, then what the heck is it? Presume an error
+			err = B_BAD_VALUE;
+				// If it's not +OK, and it's not -ERR, then what the heck
+				// is it? Presume an error
 			break;
 		}
 	}
@@ -693,51 +713,59 @@ POP3Protocol::SendCommand(const char *cmd)
 }
 
 
-void POP3Protocol::MD5Digest (unsigned char *in,char *ascii_digest)
+void
+POP3Protocol::MD5Digest(unsigned char *in, char *asciiDigest)
 {	
-        unsigned char digest[16];
+	unsigned char digest[16];
 
-    #ifdef USESSL
-	MD5(in, ::strlen((char*)in),digest);
-    #else
+#ifdef USESSL
+	MD5(in, ::strlen((char*)in), digest);
+#else
 	MD5_CTX context;
 
-        MD5Init(&context);
+	MD5Init(&context);
 	MD5Update(&context, in, ::strlen((char*)in));
 	MD5Final(digest, &context);
-    #endif
+#endif
 
-  	for (int i = 0;  i < 16;  i++)
-    	sprintf(ascii_digest+2*i, "%02x", digest[i]);
+	for (int i = 0;  i < 16;  i++) {
+		sprintf(asciiDigest + 2 * i, "%02x", digest[i]);
+	}
 
 	return;
 }
 
 
-BMailFilter *instantiate_mailfilter(BMessage *settings, BMailChainRunner *runner)
+//	#pragma mark -
+
+
+BMailFilter *
+instantiate_mailfilter(BMessage *settings, BMailChainRunner *runner)
 {
 	return new POP3Protocol(settings,runner);
 }
 
 
-BView* instantiate_config_panel(BMessage *settings,BMessage *)
+BView*
+instantiate_config_panel(BMessage *settings, BMessage *)
 {
-	BMailProtocolConfigView *view = new BMailProtocolConfigView(B_MAIL_PROTOCOL_HAS_USERNAME | B_MAIL_PROTOCOL_HAS_AUTH_METHODS | B_MAIL_PROTOCOL_HAS_PASSWORD | B_MAIL_PROTOCOL_HAS_HOSTNAME | B_MAIL_PROTOCOL_CAN_LEAVE_MAIL_ON_SERVER
-	#if USESSL
-		| B_MAIL_PROTOCOL_HAS_FLAVORS);
-	#else
+	BMailProtocolConfigView *view = new BMailProtocolConfigView(
+		B_MAIL_PROTOCOL_HAS_USERNAME | B_MAIL_PROTOCOL_HAS_AUTH_METHODS
+		| B_MAIL_PROTOCOL_HAS_PASSWORD | B_MAIL_PROTOCOL_HAS_HOSTNAME
+		| B_MAIL_PROTOCOL_CAN_LEAVE_MAIL_ON_SERVER
+#if USESSL
+		| B_MAIL_PROTOCOL_HAS_FLAVORS
+#endif
 		);
-	#endif
 	view->AddAuthMethod("Plain Text");
 	view->AddAuthMethod("APOP");
 
-        #if USESSL
-            view->AddFlavor("No Encryption");
-            view->AddFlavor("SSL");
-        #endif
+#if USESSL
+	view->AddFlavor("No Encryption");
+	view->AddFlavor("SSL");
+#endif
 
 	view->SetTo(settings);
-
 	return view;
 }
 
