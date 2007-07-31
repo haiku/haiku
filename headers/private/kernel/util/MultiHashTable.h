@@ -5,14 +5,14 @@
  * Authors:
  *      Hugo Santos, hugosantos@gmail.com
  */
+#ifndef _KERNEL_UTIL_MULTI_HASH_TABLE_H
+#define _KERNEL_UTIL_MULTI_HASH_TABLE_H
 
-
-#ifndef _MULTI_HASH_TABLE_H_
-#define _MULTI_HASH_TABLE_H_
 
 #include <KernelExport.h>
 #include <util/kernel_cpp.h>
 #include <util/OpenHashTable.h>
+
 
 // MultiHashTable is a container which acts a bit like multimap<>
 // but with hash table semantics.
@@ -34,9 +34,9 @@ public:
 	MultiHashTable(size_t initialSize = HashTable::kMinimumSize)
 		: HashTable(initialSize) {}
 
-	MultiHashTable(typename Definition::ParentType *parent,
+	MultiHashTable(const Definition& definition,
 		size_t initialSize = HashTable::kMinimumSize)
-		: HashTable(parent, initialSize) {}
+		: HashTable(definition, initialSize) {}
 
 	status_t InitCheck() const { return HashTable::InitCheck(); }
 
@@ -174,4 +174,4 @@ private:
 	}
 };
 
-#endif
+#endif	// _KERNEL_UTIL_MULTI_HASH_TABLE_H

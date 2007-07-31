@@ -1,12 +1,14 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Hugo Santos, hugosantos@gmail.com
  */
 #ifndef ENDPOINT_MANAGER_H
 #define ENDPOINT_MANAGER_H
+
 
 #include "tcp.h"
 
@@ -27,11 +29,15 @@ class TCPEndpoint;
 
 struct ConnectionHashDefinition {
 public:
-	typedef EndpointManager ParentType;
 	typedef std::pair<const sockaddr *, const sockaddr *> KeyType;
 	typedef TCPEndpoint ValueType;
 
 	ConnectionHashDefinition(EndpointManager *manager);
+
+	ConnectionHashDefinition(const ConnectionHashDefinition& definition)
+		: fManager(definition.fManager)
+	{
+	}
 
 	size_t HashKey(const KeyType &key) const;
 	size_t Hash(TCPEndpoint *endpoint) const;
@@ -45,7 +51,6 @@ private:
 
 class EndpointHashDefinition {
 public:
-	typedef EndpointManager ParentType;
 	typedef uint16 KeyType;
 	typedef TCPEndpoint ValueType;
 

@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Hugo Santos, hugosantos@gmail.com
  */
 
 
@@ -30,7 +31,11 @@ static const uint16 kFirstEphemeralPort = 40000;
 
 
 ConnectionHashDefinition::ConnectionHashDefinition(EndpointManager *manager)
-	: fManager(manager) {}
+	:
+	fManager(manager)
+{
+}
+
 
 size_t
 ConnectionHashDefinition::HashKey(const KeyType &key) const

@@ -131,7 +131,6 @@ typedef MulticastGroupInterface<IPv4Multicast> IPv4GroupInterface;
 typedef MulticastFilter<IPv4Multicast> IPv4MulticastFilter;
 
 struct MulticastStateHash {
-	typedef void ParentType;
 	typedef std::pair<const in_addr *, uint32> KeyType;
 	typedef IPv4GroupInterface ValueType;
 

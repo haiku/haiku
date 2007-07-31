@@ -115,8 +115,10 @@ struct UdpHashDefinition {
 	typedef std::pair<const sockaddr *, const sockaddr *> KeyType;
 	typedef UdpEndpoint ValueType;
 
-	UdpHashDefinition(net_address_module_info *parent)
-		: module(parent) {}
+	UdpHashDefinition(net_address_module_info *_module)
+		: module(_module) {}
+	UdpHashDefinition(const UdpHashDefinition& definition)
+		: module(definition.module) {}
 
 	size_t HashKey(const KeyType &key) const
 	{

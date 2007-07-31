@@ -5,36 +5,37 @@
  * Authors:
  *      Hugo Santos, hugosantos@gmail.com
  */
+#ifndef _KERNEL_UTIL_OPEN_HASH_TABLE_H
+#define _KERNEL_UTIL_OPEN_HASH_TABLE_H
 
-
-#ifndef _OPEN_HASH_TABLE_H_
-#define _OPEN_HASH_TABLE_H_
 
 #include <KernelExport.h>
 #include <util/kernel_cpp.h>
 
-// the Definition template must have four methods: `HashKey', `Hash',
-// `Compare' and `GetLink;. It must also define several types as shown in the
-// following example:
-//
-// struct Foo : HashTableLink<Foo> {
-//	int bar;
-//
-//	HashTableLink<Foo> otherLink;
-// };
-//
-// struct HashTableDefinition {
-//	typedef void	ParentType;
-//	typedef int		KeyType;
-//	typedef	Foo		ValueType;
-//
-//	HashTableDefinition(void *parent) {}
-//
-//	size_t HashKey(int key) const { return key >> 1; }
-//	size_t Hash(Foo *value) const { return HashKey(value->bar); }
-//	bool Compare(int key, Foo *value) const { return value->bar == key; }
-//  HashTableLink<Foo> *GetLink(Foo *value) const { return value; }
-// };
+
+/*!
+	The Definition template must have four methods: `HashKey', `Hash',
+	`Compare' and `GetLink;. It must also define several types as shown in the
+	following example:
+
+	struct Foo : HashTableLink<Foo> {
+		int bar;
+	
+		HashTableLink<Foo> otherLink;
+	};
+
+	struct HashTableDefinition {
+		typedef int		KeyType;
+		typedef	Foo		ValueType;
+
+		HashTableDefinition(const HashTableDefinition&) {}
+
+		size_t HashKey(int key) const { return key >> 1; }
+		size_t Hash(Foo *value) const { return HashKey(value->bar); }
+		bool Compare(int key, Foo *value) const { return value->bar == key; }
+		HashTableLink<Foo> *GetLink(Foo *value) const { return value; }
+	};
+*/
 
 template<typename Type>
 struct HashTableLink {
@@ -59,15 +60,22 @@ public:
 	//                   50 / 256 = 19.53125%
 
 	OpenHashTable(size_t initialSize = kMinimumSize)
-		: fTableSize(0), fItemCount(0), fTable(NULL)
+		:
+		fTableSize(0),
+		fItemCount(0),
+		fTable(NULL)
 	{
 		if (initialSize > 0)
 			_Resize(initialSize);
 	}
 
-	OpenHashTable(typename Definition::ParentType *parent,
-		size_t initialSize = kMinimumSize)
-		: fDefinition(parent), fTableSize(0), fItemCount(0), fTable(NULL)
+	OpenHashTable(const Definition& definition,
+			size_t initialSize = kMinimumSize)
+		:
+		fDefinition(definition),
+		fTableSize(0),
+		fItemCount(0),
+		fTable(NULL)
 	{
 		if (initialSize > 0)
 			_Resize(initialSize);
@@ -273,4 +281,4 @@ protected:
 	ValueType **fTable;
 };
 
-#endif
+#endif	// _KERNEL_UTIL_OPEN_HASH_TABLE_H

@@ -1,10 +1,11 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Andrew Galante, haiku.galante@gmail.com
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Hugo Santos, hugosantos@gmail.com
  */
 #ifndef TCP_ENDPOINT_H
 #define TCP_ENDPOINT_H
@@ -13,7 +14,6 @@
 #include "BufferQueue.h"
 #include "EndpointManager.h"
 #include "tcp.h"
-
 
 #include <ProtocolUtilities.h>
 #include <net_protocol.h>

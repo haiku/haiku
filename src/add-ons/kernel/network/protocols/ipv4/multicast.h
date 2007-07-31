@@ -5,9 +5,9 @@
  * Authors:
  *      Hugo Santos, hugosantos@gmail.com
  */
-
 #ifndef _PRIVATE_MULTICAST_H_
 #define _PRIVATE_MULTICAST_H_
+
 
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
@@ -17,6 +17,7 @@
 #include <netinet/in.h>
 
 #include <utility>
+
 
 struct net_buffer;
 struct net_protocol;
@@ -164,7 +165,6 @@ public:
 	bool FilterAccepts(net_buffer *buffer) const;
 
 	struct HashDefinition {
-		typedef void ParentType;
 		typedef std::pair<const AddressType *, uint32> KeyType;
 		typedef ThisType ValueType;
 

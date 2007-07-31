@@ -112,6 +112,7 @@ struct HashedObjectCache : object_cache {
 		typedef Link				ValueType;
 
 		Definition(HashedObjectCache *_parent) : parent(_parent) {}
+		Definition(const Definition& definition) : parent(definition.parent) {}
 
 		size_t HashKey(const void *key) const
 		{
