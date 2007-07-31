@@ -79,7 +79,6 @@ TermParse::StartThreads(TermView *view)
 	fView = view;
 
 	status_t status = InitPtyReader();
-
 	if (status < B_OK) {
 		fView = NULL;	
 		return status;
@@ -87,11 +86,7 @@ TermParse::StartThreads(TermView *view)
 
 	status = InitTermParse();
 	if (status < B_OK) {
-		delete_sem(fReaderSem);
-		delete_sem(fReaderLocker);
-		fQuitting = true;
-		status_t dummy;
-		wait_for_thread(fReaderThread, &dummy);
+		StopPtyReader();
 		fView = NULL;
 		return status;		
 	}
@@ -108,72 +103,14 @@ TermParse::StopThreads()
 
 	fQuitting = true;
 
-	delete_sem(fReaderSem);
-	fReaderSem = -1;
-	delete_sem(fReaderLocker);
-	fReaderSem = -1;
-
 	//suspend_thread(fReaderThread);
 		// TODO: interrupt read() - doesn't work for whatever reason
 
-	status_t dummy;
-	wait_for_thread(fReaderThread, &dummy);
-	fReaderThread = -1;
-	wait_for_thread(fParseThread, &dummy);
-	fReaderThread = -1;	
+	StopPtyReader();
+	StopTermParse();
 	
 	fView = NULL;
 	
-	return B_OK;
-}
-
-
-//! Get data from pty device.
-int32
-TermParse::PtyReader()
-{
-	uint read_p = 0;
-	while (!fQuitting) {
-		// If Pty Buffer nearly full, snooze this thread, and continue.
-		if ((read_p - fBufferPosition) > READ_BUF_SIZE - 16) {
-			fLockFlag = READ_BUF_SIZE / 2;
-			status_t status;
-			do {			
-				status = acquire_sem(fReaderLocker);
-			} while (status == B_INTERRUPTED);
-			if (status < B_OK)
-				return status;		
-		}
-
-		// Read PTY
-		uchar buf[READ_BUF_SIZE];
-		int nread = read(fFd, buf, READ_BUF_SIZE - (read_p - fBufferPosition));
-		if (nread <= 0) {
-			fView->NotifyQuit(errno);
-			// on the next iteration, fQuitting will probably be true,
-			// or the semaphore acquisition will fail, so this thread will
-			// be killed anyway.
-			continue;			
-		}
-
-		// Copy read string to PtyBuffer.
-
-		int left = READ_BUF_SIZE - (read_p % READ_BUF_SIZE);
-		int mod = read_p % READ_BUF_SIZE;
-
-		if (nread >= left) {
-			memcpy(fReadBuffer + mod, buf, left);
-			memcpy(fReadBuffer, buf + left, nread - left);
-		} else
-			memcpy(fReadBuffer + mod, buf, nread);
-
-		read_p += nread;
-
-		// Release semaphore. Number of semaphore counter is nread.
-		release_sem_etc(fReaderSem, nread, 0);
-	}
-
-	fReaderThread = -1;
 	return B_OK;
 }
 
@@ -228,12 +165,14 @@ TermParse::InitTermParse()
 	fParseThread = spawn_thread(_escparse_thread, "EscParse",
 		B_DISPLAY_PRIORITY, this);
 
-	return resume_thread(fParseThread);
+	resume_thread(fParseThread);
+	
+	return B_OK;
 }
 
 
 //! Initialize and spawn PtyReader thread.
-thread_id
+status_t
 TermParse::InitPtyReader()
 {
 	if (fReaderThread >= 0)
@@ -246,6 +185,7 @@ TermParse::InitPtyReader()
 	fReaderLocker = create_sem(0, "pty_locker_sem");
 	if (fReaderLocker < 0) {
 		delete_sem(fReaderSem);
+		fReaderSem = -1;
 		return fReaderLocker;	
 	}
 
@@ -253,11 +193,95 @@ TermParse::InitPtyReader()
 		B_NORMAL_PRIORITY, this);
   	if (fReaderThread < 0) {
 		delete_sem(fReaderSem);
+		fReaderSem = -1;
 		delete_sem(fReaderLocker);
+		fReaderLocker = -1;
 		return fReaderThread;	
 	}	
 
-	return resume_thread(fReaderThread);
+	resume_thread(fReaderThread);
+
+	return B_OK;
+}
+
+
+void
+TermParse::StopTermParse()
+{
+	if (fParseThread >= 0) {
+		status_t dummy;
+		wait_for_thread(fParseThread, &dummy);
+		fParseThread = -1;	
+	}
+}
+
+
+void
+TermParse::StopPtyReader()
+{
+	if (fReaderSem >= 0) {
+		delete_sem(fReaderSem);
+		fReaderSem = -1;
+	}
+	if (fReaderLocker >= 0) {	
+		delete_sem(fReaderLocker);
+		fReaderLocker = -1;
+	}
+
+	if (fReaderThread >= 0) {
+		status_t dummy;
+		wait_for_thread(fReaderThread, &dummy);
+		fReaderThread = -1;	
+	}
+}
+
+
+//! Get data from pty device.
+int32
+TermParse::PtyReader()
+{
+	uint read_p = 0;
+	while (!fQuitting) {
+		// If Pty Buffer nearly full, snooze this thread, and continue.
+		if ((read_p - fBufferPosition) > READ_BUF_SIZE - 16) {
+			fLockFlag = READ_BUF_SIZE / 2;
+			status_t status;
+			do {			
+				status = acquire_sem(fReaderLocker);
+			} while (status == B_INTERRUPTED);
+			if (status < B_OK)
+				return status;		
+		}
+
+		// Read PTY
+		uchar buf[READ_BUF_SIZE];
+		int nread = read(fFd, buf, READ_BUF_SIZE - (read_p - fBufferPosition));
+		if (nread <= 0) {
+			fView->NotifyQuit(errno);
+			// on the next iteration, fQuitting will probably be true,
+			// or the semaphore acquisition will fail, so this thread will
+			// be killed anyway.
+			continue;			
+		}
+
+		// Copy read string to PtyBuffer.
+
+		int left = READ_BUF_SIZE - (read_p % READ_BUF_SIZE);
+		int mod = read_p % READ_BUF_SIZE;
+
+		if (nread >= left) {
+			memcpy(fReadBuffer + mod, buf, left);
+			memcpy(fReadBuffer, buf + left, nread - left);
+		} else
+			memcpy(fReadBuffer + mod, buf, nread);
+
+		read_p += nread;
+
+		// Release semaphore. Number of semaphore counter is nread.
+		release_sem_etc(fReaderSem, nread, 0);
+	}
+
+	return B_OK;
 }
 
 
@@ -877,8 +901,7 @@ TermParse::EscParse()
 					break;
 		}
 	}
-	fParseThread = -1;
-	exit_thread(B_OK);
+	
 	return B_OK;
 }
 

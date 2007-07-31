@@ -54,6 +54,9 @@ private:
 	status_t InitTermParse();
 	status_t InitPtyReader();
 
+	void StopTermParse();
+	void StopPtyReader();
+
 	int32 EscParse();
 	int32 PtyReader();
 
