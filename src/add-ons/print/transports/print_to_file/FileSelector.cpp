@@ -109,13 +109,16 @@ status_t FileSelector::Go(entry_ref * ref)
 	PostMessage(START_MSG);
 	acquire_sem(m_exit_sem);
 
-	if ( m_result == B_OK && ref)
-		m_result = m_entry.GetRef(ref);
+	// cache result to avoid memory access of deleted window object
+	// after Quit().
+	status_t result = m_result;
+	if ( result == B_OK && ref)
+		result = m_entry.GetRef(ref);
 
 	Lock();
 	Quit();
 
-	return m_result;
+	return result;
 }
 
 
