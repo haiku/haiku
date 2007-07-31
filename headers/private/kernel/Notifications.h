@@ -12,18 +12,20 @@
 
 #include <SupportDefs.h>
 
-#include <Referenceable.h>
-
 #include <lock.h>
 #include <messaging.h>
-#include <util/AutoLock.h>
-#include <util/DoublyLinkedList.h>
 #include <util/khash.h>
-#include <util/KMessage.h>
-#include <util/OpenHashTable.h>
 
 
 #ifdef __cplusplus
+
+#include <Referenceable.h>
+
+#include <util/AutoLock.h>
+#include <util/DoublyLinkedList.h>
+#include <util/KMessage.h>
+#include <util/OpenHashTable.h>
+
 
 class NotificationService;
 

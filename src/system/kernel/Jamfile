@@ -10,6 +10,8 @@ SubDir HAIKU_TOP src system kernel ;
 	SubDirC++Flags $(defines) ;
 }
 
+UsePrivateHeaders shared ;
+
 AddResources kernel_$(TARGET_ARCH) : kernel.rdef ;
 
 KernelMergeObject kernel_core.o :
@@ -24,6 +26,7 @@ KernelMergeObject kernel_core.o :
 	lock.c
 	main.c
 	module.cpp
+	Notifications.cpp
 	port.c
 	real_time_clock.c
 	scheduler.cpp
@@ -68,11 +71,12 @@ KernelLd kernel_$(TARGET_ARCH) :
 
 	linkhack.so
 
-	# kernel libroot parts
+	# kernel parts borrowed from libroot and others
 	kernel_os_main.o
 	kernel_os_arch_$(TARGET_ARCH).o
 	kernel_posix.o
 	kernel_posix_arch_$(TARGET_ARCH).o
+	kernel_misc.o
 
 	$(HAIKU_STATIC_LIBSUPC++)
 

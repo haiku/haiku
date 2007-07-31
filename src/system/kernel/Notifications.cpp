@@ -335,7 +335,7 @@ NotificationManager::UpdateListener(const char* serviceName,
 extern "C" void
 notifications_init(void)
 {
-	status_t status = NotificationManager::CreateDefault();
+	status_t status = NotificationManager::CreateManager();
 	if (status < B_OK) {
 		panic("Creating the notification manager failed: %s\n",
 			strerror(status));
