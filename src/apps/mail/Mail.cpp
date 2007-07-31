@@ -46,16 +46,17 @@ All rights reserved.
 #include <sys/stat.h>
 #include <sys/utsname.h>
 
+#include <Autolock.h>
 #include <Clipboard.h>
+#include <Debug.h>
 #include <E-mail.h>
 #include <InterfaceKit.h>
 #include <Roster.h>
 #include <Screen.h>
 #include <StorageKit.h>
 #include <String.h>
+#include <TextView.h>
 #include <UTF8.h>
-#include <Debug.h>
-#include <Autolock.h>
 
 #include <fs_index.h>
 #include <fs_info.h>
@@ -291,11 +292,21 @@ TMailApp::~TMailApp()
 void
 TMailApp::AboutRequested()
 {
-	(new BAlert("",
-		"Mail\nBy Robert Polic\n\n"
-		"Enhanced by Axel Dörfler and the Dr. Zoidberg crew\n\n"
-		"Compiled on " __DATE__ " at " __TIME__ ".",
-		"OK"))->Go();
+	BAlert *alert = new BAlert("about", "Mail\n\n"
+		"written by Robert Polic\n"
+		"enhanced by the Dr. Zoidberg crew\n\n"
+		"Copyright 2007, Haiku.\n", "Ok");
+	BTextView *view = alert->TextView();
+	BFont font;
+
+	view->SetStylable(true);
+
+	view->GetFont(&font);
+	font.SetSize(font.Size() + 7.0f);
+	font.SetFace(B_BOLD_FACE); 			
+	view->SetFontAndColor(0, 4, &font);
+
+	alert->Go();
 }
 
 
