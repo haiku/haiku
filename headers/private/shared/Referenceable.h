@@ -1,24 +1,29 @@
-/* 
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
+/*
+ * Copyright 2004-2007, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+#ifndef _REFERENCEABLE_H
+#define _REFERENCEABLE_H
 
-#ifndef REFERENCABLE_H
-#define REFERENCABLE_H
 
 #include <SupportDefs.h>
 
-// Referenceable
+
+namespace BPrivate {
+
 class Referenceable {
 public:
 								Referenceable(
-									bool deleteWhenUnreferenced = false);
+									bool deleteWhenUnreferenced = true);
 	virtual						~Referenceable();
 
-			void				AddReference();
+			void				AddReference()
+									{ atomic_add(&fReferenceCount, 1); }
+
 			bool				RemoveReference();	// returns true after last
 
-			int32				CountReferences() const;
+			int32				CountReferences() const
+									{ return fReferenceCount; }
 
 protected:
 			vint32				fReferenceCount;
@@ -26,7 +31,7 @@ protected:
 };
 
 // Reference
-template<typename Type>
+template<typename Type = BPrivate::Referenceable>
 class Reference {
 public:
 	Reference()
@@ -109,4 +114,9 @@ private:
 	Type*	fObject;
 };
 
-#endif	// REFERENCABLE_H
+}	// namespace BPrivate
+
+using BPrivate::Referenceable;
+using BPrivate::Reference;
+
+#endif	// _REFERENCEABLE_H

@@ -1,10 +1,11 @@
-/* 
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
+/*
+ * Copyright 2005-2007, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
-#include "Debug.h"
-#include "Referenceable.h"
+
+#include <Referenceable.h>
+
 
 // constructor
 Referenceable::Referenceable(bool deleteWhenUnreferenced)
@@ -18,13 +19,6 @@ Referenceable::~Referenceable()
 {
 }
 
-// AddReference
-void
-Referenceable::AddReference()
-{
-	atomic_add(&fReferenceCount, 1);
-}
-
 // RemoveReference
 bool
 Referenceable::RemoveReference()
@@ -34,11 +28,3 @@ Referenceable::RemoveReference()
 		delete this;
 	return unreferenced;
 }
-
-// CountReferences
-int32
-Referenceable::CountReferences() const
-{
-	return fReferenceCount;
-}
-

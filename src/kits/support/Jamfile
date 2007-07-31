@@ -22,6 +22,7 @@ MergeObject <libbe>support_kit.o :
 	List.cpp
 	Locker.cpp
 	PointerList.cpp
+	Referenceable.cpp
 	StopWatch.cpp
 	String.cpp
 #	StreamIO.cpp
