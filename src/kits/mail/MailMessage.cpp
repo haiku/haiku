@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2001-2004 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2007, Haiku Inc. All Rights Reserved.
  *
@@ -105,14 +105,16 @@ BEmailMessage::~BEmailMessage()
 }
 
 
-status_t BEmailMessage::InitCheck() const
+status_t
+BEmailMessage::InitCheck() const
 {
 	return _status;
 }
 
 
 BEmailMessage *
-BEmailMessage::ReplyMessage(mail_reply_to_mode replyTo, bool accountFromMail, const char *quoteStyle)
+BEmailMessage::ReplyMessage(mail_reply_to_mode replyTo, bool accountFromMail,
+	const char *quoteStyle)
 {
 	BEmailMessage *to_return = new BEmailMessage;
 
@@ -181,8 +183,10 @@ BEmailMessage::ForwardMessage(bool accountFromMail, bool includeAttachments)
 	BString header = "------ Forwarded Message: ------\n";
 	header << "To: " << To() << '\n';
 	header << "From: " << From() << '\n';
-	if (CC() != NULL)
-		header << "CC: " << CC() << '\n'; // Can use CC rather than "Cc" since display only.
+	if (CC() != NULL) {
+		// Can use CC rather than "Cc" since display only.
+		header << "CC: " << CC() << '\n';
+	}
 	header << "Subject: " << Subject() << '\n';
 	header << "Date: " << Date() << "\n\n";
 	if (_text_body != NULL)
@@ -524,11 +528,16 @@ BEmailMessage::GetComponent(int32 i, bool parse_now)
 	return NULL;
 }
 
-int32 BEmailMessage::CountComponents() const {
+
+int32
+BEmailMessage::CountComponents() const
+{
 	return _num_components;
 }
 
-void BEmailMessage::Attach(entry_ref *ref, bool includeAttributes)
+
+void
+BEmailMessage::Attach(entry_ref *ref, bool includeAttributes)
 {
 	if (includeAttributes)
 		AddComponent(new BAttributedMailAttachment(ref));
@@ -536,7 +545,10 @@ void BEmailMessage::Attach(entry_ref *ref, bool includeAttributes)
 		AddComponent(new BSimpleMailAttachment(ref));
 }
 
-bool BEmailMessage::IsComponentAttachment(int32 i) {
+
+bool
+BEmailMessage::IsComponentAttachment(int32 i)
+{
 	if ((i >= _num_components) || (_num_components == 0))
 		return false;
 
@@ -553,7 +565,10 @@ bool BEmailMessage::IsComponentAttachment(int32 i) {
 	return component->IsAttachment();
 }
 
-void BEmailMessage::SetBodyTextTo(const char *text) {
+
+void
+BEmailMessage::SetBodyTextTo(const char *text)
+{
 	if (_text_body == NULL) {
 		_text_body = new BTextMailComponent;
 		AddComponent(_text_body);
@@ -563,7 +578,8 @@ void BEmailMessage::SetBodyTextTo(const char *text) {
 }
 
 
-BTextMailComponent *BEmailMessage::Body()
+BTextMailComponent *
+BEmailMessage::Body()
 {
 	if (_text_body == NULL)
 		_text_body = RetrieveTextBody(_body);
@@ -572,7 +588,9 @@ BTextMailComponent *BEmailMessage::Body()
 }
 
 
-const char *BEmailMessage::BodyText() {
+const char *
+BEmailMessage::BodyText()
+{
 	if (Body() == NULL)
 		return NULL;
 
@@ -580,7 +598,9 @@ const char *BEmailMessage::BodyText() {
 }
 
 
-status_t BEmailMessage::SetBody(BTextMailComponent *body) {
+status_t
+BEmailMessage::SetBody(BTextMailComponent *body)
+{
 	if (_text_body != NULL) {
 		return B_ERROR;
 //	removing doesn't exist for now
@@ -594,20 +614,21 @@ status_t BEmailMessage::SetBody(BTextMailComponent *body) {
 }
 
 
-BTextMailComponent *BEmailMessage::RetrieveTextBody(BMailComponent *component)
+BTextMailComponent *
+BEmailMessage::RetrieveTextBody(BMailComponent *component)
 {
 	BTextMailComponent *body = dynamic_cast<BTextMailComponent *>(component);
 	if (body != NULL)
 		return body;
 
-	BMIMEMultipartMailContainer *container = dynamic_cast<BMIMEMultipartMailContainer *>(component);
+	BMIMEMultipartMailContainer *container
+		= dynamic_cast<BMIMEMultipartMailContainer *>(component);
 	if (container != NULL) {
 		for (int32 i = 0; i < container->CountComponents(); i++) {
 			if ((component = container->GetComponent(i)) == NULL)
 				continue;
 
-			switch (component->ComponentType())
-			{
+			switch (component->ComponentType()) {
 				case B_MAIL_PLAIN_TEXT_BODY:
 					// AttributedAttachment returns the MIME type of its contents, so
 					// we have to use dynamic_cast here
@@ -691,8 +712,10 @@ BEmailMessage::RenderToRFC822(BPositionIO *file)
 
 	// Do real rendering
 
-	if (From() == NULL)
-		SendViaAccount(_chain_id); //-----Set the from string
+	if (From() == NULL) {
+		// set the "From:" string
+		SendViaAccount(_chain_id);
+	}
 
 	BList recipientList;
 	get_address_list(recipientList, To(), extract_address);
@@ -717,15 +740,19 @@ BEmailMessage::RenderToRFC822(BPositionIO *file)
 		struct tm tm;
 		localtime_r(&creationTime, &tm);
 
-		strftime(date, 128, "%a, %d %b %Y %H:%M:%S",&tm);
+		size_t length = strftime(date, sizeof(date),
+			"%a, %d %b %Y %H:%M:%S", &tm);
 
 		// GMT offsets are full hours, yes, but you never know :-)
-		if (tm.tm_gmtoff)
-			sprintf(date + strlen(date)," %+03d%02d",tm.tm_gmtoff / 3600,(tm.tm_gmtoff / 60) % 60);
-
-		uint32 length = strlen(date);
-		if (length < sizeof(date) - 5)
-			strftime(date + length, length - sizeof(date), " %Z", &tm);
+		if (tm.tm_gmtoff) {
+#ifndef HAIKU_TARGET_PLATFORM_BEOS
+			snprintf(date + length, sizeof(date) - length, " %+03d%02d",
+				tm.tm_gmtoff / 3600, (tm.tm_gmtoff / 60) % 60);
+#else
+			sprintf(date + length, " %+03d%02d",
+				tm.tm_gmtoff / 3600, (tm.tm_gmtoff / 60) % 60);
+#endif
+		}
 
 		SetHeaderField("Date", date);
 	}
