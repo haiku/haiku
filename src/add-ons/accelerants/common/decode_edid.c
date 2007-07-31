@@ -1,7 +1,8 @@
 /*
- * Copyright (c) 2003, Thomas Kurschel. All Rights Reserved.
+ * Copyright 2003, Thomas Kurschel. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
+
 
 /*!
 	Part of DDC driver
@@ -16,6 +17,7 @@
 #include "edid.h"
 
 #include <KernelExport.h>
+
 #include <string.h>
 
 
@@ -89,12 +91,15 @@ decode_std_timing(edid1_std_timing *timing, const edid1_std_timing_raw *raw)
 		case 0:
 			timing->v_size = timing->h_size;
 			break;
+
 		case 1:
 			timing->v_size = timing->h_size * 3 / 4;
 			break;
+
 		case 2:
 			timing->v_size = timing->h_size * 4 / 5;
 			break;
+
 		case 3:
 			timing->v_size = timing->h_size * 9 / 16;
 			break;
@@ -120,7 +125,7 @@ decode_whitepoint(edid1_whitepoint *whitepoint, const edid1_whitepoint_raw *raw)
 
 
 static void
-decode_detailed_timing( edid1_detailed_timing *timing,
+decode_detailed_timing(edid1_detailed_timing *timing,
 	const edid1_detailed_timing_raw *raw)
 {
 	timing->pixel_clock = raw->pixel_clock;
@@ -168,7 +173,7 @@ copy_str(char *dest, const uint8 *src, size_t len)
 
 
 static void
-decode_detailed_monitor( edid1_detailed_monitor *monitor,
+decode_detailed_monitor(edid1_detailed_monitor *monitor,
 	const edid1_detailed_monitor_raw *raw, bool enableExtra)
 {
 	int i, j;
@@ -191,21 +196,26 @@ decode_detailed_monitor( edid1_detailed_monitor *monitor,
 					copy_str( monitor->data.serial_number, 
 						raw->extra.data.serial_number, EDID1_EXTRA_STRING_LEN );
 					break;
+
 				case edid1_ascii_data:
 					copy_str( monitor->data.ascii_data, 
 						raw->extra.data.ascii_data, EDID1_EXTRA_STRING_LEN );
 					break;
+
 				case edid1_monitor_ranges:
 					monitor->data.monitor_range = raw->extra.data.monitor_range;
 					break;
+
 				case edid1_monitor_name:
 					copy_str( monitor->data.monitor_name, 
 						raw->extra.data.monitor_name, EDID1_EXTRA_STRING_LEN );
 					break;
+
 				case edid1_add_colour_pointer:
 					decode_whitepoint( monitor->data.whitepoint, 
 						&raw->extra.data.whitepoint );
 					break;
+
 				case edid1_add_std_timing:
 					for (j = 0; j < EDID1_NUM_EXTRA_STD_TIMING; ++j) {
 						decode_std_timing(&monitor->data.std_timing[j],
@@ -224,7 +234,7 @@ decode_detailed_monitor( edid1_detailed_monitor *monitor,
 //	#pragma mark -
 
 
-//! main function to decode edid data
+//!	Main function to decode edid data
 void
 edid_decode(edid1_info *edid, const edid1_raw *raw)
 {

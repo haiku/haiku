@@ -3,10 +3,12 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 /*!
 	Part of DDC driver
 	Dumps EDID content
 */
+
 
 #include "edid.h"
 #if !defined(_KERNEL_MODE) && !defined(_BOOT_MODE)
@@ -91,10 +93,13 @@ edid_dump(edid1_info *edid)
 			case edid1_serial_number:
 				dprintf("Serial Number: %s\n", monitor->data.serial_number);
 				break;
+
 			case edid1_ascii_data:
 				dprintf(" %s\n", monitor->data.serial_number);
 				break;
-			case edid1_monitor_ranges: {
+
+			case edid1_monitor_ranges:
+			{
 				edid1_monitor_range monitor_range = monitor->data.monitor_range;
 
 				dprintf("Horizontal frequency range = %d..%d kHz\n",
@@ -104,10 +109,13 @@ edid_dump(edid1_info *edid)
 				dprintf("Maximum pixel clock = %d MHz\n", (uint16)monitor_range.max_clock * 10);
 				break;
 			}
+
 			case edid1_monitor_name:
 				dprintf("Monitor Name: %s\n", monitor->data.serial_number);
 				break;
-			case edid1_add_colour_pointer: {
+
+			case edid1_add_colour_pointer:
+			{
 				for (j = 0; j < EDID1_NUM_EXTRA_WHITEPOINTS; ++j) {
 					edid1_whitepoint *whitepoint = &monitor->data.whitepoint[j];
 
@@ -122,7 +130,9 @@ edid_dump(edid1_info *edid)
 				}
 				break;
 			}
-			case edid1_add_std_timing: {		
+
+			case edid1_add_std_timing:
+			{		
 				for (j = 0; j < EDID1_NUM_EXTRA_STD_TIMING; ++j) {
 					edid1_std_timing *timing = &monitor->data.std_timing[j];
 
@@ -135,9 +145,11 @@ edid_dump(edid1_info *edid)
 				}
 				break;
 			}
-			case edid1_is_detailed_timing: {
+
+			case edid1_is_detailed_timing:
+			{
 				edid1_detailed_timing *timing = &monitor->data.detailed_timing;
-				
+
 				dprintf("Additional Video Mode:\n");
 				dprintf("clock=%f MHz\n", timing->pixel_clock / 100.0);
 				dprintf("h: (%d, %d, %d, %d)\n", 

@@ -1,14 +1,20 @@
 /*
-	Copyright (c) 2003, Thomas Kurschel
+ * Copyright 2003, Thomas Kurschel. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef DDC_INT_H
+#define DDC_INT_H
 
 
-	Part of DDC driver
-		
+/*!
+	Part of DDC driver	
 	Internal header
 */
 
-// no dprintf in user space, but if you know the trick ;)
-void    _sPrintf(const char *format, ...);
+
+void _sPrintf(const char *format, ...);
+	// no dprintf in user space, but if you know the trick ;)
+
 //bool    set_dprintf_enabled(bool);	/* returns old enable flag */
 
 #define dprintf _sPrintf
@@ -21,3 +27,5 @@ void    _sPrintf(const char *format, ...);
 #define DEBUG_MSG_PREFIX "DDC "
 
 #include "debug_ext.h"
+
+#endif	// DDC_INT_H
