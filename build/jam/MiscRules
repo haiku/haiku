@@ -2,6 +2,9 @@
 rule SetupObjectsDir
 {
 	local relPath = [ FDirName $(SUBDIR_TOKENS[2-]) ] ;
+	if $(relPath) = . {
+		relPath = ;
+	}
 	COMMON_PLATFORM_LOCATE_TARGET =
 		[ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) $(relPath) ] ;
 
