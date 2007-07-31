@@ -132,3 +132,13 @@ KernelMergeObject kernel_posix_arch_$(TARGET_ARCH).o :
 
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
+
+UsePrivateHeaders shared ;
+
+SEARCH_SOURCE = [ FDirName $(HAIKU_TOP) src kits support ] ;
+
+KernelMergeObject kernel_misc.o :
+	Referenceable.cpp
+
+	: $(TARGET_KERNEL_PIC_CCFLAGS)
+;

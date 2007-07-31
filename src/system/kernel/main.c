@@ -26,6 +26,7 @@
 #include <kscheduler.h>
 #include <ksyscalls.h>
 #include <messaging.h>
+#include <Notifications.h>
 #include <port.h>
 #include <real_time_clock.h>
 #include <sem.h>
@@ -156,6 +157,8 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		elf_init(&sKernelArgs);
 		TRACE("init scheduler\n");
 		scheduler_init();
+		TRACE("init notification services\n");
+		notifications_init();
 		TRACE("init VFS\n");
 		vfs_init(&sKernelArgs);
 
