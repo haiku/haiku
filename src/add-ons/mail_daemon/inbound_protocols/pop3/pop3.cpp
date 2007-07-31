@@ -39,7 +39,7 @@
 
 #include "pop3.h"
 
-#define POP3_RETRIEVAL_TIMEOUT 30000000
+#define POP3_RETRIEVAL_TIMEOUT 60000000
 #define CRLF	"\r\n"
 
 
@@ -95,25 +95,28 @@ POP3Protocol::Open(const char *server, int port, int)
 
 	fLog = "";
 
-	//-----Prime the error message
+	// Prime the error message
 	BString error_msg;
-	error_msg << MDR_DIALECT_CHOICE ("Error while connecting to server ","サーバに接続中にエラーが発生しました ") << server;
+	error_msg << MDR_DIALECT_CHOICE("Error while connecting to server ",
+		"サーバに接続中にエラーが発生しました ") << server;
 	if (port != 110)
 		error_msg << ":" << port;
-	
-	uint32 hostIP = inet_addr(server);  // first see if we can parse it as a numeric address
-	if ((hostIP == 0)||(hostIP == (uint32)-1)) {
+
+	uint32 hostIP = inet_addr(server);
+		// first see if we can parse it as a numeric address
+	if (hostIP == 0 || hostIP == ~0UL) {
 		struct hostent * he = gethostbyname(server);
 		hostIP = he ? *((uint32*)he->h_addr) : 0;
 	}
 
 	if (hostIP == 0) {
-		error_msg << MDR_DIALECT_CHOICE (": Connection refused or host not found",": ：接続が拒否されたかサーバーが見つかりません");
+		error_msg << MDR_DIALECT_CHOICE(": Connection refused or host not found",
+			": ：接続が拒否されたかサーバーが見つかりません");
 		runner->ShowError(error_msg.String());
 
 		return B_NAME_NOT_FOUND;
 	}
-	
+
 #ifndef HAIKU_TARGET_PLATFORM_BEOS
 	fSocket = socket(AF_INET, SOCK_STREAM, 0);
 #else
@@ -179,12 +182,16 @@ POP3Protocol::Open(const char *server, int port, int)
 
 	BString line;
 	status_t err;
+#ifndef HAIKU_TARGET_PLATFORM_BEOS
+	err = ReceiveLine(line);
+#else
 	int32 tries = 200000;
 		// no endless loop here
 	while ((err = ReceiveLine(line)) == 0) {
 		if (tries-- < 0)
 			return B_ERROR;
 	}
+#endif
 
 	if (err < 0) {
 #ifndef HAIKU_TARGET_PLATFORM_BEOS
