@@ -36,90 +36,78 @@
 
 #include "FileSelector.h"
 
-static BList *	g_files_list 	= NULL;
-static uint32	g_nb_files 		= 0;
+static BList *	gFiles 	= NULL;
 
 status_t	AddFile(BFile * file);
 status_t	RemoveFile();
 
+static const int32 kStatusOk = 'okok';
+static const int32 kStatusCancel = 'canc';
+
 extern "C" _EXPORT void exit_transport()
 {
-	printf("exit_transport\n");
 	RemoveFile();
 }
 
-extern "C" _EXPORT BDataIO * init_transport
-	(
-	BMessage *	msg
-	)
-{
-	BFile * 		file;
-	FileSelector *	selector;
-	entry_ref		ref;
-	
-	printf("init_transport\n");
-
-	selector = new FileSelector();
-	if (selector->Go(&ref) != B_OK)
-		return NULL;
-
-	file = new BFile(&ref, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
-	if ( file->InitCheck() != B_OK ) {
+extern "C" _EXPORT BDataIO * init_transport(BMessage *	msg)
+{	
+	FileSelector * selector = new FileSelector();
+	entry_ref ref;
+	if (selector->Go(&ref) != B_OK) {
+		// dialog cancelled
 		if (msg)
-			msg->what = 'canc';	// Indicates user cancel the panel...
-		delete file;
-		return NULL;
-	};
+			msg->what = kStatusCancel;
 		
-	AddFile(file);
-	
-	BPath path;
-	path.SetTo(&ref);
-	
+		// for backwards compatibility with BeOS R5 return an invalid BFile
+		BFile *file = new BFile();
+		AddFile(file);
+		return file;
+	}
+
+	BFile *file = new BFile(&ref, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	if ( file->InitCheck() != B_OK ) {
+		// invalid file selected
+		if (msg) 
+			msg->what = kStatusCancel;
+		AddFile(file);
+		return file;
+	}
+		
 	if (msg) {
 		// Print transport add-ons should set to 'okok' the message on success
-		msg->what = 'okok';	
-		msg->AddString("path", path.Path()); // Add path of new choosen file to transport message
+		msg->what = kStatusOk;	
+		
+		BPath path;
+		path.SetTo(&ref);
+		msg->AddString("path", path.Path()); 
 	}
+	AddFile(file);
 	return file;
 }
 
 status_t AddFile(BFile * file)
 {
-	if (!file)
+	if (file == NULL)
 		return B_ERROR;
 		
-	if (!g_files_list)
-		{
-		g_files_list = new BList();
-		g_nb_files = 0;
-		};
+	if (gFiles == NULL)
+		gFiles = new BList();
 
-	g_files_list->AddItem(file);
-	g_nb_files++;
-
-	printf("AddFile: %ld file transport(s) instanciated\n", g_nb_files);
+	gFiles->AddItem(file);
 
 	return B_OK;
 }
 
 status_t RemoveFile()
 {
-	void *	file;
-	int32	i;
-
-	g_nb_files--;
-
-	printf("RemoveFile: %ld file transport(s) still instanciated\n", g_nb_files);
-
-	if (g_nb_files)
+	if (gFiles == NULL)
 		return B_OK;
 
-	printf("RemoveFile: deleting files list...\n");
-
-	for (i = 0; (file = g_files_list->ItemAt(i)); i++)
-		delete (BFile*)file;		
+	int32 n = gFiles->CountItems();
+	for (int32 i = 0; i < n; i++)
+		delete (BFile*)gFiles->ItemAt(i);
 	
-	delete g_files_list;
+	delete gFiles;
+	gFiles = NULL;
 	return B_OK;
 }
