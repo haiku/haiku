@@ -123,6 +123,10 @@ public:
 			Rewind();
 		}
 
+		Iterator()
+		{
+		}
+
 		Iterator(const Iterator &other)
 		{
 			*this = other;
@@ -138,6 +142,11 @@ public:
 			fCurrent = fNext;
 			if (fNext)
 				fNext = fList->GetNext(fNext);
+			return fCurrent;
+		}
+
+		Element *Current()
+		{
 			return fCurrent;
 		}
 
