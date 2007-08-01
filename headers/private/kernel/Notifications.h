@@ -22,21 +22,24 @@
 #include <Referenceable.h>
 
 #include <util/AutoLock.h>
-#include <util/DoublyLinkedList.h>
 #include <util/KMessage.h>
 #include <util/OpenHashTable.h>
 
 
 class NotificationService;
 
-class NotificationListener
-	: public DoublyLinkedListLinkImpl<NotificationListener> {
+class NotificationListener {
 	public:
 		virtual ~NotificationListener();
 
 		virtual void EventOccured(NotificationService& service,
 			const KMessage* event);
-		virtual void AllListenersNotified();
+		virtual void AllListenersNotified(NotificationService& service);
+
+		virtual bool operator==(const NotificationListener& other) const;
+
+		bool operator!=(const NotificationListener& other) const
+			{ return !(*this == other); }
 };
 
 class UserMessagingMessageSender {
@@ -64,10 +67,10 @@ class UserMessagingListener : public NotificationListener {
 
 		virtual void EventOccured(NotificationService& service,
 			const KMessage* event);
-		virtual void AllListenersNotified();
+		virtual void AllListenersNotified(NotificationService& service);
 
-		port_id Port()	{ return fPort; }
-		int32 Token()	{ return fToken; }
+		port_id Port() const	{ return fPort; }
+		int32 Token() const		{ return fToken; }
 
 	private:
 		UserMessagingMessageSender&	fSender;
@@ -75,55 +78,16 @@ class UserMessagingListener : public NotificationListener {
 		int32						fToken;
 };
 
-class NotificationListenerUpdater {
-	public:
-		enum update_action {
-			UPDATED,
-			SKIP,
-			DELETE,
-			REMOVE
-		};
-
-		NotificationListenerUpdater(const KMessage* eventSpecifier);
-		virtual ~NotificationListenerUpdater();
-
-		virtual status_t UpdateListener(NotificationListener& listener,
-			enum update_action& action);
-
-		virtual status_t CreateListener(NotificationListener** _listener);
-
-		virtual void SetEventSpecifier(const KMessage* eventSpecifier);
-		const KMessage* EventSpecifier() const	{ return fEventSpecifier; }
-
-	protected:
-		const KMessage* fEventSpecifier;
-};
-
-class UserMessagingListenerUpdater : public NotificationListenerUpdater {
-	public:
-		UserMessagingListenerUpdater(const KMessage* eventSpecifier, port_id port,
-			int32 token);
-
-		virtual status_t UpdateListener(NotificationListener& listener,
-			enum update_action& action);
-
-	protected:
-		virtual status_t UpdateListener(UserMessagingListener& listener,
-			enum update_action& action) = 0;
-
-		port_id	fPort;
-		int32	fToken;
-};
-
 class NotificationService : public Referenceable {
 	public:
-		virtual ~NotificationService() = 0;
+		virtual ~NotificationService();
 
 		virtual status_t AddListener(const KMessage* eventSpecifier,
 			NotificationListener& listener) = 0;
 		virtual status_t RemoveListener(const KMessage* eventSpecifier,
 			NotificationListener& listener) = 0;
-		virtual status_t UpdateListener(NotificationListenerUpdater& updater) = 0;
+		virtual status_t UpdateListener(const KMessage* eventSpecifier,
+			NotificationListener& listener) = 0;
 
 		virtual const char* Name() = 0;
 		HashTableLink<NotificationService>& Link() { return fLink; }
@@ -148,13 +112,13 @@ class NotificationManager {
 		status_t AddListener(const char* service,
 			const KMessage* eventSpecifier, NotificationListener& listener);
 
-		status_t RemoveListener(const char* service, uint32 eventMask,
-			NotificationListener& listener);
-		status_t RemoveListener(const char* service,
+		status_t UpdateListener(const char* service,
+			uint32 eventMask, NotificationListener& listener);
+		status_t UpdateListener(const char* service,
 			const KMessage* eventSpecifier, NotificationListener& listener);
 
-		status_t UpdateListener(const char* service,
-			NotificationListenerUpdater& updater);
+		status_t RemoveListener(const char* service,
+			const KMessage* eventSpecifier, NotificationListener& listener);
 
 	private:
 		NotificationManager();

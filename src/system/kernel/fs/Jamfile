@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src system kernel fs ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel fs ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
-UsePrivateHeaders storage ;
+UsePrivateHeaders shared storage ;
 
 KernelMergeObject kernel_fs.o : 
 	devfs.cpp

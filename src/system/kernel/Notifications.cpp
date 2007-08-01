@@ -30,8 +30,15 @@ NotificationListener::EventOccured(NotificationService& service,
 
 
 void
-NotificationListener::AllListenersNotified()
+NotificationListener::AllListenersNotified(NotificationService& service)
 {
+}
+
+
+bool
+NotificationListener::operator==(const NotificationListener& other) const
+{
+	return &other == this;
 }
 
 
@@ -102,86 +109,18 @@ UserMessagingListener::EventOccured(NotificationService& service,
 
 
 void
-UserMessagingListener::AllListenersNotified()
+UserMessagingListener::AllListenersNotified(NotificationService& service)
 {
 	fSender.FlushMessage();
 }
 
 
-// #pragma mark - NotificationListenerUpdater
+//	#pragma mark - NotificationService
 
 
-NotificationListenerUpdater::NotificationListenerUpdater(
-		const KMessage* eventSpecifier)
-	: fEventSpecifier(eventSpecifier)
-{
-}
-
-
-NotificationListenerUpdater::~NotificationListenerUpdater()
-{
-}
-
-
-status_t
-NotificationListenerUpdater::UpdateListener(NotificationListener& listener,
-	enum update_action& action)
-{
-	action = SKIP;
-	return B_OK;
-}
-
-
-status_t
-NotificationListenerUpdater::CreateListener(NotificationListener** _listener)
-{
-	return B_ERROR;
-}
-
-
-void
-NotificationListenerUpdater::SetEventSpecifier(const KMessage* eventSpecifier)
-{
-	fEventSpecifier = eventSpecifier;
-}
-
-
-// #pragma mark - NotificationListenerUpdater
-
-
-UserMessagingListenerUpdater::UserMessagingListenerUpdater(
-		const KMessage* eventSpecifier, port_id port, int32 token)
-	:
-	NotificationListenerUpdater(eventSpecifier),
-	fPort(port),
-	fToken(token)
-{
-}
-
-
-status_t
-UserMessagingListenerUpdater::UpdateListener(NotificationListener& _listener,
-	enum update_action& action)
-{
-	UserMessagingListener* listener
-		= dynamic_cast<UserMessagingListener*>(&_listener);
-	if (listener != NULL && listener->Port() == fPort
-		&& listener->Token() == fToken) {
-		return UpdateListener(*listener, action);
-	}
-
-	action = SKIP;
-	return B_OK;
-}
-
-
-//	#pragma mark - NotificationManager
-
-#if 0
 NotificationService::~NotificationService()
 {
 }
-#endif
 
 
 //	#pragma mark - NotificationManager
@@ -285,15 +224,31 @@ NotificationManager::AddListener(const char* serviceName,
 
 
 status_t
-NotificationManager::RemoveListener(const char* serviceName, uint32 eventMask,
-	NotificationListener& listener)
+NotificationManager::UpdateListener(const char* serviceName,
+	uint32 eventMask, NotificationListener& listener)
 {
 	char buffer[96];
 	KMessage specifier;
 	specifier.SetTo(buffer, sizeof(buffer), 0);
 	specifier.AddInt32("event mask", eventMask);
 
-	return RemoveListener(serviceName, &specifier, listener);
+	return UpdateListener(serviceName, &specifier, listener);
+}
+
+
+status_t
+NotificationManager::UpdateListener(const char* serviceName,
+	const KMessage* eventSpecifier, NotificationListener& listener)
+{
+	MutexLocker locker(fLock);
+	NotificationService* service = _ServiceFor(serviceName);
+	if (service == NULL)
+		return B_NAME_NOT_FOUND;
+
+	Reference<NotificationService> reference(service);
+	locker.Unlock();
+
+	return service->UpdateListener(eventSpecifier, listener);
 }
 
 
@@ -310,22 +265,6 @@ NotificationManager::RemoveListener(const char* serviceName,
 	locker.Unlock();
 
 	return service->RemoveListener(eventSpecifier, listener);
-}
-
-
-status_t
-NotificationManager::UpdateListener(const char* serviceName,
-	NotificationListenerUpdater& updater)
-{
-	MutexLocker locker(fLock);
-	NotificationService* service = _ServiceFor(serviceName);
-	if (service == NULL)
-		return B_NAME_NOT_FOUND;
-
-	Reference<NotificationService> reference(service);
-	locker.Unlock();
-
-	return service->UpdateListener(updater);
 }
 
 

@@ -26,8 +26,8 @@ extern status_t notify_mount(dev_t device, dev_t parentDevice,
 extern status_t _user_stop_notifying(port_id port, uint32 token);
 extern status_t _user_start_watching(dev_t device, ino_t node, uint32 flags,
 					port_id port, uint32 token);
-extern status_t _user_stop_watching(dev_t device, ino_t node, uint32 flags,
-					port_id port, uint32 token);
+extern status_t _user_stop_watching(dev_t device, ino_t node, port_id port,
+					uint32 token);
 
 #ifdef __cplusplus
 }

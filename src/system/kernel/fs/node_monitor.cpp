@@ -4,21 +4,24 @@
  */
 
 
-#include <drivers/node_monitor.h>
-#include <app/AppDefs.h>
-
 #include <fs/node_monitor.h>
-#include <vfs.h>
+
+#include <stddef.h>
+#include <stdlib.h>
+
+#include <AppDefs.h>
+#include <NodeMonitor.h>
+
 #include <fd.h>
-#include <lock.h>
 #include <khash.h>
+#include <lock.h>
 #include <messaging.h>
+#include <Notifications.h>
+#include <vfs.h>
 #include <util/AutoLock.h>
+#include <util/DoublyLinkedList.h>
 #include <util/KMessage.h>
 #include <util/list.h>
-
-#include <malloc.h>
-#include <stddef.h>
 
 
 //#define TRACE_MONITOR
@@ -31,7 +34,6 @@
 
 // ToDo: add more fine grained locking - maybe using a ref_count in the
 //		node_monitor structure?
-// ToDo: implement watching mounts/unmounts
 // ToDo: return another error code than B_NO_MEMORY if the team's maximum is hit
 
 
@@ -39,462 +41,158 @@ typedef struct monitor_listener monitor_listener;
 typedef struct node_monitor node_monitor;
 
 struct monitor_listener {
-	monitor_listener	*next;
-	monitor_listener	*prev;
-	list_link			monitor_link;
-	port_id				port;
-	uint32				token;
+	list_link			context_link;
+	DoublyLinkedListLink<monitor_listener> monitor_link;
+	NotificationListener *listener;
 	uint32				flags;
 	node_monitor		*monitor;
 };
 
+typedef DoublyLinkedList<monitor_listener, DoublyLinkedListMemberGetLink<
+	monitor_listener, &monitor_listener::monitor_link> > MonitorListenerList;
+
 struct node_monitor {
-	node_monitor		*next;
+	HashTableLink<node_monitor> link;
 	dev_t				device;
 	ino_t				node;
-	struct list			listeners;
-};
-
-struct monitor_hash_key {
-	dev_t	device;
-	ino_t	node;
+	MonitorListenerList	listeners;
 };
 
 struct interested_monitor_listener_list {
-	struct list			*listeners;
-	monitor_listener	*first_listener;
+	MonitorListenerList::Iterator iterator;
 	uint32				flags;
 };
 
-#define MONITORS_HASH_TABLE_SIZE 16
+static UserMessagingMessageSender sNodeMonitorSender;
 
-static hash_table *gMonitorHash;
-static mutex gMonitorMutex;
-
-
-static int
-monitor_compare(void *_monitor, const void *_key)
-{
-	node_monitor *monitor = (node_monitor*)_monitor;
-	const struct monitor_hash_key *key = (const struct monitor_hash_key*)_key;
-
-	if (monitor->device == key->device && monitor->node == key->node)
-		return 0;
-
-	return -1;
-}
-
-
-static uint32
-monitor_hash(void *_monitor, const void *_key, uint32 range)
-{
-	node_monitor *monitor = (node_monitor*)_monitor;
-	const struct monitor_hash_key *key = (const struct monitor_hash_key*)_key;
-
-#define MHASH(device, node) (((uint32)((node) >> 32) + (uint32)(node)) ^ (uint32)(device))
-
-	if (monitor != NULL)
-		return MHASH(monitor->device, monitor->node) % range;
-
-	return MHASH(key->device, key->node) % range;
-#undef MHASH
-}
-
-
-/** Returns the monitor that matches the specified device/node pair.
- *	Must be called with monitors lock hold.
- */
-
-static node_monitor *
-get_monitor_for(dev_t device, ino_t node)
-{
-	struct monitor_hash_key key;
-	key.device = device;
-	key.node = node;
-
-	return (node_monitor *)hash_lookup(gMonitorHash, &key);
-}
-
-
-/** Returns the listener that matches the specified port/token pair.
- *	Must be called with monitors lock hold.
- */
-
-static monitor_listener *
-get_listener_for(node_monitor *monitor, port_id port, uint32 token)
-{
-	monitor_listener *listener = NULL;
-	
-	while ((listener = (monitor_listener*)list_get_next_item(
-			&monitor->listeners, listener)) != NULL) {
-		// does this listener match?
-		if (listener->port == port && listener->token == token)
-			return listener;
-	}
-
-	return NULL;
-}
-
-
-/** Removes the specified node_monitor from the hashtable
- *	and free it.
- *	Must be called with monitors lock hold.
- */
-
-static void
-remove_monitor(node_monitor *monitor)
-{
-	hash_remove(gMonitorHash, monitor);
-	free(monitor);
-}
-
-
-/** Removes the specified monitor_listener from all lists
- *	and free it.
- *	Must be called with monitors lock hold.
- */
-
-static void
-remove_listener(monitor_listener *listener)
-{
-	node_monitor *monitor = listener->monitor;
-
-	// remove it from the listener and I/O context lists	
-	list_remove_link(&listener->monitor_link);
-	list_remove_link(listener);
-
-	free(listener);
-
-	if (list_is_empty(&monitor->listeners))
-		remove_monitor(monitor);
-}
-
-
-static status_t
-add_node_monitor(io_context *context, dev_t device, ino_t node,
-	uint32 flags, port_id port, uint32 token)
-{
-	monitor_listener *listener;
-	node_monitor *monitor;
-	status_t status = B_OK;
-
-	TRACE(("add_node_monitor(dev = %ld, node = %Ld, flags = %ld, port = %ld, token = %ld\n",
-		device, node, flags, port, token));
-
-	mutex_lock(&gMonitorMutex);
-
-	monitor = get_monitor_for(device, node);
-	if (monitor == NULL) {
-		// check if this team is allowed to have more listeners
-		if (context->num_monitors >= context->max_monitors) {
-			// the BeBook says to return B_NO_MEMORY in this case, but
-			// we should have another one.
-			status = B_NO_MEMORY;
-			goto out;
+class UserNodeListener : public UserMessagingListener {
+	public:
+		UserNodeListener(port_id port, int32 token)
+			: UserMessagingListener(sNodeMonitorSender, port, token)
+		{
 		}
 
-		// create new monitor
-		monitor = (node_monitor *)malloc(sizeof(node_monitor));
-		if (monitor == NULL) {
-			status = B_NO_MEMORY;
-			goto out;
+		bool operator==(const NotificationListener& _other) const
+		{
+			const UserNodeListener* other
+				= dynamic_cast<const UserNodeListener*>(&_other);
+			return other != NULL && other->Port() == Port()
+				&& other->Token() == Token();
 		}
+};
 
-		// initialize monitor		
-		monitor->device = device;
-		monitor->node = node;
-		list_init_etc(&monitor->listeners, offsetof(monitor_listener, monitor_link));
+class NodeMonitorService : public NotificationService {
+	public:
+		NodeMonitorService();
+		virtual ~NodeMonitorService();
 
-		hash_insert(gMonitorHash, monitor);
-	} else {
-		// check if the listener is already listening, and
-		// if so, just add the new flags
+		status_t InitCheck();
 
-		listener = get_listener_for(monitor, port, token);
-		if (listener != NULL) {
-			listener->flags |= flags;
-			goto out;
-		}
+		status_t NotifyEntryCreatedOrRemoved(int32 opcode, dev_t device,
+			ino_t directory, const char *name, ino_t node);
+		status_t NotifyEntryMoved(dev_t device, ino_t fromDirectory,
+			const char *fromName, ino_t toDirectory, const char *toName,
+			ino_t node);
+		status_t NotifyStatChanged(dev_t device, ino_t node, uint32 statFields);
+		status_t NotifyAttributeChanged(dev_t device, ino_t node,
+			const char *attribute, int32 cause);
+		status_t NotifyUnmount(dev_t device);
+		status_t NotifyMount(dev_t device, dev_t parentDevice,
+			ino_t parentDirectory);
 
-		// check if this team is allowed to have more listeners
-		if (context->num_monitors >= context->max_monitors) {
-			// the BeBook says to return B_NO_MEMORY in this case, but
-			// we should have another one.
-			status = B_NO_MEMORY;
-			goto out;
-		}
-	}
+		status_t RemoveListeners(io_context *context);
 
-	// add listener
+		status_t AddListener(const KMessage *eventSpecifier,
+			NotificationListener &listener);
+		status_t UpdateListener(const KMessage *eventSpecifier,
+			NotificationListener &listener);
+		status_t RemoveListener(const KMessage *eventSpecifier,
+			NotificationListener &listener);
 
-	listener = (monitor_listener *)malloc(sizeof(monitor_listener));
-	if (listener == NULL) {
-		// no memory for the listener, so remove the monitor as well if needed
-		if (list_is_empty(&monitor->listeners))
-			remove_monitor(monitor);
+		status_t RemoveListener(io_context *context, dev_t device, ino_t node,
+			NotificationListener &notificationListener);
 
-		status = B_NO_MEMORY;
-		goto out;
-	}
+		status_t RemoveUserListeners(struct io_context *context,
+			port_id port, uint32 token);
+		status_t UpdateUserListener(io_context *context, dev_t device,
+			ino_t node, uint32 flags, UserNodeListener &userListener);
 
-	// initialize listener, and add it to the lists
-	listener->port = port;
-	listener->token = token;
-	listener->flags = flags;
-	listener->monitor = monitor;
+		virtual const char* Name() { return "node monitor"; }
 
-	list_add_link_to_head(&monitor->listeners, &listener->monitor_link);
-	list_add_link_to_head(&context->node_monitors, listener);
+	private:
+		void _RemoveMonitor(node_monitor *monitor);
+		void _RemoveListener(monitor_listener *listener);
+		node_monitor *_MonitorFor(dev_t device, ino_t node);
+		status_t _GetMonitor(io_context *context, dev_t device, ino_t node,
+			bool addIfNecessary, node_monitor **_monitor);
+		monitor_listener *_MonitorListenerFor(node_monitor* monitor,
+			NotificationListener& notificationListener);
+		status_t _AddMonitorListener(io_context *context,
+			node_monitor* monitor, uint32 flags,
+			NotificationListener& notificationListener);
+		status_t _AddListener(io_context *context, dev_t device, ino_t node,
+			uint32 flags, NotificationListener &notificationListener);
+		status_t _UpdateListener(io_context *context, dev_t device, ino_t node,
+			uint32 flags, bool addFlags,
+			NotificationListener &notificationListener);
+		void _GetInterestedMonitorListeners(dev_t device, ino_t node,
+			uint32 flags, interested_monitor_listener_list *interestedListeners,
+			int32 &interestedListenerCount);
+		status_t _SendNotificationMessage(KMessage &message,
+			interested_monitor_listener_list *interestedListeners,
+			int32 interestedListenerCount);
 
-	context->num_monitors++;
+		struct monitor_hash_key {
+			dev_t	device;
+			ino_t	node;
+		};
 
-out:
-	mutex_unlock(&gMonitorMutex);
-	return status;
-}
+		struct HashDefinition {
+			typedef monitor_hash_key* KeyType;
+			typedef	node_monitor ValueType;
 
+			size_t HashKey(monitor_hash_key* key) const
+				{ return _Hash(key->device, key->node); }
+			size_t Hash(node_monitor *monitor) const
+				{ return _Hash(monitor->device, monitor->node); }
 
-static status_t
-remove_node_monitor(struct io_context *context, dev_t device, ino_t node,
-	uint32 flags, port_id port, uint32 token)
-{
-	monitor_listener *listener;
-	node_monitor *monitor;
-	status_t status = B_OK;
-
-	TRACE(("remove_node_monitor(dev = %ld, node = %Ld, flags = %ld, port = %ld, token = %ld\n",
-		device, node, flags, port, token));
-
-	mutex_lock(&gMonitorMutex);
-
-	// get the monitor for this device/node pair
-	monitor = get_monitor_for(device, node);
-	if (monitor == NULL) {
-		status = B_ENTRY_NOT_FOUND;
-		goto out;
-	}
-
-	// see if it has the listener we are looking for
-	listener = get_listener_for(monitor, port, token);
-	if (listener == NULL) {
-		status = B_ENTRY_NOT_FOUND;
-		goto out;
-	}
-
-	// no flags means remove all flags
-	if (flags == B_STOP_WATCHING)
-		flags = ~0;
-
-	listener->flags &= ~flags;
-
-	// if there aren't anymore flags, remove this listener
-	if (listener->flags == B_STOP_WATCHING) {
-		remove_listener(listener);
-		context->num_monitors--;
-	}
-
-out:
-	mutex_unlock(&gMonitorMutex);
-	return status;
-}
-
-
-static status_t
-remove_node_monitors_by_target(struct io_context *context, port_id port, uint32 token)
-{
-	monitor_listener *listener = NULL;
-	int32 count = 0;
-
-	while ((listener = (monitor_listener*)list_get_next_item(
-			&context->node_monitors, listener)) != NULL) {
-		monitor_listener *removeListener;
-
-		if (listener->port != port || listener->token != token)
-			continue;
-
-		listener = (monitor_listener*)list_get_prev_item(
-			&context->node_monitors, removeListener = listener);
-			// this line sets the listener one item back, allowing us
-			// to remove its successor (which is saved in "removeListener")
-
-		remove_listener(removeListener);
-		count++;
-	}
-
-	return count > 0 ? B_OK : B_ENTRY_NOT_FOUND;
-}
-
-
-/**	\brief Given device and node ID and a node monitoring event mask, the
- *		   function checks whether there are listeners interested in any of
- *		   the events for that node and, if so, adds the respective listener
- *		   list to a supplied array of listener lists.
- *
- *	Note, that in general not all of the listeners in an appended list will be
- *	interested in the events, but it is guaranteed that
- *	interested_monitor_listener_list::first_listener is indeed
- *	the first listener in the list, that is interested.
- *
- *	\param device The ID of the mounted FS, the node lives in.
- *	\param node The ID of the node.
- *	\param flags The mask specifying the events occurred for the given node
- *		   (a combination of \c B_WATCH_* constants).
- *	\param interestedListeners An array of listener lists. If there are
- *		   interested listeners for the node, the list will be appended to
- *		   this array.
- *	\param interestedListenerCount The number of elements in the
- *		   \a interestedListeners array. Will be incremented, if a list is
- *		   appended.
- */
-
-static void
-get_interested_monitor_listeners(dev_t device, ino_t node,
-	uint32 flags, interested_monitor_listener_list *interestedListeners,
-	int32 &interestedListenerCount)
-{
-	// get the monitor for the node
-	node_monitor *monitor = get_monitor_for(device, node);
-	if (!monitor)
-		return;
-
-	// iterate through the listeners until we find one with matching flags
-	monitor_listener *listener = NULL;
-	while ((listener = (monitor_listener*)list_get_next_item(
-			&monitor->listeners, listener)) != NULL) {
-		if (listener->flags & flags) {
-			interested_monitor_listener_list &list
-				= interestedListeners[interestedListenerCount++];
-			list.listeners = &monitor->listeners;
-			list.first_listener = listener;
-			list.flags = flags;
-			return;
-		}
-	}
-}
-
-
-/**	\brief Sends a notifcation message to the given listeners.
- *	\param message The message to be sent.
- *	\param interestedListeners An array of listener lists.
- *	\param interestedListenerCount The number of elements in the
- *		   \a interestedListeners array. 
- *	\return
- *	- \c B_OK, if everything went fine,
- *	- another error code otherwise.
- */
-
-static status_t
-send_notification_message(KMessage &message,
-	interested_monitor_listener_list *interestedListeners,
-	int32 interestedListenerCount)
-{
-	// Since the messaging service supports broadcasting and that is more
-	// efficient than sending the messages individually, we collect the
-	// listener targets in an array and send the message to them at once.
-	const int32 maxTargetCount = 16;
-	messaging_target targets[maxTargetCount];
-	int32 targetCount = 0;
-
-	// iterate through the lists
-	interested_monitor_listener_list *list = interestedListeners;
-	for (int32 i = 0; i < interestedListenerCount; i++, list++) {
-		// iterate through the listeners
-		monitor_listener *listener = list->first_listener;
-		do {
-			if (listener->flags & list->flags) {
-				// the listener's flags match: add it to the targets
-				messaging_target &target = targets[targetCount++];
-				target.port = listener->port;
-				target.token = listener->token;
-
-				// if the target array is full, send the message
-				if (targetCount == maxTargetCount) {
-					status_t error = send_message(&message, targets,
-						targetCount);
-					if (error != B_OK)
-						return error;
-
-					targetCount = 0;
-				}
+			bool Compare(monitor_hash_key* key, node_monitor *monitor) const
+			{
+				return key->device == monitor->device
+					&& key->node == monitor->node;
 			}
-		} while ((listener = (monitor_listener*)list_get_next_item(
-				list->listeners, listener)) != NULL);
-	}
 
-	// if any targets are left (the usual case, unless the target array got
-	// full early), send the message
-	if (targetCount > 0)
-		return send_message(&message, targets, targetCount);
+			HashTableLink<node_monitor>* GetLink(
+					node_monitor* monitor) const
+				{ return &monitor->link; }
 
-	return B_OK;
-}
+			uint32 _Hash(dev_t device, ino_t node) const
+			{
+				return ((uint32)(node >> 32) + (uint32)node) ^ (uint32)device;
+			}
+		};
 
+		typedef OpenHashTable<HashDefinition> MonitorHash;
+		MonitorHash	fMonitors;
+		mutex		fMutex;
+};
 
-/**	\brief Notifies all interested listeners that an entry has been created
- *		   or removed.
- *	\param opcode \c B_ENTRY_CREATED or \c B_ENTRY_REMOVED.
- *	\param device The ID of the mounted FS, the entry lives/lived in.
- *	\param directory The entry's parent directory ID.
- *	\param name The entry's name.
- *	\param node The ID of the node the entry refers/referred to.
- *	\return
- *	- \c B_OK, if everything went fine,
- *	- another error code otherwise.
- */
-
-static status_t
-notify_entry_created_or_removed(int32 opcode, dev_t device,
-	ino_t directory, const char *name, ino_t node)
-{
-	if (!name)
-		return B_BAD_VALUE;
-
-	MutexLocker locker(gMonitorMutex);
-
-	// get the lists of all interested listeners
-	interested_monitor_listener_list interestedListeners[3];
-	int32 interestedListenerCount = 0;
-	// ... for the node
-	if (opcode != B_ENTRY_CREATED) {
-		get_interested_monitor_listeners(device, node, B_WATCH_NAME,
-			interestedListeners, interestedListenerCount);
-	}
-	// ... for the directory
-	get_interested_monitor_listeners(device, directory, B_WATCH_DIRECTORY,
-		interestedListeners, interestedListenerCount);
-
-	if (interestedListenerCount == 0)
-		return B_OK;
-
-	// there are interested listeners: construct the message and send it
-	char messageBuffer[1024];
-	KMessage message;
-	message.SetTo(messageBuffer, sizeof(messageBuffer), B_NODE_MONITOR);
-	message.AddInt32("opcode", opcode);
-	message.AddInt32("device", device);
-	message.AddInt64("directory", directory);
-	message.AddInt64("node", node);
-	message.AddString("name", name);			// for "removed" Haiku only
-
-	return send_notification_message(message, interestedListeners,
-		interestedListenerCount);
-}
+static NodeMonitorService sNodeMonitorService;
 
 
-/**	\brief Notifies the listener of a live query that an entry has been added
- *		   to or removed from the query (for whatever reason).
- *	\param opcode \c B_ENTRY_CREATED or \c B_ENTRY_REMOVED.
- *	\param port The target port of the listener.
- *	\param token The BHandler token of the listener.
- *	\param device The ID of the mounted FS, the entry lives in.
- *	\param directory The entry's parent directory ID.
- *	\param name The entry's name.
- *	\param node The ID of the node the entry refers to.
- *	\return
- *	- \c B_OK, if everything went fine,
- *	- another error code otherwise.
- */
-
+/*!	\brief Notifies the listener of a live query that an entry has been added
+  		   to or removed from the query (for whatever reason).
+  	\param opcode \c B_ENTRY_CREATED or \c B_ENTRY_REMOVED.
+  	\param port The target port of the listener.
+  	\param token The BHandler token of the listener.
+  	\param device The ID of the mounted FS, the entry lives in.
+  	\param directory The entry's parent directory ID.
+  	\param name The entry's name.
+  	\param node The ID of the node the entry refers to.
+  	\return
+  	- \c B_OK, if everything went fine,
+  	- another error code otherwise.
+*/
 static status_t
 notify_query_entry_created_or_removed(int32 opcode, port_id port, int32 token,
 	dev_t device, ino_t directory, const char *name, ino_t node)
@@ -521,49 +219,483 @@ notify_query_entry_created_or_removed(int32 opcode, port_id port, int32 token,
 }
 
 
-//	#pragma mark - private kernel API
+//	#pragma mark - NodeMonitorService
+
+
+NodeMonitorService::NodeMonitorService()
+{
+	mutex_init(&fMutex, "node monitor");
+}
+
+
+NodeMonitorService::~NodeMonitorService()
+{
+}
 
 
 status_t
-remove_node_monitors(struct io_context *context)
+NodeMonitorService::InitCheck()
 {
-	mutex_lock(&gMonitorMutex);
+	return fMutex.sem >= B_OK ? B_OK : fMutex.sem;
+}
 
-	while (!list_is_empty(&context->node_monitors)) {
-		// the remove_listener() function will also free the node_monitor
-		// if it doesn't have any listeners attached anymore
-		remove_listener(
-			(monitor_listener*)list_get_first_item(&context->node_monitors));
+
+/*! Removes the specified node_monitor from the hashtable
+	and free it.
+	Must be called with monitors lock hold.
+*/
+void
+NodeMonitorService::_RemoveMonitor(node_monitor *monitor)
+{
+	fMonitors.Remove(monitor);
+	delete monitor;
+}
+
+
+/*! Removes the specified monitor_listener from all lists
+	and free it.
+	Must be called with monitors lock hold.
+*/
+void
+NodeMonitorService::_RemoveListener(monitor_listener *listener)
+{
+	node_monitor *monitor = listener->monitor;
+
+	// remove it from the listener and I/O context lists	
+	monitor->listeners.Remove(listener);
+	list_remove_link(listener);
+
+	delete listener;
+
+	if (monitor->listeners.IsEmpty())
+		_RemoveMonitor(monitor);
+}
+
+
+/*! Returns the monitor that matches the specified device/node pair.
+	Must be called with monitors lock hold.
+*/
+node_monitor *
+NodeMonitorService::_MonitorFor(dev_t device, ino_t node)
+{
+	struct monitor_hash_key key;
+	key.device = device;
+	key.node = node;
+
+	return fMonitors.Lookup(&key);
+}
+
+
+/*! Returns the monitor that matches the specified device/node pair.
+	If the monitor does not exist yet, it will be created.
+	Must be called with monitors lock hold.
+*/
+status_t
+NodeMonitorService::_GetMonitor(io_context *context, dev_t device, ino_t node,
+	bool addIfNecessary, node_monitor** _monitor)
+{
+	node_monitor* monitor = _MonitorFor(device, node);
+	if (monitor != NULL) {
+		*_monitor = monitor;
+		return B_OK;
+	}
+	if (!addIfNecessary)
+		return B_BAD_VALUE;
+
+	// check if this team is allowed to have more listeners
+	if (context->num_monitors >= context->max_monitors) {
+		// the BeBook says to return B_NO_MEMORY in this case, but
+		// we should have another one.
+		return B_NO_MEMORY;
 	}
 
-	mutex_unlock(&gMonitorMutex);
+	// create new monitor
+	monitor = new(std::nothrow) node_monitor;
+	if (monitor == NULL)
+		return B_NO_MEMORY;
+
+	// initialize monitor		
+	monitor->device = device;
+	monitor->node = node;
+
+	if (fMonitors.Insert(monitor) < B_OK) {
+		delete monitor;
+		return B_NO_MEMORY;
+	}
+
+	*_monitor = monitor;
+	return B_OK;
+}
+
+
+/*! Returns the listener that matches the specified port/token pair.
+	Must be called with monitors lock hold.
+*/
+monitor_listener*
+NodeMonitorService::_MonitorListenerFor(node_monitor* monitor,
+	NotificationListener& notificationListener)
+{
+	MonitorListenerList::Iterator iterator
+		= monitor->listeners.GetIterator();
+
+	while (monitor_listener* listener = iterator.Next()) {
+		// does this listener match?
+		if (*listener->listener == notificationListener)
+			return listener;
+	}
+
+	return NULL;
+}
+
+
+status_t
+NodeMonitorService::_AddMonitorListener(io_context *context,
+	node_monitor* monitor, uint32 flags,
+	NotificationListener& notificationListener)
+{
+	monitor_listener *listener = new(std::nothrow) monitor_listener;
+	if (listener == NULL) {
+		// no memory for the listener, so remove the monitor as well if needed
+		if (monitor->listeners.IsEmpty())
+			_RemoveMonitor(monitor);
+
+		return B_NO_MEMORY;
+	}
+
+	// initialize listener, and add it to the lists
+	listener->listener = &notificationListener;
+	listener->flags = flags;
+	listener->monitor = monitor;
+
+	monitor->listeners.Add(listener);
+	list_add_link_to_head(&context->node_monitors, listener);
+
+	context->num_monitors++;
 	return B_OK;
 }
 
 
 status_t
-node_monitor_init(void)
+NodeMonitorService::_AddListener(io_context *context, dev_t device, ino_t node,
+	uint32 flags, NotificationListener& notificationListener)
 {
-	gMonitorHash = hash_init(MONITORS_HASH_TABLE_SIZE, offsetof(node_monitor, next),
-		&monitor_compare, &monitor_hash);
-	if (gMonitorHash == NULL)
-			panic("node_monitor_init: error creating mounts hash table\n");
+	TRACE(("%s(dev = %ld, node = %Ld, flags = %ld, listener = %p\n",
+		__PRETTY_FUNCTION__, device, node, flags, &notificationListener));
 
-	return mutex_init(&gMonitorMutex, "node monitor");
+	MutexLocker _(fMutex);
+
+	node_monitor *monitor;
+	status_t status = _GetMonitor(context, device, node, true, &monitor);
+	if (status < B_OK)
+		return status;
+
+	// add listener
+
+	return _AddMonitorListener(context, monitor, flags, notificationListener);
 }
 
 
 status_t
-notify_unmount(dev_t device)
+NodeMonitorService::_UpdateListener(io_context *context, dev_t device,
+	ino_t node, uint32 flags, bool addFlags,
+	NotificationListener& notificationListener)
 {
-	TRACE(("unmounted device: %ld\n", device));
+	TRACE(("%s(dev = %ld, node = %Ld, flags = %ld, listener = %p\n",
+		__PRETTY_FUNCTION__, device, node, flags, &notificationListener));
 
-	MutexLocker locker(gMonitorMutex);
+	MutexLocker _(fMutex);
+
+	node_monitor *monitor;
+	status_t status = _GetMonitor(context, device, node, false, &monitor);
+	if (status < B_OK)
+		return status;
+
+	MonitorListenerList::Iterator iterator = monitor->listeners.GetIterator();
+	while (monitor_listener* listener = iterator.Next()) {
+		if (*listener->listener == notificationListener) {
+			if (addFlags)
+				listener->flags |= flags;
+			else
+				listener->flags = flags;
+			return B_OK;
+		}
+	}
+
+	return B_BAD_VALUE;
+}
+
+
+/*!	\brief Given device and node ID and a node monitoring event mask, the
+		   function checks whether there are listeners interested in any of
+		   the events for that node and, if so, adds the respective listener
+		   list to a supplied array of listener lists.
+
+	Note, that in general not all of the listeners in an appended list will be
+	interested in the events, but it is guaranteed that
+	interested_monitor_listener_list::first_listener is indeed
+	the first listener in the list, that is interested.
+
+	\param device The ID of the mounted FS, the node lives in.
+	\param node The ID of the node.
+	\param flags The mask specifying the events occurred for the given node
+		   (a combination of \c B_WATCH_* constants).
+	\param interestedListeners An array of listener lists. If there are
+		   interested listeners for the node, the list will be appended to
+		   this array.
+	\param interestedListenerCount The number of elements in the
+		   \a interestedListeners array. Will be incremented, if a list is
+		   appended.
+*/
+void
+NodeMonitorService::_GetInterestedMonitorListeners(dev_t device, ino_t node,
+	uint32 flags, interested_monitor_listener_list *interestedListeners,
+	int32 &interestedListenerCount)
+{
+	// get the monitor for the node
+	node_monitor *monitor = _MonitorFor(device, node);
+	if (monitor == NULL)
+		return;
+
+	// iterate through the listeners until we find one with matching flags
+	MonitorListenerList::Iterator iterator = monitor->listeners.GetIterator();
+	while (monitor_listener *listener = iterator.Next()) {
+		if (listener->flags & flags) {
+			interested_monitor_listener_list &list
+				= interestedListeners[interestedListenerCount++];
+			list.iterator = iterator;
+			list.flags = flags;
+			return;
+		}
+	}
+}
+
+
+/*!	\brief Sends a notifcation message to the given listeners.
+	\param message The message to be sent.
+	\param interestedListeners An array of listener lists.
+	\param interestedListenerCount The number of elements in the
+		   \a interestedListeners array. 
+	\return
+	- \c B_OK, if everything went fine,
+	- another error code otherwise.
+*/
+status_t
+NodeMonitorService::_SendNotificationMessage(KMessage &message,
+	interested_monitor_listener_list *interestedListeners,
+	int32 interestedListenerCount)
+{
+	// iterate through the lists
+	interested_monitor_listener_list *list = interestedListeners;
+	for (int32 i = 0; i < interestedListenerCount; i++, list++) {
+		// iterate through the listeners
+		MonitorListenerList::Iterator iterator = list->iterator;
+		do {
+			monitor_listener *listener = iterator.Current();
+			if (listener->flags & list->flags)
+				listener->listener->EventOccured(*this, &message);
+		} while (iterator.Next() != NULL);
+	}
+
+	list = interestedListeners;
+	for (int32 i = 0; i < interestedListenerCount; i++, list++) {
+		// iterate through the listeners
+		do {
+			monitor_listener *listener = list->iterator.Current();
+			if (listener->flags & list->flags)
+				listener->listener->AllListenersNotified(*this);
+		} while (list->iterator.Next() != NULL);
+	}
+
+	return B_OK;
+}
+
+
+/*!	\brief Notifies all interested listeners that an entry has been created
+		   or removed.
+	\param opcode \c B_ENTRY_CREATED or \c B_ENTRY_REMOVED.
+	\param device The ID of the mounted FS, the entry lives/lived in.
+	\param directory The entry's parent directory ID.
+	\param name The entry's name.
+	\param node The ID of the node the entry refers/referred to.
+	\return
+	- \c B_OK, if everything went fine,
+	- another error code otherwise.
+*/
+status_t
+NodeMonitorService::NotifyEntryCreatedOrRemoved(int32 opcode, dev_t device,
+	ino_t directory, const char *name, ino_t node)
+{
+	if (!name)
+		return B_BAD_VALUE;
+
+	MutexLocker locker(fMutex);
 
 	// get the lists of all interested listeners
 	interested_monitor_listener_list interestedListeners[3];
 	int32 interestedListenerCount = 0;
-	get_interested_monitor_listeners(-1, -1, B_WATCH_MOUNT,
+	// ... for the node
+	if (opcode != B_ENTRY_CREATED) {
+		_GetInterestedMonitorListeners(device, node, B_WATCH_NAME,
+			interestedListeners, interestedListenerCount);
+	}
+	// ... for the directory
+	_GetInterestedMonitorListeners(device, directory, B_WATCH_DIRECTORY,
+		interestedListeners, interestedListenerCount);
+
+	if (interestedListenerCount == 0)
+		return B_OK;
+
+	// there are interested listeners: construct the message and send it
+	char messageBuffer[1024];
+	KMessage message;
+	message.SetTo(messageBuffer, sizeof(messageBuffer), B_NODE_MONITOR);
+	message.AddInt32("opcode", opcode);
+	message.AddInt32("device", device);
+	message.AddInt64("directory", directory);
+	message.AddInt64("node", node);
+	message.AddString("name", name);			// for "removed" Haiku only
+
+	return _SendNotificationMessage(message, interestedListeners,
+		interestedListenerCount);
+}
+
+
+inline status_t
+NodeMonitorService::NotifyEntryMoved(dev_t device, ino_t fromDirectory,
+	const char *fromName, ino_t toDirectory, const char *toName,
+	ino_t node)
+{
+	if (!fromName || !toName)
+		return B_BAD_VALUE;
+
+	// If node is a mount point, we need to resolve it to the mounted
+	// volume's root node.
+	dev_t nodeDevice = device;
+	resolve_mount_point_to_volume_root(device, node, &nodeDevice, &node);
+
+	MutexLocker locker(fMutex);
+
+	// get the lists of all interested listeners
+	interested_monitor_listener_list interestedListeners[3];
+	int32 interestedListenerCount = 0;
+	// ... for the node
+	_GetInterestedMonitorListeners(nodeDevice, node, B_WATCH_NAME,
+		interestedListeners, interestedListenerCount);
+	// ... for the source directory
+	_GetInterestedMonitorListeners(device, fromDirectory, B_WATCH_DIRECTORY,
+		interestedListeners, interestedListenerCount);
+	// ... for the target directory
+	if (toDirectory != fromDirectory) {
+		_GetInterestedMonitorListeners(device, toDirectory, B_WATCH_DIRECTORY,
+			interestedListeners, interestedListenerCount);
+	}
+
+	if (interestedListenerCount == 0)
+		return B_OK;
+
+	// there are interested listeners: construct the message and send it
+	char messageBuffer[1024];
+	KMessage message;
+	message.SetTo(messageBuffer, sizeof(messageBuffer), B_NODE_MONITOR);
+	message.AddInt32("opcode", B_ENTRY_MOVED);
+	message.AddInt32("device", device);
+	message.AddInt64("from directory", fromDirectory);
+	message.AddInt64("to directory", toDirectory);
+	message.AddInt32("node device", nodeDevice);	// Haiku only
+	message.AddInt64("node", node);
+	message.AddString("from name", fromName);		// Haiku only
+	message.AddString("name", toName);
+
+	return _SendNotificationMessage(message, interestedListeners,
+		interestedListenerCount);
+}
+
+
+inline status_t
+NodeMonitorService::NotifyStatChanged(dev_t device, ino_t node,
+	uint32 statFields)
+{
+	MutexLocker locker(fMutex);
+
+	// get the lists of all interested listeners
+	interested_monitor_listener_list interestedListeners[3];
+	int32 interestedListenerCount = 0;
+	// ... for the node
+	_GetInterestedMonitorListeners(device, node, B_WATCH_STAT,
+		interestedListeners, interestedListenerCount);
+
+	if (interestedListenerCount == 0)
+		return B_OK;
+
+	// there are interested listeners: construct the message and send it
+	char messageBuffer[1024];
+	KMessage message;
+	message.SetTo(messageBuffer, sizeof(messageBuffer), B_NODE_MONITOR);
+	message.AddInt32("opcode", B_STAT_CHANGED);
+	message.AddInt32("device", device);
+	message.AddInt64("node", node);
+	message.AddInt32("fields", statFields);		// Haiku only
+
+	return _SendNotificationMessage(message, interestedListeners,
+		interestedListenerCount);
+}
+
+
+/*!	\brief Notifies all interested listeners that a node attribute has changed.
+	\param device The ID of the mounted FS, the node lives in.
+	\param node The ID of the node.
+	\param attribute The attribute's name.
+	\param cause Either of \c B_ATTR_CREATED, \c B_ATTR_REMOVED, or
+		   \c B_ATTR_CHANGED, indicating what exactly happened to the attribute.
+	\return
+	- \c B_OK, if everything went fine,
+	- another error code otherwise.
+*/
+status_t
+NodeMonitorService::NotifyAttributeChanged(dev_t device, ino_t node,
+	const char *attribute, int32 cause)
+{
+	if (!attribute)
+		return B_BAD_VALUE;
+
+	MutexLocker locker(fMutex);
+
+	// get the lists of all interested listeners
+	interested_monitor_listener_list interestedListeners[3];
+	int32 interestedListenerCount = 0;
+	// ... for the node
+	_GetInterestedMonitorListeners(device, node, B_WATCH_ATTR,
+		interestedListeners, interestedListenerCount);
+
+	if (interestedListenerCount == 0)
+		return B_OK;
+
+	// there are interested listeners: construct the message and send it
+	char messageBuffer[1024];
+	KMessage message;
+	message.SetTo(messageBuffer, sizeof(messageBuffer), B_NODE_MONITOR);
+	message.AddInt32("opcode", B_ATTR_CHANGED);
+	message.AddInt32("device", device);
+	message.AddInt64("node", node);
+	message.AddString("attr", attribute);
+	message.AddInt32("cause", cause);		// Haiku only
+
+	return _SendNotificationMessage(message, interestedListeners,
+		interestedListenerCount);
+}
+
+
+inline status_t
+NodeMonitorService::NotifyUnmount(dev_t device)
+{
+	TRACE(("unmounted device: %ld\n", device));
+
+	MutexLocker locker(fMutex);
+
+	// get the lists of all interested listeners
+	interested_monitor_listener_list interestedListeners[3];
+	int32 interestedListenerCount = 0;
+	_GetInterestedMonitorListeners(-1, -1, B_WATCH_MOUNT,
 		interestedListeners, interestedListenerCount);
 
 	if (interestedListenerCount == 0)
@@ -576,25 +708,24 @@ notify_unmount(dev_t device)
 	message.AddInt32("opcode", B_DEVICE_UNMOUNTED);
 	message.AddInt32("device", device);
 
-	return send_notification_message(message, interestedListeners,
+	return _SendNotificationMessage(message, interestedListeners,
 		interestedListenerCount);
-
-	return B_OK;
 }
 
 
-status_t
-notify_mount(dev_t device, dev_t parentDevice, ino_t parentDirectory)
+inline status_t
+NodeMonitorService::NotifyMount(dev_t device, dev_t parentDevice,
+	ino_t parentDirectory)
 {
 	TRACE(("mounted device: %ld, parent %ld:%Ld\n", device, parentDevice,
 		parentDirectory));
 
-	MutexLocker locker(gMonitorMutex);
+	MutexLocker locker(fMutex);
 
 	// get the lists of all interested listeners
 	interested_monitor_listener_list interestedListeners[3];
 	int32 interestedListenerCount = 0;
-	get_interested_monitor_listeners(-1, -1, B_WATCH_MOUNT,
+	_GetInterestedMonitorListeners(-1, -1, B_WATCH_MOUNT,
 		interestedListeners, interestedListenerCount);
 
 	if (interestedListenerCount == 0)
@@ -609,78 +740,211 @@ notify_mount(dev_t device, dev_t parentDevice, ino_t parentDirectory)
 	message.AddInt32("device", parentDevice);
 	message.AddInt64("directory", parentDirectory);
 
-	return send_notification_message(message, interestedListeners,
+	return _SendNotificationMessage(message, interestedListeners,
 		interestedListenerCount);
+}
+
+
+inline status_t
+NodeMonitorService::RemoveListeners(io_context *context)
+{
+	MutexLocker locker(fMutex);
+
+	while (!list_is_empty(&context->node_monitors)) {
+		// the _RemoveListener() method will also free the node_monitor
+		// if it doesn't have any listeners attached anymore
+		_RemoveListener(
+			(monitor_listener*)list_get_first_item(&context->node_monitors));
+	}
 
 	return B_OK;
 }
 
 
+status_t
+NodeMonitorService::AddListener(const KMessage* eventSpecifier,
+	NotificationListener& listener)
+{
+	if (eventSpecifier == NULL)
+		return B_BAD_VALUE;
+
+	io_context *context = get_current_io_context(
+		eventSpecifier->GetBool("kernel", true));
+
+	dev_t device = eventSpecifier->GetInt32("device", -1);
+	ino_t node = eventSpecifier->GetInt64("node", -1);
+	uint32 flags = eventSpecifier->GetInt32("flags", 0);
+
+	return _AddListener(context, device, node, flags, listener);
+}
+
+
+status_t
+NodeMonitorService::UpdateListener(const KMessage* eventSpecifier,
+	NotificationListener& listener)
+{
+	if (eventSpecifier == NULL)
+		return B_BAD_VALUE;
+
+	io_context *context = get_current_io_context(
+		eventSpecifier->GetBool("kernel", true));
+
+	dev_t device = eventSpecifier->GetInt32("device", -1);
+	ino_t node = eventSpecifier->GetInt64("node", -1);
+	uint32 flags = eventSpecifier->GetInt32("flags", 0);
+	bool addFlags = eventSpecifier->GetBool("add flags", false);
+
+	return _UpdateListener(context, device, node, flags, addFlags, listener);
+}
+
+
+status_t
+NodeMonitorService::RemoveListener(const KMessage* eventSpecifier,
+	NotificationListener& listener)
+{
+	if (eventSpecifier == NULL)
+		return B_BAD_VALUE;
+
+	io_context *context = get_current_io_context(
+		eventSpecifier->GetBool("kernel", true));
+
+	dev_t device = eventSpecifier->GetInt32("device", -1);
+	ino_t node = eventSpecifier->GetInt64("node", -1);
+
+	return RemoveListener(context, device, node, listener);
+}
+
+
+status_t
+NodeMonitorService::RemoveListener(io_context *context, dev_t device,
+	ino_t node, NotificationListener& notificationListener)
+{
+	TRACE(("%s(dev = %ld, node = %Ld, listener = %p\n",
+		__PRETTY_FUNCTION__, device, node, &notificationListener));
+
+	MutexLocker _(fMutex);
+
+	// get the monitor for this device/node pair
+	node_monitor *monitor = _MonitorFor(device, node);
+	if (monitor == NULL)
+		return B_BAD_VALUE;
+
+	// see if it has the listener we are looking for
+	monitor_listener* listener = _MonitorListenerFor(monitor,
+		notificationListener);
+	if (listener == NULL)
+		return B_BAD_VALUE;
+
+	_RemoveListener(listener);
+	context->num_monitors--;
+
+	return B_OK;
+}
+
+
+inline status_t
+NodeMonitorService::RemoveUserListeners(struct io_context *context,
+	port_id port, uint32 token)
+{
+	UserNodeListener userListener(port, token);
+	monitor_listener *listener = NULL;
+	int32 count = 0;
+
+	MutexLocker _(fMutex);
+
+	while ((listener = (monitor_listener*)list_get_next_item(
+			&context->node_monitors, listener)) != NULL) {
+		monitor_listener *removeListener;
+
+		if (*listener->listener != userListener)
+			continue;
+
+		listener = (monitor_listener*)list_get_prev_item(
+			&context->node_monitors, removeListener = listener);
+			// this line sets the listener one item back, allowing us
+			// to remove its successor (which is saved in "removeListener")
+
+		_RemoveListener(removeListener);
+		count++;
+	}
+
+	return count > 0 ? B_OK : B_ENTRY_NOT_FOUND;
+}
+
+
+status_t
+NodeMonitorService::UpdateUserListener(io_context *context, dev_t device,
+	ino_t node, uint32 flags, UserNodeListener& userListener)
+{
+	TRACE(("%s(dev = %ld, node = %Ld, flags = %ld, listener = %p\n",
+		__PRETTY_FUNCTION__, device, node, flags, &userListener));
+
+	MutexLocker _(fMutex);
+
+	node_monitor *monitor;
+	status_t status = _GetMonitor(context, device, node, true, &monitor);
+	if (status < B_OK)
+		return status;
+
+	MonitorListenerList::Iterator iterator = monitor->listeners.GetIterator();
+	while (monitor_listener* listener = iterator.Next()) {
+		if (*listener->listener == userListener) {
+			listener->flags |= flags;
+			return B_OK;
+		}
+	}
+
+	UserNodeListener* copiedListener = new(std::nothrow) UserNodeListener(
+		userListener);
+	if (copiedListener == NULL) {
+		if (monitor->listeners.IsEmpty())
+			_RemoveMonitor(monitor);
+		return B_NO_MEMORY;
+	}
+
+	return _AddMonitorListener(context, monitor, flags, *copiedListener);
+}
+
+
+//	#pragma mark - private kernel API
+
+
+status_t
+remove_node_monitors(struct io_context *context)
+{
+	return sNodeMonitorService.RemoveListeners(context);
+}
+
+
+status_t
+node_monitor_init(void)
+{
+	new(&sNodeMonitorSender) UserMessagingMessageSender();
+	new(&sNodeMonitorService) NodeMonitorService();
+
+	if (sNodeMonitorService.InitCheck() < B_OK)
+		panic("initializing node monitor failed\n");
+
+	return B_OK;
+}
+
+
+status_t
+notify_unmount(dev_t device)
+{
+	return sNodeMonitorService.NotifyUnmount(device);
+}
+
+
+status_t
+notify_mount(dev_t device, dev_t parentDevice, ino_t parentDirectory)
+{
+	return sNodeMonitorService.NotifyMount(device, parentDevice,
+		parentDirectory);
+}
+
+
 //	#pragma mark - public kernel API
-
-
-/**	\brief Subscribes a target to node and/or mount watching.
- *
- *	Depending on \a flags, different actions are performed. If flags is \c 0,
- *	mount watching is requested. \a device and \a node must be \c -1 in this
- *	case. Otherwise node watching is requested. \a device and \a node must
- *	refer to a valid node, and \a flags must note contain the flag
- *	\c B_WATCH_MOUNT, but at least one of the other valid flags.
- *
- *	\param device The device the node resides on (node_ref::device). \c -1, if
- *		   only mount watching is requested.
- *	\param node The node ID of the node (node_ref::device). \c -1, if
- *		   only mount watching is requested.
- *	\param flags A bit mask composed of the values specified in
- *		   <NodeMonitor.h>.
- *	\param port The port of the target (a looper port).
- *	\param handlerToken The token of the target handler. \c -2, if the
- *		   preferred handler of the looper is the target.
- *	\return \c B_OK, if everything went fine, another error code otherwise.
- */
-
-status_t
-start_watching(dev_t device, ino_t node, uint32 flags, port_id port, uint32 token)
-{
-	io_context *context = get_current_io_context(true);
-
-	return add_node_monitor(context, device, node, flags, port, token);
-}
-
-
-/**	\brief Unsubscribes a target from watching a node.
- *	\param device The device the node resides on (node_ref::device).
- *	\param node The node ID of the node (node_ref::device).
- *	\param flags Which monitors should be removed (B_STOP_WATCHING for all)
- *	\param port The port of the target (a looper port).
- *	\param handlerToken The token of the target handler. \c -2, if the
- *		   preferred handler of the looper is the target.
- *	\return \c B_OK, if everything went fine, another error code otherwise.
- */
-
-status_t
-stop_watching(dev_t device, ino_t node, uint32 flags, port_id port, uint32 token)
-{
-	io_context *context = get_current_io_context(true);
-
-	return remove_node_monitor(context, device, node, flags, port, token);
-}
-
-
-/**	\brief Unsubscribes a target from node and mount monitoring.
- *	\param port The port of the target (a looper port).
- *	\param handlerToken The token of the target handler. \c -2, if the
- *		   preferred handler of the looper is the target.
- *	\return \c B_OK, if everything went fine, another error code otherwise.
- */
-
-status_t
-stop_notifying(port_id port, uint32 token)
-{
-	io_context *context = get_current_io_context(true);
-
-	return remove_node_monitors_by_target(context, port, token);
-}
 
 
 status_t
@@ -721,206 +985,112 @@ notify_listener(int op, dev_t device, ino_t parentNode, ino_t toParentNode,
 }
 
 
-/**	\brief Notifies all interested listeners that an entry has been created.
- *	\param device The ID of the mounted FS, the entry lives in.
- *	\param directory The entry's parent directory ID.
- *	\param name The entry's name.
- *	\param node The ID of the node the entry refers to.
- *	\return
- *	- \c B_OK, if everything went fine,
- *	- another error code otherwise.
- */
-
+/*!	\brief Notifies all interested listeners that an entry has been created.
+  	\param device The ID of the mounted FS, the entry lives in.
+  	\param directory The entry's parent directory ID.
+  	\param name The entry's name.
+  	\param node The ID of the node the entry refers to.
+  	\return
+  	- \c B_OK, if everything went fine,
+  	- another error code otherwise.
+*/
 status_t
 notify_entry_created(dev_t device, ino_t directory, const char *name,
 	ino_t node)
 {
-	return notify_entry_created_or_removed(B_ENTRY_CREATED, device,
-		directory, name, node);
+	return sNodeMonitorService.NotifyEntryCreatedOrRemoved(B_ENTRY_CREATED,
+		device, directory, name, node);
 }
 
 
-/**	\brief Notifies all interested listeners that an entry has been removed.
- *	\param device The ID of the mounted FS, the entry lived in.
- *	\param directory The entry's former parent directory ID.
- *	\param name The entry's name.
- *	\param node The ID of the node the entry referred to.
- *	\return
- *	- \c B_OK, if everything went fine,
- *	- another error code otherwise.
- */
-
+/*!	\brief Notifies all interested listeners that an entry has been removed.
+  	\param device The ID of the mounted FS, the entry lived in.
+  	\param directory The entry's former parent directory ID.
+  	\param name The entry's name.
+  	\param node The ID of the node the entry referred to.
+  	\return
+  	- \c B_OK, if everything went fine,
+  	- another error code otherwise.
+*/
 status_t
 notify_entry_removed(dev_t device, ino_t directory, const char *name,
 	ino_t node)
 {
-	return notify_entry_created_or_removed(B_ENTRY_REMOVED, device,
-		directory, name, node);
+	return sNodeMonitorService.NotifyEntryCreatedOrRemoved(B_ENTRY_REMOVED,
+		device, directory, name, node);
 }
 
 
-/**	\brief Notifies all interested listeners that an entry has been moved.
- *	\param device The ID of the mounted FS, the entry lives in.
- *	\param fromDirectory The entry's previous parent directory ID.
- *	\param fromName The entry's previous name.
- *	\param toDirectory The entry's new parent directory ID.
- *	\param toName The entry's new name.
- *	\param node The ID of the node the entry refers to.
- *	\return
- *	- \c B_OK, if everything went fine,
- *	- another error code otherwise.
- */
-
+/*!	\brief Notifies all interested listeners that an entry has been moved.
+  	\param device The ID of the mounted FS, the entry lives in.
+  	\param fromDirectory The entry's previous parent directory ID.
+  	\param fromName The entry's previous name.
+  	\param toDirectory The entry's new parent directory ID.
+  	\param toName The entry's new name.
+  	\param node The ID of the node the entry refers to.
+  	\return
+  	- \c B_OK, if everything went fine,
+  	- another error code otherwise.
+*/
 status_t
 notify_entry_moved(dev_t device, ino_t fromDirectory,
 	const char *fromName, ino_t toDirectory, const char *toName,
 	ino_t node)
 {
-	if (!fromName || !toName)
-		return B_BAD_VALUE;
-
-	// If node is a mount point, we need to resolve it to the mounted
-	// volume's root node.
-	dev_t nodeDevice = device;
-	resolve_mount_point_to_volume_root(device, node, &nodeDevice, &node);
-
-	MutexLocker locker(gMonitorMutex);
-
-	// get the lists of all interested listeners
-	interested_monitor_listener_list interestedListeners[3];
-	int32 interestedListenerCount = 0;
-	// ... for the node
-	get_interested_monitor_listeners(nodeDevice, node, B_WATCH_NAME,
-		interestedListeners, interestedListenerCount);
-	// ... for the source directory
-	get_interested_monitor_listeners(device, fromDirectory, B_WATCH_DIRECTORY,
-		interestedListeners, interestedListenerCount);
-	// ... for the target directory
-	if (toDirectory != fromDirectory) {
-		get_interested_monitor_listeners(device, toDirectory, B_WATCH_DIRECTORY,
-			interestedListeners, interestedListenerCount);
-	}
-
-	if (interestedListenerCount == 0)
-		return B_OK;
-
-	// there are interested listeners: construct the message and send it
-	char messageBuffer[1024];
-	KMessage message;
-	message.SetTo(messageBuffer, sizeof(messageBuffer), B_NODE_MONITOR);
-	message.AddInt32("opcode", B_ENTRY_MOVED);
-	message.AddInt32("device", device);
-	message.AddInt64("from directory", fromDirectory);
-	message.AddInt64("to directory", toDirectory);
-	message.AddInt32("node device", nodeDevice);	// Haiku only
-	message.AddInt64("node", node);
-	message.AddString("from name", fromName);		// Haiku only
-	message.AddString("name", toName);
-
-	return send_notification_message(message, interestedListeners,
-		interestedListenerCount);
+	return sNodeMonitorService.NotifyEntryMoved(device, fromDirectory,
+		fromName, toDirectory, toName, node);
 }
 
 
-/**	\brief Notifies all interested listeners that a node's stat data have
- *		   changed.
- *	\param device The ID of the mounted FS, the node lives in.
- *	\param node The ID of the node.
- *	\param statFields A bitwise combination of one or more of the \c B_STAT_*
- *		   constants defined in <NodeMonitor.h>, indicating what fields of the
- *		   stat data have changed.
- *	\return
- *	- \c B_OK, if everything went fine,
- *	- another error code otherwise.
- */
-
+/*!	\brief Notifies all interested listeners that a node's stat data have
+  		   changed.
+  	\param device The ID of the mounted FS, the node lives in.
+  	\param node The ID of the node.
+  	\param statFields A bitwise combination of one or more of the \c B_STAT_*
+  		   constants defined in <NodeMonitor.h>, indicating what fields of the
+  		   stat data have changed.
+  	\return
+  	- \c B_OK, if everything went fine,
+  	- another error code otherwise.
+*/
 status_t
 notify_stat_changed(dev_t device, ino_t node, uint32 statFields)
 {
-	MutexLocker locker(gMonitorMutex);
-
-	// get the lists of all interested listeners
-	interested_monitor_listener_list interestedListeners[3];
-	int32 interestedListenerCount = 0;
-	// ... for the node
-	get_interested_monitor_listeners(device, node, B_WATCH_STAT,
-		interestedListeners, interestedListenerCount);
-
-	if (interestedListenerCount == 0)
-		return B_OK;
-
-	// there are interested listeners: construct the message and send it
-	char messageBuffer[1024];
-	KMessage message;
-	message.SetTo(messageBuffer, sizeof(messageBuffer), B_NODE_MONITOR);
-	message.AddInt32("opcode", B_STAT_CHANGED);
-	message.AddInt32("device", device);
-	message.AddInt64("node", node);
-	message.AddInt32("fields", statFields);		// Haiku only
-
-	return send_notification_message(message, interestedListeners,
-		interestedListenerCount);
+	return sNodeMonitorService.NotifyStatChanged(device, node, statFields);
 }
 
 
-/**	\brief Notifies all interested listeners that a node attribute has changed.
- *	\param device The ID of the mounted FS, the node lives in.
- *	\param node The ID of the node.
- *	\param attribute The attribute's name.
- *	\param cause Either of \c B_ATTR_CREATED, \c B_ATTR_REMOVED, or
- *		   \c B_ATTR_CHANGED, indicating what exactly happened to the attribute.
- *	\return
- *	- \c B_OK, if everything went fine,
- *	- another error code otherwise.
- */
-
+/*!	\brief Notifies all interested listeners that a node attribute has changed.
+  	\param device The ID of the mounted FS, the node lives in.
+  	\param node The ID of the node.
+  	\param attribute The attribute's name.
+  	\param cause Either of \c B_ATTR_CREATED, \c B_ATTR_REMOVED, or
+  		   \c B_ATTR_CHANGED, indicating what exactly happened to the attribute.
+  	\return
+  	- \c B_OK, if everything went fine,
+  	- another error code otherwise.
+*/
 status_t
 notify_attribute_changed(dev_t device, ino_t node, const char *attribute,
 	int32 cause)
 {
-	if (!attribute)
-		return B_BAD_VALUE;
-
-	MutexLocker locker(gMonitorMutex);
-
-	// get the lists of all interested listeners
-	interested_monitor_listener_list interestedListeners[3];
-	int32 interestedListenerCount = 0;
-	// ... for the node
-	get_interested_monitor_listeners(device, node, B_WATCH_ATTR,
-		interestedListeners, interestedListenerCount);
-
-	if (interestedListenerCount == 0)
-		return B_OK;
-
-	// there are interested listeners: construct the message and send it
-	char messageBuffer[1024];
-	KMessage message;
-	message.SetTo(messageBuffer, sizeof(messageBuffer), B_NODE_MONITOR);
-	message.AddInt32("opcode", B_ATTR_CHANGED);
-	message.AddInt32("device", device);
-	message.AddInt64("node", node);
-	message.AddString("attr", attribute);
-	message.AddInt32("cause", cause);		// Haiku only
-
-	return send_notification_message(message, interestedListeners,
-		interestedListenerCount);
+	return sNodeMonitorService.NotifyAttributeChanged(device, node, attribute,
+		cause);
 }
 
 
-/**	\brief Notifies the listener of a live query that an entry has been added
- *		   to the query (for whatever reason).
- *	\param port The target port of the listener.
- *	\param token The BHandler token of the listener.
- *	\param device The ID of the mounted FS, the entry lives in.
- *	\param directory The entry's parent directory ID.
- *	\param name The entry's name.
- *	\param node The ID of the node the entry refers to.
- *	\return
- *	- \c B_OK, if everything went fine,
- *	- another error code otherwise.
- */
-
+/*!	\brief Notifies the listener of a live query that an entry has been added
+  		   to the query (for whatever reason).
+  	\param port The target port of the listener.
+  	\param token The BHandler token of the listener.
+  	\param device The ID of the mounted FS, the entry lives in.
+  	\param directory The entry's parent directory ID.
+  	\param name The entry's name.
+  	\param node The ID of the node the entry refers to.
+  	\return
+  	- \c B_OK, if everything went fine,
+  	- another error code otherwise.
+*/
 status_t
 notify_query_entry_created(port_id port, int32 token, dev_t device,
 	ino_t directory, const char *name, ino_t node)
@@ -930,19 +1100,18 @@ notify_query_entry_created(port_id port, int32 token, dev_t device,
 }
 
 
-/**	\brief Notifies the listener of a live query that an entry has been removed
- *		   from the query (for whatever reason).
- *	\param port The target port of the listener.
- *	\param token The BHandler token of the listener.
- *	\param device The ID of the mounted FS, the entry lives in.
- *	\param directory The entry's parent directory ID.
- *	\param name The entry's name.
- *	\param node The ID of the node the entry refers to.
- *	\return
- *	- \c B_OK, if everything went fine,
- *	- another error code otherwise.
- */
-
+/*!	\brief Notifies the listener of a live query that an entry has been removed
+  		   from the query (for whatever reason).
+  	\param port The target port of the listener.
+  	\param token The BHandler token of the listener.
+  	\param device The ID of the mounted FS, the entry lives in.
+  	\param directory The entry's parent directory ID.
+  	\param name The entry's name.
+  	\param node The ID of the node the entry refers to.
+  	\return
+  	- \c B_OK, if everything went fine,
+  	- another error code otherwise.
+*/
 status_t
 notify_query_entry_removed(port_id port, int32 token, dev_t device,
 	ino_t directory, const char *name, ino_t node)
@@ -960,24 +1129,29 @@ _user_stop_notifying(port_id port, uint32 token)
 {
 	io_context *context = get_current_io_context(false);
 
-	return remove_node_monitors_by_target(context, port, token);
+	return sNodeMonitorService.RemoveUserListeners(context, port, token);
 }
 
 
 status_t
-_user_start_watching(dev_t device, ino_t node, uint32 flags, port_id port, uint32 token)
+_user_start_watching(dev_t device, ino_t node, uint32 flags, port_id port,
+	uint32 token)
 {
 	io_context *context = get_current_io_context(false);
 
-	return add_node_monitor(context, device, node, flags, port, token);
+	UserNodeListener listener(port, token);
+	return sNodeMonitorService.UpdateUserListener(context, device, node, flags,
+		listener);
 }
 
 
 status_t
-_user_stop_watching(dev_t device, ino_t node, uint32 flags, port_id port, uint32 token)
+_user_stop_watching(dev_t device, ino_t node, port_id port, uint32 token)
 {
 	io_context *context = get_current_io_context(false);
 
-	return remove_node_monitor(context, device, node, flags, port, token);
+	UserNodeListener listener(port, token);
+	return sNodeMonitorService.RemoveListener(context, device, node,
+		listener);
 }
 
