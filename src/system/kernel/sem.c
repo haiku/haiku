@@ -50,6 +50,9 @@ struct sem_entry {
 			team_id				owner;	// if set to -1, means owned by a port
 #ifdef DEBUG_LAST_ACQUIRER
 			thread_id			last_acquirer;
+			int32				last_acquire_count;
+			thread_id			last_releaser;
+			int32				last_release_count;
 #endif
 		} used;
 
@@ -161,7 +164,10 @@ dump_sem(struct sem_entry *sem)
 		} else
 			kprintf(" -\n");
 #ifdef DEBUG_LAST_ACQUIRER
-		kprintf("last acquired by: 0x%lx\n", sem->u.used.last_acquirer);
+		kprintf("last acquired by: %ld, count: %ld\n", sem->u.used.last_acquirer,
+			sem->u.used.last_acquire_count);
+		kprintf("last released by: %ld, count: %ld\n", sem->u.used.last_releaser,
+			sem->u.used.last_release_count);
 #endif
 	} else {
 		kprintf("next:    %p\n", sem->u.unused.next);
@@ -649,8 +655,10 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 		}
 
 #ifdef DEBUG_LAST_ACQUIRER
-		if (thread->sem.acquire_status >= B_OK)
+		if (thread->sem.acquire_status >= B_OK) {
 			sSems[slot].u.used.last_acquirer = thread_get_current_thread_id();
+			sSems[slot].u.used.last_acquire_count = count;
+		}
 #endif
 
 		restore_interrupts(state);
@@ -662,6 +670,7 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 	} else {
 #ifdef DEBUG_LAST_ACQUIRER
 		sSems[slot].u.used.last_acquirer = thread_get_current_thread_id();
+		sSems[slot].u.used.last_acquire_count = count;
 #endif
 	}
 
@@ -715,13 +724,16 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 	//	doesn't have any use outside the kernel
 	if ((flags & B_CHECK_PERMISSION) != 0
 		&& sSems[slot].u.used.owner == team_get_kernel_team_id()) {
-		dprintf("thread %ld tried to release kernel semaphore.\n", thread_get_current_thread()->id);
+		dprintf("thread %ld tried to release kernel semaphore.\n",
+			thread_get_current_thread_id());
 		status = B_NOT_ALLOWED;
 		goto err;
 	}
 
 #ifdef DEBUG_LAST_ACQUIRER
-	sSems[slot].u.used.last_acquirer = -1;
+	sSems[slot].u.used.last_acquirer = -sSems[slot].u.used.last_acquirer;
+	sSems[slot].u.used.last_releaser = thread_get_current_thread_id();
+	sSems[slot].u.used.last_release_count = count;
 #endif
 
 	// clear out a queue we will use to hold all of the threads that we will have to
