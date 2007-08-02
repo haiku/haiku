@@ -8,10 +8,15 @@
 
 #include "SmartTabView.h"
 
+#include <TabView.h>
+
+
 SmartTabView::SmartTabView(BRect frame, const char *name, button_width width, 
 				uint32 resizingMode, uint32 flags)
 	:
-	BTabView(frame, name, width, resizingMode, flags)
+	BView(frame, name, resizingMode, flags),
+	fTabView(NULL),
+	fView(NULL)
 {
 }
 
@@ -21,50 +26,116 @@ SmartTabView::~SmartTabView()
 }
 
 
+BView *
+SmartTabView::ContainerView()
+{
+	return fTabView != NULL ? fTabView->ContainerView() : this;
+}
+
+
+BView *
+SmartTabView::ViewForTab(int32 tab)
+{
+	return fTabView != NULL ? fTabView->ViewForTab(tab) : fView; 
+}
+
+
 void
 SmartTabView::Select(int32 index)
 {
-	BTabView::Select(index);
-	BTab *tab = TabAt(Selection());
-	if (tab != NULL) {	
-		BView *view = tab->View();
-		if (view != NULL)
-			view->ResizeTo(Bounds().Width(), Bounds().Height());
+	if (fView != NULL) {
+		fView->ResizeTo(Bounds().Width(), Bounds().Height());	
+	} else if (fTabView != NULL) {
+		fTabView->Select(index);
+		BTab *tab = fTabView->TabAt(fTabView->Selection());
+		if (tab != NULL) {	
+			BView *view = tab->View();
+			if (view != NULL)
+				view->ResizeTo(fTabView->Bounds().Width(), fTabView->Bounds().Height());
+		}
 	}
 }
 
-/*
+
+int32
+SmartTabView::Selection() const
+{
+	return fTabView != NULL ? fTabView->Selection() : 0;
+}
+
+
 void
 SmartTabView::AddTab(BView *target, BTab *tab)
 {
 	if (target == NULL)
 		return;
 
-	if (CountTabs() == 1) {
-		
-	} 
-	AddTab(target, tab);
+	if (fView == NULL && fTabView == NULL) {
+		fView = target;
+		AddChild(target);	
+	} else {
+		if (fTabView == NULL) {
+			RemoveChild(fView);
+			fTabView = new BTabView(Bounds(), "tabview");			
+			AddChild(fTabView);
+			fTabView->MoveTo(B_ORIGIN);
+			fTabView->ResizeTo(Bounds().Width(), Bounds().Height());
+			fTabView->AddTab(fView);
+			fTabView->Select(0);
+			fView = NULL;
+		}					
+		fTabView->AddTab(target, tab);
+	}
 }
 
 
 BTab *
 SmartTabView::RemoveTab(int32 index)
 {
-	BTab *oldTab = RemoveTab(index);
-	if (CountTabs() == 1) {
-			
+	BTab *returnTab = NULL;
+	if (fTabView != NULL) {
+		returnTab = fTabView->RemoveTab(index);
+		if (fTabView->CountTabs() == 1) {
+			BTab *tab = fTabView->RemoveTab(0);			
+			RemoveChild(fTabView);
+			delete fTabView;			
+			fTabView = NULL;
+			fView = tab->View();
+			tab->SetView(NULL);			
+			AddChild(fView);
+			fView->MoveTo(B_ORIGIN);
+			fView->ResizeTo(Bounds().Width(), Bounds().Height());
+			delete tab;
+		}
+	} else if (fView != NULL) {		
+		RemoveChild(fView);
+		returnTab = new BTab();
+		returnTab->SetView(fView);		
+		fView = NULL;
 	}
-	return oldTab;
+	
+	return returnTab;
 }
 
 
-BRect
-SmartTabView::DrawTabs()
+int32
+SmartTabView::CountTabs() const
 {
-	//if (CountTabs() > 1)
-		return BTabView::DrawTabs();
-	//return BRect(0, 0, -1, -1);		
+	if (fTabView != NULL)
+		return fTabView->CountTabs();
+
+	return fView != NULL ? 1 : 0;	
+}
+
+
+/*
+void
+SmartTabView::Draw(BRect updateRect)
+{
+	if (fView != NULL) {
+		
+	}	
 }
 */
 
-	
+
