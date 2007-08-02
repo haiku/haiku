@@ -112,6 +112,11 @@ class AutoWriteLocker {
 			fLock.WriteLock();
 		}
 
+		bool IsLocked() const
+		{
+			return fLock.IsWriteLocked();
+		}
+
 		~AutoWriteLocker()
 		{
 			fLock.WriteUnlock();
