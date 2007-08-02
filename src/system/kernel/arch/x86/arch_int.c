@@ -355,9 +355,12 @@ i386_handle_trap(struct iframe frame)
 {
 	struct thread *thread = thread_get_current_thread();
 	int ret = B_HANDLED_INTERRUPT;
+	cpu_status state;
 
 	// all exceptions besides 3 (breakpoint), and 99 (syscall) enter this
 	// function with interrupts disabled
+
+	state = disable_interrupts();
 
 	if (thread)
 		x86_push_iframe(&thread->arch_info.iframes, &frame);
@@ -368,6 +371,8 @@ i386_handle_trap(struct iframe frame)
 		i386_exit_user_debug_at_kernel_entry();
 		thread_at_kernel_entry();
 	}
+
+	restore_interrupts(state);
 
 //	if(frame.vector != 0x20)
 //		dprintf("i386_handle_trap: vector 0x%x, ip 0x%x, cpu %d\n", frame.vector, frame.eip, smp_get_current_cpu());
@@ -457,7 +462,6 @@ i386_handle_trap(struct iframe frame)
 
 			if (kernelDebugger) {
 				// if this thread has a fault handler, we're allowed to be here
-				struct thread *thread = thread_get_current_thread();
 				if (thread && thread->fault_handler != NULL) {
 					frame.eip = thread->fault_handler;
 					break;
@@ -588,6 +592,8 @@ i386_handle_trap(struct iframe frame)
 	}
 
 //	dprintf("0x%x cpu %d!\n", thread_get_current_thread_id(), smp_get_current_cpu());
+
+	disable_interrupts();
 
 	if (thread)
 		x86_pop_iframe(&thread->arch_info.iframes);
