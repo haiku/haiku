@@ -9,20 +9,21 @@
 /** Manages kernel add-ons and their exported modules. */
 
 
-#include <boot_device.h>
-#include <elf.h>
 #include <kmodule.h>
-#include <lock.h>
-#include <vfs.h>
-
-#include <boot/elf.h>
-#include <fs/KPath.h>
-#include <util/khash.h>
 
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+
+#include <boot_device.h>
+#include <elf.h>
+#include <lock.h>
+#include <vfs.h>
+#include <boot/elf.h>
+#include <fs/KPath.h>
+#include <util/AutoLock.h>
+#include <util/khash.h>
 
 
 //#define TRACE_MODULE
@@ -227,20 +228,6 @@ module_image_compare(void *_module, const void *_key)
 }
 
 
-static inline void
-inc_module_ref_count(struct module *module)
-{
-	module->ref_count++;
-}
-
-
-static inline void
-dec_module_ref_count(struct module *module)
-{
-	module->ref_count--;
-}
-
-
 /** Try to load the module image at the specified location.
  *	If it could be loaded, it returns B_OK, and stores a pointer
  *	to the module_image object in "_moduleImage".
@@ -311,24 +298,23 @@ unload_module_image(module_image *moduleImage, const char *path)
 {
 	TRACE(("unload_module_image(image = %p, path = %s)\n", moduleImage, path));
 
-	recursive_lock_lock(&sModulesLock);
+	RecursiveLocker locker(sModulesLock);
 
 	if (moduleImage == NULL) {
 		// if no image was specified, lookup it up in the hash table
 		moduleImage = (module_image *)hash_lookup(sModuleImagesHash, path);
-		if (moduleImage == NULL) {
-			recursive_lock_unlock(&sModulesLock);
+		if (moduleImage == NULL)
 			return B_ENTRY_NOT_FOUND;
-		}
 	}
 
 	if (moduleImage->ref_count != 0) {
-		FATAL(("Can't unload %s due to ref_cnt = %ld\n", moduleImage->path, moduleImage->ref_count));
+		FATAL(("Can't unload %s due to ref_cnt = %ld\n", moduleImage->path,
+			moduleImage->ref_count));
 		return B_ERROR;
 	}
 
 	hash_remove(sModuleImagesHash, moduleImage);
-	recursive_lock_unlock(&sModulesLock);
+	locker.Unlock();
 
 	unload_kernel_add_on(moduleImage->image);
 	free(moduleImage->path);
@@ -357,23 +343,20 @@ get_module_image(const char *path, module_image **_image)
 {
 	struct module_image *image;
 
-	TRACE(("get_module_image(path = \"%s\", _image = %p)\n", path, _image));
+	TRACE(("get_module_image(path = \"%s\", loadIfNeeded = %d)\n", path,
+		loadIfNeeded));
 
-	recursive_lock_lock(&sModulesLock);
+	RecursiveLocker _(sModulesLock);
 
 	image = (module_image *)hash_lookup(sModuleImagesHash, path);
 	if (image == NULL) {
 		status_t status = load_module_image(path, &image);
-		if (status < B_OK) {
-			recursive_lock_unlock(&sModulesLock);
+		if (status < B_OK)
 			return status;
-		}
 	}
 
 	atomic_add(&image->ref_count, 1);
 	*_image = image;
-
-	recursive_lock_unlock(&sModulesLock);
 
 	return B_OK;
 }
@@ -451,7 +434,8 @@ check_module_image(const char *path, const char *searchedName)
 	module_info **info;
 	int index = 0, match = B_ENTRY_NOT_FOUND;
 
-	TRACE(("check_module_image(path = \"%s\", searchedName = \"%s\")\n", path, searchedName));
+	TRACE(("check_module_image(path = \"%s\", searchedName = \"%s\")\n", path,
+		searchedName));
 
 	if (get_module_image(path, &image) < B_OK)
 		return B_ENTRY_NOT_FOUND;
@@ -468,7 +452,8 @@ check_module_image(const char *path, const char *searchedName)
 	// The module we looked for couldn't be found, so we can unload the
 	// loaded module at this point
 	if (match != B_OK) {
-		TRACE(("check_module_file: unloading module file \"%s\" (not used yet)\n", path));
+		TRACE(("check_module_file: unloading module file \"%s\" (not used yet)\n",
+			path));
 		unload_module_image(image, path);
 	}
 
@@ -517,14 +502,15 @@ search_module(const char *name)
 static status_t
 put_dependent_modules(struct module *module)
 {
+	module_image *image = module->module_image;
 	module_dependency *dependencies;
-	int32 i = 0;
 
-	if (module->module_image == NULL
-		|| (dependencies = module->module_image->dependencies) == NULL)
+	// built-in modules don't have a module_image structure
+	if (image == NULL
+		|| (dependencies = image->dependencies) == NULL)
 		return B_OK;
 
-	for (; dependencies[i].name != NULL; i++) {
+	for (int32 i = 0; dependencies[i].name != NULL; i++) {
 		status_t status = put_module(dependencies[i].name);
 		if (status < B_OK)
 			return status;
@@ -537,20 +523,22 @@ put_dependent_modules(struct module *module)
 static status_t
 get_dependent_modules(struct module *module)
 {
+	module_image *image = module->module_image;
 	module_dependency *dependencies;
-	int32 i = 0;
 
 	// built-in modules don't have a module_image structure
-	if (module->module_image == NULL
-		|| (dependencies = module->module_image->dependencies) == NULL)
+	if (image == NULL
+		|| (dependencies = image->dependencies) == NULL)
 		return B_OK;
 
 	TRACE(("resolving module dependencies...\n"));
 
-	for (; dependencies[i].name != NULL; i++) {
-		status_t status = get_module(dependencies[i].name, dependencies[i].info);
+	for (int32 i = 0; dependencies[i].name != NULL; i++) {
+		status_t status = get_module(dependencies[i].name,
+			dependencies[i].info);
 		if (status < B_OK) {
-			TRACE(("loading dependent module \"%s\" failed!\n", dependencies[i].name));
+			dprintf("loading dependent module %s of %s failed!\n",
+				dependencies[i].name, module->name);
 			return status;
 		}
 	}
@@ -651,10 +639,11 @@ uninit_module(module *module)
 				module->state = MODULE_LOADED;
 
 				put_dependent_modules(module);
-				return 0;
+				return B_OK;
 			}
 
-			FATAL(("Error unloading module %s (%s)\n", module->name, strerror(status)));
+			FATAL(("Error unloading module %s (%s)\n", module->name,
+				strerror(status)));
 
 			module->state = MODULE_ERROR;
 			module->flags |= B_KEEP_LOADED;
@@ -941,10 +930,14 @@ register_preloaded_module_image(struct preloaded_image *image)
 		char path[B_FILE_NAME_LENGTH];
 		const char *name, *suffix;
 		if (moduleImage->info[0]
-			&& (suffix = strstr(name = moduleImage->info[0]->name, image->name)) != NULL) {
-			// even if strlcpy() is used here, it's by no means safe against buffer overflows
-			size_t length = strlcpy(path, "/boot/beos/system/add-ons/kernel/", sizeof(path));
-			strlcpy(path + length, name, strlen(image->name) + 1 + (suffix - name));
+			&& (suffix = strstr(name = moduleImage->info[0]->name,
+					image->name)) != NULL) {
+			// even if strlcpy() is used here, it's by no means safe
+			// against buffer overflows
+			size_t length = strlcpy(path, "/boot/beos/system/add-ons/kernel/",
+				sizeof(path));
+			strlcpy(path + length, name, strlen(image->name)
+				+ 1 + (suffix - name));
 
 			moduleImage->path = strdup(path);
 		} else
@@ -1070,7 +1063,8 @@ module_init(kernel_args *args)
 	if (sModulesHash == NULL)
 		return B_NO_MEMORY;
 
-	sModuleImagesHash = hash_init(MODULE_HASH_SIZE, 0, module_image_compare, module_image_hash);
+	sModuleImagesHash = hash_init(MODULE_HASH_SIZE, 0, module_image_compare,
+		module_image_hash);
 	if (sModuleImagesHash == NULL)
 		return B_NO_MEMORY;
 
@@ -1082,13 +1076,16 @@ module_init(kernel_args *args)
 
 	for (image = args->preloaded_images; image != NULL; image = image->next) {
 		status_t status = register_preloaded_module_image(image);
-		if (status != B_OK)
-			dprintf("Could not register image \"%s\": %s\n", image->name, strerror(status));
+		if (status != B_OK) {
+			dprintf("Could not register image \"%s\": %s\n", image->name,
+				strerror(status));
+		}
 	}
 
 	// ToDo: set sDisableUserAddOns from kernel_args!
 
-	add_debugger_command("modules", &dump_modules, "list all known & loaded modules");
+	add_debugger_command("modules", &dump_modules,
+		"list all known & loaded modules");
 
 	return B_OK;
 }
@@ -1145,6 +1142,18 @@ open_module_list(const char *prefix)
 			if (sDisableUserAddOns && i >= FIRST_USER_MODULE_PATH)
 				break;
 
+			// Copy base path onto the iterator stack
+			char *path = strdup(sModulePaths[i]);
+			if (path == NULL)
+				continue;
+				
+			size_t length = strlen(path);
+
+			// TODO: it would currently be nicer to use the commented
+			// version below, but the iterator won't work if the prefix
+			// is inside a module then.
+			// It works this way, but should be done better.
+#if 0
 			// Build path component: base path + '/' + prefix
 			size_t length = strlen(sModulePaths[i]);
 			char *path = (char *)malloc(length + iterator->prefix_length + 2);
@@ -1158,6 +1167,7 @@ open_module_list(const char *prefix)
 			path[length] = '/';
 			memcpy(path + length + 1, iterator->prefix,
 				iterator->prefix_length + 1);
+#endif
 
 			iterator_push_path_on_stack(iterator, path, length + 1);
 		}
@@ -1203,7 +1213,7 @@ close_module_list(void *cookie)
 	free(iterator->prefix);
 	free(iterator);
 
-	return 0;
+	return B_OK;
 }
 
 
@@ -1235,7 +1245,8 @@ read_next_module_name(void *cookie, char *buffer, size_t *_bufferSize)
 	iterator->status = status;
 	recursive_lock_unlock(&sModulesLock);
 
-	TRACE(("read_next_module_name: finished with status %s\n", strerror(status)));
+	TRACE(("read_next_module_name: finished with status %s\n",
+		strerror(status)));
 	return status;
 }
 
@@ -1262,7 +1273,7 @@ get_next_loaded_module_name(uint32 *_cookie, char *buffer, size_t *_bufferSize)
 	status_t status = B_ENTRY_NOT_FOUND;
 	uint32 offset = *_cookie;
 
-	recursive_lock_lock(&sModulesLock);
+	RecursiveLocker _(sModulesLock);
 
 	hash_iterator iterator;
 	hash_open(sModulesHash, &iterator);
@@ -1280,7 +1291,6 @@ get_next_loaded_module_name(uint32 *_cookie, char *buffer, size_t *_bufferSize)
 	}
 
 	hash_close(sModulesHash, &iterator, false);
-	recursive_lock_unlock(&sModulesLock);
 
 	return status;
 }
@@ -1298,7 +1308,7 @@ get_module(const char *path, module_info **_info)
 	if (path == NULL)
 		return B_BAD_VALUE;
 
-	recursive_lock_lock(&sModulesLock);
+	RecursiveLocker _(sModulesLock);
 
 	module = (struct module *)hash_lookup(sModulesHash, path);
 
@@ -1307,7 +1317,7 @@ get_module(const char *path, module_info **_info)
 		module = search_module(path);
 		if (module == NULL) {
 			FATAL(("module: Search for %s failed.\n", path));
-			goto err;
+			return B_ENTRY_NOT_FOUND;
 		}
 	}
 
@@ -1320,7 +1330,7 @@ get_module(const char *path, module_info **_info)
 		 * is unloaded).
 		 */
 		if (get_module_image(module->file, &moduleImage) < B_OK)
-			goto err;
+			return B_ENTRY_NOT_FOUND;
 
 		// (re)set in-memory data for the loaded module
 		module->info = moduleImage->info[module->offset];
@@ -1339,17 +1349,15 @@ get_module(const char *path, module_info **_info)
 		status = B_OK;
 
 	if (status == B_OK) {
-		inc_module_ref_count(module);
+		if (module->ref_count < 0)
+			panic("argl %s", path);
+		module->ref_count++;
 		*_info = module->info;
-	} else if ((module->flags & B_BUILT_IN_MODULE) == 0)
+	} else if ((module->flags & B_BUILT_IN_MODULE) == 0
+		&& (module->flags & B_KEEP_LOADED) == 0)
 		put_module_image(module->module_image);
 
-	recursive_lock_unlock(&sModulesLock);
 	return status;
-
-err:
-	recursive_lock_unlock(&sModulesLock);
-	return B_ENTRY_NOT_FOUND;
 }
 
 
@@ -1360,25 +1368,23 @@ put_module(const char *path)
 
 	TRACE(("put_module(path = %s)\n", path));
 
-	recursive_lock_lock(&sModulesLock);
+	RecursiveLocker _(sModulesLock);
 
 	module = (struct module *)hash_lookup(sModulesHash, path);
 	if (module == NULL) {
-		FATAL(("module: We don't seem to have a reference to module %s\n", path));
-		recursive_lock_unlock(&sModulesLock);
+		FATAL(("module: We don't seem to have a reference to module %s\n",
+			path));
 		return B_BAD_VALUE;
 	}
-	
+
+	if (module->ref_count == 0)
+		panic("module %s has no references.\n", path);
+
 	if ((module->flags & B_KEEP_LOADED) == 0) {
-		dec_module_ref_count(module);
-
-		if (module->ref_count == 0)
+		if (--module->ref_count == 0)
 			uninit_module(module);
-	}
-
-	if ((module->flags & B_BUILT_IN_MODULE) == 0)
+	} else if ((module->flags & B_BUILT_IN_MODULE) == 0)
 		put_module_image(module->module_image);
 
-	recursive_lock_unlock(&sModulesLock);
 	return B_OK;
 }
