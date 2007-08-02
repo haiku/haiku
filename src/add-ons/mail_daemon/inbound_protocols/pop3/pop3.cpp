@@ -7,27 +7,21 @@
 
 //! POP3Protocol - implementation of the POP3 protocol
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <DataIO.h>
-#include <Alert.h>
-#include <Debug.h>
-#include <netdb.h>
+#include "pop3.h"
+
 #include <errno.h>
-#include <unistd.h>
-#include <sys/time.h>
+#include <netdb.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <sys/socket.h>
-#ifndef HAIKU_TARGET_PLATFORM_BEOS // These headers don't exist in BeOS R5.
+#include <sys/time.h>
+#include <unistd.h>
+
+#ifndef HAIKU_TARGET_PLATFORM_BEOS
+	// These headers don't exist in BeOS R5.
 	#include <arpa/inet.h>
 	#include <sys/select.h>
 #endif
-
-#include <status.h>
-#include <StringList.h>
-#include <ProtocolConfigView.h>
-#include <ChainRunner.h>
-
-#include <MDRLanguage.h>
 
 #if USESSL
 	#include <openssl/ssl.h>
@@ -37,7 +31,16 @@
 	#include "md5.h"
 #endif
 
-#include "pop3.h"
+#include <DataIO.h>
+#include <Alert.h>
+#include <Debug.h>
+
+#include <status.h>
+#include <StringList.h>
+#include <ProtocolConfigView.h>
+#include <ChainRunner.h>
+
+#include <MDRLanguage.h>
 
 #define POP3_RETRIEVAL_TIMEOUT 60000000
 #define CRLF	"\r\n"
@@ -206,8 +209,12 @@ POP3Protocol::Open(const char *server, int port, int)
 	}
 
 	if (strncmp(line.String(), "+OK", 3) != 0) {
-		error_msg << MDR_DIALECT_CHOICE(". The server said:\n",
-			"サーバのメッセージです\n") << line.String();
+		if (line.Length() > 0) {
+			error_msg << MDR_DIALECT_CHOICE(". The server said:\n",
+				"サーバのメッセージです\n") << line.String();
+		} else
+			error_msg << ": No reply.\n";
+
 		runner->ShowError(error_msg.String());
 		return B_ERROR;
 	}
@@ -623,14 +630,8 @@ POP3Protocol::ReceiveLine(BString &line)
 				line += (char)c;
 			}
 		}
-	} else {
-		status_t error = errno;
-		fLog = "POP3 ";
-		fLog << strerror(error) << ".";
-
-		runner->Stop(true);
-		return error;
-	}
+	} else
+		return errno;
 
 	return len;
 }

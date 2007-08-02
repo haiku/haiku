@@ -1,17 +1,23 @@
-#ifndef ZOIDBERG_POP3_H
-#define ZOIDBERG_POP3_H
-/* POP3Protocol - implementation of the POP3 protocol
-**
-** Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
-*/
+/* 
+ * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
+ * Copyright 2007, Haiku Inc. All Rights Reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef POP3_H
+#define POP3_H
 
-#include <String.h>
+
 #include <map>
+
+#include <List.h>
+#include <String.h>
 
 #include "SimpleMailProtocol.h"
 
+
 class POP3Protocol : public SimpleMailProtocol {
-  public:
+public:
   	POP3Protocol(BMessage *settings, BMailChainRunner *status);
   	~POP3Protocol();
   
@@ -50,4 +56,4 @@ private:
 #endif
 };
 
-#endif	/* ZOIDBERG_POP3_H */
+#endif	/* POP3_H */
