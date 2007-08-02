@@ -1854,6 +1854,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 		case AS_GET_BOUNDINGBOXES_CHARS:
+		case AS_GET_BOUNDINGBOXES_STRING:
 		{
 			FTRACE(("ServerApp %s: AS_GET_BOUNDINGBOXES_CHARS\n", Signature()));
 			// Attached Data:
@@ -1922,8 +1923,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				font.SetFlags(flags);
 
 				// TODO implement for real
-				if (font.GetBoundingBoxesAsString(charArray, numChars,
-					rectArray, string_escapement, mode, delta) == B_OK) {
+				if (font.GetBoundingBoxes(charArray, numChars,
+					rectArray, string_escapement, mode, delta,
+					code == AS_GET_BOUNDINGBOXES_STRING) == B_OK) {
 					fLink.StartMessage(B_OK);
 					fLink.Attach(rectArray, sizeof(rectArray));
 					success = true;
