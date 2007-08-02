@@ -247,7 +247,7 @@ Transformable::InverseTransform(const BPoint& point) const
 
 // TransformBounds
 BRect
-Transformable::TransformBounds(BRect bounds) const
+Transformable::TransformBounds(const BRect& bounds) const
 {
 	if (bounds.IsValid()) {
 		BPoint lt(bounds.left, bounds.top);

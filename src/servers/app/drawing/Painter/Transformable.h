@@ -51,7 +51,7 @@ class Transformable : public BArchivable,
 
 								// transforms the rectangle "bounds" and
 								// returns the *bounding box* of that
-			BRect				TransformBounds(BRect bounds) const;
+			BRect				TransformBounds(const BRect& bounds) const;
 
 								// some convenience functions
 	virtual	void				TranslateBy(BPoint offset);
