@@ -290,9 +290,10 @@ case "${platform}" in
 						exit 1 ;;
 			esac
 			;;
-	Linux)	buildPlatform=linux ;;
-	FreeBSD) buildPlatform=freebsd ;;
 	Darwin)	buildPlatform=darwin ;;
+	FreeBSD) buildPlatform=freebsd ;;
+	Haiku)	buildPlatform=haiku_host ;;
+	Linux)	buildPlatform=linux ;;
 	*)		echo Unsupported platform: ${platform}
 			exit 1 ;;
 esac

@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src apps pulse ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders shared ;
-if $(TARGET_PLATFORM) != haiku {
+if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers os kernel ] : true ;
 }
 

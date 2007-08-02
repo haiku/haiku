@@ -11,7 +11,7 @@ KernelAddon vmware :
 	device.c
 ;
 
-if $(TARGET_PLATFORM) != haiku {
+if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 	LinkAgainst vmware : $(TARGET_HAIKU_COMPATIBILITY_LIBS) ;
 }
 

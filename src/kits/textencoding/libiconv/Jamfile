@@ -20,7 +20,7 @@ SubDirCcFlags
 
 SubDirSysHdrs $(SUBDIR) ;
 
-if $(TARGET_PLATFORM) != haiku {
+if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 	# Argh! Just for <posix/iconv.h>.
 	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
 }

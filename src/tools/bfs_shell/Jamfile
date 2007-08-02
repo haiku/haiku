@@ -20,7 +20,7 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems bfs ] ;
 }
 
 local libHaikuCompat ;
-if $(HOST_PLATFORM_BEOS_COMPATIBLE) && $(HOST_PLATFORM) != haiku {
+if $(HOST_PLATFORM_BEOS_COMPATIBLE) && ! $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
 	libHaikuCompat = libhaikucompat_build.a ;
 }
 

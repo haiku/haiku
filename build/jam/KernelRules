@@ -93,6 +93,10 @@ rule KernelAddon
 			kernel = <nogrist>kernel.so ;
 			beginGlue = $(HAIKU_KERNEL_ADDON_BEGIN_GLUE_CODE) ;
 			endGlue = $(HAIKU_KERNEL_ADDON_END_GLUE_CODE) ;
+		} else if $(PLATFORM) = haiku_host {
+			kernel = /boot/develop/lib/x86/kernel.so ;
+			beginGlue = $(HAIKU_KERNEL_ADDON_BEGIN_GLUE_CODE) ;
+			endGlue = $(HAIKU_KERNEL_ADDON_END_GLUE_CODE) ;
 		} else {
 			kernel = /boot/develop/lib/x86/_KERNEL_ ;
 		}

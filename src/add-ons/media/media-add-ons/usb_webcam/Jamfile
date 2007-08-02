@@ -6,7 +6,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UseLibraryHeaders usb ;
 
 # Zeta has a libusb.so, we have a USBKit.a
-if $(TARGET_PLATFORM) = haiku {
+if $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 	usbKitLibraryName = USBKit.a ;
 } else {
 	usbKitLibraryName = usb ;

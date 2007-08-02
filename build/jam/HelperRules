@@ -156,22 +156,27 @@ rule SetPlatformCompatibilityFlagVariables
 		{
 			$(varPrefix)_PLATFORM_BEOS_COMPATIBLE = true ;
 		}
-		
+	
 		case bone : 
 		{
 			$(varPrefix)_PLATFORM_BONE_COMPATIBLE = true ;
 		}
-		
+	
 		case dano :
 		{
 			$(varPrefix)_PLATFORM_DANO_COMPATIBLE = true ;
 		}
-		
+	
+		case haiku_host :
+		{
+			$(varPrefix)_PLATFORM_HAIKU_COMPATIBLE = true ;
+		}
+
 		case haiku :
 		{
 			$(varPrefix)_PLATFORM_HAIKU_COMPATIBLE = true ;
 		}
-	
+
 		case * :
 		{
 			if ! ( $(platform) in $(otherPlatforms) ) {
@@ -181,6 +186,8 @@ rule SetPlatformCompatibilityFlagVariables
 	}
 
 	# set lesser flags, e.g. "DANO" for "HAIKU" and "BEOS" for "BONE"
+	$(varPrefix)_PLATFORM_HAIKU_COMPATIBLE
+		?= $($(varPrefix)_PLATFORM_HAIKU_COMPATIBLE) ;
 	$(varPrefix)_PLATFORM_DANO_COMPATIBLE
 		?= $($(varPrefix)_PLATFORM_HAIKU_COMPATIBLE) ;
 	$(varPrefix)_PLATFORM_BONE_COMPATIBLE
@@ -190,6 +197,8 @@ rule SetPlatformCompatibilityFlagVariables
 
 	# set the machine friendly flags
 	$(varPrefix)_PLATFORM_(haiku)_COMPATIBLE
+		?= $($(varPrefix)_PLATFORM_HAIKU_COMPATIBLE) ;
+	$(varPrefix)_PLATFORM_(haiku_host)_COMPATIBLE
 		?= $($(varPrefix)_PLATFORM_HAIKU_COMPATIBLE) ;
 	$(varPrefix)_PLATFORM_(dano)_COMPATIBLE
 		?= $($(varPrefix)_PLATFORM_DANO_COMPATIBLE) ;

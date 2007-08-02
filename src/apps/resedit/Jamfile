@@ -6,7 +6,7 @@ UsePrivateHeaders shared interface ;
 
 local columnViewSources ;
 
-if $(TARGET_PLATFORM) != haiku {
+if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 	columnViewSources = ColumnListView.cpp ColumnTypes.cpp ColorTools.cpp ;
 }
 

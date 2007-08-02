@@ -95,9 +95,10 @@ if $(JAM_TARGETS) {
 HAIKU_DEBUG_LEVELS = 0 1 2 3 4 5 ;
 
 # BeOS, BONE, Dan0 compatible platforms
-HAIKU_BEOS_COMPATIBLE_PLATFORMS = haiku r5 bone dano ;
-HAIKU_BONE_COMPATIBLE_PLATFORMS = haiku bone dano ;
-HAIKU_DANO_COMPATIBLE_PLATFORMS = haiku dano ;
+HAIKU_BEOS_COMPATIBLE_PLATFORMS = haiku r5 bone dano haiku_host ;
+HAIKU_BONE_COMPATIBLE_PLATFORMS = haiku bone dano haiku_host ;
+HAIKU_DANO_COMPATIBLE_PLATFORMS = haiku dano haiku_host ;
+HAIKU_HAIKU_COMPATIBLE_PLATFORMS = haiku haiku_host ;
 
 
 #pragma mark -
@@ -436,6 +437,7 @@ HOST_KERNEL_WARNING_C++FLAGS = -Wall ;
 # debug flags
 switch $(HOST_PLATFORM) {
 	case haiku	: HOST_DEBUG_FLAGS ?= -ggdb ;
+	case haiku_host	: HOST_DEBUG_FLAGS ?= -ggdb ;
 	case linux	: HOST_DEBUG_FLAGS ?= -ggdb ;
 	case freebsd    : HOST_DEBUG_FLAGS ?= -ggdb ;
 	case darwin : HOST_DEBUG_FLAGS ?= -ggdb ;
@@ -582,7 +584,7 @@ if $(TARGET_PLATFORM) != haiku {
 }
 
 # TODO: Fix the naming!
-if $(TARGET_PLATFORM) = haiku {
+if $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 	NETWORK_LIBS = network ;
 	SELECT_UNAME_ETC_LIB = root ;
 	NETAPI_LIB = network ;
@@ -674,6 +676,7 @@ switch $(TARGET_PLATFORM) {
 	case r5			: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_BEOS ;
 	case bone		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_BONE ;
 	case dano		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_DANO ;
+	case haiku_host	: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_HAIKU ;
 	case haiku		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_HAIKU ;
 	case linux		: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_LINUX ;
 	case freebsd	: TARGET_DEFINES	+= HAIKU_TARGET_PLATFORM_FREEBSD ;
@@ -686,7 +689,7 @@ switch $(HOST_PLATFORM) {
 	case r5			: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_BEOS ;
 	case bone		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_BONE ;
 	case dano		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_DANO ;
-	case haiku		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_HAIKU ;
+	case haiku_host	: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_HAIKU ;
 	case linux		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_LINUX ;
 	case freebsd	: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_FREEBSD ;
 	case darwin		: HOST_DEFINES	+= HAIKU_HOST_PLATFORM_DARWIN ;
@@ -699,7 +702,7 @@ switch $(HOST_PLATFORM) {
 # include the HaikuBuildCompatibility.h header and link against
 # libhaikucompat.a.
 
-if $(TARGET_PLATFORM) != haiku &&  $(TARGET_PLATFORM_BEOS_COMPATIBLE) {
+if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) && $(TARGET_PLATFORM_BEOS_COMPATIBLE) {
 	# headers and flags
 	local compatibilityHeader = -include [ FDirName $(HAIKU_TOP) headers build
 		HaikuBuildCompatibility.h ] ;

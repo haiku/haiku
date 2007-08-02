@@ -6,7 +6,7 @@ AddSubDirSupportedPlatforms libbe_test ;
 UsePrivateHeaders textencoding ;
 SubDirSysHdrs [ FDirName $(SUBDIR) libiconv ] ;
 
-if $(TARGET_PLATFORM) != haiku {
+if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 	# Argh! Just for <posix/iconv.h>.
 	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
 }

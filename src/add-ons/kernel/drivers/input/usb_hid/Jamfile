@@ -6,7 +6,7 @@ SubDirSysHdrs $(HAIKU_TOP) headers os drivers ;
 UsePrivateHeaders [ FDirName kernel util ] input ;
 
 local buffer_impl = ;
-if $(TARGET_PLATFORM) != haiku {
+if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 	buffer_impl = ring_buffer.cpp ;
 }
 
