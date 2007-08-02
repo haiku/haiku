@@ -21,11 +21,5 @@ StaticLibrary libpainter.a :
 	# drawing_modes
 	PixelFormat.cpp
 
-	# font_support
-	# is contained within libagg.a,
-	# but we need a modified version that
-	# uses the FontManager
-	agg_font_freetype.cpp
-	
 	AGGTextRenderer.cpp
 ;

@@ -35,7 +35,6 @@
 
 #include "DrawState.h"
 
-#include "AGGTextRenderer.h"
 #include "DrawingMode.h"
 #include "PatternHandler.h"
 #include "RenderingBuffer.h"
@@ -79,7 +78,7 @@ Painter::Painter()
 	  fMiterLimit(B_DEFAULT_MITER_LIMIT),
 
 	  fPatternHandler(),
-	  fTextRenderer(AGGTextRenderer::Default())
+	  fTextRenderer()
 {
 	fPixelFormat.SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode, false);
 
@@ -137,7 +136,7 @@ Painter::SetDrawState(const DrawState* data, bool updateFont,
 	if (updateFont)
 		SetFont(data->Font());
 
-	fTextRenderer->SetAntialiasing(!(data->ForceFontAliasing() || data->Font().Flags() & B_DISABLE_ANTIALIASING));
+	fTextRenderer.SetAntialiasing(!(data->ForceFontAliasing() || data->Font().Flags() & B_DISABLE_ANTIALIASING));
 
 	fSubpixelPrecise = data->SubPixelPrecise();
 
@@ -992,16 +991,10 @@ Painter::DrawString(const char* utf8String, uint32 length,
 	// instance of the text renderer is used by everyone)
 	_UpdateFont();
 
-	bounds = fTextRenderer->RenderString(utf8String,
-										 length,
-										 &fRenderer,
-										 &fRendererBin,
-										 fUnpackedScanline,
-										 baseLine,
-										 fClippingRegion->Frame(),
-										 false,
-										 &fPenLocation, 
-										 delta);
+	bounds = fTextRenderer.RenderString(utf8String, length,
+		&fRenderer, &fRendererBin, fUnpackedScanline,
+		baseLine, fClippingRegion->Frame(), false,
+		&fPenLocation,  delta);
 
 	SetPattern(oldPattern);
 
@@ -1024,13 +1017,9 @@ Painter::BoundingBox(const char* utf8String, uint32 length,
 	_UpdateFont();
 
 	static BRect dummy;
-	return fTextRenderer->RenderString(utf8String,
-									   length,
-									   &fRenderer,
-									   &fRendererBin,
-									   fUnpackedScanline,
-									   baseLine, dummy, true, penLocation,
-									   delta);
+	return fTextRenderer.RenderString(utf8String, length,
+		&fRenderer, &fRendererBin, fUnpackedScanline,
+		baseLine, dummy, true, penLocation, delta);
 }
 
 // StringWidth
@@ -1038,11 +1027,7 @@ float
 Painter::StringWidth(const char* utf8String, uint32 length,
 	const escapement_delta* delta)
 {
-	// make sure the text renderer is using our font (the global
-	// instance of the text renderer is used by everyone)
-	_UpdateFont();
-
-	return fTextRenderer->StringWidth(utf8String, length, delta);
+	return fFont.StringWidth(utf8String, length, delta);
 }
 
 // #pragma mark -
@@ -1150,7 +1135,7 @@ Painter::_Clipped(const BRect& rect) const
 void
 Painter::_UpdateFont() const
 {
-	fTextRenderer->SetFont(fFont);
+	fTextRenderer.SetFont(fFont);
 }
 
 // _UpdateDrawingMode

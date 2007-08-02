@@ -6,28 +6,16 @@
 
 #include "AGGTextRenderer.h"
 
-#include "FontManager.h"
-#include "ServerFont.h"
-#include "utf8_functions.h"
-
 #include <agg_basics.h>
 #include <agg_bounding_rect.h>
 #include <agg_conv_segmentator.h>
 #include <agg_conv_transform.h>
 #include <agg_trans_affine.h>
 
-#include <Bitmap.h>
-#include <ByteOrder.h>
-#include <Entry.h>
-#include <Message.h>
-#include <UTF8.h>
-
 #include <math.h>
 #include <malloc.h>
 #include <stdio.h>
 #include <string.h>
-
-#define FLIP_Y false
 
 #define SHOW_GLYPH_BOUNDS 0
 
@@ -36,82 +24,41 @@
 #	include <agg_path_storage.h>
 #endif
 
-// rect_to_int
-inline void
-rect_to_int(BRect r,
-			int32& left, int32& top, int32& right, int32& bottom)
-{
-	left = (int32)floorf(r.left);
-	top = (int32)floorf(r.top);
-	right = (int32)ceilf(r.right);
-	bottom = (int32)ceilf(r.bottom);
-}
+#include "GlyphLayoutEngine.h"
+#include "IntRect.h"
 
-
-inline bool
-is_white_space(uint32 charCode)
-{
-	switch (charCode) {
-		case 0x0009:	/* tab */
-		case 0x000b:	/* vertical tab */
-		case 0x000c:	/* form feed */
-		case 0x0020:	/* space */
-		case 0x00a0:	/* non breaking space */
-		case 0x000a:	/* line feed */
-		case 0x000d:	/* carriage return */
-		case 0x2028:	/* line separator */
-		case 0x2029:	/* paragraph separator */
-			return true;
-	}
-
-	return false;
-}
-
-#define DEFAULT_UNI_CODE_BUFFER_SIZE	2048
-
-// init default instance
-AGGTextRenderer
-AGGTextRenderer::sDefaultInstance;
 
 // constructor
 AGGTextRenderer::AGGTextRenderer()
-	: fFontEngine(gFreeTypeLibrary),
-	  fFontCache(fFontEngine),
+	: fPathAdaptor()
+	, fGray8Adaptor()
+	, fGray8Scanline()
+	, fMonoAdaptor()
+	, fMonoScanline()
 
-	  fCurves(fFontCache.path_adaptor()),
-	  fContour(fCurves),
+	, fCurves(fPathAdaptor)
+	, fContour(fCurves)
 
-	  fUnicodeBuffer((char*)malloc(DEFAULT_UNI_CODE_BUFFER_SIZE)),
-	  fUnicodeBufferSize(DEFAULT_UNI_CODE_BUFFER_SIZE),
-
-	  fHinted(true),
-	  fAntialias(true),
-	  fKerning(true),
-	  fEmbeddedTransformation()
+	, fHinted(true)
+	, fAntialias(true)
+	, fKerning(true)
+	, fEmbeddedTransformation()
 {
 	fCurves.approximation_scale(2.0);
 	fContour.auto_detect_orientation(false);
-	fFontEngine.flip_y(FLIP_Y);
 }
 
 // destructor
 AGGTextRenderer::~AGGTextRenderer()
 {
-	Unset();
-	free(fUnicodeBuffer);
-}
-
-// Default
-/*static*/ AGGTextRenderer*
-AGGTextRenderer::Default()
-{
-	return &sDefaultInstance;
 }
 
 // SetFont
-bool
+void
 AGGTextRenderer::SetFont(const ServerFont &font)
 {
+	fFont = font;
+
 	// construct an embedded transformation (rotate & shear)
 	fEmbeddedTransformation.Reset();
 	fEmbeddedTransformation.ShearBy(B_ORIGIN,
@@ -119,17 +66,7 @@ AGGTextRenderer::SetFont(const ServerFont &font)
 	fEmbeddedTransformation.RotateBy(B_ORIGIN,
 		-font.Rotation() * PI / 180.0);
 
-	agg::glyph_rendering glyphType =
-		fHinted && fEmbeddedTransformation.IsIdentity()
-		&& font.FalseBoldWidth() == 0.0 ?
-			agg::glyph_ren_native_gray8 :
-			agg::glyph_ren_outline;
-
-	fFontEngine.load_font(font, glyphType, font.Size());
-
 	fContour.width(font.FalseBoldWidth() * 2.0);
-
-	return true;
 }
 
 // SetHinting
@@ -137,7 +74,7 @@ void
 AGGTextRenderer::SetHinting(bool hinting)
 {
 	fHinted = hinting;
-	fFontEngine.hinting(fEmbeddedTransformation.IsIdentity() && fHinted);
+//	fFontEngine.hinting(fEmbeddedTransformation.IsIdentity() && fHinted);
 }
 
 // SetAntialiasing
@@ -153,14 +90,187 @@ AGGTextRenderer::SetAntialiasing(bool antialiasing)
 	}
 }
 
-// Unset
-void
-AGGTextRenderer::Unset()
-{
-	// TODO ? release some kind of reference count on the ServerFont?
-}
+typedef agg::conv_transform<FontCacheEntry::CurveConverter, Transformable>
+	conv_font_trans_type;
+
+typedef agg::conv_transform<FontCacheEntry::ContourConverter, Transformable>
+	conv_font_contour_trans_type;
 
 
+
+class AGGTextRenderer::StringRenderer {
+ public:
+	StringRenderer(const IntRect& clippingFrame, bool dryRun,
+			renderer_type& solidRenderer,
+			renderer_bin_type& binRenderer,
+			scanline_unpacked_type& scanline,
+			FontCacheEntry::TransformedOutline& transformedGlyph,
+			FontCacheEntry::TransformedContourOutline& transformedContour,
+			const Transformable& transform,
+			const BPoint& transformOffset,
+			BPoint* nextCharPos,
+			AGGTextRenderer& renderer)
+
+		: fTransform(transform)
+		, fTransformOffset(transformOffset)
+		, fClippingFrame(clippingFrame)
+		, fDryRun(dryRun)
+		, fBounds(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN)
+		, fNextCharPos(nextCharPos)
+		, fVector(false)
+
+		, fSolidRenderer(solidRenderer)
+		, fBinRenderer(binRenderer)
+		, fScanline(scanline)
+
+		, fTransformedGlyph(transformedGlyph)
+		, fTransformedContour(transformedContour)
+
+		, fRenderer(renderer)
+	{
+	}
+
+	void Start()
+	{
+		fRenderer.fRasterizer.reset();
+	}
+	void Finish(double x, double y)
+	{
+		if (fVector) {
+			agg::render_scanlines(fRenderer.fRasterizer, fScanline,
+				fSolidRenderer);
+		}
+
+		if (fNextCharPos) {
+			fNextCharPos->x = x;
+			fNextCharPos->y = y;
+			fTransform.Transform(fNextCharPos);
+		}
+	}
+
+	void ConsumeEmptyGlyph(int32 index, uint32 charCode, double x, double y)
+	{
+	}
+
+	bool ConsumeGlyph(int32 index, uint32 charCode, const GlyphCache* glyph,
+		FontCacheEntry* entry, double x, double y)
+	{
+		// "glyphBounds" is the bounds of the glyph transformed
+		// by the x y location of the glyph along the base line,
+		// it is therefor yet "untransformed".
+		const agg::rect_i& r = glyph->bounds;
+		IntRect glyphBounds(r.x1 + x, r.y1 + y - 1,
+			r.x2 + x + 1, r.y2 + y + 1);
+			// NOTE: "-1"/"+1" converts the glyph bounding box from pixel
+			// indices to pixel area coordinates
+
+		// track bounding box
+		if (glyphBounds.IsValid())
+			fBounds = fBounds | glyphBounds;
+
+		// render the glyph if this is not a dry run
+		if (!fDryRun) {
+			// init the fontmanager's embedded adaptors
+			// NOTE: The initialization for the "location" of
+			// the glyph is different depending on wether we
+			// deal with non-(rotated/sheared) text, in which
+			// case we have a native FT bitmap. For rotated or
+			// sheared text, we use AGG vector outlines and 
+			// a transformation pipeline, which will be applied
+			// _after_ we retrieve the outline, and that's why
+			// we simply pass x and y, which are untransformed.
+
+			// "glyphBounds" is now transformed into screen coords
+			// in order to stop drawing when we are already outside
+			// of the clipping frame
+			if (glyph->data_type != glyph_data_outline) {
+				// we cannot use the transformation pipeline
+				double transformedX = x + fTransformOffset.x;
+				double transformedY = y + fTransformOffset.y;
+				entry->InitAdaptors(glyph, transformedX, transformedY,
+					fRenderer.fMonoAdaptor,
+					fRenderer.fGray8Adaptor,
+					fRenderer.fPathAdaptor);
+
+				glyphBounds.OffsetBy(fTransformOffset);
+			} else {
+				entry->InitAdaptors(glyph, x, y,
+					fRenderer.fMonoAdaptor,
+					fRenderer.fGray8Adaptor,
+					fRenderer.fPathAdaptor);
+
+				float falseBoldWidth = fRenderer.fContour.width();
+				if (falseBoldWidth != 0.0)
+					glyphBounds.InsetBy(-falseBoldWidth, -falseBoldWidth);
+				// TODO: not correct! this is later used for clipping,
+				// but it doesn't get the rect right
+				glyphBounds = fTransform.TransformBounds(glyphBounds);
+			}
+
+			if (fClippingFrame.Intersects(glyphBounds)) {
+				switch (glyph->data_type) {
+					case glyph_data_mono:
+						agg::render_scanlines(fRenderer.fMonoAdaptor, 
+							fRenderer.fMonoScanline, fBinRenderer);
+						break;
+
+					case glyph_data_gray8:
+						agg::render_scanlines(fRenderer.fGray8Adaptor, 
+							fRenderer.fGray8Scanline, fSolidRenderer);
+						break;
+
+					case glyph_data_outline: {
+						fVector = true;
+						if (fRenderer.fContour.width() == 0.0) {
+							fRenderer.fRasterizer.add_path(fTransformedGlyph);
+						} else {
+							fRenderer.fRasterizer.add_path(fTransformedContour);
+						}
+#if SHOW_GLYPH_BOUNDS
+	agg::path_storage p;
+	p.move_to(glyphBounds.left + 0.5, glyphBounds.top + 0.5);
+	p.line_to(glyphBounds.right + 0.5, glyphBounds.top + 0.5);
+	p.line_to(glyphBounds.right + 0.5, glyphBounds.bottom + 0.5);
+	p.line_to(glyphBounds.left + 0.5, glyphBounds.bottom + 0.5);
+	p.close_polygon();
+	agg::conv_stroke<agg::path_storage> ps(p);
+	ps.width(1.0);
+	fRenderer.fRasterizer.add_path(ps);
+#endif
+
+						break;
+					}
+					default:
+						break;
+				}
+			}
+		}
+		return true;
+	}
+
+	IntRect Bounds() const
+	{
+		return fBounds;
+	}
+
+ private:
+ 	const Transformable& fTransform;
+	const BPoint&		fTransformOffset;
+	const IntRect&		fClippingFrame;
+	bool				fDryRun;
+	IntRect				fBounds;
+	BPoint*				fNextCharPos;
+	bool				fVector;
+
+	renderer_type&		fSolidRenderer;
+	renderer_bin_type&	fBinRenderer;
+	scanline_unpacked_type& fScanline;
+	FontCacheEntry::TransformedOutline& fTransformedGlyph;
+	FontCacheEntry::TransformedContourOutline& fTransformedContour;
+	AGGTextRenderer&	fRenderer;
+};
+
+// RenderString
 BRect
 AGGTextRenderer::RenderString(const char* string,
 							  uint32 length,
@@ -175,11 +285,6 @@ AGGTextRenderer::RenderString(const char* string,
 {
 //printf("RenderString(\"%s\", length: %ld, dry: %d)\n", string, length, dryRun);
 
-	// "bounds" will track the bounding box arround all glyphs that are actually drawn
-	// it will be calculated in untransformed coordinates within the loop and then
-	// it is transformed to the real location at the exit of the function.
-	BRect bounds(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN);
-
 	Transformable transform(fEmbeddedTransformation);
 	transform.TranslateBy(baseLine);
 
@@ -188,199 +293,22 @@ AGGTextRenderer::RenderString(const char* string,
 	// use a transformation behind the curves
 	// (only if glyph->data_type == agg::glyph_data_outline)
 	// in the pipeline for the rasterizer
-	typedef agg::conv_transform<conv_font_curve_type, agg::trans_affine>
-		conv_font_trans_type;
-	conv_font_trans_type transformedOutline(fCurves, transform);
-
-	typedef agg::conv_transform<conv_font_contour_type, agg::trans_affine>
-		conv_font_contour_trans_type;
-	conv_font_contour_trans_type transformedContourOutline(fContour, transform);
-	float falseBoldWidth = fContour.width();
-
-	double x  = 0.0;
-	double y0 = 0.0;
-	double y  = y0;
-
-	double advanceX = 0.0;
-	double advanceY = 0.0;
-	bool firstLoop = true;
+	FontCacheEntry::TransformedOutline
+		transformedOutline(fCurves, transform);
+	FontCacheEntry::TransformedContourOutline
+		transformedContourOutline(fContour, transform);
 
 	// for when we bypass the transformation pipeline
 	BPoint transformOffset(0.0, 0.0);
 	transform.Transform(&transformOffset);
 
-	fFontCache.reset();
+	StringRenderer renderer(clippingFrame, dryRun,
+		*solidRenderer, *binRenderer, scanline,
+		transformedOutline, transformedContourOutline,
+		transform, transformOffset, nextCharPos, *this);
 
-	uint32 charCode;
-	while ((charCode = UTF8ToCharCode(&string)) > 0) {
-		// line break (not supported by R5)
-		/*if (charCode == '\n') {
-			y0 += LineOffset();
-			x = 0.0;
-			y = y0;
-			advanceX = 0.0;
-			advanceY = 0.0;
-			continue;
-		}*/
+	GlyphLayoutEngine::LayoutGlyphs(renderer, fFont, string, length, delta,
+		fKerning, B_BITMAP_SPACING);
 
-		const agg::glyph_cache* glyph = fFontCache.glyph(charCode);
-		if (glyph == NULL) {
-			fprintf(stderr, "failed to load glyph for 0x%04lx (%c)\n", charCode,
-				isprint(charCode) ? (char)charCode : '-');
-
-			continue;
-		}
-
-		if (!firstLoop && fKerning)
-			fFontCache.add_kerning(&advanceX, &advanceY);
-
-		x += advanceX;
-		y += advanceY;
-
-		if (delta)
-			x += is_white_space(charCode) ? delta->space : delta->nonspace;
-
-		// "glyphBounds" is the bounds of the glyph transformed
-		// by the x y location of the glyph along the base line,
-		// it is therefor yet "untransformed".
-		const agg::rect_i& r = glyph->bounds;
-		BRect glyphBounds(r.x1 + x, r.y1 + y - 1, r.x2 + x + 1, r.y2 + y + 1);
-			// NOTE: "-1"/"+1" converts the glyph bounding box from pixel
-			// indices to pixel area coordinates
-
-		// track bounding box
-		if (glyphBounds.IsValid())
-			bounds = bounds | glyphBounds;
-
-		// render the glyph if this is not a dry run
-		if (!dryRun) {
-			// init the fontmanager's embedded adaptors
-			// NOTE: The initialization for the "location" of
-			// the glyph is different depending on wether we
-			// deal with non-(rotated/sheared) text, in which
-			// case we have a native FT bitmap. For rotated or
-			// sheared text, we use AGG vector outlines and 
-			// a transformation pipeline, which will be applied
-			// _after_ we retrieve the outline, and that's why
-			// we simply pass x and y, which are untransformed.
-
-			// "glyphBounds" is now transformed into screen coords
-			// in order to stop drawing when we are already outside
-			// of the clipping frame
-			if (glyph->data_type != agg::glyph_data_outline) {
-				// we cannot use the transformation pipeline
-				double transformedX = x + transformOffset.x;
-				double transformedY = y + transformOffset.y;
-				fFontCache.init_embedded_adaptors(glyph,
-					transformedX, transformedY);
-				glyphBounds.OffsetBy(transformOffset);
-			} else {
-				fFontCache.init_embedded_adaptors(glyph, x, y);
-				if (falseBoldWidth != 0.0)
-					glyphBounds.InsetBy(-falseBoldWidth, -falseBoldWidth);
-				glyphBounds = transform.TransformBounds(glyphBounds);
-			}
-
-			if (clippingFrame.Intersects(glyphBounds)) {
-				switch (glyph->data_type) {
-					case agg::glyph_data_mono:
-						agg::render_scanlines(fFontCache.mono_adaptor(), 
-							fFontCache.mono_scanline(), *binRenderer);
-						break;
-
-					case agg::glyph_data_gray8:
-						agg::render_scanlines(fFontCache.gray8_adaptor(), 
-							fFontCache.gray8_scanline(), *solidRenderer);
-						break;
-
-					case agg::glyph_data_outline: {
-						fRasterizer.reset();
-
-						if (fContour.width() == 0.0) {
-							fRasterizer.add_path(transformedOutline);
-						} else {
-							fRasterizer.add_path(transformedContourOutline);
-						}
-#if SHOW_GLYPH_BOUNDS
-	agg::path_storage p;
-	p.move_to(glyphBounds.left + 0.5, glyphBounds.top + 0.5);
-	p.line_to(glyphBounds.right + 0.5, glyphBounds.top + 0.5);
-	p.line_to(glyphBounds.right + 0.5, glyphBounds.bottom + 0.5);
-	p.line_to(glyphBounds.left + 0.5, glyphBounds.bottom + 0.5);
-	p.close_polygon();
-	agg::conv_stroke<agg::path_storage> ps(p);
-	ps.width(1.0);
-	fRasterizer.add_path(ps);
-#endif
-
-						agg::render_scanlines(fRasterizer, scanline,
-							*solidRenderer);
-						break;
-					}
-					default:
-						break;
-				}
-			}
-		}
-
-		// increment pen position
-		advanceX = glyph->advance_x;
-		advanceY = glyph->advance_y;
-
-		firstLoop = false;
-	}
-
-	// put pen location behind rendered text
-	// (at the baseline of the virtual next glyph)
-	if (nextCharPos) {
-		nextCharPos->x = x + advanceX;
-		nextCharPos->y = y + advanceY;
-
-		transform.Transform(nextCharPos);
-	}
-
-	return transform.TransformBounds(bounds);
+	return transform.TransformBounds(renderer.Bounds());
 }
-
-
-double
-AGGTextRenderer::StringWidth(const char* string, uint32 length,
-	const escapement_delta* delta)
-{
-	// NOTE: The implementation does not take font rotation (or shear)
-	// into account. Just like on R5. Should it ever be desirable to
-	// "fix" this, simply use (before "return width;"):
-	//
-	// BPoint end(width, 0.0);
-	// fEmbeddedTransformation.Transform(&end);
-	// width = fabs(end.x);
-	//
-	// Note that shear will not have any influence on the baseline though.
-
-	double width = 0.0;
-	uint32 charCode;
-	double y  = 0.0;
-	const agg::glyph_cache* glyph;
-	bool firstLoop = true;
-
-	fFontCache.reset();
-
-	while ((charCode = UTF8ToCharCode(&string)) > 0) {
-		glyph = fFontCache.glyph(charCode);
-		if (glyph) {
-			if (!firstLoop && fKerning)
-				fFontCache.add_kerning(&width, &y);
-			width += glyph->advance_x;
-
-			if (delta) {
-				width += is_white_space(charCode) ?
-					delta->space : delta->nonspace;
-			}
-		}
-
-		firstLoop = false;
-	};
-
-	return width;
-}
-

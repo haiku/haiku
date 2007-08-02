@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src servers app ;
 
-UseLibraryHeaders png zlib ;
+UseLibraryHeaders agg png zlib ;
 UsePrivateHeaders app graphics input interface kernel shared storage ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
@@ -26,6 +26,9 @@ Server app_server :
 	DrawState.cpp
 	EventDispatcher.cpp
 	EventStream.cpp
+	FontCache.cpp
+	FontCacheEntry.cpp
+	FontEngine.cpp
 	FontFamily.cpp
 	FontManager.cpp
 	FontStyle.cpp
@@ -62,7 +65,7 @@ Server app_server :
 	:
 	libtranslation.so libz.so libpng.so libbe.so
 	libasdrawing.a libpainter.a libagg.a libfreetype.so
-	libtextencoding.so
+	libtextencoding.so libshared.a
 
 	: app_server.rdef
 ;

@@ -29,6 +29,7 @@
 #include <FindDirectory.h>
 #include <graphic_driver.h>
 #include <image.h>
+#include <String.h>
 
 #include <dirent.h>
 #include <new>

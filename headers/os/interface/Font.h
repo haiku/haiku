@@ -254,7 +254,7 @@ class BFont {
 		void			_GetBoundingBoxes(const char charArray[], 
 							int32 numChars, font_metric_mode mode,
 							bool string_escapement, escapement_delta *delta,
-							BRect boundingBoxArray[]) const;
+							BRect boundingBoxArray[], bool asString) const;
 };
 
 

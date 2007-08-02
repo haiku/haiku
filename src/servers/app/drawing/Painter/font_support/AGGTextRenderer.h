@@ -5,9 +5,9 @@
 #ifndef AGG_TEXT_RENDERER_H
 #define AGG_TEXT_RENDERER_H
 
-#include "agg_font_freetype.h"
 #include "defines.h"
 
+#include "FontCacheEntry.h"
 #include "ServerFont.h"
 #include "Transformable.h"
 
@@ -21,16 +21,7 @@ class AGGTextRenderer {
 								AGGTextRenderer();
 	virtual						~AGGTextRenderer();
 
-	// NOTE: every Painter instance is using the same
-	// AGGTextRenderer instance, and the only thing that
-	// protects locking is the fact that every use of a
-	// ServerFont goes through a global lock... this will
-	// have to be changed. Maybe every ServerFont should
-	// have it's own AGGTextRenderer or something
-	static	AGGTextRenderer*	Default();
-
-			bool				SetFont(const ServerFont &font);
-			void				Unset();
+			void				SetFont(const ServerFont &font);
 
 			void				SetHinting(bool hinting);
 			bool				Hinting() const
@@ -55,33 +46,27 @@ class AGGTextRenderer {
 											 BPoint* nextCharPos = NULL,
 											 const escapement_delta* delta = NULL);
 
-			double				StringWidth(const char* utf8String,
-											uint32 length,
-											const escapement_delta* delta = NULL);
-
  private:
 
-	typedef agg::font_engine_freetype_int32				font_engine_type;
-	typedef agg::font_cache_manager<font_engine_type>	font_cache_type;
-	typedef agg::conv_curve<font_cache_type::path_adaptor_type>
-														conv_font_curve_type;
-	typedef agg::conv_contour<conv_font_curve_type>		conv_font_contour_type;
-
-	font_engine_type			fFontEngine;
-	font_cache_type				fFontCache;
+	class StringRenderer;
+	friend class StringRenderer;
 
 	// Pipeline to process the vectors glyph paths (curves + contour)
-	conv_font_curve_type		fCurves;
-	conv_font_contour_type		fContour;
+	FontCacheEntry::GlyphPathAdapter	fPathAdaptor;
+	FontCacheEntry::GlyphGray8Adapter	fGray8Adaptor;
+	FontCacheEntry::GlyphGray8Scanline	fGray8Scanline;
+	FontCacheEntry::GlyphMonoAdapter	fMonoAdaptor;
+	FontCacheEntry::GlyphMonoScanline	fMonoScanline;
+
+	FontCacheEntry::CurveConverter		fCurves;
+	FontCacheEntry::ContourConverter	fContour;
 
 	rasterizer_type				fRasterizer;
 		// NOTE: the object has it's own rasterizer object
 		// since it might be using a different gamma setting
 		// to support non-anti-aliased text rendering
 
-	char*						fUnicodeBuffer;
-	int32						fUnicodeBufferSize;
-
+	ServerFont					fFont;
 	bool						fHinted;		// is glyph hinting active?
 	bool						fAntialias;
 	bool						fKerning;

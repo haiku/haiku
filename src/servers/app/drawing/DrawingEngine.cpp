@@ -13,8 +13,8 @@
 #include <algo.h>
 #include <stack.h>
 
-#include "AGGTextRenderer.h"
 #include "DrawState.h"
+#include "GlyphLayoutEngine.h"
 #include "Painter.h"
 #include "PNGDump.h"
 #include "ServerBitmap.h"
@@ -1035,8 +1035,6 @@ DrawingEngine::DrawString(const char* string, int32 length,
 {
 	CRASH_IF_NOT_LOCKED
 
-	FontLocker locker(&fPainter->Font());
-
 	BPoint penLocation = pt;
 
 //bigtime_t now = system_time();
@@ -1071,30 +1069,15 @@ float
 DrawingEngine::StringWidth(const char* string, int32 length,
 						   escapement_delta* delta)
 {
-	FontLocker locker(&fPainter->Font());
-
-	float width = 0.0;
-// NOTE: For now it is enough to block on the
-// font style lock, this already prevents multiple
-// threads from executing this code and avoids a
-// deadlock in case another thread holds the font
-// lock already and then tries to lock the drawing
-// engine after it is already locked here (race condition)
-	width = fPainter->StringWidth(string, length, delta);
-	return width;
+	return fPainter->StringWidth(string, length, delta);
 }
 
 // StringWidth
 float
 DrawingEngine::StringWidth(const char* string, int32 length,
-						   const ServerFont& font, escapement_delta* delta)
+	const ServerFont& font, escapement_delta* delta)
 {
-	FontLocker locker(&font);
-
-	AGGTextRenderer* renderer = AGGTextRenderer::Default();
-	renderer->SetFont(font);
-
-	return renderer->StringWidth(string, length, delta);
+	return font.StringWidth(string, length, delta);
 }
 
 // #pragma mark -

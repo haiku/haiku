@@ -112,6 +112,7 @@ string_for_message_code(uint32 code, BString& string)
 		case AS_GET_ESCAPEMENTS: string = "AS_GET_ESCAPEMENTS"; break;
 		case AS_GET_ESCAPEMENTS_AS_FLOATS: string = "AS_GET_ESCAPEMENTS_AS_FLOATS"; break;
 		case AS_GET_BOUNDINGBOXES_CHARS: string = "AS_GET_BOUNDINGBOXES_CHARS"; break;
+		case AS_GET_BOUNDINGBOXES_STRING: string = "AS_GET_BOUNDINGBOXES_STRING"; break;
 		case AS_GET_BOUNDINGBOXES_STRINGS: string = "AS_GET_BOUNDINGBOXES_STRINGS"; break;
 		case AS_GET_HAS_GLYPHS: string = "AS_GET_HAS_GLYPHS"; break;
 		case AS_GET_GLYPH_SHAPES: string = "AS_GET_GLYPH_SHAPES"; break;

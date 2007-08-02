@@ -1,11 +1,12 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Jérôme Duval, jerome.duval@free.fr
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 #ifndef SERVER_FONT_H
 #define SERVER_FONT_H
@@ -15,6 +16,7 @@
 #include <Rect.h>
 
 #include "FontFamily.h"
+#include "Transformable.h"
 
 class BShape;
 class BString;
@@ -135,11 +137,12 @@ class ServerFont {
 									int32 numChars, escapement_delta delta,
 									float widthArray[]) const;
 
-			status_t			GetBoundingBoxesAsString(const char charArray[],
+			status_t			GetBoundingBoxes(const char charArray[],
 									int32 numChars, BRect rectArray[],
 									bool stringEscapement,
 									font_metric_mode mode,
-									escapement_delta delta);
+									escapement_delta delta,
+									bool asString);
 
 			status_t			GetBoundingBoxesForStrings(char *charArray[],
 									int32 lengthArray[], int32 numStrings,
@@ -147,7 +150,8 @@ class ServerFont {
 									escapement_delta deltaArray[]);
 
 			float				StringWidth(const char *string,
-									int32 numChars) const;
+									int32 numChars,
+									const escapement_delta* delta = NULL) const;
 
 			bool				Lock() const { return fStyle->Lock(); }
 			void				Unlock() const { fStyle->Unlock(); }
@@ -161,6 +165,8 @@ class ServerFont {
 			void				TruncateString(BString* inOut,
 											   uint32 mode,
 											   float width) const;
+
+			Transformable		EmbeddedTransformation() const;
 
 protected:
 	friend class FontStyle;

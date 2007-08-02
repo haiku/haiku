@@ -63,6 +63,9 @@ SharedLibrary libhaikuappserver.so :
 	CursorSet.cpp
 	DesktopSettings.cpp
 	DrawState.cpp
+	FontCache.cpp
+	FontCacheEntry.cpp
+	FontEngine.cpp
 	FontFamily.cpp
 	FontManager.cpp
 	FontStyle.cpp
@@ -83,7 +86,7 @@ SharedLibrary libhaikuappserver.so :
 #	trace.c
 
 	# libraries
-	: be libtextencoding.so libfreetype.so
+	: be libpainter.a libtextencoding.so libfreetype.so libshared.a
 ;
 
 AddResources haiku_app_server : app_server.rdef ;
@@ -136,8 +139,7 @@ Server haiku_app_server :
 
 	# libraries
 	:
-	z libpng.so libhaikuappserver.so
-	libpainter.a be
+	z libpng.so libhaikuappserver.so libpainter.a be
 	libhwinterface.so libhwinterfaceimpl.so
 	libagg.a libfreetype.so libtextencoding.so
 ;

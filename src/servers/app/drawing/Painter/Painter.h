@@ -9,6 +9,7 @@
 #ifndef PAINTER_H
 #define PAINTER_H
 
+#include "AGGTextRenderer.h"
 #include "FontManager.h"
 #include "PatternHandler.h"
 #include "RGBColor.h"
@@ -23,7 +24,6 @@
 #include <Rect.h>
 
 
-class AGGTextRenderer;
 class BBitmap;
 class BRegion;
 class DrawState;
@@ -289,7 +289,7 @@ mutable agg::conv_curve<agg::path_storage> fCurve;
 	// a class handling rendering and caching of glyphs
 	// it is setup to load from a specific Freetype supported
 	// font file which it gets from ServerFont
-	AGGTextRenderer*			fTextRenderer;
+mutable AGGTextRenderer			fTextRenderer;
 };
 
 // SetHighColor

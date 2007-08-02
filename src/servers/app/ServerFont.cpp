@@ -1,17 +1,19 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Jérôme Duval, jerome.duval@free.fr
  *		Michael Lotz <mmlr@mlotz.ch>
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 
 #include "ServerFont.h"
 
 #include "Angle.h"
+#include "GlyphLayoutEngine.h"
 #include "FontManager.h"
 #include "truncate_string.h"
 #include "utf8_functions.h"
@@ -23,6 +25,8 @@
 #include <Shape.h>
 #include <String.h>
 #include <UTF8.h>
+
+#include <agg_bounding_rect.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -495,45 +499,110 @@ ServerFont::GetEscapements(const char charArray[], int32 numChars,
 }
 
 
-status_t
-ServerFont::GetBoundingBoxesAsString(const char charArray[], int32 numChars,
-	BRect rectArray[], bool stringEscapement, font_metric_mode mode,
-	escapement_delta delta)
-{
-	// TODO: The mode is never used
-	if (!charArray || numChars <= 0 || !rectArray)
-		return B_BAD_DATA;
+class BoundingBoxConsumer {
+ public:
+	BoundingBoxConsumer(Transformable& transform, BRect* rectArray,
+			bool asString)
+		: rectArray(rectArray)
+		, stringBoundingBox(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN)
+		, fAsString(asString)
+		, fCurves(fPathAdaptor)
+		, fContour(fCurves)
+		, fTransformedOutline(fCurves, transform)
+		, fTransformedContourOutline(fContour, transform)
+		, fTransform(transform)
+	{
+	}
+	void Start() {}
+	void Finish(double x, double y) {}
+	void ConsumeEmptyGlyph(int32 index, uint32 charCode, double x, double y) {}
+	bool ConsumeGlyph(int32 index, uint32 charCode, const GlyphCache* glyph,
+		FontCacheEntry* entry, double x, double y)
+	{
+		if (glyph->data_type != glyph_data_outline) {
+			const agg::rect_i& r = glyph->bounds;
+			if (fAsString) {
+				rectArray[index].left = r.x1 + x;
+				rectArray[index].top = r.y1 + y - 1;
+				rectArray[index].right = r.x2 + x + 1;
+				rectArray[index].bottom = r.y2 + y + 1;
+			} else {
+				if (rectArray) {
+					rectArray[index].left = r.x1;
+					rectArray[index].top = r.y1 - 1;
+					rectArray[index].right = r.x2 + 1;
+					rectArray[index].bottom = r.y2 + 1;
+				} else {
+					stringBoundingBox = stringBoundingBox
+						| BRect(r.x1 + x, r.y1 + y - 1,
+							r.x2 + x + 1, r.y2 + y + 1);
+				}
+			}
+		} else {
+			if (fAsString) {
+				entry->InitAdaptors(glyph, x, y,
+						fMonoAdaptor, fGray8Adaptor, fPathAdaptor);
+			} else {
+				entry->InitAdaptors(glyph, 0, 0,
+						fMonoAdaptor, fGray8Adaptor, fPathAdaptor);
+			}
+			double left = 0.0;
+			double top = 0.0;
+			double right = -1.0;
+			double bottom = -1.0;
+			uint32 pathID[1];
+			pathID[0] = 0;
+			// TODO: use fContour if falseboldwidth is > 0
+			agg::bounding_rect(fTransformedOutline, pathID, 0, 1,
+				&left, &top, &right, &bottom);
 
-	FT_Face face = GetTransformedFace(true, true);
-	if (!face)
-		return B_ERROR;
-
-	const char *string = charArray;
-	for (int i = 0; i < numChars; i++) {
-		uint32 charCode = UTF8ToCharCode(&string);
-		if (stringEscapement) {
-			if (i > 0)
-				rectArray[i].OffsetBy(is_white_space(charCode) ? delta.space / 2.0 : delta.nonspace / 2.0, 0.0);
-
-			rectArray[i].OffsetBy(is_white_space(charCode) ? delta.space / 2.0 : delta.nonspace / 2.0, 0.0);
+			if (rectArray) {
+				rectArray[index] = BRect(left, top, right, bottom);
+			} else {
+				stringBoundingBox = stringBoundingBox
+					| BRect(left, top, right, bottom);
+			}
 		}
-
-		FT_Load_Char(face, charCode, FT_LOAD_NO_BITMAP);
-		if (i < numChars - 1) {
-			rectArray[i + 1].left = rectArray[i + 1].right = rectArray[i].left
-				+ face->glyph->metrics.horiAdvance / 64.0;
-		}
-
-		rectArray[i].left += float(face->glyph->metrics.horiBearingX) / 64.0;
-		rectArray[i].right += float(face->glyph->metrics.horiBearingX
-			+ face->glyph->metrics.width) / 64.0;
-		rectArray[i].top = -float(face->glyph->metrics.horiBearingY) / 64.0;
-		rectArray[i].bottom = float(face->glyph->metrics.height
-			- face->glyph->metrics.horiBearingY) / 64.0;
+		return true;
 	}
 
-	PutTransformedFace(face);
-	return B_OK;
+	BRect*								rectArray;
+	BRect								stringBoundingBox;
+
+ private:
+	bool								fAsString;
+	FontCacheEntry::GlyphPathAdapter	fPathAdaptor;
+	FontCacheEntry::GlyphGray8Adapter	fGray8Adaptor;
+	FontCacheEntry::GlyphMonoAdapter	fMonoAdaptor;
+
+	FontCacheEntry::CurveConverter		fCurves;
+	FontCacheEntry::ContourConverter	fContour;
+
+	FontCacheEntry::TransformedOutline	fTransformedOutline;
+	FontCacheEntry::TransformedContourOutline fTransformedContourOutline;
+
+	Transformable&						fTransform;
+};
+
+
+status_t
+ServerFont::GetBoundingBoxes(const char* string, int32 numChars,
+	BRect rectArray[], bool stringEscapement, font_metric_mode mode,
+	escapement_delta delta, bool asString)
+{
+	// TODO: The font_metric_mode is not used
+	if (!string || numChars <= 0 || !rectArray)
+		return B_BAD_DATA;
+
+	bool kerning = true; // TODO make this a property?
+
+	Transformable transform(EmbeddedTransformation());
+
+	BoundingBoxConsumer consumer(transform, rectArray, asString);
+	if (GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numChars,
+		stringEscapement ? &delta : NULL, kerning, fSpacing))
+		return B_OK;
+	return B_ERROR;
 }
 
 
@@ -541,63 +610,60 @@ status_t
 ServerFont::GetBoundingBoxesForStrings(char *charArray[], int32 lengthArray[], 
 	int32 numStrings, BRect rectArray[], font_metric_mode mode, escapement_delta deltaArray[])
 {
-	// TODO: The mode is never used
+	// TODO: The font_metric_mode is never used
 	if (!charArray || !lengthArray|| numStrings <= 0 || !rectArray || !deltaArray)
 		return B_BAD_DATA;
 
-	FT_Face face = GetTransformedFace(true, true);
-	if (!face)
-		return B_ERROR;
+	bool kerning = true; // TODO make this a property?
+
+	Transformable transform(EmbeddedTransformation());
 
 	for (int32 i = 0; i < numStrings; i++) {
 		int32 numChars = lengthArray[i];
-		const char *string = charArray[i];
+		const char* string = charArray[i];
 		escapement_delta delta = deltaArray[i];
 
-		rectArray[i].left = 0.0;
-		for (int32 j = 0; j < numChars; j++) {
-			uint32 charCode = UTF8ToCharCode(&string);
-			FT_Load_Char(face, charCode, FT_LOAD_NO_BITMAP);
+		BoundingBoxConsumer consumer(transform, NULL, true);
+		if (!GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numChars,
+			&delta, kerning, fSpacing))
+			return B_ERROR;
 
-			// TODO: In my testing the width doesn't seem quite right (a
-			// little too long), though I need to do more comparisions with BeOS
-			rectArray[i].right += (face->glyph->advance.x >> 6);
-			rectArray[i].right += is_white_space(charCode) ? delta.space : delta.nonspace;
-
-			float top = -(face->glyph->metrics.horiBearingY >> 6);
-			if (top < rectArray[i].top)
-				rectArray[i].top = top;
-			float bottom = (face->glyph->metrics.height
-				- face->glyph->metrics.horiBearingY) >> 6;
-			if (bottom > rectArray[i].bottom)
-				rectArray[i].bottom = bottom;
-		}
+		rectArray[i] = consumer.stringBoundingBox;
 	}
 
-	PutTransformedFace(face);
 	return B_OK;
 }
 
 
+class StringWidthConsumer {
+ public:
+	StringWidthConsumer() : width(0.0) {}
+	void Start() {}
+	void Finish(double x, double y) { width = x; }
+	void ConsumeEmptyGlyph(int32 index, uint32 charCode, double x, double y) {}
+	bool ConsumeGlyph(int32 index, uint32 charCode, const GlyphCache* glyph,
+		FontCacheEntry* entry, double x, double y)
+	{ return true; }
+
+	float width;
+};
+
+
 float
-ServerFont::StringWidth(const char *_string, int32 numChars) const
+ServerFont::StringWidth(const char *string, int32 numChars,
+	const escapement_delta* deltaArray) const
 {
-	if (!_string || numChars <= 0)
+	if (!string || numChars <= 0)
 		return 0.0;
 
-	FT_Face face = GetTransformedFace(false, false);
-	if (!face)
+	bool kerning = true; // TODO make this a property?
+
+	StringWidthConsumer consumer;
+	if (!GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numChars,
+		deltaArray, kerning, fSpacing))
 		return 0.0;
 
-	float width = 0.0;
-	const char *string = _string;
-	for (int i = 0; i < numChars; i++) {
-		FT_Load_Char(face, UTF8ToCharCode(&string), FT_LOAD_NO_BITMAP);
-		width += face->glyph->advance.x / 64.0;
-	}
-
-	PutTransformedFace(face);
-	return width;
+	return consumer.width;
 }
 
 
@@ -653,5 +719,18 @@ ServerFont::TruncateString(BString* inOut, uint32 mode, float width) const
 
 	delete[] escapementArray;
 	delete[] result;
+}
+
+
+Transformable
+ServerFont::EmbeddedTransformation() const
+{
+	// TODO: cache this?
+	Transformable transform;
+
+	transform.ShearBy(B_ORIGIN, (90.0 - fShear) * PI / 180.0, 0.0);
+	transform.RotateBy(B_ORIGIN, -fRotation * PI / 180.0);
+
+	return transform;
 }
 
