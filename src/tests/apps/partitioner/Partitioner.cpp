@@ -549,6 +549,7 @@ private:
 		// if the disk device has no children, we select it without asking
 		if (fDevice->CountChildren() == 0) {
 			partition = fDevice;
+			_partitionIndex = 0;
 			return true;
 		}
 
