@@ -1,9 +1,12 @@
 SubDir HAIKU_TOP src kits shared ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders shared ;
 
 StaticLibrary libshared.a :
 	AboutWindow.cpp
+	CommandPipe.cpp
+	HashString.cpp
 ;
