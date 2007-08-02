@@ -5,7 +5,6 @@
  *	Authors:
  *		Stefano Ceccherini (burton666@libero.it)
  */
-
 #ifndef __SMARTTABVIEW_H
 #define __SMARTTABVIEW_H
 

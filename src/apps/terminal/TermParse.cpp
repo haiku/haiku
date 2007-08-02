@@ -258,10 +258,7 @@ TermParse::PtyReader()
 		int nread = read(fFd, buf, READ_BUF_SIZE - (read_p - fBufferPosition));
 		if (nread <= 0) {
 			fView->NotifyQuit(errno);
-			// on the next iteration, fQuitting will probably be true,
-			// or the semaphore acquisition will fail, so this thread will
-			// be killed anyway.
-			continue;			
+			return B_OK;
 		}
 
 		// Copy read string to PtyBuffer.

@@ -345,7 +345,6 @@ Shell::_Spawn(int row, int col, const char *command, const char *encoding)
 		return B_ERROR;
 	}
 
-
 	handshake_t handshake;
 
 	if (fProcessID == 0) {
@@ -489,20 +488,8 @@ Shell::_Spawn(int row, int col, const char *command, const char *encoding)
 
 		ioctl(0, TIOCSWINSZ, &ws);
 
-		/*
-		 * Set process group ID to process, and Terminal Process group ID
-		 * to this process group ID (equal process ID).
-		 */
-
-		pid_t processGroup = getpid();
-		if (setpgid(processGroup, processGroup) < 0) {
-			handshake.status = PTY_NG;
-			snprintf(handshake.msg, sizeof(handshake.msg),
-				"can't set process group id.");
-			send_handshake_message(terminalThread, handshake);
-			exit(1);		
-		}
-		tcsetpgrp(0, processGroup);
+		tcsetpgrp(0, getpgrp());
+			// set this process group ID as the controlling terminal
 
 		/* pty open and set termios successful. */
 		handshake.status = PTY_OK;

@@ -2454,7 +2454,8 @@ void
 TermView::NotifyQuit(int32 reason)
 {
 	// TODO: If we are a replicant, we can't just quit the BWindow, no?.
-	Window()->PostMessage(B_QUIT_REQUESTED);	
+	// Exactly, and the same is true for tabs!
+	Window()->PostMessage(B_QUIT_REQUESTED);
 }
 
 
