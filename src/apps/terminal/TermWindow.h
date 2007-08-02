@@ -60,6 +60,7 @@ private:
 	status_t	_DoPageSetup();
 	void		_DoPrint();
 	void		_NewTab(const char *command);
+	TermView*	_ActiveTermView();
 	
 	SmartTabView	*fTabView;
 	TermView	*fTermView;

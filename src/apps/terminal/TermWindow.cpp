@@ -31,6 +31,7 @@
 #include <Roster.h>
 #include <Screen.h>
 #include <ScrollBar.h>
+#include <ScrollView.h>
 #include <String.h>
 #include <TextControl.h>
 #include <WindowScreen.h>
@@ -49,11 +50,11 @@
 
 
 const static float kViewOffset = 3;
+const static uint32 kNewTab = 'NTab';
 
 TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	: BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE|B_QUIT_ON_WINDOW_CLOSE),
 	fTabView(NULL),
-	fTermView(NULL),	
 	fMenubar(NULL),
 	fFilemenu(NULL),
 	fEditmenu(NULL),
@@ -75,14 +76,6 @@ TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	fMatchWord(false)
 {
 	_InitWindow(command);
-	/*BView *view = new TermView(Bounds());
-	
-	AddChild(view);
-	BRect draggerFrame(0, 0, 16, 16);
-	draggerFrame.OffsetTo(Bounds().RightBottom() - BPoint(16, 16));
-	BDragger *dragger = new BDragger(draggerFrame, view, B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM, B_WILL_DRAW);
-		
-	view->AddChild(dragger);*/
 }
 
 
@@ -110,71 +103,13 @@ TermWindow::_InitWindow(const char *command)
 	// make menu bar
 	_SetupMenu();
 
-	// Setup font.
+	BRect textFrame = Bounds();
+	textFrame.top = fMenubar->Bounds().bottom + 1.0;
 
-	const char *family = PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY);
-
-	BFont halfFont;
-	halfFont.SetFamilyAndStyle(family, NULL);
-	float size = PrefHandler::Default()->getFloat(PREF_HALF_FONT_SIZE);
-	if (size < 6.0f)
-		size = 6.0f;
-	halfFont.SetSize(size);
+	fTabView = new SmartTabView(textFrame, "tab view");
+	AddChild(fTabView);
 	
-	family = PrefHandler::Default()->getString(PREF_FULL_FONT_FAMILY);
-
-	BFont fullFont;
-	fullFont.SetFamilyAndStyle(family, NULL);
-	size = PrefHandler::Default()->getFloat(PREF_FULL_FONT_SIZE);
-	if (size < 6.0f)
-		size = 6.0f;
-	fullFont.SetSize(size);
-	fullFont.SetSpacing(B_FIXED_SPACING);
-
-	// Make Terminal text view.
-
-	BRect textframe = Bounds();
-	textframe.top = fMenubar->Bounds().bottom + 1.0;
-
-	fTermView = new TermView(textframe, command);
-	fTermView->SetEncoding(longname2id(PrefHandler::Default()->getString(PREF_TEXT_ENCODING)));
-
-	// Initialize TermView. (font, size and color)
-	fTermView->SetTermFont(&halfFont, &fullFont);
-	
-	_SetTermColors();
-	BRect rect = fTermView->SetTermSize(PrefHandler::Default()->getInt32(PREF_ROWS),
-					PrefHandler::Default()->getInt32(PREF_COLS), true);
-
-	int width, height;
-	fTermView->GetFontSize(&width, &height);
-	SetSizeLimits(MIN_COLS * width, MAX_COLS * width,
-		MIN_COLS * height, MAX_COLS * height);
-	
-	// Add offset to baseview.
-	rect.InsetBy(-kViewOffset, -kViewOffset);
-
-	// Resize Window
-	ResizeTo(rect.Width()+ B_V_SCROLL_BAR_WIDTH,
-		rect.Height() + fMenubar->Bounds().Height());
-
-	fTermView->ResizeTo(rect.Width(), rect.Height());
-	
-	// Make Scroll Bar.
-
-	BRect scrollRect(0, 0, B_V_SCROLL_BAR_WIDTH,
-		rect.Height() - B_H_SCROLL_BAR_HEIGHT + 1);
-
-	scrollRect.OffsetBy(rect.Width() + 1, fMenubar->Bounds().Height());
-
-	BScrollBar *scrollBar = new BScrollBar(scrollRect, "scrollbar",
-		fTermView, 0, 0, B_VERTICAL);
-	fTermView->SetScrollBar(scrollBar);
-	
-	AddChild(scrollBar);
-	AddChild(fTermView);
-
-	fEditmenu->SetTargetForItems(fTermView);
+	_NewTab(command);
 }
 
 
@@ -182,7 +117,7 @@ void
 TermWindow::MenusBeginning()
 {
 	// Syncronize Encode Menu Pop-up menu and Preference.
-	BMenuItem *item = fEncodingmenu->FindItem(id2longname(fTermView->Encoding()));
+	BMenuItem *item = fEncodingmenu->FindItem(id2longname(_ActiveTermView()->Encoding()));
 	if (item != NULL)
 		item->SetMarked(true);
 	BWindow::MenusBeginning();
@@ -203,6 +138,12 @@ TermWindow::_SetupMenu()
 	fFilemenu = new BMenu("Terminal");
 	fFilemenu->AddItem(new BMenuItem("Switch Terminals", new BMessage(MENU_SWITCH_TERM),'G'));
 	fFilemenu->AddItem(new BMenuItem("New Terminal" B_UTF8_ELLIPSIS, new BMessage(MENU_NEW_TERM), 'N'));
+	
+
+	// TODO: Tabs disabled until various problems are fixed.
+	// n. 1: calling "exit" from a tab closes the whole app.
+	//fFilemenu->AddItem(new BMenuItem("New Tab", new BMessage(kNewTab), 'T'));
+	
 	fFilemenu->AddSeparatorItem();
 	fFilemenu->AddItem(new BMenuItem("Page Setup...", new BMessage(MENU_PAGE_SETUP)));
 	fFilemenu->AddItem(new BMenuItem("Print", new BMessage(MENU_PRINT),'P'));
@@ -286,6 +227,10 @@ TermWindow::MessageReceived(BMessage *message)
 			be_app->PostMessage(MENU_SWITCH_TERM);
 			break;
 		}
+		case kNewTab:
+			_NewTab(NULL);
+			break;
+
 		case MENU_NEW_TERM: {
 			app_info info;
 			be_app->GetAppInfo(&info);
@@ -325,7 +270,7 @@ TermWindow::MessageReceived(BMessage *message)
 			if (!fFindSelection) 
 				message->FindString("findstring", &fFindString);
 			else 
-				fTermView->GetSelection(fFindString);
+				_ActiveTermView()->GetSelection(fFindString);
 
 			if (fFindString.Length() == 0) {
 				BAlert *alert = new BAlert("find failed", "No search string.", "Okay", NULL, 
@@ -339,7 +284,7 @@ TermWindow::MessageReceived(BMessage *message)
 			message->FindBool("forwardsearch", &fForwardSearch);
 			message->FindBool("matchcase", &fMatchCase);
 			message->FindBool("matchword", &fMatchWord);
-			findresult = fTermView->Find(fFindString, fForwardSearch, fMatchCase, fMatchWord);
+			findresult = _ActiveTermView()->Find(fFindString, fForwardSearch, fMatchCase, fMatchWord);
 				
 			if (!findresult) {
 				BAlert *alert = new BAlert("find failed", "Not Found.", "Okay", NULL,
@@ -356,7 +301,7 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 		}
 		case MENU_FIND_FORWARD: {
-			findresult = fTermView->Find(fFindString, true, fMatchCase, fMatchWord);
+			findresult = _ActiveTermView()->Find(fFindString, true, fMatchCase, fMatchWord);
 			if (!findresult) {
 				BAlert *alert = new BAlert("find failed", "Not Found.", "Okay", NULL,
 					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
@@ -365,7 +310,7 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 		}
 		case MENU_FIND_BACKWARD: {
-			findresult = fTermView->Find(fFindString, false, fMatchCase, fMatchWord);
+			findresult = _ActiveTermView()->Find(fFindString, false, fMatchCase, fMatchWord);
 			if (!findresult) {
 				BAlert *alert = new BAlert("find failed", "Not Found.", "Okay", NULL,
 					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
@@ -379,14 +324,14 @@ TermWindow::MessageReceived(BMessage *message)
 
 		case MENU_ENCODING: {
 			message->FindInt32 ("op", &coding_id);
-			fTermView->SetEncoding(coding_id);
+			_ActiveTermView()->SetEncoding(coding_id);
 			break;
 		}
 		
 		// Message from Preference panel.
 		case MSG_ROWS_CHANGED:
 		case MSG_COLS_CHANGED: {
-			r = fTermView->SetTermSize (PrefHandler::Default()->getInt32 (PREF_ROWS),
+			r = _ActiveTermView()->SetTermSize (PrefHandler::Default()->getInt32 (PREF_ROWS),
 										PrefHandler::Default()->getInt32 (PREF_COLS), 0);
 		
 			ResizeTo (r.Width()+ B_V_SCROLL_BAR_WIDTH + kViewOffset * 2,
@@ -410,12 +355,12 @@ TermWindow::MessageReceived(BMessage *message)
 			fullFont.SetSize (PrefHandler::Default()->getFloat(PREF_FULL_FONT_SIZE));
 			fullFont.SetSpacing (B_FIXED_SPACING);
 			
-			fTermView->SetTermFont (&halfFont, &fullFont);
-			r = fTermView->SetTermSize (0, 0, 0);
+			_ActiveTermView()->SetTermFont (&halfFont, &fullFont);
+			r = _ActiveTermView()->SetTermSize (0, 0, 0);
 			
 			int width, height;
 			
-			fTermView->GetFontSize (&width, &height);
+			_ActiveTermView()->GetFontSize (&width, &height);
 			
 			SetSizeLimits (MIN_COLS * width, MAX_COLS * width,
 							MIN_COLS * height, MAX_COLS * height);
@@ -423,7 +368,7 @@ TermWindow::MessageReceived(BMessage *message)
 			ResizeTo (r.Width()+ B_V_SCROLL_BAR_WIDTH + kViewOffset * 2,
 			r.Height()+fMenubar->Bounds().Height() + kViewOffset * 2);
 			
-			fTermView->Invalidate();
+			_ActiveTermView()->Invalidate();
 			break;
 		}
 		case EIGHTYTWENTYFOUR: {
@@ -461,9 +406,9 @@ TermWindow::MessageReceived(BMessage *message)
 				float mbHeight = fMenubar->Bounds().Height() + 1;
 				fSavedFrame = Frame();
 				BScreen screen(this);
-				fTermView->ScrollBar()->Hide();
+				_ActiveTermView()->ScrollBar()->Hide();
 				fMenubar->Hide();
-				fTermView->ResizeBy(B_V_SCROLL_BAR_WIDTH, mbHeight);
+				_ActiveTermView()->ResizeBy(B_V_SCROLL_BAR_WIDTH, mbHeight);
 				fSavedLook = Look();
 				// done before ResizeTo to work around a Dano bug (not erasing the decor)
 				SetLook(B_NO_BORDER_WINDOW_LOOK);
@@ -472,10 +417,10 @@ TermWindow::MessageReceived(BMessage *message)
 			} else { // exit fullscreen
 				float mbHeight = fMenubar->Bounds().Height() + 1;
 				fMenubar->Show();
-				fTermView->ScrollBar()->Show();
+				_ActiveTermView()->ScrollBar()->Show();
 				ResizeTo(fSavedFrame.Width(), fSavedFrame.Height());
 				MoveTo(fSavedFrame.left, fSavedFrame.top);
-				fTermView->ResizeBy(-B_V_SCROLL_BAR_WIDTH, -mbHeight);
+				_ActiveTermView()->ResizeBy(-B_V_SCROLL_BAR_WIDTH, -mbHeight);
 				SetLook(fSavedLook);
 				fSavedFrame = BRect(0,0,-1,-1);
 			}
@@ -488,7 +433,7 @@ TermWindow::MessageReceived(BMessage *message)
 		}
 		case MSG_COLOR_CHANGED: {
 			_SetTermColors();
-			fTermView->Invalidate();
+			_ActiveTermView()->Invalidate();
 			break;
 		}
 		case SAVE_AS_DEFAULT: {
@@ -536,13 +481,13 @@ TermWindow::QuitRequested()
 void
 TermWindow::_SetTermColors()
 {
-	fTermView->SetTextColor(PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR),
+	_ActiveTermView()->SetTextColor(PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR),
 				PrefHandler::Default()->getRGB(PREF_TEXT_BACK_COLOR));
 
-	fTermView->SetSelectColor(PrefHandler::Default()->getRGB(PREF_SELECT_FORE_COLOR),
+	_ActiveTermView()->SetSelectColor(PrefHandler::Default()->getRGB(PREF_SELECT_FORE_COLOR),
 				PrefHandler::Default()->getRGB(PREF_SELECT_BACK_COLOR));
 	
-	fTermView->SetCursorColor(PrefHandler::Default()->getRGB(PREF_CURSOR_FORE_COLOR),
+	_ActiveTermView()->SetCursorColor(PrefHandler::Default()->getRGB(PREF_CURSOR_FORE_COLOR),
 				PrefHandler::Default()->getRGB(PREF_CURSOR_BACK_COLOR));
 }
 
@@ -579,7 +524,7 @@ TermWindow::_DoPrint()
 	int pHeight = (int)pageRect.Height();
 	int pWidth = (int)pageRect.Width();
 	float w,h;
-	fTermView->GetFrameSize(&w, &h);
+	_ActiveTermView()->GetFrameSize(&w, &h);
 	int xPages = (int)ceil(w / pWidth);
 	int yPages = (int)ceil(h / pHeight);
 
@@ -589,7 +534,7 @@ TermWindow::_DoPrint()
 	for (int x = 0; x < xPages; x++) {
 		for (int y = 0; y < yPages; y++) {
 			curPageRect.OffsetTo(x * pWidth, y * pHeight);
-			job.DrawView(fTermView, curPageRect, B_ORIGIN);
+			job.DrawView(_ActiveTermView(), curPageRect, B_ORIGIN);
 			job.SpoolPage();
     
 			if (!job.CanContinue()){
@@ -610,9 +555,78 @@ TermWindow::_DoPrint()
 void
 TermWindow::_NewTab(const char *command)
 {
-	TermView *view = new TermView(Bounds(), command);
-	fTabView->AddTab(view);
+	// Setup font.
+
+	const char *family = PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY);
+
+	BFont halfFont;
+	halfFont.SetFamilyAndStyle(family, NULL);
+	float size = PrefHandler::Default()->getFloat(PREF_HALF_FONT_SIZE);
+	if (size < 6.0f)
+		size = 6.0f;
+	halfFont.SetSize(size);
+	
+	family = PrefHandler::Default()->getString(PREF_FULL_FONT_FAMILY);
+
+	BFont fullFont;
+	fullFont.SetFamilyAndStyle(family, NULL);
+	size = PrefHandler::Default()->getFloat(PREF_FULL_FONT_SIZE);
+	if (size < 6.0f)
+		size = 6.0f;
+	fullFont.SetSize(size);
+	fullFont.SetSpacing(B_FIXED_SPACING);
+
+	// Make Terminal text view.
+	TermView *view = new TermView(BRect(0, 0, 10, 10), command);
+	
+	BScrollView *scrollView = new BScrollView("scrollView", view, B_FOLLOW_ALL,
+					B_WILL_DRAW|B_FRAME_EVENTS, false, true);	
+	fTabView->AddTab(scrollView);
+	view->SetScrollBar(scrollView->ScrollBar(B_VERTICAL));
+	
+	// TODO: Resize the vertical scrollbar to take the window gripping handle into account
+	// (shouldn't this be done in BScrollView itself ? At least BScrollBar does that).	
+	scrollView->ScrollBar(B_VERTICAL)->ResizeBy(0, -13);
+	view->SetEncoding(longname2id(PrefHandler::Default()->getString(PREF_TEXT_ENCODING)));
+	view->SetTermFont(&halfFont, &fullFont);
+	
+	_SetTermColors();
+	
+	BRect rect = view->SetTermSize(PrefHandler::Default()->getInt32(PREF_ROWS),
+					PrefHandler::Default()->getInt32(PREF_COLS), false);
+
+	
+	// If it's the first time we're called, setup the window
+	if (fTabView->CountTabs() == 1) {
+		int width, height;
+		view->GetFontSize(&width, &height);
+		SetSizeLimits(MIN_COLS * width, MAX_COLS * width,
+			MIN_COLS * height, MAX_COLS * height);
+	
+		// Add offset to baseview.
+		rect.InsetBy(-kViewOffset, -kViewOffset);
+	
+		// Resize Window
+		ResizeTo(rect.Width()+ B_V_SCROLL_BAR_WIDTH,
+			rect.Height() + fMenubar->Bounds().Height());
+
+		// TODO: If I don't do this, the view won't show up.
+		// Bug in BTabView or in my code ?
+		fTabView->Select(0);
+	}
+	
+	// TODO: How do I set this for the current active tab,
+	// every time a different tab is chosen ? 
+	fEditmenu->SetTargetForItems(view);
 }
 
 
+TermView *
+TermWindow::_ActiveTermView()
+{
+	// TODO: BAD HACK:
+	// We should probably use the observer api to tell
+	// the various "tabs" when settings are changed. Fix this.
+	return (TermView *)((BScrollView *)fTabView->ViewForTab(fTabView->Selection()))->Target();
+}
 

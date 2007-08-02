@@ -9,10 +9,9 @@
 #ifndef __SMARTTABVIEW_H
 #define __SMARTTABVIEW_H
 
-#include <View.h>
+#include <TabView.h>
 
-class BTabView;
-class SmartTabView : public BView {
+class SmartTabView : public BTabView {
 public:
 	SmartTabView(BRect frame, const char *name,
 			button_width width = B_WIDTH_AS_USUAL, 
@@ -22,21 +21,15 @@ public:
 					B_FRAME_EVENTS | B_NAVIGABLE);
 	virtual ~SmartTabView();
 	
-	virtual BView *ContainerView();
-	virtual BView *ViewForTab(int32);
+	virtual void MouseDown(BPoint where);
 
+	virtual void AllAttached();
 	virtual	void Select(int32 tab);
-	virtual int32 Selection() const;
-
+	
 	virtual	void AddTab(BView *target, BTab *tab = NULL);
 	virtual BTab* RemoveTab(int32 index);
-	virtual int32 CountTabs() const;	
-	
-	//virtual void Draw(BRect rect);
 
-private:
-	BTabView *fTabView;
-	BView *fView;
+	virtual BRect DrawTabs();
 };
 
 #endif // __SMARTTABVIEW_H
