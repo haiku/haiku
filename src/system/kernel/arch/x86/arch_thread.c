@@ -334,6 +334,10 @@ arch_thread_enter_userspace(struct thread *t, addr_t entry, void *args1, void *a
 
 	disable_interrupts();
 
+	// When entering the userspace, the iframe stack needs to be empty. After
+	// an exec() it'll still contain the iframe from the syscall, though.
+	t->arch_info.iframes.index = 0;
+
 	i386_set_tss_and_kstack(t->kernel_stack_base + KERNEL_STACK_SIZE);
 
 	// set the CPU dependent GDT entry for TLS
