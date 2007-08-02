@@ -200,7 +200,7 @@ TermBuffer::GetString(int row, int col, int num, uchar *buf,
 		if (ptr->attr != (ptr + 1)->attr)
 			return all_count;
 
-		buf = (uchar *)index((char *)buf, 0x00);
+		buf += strlen((char *)buf);
 		ptr++;
 		col++;
 

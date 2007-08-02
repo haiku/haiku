@@ -86,7 +86,7 @@
 /*
  * Set environment variable.
  */
-#if !defined(__HAIKU__) || defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
+#if defined(HAIKU_TARGET_PLATFORM_BEOS) || defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
 
 extern char **environ;
 
@@ -102,7 +102,7 @@ setenv(const char *var, const char *value, bool overwrite)
 			/* found it */
 			if (overwrite) {
 				environ[envindex] = (char *)malloc((unsigned)len + val_len + 2);
-				snprintf(environ[envindex], "%s=%s", var, value);
+				sprintf(environ[envindex], "%s=%s", var, value);
 			}
 			return 0;
 		}
