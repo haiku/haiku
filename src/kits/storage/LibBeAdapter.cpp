@@ -125,10 +125,8 @@ _kern_start_watching(dev_t device, ino_t node, uint32 flags,
 
 			
 status_t
-_kern_stop_watching(dev_t device, ino_t node, uint32 flags,
-	port_id port, uint32 token)
+_kern_stop_watching(dev_t device, ino_t node, port_id port, uint32 token)
 {
-	(void)flags;
 	return _kstop_watching_vnode_(device, node, port, token);
 }
 

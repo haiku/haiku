@@ -85,7 +85,6 @@ Server haiku_registrar
 	PriorityMessageQueue.cpp
 	RecentApps.cpp
 	RecentEntries.cpp
-	Referenceable.cpp
 	Registrar.cpp
 	RosterAppInfo.cpp
 	RosterSettingsCharStream.cpp

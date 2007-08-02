@@ -2891,7 +2891,7 @@ _TrackerLaunchAppWithDocuments(const entry_ref *appRef, const BMessage *refs, bo
 
 extern "C" char** environ;
 
-#ifdef __HAIKU__
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 extern "C" status_t _kern_load_image(int32 argCount, const char **args,
 	int32 envCount, const char **env, int32 priority, uint32 flags,
 	port_id errorPort, uint32 errorToken);
@@ -2917,7 +2917,7 @@ LoaderErrorDetails(const entry_ref *app, BString &details)
 
 	char *argv[2] = { const_cast<char *>(path.Path()), 0};
 
-#ifdef __HAIKU__
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	port_id errorPort = create_port(1, "Tracker loader error");
 
 	// count environment variables
