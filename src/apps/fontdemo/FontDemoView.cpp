@@ -141,11 +141,7 @@ FontDemoView::_DrawView(BView* view)
 		xCoordArray[i] += xCenter;
 		yCoordArray[i] += yCoord;
 
-		boundBoxes[i].left = xCoordArray[i] + edgeInfo[i].left * FontSize();
-		boundBoxes[i].right = boundBoxes[i].left + width;
-
-		boundBoxes[i].bottom = yCoordArray[i];
- 		boundBoxes[i].top = boundBoxes[i].bottom - height;
+		boundBoxes[i].OffsetBy(xCoordArray[i], yCoordArray[i]);
 
 		if (OutLineLevel()) {
 			view->MovePenTo(xCoordArray[i], yCoordArray[i]);
