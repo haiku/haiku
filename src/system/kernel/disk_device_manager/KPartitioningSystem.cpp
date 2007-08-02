@@ -901,6 +901,7 @@ KPartitioningSystem::Initialize(KPartition *partition, const char *name,
 	}
 
 	// let the module do its job
+// TODO: The partition must not be locked at this point!
 	status_t result = fModule->initialize(fd, partition->ID(), name, parameters,
 		job->ID());
 

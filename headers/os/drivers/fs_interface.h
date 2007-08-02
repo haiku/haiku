@@ -245,10 +245,8 @@ typedef struct file_system_module_info {
 				const char *name, disk_job_id job);
 	status_t (*set_content_parameters)(int fd, partition_id partition,
 				const char *parameters, disk_job_id job);
-	status_t (*initialize)(const char *partition, const char *name,
+	status_t (*initialize)(int fd, partition_id partition, const char *name,
 				const char *parameters, disk_job_id job);
-		// This is pretty close to how the hook in R5 looked. Save the job ID,
-		// of course and that the parameters were given as (void*, size_t) pair.
 } file_system_module_info;
 
 

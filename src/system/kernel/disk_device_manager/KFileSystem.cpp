@@ -7,6 +7,7 @@
 #include <fs_interface.h>
 
 #include "ddm_modules.h"
+#include "KDiskDeviceJob.h"
 #include "KDiskDeviceUtils.h"
 #include "KFileSystem.h"
 #include "KPartition.h"
@@ -308,8 +309,31 @@ status_t
 KFileSystem::Initialize(KPartition *partition, const char *name,
 	const char *parameters, KDiskDeviceJob *job)
 {
-	// to be implemented
-	return B_ERROR;
+	// check parameters
+	if (!partition || !job || !fModule)
+		return B_BAD_VALUE;
+	if (!fModule->initialize)
+		return B_NOT_SUPPORTED;
+
+	// open partition device (we need a temporary read-lock)
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	if (!manager->ReadLockPartition(partition->ID()))
+		return B_ERROR;
+	DeviceReadLocker locker(partition->Device(), true);
+
+	int fd = -1;
+	status_t result = partition->Open(O_RDWR, &fd);
+	if (result != B_OK)
+		return result;
+
+	locker.Unlock();
+
+	// call the module hook
+	result = fModule->initialize(fd, partition->ID(), name, parameters,
+		job->ID());
+
+	close(fd);
+	return result;
 }
 
 

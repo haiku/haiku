@@ -27,10 +27,12 @@ static const int32 kDesiredAllocationGroups = 56;
 
 class DeviceOpener {
 	public:
+		DeviceOpener(int fd, int mode);
 		DeviceOpener(const char *device, int mode);
 		~DeviceOpener();
 
 		int Open(const char *device, int mode);
+		int Open(int fd, int mode);
 		void *InitCache(off_t numBlocks, uint32 blockSize);
 		void RemoveCache(bool allowWrites);
 
@@ -53,6 +55,14 @@ DeviceOpener::DeviceOpener(const char *device, int mode)
 	fBlockCache(NULL)
 {
 	Open(device, mode);
+}
+
+
+DeviceOpener::DeviceOpener(int fd, int mode)
+	:
+	fBlockCache(NULL)
+{
+	Open(fd, mode);
 }
 
 
@@ -92,6 +102,19 @@ DeviceOpener::Open(const char *device, int mode)
 			}
 		}
 	}
+
+	return fDevice;
+}
+
+
+int
+DeviceOpener::Open(int fd, int mode)
+{
+	fDevice = dup(fd);
+	if (fDevice < 0)
+		return errno;
+
+	fMode = mode;
 
 	return fDevice;
 }
@@ -563,7 +586,7 @@ Volume::Identify(int fd, disk_super_block *superBlock)
 
 
 status_t
-Volume::Initialize(const char *device, const char *name, uint32 blockSize,
+Volume::Initialize(int fd, const char *name, uint32 blockSize,
 	uint32 flags)
 {
 	// although there is no really good reason for it, we won't
@@ -576,7 +599,7 @@ Volume::Initialize(const char *device, const char *name, uint32 blockSize,
 		&& blockSize != 8192)
 		return B_BAD_VALUE;
 
-	DeviceOpener opener(device, O_RDWR);
+	DeviceOpener opener(fd, O_RDWR);
 	if (opener.Device() < B_OK)
 		return B_BAD_VALUE;
 

@@ -228,6 +228,7 @@ BDiskDevice::CommitModifications(bool synchronously,
 	if (!_IsShadow())
 		return B_BAD_VALUE;
 	// TODO: Get port and token from the progressMessenger
+	// TODO: Respect "synchronously"!
 	port_id port = -1;
 	int32 token = -1;
 	error = _kern_commit_disk_device_modifications(ID(), port, token,

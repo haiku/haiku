@@ -2038,12 +2038,9 @@ bfs_validate_initialize(partition_data *partition, char *name,
 
 
 status_t
-bfs_initialize(const char *partition, const char *name, const char *parameters,
-	disk_job_id job)
+bfs_initialize(int fd, partition_id partition, const char *name,
+	const char *parameters, disk_job_id job)
 {
-	if (partition == NULL)
-		return B_BAD_VALUE;
-	
 	uint32 blockSize = 1024;
 	uint32 flags = 0;
 	bool verbose = false;
@@ -2070,7 +2067,7 @@ bfs_initialize(const char *partition, const char *name, const char *parameters,
 	}
 
 	Volume volume(-1);
-	status_t status = volume.Initialize(partition, name, blockSize, flags);
+	status_t status = volume.Initialize(fd, name, blockSize, flags);
 	if (status < B_OK) {
 		INFORM(("Initializing volume failed: %s\n", strerror(status)));
 		return status;

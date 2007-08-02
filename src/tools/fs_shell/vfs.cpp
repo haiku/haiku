@@ -16,6 +16,7 @@
 #include "fssh_atomic.h"
 #include "fssh_defs.h"
 #include "fssh_dirent.h"
+#include "fssh_errno.h"
 #include "fssh_fcntl.h"
 #include "fssh_fs_info.h"
 #include "fssh_fs_volume.h"
@@ -5184,30 +5185,30 @@ _kern_initialize_volume(const char* fsName, const char *partition,
 
 	// The partition argument should point to a real file/device.
 
-	// normalize the device path
-	KPath normalizedDevice;
-//	status = normalizedDevice.SetTo(device, true);
-// NOTE: normalizing works only in our namespace.
-	fssh_status_t status = normalizedDevice.SetTo(partition, false);
-	if (status != FSSH_B_OK)
-		return status;
-
-	partition = normalizedDevice.Path();
-		// correct path to file device
+	// open partition
+	int fd = fssh_open(partition, FSSH_O_RDWR);
+	if (fd < 0)
+		return fssh_errno;
 
 	// get the file system module
 	fssh_file_system_module_info* fsModule = get_file_system(fsName);
-	if (fsModule == NULL)
+	if (fsModule == NULL) {
+		fssh_close(fd);
 		return FSSH_ENODEV;
+	}
 
 	// initialize
-	if (fsModule->initialize) 
-		status = (*fsModule->initialize)(partition, name, parameters, -1);
-	else
+	fssh_status_t status;
+	if (fsModule->initialize) {
+		status = (*fsModule->initialize)(fd, -1, name, parameters, -1);
+			// We've got no partition or job IDs -- the FS will hopefully
+			// ignore that.
+	} else
 		status = FSSH_B_NOT_SUPPORTED;
 
-	// put the file system module
+	// put the file system module, close partition
 	put_file_system(fsModule);
+	fssh_close(fd);
 
 	return status;
 }

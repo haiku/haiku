@@ -279,10 +279,8 @@ typedef struct fssh_file_system_module_info {
 				const char *name, fssh_disk_job_id job);
 	fssh_status_t (*set_content_parameters)(int fd, fssh_partition_id partition,
 				const char *parameters, fssh_disk_job_id job);
-	fssh_status_t (*initialize)(const char *partition, const char *name,
-				const char *parameters, fssh_disk_job_id job);
-		// This is pretty close to how the hook in R5 looked. Save the job ID,
-		// of course and that the parameters were given as (void*, size_t) pair.
+	fssh_status_t (*initialize)(int fd, fssh_partition_id partition,
+				const char *name, const char *parameters, fssh_disk_job_id job);
 } fssh_file_system_module_info;
 
 

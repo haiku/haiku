@@ -34,7 +34,8 @@
 
 
 #ifndef __BEOS__
-	// The _kern_close() defined in libroot_build.so.
+	// Defined in libroot_build.so.
+	extern "C" int _kern_dup(int fd);
 	extern "C" status_t _kern_close(int fd);
 #endif
 
@@ -74,6 +75,24 @@ get_partition_size(int fd, off_t maxSize)
 }
 
 #endif // HAIKU_HOST_PLATFORM_LINUX
+
+
+int
+fssh_dup(int fd)
+{
+	// Use the _kern_dup() defined in libroot on BeOS incompatible systems.
+	// Required for proper attribute emulation support.
+	#if __BEOS__
+		return dup(fd);
+	#else
+		int result = _kern_dup(fd);
+		if (result < 0) {
+			fssh_set_errno(result);
+			return -1;
+		}
+		return result;
+	#endif
+}
 
 
 int

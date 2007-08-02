@@ -31,7 +31,7 @@ class Volume {
 
 		status_t			Mount(const char *device, uint32 flags);
 		status_t			Unmount();
-		status_t			Initialize(const char *device, const char *name,
+		status_t			Initialize(int fd, const char *name,
 								uint32 blockSize, uint32 flags);
 
 		bool				IsValidSuperBlock();
