@@ -306,7 +306,7 @@ HAIKU_EXECUTABLE_BEGIN_GLUE_CODE =
 ;
 HAIKU_EXECUTABLE_END_GLUE_CODE = $(HAIKU_LIBRARY_END_GLUE_CODE) ;
 HAIKU_KERNEL_ADDON_BEGIN_GLUE_CODE = crtbegin.o ;
-HAIKU_KERNEL_ADDON_END_GLUE_CODE = crtend.o ;
+HAIKU_KERNEL_ADDON_END_GLUE_CODE = $(HAIKU_GCC_LIBGCC) crtend.o ;
 
 SEARCH on crtbegin.o crtend.o = $(HAIKU_GCC_LIB_DIR) ;
 
@@ -747,7 +747,7 @@ if $(TARGET_PLATFORM) = libbe_test {
 
 # common stuff
 
-# start with a clean slate
+# start with a clean state
 CCFLAGS = ;
 C++FLAGS = ;
 DEFINES = ;
