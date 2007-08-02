@@ -1673,7 +1673,6 @@ uninit_ipv4()
 	benaphore_destroy(&sRawSocketsLock);
 	benaphore_destroy(&sReceivingProtocolLock);
 
-	put_module(NET_STACK_MODULE_NAME);
 	return B_OK;
 }
 
