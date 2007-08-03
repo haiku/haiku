@@ -557,14 +557,17 @@ Shell::_Spawn(int row, int col, const char *command, const char *encoding)
 		 * Exec failed.
 		 */
 		sleep(1);
-		const char *spawnAlertMessage = "alert --stop "
+		/*const char *spawnAlertMessage = "alert --stop "
 						"'Cannot execute \"%s\":\n"
-						"\t%s\n'"
+						"\t%s' "
 						"'Use Default Shell' 'Abort'";
 		char errorMessage[256];
 		snprintf(errorMessage, sizeof(errorMessage), spawnAlertMessage, commandLine, strerror(errno));
 
-		if (system(errorMessage) == 0)
+		// TODO: I'm not sure that system should return the return value of alert.
+		// At least, it's not doing that right now.
+		int returnValue = system(errorMessage);
+		if (returnValue == 0)*/
 			execl("/bin/sh", "/bin/sh", "-login", NULL);
 
 		exit(1);
