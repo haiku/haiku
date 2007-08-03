@@ -69,9 +69,7 @@ private:
 			*fEditmenu,
 			*fEncodingmenu,
 			*fHelpmenu,
-			*fFontMenu,
-			*fWindowSizeMenu,
-			*fNewFontMenu; 
+			*fWindowSizeMenu;
 
 	BMessage	*fPrintSettings;
 	PrefWindow	*fPrefWindow;

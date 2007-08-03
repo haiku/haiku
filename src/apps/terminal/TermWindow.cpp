@@ -33,8 +33,6 @@
 #include <ScrollBar.h>
 #include <ScrollView.h>
 #include <String.h>
-#include <TextControl.h>
-#include <WindowScreen.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -60,9 +58,7 @@ TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	fEditmenu(NULL),
 	fEncodingmenu(NULL),
 	fHelpmenu(NULL),
-	fFontMenu(NULL),
 	fWindowSizeMenu(NULL),
-	fNewFontMenu(NULL),
 	fPrintSettings(NULL),
 	fPrefWindow(NULL),
 	fFindPanel(NULL),
@@ -181,28 +177,11 @@ TermWindow::_SetupMenu()
 	fWindowSizeMenu->AddItem(new BMenuItem("132x25", new BMessage(ONETHREETWOTWENTYFIVE))); 
 	fWindowSizeMenu->AddItem(new BMenuItem("Fullscreen", new BMessage(FULLSCREEN), B_ENTER)); 
 
- 	// Considering we have this in the preferences window, this menu is not
- 	// needed and should not be shown if we are to not confuse the user
-/*  fNewFontMenu = new BMenu("Font");
-	fNewFontMenu->SetRadioMode(true);
-		int32 numFamilies1 = count_font_families();
-		for ( int32 i = 0; i < numFamilies1; i++ ) {
-			font_family family;
-			uint32 flags;
-			if ( get_font_family(i, &family, &flags) == B_OK ) {
-				fNewFontMenu->AddItem(item = new BMenuItem(family, new BMessage(MSG_FONT_CHANGED)));
-			//	if (0 ==i) item->SetMarked(true); 
-			}
-		}
-  fNewFontMenu->FindItem (PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY))->SetMarked(true);
-*/
-
 	fEncodingmenu = new BMenu("Font Encoding");
 	fEncodingmenu->SetRadioMode(true);
 	MakeEncodingMenu(fEncodingmenu, true);
 	fHelpmenu->AddItem(fWindowSizeMenu);  
 	fHelpmenu->AddItem(fEncodingmenu);
-//  fHelpmenu->AddItem(fNewFontMenu);
 	fHelpmenu->AddSeparatorItem();
 	fHelpmenu->AddItem(new BMenuItem("Preferences" B_UTF8_ELLIPSIS, new BMessage(MENU_PREF_OPEN)));
 	fHelpmenu->AddSeparatorItem();
@@ -427,7 +406,6 @@ TermWindow::MessageReceived(BMessage *message)
 			break;	
 		}
 		case MSG_FONT_CHANGED: {
-	    		PrefHandler::Default()->setString (PREF_HALF_FONT_FAMILY, fNewFontMenu->FindMarked()->Label());
 	    		PostMessage(MSG_HALF_FONT_CHANGED);
 			break;
 		}
@@ -473,6 +451,9 @@ TermWindow::WindowActivated(bool activated)
 bool
 TermWindow::QuitRequested()
 {
+	// TODO: Intercept the B_QUIT_REQUESTED message
+	// sent by the TermView, and only close one tab if there
+	// are multiple ones ? Or handle the case inside TermView itself ?
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
 }
@@ -577,7 +558,9 @@ TermWindow::_NewTab(const char *command)
 	fullFont.SetSpacing(B_FIXED_SPACING);
 
 	// Make Terminal text view.
-	TermView *view = new TermView(BRect(0, 0, 10, 10), command);
+	TermView *view = new TermView(PrefHandler::Default()->getInt32(PREF_ROWS),
+					PrefHandler::Default()->getInt32(PREF_COLS),
+					command);
 	
 	BScrollView *scrollView = new BScrollView("scrollView", view, B_FOLLOW_ALL,
 					B_WILL_DRAW|B_FRAME_EVENTS, false, true);	
@@ -592,10 +575,6 @@ TermWindow::_NewTab(const char *command)
 	
 	_SetTermColors();
 	
-	BRect rect = view->SetTermSize(PrefHandler::Default()->getInt32(PREF_ROWS),
-					PrefHandler::Default()->getInt32(PREF_COLS), false);
-
-	
 	// If it's the first time we're called, setup the window
 	if (fTabView->CountTabs() == 1) {
 		int width, height;
@@ -603,12 +582,11 @@ TermWindow::_NewTab(const char *command)
 		SetSizeLimits(MIN_COLS * width, MAX_COLS * width,
 			MIN_COLS * height, MAX_COLS * height);
 	
-		// Add offset to baseview.
-		rect.InsetBy(-kViewOffset, -kViewOffset);
-	
+		float fWidth, fHeight;
+		view->GetPreferredSize(&fWidth, &fHeight);
+		
 		// Resize Window
-		ResizeTo(rect.Width()+ B_V_SCROLL_BAR_WIDTH,
-			rect.Height() + fMenubar->Bounds().Height());
+		ResizeTo(fWidth + B_V_SCROLL_BAR_WIDTH, fHeight + fMenubar->Bounds().Height());
 
 		// TODO: If I don't do this, the view won't show up.
 		// Bug in BTabView or in my code ?

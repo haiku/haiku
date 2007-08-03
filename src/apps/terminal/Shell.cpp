@@ -232,14 +232,18 @@ Shell::Signal(int signal)
 status_t
 Shell::GetAttr(struct termios &attr)
 {
-	return tcgetattr(fFd, &attr);
+	if (tcgetattr(fFd, &attr) < 0)
+		return errno;
+	return B_OK;
 }
 
 
 status_t
 Shell::SetAttr(struct termios &attr)
 {
-	return tcsetattr(fFd, TCSANOW, &attr);
+	if (tcsetattr(fFd, TCSANOW, &attr) < 0)
+		return errno;
+	return B_OK;
 }
 
 
@@ -378,13 +382,6 @@ Shell::_Spawn(int row, int col, const char *command, const char *encoding)
 			exit(1);
 		}
 
-		struct termios tio;
-	
-		/* get tty termios (not necessary).
-		 * TODO: so why are we doing it ?
-		 */
-		tcgetattr(slave, &tio);
-
 		/* set signal default */
 		signal(SIGCHLD, SIG_DFL);
 		signal(SIGHUP, SIG_DFL);
@@ -392,6 +389,12 @@ Shell::_Spawn(int row, int col, const char *command, const char *encoding)
 		signal(SIGTERM, SIG_DFL);
 		signal(SIGINT, SIG_DFL);
 		signal(SIGTTOU, SIG_DFL);
+
+		struct termios tio;
+		/* get tty termios (not necessary).
+		 * TODO: so why are we doing it ?
+		 */
+		tcgetattr(slave, &tio);
 
 		/*
 		 * Set Terminal interface.

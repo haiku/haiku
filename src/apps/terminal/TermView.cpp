@@ -19,7 +19,6 @@
 #include "TermConst.h"
 #include "VTkeymap.h"
 
-#include <Application.h>
 #include <Alert.h>
 #include <Beep.h>
 #include <Clipboard.h>
@@ -107,10 +106,29 @@ const unsigned char M_ADD_CURSOR[] = {
 #define ROWS_DEFAULT 25
 #define COLUMNS_DEFAULT 80
 
+
+static property_info sPropList[] = { 
+	{ "encoding", 
+	{B_GET_PROPERTY, 0},
+	{B_DIRECT_SPECIFIER, 0},
+	"get terminal encoding"}, 
+	{ "encoding",
+	{B_SET_PROPERTY, 0},
+	{B_DIRECT_SPECIFIER, 0},
+	"set terminal encoding"}, 
+	{ "tty",
+	{B_GET_PROPERTY, 0},
+	{B_DIRECT_SPECIFIER, 0},
+	"get tty name."}, 
+	{ 0  }	     
+};
+
+
 const static uint32 kUpdateSigWinch = 'Rwin';
 
 const static rgb_color kBlackColor = { 0, 0, 0, 255 };
 const static rgb_color kWhiteColor = { 255, 255, 255, 255 };
+
 
 
 TermView::TermView(BRect frame, const char *command, int32 historySize)
@@ -158,6 +176,55 @@ TermView::TermView(BRect frame, const char *command, int32 historySize)
 	fIMflag(false)	
 {	
 	_InitObject(command);
+}
+
+
+TermView::TermView(int rows, int columns, const char *command, int32 historySize)
+	: BView(BRect(0, 0, 0, 0), "termview", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS | B_PULSE_NEEDED),
+	fShell(NULL),
+	fFontWidth(0),
+	fFontHeight(0),
+	fFontAscent(0),
+	fUpdateFlag(false),
+	fInsertModeFlag(MODE_OVER),
+	fScrollUpCount(0),
+	fScrollBarRange(0),
+	fFrameResized(false),
+	fLastCursorTime(0),
+	fCursorDrawFlag(CURON),
+	fCursorStatus(CURON),
+	fCursorBlinkingFlag(CURON),
+	fCursorRedrawFlag(CURON),
+	fCursorHeight(0),
+	fCurPos(0, 0),
+	fCurStack(0, 0),
+	fBufferStartPos(-1),
+	fTermRows(rows),
+	fTermColumns(columns),
+	fEncoding(M_UTF8),
+	fTop(0),	
+	fTextBuffer(NULL),
+	fScrollBar(NULL),
+	fTextForeColor(kBlackColor),
+	fTextBackColor(kWhiteColor),
+	fCursorForeColor(kWhiteColor),
+	fCursorBackColor(kBlackColor),
+	fSelectForeColor(kWhiteColor),
+	fSelectBackColor(kBlackColor),
+	fScrTop(0),
+	fScrBot(fTermRows - 1),
+	fScrBufSize(historySize),
+	fScrRegionSet(0),
+	fPreviousMousePoint(0, 0),
+	fSelStart(-1, -1),
+	fSelEnd(-1, -1),
+	fMouseTracking(false),
+	fMouseThread(-1),
+	fQuitting(false),
+	fIMflag(false)	
+{	
+	_InitObject(command);
+	SetTermSize(fTermRows, fTermColumns, true);
 }
 
 
@@ -235,11 +302,12 @@ TermView::_InitObject(const char *command)
 		return B_NO_MEMORY;
 	
 	status_t status = fShell->Open(fTermRows, fTermColumns,
-					command, longname2shortname(id2longname(fEncoding)));	
+					command, longname2shortname(id2longname(fEncoding)));
+	
 	if (status < B_OK)
 		return status;
 
-	status = AttachShell(fShell);
+	status = _AttachShell(fShell);
 	if (status < B_OK)
 		return status;
 
@@ -254,7 +322,7 @@ TermView::_InitObject(const char *command)
 
 TermView::~TermView()
 {
-	DetachShell();
+	_DetachShell();
 	
 	delete fTextBuffer;
 	delete fShell;
@@ -299,27 +367,6 @@ TermView::GetPreferredSize(float *width, float *height)
 		*width = fTermColumns * fFontWidth;
 	if (height)
 		*height = fTermRows * fFontHeight;
-}
-
-
-status_t
-TermView::AttachShell(Shell *shell)
-{
-	if (shell == NULL)
-		return B_BAD_VALUE;
-	
-	fShell = shell;
-	fShell->ViewAttached(this);	
-
-	return B_OK;
-}
-
-
-void
-TermView::DetachShell()
-{
-	fShell->ViewDetached();
-	fShell = NULL;
 }
 
 
@@ -464,6 +511,16 @@ void
 TermView::SetScrollBar(BScrollBar *scrollBar)
 {
 	fScrollBar = scrollBar;
+}
+
+
+void
+TermView::SetTitle(const char *title)
+{
+	// TODO: Do something different in case we're a replicant,
+	// or in case we are inside a BTabView ?
+	if (Window())
+		Window()->SetTitle(title);
 }
 
 
@@ -950,6 +1007,27 @@ TermView::ScrollAtCursor()
 
 
 status_t
+TermView::_AttachShell(Shell *shell)
+{
+	if (shell == NULL)
+		return B_BAD_VALUE;
+	
+	fShell = shell;
+	fShell->ViewAttached(this);	
+
+	return B_OK;
+}
+
+
+void
+TermView::_DetachShell()
+{
+	fShell->ViewDetached();
+	fShell = NULL;
+}
+
+
+status_t
 TermView::_InitMouseThread()
 {
 	// spawn Mouse Tracking thread.
@@ -1007,9 +1085,9 @@ TermView::_MouseTracking()
 					}
 					
 					if (tmppos > stpos && tmppos < edpos)
-						be_app->SetCursor(M_ADD_CURSOR);
+						SetViewCursor(M_ADD_CURSOR);
 					else 
-						be_app->SetCursor(B_HAND_CURSOR);
+						SetViewCursor(B_HAND_CURSOR);
 				}
 			}
 			snooze(50 * 1000);
@@ -1442,12 +1520,17 @@ TermView::WindowActivated(bool active)
 void
 TermView::KeyDown(const char *bytes, int32 numBytes)
 {
-	int32 key, mod;
-	Looper()->CurrentMessage()->FindInt32("modifiers", &mod);
-	Looper()->CurrentMessage()->FindInt32("key", &key);
-
 	if (fIMflag)
 		return;
+
+	int32 key, mod, rawChar;
+	BMessage *currentMessage = Looper()->CurrentMessage();
+	if (currentMessage == NULL)
+		return;
+	
+	currentMessage->FindInt32("modifiers", &mod);
+	currentMessage->FindInt32("key", &key);
+	currentMessage->FindInt32("raw_char", &rawChar);
 
 	// If bytes[0] equal intr character,
 	// send signal to shell process group.
@@ -1457,6 +1540,8 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 		if (tio.c_lflag & ISIG)
 			fShell->Signal(SIGINT);
 	}
+
+	printf("rawKey: %c\n", (char)rawChar);
 
 	// Terminal filters RET, ENTER, F1...F12, and ARROW key code.
 	// TODO: Cleanup
@@ -1594,7 +1679,7 @@ TermView::FrameResized(float width, float height)
 {
 	const int cols = ((int)width + 1) / fFontWidth;
 	const int rows = ((int)height + 1) / fFontHeight;
-
+	
 	int offset = 0;
 
 	if (rows < fCurPos.y + 1) {
@@ -1673,13 +1758,14 @@ TermView::MessageReceived(BMessage *msg)
 			_DoSelectAll();
 			break;
 		
-		case B_SET_PROPERTY: {
+		case B_SET_PROPERTY:
+		{
 			int32 i;
 			int32 encodingID;
-			BMessage spe;
-			msg->GetCurrentSpecifier(&i, &spe);
-			if (!strcmp("encoding", spe.FindString("property", i))){
-				msg->FindInt32 ("data",  &encodingID);
+			BMessage specifier;
+			msg->GetCurrentSpecifier(&i, &specifier);
+			if (!strcmp("encoding", specifier.FindString("property", i))){
+				msg->FindInt32 ("data", &encodingID);
 				SetEncoding(encodingID);
 				msg->SendReply(B_REPLY);
 			} else {
@@ -1688,16 +1774,16 @@ TermView::MessageReceived(BMessage *msg)
 			break;
 		}
 
-		case B_GET_PROPERTY: {
+		case B_GET_PROPERTY: 
+		{
 			int32 i;
-			BMessage spe;
-			msg->GetCurrentSpecifier(&i, &spe);
-			if (!strcmp("encoding", spe.FindString("property", i))){
+			BMessage specifier;
+			msg->GetCurrentSpecifier(&i, &specifier);
+			if (!strcmp("encoding", specifier.FindString("property", i))){
 				BMessage reply(B_REPLY);
 				reply.AddInt32("result", Encoding());
 				msg->SendReply(&reply);
-			}
-			else if (!strcmp("tty", spe.FindString("property", i))) {
+			} else if (!strcmp("tty", specifier.FindString("property", i))) {
 				BMessage reply(B_REPLY);
 				reply.AddString("result", TerminalName());
 				msg->SendReply(&reply);
@@ -1748,40 +1834,23 @@ TermView::MessageReceived(BMessage *msg)
 status_t
 TermView::GetSupportedSuites(BMessage *message) 
 { 
-	static property_info propList[] = { 
-		{ "encoding",
-		{B_GET_PROPERTY, 0},
-		{B_DIRECT_SPECIFIER, 0},
-		"get muterminal encoding"}, 
-		{ "encoding",
-		{B_SET_PROPERTY, 0},
-		{B_DIRECT_SPECIFIER, 0},
-		"set muterminal encoding"}, 
-		{ "tty",
-		{B_GET_PROPERTY, 0},
-		{B_DIRECT_SPECIFIER, 0},
-		"get tty_name."}, 
-		{ 0  }
-		     
-	};
-
-	message->AddString("suites", "suite/vnd.naan-termview"); 
-	BPropertyInfo propInfo(propList); 
+	BPropertyInfo propInfo(sPropList); 
+	message->AddString("suites", "suite/vnd.naan-termview"); 	
 	message->AddFlat("messages", &propInfo); 
 	return BView::GetSupportedSuites(message); 
 }
 
 
 BHandler*
-TermView::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
-				int32 form, const char *property)
+TermView::ResolveSpecifier(BMessage *message, int32 index, BMessage *specifier,
+				int32 what, const char *property)
 {
-	if (((strcmp(property, "encode") == 0) 
-		&& ((msg->what == B_SET_PROPERTY) || (msg->what == B_GET_PROPERTY))) 
-		|| ((strcmp(property, "tty") == 0) &&  (msg->what == B_GET_PROPERTY))) 
-	return this;
-
-	return BView::ResolveSpecifier(msg, index, specifier, form, property);
+	BHandler *target = this;
+	BPropertyInfo propInfo(sPropList);
+	if (propInfo.FindMatch(message, index, specifier, what, property) < B_OK)			
+		target = BView::ResolveSpecifier(message, index, specifier, what, property);
+	
+	return target;
 }
 
 
@@ -2058,14 +2127,13 @@ TermView::MouseMoved(BPoint where, uint32 transit, const BMessage *message)
 void
 TermView::_Select(CurPos start, CurPos end)
 {
-	uchar buf[4];
-	ushort attr;
-	
 	if (start.x < 0)
 		start.x = 0;
 	if (end.x >= fTermColumns)
 		end.x = fTermColumns - 1;
 	
+	uchar buf[4];
+	ushort attr;
 	if (fTextBuffer->GetChar(start.y, start.x, buf, &attr) == IN_STRING) {
 		start.x--;
 		if (start.x < 0)
@@ -2090,10 +2158,6 @@ TermView::_Select(CurPos start, CurPos end)
 void
 TermView::_AddSelectRegion(CurPos pos)
 {
-	uchar buf[4];
-	ushort attr;
-	CurPos start, end, inPos;
-	
 	if (!_HasSelection())
 		return;
 	
@@ -2107,14 +2171,17 @@ TermView::_AddSelectRegion(CurPos pos)
 	if (pos.y < 0)
 		pos.y = 0;
 	
+	uchar buf[4];
+	ushort attr;
 	if (fTextBuffer->GetChar(pos.y, pos.x, buf, &attr) == IN_STRING) {
 		pos.x++;
 		if (pos.x >= fTermColumns)
 			pos.x = fTermColumns - 1;
 	}
 	
-	start = fSelStart;
-	end = fSelEnd;
+	CurPos start = fSelStart;
+	CurPos end = fSelEnd;
+	CurPos inPos;
 	
 	// Mouse point is same as selected line.
 	if (pos.y == fSelStart.y && pos.y == fSelEnd.y) {
@@ -2169,11 +2236,7 @@ TermView::_AddSelectRegion(CurPos pos)
 void
 TermView::_ResizeSelectRegion(CurPos pos)
 {
-	CurPos inPos;
-	uchar buf[4];
-	ushort attr;
-	
-	inPos = fSelEnd;
+	CurPos inPos = fSelEnd;
 	
 	// error check, and if mouse point to a plase full width character,
 	// select point decliment.
@@ -2185,8 +2248,9 @@ TermView::_ResizeSelectRegion(CurPos pos)
 	if (pos.y < 0)
 		pos.y = 0;
 	
-	if (fTextBuffer->GetChar(pos.y, pos.x, buf, &attr) == IN_STRING) {
-		
+	uchar buf[4];
+	ushort attr;
+	if (fTextBuffer->GetChar(pos.y, pos.x, buf, &attr) == IN_STRING) {	
 		pos.x++;
 		
 		if (pos == inPos)
@@ -2206,15 +2270,13 @@ TermView::_ResizeSelectRegion(CurPos pos)
 void
 TermView::_DeSelect(void)
 {
-	CurPos start, end;
-	
 	if (!_HasSelection())
 		return;
 	
 	fTextBuffer->DeSelect();
 	
-	start = fSelStart;
-	end = fSelEnd;
+	CurPos start = fSelStart;
+	CurPos end = fSelEnd;
 	
 	fSelStart.Set(-1, -1);
 	fSelEnd.Set(-1, -1);
@@ -2241,19 +2303,13 @@ TermView::_SelectWord(BPoint where, int mod)
 	fTextBuffer->Select(start, end);
 
 	if (mod & B_SHIFT_KEY) {
-	
 		if (flag) {
-		
 			if (start < fSelStart)
 				_AddSelectRegion(start);
 			else if (end > fSelEnd)
-				_AddSelectRegion(end);
-	
-		
+				_AddSelectRegion(end);		
 		} else
 			_AddSelectRegion(pos);
-
-		
 	} else {
 		_DeSelect();
 		if (flag)
@@ -2440,6 +2496,7 @@ TermView::Find(const BString &str, bool forwardSearch, bool matchCase, bool matc
  
 	return true;
 }
+
 
 //! Get the selected text and copy to str
 void

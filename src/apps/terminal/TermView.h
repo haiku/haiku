@@ -33,22 +33,21 @@ class TermBuffer;
 class TermView : public BView {
 public:
 	TermView(BRect frame, const char *command = NULL, int32 historySize = 1000);
+	TermView(int rows, int columns, const char *command = NULL, int32 historySize = 1000);
 	TermView(BMessage *archive);	
 	~TermView();
 
 	static	BArchivable* Instantiate(BMessage* data);
 	virtual status_t Archive(BMessage* data, bool deep = true) const;
+	
 	virtual void GetPreferredSize(float *width, float *height);
-
-	status_t AttachShell(Shell *shell);
-	void	DetachShell();
 
 	const char *TerminalName() const;
 
 	void	SetTermFont(const BFont *halfFont, const BFont *fullFont);
 	void	GetFontSize(int *width, int *height);
 
-	BRect	SetTermSize(int rows, int cols, bool flag);
+	BRect	SetTermSize(int rows, int cols, bool resize);
 	void	SetTextColor(rgb_color fore, rgb_color back);
 	void	SetSelectColor(rgb_color fore, rgb_color back);
 	void	SetCursorColor(rgb_color fore, rgb_color back);
@@ -60,6 +59,8 @@ public:
 	void	SetScrollBar(BScrollBar *scrbar);
 	BScrollBar  *ScrollBar() const { return fScrollBar; };
 
+	void	SetTitle(const char *title);
+	
 	// Output Charactor
 	void	PutChar(uchar *string, ushort attr, int width);
 	void	PutCR(void);
@@ -134,6 +135,9 @@ protected:
 private:
 	status_t _InitObject(const char *command);
 	status_t _InitMouseThread(void);
+
+	status_t _AttachShell(Shell *shell);
+	void _DetachShell();
 
 	void _AboutRequested();
 

@@ -20,7 +20,7 @@ SmartTabView::SmartTabView(BRect frame, const char *name, button_width width,
 {
 	// See BTabView::_InitObject() to see why we are doing this
 	ContainerView()->MoveBy(-3, -TabHeight() - 3);
-	ContainerView()->ResizeBy(9, TabHeight() + 9);
+	ContainerView()->ResizeBy(10, TabHeight() + 9);
 }
 
 

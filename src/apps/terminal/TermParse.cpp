@@ -19,7 +19,6 @@
 
 #include <Beep.h>
 #include <Message.h>
-#include <Window.h>
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -851,7 +850,7 @@ TermParse::EscParse()
 						switch (mode_char) {
 							case '0':
 							case '2':
-								fView->Window()->SetTitle(string);
+								fView->SetTitle(string);
 								break;
 							case '1':
 								break;
