@@ -132,7 +132,8 @@ const static rgb_color kWhiteColor = { 255, 255, 255, 255 };
 
 
 TermView::TermView(BRect frame, const char *command, int32 historySize)
-	: BView(frame, "termview", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS | B_PULSE_NEEDED),
+	: BView(frame, "termview", B_FOLLOW_ALL,
+		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE| B_PULSE_NEEDED),
 	fShell(NULL),
 	fFontWidth(0),
 	fFontHeight(0),
@@ -180,7 +181,8 @@ TermView::TermView(BRect frame, const char *command, int32 historySize)
 
 
 TermView::TermView(int rows, int columns, const char *command, int32 historySize)
-	: BView(BRect(0, 0, 0, 0), "termview", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS | B_PULSE_NEEDED),
+	: BView(BRect(0, 0, 0, 0), "termview", B_FOLLOW_ALL,
+		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE| B_PULSE_NEEDED),
 	fShell(NULL),
 	fFontWidth(0),
 	fFontHeight(0),
@@ -408,8 +410,6 @@ TermView::SetTermSize(int rows, int cols, bool resize)
 	if (resize)
 		ResizeTo(fTermColumns * fFontWidth - 1, fTermRows * fFontHeight -1);
 
-	Invalidate();
-
 	return rect;
 }
 
@@ -521,6 +521,104 @@ TermView::SetTitle(const char *title)
 	// or in case we are inside a BTabView ?
 	if (Window())
 		Window()->SetTitle(title);
+}
+
+
+void
+TermView::Copy(BClipboard *clipboard)
+{
+	if (!_HasSelection())
+		return;
+
+	BString copyStr;
+	fTextBuffer->GetStringFromRegion(copyStr, fSelStart, fSelEnd);
+
+	if (clipboard->Lock()) {
+		BMessage *clipMsg = NULL;
+		clipboard->Clear();
+
+		if ((clipMsg = clipboard->Data()) != NULL) {
+			clipMsg->AddData("text/plain", B_MIME_TYPE, copyStr.String(),
+				copyStr.Length());
+			clipboard->Commit();
+		}
+		clipboard->Unlock();
+	}
+
+	// Deselecting the current selection is not the behavior that
+	// R5's Terminal app displays. We want to mimic the behavior, so we will
+	// no longer do the deselection
+//	if (!fMouseTracking)
+//		_DeSelect();
+}
+
+
+void
+TermView::Paste(BClipboard *clipboard)
+{
+	if (clipboard->Lock()) {
+		BMessage *clipMsg = clipboard->Data();
+		char *text;
+		ssize_t numBytes;
+		if (clipMsg->FindData("text/plain", B_MIME_TYPE,
+				(const void **)&text, &numBytes) == B_OK ) {
+			// Clipboard text doesn't attached EOF?
+			text[numBytes] = '\0';
+			_WritePTY((uchar *)text, numBytes);
+		}
+
+		clipboard->Unlock();
+	}
+}
+
+
+void
+TermView::SelectAll()
+{
+	int screen_top = fTop / fFontHeight;
+	int viewheight = fTermRows;
+	
+	int start_pos = screen_top -(fScrBufSize - viewheight * 2);
+	
+	CurPos start, end;
+	start.x = 0;
+	end.x = fTermColumns -1;
+	
+	if (start_pos > 0)
+		start.y = start_pos;
+	else
+		start.y = 0;
+	
+	end.y = fCurPos.y  + screen_top;
+	
+	_Select(start, end);
+}
+
+
+void
+TermView::Clear()
+{
+	_DeSelect();
+	fTextBuffer->Clear();
+	
+	fTop = 0;
+	ScrollTo(0, 0);
+	
+	if (LockLooper()) {
+		SetHighColor(fTextBackColor);
+		
+		FillRect(Bounds());
+		SetHighColor(fTextForeColor);
+		UnlockLooper();
+	}
+	
+	// reset cursor pos
+	SetCurPos(0, 0);
+	
+	if (fScrollBar) {	
+		fScrollBar->SetRange(0, 0);
+		fScrollBar->SetProportion(1);
+	}
 }
 
 
@@ -1692,9 +1790,6 @@ TermView::FrameResized(float width, float height)
 	fTermColumns = cols;
 
 	fFrameResized = true;
-	
-	// TODO: Fix this	
-	Invalidate();
 }
 
 
@@ -1743,19 +1838,19 @@ TermView::MessageReceived(BMessage *msg)
 		}
 
 		case B_COPY:
-			_DoCopy();
+			Copy(be_clipboard);
 			break;
 
 		case B_PASTE:
 		{
 			int32 code;
 			if (msg->FindInt32("index", &code) == B_OK)
-				_DoPaste();
+				Paste(be_clipboard);
 			break;
 		}
 
 		case B_SELECT_ALL:
-			_DoSelectAll();
+			SelectAll();
 			break;
 		
 		case B_SET_PROPERTY:
@@ -1794,7 +1889,7 @@ TermView::MessageReceived(BMessage *msg)
 		}
 	
 		case MENU_CLEAR_ALL:
-			_DoClearAll();
+			Clear();
 			fShell->Write(ctrl_l, 1);
 			break;
 
@@ -1867,110 +1962,6 @@ TermView::_DoFileDrop(entry_ref &ref)
 }
 
 
-//! Copy selected text to Clipboard.
-void 
-TermView::_DoCopy()
-{
-	if (!_HasSelection())
-		return;
-
-	BString copyStr;
-	fTextBuffer->GetStringFromRegion(copyStr, fSelStart, fSelEnd);
-
-	if (be_clipboard->Lock()) {
-		BMessage *clipMsg = NULL;
-		be_clipboard->Clear();
-
-		if ((clipMsg = be_clipboard->Data()) != NULL) {
-			clipMsg->AddData("text/plain", B_MIME_TYPE, copyStr.String(),
-				copyStr.Length());
-			be_clipboard->Commit();
-		}
-		be_clipboard->Unlock();
-	}
-
-	// Deselecting the current selection is not the behavior that
-	// R5's Terminal app displays. We want to mimic the behavior, so we will
-	// no longer do the deselection
-//	if (!fMouseTracking)
-//		_DeSelect();
-}
-
-
-//! Paste clipboard text at cursor position.
-void 
-TermView::_DoPaste()
-{
-	if (be_clipboard->Lock()) {
-		BMessage *clipMsg = be_clipboard->Data();
-		char *text;
-		ssize_t numBytes;
-		if (clipMsg->FindData("text/plain", B_MIME_TYPE,
-				(const void **)&text, &numBytes) == B_OK ) {
-			// Clipboard text doesn't attached EOF?
-			text[numBytes] = '\0';
-			_WritePTY((uchar *)text, numBytes);
-		}
-
-		be_clipboard->Unlock();
-	}
-}
-
-
-//! Select all displayed text and text /in buffer.
-void 
-TermView::_DoSelectAll(void)
-{
-	CurPos start, end;
-	int screen_top;
-	int viewheight, start_pos;
-	
-	screen_top = fTop / fFontHeight;
-	viewheight = fTermRows;
-	
-	start_pos = screen_top -(fScrBufSize - viewheight * 2);
-	
-	start.x = 0;
-	end.x = fTermColumns -1;
-	
-	if (start_pos > 0)
-		start.y = start_pos;
-	else
-		start.y = 0;
-	
-	end.y = fCurPos.y  + screen_top;
-	
-	_Select(start, end);
-}
-
-// Clear display and text buffer, then moves Cursorr at home position.
-void 
-TermView::_DoClearAll(void)
-{
-	_DeSelect();
-	fTextBuffer->Clear();
-	
-	fTop = 0;
-	ScrollTo(0, 0);
-	
-	if (LockLooper()) {
-		SetHighColor(fTextBackColor);
-		
-		FillRect(Bounds());
-		SetHighColor(fTextForeColor);
-		UnlockLooper();
-	}
-	
-	// reset cursor pos
-	SetCurPos(0, 0);
-	
-	if (fScrollBar) {	
-		fScrollBar->SetRange(0, 0);
-		fScrollBar->SetProportion(1);
-	}
-}
-
-
 /*!	Write strings to PTY device. If encoding system isn't UTF8, change
 	encoding to UTF8 before writing PTY.
 */
@@ -2009,7 +2000,7 @@ TermView::MouseDown(BPoint where)
 			_WritePTY((uchar *)copy.String(), copy.Length());
 		} else {
 			// copy text from clipboard.
-			_DoPaste();
+			Paste(be_clipboard);
 		}
 		return;
 	}
@@ -2120,6 +2111,13 @@ void
 TermView::MouseMoved(BPoint where, uint32 transit, const BMessage *message)
 {
 	BView::MouseMoved(where, transit, message);
+}
+
+
+void
+TermView::MouseUp(BPoint where)
+{
+	
 }
 
 

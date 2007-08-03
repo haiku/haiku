@@ -22,6 +22,7 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Clipboard.h>
 #include <Dragger.h>
 #include <Menu.h>
 #include <MenuBar.h>
@@ -49,6 +50,16 @@
 
 const static float kViewOffset = 3;
 const static uint32 kNewTab = 'NTab';
+const static uint32 kCloseView = 'ClVw';
+
+
+class CustomTermView : public TermView {
+public:
+	CustomTermView(int32 rows, int32 columns, const char *command = NULL, int32 historySize = 1000);
+	virtual void NotifyQuit(int32 reason);
+	virtual void SetTitle(const char *title);
+};
+
 
 TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	: BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE|B_QUIT_ON_WINDOW_CLOSE),
@@ -135,10 +146,9 @@ TermWindow::_SetupMenu()
 	fFilemenu->AddItem(new BMenuItem("Switch Terminals", new BMessage(MENU_SWITCH_TERM),'G'));
 	fFilemenu->AddItem(new BMenuItem("New Terminal" B_UTF8_ELLIPSIS, new BMessage(MENU_NEW_TERM), 'N'));
 	
-
 	// TODO: Tabs disabled until various problems are fixed.
 	// n. 1: calling "exit" from a tab closes the whole app.
-	//fFilemenu->AddItem(new BMenuItem("New Tab", new BMessage(kNewTab), 'T'));
+	fFilemenu->AddItem(new BMenuItem("New Tab", new BMessage(kNewTab), 'T'));
 	
 	fFilemenu->AddSeparatorItem();
 	fFilemenu->AddItem(new BMenuItem("Page Setup...", new BMessage(MENU_PAGE_SETUP)));
@@ -153,13 +163,13 @@ TermWindow::_SetupMenu()
 	fEditmenu = new BMenu ("Edit");
 	fEditmenu->AddItem (new BMenuItem ("Copy", new BMessage (B_COPY),'C'));
 	fEditmenu->AddItem (new BMenuItem ("Paste", new BMessage (B_PASTE),'V'));
-	fEditmenu->AddSeparatorItem ();
+	fEditmenu->AddSeparatorItem();
 	fEditmenu->AddItem (new BMenuItem ("Select All", new BMessage (B_SELECT_ALL), 'A'));
 	fEditmenu->AddItem (new BMenuItem ("Clear All", new BMessage (MENU_CLEAR_ALL), 'L'));
-	fEditmenu->AddSeparatorItem ();
+	fEditmenu->AddSeparatorItem();
 	fEditmenu->AddItem (new BMenuItem ("Find" B_UTF8_ELLIPSIS, new BMessage (MENU_FIND_STRING),'F'));
 	fFindBackwardMenuItem = new BMenuItem ("Find Backward", new BMessage (MENU_FIND_BACKWARD), '[');
-	fEditmenu->AddItem (fFindBackwardMenuItem);
+	fEditmenu->AddItem(fFindBackwardMenuItem);
 	fFindBackwardMenuItem->SetEnabled(false);
 	fFindForwardMenuItem = new BMenuItem ("Find Forward", new BMessage (MENU_FIND_FORWARD), ']');
 	fEditmenu->AddItem (fFindForwardMenuItem);
@@ -202,6 +212,22 @@ TermWindow::MessageReceived(BMessage *message)
 	bool findresult;
   
 	switch (message->what) {
+		case B_COPY:
+			_ActiveTermView()->Copy(be_clipboard);
+			break;
+		
+		case B_PASTE:
+			_ActiveTermView()->Paste(be_clipboard);
+			break;
+		
+		case B_SELECT_ALL:
+			_ActiveTermView()->SelectAll();
+			break;
+		
+		case MENU_CLEAR_ALL:
+			_ActiveTermView()->Clear();
+			break;	
+			
 		case MENU_SWITCH_TERM: {
 			be_app->PostMessage(MENU_SWITCH_TERM);
 			break;
@@ -209,6 +235,16 @@ TermWindow::MessageReceived(BMessage *message)
 		case kNewTab:
 			_NewTab(NULL);
 			break;
+
+		case kCloseView:
+		{
+			// TODO: We assume that this message was sent from the current active tab.
+			// Since the implementation of BTabView uses AddChild/RemoveChild on the
+			// views, the current active tab is the only one who is attached, thus
+			// the only one which could send a message.
+			delete fTabView->RemoveTab(fTabView->Selection());
+			break;	
+		}
 
 		case MENU_NEW_TERM: {
 			app_info info;
@@ -558,7 +594,7 @@ TermWindow::_NewTab(const char *command)
 	fullFont.SetSpacing(B_FIXED_SPACING);
 
 	// Make Terminal text view.
-	TermView *view = new TermView(PrefHandler::Default()->getInt32(PREF_ROWS),
+	CustomTermView *view = new CustomTermView(PrefHandler::Default()->getInt32(PREF_ROWS),
 					PrefHandler::Default()->getInt32(PREF_COLS),
 					command);
 	
@@ -592,10 +628,6 @@ TermWindow::_NewTab(const char *command)
 		// Bug in BTabView or in my code ?
 		fTabView->Select(0);
 	}
-	
-	// TODO: How do I set this for the current active tab,
-	// every time a different tab is chosen ? 
-	fEditmenu->SetTargetForItems(view);
 }
 
 
@@ -606,5 +638,31 @@ TermWindow::_ActiveTermView()
 	// We should probably use the observer api to tell
 	// the various "tabs" when settings are changed. Fix this.
 	return (TermView *)((BScrollView *)fTabView->ViewForTab(fTabView->Selection()))->Target();
+}
+
+
+// CustomTermView
+CustomTermView::CustomTermView(int32 rows, int32 columns, const char *command, int32 historySize)
+	:
+	TermView(rows, columns, command, historySize)
+{
+}
+
+
+void
+CustomTermView::NotifyQuit(int32 reason)
+{
+	if (Window()) {
+		BMessage message(kCloseView);
+		message.AddInt32("reason", reason);
+		Window()->PostMessage(&message);
+	}
+}
+
+
+void
+CustomTermView::SetTitle(const char *title)
+{
+	//Window()->SetTitle(title);
 }
 

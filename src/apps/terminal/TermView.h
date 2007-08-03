@@ -24,8 +24,8 @@
 #define CURON  1
 
 
+class BClipboard;
 class BMessageRunner;
-class BPopUpMenu;
 class BScrollBar;
 class BString;
 class Shell;
@@ -59,7 +59,14 @@ public:
 	void	SetScrollBar(BScrollBar *scrbar);
 	BScrollBar  *ScrollBar() const { return fScrollBar; };
 
-	void	SetTitle(const char *title);
+	virtual void	SetTitle(const char *title);
+	virtual void	NotifyQuit(int32 reason);
+
+	// edit functions
+	void	Copy(BClipboard *clipboard);	
+	void	Paste(BClipboard *clipboard);
+	void	SelectAll();
+	void	Clear();	
 	
 	// Output Charactor
 	void	PutChar(uchar *string, ushort attr, int width);
@@ -112,8 +119,6 @@ public:
 	bool	Find(const BString &str, bool forwardSearch, bool matchCase, bool matchWord);
 	void	GetSelection(BString &str);
 
-	void	NotifyQuit(int32 reason);
-
 protected:
 	virtual void	AttachedToWindow();
 	virtual void	DetachedFromWindow();
@@ -121,8 +126,10 @@ protected:
 	virtual void	Draw(BRect updateRect);
 	virtual void	WindowActivated(bool active);
 	virtual void	KeyDown(const char*, int32);
+	
 	virtual void	MouseDown(BPoint where);
 	virtual void	MouseMoved(BPoint, uint32, const BMessage *);
+	virtual void	MouseUp(BPoint where);
 
 	virtual void	FrameResized(float width, float height);
 	virtual void	MessageReceived(BMessage* message);
@@ -150,12 +157,6 @@ private:
 	void _DoPrint(BRect updateRect);
 	void _ResizeScrBarRange (void);
 	void _DoFileDrop(entry_ref &ref);
-
-	// edit menu function.
-	void _DoCopy();
-	void _DoPaste();
-	void _DoSelectAll();
-	void _DoClearAll();
 
 	void _WritePTY(const uchar *text, int num_byteses);
 
