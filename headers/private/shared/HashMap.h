@@ -192,8 +192,8 @@ protected:
 template<typename Key, typename Value>
 class SynchronizedHashMap : public BLocker {
 public:
-	typedef HashMap<Key, Value>::Entry Entry;
-	typedef HashMap<Key, Value>::Iterator Iterator;
+	typedef struct HashMap<Key, Value>::Entry Entry;
+	typedef struct HashMap<Key, Value>::Iterator Iterator;
 
 	SynchronizedHashMap() : BLocker("synchronized hash map")	{}
 	~SynchronizedHashMap()	{ Lock(); }
@@ -422,7 +422,7 @@ HashMap<Key, Value>::Size() const
 
 // GetIterator
 template<typename Key, typename Value>
-HashMap<Key, Value>::Iterator
+struct HashMap<Key, Value>::Iterator
 HashMap<Key, Value>::GetIterator() const
 {
 	return Iterator(this);
@@ -430,7 +430,7 @@ HashMap<Key, Value>::GetIterator() const
 
 // _FindElement
 template<typename Key, typename Value>
-HashMap<Key, Value>::Element *
+struct HashMap<Key, Value>::Element *
 HashMap<Key, Value>::_FindElement(const Key& key) const
 {
 	Element* element = fTable.FindFirst(key.GetHashCode());
