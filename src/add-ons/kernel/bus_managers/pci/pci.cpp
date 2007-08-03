@@ -7,6 +7,7 @@
  */
 
 
+#include <string.h>
 #include <KernelExport.h>
 #define __HAIKU_PCI_BUS_MANAGER_TESTING 1
 #include <PCI.h>
@@ -122,6 +123,80 @@ pci_find_capability(uchar bus, uchar device, uchar function, uchar cap_id, uchar
 }
 
 
+// #pragma mark kernel debugger commands
+
+static int
+display_io(int argc, char **argv)
+{
+	int32 displayWidth;
+	int32 itemSize;
+	int32 num = -1;
+	int address;
+	int i = 1, j;
+
+	switch (argc) {
+	case 3:
+		num = atoi(argv[2]);
+	case 2:
+		address = strtoul(argv[1], NULL, 0);
+	default:
+		kprintf("usage: %s <address> [num]\n", argv[0]);
+		return 0;
+	}
+
+	// build the format string
+	if (strcmp(argv[0], "inb") == 0 || strcmp(argv[0], "in8") == 0) {
+		itemSize = 1;
+		displayWidth = 16;
+	} else if (strcmp(argv[0], "ins") == 0 || strcmp(argv[0], "in16") == 0) {
+		itemSize = 2;
+		displayWidth = 8;
+	} else if (strcmp(argv[0], "inw") == 0 || strcmp(argv[0], "in32") == 0) {
+		itemSize = 4;
+		displayWidth = 4;
+	} else {
+		kprintf("display_io called in an invalid way!\n");
+		return 0;
+	}
+
+	if (num <= 0)
+		num = displayWidth;
+
+	for (i = 0; i < num; i++) {
+		if ((i % displayWidth) == 0) {
+			int32 displayed = min_c(displayWidth, (num-i)) * itemSize;
+			if (i != 0)
+				kprintf("\n");
+
+			kprintf("[0x%lx]  ", address + i * itemSize);
+
+			if (num > displayWidth) {
+				// make sure the spacing in the last line is correct
+				for (j = displayed; j < displayWidth * itemSize; j++)
+					kprintf(" ");
+			}
+			kprintf("  ");
+		}
+
+		switch (itemSize) {
+			case 1:
+				kprintf(" %02x", pci_read_io_8(address + i * itemSize));
+				break;
+			case 2:
+				kprintf(" %04x", pci_read_io_16(address + i * itemSize));
+				break;
+			case 4:
+				kprintf(" %08lx", pci_read_io_32(address + i * itemSize));
+				break;
+		}
+	}
+
+	kprintf("\n");
+	return 0;
+}
+
+
+
 // #pragma mark bus manager init/uninit
 
 status_t
@@ -133,6 +208,13 @@ pci_init(void)
 		TRACE(("PCI: pci_io_init failed\n"));
 		return B_ERROR;
 	}
+
+	add_debugger_command("inw", &display_io, "dump io words (32-bit)");
+	add_debugger_command("in32", &display_io, "dump io words (32-bit)");
+	add_debugger_command("ins", &display_io, "dump io shorts (16-bit)");
+	add_debugger_command("in16", &display_io, "dump io shorts (16-bit)");
+	add_debugger_command("inb", &display_io, "dump io bytes (8-bit)");
+	add_debugger_command("in8", &display_io, "dump io bytes (8-bit)");
 
 	if (pci_controller_init() != B_OK) {
 		TRACE(("PCI: pci_controller_init failed\n"));
@@ -149,6 +231,12 @@ pci_init(void)
 void
 pci_uninit(void)
 {
+	remove_debugger_command("inw", &display_io);
+	remove_debugger_command("in32", &display_io);
+	remove_debugger_command("ins", &display_io);
+	remove_debugger_command("in16", &display_io);
+	remove_debugger_command("inb", &display_io);
+	remove_debugger_command("in8", &display_io);
 	delete sPCI;
 }
 
