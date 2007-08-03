@@ -45,8 +45,10 @@ struct GlyphCache {
 	unsigned		data_size;
 	glyph_data_type	data_type;
 	agg::rect_i		bounds;
-	double			advance_x;
-	double			advance_y;
+	float			advance_x;
+	float			advance_y;
+	float			inset_left;
+	float			inset_right;
 };
 
 class FontCache;
@@ -74,7 +76,7 @@ class FontCacheEntry : public MultiLocker, public Referenceable {
 			bool				Init(const ServerFont& font);
 
 			bool				HasGlyphs(const char* utf8String,
-									size_t glyphCount) const;
+									ssize_t glyphCount) const;
 
 			const GlyphCache*	Glyph(uint16 glyphCode);
 

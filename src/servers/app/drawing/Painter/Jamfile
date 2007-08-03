@@ -8,11 +8,9 @@ UsePrivateHeaders app graphics interface shared ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes ] ;
-UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter font_support ] ;
 UseFreeTypeHeaders ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) drawing_modes ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) font_support ] ;
 
 StaticLibrary libpainter.a :
 	Painter.cpp

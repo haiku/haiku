@@ -95,6 +95,10 @@ class FontEngine {
 									{ return fAdvanceX; }
 			double				AdvanceY() const
 									{ return fAdvanceY; }
+			double				InsetLeft() const
+									{ return fInsetLeft; }
+			double				InsetRight() const
+									{ return fInsetRight; }
 
 			void				WriteGlyphTo(uint8* data) const;
 
@@ -123,6 +127,8 @@ class FontEngine {
 			agg::rect_i			fBounds;
 			double				fAdvanceX;
 			double				fAdvanceY;
+			double				fInsetLeft;
+			double				fInsetRight;
 
 			// these members are for caching memory allocations
 			// when rendering glyphs		

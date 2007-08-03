@@ -1416,14 +1416,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 					if (!stringArray[i] || lengthArray[i] <= 0)
 						widthArray[i] = 0.0;
 					else {
-						widthArray[i] = fDesktop->GetDrawingEngine()->
-							StringWidth(stringArray[i], lengthArray[i], font);
-						// NOTE: The line below will return the exact same thing.
-						// However, the line above uses the AGG rendering backend,
-						// for which glyph caching actually works. It is about
-						// 20 times faster!
-//						widthArray[i] = font.StringWidth(stringArray[i],
-//							lengthArray[i]);
+						widthArray[i] = font.StringWidth(stringArray[i],
+							lengthArray[i]);
 					}
 				}
 

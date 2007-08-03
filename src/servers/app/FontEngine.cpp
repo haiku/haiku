@@ -365,6 +365,8 @@ FontEngine::FontEngine()
 	, fBounds(1, 1, 0, 0)
 	, fAdvanceX(0.0)
 	, fAdvanceY(0.0)
+	, fInsetLeft(0.0)
+	, fInsetRight(0.0)
 
 	, fPath()
 	, fCurves(fPath)
@@ -411,6 +413,12 @@ FontEngine::PrepareGlyph(unsigned glyph_code)
 	if (fLastError != 0)
 		return false;
 
+	fAdvanceX = int26p6_to_dbl(fFace->glyph->advance.x);
+	fAdvanceY = int26p6_to_dbl(fFace->glyph->advance.y);
+	fInsetLeft = int26p6_to_dbl(fFace->glyph->metrics.horiBearingX);
+	fInsetRight = int26p6_to_dbl(fFace->glyph->metrics.horiBearingX 
+		+ fFace->glyph->metrics.width - fFace->glyph->metrics.horiAdvance);
+
 	switch(fGlyphRendering) {
 		case glyph_ren_native_mono:
 			fLastError = FT_Render_Glyph(fFace->glyph, FT_RENDER_MODE_MONO);
@@ -428,8 +436,6 @@ FontEngine::PrepareGlyph(unsigned glyph_code)
 				fBounds.y2 = fScanlineStorageBin.max_y();
 				fDataSize = fScanlineStorageBin.byte_size(); 
 				fDataType = glyph_data_mono;
-				fAdvanceX = int26p6_to_dbl(fFace->glyph->advance.x);
-				fAdvanceY = int26p6_to_dbl(fFace->glyph->advance.y);
 				return true;
 			}
 			break;
@@ -451,8 +457,6 @@ FontEngine::PrepareGlyph(unsigned glyph_code)
 				fBounds.y2 = fScanlineStorageAA.max_y();
 				fDataSize = fScanlineStorageAA.byte_size(); 
 				fDataType = glyph_data_gray8;
-				fAdvanceX = int26p6_to_dbl(fFace->glyph->advance.x);
-				fAdvanceY = int26p6_to_dbl(fFace->glyph->advance.y);
 				return true;
 			}
 			break;
@@ -470,8 +474,6 @@ FontEngine::PrepareGlyph(unsigned glyph_code)
 				fBounds.y1 = int(floor(bnd.y1));
 				fBounds.x2 = int(ceil(bnd.x2));
 				fBounds.y2 = int(ceil(bnd.y2));
-				fAdvanceX = int26p6_to_dbl(fFace->glyph->advance.x);
-				fAdvanceY = int26p6_to_dbl(fFace->glyph->advance.y);
 				return true;
 			}
 			break;

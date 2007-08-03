@@ -28,17 +28,17 @@ class GlyphLayoutEngine {
 									bool kerning = true,
 									uint8 spacing = B_BITMAP_SPACING);
 
+	static	bool				IsWhiteSpace(uint32 glyphCode);
+
  private:
 								GlyphLayoutEngine();
 	virtual						~GlyphLayoutEngine();
-
-	static	bool				_IsWhiteSpace(uint32 glyph);
 };
 
 
-// _IsWhiteSpace
+// IsWhiteSpace
 inline bool
-GlyphLayoutEngine::_IsWhiteSpace(uint32 charCode)
+GlyphLayoutEngine::IsWhiteSpace(uint32 charCode)
 {
 	switch (charCode) {
 		case 0x0009:	/* tab */
@@ -64,6 +64,7 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 	const char* utf8String, int32 length,
 	const escapement_delta* delta, bool kerning, uint8 spacing)
 {
+	// TODO: implement spacing modes
 	FontCache* cache = FontCache::Default();
 	FontCacheEntry* entry = cache->FontCacheEntryFor(font);
 
@@ -113,7 +114,7 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 		y += advanceY;
 
 		if (delta)
-			x += _IsWhiteSpace(charCode) ? delta->space : delta->nonspace;
+			x += IsWhiteSpace(charCode) ? delta->space : delta->nonspace;
 
 		if (!consumer.ConsumeGlyph(index, charCode, glyph, entry, x, y))
 			break;

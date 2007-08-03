@@ -410,92 +410,171 @@ ServerFont::GetHasGlyphs(const char charArray[], int32 numChars,
 }
 
 
-status_t
-ServerFont::GetEdges(const char charArray[], int32 numChars,
-	edge_info edgeArray[]) const
-{
-	if (!charArray || numChars <= 0 || !edgeArray)
-		return B_BAD_DATA;
-
-	FT_Face face = GetTransformedFace(false, false);
-	if (!face)
-		return B_ERROR;
-
-	const char *string = charArray;
-	for (int i = 0; i < numChars; i++) {
-		FT_Load_Char(face, UTF8ToCharCode(&string), FT_LOAD_NO_BITMAP);
-		edgeArray[i].left = float(face->glyph->metrics.horiBearingX)
-			/ 64 / fSize;
-		edgeArray[i].right = float(face->glyph->metrics.horiBearingX 
-			+ face->glyph->metrics.width - face->glyph->metrics.horiAdvance)
-			/ 64 / fSize;
+class EdgesConsumer {
+ public:
+	EdgesConsumer(edge_info* edges, float size)
+		: fEdges(edges)
+		, fSize(size)
+	{
+	}
+	void Start() {}
+	void Finish(double x, double y) {}
+	void ConsumeEmptyGlyph(int32 index, uint32 charCode, double x, double y)
+	{
+		fEdges[index].left = 0.0;
+		fEdges[index].right = 0.0;
+	}
+	bool ConsumeGlyph(int32 index, uint32 charCode, const GlyphCache* glyph,
+		FontCacheEntry* entry, double x, double y)
+	{
+		fEdges[index].left = glyph->inset_left / fSize;
+		fEdges[index].right = glyph->inset_right / fSize;
+		return true;
 	}
 
-	PutTransformedFace(face);
-	return B_OK;
+ private:
+	edge_info* fEdges;
+	float fSize;
+};
+
+
+status_t
+ServerFont::GetEdges(const char* string, int32 numChars,
+	edge_info* edges) const
+{
+	if (!string || numChars <= 0 || !edges)
+		return B_BAD_DATA;
+
+	bool kerning = true; // TODO make this a property?
+
+	EdgesConsumer consumer(edges, fSize);
+	if (GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numChars,
+		NULL, kerning, fSpacing))
+		return B_OK;
+
+	return B_ERROR;
+
+//	FT_Face face = GetTransformedFace(false, false);
+//	if (!face)
+//		return B_ERROR;
+//
+//	const char *string = charArray;
+//	for (int i = 0; i < numChars; i++) {
+//		FT_Load_Char(face, UTF8ToCharCode(&string), FT_LOAD_NO_BITMAP);
+//		edgeArray[i].left = float(face->glyph->metrics.horiBearingX)
+//			/ 64 / fSize;
+//		edgeArray[i].right = float(face->glyph->metrics.horiBearingX 
+//			+ face->glyph->metrics.width - face->glyph->metrics.horiAdvance)
+//			/ 64 / fSize;
+//	}
+//
+//	PutTransformedFace(face);
+//	return B_OK;
 }
 
 
-status_t
-ServerFont::GetEscapements(const char charArray[], int32 numChars,
-	escapement_delta delta, BPoint escapementArray[],
-	BPoint offsetArray[]) const
-{
-	if (!charArray || numChars <= 0 || !escapementArray)
-		return B_BAD_DATA;
-
-	FT_Face face = GetTransformedFace(true, false);
-	if (!face)
-		return B_ERROR;
-
-	const char *string = charArray;
-	for (int i = 0; i < numChars; i++) {
-		uint32 charCode = UTF8ToCharCode(&string);
-		FT_Load_Char(face, charCode, FT_LOAD_NO_BITMAP);
-		escapementArray[i].x = is_white_space(charCode) ? delta.space : delta.nonspace;
-		escapementArray[i].x += float(face->glyph->advance.x) / 64;
-		escapementArray[i].y = -float(face->glyph->advance.y) / 64;
-		escapementArray[i].x /= fSize;
-		escapementArray[i].y /= fSize;
-
-		if (offsetArray) {
+class BPointEscapementConsumer {
+ public:
+	BPointEscapementConsumer(BPoint* escapements, BPoint* offsets, float size)
+		: fEscapements(escapements)
+		, fOffsets(offsets)
+		, fSize(size)
+	{
+	}
+	void Start() {}
+	void Finish(double x, double y) {}
+	void ConsumeEmptyGlyph(int32 index, uint32 charCode, double x, double y)
+	{
+		_Set(index, 0, 0);
+	}
+	bool ConsumeGlyph(int32 index, uint32 charCode, const GlyphCache* glyph,
+		FontCacheEntry* entry, double x, double y)
+	{
+		_Set(index, glyph->advance_x, glyph->advance_y);
+		return true;
+	}
+ private:
+	inline void _Set(int32 index, double x, double y)
+	{
+		fEscapements[index].x = x / fSize;
+		fEscapements[index].y = y / fSize;
+		if (fOffsets) {
 			// ToDo: According to the BeBook: "The offsetArray is applied by
 			// the dynamic spacing in order to improve the relative position
 			// of the character's width with relation to another character,
 			// without altering the width." So this will probably depend on
 			// the spacing mode.
-			offsetArray[i].x = 0;
-			offsetArray[i].y = 0;
+			fOffsets[index].x = 0;
+			fOffsets[index].y = 0;
 		}
 	}
 
-	PutTransformedFace(face);
-	return B_OK;
-}
+	BPoint* fEscapements;
+	BPoint* fOffsets;
+ 	float fSize;
+};
 
 
 status_t
-ServerFont::GetEscapements(const char charArray[], int32 numChars,
-	escapement_delta delta, float widthArray[]) const
+ServerFont::GetEscapements(const char* string, int32 numChars,
+	escapement_delta delta, BPoint escapementArray[],
+	BPoint offsetArray[]) const
 {
-	if (!charArray || numChars <= 0 || !widthArray)
+	if (!string || numChars <= 0 || !escapementArray)
 		return B_BAD_DATA;
 
-	FT_Face face = GetTransformedFace(false, false);
-	if (!face)
-		return B_ERROR;
+	bool kerning = true; // TODO make this a property?
 
-	const char *string = charArray;
-	for (int i = 0; i < numChars; i++) {
-		uint32 charCode = UTF8ToCharCode(&string);
-		FT_Load_Char(face, charCode, FT_LOAD_NO_BITMAP);
-		widthArray[i] = is_white_space(charCode) ? delta.space : delta.nonspace;
-		widthArray[i] += float(face->glyph->metrics.horiAdvance) / 64.0;
-		widthArray[i] /= fSize;
+	BPointEscapementConsumer consumer(escapementArray, offsetArray, fSize);
+	if (GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numChars,
+		&delta, kerning, fSpacing))
+		return B_OK;
+
+	return B_ERROR;
+}
+
+
+class WidthEscapementConsumer {
+ public:
+	WidthEscapementConsumer(float* widths, float size)
+		: fWidths(widths)
+		, fSize(size)
+	{
+	}
+	void Start() {}
+	void Finish(double x, double y) {}
+	void ConsumeEmptyGlyph(int32 index, uint32 charCode, double x, double y)
+	{
+		fWidths[index] = 0.0;
+	}
+	bool ConsumeGlyph(int32 index, uint32 charCode, const GlyphCache* glyph,
+		FontCacheEntry* entry, double x, double y)
+	{
+		fWidths[index] = glyph->advance_x / fSize;
+		return true;
 	}
 
-	PutTransformedFace(face);
-	return B_OK;
+ private:
+	float* fWidths;
+	float fSize;
+};
+
+
+
+status_t
+ServerFont::GetEscapements(const char* string, int32 numChars,
+	escapement_delta delta, float widthArray[]) const
+{
+	if (!string || numChars <= 0 || !widthArray)
+		return B_BAD_DATA;
+
+	bool kerning = true; // TODO make this a property?
+
+	WidthEscapementConsumer consumer(widthArray, fSize);
+	if (GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numChars,
+		&delta, kerning, fSpacing))
+		return B_OK;
+	return B_ERROR;
 }
 
 
@@ -523,18 +602,18 @@ class BoundingBoxConsumer {
 			const agg::rect_i& r = glyph->bounds;
 			if (fAsString) {
 				rectArray[index].left = r.x1 + x;
-				rectArray[index].top = r.y1 + y - 1;
+				rectArray[index].top = r.y1 + y;
 				rectArray[index].right = r.x2 + x + 1;
 				rectArray[index].bottom = r.y2 + y + 1;
 			} else {
 				if (rectArray) {
 					rectArray[index].left = r.x1;
-					rectArray[index].top = r.y1 - 1;
+					rectArray[index].top = r.y1;
 					rectArray[index].right = r.x2 + 1;
 					rectArray[index].bottom = r.y2 + 1;
 				} else {
 					stringBoundingBox = stringBoundingBox
-						| BRect(r.x1 + x, r.y1 + y - 1,
+						| BRect(r.x1 + x, r.y1 + y,
 							r.x2 + x + 1, r.y2 + y + 1);
 				}
 			}

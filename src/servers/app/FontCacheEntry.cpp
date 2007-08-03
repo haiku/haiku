@@ -56,7 +56,7 @@ class FontCacheEntry::GlyphCachePool {
 
 	GlyphCache* CacheGlyph(uint16 glyphCode, unsigned glyphIndex,
 		unsigned dataSize, glyph_data_type dataType, const agg::rect_i& bounds,
-		double advanceX, double advanceY)
+		float advanceX, float advanceY, float insetLeft, float insetRight)
 	{
 		unsigned msb = (glyphCode >> 8) & 0xFF;
 		if (fGlyphs[msb] == 0) {
@@ -81,6 +81,8 @@ class FontCacheEntry::GlyphCachePool {
 		glyph->bounds = bounds;
 		glyph->advance_x = advanceX;
 		glyph->advance_y = advanceY;
+		glyph->inset_left = insetLeft;
+		glyph->inset_right = insetRight;
 
 		return fGlyphs[msb][lsb] = glyph;
 	}
@@ -133,7 +135,7 @@ FontCacheEntry::Init(const ServerFont& font)
 
 // HasGlyphs
 bool
-FontCacheEntry::HasGlyphs(const char* utf8String, size_t length) const
+FontCacheEntry::HasGlyphs(const char* utf8String, ssize_t length) const
 {
 	uint32 charCode;
 	const char* start = utf8String;
@@ -158,7 +160,8 @@ FontCacheEntry::Glyph(uint16 glyphCode)
 			glyph = fGlyphCache->CacheGlyph(glyphCode,
 				fEngine.GlyphIndex(), fEngine.DataSize(),
 				fEngine.DataType(), fEngine.Bounds(),
-				fEngine.AdvanceX(), fEngine.AdvanceY());
+				fEngine.AdvanceX(), fEngine.AdvanceY(),
+				fEngine.InsetLeft(), fEngine.InsetRight());
 
 			fEngine.WriteGlyphTo(glyph->data);
 
