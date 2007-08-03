@@ -100,3 +100,12 @@ pathconf(const char *path, int name)
 	return fpathconf(-1, name);
 }
 
+
+size_t 
+confstr(int name, char *buf, size_t len)
+{
+	// ToDo: find out what BeOS supports here
+	errno = EINVAL;
+	return 0;
+}
+

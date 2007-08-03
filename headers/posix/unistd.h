@@ -111,6 +111,7 @@ extern int      getdtablesize(void);
 extern long		sysconf(int name);
 extern long		fpathconf(int fd, int name);
 extern long		pathconf(const char *path, int name);
+extern size_t		confstr(int name, char *buf, size_t len);
 
 /* process functions */
 extern pid_t	fork(void);
