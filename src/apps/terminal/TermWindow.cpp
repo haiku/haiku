@@ -145,9 +145,6 @@ TermWindow::_SetupMenu()
 	fFilemenu = new BMenu("Terminal");
 	fFilemenu->AddItem(new BMenuItem("Switch Terminals", new BMessage(MENU_SWITCH_TERM),'G'));
 	fFilemenu->AddItem(new BMenuItem("New Terminal" B_UTF8_ELLIPSIS, new BMessage(MENU_NEW_TERM), 'N'));
-	
-	// TODO: Tabs disabled until various problems are fixed.
-	// n. 1: calling "exit" from a tab closes the whole app.
 	fFilemenu->AddItem(new BMenuItem("New Tab", new BMessage(kNewTab), 'T'));
 	
 	fFilemenu->AddSeparatorItem();
@@ -487,11 +484,8 @@ TermWindow::WindowActivated(bool activated)
 bool
 TermWindow::QuitRequested()
 {
-	// TODO: Intercept the B_QUIT_REQUESTED message
-	// sent by the TermView, and only close one tab if there
-	// are multiple ones ? Or handle the case inside TermView itself ?
 	be_app->PostMessage(B_QUIT_REQUESTED);
-	return true;
+	return BWindow::QuitRequested();
 }
 
 
