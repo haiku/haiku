@@ -1,5 +1,5 @@
 /* 
-** Copyright 2004, Jérôme Duval, korli@users.sourceforge.net. All rights reserved.
+** Copyright 2004, JÃ©rÃ´me Duval, korli@users.sourceforge.net. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 */
 
@@ -9,7 +9,7 @@
 int32 
 suggest_thread_priority(uint32 what, int32 period, bigtime_t jitter, bigtime_t length)
 {
-	return 0;
+	return 10;
 }
 
 bigtime_t 
