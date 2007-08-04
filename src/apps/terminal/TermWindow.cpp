@@ -239,7 +239,10 @@ TermWindow::MessageReceived(BMessage *message)
 			// Since the implementation of BTabView uses AddChild/RemoveChild on the
 			// views, the current active tab is the only one who is attached, thus
 			// the only one which could send a message.
-			delete fTabView->RemoveTab(fTabView->Selection());
+			if (fTabView->CountTabs() > 1)			
+				delete fTabView->RemoveTab(fTabView->Selection());
+			else
+				PostMessage(B_QUIT_REQUESTED);			
 			break;	
 		}
 
