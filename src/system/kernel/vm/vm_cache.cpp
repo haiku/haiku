@@ -294,6 +294,18 @@ vm_cache_insert_page(vm_cache *cache, vm_page *page, off_t offset)
 	state = disable_interrupts();
 	acquire_spinlock(&sPageCacheTableLock);
 
+#if KDEBUG
+	struct page_lookup_key key;
+	key.offset = (uint32)(offset >> PAGE_SHIFT);
+	key.cache = cache;
+	vm_page* otherPage = (vm_page *)hash_lookup(sPageCacheTable, &key);
+	if (otherPage != NULL) {
+		panic("vm_cache_insert_page(): there's already page %p with cache "
+			"offset %lu in cache %p; inserting page %p", otherPage,
+			page->cache_offset, cache, page);
+	}
+#endif	// KDEBUG
+
 	hash_insert(sPageCacheTable, page);
 
 	release_spinlock(&sPageCacheTableLock);
