@@ -3239,58 +3239,55 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 
 		// The current cache does not contain the page we're looking for
 
-		// If we're at the top most cache, insert the dummy page here to keep other threads
-		// from faulting on the same address and chasing us up the cache chain
-		if (cache == topCache && dummyPage.state != PAGE_STATE_BUSY)
-			fault_insert_dummy_page(cache, dummyPage, cacheOffset);
-
 		// see if the vm_store has it
 		vm_store *store = cache->store;
-		if (store->ops->has_page != NULL && store->ops->has_page(store, cacheOffset)) {
-			size_t bytesRead;
-			iovec vec;
+		if (store->ops->has_page != NULL
+			&& store->ops->has_page(store, cacheOffset)) {
 
+			// insert a fresh page and mark it busy -- we're going to read it in
 			page = vm_page_allocate_page(PAGE_STATE_FREE);
-
-			// we mark that page busy reading, so that the file cache can
-			// ignore us in case it works on the very same page
-			// (this is actually only needed if this is the topRefCache, but we
-			// do it anyway for simplicity's sake)
-			dummyPage.queue_next = page;
-			dummyPage.busy_reading = true;
+			page->state = PAGE_STATE_BUSY;
+			vm_cache_insert_page(cache, page, cacheOffset);
 
 			mutex_unlock(&cache->lock);
 
-			map->ops->get_physical_page(page->physical_page_number * B_PAGE_SIZE,
+			// get a virtual address for the page
+			iovec vec;
+			map->ops->get_physical_page(
+				page->physical_page_number * B_PAGE_SIZE,
 				(addr_t *)&vec.iov_base, PHYSICAL_PAGE_CAN_WAIT);
-			vec.iov_len = bytesRead = B_PAGE_SIZE;
+			size_t bytesRead = vec.iov_len = B_PAGE_SIZE;
 
+			// read it in
 			status_t status = store->ops->read(store, cacheOffset, &vec, 1,
 				&bytesRead, false);
-			if (status < B_OK) {
-				// TODO: real error handling!
-				panic("reading from store %p (cache %p) returned: %s!\n",
-					store, cache, strerror(status));
-			}
+
 			map->ops->put_physical_page((addr_t)vec.iov_base);
 
 			mutex_lock(&cache->lock);
 
-			if (cache == topCache)
-				fault_remove_dummy_page(dummyPage, true);
+			if (status < B_OK) {
+				// on error remove and free the page
+				dprintf("reading page from store %p (cache %p) returned: %s!\n",
+					store, cache, strerror(status));
 
-			// We insert the queue_next here, because someone else could have
-			// replaced our page
-			vm_cache_insert_page(cache, dummyPage.queue_next, cacheOffset);
-
-			if (dummyPage.queue_next != page) {
-				// Indeed, the page got replaced by someone else - we can safely
-				// throw our page away now
+				vm_cache_remove_page(cache, page);
 				vm_page_set_state(page, PAGE_STATE_FREE);
-				page = dummyPage.queue_next;
+
+				return NULL;
 			}
+
+			// mark the page unbusy again
+			page->state = PAGE_STATE_ACTIVE;
+
 			break;
 		}
+
+		// If we're at the top most cache, insert the dummy page here to keep
+		// other threads from faulting on the same address and chasing us up the
+		// cache chain
+		if (cache == topCache && dummyPage.state != PAGE_STATE_BUSY)
+			fault_insert_dummy_page(cache, dummyPage, cacheOffset);
 
 		vm_cache *nextCache;
 		status_t status = fault_acquire_locked_source(cache, &nextCache);
