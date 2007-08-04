@@ -33,10 +33,11 @@ static struct {
 int32 
 suggest_thread_priority(uint32 what, int32 period, bigtime_t jitter, bigtime_t length)
 {
+	int i;
 	int32 priority = what == B_DEFAULT_MEDIA_PRIORITY ? 0x0a : 0;
 		// default priority
 	
-	for (int i = 0; gWhatPriorityArray[i].what != (uint32)-1; i ++) {
+	for (i = 0; gWhatPriorityArray[i].what != (uint32)-1; i ++) {
 		if ((what & gWhatPriorityArray[i].what) != 0) {
 			priority = gWhatPriorityArray[i].priority;
 			break;
