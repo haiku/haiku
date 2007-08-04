@@ -212,8 +212,11 @@ FontCacheEntry::GetKerning(uint16 glyphCode1, uint16 glyphCode2,
 FontCacheEntry::GenerateSignature(char* signature, const ServerFont& font)
 {
 	glyph_rendering renderingType = glyph_ren_native_gray8;
-	if (font.Rotation() != 0.0 || font.Shear() != 90.0)
+	if (font.Rotation() != 0.0 || font.Shear() != 90.0
+		|| font.Flags() & B_DISABLE_ANTIALIASING
+		|| font.Size() > 30) {
 		renderingType = glyph_ren_outline;
+	}
 
 	// TODO: read more of these from the font
 	FT_Encoding charMap = FT_ENCODING_NONE;

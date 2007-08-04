@@ -185,7 +185,7 @@ DrawingEngine::ConstrainClippingRegion(const BRegion* region)
 void
 DrawingEngine::SetDrawState(const DrawState* state, int32 xOffset, int32 yOffset)
 {
-	fPainter->SetDrawState(state, true, xOffset, yOffset);	
+	fPainter->SetDrawState(state, xOffset, yOffset);	
 }
 
 
@@ -665,18 +665,12 @@ DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end,
 	bool cursorTouched = fGraphicsCard->HideSoftwareCursor(touched);
 
 	if (!fPainter->StraightLine(start, end, color.GetColor32())) {
-		// TODO: all this is quite expensive, but it is currently
-		// used only for the "gradient" decorator tab buttons
-		rgb_color previousColor = fPainter->HighColor();
-		drawing_mode previousMode = fPainter->DrawingMode();
 		fPainter->SetHighColor(color);
 		fPainter->SetDrawingMode(B_OP_OVER);
 		fPainter->StrokeLine(start, end);
-		fPainter->SetHighColor(previousColor);
-		fPainter->SetDrawingMode(previousMode);
-	} else {
-		fGraphicsCard->Invalidate(touched);
 	}
+
+	fGraphicsCard->Invalidate(touched);
 	if (cursorTouched)
 		fGraphicsCard->ShowSoftwareCursor();
 }
@@ -742,17 +736,12 @@ DrawingEngine::FillRegion(BRegion& r, const RGBColor& color)
 	BRect frame = r.Frame();
 	bool cursorTouched = fGraphicsCard->HideSoftwareCursor(frame);
 
-	bool doInSoftware = true;
 	// try hardware optimized version first
 	if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0
 		&& frame.Width() * frame.Height() > 100) {
 		fGraphicsCard->FillRegion(r, color, fSuspendSyncLevel == 0
 											|| cursorTouched);
-		doInSoftware = false;
-	}
-
-	if (doInSoftware) {
-
+	} else {
 		int32 count = r.CountRects();
 		for (int32 i = 0; i < count; i++) {
 			fPainter->FillRectNoClipping(r.RectAt(i), color.GetColor32());
@@ -1037,6 +1026,19 @@ DrawingEngine::DrawString(const char* string, int32 length,
 
 	BPoint penLocation = pt;
 
+	// try a fast clipping path
+	float fontSize = fPainter->Font().Size();
+	BRect clippingFrame = fPainter->ClippingRegion()->Frame();
+	if (pt.x > clippingFrame.right || pt.y + fontSize < clippingFrame.top
+		|| pt.y - fontSize > clippingFrame.bottom) {
+		penLocation.x += StringWidth(string, length, delta);
+		return penLocation;
+	}
+
+	// use a FontCacheRefernece to speed up the second pass of
+	// drawing the string
+	FontCacheReference cacheReference;
+
 //bigtime_t now = system_time();
 // TODO: BoundingBox is quite slow!! Optimizing it will be beneficial.
 // Cursiously, the DrawString after it is actually faster!?!
@@ -1045,7 +1047,8 @@ DrawingEngine::DrawString(const char* string, int32 length,
 // in case we don't have one.
 // TODO: Watch out about penLocation and use Painter::PenLocation() when
 // not using BoundindBox anymore.
-	BRect b = fPainter->BoundingBox(string, length, pt, &penLocation, delta);
+	BRect b = fPainter->BoundingBox(string, length, pt, &penLocation, delta,
+		&cacheReference);
 	// stop here if we're supposed to render outside of the clipping
 	b = fPainter->ClipRect(b);
 	if (b.IsValid()) {
@@ -1053,7 +1056,8 @@ DrawingEngine::DrawString(const char* string, int32 length,
 		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(b);
 
 //now = system_time();
-		BRect touched = fPainter->DrawString(string, length, pt, delta);
+		BRect touched = fPainter->DrawString(string, length, pt, delta,
+			&cacheReference);
 //printf("drawing string: %lld µs\n", system_time() - now);
 
 		fGraphicsCard->Invalidate(touched);

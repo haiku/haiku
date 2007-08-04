@@ -72,13 +72,12 @@ Painter::Painter()
 	  fDrawingText(false),
 	  fAlphaSrcMode(B_PIXEL_ALPHA),
 	  fAlphaFncMode(B_ALPHA_OVERLAY),
-	  fPenLocation(0.0, 0.0),
 	  fLineCapMode(B_BUTT_CAP),
 	  fLineJoinMode(B_MITER_JOIN),
 	  fMiterLimit(B_DEFAULT_MITER_LIMIT),
 
 	  fPatternHandler(),
-	  fTextRenderer()
+	  fTextRenderer(fRenderer, fRendererBin, fUnpackedScanline)
 {
 	fPixelFormat.SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode, false);
 
@@ -122,21 +121,18 @@ Painter::DetachFromBuffer()
 
 // SetDrawState
 void
-Painter::SetDrawState(const DrawState* data, bool updateFont,
-					  int32 xOffset, int32 yOffset)
+Painter::SetDrawState(const DrawState* data, int32 xOffset, int32 yOffset)
 {
-	// NOTE: The custom clipping in "data" is ignored, because it has already been
-	// taken into account elsewhere
+	// NOTE: The custom clipping in "data" is ignored, because it has already
+	// been taken into account elsewhere
 
 	// TODO: optimize "context switch" for speed...
 	// but for now...
 	SetPenSize(data->PenSize());
-	SetPenLocation(data->PenLocation());
 
-	if (updateFont)
-		SetFont(data->Font());
-
-	fTextRenderer.SetAntialiasing(!(data->ForceFontAliasing() || data->Font().Flags() & B_DISABLE_ANTIALIASING));
+	SetFont(data->Font());
+	fTextRenderer.SetAntialiasing(!(data->ForceFontAliasing()
+		|| data->Font().Flags() & B_DISABLE_ANTIALIASING));
 
 	fSubpixelPrecise = data->SubPixelPrecise();
 
@@ -259,18 +255,11 @@ Painter::SetPattern(const pattern& p, bool drawingText)
 	}
 }
 
-// SetPenLocation
-void
-Painter::SetPenLocation(const BPoint& location)
-{
-	fPenLocation = location;
-}
-
 // SetFont
 void
 Painter::SetFont(const ServerFont& font)
 {
-	fFont = font;
+	fTextRenderer.SetFont(font);
 }
 
 // #pragma mark - drawing
@@ -524,14 +513,14 @@ Painter::DrawShape(const int32& opCount, const uint32* opList,
 	for (int32 i = 0; i < opCount; i++) {
 		uint32 op = opList[i] & 0xFF000000;
 		if (op & OP_MOVETO) {
-			fPath.move_to(points->x + fPenLocation.x, points->y + fPenLocation.y);
+			fPath.move_to(points->x, points->y);
 			points++;
 		}
 
 		if (op & OP_LINETO) {
 			int32 count = opList[i] & 0x00FFFFFF;
 			while (count--) {
-				fPath.line_to(points->x + fPenLocation.x, points->y + fPenLocation.y);
+				fPath.line_to(points->x, points->y);
 				points++;
 			}
 		}
@@ -539,9 +528,9 @@ Painter::DrawShape(const int32& opCount, const uint32* opList,
 		if (op & OP_BEZIERTO) {
 			int32 count = opList[i] & 0x00FFFFFF;
 			while (count) {
-				fPath.curve4(points[0].x + fPenLocation.x, points[0].y + fPenLocation.y,
-							 points[1].x + fPenLocation.x, points[1].y + fPenLocation.y,
-							 points[2].x + fPenLocation.x, points[2].y + fPenLocation.y);
+				fPath.curve4(points[0].x, points[0].y,
+							 points[1].x, points[1].y,
+							 points[2].x, points[2].y);
 				points += 3;
 				count -= 3;
 			}
@@ -972,7 +961,8 @@ Painter::FillArc(BPoint center, float xRadius, float yRadius,
 // DrawString
 BRect
 Painter::DrawString(const char* utf8String, uint32 length,
-					BPoint baseLine, const escapement_delta* delta)
+					BPoint baseLine, const escapement_delta* delta,
+					FontCacheReference* cacheReference)
 {
 	CHECK_CLIPPING
 
@@ -987,14 +977,10 @@ Painter::DrawString(const char* utf8String, uint32 length,
 	// make sure that the previous pattern is restored
 	pattern oldPattern = *fPatternHandler.GetR5Pattern();
 	SetPattern(B_SOLID_HIGH, true);
-	// make sure the text renderer is using our font (the global
-	// instance of the text renderer is used by everyone)
-	_UpdateFont();
 
 	bounds = fTextRenderer.RenderString(utf8String, length,
-		&fRenderer, &fRendererBin, fUnpackedScanline,
-		baseLine, fClippingRegion->Frame(), false,
-		&fPenLocation,  delta);
+		baseLine, fClippingRegion->Frame(), false, NULL, delta,
+		cacheReference);
 
 	SetPattern(oldPattern);
 
@@ -1005,21 +991,17 @@ Painter::DrawString(const char* utf8String, uint32 length,
 BRect
 Painter::BoundingBox(const char* utf8String, uint32 length,
 					 BPoint baseLine, BPoint* penLocation,
-					 const escapement_delta* delta) const
+					 const escapement_delta* delta,
+					 FontCacheReference* cacheReference) const
 {
 	if (!fSubpixelPrecise) {
 		baseLine.x = roundf(baseLine.x);
 		baseLine.y = roundf(baseLine.y);
 	}
 
-	// make sure the text renderer is using our font (the global
-	// instance of the text renderer is used by everyone)
-	_UpdateFont();
-
 	static BRect dummy;
 	return fTextRenderer.RenderString(utf8String, length,
-		&fRenderer, &fRendererBin, fUnpackedScanline,
-		baseLine, dummy, true, penLocation, delta);
+		baseLine, dummy, true, penLocation, delta, cacheReference);
 }
 
 // StringWidth
@@ -1027,7 +1009,7 @@ float
 Painter::StringWidth(const char* utf8String, uint32 length,
 	const escapement_delta* delta)
 {
-	return fFont.StringWidth(utf8String, length, delta);
+	return Font().StringWidth(utf8String, length, delta);
 }
 
 // #pragma mark -
@@ -1051,7 +1033,8 @@ Painter::DrawBitmap(const ServerBitmap* bitmap,
 						 bitmap->Height(),
 						 bitmap->BytesPerRow());
 
-		_DrawBitmap(srcBuffer, bitmap->ColorSpace(), actualBitmapRect, bitmapRect, viewRect);
+		_DrawBitmap(srcBuffer, bitmap->ColorSpace(), actualBitmapRect,
+			bitmapRect, viewRect);
 	}
 	return touched;
 }
@@ -1129,13 +1112,6 @@ Painter::_Clipped(const BRect& rect) const
 		return BRect(rect & fClippingRegion->Frame());
 	}
 	return BRect(rect);
-}
-
-// _UpdateFont
-void
-Painter::_UpdateFont() const
-{
-	fTextRenderer.SetFont(fFont);
 }
 
 // _UpdateDrawingMode

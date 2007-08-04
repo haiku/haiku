@@ -27,6 +27,7 @@
 class BBitmap;
 class BRegion;
 class DrawState;
+class FontCacheReference;
 class RenderingBuffer;
 class ServerBitmap;
 class ServerFont;
@@ -47,7 +48,6 @@ class Painter {
 									{ return fClippingRegion; }
 
 			void				SetDrawState(const DrawState* data,
-											 bool updateFont = false,
 											 int32 xOffset = 0,
 											 int32 yOffset = 0);
 
@@ -84,12 +84,9 @@ class Painter {
 			void				SetBlendingMode(source_alpha srcAlpha,
 									alpha_function alphaFunc);
 
-			void				SetPenLocation(const BPoint& location);
-	inline	BPoint				PenLocation() const
-									{ return fPenLocation; }
 			void				SetFont(const ServerFont& font);
 	inline	const ServerFont&	Font() const
-									{ return fFont; }
+									{ return fTextRenderer.Font(); }
 
 								// painting functions
 
@@ -178,13 +175,15 @@ class Painter {
 			BRect				DrawString(		const char* utf8String,
 												uint32 length,
 												BPoint baseLine,
-												const escapement_delta* delta = NULL);
+												const escapement_delta* delta,
+												FontCacheReference* cacheReference = NULL);
 
 			BRect				BoundingBox(	const char* utf8String,
 												uint32 length,
 												BPoint baseLine,
 												BPoint* penLocation,
-												const escapement_delta* delta = NULL) const;
+												const escapement_delta* delta,
+												FontCacheReference* cacheReference = NULL) const;
 
 			float				StringWidth(	const char* utf8String,
 												uint32 length,
@@ -278,14 +277,12 @@ mutable agg::conv_curve<agg::path_storage> fCurve;
 	bool						fDrawingText;
 	source_alpha				fAlphaSrcMode;
 	alpha_function				fAlphaFncMode;
-	BPoint						fPenLocation;
 	cap_mode					fLineCapMode;
 	join_mode					fLineJoinMode;
 	float						fMiterLimit;
 
 	PatternHandler				fPatternHandler;
 
-	ServerFont					fFont;
 	// a class handling rendering and caching of glyphs
 	// it is setup to load from a specific Freetype supported
 	// font file which it gets from ServerFont

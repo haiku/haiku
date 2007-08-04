@@ -29,7 +29,8 @@
 
 
 // constructor
-AGGTextRenderer::AGGTextRenderer()
+AGGTextRenderer::AGGTextRenderer(renderer_type& solidRenderer,
+		renderer_bin_type& binRenderer, scanline_unpacked_type& scanline)
 	: fPathAdaptor()
 	, fGray8Adaptor()
 	, fGray8Scanline()
@@ -38,6 +39,11 @@ AGGTextRenderer::AGGTextRenderer()
 
 	, fCurves(fPathAdaptor)
 	, fContour(fCurves)
+
+	, fSolidRenderer(solidRenderer)
+	, fBinRenderer(binRenderer)
+	, fScanline(scanline)
+	, fRasterizer()
 
 	, fHinted(true)
 	, fAntialias(true)
@@ -101,9 +107,6 @@ typedef agg::conv_transform<FontCacheEntry::ContourConverter, Transformable>
 class AGGTextRenderer::StringRenderer {
  public:
 	StringRenderer(const IntRect& clippingFrame, bool dryRun,
-			renderer_type& solidRenderer,
-			renderer_bin_type& binRenderer,
-			scanline_unpacked_type& scanline,
 			FontCacheEntry::TransformedOutline& transformedGlyph,
 			FontCacheEntry::TransformedContourOutline& transformedContour,
 			const Transformable& transform,
@@ -119,10 +122,6 @@ class AGGTextRenderer::StringRenderer {
 		, fNextCharPos(nextCharPos)
 		, fVector(false)
 
-		, fSolidRenderer(solidRenderer)
-		, fBinRenderer(binRenderer)
-		, fScanline(scanline)
-
 		, fTransformedGlyph(transformedGlyph)
 		, fTransformedContour(transformedContour)
 
@@ -137,8 +136,8 @@ class AGGTextRenderer::StringRenderer {
 	void Finish(double x, double y)
 	{
 		if (fVector) {
-			agg::render_scanlines(fRenderer.fRasterizer, fScanline,
-				fSolidRenderer);
+			agg::render_scanlines(fRenderer.fRasterizer, fRenderer.fScanline,
+				fRenderer.fSolidRenderer);
 		}
 
 		if (fNextCharPos) {
@@ -157,7 +156,8 @@ class AGGTextRenderer::StringRenderer {
 	{
 		// "glyphBounds" is the bounds of the glyph transformed
 		// by the x y location of the glyph along the base line,
-		// it is therefor yet "untransformed".
+		// it is therefor yet "untransformed" in case there is an
+		// embedded transformation.
 		const agg::rect_i& r = glyph->bounds;
 		IntRect glyphBounds(r.x1 + x, r.y1 + y - 1,
 			r.x2 + x + 1, r.y2 + y + 1);
@@ -211,12 +211,12 @@ class AGGTextRenderer::StringRenderer {
 				switch (glyph->data_type) {
 					case glyph_data_mono:
 						agg::render_scanlines(fRenderer.fMonoAdaptor, 
-							fRenderer.fMonoScanline, fBinRenderer);
+							fRenderer.fMonoScanline, fRenderer.fBinRenderer);
 						break;
 
 					case glyph_data_gray8:
 						agg::render_scanlines(fRenderer.fGray8Adaptor, 
-							fRenderer.fGray8Scanline, fSolidRenderer);
+							fRenderer.fGray8Scanline, fRenderer.fSolidRenderer);
 						break;
 
 					case glyph_data_outline: {
@@ -262,9 +262,6 @@ class AGGTextRenderer::StringRenderer {
 	BPoint*				fNextCharPos;
 	bool				fVector;
 
-	renderer_type&		fSolidRenderer;
-	renderer_bin_type&	fBinRenderer;
-	scanline_unpacked_type& fScanline;
 	FontCacheEntry::TransformedOutline& fTransformedGlyph;
 	FontCacheEntry::TransformedContourOutline& fTransformedContour;
 	AGGTextRenderer&	fRenderer;
@@ -274,14 +271,12 @@ class AGGTextRenderer::StringRenderer {
 BRect
 AGGTextRenderer::RenderString(const char* string,
 							  uint32 length,
-							  renderer_type* solidRenderer,
-							  renderer_bin_type* binRenderer,
-							  scanline_unpacked_type& scanline,
 							  const BPoint& baseLine,
 							  const BRect& clippingFrame,
 							  bool dryRun,
 							  BPoint* nextCharPos,
-							  const escapement_delta* delta)
+							  const escapement_delta* delta,
+							  FontCacheReference* cacheReference)
 {
 //printf("RenderString(\"%s\", length: %ld, dry: %d)\n", string, length, dryRun);
 
@@ -303,12 +298,11 @@ AGGTextRenderer::RenderString(const char* string,
 	transform.Transform(&transformOffset);
 
 	StringRenderer renderer(clippingFrame, dryRun,
-		*solidRenderer, *binRenderer, scanline,
 		transformedOutline, transformedContourOutline,
 		transform, transformOffset, nextCharPos, *this);
 
 	GlyphLayoutEngine::LayoutGlyphs(renderer, fFont, string, length, delta,
-		fKerning, B_BITMAP_SPACING);
+		fKerning, B_BITMAP_SPACING, cacheReference);
 
 	return transform.TransformBounds(renderer.Bounds());
 }

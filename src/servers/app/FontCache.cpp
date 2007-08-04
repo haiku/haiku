@@ -48,7 +48,7 @@ FontCache::Default()
 	return &sDefaultInstance;
 }
 
-// SetFont
+// FontCacheEntryFor
 FontCacheEntry*
 FontCache::FontCacheEntryFor(const ServerFont& font)
 {
@@ -62,6 +62,7 @@ FontCache::FontCacheEntryFor(const ServerFont& font)
 	if (entry) {
 		// the entry was already there
 		entry->AddReference();
+//printf("FontCacheEntryFor(%ld): %p\n", font.GetFamilyAndStyle(), entry);
 		return entry;
 	}
 
@@ -91,6 +92,7 @@ FontCache::FontCacheEntryFor(const ServerFont& font)
 			return NULL;
 		}
 	}
+//printf("FontCacheEntryFor(%ld): %p (insert)\n", font.GetFamilyAndStyle(), entry);
 
 	entry->AddReference();
 	return entry;
@@ -100,6 +102,7 @@ FontCache::FontCacheEntryFor(const ServerFont& font)
 void
 FontCache::Recycle(FontCacheEntry* entry)
 {
+//printf("Recycle(%p)\n", entry);
 	entry->UpdateUsage();
 	entry->RemoveReference();
 }

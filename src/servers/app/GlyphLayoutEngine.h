@@ -16,6 +16,42 @@
 #include "ServerFont.h"
 
 
+class FontCacheReference {
+ public:
+								FontCacheReference()
+									: fCacheEntry(NULL)
+									, fWriteLocked(false)
+								{
+								}
+								~FontCacheReference()
+								{
+									if (fCacheEntry) {
+										if (fWriteLocked)
+											fCacheEntry->WriteUnlock();
+										else
+											fCacheEntry->ReadUnlock();
+									
+										FontCache::Default()->Recycle(
+											fCacheEntry);
+									}
+								}
+			void				SetTo(FontCacheEntry* entry,
+									bool writeLocked)
+								{
+									fCacheEntry = entry;
+									fWriteLocked = writeLocked;
+								}
+	inline	FontCacheEntry*		Entry() const
+									{ return fCacheEntry; }
+	inline	bool				WriteLocked() const
+									{ return fWriteLocked; }
+
+ private:
+			FontCacheEntry*		fCacheEntry;
+			bool				fWriteLocked;
+};
+
+
 class GlyphLayoutEngine {
  public:
 
@@ -26,7 +62,8 @@ class GlyphLayoutEngine {
 									int32 length,
 									const escapement_delta* delta = NULL,
 									bool kerning = true,
-									uint8 spacing = B_BITMAP_SPACING);
+									uint8 spacing = B_BITMAP_SPACING,
+									FontCacheReference* cacheReference = NULL);
 
 	static	bool				IsWhiteSpace(uint32 glyphCode);
 
@@ -62,27 +99,37 @@ inline bool
 GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 	const ServerFont& font,
 	const char* utf8String, int32 length,
-	const escapement_delta* delta, bool kerning, uint8 spacing)
+	const escapement_delta* delta, bool kerning, uint8 spacing,
+	FontCacheReference* cacheReference)
 {
 	// TODO: implement spacing modes
-	FontCache* cache = FontCache::Default();
-	FontCacheEntry* entry = cache->FontCacheEntryFor(font);
 
-	if (!entry || !entry->ReadLock()) {
-		cache->Recycle(entry);
-		return false;
+	FontCacheEntry* entry = NULL;
+	bool needsWriteLock = false;
+	if (cacheReference) {
+		entry = cacheReference->Entry();
+		needsWriteLock = cacheReference->WriteLocked();
 	}
 
-	bool needsWriteLock
-		= !entry->HasGlyphs(utf8String, length);
-
-	if (needsWriteLock) {
-		entry->ReadUnlock();
-		if (!entry->WriteLock()) {
+	if (!entry) {
+		FontCache* cache = FontCache::Default();
+		entry = cache->FontCacheEntryFor(font);
+	
+		if (!entry || !entry->ReadLock()) {
 			cache->Recycle(entry);
 			return false;
 		}
-	}
+	
+		needsWriteLock = !entry->HasGlyphs(utf8String, length);
+	
+		if (needsWriteLock) {
+			entry->ReadUnlock();
+			if (!entry->WriteLock()) {
+				cache->Recycle(entry);
+				return false;
+			}
+		}
+	} // else the entry was already used and is still locked
 
 	consumer.Start();
 
@@ -107,8 +154,8 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 			continue;
 		}
 
-		if (kerning)
-			entry->GetKerning(lastCharCode, charCode, &advanceX, &advanceY);
+//		if (kerning)
+//			entry->GetKerning(lastCharCode, charCode, &advanceX, &advanceY);
 
 		x += advanceX;
 		y += advanceY;
@@ -133,12 +180,18 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 	y += advanceY;
 	consumer.Finish(x, y);
 
-	if (needsWriteLock)
-		entry->WriteUnlock();
-	else
-		entry->ReadUnlock();
-
-	cache->Recycle(entry);
+	if (!cacheReference) {
+		if (needsWriteLock)
+			entry->WriteUnlock();
+		else
+			entry->ReadUnlock();
+	
+		FontCache::Default()->Recycle(entry);
+	} else {
+		// the reference will take care of locking
+		if (!cacheReference->Entry())
+			cacheReference->SetTo(entry, needsWriteLock);
+	}
 	return true;
 }
 

@@ -1,9 +1,10 @@
 /*
- * Copyright 2005-2006, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
+ * Copyright 2005-2007, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef AGG_TEXT_RENDERER_H
 #define AGG_TEXT_RENDERER_H
+
 
 #include "defines.h"
 
@@ -16,12 +17,18 @@
 #include <agg_scanline_u.h>
 
 
+class FontCacheReference;
+
 class AGGTextRenderer {
  public:
-								AGGTextRenderer();
+								AGGTextRenderer(renderer_type& solidRenderer,
+									renderer_bin_type& binRenderer,
+									scanline_unpacked_type& scanline);
 	virtual						~AGGTextRenderer();
 
 			void				SetFont(const ServerFont &font);
+	inline	const ServerFont&	Font() const
+									{ return fFont; }
 
 			void				SetHinting(bool hinting);
 			bool				Hinting() const
@@ -37,14 +44,12 @@ class AGGTextRenderer {
 
 			BRect				RenderString(const char* utf8String,
 											 uint32 length,
-											 renderer_type* solidRenderer,
-											 renderer_bin_type* binRenderer,
-											 scanline_unpacked_type& scanline,
 											 const BPoint& baseLine,
 											 const BRect& clippingFrame,
-											 bool dryRun = false,
-											 BPoint* nextCharPos = NULL,
-											 const escapement_delta* delta = NULL);
+											 bool dryRun,
+											 BPoint* nextCharPos,
+											 const escapement_delta* delta,
+											 FontCacheReference* cacheReference);
 
  private:
 
@@ -61,6 +66,9 @@ class AGGTextRenderer {
 	FontCacheEntry::CurveConverter		fCurves;
 	FontCacheEntry::ContourConverter	fContour;
 
+	renderer_type&				fSolidRenderer;
+	renderer_bin_type&			fBinRenderer;
+	scanline_unpacked_type&		fScanline;
 	rasterizer_type				fRasterizer;
 		// NOTE: the object has it's own rasterizer object
 		// since it might be using a different gamma setting
