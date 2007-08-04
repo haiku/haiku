@@ -2545,15 +2545,17 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 		}
 		
 		case AS_DRAW_STRING:
+		case AS_DRAW_STRING_WITH_DELTA:
 		{
 			char* string = NULL;
 			int32 length;
 			BPoint location;
-			escapement_delta delta;
-
+			
 			link.Read<int32>(&length);
 			link.Read<BPoint>(&location);
-			link.Read<escapement_delta>(&delta);
+			escapement_delta delta = { 0, 0 };
+			if (code == AS_DRAW_STRING_WITH_DELTA)
+				link.Read<escapement_delta>(&delta);
 			link.ReadString(&string);
 
 			picture->WriteDrawString(location, string, length, delta);
