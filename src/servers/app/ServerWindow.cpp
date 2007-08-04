@@ -2241,8 +2241,13 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			if (link.Read(opList, opCount * sizeof(uint32)) >= B_OK &&
 				link.Read(ptList, ptCount * sizeof(BPoint)) >= B_OK) {
 
-				for (int32 i = 0; i < ptCount; i++)
+				// this might seem a bit weird, but under R5, the shapes
+				// are always offset by the current pen location
+				BPoint penLocation = fCurrentLayer->CurrentState()->PenLocation();
+				for (int32 i = 0; i < ptCount; i++) {
+					ptList[i] += penLocation;
 					fCurrentLayer->ConvertToScreenForDrawing(&ptList[i]);
+				}
 
 				drawingEngine->DrawShape(shapeFrame, opCount, opList, ptCount, ptList,
 					code == AS_FILL_SHAPE);
@@ -2296,27 +2301,31 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 			break;
 		}
 		case AS_DRAW_STRING:
+		case AS_DRAW_STRING_WITH_DELTA:
 		{
 			DTRACE(("ServerWindow %s: Message AS_DRAW_STRING\n", Title()));
 			char* string;
 			int32 length;
 			BPoint location;
-			escapement_delta delta;
+			escapement_delta _delta;
+			escapement_delta* delta = NULL;
 
 			link.Read<int32>(&length);
 			link.Read<BPoint>(&location);
-			link.Read<escapement_delta>(&delta);
+			if (code == AS_DRAW_STRING_WITH_DELTA) {
+				link.Read<escapement_delta>(&_delta);
+				if (_delta.nonspace != 0.0 || _delta.space != 0.0)
+					delta = &_delta;
+			}
 			link.ReadString(&string);
+
 
 			fCurrentLayer->ConvertToScreenForDrawing(&location);
 			BPoint penLocation = drawingEngine->DrawString(string, length,
-				location, &delta);
+				location, delta);
 
 			fCurrentLayer->ConvertFromScreenForDrawing(&penLocation);
 			fCurrentLayer->CurrentState()->SetPenLocation(penLocation);
-			// pen location has changed, update DrawingEngine
-			// TODO: optimize with flags
-			_UpdateDrawState(fCurrentLayer);
 
 			free(string);
 			break;

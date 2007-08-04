@@ -2424,20 +2424,16 @@ BView::DrawString(const char *string, int32 length, BPoint location,
 	if (fOwner) {
 		check_lock();
 
-		fOwner->fLink->StartMessage(AS_DRAW_STRING);
+		// quite often delta will be NULL
+		if (delta)
+			fOwner->fLink->StartMessage(AS_DRAW_STRING_WITH_DELTA);
+		else
+			fOwner->fLink->StartMessage(AS_DRAW_STRING);
 		fOwner->fLink->Attach<int32>(length);
 		fOwner->fLink->Attach<BPoint>(location);
 
-		// Quite often delta will be NULL, so we have to accomodate this.
 		if (delta)
 			fOwner->fLink->Attach<escapement_delta>(*delta);
-		else {
-			escapement_delta tdelta;
-			tdelta.space = 0;
-			tdelta.nonspace = 0;
-
-			fOwner->fLink->Attach<escapement_delta>(tdelta);
-		}
 
 		fOwner->fLink->AttachString(string, length);
 
