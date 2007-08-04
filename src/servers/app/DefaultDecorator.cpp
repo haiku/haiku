@@ -905,12 +905,6 @@ DefaultDecorator::_DrawTab(BRect invalid)
 	if (!fTabRect.IsValid() || !invalid.Intersects(fTabRect))
 		return;
 
-	// TODO: cache these
-	RGBColor tabColorLight = RGBColor(tint_color(fTabColor.GetColor32(),
-												 (B_LIGHTEN_2_TINT + B_LIGHTEN_MAX_TINT) / 2));
-	RGBColor tabColorShadow = RGBColor(tint_color(fTabColor.GetColor32(),
-												  B_DARKEN_2_TINT));
-
 	// outer frame
 	fDrawingEngine->StrokeLine(fTabRect.LeftTop(), fTabRect.LeftBottom(), fFrameColors[0]);
 	fDrawingEngine->StrokeLine(fTabRect.LeftTop(), fTabRect.RightTop(), fFrameColors[0]);
@@ -922,17 +916,17 @@ DefaultDecorator::_DrawTab(BRect invalid)
 	// bevel
 	fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 1, fTabRect.top + 1),
 		BPoint(fTabRect.left + 1, fTabRect.bottom - (fLook == kLeftTitledWindowLook ? 1 : 0)),
-		tabColorLight);
+		fTabColorLight);
 	fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 1, fTabRect.top + 1),
 		BPoint(fTabRect.right - (fLook == kLeftTitledWindowLook ? 0 : 1), fTabRect.top + 1),
-		tabColorLight);
+		fTabColorLight);
 
 	if (fLook != kLeftTitledWindowLook) {
 		fDrawingEngine->StrokeLine(BPoint(fTabRect.right - 1, fTabRect.top + 2),
-			BPoint(fTabRect.right - 1, fTabRect.bottom), tabColorShadow);
+			BPoint(fTabRect.right - 1, fTabRect.bottom), fTabColorShadow);
 	} else {
 		fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 2, fTabRect.bottom - 1),
-			BPoint(fTabRect.right, fTabRect.bottom - 1), tabColorShadow);
+			BPoint(fTabRect.right, fTabRect.bottom - 1), fTabColorShadow);
 	}
 
 	// fill
@@ -1045,6 +1039,11 @@ DefaultDecorator::_SetFocus()
 //		fFrameColors[4].SetColor(152, 152, 152);
 //		fFrameColors[5].SetColor(96, 96, 96);
 	}
+
+	fTabColorLight = RGBColor(tint_color(fTabColor.GetColor32(),
+		(B_LIGHTEN_2_TINT + B_LIGHTEN_MAX_TINT) / 2));
+	fTabColorShadow = RGBColor(tint_color(fTabColor.GetColor32(),
+		B_DARKEN_2_TINT));
 }
 
 // _SetColors

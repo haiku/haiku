@@ -81,7 +81,9 @@ class DefaultDecorator: public Decorator {
 			RGBColor			fButtonLowColor;
 			RGBColor			fTextColor;
 			RGBColor			fTabColor;
-	
+			RGBColor			fTabColorLight;
+			RGBColor			fTabColorShadow;
+
 			RGBColor*			fFrameColors;
 	
 			// Individual rects for handling window frame
