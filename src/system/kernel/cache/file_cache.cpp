@@ -1112,6 +1112,15 @@ cache_prefetch_vnode(void *vnode, off_t offset, size_t size)
 	restart:
 		vm_page *page = vm_cache_lookup_page(cache, offset);
 		if (page != NULL) {
+			if (page->state == PAGE_STATE_BUSY) {
+				// if busy retry again a little later
+				mutex_unlock(&cache->lock);
+				snooze(20000);
+				mutex_lock(&cache->lock);
+
+				goto restart;
+			}
+
 			// it is, so let's satisfy in the first part of the request
 			if (lastOffset < offset) {
 				size_t requestSize = offset - lastOffset;
