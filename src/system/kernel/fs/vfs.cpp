@@ -4206,7 +4206,7 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 
 			// O_CLOEXEC is the only flag available at this time
 			mutex_lock(&context->io_mutex);
-			fd_set_close_on_exec(context, fd, argument == FD_CLOEXEC);
+			fd_set_close_on_exec(context, fd, argument & FD_CLOEXEC);
 			mutex_unlock(&context->io_mutex);
 			
 			status = B_OK;
