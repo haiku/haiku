@@ -626,17 +626,19 @@ Inode::WriteDataToBuffer(const void **_data, size_t *_bytesLeft,
 	// still come in and we don't block the whole inode data transfer
 	// to prevent deadlocks from happening
 
-	if (!nonBlocking)
+	while (fBuffer.Writable() == 0) {
+		if (nonBlocking)
+			return B_WOULD_BLOCK;
+
 		benaphore_unlock(&fRequestLock);
 
-	status_t status = acquire_sem_etc(fWriteLock, 1,
-		(nonBlocking ? B_TIMEOUT : 0) | B_CAN_INTERRUPT, 0);
+		status_t status = acquire_sem_etc(fWriteLock, 1, B_CAN_INTERRUPT, 0);
 
-	if (!nonBlocking)
 		benaphore_lock(&fRequestLock);
 
-	if (status != B_OK)
-		return status;
+		if (status != B_OK)
+			return status;
+	}
 
 	// ensure that we don't write more than PIPEFS_MAX_BUFFER_SIZE
 	// into a pipe without blocking
@@ -1007,7 +1009,7 @@ ReadRequest::PutBuffer(RingBuffer &buffer, size_t *_bytesRead,
 	if (length == 0)
 		return B_OK;
 
-	if (buffer.UserRead(fBuffer, length) < B_OK) {
+	if (buffer.UserRead((char*)fBuffer + fBytesRead, length) < B_OK) {
 		// if the buffer is just invalid, we release the reader as well
 		release_sem(fLock);
 		return B_BAD_ADDRESS;
