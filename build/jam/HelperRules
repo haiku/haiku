@@ -142,7 +142,7 @@ rule SetPlatformCompatibilityFlagVariables
 
 	# special case: Haiku libbe.so built for testing under BeOS
 	if $(platform) = libbe_test {
-		platform = haiku ;
+		platform = $(HOST_PLATFORM) ;
 	}
 
 	$(varPrefix)_PLATFORM_BEOS_COMPATIBLE = ;

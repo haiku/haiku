@@ -18,7 +18,7 @@ SubDirC++Flags
 	;
 
 local vector_icon_libs ;
-if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
+if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) && $(TARGET_PLATFORM) != libbe_test {
 	vector_icon_libs = libicon.a libagg.a ;
 }
 
