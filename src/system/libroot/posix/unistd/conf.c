@@ -101,11 +101,22 @@ pathconf(const char *path, int name)
 }
 
 
+#define min_c(a,b) ((a)>(b)?(b):(a))
+
 size_t 
 confstr(int name, char *buf, size_t len)
 {
-	// ToDo: find out what BeOS supports here
-	errno = EINVAL;
-	return 0;
+	size_t string_len = 1;
+	char *string = "";
+	switch (name) {
+		case 0:
+			break;
+		default:
+			errno = EINVAL;
+			return 0;
+	}
+	if (buf != NULL)
+		strncpy(buf, string, min_c(len, string_len));
+	return string_len;
 }
 
