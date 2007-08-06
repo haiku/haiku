@@ -2340,9 +2340,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 				
 				ServerPicture *picture = App()->FindPicture(token);
 				if (picture != NULL) {
-					fCurrentLayer->ConvertToScreenForDrawing(&where);
-					fCurrentLayer->CurrentState()->SetPenLocation(where);
-					// TODO: pass the location to the play method and handle it there
+					fCurrentLayer->CurrentState()->SetOrigin(where);
 					picture->Play(fCurrentLayer);
 				}
 			}
