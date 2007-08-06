@@ -3184,10 +3184,12 @@ fault_remove_dummy_page(vm_page &dummyPage, bool isLocked)
 	otherwise, it will return the vm_cache that contains the cache.
 	It always grabs a reference to the vm_cache that it returns, and also locks it.
 */
-static inline vm_page *
+static inline status_t
 fault_find_page(vm_translation_map *map, vm_cache *topCache,
-	off_t cacheOffset, bool isWrite, vm_page &dummyPage, vm_cache **_pageCache)
+	off_t cacheOffset, bool isWrite, vm_page &dummyPage, vm_cache **_pageCache,
+	vm_page** _page, bool* _restart)
 {
+	*_restart = false;
 	vm_cache *cache = topCache;
 	vm_cache *lastCache = NULL;
 	vm_page *page = NULL;
@@ -3225,12 +3227,8 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 				// the top cache.
 				mutex_unlock(&cache->lock);
 				vm_cache_release_ref(cache);
-
-				cache = topCache;
-				lastCache = cache;
-				
-				vm_cache_acquire_ref(cache);
-				mutex_lock(&cache->lock);
+				*_restart = true;
+				return B_OK;
 			}
 		}
 
@@ -3274,7 +3272,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 				vm_cache_remove_page(cache, page);
 				vm_page_set_state(page, PAGE_STATE_FREE);
 
-				return NULL;
+				return status;
 			}
 
 			// mark the page unbusy again
@@ -3296,10 +3294,17 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 			// with his only consumer (cacheRef); since its pages are moved
 			// upwards, too, we try this cache again
 			mutex_unlock(&cache->lock);
+			thread_yield();
 			mutex_lock(&cache->lock);
-			if (cache->busy)
-				panic("fault_find_page(): cache became busy: %p\n", cache);
-					// TODO: Don't panic()!
+			if (cache->busy) {
+				// The cache became busy, which means, it is about to be
+				// removed by vm_cache_remove_consumer(). We start again with
+				// the top cache.
+				mutex_unlock(&cache->lock);
+				vm_cache_release_ref(cache);
+				*_restart = true;
+				return B_OK;
+			}
 			lastCache = NULL;
 			continue;
 		} else if (status < B_OK)
@@ -3321,9 +3326,26 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 				// top most cache may have direct write access.
 			vm_cache_acquire_ref(cache);
 			mutex_lock(&cache->lock);
-			if (cache->busy)
-				panic("fault_find_page(): 2. cache became busy: %p\n", cache);
-					// TOOD: Don't panic()!
+
+			if (cache->busy) {
+				// The cache became busy, which means, it is about to be
+				// removed by vm_cache_remove_consumer(). We start again with
+				// the top cache.
+				mutex_unlock(&cache->lock);
+				vm_cache_release_ref(cache);
+				*_restart = true;
+			} else {
+				vm_page* newPage = vm_cache_lookup_page(cache, cacheOffset);
+				if (newPage && newPage != &dummyPage) {
+					// A new page turned up. It could be the one we're looking
+					// for, but it could as well be a dummy page from someone
+					// else or an otherwise busy page. We can't really handle
+					// that here. Hence we completely restart this functions.
+					mutex_unlock(&cache->lock);
+					vm_cache_release_ref(cache);
+					*_restart = true;
+				}
+			}
 		}
 
 		// release the reference of the last vm_cache we still have from the loop above
@@ -3334,7 +3356,8 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 	}
 
 	*_pageCache = cache;
-	return page;
+	*_page = page;
+	return B_OK;
 }
 
 
@@ -3343,14 +3366,35 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 	It returns the owner of the page in \a sourceCache - it keeps a reference
 	to it, and has also locked it on exit.
 */
-static inline vm_page *
+static inline status_t
 fault_get_page(vm_translation_map *map, vm_cache *topCache,
 	off_t cacheOffset, bool isWrite, vm_page &dummyPage, vm_cache **_sourceCache,
-	vm_cache **_copiedSource)
+	vm_cache **_copiedSource, vm_page** _page)
 {
 	vm_cache *cache;
-	vm_page *page = fault_find_page(map, topCache, cacheOffset, isWrite,
-		dummyPage, &cache);
+	vm_page *page;
+	bool restart;
+	for (;;) {
+		status_t status = fault_find_page(map, topCache, cacheOffset, isWrite,
+			dummyPage, &cache, &page, &restart);
+		if (status != B_OK)
+			return status;
+
+		if (!restart)
+			break;
+
+		// Remove the dummy page, if it has been inserted.
+		mutex_lock(&topCache->lock);
+
+		if (dummyPage.state == PAGE_STATE_BUSY) {
+			ASSERT_PRINT(dummyPage.cache == topCache, "dummy page: %p\n",
+				&dummyPage);
+			fault_remove_dummy_page(dummyPage, true);
+		}
+
+		mutex_unlock(&topCache->lock);
+	}
+
 	if (page == NULL) {
 		// we still haven't found a page, so we allocate a clean one
 
@@ -3359,7 +3403,8 @@ fault_get_page(vm_translation_map *map, vm_cache *topCache,
 
 		// Insert the new page into our cache, and replace it with the dummy page if necessary
 
-		// if we inserted a dummy page into this cache, we have to remove it now
+		// If we inserted a dummy page into this cache (i.e. if it is the top
+		// cache), we have to remove it now
 		if (dummyPage.state == PAGE_STATE_BUSY && dummyPage.cache == cache) {
 #ifdef DEBUG_PAGE_CACHE_TRANSITIONS
 			page->debug_flags = dummyPage.debug_flags | 0x8;
@@ -3383,8 +3428,12 @@ fault_get_page(vm_translation_map *map, vm_cache *topCache,
 			}
 #endif	// DEBUG_PAGE_CACHE_TRANSITIONS
 
-			// we had inserted the dummy cache in another cache, so let's remove it from there
+			// This is not the top cache into which we inserted the dummy page,
+			// let's remove it from there. We need to temporarily unlock our
+			// cache to comply with the cache locking policy.
+			mutex_unlock(&cache->lock);
 			fault_remove_dummy_page(dummyPage, false);
+			mutex_lock(&cache->lock);
 		}
 	}
 
@@ -3392,8 +3441,11 @@ fault_get_page(vm_translation_map *map, vm_cache *topCache,
 	// sure that the area's cache can access it, too, and sees the correct data
 
 	if (page->cache != topCache && isWrite) {
-		// now we have a page that has the data we want, but in the wrong cache object
-		// so we need to copy it and stick it into the top cache
+		// Now we have a page that has the data we want, but in the wrong cache
+		// object so we need to copy it and stick it into the top cache.
+		// Note that this and the "if" before are mutual exclusive. If
+		// fault_find_page() didn't find the page, it would return the top cache
+		// for write faults.
 		vm_page *sourcePage = page;
 		void *source, *dest;
 
@@ -3431,17 +3483,41 @@ if (cacheOffset == 0x12000)
 		mutex_unlock(&cache->lock);
 		mutex_lock(&topCache->lock);
 
-		// Insert the new page into our cache, and replace it with the dummy page if necessary
+		// Since the top cache has been unlocked for a while, someone else
+		// (vm_cache_remove_consumer()) might have replaced our dummy page.
+		vm_page* newPage = NULL;
+		for (;;) {
+			newPage = vm_cache_lookup_page(topCache, cacheOffset);
+			if (newPage == NULL || newPage == &dummyPage) {
+				newPage = NULL;
+				break;
+			}
 
-		// if we inserted a dummy page into this cache, we have to remove it now
-		if (dummyPage.state == PAGE_STATE_BUSY && dummyPage.cache == topCache)
-			fault_remove_dummy_page(dummyPage, true);
+			if (newPage->state != PAGE_STATE_BUSY)
+				break;
 
-		vm_cache_insert_page(topCache, page, cacheOffset);
+			// The page is busy, wait till it becomes unbusy.
+			mutex_unlock(&topCache->lock);
+			snooze(10000);
+			mutex_lock(&topCache->lock);
+		}
 
-		if (dummyPage.state == PAGE_STATE_BUSY) {
-			// we had inserted the dummy cache in another cache, so let's remove it from there
-			fault_remove_dummy_page(dummyPage, false);
+		if (newPage) {
+			// Indeed someone else threw in a page. We free ours and are happy.
+			vm_page_set_state(page, PAGE_STATE_FREE);
+			page = newPage;
+		} else {
+			// Insert the new page into our cache and remove the dummy page, if
+			// necessary.
+
+			// if we inserted a dummy page into this cache, we have to remove it now
+			if (dummyPage.state == PAGE_STATE_BUSY) {
+				ASSERT_PRINT(dummyPage.cache == topCache, "dummy page: %p\n",
+					&dummyPage);
+				fault_remove_dummy_page(dummyPage, true);
+			}
+
+			vm_cache_insert_page(topCache, page, cacheOffset);
 		}
 
 		*_copiedSource = cache;
@@ -3451,7 +3527,8 @@ if (cacheOffset == 0x12000)
 	}
 
 	*_sourceCache = cache;
-	return page;
+	*_page = page;
+	return B_OK;
 }
 
 
@@ -3562,13 +3639,12 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 
 	vm_cache *copiedPageSource = NULL;
 	vm_cache *pageSource;
-	vm_page *page = fault_get_page(map, topCache, cacheOffset, isWrite,
-		dummyPage, &pageSource, &copiedPageSource);
-
-	status_t status = B_OK;
+	vm_page *page;
+	status_t status = fault_get_page(map, topCache, cacheOffset, isWrite,
+		dummyPage, &pageSource, &copiedPageSource, &page);
 
 	acquire_sem_etc(addressSpace->sem, READ_COUNT, 0, 0);
-	if (changeCount != addressSpace->change_count) {
+	if (status == B_OK && changeCount != addressSpace->change_count) {
 		// something may have changed, see if the address is still valid
 		area = vm_area_lookup(addressSpace, address);
 		if (area == NULL
