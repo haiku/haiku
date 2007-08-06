@@ -19,7 +19,7 @@ class EthernetSettingsWindow : public BWindow {
 		EthernetSettingsWindow();
 		virtual ~EthernetSettingsWindow();
 		virtual bool QuitRequested();
-		virtual void EthernetSettingsWindow::MessageReceived(BMessage* mesage);
+		virtual void MessageReceived(BMessage* mesage);
 
 		private:
 			EthernetSettingsView *fEthView;

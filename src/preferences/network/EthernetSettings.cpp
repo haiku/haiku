@@ -21,13 +21,15 @@ EthernetSettings::~EthernetSettings()
 {
 }
 
-void EthernetSettings::ReadyToRun()
+void
+EthernetSettings::ReadyToRun()
 {
 	fEthWindow = new EthernetSettingsWindow();
 	fEthWindow->Show();
 }
 
-int main(int argc, char** argv)
+int
+main(int argc, char** argv)
 {
 	EthernetSettings app;
 	app.Run();

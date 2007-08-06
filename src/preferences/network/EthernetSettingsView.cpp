@@ -50,7 +50,8 @@
 
 
 
-bool EthernetSettingsView::_PrepareRequest(struct ifreq& request, const char* name)
+bool
+EthernetSettingsView::_PrepareRequest(struct ifreq& request, const char* name)
 {
 	//This function is used for talking direct to the stack. 
 	//It´s used by _ShowConfiguration.
@@ -62,7 +63,9 @@ bool EthernetSettingsView::_PrepareRequest(struct ifreq& request, const char* na
 	return true;
 }
 
-void EthernetSettingsView::_GatherInterfaces() {
+void
+EthernetSettingsView::_GatherInterfaces()
+{
 	// iterate over all interfaces and retrieve minimal status
 
 	ifconf config;
@@ -83,12 +86,13 @@ void EthernetSettingsView::_GatherInterfaces() {
 	if (ioctl(fSocket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0)
 		return;
 
-	ifreq *interface = (ifreq *)buffer;
+	ifreq* interface = (ifreq *)buffer;
 
 	fInterfaces.MakeEmpty();
 
 	for (uint32 i = 0; i < count; i++) {
-		if (strncmp(interface->ifr_name, "loop", 4) && interface->ifr_name[0]) {
+		if (strncmp(interface->ifr_name, "loop", 4) && interface->ifr_name[0])
+		{
 			fInterfaces.AddItem(new BString(interface->ifr_name));
 			
 		}
@@ -102,20 +106,23 @@ void EthernetSettingsView::_GatherInterfaces() {
 }
 
 
-void EthernetSettingsView::AttachedToWindow()
+void
+EthernetSettingsView::AttachedToWindow()
 {
 	fOKButton->SetTarget(this);
 	fApplyButton->SetTarget(this);
+	fDeviceMenuField->Menu()->SetTargetForItems(this); 
 }
 
 
-void EthernetSettingsView::DetachedFromWindow()
+void
+EthernetSettingsView::DetachedFromWindow()
 {
-	close(fSocket);
 }
 
 
-EthernetSettingsView::EthernetSettingsView(BRect rect) : BView(rect, "EthernetSettingsView", B_FOLLOW_ALL, B_WILL_DRAW)
+EthernetSettingsView::EthernetSettingsView(BRect rect)
+: BView(rect, "EthernetSettingsView", B_FOLLOW_ALL, B_WILL_DRAW)
 {
 	float defaultWidth = 190;
 	float inset = ceilf(be_plain_font->Size() * 0.8);
@@ -135,7 +142,7 @@ EthernetSettingsView::EthernetSettingsView(BRect rect) : BView(rect, "EthernetSe
 		info->AddString("interface", name.String());
 		BMenuItem* item = new BMenuItem(label.String(), info);
 		devmenu->AddItem(item);
-		item->SetTarget(this);
+		
 		
 	}
 
@@ -146,50 +153,68 @@ EthernetSettingsView::EthernetSettingsView(BRect rect) : BView(rect, "EthernetSe
 	modemenu->AddItem(modeitem);
 	
 	fDeviceMenuField = new BMenuField(frame, "networkcards", "Adapter:", devmenu);
-	fDeviceMenuField->SetDivider(fDeviceMenuField->StringWidth(fDeviceMenuField->Label()) + 8);
+	fDeviceMenuField->SetDivider(
+		fDeviceMenuField->StringWidth(fDeviceMenuField->Label()) + 8);
 	AddChild(fDeviceMenuField);
 	fDeviceMenuField->ResizeToPreferred();
 
 	
 	fTypeMenuField = new BMenuField(frame, "type", "Mode:", modemenu);
-	fTypeMenuField->SetDivider(fTypeMenuField->StringWidth(fTypeMenuField->Label()) + 8);
+	fTypeMenuField->SetDivider(
+		fTypeMenuField->StringWidth(fTypeMenuField->Label()) + 8);
 	fTypeMenuField->MoveTo(fDeviceMenuField->Frame().LeftBottom() + BPoint(0,10));
 	AddChild(fTypeMenuField);
 	fTypeMenuField->ResizeToPreferred();
 
-	fIPTextControl = new BTextControl(frame, "ip", "IP Address:", "", NULL, B_FOLLOW_TOP, B_WILL_DRAW );
-	fIPTextControl->SetDivider(fIPTextControl->StringWidth(fIPTextControl->Label()) + 8);
+	fIPTextControl = new BTextControl(frame, "ip", "IP Address:", "", NULL, 
+	B_FOLLOW_TOP, B_WILL_DRAW );
+	fIPTextControl->SetDivider(
+		fIPTextControl->StringWidth(fIPTextControl->Label()) + 8);
 	fIPTextControl->MoveTo(fTypeMenuField->Frame().LeftBottom() + BPoint(0,10));
 	fIPTextControl->ResizeToPreferred();
 	AddChild(fIPTextControl);
 
-	fNetMaskTextControl = new BTextControl(frame, "mask", "Netmask:", "", NULL, B_FOLLOW_TOP, B_WILL_DRAW );
-	fNetMaskTextControl->SetDivider(fNetMaskTextControl->StringWidth(fNetMaskTextControl->Label()) + 8);
-	fNetMaskTextControl->MoveTo(fIPTextControl->Frame().LeftBottom() + BPoint(0,10));
+	fNetMaskTextControl = new BTextControl(frame, "mask", "Netmask:", "", NULL,
+	B_FOLLOW_TOP, B_WILL_DRAW );
+	fNetMaskTextControl->SetDivider(
+		fNetMaskTextControl->StringWidth(fNetMaskTextControl->Label()) + 8);
+	fNetMaskTextControl->MoveTo(
+		fIPTextControl->Frame().LeftBottom() + BPoint(0,10));
 	AddChild(fNetMaskTextControl);
 	fNetMaskTextControl->ResizeToPreferred();
 
-	fGatewayTextControl = new BTextControl(frame, "gateway", "Gateway:", "", NULL, B_FOLLOW_TOP, B_WILL_DRAW );
-	fGatewayTextControl->SetDivider(fGatewayTextControl->StringWidth(fGatewayTextControl->Label()) + 8);
-	fGatewayTextControl->MoveTo(fNetMaskTextControl->Frame().LeftBottom() + BPoint(0,10));
+	fGatewayTextControl = new BTextControl(frame, "gateway", "Gateway:", "",
+		NULL, B_FOLLOW_TOP, B_WILL_DRAW );
+	fGatewayTextControl->SetDivider(
+		fGatewayTextControl->StringWidth(fGatewayTextControl->Label()) + 8);
+	fGatewayTextControl->MoveTo(
+		fNetMaskTextControl->Frame().LeftBottom() + BPoint(0,10));
 	AddChild(fGatewayTextControl);
 	fGatewayTextControl->ResizeToPreferred();
 	
-	fPrimaryDNSTextControl = new BTextControl(frame, "dns1", "DNS #1:", "", NULL, B_FOLLOW_TOP, B_WILL_DRAW );
-	fPrimaryDNSTextControl->SetDivider(fPrimaryDNSTextControl->StringWidth(fPrimaryDNSTextControl->Label()) + 8);
-	fPrimaryDNSTextControl->MoveTo(fGatewayTextControl->Frame().LeftBottom() + BPoint(0,10));
+	fPrimaryDNSTextControl = new BTextControl(
+		frame, "dns1", "DNS #1:", "", NULL, B_FOLLOW_TOP, B_WILL_DRAW );
+	fPrimaryDNSTextControl->SetDivider(
+		fPrimaryDNSTextControl->StringWidth(fPrimaryDNSTextControl->Label()) + 8);
+	fPrimaryDNSTextControl->MoveTo(
+		fGatewayTextControl->Frame().LeftBottom() + BPoint(0,10));
 	AddChild(fPrimaryDNSTextControl);
 	fPrimaryDNSTextControl->ResizeToPreferred();
 	
-	fSecondaryDNSTextControl = new BTextControl(frame, "dns2", "DNS #2:", "", NULL, B_FOLLOW_TOP, B_WILL_DRAW );
-	fSecondaryDNSTextControl->SetDivider(fSecondaryDNSTextControl->StringWidth(fSecondaryDNSTextControl->Label()) + 8);
-	fSecondaryDNSTextControl->MoveTo(fPrimaryDNSTextControl->Frame().LeftBottom() + BPoint(0,10));
+	fSecondaryDNSTextControl = new BTextControl(
+		frame, "dns2", "DNS #2:", "", NULL, B_FOLLOW_TOP, B_WILL_DRAW );
+	fSecondaryDNSTextControl->SetDivider(
+		fSecondaryDNSTextControl->StringWidth(
+			fSecondaryDNSTextControl->Label()) + 8);
+	fSecondaryDNSTextControl->MoveTo(
+		fPrimaryDNSTextControl->Frame().LeftBottom() + BPoint(0,10));
 	AddChild(fSecondaryDNSTextControl);
 	fSecondaryDNSTextControl->ResizeToPreferred();
 
 	fApplyButton = new BButton(frame, "apply", "Apply", new BMessage(kMsgApply));
 	fApplyButton->ResizeToPreferred();
-	fApplyButton->MoveTo(fSecondaryDNSTextControl->Frame().LeftBottom() + BPoint(0,10));
+	fApplyButton->MoveTo(
+		fSecondaryDNSTextControl->Frame().LeftBottom() + BPoint(0,10));
 	AddChild(fApplyButton);
 	
 	fOKButton = new BButton(frame, "ok", "OK", new BMessage(kMsgOK));
@@ -201,12 +226,14 @@ EthernetSettingsView::EthernetSettingsView(BRect rect) : BView(rect, "EthernetSe
 
 EthernetSettingsView::~EthernetSettingsView()
 {
+	close(fSocket);
 }
 
-void EthernetSettingsView::_ShowConfiguration(BMessage* message)
+void
+EthernetSettingsView::_ShowConfiguration(BMessage* message)
 {
 	
- 	const char *name;
+ 	const char* name;
 	if (message->FindString("interface", &name) != B_OK)
 		return;
 
@@ -248,7 +275,7 @@ void EthernetSettingsView::_ShowConfiguration(BMessage* message)
 	
 	// Obtain gateway
 	
-	char *gwAddress;
+	char* gwAddress;
 	ifconf config;
 	config.ifc_len = sizeof(config.ifc_value);
 	if (ioctl(fSocket, SIOCGRTSIZE, &config, sizeof(struct ifconf)) < 0)
@@ -265,8 +292,10 @@ void EthernetSettingsView::_ShowConfiguration(BMessage* message)
 	config.ifc_len = size;
 	config.ifc_buf = buffer;
 	
-	if (ioctl(fSocket, SIOCGRTTABLE, &config, sizeof(struct ifconf)) < 0)
+	if (ioctl(fSocket, SIOCGRTTABLE, &config, sizeof(struct ifconf)) < 0) {
+		free(buffer);
 		return;
+	}
 		
 	ifreq *interface = (ifreq *)buffer;
 	ifreq *end = (ifreq *)((uint8 *)buffer + size);
@@ -292,11 +321,12 @@ void EthernetSettingsView::_ShowConfiguration(BMessage* message)
 		if (route.gateway != NULL)
 			addressSize += route.gateway->sa_len;
 			
-		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE + sizeof(route_entry) + addressSize);
+		interface = (ifreq *)((addr_t)interface + 
+			IF_NAMESIZE + sizeof(route_entry) + addressSize);
 	
 	}
 	
-	free(buffer);	
+	free(buffer);
 	
 	// Obtain DNS
 	
@@ -327,7 +357,8 @@ void EthernetSettingsView::_ShowConfiguration(BMessage* message)
 	
 }
 
-void EthernetSettingsView::MessageReceived(BMessage* message)
+void
+EthernetSettingsView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgInfo:

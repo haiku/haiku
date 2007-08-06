@@ -15,19 +15,21 @@
 #include "EthernetSettingsView.h"
 
 
-EthernetSettingsWindow::EthernetSettingsWindow() : BWindow(BRect(50, 50, 269, 302), 
-	"Ethernet Settings", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
+EthernetSettingsWindow::EthernetSettingsWindow()
+: BWindow(BRect(50, 50, 269, 302), "Ethernet Settings", 
+B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS
+| B_NOT_ZOOMABLE)
 {
 			
 	fEthView = new EthernetSettingsView(Bounds());
 			
 	AddChild(fEthView);
 			
-	Show();
 }
 	
 
-void EthernetSettingsWindow::MessageReceived(BMessage* message)
+void
+EthernetSettingsWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgInfo:
@@ -44,7 +46,8 @@ EthernetSettingsWindow::~EthernetSettingsWindow()
 }
 
 
-bool EthernetSettingsWindow::QuitRequested()
+bool
+EthernetSettingsWindow::QuitRequested()
 {
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
