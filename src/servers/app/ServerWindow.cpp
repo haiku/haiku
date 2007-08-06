@@ -2080,12 +2080,8 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE_RECT\n", Title()));
 			
-			float left, top, right, bottom;
-			link.Read<float>(&left);
-			link.Read<float>(&top);
-			link.Read<float>(&right);
-			link.Read<float>(&bottom);
-			BRect rect(left,top,right,bottom);
+			BRect rect;
+			link.Read<BRect>(&rect);
 
 			fCurrentLayer->ConvertToScreenForDrawing(&rect);
 			drawingEngine->StrokeRect(rect);
