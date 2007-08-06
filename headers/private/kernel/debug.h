@@ -24,11 +24,20 @@
 #define ASSERT_ALWAYS(x) \
 	do { if (!(x)) { panic("ASSERT FAILED (%s:%d): %s\n", __FILE__, __LINE__, #x); } } while (0)
 
+#define ASSERT_ALWAYS_PRINT(x, format...) \
+	do {																	\
+		if (!(x)) {															\
+			dprintf(format);												\
+			panic("ASSERT FAILED (%s:%d): %s\n", __FILE__, __LINE__, #x);	\
+		}																	\
+	} while (0)
+
 #if KDEBUG
-#define ASSERT(x) ASSERT_ALWAYS(x)
+#	define ASSERT(x)					ASSERT_ALWAYS(x)
+#	define ASSERT_PRINT(x, format...)	ASSERT_ALWAYS_PRINT(x, format)
 #else 
-#define ASSERT(x) \
-	do { } while(0)
+#	define ASSERT(x)					do { } while(0)
+#	define ASSERT_PRINT(x, format...)	do { } while(0)
 #endif
 
 extern int dbg_register_file[B_MAX_CPU_COUNT][14];
