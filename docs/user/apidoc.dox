@@ -3,9 +3,9 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *   Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  * Proofreaders:
- *   Alan Smale, ajsmale@gmail.com
+ *		Alan Smale, ajsmale@gmail.com
  */
 
 
@@ -15,7 +15,10 @@
 	This article explains how to document the API. Its intended audience are the
 	Haiku developers who want to document their own classes, and also the
 	members of the API Documentation team who want to brush up the
-	documentation.
+	documentation. The guidelines are synchronous with the Haiku Coding
+	Guidelines, which means that the formal requirements are the same where
+	applicable. If you find an inconsistency, it's usually a good idea to
+	report this on the documentation team's mailing list.
 	
 	This document is divided into three sections. \ref formalrequirements
 	describes the demands that are made from the markup and spacing of the
@@ -83,12 +86,12 @@
 * Distributed under the terms of the MIT License.
 *
 * Authors:
-*   Niels Sascha Reedijk, niels.reedijk@gmail.com
+*		Niels Sascha Reedijk, niels.reedijk@gmail.com
 * Proofreaders:
-*   Alan Smale, ajsmale@gmail.com
+*		Alan Smale, ajsmale@gmail.com
 * Corresponds to:
-*   /trunk/headers/os/support/String.h  rev 19731
-*   /trunk/src/kits/support/String.cpp  rev 19731
+*		/trunk/headers/os/support/String.h  rev 19731
+*		/trunk/src/kits/support/String.cpp  rev 19731
 */
 	\endverbatim
 
@@ -104,7 +107,7 @@
 		followed by an empty line.
 	-# Then there is a label <tt>Authors:</tt>, which is followed by
 		lines with names and email addresses. The latter one is optional, but
-		recommended.
+		recommended. Each author is preceeded by two tabs after the asterix.
 	-# In the same vein there is the label <tt>Proofreaders:</tt> in case the
 		file has been proofread.
 	-# The final part is underneath the label <tt>Corresponds to:</tt>.

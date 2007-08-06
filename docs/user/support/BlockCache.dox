@@ -3,15 +3,15 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *   Niels Sascha Reedijk, niels.reedijk@gmail.com
+ * 		Niels Sascha Reedijk, niels.reedijk@gmail.com
  *
  * Proofreading:
- *   David Weizades, ddewbofh@hotmail.com
- *   Thom Holwerda, slakje@quicknet.nl
+ * 		David Weizades, ddewbofh@hotmail.com
+ *		Thom Holwerda, slakje@quicknet.nl
  * 
  * Corresponds to:
- *   /trunk/headers/os/support/BlockCache.h  rev 19972
- *   /trunk/src/kits/support/BlockCache.cpp  rev 4568
+ *		/trunk/headers/os/support/BlockCache.h  rev 19972
+ *		/trunk/src/kits/support/BlockCache.cpp  rev 4568
  */
 
 

@@ -3,15 +3,15 @@
  * Distributed under the terms of the MIT License.
  *
  * Author:
- *   Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  *
  * Proofreader:
- *   David Weizades, ddewbofh@hotmail.com
- *   Thom Holwerda, slakje@quicknet.nl
+ *		David Weizades, ddewbofh@hotmail.com
+ *		Thom Holwerda, slakje@quicknet.nl
  *
  * Corresponds to:
- *   /trunk/headers/os/support/Archivable.h rev 19972
- *   /trunk/src/kits/support/Archivable.cpp rev 19095
+ *		/trunk/headers/os/support/Archivable.h rev 19972
+ *		/trunk/src/kits/support/Archivable.cpp rev 19095
  */
 
 

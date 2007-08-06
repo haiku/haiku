@@ -3,16 +3,16 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *   Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  * 
  * Proofreading:
- *   David Weizades, ddewbofh@hotmail.com
- *   Thom Holwerda, slakje@quicknet.nl
- *   John Drinkwater, jdrinkwater@gmail.com
+ *		David Weizades, ddewbofh@hotmail.com
+ *		Thom Holwerda, slakje@quicknet.nl
+ *		John Drinkwater, jdrinkwater@gmail.com
  *
  * Corresponds to:
- *   /trunk/headers/os/support/List.h  rev 19972
- *   /trunk/src/kits/support/List.cpp  rev 18649
+ *		/trunk/headers/os/support/List.h  rev 19972
+ *		/trunk/src/kits/support/List.cpp  rev 18649
  */
 
 
