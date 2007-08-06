@@ -2578,7 +2578,16 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (opList != NULL && ptList != NULL
 				&& link.Read(opList, opCount * sizeof(uint32)) >= B_OK
 				&& link.Read(ptList, ptCount * sizeof(BPoint)) >= B_OK) {
-				
+
+				// TODO: I'm not sure If I have to do this here (when the BPicture is
+				// recorded, or inside ServerPicture, when the picture is replayed. 				
+				// This might seem a bit weird, but under R5, the shapes
+				// are always offset by the current pen location
+				BPoint penLocation = fCurrentLayer->CurrentState()->PenLocation();
+				for (int32 i = 0; i < ptCount; i++) {
+					ptList[i] += penLocation;
+					fCurrentLayer->ConvertToScreenForDrawing(&ptList[i]);
+				}
 				const bool fill = (code == AS_FILL_SHAPE);
 				picture->WriteDrawShape(opCount, opList, ptCount, ptList, fill);
 			}
