@@ -163,7 +163,6 @@ typedef struct vm_area {
 	uint32				protection;
 	uint16				wiring;
 	uint16				memory_type;
-	vint32				ref_count;
 
 	struct vm_cache		*cache;
 	vint32				no_cache_change;
