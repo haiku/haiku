@@ -385,9 +385,11 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 
 	if (thread->kernel_stack_area < 0) {
 		// we're not yet part of a team, so we can just bail out
-		dprintf("create_thread: error creating kernel stack!\n");
-
 		status = thread->kernel_stack_area;
+
+		dprintf("create_thread: error creating kernel stack: %s!\n",
+			strerror(status));
+
 		delete_thread_struct(thread);
 		return status;
 	}
