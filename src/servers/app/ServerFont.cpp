@@ -592,6 +592,7 @@ class BoundingBoxConsumer {
 		, fTransform(transform)
 	{
 	}
+
 	void Start() {}
 	void Finish(double x, double y) {}
 	void ConsumeEmptyGlyph(int32 index, uint32 charCode, double x, double y) {}
@@ -601,21 +602,21 @@ class BoundingBoxConsumer {
 		if (glyph->data_type != glyph_data_outline) {
 			const agg::rect_i& r = glyph->bounds;
 			if (fAsString) {
-				rectArray[index].left = r.x1 + x;
-				rectArray[index].top = r.y1 + y;
-				rectArray[index].right = r.x2 + x + 1;
-				rectArray[index].bottom = r.y2 + y + 1;
-			} else {
 				if (rectArray) {
-					rectArray[index].left = r.x1;
-					rectArray[index].top = r.y1;
-					rectArray[index].right = r.x2 + 1;
-					rectArray[index].bottom = r.y2 + 1;
+					rectArray[index].left = r.x1 + x;
+					rectArray[index].top = r.y1 + y;
+					rectArray[index].right = r.x2 + x + 1;
+					rectArray[index].bottom = r.y2 + y + 1;
 				} else {
 					stringBoundingBox = stringBoundingBox
 						| BRect(r.x1 + x, r.y1 + y,
 							r.x2 + x + 1, r.y2 + y + 1);
 				}
+			} else {
+				rectArray[index].left = r.x1;
+				rectArray[index].top = r.y1;
+				rectArray[index].right = r.x2 + 1;
+				rectArray[index].bottom = r.y2 + 1;
 			}
 		} else {
 			if (fAsString) {
@@ -686,8 +687,9 @@ ServerFont::GetBoundingBoxes(const char* string, int32 numChars,
 
 
 status_t
-ServerFont::GetBoundingBoxesForStrings(char *charArray[], int32 lengthArray[], 
-	int32 numStrings, BRect rectArray[], font_metric_mode mode, escapement_delta deltaArray[])
+ServerFont::GetBoundingBoxesForStrings(char *charArray[], int32 lengthArray[],
+	int32 numStrings, BRect rectArray[], font_metric_mode mode,
+	escapement_delta deltaArray[])
 {
 	// TODO: The font_metric_mode is never used
 	if (!charArray || !lengthArray|| numStrings <= 0 || !rectArray || !deltaArray)
