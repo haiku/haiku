@@ -62,10 +62,12 @@
 class AddressSpaceReadLocker {
 public:
 	AddressSpaceReadLocker(team_id team);
+	AddressSpaceReadLocker(vm_address_space* space);
 	AddressSpaceReadLocker();
 	~AddressSpaceReadLocker();
 
 	status_t SetTo(team_id team);
+	void SetTo(vm_address_space* space);
 	status_t SetFromArea(area_id areaID, vm_area*& area);
 
 	bool IsLocked() const { return fLocked; }
@@ -123,6 +125,7 @@ public:
 private:
 	bool _ResizeIfNeeded();
 	vm_address_space*& _CurrentItem() { return fSpaces[fCount]; }
+	bool _HasAddressSpace(vm_address_space* space) const;
 
 	static int _CompareItems(const void* _a, const void* _b);
 
@@ -160,6 +163,16 @@ AddressSpaceReadLocker::AddressSpaceReadLocker(team_id team)
 }
 
 
+//! Takes over the reference of the address space
+AddressSpaceReadLocker::AddressSpaceReadLocker(vm_address_space* space)
+	:
+	fSpace(NULL),
+	fLocked(false)
+{
+	SetTo(space);
+}
+
+
 AddressSpaceReadLocker::AddressSpaceReadLocker()
 	:
 	fSpace(NULL),
@@ -193,6 +206,16 @@ AddressSpaceReadLocker::SetTo(team_id team)
 	acquire_sem_etc(fSpace->sem, READ_COUNT, 0, 0);
 	fLocked = true;
 	return B_OK;
+}
+
+
+//! Takes over the reference of the address space
+void
+AddressSpaceReadLocker::SetTo(vm_address_space* space)
+{
+	fSpace = space;
+	acquire_sem_etc(fSpace->sem, READ_COUNT, 0, 0);
+	fLocked = true;
 }
 
 
@@ -354,6 +377,7 @@ AddressSpaceWriteLocker::Unlock()
 	if (fLocked) {
 		release_sem_etc(fSpace->sem, fDegraded ? READ_COUNT : WRITE_COUNT, 0);
 		fLocked = false;
+		fDegraded = false;
 	}
 }
 
@@ -412,6 +436,18 @@ MultiAddressSpaceLocker::_ResizeIfNeeded()
 }
 
 
+bool
+MultiAddressSpaceLocker::_HasAddressSpace(vm_address_space* space) const
+{
+	for (int32 i = 0; i < fCount; i++) {
+		if (fSpaces[i] == space)
+			return true;
+	}
+	
+	return false;
+}
+
+
 status_t
 MultiAddressSpaceLocker::AddTeam(team_id team, vm_address_space** _space)
 {
@@ -422,6 +458,15 @@ MultiAddressSpaceLocker::AddTeam(team_id team, vm_address_space** _space)
 	space = vm_get_address_space_by_id(team);
 	if (space == NULL)
 		return B_BAD_VALUE;
+
+	// check if we have already added this address space
+	if (_HasAddressSpace(space)) {
+		// no need to add it again
+		vm_put_address_space(space);
+		if (_space != NULL)
+			*_space = space;
+		return B_OK;
+	}
 
 	fCount++;
 
@@ -444,14 +489,12 @@ MultiAddressSpaceLocker::AddArea(area_id area, vm_address_space** _space)
 		return B_BAD_VALUE;
 
 	// check if we have already added this address space
-	for (int32 i = 0; i < fCount; i++) {
-		if (fSpaces[i] == space) {
-			// no need to add it again
-			vm_put_address_space(space);
-			if (_space != NULL)
-				*_space = space;
-			return B_OK;
-		}
+	if (_HasAddressSpace(space)) {
+		// no need to add it again
+		vm_put_address_space(space);
+		if (_space != NULL)
+			*_space = space;
+		return B_OK;
 	}
 
 	fCount++;
@@ -1683,7 +1726,7 @@ vm_clone_area(team_id team, const char *name, void **address,
 {
 	vm_area *newArea = NULL;
 	vm_area *sourceArea;
-	
+
 	MultiAddressSpaceLocker locker;
 	vm_address_space *sourceAddressSpace;
 	status_t status = locker.AddArea(sourceID, &sourceAddressSpace);
@@ -1822,6 +1865,10 @@ delete_area(vm_address_space *addressSpace, vm_area *area)
 
 	arch_vm_unset_memory_type(area);
 	remove_area_from_address_space(addressSpace, area);
+	// TODO: the following line fixes an address space leak - however,
+	// there seems to be something wrong with the order in which teams
+	// are torn down, and the first shell command hangs on a pipe then
+	//vm_put_address_space(addressSpace);
 
 	vm_cache_remove_area(area->cache, area);
 	vm_cache_release_ref(area->cache);
@@ -1948,16 +1995,6 @@ area_id
 vm_copy_area(team_id team, const char *name, void **_address,
 	uint32 addressSpec, uint32 protection, area_id sourceID)
 {
-	MultiAddressSpaceLocker locker;
-
-	vm_address_space *sourceAddressSpace = NULL;
-	vm_address_space *targetAddressSpace;
-	status_t status = locker.AddTeam(team, &targetAddressSpace);
-	if (status == B_OK)
-		status = locker.AddArea(sourceID, &sourceAddressSpace);
-	if (status != B_OK)
-		return status;
-
 	bool writableCopy = (protection & (B_KERNEL_WRITE_AREA | B_WRITE_AREA)) != 0;
 
 	if ((protection & B_KERNEL_PROTECTION) == 0) {
@@ -1966,6 +2003,17 @@ vm_copy_area(team_id team, const char *name, void **_address,
 		if (writableCopy)
 			protection |= B_KERNEL_WRITE_AREA;
 	}
+
+	MultiAddressSpaceLocker locker;
+	vm_address_space *sourceAddressSpace = NULL;
+	vm_address_space *targetAddressSpace;
+	status_t status = locker.AddTeam(team, &targetAddressSpace);
+	if (status == B_OK)
+		status = locker.AddArea(sourceID, &sourceAddressSpace);
+	if (status == B_OK)
+		status = locker.Lock();
+	if (status != B_OK)
+		return status;
 
 	vm_area* source = lookup_area(sourceAddressSpace, sourceID);
 	if (source == NULL)
@@ -3865,16 +3913,14 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 		return B_BAD_ADDRESS;
 	}
 
+	AddressSpaceReadLocker locker(addressSpace);
+
 	atomic_add(&addressSpace->fault_count, 1);
 
 	// Get the area the fault was in
 
-	acquire_sem_etc(addressSpace->sem, READ_COUNT, 0, 0);
-
 	vm_area *area = vm_area_lookup(addressSpace, address);
 	if (area == NULL) {
-		release_sem_etc(addressSpace->sem, READ_COUNT, 0);
-		vm_put_address_space(addressSpace);
 		dprintf("vm_soft_fault: va 0x%lx not covered by area in address space\n",
 			originalAddress);
 		return B_BAD_ADDRESS;
@@ -3882,14 +3928,10 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 
 	// check permissions
 	if (isUser && (area->protection & B_USER_PROTECTION) == 0) {
-		release_sem_etc(addressSpace->sem, READ_COUNT, 0);
-		vm_put_address_space(addressSpace);
 		dprintf("user access on kernel area 0x%lx at %p\n", area->id, (void *)originalAddress);
 		return B_PERMISSION_DENIED;
 	}
 	if (isWrite && (area->protection & (B_WRITE_AREA | (isUser ? 0 : B_KERNEL_WRITE_AREA))) == 0) {
-		release_sem_etc(addressSpace->sem, READ_COUNT, 0);
-		vm_put_address_space(addressSpace);
 		dprintf("write access attempted on read-only area 0x%lx at %p\n",
 			area->id, (void *)originalAddress);
 		return B_PERMISSION_DENIED;
@@ -3905,8 +3947,6 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	atomic_add(&area->no_cache_change, 1);
 		// make sure the area's cache isn't replaced during the page fault
 
-	release_sem_etc(addressSpace->sem, READ_COUNT, 0);
-
 	// See if this cache has a fault handler - this will do all the work for us
 	{
 		vm_store *store = topCache->store;
@@ -3917,7 +3957,6 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 			status_t status = store->ops->fault(store, addressSpace, cacheOffset);
 			if (status != B_BAD_HANDLER) {
 				vm_area_put_locked_cache(topCache);
-				vm_put_address_space(addressSpace);
 				return status;
 			}
 		}
@@ -3943,21 +3982,11 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	vm_cache *copiedPageSource = NULL;
 	vm_cache *pageSource;
 	vm_page *page;
+	// TODO: We keep the address space read lock during the whole operation
+	// which might be rather expensive depending on where the data has to
+	// be retrieved from.
 	status_t status = fault_get_page(map, topCache, cacheOffset, isWrite,
 		dummyPage, &pageSource, &copiedPageSource, &page);
-
-	acquire_sem_etc(addressSpace->sem, READ_COUNT, 0, 0);
-	if (status == B_OK && changeCount != addressSpace->change_count) {
-		// something may have changed, see if the address is still valid
-		area = vm_area_lookup(addressSpace, address);
-		if (area == NULL
-			|| area->cache != topCache
-			|| (address - area->base + area->cache_offset) != cacheOffset
-			|| address > area->base + (area->size - 1)) {
-			dprintf("vm_soft_fault: address space layout changed effecting ongoing soft fault\n");
-			status = B_BAD_ADDRESS;
-		}
-	}
 
 	if (status == B_OK) {
 		// All went fine, all there is left to do is to map the page into the address space
@@ -3979,7 +4008,6 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	}
 
 	atomic_add(&area->no_cache_change, -1);
-	release_sem_etc(addressSpace->sem, READ_COUNT, 0);
 
 	mutex_unlock(&pageSource->lock);
 	vm_cache_release_ref(pageSource);
@@ -3993,7 +4021,6 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	}
 
 	vm_cache_release_ref(topCache);
-	vm_put_address_space(addressSpace);
 
 	return status;
 }
@@ -4340,7 +4367,8 @@ out:
  */
 
 long
-get_memory_map(const void *address, ulong numBytes, physical_entry *table, long numEntries)
+get_memory_map(const void *address, ulong numBytes, physical_entry *table,
+	long numEntries)
 {
 	vm_address_space *addressSpace;
 	addr_t virtualAddress = (addr_t)address;
@@ -4351,7 +4379,8 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table, long 
 	addr_t offset = 0;
 	bool interrupts = are_interrupts_enabled();
 
-	TRACE(("get_memory_map(%p, %lu bytes, %ld entries)\n", address, numBytes, numEntries));
+	TRACE(("get_memory_map(%p, %lu bytes, %ld entries)\n", address, numBytes,
+		numEntries));
 
 	if (numEntries == 0 || numBytes == 0)
 		return B_BAD_VALUE;
@@ -4385,6 +4414,7 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table, long 
 			break;
 		if ((flags & PAGE_PRESENT) == 0) {
 			panic("get_memory_map() called on unmapped memory!");
+			vm_put_address_space(addressSpace);
 			return B_BAD_ADDRESS;
 		}
 
@@ -4414,6 +4444,8 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table, long 
 
 	if (interrupts)
 		map->ops->unlock(map);
+
+	vm_put_address_space(addressSpace);
 
 	// close the entry list
 
