@@ -463,10 +463,12 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT                  = . \
+						 app \
                          drivers \
                          midi \
                          midi2 \
                          support \
+						 ../../headers/os/app \
                          ../../headers/os/drivers/fs_interface.h \
                          ../../headers/os/drivers/USB3.h \
                          ../../headers/os/drivers/USB_spec.h \

@@ -3,6 +3,7 @@
 
   \section kits Kits and Servers
 
+  - \ref app | \link app_intro \em Introduction \endlink
   - \ref drivers
   - \ref midi1
   - \ref midi2 | \link midi2_intro \em Introduction \endlink
