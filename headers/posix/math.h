@@ -251,7 +251,7 @@ extern int		__isinf(double value);
 		: __isnanl(value))
 
 /* returns non-zero if 'value is Inf */
-# define isinf(x) \
+# define isinf(value) \
 	(sizeof(value) == sizeof(float) ? __isinff(value)			\
 		: sizeof(value) == sizeof(double) ? __isinf(value)		\
 		: __isinfl(value))
