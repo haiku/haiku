@@ -4387,9 +4387,9 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table,
 
 	// in which address space is the address to be found?	
 	if (IS_USER_ADDRESS(virtualAddress))
-		addressSpace = vm_get_current_user_address_space();
+		addressSpace = thread_get_current_thread()->team->address_space;
 	else
-		addressSpace = vm_get_kernel_address_space();
+		addressSpace = vm_kernel_address_space();
 
 	if (addressSpace == NULL)
 		return B_ERROR;
@@ -4414,7 +4414,6 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table,
 			break;
 		if ((flags & PAGE_PRESENT) == 0) {
 			panic("get_memory_map() called on unmapped memory!");
-			vm_put_address_space(addressSpace);
 			return B_BAD_ADDRESS;
 		}
 
@@ -4444,8 +4443,6 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table,
 
 	if (interrupts)
 		map->ops->unlock(map);
-
-	vm_put_address_space(addressSpace);
 
 	// close the entry list
 
