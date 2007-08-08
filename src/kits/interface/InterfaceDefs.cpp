@@ -19,6 +19,7 @@
 #include <DefaultColors.h>
 #include <InputServerTypes.h>
 #include <input_globals.h>
+#include <pr_server.h>
 #include <ServerProtocol.h>
 #include <ServerReadOnlyMemory.h>
 #include <WidthBuffer.h>
@@ -649,8 +650,11 @@ idle_time()
 _IMPEXP_BE void
 run_select_printer_panel()
 {
+	if (be_roster == NULL)
+		return;
+		
 	// Launches the Printer prefs app via the Roster
-	be_roster->Launch("application/x-vnd.Be-PRNT");
+	be_roster->Launch(PRNT_SIGNATURE_TYPE);
 }
 
 
@@ -659,7 +663,10 @@ run_add_printer_panel()
 {
 	// Launches the Printer prefs app via the Roster and asks it to 
 	// add a printer
-	// TODO: Implement
+	run_select_printer_panel();
+
+	BMessenger printerPanelMessenger(PRNT_SIGNATURE_TYPE);
+	printerPanelMessenger.SendMessage(PRINTERS_ADD_PRINTER);	
 }
 
 
