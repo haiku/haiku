@@ -343,8 +343,7 @@ get_module_image(const char *path, module_image **_image)
 {
 	struct module_image *image;
 
-	TRACE(("get_module_image(path = \"%s\", loadIfNeeded = %d)\n", path,
-		loadIfNeeded));
+	TRACE(("get_module_image(path = \"%s\")\n", path));
 
 	RecursiveLocker _(sModulesLock);
 
