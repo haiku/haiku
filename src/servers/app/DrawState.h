@@ -108,6 +108,7 @@ class DrawState {
 
 		void				SetPenSize(float size);
 		float				PenSize() const;
+		float				UnscaledPenSize() const;
 
 							// font
 		void				SetFont(const ServerFont& font,

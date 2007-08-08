@@ -496,6 +496,18 @@ DrawState::PenSize() const
 }
 
 
+//! returns the unscaled pen size
+float
+DrawState::UnscaledPenSize() const
+{
+	// NOTE: As documented in the BeBook,
+	// pen size is never smaller than 1.0.
+	// This is supposed to be the smallest
+	// possible device size.
+	return max_c(fPenSize, 1.0);
+}
+
+
 //! sets the font to be already scaled by fScale
 void
 DrawState::SetFont(const ServerFont& font, uint32 flags)
