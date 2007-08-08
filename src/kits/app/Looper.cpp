@@ -546,7 +546,6 @@ BLooper::IsLocked() const
 		return false;
 	}
 
-	// Got this from Jeremy's BLocker implementation
 	return find_thread(NULL) == fOwner;
 }
 
@@ -907,7 +906,8 @@ BLooper::_Lock(BLooper* looper, port_id port, bigtime_t timeout)
 
 
 status_t
-BLooper::_LockComplete(BLooper *looper, int32 oldCount, thread_id thread, sem_id sem, bigtime_t timeout)
+BLooper::_LockComplete(BLooper *looper, int32 oldCount, thread_id thread,
+	sem_id sem, bigtime_t timeout)
 {
 	status_t err = B_OK;
 
@@ -922,6 +922,7 @@ BLooper::_LockComplete(BLooper *looper, int32 oldCount, thread_id thread, sem_id
 #endif
 	if (err == B_OK) {
 		looper->fOwner = thread;
+		looper->fCachedStack = (addr_t)&err & ~(B_PAGE_SIZE - 1);
 		looper->fOwnerCount = 1;
 	}
 
@@ -1332,8 +1333,12 @@ BLooper::check_lock()
 	// This is a cheap variant of AssertLocked()
 	// It is used in situations where it's clear that the looper is valid,
 	// ie. from handlers
-	if (fOwner == -1 || fOwner != find_thread(NULL))
-		debugger("Looper must be locked.");
+	uint32 stack;
+	if (((uint32)&stack & ~(B_PAGE_SIZE - 1)) == fCachedStack
+		|| fOwner == find_thread(NULL))
+		return;
+
+	debugger("Looper must be locked.");
 }
 
 

@@ -159,13 +159,14 @@ private:
 			int32			fOwnerCount;
 			thread_id		fOwner;
 			thread_id		fThread;
+			addr_t			fCachedStack;
 			int32			fInitPriority;
 			BHandler*		fPreferred;
 			BList			fHandlers;
 			BList*			fCommonFilters;
 			bool			fTerminating;
 			bool			fRunCalled;
-			uint32			_reserved[12];
+			uint32			_reserved[11];
 };
 
 #endif	// _LOOPER_H
