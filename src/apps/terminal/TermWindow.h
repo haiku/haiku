@@ -59,7 +59,8 @@ private:
 	void		_SetupMenu();
 	status_t	_DoPageSetup();
 	void		_DoPrint();
-	void		_NewTab(const char *command);
+	void		_AddTab(const char *command);
+	void		_RemoveTab(int32 index);
 	TermView*	_ActiveTermView();
 	
 	SmartTabView	*fTabView;

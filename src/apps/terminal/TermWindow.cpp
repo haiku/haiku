@@ -116,7 +116,7 @@ TermWindow::_InitWindow(const char *command)
 	fTabView = new SmartTabView(textFrame, "tab view");
 	AddChild(fTabView);
 	
-	_NewTab(command);
+	_AddTab(command);
 }
 
 
@@ -202,8 +202,7 @@ TermWindow::_SetupMenu()
 void
 TermWindow::MessageReceived(BMessage *message)
 {
-	int32 coding_id;
-	BRect r;
+	int32 encodingId;
 	BFont halfFont;
 	BFont fullFont;
 	bool findresult;
@@ -225,28 +224,24 @@ TermWindow::MessageReceived(BMessage *message)
 			_ActiveTermView()->Clear();
 			break;	
 			
-		case MENU_SWITCH_TERM: {
+		case MENU_SWITCH_TERM:
 			be_app->PostMessage(MENU_SWITCH_TERM);
 			break;
-		}
+
 		case kNewTab:
-			_NewTab(NULL);
+			_AddTab(NULL);
 			break;
 
 		case kCloseView:
-		{
 			// TODO: We assume that this message was sent from the current active tab.
 			// Since the implementation of BTabView uses AddChild/RemoveChild on the
 			// views, the current active tab is the only one who is attached, thus
-			// the only one which could send a message.
-			if (fTabView->CountTabs() > 1)			
-				delete fTabView->RemoveTab(fTabView->Selection());
-			else
-				PostMessage(B_QUIT_REQUESTED);			
+			// the only one which could send a message. Change this.
+			_RemoveTab(fTabView->Selection());			
 			break;	
-		}
 
-		case MENU_NEW_TERM: {
+		case MENU_NEW_TERM: 
+		{
 			app_info info;
 			be_app->GetAppInfo(&info);
 			
@@ -255,18 +250,18 @@ TermWindow::MessageReceived(BMessage *message)
 				be_roster->Launch(TERM_SIGNATURE);
 			break;
 		}
-		case MENU_PREF_OPEN: {
+		case MENU_PREF_OPEN:
 			if (!fPrefWindow)
 				fPrefWindow = new PrefWindow(this);
 			else
 				fPrefWindow->Activate();
 			break;
-		}
-		case MSG_PREF_CLOSED: {
+		
+		case MSG_PREF_CLOSED:
 			fPrefWindow = NULL;
 			break;
-		}
-		case MENU_FIND_STRING: {
+	
+		case MENU_FIND_STRING:
 			if (!fFindPanel) {
 				BRect r = Frame();
 				r.left += 20;
@@ -278,8 +273,8 @@ TermWindow::MessageReceived(BMessage *message)
 			else
 				fFindPanel->Activate();
 			break;
-		}
-		case MSG_FIND: {
+	
+		case MSG_FIND:
 			fFindPanel->PostMessage(B_QUIT_REQUESTED);
 			message->FindBool("findselection", &fFindSelection);
 			if (!fFindSelection) 
@@ -314,8 +309,8 @@ TermWindow::MessageReceived(BMessage *message)
 			fFindBackwardMenuItem->SetEnabled(true);
 			fFindForwardMenuItem->SetEnabled(true);
 			break;
-		}
-		case MENU_FIND_FORWARD: {
+		
+		case MENU_FIND_FORWARD:
 			findresult = _ActiveTermView()->Find(fFindString, true, fMatchCase, fMatchWord);
 			if (!findresult) {
 				BAlert *alert = new BAlert("find failed", "Not Found.", "Okay", NULL,
@@ -323,8 +318,8 @@ TermWindow::MessageReceived(BMessage *message)
 				alert->Go();
 			}
 			break;
-		}
-		case MENU_FIND_BACKWARD: {
+	
+		case MENU_FIND_BACKWARD:
 			findresult = _ActiveTermView()->Find(fFindString, false, fMatchCase, fMatchWord);
 			if (!findresult) {
 				BAlert *alert = new BAlert("find failed", "Not Found.", "Okay", NULL,
@@ -332,25 +327,25 @@ TermWindow::MessageReceived(BMessage *message)
 				alert->Go();
 			}
 			break;
-		}
+		
 		case MSG_FIND_CLOSED:
 			fFindPanel = NULL;
 			break;
 
-		case MENU_ENCODING: {
-			message->FindInt32 ("op", &coding_id);
-			_ActiveTermView()->SetEncoding(coding_id);
+		case MENU_ENCODING:
+			if (message->FindInt32("op", &encodingId) == B_OK)
+				_ActiveTermView()->SetEncoding(encodingId);
 			break;
-		}
 		
 		// Message from Preference panel.
 		case MSG_ROWS_CHANGED:
-		case MSG_COLS_CHANGED: {
-			r = _ActiveTermView()->SetTermSize (PrefHandler::Default()->getInt32 (PREF_ROWS),
+		case MSG_COLS_CHANGED:
+		{
+			BRect rect = _ActiveTermView()->SetTermSize(PrefHandler::Default()->getInt32 (PREF_ROWS),
 										PrefHandler::Default()->getInt32 (PREF_COLS), 0);
 		
-			ResizeTo (r.Width()+ B_V_SCROLL_BAR_WIDTH + kViewOffset * 2,
-				r.Height()+fMenubar->Bounds().Height() + kViewOffset *2);
+			ResizeTo (rect.Width()+ B_V_SCROLL_BAR_WIDTH + kViewOffset * 2,
+				rect.Height()+fMenubar->Bounds().Height() + kViewOffset *2);
 		
 			BPath path;
 			if (PrefHandler::GetDefaultPath(path) == B_OK)
@@ -360,7 +355,8 @@ TermWindow::MessageReceived(BMessage *message)
 		case MSG_HALF_FONT_CHANGED:
 		case MSG_FULL_FONT_CHANGED:
 		case MSG_HALF_SIZE_CHANGED:
-		case MSG_FULL_SIZE_CHANGED: {
+		case MSG_FULL_SIZE_CHANGED: 
+		{
 	
 			halfFont.SetFamilyAndStyle (PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY),NULL);
 			halfFont.SetSize (PrefHandler::Default()->getFloat(PREF_HALF_FONT_SIZE));
@@ -371,52 +367,51 @@ TermWindow::MessageReceived(BMessage *message)
 			fullFont.SetSpacing (B_FIXED_SPACING);
 			
 			_ActiveTermView()->SetTermFont (&halfFont, &fullFont);
-			r = _ActiveTermView()->SetTermSize (0, 0, 0);
+			BRect rect = _ActiveTermView()->SetTermSize (0, 0, 0);
 			
 			int width, height;
-			
-			_ActiveTermView()->GetFontSize (&width, &height);
+			_ActiveTermView()->GetFontSize(&width, &height);
 			
 			SetSizeLimits (MIN_COLS * width, MAX_COLS * width,
 							MIN_COLS * height, MAX_COLS * height);
 			
-			ResizeTo (r.Width()+ B_V_SCROLL_BAR_WIDTH + kViewOffset * 2,
-			r.Height()+fMenubar->Bounds().Height() + kViewOffset * 2);
+			ResizeTo(rect.Width()+ B_V_SCROLL_BAR_WIDTH + kViewOffset * 2,
+				rect.Height()+fMenubar->Bounds().Height() + kViewOffset * 2);
 			
 			_ActiveTermView()->Invalidate();
 			break;
 		}
-		case EIGHTYTWENTYFOUR: {
+		case EIGHTYTWENTYFOUR:
 			PrefHandler::Default()->setString(PREF_COLS, "80");
 			PrefHandler::Default()->setString(PREF_ROWS, "24");
 		   	PostMessage (MSG_COLS_CHANGED);
 			break;
-		}
-		case EIGHTYTWENTYFIVE: {
+	
+		case EIGHTYTWENTYFIVE:
 			PrefHandler::Default()->setString(PREF_COLS, "80");
 			PrefHandler::Default()->setString(PREF_ROWS, "25");
 		   	PostMessage (MSG_COLS_CHANGED);
 			break;		
-		}
-		case EIGHTYFORTY: {
+	
+		case EIGHTYFORTY:
 			PrefHandler::Default()->setString(PREF_COLS, "80");
 			PrefHandler::Default()->setString(PREF_ROWS, "40");
 		   	PostMessage (MSG_COLS_CHANGED);
 			break;	
-		}
-		case ONETHREETWOTWENTYFOUR: {
+		
+		case ONETHREETWOTWENTYFOUR:
 			PrefHandler::Default()->setString(PREF_COLS, "132");
 			PrefHandler::Default()->setString(PREF_ROWS, "24");
 		   	PostMessage (MSG_COLS_CHANGED);
 			break;	
-		}
-		case ONETHREETWOTWENTYFIVE: {
+		
+		case ONETHREETWOTWENTYFIVE:
 			PrefHandler::Default()->setString(PREF_COLS, "132");
 			PrefHandler::Default()->setString(PREF_ROWS, "25");
 		   	PostMessage (MSG_COLS_CHANGED);
 			break;	
-		}
-		case FULLSCREEN: {
+		
+		case FULLSCREEN:
 			if (!fSavedFrame.IsValid()) { // go fullscreen
 				float mbHeight = fMenubar->Bounds().Height() + 1;
 				fSavedFrame = Frame();
@@ -440,39 +435,38 @@ TermWindow::MessageReceived(BMessage *message)
 				fSavedFrame = BRect(0,0,-1,-1);
 			}
 			break;	
-		}
-		case MSG_FONT_CHANGED: {
+		
+		case MSG_FONT_CHANGED:
 	    		PostMessage(MSG_HALF_FONT_CHANGED);
 			break;
-		}
-		case MSG_COLOR_CHANGED: {
+		
+		case MSG_COLOR_CHANGED:
 			_SetTermColors();
 			_ActiveTermView()->Invalidate();
 			break;
-		}
-		case SAVE_AS_DEFAULT: {
+		
+		case SAVE_AS_DEFAULT: 
+		{
 			BPath path;
 			if (PrefHandler::GetDefaultPath(path) == B_OK)
 				PrefHandler::Default()->SaveAsText(path.Path(), PREFFILE_MIMETYPE);
 			break;
 		}
-		case MENU_PAGE_SETUP: {
+		case MENU_PAGE_SETUP:
 			_DoPageSetup();
 			break;
-		}
-		case MENU_PRINT: {
+		
+		case MENU_PRINT:
 			_DoPrint();
 			break;
-		}
 
-		case B_ABOUT_REQUESTED: {
+		case B_ABOUT_REQUESTED:
 			be_app->PostMessage(B_ABOUT_REQUESTED);
 			break;
-		}
-		default: {
+	
+		default:
 			BWindow::MessageReceived(message);
 			break;
-		}
 	}
 }
 
@@ -567,7 +561,7 @@ TermWindow::_DoPrint()
 
 
 void
-TermWindow::_NewTab(const char *command)
+TermWindow::_AddTab(const char *command)
 {
 	// Setup font.
 
@@ -625,6 +619,16 @@ TermWindow::_NewTab(const char *command)
 		// Bug in BTabView or in my code ?
 		fTabView->Select(0);
 	}
+}
+
+
+void
+TermWindow::_RemoveTab(int32 index)
+{
+	if (fTabView->CountTabs() > 1)			
+		delete fTabView->RemoveTab(fTabView->Selection());
+	else
+		PostMessage(B_QUIT_REQUESTED);
 }
 
 

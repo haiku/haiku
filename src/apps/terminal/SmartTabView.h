@@ -10,6 +10,7 @@
 
 #include <TabView.h>
 
+class BPopUpMenu;
 class SmartTabView : public BTabView {
 public:
 	SmartTabView(BRect frame, const char *name,
@@ -22,13 +23,22 @@ public:
 	
 	virtual void MouseDown(BPoint where);
 
+	virtual void AttachedToWindow();
 	virtual void AllAttached();
+
+	virtual void MessageReceived(BMessage *message);
+
 	virtual	void Select(int32 tab);
+	
+		void RemoveAndDeleteTab(int32 index);
 	
 	virtual	void AddTab(BView *target, BTab *tab = NULL);
 	virtual BTab* RemoveTab(int32 index);
 
 	virtual BRect DrawTabs();
+
+private:
+		int32 _ClickedTabIndex(const BPoint &point);	
 };
 
 #endif // __SMARTTABVIEW_H
