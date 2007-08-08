@@ -1002,8 +1002,13 @@ DrawingEngine::StrokeLineArray(int32 numLines,
 
 		data = (const LineArrayData *)&(linedata[0]);
 
+		// store current graphics state, we mess with the
+		// high color and pattern...
 		rgb_color oldColor = fPainter->HighColor();
+		struct pattern pattern = fPainter->Pattern();
+
 		fPainter->SetHighColor(data->color);
+		fPainter->SetPattern(B_SOLID_HIGH);
 		fPainter->StrokeLine(data->pt1, data->pt2);
 
 		for (int32 i = 1; i < numLines; i++) {
@@ -1012,8 +1017,9 @@ DrawingEngine::StrokeLineArray(int32 numLines,
 			fPainter->StrokeLine(data->pt1, data->pt2);
 		}
 
-		// restore correct drawing state highcolor
+		// restore correct drawing state highcolor and pattern
 		fPainter->SetHighColor(oldColor);
+		fPainter->SetPattern(pattern);
 
 		fGraphicsCard->Invalidate(touched);
 		if (cursorTouched)
