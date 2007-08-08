@@ -1550,8 +1550,6 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			link.Read<float>(&y);
 
 			fCurrentLayer->CurrentState()->SetPenLocation(BPoint(x, y));
-			// TODO: is this necessary?
-			_UpdateDrawState(fCurrentLayer);
 			break;
 		}
 		case AS_LAYER_GET_PEN_LOC:
@@ -1570,15 +1568,16 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			link.Read<float>(&penSize);
 
 			fCurrentLayer->CurrentState()->SetPenSize(penSize);
-			//_UpdateDrawState(fCurrentLayer);
-			fWindowLayer->GetDrawingEngine()->SetPenSize(penSize);
+			fWindowLayer->GetDrawingEngine()->SetPenSize(
+				fCurrentLayer->CurrentState()->PenSize());
 			break;
 		}
 		case AS_LAYER_GET_PEN_SIZE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
 			fLink.StartMessage(B_OK);
-			fLink.Attach<float>(fCurrentLayer->CurrentState()->PenSize());
+			fLink.Attach<float>(
+				fCurrentLayer->CurrentState()->UnscaledPenSize());
 			fLink.Flush();
 		
 			break;
@@ -1854,7 +1853,6 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			link.Read(&c, sizeof(rgb_color));
 			
 			fCurrentLayer->CurrentState()->SetHighColor(RGBColor(c));
-//			_UpdateDrawState(fCurrentLayer);
 			fWindowLayer->GetDrawingEngine()->SetHighColor(c);
 			break;
 		}
@@ -1866,7 +1864,6 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			link.Read(&c, sizeof(rgb_color));
 
 			fCurrentLayer->CurrentState()->SetLowColor(RGBColor(c));
-//			_UpdateDrawState(fCurrentLayer);
 			fWindowLayer->GetDrawingEngine()->SetLowColor(c);
 			break;
 		}
@@ -1878,7 +1875,6 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			link.Read(&pat, sizeof(pattern));
 
 			fCurrentLayer->CurrentState()->SetPattern(Pattern(pat));
-//			_UpdateDrawState(fCurrentLayer);
 			fWindowLayer->GetDrawingEngine()->SetPattern(pat);
 			break;
 		}
@@ -2575,14 +2571,11 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 				&& link.Read(opList, opCount * sizeof(uint32)) >= B_OK
 				&& link.Read(ptList, ptCount * sizeof(BPoint)) >= B_OK) {
 
-				// TODO: I'm not sure If I have to do this here (when the BPicture is
-				// recorded, or inside ServerPicture, when the picture is replayed. 				
 				// This might seem a bit weird, but under R5, the shapes
 				// are always offset by the current pen location
 				BPoint penLocation = fCurrentLayer->CurrentState()->PenLocation();
 				for (int32 i = 0; i < ptCount; i++) {
 					ptList[i] += penLocation;
-					fCurrentLayer->ConvertToScreenForDrawing(&ptList[i]);
 				}
 				const bool fill = (code == AS_FILL_SHAPE);
 				picture->WriteDrawShape(opCount, opList, ptCount, ptList, fill);

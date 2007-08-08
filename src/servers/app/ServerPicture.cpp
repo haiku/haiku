@@ -128,6 +128,7 @@ ShapePainter::Draw(ViewLayer *view, BRect frame, bool filled)
 		for(i = (ptCount - 1);i >= 0;i--) {
 			ptList[i] = fPtStack.top();
 			fPtStack.pop();
+			view->ConvertToScreenForDrawing(&ptList[i]);
 		}
 
 		view->Window()->GetDrawingEngine()->DrawShape(frame, opCount, opList, ptCount, ptList,
@@ -173,16 +174,24 @@ nop()
 static void
 move_pen_by(ViewLayer *view, BPoint delta)
 {
-	view->CurrentState()->SetPenLocation(delta - view->CurrentState()->PenLocation());
+//	view->CurrentState()->SetPenLocation(delta - view->CurrentState()->PenLocation()); ?!?
+	view->CurrentState()->SetPenLocation(view->CurrentState()->PenLocation() + delta);
 }
 
 
 static void
 stroke_line(ViewLayer *view, BPoint start, BPoint end)
 {
+	BPoint penPos = end;
+
 	view->ConvertToScreenForDrawing(&start);
 	view->ConvertToScreenForDrawing(&end);	
 	view->Window()->GetDrawingEngine()->StrokeLine(start, end);
+
+	view->CurrentState()->SetPenLocation(penPos);
+	// the DrawingEngine/Painter does not need to be updated, since this
+	// effects only the view->screen coord conversion, which is handled
+	// by the view only
 }
 
 
@@ -376,13 +385,20 @@ static void
 draw_string(ViewLayer *view, const char *string, float deltaSpace,
 	float deltaNonSpace)
 {
+	// NOTE: the picture data was recorded with a "set pen location" command
+	// inserted before the "draw string" command, so we can use PenLocation()
 	BPoint location = view->CurrentState()->PenLocation();
+
 	escapement_delta delta = {deltaSpace, deltaNonSpace };
 	view->ConvertToScreenForDrawing(&location);
 	view->Window()->GetDrawingEngine()->DrawString(string, strlen(string),
 		location, &delta);
-	// TODO: Update pen location ?
-	
+
+	view->ConvertFromScreenForDrawing(&location);
+	view->CurrentState()->SetPenLocation(location);
+	// the DrawingEngine/Painter does not need to be updated, since this
+	// effects only the view->screen coord conversion, which is handled
+	// by the view only
 }
 
 
@@ -482,12 +498,9 @@ static void
 set_pen_location(ViewLayer *view, BPoint pt)
 {
 	view->CurrentState()->SetPenLocation(pt);
-
-	// TODO: faster version
-	IntPoint p = view->ScrollingOffset();
-	p += IntPoint(view->CurrentState()->Origin());
-	view->Window()->GetDrawingEngine()->SetDrawState(
-		view->CurrentState(), p.x, p.y);
+	// the DrawingEngine/Painter does not need to be updated, since this
+	// effects only the view->screen coord conversion, which is handled
+	// by the view only
 }
 
 
@@ -546,6 +559,9 @@ static void
 set_scale(ViewLayer *view, float scale)
 {
 	view->CurrentState()->SetScale(scale);
+	// the DrawingEngine/Painter does not need to be updated, since this
+	// effects only the view->screen coord conversion, which is handled
+	// by the view only
 }
 
 
