@@ -68,6 +68,8 @@ private:
 	BBox*		fJobsBox;
 
 	PrinterItem* fSelectedPrinter;
+	
+	bool fAddingPrinter;
 };
 
 #endif

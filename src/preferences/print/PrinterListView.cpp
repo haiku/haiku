@@ -84,8 +84,8 @@ PrinterListView::AttachedToWindow()
 {
 	Inherited::AttachedToWindow();
 
-	SetSelectionMessage(new BMessage(MSG_PRINTER_SELECTED));
-	SetInvocationMessage(new BMessage(MSG_MKDEF_PRINTER));
+	SetSelectionMessage(new BMessage(kMsgPrinterSelected));
+	SetInvocationMessage(new BMessage(kMsgMakeDefaultPrinter));
 	SetTarget(Window());	
 
 	BPath path;	

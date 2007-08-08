@@ -28,9 +28,9 @@
 
 #include "Printers.h"
 
-#ifndef PRINTERSWINDOW_H
-	#include "PrintersWindow.h"
-#endif
+#include "pr_server.h"
+#include "Messages.h"
+#include "PrintersWindow.h"
 
 int main()
 {
@@ -51,12 +51,16 @@ void PrintersApp::ReadyToRun()
 }
 
 void PrintersApp::MessageReceived(BMessage* msg) {
-	if (msg->what == B_PRINTER_CHANGED) {
+	if (msg->what == B_PRINTER_CHANGED || msg->what == PRINTERS_ADD_PRINTER) {
 			// broadcast message
+		uint32 what = msg->what;
+		if (what == PRINTERS_ADD_PRINTER)
+			what = kMsgAddPrinter;
+
 		BWindow* w;
 		for (int32 i = 0; (w = WindowAt(i)) != NULL; i ++) {
 			BMessenger msgr(NULL, w);
-			msgr.SendMessage(B_PRINTER_CHANGED);
+			msgr.SendMessage(what);
 		}
 	} else {
 		BApplication::MessageReceived(msg);

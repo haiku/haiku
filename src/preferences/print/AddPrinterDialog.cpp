@@ -12,6 +12,7 @@
 #include "PrinterListView.h"
 #include "pr_server.h"
 #include "Globals.h"
+#include "Messages.h"
 
 #include <Box.h>
 #include <Button.h>
@@ -26,21 +27,22 @@
 #include <StorageKit.h>
 
 
-status_t
-AddPrinterDialog::Start()
-{
-	new AddPrinterDialog();
-	return B_OK;
-}
-
-
-AddPrinterDialog::AddPrinterDialog()
+AddPrinterDialog::AddPrinterDialog(BWindow *parent)
 	: Inherited(BRect(78.0, 71.0, 400, 300), "Add Printer",
 		B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL, B_NOT_ZOOMABLE)
+	, fPrintersPrefletMessenger(parent)
 {
 	BuildGUI(0);
 
 	Show();
+}
+
+
+bool
+AddPrinterDialog::QuitRequested()
+{
+	fPrintersPrefletMessenger.SendMessage(kMsgAddPrinterClosed);
+	return Inherited::QuitRequested();
 }
 
 

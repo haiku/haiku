@@ -23,7 +23,9 @@ class AddPrinterDialog : public BWindow
 		typedef BWindow Inherited;
 	
 	public:
-		static status_t Start();
+		AddPrinterDialog(BWindow *parent);
+		
+		bool QuitRequested();
 	
 	private:
 		enum MessageKind {
@@ -32,7 +34,6 @@ class AddPrinterDialog : public BWindow
 			kNameChangedMsg,
 		};
 	
-		AddPrinterDialog();
 		void MessageReceived(BMessage *msg);
 	
 		void AddPrinter(BMessage *msg);
@@ -44,6 +45,8 @@ class AddPrinterDialog : public BWindow
 		void AddPortSubMenu(BMenu *menu, const char *transport, const char *port);
 		void Update();
 		
+		BMessenger fPrintersPrefletMessenger;
+
 		BTextControl *fName;
 		BPopUpMenu *fPrinter;
 		BPopUpMenu *fTransport;
@@ -52,7 +55,7 @@ class AddPrinterDialog : public BWindow
 		BString fNameText;
 		BString fPrinterText;
 		BString fTransportText;
-		BString fTransportPathText;
+		BString fTransportPathText;		
 };
 
 #endif

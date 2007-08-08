@@ -47,6 +47,7 @@
 PrintersWindow::PrintersWindow(BRect frame)
 	: Inherited(BRect(78.0, 71.0, 561.0, 409.0), "Printers", B_TITLED_WINDOW, B_NOT_H_RESIZABLE)
 	, fSelectedPrinter(NULL)
+	, fAddingPrinter(false)
 {
 	BuildGUI();
 }
@@ -65,7 +66,7 @@ void PrintersWindow::MessageReceived(BMessage* msg)
 {
 	switch(msg->what)
 	{
-		case MSG_PRINTER_SELECTED:
+		case kMsgPrinterSelected:
 			{
 				fSelectedPrinter = fPrinterListView->SelectedItem();
 				if (fSelectedPrinter)
@@ -88,18 +89,25 @@ void PrintersWindow::MessageReceived(BMessage* msg)
 			}
 			break;
 
-		case MSG_ADD_PRINTER:
-			AddPrinterDialog::Start();
+		case kMsgAddPrinter:
+			if (!fAddingPrinter) {
+				fAddingPrinter = true;
+				new AddPrinterDialog(this);
+			}
+			break;
+	
+		case kMsgAddPrinterClosed:
+			fAddingPrinter = false;
 			break;
 
-		case MSG_REMOVE_PRINTER:
+		case kMsgRemovePrinter:
 			{
 				fSelectedPrinter = fPrinterListView->SelectedItem();
 				if (fSelectedPrinter) fSelectedPrinter->Remove(fPrinterListView);
 			}
 			break;
 
-		case MSG_MKDEF_PRINTER:
+		case kMsgMakeDefaultPrinter:
 			{
 				int32 prIndex = fPrinterListView->CurrentSelection();
 				if (prIndex >= 0)
@@ -121,13 +129,13 @@ void PrintersWindow::MessageReceived(BMessage* msg)
 			break;
 
 
-		case MSG_CANCEL_JOB: fJobListView->CancelJob();
+		case kMsgCancelJob: fJobListView->CancelJob();
 			break;
 
-		case MSG_RESTART_JOB: fJobListView->RestartJob();
+		case kMsgRestartJob: fJobListView->RestartJob();
 			break;
 
-		case MSG_JOB_SELECTED: UpdateJobButtons();
+		case kMsgJobSelected: UpdateJobButtons();
 			break;
 
 		case B_PRINTER_CHANGED:
@@ -162,14 +170,14 @@ void PrintersWindow::BuildGUI()
 	float maxWidth = 0;
 
 		// Add Button
-	BButton* addButton = new BButton(BRect(5,5,5,5), "add", "Add " B_UTF8_ELLIPSIS, new BMessage(MSG_ADD_PRINTER), B_FOLLOW_RIGHT);
+	BButton* addButton = new BButton(BRect(5,5,5,5), "add", "Add " B_UTF8_ELLIPSIS, new BMessage(kMsgAddPrinter), B_FOLLOW_RIGHT);
 	printersBox->AddChild(addButton);
 	addButton->ResizeToPreferred();
 
 	maxWidth = addButton->Bounds().Width();
 
 		// Remove button
-	fRemove = new BButton(BRect(5,30,5,30), "remove", "Remove", new BMessage(MSG_REMOVE_PRINTER), B_FOLLOW_RIGHT);
+	fRemove = new BButton(BRect(5,30,5,30), "remove", "Remove", new BMessage(kMsgRemovePrinter), B_FOLLOW_RIGHT);
 	printersBox->AddChild(fRemove);
 	fRemove->ResizeToPreferred();
 
@@ -177,7 +185,7 @@ void PrintersWindow::BuildGUI()
 		maxWidth = fRemove->Bounds().Width();
 
 		// Make Default button
-	fMakeDefault = new BButton(BRect(5,60,5,60), "default", "Make Default", new BMessage(MSG_MKDEF_PRINTER), B_FOLLOW_RIGHT);
+	fMakeDefault = new BButton(BRect(5,60,5,60), "default", "Make Default", new BMessage(kMsgMakeDefaultPrinter), B_FOLLOW_RIGHT);
 	printersBox->AddChild(fMakeDefault);
 	fMakeDefault->ResizeToPreferred();
 
@@ -217,7 +225,7 @@ void PrintersWindow::BuildGUI()
 	backdrop->AddChild(fJobsBox);
 
 		// Cancel Job Button
-	BButton* cancelButton = new BButton(BRect(5,5,5,5), "cancel", "Cancel Job", new BMessage(MSG_CANCEL_JOB), B_FOLLOW_RIGHT+B_FOLLOW_TOP);
+	BButton* cancelButton = new BButton(BRect(5,5,5,5), "cancel", "Cancel Job", new BMessage(kMsgCancelJob), B_FOLLOW_RIGHT+B_FOLLOW_TOP);
 	fJobsBox->AddChild(cancelButton);
 	cancelButton->ResizeToPreferred();
 	fCancel = cancelButton;
@@ -225,7 +233,7 @@ void PrintersWindow::BuildGUI()
 	maxWidth = cancelButton->Bounds().Width();
 
 		// Restart Job button
-	BButton* restartButton = new BButton(BRect(5,30,5,30), "restart", "Restart Job", new BMessage(MSG_RESTART_JOB), B_FOLLOW_RIGHT+B_FOLLOW_TOP);
+	BButton* restartButton = new BButton(BRect(5,30,5,30), "restart", "Restart Job", new BMessage(kMsgRestartJob), B_FOLLOW_RIGHT+B_FOLLOW_TOP);
 	fJobsBox->AddChild(restartButton);
 	restartButton->ResizeToPreferred();
 	fRestart = restartButton;

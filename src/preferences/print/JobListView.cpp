@@ -50,7 +50,7 @@ void JobListView::AttachedToWindow()
 {
 	Inherited::AttachedToWindow();
 
-	SetSelectionMessage(new BMessage(MSG_JOB_SELECTED));
+	SetSelectionMessage(new BMessage(kMsgJobSelected));
 	SetTarget(Window());	
 }
 

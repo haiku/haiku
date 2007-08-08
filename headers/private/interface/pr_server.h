@@ -49,6 +49,9 @@
 #define PSRV_PRINT_SPOOLED_JOB				'psns'
 #define PSRV_GET_DEFAULT_SETTINGS      'pdef'
 
+// messages sent to Printers preflet
+#define PRINTERS_ADD_PRINTER				'addp'
+
 // mime file types
 #define PSRV_PRINTER_FILETYPE		"application/x-vnd.Be.printer"
 #define PSRV_SPOOL_FILETYPE			"application/x-vnd.Be.printer-spool"
