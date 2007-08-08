@@ -522,6 +522,7 @@ PRINT(("  fOwnerCount now: %ld\n", fOwnerCount));
 	if (fOwnerCount == 0) {
 		//	Set fOwner to invalid thread_id (< 0)
 		fOwner = -1;
+		fCachedStack = 0;
 
 #if DEBUG < 1
 		//	Decrement requested lock count (using fAtomicCount for this)
@@ -935,6 +936,7 @@ void
 BLooper::_InitData(const char *name, int32 priority, int32 portCapacity)
 {
 	fOwner = B_ERROR;
+	fCachedStack = 0;
 	fRunCalled = false;
 	fDirectTarget = new (std::nothrow) BPrivate::BDirectMessageTarget();
 	fCommonFilters = NULL;
@@ -1401,6 +1403,7 @@ BLooper::UnlockFully()
 	fOwnerCount = 0;
 	// Nobody owns the lock now
 	fOwner = -1;
+	fCachedStack = 0;
 #if DEBUG < 1
 	// There is now one less thread holding a lock on this looper
 	int32 atomicCount = atomic_add(&fAtomicCount, -1);
