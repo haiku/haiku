@@ -233,8 +233,9 @@ bool PCL6Driver::startPage(int)
 	if (getJobData()->getPrintStyle() == JobData::kSimplex) {
 		fWriter->BeginPage(orientation, mediaSize, mediaSource);
 	} else if (getJobData()->getPrintStyle() == JobData::kDuplex) {
+		// TODO move duplex binding option to UI
 		fWriter->BeginPage(orientation, mediaSize, mediaSource, 
-			PCL6Writer::kDuplexHorizontalBinding, fMediaSide);
+			PCL6Writer::kDuplexVerticalBinding, fMediaSide);
 
 		if (fMediaSide == PCL6Writer::kFrontMediaSide) {
 			fMediaSide = PCL6Writer::kBackMediaSide;
