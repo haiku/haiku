@@ -12,6 +12,7 @@
 
 #include <Handler.h>
 #include <InputServerDevice.h>
+#include <Locker.h>
 #include <List.h>
 
 #include <stdio.h>
@@ -74,6 +75,7 @@ class KeyboardInputDevice : public BInputServerDevice {
 		BList fDevices;
 		Keymap	fKeymap;
 		TMWindow *fTMWindow;
+		BLocker	fKeymapLock;
 };
 
 extern "C" BInputServerDevice *instantiate_input_device();

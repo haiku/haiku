@@ -8,6 +8,7 @@
 #include "kb_mouse_driver.h"
 
 #include <Application.h>
+#include <Autolock.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <NodeMonitor.h>
@@ -365,7 +366,8 @@ get_short_name(const char *longName)
 
 KeyboardInputDevice::KeyboardInputDevice()
 	:
-	fTMWindow(NULL)
+	fTMWindow(NULL),
+	fKeymapLock("keymap lock")
 {
 #if DEBUG
 	if (sLogFile == NULL)
@@ -428,7 +430,8 @@ KeyboardInputDevice::_InitFromSettings(void *cookie, uint32 opcode)
 
 	if (opcode == 0 
 		|| opcode == B_KEY_MAP_CHANGED 
-		|| opcode == B_KEY_LOCKS_CHANGED) {	
+		|| opcode == B_KEY_LOCKS_CHANGED) {
+		BAutolock lock(fKeymapLock);
 		fKeymap.LoadCurrent();
 		device->modifiers = fKeymap.Locks();
 		_SetLeds(device);
@@ -696,6 +699,8 @@ KeyboardInputDevice::_DeviceWatcher(void *arg)
 					LOG("KB_CANCEL_CONTROL_ALT_DEL : OK\n");
 			}
 		}
+
+		BAutolock lock(owner->fKeymapLock);
 
 		uint32 modifiers = keymap->Modifier(keycode);
 		if (modifiers 
