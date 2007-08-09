@@ -116,9 +116,7 @@ FontCacheEntry::~FontCacheEntry()
 bool
 FontCacheEntry::Init(const ServerFont& font)
 {
-	glyph_rendering renderingType = glyph_ren_native_gray8;
-	if (font.Rotation() != 0.0 || font.Shear() != 90.0)
-		renderingType = glyph_ren_outline;
+	glyph_rendering renderingType = _RenderTypeFor(font);
 
 	// TODO: encoding from font
 	FT_Encoding charMap = FT_ENCODING_NONE;
@@ -211,18 +209,13 @@ FontCacheEntry::GetKerning(uint16 glyphCode1, uint16 glyphCode2,
 /*static*/ void
 FontCacheEntry::GenerateSignature(char* signature, const ServerFont& font)
 {
-	glyph_rendering renderingType = glyph_ren_native_gray8;
-	if (font.Rotation() != 0.0 || font.Shear() != 90.0
-		|| font.Flags() & B_DISABLE_ANTIALIASING
-		|| font.Size() > 30) {
-		renderingType = glyph_ren_outline;
-	}
+	glyph_rendering renderingType = _RenderTypeFor(font);
 
 	// TODO: read more of these from the font
 	FT_Encoding charMap = FT_ENCODING_NONE;
 	bool hinting = true; // TODO: font.Hinting();
 
-	sprintf(signature, "%ld%u%d%d%.1f%d",
+	sprintf(signature, "%ld,%u,%d,%d,%.1f,%d",
 		font.GetFamilyAndStyle(), charMap,
 		font.Face(), int(renderingType), font.Size(), hinting);
 }
@@ -242,3 +235,15 @@ FontCacheEntry::UpdateUsage()
 	fUseCounter++;
 }
 
+// _RenderTypeFor
+/*static*/ glyph_rendering
+FontCacheEntry::_RenderTypeFor(const ServerFont& font)
+{
+	glyph_rendering renderingType = glyph_ren_native_gray8;
+	if (font.Rotation() != 0.0 || font.Shear() != 90.0
+		|| font.Flags() & B_DISABLE_ANTIALIASING
+		|| font.Size() > 30) {
+		renderingType = glyph_ren_outline;
+	}
+	return renderingType;
+}

@@ -104,6 +104,8 @@ class FontCacheEntry : public MultiLocker, public Referenceable {
 								FontCacheEntry(const FontCacheEntry&);
 			const FontCacheEntry& operator=(const FontCacheEntry&);
 
+	static	glyph_rendering		_RenderTypeFor(const ServerFont& font);
+
 			class GlyphCachePool;
 
 			GlyphCachePool*		fGlyphCache;
