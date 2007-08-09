@@ -563,7 +563,11 @@ WindowLayer::GetEffectiveDrawingRegion(ViewLayer* layer, BRegion& region)
 {
 	if (!fEffectiveDrawingRegionValid) {
 		fEffectiveDrawingRegion = VisibleContentRegion();
-		if (fInUpdate) {
+		if (fUpdateRequested && !fInUpdate) {
+			// we requested an update, but the client has not started it yet,
+			// so it is only allowed to draw outside the pending update sessions region
+			fEffectiveDrawingRegion.Exclude(&fPendingUpdateSession.DirtyRegion());
+		} else if (fInUpdate) {
 			// enforce the dirty region of the update session
 			fEffectiveDrawingRegion.IntersectWith(&fCurrentUpdateSession.DirtyRegion());
 		} else {
@@ -1828,10 +1832,16 @@ WindowLayer::_TransferToUpdateSession(BRegion* contentDirtyRegion)
 	// this could be done smarter (clip layers from pending
 	// that have not yet been redrawn in the current update
 	// session)
-	if (fCurrentUpdateSession.IsUsed() && fCurrentUpdateSession.IsExpose()) {
-		fCurrentUpdateSession.Exclude(contentDirtyRegion);
-		fEffectiveDrawingRegionValid = false;
-	}
+	// NOTE: appearently the R5 app_server does not do that, it just
+	// keeps drawing until the screen is valid, without caring much
+	// for a consistent display while it does so, it just keeps drawing
+	// until everything settles down. Potentially, this could even give
+	// the impression of faster updates, even though they might look
+	// wrong when looked at closer, but will fix themselves shortly later
+//	if (fCurrentUpdateSession.IsUsed() && fCurrentUpdateSession.IsExpose()) {
+//		fCurrentUpdateSession.Exclude(contentDirtyRegion);
+//		fEffectiveDrawingRegionValid = false;
+//	}
 
 	if (!fUpdateRequested) {
 		// send this to client
@@ -1850,6 +1860,7 @@ WindowLayer::_SendUpdateMessage()
 	ServerWindow()->SendMessageToClient(&message);
 
 	fUpdateRequested = true;
+	fEffectiveDrawingRegionValid = false;
 }
 
 void
