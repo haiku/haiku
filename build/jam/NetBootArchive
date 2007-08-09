@@ -38,7 +38,7 @@ AddFilesToNetBootArchive beos system add-ons kernel console : vga_text ;
 AddFilesToNetBootArchive beos system add-ons kernel file_systems
 	: $(BEOS_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToNetBootArchive beos system add-ons kernel generic
-	: block_io fast_log ide_adapter locked_pool mpu401 scsi_periph ;
+	: block_io fast_log ide_adapter locked_pool scsi_periph ;
 AddFilesToNetBootArchive beos system add-ons kernel partitioning_systems
 	: intel session ;
 AddFilesToNetBootArchive beos system add-ons kernel interrupt_controllers
@@ -82,7 +82,7 @@ AddBootModuleSymlinksToNetBootArchive
 	$(BEOS_ADD_ONS_BUS_MANAGERS)
 	ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112
 	$(BEOS_ADD_ONS_FILE_SYSTEMS)
-	block_io fast_log ide_adapter locked_pool mpu401 scsi_periph
+	block_io fast_log ide_adapter locked_pool scsi_periph
 	intel session
 	$(PPC_ONLY)openpic
 	$(X86_ONLY)generic_x86
