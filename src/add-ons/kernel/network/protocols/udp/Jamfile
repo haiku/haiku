@@ -10,7 +10,8 @@ if $(TARGET_PLATFORM) != haiku {
 		# Unfortunately we get more than we want, namely all POSIX headers.
 }
 
-UsePrivateHeaders kernel net ;
+UsePrivateKernelHeaders ;
+UsePrivateHeaders net ;
 
 KernelAddon udp :
 	udp.cpp

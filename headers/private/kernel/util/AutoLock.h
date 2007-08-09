@@ -6,8 +6,12 @@
 #define KERNEL_UTIL_AUTO_LOCKER_H
 
 
-#include <lock.h>
+#include <KernelExport.h>
+
 #include <shared/AutoLocker.h>
+
+#include <int.h>
+#include <lock.h>
 
 
 namespace BPrivate {
@@ -63,11 +67,60 @@ public:
 // BenaphoreLocker
 typedef AutoLocker<benaphore, BenaphoreLocking> BenaphoreLocker;
 
+// InterruptsLocking
+class InterruptsLocking {
+public:
+	inline bool Lock(int* lockable)
+	{
+		*lockable = disable_interrupts();
+		return true;
+	}
+
+	inline void Unlock(int* lockable)
+	{
+		restore_interrupts(*lockable);
+	}
+};
+
+// InterruptsLocker
+class InterruptsLocker : AutoLocker<int, InterruptsLocking> {
+public:
+	inline InterruptsLocker(bool alreadyLocked = false,
+		bool lockIfNotLocked = true)
+		: AutoLocker<int, InterruptsLocking>(&fState, alreadyLocked,
+			lockIfNotLocked)
+	{
+	}
+
+private:
+	int	fState;
+};
+
+// SpinLocking
+class SpinLocking {
+public:
+	inline bool Lock(spinlock* lockable)
+	{
+		acquire_spinlock(lockable);
+		return true;
+	}
+
+	inline void Unlock(spinlock* lockable)
+	{
+		release_spinlock(lockable);
+	}
+};
+
+// SpinLocker
+typedef AutoLocker<spinlock, SpinLocking> SpinLocker;
+
 }	// namespace BPrivate
 
 using BPrivate::AutoLocker;
 using BPrivate::MutexLocker;
 using BPrivate::RecursiveLocker;
 using BPrivate::BenaphoreLocker;
+using BPrivate::InterruptsLocker;
+using BPrivate::SpinLocker;
 
 #endif	// KERNEL_UTIL_AUTO_LOCKER_H
