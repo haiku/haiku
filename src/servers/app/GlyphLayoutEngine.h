@@ -15,6 +15,7 @@
 #include "FontCacheEntry.h"
 #include "ServerFont.h"
 
+#include <ctype.h>
 
 class FontCacheReference {
  public:
