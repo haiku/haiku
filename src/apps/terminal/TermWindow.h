@@ -54,7 +54,7 @@ protected:
 
 
 private:
-	void		_SetTermColors();
+	void		_SetTermColors(TermView *termView);
 	void		_InitWindow(const char *command);
 	void		_SetupMenu();
 	status_t	_DoPageSetup();

@@ -441,7 +441,7 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 		
 		case MSG_COLOR_CHANGED:
-			_SetTermColors();
+			_SetTermColors(_ActiveTermView());
 			_ActiveTermView()->Invalidate();
 			break;
 		
@@ -487,15 +487,15 @@ TermWindow::QuitRequested()
 
 
 void
-TermWindow::_SetTermColors()
+TermWindow::_SetTermColors(TermView *termView)
 {
-	_ActiveTermView()->SetTextColor(PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR),
+	termView->SetTextColor(PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR),
 				PrefHandler::Default()->getRGB(PREF_TEXT_BACK_COLOR));
 
-	_ActiveTermView()->SetSelectColor(PrefHandler::Default()->getRGB(PREF_SELECT_FORE_COLOR),
+	termView->SetSelectColor(PrefHandler::Default()->getRGB(PREF_SELECT_FORE_COLOR),
 				PrefHandler::Default()->getRGB(PREF_SELECT_BACK_COLOR));
 	
-	_ActiveTermView()->SetCursorColor(PrefHandler::Default()->getRGB(PREF_CURSOR_FORE_COLOR),
+	termView->SetCursorColor(PrefHandler::Default()->getRGB(PREF_CURSOR_FORE_COLOR),
 				PrefHandler::Default()->getRGB(PREF_CURSOR_BACK_COLOR));
 }
 
@@ -600,7 +600,7 @@ TermWindow::_AddTab(const char *command)
 	view->SetEncoding(longname2id(PrefHandler::Default()->getString(PREF_TEXT_ENCODING)));
 	view->SetTermFont(&halfFont, &fullFont);
 	
-	_SetTermColors();
+	_SetTermColors(view);
 	
 	// If it's the first time we're called, setup the window
 	if (fTabView->CountTabs() == 1) {
