@@ -1,11 +1,11 @@
 /***************************************************************************/
 /*                                                                         */
-/*  autofit.c                                                              */
+/*  afindic.h                                                              */
 /*                                                                         */
-/*    Auto-fitter module (body).                                           */
+/*    Auto-fitter hinting routines for Indic scripts (specification).      */
 /*                                                                         */
-/*  Copyright 2003, 2004, 2005, 2006, 2007 by                              */
-/*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+/*  Copyright 2007 by                                                      */
+/*  Rahul Bhalerao <rahul.bhalerao@redhat.com>, <b.rahul.pm@gmail.com>.    */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
 /*  modified, and distributed under the terms of the FreeType project      */
@@ -16,25 +16,26 @@
 /***************************************************************************/
 
 
-#define FT_MAKE_OPTION_SINGLE_OBJECT
-#include <ft2build.h>
-#include "afangles.c"
-#include "afglobal.c"
-#include "afhints.c"
+#ifndef __AFINDIC_H__
+#define __AFINDIC_H__
 
-#include "afdummy.c"
-#include "aflatin.c"
-#ifdef FT_OPTION_AUTOFIT2
-#include "aflatin2.c"
-#endif
-#include "afcjk.c"
-#include "afindic.c"
+#include "afhints.h"
 
-#include "afloader.c"
-#include "afmodule.c"
 
-#ifdef AF_USE_WARPER
-#include "afwarp.c"
-#endif
+FT_BEGIN_HEADER
+
+
+  /* the Indic-specific script class */
+
+  FT_CALLBACK_TABLE const AF_ScriptClassRec
+  af_indic_script_class;
+
+
+/* */
+
+FT_END_HEADER
+
+#endif /* __AFINDIC_H__ */
+
 
 /* END */

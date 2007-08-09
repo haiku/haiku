@@ -1,11 +1,10 @@
 /***************************************************************************/
 /*                                                                         */
-/*  autofit.c                                                              */
+/*  svttglyf.h                                                             */
 /*                                                                         */
-/*    Auto-fitter module (body).                                           */
+/*    The FreeType TrueType glyph service.                                 */
 /*                                                                         */
-/*  Copyright 2003, 2004, 2005, 2006, 2007 by                              */
-/*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+/*  Copyright 2007 by David Turner.                                        */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
 /*  modified, and distributed under the terms of the FreeType project      */
@@ -15,26 +14,35 @@
 /*                                                                         */
 /***************************************************************************/
 
+#ifndef __SVTTGLYF_H__
+#define __SVTTGLYF_H__
 
-#define FT_MAKE_OPTION_SINGLE_OBJECT
-#include <ft2build.h>
-#include "afangles.c"
-#include "afglobal.c"
-#include "afhints.c"
+#include FT_INTERNAL_SERVICE_H
+#include FT_TRUETYPE_TABLES_H
 
-#include "afdummy.c"
-#include "aflatin.c"
-#ifdef FT_OPTION_AUTOFIT2
-#include "aflatin2.c"
-#endif
-#include "afcjk.c"
-#include "afindic.c"
 
-#include "afloader.c"
-#include "afmodule.c"
+FT_BEGIN_HEADER
 
-#ifdef AF_USE_WARPER
-#include "afwarp.c"
-#endif
+
+#define FT_SERVICE_ID_TT_GLYF "tt-glyf"
+
+
+  typedef FT_ULong
+  (*TT_Glyf_GetLocationFunc)( FT_Face    face,
+                              FT_UInt    gindex,
+                              FT_ULong  *psize );
+
+  FT_DEFINE_SERVICE( TTGlyf )
+  {
+    TT_Glyf_GetLocationFunc  get_location;
+  };
+
+  /* */
+
+
+FT_END_HEADER
+
+#endif /* __SVTTGLYF_H__ */
+
 
 /* END */

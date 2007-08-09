@@ -21,7 +21,7 @@ UseFreeTypeHeaders ;
 
   if $(FT2_MULTI)
   {
-    _sources = afangles afglobal afhints aflatin afloader afmodule afdummy afwarp ;
+    _sources = afangles afglobal afhints aflatin afcjk afindic afloader afmodule afdummy afwarp ;
   }
   else
   {
