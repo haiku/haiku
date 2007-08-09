@@ -16,6 +16,7 @@ AddResources kernel_$(TARGET_ARCH) : kernel.rdef ;
 
 KernelMergeObject kernel_core.o :
 	boot_item.cpp
+	condition_variable.cpp
 	cpu.c
 	elf.cpp
 	heap.c
