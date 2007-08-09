@@ -338,6 +338,11 @@ rule UseLegacyObjectHeaders
 	SourceSysHdrs $(1) : [ FDirName $(HAIKU_TOP) headers legacy ] : $(2) ;
 }
 
+rule UsePrivateKernelHeaders
+{
+	UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
+}
+
 rule FStandardOSHeaders
 {
 	local osIncludes = add-ons add-ons/file_system add-ons/graphics
