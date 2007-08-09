@@ -2135,7 +2135,7 @@ _slang_compile(GLcontext *ctx, struct gl_shader *shader)
          progTarget = GL_FRAGMENT_PROGRAM_ARB;
       shader->Programs
          = (struct gl_program **) malloc(sizeof(struct gl_program*));
-      shader->Programs[0] = _mesa_new_program(ctx, progTarget, 1);
+      shader->Programs[0] = ctx->Driver.NewProgram(ctx, progTarget, 1);
       shader->NumPrograms = 1;
 
       shader->Programs[0]->Parameters = _mesa_new_parameter_list();

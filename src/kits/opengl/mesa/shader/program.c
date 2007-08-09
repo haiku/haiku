@@ -333,7 +333,7 @@ _mesa_clone_program(GLcontext *ctx, const struct gl_program *prog)
 {
    struct gl_program *clone;
 
-   clone = _mesa_new_program(ctx, prog->Target, prog->Id);
+   clone = ctx->Driver.NewProgram(ctx, prog->Target, prog->Id);
    if (!clone)
       return NULL;
 

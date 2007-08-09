@@ -145,7 +145,7 @@ public:
     void		newtmeshvert( long, long );
 
 #ifdef _WIN32
-    void 	        putCallBack(GLenum which, void (APIENTRY *fn)() );
+    void 	        putCallBack(GLenum which, void (GLAPIENTRY *fn)() );
 #else
     void 	        putCallBack(GLenum which, _GLUfuncptr fn );
 #endif

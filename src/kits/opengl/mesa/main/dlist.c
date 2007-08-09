@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.1
+ * Version:  7.0.1
  *
- * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -2716,21 +2716,20 @@ save_PolygonMode(GLenum face, GLenum mode)
 }
 
 
-/*
- * Polygon stipple must have been upacked already!
- */
 static void GLAPIENTRY
 save_PolygonStipple(const GLubyte * pattern)
 {
    GET_CURRENT_CONTEXT(ctx);
+   GLvoid *image = unpack_image(2, 32, 32, 1, GL_COLOR_INDEX, GL_BITMAP,
+                                pattern, &ctx->Unpack);
    Node *n;
    ASSERT_OUTSIDE_SAVE_BEGIN_END_AND_FLUSH(ctx);
    n = ALLOC_INSTRUCTION(ctx, OPCODE_POLYGON_STIPPLE, 1);
    if (n) {
-      void *data;
-      n[1].data = _mesa_malloc(32 * 4);
-      data = n[1].data;         /* This needed for Acorn compiler */
-      MEMCPY(data, pattern, 32 * 4);
+      n[1].data = image; 
+   }
+   else if (image) {
+      _mesa_free(image);
    }
    if (ctx->ExecuteFlag) {
       CALL_PolygonStipple(ctx->Exec, ((GLubyte *) pattern));
@@ -6169,7 +6168,12 @@ execute_list(GLcontext *ctx, GLuint list)
             CALL_PolygonMode(ctx->Exec, (n[1].e, n[2].e));
             break;
          case OPCODE_POLYGON_STIPPLE:
-            CALL_PolygonStipple(ctx->Exec, ((GLubyte *) n[1].data));
+            {
+               const struct gl_pixelstore_attrib save = ctx->Unpack;
+               ctx->Unpack = ctx->DefaultPacking;
+               CALL_PolygonStipple(ctx->Exec, ((GLubyte *) n[1].data));
+               ctx->Unpack = save;      /* restore */
+            }
             break;
          case OPCODE_POLYGON_OFFSET:
             CALL_PolygonOffset(ctx->Exec, (n[1].f, n[2].f));

@@ -104,12 +104,7 @@ static LONG WINAPI ExceptionFilter(LPEXCEPTION_POINTERS exp)
 
 static void check_os_sse_support( void )
 {
-#if defined(__linux__)
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,4,0)
-   _mesa_debug(NULL, "Cannot safely enable SSE on pre-2.4 kernels.\n");
-   _mesa_x86_cpu_features &= ~(X86_FEATURE_XMM);
-#endif
-#elif defined(__FreeBSD__)
+#if defined(__FreeBSD__)
    {
       int ret, enabled;
       unsigned int len;
@@ -160,7 +155,7 @@ static void check_os_sse_support( void )
    /* Do nothing on other platforms for now.
     */
    _mesa_debug(NULL, "Not testing OS support for SSE, leaving enabled.\n");
-#endif /* __linux__ */
+#endif /* __FreeBSD__ */
 }
 
 #endif /* USE_SSE_ASM */

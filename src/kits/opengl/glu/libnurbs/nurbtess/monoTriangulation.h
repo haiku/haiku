@@ -43,10 +43,9 @@
 #include "definitions.h"
 #include "primitiveStream.h"
 #include "directedLine.h"
+#include "arc.h"
 
 class Backend;
-class Arc;
-typedef Arc *Arc_ptr;
 
 class reflexChain{
   Real2 *queue; 

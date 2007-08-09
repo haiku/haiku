@@ -27,7 +27,7 @@
 #include "context.h"
 #include "slang_ir.h"
 #include "slang_mem.h"
-#include "prog_print.h"
+#include "shader/prog_print.h"
 
 
 static const slang_ir_info IrInfo[] = {
@@ -311,7 +311,7 @@ _slang_print_ir_tree(const slang_ir_node *n, int indent)
       printf("RETURN\n");
       break;
    case IR_CALL:
-      printf("CALL\n");
+      printf("CALL %s\n", n->Label->Name);
       break;
 
    case IR_LOOP:

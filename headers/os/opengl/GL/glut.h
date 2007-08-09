@@ -10,6 +10,10 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+#if defined(__MINGW32__)
+#include <GL/mesa_wgl.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -115,7 +119,7 @@ extern _CRTIMP void __cdecl exit(int);
 #endif
 
 /* GLUT API entry point declarations for Win32. */
-#if defined(GLUT_BUILDING_LIB) && defined(_DLL)
+#if (defined(BUILD_GLUT32) || defined(GLUT_BUILDING_LIB)) && defined(_DLL)
 # 	define GLUTAPI __declspec(dllexport)
 #elif defined(_DLL)
 #   define GLUTAPI __declspec(dllimport)
@@ -130,9 +134,12 @@ extern _CRTIMP void __cdecl exit(int);
 #		pragma message( "----: being multiply defined you should include WINDOWS.H priot to gl/glut.h" )
 #	endif
 #	define CALLBACK __stdcall
-typedef int (GLUTAPIENTRY *PROC)();
-typedef void *HGLRC;
-typedef void *HDC;
+
+#if !defined(__MINGW32__)
+	typedef int (GLUTAPIENTRY *PROC)();
+	typedef void *HGLRC;
+	typedef void *HDC;
+#endif
 typedef unsigned long COLORREF;
 #endif
 

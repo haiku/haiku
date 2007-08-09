@@ -62,8 +62,6 @@ typedef enum
    IR_RETURN,    /* return from subroutine */
    IR_CALL,      /* call subroutine */
 
-   IR_FUNC,      /* inlined function code */
-
    IR_LOOP,      /* high-level loop-begin / loop-end */
                  /* Children[0] = loop body */
                  /* Children[1] = loop tail code, or NULL */

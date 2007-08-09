@@ -1,6 +1,6 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.3
+ * Version:  7.1
  *
  * Copyright (C) 2005-2007  Brian Paul   All Rights Reserved.
  *
@@ -37,13 +37,13 @@
 
 
 
-#include "imports.h"
-#include "macros.h"
-#include "mtypes.h"
-#include "program.h"
-#include "prog_instruction.h"
-#include "prog_parameter.h"
-#include "prog_statevars.h"
+#include "main/imports.h"
+#include "main/macros.h"
+#include "main/mtypes.h"
+#include "shader/program.h"
+#include "shader/prog_instruction.h"
+#include "shader/prog_parameter.h"
+#include "shader/prog_statevars.h"
 #include "slang_typeinfo.h"
 #include "slang_codegen.h"
 #include "slang_compile.h"
@@ -536,7 +536,7 @@ new_not(slang_ir_node *n)
 static slang_ir_node *
 new_inlined_function_call(slang_ir_node *code, slang_label *name)
 {
-   slang_ir_node *n = new_node1(IR_FUNC, code);
+   slang_ir_node *n = new_node1(IR_CALL, code);
    assert(name);
    if (n)
       n->Label = name;
@@ -1202,17 +1202,29 @@ _slang_gen_function_call(slang_assemble_ctx *A, slang_function *fun,
       /* non-assembly function */
       inlined = slang_inline_function_call(A, fun, oper, dest);
       if (inlined && _slang_find_node_type(inlined, SLANG_OPER_RETURN)) {
-         /* This inlined function has one or more 'return' statements.
+         slang_operation *callOper;
+         /* The function we're calling has one or more 'return' statements.
           * So, we can't truly inline this function because we need to
           * implement 'return' with RET (and CAL).
+          * Nevertheless, we performed "inlining" to make a new instance
+          * of the function body to deal with static register allocation.
+          *
           * XXX check if there's one 'return' and if it's the very last
           * statement in the function - we can optimize that case.
           */
          assert(inlined->type == SLANG_OPER_BLOCK_NEW_SCOPE ||
                 inlined->type == SLANG_OPER_SEQUENCE);
-         inlined->type = SLANG_OPER_INLINED_CALL;
-         inlined->fun = fun;
-         inlined->label = _slang_label_new_unique((char*) fun->header.a_name);
+         if (_slang_function_has_return_value(fun) && !dest) {
+            assert(inlined->children[0].type == SLANG_OPER_VARIABLE_DECL);
+            assert(inlined->children[2].type == SLANG_OPER_IDENTIFIER);
+            callOper = &inlined->children[1];
+         }
+         else {
+            callOper = inlined;
+         }
+         callOper->type = SLANG_OPER_INLINED_CALL;
+         callOper->fun = fun;
+         callOper->label = _slang_label_new_unique((char*) fun->header.a_name);
       }
    }
 
@@ -1261,15 +1273,23 @@ make_writemask(const char *field)
    while (*field) {
       switch (*field) {
       case 'x':
+      case 's':
+      case 'r':
          mask |= WRITEMASK_X;
          break;
       case 'y':
+      case 't':
+      case 'g':
          mask |= WRITEMASK_Y;
          break;
       case 'z':
+      case 'p':
+      case 'b':
          mask |= WRITEMASK_Z;
          break;
       case 'w':
+      case 'q':
+      case 'a':
          mask |= WRITEMASK_W;
          break;
       default:
@@ -1941,8 +1961,7 @@ static slang_ir_node *
 _slang_gen_return(slang_assemble_ctx * A, slang_operation *oper)
 {
    const GLboolean haveReturnValue
-      = (oper->num_children == 1 &&
-         oper->children[0].type != SLANG_OPER_VOID);
+      = (oper->num_children == 1 && oper->children[0].type != SLANG_OPER_VOID);
 
    /* error checking */
    assert(A->CurFunction);
@@ -1952,7 +1971,7 @@ _slang_gen_return(slang_assemble_ctx * A, slang_operation *oper)
       return NULL;
    }
    else if (!haveReturnValue &&
-       A->CurFunction->header.type.specifier.type != SLANG_SPEC_VOID) {
+            A->CurFunction->header.type.specifier.type != SLANG_SPEC_VOID) {
       slang_info_log_error(A->log, "return statement requires an expression");
       return NULL;
    }
@@ -2037,7 +2056,8 @@ _slang_gen_declaration(slang_assemble_ctx *A, slang_operation *oper)
       }
       /* XXX make copy of this initializer? */
       rhs = _slang_gen_operation(A, &oper->children[0]);
-      assert(rhs);
+      if (!rhs)
+         return NULL;  /* must have found an error */
       init = new_node2(IR_MOVE, var, rhs);
       /*assert(rhs->Opcode != IR_SEQ);*/
       n = new_seq(varDecl, init);
@@ -2228,7 +2248,9 @@ _slang_gen_assignment(slang_assemble_ctx * A, slang_operation *oper)
       }
       if (var->type.qualifier == SLANG_QUAL_CONST ||
           var->type.qualifier == SLANG_QUAL_ATTRIBUTE ||
-          var->type.qualifier == SLANG_QUAL_UNIFORM) {
+          var->type.qualifier == SLANG_QUAL_UNIFORM ||
+          (var->type.qualifier == SLANG_QUAL_VARYING &&
+           A->program->Target == GL_FRAGMENT_PROGRAM_ARB)) {
          slang_info_log_error(A->log,
                               "illegal assignment to read-only variable '%s'",
                               (char *) oper->children[0].a_id);
@@ -2256,10 +2278,11 @@ _slang_gen_assignment(slang_assemble_ctx * A, slang_operation *oper)
       lhs = _slang_gen_operation(A, &oper->children[0]);
 
       if (lhs) {
-         if (lhs->Store->File != PROGRAM_OUTPUT &&
-             lhs->Store->File != PROGRAM_TEMPORARY &&
-             lhs->Store->File != PROGRAM_VARYING &&
-             lhs->Store->File != PROGRAM_UNDEFINED) {
+         if (!(lhs->Store->File == PROGRAM_OUTPUT ||
+               lhs->Store->File == PROGRAM_TEMPORARY ||
+               (lhs->Store->File == PROGRAM_VARYING &&
+                A->program->Target == GL_VERTEX_PROGRAM_ARB) ||
+               lhs->Store->File == PROGRAM_UNDEFINED)) {
             slang_info_log_error(A->log,
                                  "illegal assignment to read-only l-value");
             return NULL;
@@ -2320,7 +2343,8 @@ _slang_gen_field(slang_assemble_ctx * A, slang_operation *oper)
          n = _slang_gen_swizzle(n, swizzle);
       return n;
    }
-   else if (ti.spec.type == SLANG_SPEC_FLOAT) {
+   else if (   ti.spec.type == SLANG_SPEC_FLOAT
+            || ti.spec.type == SLANG_SPEC_INT) {
       const GLuint rows = 1;
       slang_swizzle swz;
       slang_ir_node *n;

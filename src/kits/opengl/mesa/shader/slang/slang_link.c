@@ -329,8 +329,10 @@ _slang_resolve_attributes(struct gl_shader_program *shProg,
                 * glVertex/position.
                 */
                for (attr = 1; attr < MAX_VERTEX_ATTRIBS; attr++) {
-                  if (((1 << attr) & usedAttributes) == 0)
+                  if (((1 << attr) & usedAttributes) == 0) {
+                     usedAttributes |= (1 << attr);
                      break;
+                  }
                }
                if (attr == MAX_VERTEX_ATTRIBS) {
                   /* too many!  XXX record error log */

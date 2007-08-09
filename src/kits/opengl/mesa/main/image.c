@@ -1,6 +1,6 @@
 /*
  * Mesa 3-D graphics library
- * Version:  7.0
+ * Version:  7.0.1
  *
  * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
@@ -850,7 +850,7 @@ _mesa_unpack_bitmap( GLint width, GLint height, const GLubyte *pixels,
          return NULL;
       }
 
-      if (packing->SkipPixels == 0) {
+      if ((packing->SkipPixels & 7) == 0) {
          _mesa_memcpy( dst, src, width_in_bytes );
          if (packing->LsbFirst) {
             flip_bytes( dst, width_in_bytes );
@@ -942,7 +942,7 @@ _mesa_pack_bitmap( GLint width, GLint height, const GLubyte *source,
       if (!dst)
          return;
 
-      if (packing->SkipPixels == 0) {
+      if ((packing->SkipPixels & 7) == 0) {
          _mesa_memcpy( dst, src, width_in_bytes );
          if (packing->LsbFirst) {
             flip_bytes( dst, width_in_bytes );
@@ -961,20 +961,20 @@ _mesa_pack_bitmap( GLint width, GLint height, const GLubyte *source,
                if (*s & srcMask) {
                   *d |= dstMask;
                }
-               if (srcMask == 128) {
-                  srcMask = 1;
+               if (srcMask == 1) {
+                  srcMask = 128;
                   s++;
                }
                else {
-                  srcMask = srcMask << 1;
+                  srcMask = srcMask >> 1;
                }
-               if (dstMask == 1) {
-                  dstMask = 128;
+               if (dstMask == 128) {
+                  dstMask = 1;
                   d++;
                   *d = 0;
                }
                else {
-                  dstMask = dstMask >> 1;
+                  dstMask = dstMask << 1;
                }
             }
          }
@@ -3648,11 +3648,13 @@ _mesa_unpack_stencil_span( const GLcontext *ctx, GLuint n,
     * Try simple cases first
     */
    if (transferOps == 0 &&
+       !ctx->Pixel.MapStencilFlag &&
        srcType == GL_UNSIGNED_BYTE &&
        dstType == GL_UNSIGNED_BYTE) {
       _mesa_memcpy(dest, source, n * sizeof(GLubyte));
    }
    else if (transferOps == 0 &&
+            !ctx->Pixel.MapStencilFlag &&
             srcType == GL_UNSIGNED_INT &&
             dstType == GL_UNSIGNED_INT &&
             !srcPacking->SwapBytes) {
@@ -3668,19 +3670,17 @@ _mesa_unpack_stencil_span( const GLcontext *ctx, GLuint n,
       extract_uint_indexes(n, indexes, GL_STENCIL_INDEX, srcType, source,
                            srcPacking);
 
-      if (transferOps) {
-         if (transferOps & IMAGE_SHIFT_OFFSET_BIT) {
-            /* shift and offset indexes */
-            shift_and_offset_ci(ctx, n, indexes);
-         }
+      if (transferOps & IMAGE_SHIFT_OFFSET_BIT) {
+         /* shift and offset indexes */
+         shift_and_offset_ci(ctx, n, indexes);
+      }
 
-         if (ctx->Pixel.MapStencilFlag) {
-            /* Apply stencil lookup table */
-            GLuint mask = ctx->PixelMaps.StoS.Size - 1;
-            GLuint i;
-            for (i=0;i<n;i++) {
-               indexes[i] = ctx->PixelMaps.StoS.Map[ indexes[i] & mask ];
-            }
+      if (ctx->Pixel.MapStencilFlag) {
+         /* Apply stencil lookup table */
+         const GLuint mask = ctx->PixelMaps.StoS.Size - 1;
+         GLuint i;
+         for (i = 0; i < n; i++) {
+            indexes[i] = ctx->PixelMaps.StoS.Map[ indexes[i] & mask ];
          }
       }
 
@@ -3733,7 +3733,7 @@ _mesa_pack_stencil_span( const GLcontext *ctx, GLuint n,
 
    switch (dstType) {
    case GL_UNSIGNED_BYTE:
-      if (sizeof(GLstencil) == 8) {
+      if (sizeof(GLstencil) == 1) {
          _mesa_memcpy( dest, source, n );
       }
       else {
@@ -3745,14 +3745,11 @@ _mesa_pack_stencil_span( const GLcontext *ctx, GLuint n,
       }
       break;
    case GL_BYTE:
-      if (sizeof(GLstencil) == 8) {
-         _mesa_memcpy( dest, source, n );
-      }
-      else {
+      {
          GLbyte *dst = (GLbyte *) dest;
          GLuint i;
          for (i=0;i<n;i++) {
-            dst[i] = (GLbyte) source[i];
+            dst[i] = (GLbyte) (source[i] & 0x7f);
          }
       }
       break;
@@ -3878,10 +3875,20 @@ _mesa_pack_stencil_span( const GLcontext *ctx, GLuint n,
                     SWAP4BYTE(value);                                   \
                 }                                                       \
             }                                                           \
-            depthValues[i] = CLAMP(GLTYPE2FLOAT(value), 0.0F, 1.0F);    \
+            depthValues[i] = GLTYPE2FLOAT(value);                       \
         }                                                               \
     } while (0)
 
+
+/**
+ * Unpack a row of depth/z values from memory, returning GLushort, GLuint
+ * or GLfloat values.
+ * The glPixelTransfer (scale/bias) params will be applied.
+ *
+ * \param dstType  one of GL_UNSIGNED_SHORT, GL_UNSIGNED_INT, GL_FLOAT
+ * \param depthScale  scale factor (max value) for returned GLushort or
+ *                    GLuint values (ignored for GLfloat).
+ */
 void
 _mesa_unpack_depth_span( const GLcontext *ctx, GLuint n,
                          GLenum dstType, GLvoid *dest, GLfloat depthScale,
@@ -3889,6 +3896,7 @@ _mesa_unpack_depth_span( const GLcontext *ctx, GLuint n,
                          const struct gl_pixelstore_attrib *srcPacking )
 {
    GLfloat depthTemp[MAX_WIDTH], *depthValues;
+   GLboolean needClamp = GL_FALSE;
 
    /* Look for special cases first.
     * Not only are these faster, they're less prone to numeric conversion
@@ -3906,7 +3914,9 @@ _mesa_unpack_depth_span( const GLcontext *ctx, GLuint n,
          }
          return;
       }
-      if (srcType == GL_UNSIGNED_SHORT && dstType == GL_UNSIGNED_INT) {
+      if (srcType == GL_UNSIGNED_SHORT
+          && dstType == GL_UNSIGNED_INT
+          && depthScale == (GLfloat) 0xffffffff) {
          const GLushort *src = (const GLushort *) source;
          GLuint *dst = (GLuint *) dest;
          GLuint i;
@@ -3918,7 +3928,7 @@ _mesa_unpack_depth_span( const GLcontext *ctx, GLuint n,
       /* XXX may want to add additional cases here someday */
    }
 
-   /* general case path */
+   /* general case path follows */
 
    if (dstType == GL_FLOAT) {
       depthValues = (GLfloat *) dest;
@@ -3927,29 +3937,31 @@ _mesa_unpack_depth_span( const GLcontext *ctx, GLuint n,
       depthValues = depthTemp;
    }
 
-   /* XXX we need to obey srcPacking->SwapBytes here!!! */
-   (void) srcPacking;
-
-   /* convert incoming values to GLfloat */
+   /* Convert incoming values to GLfloat.  Some conversions will require
+    * clamping, below.
+    */
    switch (srcType) {
       case GL_BYTE:
-          DEPTH_VALUES(GLbyte, BYTE_TO_FLOAT);
-          break;
+         DEPTH_VALUES(GLbyte, BYTE_TO_FLOAT);
+         needClamp = GL_TRUE;
+         break;
       case GL_UNSIGNED_BYTE:
-          DEPTH_VALUES(GLubyte, UBYTE_TO_FLOAT);
-          break;
+         DEPTH_VALUES(GLubyte, UBYTE_TO_FLOAT);
+         break;
       case GL_SHORT:
-          DEPTH_VALUES(GLshort, SHORT_TO_FLOAT);
-          break;
+         DEPTH_VALUES(GLshort, SHORT_TO_FLOAT);
+         needClamp = GL_TRUE;
+         break;
       case GL_UNSIGNED_SHORT:
-          DEPTH_VALUES(GLushort, USHORT_TO_FLOAT);
-          break;
+         DEPTH_VALUES(GLushort, USHORT_TO_FLOAT);
+         break;
       case GL_INT:
-          DEPTH_VALUES(GLint, INT_TO_FLOAT);
-          break;
+         DEPTH_VALUES(GLint, INT_TO_FLOAT);
+         needClamp = GL_TRUE;
+         break;
       case GL_UNSIGNED_INT:
-          DEPTH_VALUES(GLuint, UINT_TO_FLOAT);
-          break;
+         DEPTH_VALUES(GLuint, UINT_TO_FLOAT);
+         break;
       case GL_UNSIGNED_INT_24_8_EXT: /* GL_EXT_packed_depth_stencil */
          if (dstType == GL_UNSIGNED_INT &&
              depthScale == (GLfloat) 0xffffff &&
@@ -3981,19 +3993,21 @@ _mesa_unpack_depth_span( const GLcontext *ctx, GLuint n,
          }
          break;
       case GL_FLOAT:
-          DEPTH_VALUES(GLfloat, 1*);
-          break;
+         DEPTH_VALUES(GLfloat, 1*);
+         needClamp = GL_TRUE;
+         break;
       case GL_HALF_FLOAT_ARB:
          {
             GLuint i;
             const GLhalfARB *src = (const GLhalfARB *) source;
             for (i = 0; i < n; i++) {
-                GLhalfARB value = src[i];
-                if (srcPacking->SwapBytes) {
-                    SWAP2BYTE(value);
-                }
+               GLhalfARB value = src[i];
+               if (srcPacking->SwapBytes) {
+                  SWAP2BYTE(value);
+               }
                depthValues[i] = _mesa_half_to_float(value);
             }
+            needClamp = GL_TRUE;
          }
          break;
       default:
@@ -4001,12 +4015,30 @@ _mesa_unpack_depth_span( const GLcontext *ctx, GLuint n,
          return;
    }
 
-
-   /* apply depth scale and bias and clamp to [0,1] */
-   if (ctx->Pixel.DepthScale != 1.0 || ctx->Pixel.DepthBias != 0.0) {
-      _mesa_scale_and_bias_depth(ctx, n, depthValues);
+   /* apply depth scale and bias */
+   {
+      const GLfloat scale = ctx->Pixel.DepthScale;
+      const GLfloat bias = ctx->Pixel.DepthBias;
+      if (scale != 1.0 || bias != 0.0) {
+         GLuint i;
+         for (i = 0; i < n; i++) {
+            depthValues[i] = depthValues[i] * scale + bias;
+         }
+         needClamp = GL_TRUE;
+      }
    }
 
+   /* clamp to [0, 1] */
+   if (needClamp) {
+      GLuint i;
+      for (i = 0; i < n; i++) {
+         depthValues[i] = CLAMP(depthValues[i], 0.0, 1.0);
+      }
+   }
+
+   /*
+    * Convert values to dstType
+    */
    if (dstType == GL_UNSIGNED_INT) {
       GLuint *zValues = (GLuint *) dest;
       GLuint i;

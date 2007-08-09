@@ -575,7 +575,11 @@ _mesa_ffs(int i)
  *          if no bits set.
  */
 int
+#ifdef __MINGW32__
+_mesa_ffsll(long val)
+#else
 _mesa_ffsll(long long val)
+#endif
 {
 #ifdef ffsll
    return ffsll(val);

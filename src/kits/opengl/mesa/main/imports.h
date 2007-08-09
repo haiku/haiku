@@ -700,7 +700,11 @@ extern int
 _mesa_ffs(int i);
 
 extern int
+#ifdef __MINGW32__
+_mesa_ffsll(long i);
+#else
 _mesa_ffsll(long long i);
+#endif
 
 extern unsigned int
 _mesa_bitcount(unsigned int n);

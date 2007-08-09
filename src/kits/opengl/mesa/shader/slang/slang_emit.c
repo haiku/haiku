@@ -36,13 +36,13 @@
  ***/
 
 
-#include "imports.h"
-#include "context.h"
-#include "macros.h"
-#include "program.h"
-#include "prog_instruction.h"
-#include "prog_parameter.h"
-#include "prog_print.h"
+#include "main/imports.h"
+#include "main/context.h"
+#include "main/macros.h"
+#include "shader/program.h"
+#include "shader/prog_instruction.h"
+#include "shader/prog_parameter.h"
+#include "shader/prog_print.h"
 #include "slang_builtin.h"
 #include "slang_emit.h"
 #include "slang_mem.h"
@@ -780,16 +780,18 @@ emit_label(slang_emit_info *emitInfo, const slang_ir_node *n)
 
 
 /**
- * Emit code for an inlined function call (subroutine).
+ * Emit code for a function call.
+ * Note that for each time a function is called, we emit the function's
+ * body code again because the set of available registers may be different.
  */
 static struct prog_instruction *
-emit_func(slang_emit_info *emitInfo, slang_ir_node *n)
+emit_fcall(slang_emit_info *emitInfo, slang_ir_node *n)
 {
    struct gl_program *progSave;
    struct prog_instruction *inst;
    GLuint subroutineId;
 
-   assert(n->Opcode == IR_FUNC);
+   assert(n->Opcode == IR_CALL);
    assert(n->Label);
 
    /* save/push cur program */
@@ -1687,10 +1689,10 @@ emit(slang_emit_info *emitInfo, slang_ir_node *n)
    case IR_KILL:
       return emit_kill(emitInfo);
 
-   case IR_FUNC:
-      /* new variable scope for subroutines/function calls*/
+   case IR_CALL:
+      /* new variable scope for subroutines/function calls */
       _slang_push_var_table(emitInfo->vt);
-      inst = emit_func(emitInfo, n);
+      inst = emit_fcall(emitInfo, n);
       _slang_pop_var_table(emitInfo->vt);
       return inst;
 
@@ -1782,7 +1784,7 @@ _slang_resolve_subroutines(slang_emit_info *emitInfo)
    emitInfo->NumSubroutines = 0;
 
    /* Examine CAL instructions.
-    * At this point, the BranchTarget field of the CAL instructions is
+    * At this point, the BranchTarget field of the CAL instruction is
     * the number/id of the subroutine to call (an index into the
     * emitInfo->Subroutines list).
     * Translate that into an actual instruction location now.

@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.1
+ * Version:  7.0.1
  *
- * Copyright (C) 1999-2003  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -100,6 +100,11 @@ _mesa_validate_DrawElements(GLcontext *ctx,
                          (const GLubyte *) indices);
       }
    }
+   else {
+      /* not using a VBO */
+      if (!indices)
+         return GL_FALSE;
+   }
 
    if (ctx->Const.CheckArrayBounds) {
       /* find max array index */
@@ -169,6 +174,16 @@ _mesa_validate_DrawRangeElements(GLcontext *ctx, GLenum mode,
    if (!ctx->Array.ArrayObj->Vertex.Enabled
        && !(ctx->VertexProgram._Enabled && ctx->Array.ArrayObj->VertexAttrib[0].Enabled))
       return GL_FALSE;
+
+   /* Vertex buffer object tests */
+   if (ctx->Array.ElementArrayBufferObj->Name) {
+      /* XXX re-use code from above? */
+   }
+   else {
+      /* not using VBO */
+      if (!indices)
+         return GL_FALSE;
+   }
 
    if (ctx->Const.CheckArrayBounds) {
       /* Find max array index.

@@ -181,6 +181,11 @@ vec2 __constructor(const vec3 v)
    __retVal.xy = v.xy;
 }
 
+vec2 __constructor(const vec4 v)
+{
+   __retVal.xy = v.xy;
+}
+
 
 //// vec3 constructors
 

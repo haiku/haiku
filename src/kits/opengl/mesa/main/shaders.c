@@ -83,7 +83,7 @@ _mesa_CreateShader(GLenum type)
 }
 
 
-GLhandleARB APIENTRY
+GLhandleARB GLAPIENTRY
 _mesa_CreateShaderObjectARB(GLenum type)
 {
    GET_CURRENT_CONTEXT(ctx);
@@ -99,7 +99,7 @@ _mesa_CreateProgram(void)
 }
 
 
-GLhandleARB APIENTRY
+GLhandleARB GLAPIENTRY
 _mesa_CreateProgramObjectARB(void)
 {
    GET_CURRENT_CONTEXT(ctx);
@@ -319,7 +319,7 @@ _mesa_GetUniformivARB(GLhandleARB program, GLint location, GLint * params)
 
 
 #if 0
-GLint APIENTRY
+GLint GLAPIENTRY
 _mesa_GetUniformLocation(GLuint program, const GLcharARB *name)
 {
    GET_CURRENT_CONTEXT(ctx);
@@ -336,7 +336,7 @@ _mesa_GetHandleARB(GLenum pname)
 }
 
 
-GLint APIENTRY
+GLint GLAPIENTRY
 _mesa_GetUniformLocationARB(GLhandleARB programObj, const GLcharARB *name)
 {
    GET_CURRENT_CONTEXT(ctx);

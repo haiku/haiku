@@ -91,6 +91,9 @@
 #  pragma disable_message(201) /* Disable unreachable code warnings */
 #endif
 
+#ifdef WGLAPI
+#	undef WGLAPI
+#endif
 
 #if !defined(OPENSTEP) && (defined(__WIN32__) && !defined(__CYGWIN__)) && !defined(BUILD_FOR_SNAP)
 #  if !defined(__GNUC__) /* mingw environment */

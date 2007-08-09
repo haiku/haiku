@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.2
+ * Version:  7.0.1
  *
- * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -406,10 +406,9 @@ draw_stencil_pixels( GLcontext *ctx, GLint x, GLint y,
                                                       width, height,
                                                       GL_COLOR_INDEX, type,
                                                       row, skipPixels);
-         _mesa_unpack_index_span(ctx, spanWidth, destType, values,
-                                 type, source, unpack,
-                                 ctx->_ImageTransferState);
-         _mesa_apply_stencil_transfer_ops(ctx, spanWidth, values);
+         _mesa_unpack_stencil_span(ctx, spanWidth, destType, values,
+                                   type, source, unpack,
+                                   ctx->_ImageTransferState);
          if (zoom) {
             _swrast_write_zoomed_stencil_span(ctx, x, y, spanWidth,
                                               spanX, spanY, values);

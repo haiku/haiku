@@ -43,6 +43,11 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "vbo_context.h"
 
+#ifdef ERROR
+#undef ERROR
+#endif
+
+
 static void reset_attrfv( struct vbo_exec_context *exec );
 
 

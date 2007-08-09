@@ -80,6 +80,10 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "vbo_context.h"
 
 
+#ifdef ERROR
+#undef ERROR
+#endif
+
 
 /*
  * NOTE: Old 'parity' issue is gone, but copying can still be
