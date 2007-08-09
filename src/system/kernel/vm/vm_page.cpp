@@ -10,16 +10,17 @@
 #include <KernelExport.h>
 #include <OS.h>
 
-#include <kernel.h>
 #include <arch/cpu.h>
+#include <arch/vm_translation_map.h>
+#include <boot/kernel_args.h>
+#include <condition_variable.h>
+#include <kernel.h>
 #include <thread.h>
 #include <vm.h>
 #include <vm_address_space.h>
 #include <vm_priv.h>
 #include <vm_page.h>
 #include <vm_cache.h>
-#include <arch/vm_translation_map.h>
-#include <boot/kernel_args.h>
 
 #include <signal.h>
 #include <string.h>
@@ -215,7 +216,6 @@ find_page(int argc, char **argv)
 static int
 dump_page(int argc, char **argv)
 {
-	struct vm_page_mapping *mapping;
 	struct vm_page *page;
 	addr_t address;
 	bool physical = false;
@@ -277,8 +277,9 @@ dump_page(int argc, char **argv)
 	#endif	// DEBUG_PAGE_CACHE_TRANSITIONS
 	kprintf("area mappings:\n");
 
-	mapping = page->mappings;
-	while (mapping != NULL) {
+	vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
+	vm_page_mapping *mapping;
+	while ((mapping = iterator.Next()) != NULL) {
 		kprintf("  %p (%#lx)\n", mapping->area, mapping->area->id);
 		mapping = mapping->page_link.next;
 	}
@@ -676,6 +677,7 @@ vm_page_write_modified(vm_cache *cache, bool fsReenter)
 		off_t pageOffset;
 		status_t status;
 		vm_area *area;
+		ConditionVariable<vm_page> busyCondition;
 
 		cpu_status state = disable_interrupts();
 		acquire_spinlock(&sPageLock);
@@ -683,20 +685,22 @@ vm_page_write_modified(vm_cache *cache, bool fsReenter)
 		if (page->state == PAGE_STATE_MODIFIED) {
 			remove_page_from_queue(&page_modified_queue, page);
 			page->state = PAGE_STATE_BUSY;
+			busyCondition.Publish(page, "page");
 			gotPage = true;
 		}
 
 		release_spinlock(&sPageLock);
 		restore_interrupts(state);
 
-		// We may have a modified page - however, while we're writing it back, the page
-		// is still mapped. In order not to lose any changes to the page, we mark it clean
-		// before actually writing it back; if writing the page fails for some reason, we
-		// just keep it in the modified page list, but that should happen only rarely.
+		// We may have a modified page - however, while we're writing it back,
+		// the page is still mapped. In order not to lose any changes to the
+		// page, we mark it clean before actually writing it back; if writing
+		// the page fails for some reason, we just keep it in the modified page
+		// list, but that should happen only rarely.
 
-		// If the page is changed after we cleared the dirty flag, but before we had
-		// the chance to write it back, then we'll write it again later - that will
-		// probably not happen that often, though.
+		// If the page is changed after we cleared the dirty flag, but before we
+		// had the chance to write it back, then we'll write it again later -
+		// that will probably not happen that often, though.
 
 		pageOffset = (off_t)page->cache_offset << PAGE_SHIFT;
 
@@ -713,6 +717,7 @@ vm_page_write_modified(vm_cache *cache, bool fsReenter)
 					map->ops->query(map, pageOffset - area->cache_offset + area->base,
 						&physicalAddress, &flags);
 					if (flags & PAGE_MODIFIED) {
+// TODO: Mark busy?
 						gotPage = true;
 						dequeuedPage = false;
 					}
@@ -742,10 +747,12 @@ vm_page_write_modified(vm_cache *cache, bool fsReenter)
 				state = disable_interrupts();
 				acquire_spinlock(&sPageLock);
 
-				if (page->mappings != NULL || page->wired_count)
+				if (!page->mappings.IsEmpty() || page->wired_count)
 					page->state = PAGE_STATE_ACTIVE;
 				else
 					page->state = PAGE_STATE_INACTIVE;
+
+				busyCondition.Unpublish();
 
 				enqueue_page(&page_active_queue, page);
 
@@ -761,6 +768,8 @@ vm_page_write_modified(vm_cache *cache, bool fsReenter)
 
 				page->state = PAGE_STATE_MODIFIED;
 				enqueue_page(&page_modified_queue, page);
+
+				busyCondition.Unpublish();
 
 				release_spinlock(&sPageLock);
 				restore_interrupts(state);
@@ -828,7 +837,7 @@ vm_page_init(kernel_args *args)
 		sPages[i].physical_page_number = sPhysicalPageOffset + i;
 		sPages[i].type = PAGE_TYPE_PHYSICAL;
 		sPages[i].state = PAGE_STATE_FREE;
-		sPages[i].mappings = NULL;
+		new(&sPages[i].mappings) vm_page_mappings();
 		sPages[i].wired_count = 0;
 		sPages[i].usage_count = 0;
 		sPages[i].cache = NULL;

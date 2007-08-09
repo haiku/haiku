@@ -14,6 +14,7 @@
 #include <arch/platform.h>
 #include <boot_item.h>
 #include <cbuf.h>
+#include <condition_variable.h>
 #include <cpu.h>
 #include <debug.h>
 #include <elf.h>
@@ -131,6 +132,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 
 		TRACE("init semaphores\n");
 		sem_init(&sKernelArgs);
+		condition_variable_init();
 
 		// now we can create and use semaphores
 		TRACE("init VM semaphores\n");

@@ -22,6 +22,7 @@
 #include <vm_low_memory.h>
 #include <file_cache.h>
 #include <memheap.h>
+#include <condition_variable.h>
 #include <debug.h>
 #include <console.h>
 #include <int.h>
@@ -3496,11 +3497,13 @@ retry:
 	away by grabbing a reference to it.
 */
 static inline void
-fault_insert_dummy_page(vm_cache *cache, vm_page &dummyPage, off_t cacheOffset)
+fault_insert_dummy_page(vm_cache *cache, vm_dummy_page &dummyPage,
+	off_t cacheOffset)
 {
 	dummyPage.state = PAGE_STATE_BUSY;
 	vm_cache_acquire_ref(cache);
 	vm_cache_insert_page(cache, &dummyPage, cacheOffset);
+	dummyPage.busy_condition.Publish(&dummyPage, "page");
 }
 
 
@@ -3509,7 +3512,7 @@ fault_insert_dummy_page(vm_cache *cache, vm_page &dummyPage, off_t cacheOffset)
 	the cache.
 */
 static inline void
-fault_remove_dummy_page(vm_page &dummyPage, bool isLocked)
+fault_remove_dummy_page(vm_dummy_page &dummyPage, bool isLocked)
 {
 	vm_cache *cache = dummyPage.cache;
 	if (!isLocked)
@@ -3518,6 +3521,7 @@ fault_remove_dummy_page(vm_page &dummyPage, bool isLocked)
 	if (dummyPage.state == PAGE_STATE_BUSY) {
 		vm_cache_remove_page(cache, &dummyPage);
 		dummyPage.state = PAGE_STATE_INACTIVE;
+		dummyPage.busy_condition.Unpublish();
 	}
 
 	if (!isLocked)
@@ -3537,8 +3541,8 @@ fault_remove_dummy_page(vm_page &dummyPage, bool isLocked)
 */
 static inline status_t
 fault_find_page(vm_translation_map *map, vm_cache *topCache,
-	off_t cacheOffset, bool isWrite, vm_page &dummyPage, vm_cache **_pageCache,
-	vm_page** _page, bool* _restart)
+	off_t cacheOffset, bool isWrite, vm_dummy_page &dummyPage,
+	vm_cache **_pageCache, vm_page** _page, bool* _restart)
 {
 	*_restart = false;
 	vm_cache *cache = topCache;
@@ -3560,24 +3564,36 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 		for (;;) {
 			page = vm_cache_lookup_page(cache, cacheOffset);
 			if (page != NULL && page->state != PAGE_STATE_BUSY) {
+				// Note: We set the page state to busy, but we don't need a
+				// condition variable here, since we keep the cache locked
+				// till we mark the page unbusy again (in fault_get_page()
+				// the source page, or in vm_soft_fault() when mapping the
+				// page), so no one will ever know the page was busy in the
+				// first place.
 				vm_page_set_state(page, PAGE_STATE_BUSY);
 				break;
 			}
 			if (page == NULL || page == &dummyPage)
 				break;
 
-			// page must be busy
-			// ToDo: don't wait forever!
-			mutex_unlock(&cache->lock);
-			thread_yield();
-			mutex_lock(&cache->lock);
+			// page must be busy -- wait for it to become unbusy
+			{
+				ConditionVariableEntry<vm_page> entry;
+				entry.Add(page);
+				mutex_unlock(&cache->lock);
+				entry.Wait();
+				mutex_lock(&cache->lock);
+			}
 
 			if (cache->busy) {
 				// The cache became busy, which means, it is about to be
 				// removed by vm_cache_remove_consumer(). We start again with
 				// the top cache.
+				ConditionVariableEntry<vm_cache> entry;
+				entry.Add(cache);
 				mutex_unlock(&cache->lock);
 				vm_cache_release_ref(cache);
+				entry.Wait();
 				*_restart = true;
 				return B_OK;
 			}
@@ -3595,8 +3611,10 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 
 			// insert a fresh page and mark it busy -- we're going to read it in
 			page = vm_page_allocate_page(PAGE_STATE_FREE);
-			page->state = PAGE_STATE_BUSY;
 			vm_cache_insert_page(cache, page, cacheOffset);
+
+			ConditionVariable<vm_page> busyCondition;
+			busyCondition.Publish(page, "page");
 
 			mutex_unlock(&cache->lock);
 
@@ -3620,6 +3638,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 				dprintf("reading page from store %p (cache %p) returned: %s!\n",
 					store, cache, strerror(status));
 
+				busyCondition.Unpublish();
 				vm_cache_remove_page(cache, page);
 				vm_page_set_state(page, PAGE_STATE_FREE);
 
@@ -3628,6 +3647,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 
 			// mark the page unbusy again
 			page->state = PAGE_STATE_ACTIVE;
+			busyCondition.Unpublish();
 
 			break;
 		}
@@ -3651,8 +3671,11 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 				// The cache became busy, which means, it is about to be
 				// removed by vm_cache_remove_consumer(). We start again with
 				// the top cache.
+				ConditionVariableEntry<vm_cache> entry;
+				entry.Add(cache);
 				mutex_unlock(&cache->lock);
 				vm_cache_release_ref(cache);
+				entry.Wait();
 				*_restart = true;
 				return B_OK;
 			}
@@ -3682,8 +3705,11 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 				// The cache became busy, which means, it is about to be
 				// removed by vm_cache_remove_consumer(). We start again with
 				// the top cache.
+				ConditionVariableEntry<vm_cache> entry;
+				entry.Add(cache);
 				mutex_unlock(&cache->lock);
 				vm_cache_release_ref(cache);
+				entry.Wait();
 				*_restart = true;
 			} else {
 				vm_page* newPage = vm_cache_lookup_page(cache, cacheOffset);
@@ -3718,8 +3744,8 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 	to it, and has also locked it on exit.
 */
 static inline status_t
-fault_get_page(vm_translation_map *map, vm_cache *topCache,
-	off_t cacheOffset, bool isWrite, vm_page &dummyPage, vm_cache **_sourceCache,
+fault_get_page(vm_translation_map *map, vm_cache *topCache, off_t cacheOffset,
+	bool isWrite, vm_dummy_page &dummyPage, vm_cache **_sourceCache,
 	vm_cache **_copiedSource, vm_page** _page)
 {
 	vm_cache *cache;
@@ -3848,8 +3874,10 @@ if (cacheOffset == 0x12000)
 				break;
 
 			// The page is busy, wait till it becomes unbusy.
+			ConditionVariableEntry<vm_page> entry;
+			entry.Add(newPage);
 			mutex_unlock(&topCache->lock);
-			snooze(10000);
+			entry.Wait();
 			mutex_lock(&topCache->lock);
 		}
 
@@ -3968,7 +3996,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	// already have the page we're searching for (we're going from top to bottom)
 
 	vm_translation_map *map = &addressSpace->translation_map;
-	vm_page dummyPage;
+	vm_dummy_page dummyPage;
 	dummyPage.cache = NULL;
 	dummyPage.state = PAGE_STATE_INACTIVE;
 	dummyPage.type = PAGE_TYPE_DUMMY;

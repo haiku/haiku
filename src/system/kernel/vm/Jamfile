@@ -6,7 +6,7 @@ KernelMergeObject kernel_vm.o :
 	vm_cache.cpp
 	vm_daemons.c
 	vm_low_memory.cpp
-	vm_page.c
+	vm_page.cpp
 	vm_store_anonymous_noswap.c
 	vm_store_device.c
 	vm_store_null.c

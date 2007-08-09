@@ -9,13 +9,14 @@
 #include <KernelExport.h>
 #include <fs_cache.h>
 
-#include <util/kernel_cpp.h>
+#include <condition_variable.h>
 #include <file_cache.h>
+#include <generic_syscall.h>
+#include <util/kernel_cpp.h>
 #include <vfs.h>
 #include <vm.h>
 #include <vm_page.h>
 #include <vm_cache.h>
-#include <generic_syscall.h>
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -30,7 +31,7 @@
 #endif
 
 // maximum number of iovecs per request
-#define MAX_IO_VECS			64	// 256 kB
+#define MAX_IO_VECS			32	// 128 kB
 #define MAX_FILE_IO_VECS	32
 #define MAX_TEMP_IO_VECS	8
 
@@ -522,10 +523,13 @@ read_chunk_into_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 
 	vm_cache *cache = ref->cache;
 
+	// TODO: We're using way too much stack! Rather allocate a sufficiently
+	// large chunk on the heap.
 	iovec vecs[MAX_IO_VECS];
 	int32 vecCount = 0;
 
 	vm_page *pages[MAX_IO_VECS];
+	ConditionVariable<vm_page> busyConditions[MAX_IO_VECS];
 	int32 pageIndex = 0;
 
 	// allocate pages for the cache and mark them busy
@@ -534,7 +538,7 @@ read_chunk_into_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 		if (page == NULL)
 			panic("no more pages!");
 
-		page->state = PAGE_STATE_BUSY;
+		busyConditions[pageIndex - 1].Publish(page, "page");
 
 		vm_cache_insert_page(cache, page, offset + pos);
 
@@ -569,6 +573,7 @@ read_chunk_into_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 		mutex_lock(&cache->lock);
 
 		for (int32 i = 0; i < pageIndex; i++) {
+			busyConditions[i].Unpublish();
 			vm_cache_remove_page(cache, pages[i]);
 			vm_page_set_state(pages[i], PAGE_STATE_FREE);
 		}
@@ -599,8 +604,10 @@ read_chunk_into_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 	mutex_lock(&cache->lock);
 
 	// make the pages accessible in the cache
-	for (int32 i = pageIndex; i-- > 0;)
+	for (int32 i = pageIndex; i-- > 0;) {
 		pages[i]->state = PAGE_STATE_ACTIVE;
+		busyConditions[i].Unpublish();
+	}
 
 	return B_OK;
 }
@@ -664,11 +671,14 @@ static inline status_t
 write_chunk_to_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 	int32 pageOffset, addr_t buffer, size_t bufferSize)
 {
+	// TODO: We're using way too much stack! Rather allocate a sufficiently
+	// large chunk on the heap.
 	iovec vecs[MAX_IO_VECS];
 	int32 vecCount = 0;
 	vm_page *pages[MAX_IO_VECS];
 	int32 pageIndex = 0;
 	status_t status = B_OK;
+	ConditionVariable<vm_page> busyConditions[MAX_IO_VECS];
 
 	// ToDo: this should be settable somewhere
 	bool writeThrough = false;
@@ -679,7 +689,7 @@ write_chunk_to_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 		//	big - shouldn't we better steal the pages directly in that case?
 		//	(a working set like approach for the file cache)
 		vm_page *page = pages[pageIndex++] = vm_page_allocate_page(PAGE_STATE_FREE);
-		page->state = PAGE_STATE_BUSY;
+		busyConditions[pageIndex - 1].Publish(page, "page");
 
 		vm_cache_insert_page(ref->cache, page, offset + pos);
 
@@ -769,6 +779,8 @@ write_chunk_to_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 
 	// make the pages accessible in the cache
 	for (int32 i = pageIndex; i-- > 0;) {
+		busyConditions[i].Unpublish();
+
 		if (writeThrough)
 			pages[i]->state = PAGE_STATE_ACTIVE;
 		else
@@ -914,9 +926,10 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size, bool doWri
 						return B_NO_MEMORY;
 					}
 				} else {
+					ConditionVariableEntry<vm_page> entry;
+					entry.Add(page);
 					mutex_unlock(&cache->lock);
-					// ToDo: don't wait forever!
-					snooze(20000);
+					entry.Wait();
 					mutex_lock(&cache->lock);
 					goto restart;
 				}
@@ -974,9 +987,10 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size, bool doWri
 						// we let the other party add our page
 						currentPage->queue_next = page;
 					} else {
+						ConditionVariableEntry<vm_page> entry;
+						entry.Add(page);
 						mutex_unlock(&cache->lock);
-						// ToDo: don't wait forever!
-						snooze(20000);
+						entry.Wait();
 						mutex_lock(&cache->lock);
 						goto restart_dummy_lookup;
 					}
@@ -1113,9 +1127,11 @@ cache_prefetch_vnode(void *vnode, off_t offset, size_t size)
 		vm_page *page = vm_cache_lookup_page(cache, offset);
 		if (page != NULL) {
 			if (page->state == PAGE_STATE_BUSY) {
-				// if busy retry again a little later
+				// if busy retry again later
+				ConditionVariableEntry<vm_page> entry;
+				entry.Add(page);
 				mutex_unlock(&cache->lock);
-				snooze(20000);
+				entry.Wait();
 				mutex_lock(&cache->lock);
 
 				goto restart;

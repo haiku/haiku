@@ -6,22 +6,23 @@
  * Distributed under the terms of the NewOS License.
  */
 
-
-#include <kernel.h>
-#include <vm.h>
-#include <vm_priv.h>
 #include <vm_cache.h>
-#include <vm_page.h>
-#include <int.h>
-#include <util/khash.h>
-#include <lock.h>
-#include <debug.h>
-#include <lock.h>
-#include <smp.h>
-#include <arch/cpu.h>
 
 #include <stddef.h>
 #include <stdlib.h>
+
+#include <arch/cpu.h>
+#include <condition_variable.h>
+#include <debug.h>
+#include <int.h>
+#include <kernel.h>
+#include <lock.h>
+#include <smp.h>
+#include <util/khash.h>
+#include <vm.h>
+#include <vm_page.h>
+#include <vm_priv.h>
+
 
 //#define TRACE_VM_CACHE
 #ifdef TRACE_VM_CACHE
@@ -479,9 +480,12 @@ vm_cache_remove_consumer(vm_cache *cache, vm_cache *consumer)
 			}
 		}
 
+		ConditionVariable<vm_cache> busyCondition;
+
 		if (merge) {
 			// But since we need to keep the locking order upper->lower cache, we
 			// need to unlock our cache now
+			busyCondition.Publish(cache, "cache");
 			cache->busy = true;
 			mutex_unlock(&cache->lock);
 
@@ -496,6 +500,7 @@ vm_cache_remove_consumer(vm_cache *cache, vm_cache *consumer)
 					"not merging it\n", cache);
 				merge = false;
 				cache->busy = false;
+				busyCondition.Unpublish();
 				mutex_unlock(&consumer->lock);
 				vm_cache_release_ref(consumer);
 			}
@@ -535,6 +540,7 @@ if (consumer->virtual_base == 0x11000)
 //dprintf("%ld: merged busy page %p, cache %p, offset %ld\n", find_thread(NULL), page, cacheRef->cache, page->cache_offset);
 					vm_cache_remove_page(consumer, consumerPage);
 					consumerPage->state = PAGE_STATE_INACTIVE;
+					((vm_dummy_page*)consumerPage)->busy_condition.Unpublish();
 
 					vm_cache_remove_page(cache, page);
 					vm_cache_insert_page(consumer, page,
@@ -582,6 +588,9 @@ panic("cacheRef %p ref count too low!\n", cache);
 			mutex_unlock(&consumer->lock);
 			vm_cache_release_ref(consumer);
 		}
+	
+		if (cache->busy)
+			busyCondition.Unpublish();
 	}
 
 	mutex_unlock(&cache->lock);

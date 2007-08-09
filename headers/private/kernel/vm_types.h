@@ -133,6 +133,16 @@ enum {
 	CACHE_TYPE_NULL
 };
 
+#ifdef __cplusplus
+
+#include <condition_variable.h>
+
+struct vm_dummy_page : vm_page {
+	ConditionVariable<vm_page>	busy_condition;
+};
+
+#endif	// __cplusplus
+
 // vm_cache
 typedef struct vm_cache {
 	mutex				lock;

@@ -210,6 +210,7 @@ create_thread_struct(struct thread *inthread, const char *name,
 	thread->team = NULL;
 	thread->cpu = cpu;
 	thread->sem.blocking = -1;
+	thread->condition_variable = NULL;
 	thread->fault_handler = 0;
 	thread->page_faults_allowed = 1;
 	thread->kernel_stack_area = -1;
@@ -723,6 +724,7 @@ _dump_thread_info(struct thread *thread)
 	kprintf("  sem.count:        0x%lx\n", thread->sem.count);
 	kprintf("  sem.acquire_status: 0x%lx\n", thread->sem.acquire_status);
 	kprintf("  sem.flags:        0x%lx\n", thread->sem.flags);
+	kprintf("condition variable: %p\n", thread->condition_variable);
 	kprintf("fault_handler:      %p\n", (void *)thread->fault_handler);
 	kprintf("args:               %p %p\n", thread->args1, thread->args2);
 	kprintf("entry:              %p\n", (void *)thread->entry);
@@ -826,7 +828,8 @@ dump_thread_list(int argc, char **argv)
 			kprintf("ignoring invalid team argument.\n");
 	}
 
-	kprintf("thread         id  state       sem cpu pri  stack      team  name\n");
+	kprintf("thread         id  state        sem/cv cpu pri  stack      team  "
+		"name\n");
 
 	hash_open(sThreadHash, &i);
 	while ((thread = hash_next(sThreadHash, &i)) != NULL) {
@@ -840,11 +843,14 @@ dump_thread_list(int argc, char **argv)
 		kprintf("%p %6lx  %-9s", thread, thread->id, state_to_text(thread,
 			thread->state));
 
-		// does it block on a semaphore?
-		if (thread->state == B_THREAD_WAITING)
-			kprintf("%6lx  ", thread->sem.blocking);
-		else
-			kprintf("     -  ");
+		// does it block on a semaphore or a condition variable?
+		if (thread->state == B_THREAD_WAITING) {
+			if (thread->condition_variable)
+				kprintf("%p  ", thread->condition_variable);
+			else
+				kprintf("%10lx  ", thread->sem.blocking);
+		} else
+			kprintf("      -     ");
 
 		// on which CPU does it run?
 		if (thread->cpu)
