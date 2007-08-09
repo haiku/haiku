@@ -185,28 +185,28 @@ DrawingEngine::ConstrainClippingRegion(const BRegion* region)
 void
 DrawingEngine::SetDrawState(const DrawState* state, int32 xOffset, int32 yOffset)
 {
-	fPainter->SetDrawState(state, xOffset, yOffset);	
+	fPainter->SetDrawState(state, xOffset, yOffset);
 }
 
 
 void
 DrawingEngine::SetHighColor(const rgb_color& color)
 {
-	fPainter->SetHighColor(color);	
+	fPainter->SetHighColor(color);
 }
 
 
 void
 DrawingEngine::SetLowColor(const rgb_color& color)
 {
-	fPainter->SetLowColor(color);	
+	fPainter->SetLowColor(color);
 }
 
 
 void
 DrawingEngine::SetPenSize(float size)
 {
-	fPainter->SetPenSize(size);	
+	fPainter->SetPenSize(size);
 }
 
 
@@ -214,35 +214,42 @@ void
 DrawingEngine::SetStrokeMode(cap_mode lineCap, join_mode joinMode,
 								float miterLimit)
 {
-	fPainter->SetStrokeMode(lineCap, joinMode, miterLimit);	
+	fPainter->SetStrokeMode(lineCap, joinMode, miterLimit);
 }
 
 
 void
 DrawingEngine::SetBlendingMode(source_alpha srcAlpha, alpha_function alphaFunc)
 {
-	fPainter->SetBlendingMode(srcAlpha, alphaFunc);	
+	fPainter->SetBlendingMode(srcAlpha, alphaFunc);
 }
 
 
 void
 DrawingEngine::SetPattern(const struct pattern& pattern)
 {
-	fPainter->SetPattern(pattern, false);	
+	fPainter->SetPattern(pattern, false);
 }
 
 
 void
 DrawingEngine::SetDrawingMode(drawing_mode mode)
 {
-	fPainter->SetDrawingMode(mode);	
+	fPainter->SetDrawingMode(mode);
 }
 
 
 void
 DrawingEngine::SetFont(const ServerFont& font)
 {
-	fPainter->SetFont(font);	
+	fPainter->SetFont(font);
+}
+
+
+void
+DrawingEngine::SetFont(const DrawState* state)
+{
+	fPainter->SetFont(state);
 }
 
 

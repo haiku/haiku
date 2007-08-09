@@ -85,6 +85,7 @@ class Painter {
 									alpha_function alphaFunc);
 
 			void				SetFont(const ServerFont& font);
+			void				SetFont(const DrawState* state);
 	inline	const ServerFont&	Font() const
 									{ return fTextRenderer.Font(); }
 

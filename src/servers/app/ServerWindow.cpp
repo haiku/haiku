@@ -1271,9 +1271,8 @@ ServerWindow::_DispatchViewMessage(int32 code,
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: ViewLayer name: %s\n", fTitle, fCurrentLayer->Name()));
 			fCurrentLayer->CurrentState()->ReadFontFromLink(link);
-//			_UpdateDrawState(fCurrentLayer);
 			fWindowLayer->GetDrawingEngine()->SetFont(
-				fCurrentLayer->CurrentState()->Font());
+				fCurrentLayer->CurrentState());
 			break;
 		}
 		case AS_LAYER_GET_STATE:

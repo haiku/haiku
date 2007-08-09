@@ -79,6 +79,7 @@ public:
 			void			SetBlendingMode(source_alpha srcAlpha,
 								alpha_function alphaFunc);
 			void			SetFont(const ServerFont& font);
+			void			SetFont(const DrawState* state);
 
 			void			SuspendAutoSync();
 			void			Sync();

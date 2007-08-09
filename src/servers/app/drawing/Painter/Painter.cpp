@@ -130,9 +130,7 @@ Painter::SetDrawState(const DrawState* data, int32 xOffset, int32 yOffset)
 	// but for now...
 	SetPenSize(data->PenSize());
 
-	SetFont(data->Font());
-	fTextRenderer.SetAntialiasing(!(data->ForceFontAliasing()
-		|| data->Font().Flags() & B_DISABLE_ANTIALIASING));
+	SetFont(data);
 
 	fSubpixelPrecise = data->SubPixelPrecise();
 
@@ -260,6 +258,17 @@ void
 Painter::SetFont(const ServerFont& font)
 {
 	fTextRenderer.SetFont(font);
+	fTextRenderer.SetAntialiasing(
+		!(font.Flags() & B_DISABLE_ANTIALIASING));
+}
+
+// SetFont
+void
+Painter::SetFont(const DrawState* state)
+{
+	fTextRenderer.SetFont(state->Font());
+	fTextRenderer.SetAntialiasing(!(state->ForceFontAliasing()
+		|| state->Font().Flags() & B_DISABLE_ANTIALIASING));
 }
 
 // #pragma mark - drawing
