@@ -90,23 +90,10 @@ enum {
 
 class _BTextTrackState_ {
 public:
-	_BTextTrackState_(BMessenger messenger)
-		:
-		clickOffset(0),
-		shiftDown(false),
-		anchor(0),
-		selStart(0),
-		selEnd(0),
-		fRunner(NULL)
-	{
-		BMessage message(_PING_);
-		fRunner = new (nothrow) BMessageRunner(messenger, &message, 300000);
-	}
+	_BTextTrackState_(BMessenger messenger);
+	~_BTextTrackState_();
 
-	~_BTextTrackState_()
-	{
-		delete fRunner;
-	}
+	void SimulateMouseMovement(BTextView *view);
 
 	int32 clickOffset;
 	bool shiftDown;
@@ -906,8 +893,10 @@ BTextView::MessageReceived(BMessage *message)
 					delete fClickRunner;
 					fClickRunner = NULL;
 				}
-			} else
+			} else if (fTrackingMouse) {
+				fTrackingMouse->SimulateMouseMovement(this);
 				PerformAutoScrolling();
+			}
 			break;
 		}
 
@@ -4539,3 +4528,39 @@ BTextView::UnlockWidthBuffer()
 	if (atomic_add(&sWidthAtom, -1) > 1)
 		release_sem(sWidthSem);
 }
+
+
+// _BTextTrackState_
+_BTextTrackState_::_BTextTrackState_(BMessenger messenger)
+	:
+	clickOffset(0),
+	shiftDown(false),
+	anchor(0),
+	selStart(0),
+	selEnd(0),
+	fRunner(NULL)
+{
+	BMessage message(_PING_);
+	fRunner = new (nothrow) BMessageRunner(messenger, &message, 300000);
+}
+
+
+_BTextTrackState_::~_BTextTrackState_()
+{
+	delete fRunner;
+}
+
+
+void
+_BTextTrackState_::SimulateMouseMovement(BTextView *textView)
+{
+	BPoint where;
+	ulong buttons;
+	// When the mouse cursor is still and outside the textview,
+	// no B_MOUSE_MOVED message are sent, obviously. But scrolling
+	// has to work neverthless, so we "fake" a MouseMoved() call here.
+	textView->GetMouse(&where, &buttons);
+	textView->PerformMouseMoved(where, B_INSIDE_VIEW);
+}
+
+
