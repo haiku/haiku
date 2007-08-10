@@ -51,7 +51,6 @@ StdBinCommands
 	ptx.c
 	readlink.c
 	rmdir.c
-	seq.c
 	shred.c
 	shuf.c
 	split.c
@@ -102,6 +101,13 @@ StdBinCommands
 # pinky.c
 # users.c
 # who.c
+
+local seq_src = seq.c ;
+if $(HAIKU_GCC_VERSION[1]) < 3 {
+	seq_src = seq-old.c ;
+}
+
+BinCommand seq : $(seq_src) : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand "[" : lbracket.c : libfetish.a : $(coreutils_rsrc) ;
 
