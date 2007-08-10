@@ -41,7 +41,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) vbo ] ;
 
 	if $(TARGET_ARCH) = x86 {
 		defines += USE_X86_ASM USE_MMX_ASM USE_3DNOW_ASM ; 
-		if $(TARGET_PLATFORM != haiku) {
+		if $(TARGET_PLATFORM) != haiku {
 			# FIXME: Remove me when Haiku SSE support will be fixed.
 			defines += USE_SSE_ASM ;
 		}
