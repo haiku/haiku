@@ -63,6 +63,7 @@ typedef struct transfer_data_s {
 	uhci_td			*first_descriptor;
 	uhci_td			*data_descriptor;
 	bool			incoming;
+	bool			canceled;
 	transfer_data_s	*link;
 } transfer_data;
 

@@ -487,6 +487,9 @@ UHCI::~UHCI()
 	Lock();
 	transfer_data *transfer = fFirstTransfer;
 	while (transfer) {
+		transfer->transfer->Finished(B_CANCELED, 0);
+		delete transfer->transfer;
+
 		transfer_data *next = transfer->link;
 		delete transfer;
 		transfer = next;
@@ -611,31 +614,20 @@ UHCI::CancelQueuedTransfers(Pipe *pipe)
 	if (!Lock())
 		return B_ERROR;
 
-	transfer_data *last = NULL;
 	transfer_data *current = fFirstTransfer;
 	while (current) {
 		if (current->transfer->TransferPipe() == pipe) {
-			current->queue->RemoveTransfer(current->transfer_queue);
-			FreeDescriptorChain(current->first_descriptor);
-			FreeTransferQueue(current->transfer_queue);
+			// clear the active bit so the descriptors are canceled
+			uhci_td *descriptor = current->first_descriptor;
+			while (descriptor) {
+				descriptor->status &= ~TD_STATUS_ACTIVE;
+				descriptor = (uhci_td *)descriptor->link_log;
+			}
+
 			current->transfer->Finished(B_CANCELED, 0);
-			delete current->transfer;
-
-			transfer_data *next = current->link;
-			if (last)
-				last->link = next;
-			else
-				fFirstTransfer = next;
-
-			if (fLastTransfer == current)
-				fLastTransfer = last;
-
-			delete current;
-			current = next;
-		} else {
-			last = current;
-			current = current->link;
+			current->canceled = true;
 		}
+		current = current->link;
 	}
 
 	Unlock();
@@ -754,7 +746,7 @@ UHCI::AddPendingTransfer(Transfer *transfer, Queue *queue,
 	if (!transfer || !queue || !transferQueue || !firstDescriptor)
 		return B_BAD_VALUE;
 
-	transfer_data *data = new(std::nothrow) transfer_data();
+	transfer_data *data = new(std::nothrow) transfer_data;
 	if (!data)
 		return B_NO_MEMORY;
 
@@ -768,6 +760,7 @@ UHCI::AddPendingTransfer(Transfer *transfer, Queue *queue,
 	data->first_descriptor = firstDescriptor;
 	data->data_descriptor = dataDescriptor;
 	data->incoming = directionIn;
+	data->canceled = false;
 	data->link = NULL;
 
 	if (!Lock()) {
@@ -1038,23 +1031,22 @@ UHCI::FinishTransfers()
 		while (transfer) {
 			bool transferDone = false;
 			uhci_td *descriptor = transfer->first_descriptor;
+			status_t callbackStatus = B_OK;
 
 			while (descriptor) {
 				uint32 status = descriptor->status;
 				if (status & TD_STATUS_ACTIVE) {
-					TRACE(("usb_uhci: td (0x%08lx) still active\n", descriptor->this_phy));
 					// still in progress
+					TRACE(("usb_uhci: td (0x%08lx) still active\n", descriptor->this_phy));
 					break;
 				}
 
 				if (status & TD_ERROR_MASK) {
+					// an error occured
 					TRACE_ERROR(("usb_uhci: td (0x%08lx) error: status: 0x%08lx;"
 						" token: 0x%08lx;\n", descriptor->this_phy, status,
 						descriptor->token));
-					// an error occured. we have to remove the
-					// transfer from the queue and clean up
 
-					status_t callbackStatus = B_ERROR;
 					uint8 errorCount = status >> TD_ERROR_COUNT_SHIFT;
 					errorCount &= TD_ERROR_COUNT_MASK;
 					if (errorCount == 0) {
@@ -1089,23 +1081,49 @@ UHCI::FinishTransfers()
 						callbackStatus = B_DEV_STALLED;
 					}
 
-					transfer->queue->RemoveTransfer(transfer->transfer_queue);
-					FreeDescriptorChain(transfer->first_descriptor);
-					FreeTransferQueue(transfer->transfer_queue);
-					transfer->transfer->Finished(callbackStatus, 0);
 					transferDone = true;
 					break;
 				}
 
-				// either all descriptors are done, or we have a short packet
 				if ((descriptor->link_phy & TD_TERMINATE)
 					|| (descriptor->status & TD_STATUS_ACTLEN_MASK)
 					< (descriptor->token >> TD_TOKEN_MAXLEN_SHIFT)) {
+					// all descriptors are done, or we have a short packet
 					TRACE(("usb_uhci: td (0x%08lx) ok\n", descriptor->this_phy));
-					// we got through without errors so we are finished
-					transfer->queue->RemoveTransfer(transfer->transfer_queue);
+					callbackStatus = B_OK;
+					transferDone = true;
+					break;
+				}
 
-					size_t actualLength = 0;
+				descriptor = (uhci_td *)descriptor->link_log;
+			}
+
+			if (!transferDone) {
+				lastTransfer = transfer;
+				transfer = transfer->link;
+				continue;
+			}
+
+			// remove the transfer from the list first so we are sure
+			// it doesn't get canceled while we still process it
+			transfer_data *next = transfer->link;
+			if (Lock()) {
+				if (lastTransfer)
+					lastTransfer->link = transfer->link;
+
+				if (transfer == fFirstTransfer)
+					fFirstTransfer = transfer->link;
+				if (transfer == fLastTransfer)
+					fLastTransfer = lastTransfer;
+
+				transfer->link = NULL;
+				Unlock();
+			}
+
+			// if canceled the callback has already been called
+			if (!transfer->canceled) {
+				size_t actualLength = 0;
+				if (callbackStatus == B_OK) {
 					uint8 lastDataToggle = 0;
 					if (transfer->data_descriptor && transfer->incoming) {
 						// data to read out
@@ -1124,63 +1142,59 @@ UHCI::FinishTransfers()
 					}
 
 					transfer->transfer->TransferPipe()->SetDataToggle(lastDataToggle == 0);
-					FreeDescriptorChain(transfer->first_descriptor);
-					FreeTransferQueue(transfer->transfer_queue);
+
 					if (transfer->transfer->IsFragmented()) {
 						// this transfer may still have data left
 						TRACE(("usb_uhci: advancing fragmented transfer\n"));
 						transfer->transfer->AdvanceByFragment(actualLength);
 						if (transfer->transfer->VectorLength() > 0) {
-							TRACE(("usb_uhci: still %ld bytes left on transfer\n", transfer->transfer->VectorLength()));
+							TRACE(("usb_uhci: still %ld bytes left on transfer\n",
+								transfer->transfer->VectorLength()));
+
+							// free the used descriptors
+							transfer->queue->RemoveTransfer(transfer->transfer_queue);
+							FreeDescriptorChain(transfer->first_descriptor);
+
 							// resubmit the advanced transfer so the rest
 							// of the buffers are transmitted over the bus
 							transfer->transfer->PrepareKernelAccess();
 							status_t result = CreateFilledTransfer(transfer->transfer,
 								&transfer->first_descriptor,
 								&transfer->transfer_queue);
-							if (result < B_OK) {
-								transfer->transfer->Finished(result, 0);
-								transferDone = true;
-							};
-
 							transfer->data_descriptor = transfer->first_descriptor;
-							transfer->queue->AppendTransfer(transfer->transfer_queue);
-							break;
+							if (result == B_OK && Lock()) {
+								// reappend the transfer
+								if (fLastTransfer)
+									fLastTransfer->link = transfer;
+								if (!fFirstTransfer)
+									fFirstTransfer = transfer;
+
+								fLastTransfer = transfer;
+								Unlock();
+
+								transfer->queue->AppendTransfer(transfer->transfer_queue);
+								transfer = next;
+								continue;
+							}
 						}
 
 						// the transfer is done, but we already set the
 						// actualLength with AdvanceByFragment()
 						actualLength = 0;
 					}
-
-					transfer->transfer->Finished(B_OK, actualLength);
-					transferDone = true;
-					break;
 				}
 
-				descriptor = (uhci_td *)descriptor->link_log;
+				transfer->transfer->Finished(callbackStatus, actualLength);
 			}
 
-			if (transferDone) {
-				if (Lock()) {
-					if (lastTransfer)
-						lastTransfer->link = transfer->link;
+			// remove and free the hardware queue and its descriptors
+			transfer->queue->RemoveTransfer(transfer->transfer_queue);
+			FreeDescriptorChain(transfer->first_descriptor);
+			FreeTransferQueue(transfer->transfer_queue);
 
-					if (transfer == fFirstTransfer)
-						fFirstTransfer = transfer->link;
-					if (transfer == fLastTransfer)
-						fLastTransfer = lastTransfer;
-
-					transfer_data *next = transfer->link;
-					delete transfer->transfer;
-					delete transfer;
-					transfer = next;
-					Unlock();
-				}
-			} else {
-				lastTransfer = transfer;
-				transfer = transfer->link;
-			}
+			delete transfer->transfer;
+			delete transfer;
+			transfer = next;
 		}
 	}
 }
@@ -1698,7 +1712,7 @@ UHCI::CreateDescriptor(Pipe *pipe, uint8 direction, size_t bufferSize)
 	result->link_log = NULL;
 	if (bufferSize <= 0) {
 		result->buffer_log = NULL;
-		result->buffer_phy = NULL;
+		result->buffer_phy = 0;
 		return result;
 	}
 
