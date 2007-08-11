@@ -4,19 +4,23 @@ UsePrivateHeaders syslog_daemon ;
 
 SimpleTest SyslogTest
 	: SyslogTest.cpp syslog.cpp
-	;
+;
 
 SimpleTest flock_test
 	: flock_test.cpp
-	;
+;
 
 SimpleTest setjmp_test
 	: setjmp_test.c
-	;
+;
 
 SimpleTest sigsetjmp_test
 	: sigsetjmp_test.c
-	;
+;
+
+SimpleTest init_rld_after_fork_test
+	: init_rld_after_fork_test.cpp
+;
 
 # Tell Jam where to find these sources
 SEARCH on [ FGristFiles
