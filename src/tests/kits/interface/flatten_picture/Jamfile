@@ -1,0 +1,14 @@
+SubDir HAIKU_TOP src tests kits interface flatten_picture ;
+
+SimpleTest FlattenPictureTest :
+	PictureTest.cpp
+	PictureTestApp.cpp
+	PictureTestCases.cpp
+	PictureTestWindow.cpp
+	TestResultItem.cpp
+	;
+
+LinkAgainst FlattenPictureTest :
+	be
+	root
+	;
