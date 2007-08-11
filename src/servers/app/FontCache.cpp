@@ -103,6 +103,8 @@ void
 FontCache::Recycle(FontCacheEntry* entry)
 {
 //printf("Recycle(%p)\n", entry);
+	if (!entry)
+		return;
 	entry->UpdateUsage();
 	entry->RemoveReference();
 }
