@@ -579,7 +579,7 @@ _AVL_TREE_MAP_CLASS_NAME::CompareNodes(const AVLTreeNode* node1,
 
 // _Allocate
 _AVL_TREE_MAP_TEMPLATE_LIST
-inline _AVL_TREE_MAP_CLASS_NAME::Node*
+inline typename _AVL_TREE_MAP_CLASS_NAME::Node*
 _AVL_TREE_MAP_CLASS_NAME::_Allocate(const Key& key, const Value& value)
 {
 	return fStrategy.Allocate(key, value);
@@ -624,7 +624,7 @@ _AVL_TREE_MAP_CLASS_NAME::_GetAVLTreeNode(const Node* node) const
 
 // _GetNode
 _AVL_TREE_MAP_TEMPLATE_LIST
-inline _AVL_TREE_MAP_CLASS_NAME::Node*
+inline typename _AVL_TREE_MAP_CLASS_NAME::Node*
 _AVL_TREE_MAP_CLASS_NAME::_GetNode(const AVLTreeNode* node) const
 {
 	return fStrategy.GetNode(const_cast<AVLTreeNode*>(node));
