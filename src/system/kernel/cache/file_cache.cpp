@@ -892,7 +892,6 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size, bool doWri
 		// check if this page is already in memory
 	restart:
 		vm_page *page = vm_cache_lookup_page(cache, offset);
-		vm_page *dummyPage = NULL;
 		if (page != NULL) {
 			// The page is busy - since we need to unlock the cache sometime
 			// in the near future, we need to satisfy the request of the pages
@@ -918,21 +917,12 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size, bool doWri
 			}
 
 			if (page->state == PAGE_STATE_BUSY) {
-				if (page->type == PAGE_TYPE_DUMMY) {
-					dummyPage = page;
-					page = vm_page_allocate_page(PAGE_STATE_FREE);
-					if (page == NULL) {
-						mutex_unlock(&cache->lock);
-						return B_NO_MEMORY;
-					}
-				} else {
-					ConditionVariableEntry<vm_page> entry;
-					entry.Add(page);
-					mutex_unlock(&cache->lock);
-					entry.Wait();
-					mutex_lock(&cache->lock);
-					goto restart;
-				}
+				ConditionVariableEntry<vm_page> entry;
+				entry.Add(page);
+				mutex_unlock(&cache->lock);
+				entry.Wait();
+				mutex_lock(&cache->lock);
+				goto restart;
 			}
 		}
 
@@ -943,24 +933,6 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size, bool doWri
 		if (page != NULL) {
 			vm_get_physical_page(page->physical_page_number * B_PAGE_SIZE,
 				&virtualAddress, PHYSICAL_PAGE_CAN_WAIT);
-
-			if (dummyPage != NULL && (!doWrite || bytesInPage != B_PAGE_SIZE)) {
-				// This page is currently in-use by someone else - since we cannot
-				// know if this someone does what we want, and if it even can do
-				// what we want (we may own a lock the blocks the other request),
-				// we need to handle this case specifically
-				iovec vec;
-				vec.iov_base = (void *)virtualAddress;
-				vec.iov_len = B_PAGE_SIZE;
-
-				size_t size = B_PAGE_SIZE;
-				status_t status = pages_io(ref, offset, &vec, 1, &size, false);
-				if (status != B_OK) {
-					vm_put_physical_page(virtualAddress);
-					mutex_unlock(&cache->lock);
-					return status;
-				}
-			}
 
 			// and copy the contents of the page already in memory
 			if (doWrite) {
@@ -973,43 +945,6 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size, bool doWri
 				user_memcpy((void *)buffer, (void *)(virtualAddress + pageOffset), bytesInPage);
 
 			vm_put_physical_page(virtualAddress);
-
-			if (dummyPage != NULL) {
-				// check if the dummy page is still in place
-			restart_dummy_lookup:
-				vm_page *currentPage = vm_cache_lookup_page(cache, offset);
-				if (currentPage == NULL) {
-					// there is no page in place anymore, we'll put ours
-					// into it
-					vm_cache_insert_page(cache, page, offset);
-				} else if (currentPage->state == PAGE_STATE_BUSY) {
-					if (currentPage->type == PAGE_TYPE_DUMMY) {
-						// we let the other party add our page
-						currentPage->queue_next = page;
-					} else {
-						ConditionVariableEntry<vm_page> entry;
-						entry.Add(page);
-						mutex_unlock(&cache->lock);
-						entry.Wait();
-						mutex_lock(&cache->lock);
-						goto restart_dummy_lookup;
-					}
-				} else {
-					// we need to copy our new page into the old one
-					addr_t destinationAddress;
-					vm_get_physical_page(page->physical_page_number * B_PAGE_SIZE,
-						&virtualAddress, PHYSICAL_PAGE_CAN_WAIT);
-					vm_get_physical_page(currentPage->physical_page_number * B_PAGE_SIZE,
-						&destinationAddress, PHYSICAL_PAGE_CAN_WAIT);
-
-					memcpy((void *)destinationAddress, (void *)virtualAddress, B_PAGE_SIZE);
-
-					vm_put_physical_page(destinationAddress);
-					vm_put_physical_page(virtualAddress);
-
-					vm_page_set_state(page, PAGE_STATE_FREE);
-				}
-			}
 
 			if (bytesLeft <= bytesInPage) {
 				// we've read the last page, so we're done!
