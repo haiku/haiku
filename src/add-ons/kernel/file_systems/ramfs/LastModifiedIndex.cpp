@@ -158,7 +158,7 @@ LastModifiedIndex::Changed(Node *node, time_t oldModified)
 					iterator->NodeRemoved(node);
 			}
 			// remove and re-insert the node
-			fNodes->Remove(it);
+			it.Remove();
 			error = fNodes->Insert(node);
 
 			// udpate live queries

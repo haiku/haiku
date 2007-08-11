@@ -105,6 +105,19 @@ IndexIterator::Find(const uint8 *const key, size_t keyLength)
 	return error;
 }
 
+// Rewind
+status_t
+IndexIterator::Rewind()
+{
+	status_t error = B_ENTRY_NOT_FOUND;
+	if (fIndexWrapper && fIndexWrapper->fIndex) {
+		fInitialized = fIndexWrapper->fIndex->GetIterator(&fIterator);
+		if (fInitialized)
+			error = B_OK;
+	}
+	return error;
+}
+
 // GetNextEntry
 status_t
 IndexIterator::GetNextEntry(uint8 *buffer, uint16 *_keyLength,
@@ -1119,8 +1132,10 @@ Equation::PrepareQuery(Volume */*volume*/, IndexWrapper &index, IndexIterator **
 		if (fOp == OP_EQUAL && !fIsPattern)
 			return status;
 		else if (status == B_ENTRY_NOT_FOUND
-			&& (fIsPattern || fOp == OP_GREATER_THAN || fOp == OP_GREATER_THAN_OR_EQUAL))
-			return B_OK;
+			&& (fIsPattern || fOp == OP_GREATER_THAN
+				|| fOp == OP_GREATER_THAN_OR_EQUAL)) {
+			return (*iterator)->Rewind();
+		}
 
 		RETURN_ERROR(status);
 	}

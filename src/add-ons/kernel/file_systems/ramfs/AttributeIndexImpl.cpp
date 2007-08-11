@@ -142,12 +142,8 @@ public:
 	AttributeTree(uint32 type)
 		: TwoKeyAVLTree<Attribute*, PrimaryKey, PrimaryKeyCompare,
 						GetPrimaryKey>(PrimaryKeyCompare(type),
-		  	GetPrimaryKey(), AVLTreeStandardCompare<Attribute*>(),
-			AVLTreeStandardGetKey<Attribute*, Attribute*>(),
-			AVLTreeStandardNodeAllocator<Attribute*,
-										 AVLTreeStandardNode<Attribute*> >(),
-			AVLTreeStandardGetValue<Attribute*,
-									AVLTreeStandardNode<Attribute*> >())
+		  	GetPrimaryKey(), TwoKeyAVLTreeStandardCompare<Attribute*>(),
+			TwoKeyAVLTreeStandardGetKey<Attribute*, Attribute*>())
 	{
 	}
 };
@@ -254,7 +250,7 @@ AttributeIndexImpl::Changed(Attribute *attribute, const uint8 *oldKey,
 						iterator->NodeRemoved(node);
 				}
 				// remove and re-insert the attribute
-				fAttributes->Remove(it);
+				it.Remove();
 			}
 		}
 		// re-insert the attribute

@@ -137,7 +137,7 @@ NameIndex::Changed(Entry *entry, const char *oldName)
 		Entry **foundEntry
 			= fEntries->Find(NameIndexPrimaryKey(entry, oldName), entry, &it);
 		if (foundEntry && *foundEntry == entry) {
-			fEntries->Remove(it);
+			it.Remove();
 			error = fEntries->Insert(entry);
 
 			// udpate live queries

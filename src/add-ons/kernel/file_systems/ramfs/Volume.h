@@ -57,6 +57,7 @@ const ino_t kRootParentID = 0;
 // NodeListenerValue
 class NodeListenerValue {
 public:
+	inline NodeListenerValue() {}
 	inline NodeListenerValue(int) {}
 	inline NodeListenerValue(NodeListener *listener, Node *node, uint32 flags)
 		: listener(listener), node(node), flags(flags) {}
@@ -73,6 +74,7 @@ typedef List<NodeListenerValue> NodeListenerList;
 // EntryListenerValue
 class EntryListenerValue {
 public:
+	inline EntryListenerValue() {}
 	inline EntryListenerValue(int) {}
 	inline EntryListenerValue(EntryListener *listener, Entry *entry,
 							  uint32 flags)

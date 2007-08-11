@@ -81,10 +81,9 @@ public:
 
 // NodeListenerTree
 typedef TwoKeyAVLTree<NodeListenerValue, Node*,
-					  AVLTreeStandardCompare<Node*>,
+					  TwoKeyAVLTreeStandardCompare<Node*>,
 					  NodeListenerGetPrimaryKey, NodeListener*,
-					  AVLTreeStandardNode<NodeListenerValue>,
-					  AVLTreeStandardCompare<NodeListener*>,
+					  TwoKeyAVLTreeStandardCompare<NodeListener*>,
 					  NodeListenerGetSecondaryKey > _NodeListenerTree;
 class NodeListenerTree : public _NodeListenerTree {};
 
@@ -118,10 +117,9 @@ public:
 
 // EntryListenerTree
 typedef TwoKeyAVLTree<EntryListenerValue, Entry*,
-					  AVLTreeStandardCompare<Entry*>,
+					  TwoKeyAVLTreeStandardCompare<Entry*>,
 					  EntryListenerGetPrimaryKey, EntryListener*,
-					  AVLTreeStandardNode<EntryListenerValue>,
-					  AVLTreeStandardCompare<EntryListener*>,
+					  TwoKeyAVLTreeStandardCompare<EntryListener*>,
 					  EntryListenerGetSecondaryKey > _EntryListenerTree;
 class EntryListenerTree : public _EntryListenerTree {};
 

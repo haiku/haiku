@@ -4,6 +4,8 @@ local userlandFSTop = [ FDirName $(HAIKU_TOP) src add-ons kernel
 	file_systems userlandfs ] ;
 local userlandFSIncludes = [ PrivateHeaders userlandfs ] ;
 
+UsePrivateHeaders kernel ;	# for <util/*>
+
 SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
 
 SEARCH_SOURCE += [ FDirName $(userlandFSTop) shared ] ;

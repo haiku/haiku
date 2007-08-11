@@ -57,6 +57,7 @@ public:
 	IndexIterator(IndexWrapper *indexWrapper);
 
 	status_t Find(const uint8 *const key, size_t keyLength);
+	status_t Rewind();
 	status_t GetNextEntry(uint8 *buffer, uint16 *keyLength, size_t bufferSize,
 						  Entry **entry);
 

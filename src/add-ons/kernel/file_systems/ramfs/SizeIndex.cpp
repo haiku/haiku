@@ -157,7 +157,7 @@ SizeIndex::Changed(Node *node, off_t oldSize)
 			}
 
 			// remove and re-insert the node
-			fNodes->Remove(it);
+			it.Remove();
 			error = fNodes->Insert(node);
 
 			// udpate live queries
