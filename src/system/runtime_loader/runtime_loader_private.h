@@ -44,6 +44,7 @@ int resolve_symbol(image_t *rootImage, image_t *image, struct Elf32_Sym *sym,
 status_t elf_verify_header(void *header, int32 length);
 void rldelf_init(void);
 void rldexport_init(void);
+status_t elf_reinit_after_fork();
 
 status_t heap_init(void);
 

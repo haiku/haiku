@@ -34,7 +34,9 @@ struct rld_export gRuntimeLoader = {
 	get_symbol,
 	get_nth_symbol,
 	test_executable,
-	get_next_image_dependency
+	get_next_image_dependency,
+
+	elf_reinit_after_fork
 };
 
 

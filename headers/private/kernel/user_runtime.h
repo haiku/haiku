@@ -39,6 +39,8 @@ struct rld_export {
 	status_t (*get_next_image_dependency)(image_id id, uint32 *cookie,
 		const char **_name);
 
+	status_t (*reinit_after_fork)();
+
 	const struct user_space_program_args *program_args;
 };
 

@@ -4,12 +4,14 @@
  */
 
 
-#include <syscalls.h>
 #include <fork.h>
 
 #include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>
+
+#include <syscalls.h>
+#include <user_runtime.h>
 
 
 typedef struct fork_hook {
@@ -153,6 +155,7 @@ fork(void)
 		// ToDo: initialize child
 		__main_thread_id = find_thread(NULL);
 		__init_fork();
+		__gRuntimeLoader->reinit_after_fork();
 
 		call_fork_hooks(sChildHooks);
 	} else {

@@ -1670,3 +1670,14 @@ rldelf_init(void)
 		sErrorMessage.SetTo(buffer, 1024, 'Rler');
 	}
 }
+
+
+status_t
+elf_reinit_after_fork()
+{
+	rld_sem = create_sem(1, "rld_lock");
+	if (rld_sem < 0)
+		return rld_sem;
+
+	return B_OK;
+}
