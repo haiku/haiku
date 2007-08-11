@@ -189,7 +189,7 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator,
 		bitmap->fBuffer = buffer;
 		bitmap->fToken = gTokenSpace.NewToken(kBitmapToken, bitmap);
 
-		if (flags & B_BITMAP_CLEAR_TO_WHITE) {
+		if (flags & (B_BITMAP_CLEAR_TO_WHITE | B_BITMAP_ACCEPTS_VIEWS)) {
 			if (space == B_CMAP8) {
 				// "255" is the "transparent magic" index for B_CMAP8 bitmaps
 				memset(bitmap->Bits(), 65, bitmap->BitsLength());
