@@ -1637,7 +1637,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			status_t status = font.SetFamilyAndStyle(familyID, styleID);
 			if (status == B_OK) {
 				bool hasArray[numChars];
-				status = font.GetHasGlyphs(charArray, numChars, hasArray);
+				status = font.GetHasGlyphs(charArray, numBytes, hasArray);
 				if (status == B_OK) {
 					fLink.StartMessage(B_OK);
 					fLink.Attach(hasArray, sizeof(hasArray));
@@ -1676,7 +1676,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			status_t status = font.SetFamilyAndStyle(familyID, styleID);
 			if (status == B_OK) {
 				edge_info edgeArray[numChars];
-				status = font.GetEdges(charArray, numChars, edgeArray);
+				status = font.GetEdges(charArray, numBytes, edgeArray);
 				if (status == B_OK) {
 					fLink.StartMessage(B_OK);
 					fLink.Attach(edgeArray, sizeof(edgeArray));
@@ -1747,7 +1747,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				if (wantsOffsets)
 					offsets = new (nothrow) BPoint[numChars];
 
-				status = font.GetEscapements(charArray, numChars, delta,
+				status = font.GetEscapements(charArray, numBytes, delta,
 					escapements, offsets);
 
 				if (status == B_OK) {
@@ -1829,7 +1829,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				font.SetRotation(rotation);
 				font.SetFlags(flags);
 
-				status = font.GetEscapements(charArray, numChars, delta,
+				status = font.GetEscapements(charArray, numBytes, delta,
 					escapements);
 
 				if (status == B_OK) {
@@ -1917,7 +1917,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				font.SetFlags(flags);
 
 				// TODO implement for real
-				if (font.GetBoundingBoxes(charArray, numChars,
+				if (font.GetBoundingBoxes(charArray, numBytes,
 					rectArray, string_escapement, mode, delta,
 					code == AS_GET_BOUNDINGBOXES_STRING) == B_OK) {
 					fLink.StartMessage(B_OK);

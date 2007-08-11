@@ -390,23 +390,45 @@ ServerFont::GetGlyphShapes(const char charArray[], int32 numChars,
 }
 
 
+class HasGlyphsConsumer {
+ public:
+	HasGlyphsConsumer(bool* hasArray)
+		: fHasArray(hasArray)
+	{
+	}
+	void Start() {}
+	void Finish(double x, double y) {}
+	void ConsumeEmptyGlyph(int32 index, uint32 charCode, double x, double y)
+	{
+		fHasArray[index] = false;
+	}
+	bool ConsumeGlyph(int32 index, uint32 charCode, const GlyphCache* glyph,
+		FontCacheEntry* entry, double x, double y)
+	{
+		fHasArray[index] = glyph->glyph_index >= 0;
+		return true;
+	}
+
+ private:
+	bool* fHasArray;
+};
+
+
 status_t
-ServerFont::GetHasGlyphs(const char charArray[], int32 numChars,
-	bool hasArray[]) const
+ServerFont::GetHasGlyphs(const char* string, int32 numBytes,
+	bool* hasArray) const
 {
-	if (!charArray || numChars <= 0 || !hasArray)
+	if (!string || numBytes <= 0 || !hasArray)
 		return B_BAD_DATA;
 
-	FT_Face face = GetTransformedFace(false, false);
-	if (!face)
-		return B_ERROR;
+	bool kerning = true; // TODO make this a property?
 
-	const char *string = charArray;
-	for (int i = 0; i < numChars; i++)
-		hasArray[i] = FT_Get_Char_Index(face, UTF8ToCharCode(&string)) > 0;
+	HasGlyphsConsumer consumer(hasArray);
+	if (GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numBytes,
+		NULL, kerning, fSpacing))
+		return B_OK;
 
-	PutTransformedFace(face);
-	return B_OK;
+	return B_ERROR;
 }
 
 
@@ -439,16 +461,16 @@ class EdgesConsumer {
 
 
 status_t
-ServerFont::GetEdges(const char* string, int32 numChars,
+ServerFont::GetEdges(const char* string, int32 numBytes,
 	edge_info* edges) const
 {
-	if (!string || numChars <= 0 || !edges)
+	if (!string || numBytes <= 0 || !edges)
 		return B_BAD_DATA;
 
 	bool kerning = true; // TODO make this a property?
 
 	EdgesConsumer consumer(edges, fSize);
-	if (GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numChars,
+	if (GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numBytes,
 		NULL, kerning, fSpacing))
 		return B_OK;
 
@@ -516,17 +538,17 @@ class BPointEscapementConsumer {
 
 
 status_t
-ServerFont::GetEscapements(const char* string, int32 numChars,
+ServerFont::GetEscapements(const char* string, int32 numBytes,
 	escapement_delta delta, BPoint escapementArray[],
 	BPoint offsetArray[]) const
 {
-	if (!string || numChars <= 0 || !escapementArray)
+	if (!string || numBytes <= 0 || !escapementArray)
 		return B_BAD_DATA;
 
 	bool kerning = true; // TODO make this a property?
 
 	BPointEscapementConsumer consumer(escapementArray, offsetArray, fSize);
-	if (GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numChars,
+	if (GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numBytes,
 		&delta, kerning, fSpacing))
 		return B_OK;
 
@@ -562,16 +584,16 @@ class WidthEscapementConsumer {
 
 
 status_t
-ServerFont::GetEscapements(const char* string, int32 numChars,
+ServerFont::GetEscapements(const char* string, int32 numBytes,
 	escapement_delta delta, float widthArray[]) const
 {
-	if (!string || numChars <= 0 || !widthArray)
+	if (!string || numBytes <= 0 || !widthArray)
 		return B_BAD_DATA;
 
 	bool kerning = true; // TODO make this a property?
 
 	WidthEscapementConsumer consumer(widthArray, fSize);
-	if (GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numChars,
+	if (GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numBytes,
 		&delta, kerning, fSpacing))
 		return B_OK;
 	return B_ERROR;
@@ -666,12 +688,12 @@ class BoundingBoxConsumer {
 
 
 status_t
-ServerFont::GetBoundingBoxes(const char* string, int32 numChars,
+ServerFont::GetBoundingBoxes(const char* string, int32 numBytes,
 	BRect rectArray[], bool stringEscapement, font_metric_mode mode,
 	escapement_delta delta, bool asString)
 {
 	// TODO: The font_metric_mode is not used
-	if (!string || numChars <= 0 || !rectArray)
+	if (!string || numBytes <= 0 || !rectArray)
 		return B_BAD_DATA;
 
 	bool kerning = true; // TODO make this a property?
@@ -679,7 +701,7 @@ ServerFont::GetBoundingBoxes(const char* string, int32 numChars,
 	Transformable transform(EmbeddedTransformation());
 
 	BoundingBoxConsumer consumer(transform, rectArray, asString);
-	if (GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numChars,
+	if (GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numBytes,
 		stringEscapement ? &delta : NULL, kerning, fSpacing))
 		return B_OK;
 	return B_ERROR;
@@ -700,12 +722,12 @@ ServerFont::GetBoundingBoxesForStrings(char *charArray[], int32 lengthArray[],
 	Transformable transform(EmbeddedTransformation());
 
 	for (int32 i = 0; i < numStrings; i++) {
-		int32 numChars = lengthArray[i];
+		int32 numBytes = lengthArray[i];
 		const char* string = charArray[i];
 		escapement_delta delta = deltaArray[i];
 
 		BoundingBoxConsumer consumer(transform, NULL, true);
-		if (!GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numChars,
+		if (!GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numBytes,
 			&delta, kerning, fSpacing))
 			return B_ERROR;
 
@@ -731,16 +753,16 @@ class StringWidthConsumer {
 
 
 float
-ServerFont::StringWidth(const char *string, int32 numChars,
+ServerFont::StringWidth(const char *string, int32 numBytes,
 	const escapement_delta* deltaArray) const
 {
-	if (!string || numChars <= 0)
+	if (!string || numBytes <= 0)
 		return 0.0;
 
 	bool kerning = true; // TODO make this a property?
 
 	StringWidthConsumer consumer;
-	if (!GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numChars,
+	if (!GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numBytes,
 		deltaArray, kerning, fSpacing))
 		return 0.0;
 
@@ -791,7 +813,7 @@ ServerFont::TruncateString(BString* inOut, uint32 mode, float width) const
 	// get the escapement of each glyph in font units
 	float *escapementArray = new float[numChars];
 	static escapement_delta delta = (escapement_delta){ 0.0, 0.0 };
-	if (GetEscapements(string, numChars, delta, escapementArray) == B_OK) {
+	if (GetEscapements(string, length, delta, escapementArray) == B_OK) {
 		truncate_string(string, mode, width, result, escapementArray, fSize,
 			ellipsisWidth, length, numChars);
 

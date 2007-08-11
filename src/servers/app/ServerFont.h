@@ -41,8 +41,6 @@ class ServerFont {
 									{ return fDirection; }
 			uint32				Encoding() const
 									{ return fEncoding; }
-			edge_info			Edges() const
-									{ return fEdges; }
 			uint32				Flags() const
 									{ return fFlags; }
 			uint32				Spacing() const
@@ -81,8 +79,6 @@ class ServerFont {
 
 			void				SetDirection(font_direction dir)
 									{ fDirection = dir; }
-			void				SetEdges(edge_info info)
-									{ fEdges = info; }
 			void				SetEncoding(uint32 encoding)
 									{ fEncoding = encoding; }
 			void				SetFlags(uint32 value)
@@ -123,22 +119,22 @@ class ServerFont {
 									int32 numChars, BShape *shapeArray[]) const;
 
 			status_t			GetHasGlyphs(const char charArray[], 
-									int32 numChars, bool hasArray[]) const;
+									int32 numBytes, bool hasArray[]) const;
 			
-			status_t			GetEdges(const char charArray[], int32 numChars,
+			status_t			GetEdges(const char charArray[], int32 numBytes,
 									edge_info edgeArray[]) const;
 
 			status_t			GetEscapements(const char charArray[],
-									int32 numChars, escapement_delta delta,
+									int32 numBytes, escapement_delta delta,
 									BPoint escapementArray[],
 									BPoint offsetArray[]) const;
 
 			status_t			GetEscapements(const char charArray[],
-									int32 numChars, escapement_delta delta,
+									int32 numBytes, escapement_delta delta,
 									float widthArray[]) const;
 
 			status_t			GetBoundingBoxes(const char charArray[],
-									int32 numChars, BRect rectArray[],
+									int32 numBytes, BRect rectArray[],
 									bool stringEscapement,
 									font_metric_mode mode,
 									escapement_delta delta,
@@ -150,14 +146,14 @@ class ServerFont {
 									escapement_delta deltaArray[]);
 
 			float				StringWidth(const char *string,
-									int32 numChars,
+									int32 numBytes,
 									const escapement_delta* delta = NULL) const;
 
 			bool				Lock() const { return fStyle->Lock(); }
 			void				Unlock() const { fStyle->Unlock(); }
 
-			FT_Face				GetFTFace() const
-									{ return fStyle->FreeTypeFace(); };
+//			FT_Face				GetFTFace() const
+//									{ return fStyle->FreeTypeFace(); };
 	
 			BRect				BoundingBox();
 			void				GetHeight(font_height& height) const;
@@ -172,7 +168,6 @@ protected:
 	friend class FontStyle;
 
 			FontStyle*			fStyle;
-			edge_info			fEdges;
 			float				fSize;
 			float				fRotation;
 			float				fShear;
