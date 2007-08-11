@@ -403,9 +403,9 @@ FontEngine::CountFaces() const
 
 // PrepareGlyph
 bool
-FontEngine::PrepareGlyph(unsigned glyph_code)
+FontEngine::PrepareGlyph(unsigned glyphCode)
 {
-	fGlyphIndex = FT_Get_Char_Index(fFace, glyph_code);
+	fGlyphIndex = FT_Get_Char_Index(fFace, glyphCode);
 	fLastError = FT_Load_Glyph(fFace, fGlyphIndex,
 		fHinting ? FT_LOAD_DEFAULT : FT_LOAD_NO_HINTING);
 //		fHinting ? FT_LOAD_FORCE_AUTOHINT : FT_LOAD_NO_HINTING);
