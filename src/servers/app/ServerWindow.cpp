@@ -1381,8 +1381,8 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
 			fLink.StartMessage(B_OK);
 			// our offset in the parent -> will be originX and originY in BView
-			fLink.Attach<float>(fCurrentLayer->Frame().left);
-			fLink.Attach<float>(fCurrentLayer->Frame().top);
+			BPoint parentOffset = fCurrentLayer->Frame().LeftTop();
+			fLink.Attach<BPoint>(parentOffset);
 			fLink.Attach<BRect>(fCurrentLayer->Bounds());
 			fLink.Flush();
 			break;
@@ -1403,9 +1403,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_ORIGIN: ViewLayer: %s\n", Title(), fCurrentLayer->Name()));
 			fLink.StartMessage(B_OK);
-			// TODO: rename this where it is used in the BView code!
-			// (it wants to know scrolling offset, not drawing origin)
-			fLink.Attach<BPoint>(fCurrentLayer->ScrollingOffset());
+			fLink.Attach<BPoint>(fCurrentLayer->DrawingOrigin());
 			fLink.Flush();
 			break;
 		}

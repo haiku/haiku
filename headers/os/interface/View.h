@@ -599,6 +599,13 @@ private:
 			void			_ResizeBy(int32 deltaWidth, int32 deltaHeight);
 			void			_ParentResizedBy(int32 x, int32 y);
 
+			void			_ConvertToScreen(BPoint* pt, bool checkLock) const;
+			void			_ConvertFromScreen(BPoint* pt, bool checkLock) const;
+
+			void			_ConvertToParent(BPoint* pt, bool checkLock) const;
+			void			_ConvertFromParent(BPoint* pt, bool checkLock) const;
+
+
 			void			_Activate(bool state);
 			void			_Attach();
 			void			_Detach();

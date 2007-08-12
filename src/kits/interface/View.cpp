@@ -628,20 +628,24 @@ BView::Bounds() const
 
 
 void
-BView::ConvertToParent(BPoint *point) const
+BView::_ConvertToParent(BPoint *point, bool checkLock) const
 {
 	if (!fParent)
 		return;
 
-	check_lock_no_pick();
+	if (checkLock)
+		check_lock_no_pick();
 
-	// TODO: handle scale
+	// - our scrolling offset
+	// + our bounds location within the parent
+	point->x += -fBounds.left + fParentOffset.x;
+	point->y += -fBounds.top + fParentOffset.y;
+}
 
-	// our local coordinate transformation
-	*point -= Origin();
-
-	// our bounds location within the parent
-	*point += fParentOffset;
+void
+BView::ConvertToParent(BPoint *point) const
+{
+	_ConvertToParent(point, true);
 }
 
 
@@ -655,20 +659,24 @@ BView::ConvertToParent(BPoint point) const
 
 
 void
-BView::ConvertFromParent(BPoint *point) const
+BView::_ConvertFromParent(BPoint *point, bool checkLock) const
 {
 	if (!fParent)
 		return;
 
-	check_lock_no_pick();
+	if (checkLock)
+		check_lock_no_pick();
 
-	// TODO: handle scale
+	// - our bounds location within the parent
+	// + our scrolling offset
+	point->x += -fParentOffset.x + fBounds.left;
+	point->y += -fParentOffset.y + fBounds.top;
+}
 
-	// our bounds location within the parent
-	*point -= fParentOffset;
-
-	// our local coordinate transformation
-	*point += Origin();
+void
+BView::ConvertFromParent(BPoint *point) const
+{
+	_ConvertFromParent(point, true);
 }
 
 
@@ -689,15 +697,10 @@ BView::ConvertToParent(BRect *rect) const
 
 	check_lock_no_pick();
 
-	// TODO: handle scale
-
-	BPoint origin = Origin();
-
-	// our local coordinate transformation
-	rect->OffsetBy(-origin.x, -origin.y);
-
-	// our bounds location within the parent
-	rect->OffsetBy(fParentOffset);
+	// - our scrolling offset
+	// + our bounds location within the parent
+	rect->OffsetBy(-fBounds.left + fParentOffset.x,
+		-fBounds.top + fParentOffset.y);
 }
 
 
@@ -718,13 +721,10 @@ BView::ConvertFromParent(BRect *rect) const
 
 	check_lock_no_pick();
 
-	// TODO: handle scale
-
-	// our bounds location within the parent
-	rect->OffsetBy(-fParentOffset.x, -fParentOffset.y);
-
-	// our local coordinate transformation
-	rect->OffsetBy(Origin());
+	// - our bounds location within the parent
+	// + our scrolling offset
+	rect->OffsetBy(-fParentOffset.x + fBounds.left,
+		-fParentOffset.y + fBounds.top);
 }
 
 
@@ -738,7 +738,7 @@ BView::ConvertFromParent(BRect rect) const
 
 
 void
-BView::ConvertToScreen(BPoint *pt) const
+BView::_ConvertToScreen(BPoint *pt, bool checkLock) const
 {
 	if (!fParent) {
 		if (fOwner)
@@ -747,10 +747,18 @@ BView::ConvertToScreen(BPoint *pt) const
 		return;
 	}
 
-	do_owner_check_no_pick();
+	if (checkLock)
+		do_owner_check_no_pick();
 
-	ConvertToParent(pt);
-	fParent->ConvertToScreen(pt);
+	_ConvertToParent(pt, false);
+	fParent->_ConvertToScreen(pt, false);
+}
+
+
+void
+BView::ConvertToScreen(BPoint *pt) const
+{
+	_ConvertToScreen(pt, true);
 }
 
 
@@ -764,7 +772,7 @@ BView::ConvertToScreen(BPoint pt) const
 
 
 void
-BView::ConvertFromScreen(BPoint *pt) const
+BView::_ConvertFromScreen(BPoint *pt, bool checkLock) const
 {
 	if (!fParent) {
 		if (fOwner)
@@ -773,10 +781,17 @@ BView::ConvertFromScreen(BPoint *pt) const
 		return;
 	}
 
-	do_owner_check_no_pick();
+	if (checkLock)
+		do_owner_check_no_pick();
 
-	ConvertFromParent(pt);
-	fParent->ConvertFromScreen(pt);
+	_ConvertFromParent(pt, false);
+	fParent->_ConvertFromScreen(pt, false);
+}
+
+void
+BView::ConvertFromScreen(BPoint *pt) const
+{
+	_ConvertFromScreen(pt, true);
 }
 
 
@@ -975,6 +990,9 @@ BView::SetOrigin(float x, float y)
 	if (fState->IsValid(B_VIEW_ORIGIN_BIT)
 		&& x == fState->origin.x && y == fState->origin.y)
 		return;
+
+	fState->origin.x = x;
+	fState->origin.y = y;
 
 	if (do_owner_check()) {
 		fOwner->fLink->StartMessage(AS_LAYER_SET_ORIGIN);
@@ -1539,7 +1557,7 @@ BView::ScrollBy(float deltaX, float deltaY)
 
 		fOwner->fLink->Flush();
 
-		fState->valid_flags &= ~(B_VIEW_FRAME_BIT | B_VIEW_ORIGIN_BIT);
+//		fState->valid_flags &= ~B_VIEW_FRAME_BIT;
 	}
 
 	// we modify our bounds rectangle by deltaX/deltaY coord units hor/ver.
@@ -3572,7 +3590,7 @@ BView::MoveTo(float x, float y)
 		fOwner->fLink->Attach<float>(x);
 		fOwner->fLink->Attach<float>(y);
 
-		fState->valid_flags |= B_VIEW_FRAME_BIT;
+//		fState->valid_flags |= B_VIEW_FRAME_BIT;
 
 		_FlushIfNotInTransaction();
 	}
@@ -3600,7 +3618,7 @@ BView::ResizeBy(float deltaWidth, float deltaHeight)
 		fOwner->fLink->Attach<float>(fBounds.right + deltaWidth);
 		fOwner->fLink->Attach<float>(fBounds.bottom + deltaHeight);
 
-		fState->valid_flags |= B_VIEW_FRAME_BIT;
+//		fState->valid_flags |= B_VIEW_FRAME_BIT;
 
 		_FlushIfNotInTransaction();
 	}
@@ -4652,17 +4670,17 @@ BView::_UpdateStateForRemove()
 		return;
 
 	fState->UpdateFrom(*fOwner->fLink);
-	if (!fState->IsValid(B_VIEW_FRAME_BIT)) {
-		fOwner->fLink->StartMessage(AS_LAYER_GET_COORD);
-
-		status_t code;
-		if (fOwner->fLink->FlushWithReply(code) == B_OK
-			&& code == B_OK) {
-			fOwner->fLink->Read<BPoint>(&fParentOffset);
-			fOwner->fLink->Read<BRect>(&fBounds);
-			fState->valid_flags |= B_VIEW_FRAME_BIT;
-		}
-	}
+//	if (!fState->IsValid(B_VIEW_FRAME_BIT)) {
+//		fOwner->fLink->StartMessage(AS_LAYER_GET_COORD);
+//
+//		status_t code;
+//		if (fOwner->fLink->FlushWithReply(code) == B_OK
+//			&& code == B_OK) {
+//			fOwner->fLink->Read<BPoint>(&fParentOffset);
+//			fOwner->fLink->Read<BRect>(&fBounds);
+//			fState->valid_flags |= B_VIEW_FRAME_BIT;
+//		}
+//	}
 	
 	// update children as well
 
