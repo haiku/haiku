@@ -831,7 +831,7 @@ status_t
 EHCI::AddPendingTransfer(Transfer *transfer, ehci_qh *queueHead,
 	ehci_qtd *dataDescriptor, bool directionIn)
 {
-	transfer_data *data = new(std::nothrow) transfer_data();
+	transfer_data *data = new(std::nothrow) transfer_data;
 	if (!data)
 		return B_NO_MEMORY;
 
@@ -842,8 +842,8 @@ EHCI::AddPendingTransfer(Transfer *transfer, ehci_qh *queueHead,
 	data->transfer = transfer;
 	data->queue_head = queueHead;
 	data->data_descriptor = dataDescriptor;
-	data->user_area = -1;
 	data->incoming = directionIn;
+	data->canceled = false;
 	data->link = NULL;
 
 	if (!Lock()) {
@@ -869,29 +869,21 @@ EHCI::CancelQueuedTransfers(Pipe *pipe)
 	if (!Lock())
 		return B_ERROR;
 
-	transfer_data *last = NULL;
 	transfer_data *current = fFirstTransfer;
 	while (current) {
 		if (current->transfer->TransferPipe() == pipe) {
-			UnlinkQueueHead(current->queue_head, &fFreeListHead);
+			// clear the active bit so the descriptors are canceled
+			ehci_qtd *descriptor = (ehci_qtd *)current->queue_head->element_log;
+			while (descriptor) {
+				descriptor->token &= ~EHCI_QTD_STATUS_ACTIVE;
+				descriptor = (ehci_qtd *)descriptor->next_log;
+			}
+
 			current->transfer->Finished(B_CANCELED, 0);
-			delete current->transfer;
-
-			transfer_data *next = current->link;
-			if (last)
-				last->link = next;
-			else
-				fFirstTransfer = next;
-
-			if (fLastTransfer == current)
-				fLastTransfer = last;
-
-			delete current;
-			current = next;
-		} else {
-			last = current;
-			current = current->link;
+			current->canceled = true;
 		}
+
+		current = current->link;
 	}
 
 	Unlock();
@@ -954,10 +946,7 @@ EHCI::FinishTransfers()
 		while (transfer) {
 			bool transferDone = false;
 			ehci_qtd *descriptor = (ehci_qtd *)transfer->queue_head->element_log;
-
-#ifdef TRACE_USB
-			print_queue(transfer->queue_head);
-#endif
+			status_t callbackStatus = B_OK;
 
 			while (descriptor) {
 				uint32 status = descriptor->token;
@@ -998,8 +987,6 @@ EHCI::FinishTransfers()
 						callbackStatus = B_DEV_STALLED;
 					}
 
-					UnlinkQueueHead(transfer->queue_head, &fFreeListHead);
-					transfer->transfer->Finished(callbackStatus, 0);
 					transferDone = true;
 					break;
 				}
@@ -1007,8 +994,41 @@ EHCI::FinishTransfers()
 				if (descriptor->next_phy & EHCI_QTD_TERMINATE) {
 					// we arrived at the last (stray) descriptor, we're done
 					TRACE(("usb_ehci: qtd (0x%08lx) done\n", descriptor->this_phy));
+					callbackStatus = B_OK;
+					transferDone = true;
+					break;
+				}
 
-					size_t actualLength = 0;
+				descriptor = (ehci_qtd *)descriptor->next_log;
+			}
+
+			if (!transferDone) {
+				lastTransfer = transfer;
+				transfer = transfer->link;
+				continue;
+			}
+
+			// remove the transfer from the list first so we are sure
+			// it doesn't get canceled while we still process it
+			transfer_data *next = transfer->link;
+			if (Lock()) {
+				if (lastTransfer)
+					lastTransfer->link = transfer->link;
+
+				if (transfer == fFirstTransfer)
+					fFirstTransfer = transfer->link;
+				if (transfer == fLastTransfer)
+					fLastTransfer = lastTransfer;
+
+				transfer->link = NULL;
+				Unlock();
+			}
+
+			// if canceled the callback has already been called
+			if (!transfer->canceled) {
+				size_t actualLength = 0;
+
+				if (callbackStatus == B_OK) {
 					bool nextDataToggle = false;
 					if (transfer->data_descriptor && transfer->incoming) {
 						// data to read out
@@ -1027,56 +1047,47 @@ EHCI::FinishTransfers()
 					}
 
 					transfer->transfer->TransferPipe()->SetDataToggle(nextDataToggle);
+
 					if (transfer->transfer->IsFragmented()) {
 						// this transfer may still have data left
 						transfer->transfer->AdvanceByFragment(actualLength);
 						if (transfer->transfer->VectorLength() > 0) {
 							FreeDescriptorChain(transfer->data_descriptor);
 							transfer->transfer->PrepareKernelAccess();
-							FillQueueWithData(transfer->transfer,
+							status_t result = FillQueueWithData(
+								transfer->transfer,
 								transfer->queue_head,
 								&transfer->data_descriptor, NULL);
-							break;
+
+							if (result == B_OK && Lock()) {
+								// reappend the transfer
+								if (fLastTransfer)
+									fLastTransfer->link = transfer;
+								if (!fFirstTransfer)
+									fFirstTransfer = transfer;
+
+								fLastTransfer = transfer;
+								Unlock();
+
+								transfer = next;
+								continue;
+							}
 						}
 
 						// the transfer is done, but we already set the
 						// actualLength with AdvanceByFragment()
 						actualLength = 0;
 					}
-
-					UnlinkQueueHead(transfer->queue_head, &fFreeListHead);
-					transfer->transfer->Finished(B_OK, actualLength);
-					transferDone = true;
-					break;
 				}
 
-				descriptor = (ehci_qtd *)descriptor->next_log;
+				transfer->transfer->Finished(callbackStatus, actualLength);
 			}
 
-			if (transferDone) {
-				if (Lock()) {
-					if (lastTransfer)
-						lastTransfer->link = transfer->link;
-
-					if (transfer == fFirstTransfer)
-						fFirstTransfer = transfer->link;
-					if (transfer == fLastTransfer)
-						fLastTransfer = lastTransfer;
-
-					transfer_data *next = transfer->link;
-					delete transfer->transfer;
-					delete transfer;
-					transfer = next;
-					Unlock();
-				}
-			} else {
-				if (Lock()) {
-					lastTransfer = transfer;
-					transfer = transfer->link;
-					Unlock();
-				}
-			}
-
+			// unlink hardware queue and delete the transfer
+			UnlinkQueueHead(transfer->queue_head, &fFreeListHead);
+			delete transfer->transfer;
+			delete transfer;
+			transfer = next;
 			release_sem(fCleanupSem);
 		}
 	}
