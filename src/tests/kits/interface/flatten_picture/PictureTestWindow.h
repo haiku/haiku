@@ -28,10 +28,16 @@ private:
 	};
 
 	void BuildGUI();
+	void UpdateHeader();
 	void RunTests();
+	void RunTests(int32 testIndex);
+	void RunTests(int32 testIndex, color_space colorSpace);
 	
 	BListView *fListView;
+	BStringView *fHeader;
 	
+	int32 fFailedTests;
+	int32 fNumberOfTests;
 };
 
 #endif

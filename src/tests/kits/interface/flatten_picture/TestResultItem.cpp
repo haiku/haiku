@@ -14,6 +14,7 @@ TestResultItem::TestResultItem(const char* name, BRect bitmapSize)
 	: fName(name)
 	, fBitmapSize(bitmapSize)
 	, fOk(true)
+	, fDirectBitmap(NULL)
 	, fOriginalBitmap(NULL)
 	, fArchivedBitmap(NULL)
 {
@@ -21,6 +22,8 @@ TestResultItem::TestResultItem(const char* name, BRect bitmapSize)
 
 TestResultItem::~TestResultItem()
 {
+	delete fDirectBitmap;
+	fDirectBitmap = NULL;
 	delete fOriginalBitmap;
 	fOriginalBitmap = NULL;
 	delete fArchivedBitmap;
@@ -55,6 +58,11 @@ TestResultItem::DrawItem(BView *owner, BRect itemRect, bool drawEverthing)
 	owner->PopState();
 	
 	owner->MovePenTo(itemRect.left+1, itemRect.top+1);
+	if (fDirectBitmap != NULL) {
+		owner->DrawBitmap(fDirectBitmap);
+	}
+	owner->MovePenBy(fBitmapSize.Width() + distance, 0);
+
 	if (fOriginalBitmap != NULL) {
 		owner->DrawBitmap(fOriginalBitmap);
 	}
@@ -95,8 +103,8 @@ TestResultItem::Update(BView *owner, const BFont *font)
 	width += distance;
 	width += font->StringWidth(fErrorMessage.String());
 	
-	width += 2 * distance;
-	width += 2 * fBitmapSize.Width();
+	width += 3 * distance;
+	width += 3 * fBitmapSize.Width();
 
 	height = fBitmapSize.Height();	
 		

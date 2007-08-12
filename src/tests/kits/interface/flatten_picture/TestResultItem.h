@@ -25,6 +25,7 @@ public:
 	
 	void SetOk(bool ok) { fOk = ok; }
 	void SetErrorMessage(const char *errorMessage) { fErrorMessage = errorMessage; }
+	void SetDirectBitmap(BBitmap *directBitmap) { fDirectBitmap = directBitmap; }
 	void SetOriginalBitmap(BBitmap *originalBitmap) { fOriginalBitmap = originalBitmap; }
 	void SetArchivedBitmap(BBitmap *archivedBitmap) { fArchivedBitmap = archivedBitmap; }
 	
@@ -33,6 +34,7 @@ private:
 	BRect fBitmapSize;
 	bool fOk;
 	BString fErrorMessage;
+	BBitmap *fDirectBitmap;
 	BBitmap *fOriginalBitmap;
 	BBitmap *fArchivedBitmap;
 };

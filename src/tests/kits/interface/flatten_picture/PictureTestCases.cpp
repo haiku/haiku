@@ -46,7 +46,7 @@ void testStrokeRect(BView *view, BRect frame)
 	}
 }
 
-void testVerticalLine(BView *view, BRect frame)
+void testDiagonalLine(BView *view, BRect frame)
 {
 	view->StrokeLine(BPoint(frame.left, frame.top), BPoint(frame.right, frame.bottom));
 }
@@ -112,7 +112,7 @@ void testBitmap(BView *view, BRect frame) {
 
 TestCase gTestCases[] = {
 	{ "Test Empty Picture", testEmptyPicture },
-	{ "Test Vertical Line", testVerticalLine },
+	{ "Test Diagonal Line", testDiagonalLine },
 	{ "Test Stroke Rect", testStrokeRect },
 	{ "Test Draw String", testDrawString },
 	{ "Test Fill Red", testFillRed },

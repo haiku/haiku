@@ -22,7 +22,9 @@
 #include "TestResultItem.h"
 
 PictureTestWindow::PictureTestWindow()
-	: Inherited(BRect(100,100,500,300), "Picture Tests", B_DOCUMENT_WINDOW, 0)
+	: Inherited(BRect(10, 30, 630, 470), "Bitmap Drawing Tests", B_DOCUMENT_WINDOW, 0)
+	, fFailedTests(0)
+	, fNumberOfTests(0)
 {
 	BuildGUI();
 }
@@ -62,11 +64,13 @@ void PictureTestWindow::BuildGUI()
 	BRect b = Bounds();
 	b.top = mb->Bounds().bottom + 1;
 	
-	BStringView *header = new BStringView(b, "header", "Picture, Unflattened Picture, Test Name, Error Message", B_FOLLOW_LEFT | B_FOLLOW_RIGHT | B_FOLLOW_TOP);
-	header->ResizeToPreferred();
-	backdrop->AddChild(header);
-	b.top = header->Frame().bottom + 1;
-	
+	fHeader = new BStringView(b, "header", 
+		"X", B_FOLLOW_LEFT | B_FOLLOW_RIGHT | B_FOLLOW_TOP);
+	float width, height;
+	fHeader->GetPreferredSize(&width, &height);
+	fHeader->ResizeTo(b.Width(), height);
+	backdrop->AddChild(fHeader);
+	b.top = fHeader->Frame().bottom + 1;
 	
 	b.right -= B_V_SCROLL_BAR_WIDTH;
 	b.bottom -= B_H_SCROLL_BAR_HEIGHT;
@@ -74,6 +78,16 @@ void PictureTestWindow::BuildGUI()
 		B_FOLLOW_ALL_SIDES, 
 		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE);
 	backdrop->AddChild(new BScrollView("scroll_results", fListView, B_FOLLOW_ALL_SIDES, 0, true, true));	
+
+	UpdateHeader();
+}
+
+void
+PictureTestWindow::UpdateHeader()
+{
+	BString text("Direct Drawing, Picture Drawing, Restored Picture Drawing, Test Name, Error Message");
+	text << " (failures = " << fFailedTests << ",  tests =" << fNumberOfTests << ")";
+	fHeader->SetText(text.String());
 }
 
 void
@@ -90,6 +104,27 @@ PictureTestWindow::MessageReceived(BMessage *msg) {
 void
 PictureTestWindow::RunTests()
 {
+	for (int testIndex = 0; testIndex < 2; testIndex ++) {
+		BString text;
+		switch (testIndex)
+		{
+			case 0:
+				text = "Flatten Picture Test";
+				break;
+			case 1:
+				text = "Archive Picture Test";
+				break;
+			default:
+				text = "Unknown test method!";
+		}
+		fListView->AddItem(new BStringItem(text.String()));
+		RunTests(testIndex);
+	}
+}
+
+void 
+PictureTestWindow::RunTests(int32 testIndex)
+{
 	color_space colorSpaces[] = {
 		B_RGBA32,
 		B_RGB32,
@@ -97,7 +132,7 @@ PictureTestWindow::RunTests()
 		B_RGB16,
 		B_RGB15
 	};
-	BRect frame(0, 0, 100, 30);
+	
 	for (uint32 csIndex = 0; csIndex < sizeof(colorSpaces)/sizeof(color_space); csIndex ++) {
 		color_space colorSpace = colorSpaces[csIndex];
 		const char *csText;
@@ -126,19 +161,46 @@ PictureTestWindow::RunTests()
 		text += csText;
 		fListView->AddItem(new BStringItem(text.String()));
 		
-		for (int i = 0; gTestCases[i].name != NULL; i ++) {
-			TestCase *testCase = &gTestCases[i];
-			PictureTest test;
-			test.SetColorSpace(colorSpace);
-			bool ok = test.Test(testCase->func, frame);
-			
-			TestResultItem *item = new TestResultItem(testCase->name, frame);
-			item->SetOk(ok);
-			item->SetErrorMessage(test.ErrorMessage());
-			item->SetOriginalBitmap(test.GetOriginalBitmap(true));
-			item->SetArchivedBitmap(test.GetArchivedBitmap(true));
-			
-			fListView->AddItem(item);
+		RunTests(testIndex, colorSpace);
+	}
+}
+
+void 
+PictureTestWindow::RunTests(int32 testIndex, color_space colorSpace)
+{
+	BRect frame(0, 0, 100, 30);
+	for (int i = 0; gTestCases[i].name != NULL; i ++) {
+		TestCase *testCase = &gTestCases[i];
+		PictureTest *test;
+		switch (testIndex) {
+			case 0:
+				test = new FlattenPictureTest();
+				break;
+			case 1:
+				test = new ArchivePictureTest();
+				break;
+			default:
+				continue;
 		}
+		
+		test->SetColorSpace(colorSpace);
+		bool ok = test->Test(testCase->func, frame);
+		
+		TestResultItem *item = new TestResultItem(testCase->name, frame);
+		item->SetOk(ok);
+		item->SetErrorMessage(test->ErrorMessage());
+		item->SetDirectBitmap(test->DirectBitmap(true));
+		item->SetOriginalBitmap(test->BitmapFromPicture(true));
+		item->SetArchivedBitmap(test->BitmapFromRestoredPicture(true));
+		
+		delete test;
+		
+		fListView->AddItem(item);
+
+		fNumberOfTests ++;
+		if (!ok)
+			fFailedTests ++;
+		
+		UpdateHeader();
 	}
 }
