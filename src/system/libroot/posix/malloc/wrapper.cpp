@@ -26,6 +26,7 @@
 
 #include <image.h>
 
+#include <errno.h>
 #include <string.h>
 
 using namespace BPrivate;
@@ -210,9 +211,15 @@ malloc(size_t size)
 	static processHeap *pHeap = getAllocator();
 
 	void *addr = pHeap->getHeap(pHeap->getHeapIndex()).malloc(size);
+	if (addr == NULL) {
+		errno = B_NO_MEMORY;
+		return NULL;
+	}
+
 #if HEAP_LEAK_CHECK
 	add_address(addr, size);
 #endif
+
 	return addr;
 }
 
@@ -222,6 +229,10 @@ calloc(size_t nelem, size_t elsize)
 {
 	static processHeap *pHeap = getAllocator();
 	void *ptr = pHeap->getHeap(pHeap->getHeapIndex()).malloc(nelem * elsize);
+	if (ptr == NULL) {
+		errno = B_NO_MEMORY;
+		return NULL;
+	}
 
 #if HEAP_LEAK_CHECK
 	add_address(ptr, nelem * elsize);
@@ -250,6 +261,11 @@ memalign(size_t alignment, size_t size)
 {
 	static processHeap *pHeap = getAllocator();
 	void *addr = pHeap->getHeap(pHeap->getHeapIndex()).memalign(alignment, size);
+	if (addr == NULL) {
+		errno = B_NO_MEMORY;
+		return NULL;
+	}
+
 #if HEAP_LEAK_CHECK
 	add_address(addr, size);
 #endif
@@ -286,8 +302,8 @@ realloc(void *ptr, size_t size)
 	// Allocate a new block of size sz.
 	void *buffer = malloc(size);
 	if (buffer == NULL) {
-		// Allocation failed, free old block and return
-		free(ptr);
+		// Allocation failed, leave old block and return
+		errno = B_NO_MEMORY;
 		return NULL;
 	}
 
