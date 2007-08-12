@@ -12,34 +12,6 @@
 status_t
 swap_data(type_code type, void *_data, size_t length, swap_action action)
 {
-	if (_data == NULL || length == 0)
-		return B_BAD_VALUE;
-
-	switch (type) {
-		// allowed types
-		case B_INT16_TYPE:
-		case B_UINT16_TYPE:
-		case B_FLOAT_TYPE:
-		case B_INT32_TYPE:
-		case B_UINT32_TYPE:
-		case B_SIZE_T_TYPE:
-		case B_SSIZE_T_TYPE:
-		case B_TIME_TYPE:
-		case B_POINTER_TYPE:
-		case B_RECT_TYPE:
-		case B_POINT_TYPE:
-		case B_DOUBLE_TYPE:
-		case B_INT64_TYPE:
-		case B_UINT64_TYPE:
-		case B_OFF_T_TYPE:
-		case B_MESSENGER_TYPE:
-			break;
-
-		default:
-			// not swappable or recognized type!
-			return B_BAD_VALUE;
-	}
-
 	// is there anything to do?
 #if B_HOST_IS_LENDIAN
 	if (action == B_SWAP_HOST_TO_LENDIAN || action == B_SWAP_LENDIAN_TO_HOST)
@@ -49,6 +21,15 @@ swap_data(type_code type, void *_data, size_t length, swap_action action)
 		return B_OK;
 #endif
 
+	if (length == 0)
+		return B_OK;
+
+	if (_data == NULL)
+		return B_BAD_VALUE;
+
+	// ToDo: these are not safe. If the length is smaller than the size of
+	// the type to be converted, too much data may be read. R5 behaves in the
+	// same way though.
 	switch (type) {
 		// 16 bit types
 		case B_INT16_TYPE:
@@ -119,6 +100,10 @@ swap_data(type_code type, void *_data, size_t length, swap_action action)
 			}
 			break;
 		}
+
+		default:
+			// not swappable or recognized type!
+			return B_BAD_VALUE;
 	}
 
 	return B_OK;
@@ -132,7 +117,6 @@ is_type_swapped(type_code type)
 	// Looks like a pretty strange function to me :)
 
 	switch (type) {
-		case B_ANY_TYPE:
 		case B_BOOL_TYPE:
 		case B_CHAR_TYPE:
 		case B_COLOR_8_BIT_TYPE:
@@ -147,12 +131,10 @@ is_type_swapped(type_code type)
 		case B_MESSENGER_TYPE:
 		case B_MIME_TYPE:
 		case B_MONOCHROME_1_BIT_TYPE:
-		case B_OBJECT_TYPE:
 		case B_OFF_T_TYPE:
 		case B_PATTERN_TYPE:
 		case B_POINTER_TYPE:
 		case B_POINT_TYPE:
-		case B_RAW_TYPE:
 		case B_RECT_TYPE:
 		case B_REF_TYPE:
 		case B_RGB_32_BIT_TYPE:
@@ -165,12 +147,8 @@ is_type_swapped(type_code type)
 		case B_UINT32_TYPE:
 		case B_UINT16_TYPE:
 		case B_UINT8_TYPE:
-		case B_MEDIA_PARAMETER_TYPE:
-		case B_MEDIA_PARAMETER_WEB_TYPE:
-		case B_MEDIA_PARAMETER_GROUP_TYPE:
 			return true;
 	}
 
 	return false;
 }
-
