@@ -274,7 +274,9 @@ KPartitioningSystem::SupportsInitializing(KPartition *partition)
 }
 
 // SupportsInitializingChild
-//! Check whether the add-on supports initializing a child of this partition.
+/*! Check whether the child partition managed by this partitioning system can
+	be initialized with the given disk system.
+*/
 bool
 KPartitioningSystem::SupportsInitializingChild(KPartition *child,
 	const char *diskSystem)
