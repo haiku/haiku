@@ -285,6 +285,11 @@ realloc(void *ptr, size_t size)
 
 	// Allocate a new block of size sz.
 	void *buffer = malloc(size);
+	if (buffer == NULL) {
+		// Allocation failed, free old block and return
+		free(ptr);
+		return NULL;
+	}
 
 	// Copy the contents of the original object
 	// up to the size of the new block.
