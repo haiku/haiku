@@ -24,13 +24,15 @@ private:
 
 	enum {
 		kMsgRunTests = 'PTst',
-		kMsgWriteImages,
+		kMsgRunTests1,
 	};
 
 	void BuildGUI();
 	void UpdateHeader();
 	void RunTests();
-	void RunTests(int32 testIndex);
+	void RunTests1();
+	void RunTests(color_space *colorSpaces, int32 n);
+	void RunTests(int32 testIndex, color_space *colorSpaces, int32 n);
 	void RunTests(int32 testIndex, color_space colorSpace);
 	
 	BListView *fListView;

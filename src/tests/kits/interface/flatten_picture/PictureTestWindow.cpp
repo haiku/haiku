@@ -54,9 +54,7 @@ void PictureTestWindow::BuildGUI()
 
 	m = new BMenu("Tests");
 		m->AddItem(new BMenuItem("Run", new BMessage(kMsgRunTests), 'R'));
-	// not implemented
-	//	m->AddSeparatorItem();
-	//	m->AddItem(new BMenuItem("Write images", new BMessage(kMsgWriteImages), 'W'));
+		m->AddItem(new BMenuItem("Run Color Space B_RGB32", new BMessage(kMsgRunTests1), 'S'));
 	mb->AddItem(m);
 
 	backdrop->AddChild(mb);
@@ -96,6 +94,9 @@ PictureTestWindow::MessageReceived(BMessage *msg) {
 		case kMsgRunTests:
 			RunTests();
 			break;
+		case kMsgRunTests1:
+			RunTests1();
+			break;
 	}
 	Inherited::MessageReceived(msg);
 }
@@ -103,6 +104,29 @@ PictureTestWindow::MessageReceived(BMessage *msg) {
 
 void
 PictureTestWindow::RunTests()
+{
+	color_space colorSpaces[] = {
+		B_RGBA32,
+		B_RGB32,
+		B_RGB24,
+		B_RGB16,
+		B_RGB15
+	};
+
+	RunTests(colorSpaces, sizeof(colorSpaces) / sizeof(color_space));	
+}
+
+void
+PictureTestWindow::RunTests1()
+{
+	color_space colorSpaces[] = {
+		B_RGBA32
+	};
+	RunTests(colorSpaces, 1);
+}
+
+void
+PictureTestWindow::RunTests(color_space *colorSpaces, int32 n)
 {
 	for (int testIndex = 0; testIndex < 2; testIndex ++) {
 		BString text;
@@ -118,22 +142,14 @@ PictureTestWindow::RunTests()
 				text = "Unknown test method!";
 		}
 		fListView->AddItem(new BStringItem(text.String()));
-		RunTests(testIndex);
+		RunTests(testIndex, colorSpaces, n);
 	}
 }
 
 void 
-PictureTestWindow::RunTests(int32 testIndex)
+PictureTestWindow::RunTests(int32 testIndex, color_space *colorSpaces, int32 n)
 {
-	color_space colorSpaces[] = {
-		B_RGBA32,
-		B_RGB32,
-		B_RGB24,
-		B_RGB16,
-		B_RGB15
-	};
-	
-	for (uint32 csIndex = 0; csIndex < sizeof(colorSpaces)/sizeof(color_space); csIndex ++) {
+	for (int32 csIndex = 0; csIndex < n; csIndex ++) {
 		color_space colorSpace = colorSpaces[csIndex];
 		const char *csText;
 		switch (colorSpace) {
