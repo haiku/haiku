@@ -1802,7 +1802,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			if (rectCount >= 0) {
 				// we are supposed to set the clipping region
 				BRegion region;
-				if (link.ReadRegion(&region) < B_OK)
+				if (rectCount > 0 && link.ReadRegion(&region) < B_OK)
 					break;
 				fCurrentLayer->SetUserClipping(&region);
 			} else {

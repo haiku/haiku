@@ -1011,6 +1011,8 @@ BPoint
 BView::Origin() const
 {
 	if (!fState->IsValid(B_VIEW_ORIGIN_BIT)) {
+		// we don't keep graphics state information, therefor
+		// we need to ask the server for the origin after PopState()
 		do_owner_check();
 
 		fOwner->fLink->StartMessage(AS_LAYER_GET_ORIGIN);
@@ -2169,7 +2171,6 @@ BView::SetFont(const BFont* font, uint32 mask)
 
 	if (fOwner) {
 		check_lock();
-		do_owner_check();
 
 		fState->UpdateServerFontState(*fOwner->fLink);
 	}
@@ -2260,7 +2261,8 @@ BView::GetClippingRegion(BRegion* region) const
 	// changed, so it is always read from the serber
 	region->MakeEmpty();
 
-	if (fOwner && do_owner_check()) {
+	if (fOwner) {
+		check_lock();
 		fOwner->fLink->StartMessage(AS_LAYER_GET_CLIP_REGION);
 
  		int32 code;
@@ -2277,21 +2279,20 @@ void
 BView::ConstrainClippingRegion(BRegion* region)
 {
 	if (do_owner_check()) {
-
 		fOwner->fLink->StartMessage(AS_LAYER_SET_CLIP_REGION);
 
 		if (region) {
 			int32 count = region->CountRects();
 			fOwner->fLink->Attach<int32>(count);
-			fOwner->fLink->AttachRegion(*region);
+			if (count > 0)
+				fOwner->fLink->AttachRegion(*region);
 		} else {
 			fOwner->fLink->Attach<int32>(-1);
 			// '-1' means that in the app_server, there won't be any 'local'
 			// clipping region (it will be NULL)
 		}
 
-		// we flush here because app_server waits for all the rects
-		fOwner->fLink->Flush();
+		_FlushIfNotInTransaction();
 
 		fState->valid_flags &= ~B_VIEW_CLIP_REGION_BIT;
 		fState->archiving_flags |= B_VIEW_CLIP_REGION_BIT;
@@ -4666,6 +4667,7 @@ BView::_Pulse()
 void
 BView::_UpdateStateForRemove()
 {
+	// TODO: check_lock() would be good enough, no?
 	if (!do_owner_check())
 		return;
 
@@ -4767,23 +4769,12 @@ BView::do_owner_check() const
 {
 	STRACE(("BView(%s)::do_owner_check()...", Name()));
 
-	int32 serverToken = _get_object_token_(this);
-
 	if (fOwner == NULL) {
 		debugger("View method requires owner and doesn't have one.");
 		return false;
 	}
 
-	fOwner->check_lock();
-
-	if (fOwner->fLastViewToken != serverToken) {
-		STRACE(("contacting app_server... sending token: %ld\n", serverToken));
-		fOwner->fLink->StartMessage(AS_SET_CURRENT_LAYER);
-		fOwner->fLink->Attach<int32>(serverToken);
-
-		fOwner->fLastViewToken = serverToken;
-	} else
-		STRACE(("this is the lastViewToken\n"));
+	check_lock();
 
 	return true;
 }
