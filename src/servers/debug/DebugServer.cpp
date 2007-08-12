@@ -441,7 +441,7 @@ TeamDebugHandler::_EnterDebugger()
 
 	// prepare the argument vector
 	char teamString[32];
-	snprintf(teamString, sizeof(teamString), "%ld", fTeam);
+	snprintf(teamString, sizeof(teamString), "--pid=%ld", fTeam);
 
 	const char *terminal = (debugInConsoled ? kConsoledPath : kTerminalPath);
 
@@ -459,8 +459,9 @@ TeamDebugHandler::_EnterDebugger()
 	}
 
 	argv[argc++] = kGDBPath;
-	argv[argc++] = fExecutablePath;
 	argv[argc++] = teamString;
+	if (strlen(fExecutablePath) > 0)
+		argv[argc++] = fExecutablePath;
 	argv[argc] = NULL;
 
 	// start the terminal
@@ -553,10 +554,9 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 	// ask the user whether to debug or kill the team
 	if (_IsGUIServer()) {
 		// App server, input server, or registrar. We always debug those.
-		kill = !(strlen(fExecutablePath) > 0);
+		kill = false;
 	} else if (USE_GUI && _AreGUIServersAlive() && _InitGUI() == B_OK) {
-		// normal app
-
+		// normal app -- tell the user
 		_NotifyAppServer(fTeam);
 
 		char buffer[1024];
@@ -564,18 +564,10 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 			"has encountered an error which prevents it from continuing. Haiku "
 			"will terminate the application and clean up.", fTeamInfo.args);
 
-		if (strlen(fExecutablePath) > 0) {
-			// we have a usable path, so we can debug the team
-			BAlert *alert = new BAlert(NULL, buffer, "Debug", "OK", NULL,
-				B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-			int32 result = alert->Go();
-			kill = (result == 1);
-		} else {
-			// no usable path
-			BAlert *alert = new BAlert(NULL, buffer, "OK", NULL, NULL,
-				B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-			alert->Go();
-		}
+		BAlert *alert = new BAlert(NULL, buffer, "Debug", "OK", NULL,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		int32 result = alert->Go();
+		kill = (result == 1);
 	}
 
 	return kill;
