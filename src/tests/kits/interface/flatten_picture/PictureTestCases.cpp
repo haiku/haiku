@@ -374,7 +374,8 @@ TestCase gTestCases[] = {
 	{ "Test AppendToPicture", testAppendToPicture },
 	{ "Test LineArray", testLineArray },
 	// does not work under R5 for pictures!
-	{ "Test CopyBits*", testCopyBits },
+	// TODO verify that CopyBits is not supported when recording to a BPicture
+	// { "Test CopyBits*", testCopyBits },
 	{ "Test InvertRect", testInvertRect },
 	{ "Test Bitmap", testBitmap },
 	{ NULL, NULL }
