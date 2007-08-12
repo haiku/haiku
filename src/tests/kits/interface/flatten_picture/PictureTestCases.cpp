@@ -123,3 +123,4 @@ TestCase gTestCases[] = {
 	{ "Test Draw Bitmap", testBitmap },
 	{ NULL, NULL }
 };
+

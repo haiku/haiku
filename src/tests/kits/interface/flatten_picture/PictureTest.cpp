@@ -296,3 +296,4 @@ ArchivePictureTest::SaveAndRestore(BPicture *picture)
 
 	return archivedPicture;
 }
+
