@@ -240,17 +240,18 @@ PartitionType::SetContentType(const char *contentType)
 /*!
 	\brief Finds next supported partition.
 */
-void
+bool
 PartitionType::FindNext()
 {
 	for (int32 i = 0; kPartitionTypes[i].name; i++) {
 		if (fType < kPartitionTypes[i].type) {
 			fType = kPartitionTypes[i].type;
 			fValid = true;
-			return;
+			return true;
 		}
 	}
 	fValid = false;
+	return false;
 }
 
 

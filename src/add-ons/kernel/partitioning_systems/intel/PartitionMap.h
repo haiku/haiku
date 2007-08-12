@@ -110,7 +110,7 @@ public:
 	bool IsExtended() const	{ return is_extended_type(fType); }
 
 	uint8 Type() const		{ return fType; }
-	void FindNext();
+	bool FindNext();
 	void GetTypeString(char *buffer) const
 		{ get_partition_type_string(fType, buffer); }
 private:

@@ -65,8 +65,6 @@ struct PartitionMapCookie : PartitionMap {
 };
 
 
-#ifndef _BOOT_MODE
-
 // Maximal size of move buffer (in sectors).
 static const int32 MAX_MOVE_BUFFER = 2 * 1024 * 4;
 
@@ -91,329 +89,10 @@ typedef int32 (*fc_fill_partitionable_spaces_buffer)(partition_data *partition,
 		PartitionPosition *positions);
 
 
-#endif	//!_BOOT_MODE
-
-
-// #pragma mark - Intel Partition Map Module
-
-
-// module
-static status_t pm_std_ops(int32 op, ...);
-
-// scanning
-static float pm_identify_partition(int fd, partition_data *partition,
-								   void **cookie);
-static status_t pm_scan_partition(int fd, partition_data *partition,
-								  void *cookie);
-static void pm_free_identify_partition_cookie(partition_data *partition,
-											  void *cookie);
-static void pm_free_partition_cookie(partition_data *partition);
-static void pm_free_partition_content_cookie(partition_data *partition);
-
-#ifndef _BOOT_MODE
-// querying
-static bool pm_supports_resizing(partition_data *partition);
-static bool pm_supports_resizing_child(partition_data *partition,
-									   partition_data *child);
-static bool pm_supports_moving(partition_data *partition, bool *isNoOp);
-static bool pm_supports_moving_child(partition_data *partition,
-									 partition_data *child);
-static bool pm_supports_setting_name(partition_data *partition);
-static bool pm_supports_setting_content_name(partition_data *partition);
-static bool pm_supports_setting_type(partition_data *partition);
-static bool pm_supports_initializing(partition_data *partition);
-static bool pm_supports_creating_child(partition_data *partition);
-static bool pm_supports_deleting_child(partition_data *partition,
-									   partition_data *child);
-static bool pm_is_sub_system_for(partition_data *partition);
-
-static bool pm_validate_resize(partition_data *partition, off_t *size);
-static bool pm_validate_resize_child(partition_data *partition,
-									 partition_data *child, off_t *size);
-static bool pm_validate_move(partition_data *partition, off_t *start);
-static bool pm_validate_move_child(partition_data *partition,
-								   partition_data *child, off_t *start);
-static bool pm_validate_set_type(partition_data *partition, const char *type);
-static bool pm_validate_initialize(partition_data *partition,
-								   char *name, const char *parameters);
-static bool pm_validate_create_child(partition_data *partition,
-									 off_t *start, off_t *size,
-									 const char *type, const char *parameters,
-									 int32 *index);
 static status_t pm_get_partitionable_spaces(partition_data *partition,
-											partitionable_space_data *buffer,
-											int32 count, int32 *actualCount);
-static status_t pm_get_next_supported_type(partition_data *partition,
-										   int32 *cookie, char *type);
-static status_t get_type_for_content_type(const char *contentType,
-										  char *type);
-
-// shadow partition modification
-static status_t pm_shadow_changed(partition_data *partition, uint32 operation);
-
-// writing
-static status_t pm_resize(int fd, partition_id partition, off_t size,
-						  disk_job_id job);
-static status_t pm_resize_child(int fd, partition_id partition, off_t size,
-								disk_job_id job);
-static status_t pm_move(int fd, partition_id partition, off_t offset,
-						disk_job_id job);
-static status_t pm_move_child(int fd, partition_id partition, partition_id child,
-							  off_t offset, disk_job_id job);
-static status_t pm_set_type(int fd, partition_id partition, const char *type,
-							disk_job_id job);
-static status_t pm_initialize(int fd, partition_id partition, const char *name,
-							  const char *parameters, disk_job_id job);
-static status_t pm_create_child(int fd, partition_id partition, off_t offset,
-								off_t size, const char *type,
-								const char *parameters, disk_job_id job,
-								partition_id *childID);
-static status_t pm_delete_child(int fd, partition_id partition,
-								partition_id child, disk_job_id job);
-
-#endif
-
-#ifdef _BOOT_MODE
-partition_module_info gIntelPartitionMapModule =
-#else
-static partition_module_info intel_partition_map_module =
-#endif
-{
-	{
-		INTEL_PARTITION_MODULE_NAME,
-		0,
-		pm_std_ops
-	},
-	INTEL_PARTITION_NAME,				// pretty_name
-	0,									// flags
-
-	// scanning
-	pm_identify_partition,				// identify_partition
-	pm_scan_partition,					// scan_partition
-	pm_free_identify_partition_cookie,	// free_identify_partition_cookie
-	pm_free_partition_cookie,			// free_partition_cookie
-	pm_free_partition_content_cookie,	// free_partition_content_cookie
-
-#ifndef _BOOT_MODE
-	// querying
-	NULL,								// supports_repairing
-	pm_supports_resizing,				// supports_resizing
-	pm_supports_resizing_child,			// supports_resizing_child
-	pm_supports_moving,					// supports_moving
-	pm_supports_moving_child,			// supports_moving_child
-	pm_supports_setting_name,			// supports_setting_name
-	pm_supports_setting_content_name,	// supports_setting_content_name
-	pm_supports_setting_type,			// supports_setting_type
-	NULL,								// supports_setting_parameters
-	NULL,								// supports_setting_content_parameters
-	pm_supports_initializing,			// supports_initializing
-	NULL,								// supports_initializing_child
-	pm_supports_creating_child,			// supports_creating_child
-	pm_supports_deleting_child,			// supports_deleting_child
-	pm_is_sub_system_for,				// is_sub_system_for
-
-	pm_validate_resize,					// validate_resize
-	pm_validate_resize_child,			// validate_resize_child
-	pm_validate_move,					// validate_move
-	pm_validate_move_child,				// validate_move_child
-	NULL,								// validate_set_name
-	NULL,								// validate_set_content_name
-	pm_validate_set_type,				// validate_set_type
-	NULL,								// validate_set_parameters
-	NULL,								// validate_set_content_parameters
-	pm_validate_initialize,				// validate_initialize
-	pm_validate_create_child,			// validate_create_child
-	pm_get_partitionable_spaces,		// get_partitionable_spaces
-	pm_get_next_supported_type,			// get_next_supported_type
-	get_type_for_content_type,			// get_type_for_content_type
-
-	// shadow partition modification
-	pm_shadow_changed,					// shadow_changed
-
-	// writing
-	NULL,								// repair
-	pm_resize,							// resize
-	pm_resize_child,					// resize_child
-	pm_move,							// move
-	pm_move_child,						// move_child
-	NULL,								// set_name
-	NULL,								// set_content_name
-	pm_set_type,						// set_type
-	NULL,								// set_parameters
-	NULL,								// set_content_parameters
-	pm_initialize,						// initialize
-	pm_create_child,					// create_child
-	pm_delete_child,					// delete_child
-#else
-	NULL
-#endif	// _BOOT_MODE
-};
-
-
-// #pragma mark - Intel Extended Partition Module
-
-
-// module
-static status_t ep_std_ops(int32 op, ...);
-
-// scanning
-static float ep_identify_partition(int fd, partition_data *partition,
-		void **cookie);
-static status_t ep_scan_partition(int fd, partition_data *partition,
-		void *cookie);
-static void ep_free_identify_partition_cookie(partition_data *partition,
-		void *cookie);
-static void ep_free_partition_cookie(partition_data *partition);
-static void ep_free_partition_content_cookie(partition_data *partition);
-
-#ifndef _BOOT_MODE
-// querying
-static bool ep_supports_resizing(partition_data *partition);
-static bool ep_supports_resizing_child(partition_data *partition,
-									   partition_data *child);
-static bool ep_supports_moving(partition_data *partition, bool *isNoOp);
-static bool ep_supports_moving_child(partition_data *partition,
-									 partition_data *child);
-static bool ep_supports_setting_name(partition_data *partition);
-static bool ep_supports_setting_content_name(partition_data *partition);
-static bool ep_supports_setting_type(partition_data *partition);
-static bool ep_supports_initializing(partition_data *partition);
-static bool ep_supports_creating_child(partition_data *partition);
-static bool ep_supports_deleting_child(partition_data *partition,
-									   partition_data *child);
-static bool ep_is_sub_system_for(partition_data *partition);
-
-static bool ep_validate_resize(partition_data *partition, off_t *size);
-static bool ep_validate_resize_child(partition_data *partition,
-									 partition_data *child, off_t *size);
-static bool ep_validate_move(partition_data *partition, off_t *start);
-static bool ep_validate_move_child(partition_data *partition,
-								   partition_data *child, off_t *start);
-static bool ep_validate_set_type(partition_data *partition, const char *type);
-static bool ep_validate_initialize(partition_data *partition,
-								   char *name, const char *parameters);
-static bool ep_validate_create_child(partition_data *partition,
-									 off_t *start, off_t *size,
-									 const char *type, const char *parameters,
-									 int32 *index);
+	partitionable_space_data *buffer, int32 count, int32 *actualCount);
 static status_t ep_get_partitionable_spaces(partition_data *partition,
-											partitionable_space_data *buffer,
-											int32 count, int32 *actualCount);
-static status_t ep_get_next_supported_type(partition_data *partition,
-										   int32 *cookie, char *type);
-
-// shadow partition modification
-static status_t ep_shadow_changed(partition_data *partition, uint32 operation);
-
-// writing
-static status_t ep_resize(int fd, partition_id partition, off_t size,
-						  disk_job_id job);
-static status_t ep_resize_child(int fd, partition_id partition, off_t size,
-								disk_job_id job);
-static status_t ep_move(int fd, partition_id partition, off_t offset,
-						disk_job_id job);
-static status_t ep_move_child(int fd, partition_id partition, partition_id child,
-							  off_t offset, disk_job_id job);
-static status_t ep_set_type(int fd, partition_id partition, const char *type,
-							disk_job_id job);
-static status_t ep_initialize(int fd, partition_id partition, const char *name,
-							  const char *parameters, disk_job_id job);
-static status_t ep_create_child(int fd, partition_id partition, off_t offset,
-								off_t size, const char *type,
-								const char *parameters, disk_job_id job,
-								partition_id *childID);
-static status_t ep_delete_child(int fd, partition_id partition,
-								partition_id child, disk_job_id job);
-
-#endif
-
-
-#ifdef _BOOT_MODE
-partition_module_info gIntelExtendedPartitionModule =
-#else
-static partition_module_info intel_extended_partition_module =
-#endif
-{
-	{
-		INTEL_EXTENDED_PARTITION_MODULE_NAME,
-		0,
-		ep_std_ops
-	},
-	INTEL_EXTENDED_PARTITION_NAME,		// pretty_name
-	0,									// flags
-
-	// scanning
-	ep_identify_partition,				// identify_partition
-	ep_scan_partition,					// scan_partition
-	ep_free_identify_partition_cookie,	// free_identify_partition_cookie
-	ep_free_partition_cookie,			// free_partition_cookie
-	ep_free_partition_content_cookie,	// free_partition_content_cookie
-
-#ifndef _BOOT_MODE
-	// querying
-	NULL,								// supports_repairing
-	ep_supports_resizing,				// supports_resizing
-	ep_supports_resizing_child,			// supports_resizing_child
-	ep_supports_moving,					// supports_moving
-	ep_supports_moving_child,			// supports_moving_child
-	ep_supports_setting_name,			// supports_setting_name
-	ep_supports_setting_content_name,	// supports_setting_content_name
-	ep_supports_setting_type,			// supports_setting_type
-	NULL,								// supports_setting_parameters
-	NULL,								// supports_setting_content_parameters
-	ep_supports_initializing,			// supports_initializing
-	NULL,								// supports_initializing_child
-	ep_supports_creating_child,			// supports_creating_child
-	ep_supports_deleting_child,			// supports_deleting_child
-	ep_is_sub_system_for,				// is_sub_system_for
-
-	ep_validate_resize,					// validate_resize
-	ep_validate_resize_child,			// validate_resize_child
-	ep_validate_move,					// validate_move
-	ep_validate_move_child,				// validate_move_child
-	NULL,								// validate_set_name
-	NULL,								// validate_set_content_name
-	ep_validate_set_type,				// validate_set_type
-	NULL,								// validate_set_parameters
-	NULL,								// validate_set_content_parameters
-	ep_validate_initialize,				// validate_initialize
-	ep_validate_create_child,			// validate_create_child
-	ep_get_partitionable_spaces,		// get_partitionable_spaces
-	ep_get_next_supported_type,			// get_next_supported_type
-	get_type_for_content_type,			// get_type_for_content_type
-
-	// shadow partition modification
-	ep_shadow_changed,					// shadow_changed
-
-	// writing
-	NULL,								// repair
-	ep_resize,							// resize
-	ep_resize_child,					// resize_child
-	ep_move,							// move
-	ep_move_child,						// move_child
-	NULL,								// set_name
-	NULL,								// set_content_name
-	ep_set_type,						// set_type
-	NULL,								// set_parameters
-	NULL,								// set_content_parameters
-	ep_initialize,						// initialize
-	ep_create_child,					// create_child
-	ep_delete_child,					// delete_child
-#else	// _BOOT_MODE
-	NULL
-#endif	// _BOOT_MODE
-};
-
-
-#ifndef _BOOT_MODE
-extern "C" partition_module_info *modules[];
-_EXPORT partition_module_info *modules[] =
-{
-	&intel_partition_map_module,
-	&intel_extended_partition_module,
-	NULL
-};
-#endif
+	partitionable_space_data *buffer, int32 count, int32 *actualCount);
 
 
 // #pragma mark - Intel Partition Map Module
@@ -674,10 +353,7 @@ pm_supports_initializing(partition_data *partition)
 		partition->child_count == 0,
 		partition->content_cookie == NULL));
 
-	return (partition
-		&& !partition->content_type
-		&& partition->child_count == 0
-		&& partition->content_cookie == NULL);
+	return true;
 }
 
 // pm_supports_creating_child
@@ -1298,31 +974,38 @@ pm_get_partitionable_spaces(partition_data *partition,
 
 // pm_get_next_supported_type
 static status_t
-pm_get_next_supported_type(partition_data *partition, int32 *cookie, char *type)
+pm_get_next_supported_type(partition_data *partition, int32 *cookie,
+	char *_type)
 {
 	TRACE(("intel: pm_get_next_supported_type\n"));
 	
 	if (!partition || !partition->content_type
 		|| strcmp(partition->content_type, kPartitionTypeIntel)
-		|| !cookie || !type) {
+		|| !cookie || !_type) {
 		return B_BAD_VALUE;
 	}
 
+	if (*cookie > 255)
+		return B_ENTRY_NOT_FOUND;
 	if (*cookie < 1)
 		*cookie = 1;
-	else if (*cookie > 255)
-		return B_BAD_INDEX;
 
-	// finding out supported type
+	uint8 type = *cookie;
+
+	// get type
 	PartitionType ptype;
-	ptype.SetType(*cookie);
+	ptype.SetType(type);
 	if (!ptype.IsValid())
-		ptype.FindNext();
-	if (!ptype.IsValid())
-		return B_BAD_INDEX;
+		return B_ENTRY_NOT_FOUND;
 
-	ptype.GetTypeString(type);
-	*cookie = ptype.Type();
+	ptype.GetTypeString(_type);
+
+	// find next type
+	if (ptype.FindNext())
+		*cookie = ptype.Type();
+	else
+		*cookie = 256;
+
 	return B_OK;
 }
 
@@ -2115,14 +1798,22 @@ ep_supports_setting_type(partition_data *partition)
 static bool
 ep_supports_initializing(partition_data *partition)
 {
-	TRACE(("intel: ep_supports_initializing(%ld: %lld, %lld, %ld, %s)\n",
-		partition->id, partition->offset, partition->size,
-		partition->block_size, partition->content_type));
-	
-	return (partition
-		&& !partition->content_type
-		&& partition->child_count == 0
-		&& partition->content_cookie == NULL);
+//	TRACE(("intel: ep_supports_initializing(%ld: %lld, %lld, %ld, %s)\n",
+//		partition->id, partition->offset, partition->size,
+//		partition->block_size, partition->content_type));
+
+	if (!partition)
+		return true;
+
+	if (partition_data* parent = get_parent_partition(partition->id)) {
+		if (partition->type
+			&& strcmp(partition->type, kPartitionTypeIntelExtended) == 0
+			&& strcmp(parent->content_type, kPartitionTypeIntel) == 0) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 // ep_supports_creating_child
@@ -2346,33 +2037,41 @@ ep_get_partitionable_spaces(partition_data *partition,
 
 // ep_get_next_supported_type
 static status_t
-ep_get_next_supported_type(partition_data *partition, int32 *cookie, char *type)
+ep_get_next_supported_type(partition_data *partition, int32 *cookie,
+	char *_type)
 {
 	TRACE(("intel: ep_get_next_supported_type\n"));
 	
 	if (!partition || !partition->content_type
 		|| strcmp(partition->content_type, kPartitionTypeIntelExtended)
-		|| !cookie || !type) {
+		|| !cookie || !_type) {
 		return B_BAD_VALUE;
 	}
 
+	if (*cookie > 255)
+		return B_ENTRY_NOT_FOUND;
 	if (*cookie < 1)
 		*cookie = 1;
-	else if (*cookie > 255)
-		return B_BAD_INDEX;
 
-	// finding out supported type
+	uint8 type = *cookie;
+
+	// get type
 	PartitionType ptype;
-	ptype.SetType(*cookie);
-	if (!ptype.IsValid())
+	ptype.SetType(type);
+	while (ptype.IsValid() && !ptype.IsExtended())
 		ptype.FindNext();
-	while (ptype.IsValid() && ptype.IsExtended())
-		ptype.FindNext();
-	if (!ptype.IsValid())
-		return B_BAD_INDEX;
 
-	ptype.GetTypeString(type);
-	*cookie = ptype.Type();
+	if (!ptype.IsValid())
+		return B_ENTRY_NOT_FOUND;
+
+	ptype.GetTypeString(_type);
+
+	// find next type
+	if (ptype.FindNext())
+		*cookie = ptype.Type();
+	else
+		*cookie = 256;
+
 	return B_OK;
 }
 
@@ -2866,3 +2565,171 @@ ep_delete_child(int fd, partition_id partitionID, partition_id childID,
 }
 
 #endif	// !_BOOT_MODE
+
+
+// #pragma mark - modules
+
+
+#ifdef _BOOT_MODE
+partition_module_info gIntelPartitionMapModule =
+#else
+static partition_module_info intel_partition_map_module =
+#endif
+{
+	{
+		INTEL_PARTITION_MODULE_NAME,
+		0,
+		pm_std_ops
+	},
+	INTEL_PARTITION_NAME,				// pretty_name
+	0,									// flags
+
+	// scanning
+	pm_identify_partition,				// identify_partition
+	pm_scan_partition,					// scan_partition
+	pm_free_identify_partition_cookie,	// free_identify_partition_cookie
+	pm_free_partition_cookie,			// free_partition_cookie
+	pm_free_partition_content_cookie,	// free_partition_content_cookie
+
+#ifndef _BOOT_MODE
+	// querying
+	NULL,								// supports_repairing
+	pm_supports_resizing,				// supports_resizing
+	pm_supports_resizing_child,			// supports_resizing_child
+	pm_supports_moving,					// supports_moving
+	pm_supports_moving_child,			// supports_moving_child
+	pm_supports_setting_name,			// supports_setting_name
+	pm_supports_setting_content_name,	// supports_setting_content_name
+	pm_supports_setting_type,			// supports_setting_type
+	NULL,								// supports_setting_parameters
+	NULL,								// supports_setting_content_parameters
+	pm_supports_initializing,			// supports_initializing
+	NULL,								// supports_initializing_child
+	pm_supports_creating_child,			// supports_creating_child
+	pm_supports_deleting_child,			// supports_deleting_child
+	pm_is_sub_system_for,				// is_sub_system_for
+
+	pm_validate_resize,					// validate_resize
+	pm_validate_resize_child,			// validate_resize_child
+	pm_validate_move,					// validate_move
+	pm_validate_move_child,				// validate_move_child
+	NULL,								// validate_set_name
+	NULL,								// validate_set_content_name
+	pm_validate_set_type,				// validate_set_type
+	NULL,								// validate_set_parameters
+	NULL,								// validate_set_content_parameters
+	pm_validate_initialize,				// validate_initialize
+	pm_validate_create_child,			// validate_create_child
+	pm_get_partitionable_spaces,		// get_partitionable_spaces
+	pm_get_next_supported_type,			// get_next_supported_type
+	get_type_for_content_type,			// get_type_for_content_type
+
+	// shadow partition modification
+	pm_shadow_changed,					// shadow_changed
+
+	// writing
+	NULL,								// repair
+	pm_resize,							// resize
+	pm_resize_child,					// resize_child
+	pm_move,							// move
+	pm_move_child,						// move_child
+	NULL,								// set_name
+	NULL,								// set_content_name
+	pm_set_type,						// set_type
+	NULL,								// set_parameters
+	NULL,								// set_content_parameters
+	pm_initialize,						// initialize
+	pm_create_child,					// create_child
+	pm_delete_child,					// delete_child
+#else
+	NULL
+#endif	// _BOOT_MODE
+};
+
+
+#ifdef _BOOT_MODE
+partition_module_info gIntelExtendedPartitionModule =
+#else
+static partition_module_info intel_extended_partition_module =
+#endif
+{
+	{
+		INTEL_EXTENDED_PARTITION_MODULE_NAME,
+		0,
+		ep_std_ops
+	},
+	INTEL_EXTENDED_PARTITION_NAME,		// pretty_name
+	0,									// flags
+
+	// scanning
+	ep_identify_partition,				// identify_partition
+	ep_scan_partition,					// scan_partition
+	ep_free_identify_partition_cookie,	// free_identify_partition_cookie
+	ep_free_partition_cookie,			// free_partition_cookie
+	ep_free_partition_content_cookie,	// free_partition_content_cookie
+
+#ifndef _BOOT_MODE
+	// querying
+	NULL,								// supports_repairing
+	ep_supports_resizing,				// supports_resizing
+	ep_supports_resizing_child,			// supports_resizing_child
+	ep_supports_moving,					// supports_moving
+	ep_supports_moving_child,			// supports_moving_child
+	ep_supports_setting_name,			// supports_setting_name
+	ep_supports_setting_content_name,	// supports_setting_content_name
+	ep_supports_setting_type,			// supports_setting_type
+	NULL,								// supports_setting_parameters
+	NULL,								// supports_setting_content_parameters
+	ep_supports_initializing,			// supports_initializing
+	NULL,								// supports_initializing_child
+	ep_supports_creating_child,			// supports_creating_child
+	ep_supports_deleting_child,			// supports_deleting_child
+	ep_is_sub_system_for,				// is_sub_system_for
+
+	ep_validate_resize,					// validate_resize
+	ep_validate_resize_child,			// validate_resize_child
+	ep_validate_move,					// validate_move
+	ep_validate_move_child,				// validate_move_child
+	NULL,								// validate_set_name
+	NULL,								// validate_set_content_name
+	ep_validate_set_type,				// validate_set_type
+	NULL,								// validate_set_parameters
+	NULL,								// validate_set_content_parameters
+	ep_validate_initialize,				// validate_initialize
+	ep_validate_create_child,			// validate_create_child
+	ep_get_partitionable_spaces,		// get_partitionable_spaces
+	ep_get_next_supported_type,			// get_next_supported_type
+	get_type_for_content_type,			// get_type_for_content_type
+
+	// shadow partition modification
+	ep_shadow_changed,					// shadow_changed
+
+	// writing
+	NULL,								// repair
+	ep_resize,							// resize
+	ep_resize_child,					// resize_child
+	ep_move,							// move
+	ep_move_child,						// move_child
+	NULL,								// set_name
+	NULL,								// set_content_name
+	ep_set_type,						// set_type
+	NULL,								// set_parameters
+	NULL,								// set_content_parameters
+	ep_initialize,						// initialize
+	ep_create_child,					// create_child
+	ep_delete_child,					// delete_child
+#else	// _BOOT_MODE
+	NULL
+#endif	// _BOOT_MODE
+};
+
+
+#ifndef _BOOT_MODE
+extern "C" partition_module_info *modules[];
+_EXPORT partition_module_info *modules[] =
+{
+	&intel_partition_map_module,
+	&intel_extended_partition_module,
+	NULL
+};
+#endif
