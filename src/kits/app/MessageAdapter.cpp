@@ -43,16 +43,19 @@ struct r5_message_header {
 	uint8	flags;
 } _PACKED;
 
+
 struct dano_section_header {
 	uint32		code;
 	ssize_t		size;
 	uint8		data[0];
 } _PACKED;
 
+
 struct dano_message_header {
 	int32		what;
 	int32		padding;
 } _PACKED;
+
 
 typedef struct offset_table_s {
 	int32		indexTable;
@@ -60,12 +63,14 @@ typedef struct offset_table_s {
 	int64		padding;
 } OffsetTable;
 
+
 struct dano_single_item {
 	type_code	type;
 	ssize_t		item_size;
 	uint8		name_length;
 	char		name[0];
 } _PACKED;
+
 
 struct dano_fixed_size_array {
 	type_code	type;
@@ -171,11 +176,18 @@ MessageAdapter::Unflatten(uint32 format, BMessage *into, const char *buffer)
 	try {
 		switch (format) {
 			case MESSAGE_FORMAT_R5:
-			case MESSAGE_FORMAT_R5_SWAPPED:
 			{
 				r5_message_header *header = (r5_message_header *)buffer;
 				BMemoryIO stream(buffer + sizeof(uint32),
 					header->flattened_size - sizeof(uint32));
+				return _UnflattenR5Message(format, into, &stream);
+			}
+
+			case MESSAGE_FORMAT_R5_SWAPPED:
+			{
+				r5_message_header *header = (r5_message_header *)buffer;
+				BMemoryIO stream(buffer + sizeof(uint32),
+					__swap_int32(header->flattened_size) - sizeof(uint32));
 				return _UnflattenR5Message(format, into, &stream);
 			}
 
@@ -582,24 +594,50 @@ MessageAdapter::_UnflattenR5Message(uint32 format, BMessage *into,
 		if (fixedSize)
 			itemSize = dataSize / itemCount;
 
-		for (int32 i = 0; i < itemCount; i++) {
-			if (!fixedSize) {
+		if (fixedSize) {
+			for (int32 i = 0; i < itemCount; i++) {
+				// ToDo: what if we are swapped? need B_INT32_TYPEs and the
+				// like be swapped here?
+				result = into->AddData(nameBuffer, type, pointer, itemSize,
+					fixedSize, itemCount);
+
+				if (result < B_OK) {
+					free(buffer);
+					return result;
+				}
+
+				pointer += itemSize;
+			}
+		} else if (format == MESSAGE_FORMAT_R5_SWAPPED) {
+			for (int32 i = 0; i < itemCount; i++) {
+				itemSize = __swap_int32(*(ssize_t *)pointer);
+				pointer += sizeof(ssize_t);
+
+				result = into->AddData(nameBuffer, type, pointer, itemSize,
+					fixedSize, itemCount);
+
+				if (result < B_OK) {
+					free(buffer);
+					return result;
+				}
+
+				pointer += pad_to_8(itemSize + sizeof(ssize_t)) - sizeof(ssize_t);
+			}
+		} else {
+			for (int32 i = 0; i < itemCount; i++) {
 				itemSize = *(ssize_t *)pointer;
 				pointer += sizeof(ssize_t);
-			}
 
-			result = into->AddData(nameBuffer, type, pointer, itemSize,
-				fixedSize, itemCount);
+				result = into->AddData(nameBuffer, type, pointer, itemSize,
+					fixedSize, itemCount);
 
-			if (result < B_OK) {
-				free(buffer);
-				return result;
-			}
+				if (result < B_OK) {
+					free(buffer);
+					return result;
+				}
 
-			if (fixedSize)
-				pointer += itemSize;
-			else
 				pointer += pad_to_8(itemSize + sizeof(ssize_t)) - sizeof(ssize_t);
+			}
 		}
 
 		free(buffer);
