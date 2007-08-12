@@ -1000,6 +1000,7 @@ insert_area(vm_address_space *addressSpace, void **_address,
 
 /*! You need to hold the lock of the cache and the write lock of the address
 	space when calling this function.
+	Note, that in case of error your cache will be temporarily unlocked.
 */
 static status_t
 map_backing_store(vm_address_space *addressSpace, vm_cache *cache,
@@ -1022,6 +1023,7 @@ map_backing_store(vm_address_space *addressSpace, vm_cache *cache,
 
 	// if this is a private map, we need to create a new cache & store object
 	// pair to handle the private copies of pages as they are written to
+	vm_cache* sourceCache = cache;
 	if (mapping == REGION_PRIVATE_MAP) {
 		vm_cache *newCache;
 		vm_store *newStore;
@@ -1091,9 +1093,13 @@ map_backing_store(vm_address_space *addressSpace, vm_cache *cache,
 
 err2:
 	if (mapping == REGION_PRIVATE_MAP) {
-		// we created this cache, so we must delete it again
+		// We created this cache, so we must delete it again. Note, that we
+		// need to temporarily unlock the source cache or we'll otherwise
+		// deadlock, since vm_cache_remove_consumer will try to lock it too.
 		mutex_unlock(&cache->lock);
+		mutex_unlock(&sourceCache->lock);
 		vm_cache_release_ref(cache);
+		mutex_lock(&sourceCache->lock);
 	}
 err1:
 	free(area->name);
