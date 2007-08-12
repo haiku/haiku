@@ -87,5 +87,5 @@ Addon <test>netfs
 	  VolumeManager.cpp
 
 	: <test>UserlandFSServer
-	  $(NETWORK_LIBS)
+	  $(TARGET_NETWORK_LIBS)
 ;

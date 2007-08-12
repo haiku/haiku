@@ -22,7 +22,7 @@ Addon POP3 :
 	SimpleMailProtocol.cpp
 	md5c.c ;
 
-LinkAgainst POP3 : be libmail.so $(NETWORK_LIBS) ;
+LinkAgainst POP3 : be libmail.so $(TARGET_NETWORK_LIBS) ;
 
 if $(USESSL) {
 	LinkAgainst POP3 : ssl crypto ;

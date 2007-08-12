@@ -8,7 +8,7 @@ Application CodyCam :
 	Settings.cpp
 	SettingsHandler.cpp
 	VideoConsumer.cpp
-	: be media translation $(NETAPI_LIB) $(TARGET_LIBSTDC++)
+	: be media translation $(TARGET_NETAPI_LIB) $(TARGET_LIBSTDC++)
 	: CodyCam.rdef
 ;
 

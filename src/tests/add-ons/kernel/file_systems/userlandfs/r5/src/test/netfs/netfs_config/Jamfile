@@ -28,5 +28,5 @@ Application <test>netfs_config
 #	  Blocker.cpp
 
 	  netfs_config.cpp
-	: be # $(NETWORK_LIBS)
+	: be # $(TARGET_NETWORK_LIBS)
 ;

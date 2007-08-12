@@ -60,7 +60,7 @@ BinCommand vim :
 	os_beos.c
 	version.c
 	pathdef.c
-	: be libtermcap.a $(SELECT_UNAME_ETC_LIB)
+	: be libtermcap.a $(TARGET_SELECT_UNAME_ETC_LIB)
 	: vim.rdef ;
 
 SEARCH on [ FGristFiles pathdef.c ] = [ FDirName $(SUBDIR) auto ] ;

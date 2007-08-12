@@ -47,8 +47,8 @@ SharedLibrary libmail.so :
 	libtextencoding.so
 	tracker
 	$(TARGET_LIBSTDC++)
-	$(NETWORK_LIBS)
-	$(SELECT_UNAME_ETC_LIB)
+	$(TARGET_NETWORK_LIBS)
+	$(TARGET_SELECT_UNAME_ETC_LIB)
 ;
 
 Package haiku-maildaemon-cvs :

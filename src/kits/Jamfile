@@ -74,7 +74,7 @@ SharedLibrary libbe_haiku.so :
 	libagg.a
 
 	libbeadapter.so
-	$(NETWORK_LIBS)
+	$(TARGET_NETWORK_LIBS)
 	$(TARGET_LIBSTDC++)
 ;
 

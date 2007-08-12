@@ -10,7 +10,7 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 
 BinCommand ping :
 	ping.c
-	: $(NETWORK_LIBS) $(SELECT_UNAME_ETC_LIB) ;
+	: $(TARGET_NETWORK_LIBS) $(TARGET_SELECT_UNAME_ETC_LIB) ;
 
 # Installation -- in the test directory for the time being
 HaikuInstall install-networking

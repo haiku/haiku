@@ -84,5 +84,5 @@ Application <test>NetFSServer
 	  UserSecurityContext.cpp
 	  Volume.cpp
 	  VolumeManager.cpp
-	: be $(NETWORK_LIBS)
+	: be $(TARGET_NETWORK_LIBS)
 ;

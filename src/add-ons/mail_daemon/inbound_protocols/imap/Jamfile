@@ -21,7 +21,7 @@ Addon IMAP :
 	imap_config.cpp
 	NestedString.cpp ;
 
-LinkAgainst IMAP : be libmail.so $(NETWORK_LIBS) ;
+LinkAgainst IMAP : be libmail.so $(TARGET_NETWORK_LIBS) ;
 
 if $(USESSL) {
 	LinkAgainst IMAP : ssl crypto ;

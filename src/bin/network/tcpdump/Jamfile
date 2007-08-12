@@ -124,7 +124,7 @@ BinCommand tcpdump :
 	tcpdump.c
 	util.c
 	version.c
-	: libpcap.a $(NETWORK_LIBS)
+	: libpcap.a $(TARGET_NETWORK_LIBS)
 ;
 
 SubInclude HAIKU_TOP src bin network tcpdump libpcap ;

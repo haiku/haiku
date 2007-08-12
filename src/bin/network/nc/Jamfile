@@ -10,7 +10,7 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 
 BinCommand nc :
 	netcat.c
-	: $(NETWORK_LIBS)
+	: $(TARGET_NETWORK_LIBS)
 ;
 
 HaikuInstall install-networking

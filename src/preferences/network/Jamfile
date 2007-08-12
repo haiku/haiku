@@ -8,7 +8,7 @@ Preference Network :
 	EthernetSettingsWindow.cpp
 	EthernetSettingsView.cpp
 	EthernetSettings.cpp
-	: be root $(NETWORK_LIBS)
+	: be root $(TARGET_NETWORK_LIBS)
 	;
 
 Package haiku-networksettings :

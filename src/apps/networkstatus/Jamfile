@@ -14,6 +14,6 @@ Application NetworkStatus :
 	NetworkStatusWindow.cpp
 	NetworkStatusView.cpp
 	NetworkStatus.cpp
-	: be $(icon_libs) $(NETWORK_LIBS)
+	: be $(icon_libs) $(TARGET_NETWORK_LIBS)
 	: NetworkStatus.rdef NetworkStatusIcons.rdef
 	;

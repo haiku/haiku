@@ -18,12 +18,12 @@ UsePrivateHeaders net ;
 #UsePrivateHeaders kernel ;
 #UseArchHeaders $(TARGET_ARCH) ;
 
-SimpleTest udp_client : udp_client.c : $(NETWORK_LIBS) ;
-SimpleTest udp_echo : udp_echo.c : $(NETWORK_LIBS) ;
-SimpleTest udp_server : udp_server.c : $(NETWORK_LIBS) ;
+SimpleTest udp_client : udp_client.c : $(TARGET_NETWORK_LIBS) ;
+SimpleTest udp_echo : udp_echo.c : $(TARGET_NETWORK_LIBS) ;
+SimpleTest udp_server : udp_server.c : $(TARGET_NETWORK_LIBS) ;
 
-SimpleTest tcp_server : tcp_server.c : $(NETWORK_LIBS) ;
-SimpleTest tcp_client : tcp_client.c : $(NETWORK_LIBS) ;
+SimpleTest tcp_server : tcp_server.c : $(TARGET_NETWORK_LIBS) ;
+SimpleTest tcp_client : tcp_client.c : $(TARGET_NETWORK_LIBS) ;
 
 SimpleTest tcp_tester :
 	tcp_tester.cpp

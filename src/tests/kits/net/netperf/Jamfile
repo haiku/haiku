@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src tests kits net netperf ;
 
 Depends netperf : install_netperf_scripts ;
 
-if ! $(BONE_COMPATIBLE) {
+if ! $(TARGET_PLATFORM_BONE_COMPATIBLE) {
 	SubDirCcFlags -DBUILDING_R5_LIBNET -Dclose=closesocket ;
 }
 
@@ -24,13 +24,13 @@ Objects $(net_files) ;
 SimpleTest netperf : 
 	netperf.c
 	[ FGristFiles $(net_files:S=$(SUFOBJ)) ]
-	: $(NETWORK_LIBS)
+	: $(TARGET_NETWORK_LIBS)
 ;
 
 SimpleTest netserver : 
 	netserver.c
 	[ FGristFiles $(net_files:S=$(SUFOBJ)) ]
-	: $(NETWORK_LIBS)
+	: $(TARGET_NETWORK_LIBS)
 ;
 
 HaikuInstall install_netperf_scripts : [ FDirName $(HAIKU_TEST_DIR) kits net netperf ] :

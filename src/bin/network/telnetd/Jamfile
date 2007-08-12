@@ -18,5 +18,5 @@ BinCommand telnetd :
 	telnetd.c
 	termstat.c
 	utility.c
-	: libtermcap.a libtelnet.a libutil.a libbsd.so $(NETWORK_LIBS)
+	: libtermcap.a libtelnet.a libutil.a libbsd.so $(TARGET_NETWORK_LIBS)
 ;

@@ -13,7 +13,7 @@ Addon LPR :
 	Socket.o
 	SocketStream.o
 	DbgMsg.o
-	: be $(NETWORK_LIBS) $(TARGET_LIBSTDC++)
+	: be $(TARGET_NETWORK_LIBS) $(TARGET_LIBSTDC++)
 ;
 
 ObjectReferences

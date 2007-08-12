@@ -82,7 +82,7 @@ StdBinCommands
 	hostname.c
 	tail.c
 	uname.c
-	: libfetish.a $(SELECT_UNAME_ETC_LIB) : $(coreutils_rsrc) ;
+	: libfetish.a $(TARGET_SELECT_UNAME_ETC_LIB) : $(coreutils_rsrc) ;
 
 #commands requiring something in libroot.so (getrlimit, fchdir...)
 

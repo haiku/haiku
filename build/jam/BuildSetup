@@ -282,6 +282,11 @@ if $(HAIKU_SHARED_LIBSUPC++) {
 	HAIKU_LIBSUPC++ = ;
 }
 
+# network libraries
+HAIKU_NETWORK_LIBS = network ;
+HAIKU_NETAPI_LIB = network ;
+HAIKU_SELECT_UNAME_ETC_LIB = ;	# libroot, against which we link anyway
+
 # library and executable glue code
 local commonGlueCode =
 	<src!system!glue>init_term_dyn.o
@@ -534,6 +539,26 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	}
 }
 
+# network libraries
+if $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
+	HOST_NETWORK_LIBS = network ;
+	HOST_NETAPI_LIB = network ;
+	HOST_SELECT_UNAME_ETC_LIB = ;	# libroot
+} else if $(HOST_PLATFORM_BONE_COMPATIBLE) {
+	HOST_NETWORK_LIBS = socket bind ;
+	HOST_NETAPI_LIB = bnetapi ;
+	HOST_SELECT_UNAME_ETC_LIB = ;	# libroot
+} else if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+	HOST_NETWORK_LIBS = net ;
+	HOST_NETAPI_LIB = netapi ;
+	HOST_SELECT_UNAME_ETC_LIB = net ;
+} else {
+	# Linux,...
+	HOST_NETWORK_LIBS = ;
+	HOST_NETAPI_LIB = ;
+	HOST_SELECT_UNAME_ETC_LIB = ;
+}
+
 # define the executable MIME type
 HOST_EXECUTABLE_MIME_TYPE = "application/x-vnd.Be-elfexecutable" ;
 
@@ -583,27 +608,6 @@ if $(TARGET_PLATFORM) != haiku {
 	}
 }
 
-# TODO: Fix the naming!
-if $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
-	NETWORK_LIBS = network ;
-	SELECT_UNAME_ETC_LIB = root ;
-	NETAPI_LIB = network ;
-} else if $(TARGET_PLATFORM_BONE_COMPATIBLE) {
-	NETWORK_LIBS = socket bind ;
-	NETAPI_LIB = bnetapi ;
-	SELECT_UNAME_ETC_LIB = root ;
-} else {
-	NETWORK_LIBS = net ;
-	NETAPI_LIB = netapi ;
-	SELECT_UNAME_ETC_LIB = net ;
-}
-
-# TODO: For compatibility only. Remove when no longer used.
-R5_COMPATIBLE		= $(TARGET_PLATFORM_BEOS_COMPATIBLE) ;
-BONE_COMPATIBLE		= $(TARGET_PLATFORM_BONE_COMPATIBLE) ;
-DANO_COMPATIBLE		= $(TARGET_PLATFORM_DANO_COMPATIBLE) ;
-HAIKU_COMPATIBLE	= $(TARGET_PLATFORM_HAIKU_COMPATIBLE) ;
-
 # Set TARGET_* variables either from HAIKU_* or HOST_* depending on the
 # specified TARGET_PLATFORM.
 
@@ -633,6 +637,8 @@ local buildVars =
 	PRIVATE_KERNEL_HEADERS
 
 	LIBSTDC++ LIBSUPC++
+
+	NETWORK_LIBS NETAPI_LIB SELECT_UNAME_ETC_LIB
 
 	ARCH_MACRO_DEFINE EXECUTABLE_MIME_TYPE
 

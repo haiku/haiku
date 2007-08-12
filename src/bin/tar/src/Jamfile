@@ -34,5 +34,5 @@ BinCommand tar :
 
 BinCommand rmt :
 	rmt.c
-	: libtar.a $(NETWORK_LIBS)
+	: libtar.a $(TARGET_NETWORK_LIBS)
 	: tar.rsrc ;

@@ -20,7 +20,7 @@ Addon SMTP :
 	smtp.cpp
 	md5c.c ;
 
-LinkAgainst SMTP : be libmail.so $(NETWORK_LIBS) ;
+LinkAgainst SMTP : be libmail.so $(TARGET_NETWORK_LIBS) ;
 
 if $(USESSL) {
 	LinkAgainst SMTP : ssl crypto ;

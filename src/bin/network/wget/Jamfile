@@ -39,5 +39,5 @@ BinCommand wget :
 	utils.c
 	version.c
 	xmalloc.c
-	: $(NETWORK_LIBS)
+	: $(TARGET_NETWORK_LIBS)
 ;
