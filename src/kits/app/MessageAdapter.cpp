@@ -594,24 +594,12 @@ MessageAdapter::_UnflattenR5Message(uint32 format, BMessage *into,
 		if (fixedSize)
 			itemSize = dataSize / itemCount;
 
-		if (fixedSize) {
+		if (format == MESSAGE_FORMAT_R5) {
 			for (int32 i = 0; i < itemCount; i++) {
-				// ToDo: what if we are swapped? need B_INT32_TYPEs and the
-				// like be swapped here?
-				result = into->AddData(nameBuffer, type, pointer, itemSize,
-					fixedSize, itemCount);
-
-				if (result < B_OK) {
-					free(buffer);
-					return result;
+				if (!fixedSize) {
+					itemSize = *(ssize_t *)pointer;
+					pointer += sizeof(ssize_t);
 				}
-
-				pointer += itemSize;
-			}
-		} else if (format == MESSAGE_FORMAT_R5_SWAPPED) {
-			for (int32 i = 0; i < itemCount; i++) {
-				itemSize = __swap_int32(*(ssize_t *)pointer);
-				pointer += sizeof(ssize_t);
 
 				result = into->AddData(nameBuffer, type, pointer, itemSize,
 					fixedSize, itemCount);
@@ -621,13 +609,19 @@ MessageAdapter::_UnflattenR5Message(uint32 format, BMessage *into,
 					return result;
 				}
 
-				pointer += pad_to_8(itemSize + sizeof(ssize_t)) - sizeof(ssize_t);
+				if (fixedSize)
+					pointer += itemSize;
+				else
+					pointer += pad_to_8(itemSize + sizeof(ssize_t)) - sizeof(ssize_t);
 			}
 		} else {
 			for (int32 i = 0; i < itemCount; i++) {
-				itemSize = *(ssize_t *)pointer;
-				pointer += sizeof(ssize_t);
+				if (!fixedSize) {
+					itemSize = __swap_int32(*(ssize_t *)pointer);
+					pointer += sizeof(ssize_t);
+				}
 
+				swap_data(type, pointer, itemSize, B_SWAP_ALWAYS);
 				result = into->AddData(nameBuffer, type, pointer, itemSize,
 					fixedSize, itemCount);
 
@@ -636,7 +630,10 @@ MessageAdapter::_UnflattenR5Message(uint32 format, BMessage *into,
 					return result;
 				}
 
-				pointer += pad_to_8(itemSize + sizeof(ssize_t)) - sizeof(ssize_t);
+				if (fixedSize)
+					pointer += itemSize;
+				else
+					pointer += pad_to_8(itemSize + sizeof(ssize_t)) - sizeof(ssize_t);
 			}
 		}
 
