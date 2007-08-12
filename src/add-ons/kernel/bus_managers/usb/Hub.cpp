@@ -106,8 +106,10 @@ Hub::~Hub()
 			continue;
 
 		TRACE(("USB Hub %d: removing device 0x%08lx\n", DeviceAddress(), fChildren[i]));
-		GetStack()->NotifyDeviceChange(fChildren[i], false);
+		rescan_item *rescanList = NULL;
+		GetStack()->NotifyDeviceChange(fChildren[i], &rescanList, false);
 		GetBusManager()->FreeDevice(fChildren[i]);
+		GetStack()->RescanDrivers(rescanList);
 	}
 
 	delete fInterruptPipe;
@@ -207,6 +209,7 @@ Hub::Explore()
 				USB_REQUEST_CLEAR_FEATURE, C_PORT_CONNECTION, i + 1,
 				0, NULL, 0, NULL);
 
+			rescan_item *rescanList = NULL;
 			if (fPortStatus[i].status & PORT_STATUS_CONNECTION) {
 				// new device attached!
 				TRACE(("USB Hub %d: new device connected\n", DeviceAddress()));
@@ -234,13 +237,15 @@ Hub::Explore()
 
 					// Remove previous device first
 					TRACE(("USB Hub %d: removing device 0x%08lx\n", DeviceAddress(), fChildren[i]));
-					GetStack()->NotifyDeviceChange(fChildren[i], false);
+					GetStack()->NotifyDeviceChange(fChildren[i], &rescanList, false);
 
 					if (Lock()) {
 						GetBusManager()->FreeDevice(fChildren[i]);
 						fChildren[i] = NULL;
 						Unlock();
 					}
+
+					GetStack()->RescanDrivers(rescanList);
 				}
 
 				usb_speed speed = USB_SPEED_FULLSPEED;
@@ -254,7 +259,8 @@ Hub::Explore()
 				if (newDevice && Lock()) {
 					fChildren[i] = newDevice;
 					Unlock();
-					GetStack()->NotifyDeviceChange(fChildren[i], true);
+					GetStack()->NotifyDeviceChange(fChildren[i], &rescanList, true);
+					GetStack()->RescanDrivers(rescanList);
 				} else {
 					if (newDevice)
 						GetBusManager()->FreeDevice(newDevice);
@@ -271,13 +277,15 @@ Hub::Explore()
 				TRACE(("USB Hub %d: device removed\n", DeviceAddress()));
 				if (fChildren[i]) {
 					TRACE(("USB Hub %d: removing device 0x%08lx\n", DeviceAddress(), fChildren[i]));
-					GetStack()->NotifyDeviceChange(fChildren[i], false);
+					GetStack()->NotifyDeviceChange(fChildren[i], &rescanList, false);
 
 					if (Lock()) {
 						GetBusManager()->FreeDevice(fChildren[i]);
 						fChildren[i] = NULL;
 						Unlock();
 					}
+
+					GetStack()->RescanDrivers(rescanList);
 				}
 			}
 		}

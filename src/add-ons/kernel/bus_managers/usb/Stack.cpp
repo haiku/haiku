@@ -42,6 +42,7 @@ Stack::Stack()
 	if (!fAllocator || fAllocator->InitCheck() < B_OK) {
 		TRACE_ERROR(("USB Stack: failed to allocate the allocator\n"));
 		delete fAllocator;
+		fAllocator = NULL;
 		return;
 	}
 
@@ -268,7 +269,7 @@ Stack::AllocateArea(void **logicalAddress, void **physicalAddress, size_t size,
 
 
 void
-Stack::NotifyDeviceChange(Device *device, bool added)
+Stack::NotifyDeviceChange(Device *device, rescan_item **rescanList, bool added)
 {
 	TRACE(("USB Stack: device %s\n", added ? "added" : "removed"));
 
@@ -279,27 +280,46 @@ Stack::NotifyDeviceChange(Device *device, bool added)
 			&element->cookies, added);
 
 		if (result >= B_OK) {
-			// the device is supported by this driver. it either got notified
-			// already by the hooks or it is not loaded at this time. in any
-			// case we will rescan the driver so it either is loaded and can
-			// scan for supported devices or its publish_devices hook will be
-			// called to expose new devices.
-			const char *name = element->driver_name;
-			if (element->republish_driver_name)
-				name = element->republish_driver_name;
+			rescan_item *item = new(std::nothrow) rescan_item;
+			if (!item)
+				return;
 
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
-			// the R5 way to republish a device in devfs
-			int devFS = open("/dev", O_WRONLY);
-			write(devFS, name, strlen(name));
-			close(devFS);
-#else
-			// use the private devfs API under Haiku
-			//devfs_rescan_driver(name);
-#endif
+			item->name = element->driver_name;
+			if (element->republish_driver_name)
+				item->name = element->republish_driver_name;
+
+			item->link = *rescanList;
+			*rescanList = item;
 		}
 
 		element = element->link;
+	}
+}
+
+
+void
+Stack::RescanDrivers(rescan_item *rescanItem)
+{
+	while (rescanItem) {
+		// the device is supported by this driver. it either got notified
+		// already by the hooks or it is not loaded at this time. in any
+		// case we will rescan the driver so it either is loaded and can
+		// scan for supported devices or its publish_devices hook will be
+		// called to expose changed devices.
+
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
+		// the R5 way to republish a device in devfs
+		int devFS = open("/dev", O_WRONLY);
+		write(devFS, rescanItem->name, strlen(rescanItem->name));
+		close(devFS);
+#else
+		// use the private devfs API under Haiku
+		//devfs_rescan_driver(name);
+#endif
+
+		rescan_item *next = rescanItem->link;
+		delete rescanItem;
+		rescanItem = next;
 	}
 }
 

@@ -60,6 +60,12 @@ struct usb_driver_info {
 };
 
 
+struct rescan_item {
+	const char						*name;
+	rescan_item						*link;
+};
+
+
 typedef enum {
 	USB_SPEED_LOWSPEED = 0,
 	USB_SPEED_FULLSPEED,
@@ -113,7 +119,9 @@ public:
 											size_t size, const char *name);
 
 		void							NotifyDeviceChange(Device *device,
+											rescan_item **rescanList,
 											bool added);
+		void							RescanDrivers(rescan_item *rescanItem);
 
 		// USB API
 		status_t						RegisterDriver(const char *driverName,
