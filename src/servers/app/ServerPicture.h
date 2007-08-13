@@ -12,6 +12,7 @@
 class ServerApp;
 class ViewLayer;
 class BPrivate::LinkReceiver;
+class BList;
 class ServerPicture : public PictureDataWriter {
 public:	
 		int32		Token() { return fToken; }
@@ -22,10 +23,14 @@ public:
 		void		EnterFontChange();
 		void		ExitFontChange();
 		
-		void		SyncState(ViewLayer *view);
-		
+		void		SyncState(ViewLayer *view);	
 		void		Play(ViewLayer *view);
 		
+		void 		Usurp(ServerPicture *newPicture);
+		ServerPicture*	StepDown();		
+		
+		bool		NestPicture(ServerPicture *picture);
+
 		off_t		DataLength() const;
 		
 		status_t	ImportData(BPrivate::LinkReceiver &link);
@@ -42,6 +47,8 @@ friend class	ServerApp;
 		int32		fToken;
 		BPositionIO	*fData;
 		// DrawState	*fState;
+		BList		*fPictures;
+		ServerPicture	*fUsurped;
 };
 
 #endif // __SERVER_PICTURE_H

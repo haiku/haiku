@@ -10,6 +10,7 @@
 
 
 #include "DrawingEngine.h"
+#include "ServerApp.h"
 #include "ServerBitmap.h"
 #include "ServerPicture.h"
 #include "ServerTokenSpace.h"
@@ -25,6 +26,7 @@
 #include <ShapePrivate.h>
 
 #include <Bitmap.h>
+#include <List.h>
 #include <Shape.h>
 
 #include <stdio.h>
@@ -108,7 +110,7 @@ ShapePainter::IterateClose(void)
 void
 ShapePainter::Draw(ViewLayer *view, BRect frame, bool filled)
 {
-	// We're going to draw the currently iterated picture.
+	// We're going to draw the currently iterated shape.
 	int32 opCount, ptCount;
 	opCount = fOpStack.size();
 	ptCount = fPtStack.size();
@@ -136,6 +138,8 @@ ShapePainter::Draw(ViewLayer *view, BRect frame, bool filled)
 	}
 }
 
+
+// drawing functions
 static void
 get_polygon_frame(const BPoint *points, int32 numPoints, BRect *_frame)
 {
@@ -406,7 +410,6 @@ static void
 draw_pixels(ViewLayer *view, BRect src, BRect dest, int32 width, int32 height,
 				 int32 bytesPerRow, int32 pixelFormat, int32 flags, const void *data)
 {
-	// TODO: Review this
 	UtilityBitmap bitmap(BRect(0, 0, width - 1, height - 1), (color_space)pixelFormat, flags, bytesPerRow);
 	
 	if (!bitmap.IsValid())
@@ -417,6 +420,17 @@ draw_pixels(ViewLayer *view, BRect src, BRect dest, int32 width, int32 height,
 	view->ConvertToScreenForDrawing(&dest);
 	
 	view->Window()->GetDrawingEngine()->DrawBitmap(&bitmap, src, dest);
+}
+
+
+static void
+draw_picture(ViewLayer *view, BPoint where, int32 token)
+{
+	ServerPicture *picture = view->Window()->ServerWindow()->App()->FindPicture(token);	
+	if (picture != NULL) {
+		view->CurrentState()->SetOrigin(where);
+		picture->Play(view);
+	}
 }
 
 
@@ -667,7 +681,7 @@ const void *tableEntries[] = {
 	(const void *)fill_shape,
 	(const void *)draw_string,
 	(const void *)draw_pixels,
-	(const void *)reserved,	// TODO: This is probably "draw_picture". Investigate
+	(const void *)draw_picture,
 	(const void *)set_clipping_rects,
 	(const void *)clip_to_picture,
 	(const void *)push_state,
@@ -703,7 +717,9 @@ const void *tableEntries[] = {
 ServerPicture::ServerPicture()
 	:
 	PictureDataWriter(),
-	fData(NULL)
+	fData(NULL),
+	fPictures(NULL),
+	fUsurped(NULL)
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
 	fData = new (std::nothrow) BMallocIO();
@@ -715,7 +731,9 @@ ServerPicture::ServerPicture()
 ServerPicture::ServerPicture(const ServerPicture &picture)
 	:
 	PictureDataWriter(),
-	fData(NULL)
+	fData(NULL),
+	fPictures(NULL),
+	fUsurped(NULL)
 {
 	fToken = gTokenSpace.NewToken(kPictureToken, this);
 
@@ -738,7 +756,9 @@ ServerPicture::ServerPicture(const ServerPicture &picture)
 ServerPicture::ServerPicture(const char *fileName, const int32 &offset)
 	:
 	PictureDataWriter(),
-	fData(NULL)
+	fData(NULL),
+	fPictures(NULL),
+	fUsurped(NULL)
 {
 	BPrivate::Storage::OffsetFile *file =
 		new BPrivate::Storage::OffsetFile(new BFile(fileName, B_READ_WRITE), (off_t)offset);
@@ -757,6 +777,7 @@ ServerPicture::~ServerPicture()
 {
 	delete fData;
 	gTokenSpace.RemoveToken(fToken);
+	delete fPictures;
 }
 
 
@@ -800,8 +821,38 @@ ServerPicture::Play(ViewLayer *view)
 	if (mallocIO == NULL)
 		return;
 
-	PicturePlayer player(mallocIO->Buffer(), mallocIO->BufferLength(), NULL);
+	PicturePlayer player(mallocIO->Buffer(), mallocIO->BufferLength(), fPictures);
 	player.Play(const_cast<void **>(tableEntries), sizeof(tableEntries) / sizeof(void *), view);
+}
+
+
+void
+ServerPicture::Usurp(ServerPicture *picture)
+{
+	fUsurped = picture;
+}
+
+
+ServerPicture *
+ServerPicture::StepDown()
+{
+	ServerPicture *old = fUsurped;
+	fUsurped = NULL;
+	return old;
+}
+
+
+bool
+ServerPicture::NestPicture(ServerPicture *picture)
+{
+	if (fPictures == NULL)
+		fPictures = new (std::nothrow) BList;
+	
+	if (fPictures == NULL
+		|| !fPictures->AddItem(picture))
+		return false;
+
+	return true;
 }
 
 

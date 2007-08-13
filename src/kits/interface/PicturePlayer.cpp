@@ -38,6 +38,7 @@ typedef void (*fnc_ss)(void *, int16, int16);
 typedef void (*fnc_PBRecti)(void*, const BRect*, int32);
 typedef void (*fnc_DrawPixels)(void *, BRect, BRect, int32, int32, int32,
 							   int32, int32, const void *);
+typedef void (*fnc_DrawPicture)(void *, BPoint, int32);
 typedef void (*fnc_BShape)(void*, BShape*);
 
 
@@ -230,6 +231,9 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 
 			case B_PIC_DRAW_PICTURE:
 			{
+				((fnc_DrawPicture)callBackTable[19])(userData,
+					*reinterpret_cast<const BPoint *>(data),
+					*reinterpret_cast<const int32 *>(data + sizeof(BPoint)));
 				break;
 			}
 			

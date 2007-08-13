@@ -3091,7 +3091,8 @@ BView::SetDiskMode(char* filename, long offset)
 } 
 
 
-void BView::BeginPicture(BPicture *picture)
+void
+BView::BeginPicture(BPicture *picture)
 {
 	if (do_owner_check() && picture && picture->usurped == NULL) {
 		picture->usurp(cpicture);

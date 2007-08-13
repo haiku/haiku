@@ -36,6 +36,10 @@ public:
 	status_t WriteDrawEllipse(const BRect &rect, const bool &fill);
 	status_t WriteDrawArc(const BPoint &center, const BPoint &radius,
 				const float &startTheta, const float &arcTheta, const bool &fill);
+	status_t WriteDrawPolygon(const int32 &numPoints, BPoint *points,
+				const bool &isClosed, const bool &fill);
+	status_t WriteDrawBezier(const BPoint points[4], const bool &fill);
+
 	status_t WriteStrokeLine(const BPoint &start, const BPoint &end);
 	
 	status_t WriteSetHighColor(const rgb_color &color);
@@ -48,7 +52,9 @@ public:
 	status_t WriteDrawBitmap(const BRect &srcRect, const BRect &dstRect, const int32 &width, const int32 &height,
 				const int32 &bytesPerRow, const int32 &colorSpace, const int32 &flags,
 				const void *data, const int32 &length);
-	
+
+	status_t WriteDrawPicture(const BPoint &where, const int32 &token);
+
 	status_t WriteSetFontFamily(const font_family &family);
 	status_t WriteSetFontStyle(const font_style &style);
 	status_t WriteSetFontSpacing(const int32 &spacing);

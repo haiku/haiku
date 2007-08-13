@@ -222,6 +222,40 @@ PictureDataWriter::WriteDrawArc(const BPoint &center, const BPoint &radius,
 
 
 status_t
+PictureDataWriter::WriteDrawPolygon(const int32 &numPoints, BPoint *points,
+				const bool &isClosed, const bool &fill)
+{
+	try {
+		BeginOp(fill ? B_PIC_FILL_POLYGON : B_PIC_STROKE_POLYGON);
+		Write<int32>(numPoints);
+		for (int32 i = 0; i < numPoints; i++)
+			Write<BPoint>(points[i]);
+		if (!fill)
+			Write<uint8>((uint8)isClosed);
+		EndOp();
+	} catch (status_t &status) {
+		return status;	
+	}
+	return B_OK;
+}
+
+
+status_t
+PictureDataWriter::WriteDrawBezier(const BPoint points[4], const bool &fill)
+{
+	try {
+		BeginOp(fill ? B_PIC_FILL_BEZIER : B_PIC_STROKE_BEZIER);
+		for (int32 i = 0; i < 4; i++)
+			Write<BPoint>(points[i]);
+		EndOp();
+	} catch (status_t &status) {
+		return status;	
+	}
+	return B_OK;
+}
+
+
+status_t
 PictureDataWriter::WriteStrokeLine(const BPoint &start, const BPoint &end)
 {
 	try {
@@ -299,6 +333,23 @@ PictureDataWriter::WriteDrawBitmap(const BRect &srcRect, const BRect &dstRect, c
 		EndOp();
 	} catch (status_t &status) {
 		return status;	
+	}
+	return B_OK;
+}
+
+
+status_t
+PictureDataWriter::WriteDrawPicture(const BPoint &where, const int32 &token)
+{
+	// TODO: I'm not sure about this function. I think we need to attach the picture
+	// data too. The token won't be sufficient in many cases.
+	try {
+		BeginOp(B_PIC_DRAW_PICTURE);
+		Write<BPoint>(where);
+		Write<int32>(token);	
+		EndOp();
+	} catch (status_t &status) {
+		return status;
 	}
 	return B_OK;
 }
@@ -493,6 +544,6 @@ PictureDataWriter::WriteData(const void *data, size_t size)
 	ssize_t result = fData->Write(data, size);
 	if (result < 0)
 		THROW_ERROR(result);
-	if (result != size)
+	if ((size_t)result != size)
 		THROW_ERROR(B_IO_ERROR); 
 }

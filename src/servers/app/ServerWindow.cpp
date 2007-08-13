@@ -2171,14 +2171,14 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		case AS_FILL_TRIANGLE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE/FILL_TRIANGLE\n", Title()));
-
-			BPoint pts[3];
+ 
+ 			BPoint pts[3];
 			BRect rect;
 
-			for (int32 i = 0; i < 3; i++) {
+ 			for (int32 i = 0; i < 3; i++) {
 				link.Read<BPoint>(&(pts[i]));
 				fCurrentLayer->ConvertToScreenForDrawing(&pts[i]);
-			}
+ 			}
 
 			link.Read<BRect>(&rect);
 
@@ -2439,6 +2439,18 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			break;
 		}
 		
+		case AS_FILL_REGION:
+		{
+			// There is no B_PIC_FILL_REGION op, we have to
+			// implement it using B_PIC_FILL_RECT
+			BRegion region;
+			if (link.ReadRegion(&region) < B_OK)
+				break;
+			for (int32 i = 0; i < region.CountRects(); i++)
+				picture->WriteDrawRect(region.RectAt(i), true);
+			break;
+		}
+
 		case AS_STROKE_ROUNDRECT:
 		case AS_FILL_ROUNDRECT:
 		{
@@ -2475,6 +2487,57 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			BPoint center = rect.LeftTop() + radii;
 
 			picture->WriteDrawArc(center, radii, startTheta, arcTheta, code == AS_FILL_ARC);
+			break;
+		}
+
+		case AS_STROKE_TRIANGLE:
+		case AS_FILL_TRIANGLE:
+		{
+			// There is no B_PIC_FILL/STROKE_TRIANGLE op,
+			// we implement it using B_PIC_FILL/STROKE_POLYGON
+			BPoint points[3];
+			
+			for (int32 i = 0; i < 3; i++) {
+				link.Read<BPoint>(&(points[i]));
+			}
+
+			BRect rect;
+			link.Read<BRect>(&rect);
+			
+			picture->WriteDrawPolygon(3, points,
+					true, code == AS_FILL_TRIANGLE);
+			break;
+		}
+		case AS_STROKE_POLYGON:
+		case AS_FILL_POLYGON:
+		{
+			BRect polyFrame;
+			bool isClosed = true;
+			int32 pointCount;
+			const bool fill = (code == AS_FILL_POLYGON);
+			
+			link.Read<BRect>(&polyFrame);
+			if (code == AS_STROKE_POLYGON)
+				link.Read<bool>(&isClosed);
+			link.Read<int32>(&pointCount);
+
+			BPoint* pointList = new(nothrow) BPoint[pointCount];
+			if (link.Read(pointList, pointCount * sizeof(BPoint)) >= B_OK) {
+				picture->WriteDrawPolygon(pointCount, pointList,
+					isClosed && pointCount > 2, fill);
+			}
+			delete[] pointList;
+			break;
+		}
+
+		case AS_STROKE_BEZIER:
+		case AS_FILL_BEZIER:
+		{
+			BPoint points[4];
+			for (int32 i = 0; i < 4; i++) {
+				link.Read<BPoint>(&(points[i]));
+			}
+			picture->WriteDrawBezier(points, code == AS_FILL_BEZIER);
 			break;
 		}
 
@@ -2603,6 +2666,41 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 						bitmap->Bits(), bitmap->BitsLength());
 
 			break;
+		}
+		
+		case AS_LAYER_DRAW_PICTURE:
+		{
+			int32 token;
+			if (link.Read<int32>(&token) == B_OK) {
+				BPoint where;
+				link.Read<BPoint>(&where);
+				picture->WriteDrawPicture(where, token);
+			}
+			break;
+		}
+
+		case AS_LAYER_BEGIN_PICTURE:
+		{
+			ServerPicture *newPicture = App()->CreatePicture();
+			newPicture->Usurp(picture);			
+			newPicture->SyncState(fCurrentLayer);
+			fCurrentLayer->SetPicture(newPicture);
+						
+			break;
+		}
+		
+		case AS_LAYER_END_PICTURE:
+		{
+			ServerPicture *steppedDown = picture->StepDown();
+			if (!steppedDown)
+				return false;
+			
+			steppedDown->NestPicture(picture);
+			fCurrentLayer->SetPicture(steppedDown);
+			fLink.StartMessage(B_OK);
+			fLink.Attach<int32>(picture->Token());
+			fLink.Flush();
+			return true;
 		}
 /*
 		case AS_LAYER_SET_BLENDING_MODE:
