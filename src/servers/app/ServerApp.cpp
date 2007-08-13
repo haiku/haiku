@@ -694,9 +694,17 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			STRACE(("ServerApp %s: Create Picture\n", Signature()));
 			status_t status = B_ERROR;			
 			ServerPicture *picture = CreatePicture();
-			if (picture != NULL)
+			if (picture != NULL) {
+				int32 subPicturesCount = 0;
+				link.Read<int32>(&subPicturesCount);
+				for (int32 c = 0; c < subPicturesCount; c++) {
+					int32 token = -1;
+					link.Read<int32>(&token);
+					if (ServerPicture *subPicture = FindPicture(token))
+						picture->NestPicture(subPicture);
+				}
 				status = picture->ImportData(link);
-			
+			}
 			if (status == B_OK) {
 				fLink.StartMessage(B_OK);
 				fLink.Attach<int32>(picture->Token());

@@ -178,7 +178,6 @@ nop()
 static void
 move_pen_by(ViewLayer *view, BPoint delta)
 {
-//	view->CurrentState()->SetPenLocation(delta - view->CurrentState()->PenLocation()); ?!?
 	view->CurrentState()->SetPenLocation(view->CurrentState()->PenLocation() + delta);
 }
 
@@ -876,13 +875,7 @@ ServerPicture::DataLength() const
 
 status_t
 ServerPicture::ImportData(BPrivate::LinkReceiver &link)
-{
-	int32 subPicturesCount = 0;
-	link.Read<int32>(&subPicturesCount);
-	for (int32 c = 0; c < subPicturesCount; c++) {
-		// TODO: Support nested pictures
-	} 
-	
+{	
 	int32 size = 0;
 	link.Read<int32>(&size);
 
@@ -919,7 +912,15 @@ ServerPicture::ExportData(BPrivate::PortLink &link)
 	fData->Seek(0, SEEK_SET);
 
 	int32 subPicturesCount = 0;
+	if (fPictures != NULL)
+		subPicturesCount = fPictures->CountItems();
 	link.Attach<int32>(subPicturesCount);
+	if (subPicturesCount > 0) {
+		for (int32 i = 0; i < subPicturesCount; i++) {
+			ServerPicture *subPic = static_cast<ServerPicture *>(fPictures->ItemAtFast(i));	
+			link.Attach<int32>(subPic->Token());		
+		}	
+	}
 
 	off_t size = 0;
 	fData->GetSize(&size);

@@ -2711,7 +2711,7 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			link.Read<int32>(&pictureToken);
 			ServerPicture *appendPicture = App()->FindPicture(pictureToken);
 			if (appendPicture) {
-				picture->SyncState(fCurrentLayer);
+				//picture->SyncState(fCurrentLayer);
 				appendPicture->Usurp(picture);			
 			}
 			fCurrentLayer->SetPicture(appendPicture);
