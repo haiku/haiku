@@ -257,8 +257,8 @@ static void
 stroke_arc(ViewLayer *view, BPoint center, BPoint radii, float startTheta,
 			   float arcTheta)
 {
-	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x,
-			center.y + radii.y);
+	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x - 1,
+			center.y + radii.y - 1);
 	view->ConvertToScreenForDrawing(&rect);
 	view->Window()->GetDrawingEngine()->DrawArc(rect, startTheta, arcTheta, false);
 }
@@ -268,8 +268,8 @@ static void
 fill_arc(ViewLayer *view, BPoint center, BPoint radii, float startTheta,
 			 float arcTheta)
 {
-	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x,
-			center.y + radii.y);
+	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x - 1,
+			center.y + radii.y - 1);
 	view->ConvertToScreenForDrawing(&rect);
 	view->Window()->GetDrawingEngine()->DrawArc(rect, startTheta, arcTheta, true);
 }
@@ -278,8 +278,8 @@ fill_arc(ViewLayer *view, BPoint center, BPoint radii, float startTheta,
 static void
 stroke_ellipse(ViewLayer *view, BPoint center, BPoint radii)
 {
-	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x,
-			center.y + radii.y);
+	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x - 1,
+			center.y + radii.y - 1);
 	view->ConvertToScreenForDrawing(&rect);
 	view->Window()->GetDrawingEngine()->DrawEllipse(rect, false);
 }
@@ -288,8 +288,8 @@ stroke_ellipse(ViewLayer *view, BPoint center, BPoint radii)
 static void
 fill_ellipse(ViewLayer *view, BPoint center, BPoint radii)
 {
-	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x,
-			center.y + radii.y);
+	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x - 1,
+			center.y + radii.y - 1);
 	view->ConvertToScreenForDrawing(&rect);
 	view->Window()->GetDrawingEngine()->DrawEllipse(rect, true);
 }
