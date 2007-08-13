@@ -269,19 +269,19 @@ static bool Radeon_DetectTVCRT_R300( accelerator_info *ai )
     	RADEON_DAC_FORCE_DATA_SEL_RGB |
     	(0x1b6 << RADEON_DAC_FORCE_DATA_SHIFT ));
     	
-    old_dac_cntl2 = INREG( regs, RADEON_DAC_CNTL2 );
+	old_dac_cntl2 = INREG( regs, RADEON_DAC_CNTL2 );
 
 	// enable CRT mode of TV-DAC and enable comparator    
-    tmp = old_dac_cntl2 | RADEON_DAC2_CLK_SEL_CRT | RADEON_DAC2_CMP_EN;
+	tmp = old_dac_cntl2 | RADEON_DAC2_CLK_SEL_CRT | RADEON_DAC2_CMP_EN;
     
-    OUTREG( regs, RADEON_DAC_CNTL2, tmp );
+	OUTREG( regs, RADEON_DAC_CNTL2, tmp );
     
-    snooze( 10000 );
+	snooze( 10000 );
     
-    // check connection of blue data signal to see whether there is a CRT
+	// check connection of blue data signal to see whether there is a CRT
 	found = (INREG( regs, RADEON_DAC_CNTL2 ) & RADEON_DAC2_CMP_OUT_B) != 0;
     
-    // clean up the mess
+	// clean up the mess
 	OUTREG( regs, RADEON_DAC_CNTL2, old_dac_cntl2 );
 	OUTREG( regs, RADEON_DAC_EXT_CNTL, 0 );
 	OUTREG( regs, RADEON_TV_DAC_CNTL, old_tv_dac_cntl );
@@ -289,7 +289,7 @@ static bool Radeon_DetectTVCRT_R300( accelerator_info *ai )
 
 	OUTREGP( regs, RADEON_GPIOPAD_A, old_radeon_gpiopad_a, ~1 );
     
-    return found;
+	return found;
 }
 
 
@@ -800,9 +800,9 @@ static void Radeon_FindFPTiming_StandardTiming(
 }
 	
 // read edid data of flat panel and setup its timing accordingly
-static status_t Radeon_StoreFPEDID( accelerator_info *ai, const edid1_info *edid )
+static status_t Radeon_StoreFPEDID( accelerator_info *ai, int port, const edid1_info *edid )
 {
-	fp_info *fp = &ai->si->flatpanels[0];
+	fp_info *fp = &ai->si->flatpanels[port];
 	uint32 max_hsize, max_vsize;
 
 	//SHOW_FLOW0( 2, "EDID data read from DVI port via DDC2:" );
@@ -954,10 +954,12 @@ void Radeon_DetectDisplays( accelerator_info *ai )
 	// use DDC to detect monitors - if we can read DDC, there must be a monitor
 	for ( i = 0; i < 2; i++ )
 	{
-		if (routes->port_info[i].mon_type != mt_unknown ) {
-			SHOW_FLOW0( 2, "known type, skpping detection" );	
-			continue;
-		}
+		//TODO could skip edid reading instead if we already have it, but what
+		//if monitors have been hot swapped?  Also rely on edid for DVI-D detection
+		//if (routes->port_info[i].mon_type != mt_unknown ) {
+		//	SHOW_FLOW0( 2, "known type, skpping detection" );	
+		//	continue;
+		//}
 		
 		memset( &routes->port_info[i].edid , 0, sizeof(edid1_info) );
 		switch ( routes->port_info[i].ddc_type ) {
@@ -993,9 +995,10 @@ void Radeon_DetectDisplays( accelerator_info *ai )
 				// both LDVS and TMDS are disable, we still need to treat it as a LVDS panel.
 				if ( routes->port_info[i].tmds_type == tmds_ext ){
 					// store info about DVI-connected flat-panel
-					if( Radeon_StoreFPEDID( ai, &routes->port_info[i].edid ) == B_OK ) {
+					if( Radeon_StoreFPEDID( ai, i, &routes->port_info[i].edid ) == B_OK ) {
 						SHOW_INFO0( 2, "Found Ext Laptop DVI" );
 						routes->port_info[i].mon_type = mt_dfp;
+						ai->si->flatpanels[i].is_fp2 = true;
 						displays |= dd_dvi_ext;
 					} else {
 						SHOW_ERROR0( 2, "Disabled Ext DVI - invalid EDID" );
@@ -1003,7 +1006,7 @@ void Radeon_DetectDisplays( accelerator_info *ai )
 				} else {
 					if( INREG( ai->regs, RADEON_FP_GEN_CNTL) & (1 << 7) || ( !si->is_mobility ) ) {
 						// store info about DVI-connected flat-panel
-						if( Radeon_StoreFPEDID( ai, &routes->port_info[i].edid ) == B_OK ) {
+						if( Radeon_StoreFPEDID( ai, i, &routes->port_info[i].edid ) == B_OK ) {
 							SHOW_INFO0( 2, "Found DVI" );
 							routes->port_info[i].mon_type = mt_dfp;
 							displays |= dd_dvi;
@@ -1015,6 +1018,7 @@ void Radeon_DetectDisplays( accelerator_info *ai )
 						routes->port_info[i].mon_type = mt_lcd;
 						displays |= dd_lvds;
 					}
+					ai->si->flatpanels[1].is_fp2 = FALSE;
 				}
 			} else {
 				// must be the analog portion of DVI
@@ -1049,7 +1053,7 @@ void Radeon_DetectDisplays( accelerator_info *ai )
 		if ( si->is_mobility && (INREG( ai->regs, RADEON_FP2_GEN_CNTL) & RADEON_FP2_FPON)) {
 			SHOW_INFO0( 2, "Found Ext Laptop DVI" );
 			routes->port_info[1].mon_type = mt_dfp;
-			displays |= dd_dvi;
+			displays |= dd_dvi_ext;
 		}
 	}
 	

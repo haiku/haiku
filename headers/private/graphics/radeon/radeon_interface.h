@@ -348,6 +348,11 @@ typedef struct {
 	uint32 best_vco;			// preferred VCO frequency (0 for don't care)
 } pll_info;
 
+// info for ext tmds pll
+typedef struct {
+	uint32 freq;
+	uint32 value;
+} tmds_pll_info;
 
 // one overlay buffer
 typedef struct overlay_buffer_node {
@@ -520,24 +525,24 @@ typedef struct {
 	uint16		device_id;		// PCI device id
 	uint8		revision;		// PCI device revision
 	
-	//bool 		has_crtc2;		// has second CRTC
 	radeon_type	asic;			// ASIC version
-	bool		is_mobility;	// mobility version
-	bool		is_igp;			//	might need to know if it's an integrated chip
+	bool		is_mobility;		// mobility version
+	bool		is_igp;			// might need to know if it's an integrated chip
 	bool		is_atombios;
-	tv_chip_type tv_chip;		// type of TV-Out encoder
+
+	tv_chip_type 	tv_chip;		// type of TV-Out encoder
 	bool		new_pll;		// r300 style PLL
-	bool		has_no_i2c; 	// I2C is broken
-	uint16		panel_pwr_delay;// delay for LCD backlight to stabilise
-	uint8		theatre_channel;// VIP channel of Rage Theatre (if applicable)
+	bool		has_no_i2c; 		// I2C is broken
+	uint16		panel_pwr_delay;	// delay for LCD backlight to stabilise
+	uint8		theatre_channel;	// VIP channel of Rage Theatre (if applicable)
 		
 	general_pll_info	pll;
-	
+	tmds_pll_info		tmds_pll[4];
+
 	area_id		regs_area;		// area of memory mapped registers
 	area_id		ROM_area;		// area of ROM
-	//area_id		fb_area;	// area of frame buffer
 	void		*framebuffer_pci;	// physical address of frame buffer (aka local memory)
-								// this is a hack needed by BeOS
+							// this is a hack needed by BeOS
 
 	crtc_info	crtc[2];		// info about each crtc
 	uint8		num_crtc;		// number of physical heads
@@ -557,6 +562,8 @@ typedef struct {
 	uint32	active_vc;			// currently selected virtual card in terms of 2D acceleration
 		
 	uint32	dac_cntl2;			// content of dac_cntl2 register
+	uint32	tmds_pll_cntl;			// undocumented here be dragons
+	uint32	tmds_transmitter_cntl;		// undocumented here be dragons
 
 	overlay_info	pending_overlay;	// overlay to be shown
 	overlay_info	active_overlay;		// overlay shown

@@ -634,8 +634,11 @@ static void assignDefaultMonitorRoute(
 		else if( ai->si->num_crtc > 1 && (crtc2_displays & ~(dd_stv | dd_ctv)) == 0 && vc->assigned_crtc[1] )
 			crtc2_displays |= dd_tv_crt;
 	}
-	
-	SHOW_FLOW( 3, "CRTC1: 0x%x, CRTC2: 0x%x", crtc1_displays, crtc2_displays );
+
+	if( (display_devices & dd_dvi_ext) != 0 )
+		crtc2_displays |= dd_dvi_ext;
+
+	SHOW_FLOW( 2, "CRTC1: 0x%x, CRTC2: 0x%x", crtc1_displays, crtc2_displays );
 	
 	*crtc1 = crtc1_displays;
 	*crtc2 = crtc2_displays;
@@ -651,7 +654,7 @@ void Radeon_SetupDefaultMonitorRouting(
 	shared_info *si = ai->si;
 	display_device_e display_devices = vc->connected_displays;
 
-	if (ai->si->settings.force_lcd) {	
+	if (ai->si->settings.force_lcd) {
 		use_laptop_panel = true;
 		SHOW_FLOW0( 2, 	"LCD Forced Used by Kernel Settings");
 	}

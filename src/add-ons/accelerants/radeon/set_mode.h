@@ -98,17 +98,19 @@ typedef struct {
 typedef struct {
 	uint32		fp_gen_cntl;
 	uint32		fp_panel_cntl;
-    uint32		lvds_gen_cntl;
+	uint32		lvds_gen_cntl;
+	uint32		tmds_pll_cntl;
+	uint32		tmds_trans_cntl;
 	uint32		fp_h_sync_strt_wid;
 	uint32		fp_v_sync_strt_wid;
 	uint32		fp2_gen_cntl;
     
-    uint32		fp2_h_sync_strt_wid;
+	uint32		fp2_h_sync_strt_wid;
 	uint32		fp2_v_sync_strt_wid;
 	
 	// RMX registers
 	uint32		fp_horz_stretch;
-    uint32		fp_vert_stretch;
+	uint32		fp_vert_stretch;
 
 	// Bios values used by Mobility Asics
 	uint32		bios_4_scratch;

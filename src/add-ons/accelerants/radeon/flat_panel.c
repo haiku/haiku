@@ -108,7 +108,7 @@ void Radeon_ProgramRMXRegisters(
 	accelerator_info *ai, fp_regs *values )
 {
 	vuint8 *regs = ai->regs;
-
+	SHOW_FLOW0( 2, "" );
 	OUTREG( regs, RADEON_FP_HORZ_STRETCH, values->fp_horz_stretch );
 	OUTREG( regs, RADEON_FP_VERT_STRETCH, values->fp_vert_stretch );
 }
@@ -119,9 +119,11 @@ void Radeon_ReadFPRegisters(
 {
 	vuint8 *regs = ai->regs;
 
-    values->fp_gen_cntl = INREG( regs, RADEON_FP_GEN_CNTL );
-    values->fp2_gen_cntl = INREG( regs, RADEON_FP2_GEN_CNTL );
-    values->lvds_gen_cntl = INREG( regs, RADEON_LVDS_GEN_CNTL );
+	values->fp_gen_cntl = INREG( regs, RADEON_FP_GEN_CNTL );
+	values->fp2_gen_cntl = INREG( regs, RADEON_FP2_GEN_CNTL );
+	values->lvds_gen_cntl = INREG( regs, RADEON_LVDS_GEN_CNTL );
+	values->tmds_pll_cntl = INREG( regs, RADEON_TMDS_PLL_CNTL );
+	values->tmds_trans_cntl = INREG( regs, RADEON_TMDS_TRANSMITTER_CNTL );
 	values->fp_h_sync_strt_wid = INREG( regs, RADEON_FP_H_SYNC_STRT_WID );
 	values->fp_v_sync_strt_wid = INREG( regs, RADEON_FP_V_SYNC_STRT_WID );
 	values->fp2_h_sync_strt_wid = INREG( regs, RADEON_FP_H2_SYNC_STRT_WID );
@@ -130,9 +132,14 @@ void Radeon_ReadFPRegisters(
 	values->bios_5_scratch =  INREG( regs, RADEON_BIOS_5_SCRATCH );
 	values->bios_6_scratch =  INREG( regs, RADEON_BIOS_6_SCRATCH );
 
-    SHOW_FLOW( 2, "before: fp_gen_cntl=%08lx, horz=%08lx, vert=%08lx, lvds_gen_cntl=%08lx",
-    	values->fp_gen_cntl, values->fp_horz_stretch, values->fp_vert_stretch, 
-    	values->lvds_gen_cntl );
+	if (ai->si->asic == rt_rv280) {
+		// bit 22 of TMDS_PLL_CNTL is read-back inverted
+		values->tmds_pll_cntl ^= (1 << 22);
+	}
+
+	SHOW_FLOW( 2, "before: fp_gen_cntl=%08lx, horz=%08lx, vert=%08lx, lvds_gen_cntl=%08lx",
+    		values->fp_gen_cntl, values->fp_horz_stretch, values->fp_vert_stretch, 
+    		values->lvds_gen_cntl );
 }
 
 // calculcate flat panel crtc registers;
@@ -141,20 +148,27 @@ void Radeon_CalcFPRegisters(
 	accelerator_info *ai, crtc_info *crtc, 
 	fp_info *fp_port, crtc_regs *crtc_values, fp_regs *values )
 {
+	int i;
+	uint32 tmp = values->tmds_pll_cntl & 0xfffff;
+
 	// setup synchronization position
 	// (most values are ignored according to fp_gen_cntl, but at least polarity
 	//  and pixel precise horizontal sync position are always used)
 	if( fp_port->is_fp2 ) {
+		SHOW_FLOW0( 2, "is_fp2" );
 		values->fp2_h_sync_strt_wid = crtc_values->crtc_h_sync_strt_wid;
 		values->fp2_v_sync_strt_wid = crtc_values->crtc_v_sync_strt_wid;
 	} else {
+		SHOW_FLOW0( 2, "fp1" );
 		values->fp_h_sync_strt_wid = crtc_values->crtc_h_sync_strt_wid;
 		values->fp_v_sync_strt_wid = crtc_values->crtc_v_sync_strt_wid;
 	}
 
-	if( fp_port->is_fp2 )
-		values->fp2_gen_cntl = 0;
-	else {
+	if( fp_port->is_fp2 ) {
+		// should retain POST values (esp bit 28)
+		values->fp2_gen_cntl &= (0xFFFF0000);
+
+	} else {
 		// setup magic CRTC shadowing 	
 		values->fp_gen_cntl &= 
 			~(RADEON_FP_RMX_HVSYNC_CONTROL_EN |
@@ -169,29 +183,64 @@ void Radeon_CalcFPRegisters(
 			RADEON_FP_CRTC_DONT_SHADOW_HEND;
 	}
 	
+	for (i = 0; i < 4; i++) {
+		if (ai->si->tmds_pll[i].freq == 0) 
+			break;
+		if ((uint32)(fp_port->dot_clock) < ai->si->tmds_pll[i].freq) {
+			tmp = ai->si->tmds_pll[i].value ;
+			break;
+		}
+	}
+
+	if (IS_R300_VARIANT || (ai->si->asic == rt_rv280)) {
+		if (tmp & 0xfff00000) {
+			values->tmds_pll_cntl = tmp;
+		} else {
+			values->tmds_pll_cntl = ai->si->tmds_pll_cntl & 0xfff00000;
+			values->tmds_pll_cntl |= tmp;
+		}
+	} else {
+		values->tmds_pll_cntl = tmp;
+	}
+
+	values->tmds_trans_cntl = ai->si->tmds_transmitter_cntl 
+		& ~(RADEON_TMDS_TRANSMITTER_PLLRST);
+
+	if (IS_R300_VARIANT || (ai->si->asic == rt_r200) || (ai->si->num_crtc == 1))
+		values->tmds_trans_cntl &= ~(RADEON_TMDS_TRANSMITTER_PLLEN);
+	else // weird, RV chips got this bit reversed?
+		values->tmds_trans_cntl |= (RADEON_TMDS_TRANSMITTER_PLLEN);
+
+
 	// enable proper transmitter	
 	if( (crtc->chosen_displays & dd_lvds) != 0 ) {
 		// using LVDS means there cannot be a DVI monitor
+		SHOW_FLOW0( 2, "lvds" );
 		values->lvds_gen_cntl |= (RADEON_LVDS_ON | RADEON_LVDS_BLON);
 		values->fp_gen_cntl &= ~(RADEON_FP_FPON | RADEON_FP_TMDS_EN);
 		
 	} else if( !fp_port->is_fp2 ) {
 		// DVI on internal transmitter
+		SHOW_FLOW0( 2, "DVI INT" );
 		values->fp_gen_cntl |= RADEON_FP_FPON | RADEON_FP_TMDS_EN;
 		// enabling 8 bit data may be dangerous; BIOS should have taken care of that
 		values->fp_gen_cntl |= RADEON_FP_PANEL_FORMAT;
 		
 	} else {
 		// DVI on external transmitter
+		SHOW_FLOW0( 2, "DVI EXT" );
 		values->fp2_gen_cntl |= RADEON_FP2_FPON | RADEON_FP_PANEL_FORMAT;
 		values->fp2_gen_cntl &= ~RADEON_FP2_BLANK_EN;
 		
+		//hack in missing bits test...
+		//values->fp2_gen_cntl |= (1 << 22) | (1 << 28);
+
 		if( ai->si->asic >= rt_r200 )
 			values->fp2_gen_cntl |= RADEON_FP2_DV0_EN;
 	}
 		
-    SHOW_FLOW( 2, "after: fp_gen_cntl=%08lx, horz=%08lx, vert=%08lx, lvds_gen_cntl=%08lx",
-    	values->fp_gen_cntl, values->fp_horz_stretch, values->fp_vert_stretch, 
+    SHOW_FLOW( 2, "after: fp_gen_cntl=%08lx, fp2_gen_cntl=%08lx, horz=%08lx, vert=%08lx, lvds_gen_cntl=%08lx",
+    	values->fp_gen_cntl, values->fp2_gen_cntl, values->fp_horz_stretch, values->fp_vert_stretch, 
     	values->lvds_gen_cntl );
 }
 
@@ -209,11 +258,15 @@ void Radeon_ProgramFPRegisters(
 	OUTREGP( regs, RADEON_FP_GEN_CNTL, values->fp_gen_cntl, RADEON_FP_SEL_CRTC2 );
 
 	if( fp_port->is_fp2 ) {
+		SHOW_FLOW0( 2, "is_fp2" );
+		OUTREGP( regs, RADEON_FP2_GEN_CNTL, values->fp2_gen_cntl, 
+			~(RADEON_FP2_SOURCE_SEL_MASK | RADEON_FP2_SRC_SEL_MASK));
 		OUTREGP( regs, RADEON_FP2_GEN_CNTL, values->fp2_gen_cntl, 
 			RADEON_FP2_SOURCE_SEL_CRTC2 | RADEON_FP2_SRC_SEL_CRTC2 );
 		OUTREG( regs, RADEON_FP_H2_SYNC_STRT_WID, values->fp2_h_sync_strt_wid );
 		OUTREG( regs, RADEON_FP_V2_SYNC_STRT_WID, values->fp2_v_sync_strt_wid );
 	} else {
+		SHOW_FLOW0( 2, "is_fp1" );
 		OUTREG( regs, RADEON_FP_H_SYNC_STRT_WID, values->fp_h_sync_strt_wid );
 		OUTREG( regs, RADEON_FP_V_SYNC_STRT_WID, values->fp_v_sync_strt_wid );
 	}

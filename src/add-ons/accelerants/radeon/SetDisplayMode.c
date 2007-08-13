@@ -23,11 +23,20 @@
 #include "fp_regs.h"
 #include "gpiopad_regs.h"
 
+#include "pll_regs.h"
+#include "tv_out_regs.h"
+#include "config_regs.h"
+#include "ddc_regs.h"
+#include "pll_access.h"
+#include "theatre_regs.h"
+#include "set_mode.h"
+#include "ddc.h"
+
 #include "set_mode.h"
 
 #include <string.h>
 
-void Radeon_SetMode( 
+status_t Radeon_SetMode( 
 	accelerator_info *ai, crtc_info *crtc, display_mode *mode, impactv_params *tv_params );
 
 // round virtual width up to next valid size
@@ -94,7 +103,7 @@ static void Radeon_InitCommonRegs(
 
 // set display mode of one head;
 // port restrictions, like fixed-sync TFTs connected to it, are taken care of
-void Radeon_SetMode( 
+status_t Radeon_SetMode( 
 	accelerator_info *ai, crtc_info *crtc, display_mode *mode, impactv_params *tv_params )
 {
 	virtual_card *vc = ai->vc;
@@ -126,11 +135,26 @@ void Radeon_SetMode(
 	// is determined by the physical resolution; 
 	// also, all timing is fixed
 	if( (disp_devices & (dd_lvds | dd_dvi | dd_dvi_ext)) != 0 ) {
+		SHOW_FLOW0( 0, "requested resolution higher than native panel" );
 		if( mode->timing.h_display > fp_info->panel_xres )
 			mode->timing.h_display = fp_info->panel_xres;
 		if(	mode->timing.v_display > fp_info->panel_yres )
 			mode->timing.v_display = fp_info->panel_yres;
 		
+		if( (disp_devices & dd_dvi_ext) != 0 ) {
+			SHOW_FLOW0( 0, "requested resolution less than second native panel" );
+			if( mode->timing.h_display < fp_info->panel_xres )
+				mode->timing.h_display = fp_info->panel_xres;
+			if(	mode->timing.v_display < fp_info->panel_yres )
+				mode->timing.v_display = fp_info->panel_yres;
+
+			//TODO at this point we know we are going to do centered timing
+			//need to set flags to a. blank the unused memory, b.center screen
+			//for now it's in the top corner, and surrounded by garbage.
+			// although if the DVI panels are the same size and we are cloning
+			// we can switch the FP2 source to RMX, and drive both screens from
+			// the RMX unit.
+		}
 		mode->timing.h_total = mode->timing.h_display + fp_info->h_blank;
 		mode->timing.h_sync_start = mode->timing.h_display + fp_info->h_over_plus;
 		mode->timing.h_sync_end = mode->timing.h_sync_start + fp_info->h_sync_width;
@@ -254,6 +278,28 @@ void Radeon_SetMode(
 			Radeon_TheatreProgramTVRegisters( ai, &impactv_values );
 	}
 
+	// spit out some debug stuff in a radeontool stylee
+	SHOW_FLOW0( 0, "" );
+	SHOW_FLOW( 0, "RADEON_DAC_CNTL %08X ", INREG( regs, RADEON_DAC_CNTL ));
+	SHOW_FLOW( 0, "RADEON_DAC_CNTL2 %08X ", INREG( regs, RADEON_DAC_CNTL2 ));
+	SHOW_FLOW( 0, "RADEON_TV_DAC_CNTL %08X ", INREG( regs, RADEON_TV_DAC_CNTL ));
+	SHOW_FLOW( 0, "RADEON_DISP_OUTPUT_CNTL %08X ", INREG( regs, RADEON_DISP_OUTPUT_CNTL ));
+	SHOW_FLOW( 0, "RADEON_AUX_SC_CNTL %08X ", INREG( regs, RADEON_AUX_SC_CNTL ));
+	SHOW_FLOW( 0, "RADEON_CRTC_EXT_CNTL %08X ", INREG( regs, RADEON_CRTC_EXT_CNTL ));
+	SHOW_FLOW( 0, "RADEON_CRTC_GEN_CNTL %08X ", INREG( regs, RADEON_CRTC_GEN_CNTL ));
+	SHOW_FLOW( 0, "RADEON_CRTC2_GEN_CNTL %08X ", INREG( regs, RADEON_CRTC2_GEN_CNTL ));
+	SHOW_FLOW( 0, "RADEON_DISP_MISC_CNTL %08X ", INREG( regs, RADEON_DISP_MISC_CNTL ));
+	SHOW_FLOW( 0, "RADEON_FP_GEN_CNTL %08X ", INREG( regs, RADEON_FP_GEN_CNTL ));
+	SHOW_FLOW( 0, "RADEON_FP2_GEN_CNTL %08X ", INREG( regs, RADEON_FP2_GEN_CNTL ));
+	SHOW_FLOW( 0, "RADEON_LVDS_GEN_CNTL %08X ", INREG( regs, RADEON_LVDS_GEN_CNTL ));
+	SHOW_FLOW( 0, "RADEON_TMDS_PLL_CNTL %08X ", INREG( regs, RADEON_TMDS_PLL_CNTL ));
+	SHOW_FLOW( 0, "RADEON_TMDS_TRANSMITTER_CNTL %08X ", INREG( regs, RADEON_TMDS_TRANSMITTER_CNTL ));
+	SHOW_FLOW( 0, "RADEON_FP_H_SYNC_STRT_WID %08X ", INREG( regs, RADEON_FP_H_SYNC_STRT_WID ));
+	SHOW_FLOW( 0, "RADEON_FP_V_SYNC_STRT_WID %08X ", INREG( regs, RADEON_FP_V_SYNC_STRT_WID ));
+	SHOW_FLOW( 0, "RADEON_FP_H2_SYNC_STRT_WID %08X ", INREG( regs, RADEON_FP_H2_SYNC_STRT_WID ));
+	SHOW_FLOW( 0, "RADEON_FP_V2_SYNC_STRT_WID %08X ", INREG( regs, RADEON_FP_V2_SYNC_STRT_WID ));
+	// spit end
+
 	crtc->active_displays = disp_devices;
 	
 	// programming is over, so hardware can be used again
@@ -263,6 +309,8 @@ void Radeon_SetMode(
 	// TBD: this won't work if another virtual card was using it,
 	// but currently, virtual cards don't work anyway...
 	si->active_overlay.crtc_idx = -1;
+
+	return B_OK;
 }
 
 
@@ -432,6 +480,8 @@ status_t SET_DISPLAY_MODE(
 	{
 		routing_regs routing_values;
 		impactv_params tv_params;
+		status_t err1 , err2;
+		err1 = err2 = B_OK;
 	
 		// we first switch off all output, so the monitor(s) won't get invalid signals
 		if( vc->assigned_crtc[0] ) {
@@ -451,10 +501,14 @@ status_t SET_DISPLAY_MODE(
 	
 		// then change the mode
 		if( vc->used_crtc[0] )
-			Radeon_SetMode( ai, &si->crtc[0], &mode, &tv_params );
+			err1 = Radeon_SetMode( ai, &si->crtc[0], &mode, &tv_params );
 		if( vc->used_crtc[1] )
-			Radeon_SetMode( ai, &si->crtc[1], &mode, &tv_params );
+			err2 = Radeon_SetMode( ai, &si->crtc[1], &mode, &tv_params );
 			
+		
+		SHOW_FLOW( 2, "SetModes 1=%s, 2=%s", 
+			(err1 == B_OK) ? "OK" : "FAIL", (err2 == B_OK) ? "OK" : "FAIL");
+
 		// setup signal routing
 		Radeon_ReadMonitorRoutingRegs( ai, &routing_values );
 		Radeon_CalcMonitorRouting( ai, &tv_params, &routing_values );
@@ -462,9 +516,9 @@ status_t SET_DISPLAY_MODE(
 	   	
 		// finally, switch display(s) on
 		if( vc->used_crtc[0] )
-			Radeon_SetDPMS( ai, 0, B_DPMS_ON );
+			Radeon_SetDPMS( ai, 0, (err1 == B_OK) ? B_DPMS_ON : B_DPMS_SUSPEND );
 		if( vc->used_crtc[1] )
-			Radeon_SetDPMS( ai, 1, B_DPMS_ON );
+			Radeon_SetDPMS( ai, 1, (err2 == B_OK) ? B_DPMS_ON : B_DPMS_SUSPEND );
 			
 		OUTREGP( ai->regs, RADEON_CRTC_EXT_CNTL, 0, ~RADEON_CRTC_DISPLAY_DIS );
 	}

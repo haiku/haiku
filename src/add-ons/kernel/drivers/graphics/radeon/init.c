@@ -15,6 +15,7 @@
 */
 
 #include "dac_regs.h"
+#include "tv_out_regs.h"
 #include "fp_regs.h"
 #include "mmio.h"
 #include "radeon_driver.h"
@@ -266,20 +267,17 @@ status_t Radeon_FirstOpen( device_info *di )
 	// so we let the first accelerant take care of it
 	si->theatre_channel = -1;
 	
-/*	si->ports[0].disp_type = di->disp_type[0];
-	si->ports[1].disp_type = di->disp_type[1];*/
 	si->crtc[0].crtc_idx = 0;
 	si->crtc[0].flatpanel_port = 0;
 	si->crtc[1].crtc_idx = 1;
 	si->crtc[1].flatpanel_port = 1;
 	si->num_crtc = di->num_crtc;
 	
-	si->flatpanels[0] = di->fp_info;
+	if (di->is_mobility)
+		si->flatpanels[0] = di->fp_info;
+
 	si->pll = di->pll;
-/*	si->ram = di->ram;
-	strcpy( si->ram_type, di->ram_type );*/
-	//si->local_mem_size = di->local_mem_size;
-		
+
 	// create virtual card info; don't allow access by apps -
 	// they'll clone it 
 	sprintf( buffer, "%04X_%04X_%02X%02X%02X virtual card 0",
@@ -306,7 +304,7 @@ status_t Radeon_FirstOpen( device_info *di )
 	di->vc->assigned_crtc[0] = true;
 	di->vc->assigned_crtc[1] = si->num_crtc > 1;
 	di->vc->controlled_displays = 
-		dd_tv_crt | dd_crt | dd_lvds | dd_dvi | dd_ctv | dd_stv;
+		dd_tv_crt | dd_crt | dd_lvds | dd_dvi | dd_dvi_ext | dd_ctv | dd_stv;
 
 	di->vc->fb_mem_handle = 0;
 	di->vc->cursor.mem_handle = 0;
@@ -324,13 +322,21 @@ status_t Radeon_FirstOpen( device_info *di )
 	if( di->asic == rt_rv100 && di->is_mobility)
 		di->dac2_cntl = INREG( di->regs, RADEON_DAC_CNTL2 );
 	
+	memcpy(&si->tmds_pll, &di->tmds_pll, sizeof(di->tmds_pll));
+	si->tmds_pll_cntl = INREG( di->regs, RADEON_TMDS_PLL_CNTL);
+	si->tmds_transmitter_cntl = INREG( di->regs, RADEON_TMDS_TRANSMITTER_CNTL);
+
 	// print these out to capture bios status...
-	if ( di->is_mobility ) {
-		SHOW_INFO0( 4, "Copy of Laptop Display Regs for Reference:");
-		SHOW_INFO( 4, "LVDS CNTL = %8lx", INREG( di->regs, RADEON_LVDS_GEN_CNTL ));
-		SHOW_INFO( 4, "FP1  CNTL = %8lx", INREG( di->regs, RADEON_FP_GEN_CNTL ));
-		SHOW_INFO( 4, "FP2  CNTL = %8lx", INREG( di->regs, RADEON_FP2_GEN_CNTL ));
-	}
+//	if ( di->is_mobility ) {
+		SHOW_INFO0( 2, "Copy of Laptop Display Regs for Reference:");
+		SHOW_INFO( 2, "LVDS GEN = %8lx", INREG( di->regs, RADEON_LVDS_GEN_CNTL ));
+		SHOW_INFO( 2, "LVDS PLL = %8lx", INREG( di->regs, RADEON_LVDS_PLL_CNTL ));
+		SHOW_INFO( 2, "TMDS PLL = %8lx", INREG( di->regs, RADEON_TMDS_PLL_CNTL ));
+		SHOW_INFO( 2, "TMDS TRANS = %8lx", INREG( di->regs, RADEON_TMDS_TRANSMITTER_CNTL ));
+		SHOW_INFO( 2, "FP1 GEN = %8lx", INREG( di->regs, RADEON_FP_GEN_CNTL ));
+		SHOW_INFO( 2, "FP2 GEN = %8lx", INREG( di->regs, RADEON_FP2_GEN_CNTL ));
+		SHOW_INFO( 2, "TV DAC = %8lx", INREG( di->regs, RADEON_TV_DAC_CNTL )); //not setup right when ext dvi
+//	}
 	
 	result = Radeon_InitPCIGART( di );
 	if( result < 0 )

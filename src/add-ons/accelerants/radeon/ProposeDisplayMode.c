@@ -148,6 +148,10 @@ Radeon_ProposeDisplayMode(shared_info *si, crtc_info *crtc,
 	int eff_virtual_width;
 	fp_info *flatpanel = &si->flatpanels[crtc->flatpanel_port];
 
+	SHOW_FLOW( 4, "CRTC %d, DVI %d", (crtc == &si->crtc[0]) ? 0 : 1, crtc->flatpanel_port );
+	SHOW_FLOW( 4, "X %d, virtX %d", target->timing.h_display,  target->virtual_width);
+	SHOW_FLOW( 4, "fpRes %dx%d", flatpanel->panel_xres,  flatpanel->panel_yres);
+
 	// save refresh rate - we want to leave this (artifical) value untouched
 	// don't use floating point, we are in kernel mode
 	target_refresh = 
@@ -163,12 +167,23 @@ Radeon_ProposeDisplayMode(shared_info *si, crtc_info *crtc,
 	// for flat panels, check maximum resolution;
 	// all the other tricks (like fixed resolution and resulting scaling)
 	// are done automagically by set_display_mode
-    if( (crtc->chosen_displays & (dd_lvds | dd_dvi | dd_dvi_ext)) != 0 ) {
+    if( (crtc->chosen_displays & (dd_lvds | dd_dvi)) != 0 ) {
 		if( target->timing.h_display > flatpanel->panel_xres )
 			target->timing.h_display = flatpanel->panel_xres;
 		
 		if(	target->timing.v_display > flatpanel->panel_yres )
 			target->timing.v_display = flatpanel->panel_yres;
+	}
+
+	// for secondary flat panels there is no RMX unit for
+	// scaling up lower resolutions.  Until we can do centered timings
+	// we need to disable the screen unless it is the native resolution.
+	// if the DVI input has a scaler we would need to know about it somehow...
+    if( (crtc->chosen_displays & dd_dvi_ext) != 0 ) {
+		SHOW_FLOW0( 4, "external (secondary) DVI cannot support non-native resolutions" );
+		if( ( target->timing.h_display != flatpanel->panel_xres ) ||
+			( target->timing.v_display != flatpanel->panel_yres ) )
+			return B_ERROR;
 	}
 
 /*
@@ -325,7 +340,7 @@ Radeon_ProposeDisplayMode(shared_info *si, crtc_info *crtc,
 	if( target->timing.pixel_clock / 10 > pll->max_pll_freq || 
 		target->timing.pixel_clock / 10 * 12 < pll->min_pll_freq ) 
 	{
-		SHOW_ERROR( 2, "pixel_clock (%ld) out of range (%d, %d)", target->timing.pixel_clock, 
+		SHOW_ERROR( 4, "pixel_clock (%ld) out of range (%d, %d)", target->timing.pixel_clock, 
 			pll->max_pll_freq * 10, pll->min_pll_freq / 12 );
 		return B_ERROR;
 	}
@@ -371,7 +386,7 @@ Radeon_ProposeDisplayMode(shared_info *si, crtc_info *crtc,
 
 	// make sure we haven't shrunk virtual height too much
 	if (target->virtual_height < target->timing.v_display) {
-		SHOW_ERROR( 2, "not enough memory for this mode (could show only %d of %d lines)", 
+		SHOW_ERROR( 4, "not enough memory for this mode (could show only %d of %d lines)", 
 			target->virtual_height, target->timing.v_display );
 		return B_ERROR;
 	}
@@ -516,11 +531,11 @@ static void addFPMode( accelerator_info *ai )
 {
 	shared_info *si = ai->si;
 	
-	fp_info *fp_info = &si->flatpanels[0];
+	fp_info *fp_info = &si->flatpanels[0];	//todo fix the hardcoding what about ext dvi?
 	
-    if( (ai->vc->connected_displays & (dd_dvi | dd_lvds)) != 0 ) {
+    if( (ai->vc->connected_displays & (dd_dvi | dd_dvi_ext | dd_lvds)) != 0 ) {
     	display_mode mode;
-    	
+    	SHOW_FLOW0( 2, "" );
 		mode.virtual_width = mode.timing.h_display = fp_info->panel_xres;
 		mode.virtual_height = mode.timing.v_display = fp_info->panel_yres;
 		
@@ -631,14 +646,14 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low,
 	Radeon_DetectMultiMode( vc, target );
 	Radeon_VerifyMultiMode( vc, si, target );
 	
-	SHOW_FLOW0( 3, "wished:" );
-	SHOW_FLOW( 3, "H: %4d %4d %4d %4d (v=%4d)", 
+	SHOW_FLOW0( 2, "wished:" );
+	SHOW_FLOW( 2, "H: %4d %4d %4d %4d (v=%4d)", 
 		target->timing.h_display, target->timing.h_sync_start, 
 		target->timing.h_sync_end, target->timing.h_total, target->virtual_width );
-	SHOW_FLOW( 3, "V: %4d %4d %4d %4d (h=%4d)", 
+	SHOW_FLOW( 2, "V: %4d %4d %4d %4d (h=%4d)", 
 		target->timing.v_display, target->timing.v_sync_start, 
 		target->timing.v_sync_end, target->timing.v_total, target->virtual_height );
-	SHOW_FLOW( 3, "clk: %ld", target->timing.pixel_clock );
+	SHOW_FLOW( 2, "clk: %ld", target->timing.pixel_clock );
 	
 	// we must assure that each ProposeMode call doesn't tweak the mode in
 	// a way that it cannot be handled by the other port anymore
@@ -659,14 +674,14 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low,
 		result2 = B_OK;
 	}
 	
-	SHOW_INFO0( 4, "got:" );
-	SHOW_INFO( 4, "H: %4d %4d %4d %4d (v=%4d)", 
+	SHOW_INFO0( 2, "got:" );
+	SHOW_INFO( 2, "H: %4d %4d %4d %4d (v=%4d)", 
 		target->timing.h_display, target->timing.h_sync_start, 
 		target->timing.h_sync_end, target->timing.h_total, target->virtual_width );
-	SHOW_INFO( 4, "V: %4d %4d %4d %4d (h=%4d)", 
+	SHOW_INFO( 2, "V: %4d %4d %4d %4d (h=%4d)", 
 		target->timing.v_display, target->timing.v_sync_start, 
 		target->timing.v_sync_end, target->timing.v_total, target->virtual_height );
-	SHOW_INFO( 4, "clk: %ld", target->timing.pixel_clock );
+	SHOW_INFO( 2, "clk: %ld", target->timing.pixel_clock );
 
 	Radeon_HideMultiMode( vc, target );
 	

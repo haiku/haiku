@@ -32,7 +32,7 @@ extern int debug_level_error;
 
 #define DEBUG_MSG_PREFIX "Radeon - "
 
-#define DEBUG_MAX_LEVEL_FLOW 2
+#define DEBUG_MAX_LEVEL_FLOW 3
 
 #include "debug_ext.h"
 

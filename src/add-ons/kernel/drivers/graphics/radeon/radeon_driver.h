@@ -116,6 +116,7 @@ typedef struct device_info {
 	disp_entity	routing;
 	
 	general_pll_info pll;
+	tmds_pll_info 	 tmds_pll[4];
 	ram_info	ram;	
 	char		ram_type[32];	// human-readable name of ram type
 	uint32		local_mem_size;

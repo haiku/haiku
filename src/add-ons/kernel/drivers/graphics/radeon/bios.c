@@ -31,13 +31,32 @@
 
 #define RADEON_BIOS8(v) 	 (di->rom.rom_ptr[v])
 #define RADEON_BIOS16(v) 	((di->rom.rom_ptr[v]) | \
-						  	 (di->rom.rom_ptr[(v) + 1] << 8))
+				(di->rom.rom_ptr[(v) + 1] << 8))
 #define RADEON_BIOS32(v) 	((di->rom.rom_ptr[v]) | \
-							 (di->rom.rom_ptr[(v) + 1] << 8) \
-							 (di->rom.rom_ptr[(v) + 2] << 16) \
-							 (di->rom.rom_ptr[(v) + 3] << 24))
+				(di->rom.rom_ptr[(v) + 1] << 8) | \
+				(di->rom.rom_ptr[(v) + 2] << 16) | \
+				(di->rom.rom_ptr[(v) + 3] << 24))
 
 static const char ati_rom_sig[] = "761295520";
+
+static const tmds_pll_info default_tmds_pll[14][4] =
+{
+    {{12000, 0xa1b}, {0xffffffff, 0xa3f}, {0, 0}, {0, 0}},			// r100
+    {{12000, 0xa1b}, {0xffffffff, 0xa3f}, {0, 0}, {0, 0}},			// rv100
+    {{0, 0}, {0, 0}, {0, 0}, {0, 0}},						// rs100
+    {{15000, 0xa1b}, {0xffffffff, 0xa3f}, {0, 0}, {0, 0}},			// rv200
+    {{12000, 0xa1b}, {0xffffffff, 0xa3f}, {0, 0}, {0, 0}},			// rs200
+    {{15000, 0xa1b}, {0xffffffff, 0xa3f}, {0, 0}, {0, 0}},			// r200
+    {{15500, 0x81b}, {0xffffffff, 0x83f}, {0, 0}, {0, 0}},			// rv250
+    {{0, 0}, {0, 0}, {0, 0}, {0, 0}},						// rs300
+    {{13000, 0x400f4}, {15000, 0x400f7}, {0xffffffff, 0x40111}, {0, 0}}, 	// rv280
+    {{0xffffffff, 0xb01cb}, {0, 0}, {0, 0}, {0, 0}},				// r300
+    {{0xffffffff, 0xb01cb}, {0, 0}, {0, 0}, {0, 0}},				// r350
+    {{15000, 0xb0155}, {0xffffffff, 0xb01cb}, {0, 0}, {0, 0}},			// rv350
+    {{15000, 0xb0155}, {0xffffffff, 0xb01cb}, {0, 0}, {0, 0}},			// rv380
+    {{0xffffffff, 0xb01cb}, {0, 0}, {0, 0}, {0, 0}},				// r420
+};
+
 
 // find address of ROM;
 // this code is really nasty as maintaining the radeon signatures
@@ -691,6 +710,108 @@ static void Radeon_RevEnvDFPTiming( device_info *di )
 		>> RADEON_CRTC_V_SYNC_WID_SHIFT);
 }
 
+//snaffled from X.org hope it works...
+static void Radeon_GetTMDSInfoFromBios( device_info *di )
+{
+    uint32 tmp, maxfreq;
+    uint32 found = FALSE;
+    int i, n;
+    uint16 bios_header;
+
+    bios_header = RADEON_BIOS16( 0x48 );
+
+	for (i = 0; i < 4; i++) {
+        di->tmds_pll[i].value = 0;
+        di->tmds_pll[i].freq = 0;
+    }
+    
+	if (di->is_atombios)
+	{
+		int master_data_start;
+		master_data_start = RADEON_BIOS16( bios_header + 32 );
+		
+		if((tmp = RADEON_BIOS16 (master_data_start + 18))) {
+	
+		    maxfreq = RADEON_BIOS16(tmp + 4);
+		    
+		    for (i = 0; i < 4; i++) {
+				di->tmds_pll[i].freq = RADEON_BIOS16(tmp + i * 6 + 6);
+				// This assumes each field in TMDS_PLL has 6 bit as in R300/R420
+				di->tmds_pll[i].value = ((RADEON_BIOS8(tmp + i * 6 + 8) & 0x3f) |
+				   ((RADEON_BIOS8(tmp + i * 6 + 10) & 0x3f) << 6) |
+				   ((RADEON_BIOS8(tmp + i * 6 +  9) & 0xf) << 12) |
+				   ((RADEON_BIOS8(tmp + i * 6 + 11) & 0xf) << 16));
+				SHOW_ERROR( 2, "TMDS PLL from BIOS: %ld %lx", 
+				   di->tmds_pll[i].freq, di->tmds_pll[i].value);
+				       
+				if (maxfreq == di->tmds_pll[i].freq) {
+				    di->tmds_pll[i].freq = 0xffffffff;
+				    break;
+				}
+		    }
+		    found = TRUE;
+		}
+    } else {
+
+		tmp = RADEON_BIOS16(bios_header + 0x34);
+		if (tmp) {
+		    SHOW_ERROR( 2, "DFP table revision: %d", RADEON_BIOS8(tmp));
+		    if (RADEON_BIOS8(tmp) == 3) {
+				n = RADEON_BIOS8(tmp + 5) + 1;
+				if (n > 4) 
+					n = 4;
+				for (i = 0; i < n; i++) {
+					di->tmds_pll[i].value = RADEON_BIOS32(tmp + i * 10 + 0x08);
+					di->tmds_pll[i].freq = RADEON_BIOS16(tmp + i * 10 + 0x10);
+				}
+				found = TRUE;
+		    } else if (RADEON_BIOS8(tmp) == 4) {
+		        int stride = 0;
+				n = RADEON_BIOS8(tmp + 5) + 1;
+				if (n > 4) 
+					n = 4;
+				for (i = 0; i < n; i++) {
+				    di->tmds_pll[i].value = RADEON_BIOS32(tmp + stride + 0x08);
+				    di->tmds_pll[i].freq = RADEON_BIOS16(tmp + stride + 0x10);
+				    if (i == 0) 
+				    	stride += 10;
+				    else 
+				    	stride += 6;
+				}
+				found = TRUE;
+		    }
+	
+		    // revision 4 has some problem as it appears in RV280, 
+		    // comment it off for now, use default instead    
+			/*
+				else if (RADEON_BIOS8(tmp) == 4) {
+				int stride = 0;
+				n = RADEON_BIOS8(tmp + 5) + 1;
+				if (n > 4) n = 4;
+				for (i = 0; i < n; i++) {
+					di->tmds_pll[i].value = RADEON_BIOS32(tmp + stride + 0x08);
+					di->tmds_pll[i].freq = RADEON_BIOS16(tmp + stride + 0x10);
+					if (i == 0) 
+						stride += 10;
+					else 
+						stride += 6;
+				}
+				found = TRUE;
+			}
+			*/
+		    
+		}
+    }
+    
+    if (found == FALSE) {
+    	for (i = 0; i < 4; i++) {
+	        di->tmds_pll[i].value = default_tmds_pll[di->asic][i].value;
+	        di->tmds_pll[i].freq = default_tmds_pll[di->asic][i].freq;
+	        SHOW_ERROR( 2, "TMDS PLL from DEFAULTS: %ld %lx", 
+				di->tmds_pll[i].freq, di->tmds_pll[i].value);
+    	}
+    }
+}
 
 /*
 // get everything in terms of monitors connected to the card
@@ -964,6 +1085,12 @@ status_t Radeon_ReadBIOSData( device_info *di )
 	di->routing.port_info[0].dac_type = dac_unknown;
 	di->routing.port_info[0].tmds_type = tmds_unknown;
 	di->routing.port_info[0].connector_type = connector_none;
+
+	di->routing.port_info[1].mon_type = mt_unknown;
+	di->routing.port_info[1].ddc_type = ddc_none_detected;
+	di->routing.port_info[1].dac_type = dac_unknown;
+	di->routing.port_info[1].tmds_type = tmds_unknown;
+	di->routing.port_info[1].connector_type = connector_none;
 	
 	if ( !Radeon_GetConnectorInfoFromBIOS( di ) )
 	{
@@ -981,6 +1108,7 @@ status_t Radeon_ReadBIOSData( device_info *di )
 
 	}
 	Radeon_GetFPData( di );
+	Radeon_GetTMDSInfoFromBios( di );
 	Radeon_DetectRAM( di );
 	
 	Radeon_UnmapDevice( di );

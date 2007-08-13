@@ -35,6 +35,7 @@
 #       define RADEON_FP2_PANEL_FORMAT          (1 <<  3)
 #       define RADEON_FP2_SOURCE_SEL_MASK       (3 << 10)
 #       define RADEON_FP2_SOURCE_SEL_CRTC2      (1 << 10)
+#       define RADEON_FP2_SOURCE_SEL_RMX        (2 << 10) 
 #       define RADEON_FP2_SRC_SEL_MASK          (3 << 13)
 #       define RADEON_FP2_SRC_SEL_CRTC2         (1 << 13)
 #       define RADEON_FP2_FP_POL                (1 << 16)
@@ -68,6 +69,12 @@
 #       define RADEON_VERT_STRETCH_BLEND       (1     << 26)
 #       define RADEON_VERT_AUTO_RATIO_EN       (1     << 27)
 #       define RADEON_VERT_STRETCH_RESERVED    0xf1000000
+
+#define RADEON_TMDS_PLL_CNTL                0x02a8
+#define RADEON_TMDS_TRANSMITTER_CNTL        0x02a4
+#       define RADEON_TMDS_TRANSMITTER_PLLEN  1
+#       define RADEON_TMDS_TRANSMITTER_PLLRST 2
+
 #define RADEON_FP_H_SYNC_STRT_WID           0x02c4
 #define RADEON_FP_V_SYNC_STRT_WID           0x02c8
 
@@ -80,6 +87,9 @@
 #       define RADEON_LVDS_DIGON            (1   << 18)
 #       define RADEON_LVDS_BLON             (1   << 19)
 #       define RADEON_LVDS_SEL_CRTC2        (1   << 23)
+#define RADEON_LVDS_PLL_CNTL                0x02d4
+#       define RADEON_HSYNC_DELAY_SHIFT     28
+#       define RADEON_HSYNC_DELAY_MASK      (0xf << 28)
 
 #define RADEON_FP_CRTC2_H_TOTAL_DISP        0x0350
 #define RADEON_FP_CRTC2_V_TOTAL_DISP        0x0354
