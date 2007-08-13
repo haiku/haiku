@@ -309,20 +309,6 @@ static void testLineArray(BView *view, BRect frame)
 	view->EndLineArray();
 }
 
-static void testCopyBits(BView *view, BRect frame)
-{
-	frame.InsetBy(2, 2);
-	BRect leftHalf(frame);
-	leftHalf.right = centerPoint(frame).x - 1;
-	
-	BRect rightHalf(frame);
-	rightHalf.left = centerPoint(frame).x + 1;
-	
-	view->StrokeRect(leftHalf);
-	
-	view->CopyBits(leftHalf, rightHalf);
-}
-
 static void testInvertRect(BView *view, BRect frame)
 {
 	frame.InsetBy(2, 2);
@@ -345,6 +331,220 @@ static void testBitmap(BView *view, BRect frame) {
 	view->DrawBitmap(&bitmap, BPoint(0, 0));
 }
 
+static void testConstrainClippingRegion(BView *view, BRect frame) 
+{
+	frame.InsetBy(2, 2);
+	// draw background
+	view->SetHighColor(kRed);
+	view->FillRect(frame);
+	
+	frame.InsetBy(1, 1);
+	BRegion region(frame);
+	BRect r(frame);
+	r.InsetBy(r.IntegerWidth() / 4, r.IntegerHeight() / 4);
+	region.Exclude(r);
+	view->ConstrainClippingRegion(&region);
+	
+	frame.InsetBy(-1, -1);
+	view->SetHighColor(kBlack);
+	view->FillRect(frame);
+	// a filled black rectangle with a red one pixel border
+	// and inside a red rectangle should be drawn.
+}
+
+static void testClipToPicture(BView *view, BRect frame) 
+{
+	frame.InsetBy(2, 2);
+	
+	view->BeginPicture(new BPicture());
+	view->FillEllipse(frame);
+	BPicture *picture = view->EndPicture();
+	if (picture == NULL)
+		return;
+	
+	view->ClipToPicture(picture);
+	delete picture;
+	
+	view->FillRect(frame);
+	// black ellipse should be drawn
+}
+
+static void testClipToInversePicture(BView *view, BRect frame) 
+{
+	frame.InsetBy(2, 2);
+	
+	view->BeginPicture(new BPicture());
+	view->FillEllipse(frame);
+	BPicture *picture = view->EndPicture();
+	if (picture == NULL)
+		return;
+	
+	view->ClipToInversePicture(picture);
+	delete picture;
+	
+	view->FillRect(frame);
+	// white ellipse inside a black rectangle
+}
+
+static void testSetPenSize(BView *view, BRect frame)
+{
+	frame.InsetBy(8, 2);
+	float x = centerPoint(frame).x;
+	
+	view->StrokeLine(BPoint(frame.left, frame.top), BPoint(frame.right, frame.top));
+	
+	frame.OffsetBy(0, 5);
+	view->SetPenSize(1);
+	view->StrokeLine(BPoint(frame.left, frame.top), BPoint(x, frame.top));
+	view->SetPenSize(0);
+	view->StrokeLine(BPoint(x+1, frame.top), BPoint(frame.right, frame.top));
+
+	frame.OffsetBy(0, 5);
+	view->SetPenSize(1);
+	view->StrokeLine(BPoint(frame.left, frame.top), BPoint(x, frame.top));
+	view->SetPenSize(2);
+	view->StrokeLine(BPoint(x+1, frame.top), BPoint(frame.right, frame.top));
+
+	frame.OffsetBy(0, 5);
+	view->SetPenSize(1);
+	view->StrokeLine(BPoint(frame.left, frame.top), BPoint(x, frame.top));
+	view->SetPenSize(3);
+	view->StrokeLine(BPoint(x+1, frame.top), BPoint(frame.right, frame.top));
+
+	frame.OffsetBy(0, 5);
+	view->SetPenSize(1);
+	view->StrokeLine(BPoint(frame.left, frame.top), BPoint(x, frame.top));
+	view->SetPenSize(4);
+	view->StrokeLine(BPoint(x+1, frame.top), BPoint(frame.right, frame.top));
+}
+
+static void testSetPenSize2(BView *view, BRect frame)
+{
+	// test if pen size is scaled too
+	frame.InsetBy(2, 2);
+	frame.OffsetBy(0, 5);
+	view->SetPenSize(4);
+	view->StrokeLine(BPoint(frame.left, frame.top), BPoint(frame.right, frame.top));
+	view->SetScale(0.5);
+	view->StrokeLine(BPoint(frame.left + 2, frame.bottom), BPoint(frame.right + 2, frame.bottom));	
+	
+	// black line from left to right, 4 pixel size
+	// below black line with half the length of the first one
+	// and 2 pixel size
+}
+
+static void testPattern(BView *view, BRect frame)
+{
+	frame.InsetBy(2, 2);
+	int x = frame.IntegerWidth() / 3;
+	frame.right = frame.left + x - 2;
+		// -2 for an empty pixel row between 
+		// filled rectangles
+
+	view->SetLowColor(kGreen);
+	view->SetHighColor(kRed);
+	
+	view->FillRect(frame, B_SOLID_HIGH);
+	
+	frame.OffsetBy(x, 0);
+	view->FillRect(frame, B_MIXED_COLORS);
+	
+	frame.OffsetBy(x, 0);
+	view->FillRect(frame, B_SOLID_LOW);
+}
+
+static void testSetOrigin(BView *view, BRect frame)
+{
+	BPoint origin = view->Origin();
+	BPoint center = centerPoint(frame);
+	view->SetOrigin(center);
+
+	BRect r(0, 0, center.x, center.y);
+	view->SetHighColor(kBlue);
+	view->FillRect(r);
+	
+	view->SetOrigin(origin);
+	view->SetHighColor(kRed);
+	view->FillRect(r);
+	
+	// red rectangle in left, top corner
+	// blue rectangle in right, bottom corner
+	// the red rectangle overwrites the
+	// top, left pixel of the blue rectangle
+}
+
+static void testSetOrigin2(BView *view, BRect frame)
+{
+	BPoint center = centerPoint(frame);
+	BRect r(0, 0, center.x, center.y);
+	view->SetOrigin(center);
+	view->PushState();
+		view->SetOrigin(BPoint(-center.x, 0));
+		view->FillRect(r);
+	view->PopState();	
+	// black rectangle in left, bottom corner
+}
+
+static void testSetScale(BView *view, BRect frame)
+{
+	view->SetScale(0.5);
+	view->FillRect(frame);
+	// black rectangle in left, top corner
+}
+
+static void testSetScale2(BView *view, BRect frame)
+{
+	view->SetScale(0.5);
+	view->PushState();
+		view->SetScale(0.5);
+		view->FillRect(frame);
+	view->PopState();	
+	// black rectangle in left, top corner
+	// with half the size of the rectangle
+	// from test testSetScaling
+}
+
+static void testSetScale3(BView *view, BRect frame)
+{
+	view->SetScale(0.5);
+	view->PushState();
+		// if the second scale value differs slightly
+		// the bug under BeOS R5 in testSetScale2 
+		// does not occur
+		view->SetScale(0.5000001);
+		view->FillRect(frame);
+	view->PopState();	
+	// black rectangle in left, top corner
+	// with half the size of the rectangle
+	// from test testSetScaling
+}
+
+static void testSetFontSize(BView *view, BRect frame)
+{
+	frame.InsetBy(2, 2);
+	int size = frame.IntegerHeight() / 3;
+	
+	frame.OffsetBy(0, size);
+	view->MovePenTo(BPoint(frame.left, frame.top));
+	view->SetFontSize(size);
+	view->DrawString("Haiku");
+	
+	size *= 2;	
+	frame.OffsetBy(0, size);
+	view->MovePenTo(BPoint(frame.left, frame.top));
+	view->SetFontSize(size);
+	view->DrawString("Haiku");	
+}
+
+// TODO
+// - drawing mode
+// - blending mode
+// - line mode
+// - push/pop state
+// - move pen
+// - set font
+
+
 TestCase gTestCases[] = {
 	{ "Test No Operation", testNoOp },
 	{ "Test DrawChar", testDrawChar },
@@ -352,6 +552,8 @@ TestCase gTestCases[] = {
 	{ "Test Draw String With Length", testDrawStringWithLength },
 	{ "Test FillArc", testFillArc },
 	{ "Test StrokeArc", testStrokeArc },
+	// testFillBezier fails under BeOS because the
+	// direct draw version is not correct
 	{ "Test FillBezier", testFillBezier },
 	{ "Test StrokeBezier", testStrokeBezier },
 	{ "Test FillEllipse", testFillEllipse },
@@ -373,11 +575,22 @@ TestCase gTestCases[] = {
 	{ "Test Record And Play Picture With Offset", testRecordAndPlayPictureWithOffset },
 	{ "Test AppendToPicture", testAppendToPicture },
 	{ "Test LineArray", testLineArray },
-	// does not work under R5 for pictures!
-	// TODO verify that CopyBits is not supported when recording to a BPicture
-	// { "Test CopyBits*", testCopyBits },
 	{ "Test InvertRect", testInvertRect },
 	{ "Test Bitmap", testBitmap },
+	{ "Test ConstrainClippingRegion", testConstrainClippingRegion }, 
+	{ "Test ClipToPicture", testClipToPicture },
+	{ "Test ClipToInversePicture", testClipToInversePicture },
+	{ "Test SetPenSize", testSetPenSize },
+	{ "Test SetPenSize2", testSetPenSize2 },
+	{ "Test Pattern", testPattern },
+	{ "Test SetOrigin", testSetOrigin },
+	{ "Test SetOrigin2", testSetOrigin2 },
+	{ "Test SetScale", testSetScale },
+	// testSetScale2 fails under BeOS. The picture versions of the
+	// rectangle are twice as large as the direct draw version
+	{ "Test SetScale2*", testSetScale2 },
+	{ "Test SetScale3", testSetScale3 },
+	{ "Test SetFontSize", testSetFontSize },
 	{ NULL, NULL }
 };
 

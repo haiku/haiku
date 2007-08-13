@@ -144,6 +144,8 @@ PictureTestWindow::RunTests(color_space *colorSpaces, int32 n)
 		fListView->AddItem(new BStringItem(text.String()));
 		RunTests(testIndex, colorSpaces, n);
 	}
+		
+	UpdateHeader();
 }
 
 void 
@@ -216,7 +218,5 @@ PictureTestWindow::RunTests(int32 testIndex, color_space colorSpace)
 		fNumberOfTests ++;
 		if (!ok)
 			fFailedTests ++;
-		
-		UpdateHeader();
 	}
 }
