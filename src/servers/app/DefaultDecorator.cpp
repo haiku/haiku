@@ -432,6 +432,7 @@ DefaultDecorator::Draw(BRect update)
 
 	// We need to draw a few things: the tab, the resize thumb, the borders,
 	// and the buttons
+	fDrawingEngine->SetDrawState(&fDrawState);
 
 	_DrawFrame(update);
 	_DrawTab(update);
@@ -443,6 +444,7 @@ DefaultDecorator::Draw()
 {
 	// Easy way to draw everything - no worries about drawing only certain
 	// things
+	fDrawingEngine->SetDrawState(&fDrawState);
 
 	_DrawFrame(BRect(fTopBorder.LeftTop(), fBottomBorder.RightBottom()));
 	_DrawTab(fTabRect);
