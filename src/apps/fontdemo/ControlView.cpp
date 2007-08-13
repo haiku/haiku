@@ -339,7 +339,7 @@ ControlView::MessageReceived(BMessage* msg)
 		 		else {
 		 			fFontStyleindex = 0;
 
-		 			if (familyindex < count_font_families())
+		 			if (familyindex < count_font_families() - 1)
 				 		familyindex++;
 				 	else
 			 			familyindex = 0;
