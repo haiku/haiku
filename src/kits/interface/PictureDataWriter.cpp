@@ -89,6 +89,20 @@ PictureDataWriter::WriteSetDrawingMode(const drawing_mode &mode)
 
 
 status_t
+PictureDataWriter::WriteSetPenLocation(const BPoint &point)
+{
+	try {
+		BeginOp(B_PIC_SET_PEN_LOCATION);
+		Write<BPoint>(point);
+		EndOp();
+	} catch (status_t &status) {
+		return status;	
+	}
+	return B_OK;
+}
+
+
+status_t
 PictureDataWriter::WriteSetPenSize(const float &penSize)
 {
 	try {

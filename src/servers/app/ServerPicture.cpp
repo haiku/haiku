@@ -735,8 +735,6 @@ ServerPicture::ServerPicture(const ServerPicture &picture)
 	fPictures(NULL),
 	fUsurped(NULL)
 {
-	fToken = gTokenSpace.NewToken(kPictureToken, this);
-
 	BMallocIO *mallocIO = new (std::nothrow) BMallocIO();
 	if (mallocIO == NULL)
 		return;
@@ -747,6 +745,8 @@ ServerPicture::ServerPicture(const ServerPicture &picture)
 	if (mallocIO->SetSize(size) < B_OK)
 		return;
 	
+	fToken = gTokenSpace.NewToken(kPictureToken, this);
+
 	picture.fData->ReadAt(0, const_cast<void *>(mallocIO->Buffer()), size);
 		
 	PictureDataWriter::SetTo(fData);
@@ -790,7 +790,8 @@ ServerPicture::SyncState(ViewLayer *view)
 	// TODO: Finish this
 	BeginOp(B_PIC_ENTER_STATE_CHANGE);
 
-//	WriteSetPenLocation(view->CurrentState()->PenLocation());
+	WriteSetOrigin(view->CurrentState()->Origin());
+	WriteSetPenLocation(view->CurrentState()->PenLocation());
 	WriteSetPenSize(view->CurrentState()->PenSize());
 	WriteSetScale(view->CurrentState()->Scale());
 	WriteSetLineMode(view->CurrentState()->LineCapMode(), view->CurrentState()->LineJoinMode(),

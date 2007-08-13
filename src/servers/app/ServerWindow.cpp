@@ -2400,6 +2400,14 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			break;
 		}
 		
+		case AS_LAYER_SET_PEN_LOC:
+		{
+			float x, y;
+			link.Read<float>(&x);
+			link.Read<float>(&y);
+			picture->WriteSetPenLocation(BPoint(x, y));
+			break;
+		}
 		case AS_LAYER_SET_PEN_SIZE:
 		{
 			float penSize;
@@ -2697,12 +2705,23 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			break;
 		}
 		
+		case AS_LAYER_APPEND_TO_PICTURE:
+		{
+			int32 pictureToken;
+			link.Read<int32>(&pictureToken);
+			ServerPicture *appendPicture = App()->FindPicture(pictureToken);
+			if (appendPicture) {
+				picture->SyncState(fCurrentLayer);
+				appendPicture->Usurp(picture);			
+			}
+			fCurrentLayer->SetPicture(appendPicture);
+				// we don't care if it's NULL
+			break;
+		}
+
 		case AS_LAYER_END_PICTURE:
 		{
 			ServerPicture *steppedDown = picture->StepDown();
-			if (!steppedDown)
-				return false;
-			
 			fCurrentLayer->SetPicture(steppedDown);
 			fLink.StartMessage(B_OK);
 			fLink.Attach<int32>(picture->Token());
