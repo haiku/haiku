@@ -860,12 +860,15 @@ DrawingEngine::FillRegion(BRegion& r)
 										  fSuspendSyncLevel == 0
 										  || cursorTouched);
 				doInSoftware = false;
-			} else if (fAvailableHWAccleration & HW_ACC_INVERT_REGION
-					   && fPainter->Pattern() == B_SOLID_HIGH
-					   && fPainter->DrawingMode() == B_OP_INVERT) {
-				r.IntersectWith(fPainter->ClippingRegion());
-				fGraphicsCard->InvertRegion(r);
 			}
+		}
+
+		if (doInSoftware && fAvailableHWAccleration & HW_ACC_INVERT_REGION
+				   && fPainter->Pattern() == B_SOLID_HIGH
+				   && fPainter->DrawingMode() == B_OP_INVERT) {
+			r.IntersectWith(fPainter->ClippingRegion());
+			fGraphicsCard->InvertRegion(r);
+			doInSoftware = false;
 		}
 
 		if (doInSoftware) {
