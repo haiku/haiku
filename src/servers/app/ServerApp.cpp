@@ -2675,7 +2675,7 @@ ServerApp::CreatePicture(const ServerPicture *original)
 ServerPicture *
 ServerApp::FindPicture(const int32 &token) const
 {
-	// TODO: we need to make sure the picture is ours?!
+	// TODO: we need to make sure the picture is ours?!	
 	ServerPicture* picture;
 	if (gTokenSpace.GetToken(token, kPictureToken, (void**)&picture) == B_OK)
 		return picture;

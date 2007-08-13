@@ -2674,7 +2674,15 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (link.Read<int32>(&token) == B_OK) {
 				BPoint where;
 				link.Read<BPoint>(&where);
-				picture->WriteDrawPicture(where, token);
+				
+				ServerPicture *pictureToDraw = App()->FindPicture(token);
+				if (picture != NULL) {
+					// We need to make a copy of the picture, since it can change
+					// after it has been drawn
+					ServerPicture *copy = App()->CreatePicture(pictureToDraw);
+					picture->NestPicture(copy);
+					picture->WriteDrawPicture(where, copy->Token());
+				}			
 			}
 			break;
 		}
@@ -2695,7 +2703,6 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			if (!steppedDown)
 				return false;
 			
-			steppedDown->NestPicture(picture);
 			fCurrentLayer->SetPicture(steppedDown);
 			fLink.StartMessage(B_OK);
 			fLink.Attach<int32>(picture->Token());

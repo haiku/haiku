@@ -777,7 +777,12 @@ ServerPicture::~ServerPicture()
 {
 	delete fData;
 	gTokenSpace.RemoveToken(fToken);
-	delete fPictures;
+	
+	if (fPictures != NULL) {
+		for (int32 i = fPictures->CountItems() - 1; i >= 0; i--)
+			delete static_cast<ServerPicture *>(fPictures->ItemAtFast(i));		
+		delete fPictures;
+	}
 }
 
 
