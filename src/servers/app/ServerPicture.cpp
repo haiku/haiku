@@ -778,11 +778,9 @@ ServerPicture::~ServerPicture()
 	delete fData;
 	gTokenSpace.RemoveToken(fToken);
 	
-	if (fPictures != NULL) {
-		for (int32 i = fPictures->CountItems() - 1; i >= 0; i--)
-			delete static_cast<ServerPicture *>(fPictures->ItemAtFast(i));		
-		delete fPictures;
-	}
+	// We don't delete the subpictures themselves, the ServerApp keeps
+	// them in a list and will delete them on quit.
+	delete fPictures;
 }
 
 
