@@ -3095,7 +3095,7 @@ void
 BView::BeginPicture(BPicture *picture)
 {
 	if (do_owner_check() && picture && picture->usurped == NULL) {
-		picture->usurp(cpicture);
+		picture->Usurp(cpicture);
 		cpicture = picture;
 
 		fOwner->fLink->StartMessage(AS_LAYER_BEGIN_PICTURE);
@@ -3115,7 +3115,7 @@ BView::AppendToPicture(BPicture *picture)
 			BeginPicture(picture);
 		} else {
 			picture->set_token(-1);
-			picture->usurp(cpicture);
+			picture->Usurp(cpicture);
 			cpicture = picture;			
 			fOwner->fLink->StartMessage(AS_LAYER_APPEND_TO_PICTURE);
 			fOwner->fLink->Attach<int32>(token);
@@ -3137,8 +3137,8 @@ BView::EndPicture()
 			&& code == B_OK
 			&& fOwner->fLink->Read<int32>(&token) == B_OK) {
 			BPicture *picture = cpicture;
-			cpicture = picture->step_down();
-			picture->set_token(token);
+			cpicture = picture->StepDown();
+			picture->SetToken(token);
 
 			return picture;
 		}

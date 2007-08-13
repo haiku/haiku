@@ -78,24 +78,29 @@ virtual	void				_ReservedPicture3();
 
 		BPicture			&operator=(const BPicture &);
 
-		void				init_data();
-		void				import_data(const void *data, int32 size, BPicture **subs, int32 subCount);
-		void				import_old_data(const void *data, int32 size);
-		void				set_token(int32 token);
-		bool				assert_local_copy();
-		bool				assert_old_local_copy();
-		bool				assert_server_copy();
+		void				_InitData();
+		void				_DisposeData();
+
+		void				_ImportData(const void *data, int32 size, BPicture **subs, int32 subCount);
+		void				_ImportOldData(const void *data, int32 size);
+		void				SetToken(int32 token);
+		bool				_AssertLocalCopy();
+		bool				_AssertOldLocalCopy();
+		bool				_AssertServerCopy();
+
+		status_t			_Upload();
+		status_t			_Download();
 
 		/**Deprecated API**/
 							BPicture(const void *data, int32 size);
 		const void			*Data() const;
 		int32				DataSize() const;
 
-		void				usurp(BPicture *lameDuck);
-		BPicture			*step_down();
+		void				Usurp(BPicture *lameDuck);
+		BPicture			*StepDown();
 
 		int32				token;
-		_BPictureExtent_	*extent;
+		_BPictureExtent_		*extent;
 		BPicture			*usurped;
 		uint32				_reserved[3];
 };
