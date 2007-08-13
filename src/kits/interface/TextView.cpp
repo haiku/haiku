@@ -54,7 +54,7 @@ using namespace std;
 #endif
 
 
-#define USE_WIDTHBUFFER 0
+#define USE_WIDTHBUFFER 1
 #define USE_DOUBLEBUFFERING 0
 
 
