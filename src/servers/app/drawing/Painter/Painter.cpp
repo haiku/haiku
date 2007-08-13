@@ -1147,6 +1147,8 @@ Painter::_UpdateDrawingMode(bool drawingText)
 	// are up to date for use by the solid drawing mode version.
 	fPixelFormat.SetDrawingMode(fDrawingMode, fAlphaSrcMode,
 								fAlphaFncMode, drawingText);
+	if (drawingText)
+		fPatternHandler.MakeOpCopyColorCache();
 }
 
 // _SetRendererColor

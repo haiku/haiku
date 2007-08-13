@@ -9,6 +9,7 @@
 #include "PatternHandler.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #include <Point.h>
 
@@ -30,8 +31,10 @@ PatternHandler::PatternHandler(void)
 	  fHighColor(kBlack),
 	  fLowColor(kWhite),
 	  fXOffset(0),
-	  fYOffset(0)
+	  fYOffset(0),
+	  fColorsWhenCached(ULONGLONG_MAX)
 {
+	memset(fOpCopyColorCache, 255, 256 * sizeof(rgb_color));
 }
 
 /*!
@@ -46,8 +49,10 @@ PatternHandler::PatternHandler(const int8* pat)
 	  fHighColor(kBlack),
 	  fLowColor(kWhite),
 	  fXOffset(0),
-	  fYOffset(0)
+	  fYOffset(0),
+	  fColorsWhenCached(ULONGLONG_MAX)
 {
+	memset(fOpCopyColorCache, 255, 256 * sizeof(rgb_color));
 }
 
 /*!
@@ -62,8 +67,10 @@ PatternHandler::PatternHandler(const uint64& pat)
 	  fHighColor(kBlack),
 	  fLowColor(kWhite),
 	  fXOffset(0),
-	  fYOffset(0)
+	  fYOffset(0),
+	  fColorsWhenCached(ULONGLONG_MAX)
 {
+	memset(fOpCopyColorCache, 255, 256 * sizeof(rgb_color));
 }
 
 /*!
@@ -78,8 +85,10 @@ PatternHandler::PatternHandler(const Pattern& pat)
 	  fHighColor(kBlack),
 	  fLowColor(kWhite),
 	  fXOffset(0),
-	  fYOffset(0)
+	  fYOffset(0),
+	  fColorsWhenCached(ULONGLONG_MAX)
 {
+	memset(fOpCopyColorCache, 255, 256 * sizeof(rgb_color));
 }
 
 /*!
@@ -93,8 +102,10 @@ PatternHandler::PatternHandler(const PatternHandler& other)
 	  fHighColor(other.fHighColor),
 	  fLowColor(other.fLowColor),
 	  fXOffset(other.fXOffset),
-	  fYOffset(other.fYOffset)
+	  fYOffset(other.fYOffset),
+	  fColorsWhenCached(ULONGLONG_MAX)
 {
+	memset(fOpCopyColorCache, 255, 256 * sizeof(rgb_color));
 }
 
 //! Destructor does nothing
@@ -189,7 +200,6 @@ void
 PatternHandler::SetColors(const rgb_color& high, const rgb_color& low)
 {
 	fHighColor = high;
-	fLowColor = low;
 }
 
 /*!
@@ -257,4 +267,40 @@ PatternHandler::SetOffsets(int32 x, int32 y)
 	fXOffset = x & 7;
 	fYOffset = y & 7;
 }
+
+
+void
+PatternHandler::MakeOpCopyColorCache()
+{
+	rgb_color highColor = fHighColor.GetColor32();
+	rgb_color lowColor = fLowColor.GetColor32();
+
+	uint64 t1 = *(uint32*)&highColor;
+	uint32 t2 = *(uint32*)&lowColor;
+
+	uint64 colors = (t1 << 32) | t2;
+
+	if (fColorsWhenCached == colors)
+		return;
+
+	fColorsWhenCached = colors;
+
+	// ramp from low color to high color
+	uint8 rA = fLowColor.GetColor32().red;
+	uint8 gA = fLowColor.GetColor32().green;
+	uint8 bA = fLowColor.GetColor32().blue;
+
+	uint8 rB = fHighColor.GetColor32().red;
+	uint8 gB = fHighColor.GetColor32().green;
+	uint8 bB = fHighColor.GetColor32().blue;
+
+	for (int32 i = 0; i < 256; i++) {
+		// NOTE: rgb is twisted around, since this is
+		// only used as uint32 in the end
+		fOpCopyColorCache[i].red = (((bB - bA) * i) + (bA << 8)) >> 8;
+		fOpCopyColorCache[i].green = (((gB - gA) * i) + (gA << 8)) >> 8;
+		fOpCopyColorCache[i].blue = (((rB - rA) * i) + (rA << 8)) >> 8;
+	}
+}
+
 

@@ -64,19 +64,24 @@ blend_solid_hspan_copy_text(int x, int y, unsigned len,
 							 agg_buffer* buffer,
 							 const PatternHandler* pattern)
 {
-	uint8* p = buffer->row_ptr(y) + (x << 2);
-	rgb_color l = pattern->LowColor().GetColor32();
+//printf("blend_solid_hspan_copy_text(%d, %d)\n", x, len);
+//	uint8* p = buffer->row_ptr(y) + (x << 2);
+	uint32* p = (uint32*)(buffer->row_ptr(y) + (x << 2));
+	const uint32* cache = (const uint32*)pattern->OpCopyColorCache();
+//	rgb_color l = pattern->LowColor().GetColor32();
 	do {
-		if (*covers) {
-			if(*covers == 255) {
-				ASSIGN_COPY(p, c.r, c.g, c.b, c.a);
-			} else {
-				BLEND_COPY(p, c.r, c.g, c.b, *covers,
-						   l.red, l.green, l.blue);
-			}
-		}
+//		if (*covers) {
+			*p = cache[*covers];
+//			if(*covers == 255) {
+//				ASSIGN_COPY(p, c.r, c.g, c.b, c.a);
+//			} else {
+//				BLEND_COPY(p, c.r, c.g, c.b, *covers,
+//						   l.red, l.green, l.blue);
+//			}
+//		}
 		covers++;
-		p += 4;
+		p++;
+//		p += 4;
 	} while(--len);
 }
 
