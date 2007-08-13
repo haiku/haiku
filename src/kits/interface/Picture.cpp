@@ -488,12 +488,12 @@ BPicture::usurp(BPicture *lameDuck)
 		link.StartMessage(AS_DELETE_PICTURE);
 		link.Attach<int32>(token);
 		link.Flush();
+		
+		delete extent;
+
+		// Reinitializes the BPicture
+		init_data();
 	}
-
-	delete extent;
-
-	// Reinitializes the BPicture
-	init_data();
 
 	// Do the usurping
 	usurped = lameDuck;

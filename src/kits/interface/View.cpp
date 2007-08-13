@@ -3114,8 +3114,9 @@ BView::AppendToPicture(BPicture *picture)
 		if (token == -1) {
 			BeginPicture(picture);
 		} else {
-			picture->usurped = cpicture;
 			picture->set_token(-1);
+			picture->usurp(cpicture);
+			cpicture = picture;			
 			fOwner->fLink->StartMessage(AS_LAYER_APPEND_TO_PICTURE);
 			fOwner->fLink->Attach<int32>(token);
 		}
