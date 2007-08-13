@@ -14,6 +14,8 @@ class BStatusBar : public BView {
 	public:
 		BStatusBar(BRect frame, const char* name, const char* label = NULL,
 			const char* trailingLabel = NULL);
+		BStatusBar(const char* name, const char* label = NULL,
+			const char* trailingLabel = NULL);
 		BStatusBar(BMessage* archive);
 		virtual ~BStatusBar();
 
@@ -68,6 +70,11 @@ class BStatusBar : public BView {
 		virtual status_t GetSupportedSuites(BMessage* data);
 
 		virtual status_t Perform(perform_code d, void* arg);
+
+		// Layout methods
+		virtual BSize MinSize();
+		virtual BSize MaxSize();
+		virtual BSize PreferredSize();
 
 	private:
 		virtual	void _ReservedStatusBar2();

@@ -13,6 +13,9 @@
 #include <Region.h>
 #include <StatusBar.h>
 
+#include <Layout.h>
+#include <LayoutUtils.h>
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -23,6 +26,17 @@ static const rgb_color kDefaultBarColor = {50, 150, 255, 255};
 BStatusBar::BStatusBar(BRect frame, const char *name, const char *label,
 					   const char *trailingLabel)
 	: BView(frame, name, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW),
+	fLabel(label),
+	fTrailingLabel(trailingLabel)
+{
+	_InitObject();
+}
+
+
+BStatusBar::BStatusBar(const char *name, const char *label,
+					   const char *trailingLabel)
+	: BView(BRect(0, 0, -1, -1), name, B_FOLLOW_LEFT | B_FOLLOW_TOP, 
+			B_WILL_DRAW | B_SUPPORTS_LAYOUT),
 	fLabel(label),
 	fTrailingLabel(trailingLabel)
 {
@@ -577,6 +591,37 @@ status_t
 BStatusBar::GetSupportedSuites(BMessage* data)
 {
 	return BView::GetSupportedSuites(data);
+}
+
+
+BSize
+BStatusBar::MinSize()
+{
+	float width, height;
+	GetPreferredSize(&width, &height);
+
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), BSize(width, height));
+}
+
+
+BSize
+BStatusBar::MaxSize()
+{
+	float width, height;
+	GetPreferredSize(&width, &height);
+
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), 
+			BSize(B_SIZE_UNLIMITED, height));
+}
+
+
+BSize
+BStatusBar::PreferredSize()
+{
+	float width, height;
+	GetPreferredSize(&width, &height);
+
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), BSize(width, height));
 }
 
 
