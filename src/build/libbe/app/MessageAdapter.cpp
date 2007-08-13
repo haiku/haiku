@@ -341,7 +341,7 @@ MessageAdapter::_FlattenR5Message(uint32 format, const BMessage *from,
 	r5header->flags = flags;
 
 	// store the header size - used for the checksum later
-	ssize_t headerSize = (uint32)pointer - (uint32)buffer;
+	ssize_t headerSize = (addr_t)pointer - (addr_t)buffer;
 
 	// collect and add the data
 	BMessage::field_header *field = messagePrivate.GetMessageFields();
@@ -417,7 +417,7 @@ MessageAdapter::_FlattenR5Message(uint32 format, const BMessage *from,
 	pointer++;
 
 	// calculate the flattened size from the pointers
-	r5header->flattened_size = (uint32)pointer - (uint32)buffer;
+	r5header->flattened_size = (addr_t)pointer - (addr_t)buffer;
 	r5header->checksum = CalculateChecksum((uint8 *)(buffer + 8),
 		headerSize - 8);
 
