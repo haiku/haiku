@@ -842,8 +842,8 @@ ServerPicture::SetFontFromLink(BPrivate::LinkReceiver& link)
 		link.Read<uint32>(&fontID);
 		ServerFont font;
 		font.SetFamilyAndStyle(fontID);
-		WriteSetFontFamily((font_family)font.Family());
-		WriteSetFontStyle((font_style)font.Style());
+		WriteSetFontFamily(font.Family());
+		WriteSetFontStyle(font.Style());
 	}
 
 	if (mask & B_FONT_SIZE) {
