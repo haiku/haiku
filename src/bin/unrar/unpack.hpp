@@ -57,6 +57,11 @@ struct UnpackFilter
   unsigned int BlockLength;
   unsigned int ExecCount;
   bool NextWindow;
+
+  // position of parent filter in Filters array used as prototype for filter
+  // in PrgStack array. Not defined for filters in Filters array.
+  unsigned int ParentFilter;
+
   VM_PreparedProgram Prg;
 };
 
@@ -111,9 +116,17 @@ class Unpack:private BitInput
     int PPMEscChar;
 
     RarVM VM;
+
+    /* Filters code, one entry per filter */
     Array<UnpackFilter*> Filters;
+
+    /* Filters stack, several entrances of same filter are possible */
     Array<UnpackFilter*> PrgStack;
+
+    /* lengths of preceding blocks, one length per filter. Used to reduce
+       size required to write block length if lengths are repeating */
     Array<int> OldFilterLengths;
+
     int LastFilter;
 
     bool TablesRead;

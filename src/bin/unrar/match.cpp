@@ -50,8 +50,8 @@ bool CmpName(char *Wildcard,char *Name,int CmpPath)
         return(true);
     }
     char Path1[NM],Path2[NM];
-    GetFilePath(Wildcard,Path1);
-    GetFilePath(Name,Path2);
+    GetFilePath(Wildcard,Path1,ASIZE(Path1));
+    GetFilePath(Name,Path2,ASIZE(Path1));
     if (mstricompc(Wildcard,Path2,ForceCase)==0)
       return(true);
     if ((CmpPath==MATCH_PATH || CmpPath==MATCH_EXACTPATH) && mstricompc(Path1,Path2,ForceCase)!=0)
@@ -94,8 +94,8 @@ bool CmpName(wchar *Wildcard,wchar *Name,int CmpPath)
         return(true);
     }
     wchar Path1[NM],Path2[NM];
-    GetFilePath(Wildcard,Path1);
-    GetFilePath(Name,Path2);
+    GetFilePath(Wildcard,Path1,ASIZE(Path1));
+    GetFilePath(Name,Path2,ASIZE(Path2));
     if ((CmpPath==MATCH_PATH || CmpPath==MATCH_EXACTPATH) && mstricompcw(Path1,Path2,ForceCase)!=0)
       return(false);
     if (CmpPath==MATCH_SUBPATH || CmpPath==MATCH_WILDSUBPATH)

@@ -3,7 +3,7 @@
 static bool IsUnicode(byte *Data,int Size);
 
 bool ReadTextFile(char *Name,StringList *List,bool Config,bool AbortOnError,
-                  bool ConvertToAnsi,bool Unquote,bool SkipComments)
+                  RAR_CHARSET SrcCharset,bool Unquote,bool SkipComments)
 {
   char FileName[NM];
   if (Config)
@@ -37,9 +37,15 @@ bool ReadTextFile(char *Name,StringList *List,bool Config,bool AbortOnError,
 
   memset(&Data[DataSize],0,5);
 
-  if (IsUnicode((byte *)&Data[0],DataSize))
+  if (SrcCharset==RCH_UNICODE ||
+      SrcCharset==RCH_DEFAULT && IsUnicode((byte *)&Data[0],DataSize))
   {
-    wchar *CurStr=(wchar *)&Data[2];
+    // Unicode in native system format, can be more than 2 bytes per character
+    Array<wchar> DataW(Data.Size()/2+1);
+    for (int I=2;I<Data.Size()-1;I+=2)
+      DataW[(I-2)/2]=(wchar)Data[I]+(wchar)Data[I+1]*256;
+
+    wchar *CurStr=&DataW[0];
     Array<char> AnsiName;
 
     while (*CurStr!=0)
@@ -114,7 +120,7 @@ bool ReadTextFile(char *Name,StringList *List,bool Config,bool AbortOnError,
           }
         }
 #if defined(_WIN_32)
-        if (ConvertToAnsi)
+        if (SrcCharset==RCH_OEM)
           OemToChar(CurStr,CurStr);
 #endif
         List->AddString(CurStr);
@@ -133,7 +139,7 @@ bool IsUnicode(byte *Data,int Size)
   if (Size<4 || Data[0]!=0xff || Data[1]!=0xfe)
     return(false);
   for (int I=2;I<Size;I++)
-    if (Data[I]<32)
+    if (Data[I]<32 && Data[I]!='\r' && Data[I]!='\n')
       return(true);
   return(false);
 }

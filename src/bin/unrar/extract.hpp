@@ -24,7 +24,6 @@ class CmdExtract
     char Password[MAXPASSWORD];
     bool PasswordAll;
     bool PrevExtracted;
-    bool SignatureFound;
     char DestFileName[NM];
     wchar DestFileNameW[NM];
     bool PasswordCancelled;
@@ -36,6 +35,8 @@ class CmdExtract
     bool ExtractCurrentFile(CommandData *Cmd,Archive &Arc,int HeaderSize,
                             bool &Repeat);
     static void UnstoreFile(ComprDataIO &DataIO,Int64 DestUnpSize);
+
+    bool SignatureFound;
 };
 
 #endif

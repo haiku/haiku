@@ -33,7 +33,8 @@ void ExtractStreams(Archive &Arc,char *FileName,wchar *FileNameW)
   }
   else
     strcpy(StreamName,FileName);
-  if (strlen(StreamName)+strlen((char *)Arc.StreamHead.StreamName)>=sizeof(StreamName))
+  if (strlen(StreamName)+strlen((char *)Arc.StreamHead.StreamName)>=sizeof(StreamName) ||
+      Arc.StreamHead.StreamName[0]!=':')
   {
 #ifndef SILENT
     Log(Arc.FileName,St(MStreamBroken),FileName);
@@ -41,6 +42,8 @@ void ExtractStreams(Archive &Arc,char *FileName,wchar *FileNameW)
     ErrHandler.SetErrorCode(CRC_ERROR);
     return;
   }
+
+  ConvertPath((char *)Arc.StreamHead.StreamName+1,(char *)Arc.StreamHead.StreamName+1);
 
   strcat(StreamName,(char *)Arc.StreamHead.StreamName);
 
@@ -119,6 +122,17 @@ void ExtractStreamsNew(Archive &Arc,char *FileName,wchar *FileNameW)
   RawToWide(SrcName,DestName,DestSize);
   DestName[DestSize]=0;
 
+  if (*DestName!=':')
+  {
+#if !defined(SILENT) && !defined(SFX_MODULE)
+    Log(Arc.FileName,St(MStreamBroken),FileName);
+#endif
+    ErrHandler.SetErrorCode(CRC_ERROR);
+    return;
+  }
+
+  ConvertPath(DestName+1,DestName+1);
+
   FindData fd;
   bool Found=FindFile::FastFind(FileName,FileNameW,&fd);
 
@@ -133,6 +147,8 @@ void ExtractStreamsNew(Archive &Arc,char *FileName,wchar *FileNameW)
   if (Found && HostFile.Open(FileName,FileNameW,true,true))
     SetFileTime(HostFile.GetHandle(),&fd.ftCreationTime,&fd.ftLastAccessTime,
                 &fd.ftLastWriteTime);
-  if (fd.FileAttr & FILE_ATTRIBUTE_READONLY)
-    SetFileAttr(FileName,FileNameW,fd.FileAttr);
+
+  // Restoring original file attributes. Important if file was read only
+  // or did not have "Archive" attribute
+  SetFileAttr(FileName,FileNameW,fd.FileAttr);
 }

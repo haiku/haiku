@@ -21,6 +21,8 @@ enum OVERWRITE_MODE {
   OVERWRITE_ASK,OVERWRITE_ALL,OVERWRITE_NONE,OVERWRITE_AUTORENAME
 };
 
+enum RAR_CHARSET { RCH_DEFAULT=0,RCH_ANSI,RCH_OEM,RCH_UNICODE };
+
 #define     MAX_FILTERS           16
 enum FilterState {FILTER_DEFAULT=0,FILTER_AUTO,FILTER_FORCE,FILTER_DISABLE};
 
@@ -49,7 +51,8 @@ class RAROptions
     char ExtrPath[NM];
     wchar ExtrPathW[NM];
     char CommentFile[NM];
-    bool UnicodeComment;
+    RAR_CHARSET CommentCharset;
+    RAR_CHARSET FilelistCharset;
     char ArcPath[NM];
     char Password[MAXPASSWORD];
     bool EncryptHeaders;

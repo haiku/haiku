@@ -139,7 +139,7 @@ bool UpdateExistingShortName(char *Name,wchar *NameW)
   char NewName[NM];
   for (int I=0;I<10000;I+=123)
   {
-    strncpy(NewName,Name,sizeof(NewName));
+    strncpyz(NewName,Name,ASIZE(NewName));
     sprintf(PointToName(NewName),"rtmp%d",I);
     if (!FileExist(NewName))
       break;
@@ -147,7 +147,7 @@ bool UpdateExistingShortName(char *Name,wchar *NameW)
   if (FileExist(NewName))
     return(false);
   char FullName[NM];
-  strncpy(FullName,Name,sizeof(FullName));
+  strncpyz(FullName,Name,ASIZE(FullName));
   strcpy(PointToName(FullName),PointToName(fd.Name));
   if (!MoveFile(FullName,NewName))
     return(false);

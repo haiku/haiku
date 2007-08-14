@@ -197,6 +197,10 @@ bool Archive::IsArchive(bool EnableBroken)
 #ifdef RARDLL
   SilentOpen=true;
 #endif
+
+  //if not encrypted, we'll check it below
+  NotFirstVolume=Encrypted && (NewMhd.Flags & MHD_FIRSTVOLUME)==0;
+
   if (!SilentOpen || !Encrypted)
   {
     SaveFilePos SavePos(*this);
@@ -226,6 +230,12 @@ bool Archive::IsArchive(bool EnableBroken)
     CurBlockPos=SaveCurBlockPos;
     NextBlockPos=SaveNextBlockPos;
   }
+  if (!Volume || !NotFirstVolume)
+  {
+    strcpy(FirstVolumeName,FileName);
+    strcpyw(FirstVolumeNameW,FileNameW);
+  }
+
   return(true);
 }
 

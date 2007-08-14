@@ -18,10 +18,10 @@ int uni_init(int codepage);
 int uni_done();
 #endif
 
-bool WideToChar(const wchar *Src,char *Dest,int DestSize=0x10000000);
-bool CharToWide(const char *Src,wchar *Dest,int DestSize=0x10000000);
-byte* WideToRaw(const wchar *Src,byte *Dest,int DestSize=0x10000000);
-wchar* RawToWide(const byte *Src,wchar *Dest,int DestSize=0x10000000);
+bool WideToChar(const wchar *Src,char *Dest,int DestSize=0x1000000);
+bool CharToWide(const char *Src,wchar *Dest,int DestSize=0x1000000);
+byte* WideToRaw(const wchar *Src,byte *Dest,int DestSize=0x1000000);
+wchar* RawToWide(const byte *Src,wchar *Dest,int DestSize=0x1000000);
 void WideToUtf(const wchar *Src,char *Dest,int DestSize);
 void UtfToWide(const char *Src,wchar *Dest,int DestSize);
 bool UnicodeEnabled();

@@ -46,6 +46,9 @@ int main(int argc, char *argv[])
 
 #endif
 
+#if defined(_WIN_32) && !defined(SFX_MODULE) && !defined(SHELL_EXT)
+  bool ShutdownOnClose;
+#endif
 
 #ifdef ALLOW_EXCEPTIONS
   try 
@@ -71,7 +74,7 @@ int main(int argc, char *argv[])
 #endif
     if (Switch!=NULL && Cmd.IsSwitch(Switch[0]))
     {
-      int UpperCmd=toupper(Switch[1]);
+      int UpperCmd=etoupper(Switch[1]);
       switch(UpperCmd)
       {
         case 'T':
@@ -95,6 +98,9 @@ int main(int argc, char *argv[])
 #endif
     Cmd.ParseDone();
 
+#if defined(_WIN_32) && !defined(SFX_MODULE) && !defined(SHELL_EXT)
+    ShutdownOnClose=Cmd.Shutdown;
+#endif
 
     InitConsoleOptions(Cmd.MsgStream,Cmd.Sound);
     InitLogOptions(Cmd.LogName);
@@ -126,6 +132,10 @@ int main(int argc, char *argv[])
 #endif
 #if defined(_EMX) && !defined(_DJGPP)
   uni_done();
+#endif
+#if defined(_WIN_32) && !defined(SFX_MODULE) && !defined(SHELL_EXT)
+  if (ShutdownOnClose)
+    Shutdown();
 #endif
   return(ErrHandler.GetErrorCode());
 }

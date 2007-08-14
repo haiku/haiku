@@ -22,15 +22,43 @@ bool MergeArchive(Archive &Arc,ComprDataIO *DataIO,bool ShowFileName,char Comman
   Arc.Close();
 
   char NextName[NM];
+  wchar NextNameW[NM];
+  *NextNameW=0;
   strcpy(NextName,Arc.FileName);
   NextVolumeName(NextName,(Arc.NewMhd.Flags & MHD_NEWNUMBERING)==0 || Arc.OldFormat);
+
+  if (*Arc.FileNameW!=0)
+  {
+    // Copy incremented trailing low ASCII volume name part to Unicode name.
+    // It is simpler than also implementing Unicode version of NextVolumeName.
+
+    strcpyw(NextNameW,Arc.FileNameW);
+    char *NumPtr=GetVolNumPart(NextName);
+
+    // moving to first digit in volume number
+    while (NumPtr>NextName && isdigit(*NumPtr) && isdigit(*(NumPtr-1)))
+      NumPtr--;
+
+    // also copy the first character before volume number,
+    // because it can be changed when going from .r99 to .s00
+    if (NumPtr>NextName)
+      NumPtr--;
+
+    int CharsToCopy=strlen(NextName)-(NumPtr-NextName);
+    int DestPos=strlenw(NextNameW)-CharsToCopy;
+    if (DestPos>0)
+    {
+      CharToWide(NumPtr,NextNameW+DestPos,ASIZE(NextNameW)-DestPos-1);
+      NextNameW[ASIZE(NextNameW)-1]=0;
+    }
+  }
 
 #if !defined(SFX_MODULE) && !defined(RARDLL)
   bool RecoveryDone=false;
 #endif
   bool FailedOpen=false,OldSchemeTested=false;
 
-  while (!Arc.Open(NextName))
+  while (!Arc.Open(NextName,NextNameW))
   {
     if (!OldSchemeTested)
     {
@@ -41,6 +69,7 @@ bool MergeArchive(Archive &Arc,ComprDataIO *DataIO,bool ShowFileName,char Comman
       if (Arc.Open(AltNextName))
       {
         strcpy(NextName,AltNextName);
+        *NextNameW=0;
         break;
       }
     }
@@ -94,6 +123,7 @@ bool MergeArchive(Archive &Arc,ComprDataIO *DataIO,bool ShowFileName,char Comman
       FailedOpen=true;
       break;
     }
+    *NextNameW=0;
 #endif
   }
   if (FailedOpen)

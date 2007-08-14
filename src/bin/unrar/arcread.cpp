@@ -162,8 +162,7 @@ int Archive::ReadHeader()
         Raw.Get((byte *)FileName,NameSize);
         FileName[NameSize]=0;
 
-        strncpy(hd->FileName,FileName,sizeof(hd->FileName));
-        hd->FileName[sizeof(hd->FileName)-1]=0;
+        strncpyz(hd->FileName,FileName,ASIZE(hd->FileName));
 
         if (hd->HeadType==NEWSUB_HEAD)
         {

@@ -41,7 +41,7 @@ MKDIR_CODE MakeDir(const char *Name,const wchar *NameW,uint Attr)
 }
 
 
-void CreatePath(const char *Path,const wchar *PathW,bool SkipLastName)
+bool CreatePath(const char *Path,const wchar *PathW,bool SkipLastName)
 {
 #ifdef _WIN_32
   uint DirAttr=0;
@@ -54,6 +54,7 @@ void CreatePath(const char *Path,const wchar *PathW,bool SkipLastName)
   bool Wide=false;
 #endif
   bool IgnoreAscii=false;
+  bool Success=true;
 
   const char *s=Path;
   for (int PosW=0;;PosW++)
@@ -95,12 +96,16 @@ void CreatePath(const char *Path,const wchar *PathW,bool SkipLastName)
         mprintf(" %s",St(MOk));
 #endif
       }
+      else
+        Success=false;
     }
     if (!IgnoreAscii)
       s=charnext(s);
   }
   if (!SkipLastName && !IsPathDiv(*PointToLastChar(Path)))
-    MakeDir(Path,PathW,DirAttr);
+    if (MakeDir(Path,PathW,DirAttr)!=MKDIR_SUCCESS)
+      Success=false;
+  return(Success);
 }
 
 
@@ -148,7 +153,7 @@ bool IsRemovable(const char *Name)
   int Type=GetDriveType(*Root ? Root:NULL);
   return(Type==DRIVE_REMOVABLE || Type==DRIVE_CDROM);
 #elif defined(_EMX)
-  char Drive=toupper(Name[0]);
+  char Drive=etoupper(Name[0]);
   return((Drive=='A' || Drive=='B') && Name[1]==':');
 #else
   return(false);
@@ -176,7 +181,7 @@ Int64 GetFreeDisk(const char *Name)
   }
   if (pGetDiskFreeSpaceEx!=NULL)
   {
-    GetFilePath(Name,Root);
+    GetFilePath(Name,Root,ASIZE(Root));
     ULARGE_INTEGER uiTotalSize,uiTotalFree,uiUserFree;
     uiUserFree.u.LowPart=uiUserFree.u.HighPart=0;
     if (pGetDiskFreeSpaceEx(*Root ? Root:NULL,&uiUserFree,&uiTotalSize,&uiTotalFree) &&
@@ -192,7 +197,7 @@ Int64 GetFreeDisk(const char *Name)
   return(FreeSize);
 #elif defined(_BEOS)
   char Root[NM];
-  GetFilePath(Name,Root);
+  GetFilePath(Name,Root,ASIZE(Root));
   dev_t Dev=dev_for_path(*Root ? Root:".");
   if (Dev<0)
     return(1457664);
@@ -205,7 +210,7 @@ Int64 GetFreeDisk(const char *Name)
 #elif defined(_UNIX)
   return(1457664);
 #elif defined(_EMX)
-  int Drive=(!isalpha(Name[0]) || Name[1]!=':') ? 0:toupper(Name[0])-'A'+1;
+  int Drive=(!isalpha(Name[0]) || Name[1]!=':') ? 0:etoupper(Name[0])-'A'+1;
   if (_osmode == OS2_MODE)
   {
     FSALLOCATE fsa;
@@ -465,7 +470,7 @@ char *MkTemp(char *Name)
 
 
 #ifndef SFX_MODULE
-uint CalcFileCRC(File *SrcFile,Int64 Size)
+uint CalcFileCRC(File *SrcFile,Int64 Size,CALCCRC_SHOWMODE ShowMode)
 {
   SaveFilePos SavePos(*SrcFile);
   const int BufSize=0x10000;
@@ -474,6 +479,15 @@ uint CalcFileCRC(File *SrcFile,Int64 Size)
   uint DataCRC=0xffffffff;
   int ReadSize;
 
+#if !defined(SILENT) && !defined(_WIN_CE)
+  Int64 FileLength=SrcFile->FileLength();
+  if (ShowMode!=CALCCRC_SHOWNONE)
+  {
+    mprintf(St(MCalcCRC));
+    mprintf("     ");
+  }
+
+#endif
 
   SrcFile->Seek(0,SEEK_SET);
   while ((ReadSize=SrcFile->Read(&Data[0],int64to32(Size==INT64ERR ? Int64(BufSize):Min(Int64(BufSize),Size))))!=0)
@@ -481,12 +495,20 @@ uint CalcFileCRC(File *SrcFile,Int64 Size)
     ++BlockCount;
     if ((BlockCount & 15)==0)
     {
+#if !defined(SILENT) && !defined(_WIN_CE)
+      if (ShowMode==CALCCRC_SHOWALL)
+        mprintf("\b\b\b\b%3d%%",ToPercent(BlockCount*Int64(BufSize),FileLength));
+#endif
       Wait();
     }
     DataCRC=CRC(DataCRC,&Data[0],ReadSize);
     if (Size!=INT64ERR)
       Size-=ReadSize;
   }
+#if !defined(SILENT) && !defined(_WIN_CE)
+  if (ShowMode==CALCCRC_SHOWALL)
+    mprintf("\b\b\b\b    ");
+#endif
   return(DataCRC^0xffffffff);
 }
 #endif

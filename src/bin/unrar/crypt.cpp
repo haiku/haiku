@@ -204,7 +204,7 @@ void CryptData::SetCryptKeys(char *Password,byte *Salt,bool Encrypt,bool OldOnly
 #if defined(_WIN_32) && !defined(GUI)
     CharToOemBuff(Password,(char*)Psw,strlen(Password));
 #else
-    strncpy((char *)Psw,Password,MAXPASSWORD-1);
+    strncpyz((char *)Psw,Password,ASIZE(Psw));
 #endif
     int PswLength=strlen(Password);
     memcpy(SubstTable,InitSubstTable,sizeof(SubstTable));
@@ -223,7 +223,7 @@ void CryptData::SetCryptKeys(char *Password,byte *Salt,bool Encrypt,bool OldOnly
   }
 
   bool Cached=false;
-  for (uint I=0;I<sizeof(Cache)/sizeof(Cache[0]);I++)
+  for (int I=0;I<sizeof(Cache)/sizeof(Cache[0]);I++)
     if (strcmp(Cache[I].Password,Password)==0 &&
         (Salt==NULL && !Cache[I].SaltPresent || Salt!=NULL &&
         Cache[I].SaltPresent && memcmp(Cache[I].Salt,Salt,SALT_SIZE)==0) &&

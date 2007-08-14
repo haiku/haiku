@@ -136,6 +136,9 @@ void Unpack::OldUnpWriteBuf()
 }
 
 
+#define GetShortLen1(pos) ((pos)==1 ? Buf60+3:ShortLen1[pos])
+#define GetShortLen2(pos) ((pos)==3 ? Buf60+3:ShortLen2[pos])
+
 void Unpack::ShortLZ()
 {
   static unsigned int ShortLen1[]={1,3,4,4,5,6,7,8,8,4,4,5,6,6,4,0};
@@ -167,21 +170,22 @@ void Unpack::ShortLZ()
 
   BitField>>=8;
 
-  ShortLen1[1]=ShortLen2[3]=Buf60+3;
+//  not thread safe, replaced by GetShortLen1 and GetShortLen2 macro
+//  ShortLen1[1]=ShortLen2[3]=Buf60+3;
 
   if (AvrLn1<37)
   {
     for (Length=0;;Length++)
-      if (((BitField^ShortXor1[Length]) & (~(0xff>>ShortLen1[Length])))==0)
+      if (((BitField^ShortXor1[Length]) & (~(0xff>>GetShortLen1(Length))))==0)
         break;
-    faddbits(ShortLen1[Length]);
+    faddbits(GetShortLen1(Length));
   }
   else
   {
     for (Length=0;;Length++)
-      if (((BitField^ShortXor2[Length]) & (~(0xff>>ShortLen2[Length])))==0)
+      if (((BitField^ShortXor2[Length]) & (~(0xff>>GetShortLen2(Length))))==0)
         break;
-    faddbits(ShortLen2[Length]);
+    faddbits(GetShortLen2(Length));
   }
 
   if (Length >= 9)

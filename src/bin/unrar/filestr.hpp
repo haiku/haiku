@@ -2,7 +2,7 @@
 #define _RAR_FILESTR_
 
 bool ReadTextFile(char *Name,StringList *List,bool Config,
-                  bool AbortOnError=false,bool ConvertToAnsi=false,
+                  bool AbortOnError=false,RAR_CHARSET SrcCharset=RCH_DEFAULT,
                   bool Unquote=false,bool SkipComments=false);
 
 #endif

@@ -92,7 +92,16 @@ bool FindFile::Next(struct FindData *fd,bool GetSymLink)
     {
       char FullName[NM];
       strcpy(FullName,FindMask);
-      strcpy(PointToName(FullName),ent->d_name);
+      *PointToName(FullName)=0;
+      if (strlen(FullName)+strlen(ent->d_name)>=ASIZE(FullName)-1)
+      {
+#ifndef SILENT
+        Log(NULL,"\n%s%s",FullName,ent->d_name);
+        Log(NULL,St(MPathTooLong));
+#endif
+        return(false);
+      }
+      strcat(FullName,ent->d_name);
       if (!FastFind(FullName,NULL,fd,GetSymLink))
       {
         ErrHandler.OpenErrorMsg(FullName);

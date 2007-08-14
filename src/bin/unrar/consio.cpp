@@ -124,8 +124,9 @@ void GetPasswordText(char *Str,int MaxLength)
 #elif defined(_EMX) || defined(_BEOS) || defined(__sparc) || defined(sparc) || defined (__VMS)
   fgets(Str,MaxLength-1,stdin);
 #else
-  strncpy(Str,getpass(""),MaxLength-1);
+  strncpyz(Str,getpass(""),MaxLength);
 #endif
+  Str[MaxLength-1]=0;
   RemoveLF(Str);
 }
 #endif
@@ -159,7 +160,7 @@ bool GetPassword(PASSWORD_TYPE Type,const char *FileName,char *Password,int MaxL
   Alarm();
   while (true)
   {
-    char PromptStr[256];
+    char PromptStr[NM+256];
 #if defined(_EMX) || defined(_BEOS)
     strcpy(PromptStr,St(MAskPswEcho));
 #else
@@ -168,7 +169,9 @@ bool GetPassword(PASSWORD_TYPE Type,const char *FileName,char *Password,int MaxL
     if (Type!=PASSWORD_GLOBAL)
     {
       strcat(PromptStr,St(MFor));
-      strcat(PromptStr,PointToName(FileName));
+      char *NameOnly=PointToName(FileName);
+      if (strlen(PromptStr)+strlen(NameOnly)<ASIZE(PromptStr))
+        strcat(PromptStr,NameOnly);
     }
     eprintf("\n%s: ",PromptStr);
     GetPasswordText(Password,MaxLength);
@@ -176,19 +179,12 @@ bool GetPassword(PASSWORD_TYPE Type,const char *FileName,char *Password,int MaxL
       return(false);
     if (Type==PASSWORD_GLOBAL)
     {
-      strcpy(PromptStr,St(MReAskPsw));
-      eprintf(PromptStr);
-      char CmpStr[256];
-      GetPasswordText(CmpStr,sizeof(CmpStr));
+      eprintf(St(MReAskPsw));
+      char CmpStr[MAXPASSWORD];
+      GetPasswordText(CmpStr,ASIZE(CmpStr));
       if (*CmpStr==0 || strcmp(Password,CmpStr)!=0)
       {
-        strcpy(PromptStr,St(MNotMatchPsw));
-/*
-#ifdef _WIN_32
-        CharToOem(PromptStr,PromptStr);
-#endif
-*/
-        eprintf(PromptStr);
+        eprintf(St(MNotMatchPsw));
         memset(Password,0,MaxLength);
         memset(CmpStr,0,sizeof(CmpStr));
         continue;
@@ -212,7 +208,7 @@ int Ask(const char *AskStr)
   for (const char *NextItem=AskStr;NextItem!=NULL;NextItem=strchr(NextItem+1,'_'))
   {
     char *CurItem=Item[NumItems];
-    strncpy(CurItem,NextItem+1,sizeof(Item[0]));
+    strncpyz(CurItem,NextItem+1,ASIZE(Item[0]));
     char *EndItem=strchr(CurItem,'_');
     if (EndItem!=NULL)
       *EndItem=0;

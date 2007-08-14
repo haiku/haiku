@@ -64,7 +64,7 @@
 #define  SKIP_IF_UNKNOWN    0x4000
 #define  LONG_BLOCK         0x8000
 
-#define  EARC_NEXT_VOLUME   0x0001
+#define  EARC_NEXT_VOLUME   0x0001 // not last volume
 #define  EARC_DATACRC       0x0002
 #define  EARC_REVSPACE      0x0004
 #define  EARC_VOLNUMBER     0x0008

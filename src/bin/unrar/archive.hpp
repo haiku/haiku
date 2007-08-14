@@ -10,11 +10,9 @@ class Archive:public File
   private:
     bool IsSignature(byte *D);
     void UpdateLatestTime(FileHeader *CurBlock);
-    void Protect(int RecSectors);
     void ConvertNameCase(char *Name);
     void ConvertNameCase(wchar *Name);
     void ConvertUnknownHeader();
-    bool AddArcComment(char *NameToShow);
     int ReadOldHeader();
     void PrepareExtraTime(FileHeader *hd,EXTTIME_MODE etm,EXTTIME_MODE etc,EXTTIME_MODE eta,EXTTIME_MODE etarc,Array<byte> &TimeData);
 

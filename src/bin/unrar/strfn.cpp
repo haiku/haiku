@@ -69,17 +69,17 @@ char* strupper(char *Str)
 int stricomp(const char *Str1,const char *Str2)
 {
   char S1[NM*2],S2[NM*2];
-  strncpy(S1,Str1,sizeof(S1));
-  strncpy(S2,Str2,sizeof(S2));
+  strncpyz(S1,Str1,ASIZE(S1));
+  strncpyz(S2,Str2,ASIZE(S2));
   return(strcmp(strupper(S1),strupper(S2)));
 }
 
 
 int strnicomp(const char *Str1,const char *Str2,int N)
 {
-  char S1[512],S2[512];
-  strncpy(S1,Str1,sizeof(S1));
-  strncpy(S2,Str2,sizeof(S2));
+  char S1[NM*2],S2[NM*2];
+  strncpyz(S1,Str1,ASIZE(S1));
+  strncpyz(S2,Str2,ASIZE(S2));
   return(strncmp(strupper(S1),strupper(S2),N));
 }
 
@@ -118,6 +118,17 @@ unsigned int loctoupper(byte ch)
   return(toupper(ch));
 #endif
 }
+
+
+// toupper with English only results. Avoiding Turkish i -> I conversion
+// problem
+int etoupper(int ch)
+{
+  if (ch=='i')
+    return('I');
+  return(toupper(ch));
+}
+
 
 
 
@@ -163,3 +174,26 @@ int stricompcw(const wchar *Str1,const wchar *Str2)
 #endif
 }
 #endif
+
+
+// safe strncpy: copies maxlen-1 max and always returns zero terminated dest
+char* strncpyz(char *dest, const char *src, size_t maxlen)
+{
+  if (maxlen>0)
+  {
+    strncpy(dest,src,maxlen-1);
+    dest[maxlen-1]=0;
+  }
+  return(dest);
+}
+
+// safe strncpyw: copies maxlen-1 max and always returns zero terminated dest
+wchar* strncpyzw(wchar *dest, const wchar *src, size_t maxlen)
+{
+  if (maxlen>0)
+  {
+    strncpyw(dest,src,maxlen-1);
+    dest[maxlen-1]=0;
+  }
+  return(dest);
+}

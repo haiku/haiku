@@ -20,16 +20,37 @@ void RarVM::Init()
     Mem=new byte[VM_MEMSIZE+4];
 }
 
+/*********************************************************************
+ IS_VM_MEM macro checks if address belongs to VM memory pool (Mem).
+ Only Mem data are always low endian regardless of machine architecture,
+ so we need to convert them to native format when reading or writing.
+ VM registers have endianness of host machine.
+**********************************************************************/
+#define IS_VM_MEM(a) (((byte*)a)>=Mem && ((byte*)a)<Mem+VM_MEMSIZE)
 
 inline uint RarVM::GetValue(bool ByteMode,uint *Addr)
 {
   if (ByteMode)
+  {
+#ifdef BIG_ENDIAN
+    if (IS_VM_MEM(Addr))
+      return(*(byte *)Addr);
+    else
+      return(*Addr & 0xff);
+#else
     return(*(byte *)Addr);
+#endif
+  }
   else
   {
 #if defined(BIG_ENDIAN) || !defined(ALLOW_NOT_ALIGNED_INT)
-    byte *B=(byte *)Addr;
-    return UINT32((uint)B[0]|((uint)B[1]<<8)|((uint)B[2]<<16)|((uint)B[3]<<24));
+    if (IS_VM_MEM(Addr))
+    {
+      byte *B=(byte *)Addr;
+      return UINT32((uint)B[0]|((uint)B[1]<<8)|((uint)B[2]<<16)|((uint)B[3]<<24));
+    }
+    else
+      return UINT32(*Addr);
 #else
     return UINT32(*Addr);
 #endif
@@ -46,14 +67,28 @@ inline uint RarVM::GetValue(bool ByteMode,uint *Addr)
 inline void RarVM::SetValue(bool ByteMode,uint *Addr,uint Value)
 {
   if (ByteMode)
+  {
+#ifdef BIG_ENDIAN
+    if (IS_VM_MEM(Addr))
+      *(byte *)Addr=Value;
+    else
+      *Addr=(*Addr & ~0xff)|(Value & 0xff);
+#else
     *(byte *)Addr=Value;
+#endif
+  }
   else
   {
 #if defined(BIG_ENDIAN) || !defined(ALLOW_NOT_ALIGNED_INT) || !defined(PRESENT_INT32)
-    ((byte *)Addr)[0]=(byte)Value;
-    ((byte *)Addr)[1]=(byte)(Value>>8);
-    ((byte *)Addr)[2]=(byte)(Value>>16);
-    ((byte *)Addr)[3]=(byte)(Value>>24);
+    if (IS_VM_MEM(Addr))
+    {
+      ((byte *)Addr)[0]=(byte)Value;
+      ((byte *)Addr)[1]=(byte)(Value>>8);
+      ((byte *)Addr)[2]=(byte)(Value>>16);
+      ((byte *)Addr)[3]=(byte)(Value>>24);
+    }
+    else
+      *(uint *)Addr=Value;
 #else
     *(uint32 *)Addr=Value;
 #endif
@@ -67,9 +102,16 @@ inline void RarVM::SetValue(bool ByteMode,uint *Addr,uint Value)
 #endif
 
 
-void RarVM::SetValue(uint *Addr,uint Value)
+void RarVM::SetLowEndianValue(uint *Addr,uint Value)
 {
-  SetValue(false,Addr,Value);
+#if defined(BIG_ENDIAN) || !defined(ALLOW_NOT_ALIGNED_INT) || !defined(PRESENT_INT32)
+  ((byte *)Addr)[0]=(byte)Value;
+  ((byte *)Addr)[1]=(byte)(Value>>8);
+  ((byte *)Addr)[2]=(byte)(Value>>16);
+  ((byte *)Addr)[3]=(byte)(Value>>24);
+#else
+  *(uint32 *)Addr=Value;
+#endif
 }
 
 
@@ -88,7 +130,7 @@ void RarVM::Execute(VM_PreparedProgram *Prg)
   unsigned int GlobalSize=Min(Prg->GlobalData.Size(),VM_GLOBALMEMSIZE);
   if (GlobalSize)
     memcpy(Mem+VM_GLOBALMEMADDR,&Prg->GlobalData[0],GlobalSize);
-  uint StaticSize=Min((uint)Prg->StaticData.Size(),VM_GLOBALMEMSIZE-GlobalSize);
+  unsigned int StaticSize=Min(Prg->StaticData.Size(),VM_GLOBALMEMSIZE-GlobalSize);
   if (StaticSize)
     memcpy(Mem+VM_GLOBALMEMADDR+GlobalSize,&Prg->StaticData[0],StaticSize);
 
@@ -106,7 +148,8 @@ void RarVM::Execute(VM_PreparedProgram *Prg)
   Prg->FilteredDataSize=NewBlockSize;
 
   Prg->GlobalData.Reset();
-  uint DataSize=Min(GET_VALUE(false,(uint*)&Mem[VM_GLOBALMEMADDR+0x30]),VM_GLOBALMEMSIZE);
+
+  uint DataSize=Min(GET_VALUE(false,(uint*)&Mem[VM_GLOBALMEMADDR+0x30]),VM_GLOBALMEMSIZE-VM_FIXEDGLOBALSIZE);
   if (DataSize!=0)
   {
     Prg->GlobalData.Add(DataSize+VM_FIXEDGLOBALSIZE);
@@ -114,6 +157,14 @@ void RarVM::Execute(VM_PreparedProgram *Prg)
   }
 }
 
+
+/*
+Note:
+  Due to performance considerations RAR VM may set VM_FS, VM_FC, VM_FZ
+  incorrectly for byte operands. These flags are always valid only
+  for 32-bit operands. Check implementation of concrete VM command
+  to see if it sets flags right.
+*/
 
 #define SET_IP(IP)                      \
   if ((IP)>=CodeSize)                   \
@@ -171,7 +222,13 @@ bool RarVM::ExecuteCode(VM_PreparedCommand *PreparedCode,int CodeSize)
         {
           uint Value1=GET_VALUE(Cmd->ByteMode,Op1);
           uint Result=UINT32(Value1+GET_VALUE(Cmd->ByteMode,Op2));
-          Flags=Result==0 ? VM_FZ:(Result<Value1)|(Result&VM_FS);
+          if (Cmd->ByteMode)
+          {
+            Result&=0xff;
+            Flags=(Result<Value1)|(Result==0 ? VM_FZ:((Result&0x80) ? VM_FS:0));
+          }
+          else
+            Flags=(Result<Value1)|(Result==0 ? VM_FZ:(Result&VM_FS));
           SET_VALUE(Cmd->ByteMode,Op1,Result);
         }
         break;
@@ -209,13 +266,15 @@ bool RarVM::ExecuteCode(VM_PreparedCommand *PreparedCode,int CodeSize)
       case VM_JNZ:
         if ((Flags & VM_FZ)==0)
         {
-          SET_IP(GET_VALUE(false,(uint)Op1));
+          SET_IP(GET_VALUE(false,Op1));
           continue;
         }
         break;
       case VM_INC:
         {
           uint Result=UINT32(GET_VALUE(Cmd->ByteMode,Op1)+1);
+          if (Cmd->ByteMode)
+            Result&=0xff;
           SET_VALUE(Cmd->ByteMode,Op1,Result);
           Flags=Result==0 ? VM_FZ:Result&VM_FS;
         }
@@ -244,7 +303,7 @@ bool RarVM::ExecuteCode(VM_PreparedCommand *PreparedCode,int CodeSize)
         break;
 #endif
       case VM_JMP:
-        SET_IP(GET_VALUE((uint)false,Op1));
+        SET_IP(GET_VALUE(false,Op1));
         continue;
       case VM_XOR:
         {
@@ -276,42 +335,42 @@ bool RarVM::ExecuteCode(VM_PreparedCommand *PreparedCode,int CodeSize)
       case VM_JS:
         if ((Flags & VM_FS)!=0)
         {
-          SET_IP(GET_VALUE((uint)false,Op1));
+          SET_IP(GET_VALUE(false,Op1));
           continue;
         }
         break;
       case VM_JNS:
         if ((Flags & VM_FS)==0)
         {
-          SET_IP(GET_VALUE((uint)false,Op1));
+          SET_IP(GET_VALUE(false,Op1));
           continue;
         }
         break;
       case VM_JB:
         if ((Flags & VM_FC)!=0)
         {
-          SET_IP(GET_VALUE((uint)false,Op1));
+          SET_IP(GET_VALUE(false,Op1));
           continue;
         }
         break;
       case VM_JBE:
         if ((Flags & (VM_FC|VM_FZ))!=0)
         {
-          SET_IP(GET_VALUE((uint)false,Op1));
+          SET_IP(GET_VALUE(false,Op1));
           continue;
         }
         break;
       case VM_JA:
         if ((Flags & (VM_FC|VM_FZ))==0)
         {
-          SET_IP(GET_VALUE((uint)false,Op1));
+          SET_IP(GET_VALUE(false,Op1));
           continue;
         }
         break;
       case VM_JAE:
         if ((Flags & VM_FC)==0)
         {
-          SET_IP(GET_VALUE((uint)false,Op1));
+          SET_IP(GET_VALUE(false,Op1));
           continue;
         }
         break;
@@ -430,7 +489,9 @@ bool RarVM::ExecuteCode(VM_PreparedCommand *PreparedCode,int CodeSize)
           uint Value1=GET_VALUE(Cmd->ByteMode,Op1);
           uint FC=(Flags&VM_FC);
           uint Result=UINT32(Value1+GET_VALUE(Cmd->ByteMode,Op2)+FC);
-          Flags=Result==0 ? VM_FZ:(Result<Value1 || Result==Value1 && FC)|(Result&VM_FS);
+          if (Cmd->ByteMode)
+            Result&=0xff;
+          Flags=(Result<Value1 || Result==Value1 && FC)|(Result==0 ? VM_FZ:(Result&VM_FS));
           SET_VALUE(Cmd->ByteMode,Op1,Result);
         }
         break;
@@ -439,7 +500,9 @@ bool RarVM::ExecuteCode(VM_PreparedCommand *PreparedCode,int CodeSize)
           uint Value1=GET_VALUE(Cmd->ByteMode,Op1);
           uint FC=(Flags&VM_FC);
           uint Result=UINT32(Value1-GET_VALUE(Cmd->ByteMode,Op2)-FC);
-          Flags=Result==0 ? VM_FZ:(Result>Value1 || Result==Value1 && FC)|(Result&VM_FS);
+          if (Cmd->ByteMode)
+            Result&=0xff;
+          Flags=(Result>Value1 || Result==Value1 && FC)|(Result==0 ? VM_FZ:(Result&VM_FS));
           SET_VALUE(Cmd->ByteMode,Op1,Result);
         }
         break;
@@ -496,6 +559,10 @@ void RarVM::Prepare(byte *Code,int CodeSize,VM_PreparedProgram *Prg)
 #endif  
     uint DataFlag=fgetbits();
     faddbits(1);
+
+/* Read static data contained in DB operators. This data cannot be changed,
+   it is a part of VM code, not a filter parameter.
+*/
     if (DataFlag&0x8000)
     {
       int DataSize=ReadData(*this)+1;
@@ -506,6 +573,7 @@ void RarVM::Prepare(byte *Code,int CodeSize,VM_PreparedProgram *Prg)
         faddbits(8);
       }
     }
+
     while (InAddr<CodeSize)
     {
       Prg->Cmd.Add(1);
@@ -699,8 +767,6 @@ void RarVM::Optimize(VM_PreparedProgram *Prg)
       case VM_CMP:
         Cmd->OpCode=Cmd->ByteMode ? VM_CMPB:VM_CMPD;
         continue;
-      default:
-      	break;
     }
     if ((VM_CmdFlags[Cmd->OpCode] & VMCF_CHFLAGS)==0)
       continue;
@@ -735,8 +801,6 @@ void RarVM::Optimize(VM_PreparedProgram *Prg)
       case VM_NEG:
         Cmd->OpCode=Cmd->ByteMode ? VM_NEGB:VM_NEGD;
         continue;
-      default:
-      	break;
     }
   }
 }
@@ -864,6 +928,10 @@ void RarVM::ExecuteStandardFilter(VM_StandardFilters FilterType)
         SET_VALUE(false,&Mem[VM_GLOBALMEMADDR+0x20],DataSize);
         if (DataSize>=VM_GLOBALMEMADDR/2)
           break;
+
+// bytes from same channels are grouped to continual data blocks,
+// so we need to place them back to their interleaving positions
+
         for (int CurChannel=0;CurChannel<Channels;CurChannel++)
         {
           byte PrevByte=0;
@@ -878,7 +946,7 @@ void RarVM::ExecuteStandardFilter(VM_StandardFilters FilterType)
         byte *SrcData=Mem,*DestData=SrcData+DataSize;
         const int Channels=3;
         SET_VALUE(false,&Mem[VM_GLOBALMEMADDR+0x20],DataSize);
-        if (DataSize>=VM_GLOBALMEMADDR/2)
+        if (DataSize>=VM_GLOBALMEMADDR/2 || PosR<0)
           break;
         for (int CurChannel=0;CurChannel<Channels;CurChannel++)
         {

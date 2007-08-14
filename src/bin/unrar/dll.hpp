@@ -1,18 +1,19 @@
 #ifndef _UNRAR_DLL_
 #define _UNRAR_DLL_
 
-#define ERAR_END_ARCHIVE     10
-#define ERAR_NO_MEMORY       11
-#define ERAR_BAD_DATA        12
-#define ERAR_BAD_ARCHIVE     13
-#define ERAR_UNKNOWN_FORMAT  14
-#define ERAR_EOPEN           15
-#define ERAR_ECREATE         16
-#define ERAR_ECLOSE          17
-#define ERAR_EREAD           18
-#define ERAR_EWRITE          19
-#define ERAR_SMALL_BUF       20
-#define ERAR_UNKNOWN         21
+#define ERAR_END_ARCHIVE        10
+#define ERAR_NO_MEMORY          11
+#define ERAR_BAD_DATA           12
+#define ERAR_BAD_ARCHIVE        13
+#define ERAR_UNKNOWN_FORMAT     14
+#define ERAR_EOPEN              15
+#define ERAR_ECREATE            16
+#define ERAR_ECLOSE             17
+#define ERAR_EREAD              18
+#define ERAR_EWRITE             19
+#define ERAR_SMALL_BUF          20
+#define ERAR_UNKNOWN            21
+#define ERAR_MISSING_PASSWORD   22
 
 #define RAR_OM_LIST           0
 #define RAR_OM_EXTRACT        1

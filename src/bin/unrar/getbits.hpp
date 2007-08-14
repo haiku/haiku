@@ -33,5 +33,6 @@ class BitInput
     }
     void faddbits(int Bits);
     unsigned int fgetbits();
+    bool Overflow(int IncPtr) {return(InAddr+IncPtr>=MAX_SIZE);}
 };
 #endif

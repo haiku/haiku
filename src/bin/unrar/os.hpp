@@ -33,6 +33,7 @@
 #include <prsht.h>
 
 #ifndef _WIN_CE
+  #include <shlobj.h>
   #include <winioctl.h>
 #endif
 

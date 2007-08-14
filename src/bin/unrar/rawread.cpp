@@ -52,23 +52,38 @@ void RawRead::Read(byte *SrcData,int Size)
 
 void RawRead::Get(byte &Field)
 {
-  Field=Data[ReadPos];
-  ReadPos++;
+  if (ReadPos<DataSize)
+  {
+    Field=Data[ReadPos];
+    ReadPos++;
+  }
+  else
+    Field=0;
 }
 
 
 void RawRead::Get(ushort &Field)
 {
-  Field=Data[ReadPos]+(Data[ReadPos+1]<<8);
-  ReadPos+=2;
+  if (ReadPos+1<DataSize)
+  {
+    Field=Data[ReadPos]+(Data[ReadPos+1]<<8);
+    ReadPos+=2;
+  }
+  else
+    Field=0;
 }
 
 
 void RawRead::Get(uint &Field)
 {
-  Field=Data[ReadPos]+(Data[ReadPos+1]<<8)+(Data[ReadPos+2]<<16)+
-        (Data[ReadPos+3]<<24);
-  ReadPos+=4;
+  if (ReadPos+3<DataSize)
+  {
+    Field=Data[ReadPos]+(Data[ReadPos+1]<<8)+(Data[ReadPos+2]<<16)+
+          (Data[ReadPos+3]<<24);
+    ReadPos+=4;
+  }
+  else
+    Field=0;
 }
 
 
@@ -83,15 +98,25 @@ void RawRead::Get8(Int64 &Field)
 
 void RawRead::Get(byte *Field,int Size)
 {
-  memcpy(Field,&Data[ReadPos],Size);
-  ReadPos+=Size;
+  if (ReadPos+Size-1<DataSize)
+  {
+    memcpy(Field,&Data[ReadPos],Size);
+    ReadPos+=Size;
+  }
+  else
+    memset(Field,0,Size);
 }
 
 
 void RawRead::Get(wchar *Field,int Size)
 {
-  RawToWide(&Data[ReadPos],Field,Size);
-  ReadPos+=2*Size;
+  if (ReadPos+2*Size-1<DataSize)
+  {
+    RawToWide(&Data[ReadPos],Field,Size);
+    ReadPos+=2*Size;
+  }
+  else
+    memset(Field,0,2*Size);
 }
 
 

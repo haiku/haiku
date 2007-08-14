@@ -40,7 +40,7 @@
 
    This source includes parts of code written by the following authors:
 
-   Dmitry Shkarin     PPMII text compression
+   Dmitry Shkarin     PPMII v.H text compression
    Dmitry Subbotin    Carryless rangecoder
    Szymon Stefanek    AES encryption
    Brian Gladman      AES encryption

@@ -223,7 +223,7 @@ void RarTime::SetAgeText(char *TimeText)
       Value=Value*10+Ch-'0';
     else
     {
-      switch(toupper(Ch))
+      switch(etoupper(Ch))
       {
         case 'D':
           Seconds+=Value*24*3600;

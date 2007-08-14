@@ -18,6 +18,17 @@ bool WideToChar(const wchar *Src,char *Dest,int DestSize)
 // TODO: haiku fix this!
   if (wcstombs(Dest,Src,DestSize)==(size_t)-1)
     RetCode=false;
+
+  if ((!RetCode || *Dest==0 && *Src!=0) && DestSize>NM && strlenw(Src)<NM)
+  {
+    /* Workaround for strange Linux Unicode functions bug.
+       Some of wcstombs and mbstowcs implementations in some situations
+       (we are yet to find out what it depends on) can return an empty
+       string and success code if buffer size value is too large.
+    */
+    return(WideToChar(Src,Dest,NM));
+  }
+
 #else
   if (UnicodeEnabled())
   {
@@ -57,6 +68,16 @@ bool CharToWide(const char *Src,wchar *Dest,int DestSize)
 // TODO: haiku fix this!
   if (mbstowcs(Dest,Src,DestSize)==(size_t)-1)
     RetCode=false;
+
+  if ((!RetCode || *Dest==0 && *Src!=0) && DestSize>NM && strlen(Src)<NM)
+  {
+    /* Workaround for strange Linux Unicode functions bug.
+       Some of wcstombs and mbstowcs implementations in some situations
+       (we are yet to find out what it depends on) can return an empty
+       string and success code if buffer size value is too large.
+    */
+    return(CharToWide(Src,Dest,NM));
+  }
 #else
   if (UnicodeEnabled())
   {
@@ -300,8 +321,8 @@ inline int strnicmpw_w2c(const wchar *s1,const wchar *s2,int n)
   wchar Wide1[NM*2],Wide2[NM*2];
   strncpyw(Wide1,s1,sizeof(Wide1)/sizeof(Wide1[0])-1);
   strncpyw(Wide2,s2,sizeof(Wide2)/sizeof(Wide2[0])-1);
-  Wide1[Min(sizeof(Wide1)/sizeof(Wide1[0])-1,(uint)n)]=0;
-  Wide2[Min(sizeof(Wide2)/sizeof(Wide2[0])-1,(uint)n)]=0;
+  Wide1[Min(sizeof(Wide1)/sizeof(Wide1[0])-1,n)]=0;
+  Wide2[Min(sizeof(Wide2)/sizeof(Wide2[0])-1,n)]=0;
   char Ansi1[NM*2],Ansi2[NM*2];
   WideToChar(Wide1,Ansi1,sizeof(Ansi1));
   WideToChar(Wide2,Ansi2,sizeof(Ansi2));

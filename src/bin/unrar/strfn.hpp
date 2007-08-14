@@ -15,6 +15,11 @@ char* RemoveLF(char *Str);
 unsigned int loctolower(byte ch);
 unsigned int loctoupper(byte ch);
 
+char* strncpyz(char *dest, const char *src, size_t maxlen);
+wchar* strncpyzw(wchar *dest, const wchar *src, size_t maxlen);
+
+int etoupper(int ch);
+
 
 
 bool LowAscii(const char *Str);

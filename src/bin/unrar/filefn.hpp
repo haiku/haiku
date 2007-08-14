@@ -4,7 +4,7 @@
 enum MKDIR_CODE {MKDIR_SUCCESS,MKDIR_ERROR,MKDIR_BADPATH};
 
 MKDIR_CODE MakeDir(const char *Name,const wchar *NameW,uint Attr);
-void CreatePath(const char *Path,const wchar *PathW,bool SkipLastName);
+bool CreatePath(const char *Path,const wchar *PathW,bool SkipLastName);
 void SetDirTime(const char *Name,RarTime *ftm,RarTime *ftc,RarTime *fta);
 bool IsRemovable(const char *Name);
 Int64 GetFreeDisk(const char *Name);
@@ -25,7 +25,9 @@ void ConvertNameToFull(const wchar *Src,wchar *Dest);
 char* MkTemp(char *Name);
 
 
-uint CalcFileCRC(File *SrcFile,Int64 Size=INT64ERR);
+enum CALCCRC_SHOWMODE {CALCCRC_SHOWNONE,CALCCRC_SHOWTEXT,CALCCRC_SHOWALL};
+uint CalcFileCRC(File *SrcFile,Int64 Size=INT64ERR,CALCCRC_SHOWMODE ShowMode=CALCCRC_SHOWNONE);
+
 bool RenameFile(const char *SrcName,const wchar *SrcNameW,const char *DestName,const wchar *DestNameW);
 bool DelFile(const char *Name);
 bool DelFile(const char *Name,const wchar *NameW);

@@ -59,6 +59,8 @@ bool ScanTree::PrepareMasks()
 {
   if (!FileMasks->GetString(CurMask,CurMaskW,sizeof(CurMask)))
     return(false);
+  CurMask[ASIZE(CurMask)-1]=0;
+  CurMaskW[ASIZE(CurMaskW)-1]=0;
 #ifdef _WIN_32
   UnixSlashToDos(CurMask);
 #endif
