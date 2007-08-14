@@ -805,6 +805,76 @@ ServerPicture::SyncState(ViewLayer *view)
 
 }
 
+void
+ServerPicture::SetFontFromLink(BPrivate::LinkReceiver& link)
+{
+	BeginOp(B_PIC_ENTER_STATE_CHANGE);
+
+	uint16 mask;
+	link.Read<uint16>(&mask);
+
+	if (mask & B_FONT_FAMILY_AND_STYLE) {
+		uint32 fontID;
+		link.Read<uint32>(&fontID);
+		//uint16 style = fontID & 0xFFFF;
+		//uint16 family = (fontID & 0xFFFF0000) >> 16;		
+		// TODO: WriteSetFamily() and WriteSetStyle()
+		// accept font_family and font_style parameters, not uint16		
+		//WriteSetFontFamily(family);
+		//WriteSetFontStyle(style);
+	}
+
+	if (mask & B_FONT_SIZE) {
+		float size;
+		link.Read<float>(&size);
+		WriteSetFontSize(size);
+	}
+	
+	if (mask & B_FONT_SHEAR) {
+		float shear;
+		link.Read<float>(&shear);
+		WriteSetFontShear(shear);
+	}
+
+	if (mask & B_FONT_ROTATION) {
+		float rotation;
+		link.Read<float>(&rotation);
+		WriteSetFontRotation(rotation);
+	}
+
+	if (mask & B_FONT_FALSE_BOLD_WIDTH) {
+		float falseBoldWidth;
+		link.Read<float>(&falseBoldWidth);
+		//SetFalseBoldWidth(falseBoldWidth);
+	}
+
+	if (mask & B_FONT_SPACING) {
+		uint8 spacing;
+		link.Read<uint8>(&spacing);
+		WriteSetFontSpacing(spacing);
+	}
+
+	if (mask & B_FONT_ENCODING) {
+		uint8 encoding;
+		link.Read<uint8>((uint8*)&encoding);
+		WriteSetFontEncoding(encoding);
+	}
+
+	if (mask & B_FONT_FACE) {
+		uint16 face;
+		link.Read<uint16>(&face);
+		WriteSetFontFace(face);
+	}
+
+	if (mask & B_FONT_FLAGS) {
+		uint32 flags;
+		link.Read<uint32>(&flags);
+		WriteSetFontFlags(flags);
+	}
+
+	EndOp();
+}
+
 
 void
 ServerPicture::Play(ViewLayer *view)

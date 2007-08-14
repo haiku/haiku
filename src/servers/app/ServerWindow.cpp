@@ -2445,6 +2445,12 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			break;
 		}
 
+		case AS_LAYER_SET_FONT_STATE:
+		{
+			picture->SetFontFromLink(link);
+			break;
+		}
+
 		case AS_FILL_RECT:
 		case AS_STROKE_RECT:
 		{

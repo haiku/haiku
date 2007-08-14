@@ -23,7 +23,9 @@ public:
 		void		EnterFontChange();
 		void		ExitFontChange();
 		
-		void		SyncState(ViewLayer *view);	
+		void		SyncState(ViewLayer *view);
+		void		SetFontFromLink(BPrivate::LinkReceiver& link);	
+		
 		void		Play(ViewLayer *view);
 		
 		void 		Usurp(ServerPicture *newPicture);
