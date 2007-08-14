@@ -2709,6 +2709,31 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			break;
 		}
 
+		case AS_LAYER_SET_CLIP_REGION:
+		{
+			int32 rectCount;
+			status_t status = link.Read<int32>(&rectCount);
+				// a negative count means no
+				// region for the current draw state,
+				// but an *empty* region is actually valid!
+				// even if it means no drawing is allowed
+
+			if (status < B_OK)
+				break;
+
+			if (rectCount >= 0) {
+				// we are supposed to set the clipping region
+				BRegion region;
+				if (rectCount > 0 && link.ReadRegion(&region) < B_OK)
+					break;
+				picture->WriteSetClipping(region);
+			} else {
+				// we are supposed to clear the clipping region
+				picture->WriteClearClipping();
+			}
+
+			break;
+		}
 		case AS_LAYER_BEGIN_PICTURE:
 		{
 			ServerPicture *newPicture = App()->CreatePicture();

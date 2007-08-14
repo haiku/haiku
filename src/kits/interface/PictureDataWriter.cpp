@@ -13,6 +13,7 @@
 #include <DataIO.h>
 #include <Point.h>
 #include <Rect.h>
+#include <Region.h>
 
 #include <PictureProtocol.h>
 
@@ -155,6 +156,40 @@ PictureDataWriter::WriteSetPattern(const pattern &pat)
 	try {
 		BeginOp(B_PIC_SET_STIPLE_PATTERN);
 		Write<pattern>(pat);
+		EndOp();
+	} catch (status_t &status) {
+		return status;
+	}
+	return B_OK;
+}
+
+
+status_t
+PictureDataWriter::WriteSetClipping(/*const */BRegion &region)
+{
+	// TODO: I don't know if it's compatible with R5's BPicture version
+	try {
+		const int32 numRects = region.CountRects();
+		if (numRects > 0 && region.Frame().IsValid()) {	
+			BeginOp(B_PIC_SET_CLIPPING_RECTS);
+			Write<int32>(numRects);
+			for (int32 i = 0; i < numRects; i++)
+				Write<BRect>(region.RectAt(i));			
+			EndOp();
+		} else
+			WriteClearClipping();
+	} catch (status_t &status) {
+		return status;
+	}
+	return B_OK;
+}
+
+
+status_t
+PictureDataWriter::WriteClearClipping()
+{
+	try {
+		BeginOp(B_PIC_CLEAR_CLIPPING_RECTS);
 		EndOp();
 	} catch (status_t &status) {
 		return status;

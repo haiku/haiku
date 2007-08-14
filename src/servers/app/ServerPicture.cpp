@@ -437,7 +437,8 @@ draw_picture(ViewLayer *view, BPoint where, int32 token)
 static void
 set_clipping_rects(ViewLayer *view, const BRect *rects, uint32 numRects)
 {
-	// TODO: This is too slow, we should copy the rects directly to BRegion's internal data
+	// TODO: This might be too slow, we should copy the rects
+	// directly to BRegion's internal data
 	BRegion region;
 	for (uint32 c = 0; c < numRects; c++)
 		region.Include(rects[c]);

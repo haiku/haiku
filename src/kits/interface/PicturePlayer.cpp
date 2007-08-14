@@ -35,7 +35,7 @@ typedef void (*fnc_f)(void*, float);
 typedef void (*fnc_Color)(void*, rgb_color);
 typedef void (*fnc_Pattern)(void*, pattern);
 typedef void (*fnc_ss)(void *, int16, int16);
-typedef void (*fnc_PBRecti)(void*, const BRect*, int32);
+typedef void (*fnc_PBRecti)(void*, const BRect*, uint32);
 typedef void (*fnc_DrawPixels)(void *, BRect, BRect, int32, int32, int32,
 							   int32, int32, const void *);
 typedef void (*fnc_DrawPicture)(void *, BPoint, int32);
@@ -283,15 +283,18 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 			case B_PIC_SET_CLIPPING_RECTS:
 			{
 				if (tableEntries <= 20)
-					break;
-				// TODO: Implement
+					break;			
+				// TODO: Not sure if it's compatible with R5's BPicture version
+				((fnc_PBRecti)callBackTable[20])(userData,
+					reinterpret_cast<const BRect *>(data + sizeof(uint32)),
+					*reinterpret_cast<const uint32 *>(data));
 				break;
 			}
 
 			case B_PIC_CLEAR_CLIPPING_RECTS:
 			{
 				if (tableEntries <= 20)
-					break;
+					break;		
 				((fnc_PBRecti)callBackTable[20])(userData, NULL, 0);
 				break;
 			}
