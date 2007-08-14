@@ -19,9 +19,6 @@ public:
 		
 		void		EnterStateChange();
 		void		ExitStateChange();
-
-		void		EnterFontChange();
-		void		ExitFontChange();
 		
 		void		SyncState(ViewLayer *view);
 		void		SetFontFromLink(BPrivate::LinkReceiver& link);	

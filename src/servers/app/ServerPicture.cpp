@@ -473,31 +473,30 @@ pop_state(ViewLayer *view)
 }
 
 
+// TODO: Be smart and actually take advantage of these methods:
+// only apply state changes when they are called
 static void
 enter_state_change(ViewLayer *view)
 {
-	printf("EnterStateChange\n");
 }
 
 
 static void
 exit_state_change(ViewLayer *view)
 {
-	printf("ExitStateChange\n");
 }
 
 
 static void 
 enter_font_state(ViewLayer *view)
 {
-	printf("EnterFontState\n");
 }
 
 
 static void
 exit_font_state(ViewLayer *view)
 {
-	printf("ExitFontState\n");
+	view->Window()->GetDrawingEngine()->SetFont(view->CurrentState()->Font());
 }
 
 
@@ -601,7 +600,6 @@ set_font_spacing(ViewLayer *view, int32 spacing)
 	ServerFont font;
 	font.SetSpacing(spacing);
 	view->CurrentState()->SetFont(font, B_FONT_SPACING);
-	view->Window()->GetDrawingEngine()->SetFont(view->CurrentState()->Font());
 }
 
 
@@ -611,7 +609,6 @@ set_font_size(ViewLayer *view, float size)
 	ServerFont font;
 	font.SetSize(size);
 	view->CurrentState()->SetFont(font, B_FONT_SIZE);
-	view->Window()->GetDrawingEngine()->SetFont(view->CurrentState()->Font());
 }
 
 
@@ -621,7 +618,6 @@ set_font_rotate(ViewLayer *view, float rotation)
 	ServerFont font;
 	font.SetRotation(rotation);
 	view->CurrentState()->SetFont(font, B_FONT_ROTATION);
-	view->Window()->GetDrawingEngine()->SetFont(view->CurrentState()->Font());
 }
 
 
@@ -631,7 +627,6 @@ set_font_encoding(ViewLayer *view, int32 encoding)
 	ServerFont font;
 	font.SetEncoding(encoding);
 	view->CurrentState()->SetFont(font, B_FONT_ENCODING);
-	view->Window()->GetDrawingEngine()->SetFont(view->CurrentState()->Font());
 }
 
 
@@ -641,7 +636,6 @@ set_font_flags(ViewLayer *view, int32 flags)
 	ServerFont font;
 	font.SetFlags(flags);
 	view->CurrentState()->SetFont(font, B_FONT_FLAGS);
-	view->Window()->GetDrawingEngine()->SetFont(view->CurrentState()->Font());
 }
 
 
@@ -651,7 +645,6 @@ set_font_shear(ViewLayer *view, float shear)
 	ServerFont font;
 	font.SetShear(shear);
 	view->CurrentState()->SetFont(font, B_FONT_SHEAR);
-	view->Window()->GetDrawingEngine()->SetFont(view->CurrentState()->Font());
 }
 
 
@@ -661,7 +654,6 @@ set_font_face(ViewLayer *view, int32 face)
 	ServerFont font;
 	font.SetFace(face);
 	view->CurrentState()->SetFont(font, B_FONT_FACE);
-	view->Window()->GetDrawingEngine()->SetFont(view->CurrentState()->Font());
 }
 
 
@@ -802,10 +794,24 @@ ServerPicture::~ServerPicture()
 
 
 void
+ServerPicture::EnterStateChange()
+{
+	BeginOp(B_PIC_ENTER_STATE_CHANGE);
+}
+
+
+void
+ServerPicture::ExitStateChange()
+{
+	EndOp();
+}
+
+
+void
 ServerPicture::SyncState(ViewLayer *view)
 {
 	// TODO: Finish this
-	//BeginOp(B_PIC_ENTER_STATE_CHANGE);
+	EnterStateChange();
 
 	WriteSetOrigin(view->CurrentState()->Origin());
 	WriteSetPenLocation(view->CurrentState()->PenLocation());
@@ -819,14 +825,13 @@ ServerPicture::SyncState(ViewLayer *view)
 	WriteSetHighColor(view->CurrentState()->HighColor().GetColor32());
 	WriteSetLowColor(view->CurrentState()->LowColor().GetColor32());
 
-	//EndOp();
-
+	ExitStateChange();
 }
 
 void
 ServerPicture::SetFontFromLink(BPrivate::LinkReceiver& link)
 {
-	//BeginOp(B_PIC_ENTER_STATE_CHANGE);
+	BeginOp(B_PIC_ENTER_FONT_STATE);
 
 	uint16 mask;
 	link.Read<uint16>(&mask);
@@ -890,7 +895,7 @@ ServerPicture::SetFontFromLink(BPrivate::LinkReceiver& link)
 		WriteSetFontFlags(flags);
 	}
 
-	//EndOp();
+	EndOp();
 }
 
 

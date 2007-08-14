@@ -392,7 +392,7 @@ PictureDataWriter::WriteSetFontFamily(const font_family family)
 	try {
 		BeginOp(B_PIC_SET_FONT_FAMILY);
 		WriteData(family, strlen(family));
-		Write<int8>(0);
+		Write<uint8>(0);
 		EndOp();
 	} catch (status_t &status) {
 		return status;
@@ -407,7 +407,7 @@ PictureDataWriter::WriteSetFontStyle(const font_style style)
 	try {
 		BeginOp(B_PIC_SET_FONT_STYLE);
 		WriteData(style, strlen(style));
-		Write<int8>(0);
+		Write<uint8>(0);
 		EndOp();
 	} catch (status_t &status) {
 		return status;

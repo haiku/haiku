@@ -69,6 +69,9 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 	const char *data = reinterpret_cast<const char *>(fData);
 	size_t pos = 0;
 
+	int32 fontStateBlockSize = -1;
+	int32 stateBlockSize = -1;
+
 	while ((pos + 6) <= fSize) {
 		int16 op = *reinterpret_cast<const int16 *>(data);
 		int32 size = *reinterpret_cast<const int32 *>(data + 2);
@@ -284,6 +287,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 			{
 				if (tableEntries <= 20)
 					break;
+				// TODO: Implement
 				break;
 			}
 
@@ -299,6 +303,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 			{
 				if (tableEntries <= 21)
 					break;
+				// TODO: Implement
 				break;
 			}
 
@@ -320,17 +325,17 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 
 			case B_PIC_ENTER_STATE_CHANGE:
 			{
-				if (tableEntries <= 24)
-					break;
-				((fnc)callBackTable[24])(userData);
+				if (tableEntries > 24)
+					((fnc)callBackTable[24])(userData);
+				stateBlockSize = size;
 				break;
 			}
 
 			case B_PIC_ENTER_FONT_STATE:
 			{
-				if (tableEntries <= 26)
-					break;
-				((fnc)callBackTable[26])(userData);
+				if (tableEntries > 26)
+					((fnc)callBackTable[26])(userData);
+				fontStateBlockSize = size;				
 				break;
 			}
 
@@ -512,15 +517,31 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				break;
 		}
 
-		// TODO: This is not correct. B_PIC_ENTER_STATE_CHANGE and
-		// B_PIC_ENTER_FONT_STATE ops include other ops. We should just advance
-		// the buffer by the size of these ops, not the size of the whole block,
-		// otherwise the nested ops won't be executed. I disabled them in
-		// ServerPicture::SyncState() and ServerPicture::SetFontFromLink()
-		// until we handle them correctly here.
-		pos += size;
-		data += size;
-
+		// Skip the already handled block unless it's one of these two, 
+		// since they can contain other nested ops.
+		if (op != B_PIC_ENTER_STATE_CHANGE && op != B_PIC_ENTER_FONT_STATE) {		
+			pos += size;
+			data += size;
+			if (stateBlockSize > 0)
+				stateBlockSize -= size + 6;
+			if (fontStateBlockSize > 0)
+				fontStateBlockSize -= size + 6;
+		}
+		
+		// call the exit_state_change hook if needed
+		if (stateBlockSize == 0) {
+			if (tableEntries > 25)
+				((fnc)callBackTable[25])(userData);
+			stateBlockSize = -1;		
+		}
+		
+		// call the exit_font_state hook if needed
+		if (fontStateBlockSize == 0) {
+			if (tableEntries > 27)
+				((fnc)callBackTable[27])(userData);
+			fontStateBlockSize = -1;		
+		}
+		
 		// TODO: what if too much was read, should we return B_ERROR?
 	}
 
