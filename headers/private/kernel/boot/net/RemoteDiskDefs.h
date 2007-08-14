@@ -1,12 +1,13 @@
 /*
- * Copyright 2005, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
+ * Copyright 2005-2007, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
 #ifndef _BOOT_REMOTE_DISK_DEFS_H
 #define _BOOT_REMOTE_DISK_DEFS_H
 
-#include <stdint.h>
+
+#include <inttypes.h>
+
 
 enum {
 	REMOTE_DISK_SERVER_PORT	= 8765,

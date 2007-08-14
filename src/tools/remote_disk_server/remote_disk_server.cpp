@@ -6,6 +6,7 @@
 #include <endian.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,11 +17,9 @@
 
 #include <boot/net/RemoteDiskDefs.h>
 
+
 #if defined(__BEOS__) && !defined(__HAIKU__)
-#	include <limits.h>
 typedef int socklen_t;
-#else
-#	include <stdint.h>
 #endif
 
 
@@ -91,7 +90,7 @@ public:
 			// short package?
 			if (bytesRead < (ssize_t)sizeof(remote_disk_header)) {
 				fprintf(stderr, "Dropping short request package (%d bytes).\n",
-					bytesRead);
+					(int)bytesRead);
 				continue;
 			}
 
