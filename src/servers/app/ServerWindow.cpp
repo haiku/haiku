@@ -2437,6 +2437,14 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver &link)
 			break;
 		}
 
+		case AS_LAYER_SET_PATTERN:
+		{
+			pattern pat;
+			link.Read(&pat, sizeof(pattern));
+			picture->WriteSetPattern(pat);
+			break;
+		}
+
 		case AS_FILL_RECT:
 		case AS_STROKE_RECT:
 		{

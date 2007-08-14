@@ -31,6 +31,7 @@ public:
 	status_t WriteSetPenSize(const float &penSize);
 	status_t WriteSetLineMode(const cap_mode &cap, const join_mode &join, const float &miterLimit);	
 	status_t WriteSetScale(const float &scale);
+	status_t WriteSetPattern(const pattern &pat);
 
 	status_t WritePushState();
 	status_t WritePopState();	

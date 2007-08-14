@@ -777,8 +777,8 @@ ServerPicture::~ServerPicture()
 	delete fData;
 	gTokenSpace.RemoveToken(fToken);
 	
-	// We don't delete the subpictures themselves, the ServerApp keeps
-	// them in a list and will delete them on quit.
+	// We only delete the subpictures list, not the subpictures themselves,
+	// since the ServerApp keeps them in a list and will delete them on quit.
 	delete fPictures;
 }
 
@@ -795,19 +795,9 @@ ServerPicture::SyncState(ViewLayer *view)
 	WriteSetScale(view->CurrentState()->Scale());
 	WriteSetLineMode(view->CurrentState()->LineCapMode(), view->CurrentState()->LineJoinMode(),
 			view->CurrentState()->MiterLimit());
-	
-/*
-	BeginOp(B_PIC_SET_STIPLE_PATTERN);
-	AddData(view->CurrentState()->GetPattern().GetInt8(), sizeof(pattern));
-	EndOp();
-*/
+	//WriteSetPattern(*view->CurrentState()->GetPattern().GetInt8());
 	WriteSetDrawingMode(view->CurrentState()->GetDrawingMode());
 	
-	/*BeginOp(B_PIC_SET_BLENDING_MODE);
-	AddInt16((int16)view->CurrentState()->AlphaSrcMode());
-	AddInt16((int16)view->CurrentState()->AlphaFncMode());
-	EndOp();
-*/
 	WriteSetHighColor(view->CurrentState()->HighColor().GetColor32());
 	WriteSetLowColor(view->CurrentState()->LowColor().GetColor32());
 
