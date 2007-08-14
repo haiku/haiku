@@ -2367,6 +2367,7 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 
 	if (title == NULL)
 		title = "";
+// TODO: Where's da "w>"?
 	fTitle = strdup(title);
 	SetName(title);
 
