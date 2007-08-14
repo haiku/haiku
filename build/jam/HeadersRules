@@ -352,7 +352,8 @@ rule FStandardOSHeaders
 					   kernel media mail midi midi2 net opengl storage support
 					   translation ;
 	
-	return [ PublicHeaders $(osIncludes) ] ;
+	return [ FDirName $(HAIKU_TOP) headers os ]
+		[ PublicHeaders $(osIncludes) ] ;
 }
 
 rule FStandardHeaders
@@ -377,6 +378,7 @@ rule FStandardHeaders
 	headers += [ FDirName $(HAIKU_TOP) headers glibc ] ;
 
 	# Use public OS header directories
+	headers += [ FDirName $(HAIKU_TOP) headers os ] ;
 	headers += [ PublicHeaders $(osIncludes) ] ;
 
 	# Use the root of the private headers -- not so nice, but simplifies things.
