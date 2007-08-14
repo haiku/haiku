@@ -595,7 +595,10 @@ set_font_style(ViewLayer *view, const char *style)
 static void
 set_font_spacing(ViewLayer *view, int32 spacing)
 {
-	printf("SetFontSpacing(%ld)\n", spacing);
+	ServerFont font;
+	font.SetSpacing(spacing);
+	view->CurrentState()->SetFont(font, B_FONT_SPACING);
+	view->Window()->GetDrawingEngine()->SetFont(view->CurrentState()->Font());
 }
 
 
@@ -622,28 +625,40 @@ set_font_rotate(ViewLayer *view, float rotation)
 static void
 set_font_encoding(ViewLayer *view, int32 encoding)
 {
-	printf("SetFontEncoding(%ld)\n", encoding);
+	ServerFont font;
+	font.SetEncoding(encoding);
+	view->CurrentState()->SetFont(font, B_FONT_ENCODING);
+	view->Window()->GetDrawingEngine()->SetFont(view->CurrentState()->Font());
 }
 
 
 static void
 set_font_flags(ViewLayer *view, int32 flags)
 {
-	printf("SetFontFlags(%ld)\n", flags);
+	ServerFont font;
+	font.SetFlags(flags);
+	view->CurrentState()->SetFont(font, B_FONT_FLAGS);
+	view->Window()->GetDrawingEngine()->SetFont(view->CurrentState()->Font());
 }
 
 
 static void
 set_font_shear(ViewLayer *view, float shear)
 {
-	printf("SetFontShear(%.2f)\n", shear);
+	ServerFont font;
+	font.SetShear(shear);
+	view->CurrentState()->SetFont(font, B_FONT_SHEAR);
+	view->Window()->GetDrawingEngine()->SetFont(view->CurrentState()->Font());
 }
 
 
 static void
-set_font_face(ViewLayer *view, int32 flags)
+set_font_face(ViewLayer *view, int32 face)
 {
-	printf("SetFontFace(%ld)\n", flags);
+	ServerFont font;
+	font.SetFace(face);
+	view->CurrentState()->SetFont(font, B_FONT_FACE);
+	view->Window()->GetDrawingEngine()->SetFont(view->CurrentState()->Font());
 }
 
 
@@ -707,7 +722,7 @@ const void *tableEntries[] = {
 	(const void *)set_font_flags,
 	(const void *)set_font_shear,
 	(const void *)reserved,		// TODO: Marc Flerackers calls this "set_font_bpp". Investigate
-	(const void *)set_font_face, // TODO: R5 function table ends here... how is set blending mode implemented there ?
+	(const void *)set_font_face,
 	(const void *)set_blending_mode 
 };
 
