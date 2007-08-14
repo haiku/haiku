@@ -117,6 +117,7 @@ TBarView::AttachedToWindow()
 	if (fTrayLocation != 0)
 		AddChild(fDragRegion);
 
+	UpdateAutoRaise();
 	UpdatePlacement();
 
 	fTrackingHookData.fTrackingHook = MenuTrackingHook;
@@ -170,6 +171,26 @@ TBarView::MessageReceived(BMessage *message)
 
 		default:
 			BView::MessageReceived(message);
+	}
+}
+
+
+void
+TBarView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
+{
+	if (Window() == NULL || EventMask() == 0)
+		return;
+
+	// Auto-Raise
+
+	where = ConvertToScreen(where);
+	BScreen screen(Window());
+	BRect frame = screen.Frame();
+	if (where.x == frame.left || where.x == frame.right
+		|| where.y == frame.top || where.y == frame.bottom) {
+		// cursor is on screen edge
+		if (Window()->Frame().Contains(where))
+			Window()->Activate();
 	}
 }
 
@@ -385,6 +406,16 @@ TBarView::SaveSettings()
 	
 	fReplicantTray->RememberClockSettings();
 	settings->alwaysOnTop = (Window()->Feel() & B_FLOATING_ALL_WINDOW_FEEL) != 0;
+}
+
+
+void
+TBarView::UpdateAutoRaise()
+{
+	if (((TBarApp*)be_app)->Settings()->autoRaise)
+		SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
+	else
+		SetEventMask(0);
 }
 
 

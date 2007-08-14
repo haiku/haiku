@@ -204,6 +204,7 @@ TBarApp::SaveSettings()
 		fSettingsFile->Write(&fSettings.sortRunningApps, sizeof(bool));
 		fSettingsFile->Write(&fSettings.superExpando, sizeof(bool));
 		fSettingsFile->Write(&fSettings.expandNewTeams, sizeof(bool));
+		fSettingsFile->Write(&fSettings.autoRaise, sizeof(bool));
 	}
 }
 
@@ -232,6 +233,7 @@ TBarApp::InitSettings()
 	settings.sortRunningApps = false;
 	settings.superExpando = false;
 	settings.expandNewTeams = false;
+	settings.autoRaise = true;
 
 	BPath dirPath;
 	const char *settingsFileName = "Deskbar_settings";
@@ -250,10 +252,10 @@ TBarApp::InitSettings()
 		}
 
 		if (fSettingsFile->InitCheck() == B_OK) {
-			off_t theSize = 0;
-			fSettingsFile->GetSize(&theSize);
-			
-			if (theSize >= kValidSettingsSize1) {
+			off_t size = 0;
+			fSettingsFile->GetSize(&size);
+
+			if (size >= kValidSettingsSize1) {
 				fSettingsFile->Seek(0, SEEK_SET);
 				fSettingsFile->Read(&settings.vertical, sizeof(bool));
 				fSettingsFile->Read(&settings.left, sizeof(bool));
@@ -263,32 +265,34 @@ TBarApp::InitSettings()
 				fSettingsFile->Read(&settings.width, sizeof(float));
 				fSettingsFile->Read(&settings.showTime, sizeof(bool));
 			}
-			if (theSize >= kValidSettingsSize2)
+			if (size >= kValidSettingsSize2)
 				fSettingsFile->Read(&settings.switcherLoc, sizeof(BPoint));
-			if (theSize >= kValidSettingsSize3) {
+			if (size >= kValidSettingsSize3) {
 				fSettingsFile->Read(&settings.recentAppsCount, sizeof(int32));
 				fSettingsFile->Read(&settings.recentDocsCount, sizeof(int32));
 			}
-			if (theSize >= kValidSettingsSize4) {
+			if (size >= kValidSettingsSize4) {
 				fSettingsFile->Read(&settings.timeShowSeconds, sizeof(bool));						
 				fSettingsFile->Read(&settings.timeShowMil, sizeof(bool));
 			}
-			if (theSize >= kValidSettingsSize5)
+			if (size >= kValidSettingsSize5)
 				fSettingsFile->Read(&settings.recentFoldersCount, sizeof(int32));
-			if (theSize >= kValidSettingsSize6) {
+			if (size >= kValidSettingsSize6) {
 				fSettingsFile->Read(&settings.timeShowEuro, sizeof(bool));
 				fSettingsFile->Read(&settings.alwaysOnTop, sizeof(bool));
 			}
-			if (theSize >= kValidSettingsSize7)
+			if (size >= kValidSettingsSize7)
 				fSettingsFile->Read(&settings.timeFullDate, sizeof(bool));
-			if (theSize >= kValidSettingsSize8) {
+			if (size >= kValidSettingsSize8) {
 				fSettingsFile->Read(&settings.trackerAlwaysFirst, sizeof(bool));
 				fSettingsFile->Read(&settings.sortRunningApps, sizeof(bool));
 			}
-			if (theSize >= kValidSettingsSize9) {
+			if (size >= kValidSettingsSize9) {
 				fSettingsFile->Read(&settings.superExpando, sizeof(bool));
 				fSettingsFile->Read(&settings.expandNewTeams, sizeof(bool));
 			}
+			if (size >= kValidSettingsSize10)
+				fSettingsFile->Read(&settings.autoRaise, sizeof(bool));
 		}
 	}
 
@@ -415,6 +419,17 @@ TBarApp::MessageReceived(BMessage *message)
  			fBarWindow->SetFeel(fSettings.alwaysOnTop ? 
  				B_FLOATING_ALL_WINDOW_FEEL : B_NORMAL_WINDOW_FEEL);
  			break;
+
+		case msg_AutoRaise:
+		{
+			fSettings.autoRaise = !fSettings.autoRaise;
+
+			TBarView *barView = static_cast<TBarApp *>(be_app)->BarView();
+			fBarWindow->Lock();
+			barView->UpdateAutoRaise();
+			fBarWindow->Unlock();
+			break;
+		}
 
 		case msg_trackerFirst:
 		{

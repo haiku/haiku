@@ -285,6 +285,11 @@ TBeMenu::AddStandardBeMenuItems()
 	 	item->SetMarked((window->Feel() & B_FLOATING_ALL_WINDOW_FEEL) != 0);
  	subMenu->AddItem(item);
 
+	item = new BMenuItem("Auto Raise", new BMessage(msg_AutoRaise));
+ 	item->SetTarget(be_app);
+	item->SetMarked(static_cast<TBarApp *>(be_app)->Settings()->autoRaise);
+ 	subMenu->AddItem(item);
+
 	item = new BMenuItem("Sort Running Applications", new BMessage(msg_sortRunningApps));
 	item->SetTarget(be_app);
 	item->SetMarked(static_cast<TBarApp *>(be_app)->Settings()->sortRunningApps);

@@ -77,6 +77,7 @@ const uint32 msg_trackerFirst = 'TkFt';
 const uint32 msg_sortRunningApps = 'SAps';
 const uint32 msg_superExpando = 'SprE';
 const uint32 msg_expandNewTeams = 'ExTm';
+const uint32 msg_AutoRaise = 'AtRs';
 
 // from roster_private.h
 const uint32 CMD_SHUTDOWN_SYSTEM = 301;
@@ -109,6 +110,7 @@ struct desk_settings {
 	bool sortRunningApps;
 	bool superExpando;			// version 9
 	bool expandNewTeams;
+	bool autoRaise;				// version 10
 };
 
 // the following structures are defined to compute
@@ -123,6 +125,7 @@ const uint32 kValidSettingsSize6 = 2 * sizeof(bool) + kValidSettingsSize5;
 const uint32 kValidSettingsSize7 = sizeof(bool) + kValidSettingsSize6;
 const uint32 kValidSettingsSize8 = 2 * sizeof(bool) + kValidSettingsSize7;
 const uint32 kValidSettingsSize9 = 2 * sizeof(bool) + kValidSettingsSize8;
+const uint32 kValidSettingsSize10 = sizeof(bool) + kValidSettingsSize9;
 
 class TBarView;
 class BFile;

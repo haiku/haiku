@@ -72,10 +72,13 @@ class TBarView : public BView {
 		~TBarView();
 
 		virtual void AttachedToWindow();
-		virtual void Draw(BRect);
-		virtual void MessageReceived(BMessage *);
+		virtual void Draw(BRect updateRect);
+		virtual void MessageReceived(BMessage* message);
+		virtual void MouseMoved(BPoint where, uint32 transit,
+			const BMessage* dragMessage);
 
 		void SaveSettings();
+		void UpdateAutoRaise();
 		void UpdatePlacement();
 		void ChangeState(int32 state, bool vertical, bool left, bool top);
 
