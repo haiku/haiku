@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku, Inc.
+ * Copyright 2002-2007, Haiku, Inc.
  * Copyright 2002, François Revol, revol@free.fr.
  * This file is distributed under the terms of the MIT License.
  *
@@ -56,6 +56,15 @@ class WorkspacesPreferences {
 		BRect	fWindowFrame, fScreenFrame;
 };
 
+class WorkspacesView : public BView {
+	public:
+		WorkspacesView(BRect frame);
+		~WorkspacesView();
+
+		virtual void MouseMoved(BPoint where, uint32 transit,
+			const BMessage* dragMessage);
+};
+
 class WorkspacesWindow : public BWindow {
 	public:
 		WorkspacesWindow(WorkspacesPreferences *fPreferences);
@@ -68,6 +77,8 @@ class WorkspacesWindow : public BWindow {
 
 		virtual void MessageReceived(BMessage *msg);
 		virtual bool QuitRequested();
+
+		void SetAutoRaise();
 
 	private:
 		WorkspacesPreferences *fPreferences;
@@ -86,7 +97,7 @@ class WorkspacesApp : public BApplication {
 		void Usage(const char *programName);
 
 	private:
-		BWindow		*fWindow;
+		WorkspacesWindow*	fWindow;
 };
 
 
@@ -188,6 +199,41 @@ WorkspacesPreferences::SetWindowFrame(BRect frame)
 //	#pragma mark -
 
 
+WorkspacesView::WorkspacesView(BRect frame)
+	: BView(frame, "workspaces", 0, B_FOLLOW_NONE)
+{
+}
+
+
+WorkspacesView::~WorkspacesView()
+{
+}
+
+
+void
+WorkspacesView::MouseMoved(BPoint where, uint32 transit,
+	const BMessage* dragMessage)
+{
+	if (Window() == NULL || EventMask() == 0)
+		return;
+
+	// Auto-Raise
+
+	where = ConvertToScreen(where);
+	BScreen screen(Window());
+	BRect frame = screen.Frame();
+	if (where.x == frame.left || where.x == frame.right
+		|| where.y == frame.top || where.y == frame.bottom) {
+		// cursor is on screen edge
+		if (Window()->Frame().Contains(where))
+			Window()->Activate();
+	}
+}
+
+
+//	#pragma mark -
+
+
 WorkspacesWindow::WorkspacesWindow(WorkspacesPreferences *preferences)
 	: BWindow(preferences->WindowFrame(), "Workspaces", B_TITLED_WINDOW_LOOK,
  			B_NORMAL_WINDOW_FEEL,
@@ -195,6 +241,7 @@ WorkspacesWindow::WorkspacesWindow(WorkspacesPreferences *preferences)
  			B_ALL_WORKSPACES),
  	fPreferences(preferences)
 {
+	AddChild(new WorkspacesView(BRect(-10, -10, -5, -5)));
 	fPreviousFrame = Frame();
 }
 
@@ -271,6 +318,13 @@ WorkspacesWindow::QuitRequested()
 }
 
 
+void
+WorkspacesWindow::SetAutoRaise()
+{
+	ChildAt(0)->SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
+}
+
+
 //	#pragma mark -
 
 
@@ -292,7 +346,7 @@ WorkspacesApp::AboutRequested()
 	BAlert *alert = new BAlert("about", "Workspaces\n"
 		"\twritten by François Revol, Axel Dörfler,\n"
 		"\t\tand Matt Madia.\n"
-		"\tCopyright 2002-2006, Haiku.\n", "Ok");
+		"\tCopyright 2002-2007, Haiku.\n", "Ok");
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -317,6 +371,7 @@ WorkspacesApp::Usage(const char *programName)
 		"  --avoidfocus\t\tprevents the window from being the target of keyboard events.\n"
 		"  --alwaysontop\t\tkeeps window on top\n"
 		"  --notmovable\t\twindow can't be moved around\n"
+		"  --autoraise\t\tauto-raise the workspace window when it's at the screen corner\n"
 		"  --help\t\tdisplay this help and exit\n"
 		"and \"workspace\" is the number of the Workspace to which to switch (0-31)\n",
 		programName);
@@ -343,6 +398,8 @@ WorkspacesApp::ArgvReceived(int32 argc, char **argv)
 				fWindow->SetFlags(fWindow->Flags() | B_NOT_MOVABLE);
 			else if (!strcmp(argv[i], "--alwaysontop"))
 				fWindow->SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
+			else if (!strcmp(argv[i], "--autoraise"))
+				fWindow->SetAutoRaise();
 			else {
 				const char *programName = strrchr(argv[0], '/');
 				programName = programName ? programName + 1 : argv[0];
