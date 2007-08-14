@@ -849,7 +849,9 @@ ServerPicture::SetFontFromLink(BPrivate::LinkReceiver& link)
 	if (mask & B_FONT_SHEAR) {
 		float shear;
 		link.Read<float>(&shear);
-		WriteSetFontShear(shear);
+		// TODO: For some reason writing the font shear
+		// results in missing font in Chart's BPictureButtons. Investigate.		
+		//WriteSetFontShear(shear);
 	}
 
 	if (mask & B_FONT_ROTATION) {
