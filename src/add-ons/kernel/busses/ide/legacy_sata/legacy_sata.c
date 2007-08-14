@@ -30,6 +30,22 @@
 #define PCI_device_ALI5287	0x5287
 #define PCI_device_ALI5281	0x5281
 
+#define PCI_vendor_NVIDIA	0x10de
+#define PCI_device_NF2PROS1	0x008e
+#define PCI_device_NF3PROS1	0x00e3
+#define PCI_device_NF3PROS2	0x00ee
+#define PCI_device_MCP4S1	0x0036
+#define PCI_device_MCP4S2	0x003e
+#define PCI_device_CK804S1	0x0054
+#define PCI_device_CK804S2	0x0055
+#define PCI_device_MCP51S1	0x0266
+#define PCI_device_MCP51S2	0x0267
+#define PCI_device_MCP55S1	0x037e
+#define PCI_device_MCP55S2	0x037f
+#define PCI_device_MCP61S1	0x03e7
+#define PCI_device_MCP61S2	0x03f6
+#define PCI_device_MCP61S3	0x03f7
+
 #define ID(v,d) (((v)<< 16) | (d))
 
 /* XXX: To be moved to PCI.h */
@@ -75,6 +91,23 @@ controller_supports(device_node_handle parent, bool *_noConnection)
 		case ID(PCI_vendor_ALI, PCI_device_ALI5289):
 			break;
 
+		/* NVidia NForce chipsets */
+		case ID(PCI_vendor_NVIDIA, PCI_device_NF2PROS1):
+		case ID(PCI_vendor_NVIDIA, PCI_device_NF3PROS1):
+		case ID(PCI_vendor_NVIDIA, PCI_device_NF3PROS2):
+		case ID(PCI_vendor_NVIDIA, PCI_device_MCP4S1):
+		case ID(PCI_vendor_NVIDIA, PCI_device_MCP4S2):
+		case ID(PCI_vendor_NVIDIA, PCI_device_CK804S1):
+		case ID(PCI_vendor_NVIDIA, PCI_device_CK804S2):
+		case ID(PCI_vendor_NVIDIA, PCI_device_MCP51S1):
+		case ID(PCI_vendor_NVIDIA, PCI_device_MCP51S2):
+		case ID(PCI_vendor_NVIDIA, PCI_device_MCP55S1):
+		case ID(PCI_vendor_NVIDIA, PCI_device_MCP55S2):
+		case ID(PCI_vendor_NVIDIA, PCI_device_MCP61S1):
+		case ID(PCI_vendor_NVIDIA, PCI_device_MCP61S2):
+		case ID(PCI_vendor_NVIDIA, PCI_device_MCP61S3):
+			break;
+
 		default:
 			return 0.0f;
 	}
@@ -110,11 +143,22 @@ controller_probe(device_node_handle parent)
 	vendor_id = pci->read_pci_config(device, PCI_vendor_id, 2);
 	int_num = pci->read_pci_config(device, PCI_interrupt_line, 1);
 	bus_master_base = pci->read_pci_config(device, PCI_base_registers + 16, 4);
-	
-	/* enable PCI interrupt */
-	pci->write_pci_config(device, PCI_command,
-		pci->read_pci_config(device, PCI_command, 2) & ~PCI_command_interrupt, 2);
 
+	/* Default PCI assigments */
+	command_block_base[0] = pci->read_pci_config(device, PCI_base_registers + 0, 4 );
+	control_block_base[0] = pci->read_pci_config(device, PCI_base_registers + 4, 4);
+	command_block_base[1] = pci->read_pci_config(device, PCI_base_registers + 8, 4);
+	control_block_base[1] = pci->read_pci_config(device, PCI_base_registers + 12, 4);
+
+	/* enable PCI interrupt */
+	pci->write_pci_config(device, PCI_command, 2,
+		pci->read_pci_config(device, PCI_command, 2) & ~PCI_command_interrupt);
+
+	if (vendor_id == PCI_vendor_NVIDIA) {
+		/* enable control access */
+		pci->write_pci_config(device, 0x50, 1,
+			pci->read_pci_config(device, 0x50, 1) | 0x04);
+	}
 
 	switch (ID(vendor_id, device_id)) {
 		case ID(PCI_vendor_VIA,PCI_device_VIA6421):
@@ -136,14 +180,7 @@ controller_probe(device_node_handle parent)
                         control_block_base[3] = pci->read_pci_config(device, PCI_base_registers + 4, 4) + 4;
                         command_block_base[4] = pci->read_pci_config(device, PCI_base_registers + 8, 4) + 8;
                         control_block_base[4] = pci->read_pci_config(device, PCI_base_registers + 12, 4) + 4;
-			/* Intentional fall-through */
-
-		default:
-			/* Default PCI assigments */
-			command_block_base[0] = pci->read_pci_config(device, PCI_base_registers + 0, 4 );
-			control_block_base[0] = pci->read_pci_config(device, PCI_base_registers + 4, 4);
-			command_block_base[1] = pci->read_pci_config(device, PCI_base_registers + 8, 4);
-			control_block_base[1] = pci->read_pci_config(device, PCI_base_registers + 12, 4);
+			break;
 	}
 
         res = ide_adapter->detect_controller(pci, device, parent, bus_master_base, 

@@ -129,7 +129,7 @@ BEOS_ADD_ONS_FILE_SYSTEMS = bfs cdda dos googlefs iso9660 nfs ;
 AddFilesToHaikuImage beos system add-ons kernel bus_managers
 	: $(BEOS_ADD_ONS_BUS_MANAGERS) ;
 AddFilesToHaikuImage beos system add-ons kernel busses ide
-	: ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 ;
+	: ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata ;
 AddFilesToHaikuImage beos system add-ons kernel busses usb
 	: <usb>uhci <usb>ohci <usb>ehci ;
 AddFilesToHaikuImage beos system add-ons kernel console : vga_text ;
@@ -346,7 +346,7 @@ AddFilesToHaikuImage beos system : zbeos ;
 AddBootModuleSymlinksToHaikuImage config_manager bfs block_io fast_log
 	generic_ide_pci $(X86_ONLY)isa ide ide_adapter $(X86_ONLY)ide_isa intel
 	locked_pool $(PPC_ONLY)openpic pci scsi scsi_cd scsi_dsk scsi_periph
-	ahci silicon_image_3112
+	ahci silicon_image_3112 legacy_sata
 ;
 
 # add-ons
