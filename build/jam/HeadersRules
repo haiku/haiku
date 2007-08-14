@@ -123,7 +123,7 @@ rule PublicHeaders
 	# <group list>.
 
 	local list = $(1) ;
-	local dirs = [ FDirName $(HAIKU_TOP) headers os ] ;
+	local dirs ;
 
 	for i in $(list) {
 		dirs += [ FDirName $(HAIKU_TOP) headers os $(i) ] ;
