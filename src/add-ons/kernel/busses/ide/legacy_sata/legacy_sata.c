@@ -122,9 +122,9 @@ static status_t
 controller_probe(device_node_handle parent)
 {
         device_node_handle controller_node;
-	device_node_handle channels[2];
-	uint16 command_block_base[2];
-	uint16 control_block_base[2];
+	device_node_handle channels[4];
+	uint16 command_block_base[4];
+	uint16 control_block_base[4];
 	pci_device_module_info *pci;
 	uint8 num_channels = 2;
 	uint32 bus_master_base;
@@ -145,7 +145,7 @@ controller_probe(device_node_handle parent)
 	bus_master_base = pci->read_pci_config(device, PCI_base_registers + 16, 4);
 
 	/* Default PCI assigments */
-	command_block_base[0] = pci->read_pci_config(device, PCI_base_registers + 0, 4 );
+	command_block_base[0] = pci->read_pci_config(device, PCI_base_registers + 0, 4);
 	control_block_base[0] = pci->read_pci_config(device, PCI_base_registers + 4, 4);
 	command_block_base[1] = pci->read_pci_config(device, PCI_base_registers + 8, 4);
 	control_block_base[1] = pci->read_pci_config(device, PCI_base_registers + 12, 4);
@@ -164,11 +164,11 @@ controller_probe(device_node_handle parent)
 		case ID(PCI_vendor_VIA,PCI_device_VIA6421):
 			/* newer SATA chips has resources in one BAR for each channel */
 			num_channels = 4;
-			command_block_base[0] = pci->read_pci_config(device, PCI_base_registers + 0, 4 );
+			command_block_base[0] = pci->read_pci_config(device, PCI_base_registers + 0, 4);
 			control_block_base[0] = command_block_base[0] + 8;
 			command_block_base[1] = pci->read_pci_config(device, PCI_base_registers + 4, 4);
 			control_block_base[1] = command_block_base[1] + 8;
-			command_block_base[2] = pci->read_pci_config(device, PCI_base_registers + 8, 4 );
+			command_block_base[2] = pci->read_pci_config(device, PCI_base_registers + 8, 4);
 			control_block_base[2] = command_block_base[2] + 8;
 			command_block_base[3] = pci->read_pci_config(device, PCI_base_registers + 12, 4);
 			control_block_base[3] = command_block_base[3] + 8;
@@ -176,10 +176,10 @@ controller_probe(device_node_handle parent)
 
 		case ID(PCI_vendor_ALI, PCI_device_ALI5287):
 			num_channels = 4;
-                        command_block_base[3] = pci->read_pci_config(device, PCI_base_registers + 0, 4 ) + 8;
-                        control_block_base[3] = pci->read_pci_config(device, PCI_base_registers + 4, 4) + 4;
-                        command_block_base[4] = pci->read_pci_config(device, PCI_base_registers + 8, 4) + 8;
-                        control_block_base[4] = pci->read_pci_config(device, PCI_base_registers + 12, 4) + 4;
+                        command_block_base[2] = pci->read_pci_config(device, PCI_base_registers + 0, 4) + 8;
+                        control_block_base[2] = pci->read_pci_config(device, PCI_base_registers + 4, 4) + 4;
+                        command_block_base[3] = pci->read_pci_config(device, PCI_base_registers + 8, 4) + 8;
+                        control_block_base[3] = pci->read_pci_config(device, PCI_base_registers + 12, 4) + 4;
 			break;
 	}
 
@@ -196,22 +196,30 @@ controller_probe(device_node_handle parent)
 	}
 
         // ignore errors during registration of channels - could be a simple rescan collision
-        ide_adapter->detect_channel(pci, device, controller_node, CHANNEL_MODULE_NAME,
+        res = ide_adapter->detect_channel(pci, device, controller_node, CHANNEL_MODULE_NAME,
                 true, command_block_base[0], control_block_base[0], bus_master_base,
                 int_num, true, "Primary Channel", &channels[0], false);
 
-        ide_adapter->detect_channel(pci, device, controller_node, CHANNEL_MODULE_NAME,
+	dprintf("Primary Channel: %s\n", strerror(res));
+
+        res = ide_adapter->detect_channel(pci, device, controller_node, CHANNEL_MODULE_NAME,
                 true, command_block_base[1], control_block_base[1], bus_master_base,
                 int_num, false, "Secondary Channel", &channels[1], false);
 
+	dprintf("Secondary Channel: %s\n", strerror(res));
+
 	if (num_channels == 4) {
-		ide_adapter->detect_channel(pci, device, controller_node, CHANNEL_MODULE_NAME,
+		res = ide_adapter->detect_channel(pci, device, controller_node, CHANNEL_MODULE_NAME,
 			true, command_block_base[2], control_block_base[2], bus_master_base,
 			int_num, true, "Tertiary Channel", &channels[2], false);
 
-		ide_adapter->detect_channel(pci, device, controller_node, CHANNEL_MODULE_NAME,
+		dprintf("Tertiary Channel: %s\n", strerror(res));
+
+		res = ide_adapter->detect_channel(pci, device, controller_node, CHANNEL_MODULE_NAME,
 			true, command_block_base[3], control_block_base[3], bus_master_base,
 			int_num, false, "Quaternary Channel", &channels[3], false);
+
+		dprintf("Quaternary Channel: %s\n", strerror(res));
 	}
 
 	dm->uninit_driver(parent);
