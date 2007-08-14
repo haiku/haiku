@@ -36,8 +36,8 @@ public:
 	status_t WritePushState();
 	status_t WritePopState();	
 	
-	status_t WriteSetFontFamily(const font_family &family);
-	status_t WriteSetFontStyle(const font_style &style);
+	status_t WriteSetFontFamily(const font_family family);
+	status_t WriteSetFontStyle(const font_style style);
 	status_t WriteSetFontSpacing(const int32 &spacing);
 	status_t WriteSetFontSize(const float &size);
 	status_t WriteSetFontRotation(const float &rotation);

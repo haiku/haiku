@@ -12,6 +12,7 @@
 #include "DrawingEngine.h"
 #include "ServerApp.h"
 #include "ServerBitmap.h"
+#include "ServerFont.h"
 #include "ServerPicture.h"
 #include "ServerTokenSpace.h"
 #include "ViewLayer.h"
@@ -581,14 +582,16 @@ set_scale(ViewLayer *view, float scale)
 static void
 set_font_family(ViewLayer *view, const char *family)
 {
-	printf("SetFontFamily(%s)\n", family);
+	// TODO: Implement
+	// Can we have a ServerFont::SetFamily() which accepts a string ?
 }
 
 
 static void
 set_font_style(ViewLayer *view, const char *style)
 {
-	printf("SetFontStyle(%s)\n", style);
+	// TODO: Implement
+	// Can we have a ServerFont::SetStyle() which accepts a string ?
 }
 
 
@@ -831,12 +834,10 @@ ServerPicture::SetFontFromLink(BPrivate::LinkReceiver& link)
 	if (mask & B_FONT_FAMILY_AND_STYLE) {
 		uint32 fontID;
 		link.Read<uint32>(&fontID);
-		//uint16 style = fontID & 0xFFFF;
-		//uint16 family = (fontID & 0xFFFF0000) >> 16;		
-		// TODO: WriteSetFamily() and WriteSetStyle()
-		// accept font_family and font_style parameters, not uint16		
-		//WriteSetFontFamily(family);
-		//WriteSetFontStyle(style);
+		ServerFont font;
+		font.SetFamilyAndStyle(fontID);
+		WriteSetFontFamily((font_family)font.Family());
+		WriteSetFontStyle((font_style)font.Style());
 	}
 
 	if (mask & B_FONT_SIZE) {

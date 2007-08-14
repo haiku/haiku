@@ -18,6 +18,9 @@
 
 #define THROW_ERROR(error) throw (status_t)(error)
 
+// TODO: Review writing of strings. AFAIK in the picture data format
+// They are not supposed to be NULL terminated (at least, it's not mandatory)
+// and we should write their size.
 PictureDataWriter::PictureDataWriter()
 	:
 	fData(NULL)
@@ -384,21 +387,31 @@ PictureDataWriter::WriteDrawPicture(const BPoint &where, const int32 &token)
 
 
 status_t
-PictureDataWriter::WriteSetFontFamily(const font_family &family)
+PictureDataWriter::WriteSetFontFamily(const font_family family)
 {
-	/*BeginOp(B_PIC_SET_FONT_FAMILY);
-	Write(
-	EndOp();*/
+	try {
+		BeginOp(B_PIC_SET_FONT_FAMILY);
+		WriteData(family, strlen(family));
+		Write<int8>(0);
+		EndOp();
+	} catch (status_t &status) {
+		return status;
+	}	
 	return B_OK;
 }
 
 
 status_t
-PictureDataWriter::WriteSetFontStyle(const font_style &style)
+PictureDataWriter::WriteSetFontStyle(const font_style style)
 {
-	/*BeginOp(B_PIC_SET_FONT_STYLE);
-	Write(
-	EndOp();*/
+	try {
+		BeginOp(B_PIC_SET_FONT_STYLE);
+		WriteData(style, strlen(style));
+		Write<int8>(0);
+		EndOp();
+	} catch (status_t &status) {
+		return status;
+	}
 	return B_OK;
 }
 
