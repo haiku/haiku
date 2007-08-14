@@ -802,7 +802,7 @@ void
 ServerPicture::SyncState(ViewLayer *view)
 {
 	// TODO: Finish this
-	BeginOp(B_PIC_ENTER_STATE_CHANGE);
+	//BeginOp(B_PIC_ENTER_STATE_CHANGE);
 
 	WriteSetOrigin(view->CurrentState()->Origin());
 	WriteSetPenLocation(view->CurrentState()->PenLocation());
@@ -816,14 +816,14 @@ ServerPicture::SyncState(ViewLayer *view)
 	WriteSetHighColor(view->CurrentState()->HighColor().GetColor32());
 	WriteSetLowColor(view->CurrentState()->LowColor().GetColor32());
 
-	EndOp();
+	//EndOp();
 
 }
 
 void
 ServerPicture::SetFontFromLink(BPrivate::LinkReceiver& link)
 {
-	BeginOp(B_PIC_ENTER_STATE_CHANGE);
+	//BeginOp(B_PIC_ENTER_STATE_CHANGE);
 
 	uint16 mask;
 	link.Read<uint16>(&mask);
@@ -887,7 +887,7 @@ ServerPicture::SetFontFromLink(BPrivate::LinkReceiver& link)
 		WriteSetFontFlags(flags);
 	}
 
-	EndOp();
+	//EndOp();
 }
 
 

@@ -512,6 +512,12 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				break;
 		}
 
+		// TODO: This is not correct. B_PIC_ENTER_STATE_CHANGE and
+		// B_PIC_ENTER_FONT_STATE ops include other ops. We should just advance
+		// the buffer by the size of these ops, not the size of the whole block,
+		// otherwise the nested ops won't be executed. I disabled them in
+		// ServerPicture::SyncState() and ServerPicture::SetFontFromLink()
+		// until we handle them correctly here.
 		pos += size;
 		data += size;
 
