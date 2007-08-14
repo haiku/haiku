@@ -63,9 +63,6 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 	// If an application supplies the wrong size or an invalid pointer,
 	// it's its own fault.
 
-	// TODO: Call the exit_font_state_change and exit_state_change hooks.
-	// there are no ops for them, so we need to keep track of the size of the data block,
-	// and call them when we are at the end.
 	const char *data = reinterpret_cast<const char *>(fData);
 	size_t pos = 0;
 
