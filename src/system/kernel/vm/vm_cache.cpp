@@ -362,6 +362,9 @@ vm_cache_write_modified(vm_cache *cache, bool fsReenter)
 
 	TRACE(("vm_cache_write_modified(cache = %p)\n", cache));
 
+	if (cache->temporary)
+		return B_OK;
+
 	mutex_lock(&cache->lock);
 	status = vm_page_write_modified(cache, fsReenter);
 	mutex_unlock(&cache->lock);

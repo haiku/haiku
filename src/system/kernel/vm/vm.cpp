@@ -2389,7 +2389,9 @@ vm_map_page(vm_area *area, vm_page *page, addr_t address, uint32 protection)
 
 	map->ops->unlock(map);
 
-	vm_page_set_state(page, PAGE_STATE_ACTIVE);
+	if (page->state != PAGE_STATE_MODIFIED)
+		vm_page_set_state(page, PAGE_STATE_ACTIVE);
+
 	return B_OK;
 }
 
@@ -3570,13 +3572,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 		for (;;) {
 			page = vm_cache_lookup_page(cache, cacheOffset);
 			if (page != NULL && page->state != PAGE_STATE_BUSY) {
-				// Note: We set the page state to busy, but we don't need a
-				// condition variable here, since we keep the cache locked
-				// till we mark the page unbusy again (in fault_get_page()
-				// the source page, or in vm_soft_fault() when mapping the
-				// page), so no one will ever know the page was busy in the
-				// first place.
-				vm_page_set_state(page, PAGE_STATE_BUSY);
+				// we found the page
 				break;
 			}
 			if (page == NULL || page == &dummyPage)
@@ -3861,7 +3857,8 @@ if (cacheOffset == 0x12000)
 		map->ops->put_physical_page((addr_t)source);
 		map->ops->put_physical_page((addr_t)dest);
 
-		vm_page_set_state(sourcePage, PAGE_STATE_ACTIVE);
+		if (sourcePage->state != PAGE_STATE_MODIFIED)
+			vm_page_set_state(sourcePage, PAGE_STATE_ACTIVE);
 
 		mutex_unlock(&cache->lock);
 		mutex_lock(&topCache->lock);
