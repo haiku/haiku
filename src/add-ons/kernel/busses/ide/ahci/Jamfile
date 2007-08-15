@@ -1,7 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel busses ide ahci ;
-
-UsePrivateHeaders kernel ;
-
-KernelAddon ahci :
-	ahci.c
-	;
