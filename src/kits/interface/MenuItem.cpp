@@ -442,12 +442,17 @@ BMenuItem::Draw()
 	bool enabled = IsEnabled();
 	bool selected = IsSelected();
 
-	rgb_color noTint = ui_color(B_MENU_BACKGROUND_COLOR);
+//	rgb_color noTint = ui_color(B_MENU_BACKGROUND_COLOR);
+// TODO: the above is currently broken, because ui_color is
+// not informed of changes to the app_server palette yet
+	rgb_color noTint = fSuper->LowColor();
 	rgb_color bgColor = noTint;
 
 	// set low color and fill background if selected
 	if (selected && (enabled || Submenu()) /*&& fSuper->fRedrawAfterSticky*/) {
-		bgColor = ui_color(B_MENU_SELECTED_BACKGROUND_COLOR);
+//		bgColor = ui_color(B_MENU_SELECTED_BACKGROUND_COLOR);
+// see above
+		bgColor = tint_color(bgColor, B_DARKEN_3_TINT);
 		fSuper->SetLowColor(bgColor);
 		fSuper->FillRect(Frame(), B_SOLID_LOW);
 	} else
@@ -478,6 +483,8 @@ BMenuItem::Draw()
 		if (Submenu())
 			_DrawSubmenuSymbol(bgColor);
 	}
+
+	fSuper->SetLowColor(noTint);
 }
 
 
@@ -699,7 +706,7 @@ BMenuItem::_DrawShortcutSymbol()
 	BFont font;
 	menu->GetFont(&font);
 	BPoint where = ContentLocation();
-	where.x = fBounds.right - font.Size();	
+	where.x = fBounds.right - font.Size();
 	if (menu->fSubmenus)
 		where.x -= fBounds.Height() - 4;
 

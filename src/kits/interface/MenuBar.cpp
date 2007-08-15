@@ -152,15 +152,17 @@ BMenuBar::Draw(BRect updateRect)
 	// Restore the background of the previously selected menuitem
 	DrawBackground(bounds & updateRect);
 
-	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_LIGHTEN_2_TINT));
+	rgb_color noTint = LowColor();
+
+	SetHighColor(tint_color(noTint, B_LIGHTEN_2_TINT));
 	StrokeLine(BPoint(0.0f, bounds.bottom - 2.0f), BPoint(0.0f, 0.0f));
 	StrokeLine(BPoint(bounds.right, 0.0f));
 
-	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_1_TINT));
+	SetHighColor(tint_color(noTint, B_DARKEN_1_TINT));
 	StrokeLine(BPoint(1.0f, bounds.bottom - 1.0f),
 		BPoint(bounds.right, bounds.bottom - 1.0f));
 
-	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));
+	SetHighColor(tint_color(noTint, B_DARKEN_2_TINT));
 	StrokeLine(BPoint(0.0f, bounds.bottom), BPoint(bounds.right, bounds.bottom));
 	StrokeLine(BPoint(bounds.right, 0.0f), BPoint(bounds.right, bounds.bottom));
 

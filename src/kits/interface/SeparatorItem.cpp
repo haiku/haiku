@@ -12,6 +12,7 @@
 
 
 #include <SeparatorItem.h>
+#include <Font.h>
 
 
 BSeparatorItem::BSeparatorItem()
@@ -61,10 +62,14 @@ void
 BSeparatorItem::GetContentSize(float* _width, float* _height)
 {
 	if (_width != NULL)
-		*_width = 2.0f;
+		*_width = 2.0;
 
-	if (_height != NULL)
-		*_height = 8.0f;
+	if (_height != NULL) {
+		BFont font(be_plain_font);
+		if (Menu())
+			Menu()->GetFont(&font);
+		*_height = floorf(font.Size() * 0.8);
+	}
 }
 
 
@@ -77,11 +82,14 @@ BSeparatorItem::Draw()
 
 	BRect bounds = Frame();
 	rgb_color oldColor = menu->HighColor();
+	rgb_color lowColor = menu->LowColor();
 
-	menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_1_TINT));
-	menu->StrokeLine(BPoint(bounds.left + 1.0f, bounds.top + 4.0f), BPoint(bounds.right - 1.0f, bounds.top + 4.0f));
-	menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_LIGHTEN_2_TINT));
-	menu->StrokeLine(BPoint(bounds.left + 1.0f, bounds.top + 5.0f), BPoint(bounds.right - 1.0f, bounds.top + 5.0f));
+	menu->SetHighColor(tint_color(lowColor, B_DARKEN_1_TINT));
+	menu->StrokeLine(BPoint(bounds.left + 1.0f, bounds.top + 4.0f),
+		BPoint(bounds.right - 1.0f, bounds.top + 4.0f));
+	menu->SetHighColor(tint_color(lowColor, B_LIGHTEN_2_TINT));
+	menu->StrokeLine(BPoint(bounds.left + 1.0f, bounds.top + 5.0f),
+		BPoint(bounds.right - 1.0f, bounds.top + 5.0f));
 
 	menu->SetHighColor(oldColor);
 }

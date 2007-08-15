@@ -146,7 +146,7 @@ _BMCMenuBar_::Draw(BRect updateRect)
 	bounds.bottom += 1.0;
 
 	// prepare some colors
-	rgb_color normalNoTint = ui_color(B_MENU_BACKGROUND_COLOR);
+	rgb_color normalNoTint = LowColor();
 	rgb_color noTint = tint_color(normalNoTint, 0.74);
 	rgb_color darken4;
 	rgb_color normalDarken4;
