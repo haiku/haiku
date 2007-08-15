@@ -92,8 +92,10 @@ TBarWindow::TBarWindow()
 void
 TBarWindow::DispatchMessage(BMessage *message, BHandler *handler)
 {
-	// ToDo: check if the two following lines are doing anything...
-	if (message->what == B_MOUSE_DOWN) 
+	// Activate the window when you click on it (ie. on the tray area,
+	// the menu part will do this automatically)
+	if (message->what == B_MOUSE_DOWN
+		&& !((TBarApp *)be_app)->Settings()->autoRaise) 
 		Activate(true);
 
 	BWindow::DispatchMessage(message, handler);
