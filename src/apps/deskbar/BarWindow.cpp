@@ -137,6 +137,10 @@ TBarWindow::MenusBeginning()
 	sBeMenu->NeedsToRebuild();
 	sBeMenu->ResetTargets();
 
+	fBarView->SetEventMask(0);
+		// This works around a BeOS bug - the menu is quit with every
+		// B_MOUSE_DOWN the window receives...
+
 	BWindow::MenusBeginning();
 }
 
@@ -151,6 +155,8 @@ TBarWindow::MenusEnded()
 		sBeMenu->RemoveItems(0, sBeMenu->CountItems(), true);
 		sBeMenu->UnlockLooper();
 	}
+
+	fBarView->UpdateAutoRaise();
 }
 
 
