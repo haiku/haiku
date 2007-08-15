@@ -550,8 +550,11 @@ init_hardware(void)
 		|| (info.vendor_id == NVIDIA_VENDOR_ID &&
 			(info.device_id == NVIDIA_nForce_AC97_DEVICE_ID
 			|| info.device_id == NVIDIA_nForce2_AC97_DEVICE_ID
+			|| info.device_id == NVIDIA_nForce2_400_AC97_DEVICE_ID
 			|| info.device_id == NVIDIA_nForce3_AC97_DEVICE_ID
-			|| info.device_id == NVIDIA_nF3_250_AC97_DEVICE_ID
+			|| info.device_id == NVIDIA_nForce3_250_AC97_DEVICE_ID
+			|| info.device_id == NVIDIA_nForce4_AC97_DEVICE_ID
+			|| info.device_id == NVIDIA_nForce430_AC97_DEVICE_ID
 			)) 
 		|| (info.vendor_id == AMD_VENDOR_ID &&
 			(info.device_id == AMD_AMD8111_AC97_DEVICE_ID
@@ -792,8 +795,11 @@ init_driver(void)
 		|| (info.vendor_id == NVIDIA_VENDOR_ID &&
 			(info.device_id == NVIDIA_nForce_AC97_DEVICE_ID
 			|| info.device_id == NVIDIA_nForce2_AC97_DEVICE_ID
+			|| info.device_id == NVIDIA_nForce2_400_AC97_DEVICE_ID
 			|| info.device_id == NVIDIA_nForce3_AC97_DEVICE_ID
-			|| info.device_id == NVIDIA_nF3_250_AC97_DEVICE_ID
+			|| info.device_id == NVIDIA_nForce3_250_AC97_DEVICE_ID
+			|| info.device_id == NVIDIA_nForce4_AC97_DEVICE_ID
+			|| info.device_id == NVIDIA_nForce430_AC97_DEVICE_ID
 			)) 
 		|| (info.vendor_id == AMD_VENDOR_ID &&
 			(info.device_id == AMD_AMD8111_AC97_DEVICE_ID
