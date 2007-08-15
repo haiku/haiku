@@ -25,6 +25,7 @@
 #include <input_globals.h>
 #include <AppMisc.h>
 #include <ApplicationPrivate.h>
+#include <AppServerLink.h>
 #include <DirectMessageTarget.h>
 #include <InputServerTypes.h>
 #include <MenuPrivate.h>
@@ -268,7 +269,7 @@ BWindow::Shortcut::PrepareKey(uint32 key)
 
 
 BWindow::BWindow(BRect frame, const char* title, window_type type,
-	uint32 flags, uint32 workspace)
+		uint32 flags, uint32 workspace)
 	: BLooper(title, B_DISPLAY_PRIORITY)
 {
 	window_look look;
@@ -279,8 +280,8 @@ BWindow::BWindow(BRect frame, const char* title, window_type type,
 }
 
 
-BWindow::BWindow(BRect frame, const char* title, window_look look, window_feel feel,
-	uint32 flags, uint32 workspace)
+BWindow::BWindow(BRect frame, const char* title, window_look look,
+		window_feel feel, uint32 flags, uint32 workspace)
 	: BLooper(title, B_DISPLAY_PRIORITY)
 {
 	_InitData(frame, title, look, feel, flags, workspace);
@@ -852,10 +853,9 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 							height = nextHeight;
 
 						MessageQueue()->RemoveMessage(pendingMessage);
-						// TODO: the BeBook says that MessageQueue::RemoveMessage() deletes the message!
 						delete pendingMessage;
-						// this deletes the first *additional* message
-						// fCurrentMessage is safe
+							// this deletes the first *additional* message
+							// fCurrentMessage is safe
 					} else {
 						MessageQueue()->RemoveMessage(pendingMessage);
 					}
@@ -1798,25 +1798,7 @@ BWindow::SetTitle(const char *title)
 	free(fTitle);
 	fTitle = strdup(title);
 
-	// we will change BWindow's thread name to "w>window title"	
-
-	char threadName[B_OS_NAME_LENGTH];
-	strcpy(threadName, "w>");
-#ifdef __HAIKU__
-	strlcat(threadName, title, B_OS_NAME_LENGTH);
-#else
-	int32 length = strlen(title);
-	length = min_c(length, B_OS_NAME_LENGTH - 3);
-	memcpy(threadName + 2, title, length);
-	threadName[length + 2] = '\0';
-#endif
-
-	// change the handler's name
-	SetName(threadName);
-
-	// if the message loop has been started...
-	if (Thread() >= B_OK)
-		rename_thread(Thread(), threadName);
+	_SetName(title);
 
 	// we notify the app_server so we can actually see the change
 	if (Lock()) {
@@ -2367,9 +2349,10 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 
 	if (title == NULL)
 		title = "";
-// TODO: Where's da "w>"?
+
 	fTitle = strdup(title);
-	SetName(title);
+
+	_SetName(title);
 
 	fFeel = feel;
 	fLook = look;
@@ -2441,69 +2424,90 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 
 	STRACE(("BWindow::InitData(): contacting app_server...\n"));
 
-	// HERE we are in BApplication's thread, so for locking we use be_app variable
-	// we'll lock the be_app to be sure we're the only one writing at BApplication's server port
-	bool locked = false;
-	if (!be_app->IsLocked()) {
-// TODO: This doesn't look good. If a window is created in the message handling
-// code of another window, then the lock of that other window is already being
-// held. So, if the application tries to lock that window from its message
-// handling code, we get a beautiful deadlock. Start Icon-O-Matic, quit it, and
-// start it a second time to see that in action.
-		be_app->Lock();
-		locked = true; 
-	}
-
 	// let app_server know that a window has been created.
 	fLink = new BPrivate::PortLink(
 		BApplication::Private::ServerLink()->SenderPort(), receivePort);
 
-	if (bitmapToken < 0) {
-		fLink->StartMessage(AS_CREATE_WINDOW);
-	} else {
-		fLink->StartMessage(AS_CREATE_OFFSCREEN_WINDOW);
-		fLink->Attach<int32>(bitmapToken);
+	{
+		BPrivate::AppServerLink lockLink;
+			// we're talking to the server application using our own 
+			// communication channel (fLink) - we better make sure no one
+			// interferes by locking that channel (which AppServerLink does
+			// implicetly)
+
+		if (bitmapToken < 0) {
+			fLink->StartMessage(AS_CREATE_WINDOW);
+		} else {
+			fLink->StartMessage(AS_CREATE_OFFSCREEN_WINDOW);
+			fLink->Attach<int32>(bitmapToken);
+		}
+
+		fLink->Attach<BRect>(fFrame);
+		fLink->Attach<uint32>((uint32)fLook);
+		fLink->Attach<uint32>((uint32)fFeel);
+		fLink->Attach<uint32>(fFlags);
+		fLink->Attach<uint32>(workspace);
+		fLink->Attach<int32>(_get_object_token_(this));
+		fLink->Attach<port_id>(receivePort);
+		fLink->Attach<port_id>(fMsgPort);
+		fLink->AttachString(title);
+
+		port_id sendPort;
+		int32 code;
+		if (fLink->FlushWithReply(code) == B_OK
+			&& code == B_OK
+			&& fLink->Read<port_id>(&sendPort) == B_OK) {
+			// read the frame size and its limits that were really
+			// enforced on the server side
+
+			fLink->Read<BRect>(&fFrame);
+			fLink->Read<float>(&fMinWidth);
+			fLink->Read<float>(&fMaxWidth);
+			fLink->Read<float>(&fMinHeight);
+			fLink->Read<float>(&fMaxHeight);
+
+			fMaxZoomWidth = fMaxWidth;
+			fMaxZoomHeight = fMaxHeight;
+		} else
+			sendPort = -1;
+
+		// Redirect our link to the new window connection
+		fLink->SetSenderPort(sendPort);
 	}
-
-	fLink->Attach<BRect>(fFrame);
-	fLink->Attach<uint32>((uint32)fLook);
-	fLink->Attach<uint32>((uint32)fFeel);
-	fLink->Attach<uint32>(fFlags);
-	fLink->Attach<uint32>(workspace);
-	fLink->Attach<int32>(_get_object_token_(this));
-	fLink->Attach<port_id>(receivePort);
-	fLink->Attach<port_id>(fMsgPort);
-	fLink->AttachString(title);
-
-	port_id sendPort;
-	int32 code;
-	if (fLink->FlushWithReply(code) == B_OK
-		&& code == B_OK
-		&& fLink->Read<port_id>(&sendPort) == B_OK) {
-		// read the frame size and its limits that were really
-		// enforced on the server side
-
-		fLink->Read<BRect>(&fFrame);
-		fLink->Read<float>(&fMinWidth);
-		fLink->Read<float>(&fMaxWidth);
-		fLink->Read<float>(&fMinHeight);
-		fLink->Read<float>(&fMaxHeight);
-
-		fMaxZoomWidth = fMaxWidth;
-		fMaxZoomHeight = fMaxHeight;
-	} else
-		sendPort = -1;
-
-	// Redirect our link to the new window connection
-	fLink->SetSenderPort(sendPort);
-
-	if (locked)
-		be_app->Unlock();
 
 	STRACE(("Server says that our send port is %ld\n", sendPort));
 	STRACE(("Window locked?: %s\n", IsLocked() ? "True" : "False"));
 
 	_CreateTopView();
+}
+
+
+//! Rename the handler and its thread
+void
+BWindow::_SetName(const char *title)
+{
+	if (title == NULL)
+		title = "";
+
+	// we will change BWindow's thread name to "w>window title"	
+
+	char threadName[B_OS_NAME_LENGTH];
+	strcpy(threadName, "w>");
+#ifdef __HAIKU__
+	strlcat(threadName, title, B_OS_NAME_LENGTH);
+#else
+	int32 length = strlen(title);
+	length = min_c(length, B_OS_NAME_LENGTH - 3);
+	memcpy(threadName + 2, title, length);
+	threadName[length + 2] = '\0';
+#endif
+
+	// change the handler's name
+	SetName(threadName);
+
+	// if the message loop has been started...
+	if (Thread() >= B_OK)
+		rename_thread(Thread(), threadName);
 }
 
 

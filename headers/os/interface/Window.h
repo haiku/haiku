@@ -335,6 +335,7 @@ private:
 			void				_AdoptResize();
 			void				_SetFocus(BView* focusView,
 										  bool notifyIputServer = false);
+			void				_SetName(const char* title);
 
 			Shortcut*			_FindShortcut(uint32 key, uint32 modifiers);
 			BView*				_FindView(BView* view, BPoint point) const;
