@@ -9,7 +9,7 @@
 #include <arch_config.h>
 #include <image.h>
 #include <OS.h>
-#include <storage/DiskDeviceDefs.h>
+#include <DiskDeviceDefs.h>
 
 #include <signal.h>
 

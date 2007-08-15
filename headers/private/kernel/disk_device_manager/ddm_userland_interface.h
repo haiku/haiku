@@ -5,7 +5,7 @@
 
 #include <OS.h>
 
-#include <storage/DiskDeviceDefs.h>
+#include <DiskDeviceDefs.h>
 
 #include <disk_device_manager.h>
 
