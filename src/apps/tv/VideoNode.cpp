@@ -429,7 +429,7 @@ VideoNode::CreateBuffers(BRect frame, color_space cspace, bool overlay)
 		printf("VideoNode::CreateBuffers failed\n");
 		return B_ERROR;
 	}
-	printf("overlay bitmap: got: bytes per row: %d\n", fBitmap->BytesPerRow());
+	printf("overlay bitmap: got: bytes per row: %ld\n", fBitmap->BytesPerRow());
 	fOverlayActive = overlay;
 	UnlockBitmap();
 	printf("VideoNode::CreateBuffers success\n");
