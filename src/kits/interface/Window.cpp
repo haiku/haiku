@@ -2212,7 +2212,7 @@ void
 BWindow::Show()
 {
 	if (!fRunCalled) {
-		// this is the fist time Show() is called, which implicetly runs the looper
+		// this is the fist time Show() is called, which implicitly runs the looper
 		if (fLink->SenderPort() < B_OK) {
 			// We don't have valid app_server connection; there is no point
 			// in starting our looper
@@ -2445,6 +2445,11 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 	// we'll lock the be_app to be sure we're the only one writing at BApplication's server port
 	bool locked = false;
 	if (!be_app->IsLocked()) {
+// TODO: This doesn't look good. If a window is created in the message handling
+// code of another window, then the lock of that other window is already being
+// held. So, if the application tries to lock that window from its message
+// handling code, we get a beautiful deadlock. Start Icon-O-Matic, quit it, and
+// start it a second time to see that in action.
 		be_app->Lock();
 		locked = true; 
 	}
