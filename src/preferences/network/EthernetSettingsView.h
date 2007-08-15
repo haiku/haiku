@@ -11,6 +11,7 @@
 #ifndef ETHERNET_SETTINGS_VIEW_H
 #define ETHERNET_SETTINGS_VIEW_H
 
+#include "settings.h"
 #include <ObjectList.h>
 #include <View.h>
 
@@ -46,6 +47,8 @@ class EthernetSettingsView : public BView {
 		BTextControl* fPrimaryDNSTextControl;
 		BTextControl* fSecondaryDNSTextControl;
 		BObjectList<BString> fInterfaces;
+		BObjectList<Settings> fSettings;
+
 		int32	fStatus;
 		int		fSocket;
 		void	_GatherInterfaces();

@@ -10,6 +10,7 @@
  */
 
 #include "EthernetSettingsView.h"
+#include "settings.h"
 
 #include <Application.h>
 #include <Alert.h>
@@ -64,8 +65,7 @@ EthernetSettingsView::_PrepareRequest(struct ifreq& request, const char* name)
 }
 
 void
-EthernetSettingsView::_GatherInterfaces()
-{
+EthernetSettingsView::_GatherInterfaces() {
 	// iterate over all interfaces and retrieve minimal status
 
 	ifconf config;
@@ -94,6 +94,7 @@ EthernetSettingsView::_GatherInterfaces()
 		if (strncmp(interface->ifr_name, "loop", 4) && interface->ifr_name[0])
 		{
 			fInterfaces.AddItem(new BString(interface->ifr_name));
+			fSettings.AddItem(new Settings(interface->ifr_name));
 			
 		}
 
@@ -130,6 +131,7 @@ EthernetSettingsView::EthernetSettingsView(BRect rect)
 	
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
+	fSettings.MakeEmpty();
 	fSocket = socket(AF_INET, SOCK_DGRAM, 0);
 	_GatherInterfaces();
 	
@@ -236,122 +238,36 @@ EthernetSettingsView::_ShowConfiguration(BMessage* message)
  	const char* name;
 	if (message->FindString("interface", &name) != B_OK)
 		return;
-
-	ifreq request;
-	if (!_PrepareRequest(request, name))
-		return;
-
-	BString text = "dummy";
-	char address[32];
-	sockaddr_in* inetAddress = NULL;
 	
-	// Obtain IP.	
-	if (ioctl(fSocket, SIOCGIFADDR, &request,
-			sizeof(request)) < 0) {
-		return;
-	}
-
-	inetAddress = (sockaddr_in*)&request.ifr_addr;
-	if (inet_ntop(AF_INET, &inetAddress->sin_addr, address,
-				sizeof(address)) == NULL) {
+	int i;
+	for (i=0; i<fSettings.CountItems();i++) {
+		if (strcmp(fSettings.ItemAt(i)->GetName(), name) == 0) {
+			fIPTextControl->SetText(fSettings.ItemAt(i)->GetIP());
+			fGatewayTextControl->SetText(fSettings.ItemAt(i)->GetGateway());
+			fNetMaskTextControl->SetText(fSettings.ItemAt(i)->GetNetmask());
+			
+			
+			
+			if (fSettings.ItemAt(i)->fNameservers.CountItems() == 2) {
+				fSecondaryDNSTextControl->SetText(
+					fSettings.ItemAt(i)->fNameservers.ItemAt(1)->String());
+			} 
+			
+			if (fSettings.ItemAt(i)->fNameservers.CountItems() >= 1) {
+				fPrimaryDNSTextControl->SetText(
+						fSettings.ItemAt(i)->fNameservers.ItemAt(0)->String());
+			}
+		} else {
 			return;
 		}
-		
-	fIPTextControl->SetText(address);
-	
-	// Obtain netmask.
-	if (ioctl(fSocket, SIOCGIFNETMASK, &request,
-			sizeof(request)) < 0) {
-		return;
 	}
 	
-	inetAddress = (sockaddr_in*)&request.ifr_mask;
-	if (inet_ntop(AF_INET, &inetAddress->sin_addr, address,
-				sizeof(address)) == NULL) {
-			return;
-		}
-		
-	fNetMaskTextControl->SetText(address);
-	
-	// Obtain gateway
-	
-	char* gwAddress;
-	ifconf config;
-	config.ifc_len = sizeof(config.ifc_value);
-	if (ioctl(fSocket, SIOCGRTSIZE, &config, sizeof(struct ifconf)) < 0)
-		return;
-		
-	uint32 size = (uint32)config.ifc_value;
-	if (size == 0)
-		return;
-	
-	void *buffer = malloc(size);
-	if (buffer == NULL)
-		return;
-	
-	config.ifc_len = size;
-	config.ifc_buf = buffer;
-	
-	if (ioctl(fSocket, SIOCGRTTABLE, &config, sizeof(struct ifconf)) < 0) {
-		free(buffer);
-		return;
-	}
-		
-	ifreq *interface = (ifreq *)buffer;
-	ifreq *end = (ifreq *)((uint8 *)buffer + size);
-	
-	
-	while (interface < end) {
-		route_entry& route = interface->ifr_route;
-	
-		
-		if (route.flags & RTF_GATEWAY) {
-			inetAddress = (sockaddr_in *)route.gateway;
-					
-			
-			gwAddress = inet_ntoa(inetAddress->sin_addr);
-			fGatewayTextControl->SetText(gwAddress);
-		}
-		
-		int32 addressSize = 0;
-		if (route.destination != NULL)
-			addressSize += route.destination->sa_len;
-		if (route.mask != NULL)
-			addressSize += route.mask->sa_len;
-		if (route.gateway != NULL)
-			addressSize += route.gateway->sa_len;
-			
-		interface = (ifreq *)((addr_t)interface + 
-			IF_NAMESIZE + sizeof(route_entry) + addressSize);
-	
-	}
-	
-	free(buffer);
 	
 	// Obtain DNS
 	
-	//resolv.conf is always actual.
-	BFile file;
-	BString* line;
-	int i = 0;
-	char* ch = "0";
 	
-	if (file.SetTo("/etc/resolv.conf", B_READ_ONLY) != B_OK)
-		return;
-		
-	off_t length;
 	
-	file.GetSize(&length);
-	
-	/* 
-	The idea here is to iterate over resolv.conf
-	and look for the nameservers.
-	
-	Both netserver and DHCPClient will write to resolv.conf
-	so we can trust that the information on the file is actual.
-	
-	I need help with this routine :$
-	*/
+
 	
 
 	

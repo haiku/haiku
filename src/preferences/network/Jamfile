@@ -6,9 +6,10 @@ UsePrivateHeaders shared ;
 
 Preference Network :
 	EthernetSettingsWindow.cpp
+	settings.cpp
 	EthernetSettingsView.cpp
 	EthernetSettings.cpp
-	: be root $(TARGET_NETWORK_LIBS)
+	: be root $(HAIKU_NETWORK_LIBS)
 	;
 
 Package haiku-networksettings :
