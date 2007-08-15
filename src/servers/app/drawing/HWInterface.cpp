@@ -382,18 +382,20 @@ HWInterface::HideOverlay(Overlay* overlay)
 bool
 HWInterface::HideSoftwareCursor(const BRect& area)
 {
+	if (!fSoftwareCursorLock.Lock())
+		return false;
 	if (fCursorAreaBackup && !fCursorAreaBackup->cursor_hidden) {
 		BRect backupArea(fCursorAreaBackup->left,
 						 fCursorAreaBackup->top,
 						 fCursorAreaBackup->right,
 						 fCursorAreaBackup->bottom);
 		if (area.Intersects(backupArea)) {
-			fSoftwareCursorLock.Lock();
 			_RestoreCursorArea();
 			// do not unlock the cursor lock
 			return true;
 		}
 	}
+	fSoftwareCursorLock.Unlock();
 	return false;
 }
 
