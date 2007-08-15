@@ -1639,7 +1639,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 			fShell->Signal(SIGINT);
 	}
 
-	printf("rawKey: %c\n", (char)rawChar);
+	//printf("rawKey: %c\n", (char)rawChar);
 
 	// Terminal filters RET, ENTER, F1...F12, and ARROW key code.
 	// TODO: Cleanup
