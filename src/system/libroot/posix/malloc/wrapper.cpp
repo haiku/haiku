@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku Inc.
+ * Copyright 2002-2007, Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 
@@ -260,7 +260,8 @@ extern "C" void *
 memalign(size_t alignment, size_t size)
 {
 	static processHeap *pHeap = getAllocator();
-	void *addr = pHeap->getHeap(pHeap->getHeapIndex()).memalign(alignment, size);
+	void *addr = pHeap->getHeap(pHeap->getHeapIndex()).memalign(alignment,
+		size);
 	if (addr == NULL) {
 		errno = B_NO_MEMORY;
 		return NULL;
@@ -275,14 +276,23 @@ memalign(size_t alignment, size_t size)
 
 
 extern "C" int
-posix_memalign(void **memptr, size_t alignment, size_t size)
+posix_memalign(void **_pointer, size_t alignment, size_t size)
 {
-	if (!memptr)
-		return EINVAL;
-	*memptr = memalign(alignment, size);
-	if (memptr == NULL)
-		return ENOMEM;
-	return 0;
+	if ((alignment & 3) != 0 || _pointer == NULL)
+		return B_BAD_VALUE;
+
+	static processHeap *pHeap = getAllocator();
+	void *pointer = pHeap->getHeap(pHeap->getHeapIndex()).memalign(alignment,
+		size);
+	if (pointer == NULL)
+		return NULL;
+
+#if HEAP_LEAK_CHECK
+	add_address(pointer, size);
+#endif
+
+	*_pointer = pointer;
+	return 0;	
 }
 
 

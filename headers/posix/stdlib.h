@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2007, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _STDLIB_H_
@@ -45,11 +45,11 @@ extern "C" {
 #endif
 
 /* memory allocation (see malloc.h for additional defines & prototypes) */
-extern void		*calloc(size_t nmemb, size_t size);
+extern void		*calloc(size_t numElements, size_t size);
 extern void		free(void *pointer);
 extern void		*malloc(size_t size);
-extern void		*realloc(void * ptr, size_t size);
-extern int 		posix_memalign(void **memptr, size_t alignment, size_t size);
+extern int		posix_memalign(void **_pointer, size_t alignment, size_t size);
+extern void		*realloc(void *oldPointer, size_t newSize);
 
 /* process termination */
 extern void		abort(void);
