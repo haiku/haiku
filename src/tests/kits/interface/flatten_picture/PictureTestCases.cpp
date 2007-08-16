@@ -355,7 +355,6 @@ static void testConstrainClippingRegion(BView *view, BRect frame)
 static void testClipToPicture(BView *view, BRect frame) 
 {
 	frame.InsetBy(2, 2);
-	
 	view->BeginPicture(new BPicture());
 	view->FillEllipse(frame);
 	BPicture *picture = view->EndPicture();
@@ -519,6 +518,20 @@ static void testSetScale3(BView *view, BRect frame)
 	// from test testSetScaling
 }
 
+static void testSetOriginAndScale(BView *view, BRect frame)
+{
+	frame.InsetBy(2, 2);
+	BPoint center = centerPoint(frame);
+	
+	BRect r(0, 0, frame.IntegerWidth() / 2, frame.IntegerHeight() / 2);
+	view->SetOrigin(center);
+	view->FillRect(r);
+	
+	view->SetScale(0.5);
+	view->SetHighColor(kRed);
+	view->FillRect(r);
+}
+
 static void testSetFontSize(BView *view, BRect frame)
 {
 	frame.InsetBy(2, 2);
@@ -590,6 +603,7 @@ TestCase gTestCases[] = {
 	// rectangle are twice as large as the direct draw version
 	{ "Test SetScale2*", testSetScale2 },
 	{ "Test SetScale3", testSetScale3 },
+	{ "Test SetOriginAndScale", testSetOriginAndScale },
 	{ "Test SetFontSize", testSetFontSize },
 	{ NULL, NULL }
 };
