@@ -11,6 +11,7 @@
 
 namespace BPrivate {
 	class ServerLink;
+	class PicturePlayer;
 };
 
 
@@ -75,9 +76,9 @@ virtual	void			_ReservedShape3();
 virtual	void			_ReservedShape4();
 
 		friend class	BShapeIterator;
-		friend class	PicturePlayer;
 		friend class	BView;
 		friend class	BFont;
+		friend class	BPrivate::PicturePlayer;
 		friend class	BPrivate::ServerLink;
 
 		void			GetData(int32 *opCount, int32 *ptCount, uint32 **opList, BPoint **ptList);

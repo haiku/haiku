@@ -4,14 +4,14 @@
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
- *		Stefano Ceccherini (burton666@libero.it)
+ *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  *		Marcus Overhagen (marcus@overhagen.de)
  */
 
 /**	PicturePlayer is used to play picture data. */
 
-#ifndef	_TPICTURE_H
-#define	_TPICTURE_H
+#ifndef	_PICTUREPLAYER_H
+#define	_PICTUREPLAYER_H
 
 
 #include <GraphicsDefs.h>
@@ -20,20 +20,13 @@
 #include <DataIO.h>
 
 
+namespace BPrivate {
+
 class PicturePlayer {
 public:
 					PicturePlayer();
 					PicturePlayer(const void *data, size_t size, BList *pictures);
 virtual				~PicturePlayer();
-
-		void		BeginOp(int32);
-		void		EndOp();
-
-		void		EnterStateChange();
-		void		ExitStateChange();
-
-		void		EnterFontChange();
-		void		ExitFontChange();
 
 		status_t	Play(void **callBackTable, int32 tableEntries,
 						void *userData);
@@ -44,4 +37,6 @@ private:
 		BList		*fPictures;
 };
 
-#endif // _TPICTURE_H
+}; // namespace BPrivate
+
+#endif // _PICTUREPLAYER_H

@@ -908,7 +908,7 @@ ServerPicture::Play(ViewLayer *view)
 	if (mallocIO == NULL)
 		return;
 
-	PicturePlayer player(mallocIO->Buffer(), mallocIO->BufferLength(), fPictures);
+	BPrivate::PicturePlayer player(mallocIO->Buffer(), mallocIO->BufferLength(), fPictures);
 	player.Play(const_cast<void **>(kTableEntries), sizeof(kTableEntries) / sizeof(void *), view);
 }
 

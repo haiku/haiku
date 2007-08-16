@@ -18,6 +18,8 @@
 
 #include <Shape.h>
 
+using BPrivate::PicturePlayer;
+
 typedef void (*fnc)(void*);
 typedef void (*fnc_BPoint)(void*, BPoint);
 typedef void (*fnc_BPointBPoint)(void*, BPoint, BPoint);
@@ -47,59 +49,6 @@ static void
 nop()
 {
 }
-
-
-static void *
-kDummyTable[kOpsTableSize] = {
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop,
-	(void *)nop
-};
 
 
 #if DEBUG
@@ -193,11 +142,26 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 	// If the caller supplied a function table smaller than needed,
 	// we use our dummy table, and copy the supported ops from the supplied one.
 	void **functionTable = callBackTable;
+	void *dummyTable[kOpsTableSize] = {
+		(void *)nop, (void *)nop, (void *)nop, (void *)nop,
+		(void *)nop, (void *)nop, (void *)nop, (void *)nop,
+		(void *)nop, (void *)nop, (void *)nop, (void *)nop,
+		(void *)nop, (void *)nop, (void *)nop, (void *)nop,
+		(void *)nop, (void *)nop, (void *)nop, (void *)nop,
+		(void *)nop, (void *)nop, (void *)nop, (void *)nop,
+		(void *)nop, (void *)nop, (void *)nop, (void *)nop,
+		(void *)nop, (void *)nop, (void *)nop, (void *)nop,
+		(void *)nop, (void *)nop, (void *)nop, (void *)nop,
+		(void *)nop, (void *)nop, (void *)nop, (void *)nop,
+		(void *)nop, (void *)nop, (void *)nop, (void *)nop,
+		(void *)nop, (void *)nop, (void *)nop, (void *)nop
+	};
+
 	if ((uint32)tableEntries < kOpsTableSize) {
 #if DEBUG
 		fprintf(file, "A smaller than needed function table was supplied.\n");
 #endif
-		functionTable = kDummyTable;
+		functionTable = dummyTable;
 		memcpy(functionTable, callBackTable, (kOpsTableSize - tableEntries) * sizeof(void *));		
 	}
 

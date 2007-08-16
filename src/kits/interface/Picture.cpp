@@ -252,7 +252,7 @@ BPicture::Play(void **callBackTable, int32 tableEntries, void *user)
 	if (!_AssertLocalCopy())
 		return B_ERROR;
 
-	PicturePlayer player(extent->Data(), extent->Size(), extent->Pictures());
+	BPrivate::PicturePlayer player(extent->Data(), extent->Size(), extent->Pictures());
 
 	return player.Play(callBackTable, tableEntries, user);
 }
