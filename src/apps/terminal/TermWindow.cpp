@@ -418,7 +418,8 @@ TermWindow::MessageReceived(BMessage *message)
 				BScreen screen(this);
 				_ActiveTermView()->ScrollBar()->Hide();
 				fMenubar->Hide();
-				_ActiveTermView()->ResizeBy(B_V_SCROLL_BAR_WIDTH, mbHeight);
+				fTabView->ResizeBy(0, mbHeight);
+				fTabView->MoveBy(0, -mbHeight);
 				fSavedLook = Look();
 				// done before ResizeTo to work around a Dano bug (not erasing the decor)
 				SetLook(B_NO_BORDER_WINDOW_LOOK);
@@ -430,7 +431,8 @@ TermWindow::MessageReceived(BMessage *message)
 				_ActiveTermView()->ScrollBar()->Show();
 				ResizeTo(fSavedFrame.Width(), fSavedFrame.Height());
 				MoveTo(fSavedFrame.left, fSavedFrame.top);
-				_ActiveTermView()->ResizeBy(-B_V_SCROLL_BAR_WIDTH, -mbHeight);
+				fTabView->ResizeBy(0, -mbHeight);
+				fTabView->MoveBy(0, mbHeight);
 				SetLook(fSavedLook);
 				fSavedFrame = BRect(0,0,-1,-1);
 			}
@@ -585,9 +587,10 @@ TermWindow::_AddTab(Arguments *args)
 	fullFont.SetSpacing(B_FIXED_SPACING);
 
 	// Make Terminal text view.
-	int argc;
+	int argc = 0;
 	const char *const *argv = NULL;
-	args->GetShellArguments(argc, argv);
+	if (args != NULL)
+		args->GetShellArguments(argc, argv);
 	
 	// Note: I don't pass the Arguments class directly to the termview,
 	// only to avoid adding it as a dependency: in other words, to keep
@@ -598,7 +601,13 @@ TermWindow::_AddTab(Arguments *args)
 	
 	BScrollView *scrollView = new BScrollView("scrollView", view, B_FOLLOW_ALL,
 					B_WILL_DRAW|B_FRAME_EVENTS, false, true);	
-	fTabView->AddTab(scrollView);
+	
+	BTab *tab = new BTab;
+	// TODO: Use a better name. For example, do like MacOsX's Terminal
+	// and update the title using the last executed command ?
+	// Or like Gnome's Terminal and use the current path ?
+	fTabView->AddTab(scrollView, tab);
+	tab->SetLabel("Terminal");
 	view->SetScrollBar(scrollView->ScrollBar(B_VERTICAL));
 	
 	// TODO: Resize the vertical scrollbar to take the window gripping handle into account

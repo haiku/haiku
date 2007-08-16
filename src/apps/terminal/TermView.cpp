@@ -282,16 +282,21 @@ TermView::TermView(BMessage *archive)
 	if (archive->FindInt32("rows", (int32 *)&fTermRows) < B_OK)
 		fTermRows = 25;
 	
-	const char *argv[] = { "/bin/sh", "--login" };
-
 	// TODO: Retrieve arguments, colors, history size, etc. from archive
-	_InitObject(2, argv);
+	_InitObject(0, NULL);
 }
 
 
 status_t
 TermView::_InitObject(int32 argc, const char **argv)
 {
+	const char *defaultArgv[] = { "/bin/sh", "--login" };
+
+	if (argc == 0 || argv == NULL) {
+		argc = 2;
+		argv = defaultArgv;	
+	}
+	
 	SetTermFont(be_fixed_font, be_fixed_font);
 
 	fTextBuffer = new (std::nothrow) TermBuffer(fTermRows, fTermColumns, fScrBufSize);
