@@ -210,7 +210,7 @@ status_t
 TermApp::_MakeTermWindow(BRect &frame)
 {
 	try {
-		fTermWindow = new TermWindow(frame, fWindowTitle.String(), new Arguments(*fArgs));
+		fTermWindow = new TermWindow(frame, fWindowTitle.String(), fArgs);
 	} catch (int error) {
 		return (status_t)error;	
 	} catch (...) {
