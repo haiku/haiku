@@ -35,6 +35,7 @@
 #include <Window.h>
 
 
+class Arguments;
 class BMenu;
 class BMenuBar;
 class FindWindow;
@@ -43,7 +44,7 @@ class TermView;
 class SmartTabView;
 class TermWindow : public BWindow {
 public:
-	TermWindow(BRect frame, const char* title, const char *command);
+	TermWindow(BRect frame, const char* title, Arguments *args);
 	virtual ~TermWindow();
 
 protected:
@@ -55,11 +56,11 @@ protected:
 
 private:
 	void		_SetTermColors(TermView *termView);
-	void		_InitWindow(const char *command);
+	void		_InitWindow();
 	void		_SetupMenu();
 	status_t	_DoPageSetup();
 	void		_DoPrint();
-	void		_AddTab(const char *command);
+	void		_AddTab(Arguments *args);
 	void		_RemoveTab(int32 index);
 	TermView*	_ActiveTermView();
 	

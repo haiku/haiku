@@ -23,7 +23,7 @@ public:
 			Shell();
 	virtual		~Shell();
 
-	status_t	Open(int row, int col, const char *command, const char *coding);
+	status_t	Open(int row, int col, const char *encoding, int argc, const char **argv);
 	void		Close();
 	
 	const char *	TTYName() const;
@@ -48,7 +48,7 @@ private:
 	TermParse	*fTermParse;
 	bool		fAttached;
 
-	status_t	_Spawn(int row, int col, const char *command, const char *coding);
+	status_t	_Spawn(int row, int col, const char *encoding, int argc, const char **argv);
 };
 
 #endif // _SHELL_H

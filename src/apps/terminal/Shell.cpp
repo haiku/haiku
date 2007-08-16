@@ -80,7 +80,7 @@
 #define	RDEL	0xFF
 
 /* default shell command and options. */
-#define SHELL_COMMAND "/bin/sh -login"
+const char *kDefaultShellCommand = { "/bin/sh" "-login" };
 
 
 /*
@@ -149,12 +149,12 @@ Shell::~Shell()
 
 
 status_t
-Shell::Open(int row, int col, const char *command, const char *encoding)
+Shell::Open(int row, int col, const char *encoding, int argc, const char **argv)
 {
 	if (fFd >= 0)
 		return B_ERROR;
 
-	status_t status = _Spawn(row, col, command, encoding);
+	status_t status = _Spawn(row, col, encoding, argc, argv);
 	if (status < B_OK)
 		return status;
 
@@ -295,7 +295,7 @@ receive_handshake_message(handshake_t& handshake)
 
 
 status_t
-Shell::_Spawn(int row, int col, const char *command, const char *encoding)
+Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **argv)
 {
 	signal(SIGTTOU, SIG_IGN);
 	
@@ -504,54 +504,10 @@ Shell::_Spawn(int row, int col, const char *command, const char *encoding)
 		setenv("TERM", "beterm", true);
 		setenv("TTY", ttyName, true);
 		setenv("TTYPE", encoding, true);
+		setenv("SHELL", *argv, true);
 
-		/*
-		 * If don't set command args, exec SHELL_COMMAND.
-		 */
-		if (command == NULL)
-			command = SHELL_COMMAND;
-		
-		/*
-		 * split up the arguments in the command into an artv-like structure.
-		 */
-		char commandLine[256];
-		memcpy(commandLine, command, 256);
-		char *ptr = commandLine;
-		char *args[16];
-		int i = 0;
-		while (*ptr) {
-			/* Skip white space */
-			while ((*ptr == ' ') || (*ptr == '\t'))
-				*ptr++ = 0;
-				args[i++] = ptr;
 
-			/* Skip over this word to next white space. */
-			while ((*ptr != 0) && (*ptr != ' ') && (*ptr != '\t'))
-			ptr++;
-		}
-
-		args[i] = NULL;
-
-		setenv("SHELL", *args, true);
-
-#if 0
-		/*
-		 * Print Welcome Message.
-		 * (But, Only print message when MuTerminal coding is UTF8.)
-		 */
-		
-		time_t now_time_t = time(NULL);
-		struct tm *now_time = localtime (&now_time_t);
-		int now_hour = 0;
-		if (now_time->tm_hour >= 5 && now_time->tm_hour < 11) {
-			now_hour = 0;
-		} else if (now_time->tm_hour >= 11 && now_time->tm_hour <= 18 ) {
-			now_hour = 1;
-		} else {
-			now_hour = 2;
-		}
-#endif
-		execve(*args, args, environ);
+		execve(*argv, (char * const *)argv, environ);
 
 		/*
 		 * Exec failed.

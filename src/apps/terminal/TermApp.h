@@ -35,6 +35,7 @@
 #include <Application.h>
 #include <String.h>
 
+class Arguments;
 class BRect;
 class BWindow;
 class TermApp : public BApplication {
@@ -70,7 +71,7 @@ class TermApp : public BApplication {
 		
 		BWindow*	fTermWindow;
 		BRect		fTermFrame;
-		BString		fCommandLine;
+		Arguments	*fArgs;
 };
 
 #endif	// TERM_APP_H

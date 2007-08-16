@@ -131,7 +131,7 @@ const static rgb_color kWhiteColor = { 255, 255, 255, 255 };
 
 
 
-TermView::TermView(BRect frame, const char *command, int32 historySize)
+TermView::TermView(BRect frame, int32 argc, const char **argv, int32 historySize)
 	: BView(frame, "termview", B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE| B_PULSE_NEEDED),
 	fShell(NULL),
@@ -176,11 +176,11 @@ TermView::TermView(BRect frame, const char *command, int32 historySize)
 	fQuitting(false),
 	fIMflag(false)	
 {	
-	_InitObject(command);
+	_InitObject(argc, argv);
 }
 
 
-TermView::TermView(int rows, int columns, const char *command, int32 historySize)
+TermView::TermView(int rows, int columns, int32 argc, const char **argv, int32 historySize)
 	: BView(BRect(0, 0, 0, 0), "termview", B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE| B_PULSE_NEEDED),
 	fShell(NULL),
@@ -225,7 +225,7 @@ TermView::TermView(int rows, int columns, const char *command, int32 historySize
 	fQuitting(false),
 	fIMflag(false)	
 {	
-	_InitObject(command);
+	_InitObject(argc, argv);
 	SetTermSize(fTermRows, fTermColumns, true);
 }
 
@@ -282,16 +282,15 @@ TermView::TermView(BMessage *archive)
 	if (archive->FindInt32("rows", (int32 *)&fTermRows) < B_OK)
 		fTermRows = 25;
 	
-	const char *command = NULL;
-	archive->FindString("command", &command);
+	const char *argv[] = { "/bin/sh", "--login" };
 
-	// TODO: Retrieve colors, history size, etc. from archive
-	_InitObject(command);
+	// TODO: Retrieve arguments, colors, history size, etc. from archive
+	_InitObject(2, argv);
 }
 
 
 status_t
-TermView::_InitObject(const char *command)
+TermView::_InitObject(int32 argc, const char **argv)
 {
 	SetTermFont(be_fixed_font, be_fixed_font);
 
@@ -304,7 +303,7 @@ TermView::_InitObject(const char *command)
 		return B_NO_MEMORY;
 	
 	status_t status = fShell->Open(fTermRows, fTermColumns,
-					command, longname2shortname(id2longname(fEncoding)));
+					longname2shortname(id2longname(fEncoding)), argc, argv);
 	
 	if (status < B_OK)
 		return status;

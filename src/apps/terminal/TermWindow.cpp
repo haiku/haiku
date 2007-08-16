@@ -9,6 +9,7 @@
 
 #include "TermWindow.h"
 
+#include "Arguments.h"
 #include "Coding.h"
 #include "ColorWindow.h"
 #include "MenuUtil.h"
@@ -55,13 +56,13 @@ const static uint32 kCloseView = 'ClVw';
 
 class CustomTermView : public TermView {
 public:
-	CustomTermView(int32 rows, int32 columns, const char *command = NULL, int32 historySize = 1000);
+	CustomTermView(int32 rows, int32 columns, int32 argc, const char **argv, int32 historySize = 1000);
 	virtual void NotifyQuit(int32 reason);
 	virtual void SetTitle(const char *title);
 };
 
 
-TermWindow::TermWindow(BRect frame, const char* title, const char *command)
+TermWindow::TermWindow(BRect frame, const char* title, Arguments *args)
 	: BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE|B_QUIT_ON_WINDOW_CLOSE),
 	fTabView(NULL),
 	fMenubar(NULL),
@@ -82,7 +83,8 @@ TermWindow::TermWindow(BRect frame, const char* title, const char *command)
 	fMatchCase(false),
 	fMatchWord(false)
 {
-	_InitWindow(command);
+	_InitWindow();
+	_AddTab(args);
 }
 
 
@@ -105,7 +107,7 @@ TermWindow::~TermWindow()
 
 /** Initialize Window object. */
 void
-TermWindow::_InitWindow(const char *command)
+TermWindow::_InitWindow()
 {
 	// make menu bar
 	_SetupMenu();
@@ -115,8 +117,6 @@ TermWindow::_InitWindow(const char *command)
 
 	fTabView = new SmartTabView(textFrame, "tab view");
 	AddChild(fTabView);
-	
-	_AddTab(command);
 }
 
 
@@ -561,7 +561,7 @@ TermWindow::_DoPrint()
 
 
 void
-TermWindow::_AddTab(const char *command)
+TermWindow::_AddTab(Arguments *args)
 {
 	// Setup font.
 
@@ -585,9 +585,16 @@ TermWindow::_AddTab(const char *command)
 	fullFont.SetSpacing(B_FIXED_SPACING);
 
 	// Make Terminal text view.
+	int argc;
+	const char *const *argv = NULL;
+	args->GetShellArguments(argc, argv);
+	
+	// Note: I don't pass the Arguments class directly to the termview,
+	// only to avoid adding it as a dependency: in other words, to keep
+	// the TermView class as agnostic as possible about the surrounding world.
 	CustomTermView *view = new CustomTermView(PrefHandler::Default()->getInt32(PREF_ROWS),
 					PrefHandler::Default()->getInt32(PREF_COLS),
-					command);
+					argc, (const char **)argv);
 	
 	BScrollView *scrollView = new BScrollView("scrollView", view, B_FOLLOW_ALL,
 					B_WILL_DRAW|B_FRAME_EVENTS, false, true);	
@@ -643,9 +650,9 @@ TermWindow::_ActiveTermView()
 
 
 // CustomTermView
-CustomTermView::CustomTermView(int32 rows, int32 columns, const char *command, int32 historySize)
+CustomTermView::CustomTermView(int32 rows, int32 columns, int32 argc, const char **argv, int32 historySize)
 	:
-	TermView(rows, columns, command, historySize)
+	TermView(rows, columns, argc, argv, historySize)
 {
 }
 

@@ -32,8 +32,8 @@ class Shell;
 class TermBuffer;
 class TermView : public BView {
 public:
-	TermView(BRect frame, const char *command = NULL, int32 historySize = 1000);
-	TermView(int rows, int columns, const char *command = NULL, int32 historySize = 1000);
+	TermView(BRect frame, int32 argc, const char **argv, int32 historySize = 1000);
+	TermView(int rows, int columns, int32 argc, const char **argv, int32 historySize = 1000);
 	TermView(BMessage *archive);	
 	~TermView();
 
@@ -140,7 +140,7 @@ protected:
 						const char *property);
 
 private:
-	status_t _InitObject(const char *command);
+	status_t _InitObject(int32 argc, const char **argv);
 	status_t _InitMouseThread(void);
 
 	status_t _AttachShell(Shell *shell);
