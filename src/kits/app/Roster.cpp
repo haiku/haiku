@@ -2378,32 +2378,32 @@ BRoster::_SendToRunning(team_id team, int argc, const char *const *args,
 		BMessenger messenger;
 		BMessenger::Private(messenger).SetTo(team, info.port,
 			B_PREFERRED_TOKEN);
+		bool listContainsRefs = false;
 
 		// send messages from the list
 		if (messageList) {
 			for (int32 i = 0;
 				 BMessage *message = (BMessage*)messageList->ItemAt(i);
 				 i++) {
+				listContainsRefs |= message->what == B_REFS_RECEIVED;
 				messenger.SendMessage(message);
 			}
 		}
 
-		// send B_ARGV_RECEIVED or B_SILENT_RELAUNCH (if already running)
+		// send B_ARGV_RECEIVED or B_REFS_RECEIVED or B_SILENT_RELAUNCH (if already running)
 		if (args && argc > 1) {
 			BMessage message(B_ARGV_RECEIVED);
 			message.AddInt32("argc", argc);
 			for (int32 i = 0; i < argc; i++)
 				message.AddString("argv", args[i]);
 			messenger.SendMessage(&message);
-		} else if (alreadyRunning)
-			messenger.SendMessage(B_SILENT_RELAUNCH);
-
-		// send B_REFS_RECEIVED
-		if (ref) {
+		} else if (ref) { 
+			printf("_SendToRunning : B_REFS_RECEIVED\n");
 			BMessage message(B_REFS_RECEIVED);
 			message.AddRef("refs", ref);
 			messenger.SendMessage(&message);
-		}
+		} else if (alreadyRunning && !listContainsRefs)
+			messenger.SendMessage(B_SILENT_RELAUNCH);
 
 		// send B_READY_TO_RUN
 		if (!alreadyRunning)
