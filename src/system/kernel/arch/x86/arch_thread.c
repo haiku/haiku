@@ -155,6 +155,16 @@ set_tls_context(struct thread *thread)
 }
 
 
+static uint32 *
+get_signal_stack(struct thread *thread, struct iframe *frame, int signal)
+{
+	return (uint32 *)frame->user_esp;
+}
+
+
+//	#pragma mark -
+
+
 status_t
 arch_team_init_team_struct(struct team *p, bool kernel)
 {
@@ -351,33 +361,37 @@ arch_thread_enter_userspace(struct thread *t, addr_t entry, void *args1, void *a
 
 
 status_t
-arch_setup_signal_frame(struct thread *t, struct sigaction *sa, int sig, int sig_mask)
+arch_setup_signal_frame(struct thread *thread, struct sigaction *sa,
+	int signal, int signalMask)
 {
 	struct iframe *frame = i386_get_current_iframe();
-	uint32 *stack_ptr = (uint32 *)frame->user_esp;
-	uint32 *code_ptr;
-	uint32 *regs_ptr;
+	uint32 *userStack = (uint32 *)frame->user_esp;
+	uint32 *signalCode;
+	uint32 *userRegs;
 	struct vregs regs;
-	uint32 stack_buf[6];
+	uint32 buffer[6];
 	status_t status;
 
 	if (frame->orig_eax >= 0) {
 		// we're coming from a syscall
-		if ((status_t)frame->eax == EINTR && (sa->sa_flags & SA_RESTART) != 0) {
-			TRACE(("### restarting syscall %d after signal %d\n", frame->orig_eax, sig));
+		if ((status_t)frame->eax == EINTR
+			&& (sa->sa_flags & SA_RESTART) != 0) {
+			TRACE(("### restarting syscall %d after signal %d\n",
+				frame->orig_eax, sig));
 			frame->eax = frame->orig_eax;
 			frame->edx = frame->orig_edx;
 			frame->eip -= 2;
-				// undos the "int $99" syscall interrupt (so that it'll be called again)
+				// undos the "int $99" syscall interrupt
+				// (so that it'll be called again)
 		}
 	}
 
 	// start stuffing stuff on the user stack
-	stack_ptr = (uint32 *)frame->user_esp;
+	userStack = get_signal_stack(thread, frame, signal);
 
 	// store the saved regs onto the user stack
-	stack_ptr -= ROUNDUP(sizeof(struct vregs) / 4, 4);
-	regs_ptr = stack_ptr;
+	userStack -= ROUNDUP(sizeof(struct vregs) / 4, 4);
+	userRegs = userStack;
 	regs.eip = frame->eip;
 	regs.eflags = frame->flags;
 	regs.eax = frame->eax;
@@ -390,34 +404,36 @@ arch_setup_signal_frame(struct thread *t, struct sigaction *sa, int sig, int sig
 	regs._reserved_2[2] = frame->ebp;
 	i386_fnsave((void *)(&regs.xregs));
 	
-	status = user_memcpy(stack_ptr, &regs, sizeof(regs));
+	status = user_memcpy(userRegs, &regs, sizeof(regs));
 	if (status < B_OK)
 		return status;
 
 	// now store a code snippet on the stack
-	stack_ptr -= ((uint32)i386_end_return_from_signal - (uint32)i386_return_from_signal) / 4;
-	code_ptr = stack_ptr;
-	status = user_memcpy(code_ptr, i386_return_from_signal,
-		((uint32)i386_end_return_from_signal - (uint32)i386_return_from_signal));
-	if (status < 0)
+	userStack -= ((uint32)i386_end_return_from_signal
+		- (uint32)i386_return_from_signal) / 4;
+	signalCode = userStack;
+	status = user_memcpy(signalCode, i386_return_from_signal,
+		((uint32)i386_end_return_from_signal
+			- (uint32)i386_return_from_signal));
+	if (status < B_OK)
 		return status;
 
 	// now set up the final part
-	stack_buf[0] = (uint32)code_ptr;	// return address when sa_handler done
-	stack_buf[1] = sig;					// first argument to sa_handler
-	stack_buf[2] = (uint32)sa->sa_userdata;// second argument to sa_handler
-	stack_buf[3] = (uint32)regs_ptr;	// third argument to sa_handler
+	buffer[0] = (uint32)signalCode;	// return address when sa_handler done
+	buffer[1] = signal;				// first argument to sa_handler
+	buffer[2] = (uint32)sa->sa_userdata; // second argument to sa_handler
+	buffer[3] = (uint32)userRegs;	// third argument to sa_handler
 
-	stack_buf[4] = sig_mask;			// Old signal mask to restore
-	stack_buf[5] = (uint32)regs_ptr;	// Int frame + extra regs to restore
+	buffer[4] = signalMask;			// Old signal mask to restore
+	buffer[5] = (uint32)userRegs;	// Int frame + extra regs to restore
 
-	stack_ptr -= sizeof(stack_buf) / 4;
+	userStack -= sizeof(buffer) / 4;
 
-	status = user_memcpy(stack_ptr, stack_buf, sizeof(stack_buf));
-	if (status < 0)
+	status = user_memcpy(userStack, buffer, sizeof(buffer));
+	if (status < B_OK)
 		return status;
 
-	frame->user_esp = (uint32)stack_ptr;
+	frame->user_esp = (uint32)userStack;
 	frame->eip = (uint32)sa->sa_handler;
 
 	return B_OK;
@@ -429,27 +445,32 @@ arch_restore_signal_frame(void)
 {
 	struct thread *thread = thread_get_current_thread();
 	struct iframe *frame = i386_get_current_iframe();
-	uint32 *stack;
-	struct vregs *regs;
+	int32 signalMask;
+	uint32 *userStack;
+	struct vregs regs;
 
 	TRACE(("### arch_restore_signal_frame: entry\n"));
 
-	stack = (uint32 *)frame->user_esp;
-	atomic_set(&thread->sig_block_mask, stack[0]);
-	regs = (struct vregs *)stack[1];
+	userStack = (uint32 *)frame->user_esp;
+	if (user_memcpy(&signalMask, &userStack[0], sizeof(int32)) < B_OK
+		|| user_memcpy(&regs, (struct vregs *)userStack[1],
+				sizeof(vregs)) < B_OK)
+		return B_BAD_ADDRESS;
 
-	frame->eip = regs->eip;
-	frame->flags = regs->eflags;
-	frame->eax = regs->eax;
-	frame->ecx = regs->ecx;
-	frame->edx = regs->edx;
-	frame->esp = regs->esp;
-	frame->user_esp = regs->_reserved_1;
-	frame->edi = regs->_reserved_2[0];
-	frame->esi = regs->_reserved_2[1];
-	frame->ebp = regs->_reserved_2[2];
+	atomic_set(&thread->sig_block_mask, signalMask);
 
-	i386_frstor((void *)(&regs->xregs));
+	frame->eip = regs.eip;
+	frame->flags = regs.eflags;
+	frame->eax = regs.eax;
+	frame->ecx = regs.ecx;
+	frame->edx = regs.edx;
+	frame->esp = regs.esp;
+	frame->user_esp = regs._reserved_1;
+	frame->edi = regs._reserved_2[0];
+	frame->esi = regs._reserved_2[1];
+	frame->ebp = regs._reserved_2[2];
+
+	i386_frstor((void *)(&regs.xregs));
 
 	TRACE(("### arch_restore_signal_frame: exit\n"));
 
