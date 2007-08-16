@@ -4,11 +4,11 @@
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
- *		Stefano Ceccherini (burton666@libero.it)
+ *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  *		Marcus Overhagen (marcus@overhagen.de)
  */
 
-/**	PicturePlayer is used to create and play picture data. */
+/**	PicturePlayer is used to play picture data. */
 
 #include <stdio.h>
 
@@ -16,6 +16,8 @@
 #include <PictureProtocol.h>
 
 #include <Shape.h>
+
+#define DEBUG 3
 
 typedef void (*fnc)(void*);
 typedef void (*fnc_BPoint)(void*, BPoint);
@@ -42,6 +44,127 @@ typedef void (*fnc_DrawPicture)(void *, BPoint, int32);
 typedef void (*fnc_BShape)(void*, BShape*);
 
 
+static void
+nop()
+{
+}
+
+
+static void *
+kDummyTable[kOpsTableSize] = {
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop,
+	nop
+};
+
+
+#if DEBUG
+static const char *
+PictureOpToString(int op)
+{
+	#define RETURN_STRING(x) case x: return #x
+
+	switch(op) {
+		RETURN_STRING(B_PIC_MOVE_PEN_BY);
+		RETURN_STRING(B_PIC_STROKE_LINE);
+		RETURN_STRING(B_PIC_STROKE_RECT);
+		RETURN_STRING(B_PIC_FILL_RECT);
+		RETURN_STRING(B_PIC_STROKE_ROUND_RECT);
+		RETURN_STRING(B_PIC_FILL_ROUND_RECT);
+		RETURN_STRING(B_PIC_STROKE_BEZIER);
+		RETURN_STRING(B_PIC_FILL_BEZIER);
+		RETURN_STRING(B_PIC_STROKE_POLYGON);
+		RETURN_STRING(B_PIC_FILL_POLYGON);
+		RETURN_STRING(B_PIC_STROKE_SHAPE);
+		RETURN_STRING(B_PIC_FILL_SHAPE);
+		RETURN_STRING(B_PIC_DRAW_STRING);
+		RETURN_STRING(B_PIC_DRAW_PIXELS);
+		RETURN_STRING(B_PIC_DRAW_PICTURE);
+		RETURN_STRING(B_PIC_STROKE_ARC);
+		RETURN_STRING(B_PIC_FILL_ARC);
+		RETURN_STRING(B_PIC_STROKE_ELLIPSE);
+		RETURN_STRING(B_PIC_FILL_ELLIPSE);
+
+		RETURN_STRING(B_PIC_ENTER_STATE_CHANGE);
+		RETURN_STRING(B_PIC_SET_CLIPPING_RECTS);
+		RETURN_STRING(B_PIC_CLIP_TO_PICTURE);
+		RETURN_STRING(B_PIC_PUSH_STATE);
+		RETURN_STRING(B_PIC_POP_STATE);
+		RETURN_STRING(B_PIC_CLEAR_CLIPPING_RECTS);
+
+		RETURN_STRING(B_PIC_SET_ORIGIN);
+		RETURN_STRING(B_PIC_SET_PEN_LOCATION);
+		RETURN_STRING(B_PIC_SET_DRAWING_MODE);
+		RETURN_STRING(B_PIC_SET_LINE_MODE);
+		RETURN_STRING(B_PIC_SET_PEN_SIZE);
+		RETURN_STRING(B_PIC_SET_SCALE);
+		RETURN_STRING(B_PIC_SET_FORE_COLOR);
+		RETURN_STRING(B_PIC_SET_BACK_COLOR);
+		RETURN_STRING(B_PIC_SET_STIPLE_PATTERN);
+		RETURN_STRING(B_PIC_ENTER_FONT_STATE);
+		RETURN_STRING(B_PIC_SET_BLENDING_MODE);
+		RETURN_STRING(B_PIC_SET_FONT_FAMILY);
+		RETURN_STRING(B_PIC_SET_FONT_STYLE);
+		RETURN_STRING(B_PIC_SET_FONT_SPACING);
+		RETURN_STRING(B_PIC_SET_FONT_ENCODING);
+		RETURN_STRING(B_PIC_SET_FONT_FLAGS);
+		RETURN_STRING(B_PIC_SET_FONT_SIZE);
+		RETURN_STRING(B_PIC_SET_FONT_ROTATE);
+		RETURN_STRING(B_PIC_SET_FONT_SHEAR);
+		RETURN_STRING(B_PIC_SET_FONT_BPP);
+		RETURN_STRING(B_PIC_SET_FONT_FACE);
+		default: return "Unknown op";	
+	}
+	#undef RETURN_STRING
+}
+#endif
+
+
 PicturePlayer::PicturePlayer(const void *data, size_t size, BList *pictures)
 	:	fData(data),
 		fSize(size),
@@ -62,6 +185,22 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 	// check the tableEntries to see if the table is big enough.
 	// If an application supplies the wrong size or an invalid pointer,
 	// it's its own fault.
+#if DEBUG
+	FILE *file = fopen("/var/log/PicturePlayer.log", "a");
+	fprintf(file, "Start rendering BPicture...\n");
+	bigtime_t startTime = system_time();
+	int32 numOps = 0;
+#endif
+	// If the caller supplied a function table smaller than needed,
+	// we use our dummy table, and copy the supported ops from the supplied one.
+	void **functionTable = callBackTable;
+	if ((uint32)tableEntries < kOpsTableSize) {
+#if DEBUG
+		fprintf(file, "A smaller than needed function table was supplied.\n");
+#endif
+		functionTable = kDummyTable;
+		memcpy(functionTable, callBackTable, (kOpsTableSize - tableEntries) * sizeof(void *));		
+	}
 
 	const char *data = reinterpret_cast<const char *>(fData);
 	size_t pos = 0;
@@ -78,21 +217,21 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 		if (pos + size > fSize)
 			debugger("PicturePlayer::Play: buffer overrun\n");
 
+#if DEBUG > 1
+		bigtime_t startOpTime = system_time();
+		fprintf(file, "Op %s ", PictureOpToString(op));
+#endif
 		switch (op) {
 			case B_PIC_MOVE_PEN_BY:
 			{
-				if (tableEntries <= 1)
-					break;
-				((fnc_BPoint)callBackTable[1])(userData,
+				((fnc_BPoint)functionTable[1])(userData,
 					*reinterpret_cast<const BPoint *>(data)); /* where */
 				break;
 			}
 
 			case B_PIC_STROKE_LINE:
 			{
-				if (tableEntries <= 2)
-					break;
-				((fnc_BPointBPoint)callBackTable[2])(userData, 
+				((fnc_BPointBPoint)functionTable[2])(userData, 
 					*reinterpret_cast<const BPoint *>(data), /* start */
 					*reinterpret_cast<const BPoint *>(data + sizeof(BPoint))); /* end */
 				break;
@@ -100,27 +239,21 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 
 			case B_PIC_STROKE_RECT:
 			{
-				if (tableEntries <= 3)
-					break;
-				((fnc_BRect)callBackTable[3])(userData,
+				((fnc_BRect)functionTable[3])(userData,
 					*reinterpret_cast<const BRect *>(data)); /* rect */
 				break;
 			}
 
 			case B_PIC_FILL_RECT:
 			{
-				if (tableEntries <= 4)
-					break;
-				((fnc_BRect)callBackTable[4])(userData,
+				((fnc_BRect)functionTable[4])(userData,
 					*reinterpret_cast<const BRect *>(data)); /* rect */
 				break;
 			}
 
 			case B_PIC_STROKE_ROUND_RECT:
 			{
-				if (tableEntries <= 5)
-					break;
-				((fnc_BRectBPoint)callBackTable[5])(userData,
+				((fnc_BRectBPoint)functionTable[5])(userData,
 					*reinterpret_cast<const BRect *>(data), /* rect */
 					*reinterpret_cast<const BPoint *>(data + sizeof(BRect))); /* radii */
 				break;
@@ -128,9 +261,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 
 			case B_PIC_FILL_ROUND_RECT:
 			{
-				if (tableEntries <= 6)
-					break;
-				((fnc_BRectBPoint)callBackTable[6])(userData,
+				((fnc_BRectBPoint)functionTable[6])(userData,
 					*reinterpret_cast<const BRect *>(data), /* rect */
 					*reinterpret_cast<const BPoint *>(data + sizeof(BRect))); /* radii */
 				break;
@@ -138,27 +269,21 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 
 			case B_PIC_STROKE_BEZIER:
 			{
-				if (tableEntries <= 7)
-					break;
-				((fnc_PBPoint)callBackTable[7])(userData,
+				((fnc_PBPoint)functionTable[7])(userData,
 					reinterpret_cast<const BPoint *>(data));
 				break;
 			}
 
 			case B_PIC_FILL_BEZIER:
 			{
-				if (tableEntries <= 8)
-					break;
-				((fnc_PBPoint)callBackTable[8])(userData,
+				((fnc_PBPoint)functionTable[8])(userData,
 					reinterpret_cast<const BPoint *>(data));
 				break;
 			}
 
 			case B_PIC_STROKE_ARC:
 			{
-				if (tableEntries <= 9)
-					break;
-				((fnc_BPointBPointff)callBackTable[9])(userData, 
+				((fnc_BPointBPointff)functionTable[9])(userData, 
 					*reinterpret_cast<const BPoint *>(data), /* center */
 					*reinterpret_cast<const BPoint *>(data + sizeof(BPoint)), /* radii */
 					*reinterpret_cast<const float *>(data + 2 * sizeof(BPoint)), /* startTheta */
@@ -168,9 +293,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 
 			case B_PIC_FILL_ARC:
 			{
-				if (tableEntries <= 10)
-					break;
-				((fnc_BPointBPointff)callBackTable[10])(userData,
+				((fnc_BPointBPointff)functionTable[10])(userData,
 					*reinterpret_cast<const BPoint *>(data), /* center */
 					*reinterpret_cast<const BPoint *>(data + sizeof(BPoint)), /* radii */
 					*reinterpret_cast<const float *>(data + 2 * sizeof(BPoint)), /* startTheta */
@@ -180,32 +303,26 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 
 			case B_PIC_STROKE_ELLIPSE:
 			{
-				if (tableEntries <= 11)
-					break;
 				const BRect *rect = reinterpret_cast<const BRect *>(data);
 				BPoint radii((rect->Width() + 1) / 2.0f, (rect->Height() + 1) / 2.0f);
 				BPoint center = rect->LeftTop() + radii;
-				((fnc_BPointBPoint)callBackTable[11])(userData, center, radii);
+				((fnc_BPointBPoint)functionTable[11])(userData, center, radii);
 				break;
 			}
 
 			case B_PIC_FILL_ELLIPSE:
 			{
-				if (tableEntries <= 12)
-					break;
 				const BRect *rect = reinterpret_cast<const BRect *>(data);
 				BPoint radii((rect->Width() + 1) / 2.0f, (rect->Height() + 1) / 2.0f);
 				BPoint center = rect->LeftTop() + radii;
-				((fnc_BPointBPoint)callBackTable[12])(userData, center, radii);
+				((fnc_BPointBPoint)functionTable[12])(userData, center, radii);
 				break;
 			}
 
 			case B_PIC_STROKE_POLYGON:
 			{
-				if (tableEntries <= 13)
-					break;
 				int32 numPoints = *reinterpret_cast<const int32 *>(data);
-				((fnc_iPBPointb)callBackTable[13])(userData, 
+				((fnc_iPBPointb)functionTable[13])(userData, 
 					numPoints,
 					reinterpret_cast<const BPoint *>(data + sizeof(int32)), /* points */
 					*reinterpret_cast<const uint8 *>(data + sizeof(int32) + numPoints * sizeof(BPoint))); /* is-closed */
@@ -214,9 +331,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 
 			case B_PIC_FILL_POLYGON:
 			{
-				if (tableEntries <= 14)
-					break;
-				((fnc_iPBPoint)callBackTable[14])(userData, 
+				((fnc_iPBPoint)functionTable[14])(userData, 
 					*reinterpret_cast<const int32 *>(data), /* numPoints */
 					reinterpret_cast<const BPoint *>(data + sizeof(int32))); /* points */
 				break;
@@ -226,9 +341,6 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 			case B_PIC_FILL_SHAPE:
 			{
 				const bool stroke = (op == B_PIC_STROKE_SHAPE);							
-				if (tableEntries <= 16 || (stroke && tableEntries <= 15))
-					break;
-
 				int32 opCount = *reinterpret_cast<const int32 *>(data);
 				int32 ptCount = *reinterpret_cast<const int32 *>(data + sizeof(int32));
 				const uint32 *opList = reinterpret_cast<const uint32 *>(data + 2 * sizeof(int32));
@@ -239,15 +351,13 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 				shape.SetData(opCount, ptCount, opList, ptList);
 
 				const int32 tableIndex = stroke ? 15 : 16;
-				((fnc_BShape)callBackTable[tableIndex])(userData, &shape);
+				((fnc_BShape)functionTable[tableIndex])(userData, &shape);
 				break;
 			}
 			
 			case B_PIC_DRAW_STRING:
 			{
-				if (tableEntries <= 17)
-					break;
-				((fnc_Pcff)callBackTable[17])(userData, 
+				((fnc_Pcff)functionTable[17])(userData, 
 					reinterpret_cast<const char *>(data + 2 * sizeof(float)), /* string */
 					*reinterpret_cast<const float *>(data), /* escapement.space */
 					*reinterpret_cast<const float *>(data + sizeof(float))); /* escapement.nonspace */
@@ -256,9 +366,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 
 			case B_PIC_DRAW_PIXELS:
 			{
-				if (tableEntries <= 18)
-					break;
-				((fnc_DrawPixels)callBackTable[18])(userData,
+				((fnc_DrawPixels)functionTable[18])(userData,
 					*reinterpret_cast<const BRect *>(data), /* src */
 					*reinterpret_cast<const BRect *>(data + 1 * sizeof(BRect)), /* dst */
 					*reinterpret_cast<const int32 *>(data + 2 * sizeof(BRect)), /* width */
@@ -272,9 +380,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 
 			case B_PIC_DRAW_PICTURE:
 			{
-				if (tableEntries <= 19)
-					break;
-				((fnc_DrawPicture)callBackTable[19])(userData,
+				((fnc_DrawPicture)functionTable[19])(userData,
 					*reinterpret_cast<const BPoint *>(data),
 					*reinterpret_cast<const int32 *>(data + sizeof(BPoint)));
 				break;
@@ -282,10 +388,8 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 			
 			case B_PIC_SET_CLIPPING_RECTS:
 			{
-				if (tableEntries <= 20)
-					break;			
 				// TODO: Not sure if it's compatible with R5's BPicture version
-				((fnc_PBRecti)callBackTable[20])(userData,
+				((fnc_PBRecti)functionTable[20])(userData,
 					reinterpret_cast<const BRect *>(data + sizeof(uint32)),
 					*reinterpret_cast<const uint32 *>(data));
 				break;
@@ -293,84 +397,66 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 
 			case B_PIC_CLEAR_CLIPPING_RECTS:
 			{
-				if (tableEntries <= 20)
-					break;		
-				((fnc_PBRecti)callBackTable[20])(userData, NULL, 0);
+				((fnc_PBRecti)functionTable[20])(userData, NULL, 0);
 				break;
 			}
 
 			case B_PIC_CLIP_TO_PICTURE:
 			{
-				if (tableEntries <= 21)
-					break;
 				// TODO: Implement
 				break;
 			}
 
 			case B_PIC_PUSH_STATE:
 			{
-				if (tableEntries <= 22)
-					break;
-				((fnc)callBackTable[22])(userData);
+				((fnc)functionTable[22])(userData);
 				break;
 			}
 
 			case B_PIC_POP_STATE:
 			{
-				if (tableEntries <= 23)
-					break;
-				((fnc)callBackTable[23])(userData);
+				((fnc)functionTable[23])(userData);
 				break;
 			}
 
 			case B_PIC_ENTER_STATE_CHANGE:
 			{
-				if (tableEntries > 24)
-					((fnc)callBackTable[24])(userData);
+				((fnc)functionTable[24])(userData);
 				stateBlockSize = size;
 				break;
 			}
 
 			case B_PIC_ENTER_FONT_STATE:
 			{
-				if (tableEntries > 26)
-					((fnc)callBackTable[26])(userData);
+				((fnc)functionTable[26])(userData);
 				fontStateBlockSize = size;				
 				break;
 			}
 
 			case B_PIC_SET_ORIGIN:
 			{
-				if (tableEntries <= 28)
-					break;
-				((fnc_BPoint)callBackTable[28])(userData,
+				((fnc_BPoint)functionTable[28])(userData,
 					*reinterpret_cast<const BPoint *>(data)); /* origin */
 				break;
 			}
 
 			case B_PIC_SET_PEN_LOCATION:
 			{
-				if (tableEntries <= 29)
-					break;
-				((fnc_BPoint)callBackTable[29])(userData,
+				((fnc_BPoint)functionTable[29])(userData,
 					*reinterpret_cast<const BPoint *>(data)); /* location */
 				break;
 			}
 
 			case B_PIC_SET_DRAWING_MODE:
 			{
-				if (tableEntries <= 30)
-					break;
-				((fnc_s)callBackTable[30])(userData,
+				((fnc_s)functionTable[30])(userData,
 					*reinterpret_cast<const int16 *>(data)); /* mode */
 				break;
 			}
 
 			case B_PIC_SET_LINE_MODE:
 			{
-				if (tableEntries <= 31)
-					break;
-				((fnc_ssf)callBackTable[31])(userData,
+				((fnc_ssf)functionTable[31])(userData,
 					*reinterpret_cast<const int16 *>(data), /* cap-mode */
 					*reinterpret_cast<const int16 *>(data + 1 * sizeof(int16)), /* join-mode */
 					*reinterpret_cast<const float *>(data + 2 * sizeof(int16))); /* miter-limit */
@@ -379,135 +465,105 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 
 			case B_PIC_SET_PEN_SIZE:
 			{
-				if (tableEntries <= 32)
-					break;
-				((fnc_f)callBackTable[32])(userData,
+				((fnc_f)functionTable[32])(userData,
 					*reinterpret_cast<const float *>(data)); /* size */
 				break;
 			}
 
 			case B_PIC_SET_FORE_COLOR:
 			{			
-				if (tableEntries <= 33)
-					break;
-				((fnc_Color)callBackTable[33])(userData,
+				((fnc_Color)functionTable[33])(userData,
 					*reinterpret_cast<const rgb_color *>(data)); /* color */
 				break;
 			}
 
 			case B_PIC_SET_BACK_COLOR:
 			{		
-				if (tableEntries <= 34)
-					break;	
-				((fnc_Color)callBackTable[34])(userData,
+				((fnc_Color)functionTable[34])(userData,
 					*reinterpret_cast<const rgb_color *>(data)); /* color */
 				break;
 			}
 
 			case B_PIC_SET_STIPLE_PATTERN:
 			{
-				if (tableEntries <= 35)
-					break;
-				((fnc_Pattern)callBackTable[35])(userData,
+				((fnc_Pattern)functionTable[35])(userData,
 					*reinterpret_cast<const pattern *>(data)); /* pattern */
 				break;
 			}
 
 			case B_PIC_SET_SCALE:
 			{
-				if (tableEntries <= 36)
-					break;
-				((fnc_f)callBackTable[36])(userData,
+				((fnc_f)functionTable[36])(userData,
 					*reinterpret_cast<const float *>(data)); /* scale */
 				break;
 			}
 
 			case B_PIC_SET_FONT_FAMILY:
 			{
-				if (tableEntries <= 37)
-					break;
-				((fnc_Pc)callBackTable[37])(userData,
+				((fnc_Pc)functionTable[37])(userData,
 					reinterpret_cast<const char *>(data)); /* string */
 				break;
 			}
 
 			case B_PIC_SET_FONT_STYLE:
 			{
-				if (tableEntries <= 38)
-					break;
-				((fnc_Pc)callBackTable[38])(userData,
+				((fnc_Pc)functionTable[38])(userData,
 					reinterpret_cast<const char *>(data)); /* string */
 				break;
 			}
 
 			case B_PIC_SET_FONT_SPACING:
 			{
-				if (tableEntries <= 39)
-					break;
-				((fnc_i)callBackTable[39])(userData,
+				((fnc_i)functionTable[39])(userData,
 					*reinterpret_cast<const int32 *>(data)); /* spacing */
 				break;
 			}
 
 			case B_PIC_SET_FONT_SIZE:
 			{
-				if (tableEntries <= 40)
-					break;
-				((fnc_f)callBackTable[40])(userData,
+				((fnc_f)functionTable[40])(userData,
 					*reinterpret_cast<const float *>(data)); /* size */
 				break;
 			}
 
 			case B_PIC_SET_FONT_ROTATE:
 			{
-				if (tableEntries <= 41)
-					break;
-				((fnc_f)callBackTable[41])(userData,
+				((fnc_f)functionTable[41])(userData,
 					*reinterpret_cast<const float *>(data)); /* rotation */
 				break;
 			}
 
 			case B_PIC_SET_FONT_ENCODING:
 			{
-				if (tableEntries <= 42)
-					break;
-				((fnc_i)callBackTable[42])(userData,
+				((fnc_i)functionTable[42])(userData,
 					*reinterpret_cast<const int32 *>(data)); /* encoding */
 				break;
 			}
 
 			case B_PIC_SET_FONT_FLAGS:
 			{
-				if (tableEntries <= 43)
-					break;
-				((fnc_i)callBackTable[43])(userData,
+				((fnc_i)functionTable[43])(userData,
 					*reinterpret_cast<const int32 *>(data)); /* flags */
 				break;
 			}
 			
 			case B_PIC_SET_FONT_SHEAR:
 			{
-				if (tableEntries <= 44)
-					break;
-				((fnc_f)callBackTable[44])(userData,
+				((fnc_f)functionTable[44])(userData,
 					*reinterpret_cast<const float *>(data)); /* shear */
 				break;
 			}
 
 			case B_PIC_SET_FONT_FACE:
 			{
-				if (tableEntries <= 46)
-					break;
-				((fnc_i)callBackTable[46])(userData,
+				((fnc_i)functionTable[46])(userData,
 					*reinterpret_cast<const int32 *>(data)); /* flags */
 				break;
 			}
 
 			case B_PIC_SET_BLENDING_MODE:
 			{
-				if (tableEntries <= 47)
-					break;
-				((fnc_ss)callBackTable[47])(userData,
+				((fnc_ss)functionTable[47])(userData,
 					*reinterpret_cast<const int16 *>(data), /* alphaSrcMode */
 					*reinterpret_cast<const int16 *>(data + sizeof(int16))); /* alphaFncMode */
 				break;
@@ -530,20 +586,27 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 		
 		// call the exit_state_change hook if needed
 		if (stateBlockSize == 0) {
-			if (tableEntries > 25)
-				((fnc)callBackTable[25])(userData);
+			((fnc)functionTable[25])(userData);
 			stateBlockSize = -1;		
 		}
 		
 		// call the exit_font_state hook if needed
 		if (fontStateBlockSize == 0) {
-			if (tableEntries > 27)
-				((fnc)callBackTable[27])(userData);
+			((fnc)functionTable[27])(userData);
 			fontStateBlockSize = -1;		
 		}
-		
+#if DEBUG
+		numOps++;
+#if DEBUG > 1
+		fprintf(file, "executed in %lld usecs\n", system_time() - startOpTime);
+#endif
+#endif		
 		// TODO: what if too much was read, should we return B_ERROR?
 	}
 
+#if DEBUG
+	fprintf(file, "Done! %ld ops, rendering completed in %lld usecs.\n", numOps, system_time() - startTime);
+	fclose(file);
+#endif
 	return B_OK;
 }

@@ -172,15 +172,17 @@ PictureDataWriter::WriteSetClipping(/*const */BRegion &region)
 		const int32 numRects = region.CountRects();
 		if (numRects > 0 && region.Frame().IsValid()) {	
 			BeginOp(B_PIC_SET_CLIPPING_RECTS);
-			Write<int32>(numRects);
-			for (int32 i = 0; i < numRects; i++)
+			Write<uint32>(numRects); 
+			for (int32 i = 0; i < numRects; i++) {
 				Write<BRect>(region.RectAt(i));			
+			}			
 			EndOp();
 		} else
 			WriteClearClipping();
 	} catch (status_t &status) {
 		return status;
 	}
+
 	return B_OK;
 }
 

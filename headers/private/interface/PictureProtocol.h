@@ -53,5 +53,9 @@ enum {
 	B_PIC_SET_FONT_FACE		= 0x0389,
 };
 
+
+const static uint32 kOpsTableSize = 48;
+
+
 #endif
 

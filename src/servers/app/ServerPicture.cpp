@@ -671,7 +671,7 @@ reserved()
 }
 
 
-const void *tableEntries[] = {
+const static void *kTableEntries[] = {
 	(const void *)nop,
 	(const void *)move_pen_by,
 	(const void *)stroke_line,
@@ -909,7 +909,7 @@ ServerPicture::Play(ViewLayer *view)
 		return;
 
 	PicturePlayer player(mallocIO->Buffer(), mallocIO->BufferLength(), fPictures);
-	player.Play(const_cast<void **>(tableEntries), sizeof(tableEntries) / sizeof(void *), view);
+	player.Play(const_cast<void **>(kTableEntries), sizeof(kTableEntries) / sizeof(void *), view);
 }
 
 
