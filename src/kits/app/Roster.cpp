@@ -2378,14 +2378,12 @@ BRoster::_SendToRunning(team_id team, int argc, const char *const *args,
 		BMessenger messenger;
 		BMessenger::Private(messenger).SetTo(team, info.port,
 			B_PREFERRED_TOKEN);
-		bool listContainsRefs = false;
 
 		// send messages from the list
 		if (messageList) {
 			for (int32 i = 0;
 				 BMessage *message = (BMessage*)messageList->ItemAt(i);
 				 i++) {
-				listContainsRefs |= message->what == B_REFS_RECEIVED;
 				messenger.SendMessage(message);
 			}
 		}
@@ -2402,7 +2400,7 @@ BRoster::_SendToRunning(team_id team, int argc, const char *const *args,
 			BMessage message(B_REFS_RECEIVED);
 			message.AddRef("refs", ref);
 			messenger.SendMessage(&message);
-		} else if (alreadyRunning && !listContainsRefs)
+		} else if (alreadyRunning && (!messageList || messageList->IsEmpty()))
 			messenger.SendMessage(B_SILENT_RELAUNCH);
 
 		// send B_READY_TO_RUN
