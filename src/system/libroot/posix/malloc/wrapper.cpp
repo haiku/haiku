@@ -278,14 +278,14 @@ memalign(size_t alignment, size_t size)
 extern "C" int
 posix_memalign(void **_pointer, size_t alignment, size_t size)
 {
-	if ((alignment & 3) != 0 || _pointer == NULL)
+	if ((alignment & (sizeof(void *) - 1)) != 0 || _pointer == NULL)
 		return B_BAD_VALUE;
 
 	static processHeap *pHeap = getAllocator();
 	void *pointer = pHeap->getHeap(pHeap->getHeapIndex()).memalign(alignment,
 		size);
 	if (pointer == NULL)
-		return NULL;
+		return B_NO_MEMORY;
 
 #if HEAP_LEAK_CHECK
 	add_address(pointer, size);
