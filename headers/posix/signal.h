@@ -1,8 +1,9 @@
+/*
+ * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _SIGNAL_H_
 #define _SIGNAL_H_
-/* 
-** Distributed under the terms of the OpenBeOS License.
-*/
 
 
 #include <sys/types.h>
@@ -16,7 +17,7 @@ typedef void (*__signal_func_ptr)(int);  /* deprecated, for compatibility with B
 
 
 typedef union sigval {
-	int	sival_int;
+	int		sival_int;
 	void	*sival_ptr;
 } sigval_t;
 
@@ -31,7 +32,7 @@ typedef struct {
 	void	*si_addr;	/* address of faulting instruction */
 	int		si_status;	/* exit value or signal */
 	long	si_band;	/* band event for SIGPOLL */
-	union sigval  	si_value;	/* signal value */
+	union sigval si_value;	/* signal value */
 } siginfo_t;
 
 
@@ -59,28 +60,24 @@ struct sigaction {
 };
 
 
-/*
- * values for sa_flags
- */
-#define SA_NOCLDSTOP  0x01
-#define SA_ONESHOT    0x02
-#define SA_NOMASK     0x04
-#define SA_NODEFER    SA_NOMASK
-#define SA_RESTART    0x08
-#define SA_STACK	0x10
-#define SA_ONSTACK      SA_STACK
+/* values for sa_flags */
+#define SA_NOCLDSTOP	0x01
+#define SA_ONESHOT		0x02
+#define SA_NOMASK		0x04
+#define SA_NODEFER		SA_NOMASK
+#define SA_RESTART		0x08
+#define SA_STACK		0x10
+#define SA_ONSTACK		SA_STACK
 #define SA_RESETHAND	0x20
-#define SA_SIGINFO	0x40
+#define SA_SIGINFO		0x40
 #define SA_NOCLDWAIT	0x80
 
-/*
- * values for ss_flags
- */
-#define SS_ONSTACK	0x1
-#define SS_DISABLE	0x2
+/* values for ss_flags */
+#define SS_ONSTACK		0x1
+#define SS_DISABLE		0x2
 
-#define MINSIGSTKSZ	4096
-#define SIGSTKSZ	16384
+#define MINSIGSTKSZ		4096
+#define SIGSTKSZ		16384
 
 /*
  * for signals using an alternate stack
@@ -88,7 +85,7 @@ struct sigaction {
 typedef struct stack_t {
 	void	*ss_sp;
 	size_t	ss_size;
-	int	ss_flags;
+	int		ss_flags;
 } stack_t;
 
 typedef struct sigstack {
@@ -96,13 +93,10 @@ typedef struct sigstack {
 	void	*ss_sp;
 } sigstack;
 
-/*
- * for the 'how' arg of sigprocmask()
- */
+/* for the 'how' arg of sigprocmask() */
 #define SIG_BLOCK    1
 #define SIG_UNBLOCK  2
 #define SIG_SETMASK  3
-
 
 /*
  * The list of all defined signals:
@@ -141,8 +135,7 @@ typedef struct sigstack {
 #define SIGXCPU		28	/* CPU time limit exceeded */
 #define SIGXFSZ		29	/* File size limit exceeded */
 
-#define SIGBUS     SIGSEGV /* for old style code */
-
+#define SIGBUS		SIGSEGV /* for old style code */
 
 /*
  * Signal numbers 30-32 are currently free but may be used in future
@@ -181,13 +174,11 @@ int 	sigismember(const sigset_t *set, int signo);
 
 const char *strsignal(int sig);
 
-void        set_signal_stack(void *ptr, size_t size);
-int         sigaltstack(const stack_t *ss, stack_t *oss);         /* XXXdbg */
+void	set_signal_stack(void *ptr, size_t size);
+int		sigaltstack(const stack_t *ss, stack_t *oss);
 
-/* 
- * pthread extension : equivalent of sigprocmask() 
- */
-extern int pthread_sigmask(int how, const sigset_t *set, sigset_t *oset); 
+/* pthread extension : equivalent of sigprocmask()  */
+int		pthread_sigmask(int how, const sigset_t *set, sigset_t *oset); 
 
 extern inline int
 sigismember(const sigset_t *set, int sig)
@@ -253,7 +244,7 @@ sigdelset(sigset_t *set, int sig)
  *
  * The two additional arguments available to the signal handler are extensions
  * to the Posix standard. This feature was introduced by the BeOS and retained
- * by OpenBeOS. However, to remain compatible with Posix and ANSI C, the type
+ * by Haiku. However, to remain compatible with Posix and ANSI C, the type
  * of the sa_handler field is defined as 'sig_func_t'. This requires the handler
  * to be cast when assigned to the sa_handler field, as in the example above.
  *
@@ -261,7 +252,7 @@ sigdelset(sigset_t *set, int sig)
  * This is because they expect a "this" pointer as the first argument.
  *
  *
- * The 3 arguments that OpenBeOS provides to signal handlers are as follows:
+ * The 3 arguments that Haiku provides to signal handlers are as follows:
  *
  *  - The first argument is the (usual) signal number.
  *
@@ -287,6 +278,7 @@ sigdelset(sigset_t *set, int sig)
 
 typedef struct vregs vregs;
 
+// TODO: move those into an architecture specific header
 #if __POWERPC__
 struct vregs
 {
