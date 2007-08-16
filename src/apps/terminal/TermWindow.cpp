@@ -209,7 +209,8 @@ TermWindow::_GetPreferredFonts(BFont &fullFont, BFont &halfFont)
 	if (size < 6.0f)
 		size = 6.0f;
 	halfFont.SetSize(size);
-	
+	halfFont.SetSpacing(B_FIXED_SPACING);
+
 	family = PrefHandler::Default()->getString(PREF_FULL_FONT_FAMILY);
 
 	fullFont.SetFamilyAndStyle(family, NULL);
@@ -225,8 +226,6 @@ void
 TermWindow::MessageReceived(BMessage *message)
 {
 	int32 encodingId;
-	BFont halfFont;
-	BFont fullFont;
 	bool findresult;
   
 	switch (message->what) {
@@ -379,17 +378,10 @@ TermWindow::MessageReceived(BMessage *message)
 		case MSG_HALF_SIZE_CHANGED:
 		case MSG_FULL_SIZE_CHANGED: 
 		{
-	
-			halfFont.SetFamilyAndStyle (PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY),NULL);
-			halfFont.SetSize (PrefHandler::Default()->getFloat(PREF_HALF_FONT_SIZE));
-			halfFont.SetSpacing (B_FIXED_SPACING);
-			
-			fullFont.SetFamilyAndStyle (PrefHandler::Default()->getString(PREF_FULL_FONT_FAMILY),NULL);
-			fullFont.SetSize (PrefHandler::Default()->getFloat(PREF_FULL_FONT_SIZE));
-			fullFont.SetSpacing (B_FIXED_SPACING);
-			
+			BFont halfFont, fullFont;
+			_GetPreferredFonts(fullFont, halfFont);			
 			_ActiveTermView()->SetTermFont (&halfFont, &fullFont);
-			BRect rect = _ActiveTermView()->SetTermSize (0, 0, 0);
+			BRect rect = _ActiveTermView()->SetTermSize(0, 0, 0);
 			
 			int width, height;
 			_ActiveTermView()->GetFontSize(&width, &height);
