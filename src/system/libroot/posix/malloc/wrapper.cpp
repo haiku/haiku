@@ -274,6 +274,18 @@ memalign(size_t alignment, size_t size)
 }
 
 
+extern "C" int
+posix_memalign(void **memptr, size_t alignment, size_t size)
+{
+	if (!memptr)
+		return EINVAL;
+	*memptr = memalign(alignment, size);
+	if (memptr == NULL)
+		return ENOMEM;
+	return 0;
+}
+
+
 extern "C" void *
 valloc(size_t size)
 {
