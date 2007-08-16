@@ -191,7 +191,9 @@ reseed(ch_randgen *prandgen, const uint32 initTimes)
 
 	for (j = initTimes; j; j--) {
 		for (i = NK * initTimes; i; i--) {
-			thread_yield();
+			//thread_yield();
+			snooze(100);
+				// TODO: Our thread_yield() currently waits too long for emulators...
 
 			y.Q[0] += system_time();
 			attach(&x, &y, 0x52437EFFU, 0x026A4CEBU, 0xD9E66AC9U, 0x56E5A975U);
