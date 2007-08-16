@@ -17,8 +17,6 @@
 
 #include <Shape.h>
 
-#define DEBUG 3
-
 typedef void (*fnc)(void*);
 typedef void (*fnc_BPoint)(void*, BPoint);
 typedef void (*fnc_BPointBPoint)(void*, BPoint, BPoint);
