@@ -58,6 +58,7 @@ private:
 	void		_SetTermColors(TermView *termView);
 	void		_InitWindow();
 	void		_SetupMenu();
+	void		_GetPreferredFonts(BFont &full, BFont &half);
 	status_t	_DoPageSetup();
 	void		_DoPrint();
 	void		_AddTab(Arguments *args);

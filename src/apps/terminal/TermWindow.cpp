@@ -200,6 +200,28 @@ TermWindow::_SetupMenu()
 
 
 void
+TermWindow::_GetPreferredFonts(BFont &fullFont, BFont &halfFont)
+{
+	const char *family = PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY);
+
+	halfFont.SetFamilyAndStyle(family, NULL);
+	float size = PrefHandler::Default()->getFloat(PREF_HALF_FONT_SIZE);
+	if (size < 6.0f)
+		size = 6.0f;
+	halfFont.SetSize(size);
+	
+	family = PrefHandler::Default()->getString(PREF_FULL_FONT_FAMILY);
+
+	fullFont.SetFamilyAndStyle(family, NULL);
+	size = PrefHandler::Default()->getFloat(PREF_FULL_FONT_SIZE);
+	if (size < 6.0f)
+		size = 6.0f;
+	fullFont.SetSize(size);
+	fullFont.SetSpacing(B_FIXED_SPACING);
+}
+
+
+void
 TermWindow::MessageReceived(BMessage *message)
 {
 	int32 encodingId;
@@ -565,79 +587,66 @@ TermWindow::_DoPrint()
 void
 TermWindow::_AddTab(Arguments *args)
 {
-	// Setup font.
-
-	const char *family = PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY);
-
-	BFont halfFont;
-	halfFont.SetFamilyAndStyle(family, NULL);
-	float size = PrefHandler::Default()->getFloat(PREF_HALF_FONT_SIZE);
-	if (size < 6.0f)
-		size = 6.0f;
-	halfFont.SetSize(size);
-	
-	family = PrefHandler::Default()->getString(PREF_FULL_FONT_FAMILY);
-
-	BFont fullFont;
-	fullFont.SetFamilyAndStyle(family, NULL);
-	size = PrefHandler::Default()->getFloat(PREF_FULL_FONT_SIZE);
-	if (size < 6.0f)
-		size = 6.0f;
-	fullFont.SetSize(size);
-	fullFont.SetSpacing(B_FIXED_SPACING);
-
-	// Make Terminal text view.
 	int argc = 0;
 	const char *const *argv = NULL;
 	if (args != NULL)
 		args->GetShellArguments(argc, argv);
 	
-	// Note: I don't pass the Arguments class directly to the termview,
-	// only to avoid adding it as a dependency: in other words, to keep
-	// the TermView class as agnostic as possible about the surrounding world.
-	CustomTermView *view = new CustomTermView(PrefHandler::Default()->getInt32(PREF_ROWS),
-					PrefHandler::Default()->getInt32(PREF_COLS),
-					argc, (const char **)argv);
-	
-	BScrollView *scrollView = new BScrollView("scrollView", view, B_FOLLOW_ALL,
-					B_WILL_DRAW|B_FRAME_EVENTS, false, true);	
-	
-	BTab *tab = new BTab;
-	// TODO: Use a better name. For example, do like MacOsX's Terminal
-	// and update the title using the last executed command ?
-	// Or like Gnome's Terminal and use the current path ?
-	fTabView->AddTab(scrollView, tab);
-	tab->SetLabel("Terminal");
-	view->SetScrollBar(scrollView->ScrollBar(B_VERTICAL));
-	
-	// TODO: Resize the vertical scrollbar to take the window gripping handle into account
-	// (shouldn't this be done in BScrollView itself ? At least BScrollBar does that).	
-	scrollView->ScrollBar(B_VERTICAL)->ResizeBy(0, -13);
-	view->SetEncoding(longname2id(PrefHandler::Default()->getString(PREF_TEXT_ENCODING)));
-	view->SetTermFont(&halfFont, &fullFont);
-	
-	_SetTermColors(view);
-	
-	// If it's the first time we're called, setup the window
-	if (fTabView->CountTabs() == 1) {
-		int width, height;
-		view->GetFontSize(&width, &height);
-		SetSizeLimits(MIN_COLS * width, MAX_COLS * width,
-			MIN_COLS * height, MAX_COLS * height);
-	
-		float fWidth, fHeight;
-		view->GetPreferredSize(&fWidth, &fHeight);
+	try {
+		// Note: I don't pass the Arguments class directly to the termview,
+		// only to avoid adding it as a dependency: in other words, to keep
+		// the TermView class as agnostic as possible about the surrounding world.
+		CustomTermView *view = 
+			new CustomTermView(PrefHandler::Default()->getInt32(PREF_ROWS),
+							PrefHandler::Default()->getInt32(PREF_COLS),
+							argc, (const char **)argv);
 		
-		// Resize Window
-		ResizeTo(fWidth + B_V_SCROLL_BAR_WIDTH, fHeight + fMenubar->Bounds().Height());
-
-		// TODO: If I don't do this, the view won't show up.
-		// Bug in BTabView or in my code ?
-		fTabView->Select(0);
+		BScrollView *scrollView = new BScrollView("scrollView", view, B_FOLLOW_ALL,
+									B_WILL_DRAW|B_FRAME_EVENTS, false, true);	
+		
+		BTab *tab = new BTab;
+		// TODO: Use a better name. For example, do like MacOsX's Terminal
+		// and update the title using the last executed command ?
+		// Or like Gnome's Terminal and use the current path ?
+		fTabView->AddTab(scrollView, tab);
+		tab->SetLabel("Terminal");
+		view->SetScrollBar(scrollView->ScrollBar(B_VERTICAL));
+		
+		// Resize the vertical scrollbar to take the window gripping handle into account
+		// TODO: shouldn't this be done in BScrollView itself ? At least BScrollBar does that.	
+		scrollView->ScrollBar(B_VERTICAL)->ResizeBy(0, -13);
+		
+		view->SetEncoding(longname2id(PrefHandler::Default()->getString(PREF_TEXT_ENCODING)));
+		
+		BFont fullFont, halfFont;
+		_GetPreferredFonts(fullFont, halfFont);	
+		view->SetTermFont(&halfFont, &fullFont);
+		
+		_SetTermColors(view);
+		
+		// If it's the first time we're called, setup the window
+		if (fTabView->CountTabs() == 1) {
+			int width, height;
+			view->GetFontSize(&width, &height);
+			SetSizeLimits(MIN_COLS * width, MAX_COLS * width,
+				MIN_COLS * height, MAX_COLS * height);
+		
+			float fWidth, fHeight;
+			view->GetPreferredSize(&fWidth, &fHeight);
+			
+			// Resize Window
+			ResizeTo(fWidth + B_V_SCROLL_BAR_WIDTH, fHeight + fMenubar->Bounds().Height());
+	
+			// TODO: If I don't do this, the view won't show up.
+			// Bug in BTabView or in my code ?
+			fTabView->Select(0);
+		}
+	} catch (...) {
+		// most probably out of memory. That's bad.
+		// TODO: Should cleanup, I guess
 	}
-}
-
-
+}	
+	
 void
 TermWindow::_RemoveTab(int32 index)
 {
