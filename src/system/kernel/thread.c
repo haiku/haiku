@@ -166,6 +166,18 @@ thread_struct_hash(void *_t, const void *_key, uint32 range)
 }
 
 
+static void
+reset_signals(struct thread *thread)
+{
+	thread->sig_pending = 0;
+	thread->sig_block_mask = 0;
+	memset(thread->sig_action, 0, 32 * sizeof(struct sigaction));
+	thread->signal_stack_base = 0;
+	thread->signal_stack_size = 0;
+	thread->signal_stack_enabled = false;
+}
+
+
 /*!
 	Allocates and fills in thread structure (or reuses one from the
 	dead queue).
@@ -224,9 +236,7 @@ create_thread_struct(struct thread *inthread, const char *name,
 	thread->priority = thread->next_priority = -1;
 	thread->args1 = NULL;  thread->args2 = NULL;
 	thread->alarm.period = 0;
-	thread->sig_pending = 0;
-	thread->sig_block_mask = 0;
-	memset(thread->sig_action, 0, 32 * sizeof(struct sigaction));
+	reset_signals(thread);
 	thread->in_kernel = true;
 	thread->was_yielded = false;
 	thread->user_time = 0;
@@ -497,6 +507,143 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 
 	return status;
 }
+
+
+/*!
+	Finds a free death stack for us and allocates it.
+	Must be called with interrupts enabled.
+*/
+static uint32
+get_death_stack(void)
+{
+	cpu_status state;
+	uint32 bit;
+	int32 i;
+
+	acquire_sem(sDeathStackSem);
+
+	state = disable_interrupts();
+
+	// grap the thread lock, find a free spot and release
+	GRAB_THREAD_LOCK();
+	bit = sDeathStackBitmap;
+	bit = (~bit) & ~((~bit) - 1);
+	sDeathStackBitmap |= bit;
+	RELEASE_THREAD_LOCK();
+
+	restore_interrupts(state);
+
+	// sanity checks
+	if (!bit)
+		panic("get_death_stack: couldn't find free stack!\n");
+
+	if (bit & (bit - 1))
+		panic("get_death_stack: impossible bitmap result!\n");
+
+	// bit to number
+	for (i = -1; bit; i++) {
+		bit >>= 1;
+	}
+
+	TRACE(("get_death_stack: returning 0x%lx\n", sDeathStacks[i].address));
+
+	return (uint32)i;
+}
+
+
+/*!	Returns the thread's death stack to the pool. */
+static void
+put_death_stack(uint32 index)
+{
+	cpu_status state;
+
+	TRACE(("put_death_stack...: passed %lu\n", index));
+
+	if (index >= sNumDeathStacks)
+		panic("put_death_stack: passed invalid stack index %ld\n", index);
+
+	if (!(sDeathStackBitmap & (1 << index)))
+		panic("put_death_stack: passed invalid stack index %ld\n", index);
+
+	state = disable_interrupts();
+
+	GRAB_THREAD_LOCK();
+	sDeathStackBitmap &= ~(1 << index);
+	RELEASE_THREAD_LOCK();
+
+	restore_interrupts(state);
+
+	release_sem_etc(sDeathStackSem, 1, B_DO_NOT_RESCHEDULE);
+		// we must not have acquired the thread lock when releasing a semaphore
+}
+
+
+static void
+thread_exit2(void *_args)
+{
+	struct thread_exit_args args;
+
+	// copy the arguments over, since the source is probably on the kernel
+	// stack we're about to delete
+	memcpy(&args, _args, sizeof(struct thread_exit_args));
+
+	// we can't let the interrupts disabled at this point
+	enable_interrupts();
+
+	TRACE(("thread_exit2, running on death stack 0x%lx\n", args.death_stack));
+
+	// delete the old kernel stack area
+	TRACE(("thread_exit2: deleting old kernel stack id 0x%lx for thread 0x%lx\n",
+		args.old_kernel_stack, args.thread->id));
+
+	delete_area(args.old_kernel_stack);
+
+	// remove this thread from all of the global lists
+	TRACE(("thread_exit2: removing thread 0x%lx from global lists\n",
+		args.thread->id));
+
+	disable_interrupts();
+	GRAB_TEAM_LOCK();
+
+	remove_thread_from_team(team_get_kernel_team(), args.thread);
+
+	RELEASE_TEAM_LOCK();
+	enable_interrupts();
+		// needed for the debugger notification below
+
+	TRACE(("thread_exit2: done removing thread from lists\n"));
+
+	if (args.death_sem >= 0)
+		release_sem_etc(args.death_sem, 1, B_DO_NOT_RESCHEDULE);	
+
+	// notify the debugger
+	if (args.original_team_id >= 0
+		&& args.original_team_id != team_get_kernel_team_id()) {
+		user_debug_thread_deleted(args.original_team_id, args.thread->id);
+	}
+
+	disable_interrupts();
+
+	// Set the next state to be gone: this will cause the thread structure
+	// to be returned to a ready pool upon reschedule.
+	// Note, we need to have disabled interrupts at this point, or else
+	// we could get rescheduled too early.
+	args.thread->next_state = THREAD_STATE_FREE_ON_RESCHED;
+
+	// return the death stack and reschedule one last time
+
+	put_death_stack(args.death_stack);
+
+	GRAB_THREAD_LOCK();
+	scheduler_reschedule();
+		// requires thread lock to be held
+
+	// never get to here
+	panic("thread_exit2: made it where it shouldn't have!\n");
+}
+
+
+//	#pragma mark - debugger calls
 
 
 static int
@@ -927,138 +1074,7 @@ dump_next_thread_in_team(int argc, char **argv)
 }
 
 
-/*!
-	Finds a free death stack for us and allocates it.
-	Must be called with interrupts enabled.
-*/
-static uint32
-get_death_stack(void)
-{
-	cpu_status state;
-	uint32 bit;
-	int32 i;
-
-	acquire_sem(sDeathStackSem);
-
-	state = disable_interrupts();
-
-	// grap the thread lock, find a free spot and release
-	GRAB_THREAD_LOCK();
-	bit = sDeathStackBitmap;
-	bit = (~bit) & ~((~bit) - 1);
-	sDeathStackBitmap |= bit;
-	RELEASE_THREAD_LOCK();
-
-	restore_interrupts(state);
-
-	// sanity checks
-	if (!bit)
-		panic("get_death_stack: couldn't find free stack!\n");
-
-	if (bit & (bit - 1))
-		panic("get_death_stack: impossible bitmap result!\n");
-
-	// bit to number
-	for (i = -1; bit; i++) {
-		bit >>= 1;
-	}
-
-	TRACE(("get_death_stack: returning 0x%lx\n", sDeathStacks[i].address));
-
-	return (uint32)i;
-}
-
-
-/*!	Returns the thread's death stack to the pool. */
-static void
-put_death_stack(uint32 index)
-{
-	cpu_status state;
-
-	TRACE(("put_death_stack...: passed %lu\n", index));
-
-	if (index >= sNumDeathStacks)
-		panic("put_death_stack: passed invalid stack index %ld\n", index);
-
-	if (!(sDeathStackBitmap & (1 << index)))
-		panic("put_death_stack: passed invalid stack index %ld\n", index);
-
-	state = disable_interrupts();
-
-	GRAB_THREAD_LOCK();
-	sDeathStackBitmap &= ~(1 << index);
-	RELEASE_THREAD_LOCK();
-
-	restore_interrupts(state);
-
-	release_sem_etc(sDeathStackSem, 1, B_DO_NOT_RESCHEDULE);
-		// we must not have acquired the thread lock when releasing a semaphore
-}
-
-
-static void
-thread_exit2(void *_args)
-{
-	struct thread_exit_args args;
-
-	// copy the arguments over, since the source is probably on the kernel
-	// stack we're about to delete
-	memcpy(&args, _args, sizeof(struct thread_exit_args));
-
-	// we can't let the interrupts disabled at this point
-	enable_interrupts();
-
-	TRACE(("thread_exit2, running on death stack 0x%lx\n", args.death_stack));
-
-	// delete the old kernel stack area
-	TRACE(("thread_exit2: deleting old kernel stack id 0x%lx for thread 0x%lx\n",
-		args.old_kernel_stack, args.thread->id));
-
-	delete_area(args.old_kernel_stack);
-
-	// remove this thread from all of the global lists
-	TRACE(("thread_exit2: removing thread 0x%lx from global lists\n",
-		args.thread->id));
-
-	disable_interrupts();
-	GRAB_TEAM_LOCK();
-
-	remove_thread_from_team(team_get_kernel_team(), args.thread);
-
-	RELEASE_TEAM_LOCK();
-	enable_interrupts();
-		// needed for the debugger notification below
-
-	TRACE(("thread_exit2: done removing thread from lists\n"));
-
-	if (args.death_sem >= 0)
-		release_sem_etc(args.death_sem, 1, B_DO_NOT_RESCHEDULE);	
-
-	// notify the debugger
-	if (args.original_team_id >= 0
-		&& args.original_team_id != team_get_kernel_team_id()) {
-		user_debug_thread_deleted(args.original_team_id, args.thread->id);
-	}
-
-	disable_interrupts();
-
-	// Set the next state to be gone: this will cause the thread structure
-	// to be returned to a ready pool upon reschedule.
-	// Note, we need to have disabled interrupts at this point, or else
-	// we could get rescheduled too early.
-	args.thread->next_state = THREAD_STATE_FREE_ON_RESCHED;
-
-	// return the death stack and reschedule one last time
-
-	put_death_stack(args.death_stack);
-
-	GRAB_THREAD_LOCK();
-	scheduler_reschedule();
-		// requires thread lock to be held
-
-	// never get to here
-	panic("thread_exit2: made it where it shouldn't have!\n");
-}
+//	#pragma mark - private kernel API
 
 
 void
@@ -1358,7 +1374,14 @@ thread_at_kernel_exit(void)
 }
 
 
-//	#pragma mark - private kernel API
+void
+thread_reset_for_exec(void)
+{
+	struct thread *thread = thread_get_current_thread();
+
+	cancel_timer(&thread->alarm);
+	reset_signals(thread);
+}
 
 
 /*! Insert a thread to the tail of a queue */

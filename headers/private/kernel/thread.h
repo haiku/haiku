@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -23,11 +23,12 @@ extern "C" {
 void thread_enqueue(struct thread *t, struct thread_queue *q);
 struct thread *thread_lookat_queue(struct thread_queue *q);
 struct thread *thread_dequeue(struct thread_queue *q);
-struct thread *thread_dequeue_id(struct thread_queue *q, thread_id thr_id);
+struct thread *thread_dequeue_id(struct thread_queue *q, thread_id id);
 
 void thread_at_kernel_entry(void);
 	// called when the thread enters the kernel on behalf of the thread
 void thread_at_kernel_exit(void);
+void thread_reset_for_exec(void);
 
 status_t thread_init(struct kernel_args *args);
 status_t thread_preboot_init_percpu(struct kernel_args *args, int32 cpuNum);

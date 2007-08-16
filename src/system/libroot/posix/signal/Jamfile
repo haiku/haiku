@@ -6,7 +6,9 @@ MergeObject posix_signal.o :
 	kill.c
 	raise.c
 	send_signal.c
+	set_signal_stack.c
 	sigaction.c
+	sigaltstack.c
 	signal.c
 	sigpending.c
 	sigprocmask.c

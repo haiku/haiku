@@ -214,6 +214,13 @@ arch_thread_enter_userspace(struct thread *thread, addr_t entry, void *arg1, voi
 }
 
 
+bool
+arch_on_signal_stack(struct thread *thread)
+{
+	return false;
+}
+
+
 status_t
 arch_setup_signal_frame(struct thread *thread, struct sigaction *sa, int sig, int sigMask)
 {

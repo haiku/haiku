@@ -591,44 +591,51 @@ _user_set_alarm(bigtime_t time, uint32 mode)
 }
 
 
-int
+status_t
 _user_send_signal(pid_t team, uint signal)
 {
 	return send_signal_etc(team, signal, B_CHECK_PERMISSION);
 }
 
 
-int
+status_t
 _user_sigprocmask(int how, const sigset_t *userSet, sigset_t *userOldSet)
 {
 	sigset_t set, oldSet;
 	status_t status;
 
 	if ((userSet != NULL && user_memcpy(&set, userSet, sizeof(sigset_t)) < B_OK)
-		|| (userOldSet != NULL && user_memcpy(&oldSet, userOldSet, sizeof(sigset_t)) < B_OK))
+		|| (userOldSet != NULL && user_memcpy(&oldSet, userOldSet,
+				sizeof(sigset_t)) < B_OK))
 		return B_BAD_ADDRESS;
 
-	status = sigprocmask(how, userSet ? &set : NULL, userOldSet ? &oldSet : NULL);
+	status = sigprocmask(how, userSet ? &set : NULL,
+		userOldSet ? &oldSet : NULL);
 
 	// copy old set if asked for
-	if (status >= B_OK && userOldSet != NULL && user_memcpy(userOldSet, &oldSet, sizeof(sigset_t)) < B_OK)
+	if (status >= B_OK && userOldSet != NULL
+		&& user_memcpy(userOldSet, &oldSet, sizeof(sigset_t)) < B_OK)
 		return B_BAD_ADDRESS;
 
 	return status;
 }
 
 
-int
-_user_sigaction(int signal, const struct sigaction *userAction, struct sigaction *userOldAction)
+status_t
+_user_sigaction(int signal, const struct sigaction *userAction,
+	struct sigaction *userOldAction)
 {
 	struct sigaction act, oact;
 	status_t status;
 
-	if ((userAction != NULL && user_memcpy(&act, userAction, sizeof(struct sigaction)) < B_OK)
-		|| (userOldAction != NULL && user_memcpy(&oact, userOldAction, sizeof(struct sigaction)) < B_OK))
+	if ((userAction != NULL && user_memcpy(&act, userAction,
+				sizeof(struct sigaction)) < B_OK)
+		|| (userOldAction != NULL && user_memcpy(&oact, userOldAction,
+				sizeof(struct sigaction)) < B_OK))
 		return B_BAD_ADDRESS;
 
-	status = sigaction(signal, userAction ? &act : NULL, userOldAction ? &oact : NULL);
+	status = sigaction(signal, userAction ? &act : NULL,
+		userOldAction ? &oact : NULL);
 
 	// only copy the old action if a pointer has been given
 	if (status >= B_OK && userOldAction != NULL
@@ -639,7 +646,7 @@ _user_sigaction(int signal, const struct sigaction *userAction, struct sigaction
 }
 
 
-int
+status_t
 _user_sigsuspend(const sigset_t *userMask)
 {
 	sigset_t mask;
@@ -653,7 +660,7 @@ _user_sigsuspend(const sigset_t *userMask)
 }
 
 
-int
+status_t
 _user_sigpending(sigset_t *userSet)
 {
 	sigset_t set;
@@ -670,5 +677,61 @@ _user_sigpending(sigset_t *userSet)
 		return B_BAD_ADDRESS;
 
 	return status;
+}
+
+
+status_t
+_user_set_signal_stack(const stack_t *newUserStack, stack_t *oldUserStack)
+{
+	struct thread *thread = thread_get_current_thread();
+	struct stack_t newStack, oldStack;
+	bool onStack = false;
+
+	if ((newUserStack != NULL && user_memcpy(&newStack, newUserStack,
+				sizeof(stack_t)) < B_OK)
+		|| (oldUserStack != NULL && user_memcpy(&oldStack, oldUserStack,
+				sizeof(stack_t)) < B_OK))
+		return B_BAD_ADDRESS;
+
+	if (thread->signal_stack_enabled) {
+		// determine wether or not the user thread is currently
+		// on the active signal stack
+		onStack = arch_on_signal_stack(thread);
+	}
+
+	if (oldUserStack != NULL) {
+		oldStack.ss_sp = (void *)thread->signal_stack_base;
+		oldStack.ss_size = thread->signal_stack_size;
+		oldStack.ss_flags = (thread->signal_stack_enabled ? 0 : SS_DISABLE)
+			| (onStack ? SS_ONSTACK : 0);
+	}
+
+	if (newUserStack != NULL) {
+		// no flags other than SS_DISABLE are allowed
+		if ((newStack.ss_flags & ~SS_DISABLE) != 0)
+			return B_BAD_VALUE;
+
+		if ((newStack.ss_flags & SS_DISABLE) == 0) {
+			// check if the size is valid
+			if (newStack.ss_size < MINSIGSTKSZ)
+				return B_NO_MEMORY;
+			if (onStack)
+				return B_NOT_ALLOWED;
+			if (!IS_USER_ADDRESS(newStack.ss_sp))
+				return B_BAD_VALUE;
+
+			thread->signal_stack_base = (addr_t)newStack.ss_sp;
+			thread->signal_stack_size = newStack.ss_size;
+			thread->signal_stack_enabled = true;
+		} else
+			thread->signal_stack_enabled = false;
+	}
+
+	// only copy the old stack info if a pointer has been given
+	if (oldUserStack != NULL
+		&& user_memcpy(oldUserStack, &oldStack, sizeof(stack_t)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return B_OK;
 }
 

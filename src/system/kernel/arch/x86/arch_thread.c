@@ -76,29 +76,30 @@ x86_pop_iframe(struct iframe_stack *stack)
 }
 
 
-/**	Returns the current iframe structure of the running thread.
- *	This function must only be called in a context where it's actually
- *	sure that such iframe exists; ie. from syscalls, but usually not
- *	from standard kernel threads.
- */
-
+/*!
+	Returns the current iframe structure of the running thread.
+	This function must only be called in a context where it's actually
+	sure that such iframe exists; ie. from syscalls, but usually not
+	from standard kernel threads.
+*/
 static struct iframe *
-i386_get_current_iframe(void)
+get_current_iframe(void)
 {
 	struct thread *thread = thread_get_current_thread();
 
 	ASSERT(thread->arch_info.iframes.index >= 0);
-	return thread->arch_info.iframes.frames[thread->arch_info.iframes.index - 1];
+	return thread->arch_info.iframes.frames[
+		thread->arch_info.iframes.index - 1];
 }
 
 
-/**	\brief Returns the current thread's topmost (i.e. most recent)
- *	userland->kernel transition iframe (usually the first one, save for
- *	interrupts in signal handlers).
- *	\return The iframe, or \c NULL, if there is no such iframe (e.g. when
- *			the thread is a kernel thread).
- */
-
+/*!
+	\brief Returns the current thread's topmost (i.e. most recent)
+	userland->kernel transition iframe (usually the first one, save for
+	interrupts in signal handlers).
+	\return The iframe, or \c NULL, if there is no such iframe (e.g. when
+			the thread is a kernel thread).
+*/
 struct iframe *
 i386_get_user_iframe(void)
 {
@@ -158,6 +159,16 @@ set_tls_context(struct thread *thread)
 static uint32 *
 get_signal_stack(struct thread *thread, struct iframe *frame, int signal)
 {
+	// use the alternate signal stack if we should and can
+	if (thread->signal_stack_enabled
+		&& (thread->sig_action[signal].sa_flags & SA_ONSTACK) != 0
+		&& (frame->user_esp < thread->signal_stack_base
+			|| frame->user_esp > thread->signal_stack_base
+				+ thread->signal_stack_size)) {
+		return (uint32 *)(thread->signal_stack_base
+			+ thread->signal_stack_size);
+	}
+
 	return (uint32 *)frame->user_esp;
 }
 
@@ -360,11 +371,22 @@ arch_thread_enter_userspace(struct thread *t, addr_t entry, void *args1, void *a
 }
 
 
+bool
+arch_on_signal_stack(struct thread *thread)
+{
+	struct iframe *frame = get_current_iframe();
+	
+	return frame->user_esp >= thread->signal_stack_base
+		&& frame->user_esp < thread->signal_stack_base
+			+ thread->signal_stack_size;
+}
+
+
 status_t
 arch_setup_signal_frame(struct thread *thread, struct sigaction *sa,
 	int signal, int signalMask)
 {
-	struct iframe *frame = i386_get_current_iframe();
+	struct iframe *frame = get_current_iframe();
 	uint32 *userStack = (uint32 *)frame->user_esp;
 	uint32 *signalCode;
 	uint32 *userRegs;
@@ -444,7 +466,7 @@ int64
 arch_restore_signal_frame(void)
 {
 	struct thread *thread = thread_get_current_thread();
-	struct iframe *frame = i386_get_current_iframe();
+	struct iframe *frame = get_current_iframe();
 	int32 signalMask;
 	uint32 *userStack;
 	struct vregs regs;
@@ -483,7 +505,7 @@ arch_restore_signal_frame(void)
 void
 arch_check_syscall_restart(struct thread *thread)
 {
-	struct iframe *frame = i386_get_current_iframe();
+	struct iframe *frame = get_current_iframe();
 	if (frame == NULL) {
 		// this thread is obviously new; we didn't come from an interrupt
 		return;
@@ -506,7 +528,7 @@ arch_check_syscall_restart(struct thread *thread)
 void
 arch_store_fork_frame(struct arch_fork_arg *arg)
 {
-	struct iframe *frame = i386_get_current_iframe();
+	struct iframe *frame = get_current_iframe();
 
 	// we need to copy the threads current iframe
 	arg->iframe = *frame;

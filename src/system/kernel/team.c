@@ -984,7 +984,8 @@ exec_team(const char *path, int32 argCount, char * const *args,
 	struct thread *thread;
 	thread_id nubThreadID = -1;
 
-	TRACE(("exec_team(path = \"%s\", argc = %ld, envCount = %ld): team %lx\n", args[0], argCount, envCount, team->id));
+	TRACE(("exec_team(path = \"%s\", argc = %ld, envCount = %ld): team %lx\n",
+		args[0], argCount, envCount, team->id));
 
 	// switching the kernel at run time is probably not a good idea :)
 	if (team == team_get_kernel_team())
@@ -1031,8 +1032,9 @@ exec_team(const char *path, int32 argCount, char * const *args,
 	teamArgs->args[0] = strdup(path);
 
 	// ToDo: remove team resources if there are any left
-	// alarm, signals
 	// thread_atkernel_exit() might not be called at all
+
+	thread_reset_for_exec();
 
 	user_debug_prepare_for_exec();
 

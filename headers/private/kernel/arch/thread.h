@@ -21,10 +21,13 @@ status_t arch_team_init_team_struct(struct team *t, bool kernel);
 status_t arch_thread_init_thread_struct(struct thread *t);
 status_t arch_thread_init_tls(struct thread *thread);
 void arch_thread_context_switch(struct thread *t_from, struct thread *t_to);
-status_t arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void), void (*entry_func)(void), void (*exit_func)(void));
+status_t arch_thread_init_kthread_stack(struct thread *t,
+	int (*start_func)(void), void (*entry_func)(void), void (*exit_func)(void));
 void arch_thread_dump_info(void *info);
-status_t arch_thread_enter_userspace(struct thread *t, addr_t entry, void *args1, void *args2);
-void arch_thread_switch_kstack_and_call(struct thread *t, addr_t new_kstack, void (*func)(void *), void *arg);
+status_t arch_thread_enter_userspace(struct thread *t, addr_t entry,
+	void *args1, void *args2);
+void arch_thread_switch_kstack_and_call(struct thread *t, addr_t new_kstack,
+	void (*func)(void *), void *arg);
 
 // ToDo: doing this this way is an ugly hack - please fix me!
 //		(those functions are "static inline" for x86 - since
@@ -34,7 +37,9 @@ struct thread *arch_thread_get_current_thread(void);
 void arch_thread_set_current_thread(struct thread *t);
 #endif
 
-status_t arch_setup_signal_frame(struct thread *t, struct sigaction *sa, int sig, int sig_mask);
+bool arch_on_signal_stack(struct thread *thread);
+status_t arch_setup_signal_frame(struct thread *t, struct sigaction *sa,
+	int signal, int signalMask);
 int64 arch_restore_signal_frame(void);
 void arch_check_syscall_restart(struct thread *t);
 

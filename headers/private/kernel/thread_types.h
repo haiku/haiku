@@ -140,6 +140,9 @@ struct thread {
 	sigset_t		sig_pending;
 	sigset_t		sig_block_mask;
 	struct sigaction sig_action[32];
+	addr_t			signal_stack_base;
+	size_t			signal_stack_size;
+	bool			signal_stack_enabled;
 
 	bool			in_kernel;
 	bool			was_yielded;
