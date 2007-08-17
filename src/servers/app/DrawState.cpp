@@ -7,6 +7,7 @@
  *		Adi Oanca <adioanca@mymail.ro>
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Michael Pfeiffer <laplace@users.sourceforge.net>
  */
 
 /**	Data classes for working with BView states and draw parameters */
@@ -281,14 +282,27 @@ DrawState::WriteToLink(BPrivate::LinkSender& link) const
 void
 DrawState::SetOrigin(const BPoint& origin)
 {
-	fOrigin = fPreviousState ? fPreviousState->fOrigin + origin : origin;
+	fOrigin = origin;
+	// origin is given as a point in the
+	// "outer" coordinate system, therefore
+	// it has to be transformed
+	if (PreviousState() != NULL)
+		PreviousState()->Transform(&fOrigin);
 }
 
 
 void
 DrawState::OffsetOrigin(const BPoint& offset)
 {
-	fOrigin += offset;
+	if (PreviousState() == NULL)
+		fOrigin += offset;
+	else {
+		// TODO this is necessary only if offset 
+		// is in the "outer" coordinate system
+		float scale = PreviousState()->Scale();
+		fOrigin.x += offset.x * scale;
+		fOrigin.y += offset.y * scale;
+	}		
 }
 
 
@@ -296,14 +310,12 @@ void
 DrawState::SetScale(float scale)
 {
 	// the scale is multiplied with the scale of the previous state if any
-	float localScale = fScale;
+	float localScale = scale;
 	if (PreviousState() != NULL)
-		localScale /= PreviousState()->Scale();
+		localScale *= PreviousState()->Scale();
 
-	if (localScale != scale) {
-		fScale = scale;
-		if (PreviousState() != NULL)
-			fScale *= PreviousState()->Scale();
+	if (fScale != localScale) {
+		fScale = localScale;
 
 		// update font size
 		// (pen size is currently calulated on the fly)
@@ -315,10 +327,13 @@ DrawState::SetScale(float scale)
 void
 DrawState::Transform(float* x, float* y) const
 {
-	*x += fOrigin.x;
-	*y += fOrigin.y;
+	// scale relative to origin, therefore
+	// scale first then translate to
+	// origin
 	*x *= fScale;
 	*y *= fScale;
+	*x += fOrigin.x;
+	*y += fOrigin.y;
 }
 
 // InverseTransform
@@ -326,10 +341,10 @@ void
 DrawState::InverseTransform(float* x, float* y) const
 {
 	// TODO: watch out for fScale = 0?
-	*x /= fScale;
-	*y /= fScale;
 	*x -= fOrigin.x;
 	*y -= fOrigin.y;
+	*x /= fScale;
+	*y /= fScale;
 }
 
 // Transform
