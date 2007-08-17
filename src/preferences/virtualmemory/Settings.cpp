@@ -205,6 +205,14 @@ Settings::RevertSwapChanges()
 
 
 bool
+Settings::IsDefaultable()
+{
+	return fSwapEnabled != fInitialSwapEnabled
+		|| fSwapSize != fInitialSwapSize;
+}
+
+
+bool
 Settings::SwapChanged()
 {
 	return fSwapEnabled != fInitialSwapEnabled

@@ -33,6 +33,7 @@ class MainWindow : public BWindow {
 
 		BMessageRunner*	fRunner;
 		FontView*		fFontsView;
+		BButton*		fDefaultsButton;
 		BButton*		fRevertButton;
 
 		FontsSettings	fSettings;

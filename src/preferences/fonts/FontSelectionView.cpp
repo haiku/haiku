@@ -392,6 +392,29 @@ FontSelectionView::Revert()
 
 
 bool
+FontSelectionView::IsDefaultable()
+{
+	font_family default_family;
+	font_style default_style;
+	float default_size;
+
+	if (_get_system_default_font_(Name(), default_family, default_style, &default_size) != B_OK)
+		return false;
+
+	font_family current_family;
+	font_style current_style;
+	float current_size;
+
+	fCurrentFont.GetFamilyAndStyle(&current_family, &current_style);
+	current_size = fCurrentFont.Size();
+
+	return strcmp(current_family, default_family) != 0
+		|| strcmp(current_style, default_style) != 0
+		|| current_size != default_size;
+}
+
+
+bool
 FontSelectionView::IsRevertable()
 {
 	return fCurrentFont != fSavedFont;

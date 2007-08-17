@@ -34,6 +34,7 @@ class FontSelectionView : public BView {
 
 		void			SetDefaults();
 		void			Revert();
+		bool			IsDefaultable();
 		bool			IsRevertable();
 
 		void			UpdateFontsMenu();

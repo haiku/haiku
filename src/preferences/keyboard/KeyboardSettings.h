@@ -21,6 +21,7 @@ public :
 	void Dump();
 	void Revert();
 	void Defaults();
+	bool IsDefaultable();
 	
 	BPoint WindowCorner() const { return fCorner; }
 	void SetWindowCorner(BPoint corner);

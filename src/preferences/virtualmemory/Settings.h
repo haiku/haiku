@@ -27,6 +27,7 @@ class Settings {
 
 		void SetSwapDefaults();
 		void RevertSwapChanges();
+		bool IsDefaultable();
 		bool SwapChanged();
 
 	private:

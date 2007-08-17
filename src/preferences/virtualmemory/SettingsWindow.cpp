@@ -196,17 +196,19 @@ SettingsWindow::SettingsWindow()
 	// Add "Defaults" and "Revert" buttons
 
 	rect.top = box->Frame().bottom + 10;
-	BButton* button = new BButton(rect, "defaults", "Defaults", new BMessage(kMsgDefaults));
-	button->ResizeToPreferred();
-	view->AddChild(button);
+	fDefaultsButton = new BButton(rect, "defaults", "Defaults", new BMessage(kMsgDefaults));
+	fDefaultsButton->ResizeToPreferred();
+	fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
+	view->AddChild(fDefaultsButton);
 
-	rect = button->Frame();
+	rect = fDefaultsButton->Frame();
 	rect.OffsetBy(rect.Width() + 10, 0);
 	fRevertButton = new BButton(rect, "revert", "Revert", new BMessage(kMsgRevert));
-	button->ResizeToPreferred();
+	fRevertButton->ResizeToPreferred();
+	fRevertButton->SetEnabled(false);
 	view->AddChild(fRevertButton);
 
-	view->ResizeTo(view->Frame().Width(), button->Frame().bottom + 10);
+	view->ResizeTo(view->Frame().Width(), fRevertButton->Frame().bottom + 10);
 	ResizeTo(view->Bounds().Width(), view->Bounds().Height());
 	AddChild(view);
 		// add view after resizing the window, so that the view's resizing
@@ -265,6 +267,8 @@ SettingsWindow::_Update()
 	}
 
 	// ToDo: set volume
+
+	fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
 
 	bool changed = fSettings.SwapChanged();
 	if (fRevertButton->IsEnabled() != changed) {

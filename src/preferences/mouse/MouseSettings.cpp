@@ -191,6 +191,23 @@ MouseSettings::Defaults()
 }
 
 
+/** Checks if the settings are different then the system defaults
+ */
+
+bool
+MouseSettings::IsDefaultable()
+{
+	return fSettings.click_speed != kDefaultClickSpeed
+		|| fSettings.accel.speed != kDefaultMouseSpeed
+		|| fSettings.type != kDefaultMouseType
+		|| fSettings.accel.accel_factor != kDefaultAccelerationFactor
+		|| fMode != B_NORMAL_MOUSE
+		|| fSettings.map.button[0] != B_PRIMARY_MOUSE_BUTTON
+		|| fSettings.map.button[1] != B_SECONDARY_MOUSE_BUTTON
+		|| fSettings.map.button[2] != B_TERTIARY_MOUSE_BUTTON;
+}
+
+
 /**	Reverts to the active settings at program startup
  */
 

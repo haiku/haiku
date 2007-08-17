@@ -35,15 +35,16 @@ MainWindow::MainWindow()
 
 	rect.left = 10;
 	rect.top = rect.bottom - 10;
-	BButton *button = new BButton(rect, "defaults", "Defaults",
+	fDefaultsButton = new BButton(rect, "defaults", "Defaults",
 		new BMessage(kMsgSetDefaults), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW);
-	button->ResizeToPreferred();
-	float buttonHeight = button->Bounds().Height();
-	button->MoveBy(0, -buttonHeight);
-	view->AddChild(button);
+	fDefaultsButton->ResizeToPreferred();
+	fDefaultsButton->SetEnabled(false);
+	float buttonHeight = fDefaultsButton->Bounds().Height();
+	fDefaultsButton->MoveBy(0, -buttonHeight);
+	view->AddChild(fDefaultsButton);
 
-	rect = button->Frame();
-	rect.OffsetBy(button->Bounds().Width() + 10, 0);
+	rect = fDefaultsButton->Frame();
+	rect.OffsetBy(fDefaultsButton->Bounds().Width() + 10, 0);
 
 	fRevertButton = new BButton(rect, "revert", "Revert",
 		new BMessage(kMsgRevert), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW);
@@ -99,6 +100,8 @@ MainWindow::MainWindow()
 
 	fRunner = new BMessageRunner(this, new BMessage(kMsgCheckFonts), 3000000);
 		// every 3 seconds
+
+	fDefaultsButton->SetEnabled(fFontsView->IsDefaultable());
 }
 
 
@@ -123,16 +126,19 @@ MainWindow::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case kMsgUpdate:
+			fDefaultsButton->SetEnabled(fFontsView->IsDefaultable());
 			fRevertButton->SetEnabled(fFontsView->IsRevertable());
 			break;
 
 		case kMsgSetDefaults:
 			fFontsView->SetDefaults();
+			fDefaultsButton->SetEnabled(false);
 			fRevertButton->SetEnabled(fFontsView->IsRevertable());
 			break;
 
 		case kMsgRevert:
 			fFontsView->Revert();
+			fDefaultsButton->SetEnabled(fFontsView->IsDefaultable());
 			fRevertButton->SetEnabled(false);
 			break;
 

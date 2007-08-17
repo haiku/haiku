@@ -33,10 +33,9 @@ class MouseWindow : public BWindow {
 		virtual bool QuitRequested();
 		virtual void MessageReceived(BMessage *message);
 
-		void SetRevertable(bool revertable);
-
 	private:
 		MouseSettings	fSettings;
+		BButton			*fDefaultsButton;
 		BButton			*fRevertButton;
 		SettingsView	*fSettingsView;
 };

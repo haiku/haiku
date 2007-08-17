@@ -30,6 +30,7 @@ class MouseSettings {
 
 		void Revert();
 		void Defaults();
+		bool IsDefaultable();
 		void Dump();
 
 		BPoint WindowPosition() const { return fWindowPosition; }

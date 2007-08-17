@@ -30,6 +30,7 @@ class SettingsWindow : public BWindow {
 
 		BCheckBox*		fSwapEnabledCheckBox;
 		BSlider*		fSizeSlider;
+		BButton*		fDefaultsButton;
 		BButton*		fRevertButton;
 		BStringView*	fWarningStringView;
 

@@ -117,3 +117,11 @@ KeyboardSettings::Defaults()
 	SetKeyboardRepeatDelay(kb_default_key_repeat_delay);
 	SetKeyboardRepeatRate(kb_default_key_repeat_rate);
 }
+
+
+bool
+KeyboardSettings::IsDefaultable()
+{
+	return fSettings.key_repeat_delay != kb_default_key_repeat_delay
+		|| fSettings.key_repeat_rate != kb_default_key_repeat_rate;
+}

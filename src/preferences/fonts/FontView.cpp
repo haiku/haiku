@@ -93,6 +93,13 @@ FontView::RelayoutIfNeeded()
 	fFixedView->RelayoutIfNeeded();
 }
 
+bool
+FontView::IsDefaultable()
+{
+	return fPlainView->IsDefaultable()
+		|| fBoldView->IsDefaultable()
+		|| fFixedView->IsDefaultable();
+}
 
 bool
 FontView::IsRevertable()

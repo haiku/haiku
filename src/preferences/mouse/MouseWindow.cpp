@@ -48,12 +48,13 @@ MouseWindow::MouseWindow(BRect _rect)
 	// Add the "Default" button
 	BRect rect(kBorderSpace, fSettingsView->Frame().bottom + kItemSpace + 2,
 		kBorderSpace + 75, fSettingsView->Frame().bottom + 20);
-	BButton *button = new BButton(rect, "defaults", "Defaults", new BMessage(kMsgDefaults));
-	button->ResizeToPreferred();
-	view->AddChild(button);
+	fDefaultsButton = new BButton(rect, "defaults", "Defaults", new BMessage(kMsgDefaults));
+	fDefaultsButton->ResizeToPreferred();
+	fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
+	view->AddChild(fDefaultsButton);
 
 	// Add the "Revert" button
-	rect.OffsetBy(button->Bounds().Width() + kItemSpace, 0);
+	rect.OffsetBy(fDefaultsButton->Bounds().Width() + kItemSpace, 0);
 	fRevertButton = new BButton(rect, "revert", "Revert", new BMessage(kMsgRevert));
 	fRevertButton->SetEnabled(false);
 	fRevertButton->ResizeToPreferred();
@@ -64,7 +65,7 @@ MouseWindow::MouseWindow(BRect _rect)
 		// buttons and draw the selected imagery
 
 	ResizeTo(fSettingsView->Frame().right + kBorderSpace,
-		button->Frame().bottom + kBorderSpace - 1);
+		fRevertButton->Frame().bottom + kBorderSpace - 1);
 
 	// check if the window is on screen
 
@@ -105,7 +106,8 @@ MouseWindow::MessageReceived(BMessage *message)
 			fSettings.Defaults();
 			fSettingsView->UpdateFromSettings();
 
-			SetRevertable(true);
+			fDefaultsButton->SetEnabled(false);
+			fRevertButton->SetEnabled(true);
 			break;
 		}
 
@@ -114,7 +116,8 @@ MouseWindow::MessageReceived(BMessage *message)
 			fSettings.Revert();
 			fSettingsView->UpdateFromSettings();
 
-			SetRevertable(false);
+			fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
+			fRevertButton->SetEnabled(false);
 			break;
 		}
 
@@ -124,7 +127,8 @@ MouseWindow::MessageReceived(BMessage *message)
 			if (message->FindInt32("index", &type) == B_OK) {
 				fSettings.SetMouseType(++type);
 				fSettingsView->SetMouseType(type);
-				SetRevertable(true);
+				fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
+				fRevertButton->SetEnabled(true);
 			}
 			break;
 		}
@@ -134,7 +138,8 @@ MouseWindow::MessageReceived(BMessage *message)
 			int32 mode;
 			if (message->FindInt32("mode", &mode) == B_OK) {
 				fSettings.SetMouseMode((mode_mouse)mode);
-				SetRevertable(true);
+				fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
+				fRevertButton->SetEnabled(true);
 			}
 			break;
 		}
@@ -145,7 +150,8 @@ MouseWindow::MessageReceived(BMessage *message)
 			if (message->FindInt32("be:value", &value) == B_OK) {
 				// slow = 1000000, fast = 0
 				fSettings.SetClickSpeed(value * 1000);
-				SetRevertable(true);
+				fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
+				fRevertButton->SetEnabled(true);
 			}
 			break;
 		}
@@ -156,7 +162,8 @@ MouseWindow::MessageReceived(BMessage *message)
 			if (message->FindInt32("be:value", &value) == B_OK) {
 				// slow = 8192, fast = 524287
 				fSettings.SetMouseSpeed((int32)pow(2, value * 6 / 1000) * 8192);
-				SetRevertable(true);
+				fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
+				fRevertButton->SetEnabled(true);
 			}
 			break;
 		}
@@ -167,7 +174,8 @@ MouseWindow::MessageReceived(BMessage *message)
 			if (message->FindInt32("be:value", &value) == B_OK) {
 				// slow = 0, fast = 262144
 				fSettings.SetAccelerationFactor((int32)pow(value * 4 / 1000, 2) * 16384);
-				SetRevertable(true);
+				fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
+				fRevertButton->SetEnabled(true);
 			}
 			break;
 		}
@@ -189,7 +197,8 @@ MouseWindow::MessageReceived(BMessage *message)
 				}
 
 				fSettings.SetMapping(button, mapping);
-				SetRevertable(true);
+				fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
+				fRevertButton->SetEnabled(true);
 				fSettingsView->MouseMapUpdated();
 			}
 			break;
@@ -199,12 +208,5 @@ MouseWindow::MessageReceived(BMessage *message)
 			BWindow::MessageReceived(message);
 			break;
 	}
-}
-
-
-void 
-MouseWindow::SetRevertable(bool revertable)
-{
-	fRevertButton->SetEnabled(revertable);
 }
 
