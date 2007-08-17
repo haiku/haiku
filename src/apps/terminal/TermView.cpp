@@ -328,10 +328,13 @@ TermView::_InitObject(int32 argc, const char **argv)
 
 TermView::~TermView()
 {
+	Shell *shell = fShell;
+		// _DetachShell sets fShell to NULL
+	printf("TermView::~TermView()\n");
 	_DetachShell();
 	
 	delete fTextBuffer;
-	delete fShell;
+	delete shell;
 
 	fQuitting = true;
 	kill_thread(fMouseThread);

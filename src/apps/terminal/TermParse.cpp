@@ -102,9 +102,6 @@ TermParse::StopThreads()
 
 	fQuitting = true;
 
-	//suspend_thread(fReaderThread);
-		// TODO: interrupt read() - doesn't work for whatever reason
-
 	StopPtyReader();
 	StopTermParse();
 	
@@ -229,7 +226,11 @@ TermParse::StopPtyReader()
 
 	if (fReaderThread >= 0) {
 		status_t dummy;
-		wait_for_thread(fReaderThread, &dummy);
+		//suspend_thread(fReaderThread);
+		// TODO: interrupt read() - doesn't work for whatever reason
+		//wait_for_thread(fReaderThread, &dummy);
+		kill_thread(fReaderThread);
+	
 		fReaderThread = -1;	
 	}
 }

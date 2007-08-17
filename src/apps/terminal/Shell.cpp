@@ -31,7 +31,6 @@
 #include <time.h>
 #include <unistd.h>
 
-#define MAXPTTYS 16 * 4
 
 #ifndef CEOF
 #define CEOF ('D'&037)
@@ -55,29 +54,6 @@
 #define CSWTCH 0
 #endif
 
-/*
- * ANSI emulation.
- */
-#define INQ	0x05
-#define	FF	0x0C			/* C0, C1 control names		*/
-#define	LS1	0x0E
-#define	LS0	0x0F
-#define	CAN	0x18
-#define	SUB	0x1A
-#define	ESC	0x1B
-#define US	0x1F
-#define	DEL	0x7F
-#define HTS     ('H'+0x40)
-#define	SS2	0x8E
-#define	SS3	0x8F
-#define	DCS	0x90
-#define	OLDID	0x9A			/* ESC Z			*/
-#define	CSI	0x9B
-#define	ST	0x9C
-#define	OSC	0x9D
-#define	PM	0x9E
-#define	APC	0x9F
-#define	RDEL	0xFF
 
 /* default shell command and options. */
 const char *kDefaultShellCommand = { "/bin/sh" "-login" };
@@ -460,7 +436,7 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 		/*
 		 * set terminal interface.
 		 */
-		if (tcsetattr (0, TCSANOW, &tio) == -1) {
+		if (tcsetattr(0, TCSANOW, &tio) == -1) {
 			handshake.status = PTY_NG;
 			snprintf(handshake.msg, sizeof(handshake.msg),
 				"failed set terminal interface (TERMIOS).");
@@ -505,7 +481,6 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 		setenv("TTY", ttyName, true);
 		setenv("TTYPE", encoding, true);
 		setenv("SHELL", *argv, true);
-
 
 		execve(*argv, (char * const *)argv, environ);
 
