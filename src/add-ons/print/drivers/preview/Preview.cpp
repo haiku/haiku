@@ -165,7 +165,10 @@ void PreviewView::DrawPage(BRect rect)
 	BRect r(PrintableRect());
 	r.OffsetBy(kPreviewLeftMargin, kPreviewTopMargin);
 	BRegion clip(r);
-	ConstrainClippingRegion(&clip);	
+	// Text drawing does not work if clipping region
+	// is constraint.
+	// TODO enable after app_server bug has been fixed
+	// ConstrainClippingRegion(&clip);	
 
 	// draw page contents
 	PushState();
@@ -177,8 +180,10 @@ void PreviewView::DrawPage(BRect rect)
 	
 	SetScale(ZoomFactor());
 	
-	fCachedPage->Draw(this);
-	
+		PushState();
+		fCachedPage->Draw(this);
+		PopState();
+		
 	PopState();
 }
 
