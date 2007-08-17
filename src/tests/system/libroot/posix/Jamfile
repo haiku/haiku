@@ -10,6 +10,10 @@ SimpleTest flock_test
 	: flock_test.cpp
 ;
 
+SimpleTest signal_test
+	: signal_test.cpp
+;
+
 SimpleTest setjmp_test
 	: setjmp_test.c
 ;

@@ -1,20 +1,15 @@
-#include <stdio.h>
-#include <signal.h>
-#include <errno.h>
-
 /*
- *  Copyright (c) 2002, OpenBeOS Project. All rights reserved.
- *  Distributed under the terms of the OpenBeOS license.
+ * Copyright 2002-2007, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
  *
- *
- *  strsignal.c:
- *  implements the signal function strsignal()
- *
- *
- *  Author(s):
- *  Daniel Reinhold (danielre@users.sf.net)
- *
+ * Author:
+ *		Daniel Reinhold (danielre@users.sf.net)
  */
+
+
+#include <errno.h>
+#include <signal.h>
+#include <stdio.h>
 
 
 const char * const
@@ -56,13 +51,13 @@ const char *
 strsignal(int sig)
 {
 	const char *s = NULL;
-	
+
 	if (sig < 0 || sig > MAX_SIGNO)
 		return "Bogus signal number";
-	
+
 	if (sig < NSIG)
 		s = sys_siglist[sig];
-	
+
 	if (s)
 		return s;
 	else {

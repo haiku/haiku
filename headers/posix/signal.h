@@ -12,17 +12,20 @@
 typedef int	sig_atomic_t;
 typedef long sigset_t;
 
-typedef void (*sig_func_t)(int);
-typedef void (*__signal_func_ptr)(int);  /* deprecated, for compatibility with BeOS only */
+typedef void (*sighandler_t)(int);
+	/* GNU-like signal handler typedef */
+
+typedef void (*__signal_func_ptr)(int);
+	/* deprecated, for compatibility with BeOS only */
 
 
-typedef union sigval {
-	int		sival_int;
-	void	*sival_ptr;
-} sigval_t;
+/* macros defining the standard signal handling behavior */
+#define SIG_DFL		((sighandler_t)0)	/* "default" signal behaviour */
+#define SIG_IGN		((sighandler_t)1)	/* ignore signal */
+#define SIG_ERR		((sighandler_t)-1)	/* an error occurred during signal processing */
+#define SIG_HOLD	((sighandler_t)3)	/* the signal was hold */
 
-
-// ToDo: actually make use of this structure!
+// TODO: support this structure!
 typedef struct {
 	int		si_signo;	/* signal number */
 	int		si_code;	/* signal code */
@@ -32,45 +35,32 @@ typedef struct {
 	void	*si_addr;	/* address of faulting instruction */
 	int		si_status;	/* exit value or signal */
 	long	si_band;	/* band event for SIGPOLL */
-	union sigval si_value;	/* signal value */
 } siginfo_t;
-
-
-/*
- * macros defining the standard signal handling behavior
- */
-#define SIG_DFL	((sig_func_t) 0)   /* the signal was treated in the "default" manner */
-#define SIG_IGN	((sig_func_t) 1)   /* the signal was ignored */
-#define SIG_ERR	((sig_func_t)-1)   /* an error occurred during signal processing */
-#define SIG_HOLD ((sig_func_t) 3)  /* the signal was hold */
-
 
 /*
  * structure used by sigaction()
  *
- * Note: the 'sa_userdata' field is a non-Posix extension.
- * See the SPECIAL NOTES below for an explanation of this.
- * 
+ * Note: the 'sa_userdata' field is a non-POSIX extension.
+ * See the documentation for more info on this.
  */
 struct sigaction {
-	sig_func_t	sa_handler;
+	sighandler_t sa_handler;
 	sigset_t	sa_mask;
 	int			sa_flags;
 	void		*sa_userdata;  /* will be passed to the signal handler */
 };
 
-
 /* values for sa_flags */
 #define SA_NOCLDSTOP	0x01
-#define SA_ONESHOT		0x02
-#define SA_NOMASK		0x04
-#define SA_NODEFER		SA_NOMASK
-#define SA_RESTART		0x08
-#define SA_STACK		0x10
-#define SA_ONSTACK		SA_STACK
-#define SA_RESETHAND	0x20
+#define SA_NOCLDWAIT	0x02
+#define SA_RESETHAND	0x04
+#define SA_NODEFER		0x08
+#define SA_RESTART		0x10
+#define SA_ONSTACK		0x20
 #define SA_SIGINFO		0x40
-#define SA_NOCLDWAIT	0x80
+#define SA_NOMASK		SA_NODEFER
+#define SA_STACK		SA_ONSTACK
+#define SA_ONESHOT		SA_RESETHAND
 
 /* values for ss_flags */
 #define SS_ONSTACK		0x1
@@ -94,14 +84,14 @@ typedef struct sigstack {
 } sigstack;
 
 /* for the 'how' arg of sigprocmask() */
-#define SIG_BLOCK    1
-#define SIG_UNBLOCK  2
-#define SIG_SETMASK  3
+#define SIG_BLOCK		1
+#define SIG_UNBLOCK		2
+#define SIG_SETMASK		3
 
 /*
  * The list of all defined signals:
  *
- * The numbering of signals for OpenBeOS attempts to maintain 
+ * The numbering of signals for Haiku attempts to maintain 
  * some consistency with UN*X conventions so that things 
  * like "kill -9" do what you expect.
  */
@@ -142,9 +132,10 @@ typedef struct sigstack {
  * releases.  Use them at your own peril (if you do use them, at least
  * be smart and use them backwards from signal 32).
  */
-#define MAX_SIGNO     32       /* the most signals that a single thread can reference */
-#define __signal_max  29       /* the largest signal number that is actually defined */
-#define NSIG (__signal_max+1)  /* the number of defined signals */
+#define MAX_SIGNO		32	/* the most signals that a single thread can reference */
+#define __signal_max	29	/* the largest signal number that is actually defined */
+#define NSIG			(__signal_max+1)
+	/* the number of defined signals */
 
 
 /* the global table of text strings containing descriptions for each signal */
@@ -155,7 +146,7 @@ extern const char * const sys_siglist[NSIG];
 extern "C" {
 #endif
 
-sig_func_t signal(int sig, sig_func_t signal_handler);
+sighandler_t signal(int sig, sighandler_t signalHandler);
 int     raise(int sig);
 int     kill(pid_t pid, int sig);
 int     send_signal(pid_t tid, unsigned int sig);
@@ -205,7 +196,7 @@ sigdelset(sigset_t *set, int sig)
 }
 #endif
 
-/*
+/* TODO: move this into the documentation!
  * ==================================================
  * !!! SPECIAL NOTES CONCERNING NON-POSIX EXTENSIONS:
  * ==================================================
@@ -226,7 +217,7 @@ sigdelset(sigset_t *set, int sig)
  * handling. It also allows an opportunity, via the 'sigaction' struct, to
  * enable additional data to be passed to the handler. For example:
  *    void
- *    my_signal_handler(int sig, char *somedata, vregs regs)
+ *    my_signal_handler(int sig, char *userData, vregs regs)
  *    {
  *    . . .
  *    }
@@ -234,10 +225,9 @@ sigdelset(sigset_t *set, int sig)
  *    struct sigaction sa;
  *    char data_buffer[32];
  *
- *    sa.sa_handler = (sig_func_t) my_signal_handler;
+ *    sa.sa_handler = (sighandler_t)my_signal_handler;
  *    sigemptyset(&sa.sa_mask);
- *    sigaddset(&sa.sa_mask, SIGINT);
- *    sa.sa_userdata = data_buffer;
+ *    sa.sa_userdata = userData;
  *
  *    // install the handler
  *    sigaction(SIGINT, &sa, NULL);
@@ -245,29 +235,21 @@ sigdelset(sigset_t *set, int sig)
  * The two additional arguments available to the signal handler are extensions
  * to the Posix standard. This feature was introduced by the BeOS and retained
  * by Haiku. However, to remain compatible with Posix and ANSI C, the type
- * of the sa_handler field is defined as 'sig_func_t'. This requires the handler
+ * of the sa_handler field is defined as 'sighandler_t'. This requires the handler
  * to be cast when assigned to the sa_handler field, as in the example above.
  *
- * NOTE: C++ member functions can not be signal handlers!
- * This is because they expect a "this" pointer as the first argument.
- *
- *
  * The 3 arguments that Haiku provides to signal handlers are as follows:
+ * 1) The first argument is the (usual) signal number.
  *
- *  - The first argument is the (usual) signal number.
- *
- *  - The second argument is whatever value is put in the sa_userdata field
+ * 2) The second argument is whatever value is put in the sa_userdata field
  *    of the sigaction struct.
  *
- *  - The third argument is a pointer to a vregs struct (defined below).
+ * 3) The third argument is a pointer to a vregs struct (defined below).
  *    The vregs struct contains the contents of the volatile registers at
  *    the time the signal was delivered to your thread. You can change the fields
  *    of the structure. After your signal handler completes, the OS uses this struct
  *    to reload the registers for your thread (privileged registers are not loaded
  *    of course). The vregs struct is of course terribly machine dependent.
- *    If you use it, you should expect to have to re-work your code when new
- *    processors come out. Nonetheless, the ability to change the registers does
- *    open some interesting programming possibilities.
  */
 
 /*

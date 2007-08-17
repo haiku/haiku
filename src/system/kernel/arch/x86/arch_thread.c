@@ -156,14 +156,25 @@ set_tls_context(struct thread *thread)
 }
 
 
+static inline void
+restart_syscall(struct iframe *frame)
+{
+	frame->eax = frame->orig_eax;
+	frame->edx = frame->orig_edx;
+	frame->eip -= 2;
+		// undos the "int $99" syscall interrupt
+		// (so that it'll be called again)
+}
+
+
 static uint32 *
 get_signal_stack(struct thread *thread, struct iframe *frame, int signal)
 {
 	// use the alternate signal stack if we should and can
 	if (thread->signal_stack_enabled
-		&& (thread->sig_action[signal].sa_flags & SA_ONSTACK) != 0
+		&& (thread->sig_action[signal - 1].sa_flags & SA_ONSTACK) != 0
 		&& (frame->user_esp < thread->signal_stack_base
-			|| frame->user_esp > thread->signal_stack_base
+			|| frame->user_esp >= thread->signal_stack_base
 				+ thread->signal_stack_size)) {
 		return (uint32 *)(thread->signal_stack_base
 			+ thread->signal_stack_size);
@@ -193,7 +204,8 @@ arch_thread_init_thread_struct(struct thread *thread)
 
 
 status_t
-arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void), void (*entry_func)(void), void (*exit_func)(void))
+arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void),
+	void (*entry_func)(void), void (*exit_func)(void))
 {
 	addr_t *kstack = (addr_t *)t->kernel_stack_base;
 	addr_t *kstack_top = kstack + KERNEL_STACK_SIZE / sizeof(addr_t);
@@ -222,7 +234,8 @@ arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void), void (
 	kstack_top--;
 	*kstack_top = (unsigned int)start_func;
 
-	// set the return address to be the start of the entry (thread setup) function
+	// set the return address to be the start of the entry (thread setup)
+	// function
 	kstack_top--;
 	*kstack_top = (unsigned int)entry_func;
 
@@ -256,7 +269,8 @@ arch_thread_init_tls(struct thread *thread)
 	uint32 tls[TLS_THREAD_ID_SLOT + 1];
 	int32 i;
 
-	thread->user_local_storage = thread->user_stack_base + thread->user_stack_size;
+	thread->user_local_storage = thread->user_stack_base
+		+ thread->user_stack_size;
 
 	// initialize default TLS fields
 	tls[TLS_BASE_ADDRESS_SLOT] = thread->user_local_storage;
@@ -267,7 +281,8 @@ arch_thread_init_tls(struct thread *thread)
 
 
 void
-arch_thread_switch_kstack_and_call(struct thread *t, addr_t new_kstack, void (*func)(void *), void *arg)
+arch_thread_switch_kstack_and_call(struct thread *t, addr_t new_kstack,
+	void (*func)(void *), void *arg)
 {
 	i386_switch_stack_and_call(new_kstack, func, arg);
 }
@@ -328,7 +343,8 @@ arch_thread_dump_info(void *info)
  */
 
 status_t
-arch_thread_enter_userspace(struct thread *t, addr_t entry, void *args1, void *args2)
+arch_thread_enter_userspace(struct thread *t, addr_t entry, void *args1,
+	void *args2)
 {
 	addr_t stackTop = t->user_stack_base + t->user_stack_size;
 	uint32 codeSize = (addr_t)x86_end_userspace_thread_exit
@@ -375,7 +391,7 @@ bool
 arch_on_signal_stack(struct thread *thread)
 {
 	struct iframe *frame = get_current_iframe();
-	
+
 	return frame->user_esp >= thread->signal_stack_base
 		&& frame->user_esp < thread->signal_stack_base
 			+ thread->signal_stack_size;
@@ -383,7 +399,7 @@ arch_on_signal_stack(struct thread *thread)
 
 
 status_t
-arch_setup_signal_frame(struct thread *thread, struct sigaction *sa,
+arch_setup_signal_frame(struct thread *thread, struct sigaction *action,
 	int signal, int signalMask)
 {
 	struct iframe *frame = get_current_iframe();
@@ -397,14 +413,10 @@ arch_setup_signal_frame(struct thread *thread, struct sigaction *sa,
 	if (frame->orig_eax >= 0) {
 		// we're coming from a syscall
 		if ((status_t)frame->eax == EINTR
-			&& (sa->sa_flags & SA_RESTART) != 0) {
+			&& (action->sa_flags & SA_RESTART) != 0) {
 			TRACE(("### restarting syscall %d after signal %d\n",
 				frame->orig_eax, sig));
-			frame->eax = frame->orig_eax;
-			frame->edx = frame->orig_edx;
-			frame->eip -= 2;
-				// undos the "int $99" syscall interrupt
-				// (so that it'll be called again)
+			restart_syscall(frame);
 		}
 	}
 
@@ -412,8 +424,6 @@ arch_setup_signal_frame(struct thread *thread, struct sigaction *sa,
 	userStack = get_signal_stack(thread, frame, signal);
 
 	// store the saved regs onto the user stack
-	userStack -= ROUNDUP(sizeof(struct vregs) / 4, 4);
-	userRegs = userStack;
 	regs.eip = frame->eip;
 	regs.eflags = frame->flags;
 	regs.eax = frame->eax;
@@ -426,12 +436,14 @@ arch_setup_signal_frame(struct thread *thread, struct sigaction *sa,
 	regs._reserved_2[2] = frame->ebp;
 	i386_fnsave((void *)(&regs.xregs));
 	
+	userStack -= ROUNDUP((sizeof(struct vregs) + 3) / 4, 4);
+	userRegs = userStack;
 	status = user_memcpy(userRegs, &regs, sizeof(regs));
 	if (status < B_OK)
 		return status;
 
 	// now store a code snippet on the stack
-	userStack -= ((uint32)i386_end_return_from_signal
+	userStack -= ((uint32)i386_end_return_from_signal + 3
 		- (uint32)i386_return_from_signal) / 4;
 	signalCode = userStack;
 	status = user_memcpy(signalCode, i386_return_from_signal,
@@ -442,9 +454,9 @@ arch_setup_signal_frame(struct thread *thread, struct sigaction *sa,
 
 	// now set up the final part
 	buffer[0] = (uint32)signalCode;	// return address when sa_handler done
-	buffer[1] = signal;				// first argument to sa_handler
-	buffer[2] = (uint32)sa->sa_userdata; // second argument to sa_handler
-	buffer[3] = (uint32)userRegs;	// third argument to sa_handler
+	buffer[1] = signal;				// arguments to sa_handler
+	buffer[2] = (uint32)action->sa_userdata;
+	buffer[3] = (uint32)userRegs;
 
 	buffer[4] = signalMask;			// Old signal mask to restore
 	buffer[5] = (uint32)userRegs;	// Int frame + extra regs to restore
@@ -456,7 +468,7 @@ arch_setup_signal_frame(struct thread *thread, struct sigaction *sa,
 		return status;
 
 	frame->user_esp = (uint32)userStack;
-	frame->eip = (uint32)sa->sa_handler;
+	frame->eip = (uint32)action->sa_handler;
 
 	return B_OK;
 }
@@ -511,12 +523,8 @@ arch_check_syscall_restart(struct thread *thread)
 		return;
 	}
 
-	if ((status_t)frame->orig_eax >= 0 && (status_t)frame->eax == EINTR) {
-		frame->eax = frame->orig_eax;
-		frame->edx = frame->orig_edx;
-		frame->eip -= 2;
-			// undoes the "int $99" syscall interrupt (so that it'll be called again)
-	}
+	if ((status_t)frame->orig_eax >= 0 && (status_t)frame->eax == EINTR)
+		restart_syscall(frame);
 }
 
 
