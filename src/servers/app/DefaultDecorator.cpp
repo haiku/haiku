@@ -1011,17 +1011,19 @@ void
 DefaultDecorator::_DrawZoom(BRect r)
 {
 	STRACE(("_DrawZoom(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
-	// If this has been implemented, then the decorator has a Zoom button
-	// which should be drawn based on the state of the member zoomstate
+
+	float inset = floorf(r.Width() / 4.0);
 
 	BRect zr(r);
-	zr.left += 3.0;
-	zr.top += 3.0;
+	zr.left += inset;
+	zr.top += inset;
 	_DrawBlendedRect(zr, GetZoom());
 
+	inset = floorf(r.Width() / 2.1);
+
 	zr = r;
-	zr.right -= 5.0;
-	zr.bottom -= 5.0;
+	zr.right -= inset;
+	zr.bottom -= inset;
 	_DrawBlendedRect(zr, GetZoom());
 }
 
@@ -1126,15 +1128,14 @@ DefaultDecorator::_GetButtonSizeAndOffset(const BRect& tabRect, float* _offset,
 	bool smallTab = fLook == B_FLOATING_WINDOW_LOOK
 		|| fLook == kLeftTitledWindowLook;
 
-	*_offset = smallTab ? floorf(fDrawState.Font().Size() / 2.5)
-		: floorf(fDrawState.Font().Size() / 2.0);
+	*_offset = smallTab ? floorf(fDrawState.Font().Size() / 2.6)
+		: floorf(fDrawState.Font().Size() / 2.3);
 	*_inset = smallTab ? floorf(fDrawState.Font().Size() / 5.0)
 		: floorf(fDrawState.Font().Size() / 6.0);
-printf("");
 
 	// "+ 2" so that the rects are centered within the solid area
 	// (without the 2 pixels for the top border)
-	*_size = tabSize - *_inset * *_offset + *_inset;
+	*_size = tabSize - 2 * *_offset + *_inset;
 }
 
 // _LayoutTabItems
