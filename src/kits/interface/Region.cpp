@@ -471,9 +471,15 @@ BRegion::_SetSize(long newSize)
 		if (fData == &fBounds) {
 			fData = (clipping_rect*)malloc(newSize * sizeof(clipping_rect));
 			fData[0] = fBounds;
-		} else if (fData)
-			fData = (clipping_rect*)realloc(fData, newSize * sizeof(clipping_rect));
-		else
+		} else if (fData) {
+			clipping_rect* resizedData = (clipping_rect*)realloc(fData,
+				newSize * sizeof(clipping_rect));
+			if (!resizedData) {
+				free(fData);
+				fData = NULL;
+			} else
+				fData = resizedData;
+		} else
 			fData = (clipping_rect*)malloc(newSize * sizeof(clipping_rect));
 	} else {
 		// just an empty region, but no error
