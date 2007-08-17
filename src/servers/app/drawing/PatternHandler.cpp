@@ -165,41 +165,10 @@ PatternHandler::SetPattern(const pattern& pat)
 	\param low Low color for the handler
 */
 void
-PatternHandler::SetColors(const RGBColor& high, const RGBColor& low)
-{
-	fHighColor = high;
-	fLowColor = low;
-}
-
-/*!
-	\brief Set the high color for the pattern to use
-	\param color High color for the handler
-*/
-void
-PatternHandler::SetHighColor(const RGBColor& color)
-{
-	fHighColor = color;
-}
-
-/*!
-	\brief Set the low color for the pattern to use
-	\param color Low color for the handler
-*/
-void
-PatternHandler::SetLowColor(const RGBColor& color)
-{
-	fLowColor = color;
-}
-
-/*!
-	\brief Set the colors for the pattern to use
-	\param high High color for the handler
-	\param low Low color for the handler
-*/
-void
 PatternHandler::SetColors(const rgb_color& high, const rgb_color& low)
 {
 	fHighColor = high;
+	fLowColor = low;
 }
 
 /*!
@@ -227,7 +196,7 @@ PatternHandler::SetLowColor(const rgb_color& color)
 	\param pt Coordinates to get the color for
 	\return Color for the coordinates
 */
-RGBColor
+rgb_color
 PatternHandler::ColorAt(const BPoint &pt) const
 {
 	return ColorAt(pt.x, pt.y);
@@ -239,7 +208,7 @@ PatternHandler::ColorAt(const BPoint &pt) const
 	\param y Y coordinate to get the color for
 	\return Color for the coordinates
 */
-RGBColor
+rgb_color
 PatternHandler::ColorAt(float x, float y) const
 {
 	return ColorAt(int(x), int(y));
@@ -272,13 +241,8 @@ PatternHandler::SetOffsets(int32 x, int32 y)
 void
 PatternHandler::MakeOpCopyColorCache()
 {
-	rgb_color highColor = fHighColor.GetColor32();
-	rgb_color lowColor = fLowColor.GetColor32();
-
-	uint64 t1 = *(uint32*)&highColor;
-	uint32 t2 = *(uint32*)&lowColor;
-
-	uint64 colors = (t1 << 32) | t2;
+	uint64 t = *(uint32*)&fHighColor;
+	uint64 colors = (t << 32) | *(uint32*)&fLowColor;
 
 	if (fColorsWhenCached == colors)
 		return;
@@ -286,13 +250,13 @@ PatternHandler::MakeOpCopyColorCache()
 	fColorsWhenCached = colors;
 
 	// ramp from low color to high color
-	uint8 rA = fLowColor.GetColor32().red;
-	uint8 gA = fLowColor.GetColor32().green;
-	uint8 bA = fLowColor.GetColor32().blue;
+	uint8 rA = fLowColor.red;
+	uint8 gA = fLowColor.green;
+	uint8 bA = fLowColor.blue;
 
-	uint8 rB = fHighColor.GetColor32().red;
-	uint8 gB = fHighColor.GetColor32().green;
-	uint8 bB = fHighColor.GetColor32().blue;
+	uint8 rB = fHighColor.red;
+	uint8 gB = fHighColor.green;
+	uint8 bB = fHighColor.blue;
 
 	for (int32 i = 0; i < 256; i++) {
 		// NOTE: rgb is twisted around, since this is

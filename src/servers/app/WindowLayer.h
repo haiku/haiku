@@ -333,12 +333,12 @@ class WindowLayer {
 			UpdateSession		fPendingUpdateSession;
 			// these two flags are supposed to ensure a sane
 			// and consistent update session
-			bool				fUpdateRequested;
-			bool				fInUpdate;
+			bool				fUpdateRequested : 1;
+			bool				fInUpdate : 1;
 
-			bool				fHidden;
-			bool				fMinimized;
-			bool				fIsFocus;
+			bool				fHidden : 1;
+			bool				fMinimized : 1;
+			bool				fIsFocus : 1;
 
 			window_look			fLook;
 			window_feel			fFeel;

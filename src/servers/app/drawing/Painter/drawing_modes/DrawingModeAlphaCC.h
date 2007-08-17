@@ -32,8 +32,8 @@ blend_pixel_alpha_cc(int x, int y, const color_type& c, uint8 cover,
 					 agg_buffer* buffer, const PatternHandler* pattern)
 {
 	uint8* p = buffer->row_ptr(y) + (x << 2);
-	rgb_color color = pattern->R5ColorAt(x, y);
-	uint16 alpha = pattern->HighColor().GetColor32().alpha * cover;
+	rgb_color color = pattern->ColorAt(x, y);
+	uint16 alpha = pattern->HighColor().alpha * cover;
 	if (alpha == 255 * 255) {
 		ASSIGN_ALPHA_CC(p, color.red, color.green, color.blue);
 	} else {
@@ -47,7 +47,7 @@ blend_hline_alpha_cc(int x, int y, unsigned len,
 					 const color_type& c, uint8 cover,
 					 agg_buffer* buffer, const PatternHandler* pattern)
 {
-	rgb_color color = pattern->HighColor().GetColor32();
+	rgb_color color = pattern->HighColor();
 	uint16 alpha = color.alpha * cover;
 	if (alpha == 255 * 255) {
 		// cache the low and high color as 32bit values
@@ -59,7 +59,7 @@ blend_hline_alpha_cc(int x, int y, unsigned len,
 		p8[2] = color.red;
 		p8[3] = 255;
 		// low color
-		color = pattern->LowColor().GetColor32();
+		color = pattern->LowColor();
 		uint32 vl;
 		p8 = (uint8*)&vl;
 		p8[0] = color.blue;
@@ -79,7 +79,7 @@ blend_hline_alpha_cc(int x, int y, unsigned len,
 	} else {
 		uint8* p = buffer->row_ptr(y) + (x << 2);
 		do {
-			rgb_color color = pattern->R5ColorAt(x, y);
+			rgb_color color = pattern->ColorAt(x, y);
 			BLEND_ALPHA_CC(p, color.red, color.green, color.blue, alpha);
 			x++;
 			p += 4;
@@ -94,9 +94,9 @@ blend_solid_hspan_alpha_cc(int x, int y, unsigned len,
 						   agg_buffer* buffer, const PatternHandler* pattern)
 {
 	uint8* p = buffer->row_ptr(y) + (x << 2);
-	uint8 hAlpha = pattern->HighColor().GetColor32().alpha;
+	uint8 hAlpha = pattern->HighColor().alpha;
 	do {
-		rgb_color color = pattern->R5ColorAt(x, y);
+		rgb_color color = pattern->ColorAt(x, y);
 		uint16 alpha = hAlpha * *covers;
 		if (alpha) {
 			if (alpha == 255 * 255) {
@@ -118,9 +118,9 @@ blend_solid_vspan_alpha_cc(int x, int y, unsigned len,
 						   agg_buffer* buffer, const PatternHandler* pattern)
 {
 	uint8* p = buffer->row_ptr(y) + (x << 2);
-	uint8 hAlpha = pattern->HighColor().GetColor32().alpha;
+	uint8 hAlpha = pattern->HighColor().alpha;
 	do {
-		rgb_color color = pattern->R5ColorAt(x, y);
+		rgb_color color = pattern->ColorAt(x, y);
 		uint16 alpha = hAlpha * *covers;
 		if (alpha) {
 			if (alpha == 255 * 255) {
@@ -144,7 +144,7 @@ blend_color_hspan_alpha_cc(int x, int y, unsigned len,
 						   agg_buffer* buffer, const PatternHandler* pattern)
 {
 	uint8* p = buffer->row_ptr(y) + (x << 2);
-	uint8 hAlpha = pattern->HighColor().GetColor32().alpha;
+	uint8 hAlpha = pattern->HighColor().alpha;
 	if (covers) {
 		// non-solid opacity
 		do {

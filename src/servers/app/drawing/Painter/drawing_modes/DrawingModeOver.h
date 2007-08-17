@@ -33,7 +33,7 @@ blend_pixel_over(int x, int y, const color_type& c, uint8 cover,
 {
 	if (pattern->IsHighColor(x, y)) {
 		uint8* p = buffer->row_ptr(y) + (x << 2);
-		rgb_color color = pattern->HighColor().GetColor32();
+		rgb_color color = pattern->HighColor();
 		if (cover == 255) {
 			ASSIGN_OVER(p, color.red, color.green, color.blue);
 		} else {
@@ -49,7 +49,7 @@ blend_hline_over(int x, int y, unsigned len,
 				 agg_buffer* buffer, const PatternHandler* pattern)
 {
 	if (cover == 255) {
-		rgb_color color = pattern->HighColor().GetColor32();
+		rgb_color color = pattern->HighColor();
 		uint32 v;
 		uint8* p8 = (uint8*)&v;
 		p8[0] = (uint8)color.blue;
@@ -65,7 +65,7 @@ blend_hline_over(int x, int y, unsigned len,
 		} while(--len);
 	} else {
 		uint8* p = buffer->row_ptr(y) + (x << 2);
-		rgb_color color = pattern->HighColor().GetColor32();
+		rgb_color color = pattern->HighColor();
 		do {
 			if (pattern->IsHighColor(x, y)) {
 				BLEND_OVER(p, color.red, color.green, color.blue, cover);
@@ -83,7 +83,7 @@ blend_solid_hspan_over(int x, int y, unsigned len,
 					   agg_buffer* buffer, const PatternHandler* pattern)
 {
 	uint8* p = buffer->row_ptr(y) + (x << 2);
-	rgb_color color = pattern->HighColor().GetColor32();
+	rgb_color color = pattern->HighColor();
 	do {
 		if (pattern->IsHighColor(x, y)) {
 			if (*covers) {
@@ -109,7 +109,7 @@ blend_solid_vspan_over(int x, int y, unsigned len,
 					   agg_buffer* buffer, const PatternHandler* pattern)
 {
 	uint8* p = buffer->row_ptr(y) + (x << 2);
-	rgb_color color = pattern->HighColor().GetColor32();
+	rgb_color color = pattern->HighColor();
 	do {
 		if (pattern->IsHighColor(x, y)) {
 			if (*covers) {

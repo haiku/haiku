@@ -32,7 +32,7 @@ blend_pixel_alpha_pc(int x, int y, const color_type& c, uint8 cover,
 					 agg_buffer* buffer, const PatternHandler* pattern)
 {
 	uint8* p = buffer->row_ptr(y) + (x << 2);
-	rgb_color color = pattern->R5ColorAt(x, y);
+	rgb_color color = pattern->ColorAt(x, y);
 	uint16 alpha = color.alpha * cover;
 	if (alpha == 255*255) {
 		ASSIGN_ALPHA_PC(p, color.red, color.green, color.blue);
@@ -49,7 +49,7 @@ blend_hline_alpha_pc(int x, int y, unsigned len,
 {
 	uint8* p = buffer->row_ptr(y) + (x << 2);
 	do {
-		rgb_color color = pattern->R5ColorAt(x, y);
+		rgb_color color = pattern->ColorAt(x, y);
 		uint16 alpha = color.alpha * cover;
 		if (alpha) {
 			if (alpha == 255) {
@@ -71,7 +71,7 @@ blend_solid_hspan_alpha_pc(int x, int y, unsigned len,
 {
 	uint8* p = buffer->row_ptr(y) + (x << 2);
 	do {
-		rgb_color color = pattern->R5ColorAt(x, y);
+		rgb_color color = pattern->ColorAt(x, y);
 		uint16 alpha = color.alpha * *covers;
 		if (alpha) {
 			if(alpha == 255 * 255) {
@@ -94,7 +94,7 @@ blend_solid_vspan_alpha_pc(int x, int y, unsigned len,
 {
 	uint8* p = buffer->row_ptr(y) + (x << 2);
 	do {
-		rgb_color color = pattern->R5ColorAt(x, y);
+		rgb_color color = pattern->ColorAt(x, y);
 		uint16 alpha = color.alpha * *covers;
 		if (alpha) {
 			if (alpha == 255 * 255) {

@@ -10,8 +10,6 @@
 #define SERVER_BITMAP_H
 
 
-#include "RGBColor.h"
-
 #include <GraphicsDefs.h>
 #include <Rect.h>
 #include <OS.h>

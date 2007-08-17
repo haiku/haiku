@@ -57,8 +57,8 @@ blend_pixel_select(int x, int y, const color_type& c, uint8 cover,
 {
 	if (pattern->IsHighColor(x, y)) {
 		uint8* p = buffer->row_ptr(y) + (x << 2);
-		rgb_color high = pattern->HighColor().GetColor32();
-		rgb_color low = pattern->LowColor().GetColor32();
+		rgb_color high = pattern->HighColor();
+		rgb_color low = pattern->LowColor();
 		rgb_color color; 
 		if (compare(p, high, low, &color)) {
 			if (cover == 255) {
@@ -77,8 +77,8 @@ blend_hline_select(int x, int y, unsigned len,
 				   agg_buffer* buffer, const PatternHandler* pattern)
 {
 	uint8* p = buffer->row_ptr(y) + (x << 2);
-	rgb_color high = pattern->HighColor().GetColor32();
-	rgb_color low = pattern->LowColor().GetColor32();
+	rgb_color high = pattern->HighColor();
+	rgb_color low = pattern->LowColor();
 	rgb_color color; 
 	if (cover == 255) {
 		do {
@@ -107,8 +107,8 @@ blend_solid_hspan_select(int x, int y, unsigned len,
 						 agg_buffer* buffer, const PatternHandler* pattern)
 {
 	uint8* p = buffer->row_ptr(y) + (x << 2);
-	rgb_color high = pattern->HighColor().GetColor32();
-	rgb_color low = pattern->LowColor().GetColor32();
+	rgb_color high = pattern->HighColor();
+	rgb_color low = pattern->LowColor();
 	rgb_color color; 
 	do {
 		if (pattern->IsHighColor(x, y)) {
@@ -135,8 +135,8 @@ blend_solid_vspan_select(int x, int y, unsigned len,
 						 agg_buffer* buffer, const PatternHandler* pattern)
 {
 	uint8* p = buffer->row_ptr(y) + (x << 2);
-	rgb_color high = pattern->HighColor().GetColor32();
-	rgb_color low = pattern->LowColor().GetColor32();
+	rgb_color high = pattern->HighColor();
+	rgb_color low = pattern->LowColor();
 	rgb_color color; 
 	do {
 		if (pattern->IsHighColor(x, y)) {
@@ -163,8 +163,8 @@ blend_color_hspan_select(int x, int y, unsigned len,
 						 agg_buffer* buffer, const PatternHandler* pattern)
 {
 	uint8* p = buffer->row_ptr(y) + (x << 2);
-	rgb_color high = pattern->HighColor().GetColor32();
-	rgb_color low = pattern->LowColor().GetColor32();
+	rgb_color high = pattern->HighColor();
+	rgb_color low = pattern->LowColor();
 	rgb_color color; 
 	if (covers) {
 		// non-solid opacity

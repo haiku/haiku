@@ -799,7 +799,7 @@ void
 Desktop::_SetWorkspace(int32 index)
 {
 	int32 previousIndex = fCurrentWorkspace;
-	RGBColor previousColor = fWorkspaces[fCurrentWorkspace].Color();
+	rgb_color previousColor = fWorkspaces[fCurrentWorkspace].Color();
 	bool movedMouseEventWindow = false;
 
 	if (fMouseEventWindow != NULL) {

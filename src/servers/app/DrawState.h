@@ -17,7 +17,6 @@
 #include <Point.h>
 #include <View.h> // for B_FONT_ALL
 
-#include "RGBColor.h"
 #include "FontManager.h"
 #include "ServerFont.h"
 #include "PatternHandler.h"
@@ -78,12 +77,12 @@ class DrawState {
 	inline	BRect				ClippingRectAt(int32 index) const;*/
 
 							// color
-		void				SetHighColor(const RGBColor& color);
-		const RGBColor&		HighColor() const
+		void				SetHighColor(const rgb_color& color);
+		const rgb_color&	HighColor() const
 								{ return fHighColor; }
 
-		void				SetLowColor(const RGBColor& color);
-		const RGBColor&		LowColor() const
+		void				SetLowColor(const rgb_color& color);
+		const rgb_color&		LowColor() const
 								{ return fLowColor; }
 
 		void				SetPattern(const Pattern& pattern);
@@ -147,8 +146,8 @@ class DrawState {
 
 		BRegion*			fClippingRegion;
 
-		RGBColor			fHighColor;
-		RGBColor			fLowColor;
+		rgb_color			fHighColor;
+		rgb_color			fLowColor;
 		Pattern				fPattern;
 
 		drawing_mode		fDrawingMode;

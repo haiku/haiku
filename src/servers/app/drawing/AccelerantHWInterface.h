@@ -73,7 +73,7 @@ public:
 										   uint32 count,
 										   int32 xOffset, int32 yOffset);
 	virtual	void				FillRegion(/*const*/ BRegion& region,
-										   const RGBColor& color,
+										   const rgb_color& color,
 										   bool autoSync);
 	virtual	void				InvertRegion(/*const*/ BRegion& region);
 
@@ -101,7 +101,7 @@ private:
 		status_t				_UpdateFrameBufferConfig();
 		void					_RegionToRectParams(/*const*/ BRegion* region,
 													uint32* count) const;
-		uint32					_NativeColor(const RGBColor& color) const;
+		uint32					_NativeColor(const rgb_color& color) const;
 		status_t				_SetFallbackMode(display_mode& mode) const;
 		void					_SetSystemPalette();
 		void					_SetGrayscalePalette();

@@ -48,7 +48,7 @@ class WorkspacesLayer : public ViewLayer {
 		void _DrawWorkspace(DrawingEngine* drawingEngine, BRegion& redraw,
 					int32 index);
 
-		void _DarkenColor(RGBColor& color) const;
+		void _DarkenColor(rgb_color& color) const;
 		void _Invalidate() const;
 
 	private:

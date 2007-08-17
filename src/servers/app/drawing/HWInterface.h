@@ -23,7 +23,6 @@
 
 class Overlay;
 class RenderingBuffer;
-class RGBColor;
 class ServerBitmap;
 class ServerCursor;
 class UpdateQueue;
@@ -98,7 +97,7 @@ class HWInterface : protected MultiLocker {
 										   uint32 count,
 										   int32 xOffset, int32 yOffset) {}
 	virtual	void				FillRegion(/*const*/ BRegion& region,
-										   const RGBColor& color,
+										   const rgb_color& color,
 										   bool autoSync) {}
 	virtual	void				InvertRegion(/*const*/ BRegion& region) {}
 

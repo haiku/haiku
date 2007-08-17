@@ -80,7 +80,7 @@ ViewLayer::ViewLayer(IntRect frame, IntPoint scrollingOffset, const char* name,
 	fFrame(frame),
 	fScrollingOffset(scrollingOffset),
 
-	fViewColor(RGBColor(255, 255, 255)),
+	fViewColor((rgb_color){ 255, 255, 255, 255 }),
 	fDrawState(new (nothrow) DrawState),
 	fViewBitmap(NULL),
 
@@ -1175,7 +1175,7 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 		return;
 	}
 
-	if (fViewBitmap != NULL || !fViewColor.IsTransparentMagic()) {
+	if (fViewBitmap != NULL || fViewColor != B_TRANSPARENT_COLOR) {
 		// we can only draw within our own area
 		BRegion* redraw = fWindow->GetRegion(ScreenClipping(windowContentClipping));
 		if (!redraw)
@@ -1265,7 +1265,7 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 
 		}
 
-		if (!fViewColor.IsTransparentMagic()) {
+		if (fViewColor != B_TRANSPARENT_COLOR) {
 			// fill visible region with view color,
 			// this version of FillRegion ignores any
 			// clipping, that's why "redraw" needs to

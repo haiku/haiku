@@ -12,7 +12,6 @@
 #include "AGGTextRenderer.h"
 #include "FontManager.h"
 #include "PatternHandler.h"
-#include "RGBColor.h"
 #include "ServerFont.h"
 
 #include "defines.h"
@@ -53,21 +52,12 @@ class Painter {
 
 								// object settings
 			void				SetHighColor(const rgb_color& color);
-	inline	void				SetHighColor(uint8 r, uint8 g, uint8 b, uint8 a = 255);
-	inline	void				SetHighColor(const RGBColor& color)
-									{ SetHighColor(color.GetColor32()); }
 	inline	rgb_color			HighColor() const
-									{ return fPatternHandler.
-										HighColor().GetColor32(); }
+									{ return fPatternHandler.HighColor(); }
 
 			void				SetLowColor(const rgb_color& color);
-	inline	void				SetLowColor(uint8 r, uint8 g, uint8 b, uint8 a = 255);
-	inline	void				SetLowColor(const RGBColor& color)
-									{ SetLowColor(color.GetColor32()); }
-
 	inline	rgb_color			LowColor() const
-									{ return fPatternHandler.
-										LowColor().GetColor32(); }
+									{ return fPatternHandler.LowColor(); }
 
 			void				SetPenSize(float size);
 	inline	float				PenSize() const
@@ -289,30 +279,6 @@ mutable agg::conv_curve<agg::path_storage> fCurve;
 	// font file which it gets from ServerFont
 mutable AGGTextRenderer			fTextRenderer;
 };
-
-// SetHighColor
-inline void
-Painter::SetHighColor(uint8 r, uint8 g, uint8 b, uint8 a)
-{
-	rgb_color color;
-	color.red = r;
-	color.green = g;
-	color.blue = b;
-	color.alpha = a;
-	SetHighColor(color);
-}
-
-// SetLowColor
-inline void
-Painter::SetLowColor(uint8 r, uint8 g, uint8 b, uint8 a)
-{
-	rgb_color color;
-	color.red = r;
-	color.green = g;
-	color.blue = b;
-	color.alpha = a;
-	SetLowColor(color);
-}
 
 
 #endif // PAINTER_H

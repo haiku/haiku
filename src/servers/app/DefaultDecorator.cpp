@@ -17,7 +17,6 @@
 #include "DrawState.h"
 #include "FontManager.h"
 #include "PatternHandler.h"
-#include "RGBColor.h"
 
 #include <WindowPrivate.h>
 
@@ -90,13 +89,12 @@ DefaultDecorator::DefaultDecorator(DesktopSettings& settings, BRect rect,
 {
 	DefaultDecorator::SetLook(settings, look);
 
-	fFrameColors = new RGBColor[6];
-	fFrameColors[0].SetColor(152, 152, 152);
-	fFrameColors[1].SetColor(255, 255, 255);
-	fFrameColors[2].SetColor(216, 216, 216);
-	fFrameColors[3].SetColor(136, 136, 136);
-	fFrameColors[4].SetColor(152, 152, 152);
-	fFrameColors[5].SetColor(96, 96, 96);
+	fFrameColors[0] = (rgb_color){ 152, 152, 152, 255 };
+	fFrameColors[1] = (rgb_color){ 255, 255, 255, 255 };
+	fFrameColors[2] = (rgb_color){ 216, 216, 216, 255 };
+	fFrameColors[3] = (rgb_color){ 136, 136, 136, 255 };
+	fFrameColors[4] = (rgb_color){ 152, 152, 152, 255 };
+	fFrameColors[5] = (rgb_color){ 96, 96, 96, 255 };
 
 	// Set appropriate colors based on the current focus value. In this case, each decorator
 	// defaults to not having the focus.
@@ -116,7 +114,6 @@ DefaultDecorator::DefaultDecorator(DesktopSettings& settings, BRect rect,
 DefaultDecorator::~DefaultDecorator()
 {
 	STRACE(("DefaultDecorator: ~DefaultDecorator()\n"));
-	delete [] fFrameColors;
 }
 
 
@@ -605,21 +602,23 @@ DefaultDecorator::_DoLayout()
 	if (hasTab) {
 		// distance from one item of the tab bar to another.
 		// In this case the text and close/zoom rects
-		fTextOffset = (fLook == B_FLOATING_WINDOW_LOOK || fLook == kLeftTitledWindowLook)
-			? 10 : 18;
+		fTextOffset = (fLook == B_FLOATING_WINDOW_LOOK
+			|| fLook == kLeftTitledWindowLook) ? 10 : 18;
 
 		font_height fontHeight;
 		fDrawState.Font().GetHeight(fontHeight);
 
 		if (fLook != kLeftTitledWindowLook) {
 			fTabRect.Set(fFrame.left - fBorderWidth,
-				fFrame.top - fBorderWidth - ceilf(fontHeight.ascent + fontHeight.descent + 7.0),
+				fFrame.top - fBorderWidth
+					- ceilf(fontHeight.ascent + fontHeight.descent + 7.0),
 				((fFrame.right - fFrame.left) < 35.0 ?
 					fFrame.left + 35.0 : fFrame.right) + fBorderWidth,
 				fFrame.top - fBorderWidth);
 		} else {
-			fTabRect.Set(fFrame.left - fBorderWidth - ceilf(fontHeight.ascent + fontHeight.descent + 5.0),
-				fFrame.top - fBorderWidth, fFrame.left - fBorderWidth,
+			fTabRect.Set(fFrame.left - fBorderWidth
+				- ceilf(fontHeight.ascent + fontHeight.descent + 5.0),
+					fFrame.top - fBorderWidth, fFrame.left - fBorderWidth,
 				fFrame.bottom + fBorderWidth);
 		}
 
@@ -631,10 +630,11 @@ DefaultDecorator::_DoLayout()
 
 		float offset;
 		float size;
-		_GetButtonSizeAndOffset(fTabRect, &offset, &size);
+		float inset;
+		_GetButtonSizeAndOffset(fTabRect, &offset, &size, &inset);
 
 		// fMinTabSize contains just the room for the buttons
-		fMinTabSize = 4.0 + fTextOffset;
+		fMinTabSize = inset * 2 + fTextOffset;
 		if ((fFlags & B_NOT_CLOSABLE) == 0)
 			fMinTabSize += offset + size;
 		if ((fFlags & B_NOT_ZOOMABLE) == 0)
@@ -701,8 +701,10 @@ DefaultDecorator::_DoLayout()
 		if (fTabOffset < 0)
 			fTabOffset = 0;
 		if (fTabLocation != 0.0
-			&& fTabOffset > (fRightBorder.right - fLeftBorder.left - fTabRect.Width()))
-			fTabOffset = uint32(fRightBorder.right - fLeftBorder.left - fTabRect.Width());
+			&& fTabOffset > (fRightBorder.right - fLeftBorder.left
+				- fTabRect.Width()))
+			fTabOffset = uint32(fRightBorder.right - fLeftBorder.left
+				- fTabRect.Width());
 		fTabRect.OffsetBy(fTabOffset, 0);
 
 		// finally, layout the buttons and text within the tab rect
@@ -737,38 +739,38 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 			if (invalid.Intersects(fTopBorder)) {
 				for (int8 i = 0; i < 5; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
-										BPoint(r.right - i, r.top + i),
-										fFrameColors[i]);
+						BPoint(r.right - i, r.top + i), fFrameColors[i]);
 				}
 				if (fTabRect.IsValid()) {
-					// grey along the bottom of the tab (overwrites "white" from frame)
-					fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 2, fTabRect.bottom + 1),
-										BPoint(fTabRect.right - 2, fTabRect.bottom + 1),
-										fFrameColors[2]);
+					// grey along the bottom of the tab
+					// (overwrites "white" from frame)
+					fDrawingEngine->StrokeLine(
+						BPoint(fTabRect.left + 2, fTabRect.bottom + 1),
+						BPoint(fTabRect.right - 2, fTabRect.bottom + 1),
+						fFrameColors[2]);
 				}
 			}
 			// left
 			if (invalid.Intersects(fLeftBorder.InsetByCopy(0, -fBorderWidth))) {
 				for (int8 i = 0; i < 5; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
-										BPoint(r.left + i, r.bottom - i),
-										fFrameColors[i]);
+						BPoint(r.left + i, r.bottom - i), fFrameColors[i]);
 				}
 			}
 			// bottom
 			if (invalid.Intersects(fBottomBorder)) {
 				for (int8 i = 0; i < 5; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.bottom - i),
-										BPoint(r.right - i, r.bottom - i),
-										fFrameColors[(4 - i) == 4 ? 5 : (4 - i)]);
+						BPoint(r.right - i, r.bottom - i),
+						fFrameColors[(4 - i) == 4 ? 5 : (4 - i)]);
 				}
 			}
 			// right
 			if (invalid.Intersects(fRightBorder.InsetByCopy(0, -fBorderWidth))) {
 				for (int8 i = 0; i < 5; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.right - i, r.top + i),
-										BPoint(r.right - i, r.bottom - i),
-										fFrameColors[(4 - i) == 4 ? 5 : (4 - i)]);
+						BPoint(r.right - i, r.bottom - i),
+						fFrameColors[(4 - i) == 4 ? 5 : (4 - i)]);
 				}
 			}
 			break;
@@ -781,44 +783,46 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 			if (invalid.Intersects(fTopBorder)) {
 				for (int8 i = 0; i < 3; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
-										BPoint(r.right - i, r.top + i),
-										fFrameColors[i * 2]);
+						BPoint(r.right - i, r.top + i), fFrameColors[i * 2]);
 				}
 				if (fTabRect.IsValid() && fLook != kLeftTitledWindowLook) {
-					// grey along the bottom of the tab (overwrites "white" from frame)
-					fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 2, fTabRect.bottom + 1),
-										BPoint(fTabRect.right - 2, fTabRect.bottom + 1),
-										fFrameColors[2]);
+					// grey along the bottom of the tab
+					// (overwrites "white" from frame)
+					fDrawingEngine->StrokeLine(
+						BPoint(fTabRect.left + 2, fTabRect.bottom + 1),
+						BPoint(fTabRect.right - 2, fTabRect.bottom + 1),
+						fFrameColors[2]);
 				}
 			}
 			// left
 			if (invalid.Intersects(fLeftBorder.InsetByCopy(0, -fBorderWidth))) {
 				for (int8 i = 0; i < 3; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.top + i),
-										BPoint(r.left + i, r.bottom - i),
-										fFrameColors[i * 2]);
+						BPoint(r.left + i, r.bottom - i), fFrameColors[i * 2]);
 				}
 				if (fLook == kLeftTitledWindowLook && fTabRect.IsValid()) {
-					// grey along the right side of the tab (overwrites "white" from frame)
-					fDrawingEngine->StrokeLine(BPoint(fTabRect.right + 1, fTabRect.top + 2),
-										BPoint(fTabRect.right + 1, fTabRect.bottom - 2),
-										fFrameColors[2]);
+					// grey along the right side of the tab
+					// (overwrites "white" from frame)
+					fDrawingEngine->StrokeLine(
+						BPoint(fTabRect.right + 1, fTabRect.top + 2),
+						BPoint(fTabRect.right + 1, fTabRect.bottom - 2),
+						fFrameColors[2]);
 				}
 			}
 			// bottom
 			if (invalid.Intersects(fBottomBorder)) {
 				for (int8 i = 0; i < 3; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.left + i, r.bottom - i),
-										BPoint(r.right - i, r.bottom - i),
-										fFrameColors[(2 - i) == 2 ? 5 : (2 - i) * 2]);
+						BPoint(r.right - i, r.bottom - i),
+						fFrameColors[(2 - i) == 2 ? 5 : (2 - i) * 2]);
 				}
 			}
 			// right
 			if (invalid.Intersects(fRightBorder.InsetByCopy(0, -fBorderWidth))) {
 				for (int8 i = 0; i < 3; i++) {
 					fDrawingEngine->StrokeLine(BPoint(r.right - i, r.top + i),
-										BPoint(r.right - i, r.bottom - i),
-										fFrameColors[(2 - i) == 2 ? 5 : (2 - i) * 2]);
+						BPoint(r.right - i, r.bottom - i),
+						fFrameColors[(2 - i) == 2 ? 5 : (2 - i) * 2]);
 				}
 			}
 			break;
@@ -846,23 +850,24 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 				float x = r.right - 3;
 				float y = r.bottom - 3;
 
-				fDrawingEngine->FillRect(BRect(x - 13, y - 13, x, y), fFrameColors[2]);
-				fDrawingEngine->StrokeLine(BPoint(x - 15, y - 15), BPoint(x - 15, y - 2),
-					fFrameColors[0]);
-				fDrawingEngine->StrokeLine(BPoint(x - 14, y - 14), BPoint(x - 14, y - 1),
-					fFrameColors[1]);
-				fDrawingEngine->StrokeLine(BPoint(x - 15, y - 15), BPoint(x - 2, y - 15),
-					fFrameColors[0]);
-				fDrawingEngine->StrokeLine(BPoint(x - 14, y - 14), BPoint(x - 1, y - 14),
-					fFrameColors[1]);
+				fDrawingEngine->FillRect(BRect(x - 13, y - 13, x, y),
+					fFrameColors[2]);
+				fDrawingEngine->StrokeLine(BPoint(x - 15, y - 15),
+					BPoint(x - 15, y - 2), fFrameColors[0]);
+				fDrawingEngine->StrokeLine(BPoint(x - 14, y - 14),
+					BPoint(x - 14, y - 1), fFrameColors[1]);
+				fDrawingEngine->StrokeLine(BPoint(x - 15, y - 15),
+					BPoint(x - 2, y - 15), fFrameColors[0]);
+				fDrawingEngine->StrokeLine(BPoint(x - 14, y - 14),
+					BPoint(x - 1, y - 14), fFrameColors[1]);
 
 				if (!IsFocus())
 					break;
 
 				for (int8 i = 1; i <= 4; i++) {
 					for (int8 j = 1; j <= i; j++) {
-						BPoint		pt1(x - (3 * j) + 1, y - (3 * (5 - i)) + 1);
-						BPoint		pt2(x - (3 * j) + 2, y - (3 * (5 - i)) + 2);
+						BPoint pt1(x - (3 * j) + 1, y - (3 * (5 - i)) + 1);
+						BPoint pt2(x - (3 * j) + 2, y - (3 * (5 - i)) + 2);
 						fDrawingEngine->StrokePoint(pt1, fFrameColors[0]);
 						fDrawingEngine->StrokePoint(pt2, fFrameColors[1]);
 					}
@@ -876,16 +881,18 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 			case kLeftTitledWindowLook:
 			{
 				if (!invalid.Intersects(BRect(fRightBorder.right - 22,
-						fBottomBorder.bottom - 22, fRightBorder.right - 1,
-						fBottomBorder.bottom - 1)))
+					fBottomBorder.bottom - 22, fRightBorder.right - 1,
+					fBottomBorder.bottom - 1)))
 					break;
 		
-				fDrawingEngine->StrokeLine(BPoint(fRightBorder.left, fBottomBorder.bottom - 22),
-									BPoint(fRightBorder.right - 1, fBottomBorder.bottom - 22),
-									fFrameColors[0]);
-				fDrawingEngine->StrokeLine(BPoint(fRightBorder.right - 22, fBottomBorder.top),
-									BPoint(fRightBorder.right - 22, fBottomBorder.bottom - 1),
-									fFrameColors[0]);
+				fDrawingEngine->StrokeLine(
+					BPoint(fRightBorder.left, fBottomBorder.bottom - 22),
+					BPoint(fRightBorder.right - 1, fBottomBorder.bottom - 22),
+					fFrameColors[0]);
+				fDrawingEngine->StrokeLine(
+					BPoint(fRightBorder.right - 22, fBottomBorder.top),
+					BPoint(fRightBorder.right - 22, fBottomBorder.bottom - 1),
+					fFrameColors[0]);
 				break;
 			}
 
@@ -908,26 +915,34 @@ DefaultDecorator::_DrawTab(BRect invalid)
 		return;
 
 	// outer frame
-	fDrawingEngine->StrokeLine(fTabRect.LeftTop(), fTabRect.LeftBottom(), fFrameColors[0]);
-	fDrawingEngine->StrokeLine(fTabRect.LeftTop(), fTabRect.RightTop(), fFrameColors[0]);
-	if (fLook != kLeftTitledWindowLook)
-		fDrawingEngine->StrokeLine(fTabRect.RightTop(),fTabRect.RightBottom(), fFrameColors[5]);
-	else
-		fDrawingEngine->StrokeLine(fTabRect.LeftBottom(),fTabRect.RightBottom(), fFrameColors[5]);
+	fDrawingEngine->StrokeLine(fTabRect.LeftTop(), fTabRect.LeftBottom(),
+		fFrameColors[0]);
+	fDrawingEngine->StrokeLine(fTabRect.LeftTop(), fTabRect.RightTop(),
+		fFrameColors[0]);
+	if (fLook != kLeftTitledWindowLook) {
+		fDrawingEngine->StrokeLine(fTabRect.RightTop(), fTabRect.RightBottom(),
+			fFrameColors[5]);
+	} else {
+		fDrawingEngine->StrokeLine(fTabRect.LeftBottom(),
+			fTabRect.RightBottom(), fFrameColors[5]);
+	}
 
 	// bevel
 	fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 1, fTabRect.top + 1),
-		BPoint(fTabRect.left + 1, fTabRect.bottom - (fLook == kLeftTitledWindowLook ? 1 : 0)),
+		BPoint(fTabRect.left + 1,
+			fTabRect.bottom - (fLook == kLeftTitledWindowLook ? 1 : 0)),
 		fTabColorLight);
 	fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 1, fTabRect.top + 1),
-		BPoint(fTabRect.right - (fLook == kLeftTitledWindowLook ? 0 : 1), fTabRect.top + 1),
+		BPoint(fTabRect.right - (fLook == kLeftTitledWindowLook ? 0 : 1),
+			fTabRect.top + 1),
 		fTabColorLight);
 
 	if (fLook != kLeftTitledWindowLook) {
 		fDrawingEngine->StrokeLine(BPoint(fTabRect.right - 1, fTabRect.top + 2),
 			BPoint(fTabRect.right - 1, fTabRect.bottom), fTabColorShadow);
 	} else {
-		fDrawingEngine->StrokeLine(BPoint(fTabRect.left + 2, fTabRect.bottom - 1),
+		fDrawingEngine->StrokeLine(
+			BPoint(fTabRect.left + 2, fTabRect.bottom - 1),
 			BPoint(fTabRect.right, fTabRect.bottom - 1), fTabColorShadow);
 	}
 
@@ -964,8 +979,8 @@ DefaultDecorator::_DrawTitle(BRect r)
 {
 	STRACE(("_DrawTitle(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 
-	fDrawingEngine->SetHighColor(fTextColor.GetColor32());
-	fDrawingEngine->SetLowColor(fTabColor.GetColor32());
+	fDrawingEngine->SetHighColor(fTextColor);
+	fDrawingEngine->SetLowColor(fTabColor);
 	fDrawingEngine->SetFont(fDrawState.Font());
 
 	// figure out position of text
@@ -976,11 +991,13 @@ DefaultDecorator::_DrawTitle(BRect r)
 	if (fLook != kLeftTitledWindowLook) {
 		titlePos.x = fCloseRect.IsValid() ? fCloseRect.right + fTextOffset
 			: fTabRect.left + fTextOffset;
-		titlePos.y = floorf(((fTabRect.top + 2.0) + fTabRect.bottom + fontHeight.ascent
-			+ fontHeight.descent) / 2.0 - fontHeight.descent + 0.5);
+		titlePos.y = floorf(((fTabRect.top + 2.0) + fTabRect.bottom
+			+ fontHeight.ascent + fontHeight.descent) / 2.0
+			- fontHeight.descent + 0.5);
 	} else {
-		titlePos.x = floorf(((fTabRect.left + 2.0) + fTabRect.right + fontHeight.ascent
-			+ fontHeight.descent) / 2.0 - fontHeight.descent + 0.5);
+		titlePos.x = floorf(((fTabRect.left + 2.0) + fTabRect.right
+			+ fontHeight.ascent + fontHeight.descent) / 2.0
+			- fontHeight.descent + 0.5);
 		titlePos.y = fZoomRect.IsValid() ? fZoomRect.top - fTextOffset
 			: fTabRect.bottom - fTextOffset;
 	}
@@ -1015,37 +1032,30 @@ DefaultDecorator::_SetFocus()
 	// SetFocus() performs necessary duties for color swapping and
 	// other things when a window is deactivated or activated.
 	
-	if (IsFocus() || ((fLook == B_FLOATING_WINDOW_LOOK || fLook == kLeftTitledWindowLook)
-			&& (fFlags & B_AVOID_FOCUS) != 0)) {
+	if (IsFocus()
+		|| ((fLook == B_FLOATING_WINDOW_LOOK || fLook == kLeftTitledWindowLook)
+		&& (fFlags & B_AVOID_FOCUS) != 0)) {
 		fTabColor = UIColor(B_WINDOW_TAB_COLOR);
 		fTextColor = UIColor(B_WINDOW_TEXT_COLOR);
-		fButtonHighColor.SetColor(tint_color(fTabColor.GetColor32(), B_LIGHTEN_2_TINT));
-		fButtonLowColor.SetColor(tint_color(fTabColor.GetColor32(), B_DARKEN_1_TINT));
+		fButtonHighColor = tint_color(fTabColor, B_LIGHTEN_2_TINT);
+		fButtonLowColor = tint_color(fTabColor, B_DARKEN_1_TINT);
 
-//		fFrameColors[0].SetColor(152, 152, 152);
-//		fFrameColors[1].SetColor(255, 255, 255);
-		fFrameColors[2].SetColor(216, 216, 216);
-		fFrameColors[3].SetColor(136, 136, 136);
-//		fFrameColors[4].SetColor(152, 152, 152);
-//		fFrameColors[5].SetColor(96, 96, 96);
+		fFrameColors[2] = (rgb_color){ 216, 216, 216, 255 };
+		fFrameColors[3] = (rgb_color){ 136, 136, 136, 255 };
 	} else {
 		fTabColor = UIColor(B_WINDOW_INACTIVE_TAB_COLOR);
 		fTextColor = UIColor(B_WINDOW_INACTIVE_TEXT_COLOR);
-		fButtonHighColor.SetColor(tint_color(fTabColor.GetColor32(), B_LIGHTEN_2_TINT));
-		fButtonLowColor.SetColor(tint_color(fTabColor.GetColor32(), B_DARKEN_1_TINT));
+		fButtonHighColor = tint_color(fTabColor, B_LIGHTEN_2_TINT);
+		fButtonLowColor = tint_color(fTabColor, B_DARKEN_1_TINT);
 
-//		fFrameColors[0].SetColor(152, 152, 152);
-//		fFrameColors[1].SetColor(255, 255, 255);
-		fFrameColors[2].SetColor(232, 232, 232);
-		fFrameColors[3].SetColor(148, 148, 148);
-//		fFrameColors[4].SetColor(152, 152, 152);
-//		fFrameColors[5].SetColor(96, 96, 96);
+		fFrameColors[2] = (rgb_color){ 232, 232, 232, 255 };
+		fFrameColors[3] = (rgb_color){ 148, 148, 148, 255 };
 	}
 
-	fTabColorLight = RGBColor(tint_color(fTabColor.GetColor32(),
-		(B_LIGHTEN_2_TINT + B_LIGHTEN_MAX_TINT) / 2));
-	fTabColorShadow = RGBColor(tint_color(fTabColor.GetColor32(),
-		B_DARKEN_2_TINT));
+	fTabColorLight = tint_color(fTabColor,
+		(B_LIGHTEN_2_TINT + B_LIGHTEN_MAX_TINT) / 2);
+	fTabColorShadow = tint_color(fTabColor,
+		B_DARKEN_2_TINT);
 }
 
 // _SetColors
@@ -1067,18 +1077,18 @@ DefaultDecorator::_DrawBlendedRect(BRect r, bool down)
 	int32 w = r.IntegerWidth();
 	int32 h = r.IntegerHeight();
 
-	RGBColor temprgbcol;
+	rgb_color tempColor;
 	rgb_color halfColor, startColor, endColor;
 	float rstep, gstep, bstep;
 
 	int steps = w < h ? w : h;
 
 	if (down) {
-		startColor = fButtonLowColor.GetColor32();
-		endColor = fButtonHighColor.GetColor32();
+		startColor = fButtonLowColor;
+		endColor = fButtonHighColor;
 	} else {
-		startColor = fButtonHighColor.GetColor32();
-		endColor = fButtonLowColor.GetColor32();
+		startColor = fButtonHighColor;
+		endColor = fButtonLowColor;
 	}
 
 	halfColor = make_blend_color(startColor, endColor, 0.5);
@@ -1088,19 +1098,19 @@ DefaultDecorator::_DrawBlendedRect(BRect r, bool down)
 	bstep = float(startColor.blue - halfColor.blue) / steps;
 
 	for (int32 i = 0; i <= steps; i++) {
-		temprgbcol.SetColor(uint8(startColor.red - (i * rstep)),
-							uint8(startColor.green - (i * gstep)),
-							uint8(startColor.blue - (i * bstep)));
+		tempColor.red = uint8(startColor.red - (i * rstep));
+		tempColor.green = uint8(startColor.green - (i * gstep));
+		tempColor.blue = uint8(startColor.blue - (i * bstep));
 		
 		fDrawingEngine->StrokeLine(BPoint(r.left, r.top + i),
-							BPoint(r.left + i, r.top), temprgbcol);
+			BPoint(r.left + i, r.top), tempColor);
 
-		temprgbcol.SetColor(uint8(halfColor.red - (i * rstep)),
-							uint8(halfColor.green - (i * gstep)),
-							uint8(halfColor.blue - (i * bstep)));
+		tempColor.red = uint8(halfColor.red - (i * rstep));
+		tempColor.green = uint8(halfColor.green - (i * gstep));
+		tempColor.blue = uint8(halfColor.blue - (i * bstep));
 
 		fDrawingEngine->StrokeLine(BPoint(r.left + steps, r.top + i),
-							BPoint(r.left + i, r.top + steps), temprgbcol);
+			BPoint(r.left + i, r.top + steps), tempColor);
 	}
 	fDrawingEngine->StrokeRect(r, fFrameColors[3]);
 }
@@ -1108,16 +1118,23 @@ DefaultDecorator::_DrawBlendedRect(BRect r, bool down)
 // _GetButtonSizeAndOffset
 void
 DefaultDecorator::_GetButtonSizeAndOffset(const BRect& tabRect, float* _offset,
-	float* _size) const
+	float* _size, float* _inset) const
 {
-	*_offset = fLook == B_FLOATING_WINDOW_LOOK || fLook == kLeftTitledWindowLook ? 4.0 : 5.0;
+	float tabSize = fLook == kLeftTitledWindowLook ?
+		tabRect.Width() : tabRect.Height();
+
+	bool smallTab = fLook == B_FLOATING_WINDOW_LOOK
+		|| fLook == kLeftTitledWindowLook;
+
+	*_offset = smallTab ? floorf(fDrawState.Font().Size() / 2.5)
+		: floorf(fDrawState.Font().Size() / 2.0);
+	*_inset = smallTab ? floorf(fDrawState.Font().Size() / 5.0)
+		: floorf(fDrawState.Font().Size() / 6.0);
+printf("");
 
 	// "+ 2" so that the rects are centered within the solid area
 	// (without the 2 pixels for the top border)
-	if (fLook != kLeftTitledWindowLook)
-		*_size = tabRect.Height() - 2.0 * *_offset + 2.0f;
-	else
-		*_size = tabRect.Width() - 2.0 * *_offset + 2.0f;
+	*_size = tabSize - *_inset * *_offset + *_inset;
 }
 
 // _LayoutTabItems
@@ -1126,7 +1143,8 @@ DefaultDecorator::_LayoutTabItems(const BRect& tabRect)
 {
 	float offset;
 	float size;
-	_GetButtonSizeAndOffset(tabRect, &offset, &size);
+	float inset;
+	_GetButtonSizeAndOffset(tabRect, &offset, &size, &inset);
 
 	// calulate close rect based on the tab rectangle
 	if (fLook != kLeftTitledWindowLook) {
@@ -1160,9 +1178,9 @@ DefaultDecorator::_LayoutTabItems(const BRect& tabRect)
 	//	truncated for no apparent reason - OTOH the title does
 	//	also not appear perfectly in the middle
 	if (fLook != kLeftTitledWindowLook)
-		size = (fZoomRect.left - fCloseRect.right) - fTextOffset * 2 + 2;
+		size = (fZoomRect.left - fCloseRect.right) - fTextOffset * 2 + inset;
 	else
-		size = (fZoomRect.top - fCloseRect.bottom) - fTextOffset * 2 + 2;
+		size = (fZoomRect.top - fCloseRect.bottom) - fTextOffset * 2 + inset;
 
 	fTruncatedTitle = Title();
 	fDrawState.Font().TruncateString(&fTruncatedTitle, B_TRUNCATE_END, size);

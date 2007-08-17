@@ -26,8 +26,8 @@ WorkspacesLayer::WorkspacesLayer(BRect frame, BPoint scrollingOffset,
 	fSelectedWorkspace(-1),
 	fHasMoved(false)
 {
-	fDrawState->SetLowColor(RGBColor(255, 255, 255));
-	fDrawState->SetHighColor(RGBColor(0, 0, 0));
+	fDrawState->SetLowColor((rgb_color){ 255, 255, 255, 255 });
+	fDrawState->SetHighColor((rgb_color){ 0, 0, 0, 255 });
 }
 
 
@@ -161,11 +161,11 @@ WorkspacesLayer::_DrawWindow(DrawingEngine* drawingEngine, const BRect& workspac
 		return;
 
 	// ToDo: let decorator do this!
-	RGBColor yellow;
+	rgb_color yellow;
 	if (decorator != NULL)
 		yellow = decorator->UIColor(B_WINDOW_TAB_COLOR);
-	RGBColor frameColor(180, 180, 180);
-	RGBColor white(255, 255, 255);
+	rgb_color frameColor = (rgb_color){ 180, 180, 180, 255 };
+	rgb_color white = (rgb_color){ 255, 255, 255, 255 };
 
 	if (!active) {
 		_DarkenColor(yellow);
@@ -174,7 +174,7 @@ WorkspacesLayer::_DrawWindow(DrawingEngine* drawingEngine, const BRect& workspac
 	}
 	if (window == fSelectedWindow) {
 		// TODO: what about standard navigation color here?
-		frameColor.SetColor(80, 80, 80);
+		frameColor = (rgb_color){ 80, 80, 80, 255 };
 	}
 
 	if (tabFrame.left < frame.left)
@@ -237,16 +237,16 @@ WorkspacesLayer::_DrawWorkspace(DrawingEngine* drawingEngine,
 	bool active = workspace.IsCurrent();
 	if (active) {
 		// draw active frame
-		RGBColor black(0, 0, 0);
+		rgb_color black = (rgb_color){ 0, 0, 0, 255 };
 		drawingEngine->StrokeRect(rect, black);
 	} else if (index == fSelectedWorkspace) {
-		RGBColor gray(80, 80, 80);
+		rgb_color gray = (rgb_color){ 80, 80, 80, 255 };
 		drawingEngine->StrokeRect(rect, gray);
 	}
 
 	rect.InsetBy(1, 1);
 
-	RGBColor color = workspace.Color();
+	rgb_color color = workspace.Color();
 	if (!active)
 		_DarkenColor(color);
 
@@ -279,9 +279,9 @@ WorkspacesLayer::_DrawWorkspace(DrawingEngine* drawingEngine,
 
 
 void
-WorkspacesLayer::_DarkenColor(RGBColor& color) const
+WorkspacesLayer::_DarkenColor(rgb_color& color) const
 {
-	color = tint_color(color.GetColor32(), B_DARKEN_2_TINT);
+	color = tint_color(color, B_DARKEN_2_TINT);
 }
 
 

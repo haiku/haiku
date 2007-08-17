@@ -9,11 +9,10 @@
 #define WORKSPACE_H
 
 
-#include <SupportDefs.h>
+#include <InterfaceDefs.h>
 
 
 class Desktop;
-class RGBColor;
 class WindowLayer;
 
 
@@ -22,8 +21,8 @@ class Workspace {
 		Workspace(Desktop& desktop, int32 index);
 		~Workspace();
 
-		const RGBColor& Color() const;
-		void		SetColor(const RGBColor& color, bool makeDefault);
+		const rgb_color& Color() const;
+		void		SetColor(const rgb_color& color, bool makeDefault);
 		bool		IsCurrent() const
 						{ return fCurrentWorkspace; }
 

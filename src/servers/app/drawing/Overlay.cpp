@@ -14,8 +14,6 @@
 
 #include <BitmapPrivate.h>
 
-#include <InterfaceDefs.h>
-
 
 const static bigtime_t kOverlayTimeout = 1000000LL;
 	// after 1 second, the team holding the lock will be killed
@@ -62,7 +60,7 @@ Overlay::Overlay(HWInterface& interface, ServerBitmap* bitmap,
 	fOverlayToken(token)
 {
 	fSemaphore = create_sem(1, "overlay lock");
-	fColor.SetColor(21, 16, 21, 16);
+	fColor = (rgb_color){ 21, 16, 21, 16 };
 		// TODO: whatever fine color we want to use here...
 
 	fWindow.offset_top = 0;
@@ -221,7 +219,7 @@ Overlay::SetColorSpace(uint32 colorSpace)
 		return;
 
 	uint8 colorShift = 0, greenShift = 0, alphaShift = 0;
-	rgb_color colorKey = fColor.GetColor32();
+	rgb_color colorKey = fColor;
 
 	switch (colorSpace) {
 		case B_CMAP8:

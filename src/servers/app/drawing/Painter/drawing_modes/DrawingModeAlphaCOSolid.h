@@ -17,7 +17,7 @@ blend_pixel_alpha_co_solid(int x, int y, const color_type& c, uint8 cover,
 						   agg_buffer* buffer, const PatternHandler* pattern)
 {
 	uint8* p = buffer->row_ptr(y) + (x << 2);
-	uint16 alpha = pattern->HighColor().GetColor32().alpha * cover;
+	uint16 alpha = pattern->HighColor().alpha * cover;
 	if (alpha == 255 * 255) {
 		ASSIGN_ALPHA_CO(p, c.r, c.g, c.b);
 	} else {
@@ -31,7 +31,7 @@ blend_hline_alpha_co_solid(int x, int y, unsigned len,
 						   const color_type& c, uint8 cover,
 						   agg_buffer* buffer, const PatternHandler* pattern)
 {
-	uint16 alpha = pattern->HighColor().GetColor32().alpha * cover;
+	uint16 alpha = pattern->HighColor().alpha * cover;
 	if (alpha == 255 * 255) {
 		// cache the color as 32bit values
 		uint32 v;
@@ -69,7 +69,7 @@ blend_solid_hspan_alpha_co_solid(int x, int y, unsigned len,
 								 agg_buffer* buffer, const PatternHandler* pattern)
 {
 	uint8* p = buffer->row_ptr(y) + (x << 2);
-	uint8 hAlpha = pattern->HighColor().GetColor32().alpha;
+	uint8 hAlpha = pattern->HighColor().alpha;
 	do {
 		uint16 alpha = hAlpha * *covers;
 		if (alpha) {
@@ -94,7 +94,7 @@ blend_solid_vspan_alpha_co_solid(int x, int y, unsigned len,
 								 agg_buffer* buffer, const PatternHandler* pattern)
 {
 	uint8* p = buffer->row_ptr(y) + (x << 2);
-	uint8 hAlpha = pattern->HighColor().GetColor32().alpha;
+	uint8 hAlpha = pattern->HighColor().alpha;
 	do {
 		uint16 alpha = hAlpha * *covers;
 		if (alpha) {

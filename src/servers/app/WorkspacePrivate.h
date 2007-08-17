@@ -9,7 +9,6 @@
 #define WORKSPACE_PRIVATE_H
 
 
-#include "RGBColor.h"
 #include "WindowList.h"
 #include "Workspace.h"
 
@@ -42,8 +41,8 @@ class Workspace::Private {
 
 		// configuration
 
-		const RGBColor&		Color() const { return fColor; }
-		void				SetColor(const RGBColor& color);
+		const rgb_color&	Color() const { return fColor; }
+		void				SetColor(const rgb_color& color);
 
 		void				RestoreConfiguration(const BMessage& settings);
 		void				StoreConfiguration(BMessage& settings);
@@ -57,7 +56,7 @@ class Workspace::Private {
 
 		BObjectList<display_info> fDisplays;
 
-		RGBColor			fColor;
+		rgb_color			fColor;
 };
 
 #endif	/* WORKSPACE_PRIVATE_H */

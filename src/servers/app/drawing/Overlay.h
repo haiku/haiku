@@ -9,7 +9,7 @@
 #define OVERLAY_H
 
 
-#include "RGBColor.h"
+#include <InterfaceDefs.h>
 
 #include <video_overlay.h>
 
@@ -48,7 +48,7 @@ class Overlay {
 		sem_id Semaphore() const
 			{ return fSemaphore; }
 
-		const RGBColor& Color() const
+		const rgb_color& Color() const
 			{ return fColor; }
 
 		void Configure(const BRect& source, const BRect& destination);
@@ -65,7 +65,7 @@ class Overlay {
 		overlay_view			fView;
 		overlay_window			fWindow;
 		sem_id					fSemaphore;
-		RGBColor				fColor;
+		rgb_color				fColor;
 };
 
 #endif	// OVERLAY_H

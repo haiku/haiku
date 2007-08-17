@@ -13,7 +13,6 @@
 #define VIEW_LAYER_H
 
 
-#include "RGBColor.h"
 #include "IntRect.h"
 
 #include <GraphicsDefs.h>
@@ -157,10 +156,8 @@ class ViewLayer {
 
 			const BRegion&	LocalClipping() const { return fLocalClipping; }
 
-			const RGBColor&	ViewColor() const
+			const rgb_color& ViewColor() const
 								{ return fViewColor; }
-			void			SetViewColor(const RGBColor& color)
-								{ fViewColor = color; }
 			void			SetViewColor(const rgb_color& color)
 								{ fViewColor = color; }
 
@@ -246,7 +243,7 @@ class ViewLayer {
 			// scrolling offset
 			IntPoint		fScrollingOffset;
 
-			RGBColor		fViewColor;
+			rgb_color		fViewColor;
 			DrawState*		fDrawState;
 			ServerBitmap*	fViewBitmap;
 			IntRect			fBitmapSource;
@@ -256,10 +253,10 @@ class ViewLayer {
 
 			uint32			fResizeMode;
 			uint32			fFlags;
-			bool			fHidden;
-			bool			fVisible;
-			bool			fBackgroundDirty;
-			bool			fIsDesktopBackground;
+			bool			fHidden : 1;
+			bool			fVisible : 1;
+			bool			fBackgroundDirty : 1;
+			bool			fIsDesktopBackground : 1;
 
 			uint32			fEventMask;
 			uint32			fEventOptions;

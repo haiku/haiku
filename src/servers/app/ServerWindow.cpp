@@ -1586,7 +1586,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			
 			link.Read(&c, sizeof(rgb_color));
 
-			fCurrentLayer->SetViewColor(RGBColor(c));
+			fCurrentLayer->SetViewColor(c);
 			break;
 		}
 
@@ -1595,7 +1595,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 				Title(), fCurrentLayer->Name()));
 
 			fLink.StartMessage(B_OK);
-			fLink.Attach<rgb_color>(fCurrentLayer->CurrentState()->HighColor().GetColor32());
+			fLink.Attach<rgb_color>(fCurrentLayer->CurrentState()->HighColor());
 			fLink.Flush();
 			break;
 
@@ -1604,7 +1604,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 				Title(), fCurrentLayer->Name()));
 
 			fLink.StartMessage(B_OK);
-			fLink.Attach<rgb_color>(fCurrentLayer->CurrentState()->LowColor().GetColor32());
+			fLink.Attach<rgb_color>(fCurrentLayer->CurrentState()->LowColor());
 			fLink.Flush();
 			break;
 
@@ -1613,7 +1613,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 				Title(), fCurrentLayer->Name()));
 
 			fLink.StartMessage(B_OK);
-			fLink.Attach<rgb_color>(fCurrentLayer->ViewColor().GetColor32());
+			fLink.Attach<rgb_color>(fCurrentLayer->ViewColor());
 			fLink.Flush();
 			break;
 
@@ -1699,7 +1699,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 
 					if (bitmap != NULL && bitmap->Overlay() != NULL) {
 						bitmap->Overlay()->SetFlags(options);
-						colorKey = bitmap->Overlay()->Color().GetColor32();
+						colorKey = bitmap->Overlay()->Color();
 					}
 				} else
 					status = B_BAD_VALUE;
@@ -1849,7 +1849,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			rgb_color c;
 			link.Read(&c, sizeof(rgb_color));
 			
-			fCurrentLayer->CurrentState()->SetHighColor(RGBColor(c));
+			fCurrentLayer->CurrentState()->SetHighColor(c);
 			fWindowLayer->GetDrawingEngine()->SetHighColor(c);
 			break;
 		}
@@ -1860,7 +1860,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			rgb_color c;
 			link.Read(&c, sizeof(rgb_color));
 
-			fCurrentLayer->CurrentState()->SetLowColor(RGBColor(c));
+			fCurrentLayer->CurrentState()->SetLowColor(c);
 			fWindowLayer->GetDrawingEngine()->SetLowColor(c);
 			break;
 		}

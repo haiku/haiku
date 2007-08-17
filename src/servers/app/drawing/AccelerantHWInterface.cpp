@@ -972,11 +972,12 @@ AccelerantHWInterface::CopyRegion(const clipping_rect* sortedRectList,
 
 // FillRegion
 void
-AccelerantHWInterface::FillRegion(/*const*/ BRegion& region, const RGBColor& color,
-								  bool autoSync)
+AccelerantHWInterface::FillRegion(/*const*/ BRegion& region,
+	const rgb_color& color, bool autoSync)
 {
 	if (fAccFillRect && fAccAcquireEngine) {
-		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, &fSyncToken, &fEngineToken) >= B_OK) {
+		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, &fSyncToken,
+			&fEngineToken) >= B_OK) {
 
 			// convert the region
 			uint32 count;
@@ -1136,34 +1137,33 @@ AccelerantHWInterface::_RegionToRectParams(/*const*/ BRegion* region,
 
 // _NativeColor
 uint32
-AccelerantHWInterface::_NativeColor(const RGBColor& color) const
+AccelerantHWInterface::_NativeColor(const rgb_color& color) const
 {
 	// NOTE: This functions looks somehow suspicios to me.
 	// It assumes that all graphics cards have the same native endianess, no?
 	switch (fDisplayMode.space) {
 		case B_CMAP8:
 		case B_GRAY8:
-			return color.GetColor8();
+			return RGBColor(color).GetColor8();
 
 		case B_RGB15_BIG:
 		case B_RGBA15_BIG:
 		case B_RGB15_LITTLE:
 		case B_RGBA15_LITTLE:
-			return color.GetColor15();
+			return RGBColor(color).GetColor15();
 
 		case B_RGB16_BIG:
 		case B_RGB16_LITTLE:
-			return color.GetColor16();
+			return RGBColor(color).GetColor16();
 
 		case B_RGB32_BIG:
 		case B_RGBA32_BIG:
 		case B_RGB32_LITTLE:
 		case B_RGBA32_LITTLE: {
-			rgb_color c = color.GetColor32();
-			uint32 native = (c.alpha << 24) |
-							(c.red << 16) |
-							(c.green << 8) |
-							(c.blue);
+			uint32 native = (color.alpha << 24) |
+							(color.red << 16) |
+							(color.green << 8) |
+							(color.blue);
 			return native;
 		}
 	}

@@ -548,7 +548,7 @@ set_pen_size(ViewLayer *view, float size)
 static void
 set_fore_color(ViewLayer *view, rgb_color color)
 {
-	view->CurrentState()->SetHighColor(RGBColor(color));
+	view->CurrentState()->SetHighColor(color);
 	view->Window()->GetDrawingEngine()->SetHighColor(color);
 }
 
@@ -556,7 +556,7 @@ set_fore_color(ViewLayer *view, rgb_color color)
 static void
 set_back_color(ViewLayer *view, rgb_color color)
 {
-	view->CurrentState()->SetLowColor(RGBColor(color));
+	view->CurrentState()->SetLowColor(color);
 	view->Window()->GetDrawingEngine()->SetLowColor(color);
 }
 
@@ -823,8 +823,8 @@ ServerPicture::SyncState(ViewLayer *view)
 	//WriteSetPattern(*view->CurrentState()->GetPattern().GetInt8());
 	WriteSetDrawingMode(view->CurrentState()->GetDrawingMode());
 	
-	WriteSetHighColor(view->CurrentState()->HighColor().GetColor32());
-	WriteSetLowColor(view->CurrentState()->LowColor().GetColor32());
+	WriteSetHighColor(view->CurrentState()->HighColor());
+	WriteSetLowColor(view->CurrentState()->LowColor());
 
 	ExitStateChange();
 }

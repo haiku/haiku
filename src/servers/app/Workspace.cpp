@@ -17,7 +17,7 @@
 #include <stdlib.h>
 
 
-static RGBColor kDefaultColor = RGBColor(51, 102, 152);
+static rgb_color kDefaultColor = (rgb_color){ 51, 102, 152, 255 };
 
 
 Workspace::Private::Private()
@@ -38,7 +38,7 @@ Workspace::Private::SetDisplaysFromDesktop(Desktop* desktop)
 
 
 void
-Workspace::Private::SetColor(const RGBColor& color)
+Workspace::Private::SetColor(const rgb_color& color)
 {
 	fColor = color;
 }
@@ -49,7 +49,7 @@ Workspace::Private::RestoreConfiguration(const BMessage& settings)
 {
 	rgb_color color;
 	if (settings.FindInt32("color", (int32 *)&color) == B_OK)
-		fColor.SetColor(color);
+		fColor = color;
 }
 
 
@@ -59,16 +59,15 @@ Workspace::Private::RestoreConfiguration(const BMessage& settings)
 void
 Workspace::Private::StoreConfiguration(BMessage& settings)
 {
-	rgb_color color = fColor.GetColor32();
 	settings.RemoveName("color");
-	settings.AddInt32("color", *(int32 *)&color);
+	settings.AddInt32("color", *(int32 *)&fColor);
 }
 
 
 void
 Workspace::Private::_SetDefaults()
 {
-	fColor.SetColor(kDefaultColor);
+	fColor = kDefaultColor;
 }
 
 
@@ -96,7 +95,7 @@ Workspace::~Workspace()
 }
 
 
-const RGBColor&
+const rgb_color&
 Workspace::Color() const
 {
 	return fWorkspace.Color();
@@ -104,7 +103,7 @@ Workspace::Color() const
 
 
 void
-Workspace::SetColor(const RGBColor& color, bool makeDefault)
+Workspace::SetColor(const rgb_color& color, bool makeDefault)
 {
 	if (color == Color())
 		return;

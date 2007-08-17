@@ -374,7 +374,7 @@ WindowLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 	if (fDecorator) {
 		fDecorator->ResizeBy(x, y, dirtyRegion);
 //if (dirtyRegion) {
-//fDrawingEngine->FillRegion(*dirtyRegion, RGBColor(255, 255, 0, 255));
+//fDrawingEngine->FillRegion(*dirtyRegion, (rgb_color){ 255, 255, 0, 255 });
 //snooze(40000);
 //}
 	}
@@ -385,7 +385,7 @@ WindowLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 	}
 
 //if (dirtyRegion)
-//fDrawingEngine->FillRegion(*dirtyRegion, RGBColor(0, 255, 255, 255));
+//fDrawingEngine->FillRegion(*dirtyRegion, (rgb_color){ 0, 255, 255, 255 });
 
 	// send a message to the client informing about the changed size
 	BRect frame(Frame());
@@ -412,7 +412,7 @@ WindowLayer::ScrollViewBy(ViewLayer* view, int32 dx, int32 dy)
 
 	view->ScrollBy(dx, dy, dirty);
 
-//fDrawingEngine->FillRegion(dirty, RGBColor(255, 0, 255, 255));
+//fDrawingEngine->FillRegion(dirty, rgb_color{ 255, 0, 255, 255 });
 //snooze(2000);
 
 	if (IsVisible() && view->IsVisible()) {
@@ -715,7 +715,7 @@ WindowLayer::InvalidateView(ViewLayer* layer, BRegion& layerRegion)
 		if (layerRegion.CountRects() > 0) {
 			layerRegion.IntersectWith(&layer->ScreenClipping(&fContentRegion));
 
-//fDrawingEngine->FillRegion(layerRegion, RGBColor(0, 255, 0, 255));
+//fDrawingEngine->FillRegion(layerRegion, rgb_color{ 0, 255, 0, 255 });
 //snooze(10000);
 			fDirtyCause |= UPDATE_REQUEST;
 			_TriggerContentRedraw(layerRegion);
@@ -1817,7 +1817,7 @@ WindowLayer::_TransferToUpdateSession(BRegion* contentDirtyRegion)
 	if (contentDirtyRegion->CountRects() <= 0)
 		return;
 
-//fDrawingEngine->FillRegion(*contentDirtyRegion, RGBColor(sPendingColor));
+//fDrawingEngine->FillRegion(*contentDirtyRegion, sPendingColor);
 //snooze(10000);
 
 	// add to pending
@@ -1910,7 +1910,7 @@ WindowLayer::BeginUpdate(BPrivate::PortLink& link)
 //sPendingColor.red = rand() % 255;
 //sPendingColor.green = rand() % 255;
 //sPendingColor.blue = rand() % 255;
-//fDrawingEngine->FillRegion(*dirty, RGBColor(sCurrentColor));
+//fDrawingEngine->FillRegion(*dirty, sCurrentColor);
 //snooze(10000);
 
 		link.StartMessage(B_OK);
@@ -1929,7 +1929,7 @@ WindowLayer::BeginUpdate(BPrivate::PortLink& link)
 		link.Flush();
 
 		if (!fCurrentUpdateSession.IsExpose() && fDrawingEngine->LockParallelAccess()) {
-//fDrawingEngine->FillRegion(dirty, RGBColor(255, 0, 0, 255));
+//fDrawingEngine->FillRegion(dirty, (rgb_color){ 255, 0, 0, 255 });
 			fDrawingEngine->SuspendAutoSync();
 
 			fTopLayer->Draw(fDrawingEngine, dirty,

@@ -482,7 +482,7 @@ Decorator::DrawZoom(void)
 }
 
 
-RGBColor
+rgb_color
 Decorator::UIColor(color_which which)
 {
 	// TODO: for now - calling ui_color() from within the app_server

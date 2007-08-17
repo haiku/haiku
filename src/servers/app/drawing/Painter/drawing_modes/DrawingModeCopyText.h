@@ -20,7 +20,7 @@ blend_pixel_copy_text(int x, int y, const color_type& c, uint8 cover,
 	if (cover == 255) {
 		ASSIGN_COPY(p, c.r, c.g, c.b, c.a);
 	} else {
-		rgb_color l = pattern->LowColor().GetColor32();
+		rgb_color l = pattern->LowColor();
 		BLEND_COPY(p, c.r, c.g, c.b, cover,
 				   l.red, l.green, l.blue);
 	}
@@ -48,7 +48,7 @@ blend_hline_copy_text(int x, int y, unsigned len,
 		} while(--len);
 	} else {
 		uint8* p = buffer->row_ptr(y) + (x << 2);
-		rgb_color l = pattern->LowColor().GetColor32();
+		rgb_color l = pattern->LowColor();
 		do {
 			BLEND_COPY(p, c.r, c.g, c.b, cover,
 					   l.red, l.green, l.blue);
@@ -68,7 +68,7 @@ blend_solid_hspan_copy_text(int x, int y, unsigned len,
 //	uint8* p = buffer->row_ptr(y) + (x << 2);
 	uint32* p = (uint32*)(buffer->row_ptr(y) + (x << 2));
 	const uint32* cache = (const uint32*)pattern->OpCopyColorCache();
-//	rgb_color l = pattern->LowColor().GetColor32();
+//	rgb_color l = pattern->LowColor();
 	do {
 //		if (*covers) {
 			*p = cache[*covers];
@@ -95,7 +95,7 @@ blend_solid_vspan_copy_text(int x, int y, unsigned len,
 							 const PatternHandler* pattern)
 {
 	uint8* p = buffer->row_ptr(y) + (x << 2);
-	rgb_color l = pattern->LowColor().GetColor32();
+	rgb_color l = pattern->LowColor();
 	do {
 		if (*covers) {
 			if (*covers == 255) {
@@ -120,7 +120,7 @@ blend_color_hspan_copy_text(int x, int y, unsigned len,
 							 const PatternHandler* pattern)
 {
 	uint8* p = buffer->row_ptr(y) + (x << 2);
-	rgb_color l = pattern->LowColor().GetColor32();
+	rgb_color l = pattern->LowColor();
 	if (covers) {
 		// non-solid opacity
 		do {

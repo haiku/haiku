@@ -27,8 +27,8 @@ DrawState::DrawState()
 	: fOrigin(0.0, 0.0),
 	  fScale(1.0),
 	  fClippingRegion(NULL),
-	  fHighColor(0, 0, 0, 255),
-	  fLowColor(255, 255, 255, 255),
+	  fHighColor((rgb_color){ 0, 0, 0, 255 }),
+	  fLowColor((rgb_color){ 255, 255, 255, 255 }),
 	  fPattern(kSolidHigh),
 	  fDrawingMode(B_OP_COPY),
 	  fAlphaSrcMode(B_PIXEL_ALPHA),
@@ -253,8 +253,8 @@ DrawState::WriteToLink(BPrivate::LinkSender& link) const
 	// Attach view state
 	link.Attach<BPoint>(fPenLocation);
 	link.Attach<float>(fPenSize);
-	link.Attach<rgb_color>(fHighColor.GetColor32());
-	link.Attach<rgb_color>(fLowColor.GetColor32());
+	link.Attach<rgb_color>(fHighColor);
+	link.Attach<rgb_color>(fLowColor);
 	link.Attach<uint64>(fPattern.GetInt64());
 	link.Attach<BPoint>(fOrigin);
 	link.Attach<uint8>((uint8)fDrawingMode);
@@ -434,14 +434,14 @@ DrawState::SetClippingRegion(const BRegion* region)
 
 
 void
-DrawState::SetHighColor(const RGBColor& color)
+DrawState::SetHighColor(const rgb_color& color)
 {
 	fHighColor = color;
 }
 
 
 void
-DrawState::SetLowColor(const RGBColor& color)
+DrawState::SetLowColor(const rgb_color& color)
 {
 	fLowColor = color;
 }
@@ -606,8 +606,10 @@ DrawState::PrintToStream() const
 	printf("\t Pen Location and Size: (%.1f, %.1f) - %.2f (%.2f)\n",
 		   fPenLocation.x, fPenLocation.y, PenSize(), fPenSize);
 
-	printf("\t HighColor: "); fHighColor.PrintToStream();
-	printf("\t LowColor: "); fLowColor.PrintToStream();
+	printf("\t HighColor: r=%d g=%d b=%d a=%d\n",
+		fHighColor.red, fHighColor.green, fHighColor.blue, fHighColor.alpha);
+	printf("\t LowColor: r=%d g=%d b=%d a=%d\n",
+		fLowColor.red, fLowColor.green, fLowColor.blue, fLowColor.alpha);
 	printf("\t Pattern: %llu\n", fPattern.GetInt64());
 
 	printf("\t DrawMode: %lu\n", (uint32)fDrawingMode);

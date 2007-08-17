@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <GraphicsDefs.h>
-#include "RGBColor.h"
 
 class Pattern {
  public:
@@ -95,25 +94,19 @@ class PatternHandler {
 			void				SetPattern(const Pattern& p);
 			void				SetPattern(const pattern& p);
 
-			void				SetColors(const RGBColor& high, const RGBColor& low);
-			void				SetHighColor(const RGBColor& color);
-			void				SetLowColor(const RGBColor& color);
-
-			void				SetColors(const rgb_color& high, const rgb_color& low);
+			void				SetColors(const rgb_color& high,
+									const rgb_color& low);
 			void				SetHighColor(const rgb_color& color);
 			void				SetLowColor(const rgb_color& color);
 
-
-			RGBColor			HighColor() const
+			rgb_color			HighColor() const
 									{ return fHighColor; }
-			RGBColor			LowColor() const
+			rgb_color			LowColor() const
 									{ return fLowColor; }
 
-			RGBColor			ColorAt(const BPoint& pt) const;
-			RGBColor			ColorAt(float x, float y) const;
-	inline	RGBColor			ColorAt(int x, int y) const;
-	// TODO: any ideas for a better name of the rgb_color version of this function?
-	inline	rgb_color			R5ColorAt(int x, int y) const;
+			rgb_color			ColorAt(const BPoint& pt) const;
+			rgb_color			ColorAt(float x, float y) const;
+	inline	rgb_color			ColorAt(int x, int y) const;
 
 			bool				IsHighColor(const BPoint& pt) const;
 	inline	bool				IsHighColor(int x, int y) const;
@@ -137,8 +130,8 @@ class PatternHandler {
 
  private:
 			Pattern				fPattern;
-			RGBColor			fHighColor;
-			RGBColor			fLowColor;
+			rgb_color			fHighColor;
+			rgb_color			fLowColor;
 
 			uint16				fXOffset;
 			uint16				fYOffset;
@@ -153,22 +146,10 @@ class PatternHandler {
 	\param y Y coordinate to get the color for
 	\return Color for the coordinates
 */
-inline	RGBColor
+inline rgb_color
 PatternHandler::ColorAt(int x, int y) const
 {
 	return IsHighColor(x, y) ? fHighColor : fLowColor;
-}
-
-/*!
-	\brief Obtains the color in the pattern at the specified coordinates
-	\param x X coordinate to get the color for
-	\param y Y coordinate to get the color for
-	\return Color for the coordinates
-*/
-inline	rgb_color
-PatternHandler::R5ColorAt(int x, int y) const
-{
-	return IsHighColor(x, y) ? fHighColor.GetColor32() : fLowColor.GetColor32();
 }
 
 /*!
@@ -177,7 +158,7 @@ PatternHandler::R5ColorAt(int x, int y) const
 	\return Value for the coordinates - true if high, false if low.
 */
 
-inline	bool
+inline bool
 PatternHandler::IsHighColor(int x, int y) const
 {
 	x -= fXOffset;

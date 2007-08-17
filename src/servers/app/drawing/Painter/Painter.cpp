@@ -107,7 +107,7 @@ Painter::AttachToBuffer(RenderingBuffer* buffer)
 		// These are the AGG renderes and rasterizes which
 		// will be used for stroking paths
 
-		_SetRendererColor(fPatternHandler.HighColor().GetColor32());
+		_SetRendererColor(fPatternHandler.HighColor());
 	}
 }
 
@@ -152,8 +152,8 @@ Painter::SetDrawState(const DrawState* data, int32 xOffset, int32 yOffset)
 
 	// adopt the color *after* the pattern is set
 	// to set the renderers to the correct color
-	SetHighColor(data->HighColor().GetColor32());
-	SetLowColor(data->LowColor().GetColor32());
+	SetHighColor(data->HighColor());
+	SetLowColor(data->LowColor());
 
 	if (updateDrawingMode || fPixelFormat.UsesOpCopyForText())
 		_UpdateDrawingMode();
@@ -179,7 +179,7 @@ Painter::ConstrainClipping(const BRegion* region)
 void
 Painter::SetHighColor(const rgb_color& color)
 {
-	if (fPatternHandler.HighColor().GetColor32() == color)
+	if (fPatternHandler.HighColor() == color)
 		return;
 	fPatternHandler.SetHighColor(color);
 	if (*(fPatternHandler.GetR5Pattern()) == B_SOLID_HIGH)
@@ -245,10 +245,10 @@ Painter::SetPattern(const pattern& p, bool drawingText)
 		// update renderer color if necessary
 		if (fPatternHandler.IsSolidHigh()) {
 			// pattern was not solid high before
-			_SetRendererColor(fPatternHandler.HighColor().GetColor32());
+			_SetRendererColor(fPatternHandler.HighColor());
 		} else if (fPatternHandler.IsSolidLow()) {
 			// pattern was not solid low before
-			_SetRendererColor(fPatternHandler.LowColor().GetColor32());
+			_SetRendererColor(fPatternHandler.LowColor());
 		}
 	}
 }
@@ -290,10 +290,10 @@ Painter::StrokeLine(BPoint a, BPoint b)
 
 		pattern pat = *fPatternHandler.GetR5Pattern();
 		if (pat == B_SOLID_HIGH
-			&& StraightLine(a, b, fPatternHandler.HighColor().GetColor32())) {
+			&& StraightLine(a, b, fPatternHandler.HighColor())) {
 			return;
 		} else if (pat == B_SOLID_LOW
-			&& StraightLine(a, b, fPatternHandler.LowColor().GetColor32())) {
+			&& StraightLine(a, b, fPatternHandler.LowColor())) {
 			return;
 		}
 	}
@@ -574,12 +574,12 @@ Painter::StrokeRect(const BRect& r) const
 		if (p == B_SOLID_HIGH) {
 			BRect rect(a, b);
 			StrokeRect(rect,
-					   fPatternHandler.HighColor().GetColor32());
+					   fPatternHandler.HighColor());
 			return _Clipped(rect);
 		} else if (p == B_SOLID_LOW) {
 			BRect rect(a, b);
 			StrokeRect(rect,
-					   fPatternHandler.LowColor().GetColor32());
+					   fPatternHandler.LowColor());
 			return _Clipped(rect);
 		}
 	}
@@ -638,11 +638,11 @@ Painter::FillRect(const BRect& r) const
 		pattern p = *fPatternHandler.GetR5Pattern();
 		if (p == B_SOLID_HIGH) {
 			BRect rect(a, b);
-			FillRect(rect, fPatternHandler.HighColor().GetColor32());
+			FillRect(rect, fPatternHandler.HighColor());
 			return _Clipped(rect);
 		} else if (p == B_SOLID_LOW) {
 			BRect rect(a, b);
-			FillRect(rect, fPatternHandler.LowColor().GetColor32());
+			FillRect(rect, fPatternHandler.LowColor());
 			return _Clipped(rect);
 		}
 	}
@@ -650,12 +650,12 @@ Painter::FillRect(const BRect& r) const
 		pattern p = *fPatternHandler.GetR5Pattern();
 		if (p == B_SOLID_HIGH) {
 			BRect rect(a, b);
-			_BlendRect32(rect, fPatternHandler.HighColor().GetColor32());
+			_BlendRect32(rect, fPatternHandler.HighColor());
 			return _Clipped(rect);
 		} else if (p == B_SOLID_LOW) {
-			rgb_color c = fPatternHandler.LowColor().GetColor32();
+			rgb_color c = fPatternHandler.LowColor();
 			if (fAlphaSrcMode == B_CONSTANT_ALPHA)
-				c.alpha = fPatternHandler.HighColor().GetColor32().alpha;
+				c.alpha = fPatternHandler.HighColor().alpha;
 			BRect rect(a, b);
 			_BlendRect32(rect, c);
 			return _Clipped(rect);

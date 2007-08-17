@@ -648,10 +648,10 @@ DrawingEngine::DrawPolygon(BPoint* ptlist, int32 numpts,
 	}
 }
 
-// #pragma mark - RGBColor
+// #pragma mark - rgb_color
 
 void
-DrawingEngine::StrokePoint(const BPoint& pt, const RGBColor &color)
+DrawingEngine::StrokePoint(const BPoint& pt, const rgb_color &color)
 {
 	StrokeLine(pt, pt, color);
 }
@@ -662,7 +662,7 @@ DrawingEngine::StrokePoint(const BPoint& pt, const RGBColor &color)
 // * it assumes a one pixel wide line
 void
 DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end,
-						  const RGBColor &color)
+						  const rgb_color &color)
 {
 	CRASH_IF_NOT_LOCKED
 
@@ -671,7 +671,7 @@ DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end,
 	touched = fPainter->ClipRect(touched);
 	bool cursorTouched = fGraphicsCard->HideSoftwareCursor(touched);
 
-	if (!fPainter->StraightLine(start, end, color.GetColor32())) {
+	if (!fPainter->StraightLine(start, end, color)) {
 		fPainter->SetHighColor(color);
 		fPainter->SetDrawingMode(B_OP_OVER);
 		fPainter->StrokeLine(start, end);
@@ -684,7 +684,7 @@ DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end,
 
 // this function is used to draw a one pixel wide rect
 void
-DrawingEngine::StrokeRect(BRect r, const RGBColor &color)
+DrawingEngine::StrokeRect(BRect r, const rgb_color &color)
 {
 	CRASH_IF_NOT_LOCKED
 
@@ -693,7 +693,7 @@ DrawingEngine::StrokeRect(BRect r, const RGBColor &color)
 	if (clipped.IsValid()) {
 		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
 
-		fPainter->StrokeRect(r, color.GetColor32());
+		fPainter->StrokeRect(r, color);
 
 		fGraphicsCard->Invalidate(clipped);
 		if (cursorTouched)
@@ -703,7 +703,7 @@ DrawingEngine::StrokeRect(BRect r, const RGBColor &color)
 
 
 void
-DrawingEngine::FillRect(BRect r, const RGBColor& color)
+DrawingEngine::FillRect(BRect r, const rgb_color& color)
 {
 	CRASH_IF_NOT_LOCKED
 
@@ -723,7 +723,7 @@ DrawingEngine::FillRect(BRect r, const RGBColor& color)
 									  fSuspendSyncLevel == 0
 									  || cursorTouched);
 		} else {
-			fPainter->FillRect(r, color.GetColor32());
+			fPainter->FillRect(r, color);
 	
 			fGraphicsCard->Invalidate(r);
 		}
@@ -735,7 +735,7 @@ DrawingEngine::FillRect(BRect r, const RGBColor& color)
 
 
 void
-DrawingEngine::FillRegion(BRegion& r, const RGBColor& color)
+DrawingEngine::FillRegion(BRegion& r, const rgb_color& color)
 {
 	CRASH_IF_NOT_LOCKED
 
@@ -751,7 +751,7 @@ DrawingEngine::FillRegion(BRegion& r, const RGBColor& color)
 	} else {
 		int32 count = r.CountRects();
 		for (int32 i = 0; i < count; i++) {
-			fPainter->FillRectNoClipping(r.RectAt(i), color.GetColor32());
+			fPainter->FillRectNoClipping(r.RectAt(i), color);
 		}
 
 		fGraphicsCard->Invalidate(frame);

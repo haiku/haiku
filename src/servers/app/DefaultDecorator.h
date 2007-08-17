@@ -19,43 +19,40 @@ class Desktop;
 class DefaultDecorator: public Decorator {
  public:
 								DefaultDecorator(DesktopSettings& settings,
-												 BRect frame,
-												 window_look look,
-												 uint32 flags);
+									BRect frame, window_look look,
+									uint32 flags);
 	virtual						~DefaultDecorator();
 
 	virtual	void				SetTitle(const char* string,
-										 BRegion* updateRegion = NULL);
+									BRegion* updateRegion = NULL);
 	virtual void				SetLook(DesktopSettings& settings,
-										window_look look,
-										BRegion* updateRegion = NULL);
+									window_look look,
+									BRegion* updateRegion = NULL);
 	virtual void				SetFlags(uint32 flags,
-										 BRegion* updateRegion = NULL);
+									BRegion* updateRegion = NULL);
 
 	virtual	void				MoveBy(BPoint offset);
 	virtual	void				ResizeBy(BPoint offset, BRegion* dirty);
 
 	virtual bool				SetTabLocation(float location,
-											   BRegion* updateRegion = NULL);
+									BRegion* updateRegion = NULL);
 	virtual float				TabLocation() const
 									{ return (float)fTabOffset; }
 
 	virtual	bool				SetSettings(const BMessage& settings,
-											BRegion* updateRegion = NULL);
+									BRegion* updateRegion = NULL);
 	virtual	bool				GetSettings(BMessage* settings) const;
 
 	virtual	void				Draw(BRect updateRect);
 	virtual	void				Draw();
 
-	virtual	void				GetSizeLimits(int32* minWidth,
-											  int32* minHeight,
-											  int32* maxWidth,
-											  int32* maxHeight) const;
+	virtual	void				GetSizeLimits(int32* minWidth, int32* minHeight,
+									int32* maxWidth, int32* maxHeight) const;
 
 	virtual	void				GetFootprint(BRegion* region);
 
 	virtual	click_type			Clicked(BPoint pt, int32 buttons,
-										int32 modifiers);
+									int32 modifiers);
 
  protected:
 	virtual void				_DoLayout();
@@ -73,18 +70,18 @@ class DefaultDecorator: public Decorator {
  private:
 			void				_DrawBlendedRect(BRect r, bool down);
 			void				_GetButtonSizeAndOffset(const BRect& tabRect,
-														float* offset,
-														float*size) const;
+									float* offset, float* size,
+									float* inset) const;
 			void				_LayoutTabItems(const BRect& tabRect);
 
-			RGBColor			fButtonHighColor;
-			RGBColor			fButtonLowColor;
-			RGBColor			fTextColor;
-			RGBColor			fTabColor;
-			RGBColor			fTabColorLight;
-			RGBColor			fTabColorShadow;
+			rgb_color			fButtonHighColor;
+			rgb_color			fButtonLowColor;
+			rgb_color			fTextColor;
+			rgb_color			fTabColor;
+			rgb_color			fTabColorLight;
+			rgb_color			fTabColorShadow;
 
-			RGBColor*			fFrameColors;
+			rgb_color			fFrameColors[6];
 	
 			// Individual rects for handling window frame
 			// rendering the proper way

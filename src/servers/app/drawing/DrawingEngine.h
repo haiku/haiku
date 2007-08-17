@@ -24,7 +24,6 @@ class BRegion;
 
 class DrawState;
 class Painter;
-class RGBColor;
 class ServerBitmap;
 class ServerCursor;
 class ServerFont;
@@ -104,12 +103,12 @@ public:
 			void			DrawPolygon(BPoint *ptlist, int32 numpts,
 								BRect bounds, bool filled, bool closed);
 
-			// these RGBColor versions are used internally by the server
+			// these rgb_color versions are used internally by the server
 			void			StrokePoint(const BPoint& pt,
-								const RGBColor& color);
-			void			StrokeRect(BRect r, const RGBColor &color);
-			void			FillRect(BRect r, const RGBColor &color);
-			void			FillRegion(BRegion& r, const RGBColor& color);
+								const rgb_color& color);
+			void			StrokeRect(BRect r, const rgb_color &color);
+			void			FillRect(BRect r, const rgb_color &color);
+			void			FillRegion(BRegion& r, const rgb_color& color);
 
 			void			StrokeRect(BRect r);
 			void			FillRect(BRect r);
@@ -129,7 +128,7 @@ public:
 
 			// this version used by Decorator
 			void			StrokeLine(const BPoint& start,
-								const BPoint& end, const RGBColor& color);
+								const BPoint& end, const rgb_color& color);
 
 			void			StrokeLine(const BPoint& start,
 								const BPoint& end);

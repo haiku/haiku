@@ -2231,7 +2231,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				index = fDesktop->CurrentWorkspace();
 
 			Workspace workspace(*fDesktop, index);
-			fLink.Attach<rgb_color>(workspace.Color().GetColor32());
+			fLink.Attach<rgb_color>(workspace.Color());
 
 			fDesktop->Unlock();
 			fLink.Flush();

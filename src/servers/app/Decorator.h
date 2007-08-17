@@ -116,7 +116,7 @@ class Decorator {
 	virtual	void				DrawTitle();
 	virtual	void				DrawZoom();
 
-			RGBColor			UIColor(color_which which);
+			rgb_color			UIColor(color_which which);
 
  protected:
 			int32				_TitleWidth() const
@@ -149,11 +149,11 @@ class Decorator {
 			BRect				fBorderRect;
 
  private:
-			bool				fClosePressed;
-			bool				fZoomPressed;
-			bool				fMinimizePressed;
+			bool				fClosePressed : 1;
+			bool				fZoomPressed : 1;
+			bool				fMinimizePressed : 1;
 
-			bool				fIsFocused;
+			bool				fIsFocused : 1;
 
 			BString				fTitle;
 };
