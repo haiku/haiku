@@ -154,7 +154,16 @@ Settings::ReadConfiguration()
 	bufferDeleter.Detach();
 	free(buffer);	
 	
-	// Now that silly DNS problem...
+	uint32 flags = 0;
+	if (ioctl(fSocket, SIOCGIFFLAGS, &request, sizeof(struct ifreq)) == 0)
+		flags = request.ifr_flags;
+		
+	if ((flags & IFF_AUTO_CONFIGURED) != 0)
+		fAuto = true;
+	else
+		fAuto = false;
+	
+	// read resolv.conf for the dns.
 	fNameservers.MakeEmpty();
 
 #define	MATCH(line, name) \
@@ -173,25 +182,27 @@ Settings::ReadConfiguration()
 	if ((fp = fopen("/etc/resolv.conf", "r")) != NULL) {
 	    /* read the config file */
 	    while (fgets(buf, sizeof(buf), fp) != NULL) {
-			/* skip comments */
-			if (*buf == ';' || *buf == '#')
-				continue;
-			
-		    /* read nameservers to query */
-			if (MATCH(buf, "nameserver") && nserv < MAXNS) {
-				char sbuf[2];
-
-				cp = buf + sizeof("nameserver") - 1;
-				while (*cp == ' ' || *cp == '\t')
-					cp++;
-				cp[strcspn(cp, ";# \t\n")] = '\0';
-				if ((*cp != '\0') && (*cp != '\n')) {
-					fNameservers.AddItem(new BString(cp));
-					nserv++;
-				}
-			}
+		/* skip comments */
+		if (*buf == ';' || *buf == '#')
 			continue;
+			
+	    /* read nameservers to query */
+		if (MATCH(buf, "nameserver") && nserv < MAXNS) {
+		    char sbuf[2];
+		    
+
+		    cp = buf + sizeof("nameserver") - 1;
+		    while (*cp == ' ' || *cp == '\t')
+			cp++;
+		    cp[strcspn(cp, ";# \t\n")] = '\0';
+		    if ((*cp != '\0') && (*cp != '\n')) {
+				fNameservers.AddItem(new BString(cp));
+			    nserv++;
+		    }
 		}
-		fclose(fp);
+		    continue; 
+		}
+	fclose(fp);
+	
 	}
 }

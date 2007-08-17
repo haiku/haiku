@@ -34,6 +34,8 @@ class EthernetSettingsView : public BView {
 		virtual void AttachedToWindow();
 		virtual void DetachedFromWindow();
 		
+		void SaveProfile(BString profileName);
+		void LoadProfile(BString profileName);
 	private:
 		
 		BButton* fCloseButton;
@@ -54,6 +56,12 @@ class EthernetSettingsView : public BView {
 		void	_GatherInterfaces();
 		bool	_PrepareRequest(struct ifreq& request, const char* name);
 		void 	_ShowConfiguration(BMessage* message);
+		void 	_SaveConfiguration();
+		void 	_SaveDNSConfiguration();
+		void 	_SaveAdaptersConfiguration();
+		void	_ApplyControlsToConfiguration();
+		status_t _GetPath(const char* name, BPath& path);
+
 
 };
 

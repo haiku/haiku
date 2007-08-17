@@ -17,22 +17,19 @@ class Settings {
 		virtual ~Settings();
 
 		void SetName(BString name);
-		void SetIP(BString ip);
-		void SetGateway(BString ip);
-		void SetNetmask(BString ip);
-		void SetAutoConfigure(bool t);
+		void SetIP(BString ip) {fIP = ip; }
+		void SetGateway(BString ip) {fGateway = ip; }
+		void SetNetmask(BString ip) {fNetmask = ip; }
+		void SetAutoConfigure(bool t) {fAuto = t; }
 		
 		const char* GetIP()  {return fIP.String(); }
 		const char* GetGateway()  {return fGateway.String(); }		
 		const char* GetNetmask()  {return fNetmask.String(); }
 		const char* GetName()  {return fName.String(); }
-		bool GetAutoConfigure() const {return fAuto; }
+		bool GetAutoConfigure() {return fAuto; }
 		BObjectList<BString> fNameservers;
-
-		void SaveProfile(BString profileName);
-		void LoadProfile(BString profileName);
-		void SaveConfiguration();
 		void ReadConfiguration();
+
 		
 	private:
 		bool _PrepareRequest(struct ifreq& request);
