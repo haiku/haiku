@@ -1067,15 +1067,16 @@ BShelf::_DeleteReplicant(replicant_data* item)
 
 	int32 index = replicant_data::IndexOf(&fReplicants, item->message);
 
-	// TODO: Test if it's ok here
 	ReplicantDeleted(index, item->message, view);
-
-	fReplicants.RemoveItem(item);
+	
+	fReplicants.RemoveItem(item);	
 
 	if (loadedImage && item->image >= 0)
 		unload_add_on(item->image);
 
 	delete item;
+
+	// TODO: Should we also delete the view ?
 
 	return B_OK;
 }
@@ -1195,11 +1196,15 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 			// the view has not been accepted
 
 			if (relation == BDragger::TARGET_IS_PARENT
-				|| relation == BDragger::TARGET_IS_SIBLING)
-				delete replicant;
+				|| relation == BDragger::TARGET_IS_SIBLING) {
+				replicant->RemoveSelf();				
+				delete replicant;			
+			}
 			if (relation == BDragger::TARGET_IS_CHILD
-				|| relation == BDragger::TARGET_IS_SIBLING)
+				|| relation == BDragger::TARGET_IS_SIBLING) {
+				dragger->RemoveSelf();			
 				delete dragger;
+			}
 
 			return send_reply(data, B_ERROR, uniqueID);
 		}
