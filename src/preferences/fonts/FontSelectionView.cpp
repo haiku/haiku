@@ -394,23 +394,23 @@ FontSelectionView::Revert()
 bool
 FontSelectionView::IsDefaultable()
 {
-	font_family default_family;
-	font_style default_style;
-	float default_size;
+	font_family defaultFamily;
+	font_style defaultStyle;
+	float defaultSize;
 
-	if (_get_system_default_font_(Name(), default_family, default_style, &default_size) != B_OK)
+	if (_get_system_default_font_(Name(), defaultFamily, defaultStyle, &defaultSize) != B_OK)
 		return false;
 
-	font_family current_family;
-	font_style current_style;
-	float current_size;
+	font_family currentFamily;
+	font_style currentStyle;
+	float currentSize;
 
-	fCurrentFont.GetFamilyAndStyle(&current_family, &current_style);
-	current_size = fCurrentFont.Size();
+	fCurrentFont.GetFamilyAndStyle(&currentFamily, &currentStyle);
+	currentSize = fCurrentFont.Size();
 
-	return strcmp(current_family, default_family) != 0
-		|| strcmp(current_style, default_style) != 0
-		|| current_size != default_size;
+	return strcmp(currentFamily, defaultFamily) != 0
+		|| strcmp(currentStyle, defaultStyle) != 0
+		|| currentSize != defaultSize;
 }
 
 
