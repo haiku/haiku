@@ -532,6 +532,89 @@ static void testSetOriginAndScale(BView *view, BRect frame)
 	view->FillRect(r);
 }
 
+static void testSetOriginAndScale2(BView *view, BRect frame)
+{
+	frame.InsetBy(2, 2);
+	BPoint center = centerPoint(frame);
+	
+	BRect r(0, 0, frame.IntegerWidth() / 2, frame.IntegerHeight() / 2);
+	view->SetOrigin(center);
+	view->FillRect(r);
+	
+	view->SetScale(0.5);
+	view->SetHighColor(kRed);
+	view->FillRect(r);
+	
+	view->SetOrigin(0, 0);
+	view->SetHighColor(kGreen);
+	view->FillRect(r);
+}
+
+static void testSetOriginAndScale3(BView *view, BRect frame)
+{
+	frame.InsetBy(2, 2);
+	BPoint center = centerPoint(frame);
+	
+	BRect r(0, 0, frame.IntegerWidth() / 2, frame.IntegerHeight() / 2);
+	view->SetOrigin(center);
+	view->FillRect(r);
+	
+	view->SetScale(0.5);
+	view->SetHighColor(kRed);
+	view->FillRect(r);
+	
+	view->SetScale(0.25);
+	view->SetHighColor(kGreen);
+	view->FillRect(r);
+}
+
+static void testSetOriginAndScale4(BView *view, BRect frame)
+{
+	frame.InsetBy(2, 2);
+	BPoint center = centerPoint(frame);
+	
+	BRect r(0, 0, frame.IntegerWidth() / 2, frame.IntegerHeight() / 2);
+	view->SetOrigin(center);
+	view->FillRect(r);
+	
+	view->SetScale(0.5);
+	view->SetHighColor(kRed);
+	view->FillRect(r);
+	
+	view->PushState();
+		// 
+		view->SetOrigin(center.x+1, center.y);
+			// +1 to work around BeOS bug
+			// where setting the origin has no
+			// effect if it is the same as
+			// the previous value althou
+			// it is from the "outer" coordinate
+			// system
+		view->SetHighColor(kGreen);
+		view->FillRect(r);
+	view->PopState();
+}
+
+static void testSetOriginAndScale5(BView *view, BRect frame)
+{
+	frame.InsetBy(2, 2);
+	BPoint center = centerPoint(frame);
+	
+	BRect r(0, 0, frame.IntegerWidth() / 2, frame.IntegerHeight() / 2);
+	view->SetOrigin(center);
+	view->FillRect(r);
+	
+	view->SetScale(0.5);
+	view->SetHighColor(kRed);
+	view->FillRect(r);
+	
+	view->PushState();
+		view->SetScale(0.75);
+		view->SetHighColor(kGreen);
+		view->FillRect(r);
+	view->PopState();
+}
+
 static void testSetFontSize(BView *view, BRect frame)
 {
 	frame.InsetBy(2, 2);
@@ -604,6 +687,10 @@ TestCase gTestCases[] = {
 	{ "Test SetScale2*", testSetScale2 },
 	{ "Test SetScale3", testSetScale3 },
 	{ "Test SetOriginAndScale", testSetOriginAndScale },
+	{ "Test SetOriginAndScale2", testSetOriginAndScale2 },
+	{ "Test SetOriginAndScale3", testSetOriginAndScale3 },
+	{ "Test SetOriginAndScale4", testSetOriginAndScale4 },
+	{ "Test SetOriginAndScale5", testSetOriginAndScale5 },
 	{ "Test SetFontSize", testSetFontSize },
 	{ NULL, NULL }
 };
