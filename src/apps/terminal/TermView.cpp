@@ -330,7 +330,7 @@ TermView::~TermView()
 {
 	Shell *shell = fShell;
 		// _DetachShell sets fShell to NULL
-	printf("TermView::~TermView()\n");
+	
 	_DetachShell();
 	
 	delete fTextBuffer;
