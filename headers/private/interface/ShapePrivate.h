@@ -19,11 +19,9 @@ struct shape_data {
 	uint32	*opList;
 	int32	opCount;
 	int32	opSize;
-	int32	opBlockSize;
 	BPoint	*ptList;
 	int32	ptCount;
 	int32	ptSize;
-	int32	ptBlockSize;
 };
 
 #endif
