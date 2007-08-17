@@ -31,17 +31,20 @@
 #ifndef __TERMWINDOW_H
 #define __TERMWINDOW_H
 
+
 #include <String.h>
 #include <Window.h>
 
 
 class Arguments;
+class BFont;
 class BMenu;
 class BMenuBar;
 class FindWindow;
 class PrefWindow;
 class TermView;
 class SmartTabView;
+
 class TermWindow : public BWindow {
 public:
 	TermWindow(BRect frame, const char* title, Arguments *args);
@@ -55,39 +58,39 @@ protected:
 
 
 private:
-	void		_SetTermColors(TermView *termView);
-	void		_InitWindow();
-	void		_SetupMenu();
-	void		_GetPreferredFonts(BFont &full, BFont &half);
-	status_t	_DoPageSetup();
-	void		_DoPrint();
-	void		_AddTab(Arguments *args);
-	void		_RemoveTab(int32 index);
-	TermView*	_ActiveTermView();
+	void			_SetTermColors(TermView *termView);
+	void			_InitWindow();
+	void			_SetupMenu();
+	void			_GetPreferredFonts(BFont &full, BFont &half);
+	status_t		_DoPageSetup();
+	void			_DoPrint();
+	void			_AddTab(Arguments *args);
+	void			_RemoveTab(int32 index);
+	TermView*		_ActiveTermView();
 	
 	SmartTabView	*fTabView;
-	TermView	*fTermView;
-	BMenuBar	*fMenubar;
-	BMenu		*fFilemenu,
-			*fEditmenu,
-			*fEncodingmenu,
-			*fHelpmenu,
-			*fWindowSizeMenu;
+	TermView		*fTermView;
+	BMenuBar		*fMenubar;
+	BMenu			*fFilemenu;
+	BMenu			*fEditmenu;
+	BMenu			*fEncodingmenu;
+	BMenu			*fHelpmenu;
+	BMenu			*fWindowSizeMenu;
 
-	BMessage	*fPrintSettings;
-	PrefWindow	*fPrefWindow;
-	FindWindow	*fFindPanel;
-	BRect		fSavedFrame;
-	window_look	fSavedLook;
-	
-	//Saved search parameters
-	BString	fFindString;
-	BMenuItem	*fFindForwardMenuItem;
-	BMenuItem 	*fFindBackwardMenuItem;
-	bool		fFindSelection;
-	bool		fForwardSearch;
-	bool		fMatchCase;
-	bool		fMatchWord;
+	BMessage		*fPrintSettings;
+	PrefWindow		*fPrefWindow;
+	FindWindow		*fFindPanel;
+	BRect			fSavedFrame;
+	window_look		fSavedLook;
+
+	// Saved search parameters
+	BString			fFindString;
+	BMenuItem		*fFindForwardMenuItem;
+	BMenuItem 		*fFindBackwardMenuItem;
+	bool			fFindSelection;
+	bool			fForwardSearch;
+	bool			fMatchCase;
+	bool			fMatchWord;
 };
 
 #endif // __TERMWINDOW_H
