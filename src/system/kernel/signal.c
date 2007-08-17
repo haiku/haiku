@@ -32,8 +32,12 @@
 
 #define SIGNAL_TO_MASK(signal)	(1LL << (signal - 1))
 #define BLOCKABLE_SIGNALS		(~(KILL_SIGNALS | SIGNAL_TO_MASK(SIGSTOP)))
+#define STOP_SIGNALS \
+	(SIGNAL_TO_MASK(SIGSTOP) | SIGNAL_TO_MASK(SIGTSTP) \
+	| SIGNAL_TO_MASK(SIGTTIN) | SIGNAL_TO_MASK(SIGTTOU))
 #define DEFAULT_IGNORE_SIGNALS \
-	(SIGNAL_TO_MASK(SIGCHLD) | SIGNAL_TO_MASK(SIGWINCH) | SIGNAL_TO_MASK(SIGCONT))
+	(SIGNAL_TO_MASK(SIGCHLD) | SIGNAL_TO_MASK(SIGWINCH) \
+	| SIGNAL_TO_MASK(SIGCONT))
 
 
 const char * const sigstr[NSIG] = {
@@ -128,9 +132,6 @@ handle_signals(struct thread *thread)
 			switch (signal) {
 				case SIGCHLD:
 				case SIGWINCH:
-				case SIGTSTP:
-				case SIGTTIN:
-				case SIGTTOU:
 				case SIGCONT:
 				case SIGURG:
 					// notify the debugger
@@ -139,6 +140,9 @@ handle_signals(struct thread *thread)
 					continue;
 
 				case SIGSTOP:
+				case SIGTSTP:
+				case SIGTTIN:
+				case SIGTTOU:
 					// notify the debugger
 					if (debugSignal
 						&& !notify_debugger(thread, signal, handler, false))
@@ -212,7 +216,8 @@ handle_signals(struct thread *thread)
 bool
 is_kill_signal_pending(void)
 {
-	return (atomic_get(&thread_get_current_thread()->sig_pending) & KILL_SIGNALS) != 0;
+	return (atomic_get(&thread_get_current_thread()->sig_pending)
+		& KILL_SIGNALS) != 0;
 }
 
 
@@ -267,16 +272,21 @@ deliver_signal(struct thread *thread, uint signal, uint32 flags)
 			} else if (thread->state == B_THREAD_WAITING)
 				sem_interrupt_thread(thread);
 			break;
+
 		case SIGCONT:
 			// Wake up thread if it was suspended
 			if (thread->state == B_THREAD_SUSPENDED) {
 				thread->state = thread->next_state = B_THREAD_READY;
 				scheduler_enqueue_in_run_queue(thread);
 			}
+
+			atomic_and(&thread->sig_pending, ~STOP_SIGNALS);
+				// remove any pending stop signals
 			break;
 
 		default:
-			if (thread->sig_pending & (~thread->sig_block_mask | SIGNAL_TO_MASK(SIGCHLD))) {
+			if (thread->sig_pending
+				& (~thread->sig_block_mask | SIGNAL_TO_MASK(SIGCHLD))) {
 				// Interrupt thread if it was waiting
 				if (thread->state == B_THREAD_WAITING)
 					sem_interrupt_thread(thread);

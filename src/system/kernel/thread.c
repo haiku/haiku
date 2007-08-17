@@ -1529,7 +1529,7 @@ wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
 
 	if (thread == NULL) {
 		// we couldn't find this thread - maybe it's already gone, and we'll
-		// find its death entry
+		// find its death entry in our team
 		GRAB_TEAM_LOCK();
 
 		status = team_get_death_entry(thread_get_current_thread()->team,

@@ -225,12 +225,11 @@ TermParse::StopPtyReader()
 	}
 
 	if (fReaderThread >= 0) {
-		status_t dummy;
-		//suspend_thread(fReaderThread);
-		// TODO: interrupt read() - doesn't work for whatever reason
-		//wait_for_thread(fReaderThread, &dummy);
-		kill_thread(fReaderThread);
-	
+		suspend_thread(fReaderThread);
+
+		status_t status;
+		wait_for_thread(fReaderThread, &status);
+
 		fReaderThread = -1;	
 	}
 }
