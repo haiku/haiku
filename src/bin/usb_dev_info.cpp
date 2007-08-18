@@ -16,9 +16,9 @@ DumpInterface(const BUSBInterface *interface)
 	if (!interface)
 		return;
 
-	printf("    Class .............. %d\n", interface->Class());
-	printf("    Subclass ........... %d\n", interface->Subclass());
-	printf("    Protocol ........... %d\n", interface->Protocol());
+	printf("    Class .............. 0x%02x\n", interface->Class());
+	printf("    Subclass ........... 0x%02x\n", interface->Subclass());
+	printf("    Protocol ........... 0x%02x\n", interface->Protocol());
 	printf("    Interface String ... \"%s\"\n", interface->InterfaceString());
 
 	for (uint32 i = 0; i < interface->CountEndpoints(); i++) {
@@ -77,9 +77,9 @@ static void
 DumpInfo(BUSBDevice &device)
 {
 	printf("[Device]\n");
-	printf("Class .................. %d\n", device.Class());
-	printf("Subclass ............... %d\n", device.Subclass());
-	printf("Protocol ............... %d\n", device.Protocol());
+	printf("Class .................. 0x%02x\n", device.Class());
+	printf("Subclass ............... 0x%02x\n", device.Subclass());
+	printf("Protocol ............... 0x%02x\n", device.Protocol());
 	printf("Max Endpoint 0 Packet .. %d\n", device.MaxEndpoint0PacketSize());
 	printf("USB Version ............ 0x%04x\n", device.USBVersion());
 	printf("Vendor ID .............. 0x%04x\n", device.VendorID());
