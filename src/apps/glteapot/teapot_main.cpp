@@ -3,42 +3,48 @@
 	This file may be used under the terms of the Be Sample Code License.
 */
 
-#include <InterfaceKit.h>
 #include <stdio.h>
+#include <InterfaceKit.h>
 #include "ObjectView.h"
 
-class QuitWindow : public BDirectWindow
-{
-public:
-	QuitWindow(BRect r, char *name, window_type wt, ulong something);
-	
-	virtual bool QuitRequested();
-	virtual void DirectConnected( direct_buffer_info *info );
-	ObjectView *bgl;
+class QuitWindow : public BDirectWindow {
+	public:
+		QuitWindow(BRect r, char *name, window_type wt, ulong something);
+		
+		virtual bool QuitRequested();
+		virtual void DirectConnected( direct_buffer_info *info );
 
+		ObjectView *bgl;
 };
+
 
 QuitWindow::QuitWindow(BRect r, char *name, window_type wt, ulong something)
 	: BDirectWindow(r,name,wt,something)
 { 
 }
 
-bool QuitWindow::QuitRequested()
+
+bool
+QuitWindow::QuitRequested()
 {
-printf( "closing \n" );
+	printf("closing \n");
 	bgl->EnableDirectMode( false );
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
 };
 
-void QuitWindow::DirectConnected( direct_buffer_info *info )
+
+void
+QuitWindow::DirectConnected(direct_buffer_info *info)
 {
-	if( bgl )
+	if (bgl)
 		bgl->DirectConnected( info );	
 	bgl->EnableDirectMode( true );
 }
 
-int main(int argc, char **argv)
+
+int
+main(int argc, char **argv)
 {
 	GLenum type = BGL_RGB | BGL_DEPTH | BGL_DOUBLE;
     //GLenum type = BGL_RGB | BGL_DEPTH | BGL_SINGLE;

@@ -2,8 +2,11 @@
 	Copyright 1999, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
+#ifndef GL_OBJECT_H
+#define GL_OBJECT_H
 
 #include "ObjectView.h"
+#include "util.h"
 
 struct point {
 	float x,y,z;
@@ -20,35 +23,35 @@ struct quadStrip {
 	int *pts;
 };
 
-#include "util.h"
 
 class GLObject {
-public:
-float 				rotX,rotY,spinX,spinY,lastRotX,lastRotY;
-float				x,y,z;
-int					color;
-int					solidity;
-bool				changed;
-ObjectView *		objView;
+	public:
+						GLObject(ObjectView *ov);
+		virtual			~GLObject();
 
-					GLObject(ObjectView *ov);
-virtual				~GLObject();
+		virtual void	Draw(bool forID, float IDcolor[]);
+		virtual bool	SpinIt();
+		virtual void	MenuInvoked(BPoint point);
+		virtual void	DoDrawing(bool forID) {};
 
-virtual void		Draw(bool forID, float IDcolor[]);
-virtual bool		SpinIt();
-virtual void		MenuInvoked(BPoint point);
-
-virtual void		DoDrawing(bool forID) {};
+		float 			rotX,rotY,spinX,spinY,lastRotX,lastRotY;
+		float			x,y,z;
+		int				color;
+		int				solidity;
+		bool			changed;
+		ObjectView *	objView;
 };
 
 class TriangleObject : public GLObject {
-public:
-BufferArray<point>		points;
-BufferArray<tri>		triangles;
-BufferArray<quadStrip>	qs;
+	public:
+							TriangleObject(ObjectView *ov, char *filename);
+		virtual				~TriangleObject();
+		
+		virtual void		DoDrawing(bool forID);
 
-					TriangleObject(ObjectView *ov, char *filename);
-virtual				~TriangleObject();
-
-virtual void		DoDrawing(bool forID);
+		BufferArray<point>		points;
+		BufferArray<tri>		triangles;
+		BufferArray<quadStrip>	qs;
 };
+
+#endif // GL_OBJECT_H

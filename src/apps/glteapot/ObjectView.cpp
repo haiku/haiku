@@ -3,16 +3,17 @@
 	This file may be used under the terms of the Be Sample Code License.
 */
 
+#include "ObjectView.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <InterfaceKit.h>
 #include <FindDirectory.h>
 
-#include "ObjectView.h"
-#include "ResScroll.h"
-#include "GLObject.h"
 #include "FPS.h"
+#include "GLObject.h"
+#include "ResScroll.h"
 
 #define teapotData "teapot.data"
 char teapotPath[PATH_MAX];
@@ -35,22 +36,26 @@ float red[3] = {1.0,0.0,0.0};
 
 float *bgColor = black;
 
+
 struct light {
 	float *ambient;
 	float *diffuse;
 	float *specular;
 };
 
+
 light lights[] = {
-	{NULL,NULL,NULL},
-	{dimWhite,white,white},
-	{dimWhite,yellow,yellow},
-	{dimWhite,red,red},
-	{dimWhite,blue,blue},
-	{dimWhite,green,green}
+	{NULL, NULL, NULL},
+	{dimWhite, white, white},
+	{dimWhite, yellow, yellow},
+	{dimWhite, red, red},
+	{dimWhite, blue, blue},
+	{dimWhite, green, green}
 };
 
-long signalEvent(sem_id event)
+
+long
+signalEvent(sem_id event)
 {
 	long c;
 	get_sem_count(event,&c);
@@ -60,7 +65,9 @@ long signalEvent(sem_id event)
 	return 0;
 };
 
-long setEvent(sem_id event)
+
+long
+setEvent(sem_id event)
 {
 	long c;
 	get_sem_count(event,&c);
@@ -71,7 +78,8 @@ long setEvent(sem_id event)
 };
 
 
-long waitEvent(sem_id event)
+long
+waitEvent(sem_id event)
 {
 	acquire_sem(event);
 
@@ -83,7 +91,9 @@ long waitEvent(sem_id event)
 	return 0;
 };
 
-long simonThread(ObjectView *ov)
+
+long
+simonThread(ObjectView *ov)
 {
     int noPause=0;
     while (acquire_sem_etc(ov->quittingSem,1,B_TIMEOUT,0) == B_NO_ERROR) {
@@ -100,6 +110,7 @@ long simonThread(ObjectView *ov)
 
 	return 0;
 };
+
 
 ObjectView::ObjectView(BRect r, char *name, ulong resizingMode, ulong options)
 	: BGLView(r,name,resizingMode,0,options)
@@ -130,13 +141,16 @@ ObjectView::ObjectView(BRect r, char *name, ulong resizingMode, ulong options)
 	objListLock.Unlock();
 };
 
+
 ObjectView::~ObjectView()
 {
 	delete_sem(quittingSem);
 	delete_sem(drawEvent);
 };
 
-void ObjectView::AttachedToWindow()
+
+void
+ObjectView::AttachedToWindow()
 {
 	float position[] = {0.0, 3.0, 3.0, 0.0};
 	float position1[] = {-3.0, -3.0, 3.0, 0.0};
@@ -204,7 +218,9 @@ void ObjectView::AttachedToWindow()
 	setEvent(drawEvent);
 };
 
-void ObjectView::DetachedFromWindow()
+
+void
+ObjectView::DetachedFromWindow()
 {
 	BGLView::DetachedFromWindow();
 
@@ -224,7 +240,9 @@ void ObjectView::DetachedFromWindow()
 	while (locks--) Window()->Lock();
 };
 
-void ObjectView::Pulse()
+
+void
+ObjectView::Pulse()
 {
   Window()->Lock();
   BRect p = Parent()->Bounds();
@@ -237,7 +255,9 @@ void ObjectView::Pulse()
   Window()->Unlock();
 };
 
-void ObjectView::MessageReceived(BMessage *msg)
+
+void
+ObjectView::MessageReceived(BMessage *msg)
 {
 	BMenuItem *i;
 	bool *b;
@@ -320,7 +340,9 @@ void ObjectView::MessageReceived(BMessage *msg)
 	};		
 };
 
-int ObjectView::ObjectAtPoint(BPoint p)
+
+int
+ObjectView::ObjectAtPoint(BPoint p)
 {
 	LockGL();
 	glShadeModel(GL_FLAT);
@@ -347,7 +369,9 @@ int ObjectView::ObjectAtPoint(BPoint p)
 	return objNum;
 };
 
-void ObjectView::MouseDown(BPoint p)
+
+void
+ObjectView::MouseDown(BPoint p)
 {
 	BPoint op=p,np=p;
 	BRect bounds = Bounds();
@@ -441,7 +465,9 @@ void ObjectView::MouseDown(BPoint p)
 	setEvent(drawEvent);
 };
 
-void ObjectView::FrameResized(float w, float h)
+
+void
+ObjectView::FrameResized(float w, float h)
 {
 	LockGL();
 
@@ -481,7 +507,9 @@ void ObjectView::FrameResized(float w, float h)
 	setEvent(drawEvent);
 }
 
-bool ObjectView::RepositionView()
+
+bool
+ObjectView::RepositionView()
 {
 	if (!(persp != lastPersp) &&
 		!(lastObjectDistance != objectDistance) &&
@@ -516,7 +544,9 @@ bool ObjectView::RepositionView()
 	return true;
 };
 
-void ObjectView::EnforceState()
+
+void
+ObjectView::EnforceState()
 {
 	glShadeModel(gouraud?GL_SMOOTH:GL_FLAT);
 	if (zbuf) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);
@@ -542,7 +572,9 @@ void ObjectView::EnforceState()
 	};
 };
 
-bool ObjectView::SpinIt()
+
+bool
+ObjectView::SpinIt()
 {
 	bool changed = false;
 
@@ -615,7 +647,9 @@ bool ObjectView::SpinIt()
 	return changed;
 };
 
-void ObjectView::DrawFrame(bool noPause)
+
+void
+ObjectView::DrawFrame(bool noPause)
 {
 	LockGL();
 	glClear(GL_COLOR_BUFFER_BIT|(zbuf?GL_DEPTH_BUFFER_BIT:0));

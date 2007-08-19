@@ -3,21 +3,20 @@
 	This file may be used under the terms of the Be Sample Code License.
 */
 
-#ifndef ResScroll_h
-#define ResScroll_h
+#ifndef RESSCROLL_H
+#define RESSCROLL_H
 
 #include <interface/ScrollBar.h>
 
 class ObjectView;
 
 class ResScroll : public BScrollBar {
-public:
-		ObjectView *	objectView;
-		
-						ResScroll(BRect r, const char *name,
-							ObjectView *target, orientation posture);
-virtual	void			ValueChanged(float value);
-
+	public:
+			ObjectView *	objectView;
+			
+							ResScroll(BRect r, const char *name,
+								ObjectView *target, orientation posture);
+			virtual	void	ValueChanged(float value);
 };
 
 #endif

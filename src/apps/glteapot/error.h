@@ -3,8 +3,8 @@
 	This file may be used under the terms of the Be Sample Code License.
 */
 
-#ifndef error_h
-#define error_h
+#ifndef ERROR_H
+#define ERROR_H
 
 #include <stdio.h>
 
@@ -28,4 +28,4 @@ extern void fatalerror(char *);
 
 #endif //DEBUGGING
 
-#endif
+#endif // ERROR_H

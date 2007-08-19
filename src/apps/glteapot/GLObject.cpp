@@ -3,22 +3,17 @@
 	This file may be used under the terms of the Be Sample Code License.
 */
 
-#include <stdlib.h>
-#include <GL/gl.h>
-
-#include <InterfaceKit.h>
-
 #include "GLObject.h"
+#include <GL/gl.h>
+#include <stdlib.h>
+#include <InterfaceKit.h>
 #include "glob.h"
 
 struct material {
-	float ambient[3],diffuse[3],specular[3];
+	float ambient[3], diffuse[3], specular[3];
 };
 
-float *colors[] =
-{
-	NULL,white,yellow,blue,red,green
-};
+float *colors[] = {NULL, white, yellow, blue, red, green};
 
 material materials[] = {
 	// Null
@@ -61,25 +56,34 @@ material materials[] = {
 
 #define USE_QUAD_STRIPS 1
 
-extern long 	setEvent(sem_id event);
+extern long setEvent(sem_id event);
+
 
 GLObject::GLObject(ObjectView *ov)
+	: rotX(0),
+	rotY(0),
+	lastRotX(0),
+	lastRotY(0),
+	spinX(2),
+	spinY(2),
+	x(0),
+	y(0),
+	z(-2.0),
+	color(4),
+	solidity(0),
+	changed(false),
+	objView(ov)
 {
-	rotX = rotY = lastRotX = lastRotY = 0;
-	spinX = spinY = 2;
-	x = y = 0;
-	z = -2.0;
-	color = 4;
-	solidity = 0;
-	changed = false;
-	objView = ov;
 };
+
 
 GLObject::~GLObject()
 {
 };
 
-void GLObject::MenuInvoked(BPoint point)
+
+void
+GLObject::MenuInvoked(BPoint point)
 {
 	BPopUpMenu *m = new BPopUpMenu("Object",false,false);
 	BMenuItem *i;
@@ -126,7 +130,9 @@ void GLObject::MenuInvoked(BPoint point)
 	setEvent(objView->drawEvent);
 };
 
-bool GLObject::SpinIt()
+
+bool
+GLObject::SpinIt()
 {
 	rotX += spinX;
 	rotY += spinY;
@@ -138,7 +144,9 @@ bool GLObject::SpinIt()
 	return c;
 };
 
-void GLObject::Draw(bool forID, float IDcolor[])
+
+void
+GLObject::Draw(bool forID, float IDcolor[])
 {
 	glPushMatrix();
 		glTranslatef(x, y, z);
@@ -155,6 +163,7 @@ void GLObject::Draw(bool forID, float IDcolor[])
 
 	changed = false;
 };
+
 
 TriangleObject::TriangleObject(ObjectView *ov, char *filename)
 	: 	GLObject(ov), 
@@ -247,6 +256,7 @@ TriangleObject::TriangleObject(ObjectView *ov, char *filename)
 	fclose(f);
 };
 
+
 TriangleObject::~TriangleObject()
 {
 	for (int i=0;i<qs.num_items;i++) {
@@ -254,7 +264,9 @@ TriangleObject::~TriangleObject()
 	};
 };
 
-void TriangleObject::DoDrawing(bool forID)
+
+void
+TriangleObject::DoDrawing(bool forID)
 {
 	if (!forID) {
 		float c[3][4];
