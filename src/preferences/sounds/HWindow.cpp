@@ -139,6 +139,7 @@ HWindow::InitGUI()
 						,new BMessage(M_STOP_MESSAGE)
 						,B_FOLLOW_RIGHT | B_FOLLOW_TOP);
 	button->ResizeToPreferred();
+	button->SetEnabled(false);
 	button->MoveTo(box->Bounds().right - button->Bounds().Width() - 15, rect.top);
 	box->AddChild(button);
 	
@@ -153,6 +154,7 @@ HWindow::InitGUI()
 								,new BMessage(M_PLAY_MESSAGE)
 								,B_FOLLOW_RIGHT | B_FOLLOW_TOP);
 	button->ResizeToPreferred();
+	button->SetEnabled(false);
 	button->MoveTo(rect.left - button->Bounds().Width() - 15, rect.top);
 	box->AddChild(button);
 	
@@ -212,7 +214,7 @@ HWindow::MessageReceived(BMessage *message)
 				BMimeType mtype(type);
 				BMimeType superType;
 				mtype.GetSupertype(&superType);
-				if(strcmp(superType.Type(),"audio") != 0) {
+				if (superType.Type() == NULL || strcmp(superType.Type(), "audio") != 0) {
 					beep();
 					(new BAlert("","This is not a audio file.","OK",NULL,NULL,
 							B_WIDTH_AS_USUAL,B_STOP_ALERT))->Go();
@@ -408,9 +410,16 @@ HWindow::Pulse()
 	
 	if(!menufield)
 		return;
+
 	if(sel >=0) {
 		menufield->SetEnabled(true);
-		button->SetEnabled(true);
+
+		HEventItem *item = cast_as(fEventList->ItemAt(sel),HEventItem);
+		const char* path = item->Path();
+		if (path && strcmp(path, ""))
+			button->SetEnabled(true);
+		else
+			button->SetEnabled(false);
 	} else {
 		menufield->SetEnabled(false);
 		button->SetEnabled(false);
