@@ -1204,6 +1204,8 @@ BMenu::InitData(BMessage *data)
 	SetLowColor(sMenuInfo.background_color);
 	SetViewColor(sMenuInfo.background_color);
 
+	fTriggerEnabled = sMenuInfo.triggers_always_shown;
+
 	if (data != NULL) {
 		data->FindInt32("_layout", (int32 *)&fLayout);
 		data->FindBool("_rsize_to_fit", &fResizeToFit);
