@@ -13,6 +13,7 @@
 #include "VolumeSlider.h"
 
 #include <Application.h>
+#include <Box.h>
 #include <Button.h>
 #include <StringView.h>
 #include <TextControl.h>
