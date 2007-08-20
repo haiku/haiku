@@ -236,7 +236,9 @@ void StatusView::MouseMoved(
 		}
 		ResizeBy(x, 0.0);
 		BRect r(Bounds());
-		r.left = r.right - 10.0;
+		r.left = r.right - 5.0;
+		if (x > 0)
+			r.left -= x;
 		m_dirty = true;
 		Invalidate(r);
 		if (m_scrollBar) {
