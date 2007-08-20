@@ -11,12 +11,12 @@
 
 #include <Application.h>
 
-#include "EthernetSettingsWindow.h"
+#include "NetworkWindow.h"
 #include "EthernetSettingsView.h"
 
 
-EthernetSettingsWindow::EthernetSettingsWindow()
-: BWindow(BRect(50, 50, 269, 302), "Ethernet Settings", 
+NetworkWindow::NetworkWindow()
+: BWindow(BRect(50, 50, 269, 302), "Network", 
 B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS
 | B_NOT_ZOOMABLE)
 {
@@ -29,7 +29,7 @@ B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS
 	
 
 void
-EthernetSettingsWindow::MessageReceived(BMessage* message)
+NetworkWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgInfo:
@@ -41,13 +41,13 @@ EthernetSettingsWindow::MessageReceived(BMessage* message)
 
 }
 
-EthernetSettingsWindow::~EthernetSettingsWindow()
+NetworkWindow::~NetworkWindow()
 {
 }
 
 
 bool
-EthernetSettingsWindow::QuitRequested()
+NetworkWindow::QuitRequested()
 {
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;

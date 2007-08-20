@@ -9,24 +9,24 @@
  *		Hugo Santos
  */
 
-#ifndef ETHERNET_SETTINGS_H
-#define ETHERNET_SETTINGS_H
+#ifndef NETWORK_APP_H
+#define NETWORK_APP_H
 
 #include <stdlib.h>
 #include <unistd.h>
 #include <Application.h>
 
-#include "EthernetSettingsWindow.h"
+#include "NetworkWindow.h"
 
-class EthernetSettings : public BApplication {
+class NetworkApp : public BApplication {
 	public:
-		EthernetSettings();
-		virtual ~EthernetSettings();
+		NetworkApp();
+		virtual ~NetworkApp();
 		
 		virtual void ReadyToRun();
 	private:
-		EthernetSettingsWindow	*fEthWindow;
+		NetworkWindow	*fEthWindow;
 };
 
 
-#endif /* ETHERNET_SETTINGS_H */
+#endif /* NETWORK_APP_H */

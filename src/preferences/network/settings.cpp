@@ -60,7 +60,7 @@ Settings::_PrepareRequest(struct ifreq& request)
 
 
 void
-Settings::ReadConfiguration() 
+Settings::ReadConfiguration()
 {
 	
 	ifreq request;
@@ -172,37 +172,39 @@ Settings::ReadConfiguration()
 	 line[sizeof(name) - 1] == '\t'))
 
 		
+	register FILE *fp = fopen("/etc/resolv.conf", "r");
+	if (fp == NULL) {
+		fprintf(stderr, "failed to open '/etc/resolv.conf' to "
+			"read nameservers: %s\n", strerror(errno));
+		return;
+	}
+
 	int nserv = 0;
 	char buf[1024];
-	register FILE *fp;
-	register char *cp, **pp;
-	register int n;
+	register char *cp; //, **pp;
+//	register int n;
 	int MAXNS = 2;
 	
-	if ((fp = fopen("/etc/resolv.conf", "r")) != NULL) {
-	    /* read the config file */
-	    while (fgets(buf, sizeof(buf), fp) != NULL) {
-		/* skip comments */
+	// read the config file
+	while (fgets(buf, sizeof(buf), fp) != NULL) {
+		// skip comments
 		if (*buf == ';' || *buf == '#')
 			continue;
-			
-	    /* read nameservers to query */
-		if (MATCH(buf, "nameserver") && nserv < MAXNS) {
-		    char sbuf[2];
-		    
 
-		    cp = buf + sizeof("nameserver") - 1;
-		    while (*cp == ' ' || *cp == '\t')
-			cp++;
-		    cp[strcspn(cp, ";# \t\n")] = '\0';
-		    if ((*cp != '\0') && (*cp != '\n')) {
+		// read nameservers to query
+		if (MATCH(buf, "nameserver") && nserv < MAXNS) {
+//			char sbuf[2];
+			cp = buf + sizeof("nameserver") - 1;
+			while (*cp == ' ' || *cp == '\t')
+				cp++;
+			cp[strcspn(cp, ";# \t\n")] = '\0';
+			if ((*cp != '\0') && (*cp != '\n')) {
 				fNameservers.AddItem(new BString(cp));
-			    nserv++;
-		    }
+				nserv++;
+			}
 		}
-		    continue; 
-		}
-	fclose(fp);
-	
+		continue; 
 	}
+
+	fclose(fp);
 }

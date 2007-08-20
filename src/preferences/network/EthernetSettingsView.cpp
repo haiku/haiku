@@ -115,7 +115,6 @@ EthernetSettingsView::_GatherInterfaces() {
 void
 EthernetSettingsView::AttachedToWindow()
 {
-	fOKButton->SetTarget(this);
 	fApplyButton->SetTarget(this);
 	fDeviceMenuField->Menu()->SetTargetForItems(this); 
 	
@@ -167,6 +166,8 @@ EthernetSettingsView::EthernetSettingsView(BRect rect)
 	modemenu->AddItem(staticitem);
 	BMenuItem* dhcpitem = new BMenuItem("DHCP", NULL);
 	modemenu->AddItem(dhcpitem);
+	BMenuItem* offitem = new BMenuItem("Disconnected", NULL);
+	modemenu->AddItem(offitem);
 	
 	fDeviceMenuField = new BMenuField(frame, "networkcards", "Adapter:", devmenu);
 	fDeviceMenuField->SetDivider(
@@ -233,10 +234,6 @@ EthernetSettingsView::EthernetSettingsView(BRect rect)
 		fSecondaryDNSTextControl->Frame().LeftBottom() + BPoint(0,10));
 	AddChild(fApplyButton);
 	
-	fOKButton = new BButton(frame, "ok", "OK", new BMessage(kMsgOK));
-	fOKButton->ResizeToPreferred();
-	fOKButton->MoveTo(fApplyButton->Frame().RightTop() + BPoint(10,0));
-	AddChild(fOKButton);
 	
 }
 
@@ -248,6 +245,16 @@ EthernetSettingsView::~EthernetSettingsView()
 void
 EthernetSettingsView::_ShowConfiguration(BMessage* message)
 {
+	
+
+			
+	// Clear the inputs.
+	fIPTextControl->SetText("");
+	fGatewayTextControl->SetText("");
+	fNetMaskTextControl->SetText("");
+	fPrimaryDNSTextControl->SetText("");
+	fSecondaryDNSTextControl->SetText("");
+	
 	
  	const char* name;
 	if (message->FindString("interface", &name) != B_OK)
@@ -283,33 +290,21 @@ EthernetSettingsView::_ShowConfiguration(BMessage* message)
 				fPrimaryDNSTextControl->SetText(
 						fSettings.ItemAt(i)->fNameservers.ItemAt(0)->String());
 			}
-		} else {
-			return;
-		}
-	}
-	
-	
-	
-	
-	
-
-	
-
-	
+		} 
+	}	
 }
 
 void
 EthernetSettingsView::_ApplyControlsToConfiguration()
 {
+			
 	if (strcmp(fTypeMenuField->Menu()->FindMarked()->Label(), "Static") == 0) {
-		printf("we´re in!\n");
 		int i;
 		for (i = 0; i < fSettings.CountItems(); i++) {
 		
 
 			if (strcmp(fSettings.ItemAt(i)->
 				GetName(), fDeviceMenuField->Menu()->FindMarked()->Label()) == 0) {
-					printf("changing settings for %s", fSettings.ItemAt(i)->GetName());
 					fSettings.ItemAt(i)->
 						SetIP(fIPTextControl->Text());
 					fSettings.ItemAt(i)->
@@ -348,8 +343,11 @@ EthernetSettingsView::_SaveDNSConfiguration()
 			// loop all the adapters.
 			int j;
 			for (j = 0; j < fSettings.ItemAt(i)->fNameservers.CountItems(); j++) {
-				fprintf(fp, "nameserver\t%s\n", 
-					fSettings.ItemAt(i)->fNameservers.ItemAt(j)->String());
+				if (strcmp(
+					fSettings.ItemAt(i)->fNameservers.ItemAt(j)->String(), "") != 0) {
+						fprintf(fp, "nameserver\t%s\n", 
+							fSettings.ItemAt(i)->fNameservers.ItemAt(j)->String());
+					}
 				}
 			}
 		fclose(fp);	
@@ -363,37 +361,39 @@ EthernetSettingsView::_SaveAdaptersConfiguration()
 	BPath path;
 	status_t status = _GetPath("interfaces", path);
 	if (status < B_OK)
-		return;	
+		return;
 		
-	FILE* fp;
-	bool isOpen = false;
-	int i;
-	for (i = 0; i < fSettings.CountItems(); i++) {
-			// loop all the adapters.
-		if (fSettings.ItemAt(i)->GetAutoConfigure() == false) {
-			if (isOpen == false) {
-				if ((fp = fopen(path.Path(), "w")) == NULL)
-					return;
-				isOpen = true;
+	FILE* fp = NULL;
+	// loop over all adapters. open the settings file only once,
+	// append the settins of each non-autoconfiguring adapter
+	for (int i = 0; i < fSettings.CountItems(); i++) {
+		if (fSettings.ItemAt(i)->GetAutoConfigure())
+			continue;
+
+		if (fp == NULL) {
+			fp = fopen(path.Path(), "w");
+			if (fp == NULL) {
+				fprintf(stderr, "failed to open file %s to write "
+					"configuration: %s\n", path.Path(), strerror(errno));
+				return;
 			}
-			fprintf(fp, 
-				"device %s {\n\t\taddress {\n", fSettings.ItemAt(i)->GetName());
-			fprintf(fp, "\t\t\tfamily\tinet\n");
-			fprintf(fp, "\t\t\taddress\t%s\n", 
-				fSettings.ItemAt(i)->GetIP());
-			fprintf(fp, "\t\t\tgateway\t%s\n", 
-				fSettings.ItemAt(i)->GetGateway());
-			fprintf(fp, "\t\t\tmask\t%s\n", 
-				fSettings.ItemAt(i)->GetNetmask());
-			fprintf(fp, "\t\t}\n}\n\n");
-		
-		
-		}	
-		if (isOpen) {
-			printf("%s saved.\n", path.Path());
-			fclose(fp);
-		}	
+		}
+
+		fprintf(fp, "interface %s {\n\t\taddress {\n",
+			fSettings.ItemAt(i)->GetName());
+		fprintf(fp, "\t\t\tfamily\tinet\n");
+		fprintf(fp, "\t\t\taddress\t%s\n", 
+			fSettings.ItemAt(i)->GetIP());
+		fprintf(fp, "\t\t\tgateway\t%s\n", 
+			fSettings.ItemAt(i)->GetGateway());
+		fprintf(fp, "\t\t\tmask\t%s\n", 
+			fSettings.ItemAt(i)->GetNetmask());
+		fprintf(fp, "\t\t}\n}\n\n");
 	}
+	if (fp) {
+		printf("%s saved.\n", path.Path());
+		fclose(fp);
+	}	
 }
 
 status_t

@@ -21,7 +21,6 @@ class BTextControl;
 
 static const uint32 kMsgApply = 'aply';
 static const uint32 kMsgClose = 'clse';
-static const uint32 kMsgOK = 'okok';
 static const uint32 kMsgField = 'fild';
 static const uint32 kMsgInfo = 'info';
 
@@ -40,7 +39,6 @@ class EthernetSettingsView : public BView {
 		
 		BButton* fCloseButton;
 		BButton* fApplyButton;
-		BButton* fOKButton;
 		BMenuField* fDeviceMenuField;
 		BMenuField* fTypeMenuField;
 		BTextControl* fIPTextControl;

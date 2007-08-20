@@ -5,10 +5,10 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders shared ;
 
 Preference Network :
-	EthernetSettingsWindow.cpp
-	settings.cpp
+	NetworkApp.cpp
+	NetworkWindow.cpp
 	EthernetSettingsView.cpp
-	EthernetSettings.cpp
+	settings.cpp
 	: be root $(HAIKU_NETWORK_LIBS)
 	;
 

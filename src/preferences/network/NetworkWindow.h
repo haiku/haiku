@@ -8,16 +8,16 @@
  *		Axel Dorfler
  *		Hugo Santos
  */
-#ifndef ETHERNET_SETTINGS_WINDOW_H
-#define ETHERNET_SETTINGS_WINDOW_H
+#ifndef NETWORK_WINDOW_H
+#define NETWORK_WINDOW_H
 
 #include <Window.h>
 #include "EthernetSettingsView.h"
 
-class EthernetSettingsWindow : public BWindow {
+class NetworkWindow : public BWindow {
 	public:
-		EthernetSettingsWindow();
-		virtual ~EthernetSettingsWindow();
+		NetworkWindow();
+		virtual ~NetworkWindow();
 		virtual bool QuitRequested();
 		virtual void MessageReceived(BMessage* mesage);
 
@@ -27,4 +27,4 @@ class EthernetSettingsWindow : public BWindow {
 };
 
 
-#endif /* ETHERNET_SETTINGS_WINDOW_H */
+#endif /* NETWORK_WINDOW_H */
