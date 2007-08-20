@@ -1042,6 +1042,22 @@ FrameMoved(origin);
 		case B_MOUSE_MOVED:
 		{
 			if (BView *view = dynamic_cast<BView *>(target)) {
+				if (view->fEventOptions & B_NO_POINTER_HISTORY) {
+					// filter out older mouse moved messages in the queue
+					_DequeueAll();
+					BMessageQueue *queue = MessageQueue();
+					queue->Lock();
+
+					BMessage *moved;
+					for (int32 i = 0; (moved = queue->FindMessage(i)) != NULL; i++) {
+						if (moved != msg && moved->what == B_MOUSE_MOVED) {
+							queue->Unlock();
+							return;
+						}
+					}
+					queue->Unlock();
+				}
+
 				BPoint where;
 				uint32 buttons;
 				uint32 transit;
