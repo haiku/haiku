@@ -318,7 +318,6 @@ ViewState::UpdateFrom(BPrivate::PortLink &link)
 
 
 struct BView::LayoutData {
-
 	LayoutData()
 		: fMinSize(),
 		  fMaxSize(),
@@ -1104,8 +1103,7 @@ BView::Window() const
 }
 
 
-//	#pragma mark -
-// Hook Functions
+//	#pragma mark - Hook Functions
 
 
 void
@@ -1267,8 +1265,7 @@ BView::WindowActivated(bool state)
 }
 
 
-//	#pragma mark -
-//	Input Functions
+//	#pragma mark - Input Functions
 
 
 void
@@ -1619,10 +1616,11 @@ BView::SetMouseEventMask(uint32 mask, uint32 options)
 		&& fOwner->CurrentMessage() != NULL
 		&& fOwner->CurrentMessage()->what == B_MOUSE_DOWN) {
 		check_lock();
+		fMouseEventOptions = options;
+
 		fOwner->fLink->StartMessage(AS_LAYER_SET_MOUSE_EVENT_MASK);
 		fOwner->fLink->Attach<uint32>(mask);
 		fOwner->fLink->Attach<uint32>(options);
-
 		return B_OK;
 	}
 
@@ -1630,8 +1628,7 @@ BView::SetMouseEventMask(uint32 mask, uint32 options)
 }
 
 
-//	#pragma mark -
-//	Graphic State Functions
+//	#pragma mark - Graphic State Functions
 
 
 void
@@ -3361,8 +3358,7 @@ BView::InvertRect(BRect rect)
 }
 
 
-//	#pragma mark -
-//	View Hierarchy Functions
+//	#pragma mark - View Hierarchy Functions
 
 
 void
@@ -3644,8 +3640,7 @@ BView::ResizeTo(BSize size)
 }
 
 
-//	#pragma mark -
-//	Inherited Methods (from BHandler)
+//	#pragma mark - Inherited Methods (from BHandler)
 
 
 status_t
@@ -4172,8 +4167,7 @@ BView::_Layout(bool force, BLayoutContext* context)
 }
 
 
-//	#pragma mark -
-//	Private Functions
+//	#pragma mark - Private Functions
 
 
 void
@@ -4219,6 +4213,7 @@ BView::_InitData(BRect frame, const char *name, uint32 resizingMode, uint32 flag
 
 	fEventMask = 0;
 	fEventOptions = 0;
+	fMouseEventOptions = 0;
 
 	fLayoutData = new LayoutData;
 }

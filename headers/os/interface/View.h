@@ -654,10 +654,11 @@ private:
 			BShelf*			fShelf;
 			uint32			fEventMask;
 			uint32			fEventOptions;
+			uint32			fMouseEventOptions;
 
 			LayoutData*		fLayoutData;
 
-			uint32			_reserved[8];
+			uint32			_reserved[7];
 };
 
 

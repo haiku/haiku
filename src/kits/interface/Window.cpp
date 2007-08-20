@@ -1032,6 +1032,7 @@ FrameMoved(origin);
 			if (BView *view = dynamic_cast<BView *>(target)) {
 				BPoint where;
 				msg->FindPoint("be:view_where", &where);
+				view->fMouseEventOptions = 0;
 				view->MouseUp(where);
 			} else
 				target->MessageReceived(msg);
@@ -1042,7 +1043,8 @@ FrameMoved(origin);
 		case B_MOUSE_MOVED:
 		{
 			if (BView *view = dynamic_cast<BView *>(target)) {
-				if (view->fEventOptions & B_NO_POINTER_HISTORY) {
+				if (((view->fEventOptions | view->fMouseEventOptions)
+						& B_NO_POINTER_HISTORY) != 0) {
 					// filter out older mouse moved messages in the queue
 					_DequeueAll();
 					BMessageQueue *queue = MessageQueue();
