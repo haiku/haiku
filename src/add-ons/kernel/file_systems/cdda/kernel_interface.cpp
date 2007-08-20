@@ -444,6 +444,27 @@ fill_stat_buffer(Volume *volume, Inode *inode, Attribute *attribute,
 }
 
 
+bool
+is_data_track(const scsi_toc_track& track)
+{
+	return (track.control & 4) != 0;
+}
+
+
+uint32
+count_audio_tracks(scsi_toc_toc* toc)
+{
+	uint32 lastTrack = toc->last_track + 1 - toc->first_track;
+	uint32 count = 0;
+	for (uint32 i = 0; i < lastTrack; i++) {
+		if (!is_data_track(toc->tracks[i]))
+			count++;
+	}
+
+	return count;
+}
+
+
 //	#pragma mark - Volume class
 
 
@@ -520,6 +541,11 @@ Volume::Mount(const char* device)
 		return B_NO_MEMORY;
 
 	status_t status = read_table_of_contents(fDevice, toc, 1024);
+
+	// there has to be at least one audio track
+	if (status == B_OK && count_audio_tracks(toc) == 0)
+		status = B_BAD_TYPE;
+
 	if (status < B_OK) {
 		free(toc);
 		return status;
@@ -558,6 +584,11 @@ Volume::Mount(const char* device)
 			+ next.second * kFramesPerSecond + next.frame
 			- startFrame;
 
+		totalFrames += frames;
+
+		if (is_data_track(toc->tracks[i]))
+			continue;
+
 		if (text.titles[i] != NULL) {
 			if (text.artists[i] != NULL) {
 				snprintf(title, sizeof(title), "%02ld. %s - %s.wav", track,
@@ -576,8 +607,6 @@ Volume::Mount(const char* device)
 			else if (title[j] == '\n')
 				title[j] = ' ';
 		}
-
-		totalFrames += frames;
 
 		Inode *inode = _CreateNode(fRootNode, title, startFrame, frames,
 			S_IFREG | 0444);
@@ -1218,6 +1247,11 @@ cdda_identify_partition(int fd, partition_data *partition, void **_cookie)
 		return B_NO_MEMORY;
 
 	status_t status = read_table_of_contents(fd, toc, 1024);
+
+	// there has to be at least a single audio track
+	if (status == B_OK && count_audio_tracks(toc) == 0)
+		status = B_BAD_TYPE;
+
 	if (status < B_OK) {
 		free(toc);
 		return status;
