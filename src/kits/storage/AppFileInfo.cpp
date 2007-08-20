@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku Inc.
+ * Copyright 2002-2007, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -72,8 +72,8 @@ const uint32 LARGE_ICON_TYPE = 'ICON';
 /*!	\brief Creates an uninitialized BAppFileInfo object.
 */
 BAppFileInfo::BAppFileInfo()
-			: fResources(NULL),
-			  fWhere(B_USE_BOTH_LOCATIONS)
+	: fResources(NULL),
+	fWhere(B_USE_BOTH_LOCATIONS)
 {
 }
 
@@ -88,8 +88,8 @@ BAppFileInfo::BAppFileInfo()
 	\param file The file the object shall be initialized to.
 */
 BAppFileInfo::BAppFileInfo(BFile *file)
-			: fResources(NULL),
-			  fWhere(B_USE_BOTH_LOCATIONS)
+	: fResources(NULL),
+	fWhere(B_USE_BOTH_LOCATIONS)
 {
 	SetTo(file);
 }
@@ -101,8 +101,7 @@ BAppFileInfo::BAppFileInfo(BFile *file)
 */
 BAppFileInfo::~BAppFileInfo()
 {
-	if (fResources)
-		delete fResources;
+	delete fResources;
 }
 
 // SetTo
@@ -1166,6 +1165,10 @@ BAppFileInfo::SetIconForType(const char* type, const uint8* data,
 void
 BAppFileInfo::SetInfoLocation(info_location location)
 {
+	// if the resources failed to initialize, we must not use them
+	if (fResources == NULL)
+		location = info_location(location & ~B_USE_RESOURCES);
+
 	fWhere = location;
 }
 
@@ -1178,7 +1181,7 @@ BAppFileInfo::SetInfoLocation(info_location location)
 bool
 BAppFileInfo::IsUsingAttributes() const
 {
-	return (fWhere & B_USE_ATTRIBUTES);
+	return (fWhere & B_USE_ATTRIBUTES) != 0;
 }
 
 // IsUsingResources
@@ -1190,7 +1193,7 @@ BAppFileInfo::IsUsingAttributes() const
 bool
 BAppFileInfo::IsUsingResources() const
 {
-	return (fWhere & B_USE_RESOURCES);
+	return (fWhere & B_USE_RESOURCES) != 0;
 }
 
 // FBC
@@ -1384,9 +1387,13 @@ status_t
 BAppFileInfo::_WriteData(const char *name, int32 id, type_code type,
 						 const void *buffer, size_t bufferSize, bool findID)
 {
+	if (!IsUsingAttributes() && !IsUsingResources())
+		return B_NO_INIT;
+
 	status_t error = B_OK;
+
 	// write to attribute
-	if (IsUsingAttributes() && error == B_OK) {
+	if (IsUsingAttributes()) {
 		ssize_t written = fNode->WriteAttr(name, type, 0, buffer, bufferSize);
 		if (written < 0)
 			error = written;
@@ -1428,9 +1435,13 @@ BAppFileInfo::_WriteData(const char *name, int32 id, type_code type,
 status_t
 BAppFileInfo::_RemoveData(const char *name, type_code type)
 {
+	if (!IsUsingAttributes() && !IsUsingResources())
+		return B_NO_INIT;
+
 	status_t error = B_OK;
+
 	// remove the attribute
-	if (IsUsingAttributes() && error == B_OK) {
+	if (IsUsingAttributes()) {
 		error = fNode->RemoveAttr(name);
 		// It's no error, if there has been no attribute.
 		if (error == B_ENTRY_NOT_FOUND)
