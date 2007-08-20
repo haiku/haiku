@@ -3610,7 +3610,6 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 		vm_store *store = cache->store;
 		if (store->ops->has_page != NULL
 			&& store->ops->has_page(store, cacheOffset)) {
-
 			// insert a fresh page and mark it busy -- we're going to read it in
 			page = vm_page_allocate_page(PAGE_STATE_FREE);
 			vm_cache_insert_page(cache, page, cacheOffset);
@@ -3644,13 +3643,14 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 				vm_cache_remove_page(cache, page);
 				vm_page_set_state(page, PAGE_STATE_FREE);
 
+				mutex_unlock(&cache->lock);
+				vm_cache_release_ref(cache);
 				return status;
 			}
 
 			// mark the page unbusy again
 			page->state = PAGE_STATE_ACTIVE;
 			busyCondition.Unpublish();
-
 			break;
 		}
 
@@ -4036,12 +4036,13 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 			newProtection &= ~(B_WRITE_AREA | B_KERNEL_WRITE_AREA);
 
 		vm_map_page(area, page, address, newProtection);
+
+		mutex_unlock(&pageSource->lock);
+		vm_cache_release_ref(pageSource);
 	}
 
 	atomic_add(&area->no_cache_change, -1);
 
-	mutex_unlock(&pageSource->lock);
-	vm_cache_release_ref(pageSource);
 	if (copiedPageSource)
 		vm_cache_release_ref(copiedPageSource);
 
