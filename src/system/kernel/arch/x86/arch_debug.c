@@ -172,7 +172,7 @@ stack_trace(int argc, char **argv)
 			// read %ebp from the thread's stack stored by a pushad
 			ebp = thread->arch_info.current_stack.esp[2];
 		} else
-			thread == NULL;
+			thread = NULL;
 	} else if (argc > 2) {
 		kprintf("usage: %s [thread id]\n", argv[0]);
 		return 0;
