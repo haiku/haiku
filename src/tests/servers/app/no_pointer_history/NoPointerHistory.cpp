@@ -12,6 +12,8 @@ public:
 	virtual void AttachedToWindow();
 	virtual void MouseMoved(BPoint point, uint32 transit,
 		const BMessage *message);
+	virtual void MouseDown(BPoint point);
+	virtual void MouseUp(BPoint point);
 
 private:
 	bool	fNoHistory;
@@ -40,6 +42,24 @@ MouseView::AttachedToWindow()
 {
 	if (fNoHistory)
 		SetEventMask(0, B_NO_POINTER_HISTORY);
+}
+
+
+void
+MouseView::MouseDown(BPoint point)
+{
+	SetMouseEventMask(0, B_NO_POINTER_HISTORY);
+	SetHighColor(0, 0, 200);
+}
+
+
+void
+MouseView::MouseUp(BPoint point)
+{
+	if (fNoHistory)
+		SetHighColor(200, 0, 0);
+	else
+		SetHighColor(0, 200, 0);
 }
 
 
