@@ -543,7 +543,7 @@ ColumnTrackState::MouseUp(BPoint where)
 {
 	// if it is pressed shortly and not moved, it is a click 
 	// all else is a track
-	if (system_time() <= fPastClickTime) 
+	if (system_time() <= fPastClickTime && !fHasMoved) 
 		Clicked(where);
 	else
 		Done(where);
