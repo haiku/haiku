@@ -27,7 +27,7 @@
 #define ARG_MAX			 		(32768)
 #define ATEXIT_MAX			 	(32)	 /* XXXdbg */
 #define CHILD_MAX				(1024)
-#define IOV_MAX					(256)	/* really there is no limit */
+#define IOV_MAX					(1024)
 #define FILESIZEBITS			(64)
 #define LINK_MAX				(1)
 #define LOGIN_NAME_MAX			(32)	 /* XXXdbg */

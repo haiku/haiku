@@ -481,6 +481,9 @@ _user_read(int fd, off_t pos, void *buffer, size_t length)
 	if (!IS_USER_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
 
+	if (pos < -1)
+		return B_BAD_VALUE;
+
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (!descriptor)
 		return B_FILE_ERROR;
@@ -523,6 +526,13 @@ _user_readv(int fd, off_t pos, const iovec *userVecs, size_t count)
 	if (!IS_USER_ADDRESS(userVecs))
 		return B_BAD_ADDRESS;
 
+	if (pos < -1)
+		return B_BAD_VALUE;
+
+	/* prevent integer overflow exploit in malloc() */
+	if (count > IOV_MAX)
+		return B_BAD_VALUE;
+
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (!descriptor)
 		return B_FILE_ERROR;
@@ -554,7 +564,7 @@ _user_readv(int fd, off_t pos, const iovec *userVecs, size_t count)
 				break;
 			}
 
-			if ((uint32)bytesRead + length > SSIZE_MAX)
+			if ((uint64)bytesRead + length > SSIZE_MAX)
 				bytesRead = SSIZE_MAX;
 			else
 				bytesRead += (ssize_t)length;
@@ -583,6 +593,9 @@ _user_write(int fd, off_t pos, const void *buffer, size_t length)
 
 	if (IS_KERNEL_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
+
+	if (pos < -1)
+		return B_BAD_VALUE;
 
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (!descriptor)
@@ -626,6 +639,13 @@ _user_writev(int fd, off_t pos, const iovec *userVecs, size_t count)
 	if (!IS_USER_ADDRESS(userVecs))
 		return B_BAD_ADDRESS;
 
+	if (pos < -1)
+		return B_BAD_VALUE;
+
+	/* prevent integer overflow exploit in malloc() */
+	if (count > IOV_MAX)
+		return B_BAD_VALUE;
+
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (!descriptor)
 		return B_FILE_ERROR;
@@ -657,7 +677,7 @@ _user_writev(int fd, off_t pos, const iovec *userVecs, size_t count)
 				break;
 			}
 
-			if ((uint32)bytesWritten + length > SSIZE_MAX)
+			if ((uint64)bytesWritten + length > SSIZE_MAX)
 				bytesWritten = SSIZE_MAX;
 			else
 				bytesWritten += (ssize_t)length;
@@ -795,6 +815,9 @@ _kern_read(int fd, off_t pos, void *buffer, size_t length)
 	struct file_descriptor *descriptor;
 	ssize_t bytesRead;
 
+	if (pos < -1)
+		return B_BAD_VALUE;
+
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (!descriptor)
 		return B_FILE_ERROR;
@@ -832,6 +855,9 @@ _kern_readv(int fd, off_t pos, const iovec *vecs, size_t count)
 	status_t status;
 	uint32 i;
 
+	if (pos < -1)
+		return B_BAD_VALUE;
+
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (!descriptor)
 		return B_FILE_ERROR;
@@ -852,7 +878,7 @@ _kern_readv(int fd, off_t pos, const iovec *vecs, size_t count)
 				break;
 			}
 
-			if ((uint32)bytesRead + length > SSIZE_MAX)
+			if ((uint64)bytesRead + length > SSIZE_MAX)
 				bytesRead = SSIZE_MAX;
 			else
 				bytesRead += (ssize_t)length;
@@ -873,6 +899,9 @@ _kern_write(int fd, off_t pos, const void *buffer, size_t length)
 {
 	struct file_descriptor *descriptor;
 	ssize_t bytesWritten;
+
+	if (pos < -1)
+		return B_BAD_VALUE;
 
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (descriptor == NULL)
@@ -911,6 +940,9 @@ _kern_writev(int fd, off_t pos, const iovec *vecs, size_t count)
 	status_t status;
 	uint32 i;
 
+	if (pos < -1)
+		return B_BAD_VALUE;
+
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (!descriptor)
 		return B_FILE_ERROR;
@@ -931,7 +963,7 @@ _kern_writev(int fd, off_t pos, const iovec *vecs, size_t count)
 				break;
 			}
 
-			if ((uint32)bytesWritten + length > SSIZE_MAX)
+			if ((uint64)bytesWritten + length > SSIZE_MAX)
 				bytesWritten = SSIZE_MAX;
 			else
 				bytesWritten += (ssize_t)length;
