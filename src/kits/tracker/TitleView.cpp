@@ -105,7 +105,8 @@ BTitleView::BTitleView(BRect frame, BPoseView *view)
 	fPoseView(view),
 	fTitleList(10, true),
 	fHorizontalResizeCursor(kHorizontalResizeCursor),
-	fPreviouslyClickedColumnTitle(0)
+	fPreviouslyClickedColumnTitle(0),
+	fTrackingState(NULL)
 {
 	sTitleBackground = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), 0.88f); // 216 -> 220
 	sDarkTitleBackground = tint_color(sTitleBackground, B_DARKEN_1_TINT);
@@ -132,6 +133,7 @@ BTitleView::BTitleView(BRect frame, BPoseView *view)
 
 BTitleView::~BTitleView()
 {
+	delete fTrackingState;
 }
 
 
@@ -139,6 +141,7 @@ void
 BTitleView::Reset()
 {
 	fTitleList.MakeEmpty();
+
 	for (int32 index = 0; ; index++) {
 		BColumn *column = fPoseView->ColumnAt(index);
 		if (!column)
@@ -156,7 +159,7 @@ BTitleView::AddTitle(BColumn *column, const BColumn *after)
 	if (after) {
 		for (index = 0; index < count; index++) {
 			BColumn *titleColumn = fTitleList.ItemAt(index)->Column();
-			
+
 			if (after == titleColumn) {
 				index++;
 				break;
@@ -194,23 +197,21 @@ BTitleView::Draw(BRect rect)
 
 
 void 
-BTitleView::Draw(BRect, bool useOffscreen, bool updateOnly,
+BTitleView::Draw(BRect /*updateRect*/, bool useOffscreen, bool updateOnly,
 	const BColumnTitle *pressedColumn,
 	void (*trackRectBlitter)(BView *, BRect), BRect passThru)
 {
 	BRect bounds(Bounds());
-
 	BView *view;
 
 	if (useOffscreen) {
-		ASSERT(offscreen);
+		ASSERT(sOffscreen);
 		BRect frame(bounds);
 		frame.right += frame.left;
 			// this is kind of messy way of avoiding being clipped by the ammount the
 			// title is scrolled to the left
-			// ToDo:
-			//		fix this
-		view = offscreen->BeginUsing(frame);
+			// ToDo: fix this
+		view = sOffscreen->BeginUsing(frame);
 		view->SetOrigin(-bounds.left, 0);
 		view->SetLowColor(LowColor());
 		view->SetHighColor(HighColor());
@@ -265,8 +266,8 @@ BTitleView::Draw(BRect, bool useOffscreen, bool updateOnly,
 		if (trackRectBlitter)
 			(trackRectBlitter)(view, passThru);
 		view->Sync();
-		DrawBitmap(offscreen->Bitmap());
-		offscreen->DoneUsing();
+		DrawBitmap(sOffscreen->Bitmap());
+		sOffscreen->DoneUsing();
 	} else if (trackRectBlitter)
 		(trackRectBlitter)(view, passThru);
 }
@@ -280,13 +281,13 @@ BTitleView::MouseDown(BPoint where)
 		Window()->Activate();
 		return;
 	}
-	
+
 	// finish any pending edits
 	fPoseView->CommitActivePose();
 
 	BColumnTitle *title = FindColumnTitle(where);
 	BColumnTitle *resizedTitle = InColumnResizeArea(where);
-	
+
 	uint32 buttons;
 	GetMouse(&where, &buttons);
 
@@ -326,52 +327,43 @@ BTitleView::MouseDown(BPoint where)
 	} else if (!title)
 		return;
 
-	ColumnTrackState *trackState;
-	if (resizedTitle)
-		trackState = new ColumnResizeState(this, resizedTitle, where);
-	else
-		trackState = new ColumnDragState(this, title, where);
+	SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY | B_LOCK_WINDOW_FOCUS);
 
 	// track the mouse
-	// - if it is pressed shortly and not moved, it is a click 
-	//	all else is a track
-	bigtime_t pastClickTime = system_time() + doubleClickSpeed;
-	bool pastClick = false;
-	for (;;) {
-		BPoint old(where);
-
-		GetMouse(&where, &buttons);
-
-		if (!buttons) {
-			if (!pastClick)
-				trackState->Clicked(where, buttons);
-			else
-				trackState->Done(where);
-			break;
-		}
-
-		BRect oldMarging(old, old);
-		oldMarging.InsetBy(-1, -1);
-
-		if ((pastClick && where != old) || !oldMarging.Contains(where)) {
-			// if not pressing yet, use a margin to start, else
-			// call moved on any mouse movement
-			pastClick = true;
-			trackState->MouseMoved(where, buttons);
-		}
-		if (!pastClick && system_time() > pastClickTime) 
-			pastClick = true;
-
-		snooze(15000);
+	if (resizedTitle) {
+		fTrackingState = new ColumnResizeState(this, resizedTitle, where,
+			system_time() + doubleClickSpeed);
+	} else {
+		fTrackingState = new ColumnDragState(this, title, where,
+			system_time() + doubleClickSpeed);
 	}
-
-	delete trackState;
 }
 
 
-void 
+void
+BTitleView::MouseUp(BPoint where)
+{
+	if (fTrackingState == NULL)
+		return;
+
+	fTrackingState->MouseUp(where);
+
+	delete fTrackingState;
+	fTrackingState = NULL;
+}
+
+
+void
 BTitleView::MouseMoved(BPoint where, uint32 code, const BMessage *message)
 {
+	if (fTrackingState != NULL) {
+		int32 buttons = 0;
+		if (Looper() != NULL && Looper()->CurrentMessage() != NULL)
+			Looper()->CurrentMessage()->FindInt32("buttons", &buttons);
+		fTrackingState->MouseMoved(where, buttons);
+		return;
+	}
+
 	switch (code) {
 		default:
 			if (InColumnResizeArea(where) && Window()->IsActive())
@@ -535,23 +527,42 @@ BColumnTitle::Draw(BView *view, bool pressed)
 
 
 ColumnTrackState::ColumnTrackState(BTitleView *view, BColumnTitle *title,
-	BPoint where)
+		BPoint where, bigtime_t pastClickTime)
 	:
 	fTitleView(view),
 	fTitle(title),
-	fLastPos(where)
+	fFirstClickPoint(where),
+	fPastClickTime(pastClickTime),
+	fHasMoved(false)
 {
 }
 
 
-void 
+void
+ColumnTrackState::MouseUp(BPoint where)
+{
+	// if it is pressed shortly and not moved, it is a click 
+	// all else is a track
+	if (system_time() <= fPastClickTime) 
+		Clicked(where);
+	else
+		Done(where);
+}
+
+
+void
 ColumnTrackState::MouseMoved(BPoint where, uint32 buttons)
 {
-	if (!ValueChanged(where))
-		return;
-	
+	if (!fHasMoved && system_time() < fPastClickTime) {
+		BRect moveMargin(fFirstClickPoint, fFirstClickPoint);
+		moveMargin.InsetBy(-1, -1);
+
+		if (moveMargin.Contains(where))
+			return;
+	}
+
 	Moved(where, buttons);
-	fLastPos = where;
+	fHasMoved = true;
 }
 
 
@@ -559,8 +570,8 @@ ColumnTrackState::MouseMoved(BPoint where, uint32 buttons)
 
 
 ColumnResizeState::ColumnResizeState(BTitleView *view, BColumnTitle *title,
-	BPoint where)
-	: ColumnTrackState(view, title, where),
+		BPoint where, bigtime_t pastClickTime)
+	: ColumnTrackState(view, title, where, pastClickTime),
 	fLastLineDrawPos(-1),
 	fInitialTrackOffset((title->fColumn->Offset() + title->fColumn->Width()) - where.x)
 {
@@ -568,7 +579,7 @@ ColumnResizeState::ColumnResizeState(BTitleView *view, BColumnTitle *title,
 }
 
 
-bool 
+bool
 ColumnResizeState::ValueChanged(BPoint where)
 {
 	float newWidth = where.x + fInitialTrackOffset - fTitle->fColumn->Offset();
@@ -579,7 +590,7 @@ ColumnResizeState::ValueChanged(BPoint where)
 }
 
 
-void 
+void
 ColumnResizeState::Moved(BPoint where, uint32)
 {
 	float newWidth = where.x + fInitialTrackOffset - fTitle->fColumn->Offset();
@@ -589,34 +600,34 @@ ColumnResizeState::Moved(BPoint where, uint32)
 	BPoseView *poseView = fTitleView->PoseView();
 
 //	bool shrink = (newWidth < fTitle->fColumn->Width());
-	
+
 	// resize the column 
 	poseView->ResizeColumn(fTitle->fColumn, newWidth, &fLastLineDrawPos,
 		_DrawLine, _UndrawLine);
 
 	BRect bounds(fTitleView->Bounds());
 	bounds.left = fTitle->fColumn->Offset();
-	
+
 	// force title redraw
 	fTitleView->Draw(bounds, true, false); 
 }
 
 
-void 
-ColumnResizeState::Done(BPoint)
+void
+ColumnResizeState::Done(BPoint /*where*/)
 {
 	UndrawLine();
 }
 
 
-void 
-ColumnResizeState::Clicked(BPoint, uint32)
+void
+ColumnResizeState::Clicked(BPoint /*where*/)
 {
 	UndrawLine();
 }
 
 
-void 
+void
 ColumnResizeState::DrawLine()
 {
 	BPoseView *poseView = fTitleView->PoseView();
@@ -632,7 +643,7 @@ ColumnResizeState::DrawLine()
 }
 
 
-void 
+void
 ColumnResizeState::UndrawLine()
 {
 	if (fLastLineDrawPos < 0)
@@ -640,7 +651,7 @@ ColumnResizeState::UndrawLine()
 
 	BRect poseViewBounds(fTitleView->PoseView()->Bounds());
 	poseViewBounds.left = fLastLineDrawPos;
-	
+
 	_UndrawLine(fTitleView->PoseView(), poseViewBounds.LeftTop(),
 		poseViewBounds.LeftBottom());
 }
@@ -650,8 +661,8 @@ ColumnResizeState::UndrawLine()
 
 
 ColumnDragState::ColumnDragState(BTitleView *view, BColumnTitle *columnTitle,
-	BPoint where)
-	: ColumnTrackState(view, columnTitle, where),
+		BPoint where, bigtime_t pastClickTime)
+	: ColumnTrackState(view, columnTitle, where, pastClickTime),
 	fInitialMouseTrackOffset(where.x),
 	fTrackingRemovedColumn(false)
 {
@@ -666,7 +677,7 @@ ColumnDragState::ColumnDragState(BTitleView *view, BColumnTitle *columnTitle,
 // Autoscroll when dragging column left/right
 // fix dragging back a column before the first column (now adds as last)
 // make column swaps/adds not invalidate/redraw columns to the left
-void 
+void
 ColumnDragState::Moved(BPoint where, uint32)
 {
 	// figure out where we are with the mouse
@@ -741,8 +752,8 @@ ColumnDragState::Moved(BPoint where, uint32)
 }
 
 
-void 
-ColumnDragState::Done(BPoint)
+void
+ColumnDragState::Done(BPoint /*where*/)
 {
 	if (fTrackingRemovedColumn)
 		fTitleView->EndRectTracking();
@@ -750,8 +761,8 @@ ColumnDragState::Done(BPoint)
 }
 
 
-void 
-ColumnDragState::Clicked(BPoint, uint32)
+void
+ColumnDragState::Clicked(BPoint /*where*/)
 {
 	BPoseView *poseView = fTitleView->PoseView();
 	uint32 hash = fTitle->Column()->AttrHash();
@@ -789,27 +800,21 @@ ColumnDragState::Clicked(BPoint, uint32)
 }
 
 
-void 
-ColumnDragState::Pressing(BPoint, uint32)
-{
-}
-
-
-bool 
+bool
 ColumnDragState::ValueChanged(BPoint)
 {
 	return true;
 }
 
 
-void 
+void
 ColumnDragState::DrawPressNoOutline()
 {
 	fTitleView->Draw(fTitleView->Bounds(), true, false, fTitle);
 }
 
 
-void 
+void
 ColumnDragState::DrawOutline(float pos)
 {
 	BRect outline(fTitle->Bounds());
@@ -825,4 +830,4 @@ ColumnDragState::UndrawOutline()
 }
 
 
-OffscreenBitmap *BTitleView::offscreen = new OffscreenBitmap;
+OffscreenBitmap *BTitleView::sOffscreen = new OffscreenBitmap;

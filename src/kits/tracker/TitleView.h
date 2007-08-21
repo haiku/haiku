@@ -46,6 +46,7 @@ namespace BPrivate {
 class BPoseView;
 class BColumn;
 class BColumnTitle;
+class ColumnTrackState;
 class OffscreenBitmap;
 
 const int32 kTitleViewHeight = 16;
@@ -58,13 +59,15 @@ const int32 kMinColumnWidth = 20;
 const int32 kRemoveTitleMargin = 10;
 const int32 kColumnStart = 40;
 
+
 class BTitleView : public BView {
 public:
 	BTitleView(BRect, BPoseView *);
 	virtual ~BTitleView();
-	
-	virtual	void MouseDown(BPoint);
-	virtual	void Draw(BRect);
+
+	virtual	void MouseDown(BPoint where);
+	virtual	void MouseUp(BPoint where);
+	virtual	void Draw(BRect updateRect);
 
 	void Draw(BRect, bool useOffscreen = false,
 		bool updateOnly = true,
@@ -92,8 +95,9 @@ private:
 	
 	BColumnTitle *fPreviouslyClickedColumnTitle;
 	bigtime_t fPreviousLeftClickTime;
+	ColumnTrackState* fTrackingState;
 
-	static OffscreenBitmap *offscreen;
+	static OffscreenBitmap *sOffscreen;
 	
 	typedef BView _inherited;
 
@@ -124,35 +128,35 @@ private:
 // Utility classes to handle dragging state
 class ColumnTrackState {
 public:
-	ColumnTrackState(BTitleView *, BColumnTitle *, BPoint where);
+	ColumnTrackState(BTitleView *titleView, BColumnTitle *columnTitle,
+		BPoint where, bigtime_t pastClickTime);
 	virtual ~ColumnTrackState() {}
 
 	void MouseMoved(BPoint where, uint32 buttons);
-
-	virtual void Moved(BPoint where, uint32 buttons) = 0;
-	virtual void Clicked(BPoint where, uint32 buttons) = 0;
-	virtual void Pressing(BPoint where, uint32 buttons) = 0;
-		// called if mouse held down too long for click but hasn't
-		// been moved a bit
-	virtual void Done(BPoint where) = 0;
+	void MouseUp(BPoint where);
 
 protected:
+	virtual void Moved(BPoint where, uint32 buttons) = 0;
+	virtual void Clicked(BPoint where) = 0;
+	virtual void Done(BPoint where) = 0;
 	virtual bool ValueChanged(BPoint where) = 0; 
 
 	BTitleView *fTitleView;
 	BColumnTitle *fTitle;
-	BPoint fLastPos;
+	BPoint fFirstClickPoint;
+	bigtime_t fPastClickTime;
+	bool fHasMoved;
 };
 
 class ColumnResizeState : public ColumnTrackState {
 public:
-	ColumnResizeState(BTitleView *, BColumnTitle *, BPoint);
+	ColumnResizeState(BTitleView* titleView, BColumnTitle* columnTitle,
+		BPoint where, bigtime_t pastClickTime);
 
 protected:
-	virtual void Moved(BPoint, uint32 buttons);
-	virtual void Done(BPoint);
-	virtual void Clicked(BPoint, uint32 buttons);
-	virtual void Pressing(BPoint, uint32) {}
+	virtual void Moved(BPoint where, uint32 buttons);
+	virtual void Done(BPoint where);
+	virtual void Clicked(BPoint where);
 	virtual bool ValueChanged(BPoint); 
 
 	void DrawLine();
@@ -167,13 +171,13 @@ private:
 
 class ColumnDragState : public ColumnTrackState {
 public:
-	ColumnDragState(BTitleView *, BColumnTitle *, BPoint where);
+	ColumnDragState(BTitleView* titleView, BColumnTitle* columnTitle,
+		BPoint where, bigtime_t pastClickTime);
 
 protected:
-	virtual void Moved(BPoint, uint32 buttons);
-	virtual void Done(BPoint);
-	virtual void Clicked(BPoint, uint32 buttons);
-	virtual void Pressing(BPoint, uint32 buttons);
+	virtual void Moved(BPoint where, uint32 buttons);
+	virtual void Done(BPoint where);
+	virtual void Clicked(BPoint where);
 	virtual bool ValueChanged(BPoint); 
 	
 	void DrawOutline(float);
@@ -200,9 +204,8 @@ BTitleView::PoseView() const
 	return fPoseView;
 }
 
-
 } // namespace BPrivate
 
 using namespace BPrivate;
 
-#endif
+#endif	// _TITLE_VIEW_H

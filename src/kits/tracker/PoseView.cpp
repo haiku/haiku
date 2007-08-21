@@ -8518,7 +8518,6 @@ BPoseView::ResizeColumn(BColumn *column, float newSize,
 	BRect columnDrawRect(sourceRect);
 		// we will use columnDrawRect to draw the actual resized column
 
-
 	bool shrinking = newSize < column->Width();
 	columnDrawRect.left = column->Offset();
 	columnDrawRect.right = column->Offset() + kTitleColumnRightExtraMargin
@@ -8550,8 +8549,9 @@ BPoseView::ResizeColumn(BColumn *column, float newSize,
 		CopyBits(sourceRect, destRect);
 		if (drawLineFunc) {
 			ASSERT(lastLineDrawPos);
-			(drawLineFunc)(this, BPoint(destRect.left + kRoomForLine, destRect.top),
-				 BPoint(destRect.left + kRoomForLine, destRect.bottom));
+			(drawLineFunc)(this, BPoint(destRect.left + kRoomForLine,
+					destRect.top),
+				BPoint(destRect.left + kRoomForLine, destRect.bottom));
 			*lastLineDrawPos = destRect.left + kRoomForLine;
 		}
 	} else {
@@ -8563,10 +8563,9 @@ BPoseView::ResizeColumn(BColumn *column, float newSize,
 		}
 		if (drawLineFunc) {
 			ASSERT(lastLineDrawPos);
-#if 0
-			(drawLineFunc)(this, BPoint(destRect.left + kRoomForLine, destRect.top),
-				 BPoint(destRect.left + kRoomForLine, destRect.bottom));
-#endif
+			(drawLineFunc)(this, BPoint(destRect.left + kRoomForLine,
+					destRect.top),
+				BPoint(destRect.left + kRoomForLine, destRect.bottom));
 			*lastLineDrawPos = destRect.left + kRoomForLine;
 		}
 		ColumnRedraw(columnDrawRect);
