@@ -26,7 +26,7 @@
  * THE SOFTWARE.
  *
  */
-
+//#define DEBUG 7
 #include <MediaRoster.h>
 #include <MediaNode.h>
 #include <TimeSource.h>
@@ -46,6 +46,15 @@
 
 using std::nothrow;
 using std::nothrow_t;
+
+#undef TRACE
+//#define TRACE_MEDIA_NODE
+#ifdef TRACE_MEDIA_NODE
+  #define TRACE printf
+#else
+  #define TRACE(x...)
+#endif
+
 
 // don't rename this one, it's used and exported for binary compatibility
 int32 BMediaNode::_m_changeTag = 0;
@@ -347,7 +356,7 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 						   uint32 flags,
 						   void *_reserved_)
 {
-	PRINT(6, "CALLED BMediaNode::WaitForMessage()\n");
+	TRACE("entering: BMediaNode::WaitForMessage()\n");
 
 	// This function waits until either real time specified by 
 	// waitUntil or a message is received on the control port.
@@ -364,10 +373,10 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 		return size;	// return the error code
 	}
 
-	PRINT(7, "BMediaNode::WaitForMessage %#lx, node %ld, this %p\n", message, fNodeID, this);
+	TRACE("BMediaNode::WaitForMessage request is: %#lx, node %ld, this %p\n", message, fNodeID, this);
 
 	if (message > NODE_MESSAGE_START && message < NODE_MESSAGE_END) {
-		PRINT(4, "BMediaNode::WaitForMessage calling BMediaNode\n");
+		TRACE("BMediaNode::WaitForMessage calling BMediaNode\n");
 		if (B_OK == BMediaNode::HandleMessage(message, data, size))
 			return B_OK;
 	}
@@ -375,7 +384,7 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 	if (message > PRODUCER_MESSAGE_START && message < PRODUCER_MESSAGE_END) {
 		if (!fProducerThis)
 			fProducerThis = dynamic_cast<BBufferProducer *>(this);
-		PRINT(4, "BMediaNode::WaitForMessage calling BBufferProducer %p\n", fProducerThis);
+		TRACE("BMediaNode::WaitForMessage calling BBufferProducer %p\n", fProducerThis);
 		if (fProducerThis && B_OK == fProducerThis->BBufferProducer::HandleMessage(message, data, size))
 			return B_OK;
 	}
@@ -383,7 +392,7 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 	if (message > CONSUMER_MESSAGE_START && message < CONSUMER_MESSAGE_END) {
 		if (!fConsumerThis)
 			fConsumerThis = dynamic_cast<BBufferConsumer *>(this);
-		PRINT(4, "BMediaNode::WaitForMessage calling BBufferConsumer %p\n", fConsumerThis);
+		TRACE("BMediaNode::WaitForMessage calling BBufferConsumer %p\n", fConsumerThis);
 		if (fConsumerThis && B_OK == fConsumerThis->BBufferConsumer::HandleMessage(message, data, size))
 			return B_OK;
 	}
@@ -391,7 +400,7 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 	if (message > FILEINTERFACE_MESSAGE_START && message < FILEINTERFACE_MESSAGE_END) {
 		if (!fFileInterfaceThis)
 			fFileInterfaceThis = dynamic_cast<BFileInterface *>(this);
-		PRINT(4, "BMediaNode::WaitForMessage calling BFileInterface %p\n", fFileInterfaceThis);
+		TRACE("BMediaNode::WaitForMessage calling BFileInterface %p\n", fFileInterfaceThis);
 		if (fFileInterfaceThis && B_OK == fFileInterfaceThis->BFileInterface::HandleMessage(message, data, size))
 			return B_OK;
 	}
@@ -399,7 +408,7 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 	if (message > CONTROLLABLE_MESSAGE_START && message < CONTROLLABLE_MESSAGE_END) {
 		if (!fControllableThis)
 			fControllableThis = dynamic_cast<BControllable *>(this);
-		PRINT(4, "BMediaNode::WaitForMessage calling BControllable %p\n", fControllableThis);
+		TRACE("BMediaNode::WaitForMessage calling BControllable %p\n", fControllableThis);
 		if (fControllableThis && B_OK == fControllableThis->BControllable::HandleMessage(message, data, size))
 			return B_OK;
 	}
@@ -407,12 +416,12 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 	if (message > TIMESOURCE_MESSAGE_START && message < TIMESOURCE_MESSAGE_END) {
 		if (!fTimeSourceThis)
 			fTimeSourceThis = dynamic_cast<BTimeSource *>(this);
-		PRINT(4, "BMediaNode::WaitForMessage calling BTimeSource %p\n", fTimeSourceThis);
+		TRACE("BMediaNode::WaitForMessage calling BTimeSource %p\n", fTimeSourceThis);
 		if (fTimeSourceThis && B_OK == fTimeSourceThis->BTimeSource::HandleMessage(message, data, size))
 			return B_OK;
 	}
 
-	PRINT(4, "BMediaNode::WaitForMessage calling default\n");
+	TRACE("BMediaNode::WaitForMessage calling default HandleMessage\n");
 	if (B_OK == HandleMessage(message, data, size))
 		return B_OK;
 
@@ -522,7 +531,7 @@ BMediaNode::HandleMessage(int32 message,
 						  const void *data,
 						  size_t size)
 {
-	PRINT(4, "BMediaNode::HandleMessage %#lx, node %ld\n", message, fNodeID);
+	TRACE("BMediaNode::HandleMessage %#lx, node %ld\n", message, fNodeID);
 	switch (message) {
 		case NODE_FINAL_RELEASE:
 		{
@@ -546,7 +555,7 @@ BMediaNode::HandleMessage(int32 message,
 		case NODE_START:
 		{
 			const node_start_command *command = static_cast<const node_start_command *>(data);
-			printf("NODE_START, node %ld\n", fNodeID);
+			TRACE("BMediaNode::HandleMessage NODE_START, node %ld\n", fNodeID);
 			Start(command->performance_time);
 			return B_OK;
 		}
@@ -554,7 +563,7 @@ BMediaNode::HandleMessage(int32 message,
 		case NODE_STOP:
 		{
 			const node_stop_command *command = static_cast<const node_stop_command *>(data);
-			printf("NODE_STOP, node %ld\n", fNodeID);
+			TRACE("BMediaNode::HandleMessage NODE_STOP, node %ld\n", fNodeID);
 			Stop(command->performance_time, command->immediate);
 			return B_OK;
 		}
@@ -562,7 +571,7 @@ BMediaNode::HandleMessage(int32 message,
 		case NODE_SEEK:
 		{
 			const node_seek_command *command = static_cast<const node_seek_command *>(data);
-			printf("NODE_SEEK, node %ld\n", fNodeID);
+			TRACE("BMediaNode::HandleMessage NODE_SEEK, node %ld\n", fNodeID);
 			Seek(command->media_time, command->performance_time);
 			return B_OK;
 		}
@@ -570,6 +579,7 @@ BMediaNode::HandleMessage(int32 message,
 		case NODE_SET_RUN_MODE:
 		{
 			const node_set_run_mode_command *command = static_cast<const node_set_run_mode_command *>(data);
+			TRACE("BMediaNode::HandleMessage NODE_SET_RUN_MODE, node %ld\n", fNodeID);
 			// when changing this, also change PRODUCER_SET_RUN_MODE_DELAY
 			fRunMode = command->mode;
 			SetRunMode(fRunMode);
@@ -579,12 +589,14 @@ BMediaNode::HandleMessage(int32 message,
 		case NODE_TIME_WARP:
 		{
 			const node_time_warp_command *command = static_cast<const node_time_warp_command *>(data);
+			TRACE("BMediaNode::HandleMessage NODE_TIME_WARP, node %ld\n", fNodeID);
 			TimeWarp(command->at_real_time, command->to_performance_time);
 			return B_OK;
 		}
 
 		case NODE_PREROLL:
 		{
+			TRACE("BMediaNode::HandleMessage NODE_PREROLL, node %ld\n", fNodeID);
 			Preroll();
 			return B_OK;
 		}
@@ -593,7 +605,7 @@ BMediaNode::HandleMessage(int32 message,
 		{
 			const node_set_timesource_command *command = static_cast<const node_set_timesource_command *>(data);
 
-			TRACE("NODE_SET_TIMESOURCE, node %ld, timesource %ld enter\n", fNodeID, command->timesource_id);
+			TRACE("BMediaNode::HandleMessage NODE_SET_TIMESOURCE, node %ld, timesource %ld enter\n", fNodeID, command->timesource_id);
 			
 			fTimeSourceID = command->timesource_id;
 			
@@ -613,7 +625,7 @@ BMediaNode::HandleMessage(int32 message,
 			// any derived class
 			SetTimeSource(fTimeSource);
 
-			TRACE("NODE_SET_TIMESOURCE, node %ld, timesource %ld leave\n", fNodeID, command->timesource_id);
+			TRACE("BMediaNode::HandleMessage NODE_SET_TIMESOURCE, node %ld, timesource %ld leave\n", fNodeID, command->timesource_id);
 
 			return B_OK;
 		}
@@ -621,6 +633,7 @@ BMediaNode::HandleMessage(int32 message,
 		case NODE_GET_TIMESOURCE:
 		{
 			const node_get_timesource_request *request = static_cast<const node_get_timesource_request *>(data);
+			TRACE("BMediaNode::HandleMessage NODE_GET_TIMESOURCE, node %ld\n", fNodeID);
 			node_get_timesource_reply reply;
 			reply.timesource_id = fTimeSourceID;
 			request->SendReply(B_OK, &reply, sizeof(reply));
@@ -630,6 +643,7 @@ BMediaNode::HandleMessage(int32 message,
 		case NODE_REQUEST_COMPLETED:
 		{
 			const node_request_completed_command *command = static_cast<const node_request_completed_command *>(data);
+			TRACE("BMediaNode::HandleMessage NODE_REQUEST_COMPLETED, node %ld\n", fNodeID);
 			RequestCompleted(command->info);
 			return B_OK;
 		}

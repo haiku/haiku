@@ -74,6 +74,13 @@ void find_media_addon_server_port()
 }
 
 
+static void check(int code)
+{
+	static int rep = 0;
+	if(code == 0x204 && rep++ == 200)
+		debugger("scheisse!");
+}
+
 status_t
 request_data::SendReply(status_t result, reply_data *reply, int replysize) const
 {
@@ -138,6 +145,7 @@ status_t QueryAddonServer(int32 msgcode, request_data *request, int requestsize,
 status_t SendToPort(port_id sendport, int32 msgcode, command_data *msg, int size)
 {
 	status_t rv;
+	check(msgcode);
 	rv = write_port_etc(sendport, msgcode, msg, size, B_RELATIVE_TIMEOUT, TIMEOUT);
 	if (rv != B_OK) {
 		ERROR("SendToPort: write_port failed, msgcode 0x%lx, port %ld, error %#lx (%s)\n", msgcode, sendport, rv, strerror(rv));
@@ -150,6 +158,7 @@ status_t SendToPort(port_id sendport, int32 msgcode, command_data *msg, int size
 		} else {
 			return rv;
 		}
+	check(msgcode);
 		rv = write_port_etc(sendport, msgcode, msg, size, B_RELATIVE_TIMEOUT, TIMEOUT);
 		if (rv != B_OK) {
 			ERROR("SendToPort: retrying write_port failed, msgcode 0x%lx, port %ld, error %#lx (%s)\n", msgcode, sendport, rv, strerror(rv));
@@ -167,6 +176,7 @@ status_t QueryPort(port_id requestport, int32 msgcode, request_data *request, in
 
 	request->reply_port = _PortPool->GetPort();
 
+	check(msgcode);
 	rv = write_port_etc(requestport, msgcode, request, requestsize, B_RELATIVE_TIMEOUT, TIMEOUT);
 	
 	if (rv != B_OK) {
@@ -181,6 +191,7 @@ status_t QueryPort(port_id requestport, int32 msgcode, request_data *request, in
 			_PortPool->PutPort(request->reply_port);
 			return rv;
 		}
+	check(msgcode);
 		rv = write_port_etc(requestport, msgcode, request, requestsize, B_RELATIVE_TIMEOUT, TIMEOUT);
 		if (rv != B_OK) {
 			ERROR("QueryPort: retrying write_port failed, msgcode 0x%lx, port %ld, error %#lx (%s)\n", msgcode, requestport, rv, strerror(rv));

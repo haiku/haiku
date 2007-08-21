@@ -30,6 +30,7 @@
 /* to comply with the license above, do not remove the following line */
 char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002-2006 Marcus Overhagen <Marcus@Overhagen.de>";
 
+//#define DEBUG 7
 #include <MediaRoster.h>
 #include <Locker.h>
 #include <Message.h>
@@ -1204,7 +1205,7 @@ status_t
 BMediaRoster::SetRunModeNode(const media_node & node,
 							 BMediaNode::run_mode mode)
 {
-	CALLED();
+	TRACE("BMediaRoster::SetRunModeNode, node %ld, mode %d\n", node.node, mode);
 	if (IS_INVALID_NODE(node))
 		return B_MEDIA_BAD_NODE;
 
@@ -1243,7 +1244,7 @@ BMediaRoster::SetProducerRunModeDelay(const media_node & node,
 									  bigtime_t delay,
 									  BMediaNode::run_mode mode)
 {
-	CALLED();
+	TRACE("BMediaRoster::SetProducerRunModeDelay, node %ld, delay %Ld, mode %d\n", node.node, delay, mode);
 	if (IS_INVALID_NODE(node))
 		return B_MEDIA_BAD_NODE;
 	if ((node.kind & B_BUFFER_PRODUCER) == 0)
