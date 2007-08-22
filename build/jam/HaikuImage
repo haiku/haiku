@@ -153,7 +153,8 @@ AddDriversToHaikuImage				: console dprintf $(X86_ONLY)keyboard null
 AddDriversToHaikuImage audio hmulti	: $(BEOS_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToHaikuImage midi			: $(BEOS_ADD_ONS_DRIVERS_MIDI) ;
 AddDriversToHaikuImage bus			: usb_raw ;
-AddDriversToHaikuImage disk scsi	: ahci scsi_cd scsi_dsk ;
+AddDriversToHaikuImage disk			: ahci ;
+AddDriversToHaikuImage disk scsi	: scsi_cd scsi_dsk ;
 AddDriversToHaikuImage disk virtual	: nbd ;
 AddDriversToHaikuImage dvb			: cx23882 ;
 AddDriversToHaikuImage graphics		: $(BEOS_ADD_ONS_DRIVERS_GRAPHICS) ;
@@ -175,7 +176,7 @@ AddSymlinkToHaikuImage beos system lib : libnetwork.so : libnetapi.so ;
 AddSymlinkToHaikuImage beos system lib : libnetwork.so : libbnetapi.so ;
 # libGL.so have GLUT built-in
 if $(TARGET_ARCH) = x86 {
-AddSymlinkToHaikuImage beos system lib : $(X86_ONLY)libGL.so : libglut.so ;
+	AddSymlinkToHaikuImage beos system lib : $(X86_ONLY)libGL.so : libglut.so ;
 }
 
 # servers

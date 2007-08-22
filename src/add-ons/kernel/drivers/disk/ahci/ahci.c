@@ -7,7 +7,7 @@
 #include <device_manager.h>
 
 
-#define TRACE(a...) dprintf("ahci: " a)
+#define TRACE(a...) dprintf("\33[35mahci:\33[30m " a)
 #define FLOW(a...)	dprintf("ahci: " a)
 
 static float
@@ -38,7 +38,6 @@ ahci_supports_device(device_node_handle parent, bool *_noConnection)
 		TRACE("satacr0 = 0x%08x, satacr1 = 0x%08x\n", satacr0, satacr1);
 	}
 #endif
-
 
 	return 0.0;
 }
@@ -85,7 +84,13 @@ ahci_device_cleanup(device_node_handle node)
 static void
 ahci_get_supported_paths(const char ***_busses, const char ***_devices)
 {
+	static const char *kBus[] = { "pci", NULL };
+	static const char *kDevice[] = { "drivers/dev/disk/sata", NULL };
+
 	TRACE("ahci_get_supported_paths\n");
+
+	*_busses = kBus;
+	*_devices = kDevice;
 }
 
 
@@ -105,7 +110,7 @@ std_ops(int32 op, ...)
 
 driver_module_info ahci_driver = {
 	{
-		"ahci",
+		"ahci/device_v1",
 		0,
 		std_ops
 	},
