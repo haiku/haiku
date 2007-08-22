@@ -1780,6 +1780,7 @@ file_system_module_info gPipeFileSystem = {
 	},
 
 	"Pipe File System",
+	0,	// DDM flags
 
 	NULL,	// identify_partition()
 	NULL,	// scan_partition()

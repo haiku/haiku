@@ -2020,15 +2020,16 @@ bfs_rewind_query(void */*fs*/, void *cookie)
 //	#pragma mark -
 
 
-bool
-bfs_supports_initializing(partition_data *partition)
+static uint32
+bfs_get_supported_operations(partition_data* partition, uint32 mask)
 {
 	// TODO: We should at least check the partition size.
-	return true;
+	return B_DISK_SYSTEM_SUPPORTS_INITIALIZING
+		| B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME;
 }
 
 
-bool
+static bool
 bfs_validate_initialize(partition_data *partition, char *name,
 	const char *parameters)
 {
@@ -2037,7 +2038,7 @@ bfs_validate_initialize(partition_data *partition, char *name,
 }
 
 
-status_t
+static status_t
 bfs_initialize(int fd, partition_id partition, const char *name,
 	const char *parameters, disk_job_id job)
 {
@@ -2124,6 +2125,26 @@ static file_system_module_info sBeFileSystem = {
 	},
 
 	"Be File System",
+
+	// DDM flags
+	0
+//	| B_DISK_SYSTEM_SUPPORTS_CHECKING
+//	| B_DISK_SYSTEM_SUPPORTS_REPAIRING
+//	| B_DISK_SYSTEM_SUPPORTS_RESIZING
+//	| B_DISK_SYSTEM_SUPPORTS_MOVING
+//	| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME
+//	| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS
+	| B_DISK_SYSTEM_SUPPORTS_INITIALIZING
+	| B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME
+//	| B_DISK_SYSTEM_SUPPORTS_DEFRAGMENTING
+//	| B_DISK_SYSTEM_SUPPORTS_DEFRAGMENTING_WHILE_MOUNTED
+//	| B_DISK_SYSTEM_SUPPORTS_CHECKING_WHILE_MOUNTED
+//	| B_DISK_SYSTEM_SUPPORTS_REPAIRING_WHILE_MOUNTED
+//	| B_DISK_SYSTEM_SUPPORTS_RESIZING_WHILE_MOUNTED
+//	| B_DISK_SYSTEM_SUPPORTS_MOVING_WHILE_MOUNTED
+//	| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME_WHILE_MOUNTED
+//	| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS_WHILE_MOUNTED
+	,
 
 	// scanning
 	bfs_identify_partition,
@@ -2224,13 +2245,7 @@ static file_system_module_info sBeFileSystem = {
 	&bfs_rewind_query,
 
 	/* capability querying operations */
-	NULL,	// supports_defragmenting
-	NULL,	// supports_repairing
-	NULL,	// supports_resizing
-	NULL,	// supports_moving
-	NULL,	// supports_setting_content_name
-	NULL,	// supports_setting_content_parameters
-	&bfs_supports_initializing,
+	&bfs_get_supported_operations,
 
 	NULL,	// validate_resize
 	NULL,	// validate_move

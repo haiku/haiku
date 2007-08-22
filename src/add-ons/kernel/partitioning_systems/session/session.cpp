@@ -171,56 +171,6 @@ static partition_module_info sSessionModule = {
 	free_identify_partition_cookie,		// free_identify_partition_cookie
 	free_partition_cookie,				// free_partition_cookie
 	free_partition_content_cookie,		// free_partition_content_cookie
-
-	// querying
-	NULL,								// supports_repairing
-	NULL,								// supports_resizing
-	NULL,								// supports_resizing_child
-	NULL,								// supports_moving
-	NULL,								// supports_moving_child
-	NULL,								// supports_setting_name
-	NULL,								// supports_setting_content_name
-	NULL,								// supports_setting_type
-	NULL,								// supports_setting_parameters
-	NULL,								// supports_setting_content_parameters
-	NULL,								// supports_initializing
-	NULL,								// supports_initializing_child
-	NULL,								// supports_creating_child
-	NULL,								// supports_deleting_child
-	NULL,								// is_sub_system_for
-
-	NULL,								// validate_resize
-	NULL,								// validate_resize_child
-	NULL,								// validate_move
-	NULL,								// validate_move_child
-	NULL,								// validate_set_name
-	NULL,								// validate_set_content_name
-	NULL,								// validate_set_type
-	NULL,								// validate_set_parameters
-	NULL,								// validate_set_content_parameters
-	NULL,								// validate_initialize
-	NULL,								// validate_create_child
-	NULL,								// get_partitionable_spaces
-	NULL,								// get_next_supported_type
-	NULL,								// get_type_for_content_type
-
-	// shadow partition modification
-	NULL,								// shadow_changed
-
-	// writing
-	NULL,								// repair
-	NULL,								// resize
-	NULL,								// resize_child
-	NULL,								// move
-	NULL,								// move_child
-	NULL,								// set_name
-	NULL,								// set_content_name
-	NULL,								// set_type
-	NULL,								// set_parameters
-	NULL,								// set_content_parameters
-	NULL,								// initialize
-	NULL,								// create_child
-	NULL,								// delete_child
 };
 
 partition_module_info *modules[] = {

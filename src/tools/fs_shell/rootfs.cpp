@@ -1036,6 +1036,7 @@ fssh_file_system_module_info gRootFileSystem = {
 	},
 
 	"Root File System",
+	0,	// DDM flags
 
 	NULL,	// identify_partition()
 	NULL,	// scan_partition()

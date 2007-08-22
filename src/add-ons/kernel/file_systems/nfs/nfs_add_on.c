@@ -2430,6 +2430,7 @@ static file_system_module_info sNFSModule = {
 	},
 
 	"Network File System v2",
+	0,	// DDM flags
 
 	// scanning
 	NULL,	// fs_identify_partition,

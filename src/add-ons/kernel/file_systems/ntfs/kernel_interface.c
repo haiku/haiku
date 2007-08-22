@@ -85,6 +85,7 @@ static file_system_module_info sNTFSFileSystem = {
 	},
 
 	"ntfs File System",
+	0,	// DDM flags
 
 	// scanning
 	fs_identify_partition,

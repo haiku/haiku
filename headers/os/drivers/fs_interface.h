@@ -55,7 +55,8 @@ extern "C" {
 
 typedef struct file_system_module_info {
 	struct module_info	info;
-	const char			*pretty_name;
+	const char*			pretty_name;
+	uint32				flags;	// DDM flags
 
 	/* scanning (the device is write locked) */
 	float (*identify_partition)(int fd, partition_data *partition,
@@ -205,19 +206,7 @@ typedef struct file_system_module_info {
 	status_t (*rewind_query)(fs_volume fs, fs_cookie cookie);
 
 	/* capability querying (the device is read locked) */
-	// ToDo: this will probably be combined to a single call
-	bool (*supports_defragmenting)(partition_data *partition,
-				bool *whileMounted);
-	bool (*supports_repairing)(partition_data *partition,
-				bool checkOnly, bool *whileMounted);
-	bool (*supports_resizing)(partition_data *partition,
-				bool *whileMounted);
-	bool (*supports_moving)(partition_data *partition, bool *isNoOp);
-	bool (*supports_setting_content_name)(partition_data *partition,
-				bool *whileMounted);
-	bool (*supports_setting_content_parameters)(partition_data *partition, 
-				bool *whileMounted);
-	bool (*supports_initializing)(partition_data *partition);
+	uint32 (*get_supported_operations)(partition_data* partition, uint32 mask);
 
 	bool (*validate_resize)(partition_data *partition, off_t *size);
 	bool (*validate_move)(partition_data *partition, off_t *start);

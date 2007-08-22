@@ -1034,6 +1034,7 @@ static file_system_module_info sUserlandFSModuleInfo = {
 	},
 
 	"Userland File System",
+	0,	// DDM flags
 
 	// scanning
 	NULL,	// identify_partition()

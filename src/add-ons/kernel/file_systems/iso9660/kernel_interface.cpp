@@ -972,6 +972,7 @@ static file_system_module_info sISO660FileSystem = {
 	},
 
 	"ISO9660 File System",
+	0,	// DDM flags
 
 	// scanning
 	fs_identify_partition,

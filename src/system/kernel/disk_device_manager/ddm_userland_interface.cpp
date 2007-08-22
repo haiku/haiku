@@ -470,6 +470,7 @@ _user_supports_resizing_partition(partition_id partitionID,
 								  bool *_whileMounted)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+
 	// get the partition
 	KPartition *partition = manager->ReadLockPartition(partitionID);
 	if (!partition)
@@ -485,19 +486,33 @@ _user_supports_resizing_partition(partition_id partitionID,
 		|| partition->Parent()->IsDescendantBusy()) {
 		return false;
 	}
+
 	// get the parent disk system
 	KDiskSystem *parentDiskSystem = partition->Parent()->DiskSystem();
 	if (!parentDiskSystem)
 		return false;
-	bool result = parentDiskSystem->SupportsResizingChild(partition);
+	bool result = parentDiskSystem->SupportsChildOperations(partition,
+		B_DISK_SYSTEM_SUPPORTS_RESIZING_CHILD);
 	if (!result)
 		return false;
+
 	// get the child disk system
 	KDiskSystem *childDiskSystem = partition->DiskSystem();
 	if (_canResizeContents) {
-		bool whileMounted;
-		bool canResizeContents = (childDiskSystem
-			&& childDiskSystem->SupportsResizing(partition, &whileMounted));
+		bool canResizeContents = false;
+		bool whileMounted = false;
+		if (childDiskSystem) {
+			uint32 operations = childDiskSystem->GetSupportedOperations(
+				partition, B_DISK_SYSTEM_SUPPORTS_RESIZING
+					| B_DISK_SYSTEM_SUPPORTS_RESIZING_WHILE_MOUNTED);
+
+			if (operations & B_DISK_SYSTEM_SUPPORTS_RESIZING) {
+				canResizeContents = true;
+				if (operations & B_DISK_SYSTEM_SUPPORTS_RESIZING_WHILE_MOUNTED)
+					whileMounted = true;
+			}
+		}
+
 		user_memcpy(_canResizeContents, &canResizeContents, sizeof(canResizeContents));
 		if (_whileMounted)
 			user_memcpy(_whileMounted, &whileMounted, sizeof(whileMounted));
@@ -549,8 +564,11 @@ _user_supports_moving_partition(partition_id partitionID, int32 changeCounter,
 			// get the parent disk system
 			KDiskSystem *parentDiskSystem = partition->Parent()->DiskSystem();
 			result = parentDiskSystem;
-			if (result) 
-				result = parentDiskSystem->SupportsMovingChild(partition);
+			if (result) {
+				result = parentDiskSystem->SupportsChildOperations(partition,
+					B_DISK_SYSTEM_SUPPORTS_MOVING_CHILD);
+			}
+
 			if (result) {
 				// check the movability of the descendants' contents
 				size_t unmovableSize = bufferSize; 
@@ -591,12 +609,15 @@ _user_supports_setting_partition_name(partition_id partitionID,
 		|| partition->Parent()->IsDescendantBusy()) {
 		return false;
 	}
+
 	// get the disk system
 	KDiskSystem *diskSystem = partition->Parent()->DiskSystem();
 	if (!diskSystem)
 		return false;
+
 	// get the info
-	return diskSystem->SupportsSettingName(partition);
+	return diskSystem->SupportsChildOperations(partition,
+		B_DISK_SYSTEM_SUPPORTS_SETTING_NAME);
 }
 
 // _user_supports_setting_partition_content_name
@@ -621,11 +642,19 @@ _user_supports_setting_partition_content_name(partition_id partitionID,
 	KDiskSystem *diskSystem = partition->DiskSystem();
 	if (!diskSystem)
 		return false;
+
 	// get the info
-	bool whileMounted;
-	bool result = diskSystem->SupportsSettingContentName(partition, &whileMounted);
-	if (result && _whileMounted)
+	uint32 operations = diskSystem->GetSupportedOperations(partition,
+		B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME
+		| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME_WHILE_MOUNTED);
+
+	bool result = (operations & B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME);
+	if (result && _whileMounted) {
+		bool whileMounted = (operations
+			& B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME_WHILE_MOUNTED);
 		user_memcpy(_whileMounted, &whileMounted, sizeof(whileMounted));
+	}
+
 	return result;
 }
 
@@ -655,7 +684,8 @@ _user_supports_setting_partition_type(partition_id partitionID,
 	if (!diskSystem)
 		return false;
 	// get the info
-	return diskSystem->SupportsSettingType(partition);
+	return diskSystem->SupportsChildOperations(partition,
+		B_DISK_SYSTEM_SUPPORTS_SETTING_TYPE);
 }
 
 // _user_supports_setting_partition_parameters
@@ -684,7 +714,8 @@ _user_supports_setting_partition_parameters(partition_id partitionID,
 	if (!diskSystem)
 		return false;
 	// get the info
-	return diskSystem->SupportsSettingParameters(partition);
+	return diskSystem->SupportsChildOperations(partition,
+		B_DISK_SYSTEM_SUPPORTS_SETTING_PARAMETERS);
 }
 
 // _user_supports_setting_partition_content_parameters
@@ -710,11 +741,16 @@ _user_supports_setting_partition_content_parameters(partition_id partitionID,
 	if (!diskSystem)
 		return false;
 	// get the info
-	bool whileMounted;
-	bool result = diskSystem->SupportsSettingContentParameters(partition,
-														       &whileMounted);
-	if (result && _whileMounted)
+	uint32 operations = diskSystem->GetSupportedOperations(partition,
+		B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS
+		| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS_WHILE_MOUNTED);
+	bool result = (operations
+		& B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS);
+	if (result && _whileMounted) {
+		bool whileMounted = (operations
+			& B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS_WHILE_MOUNTED);
 		user_memcpy(_whileMounted, &whileMounted, sizeof(whileMounted));
+	}
 	return result;
 }
 
@@ -731,6 +767,7 @@ _user_supports_initializing_partition(partition_id partitionID,
 	if (error)
 		return error;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+
 	// get the partition
 	KPartition *partition = manager->ReadLockPartition(partitionID);
 	if (!partition)
@@ -742,14 +779,31 @@ _user_supports_initializing_partition(partition_id partitionID,
 		return false;
 	if (partition->IsBusy() || partition->IsDescendantBusy())
 		return false;
+
 	// get the disk system
 	KDiskSystem *diskSystem = manager->LoadDiskSystem(diskSystemName);
 	if (!diskSystem)
 		return false;
 	DiskSystemLoader loader(diskSystem, true);
+
 	// get the info
-	return diskSystem->SupportsInitializing(partition);
-// TODO: Ask the parent partitioning system as well.
+	if (!diskSystem->SupportsOperations(partition,
+		B_DISK_SYSTEM_SUPPORTS_INITIALIZING)) {
+		return false;
+	}
+
+	// get the parent partition's disk system
+	KPartition* parentPartition = partition->Parent();
+	if (!parentPartition)
+		return true;
+
+	KDiskSystem* parentDiskSystem = parentPartition->DiskSystem();
+	if (!parentDiskSystem)
+		return false;	// something's fishy!
+
+	// ask the parent disk system
+	return parentDiskSystem->SupportsInitializingChild(partition,
+		diskSystemName);
 }
 
 // _user_supports_creating_child_partition
@@ -774,7 +828,8 @@ _user_supports_creating_child_partition(partition_id partitionID,
 	if (!diskSystem)
 		return false;
 	// get the info
-	return diskSystem->SupportsCreatingChild(partition);
+	return diskSystem->SupportsOperations(partition,
+		B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD);
 }
 
 // _user_supports_deleting_child_partition

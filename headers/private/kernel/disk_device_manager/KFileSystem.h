@@ -35,17 +35,7 @@ public:
 
 	// Querying
 
-	virtual bool SupportsDefragmenting(KPartition *partition,
-									   bool *whileMounted);
-	virtual bool SupportsRepairing(KPartition *partition, bool checkOnly,
-								   bool *whileMounted);
-	virtual bool SupportsResizing(KPartition *partition, bool *whileMounted);
-	virtual bool SupportsMoving(KPartition *partition, bool *isNoOp);
-	virtual bool SupportsSettingContentName(KPartition *partition,
-											bool *whileMounted);
-	virtual bool SupportsSettingContentParameters(KPartition *partition,
-												  bool *whileMounted);
-	virtual bool SupportsInitializing(KPartition *partition);
+	virtual uint32 GetSupportedOperations(KPartition* partition, uint32 mask);
 
 	virtual bool ValidateResize(KPartition *partition, off_t *size);
 	virtual bool ValidateMove(KPartition *partition, off_t *start);

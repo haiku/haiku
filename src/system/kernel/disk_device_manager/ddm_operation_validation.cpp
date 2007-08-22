@@ -97,14 +97,14 @@ BPrivate::DiskDevice::get_unmovable_descendants(KPartition *partition,
 	}
 	// check partition
 	KDiskSystem *diskSystem = partition->DiskSystem();
-	bool isNoOp = true;
 	bool supports = (diskSystem
-					 && diskSystem->SupportsMoving(partition, &isNoOp));
+		&& diskSystem->SupportsOperations(partition,
+			B_DISK_SYSTEM_SUPPORTS_MOVING));
 	if (supports) {
 		unmovable[0] = partition->ID();
 		unmovableSize--;
 	}
-	if (supports && !isNoOp && diskSystem->IsFileSystem()) {
+	if (supports && diskSystem->IsFileSystem()) {
 		needUnmounting[0] = partition->ID();
 		needUnmountingSize--;
 	}
@@ -128,8 +128,10 @@ BPrivate::DiskDevice::validate_move_descendants(KPartition *partition,
 	// check partition
 	bool uninitialized = partition->IsUninitialized();
 	KDiskSystem *diskSystem = partition->DiskSystem();
-	bool movable = (uninitialized || diskSystem
-					|| diskSystem->SupportsMoving(partition, NULL));
+	bool movable = (uninitialized
+		|| diskSystem && diskSystem->SupportsOperations(partition,
+			B_DISK_SYSTEM_SUPPORTS_MOVING));
+
 	if (markMovable)
 		partition->SetAlgorithmData(movable);
 	// moving partition is supported in principle, now check the new offset
@@ -161,13 +163,24 @@ BPrivate::DiskDevice::validate_defragment_partition(KPartition *partition,
 	status_t error = check_partition(partition, changeCounter, requireShadow);
 	if (error != B_OK)
 		return error;
+
 	// get the disk system and get the info
 	KDiskSystem *diskSystem = partition->DiskSystem();
 	if (!diskSystem)
 		return B_ENTRY_NOT_FOUND;
-	if (diskSystem->SupportsDefragmenting(partition, whileMounted))
-		return B_OK;
-	return B_ERROR;
+
+	uint32 operations = diskSystem->GetSupportedOperations(partition,
+		B_DISK_SYSTEM_SUPPORTS_DEFRAGMENTING
+		| B_DISK_SYSTEM_SUPPORTS_DEFRAGMENTING_WHILE_MOUNTED);
+	if (!(operations & B_DISK_SYSTEM_SUPPORTS_DEFRAGMENTING))
+		return B_ERROR;
+
+	if (whileMounted) {
+		*whileMounted = (operations
+			& B_DISK_SYSTEM_SUPPORTS_DEFRAGMENTING_WHILE_MOUNTED);
+	}
+
+	return B_OK;
 }
 
 // validate_repair_partition
@@ -179,13 +192,24 @@ BPrivate::DiskDevice::validate_repair_partition(KPartition *partition,
 	status_t error = check_partition(partition, changeCounter, requireShadow);
 	if (error != B_OK)
 		return error;
+
 	// get the disk system and get the info
 	KDiskSystem *diskSystem = partition->DiskSystem();
 	if (!diskSystem)
 		return B_ENTRY_NOT_FOUND;
-	if (diskSystem->SupportsRepairing(partition, checkOnly, whileMounted))
-		return B_OK;
-	return B_ERROR;
+
+	uint32 operations = diskSystem->GetSupportedOperations(partition,
+		B_DISK_SYSTEM_SUPPORTS_REPAIRING
+		| B_DISK_SYSTEM_SUPPORTS_REPAIRING_WHILE_MOUNTED);
+	if (!(operations & B_DISK_SYSTEM_SUPPORTS_REPAIRING))
+		return B_ERROR;
+
+	if (whileMounted) {
+		*whileMounted = (operations
+			& B_DISK_SYSTEM_SUPPORTS_REPAIRING_WHILE_MOUNTED);
+	}
+
+	return B_OK;
 }
 
 // validate_resize_partition
@@ -201,12 +225,14 @@ BPrivate::DiskDevice::validate_resize_partition(KPartition *partition,
 	status_t error = check_busy_partition(partition->Parent(), requireShadow);
 	if (error != B_OK)
 		return error;
+
 	// get the parent disk system and let it check the value
 	KDiskSystem *parentDiskSystem = partition->Parent()->DiskSystem();
 	if (!parentDiskSystem)
 		return B_ENTRY_NOT_FOUND;
 	if (!parentDiskSystem->ValidateResizeChild(partition, size))
 		return B_ERROR;
+
 	// if contents is uninitialized, then there's no need to check anything
 	// more
 	if (partition->IsUninitialized())
@@ -426,6 +452,7 @@ BPrivate::DiskDevice::validate_delete_child_partition(KPartition *partition,
 {
 	if (!partition)
 		return B_BAD_VALUE;
+
 	// check the partition
 	if (!check_shadow_partition(partition, changeCounter, requireShadow)
 		|| !partition->Parent()) {
@@ -434,13 +461,17 @@ BPrivate::DiskDevice::validate_delete_child_partition(KPartition *partition,
 	status_t error = check_busy_partition(partition->Parent(), requireShadow);
 	if (error != B_OK)
 		return error;
+
 	// get the disk system
 	KDiskSystem *diskSystem = partition->Parent()->DiskSystem();
 	if (!diskSystem)
 		return B_ENTRY_NOT_FOUND;
+
 	// get the info
-	if (diskSystem->SupportsDeletingChild(partition))
+	if (diskSystem->SupportsChildOperations(partition,
+			B_DISK_SYSTEM_SUPPORTS_DELETING_CHILD)) {
 		return B_OK;
+	}
 	return B_ERROR;
 }
 

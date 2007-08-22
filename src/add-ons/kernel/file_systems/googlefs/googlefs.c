@@ -1620,6 +1620,7 @@ static file_system_module_info sGoogleFSModule = {
 	},
 
 	GOOGLEFS_PRETTY_NAME,
+	0,	// DDM flags
 
 	// scanning
 	NULL,	// fs_identify_partition,

@@ -264,128 +264,39 @@ pm_free_partition_content_cookie(partition_data *partition)
 // #pragma mark - Intel Partition Map - support functions
 
 
-// pm_supports_resizing
-static bool
-pm_supports_resizing(partition_data *partition)
+// pm_get_supported_operations
+static uint32
+pm_get_supported_operations(partition_data* partition, uint32 mask = ~0)
 {
-	TRACE(("intel: pm_supports_resizing(%ld: %lld, %lld, %ld, %s)\n",
-		partition->id, partition->offset, partition->size,
-		partition->block_size, partition->content_type));
-	
-	return (partition && partition->content_type
-		&& !strcmp(partition->content_type, kPartitionTypeIntel));
-}
+	uint32 flags = B_DISK_SYSTEM_SUPPORTS_RESIZING
+		| B_DISK_SYSTEM_SUPPORTS_MOVING
+		| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS
+		| B_DISK_SYSTEM_SUPPORTS_INITIALIZING;
 
-// pm_supports_resizing_child
-static bool
-pm_supports_resizing_child(partition_data *partition, partition_data *child)
-{
-	TRACE(("intel: pm_supports_resizing_child(%ld: %lld, %lld, %ld, %s)\n",
-		partition->id, partition->offset, partition->size,
-		partition->block_size, partition->content_type));
-	
-	return (partition && child && partition->content_type
-			&& !strcmp(partition->content_type, kPartitionTypeIntel));
-}
-
-// pm_supports_moving
-static bool
-pm_supports_moving(partition_data *partition, bool *isNoOp)
-{
-	TRACE(("intel: pm_supports_moving(%ld: %lld, %lld, %ld, %s)\n",
-		partition->id, partition->offset, partition->size,
-		partition->block_size, partition->content_type));
-	
-	*isNoOp = true;
-	return (partition && partition->content_type
-		&& !strcmp(partition->content_type, kPartitionTypeIntel));
-}
-
-// pm_supports_moving_child
-static bool
-pm_supports_moving_child(partition_data *partition, partition_data *child)
-{
-	TRACE(("intel: pm_supports_moving_child(%ld: %lld, %lld, %ld, %s)\n",
-		partition->id, partition->offset, partition->size,
-		partition->block_size, partition->content_type));
-	
-	return (partition && child && partition->content_type
-		&& !strcmp(partition->content_type, kPartitionTypeIntel));
-}
-
-// pm_supports_setting_name
-static bool
-pm_supports_setting_name(partition_data *partition)
-{
-	return false;
-}
-
-// pm_supports_setting_content_name
-static bool
-pm_supports_setting_content_name(partition_data *partition)
-{
-	return false;
-}
-
-// pm_supports_setting_type
-static bool
-pm_supports_setting_type(partition_data *partition)
-{
-	TRACE(("intel: pm_supports_setting_type(%ld: %lld, %lld, %ld)\n",
-		partition->id, partition->offset, partition->size,
-		partition->block_size));
-	
-	// partition should be child of "Intel Partition Map"
-	partition_data *parent;
-	return (partition
-		&& (parent = get_parent_partition(partition->id))
-		&& parent->content_type
-		&& !strcmp(parent->content_type, kPartitionTypeIntel));
-}
-
-// pm_supports_initializing
-static bool
-pm_supports_initializing(partition_data *partition)
-{
-	TRACE(("intel: pm_supports_initializing(%ld: %lld, %lld, %ld, %s, %d, %d)\n",
-		partition->id, partition->offset, partition->size,
-		partition->block_size, partition->content_type,
-		partition->child_count == 0,
-		partition->content_cookie == NULL));
-
-	return true;
-}
-
-// pm_supports_creating_child
-static bool
-pm_supports_creating_child(partition_data *partition)
-{
-	TRACE(("intel: pm_supports_creating_child(%ld: %lld, %lld, %ld, %s, %ld)\n",
-		partition->id, partition->offset, partition->size,
-		partition->block_size, partition->content_type,
-		partition->child_count));
-
-	int32 count_spaces = 0;
-	return (partition && partition->content_type
-		&& !strcmp(partition->content_type, kPartitionTypeIntel)
-		&& partition->child_count < 4
+	// creating child
+	int32 countSpaces = 0;
+	if (partition->child_count < 4
 		// free space check
-		&& pm_get_partitionable_spaces(partition, NULL, 0, &count_spaces)
-			== B_OK
-		&& count_spaces);
+		&& pm_get_partitionable_spaces(partition, NULL, 0, &countSpaces) == B_OK
+		&& countSpaces > 0) {
+		flags |= B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD;
+	}
+
+	return flags;
 }
 
-// pm_supports_deleting_child
-static bool
-pm_supports_deleting_child(partition_data *partition, partition_data *child)
+
+// pm_get_supported_child_operations
+static uint32
+pm_get_supported_child_operations(partition_data* partition,
+	partition_data* child, uint32 mask = ~0)
 {
-	TRACE(("intel: pm_supports_deleting_child(%ld: %lld, %lld, %ld, %s)\n",
-		partition->id, partition->offset, partition->size,
-		partition->block_size, partition->content_type));
-	
-	return (partition && child && partition->content_type
-		&& !strcmp(partition->content_type, kPartitionTypeIntel));
+	return B_DISK_SYSTEM_SUPPORTS_RESIZING_CHILD
+		| B_DISK_SYSTEM_SUPPORTS_MOVING_CHILD
+		| B_DISK_SYSTEM_SUPPORTS_SETTING_TYPE
+		| B_DISK_SYSTEM_SUPPORTS_DELETING_CHILD;
 }
+
 
 // pm_is_sub_system_for
 static bool
@@ -457,7 +368,7 @@ pm_validate_resize(partition_data *partition, off_t *size)
 {
 	TRACE(("intel: pm_validate_resize\n"));
 	
-	if (!partition || !pm_supports_resizing(partition) || !size)
+	if (!partition || !size)
 		return false;
 
 	return validate_resize(partition, size);
@@ -604,10 +515,8 @@ pm_validate_resize_child(partition_data *partition, partition_data *child,
 {
 	TRACE(("intel: pm_validate_resize_child\n"));
 	
-	if (!partition || !child || !size
-		|| !pm_supports_resizing_child(partition, child)) {
+	if (!partition || !child || !size)
 		return false;
-	}
 
 	return validate_resize_child(partition, child, child->offset,
 		child->size, size, get_sibling_partitions_pm);
@@ -619,8 +528,7 @@ pm_validate_move(partition_data *partition, off_t *start)
 {
 	TRACE(("intel: pm_validate_move\n"));
 	
-	bool isNoOp;
-	if (!partition || !start || !pm_supports_moving(partition, &isNoOp))
+	if (!partition || !start)
 		return false;
 	// nothing to do here
 	return true;
@@ -675,8 +583,7 @@ pm_validate_move_child(partition_data *partition, partition_data *child,
 {
 	TRACE(("intel: pm_validate_move_child\n"));
 	
-	if (!partition || !child || !start
-		|| !pm_supports_moving_child(partition, child))
+	if (!partition || !child || !start)
 		return false;
 	if (*start == child->offset)
 		return true;
@@ -721,7 +628,7 @@ pm_validate_set_type(partition_data *partition, const char *type)
 {
 	TRACE(("intel: pm_validate_set_type\n"));
 	
-	if (!partition || !pm_supports_setting_type(partition) || !type)
+	if (!partition || !type)
 		return false;
 	
 	partition_data *father = get_parent_partition(partition->id);
@@ -742,8 +649,10 @@ pm_validate_initialize(partition_data *partition, char *name,
 {
 	TRACE(("intel: pm_validate_initialize\n"));
 	
-	if (!partition || !pm_supports_initializing(partition))
+	if (!partition || !(pm_get_supported_operations(partition)
+			& B_DISK_SYSTEM_SUPPORTS_INITIALIZING)) {
 		return false;
+	}
 	// name is ignored - we cannot set it to the intel partitioning map
 	// TODO: check parameters - don't know whether any parameters could be set
 	//		 to the intel partition map
@@ -802,8 +711,9 @@ pm_validate_create_child(partition_data *partition, off_t *start, off_t *size,
 {
 	TRACE(("intel: pm_validate_create_child\n"));
 	
-	if (!partition || !pm_supports_creating_child(partition)
-			|| !start || !size || !type || !index) {
+	if (!partition || !(pm_get_supported_operations(partition)
+			& B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD)
+		|| !start || !size || !type || !index) {
 		return false;
 	}
 
@@ -1535,9 +1445,6 @@ pm_delete_child(int fd, partition_id partitionID, partition_id childID,
 	if (!partition || !child)
 		return B_BAD_VALUE;
 	
-	if (!pm_supports_deleting_child(partition, child))
-		return B_ERROR;
-
 	PartitionMap *map = (PartitionMap*)partition->content_cookie;
 	PrimaryPartition *primary = (PrimaryPartition*)child->cookie;
 	if (!map || !primary)
@@ -1711,141 +1618,45 @@ ep_free_partition_content_cookie(partition_data *partition)
 // #pragma mark - Intel Extended Partition - support functions
 
 
-// ep_supports_resizing
-static bool
-ep_supports_resizing(partition_data *partition)
+// ep_get_supported_operations
+static uint32
+ep_get_supported_operations(partition_data* partition, uint32 mask = ~0)
 {
-	TRACE(("intel: ep_supports_resizing(%ld: %lld, %lld, %ld, %s)\n",
-		partition->id, partition->offset, partition->size,
-		partition->block_size, partition->content_type));
-	
-	
-	return (partition && partition->content_type
-		&& !strcmp(partition->content_type, kPartitionTypeIntelExtended));
-}
+	uint32 flags = B_DISK_SYSTEM_SUPPORTS_RESIZING
+		| B_DISK_SYSTEM_SUPPORTS_MOVING
+		| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS;
 
-// ep_supports_resizing_child
-static bool
-ep_supports_resizing_child(partition_data *partition, partition_data *child)
-{
-	TRACE(("intel: ep_supports_resizing_child(%ld: %lld, %lld, %ld, %s)\n",
-		partition->id, partition->offset, partition->size,
-		partition->block_size, partition->content_type));
-	
-	
-	return (partition && child && partition->content_type
-		&& !strcmp(partition->content_type, kPartitionTypeIntelExtended));
-}
-
-// ep_supports_moving
-static bool
-ep_supports_moving(partition_data *partition, bool *isNoOp)
-{
-	TRACE(("intel: ep_supports_moving(%ld: %lld, %lld, %ld, %s)\n",
-		partition->id, partition->offset, partition->size,
-		partition->block_size, partition->content_type));
-	
-	
-	*isNoOp = true;
-	return (partition && partition->content_type
-		&& !strcmp(partition->content_type, kPartitionTypeIntelExtended));
-}
-
-// ep_supports_moving_child
-static bool
-ep_supports_moving_child(partition_data *partition, partition_data *child)
-{
-	TRACE(("intel: ep_supports_moving_child(%ld: %lld, %lld, %ld, %s)\n",
-		partition->id, partition->offset, partition->size,
-		partition->block_size, partition->content_type));
-	
-	
-	return (partition && child && partition->content_type
-		&& !strcmp(partition->content_type, kPartitionTypeIntelExtended));
-}
-
-// ep_supports_setting_name
-static bool
-ep_supports_setting_name(partition_data *partition)
-{
-	return false;
-}
-
-// ep_supports_setting_content_name
-static bool
-ep_supports_setting_content_name(partition_data *partition)
-{
-	return false;
-}
-
-// ep_supports_setting_type
-static bool
-ep_supports_setting_type(partition_data *partition)
-{
-	TRACE(("intel: ep_supports_setting_type(%ld: %lld, %lld, %ld)\n",
-		partition->id, partition->offset, partition->size,
-		partition->block_size));
-	
-	// partition should be child of "Intel Extended Partition"
-	partition_data *parent;
-	return (partition
-		&& (parent = get_parent_partition(partition->id))
-		&& parent->content_type
-		&& !strcmp(parent->content_type, kPartitionTypeIntelExtended));
-}
-
-// ep_supports_initializing
-static bool
-ep_supports_initializing(partition_data *partition)
-{
-//	TRACE(("intel: ep_supports_initializing(%ld: %lld, %lld, %ld, %s)\n",
-//		partition->id, partition->offset, partition->size,
-//		partition->block_size, partition->content_type));
-
-	if (!partition)
-		return true;
-
+	// initializing
 	if (partition_data* parent = get_parent_partition(partition->id)) {
 		if (partition->type
 			&& strcmp(partition->type, kPartitionTypeIntelExtended) == 0
 			&& strcmp(parent->content_type, kPartitionTypeIntel) == 0) {
-			return true;
+			flags |= B_DISK_SYSTEM_SUPPORTS_INITIALIZING;
 		}
 	}
 
-	return false;
-}
-
-// ep_supports_creating_child
-static bool
-ep_supports_creating_child(partition_data *partition)
-{
-	TRACE(("intel: ep_supports_creating_child(%ld: %lld, %lld, %ld, %s)\n",
-		partition->id, partition->offset, partition->size,
-		partition->block_size, partition->content_type));
-	
-	
+	// creating child
 	int32 countSpaces = 0;
-	return (partition && partition->content_type
-		&& !strcmp(partition->content_type, kPartitionTypeIntelExtended)
-		// free space check
-		&& ep_get_partitionable_spaces(partition, NULL, 0, &countSpaces)
-			== B_OK
-		&& countSpaces);
+	if (pm_get_partitionable_spaces(partition, NULL, 0, &countSpaces) == B_OK
+		&& countSpaces > 0) {
+		flags |= B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD;
+	}
+
+	return flags;
 }
 
-// ep_supports_deleting_child
-static bool
-ep_supports_deleting_child(partition_data *partition, partition_data *child)
+
+// ep_get_supported_child_operations
+static uint32
+ep_get_supported_child_operations(partition_data* partition,
+	partition_data* child, uint32 mask = ~0)
 {
-	TRACE(("intel: ep_supports_deleting_child(%ld: %lld, %lld, %ld, %s)\n",
-		partition->id, partition->offset, partition->size,
-		partition->block_size, partition->content_type));
-	
-	
-	return (partition && child && partition->content_type
-		&& !strcmp(partition->content_type, kPartitionTypeIntelExtended));
+	return B_DISK_SYSTEM_SUPPORTS_RESIZING_CHILD
+		| B_DISK_SYSTEM_SUPPORTS_MOVING_CHILD
+		| B_DISK_SYSTEM_SUPPORTS_SETTING_TYPE
+		| B_DISK_SYSTEM_SUPPORTS_DELETING_CHILD;
 }
+
 
 // ep_is_sub_system_for
 static bool
@@ -1872,7 +1683,7 @@ ep_validate_resize(partition_data *partition, off_t *size)
 {
 	TRACE(("intel: ep_validate_resize\n"));
 	
-	if (!partition || !ep_supports_resizing(partition) || !size)
+	if (!partition || !size)
 		return false;
 
 	return validate_resize(partition, size);
@@ -1885,8 +1696,7 @@ ep_validate_resize_child(partition_data *partition, partition_data *child,
 {
 	TRACE(("intel: ep_validate_resize_child\n"));
 	
-	if (!partition || !child || !_size
-		|| !ep_supports_resizing_child(partition, child))
+	if (!partition || !child || !_size)
 		return false;
 
 	// validate position
@@ -1905,8 +1715,7 @@ ep_validate_move(partition_data *partition, off_t *start)
 {
 	TRACE(("intel: ep_validate_move\n"));
 	
-	bool isNoOp;
-	if (!partition || !start || !ep_supports_moving(partition, &isNoOp))
+	if (!partition || !start)
 		return false;
 	// nothing to do here
 	return true;
@@ -1919,8 +1728,7 @@ ep_validate_move_child(partition_data *partition, partition_data *child,
 {
 	TRACE(("intel: ep_validate_move_child\n"));
 	
-	if (!partition || !child || !_start
-		|| !ep_supports_moving_child(partition, child))
+	if (!partition || !child || !_start)
 		return false;
 	if (*_start == child->offset)
 		return true;
@@ -1951,7 +1759,7 @@ ep_validate_set_type(partition_data *partition, const char *type)
 {
 	TRACE(("intel: ep_validate_set_type\n"));
 	
-	if (!partition || !ep_supports_setting_type(partition) || !type)
+	if (!partition || !type)
 		return false;
 	
 	// validity check of the type
@@ -1965,8 +1773,10 @@ ep_validate_initialize(partition_data *partition, char *name,
 {
 	TRACE(("intel: ep_validate_initialize\n"));
 	
-	if (!partition || !ep_supports_initializing(partition))
+	if (!partition || !(ep_get_supported_operations(partition)
+			& B_DISK_SYSTEM_SUPPORTS_INITIALIZING)) {
 		return false;
+	}
 	// name is ignored - we cannot set it to the Intel Extended Partition
 	// TODO: check parameters - don't know whether any parameters could be set
 	//		 to the Intel Extended Partition
@@ -1981,7 +1791,8 @@ ep_validate_create_child(partition_data *partition, off_t *_start, off_t *_size,
 {
 	TRACE(("intel: ep_validate_create_child\n"));
 	
-	if (!partition || !ep_supports_creating_child(partition)
+	if (!partition || !(ep_get_supported_operations(partition)
+			& B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD)
 		|| !_start || !_size || !type || !index) {
 		return false;
 	}
@@ -2532,9 +2343,6 @@ ep_delete_child(int fd, partition_id partitionID, partition_id childID,
 	if (!partition || !child)
 		return B_BAD_VALUE;
 	
-	if (!ep_supports_deleting_child(partition, child))
-		return B_ERROR;
-
 	PrimaryPartition *primary = (PrimaryPartition*)partition->cookie;
 	LogicalPartition *logical = (LogicalPartition*)child->cookie;
 	if (!primary || !logical)
@@ -2582,7 +2390,27 @@ static partition_module_info intel_partition_map_module =
 		pm_std_ops
 	},
 	INTEL_PARTITION_NAME,				// pretty_name
-	0,									// flags
+
+	// flags
+	0
+//	| B_DISK_SYSTEM_SUPPORTS_CHECKING
+//	| B_DISK_SYSTEM_SUPPORTS_REPAIRING
+	| B_DISK_SYSTEM_SUPPORTS_RESIZING
+	| B_DISK_SYSTEM_SUPPORTS_MOVING
+//	| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME
+	| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS
+	| B_DISK_SYSTEM_SUPPORTS_INITIALIZING
+//	| B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME
+
+	| B_DISK_SYSTEM_SUPPORTS_RESIZING_CHILD
+	| B_DISK_SYSTEM_SUPPORTS_MOVING_CHILD
+//	| B_DISK_SYSTEM_SUPPORTS_SETTING_NAME
+	| B_DISK_SYSTEM_SUPPORTS_SETTING_TYPE
+//	| B_DISK_SYSTEM_SUPPORTS_SETTING_PARAMETERS
+	| B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD
+	| B_DISK_SYSTEM_SUPPORTS_DELETING_CHILD
+//	| B_DISK_SYSTEM_SUPPORTS_NAME
+	,
 
 	// scanning
 	pm_identify_partition,				// identify_partition
@@ -2593,20 +2421,9 @@ static partition_module_info intel_partition_map_module =
 
 #ifndef _BOOT_MODE
 	// querying
-	NULL,								// supports_repairing
-	pm_supports_resizing,				// supports_resizing
-	pm_supports_resizing_child,			// supports_resizing_child
-	pm_supports_moving,					// supports_moving
-	pm_supports_moving_child,			// supports_moving_child
-	pm_supports_setting_name,			// supports_setting_name
-	pm_supports_setting_content_name,	// supports_setting_content_name
-	pm_supports_setting_type,			// supports_setting_type
-	NULL,								// supports_setting_parameters
-	NULL,								// supports_setting_content_parameters
-	pm_supports_initializing,			// supports_initializing
+	pm_get_supported_operations,		// get_supported_operations
+	pm_get_supported_child_operations,	// get_supported_child_operations
 	NULL,								// supports_initializing_child
-	pm_supports_creating_child,			// supports_creating_child
-	pm_supports_deleting_child,			// supports_deleting_child
 	pm_is_sub_system_for,				// is_sub_system_for
 
 	pm_validate_resize,					// validate_resize
@@ -2659,7 +2476,27 @@ static partition_module_info intel_extended_partition_module =
 		ep_std_ops
 	},
 	INTEL_EXTENDED_PARTITION_NAME,		// pretty_name
-	0,									// flags
+
+	// flags
+	0
+//	| B_DISK_SYSTEM_SUPPORTS_CHECKING
+//	| B_DISK_SYSTEM_SUPPORTS_REPAIRING
+	| B_DISK_SYSTEM_SUPPORTS_RESIZING
+	| B_DISK_SYSTEM_SUPPORTS_MOVING
+//	| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME
+	| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS
+	| B_DISK_SYSTEM_SUPPORTS_INITIALIZING
+//	| B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME
+
+	| B_DISK_SYSTEM_SUPPORTS_RESIZING_CHILD
+	| B_DISK_SYSTEM_SUPPORTS_MOVING_CHILD
+//	| B_DISK_SYSTEM_SUPPORTS_SETTING_NAME
+	| B_DISK_SYSTEM_SUPPORTS_SETTING_TYPE
+//	| B_DISK_SYSTEM_SUPPORTS_SETTING_PARAMETERS
+	| B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD
+	| B_DISK_SYSTEM_SUPPORTS_DELETING_CHILD
+//	| B_DISK_SYSTEM_SUPPORTS_NAME
+	,
 
 	// scanning
 	ep_identify_partition,				// identify_partition
@@ -2670,20 +2507,9 @@ static partition_module_info intel_extended_partition_module =
 
 #ifndef _BOOT_MODE
 	// querying
-	NULL,								// supports_repairing
-	ep_supports_resizing,				// supports_resizing
-	ep_supports_resizing_child,			// supports_resizing_child
-	ep_supports_moving,					// supports_moving
-	ep_supports_moving_child,			// supports_moving_child
-	ep_supports_setting_name,			// supports_setting_name
-	ep_supports_setting_content_name,	// supports_setting_content_name
-	ep_supports_setting_type,			// supports_setting_type
-	NULL,								// supports_setting_parameters
-	NULL,								// supports_setting_content_parameters
-	ep_supports_initializing,			// supports_initializing
+	ep_get_supported_operations,		// get_supported_operations
+	ep_get_supported_child_operations,	// get_supported_child_operations
 	NULL,								// supports_initializing_child
-	ep_supports_creating_child,			// supports_creating_child
-	ep_supports_deleting_child,			// supports_deleting_child
 	ep_is_sub_system_for,				// is_sub_system_for
 
 	ep_validate_resize,					// validate_resize

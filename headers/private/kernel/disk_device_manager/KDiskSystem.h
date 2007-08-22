@@ -54,26 +54,19 @@ public:
 	// Querying
 	// Device must be read locked.
 
-	virtual bool SupportsDefragmenting(KPartition *partition,
-									   bool *whileMounted);
-	virtual bool SupportsRepairing(KPartition *partition, bool checkOnly,
-								   bool *whileMounted);
-	virtual bool SupportsResizing(KPartition *partition, bool *whileMounted);
-	virtual bool SupportsResizingChild(KPartition *child);
-	virtual bool SupportsMoving(KPartition *partition, bool *isNoOp);
-	virtual bool SupportsMovingChild(KPartition *child);
-	virtual bool SupportsSettingName(KPartition *partition);
-	virtual bool SupportsSettingContentName(KPartition *partition,
-											bool *whileMounted);
-	virtual bool SupportsSettingType(KPartition *partition);
-	virtual bool SupportsSettingParameters(KPartition *partition);
-	virtual bool SupportsSettingContentParameters(KPartition *partition,
-												  bool *whileMounted);
-	virtual bool SupportsInitializing(KPartition *partition);
+	virtual uint32 GetSupportedOperations(KPartition* partition, uint32 mask);
+	virtual uint32 GetSupportedChildOperations(KPartition* child, uint32 mask);
+
+	// for convenience
+	bool SupportsOperations(KPartition* partition, uint32 operations)
+		{ return (GetSupportedOperations(partition, operations) & operations)
+			== operations; }
+	bool SupportsChildOperations(KPartition* child, uint32 operations)
+		{ return (GetSupportedChildOperations(child, operations) & operations)
+			== operations; }
+
 	virtual bool SupportsInitializingChild(KPartition *child,
-										   const char *diskSystem);
-	virtual bool SupportsCreatingChild(KPartition *partition);
-	virtual bool SupportsDeletingChild(KPartition *child);
+		const char *diskSystem);
 	virtual bool IsSubSystemFor(KPartition *partition);
 
 	virtual bool ValidateResize(KPartition *partition, off_t *size);

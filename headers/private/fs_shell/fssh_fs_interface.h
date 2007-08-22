@@ -54,7 +54,8 @@ extern "C" {
 
 typedef struct fssh_file_system_module_info {
 	struct fssh_module_info	info;
-	const char				*pretty_name;
+	const char*				pretty_name;
+	uint32_t				flags;	// DDM flags
 
 	/* scanning (the device is write locked) */
 	float (*identify_partition)(int fd, fssh_partition_data *partition,
@@ -239,19 +240,8 @@ typedef struct fssh_file_system_module_info {
 	fssh_status_t (*rewind_query)(fssh_fs_volume fs, fssh_fs_cookie cookie);
 
 	/* capability querying (the device is read locked) */
-	// ToDo: this will probably be combined to a single call
-	bool (*supports_defragmenting)(fssh_partition_data *partition,
-				bool *whileMounted);
-	bool (*supports_repairing)(fssh_partition_data *partition,
-				bool checkOnly, bool *whileMounted);
-	bool (*supports_resizing)(fssh_partition_data *partition,
-				bool *whileMounted);
-	bool (*supports_moving)(fssh_partition_data *partition, bool *isNoOp);
-	bool (*supports_setting_content_name)(fssh_partition_data *partition,
-				bool *whileMounted);
-	bool (*supports_setting_content_parameters)(fssh_partition_data *partition, 
-				bool *whileMounted);
-	bool (*supports_initializing)(fssh_partition_data *partition);
+	uint32_t (*get_supported_operations)(fssh_partition_data* partition,
+				uint32_t mask);
 
 	bool (*validate_resize)(fssh_partition_data *partition, fssh_off_t *size);
 	bool (*validate_move)(fssh_partition_data *partition, fssh_off_t *start);

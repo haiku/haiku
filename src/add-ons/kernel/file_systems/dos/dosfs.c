@@ -1192,6 +1192,7 @@ static file_system_module_info sDosFileSystem = {
 	},
 
 	"FAT32 File System",
+	0,	// DDM flags
 
 	// scanning
 	dosfs_identify_partition,

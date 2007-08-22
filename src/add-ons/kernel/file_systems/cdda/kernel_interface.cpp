@@ -2007,6 +2007,7 @@ static file_system_module_info sCDDAFileSystem = {
 	},
 
 	"CDDA File System",
+	0,	// DDM flags
 
 	cdda_identify_partition,
 	cdda_scan_partition,
