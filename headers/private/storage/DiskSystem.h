@@ -29,6 +29,8 @@ public:
 	bool SupportsResizingChild() const;
 	bool SupportsMoving(bool *whileMounted) const;
 	bool SupportsMovingChild() const;
+	bool SupportsName() const;
+	bool SupportsContentName() const;
 	bool SupportsSettingName() const;
 	bool SupportsSettingContentName(bool *whileMounted) const;
 	bool SupportsSettingType() const;

@@ -140,6 +140,22 @@ BDiskSystem::SupportsMovingChild() const
 			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_MOVING_CHILD));
 }
 
+// SupportsName
+bool
+BDiskSystem::SupportsName() const
+{
+	return (InitCheck() == B_OK && IsPartitioningSystem()
+			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_NAME));
+}
+
+// SupportsContentName
+bool
+BDiskSystem::SupportsContentName() const
+{
+	return (InitCheck() == B_OK
+		&& (fFlags & B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME));
+}
+
 // SupportsSettingName
 bool
 BDiskSystem::SupportsSettingName() const
