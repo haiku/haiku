@@ -1345,7 +1345,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 
 			// TODO: think about how to avoid this hack:
 			// the parent clipping needs to be updated, it is not
-			// done in MoveBy() since it would need to avoid
+			// done in MoveBy() since it would cause
 			// too much computations when children are resized because
 			// follow modes
 			if (ViewLayer* parent = fCurrentLayer->Parent())
