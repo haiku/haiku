@@ -12,7 +12,7 @@ usage()
 
 Usage: $0 <options>
 options:
-  --bochs-debug               Enables bochs serial debug emulation (activated 
+  --bochs-debug               Enables bochs serial debug emulation (activated
                               via kernel settings file).
   --build-cross-tools <build tools dir>
                               Assume cross compilation. <build tools dir>
@@ -47,6 +47,7 @@ options:
                               valid targets=r5,bone,dano,haiku
   --use-gcc-pipe              Build with GCC option -pipe. Speeds up the build
                               process, but uses more memory.
+  --use-32bit                 Use -m32 flag on 64bit host gcc compiler.
   --use-xattr                 Use Linux xattr support for BeOS attribute
                               emulation. Warning: Make sure your file system
                               supports sufficient attribute sizes (4 KB per
@@ -105,7 +106,7 @@ standard_gcc_settings()
 
 	haikuGCCVersion=`$HAIKU_CC -dumpversion`
 	haikuGCCMachine=`$HAIKU_CC -dumpmachine`
-	
+
 	HAIKU_GCC_LIB_DIR=${gccdir}
 	HAIKU_GCC_LIBGCC=${gccdir}/libgcc.a
 	HAIKU_GCC_GLUE_CODE="crtbegin.o crtend.o"
@@ -131,8 +132,8 @@ standard_gcc_settings()
 					$headers/$d"
 			done
 
-			
-			# when not building the crosscompiler, to use cpp headers from 
+
+			# when not building the crosscompiler, to use cpp headers from
 			# tree first, but fallback to local C++ system headers (like <new>)
 			# if [ "$buildCrossTools" = "" ]; then
 			#	haikuCxxHeadersDir="headers/cpp $haikuCxxHeadersDir"
@@ -181,7 +182,7 @@ get_build_tool_path()
 	local var="HAIKU_$1"
 	local tool=$2
 	local path="${crossToolsPrefix}$tool"
-	
+
 	if [ -f "$path" ]; then
 		# get absolute path
 		local oldPwd=$(pwd)
@@ -194,7 +195,7 @@ get_build_tool_path()
 			exit 1
 		}
 	fi
-	
+
 	eval "$var=$path"
 }
 
@@ -220,6 +221,7 @@ include_gpl_addons=0
 distroCompatibility=default
 target=haiku
 use_gcc_pipe=0
+use_32bit=0
 use_xattr=0
 crossToolsPrefix=
 buildCrossTools=
@@ -273,6 +275,7 @@ while [ $# -gt 0 ] ; do
 						shift 2;;
 		--target=*)     target=`echo $1 | cut -d'=' -f2-`; shift 1;;
 		--use-gcc-pipe)	use_gcc_pipe=1; shift 1;;
+		--use-32bit)	use_32bit=1; shift 1;;
 		--use-xattr)	use_xattr=1; shift 1;;
 		*)				echo Invalid argument: \`$1\'; exit 1;;
 	esac
@@ -350,6 +353,7 @@ BOCHS_DEBUG_HACK			?= "${bochs_debug}" ;
 INCLUDE_GPL_ADDONS			?= "${include_gpl_addons}" ;
 HAIKU_DISTRO_COMPATIBILITY	?= "${distroCompatibility}" ;
 HAIKU_USE_GCC_PIPE			?= "${use_gcc_pipe}" ;
+HAIKU_HOST_USE_32BIT		?= "${use_32bit}" ;
 HAIKU_HOST_USE_XATTR		?= "${use_xattr}" ;
 
 HAIKU_GCC_RAW_VERSION		?= ${haikuGCCVersion} ;

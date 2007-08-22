@@ -346,6 +346,12 @@ HAIKU_BUILD_DESCRIPTION ?= "Unknown Build" ;
 
 # host platform settings
 
+# enable GCC -m32 option, if requested
+if $(HAIKU_HOST_USE_32BIT) = 1 {
+	HOST_GCC_BASE_FLAGS = -m32 ;
+}
+
+
 # save jam's variables for the build platform
 HOST_AR				?= $(AR) ;
 HOST_CC				?= $(CC) ;
@@ -355,12 +361,13 @@ HOST_LD				?= ld ;			# TODO: Fix this!
 HOST_OBJCOPY		?= objcopy ;	#
 HOST_RANLIB			?= $(RANLIB) ;
 HOST_CPPFLAGS		?= $(CPPFLAGS) ;
-HOST_CCFLAGS		?= $(CCFLAGS) ;
-HOST_C++FLAGS		?= $(C++FLAGS) ;
-HOST_LDFLAGS		?= $(LDFLAGS) ;
-HOST_LINKFLAGS		?= $(LINKFLAGS) ;
+HOST_CCFLAGS		?= $(HOST_GCC_BASE_FLAGS) $(CCFLAGS) ;
+HOST_C++FLAGS		?= $(HOST_GCC_BASE_FLAGS) $(C++FLAGS) ;
+HOST_LDFLAGS		?= $(HOST_GCC_BASE_FLAGS) $(LDFLAGS) ;
+HOST_LINKFLAGS		?= $(HOST_GCC_BASE_FLAGS) $(LINKFLAGS) ;
 HOST_DEFINES		?= $(DEFINES) ;
 HOST_HDRS			?= $(HDRS) ;
+
 
 # split up HOST_AR into the command name and flags
 HOST_AR				= [ Match "([^ ]*) *(.*)" : $(HOST_AR[1]) ]
@@ -415,10 +422,10 @@ HOST_C++FLAGS += -Wno-multichar ;
 HOST_PIC_CCFLAGS += -fPIC ;
 HOST_PIC_C++FLAGS += -fPIC ;
 
-HOST_KERNEL_CCFLAGS += -finline -fno-builtin
+HOST_KERNEL_CCFLAGS += $(HOST_GCC_BASE_FLAGS) -finline -fno-builtin
 	-DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) -D_KERNEL_MODE ;
-HOST_KERNEL_C++FLAGS += -finline -fno-builtin -fno-exceptions
-	-DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) -D_KERNEL_MODE ;
+HOST_KERNEL_C++FLAGS += $(HOST_GCC_BASE_FLAGS) -finline -fno-builtin
+	-fno-exceptions -DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) -D_KERNEL_MODE ;
 
 HOST_KERNEL_PIC_CCFLAGS = -fno-pic ;
 HOST_KERNEL_PIC_LINKFLAGS = ;
@@ -463,6 +470,11 @@ for level in $(HAIKU_DEBUG_LEVELS[2-]) {
 	HOST_DEBUG_$(level)_C++FLAGS		= $(flags) ;
 	HOST_KERNEL_DEBUG_$(level)_CCFLAGS	= $(flags) ;
 	HOST_KERNEL_DEBUG_$(level)_C++FLAGS	= $(flags) ;
+}
+
+# ld flags
+if $(HOST_ARCH) = x86 && $(HAIKU_HOST_USE_32BIT) = 1 {
+	HOST_LDFLAGS += -melf_i386 ;
 }
 
 # private kernel headers do be used when compiling kernel code
@@ -517,7 +529,7 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	} else if $(HOST_PLATFORM) = darwin {
 		HOST_LIBROOT += /opt/local/lib/libgnuregex.dylib ;
 	}
-  
+
 
 	# The BeOS compilers define __INTEL__ respectively __POWERPC__. On the
 	# build platform we need to make sure, this is also defined.
