@@ -518,7 +518,7 @@ static void
 dump_mem(system_info *info)
 {
 	printf("%10lu bytes free      (used/max %10lu / %10lu)\n",
-		B_PAGE_SIZE * (uint32)(info->max_pages - info->used_pages)),
+		B_PAGE_SIZE * (uint32)(info->max_pages - info->used_pages),
 		B_PAGE_SIZE * (uint32)info->used_pages,
 		B_PAGE_SIZE * (uint32)info->max_pages);
 }
@@ -642,4 +642,3 @@ main(int argc, char *argv[])
 	}
 	return 0;
 }
-
