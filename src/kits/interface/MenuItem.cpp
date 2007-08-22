@@ -461,11 +461,8 @@ BMenuItem::Draw()
 	// set high color
 	if (enabled)
 		fSuper->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
-	else if (selected)
-		fSuper->SetHighColor(tint_color(noTint,
-			B_LIGHTEN_1_TINT));
 	else
-		fSuper->SetHighColor(tint_color(noTint,
+		fSuper->SetHighColor(tint_color(bgColor,
 			B_DISABLED_LABEL_TINT));
 
 	// draw content
