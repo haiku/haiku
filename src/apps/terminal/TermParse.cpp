@@ -125,7 +125,7 @@ TermParse::GetReaderBuf(uchar &c)
 		fView->UpdateLine();
 
 		// Reset cursor blinking time and turn on cursor blinking.
-		fView->SetCurDraw(CURON);
+		fView->SetCurDraw(true);
 
 		// wait new input from pty.
 		do {
@@ -146,7 +146,7 @@ TermParse::GetReaderBuf(uchar &c)
 			release_sem(fReaderLocker);
 	}
 
-	fView->SetCurDraw(CUROFF);
+	fView->SetCurDraw(false);
 	return B_OK;
 }
 

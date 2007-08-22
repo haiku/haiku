@@ -144,10 +144,10 @@ TermView::TermView(BRect frame, int32 argc, const char **argv, int32 historySize
 	fScrollBarRange(0),
 	fFrameResized(false),
 	fLastCursorTime(0),
-	fCursorDrawFlag(CURON),
-	fCursorStatus(CURON),
-	fCursorBlinkingFlag(CURON),
-	fCursorRedrawFlag(CURON),
+	fCursorDrawFlag(true),
+	fCursorStatus(true),
+	fCursorBlinkingFlag(true),
+	fCursorRedrawFlag(true),
 	fCursorHeight(0),
 	fCurPos(0, 0),
 	fCurStack(0, 0),
@@ -193,10 +193,10 @@ TermView::TermView(int rows, int columns, int32 argc, const char **argv, int32 h
 	fScrollBarRange(0),
 	fFrameResized(false),
 	fLastCursorTime(0),
-	fCursorDrawFlag(CURON),
-	fCursorStatus(CURON),
-	fCursorBlinkingFlag(CURON),
-	fCursorRedrawFlag(CURON),
+	fCursorDrawFlag(true),
+	fCursorStatus(true),
+	fCursorBlinkingFlag(true),
+	fCursorRedrawFlag(true),
 	fCursorHeight(0),
 	fCurPos(0, 0),
 	fCurStack(0, 0),
@@ -243,10 +243,10 @@ TermView::TermView(BMessage *archive)
 	fScrollBarRange(0),
 	fFrameResized(false),
 	fLastCursorTime(0),
-	fCursorDrawFlag(CURON),
-	fCursorStatus(CURON),
-	fCursorBlinkingFlag(CURON),
-	fCursorRedrawFlag(CURON),
+	fCursorDrawFlag(true),
+	fCursorStatus(true),
+	fCursorBlinkingFlag(true),
+	fCursorRedrawFlag(true),
 	fCursorHeight(0),
 	fCurPos(0, 0),
 	fCurStack(0, 0),
@@ -1006,15 +1006,15 @@ TermView::DrawCursor()
 void
 TermView::BlinkCursor()
 {
-	if (fCursorDrawFlag == CURON
-		&& fCursorBlinkingFlag == CURON
+	if (fCursorDrawFlag
+		&& fCursorBlinkingFlag
 		&& Window()->IsActive()) {
-		if (fCursorStatus == CURON)
+		if (fCursorStatus)
 			_TermDraw(fCurPos, fCurPos);
 		else
 			DrawCursor();
 
-		fCursorStatus = fCursorStatus == CURON ? CUROFF : CURON;
+		fCursorStatus = !fCursorStatus;
 		fLastCursorTime = system_time();
 	}
 }
@@ -1024,16 +1024,16 @@ TermView::BlinkCursor()
 void
 TermView::SetCurDraw(bool flag)
 {
-	if (flag == CUROFF) {
-		if (fCursorStatus == CURON)
+	if (!flag) {
+		if (fCursorStatus)
 			_TermDraw(fCurPos, fCurPos);
 
-		fCursorStatus = CUROFF;
-		fCursorDrawFlag = CUROFF;
+		fCursorStatus = false;
+		fCursorDrawFlag = false;
 	} else {
-		if (fCursorDrawFlag == CUROFF) {
-			fCursorDrawFlag = CURON;
-			fCursorStatus = CURON;
+		if (!fCursorDrawFlag) {
+			fCursorDrawFlag = true;
+			fCursorStatus = true;
 
 			if (LockLooper()) {
 				DrawCursor();
@@ -1561,7 +1561,7 @@ TermView::Draw(BRect updateRect)
 		}
 	}
 
-	if (fCursorStatus == CURON)
+	if (fCursorStatus)
 		DrawCursor();
 
 	Window()->EndViewTransaction();

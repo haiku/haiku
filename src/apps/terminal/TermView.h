@@ -19,10 +19,6 @@
 #include <String.h>
 #include <View.h>
 
-/* Cursor Blinking flag */
-#define CUROFF 0
-#define CURON  1
-
 
 class BClipboard;
 class BMessageRunner;
