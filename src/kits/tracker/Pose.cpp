@@ -581,7 +581,7 @@ BPose::Draw(BRect rect, BPoseView *poseView, BView *drawView, bool fullDraw,
 						widget->RecalculateText(poseView);
 					
 					bool selectDuringDraw = directDraw && selected
-						&& (windowActive && !poseView->EraseWidgetTextBackground());
+						&& (windowActive && !poseView->WidgetTextOutline());
 					
 					if (index == 0 && selectDuringDraw) {
 						//draw with dark background to select text
@@ -638,7 +638,7 @@ BPose::Draw(BRect rect, BPoseView *poseView, BView *drawView, bool fullDraw,
 
 		bool selectDuringDraw = directDraw && selected
 			&& (poseView->IsDesktopWindow()
-			|| (windowActive && !poseView->EraseWidgetTextBackground()));
+			|| (windowActive && !poseView->WidgetTextOutline()));
 			
 		if (selectDuringDraw) {
 			// draw with dark background to select text

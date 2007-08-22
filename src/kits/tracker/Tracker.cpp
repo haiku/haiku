@@ -1280,6 +1280,7 @@ TTracker::ReadyToRun()
 	InitMimeTypes();
 	InstallDefaultTemplates();
 	InstallIndices();
+	InstallTemporaryBackgroundImages();
 	
 	HideVarDir();
 

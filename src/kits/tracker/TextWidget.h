@@ -86,7 +86,7 @@ public:
 	void SetActive(bool);
 	
 	const char *Text() const;
-		// returns the untrucated version of the text
+		// returns the untruncated version of the text
 	float TextWidth(const BPoseView *) const;
 	float PreferredWidth(const BPoseView *) const;
 	int	Compare(const BTextWidget &, BPoseView *) const;

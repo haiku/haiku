@@ -45,11 +45,12 @@ All rights reserved.
 /*----------------------------------------------------------------*/
 /*-----  Tracker background BMessage entries  --------------------*/
 
-#define B_BACKGROUND_IMAGE		"be:bgndimginfopath"		// string path
-#define B_BACKGROUND_MODE		"be:bgndimginfomode"		// int32, the enum below
-#define B_BACKGROUND_ORIGIN		"be:bgndimginfooffset"		// BPoint
-#define B_BACKGROUND_ERASE_TEXT	"be:bgndimginfoerasetext"	// bool
-#define B_BACKGROUND_WORKSPACES	"be:bgndimginfoworkspaces"	// uint32
+#define B_BACKGROUND_IMAGE			"be:bgndimginfopath"		// string path
+#define B_BACKGROUND_MODE			"be:bgndimginfomode"		// int32, the enum below
+#define B_BACKGROUND_ORIGIN			"be:bgndimginfooffset"		// BPoint
+#define B_BACKGROUND_TEXT_OUTLINE	"be:bgndimginfoerasetext"	// bool
+	// NOTE: the actual attribute name is kept for backwards compatible settings
+#define B_BACKGROUND_WORKSPACES		"be:bgndimginfoworkspaces"	// uint32
 
 /*----------------------------------------------------------------*/
 /*-----  Background mode values  ---------------------------------*/

@@ -118,7 +118,7 @@ class BackgroundsView : public BBox {
 
 		BColorControl *fPicker;			// color picker
 		BButton *fApply, *fRevert;		// apply and revert buttons
-		BCheckBox *fIconLabelBackground;	// label ckeckbox
+		BCheckBox *fIconLabelOutline;	// label ckeckbox
 		BMenu* fPlacementMenu, *fImageMenu, *fWorkspaceMenu;	// the three comboboxes
 		BTextControl *fXPlacementText, *fYPlacementText;		// x and y textboxes
 		PreView *fPreView;				// the view for previewing the result

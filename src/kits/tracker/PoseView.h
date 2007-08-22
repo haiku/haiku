@@ -207,8 +207,8 @@ class BPoseView : public BView {
 		rgb_color DeskTextColor() const;
 		rgb_color DeskTextBackColor() const;
 
-		bool EraseWidgetTextBackground() const;
-		void SetEraseWidgetTextBackground(bool);
+		bool WidgetTextOutline() const;
+		void SetWidgetTextOutline(bool);
 			// used to not erase when we have a background image and
 			// invalidate instead
 
@@ -627,7 +627,7 @@ class BPoseView : public BView {
 		float fAutoScrollInc;
 		int32 fAutoScrollState;
 		std::set<thread_id> fAddPosesThreads;
-		bool fEraseWidgetBackground;
+		bool fWidgetTextOutline;
 		const BPose *fSelectionPivotPose;
 		const BPose *fRealPivotPose;
 		BMessageRunner *fKeyRunner;

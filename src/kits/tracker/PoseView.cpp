@@ -196,7 +196,7 @@ BPoseView::BPoseView(Model *model, BRect bounds, uint32 viewMode, uint32 resizeM
 	fRefFilter(NULL),
 	fAutoScrollInc(20),
 	fAutoScrollState(kAutoScrollOff),
-	fEraseWidgetBackground(true),
+	fWidgetTextOutline(false),
 	fSelectionPivotPose(NULL),
 	fRealPivotPose(NULL),
 	fKeyRunner(NULL),
@@ -2873,7 +2873,7 @@ BPoseView::UpdatePosesClipboardModeFromClipboard(BMessage *clipboardReport)
 						|| bounds.Contains(poseRect.LeftBottom())
 						|| bounds.Contains(poseRect.RightBottom())
 						|| bounds.Contains(poseRect.RightTop())) {
-						if (!EraseWidgetTextBackground()
+						if (!WidgetTextOutline()
 							|| clipNode->moveMode == kMoveSelectionTo)
 							Invalidate(poseRect);
 						else
@@ -3432,7 +3432,7 @@ BPoseView::SelectPoses(int32 start, int32 end)
 				poseRect = pose->CalcRect(loc, this);
 
 			if (bounds.Intersects(poseRect)) {
-				if (EraseWidgetTextBackground())
+				if (WidgetTextOutline())
 					Invalidate(poseRect);
 				else
 					pose->Draw(poseRect, this, false);
@@ -6871,7 +6871,7 @@ BPoseView::SelectPosesListMode(BRect selectionRect, BList **oldList)
 										// using a vector class instead of BList
 
 			if ((selected != pose->IsSelected()) && poseRect.Intersects(bounds)) {
-				if (pose->IsSelected() || EraseWidgetTextBackground())
+				if (pose->IsSelected() || WidgetTextOutline())
 					pose->Draw(poseRect, this, false);
 				else
 					Invalidate(poseRect);
@@ -6900,7 +6900,7 @@ BPoseView::SelectPosesListMode(BRect selectionRect, BList **oldList)
 			BRect poseRect(pose->CalcRect(loc, this));
 
 			if (poseRect.Intersects(bounds)) {
-				if (pose->IsSelected() || EraseWidgetTextBackground())
+				if (pose->IsSelected() || WidgetTextOutline())
 					pose->Draw(poseRect, this, false);
 				else
 					Invalidate(poseRect);
@@ -6939,7 +6939,7 @@ BPoseView::SelectPosesIconMode(BRect selectionRect, BList **oldList)
 				newList->AddItem((void *)index);
 
 				if ((selected != pose->IsSelected()) && poseRect.Intersects(bounds)) {
-					if (pose->IsSelected() || EraseWidgetTextBackground())
+					if (pose->IsSelected() || WidgetTextOutline())
 						pose->Draw(poseRect, this, false);
 					else
 						Invalidate(poseRect);
@@ -6967,7 +6967,7 @@ BPoseView::SelectPosesIconMode(BRect selectionRect, BList **oldList)
 			BRect poseRect(pose->CalcRect(this));
 
 			if (poseRect.Intersects(bounds)) {
-				if (pose->IsSelected() || EraseWidgetTextBackground())
+				if (pose->IsSelected() || WidgetTextOutline())
 					pose->Draw(poseRect, this, false);
 				else
 					Invalidate(poseRect);
@@ -7725,7 +7725,7 @@ BPoseView::ClearSelection()
 				if (pose->IsSelected()) {
 					pose->Select(false);
 					BRect poseRect(pose->CalcRect(loc, this, false));
-					if (EraseWidgetTextBackground())
+					if (WidgetTextOutline())
 						pose->Draw(poseRect, this, false);
 					else
 						Invalidate(poseRect);
@@ -7744,7 +7744,7 @@ BPoseView::ClearSelection()
 					if (pose->IsSelected()) {
 						pose->Select(false);
 						BRect poseRect(pose->CalcRect(this));
-						if (EraseWidgetTextBackground())
+						if (WidgetTextOutline())
 							pose->Draw(poseRect, this, false);
 						else
 							Invalidate(poseRect);
@@ -7807,7 +7807,7 @@ BPoseView::ShowSelection(bool show)
 						if (pose->IsSelected() != show || fShowSelectionWhenInactive) {
 							if (!fShowSelectionWhenInactive)
 								pose->Select(show);
-							if (show && EraseWidgetTextBackground())
+							if (show && WidgetTextOutline())
 								pose->Draw(pose->CalcRect(this), this, false);
 							else
 								Invalidate(pose->CalcRect(this));
@@ -7850,7 +7850,7 @@ BPoseView::AddRemovePoseFromSelection(BPose *pose, int32 index, bool select)
 	pose->Select(select);
 
 	// update display
-	if (EraseWidgetTextBackground())
+	if (WidgetTextOutline())
 		DrawPose(pose, index, false);
 	else
 		Invalidate(pose->CalcRect(this));
@@ -8887,7 +8887,7 @@ BPoseView::HiliteDropTarget(bool hiliteState)
 			BPose *pose = fVSPoseList->ItemAt(index);
 			if (pose) {
 				if (pose == fDropTarget) {
-					if (!hiliteState && !EraseWidgetTextBackground())
+					if (!hiliteState && !WidgetTextOutline())
 						// deselecting an icon with widget drawn over background
 						// have to be a little tricky here - draw just the icon,
 						// invalidate the widget
@@ -9210,16 +9210,16 @@ BPoseView::AdaptToDesktopIntegrationChange(BMessage *)
 
 
 bool
-BPoseView::EraseWidgetTextBackground() const
+BPoseView::WidgetTextOutline() const
 {
-	return fEraseWidgetBackground;
+	return fWidgetTextOutline;
 }
 
 
 void
-BPoseView::SetEraseWidgetTextBackground(bool on)
+BPoseView::SetWidgetTextOutline(bool on)
 {
-	fEraseWidgetBackground = on;
+	fWidgetTextOutline = on;
 }
 
 

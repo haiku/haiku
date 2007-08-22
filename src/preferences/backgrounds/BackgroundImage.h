@@ -83,7 +83,7 @@ class BackgroundImage {
 				// element of the per-workspace list
 			public:
 				BackgroundImageInfo(uint32 workspace, int32 imageIndex, Mode mode,
-					BPoint offset, bool eraseTextWidget, uint32 imageSet,
+					BPoint offset, bool textWidgetLabelOutline, uint32 imageSet,
 					uint32 cacheMode);
 				~BackgroundImageInfo();
 
@@ -94,7 +94,7 @@ class BackgroundImage {
 				int32 fImageIndex;
 				Mode fMode;
 				BPoint fOffset;
-				bool fEraseTextWidgetBackground;
+				bool fTextWidgetLabelOutline;
 				uint32 fImageSet;
 				uint32 fCacheMode;		// image cache strategy (0 cache , 1 no cache)
 		};

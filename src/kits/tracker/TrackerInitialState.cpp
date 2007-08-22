@@ -41,6 +41,7 @@ All rights reserved.
 #include <Message.h>
 #include <Node.h>
 #include <Path.h>
+#include <Screen.h>
 #include <VolumeRoster.h>
 
 #include <fs_attr.h>
@@ -429,24 +430,24 @@ InstallTemporaryBackgroundImages(BNode *node, BMessage *message)
 
 static void
 AddTemporaryBackgroundImages(BMessage *message, const char *imagePath,
-	BackgroundImage::Mode mode, BPoint offset, uint32 workspaces, bool eraseTextWidgets)
+	BackgroundImage::Mode mode, BPoint offset, uint32 workspaces, bool textWidgetOutlines)
 {
 	message->AddString(kBackgroundImageInfoPath, imagePath);
 	message->AddInt32(kBackgroundImageInfoWorkspaces, (int32)workspaces);
 	message->AddInt32(kBackgroundImageInfoMode, mode);
-	message->AddBool(kBackgroundImageInfoEraseText, eraseTextWidgets);
+	message->AddBool(kBackgroundImageInfoTextOutline, textWidgetOutlines);
 	message->AddPoint(kBackgroundImageInfoOffset, offset);
 }
 
 static void
 InstallTemporaryBackgroundImagesIfNeeded(BNode *node, const char *imagePath,
-	BackgroundImage::Mode mode, BPoint offset, uint32 workspaces, bool eraseTextWidgets)
+	BackgroundImage::Mode mode, BPoint offset, uint32 workspaces, bool textWidgetOutlines)
 {
 	attr_info info;
 	if (node->GetAttrInfo(kBackgroundImageInfo, &info) != B_OK) {
 		BMessage message;
 		AddTemporaryBackgroundImages(&message, imagePath, mode, offset, workspaces,
-			eraseTextWidgets);
+			textWidgetOutlines);
 		InstallTemporaryBackgroundImages(node, &message);
 	}
 }
@@ -454,97 +455,39 @@ InstallTemporaryBackgroundImagesIfNeeded(BNode *node, const char *imagePath,
 void 
 TTracker::InstallTemporaryBackgroundImages()
 {
-	// TODO: make the large Haiku Logo the default background
+	// make the large Haiku Logo the default background
 
-	BPath path;
-	FSFindTrackerSettingsDir(&path, false);
-	BString defaultFolderPath(path.Path());
-	defaultFolderPath << '/' << kDefaultFolderTemplate << '/';
-	
+//	BPath path;
+	BPath path("/boot/beos/etc/artwork");
+//	FSFindTrackerSettingsDir(&path, false);
+//	path.Append(kDefaultFolderTemplate);
+
+	BString defaultBackgroundImage("/HAIKU logo - white on blue - big.png");
+	BString defaultBackgroundTexture("/backgroundTexture.tga");
+
 	BNode node;
-	if (BContainerWindow::DefaultStateSourceNode(kDefaultFolderTemplate, &node, true))
+	if (BContainerWindow::DefaultStateSourceNode(kDefaultFolderTemplate, &node, true)) {
+		// install a default background texture for folders in icon view mode
 		InstallTemporaryBackgroundImagesIfNeeded(&node,
-			(BString(defaultFolderPath) << "backgroundTexture.tga").String(),
+			(BString(path.Path()) << defaultBackgroundTexture).String(),
 			BackgroundImage::kTiled,
 			BPoint(0, 0), 0xffffffff, false);
+	}
 
 	BDirectory dir;
 	if (FSGetBootDeskDir(&dir) == B_OK) {
+		// install a default background if there is no background defined yet
 		attr_info info;
 		if (dir.GetAttrInfo(kBackgroundImageInfo, &info) != B_OK) {
+			BScreen screen(B_MAIN_SCREEN_ID);
+			BPoint logoPos;
+			logoPos.x = floorf((screen.Frame().Width() - 605) * (sqrtf(5) - 1) / 2);
+			logoPos.y = floorf((screen.Frame().Height() - 190) * 0.9);
 			BMessage message;
 			AddTemporaryBackgroundImages(&message,
-				(BString(defaultFolderPath) << "bgdefault.tga").String(),
-				BackgroundImage::kScaledToFit,
-				BPoint(0, 0), 0xffffffff, true);
-			AddTemporaryBackgroundImages(&message,
-				(BString(defaultFolderPath) << "bg1.tga").String(),
-				BackgroundImage::kScaledToFit,
-				BPoint(0, 0), 0x00000001, true);
-			AddTemporaryBackgroundImages(&message,
-				(BString(defaultFolderPath) << "bg2.tga").String(),
-				BackgroundImage::kScaledToFit,
-				BPoint(0, 0), 0x00000002, true);
-			AddTemporaryBackgroundImages(&message,
-				(BString(defaultFolderPath) << "bg3.tga").String(),
-				BackgroundImage::kScaledToFit,
-				BPoint(0, 0), 0x00000004, true);
-			AddTemporaryBackgroundImages(&message,
-				(BString(defaultFolderPath) << "bg4.tga").String(),
-				BackgroundImage::kScaledToFit,
-				BPoint(0, 0), 0x00000008, true);
-			AddTemporaryBackgroundImages(&message,
-				(BString(defaultFolderPath) << "bg5.tga").String(),
-				BackgroundImage::kScaledToFit,
-				BPoint(0, 0), 0x00000010, true);
-			AddTemporaryBackgroundImages(&message,
-				(BString(defaultFolderPath) << "bg6.tga").String(),
-				BackgroundImage::kScaledToFit,
-				BPoint(0, 0), 0x00000020, true);
-			AddTemporaryBackgroundImages(&message,
-				(BString(defaultFolderPath) << "bg7.tga").String(),
-				BackgroundImage::kScaledToFit,
-				BPoint(0, 0), 0x00000040, true);
-			AddTemporaryBackgroundImages(&message,
-				(BString(defaultFolderPath) << "bg8.tga").String(),
-				BackgroundImage::kScaledToFit,
-				BPoint(0, 0), 0x00000080, true);
-			AddTemporaryBackgroundImages(&message,
-				(BString(defaultFolderPath) << "bg9.tga").String(),
-				BackgroundImage::kScaledToFit,
-				BPoint(0, 0), 0x00000100, true);
-			AddTemporaryBackgroundImages(&message,
-				(BString(defaultFolderPath) << "bg10.tga").String(),
-				BackgroundImage::kScaledToFit,
-				BPoint(0, 0), 0x00000200, true);
-			AddTemporaryBackgroundImages(&message,
-				(BString(defaultFolderPath) << "bg11.tga").String(),
-				BackgroundImage::kScaledToFit,
-				BPoint(0, 0), 0x00000400, true);
-			AddTemporaryBackgroundImages(&message,
-				(BString(defaultFolderPath) << "bg12.tga").String(),
-				BackgroundImage::kScaledToFit,
-				BPoint(0, 0), 0x00000800, true);
-			AddTemporaryBackgroundImages(&message,
-				(BString(defaultFolderPath) << "bg12.tga").String(),
-				BackgroundImage::kScaledToFit,
-				BPoint(0, 0), 0x00001000, true);
-			AddTemporaryBackgroundImages(&message,
-				(BString(defaultFolderPath) << "bg13.tga").String(),
-				BackgroundImage::kScaledToFit,
-				BPoint(0, 0), 0x00002000, true);
-			AddTemporaryBackgroundImages(&message,
-				(BString(defaultFolderPath) << "bg14.tga").String(),
-				BackgroundImage::kScaledToFit,
-				BPoint(0, 0), 0x00002000, true);
-			AddTemporaryBackgroundImages(&message,
-				(BString(defaultFolderPath) << "bg15.tga").String(),
-				BackgroundImage::kScaledToFit,
-				BPoint(0, 0), 0x00004000, true);
-			AddTemporaryBackgroundImages(&message,
-				(BString(defaultFolderPath) << "bg16.tga").String(),
-				BackgroundImage::kScaledToFit,
-				BPoint(0, 0), 0x00008000, true);
+				(BString(path.Path()) << defaultBackgroundImage).String(),
+				BackgroundImage::kAtOffset,
+				logoPos, 0xffffffff, false);
 			::InstallTemporaryBackgroundImages(&dir, &message);
 		}
 	}

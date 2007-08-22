@@ -44,17 +44,19 @@ All rights reserved.
 #include <fs_attr.h>
 
 #include "BackgroundImage.h"
+
+#include "Background.h"
 #include "Commands.h"
 #include "PoseView.h"
 
 namespace BPrivate {
 
-const char *kBackgroundImageInfo 			= "be:bgndimginfo";
-const char *kBackgroundImageInfoOffset 		= "be:bgndimginfooffset";
-const char *kBackgroundImageInfoEraseText	= "be:bgndimginfoerasetext";
-const char *kBackgroundImageInfoMode 		= "be:bgndimginfomode";
-const char *kBackgroundImageInfoWorkspaces 	= "be:bgndimginfoworkspaces";
-const char *kBackgroundImageInfoPath 		= "be:bgndimginfopath";
+const char *kBackgroundImageInfo 			= B_BACKGROUND_INFO;
+const char *kBackgroundImageInfoOffset 		= B_BACKGROUND_ORIGIN;
+const char *kBackgroundImageInfoTextOutline	= B_BACKGROUND_TEXT_OUTLINE;
+const char *kBackgroundImageInfoMode 		= B_BACKGROUND_MODE;
+const char *kBackgroundImageInfoWorkspaces 	= B_BACKGROUND_WORKSPACES;
+const char *kBackgroundImageInfoPath 		= B_BACKGROUND_IMAGE;
 
 }
 
@@ -82,7 +84,7 @@ BackgroundImage::GetBackgroundImage(const BNode *node, bool isDesktop)
 		const char *path;
 		uint32 workspaces = B_ALL_WORKSPACES;
 		Mode mode = kTiled;
-		bool eraseTextWidgetBackground = true;
+		bool textWidgetLabelOutline = false;
 		BPoint offset;
 		
 		if (container.FindString(kBackgroundImageInfoPath, index, &path) != B_OK)
@@ -96,12 +98,12 @@ BackgroundImage::GetBackgroundImage(const BNode *node, bool isDesktop)
 		
 		container.FindInt32(kBackgroundImageInfoWorkspaces, index, (int32 *)&workspaces);
 		container.FindInt32(kBackgroundImageInfoMode, index, (int32 *)&mode);
-		container.FindBool(kBackgroundImageInfoEraseText, index, &eraseTextWidgetBackground);
+		container.FindBool(kBackgroundImageInfoTextOutline, index, &textWidgetLabelOutline);
 		container.FindPoint(kBackgroundImageInfoOffset, index, &offset);
 		
 		BackgroundImage::BackgroundImageInfo *imageInfo = new
 			BackgroundImage::BackgroundImageInfo(workspaces, bitmap, mode, offset,
-				eraseTextWidgetBackground);
+				textWidgetLabelOutline);
 
 		if (!result) 
 			result = new BackgroundImage(node, isDesktop);
@@ -113,12 +115,12 @@ BackgroundImage::GetBackgroundImage(const BNode *node, bool isDesktop)
 
 
 BackgroundImage::BackgroundImageInfo::BackgroundImageInfo(uint32 workspaces,
-	BBitmap *bitmap, Mode mode, BPoint offset, bool eraseTextWidget)
+	BBitmap *bitmap, Mode mode, BPoint offset, bool textWidgetOutline)
 	:	fWorkspace(workspaces),
 		fBitmap(bitmap),
 		fMode(mode),
 		fOffset(offset),
-		fEraseTextWidgetBackground(eraseTextWidget)
+		fTextWidgetOutline(textWidgetOutline)
 {
 }
 
@@ -158,7 +160,7 @@ BackgroundImage::Show(BView *view, int32 workspace)
 	if (info) {
 		BPoseView *poseView = dynamic_cast<BPoseView *>(fView);
 		if (poseView)
-			poseView->SetEraseWidgetTextBackground(info->fEraseTextWidgetBackground);
+			poseView->SetWidgetTextOutline(info->fTextWidgetOutline);
 		Show(info, fView);
 	}
 }
@@ -205,7 +207,7 @@ BackgroundImage::Show(BackgroundImageInfo *info, BView *view)
 	
 	BPoseView *poseView = dynamic_cast<BPoseView *>(view);
 	if (poseView)
-		poseView->SetEraseWidgetTextBackground(info->fEraseTextWidgetBackground);
+		poseView->SetWidgetTextOutline(info->fTextWidgetOutline);
 	
 	// switch to the bitmap and force a redraw
 	view->SetViewBitmap(info->fBitmap, bitmapBounds, destinationBitmapBounds,
@@ -224,7 +226,7 @@ BackgroundImage::Remove()
 		BPoseView *poseView = dynamic_cast<BPoseView *>(fView);
 		// make sure text widgets draw the default way, erasing their background
 		if (poseView)
-			poseView->SetEraseWidgetTextBackground(true);
+			poseView->SetWidgetTextOutline(true);
 	}
 	fShowingBitmap = NULL;
 }
@@ -271,7 +273,7 @@ BackgroundImage::WorkspaceActivated(BView *view, int32 workspace, bool state)
 			Show(info, view);
 		else {
 			if (BPoseView *poseView = dynamic_cast<BPoseView *>(view))
-				poseView->SetEraseWidgetTextBackground(true);
+				poseView->SetWidgetTextOutline(true);
 			view->ClearViewBitmap();
 			view->Invalidate();
 		}

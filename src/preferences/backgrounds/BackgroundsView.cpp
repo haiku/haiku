@@ -42,7 +42,7 @@ static const uint32 kMsgCenterPlacement = 'cnpl';
 static const uint32 kMsgManualPlacement = 'mnpl';
 static const uint32 kMsgScalePlacement = 'scpl';
 static const uint32 kMsgTilePlacement = 'tlpl';
-static const uint32 kMsgIconLabelBackground = 'ilcb';
+static const uint32 kMsgIconLabelOutline = 'ilol';
 
 static const uint32 kMsgImagePlacement = 'xypl';
 static const uint32 kMsgUpdatePreviewPlacement = 'pvpl';
@@ -207,18 +207,18 @@ BackgroundsView::BackgroundsView(BRect frame, const char *name, int32 resize,
 	rightbox->AddChild(placementMenuField);
 
 	rect.OffsetBy(offset, placementMenuField->Bounds().Height() + 5);
-	fIconLabelBackground = new BCheckBox(rect, "iconLabelBackground",
-		"Icon label background", new BMessage(kMsgIconLabelBackground));
-	fIconLabelBackground->SetValue(B_CONTROL_ON);
-	fIconLabelBackground->ResizeToPreferred();
-	rightbox->AddChild(fIconLabelBackground);
+	fIconLabelOutline = new BCheckBox(rect, "iconLabelOutline",
+		"Icon label outline", new BMessage(kMsgIconLabelOutline));
+	fIconLabelOutline->SetValue(B_CONTROL_OFF);
+	fIconLabelOutline->ResizeToPreferred();
+	rightbox->AddChild(fIconLabelOutline);
 
-	rect.top += fIconLabelBackground->Bounds().Height() + 15;
+	rect.top += fIconLabelOutline->Bounds().Height() + 15;
 	fPicker = new BColorControl(BPoint(10, rect.top), B_CELLS_32x8, 5.0, "Picker",
 		new BMessage(kMsgUpdateColor));
 	rightbox->AddChild(fPicker);
 
-	float xDelta = max_c(fIconLabelBackground->Frame().right, fPicker->Frame().right)
+	float xDelta = max_c(fIconLabelOutline->Frame().right, fPicker->Frame().right)
 		+ 10.0f - rightbox->Bounds().Width();
 	delta = fPicker->Frame().bottom + 10.0f - rightbox->Bounds().Height();
 
@@ -273,7 +273,7 @@ BackgroundsView::AllAttached()
 	fWorkspaceMenu->SetTargetForItems(this);
 	fXPlacementText->SetTarget(this);
 	fYPlacementText->SetTarget(this);
-	fIconLabelBackground->SetTarget(this);
+	fIconLabelOutline->SetTarget(this);
 	fPicker->SetTarget(this);
 	fApply->SetTarget(this);
 	fRevert->SetTarget(this);
@@ -326,7 +326,7 @@ BackgroundsView::MessageReceived(BMessage *msg)
 			UpdateButtons();
 			break;
 
-		case kMsgIconLabelBackground:
+		case kMsgIconLabelOutline:
 			UpdateButtons();
 			break;
 
@@ -507,8 +507,9 @@ BackgroundsView::UpdateWithCurrent(void)
 	if (!fCurrentInfo) {
 		fImageMenu->FindItem(kMsgNoImage)->SetMarked(true);
 		fPlacementMenu->FindItem(kMsgManualPlacement)->SetMarked(true);
+		fIconLabelOutline->SetValue(B_CONTROL_OFF);
 	} else {
-		fIconLabelBackground->SetValue(fCurrentInfo->fEraseTextWidgetBackground
+		fIconLabelOutline->SetValue(fCurrentInfo->fTextWidgetLabelOutline
 			? B_CONTROL_ON : B_CONTROL_OFF);
 
 		BString xtext, ytext;
@@ -557,18 +558,18 @@ BackgroundsView::UpdateWithCurrent(void)
 void
 BackgroundsView::Save()
 {
-	bool eraseTextWidgetBackground =
-		fIconLabelBackground->Value() == B_CONTROL_ON;
+	bool textWidgetLabelOutline =
+		fIconLabelOutline->Value() == B_CONTROL_ON;
 	BackgroundImage::Mode mode = FindPlacementMode();
 	BPoint offset(atoi(fXPlacementText->Text()), atoi(fYPlacementText->Text()));
 
 	if (!fCurrent->IsDesktop()) {
 		if (fCurrentInfo == NULL) {
 			fCurrentInfo = new BackgroundImage::BackgroundImageInfo(B_ALL_WORKSPACES,
-				fLastImageIndex, mode, offset, eraseTextWidgetBackground, 0, 0);
+				fLastImageIndex, mode, offset, textWidgetLabelOutline, 0, 0);
 			fCurrent->Add(fCurrentInfo);
 		} else {
-			fCurrentInfo->fEraseTextWidgetBackground = eraseTextWidgetBackground;
+			fCurrentInfo->fTextWidgetLabelOutline = textWidgetLabelOutline;
 			fCurrentInfo->fMode = mode;
 			if (fCurrentInfo->fMode == BackgroundImage::kAtOffset)
 				fCurrentInfo->fOffset = offset;
@@ -588,14 +589,14 @@ BackgroundsView::Save()
 					if (fLastImageIndex > -1) {
 						fCurrentInfo = new BackgroundImage::BackgroundImageInfo(
 							workspaceMask, fLastImageIndex, mode, offset,
-							eraseTextWidgetBackground, fCurrentInfo->fImageSet,
+							textWidgetLabelOutline, fCurrentInfo->fImageSet,
 							fCurrentInfo->fCacheMode);
 						fCurrent->Add(fCurrentInfo);
 					}
 				} else {
 					if (fLastImageIndex > -1) {
-						fCurrentInfo->fEraseTextWidgetBackground =
-							eraseTextWidgetBackground;
+						fCurrentInfo->fTextWidgetLabelOutline =
+							textWidgetLabelOutline;
 						fCurrentInfo->fMode = mode;
 						if (fCurrentInfo->fMode == BackgroundImage::kAtOffset)
 							fCurrentInfo->fOffset = offset;
@@ -610,7 +611,7 @@ BackgroundsView::Save()
 				fCurrent->RemoveAll();
 				fCurrentInfo = new BackgroundImage::BackgroundImageInfo(
 					B_ALL_WORKSPACES, fLastImageIndex, mode, offset,
-					eraseTextWidgetBackground, fCurrent->GetShowingImageSet(),
+					textWidgetLabelOutline, fCurrent->GetShowingImageSet(),
 					fCurrentInfo->fCacheMode);
 				fCurrent->Add(fCurrentInfo);
 			}
@@ -618,12 +619,12 @@ BackgroundsView::Save()
 			if (fWorkspaceMenu->FindItem(kMsgCurrentWorkspace)->IsMarked()) {
 				fCurrentInfo = new BackgroundImage::BackgroundImageInfo(
 					workspaceMask, fLastImageIndex, mode, offset,
-					eraseTextWidgetBackground, fCurrent->GetShowingImageSet(), 0);
+					textWidgetLabelOutline, fCurrent->GetShowingImageSet(), 0);
 			} else {
 				fCurrent->RemoveAll();
 				fCurrentInfo = new BackgroundImage::BackgroundImageInfo(
 					B_ALL_WORKSPACES, fLastImageIndex, mode, offset,
-					eraseTextWidgetBackground, fCurrent->GetShowingImageSet(), 0);
+					textWidgetLabelOutline, fCurrent->GetShowingImageSet(), 0);
 			}
 			fCurrent->Add(fCurrentInfo);
 		}
@@ -836,8 +837,8 @@ BackgroundsView::UpdatePreview()
 	bool imageEnabled = !(fImageMenu->FindItem(kMsgNoImage)->IsMarked());
 	if (fPlacementMenu->IsEnabled() ^ imageEnabled)
 		fPlacementMenu->SetEnabled(imageEnabled);
-	if (fIconLabelBackground->IsEnabled() ^ imageEnabled)
-		fIconLabelBackground->SetEnabled(imageEnabled);
+	if (fIconLabelOutline->IsEnabled() ^ imageEnabled)
+		fIconLabelOutline->SetEnabled(imageEnabled);
 
 	bool textEnabled = (fPlacementMenu->FindItem(kMsgManualPlacement)->IsMarked())
 		&& imageEnabled;
@@ -870,7 +871,7 @@ BackgroundsView::UpdatePreview()
 				new BackgroundImage::BackgroundImageInfo(0, index,
 					FindPlacementMode(), BPoint(atoi(fXPlacementText->Text()),
 						atoi(fYPlacementText->Text())),
-					fIconLabelBackground->Value() == B_CONTROL_ON, 0, 0);
+					fIconLabelOutline->Value() == B_CONTROL_ON, 0, 0);
 			if (info->fMode == BackgroundImage::kAtOffset) {
 				fPreView->SetEnabled(true);
 				fPreView->fPoint.x = atoi(fXPlacementText->Text());
@@ -923,8 +924,8 @@ BackgroundsView::UpdateButtons()
 		&& fPicker->ValueAsColor() != BScreen().DesktopColor()) {
 		hasChanged = true;
 	} else if (fCurrentInfo) {
-		if ((fIconLabelBackground->Value() == B_CONTROL_ON) ^
-			fCurrentInfo->fEraseTextWidgetBackground) {
+		if ((fIconLabelOutline->Value() == B_CONTROL_ON) ^
+			fCurrentInfo->fTextWidgetLabelOutline) {
 			hasChanged = true;
 		} else if (FindPlacementMode() != fCurrentInfo->fMode) {
 			hasChanged = true;

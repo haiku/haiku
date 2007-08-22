@@ -57,7 +57,11 @@ All rights reserved.
 
 const char *kBackgroundImageInfo 			= "be:bgndimginfo";
 const char *kBackgroundImageInfoOffset 		= "be:bgndimginfooffset";
-const char *kBackgroundImageInfoEraseText	= "be:bgndimginfoerasetext";
+//const char *kBackgroundImageInfoTextOutline	= "be:bgndimginfotextoutline";
+const char *kBackgroundImageInfoTextOutline	= "be:bgndimginfoerasetext";
+// NOTE: the attribute keeps the old name for backwards compatibility,
+// just in case some users spend time configuring a few windows with
+// this feature on or off...
 const char *kBackgroundImageInfoMode 		= "be:bgndimginfomode";
 const char *kBackgroundImageInfoWorkspaces 	= "be:bgndimginfoworkspaces";
 const char *kBackgroundImageInfoPath 		= "be:bgndimginfopath";
@@ -107,7 +111,7 @@ BackgroundImage::GetBackgroundImage(const BNode *node, bool isDesktop,
 		const char *path;
 		uint32 workspaces = B_ALL_WORKSPACES;
 		Mode mode = kTiled;
-		bool eraseTextWidgetBackground = true;
+		bool textWidgetLabelOutline = false;
 		BPoint offset;
 		uint32 imageSet = 0;
 		uint32 cacheMode = 0;
@@ -122,8 +126,8 @@ BackgroundImage::GetBackgroundImage(const BNode *node, bool isDesktop,
 		container.FindInt32(kBackgroundImageInfoWorkspaces, index,
 			(int32 *)&workspaces);
 		container.FindInt32(kBackgroundImageInfoMode, index, (int32 *)&mode);
-		container.FindBool(kBackgroundImageInfoEraseText, index,
-			&eraseTextWidgetBackground);
+		container.FindBool(kBackgroundImageInfoTextOutline, index,
+			&textWidgetLabelOutline);
 		container.FindPoint(kBackgroundImageInfoOffset, index, &offset);
 
 		if (isDesktop) {
@@ -135,7 +139,7 @@ BackgroundImage::GetBackgroundImage(const BNode *node, bool isDesktop,
 
 		BackgroundImage::BackgroundImageInfo *imageInfo = new
 			BackgroundImage::BackgroundImageInfo(workspaces, imageIndex,
-				mode, offset, eraseTextWidgetBackground, imageSet, cacheMode);
+				mode, offset, textWidgetLabelOutline, imageSet, cacheMode);
 
 		//imageInfo->UnloadBitmap(globalCacheMode);
 
@@ -159,14 +163,14 @@ BackgroundImage::GetBackgroundImage(const BNode *node, bool isDesktop,
 
 
 BackgroundImage::BackgroundImageInfo::BackgroundImageInfo(uint32 workspaces,
-	int32 imageIndex, Mode mode, BPoint offset, bool eraseTextWidget,
+	int32 imageIndex, Mode mode, BPoint offset, bool textWidgetLabelOutline,
 	uint32 imageSet, uint32 cacheMode)
 	:
 	fWorkspace(workspaces),
 	fImageIndex(imageIndex),
 	fMode(mode),
 	fOffset(offset),
-	fEraseTextWidgetBackground(eraseTextWidget),
+	fTextWidgetLabelOutline(textWidgetLabelOutline),
 	fImageSet(imageSet),
 	fCacheMode(cacheMode)
 {
@@ -239,7 +243,7 @@ BackgroundImage::Show(BView *view, int32 workspace)
 	if (info) {
 		/*BPoseView *poseView = dynamic_cast<BPoseView *>(fView);
 		if (poseView)
-			poseView->SetEraseWidgetTextBackground(info->fEraseTextWidgetBackground);*/
+			poseView->SetEraseWidgetTextBackground(info->fTextWidgetLabelOutline);*/
 		Show(info, fView);
 	}
 }
@@ -425,8 +429,8 @@ BackgroundImage::SetBackgroundImage(BNode *node)
 		if (fBackgroundsView->GetImage(info->fImageIndex) == NULL)
 			continue;
 
-		container.AddBool(kBackgroundImageInfoEraseText,
-			info->fEraseTextWidgetBackground);
+		container.AddBool(kBackgroundImageInfoTextOutline,
+			info->fTextWidgetLabelOutline);
 		container.AddString(kBackgroundImageInfoPath,
 			fBackgroundsView->GetImage(info->fImageIndex)->GetPath().Path());
 		container.AddInt32(kBackgroundImageInfoWorkspaces, info->fWorkspace);

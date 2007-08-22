@@ -52,7 +52,7 @@ class BPoseView;
 
 extern const char *kBackgroundImageInfo;
 extern const char *kBackgroundImageInfoOffset;
-extern const char *kBackgroundImageInfoEraseText;
+extern const char *kBackgroundImageInfoTextOutline;
 extern const char *kBackgroundImageInfoMode;
 extern const char *kBackgroundImageInfoWorkspaces;
 extern const char *kBackgroundImageInfoPath;
@@ -77,14 +77,14 @@ public:
 		// element of the per-workspace list
 	public:
 		BackgroundImageInfo(uint32 workspace, BBitmap *bitmap, Mode mode, BPoint offset,
-			bool eraseTextWidget);
+			bool textWidgetOutline);
 		~BackgroundImageInfo();
 
 		uint32 fWorkspace;
 		BBitmap *fBitmap;
 		Mode fMode;
 		BPoint fOffset;
-		bool fEraseTextWidgetBackground;
+		bool fTextWidgetOutline;
 	};
 
 	static BackgroundImage *GetBackgroundImage(const BNode *, bool isDesktop);

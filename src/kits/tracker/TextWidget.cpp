@@ -477,12 +477,22 @@ void
 BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView *view,
 	BView *drawView, bool selected, uint32 clipboardMode, BPoint offset, bool direct)
 {
+	textRect.OffsetBy(offset);
+
 	if (direct) {
+#if __HAIKU__
+		// draw selection box if selected
+		if (selected) {
+#else
 		// erase area we're going to draw in
-		if (view->EraseWidgetTextBackground() || selected) {
+		// NOTE: WidgetTextOutline() is reused for
+		// erasing background on R5 here
+		if (view->WidgetTextOutline() || selected) {
+#endif
 			drawView->SetDrawingMode(B_OP_COPY);
 			eraseRect.OffsetBy(offset);
-			drawView->FillRect(eraseRect, B_SOLID_LOW);
+//			drawView->FillRect(eraseRect, B_SOLID_LOW);
+			drawView->FillRect(textRect, B_SOLID_LOW);
 		} else
 			drawView->SetDrawingMode(B_OP_OVER);	
 
@@ -493,34 +503,74 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView *view,
 				highColor = kWhite;
 			else
 				highColor = view->DeskTextColor();
-		} else if (selected && view->Window()->IsActive() && !view->EraseWidgetTextBackground()) {
+		} else if (selected && view->Window()->IsActive()) {
 			highColor = kWhite;
 		} else
 			highColor = kBlack;
 
 		if (clipboardMode == kMoveSelectionTo && !selected) {
-			view->SetDrawingMode(B_OP_ALPHA);
-			view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+			drawView->SetDrawingMode(B_OP_ALPHA);
+			drawView->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
 			highColor.alpha = 64;
 		}
 		drawView->SetHighColor(highColor);
 	}
 
 	BPoint loc;
-	textRect.OffsetBy(offset);
-
 	loc.y = textRect.bottom - view->FontInfo().descent;
 	loc.x = textRect.left + 1;
 
-	drawView->MovePenTo(loc);
-	drawView->DrawString(fText->FittingText(view));
+	const char* fittingText = fText->FittingText(view);
+
+#if __HAIKU__
+	if (!selected && view->WidgetTextOutline()) {
+		// draw a halo around the text by using the "false bold"
+		// feature for text rendering. Either black or white is used for
+		// the glow (whatever acts as contrast) with a some alpha value,
+		// two passes are used to achive a blur effect
+		drawView->SetDrawingMode(B_OP_ALPHA);
+		drawView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
+
+		BFont font;
+		drawView->GetFont(&font);
+// NOTE: commented out first pass for halo, since just a plain
+// outline looks better IMHO -stippi
+//		font.SetFalseBoldWidth(2.0);
+//		drawView->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+		rgb_color textColor = drawView->HighColor();
+		rgb_color glow = textColor.red
+			+ textColor.green + textColor.blue > 128 * 3 ? kBlack : kWhite;
+//		glow.alpha = 40;
+//		drawView->SetHighColor(glow);
+
+//		drawView->DrawString(fittingText, loc);
+
+		font.SetFalseBoldWidth(1.0);
+		drawView->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+		glow.alpha = 220;
+		drawView->SetHighColor(glow);
+
+		drawView->DrawString(fittingText, loc);
+
+		font.SetFalseBoldWidth(0.0);
+		drawView->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+		drawView->SetHighColor(textColor);
+	}
+#endif // __HAIKU__
+
+	drawView->DrawString(fittingText, loc);
 
 	if (fSymLink && (fAttrHash == view->FirstColumn()->AttrHash())) {
 		// ToDo:
 		// this should be exported to the WidgetAttribute class, probably
 		// by having a per widget kind style
-		if (direct) 
-			drawView->SetHighColor(125, 125, 125);
+		if (direct) {
+			rgb_color underlineColor = drawView->HighColor();
+			underlineColor.alpha = 180;
+			drawView->SetHighColor(underlineColor);
+			drawView->SetDrawingMode(B_OP_ALPHA);
+			drawView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
+		}
 
 		textRect.right = textRect.left + fText->Width(view);
 			// only underline text part
