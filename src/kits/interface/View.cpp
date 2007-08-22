@@ -3601,8 +3601,6 @@ BView::MoveTo(float x, float y)
 void
 BView::ResizeBy(float deltaWidth, float deltaHeight)
 {
-	// TODO: this doesn't look like it would work correctly with scrolled views
-
 	// BeBook says we should do this. And it makes sense.
 	deltaWidth = roundf(deltaWidth);
 	deltaHeight = roundf(deltaHeight);
@@ -3614,8 +3612,8 @@ BView::ResizeBy(float deltaWidth, float deltaHeight)
 		check_lock();
 		fOwner->fLink->StartMessage(AS_LAYER_RESIZE_TO);
 
-		fOwner->fLink->Attach<float>(fBounds.right + deltaWidth);
-		fOwner->fLink->Attach<float>(fBounds.bottom + deltaHeight);
+		fOwner->fLink->Attach<float>(fBounds.Width() + deltaWidth);
+		fOwner->fLink->Attach<float>(fBounds.Height() + deltaHeight);
 
 //		fState->valid_flags |= B_VIEW_FRAME_BIT;
 
