@@ -241,6 +241,7 @@ FontCacheEntry::_RenderTypeFor(const ServerFont& font)
 {
 	glyph_rendering renderingType = glyph_ren_native_gray8;
 	if (font.Rotation() != 0.0 || font.Shear() != 90.0
+		|| font.FalseBoldWidth() != 0.0
 		|| font.Flags() & B_DISABLE_ANTIALIASING
 		|| font.Size() > 30) {
 		renderingType = glyph_ren_outline;
