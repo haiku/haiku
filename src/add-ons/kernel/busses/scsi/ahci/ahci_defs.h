@@ -2,14 +2,17 @@
  * Copyright 2007, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef _AHCI_DEFS_H
 #define _AHCI_DEFS_H
 
-#include <SupportDefs.h>
+#include <bus/PCI.h>
+#include <bus/SCSI.h>
 
-typedef struct
-{
+#define AHCI_DEVICE_MODULE_NAME "busses/scsi/ahci/device_v1"
+#define AHCI_SIM_MODULE_NAME "busses/scsi/ahci/sim/v1"
+
+
+typedef struct {
 	uint32		clb;			// Command List Base Address
 	uint32		clbu;			// Command List Base Address Upper 32-Bits
 	uint32		fb;				// FIS Base Address
@@ -32,8 +35,7 @@ typedef struct
 } ahci_port;
 
 
-typedef struct
-{
+typedef struct {
 	uint32		cap;			// Host Capabilities
 	uint32		ghc;			// Global Host Control
 	uint32		is;				// Interrupt Status
@@ -48,4 +50,8 @@ typedef struct
 	ahci_port	port[32];
 } ahci_hba;
 
-#endif
+extern scsi_sim_interface gAHCISimInterface;
+extern pci_device_module_info *gPCI;
+extern scsi_for_sim_interface *gSCSI;
+
+#endif	/* _AHCI_DEFS_H */

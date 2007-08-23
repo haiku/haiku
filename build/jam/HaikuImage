@@ -130,6 +130,8 @@ AddFilesToHaikuImage beos system add-ons kernel bus_managers
 	: $(BEOS_ADD_ONS_BUS_MANAGERS) ;
 AddFilesToHaikuImage beos system add-ons kernel busses ide
 	: generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata ;
+AddFilesToHaikuImage beos system add-ons kernel busses scsi
+	: ahci ;
 AddFilesToHaikuImage beos system add-ons kernel busses usb
 	: <usb>uhci <usb>ohci <usb>ehci ;
 AddFilesToHaikuImage beos system add-ons kernel console : vga_text ;
@@ -153,7 +155,6 @@ AddDriversToHaikuImage				: console dprintf $(X86_ONLY)keyboard null
 AddDriversToHaikuImage audio hmulti	: $(BEOS_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToHaikuImage midi			: $(BEOS_ADD_ONS_DRIVERS_MIDI) ;
 AddDriversToHaikuImage bus			: usb_raw ;
-AddDriversToHaikuImage disk			: ahci ;
 AddDriversToHaikuImage disk scsi	: scsi_cd scsi_dsk ;
 AddDriversToHaikuImage disk virtual	: nbd ;
 AddDriversToHaikuImage dvb			: cx23882 ;
