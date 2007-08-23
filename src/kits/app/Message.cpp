@@ -410,12 +410,11 @@ BMessage::_PrintToStream(const char* indent) const
 	for (int32 i = 0; i < fHeader->field_count; i++, field++) {
 		value = B_BENDIAN_TO_HOST_INT32(field->type);
 		ssize_t size = 0;
-		if (field->flags & FIELD_FLAG_FIXED_SIZE)
+		if ((field->flags & FIELD_FLAG_FIXED_SIZE) && field->count > 0)
 			size = field->data_size / field->count;
 
 		uint8 *pointer = fData + field->offset + field->name_length;
-
-		for (int32 j=0; j<field->count; j++) {
+		for (int32 j = 0; j < field->count; j++) {
 			if (field->count == 1) {
 				printf("%s        %s = ", indent,
 					(char *)(fData + field->offset));
@@ -541,10 +540,14 @@ BMessage::Rename(const char *oldEntry, const char *newEntry)
 				nextField = &fFields[*nextField].next_field;
 			*nextField = index;
 
-			int32 oldLength = field->name_length;
-			field->name_length = strlen(newEntry) + 1;
-			_ResizeData(field->offset, field->name_length - oldLength);
-			memcpy(fData + field->offset, newEntry, field->name_length);
+			int32 newLength = strlen(newEntry) + 1;
+			status_t result = _ResizeData(field->offset + 1,
+				newLength - field->name_length);
+			if (result < B_OK)
+				return result;
+
+			memcpy(fData + field->offset, newEntry, newLength);
+			field->name_length = newLength;
 			return B_OK;
 		}
 
@@ -1329,10 +1332,11 @@ BMessage::_ResizeData(int32 offset, int32 change)
 		size = min_c(size, fHeader->data_size + MAX_DATA_PREALLOCATION);
 		size = max_c(size, fHeader->data_size + change);
 
-		fData = (uint8 *)realloc(fData, size);
-		if (!fData)
+		uint8 *newData = (uint8 *)realloc(fData, size);
+		if (size > 0 && !newData)
 			return B_NO_MEMORY;
 
+		fData = newData;
 		if (offset < fHeader->data_size) {
 			memmove(fData + offset + change, fData + offset,
 				fHeader->data_size - offset);
@@ -1350,10 +1354,14 @@ BMessage::_ResizeData(int32 offset, int32 change)
 
 		if (fHeader->data_available > MAX_DATA_PREALLOCATION) {
 			ssize_t available = MAX_DATA_PREALLOCATION / 2;
-			fData = (uint8 *)realloc(fData, fHeader->data_size + available);
-			if (!fData)
-				return B_NO_MEMORY;
+			ssize_t size = fHeader->data_size + available;
+			uint8 *newData = (uint8 *)realloc(fData, size);
+			if (size > 0 && !newData) {
+				// this is strange, but not really fatal
+				return B_OK;
+			}
 
+			fData = newData;
 			fHeader->data_available = available;
 		}
 	}
@@ -1420,15 +1428,16 @@ BMessage::_AddField(const char *name, type_code type, bool isFixedSize,
 		int32 count = fHeader->field_count * 2 + 1;
 		count = min_c(count, fHeader->field_count + MAX_FIELD_PREALLOCATION);
 
-		fFields = (field_header *)realloc(fFields, count * sizeof(field_header));
-		if (!fFields)
+		field_header *newFields = (field_header *)realloc(fFields,
+			count * sizeof(field_header));
+		if (count > 0 && !newFields)
 			return B_NO_MEMORY;
 
+		fFields = newFields;
 		fHeader->fields_available = count - fHeader->field_count;
 	}
 
 	uint32 hash = _HashName(name) % fHeader->hash_table_size;
-
 	int32 *nextField = &fHeader->hash_table[hash];
 	while (*nextField >= 0)
 		nextField = &fFields[*nextField].next_field;
@@ -1436,18 +1445,20 @@ BMessage::_AddField(const char *name, type_code type, bool isFixedSize,
 
 	field_header *field = &fFields[fHeader->field_count];
 	field->type = type;
-	field->flags = FIELD_FLAG_VALID;
-	if (isFixedSize)
-		field->flags |= FIELD_FLAG_FIXED_SIZE;
-
 	field->count = 0;
 	field->data_size = 0;
 	field->allocated = 0;
 	field->next_field = -1;
 	field->offset = fHeader->data_size;
 	field->name_length = strlen(name) + 1;
-	_ResizeData(field->offset, field->name_length);
+	status_t status = _ResizeData(field->offset, field->name_length);
+	if (status < B_OK)
+		return status;
+
 	memcpy(fData + field->offset, name, field->name_length);
+	field->flags = FIELD_FLAG_VALID;
+	if (isFixedSize)
+		field->flags |= FIELD_FLAG_FIXED_SIZE;
 
 	fHeader->fields_available--;
 	fHeader->fields_size += sizeof(field_header);
@@ -1460,6 +1471,11 @@ BMessage::_AddField(const char *name, type_code type, bool isFixedSize,
 status_t
 BMessage::_RemoveField(field_header *field)
 {
+	status_t result = _ResizeData(field->offset, -(field->data_size
+		+ field->name_length));
+	if (result < B_OK)
+		return result;
+
 	int32 index = ((uint8 *)field - (uint8 *)fFields) / sizeof(field_header);
 	int32 nextField = field->next_field;
 	if (nextField > index)
@@ -1481,8 +1497,6 @@ BMessage::_RemoveField(field_header *field)
 			other->next_field = nextField;
 	}
 
-	_ResizeData(field->offset, -(field->data_size + field->name_length));
-
 	ssize_t size = fHeader->fields_size - (index + 1) * sizeof(field_header);
 	memmove(fFields + index, fFields + index + 1, size);
 	fHeader->fields_size -= sizeof(field_header);
@@ -1491,11 +1505,14 @@ BMessage::_RemoveField(field_header *field)
 
 	if (fHeader->fields_available > MAX_FIELD_PREALLOCATION) {
 		ssize_t available = MAX_FIELD_PREALLOCATION / 2;
-		fFields = (field_header *)realloc(fFields, fHeader->fields_size
-			+ available * sizeof(field_header));
-		if (!fFields)
-			return B_NO_MEMORY;
+		size = fHeader->fields_size + available * sizeof(field_header);
+		field_header *newFields = (field_header *)realloc(fFields, size);
+		if (size > 0 && !newFields) {
+			// this is strange, but not really fatal
+			return B_OK;
+		}
 
+		fFields = newFields;
 		fHeader->fields_available = available;
 	}
 
@@ -1519,8 +1536,11 @@ BMessage::AddData(const char *name, type_code type, const void *data,
 	if (result == B_NAME_NOT_FOUND)
 		result = _AddField(name, type, isFixedSize, &field);
 
-	if (result < B_OK || !field)
+	if (result < B_OK)
 		return result;
+
+	if (!field)
+		return B_ERROR;
 
 	uint32 offset = field->offset + field->name_length + field->data_size;
 	if (field->flags & FIELD_FLAG_FIXED_SIZE) {
@@ -1530,12 +1550,24 @@ BMessage::AddData(const char *name, type_code type, const void *data,
 				return B_BAD_VALUE;
 		}
 
-		_ResizeData(offset, numBytes);
+		result = _ResizeData(offset, numBytes);
+		if (result < B_OK) {
+			if (field->count == 0)
+				_RemoveField(field);
+			return result;
+		}
+
 		memcpy(fData + offset, data, numBytes);
 		field->data_size += numBytes;
 	} else {
 		int32 change = numBytes + sizeof(numBytes);
-		_ResizeData(offset, change);
+		result = _ResizeData(offset, change);
+		if (result < B_OK) {
+			if (field->count == 0)
+				_RemoveField(field);
+			return result;
+		}
+
 		memcpy(fData + offset, &numBytes, sizeof(numBytes));
 		memcpy(fData + offset + sizeof(numBytes), data, numBytes);
 		field->data_size += change;
@@ -1574,7 +1606,10 @@ BMessage::RemoveData(const char *name, int32 index)
 	uint32 offset = field->offset + field->name_length;
 	if (field->flags & FIELD_FLAG_FIXED_SIZE) {
 		ssize_t size = field->data_size / field->count;
-		_ResizeData(offset + index * size, -size);
+		result = _ResizeData(offset + index * size, -size);
+		if (result < B_OK)
+			return result;
+
 		field->data_size -= size;
 	} else {
 		uint8 *pointer = fData + offset;
@@ -1585,7 +1620,10 @@ BMessage::RemoveData(const char *name, int32 index)
 		}
 
 		ssize_t currentSize = *(ssize_t *)pointer + sizeof(ssize_t);
-		_ResizeData(offset, -currentSize);
+		result = _ResizeData(offset, -currentSize);
+		if (result < B_OK)
+			return result;
+
 		field->data_size -= currentSize;
 	}
 
@@ -1703,7 +1741,10 @@ BMessage::ReplaceData(const char *name, type_code type, int32 index,
 
 		ssize_t currentSize = *(ssize_t *)pointer;
 		int32 change = numBytes - currentSize;
-		_ResizeData(offset, change);
+		result = _ResizeData(offset, change);
+		if (result < B_OK)
+			return result;
+
 		memcpy(fData + offset, &numBytes, sizeof(numBytes));
 		memcpy(fData + offset + sizeof(numBytes), data, numBytes);
 		field->data_size += change;
