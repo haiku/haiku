@@ -604,6 +604,11 @@ if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 # platform, e.g. containing missing POSIX/GNU headers.
 HOST_HDRS += [ FDirName $(HAIKU_TOP) headers build host $(HOST_PLATFORM) ] ;
 
+# For all versions of BeOS also add the common beos directory.
+if $(HOST_PLATFORM) in r5 bone dano {
+	HOST_HDRS += [ FDirName $(HAIKU_TOP) headers build host beos_common ] ;
+}
+
 
 #pragma mark -
 
