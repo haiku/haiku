@@ -1,6 +1,7 @@
 #include <inttypes.h>
 #include <signal.h>
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 
 #define ADD_SIGNAL(signal)	{ signal, #signal }
