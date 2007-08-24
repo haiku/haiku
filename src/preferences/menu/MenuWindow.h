@@ -25,14 +25,11 @@ class MenuWindow : public BWindow {
 		virtual void MessageReceived(BMessage *message);
 		virtual bool QuitRequested();
 
-		void Update();
-		void Defaults();
-
 	private:	
-		bool		fRevert;
-		ColorWindow* fColorWindow;
-		MenuBar*	fMenuBar;
-		BButton*	fRevertButton;
+		ColorWindow*	fColorWindow;
+		MenuBar*		fMenuBar;
+		BButton*		fDefaultsButton;
+		BButton*		fRevertButton;
 };
 
 #endif	// MENU_WINDOW_H

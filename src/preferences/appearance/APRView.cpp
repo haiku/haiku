@@ -146,7 +146,8 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	fDefaults = new BButton(BRect(0,0,1,1),"DefaultsButton","Defaults",
 							new BMessage(DEFAULT_SETTINGS),
 							B_FOLLOW_LEFT |B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
-	fDefaults->ResizeToPreferred(); 
+	fDefaults->ResizeToPreferred();
+	fDefaults->SetEnabled(false);
 	fDefaults->MoveTo((fPicker->Frame().right-(fDefaults->Frame().Width()*2)-20)/2,fPicker->Frame().bottom+20);
 	AddChild(fDefaults);
 	
@@ -157,8 +158,8 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	fRevert = new BButton(cvrect,"RevertButton","Revert", 
 						new BMessage(REVERT_SETTINGS),
 						B_FOLLOW_LEFT |B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
-	AddChild(fRevert);
 	fRevert->SetEnabled(false);
+	AddChild(fRevert);
 	
 }
 
@@ -185,6 +186,8 @@ APRView::AttachedToWindow(void)
 					   fDefaults->Frame().bottom + 10);
 	LoadSettings();
 	fAttrList->Select(0);
+	
+	fDefaults->SetEnabled(fCurrentSet.IsDefaultable());
 }
 
 void
@@ -221,6 +224,7 @@ APRView::MessageReceived(BMessage *msg)
 			// Update current fAttribute in the settings
 			fCurrentSet.SetColor(fAttrString.String(),col);
 			
+			fDefaults->SetEnabled(fCurrentSet.IsDefaultable());
 			fRevert->SetEnabled(true);
 			
 			break;
@@ -236,6 +240,8 @@ APRView::MessageReceived(BMessage *msg)
 			
 			fAttrString=whichitem->Text();
 			UpdateControlsFromAttr(whichitem->Text());
+
+			fDefaults->SetEnabled(fCurrentSet.IsDefaultable());
 			break;
 		}
 		case REVERT_SETTINGS: {
@@ -248,6 +254,7 @@ APRView::MessageReceived(BMessage *msg)
 		}
 		case DEFAULT_SETTINGS: {
 			fCurrentSet.SetToDefaults();
+			fDefaults->SetEnabled(false);
 			
 			UpdateControlsFromAttr(fAttrString.String());
 			BMenuItem *item = fDecorMenu->FindItem("Default");

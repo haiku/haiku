@@ -57,6 +57,7 @@ class SettingsView : public BView {
 		virtual ~SettingsView();
 
 		virtual void SetDefaults();
+		virtual bool IsDefaultable() const;
 		virtual void Revert();
 		virtual void ShowCurrentSettings();
 		virtual void RecordRevertSettings();
@@ -75,6 +76,7 @@ class DesktopSettingsView : public SettingsView {
 		virtual void GetPreferredSize(float *_width, float *_height);
 
 		virtual void SetDefaults();
+		virtual bool IsDefaultable() const;
 		virtual void Revert();
 		virtual void ShowCurrentSettings();
 		virtual void RecordRevertSettings();
@@ -108,6 +110,7 @@ class WindowsSettingsView : public SettingsView {
 		virtual void GetPreferredSize(float *_width, float *_height);
 
 		virtual void SetDefaults();
+		virtual bool IsDefaultable() const;
 		virtual void Revert();
 		virtual void ShowCurrentSettings();
 		virtual void RecordRevertSettings();
@@ -139,6 +142,7 @@ class TimeFormatSettingsView : public SettingsView {
 		virtual void GetPreferredSize(float *_width, float *_height);
 
 		virtual void SetDefaults();
+		virtual bool IsDefaultable() const;
 		virtual void Revert();
 		virtual void ShowCurrentSettings();
 		virtual void RecordRevertSettings();
@@ -178,6 +182,7 @@ class SpaceBarSettingsView : public SettingsView {
 		virtual void GetPreferredSize(float *_width, float *_height);
 
 		virtual void SetDefaults();
+		virtual bool IsDefaultable() const;
 		virtual void Revert();
 		virtual void ShowCurrentSettings();
 		virtual void RecordRevertSettings();
@@ -206,6 +211,7 @@ class TrashSettingsView : public SettingsView {
 		virtual void GetPreferredSize(float *_width, float *_height);
 
 		virtual void SetDefaults();
+		virtual bool IsDefaultable() const;
 		virtual void Revert();
 		virtual void ShowCurrentSettings();
 		virtual void RecordRevertSettings();

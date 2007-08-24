@@ -74,3 +74,17 @@ MenuSettings::ResetToDefaults()
 	set_menu_info(&fDefaultSettings);
 }
 
+
+bool
+MenuSettings::IsDefaultable()
+{
+	menu_info info;
+	get_menu_info(&info);
+
+	return info.font_size !=  fDefaultSettings.font_size
+		|| info.background_color != fDefaultSettings.background_color
+		|| info.separator != fDefaultSettings.separator
+		|| info.click_to_open != fDefaultSettings.click_to_open
+		|| info.triggers_always_shown != fDefaultSettings.triggers_always_shown;
+}
+

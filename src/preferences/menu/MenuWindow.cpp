@@ -31,7 +31,6 @@ MenuWindow::MenuWindow(BRect rect)
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE)
 {
 	fColorWindow = NULL;
-	fRevert = false;
 
 	BView* topView = new BView(Bounds(), "menuView", B_FOLLOW_ALL_SIDES,
 		B_WILL_DRAW);
@@ -48,10 +47,11 @@ MenuWindow::MenuWindow(BRect rect)
 	BRect buttonFrame(menuBarFrame.left, menuBarFrame.bottom + 10, 
 		menuBarFrame.left + 75, menuBarFrame.bottom + 30);
 
-	BButton* defaultButton = new BButton(buttonFrame, "Default", "Defaults",
+	fDefaultsButton = new BButton(buttonFrame, "Default", "Defaults",
 		new BMessage(MENU_DEFAULT), B_FOLLOW_H_CENTER | B_FOLLOW_BOTTOM,
 		B_WILL_DRAW | B_NAVIGABLE);
-	topView->AddChild(defaultButton);
+	fDefaultsButton->SetEnabled(false);
+	topView->AddChild(fDefaultsButton);
 
 	buttonFrame.OffsetBy(buttonFrame.Width() + 20, 0);
 	fRevertButton = new BButton(buttonFrame, "Revert", "Revert", new BMessage(MENU_REVERT),
@@ -60,8 +60,7 @@ MenuWindow::MenuWindow(BRect rect)
 	topView->AddChild(fRevertButton);
 
 	topView->MakeFocus();
-
-	Update();	
+	fMenuBar->Update();
 }
 
 
@@ -73,25 +72,27 @@ MenuWindow::MessageReceived(BMessage *msg)
 
 	switch (msg->what) {
 		case MENU_REVERT:
-			fRevert = false;
 			settings->Revert();
-			Update();
+
+			fRevertButton->SetEnabled(false);
+			fDefaultsButton->SetEnabled(settings->IsDefaultable());
+			fMenuBar->Update();
 			break;
 
 		case MENU_DEFAULT:
-			fRevert = true;
 			settings->ResetToDefaults();
-			Update();
+
+			fDefaultsButton->SetEnabled(false);
+			fMenuBar->Update();
 			break;
 
 		case UPDATE_WINDOW:
-			Update();
+			fMenuBar->Update();
 			break;
 
 		case MENU_FONT_FAMILY:
 		case MENU_FONT_STYLE:
 		{
-			fRevert = true;
 			const font_family *family;
 			msg->FindString("family", (const char **)&family);
 			const font_style *style;
@@ -101,40 +102,49 @@ MenuWindow::MessageReceived(BMessage *msg)
 			strlcpy(info.f_family, (const char *)family, B_FONT_FAMILY_LENGTH);
 			strlcpy(info.f_style, (const char *)style, B_FONT_STYLE_LENGTH);
 			settings->Set(info);
-			Update();
+
+			fRevertButton->SetEnabled(true);
+			fDefaultsButton->SetEnabled(settings->IsDefaultable());
+			fMenuBar->Update();
 			break;
 		}
 
 		case MENU_FONT_SIZE:
-			fRevert = true;
 			settings->Get(info);
 			msg->FindFloat("size", &info.font_size);
 			settings->Set(info);
-			Update();
+
+			fRevertButton->SetEnabled(true);
+			fDefaultsButton->SetEnabled(settings->IsDefaultable());
+			fMenuBar->Update();
 			break;
 
 		case ALLWAYS_TRIGGERS_MSG:
-			fRevert = true;
 			settings->Get(info);
 			info.triggers_always_shown = !info.triggers_always_shown;
 			settings->Set(info);
+
+			fRevertButton->SetEnabled(true);
+			fDefaultsButton->SetEnabled(settings->IsDefaultable());
 			fMenuBar->UpdateMenu();
-			Update();
+			fMenuBar->Update();
 			break;
 
 		case CTL_MARKED_MSG:
-			fRevert = true;
 			// This might not be the same for all keyboards
 			set_modifier_key(B_LEFT_COMMAND_KEY, 0x5c);
 			set_modifier_key(B_RIGHT_COMMAND_KEY, 0x60);
 			set_modifier_key(B_LEFT_CONTROL_KEY, 0x5d);
 			set_modifier_key(B_RIGHT_OPTION_KEY, 0x5f);
 			be_roster->Broadcast(new BMessage(B_MODIFIERS_CHANGED));
-			Update();
+
+			fRevertButton->SetEnabled(true);
+			fDefaultsButton->SetEnabled(settings->IsDefaultable());
+			fMenuBar->Update();
 			break;
 
 		case ALT_MARKED_MSG:
-			fRevert = true;
+
 			// This might not be the same for all keyboards
 			set_modifier_key(B_LEFT_COMMAND_KEY, 0x5d);
 			set_modifier_key(B_RIGHT_COMMAND_KEY, 0x5f);
@@ -142,7 +152,10 @@ MenuWindow::MessageReceived(BMessage *msg)
 			set_modifier_key(B_RIGHT_OPTION_KEY, 0x60);
 
 			be_roster->Broadcast(new BMessage(B_MODIFIERS_CHANGED));
-			Update();
+
+			fRevertButton->SetEnabled(true);
+			fDefaultsButton->SetEnabled(settings->IsDefaultable());
+			fMenuBar->Update();
 			break;
 
 		case COLOR_SCHEME_OPEN_MSG:
@@ -158,8 +171,9 @@ MenuWindow::MessageReceived(BMessage *msg)
 			break;
 
 		case MENU_COLOR:
-			fRevert = true;
-			Update();
+			fRevertButton->SetEnabled(true);
+			fDefaultsButton->SetEnabled(settings->IsDefaultable());
+			fMenuBar->Update();
 			break;
 
 		default:
@@ -178,15 +192,5 @@ MenuWindow::QuitRequested()
 	}
 
 	return true;
-}
-
-
-void
-MenuWindow::Update()
-{
-	fRevertButton->SetEnabled(fRevert);
-
-	// alert the rest of the application to update	
-	fMenuBar->Update();
 }
 

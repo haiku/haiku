@@ -88,6 +88,7 @@ TrackerSettingsWindow::TrackerSettingsWindow()
 	fDefaultsButton = new BButton(rect, "Defaults", "Defaults",
 		new BMessage(kDefaultsButtonPressed), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	fDefaultsButton->ResizeToPreferred();
+	fDefaultsButton->SetEnabled(false);
 	fDefaultsButton->MoveBy(0, -fDefaultsButton->Bounds().Height());
 	topView->AddChild(fDefaultsButton);
 
@@ -240,13 +241,16 @@ TrackerSettingsWindow::_HandleChangedContents()
 {
 	int32 itemCount = fSettingsTypeListView->CountItems();
 
+	bool defaultable = false;
 	bool revertable = false;
 
 	for (int32 i = 0; i < itemCount; i++) {
+		defaultable |= _ViewAt(i)->IsDefaultable();
 		revertable |= _ViewAt(i)->IsRevertable();
 	}
 
-	fSettingsTypeListView->Invalidate();	
+	fSettingsTypeListView->Invalidate();
+	fDefaultsButton->SetEnabled(defaultable);
 	fRevertButton->SetEnabled(revertable);
 
 	TrackerSettings().SaveSettings(false);
@@ -258,8 +262,10 @@ TrackerSettingsWindow::_HandlePressedDefaultsButton()
 {
 	int32 itemCount = fSettingsTypeListView->CountItems();
 	
-	for (int32 i = 0; i < itemCount; i++)
-		_ViewAt(i)->SetDefaults();
+	for (int32 i = 0; i < itemCount; i++) {
+		if (_ViewAt(i)->IsDefaultable())
+			_ViewAt(i)->SetDefaults();
+	}
 
 	_HandleChangedContents();
 }

@@ -32,6 +32,7 @@ class ColorSet : public BLocker {
 		bool		ConvertFromMessage(const BMessage *msg);
 
 		void		SetToDefaults(void);
+		bool		IsDefaultable(void);
 
 		rgb_color 	StringToColor(const char *string);
 		rgb_color	AttributeToColor(int32 which);

@@ -26,6 +26,15 @@ set_rgb_color(rgb_color& color, uint8 red, uint8 green, uint8 blue)
 }
 
 
+static bool
+match_rgb_color(rgb_color& color, uint8 red, uint8 green, uint8 blue)
+{
+	return color.red == red
+		&& color.green == green
+		&& color.blue == blue;
+}
+
+
 //	#pragma mark -
 
 
@@ -170,6 +179,40 @@ printf("Initializing color settings to defaults\n");
 	set_rgb_color(window_tab_text, 0, 0, 0);
 	set_rgb_color(inactive_window_tab, 232, 232, 232);
 	set_rgb_color(inactive_window_tab_text, 80, 80, 80);
+}
+
+/*!
+	\brief Checks if the ColorSet can be set to defaults.
+*/
+bool
+ColorSet::IsDefaultable()
+{
+	// TODO: Move all the default color values into constants
+	return !match_rgb_color(panel_background, 216, 216, 216)
+		|| !match_rgb_color(panel_text, 0, 0, 0)
+		|| !match_rgb_color(document_background, 255, 255, 255)
+		|| !match_rgb_color(document_text, 0, 0, 0)
+		|| !match_rgb_color(control_background, 245, 245, 245)
+		|| !match_rgb_color(control_text, 0, 0, 0)
+		|| !match_rgb_color(control_border, 0, 0, 0)
+		|| !match_rgb_color(control_highlight, 102, 152, 203)
+		|| !match_rgb_color(keyboard_navigation_base, 0, 0, 229)
+		|| !match_rgb_color(keyboard_navigation_pulse, 0, 0, 0)
+		|| !match_rgb_color(shine, 255, 255, 255)
+		|| !match_rgb_color(shadow, 0, 0, 0)
+		|| !match_rgb_color(menu_background, 216, 216, 216)
+		|| !match_rgb_color(menu_selected_background, 115, 120, 184)
+		|| !match_rgb_color(menu_text, 0, 0, 0)
+		|| !match_rgb_color(menu_selected_text, 255, 255, 255)
+		|| !match_rgb_color(menu_selected_border, 0, 0, 0)
+		|| !match_rgb_color(tooltip_background, 255, 255, 0)
+		|| !match_rgb_color(tooltip_text, 0, 0, 0)
+		|| !match_rgb_color(success, 0, 255, 0)
+		|| !match_rgb_color(failure, 255, 0, 0)
+		|| !match_rgb_color(window_tab, 255, 203, 0)
+		|| !match_rgb_color(window_tab_text, 0, 0, 0)
+		|| !match_rgb_color(inactive_window_tab, 232, 232, 232)
+		|| !match_rgb_color(inactive_window_tab_text, 80, 80, 80);
 }
 
 /*!

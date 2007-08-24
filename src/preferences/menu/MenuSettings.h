@@ -21,6 +21,7 @@ class MenuSettings {
 
 		void Revert();
 		void ResetToDefaults();
+		bool IsDefaultable();
 
 	private:
 		MenuSettings();

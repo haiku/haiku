@@ -93,6 +93,19 @@ SettingsView::SetDefaults()
 
 
 /*!
+	This function is used by the window to tell whether
+	it can ghost the defaults button or not. It doesn't
+	shows the default settings, this function should
+	return true.
+*/
+bool
+SettingsView::IsDefaultable() const
+{
+	return true;
+}
+
+
+/*!
 	The inherited functions should set the values that was
 	active when the settings window opened. It should also
 	update the UI widgets accordingly, preferrable by calling
@@ -314,6 +327,19 @@ DesktopSettingsView::SetDefaults()
 
 	ShowCurrentSettings();
 	_SendNotices();
+}
+
+
+bool
+DesktopSettingsView::IsDefaultable() const
+{
+	TrackerSettings settings;
+
+	return settings.ShowDisksIcon() != false
+		|| settings.MountVolumesOntoDesktop() != true
+		|| settings.MountSharedVolumesOntoDesktop() != true
+		|| settings.IntegrateNonBootBeOSDesktops() != false
+		|| settings.EjectWhenUnmounting() != true;
 }
 
 
@@ -567,6 +593,19 @@ WindowsSettingsView::SetDefaults()
 	}
 
 	ShowCurrentSettings();
+}
+
+
+bool
+WindowsSettingsView::IsDefaultable() const
+{
+	TrackerSettings settings;
+
+	return settings.ShowFullPathInTitleBar() != false
+		|| settings.SingleWindowBrowse() != false
+		|| settings.ShowNavigator() != false
+		|| settings.TransparentSelection() != true
+		|| settings.SortFolderNamesFirst() != true;
 }
 
 
@@ -840,6 +879,17 @@ TimeFormatSettingsView::SetDefaults()
 
 	ShowCurrentSettings();
 	_SendNotices();
+}
+
+
+bool
+TimeFormatSettingsView::IsDefaultable() const
+{
+	TrackerSettings settings;
+
+	return settings.TimeFormatSeparator() != kSlashSeparator
+		|| settings.DateOrderFormat() != kMDYFormat
+		|| settings.ClockIs24Hr() != false;
 }
 
 
@@ -1146,6 +1196,18 @@ SpaceBarSettingsView::SetDefaults()
 }
 
 
+bool
+SpaceBarSettingsView::IsDefaultable() const
+{
+	TrackerSettings settings;
+
+	return settings.ShowVolumeSpaceBar() != false
+		|| settings.UsedSpaceColor() != Color(0, 203, 0, 192)
+		|| settings.FreeSpaceColor() != Color(255, 255, 255, 192)
+		|| settings.WarningSpaceColor() != Color(203, 0, 0, 192);
+}
+
+
 void
 SpaceBarSettingsView::Revert()
 {
@@ -1304,6 +1366,16 @@ TrashSettingsView::SetDefaults()
 
 	ShowCurrentSettings();
 	_SendNotices();
+}
+
+
+bool
+TrashSettingsView::IsDefaultable() const
+{
+	TrackerSettings settings;
+
+	return settings.DontMoveFilesToTrash() != false
+		|| settings.AskBeforeDeleteFile() != true;
 }
 
 
