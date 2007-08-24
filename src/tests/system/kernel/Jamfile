@@ -40,6 +40,11 @@ SimpleTest wait_test_2 : wait_test_2.cpp ;
 SimpleTest wait_test_3 : wait_test_3.cpp ;
 SimpleTest wait_test_4 : wait_test_4.cpp ;
 
+SetSupportedPlatformsForTarget sigint_bug113_test
+	: $(HAIKU_BEOS_COMPATIBLE_PLATFORMS) ;
+SimpleTest sigint_bug113_test : sigint_bug113_test.cpp ;
+
+
 SubInclude HAIKU_TOP src tests system kernel cache ;
 #SubInclude HAIKU_TOP src tests system kernel disk_device_manager ;
 SubInclude HAIKU_TOP src tests system kernel device_manager ;
