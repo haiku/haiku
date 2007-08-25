@@ -343,7 +343,6 @@ AboutView::AboutView(const BRect &rect)
 		"Philippe Houdoin\n"
 		"Waldemar Kornewald\n"
 		"Marcus Overhagen\n"
-		"Michael Pfeiffer\n"
 		"Ingo Weinhold\n"
 		"Jonathan Yoder\n"
 		"\n");
@@ -362,6 +361,7 @@ AboutView::AboutView(const BRect &rect)
 		"Waldemar Kornewald\n"
 		"Ryan Leavengood\n"
 		"Michael Lotz\n"
+		"Michael Pfeiffer\n"
 		"Niels Reedijk\n"
 		"François Revol\n"
 		"Hugo Santos\n"
