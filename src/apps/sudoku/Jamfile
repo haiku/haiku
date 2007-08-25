@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src apps sudoku ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+Application Sudoku :
+	ProgressWindow.cpp
+	Sudoku.cpp
+	SudokuField.cpp
+	SudokuGenerator.cpp
+	SudokuSolver.cpp
+	SudokuView.cpp
+	SudokuWindow.cpp
+
+	: be tracker
+	: Sudoku.rdef
+	;

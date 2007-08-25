@@ -30,6 +30,7 @@ SubInclude HAIKU_TOP src apps resedit ;
 SubInclude HAIKU_TOP src apps showimage ;
 SubInclude HAIKU_TOP src apps soundrecorder ;
 SubInclude HAIKU_TOP src apps stylededit ;
+SubInclude HAIKU_TOP src apps sudoku ;
 SubInclude HAIKU_TOP src apps terminal ;
 SubInclude HAIKU_TOP src apps tracker ;
 SubInclude HAIKU_TOP src apps tv ;
