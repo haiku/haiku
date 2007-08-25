@@ -27,7 +27,7 @@
 #include "PadView.h"
 
 // constructor
-MainWindow::MainWindow(const char* name, BRect frame)
+MainWindow::MainWindow(const char* name, BRect frame, bool addDefaultButtons)
 	: BWindow(frame, name,
 			  B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 			  B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
@@ -36,15 +36,19 @@ MainWindow::MainWindow(const char* name, BRect frame)
 	  fSettings(new BMessage('sett')),
 	  fPadView(new PadView("pad view")),
 	  fLastID(0),
-	  fNamePanelFrame(-1000.0, -1000.0, -900.0, -900.0),
+	  fNamePanelFrame(-1000.0, -1000.0, -800.0, -900.0),
 	  fAutoRaise(false),
 	  fShowOnAllWorkspaces(true)
 {
 	bool buttonsAdded = false;
 	if (load_settings(fSettings, "main_settings", "LaunchBox") >= B_OK)
 		buttonsAdded = LoadSettings(fSettings);
-	if (!buttonsAdded)
-		_AddDefaultButtons();
+	if (!buttonsAdded) {
+		if (addDefaultButtons)
+			_AddDefaultButtons();
+		else
+			_AddEmptyButtons();
+	}
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	AddChild(fPadView);
@@ -65,7 +69,7 @@ MainWindow::MainWindow(const char* name, BRect frame, BMessage* settings)
 	  fShowOnAllWorkspaces(true)
 {
 	if (!LoadSettings(settings))
-		_AddDefaultButtons();
+		_AddEmptyButtons();
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	AddChild(fPadView);
@@ -474,6 +478,7 @@ MainWindow::_AdjustLocation(BRect frame)
 	ResizeTo(frame.Width(), frame.Height());
 }
 
+// _AddDefaultButtons
 void
 MainWindow::_AddDefaultButtons()
 {
@@ -512,6 +517,23 @@ MainWindow::_AddDefaultButtons()
 		new BMessage(MSG_LAUNCH));
 	fPadView->AddButton(button);
 	button->SetTo("application/x-vnd.Haiku-Terminal", true);
+}
+
+// _AddEmptyButtons
+void
+MainWindow::_AddEmptyButtons()
+{
+	LaunchButton* button = new LaunchButton("launch button", fLastID++, NULL,
+		new BMessage(MSG_LAUNCH));
+	fPadView->AddButton(button);
+
+	button = new LaunchButton("launch button", fLastID++, NULL,
+		new BMessage(MSG_LAUNCH));
+	fPadView->AddButton(button);
+
+	button = new LaunchButton("launch button", fLastID++, NULL,
+		new BMessage(MSG_LAUNCH));
+	fPadView->AddButton(button);
 }
 
 

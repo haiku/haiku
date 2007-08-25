@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src apps launchbox ;
 
 AddSubDirSupportedPlatforms libbe_test ;
 
+UsePrivateHeaders shared ;
+
 Application LaunchBox :
 	App.cpp
 	IconButton.cpp
@@ -12,7 +14,7 @@ Application LaunchBox :
 	PadView.cpp
 	Panel.cpp
 	support.cpp
-	: be translation
+	: be translation libshared.a
 	: LaunchBox.rdef
 ;
 

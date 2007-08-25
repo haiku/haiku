@@ -6,9 +6,12 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
+
+#include "App.h"
+
 #include <stdio.h>
 
-#include <Alert.h>
+#include <AboutWindow.h>
 #include <Entry.h>
 #include <Message.h>
 #include <String.h>
@@ -17,7 +20,6 @@
 
 #include "MainWindow.h"
 
-#include "App.h"
 
 // constructor
 App::App()
@@ -73,7 +75,7 @@ App::ReadyToRun()
 	}
 	
 	if (!windowAdded) {
-		MainWindow* window = new MainWindow("Pad 1", frame);
+		MainWindow* window = new MainWindow("Pad 1", frame, true);
 		window->Show();
 	}
 }
@@ -85,11 +87,13 @@ App::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case MSG_ADD_WINDOW: {
 			BMessage* settings = new BMessage('sett');
-			message->FindMessage("window", settings);
+			bool wasCloned = message->FindMessage("window", settings) == B_OK;
 			BString name("Pad ");
 			name << CountWindows() + 1;
 			MainWindow* window = new MainWindow(name.String(),
-												BRect(50.0, 50.0, 65.0, 100.0), settings);
+				BRect(50.0, 50.0, 65.0, 100.0), settings);
+			if (wasCloned)
+				window->MoveBy(10, 10);
 			window->Show();
 			break;
 		}
@@ -103,8 +107,8 @@ App::MessageReceived(BMessage* message)
 void
 App::AboutRequested()
 {
-	(new BAlert("about", "LaunchBox by stippi\n\n"
-						 "for bonefish\n\n\n"
-						 "v1.1.0",
-						 "Neat", NULL, NULL))->Go(NULL);
+	const char* authors[2];
+	authors[0] = "Stephan Aßmus (aka stippi)";
+	authors[1] = NULL;
+	(new BAboutWindow("LaunchBox", 2004, authors))->Show();
 }

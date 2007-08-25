@@ -27,10 +27,10 @@ enum {
 
 class MainWindow : public BWindow {
  public:
-								MainWindow(const char* name,
-										   BRect frame); 
-								MainWindow(const char* name,
-										   BRect frame, BMessage* settings); 
+								MainWindow(const char* name, BRect frame,
+									bool addDefaultButtons = false); 
+								MainWindow(const char* name, BRect frame,
+									BMessage* settings); 
 	virtual						~MainWindow();
 
 	// BWindow interface
@@ -63,6 +63,7 @@ class MainWindow : public BWindow {
  			void				_GetLocation();
 			void				_AdjustLocation(BRect frame);
 			void				_AddDefaultButtons();
+			void				_AddEmptyButtons();
 
 	BMessage*					fSettings;
 	PadView*					fPadView;
