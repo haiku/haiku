@@ -191,8 +191,7 @@ class Painter {
 
 			BRect				InvertRect(		const BRect& r) const;
 
-	inline	BRect				ClipRect(const BRect& rect) const
-									{ return _Clipped(rect); }
+	inline	BRect				ClipRect(		BRect rect) const;
 
  private:
 			void				_Transform(BPoint* point,
@@ -279,6 +278,17 @@ mutable agg::conv_curve<agg::path_storage> fCurve;
 	// font file which it gets from ServerFont
 mutable AGGTextRenderer			fTextRenderer;
 };
+
+
+inline BRect
+Painter::ClipRect(BRect rect) const
+{
+	rect.left = floorf(rect.left);
+	rect.top = floorf(rect.top);
+	rect.right = ceilf(rect.right);
+	rect.bottom = ceilf(rect.bottom);
+	return _Clipped(rect);
+}
 
 
 #endif // PAINTER_H
