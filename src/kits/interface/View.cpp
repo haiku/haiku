@@ -3311,7 +3311,20 @@ BView::DrawPictureAsync(const char *filename, long offset, BPoint where)
 void
 BView::Invalidate(BRect invalRect)
 {
-	if (!invalRect.IsValid() || fOwner == NULL)
+	if (fOwner == NULL)
+		return;
+
+	// NOTE: This rounding of the invalid rect is to stay compatible with BeOS.
+	// On the server side, the invalid rect will be converted to a BRegion,
+	// which rounds in a different manner, so that it really includes the
+	// fractional coordinates of a BRect (ie ceilf(rect.right) &
+	// ceilf(rect.bottom)), which is also what BeOS does. So we have to do the
+	// different rounding here to stay compatible in both ways.
+	invalRect.left = (int)invalRect.left;
+	invalRect.top = (int)invalRect.top;
+	invalRect.right = (int)invalRect.right;
+	invalRect.bottom = (int)invalRect.bottom;
+	if (!invalRect.IsValid())
 		return;
 
 	check_lock();
