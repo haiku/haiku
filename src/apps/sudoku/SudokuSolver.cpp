@@ -31,7 +31,7 @@ private:
 	uint32			fY;
 };
 
-typedef vector<SolutionStep*> StepList;
+typedef std::vector<SolutionStep*> StepList;
 
 
 uint32

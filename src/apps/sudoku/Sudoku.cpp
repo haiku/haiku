@@ -71,7 +71,7 @@ Sudoku::AboutRequested()
 {
 	BAlert *alert = new BAlert("about", "Sudoku\n"
 		"\twritten by Axel Dörfler\n"
-		"\tCopyright 2007, pinc Software.\n", "Ok");
+		"\tCopyright 2007, Haiku Inc.\n", "Ok");
 	BTextView *view = alert->TextView();
 	BFont font;
 

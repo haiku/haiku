@@ -26,7 +26,7 @@ public:
 	SudokuField* SolutionAt(uint32 index);
 
 private:
-	typedef vector<SudokuField*> SudokuList;
+	typedef std::vector<SudokuField*> SudokuList;
 
 	SudokuField*	fField;
 	SudokuList		fSolutions;
