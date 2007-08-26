@@ -2,5 +2,5 @@ SubDir HAIKU_TOP src add-ons kernel busses scsi ahci ;
 
 KernelAddon ahci :
 	ahci.c
-	ahci_sim.c
+	ahci_sim.cpp
 	;

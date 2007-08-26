@@ -6,6 +6,7 @@
 #include "ahci_defs.h"
 
 #include <KernelExport.h>
+#include <string.h>
 
 #define TRACE(a...) dprintf("\33[34mahci:\33[30m " a)
 #define FLOW(a...)	dprintf("ahci: " a)
