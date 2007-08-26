@@ -11,7 +11,7 @@
 #include <block_io.h>
 
 
-#define TRACE(a...) dprintf("\33[35mahci:\33[30m " a)
+#define TRACE(a...) dprintf("\33[35mahci:\33[0m " a)
 #define FLOW(a...)	dprintf("ahci: " a)
 
 #define AHCI_ID_GENERATOR "ahci/id"

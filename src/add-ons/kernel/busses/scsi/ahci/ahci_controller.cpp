@@ -6,7 +6,7 @@
 
 #include <KernelExport.h>
 
-#define TRACE(a...) dprintf("\33[34mahci:\33[30m " a)
+#define TRACE(a...) dprintf("\33[34mahci:\33[0m " a)
 #define FLOW(a...)	dprintf("ahci: " a)
 
 // HACK! this device manager stuff just sucks!
