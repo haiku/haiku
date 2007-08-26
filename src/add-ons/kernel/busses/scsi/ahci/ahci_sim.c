@@ -22,9 +22,12 @@ scsi_for_sim_interface *gSCSI;
 static void
 ahci_scsi_io(scsi_sim_cookie cookie, scsi_ccb *request)
 {
-	TRACE("ahci_scsi_io, cookie %p\n", cookie);
+	TRACE("ahci_scsi_io, cookie %p, path_id %u, target_id %u, target_lun %u\n", 
+		cookie, request->path_id, request->target_id, request->target_lun);
 
-	request->subsys_status = SCSI_NO_HBA;
+	TRACE("ahci_scsi_io, opcode %u, length %u\n", request->cdb[0], request->cdb_length);
+
+	request->subsys_status = SCSI_REQ_CMP;
 	gSCSI->finished(request, 1);
 }
 
@@ -54,7 +57,7 @@ ahci_terminate_io(scsi_sim_cookie cookie, scsi_ccb *request)
 {
 	TRACE("ahci_terminate_io, cookie %p\n", cookie);
 
-	return SCSI_NO_HBA;
+	return SCSI_REQ_CMP;
 }
 
 
@@ -73,7 +76,7 @@ ahci_path_inquiry(scsi_sim_cookie cookie, scsi_path_inquiry *info)
 	// adapter command queue size
 	info->hba_queue_size = 1;
 
-	return SCSI_NO_HBA;
+	return SCSI_REQ_CMP;
 }
 
 
@@ -83,7 +86,7 @@ ahci_scan_bus(scsi_sim_cookie cookie)
 {
 	TRACE("ahci_scan_bus, cookie %p\n", cookie);
 
-	return SCSI_NO_HBA;
+	return SCSI_REQ_CMP;
 }
 
 
@@ -92,7 +95,7 @@ ahci_reset_bus(scsi_sim_cookie cookie)
 {
 	TRACE("ahci_reset_bus, cookie %p\n", cookie);
 
-	return SCSI_NO_HBA;
+	return SCSI_REQ_CMP;
 }
 
 
