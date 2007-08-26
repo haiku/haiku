@@ -413,7 +413,7 @@ typedef struct scsi_for_sim_interface {
 // controller name (required, string)
 #define SCSI_DESCRIPTION_CONTROLLER_NAME "controller_name"
 
-typedef struct scsi_sim_cookie *scsi_sim_cookie;
+typedef void * scsi_sim_cookie;
 
 // SIM interface
 // SCSI controller drivers must provide this interface
