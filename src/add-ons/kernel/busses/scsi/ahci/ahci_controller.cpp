@@ -53,6 +53,10 @@ AHCIController::ExecuteRequest(scsi_ccb *request)
 
 	TRACE("AHCIController::ExecuteRequest opcode %u, length %u\n", request->cdb[0], request->cdb_length);
 
+	request->subsys_status = SCSI_DEV_NOT_THERE;
+	fSCSI->finished(request, 1);
+	return;
+
 	request->subsys_status = SCSI_REQ_CMP;
 	fSCSI->finished(request, 1);
 }
