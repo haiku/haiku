@@ -1921,7 +1921,7 @@ fill_thread_info(struct thread *thread, thread_info *info, size_t size)
 		else
 			info->state = B_THREAD_WAITING;
 	} else
-		info->state = (enum thread_state)thread->state;
+		info->state = (thread_state)thread->state;
 
 	info->priority = thread->priority;
 	info->sem = thread->sem.blocking;
