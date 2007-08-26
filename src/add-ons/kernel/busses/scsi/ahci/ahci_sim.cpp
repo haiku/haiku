@@ -3,10 +3,11 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "ahci_defs.h"
+#include "ahci_controller.h"
 
 #include <KernelExport.h>
 #include <string.h>
+#include <new>
 
 #define TRACE(a...) dprintf("\33[34mahci:\33[30m " a)
 #define FLOW(a...)	dprintf("ahci: " a)
@@ -25,11 +26,7 @@ ahci_scsi_io(scsi_sim_cookie cookie, scsi_ccb *request)
 {
 	TRACE("ahci_scsi_io, cookie %p, path_id %u, target_id %u, target_lun %u\n", 
 		cookie, request->path_id, request->target_id, request->target_lun);
-
-	TRACE("ahci_scsi_io, opcode %u, length %u\n", request->cdb[0], request->cdb_length);
-
-	request->subsys_status = SCSI_REQ_CMP;
-	gSCSI->finished(request, 1);
+	static_cast<AHCIController *>(cookie)->ExecuteRequest(request);
 }
 
 
@@ -38,8 +35,7 @@ static uchar
 ahci_abort_io(scsi_sim_cookie cookie, scsi_ccb *request)
 {
 	TRACE("ahci_abort_io, cookie %p\n", cookie);
-
-	return SCSI_REQ_CMP;
+	return static_cast<AHCIController *>(cookie)->AbortRequest(request);
 }
 
 
@@ -47,8 +43,7 @@ static uchar
 ahci_reset_device(scsi_sim_cookie cookie, uchar targetID, uchar targetLUN)
 {
 	TRACE("ahci_reset_device, cookie %p\n", cookie);
-
-	return SCSI_REQ_CMP;
+	return static_cast<AHCIController *>(cookie)->ResetDevice(targetID, targetLUN);
 }
 
 
@@ -57,8 +52,7 @@ static uchar
 ahci_terminate_io(scsi_sim_cookie cookie, scsi_ccb *request)
 {
 	TRACE("ahci_terminate_io, cookie %p\n", cookie);
-
-	return SCSI_REQ_CMP;
+	return static_cast<AHCIController *>(cookie)->TerminateRequest(request);
 }
 
 
@@ -131,7 +125,10 @@ static status_t
 ahci_sim_init_bus(device_node_handle node, void *user_cookie, void **_cookie)
 {
 	TRACE("ahci_sim_init_bus, user_cookie %p\n", user_cookie);
-	*_cookie = (void *)0x1234;
+//	*_cookie = (void *)0x1234;
+	*_cookie = new(std::nothrow) AHCIController(node, gPCI, gSCSI);
+	if (!*_cookie)
+		return B_NO_MEMORY;
 	TRACE("cookie = %p\n", *_cookie);
 	return B_OK;
 }
@@ -141,6 +138,7 @@ static status_t
 ahci_sim_uninit_bus(void *cookie)
 {
 	TRACE("ahci_sim_uninit_bus, cookie %p\n", cookie);
+	delete static_cast<AHCIController *>(cookie);
 	return B_OK;
 }
 
