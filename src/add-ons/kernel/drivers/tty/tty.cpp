@@ -12,6 +12,7 @@
 #include <ctype.h>
 #include <signal.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <util/AutoLock.h>
 #include <util/kernel_cpp.h>
@@ -114,6 +115,7 @@ class WriterLocker : public AbstractLocker {
 
 	private:
 		size_t _CheckAvailableBytes() const;
+		status_t _CheckBackgroundWrite() const;
 
 		struct tty		*fSource;
 		struct tty		*fTarget;
@@ -130,6 +132,8 @@ class ReaderLocker : public AbstractLocker {
 		status_t AcquireReader(bool dontBlock);
 
 	private:
+	status_t _CheckBackgroundRead() const;
+
 		struct tty		*fTTY;
 		RequestOwner	fRequestOwner;
 };
@@ -581,6 +585,9 @@ WriterLocker::AcquireWriter(bool dontBlock, size_t bytesNeeded)
 		status = fRequestOwner.Error();
 	}
 
+	if (status == B_OK)
+		status = _CheckBackgroundWrite();
+
 	if (status == B_OK) {
 		if (fTarget->open_count > 0)
 			fBytes = _CheckAvailableBytes();
@@ -589,6 +596,25 @@ WriterLocker::AcquireWriter(bool dontBlock, size_t bytesNeeded)
 	}
 
 	return status;
+}
+
+
+status_t
+WriterLocker::_CheckBackgroundWrite() const
+{
+	// only relevant for the slave end and only when TOSTOP is set
+	if (fSource->is_master
+		|| (fSource->settings->termios.c_lflag & TOSTOP) == 0) {
+		return B_OK;
+	}
+
+	pid_t processGroup = getpgid(0);
+	if (processGroup != fSource->settings->pgrp_id) {
+		send_signal(-processGroup, SIGTTOU);
+		return EIO;
+	}
+
+	return B_OK;
 }
 
 
@@ -632,6 +658,10 @@ ReaderLocker::AcquireReader(bool dontBlock)
 	if (fCookie->closed)
 		return B_FILE_ERROR;
 
+	status_t status = _CheckBackgroundRead();
+	if (status != B_OK)
+		return status;
+
 	// check, if we're first in queue, and if there is something to read
 	if (fRequestOwner.IsFirstInQueues()) {
 		fBytes = line_buffer_readable(fTTY->input_buffer);
@@ -646,13 +676,33 @@ ReaderLocker::AcquireReader(bool dontBlock)
 
 	// block until something happens
 	Unlock();
-	status_t status = fRequestOwner.Wait(true);
+	status = fRequestOwner.Wait(true);
 	Lock();
+
+	if (status == B_OK)
+		status = _CheckBackgroundRead();
 
 	if (status == B_OK)
 		fBytes = line_buffer_readable(fTTY->input_buffer);
 
 	return status;
+}
+
+
+status_t
+ReaderLocker::_CheckBackgroundRead() const
+{
+	// only relevant for the slave end
+	if (fTTY->is_master)
+		return B_OK;
+
+	pid_t processGroup = getpgid(0);
+	if (processGroup != fTTY->settings->pgrp_id) {
+		send_signal(-processGroup, SIGTTIN);
+		return EIO;
+	}
+
+	return B_OK;
 }
 
 
@@ -752,8 +802,7 @@ tty_input_putc_locked(struct tty *tty, int c)
 		else if (c == tty->settings->termios.c_cc[VQUIT])
 			signal = SIGQUIT;
 		else if (c == tty->settings->termios.c_cc[VSUSP])
-			// ToDo: what to do here?
-			signal = -1;
+			signal = SIGTSTP;
 
 		// do we need to deliver a signal?
 		if (signal != -1) {
