@@ -116,6 +116,9 @@ ahci_register_device(device_node_handle parent)
 		// info about ourself and our consumer
 		{ B_DRIVER_MODULE, B_STRING_TYPE, { string: AHCI_DEVICE_MODULE_NAME }},
 
+		{ SCSI_DEVICE_MAX_TARGET_COUNT, B_UINT32_TYPE,
+			{ ui32: 33 }},
+
 		// DMA properties
 		// data must be word-aligned; 
 		{ B_BLOCK_DEVICE_DMA_ALIGNMENT, B_UINT32_TYPE,
