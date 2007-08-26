@@ -18,7 +18,6 @@
 #define AHCI_ID_ITEM "ahci/id"
 
 static device_manager_info *sDeviceManager;
-static pci_device *sPCIDevice;
 
 
 static status_t
@@ -110,6 +109,7 @@ static status_t
 ahci_register_device(device_node_handle parent)
 {
 	device_node_handle node;
+	pci_device *pciDevice;
 	status_t status;
 
 	device_attr attrs[] = {
@@ -139,7 +139,7 @@ ahci_register_device(device_node_handle parent)
 
 	// initialize parent (the bus) to get the PCI interface and device
 	status = sDeviceManager->init_driver(parent, NULL,
-			(driver_module_info **)&gPCI, (void **)&sPCIDevice);
+			(driver_module_info **)&gPCI, (void **)&pciDevice);
 	if (status != B_OK)
 		return status;
 
