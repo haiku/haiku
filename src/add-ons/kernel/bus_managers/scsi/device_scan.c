@@ -255,7 +255,7 @@ scsi_scan_bus(scsi_bus_info *bus)
 	// as this function is optional for SIM, we ignore its result
 	bus->interface->scan_bus(bus->sim_cookie);
 
-	for (target_id = 0; target_id <= 1/*MAX_TARGET_ID*/; ++target_id) {
+	for (target_id = 0; target_id < bus->max_target_count; ++target_id) {
 		int lun;
 
 		SHOW_FLOW(3, "target: %d", target_id);

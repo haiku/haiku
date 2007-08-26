@@ -285,6 +285,9 @@ typedef struct {
 // revision (string)
 #define SCSI_DEVICE_REVISION_ITEM "scsi/revision"
 
+// maximum targets on scsi bus
+#define SCSI_DEVICE_MAX_TARGET_COUNT "scsi/max_target_count"
+
 // directory containing links to peripheral drivers
 #define SCSI_PERIPHERAL_DRIVERS_DIR "scsi"
 

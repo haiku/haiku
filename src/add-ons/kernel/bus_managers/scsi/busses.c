@@ -99,6 +99,10 @@ scsi_create_bus(device_node_handle node, uint8 path_id)
 	memset(bus, 0, sizeof(*bus));
 
 	bus->path_id = path_id;
+
+	if (pnp->get_attr_uint32(node, SCSI_DEVICE_MAX_TARGET_COUNT, &bus->max_target_count, true) != B_OK)
+		bus->max_target_count = MAX_TARGET_ID + 1;
+
 	bus->node = node;
 	bus->lock_count = bus->blocked[0] = bus->blocked[1] = 0;
 	bus->sim_overflow = 0;

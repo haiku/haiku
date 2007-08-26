@@ -43,7 +43,7 @@
 
 
 #define MAX_PATH_ID 255
-#define MAX_TARGET_ID 31
+#define MAX_TARGET_ID 15
 #define MAX_LUN_ID 7
 
 
@@ -107,6 +107,7 @@ typedef struct scsi_bus_info {
 	bool sim_overflow;			// 1, if SIM refused req because of bus queue overflow
 	
 	uchar path_id;				// SCSI path id
+	uint32 max_target_count;	// maximum count of target_ids on the bus
 		
 	thread_id service_thread;	// service thread
 	sem_id start_service;		// released whenever service thread has work to do
