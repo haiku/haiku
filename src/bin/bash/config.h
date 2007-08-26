@@ -26,7 +26,9 @@
 
 /* Define JOB_CONTROL if your operating system supports
    BSD-like job control. */
-/* #undef JOB_CONTROL */
+#if __HAIKU__
+#define JOB_CONTROL 1
+#endif
 
 /* Define ALIAS if you want the alias features. */
 #define ALIAS 1

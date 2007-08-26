@@ -50,15 +50,26 @@ actions MkSignamesExt1
 
 MkSignamesExt <bash>signames.h ;
 
+# Haiku supports job control, BeOS doesn't.
+local jobControlSources ;
+if $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
+	jobControlSources = jobs.c ;
+} else {
+	jobControlSources = nojobs.c ;
+}
+
 BinCommand sh :
 	parse.y shell.c eval.c general.c make_cmd.c print_cmd.c
 	dispose_cmd.c execute_cmd.c variables.c version.c
 	expr.c copy_cmd.c flags.c subst.c hashcmd.c hashlib.c mailcheck.c
-	trap.c alias.c nojobs.c braces.c
+	trap.c alias.c braces.c
 	input.c bashhist.c array.c arrayfunc.c pathexp.c
 	unwind_prot.c bashline.c bracecomp.c error.c
 	list.c stringlib.c locale.c findcmd.c redir.c
 	pcomplete.c pcomplib.c syntax.c xmalloc.c test.c sig.c
+
+	$(jobControlSources)
+
 	: libreadline.a <bash>libglob.a libbuiltins.a libtilde.a libsh.a
 	  libtermcap.a $(TARGET_SELECT_UNAME_ETC_LIB)
 	: bash.rdef ;
