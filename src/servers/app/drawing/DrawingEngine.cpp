@@ -811,7 +811,7 @@ DrawingEngine::FillRect(BRect r)
 											  || cursorTouched);
 					doInSoftware = false;
 				} else if (fPainter->Pattern() == B_SOLID_LOW
-						   && fPainter->DrawingMode() == B_OP_COPY) {
+						&& fPainter->DrawingMode() == B_OP_COPY) {
 					BRegion region(r);
 					region.IntersectWith(fPainter->ClippingRegion());
 					fGraphicsCard->FillRegion(region, fPainter->LowColor(),
@@ -821,6 +821,16 @@ DrawingEngine::FillRect(BRect r)
 				}
 			}
 		}
+
+		if (doInSoftware && fAvailableHWAccleration & HW_ACC_INVERT_REGION
+				&& fPainter->Pattern() == B_SOLID_HIGH
+				&& fPainter->DrawingMode() == B_OP_INVERT) {
+			BRegion region(r);
+			region.IntersectWith(fPainter->ClippingRegion());
+			fGraphicsCard->InvertRegion(region);
+			doInSoftware = false;
+		}
+
 		if (doInSoftware) {
 			fPainter->FillRect(r);
 
@@ -854,7 +864,7 @@ DrawingEngine::FillRegion(BRegion& r)
 										  || cursorTouched);
 				doInSoftware = false;
 			} else if (fPainter->Pattern() == B_SOLID_LOW
-					   && fPainter->DrawingMode() == B_OP_COPY) {
+					&& fPainter->DrawingMode() == B_OP_COPY) {
 				r.IntersectWith(fPainter->ClippingRegion());
 				fGraphicsCard->FillRegion(r, fPainter->LowColor(),
 										  fSuspendSyncLevel == 0
@@ -864,8 +874,8 @@ DrawingEngine::FillRegion(BRegion& r)
 		}
 
 		if (doInSoftware && fAvailableHWAccleration & HW_ACC_INVERT_REGION
-				   && fPainter->Pattern() == B_SOLID_HIGH
-				   && fPainter->DrawingMode() == B_OP_INVERT) {
+				&& fPainter->Pattern() == B_SOLID_HIGH
+				&& fPainter->DrawingMode() == B_OP_INVERT) {
 			r.IntersectWith(fPainter->ClippingRegion());
 			fGraphicsCard->InvertRegion(r);
 			doInSoftware = false;
