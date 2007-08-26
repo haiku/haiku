@@ -33,12 +33,12 @@ KernelMergeObject kernel_core.o :
 	scheduler.cpp
 	sem.c
 	shutdown.c
-	signal.c
+	signal.cpp
 	system_info.c
 	smp.c
 	syscalls.c
-	team.c
-	thread.c
+	team.cpp
+	thread.cpp
 	timer.c
 
 	: $(TARGET_KERNEL_PIC_CCFLAGS)

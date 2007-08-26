@@ -65,7 +65,7 @@ spinlock thread_spinlock = 0;
 
 // thread list
 static struct thread sIdleThreads[B_MAX_CPU_COUNT];
-static void *sThreadHash = NULL;
+static hash_table *sThreadHash = NULL;
 static thread_id sNextThreadID = 1;
 
 // some arbitrary chosen limits - should probably depend on the available
@@ -143,8 +143,8 @@ remove_thread_from_team(struct team *team, struct thread *thread)
 static int
 thread_struct_compare(void *_t, const void *_key)
 {
-	struct thread *thread = _t;
-	const struct thread_key *key = _key;
+	struct thread *thread = (struct thread*)_t;
+	const struct thread_key *key = (const struct thread_key*)_key;
 
 	if (thread->id == key->id)
 		return 0;
@@ -156,8 +156,8 @@ thread_struct_compare(void *_t, const void *_key)
 static uint32
 thread_struct_hash(void *_t, const void *_key, uint32 range)
 {
-	struct thread *thread = _t;
-	const struct thread_key *key = _key;
+	struct thread *thread = (struct thread*)_t;
+	const struct thread_key *key = (const struct thread_key*)_key;
 
 	if (thread != NULL)
 		return thread->id % range;
@@ -347,7 +347,7 @@ static int
 _create_kernel_thread_kentry(void)
 {
 	struct thread *thread = thread_get_current_thread();
-	int (*func)(void *args) = (void *)thread->entry;
+	int (*func)(void *args) = (int (*)(void *))thread->entry;
 
 	// call the entry function with the appropriate args
 	return func(thread->args1);
@@ -663,7 +663,7 @@ make_thread_unreal(int argc, char **argv)
 
 	hash_open(sThreadHash, &i);
 
-	while ((thread = hash_next(sThreadHash, &i)) != NULL) {
+	while ((thread = (struct thread*)hash_next(sThreadHash, &i)) != NULL) {
 		if (id != -1 && thread->id != id)
 			continue;
 
@@ -704,7 +704,7 @@ set_thread_prio(int argc, char **argv)
 
 	hash_open(sThreadHash, &i);
 
-	while ((thread = hash_next(sThreadHash, &i)) != NULL) {
+	while ((thread = (struct thread*)hash_next(sThreadHash, &i)) != NULL) {
 		if (thread->id != id)
 			continue;
 		thread->priority = thread->next_priority = prio;
@@ -738,7 +738,7 @@ make_thread_suspended(int argc, char **argv)
 
 	hash_open(sThreadHash, &i);
 
-	while ((thread = hash_next(sThreadHash, &i)) != NULL) {
+	while ((thread = (struct thread*)hash_next(sThreadHash, &i)) != NULL) {
 		if (thread->id != id)
 			continue;
 
@@ -772,7 +772,7 @@ make_thread_resumed(int argc, char **argv)
 
 	hash_open(sThreadHash, &i);
 
-	while ((thread = hash_next(sThreadHash, &i)) != NULL) {
+	while ((thread = (struct thread*)hash_next(sThreadHash, &i)) != NULL) {
 		if (thread->id != id)
 			continue;
 
@@ -881,7 +881,8 @@ _dump_thread_info(struct thread *thread)
 	kprintf("  exit.reason:      0x%x\n", thread->exit.reason);
 	kprintf("  exit.signal:      0x%x\n", thread->exit.signal);
 	kprintf("  exit.waiters:\n");
-	while ((death = list_get_next_item(&thread->exit.waiters, death)) != NULL) {
+	while ((death = (struct death_entry*)list_get_next_item(
+			&thread->exit.waiters, death)) != NULL) {
 		kprintf("\t%p (group 0x%lx, thread 0x%lx)\n", death, death->group_id, death->thread);
 	}
 
@@ -930,7 +931,7 @@ dump_thread_info(int argc, char **argv)
 
 	// walk through the thread list, trying to match name or id
 	hash_open(sThreadHash, &i);
-	while ((thread = hash_next(sThreadHash, &i)) != NULL) {
+	while ((thread = (struct thread*)hash_next(sThreadHash, &i)) != NULL) {
 		if ((name != NULL && !strcmp(name, thread->name)) || thread->id == id) {
 			_dump_thread_info(thread);
 			found = true;
@@ -979,7 +980,7 @@ dump_thread_list(int argc, char **argv)
 		"name\n");
 
 	hash_open(sThreadHash, &i);
-	while ((thread = hash_next(sThreadHash, &i)) != NULL) {
+	while ((thread = (struct thread*)hash_next(sThreadHash, &i)) != NULL) {
 		// filter out threads not matching the search criteria
 		if ((requiredState && thread->state != requiredState)
 			|| (sem > 0 && thread->sem.blocking != sem)
@@ -1156,7 +1157,8 @@ thread_exit(void)
 
 				list_add_link_to_tail(&parent->dead_children.list, death);
 				if (++parent->dead_children.count > MAX_DEAD_CHILDREN) {
-					death = list_remove_head_item(&parent->dead_children.list);
+					death = (struct death_entry*)list_remove_head_item(
+						&parent->dead_children.list);
 					parent->dead_children.count--;
 				} else
 					death = NULL;
@@ -1244,8 +1246,8 @@ thread_exit(void)
 
 		// fill all death entries
 		death = NULL;
-		while ((death = list_get_next_item(&thread->exit.waiters,
-				death)) != NULL) {
+		while ((death = (struct death_entry*)list_get_next_item(
+				&thread->exit.waiters, death)) != NULL) {
 			death->status = thread->exit.status;
 			death->reason = thread->exit.reason;
 			death->signal = thread->exit.signal;
@@ -1308,7 +1310,7 @@ thread_get_thread_struct_locked(thread_id id)
 
 	key.id = id;
 
-	return hash_lookup(sThreadHash, &key);
+	return (struct thread*)hash_lookup(sThreadHash, &key);
 }
 
 
@@ -1858,7 +1860,7 @@ receive_data_etc(thread_id *_sender, void *buffer, size_t bufferSize,
 	}
 
 	if (buffer != NULL && bufferSize != 0) {
-		size = min(bufferSize, thread->msg.size);
+		size = min_c(bufferSize, thread->msg.size);
 		status = cbuf_user_memcpy_from_chain(buffer, thread->msg.buffer,
 			0, size);
 		if (status < B_OK) {
@@ -1919,7 +1921,7 @@ fill_thread_info(struct thread *thread, thread_info *info, size_t size)
 		else
 			info->state = B_THREAD_WAITING;
 	} else
-		info->state = thread->state;
+		info->state = (enum thread_state)thread->state;
 
 	info->priority = thread->priority;
 	info->sem = thread->sem.blocking;
@@ -2026,7 +2028,8 @@ find_thread(const char *name)
 	//		cheap either - although this function is probably used very rarely.
 
 	hash_open(sThreadHash, &iterator);
-	while ((thread = hash_next(sThreadHash, &iterator)) != NULL) {
+	while ((thread = (struct thread*)hash_next(sThreadHash, &iterator))
+			!= NULL) {
 		// Search through hash
 		if (thread->name != NULL && !strcmp(thread->name, name)) {
 			thread_id id = thread->id;

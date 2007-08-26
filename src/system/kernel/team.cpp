@@ -65,8 +65,8 @@ struct fork_arg {
 };
 
 
-static void *sTeamHash = NULL;
-static void *sGroupHash = NULL;
+static hash_table *sTeamHash = NULL;
+static hash_table *sGroupHash = NULL;
 static struct team *sKernelTeam = NULL;
 
 // some arbitrary chosen limits - should probably depend on the available
@@ -130,7 +130,7 @@ dump_team_info(int argc, char **argv)
 
 	// walk through the thread list, trying to match name or id
 	hash_open(sTeamHash, &iterator);
-	while ((team = hash_next(sTeamHash, &iterator)) != NULL) {
+	while ((team = (struct team*)hash_next(sTeamHash, &iterator)) != NULL) {
 		if ((team->name && strcmp(argv[1], team->name) == 0) || team->id == id) {
 			_dump_team_info(team);
 			found = true;
@@ -154,7 +154,7 @@ dump_teams(int argc, char **argv)
 	kprintf("team          id  parent      name\n");
 	hash_open(sTeamHash, &iterator);
 
-	while ((team = hash_next(sTeamHash, &iterator)) != NULL) {
+	while ((team = (struct team*)hash_next(sTeamHash, &iterator)) != NULL) {
 		kprintf("%p%6lx  %p  %s\n", team, team->id, team->parent, team->name);
 	}
 
@@ -301,8 +301,8 @@ copy_strings_array(char * const *strings, int32 count, char ***_strings,
 static int
 team_struct_compare(void *_p, const void *_key)
 {
-	struct team *p = _p;
-	const struct team_key *key = _key;
+	struct team *p = (struct team*)_p;
+	const struct team_key *key = (const struct team_key*)_key;
 
 	if (p->id == key->id)
 		return 0;
@@ -314,8 +314,8 @@ team_struct_compare(void *_p, const void *_key)
 static uint32
 team_struct_hash(void *_p, const void *_key, uint32 range)
 {
-	struct team *p = _p;
-	const struct team_key *key = _key;
+	struct team *p = (struct team*)_p;
+	const struct team_key *key = (const struct team_key*)_key;
 
 	if (p != NULL)
 		return p->id % range;
@@ -327,8 +327,8 @@ team_struct_hash(void *_p, const void *_key, uint32 range)
 static int
 process_group_compare(void *_group, const void *_key)
 {
-	struct process_group *group = _group;
-	const struct team_key *key = _key;
+	struct process_group *group = (struct process_group*)_group;
+	const struct team_key *key = (const struct team_key*)_key;
 
 	if (group->id == key->id)
 		return 0;
@@ -340,8 +340,8 @@ process_group_compare(void *_group, const void *_key)
 static uint32
 process_group_hash(void *_group, const void *_key, uint32 range)
 {
-	struct process_group *group = _group;
-	const struct team_key *key = _key;
+	struct process_group *group = (struct process_group*)_group;
+	const struct team_key *key = (const struct team_key*)_key;
 
 	if (group != NULL)
 		return group->id % range;
@@ -596,8 +596,10 @@ delete_team_struct(struct team *team)
 
 	delete_sem(team->dead_children.sem);
 
-	while ((death = list_remove_head_item(&team->dead_children.list)) != NULL)
+	while ((death = (struct death_entry*)list_remove_head_item(
+			&team->dead_children.list)) != NULL) {
 		free(death);
+	}
 
 	free(team);
 }
@@ -668,7 +670,7 @@ team_create_thread_start(void *args)
 	status_t err;
 	struct thread *t;
 	struct team *team;
-	struct team_arg *teamArgs = args;
+	struct team_arg *teamArgs = (struct team_arg*)args;
 	const char *path;
 	addr_t entry;
 	char ustack_name[128];
@@ -1477,7 +1479,8 @@ team_get_death_entry(struct team *team, thread_id child, struct death_entry *dea
 		child = -team->group_id;
 	}
 
-	while ((entry = list_get_next_item(&team->dead_children.list, entry)) != NULL) {
+	while ((entry = (struct death_entry*)list_get_next_item(
+			&team->dead_children.list, entry)) != NULL) {
 		if (child != -1 && entry->thread != child && entry->group_id != -child)
 			continue;
 
@@ -1530,7 +1533,7 @@ team_get_team_struct_locked(team_id id)
 	struct team_key key;
 	key.id = id;
 
-	return hash_lookup(sTeamHash, &key);
+	return (struct team*)hash_lookup(sTeamHash, &key);
 }
 
 
@@ -1699,7 +1702,8 @@ team_delete_team(struct team *team)
 		// we're not reachable from anyone anymore at this point, so we
 		// can safely access the list without any locking
 		struct team_watcher *watcher;
-		while ((watcher = list_remove_head_item(&team->watcher_list)) != NULL) {
+		while ((watcher = (struct team_watcher*)list_remove_head_item(
+				&team->watcher_list)) != NULL) {
 			watcher->hook(teamID, watcher->data);
 			free(watcher);
 		}
@@ -1793,7 +1797,7 @@ start_watching_team(team_id teamID, void (*hook)(team_id, void *), void *data)
 	if (hook == NULL || teamID < B_OK)
 		return B_BAD_VALUE;
 
-	watcher = malloc(sizeof(struct team_watcher));
+	watcher = (struct team_watcher*)malloc(sizeof(struct team_watcher));
 	if (watcher == NULL)
 		return B_NO_MEMORY;
 
@@ -1839,7 +1843,8 @@ stop_watching_team(team_id teamID, void (*hook)(team_id, void *), void *data)
 	team = team_get_team_struct_locked(teamID);
 	if (team != NULL) {
 		// search for watcher
-		while ((watcher = list_get_next_item(&team->watcher_list, watcher)) != NULL) {
+		while ((watcher = (struct team_watcher*)list_get_next_item(
+				&team->watcher_list, watcher)) != NULL) {
 			if (watcher->hook == hook && watcher->data == data) {
 				// got it!
 				list_remove_item(&team->watcher_list, watcher);
