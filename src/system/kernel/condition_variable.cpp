@@ -11,6 +11,7 @@
 
 #include <debug.h>
 #include <kscheduler.h>
+#include <ksignal.h>
 #include <int.h>
 #include <thread.h>
 #include <util/AutoLock.h>
@@ -89,18 +90,29 @@ dump_condition_variable(int argc, char** argv)
 
 
 bool
-PrivateConditionVariableEntry::Add(const void* object)
+PrivateConditionVariableEntry::Add(const void* object,
+	PrivateConditionVariableEntry* threadNext)
 {
 	ASSERT(object != NULL);
 
 	fThread = thread_get_current_thread();
+	fFlags = 0;
 
 	InterruptsLocker _;
 	SpinLocker locker(sConditionVariablesLock);
 
+	// add to the list of entries for this thread
+	fThreadNext = threadNext;
+	if (threadNext) {
+		fThreadPrevious = threadNext->fThreadPrevious;
+		threadNext->fThreadPrevious = this;
+	} else
+		fThreadPrevious = NULL;
+
+	// add to the queue for the variable
 	fVariable = sConditionVariableHash.Lookup(object);
 	if (fVariable) {
-		fNext = fVariable->fEntries;
+		fVariableNext = fVariable->fEntries;
 		fVariable->fEntries = this;
 	}
 
@@ -109,7 +121,7 @@ PrivateConditionVariableEntry::Add(const void* object)
 
 
 void
-PrivateConditionVariableEntry::Wait()
+PrivateConditionVariableEntry::Wait(uint32 flags)
 {
 	if (!are_interrupts_enabled()) {
 		panic("wait_for_condition_variable_entry() called with interrupts "
@@ -120,26 +132,87 @@ PrivateConditionVariableEntry::Wait()
 	InterruptsLocker _;
 	SpinLocker locker(sConditionVariablesLock);
 
-	if (fVariable != NULL) {
-		struct thread* thread = thread_get_current_thread();
-		thread->next_state = B_THREAD_WAITING;
-		thread->condition_variable = fVariable;
-		thread->sem.blocking = -1;
+	// get first entry for this thread
+	PrivateConditionVariableEntry* firstEntry = this;
+	while (firstEntry->fThreadPrevious)
+		firstEntry = firstEntry->fThreadPrevious;
 
-		GRAB_THREAD_LOCK();
-		locker.Unlock();
-		scheduler_reschedule();
-		RELEASE_THREAD_LOCK();
+	// check whether any entry has already been notified
+	// (set the flags while at it)
+	PrivateConditionVariableEntry* entry = firstEntry;
+	while (entry) {
+		if (entry->fVariable == NULL)
+			return;
+
+		entry->fFlags = flags;
+
+		entry = entry->fThreadNext;
 	}
+
+	// all entries are unnotified -- wait
+	struct thread* thread = thread_get_current_thread();
+	thread->next_state = B_THREAD_WAITING;
+	thread->condition_variable_entry = firstEntry;
+	thread->sem.blocking = -1;
+
+	GRAB_THREAD_LOCK();
+	locker.Unlock();
+	scheduler_reschedule();
+	RELEASE_THREAD_LOCK();
 }
 
 
 void
-PrivateConditionVariableEntry::Wait(const void* object)
+PrivateConditionVariableEntry::Wait(const void* object, uint32 flags)
 {
-	if (Add(object))
-		Wait(object);
+	if (Add(object, NULL))
+		Wait(flags);
 }
+
+
+/*! Removes the entry from its variable.
+	Interrupts must be disabled, sConditionVariablesLock must be held.
+*/
+void
+PrivateConditionVariableEntry::_Remove()
+{
+	if (!fVariable)
+		return;
+
+	// fast path, if we're first in queue
+	if (this == fVariable->fEntries) {
+		fVariable->fEntries = fVariableNext;
+		fVariableNext = NULL;
+		return;
+	}
+
+	// we're not the first entry -- find our previous entry
+	PrivateConditionVariableEntry* entry = fVariable->fEntries;
+	while (entry->fVariableNext) {
+		if (this == entry->fVariableNext) {
+			entry->fVariableNext = fVariableNext;
+			fVariableNext = NULL;
+			return;
+		}
+
+		entry = entry->fVariableNext;
+	}
+}
+
+
+class PrivateConditionVariableEntry::Private {
+public:
+	inline Private(PrivateConditionVariableEntry& entry)
+		: fEntry(entry)
+	{
+	}
+
+	inline uint32 Flags() const	{ return fEntry.fFlags; }
+	inline void Remove() const	{ fEntry._Remove(); }
+
+private:
+	PrivateConditionVariableEntry&	fEntry;
+};
 
 
 // #pragma mark - PrivateConditionVariable
@@ -157,7 +230,7 @@ PrivateConditionVariable::ListAll()
 		PrivateConditionVariableEntry* entry = variable->fEntries;
 		while (entry) {
 			count++;
-			entry = entry->fNext;
+			entry = entry->fVariableNext;
 		}
 
 		kprintf("%p  %p  %-20s %15d\n", variable, variable->fObject,
@@ -175,7 +248,7 @@ PrivateConditionVariable::Dump()
 	PrivateConditionVariableEntry* entry = fEntries;
 	while (entry) {
 		kprintf(" %ld", entry->fThread->id);
-		entry = entry->fNext;
+		entry = entry->fVariableNext;
 	}
 	kprintf("\n");
 }
@@ -221,12 +294,12 @@ PrivateConditionVariable::Unpublish()
 	fObjectType = NULL;
 
 	if (fEntries)
-		_Notify();
+		_Notify(true);
 }
 
 
 void
-PrivateConditionVariable::Notify()
+PrivateConditionVariable::Notify(bool all)
 {
 	ASSERT(fObject != NULL);
 
@@ -242,169 +315,105 @@ PrivateConditionVariable::Notify()
 #endif
 
 	if (fEntries)
-		_Notify();
+		_Notify(all);
 }
 
 
 //! Called with interrupts disabled and the condition variable spinlock held.
 void
-PrivateConditionVariable::_Notify()
+PrivateConditionVariable::_Notify(bool all)
 {
 	// dequeue and wake up the blocked threads
 	GRAB_THREAD_LOCK();
 
 	while (PrivateConditionVariableEntry* entry = fEntries) {
-		fEntries = entry->fNext;
+		fEntries = entry->fVariableNext;
+		struct thread* thread = entry->fThread;
 
-		entry->fNext = NULL;
+		entry->fVariableNext = NULL;
 		entry->fVariable = NULL;
 
-		entry->fThread->condition_variable = NULL;
-		if (entry->fThread->state == B_THREAD_WAITING) {
-			entry->fThread->state = B_THREAD_READY;
-			scheduler_enqueue_in_run_queue(entry->fThread);
+		// remove other entries of this thread from their respective variables
+		PrivateConditionVariableEntry* otherEntry = entry->fThreadPrevious;
+		while (otherEntry) {
+			otherEntry->_Remove();
+			otherEntry = otherEntry->fThreadPrevious;
 		}
+
+		otherEntry = entry->fThreadNext;
+		while (otherEntry) {
+			otherEntry->_Remove();
+			otherEntry = otherEntry->fThreadNext;
+		}
+
+		// wake up the thread
+		thread->condition_variable_entry = NULL;
+		if (thread->state == B_THREAD_WAITING) {
+			thread->state = B_THREAD_READY;
+			scheduler_enqueue_in_run_queue(thread);
+		}
+
+		if (!all)
+			break;
 	}
 
 	RELEASE_THREAD_LOCK();
 }
 
 
-#if 0
+// #pragma mark -
 
-void
-publish_stack_condition_variable(condition_variable* variable,
-	const void* object, const char* objectType)
+
+/*!	Interrupts must be disabled, thread lock must be held. Note, that the thread
+	lock may temporarily be released.
+*/
+status_t
+condition_variable_interrupt_thread(struct thread* thread)
 {
-	ASSERT(variable != NULL);
-	ASSERT(object != NULL);
-
-	variable->object = object;
-	variable->object_type = objectType;
-	variable->entries = NULL;
-
-	InterruptsLocker _;
-	SpinLocker locker(sConditionVariablesLock);
-
-	ASSERT_PRINT(sConditionVariableHash.Lookup(object) == NULL,
-		"condition variable: %p\n", sConditionVariableHash.Lookup(object));
-
-	sConditionVariableHash.InsertUnchecked(variable);
-}
-
-
-void
-unpublish_condition_variable(const void* object)
-{
-	ASSERT(object != NULL);
-
-	InterruptsLocker _;
-	SpinLocker locker(sConditionVariablesLock);
-
-	condition_variable* variable = sConditionVariableHash.Lookup(object);
-	condition_variable_entry* entries = NULL;
-	if (variable) {
-		sConditionVariableHash.RemoveUnchecked(variable);
-		entries = variable->entries;
-		variable->object = NULL;
-		variable->object_type = NULL;
-		variable->entries = NULL;
-	} else {
-		panic("No condition variable for %p\n", object);
+	if (thread == NULL || thread->state != B_THREAD_WAITING
+		|| thread->condition_variable_entry == NULL) {
+		return B_BAD_VALUE;
 	}
 
-	if (entries)
-		notify_condition_variable_entries(entries);
-}
+	thread_id threadID = thread->id;
 
-
-void
-notify_condition_variable(const void* object)
-{
-	ASSERT(object != NULL);
-
-	InterruptsLocker _;
+	// We also need the condition variable spin lock, so, in order to respect
+	// the locking order, we must temporarily release the thread lock.
+	RELEASE_THREAD_LOCK();
 	SpinLocker locker(sConditionVariablesLock);
+	GRAB_THREAD_LOCK();
 
-	condition_variable* variable = sConditionVariableHash.Lookup(object);
-	condition_variable_entry* entries = NULL;
-	if (variable) {
-		entries = variable->entries;
-		variable->entries = NULL;
-	} else {
-		panic("No condition variable for %p\n", object);
+	// re-get the thread and do the checks again
+	thread = thread_get_thread_struct_locked(threadID);
+
+	if (thread != NULL || thread->state != B_THREAD_WAITING
+		|| thread->condition_variable_entry == NULL) {
+		return B_BAD_VALUE;
 	}
 
-	locker.Unlock();
+	PrivateConditionVariableEntry* entry = thread->condition_variable_entry;
+	uint32 flags = PrivateConditionVariableEntry::Private(*entry).Flags();
 
-	if (entries)
-		notify_condition_variable_entries(entries);
-}
-
-
-void
-wait_for_condition_variable(const void* object)
-{
-	condition_variable_entry entry;
-	if (add_condition_variable_entry(object, &entry))
-		wait_for_condition_variable_entry(&entry);
-}
-
-
-bool
-add_condition_variable_entry(const void* object,
-	condition_variable_entry* entry)
-{
-	ASSERT(object != NULL);
-	ASSERT(entry != NULL);
-
-	entry->thread = thread_get_current_thread();
-
-	InterruptsLocker _;
-	SpinLocker locker(sConditionVariablesLock);
-
-	condition_variable* variable = sConditionVariableHash.Lookup(object);
-	if (variable) {
-		entry->variable = variable;
-		entry->next = variable->entries;
-		variable->entries = entry;
-	} else
-		entry->variable = NULL;
-
-	return (variable != NULL);
-}
-
-
-void
-wait_for_condition_variable_entry(condition_variable_entry* entry)
-{
-	ASSERT(entry != NULL);
-
-	if (!are_interrupts_enabled()) {
-		panic("wait_for_condition_variable_entry() called with interrupts "
-			"disabled");
-		return;
+	// interruptable?
+	if ((flags & B_CAN_INTERRUPT) == 0
+		&& ((flags & B_KILL_CAN_INTERRUPT) == 0
+			|| (thread->sig_pending & KILL_SIGNALS) == 0)) {
+		return B_NOT_ALLOWED;
 	}
 
-	InterruptsLocker _;
-	SpinLocker locker(sConditionVariablesLock);
-
-	condition_variable* variable = entry->variable;
-	if (variable != NULL) {
-		struct thread* thread = thread_get_current_thread();
-		thread->next_state = B_THREAD_WAITING;
-		thread->condition_variable = variable;
-		thread->sem.blocking = -1;
+	// remove all of the thread's entries from their variables
+	while (entry) {
+		PrivateConditionVariableEntry::Private(*entry).Remove();
+		entry = entry->ThreadNext();
 	}
 
-	if (variable != NULL) {
-		GRAB_THREAD_LOCK();
-		locker.Unlock();
-		scheduler_reschedule();
-		RELEASE_THREAD_LOCK();
-	}
+	// wake up the thread
+	thread->condition_variable_entry = NULL;
+	thread->state = B_THREAD_READY;
+	scheduler_enqueue_in_run_queue(thread);
+
+	return B_OK;
 }
-#endif
 
 
 void

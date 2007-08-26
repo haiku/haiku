@@ -11,6 +11,7 @@
 
 #include <OS.h>
 
+#include <condition_variable.h>
 #include <cpu.h>
 #include <int.h>
 #include <kimage.h>
@@ -222,7 +223,7 @@ create_thread_struct(struct thread *inthread, const char *name,
 	thread->team = NULL;
 	thread->cpu = cpu;
 	thread->sem.blocking = -1;
-	thread->condition_variable = NULL;
+	thread->condition_variable_entry = NULL;
 	thread->fault_handler = 0;
 	thread->page_faults_allowed = 1;
 	thread->kernel_stack_area = -1;
@@ -871,7 +872,15 @@ _dump_thread_info(struct thread *thread)
 	kprintf("  sem.count:        0x%lx\n", thread->sem.count);
 	kprintf("  sem.acquire_status: 0x%lx\n", thread->sem.acquire_status);
 	kprintf("  sem.flags:        0x%lx\n", thread->sem.flags);
-	kprintf("condition variable: %p\n", thread->condition_variable);
+
+	kprintf("condition variables:");
+	PrivateConditionVariableEntry* entry = thread->condition_variable_entry;
+	while (entry != NULL) {
+		kprintf(" %p", entry->Variable());
+		entry = entry->ThreadNext();
+	}
+	kprintf("\n");
+
 	kprintf("fault_handler:      %p\n", (void *)thread->fault_handler);
 	kprintf("args:               %p %p\n", thread->args1, thread->args2);
 	kprintf("entry:              %p\n", (void *)thread->entry);
@@ -993,8 +1002,8 @@ dump_thread_list(int argc, char **argv)
 
 		// does it block on a semaphore or a condition variable?
 		if (thread->state == B_THREAD_WAITING) {
-			if (thread->condition_variable)
-				kprintf("%p  ", thread->condition_variable);
+			if (thread->condition_variable_entry)
+				kprintf("%p  ", thread->condition_variable_entry->Variable());
 			else
 				kprintf("%10lx  ", thread->sem.blocking);
 		} else

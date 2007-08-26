@@ -10,6 +10,7 @@
 #include <OS.h>
 #include <KernelExport.h>
 
+#include <condition_variable.h>
 #include <debug.h>
 #include <kernel.h>
 #include <kscheduler.h>
@@ -221,12 +222,26 @@ is_kill_signal_pending(void)
 }
 
 
-/**	Delivers the \a signal to the \a thread, but doesn't handle the signal -
- *	it just makes sure the thread gets the signal, ie. unblocks it if needed.
- *	This function must be called with interrupts disabled and the
- *	thread lock held.
- */
+/*!	Tries to interrupt a thread waiting for a semaphore or a condition variable.
+	Interrupts must be disabled, the thread lock be held. Note, that the thread
+	lock may temporarily be released.
+*/
+static status_t
+signal_interrupt_thread(struct thread* thread)
+{
+	if (thread->sem.blocking >= 0)
+		return sem_interrupt_thread(thread);
+	else if (thread->condition_variable_entry)
+		return condition_variable_interrupt_thread(thread);
+	return B_BAD_VALUE;
+}
 
+
+/*!	Delivers the \a signal to the \a thread, but doesn't handle the signal -
+	it just makes sure the thread gets the signal, ie. unblocks it if needed.
+	This function must be called with interrupts disabled and the
+	thread lock held.
+*/
 static status_t
 deliver_signal(struct thread *thread, uint signal, uint32 flags)
 {
@@ -260,7 +275,7 @@ deliver_signal(struct thread *thread, uint signal, uint32 flags)
 				mainThread->state = mainThread->next_state = B_THREAD_READY;
 				scheduler_enqueue_in_run_queue(mainThread);
 			} else if (mainThread->state == B_THREAD_WAITING)
-				sem_interrupt_thread(mainThread);
+				signal_interrupt_thread(mainThread);
 
 			// Supposed to fall through
 		}
@@ -270,7 +285,7 @@ deliver_signal(struct thread *thread, uint signal, uint32 flags)
 				thread->state = thread->next_state = B_THREAD_READY;
 				scheduler_enqueue_in_run_queue(thread);
 			} else if (thread->state == B_THREAD_WAITING)
-				sem_interrupt_thread(thread);
+				signal_interrupt_thread(thread);
 			break;
 
 		case SIGCONT:
@@ -289,7 +304,7 @@ deliver_signal(struct thread *thread, uint signal, uint32 flags)
 				& (~thread->sig_block_mask | SIGNAL_TO_MASK(SIGCHLD))) {
 				// Interrupt thread if it was waiting
 				if (thread->state == B_THREAD_WAITING)
-					sem_interrupt_thread(thread);
+					signal_interrupt_thread(thread);
 			}
 			break;
 	}

@@ -155,7 +155,7 @@ struct thread {
 		int32		flags;
 	} sem;
 
-	struct PrivateConditionVariable *condition_variable;
+	struct PrivateConditionVariableEntry *condition_variable_entry;
 
 	struct {
 		sem_id		write_sem;

@@ -15,22 +15,41 @@
 
 class PrivateConditionVariable;
 
-class PrivateConditionVariableEntry {
-protected:
-			bool				Add(const void* object);
-			void				Wait();
-			void				Wait(const void* object);
+
+struct PrivateConditionVariableEntry {
+public:
+	inline	PrivateConditionVariable* Variable() const
+		{ return fVariable; }
+
+	inline	PrivateConditionVariableEntry* ThreadNext() const
+		{ return fThreadNext; }
+
+	class Private;
 
 protected:
-			PrivateConditionVariableEntry* fNext;
+			bool				Add(const void* object,
+									PrivateConditionVariableEntry* threadNext);
+			void				Wait(uint32 flags);
+			void				Wait(const void* object, uint32 flags);
+
+private:
+			void				_Remove();
+
+protected:
+			PrivateConditionVariableEntry* fVariableNext;
 			PrivateConditionVariable* fVariable;
 			struct thread*		fThread;
+			uint32				fFlags;
+
+			PrivateConditionVariableEntry* fThreadPrevious;
+			PrivateConditionVariableEntry* fThreadNext;
 
 			friend class PrivateConditionVariable;
+			friend class Private;
 };
 
 
-struct PrivateConditionVariable
+class PrivateConditionVariable
 	: protected HashTableLink<PrivateConditionVariable> {
 public:
 	static	void				ListAll();
@@ -40,10 +59,10 @@ protected:
 			void				Publish(const void* object,
 									const char* objectType);
 			void				Unpublish();
-			void				Notify();
+			void				Notify(bool all);
 
 private:
-			void				_Notify();
+			void				_Notify(bool all);
 
 protected:
 			const void*			fObject;
@@ -62,16 +81,19 @@ public:
 									const char* objectType);
 
 	inline	void				Unpublish();
-	inline	void				Notify();
+	inline	void				NotifyOne();
+	inline	void				NotifyAll();
 };
 
 
 template<typename Type>
-class ConditionVariableEntry : private PrivateConditionVariableEntry {
+class ConditionVariableEntry : public PrivateConditionVariableEntry {
 public:
-	inline	bool				Add(const Type* object);
-	inline	void				Wait();
-	inline	void				Wait(const Type* object);
+	inline	bool				Add(const Type* object,
+									PrivateConditionVariableEntry* threadNext
+										= NULL);
+	inline	void				Wait(uint32 flags = 0);
+	inline	void				Wait(const Type* object, uint32 flags = 0);
 
 private:
 			bool				fAdded;
@@ -96,51 +118,51 @@ ConditionVariable<Type>::Unpublish()
 
 template<typename Type>
 inline void
-ConditionVariable<Type>::Notify()
+ConditionVariable<Type>::NotifyOne()
 {
-	PrivateConditionVariable::Notify();
+	PrivateConditionVariable::Notify(false);
+}
+
+
+template<typename Type>
+inline void
+ConditionVariable<Type>::NotifyAll()
+{
+	PrivateConditionVariable::Notify(true);
 }
 
 
 template<typename Type>
 inline bool
-ConditionVariableEntry<Type>::Add(const Type* object)
+ConditionVariableEntry<Type>::Add(const Type* object,
+	PrivateConditionVariableEntry* threadNext)
 {
-	return PrivateConditionVariableEntry::Add(object);
+	return PrivateConditionVariableEntry::Add(object, threadNext);
 }
 
 
 template<typename Type>
 inline void
-ConditionVariableEntry<Type>::Wait()
+ConditionVariableEntry<Type>::Wait(uint32 flags)
 {
-	PrivateConditionVariableEntry::Wait();
+	PrivateConditionVariableEntry::Wait(flags);
 }
 
 
 template<typename Type>
 inline void
-ConditionVariableEntry<Type>::Wait(const Type* object)
+ConditionVariableEntry<Type>::Wait(const Type* object, uint32 flags)
 {
-	PrivateConditionVariableEntry::Wait(object);
+	PrivateConditionVariableEntry::Wait(object, flags);
 }
 
-
-#if 0
-extern void publish_stack_condition_variable(condition_variable* variable,
-	const void* object, const char* objectType);
-extern void unpublish_condition_variable(const void* object);
-extern void notify_condition_variable(const void* object);
-
-extern void wait_for_condition_variable(const void* object);
-extern bool add_condition_variable_entry(const void* object,
-	condition_variable_entry* entry);
-extern void wait_for_condition_variable_entry(
-	condition_variable_entry* entry);
-#endif	// 0
 
 extern "C" {
 #endif	// __cplusplus
+
+struct thread;
+
+extern status_t condition_variable_interrupt_thread(struct thread* thread);
 
 extern void condition_variable_init();
 
