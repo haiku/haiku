@@ -9,28 +9,31 @@
 #define TRACE(a...) dprintf("\33[34mahci:\33[30m " a)
 #define FLOW(a...)	dprintf("ahci: " a)
 
+// HACK! this device manager stuff just sucks!
+pci_device pd;
 
-AHCIController::AHCIController(device_node_handle node, pci_device_module_info *pci, scsi_for_sim_interface * scsi)
+AHCIController::AHCIController(device_node_handle node, pci_device_module_info *pci, scsi_for_sim_interface *scsi)
  :	fNode(node)
  ,	fPCI(pci)
  ,	fSCSI(scsi)
+ ,	fPCIDevice(0)
  ,	fDevicePresentMask(0)
 {
+	// HACK! this device manager stuff just sucks!
+	fPCIDevice = pd;
 
 	fDevicePresentMask = (1 << 7) | (1 << 19);
 
-#if 0
 	uchar cap_ofs;
-	status_t res = fPCI->find_pci_capability(device, PCI_cap_id_sata, &cap_ofs);
+	status_t res = fPCI->find_pci_capability(fPCIDevice, PCI_cap_id_sata, &cap_ofs);
 	if (res == B_OK) {
 		uint32 satacr0;
 		uint32 satacr1;
 		TRACE("PCI SATA capability found at offset 0x%x\n", cap_ofs);
-		satacr0 = pci->read_pci_config(device, cap_ofs, 4);
-		satacr1 = pci->read_pci_config(device, cap_ofs + 4, 4);
-		TRACE("satacr0 = 0x%08x, satacr1 = 0x%08x\n", satacr0, satacr1);
+		satacr0 = fPCI->read_pci_config(fPCIDevice, cap_ofs, 4);
+		satacr1 = fPCI->read_pci_config(fPCIDevice, cap_ofs + 4, 4);
+		TRACE("satacr0 = 0x%08lx, satacr1 = 0x%08lx\n", satacr0, satacr1);
 	}
-#endif
 }
 
 

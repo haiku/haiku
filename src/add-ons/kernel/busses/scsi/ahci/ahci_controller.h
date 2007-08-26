@@ -28,7 +28,8 @@ private:
 private:
 	device_node_handle 			fNode;
 	pci_device_module_info *	fPCI;
-	scsi_for_sim_interface *	fSCSI;
+ 	scsi_for_sim_interface *	fSCSI;
+	pci_device					fPCIDevice;
 	uint32						fDevicePresentMask;
 };
 

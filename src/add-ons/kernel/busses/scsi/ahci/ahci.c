@@ -148,6 +148,10 @@ ahci_register_device(device_node_handle parent)
 	if (status < B_OK)
 		return status;
 
+	// HACK! this device manager stuff just sucks!
+	extern pci_device pd;
+	pd = *pciDevice;
+
 	// TODO: register SIM for every controller we find!
 	return register_sim(node);
 }
