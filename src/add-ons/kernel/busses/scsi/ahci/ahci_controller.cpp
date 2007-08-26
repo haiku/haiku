@@ -24,6 +24,11 @@ AHCIController::AHCIController(device_node_handle node, pci_device_module_info *
 
 	fDevicePresentMask = (1 << 7) | (1 << 19);
 
+	uint16 vendorID = fPCI->read_pci_config(fPCIDevice, PCI_vendor_id, 2);
+	uint16 deviceID = fPCI->read_pci_config(fPCIDevice, PCI_device_id, 2);
+
+	TRACE("AHCIController::AHCIController vendor %04x, device %04x\n", vendorID, deviceID);
+
 	uchar cap_ofs;
 	status_t res = fPCI->find_pci_capability(fPCIDevice, PCI_cap_id_sata, &cap_ofs);
 	if (res == B_OK) {
