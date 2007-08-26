@@ -22,7 +22,7 @@ scsi_for_sim_interface *gSCSI;
 static void
 ahci_scsi_io(scsi_sim_cookie cookie, scsi_ccb *request)
 {
-	TRACE("ahci_scsi_io()\n");
+	TRACE("ahci_scsi_io, cookie %p\n", cookie);
 
 	request->subsys_status = SCSI_NO_HBA;
 	gSCSI->finished(request, 1);
@@ -33,7 +33,7 @@ ahci_scsi_io(scsi_sim_cookie cookie, scsi_ccb *request)
 static uchar
 ahci_abort_io(scsi_sim_cookie cookie, scsi_ccb *request)
 {
-	TRACE("ahci_abort_io()\n");
+	TRACE("ahci_abort_io, cookie %p\n", cookie);
 
 	return SCSI_REQ_CMP;
 }
@@ -42,7 +42,7 @@ ahci_abort_io(scsi_sim_cookie cookie, scsi_ccb *request)
 static uchar
 ahci_reset_device(scsi_sim_cookie cookie, uchar targetID, uchar targetLUN)
 {
-	TRACE("ahci_reset_device()\n");
+	TRACE("ahci_reset_device, cookie %p\n", cookie);
 
 	return SCSI_REQ_CMP;
 }
@@ -52,7 +52,7 @@ ahci_reset_device(scsi_sim_cookie cookie, uchar targetID, uchar targetLUN)
 static uchar
 ahci_terminate_io(scsi_sim_cookie cookie, scsi_ccb *request)
 {
-	TRACE("ahci_terminate_io()\n");
+	TRACE("ahci_terminate_io, cookie %p\n", cookie);
 
 	return SCSI_NO_HBA;
 }
@@ -62,7 +62,16 @@ ahci_terminate_io(scsi_sim_cookie cookie, scsi_ccb *request)
 static uchar
 ahci_path_inquiry(scsi_sim_cookie cookie, scsi_path_inquiry *info)
 {
-	TRACE("ahci_path_inquiry()\n");
+	TRACE("ahci_path_inquiry, cookie %p\n", cookie);
+
+	memset(info, 0, sizeof(*info));
+	info->version_num = 1;
+	// supports tagged requests and soft reset
+	info->hba_inquiry = 0; // SCSI_PI_TAG_ABLE | SCSI_PI_SOFT_RST;
+	// controller is 32, devices are 0 to 31
+	info->initiator_id = 32;
+	// adapter command queue size
+	info->hba_queue_size = 1;
 
 	return SCSI_NO_HBA;
 }
@@ -72,7 +81,7 @@ ahci_path_inquiry(scsi_sim_cookie cookie, scsi_path_inquiry *info)
 static uchar
 ahci_scan_bus(scsi_sim_cookie cookie)
 {
-	TRACE("ahci_scan_bus()\n");
+	TRACE("ahci_scan_bus, cookie %p\n", cookie);
 
 	return SCSI_NO_HBA;
 }
@@ -81,7 +90,7 @@ ahci_scan_bus(scsi_sim_cookie cookie)
 static uchar
 ahci_reset_bus(scsi_sim_cookie cookie)
 {
-	TRACE("ahci_reset_bus()\n");
+	TRACE("ahci_reset_bus, cookie %p\n", cookie);
 
 	return SCSI_NO_HBA;
 }
@@ -94,7 +103,7 @@ static void
 ahci_get_restrictions(scsi_sim_cookie cookie, uchar targetID, bool *isATAPI,
 	bool *noAutoSense, uint32 *maxBlocks)
 {
-	TRACE("ahci_get_restrictions()\n");
+	TRACE("ahci_get_restrictions, cookie %p\n", cookie);
 
 	*isATAPI = false;
 	*noAutoSense = false;
@@ -106,7 +115,7 @@ static status_t
 ahci_ioctl(scsi_sim_cookie cookie, uint8 targetID, uint32 op, void *buffer,
 	size_t length)
 {
-	TRACE("ahci_ioctl()\n");
+	TRACE("ahci_ioctl, cookie %p\n", cookie);
 	return B_BAD_VALUE;
 }
 
@@ -117,7 +126,9 @@ ahci_ioctl(scsi_sim_cookie cookie, uint8 targetID, uint32 op, void *buffer,
 static status_t
 ahci_sim_init_bus(device_node_handle node, void *user_cookie, void **_cookie)
 {
-	TRACE("ahci_sim_init_bus\n");
+	TRACE("ahci_sim_init_bus, user_cookie %p\n", user_cookie);
+	*_cookie = (void *)0x1234;
+	TRACE("cookie = %p\n", *_cookie);
 	return B_OK;
 }
 
@@ -125,7 +136,7 @@ ahci_sim_init_bus(device_node_handle node, void *user_cookie, void **_cookie)
 static status_t
 ahci_sim_uninit_bus(void *cookie)
 {
-	TRACE("ahci_sim_uninit_bus\n");
+	TRACE("ahci_sim_uninit_bus, cookie %p\n", cookie);
 	return B_OK;
 }
 
@@ -133,7 +144,7 @@ ahci_sim_uninit_bus(void *cookie)
 static void
 ahci_sim_bus_removed(device_node_handle node, void *cookie)
 {
-	TRACE("ahci_sim_bus_removed\n");
+	TRACE("ahci_sim_bus_removed, cookie %p\n", cookie);
 }
 
 
