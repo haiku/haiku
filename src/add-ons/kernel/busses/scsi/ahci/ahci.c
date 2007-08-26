@@ -20,6 +20,10 @@
 static device_manager_info *sDeviceManager;
 
 
+// HACK! this device manager stuff just sucks!
+extern pci_device pd;
+
+
 static status_t
 register_sim(device_node_handle parent)
 {
@@ -149,7 +153,6 @@ ahci_register_device(device_node_handle parent)
 		return status;
 
 	// HACK! this device manager stuff just sucks!
-	extern pci_device pd;
 	pd = *pciDevice;
 
 	// TODO: register SIM for every controller we find!
