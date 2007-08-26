@@ -36,7 +36,7 @@
 #define CEOF ('D'&037)
 #endif
 #ifndef CSUSP
-#define CSUSP ('@'&037)
+#define CSUSP ('Z'&037)
 #endif
 #ifndef CQUIT
 #define CQUIT ('\\'&037)
@@ -419,7 +419,7 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 		tio.c_cc[VSWTCH] = CSWTCH;		/* '^@' */
 		tio.c_cc[VSTART] = CSTART;		/* '^S' */
 		tio.c_cc[VSTOP]  = CSTOP;		/* '^Q' */
-		tio.c_cc[VSUSP]  = CSUSP;		/* '^@' */
+		tio.c_cc[VSUSP]  = CSUSP;		/* '^Z' */
 
 		/*
 		 * change control tty. 
