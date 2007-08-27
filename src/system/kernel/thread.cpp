@@ -1164,11 +1164,11 @@ thread_exit(void)
 			if (death != NULL) {
 				// insert death entry into the parent's list
 
-				list_add_link_to_tail(&parent->dead_children.list, death);
-				if (++parent->dead_children.count > MAX_DEAD_CHILDREN) {
+				list_add_link_to_tail(&parent->dead_children->list, death);
+				if (++parent->dead_children->count > MAX_DEAD_CHILDREN) {
 					death = (struct death_entry*)list_remove_head_item(
-						&parent->dead_children.list);
-					parent->dead_children.count--;
+						&parent->dead_children->list);
+					parent->dead_children->count--;
 				} else
 					death = NULL;
 
@@ -1176,10 +1176,7 @@ thread_exit(void)
 
 				// notify listeners that a new death entry is available
 				// TODO: should that be moved to handle_signal() (for SIGCHLD)?
-				release_sem_etc(parent->dead_children.sem,
-					parent->dead_children.waiters, B_DO_NOT_RESCHEDULE);
-
-				parent->dead_children.waiters = 0;
+				parent->dead_children->condition_variable.NotifyOne();
 			} else
 				RELEASE_THREAD_LOCK();
 

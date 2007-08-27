@@ -82,6 +82,27 @@ struct team_watcher {
 #define MAX_DEAD_CHILDREN	32
 	// this is a soft limit for the number of dead entries in a team
 
+typedef struct team_dead_children team_dead_children;
+
+
+#ifdef __cplusplus
+
+#include <condition_variable.h>
+
+struct team_dead_children {
+	ConditionVariable<team_dead_children> condition_variable;
+									// wait for dead child entries
+	struct list	list;
+	uint32		count;
+	vint32		wait_for_any;	// count of wait_for_child() that wait for any
+								// child
+	bigtime_t	kernel_time;
+	bigtime_t	user_time;
+};
+
+#endif	// __cplusplus
+
+
 struct team {
 	struct team		*next;			// next in hash
 	struct team		*siblings_next;
@@ -99,15 +120,7 @@ struct team {
 	int				pending_signals;
 	void			*io_context;
 	sem_id			death_sem;		// semaphore to wait on for dying threads
-	struct {
-		sem_id		sem;			// wait for dead child entries
-		struct list	list;
-		uint32		count;
-		vint32		wait_for_any;	// count of wait_for_child() that wait for any child
-		int32		waiters;		// count of all threads waiting for dead children sem
-		bigtime_t	kernel_time;
-		bigtime_t	user_time;
-	} dead_children;
+	team_dead_children *dead_children;
 	struct vm_address_space *address_space;
 	struct thread	*main_thread;
 	struct thread	*thread_list;

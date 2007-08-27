@@ -8,7 +8,14 @@
 
 /* Team functions */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/wait.h>
+
 #include <OS.h>
+
+#include <AutoDeleter.h>
 
 #include <elf.h>
 #include <file_cache.h>
@@ -27,11 +34,6 @@
 #include <vm.h>
 #include <vm_address_space.h>
 #include <util/khash.h>
-
-#include <sys/wait.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 //#define TRACE_TEAM
 #ifdef TRACE_TEAM
@@ -543,6 +545,7 @@ create_team_struct(const char *name, bool kernel)
 	struct team *team = (struct team *)malloc(sizeof(struct team));
 	if (team == NULL)
 		return NULL;
+	MemoryDeleter teamDeleter(team);
 
 	team->next = team->siblings_next = team->children = team->parent = NULL;
 	team->id = allocate_thread_id();
@@ -561,31 +564,33 @@ create_team_struct(const char *name, bool kernel)
 	team->dead_threads_kernel_time = 0;
 	team->dead_threads_user_time = 0;
 
-	list_init(&team->dead_children.list);
-	team->dead_children.count = 0;
-	team->dead_children.wait_for_any = 0;
-	team->dead_children.waiters = 0;
-	team->dead_children.kernel_time = 0;
-	team->dead_children.user_time = 0;
-	team->dead_children.sem = create_sem(0, "dead children");
-	if (team->dead_children.sem < B_OK)
-		goto error1;
+	team->dead_children
+		= (team_dead_children*)malloc(sizeof(team_dead_children));
+	if (team->dead_children == NULL)
+		return NULL;
+	MemoryDeleter deadChildrenDeleter(team->dead_children);
+
+	list_init(&team->dead_children->list);
+	team->dead_children->count = 0;
+	team->dead_children->wait_for_any = 0;
+	team->dead_children->kernel_time = 0;
+	team->dead_children->user_time = 0;
+	team->dead_children->condition_variable.Publish(team->dead_children,
+		"dead children");
 
 	list_init(&team->image_list);
 	list_init(&team->watcher_list);
 
 	clear_team_debug_info(&team->debug_info, true);
 
-	if (arch_team_init_team_struct(team, kernel) < 0)
-		goto error2;
+	if (arch_team_init_team_struct(team, kernel) < 0) {
+		team->dead_children->condition_variable.Unpublish();
+		return NULL;
+	}
 
+	deadChildrenDeleter.Detach();
+	teamDeleter.Detach();
 	return team;
-
-error2:
-	delete_sem(team->dead_children.sem);
-error1:
-	free(team);
-	return NULL;
 }
 
 
@@ -594,13 +599,14 @@ delete_team_struct(struct team *team)
 {
 	struct death_entry *death;
 
-	delete_sem(team->dead_children.sem);
+	team->dead_children->condition_variable.Unpublish();
 
 	while ((death = (struct death_entry*)list_remove_head_item(
-			&team->dead_children.list)) != NULL) {
+			&team->dead_children->list)) != NULL) {
 		free(death);
 	}
 
+	free(team->dead_children);
 	free(team);
 }
 
@@ -1276,11 +1282,11 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 	}
 	if (child < 0) {
 		// we need to make sure the death entries won't get deleted too soon
-		atomic_add(&team->dead_children.wait_for_any, 1);
+		atomic_add(&team->dead_children->wait_for_any, 1);
 	}
 
 	while (true) {
-		sem_id waitSem = -1;
+		ConditionVariableEntry<team_dead_children> waitEntry;
 
 		cpu_status state = disable_interrupts();
 		GRAB_THREAD_LOCK();
@@ -1332,8 +1338,7 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 		if (status == B_WOULD_BLOCK && (flags & WNOHANG) == 0) {
 			// We need to hold the team lock when changing this counter,
 			// but of course only if we really will wait later
-			waitSem = team->dead_children.sem;
-			team->dead_children.waiters++;
+			waitEntry.Add(team->dead_children);
 		}
 
 		RELEASE_TEAM_LOCK();
@@ -1345,7 +1350,7 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 		if (status != B_WOULD_BLOCK || (flags & WNOHANG) != 0)
 			goto err;
 
-		status = acquire_sem_etc(waitSem, 1, B_CAN_INTERRUPT, 0);
+		status = waitEntry.Wait(B_CAN_INTERRUPT);
 		if (status == B_INTERRUPTED)
 			goto err;
 	}
@@ -1361,7 +1366,7 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 
 err:
 	if (child < 0)
-		atomic_add(&team->dead_children.wait_for_any, -1);
+		atomic_add(&team->dead_children->wait_for_any, -1);
 
 	return status;
 }
@@ -1480,7 +1485,7 @@ team_get_death_entry(struct team *team, thread_id child, struct death_entry *dea
 	}
 
 	while ((entry = (struct death_entry*)list_get_next_item(
-			&team->dead_children.list, entry)) != NULL) {
+			&team->dead_children->list, entry)) != NULL) {
 		if (child != -1 && entry->thread != child && entry->group_id != -child)
 			continue;
 
@@ -1489,10 +1494,10 @@ team_get_death_entry(struct team *team, thread_id child, struct death_entry *dea
 		*death = *entry;
 
 		// only remove the death entry if there aren't any other interested parties
-		if ((child < 0 && atomic_add(&team->dead_children.wait_for_any, -1) == 1)
-			|| (child > 0 && team->dead_children.wait_for_any == 0)) {
+		if ((child < 0 && atomic_add(&team->dead_children->wait_for_any, -1) == 1)
+			|| (child > 0 && team->dead_children->wait_for_any == 0)) {
 			list_remove_link(entry);
-			team->dead_children.count--;
+			team->dead_children->count--;
 			*_freeDeath = entry;
 		}
 
@@ -1588,10 +1593,10 @@ team_remove_team(struct team *team, struct process_group **_freeGroup)
 	struct team *parent = team->parent;
 
 	// remember how long this team lasted
-	parent->dead_children.kernel_time += team->dead_threads_kernel_time
-		+ team->dead_children.kernel_time;
-	parent->dead_children.user_time += team->dead_threads_user_time
-		+ team->dead_children.user_time;
+	parent->dead_children->kernel_time += team->dead_threads_kernel_time
+		+ team->dead_children->kernel_time;
+	parent->dead_children->user_time += team->dead_threads_user_time
+		+ team->dead_children->user_time;
 
 	hash_remove(sTeamHash, team);
 	sUsedTeams--;
@@ -2064,8 +2069,8 @@ _get_team_usage_info(team_id id, int32 who, team_usage_info *info, size_t size)
 				userTime += child->dead_threads_user_time;
 			}
 
-			kernelTime += team->dead_children.kernel_time;
-			userTime += team->dead_children.user_time;
+			kernelTime += team->dead_children->kernel_time;
+			userTime += team->dead_children->user_time;
 			break;
 		}
 	}
