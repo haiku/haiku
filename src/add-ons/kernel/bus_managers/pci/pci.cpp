@@ -16,6 +16,8 @@
 #include "pci_priv.h"
 #include "pci.h"
 
+#define TRACE_CAP(x...) dprintf(x)
+
 static PCI *sPCI;
 
 // #pragma mark bus manager exports
@@ -74,13 +76,13 @@ pci_find_capability(uchar bus, uchar device, uchar function, uchar cap_id, uchar
 	int i;
 
 	if (!offset) {
-		dprintf("find_pci_capability: ERROR %02x:%02x:%02x cap %02x offset NULL pointer\n", bus, device, function, cap_id);
+		TRACE_CAP("PCI: find_pci_capability ERROR %u:%u:%u capability %#02x offset NULL pointer\n", bus, device, function, cap_id);
 		return B_BAD_VALUE;
 	}
 
 	status = pci_read_config(bus, device, function, PCI_status, 2);
 	if (!(status & PCI_status_capabilities)) {
-		dprintf("find_pci_capability: ERROR %02x:%02x:%02x cap %02x not supported\n", bus, device, function, cap_id);
+		TRACE_CAP("PCI: find_pci_capability ERROR %u:%u:%u capability %#02x not supported\n", bus, device, function, cap_id);
 		return B_ERROR;
 	}
 
@@ -94,13 +96,13 @@ pci_find_capability(uchar bus, uchar device, uchar function, uchar cap_id, uchar
 			cap_ptr = pci_read_config(bus, device, function, PCI_capabilities_ptr_2, 1);
 			break;
 		default:
-			dprintf("find_pci_capability: ERROR %02x:%02x:%02x cap %02x unknown header type\n", bus, device, function, cap_id);
+			TRACE_CAP("PCI: find_pci_capability ERROR %u:%u:%u capability %#02x unknown header type\n", bus, device, function, cap_id);
 			return B_ERROR;
 	}
 
 	cap_ptr &= ~3;
 	if (!cap_ptr) {
-		dprintf("find_pci_capability: ERROR %02x:%02x:%02x cap %02x empty list\n", bus, device, function, cap_id);
+		TRACE_CAP("PCI: find_pci_capability ERROR %u:%u:%u capability %#02x empty list\n", bus, device, function, cap_id);
 		return B_NAME_NOT_FOUND;
 	}
 
@@ -118,7 +120,7 @@ pci_find_capability(uchar bus, uchar device, uchar function, uchar cap_id, uchar
 			return B_NAME_NOT_FOUND;
 	}
 
-	dprintf("find_pci_capability: ERROR %02x:%02x:%02x cap %02x circular list\n", bus, device, function, cap_id);
+	TRACE_CAP("PCI: find_pci_capability ERROR %u:%u:%u capability %#02x circular list\n", bus, device, function, cap_id);
 	return B_ERROR;
 }
 
