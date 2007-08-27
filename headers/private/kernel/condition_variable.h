@@ -29,8 +29,8 @@ public:
 protected:
 			bool				Add(const void* object,
 									PrivateConditionVariableEntry* threadNext);
-			void				Wait(uint32 flags);
-			void				Wait(const void* object, uint32 flags);
+			status_t			Wait(uint32 flags);
+			status_t			Wait(const void* object, uint32 flags);
 
 private:
 			void				_Remove();
@@ -40,6 +40,7 @@ protected:
 			PrivateConditionVariable* fVariable;
 			struct thread*		fThread;
 			uint32				fFlags;
+			status_t			fResult;
 
 			PrivateConditionVariableEntry* fThreadPrevious;
 			PrivateConditionVariableEntry* fThreadNext;
@@ -62,7 +63,7 @@ protected:
 			void				Notify(bool all);
 
 private:
-			void				_Notify(bool all);
+			void				_Notify(bool all, status_t result);
 
 protected:
 			const void*			fObject;
@@ -92,11 +93,8 @@ public:
 	inline	bool				Add(const Type* object,
 									PrivateConditionVariableEntry* threadNext
 										= NULL);
-	inline	void				Wait(uint32 flags = 0);
-	inline	void				Wait(const Type* object, uint32 flags = 0);
-
-private:
-			bool				fAdded;
+	inline	status_t			Wait(uint32 flags = 0);
+	inline	status_t			Wait(const Type* object, uint32 flags = 0);
 };
 
 
@@ -142,18 +140,18 @@ ConditionVariableEntry<Type>::Add(const Type* object,
 
 
 template<typename Type>
-inline void
+inline status_t
 ConditionVariableEntry<Type>::Wait(uint32 flags)
 {
-	PrivateConditionVariableEntry::Wait(flags);
+	return PrivateConditionVariableEntry::Wait(flags);
 }
 
 
 template<typename Type>
-inline void
+inline status_t
 ConditionVariableEntry<Type>::Wait(const Type* object, uint32 flags)
 {
-	PrivateConditionVariableEntry::Wait(object, flags);
+	return PrivateConditionVariableEntry::Wait(object, flags);
 }
 
 

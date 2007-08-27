@@ -97,6 +97,7 @@ PrivateConditionVariableEntry::Add(const void* object,
 
 	fThread = thread_get_current_thread();
 	fFlags = 0;
+	fResult = B_OK;
 
 	InterruptsLocker _;
 	SpinLocker locker(sConditionVariablesLock);
@@ -114,19 +115,20 @@ PrivateConditionVariableEntry::Add(const void* object,
 	if (fVariable) {
 		fVariableNext = fVariable->fEntries;
 		fVariable->fEntries = this;
-	}
+	} else
+		fResult = B_ENTRY_NOT_FOUND;
 
 	return (fVariable != NULL);
 }
 
 
-void
+status_t
 PrivateConditionVariableEntry::Wait(uint32 flags)
 {
 	if (!are_interrupts_enabled()) {
 		panic("wait_for_condition_variable_entry() called with interrupts "
 			"disabled");
-		return;
+		return B_ERROR;
 	}
 
 	InterruptsLocker _;
@@ -142,7 +144,7 @@ PrivateConditionVariableEntry::Wait(uint32 flags)
 	PrivateConditionVariableEntry* entry = firstEntry;
 	while (entry) {
 		if (entry->fVariable == NULL)
-			return;
+			return entry->fResult;
 
 		entry->fFlags = flags;
 
@@ -159,14 +161,17 @@ PrivateConditionVariableEntry::Wait(uint32 flags)
 	locker.Unlock();
 	scheduler_reschedule();
 	RELEASE_THREAD_LOCK();
+
+	return firstEntry->fResult;
 }
 
 
-void
+status_t
 PrivateConditionVariableEntry::Wait(const void* object, uint32 flags)
 {
 	if (Add(object, NULL))
-		Wait(flags);
+		return Wait(flags);
+	return B_ENTRY_NOT_FOUND;
 }
 
 
@@ -207,8 +212,9 @@ public:
 	{
 	}
 
-	inline uint32 Flags() const	{ return fEntry.fFlags; }
-	inline void Remove() const	{ fEntry._Remove(); }
+	inline uint32 Flags() const				{ return fEntry.fFlags; }
+	inline void Remove() const				{ fEntry._Remove(); }
+	inline void SetResult(status_t result)	{ fEntry.fResult = result; }
 
 private:
 	PrivateConditionVariableEntry&	fEntry;
@@ -294,7 +300,7 @@ PrivateConditionVariable::Unpublish()
 	fObjectType = NULL;
 
 	if (fEntries)
-		_Notify(true);
+		_Notify(true, B_ENTRY_NOT_FOUND);
 }
 
 
@@ -315,13 +321,13 @@ PrivateConditionVariable::Notify(bool all)
 #endif
 
 	if (fEntries)
-		_Notify(all);
+		_Notify(all, B_OK);
 }
 
 
 //! Called with interrupts disabled and the condition variable spinlock held.
 void
-PrivateConditionVariable::_Notify(bool all)
+PrivateConditionVariable::_Notify(bool all, status_t result)
 {
 	// dequeue and wake up the blocked threads
 	GRAB_THREAD_LOCK();
@@ -329,6 +335,9 @@ PrivateConditionVariable::_Notify(bool all)
 	while (PrivateConditionVariableEntry* entry = fEntries) {
 		fEntries = entry->fVariableNext;
 		struct thread* thread = entry->fThread;
+
+		if (thread->condition_variable_entry != NULL)
+			thread->condition_variable_entry->fResult = result;
 
 		entry->fVariableNext = NULL;
 		entry->fVariable = NULL;
@@ -400,6 +409,8 @@ condition_variable_interrupt_thread(struct thread* thread)
 			|| (thread->sig_pending & KILL_SIGNALS) == 0)) {
 		return B_NOT_ALLOWED;
 	}
+
+	PrivateConditionVariableEntry::Private(*entry).SetResult(B_INTERRUPTED);
 
 	// remove all of the thread's entries from their variables
 	while (entry) {
