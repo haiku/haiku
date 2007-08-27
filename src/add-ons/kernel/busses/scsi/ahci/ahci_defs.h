@@ -51,6 +51,7 @@ typedef struct {
 } ahci_hba;
 
 extern scsi_sim_interface gAHCISimInterface;
+extern device_manager_info *gDeviceManager;
 extern pci_device_module_info *gPCI;
 extern scsi_for_sim_interface *gSCSI;
 

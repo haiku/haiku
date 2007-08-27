@@ -17,17 +17,13 @@
 #define AHCI_ID_GENERATOR "ahci/id"
 #define AHCI_ID_ITEM "ahci/id"
 
-static device_manager_info *sDeviceManager;
-
-
-// HACK! this device manager stuff just sucks!
-extern pci_device pd;
+device_manager_info *gDeviceManager;
 
 
 static status_t
 register_sim(device_node_handle parent)
 {
-	int32 id = sDeviceManager->create_id(AHCI_ID_GENERATOR);
+	int32 id = gDeviceManager->create_id(AHCI_ID_GENERATOR);
 	if (id < 0)
 		return id;
 
@@ -50,10 +46,10 @@ register_sim(device_node_handle parent)
 		};
 
 		device_node_handle node;
-		status_t status = sDeviceManager->register_device(parent, attrs, NULL,
+		status_t status = gDeviceManager->register_device(parent, attrs, NULL,
 			&node);
 		if (status < B_OK)
-			sDeviceManager->free_id(AHCI_ID_GENERATOR, id);
+			gDeviceManager->free_id(AHCI_ID_GENERATOR, id);
 
 		return status;
 	}
@@ -73,17 +69,17 @@ ahci_supports_device(device_node_handle parent, bool *_noConnection)
 
 	TRACE("ahci_supports_device\n");
 
-	if (sDeviceManager->get_attr_string(parent, B_DRIVER_BUS, &bus,
+	if (gDeviceManager->get_attr_string(parent, B_DRIVER_BUS, &bus,
 				false) != B_OK
-		|| sDeviceManager->get_attr_uint8(parent,
+		|| gDeviceManager->get_attr_uint8(parent,
 				PCI_DEVICE_BASE_CLASS_ID_ITEM, &baseClass, false) != B_OK
-		|| sDeviceManager->get_attr_uint8(parent,
+		|| gDeviceManager->get_attr_uint8(parent,
 				PCI_DEVICE_SUB_CLASS_ID_ITEM, &subClass, false) != B_OK
-		|| sDeviceManager->get_attr_uint8(parent,
+		|| gDeviceManager->get_attr_uint8(parent,
 				PCI_DEVICE_API_ID_ITEM, &classAPI, false) != B_OK
-		|| sDeviceManager->get_attr_uint16(parent,
+		|| gDeviceManager->get_attr_uint16(parent,
 				PCI_DEVICE_VENDOR_ID_ITEM, &vendorID, false) != B_OK
-		|| sDeviceManager->get_attr_uint16(parent,
+		|| gDeviceManager->get_attr_uint16(parent,
 			PCI_DEVICE_DEVICE_ID_ITEM, &deviceID, false) != B_OK)
 		return B_ERROR;
 
@@ -113,7 +109,6 @@ static status_t
 ahci_register_device(device_node_handle parent)
 {
 	device_node_handle node;
-	pci_device *pciDevice;
 	status_t status;
 
 	device_attr attrs[] = {
@@ -141,19 +136,10 @@ ahci_register_device(device_node_handle parent)
 
 	TRACE("ahci_register_device\n");
 
-	// initialize parent (the bus) to get the PCI interface and device
-	status = sDeviceManager->init_driver(parent, NULL,
-			(driver_module_info **)&gPCI, (void **)&pciDevice);
-	if (status != B_OK)
-		return status;
-
-	status = sDeviceManager->register_device(parent, attrs,
+	status = gDeviceManager->register_device(parent, attrs,
 		NULL, &node); 
 	if (status < B_OK)
 		return status;
-
-	// HACK! this device manager stuff just sucks!
-	pd = *pciDevice;
 
 	// TODO: register SIM for every controller we find!
 	return register_sim(node);
@@ -161,11 +147,27 @@ ahci_register_device(device_node_handle parent)
 
 
 static status_t
-ahci_init_driver(device_node_handle node, void *user_cookie, void **_cookie)
+ahci_init_driver(device_node_handle node, void *userCookie, void **_cookie)
 {
-	TRACE("ahci_init_driver, user_cookie %p\n", user_cookie);
-	*_cookie = (void *)0x5678;
-	TRACE("cookie = %p\n", *_cookie);
+	pci_device *_userCookie = userCookie;
+	pci_device pciDevice;
+	device_node_handle parent;
+	status_t status;
+
+	TRACE("ahci_init_driver, userCookie %p\n", userCookie);
+
+	parent = gDeviceManager->get_parent(node);
+
+	// initialize parent (the bus) to get the PCI interface and device
+	status = gDeviceManager->init_driver(parent, NULL,
+		(driver_module_info **)&gPCI, (void **)&pciDevice);
+	if (status != B_OK)
+		return status;
+
+	gDeviceManager->put_device_node(parent);
+
+	*_userCookie = pciDevice;
+	*_cookie = node;
 	return B_OK;
 }
 
@@ -173,7 +175,14 @@ ahci_init_driver(device_node_handle node, void *user_cookie, void **_cookie)
 static status_t
 ahci_uninit_driver(void *cookie)
 {
+	device_node_handle node = cookie;
+	device_node_handle parent;
+
 	TRACE("ahci_uninit_driver, cookie %p\n", cookie);
+
+	parent = gDeviceManager->get_parent(node);
+	gDeviceManager->uninit_driver(parent);
+	gDeviceManager->put_device_node(parent);
 	return B_OK;
 }
 
@@ -235,7 +244,7 @@ driver_module_info sAHCIDevice = {
 };
 
 module_dependency module_dependencies[] = {
-	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&sDeviceManager },
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&gDeviceManager },
 	{ SCSI_FOR_SIM_MODULE_NAME, (module_info **)&gSCSI },
 	{}
 };
