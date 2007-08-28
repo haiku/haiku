@@ -37,7 +37,8 @@ public:
 	status_t	GetAttr(struct termios &attr);
 	status_t	SetAttr(struct termios &attr);
 
-	int		FD() const;
+	int			FD() const;
+	pid_t		ProcessID() const	{ return fProcessID; }
 	
 	virtual	void	ViewAttached(TermView *view);
 	virtual void	ViewDetached();

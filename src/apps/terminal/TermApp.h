@@ -63,6 +63,10 @@ class TermApp : public BApplication {
 		void _UnregisterTerminal();
 		void _RegisterTerminal();
 
+		void _HandleChildCleanup();
+		static void _SigChildHandler(int signal, void* data);
+		static status_t _ChildCleanupThread(void* data);
+
 		void _Usage(char *name);
 
 		bool		fStartFullscreen;

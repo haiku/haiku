@@ -83,6 +83,7 @@ const uint32 FULLSCREEN			= 'fscr';
 
 const uint32 MSG_FONT_CHANGED		= 'fntc';
 const uint32 SAVE_AS_DEFAULT 		= 'sadf';
+const uint32 MSG_CHECK_CHILDREN		= 'ckch';
 
 // Preference Read/Write Keys
 const char* const PREF_HALF_FONT_FAMILY = "Half Font Famly";

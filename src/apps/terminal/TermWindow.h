@@ -67,6 +67,8 @@ private:
 	void			_AddTab(Arguments *args);
 	void			_RemoveTab(int32 index);
 	TermView*		_ActiveTermView();
+	int32			_IndexOfTermView(TermView* termView) const;
+	void			_CheckChildren();
 	
 	SmartTabView	*fTabView;
 	TermView		*fTermView;

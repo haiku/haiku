@@ -115,6 +115,8 @@ public:
 	bool	Find(const BString &str, bool forwardSearch, bool matchCase, bool matchWord);
 	void	GetSelection(BString &str);
 
+	void	CheckShellGone();
+
 protected:
 	virtual void	AttachedToWindow();
 	virtual void	DetachedFromWindow();

@@ -9,11 +9,11 @@
 
 #include "TermApp.h"
 
-#include "Arguments.h"
-#include "CodeConv.h"
-#include "PrefHandler.h"
-#include "TermWindow.h"
-#include "TermConst.h"
+#include <errno.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #include <Alert.h>
 #include <Clipboard.h>
@@ -24,9 +24,11 @@
 #include <String.h>
 #include <TextView.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include "Arguments.h"
+#include "CodeConv.h"
+#include "PrefHandler.h"
+#include "TermWindow.h"
+#include "TermConst.h"
 
 
 static bool sUsageRequested = false;
@@ -73,6 +75,18 @@ TermApp::ReadyToRun()
 	// Prevent opeing window when option -h is given.
 	if (sUsageRequested)
 		return;
+
+	// Install a SIGCHLD signal handler, so that we will be notified, when
+	// a shell exits.
+	struct sigaction action;
+	action.sa_handler = (sighandler_t)_SigChildHandler;
+	sigemptyset(&action.sa_mask);
+	action.sa_flags = SA_NODEFER;
+	action.sa_userdata = this;
+	if (sigaction(SIGCHLD, &action, NULL) < 0) {
+		fprintf(stderr, "sigaction() failed: %s\n", strerror(errno));
+		// continue anyway
+	}
 
 	status_t status = _MakeTermWindow(fTermFrame);
 
@@ -142,6 +156,10 @@ TermApp::MessageReceived(BMessage* msg)
 			msg->SendReply(&reply);
 			break;
 		}
+
+		case MSG_CHECK_CHILDREN:
+			_HandleChildCleanup();
+			break;
 
 		default:
 			BApplication::MessageReceived(msg);
@@ -471,6 +489,39 @@ TermApp::_RegisterTerminal()
 //  // Activate net+
 //  be_roster->ActivateApp(be_roster->TeamFor(B_NETPOSITIVE_APP_SIGNATURE));
 //}
+
+
+void
+TermApp::_HandleChildCleanup()
+{
+}
+
+
+/*static*/ void
+TermApp::_SigChildHandler(int signal, void* data)
+{
+	// Spawing a thread that does the actual signal handling is pretty much
+	// the only safe thing to do in a multi-threaded application. The
+	// interrupted thread might have been anywhere, e.g. in a critical section,
+	// holding locks. If we do anything that does require locking at any point
+	// (e.g. memory allocation, messaging), we risk a dead-lock or data
+	// structure corruption. Spawing a thread is safe though, since its only
+	// a system call.
+	thread_id thread = spawn_thread(_ChildCleanupThread, "child cleanup",
+		B_NORMAL_PRIORITY, ((TermApp*)data)->fTermWindow);
+	if (thread >= 0)
+		resume_thread(thread);
+}
+
+
+/*static*/ status_t
+TermApp::_ChildCleanupThread(void* data)
+{
+	// Just drop the windowa message and let it do the actual work. This
+	// saves us additional synchronization measures.
+	return ((TermWindow*)data)->PostMessage(MSG_CHECK_CHILDREN);
+}
+
 
 
 void

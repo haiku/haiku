@@ -2521,6 +2521,22 @@ TermView::NotifyQuit(int32 reason)
 }
 
 
+void
+TermView::CheckShellGone()
+{
+	if (!fShell)
+		return;
+
+	// check, if the shell does still live
+	pid_t pid = fShell->ProcessID();
+	team_info info;
+	if (get_team_info(pid, &info) == B_BAD_TEAM_ID) {
+		// the shell is gone
+		NotifyQuit(0);
+	}
+}
+
+
 inline void
 TermView::_Redraw(int x1, int y1, int x2, int y2)
 {

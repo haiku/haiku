@@ -254,12 +254,15 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 
 		case kCloseView:
-			// TODO: We assume that this message was sent from the current active tab.
-			// Since the implementation of BTabView uses AddChild/RemoveChild on the
-			// views, the current active tab is the only one who is attached, thus
-			// the only one which could send a message. Change this.
-			_RemoveTab(fTabView->Selection());			
-			break;	
+		{
+			TermView* termView;
+			if (message->FindPointer("termView", (void**)&termView) == B_OK) {
+				int32 index = _IndexOfTermView(termView);
+				if (index >= 0)
+					_RemoveTab(index);
+			}
+			break;
+		}
 
 		case MENU_NEW_TERM: 
 		{
@@ -455,12 +458,12 @@ TermWindow::MessageReceived(BMessage *message)
 		case MSG_FONT_CHANGED:
 	    		PostMessage(MSG_HALF_FONT_CHANGED);
 			break;
-		
+
 		case MSG_COLOR_CHANGED:
 			_SetTermColors(_ActiveTermView());
 			_ActiveTermView()->Invalidate();
 			break;
-		
+
 		case SAVE_AS_DEFAULT: 
 		{
 			BPath path;
@@ -474,6 +477,10 @@ TermWindow::MessageReceived(BMessage *message)
 		
 		case MENU_PRINT:
 			_DoPrint();
+			break;
+
+		case MSG_CHECK_CHILDREN:
+			_CheckChildren();
 			break;
 
 		case B_ABOUT_REQUESTED:
@@ -659,6 +666,50 @@ TermWindow::_ActiveTermView()
 }
 
 
+int32
+TermWindow::_IndexOfTermView(TermView* termView) const
+{
+	if (!termView)
+		return -1;
+
+	// find the view
+	int32 count = fTabView->CountTabs();
+	for (int32 i = count - 1; i >= 0; i--) {
+		BScrollView* scrollView
+			= dynamic_cast<BScrollView*>(fTabView->ViewForTab(i));
+		if (!scrollView)
+			continue;
+
+		if (termView == scrollView->Target())
+			return i;
+	}
+
+	return -1;
+}
+
+
+void
+TermWindow::_CheckChildren()
+{
+	// There seems to be no separate list of sessions, so we have to iterate
+	// through the tabs.
+	int32 count = fTabView->CountTabs();
+	for (int32 i = count - 1; i >= 0; i--) {
+		// get the term view
+		BScrollView* scrollView
+			= dynamic_cast<BScrollView*>(fTabView->ViewForTab(i));
+		if (!scrollView)
+			continue;
+		TermView* termView = dynamic_cast<TermView*>(scrollView->Target());
+		if (!termView)
+			continue;
+
+		termView->CheckShellGone();
+	}
+}
+
+
+
 // CustomTermView
 CustomTermView::CustomTermView(int32 rows, int32 columns, int32 argc, const char **argv, int32 historySize)
 	:
@@ -672,6 +723,7 @@ CustomTermView::NotifyQuit(int32 reason)
 {
 	if (Window()) {
 		BMessage message(kCloseView);
+		message.AddPointer("termView", this);
 		message.AddInt32("reason", reason);
 		Window()->PostMessage(&message);
 	}
