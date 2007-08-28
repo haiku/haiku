@@ -15,6 +15,9 @@ public:
 					pci_device_info *pciDevice);
 				~AHCIController();
 
+	status_t	Init();
+	void		Uninit();
+
 	void		ExecuteRequest(scsi_ccb *request);
 	uchar		AbortRequest(scsi_ccb *request);
 	uchar		TerminateRequest(scsi_ccb *request);
@@ -29,6 +32,12 @@ private:
 	device_node_handle 			fNode;
 	pci_device_info*			fPCIDevice;
 	uint32						fDevicePresentMask;
+
+
+// --- Instance check workaround begin
+	port_id fInstanceCheck;
+// --- Instance check workaround end
+
 };
 
 
