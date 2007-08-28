@@ -83,7 +83,7 @@ public:
 };
 
 // InterruptsLocker
-class InterruptsLocker : AutoLocker<int, InterruptsLocking> {
+class InterruptsLocker : public AutoLocker<int, InterruptsLocking> {
 public:
 	inline InterruptsLocker(bool alreadyLocked = false,
 		bool lockIfNotLocked = true)
@@ -114,6 +114,39 @@ public:
 // SpinLocker
 typedef AutoLocker<spinlock, SpinLocking> SpinLocker;
 
+// InterruptsSpinLocking
+class InterruptsSpinLocking {
+public:
+	struct State {
+		State(spinlock* lock)
+			: lock(lock)
+		{
+		}
+
+		int			state;
+		spinlock*	lock;
+	};
+
+	inline bool Lock(spinlock* lockable)
+	{
+		fState = disable_interrupts();
+		acquire_spinlock(lockable);
+		return true;
+	}
+
+	inline void Unlock(spinlock* lockable)
+	{
+		release_spinlock(lockable);
+		restore_interrupts(fState);
+	}
+
+private:
+	int	fState;
+};
+
+// InterruptsSpinLocker
+typedef AutoLocker<spinlock, InterruptsSpinLocking> InterruptsSpinLocker;
+
 }	// namespace BPrivate
 
 using BPrivate::AutoLocker;
@@ -122,5 +155,6 @@ using BPrivate::RecursiveLocker;
 using BPrivate::BenaphoreLocker;
 using BPrivate::InterruptsLocker;
 using BPrivate::SpinLocker;
+using BPrivate::InterruptsSpinLocker;
 
 #endif	// KERNEL_UTIL_AUTO_LOCKER_H
