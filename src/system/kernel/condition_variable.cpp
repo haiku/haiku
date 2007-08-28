@@ -188,6 +188,7 @@ PrivateConditionVariableEntry::_Remove()
 	if (this == fVariable->fEntries) {
 		fVariable->fEntries = fVariableNext;
 		fVariableNext = NULL;
+		fVariable = NULL;
 		return;
 	}
 
@@ -197,6 +198,7 @@ PrivateConditionVariableEntry::_Remove()
 		if (this == entry->fVariableNext) {
 			entry->fVariableNext = fVariableNext;
 			fVariableNext = NULL;
+			fVariable = NULL;
 			return;
 		}
 
@@ -335,13 +337,13 @@ PrivateConditionVariable::_Notify(bool all, bool threadsLocked, status_t result)
 
 	while (PrivateConditionVariableEntry* entry = fEntries) {
 		fEntries = entry->fVariableNext;
+		entry->fVariableNext = NULL;
+		entry->fVariable = NULL;
+
 		struct thread* thread = entry->fThread;
 
 		if (thread->condition_variable_entry != NULL)
 			thread->condition_variable_entry->fResult = result;
-
-		entry->fVariableNext = NULL;
-		entry->fVariable = NULL;
 
 		// remove other entries of this thread from their respective variables
 		PrivateConditionVariableEntry* otherEntry = entry->fThreadPrevious;
