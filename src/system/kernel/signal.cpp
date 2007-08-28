@@ -51,6 +51,10 @@ const char * const sigstr[NSIG] = {
 };
 
 
+static status_t deliver_signal(struct thread *thread, uint signal,
+	uint32 flags);
+
+
 static bool
 notify_debugger(struct thread *thread, int signal, struct sigaction *handler,
 	bool deadly)
@@ -72,10 +76,9 @@ notify_debugger(struct thread *thread, int signal, struct sigaction *handler,
 }
 
 
-/** Actually handles the signal - ie. the thread will exit, a custom signal
- *	handler is prepared, or whatever the signal demands.
- */
-
+/*! Actually handles the signal - ie. the thread will exit, a custom signal
+	handler is prepared, or whatever the signal demands.
+*/
 bool
 handle_signals(struct thread *thread)
 {
@@ -172,6 +175,11 @@ handle_signals(struct thread *thread)
 						InterruptsSpinLocker locker(team_spinlock);
 						team_set_job_control_state(thread->team,
 							JOB_CONTROL_STATE_STOPPED, signal, false);
+
+						// send a SIGCHLD to the parent
+						SpinLocker _(thread_spinlock);
+						deliver_signal(thread->team->parent->main_thread,
+							SIGCHLD, 0);
 					}
 					continue;
 
