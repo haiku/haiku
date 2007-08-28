@@ -155,6 +155,10 @@ handle_signals(struct thread *thread)
 						InterruptsSpinLocker locker(team_spinlock);
 						team_set_job_control_state(thread->team,
 							JOB_CONTROL_STATE_CONTINUED, signal, false);
+
+						// The standard states that the system *may* send a
+						// SIGCHLD when a child is continued. I haven't found
+						// a good reason why we would want to, though.
 					}
 					continue;
 
@@ -176,10 +180,15 @@ handle_signals(struct thread *thread)
 						team_set_job_control_state(thread->team,
 							JOB_CONTROL_STATE_STOPPED, signal, false);
 
-						// send a SIGCHLD to the parent
+						// send a SIGCHLD to the parent (if it does have
+						// SA_NOCLDSTOP defined)
 						SpinLocker _(thread_spinlock);
-						deliver_signal(thread->team->parent->main_thread,
-							SIGCHLD, 0);
+						struct thread* parentThread
+							= thread->team->parent->main_thread;
+						struct sigaction& parentHandler
+							= parentThread->sig_action[SIGCHLD - 1];
+						if ((parentHandler.sa_flags & SA_NOCLDSTOP) == 0)
+							deliver_signal(parentThread, SIGCHLD, 0);
 					}
 					continue;
 
