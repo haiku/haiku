@@ -1443,6 +1443,12 @@ wait_for_child(pid_t child, uint32 flags, int32 *_reason,
 	*_returnCode = foundEntry.status;
 	*_reason = (foundEntry.signal << 16) | reason;
 
+	// TODO: From the Open Group Base Specs Issue 6:
+	// "... if SIGCHLD is blocked, if wait() or waitpid() return because
+	// the status of a child process is available, any pending SIGCHLD signal
+	// shall be cleared unless the status of another child process is
+	// available."
+
 	return foundEntry.thread;
 }
 
