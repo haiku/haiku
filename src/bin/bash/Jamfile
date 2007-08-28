@@ -48,7 +48,13 @@ actions MkSignamesExt1
 	$(2) $(1) ;
 }
 
-MkSignamesExt <bash>signames.h ;
+local signamesHeader = <bash>signames.h ;
+if $(TARGET_PLATFORM) = haiku {
+	MakeLocateArch $(signamesHeader) ;
+	File $(signamesHeader) : [ FGristFiles signames_haiku.h ] ;
+} else {
+	MkSignamesExt $(signamesHeader) ;
+}
 
 # Haiku supports job control, BeOS doesn't.
 local jobControlSources ;
