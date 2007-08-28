@@ -28,22 +28,34 @@ waitpid(pid_t pid, int *_status, int options)
 	status_t returnCode;
 	int32 reason;
 
-	// TODO: there is no support for WUNTRACED and WCONTINUED yet!
 	thread_id thread = _kern_wait_for_child(pid, options, &reason, &returnCode);
 
 	if (thread >= B_OK && _status != NULL) {
-		int status = returnCode & 0xff;
-			// WEXITSTATUS()
 
-		// See kernel's wait_for_child() for how the return information is encoded:
+		// See kernel's wait_for_child() for how the return information is
+		// encoded:
 		// reason = (signal << 16) | reason
 
-		// fill in signal for WIFSIGNALED() and WTERMSIG()
-		if (reason & THREAD_RETURN_INTERRUPTED)
-			status = (reason >> 8) & 0xff00;
-
-		// TODO: fill in _status correctly for WIFSTOPPED(), WSTOPSIG(), WIFCORED(),
-		//	and WIFCONTINUED()
+		int status;
+		switch (reason & 0xffff) {
+			case THREAD_RETURN_INTERRUPTED:
+				// fill in signal for WIFSIGNALED() and WTERMSIG()
+				status = (reason >> 8) & 0xff00;
+				break;
+			case THREAD_STOPPED:
+				// WIFSTOPPED() and WSTOPSIG()
+				status = reason & 0xff0000;
+				break;
+			case THREAD_CONTINUED:
+				// WIFCONTINUED()
+				status = 0x20000;
+				break;
+			case THREAD_RETURN_EXIT:
+			default:
+				// WEXITSTATUS()
+				status = returnCode & 0xff;
+				break;
+		}
 
 		*_status = status;
 	}
