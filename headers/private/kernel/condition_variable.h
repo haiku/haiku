@@ -59,11 +59,12 @@ public:
 protected:
 			void				Publish(const void* object,
 									const char* objectType);
-			void				Unpublish();
-			void				Notify(bool all);
+			void				Unpublish(bool threadsLocked);
+			void				Notify(bool all, bool threadsLocked);
 
 private:
-			void				_Notify(bool all, status_t result);
+			void				_Notify(bool all, bool threadsLocked,
+									status_t result);
 
 protected:
 			const void*			fObject;
@@ -81,9 +82,9 @@ public:
 	inline	void				Publish(const Type* object,
 									const char* objectType);
 
-	inline	void				Unpublish();
-	inline	void				NotifyOne();
-	inline	void				NotifyAll();
+	inline	void				Unpublish(bool threadsLocked = false);
+	inline	void				NotifyOne(bool threadsLocked = false);
+	inline	void				NotifyAll(bool threadsLocked = false);
 };
 
 
@@ -108,25 +109,25 @@ ConditionVariable<Type>::Publish(const Type* object, const char* objectType)
 
 template<typename Type>
 inline void
-ConditionVariable<Type>::Unpublish()
+ConditionVariable<Type>::Unpublish(bool threadsLocked)
 {
-	PrivateConditionVariable::Unpublish();
+	PrivateConditionVariable::Unpublish(threadsLocked);
 }
 
 
 template<typename Type>
 inline void
-ConditionVariable<Type>::NotifyOne()
+ConditionVariable<Type>::NotifyOne(bool threadsLocked)
 {
-	PrivateConditionVariable::Notify(false);
+	PrivateConditionVariable::Notify(false, threadsLocked);
 }
 
 
 template<typename Type>
 inline void
-ConditionVariable<Type>::NotifyAll()
+ConditionVariable<Type>::NotifyAll(bool threadsLocked)
 {
-	PrivateConditionVariable::Notify(true);
+	PrivateConditionVariable::Notify(true, threadsLocked);
 }
 
 

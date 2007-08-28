@@ -280,7 +280,7 @@ PrivateConditionVariable::Publish(const void* object, const char* objectType)
 
 
 void
-PrivateConditionVariable::Unpublish()
+PrivateConditionVariable::Unpublish(bool threadsLocked)
 {
 	ASSERT(fObject != NULL);
 
@@ -300,12 +300,12 @@ PrivateConditionVariable::Unpublish()
 	fObjectType = NULL;
 
 	if (fEntries)
-		_Notify(true, B_ENTRY_NOT_FOUND);
+		_Notify(true, threadsLocked, B_ENTRY_NOT_FOUND);
 }
 
 
 void
-PrivateConditionVariable::Notify(bool all)
+PrivateConditionVariable::Notify(bool all, bool threadsLocked)
 {
 	ASSERT(fObject != NULL);
 
@@ -321,16 +321,17 @@ PrivateConditionVariable::Notify(bool all)
 #endif
 
 	if (fEntries)
-		_Notify(all, B_OK);
+		_Notify(all, threadsLocked, B_OK);
 }
 
 
 //! Called with interrupts disabled and the condition variable spinlock held.
 void
-PrivateConditionVariable::_Notify(bool all, status_t result)
+PrivateConditionVariable::_Notify(bool all, bool threadsLocked, status_t result)
 {
 	// dequeue and wake up the blocked threads
-	GRAB_THREAD_LOCK();
+	if (!threadsLocked)
+		GRAB_THREAD_LOCK();
 
 	while (PrivateConditionVariableEntry* entry = fEntries) {
 		fEntries = entry->fVariableNext;
@@ -366,7 +367,8 @@ PrivateConditionVariable::_Notify(bool all, status_t result)
 			break;
 	}
 
-	RELEASE_THREAD_LOCK();
+	if (!threadsLocked)
+		RELEASE_THREAD_LOCK();
 }
 
 
