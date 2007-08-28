@@ -333,9 +333,9 @@ arch_thread_dump_info(void *info)
 {
 	struct arch_thread *at = (struct arch_thread *)info;
 
-	dprintf("\tesp: %p\n", at->current_stack.esp);
-	dprintf("\tss: %p\n", at->current_stack.ss);
-	dprintf("\tfpu_state at %p\n", at->fpu_state);
+	kprintf("\tesp: %p\n", at->current_stack.esp);
+	kprintf("\tss: %p\n", at->current_stack.ss);
+	kprintf("\tfpu_state at %p\n", at->fpu_state);
 }
 
 
