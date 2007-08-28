@@ -3038,12 +3038,13 @@ BTextView::HandleAlphaKey(const char *bytes, int32 numBytes)
 		undoBuffer->InputCharacter(numBytes);
 	}
 
-	bool refresh = fSelStart != fText->Length();
+	bool erase = fSelStart != fText->Length();
+	int32 saveStart = fSelStart;
 
 	if (fSelStart != fSelEnd) {
 		Highlight(fSelStart, fSelEnd);
 		DeleteText(fSelStart, fSelEnd);
-		refresh = true;
+		erase = true;
 	}
 	
 	if (fAutoindent && numBytes == 1 && *bytes == B_ENTER) {
@@ -3063,11 +3064,10 @@ BTextView::HandleAlphaKey(const char *bytes, int32 numBytes)
 	} else
 		InsertText(bytes, numBytes, fSelStart, NULL);
 	
-	int32 saveStart = fSelStart;
 	fClickOffset = fSelEnd = fSelStart = fSelStart + numBytes;
 
 	if (Window())
-		Refresh(saveStart, fSelEnd, refresh, true);
+		Refresh(saveStart, fSelEnd, erase, true);
 }
 
 
@@ -3082,6 +3082,8 @@ BTextView::HandleAlphaKey(const char *bytes, int32 numBytes)
 void
 BTextView::Refresh(int32 fromOffset, int32 toOffset, bool erase, bool scroll)
 {
+	PRINT(("Refresh(fromOffset: %ld, toOffset: %ld, erase: %d, scroll: %d\n",
+			fromOffset, toOffset, erase, scroll));
 	// TODO: Cleanup
 	float saveHeight = fTextRect.Height();
 	int32 fromLine = LineAt(fromOffset);
@@ -3101,8 +3103,10 @@ BTextView::Refresh(int32 fromOffset, int32 toOffset, bool erase, bool scroll)
 	
 	// if the line breaks have changed, force an erase
 	if (fromLine != saveFromLine || toLine != saveToLine
-			|| newHeight != saveHeight )
+			|| newHeight != saveHeight ) {
 		erase = true;
+		fromOffset = -1;	
+	}
 	
 	if (newHeight != saveHeight) {
 		// the text area has changed
@@ -3177,7 +3181,7 @@ BTextView::RecalculateLineBreaks(int32 *startLine, int32 *endLine)
 		
 		lineIndex++;
 		STELine saveLine = *nextLine;		
-		if ( lineIndex > fLines->NumLines() || 
+		if (lineIndex > fLines->NumLines() || 
 			 toOffset < nextLine->offset ) {
 			// the new line comes before the old line start, add a line
 			STELine newLine;
@@ -3525,8 +3529,10 @@ BTextView::_DrawLine(BView *view, const int32 &lineNum, const int32 &startOffset
 		if (fAlignment == B_ALIGN_CENTER)
 			startLeft /= 2;
 		startLeft += fTextRect.left;
-	}	
+	}
+	
 	view->MovePenTo(startLeft, line->origin + line->ascent + fTextRect.top + 1);
+	
 	if (erase) {
 		eraseRect.top = line->origin + fTextRect.top;
 		eraseRect.bottom = (line + 1)->origin + fTextRect.top;
@@ -3616,6 +3622,9 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 	if (!Window())
 		return;
 
+	PRINT(("DrawLines(startLine: %ld, endLine: %ld, startOffset: %ld, erase: %d\n",
+		startLine, endLine, startOffset, erase));
+
 	// clip the text
 	BRect clipRect = Bounds() & fTextRect;
 	clipRect.InsetBy(-1, -1);
@@ -3655,10 +3664,11 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 	BRect eraseRect = clipRect;
 	int32 startEraseLine = startLine;
 	STELine* line = (*fLines)[startLine];
+	
 	if (erase && startOffset != -1 && fAlignment == B_ALIGN_LEFT) {
 		// erase only to the right of startOffset
 		startEraseLine++;
-		long startErase = startOffset;
+		int32 startErase = startOffset;
 
 		BPoint erasePoint = PointAt(startErase);
 		eraseRect.left = erasePoint.x;
