@@ -7,6 +7,9 @@
 
 /* POSIX signals handling routines */
 
+#include <stddef.h>
+#include <string.h>
+
 #include <OS.h>
 #include <KernelExport.h>
 
@@ -19,9 +22,8 @@
 #include <team.h>
 #include <thread.h>
 #include <user_debugger.h>
+#include <util/AutoLock.h>
 
-#include <stddef.h>
-#include <string.h>
 
 //#define TRACE_SIGNAL
 #ifdef TRACE_SIGNAL
@@ -133,11 +135,24 @@ handle_signals(struct thread *thread)
 			switch (signal) {
 				case SIGCHLD:
 				case SIGWINCH:
-				case SIGCONT:
 				case SIGURG:
 					// notify the debugger
 					if (debugSignal)
 						notify_debugger(thread, signal, handler, false);
+					continue;
+
+				case SIGCONT:
+					// notify the debugger
+					if (debugSignal
+						&& !notify_debugger(thread, signal, handler, false))
+						continue;
+
+					// notify threads waiting for team state changes
+					if (thread == thread->team->main_thread) {
+						InterruptsSpinLocker locker(team_spinlock);
+						team_set_job_control_state(thread->team,
+							JOB_CONTROL_STATE_CONTINUED, signal, false);
+					}
 					continue;
 
 				case SIGSTOP:
@@ -151,6 +166,13 @@ handle_signals(struct thread *thread)
 
 					thread->next_state = B_THREAD_SUSPENDED;
 					reschedule = true;
+
+					// notify threads waiting for team state changes
+					if (thread == thread->team->main_thread) {
+						InterruptsSpinLocker locker(team_spinlock);
+						team_set_job_control_state(thread->team,
+							JOB_CONTROL_STATE_STOPPED, signal, false);
+					}
 					continue;
 
 				case SIGQUIT:

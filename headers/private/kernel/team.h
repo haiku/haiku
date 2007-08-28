@@ -29,12 +29,15 @@ status_t team_get_address_space(team_id id,
 			struct vm_address_space **_addressSpace);
 char **user_team_get_arguments(void);
 int user_team_get_arg_count(void);
-status_t team_get_death_entry(struct team *team, thread_id child,
-			struct death_entry *death, struct death_entry **_freeDeath);
+struct job_control_entry* team_get_death_entry(struct team *team,
+			thread_id child, bool* _deleteEntry);
 bool team_is_valid(team_id id);
 struct team *team_get_team_struct_locked(team_id id);
 int32 team_max_teams(void);
 int32 team_used_teams(void);
+
+void team_set_job_control_state(struct team* team, job_control_state newState,
+			int signal, bool threadsLocked);
 
 status_t start_watching_team(team_id team, void (*hook)(team_id, void *),
 			void *data);

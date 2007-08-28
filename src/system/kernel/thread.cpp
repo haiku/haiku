@@ -1094,7 +1094,6 @@ thread_exit(void)
 	struct thread *thread = thread_get_current_thread();
 	struct process_group *freeGroup = NULL;
 	struct team *team = thread->team;
-	struct death_entry *death = NULL;
 	thread_id parentID = -1;
 	bool deleteTeam = false;
 	sem_id cachedDeathSem = -1;
@@ -1122,20 +1121,11 @@ thread_exit(void)
 		delete_area_etc(team, area);
 	}
 
+	struct job_control_entry *death = NULL;
 	if (team != team_get_kernel_team()) {
 		if (team->main_thread == thread) {
 			// this was the main thread in this team, so we will delete that as well
 			deleteTeam = true;
-
-			// put a death entry into the dead children list of our parent
-			death = (struct death_entry *)malloc(sizeof(struct death_entry));
-			if (death != NULL) {
-				death->group_id = team->group_id;
-				death->thread = thread->id;
-				death->status = thread->exit.status;
-				death->reason = thread->exit.reason;
-				death->signal = thread->exit.signal;
-			}
 		}
 
 		// remove this thread from the current team and add it to the kernel
@@ -1161,22 +1151,30 @@ thread_exit(void)
 			// remember who our parent was so we can send a signal
 			parentID = parent->id;
 
-			if (death != NULL) {
-				// insert death entry into the parent's list
+			// Set the team job control state to "dead" and detach the job
+			// control entry from our team struct.
+			team_set_job_control_state(team, JOB_CONTROL_STATE_DEAD, 0, true);
+			death = team->job_control_entry;
+			team->job_control_entry = NULL;
 
-				list_add_link_to_tail(&parent->dead_children->list, death);
-				if (++parent->dead_children->count > MAX_DEAD_CHILDREN) {
-					death = (struct death_entry*)list_remove_head_item(
-						&parent->dead_children->list);
+			if (death != NULL) {
+				death->team = NULL;
+				death->group_id = team->group_id;
+				death->thread = thread->id;
+				death->status = thread->exit.status;
+				death->reason = thread->exit.reason;
+				death->signal = thread->exit.signal;
+
+				// team_set_job_control_state() already moved our entry
+				// into the parent's list. We just check the soft limit of
+				// death entries.
+				if (parent->dead_children->count > MAX_DEAD_CHILDREN) {
+					death = parent->dead_children->entries.RemoveHead();
 					parent->dead_children->count--;
 				} else
 					death = NULL;
 
 				RELEASE_THREAD_LOCK();
-
-				// notify listeners that a new death entry is available
-				// TODO: should that be moved to handle_signal() (for SIGCHLD)?
-				parent->dead_children->condition_variable.NotifyOne();
 			} else
 				RELEASE_THREAD_LOCK();
 
@@ -1198,9 +1196,9 @@ thread_exit(void)
 		team_delete_process_group(freeGroup);
 		team_delete_team(team);
 
-		// we need to remove any death entry that made it to here
+		// we need to delete any death entry that made it to here
 		if (death != NULL)
-			free(death);
+			delete death;
 
 		send_signal_etc(parentID, SIGCHLD, B_DO_NOT_RESCHEDULE);
 		cachedDeathSem = -1;
@@ -1251,12 +1249,12 @@ thread_exit(void)
 		thread->exit.sem = -1;
 
 		// fill all death entries
-		death = NULL;
-		while ((death = (struct death_entry*)list_get_next_item(
-				&thread->exit.waiters, death)) != NULL) {
-			death->status = thread->exit.status;
-			death->reason = thread->exit.reason;
-			death->signal = thread->exit.signal;
+		death_entry* entry = NULL;
+		while ((entry = (struct death_entry*)list_get_next_item(
+				&thread->exit.waiters, entry)) != NULL) {
+			entry->status = thread->exit.status;
+			entry->reason = thread->exit.reason;
+			entry->signal = thread->exit.signal;
 		}
 
 		RELEASE_THREAD_LOCK();
@@ -1513,7 +1511,8 @@ wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
 	status_t *_returnCode)
 {
 	sem_id exitSem = B_BAD_THREAD_ID;
-	struct death_entry death, *freeDeath = NULL;
+	struct death_entry death;
+	job_control_entry* freeDeath = NULL;
 	struct thread *thread;
 	cpu_status state;
 	status_t status = B_OK;
@@ -1540,8 +1539,15 @@ wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
 		// find its death entry in our team
 		GRAB_TEAM_LOCK();
 
-		status = team_get_death_entry(thread_get_current_thread()->team,
-			id, &death, &freeDeath);
+		bool deleteEntry;
+		freeDeath = team_get_death_entry(thread_get_current_thread()->team, id,
+			&deleteEntry);
+		if (freeDeath != NULL) {
+			death.status = freeDeath->status;
+			if (!deleteEntry)
+				freeDeath = NULL;
+		} else
+			status = B_BAD_THREAD_ID;
 
 		RELEASE_TEAM_LOCK();
 	}
@@ -1553,7 +1559,7 @@ wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
 		if (_returnCode)
 			*_returnCode = death.status;
 
-		free(freeDeath);
+		delete freeDeath;
 		return B_OK;
 	}
 

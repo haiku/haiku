@@ -33,6 +33,7 @@
 #include <vfs.h>
 #include <vm.h>
 #include <vm_address_space.h>
+#include <util/AutoLock.h>
 #include <util/khash.h>
 
 //#define TRACE_TEAM
@@ -564,32 +565,63 @@ create_team_struct(const char *name, bool kernel)
 	team->dead_threads_kernel_time = 0;
 	team->dead_threads_user_time = 0;
 
-	team->dead_children
-		= (team_dead_children*)malloc(sizeof(team_dead_children));
+	// dead children
+	team->dead_children = new(nothrow) team_dead_children;
 	if (team->dead_children == NULL)
 		return NULL;
-	MemoryDeleter deadChildrenDeleter(team->dead_children);
+	ObjectDeleter<team_dead_children> deadChildrenDeleter(team->dead_children);
 
-	list_init(&team->dead_children->list);
 	team->dead_children->count = 0;
-	team->dead_children->wait_for_any = 0;
 	team->dead_children->kernel_time = 0;
 	team->dead_children->user_time = 0;
-	team->dead_children->condition_variable.Publish(team->dead_children,
-		"dead children");
+
+	// stopped children
+	team->stopped_children = new(nothrow) team_job_control_children;
+	if (team->stopped_children == NULL)
+		return NULL;
+	ObjectDeleter<team_job_control_children> stoppedChildrenDeleter(
+		team->stopped_children);
+
+	// continued children
+	team->continued_children = new(nothrow) team_job_control_children;
+	if (team->continued_children == NULL)
+		return NULL;
+	ObjectDeleter<team_job_control_children> continuedChildrenDeleter(
+		team->continued_children);
+
+	// job control entry
+	team->job_control_entry = new(nothrow) job_control_entry;
+	if (team->job_control_entry == NULL)
+		return NULL;
+	ObjectDeleter<job_control_entry> jobControlEntryDeleter(
+		team->job_control_entry);
+	team->job_control_entry->state = JOB_CONTROL_STATE_NONE;
+	team->job_control_entry->thread = team->id;
+	team->job_control_entry->team = team;
 
 	list_init(&team->image_list);
 	list_init(&team->watcher_list);
 
 	clear_team_debug_info(&team->debug_info, true);
 
-	if (arch_team_init_team_struct(team, kernel) < 0) {
-		team->dead_children->condition_variable.Unpublish();
+	if (arch_team_init_team_struct(team, kernel) < 0)
 		return NULL;
-	}
 
+	// publish dead/stopped/continued children condition vars
+	team->dead_children->condition_variable.Publish(team->dead_children,
+		"dead children");
+	team->stopped_children->condition_variable.Publish(team->stopped_children,
+		"stopped children");
+	team->continued_children->condition_variable.Publish(
+		team->continued_children, "continued children");
+
+	// keep all allocated structures
+	jobControlEntryDeleter.Detach();
+	continuedChildrenDeleter.Detach();
+	stoppedChildrenDeleter.Detach();
 	deadChildrenDeleter.Detach();
 	teamDeleter.Detach();
+
 	return team;
 }
 
@@ -597,16 +629,19 @@ create_team_struct(const char *name, bool kernel)
 static void
 delete_team_struct(struct team *team)
 {
-	struct death_entry *death;
+	team->stopped_children->condition_variable.Unpublish();
+	team->continued_children->condition_variable.Unpublish();
 
 	team->dead_children->condition_variable.Unpublish();
 
-	while ((death = (struct death_entry*)list_remove_head_item(
-			&team->dead_children->list)) != NULL) {
-		free(death);
-	}
+	while (job_control_entry* entry = team->dead_children->entries.RemoveHead())
+		delete entry;
 
-	free(team->dead_children);
+	delete team->job_control_entry;
+		// usually already NULL and transferred to the parent
+	delete team->continued_children;
+	delete team->stopped_children;
+	delete team->dead_children;
 	free(team);
 }
 
@@ -1262,17 +1297,40 @@ has_children_in_group(struct team *parent, pid_t groupID)
 }
 
 
-/** This is the kernel backend for waitpid(). It is a bit more powerful when it comes
- *	to the reason why a thread has died than waitpid() can be.
- */
+static job_control_entry*
+get_job_control_entry(team_job_control_children* children, pid_t id)
+{
+	for (JobControlEntryList::Iterator it = children->entries.GetIterator();
+		 job_control_entry* entry = it.Next();) {
 
+		if (id > 0) {
+			if (entry->thread == id)
+				return entry;
+		} else if (id == -1) {
+			return entry;
+		} else {
+			pid_t processGroup
+				= (entry->team ? entry->team->group_id : entry->group_id);
+			if (processGroup == -id)
+				return entry;
+		}
+	}
+
+	return NULL;
+}
+
+
+/*! This is the kernel backend for waitpid(). It is a bit more powerful when it
+	comes to the reason why a thread has died than waitpid() can be.
+*/
 static thread_id
-wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnCode)
+wait_for_child(pid_t child, uint32 flags, int32 *_reason,
+	status_t *_returnCode)
 {
 	struct team *team = thread_get_current_thread()->team;
-	struct death_entry death, *freeDeath = NULL;
+	struct job_control_entry foundEntry;
+	struct job_control_entry* freeDeathEntry = NULL;
 	status_t status = B_OK;
-	bool childrenExist = false;
 
 	TRACE(("wait_for_child(child = %ld, flags = %ld)\n", child, flags));
 
@@ -1280,52 +1338,34 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 		// wait for all children in the process group of the calling team
 		child = -team->group_id;
 	}
-	if (child < 0) {
-		// we need to make sure the death entries won't get deleted too soon
-		atomic_add(&team->dead_children->wait_for_any, 1);
-	}
 
 	while (true) {
-		ConditionVariableEntry<team_dead_children> waitEntry;
+		InterruptsSpinLocker locker(team_spinlock);
 
-		cpu_status state = disable_interrupts();
-		GRAB_THREAD_LOCK();
+		// check whether any condition holds
+		job_control_entry* entry = get_job_control_entry(team->dead_children,
+			child);
 
-		if (child > 0 && !childrenExist) {
-			// wait for the specified child
+		if (entry == NULL && (flags & WCONTINUED) != 0)
+			entry = get_job_control_entry(team->continued_children, child);
 
-			struct thread *childThread = thread_get_thread_struct_locked(child);
-			if (childThread != NULL) {
-				// team is still running, so we would need to block
-				if ((flags & WNOHANG) != 0)
-					status = B_WOULD_BLOCK;
+		if (entry == NULL && (flags & WUNTRACED) != 0)
+			entry = get_job_control_entry(team->stopped_children, child);
 
-				// make sure this child is one of ours
-				if (childThread->team->parent != team)
-					status = ECHILD;
-
-				childrenExist = true;
-			}
-		}
-
-		RELEASE_THREAD_LOCK();
-
-		if (status != B_OK) {
-			restore_interrupts(state);
-			return status;
-		}
-
-		// see if there is any death entry for us already
-
-		GRAB_TEAM_LOCK();
-
-		status = team_get_death_entry(team, child, &death, &freeDeath);
-		if (status < B_OK) {
-			// there is no matching death entry
-			if (child == -1)
+		// If we don't have an entry yet, check whether there are any children
+		// complying to the process group specification at all.
+		if (entry == NULL) {
+			// No success yet -- check whether there are any children we could
+			// wait for.
+			bool childrenExist = false;
+			if (child == -1) {
 				childrenExist = team->children != NULL;
-			else if (child < -1)
+			} else if (child < -1) {
 				childrenExist = has_children_in_group(team, -child);
+			} else {
+				if (struct team* childTeam = team_get_team_struct_locked(child))
+					childrenExist = team->parent == team;
+			}
 
 			if (!childrenExist) {
 				// there is no child we could wait for
@@ -1334,41 +1374,76 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 				// the children we're waiting for are still running
 				status = B_WOULD_BLOCK;
 			}
+		} else {
+			// got something
+			foundEntry = *entry;
+			if (entry->state == JOB_CONTROL_STATE_DEAD) {
+				// The child is dead. Reap its death entry.
+				freeDeathEntry = entry;
+				team->dead_children->entries.Remove(entry);
+				team->dead_children->count--;
+			} else {
+				// The child is well. Reset its job control state.
+				team_set_job_control_state(entry->team,
+					JOB_CONTROL_STATE_NONE, 0, false);
+			}
 		}
+
+		// If we haven't got anything yet, add prepare for waiting for the
+		// condition variables.
+		ConditionVariableEntry<team_dead_children> deadWaitEntry;
+		ConditionVariableEntry<team_job_control_children> continuedWaitEntry;
+		ConditionVariableEntry<team_job_control_children> stoppedWaitEntry;
+
 		if (status == B_WOULD_BLOCK && (flags & WNOHANG) == 0) {
-			// We need to hold the team lock when changing this counter,
-			// but of course only if we really will wait later
-			waitEntry.Add(team->dead_children);
+			deadWaitEntry.Add(team->dead_children);
+
+			if ((flags & WCONTINUED) != 0) {
+				continuedWaitEntry.Add(team->continued_children,
+					&deadWaitEntry);
+			}
+
+			if ((flags & WUNTRACED) != 0)
+				stoppedWaitEntry.Add(team->stopped_children, &deadWaitEntry);
 		}
 
-		RELEASE_TEAM_LOCK();
-		restore_interrupts(state);
+		locker.Unlock();
 
-		// we got our death entry and can return to our caller
+		// we got our entry and can return to our caller
 		if (status == B_OK)
 			break;
 		if (status != B_WOULD_BLOCK || (flags & WNOHANG) != 0)
-			goto err;
+			return status;
 
-		status = waitEntry.Wait(B_CAN_INTERRUPT);
+		status = deadWaitEntry.Wait(B_CAN_INTERRUPT);
 		if (status == B_INTERRUPTED)
-			goto err;
+			return status;
 	}
 
-	free(freeDeath);
+	delete freeDeathEntry;
 
 	// when we got here, we have a valid death entry, and
 	// already got unregistered from the team or group
-	*_returnCode = death.status;
-	*_reason = (death.signal << 16) | death.reason;
+	int reason = 0;
+	switch (foundEntry.state) {
+		case JOB_CONTROL_STATE_DEAD:
+			reason = foundEntry.reason;
+			break;
+		case JOB_CONTROL_STATE_STOPPED:
+			reason = THREAD_STOPPED;
+			break;
+		case JOB_CONTROL_STATE_CONTINUED:
+			reason = THREAD_CONTINUED;
+			break;
+		case JOB_CONTROL_STATE_NONE:
+			// can't happen
+			break;
+	}
 
-	return death.thread;
+	*_returnCode = foundEntry.status;
+	*_reason = (foundEntry.signal << 16) | reason;
 
-err:
-	if (child < 0)
-		atomic_add(&team->dead_children->wait_for_any, -1);
-
-	return status;
+	return foundEntry.thread;
 }
 
 
@@ -1466,45 +1541,29 @@ team_used_teams(void)
 }
 
 
-/** Fills the provided death entry if it's in the team.
- *	The \a child parameter follows waitpid() semantics.
- *	You need to have the team lock held when calling this function.
- */
-
-status_t
-team_get_death_entry(struct team *team, thread_id child, struct death_entry *death,
-	struct death_entry **_freeDeath)
+/*! Fills the provided death entry if it's in the team.
+	You need to have the team lock held when calling this function.
+*/
+job_control_entry*
+team_get_death_entry(struct team *team, thread_id child, bool* _deleteEntry)
 {
-	struct death_entry *entry = NULL;
+	if (child <= 0)
+		return NULL;
 
-	// find matching death entry structure
-
-	if (child == 0) {
-		// wait for all children in the process group of the calling team
-		child = -team->group_id;
-	}
-
-	while ((entry = (struct death_entry*)list_get_next_item(
-			&team->dead_children->list, entry)) != NULL) {
-		if (child != -1 && entry->thread != child && entry->group_id != -child)
-			continue;
-
-		// we found one
-
-		*death = *entry;
-
-		// only remove the death entry if there aren't any other interested parties
-		if ((child < 0 && atomic_add(&team->dead_children->wait_for_any, -1) == 1)
-			|| (child > 0 && team->dead_children->wait_for_any == 0)) {
-			list_remove_link(entry);
+	job_control_entry* entry = get_job_control_entry(team->dead_children,
+		child);
+	if (entry) {
+		// remove the entry only, if the caller is the parent of the found team
+		if (team_get_current_team_id() == entry->thread) {
+			team->dead_children->entries.Remove(entry);
 			team->dead_children->count--;
-			*_freeDeath = entry;
+			*_deleteEntry = true;
+		} else {
+			*_deleteEntry = false;
 		}
-
-		return B_OK;
 	}
 
-	return B_ERROR;
+	return entry;
 }
 
 
@@ -1722,7 +1781,6 @@ team_delete_team(struct team *team)
 	remove_images(team);
 	vfs_free_io_context(team->io_context);
 
-	// ToDo: should our death_entries be moved one level up?
 	delete_team_struct(team);
 
 	// notify the debugger, that the team is gone
@@ -1784,6 +1842,74 @@ team_get_address_space(team_id id, vm_address_space **_addressSpace)
 	restore_interrupts(state);
 
 	return status;
+}
+
+
+/*!	Sets the team's job control state.
+	Interrupts must be disabled and the team lock being held.
+	\a threadsLocked indicates whether the thread lock is being held, too.
+*/
+void
+team_set_job_control_state(struct team* team, job_control_state newState,
+	int signal, bool threadsLocked)
+{
+	if (team == NULL || team->job_control_entry == NULL)
+		return;
+
+	// don't touch anything, if the state stays the same or the team is already
+	// dead
+	job_control_entry* entry = team->job_control_entry;
+	if (entry->state == newState || entry->state == JOB_CONTROL_STATE_DEAD)
+		return;
+
+	// remove from the old list
+	switch (entry->state) {
+		case JOB_CONTROL_STATE_NONE:
+			// entry is in no list ATM
+			break;
+		case JOB_CONTROL_STATE_DEAD:
+			// can't get here
+			break;
+		case JOB_CONTROL_STATE_STOPPED:
+			team->parent->stopped_children->entries.Remove(entry);
+			break;
+		case JOB_CONTROL_STATE_CONTINUED:
+			team->parent->continued_children->entries.Remove(entry);
+			break;
+	}
+
+	entry->state = newState;
+	entry->signal = signal;
+
+	// add to new list
+	team_job_control_children* childList = NULL;
+	switch (entry->state) {
+		case JOB_CONTROL_STATE_NONE:
+			// entry doesn't get into any list
+			break;
+		case JOB_CONTROL_STATE_DEAD:
+			childList = team->parent->dead_children;
+			team->parent->dead_children->count++;
+			// When a child dies, we need to notify all lists, since that might
+			// have been the last of the parent's children, and a waiting
+			// parent thread wouldn't wake up otherwise.
+			team->parent->stopped_children->condition_variable.NotifyAll(
+				threadsLocked);
+			team->parent->continued_children->condition_variable.NotifyAll(
+				threadsLocked);
+			break;
+		case JOB_CONTROL_STATE_STOPPED:
+			childList = team->parent->stopped_children;
+			break;
+		case JOB_CONTROL_STATE_CONTINUED:
+			childList = team->parent->continued_children;
+			break;
+	}
+
+	if (childList != NULL) {
+		childList->entries.Add(entry);
+		childList->condition_variable.NotifyAll(threadsLocked);
+	}
 }
 
 

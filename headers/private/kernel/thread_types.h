@@ -40,8 +40,17 @@ enum team_state {
 	TEAM_STATE_DEATH	// being killed
 };
 
+typedef enum job_control_state {
+	JOB_CONTROL_STATE_NONE,
+	JOB_CONTROL_STATE_STOPPED,
+	JOB_CONTROL_STATE_CONTINUED,
+	JOB_CONTROL_STATE_DEAD
+} job_control_state;
+
 #define THREAD_RETURN_EXIT			0x1
 #define THREAD_RETURN_INTERRUPTED	0x2
+#define THREAD_STOPPED				0x3
+#define THREAD_CONTINUED			0x4
 
 struct image;
 	// defined in image.c
@@ -83,22 +92,43 @@ struct team_watcher {
 	// this is a soft limit for the number of dead entries in a team
 
 typedef struct team_dead_children team_dead_children;
+typedef struct team_job_control_children  team_job_control_children;
+typedef struct job_control_entry job_control_entry;
 
 
 #ifdef __cplusplus
 
 #include <condition_variable.h>
+#include <util/DoublyLinkedList.h>
 
-struct team_dead_children {
-	ConditionVariable<team_dead_children> condition_variable;
-									// wait for dead child entries
-	struct list	list;
+
+struct job_control_entry : DoublyLinkedListLinkImpl<job_control_entry> {
+	job_control_state	state;		// current team job control state
+	thread_id			thread;		// main thread ID == team ID
+
+	// valid while state != JOB_CONTROL_STATE_DEAD
+	struct team*		team;
+
+	// valid when state == JOB_CONTROL_STATE_DEAD
+	pid_t				group_id;
+	status_t			status;
+	uint16				reason;
+	uint16				signal;
+};
+
+typedef DoublyLinkedList<job_control_entry> JobControlEntryList;
+
+struct team_job_control_children {
+	ConditionVariable<team_job_control_children>	condition_variable;
+	JobControlEntryList								entries;
+};
+
+struct team_dead_children : team_job_control_children {
 	uint32		count;
-	vint32		wait_for_any;	// count of wait_for_child() that wait for any
-								// child
 	bigtime_t	kernel_time;
 	bigtime_t	user_time;
 };
+
 
 #endif	// __cplusplus
 
@@ -120,7 +150,12 @@ struct team {
 	int				pending_signals;
 	void			*io_context;
 	sem_id			death_sem;		// semaphore to wait on for dying threads
+
 	team_dead_children *dead_children;
+	team_job_control_children *stopped_children;
+	team_job_control_children *continued_children;
+	struct job_control_entry* job_control_entry;
+
 	struct vm_address_space *address_space;
 	struct thread	*main_thread;
 	struct thread	*thread_list;
