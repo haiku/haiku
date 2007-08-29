@@ -264,6 +264,14 @@ local logoArtwork = "HAIKU logo - white on blue - big.png"
 SEARCH on $(logoArtwork) = [ FDirName $(HAIKU_TOP) data artwork ] ;
 AddFilesToHaikuImage beos etc artwork : $(logoArtwork) ;
 
+# Mail spell check dictionaries
+local spellFiles = words geekspeak ;
+spellFiles = $(spellFiles:G=spell) ;
+SEARCH on $(spellFiles)
+	= [ FDirName $(HAIKU_TOP) src apps mail ] ;
+#AddDirectoryToHaikuImage beos etc word_dictionary ;
+AddFilesToHaikuImage beos etc word_dictionary : $(spellFiles) ;
+
 local svgFiles = "lion.svg" ;
 SEARCH on $(svgFiles)
 	= [ FDirName $(HAIKU_TOP) src tests kits interface picture ] ;
