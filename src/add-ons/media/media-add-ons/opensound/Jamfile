@@ -5,7 +5,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders media ;
 
 if $(TARGET_PLATFORM) != haiku {
-	SubDirC++Flags -fmultiple-symbol-spaces ;
+	SubDirC++Flags -fmultiple-symbol-spaces -D_ZETA_TS_FIND_DIR_=1 ;
 }
 
 Addon opensound.media_addon :
