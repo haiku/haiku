@@ -15,6 +15,7 @@
 #include <stdlib.h>
 
 #include <Application.h>
+#include <Beep.h>
 #include <File.h>
 #include <Path.h>
 
@@ -617,12 +618,18 @@ SudokuView::MessageReceived(BMessage* message)
 			if (solver.CountSolutions() > 0) {
 				fField->SetTo(solver.SolutionAt(0));
 				Invalidate();
-			}
+			} else
+				beep();
 			break;
 		}
 
 		case kMsgSolveSingle:
 		{
+			if (fField->IsSolved()) {
+				beep();
+				break;
+			}
+
 			SudokuSolver solver;
 			solver.SetTo(fField);
 			bigtime_t start = system_time();
@@ -640,7 +647,8 @@ SudokuView::MessageReceived(BMessage* message)
 				fField->SetValueAt(x, y,
 					solver.SolutionAt(0)->ValueAt(x, y));
 				_InvalidateField(x, y);
-			}
+			} else
+				beep();
 			break;
 		}
 

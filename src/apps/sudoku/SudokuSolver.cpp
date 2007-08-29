@@ -144,7 +144,13 @@ SudokuSolver::SudokuSolver()
 SudokuSolver::~SudokuSolver()
 {
 	// we don't own the field but the solutions
-	
+	_MakeEmpty();
+}
+
+
+void
+SudokuSolver::_MakeEmpty()
+{
 	for (uint32 i = 0; i < fSolutions.size(); i++) {
 		delete fSolutions[i];
 	}
@@ -161,6 +167,20 @@ SudokuSolver::SetTo(SudokuField* field)
 void
 SudokuSolver::ComputeSolutions()
 {
+	_MakeEmpty();
+
+	// We need to check if generating a solution is affordable with a
+	// brute force algorithm like this one
+	uint32 set = 0;
+	for (uint32 y = 0; y < fField->Size(); y++) {
+		for (uint32 x = 0; x < fField->Size(); x++) {
+			if (fField->ValueAt(x, y))
+				set++;
+		}
+	}
+	if (set < fField->Size() * fField->Size() / 6)
+		return;
+
 	Stack<SolutionStep*> stack;
 	SolutionStep* step = new SolutionStep(fField);
 	step->ToFirstUnset();

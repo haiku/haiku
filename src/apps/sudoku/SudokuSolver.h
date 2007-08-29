@@ -26,6 +26,8 @@ public:
 	SudokuField* SolutionAt(uint32 index);
 
 private:
+	void _MakeEmpty();
+
 	typedef std::vector<SudokuField*> SudokuList;
 
 	SudokuField*	fField;
