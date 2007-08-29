@@ -78,6 +78,7 @@ const char *kAllMimeTypes = "mime/ALLTYPES";
 const BRect kInitialRect(100, 100, 530, 210);
 const int32 kInitialAttrModeWindowHeight = 140;
 const int32 kIncrementPerAttribute = 30;
+const float kMoreOptionsDelta = 20;
 
 const uint32 kMoreOptionsMessage = 'mrop';
 const uint32 kNameModifiedMessage = 'nmmd';
@@ -639,7 +640,6 @@ FindWindow::MessageReceived(BMessage *message)
 
 //	#pragma mark -
 
-const float kMoreOptionsDelta = 20;
 
 FindPanel::FindPanel(BRect frame, BFile *node, FindWindow *parent,
 	bool , bool editTemplateOnly)
@@ -1830,8 +1830,10 @@ FindPanel::AddOneAttributeItem(BBox *box, BRect rect)
 void
 FindPanel::SetUpAddRemoveButtons(BBox *box)
 {
-	BButton *button = dynamic_cast<BButton *>(Window()->FindView("remove"));
-	if (!button) {	
+	BButton *button = Window() != NULL
+		? dynamic_cast<BButton *>(Window()->FindView("remove"))
+		: NULL;
+	if (button == NULL) {	
 		BRect rect = box->Bounds();
 		rect.InsetBy(5, 10);
 		rect.top = rect.bottom - 20;

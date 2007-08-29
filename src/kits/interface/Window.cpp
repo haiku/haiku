@@ -503,7 +503,8 @@ void
 BWindow::AddChild(BView *child, BView *before)
 {
 	BAutolock locker(this);
-	fTopView->AddChild(child, before);
+	if (locker.IsLocked())
+		fTopView->AddChild(child, before);
 }
 
 
@@ -511,6 +512,9 @@ bool
 BWindow::RemoveChild(BView *child)
 {
 	BAutolock locker(this);
+	if (!locker.IsLocked())
+		return false;
+
 	return fTopView->RemoveChild(child);
 }
 
@@ -518,7 +522,10 @@ BWindow::RemoveChild(BView *child)
 int32
 BWindow::CountChildren() const
 {
-	BAutolock _(const_cast<BWindow*>(this));
+	BAutolock locker(const_cast<BWindow*>(this));
+	if (!locker.IsLocked())
+		return 0;
+
 	return fTopView->CountChildren();
 }
 
@@ -526,7 +533,10 @@ BWindow::CountChildren() const
 BView *
 BWindow::ChildAt(int32 index) const
 {
-	BAutolock _(const_cast<BWindow*>(this));
+	BAutolock locker(const_cast<BWindow*>(this));
+	if (!locker.IsLocked())
+		return NULL;
+
 	return fTopView->ChildAt(index);
 }
 
@@ -1673,7 +1683,10 @@ BWindow::UpdateIfNeeded()
 BView *
 BWindow::FindView(const char *viewName) const
 {
-	BAutolock _(const_cast<BWindow*>(this));
+	BAutolock locker(const_cast<BWindow*>(this));
+	if (!locker.IsLocked())
+		return NULL;
+
 	return fTopView->FindView(viewName);
 }
 
@@ -1681,7 +1694,10 @@ BWindow::FindView(const char *viewName) const
 BView *
 BWindow::FindView(BPoint point) const
 {
-	BAutolock _(const_cast<BWindow*>(this));
+	BAutolock locker(const_cast<BWindow*>(this));
+	if (!locker.IsLocked())
+		return NULL;
+
 	// point is assumed to be in window coordinates,
 	// fTopView has same bounds as window
 	return _FindView(fTopView, point);
@@ -1946,6 +1962,8 @@ status_t
 BWindow::SetLook(window_look look)
 {
 	BAutolock locker(this);
+	if (!locker.IsLocked())
+		return B_BAD_VALUE;
 
 	fLink->StartMessage(AS_SET_LOOK);
 	fLink->Attach<int32>((int32)look);
@@ -1972,6 +1990,8 @@ status_t
 BWindow::SetFeel(window_feel feel)
 {
 	BAutolock locker(this);
+	if (!locker.IsLocked())
+		return B_BAD_VALUE;
 
 	fLink->StartMessage(AS_SET_FEEL);
 	fLink->Attach<int32>((int32)feel);
@@ -1995,6 +2015,8 @@ status_t
 BWindow::SetFlags(uint32 flags)
 {
 	BAutolock locker(this);
+	if (!locker.IsLocked())
+		return B_BAD_VALUE;
 
 	fLink->StartMessage(AS_SET_FLAGS);
 	fLink->Attach<uint32>(flags);
