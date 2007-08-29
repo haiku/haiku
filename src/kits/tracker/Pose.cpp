@@ -671,7 +671,6 @@ void
 BPose::DeselectWithoutErasingBackground(BRect, BPoseView *poseView)
 {
 	ASSERT(poseView->ViewMode() != kListMode);
-	ASSERT(!poseView->EraseWidgetTextBackground());
 	ASSERT(!IsSelected());
 
 	// draw icon directly
