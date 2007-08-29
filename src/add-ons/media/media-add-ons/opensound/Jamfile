@@ -1,0 +1,23 @@
+SubDir HAIKU_TOP src add-ons media media-add-ons opensound ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders media ;
+
+if $(TARGET_PLATFORM) != haiku {
+	SubDirC++Flags -fmultiple-symbol-spaces ;
+}
+
+Addon opensound.media_addon :
+	OpenSoundAddOn.cpp
+	OpenSoundDevice.cpp
+	OpenSoundDeviceEngine.cpp
+	OpenSoundDeviceMixer.cpp
+	OpenSoundNode.cpp
+	: be media
+;
+
+Package haiku-opensound-cvs
+	: opensound.media_addon
+	: boot home config add-ons media ;
+
