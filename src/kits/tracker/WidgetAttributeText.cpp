@@ -663,7 +663,7 @@ ScalarAttributeText::Compare(WidgetAttributeText &attr, BPoseView *)
 	if (fValueDirty)
 		fValue = ReadValue();
 
-	return fValue > compareTo->Value() ? (fValue == compareTo->Value() ? 0 : -1) : 1 ;
+	return fValue <= compareTo->Value() ? (fValue == compareTo->Value() ? 0 : -1) : 1 ;
 }
 
 
@@ -1445,52 +1445,52 @@ GenericAttributeText::Compare(WidgetAttributeText &attr, BPoseView *)
 			}
 
 		case B_FLOAT_TYPE:
-			return fValue.floatt > compareTo->fValue.floatt ?
+			return fValue.floatt <= compareTo->fValue.floatt ?
 				(fValue.floatt == compareTo->fValue.floatt ? 0 : -1) : 1;
 
 		case B_DOUBLE_TYPE:
-			return fValue.doublet > compareTo->fValue.doublet ?
+			return fValue.doublet <= compareTo->fValue.doublet ?
 				(fValue.doublet == compareTo->fValue.doublet ? 0 : -1) : 1;
 
 		case B_BOOL_TYPE:
-			return fValue.boolt > compareTo->fValue.boolt ?
+			return fValue.boolt <= compareTo->fValue.boolt ?
 				(fValue.boolt == compareTo->fValue.boolt ? 0 : -1) : 1;
 
 		case B_UINT8_TYPE:
-			return fValue.uint8t > compareTo->fValue.uint8t ?
+			return fValue.uint8t <= compareTo->fValue.uint8t ?
 				(fValue.uint8t == compareTo->fValue.uint8t ? 0 : -1) : 1;
 
 		case B_INT8_TYPE:
-			return fValue.int8t > compareTo->fValue.int8t ?
+			return fValue.int8t <= compareTo->fValue.int8t ?
 					(fValue.int8t == compareTo->fValue.int8t ? 0 : -1) : 1;
 
 		case B_UINT16_TYPE:
-			return fValue.uint16t > compareTo->fValue.uint16t ?
+			return fValue.uint16t <= compareTo->fValue.uint16t ?
 				(fValue.uint16t == compareTo->fValue.uint16t ? 0 : -1) : 1;
 
 		case B_INT16_TYPE:
-			return fValue.int16t > compareTo->fValue.int16t ?
+			return fValue.int16t <= compareTo->fValue.int16t ?
 				(fValue.int16t == compareTo->fValue.int16t ? 0 : -1) : 1;
 
 		case B_UINT32_TYPE:
-			return fValue.uint32t > compareTo->fValue.uint32t ?
+			return fValue.uint32t <= compareTo->fValue.uint32t ?
 				(fValue.uint32t == compareTo->fValue.uint32t ? 0 : -1) : 1;
 
 		case B_TIME_TYPE:
 			// time_t typedef'd to a long, i.e. a int32
 		case B_INT32_TYPE:
-			return fValue.int32t > compareTo->fValue.int32t ?
+			return fValue.int32t <= compareTo->fValue.int32t ?
 				(fValue.int32t == compareTo->fValue.int32t ? 0 : -1) : 1;
 
 		case B_OFF_T_TYPE:
 			// off_t typedef'd to a long long, i.e. a int64
 		case B_INT64_TYPE:
-			return fValue.int64t > compareTo->fValue.int64t ?
+			return fValue.int64t <= compareTo->fValue.int64t ?
 				(fValue.int64t == compareTo->fValue.int64t ? 0 : -1) : 1;
 
 		case B_UINT64_TYPE:
 		default:
-			return fValue.uint64t > compareTo->fValue.uint64t ?
+			return fValue.uint64t <= compareTo->fValue.uint64t ?
 				(fValue.uint64t == compareTo->fValue.uint64t ? 0 : -1) : 1;
 	}
 	return 0;
