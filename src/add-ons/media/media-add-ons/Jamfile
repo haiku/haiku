@@ -8,6 +8,7 @@ SubInclude HAIKU_TOP src add-ons media media-add-ons esound_sink ;
 SubInclude HAIKU_TOP src add-ons media media-add-ons legacy ;
 SubInclude HAIKU_TOP src add-ons media media-add-ons mixer ;
 SubInclude HAIKU_TOP src add-ons media media-add-ons multi_audio ;
+SubInclude HAIKU_TOP src add-ons media media-add-ons opensound ;
 SubInclude HAIKU_TOP src add-ons media media-add-ons radeon ;
 SubInclude HAIKU_TOP src add-ons media media-add-ons tone_producer_demo ;
 SubInclude HAIKU_TOP src add-ons media media-add-ons usb_vision ;
