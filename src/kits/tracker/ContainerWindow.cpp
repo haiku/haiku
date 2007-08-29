@@ -913,7 +913,7 @@ BContainerWindow::Init(const BMessage *message)
 		}
 
 		// add folder icon to menu bar
-		if (!TargetModel()->IsRoot() && !IsTrash() && !IsPrintersDir()) {
+		if (!TargetModel()->IsRoot() && !IsTrash()) {
 			float iconSize = fMenuBar->Bounds().Height() - 2;
 			if (iconSize < 16)
 				iconSize = 16;
