@@ -1,13 +1,14 @@
 /*
- * Copyright (c) 2001-2006, Haiku, Inc.
+ * Copyright (c) 2001-2007, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Erik Jaesler (erik@cgsoftware.com)
  */
 
-/**	Description:	BArchivable mix-in class defines the archiving
-					protocol.  Also some global archiving functions.*/
+/*!	BArchivable mix-in class defines the archiving protocol.
+	Also some global archiving functions.
+*/
 
 
 #include <ctype.h>
@@ -15,6 +16,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string>
+#include <syslog.h>
 #include <typeinfo>
 #include <vector>
 
@@ -26,8 +28,6 @@
 #include <Path.h>
 #include <Roster.h>
 #include <String.h>
-#include <SupportDefs.h>
-#include <syslog.h>
 
 
 using std::string;
@@ -37,34 +37,14 @@ const char* B_CLASS_FIELD = "class";
 const char* B_ADD_ON_FIELD = "add_on";
 const int32 FUNC_NAME_LEN = 1024;
 
-// TODO: consider moving these
-//		 to a separate module, and making them more full-featured (e.g., taking
-//		 NS::ClassName::Function(Param p) instead of just NS::ClassName)
+// TODO: consider moving these to a separate module, and making them more
+//	full-featured (e.g., taking NS::ClassName::Function(Param p) instead
+//	of just NS::ClassName)
 static void Demangle(const char *name, BString &out);
 static void Mangle(const char *name, BString &out);
 static instantiation_func FindFuncInImage(BString& funcName, image_id id,
-										  status_t& err);
+	status_t& err);
 static bool CheckSig(const char* sig, image_info& info);
-
-/*
-// TODO: Where do these get triggered from?
-Log entries graciously coughed up by the Be implementation:
-	Nov 28 01:40:45 instantiate_object failed: NULL BMessage argument 
-	Nov 28 01:40:45 instantiate_object failed: Failed to find an entrydefining the class name (Name not found). 
-	Nov 28 01:40:45 instantiate_object failed: No signature specified in archive, looking for class "TInvalidClassName". 
-	Nov 28 01:40:45 instantiate_object failed: Error finding app with signature "application/x-vnd.InvalidSignature" (Application could not be found) 
-	Nov 28 01:40:45 instantiate_object failed: Application could not be found (8000200b) 
-	Nov 28 01:40:45 instantiate_object failed: Failed to find exported Instantiate static function for class TInvalidClassName. 
-	Nov 28 01:40:45 instantiate_object failed: Invalid argument (80000005) 
-	Nov 28 01:40:45 instantiate_object failed: No signature specified in archive, looking for class "TRemoteTestObject". 
-	Nov 28 01:40:45 instantiate_object - couldn't get mime sig for /boot/home/src/projects/OpenBeOS/app_kit/test/lib/support/BArchivable/./BArchivableSystemTester 
-	Nov 28 01:40:45 instantiate_object failed: Error finding app with signature "application/x-vnd.InvalidSignature" (Application could not be found) 
-	Nov 28 01:40:45 instantiate_object failed: Application could not be found (8000200b) 
-	Nov 28 01:40:45 instantiate_object failed: Error finding app with signature "application/x-vnd.InvalidSignature" (Application could not be found) 
-	Nov 28 01:40:45 instantiate_object failed: Application could not be found (8000200b) 
-	Nov 28 01:40:45 instantiate_object failed: Error finding app with signature "application/x-vnd.InvalidSignature" (Application could not be found) 
-	Nov 28 01:40:45 instantiate_object failed: Application could not be found (8000200b) 
-*/
 
 
 BArchivable::BArchivable()
@@ -142,12 +122,9 @@ BuildFuncName(const char* className, BString& funcName)
 BArchivable*
 instantiate_object(BMessage* archive, image_id* id)
 {
-	errno = B_OK;
-
 	// Check our params
-	if (id) {
+	if (id)
 		*id = B_BAD_VALUE;
-	}
 
 	if (!archive) {
 		// TODO: extended error handling
@@ -162,7 +139,7 @@ instantiate_object(BMessage* archive, image_id* id)
 	if (err) {
 		// TODO: extended error handling
 		syslog(LOG_ERR, "instantiate_object failed: Failed to find an entry "
-			   "defining the class name (%s).", strerror(err));
+			"defining the class name (%s).", strerror(err));
 		return NULL;
 	}
 
@@ -172,68 +149,68 @@ instantiate_object(BMessage* archive, image_id* id)
 
 	instantiation_func iFunc = find_instantiation_func(name, sig);
 
-	//	if find_instantiation_func() can't locate Class::Instantiate()
-	//		and a signature was specified
+	// if find_instantiation_func() can't locate Class::Instantiate()
+	// and a signature was specified
 	if (!iFunc && hasSig) {
-		//	use BRoster::FindApp() to locate an app or add-on with the symbol
+		// use BRoster::FindApp() to locate an app or add-on with the symbol
 		BRoster Roster;
 		entry_ref ref;
 		err = Roster.FindApp(sig, &ref);
 
+		// if an entry_ref is obtained
 		BEntry entry;
-
-		//	if an entry_ref is obtained
 		if (!err)
 			err = entry.SetTo(&ref);
 
 		if (err) {
 			syslog(LOG_ERR, "instantiate_object failed: Error finding app "
-							"with signature \"%s\" (%s)", sig, strerror(err));
+				"with signature \"%s\" (%s)", sig, strerror(err));
 		}
 
 		if (!err) {
 			BPath path;
 			err = entry.GetPath(&path);
 			if (!err) {
-				//	load the app/add-on
-				image_id theImage = load_add_on(path.Path());
-				if (theImage < 0) {
+				// load the app/add-on
+				image_id addOn = load_add_on(path.Path());
+				if (addOn < 0) {
 					// TODO: extended error handling
+					syslog(LOG_ERR, "instantiate_object failed: Could not load "
+						"add-on %s: %s.", path.Path(), strerror(addOn));
 					return NULL;
 				}
-		
+
 				// Save the image_id
-				if (id) {
-					*id = theImage;
-				}
-		
+				if (id)
+					*id = addOn;
+
 				BString funcName;
 				BuildFuncName(name, funcName);
-				iFunc = FindFuncInImage(funcName, theImage, err);
-				if (!iFunc)
-				{
+
+				iFunc = FindFuncInImage(funcName, addOn, err);
+				if (!iFunc) {
 					syslog(LOG_ERR, "instantiate_object failed: Failed to find exported "
-						   "Instantiate static function for class %s.", name);
+						"Instantiate static function for class %s.", name);
 				}
 			}
 		}
 	} else if (!iFunc) {
 		syslog(LOG_ERR, "instantiate_object failed: No signature specified "
-			   "in archive, looking for class \"%s\".", name);
+			"in archive, looking for class \"%s\".", name);
 		errno = B_BAD_VALUE;
 	}
 
 	if (err) {
 		// TODO: extended error handling
 		syslog(LOG_ERR, "instantiate_object failed: %s (%x)",
-			   strerror(err), err);
+			strerror(err), err);
 		errno = err;
 		return NULL;
 	}
 
-	//	if Class::Instantiate(BMessage*) was found
+	// if Class::Instantiate(BMessage*) was found
 	if (iFunc) {
-		//	use to create and return an object instance
+		// use to create and return an object instance
 		return iFunc(archive);
 	}
 

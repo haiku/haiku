@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -1088,7 +1088,8 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 	// Check shelf types if needed
 	if (fTypeEnforced) {
 		const char *shelfType = NULL;
-		if (data->FindString("shelf_type", &shelfType) == B_OK && shelfType != NULL) {
+		if (data->FindString("shelf_type", &shelfType) == B_OK
+			&& shelfType != NULL) {
 			if (Name() && strcmp(shelfType, Name()) != 0) {
 				printf("Replicant was rejected by BShelf: The BShelf's type and the Replicant's type don't match.");
 				return send_reply(data, B_ERROR, uniqueID);
@@ -1142,10 +1143,14 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 	// Instantiate the object, if this fails we have a zombie
 	image_id image;
 	BArchivable *archivable = _InstantiateObject(data, &image);
-	if (archivable) {
-		BView *view = dynamic_cast<BView*>(archivable);
-		BPoint point;
+	BView *view = dynamic_cast<BView*>(archivable);
+	if (archivable != NULL && view == NULL) {
+		printf("Replicant was rejected: it's not a view!");
+		return send_reply(data, B_ERROR, uniqueID);
+	}
 
+	if (view != NULL) {
+		BPoint point;
 		if (location)
 			point = *location;
 		else
@@ -1215,7 +1220,8 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 		view->MoveTo(point + adjust);	
 
 		// if it's a sibling or a child, we need to add the dragger
-		if (relation == BDragger::TARGET_IS_SIBLING || relation == BDragger::TARGET_IS_CHILD)
+		if (relation == BDragger::TARGET_IS_SIBLING
+			|| relation == BDragger::TARGET_IS_CHILD)
 			fContainerView->AddChild(dragger);
 
 		replicant->AddFilter(new ReplicantViewFilter(this, replicant));
@@ -1246,13 +1252,17 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 
 			fContainerView->AddChild(zombie);
 		}
+	} else if (!fAllowZombies) {
+		// There was no view, and we're not allowed to have any zombies
+		// in the house
+		return send_reply(data, B_ERROR, uniqueID);
 	}
 
 	data->RemoveName("_drop_point_");
 	data->RemoveName("_drop_offset_");
 
-	replicant_data *item = new replicant_data(data, replicant, dragger, relation,
-		uniqueID, image);
+	replicant_data *item = new replicant_data(data, replicant, dragger,
+		relation, uniqueID, image);
 
 	item->error = B_OK;
 	item->zombie_view = zombie;
