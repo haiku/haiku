@@ -32,11 +32,8 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-//--------------------------------------------------------------------
-//	
-//	Prefs.cpp
-//
-//--------------------------------------------------------------------
+
+#include "Prefs.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -56,8 +53,10 @@ All rights reserved.
 
 using namespace BPrivate;
 
-#include "Mail.h"
-#include "Prefs.h"
+#include "MailApp.h"
+#include "MailSupport.h"
+#include "MailWindow.h"
+#include "Messages.h"
 
 #define BUTTON_WIDTH		70
 #define BUTTON_HEIGHT		20
@@ -304,10 +303,9 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont *font, int32 *level, bool *wrap,
 
 TPrefsWindow::~TPrefsWindow()
 {
-	prefs_window = Frame().LeftTop();
-
 	BMessage msg(WINDOW_CLOSED);
 	msg.AddInt32("kind", PREFS_WINDOW);
+	msg.AddPoint("window pos", Frame().LeftTop());
 	be_app->PostMessage(&msg);
 }
 

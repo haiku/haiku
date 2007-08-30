@@ -32,11 +32,6 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-//--------------------------------------------------------------------
-//	
-//	Content.cpp
-//	
-//--------------------------------------------------------------------
 
 #include <stdlib.h>
 #include <string.h>
@@ -72,7 +67,10 @@ All rights reserved.
 
 #include <MDRLanguage.h>
 
-#include "Mail.h"
+#include "MailApp.h"
+#include "MailSupport.h"
+#include "MailWindow.h"
+#include "Messages.h"
 #include "Content.h"
 #include "Utilities.h"
 #include "FieldMsg.h"
@@ -98,9 +96,6 @@ const rgb_color kQuoteColors[] =
 	{0x80, 0, 0, 0}			// 2nd, ...
 };
 const int32 kNumQuoteColors = 3;
-
-extern bool header_flag;
-extern bool gColoredQuotes;
 
 void Unicode2UTF8(int32 c, char **out);
 
@@ -573,15 +568,13 @@ TextRunArray::~TextRunArray()
 //	#pragma mark -
 
 
-TContentView::TContentView(BRect rect, bool incoming, BEmailMessage *mail, BFont *font)
-	:	BView(rect, "m_content", B_FOLLOW_ALL, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
+TContentView::TContentView(BRect rect, bool incoming, BEmailMessage *mail,
+		BFont* font, bool showHeader, bool coloredQuotes)
+	: BView(rect, "m_content", B_FOLLOW_ALL, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 	fFocus(false),
 	fIncoming(incoming)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	BFont v_font = *be_plain_font;
-	v_font.SetSize(FONT_SIZE);
 	fOffset = 12;
 
 	BRect r(rect);
@@ -593,7 +586,8 @@ TContentView::TContentView(BRect rect, bool incoming, BEmailMessage *mail, BFont
 	text.OffsetTo(0, 0);
 	text.InsetBy(5, 5);
 
-	fTextView = new TTextView(r, text, fIncoming, mail, this, font);
+	fTextView = new TTextView(r, text, fIncoming, mail, this, font,
+		showHeader, coloredQuotes);
 	BScrollView *scroll = new BScrollView("", fTextView, B_FOLLOW_ALL, 0, true, true);
 	AddChild(scroll);
 }
@@ -768,12 +762,6 @@ TContentView::Focus(bool focus)
 void
 TContentView::FrameResized(float /* width */, float /* height */)
 {
-	BFont v_font = *be_plain_font;
-	v_font.SetSize(FONT_SIZE);
-
-	font_height fHeight;
-	v_font.GetHeight(&fHeight);
-
 	BRect r(fTextView->Bounds());
 	r.OffsetTo(0, 0);
 	r.InsetBy(5, 5);	
@@ -785,10 +773,12 @@ TContentView::FrameResized(float /* width */, float /* height */)
 //	#pragma mark -
 
 
-TTextView::TTextView(BRect frame, BRect text, bool incoming, BEmailMessage *mail,
-	TContentView *view, BFont *font)
-	:	BTextView(frame, "", text, B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE),
-	fHeader(header_flag),
+TTextView::TTextView(BRect frame, BRect text, bool incoming,
+		BEmailMessage *mail, TContentView *view, BFont *font,
+		bool showHeader, bool coloredQuotes)
+	: BTextView(frame, "", text, B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE),
+	fHeader(showHeader),
+	fColoredQuotes(coloredQuotes),
 	fReady(false),
 	fYankBuffer(NULL),
 	fLastPosition(-1),
@@ -2355,7 +2345,7 @@ TTextView::Reader::Insert(const char *line, int32 count, bool isHyperLink, bool 
 	BFont font(fView->Font());
 	TextRunArray style(count / 8 + 8);
 
-	if (gColoredQuotes && !isHeader && !isHyperLink)
+	if (fView->fColoredQuotes && !isHeader && !isHyperLink)
 		FillInQuoteTextRuns(fView, line, count, font, &style.Array(), style.MaxEntries());
 	else {
 		text_run_array &array = style.Array();
@@ -3067,7 +3057,7 @@ TTextView::AddQuote(int32 start, int32 finish)
 	free(text);
 	Delete();
 
-	if (gColoredQuotes) {
+	if (fColoredQuotes) {
 		const BFont *font = Font();
 		TextRunArray style(targetLength / 8 + 8);
 
@@ -3144,7 +3134,7 @@ TTextView::RemoveQuote(int32 start, int32 finish)
 	if (removed) {
 		Delete();
 
-		if (gColoredQuotes) {
+		if (fColoredQuotes) {
 			const BFont *font = Font();
 			TextRunArray style(length / 8 + 8);
 

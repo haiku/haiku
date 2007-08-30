@@ -56,8 +56,6 @@ All rights reserved.
 #define TO_FIELD_V			  7
 #define TO_FIELD_WIDTH		270
 #define FROM_FIELD_WIDTH	280
-#define TO_FIELD_HEIGHT		 16
-#define FIELD_HEIGHT		 24
 
 #define ACCOUNT_TEXT		"Account:"
 #define ACCOUNT_FIELD_WIDTH	165
@@ -91,7 +89,7 @@ class QPopupMenu;
 class THeaderView : public BBox {
 	public:
 		THeaderView(BRect, BRect, bool incoming, BEmailMessage *mail,
-			bool resending, uint32 defaultCharacterSet);
+			bool resending, uint32 defaultCharacterSet, uint32 defaultChain);
 
 		virtual void	MessageReceived(BMessage *);
 		virtual void	AttachedToWindow(void);
@@ -106,6 +104,7 @@ class THeaderView : public BBox {
 		TTextControl	*fCc;
 		TTextControl	*fSubject;
 		TTextControl	*fTo;
+		BStringView		*fDateLabel;
 		BStringView		*fDate;
 		bool			fIncoming;
 		uint32			fCharacterSetUserSees;

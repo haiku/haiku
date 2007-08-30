@@ -116,7 +116,8 @@ class TSavePanel;
 class TContentView : public BView
 {
 	public:
-		TContentView(BRect, bool incoming, BEmailMessage *mail, BFont *); 
+		TContentView(BRect, bool incoming, BEmailMessage *mail, BFont*,
+			bool showHeader, bool coloredQuotes); 
 		virtual void MessageReceived(BMessage *);
 		void FindString(const char *);
 		void Focus(bool);
@@ -140,7 +141,8 @@ enum {
 class TTextView : public BTextView
 {
 	public:
-		TTextView(BRect, BRect, bool incoming, BEmailMessage *mail, TContentView *,BFont *);
+		TTextView(BRect, BRect, bool incoming, BEmailMessage *mail,
+			TContentView *, BFont *, bool showHeader, bool coloredQuotes);
 		~TTextView();
 
 		virtual	void AttachedToWindow();
@@ -175,6 +177,7 @@ class TTextView : public BTextView
 		const BFont *Font() const { return &fFont; }
 
 		bool fHeader;
+		bool fColoredQuotes;
 		bool fReady;
 
 	private:

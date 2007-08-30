@@ -38,7 +38,9 @@ All rights reserved.
 // ===========================================================================
 
 #include "FindWindow.h"
-#include "Mail.h"
+#include "MailApp.h"
+#include "MailWindow.h"
+#include "Messages.h"
 #include "AutoTextControl.h"
 
 #include <TextView.h>

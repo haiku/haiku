@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src apps mail ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
 
 if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders mail ;
@@ -20,7 +21,10 @@ Application Mail :
 	Enclosures.cpp
 	FindWindow.cpp
 	Header.cpp
-	Mail.cpp
+	MailApp.cpp
+	MailPopUpMenu.cpp
+	MailSupport.cpp
+	MailWindow.cpp
 	Prefs.cpp
 	QueryMenu.cpp
 	Signature.cpp
@@ -35,3 +39,9 @@ LinkAgainst Mail : be tracker $(TARGET_LIBSTDC++) libmail.so libtextencoding.so 
 Package haiku-maildaemon-cvs :
 	Mail : 
 	boot beos apps ;
+
+
+if ( $(TARGET_PLATFORM) = libbe_test ) {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Mail
+		: tests!apps ;
+}

@@ -39,7 +39,6 @@ All rights reserved.
 //	and the view containing the list and handling the messages (TEnclosuresView).
 //--------------------------------------------------------------------
 
-#include "Mail.h"
 #include "Enclosures.h"
 
 #include <Debug.h>
@@ -48,6 +47,7 @@ All rights reserved.
 #include <MenuItem.h>
 #include <Alert.h>
 #include <NodeMonitor.h>
+#include <PopUpMenu.h>
 
 #include <MailAttachment.h>
 #include <MailMessage.h>
@@ -58,9 +58,13 @@ All rights reserved.
 #include <stdlib.h>
 #include <string.h>
 
+#include "MailApp.h"
+#include "MailSupport.h"
+#include "MailWindow.h"
+#include "Messages.h"
 
-//====================================================================
 
+static const float kPlainFontSizeScale = 0.9;
 
 static status_t 
 GetTrackerIcon(BMimeType &type, BBitmap *icon, icon_size iconSize)
@@ -125,10 +129,10 @@ TEnclosuresView::TEnclosuresView(BRect rect, BRect wind_rect)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	BFont font = *be_plain_font;
-	font.SetSize(FONT_SIZE);
-	font_height fHeight;
-	font.GetHeight(&fHeight);
+	BFont font(be_plain_font);
+	font.SetSize(font.Size() * kPlainFontSizeScale);
+	SetFont(&font);
+
 	fOffset = 12;
 
 	BRect r;
@@ -166,16 +170,13 @@ TEnclosuresView::Draw(BRect where)
 {
 	BView::Draw(where);
 
-	BFont font = *be_plain_font;
-	font.SetSize(FONT_SIZE);
-	SetFont(&font);
 	SetHighColor(0, 0, 0);
 	SetLowColor(ViewColor());
 
-	font_height fHeight;
-	font.GetHeight(&fHeight);
+	font_height fh;
+	GetFontHeight(&fh);
 
-	MovePenTo(ENCLOSE_TEXT_H, ENCLOSE_TEXT_V + fHeight.ascent);
+	MovePenTo(ENCLOSE_TEXT_H, ENCLOSE_TEXT_V + fh.ascent);
 	DrawString(ENCLOSE_TEXT);
 }
 
@@ -396,8 +397,8 @@ TListView::AttachedToWindow()
 {
 	BListView::AttachedToWindow();
 
-	BFont font = *be_plain_font;
-	font.SetSize(FONT_SIZE);
+	BFont font(be_plain_font);
+	font.SetSize(font.Size() * kPlainFontSizeScale);
 	SetFont(&font);
 }
 
@@ -509,7 +510,7 @@ TListItem::DrawItem(BView *owner, BRect r, bool /* complete */)
 	owner->SetHighColor(0, 0, 0);
 
 	BFont font = *be_plain_font;
-	font.SetSize(FONT_SIZE);
+	font.SetSize(font.Size() * kPlainFontSizeScale);
 	owner->SetFont(&font);
 	owner->MovePenTo(r.left + 24, r.bottom - 4);
 

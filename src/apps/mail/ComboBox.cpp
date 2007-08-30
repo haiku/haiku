@@ -1265,7 +1265,7 @@ BComboBox::TextView()
 void
 BComboBox::SetDivider(float divide)
 {
-	float	diff = fDivider - divide;
+	float diff = fDivider - divide;
 	fDivider = divide;
 
 	fText->MoveBy(-diff, 0);

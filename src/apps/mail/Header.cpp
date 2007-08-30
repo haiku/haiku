@@ -32,7 +32,10 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-#include "Mail.h"
+#include "MailApp.h"
+#include "MailSupport.h"
+#include "MailWindow.h"
+#include "Messages.h"
 #include "Header.h"
 #include "Utilities.h"
 #include "QueryMenu.h"
@@ -46,6 +49,7 @@ All rights reserved.
 #include <CharacterSet.h>
 #include <CharacterSetRoster.h>
 #include <E-mail.h>
+#include <MenuBar.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
@@ -69,13 +73,13 @@ All rights reserved.
 using namespace BPrivate;
 using std::map;
 
-extern uint32 gDefaultChain;
-
 const char* kDateLabel = "Date:";
 const uint32 kMsgFrom = 'hFrm';
 const uint32 kMsgEncoding = 'encd';
 const uint32 kMsgAddressChosen = 'acsn';
 
+static const float kTextControlDividerOffset = 0;
+static const float kMenuFieldDividerOffset = 6;
 
 class QPopupMenu : public QueryMenu {
 	public:
@@ -116,21 +120,26 @@ mail_to_filter(const char* text, int32& length, const text_run_array*& runs)
 }
 
 
+static const float kPlainFontSizeScale = 0.9;
+
+
 //	#pragma mark - THeaderView
 
 
 THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
-		BEmailMessage *mail, bool resending, uint32 defaultCharacterSet)
+		BEmailMessage *mail, bool resending, uint32 defaultCharacterSet,
+		uint32 defaultChain)
 	: BBox(rect, "m_header", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW, B_NO_BORDER),
 	fAccountMenu(NULL),
 	fEncodingMenu(NULL),
-	fChain(gDefaultChain),
+	fChain(defaultChain),
 	fAccountTo(NULL),
 	fAccount(NULL),
 	fBcc(NULL),
 	fCc(NULL),
 	fSubject(NULL),
 	fTo(NULL),
+	fDateLabel(NULL),
 	fDate(NULL),
 	fIncoming(incoming),
 	fCharacterSetUserSees(defaultCharacterSet),
@@ -143,12 +152,18 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 	BMenuField* field;
 	BMessage* msg;
 
-	BFont font = *be_plain_font;
-	font.SetSize(FONT_SIZE);
-	SetFont(&font);
-	float x = font.StringWidth( /* The longest title string in the header area */
+	float x = StringWidth( /* The longest title string in the header area */
 		MDR_DIALECT_CHOICE ("Enclosures: ","添付ファイル：")) + 9;
 	float y = TO_FIELD_V;
+
+	float menuFieldHeight;
+	BMenuBar* dummy = new BMenuBar(BRect(0, 0, 100, 15), "Dummy");
+	AddChild(dummy);
+	float width;
+	dummy->GetPreferredSize(&width, &menuFieldHeight);
+	menuFieldHeight += floorf(be_plain_font->Size() / 1.15);
+	dummy->RemoveSelf();
+	delete dummy;
 
 	if (!fIncoming) {
 		InitEmailCompletion();
@@ -195,8 +210,8 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 			item->SetMarked(true);
 			markedCharSet = true;
 		}
-		if (font.StringWidth(name.String()) > widestCharacterSet)
-			widestCharacterSet = font.StringWidth(name.String());
+		if (StringWidth(name.String()) > widestCharacterSet)
+			widestCharacterSet = StringWidth(name.String());
 	}
 
 	msg = new BMessage(kMsgEncoding);
@@ -226,31 +241,34 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 	if (fIncoming && !resending) {
 		// Set up the character set pop-up menu on the right of "To" box.
 		r.Set (windowRect.Width() - widestCharacterSet -
-			font.StringWidth (DECODING_TEXT) - 2 * SEPARATOR_MARGIN,
-			y - 2, windowRect.Width() - SEPARATOR_MARGIN, y + TO_FIELD_HEIGHT + 2);
+			StringWidth (DECODING_TEXT) - 2 * SEPARATOR_MARGIN, y - 2,
+			windowRect.Width() - SEPARATOR_MARGIN, y + menuFieldHeight + 2);
 		field = new BMenuField (r, "decoding", DECODING_TEXT, fEncodingMenu,
 			true /* fixedSize */,
 			B_FOLLOW_TOP | B_FOLLOW_RIGHT,
 			B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-		field->SetFont (&font);
-		field->SetDivider (font.StringWidth(DECODING_TEXT) + 5);
+		field->SetDivider(field->StringWidth(DECODING_TEXT) + 5);
 		AddChild(field);
-		r.Set(x - font.StringWidth(FROM_TEXT) - 11, y,
-			  field->Frame().left - SEPARATOR_MARGIN, y + TO_FIELD_HEIGHT);
+		r.Set(SEPARATOR_MARGIN, y,
+			  field->Frame().left - SEPARATOR_MARGIN, y + menuFieldHeight);
 		sprintf(string, FROM_TEXT);
 	} else {
-		r.Set(x - 11, y, windowRect.Width() - SEPARATOR_MARGIN, y + TO_FIELD_HEIGHT);
+		r.Set(x - 12, y, windowRect.Width() - SEPARATOR_MARGIN,
+			y + menuFieldHeight);
 		string[0] = 0;
 	}
 
-	y += FIELD_HEIGHT;
-	fTo = new TTextControl(r, string, new BMessage(TO_FIELD), fIncoming, resending,
-		B_FOLLOW_LEFT_RIGHT);
+	y += menuFieldHeight;
+	fTo = new TTextControl(r, string, new BMessage(TO_FIELD), fIncoming,
+		resending, B_FOLLOW_LEFT_RIGHT);
 	fTo->SetFilter(mail_to_filter);
 
 	if (!fIncoming || resending) {
 		fTo->SetChoiceList(&fEmailList);
 		fTo->SetAutoComplete(true);
+	} else {
+		fTo->SetDivider(x - 12 - SEPARATOR_MARGIN);
+		fTo->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	}
 
 	AddChild(fTo);
@@ -259,11 +277,12 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 	fTo->SetModificationMessage(msg);
 
 	if (!fIncoming || resending) {
-		r.right = r.left + 8;
-		r.left = r.right - be_plain_font->StringWidth(TO_TEXT) - 30;
+		r.right = r.left - 5;
+		r.left = r.right - be_plain_font->StringWidth(TO_TEXT) - 15;
 		r.top -= 1;
 		fToMenu = new QPopupMenu(TO_TEXT);
-		field = new BMenuField(r, "", "", fToMenu, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+		field = new BMenuField(r, "", "", fToMenu,
+			B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 		field->SetDivider(0.0);
 		field->SetEnabled(true);
 		AddChild(field);
@@ -273,14 +292,13 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 	if (!fIncoming || resending) {
 		// Put the character set box on the right of the From field.
 		r.Set(windowRect.Width() - widestCharacterSet -
-			font.StringWidth(ENCODING_TEXT) - 2 * SEPARATOR_MARGIN,
-			y - 2, windowRect.Width() - SEPARATOR_MARGIN, y + TO_FIELD_HEIGHT + 2);
+			StringWidth(ENCODING_TEXT) - 2 * SEPARATOR_MARGIN,
+			y - 2, windowRect.Width() - SEPARATOR_MARGIN, y + menuFieldHeight + 2);
 		field = new BMenuField (r, "encoding", ENCODING_TEXT, fEncodingMenu,
 			true /* fixedSize */,
-			B_FOLLOW_TOP | B_FOLLOW_LEFT,
+			B_FOLLOW_TOP | B_FOLLOW_RIGHT,
 			B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-		field->SetFont(&font);
-		field->SetDivider(font.StringWidth(ENCODING_TEXT) + 5);
+		field->SetDivider(field->StringWidth(ENCODING_TEXT) + 5);
 		AddChild(field);
 
 		// And now the "from account" pop-up menu, on the left side, taking the
@@ -303,7 +321,7 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 
 				msg->AddInt32("id", chain->ID());
 
-				if (gDefaultChain == chain->ID()) {
+				if (defaultChain == chain->ID()) {
 					item->SetMarked(true);
 					marked = true;
 				}
@@ -322,30 +340,36 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 					fChain = ~0UL;
 				}
 				// default chain is invalid, set to marked
-				gDefaultChain = fChain;
+				// TODO: do this differently, no casting and knowledge
+				// of TMailApp here....
+				if (TMailApp* app = dynamic_cast<TMailApp*>(be_app))
+					app->SetDefaultChain(fChain);
 			}
 		}
-		r.Set(x - font.StringWidth(FROM_TEXT) - 11, y - 2,
-			  field->Frame().left - SEPARATOR_MARGIN, y + TO_FIELD_HEIGHT + 2);
+		r.Set(SEPARATOR_MARGIN, y - 2,
+			  field->Frame().left - SEPARATOR_MARGIN, y + menuFieldHeight + 2);
 		field = new BMenuField(r, "account", FROM_TEXT, fAccountMenu,
 			true /* fixedSize */,
-			B_FOLLOW_TOP | B_FOLLOW_LEFT,
+			B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT,
 			B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-		field->SetFont(&font);
-		field->SetDivider(font.StringWidth(FROM_TEXT) + 11);
 		AddChild(field);
+		field->SetDivider(x - 12 - SEPARATOR_MARGIN + kMenuFieldDividerOffset);
+		field->SetAlignment(B_ALIGN_RIGHT);
+//		field->MenuBar()->SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
 
-		y += FIELD_HEIGHT;
+		y += menuFieldHeight;
 	} else {
 		// To: account
 		bool account = count_pop_accounts() > 0;
 
-		r.Set(x - font.StringWidth(TO_TEXT) - 11, y,
-			  windowRect.Width() - SEPARATOR_MARGIN, y + TO_FIELD_HEIGHT);
+		r.Set(SEPARATOR_MARGIN, y,
+			  windowRect.Width() - SEPARATOR_MARGIN, y + menuFieldHeight);
 		if (account)
 			r.right -= SEPARATOR_MARGIN + ACCOUNT_FIELD_WIDTH;
 		fAccountTo = new TTextControl(r, TO_TEXT, NULL, fIncoming, false, B_FOLLOW_LEFT_RIGHT);
 		fAccountTo->SetEnabled(false);
+		fAccountTo->SetDivider(x - 12 - SEPARATOR_MARGIN);
+		fAccountTo->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 		AddChild(fAccountTo);
 
 		if (account) {
@@ -354,26 +378,27 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 			fAccount->SetEnabled(false);
 			AddChild(fAccount);
 		}
-		y += FIELD_HEIGHT;
+		y += menuFieldHeight;
 	}
 
 	--y;
-	r.Set(x - font.StringWidth(SUBJECT_TEXT) - 11, y,
-		  windowRect.Width() - SEPARATOR_MARGIN, y + TO_FIELD_HEIGHT);
-	y += FIELD_HEIGHT;
+	r.Set(SEPARATOR_MARGIN, y,
+		windowRect.Width() - SEPARATOR_MARGIN, y + menuFieldHeight);
+	y += menuFieldHeight;
 	fSubject = new TTextControl(r, SUBJECT_TEXT, new BMessage(SUBJECT_FIELD),
 				fIncoming, false, B_FOLLOW_LEFT_RIGHT);
 	AddChild(fSubject);
 	(msg = new BMessage(FIELD_CHANGED))->AddInt32("bitmask", FIELD_SUBJECT);
 	fSubject->SetModificationMessage(msg);
-
+	fSubject->SetDivider(x - 12 - SEPARATOR_MARGIN);
+	fSubject->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	if (fResending)
 		fSubject->SetEnabled(false);
 
 	--y;
 
 	if (!fIncoming) {
-		r.Set(x - 11, y, CC_FIELD_H + CC_FIELD_WIDTH, y + CC_FIELD_HEIGHT);
+		r.Set(x - 12, y, CC_FIELD_H + CC_FIELD_WIDTH, y + menuFieldHeight);
 		fCc = new TTextControl(r, "", new BMessage(CC_FIELD), fIncoming, false);
 		fCc->SetFilter(mail_to_filter);
 		fCc->SetChoiceList(&fEmailList);
@@ -382,19 +407,20 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 		(msg = new BMessage(FIELD_CHANGED))->AddInt32("bitmask", FIELD_CC);
 		fCc->SetModificationMessage(msg);
 
-		r.right = r.left + 9;
-		r.left = r.right - be_plain_font->StringWidth(CC_TEXT) - 30;
+		r.right = r.left - 5;
+		r.left = r.right - be_plain_font->StringWidth(CC_TEXT) - 15;
 		r.top -= 1;
 		fCcMenu = new QPopupMenu(CC_TEXT);
-		field = new BMenuField(r, "", "", fCcMenu, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+		field = new BMenuField(r, "", "", fCcMenu,
+			B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 
 		field->SetDivider(0.0);
 		field->SetEnabled(true);
 		AddChild(field);
 
 		r.Set(BCC_FIELD_H + be_plain_font->StringWidth(BCC_TEXT), y,
-			  windowRect.Width() - SEPARATOR_MARGIN, y + BCC_FIELD_HEIGHT);
-		y += FIELD_HEIGHT;
+			  windowRect.Width() - SEPARATOR_MARGIN, y + menuFieldHeight);
+		y += menuFieldHeight;
 		fBcc = new TTextControl(r, "", new BMessage(BCC_FIELD),
 						fIncoming, false, B_FOLLOW_LEFT_RIGHT);
 		fBcc->SetFilter(mail_to_filter);
@@ -404,26 +430,34 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 		(msg = new BMessage(FIELD_CHANGED))->AddInt32("bitmask", FIELD_BCC);
 		fBcc->SetModificationMessage(msg);
 
-		r.right = r.left + 9;
-		r.left = r.right - be_plain_font->StringWidth(BCC_TEXT) - 30;
+		r.right = r.left - 5;
+		r.left = r.right - be_plain_font->StringWidth(BCC_TEXT) - 15;
 		r.top -= 1;
 		fBccMenu = new QPopupMenu(BCC_TEXT);
-		field = new BMenuField(r, "", "", fBccMenu, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+		field = new BMenuField(r, "", "", fBccMenu,
+			B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 		field->SetDivider(0.0);
 		field->SetEnabled(true);
 		AddChild(field);
 	} else {
-		r.Set(x - font.StringWidth(kDateLabel) - 10, y + 4,
-			  windowRect.Width(), y + TO_FIELD_HEIGHT + 1);
-		y += TO_FIELD_HEIGHT + 5;
+		y -= SEPARATOR_MARGIN;
+		r.Set(SEPARATOR_MARGIN, y, x - 12 - 1, y + menuFieldHeight + 1);
+		fDateLabel = new BStringView(r, "", kDateLabel);
+		fDateLabel->SetAlignment(B_ALIGN_RIGHT);
+		AddChild(fDateLabel);
+		fDateLabel->SetHighColor(0, 0, 0);
+
+		r.Set(r.right + 9, y, windowRect.Width() - SEPARATOR_MARGIN,
+			y + menuFieldHeight + 1);
 		fDate = new BStringView(r, "", "");
-		AddChild(fDate);	
-		fDate->SetFont(&font);	
+		AddChild(fDate);
 		fDate->SetHighColor(0, 0, 0);
+
+		y += menuFieldHeight + 5;
 
 		LoadMessage(mail);
 	}
-	ResizeTo(Bounds().Width(),y);
+	ResizeTo(Bounds().Width(), y);
 }
 
 
@@ -656,7 +690,7 @@ THeaderView::LoadMessage(BEmailMessage *mail)
 	//	Set the date on this message
 	const char *dateField = mail->Date();
 	char string[256];
-	sprintf(string, "%s   %s", kDateLabel, dateField != NULL ? dateField : "Unknown");
+	sprintf(string, "%s", dateField != NULL ? dateField : "Unknown");
 	fDate->SetText(string);
 
 	//	Set contents of header fields
@@ -711,18 +745,11 @@ TTextControl::TTextControl(BRect rect, char *label, BMessage *msg,
 void
 TTextControl::AttachedToWindow()
 {
-	BFont font = *be_plain_font;
-	BTextView *text;
-
 	SetHighColor(0, 0, 0);
 	// BTextControl::AttachedToWindow();
 	BComboBox::AttachedToWindow();
-	font.SetSize(FONT_SIZE);
-	SetFont(&font);
 
-	SetDivider(StringWidth(fLabel) + 6);
-	text = (BTextView *)ChildAt(0);
-	text->SetFont(&font);
+	SetDivider(Divider() + kTextControlDividerOffset);
 }
 
 

@@ -31,9 +31,6 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
-
-#include "Mail.h"
 #include "Status.h"
 
 #include <Button.h>
@@ -51,6 +48,10 @@ All rights reserved.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "MailApp.h"
+#include "MailWindow.h"
+#include "Messages.h"
 
 
 #define STATUS_TEXT			"Status:"

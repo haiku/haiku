@@ -31,24 +31,24 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
-//--------------------------------------------------------------------
-//	
-//	Signature.cpp
-//	
-//--------------------------------------------------------------------
+#include "Signature.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include <Clipboard.h>
 #include <InterfaceKit.h>
 #include <StorageKit.h>
 
-#include "Mail.h"
-#include "Signature.h"
+#include "MailApp.h"
+#include "MailPopUpMenu.h"
+#include "MailSupport.h"
+#include "MailWindow.h"
+#include "Messages.h"
 
 #include <MDRLanguage.h>
+
 
 extern BRect		signature_window;
 extern const char	*kUndoStrings[];
@@ -114,7 +114,6 @@ TSignatureWindow::TSignatureWindow(BRect rect)
 
 TSignatureWindow::~TSignatureWindow()
 {
-	signature_window = Frame();
 }
 
 
@@ -245,6 +244,7 @@ TSignatureWindow::QuitRequested()
 	if (Clear()) {
 		BMessage msg(WINDOW_CLOSED);
 		msg.AddInt32("kind", SIG_WINDOW);
+		msg.AddRect("window frame", Frame());
 
 		be_app->PostMessage(&msg);
 		return true;

@@ -32,11 +32,8 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-//--------------------------------------------------------------------
-//
-//	Mail.cpp
-//
-//--------------------------------------------------------------------
+
+#include "MailWindow.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -75,19 +72,22 @@ using namespace BPrivate ;
 	#include <netdb.h>
 #endif
 
-#include "Mail.h"
-#include "Header.h"
+#include "ButtonBar.h"
 #include "Content.h"
 #include "Enclosures.h"
+#include "FieldMsg.h"
+#include "FindWindow.h"
+#include "Header.h"
+#include "Messages.h"
+#include "MailApp.h"
+#include "MailPopUpMenu.h"
+#include "MailSupport.h"
 #include "Prefs.h"
+#include "QueryMenu.h"
 #include "Signature.h"
 #include "Status.h"
 #include "String.h"
-#include "FindWindow.h"
 #include "Utilities.h"
-#include "ButtonBar.h"
-#include "QueryMenu.h"
-#include "FieldMsg.h"
 #include "Words.h"
 
 
@@ -109,22 +109,6 @@ const char *kRedoStrings[] = {
 	MDR_DIALECT_CHOICE ("Redo Drop", "Z) やり直し（ドロップ）")
 };
 
-// Spam related globals.
-static bool			 gShowSpamGUI = true;
-static BMessenger	 gMessengerToSpamServer;
-static const char	*kSpamServerSignature = "application/x-vnd.agmsmith.spamdbm";
-
-static const char *kDraftPath = "mail/draft";
-static const char *kDraftType = "text/x-vnd.Be-MailDraft";
-static const char *kMailFolder = "mail";
-static const char *kMailboxFolder = "mail/mailbox";
-
-static const char *kDictDirectory = "word_dictionary";
-static const char *kIndexDirectory = "word_index";
-static const char *kWordsPath = "/boot/optional/goodies/words";
-static const char *kExact = ".exact";
-static const char *kMetaphone = ".metaphone";
-
 
 // Text for both the main menu and the pop-up menu.
 static const char *kSpamMenuItemTextArray[] = {
@@ -134,1103 +118,20 @@ static const char *kSpamMenuItemTextArray[] = {
 	"Mark as Genuine"						// M_TRAIN_GENUINE
 };
 
-// global variables
-bool		gHelpOnly = false;
-bool		header_flag = false;
-static bool	sWrapMode = true;
-bool		attachAttributes_mode = true;
-bool		gColoredQuotes = true;
-static uint8 sShowButtonBar = true;
-char		*gReplyPreamble;
-char		*signature;
-// int32		level = L_BEGINNER;
-entry_ref	open_dir;
-BMessage	*print_settings = NULL;
-BPoint		prefs_window;
-BRect		signature_window;
-BRect		mail_window;
-BRect		last_window;
-uint32		gMailCharacterSet = B_MS_WINDOWS_CONVERSION;
-bool		gWarnAboutUnencodableCharacters = true;
-Words 		*gWords[MAX_DICTIONARIES], *gExactWords[MAX_DICTIONARIES];
-int32 		gUserDict;
-BFile 		*gUserDictFile;
-int32 		gDictCount = 0;
-bool		gStartWithSpellCheckOn = false;
-uint32		gDefaultChain;
-int32		gUseAccountFrom;
 
 // static list for tracking of Windows
 BList TMailWindow::sWindowList;
 BLocker TMailWindow::sWindowListLock;
 
 
-//====================================================================
-
-int
-main()
-{
-	TMailApp().Run();
-	return B_NO_ERROR;
-}
-
-
-int32
-add_query_menu_items(BMenu* menu, const char* attribute, uint32 what,
-	const char* format, bool popup = false)
-{
-	BVolume	volume;
-	BVolumeRoster().GetBootVolume(&volume);
-
-	BQuery query;
-	query.SetVolume(&volume);
-	query.PushAttr(attribute);
-	query.PushString("*");
-	query.PushOp(B_EQ);
-	query.Fetch();
-
-	int32 index = 0;
-	BEntry entry;
-	while (query.GetNextEntry(&entry) == B_OK) {
-		BFile file(&entry, B_READ_ONLY);
-		if (file.InitCheck() == B_OK) {
-			BMessage* message = new BMessage(what);
-
-			entry_ref ref;
-			entry.GetRef(&ref);
-			message->AddRef("ref", &ref);
-
-			BString value;
-			if (file.ReadAttrString(attribute, &value) < B_OK)
-				continue;
-
-			message->AddString("attribute", value.String());
-
-			char name[256];
-			if (format != NULL)
-				snprintf(name, sizeof(name), format, value.String());
-			else
-				strlcpy(name, value.String(), sizeof(name));
-
-			if (index < 9 && !popup)
-				menu->AddItem(new BMenuItem(name, message, '1' + index));
-			else
-				menu->AddItem(new BMenuItem(name, message));
-			index++;
-		}
-	}
-
-	return index;
-}
-
-
-int32
-header_len(BFile *file)
-{
-	char	*buffer;
-	int32	length;
-	int32	result = 0;
-	off_t	size;
-
-	if (file->ReadAttr(B_MAIL_ATTR_HEADER, B_INT32_TYPE, 0, &result, sizeof(int32)) != sizeof(int32))
-	{
-		file->GetSize(&size);
-		buffer = (char *)malloc(size);
-		if (buffer)
-		{
-			file->Seek(0, 0);
-			if (file->Read(buffer, size) == size)
-			{
-				while ((length = linelen(buffer + result, size - result, true)) > 2)
-					result += length;
-
-				result += length;
-			}
-			free(buffer);
-			file->WriteAttr(B_MAIL_ATTR_HEADER, B_INT32_TYPE, 0, &result, sizeof(int32));
-		}
-	}
-	return result;
-}
-
-
 //	#pragma mark -
 
 
-TMailApp::TMailApp()
-	:	BApplication("application/x-vnd.Be-MAIL"),
-	fFont(*be_plain_font),
-	fWindowCount(0),
-	fPrefsWindow(NULL),
-	fSigWindow(NULL)
-{
-	// set default values
-	fFont.SetSize(FONT_SIZE);
-	signature = (char *)malloc(strlen(SIG_NONE) + 1);
-	strcpy(signature, SIG_NONE);
-	gReplyPreamble = (char *)malloc(1);
-	gReplyPreamble[0] = '\0';
-
-	mail_window.Set(0, 0, 0, 0);
-	signature_window.Set(6, TITLE_BAR_HEIGHT, 6 + kSigWidth, TITLE_BAR_HEIGHT + kSigHeight);
-	prefs_window.Set(6, TITLE_BAR_HEIGHT);
-
-	// Find and read settings file.
-	LoadSettings();
-
-	CheckForSpamFilterExistence();
-	fFont.SetSpacing(B_BITMAP_SPACING);
-	last_window = mail_window;
-}
-
-
-TMailApp::~TMailApp()
-{
-}
-
-
-void
-TMailApp::AboutRequested()
-{
-	BAlert *alert = new BAlert("about", "Mail\n\n"
-		"written by Robert Polic\n"
-		"enhanced by the Dr. Zoidberg crew\n\n"
-		"Copyright 2007, Haiku.\n", "Ok");
-	BTextView *view = alert->TextView();
-	BFont font;
-
-	view->SetStylable(true);
-
-	view->GetFont(&font);
-	font.SetSize(font.Size() + 7.0f);
-	font.SetFace(B_BOLD_FACE); 			
-	view->SetFontAndColor(0, 4, &font);
-
-	alert->Go();
-}
-
-
-void
-TMailApp::ArgvReceived(int32 argc, char **argv)
-{
-	BEntry entry;
-	BString names;
-	BString ccNames;
-	BString bccNames;
-	BString subject;
-	BString body;
-	BMessage enclosure(B_REFS_RECEIVED);
-	// a "mailto:" with no name should open an empty window
-	// so remember if we got a "mailto:" even if there isn't a name
-	// that goes along with it (this allows deskbar replicant to open
-	// an empty message even when Mail is already running)
-	bool gotmailto = false;
-
-	for (int32 loop = 1; loop < argc; loop++)
-	{
-		if (strcmp(argv[loop], "-h") == 0
-			|| strcmp(argv[loop], "--help") == 0)
-		{
-			printf(" usage: %s [ mailto:<address> ] [ -subject \"<text>\" ] [ ccto:<address> ] [ bccto:<address> ] "
-				"[ -body \"<body text\" ] [ enclosure:<path> ] [ <message to read> ...] \n",
-				argv[0]);
-			gHelpOnly = true;
-			be_app->PostMessage(B_QUIT_REQUESTED);
-			return;
-		}
-		else if (strncmp(argv[loop], "mailto:", 7) == 0)
-		{
-			if (names.Length())
-				names += ", ";
-			char *options;
-			if ((options = strchr(argv[loop],'?')) != NULL)
-			{
-				names.Append(argv[loop] + 7, options - argv[loop] - 7);
-				if (!strncmp(++options,"subject=",8))
-					subject = options + 8;
-			}
-			else
-				names += argv[loop] + 7;
-			gotmailto = true;
-		}
-		else if (strncmp(argv[loop], "ccto:", 5) == 0)
-		{
-			if (ccNames.Length())
-				ccNames += ", ";
-			ccNames += argv[loop] + 5;
-		}
-		else if (strncmp(argv[loop], "bccto:", 6) == 0)
-		{
-			if (bccNames.Length())
-				bccNames += ", ";
-			bccNames += argv[loop] + 6;
-		}
-		else if (strcmp(argv[loop], "-subject") == 0)
-			subject = argv[++loop];
-		else if (strcmp(argv[loop], "-body") == 0 && argv[loop + 1])
-			body = argv[++loop];
-		else if (strncmp(argv[loop], "enclosure:", 10) == 0)
-		{
-			BEntry tmp(argv[loop] + 10, true);
-			if (tmp.InitCheck() == B_OK && tmp.Exists())
-			{
-				entry_ref ref;
-				tmp.GetRef(&ref);
-				enclosure.AddRef("refs", &ref);
-			}
-		}
-		else if (entry.SetTo(argv[loop]) == B_NO_ERROR)
-		{
-			BMessage msg(B_REFS_RECEIVED);
-			entry_ref ref;
-			entry.GetRef(&ref);
-			msg.AddRef("refs", &ref);
-			RefsReceived(&msg);
-		}
-	}
-
-	if (gotmailto || names.Length() || ccNames.Length() || bccNames.Length() || subject.Length()
-		|| body.Length() || enclosure.HasRef("refs"))
-	{
-		TMailWindow	*window = NewWindow(NULL, names.String());
-		window->SetTo(names.String(), subject.String(), ccNames.String(), bccNames.String(),
-			&body, &enclosure);
-		window->Show();
-	}
-}
-
-
-void
-TMailApp::MessageReceived(BMessage *msg)
-{
-	TMailWindow	*window = NULL;
-	entry_ref	ref;
-
-	switch (msg->what)
-	{
-		case M_NEW:
-		{
-			int32 type;
-			msg->FindInt32("type", &type);
-			switch (type)
-			{
-				case M_NEW:
-					window = NewWindow();
-					break;
-
-				case M_RESEND:
-				{
-					msg->FindRef("ref", &ref);
-					BNode file(&ref);
-					BString string = "";
-
-					if (file.InitCheck() == B_OK)
-						ReadAttrString(&file, B_MAIL_ATTR_TO, &string);
-
-					window = NewWindow(&ref, string.String(), true);
-					break;
-				}
-				case M_FORWARD:
-				case M_FORWARD_WITHOUT_ATTACHMENTS:
-				{
-					TMailWindow	*sourceWindow;
-					if (msg->FindPointer("window", (void **)&sourceWindow) < B_OK
-						|| !sourceWindow->Lock())
-						break;
-
-					msg->FindRef("ref", &ref);
-					window = NewWindow();
-					if (window->Lock()) {
-						window->Forward(&ref, sourceWindow, type == M_FORWARD);
-						window->Unlock();
-					}
-					sourceWindow->Unlock();
-					break;
-				}
-
-				case M_REPLY:
-				case M_REPLY_TO_SENDER:
-				case M_REPLY_ALL:
-				case M_COPY_TO_NEW:
-				{
-					TMailWindow	*sourceWindow;
-					if (msg->FindPointer("window", (void **)&sourceWindow) < B_OK
-						|| !sourceWindow->Lock())
-						break;
-					msg->FindRef("ref", &ref);
-					window = NewWindow();
-					if (window->Lock()) {
-						if (type == M_COPY_TO_NEW)
-							window->CopyMessage(&ref, sourceWindow);
-						else
-							window->Reply(&ref, sourceWindow, type);
-						window->Unlock();
-					}
-					sourceWindow->Unlock();
-					break;
-				}
-			}
-			if (window)
-				window->Show();
-			break;
-		}
-
-		case M_PREFS:
-			if (fPrefsWindow)
-				fPrefsWindow->Activate(true);
-			else
-			{
-				fPrefsWindow = new TPrefsWindow(BRect(prefs_window.x,
-						prefs_window.y, prefs_window.x + PREF_WIDTH,
-						prefs_window.y + PREF_HEIGHT),
-						&fFont, NULL, &sWrapMode, &attachAttributes_mode,
-						&gColoredQuotes, &gDefaultChain, &gUseAccountFrom,
-						&gReplyPreamble, &signature, &gMailCharacterSet,
-						&gWarnAboutUnencodableCharacters,
-						&gStartWithSpellCheckOn, &sShowButtonBar);
-				fPrefsWindow->Show();
-				fPreviousShowButtonBar = sShowButtonBar;
-			}
-			break;
-
-		case PREFS_CHANGED:
-		{
-			// Do we need to update the state of the button bars?
-			if (fPreviousShowButtonBar != sShowButtonBar) {
-				// Notify all Mail windows
-				TMailWindow	*window;
-				for (int32 i = 0; (window=(TMailWindow *)fWindowList.ItemAt(i)) != NULL; i++) {
-					window->Lock();
-					window->UpdateViews();
-					window->Unlock();
-				}
-				fPreviousShowButtonBar = sShowButtonBar;
-			}
-			break;
-		}
-
-		case M_EDIT_SIGNATURE:
-			if (fSigWindow)
-				fSigWindow->Activate(true);
-			else {
-				fSigWindow = new TSignatureWindow(signature_window);
-				fSigWindow->Show();
-			}
-			break;
-
-		case M_FONT:
-			FontChange();
-			break;
-
-		case REFS_RECEIVED:
-			if (msg->HasPointer("window"))
-			{
-				msg->FindPointer("window", (void **)&window);
-				BMessage message(*msg);
-				window->PostMessage(&message, window);
-			}
-			break;
-
-		case WINDOW_CLOSED:
-			switch (msg->FindInt32("kind"))
-			{
-				case MAIL_WINDOW:
-				{
-					TMailWindow	*window;
-					if( msg->FindPointer( "window", (void **)&window ) == B_OK )
-						fWindowList.RemoveItem( window );
-					fWindowCount--;
-					break;
-				}
-
-				case PREFS_WINDOW:
-					fPrefsWindow = NULL;
-					break;
-
-				case SIG_WINDOW:
-					fSigWindow = NULL;
-					break;
-			}
-
-			if (!fWindowCount && !fSigWindow && !fPrefsWindow)
-				be_app->PostMessage(B_QUIT_REQUESTED);
-			break;
-
-		case B_REFS_RECEIVED:
-			RefsReceived(msg);
-			break;
-
-		case B_PRINTER_CHANGED:
-			ClearPrintSettings();
-			break;
-
-		default:
-			BApplication::MessageReceived(msg);
-	}
-}
-
-
-bool
-TMailApp::QuitRequested()
-{
-	if (!BApplication::QuitRequested())
-		return false;
-
-    mail_window = last_window;
-    	// Last closed window becomes standard window size.
-	
-	// Shut down the spam server if it's still running. If the user has trained it on a message, it will stay
-	// open. This is actually a good thing if there's quite a bit of spam -- no waiting for the thing to start
-	// up for each message, but it has no business staying that way if the user isn't doing anything with e-mail. :)
-	if (be_roster->IsRunning(kSpamServerSignature)) {
-		team_id serverTeam = be_roster->TeamFor(kSpamServerSignature);
-		if (serverTeam >= 0) {
-			int32 errorCode = B_SERVER_NOT_FOUND;
-			gMessengerToSpamServer = BMessenger (kSpamServerSignature, serverTeam, &errorCode);
-			if (gMessengerToSpamServer.IsValid()) {
-				BMessage quitMessage(B_QUIT_REQUESTED);
-				gMessengerToSpamServer.SendMessage(&quitMessage);
-			}
-		}
-
-	}
-	
-	SaveSettings();
-	return true;
-}
-
-
-void
-TMailApp::ReadyToRun()
-{
-	// Create needed indices for META:group, META:email, MAIL:draft,
-	// INDEX_SIGNATURE, INDEX_STATUS on the boot volume
-
-	BVolume volume;
-	BVolumeRoster().GetBootVolume(&volume);
-
-	fs_create_index(volume.Device(), "META:group", B_STRING_TYPE, 0);
-	fs_create_index(volume.Device(), "META:email", B_STRING_TYPE, 0);
-	fs_create_index(volume.Device(), "MAIL:draft", B_INT32_TYPE, 0);
-	fs_create_index(volume.Device(), INDEX_SIGNATURE, B_STRING_TYPE, 0);
-	fs_create_index(volume.Device(), INDEX_STATUS, B_STRING_TYPE, 0);
-
-	// Load dictionaries
-	BPath indexDir;
-	BPath dictionaryDir;
-	BPath dataPath;
-	BPath indexPath;
-	BDirectory directory;
-	BEntry entry;
-
-	// Locate user settings directory
-	find_directory(B_BEOS_ETC_DIRECTORY, &indexDir, true);
-	dictionaryDir = indexDir;
-
-	// Setup directory paths
-	indexDir.Append(kIndexDirectory);
-	dictionaryDir.Append(kDictDirectory);
-
-	// Create directories if needed
-	directory.CreateDirectory(indexDir.Path(), NULL);
-	directory.CreateDirectory(dictionaryDir.Path(), NULL);
-
-	dataPath = dictionaryDir;
-	dataPath.Append("words");
-
-	// Only Load if Words Dictionary
-	if (BEntry(kWordsPath).Exists() || BEntry(dataPath.Path()).Exists())
-	{
-		// If "/boot/optional/goodies/words" exists but there is no system dictionary, copy words
-		if (!BEntry(dataPath.Path()).Exists() && BEntry(kWordsPath).Exists())
-		{
-			BFile words(kWordsPath, B_READ_ONLY);
-			BFile copy(dataPath.Path(), B_WRITE_ONLY | B_CREATE_FILE);
-			char buffer[4096];
-			ssize_t size;
-
-			while ((size = words.Read( buffer, 4096)) > 0)
-				copy.Write(buffer, size);
-			BNodeInfo(&copy).SetType("text/plain");
-		}
-
-		// Create user dictionary if it does not exist
-		dataPath = dictionaryDir;
-		dataPath.Append("user");
-		if (!BEntry(dataPath.Path()).Exists())
-		{
-			BFile user(dataPath.Path(), B_WRITE_ONLY | B_CREATE_FILE);
-			BNodeInfo(&user).SetType("text/plain");
-		}
-
-		// Load dictionaries
-		directory.SetTo(dictionaryDir.Path());
-
-		BString leafName;
-		gUserDict = -1;
-
-		while (gDictCount < MAX_DICTIONARIES
-			&& directory.GetNextEntry(&entry) != B_ENTRY_NOT_FOUND)
-		{
-			dataPath.SetTo(&entry);
-
-			// Identify the user dictionary
-			if (strcmp("user", dataPath.Leaf()) == 0)
-			{
-				gUserDictFile = new BFile(dataPath.Path(), B_WRITE_ONLY | B_OPEN_AT_END);
-				gUserDict = gDictCount;
-			}
-
-			indexPath = indexDir;
-			leafName.SetTo(dataPath.Leaf());
-			leafName.Append(kMetaphone);
-			indexPath.Append(leafName.String());
-			gWords[gDictCount] = new Words(dataPath.Path(), indexPath.Path(), true);
-
-			indexPath = indexDir;
-			leafName.SetTo(dataPath.Leaf());
-			leafName.Append(kExact);
-			indexPath.Append(leafName.String());
-			gExactWords[gDictCount] = new Words(dataPath.Path(), indexPath.Path(), false);
-			gDictCount++;
-		}
-	}
-
-	// Create a new window if starting up without any extra arguments.
-
-	if (!gHelpOnly && !fWindowCount)
-	{
-		TMailWindow	*window;
-		window = NewWindow();
-		window->Show();
-	}
-}
-
-
-void
-TMailApp::RefsReceived(BMessage *msg)
-{
-	bool		have_names = false;
-	BString		names;
-	char		type[B_FILE_NAME_LENGTH];
-	int32		item = 0;
-	BFile		file;
-	TMailWindow	*window;
-	entry_ref	ref;
-
-	//
-	// If a tracker window opened me, get a messenger from it.
-	//
-	BMessenger messenger;
-	if (msg->HasMessenger("TrackerViewToken"))
-		msg->FindMessenger("TrackerViewToken", &messenger);
-
-	while (msg->HasRef("refs", item)) {
-		msg->FindRef("refs", item++, &ref);
-		if ((window = FindWindow(ref)) != NULL)
-			window->Activate(true);
-		else {
-			file.SetTo(&ref, O_RDONLY);
-			if (file.InitCheck() == B_NO_ERROR) {
-				BNodeInfo	node(&file);
-				node.GetType(type);
-				if (!strcmp(type, B_MAIL_TYPE)) {
-					window = NewWindow(&ref, NULL, false, &messenger);
-					window->Show();
-				} else if(!strcmp(type, "application/x-person")) {
-					/* Got a People contact info file, see if it has an Email address. */
-					BString name;
-					BString email;
-					attr_info	info;
-					char *attrib;
-
-					if (file.GetAttrInfo("META:email", &info) == B_NO_ERROR) {
-						attrib = (char *) malloc(info.size + 1);
-						file.ReadAttr("META:email", B_STRING_TYPE, 0, attrib, info.size);
-						attrib[info.size] = 0; // Just in case it wasn't NUL terminated.
-						email << attrib;
-						free(attrib);
-
-						/* we got something... */
-						if (email.Length() > 0) {
-							/* see if we can get a username as well */
-							if(file.GetAttrInfo("META:name", &info) == B_NO_ERROR) {
-								attrib = (char *) malloc(info.size + 1);
-								file.ReadAttr("META:name", B_STRING_TYPE, 0, attrib, info.size);
-								attrib[info.size] = 0; // Just in case it wasn't NUL terminated.
-								name << "\"" << attrib << "\" ";
-								email.Prepend("<");
-								email.Append(">");
-								free(attrib);
-							}
-
-							if (names.Length() == 0) {
-								names << name << email;
-							} else {
-								names << ", " << name << email;
-							}
-							have_names = true;
-							email.SetTo("");
-							name.SetTo("");
-						}
-					}
-				}
-				else if (!strcmp(type, kDraftType))
-				{
-					window = NewWindow();
-
-					// If it's a draft message, open it
-					window->OpenMessage(&ref);
-					window->Show();
-				}
-			} /* end of else(file.InitCheck() == B_NO_ERROR */
-		}
-	}
-
-	if (have_names) {
-		window = NewWindow(NULL, names.String());
-		window->Show();
-	}
-}
-
-
-TMailWindow *
-TMailApp::FindWindow(const entry_ref &ref)
-{
-	BEntry entry(&ref);
-	if (entry.InitCheck() < B_OK)
-		return NULL;
-
-	node_ref nodeRef;
-	if (entry.GetNodeRef(&nodeRef) < B_OK)
-		return NULL;
-
-	BWindow	*window;
-	int32 index = 0;
-	while ((window = WindowAt(index++)) != NULL) {
-		TMailWindow *mailWindow = dynamic_cast<TMailWindow *>(window);
-		if (mailWindow == NULL)
-			continue;
-
-		node_ref mailNodeRef;
-		if (mailWindow->GetMailNodeRef(mailNodeRef) == B_OK
-			&& mailNodeRef == nodeRef)
-			return mailWindow;
-	}
-
-	return NULL;
-}
-
-
-void
-TMailApp::CheckForSpamFilterExistence()
-{
-	// Looks at the filter settings to see if the user is using a spam filter.
-	// If there is one there, set gShowSpamGUI to TRUE, otherwise to FALSE.
-
-	int32		addonNameIndex;
-	const char *addonNamePntr;
-	BDirectory	inChainDir;
-	BPath		path;
-	BEntry		settingsEntry;
-	BFile		settingsFile;
-	BMessage	settingsMessage;
-
-	gShowSpamGUI = false;
-
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
-		return;
-	path.Append("Mail/chains/inbound");
-	if (inChainDir.SetTo(path.Path()) != B_OK)
-		return;
-
-	while (inChainDir.GetNextEntry (&settingsEntry, true /* traverse */) == B_OK) {
-		if (!settingsEntry.IsFile())
-			continue;
-		if (settingsFile.SetTo (&settingsEntry, B_READ_ONLY) != B_OK)
-			continue;
-		if (settingsMessage.Unflatten (&settingsFile) != B_OK)
-			continue;
-		for (addonNameIndex = 0; B_OK == settingsMessage.FindString (
-			"filter_addons", addonNameIndex, &addonNamePntr);
-			addonNameIndex++) {
-			if (strstr (addonNamePntr, "Spam Filter") != NULL) {
-				gShowSpamGUI = true; // Found it!
-				return;
-			}
-		}
-	}
-}
-
-
-void
-TMailApp::ClearPrintSettings()
-{
-	delete print_settings;
-	print_settings = NULL;
-}
-
-
-status_t
-TMailApp::GetSettingsPath(BPath &path)
-{
-	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
-	if (status != B_OK)
-		return status;
-
-	path.Append("Mail");
-	return create_directory(path.Path(), 0755);
-}
-
-
-status_t
-TMailApp::LoadOldSettings()
-{
-	BPath path;
-	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
-	if (status != B_OK)
-		return status;
-
-	path.Append("Mail_data");
-
-	BFile file;
-	status = file.SetTo(path.Path(), B_READ_ONLY);
-	if (status != B_OK)
-		return status;
-
-	file.Read(&mail_window, sizeof(BRect));
-//	file.Read(&level, sizeof(level));
-
-	font_family	fontFamily;
-	font_style	fontStyle;
-	float size;
-	file.Read(&fontFamily, sizeof(font_family));
-	file.Read(&fontStyle, sizeof(font_style));
-	file.Read(&size, sizeof(float));
-	if (size >= 9)
-		fFont.SetSize(size);
-
-	if (fontFamily[0] && fontStyle[0])
-		fFont.SetFamilyAndStyle(fontFamily, fontStyle);
-
-	file.Read(&signature_window, sizeof(BRect));
-	file.Read(&header_flag, sizeof(bool));
-	file.Read(&sWrapMode, sizeof(bool));
-	file.Read(&prefs_window, sizeof(BPoint));
-
-	int32 length;
-	if (file.Read(&length, sizeof(int32)) < (ssize_t)sizeof(int32))
-		return B_IO_ERROR;
-
-	free(signature);
-	signature = NULL;
-
-	if (length > 0) {
-		signature = (char *)malloc(length);
-		if (signature == NULL)
-			return B_NO_MEMORY;
-
-		file.Read(signature, length);
-	}
-
-	file.Read(&gMailCharacterSet, sizeof(int32));
-	if (gMailCharacterSet != B_MAIL_UTF8_CONVERSION
-		&& gMailCharacterSet != B_MAIL_US_ASCII_CONVERSION
-		&& BCharacterSetRoster::GetCharacterSetByConversionID(gMailCharacterSet) == NULL)
-		gMailCharacterSet = B_MS_WINDOWS_CONVERSION;
-
-	if (file.Read(&length, sizeof(int32)) == (ssize_t)sizeof(int32)) {
-		char *findString = (char *)malloc(length + 1);
-		if (findString == NULL)
-			return B_NO_MEMORY;
-
-		file.Read(findString, length);
-		findString[length] = '\0';
-		FindWindow::SetFindString(findString);
-		free(findString);
-	}
-	if (file.Read(&sShowButtonBar, sizeof(uint8)) < (ssize_t)sizeof(uint8))
-		sShowButtonBar = true;
-	if (file.Read(&gUseAccountFrom, sizeof(int32)) < (ssize_t)sizeof(int32)
-		|| gUseAccountFrom < ACCOUNT_USE_DEFAULT
-		|| gUseAccountFrom > ACCOUNT_FROM_MAIL)
-		gUseAccountFrom = ACCOUNT_USE_DEFAULT;
-	if (file.Read(&gColoredQuotes, sizeof(bool)) < (ssize_t)sizeof(bool))
-		gColoredQuotes = true;
-
-	if (file.Read(&length, sizeof(int32)) == (ssize_t)sizeof(int32)) {
-		free(gReplyPreamble);
-		gReplyPreamble = (char *)malloc(length + 1);
-		if (gReplyPreamble == NULL)
-			return B_NO_MEMORY;
-
-		file.Read(gReplyPreamble, length);
-		gReplyPreamble[length] = '\0';
-	}
-
-	file.Read(&attachAttributes_mode, sizeof(bool));
-	file.Read(&gWarnAboutUnencodableCharacters, sizeof(bool));
-
-	return B_OK;
-}
-
-
-status_t
-TMailApp::SaveSettings()
-{
-	BMailSettings chainSettings;
-
-	if (gDefaultChain != ~0UL) {
-		chainSettings.SetDefaultOutboundChainID(gDefaultChain);
-		chainSettings.Save();
-	}
-
-	BPath path;
-	status_t status = GetSettingsPath(path);
-	if (status != B_OK)
-		return status;
-
-	path.Append("BeMail Settings~");
-
-	BFile file;
-	status = file.SetTo(path.Path(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
-	if (status != B_OK)
-		return status;
-
-	BMessage settings('BeMl');
-	settings.AddRect("MailWindowSize", mail_window);
-//	settings.AddInt32("ExperienceLevel", level);
-
-	font_family fontFamily;
-	font_style fontStyle;
-	fFont.GetFamilyAndStyle(&fontFamily, &fontStyle);
-
-	settings.AddString("FontFamily", fontFamily);
-	settings.AddString("FontStyle", fontStyle);
-	settings.AddFloat("FontSize", fFont.Size());
-
-	settings.AddRect("SignatureWindowSize", signature_window);
-	settings.AddBool("ShowHeadersMode", header_flag);
-	settings.AddBool("WordWrapMode", sWrapMode);
-	settings.AddPoint("PreferencesWindowLocation", prefs_window);
-	settings.AddString("SignatureText", signature);
-	settings.AddInt32("CharacterSet", gMailCharacterSet);
-	settings.AddString("FindString", FindWindow::GetFindString());
-	settings.AddInt8("ShowButtonBar", sShowButtonBar);
-	settings.AddInt32("UseAccountFrom", gUseAccountFrom);
-	settings.AddBool("ColoredQuotes", gColoredQuotes);
-	settings.AddString("ReplyPreamble", gReplyPreamble);
-	settings.AddBool("AttachAttributes", attachAttributes_mode);
-	settings.AddBool("WarnAboutUnencodableCharacters", gWarnAboutUnencodableCharacters);
-	settings.AddBool("StartWithSpellCheck", gStartWithSpellCheckOn);
-
-	BEntry entry;
-	status = entry.SetTo(path.Path());
-	if (status != B_OK)
-		return status;
-
-	status = settings.Flatten(&file);
-	if (status == B_OK) {
-		// replace original settings file
-		status = entry.Rename("BeMail Settings", true);
-	} else
-		entry.Remove();
-
-	return status;
-}
-
-
-status_t
-TMailApp::LoadSettings()
-{
-	BMailSettings chainSettings;
-	gDefaultChain = chainSettings.DefaultOutboundChainID();
-
-	BPath path;
-	status_t status = GetSettingsPath(path);
-	if (status != B_OK)
-		return status;
-
-	path.Append("BeMail Settings");
-
-	BFile file;
-	status = file.SetTo(path.Path(), B_READ_ONLY);
-	if (status != B_OK)
-		return LoadOldSettings();
-
-	BMessage settings;
-	status = settings.Unflatten(&file);
-	if (status < B_OK || settings.what != 'BeMl') {
-		// the current settings are corrupted, try old ones
-		return LoadOldSettings();
-	}
-
-	BRect rect;
-	if (settings.FindRect("MailWindowSize", &rect) == B_OK)
-		mail_window = rect;
-
-	int32 int32Value;
-//	if (settings.FindInt32("ExperienceLevel", &int32Value) == B_OK)
-//		level = int32Value;
-
-	const char *fontFamily;
-	if (settings.FindString("FontFamily", &fontFamily) == B_OK) {
-		const char *fontStyle;
-		if (settings.FindString("FontStyle", &fontStyle) == B_OK) {
-			float size;
-			if (settings.FindFloat("FontSize", &size) == B_OK) {
-				if (size >= 7)
-					fFont.SetSize(size);
-
-				if (fontFamily[0] && fontStyle[0]) {
-					fFont.SetFamilyAndStyle(fontFamily[0] ? fontFamily : NULL,
-						fontStyle[0] ? fontStyle : NULL);
-				}
-			}
-		}
-	}
-
-	if (settings.FindRect("SignatureWindowSize", &rect) == B_OK)
-		signature_window = rect;
-
-	bool boolValue;
-	if (settings.FindBool("ShowHeadersMode", &boolValue) == B_OK)
-		header_flag = boolValue;
-
-	if (settings.FindBool("WordWrapMode", &boolValue) == B_OK)
-		sWrapMode = boolValue;
-
-	BPoint point;
-	if (settings.FindPoint("PreferencesWindowLocation", &point) == B_OK)
-		prefs_window = point;
-
-	const char *string;
-	if (settings.FindString("SignatureText", &string) == B_OK) {
-		free(signature);
-		signature = strdup(string);
-	}
-
-	if (settings.FindInt32("CharacterSet", &int32Value) == B_OK)
-		gMailCharacterSet = int32Value;
-	if (gMailCharacterSet != B_MAIL_UTF8_CONVERSION
-		&& gMailCharacterSet != B_MAIL_US_ASCII_CONVERSION
-		&& BCharacterSetRoster::GetCharacterSetByConversionID(gMailCharacterSet) == NULL)
-		gMailCharacterSet = B_MS_WINDOWS_CONVERSION;
-
-	if (settings.FindString("FindString", &string) == B_OK)
-		FindWindow::SetFindString(string);
-
-	int8 int8Value;
-	if (settings.FindInt8("ShowButtonBar", &int8Value) == B_OK)
-		sShowButtonBar = int8Value;
-
-	if (settings.FindInt32("UseAccountFrom", &int32Value) == B_OK)
-		gUseAccountFrom = int32Value;
-	if (gUseAccountFrom < ACCOUNT_USE_DEFAULT
-		|| gUseAccountFrom > ACCOUNT_FROM_MAIL)
-		gUseAccountFrom = ACCOUNT_USE_DEFAULT;
-
-	if (settings.FindBool("ColoredQuotes", &boolValue) == B_OK)
-		gColoredQuotes = boolValue;
-
-	if (settings.FindString("ReplyPreamble", &string) == B_OK) {
-		free(gReplyPreamble);
-		gReplyPreamble = strdup(string);
-	}
-
-	if (settings.FindBool("AttachAttributes", &boolValue) == B_OK)
-		attachAttributes_mode = boolValue;
-
-	if (settings.FindBool("WarnAboutUnencodableCharacters", &boolValue) == B_OK)
-		gWarnAboutUnencodableCharacters = boolValue;
-
-	if (settings.FindBool("StartWithSpellCheck", &boolValue) == B_OK)
-		gStartWithSpellCheckOn = boolValue;
-
-	return B_OK;
-}
-
-
-void
-TMailApp::FontChange()
-{
-	int32		index = 0;
-	BMessage	msg;
-	BWindow		*window;
-
-	msg.what = CHANGE_FONT;
-	msg.AddPointer("font", &fFont);
-
-	for (;;) {
-		window = WindowAt(index++);
-		if (!window)
-			break;
-
-		window->PostMessage(&msg);
-	}
-}
-
-
-TMailWindow *
-TMailApp::NewWindow(const entry_ref *ref, const char *to, bool resend,
-	BMessenger *trackerMessenger)
-{
-	BScreen screen(B_MAIN_SCREEN_ID);
-	BRect screen_frame = screen.Frame();
-
-	BRect r;
-	if ((mail_window.Width() > 1) && (mail_window.Height() > 1))
-		r = mail_window;
-	else
-		r.Set(6, TITLE_BAR_HEIGHT, 6 + WIND_WIDTH, TITLE_BAR_HEIGHT + WIND_HEIGHT);
-
-	r.OffsetBy(fWindowCount * 20, fWindowCount * 20);
-
-	if ((r.left - 6) < screen_frame.left)
-		r.OffsetTo(screen_frame.left + 8, r.top);
-
-	if ((r.left + 20) > screen_frame.right)
-		r.OffsetTo(6, r.top);
-
-	if ((r.top - 26) < screen_frame.top)
-		r.OffsetTo(r.left, screen_frame.top + 26);
-
-	if ((r.top + 20) > screen_frame.bottom)
-		r.OffsetTo(r.left, TITLE_BAR_HEIGHT);
-
-	if (r.Width() < WIND_WIDTH)
-		r.right = r.left + WIND_WIDTH;
-
-	fWindowCount++;
-
-	BString title;
-	BFile file;
-	if (!resend && ref && file.SetTo(ref, O_RDONLY) == B_NO_ERROR) {
-		BString name;
-		if (ReadAttrString(&file, B_MAIL_ATTR_NAME, &name) == B_NO_ERROR) {
-			title << name;
-			BString subject;
-			if (ReadAttrString(&file, B_MAIL_ATTR_SUBJECT, &subject) == B_NO_ERROR)
-				title << " -> " << subject;
-		}
-	}
-	if (title == "")
-		title = "Mail";
-
-	TMailWindow *window = new TMailWindow(r, title.String(), ref, to, &fFont, resend,
-								trackerMessenger);
-	fWindowList.AddItem(window);
-
-	return window;
-}
-
-
-//	#pragma mark -
-
-
-TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref,
-		const char *to, const BFont *font, bool resending, BMessenger *messenger)
+TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
+		const entry_ref* ref, const char* to, const BFont* font, bool resending,
+		BMessenger* messenger)
 	: BWindow(rect, title, B_DOCUMENT_WINDOW, 0),
+	fApp(app),
 	fFieldState(0),
 	fPanel(NULL),
 	fSendButton(NULL),
@@ -1420,8 +321,7 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref,
 	item->SetTarget(NULL, this);
 	menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Find", "F) 検索") B_UTF8_ELLIPSIS, new BMessage(M_FIND), 'F'));
 	menu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Find Again", "G) 次を検索"), new BMessage(M_FIND_AGAIN), 'G'));
-	if (!fIncoming)
-	{
+	if (!fIncoming) {
 		menu->AddSeparatorItem();
 		menu->AddItem(fQuote =new BMenuItem(
 			MDR_DIALECT_CHOICE ("Quote","Q) 引用符をつける"),
@@ -1434,7 +334,7 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref,
 			MDR_DIALECT_CHOICE ("Check Spelling","H) スペルチェック"),
 			new BMessage( M_CHECK_SPELLING ), ';' );
 		menu->AddItem(fSpelling);
-		if (gStartWithSpellCheckOn)
+		if (fApp->StartWithSpellCheckOn())
 			PostMessage (M_CHECK_SPELLING);
 	}
 	menu->AddSeparatorItem();
@@ -1449,7 +349,7 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref,
 	if (!resending && fIncoming) {
 		menu = new BMenu("View");
 		menu->AddItem(fHeader = new BMenuItem(MDR_DIALECT_CHOICE ("Show Header","H) ヘッダーを表示"),	new BMessage(M_HEADER), 'H'));
-		if (header_flag)
+		if (fApp->ShowHeader())
 			fHeader->SetMarked(true);
 		menu->AddItem(fRaw = new BMenuItem(MDR_DIALECT_CHOICE ("Show Raw Message","   メッセージを生で表示"), new BMessage(M_RAW)));
 		menu_bar->AddItem(menu);
@@ -1525,7 +425,7 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref,
 
 		// Spam Menu
 		
-		if (gShowSpamGUI) {
+		if (fApp->ShowSpamGUI()) {
 			menu = new BMenu("Spam Filtering");
 			menu->AddItem(new BMenuItem("Mark as Spam and Move to Trash",
 										new BMessage(M_TRAIN_SPAM_AND_DELETE), 'K'));
@@ -1561,19 +461,19 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref,
 		menu_bar->AddItem(menu);
 	}
 	
-	Lock();
 	AddChild(menu_bar);
 	height = menu_bar->Bounds().bottom + 1;
-	Unlock();
 
 	//
 	// Button Bar
 	//
 	float bbwidth = 0, bbheight = 0;
 
-	if (sShowButtonBar) {
+	bool showButtonBar = fApp->ShowButtonBar();
+
+	if (showButtonBar) {
 		BuildButtonBar();
-		fButtonBar->ShowLabels(sShowButtonBar == 1);
+		fButtonBar->ShowLabels(showButtonBar);
 		fButtonBar->Arrange(/* True for all buttons same size, false to just fit */
 			MDR_DIALECT_CHOICE (true, true));
 		fButtonBar->GetPreferredSize(&bbwidth, &bbheight);
@@ -1586,26 +486,24 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref,
 	r.top = r.bottom = height + bbheight + 1;
 	fHeaderView = new THeaderView (r, rect, fIncoming, fMail, resending,
 		(resending || !fIncoming)
-		? gMailCharacterSet // Use preferences setting for composing mail.
-		: B_MAIL_NULL_CONVERSION); // Default is automatic selection for reading mail.
+		? fApp->MailCharacterSet() // Use preferences setting for composing mail.
+		: B_MAIL_NULL_CONVERSION, // Default is automatic selection for reading mail.
+		fApp->DefaultChain()); 
 
 	r = Frame();
 	r.OffsetTo(0, 0);
 	r.top = fHeaderView->Frame().bottom - 1;
-	fContentView = new TContentView(r, fIncoming, fMail, const_cast<BFont *>(font));
+	fContentView = new TContentView(r, fIncoming, fMail,
+		const_cast<BFont *>(font), fApp->ShowHeader(), fApp->ColoredQuotes());
 		// TContentView needs to be properly const, for now cast away constness
 
-	Lock();
 	AddChild(fHeaderView);
 	if (fEnclosuresView)
 		AddChild(fEnclosuresView);
 	AddChild(fContentView);
-	Unlock();
 
 	if (to) {
-		Lock();
 		fHeaderView->fTo->SetText(to);
-		Unlock();
 	}
 
 	SetSizeLimits(WIND_WIDTH, RIGHT_BOUNDARY,
@@ -1618,8 +516,10 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref,
 	// 	If auto-signature, add signature to the text here.
 	//
 
-	if (!fIncoming && strcmp(signature, SIG_NONE) != 0) {
-		if (strcmp(signature, SIG_RANDOM) == 0)
+	BString signature = fApp->Signature();
+
+	if (!fIncoming && strcmp(signature.String(), SIG_NONE) != 0) {
+		if (strcmp(signature.String(), SIG_RANDOM) == 0)
 			PostMessage(M_RANDOM_SIG);
 		else {
 			//
@@ -1631,7 +531,7 @@ TMailWindow::TMailWindow(BRect rect, const char *title, const entry_ref *ref,
 			BQuery query;
 			query.SetVolume(&volume);
 			query.PushAttr(INDEX_SIGNATURE);
-			query.PushString(signature);
+			query.PushString(signature.String());
 			query.PushOp(B_EQ);
 			query.Fetch();
 
@@ -1704,7 +604,7 @@ TMailWindow::BuildButtonBar()
 		button->InvokeOnButton(B_SECONDARY_MOUSE_BUTTON);
 		fPrintButton = bbar->AddButton(MDR_DIALECT_CHOICE ("Print","印刷"), 16, new BMessage(M_PRINT));
 		bbar->AddButton(MDR_DIALECT_CHOICE ("Trash","削除"), 0, new BMessage(M_DELETE_NEXT));
-		if (gShowSpamGUI) {
+		if (fApp->ShowSpamGUI()) {
 			button = bbar->AddButton("Spam", 48, new BMessage(M_SPAM_BUTTON));
 			button->InvokeOnButton(B_SECONDARY_MOUSE_BUTTON);
 		}
@@ -1729,12 +629,14 @@ TMailWindow::UpdateViews()
 	float bbwidth = 0, bbheight = 0;
 	float nextY = fMenuBar->Frame().bottom+1;
 
+	bool showButtonBar = fApp->ShowButtonBar();
+
 	// Show/Hide Button Bar
-	if (sShowButtonBar) {
+	if (showButtonBar) {
 		// Create the Button Bar if needed
 		if (!fButtonBar)
 			BuildButtonBar();
-		fButtonBar->ShowLabels(sShowButtonBar == 1);
+		fButtonBar->ShowLabels(showButtonBar);
 		fButtonBar->Arrange(/* True for all buttons same size, false to just fit */
 			MDR_DIALECT_CHOICE (true, true));
 		fButtonBar->GetPreferredSize( &bbwidth, &bbheight);
@@ -1763,8 +665,9 @@ TMailWindow::UpdateViews()
 
 TMailWindow::~TMailWindow()
 {
+	fApp->SetLastWindowFrame(Frame());
+
 	delete fMail;
-	last_window = Frame();
 	delete fPanel;
 	delete fOriginatingWindow;
 
@@ -2287,11 +1190,12 @@ TMailWindow::MessageReceived(BMessage *msg)
 		}
 		case M_HEADER:
 		{
-			header_flag = !fHeader->IsMarked();
-			fHeader->SetMarked(header_flag);
+			bool showHeader = !fHeader->IsMarked();
+			fApp->SetShowHeader(showHeader);
+			fHeader->SetMarked(showHeader);
 
 			BMessage message(M_HEADER);
-			message.AddBool("header", header_flag);
+			message.AddBool("header", showHeader);
 			PostMessage(&message, fContentView->fTextView);
 			break;
 		}
@@ -2454,11 +1358,10 @@ TMailWindow::MessageReceived(BMessage *msg)
 		}
 
 		case M_ADD:
-			if (!fPanel)
-			{
+			if (!fPanel) {
 				BMessenger me(this);
 				BMessage msg(REFS_RECEIVED);
-				fPanel = new BFilePanel(B_OPEN_PANEL, &me, &open_dir, false, true, &msg);
+				fPanel = new BFilePanel(B_OPEN_PANEL, &me, &fOpenFolder, false, true, &msg);
 			}
 			else if (!fPanel->Window()->IsHidden())
 				fPanel->Window()->Activate();
@@ -2616,8 +1519,7 @@ TMailWindow::AddEnclosure(BMessage *msg)
 	if (fEnclosuresView == NULL)
 		return;
 
-	if (msg && msg->HasRef("refs"))
-	{
+	if (msg && msg->HasRef("refs")) {
 		// Add enclosure to view
 		PostMessage(msg, fEnclosuresView);
 
@@ -2627,7 +1529,7 @@ TMailWindow::AddEnclosure(BMessage *msg)
 		msg->FindRef("refs", &ref);
 		entry.SetTo(&ref);
 		entry.GetParent(&entry);
-		entry.GetRef(&open_dir);
+		entry.GetRef(&fOpenFolder);
 	}
 }
 
@@ -2747,7 +1649,7 @@ TMailWindow::Zoom(BPoint /*pos*/, float /*x*/, float /*y*/)
 	BRect		s_frame = screen.Frame();
 
 	r = Frame();
-	width = 80 * ((TMailApp*)be_app)->fFont.StringWidth("M") +
+	width = 80 * fApp->ContentFont().StringWidth("M") +
 			(r.Width() - fContentView->fTextView->Bounds().Width() + 6);
 	if (width > (s_frame.Width() - 8))
 		width = s_frame.Width() - 8;
@@ -2819,7 +1721,10 @@ TMailWindow::Forward(entry_ref *ref, TMailWindow *window, bool includeAttachment
 	if (mail == NULL)
 		return;
 
-	fMail = mail->ForwardMessage(gUseAccountFrom == ACCOUNT_FROM_MAIL, includeAttachments);
+	uint32 useAccountFrom = fApp->UseAccountFrom();
+
+	fMail = mail->ForwardMessage(useAccountFrom == ACCOUNT_FROM_MAIL,
+		includeAttachments);
 
 	BFile file(ref, O_RDONLY);
 	if (file.InitCheck() < B_NO_ERROR)
@@ -2829,7 +1734,7 @@ TMailWindow::Forward(entry_ref *ref, TMailWindow *window, bool includeAttachment
 
 	// set mail account
 
-	if (gUseAccountFrom == ACCOUNT_FROM_MAIL) {
+	if (useAccountFrom == ACCOUNT_FROM_MAIL) {
 		fHeaderView->fChain = fMail->Account();
 
 		BMenu *menu = fHeaderView->fAccountMenu;
@@ -2871,21 +1776,19 @@ TMailWindow::Print()
 {
 	BPrintJob print(Title());
 
-	if (!print_settings)
-	{
+	if (!fApp->HasPrintSettings()) {
 		if (print.Settings()) {
-			print_settings = print.Settings();
+			fApp->SetPrintSettings(print.Settings());
 		} else {
 			PrintSetup();
-			if (!print_settings)
+			if (!fApp->HasPrintSettings())
 				return;
 		}
 	}
 
-	print.SetSettings(new BMessage(*print_settings));
+	print.SetSettings(new BMessage(fApp->PrintSettings()));
 
-	if (print.ConfigJob() == B_NO_ERROR)
-	{
+	if (print.ConfigJob() == B_NO_ERROR) {
 		int32 curPage = 1;
 		int32 lastLine = 0;
 		BTextView header_view(print.PrintableRect(),"header",print.PrintableRect().OffsetByCopy(BPoint(-print.PrintableRect().left,-print.PrintableRect().top)),B_FOLLOW_ALL_SIDES);
@@ -2956,17 +1859,15 @@ TMailWindow::Print()
 void
 TMailWindow::PrintSetup()
 {
-	BPrintJob	print("mail_print");
-	status_t	result;
+	BPrintJob printJob("mail_print");
 
-	if (print_settings)
-		print.SetSettings(new BMessage(*print_settings));
-
-	if ((result = print.ConfigPage()) == B_NO_ERROR)
-	{
-		delete print_settings;
-		print_settings = print.Settings();
+	if (fApp->HasPrintSettings()) {
+		BMessage printSettings = fApp->PrintSettings();
+		printJob.SetSettings(new BMessage(printSettings));
 	}
+
+	if (printJob.ConfigPage() == B_OK)
+		fApp->SetPrintSettings(printJob.Settings());
 }
 
 
@@ -3042,8 +1943,10 @@ TMailWindow::Reply(entry_ref *ref, TMailWindow *window, uint32 type)
 	else
 		type = B_MAIL_REPLY_TO;
 
+	uint32 useAccountFrom = fApp->UseAccountFrom();
+
 	fMail = mail->ReplyMessage(mail_reply_to_mode(type),
-		gUseAccountFrom == ACCOUNT_FROM_MAIL, QUOTE);
+		useAccountFrom == ACCOUNT_FROM_MAIL, QUOTE);
 
 	// set header fields
 	fHeaderView->fTo->SetText(fMail->To());
@@ -3057,8 +1960,8 @@ TMailWindow::Reply(entry_ref *ref, TMailWindow *window, uint32 type)
 
 	// set mail account
 
-	if ((gUseAccountFrom == ACCOUNT_FROM_MAIL) || (chainID > -1)) {
-		if (gUseAccountFrom == ACCOUNT_FROM_MAIL)
+	if ((useAccountFrom == ACCOUNT_FROM_MAIL) || (chainID > -1)) {
+		if (useAccountFrom == ACCOUNT_FROM_MAIL)
 			fHeaderView->fChain = fMail->Account();
 		else
 			fHeaderView->fChain = chainID;
@@ -3075,7 +1978,12 @@ TMailWindow::Reply(entry_ref *ref, TMailWindow *window, uint32 type)
 
 	// create preamble string
 
-	char preamble[1024], *from = gReplyPreamble, *to = preamble;
+	BString replyPreamble = fApp->ReplyPreamble();
+
+	char preamble[1024];
+	const char* from = replyPreamble.String();
+	char* to = preamble;
+
 	while (*from) {
 		if (*from == '%') {
 			// insert special content
@@ -3167,7 +2075,7 @@ TMailWindow::Reply(entry_ref *ref, TMailWindow *window, uint32 type)
 			fContentView->fTextView->Insert((const char *)QUOTE);
 		}
 
-		if (gColoredQuotes) {
+		if (fApp->ColoredQuotes()) {
 			const BFont *font = fContentView->fTextView->Font();
 			int32 length = fContentView->fTextView->TextLength();
 
@@ -3193,7 +2101,7 @@ TMailWindow::Reply(entry_ref *ref, TMailWindow *window, uint32 type)
 status_t
 TMailWindow::Send(bool now)
 {
-	uint32 characterSetToUse = gMailCharacterSet;
+	uint32 characterSetToUse = fApp->MailCharacterSet();
 	mail_encoding encodingForBody = quoted_printable;
 	mail_encoding encodingForHeaders = quoted_printable;
 
@@ -3270,7 +2178,7 @@ TMailWindow::Send(bool now)
 			tempString.UnlockBuffer (tempStringLength);
 
 			// Count up the number of unencoded characters and warn the user about them.
-			if (gWarnAboutUnencodableCharacters) {
+			if (fApp->WarnAboutUnencodableCharacters()) {
 				int32 offset = 0;
 				int count = 0;
 				while (offset >= 0) {
@@ -3368,8 +2276,8 @@ TMailWindow::Send(bool now)
 
 		// the content text is always added to make sure there is a mail body
 		fMail->SetBodyTextTo("");
-		fContentView->fTextView->AddAsContent(fMail, sWrapMode, characterSetToUse,
-			encodingForBody);
+		fContentView->fTextView->AddAsContent(fMail, fApp->WrapMode(),
+			characterSetToUse, encodingForBody);
 
 		if (fEnclosuresView != NULL) {
 			TListItem *item;
@@ -3383,7 +2291,7 @@ TMailWindow::Send(bool now)
 				if (!entry.Exists())
 					continue;
 
-				fMail->Attach(item->Ref(), attachAttributes_mode);
+				fMail->Attach(item->Ref(), fApp->AttachAttributes());
 			}
 		}
 		if (fHeaderView->fChain != ~0L)
@@ -3608,7 +2516,7 @@ TMailWindow::TrainMessageAs(const char *CommandWord)
 
 	// Get a connection to the spam database server.  Launch if needed.
 
-	if (!gMessengerToSpamServer.IsValid()) {
+	if (!fMessengerToSpamServer.IsValid()) {
 		// Make sure the server is running.
 		if (!be_roster->IsRunning (kSpamServerSignature)) {
 			errorCode = be_roster->Launch (kSpamServerSignature);
@@ -3636,8 +2544,8 @@ TMailWindow::TrainMessageAs(const char *CommandWord)
 		if (serverTeam < 0)
 			goto ErrorExit;
 
-		gMessengerToSpamServer = BMessenger (kSpamServerSignature, serverTeam, &errorCode);
-		if (!gMessengerToSpamServer.IsValid())
+		fMessengerToSpamServer = BMessenger (kSpamServerSignature, serverTeam, &errorCode);
+		if (!fMessengerToSpamServer.IsValid())
 			goto ErrorExit;
 	}
 
@@ -3652,7 +2560,7 @@ TMailWindow::TrainMessageAs(const char *CommandWord)
 	if (errorCode != B_OK)
 		goto ErrorExit;
 	replyMessage.MakeEmpty();
-	errorCode = gMessengerToSpamServer.SendMessage(&scriptingMessage,
+	errorCode = fMessengerToSpamServer.SendMessage(&scriptingMessage,
 		&replyMessage);
 	if (errorCode != B_OK
 		|| replyMessage.FindInt32("error", &errorCode) != B_OK
@@ -3687,7 +2595,7 @@ TMailWindow::SetTitleForMessage()
 		else
 			title = fMail->Subject();
 
-		if (gShowSpamGUI && fRef != NULL) {
+		if (fApp->ShowSpamGUI() && fRef != NULL) {
 			BString	classification;
 			BNode	node (fRef);
 			char	numberString [30];
@@ -3879,61 +2787,4 @@ TMailWindow::FrontmostWindow()
 	return NULL;
 }
 
-
-//====================================================================
-//	#pragma mark -
-
-
-TMenu::TMenu(const char *name, const char *attribute, int32 message, bool popup,
-		bool addRandom)
-	: BPopUpMenu(name, false, false),
-	fPopup(popup),
-	fAddRandom(addRandom),
-	fMessage(message)
-{
-	fAttribute = strdup(attribute);
-	BuildMenu();
-}
-
-
-TMenu::~TMenu()
-{
-	free(fAttribute);
-}
-
-
-void
-TMenu::AttachedToWindow()
-{
-	BuildMenu();
-	BPopUpMenu::AttachedToWindow();
-}
-
-
-BPoint
-TMenu::ScreenLocation(void)
-{
-	if (fPopup)
-		return BPopUpMenu::ScreenLocation();
-
-	return BMenu::ScreenLocation();
-}
-
-
-void
-TMenu::BuildMenu()
-{
-	RemoveItems(0, CountItems(), true);
-	add_query_menu_items(this, fAttribute, fMessage, NULL, fPopup);
-
-	if (fAddRandom && CountItems() > 0) {
-		AddItem(new BSeparatorItem(), 0);
-
-		BMessage *msg = new BMessage(M_RANDOM_SIG);
-		if (!fPopup)
-			AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Random","R) 自動決定"), msg, '0'), 0);
-		else
-			AddItem(new BMenuItem(MDR_DIALECT_CHOICE ("Random","R) 自動決定"), msg), 0);
-	}
-}
 
