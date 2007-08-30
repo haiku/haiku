@@ -2194,6 +2194,8 @@ _user_remove_team_debugger(team_id teamID)
 status_t
 _user_debug_thread(thread_id threadID)
 {
+	TRACE(("[%ld] _user_debug_thread(%ld)\n", find_thread(NULL), threadID));
+
 	// tell the thread to stop as soon as possible
 	status_t error = B_OK;
 	cpu_status state = disable_interrupts();
@@ -2225,7 +2227,10 @@ _user_debug_thread(thread_id threadID)
 
 			case B_THREAD_WAITING:
 				// thread waiting: interrupt it
-				sem_interrupt_thread(thread);
+				if (thread->sem.blocking >= 0)
+					sem_interrupt_thread(thread);
+				else if (thread->condition_variable_entry)
+					condition_variable_interrupt_thread(thread);
 				break;
 		}
 	}
