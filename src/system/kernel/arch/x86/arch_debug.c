@@ -301,7 +301,7 @@ arch_debug_get_caller(void)
 	// be smart enough to save its original value.
 	struct stack_frame *frame = (struct stack_frame *)x86_read_ebp();
 
-	return (void *)frame->return_address;
+	return (void *)frame->previous->return_address;
 }
 
 
