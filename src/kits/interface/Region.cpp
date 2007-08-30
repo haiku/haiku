@@ -66,7 +66,8 @@ BRegion::BRegion(const BRect rect)
 
 // NOTE: private constructor
 /*!	\brief Initializes a region to contain a clipping_rect.
-	\param rect The BRect to set the region to.
+	\param rect The clipping_rect to set the region to, already in
+	internal rect format.
 */
 BRegion::BRegion(const clipping_rect& rect)
 	: fCount(1)
@@ -310,7 +311,7 @@ BRegion::OffsetBy(int32 x, int32 y)
 void
 BRegion::MakeEmpty()
 {
-	fBounds= (clipping_rect){ 0, 0, 0, 0 };
+	fBounds = (clipping_rect){ 0, 0, 0, 0 };
 	fCount = 0;
 }
 
@@ -475,6 +476,8 @@ BRegion::_SetSize(long newSize)
 			clipping_rect* resizedData = (clipping_rect*)realloc(fData,
 				newSize * sizeof(clipping_rect));
 			if (!resizedData) {
+				// failed to resize, but we cannot keep the
+				// previous state of the object
 				free(fData);
 				fData = NULL;
 			} else
