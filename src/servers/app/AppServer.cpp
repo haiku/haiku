@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2006, Haiku, Inc.
+ * Copyright (c) 2001-2007, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -111,67 +111,6 @@ AppServer::RunLooper()
 	rename_thread(find_thread(NULL), "picasso");
 	_message_thread((void *)this);
 }
-
-
-#if 0
-/*!
-	\brief Starts Input Server
-*/
-void
-AppServer::_LaunchInputServer()
-{
-	// We are supposed to start the input_server, but it's a BApplication
-	// that depends on the registrar running, which is started after app_server
-	// so we wait on roster thread to launch the input server
-
-	fISThreadID = B_ERROR;
-
-	while (!BRoster::Private().IsMessengerValid(false) && !fQuitting) {
-		snooze(250000);
-		BRoster::Private::DeleteBeRoster();
-		BRoster::Private::InitBeRoster();
-	}
-
-	if (fQuitting)
-		return;
-
-	// we use an area for cursor data communication with input_server
-	// area id and sem id are sent to the input_server
-
-	if (fCursorArea < B_OK)	
-		fCursorArea = create_area("isCursor", (void**) &fCursorAddr, B_ANY_ADDRESS, B_PAGE_SIZE, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
-	if (fCursorSem < B_OK)
-		fCursorSem = create_sem(0, "isSem"); 
-
-	int32 arg_c = 1;
-	char **arg_v = (char **)malloc(sizeof(char *) * (arg_c + 1));
-#if TEST_MODE
-	arg_v[0] = strdup("/boot/home/svnhaiku/trunk/distro/x86.R1/beos/system/servers/input_server");
-#else
-	arg_v[0] = strdup("/system/servers/input_server");
-#endif
-	arg_v[1] = NULL;
-	fISThreadID = load_image(arg_c, (const char**)arg_v, (const char **)environ);
-	free(arg_v[0]);
-
-	int32 tmpbuf[2] = {fCursorSem, fCursorArea};
-	int32 code = 0;
-	send_data(fISThreadID, code, (void *)tmpbuf, sizeof(tmpbuf));   
-
-	resume_thread(fISThreadID);
-	setpgid(fISThreadID, 0); 
-
-	// we receive 
-
-	thread_id sender;
-	code = receive_data(&sender, (void *)tmpbuf, sizeof(tmpbuf));
-	fISASPort = tmpbuf[0];
-	fISPort = tmpbuf[1];  
-
-	// if at any time, one of these ports is error prone, it might mean input_server is gone
-	// then relaunch input_server
-}
-#endif
 
 
 /*!
@@ -299,12 +238,6 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 //	#pragma mark -
 
 
-/*!
-	\brief Entry function to run the entire server
-	\param argc Number of command-line arguments present
-	\param argv String array of the command-line arguments
-	\return -1 if the app_server is already running, 0 if everything's OK.
-*/
 int
 main(int argc, char** argv)
 {

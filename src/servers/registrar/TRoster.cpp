@@ -179,24 +179,26 @@ PRINT(("full registration: %d\n", fullReg));
 	uint32 token = 0;
 	
 	uint32 launchFlags = flags & B_LAUNCH_MASK;
+	BEntry entry(&ref);
+	if (!entry.Exists())
+		SET_ERROR(error, B_ENTRY_NOT_FOUND);
+
+	if (error == B_OK)
+		_ValidateRunning(ref, signature);
 
 	// entry_ref
 	if (error == B_OK) {
-		// the entry_ref must be valid
-		if (BEntry(&ref).Exists()) {
 PRINT(("flags: %lx\n", flags));
 PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
-			// check single/exclusive launchers
-			RosterAppInfo *info = NULL;
-			if ((launchFlags == B_SINGLE_LAUNCH
-				 || launchFlags ==  B_EXCLUSIVE_LAUNCH)
-				&& (((info = fRegisteredApps.InfoFor(&ref)))
-					|| ((info = fEarlyPreRegisteredApps.InfoFor(&ref))))) {
-				SET_ERROR(error, B_ALREADY_RUNNING);
-				otherTeam = info->team;
-			}
-		} else
-			SET_ERROR(error, B_ENTRY_NOT_FOUND);
+		// check single/exclusive launchers
+		RosterAppInfo *info = NULL;
+		if ((launchFlags == B_SINGLE_LAUNCH
+			 || launchFlags ==  B_EXCLUSIVE_LAUNCH)
+			&& ((info = info = fRegisteredApps.InfoFor(&ref)) != NULL
+				|| (info = fEarlyPreRegisteredApps.InfoFor(&ref)) != NULL)) {
+			SET_ERROR(error, B_ALREADY_RUNNING);
+			otherTeam = info->team;
+		}
 	}
 
 	// signature
@@ -1274,8 +1276,7 @@ TRoster::CheckSanity()
 	// not early (pre-)registered applications
 	AppInfoList obsoleteApps;
 	for (AppInfoList::Iterator it = fRegisteredApps.It(); it.IsValid(); ++it) {
-		team_info teamInfo;
-		if (get_team_info((*it)->team, &teamInfo) != B_OK)
+		if (!(*it)->IsRunning())
 			obsoleteApps.AddInfo(*it);
 	}
 	// remove the apps
@@ -1750,7 +1751,30 @@ TRoster::_HandleGetRecentEntries(BMessage *request)
 	FUNCTION_END();
 } 
 
-// _IsSystemApp
+
+/*!
+	\brief Checks all registered apps for \a ref and \a signature if
+		they are still alive, and removes those that aren't.
+*/
+void
+TRoster::_ValidateRunning(const entry_ref& ref, const char* signature)
+{
+	while (true) {
+		// get info via ref or signature
+		RosterAppInfo* info = fRegisteredApps.InfoFor(&ref);
+		if (info == NULL && signature != NULL)
+			info = fRegisteredApps.InfoFor(signature);
+
+		// if app is alive or does not exist, we can exit
+		if (info == NULL || info->IsRunning())
+			return;
+
+		RemoveApp(info);
+		delete info;
+	}
+}
+
+
 bool
 TRoster::_IsSystemApp(RosterAppInfo *info) const
 {

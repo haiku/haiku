@@ -84,20 +84,20 @@ private:
 	void _AppDeactivated(RosterAppInfo *info);
 
 	// helper functions
-	static status_t _AddMessageAppInfo(BMessage *message,
-									   const app_info *info);
-	static status_t _AddMessageWatchingInfo(BMessage *message,
-											const app_info *info);
+	static status_t _AddMessageAppInfo(BMessage* message, const app_info* info);
+	static status_t _AddMessageWatchingInfo(BMessage* message,
+		const app_info* info);
 	uint32 _NextToken();
 
 	void _AddIARRequest(IARRequestMap& map, int32 key, BMessage* request);
-	void _ReplyToIARRequests(BMessageQueue *requests,
-		const RosterAppInfo *info);
-	void _ReplyToIARRequest(BMessage *request, const RosterAppInfo *info);
+	void _ReplyToIARRequests(BMessageQueue* requests,
+		const RosterAppInfo* info);
+	void _ReplyToIARRequest(BMessage* request, const RosterAppInfo* info);
 
-	void _HandleGetRecentEntries(BMessage *request);
+	void _HandleGetRecentEntries(BMessage* request);
 
-	bool _IsSystemApp(RosterAppInfo *info) const;
+	void _ValidateRunning(const entry_ref& ref, const char* signature);
+	bool _IsSystemApp(RosterAppInfo* info) const;
 	
 	status_t _LoadRosterSettings(const char *path = NULL);
 	status_t _SaveRosterSettings(const char *path = NULL);
@@ -109,7 +109,7 @@ private:
 	AppInfoList		fEarlyPreRegisteredApps;
 	IARRequestMap	fIARRequestsByID;
 	IARRequestMap	fIARRequestsByToken;
-	RosterAppInfo	*fActiveApp;
+	RosterAppInfo*	fActiveApp;
 	WatchingService	fWatchingService;
 	RecentApps		fRecentApps;
 	RecentEntries	fRecentDocuments;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -161,11 +161,14 @@ LinkReceiver::AdjustReplyBuffer(bigtime_t timeout)
 		fRecvBufferSize = kInitialBufferSize;
 	} else {
 		STRACE(("info: LinkReceiver getting port_buffer_size().\n"));
+
 		ssize_t bufferSize;
-		if (timeout == B_INFINITE_TIMEOUT)
-			bufferSize = port_buffer_size(fReceivePort);
-		else
-			bufferSize = port_buffer_size_etc(fReceivePort, B_TIMEOUT, timeout);
+		do {
+			bufferSize = port_buffer_size_etc(fReceivePort,
+				timeout == B_INFINITE_TIMEOUT ? B_RELATIVE_TIMEOUT : 0,
+				timeout);
+		} while (bufferSize == B_INTERRUPTED);
+
 		STRACE(("info: LinkReceiver got port_buffer_size() = %ld.\n", bufferSize));
 
 		if (bufferSize < 0)

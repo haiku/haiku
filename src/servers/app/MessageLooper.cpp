@@ -118,7 +118,12 @@ MessageLooper::_PrepareQuit()
 void
 MessageLooper::_GetLooperName(char* name, size_t length)
 {
-	strcpy(name, "unnamed looper");
+	sem_id semaphore = Sem();
+	sem_info info;
+	if (get_sem_info(semaphore, &info) == B_OK)
+		strlcpy(name, info.name, length);
+	else
+		strlcpy(name, "unnamed looper", length);
 }
 
 
@@ -138,7 +143,10 @@ MessageLooper::_MessageLooper()
 		status_t status = receiver.GetNextMessage(code);
 		if (status < B_OK) {
 			// that shouldn't happen, it's our port
-			printf("Someone deleted our message port!\n");
+			char name[256];
+			_GetLooperName(name, 256);
+			printf("MessageLooper \"%s\": Someone deleted our message port %ld, %s!\n",
+				name, receiver.Port(), strerror(status));
 			break;
 		}
 
