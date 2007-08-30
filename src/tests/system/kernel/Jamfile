@@ -44,6 +44,10 @@ SetSupportedPlatformsForTarget sigint_bug113_test
 	: $(HAIKU_BEOS_COMPATIBLE_PLATFORMS) ;
 SimpleTest sigint_bug113_test : sigint_bug113_test.cpp ;
 
+SetSupportedPlatformsForTarget set_area_protection_test1
+	: $(HAIKU_BEOS_COMPATIBLE_PLATFORMS) ;
+SimpleTest set_area_protection_test1 : set_area_protection_test1.cpp ;
+
 
 SubInclude HAIKU_TOP src tests system kernel cache ;
 #SubInclude HAIKU_TOP src tests system kernel disk_device_manager ;
