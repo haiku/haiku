@@ -74,9 +74,7 @@ enum {
 
 	B_TEAM_DEBUG_KERNEL_FLAG_MASK	= 0xffff,
 
-	B_TEAM_DEBUG_DEFAULT_FLAGS		= B_TEAM_DEBUG_SIGNALS
-									  | B_TEAM_DEBUG_PRE_SYSCALL
-									  | B_TEAM_DEBUG_POST_SYSCALL,
+	B_TEAM_DEBUG_DEFAULT_FLAGS		= 0,
 };
 
 // thread debugging flags (user-specifiable flags are in <debugger.h>)
