@@ -64,6 +64,9 @@
 //#include "fwmem.h"
 #include "iec68113.h"
 
+#define TRACE(x...)
+//#define TRACE(x...) dprintf(x)
+
 #include "firewire_module.h"
 
 #define	FWNODE_INVAL 0xffff
@@ -103,7 +106,7 @@ fwdev_allocbuf(struct fw_xferq *q,
 	b->psize = roundup2(b->psize, sizeof(uint32_t));
 	q->buf = gFirewire->fwdma_malloc_multiseg(sizeof(uint32_t), 
 			b->psize, b->nchunk * b->npacket);
-
+TRACE("fwdev_allocbuf %d\n", b->psize*b->nchunk*b->npacket);
 	if (q->buf == NULL) {
 		free(q->bulkxfer);
 		q->bulkxfer = NULL;
@@ -169,7 +172,7 @@ fw_open (const char *name, uint32 flags, void **cookie)
 		return B_BAD_VALUE;
 	}
 	
-	if (gFirewire->get_handle(count, sc) != B_OK) {
+	if (gFirewire->get_handle(count, &sc) != B_OK) {
 		return ENODEV;
 	}
 	
@@ -220,7 +223,7 @@ fw_free(void *cookie)
 	struct fw_xfer *xfer;
 	struct fw_bind *fwb;
 
-	
+	TRACE("fw_free\n");
 	d = (struct fw_drv1 *)cookie;
 	delete_sem(d->rqSem);
 	fc = d->fc;
@@ -979,11 +982,12 @@ init_driver()
 #endif
 
 	if ((err = get_module(FIREWIRE_MODULE_NAME, (module_info **)&gFirewire)) != B_OK) {
+		dprintf("fw_raw: couldn't load "FIREWIRE_MODULE_NAME"\n");
 		return err;
 	}
-	
+
 	devices_count = 0;
-	while (gFirewire->get_handle(devices_count, sc)==B_OK) {
+	while (gFirewire->get_handle(devices_count, &sc)==B_OK) {
 		devices_count++;
 	}
 
@@ -997,6 +1001,7 @@ init_driver()
 	}
 	devices[devices_count] = NULL;
 	
+	TRACE("fw_raw init_driver returns OK\n");
 	return B_OK;
 }
 

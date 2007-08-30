@@ -54,6 +54,7 @@
 #include <string.h>
 #ifdef __HAIKU__
 #include <stdint.h>
+#include <endian.h>
 #include "firewire.h"
 #include "iec68113.h"
 #else

@@ -36,7 +36,9 @@
  */
 #ifndef _FIREWIREREG_H
 #define _FIREWIREREG_H
-#ifndef __HAIKU__
+#ifdef __HAIKU__
+#include <OS.h>
+#else
 #ifdef __DragonFly__
 typedef	d_thread_t fw_proc;
 #include <sys/select.h>
@@ -55,10 +57,14 @@ typedef	struct proc fw_proc;
 #include <sys/mutex.h>
 #include <sys/taskqueue.h>
 #define	splfw splimp
-#else 
-#define splfw disable_interrupts
-#define splx restore_interrupts
+#else
+#include <lock.h>
+#include <dpc.h>
+#include "fwglue.h"
+#include "timer.h"
 #endif
+
+#define MAX_REQCOUNT	0xffff
 
 STAILQ_HEAD(fw_xferlist, fw_xfer);
 
@@ -119,8 +125,20 @@ struct crom_src_buf {
 	struct crom_chunk root;
 	struct crom_chunk vendor;
 	struct crom_chunk hw;
+};//move from firewire.c to here
+
+struct firewire_notify_hooks {
+	status_t		(*device_attach)(struct firewire_softc *sc, void **cookie);
+	status_t		(*device_detach)(struct firewire_softc *sc, void *cookie);
 };
-#endif //move from firewire.c to firewirereg.h
+
+struct firewire_child_info {
+	const char *child_name;
+	void *cookie;
+	struct firewire_notify_hooks notify_hooks;
+	struct firewire_child_info *link;
+};
+#endif
 
 struct firewire_comm{
 #ifndef __HAIKU__
@@ -171,12 +189,12 @@ struct firewire_comm{
 	struct callout busprobe_callout;
 	struct callout bmr_callout;
 	struct callout timeout_callout;
+	struct task task_timeout;
 #else
-	//timer_id busprobe_callout;
-	//timer_id bmr_callout;
-	//timer_id timeout_callout;
+	timer_id busprobe_callout;
+	timer_id bmr_callout;
+	timer_id timeout_callout;
 #endif
-	//struct task task_timeout;
 	uint32_t (*cyctimer) (struct  firewire_comm *);
 	void (*ibr) (struct firewire_comm *);
 	uint32_t (*set_bmr) (struct firewire_comm *, uint32_t);
@@ -199,29 +217,28 @@ struct firewire_comm{
 	bus_dma_tag_t dmat;
 	struct mtx mtx;
 	struct mtx wait_lock;
-#else
-	sem_id mtx;
-	sem_id wait_lock;
-#endif
-//	struct taskqueue *taskqueue;//to be completed
-#ifndef __HAIKU__
+	struct taskqueue *taskqueue;
 	struct proc *probe_thread;
 #else
+	benaphore mtx;
+	benaphore wait_lock;
+	void *taskqueue;
 	thread_id probe_thread;
+	sem_id Sem;
+	area_id crom_sid_Area;
+	struct firewire_child_info *childList;
 #endif
 };
 #define CSRARC(sc, offset) ((sc)->csr_arc[(offset)/4])
 
-#ifndef __HAIKU__
 #define FW_GMTX(fc)		(&(fc)->mtx)
 #define FW_GLOCK(fc)		mtx_lock(FW_GMTX(fc))
 #define FW_GUNLOCK(fc)		mtx_unlock(FW_GMTX(fc))
+#ifndef __HAIKU__
 #define FW_GLOCK_ASSERT(fc)	mtx_assert(FW_GMTX(fc), MA_OWNED)
-#endif
-#define FW_GMTX(fc)		((fc)->mtx)
-#define FW_GLOCK(fc)		acquire_sem_etc(FW_GMTX(fc), 1, B_CAN_INTERRUPT | B_TIMEOUT, 0)
-#define FW_GUNLOCK(fc)		release_sem(FW_GMTX(fc))
+#else
 #define FW_GLOCK_ASSERT(fc)
+#endif
 
 struct fw_xferq {
 	int flag;
@@ -252,15 +269,15 @@ struct fw_xferq {
 	STAILQ_HEAD(, fw_bulkxfer) stdma;
 	struct fw_bulkxfer *stproc;
 //	struct selinfo rsel;
-	spinlock Spinlock;
-	sem_id Sem;
 	caddr_t sc;
 	void (*hand) (struct fw_xferq *);
+	spinlock Spinlock;
+	sem_id Sem;
 };
 
 struct fw_bulkxfer{
 	int poffset;
-//	struct mbuf *mbuf;//to be completed
+//	struct mbuf *mbuf;
 	STAILQ_ENTRY(fw_bulkxfer) link;
 	caddr_t start;
 	caddr_t end;
@@ -280,8 +297,10 @@ struct fw_xfer{
 	caddr_t sc;
 	struct firewire_comm *fc;
 	struct fw_xferq *q;
-//	struct timeval tv;//to be completed
-	int8_t resp;
+//	struct timeval tv;
+	bigtime_t tv;
+
+	int32_t resp;
 #define FWXF_INIT	0x00
 #define FWXF_INQ	0x01
 #define FWXF_START	0x02
@@ -294,16 +313,19 @@ struct fw_xfer{
 	uint8_t flag;
 	int8_t tl;
 	void (*hand) (struct fw_xfer *);
-	struct {
+	struct send_recv{
 		struct fw_pkt hdr;
 		uint32_t *payload;
+		area_id payArea;
+		bus_addr_t bus_addr;
 		uint16_t pay_len;
 		uint8_t spd;
 	} send, recv;
-//	struct mbuf *mbuf;//to be completed
+//	struct mbuf *mbuf;
 	STAILQ_ENTRY(fw_xfer) link;
 	STAILQ_ENTRY(fw_xfer) tlabel;
-	struct malloc_type *malloc;
+//	struct malloc_type *malloc;
+	sem_id Sem;
 };
 
 struct fw_rcv_buf {
@@ -313,20 +335,20 @@ struct fw_rcv_buf {
 	u_int nvec;
 	uint8_t spd;
 };
-#ifndef __HAIKU__
+//#ifndef __HAIKU__
 void fw_sidrcv (struct firewire_comm *, uint32_t *, u_int);
 void fw_rcv (struct fw_rcv_buf *);
 void fw_xfer_unload ( struct fw_xfer*);
 void fw_xfer_free_buf ( struct fw_xfer*);
 void fw_xfer_free ( struct fw_xfer*);
-struct fw_xfer *fw_xfer_alloc (struct malloc_type *);
-struct fw_xfer *fw_xfer_alloc_buf (struct malloc_type *, int, int);
+struct fw_xfer *fw_xfer_alloc ();
+struct fw_xfer *fw_xfer_alloc_buf (int, int);
 void fw_init (struct firewire_comm *);
 int fw_tbuf_update (struct firewire_comm *, int, int);
 int fw_rbuf_update (struct firewire_comm *, int, int);
 int fw_bindadd (struct firewire_comm *, struct fw_bind *);
 int fw_bindremove (struct firewire_comm *, struct fw_bind *);
-int fw_xferlist_add (struct fw_xferlist *, struct malloc_type *, int, int, int,
+int fw_xferlist_add (struct fw_xferlist *,  int, int, int,
     struct firewire_comm *, void *, void (*)(struct fw_xfer *));
 void fw_xferlist_remove (struct fw_xferlist *);
 int fw_asyreq (struct firewire_comm *, int, struct fw_xfer*);
@@ -341,11 +363,11 @@ struct fw_device *fw_noderesolve_nodeid (struct firewire_comm *, int);
 struct fw_device *fw_noderesolve_eui64 (struct firewire_comm *, struct fw_eui64 *);
 struct fw_bind *fw_bindlookup (struct firewire_comm *, uint16_t, uint32_t);
 void fw_drain_txq (struct firewire_comm *);
-int fwdev_makedev (struct firewire_softc *);
-int fwdev_destroydev (struct firewire_softc *);
-void fwdev_clone (void *, struct ucred *, char *, int, struct cdev **);
+//int fwdev_makedev (struct firewire_softc *);
+//int fwdev_destroydev (struct firewire_softc *);
+//void fwdev_clone (void *, struct ucred *, char *, int, struct cdev **);
 int fw_open_isodma(struct firewire_comm *, int);
-#endif
+//#endif
 extern int firewire_debug;
 #ifndef __HAIKU__
 extern devclass_t firewire_devclass;

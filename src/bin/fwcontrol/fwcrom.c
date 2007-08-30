@@ -54,6 +54,12 @@ __FBSDID("$FreeBSD: src/sys/dev/firewire/fwcrom.c,v 1.14 2006/02/04 21:37:39 imp
 #ifndef __HAIKU__
 #include <sys/systm.h>
 #include <sys/kernel.h>
+#else
+#include <OS.h>
+#include <KernelExport.h>
+#include <ByteOrder.h>
+#include <string.h>
+#include "fwglue.h"
 #endif
 #else
 #include <netinet/in.h>

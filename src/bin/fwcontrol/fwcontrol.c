@@ -40,6 +40,7 @@ __FBSDID("$FreeBSD: src/usr.sbin/fwcontrol/fwcontrol.c,v 1.23 2006/10/26 22:33:3
 #ifdef __HAIKU__
 #include <sys/param.h>
 #include <sys/types.h>
+#include <endian.h>
 #include "eui64.h"
 #include "firewire.h"
 #include "iec13213.h"
@@ -624,15 +625,21 @@ dump_phy_registers(int fd)
 static void
 open_dev(int *fd, char *devbase)
 {
+#ifndef __HAIKU__
 	char name[256];
 	int i;
+#endif
 
 	if (*fd < 0) {
+#ifdef __HAIKU__
+		*fd = open(devbase, O_RDWR);
+#else
 		for (i = 0; i < 4; i++) {
 			snprintf(name, sizeof(name), "%s.%d", devbase, i);
 			if ((*fd = open(name, O_RDWR)) >= 0)
 				break;
 		}
+#endif
 		if (*fd < 0)
 			err(1, "open");
 
@@ -665,7 +672,7 @@ detect_recv_fn(int fd, char ich)
 	bufreq.tx.nchunk = 0;
 	bufreq.tx.npacket = 0;
 	bufreq.tx.psize = 0;
-
+printf("detect dv format\n");
 	if (ioctl(fd, FW_SSTBUF, &bufreq) < 0)
 		err(1, "ioctl FW_SSTBUF");
 
@@ -701,7 +708,7 @@ main(int argc, char **argv)
 {
 	u_int32_t crom_buf[1024/4];
 #ifdef __HAIKU__
-	char devbase[1024] = "/dev/fw";
+	char devbase[1024] = "/dev/bus/fw/0";
 #else
 	char devbase[1024] = "/dev/fw0";
 #endif
@@ -788,7 +795,11 @@ main(int argc, char **argv)
 			break;
 		case 'u':
 			tmp = strtol(optarg, NULL, 0);
+#ifdef __HAIKU__
+			snprintf(devbase, sizeof(devbase), "/dev/bus/fw/%ld", tmp);
+#else
 			snprintf(devbase, sizeof(devbase), "/dev/fw%ld", tmp);
+#endif
 			if (fd > 0) {
 				close(fd);
 				fd = -1;

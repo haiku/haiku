@@ -36,21 +36,13 @@
 #ifndef _FWDMA_H
 #define _FWDMA_H
 
-#ifndef howmany
-#define howmany(x, y)   (((x)+((y)-1))/(y)) // x/y的上界
-#endif
-#define rounddown(x, y) (((x)/(y))*(y)) // 比x小，y的最大的倍数
-#define roundup(x, y)   ((((x)+((y)-1))/(y))*(y))  /* to any y */ // 比x大，y的最小倍数
-#define roundup2(x, y)  (((x)+((y)-1))&(~((y)-1))) /* if y is powers of two */
-#define powerof2(x)     ((((x)-1)&(x))==0) // 是否是2的次方
+#include "fwglue.h"
 
-typedef uint32_t bus_addr_t;
-typedef uint32_t bus_size_t;
 
 struct fwdma_alloc {
 //	bus_dma_tag_t	dma_tag;
 //	bus_dmamap_t	dma_map;
-	area_id		BufArea;
+	area_id		Area;
 	void *		v_addr;
 	bus_addr_t	bus_addr;
 };
@@ -67,7 +59,7 @@ struct fwdma_alloc_multi {
 	bus_size_t	esize;
 	int		nseg;
 //	bus_dma_tag_t	dma_tag;
-	area_id		BufArea;
+	area_id		Area;
 
 	struct fwdma_seg seg[0];
 };
@@ -119,12 +111,16 @@ fwdma_sync_multiseg_all(struct fwdma_alloc_multi *am, bus_dmasync_op_t op)
 		bus_dmamap_sync(am->dma_tag, seg->dma_map, op);
 }
 
-void *fwdma_malloc(int, bus_size_t, struct fwdma_alloc *, int);
-void fwdma_free(struct fwdma_alloc *);
+void *fwdma_malloc(struct firewire_comm *, int, bus_size_t, struct fwdma_alloc *, int);
+void fwdma_free(struct firewire_comm *, struct fwdma_alloc *);
 void *fwdma_malloc_size(bus_dma_tag_t, bus_dmamap_t *, bus_size_t, bus_addr_t *, int);
 void fwdma_free_size(bus_dma_tag_t, bus_dmamap_t, void *, bus_size_t);
+
 struct fwdma_alloc_multi *fwdma_malloc_multiseg(struct firewire_comm *,
 	int, int, int, int);
+#else
+struct fwdma_alloc_multi *fwdma_malloc_multiseg(int, int, int);
+void fwdma_free_multiseg(struct fwdma_alloc_multi *);
 #endif /*__HAIKU__*/
 
 #endif /* _FWDMA_H*/
