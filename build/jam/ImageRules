@@ -491,7 +491,7 @@ rule AddSourceDirectoryToHaikuImage dirTokens : alwaysUpdate
 
 	# If the image shall only be updated, we update sources only, if explicitely
 	# requested.
-	if ! $(HAIKU_IMAGE_UPDATE_ONLY) || $(alwaysUpdate) {
+	if ! [ IsUpdateHaikuImageOnly ] || $(alwaysUpdate) {
 		HAIKU_INSTALL_SOURCE_DIRS += [ FDirName $(HAIKU_TOP) $(dirTokens) ] ;
 	}
 }
