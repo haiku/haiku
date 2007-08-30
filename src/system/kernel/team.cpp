@@ -1364,7 +1364,7 @@ wait_for_child(pid_t child, uint32 flags, int32 *_reason,
 				childrenExist = has_children_in_group(team, -child);
 			} else {
 				if (struct team* childTeam = team_get_team_struct_locked(child))
-					childrenExist = team->parent == team;
+					childrenExist = childTeam->parent == team;
 			}
 
 			if (!childrenExist) {
