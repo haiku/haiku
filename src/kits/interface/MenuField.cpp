@@ -526,7 +526,7 @@ BMenuField::SetDivider(float divider)
 		fMenuBar->MoveTo(fDivider + 1, kVMargin);
 
 		if (fFixedSizeMB) {
-			fMenuBar->ResizeTo(Bounds().Width() - fDivider + 1 - 2,
+			fMenuBar->ResizeTo(Bounds().Width() - fDivider - 2,
 							   dirty.Height());
 		}
 
@@ -760,7 +760,7 @@ BMenuField::InitObject2()
 	float height = floorf(fontHeight.ascent + fontHeight.descent
 		+ fontHeight.leading) + 7;
 
-	fMenuBar->ResizeTo(Bounds().Width() - fDivider, height);
+	fMenuBar->ResizeTo(Bounds().Width() - fDivider - 2, height);
 	fMenuBar->AddFilter(new _BMCFilter_(this, B_MOUSE_DOWN));
 }
 
@@ -883,7 +883,7 @@ BMenuField::_InitMenuBar(BMenu* menu, BRect frame, bool fixedSize)
 	InitMenu(menu);
 
 	fMenuBar = new _BMCMenuBar_(BRect(frame.left + fDivider + 1,
-		frame.top + kVMargin, frame.right, frame.bottom - kVMargin),
+		frame.top + kVMargin, frame.right - 2, frame.bottom - kVMargin),
 		fixedSize, this);
 
 	// by default align the menu bar left in the available space

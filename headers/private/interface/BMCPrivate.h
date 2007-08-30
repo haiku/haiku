@@ -57,6 +57,7 @@ private:
 		bool		fFixedSize;	
 		BMessageRunner	*fRunner;
 		bool		fShowPopUpMarker;
+		float		fPreviousWidth;
 };
 //------------------------------------------------------------------------------
 

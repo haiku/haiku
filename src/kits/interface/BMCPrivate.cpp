@@ -55,15 +55,15 @@ _BMCFilter_::operator=(const _BMCFilter_ &)
 }
 
 
-_BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixed_size, BMenuField *menuField)
-	:	BMenuBar(frame, "_mc_mb_", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_ITEMS_IN_ROW,
-			!fixed_size)
+_BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixedSize, BMenuField *menuField)
+	: BMenuBar(frame, "_mc_mb_", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_ITEMS_IN_ROW,
+		!fixedSize)
 {
 	SetFlags(Flags() | B_FRAME_EVENTS);
 	SetBorder(B_BORDER_CONTENTS);
 
 	fMenuField = menuField;
-	fFixedSize = fixed_size;
+	fFixedSize = fixedSize;
 	fRunner = NULL;
 	fShowPopUpMarker = true;
 
@@ -76,6 +76,8 @@ _BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixed_size, BMenuField *menuField)
 	SetItemMargins(left, top, right, bottom);
 
 	SetMaxContentWidth(frame.Width() - (left + right));
+
+	fPreviousWidth = frame.Width();
 }
 
 
@@ -115,6 +117,8 @@ _BMCMenuBar_::AttachedToWindow()
 
 	BMenuBar *menuBar = Window()->KeyMenuBar();
 	BMenuBar::AttachedToWindow();
+	if (fFixedSize)
+		SetResizingMode(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	Window()->SetKeyMenuBar(menuBar);
 }
 
@@ -227,27 +231,32 @@ _BMCMenuBar_::FrameResized(float width, float height)
 {
 	// we need to take care of resizing and cleaning up
 	// the parent menu field
-	float diff = Frame().right - fMenuField->Bounds().right;
+	float diff;
+	if (fFixedSize)
+		diff = width - fPreviousWidth;
+	else
+		diff = Frame().right - fMenuField->Bounds().right;
+
+	fPreviousWidth = width;
+
 	if (Window()) {
 		if (diff > 0) {
 			// clean up the dirty right border of
 			// the menu field when enlarging
 			BRect dirty(fMenuField->Bounds());
-			dirty.left = dirty.right - 2;
+			dirty.left = dirty.right - diff - 2;
 			fMenuField->Invalidate(dirty);
 			
 			// clean up the arrow part
 			dirty = Bounds();
-			dirty.right -= diff;
-			dirty.left = dirty.right - 12;
+			dirty.left = dirty.right - diff - 12;
 			Invalidate(dirty);
 
 		} else if (diff < 0) {
 			// clean up the dirty right line of
 			// the menu field when shrinking
 			BRect dirty(fMenuField->Bounds());
-			dirty.left = dirty.right + diff + 1;
-			dirty.right = dirty.left + 1;
+			dirty.left = dirty.right - 2;
 			fMenuField->Invalidate(dirty);
 			
 			// clean up the arrow part
@@ -257,10 +266,13 @@ _BMCMenuBar_::FrameResized(float width, float height)
 		}
 	}
 
-	// we have been shrinked or enlarged and need to take
-	// of the size of the parent menu field as well
-	// NOTE: no worries about follow mode, we follow left and top
-	fMenuField->ResizeBy(diff + 2, 0.0);
+	if (!fFixedSize) {
+		// we have been shrinked or enlarged and need to take
+		// of the size of the parent menu field as well
+		// NOTE: no worries about follow mode, we follow left and top
+		// in autosize mode
+		fMenuField->ResizeBy(diff + 2, 0.0);
+	}
 	BMenuBar::FrameResized(width, height);
 }
 
