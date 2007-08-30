@@ -104,33 +104,31 @@ void ButtonBar::Arrange(bool fixedWidth)
 	}
 	
 	// Arrange buttons
-	for (i = 0; (button = (BmapButton *)fButtonList.ItemAt(i)) != NULL; i++)
-	{
+	for (i = 0; (button = (BmapButton *)fButtonList.ItemAt(i)) != NULL; i++) {
 		button->MoveTo(fNextXOffset, fVMargin);
 		if (fixedWidth) {
 			button->ResizeTo(fMaxWidth, fMaxHeight);
-			fNextXOffset += fMaxWidth+fHMargin;
+			fNextXOffset += fMaxWidth + fHMargin;
 		} else {
 			button->GetPreferredSize(&width, &height);
 			button->ResizeTo(width, fMaxHeight);
-			fNextXOffset += width+fHMargin;
+			fNextXOffset += width + fHMargin;
 		}
 	}
 	
 	// Move dividers to match
-	for(i = 0; i < fDividers; i++)
-	{
+	for(i = 0; i < fDividers; i++) {
 		if (fDividerArray[i].button)
 			fDividerArray[i].where = fDividerArray[i].button->Frame().right + floor(fHMargin/2);
 		else
-			fDividerArray[i].where = floor(fHMargin/2);
+			fDividerArray[i].where = floor(fHMargin / 2);
 	}
 }
 
 void ButtonBar::GetPreferredSize(float *width, float *height)
 {
-	*width = fNextXOffset+fHMargin;
-	*height = fMaxHeight+(2*fVMargin);
+	*width = fNextXOffset + fHMargin;
+	*height = fMaxHeight + (2 * fVMargin);
 }
 
 void ButtonBar::AttachedToWindow(void)

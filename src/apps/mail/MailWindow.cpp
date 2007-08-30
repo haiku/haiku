@@ -506,10 +506,6 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		fHeaderView->fTo->SetText(to);
 	}
 
-	SetSizeLimits(WIND_WIDTH, RIGHT_BOUNDARY,
-				  fHeaderView->Bounds().Height() + ENCLOSURES_HEIGHT + height + 60,
-				  RIGHT_BOUNDARY);
-
 	AddShortcut('n', B_COMMAND_KEY, new BMessage(M_NEW));
 
 	//
@@ -566,6 +562,8 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 
 	if (fRef)
 		SetTitleForMessage();
+
+	_UpdateSizeLimits();
 }
 
 
@@ -578,26 +576,21 @@ TMailWindow::BuildButtonBar()
 	bbar->AddButton(MDR_DIALECT_CHOICE ("New","新規"), 28, new BMessage(M_NEW));
 	bbar->AddDivider(5);
 
-	if (fResending)
-	{
+	if (fResending) {
 		fSendButton = bbar->AddButton(MDR_DIALECT_CHOICE ("Send","送信"), 8, new BMessage(M_SEND_NOW));
 		bbar->AddDivider(5);
-	}
-	else if (!fIncoming)
-	{
+	} else if (!fIncoming) {
 		fSendButton = bbar->AddButton(MDR_DIALECT_CHOICE ("Send","送信"), 8, new BMessage(M_SEND_NOW));
 		fSendButton->SetEnabled(false);
 		fSigButton = bbar->AddButton(MDR_DIALECT_CHOICE ("Signature","署名"), 4, new BMessage(M_SIG_MENU));
 		fSigButton->InvokeOnButton(B_SECONDARY_MOUSE_BUTTON);
 		fSaveButton = bbar->AddButton(MDR_DIALECT_CHOICE ("Save","保存"), 44, new BMessage(M_SAVE_AS_DRAFT));
 		fSaveButton->SetEnabled(false);
-		bbar->AddDivider(5);
 		fPrintButton = bbar->AddButton(MDR_DIALECT_CHOICE ("Print","印刷"), 16, new BMessage(M_PRINT));
 		fPrintButton->SetEnabled(false);
 		bbar->AddButton(MDR_DIALECT_CHOICE ("Trash","削除"), 0, new BMessage(M_DELETE));
-	}
-	else
-	{
+		bbar->AddDivider(5);
+	} else {
 		BmapButton *button = bbar->AddButton(MDR_DIALECT_CHOICE ("Reply","返信"), 12, new BMessage(M_REPLY));
 		button->InvokeOnButton(B_SECONDARY_MOUSE_BUTTON);
 		button = bbar->AddButton(MDR_DIALECT_CHOICE ("Forward","転送"), 40, new BMessage(M_FORWARD));
@@ -614,7 +607,6 @@ TMailWindow::BuildButtonBar()
 	}
 	bbar->AddButton(MDR_DIALECT_CHOICE ("Inbox","受信箱"), 36, new BMessage(M_OPEN_MAIL_BOX));
 	bbar->AddButton(MDR_DIALECT_CHOICE ("Mail","メール"), 32, new BMessage(M_OPEN_MAIL_FOLDER));
-	bbar->AddDivider(5);
 
 	bbar->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	bbar->Hide();
@@ -660,6 +652,8 @@ TMailWindow::UpdateViews()
 	BRect bounds(Bounds());
 	fContentView->MoveTo(0, nextY-1);
 	fContentView->ResizeTo(bounds.right-bounds.left, bounds.bottom-nextY+1);
+
+	_UpdateSizeLimits();
 }
 
 
@@ -2788,3 +2782,28 @@ TMailWindow::FrontmostWindow()
 }
 
 
+// #pragma mark -
+
+
+void
+TMailWindow::_UpdateSizeLimits()
+{
+	float minWidth, maxWidth, minHeight, maxHeight;
+	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
+
+	float height;
+	fMenuBar->GetPreferredSize(&minWidth, &height);
+
+	minHeight = height;
+
+	if (fButtonBar) {
+		fButtonBar->GetPreferredSize(&minWidth, &height);
+		minHeight += height;
+	} else {
+		minWidth = WIND_WIDTH;
+	}
+
+	minHeight += fHeaderView->Bounds().Height() + ENCLOSURES_HEIGHT + 60;
+
+	SetSizeLimits(minWidth, RIGHT_BOUNDARY, minHeight, RIGHT_BOUNDARY);
+}

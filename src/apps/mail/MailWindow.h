@@ -118,6 +118,8 @@ class TMailWindow : public BWindow {
 				status_t		TrainMessageAs(const char* commandWord);
 
 	private:
+				void			_UpdateSizeLimits();
+
 				TMailApp*		fApp;
 
 				BEmailMessage*	fMail;

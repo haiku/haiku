@@ -156,14 +156,15 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 		MDR_DIALECT_CHOICE ("Enclosures: ","添付ファイル：")) + 9;
 	float y = TO_FIELD_V;
 
-	float menuFieldHeight;
 	BMenuBar* dummy = new BMenuBar(BRect(0, 0, 100, 15), "Dummy");
 	AddChild(dummy);
-	float width;
-	dummy->GetPreferredSize(&width, &menuFieldHeight);
-	menuFieldHeight += floorf(be_plain_font->Size() / 1.15);
+	float width, menuBarHeight;
+	dummy->GetPreferredSize(&width, &menuBarHeight);
 	dummy->RemoveSelf();
 	delete dummy;
+
+	float menuFieldHeight = menuBarHeight + 6;
+	float controlHeight = menuBarHeight + floorf(be_plain_font->Size() / 1.15);
 
 	if (!fIncoming) {
 		InitEmailCompletion();
@@ -242,7 +243,7 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 		// Set up the character set pop-up menu on the right of "To" box.
 		r.Set (windowRect.Width() - widestCharacterSet -
 			StringWidth (DECODING_TEXT) - 2 * SEPARATOR_MARGIN, y - 2,
-			windowRect.Width() - SEPARATOR_MARGIN, y + menuFieldHeight + 2);
+			windowRect.Width() - SEPARATOR_MARGIN, y + menuFieldHeight);
 		field = new BMenuField (r, "decoding", DECODING_TEXT, fEncodingMenu,
 			true /* fixedSize */,
 			B_FOLLOW_TOP | B_FOLLOW_RIGHT,
@@ -258,7 +259,7 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 		string[0] = 0;
 	}
 
-	y += menuFieldHeight;
+	y += controlHeight;
 	fTo = new TTextControl(r, string, new BMessage(TO_FIELD), fIncoming,
 		resending, B_FOLLOW_LEFT_RIGHT);
 	fTo->SetFilter(mail_to_filter);
@@ -278,10 +279,10 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 
 	if (!fIncoming || resending) {
 		r.right = r.left - 5;
-		r.left = r.right - be_plain_font->StringWidth(TO_TEXT) - 15;
+		r.left = r.right - ceilf(be_plain_font->StringWidth(TO_TEXT) + 25);
 		r.top -= 1;
 		fToMenu = new QPopupMenu(TO_TEXT);
-		field = new BMenuField(r, "", "", fToMenu,
+		field = new BMenuField(r, "", "", fToMenu, true,
 			B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 		field->SetDivider(0.0);
 		field->SetEnabled(true);
@@ -293,7 +294,7 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 		// Put the character set box on the right of the From field.
 		r.Set(windowRect.Width() - widestCharacterSet -
 			StringWidth(ENCODING_TEXT) - 2 * SEPARATOR_MARGIN,
-			y - 2, windowRect.Width() - SEPARATOR_MARGIN, y + menuFieldHeight + 2);
+			y - 2, windowRect.Width() - SEPARATOR_MARGIN, y + menuFieldHeight);
 		field = new BMenuField (r, "encoding", ENCODING_TEXT, fEncodingMenu,
 			true /* fixedSize */,
 			B_FOLLOW_TOP | B_FOLLOW_RIGHT,
@@ -347,7 +348,7 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 			}
 		}
 		r.Set(SEPARATOR_MARGIN, y - 2,
-			  field->Frame().left - SEPARATOR_MARGIN, y + menuFieldHeight + 2);
+			  field->Frame().left - SEPARATOR_MARGIN, y + menuFieldHeight);
 		field = new BMenuField(r, "account", FROM_TEXT, fAccountMenu,
 			true /* fixedSize */,
 			B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT,
@@ -355,9 +356,11 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 		AddChild(field);
 		field->SetDivider(x - 12 - SEPARATOR_MARGIN + kMenuFieldDividerOffset);
 		field->SetAlignment(B_ALIGN_RIGHT);
-//		field->MenuBar()->SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
+#ifndef __HAIKU__
+		field->MenuBar()->SetResizingMode(B_FOLLOW_LEFT_RIGHT);
+#endif
 
-		y += menuFieldHeight;
+		y += controlHeight;
 	} else {
 		// To: account
 		bool account = count_pop_accounts() > 0;
@@ -378,13 +381,13 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 			fAccount->SetEnabled(false);
 			AddChild(fAccount);
 		}
-		y += menuFieldHeight;
+		y += controlHeight;
 	}
 
 	--y;
 	r.Set(SEPARATOR_MARGIN, y,
 		windowRect.Width() - SEPARATOR_MARGIN, y + menuFieldHeight);
-	y += menuFieldHeight;
+	y += controlHeight;
 	fSubject = new TTextControl(r, SUBJECT_TEXT, new BMessage(SUBJECT_FIELD),
 				fIncoming, false, B_FOLLOW_LEFT_RIGHT);
 	AddChild(fSubject);
@@ -408,10 +411,10 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 		fCc->SetModificationMessage(msg);
 
 		r.right = r.left - 5;
-		r.left = r.right - be_plain_font->StringWidth(CC_TEXT) - 15;
+		r.left = r.right - ceilf(be_plain_font->StringWidth(CC_TEXT) + 25);
 		r.top -= 1;
 		fCcMenu = new QPopupMenu(CC_TEXT);
-		field = new BMenuField(r, "", "", fCcMenu,
+		field = new BMenuField(r, "", "", fCcMenu, true,
 			B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 
 		field->SetDivider(0.0);
@@ -420,7 +423,7 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 
 		r.Set(BCC_FIELD_H + be_plain_font->StringWidth(BCC_TEXT), y,
 			  windowRect.Width() - SEPARATOR_MARGIN, y + menuFieldHeight);
-		y += menuFieldHeight;
+		y += controlHeight;
 		fBcc = new TTextControl(r, "", new BMessage(BCC_FIELD),
 						fIncoming, false, B_FOLLOW_LEFT_RIGHT);
 		fBcc->SetFilter(mail_to_filter);
@@ -431,29 +434,29 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 		fBcc->SetModificationMessage(msg);
 
 		r.right = r.left - 5;
-		r.left = r.right - be_plain_font->StringWidth(BCC_TEXT) - 15;
+		r.left = r.right - ceilf(be_plain_font->StringWidth(BCC_TEXT) + 25);
 		r.top -= 1;
 		fBccMenu = new QPopupMenu(BCC_TEXT);
-		field = new BMenuField(r, "", "", fBccMenu,
+		field = new BMenuField(r, "", "", fBccMenu, true,
 			B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 		field->SetDivider(0.0);
 		field->SetEnabled(true);
 		AddChild(field);
 	} else {
 		y -= SEPARATOR_MARGIN;
-		r.Set(SEPARATOR_MARGIN, y, x - 12 - 1, y + menuFieldHeight + 1);
+		r.Set(SEPARATOR_MARGIN, y, x - 12 - 1, y + menuFieldHeight);
 		fDateLabel = new BStringView(r, "", kDateLabel);
 		fDateLabel->SetAlignment(B_ALIGN_RIGHT);
 		AddChild(fDateLabel);
 		fDateLabel->SetHighColor(0, 0, 0);
 
 		r.Set(r.right + 9, y, windowRect.Width() - SEPARATOR_MARGIN,
-			y + menuFieldHeight + 1);
+			y + menuFieldHeight);
 		fDate = new BStringView(r, "", "");
 		AddChild(fDate);
 		fDate->SetHighColor(0, 0, 0);
 
-		y += menuFieldHeight + 5;
+		y += controlHeight + 5;
 
 		LoadMessage(mail);
 	}
