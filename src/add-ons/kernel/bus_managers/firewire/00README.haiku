@@ -1,0 +1,105 @@
+src/add-ons/kernel/bus_managers/firewire/00README, v 0.1 2007/08/31 09:10:08 JiSheng Zhang
+
+IEEE 1394 support for haiku
+
+1. Introduction
+
+	  These directories contains IEEE1394(FireWire) driver which is my 
+	GSOC2007 project work under my mentor Jerome Duval's guidance.
+	Please note this driver is still under development. You can find latest 
+	version from Haiku's repository:
+
+	The driver consists of 13 parts:
+	
+	DIRECTORY: src/add-ons/kernel/bus_managers/firewire/
+	- fwohci.c/fwohci_pci.c
+		OHCI driver
+			- IEEE1394 link/phy chip control
+	- firewire.c
+		Chip independent driver 
+			- CSR
+			- Transaction
+			- Bus management
+	- fwdma.c
+		allocate memory and other convenient functions for DMA.
+
+	- fwmem.c
+		physical memory of a remote node.
+
+	- firewire_module.c
+		implementation of firewire module interfaces
+
+	- util.c
+		memory allocation. Copied from haiku's rtl8169 driver
+	
+	- timer.c
+		timer implemetation. Copied from haiku's rtl8169 driver
+	
+	- fwcrom.c(This file is in src/bin/fwcontrol directory)
+		handle with config rom
+	
+	DIRECTORY: src/add-ons/kernel/drivers/bus/firewire/
+	
+	- fw_raw.c
+		Character devices for userland
+	
+	DIRECTORY: src/bin/fwcontrol/
+
+	- fwcontrol.c (userland)
+		Bus management function for user. 
+		show topology map, change gap count, bus reset, etc.
+	
+	- eui64.c
+		handle with EUI64 ID
+	
+	- fwdv.c
+		dv format support
+	
+	- fwmpegts.c
+		mpegts format support
+
+2. Installation
+
+	- svn up to update the source
+	- jam -q firewire.
+	- jam -q fw_raw
+	- jam -q fwcontrol
+	- jam -q dpc(This file is in src/add-ons/kernel/generic/dpc)
+	- cp the firewire to haiku's /system/add-ons/kernel/bus_managers
+	- cp the dpc to haiku's /system/add-ons/kernel/generic
+	- cp the fw_raw to haiku's drivers/bin and make a softlink in drivers/dev
+
+3. DV
+	I have tested my minidv: MV920. It works OK.
+
+4. SBP
+	This support is still under development
+
+5. Tested HW
+
+	OS
+	- HAIKU/i386
+
+	* Not tested on SMP.
+	* Not tested on big-endian machine...
+
+	OHCI
+	- Texas Instruments TSB12LV26 (PCI)
+
+	* There might be phy probing problem but most of the OHCI
+	  chips should work.
+
+	Physical layer chip
+	- This does not matter, most physical layer chip should work
+
+References:
+[1] IEEE 1394-1995
+[2] IEEE 1394a-2000
+[3] IEEE 1212-2001
+[4] IEC 61883
+[5] http://developer.intel.com/technology/1394/download/ohci_11.htm
+[6] FreeBSD's current
+
+
+JiSheng Zhang
+jszhang3@gmail.com
