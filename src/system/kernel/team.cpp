@@ -1781,11 +1781,11 @@ team_delete_team(struct team *team)
 
 	// free team resources
 
-	vm_delete_address_space(team->address_space);
+	vfs_free_io_context(team->io_context);
 	delete_owned_ports(teamID);
 	sem_delete_owned_sems(teamID);
 	remove_images(team);
-	vfs_free_io_context(team->io_context);
+	vm_delete_address_space(team->address_space);
 
 	delete_team_struct(team);
 

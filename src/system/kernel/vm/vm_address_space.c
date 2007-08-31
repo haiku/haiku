@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -7,7 +7,6 @@
  */
 
 
-//#include <OS.h>
 #include <KernelExport.h>
 
 #include <vm.h>
@@ -132,10 +131,9 @@ aspace_hash(void *_a, const void *key, uint32 range)
 }
 
 
-/** When this function is called, all references to this address space
- *	have been released, so it's safe to remove it.
- */
-
+/*! When this function is called, all references to this address space
+	have been released, so it's safe to remove it.
+*/
 static void
 delete_address_space(vm_address_space *addressSpace)
 {
@@ -144,14 +142,8 @@ delete_address_space(vm_address_space *addressSpace)
 	if (addressSpace == sKernelAddressSpace)
 		panic("tried to delete the kernel aspace!\n");
 
-	// put this aspace in the deletion state
-	// this guarantees that no one else will add regions to the list
 	acquire_sem_etc(addressSpace->sem, WRITE_COUNT, 0, 0);
-
-	addressSpace->state = VM_ASPACE_STATE_DELETION;
-
 	(*addressSpace->translation_map.ops->destroy)(&addressSpace->translation_map);
-
 	delete_sem(addressSpace->sem);
 	free(addressSpace);
 }
@@ -161,17 +153,17 @@ delete_address_space(vm_address_space *addressSpace)
 
 
 vm_address_space *
-vm_get_address_space_by_id(team_id aid)
+vm_get_address_space_by_id(team_id id)
 {
-	vm_address_space *aspace;
+	vm_address_space *addressSpace;
 
 	acquire_sem_etc(sAddressSpaceHashSem, READ_COUNT, 0, 0);
-	aspace = hash_lookup(sAddressSpaceTable, &aid);
-	if (aspace)
-		atomic_add(&aspace->ref_count, 1);
+	addressSpace = hash_lookup(sAddressSpaceTable, &id);
+	if (addressSpace)
+		atomic_add(&addressSpace->ref_count, 1);
 	release_sem_etc(sAddressSpaceHashSem, READ_COUNT, 0);
 
-	return aspace;
+	return addressSpace;
 }
 
 
@@ -228,30 +220,29 @@ vm_current_user_address_space_id(void)
 
 
 void
-vm_put_address_space(vm_address_space *aspace)
+vm_put_address_space(vm_address_space *addressSpace)
 {
 	bool remove = false;
 
 	acquire_sem_etc(sAddressSpaceHashSem, WRITE_COUNT, 0, 0);
-	if (atomic_add(&aspace->ref_count, -1) == 1) {
-		hash_remove(sAddressSpaceTable, aspace);
+	if (atomic_add(&addressSpace->ref_count, -1) == 1) {
+		hash_remove(sAddressSpaceTable, addressSpace);
 		remove = true;
 	}
 	release_sem_etc(sAddressSpaceHashSem, WRITE_COUNT, 0);
 
 	if (remove)
-		delete_address_space(aspace);
+		delete_address_space(addressSpace);
 }
 
 
-/** Deletes all areas in the specified address space, and the address
- *	space by decreasing all reference counters. It also marks the
- *	address space of being in deletion state, so that no more areas
- *	can be created in it.
- *	After this, the address space is not operational anymore, but might
- *	still be in memory until the last reference has been released.
- */
-
+/*! Deletes all areas in the specified address space, and the address
+	space by decreasing all reference counters. It also marks the
+	address space of being in deletion state, so that no more areas
+	can be created in it.
+	After this, the address space is not operational anymore, but might
+	still be in memory until the last reference has been released.
+*/
 void
 vm_delete_address_space(vm_address_space *addressSpace)
 {
@@ -298,13 +289,15 @@ vm_create_address_space(team_id id, addr_t base, addr_t size,
 	addressSpace->state = VM_ASPACE_STATE_NORMAL;
 	addressSpace->fault_count = 0;
 	addressSpace->scan_va = base;
-	addressSpace->working_set_size = kernel ? DEFAULT_KERNEL_WORKING_SET : DEFAULT_WORKING_SET;
+	addressSpace->working_set_size = kernel
+		? DEFAULT_KERNEL_WORKING_SET : DEFAULT_WORKING_SET;
 	addressSpace->max_working_set = DEFAULT_MAX_WORKING_SET;
 	addressSpace->min_working_set = DEFAULT_MIN_WORKING_SET;
 	addressSpace->last_working_set_adjust = system_time();
 
 	// initialize the corresponding translation map
-	status = arch_vm_translation_map_init_map(&addressSpace->translation_map, kernel);
+	status = arch_vm_translation_map_init_map(&addressSpace->translation_map,
+		kernel);
 	if (status < B_OK) {
 		free(addressSpace);
 		return status;
@@ -349,8 +342,9 @@ vm_address_space_init(void)
 	// create the area and address space hash tables
 	{
 		vm_address_space *aspace;
-		sAddressSpaceTable = hash_init(ASPACE_HASH_TABLE_SIZE, (addr_t)&aspace->hash_next - (addr_t)aspace,
-			&aspace_compare, &aspace_hash);
+		sAddressSpaceTable = hash_init(ASPACE_HASH_TABLE_SIZE, 
+			(addr_t)&aspace->hash_next - (addr_t)aspace, &aspace_compare,
+			&aspace_hash);
 		if (sAddressSpaceTable == NULL)
 			panic("vm_init: error creating aspace hash table\n");
 	}
@@ -362,8 +356,10 @@ vm_address_space_init(void)
 			true, &sKernelAddressSpace) != B_OK)
 		panic("vm_init: error creating kernel address space!\n");
 
-	add_debugger_command("aspaces", &dump_aspace_list, "Dump a list of all address spaces");
-	add_debugger_command("aspace", &dump_aspace, "Dump info about a particular address space");
+	add_debugger_command("aspaces", &dump_aspace_list,
+		"Dump a list of all address spaces");
+	add_debugger_command("aspace", &dump_aspace,
+		"Dump info about a particular address space");
 
 	return B_OK;
 }
@@ -372,11 +368,13 @@ vm_address_space_init(void)
 status_t
 vm_address_space_init_post_sem(void)
 {
-	status_t status = arch_vm_translation_map_init_kernel_map_post_sem(&sKernelAddressSpace->translation_map);
+	status_t status = arch_vm_translation_map_init_kernel_map_post_sem(
+		&sKernelAddressSpace->translation_map);
 	if (status < B_OK)
 		return status;
 
-	status = sKernelAddressSpace->sem = create_sem(WRITE_COUNT, "kernel_aspacelock");
+	status = sKernelAddressSpace->sem = create_sem(WRITE_COUNT,
+		"kernel_aspacelock");
 	if (status < B_OK)
 		return status;
 

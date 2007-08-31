@@ -741,6 +741,7 @@ find_reserved_area(vm_address_space *addressSpace, addr_t start,
 		if (reserved == NULL)
 			return B_NO_MEMORY;
 
+		atomic_add(&addressSpace->ref_count, 1);
 		reserved->address_space_next = next->address_space_next;
 		area->address_space_next = reserved;
 		next->address_space_next = area;
@@ -1185,6 +1186,7 @@ vm_reserve_address_range(team_id team, void **_address, uint32 addressSpec,
 	area->cache_offset = area->base;
 		// we cache the original base address here
 
+	atomic_add(&locker.AddressSpace()->ref_count, 1);
 	return B_OK;
 }
 
@@ -1872,10 +1874,7 @@ delete_area(vm_address_space *addressSpace, vm_area *area)
 
 	arch_vm_unset_memory_type(area);
 	remove_area_from_address_space(addressSpace, area);
-	// TODO: the following line fixes an address space leak - however,
-	// there seems to be something wrong with the order in which teams
-	// are torn down, and the first shell command hangs on a pipe then
-	//vm_put_address_space(addressSpace);
+	vm_put_address_space(addressSpace);
 
 	vm_cache_remove_area(area->cache, area);
 	vm_cache_release_ref(area->cache);
