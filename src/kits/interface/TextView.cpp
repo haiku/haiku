@@ -773,11 +773,17 @@ BTextView::MessageReceived(BMessage *message)
 
 	switch (message->what) {
 		case B_CUT:
-			Cut(be_clipboard);
+			if (!IsTypingHidden())
+				Cut(be_clipboard);
+			else
+				beep();
 			break;
 			
 		case B_COPY:
-			Copy(be_clipboard);
+			if (!IsTypingHidden())
+				Copy(be_clipboard);
+			else
+				beep();
 			break;
 			
 		case B_PASTE:
@@ -845,36 +851,29 @@ BTextView::MessageReceived(BMessage *message)
 				BView::MessageReceived(message);
 				break;
 			}
-
+			
+			BMessage reply;
+			bool handled = false;
 			switch(message->what) {		
 				case B_GET_PROPERTY:
-				{
-					BMessage reply;
-					GetProperty(&specifier, specifier.what, property, &reply);
-					message->SendReply(&reply);
+					handled = GetProperty(&specifier, specifier.what, property, &reply);
 					break;
-				}
 				
 				case B_SET_PROPERTY:
-				{
-					BMessage reply;
-					SetProperty(&specifier, specifier.what, property, &reply);
-					message->SendReply(&reply);
+					handled = SetProperty(&specifier, specifier.what, property, &reply);
 					break;
-				}
 				
 				case B_COUNT_PROPERTIES:
-				{
-					BMessage reply;
-					CountProperties(&specifier, specifier.what, property, &reply);	
-					message->SendReply(&reply);
+					handled = CountProperties(&specifier, specifier.what, property, &reply);	
 					break;
-				}
 				
 				default:
 					break;
 			}
-
+			if (handled)
+				message->SendReply(&reply);
+			else
+				BView::MessageReceived(message);
 			break;
 		}
 
@@ -1132,7 +1131,7 @@ BTextView::Delete(int32 startOffset, int32 endOffset)
 const char *
 BTextView::Text() const
 {
-	return fText->Text();
+	return fText->RealText();
 }
 
 
@@ -1164,7 +1163,7 @@ BTextView::ByteAt(int32 offset) const
 	if (offset < 0 || offset >= fText->Length())
 		return '\0';
 		
-	return (*fText)[offset];
+	return fText->RealCharAt(offset);
 }
 
 
@@ -1635,7 +1634,7 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 		height = (line + 1)->origin - line->origin;
 	
 		// special case: go down one line if inOffset is a newline
-		if (inOffset == textLength && (*fText)[inOffset - 1] == B_ENTER) {
+		if (inOffset == textLength && fText->RealCharAt(inOffset - 1) == B_ENTER) {
 			result.y += height;
 			height = LineHeight(CountLines() - 1);
 	
@@ -1862,7 +1861,7 @@ BTextView::TextHeight(int32 startLine, int32 endLine) const
 	
 	float height = (*fLines)[endLine + 1]->origin - (*fLines)[startLine]->origin;
 				
-	if (startLine != endLine && endLine == numLines - 1 && (*fText)[fText->Length() - 1] == B_ENTER)
+	if (startLine != endLine && endLine == numLines - 1 && fText->RealCharAt(fText->Length() - 1) == B_ENTER)
 		height += (*fLines)[endLine + 1]->origin - (*fLines)[endLine]->origin;
 	
 	return ceilf(height);
@@ -2652,7 +2651,7 @@ BTextView::GetDragParameters(BMessage *drag, BBitmap **bitmap, BPoint *point, BH
 	drag->AddInt32("be_actions", B_TRASH_TARGET);
 	
 	// add the text
-	drag->AddData("text/plain", B_MIME_TYPE, fText->Text() + fSelStart, 
+	drag->AddData("text/plain", B_MIME_TYPE, fText->RealText() + fSelStart, 
 			  	  fSelEnd - fSelStart);
 	
 	// add the corresponding styles
@@ -3287,7 +3286,7 @@ BTextView::FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent, 
 				break;
 		}
 		for ( ; (offset + delta) < limit; delta++) {
-			uchar theChar = (*fText)[offset + delta];
+			uchar theChar = fText->RealCharAt(offset + delta);
 			if (!CanEndLine(offset + delta))
 				break;
 			
@@ -3320,7 +3319,7 @@ BTextView::FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent, 
 			tabWidth = 0.0;
 		else {
 			int32 tabCount = 0;
-			for (int32 i = delta - 1; (*fText)[offset + i] == B_TAB; i--)
+			for (int32 i = delta - 1; fText->RealCharAt(offset + i) == B_TAB; i--)
 				tabCount++;
 				
 			tabWidth = ActualTabWidth(strWidth);
@@ -3350,12 +3349,13 @@ BTextView::FindLineBreak(int32 fromOffset, float *outAscent, float *outDescent, 
 
 			if (!foundNewline) {
 				for ( ; (offset + delta) < limit; delta++) {
-					if ((*fText)[offset + delta] != B_SPACE &&
-						(*fText)[offset + delta] != B_TAB)
+					const char realChar = fText->RealCharAt(offset + delta);
+					if (realChar != B_SPACE
+						&& realChar != B_TAB)
 						break;
 				}
-				if ( (offset + delta) < limit && 
-					 (*fText)[offset + delta] == B_ENTER )
+				if ((offset + delta) < limit
+					&& fText->RealCharAt(offset + delta) == B_ENTER )
 					delta++;
 			}
 			// get the ascent and descent of the spaces/tabs
@@ -3426,7 +3426,7 @@ BTextView::StyledWidth(int32 fromOffset, int32 length, float *outAscent,
 			UnlockWidthBuffer();
 		} else
 #endif
-			result += font->StringWidth(fText->Text() + fromOffset, numChars);
+			result += font->StringWidth(fText->RealText() + fromOffset, numChars);
 		
 		fromOffset += numChars;
 		length -= numChars;
@@ -3593,8 +3593,9 @@ BTextView::_DrawLine(BView *view, const int32 &lineNum, const int32 &startOffset
 				}
 				
 				int32 returnedBytes = tabChars;
-				view->DrawString(fText->GetString(offset, &returnedBytes), returnedBytes);
-				
+				const char *stringToDraw = fText->GetString(offset, &returnedBytes);
+					
+				view->DrawString(stringToDraw, returnedBytes);
 				if (foundTab) {
 					float penPos = PenLocation().x - fTextRect.left;
 					float tabWidth = ActualTabWidth(penPos);
@@ -4308,6 +4309,13 @@ BTextView::GetProperty(BMessage *specifier, int32 form, const char *property, BM
 		return true;
 
 	} else if (strcmp(property, "Text") == 0) {
+		
+		if (IsTypingHidden()) {
+			// Do not allow stealing passwords via scripting			
+			beep();
+			return false;		
+		}		
+
 		int32 index, range;
 		
 		specifier->FindInt32("index", &index);

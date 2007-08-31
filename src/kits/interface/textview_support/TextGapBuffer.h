@@ -29,11 +29,9 @@ virtual				~_BTextGapBuffer_();
 		bool		FindChar(char inChar, int32 fromIndex, int32 *ioDelta);
 
 		const char 	*Text();
+		const char 	*RealText();
 		int32		Length() const;
-		char		operator[](int32 index) const;
-
 		
-//		char 		*RealText();
 		const char 	*GetString(int32 fromOffset, int32 *numBytes);
 		void		GetString(int32 offset, int32 length, char *buffer);
 		
@@ -65,7 +63,7 @@ _BTextGapBuffer_::Length() const
 
 
 inline char 
-_BTextGapBuffer_::operator[](long index) const
+_BTextGapBuffer_::RealCharAt(long index) const
 {
 	return (index < fGapIndex) ? fBuffer[index] : fBuffer[index + fGapCount];
 }

@@ -7,6 +7,7 @@
  *		Stefano Ceccherini (burton666@libero.it)
  */
 
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 
@@ -193,7 +194,7 @@ _BTextGapBuffer_::GetString(int32 fromOffset, int32 *_numBytes)
 		}
 		
 		for (long i = 0; i < numBytes; i++)
-			fScratchBuffer[i] = (*this)[fromOffset + i];
+			fScratchBuffer[i] = RealCharAt(fromOffset + i);
 
 		result = fScratchBuffer;
 	}
@@ -203,7 +204,8 @@ _BTextGapBuffer_::GetString(int32 fromOffset, int32 *_numBytes)
 	if (fPasswordMode) {
 		uint32 numChars = UTF8CountChars(result, numBytes);
 		uint32 charLen = UTF8CountBytes(B_UTF8_BULLET, 1);
-		uint32 newSize = numChars * charLen + 1;
+		uint32 newSize = numChars * charLen;
+		
 		if ((uint32)fScratchSize < newSize) {
 			fScratchBuffer = (char *)realloc(fScratchBuffer, newSize);
 			fScratchSize = newSize;
@@ -215,7 +217,6 @@ _BTextGapBuffer_::GetString(int32 fromOffset, int32 *_numBytes)
 			memcpy(scratchPtr, B_UTF8_BULLET, charLen);
 			scratchPtr += charLen;
 		}
-		scratchPtr = '\0';	
 		*_numBytes = newSize - 1;	
 	}
 
@@ -228,9 +229,9 @@ _BTextGapBuffer_::FindChar(char inChar, long fromIndex, long *ioDelta)
 {
 	long numChars = *ioDelta;
 	for (long i = 0; i < numChars; i++) {
-		if (((*this)[fromIndex + i] & 0xc0) == 0x80)
+		if ((RealCharAt(fromIndex + i) & 0xc0) == 0x80)
 			continue;
-		if ((*this)[fromIndex + i] == inChar) {
+		if (RealCharAt(fromIndex + i) == inChar) {
 			*ioDelta = i;
 			return true;
 		}
@@ -243,18 +244,40 @@ _BTextGapBuffer_::FindChar(char inChar, long fromIndex, long *ioDelta)
 const char *
 _BTextGapBuffer_::Text()
 {
+	const char *realText = RealText();
+	
+	if (fPasswordMode) {
+		const uint32 numChars = UTF8CountChars(realText, Length());
+		const uint32 bulletCharLen = UTF8CountBytes(B_UTF8_BULLET, 1);
+		uint32 newSize = numChars * bulletCharLen + 1;
+		
+		if ((uint32)fScratchSize < newSize) {
+			fScratchBuffer = (char *)realloc(fScratchBuffer, newSize);
+			fScratchSize = newSize;
+		}
+		
+		char *scratchPtr = fScratchBuffer;
+		for (uint32 i = 0; i < numChars; i++) {
+			memcpy(scratchPtr, B_UTF8_BULLET, bulletCharLen);
+			scratchPtr += bulletCharLen;
+		}
+		scratchPtr = '\0';
+
+		return fScratchBuffer;
+	}
+	
+	return realText;
+}
+
+
+const char *
+_BTextGapBuffer_::RealText()
+{
 	MoveGapTo(fItemCount);
 	fBuffer[fItemCount] = '\0';
 	
 	return fBuffer;
 }
-
-
-/*char *
-_BTextGapBuffer_::RealText()
-{
-	return fText;
-}*/
 
 
 void
@@ -295,13 +318,6 @@ _BTextGapBuffer_::GetString(int32 offset, int32 length, char *buffer)
 	}
 	
 	buffer[length] = '\0';
-}
-
-
-char 
-_BTextGapBuffer_::RealCharAt(int32 offset) const
-{
-	return (offset < fGapIndex) ? fBuffer[offset] : fBuffer[offset + fGapCount];
 }
 
 
