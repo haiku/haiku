@@ -101,6 +101,7 @@ class BTextControl : public BControl {
 		void				_InitData(const char* label, const char* initialText,
 								BMessage* archive = NULL);
 		void				_ValidateLayout();
+		void				_LayoutTextView();
 		void				_UpdateFrame();
 
 	private:

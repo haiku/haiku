@@ -141,8 +141,7 @@ _BTextInput_::MakeFocus(bool state)
 // I'm leaving this in, but it looks suspicious... :-)
 		Invalidate(Bounds());
 		if (BTextControl* parent = dynamic_cast<BTextControl*>(Parent())) {
-			BRect frame = parent->Bounds();
-			frame.left = parent->Divider();
+			BRect frame = Frame();
 			frame.InsetBy(-1.0, -1.0);
 			parent->Invalidate(frame);
 		}

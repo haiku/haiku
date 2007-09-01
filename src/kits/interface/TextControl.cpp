@@ -252,14 +252,9 @@ BTextControl::GetAlignment(alignment* _label, alignment* _text) const
 void
 BTextControl::SetDivider(float dividingLine)
 {
-	dividingLine = floorf(dividingLine + 0.5);
+	fDivider = floorf(dividingLine + 0.5);
 
-	float dx = fDivider - dividingLine;
-
-	fDivider = dividingLine;
-
-	fText->MoveBy(-dx, 0.0f);
-	fText->ResizeBy(dx, 0.0f);
+	_LayoutTextView();
 
 	if (Window()) {
 		fText->Invalidate();
@@ -295,8 +290,8 @@ BTextControl::Draw(BRect updateRect)
 
 	// outer bevel
 
-	BRect rect = Bounds();
-	rect.left = fDivider;
+	BRect rect = fText->Frame();
+	rect.InsetBy(-2, -2);
 
 	if (enabled)
 		SetHighColor(darken1);
@@ -363,7 +358,7 @@ BTextControl::Draw(BRect updateRect)
 				ceilf(fontHeight.ascent + fontHeight.descent) + 1);
 		if (x < fDivider && updateRect.Intersects(labelArea)) {
 			labelArea.right = fDivider;
-			
+
 			BRegion clipRegion(labelArea);
 			ConstrainClippingRegion(&clipRegion);
 			SetHighColor(IsEnabled() ? ui_color(B_CONTROL_TEXT_COLOR)
@@ -434,7 +429,7 @@ BTextControl::GetPreferredSize(float *_width, float *_height)
 		GetFontHeight(&fontHeight);
 		float labelHeight = ceil(fontHeight.ascent + fontHeight.descent
 			+ fontHeight.leading);
-		float textHeight = fText->LineHeight(0) + 4.0;
+		float textHeight = ceilf(fText->LineHeight(0)) + 4.0;
 
 		*_height = max_c(labelHeight, textHeight);
 	}
@@ -765,11 +760,32 @@ BTextControl::_ValidateLayout()
 
 	ResizeTo(Bounds().Width(), height);
 
-	float lineHeight = ceil(fText->LineHeight(0));
-	fText->ResizeTo(fText->Bounds().Width(), lineHeight);
-	fText->MoveTo(fText->Frame().left, (height - lineHeight) / 2);
+	_LayoutTextView();
 
 	fPreviousHeight = Bounds().Height();
+}
+
+
+void
+BTextControl::_LayoutTextView()
+{
+	BRect frame = Bounds();
+	frame.left = fDivider;
+	// we are stroking the frame around the text view, which
+	// is 2 pixels wide
+	frame.InsetBy(2.0, 2.0);
+	fText->MoveTo(frame.left, frame.top);
+	fText->ResizeTo(frame.Width(), frame.Height());
+
+	BRect textRect(frame.OffsetToCopy(B_ORIGIN));
+
+	// the label font could require the control to be higher than
+	// necessary for the text view, we compensate this by layouting
+	// the text rect to be in the middle, normally this means there
+	// is one pixel spacing on each side
+	float lineHeight = ceilf(fText->LineHeight(0));
+	textRect.InsetBy(1, floorf((frame.Height() - lineHeight) / 2));
+	fText->SetTextRect(textRect);
 }
 
 
