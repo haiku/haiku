@@ -4,6 +4,7 @@
  */
 
 #include "ahci_port.h"
+#include "ahci_controller.h"
 
 #include <KernelExport.h>
 #include <stdio.h>
@@ -14,6 +15,7 @@
 
 AHCIPort::AHCIPort(AHCIController *controller, int index)
 	: fIndex(index)
+	, fRegs(&controller->fRegs->port[index])
 {
 }
 				
@@ -43,3 +45,41 @@ AHCIPort::Interrupt()
 {
 	TRACE("AHCIPort::Interrupt port %d\n", fIndex);
 }
+
+
+void
+AHCIPort::ExecuteRequest(scsi_ccb *request)
+{
+
+	TRACE("AHCIPort::ExecuteRequest port %d, opcode %u, length %u\n", fIndex, request->cdb[0], request->cdb_length);
+
+	request->subsys_status = SCSI_DEV_NOT_THERE;
+	gSCSI->finished(request, 1);
+	return;
+
+	request->subsys_status = SCSI_REQ_CMP;
+	gSCSI->finished(request, 1);
+}
+
+
+uchar
+AHCIPort::AbortRequest(scsi_ccb *request)
+{
+
+	return SCSI_REQ_CMP;
+}
+
+
+uchar
+AHCIPort::TerminateRequest(scsi_ccb *request)
+{
+	return SCSI_REQ_CMP;
+}
+
+
+uchar
+AHCIPort::ResetDevice()
+{
+	return SCSI_REQ_CMP;
+}
+

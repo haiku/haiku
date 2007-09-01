@@ -33,10 +33,11 @@ private:
 
 static int32	Interrupt(void *data);
 
+	friend class AHCIPort;
+
 private:
 	device_node_handle 			fNode;
 	pci_device_info*			fPCIDevice;
-	uint32						fDevicePresentMask;
 	uint16						fPCIVendorID;
 	uint16						fPCIDeviceID;
 
@@ -46,7 +47,7 @@ private:
 	int							fPortCount;
 	int							fPortMax;
 	uint8						fIRQ;
-	AHCIPort *					fPorts[32];
+	AHCIPort *					fPort[32];
 
 
 // --- Instance check workaround begin
@@ -54,13 +55,6 @@ private:
 // --- Instance check workaround end
 
 };
-
-
-inline bool
-AHCIController::IsDevicePresent(uint device)
-{
-	return fDevicePresentMask & (1 << device);
-}
 
 
 inline void

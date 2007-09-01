@@ -19,8 +19,16 @@ public:
 
 	void		Interrupt();
 
+
+	void		ExecuteRequest(scsi_ccb *request);
+	uchar		AbortRequest(scsi_ccb *request);
+	uchar		TerminateRequest(scsi_ccb *request);
+	uchar		ResetDevice();
+
+
 private:
-	int			fIndex;
+	int						fIndex;
+	volatile ahci_port *	fRegs;
 };
 
 #endif	// _AHCI_PORT_H

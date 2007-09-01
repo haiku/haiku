@@ -18,7 +18,6 @@
 AHCIController::AHCIController(device_node_handle node, pci_device_info *device)
 	: fNode(node)
 	, fPCIDevice(device)
-	, fDevicePresentMask(0)
 	, fPCIVendorID(0xffff)
 	, fPCIDeviceID(0xffff)
 	, fCommandSlotCount(0)
@@ -27,7 +26,7 @@ AHCIController::AHCIController(device_node_handle node, pci_device_info *device)
 	, fIRQ(0)
  	, fInstanceCheck(-1)
 {
-	memset(fPorts, 0, sizeof(fPorts));
+	memset(fPort, 0, sizeof(fPort));
 }
 
 
@@ -135,16 +134,16 @@ AHCIController::Init()
 
 	for (int i = 0; i <= fPortMax; i++) {
 		if (fRegs->pi & (1 << i)) {
-			fPorts[i] = new (std::nothrow)AHCIPort(this, i);
-			if (!fPorts[i]) {
+			fPort[i] = new (std::nothrow)AHCIPort(this, i);
+			if (!fPort[i]) {
 				TRACE("out of memory creating port %d", i);
 				break;
 			}
-			status_t status = fPorts[i]->Init();
+			status_t status = fPort[i]->Init();
 			if (status < B_OK) {
 				TRACE("init port %d failed", i);
-				delete fPorts[i];
-				fPorts[i] = NULL;
+				delete fPort[i];
+				fPort[i] = NULL;
 				break;
 			}
 		}
@@ -164,9 +163,9 @@ AHCIController::Uninit()
 	TRACE("AHCIController::Uninit\n");
 
 	for (int i = 0; i <= fPortMax; i++) {
-		if (fPorts[i]) {
-			fPorts[i]->Uninit();
-			delete fPorts[i];
+		if (fPort[i]) {
+			fPort[i]->Uninit();
+			delete fPort[i];
 		}
 	}
 
@@ -229,8 +228,8 @@ AHCIController::Interrupt(void *data)
 
 	for (int i = 0; i < self->fPortMax; i++) {
 		if (int_stat & (1 << i)) {
-			if (self->fPorts[i]) {
-				self->fPorts[i]->Interrupt();
+			if (self->fPort[i]) {
+				self->fPort[i]->Interrupt();
 			} else {
 				FLOW("interrupt on non-existent port %d\n", i);
 			}
@@ -247,49 +246,42 @@ AHCIController::Interrupt(void *data)
 void
 AHCIController::ExecuteRequest(scsi_ccb *request)
 {
-	if (request->target_lun || !IsDevicePresent(request->target_id)) {
+	if (request->target_lun || !fPort[request->target_id]) {
 		request->subsys_status = SCSI_DEV_NOT_THERE;
 		gSCSI->finished(request, 1);
 		return;
 	}
 
-	TRACE("AHCIController::ExecuteRequest opcode %u, length %u\n", request->cdb[0], request->cdb_length);
-
-	request->subsys_status = SCSI_DEV_NOT_THERE;
-	gSCSI->finished(request, 1);
-	return;
-
-	request->subsys_status = SCSI_REQ_CMP;
-	gSCSI->finished(request, 1);
+	fPort[request->target_id]->ExecuteRequest(request);
 }
 
 
 uchar
 AHCIController::AbortRequest(scsi_ccb *request)
 {
-	if (request->target_lun || !IsDevicePresent(request->target_id))
+	if (request->target_lun || !fPort[request->target_id])
 		return SCSI_DEV_NOT_THERE;
 
-	return SCSI_REQ_CMP;
+	return fPort[request->target_id]->AbortRequest(request);
 }
 
 
 uchar
 AHCIController::TerminateRequest(scsi_ccb *request)
 {
-	if (request->target_lun || !IsDevicePresent(request->target_id))
+	if (request->target_lun || !fPort[request->target_id])
 		return SCSI_DEV_NOT_THERE;
 
-	return SCSI_REQ_CMP;
+	return fPort[request->target_id]->TerminateRequest(request);
 }
 
 
 uchar
 AHCIController::ResetDevice(uchar targetID, uchar targetLUN)
 {
-	if (targetLUN || !IsDevicePresent(targetID))
+	if (targetLUN || !fPort[targetID])
 		return SCSI_DEV_NOT_THERE;
 
-	return SCSI_REQ_CMP;
+	return fPort[targetID]->ResetDevice();
 }
 
