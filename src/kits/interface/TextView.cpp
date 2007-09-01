@@ -3968,8 +3968,7 @@ BTextView::MessageDropped(BMessage *inMessage, BPoint where, BPoint offset)
 	
 	ssize_t dataLen = 0;
 	const char *text = NULL;
-	if (inMessage->FindData("text/plain", B_MIME_TYPE, (const void **)&text, &dataLen) == B_OK) {
-		
+	if (inMessage->FindData("text/plain", B_MIME_TYPE, (const void **)&text, &dataLen) == B_OK) {	
 		text_run_array *runArray = NULL;
 		ssize_t runLen = 0;
 		if (fStylable)
@@ -4083,27 +4082,24 @@ BTextView::UpdateScrollbars()
 void
 BTextView::AutoResize(bool redraw)
 {
-	// TODO: Review this
 	if (fResizable) {
 		float oldWidth = Bounds().Width() + 1;
-		float newWidth = 0;
+		float newWidth = 3;
 		for (int32 i = 0; i < CountLines(); i++)
 			newWidth += LineWidth(i);
 		
-		if (newWidth < 3)
-			newWidth = 3;
-		BRect newRect(0, 0, ceilf(newWidth) + 1, ceilf(TextHeight(0, 0)) + 1);
+		BRect newRect(0, 0, ceilf(newWidth), ceilf(LineHeight(0)) + 2);
 		
 		if (fContainerView != NULL) {
-			fContainerView->ResizeTo(newRect.Width(), newRect.Height());	
+			fContainerView->ResizeTo(newRect.Width() + 1, newRect.Height());	
 			if (fAlignment == B_ALIGN_CENTER)
-				fContainerView->MoveBy((oldWidth - newRect.Width()) / 2, 0);
+				fContainerView->MoveBy(ceilf((oldWidth - (newRect.Width() + 1)) / 2), 0);
 			else if (fAlignment == B_ALIGN_RIGHT)
-				fContainerView->MoveBy(oldWidth - newRect.Width(), 0);
+				fContainerView->MoveBy(oldWidth - (newRect.Width() + 1), 0);
 			fContainerView->Invalidate();
 		}
 	
-		fTextRect = newRect.InsetBySelf(1, 1);
+		fTextRect = newRect.InsetBySelf(0, 1);
 		
 		if (redraw)
 			DrawLines(0, 0);
