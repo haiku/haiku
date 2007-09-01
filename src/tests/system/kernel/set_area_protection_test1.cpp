@@ -52,6 +52,7 @@ main()
 	const int kAreaCount = 4;
 	area_id areas[kAreaCount];
 	int* areaAddresses[kAreaCount];
+
 	areas[0] = create_test_area("area0", &areaAddresses[0], B_READ_AREA);
 	areas[1] = create_test_area("area1", &areaAddresses[1], B_READ_AREA);
 	areas[2] = create_test_area("area2", &areaAddresses[2], B_READ_AREA);
@@ -62,8 +63,10 @@ main()
 	/*area_id area2Clone =*/ clone_test_area("area2clone", &area2CloneAddress,
 		B_READ_AREA | B_WRITE_AREA, areas[2]);
 
+	int area3Value = *areaAddresses[3];
+
 	for (int i = 0; i < kAreaCount; i++) {
-		printf("parent: areas[%d]: %ld, %p (%d)\n", i, areas[i],
+		printf("parent: areas[%d]: %ld, %p (0x%08x)\n", i, areas[i],
 			areaAddresses[i], *areaAddresses[i]);
 	}
 
@@ -76,6 +79,18 @@ main()
 
 	if (pid == 0) {
 		// child
+		pid = find_thread(NULL);
+
+		int expectedValues[kAreaCount] = {
+			0,				// CoW -- the child should see the original value
+			pid,			// clone -- the child should see the change
+			pid,			// clone -- the child should see the change
+			area3Value		// CoW -- the child should see the original value
+							// Note: It looks alright in BeOS in the first run,
+							// but the parent actually seems to modify some
+							// cached page, and in the next run, we'll see
+							// the changed value.
+		};
 
 		// get the IDs of the copied areas
 		area_id parentAreas[kAreaCount];
@@ -101,8 +116,10 @@ main()
 
 		snooze(400000);
 
-		for (int i = 0; i < kAreaCount; i++)
-			printf("child: area[%d] contains: %d\n", i, *areaAddresses[i]);
+		for (int i = 0; i < kAreaCount; i++) {
+			printf("child: area[%d] contains: 0x%08x (expected: 0x%08x)\n", i,
+				*areaAddresses[i], expectedValues[i]);
+		}
 
 	} else {
 		// parent
