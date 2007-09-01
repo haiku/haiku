@@ -29,12 +29,12 @@ enum {
 	CAP_PMD 		= (1 << 15),	// PIO Multiple DRQ Block
 	CAP_SSC 		= (1 << 14),	// Slumber State Capable
 	CAP_PSC 		= (1 << 13),	// Partial State Capable
-	CAP_NCS_MASK 	= 0x1f,			// Number of Command Slots
+	CAP_NCS_MASK 	= 0x1f,			// Number of Command Slots (zero-based number)
 	CAP_NCS_SHIFT	= 8,
 	CAP_CCCS 		= (1 << 7),		// Command Completion Coalescing Supported
 	CAP_EMS 		= (1 << 6),		// Enclosure Management Supported
 	CAP_SXS 		= (1 << 5), 	// Supports External SATA
-	CAP_NP_MASK		= 0x1f,			// Number of Ports
+	CAP_NP_MASK		= 0x1f,			// Number of Ports (zero-based number)
 	CAP_NP_SHIFT	= 0,
 };
 

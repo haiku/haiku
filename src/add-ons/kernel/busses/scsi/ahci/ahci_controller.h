@@ -35,6 +35,8 @@ private:
 
 	ahci_hba *					fRegs;
 	area_id						fRegsArea;
+	int							fCommandSlotCount;
+	int							fPortCount;
 
 
 // --- Instance check workaround begin

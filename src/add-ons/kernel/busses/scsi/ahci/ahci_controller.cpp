@@ -17,6 +17,8 @@ AHCIController::AHCIController(device_node_handle node, pci_device_info *device)
 	: fNode(node)
 	, fPCIDevice(device)
 	, fDevicePresentMask(0)
+	, fCommandSlotCount(0)
+	, fPortCount(0)
  	, fInstanceCheck(-1)
 {
 }
@@ -73,9 +75,12 @@ AHCIController::Init()
 		return B_ERROR;
 	}
 
-	TRACE("cap: Interface Speed Support: %lu\n",		(fRegs->cap >> CAP_ISS_SHIFT) & CAP_ISS_MASK);
-	TRACE("cap: Number of Command Slots: %lu\n",		(fRegs->cap >> CAP_NCS_SHIFT) & CAP_NCS_MASK);
-	TRACE("cap: Number of Ports: %lu\n",				(fRegs->cap >> CAP_NP_SHIFT) & CAP_NP_MASK);
+	fCommandSlotCount = 1 + ((fRegs->cap >> CAP_NCS_SHIFT) & CAP_NCS_MASK);
+	fPortCount = 1 + ((fRegs->cap >> CAP_NP_SHIFT) & CAP_NP_MASK);
+
+	TRACE("cap: Interface Speed Support: generation %lu\n",	(fRegs->cap >> CAP_ISS_SHIFT) & CAP_ISS_MASK);
+	TRACE("cap: Number of Command Slots: %d (raw %#lx)\n",	fCommandSlotCount, (fRegs->cap >> CAP_NCS_SHIFT) & CAP_NCS_MASK);
+	TRACE("cap: Number of Ports: %d (raw %#lx)\n",			fPortCount, (fRegs->cap >> CAP_NCS_SHIFT) & CAP_NCS_MASK);
 	TRACE("cap: Supports Port Multiplier: %s\n",		(fRegs->cap & CAP_SPM) ? "yes" : "no");
 	TRACE("cap: Supports External SATA: %s\n",			(fRegs->cap & CAP_SXS) ? "yes" : "no");
 	TRACE("cap: Enclosure Management Supported: %s\n",	(fRegs->cap & CAP_EMS) ? "yes" : "no");
