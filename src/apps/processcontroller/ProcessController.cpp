@@ -36,6 +36,7 @@
 
 #include <Alert.h>
 #include <Bitmap.h>
+#include <debugger.h>
 #include <Deskbar.h>
 #include <Directory.h>
 #include <Dragger.h>
@@ -745,6 +746,9 @@ long
 thread_debug_thread(void *arg)
 {
 	Tdebug_thead_param*	param = (Tdebug_thead_param*) arg;
+#ifdef __HAIKU__
+	debug_thread(param->thread);
+#else	// !__HAIKU__
 	thread_info	thinfo;
 	get_thread_info(param->thread, &thinfo);
 	char text[4096];
@@ -792,6 +796,7 @@ thread_debug_thread(void *arg)
 			}
 		}
 	}
+#endif	// !__HAIKU__
 	delete param;
 	return B_OK;
 }
