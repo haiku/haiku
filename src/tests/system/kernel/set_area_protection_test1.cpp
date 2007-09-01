@@ -6,6 +6,14 @@
 
 #include <OS.h>
 
+
+int
+test_function()
+{
+	return 0;
+}
+
+
 static area_id
 create_test_area(const char* name, int** address, uint32 protection)
 {
@@ -41,19 +49,23 @@ int
 main()
 {
 	// allocate read-only areas
-	const int kAreaCount = 3;
+	const int kAreaCount = 4;
 	area_id areas[kAreaCount];
 	int* areaAddresses[kAreaCount];
 	areas[0] = create_test_area("area0", &areaAddresses[0], B_READ_AREA);
 	areas[1] = create_test_area("area1", &areaAddresses[1], B_READ_AREA);
 	areas[2] = create_test_area("area2", &areaAddresses[2], B_READ_AREA);
+	areaAddresses[3] = (int*)test_function;
+	areas[3] = area_for(areaAddresses[3]);
 
 	int* area2CloneAddress;
 	/*area_id area2Clone =*/ clone_test_area("area2clone", &area2CloneAddress,
 		B_READ_AREA | B_WRITE_AREA, areas[2]);
 
-	for (int i = 0; i < kAreaCount; i++)
-		printf("parent: areas[%d]: %ld, %p\n", i, areas[i], areaAddresses[i]);
+	for (int i = 0; i < kAreaCount; i++) {
+		printf("parent: areas[%d]: %ld, %p (%d)\n", i, areas[i],
+			areaAddresses[i], *areaAddresses[i]);
+	}
 
 	// fork()
 	pid_t pid = fork();
