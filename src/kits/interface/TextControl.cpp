@@ -354,10 +354,9 @@ BTextControl::Draw(BRect updateRect)
 				break;
 		}
 
-		BRect labelArea(x, fText->Frame().top, x + labelWidth,
-				ceilf(fontHeight.ascent + fontHeight.descent) + 1);
+		BRect labelArea(x, Bounds().top, x + labelWidth, Bounds().bottom);
 		if (x < fDivider && updateRect.Intersects(labelArea)) {
-			labelArea.right = fDivider;
+			labelArea.right = fText->Frame().left - 3;
 
 			BRegion clipRegion(labelArea);
 			ConstrainClippingRegion(&clipRegion);
@@ -606,8 +605,8 @@ BTextControl::WindowActivated(bool active)
 {
 	if (fText->IsFocus()) {
 		// invalidate to remove/show focus indication
-		BRect rect = Bounds();
-		rect.left = fDivider;
+		BRect rect = fText->Frame();
+		rect.InsetBy(-1, -1);
 		Invalidate(rect);
 
 		// help out embedded text view which doesn't
