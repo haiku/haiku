@@ -8,6 +8,8 @@
 
 #include <KernelExport.h>
 #include <stdio.h>
+#include <string.h>
+#include <new>
 
 #define TRACE(a...) dprintf("\33[34mahci:\33[0m " a)
 #define FLOW(a...)	dprintf("ahci: " a)
@@ -17,10 +19,14 @@ AHCIController::AHCIController(device_node_handle node, pci_device_info *device)
 	: fNode(node)
 	, fPCIDevice(device)
 	, fDevicePresentMask(0)
+	, fPCIVendorID(0xffff)
+	, fPCIDeviceID(0xffff)
 	, fCommandSlotCount(0)
 	, fPortCount(0)
+	, fPortMax(0)
  	, fInstanceCheck(-1)
 {
+	memset(fPorts, 0, sizeof(fPorts));
 }
 
 
@@ -39,8 +45,11 @@ AHCIController::Init()
 		return B_ERROR;
 	}
 
+	fPCIVendorID = pciInfo.vendor_id;
+	fPCIDeviceID = pciInfo.device_id;
+
 	TRACE("AHCIController::Init %u:%u:%u vendor %04x, device %04x\n", 
-		pciInfo.bus, pciInfo.device, pciInfo.function, pciInfo.vendor_id, pciInfo.device_id);
+		pciInfo.bus, pciInfo.device, pciInfo.function, fPCIVendorID, fPCIDeviceID);
 
 // --- Instance check workaround begin
 	char sName[32];
@@ -75,8 +84,21 @@ AHCIController::Init()
 		return B_ERROR;
 	}
 
+	if (ResetController() < B_OK) {
+		TRACE("controller reset failed\n");
+		goto err;
+	}
+
 	fCommandSlotCount = 1 + ((fRegs->cap >> CAP_NCS_SHIFT) & CAP_NCS_MASK);
 	fPortCount = 1 + ((fRegs->cap >> CAP_NP_SHIFT) & CAP_NP_MASK);
+
+	if (fRegs->pi == 0) {
+		TRACE("controller doesn't implement any ports\n");
+		goto err;
+	}
+	fPortMax = 31;
+	while ((fRegs->pi & (1 << fPortMax)) == 0) 
+		fPortMax--;
 
 	TRACE("cap: Interface Speed Support: generation %lu\n",	(fRegs->cap >> CAP_ISS_SHIFT) & CAP_ISS_MASK);
 	TRACE("cap: Number of Command Slots: %d (raw %#lx)\n",	fCommandSlotCount, (fRegs->cap >> CAP_NCS_SHIFT) & CAP_NCS_MASK);
@@ -84,10 +106,36 @@ AHCIController::Init()
 	TRACE("cap: Supports Port Multiplier: %s\n",		(fRegs->cap & CAP_SPM) ? "yes" : "no");
 	TRACE("cap: Supports External SATA: %s\n",			(fRegs->cap & CAP_SXS) ? "yes" : "no");
 	TRACE("cap: Enclosure Management Supported: %s\n",	(fRegs->cap & CAP_EMS) ? "yes" : "no");
+
+	TRACE("cap: Supports 64-bit Addressing: %s\n",		(fRegs->cap & CAP_S64A) ? "yes" : "no");
+	TRACE("cap: Supports Native Command Queuing: %s\n",	(fRegs->cap & CAP_SNCQ) ? "yes" : "no");
+	TRACE("cap: Supports SNotification Register: %s\n",	(fRegs->cap & CAP_SSNTF) ? "yes" : "no");
+	TRACE("cap: Supports Command List Override: %s\n",	(fRegs->cap & CAP_SCLO) ? "yes" : "no");
+
+
 	TRACE("cap: Supports AHCI mode only: %s\n",			(fRegs->cap & CAP_SAM) ? "yes" : "no");
 	TRACE("ghc: AHCI Enable: %s\n",						(fRegs->ghc & GHC_AE) ? "yes" : "no");
 	TRACE("Ports Implemented: %08lx\n",					fRegs->pi);
+	TRACE("Highest port Number: %d\n",					fPortMax);
 	TRACE("AHCI Version %lu.%lu\n",						fRegs->vs >> 16, fRegs->vs & 0xff);
+
+
+	for (int i = 0; i <= fPortMax; i++) {
+		if (fRegs->pi & (1 << i)) {
+			fPorts[i] = new (std::nothrow)AHCIPort(this, i);
+			if (!fPorts[i]) {
+				TRACE("out of memory creating port %d", i);
+				break;
+			}
+			status_t status = fPorts[i]->Init();
+			if (status < B_OK) {
+				TRACE("init port %d failed", i);
+				delete fPorts[i];
+				fPorts[i] = NULL;
+				break;
+			}
+		}
+	}
 
 	// disable interrupts
 	fRegs->ghc &= ~GHC_IE;
@@ -96,6 +144,10 @@ AHCIController::Init()
 
 
 	return B_OK;
+
+err:
+	delete_area(fRegsArea);
+	return B_ERROR;
 }
 
 
@@ -103,6 +155,13 @@ void
 AHCIController::Uninit()
 {
 	TRACE("AHCIController::Uninit\n");
+
+	for (int i = 0; i <= fPortMax; i++) {
+		if (fPorts[i]) {
+			fPorts[i]->Uninit();
+			delete fPorts[i];
+		}
+	}
 
 	// disable interrupts
 	fRegs->ghc &= ~GHC_IE;
@@ -114,6 +173,38 @@ AHCIController::Uninit()
 // --- Instance check workaround begin
 	delete_port(fInstanceCheck);
 // --- Instance check workaround end
+}
+
+
+status_t
+AHCIController::ResetController()
+{
+	uint32 saveCaps = fRegs->cap & (CAP_SMPS | CAP_SSS | CAP_SPM | CAP_EMS | CAP_SXS);
+	uint32 savePI = fRegs->pi;
+	
+	fRegs->ghc |= GHC_HR;
+	RegsFlush();
+	for (int i = 0; i < 20; i++) {
+		snooze(50000);
+		if ((fRegs->ghc & GHC_HR) == 0)
+			break;
+	}
+	if (fRegs->ghc & GHC_HR)
+		return B_TIMED_OUT;
+
+	fRegs->ghc |= GHC_AE;
+	RegsFlush();
+	fRegs->cap |= saveCaps;
+	fRegs->pi = savePI;
+	RegsFlush();
+
+	if (fPCIVendorID == 0x8086) {
+		// Intel PCS—Port Control and Status
+		// In AHCI enabled systems, bits[3:0] must always be set
+		gPCI->write_pci_config(fPCIDevice, 0x92, 2, 
+			0xf | gPCI->read_pci_config(fPCIDevice, 0x92, 2));
+	}
+	return B_OK;
 }
 
 

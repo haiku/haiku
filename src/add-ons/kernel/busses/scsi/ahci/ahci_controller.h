@@ -7,6 +7,7 @@
 
 
 #include "ahci_defs.h"
+#include "ahci_port.h"
 
 
 class AHCIController {
@@ -27,16 +28,22 @@ public:
 
 private:
 	bool		IsDevicePresent(uint device);
+	status_t	ResetController();
+	void		RegsFlush();
 
 private:
 	device_node_handle 			fNode;
 	pci_device_info*			fPCIDevice;
 	uint32						fDevicePresentMask;
+	uint16						fPCIVendorID;
+	uint16						fPCIDeviceID;
 
-	ahci_hba *					fRegs;
+	volatile ahci_hba *			fRegs;
 	area_id						fRegsArea;
 	int							fCommandSlotCount;
 	int							fPortCount;
+	int							fPortMax;
+	AHCIPort *					fPorts[32];
 
 
 // --- Instance check workaround begin
@@ -50,6 +57,14 @@ inline bool
 AHCIController::IsDevicePresent(uint device)
 {
 	return fDevicePresentMask & (1 << device);
+}
+
+
+inline void
+AHCIController::RegsFlush()
+{
+	volatile uint32 dummy = fRegs->ghc;
+	dummy = dummy;
 }
 
 
