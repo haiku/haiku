@@ -1,29 +1,16 @@
-/* Realtek RTL8169 Family Driver
- * Copyright (C) 2004 Marcus Overhagen <marcus@overhagen.de>. All rights reserved.
- *
- * Permission to use, copy, modify and distribute this software and its 
- * documentation for any purpose and without fee is hereby granted, provided
- * that the above copyright notice appear in all copies, and that both the
- * copyright notice and this permission notice appear in supporting documentation.
- *
- * Marcus Overhagen makes no representations about the suitability of this software
- * for any purpose. It is provided "as is" without express or implied warranty.
- *
- * MARCUS OVERHAGEN DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
- * ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL MARCUS
- * OVERHAGEN BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
- * DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+/*
+ * Copyright 2004-2007, Marcus Overhagen. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
-#include <Errors.h>
+#include "util.h"
+
+#include <KernelExport.h>
 #include <OS.h>
 #include <string.h>
 
-//#define DEBUG
 
-#include "debug.h"
-#include "util.h"
+#define TRACE(a...) dprintf("\33[34mahci:\33[0m " a)
+#define ERROR(a...) dprintf("\33[34mahci:\33[0m " a)
 
 static inline uint32
 round_to_pagesize(uint32 size)

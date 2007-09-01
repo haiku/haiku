@@ -4,6 +4,7 @@
  */
 
 #include "ahci_controller.h"
+#include "util.h"
 
 #include <KernelExport.h>
 #include <stdio.h>
@@ -61,7 +62,33 @@ AHCIController::Init()
 		TRACE("satacr0 = 0x%08lx, satacr1 = 0x%08lx\n", satacr0, satacr1);
 	}
 
-	fDevicePresentMask = (1 << 7) | (1 << 19);
+	void *addr = (void *)pciInfo.u.h0.base_registers[5];
+	size_t size = pciInfo.u.h0.base_register_sizes[5];
+
+	TRACE("registers at %p, size %#lx\n", addr, size);
+	
+	fRegsArea = map_mem((void **)&fRegs, addr, size, 0, "AHCI HBA regs");
+	if (fRegsArea < B_OK) {
+		TRACE("mapping registers failed\n");
+		return B_ERROR;
+	}
+
+	TRACE("cap: Interface Speed Support: %lu\n",		(fRegs->cap >> CAP_ISS_SHIFT) & CAP_ISS_MASK);
+	TRACE("cap: Number of Command Slots: %lu\n",		(fRegs->cap >> CAP_NCS_SHIFT) & CAP_NCS_MASK);
+	TRACE("cap: Number of Ports: %lu\n",				(fRegs->cap >> CAP_NP_SHIFT) & CAP_NP_MASK);
+	TRACE("cap: Supports Port Multiplier: %s\n",		(fRegs->cap & CAP_SPM) ? "yes" : "no");
+	TRACE("cap: Supports External SATA: %s\n",			(fRegs->cap & CAP_SXS) ? "yes" : "no");
+	TRACE("cap: Enclosure Management Supported: %s\n",	(fRegs->cap & CAP_EMS) ? "yes" : "no");
+	TRACE("cap: Supports AHCI mode only: %s\n",			(fRegs->cap & CAP_SAM) ? "yes" : "no");
+	TRACE("ghc: AHCI Enable: %s\n",						(fRegs->ghc & GHC_AE) ? "yes" : "no");
+	TRACE("Ports Implemented: %08lx\n",					fRegs->pi);
+	TRACE("AHCI Version %lu.%lu\n",						fRegs->vs >> 16, fRegs->vs & 0xff);
+
+	// disable interrupts
+	fRegs->ghc &= ~GHC_IE;
+	// clear pending interrupts
+	fRegs->is = 0xffffffff;
+
 
 	return B_OK;
 }
@@ -71,6 +98,13 @@ void
 AHCIController::Uninit()
 {
 	TRACE("AHCIController::Uninit\n");
+
+	// disable interrupts
+	fRegs->ghc &= ~GHC_IE;
+	// clear pending interrupts
+	fRegs->is = 0xffffffff;
+
+	delete_area(fRegsArea);
 
 // --- Instance check workaround begin
 	delete_port(fInstanceCheck);

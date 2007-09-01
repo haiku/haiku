@@ -33,6 +33,9 @@ private:
 	pci_device_info*			fPCIDevice;
 	uint32						fDevicePresentMask;
 
+	ahci_hba *					fRegs;
+	area_id						fRegsArea;
+
 
 // --- Instance check workaround begin
 	port_id fInstanceCheck;

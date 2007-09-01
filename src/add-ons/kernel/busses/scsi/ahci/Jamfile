@@ -4,4 +4,5 @@ KernelAddon ahci :
 	ahci.c
 	ahci_controller.cpp
 	ahci_sim.cpp
+	util.c
 	;
