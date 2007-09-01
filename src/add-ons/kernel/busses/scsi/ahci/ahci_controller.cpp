@@ -149,6 +149,10 @@ AHCIController::Init()
 		}
 	}
 
+	// enable interrupts
+	fRegs->ghc |= GHC_IE;
+	RegsFlush();
+
 	return B_OK;
 
 err:
@@ -171,8 +175,11 @@ AHCIController::Uninit()
 
 	// disable interrupts
 	fRegs->ghc &= ~GHC_IE;
+	RegsFlush();
+
 	// clear pending interrupts
 	fRegs->is = 0xffffffff;
+	RegsFlush();
 
   	// well...
   	remove_io_interrupt_handler(fIRQ, Interrupt, this);
