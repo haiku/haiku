@@ -36,3 +36,10 @@ AHCIPort::Uninit()
 {
 	TRACE("AHCIPort::Uninit port %d\n", fIndex);
 }
+
+
+void
+AHCIPort::Interrupt()
+{
+	TRACE("AHCIPort::Interrupt port %d\n", fIndex);
+}

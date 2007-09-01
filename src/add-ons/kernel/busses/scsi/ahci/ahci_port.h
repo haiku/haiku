@@ -17,6 +17,8 @@ public:
 	status_t	Init();
 	void		Uninit();
 
+	void		Interrupt();
+
 private:
 	int			fIndex;
 };

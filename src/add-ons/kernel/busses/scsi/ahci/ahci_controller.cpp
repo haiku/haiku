@@ -24,6 +24,7 @@ AHCIController::AHCIController(device_node_handle node, pci_device_info *device)
 	, fCommandSlotCount(0)
 	, fPortCount(0)
 	, fPortMax(0)
+	, fIRQ(0)
  	, fInstanceCheck(-1)
 {
 	memset(fPorts, 0, sizeof(fPorts));
@@ -100,6 +101,12 @@ AHCIController::Init()
 	while ((fRegs->pi & (1 << fPortMax)) == 0) 
 		fPortMax--;
 
+	fIRQ = gPCI->read_pci_config(fPCIDevice, PCI_interrupt_line, 1);
+	if (fIRQ == 0 || fIRQ == 0xff) {
+		TRACE("no IRQ assigned\n");
+		goto err;
+	}
+
 	TRACE("cap: Interface Speed Support: generation %lu\n",	(fRegs->cap >> CAP_ISS_SHIFT) & CAP_ISS_MASK);
 	TRACE("cap: Number of Command Slots: %d (raw %#lx)\n",	fCommandSlotCount, (fRegs->cap >> CAP_NCS_SHIFT) & CAP_NCS_MASK);
 	TRACE("cap: Number of Ports: %d (raw %#lx)\n",			fPortCount, (fRegs->cap >> CAP_NCS_SHIFT) & CAP_NCS_MASK);
@@ -118,7 +125,13 @@ AHCIController::Init()
 	TRACE("Ports Implemented: %08lx\n",					fRegs->pi);
 	TRACE("Highest port Number: %d\n",					fPortMax);
 	TRACE("AHCI Version %lu.%lu\n",						fRegs->vs >> 16, fRegs->vs & 0xff);
+	TRACE("Interrupt %u\n",								fIRQ);
 
+	// setup interrupt handler
+	if (install_io_interrupt_handler(fIRQ, Interrupt, this, 0) < B_OK) {
+		TRACE("can't install interrupt handler\n");
+		goto err;
+	}
 
 	for (int i = 0; i <= fPortMax; i++) {
 		if (fRegs->pi & (1 << i)) {
@@ -136,12 +149,6 @@ AHCIController::Init()
 			}
 		}
 	}
-
-	// disable interrupts
-	fRegs->ghc &= ~GHC_IE;
-	// clear pending interrupts
-	fRegs->is = 0xffffffff;
-
 
 	return B_OK;
 
@@ -167,6 +174,10 @@ AHCIController::Uninit()
 	fRegs->ghc &= ~GHC_IE;
 	// clear pending interrupts
 	fRegs->is = 0xffffffff;
+
+  	// well...
+  	remove_io_interrupt_handler(fIRQ, Interrupt, this);
+
 
 	delete_area(fRegsArea);
 
@@ -205,6 +216,31 @@ AHCIController::ResetController()
 			0xf | gPCI->read_pci_config(fPCIDevice, 0x92, 2));
 	}
 	return B_OK;
+}
+
+
+int32
+AHCIController::Interrupt(void *data)
+{
+	AHCIController *self = (AHCIController *)data;
+	uint32 int_stat = self->fRegs->is & self->fRegs->pi;
+	if (int_stat == 0)
+		return B_UNHANDLED_INTERRUPT;
+
+	for (int i = 0; i < self->fPortMax; i++) {
+		if (int_stat & (1 << i)) {
+			if (self->fPorts[i]) {
+				self->fPorts[i]->Interrupt();
+			} else {
+				FLOW("interrupt on non-existent port %d\n", i);
+			}
+		}
+	}
+
+	// clear interrupts
+	self->fRegs->is = int_stat;
+
+	return B_INVOKE_SCHEDULER;
 }
 
 

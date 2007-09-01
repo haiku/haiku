@@ -31,6 +31,8 @@ private:
 	status_t	ResetController();
 	void		RegsFlush();
 
+static int32	Interrupt(void *data);
+
 private:
 	device_node_handle 			fNode;
 	pci_device_info*			fPCIDevice;
@@ -43,6 +45,7 @@ private:
 	int							fCommandSlotCount;
 	int							fPortCount;
 	int							fPortMax;
+	uint8						fIRQ;
 	AHCIPort *					fPorts[32];
 
 
