@@ -94,7 +94,7 @@ public:
 	{
 		Unlock();
 		fLockable = lockable;
-		fLocked = alreadyLocked;
+		fLocked = (lockable && alreadyLocked);
 		if (!alreadyLocked && lockIfNotLocked)
 			Lock();
 	}
