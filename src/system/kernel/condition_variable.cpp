@@ -107,6 +107,8 @@ PrivateConditionVariableEntry::Add(const void* object,
 	if (threadNext) {
 		fThreadPrevious = threadNext->fThreadPrevious;
 		threadNext->fThreadPrevious = this;
+		if (fThreadPrevious)
+			fThreadPrevious->fThreadNext = this;
 	} else
 		fThreadPrevious = NULL;
 
@@ -399,7 +401,7 @@ condition_variable_interrupt_thread(struct thread* thread)
 	// re-get the thread and do the checks again
 	thread = thread_get_thread_struct_locked(threadID);
 
-	if (thread != NULL || thread->state != B_THREAD_WAITING
+	if (thread == NULL || thread->state != B_THREAD_WAITING
 		|| thread->condition_variable_entry == NULL) {
 		return B_BAD_VALUE;
 	}
@@ -417,6 +419,7 @@ condition_variable_interrupt_thread(struct thread* thread)
 	PrivateConditionVariableEntry::Private(*entry).SetResult(B_INTERRUPTED);
 
 	// remove all of the thread's entries from their variables
+	ASSERT(entry->ThreadPrevious() == NULL);
 	while (entry) {
 		PrivateConditionVariableEntry::Private(*entry).Remove();
 		entry = entry->ThreadNext();

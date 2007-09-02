@@ -8,6 +8,8 @@
 
 #include <OS.h>
 
+#include <debug.h>
+
 #ifdef __cplusplus
 
 #include <util/OpenHashTable.h>
@@ -18,11 +20,28 @@ class PrivateConditionVariable;
 
 struct PrivateConditionVariableEntry {
 public:
+#if KDEBUG
+	inline PrivateConditionVariableEntry()
+		: fVariable(NULL)
+	{
+	}
+
+	inline ~PrivateConditionVariableEntry()
+	{
+		if (fVariable != NULL) {
+			panic("Destroying condition variable entry %p, but it's still "
+				"attached to variable %p\n", this, fVariable);
+		}
+	}
+#endif
+
 	inline	PrivateConditionVariable* Variable() const
 		{ return fVariable; }
 
 	inline	PrivateConditionVariableEntry* ThreadNext() const
 		{ return fThreadNext; }
+	inline	PrivateConditionVariableEntry* ThreadPrevious() const
+		{ return fThreadPrevious; }
 
 	class Private;
 
