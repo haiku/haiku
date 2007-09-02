@@ -11,6 +11,9 @@
 extern "C" {
 #endif
 
+// Enable this to get support for kernel breakpoints.
+//#define KERNEL_BREAKPOINTS 1
+
 struct arch_team_debug_info;
 struct arch_thread_debug_info;
 
@@ -26,6 +29,13 @@ status_t arch_set_breakpoint(void *address);
 status_t arch_clear_breakpoint(void *address);
 status_t arch_set_watchpoint(void *address, uint32 type, int32 length);
 status_t arch_clear_watchpoint(void *address);
+
+#if KERNEL_BREAKPOINTS
+status_t arch_set_kernel_breakpoint(void *address);
+status_t arch_clear_kernel_breakpoint(void *address);
+status_t arch_set_kernel_watchpoint(void *address, uint32 type, int32 length);
+status_t arch_clear_kernel_watchpoint(void *address);
+#endif
 
 #ifdef __cplusplus
 }

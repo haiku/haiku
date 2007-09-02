@@ -3,13 +3,16 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <arch/user_debugger.h>
+
 #include <string.h>
 
 #include <debugger.h>
 #include <driver_settings.h>
 #include <int.h>
+#include <team.h>
 #include <thread.h>
-#include <arch/user_debugger.h>
+
 
 //#define TRACE_ARCH_USER_DEBUGGER
 #ifdef TRACE_ARCH_USER_DEBUGGER
@@ -18,13 +21,13 @@
 #	define TRACE(x) ;
 #endif
 
-#define B_NO_MORE_BREAKPOINTS				B_ERROR
-#define B_NO_MORE_WATCHPOINTS				B_ERROR
-#define B_BAD_WATCHPOINT_ALIGNMENT			B_ERROR
-#define B_WATCHPOINT_TYPE_NOT_SUPPORTED		B_ERROR
-#define B_WATCHPOINT_LENGTH_NOT_SUPPORTED	B_ERROR
-#define B_BREAKPOINT_NOT_FOUND				B_ERROR
-#define B_WATCHPOINT_NOT_FOUND				B_ERROR
+#define B_NO_MORE_BREAKPOINTS				B_BUSY
+#define B_NO_MORE_WATCHPOINTS				B_BUSY
+#define B_BAD_WATCHPOINT_ALIGNMENT			B_BAD_VALUE
+#define B_WATCHPOINT_TYPE_NOT_SUPPORTED		B_NOT_SUPPORTED
+#define B_WATCHPOINT_LENGTH_NOT_SUPPORTED	B_NOT_SUPPORTED
+#define B_BREAKPOINT_NOT_FOUND				B_NAME_NOT_FOUND
+#define B_WATCHPOINT_NOT_FOUND				B_NAME_NOT_FOUND
 	// ToDo: Make those real error codes.
 
 // maps breakpoint slot index to LEN_i LSB number
@@ -42,6 +45,11 @@ static const uint32 sDR7L[4] = {
 	X86_DR7_L0, X86_DR7_L1, X86_DR7_L2, X86_DR7_L3
 };
 
+// maps breakpoint slot index to G_i bit number
+static const uint32 sDR7G[4] = {
+	X86_DR7_G0, X86_DR7_G1, X86_DR7_G2, X86_DR7_G3
+};
+
 // maps breakpoint slot index to B_i bit number
 static const uint32 sDR6B[4] = {
 	X86_DR6_B0, X86_DR6_B1, X86_DR6_B2, X86_DR6_B3
@@ -50,6 +58,250 @@ static const uint32 sDR6B[4] = {
 // Enables a hack to make single stepping work under qemu. Set via kernel
 // driver settings.
 static bool sQEmuSingleStepHack = false;
+
+
+static inline void
+install_breakpoints(const arch_team_debug_info &teamInfo)
+{
+	// set breakpoints
+	asm("movl %0, %%dr0" : : "r"(teamInfo.breakpoints[0].address));
+	asm("movl %0, %%dr1" : : "r"(teamInfo.breakpoints[1].address));
+	asm("movl %0, %%dr2" : : "r"(teamInfo.breakpoints[2].address));
+//	asm("movl %0, %%dr3" : : "r"(teamInfo.breakpoints[3].address));
+		// DR3 is used to hold the current struct thread*.
+
+	// enable breakpoints
+	asm("movl %0, %%dr7" : : "r"(teamInfo.dr7));
+}
+
+
+static inline void
+disable_breakpoints()
+{
+	asm("movl %0, %%dr7" : : "r"(X86_BREAKPOINTS_DISABLED_DR7));
+}
+
+
+/*! Sets a break-/watchpoint in the given team info.
+	Interrupts must be disabled and the team debug info lock be held.
+*/
+static inline status_t
+set_breakpoint(arch_team_debug_info &info, void *address, uint32 type,
+	uint32 length, bool setGlobalFlag)
+{
+	// check, if there is already a breakpoint at that address
+	bool alreadySet = false;
+	for (int32 i = 0; i < X86_BREAKPOINT_COUNT; i++) {
+		if (info.breakpoints[i].address == address
+			&& info.breakpoints[i].type == type) {
+			alreadySet = true;
+			break;
+		}
+	}
+
+	if (!alreadySet) {
+		// find a free slot
+		int32 slot = -1;
+		for (int32 i = 0; i < X86_BREAKPOINT_COUNT; i++) {
+			if (!info.breakpoints[i].address) {
+				slot = i;
+				break;
+			}
+		}
+
+		// init the breakpoint
+		if (slot >= 0) {
+			info.breakpoints[slot].address = address;
+			info.breakpoints[slot].type = type;
+			info.breakpoints[slot].length = length;
+
+			info.dr7 |= (length << sDR7Len[slot])
+				| (type << sDR7RW[slot])
+				| (1 << sDR7L[slot]);
+			if (setGlobalFlag)
+				info.dr7 |= (1 << sDR7G[slot]);
+		} else {
+			if (type == X86_INSTRUCTION_BREAKPOINT)
+				return B_NO_MORE_BREAKPOINTS;
+			else
+				return B_NO_MORE_WATCHPOINTS;
+		}
+	}
+
+	return B_OK;
+}
+
+
+/*! Clears a break-/watchpoint in the given team info.
+	Interrupts must be disabled and the team debug info lock be held.
+*/
+static inline status_t
+clear_breakpoint(arch_team_debug_info &info, void *address, bool watchpoint)
+{
+	// find the breakpoint
+	int32 slot = -1;
+	for (int32 i = 0; i < X86_BREAKPOINT_COUNT; i++) {
+		if (info.breakpoints[i].address == address
+			&& (watchpoint
+				!= (info.breakpoints[i].type == X86_INSTRUCTION_BREAKPOINT))) {
+			slot = i;
+			break;
+		}
+	}
+
+	// clear the breakpoint
+	if (slot >= 0) {
+		info.breakpoints[slot].address = NULL;
+
+		info.dr7 &= ~((0x3 << sDR7Len[slot])
+			| (0x3 << sDR7RW[slot])
+			| (1 << sDR7L[slot])
+			| (1 << sDR7G[slot]));
+	} else {
+		if (watchpoint)
+			return B_WATCHPOINT_NOT_FOUND;
+		else
+			return B_BREAKPOINT_NOT_FOUND;
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+set_breakpoint(void *address, uint32 type, uint32 length)
+{
+	if (!address)
+		return B_BAD_VALUE;
+
+	struct thread *thread = thread_get_current_thread();
+
+	cpu_status state = disable_interrupts();
+	GRAB_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
+
+	status_t error = set_breakpoint(thread->team->debug_info.arch_info, address,
+		type, length, false);
+
+	RELEASE_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
+	restore_interrupts(state);
+
+	return error;
+}
+
+
+static status_t
+clear_breakpoint(void *address, bool watchpoint)
+{
+	if (!address)
+		return B_BAD_VALUE;
+
+	struct thread *thread = thread_get_current_thread();
+
+	cpu_status state = disable_interrupts();
+	GRAB_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
+
+	status_t error = clear_breakpoint(thread->team->debug_info.arch_info,
+		address, watchpoint);
+
+	RELEASE_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
+	restore_interrupts(state);
+
+	return error;
+}
+
+
+#if KERNEL_BREAKPOINTS
+
+static status_t
+set_kernel_breakpoint(void *address, uint32 type, uint32 length)
+{
+	if (!address)
+		return B_BAD_VALUE;
+
+	struct team* kernelTeam = team_get_kernel_team();
+
+	cpu_status state = disable_interrupts();
+	GRAB_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
+
+	status_t error = set_breakpoint(kernelTeam->debug_info.arch_info, address,
+		type, length, true);
+
+	install_breakpoints(kernelTeam->debug_info.arch_info);
+
+	RELEASE_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
+	restore_interrupts(state);
+
+	return error;
+}
+
+
+static status_t
+clear_kernel_breakpoint(void *address, bool watchpoint)
+{
+	if (!address)
+		return B_BAD_VALUE;
+
+	struct team* kernelTeam = team_get_kernel_team();
+
+	cpu_status state = disable_interrupts();
+	GRAB_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
+
+	status_t error = clear_breakpoint(kernelTeam->debug_info.arch_info,
+		address, watchpoint);
+
+	install_breakpoints(kernelTeam->debug_info.arch_info);
+
+	RELEASE_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
+	restore_interrupts(state);
+
+	return error;
+}
+
+#endif	// KERNEL_BREAKPOINTS
+
+
+static inline status_t
+check_watch_point_parameters(void* address, uint32 type, int32 length,
+	uint32& archType, uint32& archLength)
+{
+	// check type
+	switch (type) {
+		case B_DATA_WRITE_WATCHPOINT:
+			archType = X86_DATA_WRITE_BREAKPOINT;
+			break;
+		case B_DATA_READ_WRITE_WATCHPOINT:
+			archType = X86_DATA_READ_WRITE_BREAKPOINT;
+			break;
+		case B_DATA_READ_WATCHPOINT:
+		default:
+			return B_WATCHPOINT_TYPE_NOT_SUPPORTED;
+			break;
+	}
+
+	// check length and alignment
+	switch (length) {
+		case 1:
+			archLength = X86_BREAKPOINT_LENGTH_1;
+			break;
+		case 2:
+			if ((uint32)address & 0x1)
+				return B_BAD_WATCHPOINT_ALIGNMENT;
+			archLength = X86_BREAKPOINT_LENGTH_2;
+			break;
+		case 4:
+			if ((uint32)address & 0x3)
+				return B_BAD_WATCHPOINT_ALIGNMENT;
+			archLength = X86_BREAKPOINT_LENGTH_4;
+			break;
+		default:
+			return B_WATCHPOINT_LENGTH_NOT_SUPPORTED;
+	}
+
+	return B_OK;
+}
+
+
+// #pragma mark - in-kernel public interface
 
 
 void
@@ -116,6 +368,7 @@ arch_set_debug_cpu_state(const struct debug_cpu_state *cpuState)
 	}
 }
 
+
 void
 arch_get_debug_cpu_state(struct debug_cpu_state *cpuState)
 {
@@ -148,111 +401,6 @@ arch_get_debug_cpu_state(struct debug_cpu_state *cpuState)
 	}
 }
 
-static status_t
-set_breakpoint(void *address, uint32 type, uint32 length)
-{
-	if (!address)
-		return B_BAD_VALUE;
-
-	struct thread *thread = thread_get_current_thread();
-
-	status_t error = B_OK;
-
-	cpu_status state = disable_interrupts();
-	GRAB_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
-
-	arch_team_debug_info &info = thread->team->debug_info.arch_info;
-
-	// check, if there is already a breakpoint at that address
-	bool alreadySet = false;
-	for (int32 i = 0; i < X86_BREAKPOINT_COUNT; i++) {
-		if (info.breakpoints[i].address == address
-			&& info.breakpoints[i].type == type) {
-			alreadySet = true;
-			break;
-		}
-	}
-
-	if (!alreadySet) {
-		// find a free slot
-		int32 slot = -1;
-		for (int32 i = 0; i < X86_BREAKPOINT_COUNT; i++) {
-			if (!info.breakpoints[i].address) {
-				slot = i;
-				break;
-			}
-		}
-
-		// init the breakpoint
-		if (slot >= 0) {
-			info.breakpoints[slot].address = address;
-			info.breakpoints[slot].type = type;
-			info.breakpoints[slot].length = length;
-
-			info.dr7 |= (length << sDR7Len[slot])
-				| (type << sDR7RW[slot])
-				| (1 << sDR7L[slot]);
-		} else {
-			if (type == X86_INSTRUCTION_BREAKPOINT)
-				error = B_NO_MORE_BREAKPOINTS;
-			else
-				error = B_NO_MORE_WATCHPOINTS;
-		}
-	}
-
-	RELEASE_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
-	restore_interrupts(state);
-
-	return error;
-}
-
-
-static status_t
-clear_breakpoint(void *address, bool watchpoint)
-{
-	if (!address)
-		return B_BAD_VALUE;
-
-	struct thread *thread = thread_get_current_thread();
-
-	status_t error = B_OK;
-
-	cpu_status state = disable_interrupts();
-	GRAB_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
-
-	arch_team_debug_info &info = thread->team->debug_info.arch_info;
-
-	// find the breakpoint
-	int32 slot = -1;
-	for (int32 i = 0; i < X86_BREAKPOINT_COUNT; i++) {
-		if (info.breakpoints[i].address == address
-			&& (watchpoint
-				!= (info.breakpoints[i].type == X86_INSTRUCTION_BREAKPOINT))) {
-			slot = i;
-			break;
-		}
-	}
-
-	// clear the breakpoint
-	if (slot >= 0) {
-		info.breakpoints[slot].address = NULL;
-
-		info.dr7 &= ~((0x3 << sDR7Len[slot])
-			| (0x3 << sDR7RW[slot])
-			| (1 << sDR7L[slot]));
-	} else {
-		if (watchpoint)
-			error = B_WATCHPOINT_NOT_FOUND;
-		else
-			error = B_BREAKPOINT_NOT_FOUND;
-	}
-
-	RELEASE_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
-	restore_interrupts(state);
-
-	return error;
-}
-
 
 status_t
 arch_set_breakpoint(void *address)
@@ -272,40 +420,11 @@ arch_clear_breakpoint(void *address)
 status_t
 arch_set_watchpoint(void *address, uint32 type, int32 length)
 {
-	// check type
-	uint32 archType;
-	switch (type) {
-		case B_DATA_WRITE_WATCHPOINT:
-			archType = X86_DATA_WRITE_BREAKPOINT;
-			break;
-		case B_DATA_READ_WRITE_WATCHPOINT:
-			archType = X86_DATA_READ_WRITE_BREAKPOINT;
-			break;
-		case B_DATA_READ_WATCHPOINT:
-		default:
-			return B_WATCHPOINT_TYPE_NOT_SUPPORTED;
-			break;
-	}
-
-	// check length and alignment
-	uint32 archLength;
-	switch (length) {
-		case 1:
-			archLength = X86_BREAKPOINT_LENGTH_1;
-			break;
-		case 2:
-			if ((uint32)address & 0x1)
-				return B_BAD_WATCHPOINT_ALIGNMENT;
-			archLength = X86_BREAKPOINT_LENGTH_2;
-			break;
-		case 4:
-			if ((uint32)address & 0x3)
-				return B_BAD_WATCHPOINT_ALIGNMENT;
-			archLength = X86_BREAKPOINT_LENGTH_4;
-			break;
-		default:
-			return B_WATCHPOINT_LENGTH_NOT_SUPPORTED;
-	}
+	uint32 archType, archLength;
+	status_t error = check_watch_point_parameters(address, type, length,
+		archType, archLength);
+	if (error != B_OK)
+		return error;
 
 	return set_breakpoint(address, archType, archLength);
 }
@@ -318,19 +437,73 @@ arch_clear_watchpoint(void *address)
 }
 
 
-static inline void
-install_breakpoints(const arch_team_debug_info &teamInfo)
-{
-	// set breakpoints
-	asm("movl %0, %%dr0" : : "r"(teamInfo.breakpoints[0].address));
-	asm("movl %0, %%dr1" : : "r"(teamInfo.breakpoints[1].address));
-	asm("movl %0, %%dr2" : : "r"(teamInfo.breakpoints[2].address));
-//	asm("movl %0, %%dr3" : : "r"(teamInfo.breakpoints[3].address));
-		// DR3 is used to hold the current struct thread*.
+#if KERNEL_BREAKPOINTS
 
-	// enable breakpoints
-	asm("movl %0, %%dr7" : : "r"(teamInfo.dr7));
+status_t
+arch_set_kernel_breakpoint(void *address)
+{
+	status_t error = set_kernel_breakpoint(address, X86_INSTRUCTION_BREAKPOINT,
+		X86_BREAKPOINT_LENGTH_1);
+
+	if (error != B_OK) {
+		panic("arch_set_kernel_breakpoint() failed to set breakpoint: %s",
+			strerror(error));
+	}
+
+	return error;
 }
+
+
+status_t
+arch_clear_kernel_breakpoint(void *address)
+{
+	status_t error = clear_kernel_breakpoint(address, false);
+
+	if (error != B_OK) {
+		panic("arch_clear_kernel_breakpoint() failed to clear breakpoint: %s",
+			strerror(error));
+	}
+
+	return error;
+}
+
+
+status_t
+arch_set_kernel_watchpoint(void *address, uint32 type, int32 length)
+{
+	uint32 archType, archLength;
+	status_t error = check_watch_point_parameters(address, type, length,
+		archType, archLength);
+
+	if (error == B_OK)
+		error = set_kernel_breakpoint(address, archType, archLength);
+
+	if (error != B_OK) {
+		panic("arch_set_kernel_watchpoint() failed to set watchpoint: %s",
+			strerror(error));
+	}
+
+	return error;
+}
+
+
+status_t
+arch_clear_kernel_watchpoint(void *address)
+{
+	status_t error = clear_kernel_breakpoint(address, true);
+
+	if (error != B_OK) {
+		panic("arch_clear_kernel_watchpoint() failed to clear watchpoint: %s",
+			strerror(error));
+	}
+
+	return error;
+}
+
+#endif	// KERNEL_BREAKPOINTS
+
+
+// #pragma mark - x86 implementation interface
 
 
 /**
@@ -378,8 +551,15 @@ i386_exit_user_debug_at_kernel_entry()
 	GRAB_THREAD_LOCK();
 
 	// disable breakpoints
-	asm("movl %0, %%dr7" : : "r"(X86_BREAKPOINTS_DISABLED_DR7));
+	disable_breakpoints();
 	thread->debug_info.arch_info.flags &= ~X86_THREAD_DEBUG_DR7_SET;
+
+#if KERNEL_BREAKPOINTS
+	struct team* kernelTeam = team_get_kernel_team();
+	GRAB_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
+	install_breakpoints(kernelTeam->debug_info.arch_info);
+	RELEASE_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
+#endif
 
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
@@ -392,12 +572,29 @@ i386_exit_user_debug_at_kernel_entry()
 void
 i386_reinit_user_debug_after_context_switch(struct thread *thread)
 {
+	// This function deals with a race condition: We set up the debugging
+	// registers in i386_init_user_debug_at_kernel_exit() when a userland
+	// thread is going to leave the kernel. Afterwards the thread might be
+	// preempted, though, since interrupts are enabled.
+	// X86_THREAD_DEBUG_DR7_SET indicates, when this happens.
+// TODO: We should fix this by disabling interrupts before
+// i386_init_user_debug_at_kernel_exit() is called and keep them disabled
+// until returning from the interrupt.
+
 	if (thread->debug_info.arch_info.flags & X86_THREAD_DEBUG_DR7_SET) {
 		GRAB_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
 
 		install_breakpoints(thread->team->debug_info.arch_info);
 
 		RELEASE_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
+#if KERNEL_BREAKPOINTS
+	} else {
+		// we're still in the kernel
+		struct team* kernelTeam = team_get_kernel_team();
+		GRAB_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
+		install_breakpoints(kernelTeam->debug_info.arch_info);
+		RELEASE_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
+#endif
 	}
 }
 
@@ -414,6 +611,12 @@ i386_handle_debug_exception(struct iframe *frame)
 	asm("movl %%dr7, %0" : "=r"(dr7));
 
 	TRACE(("i386_handle_debug_exception(): DR6: %lx, DR7: %lx\n", dr6, dr7));
+
+	if (frame->cs != USER_CODE_SEG) {
+		panic("debug exception in kernel mode: dr6: 0x%lx, dr7: 0x%lx", dr6,
+			dr7);
+		return B_HANDLED_INTERRUPT;
+	}
 
 	// check, which exception condition applies
 	if (dr6 & X86_DR6_BREAKPOINT_MASK) {
@@ -482,6 +685,11 @@ int
 i386_handle_breakpoint_exception(struct iframe *frame)
 {
 	TRACE(("i386_handle_breakpoint_exception()\n"));
+
+	if (frame->cs != USER_CODE_SEG) {
+		panic("breakpoint exception in kernel mode");
+		return B_HANDLED_INTERRUPT;
+	}
 
 	enable_interrupts();
 
