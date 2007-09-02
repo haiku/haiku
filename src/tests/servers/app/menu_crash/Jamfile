@@ -1,0 +1,13 @@
+SubDir HAIKU_TOP src tests servers app menu_crash ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
+UseHeaders [ FDirName os app ] ;
+UseHeaders [ FDirName os interface ] ;
+
+Application MenuCrash :
+	MenuCrash.cpp
+	: be
+;
+
