@@ -25,6 +25,9 @@
 // between caches.
 //#define DEBUG_PAGE_CACHE_TRANSITIONS	1
 
+// Enables a global list of all vm_cache structures.
+//#define DEBUG_CACHE_LIST 1
+
 #ifdef __cplusplus
 struct vm_page_mapping;
 typedef DoublyLinkedListLink<vm_page_mapping> vm_page_mapping_link;
@@ -91,14 +94,14 @@ typedef struct vm_page {
 
 	vm_page_mappings	mappings;
 
-	#ifdef DEBUG_PAGE_QUEUE
+#ifdef DEBUG_PAGE_QUEUE
 	void*				queue;
-	#endif
+#endif
 
-	#ifdef DEBUG_PAGE_CACHE_TRANSITIONS
+#ifdef DEBUG_PAGE_CACHE_TRANSITIONS
 	uint32	debug_flags;
 	struct vm_page *collided_page;
-	#endif
+#endif
 
 	uint8				type : 2;
 	uint8				state : 3;
@@ -162,7 +165,17 @@ typedef struct vm_cache {
 	uint32				scan_skip : 1;
 	uint32				busy : 1;
 	uint32				type : 5;
+
+#if DEBUG_CACHE_LIST
+	struct vm_cache*	debug_previous;
+	struct vm_cache*	debug_next;
+#endif
 } vm_cache;
+
+
+#if DEBUG_CACHE_LIST
+extern vm_cache* gDebugCacheList;
+#endif
 
 // vm area
 typedef struct vm_area {

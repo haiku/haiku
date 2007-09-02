@@ -38,6 +38,12 @@
 static hash_table *sPageCacheTable;
 static spinlock sPageCacheTableLock;
 
+#if DEBUG_CACHE_LIST
+vm_cache* gDebugCacheList;
+static spinlock sDebugCacheListLock;
+#endif
+
+
 struct page_lookup_key {
 	uint32	offset;
 	vm_cache *cache;
@@ -120,6 +126,21 @@ vm_cache_create(vm_store *store)
 	cache->page_count = 0;
 	cache->busy = false;
 
+
+#if DEBUG_CACHE_LIST
+	int state = disable_interrupts();
+	acquire_spinlock(&sDebugCacheListLock);
+
+	if (gDebugCacheList)
+		gDebugCacheList->debug_previous = cache;
+	cache->debug_previous = NULL;
+	cache->debug_next = gDebugCacheList;
+	gDebugCacheList = cache;
+
+	release_spinlock(&sDebugCacheListLock);
+	restore_interrupts(state);
+#endif
+
 	// connect the store to its cache
 	cache->store = store;
 	store->cache = cache;
@@ -197,6 +218,21 @@ vm_cache_release_ref(vm_cache *cache)
 		panic("cache %p to be deleted still has areas", cache);
 	if (!list_is_empty(&cache->consumers))
 		panic("cache %p to be deleted still has consumers", cache);
+
+#if DEBUG_CACHE_LIST
+	int state = disable_interrupts();
+	acquire_spinlock(&sDebugCacheListLock);
+
+	if (cache->debug_previous)
+		cache->debug_previous->debug_next = cache->debug_next;
+	if (cache->debug_next)
+		cache->debug_next->debug_previous = cache->debug_previous;
+	if (cache == gDebugCacheList)
+		gDebugCacheList = cache->debug_next;
+
+	release_spinlock(&sDebugCacheListLock);
+	restore_interrupts(state);
+#endif
 
 	// delete the cache's backing store
 	cache->store->ops->destroy(cache->store);

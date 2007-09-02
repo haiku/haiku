@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src system kernel vm ;
 
+UsePrivateHeaders shared ;
+
 KernelMergeObject kernel_vm.o :
 	vm.cpp
 	vm_address_space.c

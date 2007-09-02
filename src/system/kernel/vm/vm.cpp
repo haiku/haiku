@@ -7,14 +7,18 @@
  */
 
 
-#include "vm_store_anonymous_noswap.h"
-#include "vm_store_device.h"
-#include "vm_store_null.h"
+#include <vm.h>
+
+#include <ctype.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include <OS.h>
 #include <KernelExport.h>
 
-#include <vm.h>
+#include <AutoDeleter.h>
+
 #include <vm_address_space.h>
 #include <vm_priv.h>
 #include <vm_page.h>
@@ -38,10 +42,10 @@
 #include <arch/cpu.h>
 #include <arch/vm.h>
 
-#include <string.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include "vm_store_anonymous_noswap.h"
+#include "vm_store_device.h"
+#include "vm_store_null.h"
+
 
 //#define TRACE_VM
 //#define TRACE_FAULTS
@@ -114,8 +118,14 @@ public:
 	MultiAddressSpaceLocker();
 	~MultiAddressSpaceLocker();
 
-	status_t AddTeam(team_id team, vm_address_space** _space = NULL);
-	status_t AddArea(area_id area, vm_address_space** _space = NULL);
+	inline status_t AddTeam(team_id team, bool writeLock,
+		vm_address_space** _space = NULL);
+	inline status_t AddArea(area_id area, bool writeLock,
+		vm_address_space** _space = NULL);
+
+	status_t AddAreaCacheAndLock(area_id areaID, bool writeLockThisOne,
+		bool writeLockOthers, vm_area*& _area, vm_cache** _cache = NULL,
+		bool checkNoCacheChange = false);
 
 	status_t Lock();
 	void Unlock();
@@ -124,17 +134,58 @@ public:
 	void Unset();
 
 private:
+	struct lock_item {
+		vm_address_space*	space;
+		bool				write_lock;
+	};
+
 	bool _ResizeIfNeeded();
-	vm_address_space*& _CurrentItem() { return fSpaces[fCount]; }
-	bool _HasAddressSpace(vm_address_space* space) const;
+	int32 _IndexOfAddressSpace(vm_address_space* space) const;
+	status_t _AddAddressSpace(vm_address_space* space, bool writeLock,
+		vm_address_space** _space);
 
 	static int _CompareItems(const void* _a, const void* _b);
 
-	vm_address_space** fSpaces;
+	lock_item*	fItems;
 	int32		fCapacity;
 	int32		fCount;
 	bool		fLocked;
 };
+
+
+class AreaCacheLocking {
+public:
+	inline bool Lock(vm_cache* lockable)
+	{
+		return false;
+	}
+
+	inline void Unlock(vm_cache* lockable)
+	{
+		vm_area_put_locked_cache(lockable);
+	}
+};
+
+class AreaCacheLocker : public AutoLocker<vm_cache, AreaCacheLocking> {
+public:
+	inline AreaCacheLocker(vm_cache* cache = NULL)
+		: AutoLocker<vm_cache, AreaCacheLocking>(cache, true)
+	{
+	}
+
+	inline AreaCacheLocker(vm_area* area)
+		: AutoLocker<vm_cache, AreaCacheLocking>()
+	{
+		SetTo(area);
+	}
+
+	inline void SetTo(vm_area* area)
+	{
+		return AutoLocker<vm_cache, AreaCacheLocking>::SetTo(
+			area != NULL ? vm_area_get_locked_cache(area) : NULL, true, true);
+	}
+};
+
 
 #define REGION_HASH_TABLE_SIZE 1024
 static area_id sNextAreaID;
@@ -396,7 +447,7 @@ AddressSpaceWriteLocker::DegradeToReadLock()
 
 MultiAddressSpaceLocker::MultiAddressSpaceLocker()
 	:
-	fSpaces(NULL),
+	fItems(NULL),
 	fCapacity(0),
 	fCount(0),
 	fLocked(false)
@@ -407,16 +458,16 @@ MultiAddressSpaceLocker::MultiAddressSpaceLocker()
 MultiAddressSpaceLocker::~MultiAddressSpaceLocker()
 {
 	Unset();
-	free(fSpaces);
+	free(fItems);
 }
 
 
 /*static*/ int
 MultiAddressSpaceLocker::_CompareItems(const void* _a, const void* _b)
 {
-	vm_address_space* a = *(vm_address_space **)_a;
-	vm_address_space* b = *(vm_address_space **)_b;
-	return a->id - b->id;
+	lock_item* a = (lock_item*)_a;
+	lock_item* b = (lock_item*)_b;
+	return a->space->id - b->space->id;
 }
 
 
@@ -424,52 +475,55 @@ bool
 MultiAddressSpaceLocker::_ResizeIfNeeded()
 {
 	if (fCount == fCapacity) {
-		vm_address_space** items = (vm_address_space**)realloc(fSpaces,
-			(fCapacity + 4) * sizeof(void*));
+		lock_item* items = (lock_item*)realloc(fItems,
+			(fCapacity + 4) * sizeof(lock_item));
 		if (items == NULL)
 			return false;
 
 		fCapacity += 4;
-		fSpaces = items;
+		fItems = items;
 	}
 
 	return true;
 }
 
 
-bool
-MultiAddressSpaceLocker::_HasAddressSpace(vm_address_space* space) const
+int32
+MultiAddressSpaceLocker::_IndexOfAddressSpace(vm_address_space* space) const
 {
 	for (int32 i = 0; i < fCount; i++) {
-		if (fSpaces[i] == space)
-			return true;
+		if (fItems[i].space == space)
+			return i;
 	}
 	
-	return false;
+	return -1;
 }
 
 
 status_t
-MultiAddressSpaceLocker::AddTeam(team_id team, vm_address_space** _space)
+MultiAddressSpaceLocker::_AddAddressSpace(vm_address_space* space,
+	bool writeLock, vm_address_space** _space)
 {
-	if (!_ResizeIfNeeded())
-		return B_NO_MEMORY;
-
-	vm_address_space*& space = _CurrentItem();
-	space = vm_get_address_space_by_id(team);
-	if (space == NULL)
+	if (!space)
 		return B_BAD_VALUE;
 
-	// check if we have already added this address space
-	if (_HasAddressSpace(space)) {
-		// no need to add it again
-		vm_put_address_space(space);
-		if (_space != NULL)
-			*_space = space;
-		return B_OK;
-	}
+	int32 index = _IndexOfAddressSpace(space);
+	if (index < 0) {
+		if (!_ResizeIfNeeded()) {
+			vm_put_address_space(space);
+			return B_NO_MEMORY;
+		}
 
-	fCount++;
+		lock_item& item = fItems[fCount++];
+		item.space = space;
+		item.write_lock = writeLock;
+	} else {
+
+		// one reference is enough
+		vm_put_address_space(space);
+
+		fItems[index].write_lock |= writeLock;
+	}
 
 	if (_space != NULL)
 		*_space = space;
@@ -478,32 +532,21 @@ MultiAddressSpaceLocker::AddTeam(team_id team, vm_address_space** _space)
 }
 
 
-status_t
-MultiAddressSpaceLocker::AddArea(area_id area, vm_address_space** _space)
+inline status_t
+MultiAddressSpaceLocker::AddTeam(team_id team, bool writeLock,
+	vm_address_space** _space)
 {
-	if (!_ResizeIfNeeded())
-		return B_NO_MEMORY;
+	return _AddAddressSpace(vm_get_address_space_by_id(team), writeLock,
+		_space);
+}
 
-	vm_address_space*& space = _CurrentItem();
-	space = get_address_space_by_area_id(area);
-	if (space == NULL)
-		return B_BAD_VALUE;
 
-	// check if we have already added this address space
-	if (_HasAddressSpace(space)) {
-		// no need to add it again
-		vm_put_address_space(space);
-		if (_space != NULL)
-			*_space = space;
-		return B_OK;
-	}
-
-	fCount++;
-
-	if (_space != NULL)
-		*_space = space;
-
-	return B_OK;
+inline status_t
+MultiAddressSpaceLocker::AddArea(area_id area, bool writeLock,
+	vm_address_space** _space)
+{
+	return _AddAddressSpace(get_address_space_by_area_id(area), writeLock,
+		_space);
 }
 
 
@@ -512,9 +555,8 @@ MultiAddressSpaceLocker::Unset()
 {
 	Unlock();
 
-	for (int32 i = 0; i < fCount; i++) {
-		vm_put_address_space(fSpaces[i]);
-	}
+	for (int32 i = 0; i < fCount; i++)
+		vm_put_address_space(fItems[i].space);
 
 	fCount = 0;
 }
@@ -523,13 +565,17 @@ MultiAddressSpaceLocker::Unset()
 status_t
 MultiAddressSpaceLocker::Lock()
 {
-	qsort(fSpaces, fCount, sizeof(void*), &_CompareItems);
+	ASSERT(!fLocked);
+
+	qsort(fItems, fCount, sizeof(lock_item), &_CompareItems);
 
 	for (int32 i = 0; i < fCount; i++) {
-		status_t status = acquire_sem_etc(fSpaces[i]->sem, WRITE_COUNT, 0, 0);
+		status_t status = acquire_sem_etc(fItems[i].space->sem,
+			fItems[i].write_lock ? WRITE_COUNT : READ_COUNT, 0, 0);
 		if (status < B_OK) {
 			while (--i >= 0) {
-				release_sem_etc(fSpaces[i]->sem, WRITE_COUNT, 0);
+				release_sem_etc(fItems[i].space->sem,
+					fItems[i].write_lock ? WRITE_COUNT : READ_COUNT, 0);
 			}
 			return status;
 		}
@@ -547,10 +593,132 @@ MultiAddressSpaceLocker::Unlock()
 		return;
 
 	for (int32 i = 0; i < fCount; i++) {
-		release_sem_etc(fSpaces[i]->sem, WRITE_COUNT, 0);
+		release_sem_etc(fItems[i].space->sem,
+			fItems[i].write_lock ? WRITE_COUNT : READ_COUNT, 0);
 	}
 
 	fLocked = false;
+}
+
+
+/*!	Adds all address spaces of the areas associated with the given area's cache,
+	locks them, and locks the cache (including a reference to it). It retries
+	until the situation is stable (i.e. the neither cache nor cache's areas
+	changed) or an error occurs. If \c checkNoCacheChange ist \c true it does
+	not return until all areas' \c no_cache_change flags is clear.
+*/
+status_t
+MultiAddressSpaceLocker::AddAreaCacheAndLock(area_id areaID,
+	bool writeLockThisOne, bool writeLockOthers, vm_area*& _area,
+	vm_cache** _cache, bool checkNoCacheChange)
+{
+	// remember the original state
+	int originalCount = fCount;
+	lock_item* originalItems = NULL;
+	if (fCount > 0) {
+		originalItems = new(nothrow) lock_item[fCount];
+		if (originalItems == NULL)
+			return B_NO_MEMORY;
+		memcpy(originalItems, fItems, fCount * sizeof(lock_item));
+	}
+	ArrayDeleter<lock_item> _(originalItems);
+
+	// get the cache
+	vm_cache* cache;
+	vm_area* area;
+	status_t error;
+	{
+		AddressSpaceReadLocker locker;
+		error = locker.SetFromArea(areaID, area);
+		if (error != B_OK)
+			return error;
+
+		cache = vm_area_get_locked_cache(area);
+	}
+
+	while (true) {
+		// add all areas
+		vm_area* firstArea = cache->areas;
+		for (vm_area* current = firstArea; current;
+				current = current->cache_next) {
+			error = AddArea(current->id,
+				current == area ? writeLockThisOne : writeLockOthers);
+			if (error != B_OK) {
+				vm_area_put_locked_cache(cache);
+				return error;
+			}
+		}
+
+		// unlock the cache and attempt to lock the address spaces
+		vm_area_put_locked_cache(cache);
+
+		error = Lock();
+		if (error != B_OK)
+			return error;
+
+		// lock the cache again and check whether anything has changed
+
+		// check whether the area is gone in the meantime
+		acquire_sem_etc(sAreaHashLock, READ_COUNT, 0, 0);
+		area = (vm_area *)hash_lookup(sAreaHash, &areaID);
+		release_sem_etc(sAreaHashLock, READ_COUNT, 0);
+
+		if (area == NULL) {
+			Unlock();
+			return B_BAD_VALUE;
+		}
+
+		// lock the cache
+		vm_cache* oldCache = cache;
+		cache = vm_area_get_locked_cache(area);
+
+		// If neither the area's cache has changed nor its area list we're
+		// done...
+		bool done = (cache == oldCache || firstArea == cache->areas);
+
+		// ... unless we're supposed to check the areas' "no_cache_change" flag
+		bool yield = false;
+		if (done && checkNoCacheChange) {
+			for (vm_area *tempArea = cache->areas; tempArea != NULL;
+					tempArea = tempArea->cache_next) {
+				if (tempArea->no_cache_change) {
+					done = false;
+					yield = true;
+					break;
+				}
+			}
+		}
+
+		// If everything looks dandy, return the values.
+		if (done) {
+			_area = area;
+			if (_cache != NULL)
+				*_cache = cache;
+			return B_OK;
+		}
+
+		// Restore the original state and try again.
+
+		// Unlock the address spaces, but keep the cache locked for the next
+		// iteration.
+		Unlock();
+
+		// Get an additional reference to the original address spaces.
+		for (int32 i = 0; i < originalCount; i++)
+			atomic_add(&originalItems[i].space->ref_count, 1);
+
+		// Release all references to the current address spaces.
+		for (int32 i = 0; i < fCount; i++)
+			vm_put_address_space(fItems[i].space);
+
+		// Copy over the original state.
+		fCount = originalCount;
+		if (originalItems != NULL)
+			memcpy(fItems, originalItems, fCount * sizeof(lock_item));
+
+		if (yield)
+			thread_yield();
+	}
 }
 
 
@@ -1738,12 +1906,12 @@ vm_clone_area(team_id team, const char *name, void **address,
 
 	MultiAddressSpaceLocker locker;
 	vm_address_space *sourceAddressSpace;
-	status_t status = locker.AddArea(sourceID, &sourceAddressSpace);
+	status_t status = locker.AddArea(sourceID, false, &sourceAddressSpace);
 	if (status != B_OK)
 		return status;
 
 	vm_address_space *targetAddressSpace;
-	status = locker.AddTeam(team, &targetAddressSpace);
+	status = locker.AddTeam(team, true, &targetAddressSpace);
 	if (status != B_OK)
 		return status;
 
@@ -1900,11 +2068,19 @@ vm_delete_area(team_id team, area_id id)
 }
 
 
+/*!	Creates a new cache on top of given cache, moves all areas from
+	the old cache to the new one, and changes the protection of all affected
+	areas' pages to read-only.
+	Preconditions:
+	- The given cache must be locked.
+	- All of the cache's areas' address spaces must be read locked.
+	- All of the cache's areas must have a clear \c no_cache_change flags.
+*/
 static status_t
-vm_copy_on_write_area(vm_area *area)
+vm_copy_on_write_area(vm_cache* lowerCache)
 {
 	vm_store *store;
-	vm_cache *upperCache, *lowerCache;
+	vm_cache *upperCache;
 	vm_page *page;
 	status_t status;
 
@@ -1913,33 +2089,15 @@ vm_copy_on_write_area(vm_area *area)
 	// We need to separate the cache from its areas. The cache goes one level
 	// deeper and we create a new cache inbetween.
 
-	bool noCacheChange;
-	do {
-		lowerCache = vm_area_get_locked_cache(area);
-		noCacheChange = false;
-
-		for (vm_area *tempArea = lowerCache->areas; tempArea != NULL;
-				tempArea = tempArea->cache_next) {
-			if (tempArea->no_cache_change) {
-				noCacheChange = true;
-				vm_area_put_locked_cache(lowerCache);
-				thread_yield();
-				break;
-			}
-		}
-	} while (noCacheChange);
-
 	// create an anonymous store object
 	store = vm_store_create_anonymous_noswap(false, 0, 0);
-	if (store == NULL) {
-		status = B_NO_MEMORY;
-		goto err1;
-	}
+	if (store == NULL)
+		return B_NO_MEMORY;
 
 	upperCache = vm_cache_create(store);
 	if (upperCache == NULL) {
-		status = B_NO_MEMORY;
-		goto err2;
+		store->ops->destroy(store);
+		return B_NO_MEMORY;
 	}
 
 	mutex_lock(&upperCache->lock);
@@ -1958,6 +2116,8 @@ vm_copy_on_write_area(vm_area *area)
 
 	for (vm_area *tempArea = upperCache->areas; tempArea != NULL;
 			tempArea = tempArea->cache_next) {
+		ASSERT(!tempArea->no_cache_change);
+
 		tempArea->cache = upperCache;
 		atomic_add(&upperCache->ref_count, 1);
 		atomic_add(&lowerCache->ref_count, -1);
@@ -1972,7 +2132,6 @@ vm_copy_on_write_area(vm_area *area)
 
 	for (vm_area *tempArea = upperCache->areas; tempArea != NULL;
 			tempArea = tempArea->cache_next) {
-// TODO: Don't we have to lock the area's address space for accessing base, size, and protection?
 		// The area must be readable in the same way it was previously writable
 		uint32 protection = B_KERNEL_READ_AREA;
 		if (tempArea->protection & B_READ_AREA)
@@ -1984,16 +2143,9 @@ vm_copy_on_write_area(vm_area *area)
 		map->ops->unlock(map);
 	}
 
-	vm_area_put_locked_cache(lowerCache);
 	vm_area_put_locked_cache(upperCache);
 
 	return B_OK;
-
-err2:
-	store->ops->destroy(store);
-err1:
-	vm_area_put_locked_cache(lowerCache);
-	return status;
 }
 
 
@@ -2010,22 +2162,21 @@ vm_copy_area(team_id team, const char *name, void **_address,
 			protection |= B_KERNEL_WRITE_AREA;
 	}
 
+	// Do the locking: target address space, all address spaces associated with
+	// the source cache, and the cache itself.
 	MultiAddressSpaceLocker locker;
-	vm_address_space *sourceAddressSpace = NULL;
 	vm_address_space *targetAddressSpace;
-	status_t status = locker.AddTeam(team, &targetAddressSpace);
-	if (status == B_OK)
-		status = locker.AddArea(sourceID, &sourceAddressSpace);
-	if (status == B_OK)
-		status = locker.Lock();
+	vm_cache *cache;
+	vm_area* source;
+	status_t status = locker.AddTeam(team, true, &targetAddressSpace);
+	if (status == B_OK) {
+		status = locker.AddAreaCacheAndLock(sourceID, false, false, source,
+			&cache, true);
+	}
 	if (status != B_OK)
 		return status;
 
-	vm_area* source = lookup_area(sourceAddressSpace, sourceID);
-	if (source == NULL)
-		return B_BAD_VALUE;
-
-	vm_cache *cache = vm_area_get_locked_cache(source);
+	AreaCacheLocker cacheLocker(cache);	// already locked
 
 	if (addressSpec == B_CLONE_ADDRESS) {
 		addressSpec = B_EXACT_ADDRESS;
@@ -2034,31 +2185,19 @@ vm_copy_area(team_id team, const char *name, void **_address,
 
 	// First, create a cache on top of the source area
 
-	if (!writableCopy) {
-		// map_backing_store() cannot know it has to acquire a ref to
-		// the store for REGION_NO_PRIVATE_MAP
-		vm_cache_acquire_ref(cache);
-	}
-
 	vm_area *target;
 	status = map_backing_store(targetAddressSpace, cache, _address,
 		source->cache_offset, source->size, addressSpec, source->wiring,
-		protection, writableCopy ? REGION_PRIVATE_MAP : REGION_NO_PRIVATE_MAP,
-		&target, name);
+		protection, REGION_PRIVATE_MAP, &target, name);
 
-	vm_area_put_locked_cache(cache);
-
-	if (status < B_OK) {
-		if (!writableCopy)
-			vm_cache_release_ref(cache);
+	if (status < B_OK)
 		return status;
-	}
 
 	// If the source area is writable, we need to move it one layer up as well
 
 	if ((source->protection & (B_KERNEL_WRITE_AREA | B_WRITE_AREA)) != 0) {
 		// ToDo: do something more useful if this fails!
-		if (vm_copy_on_write_area(source) < B_OK)
+		if (vm_copy_on_write_area(cache) < B_OK)
 			panic("vm_copy_on_write_area() failed!\n");
 	}
 
@@ -2093,11 +2232,16 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection)
 	if (!arch_vm_supports_protection(newProtection))
 		return B_NOT_SUPPORTED;
 
-	AddressSpaceReadLocker locker;
+	// lock address spaces and cache
+	MultiAddressSpaceLocker locker;
+	vm_cache *cache;
 	vm_area* area;
-	status_t status = locker.SetFromArea(areaID, area);
-	if (status != B_OK)
-		return status;
+	status_t status = locker.AddAreaCacheAndLock(areaID, true, false, area,
+		&cache, true);
+	AreaCacheLocker cacheLocker(cache);	// already locked
+
+	if (area->protection == newProtection)
+		return B_OK;
 
 	if (team != vm_kernel_address_space_id()
 		&& area->address_space->id != team) {
@@ -2106,11 +2250,11 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection)
 		return B_NOT_ALLOWED;
 	}
 
-	vm_cache *cache = vm_area_get_locked_cache(area);
+	bool changePageProtection = true;
 
 	if ((area->protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0
 		&& (newProtection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) == 0) {
-		// change from read/write to read-only
+		// writable -> !writable
 
 		if (cache->source != NULL && cache->temporary) {
 			if (count_writable_areas(cache, area) == 0) {
@@ -2134,43 +2278,61 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection)
 		}
 	} else if ((area->protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) == 0
 		&& (newProtection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0) {
-		// change from read-only to read/write
+		// !writable -> writable
 
-		// ToDo: if this is a shared cache, insert new cache (we only know about other
-		//	areas in this cache yet, though, not about child areas)
-		//	-> use this call with care, it might currently have unwanted consequences
-		//	   because of this. It should always be safe though, if there are no other
-		//	   (child) areas referencing this area's cache (you just might not know).
-		if (count_writable_areas(cache, area) == 0
-			&& (cache->areas != area || area->cache_next)) {
-			// ToDo: child areas are not tested for yet
-			dprintf("set_area_protection(): warning, would need to insert a new cache (not yet implemented)!\n");
-			status = B_NOT_ALLOWED;
-		} else
-			dprintf("set_area_protection() may not work correctly yet in this direction!\n");
+		if (!list_is_empty(&cache->consumers)) {
+			// There are consumers -- we have to insert a new cache. Fortunately
+			// vm_copy_on_write_area() does everything that's needed.
+			changePageProtection = false;
+			status = vm_copy_on_write_area(cache);
+		} else {
+			// No consumers, so we don't need to insert a new one.
+			if (cache->source != NULL && cache->temporary) {
+				// the cache's commitment must contain all possible pages
+				status = cache->store->ops->commit(cache->store,
+					cache->virtual_size);
+			}
 
-		if (status == B_OK && cache->source != NULL && cache->temporary) {
-			// the cache's commitment must contain all possible pages
-			status = cache->store->ops->commit(cache->store,
-				cache->virtual_size);
+			if (status == B_OK && cache->source != NULL) {
+				// There's a source cache, hence we can't just change all pages'
+				// protection or we might allow writing into pages belonging to
+				// a lower cache.
+				changePageProtection = false;
+
+				struct vm_translation_map *map
+					= &area->address_space->translation_map;
+				map->ops->lock(map);
+
+				vm_page* page = cache->page_list;
+				while (page) {
+					addr_t address = area->base
+						+ (page->cache_offset << PAGE_SHIFT);
+					map->ops->protect(map, area->base, area->base + area->size,
+						newProtection);
+					page = page->cache_next;
+				}
+
+				map->ops->unlock(map);
+			}
 		}
 	} else {
 		// we don't have anything special to do in all other cases
 	}
 
-	if (status == B_OK && area->protection != newProtection) {
+	if (status == B_OK) {
 		// remap existing pages in this cache
-		struct vm_translation_map *map = &locker.AddressSpace()->translation_map;
+		struct vm_translation_map *map = &area->address_space->translation_map;
 
-		map->ops->lock(map);
-		map->ops->protect(map, area->base, area->base + area->size,
-			newProtection);
-		map->ops->unlock(map);
+		if (changePageProtection) {
+			map->ops->lock(map);
+			map->ops->protect(map, area->base, area->base + area->size,
+				newProtection);
+			map->ops->unlock(map);
+		}
 
 		area->protection = newProtection;
 	}
 
-	vm_area_put_locked_cache(cache);
 	return status;
 }
 
@@ -2608,6 +2770,27 @@ dump_cache_tree(int argc, char **argv)
 
 	return 0;
 }
+
+
+#if DEBUG_CACHE_LIST
+
+static int
+dump_caches(int argc, char **argv)
+{
+	kprintf("caches:");
+
+	vm_cache* cache = gDebugCacheList;
+	while (cache) {
+		kprintf(" %p", cache);
+		cache = cache->debug_next;
+	}
+
+	kprintf("\n");
+
+	return 0;
+}
+
+#endif	// DEBUG_CACHE_LIST
 
 
 static const char *
@@ -3293,6 +3476,9 @@ vm_init(kernel_args *args)
 	add_debugger_command("area", &dump_area, "Dump info about a particular area");
 	add_debugger_command("cache", &dump_cache, "Dump vm_cache");
 	add_debugger_command("cache_tree", &dump_cache_tree, "Dump vm_cache tree");
+#if DEBUG_CACHE_LIST
+	add_debugger_command("caches", &dump_caches, "List vm_cache structures");
+#endif
 	add_debugger_command("avail", &dump_available_memory, "Dump available memory");
 	add_debugger_command("dl", &display_mem, "dump memory long words (64-bit)");
 	add_debugger_command("dw", &display_mem, "dump memory words (32-bit)");
@@ -4604,73 +4790,29 @@ set_area_protection(area_id area, uint32 newProtection)
 status_t
 resize_area(area_id areaID, size_t newSize)
 {
-	vm_area* first;
-	vm_cache* cache;
-
 	// is newSize a multiple of B_PAGE_SIZE?
 	if (newSize & (B_PAGE_SIZE - 1))
 		return B_BAD_VALUE;
 
+	// lock all affected address spaces and the cache
+	vm_area* area;
+	vm_cache* cache;
+
 	MultiAddressSpaceLocker locker;
-	vm_address_space* addressSpace;
-	status_t status = locker.AddArea(areaID, &addressSpace);
+	status_t status = locker.AddAreaCacheAndLock(areaID, true, true, area,
+		&cache);
 	if (status != B_OK)
 		return status;
+	AreaCacheLocker cacheLocker(cache);	// already locked
 
-	{
-		AddressSpaceReadLocker readLocker;
-		vm_area* area;
-		status = readLocker.SetFromArea(areaID, area);
-		if (status != B_OK)
-			return status;
-
-		// collect areas to lock their address spaces
-
-		vm_cache* cache = vm_area_get_locked_cache(area);
-		readLocker.Unlock();
-
-		first = cache->areas;
-		for (vm_area* current = first; current; current = current->cache_next) {
-			if (current == area)
-				continue;
-
-			status = locker.AddArea(current->id);
-			if (status != B_OK) {
-				vm_area_put_locked_cache(cache);
-				return status;
-			}
-		}
-
-		vm_area_put_locked_cache(cache);
-	}
-
-	status = locker.Lock();
-	if (status != B_OK)
-		return status;
-
-	vm_area* area = lookup_area(addressSpace, areaID);
-	if (area == NULL)
-		return B_BAD_VALUE;
-
-	cache = vm_area_get_locked_cache(area);
 	size_t oldSize = area->size;
-
-	// Check if we have locked all address spaces we need to; since
-	// new entries are put at the top, we just have to check if the
-	// first area of the cache changed - we do not care if we have
-	// locked more address spaces, though.
-	if (cache->areas != first) {
-		// TODO: just try again in this case!
-		status = B_ERROR;
-		goto out;
-	}
+	if (newSize == oldSize)
+		return B_OK;
 
 	// Resize all areas of this area's cache
 
-	if (cache->type != CACHE_TYPE_RAM) {
-		status = B_NOT_ALLOWED;
-		goto out;
-	}
+	if (cache->type != CACHE_TYPE_RAM)
+		return B_NOT_ALLOWED;
 
 	if (oldSize < newSize) {
 		// We need to check if all areas of this cache can be resized
@@ -4689,8 +4831,7 @@ resize_area(area_id areaID, size_t newSize)
 					&& next->base - 1 + next->size >= current->base - 1 + newSize)
 					continue;
 
-				status = B_ERROR;
-				goto out;
+				return B_ERROR;
 			}
 		}
 	}
@@ -4737,9 +4878,6 @@ resize_area(area_id areaID, size_t newSize)
 			current->size = oldSize;
 		}
 	}
-
-out:
-	vm_area_put_locked_cache(cache);
 
 	// ToDo: we must honour the lock restrictions of this area
 	return status;
