@@ -1528,13 +1528,21 @@ WindowLayer::RemoveFromSubset(WindowLayer* window)
 bool
 WindowLayer::HasInSubset(const WindowLayer* window) const
 {
-	if (window == NULL || fFeel == window->Feel() || fFeel == B_NORMAL_WINDOW_FEEL)
+	if (window == NULL || fFeel == window->Feel()
+		|| fFeel == B_NORMAL_WINDOW_FEEL)
+		return false;
+
+	// Menus are a special case: they will always be on-top of every window
+	// of their application
+	if (fFeel == kMenuWindowFeel)
+		return window->ServerWindow()->App() == ServerWindow()->App();
+	else if (window->Feel() == kMenuWindowFeel)
 		return false;
 
 	// we have a few special feels that have a fixed order
 
-	const int32 feel[] = {kWindowScreenFeel, kMenuWindowFeel,
-		B_MODAL_ALL_WINDOW_FEEL, B_FLOATING_ALL_WINDOW_FEEL, 0};
+	const int32 feel[] = {kWindowScreenFeel, B_MODAL_ALL_WINDOW_FEEL,
+		B_FLOATING_ALL_WINDOW_FEEL, 0};
 
 	for (int32 order = 0; feel[order]; order++) {
 		if (fFeel == feel[order])
