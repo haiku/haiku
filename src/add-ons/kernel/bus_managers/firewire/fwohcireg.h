@@ -95,7 +95,7 @@ typedef uint32_t 	fwohcireg_t;
 #if BYTE_ORDER == BIG_ENDIAN
 #ifdef __HAIKU__
 #define htole32(x) __swap_int32(x)
-#define letoh32(x) __swap_int32(x)
+#define le32toh(x) __swap_int32(x)
 #endif
 #define FWOHCI_DMA_WRITE(x, y)	((x) = htole32(y))
 #define FWOHCI_DMA_READ(x)	le32toh(x)
