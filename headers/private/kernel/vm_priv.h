@@ -44,14 +44,11 @@ extern "C" {
 #endif
 
 // Should only be used by vm internals
-status_t vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser, addr_t *newip);
+status_t vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite,
+	bool isUser, addr_t *newip);
 void vm_unreserve_memory(size_t bytes);
 status_t vm_try_reserve_memory(size_t bytes);
 status_t vm_daemon_init(void);
-
-// used by the page daemon to walk the list of address spaces
-void vm_address_space_walk_start(struct hash_iterator *i);
-vm_address_space *vm_address_space_walk_next(struct hash_iterator *i);
 
 #ifdef __cplusplus
 }

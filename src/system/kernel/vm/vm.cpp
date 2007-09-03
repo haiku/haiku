@@ -191,7 +191,7 @@ public:
 static area_id sNextAreaID;
 static hash_table *sAreaHash;
 static sem_id sAreaHashLock;
-static spinlock sMappingLock;
+static mutex sMappingLock;
 static mutex sAreaCacheLock;
 
 static off_t sAvailableMemory;
@@ -2354,13 +2354,12 @@ vm_get_page_mapping(team_id team, addr_t vaddr, addr_t *paddr)
 
 
 int32
-vm_test_map_activation(vm_page *page)
+vm_test_map_activation(vm_page *page, bool *_modified)
 {
 	int32 activation = 0;
+	bool modified = false;
 
-	// TODO: this can't work... (we need to lock the map, so this has to be a mutex)
-	cpu_status state = disable_interrupts();
-	acquire_spinlock(&sMappingLock);
+	MutexLocker locker(sMappingLock);
 
 	vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
 	vm_page_mapping *mapping;
@@ -2370,17 +2369,19 @@ vm_test_map_activation(vm_page *page)
 
 		addr_t physicalAddress;
 		uint32 flags;
-//		map->ops->lock(map);
+		map->ops->lock(map);
 		addr_t address = area->base + (page->cache_offset << PAGE_SHIFT);
 		map->ops->query_interrupt(map, address, &physicalAddress, &flags);
-//		map->ops->unlock(map);
+		map->ops->unlock(map);
 
 		if (flags & PAGE_ACCESSED)
 			activation++;
+		if (flags & PAGE_MODIFIED)
+			modified = true;
 	}
 
-	release_spinlock(&sMappingLock);
-	restore_interrupts(state);
+	if (_modified != NULL)
+		*_modified = modified;
 
 	return activation;
 }
@@ -2389,9 +2390,7 @@ vm_test_map_activation(vm_page *page)
 void
 vm_clear_map_activation(vm_page *page)
 {
-	// TODO: this can't work... (we need to lock the map, so this has to be a mutex)
-	cpu_status state = disable_interrupts();
-	acquire_spinlock(&sMappingLock);
+	MutexLocker locker(sMappingLock);
 
 	vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
 	vm_page_mapping *mapping;
@@ -2399,23 +2398,18 @@ vm_clear_map_activation(vm_page *page)
 		vm_area *area = mapping->area;
 		vm_translation_map *map = &area->address_space->translation_map;
 
-//		map->ops->lock(map);
+		map->ops->lock(map);
 		addr_t address = area->base + (page->cache_offset << PAGE_SHIFT);
 		map->ops->clear_flags(map, address, PAGE_ACCESSED);
-//		map->ops->unlock(map);
+		map->ops->unlock(map);
 	}
-
-	release_spinlock(&sMappingLock);
-	restore_interrupts(state);
 }
 
 
 void
 vm_remove_all_page_mappings(vm_page *page)
 {
-	// TODO: this can't work... (we need to lock the map, so this has to be a mutex)
-	cpu_status state = disable_interrupts();
-	acquire_spinlock(&sMappingLock);
+	MutexLocker locker(sMappingLock);
 
 	vm_page_mappings queue;
 	queue.MoveFrom(&page->mappings);
@@ -2426,16 +2420,15 @@ vm_remove_all_page_mappings(vm_page *page)
 		vm_area *area = mapping->area;
 		vm_translation_map *map = &area->address_space->translation_map;
 
-//		map->ops->lock(map);
+		map->ops->lock(map);
 		addr_t base = area->base + (page->cache_offset << PAGE_SHIFT);
 		map->ops->unmap(map, base, base + (B_PAGE_SIZE - 1));
-//		map->ops->unlock(map);
+		map->ops->unlock(map);
 
 		area->mappings.Remove(mapping);
 	}
 
-	release_spinlock(&sMappingLock);
-	restore_interrupts(state);
+	locker.Unlock();
 
 	// free now unused mappings
 
@@ -2476,6 +2469,7 @@ vm_unmap_pages(vm_area *area, addr_t base, size_t size)
 	}
 
 	map->ops->unmap(map, base, end);
+	map->ops->unlock(map);
 
 	if (area->wiring == B_NO_LOCK) {
 		uint32 startOffset = (area->cache_offset + base - area->base)
@@ -2484,15 +2478,16 @@ vm_unmap_pages(vm_area *area, addr_t base, size_t size)
 		vm_page_mapping *mapping;
 		vm_area_mappings queue;
 
-		cpu_status state = disable_interrupts();
-		acquire_spinlock(&sMappingLock);
+		mutex_lock(&sMappingLock);
+		map->ops->lock(map);
 
 		vm_area_mappings::Iterator iterator = area->mappings.GetIterator();
 		while (iterator.HasNext()) {
 			mapping = iterator.Next();
 
 			vm_page *page = mapping->page;
-			if (page->cache_offset < startOffset || page->cache_offset >= endOffset)
+			if (page->cache_offset < startOffset
+				|| page->cache_offset >= endOffset)
 				continue;
 
 			mapping->page->mappings.Remove(mapping);
@@ -2501,15 +2496,14 @@ vm_unmap_pages(vm_area *area, addr_t base, size_t size)
 			queue.Add(mapping);
 		}
 
-		release_spinlock(&sMappingLock);
-		restore_interrupts(state);
+		map->ops->unlock(map);
+		mutex_unlock(&sMappingLock);
 
 		while ((mapping = queue.RemoveHead()) != NULL) {
 			free(mapping);
 		}
 	}
 
-	map->ops->unlock(map);
 	return B_OK;
 }
 
@@ -2532,23 +2526,18 @@ vm_map_page(vm_area *area, vm_page *page, addr_t address, uint32 protection)
 	map->ops->lock(map);
 	map->ops->map(map, address, page->physical_page_number * B_PAGE_SIZE,
 		protection);
+	map->ops->unlock(map);
 
 	if (area->wiring != B_NO_LOCK) {
 		page->wired_count++;
 			// TODO: needs to be atomic on all platforms!
 	} else {
 		// insert mapping into lists
-		cpu_status state = disable_interrupts();
-		acquire_spinlock(&sMappingLock);
+		MutexLocker locker(sMappingLock);
 
 		page->mappings.Add(mapping);
 		area->mappings.Add(mapping);
-
-		release_spinlock(&sMappingLock);
-		restore_interrupts(state);
 	}
-
-	map->ops->unlock(map);
 
 	if (page->state != PAGE_STATE_MODIFIED)
 		vm_page_set_state(page, PAGE_STATE_ACTIVE);
@@ -3519,6 +3508,7 @@ vm_init_post_sem(kernel_args *args)
 
 	sAreaHashLock = create_sem(WRITE_COUNT, "area hash");
 	mutex_init(&sAreaCacheLock, "area->cache");
+	mutex_init(&sMappingLock, "page mappings");
 
 	slab_init_post_sem();
 

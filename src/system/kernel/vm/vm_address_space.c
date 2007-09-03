@@ -313,27 +313,6 @@ vm_create_address_space(team_id id, addr_t base, addr_t size,
 }
 
 
-void
-vm_address_space_walk_start(struct hash_iterator *iterator)
-{
-	hash_open(sAddressSpaceTable, iterator);
-}
-
-
-vm_address_space *
-vm_address_space_walk_next(struct hash_iterator *iterator)
-{
-	vm_address_space *aspace;
-
-	acquire_sem_etc(sAddressSpaceHashSem, READ_COUNT, 0, 0);
-	aspace = hash_next(sAddressSpaceTable, iterator);
-	if (aspace)
-		atomic_add(&aspace->ref_count, 1);
-	release_sem_etc(sAddressSpaceHashSem, READ_COUNT, 0);
-	return aspace;
-}
-
-
 status_t
 vm_address_space_init(void)
 {

@@ -327,6 +327,7 @@ vm_cache_insert_page(vm_cache *cache, vm_page *page, off_t offset)
 	cache->page_count++;
 
 	page->cache = cache;
+	page->usage_count = 2;
 
 	state = disable_interrupts();
 	acquire_spinlock(&sPageCacheTableLock);
