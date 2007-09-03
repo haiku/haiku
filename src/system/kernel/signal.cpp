@@ -113,10 +113,15 @@ handle_signals(struct thread *thread)
 		debugSignal = !(~atomic_get(&thread->team->debug_info.flags)
 				& (B_TEAM_DEBUG_SIGNALS | B_TEAM_DEBUG_DEBUGGER_INSTALLED));
 
-		// ToDo: since sigaction_etc() could clobber the fields at any time,
+		// TODO: since sigaction_etc() could clobber the fields at any time,
 		//		we should actually copy the relevant fields atomically before
 		//		accessing them (only the debugger is calling sigaction_etc()
 		//		right now).
+		//		Update: sigaction_etc() is only used by the userland debugger
+		//		support. We can just as well restrict getting/setting signal
+		//		handlers to work only when the respective thread is stopped.
+		//		Then sigaction() could be used instead and we could get rid of
+		//		sigaction_etc().
 		handler = &thread->sig_action[i];
 
 		TRACE(("Thread 0x%lx received signal %s\n", thread->id, sigstr[signal]));
