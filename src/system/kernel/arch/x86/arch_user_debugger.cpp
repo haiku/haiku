@@ -301,6 +301,182 @@ check_watch_point_parameters(void* address, uint32 type, int32 length,
 }
 
 
+// #pragma mark - kernel debugger commands
+
+#if KERNEL_BREAKPOINTS
+
+static int
+debugger_breakpoints(int argc, char** argv)
+{
+	struct team* kernelTeam = team_get_kernel_team();
+	arch_team_debug_info& info = kernelTeam->debug_info.arch_info;
+
+	for (int32 i = 0; i < X86_BREAKPOINT_COUNT; i++) {
+		kprintf("breakpoint[%ld] ", i);
+
+		if (info.breakpoints[i].address != NULL) {
+			kprintf("%p ", info.breakpoints[i].address);
+			switch (info.breakpoints[i].type) {
+				case X86_INSTRUCTION_BREAKPOINT:
+					kprintf("instruction");
+					break;
+				case X86_IO_READ_WRITE_BREAKPOINT:
+					kprintf("io read/write");
+					break;
+				case X86_DATA_WRITE_BREAKPOINT:
+					kprintf("data write");
+					break;
+				case X86_DATA_READ_WRITE_BREAKPOINT:
+					kprintf("data read/write");
+					break;
+			}
+
+			int length = 1;
+			switch (info.breakpoints[i].length) {
+				case X86_BREAKPOINT_LENGTH_1:
+					length = 1;
+					break;
+				case X86_BREAKPOINT_LENGTH_2:
+					length = 2;
+					break;
+				case X86_BREAKPOINT_LENGTH_4:
+					length = 4;
+					break;
+			}
+
+			if (info.breakpoints[i].type != X86_INSTRUCTION_BREAKPOINT)
+				kprintf(" %d byte%s", length, (length > 1 ? "s" : ""));
+		} else
+			kprintf("unused");
+
+		kprintf("\n");
+	}
+
+	return 0;
+}
+
+
+static int
+debugger_breakpoint_usage(const char* command)
+{
+	if (command[0] == 'b') {
+		kprintf("Usage: breakpoint <address>\n");
+		kprintf("       breakpoint <address> clear\n");
+	} else {
+		kprintf("Usage: watchpoint <address> [ rw ] [ <size> ]\n");
+		kprintf("       watchpoint <address> clear\n");
+	}
+	return 0;
+}
+
+
+static int
+debugger_breakpoint(int argc, char** argv)
+{
+	// get arguments
+
+	if (argc < 2 || argc > 3)
+		return debugger_breakpoint_usage(argv[0]);
+
+	addr_t address = strtoul(argv[1], NULL, 0);
+	if (address == 0)
+		return debugger_breakpoint_usage(argv[0]);
+
+	bool clear = false;
+	if (argc == 3) {
+		if (strcmp(argv[2], "clear") == 0)
+			clear = true;
+		else
+			return debugger_breakpoint_usage(argv[0]);
+	}
+
+	// set/clear breakpoint
+
+	arch_team_debug_info& info = team_get_kernel_team()->debug_info.arch_info;
+
+	status_t error;
+
+	if (clear) {
+		error = clear_breakpoint(info, (void*)address, false);
+	} else {
+		error = set_breakpoint(info, (void*)address, X86_INSTRUCTION_BREAKPOINT,
+			X86_BREAKPOINT_LENGTH_1, true);
+	}
+
+	if (error == B_OK)
+		install_breakpoints(info);
+	else
+		kprintf("Failed to install breakpoint: %s\n", strerror(error));
+
+	return 0;
+}
+
+
+static int
+debugger_watchpoint(int argc, char** argv)
+{
+	// get arguments
+
+	if (argc < 2 || argc > 4)
+		return debugger_breakpoint_usage(argv[0]);
+
+	addr_t address = strtoul(argv[1], NULL, 0);
+	if (address == 0)
+		return debugger_breakpoint_usage(argv[0]);
+
+	bool clear = false;
+	bool readWrite = false;
+	int argi = 2;
+	int length = 1;
+	if (argc >= 3) {
+		if (strcmp(argv[argi], "clear") == 0) {
+			clear = true;
+			argi++;
+		} else if (strcmp(argv[argi], "rw") == 0) {
+			readWrite = true;
+			argi++;
+		}
+
+		if (!clear && argi < argc)
+			length = strtoul(argv[argi++], NULL, 0);
+
+		if (length == 0 || argi < argc)
+			return debugger_breakpoint_usage(argv[0]);
+	}
+
+	// set/clear breakpoint
+
+	arch_team_debug_info& info = team_get_kernel_team()->debug_info.arch_info;
+
+	status_t error;
+
+	if (clear) {
+		error = clear_breakpoint(info, (void*)address, true);
+	} else {
+		uint32 type = readWrite ? B_DATA_READ_WRITE_WATCHPOINT
+			: B_DATA_WRITE_WATCHPOINT;
+
+		uint32 archType, archLength;
+		error = check_watch_point_parameters((void*)address, type, length,
+			archType, archLength);
+
+		if (error == B_OK) {
+			error = set_breakpoint(info, (void*)address, archType, archLength,
+				true);
+		}
+	}
+
+	if (error == B_OK)
+		install_breakpoints(info);
+	else
+		kprintf("Failed to install breakpoint: %s\n", strerror(error));
+
+	return 0;
+}
+
+#endif	// KERNEL_BREAKPOINTS
+
+
 // #pragma mark - in-kernel public interface
 
 
@@ -709,5 +885,17 @@ i386_init_user_debug()
 
 		unload_driver_settings(handle);
 	}
+
+#if KERNEL_BREAKPOINTS
+	// install debugger commands
+	add_debugger_command("breakpoints", &debugger_breakpoints,
+		"lists current break-/watchpoints");
+	add_debugger_command("breakpoint", &debugger_breakpoint,
+		"set/clear a breakpoint");
+	add_debugger_command("watchpoints", &debugger_breakpoints,
+		"lists current break-/watchpoints");
+	add_debugger_command("watchpoint", &debugger_watchpoint,
+		"set/clear a watchpoint");
+#endif
 }
 
