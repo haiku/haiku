@@ -33,7 +33,6 @@
 #endif
 
 
-#define SIGNAL_TO_MASK(signal)	(1LL << (signal - 1))
 #define BLOCKABLE_SIGNALS		(~(KILL_SIGNALS | SIGNAL_TO_MASK(SIGSTOP)))
 #define STOP_SIGNALS \
 	(SIGNAL_TO_MASK(SIGSTOP) | SIGNAL_TO_MASK(SIGTSTP) \

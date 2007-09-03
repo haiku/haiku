@@ -23,6 +23,7 @@
 #include <kernel.h>
 #include <kimage.h>
 #include <kscheduler.h>
+#include <ksignal.h>
 #include <port.h>
 #include <sem.h>
 #include <syscall_process_info.h>
@@ -1320,6 +1321,21 @@ get_job_control_entry(team_job_control_children* children, pid_t id)
 }
 
 
+static job_control_entry*
+get_job_control_entry(struct team* team, pid_t id, uint32 flags)
+{
+	job_control_entry* entry = get_job_control_entry(team->dead_children, id);
+
+	if (entry == NULL && (flags & WCONTINUED) != 0)
+		entry = get_job_control_entry(team->continued_children, id);
+
+	if (entry == NULL && (flags & WUNTRACED) != 0)
+		entry = get_job_control_entry(team->stopped_children, id);
+
+	return entry;
+}
+
+
 /*! This is the kernel backend for waitpid(). It is a bit more powerful when it
 	comes to the reason why a thread has died than waitpid() can be.
 */
@@ -1327,7 +1343,8 @@ static thread_id
 wait_for_child(pid_t child, uint32 flags, int32 *_reason,
 	status_t *_returnCode)
 {
-	struct team *team = thread_get_current_thread()->team;
+	struct thread* thread = thread_get_current_thread();
+	struct team* team = thread->team;
 	struct job_control_entry foundEntry;
 	struct job_control_entry* freeDeathEntry = NULL;
 	status_t status = B_OK;
@@ -1339,18 +1356,14 @@ wait_for_child(pid_t child, uint32 flags, int32 *_reason,
 		child = -team->group_id;
 	}
 
+	bool ignoreFoundEntries = false;
+	bool ignoreFoundEntriesChecked = false;
+
 	while (true) {
 		InterruptsSpinLocker locker(team_spinlock);
 
 		// check whether any condition holds
-		job_control_entry* entry = get_job_control_entry(team->dead_children,
-			child);
-
-		if (entry == NULL && (flags & WCONTINUED) != 0)
-			entry = get_job_control_entry(team->continued_children, child);
-
-		if (entry == NULL && (flags & WUNTRACED) != 0)
-			entry = get_job_control_entry(team->stopped_children, child);
+		job_control_entry* entry = get_job_control_entry(team, child, flags);
 
 		// If we don't have an entry yet, check whether there are any children
 		// complying to the process group specification at all.
@@ -1410,14 +1423,36 @@ wait_for_child(pid_t child, uint32 flags, int32 *_reason,
 		locker.Unlock();
 
 		// we got our entry and can return to our caller
-		if (status == B_OK)
+		if (status == B_OK) {
+			if (ignoreFoundEntries) {
+				// ... unless we shall ignore found entries
+				delete freeDeathEntry;
+				freeDeathEntry = NULL;
+				continue;
+			}
+
 			break;
+		}
+
 		if (status != B_WOULD_BLOCK || (flags & WNOHANG) != 0)
 			return status;
 
 		status = deadWaitEntry.Wait(B_CAN_INTERRUPT);
 		if (status == B_INTERRUPTED)
 			return status;
+
+		// If SA_NOCLDWAIT is set or SIGCHLD is ignored, we shall wait until
+		// all our children are dead and fail with ECHILD. We check the
+		// condition at this point.
+		if (!ignoreFoundEntriesChecked) {
+			struct sigaction& handler = thread->sig_action[SIGCHLD - 1];
+			if ((handler.sa_flags & SA_NOCLDWAIT) != 0
+				|| handler.sa_handler == SIG_IGN) {
+				ignoreFoundEntries = true;
+			}
+
+			ignoreFoundEntriesChecked = true;
+		}
 	}
 
 	delete freeDeathEntry;
@@ -1443,11 +1478,14 @@ wait_for_child(pid_t child, uint32 flags, int32 *_reason,
 	*_returnCode = foundEntry.status;
 	*_reason = (foundEntry.signal << 16) | reason;
 
-	// TODO: From the Open Group Base Specs Issue 6:
-	// "... if SIGCHLD is blocked, if wait() or waitpid() return because
-	// the status of a child process is available, any pending SIGCHLD signal
-	// shall be cleared unless the status of another child process is
-	// available."
+	// If SIGCHLD is blocked, we shall clear pending SIGCHLDs, if no other child
+	// status is available.
+	if ((atomic_get(&thread->sig_block_mask) & SIGNAL_TO_MASK(SIGCHLD)) != 0) {
+		InterruptsSpinLocker locker(team_spinlock);
+
+		if (get_job_control_entry(team, child, flags) == NULL)
+			atomic_and(&thread->sig_pending, ~SIGNAL_TO_MASK(SIGCHLD));
+	}
 
 	return foundEntry.thread;
 }

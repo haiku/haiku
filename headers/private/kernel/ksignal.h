@@ -12,6 +12,8 @@
 
 #define KILL_SIGNALS	((1L << (SIGKILL - 1)) | (1L << (SIGKILLTHR - 1)))
 
+#define SIGNAL_TO_MASK(signal)	(1LL << (signal - 1))
+
 
 #ifdef __cplusplus
 extern "C" {
