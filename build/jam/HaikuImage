@@ -26,11 +26,11 @@ BEOS_BIN = "[" addattr alert arp basename bc beep bison bzip2 cat cardctl catatt
 	chgrp chmod chop chown cksum clear clockconfig cmp comm compress cp copyattr
 	$(X86_ONLY)CortexAddOnHost
 	csplit ctags cut date dc dd desklink df diff diff3 dircolors dirname
-	driveinfo dstcheck du dump_cis dump_cisreg echo eject env error expand
-	expr factor false fdinfo ffm find finddir fmt fold fortune frcode ftp funzip gawk
-	$(X86_ONLY)gdb grep groups gzip gzexe hd head hey hostname id ident ideinfo
-	idestatus ifconfig <bin>install installsound iroster isvolume join keymap
-	kill less lessecho lesskey link listarea listattr listdev listimage
+	driveinfo dstcheck du dump_cis dump_cisreg echo eject env error expand expr
+	expr factor false fdinfo ffm find finddir fmt fold fortune frcode ftp funzip fwcontrol
+	gawk $(X86_ONLY)gdb grep groups gzip gzexe hd head hey hostname id ident
+	ideinfo idestatus ifconfig <bin>install installsound iroster isvolume join
+	keymap kill less lessecho lesskey link listarea listattr listdev listimage
 	listport listres listsem ln locate logger login logname ls lsindex m4 make
 	makebootable md5sum merge mimeset mkdos mkdir mkindex modifiers mount
 	mount_nfs mountvolume mv nc netstat nl od open pack_cis paste patch pathchk pc
@@ -120,7 +120,7 @@ BEOS_ADD_ONS_DRIVERS_NET = etherpci ipro1000 rtl8139 rtl8169 sis900
 ;
 #BEOS_ADD_ONS_DRIVERS_ACPI = $(X86_ONLY)acpi_button ;
 BEOS_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)ps2 $(X86_ONLY)isa ide scsi
-	config_manager $(X86_ONLY)agp usb
+	config_manager $(X86_ONLY)agp usb firewire
 ;
 BEOS_ADD_ONS_FILE_SYSTEMS = bfs cdda dos googlefs iso9660 nfs ;
 
@@ -154,7 +154,7 @@ AddDriversToHaikuImage				: console dprintf $(X86_ONLY)keyboard null
 									  random <driver>tty zero ;
 AddDriversToHaikuImage audio hmulti	: $(BEOS_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToHaikuImage midi			: $(BEOS_ADD_ONS_DRIVERS_MIDI) ;
-AddDriversToHaikuImage bus			: usb_raw ;
+AddDriversToHaikuImage bus			: fw_raw usb_raw ;
 AddDriversToHaikuImage disk scsi	: scsi_cd scsi_dsk ;
 AddDriversToHaikuImage disk virtual	: nbd ;
 AddDriversToHaikuImage dvb			: cx23882 ;
