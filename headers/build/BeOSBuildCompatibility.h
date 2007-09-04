@@ -7,6 +7,7 @@ typedef unsigned long haiku_build_addr_t;
 #include <Errors.h>
 #include <sys/types.h>
 #include <string.h>
+#include <sys/uio.h>
 
 #ifdef __x86_64__
 #define HAIKU_HOST_PLATFORM_64_BIT
