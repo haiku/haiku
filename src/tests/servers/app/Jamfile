@@ -177,3 +177,4 @@ SubInclude HAIKU_TOP src tests servers app scrolling ;
 SubInclude HAIKU_TOP src tests servers app stress_test ;
 SubInclude HAIKU_TOP src tests servers app textview ;
 SubInclude HAIKU_TOP src tests servers app view_state ;
+SubInclude HAIKU_TOP src tests servers app window_creation ;
