@@ -10,6 +10,7 @@
  * urlwrapper: wraps URL mime types around command line apps
  * or other apps that don't handle them directly.
  */
+#define DEBUG 1
 
 #include <Alert.h>
 #include <Application.h>
@@ -229,17 +230,64 @@ void UrlWrapperApp::RefsReceived(BMessage *msg)
 	int32 index = 0;
 	entry_ref ref;
 	char *args[] = { "urlwrapper", buff, NULL };
-#ifdef HANDLE_BOOKMARK_FILES
-	/* eat everything as bookmark files */
+	status_t err;
+
 	while (msg->FindRef("refs", index++, &ref) == B_OK) {
 		BFile f(&ref, B_READ_ONLY);
-		if (f.InitCheck() == B_OK) {
-			if (f.ReadAttr("META:url", B_STRING_TYPE, 0LL, buff, B_PATH_NAME_LENGTH) > 0) {
-				ArgvReceived(2, args);
+		BNodeInfo ni(&f);
+		BString mimetype;
+		if (f.InitCheck() == B_OK && ni.InitCheck() == B_OK) {
+			ni.GetType(mimetype.LockBuffer(B_MIME_TYPE_LENGTH));
+			mimetype.UnlockBuffer();
+#ifdef HANDLE_URL_FILES
+			// http://filext.com/file-extension/URL
+			if (mimetype == "wwwserver/redirection"
+			 || mimetype == "application/internet-shortcut"
+			 || mimetype == "application/x-url"
+			 || mimetype == "message/external-body"
+			 || mimetype == "text/url"
+			 || mimetype == "text/x-url") {
+				// http://www.cyanwerks.com/file-format-url.html
+				off_t size;
+				if (f.GetSize(&size) < B_OK)
+					continue;
+				BString contents, url;
+				if (f.ReadAt(0LL, contents.LockBuffer(size), size) < B_OK)
+					continue;
+				while (contents.Length()) {
+					BString line;
+					int32 cr = contents.FindFirst('\n');
+					if (cr < 0)
+						cr = contents.Length();
+					//contents.MoveInto(line, 0, cr);
+					contents.CopyInto(line, 0, cr);
+					contents.Remove(0, cr+1);
+					line.RemoveAll("\r");
+					if (!line.Length())
+						continue;
+					if (!line.ICompare("URL=", 4)) {
+						line.MoveInto(url, 4, line.Length());
+						break;
+					}
+				}
+				if (url.Length()) {
+					args[1] = (char *)url.String();
+					//ArgvReceived(2, args);
+					err = be_roster->Launch("application/x-vnd.Be.URL.http", 1, args+1);
+					continue;
+				}
 			}
+#endif
+			/* eat everything as bookmark files */
+#ifdef HANDLE_BOOKMARK_FILES
+			if (f.ReadAttr("META:url", B_STRING_TYPE, 0LL, buff, B_PATH_NAME_LENGTH) > 0) {
+				//ArgvReceived(2, args);
+				err = be_roster->Launch("application/x-vnd.Be.URL.http", 1, args+1);
+				continue;
+			}
+#endif
 		}
 	}
-#endif
 }
 
 void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
@@ -253,7 +301,7 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 		return;
 	
 	const char *failc = " || read -p 'Press any key'";
-	const char *pausec = "; read -p 'Press any key'";
+	const char *pausec = " ; read -p 'Press any key'";
 	char *args[] = { "/bin/sh", "-c", NULL, NULL};
 
 	Url u(argv[1]);
@@ -333,7 +381,7 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 	}
 
 	if (u.proto == "finger") {
-		BString cmd("finger ");
+		BString cmd("/bin/finger ");
 		
 		if (u.HasUser())
 			cmd << u.user;
@@ -350,7 +398,7 @@ void UrlWrapperApp::ArgvReceived(int32 argc, char **argv)
 
 #ifdef HANDLE_HTTP_WGET
 	if (u.proto == "http") {
-		BString cmd("wget ");
+		BString cmd("/bin/wget ");
 		
 		//cmd << url;
 		if (u.HasUser())

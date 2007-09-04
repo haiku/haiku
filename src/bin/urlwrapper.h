@@ -19,6 +19,8 @@
 
 /* NetPositive Bookmark file type */
 #define HANDLE_BOOKMARK_FILES
+/* M$IE .url files */
+#define HANDLE_URL_FILES
 
 /* file: redirects to Tracker */
 #define HANDLE_FILE

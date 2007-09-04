@@ -9,6 +9,15 @@ resource(1, "BEOS:FILE_TYPES") message
 #ifdef HANDLE_BOOKMARK_FILES
 	"types" =  "application/x-vnd.Be-bookmark",
 #endif
+#ifdef HANDLE_URL_FILES
+	/* setmime -set text/x-url -short "Internet Shortcut" -long "Internet Shortcut File" -sniffRule '0.80      ("[InternetShortcut]")' */
+	"types" = "wwwserver/redirection",
+	"types" = "application/internet-shortcut",
+	"types" = "application/x-url",
+	"types" = "message/external-body",
+	"types" = "text/url",
+	"types" = "text/x-url",
+#endif
 #ifdef HANDLE_FILE
 	"types" = "application/x-vnd.Be.URL.file",
 #endif
