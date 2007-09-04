@@ -422,7 +422,7 @@ typedef struct _UzpOpts {
     int scanimage;      /* -I: scan image files */
 #endif
     int jflag;          /* -j: junk pathnames (unzip) */
-#if (defined(__BEOS__) || defined(MACOS))
+#if (defined(__BEOS__) || defined(MACOS) || defined(HAS_JUNK_EXTRA_FIELD_OPTION))
     int J_flag;         /* -J: ignore BeOS/MacOS extra field info (unzip) */
 #endif
     int lflag;          /* -12slmv: listing format (zipinfo) */
