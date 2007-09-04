@@ -8,61 +8,70 @@
  */
 
 
-#include <Alert.h>
-#include <Autolock.h>
-#include <Path.h>
-#include <MenuItem.h>
-#include <CharacterSet.h>
-#include <CharacterSetRoster.h>
-#include <Screen.h>
-#include <stdio.h>
-
 #include "Constants.h"
 #include "StyledEditApp.h"
 #include "StyledEditWindow.h"
 
+#include <Alert.h>
+#include <Autolock.h>
+#include <MenuBar.h>
+#include <CharacterSet.h>
+#include <CharacterSetRoster.h>
+#include <FilePanel.h>
+#include <MenuItem.h>
+#include <Message.h>
+#include <Path.h>
+#include <Screen.h>
+
+#include <stdio.h>
+
+
 using namespace BPrivate;
+
 
 StyledEditApp * styled_edit_app;
 BRect gWindowRect(7-15, 26-15, 507, 426);
 
 
-void
-cascade()
+namespace 
 {
-	BScreen screen(NULL);
-	BRect screenBorder = screen.Frame();
-	float left = gWindowRect.left + 15;
-	if (left + gWindowRect.Width() > screenBorder.right)
-		left = 7;
+	void
+	cascade()
+	{
+		BScreen screen(NULL);
+		BRect screenBorder = screen.Frame();
+		float left = gWindowRect.left + 15;
+		if (left + gWindowRect.Width() > screenBorder.right)
+			left = 7;
 
-	float top = gWindowRect.top + 15;
-	if (top + gWindowRect.Height() > screenBorder.bottom)
-		top = 26;
+		float top = gWindowRect.top + 15;
+		if (top + gWindowRect.Height() > screenBorder.bottom)
+			top = 26;
 
-	gWindowRect.OffsetTo(BPoint(left,top));	
-}
-
-
-void
-uncascade()
-{
-	BScreen screen(NULL);
-	BRect screenBorder = screen.Frame();
-
-	float left = gWindowRect.left - 15;
-	if (left < 7) {
-		left = screenBorder.right - gWindowRect.Width() - 7;
-		left = left - ((int)left % 15) + 7;
+		gWindowRect.OffsetTo(BPoint(left,top));	
 	}
 
-	float top = gWindowRect.top - 15;
-	if (top < 26) {
-		top = screenBorder.bottom - gWindowRect.Height() - 26;
-		top = top - ((int)left % 15) + 26;
-	}
 
-	gWindowRect.OffsetTo(BPoint(left,top));	
+	void
+	uncascade()
+	{
+		BScreen screen(NULL);
+		BRect screenBorder = screen.Frame();
+
+		float left = gWindowRect.left - 15;
+		if (left < 7) {
+			left = screenBorder.right - gWindowRect.Width() - 7;
+			left = left - ((int)left % 15) + 7;
+		}
+
+		float top = gWindowRect.top - 15;
+		if (top < 26) {
+			top = screenBorder.bottom - gWindowRect.Height() - 26;
+			top = top - ((int)left % 15) + 26;
+		}
+
+		gWindowRect.OffsetTo(BPoint(left,top));	
+	}
 }
 
 
@@ -71,9 +80,10 @@ uncascade()
 
 StyledEditApp::StyledEditApp()
 	: BApplication(APP_SIGNATURE)
+	, fOpenPanel(NULL)
 {
-	fOpenPanel= new BFilePanel();
-	BMenuBar * menuBar =
+	fOpenPanel = new BFilePanel();
+	BMenuBar *menuBar =
 		dynamic_cast<BMenuBar*>(fOpenPanel->Window()->FindView("MenuBar"));
 
 	fOpenAsEncoding = 0;
@@ -110,6 +120,12 @@ StyledEditApp::StyledEditApp()
 }
 
 
+StyledEditApp::~StyledEditApp()
+{
+	delete fOpenPanel;
+}
+
+
 void
 StyledEditApp::DispatchMessage(BMessage *msg, BHandler *handler)
 {
@@ -128,7 +144,7 @@ StyledEditApp::DispatchMessage(BMessage *msg, BHandler *handler)
 		if (msg->FindString("cwd", &cwd) != B_OK)
 			cwd = "";
 
-		ArgvReceived(argc, argv, cwd);
+		ArgvReceivedEx(argc, argv, cwd);
 	} else
 		BApplication::DispatchMessage(msg, handler);
 }
@@ -205,7 +221,7 @@ StyledEditApp::RefsReceived(BMessage *message)
 
 
 void
-StyledEditApp::ArgvReceived(int32 argc, const char* argv[], const char* cwd)
+StyledEditApp::ArgvReceivedEx(int32 argc, const char* argv[], const char* cwd)
 {
 	for (int i = 1 ; (i < argc) ; i++) {
 		BPath path;

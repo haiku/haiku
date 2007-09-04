@@ -18,12 +18,11 @@
 
 
 FindWindow::FindWindow(BRect frame, BHandler *_handler, BString *searchString,
-	bool *caseState, bool *wrapState, bool *backState)
+	bool caseState, bool wrapState, bool backState)
 	: BWindow(frame, "FindWindow", B_MODAL_WINDOW,
-		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS,
-		B_CURRENT_WORKSPACE)
+		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS, B_CURRENT_WORKSPACE)
 {
-	AddShortcut('W',B_COMMAND_KEY,new BMessage(B_QUIT_REQUESTED));
+	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
 	
 	fFindView = new BView(Bounds(), "FindView", B_FOLLOW_ALL, B_WILL_DRAW);
 	fFindView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -31,7 +30,7 @@ FindWindow::FindWindow(BRect frame, BHandler *_handler, BString *searchString,
 
 	font_height height;
 	fFindView->GetFontHeight(&height);
-	float lineHeight = height.ascent+height.descent + height.leading;
+	float lineHeight = height.ascent + height.descent + height.leading;
 
 	float findWidth = fFindView->StringWidth("Find:") + 6;
 
@@ -65,12 +64,12 @@ FindWindow::FindWindow(BRect frame, BHandler *_handler, BString *searchString,
 
 	const char *text = searchString->String();
 
-    fSearchString->SetText(text);
+	fSearchString->SetText(text);
 	fSearchString->MakeFocus(true);
 
-	fCaseSensBox->SetValue(*caseState ? B_CONTROL_ON : B_CONTROL_OFF);
-	fWrapBox->SetValue(*wrapState ? B_CONTROL_ON : B_CONTROL_OFF);
-	fBackSearchBox->SetValue(*backState ? B_CONTROL_ON : B_CONTROL_OFF);
+	fCaseSensBox->SetValue(caseState ? B_CONTROL_ON : B_CONTROL_OFF);
+	fWrapBox->SetValue(wrapState ? B_CONTROL_ON : B_CONTROL_OFF);
+	fBackSearchBox->SetValue(backState ? B_CONTROL_ON : B_CONTROL_OFF);
 }
 
 

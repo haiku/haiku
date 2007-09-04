@@ -18,23 +18,25 @@
 
 #include <Alert.h>
 #include <Autolock.h>
-#include <Debug.h>
-#include <Clipboard.h>
-#include <File.h>
-#include <Menu.h>
-#include <MenuItem.h>
-#include <PrintJob.h>
-#include <Roster.h>
-#include <ScrollView.h>
-#include <String.h>
-#include <TextControl.h>
-#include <TranslationUtils.h>
-#include <Window.h>
-
 #include <CharacterSet.h>
 #include <CharacterSetRoster.h>
+#include <Clipboard.h>
+#include <Debug.h>
+#include <File.h>
+#include <FilePanel.h>
+#include <Menu.h>
+#include <MenuBar.h>
+#include <MenuItem.h>
+#include <PrintJob.h>
+#include <Rect.h>
+#include <ScrollView.h>
+#include <TextControl.h>
+#include <TextView.h>
+#include <TranslationUtils.h>
+#include <Roster.h>
 
 #include <stdlib.h>
+
 
 using namespace BPrivate;
 
@@ -43,8 +45,7 @@ StyledEditWindow::StyledEditWindow(BRect frame, int32 id, uint32 encoding)
 	: BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
 	InitWindow(encoding);
-	BString unTitled;
-	unTitled.SetTo("Untitled ");
+	BString unTitled("Untitled ");
 	unTitled << id;
 	SetTitle(unTitled.String());
 	fSaveItem->SetEnabled(true);
@@ -365,7 +366,7 @@ StyledEditWindow::MessageReceived(BMessage *message)
 		{
 			BRect findWindowFrame(100, 100, 400, 235);
 			BWindow* window = new FindWindow(findWindowFrame, this,
-				&fStringToFind, &fCaseSens, &fWrapAround, &fBackSearch);
+				&fStringToFind, fCaseSens, fWrapAround, fBackSearch);
 			window->Show();
 			break;
 		}
@@ -388,58 +389,45 @@ StyledEditWindow::MessageReceived(BMessage *message)
 		{
 			BRect replaceWindowFrame(100, 100, 400, 284);
 			BWindow* window = new ReplaceWindow(replaceWindowFrame, this,
-				&fStringToFind, &fReplaceString, &fCaseSens, &fWrapAround, &fBackSearch);
+				&fStringToFind, &fReplaceString, fCaseSens, fWrapAround, fBackSearch);
 			window->Show();
 			break;
 		}
 		case MSG_REPLACE:
 		{
-			BString findIt; 
-			BString replaceWith;
-			bool caseSens, wrap, backSearch;
+			message->FindBool("casesens", &fCaseSens);
+			message->FindBool("wrap", &fWrapAround);
+			message->FindBool("backsearch", &fBackSearch);
 
-			message->FindBool("casesens", &caseSens);
-			message->FindBool("wrap", &wrap);
-			message->FindBool("backsearch", &backSearch);
+			message->FindString("FindText", &fStringToFind);
+			message->FindString("ReplaceText", &fReplaceString);
 
-			message->FindString("FindText", &findIt);
-			message->FindString("ReplaceText", &replaceWith);
-			fStringToFind = findIt;
 			fFindAgainItem->SetEnabled(true);
-			fReplaceString = replaceWith;
 			fReplaceSameItem->SetEnabled(true);
-			fCaseSens = caseSens;
-			fWrapAround = wrap;
-			fBackSearch = backSearch;
 
-			Replace(findIt, replaceWith, caseSens, wrap, backSearch);
+			Replace(fStringToFind, fReplaceString, fCaseSens, fWrapAround, fBackSearch);
 			break;
 		}
 		case MENU_REPLACE_SAME:
-			Replace(fStringToFind,fReplaceString,fCaseSens,fWrapAround,fBackSearch);
+			Replace(fStringToFind, fReplaceString, fCaseSens, fWrapAround, fBackSearch);
 			break;
 
 		case MSG_REPLACE_ALL:
 		{
-			BString findIt; 
-			BString replaceWith;
-			bool caseSens, allWindows;
+			message->FindBool("casesens", &fCaseSens);
+			message->FindString("FindText",&fStringToFind);
+			message->FindString("ReplaceText",&fReplaceString);				
 
-			message->FindBool("casesens", &caseSens);
-			message->FindString("FindText",&findIt);
-			message->FindString("ReplaceText",&replaceWith);				
+			bool allWindows;
 			message->FindBool("allwindows", &allWindows);
 
-			fStringToFind = findIt;
 			fFindAgainItem->SetEnabled(true);
-			fReplaceString = replaceWith;
 			fReplaceSameItem->SetEnabled(true);
-			fCaseSens = caseSens;
 
 			if (allWindows)
-				SearchAllWindows(findIt, replaceWith, caseSens);
+				SearchAllWindows(fStringToFind, fReplaceString, fCaseSens);
 			else	
-				ReplaceAll(findIt, replaceWith,caseSens);
+				ReplaceAll(fStringToFind, fReplaceString, fCaseSens);
 			break;	
 		}
 
@@ -508,70 +496,35 @@ StyledEditWindow::MessageReceived(BMessage *message)
 
 		case ALIGN_LEFT:
 			fTextView->SetAlignment(B_ALIGN_LEFT);
-			fClean = false;
-			fUndoCleans = false;
-			fRedoCleans = false;	
-			fRevertItem->SetEnabled(fSaveMessage != NULL);
-			fSaveItem->SetEnabled(true);
-			fUndoItem->SetLabel("Can't Undo");	
-			fUndoItem->SetEnabled(false);
-			fCanUndo = false;
-			fCanRedo = false;
+			_UpdateCleanUndoRedoSaveRevert();
 			break;
 		case ALIGN_CENTER:
 			fTextView->SetAlignment(B_ALIGN_CENTER);
-			fClean = false;
-			fUndoCleans = false;
-			fRedoCleans = false;	
-			fRevertItem->SetEnabled(fSaveMessage != NULL);
-			fSaveItem->SetEnabled(true);
-			fUndoItem->SetLabel("Can't Undo");	
-			fUndoItem->SetEnabled(false);
-			fCanUndo = false;
-			fCanRedo = false;
+			_UpdateCleanUndoRedoSaveRevert();
 			break;
 		case ALIGN_RIGHT:
 			fTextView->SetAlignment(B_ALIGN_RIGHT);
-			fClean = false;
-			fUndoCleans = false;
-			fRedoCleans = false;	
-			fRevertItem->SetEnabled(fSaveMessage != NULL);
-			fSaveItem->SetEnabled(true);
-			fUndoItem->SetLabel("Can't Undo");	
-			fUndoItem->SetEnabled(false);
-			fCanUndo = false;
-			fCanRedo = false;
+			_UpdateCleanUndoRedoSaveRevert();
 			break;
 		case WRAP_LINES:
+		{
+			BRect textRect(fTextView->Bounds());
+			textRect.OffsetTo(B_ORIGIN);
+			textRect.InsetBy(TEXT_INSET,TEXT_INSET);
 			if (fTextView->DoesWordWrap()) {
 				fTextView->SetWordWrap(false);
 				fWrapItem->SetMarked(false);
-				BRect textRect;
-				textRect = fTextView->Bounds();
-				textRect.OffsetTo(B_ORIGIN);
-				textRect.InsetBy(TEXT_INSET,TEXT_INSET);
 				// the width comes from stylededit R5. TODO: find a better way
-				textRect.SetRightBottom(BPoint(1500.0,textRect.RightBottom().y));
-				fTextView->SetTextRect(textRect);
+				textRect.SetRightBottom(BPoint(1500.0, textRect.RightBottom().y));
 			} else {
 				fTextView->SetWordWrap(true);
 				fWrapItem->SetMarked(true);
-				BRect textRect;
-				textRect = fTextView->Bounds();
-				textRect.OffsetTo(B_ORIGIN);
-				textRect.InsetBy(TEXT_INSET,TEXT_INSET);
-				fTextView->SetTextRect(textRect);
-			}	
-			fClean = false;
-			fUndoCleans = false;
-			fRedoCleans = false;	
-			fRevertItem->SetEnabled(fSaveMessage != NULL);
-			fSaveItem->SetEnabled(true);
-			fUndoItem->SetLabel("Can't Undo");	
-			fUndoItem->SetEnabled(false);
-			fCanUndo = false;
-			fCanRedo = false;
+			}
+			fTextView->SetTextRect(textRect);
+
+			_UpdateCleanUndoRedoSaveRevert();
 			break;
+		}
 		case ENABLE_ITEMS:
 			fCutItem->SetEnabled(true);
 			fCopyItem->SetEnabled(true);
@@ -1303,15 +1256,7 @@ StyledEditWindow::ReplaceAll(BString findIt, BString replaceWith, bool caseSensi
 	fTextView->Select(textStart,textFinish);
 	fTextView->ScrollToSelection();
 
-	fClean = false;
-	fUndoCleans = false;
-	fRedoCleans = false;	
-	fRevertItem->SetEnabled(fSaveMessage != NULL);
-	fSaveItem->SetEnabled(true);
-	fUndoItem->SetLabel("Can't Undo");	
-	fUndoItem->SetEnabled(false);
-	fCanUndo = false;
-	fCanRedo = false;
+	_UpdateCleanUndoRedoSaveRevert();
 }
 
 
@@ -1348,15 +1293,8 @@ StyledEditWindow::SetFontSize(float fontSize)
 	fTextView->GetFontAndColor(&font, &sameProperties);
 	font.SetSize(fontSize);
 	fTextView->SetFontAndColor(&font, B_FONT_SIZE);
-	fClean = false;
-	fUndoCleans = false;
-	fRedoCleans = false;
-	fRevertItem->SetEnabled(fSaveMessage != NULL);
-	fSaveItem->SetEnabled(true);
-	fUndoItem->SetLabel("Can't Undo");
-	fUndoItem->SetEnabled(false);
-	fCanUndo = false;
-	fCanRedo = false;
+	
+	_UpdateCleanUndoRedoSaveRevert();
 }
 
 
@@ -1368,15 +1306,8 @@ StyledEditWindow::SetFontColor(const rgb_color *color)
 
 	fTextView->GetFontAndColor(&font, &sameProperties, NULL, NULL);
 	fTextView->SetFontAndColor(&font, 0, color);
-	fClean = false;
-	fUndoCleans = false;
-	fRedoCleans = false;	
-	fRevertItem->SetEnabled(fSaveMessage != NULL);
-	fSaveItem->SetEnabled(true);
-	fUndoItem->SetLabel("Can't Undo");	
-	fUndoItem->SetEnabled(false);
-	fCanUndo = false;
-	fCanRedo = false;
+
+	_UpdateCleanUndoRedoSaveRevert();
 }
 
 
@@ -1407,6 +1338,12 @@ StyledEditWindow::SetFontStyle(const char *fontFamily, const char *fontStyle)
 	if (superItem != NULL)
 		superItem->SetMarked(true);
 
+	_UpdateCleanUndoRedoSaveRevert();
+}
+
+void
+StyledEditWindow::_UpdateCleanUndoRedoSaveRevert()
+{
 	fClean = false;
 	fUndoCleans = false;
 	fRedoCleans = false;	
@@ -1417,3 +1354,4 @@ StyledEditWindow::SetFontStyle(const char *fontFamily, const char *fontStyle)
 	fCanUndo = false;
 	fCanRedo = false;
 }
+

@@ -11,36 +11,46 @@
 
 
 #include <Application.h>
-#include <Message.h>
-#include <FilePanel.h>
 
 
+struct entry_ref;
+
+class BMenu;
+class BHandler;
+class BMessage;
+class BFilePanel;
 class StyledEditWindow;
+
 
 class StyledEditApp : public BApplication {
 	public:
-						StyledEditApp();
-		virtual void 	MessageReceived(BMessage *message);
-				void	ArgvReceived(int32 argc, const char *argv[], const char * cwd);
-		virtual void	RefsReceived(BMessage *message);
-		virtual void	ReadyToRun();
+					StyledEditApp();
+					~StyledEditApp();
 
-		virtual	void	DispatchMessage(BMessage *an_event, BHandler *handler);
+		void 		MessageReceived(BMessage *message);
+		void		RefsReceived(BMessage *message);
+		void		ReadyToRun();
 
-				int32	NumberOfWindows();
-				void	OpenDocument();
-				void	OpenDocument(entry_ref * ref);
-				void	CloseDocument();
+		void		DispatchMessage(BMessage *an_event, BHandler *handler);
+
+		int32		NumberOfWindows();
+		void		OpenDocument();
+		void		OpenDocument(entry_ref * ref);
+		void		CloseDocument();
 
 	private:
-		BFilePanel*		fOpenPanel;
-		BMenu*			fOpenPanelEncodingMenu;
-		uint32			fOpenAsEncoding;
-		int32			fWindowCount;
-		int32			fNextUntitledWindow;
+		void		ArgvReceivedEx(int32 argc, const char *argv[], const char * cwd);
+
+	private:
+		BFilePanel	*fOpenPanel;
+		BMenu		*fOpenPanelEncodingMenu;
+		uint32		fOpenAsEncoding;
+		int32		fWindowCount;
+		int32		fNextUntitledWindow;
 		
 };
 
 extern StyledEditApp* styled_edit_app;
 
 #endif	// STYLED_EDIT_APP
+

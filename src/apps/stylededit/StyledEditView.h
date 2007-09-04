@@ -11,37 +11,40 @@
 #define STYLED_EDIT_VIEW_H
 
 
-#include <File.h>
-#include <DataIO.h>
 #include <String.h>
 #include <TextView.h>
 
 
+class BFile;
+class BHandler;
+class BMessanger;
+
+
 class StyledEditView : public BTextView {
 	public:
-		StyledEditView(BRect viewframe, BRect textframe, BHandler *handler);
-		virtual ~StyledEditView();
+					StyledEditView(BRect viewframe, BRect textframe, 
+						BHandler *handler);
+					~StyledEditView();
 
-		virtual void Select(int32 start, int32 finish);
-		virtual void FrameResized(float width, float height);
+		void 		Select(int32 start, int32 finish);
 	
-		virtual void Reset();
-		virtual status_t GetStyledText(BPositionIO * stream);
-		virtual status_t WriteStyledEditFile(BFile * file);
+		void		Reset();
+		status_t	GetStyledText(BPositionIO * stream);
+		status_t	WriteStyledEditFile(BFile * file);
 
-		virtual void SetEncoding(uint32 encoding);
-		virtual uint32 GetEncoding() const;
+		void 		SetEncoding(uint32 encoding);
+		uint32 		GetEncoding() const;
 
-	protected:
-		virtual void InsertText(const char *text, int32 length, int32 offset, const text_run_array *runs = NULL);
-		virtual void DeleteText(int32 start, int32 finish);
-			
 	private:
-		BHandler	*fHandler;
-		BMessage	*fChangeMessage;
+		void		DeleteText(int32 start, int32 finish);
+		void		FrameResized(float width, float height);
+		void		InsertText(const char *text, int32 length, int32 offset, 
+					const text_run_array *runs = NULL);
+
 		BMessenger 	*fMessenger;
 		bool		fSuppressChanges;
 		BString		fEncoding;
 };
 
 #endif	// STYLED_EDIT_VIEW_H
+

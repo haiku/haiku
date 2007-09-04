@@ -11,27 +11,29 @@
 
 
 #include <Window.h>
-#include <Rect.h>
-#include <Handler.h>
-#include <String.h>
-#include <Message.h>
-#include <View.h>
-#include <TextControl.h>
-#include <CheckBox.h>
-#include <Button.h>
+
+
+class BView;
+class BString;
+class BButton;
+class BHandler;
+class BMessage;
+class BCheckBox;
+class BTextControl;
 
 
 class ReplaceWindow : public BWindow {
 	public:
-		ReplaceWindow(BRect frame, BHandler *_handler,BString *searchString,
-			BString *replaceString, bool *caseState, bool *wrapState, bool *backState);
+					ReplaceWindow(BRect frame, BHandler *_handler,
+						BString *searchString, BString *replaceString,
+						bool caseState, bool wrapState, bool backState);
 
-		virtual void MessageReceived(BMessage* message);
-		virtual void DispatchMessage(BMessage* message, BHandler *handler);
+		void			MessageReceived(BMessage* message);
+		void 			DispatchMessage(BMessage* message, BHandler *handler);
 
 	private:
-		void _SendMessage(uint32 what);
-		void _ChangeUI();		
+		void 			_SendMessage(uint32 what);
+		void 			_ChangeUI();		
 
 		BView 			*fReplaceView;
 		BTextControl	*fSearchString;
@@ -48,3 +50,4 @@ class ReplaceWindow : public BWindow {
 };
 
 #endif	// REPLACE_WINDOW_H
+

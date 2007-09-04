@@ -12,6 +12,7 @@
 
 #include <Window.h>
 
+
 class BButton;
 class BCheckBox;
 class BTextControl;
@@ -20,14 +21,14 @@ class BView;
 
 class FindWindow : public BWindow {
 	public:
-		FindWindow(BRect frame, BHandler* handler, BString *searchString,
-			bool *caseState, bool *wrapState, bool *backState);
+						FindWindow(BRect frame, BHandler* handler, BString *searchString,
+							bool caseState, bool wrapState, bool backState);
 
-		virtual void MessageReceived(BMessage* message);
-		virtual void DispatchMessage(BMessage* message, BHandler* handler);
+		void			MessageReceived(BMessage* message);
+		void			DispatchMessage(BMessage* message, BHandler* handler);
 
 	private:
-		void _SendMessage();
+		void			_SendMessage();
 
 		BView 			*fFindView;
 		BTextControl	*fSearchString;
@@ -41,9 +42,4 @@ class FindWindow : public BWindow {
 };
 
 #endif	// FIND_WINDOW_H
-
-
-
-
-
 

@@ -7,14 +7,14 @@
  *		Andrew Bachmann
  */
 
-
 #include "ColorMenuItem.h"
 
+#include <Message.h>
 
 ColorMenuItem::ColorMenuItem(const char	*label, rgb_color color, BMessage *message)
 	: BMenuItem(label, message, 0, 0)
+	, fItemColor(color)
 {
-	fItemColor = color;
 }
 
 
@@ -22,9 +22,11 @@ void
 ColorMenuItem::DrawContent()
 {
 	BMenu *menu = Menu();
-	rgb_color menuColor = menu->HighColor();
+	if (menu) {
+		rgb_color menuColor = menu->HighColor();
 
-	menu->SetHighColor(fItemColor);
-	BMenuItem::DrawContent();
-	menu->SetHighColor(menuColor);
+		menu->SetHighColor(fItemColor);
+		BMenuItem::DrawContent();
+		menu->SetHighColor(menuColor);
+	}
 }

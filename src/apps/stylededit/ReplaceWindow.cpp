@@ -11,21 +11,23 @@
 #include "Constants.h"
 #include "ReplaceWindow.h"
 
-#include <Messenger.h>
 #include <Button.h>
 #include <CheckBox.h>
+#include <Handler.h>
+#include <Message.h>
+#include <Messenger.h>
+#include <Rect.h>
 #include <String.h>
 #include <TextControl.h>
-#include <Window.h>
+#include <View.h>
 
 
 ReplaceWindow::ReplaceWindow(BRect frame, BHandler *_handler, BString *searchString,
-	BString *replaceString, bool *caseState, bool *wrapState, bool *backState)
+	BString *replaceString, bool caseState, bool wrapState, bool backState)
 	: BWindow(frame, "ReplaceWindow", B_MODAL_WINDOW,
-		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS,
-		B_CURRENT_WORKSPACE) 
+		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS, B_CURRENT_WORKSPACE) 
 {
-	AddShortcut('W',B_COMMAND_KEY,new BMessage(B_QUIT_REQUESTED));
+	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
 	
 	fReplaceView = new BView(Bounds(), "ReplaceView", B_FOLLOW_ALL, B_WILL_DRAW);
 	fReplaceView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -41,7 +43,7 @@ ReplaceWindow::ReplaceWindow(BRect frame, BHandler *_handler, BString *searchStr
 	fReplaceView->AddChild(fReplaceString = new BTextControl(BRect(5, 35, 290, 50), "",
 		replaceWithLabel, NULL, NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP,
 		B_WILL_DRAW | B_NAVIGABLE));
-	float maxWidth = (replaceWithWidth > findWidth ? replaceWithWidth : findWidth) + 1;
+	float maxWidth = (replaceWithWidth > findWidth ? replaceWithWidth : findWidth) + TEXT_INSET;
 	fSearchString->SetDivider(maxWidth);
 	fReplaceString->SetDivider(maxWidth);
 
@@ -78,16 +80,16 @@ ReplaceWindow::ReplaceWindow(BRect frame, BHandler *_handler, BString *searchStr
 	fReplaceString->SetText(replacetext);
 	fSearchString->MakeFocus(true);
 
-	fCaseSensBox->SetValue(*caseState ? B_CONTROL_ON : B_CONTROL_OFF);
-	fWrapBox->SetValue(*wrapState ? B_CONTROL_ON : B_CONTROL_OFF);
-	fBackSearchBox->SetValue(*backState ? B_CONTROL_ON : B_CONTROL_OFF);
+	fCaseSensBox->SetValue(caseState ? B_CONTROL_ON : B_CONTROL_OFF);
+	fWrapBox->SetValue(wrapState ? B_CONTROL_ON : B_CONTROL_OFF);
+	fBackSearchBox->SetValue(backState ? B_CONTROL_ON : B_CONTROL_OFF);
 }
 
 
 void
 ReplaceWindow::MessageReceived(BMessage *msg)
 {
-	switch (msg->what){
+	switch (msg->what) {
 		case MSG_REPLACE:
 			_SendMessage(MSG_REPLACE);
 			break;
@@ -108,22 +110,16 @@ ReplaceWindow::MessageReceived(BMessage *msg)
 void
 ReplaceWindow::_ChangeUI()
 {
-	if (!fUIchange) {
-		fReplaceAllButton->MakeDefault(true);
-		fReplaceButton->SetEnabled(false);
-		fWrapBox->SetValue(B_CONTROL_ON);
-		fWrapBox->SetEnabled(false);
-		fBackSearchBox->SetEnabled(false);
-		fUIchange = true;
-	} else {
-		fReplaceButton->MakeDefault(true);
-		fReplaceButton->SetEnabled(true);
-		fReplaceAllButton->SetEnabled(true);
-		fWrapBox->SetValue(B_CONTROL_OFF);
-		fWrapBox->SetEnabled(true);
-		fBackSearchBox->SetEnabled(true);
-		fUIchange = false;
-	}
+	fWrapBox->SetEnabled(fUIchange);
+	fWrapBox->SetValue(fUIchange ? B_CONTROL_OFF : B_CONTROL_ON);
+
+	fBackSearchBox->SetEnabled(fUIchange);
+
+	fReplaceButton->SetEnabled(fUIchange);
+	fUIchange ? fReplaceButton->MakeDefault(true)
+		: fReplaceAllButton->MakeDefault(true);
+
+	fUIchange = !fUIchange;
 }
 
 

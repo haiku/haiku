@@ -12,17 +12,19 @@
 #include "Constants.h"
 #include "StyledEditView.h"
 
-#include <Message.h>
-#include <Messenger.h>
-#include <Rect.h>
-#include <Region.h>
-#include <TranslationUtils.h>
-#include <Node.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <CharacterSet.h>
 #include <CharacterSetRoster.h>
+#include <DataIO.h>
+#include <File.h>
+#include <Message.h>
+#include <Messenger.h>
+#include <Node.h>
+#include <Rect.h>
+#include <TranslationUtils.h>
 #include <UTF8.h>
+
+#include <stdio.h>
+#include <stdlib.h>
 
 
 using namespace BPrivate;
@@ -32,7 +34,6 @@ StyledEditView::StyledEditView(BRect viewFrame, BRect textBounds, BHandler *hand
 	: BTextView(viewFrame, "textview", textBounds, 
 		B_FOLLOW_ALL, B_FRAME_EVENTS | B_WILL_DRAW)
 { 
-	fHandler = handler;
 	fMessenger = new BMessenger(handler);
 	fSuppressChanges = false;
 }
@@ -45,35 +46,22 @@ StyledEditView::~StyledEditView()
 
 
 void
-StyledEditView::FrameResized(float width, float height)
+StyledEditView::Select(int32 start, int32 finish)
 {
-	BTextView::FrameResized(width, height);
+	fMessenger->SendMessage(start == finish ? DISABLE_ITEMS : ENABLE_ITEMS);
 
-	if (DoesWordWrap()) {
-		BRect textRect;
-		textRect = Bounds();
-		textRect.OffsetTo(B_ORIGIN);
-		textRect.InsetBy(TEXT_INSET, TEXT_INSET);
-		SetTextRect(textRect);
-	}
+	BTextView::Select(start, finish);
+}
 
-/*	// I tried to do some sort of intelligent resize thing but it just doesn't work
-	// so we revert to the R5 stylededit yucky practice of setting the text rect to
-	// some crazy large number when word wrap is turned off :-(
-	 else if (textRect.Width() > TextRect().Width()) {
-		SetTextRect(textRect);
-	}
 
-	BRegion region;
-	GetTextRegion(0,TextLength(),&region);
-	float textWidth = region.Frame().Width();
-	if (textWidth < textRect.Width()) {
-		BRect textRect(B_ORIGIN,BPoint(textWidth+TEXT_INSET*2,Bounds().Height()));
-		textRect.InsetBy(TEXT_INSET,TEXT_INSET);
-		SetTextRect(textRect);
-	}
-	*/
-}				
+void
+StyledEditView::Reset()
+{
+	fSuppressChanges = true;
+	SetText("");
+	fEncoding = "";
+	fSuppressChanges = false;
+}
 
 
 status_t
@@ -145,38 +133,17 @@ StyledEditView::WriteStyledEditFile(BFile* file)
 
 
 void
-StyledEditView::Reset()
-{
-	fSuppressChanges = true;
-	SetText("");
-	fEncoding = "";
-	fSuppressChanges = false;
-}
-
-
-void
-StyledEditView::Select(int32 start, int32 finish)
-{
-	fChangeMessage = new BMessage(start == finish ? DISABLE_ITEMS : ENABLE_ITEMS);
-	fMessenger->SendMessage(fChangeMessage);
-
-	BTextView::Select(start, finish);
-}
-
-
-void
 StyledEditView::SetEncoding(uint32 encoding)
 {
-	if (encoding == 0) {
-		fEncoding = "";
+	fEncoding = "";
+	if (encoding == 0)
 		return;
-	}
 
-	const BCharacterSet* set = BCharacterSetRoster::GetCharacterSetByFontID(encoding);
+	const BCharacterSet* set 
+		= BCharacterSetRoster::GetCharacterSetByFontID(encoding);
+
 	if (set != NULL)
 		fEncoding = set->GetName();
-	else
-		fEncoding = "";
 }
 
 
@@ -186,11 +153,22 @@ StyledEditView::GetEncoding() const
 	if (fEncoding == "")
 		return 0;
 
-	const BCharacterSet* set = BCharacterSetRoster::FindCharacterSetByName(fEncoding.String());
-	if (set != NULL)
+	const BCharacterSet* set = 
+		BCharacterSetRoster::FindCharacterSetByName(fEncoding.String());
+	if(set != NULL)
 		return set->GetFontID();
 
 	return 0;
+}
+
+
+void
+StyledEditView::DeleteText(int32 start, int32 finish)
+{
+	if (!fSuppressChanges)
+		fMessenger-> SendMessage(TEXT_CHANGED);
+
+	BTextView::DeleteText(start, finish);
 }
 
 
@@ -199,18 +177,23 @@ StyledEditView::InsertText(const char *text, int32 length, int32 offset,
 	const text_run_array *runs)
 {
 	if (!fSuppressChanges)
-		fMessenger->SendMessage(new BMessage(TEXT_CHANGED));
+		fMessenger->SendMessage(TEXT_CHANGED);
 
 	BTextView::InsertText(text, length, offset, runs);	
 }
 
 
 void
-StyledEditView::DeleteText(int32 start, int32 finish)
+StyledEditView::FrameResized(float width, float height)
 {
-	if (!fSuppressChanges)
-		fMessenger-> SendMessage(new BMessage(TEXT_CHANGED));
+	BTextView::FrameResized(width, height);
 
-	BTextView::DeleteText(start, finish);
-}
+	if (DoesWordWrap()) {
+		BRect textRect;
+		textRect = Bounds();
+		textRect.OffsetTo(B_ORIGIN);
+		textRect.InsetBy(TEXT_INSET, TEXT_INSET);
+		SetTextRect(textRect);
+	}
+}				
 

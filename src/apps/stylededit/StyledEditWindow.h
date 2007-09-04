@@ -10,29 +10,34 @@
 #define STYLED_EDIT_WINDOW_H
 
 
-#include <FilePanel.h>
-#include <MenuBar.h>
-#include <Message.h>
-#include <Rect.h>
-#include <String.h>
-#include <TextView.h>
 #include <Window.h>
+#include <String.h>
+#include <Message.h>
 
 
+struct entry_ref;
+
+class BMenu;
+class BMessage;
+class BMenuBar;
+class BMenuItem;
+class BFilePanel;
+class BScrollView;
 class StyledEditView;
+
 
 class StyledEditWindow : public BWindow {
 	public:
 						StyledEditWindow(BRect frame, int32 id, uint32 encoding = 0);
 						StyledEditWindow(BRect frame, entry_ref *ref, uint32 encoding = 0);
-		virtual			~StyledEditWindow();
+						~StyledEditWindow();
 	
-		virtual void	Quit();
-		virtual bool 	QuitRequested();
-		virtual void 	MessageReceived(BMessage *message);
-		virtual void	MenusBeginning();
+		void			Quit();
+		bool			QuitRequested();
+		void			MessageReceived(BMessage *message);
+		void			MenusBeginning();
 
-		status_t 		Save(BMessage *message = 0);
+		status_t		Save(BMessage *message = 0);
 		status_t		SaveAs(BMessage *message = 0);
 		void			OpenFile(entry_ref *ref); 
 		status_t		PageSetup(const char *documentname);
@@ -43,13 +48,15 @@ class StyledEditWindow : public BWindow {
 		void			InitWindow(uint32 encoding = 0);
 		bool			Search(BString searchfor, bool casesens, bool wrap, bool backsearch);
 		void			FindSelection();
-		bool			Replace(BString findthis, BString replacewith, bool casesens, bool wrap, bool backsearch);
+		bool			Replace(BString findthis, BString replacewith, bool casesens, 
+							bool wrap, bool backsearch);
 		void			ReplaceAll(BString find, BString replace, bool casesens);
 		void			SetFontSize(float fontSize);
 		void			SetFontColor(const rgb_color *color);
 		void			SetFontStyle(const char *fontFamily, const char *fontStyle);
 		status_t		_LoadFile(entry_ref* ref);
 		void			RevertToSaved();
+		void			_UpdateCleanUndoRedoSaveRevert();
 
 		BMenuBar		*fMenuBar;
 		BMessage		*fPrintSettings;
@@ -85,7 +92,7 @@ class StyledEditWindow : public BWindow {
 		BMenuItem		*fAlignCenter;
 		BMenuItem		*fAlignRight;
 
-		BString         fStringToFind;
+		BString			fStringToFind;
 		BString			fReplaceString;
 
 		// undo modes
@@ -103,7 +110,7 @@ class StyledEditWindow : public BWindow {
 		bool			fWrapAround;
 		bool			fBackSearch;
 
-		StyledEditView  *fTextView;
+		StyledEditView	*fTextView;
 		BScrollView		*fScrollView;
 
 		BFilePanel		*fSavePanel;
@@ -111,3 +118,4 @@ class StyledEditWindow : public BWindow {
 };
 
 #endif	// STYLED_EDIT_WINDOW_H
+

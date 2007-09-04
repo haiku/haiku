@@ -76,3 +76,4 @@ const uint32 SAVE_AS_ENCODING			= 'FPse';
 const uint32 SAVE_THEN_QUIT				= 'FPsq';
 
 #endif	// CONSTANTS_H
+
