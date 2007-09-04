@@ -1107,7 +1107,7 @@ static int set_file_attrs( const char *name,
     ptr   = (unsigned char *)attr_buff;
     guard = ptr + attr_size;
 
-    fd = open( name, O_RDWR | O_NOTRAVERSE );
+    fd = open( name, O_RDONLY | O_NOTRAVERSE );
     if( fd < 0 ) {
         return errno; /* should it be -fd ? */
     }
