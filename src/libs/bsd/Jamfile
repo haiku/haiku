@@ -5,6 +5,7 @@ SetSubDirSupportedPlatforms $(HAIKU_BONE_COMPATIBLE_PLATFORMS) ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 
 SharedLibrary libbsd.so :
+	daemon.c
 	err.c
 	fgetln.c
 	getpass.c

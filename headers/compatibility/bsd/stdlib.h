@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _BSD_STDLIB_H_
@@ -13,6 +13,7 @@
 extern "C" {
 #endif
 
+int			daemon(int noChangeDir, int noClose);
 const char	*getprogname(void);
 void		setprogname(const char *programName);
 
