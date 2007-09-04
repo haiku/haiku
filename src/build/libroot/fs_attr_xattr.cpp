@@ -36,8 +36,8 @@ using std::map;
 using std::string;
 
 // the namespace all attributes live in
-static const char* kAttributeNamespace = "user.";
-static const int kAttributeNamespaceLen = 5;
+static const char* kAttributeNamespace = "user.haiku.";
+static const int kAttributeNamespaceLen = 11;
 
 // the maximum length of an attribute listing we support
 static const int kMaxAttributeListingLength = 10240;
@@ -45,6 +45,65 @@ static const int kMaxAttributeListingLength = 10240;
 // the maximum attribute length we support
 static const int kMaxAttributeLength = 10240 * 4;
 
+
+// mangle_attribute_name
+static string
+mangle_attribute_name(const char* name)
+{
+	// prepend our xattr namespace and translate:
+	// '/' -> "%\"
+	// '%' -> "%%"
+
+	string mangledName = kAttributeNamespace;
+	for (int i = 0; name[i] != '\0'; i++) {
+		char c = name[i];
+		switch (c) {
+			case '/':
+				mangledName += "%\\";
+				break;
+			case '%':
+				mangledName += "%%";
+				break;
+			default:
+				mangledName += c;
+				break;
+		}
+	}
+	return mangledName;
+}
+
+
+// demangle_attribute_name
+static bool
+demangle_attribute_name(const char* name, string& demangledName)
+{
+	// chop of our xattr namespace and translate:
+	// "%\" -> '/'
+	// "%%" -> '%'
+
+	if (strncmp(name, kAttributeNamespace, kAttributeNamespaceLen) != 0)
+		return false;
+
+	name += kAttributeNamespaceLen;
+
+	demangledName = "";
+
+	for (int i = 0; name[i] != '\0'; i++) {
+		char c = name[i];
+		if (c == '%') {
+			c = name[++i];
+			if (c == '%')
+				demangledName += c;
+			else if (c == '\\')
+				demangledName += '/';
+			else
+				return false;
+		} else
+			demangledName += c;
+	}
+
+	return true;
+}
 
 
 namespace {
@@ -158,10 +217,11 @@ public:
 			fListingIndex += nameLen + 1;
 
 			// check the attribute namespace
-			if (strncmp(name, kAttributeNamespace, kAttributeNamespaceLen) != 0)
+			string demangledName;
+			if (!demangle_attribute_name(name, demangledName))
 				continue;
-			name += kAttributeNamespaceLen;
-			nameLen -= kAttributeNamespaceLen;
+			name = demangledName.c_str();
+			nameLen = demangledName.length();
 
 			if (nameLen == 0) {
 				// Uh, weird attribute.
@@ -393,9 +453,8 @@ fs_read_attr(int fd, const char *_attribute, uint32 type, off_t pos,
 		return -1;
 	}
 
-	// prepend the attribute namespace
-	string attribute = kAttributeNamespace;
-	attribute += _attribute;
+	// mangle the attribute name
+	string attribute = mangle_attribute_name(_attribute);
 
 	// read the attribute
 	char attributeBuffer[sizeof(AttributeHeader) + kMaxAttributeLength];
@@ -455,9 +514,8 @@ fs_write_attr(int fd, const char *_attribute, uint32 type, off_t pos,
 		return -1;
 	}
 
-	// prepend the attribute namespace
-	string attribute = kAttributeNamespace;
-	attribute += _attribute;
+	// mangle the attribute name
+	string attribute = mangle_attribute_name(_attribute);
 
 	// prepare an attribute buffer
 	char attributeBuffer[sizeof(AttributeHeader) + kMaxAttributeLength];
@@ -500,9 +558,8 @@ fs_remove_attr(int fd, const char *_attribute)
 		return -1;
 	}
 
-	// prepend the attribute namespace
-	string attribute = kAttributeNamespace;
-	attribute += _attribute;
+	// mangle the attribute name
+	string attribute = mangle_attribute_name(_attribute);
 
 	// remove attribute
 	int result;
@@ -538,9 +595,8 @@ fs_stat_attr(int fd, const char *_attribute, struct attr_info *attrInfo)
 		return -1;
 	}
 
-	// prepend the attribute namespace
-	string attribute = kAttributeNamespace;
-	attribute += _attribute;
+	// mangle the attribute name
+	string attribute = mangle_attribute_name(_attribute);
 
 	// read the attribute
 	char attributeBuffer[sizeof(AttributeHeader) + kMaxAttributeLength];
