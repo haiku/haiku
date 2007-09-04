@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2007, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SYS_SOCKET_H
@@ -122,17 +122,36 @@ struct cmsghdr {
 	/* data follows */
 };
 
+/* cmsghdr access macros */
+#define	CMSG_DATA(cmsg) ((unsigned char *)(cmsg) \
+	+ _ALIGN(sizeof(struct cmsghdr)))
+#define	CMSG_NXTHDR(mhdr, cmsg)	\
+	(((char *)(cmsg) + _ALIGN((cmsg)->cmsg_len) \
+	+ _ALIGN(sizeof(struct cmsghdr)) \
+		> (char *)(mhdr)->msg_control + (mhdr)->msg_controllen) \
+		? (struct cmsghdr *)NULL \
+		: (struct cmsghdr *)((char *)(cmsg) + _ALIGN((cmsg)->cmsg_len)))
+#define	CMSG_FIRSTHDR(mhdr) \
+	((mhdr)->msg_controllen >= sizeof(struct cmsghdr) \
+	? (struct cmsghdr *)(mhdr)->msg_control \
+	: (struct cmsghdr *)NULL)
+
 
 #if __cplusplus
 extern "C" {
 #endif
 
 int 	accept(int socket, struct sockaddr *address, socklen_t *_addressLength);
-int		bind(int socket, const struct sockaddr *address, socklen_t addressLength);
-int		connect(int socket, const struct sockaddr *address, socklen_t addressLength);
-int     getpeername(int socket, struct sockaddr *address, socklen_t *_addressLength);
-int     getsockname(int socket, struct sockaddr *address, socklen_t *_addressLength);
-int     getsockopt(int socket, int level, int option, void *value, socklen_t *_length);
+int		bind(int socket, const struct sockaddr *address,
+			socklen_t addressLength);
+int		connect(int socket, const struct sockaddr *address,
+			socklen_t addressLength);
+int     getpeername(int socket, struct sockaddr *address,
+			socklen_t *_addressLength);
+int     getsockname(int socket, struct sockaddr *address,
+			socklen_t *_addressLength);
+int     getsockopt(int socket, int level, int option, void *value,
+			socklen_t *_length);
 int		listen(int socket, int backlog);
 ssize_t recv(int socket, void *buffer, size_t length, int flags);
 ssize_t recvfrom(int socket, void *buffer, size_t bufferLength, int flags,
@@ -142,7 +161,8 @@ ssize_t send(int socket, const void *buffer, size_t length, int flags);
 ssize_t	sendmsg(int socket, const struct msghdr *message, int flags);
 ssize_t sendto(int socket, const void *message, size_t length, int flags,
 			const struct sockaddr *address, socklen_t addressLength);
-int     setsockopt(int socket, int level, int option, const void *value, socklen_t length);
+int     setsockopt(int socket, int level, int option, const void *value,
+			socklen_t length);
 int		shutdown(int socket, int how);
 int		socket(int domain, int type, int protocol);
 int		sockatmark(int socket);

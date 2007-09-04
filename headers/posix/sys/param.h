@@ -1,10 +1,13 @@
+/*
+ * Copyright 2002-2007, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _SYS_PARAM_H
 #define _SYS_PARAM_H
-/* 
-** Distributed under the terms of the OpenBeOS License.
-*/
+
 
 #include <limits.h>
+
 
 #define MAXPATHLEN      PATH_MAX
 #define MAXSYMLINKS		SYMLOOP_MAX
@@ -12,15 +15,19 @@
 #define NOFILE          OPEN_MAX
 
 #ifndef MIN
-  #define MIN(a,b) (((a) < (b)) ? (a) : (b))
+#	define MIN(a,b) (((a) < (b)) ? (a) : (b))
 #endif
 #ifndef MAX
-  #define MAX(a,b) (((a) > (b)) ? (a) : (b))
+#	define MAX(a,b) (((a) > (b)) ? (a) : (b))
 #endif
+
+#define _ALIGNBYTES	(sizeof(long) - 1)
+#define _ALIGN(p) \
+	(((u_long)(p) + _ALIGNBYTES) &~ _ALIGNBYTES)
 
 /* maximum possible length of this machine's hostname */
 #ifndef MAXHOSTNAMELEN
-  #define MAXHOSTNAMELEN 256
+#	define MAXHOSTNAMELEN 256
 #endif
 
 #endif	/* _SYS_PARAM_H */
