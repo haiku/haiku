@@ -1,0 +1,36 @@
+SubDir HAIKU_TOP src tools unzip ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin unzip ] ;
+
+if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
+	DEFINES += HAVE_TERMIOS_H=1 HAS_JUNK_EXTRA_FIELD_OPTION=1 ;
+}
+
+USES_BE_API on <build>libunzip.a <build>unzip = true ;
+
+BuildPlatformStaticLibrary <build>libunzip.a : 
+	crc32.c
+	ttyio.c
+	crctab.c
+	crypt.c
+	envargs.c
+	explode.c
+	extract.c
+	fileio.c
+	globals.c
+	inflate.c
+	list.c
+	match.c
+	process.c
+	zipinfo.c
+	beos.c
+	beosmain.cpp
+;
+
+BuildPlatformMain <build>unzip :
+	unzip.c
+	unreduce.c
+	unshrink.c
+	: <build>libunzip.a $(HOST_LIBBE)
+;
+
