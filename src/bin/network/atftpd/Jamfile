@@ -1,0 +1,19 @@
+SubDir HAIKU_TOP src bin network atftpd ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
+
+BinCommand atftpd :
+	argz.c
+	logger.c
+	options.c
+	stats.c
+	tftp_def.c
+	tftp_io.c
+	tftpd.c
+	tftpd_file.c
+	tftpd_list.c
+	tftpd_mcast.c
+	tftpd_mtftp.c
+	tftpd_pcre.c
+	: libbsd.so $(TARGET_NETWORK_LIBS)
+;
