@@ -63,6 +63,10 @@ AddSymlinkToHaikuImage home config bin : /beos/bin/crashing_app : crash ;
 AddSourceDirectoryToHaikuImage src/kits/storage ;
 AddSourceDirectoryToHaikuImage src/tests/servers/debug : 1 ;
 
+# Unzips the given zip archive onto the image under /boot/develop/tools.
+UnzipArchiveToHaikuImage develop tools
+	: /home/bonefish/develop/haiku/misc/gcc-2.95.3-beos-070218/gcc-2.95.3_binutils-2.17_rel-070218.zip ;
+
 # Specify scripts that shall be run when populating the image/installation
 # directory. The "early" script is run before anything has been copied onto
 # the image/into the installation directory. The "late" script is run after

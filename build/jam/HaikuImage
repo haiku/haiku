@@ -449,6 +449,7 @@ AddTargetVariableToScript $(script) : <build>copyattr ;
 AddTargetVariableToScript $(script) : <build>makebootable ;
 AddTargetVariableToScript $(script) : <build>rc ;
 AddTargetVariableToScript $(script) : <build>resattr ;
+AddTargetVariableToScript $(script) : <build>unzip ;
 #AddTargetVariableToScript $(script) : $(HAIKU_IMAGE) : imagePath ;
 	# causes a cyclic dependency
 AddVariableToScript $(script) : imagePath
@@ -459,11 +460,13 @@ AddVariableToScript $(script) : sourceDirsToCopy
 # create the other scripts
 HAIKU_IMAGE_MAKE_DIRS_SCRIPT = <HaikuImage>haiku.image-make-dirs ;
 HAIKU_IMAGE_COPY_FILES_SCRIPT = <HaikuImage>haiku.image-copy-files ;
+HAIKU_IMAGE_UNZIP_FILES_SCRIPT = <HaikuImage>haiku.image-unzip-files ;
 MakeLocate $(HAIKU_IMAGE_MAKE_DIRS_SCRIPT) $(HAIKU_IMAGE_COPY_FILES_SCRIPT)
-	: $(HAIKU_OUTPUT_DIR) ;
+	$(HAIKU_IMAGE_UNZIP_FILES_SCRIPT) : $(HAIKU_OUTPUT_DIR) ;
 
 CreateHaikuImageMakeDirectoriesScript $(HAIKU_IMAGE_MAKE_DIRS_SCRIPT) ;
 CreateHaikuImageCopyFilesScript $(HAIKU_IMAGE_COPY_FILES_SCRIPT) ;
+CreateHaikuImageUnzipFilesScript $(HAIKU_IMAGE_UNZIP_FILES_SCRIPT) ;
 
 # Convenience wrapper rule around BuildHaikuImage.
 rule _BuildHaikuImage
@@ -481,6 +484,7 @@ rule _BuildHaikuImage
 		$(HAIKU_IMAGE_EARLY_USER_SCRIPTS)
 		$(HAIKU_IMAGE_MAKE_DIRS_SCRIPT)
 		$(HAIKU_IMAGE_COPY_FILES_SCRIPT)
+		$(HAIKU_IMAGE_UNZIP_FILES_SCRIPT)
 		$(HAIKU_IMAGE_LATE_USER_SCRIPTS)
 		: $(isImage)
 	;
@@ -490,6 +494,7 @@ rule _BuildHaikuImage
 		$(HAIKU_IMAGE_INIT_VARIABLES_SCRIPT)
 		$(HAIKU_IMAGE_MAKE_DIRS_SCRIPT)
 		$(HAIKU_IMAGE_COPY_FILES_SCRIPT)
+		$(HAIKU_IMAGE_UNZIP_FILES_SCRIPT)
 	;
 }
 

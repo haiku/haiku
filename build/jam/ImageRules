@@ -202,6 +202,17 @@ rule AddSymlinkToContainer container : directoryTokens : linkTarget : linkName
 	SYMLINKS_TO_INSTALL on $(directory) += $(link) ;
 }
 
+rule UnzipArchiveToContainer container : directoryTokens : zipFile
+{
+	# UnzipArchiveToContainer <container> : <directory> : <zipFile> ] ;
+	#
+
+	local directory = [ AddDirectoryToContainer $(container)
+		: $(directoryTokens) ] ;
+
+	ZIP_FILES_TO_INSTALL on $(directory) += $(zipFile) ;
+}
+
 rule AddDriversToContainer container : relativeDirectoryTokens : targets
 {
 	# AddDriversToContainer <container> : <relative directory> : <targets> ;
@@ -441,6 +452,45 @@ actions AddSymlinkToContainerCopyFilesScript
 }
 
 
+rule CreateContainerUnzipFilesScript container : script
+{
+	MakeLocate $(script) : $(HAIKU_OUTPUT_DIR) ;
+	Always $(script) ;
+
+	local initScript = [ InitScript $(script) ] ;
+
+	local scriptBody
+		= [ FSameTargetWithPrependedGrist $(script) : script-body ] ;
+	LOCATE on $(scriptBody) = [ on $(script) return $(LOCATE) ] ;
+	Depends $(scriptBody) : $(initScript) ;
+	Depends $(script) : $(scriptBody) ;
+
+	local dir ;
+	for dir in [ on $(container) return $(HAIKU_INSTALL_DIRECTORIES) ] {
+		local zipFiles = [ on $(dir) return $(ZIP_FILES_TO_INSTALL) ] ;
+		local zipFile ;
+		for zipFile in $(zipFiles) {
+			# use a unique dummy target for this file, on which we
+			# can define the TARGET_DIR variable
+			local dummyTarget = $(script)-dummy-$(dir:G=)-$(zipFile) ;
+			NotFile $(dummyTarget) ;
+			TARGET_DIR on $(dummyTarget) = $(dir:G=) ;
+
+			Depends $(dummyTarget) : $(initScript) $(zipFile) ;
+			Depends $(script) : $(dummyTarget) ;
+
+			AddUnzipFileToContainerUnzipFilesScript $(dummyTarget)
+				: $(initScript) $(zipFile) ;
+		}
+	}
+}
+
+actions AddUnzipFileToContainerUnzipFilesScript
+{
+	echo unzipFile "\"$(2[2])\"" "\"$(TARGET_DIR)\"" >> $(2[1])
+}
+
+
 #pragma mark - Haiku Image rules
 
 rule SetUpdateHaikuImageOnly flag
@@ -496,6 +546,18 @@ rule AddSourceDirectoryToHaikuImage dirTokens : alwaysUpdate
 	}
 }
 
+rule UnzipArchiveToHaikuImage dirTokens : zipFile : alwaysUpdate
+{
+	# UnzipArchiveToHaikuImage <dirTokens> : <zipFile> : <alwaysUpdate> ;
+
+	# If the image shall only be updated, we unzip only, if explicitely
+	# requested.
+	if ! [ IsUpdateHaikuImageOnly ] || $(alwaysUpdate) {
+		UnzipArchiveToContainer $(HAIKU_IMAGE_CONTAINER_NAME) : $(dirTokens)
+			: $(zipFile) ;
+	}
+}
+
 rule AddDriversToHaikuImage relativeDirectoryTokens : targets
 {
 	# AddDriversToHaikuImage <relative directory> : <targets> ;
@@ -529,6 +591,11 @@ rule CreateHaikuImageMakeDirectoriesScript script
 rule CreateHaikuImageCopyFilesScript script
 {
 	CreateContainerCopyFilesScript $(HAIKU_IMAGE_CONTAINER_NAME) : $(script) ;
+}
+
+rule CreateHaikuImageUnzipFilesScript script
+{
+	CreateContainerUnzipFilesScript $(HAIKU_IMAGE_CONTAINER_NAME) : $(script) ;
 }
 
 rule BuildHaikuImage haikuImage : scripts : isImage

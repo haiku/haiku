@@ -18,6 +18,7 @@
 # makebootable
 # resattr
 # rc
+# unzip
 #
 if [ $# -gt 0 ]; then
 	. $1
@@ -52,6 +53,30 @@ else
 	rm=rm
 	mkindex=mkindex
 fi
+
+
+unzipFile()
+{
+	# unzipFile <archive> <directory>
+	zipFile=$1
+	targetUnzipDir=$2
+
+	echo "Unzipping $zipFile ..."
+
+	if [ $isImage ]; then
+		unzipDir=$tmpDir/unzip
+		rm -rf $unzipDir
+		mkdir -p $unzipDir
+
+		$unzip -q -d $unzipDir $zipFile
+		$cp -r ${sPrefix}$unzipDir/. ${tPrefix}$targetUnzipDir
+
+		rm -rf $unzipDir
+	else
+		$unzip -q -d ${tPrefix}$targetUnzipDir ${sPrefix}$zipFile
+	fi
+}
+
 
 # create the image and mount it
 if [ $isImage ]; then
