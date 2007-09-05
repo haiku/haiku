@@ -170,6 +170,26 @@ public:
 			sAttributeDirectories[fFakeDir] = this;
 		}
 
+		string tempPath;
+		if (!path) {
+			// We've got no path. If the file descriptor is one of our own and
+			// not a system FD, we need to get a path for it.
+			Descriptor*	descriptor = get_descriptor(fileFD);
+			if (descriptor && !descriptor->IsSystemFD()) {
+				if (SymlinkDescriptor* symlinkDescriptor
+						= dynamic_cast<SymlinkDescriptor*>(descriptor)) {
+					status_t error = symlinkDescriptor->GetPath(tempPath);
+					if (error != B_OK)
+						return error;
+					path = tempPath.c_str();
+					fileFD = -1;
+				} else {
+					// We don't know how to get a path.
+					return B_BAD_VALUE;
+				}
+			}
+		}
+
 		if (path) {
 			// A path was given -- check, if it's a symlink. If so we need to
 			// keep the path, otherwise we open a FD.
