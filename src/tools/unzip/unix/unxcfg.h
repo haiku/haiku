@@ -28,4 +28,8 @@
 #  ifndef EOK
 #    define EOK B_OK
 #  endif
-#endif	// __BEOS__
+
+#  define HAIKU_USE_KERN_OPEN 1
+extern int _kern_open(int fd, const char *path, int openMode, int perms);
+
+#endif	// !__BEOS__

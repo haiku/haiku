@@ -1107,10 +1107,16 @@ static int set_file_attrs( const char *name,
     ptr   = (unsigned char *)attr_buff;
     guard = ptr + attr_size;
 
+#ifdef HAIKU_USE_KERN_OPEN
+    fd = _kern_open( -1, name, O_RDONLY | O_NOTRAVERSE, 0 );
+	if( fd < 0 )
+         return fd;
+#else
     fd = open( name, O_RDONLY | O_NOTRAVERSE );
     if( fd < 0 ) {
         return errno; /* should it be -fd ? */
     }
+#endif
 
     while( ptr < guard ) {
         ssize_t              wrote_bytes;
