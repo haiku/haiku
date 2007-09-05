@@ -2411,14 +2411,8 @@ _user_setpgid(pid_t processID, pid_t groupID)
 {
 	struct thread *thread = thread_get_current_thread();
 	struct team *currentTeam = thread->team;
-	struct process_group *group = NULL, *freeGroup = NULL;
 	struct team *team;
-	cpu_status state;
 	team_id teamID = -1;
-	status_t status = B_OK;
-
-	// TODO: we might want to notify waiting wait_for_child() threads in case
-	//	they wait for children of the former process group ID (see wait_test_4.cpp)
 
 	if (groupID < 0)
 		return B_BAD_VALUE;
@@ -2439,39 +2433,35 @@ _user_setpgid(pid_t processID, pid_t groupID)
 
 			return B_NOT_ALLOWED;
 		}
-
-		status = B_OK;
 	} else {
-		state = disable_interrupts();
-		GRAB_THREAD_LOCK();
+		InterruptsSpinLocker _(thread_spinlock);
 
 		thread = thread_get_thread_struct_locked(processID);
 
 		// the thread must be the team's main thread, as that
 		// determines its process ID
-		if (thread != NULL && thread == thread->team->main_thread) {
-			// check if the thread is in a child team of the calling team and
-			// if it's already a process group leader and in the same session
-			if (thread->team->parent != currentTeam
-				|| is_process_group_leader(thread->team)
-				|| thread->team->session_id != currentTeam->session_id)
-				status = B_NOT_ALLOWED;
-			else
-				teamID = thread->team->id;
-		} else
-			status = B_BAD_THREAD_ID;
+		if (thread == NULL && thread != thread->team->main_thread)
+			return B_BAD_THREAD_ID;
 
-		RELEASE_THREAD_LOCK();
-		restore_interrupts(state);
+		// check if the thread is in a child team of the calling team and
+		// if it's already a process group leader and in the same session
+		if (thread->team->parent != currentTeam
+			|| is_process_group_leader(thread->team)
+			|| thread->team->session_id != currentTeam->session_id) {
+			return B_NOT_ALLOWED;
+		}
+
+		// TODO: According to the standard, the call is also supposed to fail
+		// on a child, when the child already has executed exec*().
+
+		teamID = thread->team->id;
 	}
-
-	if (status != B_OK)
-		return status;
 
 	// if the group ID is not specified, a new group should be created
 	if (groupID == 0)
 		groupID = processID;
 
+	struct process_group *group = NULL;
 	if (groupID == processID) {
 		// We need to create a new process group for this team
 		group = create_process_group(groupID);
@@ -2479,34 +2469,44 @@ _user_setpgid(pid_t processID, pid_t groupID)
 			return B_NO_MEMORY;
 	}
 
-	state = disable_interrupts();
-	GRAB_TEAM_LOCK();
+	status_t status = B_OK;
+	struct process_group *freeGroup = NULL;
+
+	InterruptsSpinLocker locker(team_spinlock);
 
 	team = team_get_team_struct_locked(teamID);
 	if (team != NULL) {
 		if (processID == groupID) {
-			// we created a new process group, let us insert it into the team's session
+			// we created a new process group, let us insert it into the team's
+			// session
 			insert_group_into_session(team->group->session, group);
 			remove_team_from_group(team, &freeGroup);
 			insert_team_into_group(group, team);
 		} else {
-			// check if this team can have the group ID; there must be one matching
-			// process ID in the team's session
+			// check if this team can have the group ID; there must be one
+			// matching process ID in the team's session
 
-			struct process_group *group =
+			struct process_group *targetGroup =
 				team_get_process_group_locked(team->group->session, groupID);
-			if (group) {
+			if (targetGroup != NULL) {
 				// we got a group, let's move the team there
 				remove_team_from_group(team, &freeGroup);
-				insert_team_into_group(group, team);
+				insert_team_into_group(targetGroup, team);
 			} else
 				status = B_NOT_ALLOWED;
 		}
 	} else
 		status = B_NOT_ALLOWED;
 
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
+	// Changing the process group might have changed the situation for a parent
+	// waiting in wait_for_child(). Hence we notify it.
+	if (status == B_OK) {
+		team->parent->dead_children->condition_variable.NotifyAll(false);
+		team->parent->stopped_children->condition_variable.NotifyAll(false);
+		team->parent->continued_children->condition_variable.NotifyAll(false);
+	}
+
+	locker.Unlock();
 
 	if (status != B_OK && group != NULL) {
 		// in case of error, the group hasn't been added into the hash
