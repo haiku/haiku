@@ -273,3 +273,15 @@ actions DataFileToSourceFile1
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 	$(2[1]) $(DATA_VARIABLE) $(SIZE_VARIABLE) $(2[2]) $(1)
 }
+
+rule DownloadFile target : url
+{
+	URL on $(target) = $(url) ;
+
+	DownloadFile1 $(target) ;
+}
+
+actions DownloadFile1
+{
+	wget -O $(1) $(URL)
+}
