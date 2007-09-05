@@ -300,7 +300,8 @@ class HostSymLink : public SymLink, public HostNode {
 public:
 	HostSymLink()
 		: SymLink(),
-		  HostNode()
+		  HostNode(),
+		  fPath(NULL)
 	{
 	}
 
@@ -858,7 +859,8 @@ private:
 // #pragma mark -
 
 static fssh_status_t copy_entry(FSDomain *sourceDomain, const char *source,
-	FSDomain *targetDomain, const char *target, const Options &options);
+	FSDomain *targetDomain, const char *target, const Options &options,
+	bool dereference);
 
 static FSDomain *
 get_file_domain(const char *target, const char *&fsTarget)
@@ -931,7 +933,7 @@ copy_dir_contents(FSDomain *sourceDomain, const char *source,
 		PathDeleter targetDeleter(targetEntry);
 
 		fssh_status_t error = copy_entry(sourceDomain, sourceEntry,
-			targetDomain, targetEntry, options);
+			targetDomain, targetEntry, options, false);
 		if (error != FSSH_B_OK)
 			return error;
 	}
@@ -1032,12 +1034,13 @@ copy_attributes(const char *source, Node *sourceNode, const char *target,
 
 static fssh_status_t
 copy_entry(FSDomain *sourceDomain, const char *source,
-	FSDomain *targetDomain, const char *target, const Options &options)
+	FSDomain *targetDomain, const char *target, const Options &options,
+	bool dereference)
 {
 	// open the source node
 	Node *sourceNode;
 	fssh_status_t error = sourceDomain->Open(source,
-		FSSH_O_RDONLY | (options.dereference ? 0 : FSSH_O_NOTRAVERSE),
+		FSSH_O_RDONLY | (dereference ? 0 : FSSH_O_NOTRAVERSE),
 		sourceNode);
 	if (error != FSSH_B_OK) {
 		fprintf(stderr, "Error: Failed to open source path `%s': %s\n", source,
@@ -1365,7 +1368,7 @@ command_cp(int argc, const char* const* argv)
 				PathDeleter targetDeleter(targetEntry);
 
 				error = copy_entry(sourceDomain, source, targetDomain,
-					targetEntry, options);
+					targetEntry, options, options.dereference);
 			}
 		} else {
 			// 1.2. target is no dir:
@@ -1377,7 +1380,7 @@ command_cp(int argc, const char* const* argv)
 			//    -> we create the target as a clone of the source
 			//         (copy_entry(<source>, <target>))
 			error = copy_entry(sourceDomain, source, targetDomain, target,
-				options);
+				options, options.dereference);
 		}
 
 		if (error != 0)
