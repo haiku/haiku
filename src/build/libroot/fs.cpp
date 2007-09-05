@@ -159,7 +159,7 @@ normalize_entry_path(const char *path, string &normalizedPath)
 	}
 
 	// catch special case: no leaf, or leaf is a directory
-	if (!leafName || strcmp(leafName, ".") == 0 || strcmp(leafName, ".."))
+	if (!leafName || strcmp(leafName, ".") == 0 || strcmp(leafName, "..") == 0)
 		return normalize_dir_path(path, normalizedPath);
 	
 	// normalize the dir path
@@ -514,7 +514,7 @@ open_file(const char *path, int openMode, int perms)
 	}
 	
 	// cache path, if this is a directory
-	if (S_ISDIR(st.st_mode))
+	if (exists && S_ISDIR(st.st_mode))
 		add_dir_path(path, NodeRef(st));
 	
 	return add_descriptor(descriptor);
