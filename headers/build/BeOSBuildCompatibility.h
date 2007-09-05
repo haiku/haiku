@@ -5,8 +5,10 @@ typedef unsigned long haiku_build_addr_t;
 #define addr_t haiku_build_addr_t
 
 #include <Errors.h>
-#include <sys/types.h>
+
+#include <fcntl.h>
 #include <string.h>
+#include <sys/types.h>
 #include <sys/uio.h>
 
 #ifdef __x86_64__
