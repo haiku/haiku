@@ -582,6 +582,32 @@ rule AddBootModuleSymlinksToHaikuImage targets
 		: $(targets) ;
 }
 
+rule AddOptionalHaikuImagePackages packages
+{
+	HAIKU_OPTIONAL_PACKAGE_ADDED on $(packages) = 1 ;
+}
+
+rule IsOptionalHaikuImagePackageAdded package
+{
+	if [ on $(package) return $(HAIKU_OPTIONAL_PACKAGE_ADDED) ] {
+		return 1 ;
+	}
+
+	return $(HAIKU_ADD_ALL_OPTIONAL_PACKAGES) ;
+}
+
+rule InstallOptionalHaikuImagePackage package : url : dirTokens
+{
+	# download zip file
+	local zipFile = $(package:S=.zip:G=download) ;
+	MakeLocate $(zipFile) : $(HAIKU_DOWNLOAD_DIR) ;
+	DownloadFile $(zipFile) : $(url) ;
+
+	# unzip onto image
+	UnzipArchiveToHaikuImage $(dirTokens) : $(zipFile) ;
+}
+
+
 rule CreateHaikuImageMakeDirectoriesScript script
 {
 	CreateContainerMakeDirectoriesScript $(HAIKU_IMAGE_CONTAINER_NAME)

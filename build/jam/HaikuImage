@@ -412,8 +412,22 @@ AddDirectoryToHaikuImage home config settings printers "Save as PDF"
       : home-config-settings-printers-save-as-pdf.rdef ;
 
 
+#pragma mark - Optional Packages
+
+
+# WonderBrush
+if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
+	InstallOptionalHaikuImagePackage WonderBrush
+		: http://www.yellowbites.com/downloads/WonderBrush-2.0.2-demo-x86-R5.zip
+		: apps
+	;
+	AddSymlinkToHaikuImage home config be Applications
+		: /boot/apps/WonderBrush/WonderBrush ;
+}
+
 
 #pragma mark - Build The Image
+
 
 # Set image name and directory defaults and locate the image.
 HAIKU_IMAGE_NAME ?= haiku.image ;
