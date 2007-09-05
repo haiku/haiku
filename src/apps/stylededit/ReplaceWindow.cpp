@@ -116,8 +116,10 @@ ReplaceWindow::_ChangeUI()
 	fBackSearchBox->SetEnabled(fUIchange);
 
 	fReplaceButton->SetEnabled(fUIchange);
-	fUIchange ? fReplaceButton->MakeDefault(true)
-		: fReplaceAllButton->MakeDefault(true);
+	if (fUIchange)
+		fReplaceButton->MakeDefault(true);
+	else
+		fReplaceAllButton->MakeDefault(true);
 
 	fUIchange = !fUIchange;
 }

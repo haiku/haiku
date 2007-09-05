@@ -18,11 +18,14 @@ class BMessage;
 
 class ColorMenuItem: public BMenuItem {
 	public:
-					ColorMenuItem(const char *label, rgb_color color, BMessage *message);
-					void DrawContent();
+						ColorMenuItem(const char *label, rgb_color color, 
+							BMessage *message);
+
+	protected:
+		virtual void	DrawContent();
 
 	private:
-		rgb_color	fItemColor;
+		rgb_color		fItemColor;
 };
 
 #endif	// COLOR_MENU_ITEM_H

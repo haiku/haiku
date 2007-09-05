@@ -24,8 +24,8 @@ class FindWindow : public BWindow {
 						FindWindow(BRect frame, BHandler* handler, BString *searchString,
 							bool caseState, bool wrapState, bool backState);
 
-		void			MessageReceived(BMessage* message);
-		void			DispatchMessage(BMessage* message, BHandler* handler);
+		virtual void	MessageReceived(BMessage* message);
+		virtual void	DispatchMessage(BMessage* message, BHandler* handler);
 
 	private:
 		void			_SendMessage();

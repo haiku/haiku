@@ -17,16 +17,20 @@
 
 class BFile;
 class BHandler;
-class BMessanger;
+class BMessenger;
 
 
 class StyledEditView : public BTextView {
 	public:
-					StyledEditView(BRect viewframe, BRect textframe, 
-						BHandler *handler);
-					~StyledEditView();
+						StyledEditView(BRect viewframe, BRect textframe, 
+							BHandler *handler);
+		virtual			~StyledEditView();
 
-		void 		Select(int32 start, int32 finish);
+		virtual void	Select(int32 start, int32 finish);
+		virtual void	DeleteText(int32 start, int32 finish);
+		virtual void	FrameResized(float width, float height);
+		virtual void	InsertText(const char *text, int32 length, int32 offset, 
+							const text_run_array *runs = NULL);
 	
 		void		Reset();
 		status_t	GetStyledText(BPositionIO * stream);
@@ -36,11 +40,6 @@ class StyledEditView : public BTextView {
 		uint32 		GetEncoding() const;
 
 	private:
-		void		DeleteText(int32 start, int32 finish);
-		void		FrameResized(float width, float height);
-		void		InsertText(const char *text, int32 length, int32 offset, 
-					const text_run_array *runs = NULL);
-
 		BMessenger 	*fMessenger;
 		bool		fSuppressChanges;
 		BString		fEncoding;

@@ -30,12 +30,12 @@ class StyledEditWindow : public BWindow {
 	public:
 						StyledEditWindow(BRect frame, int32 id, uint32 encoding = 0);
 						StyledEditWindow(BRect frame, entry_ref *ref, uint32 encoding = 0);
-						~StyledEditWindow();
+		virtual			~StyledEditWindow();
 	
-		void			Quit();
-		bool			QuitRequested();
-		void			MessageReceived(BMessage *message);
-		void			MenusBeginning();
+		virtual void	Quit();
+		virtual bool	QuitRequested();
+		virtual void	MessageReceived(BMessage *message);
+		virtual void	MenusBeginning();
 
 		status_t		Save(BMessage *message = 0);
 		status_t		SaveAs(BMessage *message = 0);

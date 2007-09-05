@@ -29,11 +29,11 @@
 #include <MenuItem.h>
 #include <PrintJob.h>
 #include <Rect.h>
+#include <Roster.h>
 #include <ScrollView.h>
 #include <TextControl.h>
 #include <TextView.h>
 #include <TranslationUtils.h>
-#include <Roster.h>
 
 #include <stdlib.h>
 

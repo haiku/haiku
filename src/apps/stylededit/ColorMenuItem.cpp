@@ -12,8 +12,8 @@
 #include <Message.h>
 
 ColorMenuItem::ColorMenuItem(const char	*label, rgb_color color, BMessage *message)
-	: BMenuItem(label, message, 0, 0)
-	, fItemColor(color)
+	: BMenuItem(label, message, 0, 0),
+	fItemColor(color)
 {
 }
 

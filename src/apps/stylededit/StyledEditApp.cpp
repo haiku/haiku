@@ -79,8 +79,8 @@ namespace
 
 
 StyledEditApp::StyledEditApp()
-	: BApplication(APP_SIGNATURE)
-	, fOpenPanel(NULL)
+	: BApplication(APP_SIGNATURE),
+	fOpenPanel(NULL)
 {
 	fOpenPanel = new BFilePanel();
 	BMenuBar *menuBar =

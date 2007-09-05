@@ -24,29 +24,29 @@ class StyledEditWindow;
 
 class StyledEditApp : public BApplication {
 	public:
-					StyledEditApp();
-					~StyledEditApp();
+						StyledEditApp();
+		virtual			~StyledEditApp();
 
-		void 		MessageReceived(BMessage *message);
-		void		RefsReceived(BMessage *message);
-		void		ReadyToRun();
+		virtual void	MessageReceived(BMessage *message);
+		virtual void	RefsReceived(BMessage *message);
+		virtual void	ReadyToRun();
 
-		void		DispatchMessage(BMessage *an_event, BHandler *handler);
+		virtual void	DispatchMessage(BMessage *an_event, BHandler *handler);
 
-		int32		NumberOfWindows();
-		void		OpenDocument();
-		void		OpenDocument(entry_ref * ref);
-		void		CloseDocument();
-
-	private:
-		void		ArgvReceivedEx(int32 argc, const char *argv[], const char * cwd);
+		int32			NumberOfWindows();
+		void			OpenDocument();
+		void			OpenDocument(entry_ref *ref);
+		void			CloseDocument();
 
 	private:
-		BFilePanel	*fOpenPanel;
-		BMenu		*fOpenPanelEncodingMenu;
-		uint32		fOpenAsEncoding;
-		int32		fWindowCount;
-		int32		fNextUntitledWindow;
+		void			ArgvReceivedEx(int32 argc, const char *argv[], const char * cwd);
+
+	private:
+		BFilePanel		*fOpenPanel;
+		BMenu			*fOpenPanelEncodingMenu;
+		uint32			fOpenAsEncoding;
+		int32			fWindowCount;
+		int32			fNextUntitledWindow;
 		
 };
 
