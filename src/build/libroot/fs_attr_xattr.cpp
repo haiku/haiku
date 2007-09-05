@@ -176,17 +176,11 @@ public:
 			// not a system FD, we need to get a path for it.
 			Descriptor*	descriptor = get_descriptor(fileFD);
 			if (descriptor && !descriptor->IsSystemFD()) {
-				if (SymlinkDescriptor* symlinkDescriptor
-						= dynamic_cast<SymlinkDescriptor*>(descriptor)) {
-					status_t error = symlinkDescriptor->GetPath(tempPath);
-					if (error != B_OK)
-						return error;
-					path = tempPath.c_str();
-					fileFD = -1;
-				} else {
-					// We don't know how to get a path.
-					return B_BAD_VALUE;
-				}
+				status_t error = descriptor->GetPath(tempPath);
+				if (error != B_OK)
+					return error;
+				path = tempPath.c_str();
+				fileFD = -1;
 			}
 		}
 
@@ -344,6 +338,18 @@ public:
 	const char* Path() const
 	{
 		return (fFD < 0 ? fPath.c_str() : NULL);
+	}
+
+	bool IsSymlink() const
+	{
+		struct stat st;
+		int result;
+		if (Path())
+			result = lstat(Path(), &st);
+		else
+			result = fstat(fFD, &st);
+
+		return (result == 0 && S_ISLNK(st.st_mode));
 	}
 
 private:
@@ -554,8 +560,14 @@ fs_write_attr(int fd, const char *_attribute, uint32 type, off_t pos,
 		result = fsetxattr(localFD.FD(), attribute.c_str(), attributeBuffer,
 			toWrite, 0);
 	}
-	if (result < 0)
+	if (result < 0) {
+		// Setting user attributes on symlinks is not allowed. So, if this is
+		// a symlink and we're only supposed to write a "BEOS:TYPE" attribute
+		// we silently pretend to have succeeded.
+		if (localFD.IsSymlink() && strcmp(_attribute, "BEOS:TYPE") == 0)
+			return writeBytes;
 		return -1;
+	}
 
 	return writeBytes;
 }
