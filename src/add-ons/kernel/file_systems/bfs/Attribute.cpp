@@ -61,9 +61,9 @@ Attribute::CheckAccess(const char *name, int openMode)
 	// ToDo: we might think about allowing to update those values, but
 	//	really change their corresponding values in the bfs_inode structure
 	if (name[0] == FILE_NAME_NAME && name[1] == '\0'
-		|| !strcmp(name, "name")
+/*		|| !strcmp(name, "name")
 		|| !strcmp(name, "last_modified")
-		|| !strcmp(name, "size"))
+		|| !strcmp(name, "size")*/)
 		RETURN_ERROR(B_NOT_ALLOWED);
 
 	return fInode->CheckPermissions(openModeToAccess(openMode)
