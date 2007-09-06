@@ -32,6 +32,7 @@ public:
 
 protected:
 	virtual BPicture *SaveAndRestore(BPicture *picture) = 0;
+	void SetErrorMessage(const char* message);
 
 private:
 	

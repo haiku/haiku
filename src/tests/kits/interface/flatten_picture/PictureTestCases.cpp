@@ -315,20 +315,70 @@ static void testInvertRect(BView *view, BRect frame)
 	view->InvertRect(frame);
 }
 
-static void testBitmap(BView *view, BRect frame) {
-	BBitmap bitmap(frame, B_RGBA32);
-	for (int32 y = 0; y < bitmap.Bounds().IntegerHeight(); y ++) {
-		for (int32 x = 0; x < bitmap.Bounds().IntegerWidth(); x ++) {
+static bool isBorder(int32 x, int32 y, int32 width, int32 height) {
+	return x == 0 || y == 0 || x == width - 1 || y == height - 1;
+}
+
+static void fillBitmap(BBitmap &bitmap) {
+	int32 height = bitmap.Bounds().IntegerHeight()+1;
+	int32 width = bitmap.Bounds().IntegerWidth()+1;
+	for (int32 y = 0; y < height; y ++) {
+		for (int32 x = 0; x < width; x ++) {
 			char *pixel = (char*)bitmap.Bits();
 			pixel += bitmap.BytesPerRow() * y + 4 * x;
-			// fill with blue
-			pixel[0] = 255;
-			pixel[1] = 0;
-			pixel[2] = 0;
-			pixel[3] = 255;
+			if (isBorder(x, y, width, height)) {
+				// fill with green
+				pixel[0] = 255;
+				pixel[1] = 0;
+				pixel[2] = 255;
+				pixel[3] = 0;
+			} else  {
+				// fill with blue
+				pixel[0] = 255;
+				pixel[1] = 0;
+				pixel[2] = 0;
+				pixel[3] = 255;
+			}	
 		}
 	}
+}
+
+static void testDrawBitmap(BView *view, BRect frame) {
+	BBitmap bitmap(frame, B_RGBA32);
+	fillBitmap(bitmap);
 	view->DrawBitmap(&bitmap, BPoint(0, 0));
+}
+
+static void testDrawBitmapAtPoint(BView *view, BRect frame) {
+	frame.InsetBy(2, 2);
+	
+	BRect bounds(frame);
+	bounds.OffsetTo(0, 0);
+	bounds.right /= 2;
+	bounds.bottom /= 2;
+	
+	BBitmap bitmap(bounds, B_RGBA32);
+	fillBitmap(bitmap);
+	view->DrawBitmap(&bitmap, centerPoint(frame));
+}
+
+static void testDrawBitmapAtRect(BView *view, BRect frame) {
+	BRect bounds(frame);
+	BBitmap bitmap(bounds, B_RGBA32);
+	fillBitmap(bitmap);
+	frame.InsetBy(2, 2);
+	view->DrawBitmap(&bitmap, frame);
+}
+
+static void testDrawLargeBitmap(BView *view, BRect frame) {
+	BRect bounds(frame);
+	bounds.OffsetTo(0, 0);
+	bounds.left = 1024;
+	bounds.bottom = 767;
+	BBitmap bitmap(bounds, B_RGBA32);
+	fillBitmap(bitmap);
+	frame.InsetBy(2, 2);
+	view->DrawBitmap(&bitmap, frame);
 }
 
 static void testConstrainClippingRegion(BView *view, BRect frame) 
@@ -672,7 +722,10 @@ TestCase gTestCases[] = {
 	{ "Test AppendToPicture", testAppendToPicture },
 	{ "Test LineArray", testLineArray },
 	{ "Test InvertRect", testInvertRect },
-	{ "Test Bitmap", testBitmap },
+	{ "Test DrawBitmap", testDrawBitmap },
+	{ "Test DrawBitmapAtPoint", testDrawBitmapAtPoint },
+	{ "Test DrawBitmapAtRect", testDrawBitmapAtRect },
+	{ "Test DrawDrawLargeBitmap", testDrawLargeBitmap },
 	{ "Test ConstrainClippingRegion", testConstrainClippingRegion }, 
 	{ "Test ClipToPicture", testClipToPicture },
 	{ "Test ClipToInversePicture", testClipToInversePicture },

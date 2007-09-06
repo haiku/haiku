@@ -16,7 +16,7 @@
 #define TEST_AND_RETURN(condition, message, result) \
 	{ \
 		if (condition) { \
-			fErrorMessage = message; \
+			SetErrorMessage(message); \
 			return result; \
 		} \
 	}
@@ -173,6 +173,13 @@ PictureTest::CleanUp()
 	fErrorMessage = "";
 }
 
+void
+PictureTest::SetErrorMessage(const char *message)
+{
+	if (fErrorMessage.Length() == 0)
+		fErrorMessage = message;
+}
+
 bool
 PictureTest::Test(draw_func* func, BRect frame)
 {
@@ -205,8 +212,7 @@ BBitmap *
 PictureTest::CreateBitmap(draw_func* func, BRect frame)
 {
 	OffscreenBitmap bitmap(frame, fColorSpace);
-	if (bitmap.InitCheck() != B_OK)
-		return NULL;
+	TEST_AND_RETURN(bitmap.InitCheck() != B_OK, "Offscreen bitmap for direct drawing could not be created!" , NULL);
 	func(bitmap.View(), frame);
 	return bitmap.Copy();
 }
@@ -215,8 +221,7 @@ BPicture *
 PictureTest::RecordPicture(draw_func* func, BRect frame)
 {
 	OffscreenBitmap bitmap(frame, fColorSpace);
-	if (bitmap.InitCheck() != B_OK)
-		return NULL;
+	TEST_AND_RETURN(bitmap.InitCheck() != B_OK, "Offscreen bitmap for picture recording could not be created!" , NULL);
 		
 	BView *view = bitmap.View();
 	// record
@@ -232,8 +237,7 @@ BBitmap *
 PictureTest::CreateBitmap(BPicture *picture, BRect frame)
 {
 	OffscreenBitmap bitmap(frame, fColorSpace);
-	if (bitmap.InitCheck() != B_OK)
-		return NULL;
+	TEST_AND_RETURN(bitmap.InitCheck() != B_OK, "Offscreen bitmap for picture drawing could not be created!" , NULL);
 
 	BView *view = bitmap.View();		
 	view->DrawPicture(picture);
@@ -265,15 +269,13 @@ FlattenPictureTest::SaveAndRestore(BPicture *picture)
 {
 	BMallocIO *data = new BMallocIO();
 	AutoDelete<BMallocIO> _data(data);
-	if (data == NULL)
-		return NULL;
+	TEST_AND_RETURN(data == NULL, "BMallocIO could not be allocated for flattening the picture!" , NULL);
 	
 	picture->Flatten(data);
 	
 	data->Seek(0, SEEK_SET);
 	BPicture *archivedPicture = new BPicture();
-	if (archivedPicture == NULL)
-		return NULL;
+	TEST_AND_RETURN(archivedPicture == NULL, "BPicture could not be allocated for unflattening the picture!" , NULL);
 	archivedPicture->Unflatten(data);
 		
 	return archivedPicture;
@@ -287,13 +289,16 @@ BPicture *
 ArchivePictureTest::SaveAndRestore(BPicture *picture)
 {
 	BMessage archive;
-	if (picture->Archive(&archive) != B_OK)
-		return NULL;
+	TEST_AND_RETURN(picture->Archive(&archive) != B_OK, "Picture could not be archived to BMessage", NULL);
 
-	BPicture *archivedPicture = new BPicture(&archive);
-	if (archivedPicture == NULL)
-		return NULL;
+	BArchivable *archivable = BPicture::Instantiate(&archive);
+	AutoDelete<BArchivable> _archivable(archivable);
+	TEST_AND_RETURN(archivable == NULL, "Picture could not be instantiated from BMessage", NULL);
+	
+	BPicture *archivedPicture = dynamic_cast<BPicture*>(archivable);
+	TEST_AND_RETURN(archivedPicture == NULL, "Picture could not be restored from BMessage", NULL);
 
+	_archivable.Release();
 	return archivedPicture;
 }
 
