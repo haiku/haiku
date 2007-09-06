@@ -14,6 +14,10 @@
 
 #define SIGNAL_TO_MASK(signal)	(1LL << (signal - 1))
 
+// additional send_signal_etc() flag
+#define SIGNAL_FLAG_TEAMS_LOCKED	(0x10000)
+	// interrupts are disabled and team lock is held
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,6 +26,7 @@ extern "C" {
 extern bool handle_signals(struct thread *thread);
 extern bool is_kill_signal_pending(void);
 extern int has_signals_pending(void *_thread);
+extern bool is_signal_blocked(int signal);
 
 extern int sigaction_etc(thread_id threadID, int signal,
 	const struct sigaction *newAction, struct sigaction *oldAction);

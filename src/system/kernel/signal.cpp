@@ -265,6 +265,14 @@ is_kill_signal_pending(void)
 }
 
 
+bool
+is_signal_blocked(int signal)
+{
+	return (atomic_get(&thread_get_current_thread()->sig_block_mask)
+		& SIGNAL_TO_MASK(signal)) != 0;
+}
+
+
 /*!	Tries to interrupt a thread waiting for a semaphore or a condition variable.
 	Interrupts must be disabled, the thread lock be held. Note, that the thread
 	lock may temporarily be released.
@@ -360,12 +368,13 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 {
 	status_t status = B_BAD_THREAD_ID;
 	struct thread *thread;
-	cpu_status state;
+	cpu_status state = 0;
 
 	if (signal < 0 || signal > MAX_SIGNO)
 		return B_BAD_VALUE;
 
-	state = disable_interrupts();
+	if ((flags & SIGNAL_FLAG_TEAMS_LOCKED) == 0)
+		state = disable_interrupts();
 	
 	if (id > 0) {
 		// send a signal to the specified thread
@@ -388,7 +397,8 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 		} else
 			id = -id;
 
-		GRAB_TEAM_LOCK();
+		if ((flags & SIGNAL_FLAG_TEAMS_LOCKED) == 0)
+			GRAB_TEAM_LOCK();
 
 		group = team_get_process_group_locked(NULL, id);
 		if (group != NULL) {
@@ -413,17 +423,21 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 			}
 		}
 
-		RELEASE_TEAM_LOCK();
+		if ((flags & SIGNAL_FLAG_TEAMS_LOCKED) == 0)
+			RELEASE_TEAM_LOCK();
+
 		GRAB_THREAD_LOCK();
 	}		
 
 	// ToDo: maybe the scheduler should only be invoked if there is reason to do it?
 	//	(ie. deliver_signal() moved some threads in the running queue?)
-	if ((flags & B_DO_NOT_RESCHEDULE) == 0)
+	if ((flags & (B_DO_NOT_RESCHEDULE | SIGNAL_FLAG_TEAMS_LOCKED)) == 0)
 		scheduler_reschedule();
 
 	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
+
+	if ((flags & SIGNAL_FLAG_TEAMS_LOCKED) == 0)
+		restore_interrupts(state);
 
 	return status;
 }
