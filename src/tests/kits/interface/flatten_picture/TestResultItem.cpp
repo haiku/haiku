@@ -33,6 +33,7 @@ TestResultItem::~TestResultItem()
 void 
 TestResultItem::DrawItem(BView *owner, BRect itemRect, bool drawEverthing)
 {
+	owner->SetDrawingMode(B_OP_COPY);
 	owner->PushState();
 	if (IsSelected()) {
 		owner->SetHighColor(128, 128, 128);
@@ -83,6 +84,7 @@ TestResultItem::DrawItem(BView *owner, BRect itemRect, bool drawEverthing)
 
 	if (fErrorMessage.Length() == 0)
 		return;
+
 	owner->PushState();	
 	font.SetFace(B_ITALIC_FACE);
 	owner->SetFont(&font);
