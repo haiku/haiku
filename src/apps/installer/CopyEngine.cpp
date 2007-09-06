@@ -232,6 +232,8 @@ The installer will have to reboot your machine if you proceed.", "OK", "Cancel",
 
 	BMessage msg(INSTALL_FINISHED);
 	BMessenger(fWindow).SendMessage(&msg);
+
+	return B_OK;
 }
 
 
@@ -247,8 +249,10 @@ CopyEngine::CopyFolder(BDirectory &srcDir, BDirectory &targetDir)
 		Undo undo;
 		if (S_ISDIR(statbuf.st_mode)) {
 			char name[B_FILE_NAME_LENGTH];
-			if (strcmp(name, PACKAGES_DIRECTORY) == 0)
+			if (entry.GetName(name) == B_OK
+				&& strcmp(name, PACKAGES_DIRECTORY) == 0) {
 				continue;
+			}
 			err = FSCopyFolder(&entry, &targetDir, fControl, NULL, false, undo);
 		} else {
 			err = FSCopyFile(&entry, &statbuf, &targetDir, fControl, NULL, false, undo);
@@ -281,8 +285,7 @@ CopyEngine::ScanDisksPartitions(BMenu *srcMenu, BMenu *targetMenu)
 void
 CopyEngine::SetPackagesList(BList *list)
 {
-	if (fPackages)
-		delete fPackages;
+	delete fPackages;
 	fPackages = list;
 }
 
