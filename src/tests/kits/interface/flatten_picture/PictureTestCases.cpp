@@ -725,7 +725,7 @@ TestCase gTestCases[] = {
 	{ "Test DrawBitmap", testDrawBitmap },
 	{ "Test DrawBitmapAtPoint", testDrawBitmapAtPoint },
 	{ "Test DrawBitmapAtRect", testDrawBitmapAtRect },
-	{ "Test DrawDrawLargeBitmap", testDrawLargeBitmap },
+	{ "Test DrawLargeBitmap", testDrawLargeBitmap },
 	{ "Test ConstrainClippingRegion", testConstrainClippingRegion }, 
 	{ "Test ClipToPicture", testClipToPicture },
 	{ "Test ClipToInversePicture", testClipToInversePicture },
