@@ -572,6 +572,7 @@ BFont::SetFamilyAndStyle(const font_family family, const font_style style)
 	link.Read<uint16>(&fStyleID);
 	link.Read<uint16>(&fFace);
 	fHeight.ascent = kUninitializedAscent;
+	fExtraFlags = kUninitializedExtraFlags;
 
 	return B_OK;
 }
@@ -612,6 +613,7 @@ BFont::SetFamilyAndStyle(uint32 fontcode)
 	link.Read<uint16>(&fStyleID);
 	link.Read<uint16>(&fFace);
 	fHeight.ascent = kUninitializedAscent;
+	fExtraFlags = kUninitializedExtraFlags;
 }
 
 
@@ -647,6 +649,7 @@ BFont::SetFamilyAndFace(const font_family family, uint16 face)
 	link.Read<uint16>(&fStyleID);
 	link.Read<uint16>(&fFace);
 	fHeight.ascent = kUninitializedAscent;
+	fExtraFlags = kUninitializedExtraFlags;
 
 	return B_OK;
 }
@@ -1367,6 +1370,8 @@ BFont::operator=(const BFont &font)
 	fFace = font.fFace;
 	fHeight = font.fHeight;
 	fFlags = font.fFlags;
+	fExtraFlags = font.fExtraFlags;
+
 	return *this;
 }
 
