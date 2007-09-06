@@ -480,7 +480,7 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView *view,
 	textRect.OffsetBy(offset);
 
 	if (direct) {
-#if __HAIKU__
+#ifdef __HAIKU__
 		// draw selection box if selected
 		if (selected) {
 #else
@@ -522,7 +522,7 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView *view,
 
 	const char* fittingText = fText->FittingText(view);
 
-#if __HAIKU__
+#ifdef __HAIKU__
 	if (!selected && view->WidgetTextOutline()) {
 		// draw a halo around the text by using the "false bold"
 		// feature for text rendering. Either black or white is used for

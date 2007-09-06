@@ -2873,11 +2873,7 @@ BPoseView::UpdatePosesClipboardModeFromClipboard(BMessage *clipboardReport)
 						|| bounds.Contains(poseRect.LeftBottom())
 						|| bounds.Contains(poseRect.RightBottom())
 						|| bounds.Contains(poseRect.RightTop())) {
-						if (!WidgetTextOutline()
-							|| clipNode->moveMode == kMoveSelectionTo)
-							Invalidate(poseRect);
-						else
-							pose->Draw(poseRect, this, false);
+						Invalidate(poseRect);
 					}
 				}
 			}
@@ -3406,9 +3402,6 @@ BPoseView::ResetPosePlacementHint()
 void
 BPoseView::SelectPoses(int32 start, int32 end)
 {
-	BPoint loc(0, 0);
-	BRect bounds(Bounds());
-
 	// clear selection list
 	fSelectionList->MakeEmpty();
 	fMimeTypesInSelectionCache.MakeEmpty();
@@ -3416,6 +3409,8 @@ BPoseView::SelectPoses(int32 start, int32 end)
 	fRealPivotPose = NULL;
 	
 	bool iconMode = ViewMode() != kListMode;
+	BPoint loc(0, start * fListElemHeight);
+	BRect bounds(Bounds());
 
 	int32 count = fPoseList->CountItems();
 	for (int32 index = start; index < end && index < count; index++) {
@@ -3429,14 +3424,10 @@ BPoseView::SelectPoses(int32 start, int32 end)
 			if (iconMode)
 				poseRect = pose->CalcRect(this);
 			else
-				poseRect = pose->CalcRect(loc, this);
+				poseRect = pose->CalcRect(loc, this, false);
 
 			if (bounds.Intersects(poseRect)) {
-				if (WidgetTextOutline())
-					Invalidate(poseRect);
-				else
-					pose->Draw(poseRect, this, false);
-				Flush();
+				Invalidate(poseRect);
 			}
 		}
 
@@ -5590,7 +5581,7 @@ BPoseView::SelectAll()
 	fRealPivotPose = NULL;
 
 	int32 startIndex = 0;
-	BPoint loc(0, 0);
+	BPoint loc(0, fListElemHeight * startIndex);
 
 	bool iconMode = ViewMode() != kListMode;
 
@@ -5634,7 +5625,7 @@ BPoseView::InvertSelection()
 	BRect bounds(Bounds());
 	
 	int32 startIndex = 0;
-	BPoint loc(0, 0);
+	BPoint loc(0, fListElemHeight * startIndex);
 	
 	fMimeTypesInSelectionCache.MakeEmpty();
 	fSelectionPivotPose = NULL;
@@ -6852,6 +6843,8 @@ BPoseView::SelectPosesListMode(BRect selectionRect, BList **oldList)
 	BList *newList = new BList;
 	BRect bounds(Bounds());
 	SetDrawingMode(B_OP_COPY);
+		// TODO: I _think_ there is no more synchronous drawing here,
+		// so this should be save to remove
 
 	int32 startIndex = (int32)(selectionRect.top / fListElemHeight);
 	if (startIndex < 0)
@@ -6871,10 +6864,7 @@ BPoseView::SelectPosesListMode(BRect selectionRect, BList **oldList)
 										// using a vector class instead of BList
 
 			if ((selected != pose->IsSelected()) && poseRect.Intersects(bounds)) {
-				if (pose->IsSelected() || WidgetTextOutline())
-					pose->Draw(poseRect, this, false);
-				else
-					Invalidate(poseRect);
+				Invalidate(poseRect);
 			}
 				
 			// First Pose selected gets to be the pivot.
@@ -6900,10 +6890,7 @@ BPoseView::SelectPosesListMode(BRect selectionRect, BList **oldList)
 			BRect poseRect(pose->CalcRect(loc, this));
 
 			if (poseRect.Intersects(bounds)) {
-				if (pose->IsSelected() || WidgetTextOutline())
-					pose->Draw(poseRect, this, false);
-				else
-					Invalidate(poseRect);
+				Invalidate(poseRect);
 			}
 		}
 	}
@@ -6938,11 +6925,9 @@ BPoseView::SelectPosesIconMode(BRect selectionRect, BList **oldList)
 				pose->Select(!fSelectionList->HasItem(pose));
 				newList->AddItem((void *)index);
 
-				if ((selected != pose->IsSelected()) && poseRect.Intersects(bounds)) {
-					if (pose->IsSelected() || WidgetTextOutline())
-						pose->Draw(poseRect, this, false);
-					else
-						Invalidate(poseRect);
+				if ((selected != pose->IsSelected())
+					&& poseRect.Intersects(bounds)) {
+					Invalidate(poseRect);
 				}
 
 				// First Pose selected gets to be the pivot.
@@ -6966,12 +6951,8 @@ BPoseView::SelectPosesIconMode(BRect selectionRect, BList **oldList)
 			pose->Select(!pose->IsSelected());
 			BRect poseRect(pose->CalcRect(this));
 
-			if (poseRect.Intersects(bounds)) {
-				if (pose->IsSelected() || WidgetTextOutline())
-					pose->Draw(poseRect, this, false);
-				else
-					Invalidate(poseRect);
-			}
+			if (poseRect.Intersects(bounds))
+				Invalidate(poseRect);
 		}
 	}
 
@@ -7051,6 +7032,7 @@ BPoseView::AddRemoveSelectionRange(BPoint where, bool extendSelection, BPose *po
 			int32 count = fPoseList->CountItems();
 			for (int32 index = count - 1; index >= 0; index--) {
 				BPose *currPose = fPoseList->ItemAt(index);
+				// TODO: works only in non-list mode?
 				if (selection.Intersects(currPose->CalcRect(this)))
 					AddRemovePoseFromSelection(currPose, index, select);
 			}
@@ -7724,11 +7706,7 @@ BPoseView::ClearSelection()
 				BPose *pose = fPoseList->ItemAt(index);
 				if (pose->IsSelected()) {
 					pose->Select(false);
-					BRect poseRect(pose->CalcRect(loc, this, false));
-					if (WidgetTextOutline())
-						pose->Draw(poseRect, this, false);
-					else
-						Invalidate(poseRect);
+					Invalidate(pose->CalcRect(loc, this, false));
 				}
 
 				loc.y += fListElemHeight;
@@ -7743,11 +7721,7 @@ BPoseView::ClearSelection()
 				if (pose) {
 					if (pose->IsSelected()) {
 						pose->Select(false);
-						BRect poseRect(pose->CalcRect(this));
-						if (WidgetTextOutline())
-							pose->Draw(poseRect, this, false);
-						else
-							Invalidate(poseRect);
+						Invalidate(pose->CalcRect(this));
 					}
 
 					if (pose->Location().y > bounds.bottom)
@@ -7807,10 +7781,7 @@ BPoseView::ShowSelection(bool show)
 						if (pose->IsSelected() != show || fShowSelectionWhenInactive) {
 							if (!fShowSelectionWhenInactive)
 								pose->Select(show);
-							if (show && WidgetTextOutline())
-								pose->Draw(pose->CalcRect(this), this, false);
-							else
-								Invalidate(pose->CalcRect(this));
+							Invalidate(pose->CalcRect(this));
 						}
 
 					if (pose->Location().y > bounds.bottom)
@@ -7850,8 +7821,8 @@ BPoseView::AddRemovePoseFromSelection(BPose *pose, int32 index, bool select)
 	pose->Select(select);
 
 	// update display
-	if (WidgetTextOutline())
-		DrawPose(pose, index, false);
+	if (ViewMode() == kListMode)
+		Invalidate(pose->CalcRect(BPoint(0, index * fListElemHeight), this, false));
 	else
 		Invalidate(pose->CalcRect(this));
 
@@ -8887,7 +8858,8 @@ BPoseView::HiliteDropTarget(bool hiliteState)
 			BPose *pose = fVSPoseList->ItemAt(index);
 			if (pose) {
 				if (pose == fDropTarget) {
-					if (!hiliteState && !WidgetTextOutline())
+					// TODO: maybe leave just the else part
+					if (!hiliteState)
 						// deselecting an icon with widget drawn over background
 						// have to be a little tricky here - draw just the icon,
 						// invalidate the widget
@@ -9076,8 +9048,7 @@ BPoseView::HandleAutoScroll()
 BRect
 BPoseView::CalcPoseRect(BPose *pose, int32 index, bool min) const
 {
-	return pose->CalcRect(BPoint(0, index * fListElemHeight),
-		this, min);
+	return pose->CalcRect(BPoint(0, index * fListElemHeight), this, min);
 }
 
 
