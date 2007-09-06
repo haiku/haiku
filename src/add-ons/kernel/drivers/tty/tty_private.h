@@ -120,6 +120,7 @@ typedef DoublyLinkedList<tty_cookie> TTYCookieList;
 
 struct tty_settings {
 	pid_t				pgrp_id;
+	pid_t				session_id;
 	struct termios		termios;
 	struct winsize		window_size;
 };

@@ -67,6 +67,9 @@ struct death_entry {
 struct process_session {
 	pid_t				id;
 	int32				group_count;
+	int32				controlling_tty;	// index of the controlling tty,
+											// -1 if none
+	pid_t				foreground_group;
 };
 
 struct process_group {
@@ -74,6 +77,7 @@ struct process_group {
 	struct process_session *session;
 	pid_t				id;
 	struct team			*teams;
+	bool				orphaned;
 };
 
 struct team_loading_info {

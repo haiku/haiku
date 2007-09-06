@@ -8,6 +8,8 @@
 
 #include <util/AutoLock.h>
 
+#include <team.h>
+
 #include "tty_private.h"
 
 
@@ -41,12 +43,26 @@ slave_open(const char *name, uint32 flags, void **_cookie)
 	if (gMasterTTYs[index].open_count == 0)
 		return B_IO_ERROR;
 
+	bool makeControllingTTY = (flags & O_NOCTTY) == 0;
+	pid_t processID = getpid();
+	pid_t sessionID = getsid(processID);
+
 	if (gSlaveTTYs[index].open_count == 0) {
+		// We only allow session leaders to open the tty initially.
+		if (makeControllingTTY && processID != sessionID)
+			return B_NOT_ALLOWED;
+
 		status_t status = tty_open(&gSlaveTTYs[index], NULL);
 		if (status < B_OK) {
 			// initializing TTY failed
 			return status;
 		}
+	} else if (makeControllingTTY) {
+		// If already open, we allow only processes from the same session
+		// to open the tty again.
+		pid_t ttySession = gSlaveTTYs[index].settings->session_id;
+		if (ttySession < 0 || ttySession != sessionID)
+			return B_NOT_ALLOWED;
 	}
 
  	slave_cookie *cookie = (slave_cookie *)malloc(sizeof(struct slave_cookie));
@@ -68,8 +84,15 @@ slave_open(const char *name, uint32 flags, void **_cookie)
 		return status;
 	}
 
-	if (gSlaveTTYs[index].open_count == 0)
+	if (gSlaveTTYs[index].open_count == 0) {
 		gSlaveTTYs[index].lock = gMasterTTYs[index].lock;
+
+		if (makeControllingTTY) {
+			gSlaveTTYs[index].settings->session_id = sessionID;
+			team_set_controlling_tty(gSlaveTTYs[index].index);
+		} else
+			gSlaveTTYs[index].settings->session_id = -1;
+	}
 
 	add_tty_cookie(cookie);
 

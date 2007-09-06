@@ -17,6 +17,8 @@
 #include <util/AutoLock.h>
 #include <util/kernel_cpp.h>
 
+#include <team.h>
+
 #include "SemaphorePool.h"
 #include "tty_private.h"
 
@@ -610,7 +612,8 @@ WriterLocker::_CheckBackgroundWrite() const
 
 	pid_t processGroup = getpgid(0);
 	if (processGroup != fSource->settings->pgrp_id) {
-		send_signal(-processGroup, SIGTTOU);
+		if (team_get_controlling_tty() == fSource->index)
+			send_signal(-processGroup, SIGTTOU);
 		return EIO;
 	}
 
@@ -698,7 +701,8 @@ ReaderLocker::_CheckBackgroundRead() const
 
 	pid_t processGroup = getpgid(0);
 	if (processGroup != fTTY->settings->pgrp_id) {
-		send_signal(-processGroup, SIGTTIN);
+		if (team_get_controlling_tty() == fTTY->index)
+			send_signal(-processGroup, SIGTTIN);
 		return EIO;
 	}
 
@@ -756,6 +760,7 @@ reset_tty_settings(tty_settings *settings, int32 index)
 
 	settings->pgrp_id = 0;
 		// this value prevents any signal of being sent
+	settings->session_id = -1;
 
 	// some initial window size - the TTY in question should set these values
 	settings->window_size.ws_col = 80;
@@ -1321,8 +1326,19 @@ tty_ioctl(tty_cookie *cookie, uint32 op, void *buffer, size_t length)
 			return user_memcpy(buffer, &tty->settings->pgrp_id, sizeof(pid_t));
 		case TIOCSPGRP:
 		case 'pgid':
+		{
 			TRACE(("tty: set pgrp_id\n"));
-			return user_memcpy(&tty->settings->pgrp_id, buffer, sizeof(pid_t));
+			pid_t groupID;
+			
+			if (user_memcpy(&groupID, buffer, sizeof(pid_t)) != B_OK)
+				return B_BAD_ADDRESS;
+
+			status_t error = team_set_foreground_process_group(tty->index,
+				groupID);
+			if (error == B_OK)
+				tty->settings->pgrp_id = groupID;
+			return error;
+		}
 
 		/* get and set window size */
 

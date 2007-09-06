@@ -523,6 +523,7 @@ create_process_group(pid_t id)
 	group->id = id;
 	group->session = NULL;
 	group->teams = NULL;
+	group->orphaned = true;
 	return group;
 }
 
@@ -530,12 +531,15 @@ create_process_group(pid_t id)
 static struct process_session *
 create_process_session(pid_t id)
 {
-	struct process_session *session = (struct process_session *)malloc(sizeof(struct process_session));
+	struct process_session *session
+		= (struct process_session *)malloc(sizeof(struct process_session));
 	if (session == NULL)
 		return NULL;
 
 	session->id = id;
 	session->group_count = 0;
+	session->controlling_tty = -1;
+	session->foreground_group = -1;
 
 	return session;
 }
@@ -1480,7 +1484,7 @@ wait_for_child(pid_t child, uint32 flags, int32 *_reason,
 
 	// If SIGCHLD is blocked, we shall clear pending SIGCHLDs, if no other child
 	// status is available.
-	if ((atomic_get(&thread->sig_block_mask) & SIGNAL_TO_MASK(SIGCHLD)) != 0) {
+	if (is_signal_blocked(SIGCHLD)) {
 		InterruptsSpinLocker locker(team_spinlock);
 
 		if (get_job_control_entry(team, child, flags) == NULL)
@@ -1518,6 +1522,57 @@ fill_team_info(struct team *team, team_info *info, size_t size)
 	info->argc = 1;
 
 	return B_OK;
+}
+
+
+/*!	Updates the \c orphaned field of a process_group and returns its new value.
+	Interrupts must be disabled and team lock be held.
+*/
+static bool
+update_orphaned_process_group(process_group* group, pid_t dyingProcess)
+{
+	// Orphaned Process Group: "A process group in which the parent of every
+	// member is either itself a member of the group or is not a member of the
+	// group's session." (Open Group Base Specs Issue 6)
+
+	// once orphaned, things won't change (exception: cf. setpgid())
+	if (group->orphaned)
+		return true;
+
+	struct team* team = group->teams;
+	while (team != NULL) {
+		struct team* parent = team->parent;
+		if (team->id != dyingProcess && parent->id != dyingProcess
+			&& parent->group_id != group->id
+			&& parent->session_id == group->session->id) {
+			return false;
+		}
+
+		team = team->group_next;
+	}
+
+	group->orphaned = true;
+	return true;
+}
+
+
+/*!	Returns whether the process group contains stopped processes.
+	Interrupts must be disabled and team lock be held.
+*/
+static bool
+process_group_has_stopped_processes(process_group* group)
+{
+	SpinLocker _(thread_spinlock);
+
+	struct team* team = group->teams;
+	while (team != NULL) {
+		if (team->main_thread->state == B_THREAD_SUSPENDED)
+			return true;
+
+		team = team->group_next;
+	}
+
+	return false;
 }
 
 
@@ -1683,13 +1738,73 @@ team_delete_process_group(struct process_group *group)
 }
 
 
-/**	Removes the specified team from the global team hash, and from its parent.
- *	It also moves all of its children up to the parent.
- *	You must hold the team lock when you call this function.
- *	If \a _freeGroup is set to a value other than \c NULL, it must be freed
- *	from the calling function.
- */
+void
+team_set_controlling_tty(int32 ttyIndex)
+{
+	struct team* team = thread_get_current_thread()->team;
 
+	InterruptsSpinLocker _(team_spinlock);
+
+	team->group->session->controlling_tty = ttyIndex;
+	team->group->session->foreground_group = -1;
+}
+
+
+int32
+team_get_controlling_tty()
+{
+	struct team* team = thread_get_current_thread()->team;
+
+	InterruptsSpinLocker _(team_spinlock);
+
+	return team->group->session->controlling_tty;
+}
+
+
+status_t
+team_set_foreground_process_group(int32 ttyIndex, pid_t processGroupID)
+{
+	struct thread* thread = thread_get_current_thread();
+	struct team* team = thread->team;
+
+	InterruptsSpinLocker locker(team_spinlock);
+
+	process_session* session = team->group->session;
+
+	// must be the controlling tty of the calling process
+	if (session->controlling_tty != ttyIndex)
+		return ENOTTY;
+
+	// check process group -- must belong to our session
+	process_group* group = team_get_process_group_locked(session,
+		processGroupID);
+	if (group == NULL)
+		return B_BAD_VALUE;
+
+	// If we are a background group, we can't do that unharmed, only if we
+	// ignore or block SIGTTOU. Otherwise the group gets a SIGTTOU.
+	if (session->foreground_group != -1
+		&& session->foreground_group != team->group_id
+		&& thread->sig_action[SIGTTOU - 1].sa_handler != SIG_IGN
+		&& !is_signal_blocked(SIGTTOU)) {
+		pid_t groupID = team->group->id;
+		locker.Unlock();
+		send_signal(-groupID, SIGTTOU);
+		return B_INTERRUPTED;
+	}
+
+	team->group->session->foreground_group = processGroupID;
+
+	return B_OK;
+}
+
+
+/*!	Removes the specified team from the global team hash, and from its parent.
+	It also moves all of its children up to the parent.
+	You must hold the team lock when you call this function.
+	If \a _freeGroup is set to a value other than \c NULL, it must be freed
+	from the calling function.
+*/
 void
 team_remove_team(struct team *team, struct process_group **_freeGroup)
 {
@@ -1705,6 +1820,51 @@ team_remove_team(struct team *team, struct process_group **_freeGroup)
 	sUsedTeams--;
 
 	team->state = TEAM_STATE_DEATH;
+
+	// If we're a controlling process (i.e. a session leader with controlling
+	// terminal), there's a bit of signalling we have to do.
+	if (team->session_id == team->id
+		&& team->group->session->controlling_tty >= 0) {
+		process_session* session = team->group->session;
+
+		session->controlling_tty = -1;
+
+		// send SIGHUP to the foreground 
+		if (session->foreground_group >= 0) {
+			send_signal_etc(-session->foreground_group, SIGHUP,
+				SIGNAL_FLAG_TEAMS_LOCKED);
+		}
+
+		// send SIGHUP + SIGCONT to all newly-orphaned process groups with
+		// stopped processes
+		struct team* child = team->children;
+		while (child != NULL) {
+			process_group* childGroup = child->group;
+			if (!childGroup->orphaned
+				&& update_orphaned_process_group(childGroup, team->id)
+				&& process_group_has_stopped_processes(childGroup)) {
+				send_signal_etc(-childGroup->id, SIGHUP,
+					SIGNAL_FLAG_TEAMS_LOCKED);
+				send_signal_etc(-childGroup->id, SIGCONT,
+					SIGNAL_FLAG_TEAMS_LOCKED);
+			}
+	
+			child = child->siblings_next;
+		}
+	} else {
+		// update "orphaned" flags of all children's process groups
+		struct team* child = team->children;
+		while (child != NULL) {
+			process_group* childGroup = child->group;
+			if (!childGroup->orphaned)
+				update_orphaned_process_group(childGroup, team->id);
+	
+			child = child->siblings_next;
+		}
+
+		// update "orphaned" flag of this team's process group
+		update_orphaned_process_group(team->group, team->id);
+	}
 
 	// reparent each of the team's children
 	reparent_children(team);
@@ -2467,6 +2627,10 @@ _user_setpgid(pid_t processID, pid_t groupID)
 		group = create_process_group(groupID);
 		if (group == NULL)
 			return B_NO_MEMORY;
+
+		// The team has a parent in the same session, but in another process
+		// group, so the new group won't be orphaned.
+		group->orphaned = false;
 	}
 
 	status_t status = B_OK;
@@ -2489,9 +2653,30 @@ _user_setpgid(pid_t processID, pid_t groupID)
 			struct process_group *targetGroup =
 				team_get_process_group_locked(team->group->session, groupID);
 			if (targetGroup != NULL) {
-				// we got a group, let's move the team there
-				remove_team_from_group(team, &freeGroup);
-				insert_team_into_group(targetGroup, team);
+				process_group* oldGroup = team->group;
+				if (targetGroup != oldGroup) {
+					// we got a group, let's move the team there
+					remove_team_from_group(team, &freeGroup);
+					insert_team_into_group(targetGroup, team);
+
+					// Update the "orphaned" flag of all potentially affected
+					// groups.
+
+					// the team's old group
+					if (oldGroup->teams != NULL) {
+						oldGroup->orphaned = false;
+						update_orphaned_process_group(oldGroup, -1);
+					}
+
+					// children's groups
+					struct team* child = team->children;
+					while (child != NULL) {
+						child->group->orphaned = false;
+						update_orphaned_process_group(child->group, -1);
+
+						child = child->siblings_next;
+					}
+				}
 			} else
 				status = B_NOT_ALLOWED;
 		}

@@ -40,7 +40,7 @@
 #define	O_EXCL			0x0100		/* exclusive creat */
 #define O_CREAT			0x0200		/* create and open file */
 #define O_TRUNC			0x0400		/* open with truncation */
-#define O_NOCTTY		0x1000		/* currently unsupported */
+#define O_NOCTTY		0x1000		/* don't make tty the controlling tty */
 #define	O_NOTRAVERSE	0x2000		/* do not traverse leaf link */
 
 /* flags for open() and fcntl() */
