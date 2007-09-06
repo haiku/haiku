@@ -90,7 +90,7 @@ usage(void)
 		"fwcontrol [-u bus_num] [-rt] [-g gap_count] [-o node] "
 		    "[-b pri_req] [-c node] [-d node] [-l file] "
 #ifdef __HAIKU__
-		    "[-R file] [-S file] \n"
+		    "[-M mode] [-R file] [-S file] \n"
 #else
 		    "[-R file] [-S file] [-m target]\n"
 #endif
@@ -107,6 +107,7 @@ usage(void)
 		"\t-l: load and parse hex dump file of configuration ROM\n"
 		"\t-R: Receive DV or MPEG TS stream\n"
 #ifdef __HAIKU__
+		"\t-M: Specify either d for dv mode or m for mpeg mode\n"
 		"\t-S: Send DV stream\n");
 #else
 		"\t-S: Send DV stream\n"

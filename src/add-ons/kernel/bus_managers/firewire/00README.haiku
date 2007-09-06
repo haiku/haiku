@@ -92,6 +92,27 @@ IEEE 1394 support for haiku
 	Physical layer chip
 	- This does not matter, most physical layer chip should work
 
+6. Example
+	fwcontrol 
+	Output a list of devices that are connected to the bus
+
+	fwcontrol -t
+	Show the topology map
+
+	fwcontrol -c 0
+	Show the config rom of node 0
+
+	fwcontrol -r
+	trigger bus reset
+
+	fwcontrol -R mini.dv
+	Receive DV or MPEG TS stream and save it in mini.dv. Press Ctrl-C to
+	stop receiving data.
+	Note: the program will try to guess which mode first
+	
+	fwcontrol -M d -R mini.dv
+	Explicitly specify receiving via DV mode.
+
 References:
 [1] IEEE 1394-1995
 [2] IEEE 1394a-2000
