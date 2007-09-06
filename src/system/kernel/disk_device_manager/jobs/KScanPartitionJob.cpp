@@ -76,6 +76,8 @@ KScanPartitionJob::_ScanPartition(KPartition *partition)
 		return B_BAD_VALUE;
 	if (partition->DiskSystem() != NULL) {
 		// TODO: this is more or less a hack to prevent rescanning a partition
+		for (int32 i = 0; KPartition *child = partition->ChildAt(i); i++)
+			_ScanPartition(child);
 		return B_OK;
 	}
 
