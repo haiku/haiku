@@ -54,6 +54,7 @@ extern int last_command_exit_value;
 extern int return_catch_flag;
 extern int loop_level, continuing, breaking;
 extern int parse_and_execute_level, shell_initialized;
+extern int hup_on_exit;
 
 /* Non-zero after SIGINT. */
 int interrupt_state;
@@ -412,7 +413,7 @@ termination_unwind_protect (sig)
 #endif /* HISTORY */
 
 #if defined (JOB_CONTROL)
-  if (interactive && sig == SIGHUP)
+  if (interactive && sig == SIGHUP && hup_on_exit)
     hangup_all_jobs ();
   end_job_control ();
 #endif /* JOB_CONTROL */
