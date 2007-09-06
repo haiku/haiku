@@ -1001,6 +1001,12 @@ BPlusTree::_SplitNode(bplustree_node *node, off_t nodeOffset,
 	uint8 *outKeys = other->Keys();
 	int32 keyIndex = *_keyIndex;	// can become less than zero!
 
+	if (keyIndex > node->NumKeys()) {
+		FATAL(("key index out of bounds: %d, num keys: %d\n", keyIndex,
+			node->NumKeys()));
+		return B_BAD_VALUE;
+	}
+
 	// how many keys will fit in one (half) page?
 	// that loop will find the answer to this question and
 	// change the key lengths indices for their new home
@@ -1140,6 +1146,7 @@ BPlusTree::_SplitNode(bplustree_node *node, off_t nodeOffset,
 			bytesBefore = in > skip
 				? BFS_ENDIAN_TO_HOST_INT16(inKeyLengths[in - 1]) : 0;
 			bytes = *_keyLength;
+			out++;
 		} else {
 			if (in < node->NumKeys()) {
 				inKeyLengths[in] = HOST_ENDIAN_TO_BFS_INT16(
@@ -1152,22 +1159,14 @@ BPlusTree::_SplitNode(bplustree_node *node, off_t nodeOffset,
 					bytesAfter = BFS_ENDIAN_TO_HOST_INT16(inKeyLengths[in])
 						- bytesBefore - bytes;
 				}
+				out++;
 			}
 			in++;
 		}
-
-		out++;
-
-		// break out when all keys are done
-		if (in > node->NumKeys() && keyIndex < in)
-			break;
 	}
 
 	// adjust the byte counts (since we were a bit lazy in the loop)
-	if (keyIndex >= in && keyIndex - skip < out) {
-		bytesAfter = BFS_ENDIAN_TO_HOST_INT16(inKeyLengths[in])
-			- bytesBefore - total;
-	} else if (keyIndex < skip)
+	if (keyIndex < skip)
 		bytesBefore = node->AllKeyLength() - total;
 
 	if (bytesBefore < 0 || bytesAfter < 0) {
@@ -1180,7 +1179,7 @@ BPlusTree::_SplitNode(bplustree_node *node, off_t nodeOffset,
 		// right link, and overflow link can stay the same
 	node->all_key_length = HOST_ENDIAN_TO_BFS_INT16(bytes + bytesBefore
 		+ bytesAfter);
-	node->all_key_count = HOST_ENDIAN_TO_BFS_INT16(out - 1);
+	node->all_key_count = HOST_ENDIAN_TO_BFS_INT16(out);
 
 	// array positions have changed
 	outKeyLengths = node->KeyLengths();
@@ -1189,7 +1188,7 @@ BPlusTree::_SplitNode(bplustree_node *node, off_t nodeOffset,
 	// move the keys in the old node: the order is important here,
 	// because we don't want to overwrite any contents
 
-	keys = keyIndex <= skip ? out - 1 : keyIndex - skip;
+	keys = keyIndex <= skip ? out : keyIndex - skip;
 	keyIndex -= skip;
 	in = out - keyIndex - 1;
 		// Note: keyIndex and in will contain invalid values when the new key
