@@ -4,169 +4,190 @@
  *
  * Authors:
  *		Mike Berg (inseculous)
+ *		Julun <host.haiku@gmx.de>
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-/*! Notes: OffscreenClock borrows heavily from the clock source. */
-
-
 #include "AnalogClock.h"
-#include "Bitmaps.h"
 #include "TimeMessages.h"
 
-#include <Alert.h>
+
 #include <Bitmap.h>
-#include <Debug.h>
-#include <Dragger.h>
-#include <Window.h>
+#include <Message.h>
 
 
 class OffscreenClock : public BView {
 	public:
-		OffscreenClock(BRect frame, const char *name);
-		virtual ~OffscreenClock();
+				OffscreenClock(BRect frame, const char *name);
+				~OffscreenClock();
 
-		void DrawClock();
-		BPoint Position();
-
-		void SetTo(int32 hour, int32 minute, int32 second);
+		void 	SetTo(int32 hour, int32 minute, int32 second);
+		bool	IsDirty() const
+					{ return fDirty; }
+		void 	DrawClock();
 
 	private:
-		BBitmap *fBitmap;
-		BBitmap *fCenterBitmap;
-		BBitmap *fCapBitmap;
-		BPoint fCenter;
+		void	_DrawHands(float x, float y, float radius,
+					rgb_color hourMinuteColor, rgb_color secondsColor);
 
-		BPoint fMinutePoints[60];
-		BPoint fHourPoints[60];
-		short fHours;
-		short fMinutes;
-		short fSeconds;
+		int32	fHours;
+		int32	fMinutes;
+		int32	fSeconds;
+		bool	fDirty;
 };
 
-const BRect kClockRect(0, 0, kClockFaceWidth -1, kClockFaceHeight -1);
-const BRect kCenterRect(0, 0, kCenterWidth -1, kCenterHeight -1);
-const BRect kCapRect(0, 0, kCapWidth -1, kCapHeight -1);
 
-/*!
-	Analog Clock face rendering view.
-*/
 OffscreenClock::OffscreenClock(BRect frame, const char *name)
-	: BView(frame, name, B_NOT_RESIZABLE, B_WILL_DRAW)
+	: BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW),
+	  fHours(0),
+	  fMinutes(0),
+	  fSeconds(0),
+	  fDirty(true)
 {
-	fBitmap = new BBitmap(kClockRect, kClockFaceColorSpace);
-	fBitmap->SetBits(kClockFaceBits, (kClockFaceWidth) *(kClockFaceHeight +3), 0, kClockFaceColorSpace);
-
-	ReplaceTransparentColor(fBitmap, ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	fCenterBitmap = new BBitmap(kCenterRect, kCenterColorSpace);
-	fCenterBitmap->SetBits(kCenterBits, (kCenterWidth) *(kCenterHeight +1), 0, kCenterColorSpace);
-
-	fCapBitmap = new BBitmap(kCapRect, kCapColorSpace);
-	fCapBitmap->SetBits(kCapBits, (kCapWidth +1) *(kCapHeight +1) +1, 0, kCapColorSpace);
-	
-	fCenter = BPoint(42, 42);
-
-	float counter;
-	short index;
-	float x, y, mRadius, hRadius;
-
-	mRadius = fCenter.x - 12;
-	hRadius = mRadius - 10;
-	index = 0;
-	
-	//
-	// Generate minutes/hours points array
-	//
-	for (counter = 90; counter >= 0; counter -= 6,index++) {
-		x = mRadius * cos(((360 - counter)/180.0) * 3.1415);
-		x += fCenter.x;
-		y = mRadius * sin(((360 - counter)/180.0) * 3.1415);
-		y += fCenter.x;
-		fMinutePoints[index].Set(x,y);
-		x = hRadius * cos(((360 - counter)/180.0) * 3.1415);
-		x += fCenter.x;
-		y = hRadius * sin(((360 - counter)/180.0) * 3.1415);
-		y += fCenter.x;
-		fHourPoints[index].Set(x,y);
-	}
-
-	for (counter = 354; counter > 90; counter -= 6,index++) {
-		x = mRadius * cos(((360 - counter)/180.0) * 3.1415);
-		x += fCenter.x;
-		y = mRadius * sin(((360 - counter)/180.0) * 3.1415);
-		y += fCenter.x;
-		fMinutePoints[index].Set(x,y);
-		x = hRadius * cos(((360 - counter)/180.0) * 3.1415);
-		x += fCenter.x;
-		y = hRadius * sin(((360 - counter)/180.0) * 3.1415);
-		y += fCenter.x;
-		fHourPoints[index].Set(x,y);
-	}
+	SetFlags(Flags() | B_SUBPIXEL_PRECISE);
 }
 
 
 OffscreenClock::~OffscreenClock()
-{	
-	delete fBitmap;
-	delete fCenterBitmap;
-	delete fCapBitmap;
+{
 }
 
 
 void
 OffscreenClock::SetTo(int32 hour, int32 minute, int32 second)
 {
-	if (fSeconds != second || fMinutes != minute || fHours != hour) {
-		fHours = hour;
-		fMinutes = minute;
-		fSeconds = second;
-	}
+	if (fHours == hour && fMinutes == minute && fSeconds == second)
+		return;
+
+	fHours = hour;
+	fMinutes = minute;
+	fSeconds = second;
+
+	fDirty = true;
 }
 
 
 void
 OffscreenClock::DrawClock()
 {
-	ASSERT(Window()->IsLocked());
+	if (!LockLooper())
+		return;
 
-	// draw clockface
-	SetDrawingMode(B_OP_COPY);
-	DrawBitmap(fBitmap, BPoint(0, 0));
+	BRect bounds = Bounds();
+	// clear background
+	rgb_color background = ui_color(B_PANEL_BACKGROUND_COLOR);
+	SetHighColor(background);
+	FillRect(bounds);
 
-	SetHighColor(0, 0, 0, 255);
+	float radius = floorf((MIN(bounds.Width(), bounds.Height()) / 2.0)) - 2.5;
+	float x = floorf((bounds.left + bounds.right) / 2 + 0.5) + 0.5;
+	float y = floorf((bounds.top + bounds.bottom) / 2 + 0.5) + 0.5;
+		// + 0.5 is for the offset to pixel centers
+		// (important when drawing with B_SUBPIXEL_PRECISE)
 
-	short hours = fHours;
-	if (hours >= 12)
-		hours -= 12;
+	bounds.Set(x - radius, y - radius, x + radius, y + radius);
 
-	hours *= 5;
-	hours += (fMinutes / 12);
+	SetPenSize(2.0);
 
-	// draw center hub
-	SetDrawingMode(B_OP_OVER);
-	DrawBitmap(fCenterBitmap, fCenter - BPoint(kCenterWidth/2.0, kCenterHeight/2.0));
+	SetHighColor(tint_color(background, B_DARKEN_1_TINT));
+	StrokeEllipse(bounds.OffsetByCopy(-1, -1));
 
-	// draw hands
-	StrokeLine(fCenter, fHourPoints[hours]);
-	StrokeLine(fCenter, fMinutePoints[fMinutes]);
-	SetHighColor(tint_color(HighColor(), B_LIGHTEN_1_TINT));
-	StrokeLine(fCenter, fMinutePoints[fSeconds]);
+	SetHighColor(tint_color(background, B_LIGHTEN_2_TINT));
+	StrokeEllipse(bounds.OffsetByCopy(1, 1));
 
-	// draw center cap
-	DrawBitmap(fCapBitmap, fCenter -BPoint(kCapWidth/2.0, kCapHeight/2.0));
+	SetHighColor(tint_color(background, B_DARKEN_3_TINT));
+	StrokeEllipse(bounds);
+
+	SetLowColor(255, 255, 255);
+	FillEllipse(bounds, B_SOLID_LOW);
+	radius -= 3;
+
+	SetHighColor(tint_color(HighColor(), B_DARKEN_2_TINT));
+
+	// minutes
+	SetPenSize(1.0);
+	SetLineMode(B_BUTT_CAP, B_MITER_JOIN);
+	for (int32 minute = 1; minute < 60; minute++) {
+		if (minute % 5 == 0)
+			continue;
+		float x1 = x + sinf(minute * PI / 30.0) * radius;
+		float y1 = y + cosf(minute * PI / 30.0) * radius;
+		float x2 = x + sinf(minute * PI / 30.0) * (radius * 0.95);
+		float y2 = y + cosf(minute * PI / 30.0) * (radius * 0.95);
+		StrokeLine(BPoint(x1, y1), BPoint(x2, y2));
+	}
+
+	SetHighColor(tint_color(HighColor(), B_DARKEN_1_TINT));
+
+	// hours
+	SetPenSize(2.0);
+	SetLineMode(B_ROUND_CAP, B_MITER_JOIN);
+	for (int32 hour = 0; hour < 12; hour++) {
+		float x1 = x + sinf(hour * PI / 6.0) * radius;
+		float y1 = y + cosf(hour * PI / 6.0) * radius;
+		float x2 = x + sinf(hour * PI / 6.0) * (radius * 0.9);
+		float y2 = y + cosf(hour * PI / 6.0) * (radius * 0.9);
+		StrokeLine(BPoint(x1, y1), BPoint(x2, y2));
+	}
+
+	rgb_color hourMinutColor = tint_color(HighColor(), B_DARKEN_2_TINT);
+	rgb_color secondsColor = (rgb_color){ 255, 0, 0, 255 };
+	rgb_color shadowColor = tint_color(LowColor(),
+		(B_DARKEN_1_TINT + B_DARKEN_2_TINT) / 2);
+
+	_DrawHands(x + 1.5, y + 1.5, radius, shadowColor, shadowColor);
+	_DrawHands(x, y, radius, hourMinutColor, secondsColor);
 
 	Sync();
+
+	UnlockLooper();
+}
+
+
+void
+OffscreenClock::_DrawHands(float x, float y, float radius,
+	rgb_color hourMinuteColor, rgb_color secondsColor)
+{
+	SetHighColor(hourMinuteColor);
+
+	float offsetX;
+	float offsetY;
+
+	// calc, draw hour hand
+	SetPenSize(4.0);
+	float hours = fHours + float(fMinutes) / 60.0;
+	offsetX = (radius * 0.7) * sinf((hours * PI) / 6.0);
+	offsetY = (radius * 0.7) * cosf((hours * PI) / 6.0);
+	StrokeLine(BPoint(x, y), BPoint(x + offsetX, y - offsetY));
+
+	// calc, draw minute hand
+	SetPenSize(3.0);
+	float minutes = fMinutes + float(fSeconds) / 60.0;
+	offsetX = (radius * 0.9) * sinf((minutes * PI) / 30.0);
+	offsetY = (radius * 0.9) * cosf((minutes * PI) / 30.0);
+	StrokeLine(BPoint(x, y), BPoint(x + offsetX, y - offsetY));
+
+	SetHighColor(secondsColor);
+
+	// calc, draw second hand
+	SetPenSize(1.0);
+	offsetX = (radius * 0.95) * sinf((fSeconds * PI) / 30.0);
+	offsetY = (radius * 0.95) * cosf((fSeconds * PI) / 30.0);
+	StrokeLine(BPoint(x, y), BPoint(x + offsetX, y - offsetY));
+
+	// draw the center knob
+	SetHighColor(hourMinuteColor);
+	FillEllipse(BPoint(x, y), radius * 0.06, radius * 0.06);
 }
 
 
 //	#pragma mark -
 
 
-/*!
-	BView to display clock face of current time.
-*/
-TAnalogClock::TAnalogClock(BRect frame, const char *name, uint32 resizingmode, uint32 flags)
-	: BView(frame, name, resizingmode, flags | B_DRAW_ON_CHILDREN)
+TAnalogClock::TAnalogClock(BRect frame, const char *name, uint32 resizeMask, uint32 flags)
+	: BView(frame, name, resizeMask, flags | B_DRAW_ON_CHILDREN),
+	fBitmap(NULL),
+	fClock(NULL)
 {
 	_InitView(frame);
 }
@@ -181,8 +202,8 @@ TAnalogClock::~TAnalogClock()
 void
 TAnalogClock::_InitView(BRect rect)
 {
-	fClock = new OffscreenClock(kClockRect, "offscreen");
-	fBitmap = new BBitmap(kClockRect, B_CMAP8, true);
+	fClock = new OffscreenClock(Bounds(), "offscreen");
+	fBitmap = new BBitmap(Bounds(), B_RGB32, true);
 	fBitmap->Lock();
 	fBitmap->AddChild(fClock);
 	fBitmap->Unlock();
@@ -230,12 +251,10 @@ TAnalogClock::MessageReceived(BMessage *message)
 void
 TAnalogClock::Draw(BRect /*updateRect*/)
 {
-	SetHighColor(0, 100, 10);
-
-	if (fBitmap->Lock()) {
-		fClock->DrawClock();
+	if (fBitmap) {
+		if (fClock->IsDirty())
+			fClock->DrawClock();
 		DrawBitmap(fBitmap, BPoint(0, 0));
-		fBitmap->Unlock();
 	}
 }
 
@@ -243,6 +262,9 @@ TAnalogClock::Draw(BRect /*updateRect*/)
 void
 TAnalogClock::SetTo(int32 hour, int32 minute, int32 second)
 {
-	fClock->SetTo(hour, minute, second);
+	if (fClock)
+		fClock->SetTo(hour, minute, second);
+	
 	Invalidate();
 }
+

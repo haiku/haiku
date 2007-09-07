@@ -1,7 +1,10 @@
 /*
- * TTimeWindow.cpp
- * Time mccall@@digitalparadise.co.uk
- *	
+ * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		mccall@@digitalparadise.co.uk
+ *		Julun <host.haiku@gmx.de>
  */
  
 #include <Application.h>
@@ -19,7 +22,7 @@
 #include "TimeSettings.h"
 #include "ZoneView.h"
 
-#define TIME_WINDOW_RIGHT	361 //332
+#define TIME_WINDOW_RIGHT	400 //332
 #define TIME_WINDOW_BOTTOM	227 //208
 
 
@@ -29,10 +32,13 @@ TTimeWindow::TTimeWindow()
 {
 	MoveTo(dynamic_cast<TimeApplication *>(be_app)->WindowCorner());
 
-	BScreen screen;
+	BRect frame = Frame();
+	BRect bounds = Bounds();
+	BRect screenFrame = BScreen().Frame();
 	// Code to make sure that the window doesn't get drawn off screen...
-	if (!(screen.Frame().right >= Frame().right && screen.Frame().bottom >= Frame().bottom))
-		MoveTo((screen.Frame().right-Bounds().right)*.5,(screen.Frame().bottom-Bounds().bottom)*.5);
+	if (!(screenFrame.right >= frame.right && screenFrame.bottom >= frame.bottom))
+		MoveTo((screenFrame.right - bounds.right) * 0.5f, 
+			(screenFrame.bottom - bounds.bottom) * 0.5f);
 	
 	InitWindow(); 
 	SetPulseRate(500000);
@@ -99,7 +105,7 @@ TTimeWindow::InitWindow()
 	fTimeZones = new TZoneView(bounds);
 	if (fBaseView->StartWatchingAll(fTimeZones) != B_OK)
 		printf("TimeZones->StartWatchingAll(TimeZone) failed!!!\n");
-	
+
 	// add tabs
 	BTab *tab = new BTab();
 	tabview->AddTab(fTimeSettings, tab);
@@ -110,4 +116,11 @@ TTimeWindow::InitWindow()
 	tab->SetLabel("Time Zone");
 	
 	fBaseView->AddChild(tabview);
+
+	float width;
+	float height;
+	fTimeSettings->GetPreferredSize(&width, &height);
+	// width/ height from settingsview + all InsetBy etc..
+	ResizeTo(width +10, height + tabview->TabHeight() +25);
 }
+

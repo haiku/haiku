@@ -39,3 +39,4 @@ const uint32 H_USER_CHANGE = 'obUC';
 const uint32 H_RTC_CHANGE = 'obRC';
 
 #endif //TIME_MESSAGES_H
+

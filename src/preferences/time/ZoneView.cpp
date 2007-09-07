@@ -1,12 +1,20 @@
 /*
-	ZoneView.cpp
-		by Mike Berg (inseculous)
-		
-		Status: 	mimics original Time Zone tab of Time Pref App
-		Exceptions: 	doesn't calc "Time in" time.
-		Issues: 	After experimenting with both Time Prefs, it seems the original doesn't
-				 use the link file in the users settings file to get the current Timezone.
-				 Need to find the call it uses to get its inital info so I can get exact duplication.
+ * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Mike Berg (inseculous)
+ *		Julun <host.haiku@gmx.de>
+ */
+/*
+		Exceptions:
+			doesn't calc "Time in" time.
+
+		Issues:
+			After experimenting with both Time Prefs, it seems the original
+			doesn't use the link file in the users settings file to get the
+			current Timezone. Need to find the call it uses to get its
+			inital info so I can get exact duplication.
 */
 
 #include <Button.h>
@@ -141,6 +149,13 @@ TZoneView::MessageReceived(BMessage *message)
 			BView::MessageReceived(message);
 			break;
 	}
+}
+
+
+const char*
+TZoneView::TimeZone()
+{
+	return f_current->Text();
 }
 
 

@@ -1,7 +1,11 @@
 /*
-	ZoneView.h
-		Header file for the base class of the Time Zone tab in Time Pref App.
-*/
+ * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Mike Berg (inseculous)
+ *		Julun <host.haiku@gmx.de>
+ */
 
 #ifndef ZONE_VIEW_H
 #define ZONE_VIEW_H
@@ -37,6 +41,9 @@ class TZoneView: public BView {
 		virtual void AttachedToWindow();
 		virtual void AllAttached();
 		virtual void MessageReceived(BMessage *message);
+	
+		const char* TimeZone();
+
 	protected:
 		void UpdateDateTime(BMessage *message);
 		void ChangeRegion(BMessage *);
