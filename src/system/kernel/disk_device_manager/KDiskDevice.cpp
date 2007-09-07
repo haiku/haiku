@@ -31,6 +31,7 @@ KDiskDevice::KDiskDevice(partition_id id)
 {
 	Unset();
 	fDevice = this;
+	fPublished = true;
 }
 
 // destructor

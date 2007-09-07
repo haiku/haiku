@@ -49,6 +49,7 @@ public:
 	virtual status_t Open(int flags, int *fd);
 	virtual status_t PublishDevice();
 	virtual status_t UnpublishDevice();
+	bool IsPublished() const;
 
 	void SetBusy(bool busy);
 	bool IsBusy() const;
@@ -234,6 +235,7 @@ protected:
 	uint32				fAlgorithmData;
 	int32				fReferenceCount;
 	bool				fObsolete;
+	bool				fPublished;
 	static int32		fNextID;
 };
 

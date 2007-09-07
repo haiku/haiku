@@ -37,7 +37,6 @@ KPhysicalPartition::~KPhysicalPartition()
 {
 }
 
-// Register
 // PrepareForRemoval
 bool
 KPhysicalPartition::PrepareForRemoval()
@@ -72,6 +71,9 @@ KPhysicalPartition::Open(int flags, int *fd)
 status_t
 KPhysicalPartition::PublishDevice()
 {
+	if (fPublished)
+		return B_OK;
+
 	// get the path
 	KPath path;
 	status_t error = GetPath(&path);
@@ -90,19 +92,30 @@ KPhysicalPartition::PublishDevice()
 		return B_NAME_TOO_LONG;
 	}
 
-	return devfs_publish_partition(path.Path() + 5, &info);
+	error = devfs_publish_partition(path.Path() + 5, &info);
 		// we need to remove the "/dev/" part from the path
+	if (error != B_OK)
+		return error;
+
+	fPublished = true;
+
+	return B_OK;
 }
 
 // UnpublishDevice
 status_t
 KPhysicalPartition::UnpublishDevice()
 {
+	if (!fPublished)
+		return B_OK;
+
 	// get the path
 	KPath path;
 	status_t error = GetPath(&path);
 	if (error != B_OK)
 		return error;
+
+	fPublished = false;
 
 	return devfs_unpublish_partition(path.Path() + 5);
 		// we need to remove the "/dev/" part from the path

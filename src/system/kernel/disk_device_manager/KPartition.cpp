@@ -46,7 +46,8 @@ KPartition::KPartition(partition_id id)
 	  fChangeCounter(0),
 	  fAlgorithmData(0),
 	  fReferenceCount(0),
-	  fObsolete(false)
+	  fObsolete(false),
+	  fPublished(false)
 {
 	fPartitionData.id = (id >= 0 ? id : _NextID());
 	fPartitionData.offset = 0;
@@ -163,6 +164,15 @@ KPartition::UnpublishDevice()
 {
 	return B_ERROR;
 }
+
+
+// IsPublished
+bool
+KPartition::IsPublished() const
+{
+	return fPublished;
+}
+
 
 // SetBusy
 void
