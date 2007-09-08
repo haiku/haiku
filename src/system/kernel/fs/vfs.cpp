@@ -9,11 +9,23 @@
 /*! Virtual File System and File System Interface Layer */
 
 
-#include <OS.h>
-#include <StorageDefs.h>
+#include <ctype.h>
+#include <fcntl.h>
+#include <limits.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/resource.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include <fs_info.h>
 #include <fs_interface.h>
 #include <fs_volume.h>
+#include <OS.h>
+#include <StorageDefs.h>
+
+#include <util/AutoLock.h>
 
 #include <block_cache.h>
 #include <fd.h>
@@ -33,17 +45,7 @@
 #include <disk_device_manager/KDiskDeviceUtils.h>
 #include <disk_device_manager/KDiskSystem.h>
 #include <fs/node_monitor.h>
-#include <util/kernel_cpp.h>
 
-#include <string.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <sys/resource.h>
-#include <fcntl.h>
-#include <limits.h>
-#include <stddef.h>
 
 //#define TRACE_VFS
 #ifdef TRACE_VFS
@@ -133,50 +135,50 @@ struct advisory_lock {
 
 static mutex sFileSystemsMutex;
 
-/**	\brief Guards sMountsTable.
- *
- *	The holder is allowed to read/write access the sMountsTable.
- *	Manipulation of the fs_mount structures themselves
- *	(and their destruction) requires different locks though.
- */
+/*!	\brief Guards sMountsTable.
+
+	The holder is allowed to read/write access the sMountsTable.
+	Manipulation of the fs_mount structures themselves
+	(and their destruction) requires different locks though.
+*/
 static mutex sMountMutex;
 
-/**	\brief Guards mount/unmount operations.
- *
- *	The fs_mount() and fs_unmount() hold the lock during their whole operation.
- *	That is locking the lock ensures that no FS is mounted/unmounted. In
- *	particular this means that
- *	- sMountsTable will not be modified,
- *	- the fields immutable after initialization of the fs_mount structures in
- *	  sMountsTable will not be modified,
- *	- vnode::covered_by of any vnode in sVnodeTable will not be modified.
- *	
- *	The thread trying to lock the lock must not hold sVnodeMutex or
- *	sMountMutex.
- */
+/*!	\brief Guards mount/unmount operations.
+
+	The fs_mount() and fs_unmount() hold the lock during their whole operation.
+	That is locking the lock ensures that no FS is mounted/unmounted. In
+	particular this means that
+	- sMountsTable will not be modified,
+	- the fields immutable after initialization of the fs_mount structures in
+	  sMountsTable will not be modified,
+	- vnode::covered_by of any vnode in sVnodeTable will not be modified.
+	
+	The thread trying to lock the lock must not hold sVnodeMutex or
+	sMountMutex.
+*/
 static recursive_lock sMountOpLock;
 
-/**	\brief Guards the vnode::covered_by field of any vnode
- *
- *	The holder is allowed to read access the vnode::covered_by field of any
- *	vnode. Additionally holding sMountOpLock allows for write access.
- *
- *	The thread trying to lock the must not hold sVnodeMutex.
- */
+/*!	\brief Guards the vnode::covered_by field of any vnode
+
+	The holder is allowed to read access the vnode::covered_by field of any
+	vnode. Additionally holding sMountOpLock allows for write access.
+
+	The thread trying to lock the must not hold sVnodeMutex.
+*/
 static mutex sVnodeCoveredByMutex;
 
-/**	\brief Guards sVnodeTable.
- *
- *	The holder is allowed to read/write access sVnodeTable and to
- *	to any unbusy vnode in that table, save
- *	to the immutable fields (device, id, private_node, mount) to which
- *	only read-only access is allowed, and to the field covered_by, which is
- *	guarded by sMountOpLock and sVnodeCoveredByMutex.
- *
- *	The thread trying to lock the mutex must not hold sMountMutex.
- *	You must not have this mutex held when calling create_sem(), as this
- *	might call vfs_free_unused_vnodes().
- */
+/*!	\brief Guards sVnodeTable.
+
+	The holder is allowed to read/write access sVnodeTable and to
+	any unbusy vnode in that table, save to the immutable fields (device, id,
+	private_node, mount) to which
+	only read-only access is allowed, and to the field covered_by, which is
+	guarded by sMountOpLock and sVnodeCoveredByMutex.
+
+	The thread trying to lock the mutex must not hold sMountMutex.
+	You must not have this mutex held when calling create_sem(), as this
+	might call vfs_free_unused_vnodes().
+*/
 static mutex sVnodeMutex;
 
 #define VNODE_HASH_TABLE_SIZE 1024
@@ -2606,25 +2608,26 @@ remove_vnode(dev_t mountID, ino_t vnodeID)
 	struct vnode *vnode;
 	bool remove = false;
 
-	mutex_lock(&sVnodeMutex);
+	MutexLocker locker(sVnodeMutex);
 
 	vnode = lookup_vnode(mountID, vnodeID);
-	if (vnode != NULL) {
-		if (vnode->covered_by != NULL) {
-			// this vnode is in use
-			mutex_unlock(&sVnodeMutex);
-			return B_BUSY;
-		}
+	if (vnode == NULL)
+		return B_ENTRY_NOT_FOUND;
 
-		vnode->remove = true;
-		if (vnode->unpublished) {
-			// prepare the vnode for deletion
-			vnode->busy = true;
-			remove = true;
-		}
+	if (vnode->covered_by != NULL) {
+		// this vnode is in use
+		mutex_unlock(&sVnodeMutex);
+		return B_BUSY;
 	}
 
-	mutex_unlock(&sVnodeMutex);
+	vnode->remove = true;
+	if (vnode->unpublished) {
+		// prepare the vnode for deletion
+		vnode->busy = true;
+		remove = true;
+	}
+
+	locker.Unlock();
 	
 	if (remove) {
 		// if the vnode hasn't been published yet, we delete it here
@@ -2632,7 +2635,7 @@ remove_vnode(dev_t mountID, ino_t vnodeID)
 		free_vnode(vnode, true);
 	}
 
-	return vnode != NULL ? B_OK : B_ENTRY_NOT_FOUND;
+	return B_OK;
 }
 
 
