@@ -116,6 +116,7 @@ TMailApp::TMailApp()
 	fSigWindow(NULL),
 
 	fPrintSettings(NULL),
+	fPrintHelpAndExit(false),
 
 	fWrapMode(true),
 	fShowHeader(false),
@@ -504,11 +505,10 @@ TMailApp::ReadyToRun()
 	dataPath.Append("words");
 
 	// Only Load if Words Dictionary
-	if (BEntry(kWordsPath).Exists() || BEntry(dataPath.Path()).Exists())
-	{
-		// If "/boot/optional/goodies/words" exists but there is no system dictionary, copy words
-		if (!BEntry(dataPath.Path()).Exists() && BEntry(kWordsPath).Exists())
-		{
+	if (BEntry(kWordsPath).Exists() || BEntry(dataPath.Path()).Exists()) {
+		// If "/boot/optional/goodies/words" exists but there is no
+		// system dictionary, copy words
+		if (!BEntry(dataPath.Path()).Exists() && BEntry(kWordsPath).Exists()) {
 			BFile words(kWordsPath, B_READ_ONLY);
 			BFile copy(dataPath.Path(), B_WRITE_ONLY | B_CREATE_FILE);
 			char buffer[4096];
@@ -522,8 +522,7 @@ TMailApp::ReadyToRun()
 		// Create user dictionary if it does not exist
 		dataPath = dictionaryDir;
 		dataPath.Append("user");
-		if (!BEntry(dataPath.Path()).Exists())
-		{
+		if (!BEntry(dataPath.Path()).Exists()) {
 			BFile user(dataPath.Path(), B_WRITE_ONLY | B_CREATE_FILE);
 			BNodeInfo(&user).SetType("text/plain");
 		}
@@ -535,13 +534,11 @@ TMailApp::ReadyToRun()
 		gUserDict = -1;
 
 		while (gDictCount < MAX_DICTIONARIES
-			&& directory.GetNextEntry(&entry) != B_ENTRY_NOT_FOUND)
-		{
+			&& directory.GetNextEntry(&entry) != B_ENTRY_NOT_FOUND) {
 			dataPath.SetTo(&entry);
 
 			// Identify the user dictionary
-			if (strcmp("user", dataPath.Leaf()) == 0)
-			{
+			if (strcmp("user", dataPath.Leaf()) == 0) {
 				gUserDictFile = new BFile(dataPath.Path(), B_WRITE_ONLY | B_OPEN_AT_END);
 				gUserDict = gDictCount;
 			}
@@ -563,8 +560,7 @@ TMailApp::ReadyToRun()
 
 	// Create a new window if starting up without any extra arguments.
 
-	if (!fPrintHelpAndExit && !fWindowCount)
-	{
+	if (!fPrintHelpAndExit && !fWindowCount) {
 		TMailWindow	*window;
 		window = NewWindow();
 		window->Show();
