@@ -2600,7 +2600,7 @@ _user_setpgid(pid_t processID, pid_t groupID)
 
 		// the thread must be the team's main thread, as that
 		// determines its process ID
-		if (thread == NULL && thread != thread->team->main_thread)
+		if (thread == NULL || thread != thread->team->main_thread)
 			return B_BAD_THREAD_ID;
 
 		// check if the thread is in a child team of the calling team and
