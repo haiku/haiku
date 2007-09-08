@@ -474,27 +474,20 @@ get_mount(dev_t id, struct fs_mount **_mount)
 	struct fs_mount *mount;
 	status_t status;
 
-	mutex_lock(&sMountMutex);
+	MutexLocker nodeLocker(sVnodeMutex);
+	MutexLocker mountLocker(sMountMutex);
 
 	mount = find_mount(id);
-	if (mount) {
-		// ToDo: the volume is locked (against removal) by locking
-		//	its root node - investigate if that's a good idea
-		if (mount->root_vnode)
-			inc_vnode_ref_count(mount->root_vnode);
-		else {
-			// might have been called during a mount operation in which
-			// case the root node may still be NULL
-			mount = NULL;
-		}
-	} else
-		status = B_BAD_VALUE;
-
-	mutex_unlock(&sMountMutex);
-
 	if (mount == NULL)
-		return B_BUSY;
+		return B_BAD_VALUE;
 
+	struct vnode* rootNode = mount->root_vnode;
+	if (rootNode == NULL || rootNode->busy || rootNode->ref_count == 0) {
+		// might have been called during a mount/unmount operation
+		return B_BUSY;
+	}
+
+	inc_vnode_ref_count(mount->root_vnode);
 	*_mount = mount;
 	return B_OK;
 }
