@@ -88,6 +88,7 @@ StyleView::StyleView(BRect frame)
 	fStyleType->MenuBar()->ResizeTo(width, height);
 	fStyleType->ResizeTo(frame.Width(), height + 6);
 	fStyleType->SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
+	fStyleType->MenuBar()->SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
 #endif // __HAIKU__
 
 	// gradient type
@@ -125,7 +126,7 @@ StyleView::StyleView(BRect frame)
 	layout->AddItem(BSpaceLayoutItem::CreateHorizontalStrut(3), 3, 1, 1, 3);
 	layout->AddItem(BSpaceLayoutItem::CreateVerticalStrut(3), 0, 4, 4);
 
-#else // __HAIKU__
+#else // !__HAIKU__
 	frame.OffsetBy(0, fStyleType->Frame().Height() + 6);
 	fGradientType = new BMenuField(frame, "gradient type", "Gradient Type",
 								   menu, true);
@@ -135,6 +136,7 @@ StyleView::StyleView(BRect frame)
 	fGradientType->MenuBar()->ResizeTo(width, height);
 	fGradientType->ResizeTo(frame.Width(), height + 6);
 	fGradientType->SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
+	fGradientType->MenuBar()->SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
 
 	// create gradient control
 	frame.top = fGradientType->Frame().bottom + 8;
@@ -142,7 +144,7 @@ StyleView::StyleView(BRect frame)
 	fGradientControl = new GradientControl(new BMessage(MSG_SET_COLOR),
 										   this);
 
-	width = max_c(fGradientControl->Frame().Width(), frame.Width());
+	width = frame.Width();
 	height = max_c(fGradientControl->Frame().Height(), 30);
 
 	fGradientControl->ResizeTo(width, height);
@@ -151,6 +153,13 @@ StyleView::StyleView(BRect frame)
 	fGradientControl->SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
 
 	AddChild(fGradientControl);
+
+	// align label divider
+	float divider = fGradientType->StringWidth(fGradientType->Label());
+	divider = max_c(divider, fStyleType->StringWidth(fStyleType->Label()));
+	fGradientType->SetDivider(divider + 8);
+	fStyleType->SetDivider(divider + 8);
+	
 #endif // __HAIKU__
 
 	fStyleType->SetEnabled(false);

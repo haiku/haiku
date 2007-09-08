@@ -46,7 +46,8 @@ class MainWindow : public BWindow,
 				   public Observer {
  public:
 								MainWindow(IconEditorApp* app,
-										   Document* document);
+									Document* document,
+									const BMessage* settings);
 	virtual						~MainWindow();
 
 	// BWindow interface
@@ -65,7 +66,7 @@ class MainWindow : public BWindow,
 			void				SetIcon(Icon* icon);
 
 			void				StoreSettings(BMessage* archive);
-			void				RestoreSettings(BMessage* archive);
+			void				RestoreSettings(const BMessage* archive);
 
  private:
 			void				_Init();

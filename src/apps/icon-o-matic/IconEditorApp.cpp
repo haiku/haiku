@@ -227,10 +227,10 @@ IconEditorApp::ReadyToRun()
 								new BMessage(MSG_SAVE_AS));
 
 	// create main window
-	fMainWindow = new MainWindow(this, fDocument);
+	BMessage settings('stns');
+	_RestoreSettings(settings);
 
-	_RestoreSettings();
-
+	fMainWindow = new MainWindow(this, fDocument, &settings);
 	fMainWindow->Show();
 
 	_InstallDocumentMimeType();
@@ -566,16 +566,13 @@ IconEditorApp::_StoreSettings()
 
 // _RestoreSettings
 void
-IconEditorApp::_RestoreSettings()
+IconEditorApp::_RestoreSettings(BMessage& settings)
 {
-	BMessage settings('stns');
 	load_settings(&settings, "Icon-O-Matic");
 
 	int32 mode;
 	if (settings.FindInt32("export mode", &mode) >= B_OK)
 		fSavePanel->SetExportMode(mode);
-
-	fMainWindow->RestoreSettings(&settings);
 }
 
 // _InstallDocumentMimeType

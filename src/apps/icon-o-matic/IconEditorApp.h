@@ -77,7 +77,7 @@ class IconEditorApp : public BApplication {
 			const char*			_LastFilePath(path_kind which);
 
 			void				_StoreSettings();
-			void				_RestoreSettings();
+			void				_RestoreSettings(BMessage& settings);
 			void				_InstallDocumentMimeType();
 
 			MainWindow*			fMainWindow;

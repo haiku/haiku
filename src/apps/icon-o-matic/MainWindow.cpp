@@ -18,7 +18,7 @@
 #include <Screen.h>
 #include <ScrollView.h>
 
-#if __HAIKU__
+#ifdef __HAIKU__
 # include <GridLayout.h>
 # include <GroupLayout.h>
 # include <GroupView.h>
@@ -80,14 +80,16 @@ enum {
 };
 
 // constructor
-MainWindow::MainWindow(IconEditorApp* app, Document* document)
+MainWindow::MainWindow(IconEditorApp* app, Document* document,
+		const BMessage* settings)
 	: BWindow(BRect(50, 50, 900, 750), "Icon-O-Matic",
-			  B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-			  B_ASYNCHRONOUS_CONTROLS),
+		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL, B_ASYNCHRONOUS_CONTROLS),
 	  fApp(app),
 	  fDocument(document),
 	  fIcon(NULL)
 {
+	RestoreSettings(settings);
+
 	_Init();
 }
 
@@ -425,7 +427,7 @@ MainWindow::StoreSettings(BMessage* archive)
 
 // RestoreSettings
 void
-MainWindow::RestoreSettings(BMessage* archive)
+MainWindow::RestoreSettings(const BMessage* archive)
 {
 	BRect frame;
 	if (archive->FindRect("main window frame", &frame) == B_OK) {
@@ -489,7 +491,7 @@ MainWindow::_Init()
 void
 MainWindow::_CreateGUI(BRect bounds)
 {
-	const float splitWidth = 160;
+	const float splitWidth = 13 * be_plain_font->Size();
 
 #ifdef __HAIKU__
 
@@ -676,7 +678,7 @@ MainWindow::_CreateGUI(BRect bounds)
 	topSideView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
 		swatchGroupView->MinSize().height));
 
-#else // __HAIKU__
+#else // !__HAIKU__
 
 	BView* bg = new BView(bounds, "bg", B_FOLLOW_ALL, 0);
 	bg->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
