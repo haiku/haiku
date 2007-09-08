@@ -88,9 +88,12 @@ KScanPartitionJob::_ScanPartition(KPartition *partition)
 	)
 
 	// publish the partition
-	status_t error = partition->PublishDevice();
-	if (error != B_OK)
-		return error;
+	status_t error;
+	if (!partition->IsPublished()) {
+		error = partition->PublishDevice();
+		if (error != B_OK)
+			return error;
+	}
 
 	// find the disk system that returns the best priority for this partition
 	float bestPriority = -1;
