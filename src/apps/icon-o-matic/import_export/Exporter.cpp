@@ -127,29 +127,32 @@ status_t
 Exporter::_Export(const Icon* icon,
 				  const entry_ref* docRef)
 {
+	// TODO: reenable the commented out code, but make it work
+	// the opposite direction, ie *copy* the file contents
+
 	BEntry entry(docRef, true);
 	if (entry.IsDirectory())
 		return B_BAD_VALUE;
 
 	const entry_ref* ref = docRef;
-	entry_ref tempRef;
-
-	if (entry.Exists()) {
-		// if the file exists create a temporary file in the same folder
-		// and hope that it doesn't already exist...
-		BPath tempPath(docRef);
-		if (tempPath.GetParent(&tempPath) >= B_OK) {
-			BString helper(docRef->name);
-			helper << system_time();
-			if (tempPath.Append(helper.String()) >= B_OK
-				&& entry.SetTo(tempPath.Path()) >= B_OK
-				&& entry.GetRef(&tempRef) >= B_OK) {
-				// have the output ref point to the temporary
-				// file instead
-				ref = &tempRef;
-			}
-		}
-	}
+//	entry_ref tempRef;
+//
+//	if (entry.Exists()) {
+//		// if the file exists create a temporary file in the same folder
+//		// and hope that it doesn't already exist...
+//		BPath tempPath(docRef);
+//		if (tempPath.GetParent(&tempPath) >= B_OK) {
+//			BString helper(docRef->name);
+//			helper << system_time();
+//			if (tempPath.Append(helper.String()) >= B_OK
+//				&& entry.SetTo(tempPath.Path()) >= B_OK
+//				&& entry.GetRef(&tempRef) >= B_OK) {
+//				// have the output ref point to the temporary
+//				// file instead
+//				ref = &tempRef;
+//			}
+//		}
+//	}
 
 	status_t ret = B_BAD_VALUE;
 
@@ -175,43 +178,47 @@ Exporter::_Export(const Icon* icon,
 	}
 	outFile.Unset();
 
-	if (ret < B_OK && ref != docRef) {
-		// in case of failure, remove temporary file
-		entry.Remove();
-	}
-
-	if (ret >= B_OK && ref != docRef) {
-		// move temp file overwriting actual document file
-		BEntry docEntry(docRef, true);
-		// copy attributes of previous document file
-		BNode sourceNode(&docEntry);
-		BNode destNode(&entry);
-		if (sourceNode.InitCheck() >= B_OK && destNode.InitCheck() >= B_OK) {
-			// lock the nodes
-			if (sourceNode.Lock() >= B_OK) {
-				if (destNode.Lock() >= B_OK) {
-					// iterate over the attributes
-					char attrName[B_ATTR_NAME_LENGTH];
-					while (sourceNode.GetNextAttrName(attrName) >= B_OK) {
-						attr_info info;
-						if (sourceNode.GetAttrInfo(attrName, &info) >= B_OK) {
-							char *buffer = new (nothrow) char[info.size];
-							if (buffer && sourceNode.ReadAttr(attrName, info.type, 0,
-															  buffer, info.size) == info.size) {
-								destNode.WriteAttr(attrName, info.type, 0,
-												   buffer, info.size);
-							}
-							delete[] buffer;
-						}
-					}
-					destNode.Unlock();
-				}
-				sourceNode.Unlock();
-			}
-		}
-		// clobber the orginal file with the new temporary one
-		ret = entry.Rename(docRef->name, true);
-	}
+//	if (ret < B_OK && ref != docRef) {
+//		// in case of failure, remove temporary file
+//		entry.Remove();
+//	}
+//
+//	if (ret >= B_OK && ref != docRef) {
+//		// move temp file overwriting actual document file
+//		BEntry docEntry(docRef, true);
+//		// copy attributes of previous document file
+//		BNode sourceNode(&docEntry);
+//		BNode destNode(&entry);
+//		if (sourceNode.InitCheck() >= B_OK && destNode.InitCheck() >= B_OK) {
+//			// lock the nodes
+//			if (sourceNode.Lock() >= B_OK) {
+//				if (destNode.Lock() >= B_OK) {
+//					// iterate over the attributes
+//					char attrName[B_ATTR_NAME_LENGTH];
+//					while (sourceNode.GetNextAttrName(attrName) >= B_OK) {
+////						// skip the icon, since we probably wrote that
+////						// before
+////						if (strcmp(attrName, "BEOS:ICON") == 0)
+////							continue;
+//						attr_info info;
+//						if (sourceNode.GetAttrInfo(attrName, &info) >= B_OK) {
+//							char *buffer = new (nothrow) char[info.size];
+//							if (buffer && sourceNode.ReadAttr(attrName, info.type, 0,
+//															  buffer, info.size) == info.size) {
+//								destNode.WriteAttr(attrName, info.type, 0,
+//												   buffer, info.size);
+//							}
+//							delete[] buffer;
+//						}
+//					}
+//					destNode.Unlock();
+//				}
+//				sourceNode.Unlock();
+//			}
+//		}
+//		// clobber the orginal file with the new temporary one
+//		ret = entry.Rename(docRef->name, true);
+//	}
 
 	if (ret >= B_OK && MIMEType()) {
 		// set file type

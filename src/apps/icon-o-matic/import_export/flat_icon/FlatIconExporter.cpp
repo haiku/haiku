@@ -105,15 +105,26 @@ FlatIconExporter::Export(const Icon* icon, BNode* node,
 
 	// flatten icon
 	status_t ret = _Export(buffer, icon);
-	if (ret < B_OK)
+	if (ret < B_OK) {
+		printf("failed to export to buffer: %s\n", strerror(ret));
 		return ret;
+	}
+
+#ifndef __HAIKU__
+	// work arround a BFS bug, attributes with the same name but different
+	// type fail to be written
+	node->RemoveAttr(attrName);
+#endif
 
 	// write buffer to attribute
 	ssize_t written = node->WriteAttr(attrName, B_VECTOR_ICON_TYPE, 0,
 									  buffer.Buffer(), buffer.SizeUsed());
 	if (written != (ssize_t)buffer.SizeUsed()) {
-		if (written < 0)
+		if (written < 0) {
+			printf("failed to write attribute: %s\n", strerror((status_t)written));
 			return (status_t)written;
+		}
+		printf("failed to write attribute\n");
 		return B_ERROR;
 	}
 
