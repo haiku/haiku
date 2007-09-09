@@ -34,9 +34,6 @@
 #endif
 
 
-/* hash table of pages keyed by cache they're in and offset */
-#define PAGE_TABLE_SIZE 1024 /* TODO: make this dynamic */
-
 static hash_table *sPageCacheTable;
 static spinlock sPageCacheTableLock;
 
@@ -73,7 +70,8 @@ page_hash_func(void *_p, const void *_key, uint32 range)
 	vm_page *page = (vm_page *)_p;
 	const struct page_lookup_key *key = (page_lookup_key *)_key;
 
-#define HASH(offset, ref) ((offset) ^ ((uint32)(ref) >> 4))
+	#define HASH(offset, ref) ((offset) + ((uint32)(ref) >> 6) * 997)
+		// sizeof(vm_cache) >= 64, hence (uint32)(ref) >> 6 is still unique
 
 	if (page)
 		return HASH(page->cache_offset, page->cache) % range;
@@ -107,8 +105,9 @@ acquire_unreferenced_cache_pseudo_ref(vm_cache* cache)
 status_t
 vm_cache_init(kernel_args *args)
 {
-	sPageCacheTable = hash_init(PAGE_TABLE_SIZE, offsetof(vm_page, hash_next),
-		&page_compare_func, &page_hash_func);
+	// TODO: The table should grow/shrink dynamically.
+	sPageCacheTable = hash_init(vm_page_num_pages() / 2,
+		offsetof(vm_page, hash_next), &page_compare_func, &page_hash_func);
 	if (sPageCacheTable == NULL)
 		panic("vm_cache_init: no memory\n");
 
