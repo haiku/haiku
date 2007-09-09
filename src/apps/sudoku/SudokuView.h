@@ -75,6 +75,7 @@ private:
 	void _DrawKeyboardFocus();
 	void _DrawHints(uint32 x, uint32 y);
 
+	rgb_color		fBackgroundColor;
 	SudokuField*	fField;
 	uint32			fBlockSize;
 	float			fWidth, fHeight, fBaseline;

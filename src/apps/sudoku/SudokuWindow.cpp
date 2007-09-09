@@ -6,6 +6,7 @@
 
 #include "SudokuWindow.h"
 
+#include "CenteredViewContainer.h"
 #include "ProgressWindow.h"
 #include "Sudoku.h"
 #include "SudokuField.h"
@@ -156,9 +157,13 @@ SudokuWindow::SudokuWindow()
 	top->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(top);
 
-	fSudokuView = new SudokuView(top->Bounds().InsetByCopy(10, 10),
-		"sudoku view", settings, B_FOLLOW_ALL);
-	top->AddChild(fSudokuView);
+	fSudokuView = new SudokuView(top->Bounds().InsetByCopy(10, 10).OffsetToSelf(0, 0),
+		"sudoku view", settings, B_FOLLOW_NONE);
+	CenteredViewContainer * container = new CenteredViewContainer(fSudokuView, 
+		top->Bounds().InsetByCopy(10, 10), 
+		"center", B_FOLLOW_ALL);
+	container->SetHighColor(top->ViewColor());
+	top->AddChild(container);
 
 	// add menu
 

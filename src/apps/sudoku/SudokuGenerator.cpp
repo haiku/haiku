@@ -10,6 +10,7 @@
 #include "SudokuField.h"
 #include "SudokuSolver.h"
 
+#include <stdio.h>
 
 SudokuGenerator::SudokuGenerator()
 {

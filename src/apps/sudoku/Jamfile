@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src apps sudoku ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 Application Sudoku :
+	CenteredViewContainer.cpp
 	ProgressWindow.cpp
 	Sudoku.cpp
 	SudokuField.cpp

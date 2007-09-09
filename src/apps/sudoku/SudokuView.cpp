@@ -55,8 +55,11 @@ SudokuView::SudokuView(BRect frame, const char* name,
 	if (settings.FindBool("show cursor", &fShowCursor) != B_OK)
 		fShowCursor = false;
 
-	SetViewColor(255, 255, 240);
-	SetLowColor(ViewColor());
+	SetViewColor(B_TRANSPARENT_COLOR);
+		// to avoid flickering
+	rgb_color color = { 255, 255, 240 };
+	fBackgroundColor = color;
+	SetLowColor(color);
 	FrameResized(0, 0);
 }
 
@@ -99,7 +102,7 @@ SudokuView::_FilterString(const char* data, size_t dataLength, char* buffer,
 			continue;
 
 		if (!_ValidCharacter(data[i])) {
-			return B_BAD_DATA;
+			return B_BAD_VALUE;
 		}
 
 		buffer[out++] = data[i];
@@ -737,6 +740,11 @@ SudokuView::_DrawHints(uint32 x, uint32 y)
 void
 SudokuView::Draw(BRect /*updateRect*/)
 {
+	// draw one pixel border otherwise not covered
+	// by lines and fields
+	SetLowColor(fBackgroundColor);
+	StrokeRect(Bounds(), B_SOLID_LOW);
+
 	// draw lines
 
 	uint32 size = fField->Size();
@@ -778,9 +786,11 @@ SudokuView::Draw(BRect /*updateRect*/)
 				//SetLowColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
 				SetLowColor(255, 255, 210);
 				FillRect(_Frame(x, y), B_SOLID_LOW);
-			} else
-				SetLowColor(ViewColor());
-
+			} else {
+				SetLowColor(fBackgroundColor);
+				FillRect(_Frame(x, y), B_SOLID_LOW);
+			}
+			
 			if (fShowKeyboardFocus && x == fKeyboardX && y == fKeyboardY)
 				_DrawKeyboardFocus();
 
