@@ -43,6 +43,27 @@ struct hash_table {
 #define PUT_IN_NEXT(t, e, val) (*(unsigned long *)NEXT_ADDR(t, e) = (long)(val))
 
 
+const uint32 kPrimes [] = {
+	13, 31, 61, 127, 251,
+	509, 1021, 2039, 4093, 8191, 16381, 32749, 65521, 131071, 262139,
+	524287, 1048573, 2097143, 4194301, 8388593, 16777213, 33554393, 67108859,
+	134217689, 268435399, 536870909, 1073741789, 2147483647, 0
+};
+
+
+static uint32
+get_prime_table_size(uint32 size)
+{
+	int i;
+	for (i = 0; kPrimes[i] != 0; i++) {
+		if (kPrimes[i] > size)
+			return kPrimes[i];
+	}
+
+	return kPrimes[i - 1];
+}
+
+
 static inline void *
 next_element(hash_table *table, void *element)
 {
@@ -58,6 +79,8 @@ hash_init(uint32 table_size, int next_ptr_offset,
 {
 	struct hash_table *t;
 	unsigned int i;
+
+	table_size = get_prime_table_size(table_size);
 
 	if (compare_func == NULL || hash_func == NULL) {
 		dprintf("hash_init() called with NULL function pointer\n");
@@ -303,3 +326,23 @@ hash_hash_string(const char *string)
 	return hash;
 }
 
+
+uint32
+hash_count_elements(struct hash_table *table)
+{
+	return table->num_elements;
+}
+
+
+uint32
+hash_count_used_slots(struct hash_table *table)
+{
+	uint32 usedSlots = 0;
+	uint32 i;
+	for (i = 0; i < table->table_size; i++) {
+		if (table->table[i] != NULL)
+			usedSlots++;
+	}
+
+	return usedSlots;
+}
