@@ -664,7 +664,7 @@ create_new_vnode(struct vnode **_vnode, dev_t mountID, ino_t vnodeID)
 static void
 free_vnode(struct vnode *vnode, bool reenter)
 {
-	ASSERT(vnode->ref_count == 0 && vnode->busy);
+	ASSERT_PRINT(vnode->ref_count == 0 && vnode->busy, "vnode: %p\n", vnode);
 
 	// write back any changes in this vnode's cache -- but only
 	// if the vnode won't be deleted, in which case the changes
@@ -672,6 +672,24 @@ free_vnode(struct vnode *vnode, bool reenter)
 
 	if (!vnode->remove && FS_CALL(vnode, fsync) != NULL)
 		FS_CALL(vnode, fsync)(vnode->mount->cookie, vnode->private_node);
+
+	// Note: If this vnode has a cache attached, there will still be two
+	// references to that cache at this point. The last one belongs to the vnode
+	// itself (cf. vfs_get_vnode_cache()) and one belongs to the node's file
+	// cache. Each but the last reference to a cache also includes a reference
+	// to the vnode. The file cache, however, released its reference (cf.
+	// file_cache_create()), so that this vnode's ref count has the chance to
+	// ever drop to 0. Deleting the file cache now, will cause the next to last
+	// cache reference to be released, which will also release a (no longer
+	// existing) vnode reference. To avoid problems, we set the vnode's ref
+	// count, so that it will neither become negative nor 0.
+	vnode->ref_count = 2;
+
+	// TODO: Usually, when the vnode is unreferenced, no one can get hold of the
+	// cache either (i.e. no one can get a cache reference while we're deleting
+	// the vnode).. This is, however, not the case for the page daemon. It gets
+	// its cache references via the pages it scans, so it can in fact get a
+	// vnode reference while we're deleting the vnode.
 
 	if (!vnode->unpublished) {
 		if (vnode->remove)
@@ -717,6 +735,8 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 	mutex_lock(&sVnodeMutex);
 
 	int32 oldRefCount = atomic_add(&vnode->ref_count, -1);
+
+	ASSERT_PRINT(oldRefCount > 0, "vnode %p\n", vnode);
 
 	TRACE(("dec_vnode_ref_count: vnode %p, ref now %ld\n", vnode, vnode->ref_count));
 
