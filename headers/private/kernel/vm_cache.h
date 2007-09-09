@@ -23,6 +23,7 @@ status_t vm_cache_init(struct kernel_args *args);
 vm_cache *vm_cache_create(vm_store *store);
 void vm_cache_acquire_ref(vm_cache *cache);
 void vm_cache_release_ref(vm_cache *cache);
+vm_cache *vm_cache_acquire_page_cache_ref(vm_page *page);
 vm_page *vm_cache_lookup_page(vm_cache *cache, off_t page);
 void vm_cache_insert_page(vm_cache *cache, vm_page *page, off_t offset);
 void vm_cache_remove_page(vm_cache *cache, vm_page *page);

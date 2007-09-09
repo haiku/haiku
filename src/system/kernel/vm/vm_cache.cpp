@@ -11,6 +11,9 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+#include <util/khash.h>
+#include <util/AutoLock.h>
+
 #include <arch/cpu.h>
 #include <condition_variable.h>
 #include <debug.h>
@@ -18,7 +21,6 @@
 #include <kernel.h>
 #include <lock.h>
 #include <smp.h>
-#include <util/khash.h>
 #include <vm.h>
 #include <vm_page.h>
 #include <vm_priv.h>
@@ -77,6 +79,28 @@ page_hash_func(void *_p, const void *_key, uint32 range)
 		return HASH(page->cache_offset, page->cache) % range;
 
 	return HASH(key->offset, key->cache) % range;
+}
+
+
+/*!	Acquires a pseudo reference to a cache yet unreferenced by the caller. The
+	caller must make sure, that the cache is not deleted, e.g. by holding the
+	cache's source cache lock or by holding the page cache table lock while the
+	cache is still referred to by a page. To get a real reference, the caller
+	must subsequently call vm_cache_acquire_ref() and decrement the cache's ref
+	count manually afterwards.
+	Returns \c true, if the pseudo reference could be acquired.
+*/
+static inline bool
+acquire_unreferenced_cache_pseudo_ref(vm_cache* cache)
+{
+	while (true) {
+		int32 count = cache->ref_count;
+		if (count == 0)
+			return false;
+
+		if (atomic_test_and_set(&cache->ref_count, count + 1, count) == count)
+			return true;
+	}
 }
 
 
@@ -275,6 +299,29 @@ vm_cache_release_ref(vm_cache *cache)
 }
 
 
+vm_cache*
+vm_cache_acquire_page_cache_ref(vm_page* page)
+{
+	InterruptsSpinLocker locker(sPageCacheTableLock);
+
+	vm_cache* cache = page->cache;
+	if (cache == NULL)
+		return NULL;
+
+	// get a pseudo reference
+	if (!acquire_unreferenced_cache_pseudo_ref(cache))
+		return NULL;
+
+	locker.Unlock();
+
+	// turn it into a real reference
+	vm_cache_acquire_ref(cache);
+	atomic_add(&cache->ref_count, -1);
+
+	return cache;
+}
+
+
 vm_page *
 vm_cache_lookup_page(vm_cache *cache, off_t offset)
 {
@@ -326,11 +373,12 @@ vm_cache_insert_page(vm_cache *cache, vm_page *page, off_t offset)
 	cache->page_list = page;
 	cache->page_count++;
 
-	page->cache = cache;
 	page->usage_count = 2;
 
 	state = disable_interrupts();
 	acquire_spinlock(&sPageCacheTableLock);
+
+	page->cache = cache;
 
 #if KDEBUG
 	struct page_lookup_key key;
@@ -373,6 +421,7 @@ vm_cache_remove_page(vm_cache *cache, vm_page *page)
 	acquire_spinlock(&sPageCacheTableLock);
 
 	hash_remove(sPageCacheTable, page);
+	page->cache = NULL;
 
 	release_spinlock(&sPageCacheTableLock);
 	restore_interrupts(state);
@@ -388,7 +437,6 @@ vm_cache_remove_page(vm_cache *cache, vm_page *page)
 			page->cache_next->cache_prev = page->cache_prev;
 	}
 	cache->page_count--;
-	page->cache = NULL;
 }
 
 
@@ -499,26 +547,22 @@ vm_cache_remove_consumer(vm_cache *cache, vm_cache *consumer)
 		&& cache->consumers.link.next == cache->consumers.link.prev) {
 		// The cache is not really needed anymore - it can be merged with its only
 		// consumer left.
-		bool merge = false;
 
 		consumer = (vm_cache *)list_get_first_item(&cache->consumers);
 
-		// Our cache doesn't have a ref to its consumer (only the other way around), 
-		// so we cannot just acquire it here; it might be deleted right now
-		while (true) {
-			int32 count = consumer->ref_count;
-			if (count == 0)
-				break;
-
-			if (atomic_test_and_set(&consumer->ref_count, count + 1, count) == count) {
-				// We managed to grab a reference to the consumerRef.
-				// Since this doesn't guarantee that we get the cache we wanted
-				// to, we need to check if this cache is really the last
-				// consumer of the cache we want to merge it with.
-				merge = true;
-				break;
-			}
+		bool merge = acquire_unreferenced_cache_pseudo_ref(consumer);
+		if (merge) {
+			// We managed to increment the reference count, but that's not a
+			// full reference. We get a real one now and decrement the ref count
+			// again.
+			vm_cache_acquire_ref(consumer);
+			atomic_add(&consumer->ref_count, -1);
 		}
+
+		// In case we managed to grab a reference to the consumerRef,
+		// this doesn't guarantee that we get the cache we wanted
+		// to, so we need to check if this cache is really the last
+		// consumer of the cache we want to merge it with.
 
 		ConditionVariable<vm_cache> busyCondition;
 

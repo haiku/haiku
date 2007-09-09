@@ -70,21 +70,8 @@ PageCacheLocker::Lock(vm_page* page)
 	if (_IgnorePage(page))
 		return false;
 
-	vm_cache* cache = page->cache;
-
-	// Grab a reference to this cache - the page does not own a reference
-	// to its cache, so we can't just acquire it the easy way
-	while (true) {
-		int32 count = cache->ref_count;
-		if (count == 0) {
-			cache = NULL;
-			break;
-		}
-
-		if (atomic_test_and_set(&cache->ref_count, count + 1, count) == count)
-			break;
-	}
-
+	// Grab a reference to this cache.
+	vm_cache* cache = vm_cache_acquire_page_cache_ref(page);
 	if (cache == NULL)
 		return false;
 
