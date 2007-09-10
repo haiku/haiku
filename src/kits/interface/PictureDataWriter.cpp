@@ -524,11 +524,11 @@ PictureDataWriter::WriteSetFontFlags(const int32 &flags)
 
 
 status_t
-PictureDataWriter::WriteSetFontShear(const int32 &shear)
+PictureDataWriter::WriteSetFontShear(const float &shear)
 {
 	try {
 		BeginOp(B_PIC_SET_FONT_SHEAR);
-		Write<int32>(shear);
+		Write<float>(shear);
 		EndOp();
 	} catch (status_t &status) {
 		return status;	
