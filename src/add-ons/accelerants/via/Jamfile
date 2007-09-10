@@ -25,6 +25,6 @@ Package haiku-via_gfx-cvs :
 	via.accelerant : 
 	boot home config add-ons accelerants ;
 
-Depends via.accelerant : via.driver ;
+Depends via.accelerant : via ;
 
 SubInclude HAIKU_TOP src add-ons accelerants via engine ;

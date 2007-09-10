@@ -5,16 +5,16 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics via ] ;
 
-KernelAddon via.driver :
+KernelAddon via :
 	driver.c
 ;
 
 Package haiku-via_gfx-cvs :
 	README.html UPDATE.html ;
 Package haiku-via_gfx-cvs :
-	via.driver : 
+	via : 
 	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-via_gfx-cvs : graphics via.driver ;
+PackageDriverSymLink haiku-via_gfx-cvs : graphics via ;
 Package haiku-via_gfx-cvs :
 	via.settings :
 	boot home config settings kernel drivers ;
