@@ -541,7 +541,9 @@ static void
 set_pen_size(ViewLayer *view, float size)
 {
 	view->CurrentState()->SetPenSize(size);
-	view->Window()->GetDrawingEngine()->SetPenSize(size);
+	view->Window()->GetDrawingEngine()->SetPenSize(view->CurrentState()->PenSize());
+		// DrawState::PenSize() returns the scaled pen size, so we need to
+		// use that value to set the drawing engine pen size.
 }
 
 
@@ -576,6 +578,8 @@ set_scale(ViewLayer *view, float scale)
 	// the DrawingEngine/Painter does not need to be updated, since this
 	// effects only the view->screen coord conversion, which is handled
 	// by the view only
+	// TODO: (JackBurton) What about the pen size ? Since it depends on the scale,
+	// Don't we need to tell the drawing engine about it ?
 }
 
 
