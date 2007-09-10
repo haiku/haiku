@@ -3091,7 +3091,7 @@ BView::SetDiskMode(char* filename, long offset)
 void
 BView::BeginPicture(BPicture *picture)
 {
-	if (do_owner_check() && picture && picture->usurped == NULL) {
+	if (do_owner_check() && picture && picture->fUsurped == NULL) {
 		picture->Usurp(cpicture);
 		cpicture = picture;
 
@@ -3105,8 +3105,8 @@ BView::AppendToPicture(BPicture *picture)
 {
 	check_lock();
 
-	if (picture && picture->usurped == NULL) {
-		int32 token = picture->token;
+	if (picture && picture->fUsurped == NULL) {
+		int32 token = picture->Token();
 
 		if (token == -1) {
 			BeginPicture(picture);
@@ -3277,9 +3277,9 @@ BView::DrawPictureAsync(const BPicture *picture, BPoint where)
 	if (picture == NULL)
 		return;
 
-	if (do_owner_check() && picture->token > 0) {
+	if (do_owner_check() && picture->Token() > 0) {
 		fOwner->fLink->StartMessage(AS_LAYER_DRAW_PICTURE);
-		fOwner->fLink->Attach<int32>(picture->token);
+		fOwner->fLink->Attach<int32>(picture->Token());
 		fOwner->fLink->Attach<BPoint>(where);
 
 		_FlushIfNotInTransaction();
@@ -4286,7 +4286,7 @@ BView::DoPictureClip(BPicture *picture, BPoint where,
 
 	if (do_owner_check()) {
 		fOwner->fLink->StartMessage(AS_LAYER_CLIP_TO_PICTURE);
-		fOwner->fLink->Attach<int32>(picture->token);
+		fOwner->fLink->Attach<int32>(picture->Token());
 		fOwner->fLink->Attach<BPoint>(where);
 		fOwner->fLink->Attach<bool>(invert);
 

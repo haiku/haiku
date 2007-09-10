@@ -28,21 +28,11 @@
 #ifndef	_PICTURE_H
 #define	_PICTURE_H
 
-// Standard Includes -----------------------------------------------------------
-
-// System Includes -------------------------------------------------------------
 #include <BeBuild.h>
 #include <InterfaceDefs.h>
 #include <Rect.h>
 #include <Archivable.h>
 
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
 
 class BView;
 struct _BPictureExtent_;
@@ -83,7 +73,10 @@ virtual	void				_ReservedPicture3();
 
 		void				_ImportData(const void *data, int32 size, BPicture **subs, int32 subCount);
 		void				_ImportOldData(const void *data, int32 size);
+
 		void				SetToken(int32 token);
+		int32				Token() const;
+
 		bool				_AssertLocalCopy();
 		bool				_AssertOldLocalCopy();
 		bool				_AssertServerCopy();
@@ -98,10 +91,12 @@ virtual	void				_ReservedPicture3();
 
 		void				Usurp(BPicture *lameDuck);
 		BPicture			*StepDown();
+		
 
-		int32				token;
-		_BPictureExtent_		*extent;
-		BPicture			*usurped;
+		int32				fToken;
+		_BPictureExtent_		*fExtent;
+		BPicture			*fUsurped;
+
 		uint32				_reserved[3];
 };
 //------------------------------------------------------------------------------
