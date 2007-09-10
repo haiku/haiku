@@ -485,6 +485,7 @@ enter_state_change(ViewLayer *view)
 static void
 exit_state_change(ViewLayer *view)
 {
+	view->Window()->ServerWindow()->ResyncDrawState();
 }
 
 
@@ -575,11 +576,10 @@ static void
 set_scale(ViewLayer *view, float scale)
 {
 	view->CurrentState()->SetScale(scale);
-	// the DrawingEngine/Painter does not need to be updated, since this
-	// effects only the view->screen coord conversion, which is handled
-	// by the view only
-	// TODO: (JackBurton) What about the pen size ? Since it depends on the scale,
-	// Don't we need to tell the drawing engine about it ?
+	view->Window()->ServerWindow()->ResyncDrawState();
+	
+	// Update the drawing engine draw state, since some stuff (for example
+	// the pen size) needs to be recalculated.
 }
 
 
