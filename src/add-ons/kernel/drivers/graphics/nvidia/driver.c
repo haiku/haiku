@@ -302,6 +302,7 @@ static uint16 nvidia_device_list[] = {
 	0x0392, /* Nvidia GeForce 7600 GS */
 	0x0393, /* Nvidia GeForce 7300 GT */
 	0x0398, /* Nvidia GeForce 7600 GO */
+	0x03d1, /* Nvidia GeForce 6100 nForce 405 */
 	0
 };
 /*

@@ -765,6 +765,7 @@ status_t nv_general_powerup()
 		status = nvxx_general_powerup();
 		break;
 	case 0x024210de: /* Nvidia GeForce 6100 (NFORCE4 Integr.GPU) */
+	case 0x03d110de: /* Nvidia GeForce 6100 nForce 405 */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
 		sprintf(si->adi.name, "Nvidia GeForce 6100");
