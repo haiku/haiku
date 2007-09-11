@@ -21,8 +21,8 @@ AHCIController::AHCIController(device_node_handle node, pci_device_info *device)
 	, fPCIVendorID(0xffff)
 	, fPCIDeviceID(0xffff)
 	, fCommandSlotCount(0)
-	, fPortCount(0)
-	, fPortMax(0)
+	, fPortCountMax(0)
+	, fPortCountAvail(0)
 	, fIRQ(0)
  	, fInstanceCheck(-1)
 {
@@ -90,15 +90,13 @@ AHCIController::Init()
 	}
 
 	fCommandSlotCount = 1 + ((fRegs->cap >> CAP_NCS_SHIFT) & CAP_NCS_MASK);
-	fPortCount = 1 + ((fRegs->cap >> CAP_NP_SHIFT) & CAP_NP_MASK);
+	fPortCountMax = 1 + ((fRegs->cap >> CAP_NP_SHIFT) & CAP_NP_MASK);
+	fPortCountAvail = count_bits_set(fRegs->pi);
 
 	if (fRegs->pi == 0) {
 		TRACE("controller doesn't implement any ports\n");
 		goto err;
 	}
-	fPortMax = 31;
-	while ((fRegs->pi & (1 << fPortMax)) == 0) 
-		fPortMax--;
 
 	fIRQ = gPCI->read_pci_config(fPCIDevice, PCI_interrupt_line, 1);
 	if (fIRQ == 0 || fIRQ == 0xff) {
@@ -108,7 +106,7 @@ AHCIController::Init()
 
 	TRACE("cap: Interface Speed Support: generation %lu\n",	(fRegs->cap >> CAP_ISS_SHIFT) & CAP_ISS_MASK);
 	TRACE("cap: Number of Command Slots: %d (raw %#lx)\n",	fCommandSlotCount, (fRegs->cap >> CAP_NCS_SHIFT) & CAP_NCS_MASK);
-	TRACE("cap: Number of Ports: %d (raw %#lx)\n",			fPortCount, (fRegs->cap >> CAP_NCS_SHIFT) & CAP_NCS_MASK);
+	TRACE("cap: Number of Ports: %d (raw %#lx)\n",			fPortCountMax, (fRegs->cap >> CAP_NP_SHIFT) & CAP_NP_MASK);
 	TRACE("cap: Supports Port Multiplier: %s\n",		(fRegs->cap & CAP_SPM) ? "yes" : "no");
 	TRACE("cap: Supports External SATA: %s\n",			(fRegs->cap & CAP_SXS) ? "yes" : "no");
 	TRACE("cap: Enclosure Management Supported: %s\n",	(fRegs->cap & CAP_EMS) ? "yes" : "no");
@@ -121,8 +119,8 @@ AHCIController::Init()
 
 	TRACE("cap: Supports AHCI mode only: %s\n",			(fRegs->cap & CAP_SAM) ? "yes" : "no");
 	TRACE("ghc: AHCI Enable: %s\n",						(fRegs->ghc & GHC_AE) ? "yes" : "no");
-	TRACE("Ports Implemented: %08lx\n",					fRegs->pi);
-	TRACE("Highest port Number: %d\n",					fPortMax);
+	TRACE("Ports Implemented Mask: %#08lx\n",			fRegs->pi);
+	TRACE("Number of Available Ports: %d\n",			fPortCountAvail);
 	TRACE("AHCI Version %lu.%lu\n",						fRegs->vs >> 16, fRegs->vs & 0xff);
 	TRACE("Interrupt %u\n",								fIRQ);
 
@@ -132,7 +130,7 @@ AHCIController::Init()
 		goto err;
 	}
 
-	for (int i = 0; i <= fPortMax; i++) {
+	for (int i = 0; i <= fPortCountMax; i++) {
 		if (fRegs->pi & (1 << i)) {
 			fPort[i] = new (std::nothrow)AHCIPort(this, i);
 			if (!fPort[i]) {
@@ -166,7 +164,7 @@ AHCIController::Uninit()
 {
 	TRACE("AHCIController::Uninit\n");
 
-	for (int i = 0; i <= fPortMax; i++) {
+	for (int i = 0; i <= fPortCountMax; i++) {
 		if (fPort[i]) {
 			fPort[i]->Uninit();
 			delete fPort[i];
@@ -233,7 +231,7 @@ AHCIController::Interrupt(void *data)
 	if (int_stat == 0)
 		return B_UNHANDLED_INTERRUPT;
 
-	for (int i = 0; i < self->fPortMax; i++) {
+	for (int i = 0; i < self->fPortCountMax; i++) {
 		if (int_stat & (1 << i)) {
 			if (self->fPort[i]) {
 				self->fPort[i]->Interrupt();

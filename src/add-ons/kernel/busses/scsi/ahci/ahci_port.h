@@ -25,10 +25,12 @@ public:
 	uchar		TerminateRequest(scsi_ccb *request);
 	uchar		ResetDevice();
 
+private:
 
 private:
 	int						fIndex;
 	volatile ahci_port *	fRegs;
+area_id						fArea;
 };
 
 #endif	// _AHCI_PORT_H

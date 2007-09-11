@@ -47,10 +47,37 @@ enum {
 };
 
 
+enum {
+	INT_CPD			= (1 << 31),	// Cold Port Detect Status/Enable
+	INT_TFE			= (1 << 30),	// Task File Error Status/Enable
+	INT_HBF			= (1 << 29),	// Host Bus Fatal Error Status/Enable
+	INT_HBD			= (1 << 28),	// Host Bus Data Error Status/Enable
+	INT_IF			= (1 << 27),	// Interface Fatal Error Status/Enable
+	INT_INF			= (1 << 26),	// Interface Non-fatal Error Status/Enable
+	INT_OF			= (1 << 24),	// Overflow Status/Enable
+	INT_IPM			= (1 << 23),	// Incorrect Port Multiplier Status/Enable
+	INT_PRC			= (1 << 22),	// PhyRdy Change Status/Enable
+	INT_DMP			= (1 << 7),		// Device Mechanical Presence Status/Enable
+	INT_PC			= (1 << 6),		// Port Change Interrupt Status/Enable
+	INT_DP			= (1 << 5),		// Descriptor Processed Interrupt/Enable
+	INT_UF			= (1 << 4),		// Unknown FIS Interrupt/Enable
+	INT_SDB			= (1 << 3),		// Set Device Bits Interrupt/Enable
+	INT_DS			= (1 << 2),		// DMA Setup FIS Interrupt/Enable
+	INT_PS			= (1 << 1),		// PIO Setup FIS Interrupt/Enable
+	INT_DHR			= (1 << 0),		// Device to Host Register FIS Interrupt/Enable
+};
+
+
+enum {
+	AHCI_CLB_SIZE	= 1024,
+	AHCI_FIS_SIZE	= 256,
+};
+
+
 typedef struct {
-	uint32		clb;			// Command List Base Address
+	uint32		clb;			// Command List Base Address (alignment 1024 byte)
 	uint32		clbu;			// Command List Base Address Upper 32-Bits
-	uint32		fb;				// FIS Base Address
+	uint32		fb;				// FIS Base Address (alignment 256 byte)
 	uint32		fbu;			// FIS Base Address Upper 32-Bits
 	uint32		is;				// Interrupt Status
 	uint32		ie;				// Interrupt Enable
@@ -90,5 +117,23 @@ extern scsi_sim_interface gAHCISimInterface;
 extern device_manager_info *gDeviceManager;
 extern pci_device_module_info *gPCI;
 extern scsi_for_sim_interface *gSCSI;
+
+#define LO32(val) ((uint32)(val))
+#define HI32(val) (((uint64)(val)) >> 32)
+
+#ifdef __cplusplus
+
+template <class T>
+int count_bits_set(T value)
+{
+	int count = 0;
+	for (T mask = 1; mask; mask <<= 1)
+		if (value & mask)
+			count++;
+	return count;
+}
+
+#endif	/* __cplusplus */
+
 
 #endif	/* _AHCI_DEFS_H */
