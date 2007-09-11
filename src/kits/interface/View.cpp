@@ -1274,7 +1274,7 @@ BView::BeginRectTracking(BRect startRect, uint32 style)
 	if (do_owner_check()) {
 		fOwner->fLink->StartMessage(AS_LAYER_BEGIN_RECT_TRACK);
 		fOwner->fLink->Attach<BRect>(startRect);
-		fOwner->fLink->Attach<int32>(style);
+		fOwner->fLink->Attach<uint32>(style);
 	}
 }
 

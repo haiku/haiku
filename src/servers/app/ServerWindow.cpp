@@ -1934,6 +1934,27 @@ ServerWindow::_DispatchViewMessage(int32 code,
 			break;
 		}
 
+		case AS_LAYER_BEGIN_RECT_TRACK:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_BEGIN_RECT_TRACK\n", Title()));
+			BRect dragRect;
+			uint32 style;
+
+			link.Read<BRect>(&dragRect);
+			link.Read<uint32>(&style);
+
+			// TODO: implement rect tracking (used sometimes for selecting
+			// a group of things, also sometimes used to appear to drag something,
+			// but without real drag message)
+			break;
+		}
+		case AS_LAYER_END_RECT_TRACK:
+		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_END_RECT_TRACK\n", Title()));
+			// TODO: implement rect tracking
+			break;
+		}
+
 		case AS_LAYER_BEGIN_PICTURE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_BEGIN_PICTURE\n", Title()));
@@ -2337,8 +2358,10 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		}
 
 		default:
-			printf("ServerWindow %s received unexpected code - message offset %ld\n",
-				Title(), code - B_OK);
+			BString codeString;
+			string_for_message_code(code, codeString);
+			printf("ServerWindow %s received unexpected code: %s\n",
+				Title(), codeString.String());
 
 			if (link.NeedsReply()) {
 				// the client is now blocking and waiting for a reply!
