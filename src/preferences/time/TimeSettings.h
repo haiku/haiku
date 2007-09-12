@@ -1,29 +1,31 @@
 /*
- * Copyright 2002-2006, Haiku. All rights reserved.
+ * Copyright 2002-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Authors in chronological order:
+ * Authors:
  *		Andrew McCall, mccall@digitalparadise.co.uk
- *		Mike Berg
+ *		Mike Berg (inseculous)
+ *		Julun <host.haiku@gmx.de>
  */
 #ifndef TIME_SETTINGS_H
 #define TIME_SETTINGS_H
 
 
 #include <Point.h>
+#include <String.h>
 
 
 class TimeSettings {
 	public :
-		TimeSettings();
-		~TimeSettings();
+					TimeSettings();
+					~TimeSettings();
 
-		BPoint WindowCorner() const { return fCorner; }
-		void SetWindowCorner(BPoint corner);
+		BPoint 		LeftTop() const;
+		void		SetLeftTop(const BPoint leftTop);
 
 	private:
-		static const char kTimeSettingsFile[];
-		BPoint fCorner;
+		BString		fSettingsFile;
 };
 
 #endif	// TIME_SETTINGS_H
+

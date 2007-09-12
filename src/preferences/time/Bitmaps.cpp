@@ -1,13 +1,23 @@
-#include <Bitmap.h>
+/*
+ * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Julun <host.haiku@gmx.de>
+ */
+
+#include "Bitmaps.h"
+
+
 #include <Debug.h>
 #include <Screen.h>
 
-#include "Bitmaps.h"
 
 void 
 ReplaceTransparentColor(BBitmap *bitmap, rgb_color with)
 {
-	ASSERT(bitmap->ColorSpace() == B_COLOR_8_BIT); // other color spaces not implemented yet
+	// other color spaces not implemented yet
+	ASSERT(bitmap->ColorSpace() == B_COLOR_8_BIT);
 	
 	BScreen screen(B_MAIN_SCREEN_ID);
 	uint32 withIndex = screen.IndexForColor(with); 

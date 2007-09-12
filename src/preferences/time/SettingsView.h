@@ -18,7 +18,7 @@ class TTimeEdit;
 class TCalendarView;
 class TAnalogClock;
 class BRadioButton;
-class BStringView;
+
 
 class TSettingsView : public BView {
 	public:
@@ -32,7 +32,6 @@ class TSettingsView : public BView {
 
 		void 			ChangeRTCSetting();		
 		bool 			GMTime();
-		void			SetTimeZone(const char *timezone);
 
 	private:
 		void 			InitView();
@@ -46,8 +45,7 @@ class TSettingsView : public BView {
 		TCalendarView 	*fCalendar;
 		TAnalogClock 	*fClock;
 		bool 			fIsLocalTime;
-		BStringView		*fTimeZone;
 };
 
-#endif
+#endif	// SETTINGS_VIEW_H
 

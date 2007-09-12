@@ -1,25 +1,37 @@
+/*
+ * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Mike Berg (inseculous)
+ *		Julun <host.haiku@gmx.de>
+ */
 #ifndef TIMEBASE_H
 #define TIMEBASE_H
 
-#include <Message.h>
+
 #include <View.h>
+#include <Message.h>
 
 
 class TTimeBaseView: public BView {
 	public:
-		TTimeBaseView(BRect frmae, const char *name);
-		virtual ~TTimeBaseView();
+						TTimeBaseView(BRect frame, const char *name);
+		virtual 		~TTimeBaseView();
 		
-		virtual void Pulse();
-		virtual void AttachedToWindow();
+		virtual void 	Pulse();
+		virtual void 	AttachedToWindow();
 
-		void ChangeTime(BMessage *);
-		void SetGMTime(bool);
+		void 			SetGMTime(bool gmtTime);
+		void 			ChangeTime(BMessage *message);
+
 	protected:
-		virtual void DispatchMessage();
+		virtual void 	DispatchMessage();
+
 	private:
-		BMessage *fMessage;
-		bool fIsGMT;
+		bool 			fIsGMT;
+		BMessage 		fMessage;
 };
 
-#endif //TIMEBASE_H
+#endif	// TIMEBASE_H
+

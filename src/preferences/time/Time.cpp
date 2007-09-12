@@ -1,31 +1,34 @@
 /*
- * Copyright 2002-2006, Haiku. All rights reserved.
+ * Copyright 2002-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Authors in chronological order:
+ * Authors:
  *		Andrew McCall, mccall@digitalparadise.co.uk
- *		Mike Berg
+ *		Mike Berg (inseculous)
+ *		Julun <host.haiku@gmx.de>
  */
 
-
 #include "Time.h"
-#include "TimeSettings.h"
 #include "TimeMessages.h"
+#include "TimeSettings.h"
+#include "TimeWindow.h"
+
 
 #include <Alert.h>
+#include <Message.h>
 
 
 TimeApplication::TimeApplication()
-	: BApplication(HAIKU_APP_SIGNATURE)
+	: BApplication(HAIKU_APP_SIGNATURE),
+	  fWindow(NULL)
 {
-	fSettings = new TimeSettings();
-	fWindow = new TTimeWindow();
+	BPoint pt = TimeSettings().LeftTop();
+	fWindow = new TTimeWindow(pt);
 }
 
 
 TimeApplication::~TimeApplication()
 {
-	delete fSettings;
 }
 
 
@@ -33,12 +36,12 @@ void
 TimeApplication::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
-		case ERROR_DETECTED:
-			(new BAlert("Error", "Something has gone wrong!", "OK",
-				NULL, NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
-				B_WARNING_ALERT))->Go();
-			be_app->PostMessage(B_QUIT_REQUESTED);
-			break;			
+		case UPDATE_SETTINGS:
+		{
+			BPoint pt;
+			if (message->FindPoint("LeftTop", &pt) == B_OK)
+				TimeSettings().SetLeftTop(pt);
+		}	break;			
 
 		default:
 			BApplication::MessageReceived(message);
@@ -57,14 +60,8 @@ TimeApplication::ReadyToRun()
 void
 TimeApplication::AboutRequested()
 {
-	(new BAlert("about", "...by Andrew Edward McCall\n...Mike Berg too", "Big Deal"))->Go();
-}
-
-
-void
-TimeApplication::SetWindowCorner(BPoint corner)
-{
-	fSettings->SetWindowCorner(corner);
+	BAlert alert("about", "Time & Date, by\n\nAndrew Edward McCall\nMike Berg", "OK");
+	alert.Go();
 }
 
 
@@ -72,7 +69,7 @@ TimeApplication::SetWindowCorner(BPoint corner)
 
 
 int
-main(int, char**)
+main(int argc, char** argv)
 {
 	TimeApplication app;
 	app.Run();

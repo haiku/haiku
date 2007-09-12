@@ -6,32 +6,28 @@
  *		mccall@@digitalparadise.co.uk
  *		Julun <host.haiku@gmx.de>
  */
- 
+
+#include "TimeWindow.h"
+#include "BaseView.h"
+#include "SettingsView.h"
+#include "TimeMessages.h"
+#include "ZoneView.h"
+
+
 #include <Application.h>
 #include <Message.h>
 #include <Screen.h>
 #include <TabView.h>
 
-#include <stdio.h>
 
-#include "BaseView.h"
-#include "SettingsView.h"
-#include "Time.h"
-#include "TimeMessages.h"
-#include "TimeWindow.h"
-#include "TimeSettings.h"
-#include "ZoneView.h"
-
-#define TIME_WINDOW_RIGHT	400 //332
-#define TIME_WINDOW_BOTTOM	227 //208
+#define WINDOW_RIGHT	400
+#define WINDOW_BOTTOM	227
 
 
-TTimeWindow::TTimeWindow()
-	: BWindow(BRect(0, 0, TIME_WINDOW_RIGHT, TIME_WINDOW_BOTTOM), 
-		"Time & Date", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE )
+TTimeWindow::TTimeWindow(const BPoint leftTop)
+	: BWindow(BRect(leftTop, leftTop + BPoint(WINDOW_RIGHT, WINDOW_BOTTOM)),
+		"Time & Date", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 {
-	MoveTo(dynamic_cast<TimeApplication *>(be_app)->WindowCorner());
-
 	BRect frame = Frame();
 	BRect bounds = Bounds();
 	BRect screenFrame = BScreen().Frame();
@@ -40,7 +36,7 @@ TTimeWindow::TTimeWindow()
 		MoveTo((screenFrame.right - bounds.right) * 0.5f, 
 			(screenFrame.bottom - bounds.bottom) * 0.5f);
 	
-	InitWindow(); 
+	_InitWindow(); 
 	SetPulseRate(500000);
 }
 
@@ -51,8 +47,8 @@ TTimeWindow::MessageReceived(BMessage *message)
 	switch(message->what) {
 		case H_USER_CHANGE:
 		{
-			bool istime;
-			if (message->FindBool("time", &istime) == B_OK)
+			bool isTime;
+			if (message->FindBool("time", &isTime) == B_OK)
 				fBaseView->ChangeTime(message);
 			break;
 		}
@@ -60,7 +56,7 @@ TTimeWindow::MessageReceived(BMessage *message)
 		case H_RTC_CHANGE:
 			fBaseView->SetGMTime(fTimeSettings->GMTime());
 			break;
-		
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -71,7 +67,9 @@ TTimeWindow::MessageReceived(BMessage *message)
 bool 
 TTimeWindow::QuitRequested()
 {
-	dynamic_cast<TimeApplication *>(be_app)->SetWindowCorner(BPoint(Frame().left,Frame().top));
+	BMessage msg(UPDATE_SETTINGS);
+	msg.AddPoint("LeftTop", Frame().LeftTop());
+	be_app->PostMessage(&msg);
 	
 	fBaseView->StopWatchingAll(fTimeSettings);
 	fBaseView->StopWatchingAll(fTimeZones);
@@ -79,12 +77,11 @@ TTimeWindow::QuitRequested()
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	
 	return BWindow::QuitRequested();
-	
 }
 
 
 void 
-TTimeWindow::InitWindow()
+TTimeWindow::_InitWindow()
 {
 	BRect bounds(Bounds());
 	
@@ -99,12 +96,10 @@ TTimeWindow::InitWindow()
 	bounds.bottom -= tabview->TabHeight();
 	
 	fTimeSettings = new TSettingsView(bounds);
-	if (fBaseView->StartWatchingAll(fTimeSettings) != B_OK)
-		printf("StartWatchingAll(TimeSettings) failed!!!\n");
+	fBaseView->StartWatchingAll(fTimeSettings);
 
 	fTimeZones = new TZoneView(bounds);
-	if (fBaseView->StartWatchingAll(fTimeZones) != B_OK)
-		printf("TimeZones->StartWatchingAll(TimeZone) failed!!!\n");
+	fBaseView->StartWatchingAll(fTimeZones);
 
 	// add tabs
 	BTab *tab = new BTab();
@@ -121,6 +116,6 @@ TTimeWindow::InitWindow()
 	float height;
 	fTimeSettings->GetPreferredSize(&width, &height);
 	// width/ height from settingsview + all InsetBy etc..
-	ResizeTo(width +10, height + tabview->TabHeight() +25);
+	ResizeTo(width +5, height + tabview->TabHeight() +25);
 }
 

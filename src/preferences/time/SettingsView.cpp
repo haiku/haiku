@@ -13,6 +13,7 @@
 #include "DateTimeEdit.h"
 #include "TimeMessages.h"
 
+
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
@@ -25,7 +26,7 @@
 TSettingsView::TSettingsView(BRect frame)
 	: BView(frame,"Settings", B_FOLLOW_ALL, 
 		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP),
-	fGmtTime(NULL)
+	  fGmtTime(NULL)
 {	
 	InitView();
 }
@@ -109,17 +110,6 @@ TSettingsView::InitView()
 	fCalendar = new TCalendarView(frameLeft, "calendar", B_FOLLOW_NONE, B_WILL_DRAW);
 	AddChild(fCalendar);
 
-	frameLeft.top = fCalendar->Frame().bottom + 10;
-	BStringView *text = new BStringView(frameLeft, "timezone", "Timezone:");
-	AddChild(text);
-	text->ResizeToPreferred();
-
-	frameLeft.left += 20.0f;	
-	frameLeft.top = text->Frame().bottom + 5;
-
-	fTimeZone = new BStringView(frameLeft, "label", " ");
-	AddChild(fTimeZone);
-
 	// right side
 	BRect frameRight(Bounds());
 	frameRight.left = frameRight.Width() / 2;
@@ -144,14 +134,15 @@ TSettingsView::InitView()
 	// clock radio buttons
 	frameRight.left = left;
 	frameRight.top = fClock->Frame().bottom + 10;
-	text = new BStringView(frameRight, "clockis", "Clock set to:");
+	BStringView *text = new BStringView(frameRight, "clockis", "Clock set to:");
 	AddChild(text);
 	text->ResizeToPreferred();
 
-	frameRight.left += 20.0f;	
+	frameRight.left += 10.0f;	
 	frameRight.top = text->Frame().bottom + 5;
 
-	fLocalTime = new BRadioButton(frameRight, "local", "Local time", new BMessage(H_RTC_CHANGE));
+	fLocalTime = new BRadioButton(frameRight, "local", "Local time",
+		new BMessage(H_RTC_CHANGE));
 	AddChild(fLocalTime);
 	fLocalTime->ResizeToPreferred();
 
@@ -201,14 +192,6 @@ TSettingsView::GMTime()
 
 
 void
-TSettingsView::SetTimeZone(const char *timezone)
-{
-	fTimeZone->SetText(timezone);
-	fTimeZone->ResizeToPreferred();
-}
-
-
-void
 TSettingsView::UpdateDateTime(BMessage *message)
 {
 	int32 day;	
@@ -239,9 +222,9 @@ void
 TSettingsView::ReadRTCSettings()
 {
 	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK) {
-		return; // NO USER SETTINGS DIRECTORY!!!
-	}
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
+		return;
+
 	path.Append("RTC_time_settings");
 	
 	BFile file;
@@ -249,9 +232,9 @@ TSettingsView::ReadRTCSettings()
 	if (entry.Exists()) {
 		file.SetTo(&entry, B_READ_ONLY);
 		if (file.InitCheck() == B_OK) {
-			char buff[6];
-			file.Read(buff, 6);
-			BString	text(buff);
+			char localTime[6];
+			file.Read(localTime, 6);
+			BString	text(localTime);
 			if (text.Compare("local\n", 5) == 0)
 				fIsLocalTime = true;
 			else

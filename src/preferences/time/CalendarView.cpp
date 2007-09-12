@@ -1,11 +1,10 @@
 /*
- * Copyright 2004-2005, Haiku.
+ * Copyright 2004-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Michael Berg <mike@agamemnon.homelinux.net>
  */
-
 
 #include <String.h>
 #include <Window.h>
@@ -455,12 +454,14 @@ void
 TCalendarView::DispatchMessage()
 {
 	// send message to update timedate
-	BMessage *msg = new BMessage(H_USER_CHANGE);
-	msg->AddBool("time", false);
-	msg->AddInt32("month", f_month);
+	BMessage msg(H_USER_CHANGE);
+	msg.AddBool("time", false);
+	msg.AddInt32("month", f_month);
+	msg.AddInt32("year", f_year);
+
 	if (f_cday != NULL)
-		msg->AddInt32("day", f_cday->Day());
-	msg->AddInt32("year", f_year);
+		msg.AddInt32("day", f_cday->Day());
 		
-	Window()->PostMessage(msg);
+	Window()->PostMessage(&msg);
 }
+

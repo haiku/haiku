@@ -1,15 +1,18 @@
 /*
-	
-	TimeMessages.h
-	
-*/
-
+ * Copyright 2002-2007, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Andrew McCall, mccall@digitalparadise.co.uk
+ *		Mike Berg (inseculous)
+ *		Julun <host.haiku@gmx.de>
+ */
 #ifndef TIME_MESSAGES_H
 #define TIME_MESSAGES_H
 
 #define HAIKU_APP_SIGNATURE "application/x-vnd.Be-TIME"
 
-const uint32 ERROR_DETECTED = 'ERor';
+const uint32 UPDATE_SETTINGS = 'TDUS';
 
 //Timezone messages
 const uint32 H_REGION_CHANGED = 'h_RC';
@@ -37,6 +40,9 @@ const uint32 H_USER_CHANGE = 'obUC';
 
 // local/gmt radiobuttons
 const uint32 H_RTC_CHANGE = 'obRC';
+
+// sunday/monday radio button
+const uint32 kWeekStart = '_kws';
 
 #endif //TIME_MESSAGES_H
 

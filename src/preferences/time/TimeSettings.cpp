@@ -1,66 +1,65 @@
 /*
- * Copyright 2002-2006, Haiku. All rights reserved.
+ * Copyright 2002-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Authors in chronological order:
+ * Authors:
  *		Andrew McCall, mccall@digitalparadise.co.uk
- *		Mike Berg
+ *		Mike Berg (inseculous)
+ *		Julun <host.haiku@gmx.de>
  */
-
  
 #include "TimeSettings.h"
 #include "TimeMessages.h"
 
-#include <Application.h>
-#include <FindDirectory.h>
+
 #include <File.h>
+#include <FindDirectory.h>
 #include <Path.h>
-#include <String.h>
-#include <stdio.h>
-
-
-const char TimeSettings::kTimeSettingsFile[] = "Time_settings";
 
 
 TimeSettings::TimeSettings()
+	: fSettingsFile("Time_settings")
 {
-	BPath path;
-	
-	if (find_directory(B_USER_SETTINGS_DIRECTORY,&path) == B_OK) {
-		path.Append(kTimeSettingsFile);
-		BFile file(path.Path(), B_READ_ONLY);
-		if (file.InitCheck() == B_OK) {
-			// Now read in the data
-			if (file.Read(&fCorner, sizeof(BPoint)) != sizeof(BPoint)) {
-				fCorner.x = 50;
-				fCorner.y = 50;
-			}
-		} else {
-			fCorner.x = 50;
-			fCorner.y = 50;
-		}
-	} else
-		be_app->PostMessage(ERROR_DETECTED);	
 }
 
 
 TimeSettings::~TimeSettings()
 {
+}
+
+
+BPoint
+TimeSettings::LeftTop() const
+{
 	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) < B_OK)
-		return;
+	BPoint leftTop(50.0, 50.0);
 
-	path.Append(kTimeSettingsFile);
-
-	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE);
-	if (file.InitCheck() == B_OK) {
-		file.Write(&fCorner, sizeof(BPoint));
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
+		path.Append(fSettingsFile.String());
+	
+		BFile file(path.Path(), B_READ_ONLY);
+		if (file.InitCheck() == B_OK) {
+			BPoint tmp;
+			if (file.Read(&tmp, sizeof(BPoint)) == sizeof(BPoint))
+				leftTop = tmp;
+		}
 	}
+
+	return leftTop;
 }
 
 
 void
-TimeSettings::SetWindowCorner(BPoint corner)
+TimeSettings::SetLeftTop(const BPoint leftTop)
 {
-	fCorner = corner;
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
+		return;
+
+	path.Append(fSettingsFile.String());
+	
+	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE);
+	if (file.InitCheck() == B_OK)
+		file.Write(&leftTop, sizeof(BPoint));
 }
+

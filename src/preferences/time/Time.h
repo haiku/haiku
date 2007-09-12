@@ -1,38 +1,35 @@
 /*
- * Copyright 2002-2006, Haiku. All rights reserved.
+ * Copyright 2002-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Authors in chronological order:
+ * Authors:
  *		Andrew McCall, mccall@digitalparadise.co.uk
- *		Mike Berg
+ *		Mike Berg (inseculous)
+ *		Julun <host.haiku@gmx.de>
  */
 #ifndef TIME_H
 #define TIME_H
 
 
-#include "TimeSettings.h"
-#include "TimeWindow.h"
-
 #include <Application.h>
+
+
+class BMessage;
+class TTimeWindow;
 
 
 class TimeApplication : public BApplication {
 	public:
-		TimeApplication();
-		virtual ~TimeApplication();
+						TimeApplication();
+		virtual 		~TimeApplication();
 
-		void MessageReceived(BMessage* message);
-
-		void ReadyToRun();
-		void AboutRequested();
-
-		void SetWindowCorner(BPoint corner);
-		BPoint WindowCorner() const 
-			{ return fSettings->WindowCorner(); }
+		virtual void 	MessageReceived(BMessage* message);
+		virtual void 	ReadyToRun();
+		virtual void 	AboutRequested();
 
 	private:
-		TimeSettings *fSettings;
-		TTimeWindow *fWindow;
+		TTimeWindow 	*fWindow;
 };
 
 #endif	// TIME_H
+

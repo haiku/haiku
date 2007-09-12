@@ -299,5 +299,3 @@ TSectionEdit::DoDownPress()
 {
 }
 
-
-//---//
