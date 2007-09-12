@@ -1146,6 +1146,11 @@ CopyAttributes(CopyLoopControl *control, BNode *srcNode, BNode *destNode, void *
 				continue;
 		}
 
+		// Special case for a size 0 attribute. It wouldn't be written at all
+		// otherwise.
+		if (info.size == 0)
+			destNode->WriteAttr(name, info.type, 0, buffer, 0);
+
 		ssize_t bytes;
 		ssize_t numToRead = (ssize_t)info.size;
 		for (off_t offset = 0; numToRead > 0; offset += bytes) {
