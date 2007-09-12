@@ -192,6 +192,8 @@ class Painter {
 			BRect				InvertRect(		const BRect& r) const;
 
 	inline	BRect				ClipRect(		BRect rect) const;
+	inline	BRect				AlignAndClipRect(BRect rect) const;
+
 
  private:
 			void				_Transform(BPoint* point,
@@ -287,6 +289,21 @@ Painter::ClipRect(BRect rect) const
 	rect.top = floorf(rect.top);
 	rect.right = ceilf(rect.right);
 	rect.bottom = ceilf(rect.bottom);
+	return _Clipped(rect);
+}
+
+inline BRect
+Painter::AlignAndClipRect(BRect rect) const
+{
+	rect.left = floorf(rect.left);
+	rect.top = floorf(rect.top);
+	if (fSubpixelPrecise) {
+		rect.right = ceilf(rect.right);
+		rect.bottom = ceilf(rect.bottom);
+	} else {
+		rect.right = floorf(rect.right);
+		rect.bottom = floorf(rect.bottom);
+	}
 	return _Clipped(rect);
 }
 

@@ -792,7 +792,7 @@ DrawingEngine::FillRect(BRect r)
 	CRASH_IF_NOT_LOCKED
 
 	make_rect_valid(r);
-	r = fPainter->ClipRect(r);
+	r = fPainter->AlignAndClipRect(r);
 	if (r.IsValid()) {
 		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(r);
 

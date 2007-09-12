@@ -561,9 +561,8 @@ Painter::StrokeRect(const BRect& r) const
 {
 	CHECK_CLIPPING
 
-	// support invalid rects
-	BPoint a(min_c(r.left, r.right), min_c(r.top, r.bottom));
-	BPoint b(max_c(r.left, r.right), max_c(r.top, r.bottom));
+	BPoint a(r.left, r.top);
+	BPoint b(r.right, r.bottom);
 	_Transform(&a, false);
 	_Transform(&b, false);
 
