@@ -492,7 +492,7 @@ BNode::WriteAttrString(const char *name, const BString *data)
 {
 	status_t error = (!name || !data)  ? B_BAD_VALUE : B_OK;
 	if (error == B_OK) {
-		int32 len = data->Length();
+		int32 len = data->Length() + 1;
 		ssize_t sizeWritten = WriteAttr(name, B_STRING_TYPE, 0, data->String(),
 										len);
 		if (sizeWritten != len)
