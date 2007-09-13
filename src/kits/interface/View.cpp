@@ -1470,6 +1470,11 @@ BView::GetMouse(BPoint *location, uint32 *buttons, bool checkMessageQueue)
 		ConvertFromScreen(location);
 			// TODO: in beos R5, location is already converted to the view local coordinate system,
 			// so if an app checks the window message queue by itself, it might not find what it expects.
+			// NOTE: the fact that we have mouse coords in screen space in our queue avoids the problem
+			// that messages already in the queue will be outdated as soon as a window or even the
+			// view moves. The second situation being quite common actually, also with regards to
+			// scrolling. An app reading these messages would have to know the locations of the window
+			// and view for each message... otherwise it is potentially broken anyways.
 	} else
 		*buttons = 0;
 }
