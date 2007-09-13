@@ -42,8 +42,8 @@ public:
 
 	void	SetTermFont(const BFont *halfFont, const BFont *fullFont);
 	void	GetFontSize(int *width, int *height);
-
 	BRect	SetTermSize(int rows, int cols, bool resize);
+
 	void	SetTextColor(rgb_color fore, rgb_color back);
 	void	SetSelectColor(rgb_color fore, rgb_color back);
 	void	SetCursorColor(rgb_color fore, rgb_color back);
@@ -117,6 +117,8 @@ public:
 
 	void	CheckShellGone();
 
+	void	InitiateDrag();
+
 protected:
 	virtual void	AttachedToWindow();
 	virtual void	DetachedFromWindow();
@@ -139,7 +141,7 @@ protected:
 
 private:
 	status_t _InitObject(int32 argc, const char **argv);
-	status_t _InitMouseThread(void);
+	status_t _InitMouseThread();
 
 	status_t _AttachShell(Shell *shell);
 	void _DetachShell();
@@ -164,9 +166,9 @@ private:
 	//  void _DoIMChange (BMessage* message);
 	//  void _DoIMLocation (BMessage* message);
 	//  void _DoIMConfirm (void);
-	void _ConfirmString (const char *, int32);
-	int32 _GetCharFromUTF8String (const char *, char *);
-	int32 _GetWidthFromUTF8String (const char *);
+	void _ConfirmString(const char *, int32);
+	int32 _GetCharFromUTF8String(const char *, char *);
+	int32 _GetWidthFromUTF8String(const char *);
 
 	// Mouse select
 	void _Select(CurPos start, CurPos end);
@@ -186,7 +188,6 @@ private:
 
 	bool _CheckSelectedRegion(const CurPos &pos);
 	
-
 	void _UpdateSIGWINCH();
 
 	static void _FixFontAttributes(BFont &font);

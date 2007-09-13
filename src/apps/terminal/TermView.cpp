@@ -135,6 +135,7 @@ TermView::TermView(BRect frame, int32 argc, const char **argv, int32 historySize
 	: BView(frame, "termview", B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE| B_PULSE_NEEDED),
 	fShell(NULL),
+	fWinchRunner(NULL),
 	fFontWidth(0),
 	fFontHeight(0),
 	fFontAscent(0),
@@ -184,6 +185,7 @@ TermView::TermView(int rows, int columns, int32 argc, const char **argv, int32 h
 	: BView(BRect(0, 0, 0, 0), "termview", B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE| B_PULSE_NEEDED),
 	fShell(NULL),
+	fWinchRunner(NULL),
 	fFontWidth(0),
 	fFontHeight(0),
 	fFontAscent(0),
@@ -234,6 +236,7 @@ TermView::TermView(BMessage *archive)
 	:
 	BView(archive),
 	fShell(NULL),
+	fWinchRunner(NULL),
 	fFontWidth(0),
 	fFontHeight(0),
 	fFontAscent(0),
@@ -1166,42 +1169,7 @@ TermView::_MouseTracking()
 	float scr_start, scr_end, scr_pos;
 	
 	while(!fQuitting) {
-		if (1) {
-	#ifdef CHANGE_CURSOR_IMAGE    
-			if (!has_data(find_thread(NULL))) {
-				BRect r;
-				
-				if (_HasSelection()
-					&& (modifiers() & B_CONTROL_KEY)) {
-				
-				if (LockLooper()) {
-					GetMouse(&stpoint, &button);
-					r = Bounds();
-					UnlockLooper();
-				}
-				if (r.Contains(stpoint)) {
-					CurPos tmppos = _BPointToCurPos(stpoint);
-					if (fSelStart > fSelEnd) {
-						stpos = fSelEnd;
-						edpos = fSelStart;
-					} else {
-						stpos = fSelStart;
-						edpos = fSelEnd;
-					}
-					
-					if (tmppos > stpos && tmppos < edpos)
-						SetViewCursor(M_ADD_CURSOR);
-					else 
-						SetViewCursor(B_HAND_CURSOR);
-				}
-			}
-			snooze(50 * 1000);
-			continue;
-		} else {
-#endif
-			code = receive_data(&sender,(void *)&stpoint, sizeof(BPoint));
-		}
-
+		code = receive_data(&sender,(void *)&stpoint, sizeof(BPoint));
 		if (code != MOUSE_THR_CODE)
 			continue;
 
@@ -1211,8 +1179,7 @@ TermView::_MouseTracking()
 		stpos = _BPointToCurPos(stpoint);
 		
 		do {
-			
-			snooze(40 * 1000);
+			snooze(40000);
 			
 			if (LockLooper()) {
 				GetMouse(&edpoint, &button);
@@ -2019,19 +1986,8 @@ TermView::MouseDown(BPoint where)
 		Window()->CurrentMessage()->FindInt32("clicks", &clicks);
 
 		if (_HasSelection()) {
-			CurPos inPos, stPos, edPos;
-			if (fSelStart < fSelEnd) {
-				stPos = fSelStart;
-				edPos = fSelEnd;
-			} else {
-				stPos = fSelEnd;
-				edPos = fSelStart;
-			}
-
-			inPos = _BPointToCurPos(where);
-
-			// If mouse pointer is avove selected Region, start Drag'n Copy.
-			if (inPos > stPos && inPos < edPos) {
+			CurPos inPos = _BPointToCurPos(where);
+			if (_CheckSelectedRegion(inPos)) {
 				if (mod & B_CONTROL_KEY) {
 					BPoint p;
 					uint32 bt;
@@ -2043,34 +1999,12 @@ TermView::MouseDown(BPoint where)
 							return;
 						}
 					
-						snooze(40 * 1000);
+						snooze(40000);
 					
 					} while (abs((int)(where.x - p.x)) < 4
 						&& abs((int)(where.y - p.y)) < 4);
 				
-					BString copyStr("");
-					fTextBuffer->GetStringFromRegion(copyStr, fSelStart, fSelEnd);
-				
-					BMessage msg(B_MIME_TYPE);
-					msg.AddData("text/plain", B_MIME_TYPE, copyStr.String(), copyStr.Length());
-				
-					BPoint st = _CurPosToBPoint(stPos);
-					BPoint ed = _CurPosToBPoint(edPos);
-					BRect r;
-					
-					if (stPos.y == edPos.y) {
-						r.Set(st.x, st.y - fTop,
-						ed.x + fFontWidth, ed.y + fFontHeight - fTop);
-					
-					} else {
-					
-						r.Set(0, st.y - fTop,
-						fTermColumns * fFontWidth, ed.y + fFontHeight - fTop);
-					}
-					
-					r = r & Bounds();
-					
-					DragMessage(&msg, r);
+					InitiateDrag();
 					return;
 				}
 			}
@@ -2113,6 +2047,7 @@ TermView::MouseDown(BPoint where)
 
 	BView::MouseDown(where);
 }
+
 
 void
 TermView::MouseMoved(BPoint where, uint32 transit, const BMessage *message)
@@ -2534,6 +2469,35 @@ TermView::CheckShellGone()
 		// the shell is gone
 		NotifyQuit(0);
 	}
+}
+
+
+void
+TermView::InitiateDrag()
+{
+	BString copyStr("");
+	fTextBuffer->GetStringFromRegion(copyStr, fSelStart, fSelEnd);
+
+	BMessage message(B_MIME_TYPE);
+	message.AddData("text/plain", B_MIME_TYPE, copyStr.String(), copyStr.Length());
+
+	BPoint start = _CurPosToBPoint(fSelStart);
+	BPoint end = _CurPosToBPoint(fSelEnd);
+	
+	BRect rect;	
+	if (fSelStart.y == fSelEnd.y) {
+		rect.Set(start.x, start.y - fTop, end.x + fFontWidth,
+			end.y + fFontHeight - fTop);
+	
+	} else {
+	
+		rect.Set(0, start.y - fTop, fTermColumns * fFontWidth,
+			end.y + fFontHeight - fTop);
+	}
+	
+	rect = rect & Bounds();
+	
+	DragMessage(&message, rect);
 }
 
 
