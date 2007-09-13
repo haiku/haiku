@@ -48,13 +48,14 @@ StyleView::StyleView(BRect frame)
 #ifdef __HAIKU__
 	: BView("style view", 0),
 #else
-	: BView(frame, "style view", B_FOLLOW_LEFT | B_FOLLOW_TOP, 0),
+	: BView(frame, "style view", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_FRAME_EVENTS),
 #endif
 	  fCommandStack(NULL),
 	  fCurrentColor(NULL),
 	  fStyle(NULL),
 	  fGradient(NULL),
-	  fIgnoreCurrentColorNotifications(false)
+	  fIgnoreCurrentColorNotifications(false),
+	  fPreviousBounds(frame.OffsetToCopy(B_ORIGIN))
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -182,6 +183,25 @@ StyleView::AttachedToWindow()
 {
 	fStyleType->Menu()->SetTargetForItems(this);
 	fGradientType->Menu()->SetTargetForItems(this);
+}
+
+// FrameResized
+void
+StyleView::FrameResized(float width, float height)
+{
+	BRect bounds = Bounds();
+
+#ifndef __HAIKU__
+	// Grrr, babysit the menubars...
+	BRect dirty = bounds;
+	dirty.left = min_c(bounds.right, fPreviousBounds.right) - 25;
+	fStyleType->ConvertFromParent(&dirty);
+	fStyleType->MenuBar()->ConvertFromParent(&dirty);
+	fStyleType->MenuBar()->Invalidate(dirty);
+	fGradientType->MenuBar()->Invalidate(dirty);
+#endif // !__HAIKU__
+
+	fPreviousBounds = bounds;
 }
 
 // MessageReceived

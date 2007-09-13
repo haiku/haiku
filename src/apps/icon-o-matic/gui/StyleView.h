@@ -42,6 +42,7 @@ class StyleView : public BView,
 
 	// BView interface
 	virtual	void				AttachedToWindow();
+	virtual	void				FrameResized(float width, float height);
 	virtual	void				MessageReceived(BMessage* message);
 
 #if __HAIKU__
@@ -77,6 +78,8 @@ class StyleView : public BView,
 			GradientControl*	fGradientControl;
 			BMenuField*			fStyleType;
 			BMenuField*			fGradientType;
+
+			BRect				fPreviousBounds;
 };
 
 #endif // STYLE_VIEW_H
