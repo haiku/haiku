@@ -266,8 +266,8 @@ _BMCMenuBar_::FrameResized(float width, float height)
 		}
 	}
 
-	if (!fFixedSize) {
-		// we have been shrinked or enlarged and need to take
+	if (!fFixedSize && ResizingMode() == (B_FOLLOW_LEFT | B_FOLLOW_TOP)) {
+		// we have been shrinked or enlarged and need to take care
 		// of the size of the parent menu field as well
 		// NOTE: no worries about follow mode, we follow left and top
 		// in autosize mode
