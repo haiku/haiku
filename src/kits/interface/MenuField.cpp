@@ -586,6 +586,17 @@ BMenuField::ResizeToPreferred()
 	fMenuBar->ResizeToPreferred();
 
 	BView::ResizeToPreferred();
+
+	if (fFixedSizeMB) {
+		// we have let the menubar resize itsself, but
+		// in fixed size mode, the menubar is supposed to
+		// be at the right end of the view always. Since
+		// the menu bar is in follow left/right mode then,
+		// resizing ourselfs might have caused the menubar
+		// to be outside now
+		fMenuBar->ResizeTo(Bounds().Width() - fDivider - 2,
+			fMenuBar->Frame().Height());
+	}
 }
 
 
