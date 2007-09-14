@@ -146,7 +146,7 @@ TDay::Draw(BRect updaterect)
 	SetHighColor(bgcolor);
 	FillRect(bounds);
 
-	if (f_day> 0) {
+	if (f_day > 0) {
 		if (!(Value() == 1))
 			SetHighColor(0, 0, 0, 255);
 		else
@@ -207,7 +207,7 @@ TDay::SetTo(int day, bool selected)
 	f_day = day;
 	SetValue(selected);
 	if (Value() == 1) {
-		SetFlags(Flags()|B_NAVIGABLE);
+		SetFlags(Flags() | B_NAVIGABLE);
 	} else {
 		SetFlags(Flags() & ~B_NAVIGABLE);
 	}
@@ -224,7 +224,7 @@ TCalendarView::TCalendarView(BRect frame, const char *name,
 	, f_firstday(0)
 	, f_month(0)
 	, f_day(0)
-	,f_year(0)
+	, f_year(0)
 {
 	InitView();
 }
@@ -338,20 +338,19 @@ TCalendarView::Draw(BRect updaterect)
 {	
 	BRect bounds(0.0, 0.0, f_dayrect.Width(), f_dayrect.Height());
 
-	float width = 0;	
-	float x = bounds.Width()/2.0;
-	BPoint drawpt;
-	BString day;
 	SetLowColor(ViewColor());
 	SetHighColor(0, 0, 0);
 	
-	float offset = FontHeight(this, true);
+	BPoint drawpt;
+	drawpt.y = (bounds.top + bounds.bottom + FontHeight(this, true)) / 2.0;
 	
+	float width = 0;	
+	float x = bounds.Width() / 2.0;
+	BString day;
 	for (int i = 0; i < 7; i++) {
 		day = BString(&kDays[i], 1);
 		width = be_plain_font->StringWidth(day.String());
 		drawpt.x = bounds.left + (x - width / 2.0 + 2);
-		drawpt.y = bounds.bottom - offset / 2.0;
 		DrawString(day.String(), drawpt);	
 		bounds.OffsetBy(bounds.Width() + 1, 0);
 	}

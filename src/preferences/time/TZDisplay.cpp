@@ -1,24 +1,35 @@
-#include<Message.h>
-#include <String.h>
-#include <stdio.h>
+/*
+ * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		probably Mike Berg <mike@agamemnon.homelinux.net>
+ *		and/or Andrew McCall <mccall@@digitalparadise.co.uk>
+ *		Julun <host.haiku@gmx.de>
+ *
+ */
 
-#include <math.h>
-
-#include "TimeMessages.h"
 #include "TZDisplay.h"
 
 
-TTZDisplay::TTZDisplay(BRect frame, const char *name, 
-		uint32 resizingmode, uint32 flags,
-		const char *label, const char *text, 
-		int32 hour, int32 minute)
-	: BView(frame, name, resizingmode, flags)
+namespace {
+	float _FontHeight()
+	{
+		font_height fontHeight;
+		be_plain_font->GetHeight(&fontHeight);
+		float height = ceil(fontHeight.descent) + ceil(fontHeight.ascent) 
+			+ ceil(fontHeight.leading);
+		return height;
+	}
+}
+
+
+TTZDisplay::TTZDisplay(BRect frame, const char *name, const char *label)
+	: BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW),
+	  fLabel(label),
+	  fText(""),
+	  fTime("")
 {
-	f_label = new BString(label);
-	f_text = new BString(text);
-	f_time = new BString();
-	
-	SetTo(hour, minute);
 }
 
 
@@ -36,116 +47,87 @@ TTZDisplay::AttachedToWindow()
 
 
 void
-TTZDisplay::MessageReceived(BMessage *message)
-{
-	switch(message->what) {
-		default:
-			BView::MessageReceived(message);
-			break;
-	}
-}
-
-
-static float
-fontheight()
-{
-	font_height finfo;
-	be_plain_font->GetHeight(&finfo);
-	float height = ceil(finfo.descent) +ceil(finfo.ascent) +ceil(finfo.leading);
-	return height;
-}
-
-
-void
 TTZDisplay::ResizeToPreferred()
 {
-	float height = fontheight();
+	float height = _FontHeight();
 	ResizeTo(Bounds().Width(), height *2);
 }
 
 
 void
-TTZDisplay::Draw(BRect updaterect)
+TTZDisplay::Draw(BRect /* updateRect */)
 {
 	BRect bounds(Bounds());
 	SetLowColor(ViewColor());
 	FillRect(bounds, B_SOLID_LOW);
 	
-	float height = fontheight();
+	float height = _FontHeight();
 
-	BPoint drawpt(bounds.left +2, height/2.0 +1);
-	DrawString(f_label->String(), drawpt);
+	BPoint drawpt(bounds.left +2, height /2.0 +1);
+	DrawString(fLabel.String(), drawpt);
 
-	drawpt.y += fontheight() +2;
-	DrawString(f_text->String(), drawpt);
+	drawpt.y += height +2;
+	DrawString(fText.String(), drawpt);
 	
-	drawpt.x = bounds.right -be_plain_font->StringWidth(f_time->String()) - 2;
-	DrawString(f_time->String(), drawpt);
+	drawpt.x = bounds.right -be_plain_font->StringWidth(fTime.String()) - 2;
+	DrawString(fTime.String(), drawpt);
+}
+
+
+const char*
+TTZDisplay::Label() const
+{
+	return fLabel.String();
 }
 
 
 void
 TTZDisplay::SetLabel(const char *label)
 {
-	f_label->SetTo(label);
+	fLabel.SetTo(label);
 	Draw(Bounds());
+}
+
+
+const char*
+TTZDisplay::Text() const
+{
+	return fText.String();
 }
 
 
 void
 TTZDisplay::SetText(const char *text)
 {
-	f_text->SetTo(text);
+	fText.SetTo(text);
 	Draw(Bounds());
 }
 
 
-void
-TTZDisplay::SetTo(int32 hour, int32 minute)
+const char*
+TTZDisplay::Time() const
 {
-	// format time into f_time
-	if (f_time == NULL)
-		f_time = new BString();
-	else
-		 f_time->SetTo("");
-	
+	return fTime.String();
+}
+
+
+void
+TTZDisplay::SetTime(int32 hour, int32 minute)
+{
 	int32 ahour = hour;
-	if (hour> 12)
+	if (hour > 12)
 		ahour = hour -12;
 		
 	if (ahour == 0)
 		ahour = 12;
 
-	char *ap;
-	if (hour> 11)
+	char *ap = "AM";
+	if (hour > 11)
 		ap = "PM";
-	else
-		ap = "AM";
 
-	char *time = f_time->LockBuffer(8);
-	sprintf(time, "%02lu:%02lu %s", ahour, minute, ap);
-	f_time->UnlockBuffer(8);
-	
+	fTime.SetTo("");
+	fTime << ahour << ":" << minute << ":" << ap;
+
 	Invalidate();
 }
 
-
-const char *
-TTZDisplay::Text() const
-{
-	return f_text->String();
-}
-
-
-const char *
-TTZDisplay::Label() const
-{
-	return f_label->String();
-}
-
-
-const char *
-TTZDisplay::Time() const
-{
-	return f_time->String();
-}

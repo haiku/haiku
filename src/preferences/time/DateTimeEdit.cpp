@@ -1,37 +1,38 @@
+/*
+ * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		probably Mike Berg <mike@agamemnon.homelinux.net>
+ *		and/or Andrew McCall <mccall@@digitalparadise.co.uk>
+ *		Julun <host.haiku@gmx.de>
+ *
+ */
+
 #include "DateTimeEdit.h"
 #include "DateUtils.h"
 
+
+#include <List.h>
 #include <String.h>
-#include <stdio.h>
+
 
 #define YEAR_DELTA_MAX 110
 #define YEAR_DELTA_MIN 64
 
 
-TDateTimeSection::TDateTimeSection(BRect frame, uint32 data)
-	: TSection(frame),
-	fData(data)
-{
-}
+class TDateTimeSection : public TSection {
+	public:
+				TDateTimeSection(BRect frame, uint32 data = 0)
+					: TSection(frame), fData(data) { }
+				~TDateTimeSection();
+		
+		uint32	Data() const	{	return fData;	}
+		void	SetData(uint32 data)	{	fData = data;	}
 
-
-TDateTimeSection::~TDateTimeSection()
-{
-}
-
-
-uint32
-TDateTimeSection::Data() const
-{
-	return fData;
-}
-
-
-void
-TDateTimeSection::SetData(uint32 data)
-{
-	fData = data;
-}
+	private:
+		uint32 fData;
+};
 
 
 //	#pragma mark -
@@ -46,32 +47,25 @@ TTimeEdit::TTimeEdit(BRect frame, const char *name, uint32 sections)
 
 TTimeEdit::~TTimeEdit()
 {
-	TSection *section;
-	if (f_sections->CountItems() > 0) {
-		for (int32 idx = 0; (section = (TSection *)f_sections->ItemAt(idx)); idx++)
-			delete section;
-	}
-	delete f_sections;
 }
 
 
 void
 TTimeEdit::InitView()
 {
+	// make sure we call the base class method, as it
+	// will create the arrow bitmaps and the section list
 	TSectionEdit::InitView();
-	SetSections(f_sectionsarea);
+	SetSections(fSectionArea);
 }
 
 
 void
 TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 {
-	if (f_sections->CountItems() == 0)
-		printf("No Sections!!!\n");
-
 	// user defined section drawing
 	TDateTimeSection *section;
-	section = (TDateTimeSection *)f_sections->ItemAt(index);
+	section = (TDateTimeSection *)fSectionList->ItemAt(index);
 
 	BRect bounds = section->Frame();
 
@@ -81,7 +75,7 @@ TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 
 	if (hasFocus) {
 		SetLowColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
-		value = f_holdvalue;
+		value = fHoldValue;
 	} else {
 		SetLowColor(ViewColor());
 		value = section->Data();
@@ -112,7 +106,7 @@ TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 		break;
 
 		case 3: // am/pm
-			value = ((TDateTimeSection *)f_sections->ItemAt(0))->Data();
+			value = ((TDateTimeSection *)fSectionList->ItemAt(0))->Data();
 			if (value >= 12)
 				text << "PM";
 			else 
@@ -125,10 +119,9 @@ TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 	}
 
 	// calc and center text in section rect
-		
 	float width = be_plain_font->StringWidth(text.String());
 	
-	BPoint offset(-(bounds.Width()/2.0 -width/2.0) -1.0, bounds.Height()/2.0 -6.0);
+	BPoint offset(-(bounds.Width() / 2.0 -width / 2.0) -1.0, bounds.Height() / 2.0 -6.0);
 	
 	BPoint drawpt(bounds.LeftBottom() -offset);
 	
@@ -138,27 +131,31 @@ TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 }
 
 
+/* 
+	DrawSeperator(uint32 index) user drawn seperator. Section is the
+	index of the section in fSectionList or the section to the seps left
+*/
 void
 TTimeEdit::DrawSeperator(uint32 index)
 {
-	/* user drawn seperator.  section is the index of the section 
-	in f_sections or the section to the seps left
-	*/
+	if (index == 3)
+		return;  
+
+	TDateTimeSection *section = (TDateTimeSection *)fSectionList->ItemAt(index);
 	
-	if (index >= 2)
-		return;  // no seperator for am/pm
-	BString text(":");
-	uint32 sep;
-	GetSeperatorWidth(&sep);
-	
-	TDateTimeSection *section = (TDateTimeSection *)f_sections->ItemAt(index);
 	BRect bounds = section->Frame();
+	float sepWidth = SeperatorWidth();	
+
+	char* sep = ":";
+	if (index == 2)
+		sep = "-";
+
+	float width = be_plain_font->StringWidth(sep);
 	
-	float width = be_plain_font->StringWidth(text.String());
-	BPoint offset(-(sep/2.0 -width/2.0) -1.0, bounds.Height()/2.0 -6.0);
+	BPoint offset(-(sepWidth / 2.0 - width / 2.0) -1.0, bounds.Height() / 2.0 -6.0);
 	BPoint drawpt(bounds.RightBottom() -offset);
 
-	DrawString(text.String(), drawpt);	
+	DrawString(sep, drawpt);	
 }
 
 
@@ -169,67 +166,63 @@ TTimeEdit::SetSections(BRect area)
 	BRect bounds(area);
 	// no comp for sep width	
 	
-	uint32 sep_width;
-	GetSeperatorWidth(&sep_width);
+	float sepWidth = SeperatorWidth();
 	
-	float sep_2 = ceil(sep_width/f_sectioncount +1);
-	float width = bounds.Width()/f_sectioncount -sep_2;
-	bounds.right = bounds.left +(width -sep_width/f_sectioncount);
+	float sep_2 = ceil(sepWidth / fSectionCount +1);
+	float width = bounds.Width() / fSectionCount -sep_2;
+	bounds.right = bounds.left + (width -sepWidth / fSectionCount);
 		
-	TDateTimeSection *section;
-
-	for (uint32 idx = 0; idx < f_sectioncount; idx++) {
-		section = new TDateTimeSection(bounds);
-		f_sections->AddItem(section);
+	for (uint32 idx = 0; idx < fSectionCount; idx++) {
+		fSectionList->AddItem(new TDateTimeSection(bounds));
 		
-		bounds.left = bounds.right +sep_width;
-		if (idx == f_sectioncount -2)
+		bounds.left = bounds.right + sepWidth;
+		if (idx == fSectionCount -2)
 			bounds.right = area.right -1;
 		else
-			bounds.right = bounds.left +(width -sep_2);
+			bounds.right = bounds.left + (width -sep_2);
 	}
 }
 
 
-void
-TTimeEdit::GetSeperatorWidth(uint32 *width)
+float
+TTimeEdit::SeperatorWidth() const
 {
-	*width = 8;
+	return 8.0f;
 }
 
 
 void
 TTimeEdit::SectionFocus(uint32 index)
 {
-	f_focus = index;
+	fFocus = index;
 
 	// update hold value
-	f_holdvalue = ((TDateTimeSection *)f_sections->ItemAt(f_focus))->Data();
+	fHoldValue = ((TDateTimeSection *)fSectionList->ItemAt(fFocus))->Data();
 	
 	Draw(Bounds());
 }
 
 
 void
-TTimeEdit::SetTo(uint32 hour, uint32 minute, uint32 second)
+TTimeEdit::SetTime(uint32 hour, uint32 minute, uint32 second)
 {
-	if (f_sections->CountItems()> 0)
+	if (fSectionList->CountItems()> 0)
 	{
 		bool update = false;
 		
-		TDateTimeSection *section = (TDateTimeSection *)f_sections->ItemAt(0);
+		TDateTimeSection *section = (TDateTimeSection *)fSectionList->ItemAt(0);
 		if (section->Data() != hour) {
 			section->SetData(hour);
 			update = true;
 		}
 		
-		section = (TDateTimeSection *)f_sections->ItemAt(1);
+		section = (TDateTimeSection *)fSectionList->ItemAt(1);
 		if (section->Data() != minute) {
 			section->SetData(minute);
 			update = true;
 		}
 			
-		section = (TDateTimeSection *)f_sections->ItemAt(2);
+		section = (TDateTimeSection *)fSectionList->ItemAt(2);
 		if (section->Data() != second) {
 			section->SetData(second);
 			update = true;
@@ -244,11 +237,11 @@ TTimeEdit::SetTo(uint32 hour, uint32 minute, uint32 second)
 void
 TTimeEdit::DoUpPress()
 {
-	if (f_focus == -1)
+	if (fFocus == -1)
 		SectionFocus(0);
 	
 	// update displayed value
-	f_holdvalue += 1;
+	fHoldValue += 1;
 	
 	CheckRange();
 	
@@ -260,11 +253,11 @@ TTimeEdit::DoUpPress()
 void
 TTimeEdit::DoDownPress()
 {
-	if (f_focus == -1)
+	if (fFocus == -1)
 		SectionFocus(0);
 
 	// update display value
-	f_holdvalue -= 1;
+	fHoldValue -= 1;
 	
 	CheckRange();
 	
@@ -276,20 +269,18 @@ TTimeEdit::DoDownPress()
 void
 TTimeEdit::BuildDispatch(BMessage *message)
 {
-	static const char *fields[4] = {"hour", "minute", "second", "isam"};
+	const char *fields[4] = {"hour", "minute", "second", "isam"};
 	
 	message->AddBool("time", true);
 	
-	for (int32 idx = 0; idx < f_sections->CountItems() -1; idx++) {
-		uint32 data;
+	for (int32 idx = 0; idx < fSectionList->CountItems() -1; idx++) {
+		uint32 data = ((TDateTimeSection *)fSectionList->ItemAt(idx))->Data();
 		
-		if (f_focus == idx)
-			data = f_holdvalue;
-		else
-			data = ((TDateTimeSection *)f_sections->ItemAt(idx))->Data();
+		if (fFocus == idx)
+			data = fHoldValue;
 		
 		if (idx == 3) // isam
-			message->AddBool("isam", data == 1);
+			message->AddBool(fields[idx], data == 1);
 		else
 			message->AddInt32(fields[idx], data);
 	}
@@ -299,12 +290,12 @@ TTimeEdit::BuildDispatch(BMessage *message)
 void
 TTimeEdit::CheckRange()
 {
-	int32 value = f_holdvalue;
-	switch (f_focus) {
+	int32 value = fHoldValue;
+	switch (fFocus) {
 		case 0: // hour
 			if (value> 23) 
 				value = 0;
-			 else if (value < 0) 
+			else if (value < 0) 
 				value = 23;
 			break;
 
@@ -325,22 +316,22 @@ TTimeEdit::CheckRange()
 
 		case 3:
 			// modify hour value to reflect change in am/pm
-			value = ((TDateTimeSection *)f_sections->ItemAt(0))->Data();
+			value = ((TDateTimeSection *)fSectionList->ItemAt(0))->Data();
 			if (value < 13)
 				value += 12;
 			else
 				value -= 12;
 			if (value == 24)
 				value = 0;
-			((TDateTimeSection *)f_sections->ItemAt(0))->SetData(value);
+			((TDateTimeSection *)fSectionList->ItemAt(0))->SetData(value);
 			break;
 
 		default:
 			return;
 	}
 
-	((TDateTimeSection *)f_sections->ItemAt(f_focus))->SetData(value);
-	f_holdvalue = value;
+	((TDateTimeSection *)fSectionList->ItemAt(fFocus))->SetData(value);
+	fHoldValue = value;
 
 	Invalidate(Bounds());
 }
@@ -348,12 +339,7 @@ TTimeEdit::CheckRange()
 
 //	#pragma mark -
 
-const char *months[] = {
-	"January", "Febuary", "March", "April", "May", "June",
-	"July", "August", "September", "October", "November", "December" 
-};
-  
-  
+
 TDateEdit::TDateEdit(BRect frame, const char *name, uint32 sections)
 	: TSectionEdit(frame, name, sections)
 {
@@ -363,32 +349,25 @@ TDateEdit::TDateEdit(BRect frame, const char *name, uint32 sections)
 
 TDateEdit::~TDateEdit()
 {
-	TSection *section;
-	if (f_sections->CountItems() > 0) {
-		for (int32 idx = 0; (section = (TSection *)f_sections->ItemAt(idx)); idx++)
-			delete section;
-	} 
-	delete f_sections;
 }
 
 
 void
 TDateEdit::InitView()
 {
+	// make sure we call the base class method, as it
+	// will create the arrow bitmaps and the section list
 	TSectionEdit::InitView();
-	SetSections(f_sectionsarea);
+	SetSections(fSectionArea);
 }
 
 
 void
 TDateEdit::DrawSection(uint32 index, bool hasFocus)
 {
-	if (f_sections->CountItems() == 0)
-		printf("No Sections!!!\n");
-
 	// user defined section drawing
 	TDateTimeSection *section;
-	section = (TDateTimeSection *)f_sections->ItemAt(index);
+	section = (TDateTimeSection *)fSectionList->ItemAt(index);
 
 	BRect bounds = section->Frame();
 
@@ -398,147 +377,141 @@ TDateEdit::DrawSection(uint32 index, bool hasFocus)
 
 	if (hasFocus) {
 		SetLowColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
-		value = f_holdvalue;
+		value = fHoldValue;
 	} else {
 		SetLowColor(ViewColor());
 		value = section->Data();
 	}
 
-	char text[64];
-	// format value (new method?)
+	BString text;
 	switch (index) {
-		case 0: // month
+		case 0:
+		{	 // month
 			struct tm tm;
 			tm.tm_mon = value;
-			strftime(text, sizeof(text), "%B", &tm);
-			break;
+
+			char buffer[64];
+			memset(buffer, 0, sizeof(buffer));
+			strftime(buffer, sizeof(buffer), "%B", &tm);
+			text.SetTo(buffer);
+		}	break;
 
 		case 1: // day
-			snprintf(text, sizeof(text), "%lu", value);
+			text << value;
 			break;
 
 		case 2: // year
-			snprintf(text, sizeof(text), "%lu", value + 1900);
+			text << (value + 1900);
 			break;
 
 		default:
 			return;
 	}
+
 	// calc and center text in section rect
-
-	float width = StringWidth(text);
-
-	BPoint offset(-(bounds.Width() - width) /2.0 - 1.0, (bounds.Height() / 2.0 - 6.0));
+	float width = StringWidth(text.String());
+	BPoint offset(-(bounds.Width() - width) / 2.0 - 1.0, (bounds.Height() / 2.0 - 6.0));
 
 	if (index == 0)
 		offset.x = -(bounds.Width() - width) ;
 
 	SetHighColor(0, 0, 0, 255);
 	FillRect(bounds, B_SOLID_LOW);
-	DrawString(text, bounds.LeftBottom() - offset);	
+	DrawString(text.String(), bounds.LeftBottom() - offset);	
 }
 
 
+/*
+	DrawSeperator(uint32 index) user drawn seperator. Section is the
+	index of the section in fSectionList or the section to the seps left
+*/
 void
 TDateEdit::DrawSeperator(uint32 index)
 {
-	/* user drawn seperator.  section is the index of the section 
-	in f_sections or the section to the seps left
-	*/
-	
-	if (index == 3) {
-		// no seperator for am/pm
+	if (index == 3)
 		return;
-	}
 
-	BString text("/");
-	uint32 sep;
-	GetSeperatorWidth(&sep);
-
-	TDateTimeSection *section = (TDateTimeSection *)f_sections->ItemAt(index);
+	TDateTimeSection *section = (TDateTimeSection *)fSectionList->ItemAt(index);
 	BRect bounds = section->Frame();
 
-	float width = be_plain_font->StringWidth(text.String());
-	BPoint offset(-(sep/2.0 -width/2.0) -1.0, bounds.Height()/2.0 -6.0);
-	BPoint drawpt(bounds.RightBottom() -offset);
+	float sepWidth = SeperatorWidth();
+	float width = be_plain_font->StringWidth("/");
 
-	DrawString(text.String(), drawpt);	
+	BPoint offset(-(sepWidth / 2.0 - width / 2.0) -1.0, bounds.Height() / 2.0 -6.0);
+	BPoint drawpt(bounds.RightBottom() - offset);
+
+	DrawString("/", drawpt);	
 }
 
 
 void
 TDateEdit::SetSections(BRect area)
 {
-	TDateTimeSection *section;
 	// create sections
-	for (uint32 idx = 0; idx < f_sectioncount; idx++) {
-		section = new TDateTimeSection(area);
-		f_sections->AddItem(section);
-	}
+	for (uint32 idx = 0; idx < fSectionCount; idx++)
+		fSectionList->AddItem(new TDateTimeSection(area));
 
 	BRect bounds(area);
-	float width;
 
 	// year
-	width = be_plain_font->StringWidth("0000") +6;
+	float width = be_plain_font->StringWidth("0000") +6;
 	bounds.right = area.right;
 	bounds.left = bounds.right -width;
-	((TDateTimeSection *)f_sections->ItemAt(2))->SetBounds(bounds);
+	((TDateTimeSection *)fSectionList->ItemAt(2))->SetFrame(bounds);
 
-	uint32 sep;
-	GetSeperatorWidth(&sep);
+	float sepWidth = SeperatorWidth();
 
 	// day
 	width = be_plain_font->StringWidth("00") +6;
-	bounds.right = bounds.left -sep;
+	bounds.right = bounds.left -sepWidth;
 	bounds.left = bounds.right -width;
-	((TDateTimeSection *)f_sections->ItemAt(1))->SetBounds(bounds);
+	((TDateTimeSection *)fSectionList->ItemAt(1))->SetFrame(bounds);
 
 	// month
-	bounds.right = bounds.left -sep;
+	bounds.right = bounds.left - sepWidth;
 	bounds.left = area.left;
-	((TDateTimeSection *)f_sections->ItemAt(0))->SetBounds(bounds);
+	((TDateTimeSection *)fSectionList->ItemAt(0))->SetFrame(bounds);
 }
 
 
-void
-TDateEdit::GetSeperatorWidth(uint32 *width)
+float
+TDateEdit::SeperatorWidth() const
 {
-	*width = 8;
+	return 8.0f;
 }
 
 
 void
 TDateEdit::SectionFocus(uint32 index)
 {
-	f_focus = index;
+	fFocus = index;
 
 	// update hold value
-	f_holdvalue = ((TDateTimeSection *)f_sections->ItemAt(f_focus))->Data();
+	fHoldValue = ((TDateTimeSection *)fSectionList->ItemAt(fFocus))->Data();
 
 	Draw(Bounds());
 }
 
 
 void
-TDateEdit::SetTo(uint32 year, uint32 month, uint32 day)
+TDateEdit::SetDate(uint32 year, uint32 month, uint32 day)
 {
-	if (f_sections->CountItems() > 0) {
+	if (fSectionList->CountItems() > 0) {
 		bool update = false;
 
-		TDateTimeSection *section = (TDateTimeSection *)f_sections->ItemAt(0);
+		TDateTimeSection *section = (TDateTimeSection *)fSectionList->ItemAt(0);
 		if (section->Data() != month) {
 			section->SetData(month);
 			update = true;
 		}
 
-		section = (TDateTimeSection *)f_sections->ItemAt(1);
+		section = (TDateTimeSection *)fSectionList->ItemAt(1);
 		if (section->Data() != day) {
 			section->SetData(day);
 			update = true;
 		}
 
-		section = (TDateTimeSection *)f_sections->ItemAt(2);
+		section = (TDateTimeSection *)fSectionList->ItemAt(2);
 		if (section->Data() != year) {
 			section->SetData(year);
 			update = true;
@@ -553,11 +526,11 @@ TDateEdit::SetTo(uint32 year, uint32 month, uint32 day)
 void
 TDateEdit::DoUpPress()
 {
-	if (f_focus == -1)
+	if (fFocus == -1)
 		SectionFocus(0);
 
 	// update displayed value
-	f_holdvalue += 1;
+	fHoldValue += 1;
 
 	CheckRange();
 
@@ -569,11 +542,11 @@ TDateEdit::DoUpPress()
 void
 TDateEdit::DoDownPress()
 {
-	if (f_focus == -1)
+	if (fFocus == -1)
 		SectionFocus(0);
 
 	// update display value
-	f_holdvalue -= 1;
+	fHoldValue -= 1;
 
 	CheckRange();
 
@@ -585,17 +558,15 @@ TDateEdit::DoDownPress()
 void
 TDateEdit::BuildDispatch(BMessage *message)
 {
-	static const char *fields[3] = {"month", "day", "year"};
+	const char *fields[3] = {"month", "day", "year"};
 
 	message->AddBool("time", false);
 
-	for (int32 idx = 0; idx < f_sections->CountItems(); idx++) {
-		uint32 data;
+	for (int32 idx = 0; idx < fSectionList->CountItems(); idx++) {
+		uint32 data = ((TDateTimeSection *)fSectionList->ItemAt(idx))->Data();
 
-		if (f_focus == idx)
-			data = f_holdvalue;
-		else
-			data = ((TDateTimeSection *)f_sections->ItemAt(idx))->Data();
+		if (fFocus == idx)
+			data = fHoldValue;
 
 		message->AddInt32(fields[idx], data);
 	}
@@ -605,9 +576,9 @@ TDateEdit::BuildDispatch(BMessage *message)
 void
 TDateEdit::CheckRange()
 {
-	int32 value = f_holdvalue;
+	int32 value = fHoldValue;
 	
-	switch (f_focus) {
+	switch (fFocus) {
 		case 0: // month
 		{
 			if (value > 11)
@@ -619,8 +590,8 @@ TDateEdit::CheckRange()
 
 		case 1: //day
 		{
-			uint32 month = ((TDateTimeSection *)f_sections->ItemAt(0))->Data();
-			uint32 year = ((TDateTimeSection *)f_sections->ItemAt(2))->Data();
+			uint32 month = ((TDateTimeSection *)fSectionList->ItemAt(0))->Data();
+			uint32 year = ((TDateTimeSection *)fSectionList->ItemAt(2))->Data();
 			
 			int daycnt = getDaysInMonth(month, year);
 			if (value > daycnt)
@@ -643,8 +614,8 @@ TDateEdit::CheckRange()
 			return;
 	}
 
-	((TDateTimeSection *)f_sections->ItemAt(f_focus))->SetData(value);
-	f_holdvalue = value;
+	((TDateTimeSection *)fSectionList->ItemAt(fFocus))->SetData(value);
+	fHoldValue = value;
 
 	Draw(Bounds());
 }

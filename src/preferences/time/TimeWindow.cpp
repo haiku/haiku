@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		mccall@@digitalparadise.co.uk
+ *		Andrew McCall <mccall@@digitalparadise.co.uk>
  *		Julun <host.haiku@gmx.de>
  */
 

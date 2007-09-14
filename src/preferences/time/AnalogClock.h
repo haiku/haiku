@@ -27,7 +27,7 @@ class TAnalogClock : public BView {
 		virtual void 	Draw(BRect updateRect);
 		virtual void 	MessageReceived(BMessage *message);
 
-		void 			SetTo(int32 hour, int32 minute, int32 second);
+		void 			SetTime(int32 hour, int32 minute, int32 second);
 
 	private:
 		void 			_InitView(BRect frame);

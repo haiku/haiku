@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Mike Berg (inseculous)
+ *		Mike Berg <mike@agamemnon.homelinux.net>
  *		Julun <host.haiku@gmx.de>
  */
 #ifndef ZONE_VIEW_H

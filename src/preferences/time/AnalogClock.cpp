@@ -21,9 +21,8 @@ class OffscreenClock : public BView {
 				OffscreenClock(BRect frame, const char *name);
 				~OffscreenClock();
 
-		void 	SetTo(int32 hour, int32 minute, int32 second);
-		bool	IsDirty() const
-					{ return fDirty; }
+		void 	SetTime(int32 hour, int32 minute, int32 second);
+		bool	IsDirty() const	{	return fDirty;	}
 		void 	DrawClock();
 
 	private:
@@ -54,7 +53,7 @@ OffscreenClock::~OffscreenClock()
 
 
 void
-OffscreenClock::SetTo(int32 hour, int32 minute, int32 second)
+OffscreenClock::SetTime(int32 hour, int32 minute, int32 second)
 {
 	if (fHours == hour && fMinutes == minute && fSeconds == second)
 		return;
@@ -233,7 +232,7 @@ TAnalogClock::MessageReceived(BMessage *message)
 					if (message->FindInt32("hour", &hour) == B_OK
 					 && message->FindInt32("minute", &minute) == B_OK
 					 && message->FindInt32("second", &second) == B_OK)
-						SetTo(hour, minute, second);
+						SetTime(hour, minute, second);
 					break;
 				}
 				default:
@@ -260,10 +259,10 @@ TAnalogClock::Draw(BRect /*updateRect*/)
 
 
 void
-TAnalogClock::SetTo(int32 hour, int32 minute, int32 second)
+TAnalogClock::SetTime(int32 hour, int32 minute, int32 second)
 {
 	if (fClock)
-		fClock->SetTo(hour, minute, second);
+		fClock->SetTime(hour, minute, second);
 	
 	Invalidate();
 }

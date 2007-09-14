@@ -1,54 +1,50 @@
+/*
+ * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		probably Mike Berg <mike@agamemnon.homelinux.net>
+ *		Julun <host.haiku@gmx.de>
+ *
+ */
+
+#include "SectionEdit.h"
+#include "Bitmaps.h"
+#include "TimeMessages.h"
+
+
 #include <Bitmap.h>
+#include <List.h>
 #include <Window.h>
 
-#include "Bitmaps.h"
-#include "SectionEdit.h"
-#include "TimeMessages.h"
 
 const uint32 kArrowAreaWidth = 16;
 const uint32 kSeperatorWidth = 8;
 
 
-TSection::TSection(BRect frame)
-	: f_frame(frame)
-{
-}
-
-
-void
-TSection::SetBounds(BRect frame)
-{
-	f_frame = frame;
-}
-
-
- BRect
-TSection::Bounds() const
-{
-	BRect bounds(f_frame);
-	return bounds.OffsetByCopy(B_ORIGIN);
-}
-
-
- BRect
-TSection::Frame() const
-{
-	return f_frame;
-}
-
-
-
 TSectionEdit::TSectionEdit(BRect frame, const char *name, uint32 sections)
-	: BControl(frame, name, NULL, NULL, B_FOLLOW_NONE, B_NAVIGABLE|B_WILL_DRAW)
-	, f_focus(-1)
+	: BControl(frame, name, NULL, NULL, B_FOLLOW_NONE, B_NAVIGABLE | B_WILL_DRAW),
+	  fUpArrow(NULL),
+	  fDownArrow(NULL),
+	  fSectionList(NULL),
+	  fFocus(-1),
+	  fSectionCount(sections)
 {
-	f_sectioncount = sections;
 	InitView();
 }
 
 
 TSectionEdit::~TSectionEdit()
 {
+	delete fUpArrow;
+	delete fDownArrow;
+
+	int32 count = fSectionList->CountItems();
+	if (count > 0) {
+		for (int32 index = 0; index < count; index++)
+			delete (TSection*)fSectionList->ItemAt(index);
+	}
+	delete fSectionList;
 }
 
 
@@ -57,8 +53,8 @@ TSectionEdit::AttachedToWindow()
 {
 	if (Parent()) {
 		SetViewColor(Parent()->ViewColor());
-		ReplaceTransparentColor(f_up, ViewColor());
-		ReplaceTransparentColor(f_down, ViewColor());
+		ReplaceTransparentColor(fUpArrow, ViewColor());
+		ReplaceTransparentColor(fDownArrow, ViewColor());
 	}
 }
 
@@ -67,10 +63,10 @@ void
 TSectionEdit::Draw(BRect updaterect)
 {
 	DrawBorder();
-	for (uint32 idx = 0; idx < f_sectioncount; idx++)
+	for (uint32 idx = 0; idx < fSectionCount; idx++)
 	{
-		DrawSection(idx, ((uint32)f_focus == idx) && IsFocus());
-		if (idx <f_sectioncount -1)
+		DrawSection(idx, ((uint32)fFocus == idx) && IsFocus());
+		if (idx <fSectionCount -1)
 			DrawSeperator(idx);
 	}
 }
@@ -80,14 +76,14 @@ void
 TSectionEdit::MouseDown(BPoint where)
 {
 	MakeFocus(true);
-	if (f_uprect.Contains(where))
+	if (fUpRect.Contains(where))
 		DoUpPress();
-	else if (f_downrect.Contains(where))
+	else if (fDownRect.Contains(where))
 		DoDownPress();
-	else if (f_sections->CountItems()> 0) {
+	else if (fSectionList->CountItems()> 0) {
 		TSection *section;
-		for (uint32 idx = 0; idx < f_sectioncount; idx++) {
-			section = (TSection *)f_sections->ItemAt(idx);
+		for (uint32 idx = 0; idx < fSectionCount; idx++) {
+			section = (TSection *)fSectionList->ItemAt(idx);
 			if (section->Frame().Contains(where)) {
 				SectionFocus(idx);
 				return;
@@ -100,22 +96,22 @@ TSectionEdit::MouseDown(BPoint where)
 void
 TSectionEdit::KeyDown(const char *bytes, int32 numbytes)
 {
-	if (f_focus == -1)
+	if (fFocus == -1)
 		SectionFocus(0);
 		
 	switch (bytes[0]) {
 		case B_LEFT_ARROW:
-			f_focus -= 1;
-			if (f_focus < 0)
-				f_focus = f_sectioncount -1;
-			SectionFocus(f_focus);
+			fFocus -= 1;
+			if (fFocus < 0)
+				fFocus = fSectionCount -1;
+			SectionFocus(fFocus);
 		break;
 		
 		case B_RIGHT_ARROW:
-			f_focus += 1;
-			if ((uint32)f_focus >= f_sectioncount)
-				f_focus = 0;
-			SectionFocus(f_focus);
+			fFocus += 1;
+			if ((uint32)fFocus >= fSectionCount)
+				fFocus = 0;
+			SectionFocus(fFocus);
 		break;
 		
 		case B_UP_ARROW:
@@ -146,14 +142,14 @@ TSectionEdit::DispatchMessage()
 uint32
 TSectionEdit::CountSections() const
 {
-	return f_sections->CountItems();
+	return fSectionList->CountItems();
 }
 
 
 int32
 TSectionEdit::FocusIndex() const
 {
-	return f_focus;
+	return fFocus;
 }
 
 
@@ -162,33 +158,31 @@ TSectionEdit::InitView()
 {
 	// create arrow bitmaps
 	
-	f_up = new BBitmap(BRect(0, 0, kUpArrowWidth -1, kUpArrowHeight -1), kUpArrowColorSpace);
-	f_up->SetBits(kUpArrowBits, (kUpArrowWidth) *(kUpArrowHeight+1), 0, kUpArrowColorSpace);
+	fUpArrow = new BBitmap(BRect(0, 0, kUpArrowWidth -1, kUpArrowHeight -1), kUpArrowColorSpace);
+	fUpArrow->SetBits(kUpArrowBits, (kUpArrowWidth) *(kUpArrowHeight+1), 0, kUpArrowColorSpace);
 	
-	f_down = new BBitmap(BRect(0, 0, kDownArrowWidth -1, kDownArrowHeight -2), kDownArrowColorSpace);
-	f_down->SetBits(kDownArrowBits, (kDownArrowWidth) *(kDownArrowHeight), 0, kDownArrowColorSpace);
+	fDownArrow = new BBitmap(BRect(0, 0, kDownArrowWidth -1, kDownArrowHeight -2), kDownArrowColorSpace);
+	fDownArrow->SetBits(kDownArrowBits, (kDownArrowWidth) *(kDownArrowHeight), 0, kDownArrowColorSpace);
 	
 
 	// setup sections
-	f_sections = new BList(f_sectioncount);
-	f_sectionsarea = Bounds().InsetByCopy(2, 2);
-	f_sectionsarea.right -= (kArrowAreaWidth); 
+	fSectionList = new BList(fSectionCount);
+	fSectionArea = Bounds().InsetByCopy(2, 2);
+	fSectionArea.right -= kArrowAreaWidth; 
 }
 
 
 void
 TSectionEdit::Draw3DFrame(BRect frame, bool inset)
 {
-	rgb_color color1, color2;
+	rgb_color color1 = LowColor();
+	rgb_color color2 = HighColor();
 	
 	if (inset) {
 		color1 = HighColor();
 		color2 = LowColor();
-	} else {
-		color1 = LowColor();
-		color2 = HighColor();
 	}
-	
+
 	BeginLineArray(4);
 		// left side
 		AddLine(frame.LeftBottom(), frame.LeftTop(), color2);
@@ -210,17 +204,18 @@ TSectionEdit::DrawBorder()
 	rgb_color dark = tint_color(bgcolor, B_DARKEN_1_TINT);
 	rgb_color darker = tint_color(bgcolor, B_DARKEN_3_TINT);
 
-	BRect bounds(Bounds());
 	SetHighColor(light);
 	SetLowColor(dark);
+	
+	BRect bounds(Bounds());
 	Draw3DFrame(bounds, true);
 	StrokeLine(bounds.LeftBottom(), bounds.LeftBottom(), B_SOLID_LOW);
 	
 	bounds.InsetBy(1, 1);
 	bounds.right -= kArrowAreaWidth;
 	
-	f_showfocus = (IsFocus() && Window() && Window()->IsActive());
-	if (f_showfocus) {
+	fShowFocus = (IsFocus() && Window() && Window()->IsActive());
+	if (fShowFocus) {
 		rgb_color navcolor = keyboard_navigation_color();
 	
 		SetHighColor(navcolor);
@@ -234,13 +229,16 @@ TSectionEdit::DrawBorder()
 
 	// draw up/down control
 	SetHighColor(light);
-	bounds.left = bounds.right +1;// -kArrowAreaWidth;
+	bounds.left = bounds.right +1;
 	bounds.right = Bounds().right -1;
-	f_uprect.Set(bounds.left +3, bounds.top +2, bounds.right, bounds.bottom /2.0);
-	f_downrect = f_uprect.OffsetByCopy(0, f_uprect.Height()+2);
+	fUpRect.Set(bounds.left +3, bounds.top +2, bounds.right, bounds.bottom /2.0);
+	fDownRect = fUpRect.OffsetByCopy(0, fUpRect.Height()+2);
 	
-	DrawBitmap(f_up, f_uprect.LeftTop());
-	DrawBitmap(f_down, f_downrect.LeftTop());
+	if (fUpArrow)
+		DrawBitmap(fUpArrow, fUpRect.LeftTop());
+	
+	if (fDownArrow)
+		DrawBitmap(fDownArrow, fDownRect.LeftTop());
 	
 	Draw3DFrame(bounds, false);
 	SetHighColor(dark);
@@ -251,51 +249,9 @@ TSectionEdit::DrawBorder()
 }
 
 
-void
-TSectionEdit::SetSections(BRect)
+float
+TSectionEdit::SeperatorWidth() const
 {
-}
-
-
-void
-TSectionEdit::GetSeperatorWidth(uint32 *width)
-{
-	*width = 0;
-}
-
-
-void
-TSectionEdit::DrawSection(uint32 index, bool isfocus)
-{
-}
-
-
-void
-TSectionEdit::DrawSeperator(uint32 index)
-{
-}
-
-
-void
-TSectionEdit::SectionFocus(uint32 index)
-{
-}
-
-
-void
-TSectionEdit::SectionChange(uint32 section, uint32 value)
-{
-}
-
-
-void
-TSectionEdit::DoUpPress()
-{
-}
-
-
-void
-TSectionEdit::DoDownPress()
-{
+	return 0.0f;
 }
 

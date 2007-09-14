@@ -3,6 +3,8 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		probably Mike Berg <mike@agamemnon.homelinux.net>
+ *		and/or Andrew McCall <mccall@@digitalparadise.co.uk>
  *		Julun <host.haiku@gmx.de>
  */
 #ifndef ANALOG_CLOCK_H

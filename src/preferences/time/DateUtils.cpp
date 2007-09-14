@@ -1,3 +1,11 @@
+/*
+ * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		probably Mike Berg <mike@agamemnon.homelinux.net>
+ *		and/or Andrew McCall <mccall@@digitalparadise.co.uk>
+ */
 #include "DateUtils.h"
 #include "math.h"
 
@@ -7,16 +15,15 @@ bool
 isLeapYear(const int year)
 {
 	int realYear = year + 1900;
-	return ((realYear % 400 == 0)||(realYear % 4 == 0 && realYear % 100 != 0));
+	return ((realYear % 400 == 0) || (realYear % 4 == 0 && realYear % 100 != 0));
 }
 
 
 int
 getDaysInMonth(const int month, const int year)
 {
-	if (month == 1 && isLeapYear(year)) {
+	if (month == 1 && isLeapYear(year))
 		return 29;
-	}
 	
 	static const int DaysinMonth[12] = 
 		{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
@@ -44,3 +51,4 @@ getFirstDay(const int month, const int year)
 		
 	return tm.tm_wday;
 }
+

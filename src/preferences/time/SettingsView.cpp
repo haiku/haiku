@@ -3,7 +3,8 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		<unkown>
+ *		probably Mike Berg <mike@agamemnon.homelinux.net>
+ *		and/or Andrew McCall <mccall@@digitalparadise.co.uk>
  *		Julun <host.haiku@gmx.de>
  */
 
@@ -201,7 +202,7 @@ TSettingsView::UpdateDateTime(BMessage *message)
 		&& message->FindInt32("day", &day) == B_OK
 		&& message->FindInt32("year", &year) == B_OK)
 	{
-		fDateEdit->SetTo(year, month, day);
+		fDateEdit->SetDate(year, month, day);
 		fCalendar->SetTo(year, month, day);
 	}
 	
@@ -212,8 +213,8 @@ TSettingsView::UpdateDateTime(BMessage *message)
 		&& message->FindInt32("minute", &minute) == B_OK
 		&& message->FindInt32("second", &second) == B_OK)
 	{
-		fTimeEdit->SetTo(hour, minute, second);
-		fClock->SetTo(hour, minute, second);
+		fTimeEdit->SetTime(hour, minute, second);
+		fClock->SetTime(hour, minute, second);
 	}
 }
 

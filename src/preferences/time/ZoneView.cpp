@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Mike Berg (inseculous)
+ *		Mike Berg <mike@agamemnon.homelinux.net>
  *		Julun <host.haiku@gmx.de>
  */
 
@@ -43,7 +43,7 @@
 #include <stdlib.h>
 
 
-class TZoneItem: public BStringItem {
+class TZoneItem : public BStringItem {
 	public:
 					TZoneItem(const char *text, const char *zone)
 						: BStringItem(text), fZone(new BPath(zone)) { }
@@ -154,7 +154,7 @@ TZoneView::UpdateDateTime(BMessage *message)
 		if (fHour != hour || fMinute != minute) {
 			fHour = hour;
 			fMinute = minute;
-			fCurrent->SetTo(hour, minute);
+			fCurrent->SetTime(hour, minute);
 
 			// do calc to get other zone time
 			if (fCityList->CurrentSelection() > -1)
@@ -205,14 +205,12 @@ TZoneView::InitView()
 	frameRight.top = frameLeft.top;
 
 	// Time Displays
-	fCurrent = new TTZDisplay(frameRight, "current", 
-		B_FOLLOW_NONE, B_WILL_DRAW, "Current time zone:", B_EMPTY_STRING);
+	fCurrent = new TTZDisplay(frameRight, "current", "Current time:");
 	AddChild(fCurrent);
 	fCurrent->ResizeToPreferred();
 	
 	frameRight.OffsetBy(0, (textHeight) * 3 +10.0);
-	fPreview = new TTZDisplay(frameRight, "preview", 
-		B_FOLLOW_NONE, B_WILL_DRAW, "Time in: ", B_EMPTY_STRING);
+	fPreview = new TTZDisplay(frameRight, "preview", "Preview time:");
 	AddChild(fPreview);
 	fPreview->ResizeToPreferred();
 	
@@ -391,27 +389,25 @@ TZoneView::ReadTimeZoneLink()
 void
 TZoneView::SetPreview()
 {
-	// calc and display time based on users selection in city list
 	int32 selection = fCityList->CurrentSelection();
-	if (selection>= 0) {
+	if (selection >= 0) {
 		TZoneItem *item = (TZoneItem *)fCityList->ItemAt(selection);
 
-		BString text;
-		text = item->Text();
-
-		time_t current;
-		struct tm *ltime;
-		
-		// calc time to display and update
+		// set timezone to selection
 		SetTimeZone(item->Path());
-		current = time(0);
-		ltime = localtime(&current);
+
+		// calc preview time
+		time_t current = time(0);
+		struct tm *ltime = localtime(&current);
+		
+		// update prview
+		fPreview->SetText(item->Text());
+		fPreview->SetTime(ltime->tm_hour, ltime->tm_min);
+
+		// set timezone back to current
 		SetTimeZone(fCurrentZone.Path());
 		
-		fPreview->SetTo(ltime->tm_hour, ltime->tm_min);
-		fPreview->SetText(text.String());
-		
-		fSetZone->SetEnabled((strcmp(fCurrent->Text(), text.String()) != 0));
+		fSetZone->SetEnabled((strcmp(fCurrent->Text(), item->Text()) != 0));
 	}
 }
 
@@ -420,11 +416,12 @@ void
 TZoneView::SetCurrent(const char *text)
 {
 	SetTimeZone(fCurrentZone.Path());
+	
 	time_t current = time(0);
 	struct tm *ltime = localtime(&current);
 	
-	fCurrent->SetTo(ltime->tm_hour, ltime->tm_min);
 	fCurrent->SetText(text);
+	fCurrent->SetTime(ltime->tm_hour, ltime->tm_min);
 }
 
 

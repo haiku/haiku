@@ -4,7 +4,7 @@
  *
  * Authors:
  *		Andrew McCall, mccall@digitalparadise.co.uk
- *		Mike Berg (inseculous)
+ *		Mike Berg <mike@agamemnon.homelinux.net>
  *		Julun <host.haiku@gmx.de>
  */
 #ifndef TIME_SETTINGS_H
