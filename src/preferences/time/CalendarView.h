@@ -5,7 +5,6 @@
  * Authors:
  *		probably Mike Berg <mike@agamemnon.homelinux.net>
  *		and/or Andrew McCall <mccall@@digitalparadise.co.uk>
- *		Julun <host.haiku@gmx.de>
  */
 #ifndef CALENDAR_VIEW_H
 #define CALENDAR_VIEW_H
