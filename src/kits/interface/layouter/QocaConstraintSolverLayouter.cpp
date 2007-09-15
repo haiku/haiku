@@ -1,9 +1,9 @@
 /*
- * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
+ * Copyright 2006-2007, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-#include "ConstraintSolverLayouter.h"
+#include "QocaConstraintSolverLayouter.h"
 
 #include <cmath>
 #include <cstring>
@@ -27,7 +27,6 @@
 #include <qoca/QcFloat.hh>
 #include <qoca/QcLinInEqSolver.hh>
 #include <qoca/QcLinPoly.hh>
-
 
 
 // This monster is a Layouter implementation similar to SimpleLayouter with
@@ -66,7 +65,7 @@
 
 
 // Set
-class ConstraintSolverLayouter::Set {
+class QocaConstraintSolverLayouter::Set {
 public:
 	Set()
 		: fElements()
@@ -140,7 +139,7 @@ private:
 
 
 // Variable
-class ConstraintSolverLayouter::Variable {
+class QocaConstraintSolverLayouter::Variable {
 public:
 	Variable()
 		: fQocaVariable(NULL),
@@ -213,9 +212,9 @@ private:
 
 
 // Constraint
-class ConstraintSolverLayouter::Constraint {
+class QocaConstraintSolverLayouter::Constraint {
 public:
-	Constraint(ConstraintSolverLayouter* layouter,
+	Constraint(QocaConstraintSolverLayouter* layouter,
 			int32 first, int32 last, int32 value)
 		: fLayouter(layouter),
 		  fFirst(first),
@@ -241,7 +240,8 @@ public:
 		delete fQocaConstraint;
 	}
 
-	virtual Constraint* CloneConstraint(ConstraintSolverLayouter* layouter) = 0;
+	virtual Constraint* CloneConstraint(
+		QocaConstraintSolverLayouter* layouter) = 0;
 	
 	int32 First() const
 	{
@@ -338,7 +338,7 @@ public:
 
 
 protected:
-	ConstraintSolverLayouter* fLayouter;
+	QocaConstraintSolverLayouter* fLayouter;
 
 	int32			fFirst;
 	int32			fLast;
@@ -357,16 +357,16 @@ private:
 
 
 // MinConstraint
-class ConstraintSolverLayouter::MinConstraint : public Constraint {
+class QocaConstraintSolverLayouter::MinConstraint : public Constraint {
 public:
-	MinConstraint(ConstraintSolverLayouter* layouter, int32 first, int32 last,
-		int32 value)
+	MinConstraint(QocaConstraintSolverLayouter* layouter, int32 first,
+			int32 last, int32 value)
 		: Constraint(layouter, first, last, value)
 	{
 		SetOriginalValue(value);
 	}
 
-	virtual Constraint* CloneConstraint(ConstraintSolverLayouter* layouter)
+	virtual Constraint* CloneConstraint(QocaConstraintSolverLayouter* layouter)
 	{
 		Constraint* constraint = new MinConstraint(layouter, fFirst, fLast,
 			fOriginalValue);
@@ -398,16 +398,16 @@ public:
 
 
 // MaxConstraint
-class ConstraintSolverLayouter::MaxConstraint : public Constraint {
+class QocaConstraintSolverLayouter::MaxConstraint : public Constraint {
 public:
-	MaxConstraint(ConstraintSolverLayouter* layouter, int32 first, int32 last,
-		int32 value)
+	MaxConstraint(QocaConstraintSolverLayouter* layouter, int32 first,
+			int32 last, int32 value)
 		: Constraint(layouter, first, last, value)
 	{
 		SetOriginalValue(value);
 	}
 
-	virtual Constraint* CloneConstraint(ConstraintSolverLayouter* layouter)
+	virtual Constraint* CloneConstraint(QocaConstraintSolverLayouter* layouter)
 	{
 		Constraint* constraint = new MaxConstraint(layouter, fFirst, fLast,
 			fOriginalValue);
@@ -439,7 +439,7 @@ public:
 
 
 // MinMaxEntry
-class ConstraintSolverLayouter::MinMaxEntry {
+class QocaConstraintSolverLayouter::MinMaxEntry {
 public:
 	Constraint*	minConstraint;
 	Constraint*	maxConstraint;
@@ -473,7 +473,7 @@ public:
 
 
 // MinMaxMatrix
-class ConstraintSolverLayouter::MinMaxMatrix {
+class QocaConstraintSolverLayouter::MinMaxMatrix {
 public:
 	MinMaxMatrix(int size)
 		: fSize(size),
@@ -500,7 +500,7 @@ private:
 
 
 // MyLayoutInfo
-class ConstraintSolverLayouter::MyLayoutInfo : public LayoutInfo {
+class QocaConstraintSolverLayouter::MyLayoutInfo : public LayoutInfo {
 public:
 	MyLayoutInfo(int32 elementCount)
 		: fCount(elementCount)
@@ -533,7 +533,7 @@ public:
 
 	void Dump()
 	{
-		printf("ConstraintSolverLayouter::MyLayoutInfo(): %ld elements:\n",
+		printf("QocaConstraintSolverLayouter::MyLayoutInfo(): %ld elements:\n",
 			fCount);
 		for (int32 i = 0; i < fCount; i++) {
 			printf("  %2ld: location: %4ld, size: %4ld\n", i, fLocations[i],
@@ -548,11 +548,11 @@ public:
 };
 
 
-// #pragma mark - ConstraintSolverLayouter
+// #pragma mark - QocaConstraintSolverLayouter
 
 
 // constructor
-ConstraintSolverLayouter::ConstraintSolverLayouter(int32 elementCount,
+QocaConstraintSolverLayouter::QocaConstraintSolverLayouter(int32 elementCount,
 	int32 spacing)
 	: fElementCount(elementCount),
 	  fWeights(NULL),
@@ -612,7 +612,7 @@ ConstraintSolverLayouter::ConstraintSolverLayouter(int32 elementCount,
 }
 
 // destructor
-ConstraintSolverLayouter::~ConstraintSolverLayouter()
+QocaConstraintSolverLayouter::~QocaConstraintSolverLayouter()
 {
 	delete fSetSizeConstraint;
 	delete fSizeSumConstraint;
@@ -627,7 +627,7 @@ ConstraintSolverLayouter::~ConstraintSolverLayouter()
 
 // AddConstraints
 void
-ConstraintSolverLayouter::AddConstraints(int32 element, int32 length,
+QocaConstraintSolverLayouter::AddConstraints(int32 element, int32 length,
 	float _min, float _max, float _preferred)
 {
 	if (length <= 0 || length > fElementCount)
@@ -649,7 +649,7 @@ ConstraintSolverLayouter::AddConstraints(int32 element, int32 length,
 
 // SetWeight
 void
-ConstraintSolverLayouter::SetWeight(int32 element, float weight)
+QocaConstraintSolverLayouter::SetWeight(int32 element, float weight)
 {
 	if (element < 0 || element >= fElementCount)
 		return;
@@ -659,7 +659,7 @@ ConstraintSolverLayouter::SetWeight(int32 element, float weight)
 
 // MinSize
 float
-ConstraintSolverLayouter::MinSize()
+QocaConstraintSolverLayouter::MinSize()
 {
 	_ValidateMinMax();
 	return fMin - 1;
@@ -667,7 +667,7 @@ ConstraintSolverLayouter::MinSize()
 
 // MaxSize
 float
-ConstraintSolverLayouter::MaxSize()
+QocaConstraintSolverLayouter::MaxSize()
 {
 	_ValidateMinMax();
 	return fMax - 1;
@@ -675,7 +675,7 @@ ConstraintSolverLayouter::MaxSize()
 
 // PreferredSize
 float
-ConstraintSolverLayouter::PreferredSize()
+QocaConstraintSolverLayouter::PreferredSize()
 {
 	_ValidateMinMax();
 	return fMin - 1;
@@ -683,16 +683,16 @@ ConstraintSolverLayouter::PreferredSize()
 
 // CreateLayoutInfo
 LayoutInfo*
-ConstraintSolverLayouter::CreateLayoutInfo()
+QocaConstraintSolverLayouter::CreateLayoutInfo()
 {
 	return new MyLayoutInfo(fElementCount);
 }
 
 // Layout
 void
-ConstraintSolverLayouter::Layout(LayoutInfo* layoutInfo, float _size)
+QocaConstraintSolverLayouter::Layout(LayoutInfo* layoutInfo, float _size)
 {
-//printf("ConstraintSolverLayouter::Layout(%p, %.1f): min: %ld, max: %ld\n",
+//printf("QocaConstraintSolverLayouter::Layout(%p, %.1f): min: %ld, max: %ld\n",
 //layoutInfo, _size, fMin, fMax);
 	int32 size = (int32)_size + 1;
 
@@ -710,7 +710,7 @@ ConstraintSolverLayouter::Layout(LayoutInfo* layoutInfo, float _size)
 	size -= additionalSpace;
 	int32 spacing = (fElementCount - 1) * fSpacing;
 	if (!_ComputeSolution(size - spacing)) {
-		ERROR_MESSAGE("ConstraintSolverLayouter::Layout(): no solution\n");
+		ERROR_MESSAGE("QocaConstraintSolverLayouter::Layout(): no solution\n");
 		// no solution
 		return;
 	}
@@ -750,10 +750,10 @@ ConstraintSolverLayouter::Layout(LayoutInfo* layoutInfo, float _size)
 
 // CloneLayouter
 Layouter*
-ConstraintSolverLayouter::CloneLayouter()
+QocaConstraintSolverLayouter::CloneLayouter()
 {
-	ConstraintSolverLayouter* layouter
-		= new ConstraintSolverLayouter(fElementCount, fSpacing);
+	QocaConstraintSolverLayouter* layouter
+		= new QocaConstraintSolverLayouter(fElementCount, fSpacing);
 
 	memcpy(layouter->fWeights, fWeights, sizeof(float) * fElementCount);
 
@@ -790,7 +790,7 @@ ConstraintSolverLayouter::CloneLayouter()
 
 // _ValidateMinMax
 void
-ConstraintSolverLayouter::_ValidateMinMax()
+QocaConstraintSolverLayouter::_ValidateMinMax()
 {
 	if (fMinMaxValid)
 		return;
@@ -809,7 +809,7 @@ ConstraintSolverLayouter::_ValidateMinMax()
 
 // _AddMinConstraint
 void
-ConstraintSolverLayouter::_AddMinConstraint(int32 first, int32 last,
+QocaConstraintSolverLayouter::_AddMinConstraint(int32 first, int32 last,
 	int32 value)
 {
 	if (first == last) {
@@ -823,7 +823,7 @@ ConstraintSolverLayouter::_AddMinConstraint(int32 first, int32 last,
 
 // _AddMaxConstraint
 void
-ConstraintSolverLayouter::_AddMaxConstraint(int32 first, int32 last,
+QocaConstraintSolverLayouter::_AddMaxConstraint(int32 first, int32 last,
 	int32 value)
 {
 	if (first == last) {
@@ -837,7 +837,7 @@ ConstraintSolverLayouter::_AddMaxConstraint(int32 first, int32 last,
 
 // _ComputeMin
 int32
-ConstraintSolverLayouter::_ComputeMin()
+QocaConstraintSolverLayouter::_ComputeMin()
 {
 	_RemoveSetSizeConstraint();
 	_AddConstraints();
@@ -855,7 +855,7 @@ ConstraintSolverLayouter::_ComputeMin()
 	bool success = _FindIntegerSolution(size);
 	if (!success) {
 		ERROR_MESSAGE(
-			"ConstraintSolverLayouter::_ComputeMin(): no int solution\n");
+			"QocaConstraintSolverLayouter::_ComputeMin(): no int solution\n");
 		return 0;
 	}
 
@@ -864,7 +864,7 @@ ConstraintSolverLayouter::_ComputeMin()
 
 // _ComputeMax
 int32
-ConstraintSolverLayouter::_ComputeMax()
+QocaConstraintSolverLayouter::_ComputeMax()
 {
 	_RemoveSetSizeConstraint();
 	_AddConstraints();
@@ -888,7 +888,7 @@ ConstraintSolverLayouter::_ComputeMax()
 	bool success = _FindIntegerSolution(size);
 	if (!success) {
 		ERROR_MESSAGE(
-			"ConstraintSolverLayouter::_ComputeMax(): no int solution\n");
+			"QocaConstraintSolverLayouter::_ComputeMax(): no int solution\n");
 		return B_SIZE_UNLIMITED;
 	}
 
@@ -897,9 +897,9 @@ ConstraintSolverLayouter::_ComputeMax()
 
 // _ComputeSolution
 bool
-ConstraintSolverLayouter::_ComputeSolution(int32 size)
+QocaConstraintSolverLayouter::_ComputeSolution(int32 size)
 {
-//printf("ConstraintSolverLayouter::_ComputeSolution(%ld)\n", size);
+//printf("QocaConstraintSolverLayouter::_ComputeSolution(%ld)\n", size);
 	_RemoveSetSizeConstraint();
 	_AddConstraints();
 
@@ -913,7 +913,7 @@ ConstraintSolverLayouter::_ComputeSolution(int32 size)
 
 	if (!_AddSetSizeConstraint(size)) {
 		// Ugh! Contradictory!
-		ERROR_MESSAGE("ConstraintSolverLayouter::_ComputeSolution(): "
+		ERROR_MESSAGE("QocaConstraintSolverLayouter::_ComputeSolution(): "
 			"contradictory CSP\n");
 		return false;
 	}
@@ -922,7 +922,7 @@ ConstraintSolverLayouter::_ComputeSolution(int32 size)
 	fSolver->Solve();
 
 	if (!_FindIntegerSolution(size)) {
-		ERROR_MESSAGE("ConstraintSolverLayouter::_ComputeSolution(): "
+		ERROR_MESSAGE("QocaConstraintSolverLayouter::_ComputeSolution(): "
 			"no int solution\n");
 		return false;
 	}
@@ -932,9 +932,9 @@ ConstraintSolverLayouter::_ComputeSolution(int32 size)
 
 // _FindIntegerSolution
 bool
-ConstraintSolverLayouter::_FindIntegerSolution(int32 size)
+QocaConstraintSolverLayouter::_FindIntegerSolution(int32 size)
 {
-//printf("ConstraintSolverLayouter::_FindIntegerSolution(%ld)\n", size);
+//printf("QocaConstraintSolverLayouter::_FindIntegerSolution(%ld)\n", size);
 //printf("  solution:\n");
 	// check whether there are non-integer variable values
 	Set nonIntVariables;
@@ -981,13 +981,13 @@ ConstraintSolverLayouter::_FindIntegerSolution(int32 size)
 		return true;
 	
 	if (sum > size) {
-		ERROR_MESSAGE("ConstraintSolverLayouter::_FindIntegerSolution(): "
+		ERROR_MESSAGE("QocaConstraintSolverLayouter::_FindIntegerSolution(): "
 			"computed size %ld, but element sum is %ld\n", size, sum);
 		return false;
 	}
 
 	if (nonIntVariables.IsEmpty()) {
-		ERROR_MESSAGE("ConstraintSolverLayouter::_FindIntegerSolution(): "
+		ERROR_MESSAGE("QocaConstraintSolverLayouter::_FindIntegerSolution(): "
 			"computed size %ld, element sum is %ld, but we have no "
 			"non-integer variables\n", size, sum);
 		return false;
@@ -1014,7 +1014,7 @@ ConstraintSolverLayouter::_FindIntegerSolution(int32 size)
 
 // _FindIntegerSolution
 bool
-ConstraintSolverLayouter::_FindIntegerSolution(const Set& _nonIntVariables,
+QocaConstraintSolverLayouter::_FindIntegerSolution(const Set& _nonIntVariables,
 	const BList& _minConstraints, const BList& _maxConstraints, int32 sizeDiff)
 {
 	// We get the variables that had a non-integer value, and lists of minimum
@@ -1108,14 +1108,14 @@ ConstraintSolverLayouter::_FindIntegerSolution(const Set& _nonIntVariables,
 	}
 
 	// if we are here, we didn't find a solution
-	ERROR_MESSAGE("ConstraintSolverLayouter::_FindIntegerSolution(): "
+	ERROR_MESSAGE("QocaConstraintSolverLayouter::_FindIntegerSolution(): "
 		"found no int solution\n");
 	return false;
 }
 
 // _CreateConstraint
-ConstraintSolverLayouter::Constraint*
-ConstraintSolverLayouter::_CreateConstraint(int32 type, int32 first,
+QocaConstraintSolverLayouter::Constraint*
+QocaConstraintSolverLayouter::_CreateConstraint(int32 type, int32 first,
 	int32 last, int32 value)
 {
 	switch (type) {
@@ -1131,8 +1131,8 @@ ConstraintSolverLayouter::_CreateConstraint(int32 type, int32 first,
 
 // _SetConstraint
 void
-ConstraintSolverLayouter::_SetConstraint(int32 type, Constraint** constraints,
-	int32 element, int32 value, bool restrict)
+QocaConstraintSolverLayouter::_SetConstraint(int32 type,
+	Constraint** constraints, int32 element, int32 value, bool restrict)
 {
 	if (element < 0 || element >= fElementCount)
 		return;
@@ -1156,7 +1156,7 @@ ConstraintSolverLayouter::_SetConstraint(int32 type, Constraint** constraints,
 
 // _SetConstraint
 void
-ConstraintSolverLayouter::_SetConstraint(int32 type, BList& constraints,
+QocaConstraintSolverLayouter::_SetConstraint(int32 type, BList& constraints,
 	int32 first, int32 last, int32 value, bool restrict)
 {
 	if (first < 0 || first > last || last >= fElementCount)
@@ -1185,8 +1185,8 @@ ConstraintSolverLayouter::_SetConstraint(int32 type, BList& constraints,
 
 // _IndexOfConstraint
 int
-ConstraintSolverLayouter::_IndexOfConstraint(BList& constraints, int32 first,
-	int32 last)
+QocaConstraintSolverLayouter::_IndexOfConstraint(BList& constraints,
+	int32 first, int32 last)
 {
 	int32 count = constraints.CountItems();
 	for (int32 i = 0; i < count; i++) {
@@ -1200,7 +1200,7 @@ ConstraintSolverLayouter::_IndexOfConstraint(BList& constraints, int32 first,
 
 // _AddSetSizeConstraint
 bool
-ConstraintSolverLayouter::_AddSetSizeConstraint(int32 size)
+QocaConstraintSolverLayouter::_AddSetSizeConstraint(int32 size)
 {
 	if (fSetSizeConstraintAdded) {
 		if (fSetSizeConstraint->RHS() == size)
@@ -1220,7 +1220,7 @@ ConstraintSolverLayouter::_AddSetSizeConstraint(int32 size)
 
 // _AddConstraints
 void
-ConstraintSolverLayouter::_AddConstraints()
+QocaConstraintSolverLayouter::_AddConstraints()
 {
 	if (fConstraintsAdded)
 		return;
@@ -1441,7 +1441,7 @@ ConstraintSolverLayouter::_AddConstraints()
 
 // _AddConstraints
 void
-ConstraintSolverLayouter::_AddConstraints(const BList& constraints)
+QocaConstraintSolverLayouter::_AddConstraints(const BList& constraints)
 {
 	int32 count = constraints.CountItems();
 	for (int32 i = 0; i < count; i++) {
@@ -1507,7 +1507,7 @@ ConstraintSolverLayouter::_AddConstraints(const BList& constraints)
 
 // _RemoveSetSizeConstraint
 void
-ConstraintSolverLayouter::_RemoveSetSizeConstraint()
+QocaConstraintSolverLayouter::_RemoveSetSizeConstraint()
 {
 	if (fSetSizeConstraintAdded) {
 		fSolver->RemoveConstraint(*fSetSizeConstraint);
@@ -1517,7 +1517,7 @@ ConstraintSolverLayouter::_RemoveSetSizeConstraint()
 
 // _RemoveConstraints
 void
-ConstraintSolverLayouter::_RemoveConstraints()
+QocaConstraintSolverLayouter::_RemoveConstraints()
 {
 	if (!fConstraintsAdded)
 		return;
@@ -1547,7 +1547,7 @@ ConstraintSolverLayouter::_RemoveConstraints()
 
 // _RemoveConstraint
 void
-ConstraintSolverLayouter::_RemoveConstraint(Constraint* constraint)
+QocaConstraintSolverLayouter::_RemoveConstraint(Constraint* constraint)
 {
 	if (constraint != NULL && constraint->IsAdded()) {
 		fSolver->RemoveConstraint(*constraint->QocaConstraint());
@@ -1557,7 +1557,7 @@ ConstraintSolverLayouter::_RemoveConstraint(Constraint* constraint)
 
 // _GetInvolvedConstraints
 void
-ConstraintSolverLayouter::_GetInvolvedConstraints(const BList& constraints,
+QocaConstraintSolverLayouter::_GetInvolvedConstraints(const BList& constraints,
 	const BList& variables, BList& filteredConstraints)
 {
 	filteredConstraints.MakeEmpty();
@@ -1591,7 +1591,7 @@ ConstraintSolverLayouter::_GetInvolvedConstraints(const BList& constraints,
 
 // _GetViolatedConstraints
 void
-ConstraintSolverLayouter::_GetViolatedConstraints(const BList& constraints,
+QocaConstraintSolverLayouter::_GetViolatedConstraints(const BList& constraints,
 	BList& violatedConstraints)
 {
 	violatedConstraints.MakeEmpty();
@@ -1615,7 +1615,7 @@ ConstraintSolverLayouter::_GetViolatedConstraints(const BList& constraints,
 
 // _FilterVariablesByMaxConstraints
 void
-ConstraintSolverLayouter::_FilterVariablesByMaxConstraints(
+QocaConstraintSolverLayouter::_FilterVariablesByMaxConstraints(
 	const BList& variables, const BList& constraints, Set& filteredVars)
 {
 	filteredVars.MakeEmpty();
@@ -1642,7 +1642,7 @@ ConstraintSolverLayouter::_FilterVariablesByMaxConstraints(
 
 // _CompareVariables
 int
-ConstraintSolverLayouter::_CompareVariables(const void* _a, const void* _b)
+QocaConstraintSolverLayouter::_CompareVariables(const void* _a, const void* _b)
 {
 	// compare by distance of the float solution to the integer solution
 	Variable* a = *(Variable**)_a;
@@ -1658,7 +1658,7 @@ ConstraintSolverLayouter::_CompareVariables(const void* _a, const void* _b)
 
 // _CompareConstraints
 int
-ConstraintSolverLayouter::_CompareConstraintsByLength(const void* _a,
+QocaConstraintSolverLayouter::_CompareConstraintsByLength(const void* _a,
 	const void* _b)
 {
 	// compare by number of involved variables
@@ -1670,7 +1670,7 @@ ConstraintSolverLayouter::_CompareConstraintsByLength(const void* _a,
 
 // _CompareConstraints
 int
-ConstraintSolverLayouter::_CompareConstraintsBySatisfactionDistance(
+QocaConstraintSolverLayouter::_CompareConstraintsBySatisfactionDistance(
 	const void* _a, const void* _b)
 {
 	// compare by number of involved variables

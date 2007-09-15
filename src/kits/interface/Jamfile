@@ -28,9 +28,21 @@ SetSubDirSupportedPlatforms haiku libbe_test ;
 UsePrivateHeaders app input interface shared tracker ;
 UseLibraryHeaders icon ;
 
-# qoca headers
-SubDirSysHdrs $(SUBDIR) ;
-SubDirHdrs [ FDirName $(SUBDIR) qoca ] ;
+
+# constraint solver to use
+local constraintSolverSources = ;
+switch $(LAYOUT_CONSTRAINT_SOLVER) {
+	case qoca :
+	{
+		DEFINES += USE_QOCA_CONSTRAINT_SOLVER ;
+		constraintSolverSources = QocaConstraintSolverLayouter.cpp ;
+		SubDirSysHdrs [ FDirName $(HAIKU_TOP) src libs ] ;
+		SubDirHdrs [ FDirName $(HAIKU_TOP) src libs qoca ] ;
+	}
+	case * :
+	{
+	}
+}
 
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) textview_support ] ;
@@ -126,10 +138,9 @@ MergeObject <libbe>interface_kit.o :
 	WidthBuffer.cpp
 
 	# layouter
-	ConstraintSolverLayouter.cpp
 	Layouter.cpp
 	OneElementLayouter.cpp
 	SimpleLayouter.cpp
-;
 
-SubInclude HAIKU_TOP src kits interface qoca ;
+	$(constraintSolverSources)
+;

@@ -32,7 +32,7 @@ SharedLibrary libbe.so :
 	<libbe>storage_kit.o
 	<libbe>support_kit.o
 
-	libqoca.so
+	lib$(LAYOUT_CONSTRAINT_SOLVER).so
 
 	libicon.a
 	libagg.a
@@ -68,7 +68,7 @@ SharedLibrary libbe_haiku.so :
 	<libbe>storage_kit.o
 	<libbe>support_kit.o
 
-	libqoca.so
+	lib$(LAYOUT_CONSTRAINT_SOLVER).so
 
 	libicon.a
 	libagg.a
