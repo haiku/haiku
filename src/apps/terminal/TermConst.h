@@ -141,6 +141,8 @@ enum{
 
 #define MIN_COLS 10
 #define MAX_COLS 256
+#define MIN_ROWS 1
+#define MAX_ROWS 256
 
 // Insert mode flag
 #define MODE_OVER 0

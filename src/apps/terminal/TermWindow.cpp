@@ -389,8 +389,14 @@ TermWindow::MessageReceived(BMessage *message)
 			int width, height;
 			_ActiveTermView()->GetFontSize(&width, &height);
 			
+			float minimumHeight = 0;
+			if (fMenubar)
+				minimumHeight += fMenubar->Bounds().Height();
+			if (fTabView && fTabView->CountTabs() > 1)
+				minimumHeight += fTabView->TabHeight();
 			SetSizeLimits (MIN_COLS * width, MAX_COLS * width,
-							MIN_COLS * height, MAX_COLS * height);
+							minimumHeight + MIN_ROWS * height, 
+							minimumHeight + MAX_ROWS * height);
 			
 			ResizeTo(rect.Width()+ B_V_SCROLL_BAR_WIDTH + kViewOffset * 2,
 				rect.Height()+fMenubar->Bounds().Height() + kViewOffset * 2);
@@ -623,13 +629,22 @@ TermWindow::_AddTab(Arguments *args)
 		
 		_SetTermColors(view);
 		
-		// If it's the first time we're called, setup the window
-		if (fTabView->CountTabs() == 1) {
+		if (fTabView->CountTabs() >= 1) {
 			int width, height;
 			view->GetFontSize(&width, &height);
-			SetSizeLimits(MIN_COLS * width, MAX_COLS * width,
-				MIN_COLS * height, MAX_COLS * height);
-		
+
+			float minimumHeight = 0;
+			if (fMenubar)
+				minimumHeight += fMenubar->Bounds().Height();
+			if (fTabView && fTabView->CountTabs() > 1)
+				minimumHeight += fTabView->TabHeight();
+			SetSizeLimits (MIN_COLS * width, MAX_COLS * width,
+							minimumHeight + MIN_ROWS * height, 
+							minimumHeight + MAX_ROWS * height);
+		}
+
+		// If it's the first time we're called, setup the window
+		if (fTabView->CountTabs() == 1) {
 			float fWidth, fHeight;
 			view->GetPreferredSize(&fWidth, &fHeight);
 			
