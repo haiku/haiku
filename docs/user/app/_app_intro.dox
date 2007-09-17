@@ -17,15 +17,16 @@
 	documents referenced before going to any other part of the API. 
   
 	We can divide the classes in the application kit up in two categories. The
-	biggest part of the classes are in the 'messaging' classes. The following
-	are part of it:
+	biggest part of the classes are in the 'messaging' classes. Have a look at
+	the \link app_messaging Introduction to Messaging \endlink for more 
+	information. The following classes are part of it:
 	- BHandler
 	- BInvoker
 	- BLooper
 	- BMessage
 	- BMessageFilter
 	- BMessageQueue
-	- BMessageRUnner
+	- BMessageRunner
 	- BMessenger
   
 	The second category is the 'system interaction'  category. These classes
