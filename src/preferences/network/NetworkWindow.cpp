@@ -16,15 +16,14 @@
 
 
 NetworkWindow::NetworkWindow()
-: BWindow(BRect(50, 50, 269, 302), "Network", 
-B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS
-| B_NOT_ZOOMABLE)
+	: BWindow(BRect(50, 50, 269, 302), "Network", B_TITLED_WINDOW,
+		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
 {
 			
 	fEthView = new EthernetSettingsView(Bounds());
-			
+	ResizeTo(fEthView->Frame().Width(), fEthView->Frame().Height());
+
 	AddChild(fEthView);
-			
 }
 	
 
