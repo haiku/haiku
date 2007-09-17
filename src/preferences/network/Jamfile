@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src preferences network ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders shared ;
 
 Preference Network :
@@ -12,7 +10,3 @@ Preference Network :
 	: be root $(HAIKU_NETWORK_LIBS)
 	;
 
-Package haiku-networksettings :
-	Network :
-	boot home Desktop haiku-networksettings ;
-	

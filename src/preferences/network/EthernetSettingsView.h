@@ -26,7 +26,7 @@ static const uint32 kMsgInfo = 'info';
 
 class EthernetSettingsView : public BView {
 	public:
-		EthernetSettingsView(BRect rect);
+		EthernetSettingsView(BRect frame);
 		virtual ~EthernetSettingsView();
 		
 		virtual void MessageReceived(BMessage* message);
@@ -53,7 +53,7 @@ class EthernetSettingsView : public BView {
 		int		fSocket;
 		void	_GatherInterfaces();
 		bool	_PrepareRequest(struct ifreq& request, const char* name);
-		void 	_ShowConfiguration(BMessage* message);
+		void 	_ShowConfiguration(const BMessage* message);
 		void 	_SaveConfiguration();
 		void 	_SaveDNSConfiguration();
 		void 	_SaveAdaptersConfiguration();

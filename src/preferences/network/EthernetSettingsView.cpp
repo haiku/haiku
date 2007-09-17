@@ -118,12 +118,13 @@ EthernetSettingsView::AttachedToWindow()
 	fApplyButton->SetTarget(this);
 	fDeviceMenuField->Menu()->SetTargetForItems(this); 
 	
-	// Display first adapter by default.
-	
-	BMessage* info = new BMessage(kMsgInfo);
-	info->AddString("interface", fSettings.ItemAt(0)->GetName());
-	_ShowConfiguration(info);
-	
+	// display settigs of first adapter on startup
+	Settings* settings = fSettings.ItemAt(0);
+	if (settings) {
+		BMessage info(kMsgInfo);
+		info.AddString("interface", settings->GetName());
+		_ShowConfiguration(&info);
+	}
 }
 
 
@@ -133,21 +134,19 @@ EthernetSettingsView::DetachedFromWindow()
 }
 
 
-EthernetSettingsView::EthernetSettingsView(BRect rect)
-: BView(rect, "EthernetSettingsView", B_FOLLOW_ALL, B_WILL_DRAW)
+EthernetSettingsView::EthernetSettingsView(BRect frame)
+	: BView(frame, "EthernetSettingsView", B_FOLLOW_ALL, B_WILL_DRAW)
 {
-	float defaultWidth = 190;
 	float inset = ceilf(be_plain_font->Size() * 0.8);
-	BRect frame(inset,inset, defaultWidth, 50);
+	frame.OffsetTo(B_ORIGIN);
+	frame.InsetBy(inset, inset);
 	
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
-	fSettings.MakeEmpty();
 	fSocket = socket(AF_INET, SOCK_DGRAM, 0);
 	_GatherInterfaces();
 	
-	BPopUpMenu* devmenu = new  BPopUpMenu("devices");
-	
+	BPopUpMenu* devmenu = new BPopUpMenu("devices");
 	for (int32 i = 0; i < fInterfaces.CountItems(); i++) {
 		BString& name = *fInterfaces.ItemAt(i);
 		BString label = name;
@@ -155,12 +154,8 @@ EthernetSettingsView::EthernetSettingsView(BRect rect)
 		info->AddString("interface", name.String());
 		BMenuItem* item = new BMenuItem(label.String(), info);
 		devmenu->AddItem(item);
-		
-		
 	}
 
-	
-	
 	BPopUpMenu* modemenu = new  BPopUpMenu("modes");
 	BMenuItem* staticitem = new BMenuItem("Static", NULL);
 	modemenu->AddItem(staticitem);
@@ -174,7 +169,6 @@ EthernetSettingsView::EthernetSettingsView(BRect rect)
 		fDeviceMenuField->StringWidth(fDeviceMenuField->Label()) + 8);
 	AddChild(fDeviceMenuField);
 	fDeviceMenuField->ResizeToPreferred();
-
 	
 	fTypeMenuField = new BMenuField(frame, "type", "Mode:", modemenu);
 	fTypeMenuField->SetDivider(
@@ -233,8 +227,6 @@ EthernetSettingsView::EthernetSettingsView(BRect rect)
 	fApplyButton->MoveTo(
 		fSecondaryDNSTextControl->Frame().LeftBottom() + BPoint(0,10));
 	AddChild(fApplyButton);
-	
-	
 }
 
 EthernetSettingsView::~EthernetSettingsView()
@@ -243,11 +235,8 @@ EthernetSettingsView::~EthernetSettingsView()
 }
 
 void
-EthernetSettingsView::_ShowConfiguration(BMessage* message)
+EthernetSettingsView::_ShowConfiguration(const BMessage* message)
 {
-	
-
-			
 	// Clear the inputs.
 	fIPTextControl->SetText("");
 	fGatewayTextControl->SetText("");
@@ -260,37 +249,34 @@ EthernetSettingsView::_ShowConfiguration(BMessage* message)
 	if (message->FindString("interface", &name) != B_OK)
 		return;
 	
-	int i;
-	for (i=0; i<fSettings.CountItems();i++) {
-		if (strcmp(fSettings.ItemAt(i)->GetName(), name) == 0) {
-			fDeviceMenuField->Menu()->FindItem(name)->SetMarked(true);
-			fIPTextControl->SetText(fSettings.ItemAt(i)->GetIP());
-			fGatewayTextControl->SetText(fSettings.ItemAt(i)->GetGateway());
-			fNetMaskTextControl->SetText(fSettings.ItemAt(i)->GetNetmask());
-			
-			if (fSettings.ItemAt(i)->GetAutoConfigure() == true) {
-				fTypeMenuField->Menu()->FindItem("DHCP")->SetMarked(true);
-				fTypeMenuField->Menu()->FindItem("Static")->SetMarked(false);
+	for (int32 i = 0; i < fSettings.CountItems(); i++) {
+		Settings* settings = fSettings.ItemAt(i);
+		if (strcmp(settings->GetName(), name) != 0)
+			continue;
 
-			} else {
-				fTypeMenuField->Menu()->FindItem("Static")->SetMarked(true);
-				fTypeMenuField->Menu()->FindItem("DHCP")->SetMarked(false);
+		fDeviceMenuField->Menu()->FindItem(name)->SetMarked(true);
 
-			}
-			fTypeMenuField->Menu()->SetLabelFromMarked(true);
-			fDeviceMenuField->Menu()->SetLabelFromMarked(true);
+		fIPTextControl->SetText(settings->GetIP());
+		fGatewayTextControl->SetText(settings->GetGateway());
+		fNetMaskTextControl->SetText(settings->GetNetmask());
+		
+		if (settings->GetAutoConfigure() == true)
+			fTypeMenuField->Menu()->FindItem("DHCP")->SetMarked(true);
+		else
+			fTypeMenuField->Menu()->FindItem("Static")->SetMarked(true);
 
-			
-			if (fSettings.ItemAt(i)->fNameservers.CountItems() == 2) {
-				fSecondaryDNSTextControl->SetText(
-					fSettings.ItemAt(i)->fNameservers.ItemAt(1)->String());
-			} 
-			
-			if (fSettings.ItemAt(i)->fNameservers.CountItems() >= 1) {
-				fPrimaryDNSTextControl->SetText(
-						fSettings.ItemAt(i)->fNameservers.ItemAt(0)->String());
-			}
+//		fTypeMenuField->Menu()->SetLabelFromMarked(true);
+//		fDeviceMenuField->Menu()->SetLabelFromMarked(true);
+
+		if (settings->fNameservers.CountItems() >= 2) {
+			fSecondaryDNSTextControl->SetText(
+				settings->fNameservers.ItemAt(1)->String());
 		} 
+		
+		if (settings->fNameservers.CountItems() >= 1) {
+			fPrimaryDNSTextControl->SetText(
+					settings->fNameservers.ItemAt(0)->String());
+		}
 	}	
 }
 
