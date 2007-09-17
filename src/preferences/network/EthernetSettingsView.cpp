@@ -166,8 +166,8 @@ EthernetSettingsView::EthernetSettingsView(BRect rect)
 	modemenu->AddItem(staticitem);
 	BMenuItem* dhcpitem = new BMenuItem("DHCP", NULL);
 	modemenu->AddItem(dhcpitem);
-	BMenuItem* offitem = new BMenuItem("Disconnected", NULL);
-	modemenu->AddItem(offitem);
+	//BMenuItem* offitem = new BMenuItem("Disconnected", NULL);
+	//modemenu->AddItem(offitem);
 	
 	fDeviceMenuField = new BMenuField(frame, "networkcards", "Adapter:", devmenu);
 	fDeviceMenuField->SetDivider(
@@ -298,31 +298,35 @@ void
 EthernetSettingsView::_ApplyControlsToConfiguration()
 {
 			
-	if (strcmp(fTypeMenuField->Menu()->FindMarked()->Label(), "Static") == 0) {
-		int i;
-		for (i = 0; i < fSettings.CountItems(); i++) {
+	int i;
+	for (i = 0; i < fSettings.CountItems(); i++) {
 		
 
-			if (strcmp(fSettings.ItemAt(i)->
-				GetName(), fDeviceMenuField->Menu()->FindMarked()->Label()) == 0) {
+		if (strcmp(fSettings.ItemAt(i)->
+			GetName(), fDeviceMenuField->Menu()->FindMarked()->Label()) == 0) {
+				fSettings.ItemAt(i)->
+				SetIP(fIPTextControl->Text());
+				fSettings.ItemAt(i)->
+					SetNetmask(fNetMaskTextControl->Text());
 					fSettings.ItemAt(i)->
-						SetIP(fIPTextControl->Text());
-					fSettings.ItemAt(i)->
-						SetNetmask(fNetMaskTextControl->Text());
-					fSettings.ItemAt(i)->
-						SetGateway(fGatewayTextControl->Text());
+					SetGateway(fGatewayTextControl->Text());
+				if (strcmp(fTypeMenuField->Menu()->FindMarked()->Label(), "DHCP")
+					== 0)
+					fSettings.ItemAt(i)->SetAutoConfigure(true);
+				else
 					fSettings.ItemAt(i)->SetAutoConfigure(false);
+
 					
-					fSettings.ItemAt(i)->fNameservers.MakeEmpty();
-					fSettings.ItemAt(i)->fNameservers.AddItem(new BString(
-						fPrimaryDNSTextControl->Text()));
-					fSettings.ItemAt(i)->fNameservers.AddItem(new BString(
-						fSecondaryDNSTextControl->Text()));
-						
-			}
+				fSettings.ItemAt(i)->fNameservers.MakeEmpty();
+				fSettings.ItemAt(i)->fNameservers.AddItem(new BString(
+					fPrimaryDNSTextControl->Text()));
+				fSettings.ItemAt(i)->fNameservers.AddItem(new BString(
+					fSecondaryDNSTextControl->Text()));
+					
 		}
-	} 
-}
+	}
+} 
+
 
 void
 EthernetSettingsView::_SaveConfiguration()
@@ -364,12 +368,14 @@ EthernetSettingsView::_SaveAdaptersConfiguration()
 		return;
 		
 	FILE* fp = NULL;
+	bool allDHCP = true;
 	// loop over all adapters. open the settings file only once,
 	// append the settins of each non-autoconfiguring adapter
 	for (int i = 0; i < fSettings.CountItems(); i++) {
 		if (fSettings.ItemAt(i)->GetAutoConfigure())
 			continue;
-
+		
+		allDHCP = false;
 		if (fp == NULL) {
 			fp = fopen(path.Path(), "w");
 			if (fp == NULL) {
@@ -393,7 +399,12 @@ EthernetSettingsView::_SaveAdaptersConfiguration()
 	if (fp) {
 		printf("%s saved.\n", path.Path());
 		fclose(fp);
-	}	
+	}
+	
+	if (allDHCP) {
+		// all configuration is DHCP, so delete interfaces file.
+		remove(path.Path());
+	}
 }
 
 status_t
