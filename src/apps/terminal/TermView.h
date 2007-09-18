@@ -192,9 +192,6 @@ private:
 
 	static void _FixFontAttributes(BFont &font);
 	
-	static int32 _MouseTrackingEntryFunction(void *);
-	int32 _MouseTracking();
-
 	Shell *fShell;
 
 	BMessageRunner *fWinchRunner;
@@ -268,10 +265,6 @@ private:
 	CurPos fSelStart;
 	CurPos fSelEnd;
 	bool fMouseTracking;
-
-	// thread ID / flags.
-	thread_id fMouseThread;
-	bool fQuitting;
 
 	// Input Method parameter.
 	int fIMViewPtr;

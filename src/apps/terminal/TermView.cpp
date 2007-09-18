@@ -101,8 +101,6 @@ const unsigned char M_ADD_CURSOR[] = {
 };
 
 
-
-#define MOUSE_THR_CODE 'mtcd'
 #define ROWS_DEFAULT 25
 #define COLUMNS_DEFAULT 80
 
@@ -173,8 +171,6 @@ TermView::TermView(BRect frame, int32 argc, const char **argv, int32 historySize
 	fSelStart(-1, -1),
 	fSelEnd(-1, -1),
 	fMouseTracking(false),
-	fMouseThread(-1),
-	fQuitting(false),
 	fIMflag(false)	
 {	
 	_InitObject(argc, argv);
@@ -223,8 +219,6 @@ TermView::TermView(int rows, int columns, int32 argc, const char **argv, int32 h
 	fSelStart(-1, -1),
 	fSelEnd(-1, -1),
 	fMouseTracking(false),
-	fMouseThread(-1),
-	fQuitting(false),
 	fIMflag(false)	
 {	
 	_InitObject(argc, argv);
@@ -274,8 +268,6 @@ TermView::TermView(BMessage *archive)
 	fSelStart(-1, -1),
 	fSelEnd(-1, -1),
 	fMouseTracking(false),
-	fMouseThread(-1),
-	fQuitting(false),
 	fIMflag(false)	
 {
 	if (archive->FindInt32("encoding", (int32 *)&fEncoding) < B_OK)
@@ -322,8 +314,6 @@ TermView::_InitObject(int32 argc, const char **argv)
 
 	SetTermSize(fTermRows, fTermColumns, false);
 	//SetIMAware(false);
-
-	_InitMouseThread();
 	
 	return B_OK;
 }
@@ -338,9 +328,6 @@ TermView::~TermView()
 	
 	delete fTextBuffer;
 	delete shell;
-
-	fQuitting = true;
-	kill_thread(fMouseThread);
 }
 
 
@@ -1135,120 +1122,6 @@ TermView::_DetachShell()
 }
 
 
-status_t
-TermView::_InitMouseThread()
-{
-	// spawn Mouse Tracking thread.
-	if (fMouseThread < 0) {
-		fMouseThread = spawn_thread(_MouseTrackingEntryFunction, "MouseTracking",
-			B_NORMAL_PRIORITY,this);
-	} else
-		return B_BAD_THREAD_ID;
-
-	return resume_thread(fMouseThread);
-}
-
-
-/* static */
-int32
-TermView::_MouseTrackingEntryFunction(void *data)
-{
-	return static_cast<TermView *>(data)->_MouseTracking();
-}
-
-
-//!	Thread for tracking mouse.
-int32
-TermView::_MouseTracking()
-{
-	int32 code, selected = false;
-	uint32 button;
-	thread_id sender;
-	CurPos stpos, edpos;
-	BPoint stpoint, edpoint;
-	float scr_start, scr_end, scr_pos;
-	
-	while(!fQuitting) {
-		code = receive_data(&sender,(void *)&stpoint, sizeof(BPoint));
-		if (code != MOUSE_THR_CODE)
-			continue;
-
-		selected = _HasSelection();
-		edpoint.Set(-1, -1);
-		
-		stpos = _BPointToCurPos(stpoint);
-		
-		do {
-			snooze(40000);
-			
-			if (LockLooper()) {
-				GetMouse(&edpoint, &button);
-				UnlockLooper();
-			}
-		
-			edpos = _BPointToCurPos(edpoint);
-			if (edpos.y < 0)
-				continue;
-
-				if (stpoint == edpoint) {
-					continue;
-				} else {
-					if (!selected) {
-						_Select(stpos, edpos);
-						selected = true;
-					} else {
-					
-						// Align cursor point to text.
-						if (stpos == edpos)
-							continue;
-						
-						if (edpos > stpos) {
-							edpoint.x -= fFontWidth / 2;
-							edpos = _BPointToCurPos(edpoint);
-							//edpos.x--;
-							if (edpos.x < 0)
-								edpos.x = 0;
-						}
-						else
-						if (edpos < stpos) {
-							edpoint.x += fFontWidth / 2;
-							edpos = _BPointToCurPos(edpoint);
-							//edpos.x++;
-							if (edpos.x > fTermColumns)
-								edpos.x = fTermColumns;
-						}
-						
-						// Scroll check
-						if (fScrollBar != NULL && LockLooper()) {
-							// Get now scroll point
-							fScrollBar->GetRange(&scr_start, &scr_end);
-							scr_pos = fScrollBar->Value();
-							
-							if (edpoint.y < Bounds().LeftTop().y )
-							
-								// mouse point left of window
-								if (scr_pos != scr_start)
-									ScrollTo(0, edpoint.y);
-								
-								if (edpoint.y > Bounds().LeftBottom().y) {
-								
-								// mouse point left of window
-								if (scr_pos != scr_end)
-									ScrollTo(0, edpoint.y);
-							}
-							UnlockLooper();
-						}
-						_ResizeSelectRegion(edpos);
-					}
-				}
-			} while(button);
-		fMouseTracking = false;
-	}
-	
-	return 0;
-}
-
-
 //! Draw character on offscreen bitmap.
 void
 TermView::_DrawLines(int x1, int y1, ushort attr, uchar *buf,
@@ -2011,10 +1884,14 @@ TermView::MouseDown(BPoint where)
 		}
 
 		// If mouse has a lot of movement, disable double/triple click.
-		BPoint inPoint = fPreviousMousePoint - where;
+		/*BPoint inPoint = fPreviousMousePoint - where;
 		if (abs((int)inPoint.x) > 16 || abs((int)inPoint.y) > 16)
 			clicks = 1;
-	
+		*/
+		
+		SetMouseEventMask(B_POINTER_EVENTS | B_KEYBOARD_EVENTS,
+				B_NO_POINTER_HISTORY | B_LOCK_WINDOW_FOCUS);
+
 		fPreviousMousePoint = where;
 	    
 		if (mod & B_SHIFT_KEY)
@@ -2031,7 +1908,6 @@ TermView::MouseDown(BPoint where)
 		switch (clicks) {
 			case 1:
 				fMouseTracking = true;
-				send_data(fMouseThread, MOUSE_THR_CODE, (void *)&where, sizeof(BPoint));
 	      			break;
 	  
 			case 2:
@@ -2053,13 +1929,70 @@ void
 TermView::MouseMoved(BPoint where, uint32 transit, const BMessage *message)
 {
 	BView::MouseMoved(where, transit, message);
+	if (!fMouseTracking)
+		return;
+	
+	bool selected = _HasSelection();
+
+	//int32 button;
+	//Window()->CurrentMessage()->FindInt32("buttons", &button);
+
+	CurPos startPos = _BPointToCurPos(fPreviousMousePoint);
+	CurPos endPos = _BPointToCurPos(where);
+	if (endPos.y < 0)
+		return;
+
+	if (!selected) {
+		_Select(startPos, endPos);
+		selected = true;
+	} else {
+		// Align cursor point to text.
+		if (startPos == endPos)
+			return;
+		
+		if (endPos > startPos) {
+			where.x -= fFontWidth / 2;
+			endPos = _BPointToCurPos(where);
+			//edpos.x--;
+			if (endPos.x < 0)
+				endPos.x = 0;
+		} else if (endPos < startPos) {
+			where.x += fFontWidth / 2;
+			endPos = _BPointToCurPos(where);
+			//edpos.x++;
+			if (endPos.x > fTermColumns)
+				endPos.x = fTermColumns;
+		}
+		
+		// Scroll check
+		if (fScrollBar != NULL) {
+			// Get now scroll point
+			float scrollStart, scrollEnd;
+			fScrollBar->GetRange(&scrollStart, &scrollEnd);
+			float scrollPos = fScrollBar->Value();
+			
+			if (where.y < Bounds().LeftTop().y ) {
+				// mouse point left of window
+				if (scrollPos != scrollStart)
+					ScrollTo(0, where.y);
+			}	
+			
+			if (where.y > Bounds().LeftBottom().y) {	
+				// mouse point left of window
+				if (scrollPos != scrollEnd)
+					ScrollTo(0, where.y);
+			}
+		}
+		_ResizeSelectRegion(endPos);
+	}
 }
 
 
 void
 TermView::MouseUp(BPoint where)
 {
-	
+	BView::MouseUp(where);
+	fMouseTracking = false;
 }
 
 
