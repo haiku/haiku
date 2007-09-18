@@ -23,7 +23,7 @@
 #define copy_to_user memcpy
 #define CardServices gPcmciaCs->_CardServices
 
-const char sockname[] = "bus/pcmcia/sock/%d";
+const char sockname[] = "bus/pcmcia/sock/%ld";
 static char ** devices;
 uint32 devices_count = 0;
 
@@ -369,8 +369,11 @@ init_driver()
 		devices_count++;
 	}
 	
-	if (devices_count <= 0)
+	if (devices_count <= 0) {
+		put_module(CS_CLIENT_MODULE_NAME);
+		put_module(DS_MODULE_NAME);
 		return ENODEV;
+	}
 	
 	devices = malloc(sizeof(char *) * (devices_count+1));
 	for (i=0; i<devices_count; i++) {
@@ -390,7 +393,9 @@ uninit_driver()
 	for (i=0; i<devices_count; i++) {
 		free (devices[i]);
 	}
+	free(devices);
 
 	put_module(DS_MODULE_NAME);
 	put_module(CS_CLIENT_MODULE_NAME);
 }
+
