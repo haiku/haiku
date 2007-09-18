@@ -31,8 +31,8 @@ static const char* poke_name[] = {
 
 device_hooks poke_hooks = {
 	poke_open,
-    poke_close,
-    poke_free,
+	poke_close,
+	poke_free,
 	poke_control,
 	poke_read,
 	poke_write,
@@ -51,14 +51,14 @@ static uint32 open_count;
 status_t
 init_hardware(void)
 {
-    return B_OK;
+	return B_OK;
 }
 
 
 status_t
 init_driver(void)
 {
-    open_count = 0;
+	open_count = 0;
 
 	if (get_module(B_ISA_MODULE_NAME, (module_info**)&isa) < B_OK)
 		return ENOSYS;
@@ -68,7 +68,7 @@ init_driver(void)
 		return ENOSYS;
 	}
 
-    return B_OK;
+	return B_OK;
 }
 
 
@@ -83,7 +83,7 @@ uninit_driver(void)
 const char**
 publish_devices(void)
 {
-    return poke_name;
+	return poke_name;
 }
 
 
@@ -101,29 +101,29 @@ find_device(const char* name)
 status_t
 poke_open(const char* name, uint32 flags, void** cookie)
 {
-    *cookie = NULL;
+	*cookie = NULL;
 
-    if (atomic_add(&open_count, 1) != 0) {
-        atomic_add(&open_count, -1);
-        return B_BUSY;
-    }
+	if (atomic_add(&open_count, 1) != 0) {
+		atomic_add(&open_count, -1);
+		return B_BUSY;
+	}
 
-    return B_OK;
+	return B_OK;
 }
 
 
 status_t
 poke_close(void* cookie)
 {
-    return B_OK;
+	return B_OK;
 }
 
 
 status_t
 poke_free(void* cookie)
 {
-    atomic_add(&open_count, -1);
-    return B_OK;
+	atomic_add(&open_count, -1);
+	return B_OK;
 }
 
 

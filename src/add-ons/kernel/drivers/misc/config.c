@@ -159,7 +159,6 @@ init_driver()
 void
 uninit_driver()
 {
-	if (gConfigManager != NULL)
-		put_module(B_CONFIG_MANAGER_FOR_DRIVER_MODULE_NAME);
+	put_module(B_CONFIG_MANAGER_FOR_DRIVER_MODULE_NAME);
 }
 
