@@ -590,6 +590,7 @@ init_driver()
 	result = get_module(B_USB_MODULE_NAME, (module_info **)&gUSBModule);
 	if (result < B_OK) {
 		TRACE((DRIVER_NAME": getting module failed 0x%08lx\n", result));
+		benaphore_destroy(&gDeviceListLock);
 		return result;
 	}
 
