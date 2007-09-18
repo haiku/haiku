@@ -68,7 +68,6 @@ static cb_notify_hooks	cardbus_hooks = {
 };
 
 #else // CARDBUS
-static char pci_name[] = B_PCI_MODULE_NAME;
 static pci_module_info	*pci;
 int32 num_cards;
 echo_dev cards[NUM_CARDS];
@@ -470,7 +469,7 @@ init_hardware(void)
 
 	PRINT(("init_hardware()\n"));
 
-	if (get_module(pci_name, (module_info **)&pci))
+	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci))
 		return ENOSYS;
 
 	while ((*pci->get_nth_pci_info)(ix, &info) == B_OK) {
@@ -508,7 +507,7 @@ init_hardware(void)
 		ix++;
 	}
 		
-	put_module(pci_name);
+	put_module(B_PCI_MODULE_NAME);
 
 	if(err!=B_OK) {
 		PRINT(("no card found\n"));
@@ -560,31 +559,27 @@ init_driver(void)
 	// Get card services client module
 	if (get_module(CB_ENABLER_MODULE_NAME, (module_info **)&cbemi) != B_OK) {
 		dprintf(DRIVER_NAME ": cardbus enabler module error\n");
-		goto cb_error;
+		return B_ERROR;
 	}
 	// Create the devices lock
 	device_lock = create_sem(1, DRIVER_NAME " device");
 	if (device_lock < B_OK) {
 		dprintf(DRIVER_NAME ": create device semaphore error 0x%.8x\n", device_lock);
-		put_module(CB_ENABLER_MODULE_NAME);	
-		goto cb_error;
+		put_module(CB_ENABLER_MODULE_NAME);
+		return B_ERROR;
 	}
-    // Register driver
-    cbemi->register_driver(DRIVER_NAME, descriptors, COUNT_DESCRIPTOR);
-    cbemi->install_notify(DRIVER_NAME, &cardbus_hooks);
-    LIST_INIT(&(devices));
-    return B_OK;
-    
-cb_error:
-	put_module(B_PCI_MODULE_NAME);
-	return B_ERROR;
+	// Register driver
+	cbemi->register_driver(DRIVER_NAME, descriptors, COUNT_DESCRIPTOR);
+	cbemi->install_notify(DRIVER_NAME, &cardbus_hooks);
+	LIST_INIT(&(devices));
+	return B_OK;
 #else
 	int ix=0;
 	
 	pci_info info;
 	num_cards = 0;
 	
-	if (get_module(pci_name, (module_info **) &pci))
+	if (get_module(B_PCI_MODULE_NAME, (module_info **) &pci))
 		return ENOSYS;
 		
 	while ((*pci->get_nth_pci_info)(ix, &info) == B_OK) {
@@ -635,7 +630,7 @@ cb_error:
 	}
 	if (!num_cards) {
 		PRINT(("no cards\n"));
-		put_module(pci_name);
+		put_module(B_PCI_MODULE_NAME);
 		PRINT(("no suitable cards found\n"));
 		return ENODEV;
 	}
@@ -922,7 +917,7 @@ uninit_driver(void)
 	}
 	
 	memset(&cards, 0, sizeof(cards));
-	put_module(pci_name);
+	put_module(B_PCI_MODULE_NAME);
 #endif
 }
 
