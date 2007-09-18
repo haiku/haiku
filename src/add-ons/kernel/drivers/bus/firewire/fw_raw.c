@@ -991,8 +991,10 @@ init_driver()
 		devices_count++;
 	}
 
-	if (devices_count <= 0)
+	if (devices_count <= 0) {
+		put_module(FIREWIRE_MODULE_NAME);
 		return ENODEV;
+	}
 	
 	devices = malloc(sizeof(char *) * (devices_count+1));
 	for (i=0; i<devices_count; i++) {
@@ -1013,6 +1015,7 @@ uninit_driver()
 	for (i=0; i<devices_count; i++) {
 		free(devices[i]);
 	}
+	free(devices);
 
 	put_module(FIREWIRE_MODULE_NAME);
 }
