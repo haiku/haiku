@@ -66,9 +66,7 @@ void uninit_driver(void);
 const char ** publish_devices(void);
 device_hooks * find_device(const char *);
 
-static char pci_name[] = B_PCI_MODULE_NAME;
 pci_module_info	*pci;
-static char mpu401_name[] = B_MPU_401_MODULE_NAME;
 generic_mpu401_module * mpu401;
 
 
@@ -1996,7 +1994,7 @@ init_hardware(void)
 
 	PRINT(("init_hardware()\n"));
 
-	if (get_module(pci_name, (module_info **)&pci))
+	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci))
 		return ENOSYS;
 
 	while ((*pci->get_nth_pci_info)(ix, &info) == B_OK) {
@@ -2011,7 +2009,7 @@ init_hardware(void)
 		ix++;
 	}
 		
-	put_module(pci_name);
+	put_module(B_PCI_MODULE_NAME);
 
 	return err;
 }
@@ -2776,11 +2774,11 @@ init_driver(void)
 		unload_driver_settings (settings_handle);
 	}
 
-	if (get_module(pci_name, (module_info **) &pci))
+	if (get_module(B_PCI_MODULE_NAME, (module_info **) &pci))
 		return ENOSYS;
 		
-	if (get_module(mpu401_name, (module_info **) &mpu401)) {
-		put_module(pci_name);
+	if (get_module(B_MPU_401_MODULE_NAME, (module_info **) &mpu401)) {
+		put_module(B_PCI_MODULE_NAME);
 		return ENOSYS;
 	}
 
@@ -2807,8 +2805,8 @@ init_driver(void)
 		ix++;
 	}
 	if (!num_cards) {
-		put_module(mpu401_name);
-		put_module(pci_name);
+		put_module(B_MPU_401_MODULE_NAME);
+		put_module(B_PCI_MODULE_NAME);
 		PRINT(("emuxki: no suitable cards found\n"));
 		return ENODEV;
 	}
@@ -2895,8 +2893,8 @@ uninit_driver(void)
 		emuxki_shutdown(&cards[ix]);
 	}
 	memset(&cards, 0, sizeof(cards));
-	put_module(mpu401_name);
-	put_module(pci_name);
+	put_module(B_MPU_401_MODULE_NAME);
+	put_module(B_PCI_MODULE_NAME);
 	num_cards = 0;
 }
 
