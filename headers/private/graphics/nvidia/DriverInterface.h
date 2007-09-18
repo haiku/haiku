@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-4/2006.
+	Rudolf Cornelissen 10/2002-9/2007.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -115,6 +115,27 @@ enum {
 	NV20A,
 	NV30A,
 	NV40A
+};
+
+/* card info - information gathered from PINS (and other sources) */
+enum
+{	// tv_encoder_type in order of capability (more or less)
+	NONE = 0,
+	CH7003,
+	CH7004,
+	CH7005,
+	CH7006,
+	CH7007,
+	CH7008,
+	SAA7102,
+	SAA7103,
+	SAA7104,
+	SAA7105,
+	BT868,
+	BT869,
+	CX25870,
+	CX25871,
+	NVIDIA
 };
 
 /* handles to pre-defined engine commands */
@@ -300,27 +321,6 @@ typedef struct {
 			bool mode_changing;	/* a mode-change is in progress (set/clear by 2D drv) */
 		} threeD;
 	} engine;
-
-  /* card info - information gathered from PINS (and other sources) */
-	enum
-	{	// tv_encoder_type in order of capability (more or less)
-		NONE = 0,
-		CH7003,
-		CH7004,
-		CH7005,
-		CH7006,
-		CH7007,
-		CH7008,
-		SAA7102,
-		SAA7103,
-		SAA7104,
-		SAA7105,
-		BT868,
-		BT869,
-		CX25870,
-		CX25871,
-		NVIDIA
-	};
 
 	struct
 	{
