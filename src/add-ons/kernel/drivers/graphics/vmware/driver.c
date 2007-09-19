@@ -54,7 +54,7 @@ init_hardware(void)
 status_t
 init_driver(void)
 {
-	status_t ret = B_OK;
+	status_t ret = ENODEV;
 	int i;
 
 	TRACE("init_driver\n");
@@ -73,8 +73,16 @@ init_driver(void)
 	/* Remember the PCI information */
 	for (i = 0; (*gPciBus->get_nth_pci_info)(i, &gPd->pcii) == B_OK; i++) 
 		if (gPd->pcii.vendor_id == PCI_VENDOR_ID_VMWARE &&
-			gPd->pcii.device_id == PCI_DEVICE_ID_VMWARE_SVGA2)
+			gPd->pcii.device_id == PCI_DEVICE_ID_VMWARE_SVGA2) {
+			ret = B_OK;
 			break;
+		}
+
+	if (ret != B_OK) {
+		free(gPd);
+		put_module(B_PCI_MODULE_NAME);
+		goto done;
+	}
 
 	/* Create a benaphore for exclusive access in OpenHook/FreeHook */
 	INIT_BEN(gPd->kernel);
@@ -116,6 +124,8 @@ void
 uninit_driver()
 {
 	TRACE("uninit_driver\n");
+	DELETE_BEN(gPd->kernel);
+	free(gPd->names[0]);
 	free(gPd);
 	put_module(B_PCI_MODULE_NAME);
 }

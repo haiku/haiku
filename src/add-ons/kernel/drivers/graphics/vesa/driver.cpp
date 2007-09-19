@@ -100,6 +100,7 @@ init_driver(void)
 	if (status == B_OK)
 		return B_OK;
 
+	free(gDeviceNames[0]);
 	put_module(B_ISA_MODULE_NAME);
 err1:
 	free(gDeviceInfo[0]);
