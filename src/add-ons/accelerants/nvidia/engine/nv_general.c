@@ -765,7 +765,6 @@ status_t nv_general_powerup()
 		status = nvxx_general_powerup();
 		break;
 	case 0x024210de: /* Nvidia GeForce 6100 (NFORCE4 Integr.GPU) */
-	case 0x03d110de: /* Nvidia GeForce 6100 nForce 405 */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
 		sprintf(si->adi.name, "Nvidia GeForce 6100");
@@ -843,6 +842,13 @@ status_t nv_general_powerup()
 		si->ps.card_arch = NV20A;
 		sprintf(si->adi.name, "Nvidia GeForce3 Integrated GPU");
 		sprintf(si->adi.chipset, "XBOX, NV20");
+		status = nvxx_general_powerup();
+		break;
+	case 0x02e110de:
+		si->ps.card_type = G73;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia GeForce 7600 GS");
+		sprintf(si->adi.chipset, "G73");
 		status = nvxx_general_powerup();
 		break;
 	case 0x030110de: /* Nvidia GeForce FX 5800 Ultra */
@@ -1121,7 +1127,6 @@ status_t nv_general_powerup()
 		status = nvxx_general_powerup();
 		break;
 	case 0x039210de: /* Nvidia GeForce 7600 GS */
-	case 0x02e110de:
 		si->ps.card_type = G73;
 		si->ps.card_arch = NV40A;
 		sprintf(si->adi.name, "Nvidia GeForce 7600 GS");
@@ -1141,6 +1146,13 @@ status_t nv_general_powerup()
 		si->ps.laptop = true;
 		sprintf(si->adi.name, "Nvidia GeForce 7600 GO");
 		sprintf(si->adi.chipset, "G73");
+		status = nvxx_general_powerup();
+		break;
+	case 0x03d110de: /* Nvidia GeForce 6100 nForce 405 */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia GeForce 6100");
+		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
 	/* Vendor Elsa GmbH */
