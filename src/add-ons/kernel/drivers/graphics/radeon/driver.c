@@ -155,6 +155,8 @@ status_t init_driver( void )
 	devices = (radeon_devices *)calloc( 1, sizeof( radeon_devices ));
 	if( devices == NULL ) {
 		put_module(B_PCI_MODULE_NAME);
+		if (agp_bus != NULL)
+			put_module(B_AGP_MODULE_NAME);
 		return B_ERROR;
 	}
 	
@@ -177,7 +179,8 @@ void uninit_driver( void )
 
 	put_module( B_PCI_MODULE_NAME );
 	/* put the agp module away if it's there */
-	if (agp_bus) put_module(B_AGP_MODULE_NAME);
+	if (agp_bus) 
+		put_module(B_AGP_MODULE_NAME);
 }
 
 

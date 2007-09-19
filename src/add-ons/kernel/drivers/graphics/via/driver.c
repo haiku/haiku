@@ -284,6 +284,9 @@ init_driver(void) {
 	/* driver private data */
 	pd = (DeviceData *)calloc(1, sizeof(DeviceData));
 	if (!pd) {
+		if (agp_bus)
+			put_module(B_AGP_MODULE_NAME);
+		put_module(B_ISA_MODULE_NAME);
 		put_module(B_PCI_MODULE_NAME);
 		return B_ERROR;
 	}
@@ -324,7 +327,8 @@ void uninit_driver(void) {
 	put_module(B_ISA_MODULE_NAME);
 
 	/* put the agp module away if it's there */
-	if (agp_bus) put_module(B_AGP_MODULE_NAME);
+	if (agp_bus) 
+		put_module(B_AGP_MODULE_NAME);
 }
 
 static status_t map_device(device_info *di)

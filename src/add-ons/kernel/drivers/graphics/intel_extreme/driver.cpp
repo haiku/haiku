@@ -131,8 +131,10 @@ init_driver(void)
 	}
 
 	status = init_lock(&gLock, "intel extreme ksync");
-	if (status < B_OK)
+	if (status < B_OK) {
+		put_module(B_PCI_MODULE_NAME);
 		return status;
+	}
 
 	// find devices
 
