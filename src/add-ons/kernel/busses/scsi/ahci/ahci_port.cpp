@@ -9,6 +9,7 @@
 
 #include <KernelExport.h>
 #include <stdio.h>
+#include <string.h>
 
 #define TRACE(a...) dprintf("\33[34mahci:\33[0m " a)
 #define FLOW(a...)	dprintf("ahci: " a)
@@ -32,27 +33,35 @@ AHCIPort::Init()
 {
 	TRACE("AHCIPort::Init port %d\n", fIndex);
 
-	size_t size = 999;
+	size_t size = sizeof(command_list_entry) * COMMAND_LIST_ENTRY_COUNT + sizeof(fis) + sizeof(command_table) + sizeof(prd) * PRD_TABLE_ENTRY_COUNT;
 
-	void *virtAddr;
-	void *physAddr;
+	char *virtAddr;
+	char *physAddr;
 
-	fArea = alloc_mem(&virtAddr, &physAddr, size, 0, "some AHCI port");
+	fArea = alloc_mem((void **)&virtAddr, (void **)&physAddr, size, 0, "some AHCI port");
 	if (fArea < B_OK) {
 		TRACE("failed allocating memory for port %d\n", fIndex);
 		return fArea;
 	}
+	memset(virtAddr, 0, size);
 
-	void *virtClbAddr;
-	void *physClbAddr = physAddr;
-	void *virtFisAddr;
-	void *physFisAddr = (char *)physAddr + 1024;
-
-
-	fRegs->clb  = LO32(physClbAddr);
-	fRegs->clbu = HI32(physClbAddr);
-	fRegs->fb   = LO32(physFisAddr);
-	fRegs->fbu  = HI32(physFisAddr);
+	fCommandList = (command_list_entry *)virtAddr;
+	virtAddr += sizeof(command_list_entry) * COMMAND_LIST_ENTRY_COUNT;
+	fFIS = (fis *)virtAddr;
+	virtAddr += sizeof(fis);
+	fCommandTable = (command_table *)virtAddr;
+	virtAddr += sizeof(command_table);
+	fPRDTable = (prd *)virtAddr;
+	
+	fRegs->clb  = LO32(physAddr);
+	fRegs->clbu = HI32(physAddr);
+	physAddr += sizeof(command_list_entry) * COMMAND_LIST_ENTRY_COUNT;
+	fRegs->fb   = LO32(physAddr);
+	fRegs->fbu  = HI32(physAddr);
+	physAddr += sizeof(fis);
+	fCommandList[0].ctba  = LO32(physAddr);
+	fCommandList[0].ctbau = HI32(physAddr);
+	// prdt follows after command table
 
 	return B_OK;
 }

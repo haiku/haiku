@@ -30,7 +30,12 @@ private:
 private:
 	int						fIndex;
 	volatile ahci_port *	fRegs;
-area_id						fArea;
+	area_id					fArea;
+
+	volatile fis *					fFIS;
+	volatile command_list_entry *	fCommandList;
+	volatile command_table *		fCommandTable;
+	volatile prd *					fPRDTable;
 };
 
 #endif	// _AHCI_PORT_H

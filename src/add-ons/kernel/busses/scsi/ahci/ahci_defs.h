@@ -113,6 +113,62 @@ typedef struct {
 } ahci_hba;
 
 
+typedef struct {
+	uint8		dsfis[0x1c];	// DMA Setup FIS
+	uint8		res1[0x04];
+	uint8		psfis[0x14];	// PIO Setup FIS
+	uint8		res2[0x0c];
+	uint8		rfis[0x20];		// D2H Register FIS
+	uint8		res3[0x04];
+	uint8		sdbfis[0x08];	// Set Device Bits FIS
+	uint8		ufis[0x40];		// Unknown FIS
+	uint8		res4[0x60];
+} fis;
+
+
+typedef struct {
+  union {
+   struct {
+	uint16		prdtl;			// physical region description table length;		
+	uint16		pmp : 4;		// Port Multiplier Port
+	uint16		: 1;
+	uint16		c : 1;			// Clear Busy upon R_OK
+	uint16		b : 1;			// Build In Self Test
+	uint16		r : 1;			// Reset 
+	uint16		p : 1;			// Prefetchable
+	uint16		w : 1;			// Write
+	uint16		a :	1;// ATAPI
+	uint16		cfl : 5;		// command FIS length
+   };
+    uint32		prdtl_flags_cfl;
+  };
+	uint32		ctba;			// command table desciptor base address (alignment 128 byte)
+	uint32		ctbau;			// command table desciptor base address upper
+	uint8		res1[0x10];
+} command_list_entry;
+
+#define COMMAND_LIST_ENTRY_COUNT 32
+
+typedef struct {
+	uint32		dba;			// Data Base Address (2-byte aligned)
+	uint32		dbau;			// Data Base Address Upper
+	uint32		res;
+	uint32		dbc;			// Bytecount (0-based, even, max 4MB)
+	#define DBC_I	0x80000000	/* Interrupt on completition */
+} prd;
+
+
+typedef struct {
+	uint8		cfis[0x40];		// command FIS
+	uint8		acmd[0x20];		// ATAPI command
+	uint8		res[0x20];		// reserved
+} command_table;
+
+
+#define PRD_TABLE_ENTRY_COUNT 168
+
+
+
 extern scsi_sim_interface gAHCISimInterface;
 extern device_manager_info *gDeviceManager;
 extern pci_device_module_info *gPCI;

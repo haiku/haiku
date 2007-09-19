@@ -40,7 +40,6 @@ alloc_mem(void **virt, void **phy, size_t size, uint32 protection, const char *n
 		ERROR("couldn't get mapping for %s\n", name);
 		return B_ERROR;
 	}
-	memset(virtadr, 0, size);
 	if (virt)
 		*virt = virtadr;
 	if (phy)
