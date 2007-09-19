@@ -87,8 +87,8 @@ init_driver(void)
 	int i = 0;
 	pci_info dev_info;
 
-	if (pci == NULL)
-		get_module(B_PCI_MODULE_NAME,(module_info **)&pci);
+	if (get_module(B_PCI_MODULE_NAME,(module_info **)&pci) < B_OK)
+		return ENOSYS;
 
 	while (pci->get_nth_pci_info(i++, &dev_info) == 0) {
 		if (dev_info.class_base != PCI_network
@@ -116,8 +116,14 @@ init_driver(void)
 		be_b44_dev_cards[sCardsFound].linkChangeSem = -1;
 #endif
 
-		if (b44_LM_GetAdapterInfo(&be_b44_dev_cards[sCardsFound].lm_dev) != LM_STATUS_SUCCESS)
+		if (b44_LM_GetAdapterInfo(&be_b44_dev_cards[sCardsFound].lm_dev) != LM_STATUS_SUCCESS) {
+			for (i = 0; i < sCardsFound; i++) {
+				free((void *)sDeviceNames[i]);
+				delete_sem(be_b44_dev_cards[i].packet_release_sem);
+			}
+			put_module(B_PCI_MODULE_NAME);
 			return ENODEV;
+		}
 
 		QQ_InitQueue(&be_b44_dev_cards[sCardsFound].RxPacketReadQ.Container,
 			MAX_RX_PACKET_DESC_COUNT);
@@ -147,6 +153,7 @@ uninit_driver(void)
 		
 		delete_area(pUmDevice->mem_base);
 		
+		delete_sem(be_b44_dev_cards[j].packet_release_sem);
 		free((void *)sDeviceNames[j]);
 	}
 	
