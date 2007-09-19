@@ -1,16 +1,13 @@
 /*
-	Copyright (c) 2003, Thomas Kurschel
-
-
-	Part of DDC driver
-		
-	I2C protocoll
-*/
-
+ * Copyright 2003, Thomas Kurschel. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _I2C_H
 #define _I2C_H
 
+
 #include <OS.h>
+
 
 // timing for i2c bus
 typedef struct i2c_timing {
@@ -39,31 +36,29 @@ typedef struct i2c_timing {
 
 
 // set signals on bus
-typedef status_t (*i2c_set_signals)( void *cookie, int scl, int sda );
+typedef status_t (*i2c_set_signals)(void *cookie, int clock, int data);
 // read signals from bus
-typedef status_t (*i2c_get_signals)( void *cookie, int *scl, int *sda );
-
+typedef status_t (*i2c_get_signals)(void *cookie, int *clock, int *data);
 
 // i2c bus definition
 typedef struct i2c_bus {
 	void *cookie;					// user-defined cookie
+	i2c_timing timing;
 	i2c_set_signals set_signals;	// callback to set signals
 	i2c_get_signals get_signals;	// callback to detect signals
 } i2c_bus;
 
 
 // send and receive data via i2c bus
-status_t i2c_send_receive( const i2c_bus *bus, const i2c_timing *timing,
-	int slave_address, 
-	const uint8 *write_buffer, size_t write_len, 
-	uint8 *read_buffer, size_t read_len );
+status_t i2c_send_receive(const i2c_bus *bus, int slave_address,
+	const uint8 *writeBuffer, size_t writeLength, uint8 *readBuffer,
+	size_t readLength);
 
-	
 // fill <timing> with standard 100kHz bus timing
-void i2c_get100k_timing( i2c_timing *timing );
+void i2c_get100k_timing(i2c_timing *timing);
 
 // fill <timing> with standard 400kHz bus timing
 // (as timing resolution is 1 microsecond, we cannot reach full speed!)
-void i2c_get400k_timing( i2c_timing *timing );
+void i2c_get400k_timing(i2c_timing *timing);
 
-#endif
+#endif	/* _I2C_H */

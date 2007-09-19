@@ -3,10 +3,8 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 /*!
-	Part of DDC driver	
-	Main DDC communication
+	DDC communication
 */
 
 
@@ -56,36 +54,26 @@ verify_checksum(const uint8 *data, size_t len)
 
 //!	Read ddc2 data from monitor
 static status_t
-ddc2_read(const i2c_bus *bus, int start, uint8 *buffer, size_t len)
+ddc2_read(const i2c_bus *bus, int start, uint8 *buffer, size_t length)
 {
-	uint8 write_buffer[2];
-	i2c_timing timing;
+	status_t status = B_OK;
+	uint8 writeBuffer[2];
 	int i;
-	status_t res = B_OK;
 
-	write_buffer[0] = start & 0xff;	
-	write_buffer[1] = (start >> 8) & 0xff;
-
-	i2c_get100k_timing(&timing);
-
-	timing.start_timeout = 550;
-	timing.byte_timeout = 2200;
-	timing.bit_timeout = 40;
-	timing.ack_start_timeout = 40;
-	timing.ack_timeout = 40;
+	writeBuffer[0] = start & 0xff;	
+	writeBuffer[1] = (start >> 8) & 0xff;
 
 	for (i = 0; i < READ_RETRIES; ++i) {
-		res = i2c_send_receive(bus, &timing, 
-			0xa0, write_buffer, start < 0x100 ? 1 : 2, 
-			buffer, len);
+		status = i2c_send_receive(bus, 0xa0, writeBuffer,
+			start < 0x100 ? 1 : 2, buffer, length);
 		// don't verify checksum - it's often broken
-		if (res == B_OK /*&& verify_checksum( buffer, len ) == B_OK*/)
+		if (status == B_OK /*&& verify_checksum( buffer, len ) == B_OK*/)
 			break;
 
-		res = B_ERROR;
+		status = B_ERROR;
 	}
 
-	return res;
+	return status;
 }
 
 
@@ -133,30 +121,42 @@ ddc2_read_vdif(const i2c_bus *bus, int start,
 #endif
 
 
+void
+ddc2_init_timing(i2c_bus *bus)
+{
+	i2c_get100k_timing(&bus->timing);
+
+	// VESA standard
+	bus->timing.start_timeout = 550;
+	bus->timing.byte_timeout = 2200;
+	bus->timing.bit_timeout = 40;
+	bus->timing.ack_start_timeout = 40;
+	bus->timing.ack_timeout = 40;
+}
+
+
 //! Read EDID and VDIF from monitor via ddc2
 status_t
 ddc2_read_edid1(const i2c_bus *bus, edid1_info *edid, 
-	void **vdif, size_t *vdif_len)
+	void **vdif, size_t *vdifLength)
 {
-	status_t res;
 	edid1_raw raw;
-
-	res = ddc2_read(bus, 0, (uint8 *)&raw, sizeof(raw));
-	if (res != B_OK)
-		return res;
+	status_t status = ddc2_read(bus, 0, (uint8 *)&raw, sizeof(raw));
+	if (status != B_OK)
+		return status;
 
 	edid_decode(edid, &raw);
 
 	*vdif = NULL;
-	*vdif_len = 0;
+	*vdifLength = 0;
 
 	// skip vdif as long as it's not tested	
 #if 0	
-	res = ddc2_read_vdif(bus, sizeof(raw) * (edid->num_sections + 1),
+	status = ddc2_read_vdif(bus, sizeof(raw) * (edid->num_sections + 1),
 		vdif, vdif_len);
-	if (res != B_OK)
-		return res;
+	if (status != B_OK)
+		return status;
 #endif
-	
+
 	return B_OK;
 }
