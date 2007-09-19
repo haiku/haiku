@@ -432,24 +432,17 @@ if (first) {
 		pll_divisors divisors;
 		compute_pll_divisors(target, divisors);
 
-		// switch divisor register with every mode change (not required)
-		uint32 divisorRegister;
-		if (gInfo->shared_info->pll_info.divisor_register == INTEL_DISPLAY_A_PLL_DIVISOR_0)
-			divisorRegister = INTEL_DISPLAY_A_PLL_DIVISOR_1;
-		else
-			divisorRegister = INTEL_DISPLAY_A_PLL_DIVISOR_0;
-
-		write32(divisorRegister,
+		write32(INTEL_DISPLAY_A_PLL_DIVISOR_0,
 			(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT) & DISPLAY_PLL_N_DIVISOR_MASK)
 			| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT) & DISPLAY_PLL_M1_DIVISOR_MASK)
 			| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT) & DISPLAY_PLL_M2_DIVISOR_MASK));
 
 		uint32 pll = DISPLAY_PLL_ENABLED | DISPLAY_PLL_NO_VGA_CONTROL;
 		if ((gInfo->shared_info->device_type & INTEL_TYPE_9xx) != 0) {
-//			pll |= ((1 << (divisors.post1 - 1)) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
-//				& DISPLAY_PLL_9xx_POST1_DIVISOR_MASK;
-			pll |= ((divisors.post1 - 1) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
+			pll |= ((1 << (divisors.post1 - 1)) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
 				& DISPLAY_PLL_9xx_POST1_DIVISOR_MASK;
+//			pll |= ((divisors.post1 - 1) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
+//				& DISPLAY_PLL_9xx_POST1_DIVISOR_MASK;
 			if (divisors.post2_high)
 				pll |= DISPLAY_PLL_DIVIDE_HIGH;
 
@@ -460,12 +453,15 @@ if (first) {
 		} else {
 			if (divisors.post2_high)
 				pll |= DISPLAY_PLL_DIVIDE_4X;
-			pll |= DISPLAY_PLL_2X_CLOCK;
-			pll |= (((divisors.post1 - 2) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
-				& DISPLAY_PLL_POST1_DIVISOR_MASK);
-		}
 
-		pll |= (divisorRegister == INTEL_DISPLAY_A_PLL_DIVISOR_1 ? DISPLAY_PLL_DIVISOR_1 : 0);
+			pll |= DISPLAY_PLL_2X_CLOCK;
+
+			if (divisors.post1 > 2) {
+				pll |= (((divisors.post1 - 2) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
+					& DISPLAY_PLL_POST1_DIVISOR_MASK);
+			} else
+				pll |= DISPLAY_PLL_POST1_DIVIDE_2;
+		}
 
 		debug_printf("PLL is %#lx, write: %#lx\n", read32(INTEL_DISPLAY_A_PLL), pll);
 		write32(INTEL_DISPLAY_A_PLL, pll);

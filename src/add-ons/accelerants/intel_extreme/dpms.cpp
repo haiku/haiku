@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -109,6 +109,9 @@ set_display_power_mode(uint32 mode)
 		enable_display_plane(false);
 		enable_display_pipe(false);
 	}
+
+	read32(INTEL_DISPLAY_A_BASE);
+		// flush the eventually cached PCI bus writes
 }
 
 
