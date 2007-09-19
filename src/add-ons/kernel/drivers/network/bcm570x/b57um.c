@@ -333,6 +333,10 @@ init_driver(void)
 #endif
 
 		if (LM_GetAdapterInfo(&be_b57_dev_cards[cards_found].lm_dev) != LM_STATUS_SUCCESS) {
+			for (j = 0; j < cards_found; j++) {
+				free(dev_list[j]);
+				delete_sem(be_b57_dev_cards[j].packet_release_sem);
+			}
 			put_module(B_PCI_MODULE_NAME);
 			return ENODEV;
 		}
@@ -364,6 +368,7 @@ uninit_driver(void)
 			delete_area(pUmDevice->lockmem_list[i]);
 
 		delete_area(pUmDevice->mem_base);
+		delete_sem(be_b57_dev_cards[j].packet_release_sem);
 		free((void *)dev_list[j]);
 	}
 
