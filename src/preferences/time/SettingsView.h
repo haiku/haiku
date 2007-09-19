@@ -25,18 +25,18 @@ class TSettingsView : public BView {
 	public:
 						TSettingsView(BRect frame);
 		virtual 		~TSettingsView();
-		
+
 		virtual void 	AttachedToWindow();
 		virtual void 	Draw(BRect updaterect);
 		virtual void 	MessageReceived(BMessage *message);
 		virtual void	GetPreferredSize(float *width, float *height);
 
-		void 			ChangeRTCSetting();		
 		bool 			GMTime();
 
 	private:
 		void 			InitView();
 		void 			ReadRTCSettings();
+		void			WriteRTCSettings();
 		void 			UpdateDateTime(BMessage *message);
 
 		BRadioButton 	*fLocalTime;
