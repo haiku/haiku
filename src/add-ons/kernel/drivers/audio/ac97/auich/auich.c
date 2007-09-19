@@ -56,7 +56,6 @@ device_hooks * find_device(const char *);
 int32 auich_int(void *arg);
 status_t auich_init(auich_dev * card);
 
-static char pci_name[] = B_PCI_MODULE_NAME;
 pci_module_info	*pci;
 
 int32 num_cards;
@@ -528,7 +527,7 @@ init_hardware(void)
 
 	PRINT(("init_hardware()\n"));
 
-	if (get_module(pci_name, (module_info **)&pci))
+	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci))
 		return ENOSYS;
 
 	while ((*pci->get_nth_pci_info)(ix, &info) == B_OK) {
@@ -567,7 +566,7 @@ init_hardware(void)
 		ix++;
 	}
 		
-	put_module(pci_name);
+	put_module(B_PCI_MODULE_NAME);
 
 	return err;
 }
@@ -773,7 +772,7 @@ init_driver(void)
 		unload_driver_settings (settings_handle);
 	}
 
-	if (get_module(pci_name, (module_info **) &pci))
+	if (get_module(B_PCI_MODULE_NAME, (module_info **) &pci))
 		return ENOSYS;
 		
 	while ((*pci->get_nth_pci_info)(ix, &info) == B_OK) {
@@ -823,7 +822,7 @@ init_driver(void)
 	}
 	if (!num_cards) {
 		PRINT(("no cards\n"));
-		put_module(pci_name);
+		put_module(B_PCI_MODULE_NAME);
 		PRINT(("no suitable cards found\n"));
 		return ENODEV;
 	}
@@ -867,7 +866,7 @@ uninit_driver(void)
 		auich_shutdown(&cards[ix]);
 	}
 	memset(&cards, 0, sizeof(cards));
-	put_module(pci_name);
+	put_module(B_PCI_MODULE_NAME);
 }
 
 

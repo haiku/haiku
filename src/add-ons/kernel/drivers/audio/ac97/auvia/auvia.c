@@ -413,7 +413,7 @@ init_hardware(void)
 
 	PRINT(("init_hardware()\n"));
 
-	if (get_module(pci_name, (module_info **)&pci))
+	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci))
 		return ENOSYS;
 
 	while ((*pci->get_nth_pci_info)(ix, &info) == B_OK) {
@@ -426,7 +426,7 @@ init_hardware(void)
 		ix++;
 	}
 		
-	put_module(pci_name);
+	put_module(B_PCI_MODULE_NAME);
 
 	return err;
 }
@@ -575,7 +575,7 @@ init_driver(void)
 	PRINT(("init_driver()\n"));
 	load_driver_symbols("auvia");
 
-	if (get_module(pci_name, (module_info **) &pci))
+	if (get_module(B_PCI_MODULE_NAME, (module_info **) &pci))
 		return ENOSYS;
 		
 	while ((*pci->get_nth_pci_info)(ix, &info) == B_OK) {
@@ -600,7 +600,7 @@ init_driver(void)
 	}
 	if (!num_cards) {
 		PRINT(("no cards\n"));
-		put_module(pci_name);
+		put_module(B_PCI_MODULE_NAME);
 		PRINT(("no suitable cards found\n"));
 		return ENODEV;
 	}
@@ -634,7 +634,7 @@ uninit_driver(void)
 		auvia_shutdown(&cards[ix]);
 	}
 	memset(&cards, 0, sizeof(cards));
-	put_module(pci_name);
+	put_module(B_PCI_MODULE_NAME);
 }
 
 
