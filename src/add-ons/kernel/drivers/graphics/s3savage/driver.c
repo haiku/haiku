@@ -293,7 +293,7 @@ find_device(const char *name)
 
 
 void
- uninit_driver(void)
+uninit_driver(void)
 {
 	/* free the driver data */
 	DELETE_BEN(pd->kernel);

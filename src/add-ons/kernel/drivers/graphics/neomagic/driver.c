@@ -266,8 +266,7 @@ init_driver(void) {
 		return B_ERROR;
 
 	/* get a handle for the isa bus */
-	if (get_module(B_ISA_MODULE_NAME, (module_info **)&isa_bus) != B_OK)
-	{
+	if (get_module(B_ISA_MODULE_NAME, (module_info **)&isa_bus) != B_OK) {
 		put_module(B_PCI_MODULE_NAME);
 		return B_ERROR;
 	}
