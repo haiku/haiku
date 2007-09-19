@@ -87,7 +87,7 @@
 	BLooper context. Networking usually qualifies as a candidate for its own
 	thread.
 	
-	\section app_messaging_overview_bhandler BHandler
+	\subsection app_messaging_overview_bhandler BHandler
 	
 	Objects of the BHandler type are associated to BLoopers. When they are
 	created, they should be passed to the BLooper::AddHandler() method of the
@@ -108,7 +108,7 @@
 		that the Haiku API classes handle, and not actually handling these
 		messages could lead to inconsistent internal behavior.
 	
-	\section app_messaging-overview-bmessenger BMessenger
+	\subsection app_messaging-overview-bmessenger BMessenger
 	
 	BMessenger objects can send messages to both local and remote targets. For
 	local targets, a BMessenger provides an advantage over directly calling
@@ -122,20 +122,20 @@
 	to pass messages to other applications. It facilitates inter-application
 	communication.
 	
-	\section app_messaging-overview-other Other messaging classes
+	\subsection app_messaging-overview-other Other messaging classes
 	
 	There are several convenience classes supplied with the application kit,
 	which can make your life easier in some specific cases. 
 	
-	* BInvoker binds together a message and a target. By calling 
+	- BInvoker binds together a message and a target. By calling 
 	  BInvoker::Invoke(), the message will be sent. This class is inherited by
 	  the controls in the interface kit, such as BButton.
-	* A BMessageRunner object will send messages to a specified target with
+	- A BMessageRunner object will send messages to a specified target with
 	  specified intervals in between.
-	* BMessageQueue is a class that is also internally used by BLooper. It
+	- BMessageQueue is a class that is also internally used by BLooper. It
 	  provides a queue of messages, with convenience functions of managing
 	  this queue.
-	* BMessageFilter is the base class of the filters. Filters can be applied
+	- BMessageFilter is the base class of the filters. Filters can be applied
 	  to BLoopers to filter all incoming messages, or to BHandlers to filter
 	  messages that could be handled by that object. The filter object can be
 	  subclassed and extended by overriding the Filter() method.
