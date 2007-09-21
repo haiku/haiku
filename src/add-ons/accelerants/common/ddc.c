@@ -147,13 +147,15 @@ ddc2_read_edid1(const i2c_bus *bus, edid1_info *edid,
 
 	edid_decode(edid, &raw);
 
-	*vdif = NULL;
-	*vdifLength = 0;
+	if (vdif != NULL)
+		*vdif = NULL;
+	if (vdifLength != NULL)
+		*vdifLength = 0;
 
 	// skip vdif as long as it's not tested	
 #if 0	
 	status = ddc2_read_vdif(bus, sizeof(raw) * (edid->num_sections + 1),
-		vdif, vdif_len);
+		vdif, vdifLength);
 	if (status != B_OK)
 		return status;
 #endif
