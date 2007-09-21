@@ -308,6 +308,29 @@ struct intel_free_graphics_memory {
 #define COMMAND_MODE_RGB16				0x01
 #define COMMAND_MODE_RGB32				0x03
 
+// i2c
+
+#define INTEL_I2C_IO_A					0x5010
+#define INTEL_I2C_IO_B					0x5014
+#define INTEL_I2C_IO_C					0x5018
+#define INTEL_I2C_IO_D					0x501c
+#define INTEL_I2C_IO_E					0x5020
+#define INTEL_I2C_IO_F					0x5024
+#define INTEL_I2C_IO_G					0x5028
+#define INTEL_I2C_IO_H					0x502c
+
+#define I2C_CLOCK_DIRECTION_MASK		(1 << 0)
+#define I2C_CLOCK_DIRECTION_OUT			(1 << 1)
+#define I2C_CLOCK_VALUE_MASK			(1 << 2)
+#define I2C_CLOCK_VALUE_OUT				(1 << 3)
+#define I2C_CLOCK_VALUE_IN				(1 << 4)
+#define I2C_DATA_DIRECTION_MASK			(1 << 8)
+#define I2C_DATA_DIRECTION_OUT			(1 << 9)
+#define I2C_DATA_VALUE_MASK				(1 << 10)
+#define I2C_DATA_VALUE_OUT				(1 << 11)
+#define I2C_DATA_VALUE_IN				(1 << 12)
+#define I2C_RESERVED					((1 << 13) | (1 << 5))
+
 // overlay
 
 #define INTEL_OVERLAY_UPDATE			0x30000

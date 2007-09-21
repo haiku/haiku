@@ -18,6 +18,10 @@
 #include <string.h>
 #include <math.h>
 
+#include <ddc.h>
+#include <edid.h>
+
+
 #define TRACE_MODE
 #ifdef TRACE_MODE
 extern "C" void _sPrintf(const char *format, ...);
@@ -107,6 +111,51 @@ static const uint32 kNumBaseModes = sizeof(kBaseModeList) / sizeof(display_mode)
 static const uint32 kMaxNumModes = kNumBaseModes * 4;
 
 
+static status_t
+get_i2c_signals(void* cookie, int* _clock, int* _data)
+{
+	uint32 ioRegister = (uint32)cookie;
+	uint32 value = read32(ioRegister);
+
+	*_clock = (value & I2C_CLOCK_VALUE_IN) != 0;
+	*_data = (value & I2C_DATA_VALUE_IN) != 0;
+
+	return B_OK;
+}
+
+
+static status_t
+set_i2c_signals(void* cookie, int clock, int data)
+{
+	uint32 ioRegister = (uint32)cookie;
+	uint32 value;
+
+	if (gInfo->shared_info->device_type == (INTEL_TYPE_8xx | INTEL_TYPE_83x)) {
+		// on these chips, the reserved values are fixed
+		value = 0;
+	} else {
+		// on all others, we have to preserve them manually
+		value = read32(ioRegister) & I2C_RESERVED;
+	}
+
+	if (data != 0)
+		value |= I2C_DATA_DIRECTION_MASK;
+	else
+		value |= I2C_DATA_DIRECTION_MASK | I2C_DATA_DIRECTION_OUT | I2C_DATA_VALUE_MASK;
+
+	if (clock != 0)
+		value |= I2C_CLOCK_DIRECTION_MASK;
+	else
+		value |= I2C_CLOCK_DIRECTION_MASK | I2C_CLOCK_DIRECTION_OUT | I2C_CLOCK_VALUE_MASK;
+
+	write32(ioRegister, value);
+	read32(ioRegister);
+		// make sure the PCI bus has flushed the write
+
+	return B_OK;
+}
+
+
 /*!
 	Creates the initial mode list of the primary accelerant.
 	It's called from intel_init_accelerant().
@@ -142,6 +191,19 @@ create_mode_list(void)
 	gInfo->mode_list = list;
 	gInfo->shared_info->mode_list_area = gInfo->mode_list_area;
 	gInfo->shared_info->mode_count = count;
+
+	edid1_info edid;
+	i2c_bus bus;
+	bus.cookie = (void*)INTEL_I2C_IO_A;
+	bus.set_signals = &set_i2c_signals;
+	bus.get_signals = &get_i2c_signals;
+	ddc2_init_timing(&bus);
+
+	if (ddc2_read_edid1(&bus, &edid, NULL, NULL) == B_OK) {
+		edid_dump(&edid);
+	} else {
+		TRACE(("intel_extreme: getting EDID failed!\n"));
+	}
 
 	return B_OK;
 }

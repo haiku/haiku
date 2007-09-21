@@ -15,7 +15,7 @@ Addon intel_extreme.accelerant :
 	memory.cpp
 	mode.cpp
 	overlay.cpp
-	: be
+	: be libaccelerantscommon.a
 ;
 
 Package haiku-intel_extreme-cvs :
