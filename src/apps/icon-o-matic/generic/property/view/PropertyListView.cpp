@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,6 +13,9 @@
 
 #include <ClassInfo.h>
 #include <Clipboard.h>
+#ifdef __HAIKU__
+#  include <LayoutUtils.h>
+#endif
 #include <Menu.h>
 #include <MenuItem.h>
 #include <Message.h>
@@ -249,6 +252,34 @@ PropertyListView::MessageReceived(BMessage* message)
 			BView::MessageReceived(message);
 	}
 }
+
+#ifdef __HAIKU__
+
+BSize
+PropertyListView::MinSize()
+{
+	// We need a stable min size: the BView implementation uses
+	// GetPreferredSize(), which by default just returns the current size.
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), BSize(10, 10));
+}
+
+
+BSize
+PropertyListView::MaxSize()
+{
+	return BView::MaxSize();
+}
+
+
+BSize
+PropertyListView::PreferredSize()
+{
+	// We need a stable preferred size: the BView implementation uses
+	// GetPreferredSize(), which by default just returns the current size.
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), BSize(100, 50));
+}
+
+#endif // __HAIKU__
 
 // #pragma mark -
 

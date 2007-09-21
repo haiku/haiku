@@ -1,10 +1,10 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
  *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 #include "ScrollView.h"
@@ -14,6 +14,9 @@
 #include <string.h>
 
 #include <Bitmap.h>
+#ifdef __HAIKU__
+#  include <LayoutUtils.h>
+#endif
 #include <Message.h>
 #include <ScrollBar.h>
 #include <Window.h>
@@ -22,7 +25,7 @@
 #include "ScrollCornerBitmaps.h"
 
 
-// InternalScrollBar
+// #pragma mark - InternalScrollBar
 
 class InternalScrollBar : public BScrollBar {
  public:
@@ -60,9 +63,7 @@ InternalScrollBar::ValueChanged(float value)
 		fScrollView->_ScrollValueChanged(this, value);
 }
 
-
-
-// ScrollCorner
+// #pragma mark -ScrollCorner
 
 class ScrollCorner : public BView {
  public:
@@ -255,9 +256,7 @@ ScrollCorner::SetDragging(bool dragging)
 	}
 }
 
-
-
-// ScrollView
+// #pragma mark - ScrollView
 
 // constructor
 ScrollView::ScrollView(BView* child, uint32 scrollingFlags, BRect frame,
@@ -390,6 +389,49 @@ void ScrollView::WindowActivated(bool activated)
 		Invalidate();
 }
 
+#ifdef __HAIKU__
+
+// MinSize
+BSize
+ScrollView::MinSize()
+{
+	BSize size = (fChild ? fChild->MinSize() : BSize(-1, -1));
+
+	if (fVVisible)
+		size.width += B_V_SCROLL_BAR_WIDTH;
+	if (fHVisible)
+		size.height += B_H_SCROLL_BAR_HEIGHT;
+
+	float borderSize = BorderSize();
+	size.width += 2 * borderSize;
+	size.height += 2 * borderSize;
+
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
+}
+
+// PreferredSize
+BSize
+ScrollView::PreferredSize()
+{
+// TODO: This is not yet correct.
+	BSize size = (fChild ? fChild->PreferredSize() : BSize(-1, -1));
+
+	if (fVVisible)
+		size.width += B_V_SCROLL_BAR_WIDTH;
+	if (fHVisible)
+		size.height += B_H_SCROLL_BAR_HEIGHT;
+
+	float borderSize = BorderSize();
+	size.width += 2 * borderSize;
+	size.height += 2 * borderSize;
+
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
+}
+
+#endif // __HAIKU__
+
+// #pragma mark -
+
 // ScrollingFlags
 uint32
 ScrollView::ScrollingFlags() const
@@ -459,6 +501,17 @@ ScrollView::HVScrollCorner() const
 	return fScrollCorner;
 }
 
+// BorderSize
+float
+ScrollView::BorderSize() const
+{
+	if (fScrollingFlags & SCROLL_NO_FRAME)
+		return 0.0;
+	return 2.0;
+}
+
+// #pragma mark -
+
 // SetHSmallStep
 void
 ScrollView::SetHSmallStep(float hStep)
@@ -505,6 +558,8 @@ ScrollView::VSmallStep() const
 {
 	return fVSmallStep;
 }
+
+// #pragma mark -
 
 // DataRectChanged
 void
@@ -585,6 +640,8 @@ ScrollView::_ScrollCornerValueChanged(BPoint offset)
 	// are out of range.
 	SetScrollOffset(offset);
 }
+
+// #pragma mark -
 
 // _Layout
 //

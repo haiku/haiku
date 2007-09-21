@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -22,9 +22,10 @@ class IconObjectListView : public PropertyListView,
 								IconObjectListView();
 	virtual						~IconObjectListView();
 
-	// PropertyListView interface
+	// BView interface
 	virtual	void				Draw(BRect updateRect);
 
+	// PropertyListView interface
 	virtual	void				PropertyChanged(const Property* previous,
 												const Property* current);
 	virtual	void				PasteProperties(const PropertyObject* object);

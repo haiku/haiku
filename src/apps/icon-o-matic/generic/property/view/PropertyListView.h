@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -41,6 +41,12 @@ class PropertyListView : public BView,
 	virtual	void				MakeFocus(bool focus);
 	virtual	void				MouseDown(BPoint where);
 	virtual	void				MessageReceived(BMessage* message);
+
+#ifdef __HAIKU__
+	virtual	BSize				MinSize();
+	virtual	BSize				MaxSize();
+	virtual	BSize				PreferredSize();
+#endif
 
 	// Scrollable interface
 	virtual	void				ScrollOffsetChanged(BPoint oldOffset,

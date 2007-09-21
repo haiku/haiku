@@ -41,6 +41,12 @@ class ScrollView : public BView, public Scroller {
 	virtual	void				FrameResized(float width, float height);
 	virtual	void				WindowActivated(bool activated);
 
+#ifdef __HAIKU__
+	virtual	BSize				MinSize();
+	virtual	BSize				PreferredSize();
+#endif
+
+
 			uint32				ScrollingFlags() const;
 			void				SetVisibleRectIsChildBounds(bool flag);
 			bool				VisibleRectIsChildBounds() const;
@@ -59,6 +65,8 @@ class ScrollView : public BView, public Scroller {
 											  float* vStep) const;
 			float				HSmallStep() const;
 			float				VSmallStep() const;
+
+			float				BorderSize() const;
 
  protected:
 	virtual	void				DataRectChanged(BRect oldDataRect,
