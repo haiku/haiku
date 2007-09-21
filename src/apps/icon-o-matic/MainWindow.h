@@ -73,6 +73,8 @@ class MainWindow : public BWindow,
 			void				_CreateGUI(BRect frame);
 			BMenuBar*			_CreateMenuBar(BRect frame);
 
+			void				_ImproveScrollBarLayout(BView* target);
+
 	IconEditorApp*				fApp;
 	Document*					fDocument;
 	Icon*						fIcon;

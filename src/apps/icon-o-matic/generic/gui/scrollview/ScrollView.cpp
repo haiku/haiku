@@ -260,22 +260,30 @@ ScrollCorner::SetDragging(bool dragging)
 
 // constructor
 ScrollView::ScrollView(BView* child, uint32 scrollingFlags, BRect frame,
-					   const char *name, uint32 resizingMode, uint32 flags)
-	: BView(frame, name, resizingMode, flags | B_FRAME_EVENTS | B_WILL_DRAW
-										| B_FULL_UPDATE_ON_RESIZE),
+				const char *name, uint32 resizingMode, uint32 viewFlags,
+				uint32 borderStyle, uint32 borderFlags)
+	: BView(frame, name, resizingMode, viewFlags | B_FRAME_EVENTS | B_WILL_DRAW
+				| B_FULL_UPDATE_ON_RESIZE),
 	  Scroller(),
 	  fChild(NULL),
 	  fScrollingFlags(scrollingFlags),
+
 	  fHScrollBar(NULL),
 	  fVScrollBar(NULL),
 	  fScrollCorner(NULL),
+
 	  fHVisible(true),
 	  fVVisible(true),
 	  fCornerVisible(true),
+
 	  fWindowActive(false),
 	  fChildFocused(false),
+
 	  fHSmallStep(1),
-	  fVSmallStep(1)
+	  fVSmallStep(1),
+
+	  fBorderStyle(borderStyle),
+	  fBorderFlags(borderFlags)
 {
 	// Set transparent view color -- our area is completely covered by
 	// our children.
@@ -321,6 +329,9 @@ ScrollView::AllAttached()
 // Draw
 void ScrollView::Draw(BRect updateRect)
 {
+	if (fBorderStyle == B_NO_BORDER)
+		return;
+
 	rgb_color keyboardFocus = keyboard_navigation_color();
 	rgb_color light = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 								 B_LIGHTEN_MAX_TINT);
@@ -328,50 +339,37 @@ void ScrollView::Draw(BRect updateRect)
 								  B_DARKEN_1_TINT);
 	rgb_color darkShadow = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 								  B_DARKEN_2_TINT);
-	rgb_color darkerShadow = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-								  B_DARKEN_3_TINT);
-	float left = Bounds().left, right = Bounds().right;
-	float top = Bounds().top, bottom = Bounds().bottom;
+
+	BRect r = Bounds();
+
 	if (fChildFocused && fWindowActive) {
-		BeginLineArray(4);
-		AddLine(BPoint(left, bottom),
-				BPoint(left, top), keyboardFocus);
-		AddLine(BPoint(left + 1.0, top),
-				BPoint(right, top), keyboardFocus);
-		AddLine(BPoint(right, top + 1.0),
-				BPoint(right, bottom), keyboardFocus);
-		AddLine(BPoint(right - 1.0, bottom),
-				BPoint(left + 1.0, bottom), keyboardFocus);
-		EndLineArray();
+		SetHighColor(keyboardFocus);
+		StrokeRect(r);
 	} else {
-		BeginLineArray(4);
-		AddLine(BPoint(left, bottom),
-				BPoint(left, top), shadow);
-		AddLine(BPoint(left + 1.0, top),
-				BPoint(right, top), shadow);
-		AddLine(BPoint(right, top + 1.0),
-				BPoint(right, bottom), light);
-		AddLine(BPoint(right - 1.0, bottom),
-				BPoint(left + 1.0, bottom), light);
-		EndLineArray();
+		if (fBorderStyle == B_PLAIN_BORDER) {
+			SetHighColor(darkShadow);
+			StrokeRect(r);
+		} else {
+			BeginLineArray(4);
+			AddLine(BPoint(r.left, r.bottom),
+					BPoint(r.left, r.top), shadow);
+			AddLine(BPoint(r.left + 1.0, r.top),
+					BPoint(r.right, r.top), shadow);
+			AddLine(BPoint(r.right, r.top + 1.0),
+					BPoint(r.right, r.bottom), light);
+			AddLine(BPoint(r.right - 1.0, r.bottom),
+					BPoint(r.left + 1.0, r.bottom), light);
+			EndLineArray();
+		}
 	}
+	if (fBorderStyle == B_PLAIN_BORDER)
+		return;
+
 	// The right and bottom lines will be hidden if the scroll views are
 	// visible. But that doesn't harm.
-	BRect innerRect(_InnerRect());
-	left = innerRect.left;
-	top = innerRect.top;
-	right = innerRect.right;
-	bottom = innerRect.bottom;
-	BeginLineArray(4);
-	AddLine(BPoint(left, bottom),
-			BPoint(left, top), darkerShadow);
-	AddLine(BPoint(left + 1.0, top),
-			BPoint(right, top), darkShadow);
-	AddLine(BPoint(right, top + 1.0),
-			BPoint(right, bottom), darkShadow);
-	AddLine(BPoint(right - 1.0, bottom),
-			BPoint(left + 1.0, bottom), darkShadow);
-	EndLineArray();
+	r.InsetBy(1, 1);
+	SetHighColor(darkShadow);
+	StrokeRect(r);
 }
 
 // FrameResized
@@ -396,36 +394,15 @@ BSize
 ScrollView::MinSize()
 {
 	BSize size = (fChild ? fChild->MinSize() : BSize(-1, -1));
-
-	if (fVVisible)
-		size.width += B_V_SCROLL_BAR_WIDTH;
-	if (fHVisible)
-		size.height += B_H_SCROLL_BAR_HEIGHT;
-
-	float borderSize = BorderSize();
-	size.width += 2 * borderSize;
-	size.height += 2 * borderSize;
-
-	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
+	return _Size(size);
 }
 
 // PreferredSize
 BSize
 ScrollView::PreferredSize()
 {
-// TODO: This is not yet correct.
 	BSize size = (fChild ? fChild->PreferredSize() : BSize(-1, -1));
-
-	if (fVVisible)
-		size.width += B_V_SCROLL_BAR_WIDTH;
-	if (fHVisible)
-		size.height += B_H_SCROLL_BAR_HEIGHT;
-
-	float borderSize = BorderSize();
-	size.width += 2 * borderSize;
-	size.height += 2 * borderSize;
-
-	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
+	return _Size(size);
 }
 
 #endif // __HAIKU__
@@ -499,15 +476,6 @@ BView*
 ScrollView::HVScrollCorner() const
 {
 	return fScrollCorner;
-}
-
-// BorderSize
-float
-ScrollView::BorderSize() const
-{
-	if (fScrollingFlags & SCROLL_NO_FRAME)
-		return 0.0;
-	return 2.0;
 }
 
 // #pragma mark -
@@ -659,14 +627,11 @@ ScrollView::_Layout(uint32 flags)
 	float innerWidth = childRect.Width();
 	float innerHeight = childRect.Height();
 	BPoint scrollLT(_InnerRect().LeftTop());
+	scrollLT.x--;
+	scrollLT.y--;
+
 	BPoint scrollRB(childRect.RightBottom() + BPoint(1.0f, 1.0f));
-	if (fScrollingFlags & SCROLL_NO_FRAME) {
-		// cut off the top line and left line of the
-		// scroll bars, otherwise they are used for the
-		// frame appearance
-		scrollLT.x--;
-		scrollLT.y--;
-	}
+
 	// layout scroll bars and scroll corner
 	if (corner) {
 		// In this case the scrollbars overlap one pixel.
@@ -849,9 +814,28 @@ ScrollView::_UpdateScrollBarVisibility()
 BRect
 ScrollView::_InnerRect() const
 {
-	if (fScrollingFlags & SCROLL_NO_FRAME)
-		return Bounds();
-	return Bounds().InsetBySelf(1.0f, 1.0f);
+	BRect r = Bounds();
+	float borderWidth = 0;
+	switch (fBorderStyle) {
+		case B_NO_BORDER:
+			break;
+		case B_PLAIN_BORDER:
+			borderWidth = 1;
+			break;
+		case B_FANCY_BORDER:
+		default:
+			borderWidth = 2;
+			break;
+	}
+	if (fBorderFlags & BORDER_LEFT)
+		r.left += borderWidth;
+	if (fBorderFlags & BORDER_TOP)
+		r.top += borderWidth;
+	if (fBorderFlags & BORDER_RIGHT)
+		r.right -= borderWidth;
+	if (fBorderFlags & BORDER_BOTTOM)
+		r.bottom -= borderWidth;
+	return r;
 }
 
 // _ChildRect
@@ -874,18 +858,11 @@ BRect
 ScrollView::_ChildRect(bool hbar, bool vbar) const
 {
 	BRect rect(_InnerRect());
-	float frameWidth = (fScrollingFlags & SCROLL_NO_FRAME) ? 0.0 : 1.0;
-
-	if (hbar)
-		rect.bottom -= B_H_SCROLL_BAR_HEIGHT + frameWidth;
-	else
-		rect.bottom -= frameWidth;
 	if (vbar)
-		rect.right -= B_V_SCROLL_BAR_WIDTH + frameWidth;
-	else
-		rect.right -= frameWidth;
-	rect.top += frameWidth;
-	rect.left += frameWidth;
+		rect.right -= B_V_SCROLL_BAR_WIDTH;
+	if (hbar)
+		rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
+
 	return rect;
 }
 
@@ -915,4 +892,51 @@ ScrollView::_MaxVisibleRect() const
 	return _GuessVisibleRect(true, true);
 }
 
+#ifdef __HAIKU__
+BSize
+ScrollView::_Size(BSize size)
+{
+	if (fVVisible)
+		size.width += B_V_SCROLL_BAR_WIDTH;
+	if (fHVisible)
+		size.height += B_H_SCROLL_BAR_HEIGHT;
+
+	switch (fBorderStyle) {
+		case B_NO_BORDER:
+			// one line of pixels from scrollbar possibly hidden
+			if (fBorderFlags & BORDER_RIGHT)
+				size.width += fVVisible ? -1 : 0;
+			if (fBorderFlags & BORDER_BOTTOM)
+				size.height += fHVisible ? -1 : 0;
+			break;
+
+		case B_PLAIN_BORDER:
+			if (fBorderFlags & BORDER_LEFT)
+				size.width += 1;
+			if (fBorderFlags & BORDER_TOP)
+				size.height += 1;
+			// one line of pixels in frame possibly from scrollbar
+			if (fBorderFlags & BORDER_RIGHT)
+				size.width += fVVisible ? 0 : 1;
+			if (fBorderFlags & BORDER_BOTTOM)
+				size.height += fHVisible ? 0 : 1;
+			break;
+
+		case B_FANCY_BORDER:
+		default:
+			if (fBorderFlags & BORDER_LEFT)
+				size.width += 2;
+			if (fBorderFlags & BORDER_TOP)
+				size.height += 2;
+			// one line of pixels in frame possibly from scrollbar
+			if (fBorderFlags & BORDER_RIGHT)
+				size.width += fVVisible ? 1 : 2;
+			if (fBorderFlags & BORDER_BOTTOM)
+				size.height += fHVisible ? 1 : 2;
+			break;
+	}
+
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
+}
+#endif // __HAIKU__
 

@@ -23,17 +23,25 @@ enum {
 	SCROLL_VERTICAL							= 0x02,
 	SCROLL_HORIZONTAL_MAGIC					= 0x04,
 	SCROLL_VERTICAL_MAGIC					= 0x08,
-	SCROLL_VISIBLE_RECT_IS_CHILD_BOUNDS		= 0x10,
-	SCROLL_NO_FRAME							= 0x20,
+	SCROLL_VISIBLE_RECT_IS_CHILD_BOUNDS		= 0x10
 };
+
+enum {
+	BORDER_LEFT		= 0x01,
+	BORDER_TOP		= 0x02,
+	BORDER_RIGHT	= 0x04,
+	BORDER_BOTTOM	= 0x08,
+	BORDER_ALL		= BORDER_LEFT | BORDER_TOP | BORDER_RIGHT | BORDER_BOTTOM
+};
+
 
 class ScrollView : public BView, public Scroller {
  public:
-								ScrollView(BView* child,
-										   uint32 scrollingFlags,
-										   BRect frame,
-										   const char *name,
-										   uint32 resizingMode, uint32 flags);
+								ScrollView(BView* child, uint32 scrollingFlags,
+									BRect frame, const char *name,
+									uint32 resizingMode, uint32 viewFlags,
+									uint32 borderStyle = B_FANCY_BORDER,
+									uint32 borderFlags = BORDER_ALL);
 	virtual						~ScrollView();
 
 	virtual	void				AllAttached();
@@ -66,8 +74,6 @@ class ScrollView : public BView, public Scroller {
 			float				HSmallStep() const;
 			float				VSmallStep() const;
 
-			float				BorderSize() const;
-
  protected:
 	virtual	void				DataRectChanged(BRect oldDataRect,
 												BRect newDataRect);
@@ -94,6 +100,9 @@ class ScrollView : public BView, public Scroller {
 			float				fHSmallStep;
 			float				fVSmallStep;
 
+			uint32				fBorderStyle;
+			uint32				fBorderFlags;
+
 			void				_ScrollValueChanged(
 										InternalScrollBar* scrollBar,
 										float value);
@@ -111,6 +120,9 @@ private:
 			BRect				_ChildRect(bool hbar, bool vbar) const;
 			BRect				_GuessVisibleRect(bool hbar, bool vbar) const;
 			BRect				_MaxVisibleRect() const;
+#ifdef __HAIKU__
+	virtual	BSize				_Size(BSize childSize);
+#endif
 
 	friend class InternalScrollBar;
 	friend class ScrollCorner;

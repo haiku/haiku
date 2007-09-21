@@ -451,6 +451,12 @@ MainWindow::_Init()
 	// create the GUI
 	_CreateGUI(Bounds());
 
+	// fix up scrollbar layout in listviews
+	_ImproveScrollBarLayout(fPathListView);
+	_ImproveScrollBarLayout(fStyleListView);
+	_ImproveScrollBarLayout(fShapeListView);
+	_ImproveScrollBarLayout(fTransformerListView);
+
 	// TODO: move this to CanvasView?
 	fState = new MultipleManipulatorState(fCanvasView);
 	fCanvasView->SetState(fState);
@@ -615,11 +621,9 @@ MainWindow::_CreateGUI(BRect bounds)
 
 	// scroll view around property list view
 	ScrollView* propScrollView = new ScrollView(fPropertyListView,
-										SCROLL_VERTICAL | SCROLL_NO_FRAME,
-										BRect(0, 0, splitWidth, 100),
-										"property scroll view",
-										B_FOLLOW_NONE,
-										B_WILL_DRAW | B_FRAME_EVENTS);
+		SCROLL_VERTICAL, BRect(0, 0, splitWidth, 100), "property scroll view",
+		B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER,
+		BORDER_RIGHT);
 	leftSideView->AddChild(propScrollView);
 
 	BGroupLayout* topSide = new BGroupLayout(B_HORIZONTAL);
@@ -635,9 +639,9 @@ MainWindow::_CreateGUI(BRect bounds)
 	canvasBounds.right += B_V_SCROLL_BAR_WIDTH;
 	ScrollView* canvasScrollView
 		= new ScrollView(fCanvasView, SCROLL_VERTICAL | SCROLL_HORIZONTAL
-				| SCROLL_NO_FRAME | SCROLL_VISIBLE_RECT_IS_CHILD_BOUNDS,
+				| SCROLL_VISIBLE_RECT_IS_CHILD_BOUNDS,
 				canvasBounds, "canvas scroll view",
-				B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS);
+				B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS, B_NO_BORDER);
 	layout->AddView(canvasScrollView, 1, 1);
 
 	// views along the top
@@ -730,12 +734,10 @@ MainWindow::_CreateGUI(BRect bounds)
 	bounds.bottom += B_H_SCROLL_BAR_HEIGHT;
 	bounds.right += B_V_SCROLL_BAR_WIDTH;
 	ScrollView* canvasScrollView
-		= new ScrollView(fCanvasView,
-						 SCROLL_HORIZONTAL | SCROLL_VERTICAL
-						 | SCROLL_VISIBLE_RECT_IS_CHILD_BOUNDS
-						 | SCROLL_NO_FRAME,
-						 bounds, "canvas scroll view",
-						 B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS);
+		= new ScrollView(fCanvasView, SCROLL_HORIZONTAL | SCROLL_VERTICAL
+			| SCROLL_VISIBLE_RECT_IS_CHILD_BOUNDS, bounds,
+			"canvas scroll view", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS,
+			B_NO_BORDER);
 
 	// icon previews
 	bounds.left = 5;
@@ -902,11 +904,9 @@ MainWindow::_CreateGUI(BRect bounds)
 	// scroll view around property list view
 	bounds.top = menuBar->Frame().bottom + 1;
 	bounds.bottom = bg->Bounds().bottom;
-	bg->AddChild(new ScrollView(fPropertyListView,
-								SCROLL_VERTICAL | SCROLL_NO_FRAME,
-								bounds, "property scroll view",
-								B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM,
-								B_WILL_DRAW | B_FRAME_EVENTS));
+	bg->AddChild(new ScrollView(fPropertyListView, SCROLL_VERTICAL,
+		bounds, "property scroll view", B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM,
+		B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER, BORDER_RIGHT));
 
 
 	bg->AddChild(canvasScrollView);
@@ -1063,3 +1063,20 @@ MainWindow::_CreateMenuBar(BRect frame)
 //	PathManipulator* pathManipulator = new PathManipulator(path);
 //	fState->AddManipulator(pathManipulator);
 //}
+
+// _ImproveScrollBarLayout
+void
+MainWindow::_ImproveScrollBarLayout(BView* target)
+{
+	// NOTE: The BListViews for which this function is used
+	// are directly below a BMenuBar. If the BScrollBar and
+	// the BMenuBar share bottom/top border respectively, the
+	// GUI looks a little more polished. This trick can be
+	// removed if/when the BScrollViews are embedded in a
+	// surounding border like in WonderBrush.
+
+	if (BScrollBar* scrollBar = target->ScrollBar(B_VERTICAL)) {
+		scrollBar->MoveBy(0, -1);
+		scrollBar->ResizeBy(0, 1);
+	}
+}
