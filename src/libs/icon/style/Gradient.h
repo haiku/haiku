@@ -78,6 +78,8 @@ class Gradient : public Transformable {
 
 			bool				operator==(const Gradient& other) const;
 			bool				operator!=(const Gradient& other) const;
+			bool				ColorStepsAreEqual(
+									const Gradient& other) const;
 
 			void				SetColors(const Gradient& other);
 

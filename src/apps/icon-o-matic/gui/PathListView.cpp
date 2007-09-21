@@ -623,7 +623,7 @@ PathListView::PathAdded(VectorPath* path, int32 index)
 		return;
 
 	if (_AddPath(path, index))
-		Select(CountItems() - 1);
+		Select(index);
 
 	UnlockLooper();
 }

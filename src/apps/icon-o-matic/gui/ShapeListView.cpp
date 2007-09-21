@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -129,7 +129,6 @@ ShapeListView::~ShapeListView()
 void
 ShapeListView::SelectionChanged()
 {
-
 	SimpleListView::SelectionChanged();
 
 	if (!fSyncingToSelection) {
@@ -387,7 +386,8 @@ ShapeListView::ShapeAdded(Shape* shape, int32 index)
 	if (!LockLooper())
 		return;
 
-	_AddShape(shape, index);
+	if (_AddShape(shape, index))
+		Select(index);
 
 	UnlockLooper();
 }

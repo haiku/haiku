@@ -62,7 +62,9 @@ IconEditorApp::IconEditorApp()
 
 	  fLastOpenPath(""),
 	  fLastSavePath(""),
-	  fLastExportPath("")
+	  fLastExportPath(""),
+
+	  fMessageAfterSave(NULL)
 {
 }
 
@@ -76,6 +78,8 @@ IconEditorApp::~IconEditorApp()
 
 	delete fOpenPanel;
 	delete fSavePanel;
+
+	delete fMessageAfterSave;
 }
 
 // #pragma mark -
@@ -84,7 +88,9 @@ IconEditorApp::~IconEditorApp()
 bool
 IconEditorApp::QuitRequested()
 {
-	// TODO: ask main window if quitting is ok
+	if (!_CheckSaveIcon(CurrentMessage()))
+		return false;
+
 	_StoreSettings();
 
 	fMainWindow->Lock();
@@ -103,14 +109,12 @@ IconEditorApp::MessageReceived(BMessage* message)
 			_MakeIconEmpty();
 			break;
 		case MSG_OPEN: {
-//			fOpenPanel->Refresh();
 			BMessage openMessage(B_REFS_RECEIVED);
 			fOpenPanel->SetMessage(&openMessage);
 			fOpenPanel->Show();
 			break;
 		}
 		case MSG_APPEND: {
-//			fOpenPanel->Refresh();
 			BMessage openMessage(B_REFS_RECEIVED);
 			openMessage.AddBool("append", true);
 			fOpenPanel->SetMessage(&openMessage);
@@ -126,6 +130,7 @@ IconEditorApp::MessageReceived(BMessage* message)
 				saver = fDocument->ExportSaver();
 			if (saver) {
 				saver->Save(fDocument);
+				_PickUpActionBeforeSave();
 				break;
 			} // else fall through
 		}
@@ -153,6 +158,7 @@ IconEditorApp::MessageReceived(BMessage* message)
 						else
 							fDocument->SetExportSaver(saver);
 						saver->Save(fDocument);
+						_PickUpActionBeforeSave();
 					}
 				}
 				_SyncPanels(fSavePanel, fOpenPanel);
@@ -267,9 +273,61 @@ IconEditorApp::ArgvReceived(int32 argc, char** argv)
 
 // #pragma mark -
 
+// _CheckSaveIcon
+bool
+IconEditorApp::_CheckSaveIcon(const BMessage* currentMessage)
+{
+	if (fDocument->IsEmpty() || fDocument->CommandStack()->IsSaved())
+		return true;
+
+	BAlert* alert = new BAlert("save", "Save changes to current icon?",
+		"Discard", "Cancel", "Save");
+	int32 choice = alert->Go();
+	switch (choice) {
+		case 0:
+			// discard
+			return true;
+		case 1:
+			// cancel
+			return false;
+		case 2:
+		default:
+			// cancel (save first) but pick what we were doing before
+			PostMessage(MSG_SAVE);
+			if (currentMessage) {
+				delete fMessageAfterSave;
+				fMessageAfterSave = new BMessage(*currentMessage);
+			}
+			return false;
+	}
+}
+
+// _PickUpActionBeforeSave
+void
+IconEditorApp::_PickUpActionBeforeSave()
+{
+	if (fDocument->WriteLock()) {
+		fDocument->CommandStack()->Save();
+		fDocument->WriteUnlock();
+	}
+
+	if (!fMessageAfterSave)
+		return;
+
+	PostMessage(fMessageAfterSave);
+	delete fMessageAfterSave;
+	fMessageAfterSave = NULL;
+}
+
+// #pragma mark -
+
+// _MakeIconEmpty
 void
 IconEditorApp::_MakeIconEmpty()
 {
+	if (!_CheckSaveIcon(CurrentMessage()))
+		return;
+
 	bool mainWindowLocked = fMainWindow && fMainWindow->Lock();
 
 	AutoWriteLocker locker(fDocument);
@@ -289,6 +347,9 @@ IconEditorApp::_MakeIconEmpty()
 void
 IconEditorApp::_Open(const entry_ref& ref, bool append)
 {
+	if (!_CheckSaveIcon(CurrentMessage()))
+		return;
+
 	BFile file(&ref, B_READ_ONLY);
 	if (file.InitCheck() < B_OK)
 		return;
@@ -390,6 +451,9 @@ void
 IconEditorApp::_Open(const BMessenger& externalObserver,
 					 const uint8* data, size_t size)
 {
+	if (!_CheckSaveIcon(CurrentMessage()))
+		return;
+
 	if (!externalObserver.IsValid())
 		return;
 

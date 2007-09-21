@@ -57,6 +57,8 @@ class Document : public RWLocker,
 
 			void				MakeEmpty(bool includingSavers = true);
 
+			bool				IsEmpty() const;
+
  private:
 			BPrivate::Icon::Icon* fIcon;
 			::CommandStack*		fCommandStack;

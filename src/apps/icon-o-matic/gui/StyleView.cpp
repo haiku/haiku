@@ -267,7 +267,7 @@ StyleView::ObjectChanged(const Observable* object)
 		// TODO: is this really necessary?
 		controlGradient->SetTransform(*fGradient);
 
-		if (*fGradient != *controlGradient) {
+		if (!fGradient->ColorStepsAreEqual(*controlGradient)) {
 			if (fCommandStack) {
 				fCommandStack->Perform(
 					new (nothrow) SetGradientCommand(
@@ -279,7 +279,7 @@ StyleView::ObjectChanged(const Observable* object)
 			_TransferGradientStopColor();
 		}
 	} else if (object == fGradient) {
-		if (*fGradient != *controlGradient) {
+		if (!fGradient->ColorStepsAreEqual(*controlGradient)) {
 			fGradientControl->SetGradient(fGradient);
 			_MarkType(fGradientType->Menu(), fGradient->Type());
 			// transfer the current gradient color to the current color
@@ -288,7 +288,7 @@ StyleView::ObjectChanged(const Observable* object)
 	} else if (object == fStyle) {
 		// maybe the gradient was added or removed
 		// or the color changed
-		_SetGradient(fStyle->Gradient());
+		_SetGradient(fStyle->Gradient(), false, true);
 		if (fCurrentColor && !fStyle->Gradient())
 			fCurrentColor->SetColor(fStyle->Color());
 	} else if (object == fCurrentColor) {
@@ -361,7 +361,7 @@ StyleView::SetCurrentColor(CurrentColor* color)
 
 // _SetGradient
 void
-StyleView::_SetGradient(Gradient* gradient, bool forceControlUpdate)
+StyleView::_SetGradient(Gradient* gradient, bool forceControlUpdate, bool sendMessage)
 {
 	if (!forceControlUpdate && fGradient == gradient)
 		return;
@@ -387,9 +387,9 @@ StyleView::_SetGradient(Gradient* gradient, bool forceControlUpdate)
 		_MarkType(fGradientType->Menu(), -1);
 	}
 
-	if (Window()) {
-		BMessage message(MSG_GRADIENT_SELECTED);
-		message.AddPointer("gradient", (void*)fGradient);
+	if (sendMessage) {
+		BMessage message(MSG_STYLE_TYPE_CHANGED);
+		message.AddPointer("style", fStyle);
 		Window()->PostMessage(&message);
 	}
 }

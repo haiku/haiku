@@ -63,6 +63,9 @@ class IconEditorApp : public BApplication {
 	// IconEditorApp
 
  private:
+			bool				_CheckSaveIcon(const BMessage* currentMessage);
+			void				_PickUpActionBeforeSave();
+
 			void				_MakeIconEmpty();
 			void				_Open(const entry_ref& ref,
 									  bool append = false);
@@ -89,6 +92,8 @@ class IconEditorApp : public BApplication {
 			BString				fLastOpenPath;
 			BString				fLastSavePath;
 			BString				fLastExportPath;
+
+			BMessage*			fMessageAfterSave;
 };
 
 #endif // ICON_EDITOR_APP_H

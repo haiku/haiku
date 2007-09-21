@@ -555,10 +555,8 @@ StyleListView::StyleAdded(Style* style, int32 index)
 	if (!LockLooper())
 		return;
 
-	// NOTE: shapes are always added at the end
-	// of the list, so the sorting is synced...
 	if (_AddStyle(style, index))
-		Select(CountItems() - 1);
+		Select(index);
 
 	UnlockLooper();
 }

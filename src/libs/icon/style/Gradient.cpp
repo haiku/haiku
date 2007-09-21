@@ -227,25 +227,8 @@ Gradient::operator=(const Gradient& other)
 bool
 Gradient::operator==(const Gradient& other) const
 {
-	if (Transformable::operator==(other)) {
-		int32 count = CountColors();
-		if (count == other.CountColors() &&
-			fType == other.fType &&
-			fInterpolation == other.fInterpolation &&
-			fInheritTransformation == other.fInheritTransformation) {
-	
-			bool equal = true;
-			for (int32 i = 0; i < count; i++) {
-				color_step* ourStep = ColorAtFast(i);
-				color_step* otherStep = other.ColorAtFast(i);
-				if (*ourStep != *otherStep) {
-					equal = false;
-					break;
-				}
-			}
-			return equal;
-		}
-	}
+	if (Transformable::operator==(other))
+		return ColorStepsAreEqual(other);
 	return false;
 }
 
@@ -254,6 +237,30 @@ bool
 Gradient::operator!=(const Gradient& other) const
 {
 	return !(*this == other);
+}
+
+// ColorStepsAreEqual
+bool
+Gradient::ColorStepsAreEqual(const Gradient& other) const
+{
+	int32 count = CountColors();
+	if (count == other.CountColors() &&
+		fType == other.fType &&
+		fInterpolation == other.fInterpolation &&
+		fInheritTransformation == other.fInheritTransformation) {
+
+		bool equal = true;
+		for (int32 i = 0; i < count; i++) {
+			color_step* ourStep = ColorAtFast(i);
+			color_step* otherStep = other.ColorAtFast(i);
+			if (*ourStep != *otherStep) {
+				equal = false;
+				break;
+			}
+		}
+		return equal;
+	}
+	return false;
 }
 
 // SetColors

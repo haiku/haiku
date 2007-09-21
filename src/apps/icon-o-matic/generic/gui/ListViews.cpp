@@ -533,9 +533,10 @@ DragSortableListView::MouseWheelChanged(float x, float y)
 void
 DragSortableListView::ObjectChanged(const Observable* object)
 {
-	if (object != fSelection || fModifyingSelection)
+	if (object != fSelection || fModifyingSelection || fSyncingToSelection)
 		return;
 
+//printf("%s - syncing start\n", Name());
 	fSyncingToSelection = true;
 
 	// try to sync to Selection
@@ -567,6 +568,7 @@ DragSortableListView::ObjectChanged(const Observable* object)
 	}
 
 	fSyncingToSelection = false;
+//printf("%s - done\n", Name());
 }
 
 // #pragma mark -
@@ -813,7 +815,7 @@ DragSortableListView::SelectionChanged()
 {
 //printf("%s::SelectionChanged()", typeid(*this).name());
 	// modify global Selection
-	if (!fSelection)
+	if (!fSelection || fSyncingToSelection)
 		return;
 
 	fModifyingSelection = true;

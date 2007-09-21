@@ -72,8 +72,6 @@ AddShapesCommand::Perform()
 				fContainer->RemoveShape(fShapes[j]);
 			break;
 		}
-		if (fSelection)
-			fSelection->Select(fShapes[i], i > 0);
 		index++;
 	}
 	fShapesAdded = true;

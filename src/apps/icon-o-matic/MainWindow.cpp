@@ -215,6 +215,10 @@ case MSG_PATH_SELECTED: {
 	VectorPath* path;
 	if (message->FindPointer("path", (void**)&path) < B_OK)
 		path = NULL;
+
+	fPathListView->SetCurrentShape(NULL);
+	fStyleListView->SetCurrentShape(NULL);
+	fTransformerListView->SetShape(NULL);
 	
 	fState->DeleteManipulators();
 	if (fDocument->Icon()->Paths()->HasPath(path)) {
@@ -223,7 +227,8 @@ case MSG_PATH_SELECTED: {
 	}
 	break;
 }
-case MSG_STYLE_SELECTED: {
+case MSG_STYLE_SELECTED:
+case MSG_STYLE_TYPE_CHANGED: {
 	Style* style;
 	if (message->FindPointer("style", (void**)&style) < B_OK)
 		style = NULL;
@@ -231,14 +236,13 @@ case MSG_STYLE_SELECTED: {
 		style = NULL;
 
 	fStyleView->SetStyle(style);
-	break;
-}
-case MSG_GRADIENT_SELECTED: {
-	// if there is a gradient, add a transform box around it
-	Gradient* gradient;
-	if (message->FindPointer("gradient", (void**)&gradient) < B_OK)
-		gradient = NULL;
+	fPathListView->SetCurrentShape(NULL);
+	fStyleListView->SetCurrentShape(NULL);
+	fTransformerListView->SetShape(NULL);
+
 	fState->DeleteManipulators();
+	Gradient* gradient = style ? style->Gradient() : NULL;
+
 	if (gradient) {
 		TransformGradientBox* transformBox
 			= new (nothrow) TransformGradientBox(fCanvasView,

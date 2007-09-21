@@ -31,7 +31,7 @@ using namespace BPrivate::Icon;
 // TODO: write lock the document when changing something...
 
 enum {
-	MSG_GRADIENT_SELECTED	= 'grsl',
+	MSG_STYLE_TYPE_CHANGED	= 'stch',
 };
 
 class StyleView : public BView,
@@ -59,7 +59,8 @@ class StyleView : public BView,
 
  private:
 			void				_SetGradient(Gradient* gradient,
-											 bool forceControlUpdate = false);
+											 bool forceControlUpdate = false,
+											 bool sendMessage = false);
 			void				_MarkType(BMenu* menu,
 										  int32 type) const;
 			void				_SetStyleType(int32 type);
