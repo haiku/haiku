@@ -49,6 +49,10 @@ typedef struct i2c_bus {
 } i2c_bus;
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // send and receive data via i2c bus
 status_t i2c_send_receive(const i2c_bus *bus, int slave_address,
 	const uint8 *writeBuffer, size_t writeLength, uint8 *readBuffer,
@@ -60,5 +64,9 @@ void i2c_get100k_timing(i2c_timing *timing);
 // fill <timing> with standard 400kHz bus timing
 // (as timing resolution is 1 microsecond, we cannot reach full speed!)
 void i2c_get400k_timing(i2c_timing *timing);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* _I2C_H */
