@@ -68,12 +68,6 @@ enum {
 };
 
 
-enum {
-	AHCI_CLB_SIZE	= 1024,
-	AHCI_FIS_SIZE	= 256,
-};
-
-
 typedef struct {
 	uint32		clb;			// Command List Base Address (alignment 1024 byte)
 	uint32		clbu;			// Command List Base Address Upper 32-Bits
@@ -94,7 +88,7 @@ typedef struct {
 	uint32		res2;			// Reserved for FIS-based Switching Definition
 	uint32		res[11];		// Reserved
 	uint32		vendor[2];		// Vendor Specific
-} ahci_port;
+} _PACKED ahci_port;
 
 
 typedef struct {
@@ -110,7 +104,7 @@ typedef struct {
 	uint32		res[31];		// Reserved
 	uint32		vendor[24];		// Vendor Specific registers
 	ahci_port	port[32];
-} ahci_hba;
+} _PACKED ahci_hba;
 
 
 typedef struct {
@@ -118,12 +112,12 @@ typedef struct {
 	uint8		res1[0x04];
 	uint8		psfis[0x14];	// PIO Setup FIS
 	uint8		res2[0x0c];
-	uint8		rfis[0x20];		// D2H Register FIS
+	uint8		rfis[0x14];		// D2H Register FIS
 	uint8		res3[0x04];
 	uint8		sdbfis[0x08];	// Set Device Bits FIS
 	uint8		ufis[0x40];		// Unknown FIS
 	uint8		res4[0x60];
-} fis;
+} _PACKED fis;
 
 
 typedef struct {
@@ -137,17 +131,26 @@ typedef struct {
 	uint16		r : 1;			// Reset 
 	uint16		p : 1;			// Prefetchable
 	uint16		w : 1;			// Write
-	uint16		a :	1;// ATAPI
+	uint16		a : 1;			// ATAPI
 	uint16		cfl : 5;		// command FIS length
-   };
+   } _PACKED;
     uint32		prdtl_flags_cfl;
-  };
+  } _PACKED;
+	uint32		prdbc;			// PRD Byte Count
 	uint32		ctba;			// command table desciptor base address (alignment 128 byte)
 	uint32		ctbau;			// command table desciptor base address upper
 	uint8		res1[0x10];
-} command_list_entry;
+} _PACKED command_list_entry;
 
 #define COMMAND_LIST_ENTRY_COUNT 32
+
+
+typedef struct {
+	uint8		cfis[0x40];		// command FIS
+	uint8		acmd[0x20];		// ATAPI command
+	uint8		res[0x20];		// reserved
+} _PACKED command_table;
+
 
 typedef struct {
 	uint32		dba;			// Data Base Address (2-byte aligned)
@@ -155,18 +158,9 @@ typedef struct {
 	uint32		res;
 	uint32		dbc;			// Bytecount (0-based, even, max 4MB)
 	#define DBC_I	0x80000000	/* Interrupt on completition */
-} prd;
-
-
-typedef struct {
-	uint8		cfis[0x40];		// command FIS
-	uint8		acmd[0x20];		// ATAPI command
-	uint8		res[0x20];		// reserved
-} command_table;
-
+} _PACKED prd;
 
 #define PRD_TABLE_ENTRY_COUNT 168
-
 
 
 extern scsi_sim_interface gAHCISimInterface;
@@ -176,6 +170,7 @@ extern scsi_for_sim_interface *gSCSI;
 
 #define LO32(val) ((uint32)(val))
 #define HI32(val) (((uint64)(val)) >> 32)
+#define ASSERT(expr) if (expr) {} else panic(#expr)
 
 #ifdef __cplusplus
 

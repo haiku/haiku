@@ -27,6 +27,13 @@ AHCIController::AHCIController(device_node_handle node, pci_device_info *device)
  	, fInstanceCheck(-1)
 {
 	memset(fPort, 0, sizeof(fPort));
+
+	ASSERT(sizeof(ahci_port) == 120);
+	ASSERT(sizeof(ahci_hba) == 4096);
+	ASSERT(sizeof(fis) == 256);
+	ASSERT(sizeof(command_list_entry) == 32);
+	ASSERT(sizeof(command_table) == 128);
+	ASSERT(sizeof(prd) == 16);
 }
 
 
