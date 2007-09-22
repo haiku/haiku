@@ -91,6 +91,45 @@ typedef struct {
 } _PACKED ahci_port;
 
 
+enum {
+	PORT_CMD_ICC_ACTIVE	 = (1 << 28),	// Interface Communication control
+	PORT_CMD_ICC_SLUMBER = (6 << 28),	// Interface Communication control
+	PORT_CMD_CR		= (1 << 15),	// Command List Running (DMA active)
+	PORT_CMD_FR		= (1 << 14),	// FIS Receive Running
+	PORT_CMD_FER	= (1 << 4),		// FIS Receive Enable
+	PORT_CMD_CLO	= (1 << 3),		// Command List Override
+	PORT_CMD_POD	= (1 << 2),		// Power On Device
+	PORT_CMD_SUD	= (1 << 1),		// Spin-up Device
+	PORT_CMD_ST		= (1 << 0),		// Start DMA
+};
+
+
+enum {
+	PORT_INT_CPD	= (1 << 31),	// Cold Presence Detect Status/Enable
+	PORT_INT_TFE	= (1 << 30),	// Task File Error Status/Enable
+	PORT_INT_HBF	= (1 << 29),	// Host Bus Fatal Error Status/Enable
+	PORT_INT_HBD	= (1 << 28),	// Host Bus Data Error Status/Enable
+	PORT_INT_IF		= (1 << 27),	// Interface Fatal Error Status/Enable
+	PORT_INT_INF	= (1 << 26),	// Interface Non-fatal Error Status/Enable
+	PORT_INT_OF		= (1 << 24),	// Overflow Status/Enable
+	PORT_INT_IPM	= (1 << 23),	// Incorrect Port Multiplier Status/Enable
+	PORT_INT_PRCE	= (1 << 22),	// PhyRdy Change Status/Enable
+	PORT_INT_DI		= (1 << 7),		// Device Interlock Status/Enable
+	PORT_INT_PC		= (1 << 6),		// Port Change Status/Enable
+	PORT_INT_DP		= (1 << 5),		// Descriptor Processed Interrupt
+	PORT_INT_UF		= (1 << 4),		// Unknown FIS Interrupt 
+	PORT_INT_SDB	= (1 << 3),		// Set Device Bits FIS Interrupt 
+	PORT_INT_DS		= (1 << 2),		// DMA Setup FIS Interrupt 
+	PORT_INT_PS		= (1 << 1),		// PIO Setup FIS Interrupt
+	PORT_INT_DHR	= (1 << 0),		// Device to Host Register FIS Interrupt
+};
+
+#define PORT_INT_FATAL	(PORT_INT_HBF | PORT_INT_IF | PORT_INT_IPM | PORT_INT_UF)
+#define PORT_INT_ERROR 	(PORT_INT_TFE | PORT_INT_HBD)
+#define PORT_INT_MASK	(PORT_INT_FATAL | PORT_INT_ERROR | PORT_INT_DP |\
+						 PORT_INT_SDB | PORT_INT_DS | PORT_INT_PS | PORT_INT_DHR)
+
+
 typedef struct {
 	uint32		cap;			// Host Capabilities
 	uint32		ghc;			// Global Host Control

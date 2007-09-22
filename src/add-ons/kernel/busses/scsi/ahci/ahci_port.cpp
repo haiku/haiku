@@ -63,6 +63,21 @@ AHCIPort::Init()
 	fCommandList[0].ctbau = HI32(physAddr);
 	// prdt follows after command table
 
+	// clear IRQ status bits
+	fRegs->is = fRegs->is;
+
+	// clear error bits
+	fRegs->serr = fRegs->serr;
+	
+	// enable FIS receive
+	fRegs->cmd |= PORT_CMD_FER;
+
+	// start DMA engine
+	fRegs->cmd |= PORT_CMD_ST;
+
+	// enable interrupts
+	fRegs->ie = PORT_INT_MASK;
+
 	return B_OK;
 }
 
@@ -71,6 +86,34 @@ void
 AHCIPort::Uninit()
 {
 	TRACE("AHCIPort::Uninit port %d\n", fIndex);
+
+	// disable FIS receive
+	fRegs->cmd &= ~PORT_CMD_FER;
+
+	// wait for receive completition, up to 500ms
+	for (int i = 0; i <	15; i++) {
+		if (!(fRegs->cmd & PORT_CMD_FR))
+			break;
+		snooze(50000);
+	}
+
+	if (fRegs->cmd & PORT_CMD_FR) {
+		TRACE("AHCIPort::Uninit port %d error FIS rx still running\n", fIndex);
+	}
+
+	// stop DMA engine
+	fRegs->cmd &= ~PORT_CMD_ST;
+
+	// wait for DMA completition
+	for (int i = 0; i <	15; i++) {
+		if (!(fRegs->cmd & PORT_CMD_CR))
+			break;
+		snooze(50000);
+	}
+
+	if (fRegs->cmd & PORT_CMD_CR) {
+		TRACE("AHCIPort::Uninit port %d error DMA engine still running\n", fIndex);
+	}
 
 	// disable interrupts
 	fRegs->ie = 0;
@@ -91,7 +134,11 @@ AHCIPort::Uninit()
 void
 AHCIPort::Interrupt()
 {
-	TRACE("AHCIPort::Interrupt port %d\n", fIndex);
+	uint32 is = fRegs->is;
+	TRACE("AHCIPort::Interrupt port %d, status %#08x\n", fIndex, is);
+
+	// clear interrupts
+	fRegs->is = is;
 }
 
 
