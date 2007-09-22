@@ -1,9 +1,10 @@
 #ifndef _PTHREAD_PRIVATE_H_
 #define _PTHREAD_PRIVATE_H_
 /* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007, Ryan Leavengood, leavengood@gmail.com.
+ * All rights reserved. Distributed under the terms of the MIT License.
+ */
 
 #include <OS.h>
 
@@ -11,6 +12,17 @@
 // This way, we are completely free to change them, which might be
 // necessary in the future (not only due to the incomplete implementation
 // at this point).
+
+typedef struct _pthread_condattr {
+	bool		process_shared;
+} pthread_condattr;
+
+typedef struct _pthread_cond {
+	sem_id			sem;
+	pthread_mutex_t	*mutex;
+	int32			waiter_count;
+	pthread_condattr attr;
+} pthread_cond;
 
 typedef struct _pthread_mutexattr {
 	int32		type;

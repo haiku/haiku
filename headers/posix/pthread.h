@@ -12,7 +12,7 @@ typedef struct  _pthread_attr		*pthread_attr_t;
 typedef struct  _pthread_mutex		*pthread_mutex_t;
 typedef struct  _pthread_mutexattr	*pthread_mutexattr_t;
 typedef struct  _pthread_cond		*pthread_cond_t;
-typedef struct  _pthread_cond_attr	*pthread_condattr_t;
+typedef struct  _pthread_condattr	*pthread_condattr_t;
 typedef int							pthread_key_t;
 typedef struct  _pthread_once		pthread_once_t;
 typedef struct  _pthread_rwlock		*pthread_rwlock_t;
@@ -42,10 +42,10 @@ enum pthread_process_shared {
 /*
  * Flags for threads and thread attributes.
  */
-#define PTHREAD_DETACHED		0x1
+#define PTHREAD_DETACHED			0x1
 #define PTHREAD_SCOPE_SYSTEM		0x2
 #define PTHREAD_INHERIT_SCHED		0x4
-#define PTHREAD_NOFLOAT			0x8
+#define PTHREAD_NOFLOAT				0x8
 
 #define PTHREAD_CREATE_DETACHED		PTHREAD_DETACHED
 #define PTHREAD_CREATE_JOINABLE		0
@@ -61,14 +61,12 @@ enum pthread_process_shared {
 #define PTHREAD_CANCEL_ASYNCHRONOUS	2
 #define PTHREAD_CANCELED		((void *) 1)
 
-#define PTHREAD_COND_INITIALIZER	NULL
-
 #define PTHREAD_NEEDS_INIT	0
 #define PTHREAD_DONE_INIT	1
 #define PTHREAD_ONCE_INIT 	{ PTHREAD_NEEDS_INIT, NULL }
 
 #define PTHREAD_BARRIER_SERIAL_THREAD	-1
-#define PTHREAD_PRIO_NONE		0
+#define PTHREAD_PRIO_NONE			0
 #define PTHREAD_PRIO_INHERIT		1
 #define PTHREAD_PRIO_PROTECT		2
 
@@ -83,6 +81,9 @@ extern pthread_mutex_t _pthread_recursive_mutex_static_initializer(void);
 #define PTHREAD_MUTEX_INITIALIZER NULL
 #define PTHREAD_RECURSIVE_MUTEX_INITIALIZER \
 	pthread_recursive_mutex_static_initializer();
+
+extern pthread_cond_t _pthread_cond_static_initializer(void);
+#define PTHREAD_COND_INITIALIZER _pthread_cond_static_initializer();
 
 /* mutex functions */
 extern int pthread_mutex_destroy(pthread_mutex_t *mutex);
@@ -106,6 +107,21 @@ extern int pthread_mutexattr_setprioceiling(pthread_mutexattr_t *mutexAttr, int 
 extern int pthread_mutexattr_setprotocol(pthread_mutexattr_t *mutexAttr, int protocol);
 extern int pthread_mutexattr_setpshared(pthread_mutexattr_t *mutexAttr, int processShared);
 extern int pthread_mutexattr_settype(pthread_mutexattr_t *mutexAttr, int type);
+
+/* condition variable functions */
+extern int pthread_cond_destroy(pthread_cond_t *cond);
+extern int pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr);
+extern int pthread_cond_broadcast(pthread_cond_t *cond);
+extern int pthread_cond_signal(pthread_cond_t *cond);
+extern int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex,
+	const struct timespec *abstime);
+extern int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex);
+
+/* condition variable attribute functions */
+extern int pthread_condattr_destroy(pthread_condattr_t *condAttr);
+extern int pthread_condattr_init(pthread_condattr_t *condAttr);
+extern int pthread_condattr_getpshared(const pthread_condattr_t *condAttr, int *processShared);
+extern int pthread_condattr_setpshared(pthread_condattr_t *condAttr, int processShared);
 
 /* misc. functions */
 extern int pthread_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void));
