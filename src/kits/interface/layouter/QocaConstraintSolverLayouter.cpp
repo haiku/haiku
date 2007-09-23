@@ -511,8 +511,8 @@ public:
 
 	~MyLayoutInfo()
 	{
-		delete fLocations;
-		delete fSizes;
+		delete[] fLocations;
+		delete[] fSizes;
 	}
 
 	virtual float ElementLocation(int32 element)
