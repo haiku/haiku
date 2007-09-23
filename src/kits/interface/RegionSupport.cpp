@@ -85,7 +85,7 @@ using std::nothrow;
 #ifdef DEBUG
 #include <stdio.h>
 #define assert(expr) {if (!(expr)) fprintf(stderr,\
-"Assertion failed file %s, line %d: expr\n", __FILE__, __LINE__); }
+"Assertion failed file %s, line %d: " #expr "\n", __FILE__, __LINE__); }
 #else
 #define assert(expr)
 #endif
