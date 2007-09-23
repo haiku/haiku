@@ -95,12 +95,14 @@ typedef struct codec_table_tag
 
 void default_init(device_config *);
 void ad1886_init(device_config *);
+void ad1981b_init(device_config *);
 
 void default_amp_enable(device_config *, bool);
 void cs4299_amp_enable(device_config *, bool);
 
 codec_ops default_ops = { default_init, default_amp_enable };
 codec_ops ad1886_ops = { ad1886_init, default_amp_enable };
+codec_ops ad1981b_ops = { ad1981b_init, default_amp_enable };
 codec_ops cs4299_ops = { default_init, cs4299_amp_enable };
 
 codec_table codecs[] = 
@@ -150,6 +152,7 @@ codec_table codecs[] =
 	{ 0x41445363, 0xffffffff, &default_ops, "Analog Devices AD1886A SoundMAX"B_UTF8_REGISTERED },
 	{ 0x41445371, 0xffffffff, &default_ops, "Analog Devices AD1981A SoundMAX"B_UTF8_REGISTERED },
 	{ 0x41445372, 0xffffffff, &default_ops, "Analog Devices AD1981A SoundMAX"B_UTF8_REGISTERED },
+	{ 0x41445374, 0xffffffff, &ad1981b_ops, "Analog Devices AD1981B SoundMAX"B_UTF8_REGISTERED },
 	{ 0x414c4320, 0xfffffff0, &default_ops, "Avance Logic (Realtek) ALC100/ALC100P, RL5383/RL5522" },
 	{ 0x414c4730, 0xffffffff, &default_ops, "Avance Logic (Realtek) ALC101" },
 #if 0
@@ -251,7 +254,18 @@ void default_init(device_config *config)
 void ad1886_init(device_config *config)
 {
 	LOG(("ad1886_init\n"));
-	auich_codec_write(config, 0x72, 0x0010);
+	auich_codec_write(config, AC97_AD_JACKSENSE, 0x0010);
+}
+
+void ad1981b_init(device_config *config)
+{
+	uint32 id;
+	LOG(("ad1981b_init\n"));
+	id = (config->subvendor_id << 16) | config->subsystem_id;
+	if (id == 0x103c0934) {
+		auich_codec_write(config, AC97_AD_JACKSENSE,
+			auich_codec_read(config, AC97_AD_JACKSENSE) | 0x0800);
+	}
 }
 
 void default_amp_enable(device_config *config, bool yesno)

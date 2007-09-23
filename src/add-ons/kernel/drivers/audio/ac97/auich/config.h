@@ -46,6 +46,9 @@ typedef struct
 	void *	log_mbbar; // ich4
 	area_id area_mmbar; // ich4
 	area_id area_mbbar; // ich4
+
+	ushort	subvendor_id;
+	ushort	subsystem_id;
 } device_config;
 
 #define TYPE_ICH4			0x01

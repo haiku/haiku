@@ -607,6 +607,8 @@ auich_setup(auich_dev * card)
 
 	make_device_names(card);
 	
+	card->config.subvendor_id = card->info.u.h0.subsystem_vendor_id;
+	card->config.subsystem_id = card->info.u.h0.subsystem_id;
 	card->config.nabmbar = card->info.u.h0.base_registers[0];
 	card->config.irq = card->info.u.h0.interrupt_line;
 	card->config.type = 0;
