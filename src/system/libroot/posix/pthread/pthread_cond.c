@@ -56,6 +56,7 @@ pthread_cond_init(pthread_cond_t *_cond, const pthread_condattr_t *_attr)
 
 	cond->mutex = NULL;
 	cond->waiter_count = 0;
+	cond->event_counter = 0;
 	memcpy(&cond->attr, attr, sizeof(pthread_condattr));	
 
 	*_cond = cond;
@@ -99,9 +100,18 @@ cond_wait(pthread_cond *cond, pthread_mutex_t *_mutex, bigtime_t timeout)
 
 	cond->mutex = _mutex;
 	cond->waiter_count++;
+
+	int32 event = atomic_get(&cond->event_counter);
+
 	pthread_mutex_unlock(_mutex);
-	status = acquire_sem_etc(cond->sem, 1, timeout == B_INFINITE_TIMEOUT ? 0 : B_ABSOLUTE_TIMEOUT, timeout);
+
+	do {
+		status = acquire_sem_etc(cond->sem, 1,
+			timeout == B_INFINITE_TIMEOUT ? 0 : B_ABSOLUTE_TIMEOUT, timeout);
+	} while (status == B_OK && atomic_get(&cond->event_counter) == event);
+
 	pthread_mutex_lock(_mutex);
+
 	cond->waiter_count--;
 	// If there are no more waiters, we can change mutexes
 	if (cond->waiter_count == 0)
@@ -116,6 +126,7 @@ cond_signal(pthread_cond *cond, bool broadcast)
 	if (cond == NULL)
 		return B_BAD_VALUE;
 
+	atomic_add(&cond->event_counter, 1);
 	return release_sem_etc(cond->sem, broadcast ? cond->waiter_count : 1, 0);
 }
 

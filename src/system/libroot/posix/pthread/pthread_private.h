@@ -21,6 +21,7 @@ typedef struct _pthread_cond {
 	sem_id			sem;
 	pthread_mutex_t	*mutex;
 	int32			waiter_count;
+	int32			event_counter;
 	pthread_condattr attr;
 } pthread_cond;
 
