@@ -262,7 +262,14 @@ void ad1981b_init(device_config *config)
 	uint32 id;
 	LOG(("ad1981b_init\n"));
 	id = (config->subvendor_id << 16) | config->subsystem_id;
-	if (id == 0x103c0934) {
+	if (id == 0x103c0934
+		|| id == 0x103c006d
+		|| id == 0x103c088c
+		|| id == 0x103c0890
+		|| id == 0x103c0934
+		|| id == 0x103c0938
+		|| id == 0x103c0944
+		|| id == 0x103c099c) {
 		auich_codec_write(config, AC97_AD_JACKSENSE,
 			auich_codec_read(config, AC97_AD_JACKSENSE) | 0x0800);
 	}
