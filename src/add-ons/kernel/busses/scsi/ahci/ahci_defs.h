@@ -94,6 +94,7 @@ typedef struct {
 enum {
 	PORT_CMD_ICC_ACTIVE	 = (1 << 28),	// Interface Communication control
 	PORT_CMD_ICC_SLUMBER = (6 << 28),	// Interface Communication control
+	PORT_CMD_ICC_MASK    = (0xf<<28),	// Interface Communication control
 	PORT_CMD_CR		= (1 << 15),	// Command List Running (DMA active)
 	PORT_CMD_FR		= (1 << 14),	// FIS Receive Running
 	PORT_CMD_FER	= (1 << 4),		// FIS Receive Enable

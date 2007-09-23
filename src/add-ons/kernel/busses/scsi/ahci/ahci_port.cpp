@@ -68,6 +68,12 @@ AHCIPort::Init()
 
 	// clear error bits
 	fRegs->serr = fRegs->serr;
+
+	// spin up device
+	fRegs->cmd |= PORT_CMD_SUD;
+
+	// activate link
+	fRegs->cmd = (fRegs->cmd & ~PORT_CMD_ICC_MASK) | PORT_CMD_ICC_ACTIVE;
 	
 	// enable FIS receive
 	fRegs->cmd |= PORT_CMD_FER;
@@ -135,7 +141,7 @@ void
 AHCIPort::Interrupt()
 {
 	uint32 is = fRegs->is;
-	TRACE("AHCIPort::Interrupt port %d, status %#08x\n", fIndex, is);
+	TRACE("AHCIPort::Interrupt port %d, status %#08lx\n", fIndex, is);
 
 	// clear interrupts
 	fRegs->is = is;
