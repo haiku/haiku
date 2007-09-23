@@ -83,7 +83,8 @@ pthread_cond_destroy(pthread_cond_t *_cond)
 static status_t
 cond_wait(pthread_cond *cond, pthread_mutex_t *_mutex, bigtime_t timeout)
 {
-	status_t status = B_OK;
+	status_t status;
+	int32 event;
 
 	if (cond == NULL || *_mutex == NULL)
 		return B_BAD_VALUE;
@@ -101,7 +102,7 @@ cond_wait(pthread_cond *cond, pthread_mutex_t *_mutex, bigtime_t timeout)
 	cond->mutex = _mutex;
 	cond->waiter_count++;
 
-	int32 event = atomic_get(&cond->event_counter);
+	event = atomic_get(&cond->event_counter);
 
 	pthread_mutex_unlock(_mutex);
 
@@ -120,6 +121,7 @@ cond_wait(pthread_cond *cond, pthread_mutex_t *_mutex, bigtime_t timeout)
 	return status;
 }
 
+
 static status_t
 cond_signal(pthread_cond *cond, bool broadcast)
 {
@@ -129,6 +131,7 @@ cond_signal(pthread_cond *cond, bool broadcast)
 	atomic_add(&cond->event_counter, 1);
 	return release_sem_etc(cond->sem, broadcast ? cond->waiter_count : 1, 0);
 }
+
 
 int
 pthread_cond_wait(pthread_cond_t *_cond, pthread_mutex_t *_mutex)
