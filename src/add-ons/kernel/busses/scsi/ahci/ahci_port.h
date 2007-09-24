@@ -14,18 +14,22 @@ public:
 				AHCIPort(AHCIController *controller, int index);
 				~AHCIPort();
 
-	status_t	Init();
+	status_t	Init1();
+	status_t	Init2();
 	void		Uninit();
 
 	void		Interrupt();
 
 
-	void		ExecuteRequest(scsi_ccb *request);
-	uchar		AbortRequest(scsi_ccb *request);
-	uchar		TerminateRequest(scsi_ccb *request);
-	uchar		ResetDevice();
+	void		ScsiExecuteRequest(scsi_ccb *request);
+	uchar		ScsiAbortRequest(scsi_ccb *request);
+	uchar		ScsiTerminateRequest(scsi_ccb *request);
+	uchar		ScsiResetDevice();
 
 private:
+	status_t	ResetDevice();
+	status_t	PostResetDevice();
+	void		FlushPostedWrites();
 
 private:
 	int						fIndex;
@@ -38,4 +42,10 @@ private:
 	volatile prd *					fPRDTable;
 };
 
+inline void
+AHCIPort::FlushPostedWrites()
+{
+	volatile uint32 dummy = fRegs->cmd;
+	dummy = dummy;
+}
 #endif	// _AHCI_PORT_H

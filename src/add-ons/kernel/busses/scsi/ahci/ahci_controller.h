@@ -29,7 +29,7 @@ public:
 private:
 	bool		IsDevicePresent(uint device);
 	status_t	ResetController();
-	void		RegsFlush();
+	void		FlushPostedWrites();
 
 static int32	Interrupt(void *data);
 
@@ -58,7 +58,7 @@ private:
 
 
 inline void
-AHCIController::RegsFlush()
+AHCIController::FlushPostedWrites()
 {
 	volatile uint32 dummy = fRegs->ghc;
 	dummy = dummy;

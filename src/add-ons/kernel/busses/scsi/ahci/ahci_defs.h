@@ -132,7 +132,7 @@ enum {
 						 PORT_INT_SDB | PORT_INT_DS | PORT_INT_PS | PORT_INT_DHR)
 
 enum {
-	ATA_BUSY 		= 0x80,
+	ATA_BSY 		= 0x80,
 	ATA_DRQ			= 0x08,
 	ATA_ERR			= 0x01,
 };
@@ -237,7 +237,7 @@ wait_until_set(volatile uint32 *reg, uint32 bits, bigtime_t timeout)
 {
 	int trys = (timeout + 9999) / 10000;
 	while (trys--) {
-		if ((*reg & bits) == bits)
+		if (((*reg) & bits) == bits)
 			return B_OK;
 		snooze(10000);
 	}
@@ -250,7 +250,7 @@ wait_until_clear(volatile uint32 *reg, uint32 bits, bigtime_t timeout)
 {
 	int trys = (timeout + 9999) / 10000;
 	while (trys--) {
-		if ((*reg & bits) == 0)
+		if (((*reg) & bits) == 0)
 			return B_OK;
 		snooze(10000);
 	}

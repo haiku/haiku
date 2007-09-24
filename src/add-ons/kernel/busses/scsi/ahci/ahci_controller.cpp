@@ -28,8 +28,8 @@ AHCIController::AHCIController(device_node_handle node, pci_device_info *device)
 {
 	memset(fPort, 0, sizeof(fPort));
 
-	ASSERT(sizeof(ahci_port) == 120);
-	ASSERT(sizeof(ahci_hba) == 4096);
+	ASSERT(sizeof(ahci_port) == 128);
+	ASSERT(sizeof(ahci_hba) == 4352);
 	ASSERT(sizeof(fis) == 256);
 	ASSERT(sizeof(command_list_entry) == 32);
 	ASSERT(sizeof(command_table) == 128);
@@ -144,19 +144,31 @@ AHCIController::Init()
 				TRACE("out of memory creating port %d", i);
 				break;
 			}
-			status_t status = fPort[i]->Init();
+			status_t status = fPort[i]->Init1();
 			if (status < B_OK) {
-				TRACE("init port %d failed", i);
+				TRACE("init-1 port %d failed", i);
 				delete fPort[i];
 				fPort[i] = NULL;
-				break;
 			}
 		}
 	}
 
 	// enable interrupts
 	fRegs->ghc |= GHC_IE;
-	RegsFlush();
+	FlushPostedWrites();
+
+	for (int i = 0; i <= fPortCountMax; i++) {
+		if (fPort[i]) {
+			status_t status = fPort[i]->Init2();
+			if (status < B_OK) {
+				TRACE("init-2 port %d failed", i);
+				fPort[i]->Uninit();
+				delete fPort[i];
+				fPort[i] = NULL;
+			}
+		}
+	}
+
 
 	return B_OK;
 
@@ -180,11 +192,11 @@ AHCIController::Uninit()
 
 	// disable interrupts
 	fRegs->ghc &= ~GHC_IE;
-	RegsFlush();
+	FlushPostedWrites();
 
 	// clear pending interrupts
 	fRegs->is = 0xffffffff;
-	RegsFlush();
+	FlushPostedWrites();
 
   	// well...
   	remove_io_interrupt_handler(fIRQ, Interrupt, this);
@@ -204,8 +216,9 @@ AHCIController::ResetController()
 	uint32 saveCaps = fRegs->cap & (CAP_SMPS | CAP_SSS | CAP_SPM | CAP_EMS | CAP_SXS);
 	uint32 savePI = fRegs->pi;
 	
+#if 1
 	fRegs->ghc |= GHC_HR;
-	RegsFlush();
+	FlushPostedWrites();
 	for (int i = 0; i < 20; i++) {
 		snooze(50000);
 		if ((fRegs->ghc & GHC_HR) == 0)
@@ -213,12 +226,17 @@ AHCIController::ResetController()
 	}
 	if (fRegs->ghc & GHC_HR)
 		return B_TIMED_OUT;
+#else
+	fRegs->ghc &= ~GHC_AE;
+	fRegs->is = 0xffffffff;
+	FlushPostedWrites();
+#endif
 
 	fRegs->ghc |= GHC_AE;
-	RegsFlush();
+	FlushPostedWrites();
 	fRegs->cap |= saveCaps;
 	fRegs->pi = savePI;
-	RegsFlush();
+	FlushPostedWrites();
 
 	if (fPCIVendorID == 0x8086) {
 		// Intel PCS—Port Control and Status
@@ -264,7 +282,7 @@ AHCIController::ExecuteRequest(scsi_ccb *request)
 		return;
 	}
 
-	fPort[request->target_id]->ExecuteRequest(request);
+	fPort[request->target_id]->ScsiExecuteRequest(request);
 }
 
 
@@ -274,7 +292,7 @@ AHCIController::AbortRequest(scsi_ccb *request)
 	if (request->target_lun || !fPort[request->target_id])
 		return SCSI_DEV_NOT_THERE;
 
-	return fPort[request->target_id]->AbortRequest(request);
+	return fPort[request->target_id]->ScsiAbortRequest(request);
 }
 
 
@@ -284,7 +302,7 @@ AHCIController::TerminateRequest(scsi_ccb *request)
 	if (request->target_lun || !fPort[request->target_id])
 		return SCSI_DEV_NOT_THERE;
 
-	return fPort[request->target_id]->TerminateRequest(request);
+	return fPort[request->target_id]->ScsiTerminateRequest(request);
 }
 
 
@@ -294,6 +312,6 @@ AHCIController::ResetDevice(uchar targetID, uchar targetLUN)
 	if (targetLUN || !fPort[targetID])
 		return SCSI_DEV_NOT_THERE;
 
-	return fPort[targetID]->ResetDevice();
+	return fPort[targetID]->ScsiResetDevice();
 }
 
