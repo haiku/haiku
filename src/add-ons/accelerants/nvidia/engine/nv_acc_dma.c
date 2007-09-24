@@ -1,7 +1,7 @@
 /* NV Acceleration functions */
 
 /* Author:
-   Rudolf Cornelissen 8/2003-4/2006.
+   Rudolf Cornelissen 8/2003-9/2007.
 
    This code was possible thanks to:
     - the Linux XFree86 NV driver,
@@ -269,6 +269,14 @@ status_t nv_acc_init_dma()
 
 		ACCW(HT_HANDL_13, (0x80000000 | NV_SCALED_IMAGE_FROM_MEMORY)); /* 32bit handle */
 		ACCW(HT_VALUE_13, 0x8001114b); /* instance $114b, engine = acc engine, CHID = $00 */
+
+		//2007 3D tests..
+		if (si->ps.card_type == NV15)
+		{
+			ACCW(HT_HANDL_14, (0x80000000 | NV_TCL_PRIMITIVE_3D)); /* 32bit handle */
+			ACCW(HT_VALUE_14, 0x8001114d); /* instance $114d, engine = acc engine, CHID = $00 */
+		}
+
 	}
 
 	/* program CTX registers: CTX1 is mostly done later (colorspace dependant) */
@@ -468,23 +476,34 @@ status_t nv_acc_init_dma()
 		ACCW(PR_CTX1_A, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
 		ACCW(PR_CTX2_A, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 		ACCW(PR_CTX3_A, 0x00000000); /* method traps disabled */
+		//2007 3D tests..
+		/* setup set 'B' ... */
+		if (si->ps.card_type == NV15)
+		{
+			/* ... for cmd NV11_TCL_PRIMITIVE_3D */
+			ACCW(PR_CTX0_B, 0x0300a096); /* NVclass $096, patchcfg ROP_AND, userclip enable,
+										  * context surface0 valid, nv10+: little endian */
+			ACCW(PR_CTX1_B, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
+			ACCW(PR_CTX2_B, 0x11401140); /* DMA0, DMA1 instance = $1140 */
+			ACCW(PR_CTX3_B, 0x00000000); /* method traps disabled */
+		}
 		/* setup DMA set pointed at by PF_CACH1_DMAI */
 		if (si->engine.agp_mode)
 		{
 			/* DMA page table present and of linear type;
 			 * DMA class is $002 (b0-11);
 			 * DMA target node is AGP */
-			ACCW(PR_CTX0_B, 0x00033002);
+			ACCW(PR_CTX0_C, 0x00033002);
 		}
 		else
 		{
 			/* DMA page table present and of linear type;
 			 * DMA class is $002 (b0-11);
 			 * DMA target node is PCI */
-			ACCW(PR_CTX0_B, 0x00023002);
+			ACCW(PR_CTX0_C, 0x00023002);
 		}
-		ACCW(PR_CTX1_B, 0x000fffff); /* DMA limit: tablesize is 1M bytes */
-		ACCW(PR_CTX2_B, (((uint32)((uint8 *)(si->dma_buffer_pci))) | 0x00000002));
+		ACCW(PR_CTX1_C, 0x000fffff); /* DMA limit: tablesize is 1M bytes */
+		ACCW(PR_CTX2_C, (((uint32)((uint8 *)(si->dma_buffer_pci))) | 0x00000002));
 									 /* DMA access type is READ_AND_WRITE;
 									  * table is located in main system RAM (b12-31):
 									  * It's adress needs to be at a 4kb boundary! */
@@ -935,7 +954,8 @@ status_t nv_acc_init_dma()
 	if (si->ps.card_arch >= NV40A)
 		ACCW(PF_CACH1_DMAI, 0x00001150);
 	else
-		ACCW(PF_CACH1_DMAI, 0x0000114d);
+		//2007 3d test..
+		ACCW(PF_CACH1_DMAI, 0x0000114e);
 	/* cache0 push0 access disabled */
 	ACCW(PF_CACH0_PSH0, 0x00000000);
 	/* cache0 pull0 access disabled */
