@@ -87,7 +87,7 @@ typedef struct {
 	uint32		sntf;			// SNotification
 	uint32		res2;			// Reserved for FIS-based Switching Definition
 	uint32		res[11];		// Reserved
-	uint32		vendor[2];		// Vendor Specific
+	uint32		vendor[4];		// Vendor Specific
 } _PACKED ahci_port;
 
 
@@ -95,6 +95,7 @@ enum {
 	PORT_CMD_ICC_ACTIVE	 = (1 << 28),	// Interface Communication control
 	PORT_CMD_ICC_SLUMBER = (6 << 28),	// Interface Communication control
 	PORT_CMD_ICC_MASK    = (0xf<<28),	// Interface Communication control
+	PORT_CMD_ATAPI	= (1 << 24),	// Device is ATAPI
 	PORT_CMD_CR		= (1 << 15),	// Command List Running (DMA active)
 	PORT_CMD_FR		= (1 << 14),	// FIS Receive Running
 	PORT_CMD_FER	= (1 << 4),		// FIS Receive Enable
@@ -129,6 +130,12 @@ enum {
 #define PORT_INT_ERROR 	(PORT_INT_TFE | PORT_INT_HBD)
 #define PORT_INT_MASK	(PORT_INT_FATAL | PORT_INT_ERROR | PORT_INT_DP |\
 						 PORT_INT_SDB | PORT_INT_DS | PORT_INT_PS | PORT_INT_DHR)
+
+enum {
+	ATA_BUSY 		= 0x80,
+	ATA_DRQ			= 0x08,
+	ATA_ERR			= 0x01,
+};
 
 
 typedef struct {
@@ -222,6 +229,32 @@ int count_bits_set(T value)
 		if (value & mask)
 			count++;
 	return count;
+}
+
+inline
+status_t
+wait_until_set(volatile uint32 *reg, uint32 bits, bigtime_t timeout)
+{
+	int trys = (timeout + 9999) / 10000;
+	while (trys--) {
+		if ((*reg & bits) == bits)
+			return B_OK;
+		snooze(10000);
+	}
+	return B_TIMED_OUT;
+}
+
+inline
+status_t
+wait_until_clear(volatile uint32 *reg, uint32 bits, bigtime_t timeout)
+{
+	int trys = (timeout + 9999) / 10000;
+	while (trys--) {
+		if ((*reg & bits) == 0)
+			return B_OK;
+		snooze(10000);
+	}
+	return B_TIMED_OUT;
 }
 
 #endif	/* __cplusplus */
