@@ -187,6 +187,12 @@ AHCIPort::ResetDevice()
 	fRegs->cmd |= PORT_CMD_ST;
 	FlushPostedWrites();
 
+	if (fRegs->ssts & 1)
+		if (wait_until_set(&fRegs->ssts, 0x3, 1000000) < B_OK) {
+			TRACE("AHCIPort::ResetDevice port %d device present but no phy communication\n", fIndex);
+		}
+	}
+
 	return B_OK;
 }
 
