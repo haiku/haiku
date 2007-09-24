@@ -118,6 +118,10 @@ AHCIController::Init()
 	TRACE("cap: Supports External SATA: %s\n",			(fRegs->cap & CAP_SXS) ? "yes" : "no");
 	TRACE("cap: Enclosure Management Supported: %s\n",	(fRegs->cap & CAP_EMS) ? "yes" : "no");
 
+	TRACE("cap: Supports Command List Override: %s\n",	(fRegs->cap & CAP_SCLO) ? "yes" : "no");
+	TRACE("cap: Supports Staggered Spin-up: %s\n",	(fRegs->cap & CAP_SSS) ? "yes" : "no");
+	TRACE("cap: Supports Mechanical Presence Switch: %s\n",	(fRegs->cap & CAP_SMPS) ? "yes" : "no");
+
 	TRACE("cap: Supports 64-bit Addressing: %s\n",		(fRegs->cap & CAP_S64A) ? "yes" : "no");
 	TRACE("cap: Supports Native Command Queuing: %s\n",	(fRegs->cap & CAP_SNCQ) ? "yes" : "no");
 	TRACE("cap: Supports SNotification Register: %s\n",	(fRegs->cap & CAP_SSNTF) ? "yes" : "no");

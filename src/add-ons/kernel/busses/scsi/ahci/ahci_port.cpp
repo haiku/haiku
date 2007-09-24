@@ -70,6 +70,9 @@ AHCIPort::Init1()
 //	fRegs->serr = fRegs->serr;
 	fRegs->serr = 0xffffffff;
 
+	// power up device
+	fRegs->cmd |= PORT_CMD_POD;
+
 	// spin up device
 	fRegs->cmd |= PORT_CMD_SUD;
 
@@ -172,9 +175,10 @@ AHCIPort::ResetDevice()
 	FlushPostedWrites();
 	snooze(10000);
 	fRegs->sctl &= ~0xf;
+	fRegs->serr = 0xffffffff;
 	FlushPostedWrites();
 
-	if (wait_until_set(&fRegs->ssts, 0x1, 6000000) < B_OK) {
+	if (wait_until_set(&fRegs->ssts, 0x1, 100000) < B_OK) {
 		TRACE("AHCIPort::ResetDevice port %d no device detected\n", fIndex);
 	}
 
@@ -183,15 +187,18 @@ AHCIPort::ResetDevice()
 	fRegs->serr = 0xffffffff;
 	FlushPostedWrites();
 
-	// start DMA engine
-	fRegs->cmd |= PORT_CMD_ST;
-	FlushPostedWrites();
-
 	if (fRegs->ssts & 1) {
-		if (wait_until_set(&fRegs->ssts, 0x3, 1000000) < B_OK) {
+		if (wait_until_set(&fRegs->ssts, 0x3, 500000) < B_OK) {
 			TRACE("AHCIPort::ResetDevice port %d device present but no phy communication\n", fIndex);
 		}
 	}
+
+	// clear error bits
+	fRegs->serr = 0xffffffff;
+
+	// start DMA engine
+	fRegs->cmd |= PORT_CMD_ST;
+	FlushPostedWrites();
 
 	return B_OK;
 }
