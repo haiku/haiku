@@ -17,6 +17,8 @@
 extern "C" {
 #endif
 
+void spin(bigtime_t delay);
+
 // general
 status_t intel_init_accelerant(int fd);
 ssize_t intel_accelerant_clone_info_size(void);

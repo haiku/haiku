@@ -86,6 +86,7 @@ extern void setup_ring_buffer(ring_buffer &ringBuffer, const char *name);
 
 // modes.cpp
 extern void wait_for_vblank(void);
+extern void set_frame_buffer_base(void);
 extern status_t create_mode_list(void);
 
 // memory.cpp

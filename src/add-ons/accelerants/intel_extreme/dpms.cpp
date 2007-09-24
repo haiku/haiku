@@ -32,17 +32,18 @@ enable_display_plane(bool enable)
 			write32(INTEL_DISPLAY_A_CONTROL, planeAControl | DISPLAY_CONTROL_ENABLED);
 		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL)
 			write32(INTEL_DISPLAY_B_CONTROL, planeBControl | DISPLAY_CONTROL_ENABLED);
+
+		read32(INTEL_DISPLAY_A_BASE);
+			// flush the eventually cached PCI bus writes
 	} else {
 		// when disabling it, we have to trigger the update using a write to
 		// the display base address
-		if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
+		if (gInfo->head_mode & HEAD_MODE_A_ANALOG)
 			write32(INTEL_DISPLAY_A_CONTROL, planeAControl & ~DISPLAY_CONTROL_ENABLED);
-			write32(INTEL_DISPLAY_A_BASE, gInfo->shared_info->frame_buffer_offset);
-		}
-		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
+		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL)
 			write32(INTEL_DISPLAY_B_CONTROL, planeBControl & ~DISPLAY_CONTROL_ENABLED);
-			write32(INTEL_DISPLAY_B_BASE, gInfo->shared_info->frame_buffer_offset);
-		}
+
+		set_frame_buffer_base();
 	}
 }
 
@@ -64,6 +65,9 @@ enable_display_pipe(bool enable)
 		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL)
 			write32(INTEL_DISPLAY_B_PIPE_CONTROL, pipeBControl & ~DISPLAY_PIPE_ENABLED);
 	}
+
+	read32(INTEL_DISPLAY_A_BASE);
+		// flush the eventually cached PCI bus writes
 }
 
 
@@ -73,6 +77,20 @@ set_display_power_mode(uint32 mode)
 	uint32 monitorMode = 0;
 
 	if (mode == B_DPMS_ON) {
+		uint32 pll = read32(INTEL_DISPLAY_A_PLL);
+		if ((pll & DISPLAY_PLL_ENABLED) == 0) {
+			// reactivate PLL
+			write32(INTEL_DISPLAY_A_PLL, pll);
+			read32(INTEL_DISPLAY_A_PLL);
+			spin(150);
+			write32(INTEL_DISPLAY_A_PLL, pll | DISPLAY_PLL_ENABLED);
+			read32(INTEL_DISPLAY_A_PLL);
+			spin(150);
+			write32(INTEL_DISPLAY_A_PLL, pll | DISPLAY_PLL_ENABLED);
+			read32(INTEL_DISPLAY_A_PLL);
+			spin(150);
+		}
+
 		enable_display_pipe(true);
 		enable_display_plane(true);
 	}
@@ -107,7 +125,14 @@ set_display_power_mode(uint32 mode)
 
 	if (mode != B_DPMS_ON) {
 		enable_display_plane(false);
+		wait_for_vblank();
 		enable_display_pipe(false);
+	}
+
+	if (mode == B_DPMS_OFF) {
+		write32(INTEL_DISPLAY_A_PLL, read32(INTEL_DISPLAY_A_PLL) | DISPLAY_PLL_ENABLED);
+		read32(INTEL_DISPLAY_A_PLL);
+		spin(150);
 	}
 
 	read32(INTEL_DISPLAY_A_BASE);

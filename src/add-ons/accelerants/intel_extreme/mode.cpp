@@ -68,7 +68,9 @@ struct pll_divisors {
 struct pll_limits {
 	pll_divisors	min;
 	pll_divisors	max;
-	float			min_post2_frequency;
+	uint32			min_post2_frequency;
+	uint32			min_vco;
+	uint32			max_vco;
 };
 
 static const display_mode kBaseModeList[] = {
@@ -156,6 +158,37 @@ set_i2c_signals(void* cookie, int clock, int data)
 }
 
 
+void
+set_frame_buffer_base()
+{
+	intel_shared_info &sharedInfo = *gInfo->shared_info;
+	display_mode &mode = sharedInfo.current_mode;
+	uint32 baseRegister;
+	uint32 surfaceRegister;
+
+	if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
+		baseRegister = INTEL_DISPLAY_A_BASE;
+		surfaceRegister = INTEL_DISPLAY_A_SURFACE;
+	} else {
+		baseRegister = INTEL_DISPLAY_B_BASE;
+		surfaceRegister = INTEL_DISPLAY_B_SURFACE;
+	}
+
+	if (sharedInfo.device_type == (INTEL_TYPE_9xx | INTEL_TYPE_965)) {
+		write32(baseRegister, mode.v_display_start * sharedInfo.bytes_per_row
+			+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
+		read32(baseRegister);
+		write32(surfaceRegister, sharedInfo.frame_buffer_offset);
+		read32(surfaceRegister);
+	} else {
+		write32(baseRegister, sharedInfo.frame_buffer_offset
+			+ mode.v_display_start * sharedInfo.bytes_per_row
+			+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
+		read32(baseRegister);
+	}
+}
+
+
 /*!
 	Creates the initial mode list of the primary accelerant.
 	It's called from intel_init_accelerant().
@@ -227,18 +260,18 @@ get_pll_limits(pll_limits &limits)
 		// TODO: support LVDS output limits as well
 		static const pll_limits kLimits = {
 			// p, p1, p2, high,   n,   m, m1, m2
-			{  5,  1,  5, false,  5,  70, 12,  7},	// min
-			{ 80,  8, 10, true,  10, 120, 22, 11},	// max
-			200000
+			{  5,  1, 10, false,  5,  70, 12,  7},	// min
+			{ 80,  8,  5, true,  10, 120, 22, 11},	// max
+			200000, 1400000, 2800000
 		};
 		limits = kLimits;
 	} else {
 		// TODO: support LVDS output limits as well
 		static const pll_limits kLimits = {
 			// p, p1, p2, high,   n,   m, m1, m2
-			{  4,  2,  2, false,  5,  96, 20,  8},
-			{128, 33,  4, true,  18, 140, 28, 18},
-			165000
+			{  4,  2,  4, false,  5,  96, 20,  8},
+			{128, 33,  2, true,  18, 140, 28, 18},
+			165000, 930000, 1400000
 		};
 		limits = kLimits;
 	}
@@ -261,6 +294,7 @@ valid_pll_divisors(const pll_divisors& divisors, const pll_limits& limits)
 
 	if (divisors.post < limits.min.post || divisors.post > limits.max.post
 		|| divisors.m < limits.min.m || divisors.m > limits.max.m
+		|| vco < limits.min_vco || vco > limits.max_vco
 		|| frequency < info.min_frequency || frequency > info.max_frequency)
 		return false;
 
@@ -279,9 +313,11 @@ compute_pll_divisors(const display_mode &current, pll_divisors& divisors)
 	TRACE(("required MHz: %g\n", requestedPixelClock));
 
 	if (current.timing.pixel_clock < limits.min_post2_frequency) {
+		// slow DAC timing
 	    divisors.post2 = limits.min.post2;
 	    divisors.post2_high = limits.min.post2_high;
 	} else {
+		// fast DAC timing
 	    divisors.post2 = limits.max.post2;
 	    divisors.post2_high = limits.max.post2_high;
 	}
@@ -289,13 +325,13 @@ compute_pll_divisors(const display_mode &current, pll_divisors& divisors)
 	float best = requestedPixelClock;
 	pll_divisors bestDivisors;
 
-	for (divisors.post1 = limits.min.post1; divisors.post1 <= limits.max.post1;
-			divisors.post1++) {
-		for (divisors.n = limits.min.n; divisors.n <= limits.max.n; divisors.n++) {
-			for (divisors.m1 = limits.min.m1; divisors.m1 <= limits.max.m1;
-					divisors.m1++) {
-				for (divisors.m2 = limits.min.m2; divisors.m2 < divisors.m1
-						&& divisors.m2 <= limits.max.m2; divisors.m2++) {
+	for (divisors.m1 = limits.min.m1; divisors.m1 <= limits.max.m1; divisors.m1++) {
+		for (divisors.m2 = limits.min.m2; divisors.m2 < divisors.m1
+				&& divisors.m2 <= limits.max.m2; divisors.m2++) {
+			for (divisors.n = limits.min.n; divisors.n <= limits.max.n;
+					divisors.n++) {
+				for (divisors.post1 = limits.min.post1;
+						divisors.post1 <= limits.max.post1; divisors.post1++) {
 					divisors.m = 5 * divisors.m1 + divisors.m2;
 					divisors.post = divisors.post1 * divisors.post2;
 
@@ -455,7 +491,7 @@ if (first) {
 				* sharedInfo.bytes_per_row, gInfo->frame_buffer_handle,
 				offset) == B_OK) {
 			sharedInfo.frame_buffer_offset = offset;
-			write32(INTEL_DISPLAY_A_BASE, offset);
+			set_frame_buffer_base();
 		}
 
 		return B_NO_MEMORY;
@@ -464,33 +500,13 @@ if (first) {
 	sharedInfo.frame_buffer_offset = offset;
 
 	// make sure VGA display is disabled
-	write32(INTEL_VGA_DISPLAY_CONTROL, read32(INTEL_VGA_DISPLAY_CONTROL)
-		| VGA_DISPLAY_DISABLED);
+	write32(INTEL_VGA_DISPLAY_CONTROL, VGA_DISPLAY_DISABLED);
+	read32(INTEL_VGA_DISPLAY_CONTROL);
+
+	if (gInfo->shared_info->device_type != (INTEL_TYPE_8xx | INTEL_TYPE_85x)) {
+	}
 
 	if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
-		// update timing parameters
-		write32(INTEL_DISPLAY_A_HTOTAL, ((uint32)(target.timing.h_total - 1) << 16)
-			| ((uint32)target.timing.h_display - 1));
-		write32(INTEL_DISPLAY_A_HBLANK, ((uint32)(target.timing.h_total - 1) << 16)
-			| ((uint32)target.timing.h_display - 1));
-		write32(INTEL_DISPLAY_A_HSYNC, ((uint32)(target.timing.h_sync_end - 1) << 16)
-			| ((uint32)target.timing.h_sync_start - 1));
-
-		write32(INTEL_DISPLAY_A_VTOTAL, ((uint32)(target.timing.v_total - 1) << 16)
-			| ((uint32)target.timing.v_display - 1));
-		write32(INTEL_DISPLAY_A_VBLANK, ((uint32)(target.timing.v_total - 1) << 16)
-			| ((uint32)target.timing.v_display - 1));
-		write32(INTEL_DISPLAY_A_VSYNC, ((uint32)(target.timing.v_sync_end - 1) << 16)
-			| ((uint32)target.timing.v_sync_start - 1));
-
-		write32(INTEL_DISPLAY_A_IMAGE_SIZE, ((uint32)(target.timing.h_display - 1) << 16)
-			| ((uint32)target.timing.v_display - 1));
-
-		write32(INTEL_DISPLAY_A_ANALOG_PORT, (read32(INTEL_DISPLAY_A_ANALOG_PORT)
-			& ~(DISPLAY_MONITOR_POLARITY_MASK | DISPLAY_MONITOR_VGA_POLARITY))
-			| ((target.timing.flags & B_POSITIVE_HSYNC) != 0 ? DISPLAY_MONITOR_POSITIVE_HSYNC : 0)
-			| ((target.timing.flags & B_POSITIVE_VSYNC) != 0 ? DISPLAY_MONITOR_POSITIVE_VSYNC : 0));
-
 		pll_divisors divisors;
 		compute_pll_divisors(target, divisors);
 
@@ -527,12 +543,39 @@ if (first) {
 
 		debug_printf("PLL is %#lx, write: %#lx\n", read32(INTEL_DISPLAY_A_PLL), pll);
 		write32(INTEL_DISPLAY_A_PLL, pll);
+		read32(INTEL_DISPLAY_A_PLL);
+		spin(150);
+		write32(INTEL_DISPLAY_A_PLL, pll);
+		read32(INTEL_DISPLAY_A_PLL);
+		spin(150);
 #if 0
 		write32(INTEL_DISPLAY_A_PLL, DISPLAY_PLL_ENABLED | DISPLAY_PLL_2X_CLOCK
 			| DISPLAY_PLL_NO_VGA_CONTROL | DISPLAY_PLL_DIVIDE_4X
 			| (((divisors.post1 - 2) << DISPLAY_PLL_POST1_DIVISOR_SHIFT) & DISPLAY_PLL_POST1_DIVISOR_MASK)
 			| (divisorRegister == INTEL_DISPLAY_A_PLL_DIVISOR_1 ? DISPLAY_PLL_DIVISOR_1 : 0));
 #endif
+		// update timing parameters
+		write32(INTEL_DISPLAY_A_HTOTAL, ((uint32)(target.timing.h_total - 1) << 16)
+			| ((uint32)target.timing.h_display - 1));
+		write32(INTEL_DISPLAY_A_HBLANK, ((uint32)(target.timing.h_total - 1) << 16)
+			| ((uint32)target.timing.h_display - 1));
+		write32(INTEL_DISPLAY_A_HSYNC, ((uint32)(target.timing.h_sync_end - 1) << 16)
+			| ((uint32)target.timing.h_sync_start - 1));
+
+		write32(INTEL_DISPLAY_A_VTOTAL, ((uint32)(target.timing.v_total - 1) << 16)
+			| ((uint32)target.timing.v_display - 1));
+		write32(INTEL_DISPLAY_A_VBLANK, ((uint32)(target.timing.v_total - 1) << 16)
+			| ((uint32)target.timing.v_display - 1));
+		write32(INTEL_DISPLAY_A_VSYNC, ((uint32)(target.timing.v_sync_end - 1) << 16)
+			| ((uint32)target.timing.v_sync_start - 1));
+
+		write32(INTEL_DISPLAY_A_IMAGE_SIZE, ((uint32)(target.timing.h_display - 1) << 16)
+			| ((uint32)target.timing.v_display - 1));
+
+		write32(INTEL_DISPLAY_A_ANALOG_PORT, (read32(INTEL_DISPLAY_A_ANALOG_PORT)
+			& ~(DISPLAY_MONITOR_POLARITY_MASK | DISPLAY_MONITOR_VGA_POLARITY))
+			| ((target.timing.flags & B_POSITIVE_HSYNC) != 0 ? DISPLAY_MONITOR_POSITIVE_HSYNC : 0)
+			| ((target.timing.flags & B_POSITIVE_VSYNC) != 0 ? DISPLAY_MONITOR_POSITIVE_VSYNC : 0));
 	}
 
 	// These two have to be set for display B, too - this obviously means
@@ -553,16 +596,13 @@ if (first) {
 
 	// changing bytes per row seems to be ignored if the plane/pipe is turned off
 
-	if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
+	if (gInfo->head_mode & HEAD_MODE_A_ANALOG)
 		write32(INTEL_DISPLAY_A_BYTES_PER_ROW, bytesPerRow);
-		write32(INTEL_DISPLAY_A_BASE, sharedInfo.frame_buffer_offset);
-			// triggers writing back double-buffered registers
-	}
-	if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
+	if (gInfo->head_mode & HEAD_MODE_B_DIGITAL)
 		write32(INTEL_DISPLAY_B_BYTES_PER_ROW, bytesPerRow);
-		write32(INTEL_DISPLAY_B_BASE, sharedInfo.frame_buffer_offset);
-			// triggers writing back double-buffered registers
-	}
+
+	set_frame_buffer_base();
+		// triggers writing back double-buffered registers
 
 	// update shared info
 	sharedInfo.bytes_per_row = bytesPerRow;
@@ -727,16 +767,7 @@ intel_move_display(uint16 horizontalStart, uint16 verticalStart)
 	mode.h_display_start = horizontalStart;
 	mode.v_display_start = verticalStart;
 
-	if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
-		write32(INTEL_DISPLAY_A_BASE, sharedInfo.frame_buffer_offset
-			+ verticalStart * sharedInfo.bytes_per_row
-			+ horizontalStart * (sharedInfo.bits_per_pixel + 7) / 8);
-	}
-	if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
-		write32(INTEL_DISPLAY_B_BASE, sharedInfo.frame_buffer_offset
-			+ verticalStart * sharedInfo.bytes_per_row
-			+ horizontalStart * (sharedInfo.bits_per_pixel + 7) / 8);
-	}
+	set_frame_buffer_base();
 
 	return B_OK;
 }

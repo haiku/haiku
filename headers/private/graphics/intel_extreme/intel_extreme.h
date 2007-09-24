@@ -194,6 +194,7 @@ struct intel_free_graphics_memory {
 #define INTEL_DISPLAY_A_CONTROL			0x70180
 #define INTEL_DISPLAY_A_BASE			0x70184
 #define INTEL_DISPLAY_A_BYTES_PER_ROW	0x70188
+#define INTEL_DISPLAY_A_SURFACE			0x7019c	// i965 and up only
 #define DISPLAY_CONTROL_ENABLED			(1UL << 31)
 #define DISPLAY_CONTROL_GAMMA			(1UL << 30)
 #define DISPLAY_CONTROL_COLOR_MASK		(0x0fUL << 26)
@@ -238,6 +239,7 @@ struct intel_free_graphics_memory {
 
 #define INTEL_DISPLAY_A_ANALOG_PORT		0x61100
 #define DISPLAY_MONITOR_PORT_ENABLED	(1UL << 31)
+#define DISPLAY_MONITOR_PIPE_B			(1UL << 30)
 #define DISPLAY_MONITOR_VGA_POLARITY	(1UL << 15)
 #define DISPLAY_MONITOR_MODE_MASK		(3UL << 10)
 #define DISPLAY_MONITOR_ON				0
@@ -257,6 +259,7 @@ struct intel_free_graphics_memory {
 #define INTEL_DISPLAY_B_CONTROL			0x71180
 #define INTEL_DISPLAY_B_BASE			0x71184
 #define INTEL_DISPLAY_B_BYTES_PER_ROW	0x71188
+#define INTEL_DISPLAY_B_SURFACE			0x7119c	// i965 and up only
 
 #define INTEL_DISPLAY_B_PALETTE			0x0a800
 
