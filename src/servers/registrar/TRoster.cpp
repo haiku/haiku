@@ -198,6 +198,7 @@ PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
 				|| (info = fEarlyPreRegisteredApps.InfoFor(&ref)) != NULL)) {
 			SET_ERROR(error, B_ALREADY_RUNNING);
 			otherTeam = info->team;
+			token = info->token;
 		}
 	}
 
@@ -236,14 +237,12 @@ PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
 			info->registration_time = system_time();
 			// add it to the right list
 			bool addingSuccess = false;
-			if (team >= 0)
-{
+			if (team >= 0) {
 PRINT(("added ref: %ld, %lld, %s\n", info->ref.device, info->ref.directory, info->ref.name));
 				addingSuccess = (AddApp(info) == B_OK);
 				if (addingSuccess && fullReg)
 					_AppAdded(info);
-}
-			else {
+			} else {
 				token = info->token = _NextToken();
 				addingSuccess = fEarlyPreRegisteredApps.AddInfo(info);
 PRINT(("added to early pre-regs, token: %lu\n", token));
@@ -370,8 +369,9 @@ TRoster::HandleIsAppRegistered(BMessage *request)
 		team = -1;
 	if (request->FindInt32("token", (int32*)&token) != B_OK)
 		token = 0;
-PRINT(("team: %ld, token: %lu\n", team, token));
-PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
+
+	PRINT(("team: %ld, token: %lu\n", team, token));
+	PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
 
 	// check the parameters
 	// entry_ref
@@ -385,24 +385,24 @@ PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
 	RosterAppInfo *info = NULL;
 	if (error == B_OK) {
 		if ((info = fRegisteredApps.InfoFor(team)) != NULL) {
-PRINT(("found team in fRegisteredApps\n"));
+			PRINT(("found team in fRegisteredApps\n"));
 			_ReplyToIARRequest(request, info);
 		} else if (token > 0
 			&& (info = fEarlyPreRegisteredApps.InfoForToken(token)) != NULL) {
-PRINT(("found ref in fEarlyRegisteredApps (by token)\n"));
+			PRINT(("found ref in fEarlyRegisteredApps (by token)\n"));
 			// pre-registered and has no team ID assigned yet -- queue the
 			// request
 			be_app->DetachCurrentMessage();
-			_AddIARRequest(fIARRequestsByToken, team, request);
+			_AddIARRequest(fIARRequestsByToken, token, request);
 		} else if (team >= 0
 			&& (info = fEarlyPreRegisteredApps.InfoFor(&ref)) != NULL) {
-PRINT(("found ref in fEarlyRegisteredApps (by ref)\n"));
+			PRINT(("found ref in fEarlyRegisteredApps (by ref)\n"));
 			// pre-registered and has no team ID assigned yet -- queue the
 			// request
 			be_app->DetachCurrentMessage();
 			_AddIARRequest(fIARRequestsByID, team, request);
 		} else {
-PRINT(("didn't find team or ref\n"));
+			PRINT(("didn't find team or ref\n"));
 			// team not registered, ref/token not early pre-registered
 			_ReplyToIARRequest(request, NULL);
 		}
