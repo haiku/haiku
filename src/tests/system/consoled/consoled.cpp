@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Haiku. All rights reserved.
+ * Copyright 2004-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Travis Geiselbrecht. All rights reserved.
@@ -12,6 +12,7 @@
 
 #include <ctype.h>
 #include <dirent.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -206,7 +207,7 @@ start_console(struct console *con)
 
 				con->tty_slave_fd = open(name, O_RDWR);
 				if (con->tty_slave_fd < 0) {
-					fprintf(stderr, "Could not open tty!\n");
+					fprintf(stderr, "Could not open tty %s: %s!\n", name, strerror(errno));
 					close(con->tty_master_fd);
 				} else {
 					// set default mode
@@ -316,14 +317,14 @@ main(int argc, char **argv)
 {
 	int err;
 
+	// we're a session leader
+	setsid();
+
 	err = start_console(&gConsole);
 	if (err < 0) {
 		printf("consoled: error %d starting console\n", err);
 		return err;
 	}
-
-	// we're a session leader
-	setsid();
 
 	// move our stdin and stdout to the console
 	dup2(gConsole.tty_slave_fd, 0);
