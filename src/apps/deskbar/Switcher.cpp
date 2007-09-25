@@ -984,6 +984,22 @@ TSwitchManager::QuitApp()
 }
 
 
+void
+TSwitchManager::HideApp()
+{
+	// hide all teams in this group
+
+	TTeamGroup *teamGroup = (TTeamGroup *)fGroupList.ItemAt(fCurrentIndex);
+
+	for (int32 i = teamGroup->TeamList()->CountItems(); i-- > 0;) {
+		team_id team = (team_id)teamGroup->TeamList()->ItemAt(i);
+		app_info info;
+		if (be_roster->GetRunningAppInfo(team, &info) == B_OK)
+			do_minimize_team(BRect(), team, false);
+	}
+}
+
+
 window_info *
 TSwitchManager::WindowInfo(int32 groupIndex, int32 windowIndex)
 {
@@ -1585,6 +1601,11 @@ TSwitcherWindow::DoKey(uint32 key, uint32 modifiers)
 		case 'q':
 		case 'Q':
 			fManager->QuitApp();
+			break;
+
+		case 'h':
+		case 'H':
+			fManager->HideApp();
 			break;
 
 #if _ALLOW_STICKY_
