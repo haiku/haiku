@@ -31,6 +31,7 @@ private:
 	status_t	PostResetDevice();
 	void		FlushPostedWrites();
 	void		DumpD2HFis();
+	void		IdentifyDevice();
 
 private:
 	int						fIndex;

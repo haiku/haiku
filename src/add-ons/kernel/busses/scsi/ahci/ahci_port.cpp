@@ -260,6 +260,89 @@ AHCIPort::Interrupt()
 	fRegs->is = is;
 }
 
+char c(int i)
+{
+	if (i == '\n' || i == '\r' || i == '\b')
+		return '?';
+	return i;
+}
+
+void
+AHCIPort::IdentifyDevice()
+{
+	TRACE("AHCIPort::IdentifyDevice port %d\n", fIndex);
+
+	void *phy; 
+	uint8 *data;
+	int size = 512;
+
+	area_id id = alloc_mem((void **)&data, &phy, size, 0, "identify device");
+
+	TRACE("virt   0x%08lx\n", data);
+	TRACE("phys   0x%08lx\n", phy);
+
+	memset(data, 0, size);
+
+	TRACE("ci   0x%08lx\n", fRegs->ci);
+	TRACE("ie   0x%08lx\n", fRegs->ie);
+	TRACE("is   0x%08lx\n", fRegs->is);
+	TRACE("cmd  0x%08lx\n", fRegs->cmd);
+	TRACE("ssts 0x%08lx\n", fRegs->ssts);
+	TRACE("sctl 0x%08lx\n", fRegs->sctl);
+	TRACE("serr 0x%08lx\n", fRegs->serr);
+	TRACE("sact 0x%08lx\n", fRegs->sact);
+	TRACE("tfd  0x%08lx\n", fRegs->tfd);
+
+
+	memset((void *)fCommandTable->cfis, 0, 5 * 4);
+	fCommandTable->cfis[0] = 0x27;
+	fCommandTable->cfis[1] = 0x80;
+	fCommandTable->cfis[2] = 0xec;
+
+
+	fCommandList->prdtl_flags_cfl = 0;
+	fCommandList->prdtl = 1;
+//	fCommandList->c = 1;
+	fCommandList->cfl = 5;
+	fCommandList->prdbc = 0;
+
+	TRACE("prdtl_flags_cfl %08x\n", fCommandList->prdtl_flags_cfl);
+	TRACE("prdbc           %08x\n", fCommandList->prdbc);
+
+
+	fPRDTable->dba = LO32(phy);
+	fPRDTable->dbau = HI32(phy);
+	fPRDTable->dbc = DBC_I | (size - 1);
+
+	TRACE("dba  %08x\n", fPRDTable->dba);
+	TRACE("dbau %08x\n", fPRDTable->dbau);
+	TRACE("dbc  %08x\n", fPRDTable->dbc);
+
+	fRegs->ci |= 1;
+	FlushPostedWrites();
+
+	snooze(500000);
+
+	TRACE("prdbc %ld\n", fCommandList->prdbc);
+
+	TRACE("ci   0x%08lx\n", fRegs->ci);
+	TRACE("ie   0x%08lx\n", fRegs->ie);
+	TRACE("is   0x%08lx\n", fRegs->is);
+	TRACE("cmd  0x%08lx\n", fRegs->cmd);
+	TRACE("ssts 0x%08lx\n", fRegs->ssts);
+	TRACE("sctl 0x%08lx\n", fRegs->sctl);
+	TRACE("serr 0x%08lx\n", fRegs->serr);
+	TRACE("sact 0x%08lx\n", fRegs->sact);
+	TRACE("tfd  0x%08lx\n", fRegs->tfd);
+
+	for (int i = 0; i < size; i += 8) {
+		TRACE("  %02x %02x %02x %02x %02x %02x %02x %02x\n", data[i], data[i+1], data[i+2], data[i+3], data[i+4], data[i+5], data[i+6], data[i+7]);
+//		TRACE("  %c%c%c%c%c%c%c%c\n", c(data[i]), c(data[i+1]), c(data[i+2]), c(data[i+3]), c(data[i+4]), c(data[i+5]), c(data[i+6]), c(data[i+7]));
+	}
+
+	delete_area(id);
+}
+
 
 void
 AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
@@ -267,6 +350,8 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 
 	TRACE("AHCIPort::ScsiExecuteRequest port %d, opcode %u, length %u\n", fIndex, request->cdb[0], request->cdb_length);
 
+	if (request->cdb[0] == 18)
+		IdentifyDevice();
 
 	request->subsys_status = SCSI_DEV_NOT_THERE;
 	gSCSI->finished(request, 1);

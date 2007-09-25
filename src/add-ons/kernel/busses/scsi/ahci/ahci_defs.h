@@ -170,16 +170,16 @@ typedef struct {
 typedef struct {
   union {
    struct {
-	uint16		prdtl;			// physical region description table length;		
-	uint16		pmp : 4;		// Port Multiplier Port
-	uint16		: 1;
-	uint16		c : 1;			// Clear Busy upon R_OK
-	uint16		b : 1;			// Build In Self Test
-	uint16		r : 1;			// Reset 
-	uint16		p : 1;			// Prefetchable
-	uint16		w : 1;			// Write
-	uint16		a : 1;			// ATAPI
 	uint16		cfl : 5;		// command FIS length
+	uint16		a : 1;			// ATAPI
+	uint16		w : 1;			// Write
+	uint16		p : 1;			// Prefetchable
+	uint16		r : 1;			// Reset 
+	uint16		b : 1;			// Build In Self Test
+	uint16		c : 1;			// Clear Busy upon R_OK
+	uint16		: 1;
+	uint16		pmp : 4;		// Port Multiplier Port
+	uint16		prdtl;			// physical region description table length;		
    } _PACKED;
     uint32		prdtl_flags_cfl;
   } _PACKED;
