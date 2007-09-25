@@ -850,8 +850,21 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		}
 
 		case B_HIDE_APPLICATION:
-			do_minimize_team(BRect(), be_app->Team(), false);
+		{
+			// Hide all applications with the same signature
+			// (ie. those that are part of the same group to be consistent
+			// to what the Deskbar shows you).
+			app_info info;
+			be_app->GetAppInfo(&info);
+
+			BList list;
+			be_roster->GetAppList(info.signature, &list);
+
+			for (int32 i = 0; i < list.CountItems(); i++) {
+				do_minimize_team(BRect(), (team_id)list.ItemAt(i), false);
+			}
 			break;
+		}
 
 		case B_WINDOW_RESIZED:
 		{
