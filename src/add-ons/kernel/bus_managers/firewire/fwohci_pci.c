@@ -61,7 +61,7 @@
 #define	PCIM_CMD_BUSMASTEREN	0x0004
 #define	PCIM_CMD_MWRICEN	0x0010
 #define PCIM_CMD_IOS		0x0001 
-extern pci_module_info	*pci;
+extern pci_module_info	*gPci;
 extern pci_info *pciInfo[MAX_CARDS];
 extern fwohci_softc_t *gFwohci_softc[MAX_CARDS];
 extern struct firewire_softc *gFirewire_softc[MAX_CARDS];
@@ -143,14 +143,14 @@ fwohci_pci_attach(int index)
 
 	mtx_init(FW_GMTX(&sc->fc), "firewire", NULL, MTX_DEF);
 
-	val = pci->read_pci_config(info->bus, info->device, info->function, 
+	val = gPci->read_pci_config(info->bus, info->device, info->function, 
 			PCI_command, 2);
 	val |= PCIM_CMD_MEMEN | PCIM_CMD_BUSMASTEREN | PCIM_CMD_MWRICEN;
 
 #if 1  /* for broken hardware */
 	val &= ~PCIM_CMD_MWRICEN; 
 #endif
-	pci->write_pci_config(info->bus, info->device, info->function, 
+	gPci->write_pci_config(info->bus, info->device, info->function, 
 			PCI_command, 2, val);
 
 	/*
@@ -161,28 +161,28 @@ fwohci_pci_attach(int index)
 			info->u.h0.interrupt_pin == 0)
 		info->u.h0.interrupt_pin = 3;
 
-	latency = olatency = pci->read_pci_config(info->bus, info->device, info->function, 
+	latency = olatency = gPci->read_pci_config(info->bus, info->device, info->function, 
 			PCI_latency, 1);
 #define DEF_LATENCY 0x20
 	if (olatency < DEF_LATENCY) {
 		latency = DEF_LATENCY;
-		pci->write_pci_config(info->bus, info->device, info->function, 
+		gPci->write_pci_config(info->bus, info->device, info->function, 
 				PCI_latency, 1, latency);
 	}
 
-	cache_line = ocache_line = pci->read_pci_config(info->bus, info->device, 
+	cache_line = ocache_line = gPci->read_pci_config(info->bus, info->device, 
 			info->function, PCI_line_size, 1);
 #define DEF_CACHE_LINE 8
 	if (ocache_line < DEF_CACHE_LINE) {
 		cache_line = DEF_CACHE_LINE;
-		pci->write_pci_config(info->bus, info->device, info->function, 
+		gPci->write_pci_config(info->bus, info->device, info->function, 
 				PCI_line_size, 1, cache_line);
 	}
 	TRACE("latency timer %x -> %x.\n", olatency, latency);
 	TRACE("cache size %x -> %x.\n",	ocache_line, cache_line);
 
 	// get IRQ
-	sc->irq = pci->read_pci_config(info->bus, info->device, info->function, 
+	sc->irq = gPci->read_pci_config(info->bus, info->device, info->function, 
 			PCI_interrupt_line, 1);
 	if (sc->irq == 0 || sc->irq == 0xff) {
 		ERROR("no IRQ assigned\n");
@@ -191,7 +191,7 @@ fwohci_pci_attach(int index)
 	TRACE("IRQ %d\n", sc->irq);
 
 	// map registers into memory
-//	val = pci->read_pci_config(info->bus, info->device, info->function, 0x14, 4);
+//	val = gPci->read_pci_config(info->bus, info->device, info->function, 0x14, 4);
 //	val &= PCI_address_memory_32_mask;
 //	TRACE("hardware register address %p\n", (void *) val);
 	TRACE("hardware register address %x\n", info->u.h0.base_registers[0]);

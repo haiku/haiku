@@ -32,7 +32,7 @@ status_t fwohci_pci_detach(int index);
 pci_info *pciInfo[MAX_CARDS];
 fwohci_softc_t *gFwohci_softc[MAX_CARDS];
 struct firewire_softc *gFirewire_softc[MAX_CARDS];
-pci_module_info	*pci;
+pci_module_info	*gPci;
 dpc_module_info *gDpc;
 
 struct supported_device{
@@ -74,7 +74,8 @@ struct supported_device supported_devices[] = {
 };
 
 
-static int find_device_name(pci_info *info)
+static int 
+find_device_name(pci_info *info)
 {
 	struct supported_device *device;
 	for (device = supported_devices; device->name; device++) {
@@ -148,7 +149,7 @@ fw_module_init(void)
 	if (!info)
 		return B_NO_MEMORY;
 	
-	if ((status = get_module(B_PCI_MODULE_NAME,(module_info **)&pci)) != B_OK) {
+	if ((status = get_module(B_PCI_MODULE_NAME,(module_info **)&gPci)) != B_OK) {
 		TRACE("pci module unavailable\n");
 		free(info);
 		return status;
@@ -164,7 +165,7 @@ fw_module_init(void)
 	memset(gFwohci_softc, 0, sizeof(gFwohci_softc));
 
 	// find devices
-	for (i = 0, found = 0; (status = pci->get_nth_pci_info(i, info)) == B_OK; i++) {
+	for (i = 0, found = 0; (status = gPci->get_nth_pci_info(i, info)) == B_OK; i++) {
 		if (find_device_name(info)
 				|| ((info->class_base == PCI_serial_bus)
 					&& (info->class_sub == PCI_firewire)
@@ -203,9 +204,6 @@ fw_module_init(void)
 	TRACE("found %d cards\n", found);
 	free(info);
 
-//	if (!found)
-//		goto err_found;
-
 	if ((status = initialize_timer()) != B_OK) {
 		ERROR("timer init failed\n");
 		goto err_timer;
@@ -222,7 +220,6 @@ fw_module_init(void)
 err_pci:
 	terminate_timer();
 err_timer:
-err_found:
 err_outofmem:
 	for (i = 0; i < found; i++) {
 		free(gFirewire_softc[i]);
