@@ -67,6 +67,7 @@ extern struct tm	*gmtime(const time_t *timer);
 extern struct tm	*gmtime_r(const time_t *timer, struct tm *tm); 
 extern struct tm	*localtime(const time_t *timer);
 extern struct tm	*localtime_r(const time_t *timer, struct tm *tm);
+extern int			nanosleep(const struct timespec *, struct timespec *);
 extern size_t		strftime(char *buffer, size_t maxSize, const char *format,
 						const struct tm *tm);
 extern char 		*strptime(const char *buf, const char *format, struct tm *tm);

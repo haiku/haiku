@@ -12,6 +12,7 @@ MergeObject posix_time.o :
 	ctime.c
 	difftime.c
 	localtime.c
+	nanosleep.c
 	stime.c
 	strftime.c
 	strptime.c
