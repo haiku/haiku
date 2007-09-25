@@ -47,6 +47,11 @@
 #	define STRACE(x) ;
 #endif
 
+#define B_HIDE_APPLICATION '_AHD'
+	// if we ever move this to a public namespace, we should also move the
+	// handling of this message into BApplication
+
+void do_minimize_team(BRect zoomRect, team_id team, bool zoom);
 
 struct BWindow::unpack_cookie {
 	unpack_cookie();
@@ -686,7 +691,6 @@ BWindow::MessageReceived(BMessage *msg)
 	BMessage replyMsg(B_REPLY);
 	bool handled = false;
 
-	
 	BMessage specifier;
 	int32 what;
 	const char *prop;
@@ -844,6 +848,10 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 				Minimize(minimize);
 			break;
 		}
+
+		case B_HIDE_APPLICATION:
+			do_minimize_team(BRect(), be_app->Team(), false);
+			break;
 
 		case B_WINDOW_RESIZED:
 		{
@@ -2425,6 +2433,14 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 	AddShortcut('C', B_COMMAND_KEY, new BMessage(B_COPY), NULL);
 	AddShortcut('V', B_COMMAND_KEY, new BMessage(B_PASTE), NULL);
 	AddShortcut('A', B_COMMAND_KEY, new BMessage(B_SELECT_ALL), NULL);
+
+	// Window modifier keys
+	AddShortcut('M', B_COMMAND_KEY | B_CONTROL_KEY,
+		new BMessage(B_MINIMIZE), NULL);
+	AddShortcut('Z', B_COMMAND_KEY | B_CONTROL_KEY,
+		new BMessage(B_ZOOM), NULL);
+	AddShortcut('H', B_COMMAND_KEY | B_CONTROL_KEY,
+		new BMessage(B_HIDE_APPLICATION), NULL);
 
 	// We set the default pulse rate, but we don't start the pulse
 	fPulseRate = 500000;
