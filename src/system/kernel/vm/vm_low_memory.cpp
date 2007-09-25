@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2005-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -26,16 +26,6 @@
 
 // TODO: the priority is currently ignored, and probably can be removed
 
-static const bigtime_t kLowMemoryInterval = 3000000;	// 3 secs
-
-// page limits
-static const size_t kNoteLimit = 1024;
-static const size_t kWarnLimit = 256;
-static const size_t kCriticalLimit = 32;
-
-static int32 sLowMemoryState = B_NO_LOW_MEMORY;
-
-
 struct low_memory_handler : public DoublyLinkedListLinkImpl<low_memory_handler> {
 	low_memory_func	function;
 	void			*data;
@@ -43,6 +33,18 @@ struct low_memory_handler : public DoublyLinkedListLinkImpl<low_memory_handler> 
 };
 
 typedef DoublyLinkedList<low_memory_handler> HandlerList;
+
+
+static const bigtime_t kLowMemoryInterval = 3000000;	// 3 secs
+static const bigtime_t kWarnMemoryInterval = 500000;	// 0.5 secs
+
+// page limits
+static const size_t kNoteLimit = 1024;
+static const size_t kWarnLimit = 256;
+static const size_t kCriticalLimit = 32;
+
+
+static int32 sLowMemoryState = B_NO_LOW_MEMORY;
 
 static mutex sLowMemoryMutex;
 static sem_id sLowMemoryWaitSem;
@@ -83,8 +85,12 @@ compute_state(void)
 static int32
 low_memory(void *)
 {
+	bigtime_t timeout = kLowMemoryInterval;
 	while (true) {
-		snooze(kLowMemoryInterval);
+		if (sLowMemoryState != B_LOW_MEMORY_CRITICAL) {
+			acquire_sem_etc(sLowMemoryWaitSem, 1, B_RELATIVE_TIMEOUT,
+				timeout);
+		}
 
 		sLowMemoryState = compute_state();
 
@@ -95,6 +101,11 @@ low_memory(void *)
 			continue;
 
 		call_handlers(sLowMemoryState);
+		
+		if (sLowMemoryState == B_LOW_MEMORY_WARNING)
+			timeout = kWarnMemoryInterval;
+		else
+			timeout = kLowMemoryInterval;
 	}
 	return 0;
 }
@@ -103,9 +114,9 @@ low_memory(void *)
 void
 vm_low_memory(size_t requirements)
 {
-	// ToDo: compute level with requirements in mind
+	// TODO: take requirements into account
 
-	call_handlers(B_LOW_MEMORY_NOTE);
+	release_sem(sLowMemoryWaitSem);
 }
 
 
@@ -132,7 +143,8 @@ vm_low_memory_init(void)
 		// static initializers do not work in the kernel,
 		// so we have to do it here, manually
 
-	thread = spawn_kernel_thread(&low_memory, "low memory handler", B_LOW_PRIORITY, NULL);
+	thread = spawn_kernel_thread(&low_memory, "low memory handler",
+		B_LOW_PRIORITY, NULL);
 	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
 
 	return B_OK;
