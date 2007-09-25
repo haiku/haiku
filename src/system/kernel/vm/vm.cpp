@@ -4178,7 +4178,6 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	dummyPage.cache = NULL;
 	dummyPage.state = PAGE_STATE_INACTIVE;
 	dummyPage.type = PAGE_TYPE_DUMMY;
-	dummyPage.busy_writing = isWrite;
 	dummyPage.wired_count = 0;
 #ifdef DEBUG_PAGE_CACHE_TRANSITIONS
 	dummyPage.debug_flags = 0;

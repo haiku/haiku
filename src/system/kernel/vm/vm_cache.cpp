@@ -635,8 +635,6 @@ if (consumer->virtual_base == 0x11000)
 						page->debug_flags |= 0x1;
 					if (consumerPage->type == PAGE_TYPE_DUMMY)
 						page->debug_flags |= 0x2;
-					if (!consumerPage->busy_writing)
-						page->debug_flags |= 0x4;
 					page->collided_page = consumerPage;
 					consumerPage->collided_page = page;
 #endif	// DEBUG_PAGE_CACHE_TRANSITIONS

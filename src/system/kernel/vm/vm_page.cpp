@@ -916,29 +916,27 @@ vm_mark_page_inuse(addr_t page)
 
 
 status_t
-vm_mark_page_range_inuse(addr_t start_page, addr_t length)
+vm_mark_page_range_inuse(addr_t startPage, addr_t length)
 {
-	cpu_status state;
-	vm_page *page;
-	addr_t i;
+	TRACE(("vm_mark_page_range_inuse: start 0x%lx, len 0x%lx\n",
+		startPage, length));
 
-	TRACE(("vm_mark_page_range_inuse: start 0x%lx, len 0x%lx\n", start_page, length));
-
-	if (sPhysicalPageOffset > start_page) {
-		dprintf("vm_mark_page_range_inuse: start page %ld is before free list\n", start_page);
+	if (sPhysicalPageOffset > startPage) {
+		TRACE(("vm_mark_page_range_inuse: start page %ld is before free list\n",
+			startPage));
 		return B_BAD_VALUE;
 	}
-	start_page -= sPhysicalPageOffset;
-	if (start_page + length > sNumPages) {
-		dprintf("vm_mark_page_range_inuse: range would extend past free list\n");
+	startPage -= sPhysicalPageOffset;
+	if (startPage + length > sNumPages) {
+		TRACE(("vm_mark_page_range_inuse: range would extend past free list\n"));
 		return B_BAD_VALUE;
 	}
 
-	state = disable_interrupts();
+	cpu_status state = disable_interrupts();
 	acquire_spinlock(&sPageLock);
 
-	for (i = 0; i < length; i++) {
-		page = &sPages[start_page + i];
+	for (addr_t i = 0; i < length; i++) {
+		vm_page *page = &sPages[startPage + i];
 		switch (page->state) {
 			case PAGE_STATE_FREE:
 			case PAGE_STATE_CLEAR:
@@ -953,7 +951,9 @@ vm_mark_page_range_inuse(addr_t start_page, addr_t length)
 			case PAGE_STATE_UNUSED:
 			default:
 				// uh
-				dprintf("vm_mark_page_range_inuse: page 0x%lx in non-free state %d!\n", start_page + i, page->state);
+				dprintf("vm_mark_page_range_inuse: page 0x%lx in non-free state %d!\n",
+					startPage + i, page->state);
+				break;
 		}
 	}
 
@@ -965,114 +965,67 @@ vm_mark_page_range_inuse(addr_t start_page, addr_t length)
 
 
 vm_page *
-vm_page_allocate_specific_page(addr_t page_num, int page_state)
+vm_page_allocate_page(int pageState)
 {
-	vm_page *p;
-	int old_page_state = PAGE_STATE_BUSY;
-	int state;
+	page_queue *queue;
+	page_queue *otherQueue;
 
-	state = disable_interrupts();
-	acquire_spinlock(&sPageLock);
-
-	p = vm_lookup_page(page_num);
-	if (p == NULL)
-		goto out;
-
-	switch (p->state) {
+	switch (pageState) {
 		case PAGE_STATE_FREE:
-			remove_page_from_queue(&sFreePageQueue, p);
+			queue = &sFreePageQueue;
+			otherQueue = &sClearPageQueue;
 			break;
 		case PAGE_STATE_CLEAR:
-			remove_page_from_queue(&sClearPageQueue, p);
-			break;
-		case PAGE_STATE_UNUSED:
-			break;
-		default:
-			// we can't allocate this page
-			p = NULL;
-	}
-	if (p == NULL)
-		goto out;
-
-	old_page_state = p->state;
-	p->state = PAGE_STATE_BUSY;
-
-	if (old_page_state != PAGE_STATE_UNUSED)
-		enqueue_page(&sActivePageQueue, p);
-
-out:
-	release_spinlock(&sPageLock);
-	restore_interrupts(state);
-
-	if (p != NULL && page_state == PAGE_STATE_CLEAR
-		&& (old_page_state == PAGE_STATE_FREE || old_page_state == PAGE_STATE_UNUSED))
-		clear_page(p->physical_page_number * B_PAGE_SIZE);
-
-	return p;
-}
-
-
-vm_page *
-vm_page_allocate_page(int page_state)
-{
-	vm_page *p;
-	page_queue *q;
-	page_queue *q_other;
-	int state;
-	int old_page_state;
-
-	switch (page_state) {
-		case PAGE_STATE_FREE:
-			q = &sFreePageQueue;
-			q_other = &sClearPageQueue;
-			break;
-		case PAGE_STATE_CLEAR:
-			q = &sClearPageQueue;
-			q_other = &sFreePageQueue;
+			queue = &sClearPageQueue;
+			otherQueue = &sFreePageQueue;
 			break;
 		default:
 			return NULL; // invalid
 	}
 
-	state = disable_interrupts();
+	cpu_status state = disable_interrupts();
 	acquire_spinlock(&sPageLock);
 
-	p = dequeue_page(q);
-	if (p == NULL) {
+	vm_page *page = dequeue_page(queue);
+	if (page == NULL) {
 #ifdef DEBUG
-		if (q->count != 0)
-			panic("queue %p corrupted, count = %d\n", q, q->count);
+		if (queue->count != 0)
+			panic("queue %p corrupted, count = %d\n", queue, queue->count);
 #endif
 
 		// if the primary queue was empty, grap the page from the
 		// secondary queue
-		p = dequeue_page(q_other);
-		if (p == NULL) {
+		page = dequeue_page(otherQueue);
+		if (page == NULL) {
 #ifdef DEBUG
-			if (q_other->count != 0)
-				panic("other queue %p corrupted, count = %d\n", q_other, q_other->count);
+			if (otherQueue->count != 0) {
+				panic("other queue %p corrupted, count = %d\n", otherQueue,
+					otherQueue->count);
+			}
 #endif
 
-			// ToDo: issue "someone" to free up some pages for us, and go into wait state until that's done
-			panic("vm_allocate_page: out of memory! page state = %d\n", page_state);
+			// ToDo: issue "someone" to free up some pages for us, and go into
+			// wait state until that's done
+			panic("vm_allocate_page: out of memory! page state = %d\n",
+				pageState);
 		}
 	}
-	if (p->cache != NULL)
-		panic("supposed to be free page %p has cache\n", p);
+	if (page->cache != NULL)
+		panic("supposed to be free page %p has cache\n", page);
 
-	old_page_state = p->state;
-	p->state = PAGE_STATE_BUSY;
+	int oldPageState = page->state;
+	page->state = PAGE_STATE_BUSY;
 
-	enqueue_page(&sActivePageQueue, p);
+	enqueue_page(&sActivePageQueue, page);
 
 	release_spinlock(&sPageLock);
 	restore_interrupts(state);
 
 	// if needed take the page from the free queue and zero it out
-	if (page_state == PAGE_STATE_CLEAR && old_page_state == PAGE_STATE_FREE)
-		clear_page(p->physical_page_number * B_PAGE_SIZE);
+	if (pageState == PAGE_STATE_CLEAR && oldPageState != PAGE_STATE_CLEAR)
+		clear_page(page->physical_page_number * B_PAGE_SIZE);
 
-	return p;
+	return page;
 }
 
 
@@ -1103,37 +1056,36 @@ vm_page_allocate_pages(int pageState, vm_page **pages, uint32 numPages)
 
 
 vm_page *
-vm_page_allocate_page_run(int page_state, addr_t len)
+vm_page_allocate_page_run(int pageState, addr_t length)
 {
-	unsigned int start;
-	unsigned int i;
-	vm_page *first_page = NULL;
-	int state;
+	vm_page *firstPage = NULL;
+	uint32 start = 0;
 
-	start = 0;
-
-	state = disable_interrupts();
+	cpu_status state = disable_interrupts();
 	acquire_spinlock(&sPageLock);
 
 	for (;;) {
-		bool foundit = true;
-		if (start + len > sNumPages)
+		bool foundRun = true;
+		if (start + length > sNumPages)
 			break;
 
-		for (i = 0; i < len; i++) {
+		uint32 i;
+		for (i = 0; i < length; i++) {
 			if (sPages[start + i].state != PAGE_STATE_FREE
 				&& sPages[start + i].state != PAGE_STATE_CLEAR) {
-				foundit = false;
+				foundRun = false;
 				i++;
 				break;
 			}
 		}
-		if (foundit) {
+		if (foundRun) {
 			// pull the pages out of the appropriate queues
-			for (i = 0; i < len; i++) {
+			for (i = 0; i < length; i++) {
+				sPages[start + i].is_cleared
+					= sPages[start + i].state == PAGE_STATE_CLEAR;
 				set_page_state_nolock(&sPages[start + i], PAGE_STATE_BUSY);
 			}
-			first_page = &sPages[start];
+			firstPage = &sPages[start];
 			break;
 		} else {
 			start += i;
@@ -1142,7 +1094,16 @@ vm_page_allocate_page_run(int page_state, addr_t len)
 	release_spinlock(&sPageLock);
 	restore_interrupts(state);
 
-	return first_page;
+	if (firstPage != NULL && pageState == PAGE_STATE_CLEAR) {
+		for (uint32 i = 0; i < length; i++) {
+			if (!sPages[start + i].is_cleared) {
+	 			clear_page(sPages[start + i].physical_page_number
+	 				* B_PAGE_SIZE);
+			}
+		}
+	}
+
+	return firstPage;
 }
 
 
@@ -1168,14 +1129,12 @@ vm_lookup_page(addr_t pageNumber)
 
 
 status_t
-vm_page_set_state(vm_page *page, int page_state)
+vm_page_set_state(vm_page *page, int pageState)
 {
-	status_t status;
-
 	cpu_status state = disable_interrupts();
 	acquire_spinlock(&sPageLock);
 
-	status = set_page_state_nolock(page, page_state);
+	status_t status = set_page_state_nolock(page, pageState);
 
 	release_spinlock(&sPageLock);
 	restore_interrupts(state);
