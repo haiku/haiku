@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -19,7 +19,6 @@
 #include <USB.h>
 #include <usb/USB_hid.h>
 
-#define DEBUG 1
 #if DEBUG
 	#define	DPRINTF_INFO(x)	dprintf x
 	#define	DPRINTF_ERR(x)	dprintf x
