@@ -19,6 +19,7 @@
 #include <USB.h>
 #include <usb/USB_hid.h>
 
+#define DEBUG 1
 #if DEBUG
 	#define	DPRINTF_INFO(x)	dprintf x
 	#define	DPRINTF_ERR(x)	dprintf x
@@ -85,6 +86,13 @@ typedef struct hid_device_info {
 	uint flags;
 	bool is_keyboard;
 
+	// double click (please move this into the input_server one day)
+	uint32 last_buttons;
+	uint32 click_count;
+	bigtime_t click_speed;
+	bigtime_t last_click_time;
+
+	// key repeats
 	struct hid_repeat_timer repeat_timer;
 	bigtime_t repeat_delay;
 	bigtime_t repeat_rate;

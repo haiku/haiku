@@ -346,6 +346,12 @@ create_device(const usb_device *dev, const usb_interface_info *ii,
 	device->rbuf = create_ring_buffer(384);
 	device->is_keyboard = isKeyboard;
 
+	// double click handling
+	device->click_count = 1;
+	device->click_speed = 250000;
+	device->last_click_time = 0;
+	device->last_buttons = 0;
+
 	// default values taken from the PS/2 driver
 	device->repeat_rate = 35000;
 	device->repeat_delay = 300000;
@@ -549,8 +555,7 @@ interpret_mouse_buffer(hid_device_info *device)
 		if (insn->usage_page == USAGE_PAGE_BUTTON) {
 			if ((insn->usage_id - 1) < MAX_BUTTONS) {
 				info.buttons |= (value & 1) << (insn->usage_id - 1);
-				info.clicks = 1;
-			}	
+			}
 		} else if (insn->usage_page == USAGE_PAGE_GENERIC_DESKTOP) {
 			if (insn->is_phy_signed)
 				value = sign_extend(value, insn->num_bits);
@@ -569,6 +574,20 @@ interpret_mouse_buffer(hid_device_info *device)
 		}
 	}
 
+	if (info.buttons != 0) {
+		if (device->last_buttons == 0) {
+			if (device->last_click_time + device->click_speed > device->timestamp)
+				device->click_count++;
+			else
+				device->click_count = 1;
+		}
+
+		device->last_click_time = device->timestamp;
+		info.clicks = device->click_count;
+	}
+
+	device->last_buttons = info.buttons;
+
 	info.timestamp = device->timestamp;
 	ring_buffer_write(device->rbuf, (const uint8*)&info, sizeof(info));
 	release_sem_etc(device->sem_cb, 1, B_DO_NOT_RESCHEDULE);
@@ -579,8 +598,8 @@ interpret_mouse_buffer(hid_device_info *device)
 	callback: got a report, issue next request
 */
 static void 
-usb_callback(void *cookie, uint32 busStatus,
-	void *data, uint32 actualLength)
+usb_callback(void *cookie, status_t busStatus,
+	void *data, size_t actualLength)
 {
 	hid_device_info *device = cookie;
 	status_t status;
@@ -615,7 +634,7 @@ usb_callback(void *cookie, uint32 busStatus,
 			sprintf (&linbuf[i*3], "%02X ", buffer [i]);
 		DPRINTF_INFO ((MY_ID "input report: %s\n", linbuf));
 #endif
-		device->timestamp = system_time ();
+		device->timestamp = system_time();
 		
 		if (device->is_keyboard) {
 			interpret_kb_buffer(device);
@@ -650,7 +669,7 @@ hid_device_added(const usb_device *dev, void **cookie)
 	status_t status;
 	usb_hid_descriptor *hid_desc;
 	uint8 *rep_desc = NULL;
-	size_t desc_len, actual;
+	size_t desc_len;
 	decomp_item *items;
 	size_t num_items;
 	int fd, report_id;
@@ -962,6 +981,14 @@ hid_device_control(driver_cookie *cookie, uint32 op,
         		return count;
       			break;
 			}
+			case MS_SET_CLICKSPEED:
+#ifdef __HAIKU__
+				return user_memcpy(&device->click_speed, arg, sizeof(bigtime_t));
+#else
+				device->click_speed = *(bigtime_t *)arg;
+				return B_OK;
+#endif
+
 			default:
 				/* not implemented */
 				break;
