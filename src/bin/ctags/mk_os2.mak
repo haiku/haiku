@@ -1,4 +1,4 @@
-# $Id: mk_os2.mak,v 1.3 2002/01/27 21:20:55 darren Exp $
+# $Id: mk_os2.mak 74 2002-01-27 21:20:55Z darren $
 #
 # A Makefile for OS/2 using EMX/gcc
 # You may want to use the OS/2 port of autoconf for building

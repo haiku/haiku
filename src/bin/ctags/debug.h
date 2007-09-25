@@ -1,5 +1,5 @@
 /*
-*   $Id: debug.h,v 1.3 2006/05/30 04:37:12 darren Exp $
+*   $Id: debug.h 558 2007-06-15 19:17:02Z elliotth $
 *
 *   Copyright (c) 1998-2002, Darren Hiebert
 *
@@ -63,7 +63,6 @@ extern void debugPutc (const int level, const int c);
 extern void debugParseNest (const boolean increase, const unsigned int level);
 extern void debugCppNest (const boolean begin, const unsigned int level);
 extern void debugCppIgnore (const boolean ignore);
-extern void clearString (char *const string, const int length);
 extern void debugEntry (const tagEntryInfo *const tag);
 
 #endif  /* _DEBUG_H */

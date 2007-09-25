@@ -1,5 +1,5 @@
 /*
-*   $Id: yacc.c,v 1.7 2006/05/30 04:37:13 darren Exp $
+*   $Id: yacc.c 443 2006-05-30 04:37:13Z darren $
 *
 *   Copyright (c) 2001-2002, Nick Hibma <n_hibma@van-laarhoven.org>
 *

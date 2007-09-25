@@ -1,5 +1,5 @@
 /*
-*   $Id: general.h,v 1.15 2006/05/30 04:37:12 darren Exp $
+*   $Id: general.h 508 2007-05-03 03:20:59Z dhiebert $
 *
 *   Copyright (c) 1998-2003, Darren Hiebert
 *
@@ -56,7 +56,7 @@
 /*  This is a helpful internal feature of later versions (> 2.7) of GCC
  *  to prevent warnings about unused variables.
  */
-#if (__GNUC__ > 2  ||  (__GNUC__ == 2  &&  __GNUC_MINOR__ >= 7)) && !(defined (__APPLE_CC__) || defined (__GNUG__))
+#if (__GNUC__ > 2  ||  (__GNUC__ == 2  &&  __GNUC_MINOR__ >= 7)) && !defined (__GNUG__)
 # define __unused__  __attribute__((unused))
 # define __printf__(s,f)  __attribute__((format (printf, s, f)))
 #else

@@ -1,5 +1,5 @@
 /*
-*   $Id: args.c,v 1.7 2006/05/30 04:37:11 darren Exp $
+*   $Id: args.c 536 2007-06-02 06:09:00Z elliotth $
 *
 *   Copyright (c) 1999-2002, Darren Hiebert
 *
@@ -147,10 +147,11 @@ static char* nextFileLine (FILE* const fp)
 					c = ungetc (c, fp);
 			}
 			vStringTerminate (vs);
+			vStringStripTrailing (vs);
 			result = xMalloc (vStringLength (vs) + 1, char);
 			strcpy (result, vStringValue (vs));
-			vStringDelete (vs);
 		}
+		vStringDelete (vs);
 	}
 	return result;
 }

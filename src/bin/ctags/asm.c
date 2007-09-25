@@ -1,5 +1,5 @@
 /*
-*   $Id: asm.c,v 1.18 2006/05/30 04:37:11 darren Exp $
+*   $Id: asm.c 536 2007-06-02 06:09:00Z elliotth $
 *
 *   Copyright (c) 2000-2003, Darren Hiebert
 *
@@ -129,13 +129,12 @@ static void buildAsmKeywordHash (void)
 
 static opKeyword analyzeOperator (const vString *const op)
 {
-	static vString *keyword = NULL;
-	opKeyword result = OP_UNDEFINED;
+	vString *keyword = vStringNew ();
+	opKeyword result;
 
-	if (keyword == NULL)
-		keyword = vStringNew ();
 	vStringCopyToLower (keyword, op);
 	result = (opKeyword) lookupKeyword (vStringValue (keyword), Lang_asm);
+	vStringDelete (keyword);
 	return result;
 }
 

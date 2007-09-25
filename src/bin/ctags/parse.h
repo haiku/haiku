@@ -1,5 +1,5 @@
 /*
-*   $Id: parse.h,v 1.16 2006/05/30 04:37:12 darren Exp $
+*   $Id: parse.h 443 2006-05-30 04:37:13Z darren $
 *
 *   Copyright (c) 1998-2003, Darren Hiebert
 *

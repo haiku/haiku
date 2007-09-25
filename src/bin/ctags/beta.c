@@ -1,5 +1,5 @@
 /*
-*   $Id: beta.c,v 1.7 2006/05/30 04:37:11 darren Exp $
+*   $Id: beta.c 536 2007-06-02 06:09:00Z elliotth $
 *
 *   Copyright (c) 1999-2000, Mjølner Informatics
 *
@@ -304,6 +304,7 @@ static void findBetaTags (void)
 		endofline:
 		inquote = FALSE;  /* This shouldn't really make a difference */
 	} while (!feof (File.fp));
+	vStringDelete (line);
 }
 
 extern parserDefinition* BetaParser (void)

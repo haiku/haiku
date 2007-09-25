@@ -1,5 +1,5 @@
 /*
-*   $Id: erlang.c,v 1.3 2006/05/30 04:37:12 darren Exp $
+*   $Id: erlang.c 443 2006-05-30 04:37:13Z darren $
 *
 *   Copyright (c) 2003, Brent Fulgham <bfulgham@debian.org>
 *

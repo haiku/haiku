@@ -1,5 +1,5 @@
 /*
-*   $Id: e_riscos.h,v 1.1 2002/03/08 22:35:19 darren Exp $
+*   $Id: e_riscos.h 136 2002-03-08 22:35:19Z darren $
 *
 *   Copyright (c) 2002, Andrew Wingate
 *

@@ -1,5 +1,5 @@
 /*
-*   $Id: main.c,v 1.24 2006/05/30 04:37:12 darren Exp $
+*   $Id: main.c 536 2007-06-02 06:09:00Z elliotth $
 *
 *   Copyright (c) 1996-2003, Darren Hiebert
 *
@@ -302,6 +302,7 @@ static boolean createTagsForEntry (const char *const entryName)
 	else
 		resize = parseFile (entryName);
 
+	eStatFree (status);
 	return resize;
 }
 

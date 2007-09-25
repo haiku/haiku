@@ -1,5 +1,5 @@
 /*
-*   $Id: read.h,v 1.5 2006/05/30 04:37:12 darren Exp $
+*   $Id: read.h 443 2006-05-30 04:37:13Z darren $
 *
 *   Copyright (c) 1998-2002, Darren Hiebert
 *

@@ -1,5 +1,5 @@
 /*
-*   $Id: e_djgpp.h,v 1.5 2003/10/31 04:15:35 darren Exp $
+*   $Id: e_djgpp.h 375 2003-10-31 04:15:35Z darren $
 *
 *   Copyright (c) 2002-2003, Darren Hiebert
 *

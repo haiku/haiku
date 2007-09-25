@@ -1,5 +1,5 @@
 /*
-*   $Id: e_msoft.h,v 1.8 2006/05/30 04:37:12 darren Exp $
+*   $Id: e_msoft.h 577 2007-06-30 15:30:16Z dhiebert $
 *
 *   Copyright (c) 2002-2003, Darren Hiebert
 *
@@ -66,6 +66,7 @@
 # define HAVE_DIR_H 1
 # define HAVE_DIRENT_H 1
 # define HAVE__FINDFIRST 1
+# define findfirst_t long
 # define ffblk _finddata_t
 # define FA_DIREC _A_SUBDIR
 # define ff_name name

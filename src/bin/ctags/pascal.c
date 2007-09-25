@@ -1,5 +1,5 @@
 /*
-*   $Id: pascal.c,v 1.6 2006/05/30 04:37:12 darren Exp $
+*   $Id: pascal.c 536 2007-06-02 06:09:00Z elliotth $
 *
 *   Copyright (c) 2001-2002, Darren Hiebert
 *
@@ -250,6 +250,7 @@ static void findPascalTags (void)
 			}
 		}  /* while not eof */
 	}
+	vStringDelete (name);
 }
 
 extern parserDefinition* PascalParser (void)

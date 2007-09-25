@@ -1,5 +1,5 @@
 /*
-*   $Id: verilog.c,v 1.4 2006/05/30 04:37:13 darren Exp $
+*   $Id: verilog.c 573 2007-06-26 05:41:27Z elliotth $
 * 
 *   Copyright (c) 2003, Darren Hiebert
 * 
@@ -10,9 +10,9 @@
 *   (Hardware Description Language).
 * 
 *   Language definition documents:
-*       http://www.eg.bucknell.edu/~cs320/1995-fall/verilog-manual.html
+*       http://www.eg.bucknell.edu/~cs320/verilog/verilog-manual.html
 *       http://www.sutherland-hdl.com/on-line_ref_guide/vlog_ref_top.html
-*       http://home.europa.com/~celiac/VerilogBNF.html
+*       http://www.verilog.com/VerilogBNF.html
 *       http://eesun.free.fr/DOC/VERILOG/verilog_manual1.html
 */
 
@@ -25,6 +25,7 @@
 #include <setjmp.h>
 
 #include "debug.h"
+#include "get.h"
 #include "keyword.h"
 #include "parse.h"
 #include "read.h"
@@ -145,19 +146,12 @@ static int vGetc (void)
 		}
 		else if (c2 == '*')  /* strip block comment */
 		{
-			do
-			{
-				do
-					c = fileGetc ();
-				while (c != '*'  &&  c != EOF);
-				if (c != EOF)
-					c = fileGetc ();
-			} while (c != '/'  &&  c != EOF);
-			if (c != EOF)
-				c = ' ';  /* comment equivalent to white space */
+			c = skipOverCComment();
 		}
 		else
-			Ungetc = c2;
+		{
+			fileUngetc (c2);
+		}
 	}
 	else if (c == '"')  /* strip string contents */
 	{
@@ -261,9 +255,20 @@ static void tagNameList (const verilogKind kind, int c)
 
 static void findTag (vString *const name)
 {
-	const verilogKind kind = (verilogKind)
-			lookupKeyword (vStringValue (name), Lang_verilog);
-	if (kind != K_UNDEFINED)
+	const verilogKind kind = (verilogKind) lookupKeyword (vStringValue (name), Lang_verilog);
+	if (kind == K_CONSTANT && vStringItem (name, 0) == '`')
+	{
+		/* Bug #961001: Verilog compiler directives are line-based. */
+		int c = skipWhite (vGetc ());
+		readIdentifier (name, c);
+		makeSimpleTag (name, VerilogKinds, kind);
+		/* Skip the rest of the line. */
+		do {
+			c = vGetc();
+		} while (c != '\n');
+		vUngetc (c);
+	}
+	else if (kind != K_UNDEFINED)
 	{
 		int c = skipWhite (vGetc ());
 

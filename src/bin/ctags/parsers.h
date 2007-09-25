@@ -1,5 +1,5 @@
 /*
-*   $Id: parsers.h,v 1.12 2006/05/30 04:37:12 darren Exp $
+*   $Id: parsers.h 579 2007-06-30 23:59:12Z dhiebert $
 *
 *   Copyright (c) 2000-2003, Darren Hiebert
 *
@@ -19,6 +19,7 @@
 	AsmParser, \
 	AspParser, \
 	AwkParser, \
+	BasicParser, \
 	BetaParser, \
 	CParser, \
 	CppParser, \

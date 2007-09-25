@@ -1,4 +1,4 @@
-# $Id: mk_bc5.mak,v 1.5 2003/09/19 04:02:39 darren Exp $
+# $Id: mk_bc5.mak 372 2003-09-19 04:02:39Z darren $
 #
 # Makefile for Win32 using Borland C++ compiler, version 5.5 (free version)
 

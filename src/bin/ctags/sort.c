@@ -1,5 +1,5 @@
 /*
-*   $Id: sort.c,v 1.5 2006/05/30 04:37:13 darren Exp $
+*   $Id: sort.c 498 2007-02-17 22:43:15Z dhiebert $
 *
 *   Copyright (c) 1996-2002, Darren Hiebert
 *
@@ -26,10 +26,6 @@
 #include "read.h"
 #include "routines.h"
 #include "sort.h"
-
-#ifdef TRAP_MEMORY_CALLS
-# include "safe_malloc.h"
-#endif
 
 /*
 *   FUNCTION DEFINITIONS

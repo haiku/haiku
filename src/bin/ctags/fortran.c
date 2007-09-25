@@ -1,5 +1,5 @@
 /*
-*   $Id: fortran.c,v 1.42 2006/05/30 04:37:12 darren Exp $
+*   $Id: fortran.c 617 2007-09-05 03:20:53Z dhiebert $
 *
 *   Copyright (c) 1998-2003, Darren Hiebert
 *
@@ -519,12 +519,9 @@ static void makeLabelTag (vString *const label)
 
 static lineType getLineType (void)
 {
-	static vString *label = NULL;
+	vString *label = vStringNew ();
 	int column = 0;
 	lineType type = LTYPE_UNDETERMINED;
-
-	if (label == NULL)
-		label = vStringNew ();
 
 	do  /* read in first 6 "margin" characters */
 	{
@@ -589,8 +586,8 @@ static lineType getLineType (void)
 	{
 		vStringTerminate (label);
 		makeLabelTag (label);
-		vStringClear (label);
 	}
+	vStringDelete (label);
 	return type;
 }
 
@@ -768,11 +765,7 @@ static void ungetChar (const int c)
  */
 static vString *parseInteger (int c)
 {
-	static vString *string = NULL;
-
-	if (string == NULL)
-		string = vStringNew ();
-	vStringClear (string);
+	vString *string = vStringNew ();
 
 	if (c == '-')
 	{
@@ -801,23 +794,26 @@ static vString *parseInteger (int c)
 
 static vString *parseNumeric (int c)
 {
-	static vString *string = NULL;
-
-	if (string == NULL)
-		string = vStringNew ();
-	vStringCopy (string, parseInteger (c));
+	vString *string = vStringNew ();
+	vString *integer = parseInteger (c);
+	vStringCopy (string, integer);
+	vStringDelete (integer);
 
 	c = getChar ();
 	if (c == '.')
 	{
+		integer = parseInteger ('\0');
 		vStringPut (string, c);
-		vStringCat (string, parseInteger ('\0'));
+		vStringCat (string, integer);
+		vStringDelete (integer);
 		c = getChar ();
 	}
 	if (tolower (c) == 'e')
 	{
+		integer = parseInteger ('\0');
 		vStringPut (string, c);
-		vStringCat (string, parseInteger ('\0'));
+		vStringCat (string, integer);
+		vStringDelete (integer);
 	}
 	else
 		ungetChar (c);
@@ -873,13 +869,12 @@ static void parseIdentifier (vString *const string, const int firstChar)
  */
 static keywordId analyzeToken (vString *const name)
 {
-	static vString *keyword = NULL;
+	vString *keyword = vStringNew ();
 	keywordId id;
 
-	if (keyword == NULL)
-		keyword = vStringNew ();
 	vStringCopyToLower (keyword, name);
 	id = (keywordId) lookupKeyword (vStringValue (keyword), Lang_fortran);
+	vStringDelete (keyword);
 
 	return id;
 }
@@ -904,9 +899,8 @@ static void checkForLabel (void)
 		vStringPut (token->string, c);
 		c = getChar ();
 	}
-	if (length > 0)
+	if (length > 0  &&  token != NULL)
 	{
-		Assert (token != NULL);
 		vStringTerminate (token->string);
 		makeFortranTag (token, TAG_LABEL);
 		deleteToken (token);
@@ -990,7 +984,7 @@ getNextChar:
 			{
 				do
 				   c = getChar ();
-				while (c != '\n');
+				while (c != '\n' && c != EOF);
 			}
 			else
 			{
@@ -1046,7 +1040,9 @@ getNextChar:
 				readIdentifier (token, c);
 			else if (isdigit (c))
 			{
-				vStringCat (token->string, parseNumeric (c));
+				vString *numeric = parseNumeric (c);
+				vStringCat (token->string, numeric);
+				vStringDelete (numeric);
 				token->type = TOKEN_NUMERIC;
 			}
 			else
@@ -1062,7 +1058,6 @@ static void readSubToken (tokenInfo *const token)
 		token->secondary = newToken ();
 		readToken (token->secondary);
 	}
-	Assert (token->secondary != NULL);
 }
 
 /*
@@ -1457,7 +1452,7 @@ static void parseMap (tokenInfo *const token)
 	while (! isKeyword (token, KEYWORD_end))
 		parseFieldDefinition (token);
 	readSubToken (token);
-	Assert (isSecondaryKeyword (token, KEYWORD_map));
+	/* should be at KEYWORD_map token */
 	skipToNextStatement (token);
 }
 
@@ -1495,9 +1490,9 @@ static void parseUnionStmt (tokenInfo *const token)
 	skipToNextStatement (token);
 	while (isKeyword (token, KEYWORD_map))
 		parseMap (token);
-	Assert (isKeyword (token, KEYWORD_end));
+	/* should be at KEYWORD_end token */
 	readSubToken (token);
-	Assert (isSecondaryKeyword (token, KEYWORD_union));
+	/* secondary token should be KEYWORD_end token */
 	skipToNextStatement (token);
 }
 
@@ -1563,7 +1558,7 @@ static void parseStructureStmt (tokenInfo *const token)
 	while (! isKeyword (token, KEYWORD_end))
 		parseFieldDefinition (token);
 	readSubToken (token);
-	Assert (isSecondaryKeyword (token, KEYWORD_structure));
+	/* secondary token should be KEYWORD_structure token */
 	skipToNextStatement (token);
 	ancestorPop ();
 	deleteToken (name);
@@ -1674,7 +1669,7 @@ static void parseDerivedTypeDef (tokenInfo *const token)
 			skipToNextStatement (token);
 	}
 	readSubToken (token);
-	Assert (isSecondaryKeyword (token, KEYWORD_type));
+	/* secondary token should be KEYWORD_type token */
 	skipToToken (token, TOKEN_STATEMENT_END);
 	ancestorPop ();
 }
@@ -1748,7 +1743,7 @@ static void parseInterfaceBlock (tokenInfo *const token)
 		}
 	}
 	readSubToken (token);
-	Assert (isSecondaryKeyword (token, KEYWORD_interface));
+	/* secondary token should be KEYWORD_interface token */
 	skipToNextStatement (token);
 	ancestorPop ();
 	deleteToken (name);
@@ -1927,8 +1922,7 @@ static void parseBlockData (tokenInfo *const token)
 	while (! isKeyword (token, KEYWORD_end))
 		skipToNextStatement (token);
 	readSubToken (token);
-	Assert (isSecondaryKeyword (token, KEYWORD_NONE) ||
-			isSecondaryKeyword (token, KEYWORD_block));
+	/* secondary token should be KEYWORD_NONE or KEYWORD_block token */
 	skipToNextStatement (token);
 	ancestorPop ();
 }
@@ -1968,7 +1962,7 @@ static void parseInternalSubprogramPart (tokenInfo *const token)
 }
 
 /*  module is
- *      mudule-stmt (is MODULE module-name)
+ *      module-stmt (is MODULE module-name)
  *          [specification-part]
  *          [module-subprogram-part]
  *          end-module-stmt (is END [MODULE [module-name]])
@@ -1996,8 +1990,7 @@ static void parseModule (tokenInfo *const token)
 	while (! isKeyword (token, KEYWORD_end))
 		skipToNextStatement (token);
 	readSubToken (token);
-	Assert (isSecondaryKeyword (token, KEYWORD_NONE) ||
-			isSecondaryKeyword (token, KEYWORD_module));
+	/* secondary token should be KEYWORD_NONE or KEYWORD_module token */
 	skipToNextStatement (token);
 	ancestorPop ();
 }
@@ -2073,12 +2066,11 @@ static void parseSubprogram (tokenInfo *const token, const tagType tag)
 	parseExecutionPart (token);
 	if (isKeyword (token, KEYWORD_contains))
 		parseInternalSubprogramPart (token);
-	Assert (isKeyword (token, KEYWORD_end));
+	/* should be at KEYWORD_end token */
 	readSubToken (token);
-	Assert (isSecondaryKeyword (token, KEYWORD_NONE) ||
-			isSecondaryKeyword (token, KEYWORD_program) ||
-			isSecondaryKeyword (token, KEYWORD_function) ||
-			isSecondaryKeyword (token, KEYWORD_subroutine));
+	/* secondary token should be one of KEYWORD_NONE, KEYWORD_program,
+	 * KEYWORD_function, KEYWORD_function
+	 */
 	skipToNextStatement (token);
 	ancestorPop ();
 }

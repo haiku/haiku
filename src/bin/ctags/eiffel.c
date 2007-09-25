@@ -1,5 +1,5 @@
 /*
-*   $Id: eiffel.c,v 1.18 2006/05/30 04:37:12 darren Exp $
+*   $Id: eiffel.c 560 2007-06-17 03:31:21Z elliotth $
 *
 *   Copyright (c) 1998-2002, Darren Hiebert
 *
@@ -54,7 +54,7 @@ typedef enum eException { ExceptionNone, ExceptionEOF } exception_t;
 typedef enum eKeywordId {
 	KEYWORD_NONE = -1,
 	KEYWORD_alias, KEYWORD_all, KEYWORD_and, KEYWORD_as, KEYWORD_check,
-	KEYWORD_class, KEYWORD_create, KEYWORD_creation, KEYWORD_Current,
+	KEYWORD_class, KEYWORD_convert, KEYWORD_create, KEYWORD_creation, KEYWORD_Current,
 	KEYWORD_debug, KEYWORD_deferred, KEYWORD_do, KEYWORD_else,
 	KEYWORD_elseif, KEYWORD_end, KEYWORD_ensure, KEYWORD_expanded,
 	KEYWORD_export, KEYWORD_external, KEYWORD_false, KEYWORD_feature,
@@ -142,8 +142,6 @@ static kindOption EiffelKinds [] = {
 
 #endif
 
-static langType Lang_eiffel;
-
 static jmp_buf Exception;
 
 static const keywordDesc EiffelKeywordTable [] = {
@@ -154,6 +152,7 @@ static const keywordDesc EiffelKeywordTable [] = {
 	{ "as",             KEYWORD_as         },
 	{ "check",          KEYWORD_check      },
 	{ "class",          KEYWORD_class      },
+	{ "convert",        KEYWORD_convert    },
 	{ "create",         KEYWORD_create     },
 	{ "creation",       KEYWORD_creation   },
 	{ "current",        KEYWORD_Current    },
@@ -380,11 +379,7 @@ static int skipToCharacter (const int c)
  */
 static vString *parseInteger (int c)
 {
-	static vString *string = NULL;
-
-	if (string == NULL)
-		string = vStringNew ();
-	vStringClear (string);
+	vString *string = vStringNew ();
 
 	if (c == '\0')
 		c = fileGetc ();
@@ -408,23 +403,26 @@ static vString *parseInteger (int c)
 
 static vString *parseNumeric (int c)
 {
-	static vString *string = NULL;
-
-	if (string == NULL)
-		string = vStringNew ();
-	vStringCopy (string, parseInteger (c));
+	vString *string = vStringNew ();
+	vString *integer = parseInteger (c);
+	vStringCopy (string, integer);
+	vStringDelete (integer);
 
 	c = fileGetc ();
 	if (c == '.')
 	{
+		integer = parseInteger ('\0');
 		vStringPut (string, c);
-		vStringCat (string, parseInteger ('\0'));
+		vStringCat (string, integer);
+		vStringDelete (integer);
 		c = fileGetc ();
 	}
 	if (tolower (c) == 'e')
 	{
+		integer = parseInteger ('\0');
 		vStringPut (string, c);
-		vStringCat (string, parseInteger ('\0'));
+		vStringCat (string, integer);
+		vStringDelete (integer);
 	}
 	else if (!isspace (c))
 		fileUngetc (c);
@@ -474,6 +472,7 @@ static int parseEscapedCharacter (void)
 			vString *string = parseInteger ('\0');
 			const char *value = vStringValue (string);
 			const unsigned long ascii = atol (value);
+			vStringDelete (string);
 
 			c = fileGetc ();
 			if (c == '/'  &&  ascii < 256)
@@ -506,8 +505,8 @@ static void parseString (vString *const string)
 	boolean verbatim = FALSE;
 	boolean align = FALSE;
 	boolean end = FALSE;
-	vString *verbatimCloser = NULL;
-	vString *lastLine = NULL;
+	vString *verbatimCloser = vStringNew ();
+	vString *lastLine = vStringNew ();
 	int prev = '\0';
 	int c;
 
@@ -531,8 +530,8 @@ static void parseString (vString *const string)
 			if (prev == '[' /* ||  prev == '{' */)
 			{
 				verbatim = TRUE;
-				verbatimCloser = vStringNew ();
-				lastLine = vStringNew ();
+				vStringClear (verbatimCloser);
+				vStringClear (lastLine);
 				if (prev == '{')
 					vStringPut (verbatimCloser, '}');
 				else
@@ -564,6 +563,8 @@ static void parseString (vString *const string)
 		}
 	}
 	vStringTerminate (string);
+	vStringDelete (lastLine);
+	vStringDelete (verbatimCloser);
 }
 
 /*  Read a C identifier beginning with "firstChar" and places it into "name".
@@ -600,13 +601,12 @@ static void parseFreeOperator (vString *const string, const int firstChar)
 
 static keywordId analyzeToken (vString *const name)
 {
-	static vString *keyword = NULL;
+	vString *keyword = vStringNew ();
 	keywordId id;
 
-	if (keyword == NULL)
-		keyword = vStringNew ();
 	vStringCopyToLower (keyword, name);
 	id = (keywordId) lookupKeyword (vStringValue (keyword), Lang_eiffel);
+	vStringDelete (keyword);
 
 	return id;
 }
@@ -727,7 +727,9 @@ getNextChar:
 			}
 			else if (isdigit (c))
 			{
-				vStringCat (token->string, parseNumeric (c));
+				vString* numeric = parseNumeric (c);
+				vStringCat (token->string, numeric);
+				vStringDelete (numeric);
 				token->type = TOKEN_NUMERIC;
 			}
 			else if (isFreeOperatorChar (c))
@@ -1135,6 +1137,30 @@ static void parseInherit (tokenInfo *const token)
 #endif
 }
 
+static void parseConvert (tokenInfo *const token)
+{
+	Assert (isKeyword (token, KEYWORD_convert));
+	do
+	{
+		readToken (token);
+		if (! isType (token, TOKEN_IDENTIFIER))
+			break;
+		else if (isType (token, TOKEN_OPEN_PAREN))
+		{
+			while (! isType (token, TOKEN_CLOSE_PAREN))
+				readToken (token);
+		}
+		else if (isType (token, TOKEN_COLON))
+		{
+			readToken (token);
+			if (! isType (token, TOKEN_OPEN_BRACE))
+				break;
+			else while (! isType (token, TOKEN_CLOSE_BRACE))
+				readToken (token);
+		}
+	} while (isType (token, TOKEN_COMMA));
+}
+
 static void parseClass (tokenInfo *const token)
 {
 	Assert (isKeyword (token, KEYWORD_class));
@@ -1165,6 +1191,7 @@ static void parseClass (tokenInfo *const token)
 		{
 			case KEYWORD_inherit:  parseInherit (token);        break;
 			case KEYWORD_feature:  parseFeatureClauses (token); break;
+			case KEYWORD_convert:  parseConvert (token);        break;
 			default:               readToken (token);           break;
 		}
 	} while (! isKeyword (token, KEYWORD_end));

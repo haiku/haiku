@@ -1,4 +1,4 @@
-# $Id: mk_bc3.mak,v 1.2 2003/02/24 02:27:53 darren Exp $
+# $Id: mk_bc3.mak 278 2003-02-24 02:27:53Z darren $
 #
 # Simple makefile for Borland C++ 3.1
 

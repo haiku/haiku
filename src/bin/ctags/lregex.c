@@ -1,5 +1,5 @@
 /*
-*   $Id: lregex.c,v 1.7 2006/05/30 04:37:12 darren Exp $
+*   $Id: lregex.c 576 2007-06-30 04:16:23Z elliotth $
 *
 *   Copyright (c) 2000-2003, Darren Hiebert
 *
@@ -26,7 +26,7 @@
 # ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>  /* declare off_t (not known to regex.h on FreeBSD) */
 # endif
-# include "regex.h"
+# include <regex.h>
 #endif
 
 #include "debug.h"
@@ -101,22 +101,30 @@ static int SetUpper = -1;  /* upper language index in list */
 
 static void clearPatternSet (const langType language)
 {
-	if (language < SetUpper)
+	if (language <= SetUpper)
 	{
 		patternSet* const set = Sets + language;
 		unsigned int i;
 		for (i = 0  ;  i < set->count  ;  ++i)
 		{
+			regexPattern *p = &set->patterns [i];
 #if defined (POSIX_REGEX)
-			regfree (set->patterns [i].pattern);
+			regfree (p->pattern);
 #endif
-			eFree (set->patterns [i].pattern);
-			set->patterns [i].pattern = NULL;
+			eFree (p->pattern);
+			p->pattern = NULL;
 
-			if (set->patterns [i].type == PTRN_TAG)
+			if (p->type == PTRN_TAG)
 			{
-				eFree (set->patterns [i].u.tag.name_pattern);
-				set->patterns [i].u.tag.name_pattern = NULL;
+				eFree (p->u.tag.name_pattern);
+				p->u.tag.name_pattern = NULL;
+				eFree (p->u.tag.kind.name);
+				p->u.tag.kind.name = NULL;
+				if (p->u.tag.kind.description != NULL)
+				{
+					eFree (p->u.tag.kind.description);
+					p->u.tag.kind.description = NULL;
+				}
 			}
 		}
 		if (set->patterns != NULL)
@@ -324,7 +332,7 @@ static regex_t* compileRegex (const char* const regexp, const char* const flags)
 	{
 		char errmsg[256];
 		regerror (errcode, result, errmsg, 256);
-		error (WARNING, "%s", errmsg);
+		error (WARNING, "regcomp %s: %s", regexp, errmsg);
 		regfree (result);
 		eFree (result);
 		result = NULL;
@@ -604,7 +612,7 @@ extern boolean processRegexOption (const char *const option,
 		langType language;
 		language = getNamedLanguage (dash + 1);
 		if (language == LANG_IGNORE)
-			error (WARNING, "unknown language in --%s option", option);
+			error (WARNING, "unknown language \"%s\" in --%s option", (dash + 1), option);
 		else
 			processLanguageRegex (language, parameter);
 #else
@@ -652,7 +660,7 @@ extern boolean enableRegexKind (
 	return result;
 }
 
-extern void printRegexKinds (const langType language __unused__, boolean indent)
+extern void printRegexKinds (const langType language __unused__, boolean indent __unused__)
 {
 #ifdef HAVE_REGEX
 	if (language <= SetUpper  &&  Sets [language].count > 0)

@@ -1,4 +1,4 @@
-# $Id: source.mak,v 1.15 2003/04/01 05:02:13 darren Exp $
+# $Id: source.mak 459 2006-09-24 10:55:16Z elias $
 #
 # Shared macros
 
@@ -12,6 +12,7 @@ SOURCES = \
 	asm.c \
 	asp.c \
 	awk.c \
+	basic.c \
 	beta.c \
 	c.c \
 	cobol.c \
@@ -62,6 +63,7 @@ OBJECTS = \
 	asm.$(OBJEXT) \
 	asp.$(OBJEXT) \
 	awk.$(OBJEXT) \
+	basic.$(OBJEXT) \
 	beta.$(OBJEXT) \
 	c.$(OBJEXT) \
 	cobol.$(OBJEXT) \

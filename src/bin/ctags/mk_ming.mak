@@ -1,4 +1,4 @@
-# $Id: mk_ming.mak,v 1.1 2001/11/02 04:53:43 darren Exp $
+# $Id: mk_ming.mak 2 2001-11-02 04:53:43Z darren $
 #
 # Makefile for Exuberant Ctags under Win32 with Mingw32 compiler
 #

@@ -1,5 +1,5 @@
 /*
-*   $Id: parse.c,v 1.16 2006/05/30 04:37:12 darren Exp $
+*   $Id: parse.c 597 2007-07-31 05:35:30Z dhiebert $
 *
 *   Copyright (c) 1996-2003, Darren Hiebert
 *
@@ -16,9 +16,6 @@
 #include "general.h"  /* must always come first */
 
 #include <string.h>
-#ifdef HAVE_FNMATCH_H
-#include <fnmatch.h>
-#endif
 
 #include "debug.h"
 #include "entry.h"
@@ -157,6 +154,8 @@ static langType getInterpreterLanguage (const char *const fileName)
 			const char *const cmd = lastSlash != NULL ? lastSlash+1 : line+2;
 			vString* const interpreter = determineInterpreter (cmd);
 			result = getExtensionLanguage (vStringValue (interpreter));
+			if (result == LANG_IGNORE)
+				result = getNamedLanguage (vStringValue (interpreter));
 			vStringDelete (interpreter);
 		}
 		vStringDelete (vLine);
@@ -485,7 +484,7 @@ extern boolean processKindOption (
 		vStringNCopyS (langName, option, dash - option);
 		language = getNamedLanguage (vStringValue (langName));
 		if (language == LANG_IGNORE)
-			error (WARNING, "Unknown language specified in \"%s\" option", option);
+			error (WARNING, "Unknown language \"%s\" in \"%s\" option", vStringValue (langName), option);
 		else
 			processLangKindOption (language, option, parameter);
 		vStringDelete (langName);

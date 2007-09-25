@@ -1,4 +1,49 @@
-Current Version: 5.6
+Current Version: 5.7
+
+ctags-5.7 (04 Sep 2007)
+* Added support for DIM AS [Freebasic, Bug #1741778].
+* Added support for arbitrary nesting depth [Python, Bug #1684786, Debian bug #409078].
+* Added support for verbatim string literals [C#, Bug #1515910].
+* Added support for .ctags as well as ctags.cnf on Windows [Bug #1246506].
+* Added support for non-extern, non-static functions returning wchar_t, contributed by Aaron Peromsik [C++, Patch #1458930].
+* Added support for numerous revision control systems including Bazaar and Mercurial [Bug #1472894].
+* Added support for enums [Java, Bug #1730485, Bug #1517143, Patch #1027395, Patch #1528507].
+* Added support for multiple-level namespace declarations [C#].
+* Added .svn to list of directories ignored during recursion (--recurse).
+* Added support for BlitzBasic, PureBasic and FreeBasic [FR #1100506].
+* Added support for interfaces and static/public/protected/private functions [PHP].
+* Added support for 'package' keyword [Perl].
+* Added support for multi-line subroutine, package, and constant definitions [Perl].
+* Added support for optional subroutine declarations [Perl].
+* Added support for formats [Perl].
+* Added support for new convert keyword [Eiffel].
+* Added optional tags for forward variable declarations (e.g. 'struct C;') [C, C++].
+* Changed parsing of option input file (-L) to strip trailing white space.
+* Ignore comments mixed into definitions and declarations [Perl].
+* Fixed detecting labels with whitespace after label name [Perl, Bug #1752361]
+* Fixed parsing of generic classes/interfaces [Java, Bug #1447756].
+* Fixed misidentification of fully qualified function calls as labels [Perl].
+* Fixed parsing of inner classes [Python, Bug #1411963].
+* Fixed line continuation [Python, Bug #928001, Patch #819471].
+* Fixed parsing of annotations [Java, Bug #1691412].
+* Fixed block-comment parsing [Verilog, Patch #1458042, Bugs #960316, #1111214, #1606569, #1615060].
+* Fixed typo in man page [Debian bug #366412].
+* Fixed missing chunk of text in man page and over-use of hyphens in UTF-8 locales [Debian bug #271323].
+* Fixed parsing of ` as a method name [Ruby].
+* Fixed parsing of keywords in string literals [Ruby, Bug #1742588].
+* Fixed potential segmentation violation [Bug #1672834, Bug #1222926].
+* Fixed parsing of destructors with whitespace after the '~' [C++, Bug #1585745].
+* Fixed default access of unions to be public [C++, Bug #1548443].
+* Fixed various memory leaks, mostly contributed by Dmitry Antipov.
+* Fixed parsing of `define [Verilog, Bug #961001].
+* Fixed crashes involving '/' [Verilog, Bug #1743330].
+* Fixed compilation problem on MinGW [Bug #1517424].
+* Fixed generation of HTML-formatted man page [Bug #1645864].
+* Fixed recognition of Python scripts having '#!/usr/bin/python' as first line [Bug #1764148].
+* Fixed parsing of Fortran comment-to-end-of-line with no newline before EOF [Debian bug #432872].
+* Fixed parsing of << [C/C++, Bugs #1020715, #1093123, #1770479, #1770607].
+* Fixed parsing of fully-qualified type names [Java, Bug #814263].
+* Fixed handling of lone carriage-return characters in file [Bug #1773926].
 
 ctags-5.6 (Mon May 29 2006)
 * Reformatted code for independence of tab stop setting.
@@ -9,7 +54,7 @@ ctags-5.6 (Mon May 29 2006)
 * Added .mk as extension recognized as a make language file [Make].
 * Added missing help for list-maps options [Bug #1201826].
 * Added new extension field "typeref" [thanks to Bram Moolenaar].
-* Extended functionality of Ruby parser with patch from Elliot Hughes [Ruby].
+* Extended functionality of Ruby parser with patch from Elliott Hughes [Ruby].
 * Fixed creation of TAGS file with etags-include but no files [Bug #941233].
 * Fixed problem reading last line of list file (-L) without final newline.
 * Fixed infinite loop that could occur on files without final newline [C, Java].

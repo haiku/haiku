@@ -1,4 +1,4 @@
-# $Id: mk_qdos.mak,v 1.10 2003/02/13 02:59:30 darren Exp $
+# $Id: mk_qdos.mak 264 2003-02-13 02:59:30Z darren $
 #
 # Makefile for ctags on QDOS/SMS systems and C68 v4.24
 # Submitted by Thierry Godefroy <godefroy@imaginet.fr>

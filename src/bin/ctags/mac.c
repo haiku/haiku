@@ -1,5 +1,5 @@
 /*
-*   $Id: mac.c,v 1.2 2006/05/30 04:37:12 darren Exp $
+*   $Id: mac.c 443 2006-05-30 04:37:13Z darren $
 *
 *   Copyright (c) 2001, Maarten L. Hekkelman
 *

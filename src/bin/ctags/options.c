@@ -1,5 +1,5 @@
 /*
-*   $Id: options.c,v 1.32 2006/05/30 04:37:12 darren Exp $
+*   $Id: options.c 576 2007-06-30 04:16:23Z elliotth $
 *
 *   Copyright (c) 1996-2003, Darren Hiebert
 *
@@ -453,6 +453,8 @@ extern void testEtagsInvocation (void)
 		verbose ("Running in etags mode\n");
 		setEtagsMode ();
 	}
+	eFree (execName);
+	eFree (etags);
 }
 
 /*
@@ -487,13 +489,13 @@ static void parseLongOption (cookedArgs *const args, const char *item)
 	const char* const equal = strchr (item, '=');
 	if (equal == NULL)
 	{
-		args->item = eStrdup (item);
+		args->item = eStrdup (item); /* FIXME: memory leak. */
 		args->parameter = "";
 	}
 	else
 	{
 		const size_t length = equal - item;
-		args->item = xMalloc (length + 1, char);
+		args->item = xMalloc (length + 1, char); /* FIXME: memory leak. */
 		strncpy (args->item, item, length);
 		args->item [length] = '\0';
 		args->parameter = equal + 1;
@@ -919,8 +921,9 @@ static void printFeatureList (void)
 
 static void printProgramIdentification (void)
 {
-	printf ("%s %s, Copyright (C) 1996-2004 %s\n",
-			PROGRAM_NAME, PROGRAM_VERSION, AUTHOR_NAME);
+	printf ("%s %s, %s %s\n",
+	        PROGRAM_NAME, PROGRAM_VERSION,
+	        PROGRAM_COPYRIGHT, AUTHOR_NAME);
 	printf ("  Compiled: %s, %s\n", __DATE__, __TIME__);
 	printf ("  Addresses: <%s>, %s\n", AUTHOR_EMAIL, PROGRAM_URL);
 	printFeatureList ();
@@ -952,7 +955,7 @@ static void processLanguageForceOption (
 			   "\"--%s\" option is obsolete; use \"--language-force\" instead",
 			   option);
 	if (language == LANG_IGNORE)
-		error (FATAL, "Unknown language specified in \"%s\" option", option);
+		error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 	else
 		Option.language = language;
 }
@@ -1077,7 +1080,7 @@ static void processLanguageMapOption (
 	{
 		char* const next = processLanguageMap (map);
 		if (next == NULL)
-			error (WARNING, "Unknown language specified in \"%s\" option", option);
+			error (WARNING, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		map = next;
 	}
 	eFree (maps);
@@ -1119,7 +1122,7 @@ static void processLanguagesOption (
 			{
 				const langType language = getNamedLanguage (lang);
 				if (language == LANG_IGNORE)
-					error (WARNING, "Unknown language specified in \"%s\" option", option);
+					error (WARNING, "Unknown language \"%s\" in \"%s\" option", lang, option);
 				else
 					enableLanguage (language, (boolean) (mode != Remove));
 			}
@@ -1155,7 +1158,7 @@ static void processListKindsOption (
 	{
 		langType language = getNamedLanguage (parameter);
 		if (language == LANG_IGNORE)
-			error (FATAL, "Unknown language specified in \"%s\" option",option);
+			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else
 			printLanguageKinds (language);
 	}
@@ -1172,7 +1175,7 @@ static void processListMapsOption (
 	{
 		langType language = getNamedLanguage (parameter);
 		if (language == LANG_IGNORE)
-			error (FATAL, "Unknown language specified in \"%s\" option",option);
+			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else
 			printLanguageMaps (language);
 	}
@@ -1687,28 +1690,57 @@ extern void previewFirstOption (cookedArgs* const args)
 	}
 }
 
+static void parseConfigurationFileOptionsInDirectoryWithLeafname (const char* directory, const char* leafname)
+{
+	vString* const pathname = combinePathAndFile (directory, leafname);
+	parseFileOptions (vStringValue (pathname));
+	vStringDelete (pathname);
+}
+
+static void parseConfigurationFileOptionsInDirectory (const char* directory)
+{
+	parseConfigurationFileOptionsInDirectoryWithLeafname (directory, ".ctags");
+#ifdef MSDOS_STYLE_PATH
+	parseConfigurationFileOptionsInDirectoryWithLeafname (directory, "ctags.cnf");
+#endif
+}
+
 static void parseConfigurationFileOptions (void)
 {
+	/* We parse .ctags on all systems, and additionally ctags.cnf on DOS. */
 	const char* const home = getenv ("HOME");
-	const char* conf;
 #ifdef CUSTOM_CONFIGURATION_FILE
 	parseFileOptions (CUSTOM_CONFIGURATION_FILE);
 #endif
 #ifdef MSDOS_STYLE_PATH
 	parseFileOptions ("/ctags.cnf");
-	conf = "ctags.cnf";
-#else
-	conf = ".ctags";
 #endif
 	parseFileOptions ("/etc/ctags.conf");
 	parseFileOptions ("/usr/local/etc/ctags.conf");
 	if (home != NULL)
 	{
-		vString* const homeFile = combinePathAndFile (home, conf);
-		parseFileOptions (vStringValue (homeFile));
-		vStringDelete (homeFile);
+		parseConfigurationFileOptionsInDirectory (home);
 	}
-	parseFileOptions (conf);
+	else
+	{
+#ifdef MSDOS_STYLE_PATH
+		/*
+		 * Windows users don't usually set HOME.
+		 * The OS sets HOMEDRIVE and HOMEPATH for them.
+		 */
+		const char* homeDrive = getenv ("HOMEDRIVE");
+		const char* homePath = getenv ("HOMEPATH");
+		if (homeDrive != NULL && homePath != NULL)
+		{
+			vString* const windowsHome = vStringNew ();
+			vStringCatS (windowsHome, homeDrive);
+			vStringCatS (windowsHome, homePath);
+			parseConfigurationFileOptionsInDirectory (vStringValue (windowsHome));
+			vStringDelete (windowsHome);
+		}
+#endif
+	}
+	parseConfigurationFileOptionsInDirectory (".");
 }
 
 static void parseEnvironmentOptions (void)
@@ -1760,11 +1792,25 @@ extern void initOptions (void)
 
 	/* always excluded by default */
 	verbose ("  Installing default exclude patterns:\n");
-	processExcludeOption (NULL, "EIFGEN");
-	processExcludeOption (NULL, "SCCS");
-	processExcludeOption (NULL, "RCS");
+	processExcludeOption (NULL, "{arch}");
+	processExcludeOption (NULL, ".arch-ids");
+	processExcludeOption (NULL, ".arch-inventory");
+	processExcludeOption (NULL, "autom4te.cache");
+	processExcludeOption (NULL, "BitKeeper");
+	processExcludeOption (NULL, ".bzr");
+	processExcludeOption (NULL, ".bzrignore");
 	processExcludeOption (NULL, "CVS");
-
+	processExcludeOption (NULL, ".cvsignore");
+	processExcludeOption (NULL, "_darcs");
+	processExcludeOption (NULL, ".deps");
+	processExcludeOption (NULL, "EIFGEN");
+	processExcludeOption (NULL, ".git");
+	processExcludeOption (NULL, ".hg");
+	processExcludeOption (NULL, "PENDING");
+	processExcludeOption (NULL, "RCS");
+	processExcludeOption (NULL, "RESYNC");
+	processExcludeOption (NULL, "SCCS");
+	processExcludeOption (NULL, ".svn");
 }
 
 extern void freeOptionResources (void)

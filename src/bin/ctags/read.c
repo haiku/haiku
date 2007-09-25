@@ -1,5 +1,5 @@
 /*
-*   $Id: read.c,v 1.7 2006/05/30 04:37:12 darren Exp $
+*   $Id: read.c 616 2007-09-05 03:17:50Z dhiebert $
 *
 *   Copyright (c) 1996-2002, Darren Hiebert
 *
@@ -38,10 +38,16 @@ static fpos_t StartOfLine;  /* holds deferred position of start of line */
 
 extern void freeSourceFileResources (void)
 {
-	vStringDelete (File.name);
-	vStringDelete (File.path);
-	vStringDelete (File.source.name);
-	vStringDelete (File.line);
+	if (File.name != NULL)
+		vStringDelete (File.name);
+	if (File.path != NULL)
+		vStringDelete (File.path);
+	if (File.source.name != NULL)
+		vStringDelete (File.source.name);
+	if (File.source.tagPath != NULL)
+		eFree (File.source.tagPath);
+	if (File.line != NULL)
+		vStringDelete (File.line);
 }
 
 /*
@@ -352,18 +358,21 @@ readnext:
 	}
 	else if (c == CRETURN)
 	{
-		/*  Turn line breaks into a canonical form. The three commonly
-		 *  used forms if line breaks: LF (UNIX), CR (MacIntosh), and
-		 *  CR-LF (MS-DOS) are converted into a generic newline.
+		/* Turn line breaks into a canonical form. The three commonly
+		 * used forms if line breaks: LF (UNIX/Mac OS X), CR (Mac OS 9),
+		 * and CR-LF (MS-DOS) are converted into a generic newline.
 		 */
+#ifndef macintosh
 		const int next = getc (File.fp);  /* is CR followed by LF? */
-
 		if (next != NEWLINE)
 			ungetc (next, File.fp);
-
-		c = NEWLINE;  /* convert CR into newline */
-		File.newLine = TRUE;
-		fgetpos (File.fp, &StartOfLine);
+		else
+#endif
+		{
+			c = NEWLINE;  /* convert CR into newline */
+			File.newLine = TRUE;
+			fgetpos (File.fp, &StartOfLine);
+		}
 	}
 	DebugStatement ( debugPutc (DEBUG_RAW, c); )
 	return c;

@@ -1,4 +1,4 @@
-# $Id: mk_mpw.mak,v 1.9 2003/02/13 02:59:30 darren Exp $
+# $Id: mk_mpw.mak 264 2003-02-13 02:59:30Z darren $
 #
 # Makefile for Macintosh using MPW
 #

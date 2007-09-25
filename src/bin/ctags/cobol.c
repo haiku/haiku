@@ -1,5 +1,5 @@
 /*
-*   $Id: cobol.c,v 1.6 2006/05/30 04:37:11 darren Exp $
+*   $Id: cobol.c 443 2006-05-30 04:37:13Z darren $
 *
 *   Copyright (c) 2000-2003, Darren Hiebert
 *

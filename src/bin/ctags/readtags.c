@@ -1,5 +1,5 @@
 /*
-*   $Id: readtags.c,v 1.25 2006/05/30 04:37:12 darren Exp $
+*   $Id: readtags.c 592 2007-07-31 03:30:41Z dhiebert $
 *
 *   Copyright (c) 1996-2003, Darren Hiebert
 *
@@ -57,7 +57,7 @@ struct sTagFile {
 				/* file position of last match for tag */
 			off_t pos; 
 				/* name of tag last searched for */
-			const char *name;
+			char *name;
 				/* length of name for partial matches */
 			size_t nameLength;
 				/* peforming partial match */
@@ -233,7 +233,7 @@ static int readTagLine (tagFile *const file)
 static tagResult growFields (tagFile *const file)
 {
 	tagResult result = TagFailure;
-	unsigned short newCount = 2 * file->fields.max;
+	unsigned short newCount = (unsigned short) 2 * file->fields.max;
 	tagExtensionField *newFields = (tagExtensionField*)
 			realloc (file->fields.list, newCount * sizeof (tagExtensionField));
 	if (newFields == NULL)
@@ -294,7 +294,6 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 	int i;
 	char *p = file->line.buffer;
 	char *tab = strchr (p, TAB);
-	int fieldsPresent = 0;
 
 	entry->fields.list = NULL;
 	entry->fields.count = 0;
@@ -310,6 +309,7 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 		tab = strchr (p, TAB);
 		if (tab != NULL)
 		{
+			int fieldsPresent;
 			*tab = '\0';
 			p = tab + 1;
 			if (*p == '/'  ||  *p == '?')
@@ -361,11 +361,9 @@ static char *duplicate (const char *str)
 	char *result = NULL;
 	if (str != NULL)
 	{
-		result = (char*) malloc (strlen (str) + 1);
+		result = strdup (str);
 		if (result == NULL)
 			perror (NULL);
-		else
-			strcpy (result, str);
 	}
 	return result;
 }
@@ -400,7 +398,7 @@ static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
 			if (strcmp (key, "TAG_FILE_SORTED") == 0)
 				file->sortMethod = (sortType) atoi (value);
 			else if (strcmp (key, "TAG_FILE_FORMAT") == 0)
-				file->format = atoi (value);
+				file->format = (short) atoi (value);
 			else if (strcmp (key, "TAG_PROGRAM_AUTHOR") == 0)
 				file->program.author = duplicate (value);
 			else if (strcmp (key, "TAG_PROGRAM_NAME") == 0)
@@ -441,15 +439,14 @@ static void gotoFirstLogicalTag (tagFile *const file)
 
 static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 {
-	tagFile *result = (tagFile*) malloc (sizeof (tagFile));
+	tagFile *result = (tagFile*) calloc ((size_t) 1, sizeof (tagFile));
 	if (result != NULL)
 	{
-		memset (result, 0, sizeof (tagFile));
 		growString (&result->line);
 		growString (&result->name);
 		result->fields.max = 20;
-		result->fields.list = (tagExtensionField*) malloc (
-			result->fields.max * sizeof (tagExtensionField));
+		result->fields.list = (tagExtensionField*) calloc (
+			result->fields.max, sizeof (tagExtensionField));
 		result->fp = fopen (filePath, "r");
 		if (result->fp == NULL)
 		{
@@ -486,6 +483,8 @@ static void terminate (tagFile *const file)
 		free (file->program.url);
 	if (file->program.version != NULL)
 		free (file->program.version);
+	if (file->search.name != NULL)
+		free (file->search.name);
 
 	memset (file, 0, sizeof (tagFile));
 
@@ -494,7 +493,7 @@ static void terminate (tagFile *const file)
 
 static tagResult readNext (tagFile *const file, tagEntry *const entry)
 {
-	tagResult result = TagFailure;
+	tagResult result;
 	if (file == NULL  ||  ! file->initialized)
 		result = TagFailure;
 	else if (! readTagLine (file))
@@ -650,8 +649,10 @@ static tagResult findSequential (tagFile *const file)
 static tagResult find (tagFile *const file, tagEntry *const entry,
 					   const char *const name, const int options)
 {
-	tagResult result = TagFailure;
-	file->search.name = name;
+	tagResult result;
+	if (file->search.name != NULL)
+		free (file->search.name);
+	file->search.name = duplicate (name);
 	file->search.nameLength = strlen (name);
 	file->search.partial = (options & TAG_PARTIALMATCH) != 0;
 	file->search.ignorecase = (options & TAG_IGNORECASE) != 0;
@@ -687,7 +688,7 @@ static tagResult find (tagFile *const file, tagEntry *const entry,
 
 static tagResult findNext (tagFile *const file, tagEntry *const entry)
 {
-	tagResult result = TagFailure;
+	tagResult result;
 	if ((file->sortMethod == TAG_SORTED      && !file->search.ignorecase) ||
 		(file->sortMethod == TAG_FOLDSORTED  &&  file->search.ignorecase))
 	{

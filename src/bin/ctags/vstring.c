@@ -1,5 +1,5 @@
 /*
-*   $Id: vstring.c,v 1.9 2006/05/30 04:37:13 darren Exp $
+*   $Id: vstring.c 558 2007-06-15 19:17:02Z elliotth $
 *
 *   Copyright (c) 1998-2002, Darren Hiebert
 *
@@ -60,7 +60,7 @@ extern void vStringClear (vString *const string)
 {
 	string->length = 0;
 	string->buffer [0] = '\0';
-	DebugStatement ( clearString (string->buffer, string->size); )
+	DebugStatement ( memset (string->buffer, 0, string->size); )
 }
 
 extern void vStringDelete (vString *const string)
@@ -89,12 +89,12 @@ extern vString *vStringNew (void)
 #ifndef VSTRING_PUTC_MACRO
 extern void vStringPut (vString *const string, const int c)
 {
-	if (string->length == string->size)  /*  check for buffer overflow */
+	if (string->length + 1 == string->size)  /*  check for buffer overflow */
 		vStringAutoResize (string);
 
 	string->buffer [string->length] = c;
 	if (c != '\0')
-		string->length++;
+		string->buffer [++string->length] = '\0';
 }
 #endif
 
@@ -102,7 +102,7 @@ extern void vStringCatS (vString *const string, const char *const s)
 {
 #if 1
 	const size_t len = strlen (s);
-	while (string->length + len >= string->size)/*  check for buffer overflow */
+	while (string->length + len + 1 >= string->size)/*  check for buffer overflow */
 		vStringAutoResize (string);
 	strcpy (string->buffer + string->length, s);
 	string->length += len;
@@ -114,7 +114,7 @@ extern void vStringCatS (vString *const string, const char *const s)
 #endif
 }
 
-extern vString *vStringNewCopy (vString *const string)
+extern vString *vStringNewCopy (const vString *const string)
 {
 	vString *vs = vStringNew ();
 	vStringCatS (vs, string->buffer);

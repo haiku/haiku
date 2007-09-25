@@ -1,5 +1,5 @@
 /*
-*   $Id: sml.c,v 1.7 2006/05/30 04:37:13 darren Exp $
+*   $Id: sml.c 536 2007-06-02 06:09:00Z elliotth $
 *
 *   Copyright (c) 2002, Venkatesh Prasad Ranganath and Darren Hiebert
 *
@@ -146,6 +146,7 @@ static smlKind findNextIdentifier (const unsigned char **cp)
 		if (strcmp (id, SmlKeywordTypes [i].keyword) == 0)
 			result = SmlKeywordTypes [i].kind;
 	}
+	vStringDelete (identifier);
 	return result;
 }
 

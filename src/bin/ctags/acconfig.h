@@ -1,5 +1,5 @@
 /*
-*   $Id: acconfig.h,v 1.4 2003/04/01 05:02:21 darren Exp $
+*   $Id: acconfig.h 318 2003-04-01 05:02:21Z darren $
 *
 *   Copyright (c) 1998-2003, Darren Hiebert
 *

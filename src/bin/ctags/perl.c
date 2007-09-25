@@ -1,5 +1,5 @@
 /*
-*   $Id: perl.c,v 1.14 2006/05/30 04:37:12 darren Exp $
+*   $Id: perl.c 601 2007-08-02 04:45:16Z perlguy0 $
 *
 *   Copyright (c) 2000-2003, Darren Hiebert
 *
@@ -17,10 +17,14 @@
 
 #include <string.h>
 
+#include "entry.h"
 #include "options.h"
 #include "read.h"
 #include "routines.h"
 #include "vstring.h"
+
+#define TRACE_PERL_C 0
+#define TRACE if (TRACE_PERL_C) printf("perl.c:%d: ", __LINE__), printf
 
 /*
 *   DATA DEFINITIONS
@@ -28,14 +32,20 @@
 typedef enum {
 	K_NONE = -1,
 	K_CONSTANT,
+	K_FORMAT,
 	K_LABEL,
-	K_SUBROUTINE
+	K_PACKAGE,
+	K_SUBROUTINE,
+	K_SUBROUTINE_DECLARATION
 } perlKind;
 
 static kindOption PerlKinds [] = {
-	{ TRUE, 'c', "constant",   "constants" },
-	{ TRUE, 'l', "label",      "labels" },
-	{ TRUE, 's', "subroutine", "subroutines" }
+	{ TRUE,  'c', "constant",               "constants" },
+	{ TRUE,  'f', "format",                 "formats" },
+	{ TRUE,  'l', "label",                  "labels" },
+	{ TRUE,  'p', "package",                "packages" },
+	{ TRUE,  's', "subroutine",             "subroutines" },
+	{ FALSE, 'd', "subroutine declaration", "subroutine declarations" },
 };
 
 /*
@@ -78,6 +88,82 @@ static boolean isPodWord (const char *word)
 	return result;
 }
 
+/*
+ * Perl subroutine declaration may look like one of the following:
+ *
+ *  sub abc;
+ *  sub abc :attr;
+ *  sub abc (proto);
+ *  sub abc (proto) :attr;
+ *
+ * Note that there may be more than one attribute.  Attributes may
+ * have things in parentheses (they look like arguments).  Anything
+ * inside of those parentheses goes.  Prototypes may contain semi-colons.
+ * The matching end when we encounter (outside of any parentheses) either
+ * a semi-colon (that'd be a declaration) or an left curly brace
+ * (definition).
+ *
+ * This is pretty complicated parsing (plus we all know that only perl can
+ * parse Perl), so we are only promising best effort here.
+ *
+ * If we can't determine what this is (due to a file ending, for example),
+ * we will return FALSE.
+ */
+static boolean isSubroutineDeclaration (const unsigned char *cp)
+{
+	boolean attr = FALSE;
+	int nparens = 0;
+
+	do {
+		for ( ; *cp; ++cp) {
+SUB_DECL_SWITCH:
+			switch (*cp) {
+				case ':':
+					if (nparens)
+						break;
+					else if (TRUE == attr)
+						return FALSE;    /* Invalid attribute name */
+					else
+						attr = TRUE;
+					break;
+				case '(':
+					++nparens;
+					break;
+				case ')':
+					--nparens;
+					break;
+				case ' ':
+				case '\t':
+					break;
+				case ';':
+					if (!nparens)
+						return TRUE;
+				case '{':
+					if (!nparens)
+						return FALSE;
+				default:
+					if (attr) {
+						if (isIdentifier1(*cp)) {
+							cp++;
+							while (isIdentifier (*cp))
+								cp++;
+							attr = FALSE;
+							goto SUB_DECL_SWITCH; /* Instead of --cp; */
+						} else {
+							return FALSE;
+						}
+					} else if (nparens) {
+						break;
+					} else {
+						return FALSE;
+					}
+			}
+		}
+	} while (NULL != (cp = fileReadLine ()));
+
+	return FALSE;
+}
+
 /* Algorithm adapted from from GNU etags.
  * Perl support by Bart Robinson <lomew@cs.utah.edu>
  * Perl sub names: look for /^ [ \t\n]sub [ \t\n]+ [^ \t\n{ (]+/
@@ -95,6 +181,7 @@ static void findPerlTags (void)
 		boolean qualified = FALSE;
 		const unsigned char *cp = line;
 		perlKind kind = K_NONE;
+		tagEntryInfo e;
 
 		if (skipPodDoc)
 		{
@@ -119,6 +206,7 @@ static void findPerlTags (void)
 
 		if (strncmp((const char*) cp, "sub", (size_t) 3) == 0)
 		{
+			TRACE("this looks like a sub\n");
 			cp += 3;
 			kind = K_SUBROUTINE;
 			spaceRequired = TRUE;
@@ -140,7 +228,10 @@ static void findPerlTags (void)
 		}
 		else if (strncmp((const char*) cp, "package", (size_t) 7) == 0)
 		{
-			cp += 7;
+			/* This will point to space after 'package' so that a tag
+			   can be made */
+			const unsigned char *space = cp += 7;
+
 			if (package == NULL)
 				package = vStringNew ();
 			else
@@ -153,6 +244,18 @@ static void findPerlTags (void)
 				cp++;
 			}
 			vStringCatS (package, "::");
+
+			cp = space;	 /* Rewind */
+			kind = K_PACKAGE;
+			spaceRequired = TRUE;
+			qualified = TRUE;
+		}
+		else if (strncmp((const char*) cp, "format", (size_t) 6) == 0)
+		{
+			cp += 6;
+			kind = K_FORMAT;
+			spaceRequired = TRUE;
+			qualified = TRUE;
 		}
 		else
 		{
@@ -161,27 +264,91 @@ static void findPerlTags (void)
 				const unsigned char *p = cp;
 				while (isIdentifier (*p))
 					++p;
-				if ((int) *p == ':')
+				while (isspace (*p))
+					++p;
+				if ((int) *p == ':' && (int) *(p + 1) != ':')
 					kind = K_LABEL;
 			}
 		}
 		if (kind != K_NONE)
 		{
-			if (spaceRequired && !isspace (*cp))
+			TRACE("cp0: %s\n", (const char *) cp);
+			if (spaceRequired && *cp && !isspace (*cp))
 				continue;
 
+			TRACE("cp1: %s\n", (const char *) cp);
 			while (isspace (*cp))
 				cp++;
-			while (isIdentifier (*cp))
+
+			while (!*cp || '#' == *cp) { /* Gobble up empty lines
+				                            and comments */
+				cp = fileReadLine ();
+				if (!cp)
+					goto END_MAIN_WHILE;
+				while (isspace (*cp))
+					cp++;
+			}
+
+			while (isIdentifier (*cp) || (K_PACKAGE == kind && ':' == *cp))
 			{
 				vStringPut (name, (int) *cp);
 				cp++;
 			}
+
+			if (K_FORMAT == kind &&
+				vStringLength (name) == 0 && /* cp did not advance */
+				'=' == *cp)
+			{
+				/* format's name is optional.  If it's omitted, 'STDOUT'
+				   is assumed. */
+				vStringCatS (name, "STDOUT");
+			}
+
 			vStringTerminate (name);
-			if (vStringLength (name) > 0)
+			TRACE("name: %s\n", name->buffer);
+
+			if (0 == vStringLength(name)) {
+				vStringClear(name);
+				continue;
+			}
+
+			if (K_SUBROUTINE == kind)
+			{
+				/*
+				 * isSubroutineDeclaration() may consume several lines.  So
+				 * we record line positions.
+				 */
+				initTagEntry(&e, vStringValue(name));
+
+				if (TRUE == isSubroutineDeclaration(cp)) {
+					if (TRUE == PerlKinds[K_SUBROUTINE_DECLARATION].enabled) {
+						kind = K_SUBROUTINE_DECLARATION;
+					} else {
+						vStringClear (name);
+						continue;
+					}
+				}
+
+				e.kind     = PerlKinds[kind].letter;
+				e.kindName = PerlKinds[kind].name;
+
+				makeTagEntry(&e);
+
+				if (Option.include.qualifiedTags && qualified &&
+					package != NULL  && vStringLength (package) > 0)
+				{
+					vString *const qualifiedName = vStringNew ();
+					vStringCopy (qualifiedName, package);
+					vStringCat (qualifiedName, name);
+					e.name = vStringValue(qualifiedName);
+					makeTagEntry(&e);
+					vStringDelete (qualifiedName);
+				}
+			} else if (vStringLength (name) > 0)
 			{
 				makeSimpleTag (name, PerlKinds, kind);
 				if (Option.include.qualifiedTags && qualified &&
+					K_PACKAGE != kind &&
 					package != NULL  && vStringLength (package) > 0)
 				{
 					vString *const qualifiedName = vStringNew ();
@@ -194,6 +361,8 @@ static void findPerlTags (void)
 			vStringClear (name);
 		}
 	}
+
+END_MAIN_WHILE:
 	vStringDelete (name);
 	if (package != NULL)
 		vStringDelete (package);
@@ -210,4 +379,4 @@ extern parserDefinition* PerlParser (void)
 	return def;
 }
 
-/* vi:set tabstop=4 shiftwidth=4: */
+/* vi:set tabstop=4 shiftwidth=4 noexpandtab: */

@@ -1311,7 +1311,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
           ac_config_headers="$ac_config_headers config.h"
 
 
-echo 'Exuberant Ctags, version 5.6'
+program_name=`grep 'PROGRAM_NAME  *"' ctags.h | sed -e 's/.*"\([^"]*\)".*/\1/'`
+program_version=`grep 'PROGRAM_VERSION  *"' ctags.h | sed -e 's/.*"\([^"]*\)".*/\1/'`
+echo "$program_name, version $program_version"
 uname -mrsv 2>/dev/null
 
 
@@ -2373,8 +2375,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 case `uname` in
 	HP-UX)
-		echo "$as_me:$LINENO: checking \"HP-UX native compiler\"" >&5
-echo $ECHO_N "checking \"HP-UX native compiler\"... $ECHO_C" >&6
+		echo "$as_me:$LINENO: checking HP-UX native compiler" >&5
+echo $ECHO_N "checking HP-UX native compiler... $ECHO_C" >&6
 		if test "$CC" = "cc"; then
 			echo "$as_me:$LINENO: result: yes; adding compiler options for ANSI support" >&5
 echo "${ECHO_T}yes; adding compiler options for ANSI support" >&6
@@ -2386,8 +2388,8 @@ echo "${ECHO_T}no" >&6
 		;;
 	SunOS)
 		if uname -r | grep '5\.' >/dev/null 2>&1; then
-			echo "$as_me:$LINENO: checking \"Solaris native compiler\"" >&5
-echo $ECHO_N "checking \"Solaris native compiler\"... $ECHO_C" >&6
+			echo "$as_me:$LINENO: checking Solaris native compiler" >&5
+echo $ECHO_N "checking Solaris native compiler... $ECHO_C" >&6
 			if test "$CC" = "cc" -a "`which cc`" = "/usr/ucb/cc"; then
 				echo "$as_me:$LINENO: result: yes; adding compiler option for ANSI support" >&5
 echo "${ECHO_T}yes; adding compiler option for ANSI support" >&6
@@ -2508,8 +2510,8 @@ _ACEOF
 
 fi
 
-echo "$as_me:$LINENO: checking \"for case-insensitive filenames\"" >&5
-echo $ECHO_N "checking \"for case-insensitive filenames\"... $ECHO_C" >&6
+echo "$as_me:$LINENO: checking for case-insensitive filenames" >&5
+echo $ECHO_N "checking for case-insensitive filenames... $ECHO_C" >&6
 touch conftest.cif
 if test -f CONFTEST.CIF; then
 	echo "$as_me:$LINENO: result: yes" >&5
@@ -3549,8 +3551,8 @@ done
 
 
 
-	echo "$as_me:$LINENO: checking \"if L_tmpnam is defined in stdio.h\"" >&5
-echo $ECHO_N "checking \"if L_tmpnam is defined in stdio.h\"... $ECHO_C" >&6
+	echo "$as_me:$LINENO: checking if L_tmpnam is defined in stdio.h" >&5
+echo $ECHO_N "checking if L_tmpnam is defined in stdio.h... $ECHO_C" >&6
 	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -3584,8 +3586,8 @@ rm -f conftest*
 
 
 
-	echo "$as_me:$LINENO: checking \"if INT_MAX is defined in limits.h\"" >&5
-echo $ECHO_N "checking \"if INT_MAX is defined in limits.h\"... $ECHO_C" >&6
+	echo "$as_me:$LINENO: checking if INT_MAX is defined in limits.h" >&5
+echo $ECHO_N "checking if INT_MAX is defined in limits.h... $ECHO_C" >&6
 	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -3610,8 +3612,8 @@ else
 	echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 
-	echo "$as_me:$LINENO: checking \"if MAXINT is defined in limits.h\"" >&5
-echo $ECHO_N "checking \"if MAXINT is defined in limits.h\"... $ECHO_C" >&6
+	echo "$as_me:$LINENO: checking if MAXINT is defined in limits.h" >&5
+echo $ECHO_N "checking if MAXINT is defined in limits.h... $ECHO_C" >&6
 	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -3786,8 +3788,8 @@ _ACEOF
 fi
 
 
-echo "$as_me:$LINENO: checking \"for fpos_t\"" >&5
-echo $ECHO_N "checking \"for fpos_t\"... $ECHO_C" >&6
+echo "$as_me:$LINENO: checking for fpos_t" >&5
+echo $ECHO_N "checking for fpos_t... $ECHO_C" >&6
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -3814,8 +3816,8 @@ fi
 rm -f conftest*
 
 
-echo "$as_me:$LINENO: checking \"for clock_t\"" >&5
-echo $ECHO_N "checking \"for clock_t\"... $ECHO_C" >&6
+echo "$as_me:$LINENO: checking for clock_t" >&5
+echo $ECHO_N "checking for clock_t... $ECHO_C" >&6
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -4532,8 +4534,8 @@ done
 
 if test "$have_fgetpos" != yes ; then
 
-	echo "$as_me:$LINENO: checking \"if SEEK_SET is defined in stdio.h\"" >&5
-echo $ECHO_N "checking \"if SEEK_SET is defined in stdio.h\"... $ECHO_C" >&6
+	echo "$as_me:$LINENO: checking if SEEK_SET is defined in stdio.h" >&5
+echo $ECHO_N "checking if SEEK_SET is defined in stdio.h... $ECHO_C" >&6
 	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -4558,8 +4560,8 @@ else
 	echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 
-	echo "$as_me:$LINENO: checking \"if SEEK_SET is defined in unistd.h\"" >&5
-echo $ECHO_N "checking \"if SEEK_SET is defined in unistd.h\"... $ECHO_C" >&6
+	echo "$as_me:$LINENO: checking if SEEK_SET is defined in unistd.h" >&5
+echo $ECHO_N "checking if SEEK_SET is defined in unistd.h... $ECHO_C" >&6
 	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -5322,8 +5324,8 @@ _ACEOF
  have_remove=yes
 else
 
-	echo "$as_me:$LINENO: checking \"if remove is defined in unistd.h\"" >&5
-echo $ECHO_N "checking \"if remove is defined in unistd.h\"... $ECHO_C" >&6
+	echo "$as_me:$LINENO: checking if remove is defined in unistd.h" >&5
+echo $ECHO_N "checking if remove is defined in unistd.h... $ECHO_C" >&6
 	cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -5892,8 +5894,8 @@ fi
 rm -f conftest*
 
 		if test "$have_putenv_prototype" = yes ; then
-			echo "$as_me:$LINENO: checking \"putenv prototype\"" >&5
-echo $ECHO_N "checking \"putenv prototype\"... $ECHO_C" >&6
+			echo "$as_me:$LINENO: checking putenv prototype" >&5
+echo $ECHO_N "checking putenv prototype... $ECHO_C" >&6
 			cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -6082,8 +6084,8 @@ fi
 
 
 
-{ echo "$as_me:$LINENO: checking \"for missing prototypes\"..." >&5
-echo "$as_me: checking \"for missing prototypes\"..." >&6;}
+{ echo "$as_me:$LINENO: checking for missing prototypes..." >&5
+echo "$as_me: checking for missing prototypes..." >&6;}
 
 
 

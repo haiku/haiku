@@ -1,5 +1,5 @@
 /*
-*   $Id: asp.c,v 1.8 2006/05/30 04:37:11 darren Exp $
+*   $Id: asp.c 443 2006-05-30 04:37:13Z darren $
 *
 *   Copyright (c) 2000, Patrick Dehne <patrick@steidle.net>
 *

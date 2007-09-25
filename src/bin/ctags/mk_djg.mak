@@ -1,4 +1,4 @@
-# $Id: mk_djg.mak,v 1.2 2003/03/31 04:53:22 darren Exp $
+# $Id: mk_djg.mak 307 2003-03-31 04:53:22Z darren $
 #
 # The most simplistic Makefile, for DJGPP Version 2 on Windows
 #

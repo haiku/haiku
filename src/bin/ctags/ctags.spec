@@ -1,6 +1,6 @@
 Summary: Exuberant Ctags - a multi-language source code indexing tool
 Name: ctags
-Version: 5.6
+Version: @VERSION@
 Release: 1
 License: GPL
 Group: Development/Tools

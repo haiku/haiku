@@ -1,5 +1,5 @@
 /*
-*   $Id: debug.c,v 1.5 2006/05/30 04:37:11 darren Exp $
+*   $Id: debug.c 558 2007-06-15 19:17:02Z elliotth $
 *
 *   Copyright (c) 1996-2002, Darren Hiebert
 *
@@ -66,13 +66,6 @@ extern void debugCppNest (const boolean begin, const unsigned int level)
 extern void debugCppIgnore (const boolean ignore)
 {
 	debugPrintf (DEBUG_CPP, "<*cpp:%s ignore*>", ignore ? "begin":"end");
-}
-
-extern void clearString (char *const string, const int length)
-{
-	int i;
-	for (i = 0 ; i < length ; ++i)
-		string [i] = '\0';
 }
 
 extern void debugEntry (const tagEntryInfo *const tag)
