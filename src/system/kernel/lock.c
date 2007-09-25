@@ -87,7 +87,7 @@ recursive_lock_unlock(recursive_lock *lock)
 
 	if (--lock->recursion == 0) {
 		lock->holder = -1;
-		release_sem(lock->sem);
+		release_sem_etc(lock->sem, 1, 0/*B_DO_NOT_RESCHEDULE*/);
 	}
 }
 
@@ -129,6 +129,29 @@ mutex_destroy(mutex *mutex)
 
 
 status_t
+mutex_trylock(mutex *mutex)
+{
+	thread_id me = thread_get_current_thread_id();
+	status_t status;
+
+	if (kernel_startup)
+		return B_OK;
+
+	status = acquire_sem_etc(mutex->sem, 1, B_RELATIVE_TIMEOUT, 0);
+	if (status < B_OK)
+		return status;
+
+	if (me == mutex->holder) {
+		panic("mutex_trylock failure: mutex %p (sem = 0x%lx) acquired twice by"
+			" thread 0x%lx\n", mutex, mutex->sem, me);
+	}
+
+	mutex->holder = me;
+	return B_OK;
+}
+
+
+status_t
 mutex_lock(mutex *mutex)
 {
 	thread_id me = thread_get_current_thread_id();
@@ -165,7 +188,7 @@ mutex_unlock(mutex *mutex)
 	}
 
 	mutex->holder = -1;
-	release_sem(mutex->sem);
+	release_sem_etc(mutex->sem, 1, 0/*B_DO_NOT_RESCHEDULE*/);
 }
 
 
@@ -235,7 +258,7 @@ rw_lock_read_lock(rw_lock *lock)
 status_t
 rw_lock_read_unlock(rw_lock *lock)
 {
-	return release_sem(lock->sem);
+	return release_sem_etc(lock->sem, 1, 0/*B_DO_NOT_RESCHEDULE*/);
 }
 
 

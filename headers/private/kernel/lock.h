@@ -61,6 +61,7 @@ extern int32 recursive_lock_get_recursion(recursive_lock *lock);
 
 extern status_t	mutex_init(mutex *m, const char *name);
 extern void mutex_destroy(mutex *m);
+extern status_t mutex_trylock(mutex *mutex);
 extern status_t mutex_lock(mutex *m);
 extern void mutex_unlock(mutex *m);
 
