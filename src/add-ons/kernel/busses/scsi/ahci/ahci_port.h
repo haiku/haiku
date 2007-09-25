@@ -30,6 +30,7 @@ private:
 	status_t	ResetDevice();
 	status_t	PostResetDevice();
 	void		FlushPostedWrites();
+	void		DumpD2HFis();
 
 private:
 	int						fIndex;

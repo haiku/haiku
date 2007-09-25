@@ -223,12 +223,7 @@ AHCIController::ResetController()
 #if 1
 	fRegs->ghc |= GHC_HR;
 	FlushPostedWrites();
-	for (int i = 0; i < 20; i++) {
-		snooze(50000);
-		if ((fRegs->ghc & GHC_HR) == 0)
-			break;
-	}
-	if (fRegs->ghc & GHC_HR)
+	if (wait_until_clear(&fRegs->ghc, GHC_HR, 1000000) < B_OK)
 		return B_TIMED_OUT;
 #else
 	fRegs->ghc &= ~GHC_AE;

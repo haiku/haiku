@@ -63,12 +63,14 @@ AHCIPort::Init1()
 	fCommandList[0].ctbau = HI32(physAddr);
 	// prdt follows after command table
 
+	// disable transitions to partial or slumber state
+	fRegs->sctl |= 0x300;
+
 	// clear IRQ status bits
 	fRegs->is = fRegs->is;
 
 	// clear error bits
-//	fRegs->serr = fRegs->serr;
-	fRegs->serr = 0xffffffff;
+	fRegs->serr = fRegs->serr;
 
 	// power up device
 	fRegs->cmd |= PORT_CMD_POD;
@@ -102,7 +104,7 @@ AHCIPort::Init2()
 
 	FlushPostedWrites();
 
-//	if (fRegs->sig == 0xffffffff)
+	if (1 /* fRegs->sig == 0xffffffff */)
 		ResetDevice();
 
 	PostResetDevice();
@@ -114,6 +116,7 @@ AHCIPort::Init2()
 	TRACE("sctl 0x%08lx\n", fRegs->sctl);
 	TRACE("serr 0x%08lx\n", fRegs->serr);
 	TRACE("sact 0x%08lx\n", fRegs->sact);
+	TRACE("tfd  0x%08lx\n", fRegs->tfd);
 
 	return B_OK;
 }
@@ -156,7 +159,6 @@ AHCIPort::Uninit()
 }
 
 
-
 status_t
 AHCIPort::ResetDevice()
 {
@@ -173,9 +175,8 @@ AHCIPort::ResetDevice()
 	// perform a hard reset
 	fRegs->sctl = (fRegs->sctl & ~0xf) | 1;
 	FlushPostedWrites();
-	snooze(10000);
+	spin(1100);
 	fRegs->sctl &= ~0xf;
-	fRegs->serr = 0xffffffff;
 	FlushPostedWrites();
 
 	if (wait_until_set(&fRegs->ssts, 0x1, 100000) < B_OK) {
@@ -183,8 +184,7 @@ AHCIPort::ResetDevice()
 	}
 
 	// clear error bits
-//	fRegs->serr = fRegs->serr;
-	fRegs->serr = 0xffffffff;
+	fRegs->serr = fRegs->serr;
 	FlushPostedWrites();
 
 	if (fRegs->ssts & 1) {
@@ -194,7 +194,8 @@ AHCIPort::ResetDevice()
 	}
 
 	// clear error bits
-	fRegs->serr = 0xffffffff;
+	fRegs->serr = fRegs->serr;
+	FlushPostedWrites();
 
 	// start DMA engine
 	fRegs->cmd |= PORT_CMD_ST;
@@ -209,24 +210,20 @@ AHCIPort::PostResetDevice()
 {
 	TRACE("AHCIPort::PostResetDevice port %d\n", fIndex);
 
-	TRACE("tfd 1 0x%08lx\n", fRegs->tfd);
-
-	// wait for DMA idle ?
-//	if (wait_until_clear(&fRegs->cmd, PORT_CMD_CR, 1000000) < B_OK) {
-//		TRACE("AHCIPort::PostResetDevice port %d error DMA engine doesn't stop\n", fIndex);
-//	}
-
-	switch (fRegs->tfd & 0xff) {
-		case 0x7f:
-			TRACE("no device present?\n");
-			break;
-		case 0xff:
-			TRACE("invalid task file status 0xff\n");
-			// fall through
-		default:
-			TRACE("waiting...\n");
-			wait_until_clear(&fRegs->tfd, ATA_BSY | ATA_DRQ, 31000000);
+	if ((fRegs->ssts & 0xf) != 0x3 || (fRegs->tfd & 0xff) == 0x7f) {
+		TRACE("AHCIPort::PostResetDevice port %d: no device\n", fIndex);
+		return B_OK;
 	}
+
+	if ((fRegs->tfd & 0xff) == 0xff)
+		snooze(200000);
+
+	if ((fRegs->tfd & 0xff) == 0xff) {
+		TRACE("AHCIPort::PostResetDevice port %d: invalid task file status 0xff\n", fIndex);
+		return B_ERROR;
+	}
+
+	wait_until_clear(&fRegs->tfd, ATA_BSY, 31000000);
 
 	if (fRegs->sig == 0xeb140101)
 		fRegs->cmd |= PORT_CMD_ATAPI;
@@ -237,10 +234,19 @@ AHCIPort::PostResetDevice()
 	TRACE("device signature 0x%08lx (%s)\n", fRegs->sig,
 		(fRegs->sig == 0xeb140101) ? "ATAPI" : (fRegs->sig == 0x00000101) ? "ATA" : "unknown");
 
-	TRACE("tfd 0x%08lx\n", fRegs->tfd);
-	TRACE("device detection: 0x%lx\n", fRegs->ssts & 0xf);
-
 	return B_OK;
+}
+
+
+void
+AHCIPort::DumpD2HFis()
+{
+	TRACE("D2H FIS:\n");
+	TRACE("  DW0  %02x %02x %02x %02x\n", fFIS->rfis[3], fFIS->rfis[2], fFIS->rfis[1], fFIS->rfis[0]);
+	TRACE("  DW1  %02x %02x %02x %02x\n", fFIS->rfis[7], fFIS->rfis[6], fFIS->rfis[5], fFIS->rfis[4]);
+	TRACE("  DW2  %02x %02x %02x %02x\n", fFIS->rfis[11], fFIS->rfis[10], fFIS->rfis[9], fFIS->rfis[8]);
+	TRACE("  DW3  %02x %02x %02x %02x\n", fFIS->rfis[15], fFIS->rfis[14], fFIS->rfis[13], fFIS->rfis[12]);
+	TRACE("  DW4  %02x %02x %02x %02x\n", fFIS->rfis[19], fFIS->rfis[18], fFIS->rfis[17], fFIS->rfis[16]);
 }
 
 
