@@ -443,7 +443,7 @@ vm_cache_write_modified(vm_cache *cache, bool fsReenter)
 		return B_OK;
 
 	mutex_lock(&cache->lock);
-	status = vm_page_write_modified(cache, fsReenter);
+	status = vm_page_write_modified_pages(cache, fsReenter);
 	mutex_unlock(&cache->lock);
 
 	return status;

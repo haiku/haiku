@@ -32,7 +32,9 @@ status_t vm_page_set_state(vm_page *page, int state);
 size_t vm_page_num_pages(void);
 size_t vm_page_num_free_pages(void);
 
-status_t vm_page_write_modified(vm_cache *cache, bool fsReenter);
+status_t vm_page_write_modified_page(vm_cache *cache, struct vm_page *page,
+	bool fsReenter);
+status_t vm_page_write_modified_pages(vm_cache *cache, bool fsReenter);
 
 void vm_page_unreserve_pages(uint32 count);
 void vm_page_reserve_pages(uint32 count);

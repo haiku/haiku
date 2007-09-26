@@ -50,6 +50,9 @@ void vm_unreserve_memory(size_t bytes);
 status_t vm_try_reserve_memory(size_t bytes);
 status_t vm_daemon_init(void);
 
+const char *page_state_to_string(int state);
+	// for debugging purposes only
+
 #ifdef __cplusplus
 }
 #endif

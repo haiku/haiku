@@ -217,6 +217,32 @@ find_page(int argc, char **argv)
 }
 
 
+const char *
+page_state_to_string(int state)
+{
+	switch(state) {
+		case PAGE_STATE_ACTIVE:
+			return "active";
+		case PAGE_STATE_INACTIVE:
+			return "inactive";
+		case PAGE_STATE_BUSY:
+			return "busy";
+		case PAGE_STATE_MODIFIED:
+			return "modified";
+		case PAGE_STATE_FREE:
+			return "free";
+		case PAGE_STATE_CLEAR:
+			return "clear";
+		case PAGE_STATE_WIRED:
+			return "wired";
+		case PAGE_STATE_UNUSED:
+			return "unused";
+		default:
+			return "unknown";
+	}
+}
+
+
 static int
 dump_page(int argc, char **argv)
 {
@@ -269,9 +295,9 @@ dump_page(int argc, char **argv)
 	kprintf("cache_offset:    %ld\n", page->cache_offset);
 	kprintf("cache_next,prev: %p, %p\n", page->cache_next, page->cache_prev);
 	kprintf("type:            %d\n", page->type);
-	kprintf("state:           %d\n", page->state);
-	kprintf("wired_count:     %u\n", page->wired_count);
-	kprintf("usage_count:     %u\n", page->usage_count);
+	kprintf("state:           %s\n", page_state_to_string(page->state));
+	kprintf("wired_count:     %d\n", page->wired_count);
+	kprintf("usage_count:     %d\n", page->usage_count);
 	#ifdef DEBUG_PAGE_QUEUE
 		kprintf("queue:           %p\n", page->queue);
 	#endif
@@ -323,11 +349,12 @@ dump_page_queue(int argc, char **argv)
 	if (argc == 3) {
 		struct vm_page *page = queue->head;
 		int i;
-		
+
+		kprintf("page        cache          state  wired  usage\n");
 		for (i = 0; page; i++, page = page->queue_next) {
-			kprintf("%5d. queue_next = %p, queue_prev = %p, type = %d, "
-				"state = %d\n", i, page->queue_next, page->queue_prev,
-				page->type, page->state);
+			kprintf("%p  %p  %8s  %5d  %5d\n", page, page->cache,
+				page_state_to_string(page->state),
+				page->wired_count, page->usage_count);
 		}
 	}
 	return 0;
@@ -352,14 +379,20 @@ dump_page_stats(int argc, char **argv)
 
 	kprintf("page stats:\n");
 	kprintf("active: %lu\ninactive: %lu\nbusy: %lu\nunused: %lu\n",
-		counter[PAGE_STATE_ACTIVE], counter[PAGE_STATE_INACTIVE], counter[PAGE_STATE_BUSY], counter[PAGE_STATE_UNUSED]);
+		counter[PAGE_STATE_ACTIVE], counter[PAGE_STATE_INACTIVE],
+		counter[PAGE_STATE_BUSY], counter[PAGE_STATE_UNUSED]);
 	kprintf("wired: %lu\nmodified: %lu\nfree: %lu\nclear: %lu\n",
-		counter[PAGE_STATE_WIRED], counter[PAGE_STATE_MODIFIED], counter[PAGE_STATE_FREE], counter[PAGE_STATE_CLEAR]);
+		counter[PAGE_STATE_WIRED], counter[PAGE_STATE_MODIFIED],
+		counter[PAGE_STATE_FREE], counter[PAGE_STATE_CLEAR]);
 
-	kprintf("\nfree_queue: %p, count = %ld\n", &sFreePageQueue, sFreePageQueue.count);
-	kprintf("clear_queue: %p, count = %ld\n", &sClearPageQueue, sClearPageQueue.count);
-	kprintf("modified_queue: %p, count = %ld\n", &sModifiedPageQueue, sModifiedPageQueue.count);
-	kprintf("active_queue: %p, count = %ld\n", &sActivePageQueue, sActivePageQueue.count);
+	kprintf("\nfree_queue: %p, count = %ld\n", &sFreePageQueue,
+		sFreePageQueue.count);
+	kprintf("clear_queue: %p, count = %ld\n", &sClearPageQueue,
+		sClearPageQueue.count);
+	kprintf("modified_queue: %p, count = %ld\n", &sModifiedPageQueue,
+		sModifiedPageQueue.count);
+	kprintf("active_queue: %p, count = %ld\n", &sActivePageQueue,
+		sActivePageQueue.count);
 
 	return 0;
 }
@@ -439,7 +472,9 @@ set_page_state_nolock(vm_page *page, int pageState)
 			fromQueue = &sClearPageQueue;
 			break;
 		default:
-			panic("vm_page_set_state: vm_page %p in invalid state %d\n", page, page->state);
+			panic("vm_page_set_state: vm_page %p in invalid state %d\n",
+				page, page->state);
+			break;
 	}
 
 	if (page->state == PAGE_STATE_CLEAR || page->state == PAGE_STATE_FREE) {
@@ -480,6 +515,25 @@ set_page_state_nolock(vm_page *page, int pageState)
 	move_page_to_queue(fromQueue, toQueue, page);
 
 	return B_OK;
+}
+
+
+static void
+move_page_to_active_or_inactive_queue(vm_page *page, bool dequeued)
+{
+	// Note, this logic must be in sync with what the page daemon does
+	int32 state;
+	if (!page->mappings.IsEmpty() || page->usage_count >= 0
+		|| page->wired_count)
+		state = PAGE_STATE_ACTIVE;
+	else
+		state = PAGE_STATE_INACTIVE;
+
+	if (dequeued) {
+		page->state = state;
+		enqueue_page(&sActivePageQueue, page);
+	} else
+		set_page_state_nolock(page, state);
 }
 
 
@@ -751,9 +805,69 @@ page_thief(void* /*unused*/, int32 level)
 
 /*!
 	You need to hold the vm_cache lock when calling this function.
+	And \a page must obviously be in that cache.
+	Note that the cache lock is released in this function.
 */
 status_t
-vm_page_write_modified(vm_cache *cache, bool fsReenter)
+vm_page_write_modified_page(vm_cache *cache, vm_page *page, bool fsReenter)
+{
+	ASSERT(page->state == PAGE_STATE_MODIFIED);
+	ASSERT(page->cache == cache);
+
+	ConditionVariable<vm_page> busyCondition;
+	InterruptsSpinLocker locker(&sPageLock);
+
+	remove_page_from_queue(&sModifiedPageQueue, page);
+	page->state = PAGE_STATE_BUSY;
+
+	busyCondition.Publish(page, "page");
+
+	locker.Unlock();
+
+	off_t pageOffset = (off_t)page->cache_offset << PAGE_SHIFT;
+
+	for (vm_area *area = cache->areas; area; area = area->cache_next) {
+		if (pageOffset >= area->cache_offset
+			&& pageOffset < area->cache_offset + area->size) {
+			vm_translation_map *map = &area->address_space->translation_map;
+			// clear the modified flag
+			map->ops->lock(map);
+			map->ops->clear_flags(map, pageOffset - area->cache_offset
+				+ area->base, PAGE_MODIFIED);
+			map->ops->unlock(map);
+		}
+	}
+
+	mutex_unlock(&cache->lock);
+
+	status_t status = write_page(page, fsReenter);
+
+	mutex_lock(&cache->lock);
+
+	locker.Lock();
+
+	if (status == B_OK) {
+		// put it into the active queue
+		move_page_to_active_or_inactive_queue(page, true);
+	} else {
+		// We don't have to put the PAGE_MODIFIED bit back, as it's still
+		// in the modified pages list.
+		page->state = PAGE_STATE_MODIFIED;
+		enqueue_page(&sModifiedPageQueue, page);
+	}
+
+	busyCondition.Unpublish();
+
+	return status;
+}
+
+
+/*!
+	You need to hold the vm_cache lock when calling this function.
+	Note that the cache lock is released in this function.
+*/
+status_t
+vm_page_write_modified_pages(vm_cache *cache, bool fsReenter)
 {
 	vm_page *page = cache->page_list;
 
@@ -805,7 +919,8 @@ vm_page_write_modified(vm_cache *cache, bool fsReenter)
 					map->ops->query(map, pageOffset - area->cache_offset + area->base,
 						&physicalAddress, &flags);
 					if (flags & PAGE_MODIFIED) {
-// TODO: Mark busy?
+						page->state = PAGE_STATE_BUSY;
+						busyCondition.Publish(page, "page");
 						gotPage = true;
 						dequeuedPage = false;
 					}
@@ -829,39 +944,32 @@ vm_page_write_modified(vm_cache *cache, bool fsReenter)
 		mutex_lock(&cache->lock);
 
 		if (status == B_OK) {
-			if (dequeuedPage) {
-				// put it into the active queue
+			// put it into the active/inactive queue
 
-				state = disable_interrupts();
-				acquire_spinlock(&sPageLock);
+			state = disable_interrupts();
+			acquire_spinlock(&sPageLock);
 
-				if (!page->mappings.IsEmpty() || page->wired_count)
-					page->state = PAGE_STATE_ACTIVE;
-				else
-					page->state = PAGE_STATE_INACTIVE;
+			move_page_to_active_or_inactive_queue(page, dequeuedPage);
+			busyCondition.Unpublish();
 
-				busyCondition.Unpublish();
-
-				enqueue_page(&sActivePageQueue, page);
-
-				release_spinlock(&sPageLock);
-				restore_interrupts(state);
-			}
+			release_spinlock(&sPageLock);
+			restore_interrupts(state);
 		} else {
 			// We don't have to put the PAGE_MODIFIED bit back, as it's still
 			// in the modified pages list.
-			if (dequeuedPage) {
-				state = disable_interrupts();
-				acquire_spinlock(&sPageLock);
+			state = disable_interrupts();
+			acquire_spinlock(&sPageLock);
 
+			if (dequeuedPage) {
 				page->state = PAGE_STATE_MODIFIED;
 				enqueue_page(&sModifiedPageQueue, page);
+			} else
+				set_page_state_nolock(page, PAGE_STATE_MODIFIED);
 
-				busyCondition.Unpublish();
+			busyCondition.Unpublish();
 
-				release_spinlock(&sPageLock);
-				restore_interrupts(state);
-			}
+			release_spinlock(&sPageLock);
+			restore_interrupts(state);
 		}
 	}
 

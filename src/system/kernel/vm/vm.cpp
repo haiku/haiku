@@ -2690,32 +2690,6 @@ display_mem(int argc, char **argv)
 }
 
 
-static const char *
-page_state_to_string(int state)
-{
-	switch(state) {
-		case PAGE_STATE_ACTIVE:
-			return "active";
-		case PAGE_STATE_INACTIVE:
-			return "inactive";
-		case PAGE_STATE_BUSY:
-			return "busy";
-		case PAGE_STATE_MODIFIED:
-			return "modified";
-		case PAGE_STATE_FREE:
-			return "free";
-		case PAGE_STATE_CLEAR:
-			return "clear";
-		case PAGE_STATE_WIRED:
-			return "wired";
-		case PAGE_STATE_UNUSED:
-			return "unused";
-		default:
-			return "unknown";
-	}
-}
-
-
 static void
 dump_cache_tree_recursively(vm_cache* cache, int level,
 	vm_cache* highlightCache)
