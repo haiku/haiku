@@ -955,10 +955,7 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
 
 			// Since we don't actually map pages as part of an area, we have
 			// to manually maintain its usage_count
-			if (page->usage_count < 0)
-				page->usage_count = 1;
-			else
-				page->usage_count++;
+			page->usage_count = 2;
 
 			// and copy the contents of the page already in memory
 			if (doWrite) {
