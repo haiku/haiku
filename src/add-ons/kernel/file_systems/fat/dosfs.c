@@ -2,6 +2,7 @@
 	Copyright 1999-2001, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,10 +48,11 @@ static status_t get_fsinfo(nspace *vol, uint32 *free_count, uint32 *last_allocat
 
 int32 instances = 0;
 
-static int debug_fat(int argc, char **argv)
+static int
+debug_fat(int argc, char **argv)
 {
 	int i;
-	for (i=1;i<argc;i++) {
+	for (i = 1; i < argc; i++) {
 		nspace *vol = (nspace *)strtoul(argv[i], NULL, 0);
 		if (vol == NULL)
 			continue;
@@ -84,7 +86,9 @@ static int debug_fat(int argc, char **argv)
 	return B_OK;
 }
 
-static int debug_dvnode(int argc, char **argv)
+
+static int
+debug_dvnode(int argc, char **argv)
 {
 	int i;
 
@@ -114,7 +118,9 @@ static int debug_dvnode(int argc, char **argv)
 	return B_OK;
 }
 
-static int debug_dc2s(int argc, char **argv)
+
+static int
+debug_dc2s(int argc, char **argv)
 {
 	int i;
 	nspace *vol;
@@ -139,13 +145,17 @@ static int debug_dc2s(int argc, char **argv)
 
 #endif
 
-static int lock_removable_device(int fd, bool state)
+
+static int
+lock_removable_device(int fd, bool state)
 {
 	return ioctl(fd, B_SCSI_PREVENT_ALLOW, &state, sizeof(state));
 }
 
-static status_t mount_fat_disk(const char *path, dev_t nsid,
-		const int flags, nspace** newVol, int fs_flags, int op_sync_mode)
+
+static status_t
+mount_fat_disk(const char *path, dev_t nsid, const int flags, nspace** newVol,
+	int fs_flags, int op_sync_mode)
 {
 	nspace		*vol = NULL;
 	uint8		buf[512];
@@ -158,7 +168,7 @@ static status_t mount_fat_disk(const char *path, dev_t nsid,
 		dprintf("dosfs error: out of memory\n");
 		return ENOMEM;
 	}
-	
+
 	vol->magic = NSPACE_MAGIC;
 	vol->flags = B_FS_IS_PERSISTENT | B_FS_HAS_MIME;
 	vol->fs_flags = fs_flags;
@@ -168,12 +178,11 @@ static status_t mount_fat_disk(const char *path, dev_t nsid,
 		dprintf("dosfs: unable to open %s (%s)\n", path, strerror(err));
 		goto error0;
 	}
-	
+
 	// get device characteristics
 	if (ioctl(vol->fd, B_GET_GEOMETRY, &geo) < 0) {
 		struct stat st;
-		if ((fstat(vol->fd, &st) >= 0) &&
-		    S_ISREG(st.st_mode)) {
+		if (fstat(vol->fd, &st) >= 0 && S_ISREG(st.st_mode)) {
 			/* support mounting disk images */
 			geo.bytes_per_sector = 0x200;
 			geo.sectors_per_track = 1;
@@ -210,19 +219,20 @@ static status_t mount_fat_disk(const char *path, dev_t nsid,
 
 	// see if we need to go into op sync mode
 	vol->fs_flags &= ~FS_FLAGS_OP_SYNC;
-	switch(op_sync_mode) {
+	switch (op_sync_mode) {
 		case 1:
-			if((vol->flags & B_FS_IS_REMOVABLE) == 0) {
+			if ((vol->flags & B_FS_IS_REMOVABLE) == 0) {
 				// we're not removable, so skip op_sync
 				break;
 			}
+			// supposed to fall through
 		case 2:
 			dprintf("dosfs: mounted with op_sync enabled\n");
 			vol->fs_flags |= FS_FLAGS_OP_SYNC;
 			break;
 		case 0:
 		default:
-			;
+			break;
 	}
 
 	// read in the boot sector
@@ -233,44 +243,45 @@ static status_t mount_fat_disk(const char *path, dev_t nsid,
 
 	// only check boot signature on hard disks to account for broken mtools
 	// behavior
-	if (((buf[0x1fe] != 0x55) || (buf[0x1ff] != 0xaa)) && (buf[0x15] == 0xf8))
+	if ((buf[0x1fe] != 0x55 || buf[0x1ff] != 0xaa) && buf[0x15] == 0xf8)
 		goto error;
 
 	if (!memcmp(buf+3, "NTFS    ", 8) || !memcmp(buf+3, "HPFS    ", 8)) {
-		dprintf("%4.4s, not FAT\n", buf+3);
+		dprintf("%4.4s, not FAT\n", buf + 3);
 		goto error;
 	}
 
 	// first fill in the universal fields from the bpb
-	vol->bytes_per_sector = read16(buf,0xb);
-	if ((vol->bytes_per_sector != 0x200) && (vol->bytes_per_sector != 0x400) && (vol->bytes_per_sector != 0x800)) {
+	vol->bytes_per_sector = read16(buf, 0xb);
+	if (vol->bytes_per_sector != 0x200 && vol->bytes_per_sector != 0x400
+		&& vol->bytes_per_sector != 0x800) {
 		dprintf("dosfs error: unsupported bytes per sector (%lu)\n",
 				vol->bytes_per_sector);
 		goto error;
 	}
-	
+
 	vol->sectors_per_cluster = i = buf[0xd];
-	if ((i != 1) && (i != 2) && (i != 4) && (i != 8) && 
-		(i != 0x10) && (i != 0x20) && (i != 0x40) && (i != 0x80)) {
+	if (i != 1 && i != 2 && i != 4 && i != 8
+		&& i != 0x10 && i != 0x20 && i != 0x40 && i != 0x80) {
 		dprintf("dosfs: sectors/cluster = %d\n", i);
 		goto error;
 	}
 
-	vol->reserved_sectors = read16(buf,0xe);
+	vol->reserved_sectors = read16(buf, 0xe);
 
 	vol->fat_count = buf[0x10];
-	if ((vol->fat_count == 0) || (vol->fat_count > 8)) {
+	if (vol->fat_count == 0 || vol->fat_count > 8) {
 		dprintf("dosfs: unreasonable fat count (%lu)\n", vol->fat_count);
 		goto error;
 	}
 
 	vol->media_descriptor = buf[0x15];
 	// check media descriptor versus known types
-	if ((buf[0x15] != 0xF0) && (buf[0x15] < 0xf8)) {
+	if (buf[0x15] != 0xf0 && buf[0x15] < 0xf8) {
 		dprintf("dosfs error: invalid media descriptor byte\n");
 		goto error;
 	}
-	
+
 	vol->vol_entry = -2;	// for now, assume there is no volume entry
 	memset(vol->vol_label, ' ', 11);
 
@@ -281,9 +292,10 @@ static status_t mount_fat_disk(const char *path, dev_t nsid,
 		vol->fat_bits = 32;
 		vol->sectors_per_fat = read32(buf,0x24);
 		vol->total_sectors = read32(buf,0x20);
-		
+
 		vol->fsinfo_sector = read16(buf, 0x30);
-		if ((vol->fsinfo_sector != 0xffff) && (vol->fsinfo_sector >= vol->reserved_sectors)) {
+		if (vol->fsinfo_sector != 0xffff
+			&& vol->fsinfo_sector >= vol->reserved_sectors) {
 			dprintf("dosfs: fsinfo sector too large (%x)\n", vol->fsinfo_sector);
 			goto error;
 		}
@@ -544,17 +556,19 @@ error:
 error0:
 	close(vol->fd);
 	free(vol);
-	return (err >= B_NO_ERROR) ? EINVAL : err;
+	return err >= B_NO_ERROR ? EINVAL : err;
 }
 
 
 //	#pragma mark - Scanning
+
 
 typedef struct identify_cookie {
 	uint32 bytes_per_sector;
 	uint32 total_sectors;
 	char name[12];
 } identify_cookie;
+
 
 static float
 dosfs_identify_partition(int fd, partition_data *partition, void **_cookie)
@@ -671,10 +685,11 @@ dosfs_mount(dev_t nsid, const char *device, uint32 flags,
 	int	result;
 	nspace	*vol;
 	void *handle;
-	int op_sync_mode;
+	int op_sync_mode = 0;
 	int fs_flags = 0;
 
 	handle = load_driver_settings("fat");
+	if (handle != NULL) {
 		debug_attr = strtoul(get_driver_parameter(handle, "debug_attr", "0", "0"), NULL, 0);
 		debug_dir = strtoul(get_driver_parameter(handle, "debug_dir", "0", "0"), NULL, 0);
 		debug_dlist = strtoul(get_driver_parameter(handle, "debug_dlist", "0", "0"), NULL, 0);
@@ -684,20 +699,20 @@ dosfs_mount(dev_t nsid, const char *device, uint32 flags,
 		debug_file = strtoul(get_driver_parameter(handle, "debug_file", "0", "0"), NULL, 0);
 		debug_iter = strtoul(get_driver_parameter(handle, "debug_iter", "0", "0"), NULL, 0);
 		debug_vcache = strtoul(get_driver_parameter(handle, "debug_vcache", "0", "0"), NULL, 0);
-	
+
 		op_sync_mode = strtoul(get_driver_parameter(handle, "op_sync_mode", "0", "0"), NULL, 0);
-		if (op_sync_mode < 0 || op_sync_mode > 2) {
+		if (op_sync_mode < 0 || op_sync_mode > 2)
 			op_sync_mode = 0;
-		}
 		if (strcasecmp(get_driver_parameter(handle, "lock_device", "true", "true"), "false") == 0) {
 			dprintf("dosfs: mounted with lock_device = false\n");
 		} else {
 			dprintf("dosfs: mounted with lock_device = true\n");
 			fs_flags |= FS_FLAGS_LOCK_DOOR;
 		}
-		
-	unload_driver_settings(handle);
-	
+
+		unload_driver_settings(handle);
+	}
+
 	/* args is a command line option; dosfs doesn't use any so
 	   we can ignore these arguments */
 	TOUCH(args);
@@ -756,14 +771,16 @@ error:
 	return EINVAL;
 }
 
-static void update_fsinfo(nspace *vol)
+
+static void
+update_fsinfo(nspace *vol)
 {
-	if ((vol->fat_bits == 32) && (vol->fsinfo_sector != 0xffff) &&
-		((vol->flags & B_FS_IS_READONLY) == false)) {
+	if (vol->fat_bits == 32 && vol->fsinfo_sector != 0xffff
+		&& (vol->flags & B_FS_IS_READONLY) == 0) {
 		uchar *buffer;
 		int32 tid = cache_start_transaction(vol->fBlockCache);
 		if ((buffer = (uchar *)block_cache_get_writable_etc(vol->fBlockCache, 
-			vol->fsinfo_sector, 0, vol->bytes_per_sector, tid)) != NULL) {
+				vol->fsinfo_sector, 0, vol->bytes_per_sector, tid)) != NULL) {
 			if ((read32(buffer,0) == 0x41615252) && (read32(buffer,0x1e4) == 0x61417272) && (read16(buffer,0x1fe) == 0xaa55)) {
 				//number of free clusters
 				buffer[0x1e8] = (vol->free_clusters & 0xff);
@@ -775,15 +792,17 @@ static void update_fsinfo(nspace *vol)
 				buffer[0x1ed] = ((vol->last_allocated >> 8) & 0xff);
 				buffer[0x1ee] = ((vol->last_allocated >> 16) & 0xff);
 				buffer[0x1ef] = ((vol->last_allocated >> 24) & 0xff);
-				block_cache_set_dirty(vol->fBlockCache, vol->fsinfo_sector, true, tid);
 			} else {
 				dprintf("update_fsinfo: fsinfo block has invalid magic number\n");
+				block_cache_set_dirty(vol->fBlockCache, vol->fsinfo_sector,
+					false, tid);
 			}
 			block_cache_put(vol->fBlockCache, vol->fsinfo_sector);
 			cache_end_transaction(vol->fBlockCache, tid, NULL, NULL);
 		} else {
 			cache_end_transaction(vol->fBlockCache, tid, NULL, NULL);
-			dprintf("update_fsinfo: error getting fsinfo sector %x\n", vol->fsinfo_sector);
+			dprintf("update_fsinfo: error getting fsinfo sector %x\n",
+				vol->fsinfo_sector);
 		}
 	}
 }
@@ -976,10 +995,10 @@ dosfs_write_fs_stat(void *_vol, const struct fs_info * fss, uint32 mask)
 			}
 			if ((buffer[0x26] != 0x29) || memcmp(buffer + 0x2b, vol->vol_label, 11)) {
 				dprintf("dosfs_wfsstat: label mismatch\n");
+				block_cache_set_dirty(vol->fBlockCache, 0, false, tid);
 				result = B_ERROR;
 			} else {
 				memcpy(buffer + 0x2b, name, 11);
-				block_cache_set_dirty(vol->fBlockCache, 0, true, tid);
 				result = 0;
 			}
 			block_cache_put(vol->fBlockCache, 0);
