@@ -15,10 +15,14 @@
 #include <vm_page.h>
 
 
+const static uint32 kMinScanPagesCount = 512;
+const static uint32 kMaxScanPagesCount = 8192;
+const static bigtime_t kMinScanWaitInterval = 50000LL;		// 50 ms
+const static bigtime_t kMaxScanWaitInterval = 1000000LL;	// 1 sec
+
+static uint32 sLowPagesCount;
 static sem_id sPageDaemonSem;
-static uint32 sScanPagesCount;
 static uint32 sNumPages;
-static bigtime_t sScanWaitInterval;
 
 
 class PageCacheLocker {
@@ -163,24 +167,34 @@ check_page_activation(int32 index)
 
 
 static status_t 
-page_daemon(void *unused)
+page_daemon(void* /*unused*/)
 {
+	bigtime_t scanWaitInterval = kMaxScanWaitInterval;
+	uint32 scanPagesCount = kMinScanPagesCount;
 	uint32 clearPage = 0;
 	uint32 checkPage = sNumPages / 2;
 
 	while (true) {
 		acquire_sem_etc(sPageDaemonSem, 1, B_RELATIVE_TIMEOUT,
-			sScanWaitInterval);
+			scanWaitInterval);
 
-		if (vm_low_memory_state() < B_LOW_MEMORY_NOTE) {
+		// Compute next run time
+		uint32 pagesLeft = vm_page_num_free_pages();
+		if (pagesLeft > sLowPagesCount) {
 			// don't do anything if we have enough free memory left
 			continue;
 		}
 
-		uint32 leftToFree = 32;
-			// TODO: make this depending on the low memory state
+		scanWaitInterval = kMinScanWaitInterval
+			+ (kMaxScanWaitInterval - kMinScanWaitInterval)
+			* pagesLeft / sLowPagesCount;
+		scanPagesCount = kMaxScanPagesCount
+			- (kMaxScanPagesCount - kMinScanPagesCount)
+			* pagesLeft / sLowPagesCount;
+		uint32 leftToFree = 32 + (scanPagesCount - 32)
+			* pagesLeft / sLowPagesCount;
 
-		for (uint32 i = 0; i < sScanPagesCount && leftToFree > 0; i++) {
+		for (uint32 i = 0; i < scanPagesCount && leftToFree > 0; i++) {
 			if (clearPage == 0)
 				dprintf("clear through\n");
 			if (checkPage == 0)
@@ -206,9 +220,10 @@ vm_daemon_init()
 	sPageDaemonSem = create_sem(0, "page daemon");
 
 	sNumPages = vm_page_num_pages();
-	// TODO: compute those depending on sNumPages and memory pressure!
-	sScanPagesCount = 512;
-	sScanWaitInterval = 1000000;
+
+	sLowPagesCount = sNumPages / 16;
+	if (sLowPagesCount < 1024)
+		sLowPagesCount = 1024;
 
 	// create a kernel thread to select pages for pageout
 	thread_id thread = spawn_kernel_thread(&page_daemon, "page daemon",
