@@ -223,6 +223,10 @@ extern scsi_for_sim_interface *gSCSI;
 #define PCI_PCICMD_MSE	0x02
 #define PCI_PCICMD_BME	0x04
 
+#define PCI_VENDOR_INTEL	0x8086
+#define PCI_VENDOR_JMICRON	0x197b
+#define PCI_JMICRON_CONTROLLER_CONTROL_1	0x40
+
 #ifdef __cplusplus
 
 template <class T>

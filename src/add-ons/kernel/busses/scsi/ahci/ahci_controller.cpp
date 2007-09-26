@@ -86,6 +86,15 @@ AHCIController::Init()
 	TRACE("pcicmd new 0x%04x\n", pcicmd);
 	gPCI->write_pci_config(fPCIDevice, PCI_command, 2, pcicmd);
 
+	if (fPCIVendorID == PCI_VENDOR_JMICRON) {
+		uint32 ctrl = gPCI->read_pci_config(fPCIDevice, PCI_JMICRON_CONTROLLER_CONTROL_1, 4);
+		TRACE("Jmicron controller control 1 old 0x%08lx\n", ctrl);
+		ctrl &= ~((1 << 9) | (1 << 12) | (1 << 14));	// disable SFF 8038i emulation
+		ctrl |= (1 << 8) | (1 << 13) | (1 << 15);		// enable AHCI controller
+		TRACE("Jmicron controller control 1 new 0x%08lx\n", ctrl);
+		gPCI->write_pci_config(fPCIDevice, PCI_JMICRON_CONTROLLER_CONTROL_1, 4, ctrl);
+	}
+
 	void *addr = (void *)pciInfo.u.h0.base_registers[5];
 	size_t size = pciInfo.u.h0.base_register_sizes[5];
 
@@ -243,7 +252,7 @@ AHCIController::ResetController()
 	fRegs->pi = savePI;
 	FlushPostedWrites();
 
-	if (fPCIVendorID == 0x8086) {
+	if (fPCIVendorID == PCI_VENDOR_INTEL) {
 		// Intel PCS—Port Control and Status
 		// In AHCI enabled systems, bits[3:0] must always be set
 		gPCI->write_pci_config(fPCIDevice, 0x92, 2, 
