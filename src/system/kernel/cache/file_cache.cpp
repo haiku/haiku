@@ -538,7 +538,7 @@ read_chunk_into_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 	// allocate pages for the cache and mark them busy
 	for (size_t pos = 0; pos < numBytes; pos += B_PAGE_SIZE) {
 		vm_page *page = pages[pageIndex++] = vm_page_allocate_page(
-			PAGE_STATE_FREE);
+			PAGE_STATE_FREE, false);
 		if (page == NULL)
 			panic("no more pages!");
 
@@ -612,10 +612,6 @@ read_chunk_into_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 	// make the pages accessible in the cache
 	for (int32 i = pageIndex; i-- > 0;) {
 		pages[i]->state = PAGE_STATE_ACTIVE;
-		if (pages[i]->usage_count < 0)
-			pages[i]->usage_count = 1;
-		else
-			pages[i]->usage_count++;
 
 		busyConditions[i].Unpublish();
 	}
@@ -697,11 +693,13 @@ write_chunk_to_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 
 	// allocate pages for the cache and mark them busy
 	for (size_t pos = 0; pos < numBytes; pos += B_PAGE_SIZE) {
-		// ToDo: if space is becoming tight, and this cache is already grown
+		// TODO: if space is becoming tight, and this cache is already grown
 		//	big - shouldn't we better steal the pages directly in that case?
 		//	(a working set like approach for the file cache)
+		// TODO: the pages we allocate here should have been reserved upfront
+		//	in cache_io()
 		vm_page *page = pages[pageIndex++] = vm_page_allocate_page(
-			PAGE_STATE_FREE);
+			PAGE_STATE_FREE, false);
 		busyConditions[pageIndex - 1].Publish(page, "page");
 
 		vm_cache_insert_page(ref->cache, page, offset + pos);
@@ -796,11 +794,6 @@ write_chunk_to_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 	// make the pages accessible in the cache
 	for (int32 i = pageIndex; i-- > 0;) {
 		busyConditions[i].Unpublish();
-
-		if (pages[i]->usage_count < 0)
-			pages[i]->usage_count = 1;
-		else
-			pages[i]->usage_count++;
 
 		if (writeThrough)
 			pages[i]->state = PAGE_STATE_ACTIVE;
@@ -959,6 +952,13 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
 		if (page != NULL) {
 			vm_get_physical_page(page->physical_page_number * B_PAGE_SIZE,
 				&virtualAddress, PHYSICAL_PAGE_CAN_WAIT);
+
+			// Since we don't actually map pages as part of an area, we have
+			// to manually maintain its usage_count
+			if (page->usage_count < 0)
+				page->usage_count = 1;
+			else
+				page->usage_count++;
 
 			// and copy the contents of the page already in memory
 			if (doWrite) {

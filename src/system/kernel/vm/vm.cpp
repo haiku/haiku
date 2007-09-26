@@ -1498,7 +1498,7 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 #	endif
 					continue;
 #endif
-				vm_page *page = vm_page_allocate_page(PAGE_STATE_CLEAR);
+				vm_page *page = vm_page_allocate_page(PAGE_STATE_CLEAR, false);
 				if (page == NULL) {
 					// this shouldn't really happen, as we reserve the memory upfront
 					panic("couldn't fulfill B_FULL lock!");
@@ -3789,7 +3789,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 		if (store->ops->has_page != NULL
 			&& store->ops->has_page(store, cacheOffset)) {
 			// insert a fresh page and mark it busy -- we're going to read it in
-			page = vm_page_allocate_page(PAGE_STATE_FREE);
+			page = vm_page_allocate_page(PAGE_STATE_FREE, true);
 			vm_cache_insert_page(cache, page, cacheOffset);
 
 			ConditionVariable<vm_page> busyCondition;
@@ -3955,7 +3955,7 @@ fault_get_page(vm_translation_map *map, vm_cache *topCache, off_t cacheOffset,
 	if (page == NULL) {
 		// we still haven't found a page, so we allocate a clean one
 
-		page = vm_page_allocate_page(PAGE_STATE_CLEAR);
+		page = vm_page_allocate_page(PAGE_STATE_CLEAR, true);
 		FTRACE(("vm_soft_fault: just allocated page 0x%lx\n", page->physical_page_number));
 
 		// Insert the new page into our cache, and replace it with the dummy page if necessary
@@ -4009,7 +4009,7 @@ fault_get_page(vm_translation_map *map, vm_cache *topCache, off_t cacheOffset,
 		// ToDo: if memory is low, it might be a good idea to steal the page
 		//	from our source cache - if possible, that is
 		FTRACE(("get new page, copy it, and put it into the topmost cache\n"));
-		page = vm_page_allocate_page(PAGE_STATE_FREE);
+		page = vm_page_allocate_page(PAGE_STATE_FREE, true);
 #if 0
 if (cacheOffset == 0x12000)
 	dprintf("%ld: copy page %p to page %p from cache %p to cache %p\n", find_thread(NULL),
@@ -4176,6 +4176,11 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	// The top most cache has no fault handler, so let's see if the cache or its sources
 	// already have the page we're searching for (we're going from top to bottom)
 
+	vm_page_reserve_pages(2);
+		// we may need up to 2 pages - reserving them upfront makes sure
+		// we don't have any cache locked, so that the page daemon/thief
+		// can do their job without problems
+
 	vm_translation_map *map = &addressSpace->translation_map;
 	vm_dummy_page dummyPage;
 	dummyPage.cache = NULL;
@@ -4230,6 +4235,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	}
 
 	vm_cache_release_ref(topCache);
+	vm_page_unreserve_pages(2);
 
 	return status;
 }

@@ -352,7 +352,7 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 		vm_page *page;
 
 		// we need to allocate a pgtable
-		page = vm_page_allocate_page(PAGE_STATE_CLEAR);
+		page = vm_page_allocate_page(PAGE_STATE_CLEAR, false);
 
 		// mark the page WIRED
 		vm_page_set_state(page, PAGE_STATE_WIRED);

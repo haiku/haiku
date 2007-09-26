@@ -54,6 +54,7 @@ static page_queue sActivePageQueue;
 static vm_page *sPages;
 static addr_t sPhysicalPageOffset;
 static size_t sNumPages;
+static size_t sReservedPages;
 
 static ConditionVariable<page_queue> sFreePageCondition;
 static spinlock sPageLock;
@@ -468,7 +469,7 @@ set_page_state_nolock(vm_page *page, int pageState)
 	}
 
 	if (pageState == PAGE_STATE_CLEAR || pageState == PAGE_STATE_FREE) {
-		if (sFreePageQueue.count + sClearPageQueue.count == 0)
+		if (sFreePageQueue.count + sClearPageQueue.count <= sReservedPages)
 			sFreePageCondition.NotifyAll();
 
 		if (page->cache != NULL)
@@ -1053,11 +1054,43 @@ vm_mark_page_range_inuse(addr_t startPage, addr_t length)
 }
 
 
-vm_page *
-vm_page_allocate_page(int pageState)
+void
+vm_page_unreserve_pages(uint32 count)
 {
-	// TODO: we may want to have a "canWait" argument
+	InterruptsSpinLocker locker(sPageLock);
+	ASSERT(sReservedPages >= count);
 
+	sReservedPages -= count;
+	
+	if (vm_page_num_free_pages() <= sReservedPages)
+		sFreePageCondition.NotifyAll();
+}
+
+
+void
+vm_page_reserve_pages(uint32 count)
+{
+	InterruptsSpinLocker locker(sPageLock);
+
+	sReservedPages += count;
+	size_t freePages = vm_page_num_free_pages();
+	if (sReservedPages < freePages)
+		return;
+
+	ConditionVariableEntry<page_queue> freeConditionEntry;
+	freeConditionEntry.Add(&sFreePageQueue);
+	vm_low_memory(sReservedPages - freePages);
+
+	// we need to wait until new pages become available
+	locker.Unlock();
+
+	freeConditionEntry.Wait();
+}
+
+
+vm_page *
+vm_page_allocate_page(int pageState, bool reserved)
+{
 	ConditionVariableEntry<page_queue> freeConditionEntry;
 	page_queue *queue;
 	page_queue *otherQueue;
@@ -1079,28 +1112,32 @@ vm_page_allocate_page(int pageState)
 
 	vm_page *page = NULL;
 	while (true) {
-		page = dequeue_page(queue);
-		if (page == NULL) {
-#ifdef DEBUG
-			if (queue->count != 0)
-				panic("queue %p corrupted, count = %d\n", queue, queue->count);
-#endif
-
-			// if the primary queue was empty, grap the page from the
-			// secondary queue
-			page = dequeue_page(otherQueue);
+		if (reserved || sReservedPages < vm_page_num_free_pages()) {
+			page = dequeue_page(queue);
 			if (page == NULL) {
 #ifdef DEBUG
-				if (otherQueue->count != 0) {
-					panic("other queue %p corrupted, count = %d\n", otherQueue,
-						otherQueue->count);
-				}
+				if (queue->count != 0)
+					panic("queue %p corrupted, count = %d\n", queue, queue->count);
 #endif
 
-				freeConditionEntry.Add(&sFreePageQueue);
-				vm_low_memory(1);
+				// if the primary queue was empty, grap the page from the
+				// secondary queue
+				page = dequeue_page(otherQueue);
 			}
 		}
+
+		if (page == NULL) {
+#ifdef DEBUG
+			if (otherQueue->count != 0) {
+				panic("other queue %p corrupted, count = %d\n", otherQueue,
+					otherQueue->count);
+			}
+#endif
+
+			freeConditionEntry.Add(&sFreePageQueue);
+			vm_low_memory(sReservedPages + 1);
+		}
+
 		if (page != NULL)
 			break;
 
@@ -1117,6 +1154,7 @@ vm_page_allocate_page(int pageState)
 
 	int oldPageState = page->state;
 	page->state = PAGE_STATE_BUSY;
+	page->usage_count = 2;
 
 	enqueue_page(&sActivePageQueue, page);
 
@@ -1142,7 +1180,7 @@ vm_page_allocate_pages(int pageState, vm_page **pages, uint32 numPages)
 	uint32 i;
 	
 	for (i = 0; i < numPages; i++) {
-		pages[i] = vm_page_allocate_page(pageState);
+		pages[i] = vm_page_allocate_page(pageState, false);
 		if (pages[i] == NULL) {
 			// allocation failed, we need to free what we already have
 			while (i-- > 0)
@@ -1185,6 +1223,7 @@ vm_page_allocate_page_run(int pageState, addr_t length)
 				sPages[start + i].is_cleared
 					= sPages[start + i].state == PAGE_STATE_CLEAR;
 				set_page_state_nolock(&sPages[start + i], PAGE_STATE_BUSY);
+				sPages[i].usage_count = 2;
 			}
 			firstPage = &sPages[start];
 			break;

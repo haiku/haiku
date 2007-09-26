@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -347,7 +347,7 @@ block_range::Allocate(block_cache *cache, block_chunk **_chunk)
 		if (pages[pageBaseIndex] == NULL) {
 			// there are no pages for us yet
 			for (uint32 i = 0; i < numPages; i++) {
-				vm_page *page = vm_page_allocate_page(PAGE_STATE_FREE);
+				vm_page *page = vm_page_allocate_page(PAGE_STATE_FREE, false);
 				if (page == NULL) {
 					// ToDo: handle this gracefully
 					panic("no memory for block!!\n");
