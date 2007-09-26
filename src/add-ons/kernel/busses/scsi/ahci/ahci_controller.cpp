@@ -80,6 +80,12 @@ AHCIController::Init()
 		TRACE("satacr0 = 0x%08lx, satacr1 = 0x%08lx\n", satacr0, satacr1);
 	}
 
+	uint16 pcicmd = gPCI->read_pci_config(fPCIDevice, PCI_command, 2);
+	TRACE("pcicmd old 0x%04x\n", pcicmd);
+	pcicmd = PCI_PCICMD_BME | PCI_PCICMD_MSE | (pcicmd & ~PCI_PCICMD_IOS);
+	TRACE("pcicmd new 0x%04x\n", pcicmd);
+	gPCI->write_pci_config(fPCIDevice, PCI_command, 2, pcicmd);
+
 	void *addr = (void *)pciInfo.u.h0.base_registers[5];
 	size_t size = pciInfo.u.h0.base_register_sizes[5];
 

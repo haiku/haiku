@@ -219,6 +219,10 @@ extern scsi_for_sim_interface *gSCSI;
 #define HI32(val) (((uint64)(val)) >> 32)
 #define ASSERT(expr) if (expr) {} else panic(#expr)
 
+#define PCI_PCICMD_IOS	0x01
+#define PCI_PCICMD_MSE	0x02
+#define PCI_PCICMD_BME	0x04
+
 #ifdef __cplusplus
 
 template <class T>
