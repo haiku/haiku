@@ -125,7 +125,7 @@ BEOS_ADD_ONS_DRIVERS_NET = etherpci ipro1000 rtl8139 rtl8169 sis900
 BEOS_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)ps2 $(X86_ONLY)isa ide scsi
 	config_manager $(X86_ONLY)agp usb firewire
 ;
-BEOS_ADD_ONS_FILE_SYSTEMS = bfs cdda dos googlefs iso9660 nfs ;
+BEOS_ADD_ONS_FILE_SYSTEMS = bfs cdda fat googlefs iso9660 nfs ;
 
 
 # modules

@@ -1,10 +1,10 @@
-SubDir HAIKU_TOP src add-ons kernel file_systems dos ;
+SubDir HAIKU_TOP src add-ons kernel file_systems fat ;
 
 UsePrivateHeaders kernel ;
 
 SubDirCcFlags -DTRACK_FILENAME ;
 
-KernelAddon dos :
+KernelAddon fat :
 	attr.c
 	dir.c
 	dlist.c

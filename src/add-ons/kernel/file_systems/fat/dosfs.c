@@ -47,7 +47,7 @@ static status_t get_fsinfo(nspace *vol, uint32 *free_count, uint32 *last_allocat
 
 int32 instances = 0;
 
-static int debug_dos(int argc, char **argv)
+static int debug_fat(int argc, char **argv)
 {
 	int i;
 	for (i=1;i<argc;i++) {
@@ -55,7 +55,7 @@ static int debug_dos(int argc, char **argv)
 		if (vol == NULL)
 			continue;
 
-		kprintf("dos nspace @ %p\n", vol);
+		kprintf("fat nspace @ %p\n", vol);
 		kprintf("magic: %lx\n", vol->magic);
 		kprintf("id: %lx, fd: %x, device: %s, flags %lx\n",
 				vol->id, vol->fd, vol->device, vol->flags);
@@ -429,7 +429,7 @@ static status_t mount_fat_disk(const char *path, dev_t nsid,
 	vol->beos_vnid = INVALID_VNID_BITS_MASK;
 	{
 		void *handle;
-		handle = load_driver_settings("dos");
+		handle = load_driver_settings("fat");
 		vol->respect_disk_image =
 				get_driver_boolean_parameter(handle, "respect", true, true);
 		unload_driver_settings(handle);
@@ -674,7 +674,7 @@ dosfs_mount(dev_t nsid, const char *device, uint32 flags,
 	int op_sync_mode;
 	int fs_flags = 0;
 
-	handle = load_driver_settings("dos");
+	handle = load_driver_settings("fat");
 		debug_attr = strtoul(get_driver_parameter(handle, "debug_attr", "0", "0"), NULL, 0);
 		debug_dir = strtoul(get_driver_parameter(handle, "debug_dir", "0", "0"), NULL, 0);
 		debug_dlist = strtoul(get_driver_parameter(handle, "debug_dlist", "0", "0"), NULL, 0);
@@ -734,11 +734,11 @@ dosfs_mount(dev_t nsid, const char *device, uint32 flags,
 		}
 
 #if DEBUG
-		load_driver_symbols("dos");
+		load_driver_symbols("fat");
 
 		if (atomic_add(&instances, 1) == 0) {
-			add_debugger_command("dos", debug_dos, "dump a dos nspace structure");
-			add_debugger_command("dvnode", debug_dvnode, "dump a dos vnode structure");
+			add_debugger_command("fat", debug_fat, "dump a fat nspace structure");
+			add_debugger_command("dvnode", debug_dvnode, "dump a fat vnode structure");
 			add_debugger_command("dfvnid", debug_dfvnid, "find a vnid in the vnid cache");
 			add_debugger_command("dfloc", debug_dfloc, "find a loc in the vnid cache");
 			add_debugger_command("dc2s", debug_dc2s, "calculate sector for cluster");
@@ -839,7 +839,7 @@ dosfs_unmount(void *_vol)
 
 #if DEBUG
 	if (atomic_add(&instances, -1) == 1) {
-		remove_debugger_command("dos", debug_dos);
+		remove_debugger_command("fat", debug_fat);
 		remove_debugger_command("dvnode", debug_dvnode);
 		remove_debugger_command("dfvnid", debug_dfvnid);
 		remove_debugger_command("dfloc", debug_dfloc);
@@ -1184,9 +1184,9 @@ dos_std_ops(int32 op, ...)
 }
 
 
-static file_system_module_info sDosFileSystem = {
+static file_system_module_info sFATFileSystem = {
 	{
-		"file_systems/dos" B_CURRENT_FS_API_VERSION,
+		"file_systems/fat" B_CURRENT_FS_API_VERSION,
 		0,
 		dos_std_ops,
 	},
@@ -1294,6 +1294,6 @@ static file_system_module_info sDosFileSystem = {
 };
 
 module_info *modules[] = {
-	(module_info *)&sDosFileSystem,
+	(module_info *)&sFATFileSystem,
 	NULL,
 };
