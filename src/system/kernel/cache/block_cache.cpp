@@ -1420,6 +1420,18 @@ extern "C" status_t
 block_cache_set_dirty(void *_cache, off_t blockNumber, bool dirty,
 	int32 transaction)
 {
+	block_cache *cache = (block_cache *)_cache;
+	BenaphoreLocker locker(&cache->lock);
+
+	cached_block *block = (cached_block *)hash_lookup(cache->hash,
+		&blockNumber);
+	if (block == NULL)
+		return B_BAD_VALUE;
+	if (block->is_dirty == dirty) {
+		// there is nothing to do for us
+		return B_OK;
+	}
+
 	// TODO: not yet implemented
 	if (dirty)
 		panic("block_cache_set_dirty(): not yet implemented that way!\n");
