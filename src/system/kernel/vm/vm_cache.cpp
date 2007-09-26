@@ -80,16 +80,14 @@ page_hash_func(void *_p, const void *_key, uint32 range)
 }
 
 
-/*!	Acquires a pseudo reference to a cache yet unreferenced by the caller. The
+/*!	Acquires a reference to a cache yet unreferenced by the caller. The
 	caller must make sure, that the cache is not deleted, e.g. by holding the
 	cache's source cache lock or by holding the page cache table lock while the
-	cache is still referred to by a page. To get a real reference, the caller
-	must subsequently call vm_cache_acquire_ref() and decrement the cache's ref
-	count manually afterwards.
-	Returns \c true, if the pseudo reference could be acquired.
+	cache is still referred to by a page.
+	Returns \c true, if the reference could be acquired.
 */
 static inline bool
-acquire_unreferenced_cache_pseudo_ref(vm_cache* cache)
+acquire_unreferenced_cache_ref(vm_cache* cache)
 {
 	while (true) {
 		int32 count = cache->ref_count;
@@ -100,6 +98,73 @@ acquire_unreferenced_cache_pseudo_ref(vm_cache* cache)
 			return true;
 	}
 }
+
+
+static void
+delete_cache(vm_cache *cache)
+{
+	if (cache->areas != NULL)
+		panic("cache %p to be deleted still has areas", cache);
+	if (!list_is_empty(&cache->consumers))
+		panic("cache %p to be deleted still has consumers", cache);
+
+#if DEBUG_CACHE_LIST
+	int state = disable_interrupts();
+	acquire_spinlock(&sDebugCacheListLock);
+
+	if (cache->debug_previous)
+		cache->debug_previous->debug_next = cache->debug_next;
+	if (cache->debug_next)
+		cache->debug_next->debug_previous = cache->debug_previous;
+	if (cache == gDebugCacheList)
+		gDebugCacheList = cache->debug_next;
+
+	release_spinlock(&sDebugCacheListLock);
+	restore_interrupts(state);
+#endif
+
+	// delete the cache's backing store
+	cache->store->ops->destroy(cache->store);
+
+	// free all of the pages in the cache
+	vm_page *page = cache->page_list;
+	while (page) {
+		vm_page *oldPage = page;
+		int state;
+
+		page = page->cache_next;
+
+		if (!oldPage->mappings.IsEmpty() || oldPage->wired_count != 0) {
+			panic("remove page %p from cache %p: page still has mappings!\n",
+				oldPage, cache);
+		}
+
+		// remove it from the hash table
+		state = disable_interrupts();
+		acquire_spinlock(&sPageCacheTableLock);
+
+		hash_remove(sPageCacheTable, oldPage);
+		oldPage->cache = NULL;
+		// TODO: we also need to remove all of the page's mappings!
+
+		release_spinlock(&sPageCacheTableLock);
+		restore_interrupts(state);
+
+		TRACE(("vm_cache_release_ref: freeing page 0x%lx\n",
+			oldPage->physical_page_number));
+		vm_page_set_state(oldPage, PAGE_STATE_FREE);
+	}
+
+	// remove the ref to the source
+	if (cache->source)
+		vm_cache_remove_consumer(cache->source, cache);
+
+	mutex_destroy(&cache->lock);
+	free(cache);
+}
+
+
+//	#pragma mark -
 
 
 status_t
@@ -181,9 +246,6 @@ vm_cache_acquire_ref(vm_cache *cache)
 	if (cache == NULL)
 		panic("vm_cache_acquire_ref: passed NULL\n");
 
-	if (cache->store->ops->acquire_ref != NULL)
-		cache->store->ops->acquire_ref(cache->store);
-
 	atomic_add(&cache->ref_count, 1);
 }
 
@@ -191,8 +253,6 @@ vm_cache_acquire_ref(vm_cache *cache)
 void
 vm_cache_release_ref(vm_cache *cache)
 {
-	vm_page *page;
-
 	TRACE(("vm_cache_release_ref: cacheRef %p, ref will be %ld\n",
 		cache, cache->ref_count - 1));
 
@@ -200,10 +260,6 @@ vm_cache_release_ref(vm_cache *cache)
 		panic("vm_cache_release_ref: passed NULL\n");
 
 	if (atomic_add(&cache->ref_count, -1) != 1) {
-		// the store ref is only released on the "working" refs, not
-		// on the initial one (this is vnode specific)
-		if (cache->store->ops->release_ref)
-			cache->store->ops->release_ref(cache->store);
 #if 0
 {
 	// count min references to see if everything is okay
@@ -237,64 +293,7 @@ vm_cache_release_ref(vm_cache *cache)
 
 	// delete this cache
 
-	if (cache->areas != NULL)
-		panic("cache %p to be deleted still has areas", cache);
-	if (!list_is_empty(&cache->consumers))
-		panic("cache %p to be deleted still has consumers", cache);
-
-#if DEBUG_CACHE_LIST
-	int state = disable_interrupts();
-	acquire_spinlock(&sDebugCacheListLock);
-
-	if (cache->debug_previous)
-		cache->debug_previous->debug_next = cache->debug_next;
-	if (cache->debug_next)
-		cache->debug_next->debug_previous = cache->debug_previous;
-	if (cache == gDebugCacheList)
-		gDebugCacheList = cache->debug_next;
-
-	release_spinlock(&sDebugCacheListLock);
-	restore_interrupts(state);
-#endif
-
-	// delete the cache's backing store
-	cache->store->ops->destroy(cache->store);
-
-	// free all of the pages in the cache
-	page = cache->page_list;
-	while (page) {
-		vm_page *oldPage = page;
-		int state;
-
-		page = page->cache_next;
-
-		if (!oldPage->mappings.IsEmpty() || oldPage->wired_count != 0) {
-			panic("remove page %p from cache %p: page still has mappings!\n",
-				oldPage, cache);
-		}
-
-		// remove it from the hash table
-		state = disable_interrupts();
-		acquire_spinlock(&sPageCacheTableLock);
-
-		hash_remove(sPageCacheTable, oldPage);
-		oldPage->cache = NULL;
-		// TODO: we also need to remove all of the page's mappings!
-
-		release_spinlock(&sPageCacheTableLock);
-		restore_interrupts(state);
-
-		TRACE(("vm_cache_release_ref: freeing page 0x%lx\n",
-			oldPage->physical_page_number));
-		vm_page_set_state(oldPage, PAGE_STATE_FREE);
-	}
-
-	// remove the ref to the source
-	if (cache->source)
-		vm_cache_remove_consumer(cache->source, cache);
-
-	mutex_destroy(&cache->lock);
-	free(cache);
+	delete_cache(cache);
 }
 
 
@@ -307,15 +306,9 @@ vm_cache_acquire_page_cache_ref(vm_page* page)
 	if (cache == NULL)
 		return NULL;
 
-	// get a pseudo reference
-	if (!acquire_unreferenced_cache_pseudo_ref(cache))
+	// get a reference
+	if (!acquire_unreferenced_cache_ref(cache))
 		return NULL;
-
-	locker.Unlock();
-
-	// turn it into a real reference
-	vm_cache_acquire_ref(cache);
-	atomic_add(&cache->ref_count, -1);
 
 	return cache;
 }
@@ -541,6 +534,9 @@ vm_cache_remove_consumer(vm_cache *cache, vm_cache *consumer)
 	list_remove_item(&cache->consumers, consumer);
 	consumer->source = NULL;
 
+	if (cache->store->ops->release_ref)
+		cache->store->ops->release_ref(cache->store);
+
 	if (cache->areas == NULL && cache->source != NULL
 		&& !list_is_empty(&cache->consumers)
 		&& cache->consumers.link.next == cache->consumers.link.prev) {
@@ -549,14 +545,7 @@ vm_cache_remove_consumer(vm_cache *cache, vm_cache *consumer)
 
 		consumer = (vm_cache *)list_get_first_item(&cache->consumers);
 
-		bool merge = acquire_unreferenced_cache_pseudo_ref(consumer);
-		if (merge) {
-			// We managed to increment the reference count, but that's not a
-			// full reference. We get a real one now and decrement the ref count
-			// again.
-			vm_cache_acquire_ref(consumer);
-			atomic_add(&consumer->ref_count, -1);
-		}
+		bool merge = acquire_unreferenced_cache_ref(consumer);
 
 		// In case we managed to grab a reference to the consumerRef,
 		// this doesn't guarantee that we get the cache we wanted
@@ -696,6 +685,9 @@ vm_cache_add_consumer_locked(vm_cache *cache, vm_cache *consumer)
 	list_add_item(&cache->consumers, consumer);
 
 	vm_cache_acquire_ref(cache);
+
+	if (cache->store->ops->acquire_ref != NULL)
+		cache->store->ops->acquire_ref(cache->store);
 }
 
 
@@ -714,6 +706,9 @@ vm_cache_insert_area_locked(vm_cache *cache, vm_area *area)
 	area->cache_prev = NULL;
 	cache->areas = area;
 
+	if (cache->store->ops->acquire_ref != NULL)
+		cache->store->ops->acquire_ref(cache->store);
+
 	return B_OK;
 }
 
@@ -729,6 +724,9 @@ vm_cache_remove_area(vm_cache *cache, vm_area *area)
 		area->cache_next->cache_prev = area->cache_prev;
 	if (cache->areas == area)
 		cache->areas = area->cache_next;
+
+	if (cache->store->ops->release_ref)
+		cache->store->ops->release_ref(cache->store);
 
 	mutex_unlock(&cache->lock);
 	return B_OK;

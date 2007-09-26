@@ -1761,7 +1761,7 @@ vm_create_null_area(team_id team, const char *name, void **address,
 	The vnode has to be marked busy when calling this function.
 */
 status_t
-vm_create_vnode_cache(void *vnode, struct vm_cache **_cache)
+vm_create_vnode_cache(struct vnode *vnode, struct vm_cache **_cache)
 {
 	status_t status;
 
@@ -1787,11 +1787,10 @@ err1:
 }
 
 
-/** Will map the file at the path specified by \a name to an area in memory.
- *	The file will be mirrored beginning at the specified \a offset. The \a offset
- *	and \a size arguments have to be page aligned.
- */
-
+/*!	Will map the file at the path specified by \a name to an area in memory.
+	The file will be mirrored beginning at the specified \a offset. The \a offset
+	and \a size arguments have to be page aligned.
+*/
 static area_id
 _vm_map_file(team_id team, const char *name, void **_address, uint32 addressSpec,
 	size_t size, uint32 protection, uint32 mapping, const char *path,
@@ -1827,13 +1826,10 @@ _vm_map_file(team_id team, const char *name, void **_address, uint32 addressSpec
 
 	// ToDo: this only works for file systems that use the file cache
 	status = vfs_get_vnode_cache(vnode, &cache, false);
-
-	vfs_put_vnode(vnode);
-		// we don't need this vnode anymore - if the above call was
-		// successful, the store already has a ref to it
-
-	if (status < B_OK)
+	if (status < B_OK) {
+		vfs_put_vnode(vnode);
 		return status;
+	}
 
 	mutex_lock(&cache->lock);
 
@@ -1841,6 +1837,10 @@ _vm_map_file(team_id team, const char *name, void **_address, uint32 addressSpec
 		offset, size, addressSpec, 0, protection, mapping, &area, name);
 
 	mutex_unlock(&cache->lock);
+
+	vfs_put_vnode(vnode);
+		// we don't need this vnode anymore - if the above call was
+		// successful, the store already has a ref to it
 
 	if (status < B_OK || mapping == REGION_PRIVATE_MAP) {
 		// map_backing_store() cannot know we no longer need the ref
@@ -2538,6 +2538,9 @@ vm_map_page(vm_area *area, vm_page *page, addr_t address, uint32 protection)
 		page->mappings.Add(mapping);
 		area->mappings.Add(mapping);
 	}
+
+	if (page->usage_count < 0)
+		page->usage_count = 1;
 
 	if (page->state != PAGE_STATE_MODIFIED)
 		vm_page_set_state(page, PAGE_STATE_ACTIVE);

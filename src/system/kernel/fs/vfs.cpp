@@ -685,6 +685,12 @@ free_vnode(struct vnode *vnode, bool reenter)
 	// count, so that it will neither become negative nor 0.
 	vnode->ref_count = 2;
 
+	// The file system has removed the resources of the vnode now, so we can
+	// make it available again (and remove the busy vnode from the hash)
+	mutex_lock(&sVnodeMutex);
+	hash_remove(sVnodeTable, vnode);
+	mutex_unlock(&sVnodeMutex);
+
 	// TODO: Usually, when the vnode is unreferenced, no one can get hold of the
 	// cache either (i.e. no one can get a cache reference while we're deleting
 	// the vnode).. This is, however, not the case for the page daemon. It gets
@@ -692,17 +698,14 @@ free_vnode(struct vnode *vnode, bool reenter)
 	// vnode reference while we're deleting the vnode.
 
 	if (!vnode->unpublished) {
-		if (vnode->remove)
-			FS_CALL(vnode, remove_vnode)(vnode->mount->cookie, vnode->private_node, reenter);
-		else
-			FS_CALL(vnode, put_vnode)(vnode->mount->cookie, vnode->private_node, reenter);
+		if (vnode->remove) {
+			FS_CALL(vnode, remove_vnode)(vnode->mount->cookie,
+				vnode->private_node, reenter);
+		} else {
+			FS_CALL(vnode, put_vnode)(vnode->mount->cookie, vnode->private_node,
+				reenter);
+		}
 	}
-
-	// The file system has removed the resources of the vnode now, so we can
-	// make it available again (and remove the busy vnode from the hash)
-	mutex_lock(&sVnodeMutex);
-	hash_remove(sVnodeTable, vnode);
-	mutex_unlock(&sVnodeMutex);
 
 	// if we have a vm_cache attached, remove it
 	if (vnode->cache)
@@ -3116,12 +3119,11 @@ vfs_write_pages(void *_vnode, void *cookie, off_t pos, const iovec *vecs, size_t
 }
 
 
-/** Gets the vnode's vm_cache object. If it didn't have one, it will be
- *	created if \a allocate is \c true.
- *	In case it's successful, it will also grab a reference to the cache
- *	it returns (and therefore, one from the \a vnode in question as well).
- */
-
+/*!	Gets the vnode's vm_cache object. If it didn't have one, it will be
+	created if \a allocate is \c true.
+	In case it's successful, it will also grab a reference to the cache
+	it returns.
+*/
 extern "C" status_t
 vfs_get_vnode_cache(void *_vnode, vm_cache **_cache, bool allocate)
 {
@@ -4222,9 +4224,9 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 
 			// O_CLOEXEC is the only flag available at this time
 			mutex_lock(&context->io_mutex);
-			fd_set_close_on_exec(context, fd, argument & FD_CLOEXEC);
+			fd_set_close_on_exec(context, fd, (argument & FD_CLOEXEC) != 0);
 			mutex_unlock(&context->io_mutex);
-			
+
 			status = B_OK;
 			break;
 		}

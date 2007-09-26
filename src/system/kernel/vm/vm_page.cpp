@@ -6,6 +6,9 @@
  * Distributed under the terms of the NewOS License.
  */
 
+#include <signal.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include <KernelExport.h>
 #include <OS.h>
@@ -16,15 +19,14 @@
 #include <condition_variable.h>
 #include <kernel.h>
 #include <thread.h>
+#include <util/AutoLock.h>
 #include <vm.h>
 #include <vm_address_space.h>
+#include <vm_low_memory.h>
 #include <vm_priv.h>
 #include <vm_page.h>
 #include <vm_cache.h>
 
-#include <signal.h>
-#include <string.h>
-#include <stdlib.h>
 
 //#define TRACE_VM_PAGE
 #ifdef TRACE_VM_PAGE
@@ -53,6 +55,7 @@ static vm_page *sPages;
 static addr_t sPhysicalPageOffset;
 static size_t sNumPages;
 
+static ConditionVariable<page_queue> sFreePageCondition;
 static spinlock sPageLock;
 
 static sem_id modified_pages_available;
@@ -414,8 +417,8 @@ static int dump_free_page_table(int argc, char **argv)
 static status_t
 set_page_state_nolock(vm_page *page, int pageState)
 {
-	page_queue *from_q = NULL;
-	page_queue *to_q = NULL;
+	page_queue *fromQueue = NULL;
+	page_queue *toQueue = NULL;
 
 	switch (page->state) {
 		case PAGE_STATE_BUSY:
@@ -423,16 +426,16 @@ set_page_state_nolock(vm_page *page, int pageState)
 		case PAGE_STATE_INACTIVE:
 		case PAGE_STATE_WIRED:
 		case PAGE_STATE_UNUSED:
-			from_q = &sActivePageQueue;
+			fromQueue = &sActivePageQueue;
 			break;
 		case PAGE_STATE_MODIFIED:
-			from_q = &sModifiedPageQueue;
+			fromQueue = &sModifiedPageQueue;
 			break;
 		case PAGE_STATE_FREE:
-			from_q = &sFreePageQueue;
+			fromQueue = &sFreePageQueue;
 			break;
 		case PAGE_STATE_CLEAR:
-			from_q = &sClearPageQueue;
+			fromQueue = &sClearPageQueue;
 			break;
 		default:
 			panic("vm_page_set_state: vm_page %p in invalid state %d\n", page, page->state);
@@ -442,10 +445,6 @@ set_page_state_nolock(vm_page *page, int pageState)
 		if (page->cache != NULL)
 			panic("free page %p has cache", page);
 	}
-	if (pageState == PAGE_STATE_CLEAR || pageState == PAGE_STATE_FREE) {
-		if (page->cache != NULL)
-			panic("to be freed page %p has cache", page);
-	}
 
 	switch (pageState) {
 		case PAGE_STATE_BUSY:
@@ -453,22 +452,31 @@ set_page_state_nolock(vm_page *page, int pageState)
 		case PAGE_STATE_INACTIVE:
 		case PAGE_STATE_WIRED:
 		case PAGE_STATE_UNUSED:
-			to_q = &sActivePageQueue;
+			toQueue = &sActivePageQueue;
 			break;
 		case PAGE_STATE_MODIFIED:
-			to_q = &sModifiedPageQueue;
+			toQueue = &sModifiedPageQueue;
 			break;
 		case PAGE_STATE_FREE:
-			to_q = &sFreePageQueue;
+			toQueue = &sFreePageQueue;
 			break;
 		case PAGE_STATE_CLEAR:
-			to_q = &sClearPageQueue;
+			toQueue = &sClearPageQueue;
 			break;
 		default:
 			panic("vm_page_set_state: invalid target state %d\n", pageState);
 	}
+
+	if (pageState == PAGE_STATE_CLEAR || pageState == PAGE_STATE_FREE) {
+		if (sFreePageQueue.count + sClearPageQueue.count == 0)
+			sFreePageCondition.NotifyAll();
+
+		if (page->cache != NULL)
+			panic("to be freed page %p has cache", page);
+	}
+
 	page->state = pageState;
-	move_page_to_queue(from_q, to_q, page);
+	move_page_to_queue(fromQueue, toQueue, page);
 
 	return B_OK;
 }
@@ -658,6 +666,82 @@ write_page(vm_page *page, bool fsReenter)
 	}
 
 	return status;
+}
+
+
+static void
+page_thief(void* /*unused*/, int32 level)
+{
+	uint32 steal;
+	int32 score;
+
+	switch (level) {
+		default:
+		case B_LOW_MEMORY_NOTE:
+			steal = 10;
+			score = -20;
+			break;
+		case B_LOW_MEMORY_WARNING:
+			steal = 50;
+			score = -5;
+			break;
+		case B_LOW_MEMORY_CRITICAL:
+			steal = 500;
+			score = -1;
+			break;
+	}
+
+	vm_page* page = NULL;
+	InterruptsSpinLocker locker(sPageLock);
+
+	while (steal > 0) {
+		if (!locker.IsLocked())
+			locker.Lock();
+
+		// find a candidate to steal from the inactive queue
+
+		for (int32 i = sActivePageQueue.count; i-- > 0;) {
+			// move page to the head of the queue so that we don't
+			// scan it again directly
+			page = dequeue_page(&sActivePageQueue);
+			enqueue_page(&sActivePageQueue, page);
+
+			if (page->state == PAGE_STATE_INACTIVE
+				&& page->usage_count <= score)
+				break;
+		}
+
+		if (page == NULL) {
+			if (score == 0)
+				break;
+
+			score = 0;
+			continue;
+		}
+
+		locker.Unlock();
+
+		// try to lock the page's cache
+
+		vm_cache* cache = vm_cache_acquire_page_cache_ref(page);
+		if (cache == NULL)
+			continue;
+
+		if (mutex_trylock(&cache->lock) != B_OK
+			|| page->state != PAGE_STATE_INACTIVE) {
+			vm_cache_release_ref(cache);
+			continue;
+		}
+
+		// we can now steal this page
+
+		vm_cache_remove_page(cache, page);
+		vm_page_set_state(page, PAGE_STATE_FREE);
+		steal--;
+
+		mutex_unlock(&cache->lock);
+		vm_cache_release_ref(cache);
+	}
 }
 
 
@@ -904,6 +988,11 @@ vm_page_init_post_thread(kernel_args *args)
 	tid = thread_create_kernel_thread("pageout daemon", &pageout_daemon, B_FIRST_REAL_TIME_PRIORITY + 1);
 	thread_resume_thread(tid);
 #endif
+
+	new (&sFreePageCondition) ConditionVariable<page_queue>;
+	sFreePageCondition.Publish(&sFreePageQueue, "free page");
+
+	register_low_memory_handler(page_thief, NULL, 0);
 	return B_OK;
 }
 
@@ -967,6 +1056,9 @@ vm_mark_page_range_inuse(addr_t startPage, addr_t length)
 vm_page *
 vm_page_allocate_page(int pageState)
 {
+	// TODO: we may want to have a "canWait" argument
+
+	ConditionVariableEntry<page_queue> freeConditionEntry;
 	page_queue *queue;
 	page_queue *otherQueue;
 
@@ -983,33 +1075,43 @@ vm_page_allocate_page(int pageState)
 			return NULL; // invalid
 	}
 
-	cpu_status state = disable_interrupts();
-	acquire_spinlock(&sPageLock);
+	InterruptsSpinLocker locker(sPageLock);
 
-	vm_page *page = dequeue_page(queue);
-	if (page == NULL) {
-#ifdef DEBUG
-		if (queue->count != 0)
-			panic("queue %p corrupted, count = %d\n", queue, queue->count);
-#endif
-
-		// if the primary queue was empty, grap the page from the
-		// secondary queue
-		page = dequeue_page(otherQueue);
+	vm_page *page = NULL;
+	while (true) {
+		page = dequeue_page(queue);
 		if (page == NULL) {
 #ifdef DEBUG
-			if (otherQueue->count != 0) {
-				panic("other queue %p corrupted, count = %d\n", otherQueue,
-					otherQueue->count);
-			}
+			if (queue->count != 0)
+				panic("queue %p corrupted, count = %d\n", queue, queue->count);
 #endif
 
-			// ToDo: issue "someone" to free up some pages for us, and go into
-			// wait state until that's done
-			panic("vm_allocate_page: out of memory! page state = %d\n",
-				pageState);
+			// if the primary queue was empty, grap the page from the
+			// secondary queue
+			page = dequeue_page(otherQueue);
+			if (page == NULL) {
+#ifdef DEBUG
+				if (otherQueue->count != 0) {
+					panic("other queue %p corrupted, count = %d\n", otherQueue,
+						otherQueue->count);
+				}
+#endif
+
+				freeConditionEntry.Add(&sFreePageQueue);
+				vm_low_memory(1);
+			}
 		}
+		if (page != NULL)
+			break;
+
+		// we need to wait until new pages become available
+		locker.Unlock();
+
+		freeConditionEntry.Wait();
+
+		locker.Lock();
 	}
+
 	if (page->cache != NULL)
 		panic("supposed to be free page %p has cache\n", page);
 
@@ -1018,8 +1120,7 @@ vm_page_allocate_page(int pageState)
 
 	enqueue_page(&sActivePageQueue, page);
 
-	release_spinlock(&sPageLock);
-	restore_interrupts(state);
+	locker.Unlock();
 
 	// if needed take the page from the free queue and zero it out
 	if (pageState == PAGE_STATE_CLEAR && oldPageState != PAGE_STATE_CLEAR)

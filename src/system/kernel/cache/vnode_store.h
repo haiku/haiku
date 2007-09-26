@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef VNODE_STORE_H
@@ -10,9 +10,9 @@
 
 
 struct vnode_store {
-	vm_store	vm;
-	void		*vnode;
-	void		*file_cache_ref;
+	vm_store		vm;
+	struct vnode*	vnode;
+	void*			file_cache_ref;
 };
 
 #endif	/* VNODE_STORE_H */

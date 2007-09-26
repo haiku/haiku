@@ -47,7 +47,7 @@ extern void cache_prefetch(dev_t mountID, ino_t vnodeID, off_t offset, size_t si
 extern status_t file_cache_init_post_boot_device(void);
 extern status_t file_cache_init(void);
 
-extern vm_store *vm_create_vnode_store(void *vnode);
+extern vm_store *vm_create_vnode_store(struct vnode *vnode);
 
 #ifdef __cplusplus
 }

@@ -31,6 +31,7 @@ struct vm_cache;
 struct file_descriptor;
 struct selectsync;
 struct pollfd;
+struct vnode;
 
 
 /** The I/O context of a process/team, holds the fd array among others */

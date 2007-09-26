@@ -612,6 +612,11 @@ read_chunk_into_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 	// make the pages accessible in the cache
 	for (int32 i = pageIndex; i-- > 0;) {
 		pages[i]->state = PAGE_STATE_ACTIVE;
+		if (pages[i]->usage_count < 0)
+			pages[i]->usage_count = 1;
+		else
+			pages[i]->usage_count++;
+
 		busyConditions[i].Unpublish();
 	}
 
@@ -791,6 +796,11 @@ write_chunk_to_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 	// make the pages accessible in the cache
 	for (int32 i = pageIndex; i-- > 0;) {
 		busyConditions[i].Unpublish();
+
+		if (pages[i]->usage_count < 0)
+			pages[i]->usage_count = 1;
+		else
+			pages[i]->usage_count++;
 
 		if (writeThrough)
 			pages[i]->state = PAGE_STATE_ACTIVE;
@@ -1248,16 +1258,9 @@ file_cache_create(dev_t mountID, ino_t vnodeID, off_t size, int fd)
 	if (vfs_lookup_vnode(mountID, vnodeID, &ref->vnode) != B_OK)
 		goto err2;
 
-	// Gets (usually creates) the cache for the node - note, this does grab a
-	// reference to the node...
+	// Gets (usually creates) the cache for the node
 	if (vfs_get_vnode_cache(ref->vnode, &ref->cache, true) != B_OK)
 		goto err2;
-
-	// ... that we don't need, and therefore release it again.
-	// Our caller already holds a reference to the vnode; it will destroy us
-	// when the last one goes away (which, of course, can only ever happen if
-	// we don't grab an extra reference).
-	vfs_put_vnode(ref->vnode);
 
 	ref->cache->virtual_size = size;
 	((vnode_store *)ref->cache->store)->file_cache_ref = ref;

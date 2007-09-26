@@ -15,6 +15,7 @@
 
 struct kernel_args;
 struct team;
+struct vnode;
 
 
 #ifdef __cplusplus
@@ -65,7 +66,7 @@ area_id vm_clone_area(team_id team, const char *name, void **address,
 			uint32 addressSpec, uint32 protection, uint32 mapping, 
 			area_id sourceArea);
 status_t vm_delete_area(team_id aid, area_id id);
-status_t vm_create_vnode_cache(void *vnode, vm_cache **_cache);
+status_t vm_create_vnode_cache(struct vnode *vnode, vm_cache **_cache);
 vm_area *vm_area_lookup(vm_address_space *addressSpace, addr_t address);
 status_t vm_set_area_memory_type(area_id id, addr_t physicalBase, uint32 type);
 status_t vm_get_page_mapping(team_id team, addr_t vaddr, addr_t *paddr);
