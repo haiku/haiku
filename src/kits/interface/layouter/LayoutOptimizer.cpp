@@ -13,7 +13,51 @@
 #include <AutoDeleter.h>
 
 
+//#define TRACE_LAYOUT_OPTIMIZER	1
+#if TRACE_LAYOUT_OPTIMIZER
+#	define TRACE(format...)	printf(format)
+#	define TRACE_ONLY(x)	x
+#else
+#	define TRACE(format...)
+#	define TRACE_ONLY(x)
+#endif
+#define TRACE_ERROR(format...)	fprintf(stderr, format)
+
 using std::nothrow;
+
+
+/*!	\class BPrivate::Layout::LayoutOptimizer
+
+	Given a set of layout constraints, a feasible solution, and a desired
+	(non-)solution this class finds an optimal solution. The optimization
+	criterion is to minimize the norm of the difference to the desired
+	(non-)solution.
+
+	It does so by implementing an active set method algorithm. The basic idea
+	is to start with the subset of the constraints that are barely satisfied by
+	the feasible solution, i.e. including all equality constraints and those
+	inequality constraints that are still satisfied, if restricted to equality
+	constraints. This set is called active set, the contained constraints active
+	constraints.
+
+	Considering all of the active constraints equality constraints a new
+	solution is computed, which still satisfies all those equality constraints
+	and is optimal with respect to the optimization criterion.
+
+	If the new solution equals the previous one, we find the inequality
+	constraint that, by keeping it in the active set, prevents us most from
+	further optimizing the solution. If none really does, we're done, having
+	found the globally optimal solution. Otherwise we remove the found
+	constraint from the active set and try again.
+
+	If the new solution does not equal the previous one, it might violate one
+	or more of the inactive constraints. If that is the case, we add the
+	most-violated constraint to the active set and adjust the new solution such
+	that barely satisfies that constraint. Otherwise, we don't adjust the
+	computed solution. With the adjusted respectively unadjusted solution
+	we enter the next iteration, i.e. by computing a new optimal solution with
+	respect to the active set.
+*/
 
 
 // #pragma mark - vector and matrix operations
@@ -239,7 +283,7 @@ solve(double** a, int n, double* b)
 		}
 
 		if (fuzzy_equals(pivotValue, 0)) {
-			printf("solve(): matrix is not regular\n");
+			TRACE_ERROR("solve(): matrix is not regular\n");
 			return false;
 		}
 
@@ -378,7 +422,7 @@ qr_decomposition(double** a, int m, int n, double* d, double** q)
 			innerProductU = innerProductU + a[i][j] * a[i][j];
 		double innerProduct = innerProductU + a[j][j] * a[j][j];
 		if (fuzzy_equals(innerProduct, 0)) {
-			printf("qr_decomposition(): 0 column %d\n", j);
+			TRACE_ERROR("qr_decomposition(): 0 column %d\n", j);
 			return false;
 		}
 
@@ -469,7 +513,7 @@ struct LayoutOptimizer::Constraint {
 
 	void Print() const
 	{
-		printf("c[%2ld] - c[%2ld] %2s %4d\n", right, left,
+		TRACE("c[%2ld] - c[%2ld] %2s %4d\n", right, left,
 			(equality ? "=" : ">="), (int)value);
 	}
 
@@ -642,57 +686,32 @@ LayoutOptimizer::_Solve(const double* desired, double* values)
 {
 	int32 constraintCount = fConstraints.CountItems();
 
-//printf("constraints:\n");
-//for (int32 i = 0; i < constraintCount; i++) {
-//	printf(" %-2ld:  ", i);
-//	((Constraint*)fConstraints.ItemAt(i))->Print();
-//}
+TRACE_ONLY(
+	TRACE("constraints:\n");
+	for (int32 i = 0; i < constraintCount; i++) {
+		TRACE(" %-2ld:  ", i);
+		((Constraint*)fConstraints.ItemAt(i))->Print();
+	}
+)
 
-	// our QP is suppose to be in this form:
+	// our QP is supposed to be in this form:
 	//   min_x 1/2x^TGx + x^Td
 	//   s.t. a_i^Tx = b_i,  i \in E
 	//        a_i^Tx >= b_i, i \in I
 
-	// init G and d
-	//
-	// The optimal solution minimizes the square of the distance to the desired
-	// solution:
-	//   \sum_i=1^n (x_i - desired_i)^2
-	// Since we consider the sums c_i = \sum_k=1^i x_k, no the x_i directly,
-	// we get
-	//   \sum_{i=1}^n (c_i - c_{i-1} - desired_i)^2
-	// Expanding and ignoring the constant part, we get
-	//   \sum_{i=1}^n(c_i^2 - 2c_{i-1}c_i + c_{i-1}^2
-	//                + 2desired_i(c_{i-1} - c_i))
-	// This results in a G of the form:
-	//  2 -1  0     ...   0  0
-	// -1  2 -1  0  ...   .  .
-	//  0 -1  2           .  .
-	//  .  0     .        .  .
-	//  .           .     0  0
-	//  .              . -1  0
-	//  0    ...    0 -1  2 -1
-	//  0    ...         -1  1
-	// and d:
-	//   d_i = 2(desired_{i+1} - desired_i)
-	// where desired_{n+1} = 0
-	//
-	// Note, that it is 1/2x^TGx, which is why we would have to multiply the
-	// G entries with 2. Instead we divide d by 2 though, which results in the
-	// equivalent optimization problem.
-	//
+	// init our initial x
 	double x[fVariableCount];
 	x[0] = values[0];
 	for (int i = 1; i < fVariableCount; i++)
 		x[i] = values[i] + x[i - 1];
 
+	// init d
+	// Note that the values of d and of G result from rewriting the
+	// ||x - desired|| we actually want to minimize.
 	double d[fVariableCount];
 	for (int i = 0; i < fVariableCount - 1; i++)
 		d[i] = desired[i + 1] - desired[i];
 	d[fVariableCount - 1] = -desired[fVariableCount - 1];
-
-//printf("d:\n");
-//Matrix(fVariableCount, 1, d).Print();
 
 	// init active set
 	BList activeConstraints(constraintCount);
@@ -700,7 +719,8 @@ LayoutOptimizer::_Solve(const double* desired, double* values)
 	for (int32 i = 0; i < constraintCount; i++) {
 		Constraint* constraint = (Constraint*)fConstraints.ItemAt(i);
 		double actualValue = constraint->ActualValue(x);
-//printf("constraint %ld: actual: %f  constraint: %f\n", i, actualValue, constraint->value);
+		TRACE("constraint %ld: actual: %f  constraint: %f\n", i, actualValue,
+			constraint->value);
 		if (fuzzy_equals(actualValue, constraint->value))
 			activeConstraints.AddItem(constraint);
 	}
@@ -709,16 +729,16 @@ LayoutOptimizer::_Solve(const double* desired, double* values)
 	// solution. We compute a vector p that brings our x closer to the optimum.
 	// We do that by computing the QP resulting from our active constraint set,
 	// W^k. Afterward each iteration we adjust the active set.
-//int iteration = 0;
+TRACE_ONLY(int iteration = 0;)
 	while (true) {
-//printf("\n[iteration %d]\n", iteration++);
-//printf("x:\n");
-//Matrix(fVariableCount, 1, x).Print();
-//printf("active set:\n");
-//for (int32 i = 0; i < activeConstraints.CountItems(); i++) {
-//	printf("  ");
-//	((Constraint*)activeConstraints.ItemAt(i))->Print();
-//}
+TRACE_ONLY(
+		TRACE("\n[iteration %d]\n", iteration++);
+		TRACE("active set:\n");
+		for (int32 i = 0; i < activeConstraints.CountItems(); i++) {
+			TRACE("  ");
+			((Constraint*)activeConstraints.ItemAt(i))->Print();
+		}
+)
 
 		// solve the QP:
 		//   min_p 1/2p^TGp + g_k^Tp
@@ -729,7 +749,7 @@ LayoutOptimizer::_Solve(const double* desired, double* values)
 
 		int32 activeCount = activeConstraints.CountItems();
 		if (activeCount == 0) {
-			printf("Solve(): Error: No more active constraints!\n");
+			TRACE_ERROR("Solve(): Error: No more active constraints!\n");
 			return false;
 		}
 
@@ -761,9 +781,6 @@ LayoutOptimizer::_Solve(const double* desired, double* values)
 		if (!_SolveSubProblem(gxd, am, p))
 			return false;
 
-//printf("p:\n");
-//Matrix(fVariableCount, 1, p).Print();
-
 		if (is_zero(p, fVariableCount)) {
 			// compute Lagrange multipliers lambda_i
 			// if lambda_i >= 0 for all i \in W^k \union inequality constraints,
@@ -785,8 +802,8 @@ LayoutOptimizer::_Solve(const double* desired, double* values)
 			const int aan = am;
 			if (aam != aan) {
 				// This should not happen, since A has full row rank.
-				printf("Solve(): Transposed A has less linear independent rows "
-					"than it has columns!\n");
+				TRACE_ERROR("Solve(): Transposed A has less linear independent "
+					"rows than it has columns!\n");
 				return false;
 			}
 
@@ -801,11 +818,9 @@ LayoutOptimizer::_Solve(const double* desired, double* values)
 			bool success = solve(aa, aam, lambda);
 			if (!success) {
 				// Impossible, since we've removed all linearly dependent rows.
-				printf("Solve(): Failed to compute lambda!\n");
+				TRACE_ERROR("Solve(): Failed to compute lambda!\n");
 				return false;
 			}
-//printf("lambda:\n");
-//Matrix(aam, 1, lambda).Print();
 
 			// find min lambda_i (only, if it's < 0, though)
 			double minLambda = 0;
@@ -829,7 +844,6 @@ LayoutOptimizer::_Solve(const double* desired, double* values)
 			// if the min lambda is >= 0, we're done
 			if (minIndex < 0 || fuzzy_equals(minLambda, 0)) {
 				_SetResult(x, values);
-//printf("all lambda_i >= 0\n");
 				return true;
 			}
 
@@ -859,7 +873,7 @@ LayoutOptimizer::_Solve(const double* desired, double* values)
 					barrier = i;
 				}
 			}
-//printf("alpha: %f, barrier: %d\n", alpha, barrier);
+			TRACE("alpha: %f, barrier: %d\n", alpha, barrier);
 
 			if (alpha < 1)
 				activeConstraints.AddItem(fConstraints.ItemAt(barrier));
@@ -868,64 +882,25 @@ LayoutOptimizer::_Solve(const double* desired, double* values)
 			add_vectors_scaled(x, p, alpha, fVariableCount);
 		}
 	}
-
-
-/*
-min_x 1/2x^TGx + x^Td
-s.t. Ax = b
-
-x^* = x + p
-c = Ax - b
-g = d + Gx
-
--Gp - A^T lambda^* = g
--Ap                = c
-
-p = Yp_Y + Zp_Z
-
-Y und Z aus QR-Faktorisierung von A^T
-
-(AY)p_Y = -c                   -> p_Y
-Z^TGZp_Z = -(Z^TGYp_Y + Z^Tg)  -> p_Z
------------
-
-min_x x^TGx + x^Td
-s.t. a_i^Tx =  b_i  i \in E
-     a_i^Tx >= b_i  i \in I
-
-p_k berechnen durch Loesen von
-
-min_p 1/2p^TGp + g_k^Tp
-s.t. a_i^Tp = 0, i \in W^k
-
-
-
-*/
 }
 
 
 bool
 LayoutOptimizer::_SolveSubProblem(const double* d, int am, double* p)
 {
-	// x = p
-	// d = g_k
-	// b = 0
+	// We have to solve the QP subproblem:
+	//   min_p 1/2p^TGp + d^Tp
+	//   s.t. a_i^Tp = 0
+	//   with a_i \in activeConstraints
 	//
-	// x^* = x + p
-	// c = Ax - b
-	// g = d + Gx
-	//
-	// with x = 0 we get
-	// c = -b = 0
-	// g = d = g_k
-	//
-	// p = Yp_Y + Zp_Z
-	//
-	// (AY)p_Y = -c = 0
-	// => p_Y = 0
-	//
-	// (Z^TGZ)p_Z = -(Z^TYp_Y + Z^Tg) = -Z^Tg_k
-	// -> we have to solve (Z^TGZ)p_Z = -Z^Tg_k
+	// We use the null space method, i.e. we find matrices Y and Z, such that
+	// AZ = 0 and [Y Z] is regular. Then with
+	//   p = Yp_Y + Zp_z
+	// we get
+	//   p_Y = 0
+	// and
+	//  (Z^TGZ)p_Z = -(Z^TYp_Y + Z^Tg) = -Z^Td
+	// which is a linear equation system, which we can solve.
 
 	const int an = fVariableCount;
 
@@ -935,7 +910,7 @@ LayoutOptimizer::_SolveSubProblem(const double* d, int am, double* p)
 	transpose_matrix(fActiveMatrix, fTemp1, am, an);
 	bool success = qr_decomposition(fTemp1, an, am, tempD, Q);
 	if (!success) {
-		printf("Solve(): QR decomposition failed!\n");
+		TRACE_ERROR("Solve(): QR decomposition failed!\n");
 		return false;
 	}
 
@@ -946,7 +921,7 @@ LayoutOptimizer::_SolveSubProblem(const double* d, int am, double* p)
 	for (int i = 0; i < zm; i++)
 		Z[i] = Q[i] + am;
 
-	// solve (Z^TGZ)p_Z = -Z^Tg_k
+	// solve (Z^TGZ)p_Z = -Z^Td
 
 	// Z^T
 	transpose_matrix(Z, fZtrans, zm, zn);
@@ -961,7 +936,7 @@ LayoutOptimizer::_SolveSubProblem(const double* d, int am, double* p)
 
 	success = solve(fTemp2, zn, pz);
 	if (!success) {
-		printf("Solve(): Failed to solve() system for p_Z\n");
+		TRACE_ERROR("Solve(): Failed to solve() system for p_Z\n");
 		return false;
 	}
 

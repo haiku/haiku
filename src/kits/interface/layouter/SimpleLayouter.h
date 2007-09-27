@@ -1,11 +1,15 @@
 /*
- * Copyright 2006, Haiku Inc.
- * Distributed under the terms of the MIT License.
+ * Copyright 2006-2007, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
+ *
+ * Layouter implementation that can handle simple layout constraints
+ * (restricting one element) only. It is 
  */
 #ifndef	SIMPLE_LAYOUTER_H
 #define	SIMPLE_LAYOUTER_H
 
 #include "Layouter.h"
+
 
 class BList;
 

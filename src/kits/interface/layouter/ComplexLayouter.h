@@ -1,6 +1,8 @@
 /*
  * Copyright 2007, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
+ *
+ * Layouter implementation that can handle complex constraints.
  */
 #ifndef COMPLEX_LAYOUTER_H
 #define COMPLEX_LAYOUTER_H
@@ -43,6 +45,11 @@ private:
 			struct SumItem;
 			struct SumItemBackup;
 
+			bool				_Layout(int32 size, SumItem* sums,
+									int32* sizes);
+			bool				_AddOptimizerConstraints();
+			bool				_SatisfiesConstraints(int32* sizes) const;
+			bool				_SatisfiesConstraintsSums(int32* sums) const;
 
 			void				_ValidateLayout();
 			void				_ApplyMaxConstraint(
@@ -67,6 +74,7 @@ private:
 			float				fMin;
 			float				fMax;
 			bool				fLayoutValid;
+			bool				fOptimizerConstraintsAdded;
 };
 
 }	// namespace Layout

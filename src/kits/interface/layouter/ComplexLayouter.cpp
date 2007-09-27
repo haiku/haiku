@@ -20,6 +20,15 @@
 #include "SimpleLayouter.h"
 
 
+//#define TRACE_COMPLEX_LAYOUTER	1
+#if TRACE_COMPLEX_LAYOUTER
+#	define TRACE(format...)	printf(format);
+#	define TRACE_ONLY(x)	x
+#else
+#	define TRACE(format...)
+#	define TRACE_ONLY(x)
+#endif
+
 using std::nothrow;
 
 
@@ -39,6 +48,13 @@ public:
 	~MyLayoutInfo()
 	{
 		delete[] fLocations;
+	}
+
+	void InitFromSizes(int32* sizes)
+	{
+		fLocations[0] = 0;
+		for (int32 i = 0; i < fCount; i++) 
+			fLocations[i + 1] = fLocations[i] + sizes[i] + fSpacing;
 	}
 
 	virtual float ElementLocation(int32 element)
@@ -106,6 +122,12 @@ struct ComplexLayouter::Constraint {
 		effectiveMax = max;
 	}
 
+	bool IsSatisfied(int32* sumValues) const
+	{
+		int32 value = sumValues[end] - sumValues[start - 1];
+		return (value >= min && value <= max);
+	}
+
 	int32		start;
 	int32		end;
 	int32		min;
@@ -143,9 +165,9 @@ ComplexLayouter::ComplexLayouter(int32 elementCount, int32 spacing)
 	  fSums(new(nothrow) SumItem[elementCount + 1]),
 	  fSumBackups(new(nothrow) SumItemBackup[elementCount + 1]),
 	  fOptimizer(new(nothrow) LayoutOptimizer(elementCount)),
-	  fLayoutValid(false)
+	  fLayoutValid(false),
+	  fOptimizerConstraintsAdded(false)
 {
-// TODO: Check initialization!
 	if (fConstraints)
 		memset(fConstraints, 0, sizeof(Constraint*) * fElementCount);
 
@@ -195,8 +217,8 @@ ComplexLayouter::AddConstraints(int32 element, int32 length,
 	if (element < 0 || length <= 0 || element + length > fElementCount)
 		return;
 
-//printf("%p->ComplexLayouter::AddConstraints(%ld, %ld, %ld, %ld, %ld)\n",
-//this, element, length, (int32)_min, (int32)_max, (int32)_preferred);
+	TRACE("%p->ComplexLayouter::AddConstraints(%ld, %ld, %ld, %ld, %ld)\n",
+		this, element, length, (int32)_min, (int32)_max, (int32)_preferred);
 
 	int32 spacing = fSpacing * (length - 1);
 	int32 min = (int32)_min + 1 - spacing;
@@ -283,7 +305,8 @@ ComplexLayouter::CreateLayoutInfo()
 void
 ComplexLayouter::Layout(LayoutInfo* _layoutInfo, float _size)
 {
-//printf("%p->ComplexLayouter::Layout(%ld)\n", this, (int32)_size);
+	TRACE("%p->ComplexLayouter::Layout(%ld)\n", this, (int32)_size);
+
 	if (fElementCount == 0)
 		return;
 
@@ -312,105 +335,19 @@ ComplexLayouter::Layout(LayoutInfo* _layoutInfo, float _size)
 	_PropagateChangesBack(sums, fElementCount - 1, NULL);
 	_PropagateChanges(sums, fElementCount - 1, NULL);
 
-printf("Layout(%ld)\n", size);
-for (int32 i = 0; i < fElementCount; i++) {
-SumItem& sum = sums[i + 1];
-printf("[%ld] minc = %4ld,  maxc = %4ld\n", i + 1, sum.min, sum.max);
-}
-
-// TODO: Test whether the desired solution already satisfies all constraints.
-// If so, we can skip the constraint solving part.
-
-
-// TODO: We should probably already setup the constraints in _ValidateLayout().
-// This way we might not be able to skip as many redundant constraints, but
-// supposedly it doesn't matter all that much, since those constraints
-// wouldn't make it into the active set anyway.
-	fOptimizer->RemoveAllConstraints();
-
-	// add constraints
+#if TRACE_COMPLEX_LAYOUTER
+	TRACE("Layout(%ld)\n", size);
 	for (int32 i = 0; i < fElementCount; i++) {
-		SumItem& sum = fSums[i + 1];
-
-		Constraint* constraint = fConstraints[i];
-		while (constraint != NULL) {
-			SumItem& base = fSums[constraint->start];
-			int32 sumMin = base.min + constraint->min;
-			int32 baseMax = sum.max - constraint->min;
-			bool minRedundant = (sumMin < sum.min && baseMax > base.max);
-
-			int32 sumMax = base.max + constraint->effectiveMax;
-			int32 baseMin = sum.min - constraint->effectiveMax;
-			bool maxRedundant = (sumMax > sum.max && baseMin < base.min);
-
-			if (!minRedundant || !maxRedundant) {
-				bool success = true;
-				if (constraint->min == constraint->effectiveMax) {
-					// min and max equal -- add an equality constraint
-					success = fOptimizer->AddConstraint(constraint->start - 1,
-						constraint->end, constraint->min, true);
-				} else {
-					// min and max not equal -- add them individually,
-					// unless redundant
-					if (!minRedundant) {
-						success |= fOptimizer->AddConstraint(
-							constraint->start - 1, constraint->end,
-							constraint->min, false);
-					}
-					if (!maxRedundant) {
-						success |= fOptimizer->AddConstraint(constraint->end,
-							constraint->start - 1,
-							-constraint->effectiveMax, false);
-					}
-				}
-			}
-
-			constraint = constraint->next;
-		}
+		SumItem& sum = sums[i + 1];
+		TRACE("[%ld] minc = %4ld,  maxc = %4ld\n", i + 1, sum.min, sum.max);
 	}
+#endif
 
-	// prepare a feasible solution (the minimum)
-	double values[fElementCount];
-	for (int32 i = 0; i < fElementCount; i++)
-		values[i] = sums[i + 1].min - sums[i].min;
-
-	// prepare the desired solution
 	int32 sizes[fElementCount];
-	SimpleLayouter::DistributeSize(size, fWeights, sizes, fElementCount);
-	double realSizes[fElementCount];
-	for (int32 i = 0; i < fElementCount; i++)
-		realSizes[i] = sizes[i];
-
-printf("feasible solution vs. desired solution:\n");
-for (int32 i = 0; i < fElementCount; i++)
-printf("%8.4f   %8.4f\n", values[i], realSizes[i]);
-
-	// solve
-bigtime_t time = system_time();
-	if (!fOptimizer->Solve(realSizes, size, values))
-		return;
-time = system_time() - time;
-
-	// compute integer solution
-	// The basic strategy is to floor() the sums. This guarantees that the
-	// difference between two rounded sums remains in the range of floor()
-	// and ceil() of their real value difference. Since the constraints have
-	// integer values, the integer solution will satisfy all constraints the
-	// real solution satisfied.
-printf("computed solution in %lld us:\n", time);
-	double realSum = 0;
-	int32 spacing = 0;
-	layoutInfo->fLocations[0] = 0;
-	for (int32 i = 0; i < fElementCount; i++) {
-		realSum += values[i];
-		double roundedRealSum = floor(realSum);
-		if (fuzzy_equals(realSum, roundedRealSum + 1))
-			realSum = roundedRealSum + 1;
-		layoutInfo->fLocations[i + 1] = (int32)roundedRealSum + spacing;
-		spacing += fSpacing;
-
-printf("x[%ld] = %8.4f   %4ld\n", i, values[i], layoutInfo->fLocations[i + 1] - layoutInfo->fLocations[i]);
+	if (!_Layout(size, sums, sizes)) {
 	}
+
+	layoutInfo->InitFromSizes(sizes);
 }
 
 
@@ -454,10 +391,191 @@ ComplexLayouter::CloneLayouter()
 }
 
 
+// _Layout
+bool
+ComplexLayouter::_Layout(int32 size, SumItem* sums, int32* sizes)
+{
+	// prepare the desired solution
+	SimpleLayouter::DistributeSize(size, fWeights, sizes, fElementCount);
+	if (_SatisfiesConstraints(sizes)) {
+		// The desired solution already satisfies all constraints.
+		return true;
+	}
+
+	double realSizes[fElementCount];
+	for (int32 i = 0; i < fElementCount; i++)
+		realSizes[i] = sizes[i];
+
+	if (!_AddOptimizerConstraints())
+		return false;
+
+
+	// prepare a feasible solution (the minimum)
+	double values[fElementCount];
+	for (int32 i = 0; i < fElementCount; i++)
+		values[i] = sums[i + 1].min - sums[i].min;
+
+#if TRACE_COMPLEX_LAYOUTER
+	TRACE("feasible solution vs. desired solution:\n");
+	for (int32 i = 0; i < fElementCount; i++)
+		TRACE("%8.4f   %8.4f\n", values[i], realSizes[i]);
+#endif
+
+	// solve
+	TRACE_ONLY(bigtime_t time = system_time();)
+	if (!fOptimizer->Solve(realSizes, size, values))
+		return false;
+	TRACE_ONLY(time = system_time() - time;)
+
+	// compute integer solution
+	// The basic strategy is to floor() the sums. This guarantees that the
+	// difference between two rounded sums remains in the range of floor()
+	// and ceil() of their real value difference. Since the constraints have
+	// integer values, the integer solution will therefore satisfy all
+	// constraints the real solution satisfied.
+	TRACE("computed solution in %lld us:\n", time);
+
+	double realSum = 0;
+	double previousSum = 0;
+	for (int32 i = 0; i < fElementCount; i++) {
+		realSum += values[i];
+		double roundedRealSum = floor(realSum);
+		if (fuzzy_equals(realSum, roundedRealSum + 1))
+			realSum = roundedRealSum + 1;
+		sizes[i] = int32(roundedRealSum - previousSum);
+		previousSum = roundedRealSum;
+
+		TRACE("x[%ld] = %8.4f   %4ld\n", i, values[i], sizes[i]);
+	}
+
+	return _SatisfiesConstraints(sizes);
+}
+
+
+// _AddOptimizerConstraints
+bool
+ComplexLayouter::_AddOptimizerConstraints()
+{
+	if (fOptimizerConstraintsAdded)
+		return true;
+
+	fOptimizer->RemoveAllConstraints();
+
+	// add constraints
+	for (int32 i = 0; i < fElementCount; i++) {
+		SumItem& sum = fSums[i + 1];
+
+		Constraint* constraint = fConstraints[i];
+		while (constraint != NULL) {
+			SumItem& base = fSums[constraint->start];
+			int32 sumMin = base.min + constraint->min;
+			int32 baseMax = sum.max - constraint->min;
+			bool minRedundant = (sumMin < sum.min && baseMax > base.max);
+
+			int32 sumMax = base.max + constraint->effectiveMax;
+			int32 baseMin = sum.min - constraint->effectiveMax;
+			bool maxRedundant = (sumMax > sum.max && baseMin < base.min);
+
+			if (!minRedundant || !maxRedundant) {
+				bool success = true;
+				if (constraint->min == constraint->effectiveMax) {
+					// min and max equal -- add an equality constraint
+					success = fOptimizer->AddConstraint(constraint->start - 1,
+						constraint->end, constraint->min, true);
+				} else {
+					// min and max not equal -- add them individually,
+					// unless redundant
+					if (!minRedundant) {
+						success |= fOptimizer->AddConstraint(
+							constraint->start - 1, constraint->end,
+							constraint->min, false);
+					}
+					if (!maxRedundant) {
+						success |= fOptimizer->AddConstraint(constraint->end,
+							constraint->start - 1,
+							-constraint->effectiveMax, false);
+					}
+				}
+
+				if (!success)
+					return false;
+			}
+
+			constraint = constraint->next;
+		}
+	}
+
+	fOptimizerConstraintsAdded = true;
+	return true;
+}
+
+
+// _SatisfiesConstraints
+bool
+ComplexLayouter::_SatisfiesConstraints(int32* sizes) const
+{
+	int32 sumValues[fElementCount + 1];
+	sumValues[0] = 0;
+	for (int32 i = 0; i < fElementCount; i++)
+		sumValues[i + 1] = sumValues[i] + sizes[i];
+
+	return _SatisfiesConstraintsSums(sumValues);
+}
+
+
+// _SatisfiesConstraintsSums
+bool
+ComplexLayouter::_SatisfiesConstraintsSums(int32* sumValues) const
+{
+	for (int32 i = 0; i < fElementCount; i++) {
+		Constraint* constraint = fConstraints[i];
+		while (constraint) {
+			if (!constraint->IsSatisfied(sumValues))
+				return false;
+
+			constraint = constraint->next;
+		}
+	}
+
+	return true;
+}
+
+
 // _ValidateLayout
 void
 ComplexLayouter::_ValidateLayout()
 {
+	// The general idea for computing the min and max for the given constraints
+	// is that we rewrite the problem a little. Instead of considering the
+	// x_1, ... x_n (n = fElementCount) and the constraints of the form
+	//   x_i + ... + x_{i+j} >= min[i,j] and
+	//   x_i + ... + x_{i+j} >= max[i,j], with i >= 1, j >= 0, i + j <= n
+	//   and min[i,j], max[i,j] >= 0
+	// we define
+	//   c[0] = 0
+	//   c[i] = \sum_{k=1}^i x_k, for all i, 1 <= i <= n
+	// and thus the constraints read:
+	//   c[i+j] - c[i-1] >= min[i,j]
+	//   c[i+j] - c[i-1] <= max[i,j]
+	//
+	// Let minc[i] and maxc[i] the limits imposed by the given constraints, i.e.
+	//   minc[i] <= c[i] <= maxc[i] for any tuple of (c[i])_i satisfying the
+	// constraints (minc[i] and maxc[i] are unique), then we gain:
+	//   minc[i+j] >= c[i-1] + min[i,j]
+	//   maxc[i+j] <= c[i-1] + min[i,j]
+	//   minc[i-1] >= minc[i+j] - max[i,j]
+	//   maxc[i-1] >= maxc[i+j] - min[i,j]
+	// We can compute the minc[i] and maxc[i] in an iterative process,
+	// propagating the first to kinds of constraints forward and the other two
+	// backwards. First we start considering all min constraints only. They
+	// can't contradict each other and are usually to be enforced over max
+	// constraints. Afterwards we add the max constraints one by one. For each
+	// one of them we propagate resulting changes back and forth. In case of
+	// a conflict, we relax the max constraint as much as necessary to yield
+	// a consistent set of constraints. After all constraints have been
+	// incorporated, the resulting minc[n] and maxc[n] are the min and max
+	// limits we wanted to compute.
+
 	if (fLayoutValid)
 		return;
 
@@ -473,26 +591,26 @@ ComplexLayouter::_ValidateLayout()
 	}
 
 	// apply min constraints forward:
-	//   minc[k] >= minc[i-1] + min[i,j]
+	//   minc[i+j] >= minc[i-1] + min[i,j]
 	for (int32 i = 0; i < fElementCount; i++) {
 		SumItem& sum = fSums[i + 1];
 
 		Constraint* constraint = fConstraints[i];
 		while (constraint != NULL) {
 			int32 minSum = fSums[constraint->start].min + constraint->min;
-			if (minSum > sum.min)
+			if (minSum > sum.min) {
 				sum.min = minSum;
-else {
-printf("min constraint is redundant: x%ld + ... + x%ld >= %ld\n",
-constraint->start, constraint->end, constraint->min);
-}
+			} else {
+				TRACE("min constraint is redundant: x%ld + ... + x%ld >= %ld\n",
+					constraint->start, constraint->end, constraint->min);
+			}
 
 			constraint = constraint->next;
 		}
 	}
 
 	// apply min constraints backwards:
-	//   maxc[i-1] <= maxc[k] - min[i,j]
+	//   maxc[i-1] <= maxc[i+j] - min[i,j]
 	for (int32 i = fElementCount - 1; i >= 0; i--) {
 		SumItem& sum = fSums[i + 1];
 
@@ -515,13 +633,14 @@ constraint->start, constraint->end, constraint->min);
 
 			constraint = constraint->next;
 		}
-//printf("fSums[%ld] = {%ld, %ld}\n", i + 1, sum.min, sum.max);
 	}
 
-for (int32 i = 0; i < fElementCount; i++) {
-SumItem& sum = fSums[i + 1];
-printf("[%ld] minc = %4ld,  maxc = %4ld\n", i + 1, sum.min, sum.max);
-}
+#if TRACE_COMPLEX_LAYOUTER
+	for (int32 i = 0; i < fElementCount; i++) {
+		SumItem& sum = fSums[i + 1];
+		TRACE("[%ld] minc = %4ld,  maxc = %4ld\n", i + 1, sum.min, sum.max);
+	}
+#endif
 
 	if (fElementCount == 0) {
 		fMin = -1;
@@ -532,72 +651,9 @@ printf("[%ld] minc = %4ld,  maxc = %4ld\n", i + 1, sum.min, sum.max);
 		fMax = fSums[fElementCount].max + spacing - 1;
 	}
 
+	fOptimizerConstraintsAdded = false;
 	fLayoutValid = true;
 }
-
-/*
-		x[i] + ... + x[i+j] >= min[i,j]
-		x[i] + ... + x[i+j] <= max[i,j]
-	with
-		1 <= i <= n
-		0 <= j <= n - i
-		0 <= min[i,j] <= max[i,j]
-
-	Let
-
-		c[0] = 0
-		c[k] = x[1] + ... + x[k]	for 1 <= k <= n
-
-	it follows
-
-		x[i] + ... + x[i+j] = c[i+j] - c[i-1]
-
-	and thus the constraints can be rewritten as
-
-		c[i+j] - c[i-1] >= min[i,j]
-		c[i+j] - c[i-1] <= max[i,j]
-
-	or	
-
-		c[i+j] >= c[i-1] + min[i,j]
-		c[i+j] <= c[i-1] + max[i,j]
-
-	We're looking for minimal minc[] and maximal maxc[] such that
-
-		minc[i+j] >= minc[i-1] + min[i,j]
-		maxc[i+j] <= maxc[i-1] + max[i,j]
-
-		minc[i+j] <= minc[i-1] + max[i,j]
-		maxc[i+j] >= maxc[i-1] + min[i,j]
-
-	holds for all i and j. The latter two kinds of constraints have to be
-	enforced backwards:
-
-		minc[i-1] >= minc[i+j] - max[i,j]
-		maxc[i-1] <= maxc[i+j] - min[i,j]
-
-
-
------------------
-
-	// (1) maxc[k] <= maxc[i-1] + max[i,j]
-	// (2) minc[i-1] >= minc[k] - max[i,j]
-
-	Modifying maxc[k] according to (1) potentially invalidates constraints of
-	these forms:
-
-		(i)  maxc[i'-1] <= maxc[k] - min[i',j']
-		(ii) maxc[k+1+j'] <= maxc[k] + max[k+1,j']
-
-	After propagating (i) constraints backwards, all of them will be hold,
-	though more (ii) constraints might have been invalidated, though.
-	Propagating (ii) constraints forward afterwards, will make them all hold.
-	Since the min[i,j] and max[i,j] constraints are separation constraints and
-	the CSP not including the newly added constraint was conflict-free,
-	propagating the (i) and (ii) constraints won't change the maxc[i], i < k by
-	more than what maxc[k] changed. If afterwards the constraint (1) doesn't
-	hold, it apparently conflicts with the other constraints.
-*/
 
 
 // _ApplyMaxConstraint
@@ -636,21 +692,19 @@ ComplexLayouter::_ApplyMaxConstraint(Constraint* currentConstraint, int32 index)
 		sumMax = base.max + max;
 	}
 
-	// apply changes
-
-if (currentConstraint->effectiveMax != max) {
-printf("relaxing conflicting max constraint (1): x%ld + ... + x%ld <= %ld -> %ld\n",
-currentConstraint->start, currentConstraint->end,
-currentConstraint->effectiveMax, max);
-}
+	if (currentConstraint->effectiveMax != max) {
+		TRACE("relaxing conflicting max constraint (1): "
+			"x%ld + ... + x%ld <= %ld -> %ld\n", currentConstraint->start,
+			currentConstraint->end, currentConstraint->effectiveMax, max);
+	}
 	currentConstraint->effectiveMax = max;
 
-	if (baseMin <= base.min && sumMax >= sum.max)
-{
-printf("max constraint is redundant: x%ld + ... + x%ld <= %ld\n",
-currentConstraint->start, currentConstraint->end, currentConstraint->effectiveMax);
+	if (baseMin <= base.min && sumMax >= sum.max) {
+		TRACE("max constraint is redundant: x%ld + ... + x%ld <= %ld\n",
+			currentConstraint->start, currentConstraint->end,
+			currentConstraint->effectiveMax);
 		return;
-}
+	}
 
 	// backup old values, in case we detect a conflict later
 	_BackupValues(index);
@@ -700,9 +754,9 @@ currentConstraint->start, currentConstraint->end, currentConstraint->effectiveMa
 		// if we've got a conflict, we relax the constraint and try again
 		if (diff > 0) {
 			max += diff;
-printf("relaxing conflicting max constraint (2): x%ld + ... + x%ld <= %ld -> %ld\n",
-currentConstraint->start, currentConstraint->end,
-currentConstraint->effectiveMax, max);
+			TRACE("relaxing conflicting max constraint (2): "
+				"x%ld + ... + x%ld <= %ld -> %ld\n", currentConstraint->start,
+				currentConstraint->end, currentConstraint->effectiveMax, max);
 			currentConstraint->effectiveMax = max;
 
 			_RestoreValues(index);
@@ -762,8 +816,9 @@ ComplexLayouter::_PropagateChanges(SumItem* sums, int32 toIndex,
 
 		if (sum.minDirty || sum.maxDirty) {
 			if (sum.min > sum.max) {
-// TODO: Can this actually happen?
-printf("adjusted max in propagation phase: index: %ld: %ld -> %ld\n", i, sum.max, sum.min);
+				// TODO: Can this actually happen?
+				TRACE("adjusted max in propagation phase: index: "
+					"%ld: %ld -> %ld\n", i, sum.max, sum.min);
 				sum.max = sum.min;
 				sum.maxDirty = true;
 			}
@@ -793,10 +848,11 @@ ComplexLayouter::_PropagateChangesBack(SumItem* sums, int32 changedIndex,
 			if (sum.minDirty && !ignoreMaxConstraints) {
 				int32 baseMin = sum.min - constraint->effectiveMax;
 				if (baseMin > base.min) {
-if (baseMin > base.max) {
-printf("min above max in back propagation phase: index: (%ld -> %ld), "
-"min: %ld, max: %ld\n", i, constraint->start, baseMin, base.max);
-}
+					if (baseMin > base.max) {
+						TRACE("min above max in back propagation phase: index: "
+							"(%ld -> %ld), min: %ld, max: %ld\n", i,
+							constraint->start, baseMin, base.max);
+					}
 					base.min = baseMin;
 					base.minDirty = true;
 				}
@@ -806,10 +862,11 @@ printf("min above max in back propagation phase: index: (%ld -> %ld), "
 			if (sum.maxDirty) {
 				int32 baseMax = sum.max - constraint->min;
 				if (baseMax < base.max) {
-if (baseMax < base.min) {
-printf("max below min in back propagation phase: index: (%ld -> %ld), "
-"max: %ld, min: %ld\n", i, constraint->start, baseMax, base.min);
-}
+					if (baseMax < base.min) {
+						TRACE("max below min in back propagation phase: index: "
+							"(%ld -> %ld), max: %ld, min: %ld\n", i,
+							constraint->start, baseMax, base.min);
+					}
 					base.max = baseMax;
 					base.maxDirty = true;
 				}
