@@ -27,7 +27,6 @@
 #include <vfs.h>
 #include <vm.h>
 #include <vm_address_space.h>
-#include <vm_types.h>
 
 #include <arch/cpu.h>
 #include <arch/elf.h>

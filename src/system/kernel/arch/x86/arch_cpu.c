@@ -16,7 +16,7 @@
 #include <boot_device.h>
 #include <smp.h>
 #include <tls.h>
-#include <vm_types.h>
+#include <vm.h>
 
 #include <arch_system_info.h>
 #include <arch/x86/selector.h>

@@ -17,12 +17,12 @@
 
 #include <KernelExport.h>
 
+#include <kernel.h>
 #include <smp.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 #include <vm.h>
-#include <vm_types.h>
 #include <vm_low_memory.h>
 
 

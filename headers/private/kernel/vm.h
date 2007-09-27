@@ -23,6 +23,58 @@ struct vm_address_space;
 struct vnode;
 
 
+// additional protection flags
+// Note: the VM probably won't support all combinations - it will try
+// its best, but create_area() will fail if it has to.
+// Of course, the exact behaviour will be documented somewhere...
+#define B_EXECUTE_AREA			0x04
+#define B_STACK_AREA			0x08
+	// "stack" protection is not available on most platforms - it's used
+	// to only commit memory as needed, and have guard pages at the
+	// bottom of the stack.
+	// "execute" protection is currently ignored, but nevertheless, you
+	// should use it if you require to execute code in that area.
+
+#define B_KERNEL_EXECUTE_AREA	0x40
+#define B_KERNEL_STACK_AREA		0x80
+
+#define B_USER_PROTECTION \
+	(B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA | B_STACK_AREA)
+#define B_KERNEL_PROTECTION \
+	(B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_KERNEL_EXECUTE_AREA \
+	| B_KERNEL_STACK_AREA)
+
+#define B_OVERCOMMITTING_AREA	0x1000
+	// ToDo: this is not really a protection flag, but since the "protection"
+	//	field is the only flag field, we currently use it for this.
+	//	A cleaner approach would be appreciated - maybe just an official generic
+	//	flags region in the protection field.
+
+#define B_USER_AREA_FLAGS		(B_USER_PROTECTION)
+#define B_KERNEL_AREA_FLAGS \
+	(B_KERNEL_PROTECTION | B_USER_CLONEABLE_AREA | B_OVERCOMMITTING_AREA)
+
+// flags for vm_get_physical_page()
+enum {
+	PHYSICAL_PAGE_NO_WAIT = 0,
+	PHYSICAL_PAGE_CAN_WAIT,
+};
+
+// mapping argument for several internal VM functions
+enum {
+	REGION_NO_PRIVATE_MAP = 0,
+	REGION_PRIVATE_MAP
+};
+
+enum {
+	// ToDo: these are here only temporarily - it's a private
+	//	addition to the BeOS create_area() lock flags
+	B_ALREADY_WIRED	= 6,
+};
+
+#define MEMORY_TYPE_SHIFT		28
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
