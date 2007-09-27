@@ -64,28 +64,28 @@ static sem_id modified_pages_available;
 
 /*!	Dequeues a page from the tail of the given queue */
 static vm_page *
-dequeue_page(page_queue *q)
+dequeue_page(page_queue *queue)
 {
 	vm_page *page;
 
-	page = q->tail;
+	page = queue->tail;
 	if (page != NULL) {
-		if (q->head == page)
-			q->head = NULL;
+		if (queue->head == page)
+			queue->head = NULL;
 		if (page->queue_prev != NULL)
 			page->queue_prev->queue_next = NULL;
 
-		q->tail = page->queue_prev;
-		q->count--;
+		queue->tail = page->queue_prev;
+		queue->count--;
 
-		#ifdef DEBUG_PAGE_QUEUE
-			if (page->queue != q) {
-				panic("dequeue_page(queue: %p): page %p thinks it is in queue "
-					"%p", q, page, page->queue);
-			}
+#ifdef DEBUG_PAGE_QUEUE
+		if (page->queue != queue) {
+			panic("dequeue_page(queue: %p): page %p thinks it is in queue "
+				"%p", queue, page, page->queue);
+		}
 
-			page->queue = NULL;
-		#endif	// DEBUG_PAGE_QUEUE
+		page->queue = NULL;
+#endif	// DEBUG_PAGE_QUEUE
 	}
 
 	return page;
@@ -94,44 +94,39 @@ dequeue_page(page_queue *q)
 
 /*!	Enqueues a page to the head of the given queue */
 static void
-enqueue_page(page_queue *q, vm_page *page)
+enqueue_page(page_queue *queue, vm_page *page)
 {
-	#ifdef DEBUG_PAGE_QUEUE
-		if (page->queue != NULL) {
-			panic("enqueue_page(queue: %p, page: %p): page thinks it is "
-				"already in queue %p", q, page, page->queue);
-		}
-	#endif	// DEBUG_PAGE_QUEUE
-
-	if (q->head != NULL)
-		q->head->queue_prev = page;
-	page->queue_next = q->head;
-	q->head = page;
-	page->queue_prev = NULL;
-	if (q->tail == NULL)
-		q->tail = page;
-	q->count++;
-
-	#ifdef DEBUG_PAGE_QUEUE
-		page->queue = q;
-	#endif
-
-	if (q == &sModifiedPageQueue) {
-		if (q->count == 1)
-			release_sem_etc(modified_pages_available, 1, B_DO_NOT_RESCHEDULE);
+#ifdef DEBUG_PAGE_QUEUE
+	if (page->queue != NULL) {
+		panic("enqueue_page(queue: %p, page: %p): page thinks it is "
+			"already in queue %p", queue, page, page->queue);
 	}
+#endif	// DEBUG_PAGE_QUEUE
+
+	if (queue->head != NULL)
+		queue->head->queue_prev = page;
+	page->queue_next = queue->head;
+	queue->head = page;
+	page->queue_prev = NULL;
+	if (queue->tail == NULL)
+		queue->tail = page;
+	queue->count++;
+
+#ifdef DEBUG_PAGE_QUEUE
+	page->queue = queue;
+#endif
 }
 
 
 static void
 remove_page_from_queue(page_queue *queue, vm_page *page)
 {
-	#ifdef DEBUG_PAGE_QUEUE
-		if (page->queue != queue) {
-			panic("remove_page_from_queue(queue: %p, page: %p): page thinks it "
-				"is in queue %p", queue, page, page->queue);
-		}
-	#endif	// DEBUG_PAGE_QUEUE
+#ifdef DEBUG_PAGE_QUEUE
+	if (page->queue != queue) {
+		panic("remove_page_from_queue(queue: %p, page: %p): page thinks it "
+			"is in queue %p", queue, page, page->queue);
+	}
+#endif	// DEBUG_PAGE_QUEUE
 
 	if (page->queue_prev != NULL)
 		page->queue_prev->queue_next = page->queue_next;
@@ -145,9 +140,9 @@ remove_page_from_queue(page_queue *queue, vm_page *page)
 
 	queue->count--;
 
-	#ifdef DEBUG_PAGE_QUEUE
-		page->queue = NULL;
-	#endif
+#ifdef DEBUG_PAGE_QUEUE
+	page->queue = NULL;
+#endif
 }
 
 
