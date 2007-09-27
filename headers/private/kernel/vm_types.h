@@ -69,8 +69,7 @@ class DoublyLinkedAreaLink {
 typedef class DoublyLinkedQueue<vm_page_mapping, DoublyLinkedPageLink> vm_page_mappings;
 typedef class DoublyLinkedQueue<vm_page_mapping, DoublyLinkedAreaLink> vm_area_mappings;
 
-// vm page
-typedef struct vm_page {
+struct vm_page {
 	struct vm_page		*queue_prev;
 	struct vm_page		*queue_next;
 
@@ -104,7 +103,7 @@ typedef struct vm_page {
 
 	uint16				wired_count;
 	int8				usage_count;
-} vm_page;
+};
 
 enum {
 	PAGE_TYPE_PHYSICAL = 0,
@@ -134,8 +133,7 @@ struct vm_dummy_page : vm_page {
 	ConditionVariable<vm_page>	busy_condition;
 };
 
-// vm_cache
-typedef struct vm_cache {
+struct vm_cache {
 	mutex				lock;
 	struct vm_area		*areas;
 	vint32				ref_count;
@@ -158,15 +156,14 @@ typedef struct vm_cache {
 	struct vm_cache*	debug_previous;
 	struct vm_cache*	debug_next;
 #endif
-} vm_cache;
+};
 
 
 #if DEBUG_CACHE_LIST
 extern vm_cache* gDebugCacheList;
 #endif
 
-// vm area
-typedef struct vm_area {
+struct vm_area {
 	char				*name;
 	area_id				id;
 	addr_t				base;
@@ -186,24 +183,18 @@ typedef struct vm_area {
 	struct vm_area		*cache_next;
 	struct vm_area		*cache_prev;
 	struct vm_area		*hash_next;
-} vm_area;
+};
 
-#else	// !__cplusplus
-// these are just opaque types in C
-typedef struct vm_page vm_page;
-typedef struct vm_cache vm_cache;
-typedef struct vm_area vm_area;
-#endif
+#endif	// __cplusplus
 
 enum {
 	VM_ASPACE_STATE_NORMAL = 0,
 	VM_ASPACE_STATE_DELETION
 };
 
-// address space
-typedef struct vm_address_space {
-	vm_area				*areas;
-	vm_area				*area_hint;
+struct vm_address_space {
+	struct vm_area		*areas;
+	struct vm_area		*area_hint;
 	sem_id				sem;
 	addr_t				base;
 	addr_t				size;
@@ -219,26 +210,24 @@ typedef struct vm_address_space {
 	addr_t				min_working_set;
 	bigtime_t			last_working_set_adjust;
 	struct vm_address_space *hash_next;
-} vm_address_space;
+};
 
-// vm_store
-typedef struct vm_store {
+struct vm_store {
 	struct vm_store_ops	*ops;
 	struct vm_cache		*cache;
 	off_t				committed_size;
-} vm_store;
+};
 
-// vm_store_ops
 typedef struct vm_store_ops {
 	void (*destroy)(struct vm_store *backing_store);
 	status_t (*commit)(struct vm_store *backing_store, off_t size);
 	bool (*has_page)(struct vm_store *backing_store, off_t offset);
-	status_t (*read)(struct vm_store *backing_store, off_t offset, const iovec *vecs,
-				size_t count, size_t *_numBytes, bool fsReenter);
-	status_t (*write)(struct vm_store *backing_store, off_t offset, const iovec *vecs,
-				size_t count, size_t *_numBytes, bool fsReenter);
-	status_t (*fault)(struct vm_store *backing_store, struct vm_address_space *aspace,
-				off_t offset);
+	status_t (*read)(struct vm_store *backing_store, off_t offset,
+		const iovec *vecs, size_t count, size_t *_numBytes, bool fsReenter);
+	status_t (*write)(struct vm_store *backing_store, off_t offset,
+		const iovec *vecs, size_t count, size_t *_numBytes, bool fsReenter);
+	status_t (*fault)(struct vm_store *backing_store,
+		struct vm_address_space *aspace, off_t offset);
 	void (*acquire_ref)(struct vm_store *backing_store);
 	void (*release_ref)(struct vm_store *backing_store);
 } vm_store_ops;
@@ -291,6 +280,7 @@ enum {
 	//	flags region in the protection field.
 
 #define B_USER_AREA_FLAGS		(B_USER_PROTECTION)
-#define B_KERNEL_AREA_FLAGS		(B_KERNEL_PROTECTION | B_USER_CLONEABLE_AREA | B_OVERCOMMITTING_AREA)
+#define B_KERNEL_AREA_FLAGS \
+	(B_KERNEL_PROTECTION | B_USER_CLONEABLE_AREA | B_OVERCOMMITTING_AREA)
 
 #endif	/* _KERNEL_VM_TYPES_H */

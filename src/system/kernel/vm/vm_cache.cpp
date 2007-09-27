@@ -11,9 +11,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#include <util/khash.h>
-#include <util/AutoLock.h>
-
 #include <arch/cpu.h>
 #include <condition_variable.h>
 #include <debug.h>
@@ -21,9 +18,12 @@
 #include <kernel.h>
 #include <lock.h>
 #include <smp.h>
+#include <util/khash.h>
+#include <util/AutoLock.h>
 #include <vm.h>
 #include <vm_page.h>
 #include <vm_priv.h>
+#include <vm_types.h>
 
 
 //#define TRACE_VM_CACHE

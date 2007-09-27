@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -7,23 +7,23 @@
  */
 
 
+#include <cpu.h>
+
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 #include <boot_device.h>
 #include <smp.h>
 #include <tls.h>
-#include <vm.h>
+#include <vm_types.h>
 
 #include <arch_system_info.h>
-#include <cpu.h>
-#include <arch/cpu.h>
 #include <arch/x86/selector.h>
 #include <boot/kernel_args.h>
 #include <arch/x86/commpage.h>
 
 #include "interrupts.h"
-
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
 
 
 /* cpu vendor info */

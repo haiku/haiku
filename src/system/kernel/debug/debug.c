@@ -15,6 +15,7 @@
 #include <driver_settings.h>
 #include <frame_buffer_console.h>
 #include <int.h>
+#include <kernel.h>
 #include <smp.h>
 #include <thread.h>
 #include <vm.h>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -12,12 +12,14 @@
  */
 
 
-#include <OS.h>
-#include <KernelExport.h>
 #include <cbuf.h>
-#include <vm.h>
 
 #include <string.h>
+
+#include <KernelExport.h>
+
+#include <lock.h>
+#include <kernel.h>
 
 
 #define CBUF_LENGTH 2048

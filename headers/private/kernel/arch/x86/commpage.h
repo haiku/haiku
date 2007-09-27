@@ -5,7 +5,12 @@
 #ifndef _KERNEL_ARCH_x86_COMMPAGE_H
 #define _KERNEL_ARCH_x86_COMMPAGE_H
 
-/* some systemwide commpage constants, used in the kernel and libroot */
+/*! Some systemwide commpage constants, used in the kernel and libroot */
+
+#ifndef _ASSEMBLER
+#	include <SupportDefs.h>
+#endif
+
 
 /* be careful what you put here, this file is included from assembly */
 #define COMMPAGE_ENTRY_MAGIC   0
@@ -23,5 +28,4 @@
 status_t commpage_init(void);
 #endif
 
-#endif
-
+#endif	/* _KERNEL_ARCH_x86_COMMPAGE_H */

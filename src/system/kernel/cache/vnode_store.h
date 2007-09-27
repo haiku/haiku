@@ -6,7 +6,7 @@
 #define VNODE_STORE_H
 
 
-#include <vm.h>
+#include <vm_types.h>
 
 
 struct vnode_store {

@@ -9,10 +9,11 @@
 #define _KERNEL_VM_ADDRESS_SPACE_H
 
 
-#include <vm_types.h>
-#include <arch/vm.h>
+#include <OS.h>
+
 
 struct kernel_args;
+struct vm_address_space;
 
 
 #ifdef __cplusplus
@@ -22,17 +23,17 @@ extern "C" {
 status_t vm_address_space_init(void);
 status_t vm_address_space_init_post_sem(void);
 
-void vm_delete_address_space(vm_address_space *aspace);
+void vm_delete_address_space(struct vm_address_space *aspace);
 status_t vm_create_address_space(team_id id, addr_t base, addr_t size,
-			bool kernel, vm_address_space **_aspace);
+			bool kernel, struct vm_address_space **_aspace);
 status_t vm_delete_areas(struct vm_address_space *aspace);
-vm_address_space *vm_get_kernel_address_space(void);
-vm_address_space *vm_kernel_address_space(void);
+struct vm_address_space *vm_get_kernel_address_space(void);
+struct vm_address_space *vm_kernel_address_space(void);
 team_id vm_kernel_address_space_id(void);
-vm_address_space *vm_get_current_user_address_space(void);
+struct vm_address_space *vm_get_current_user_address_space(void);
 team_id vm_current_user_address_space_id(void);
-vm_address_space *vm_get_address_space_by_id(team_id aid);
-void vm_put_address_space(vm_address_space *aspace);
+struct vm_address_space *vm_get_address_space_by_id(team_id aid);
+void vm_put_address_space(struct vm_address_space *aspace);
 #define vm_swap_address_space(aspace) arch_vm_aspace_swap(aspace)
 
 #ifdef __cplusplus

@@ -7,15 +7,17 @@
  */
 
 
-#include <thread.h>
 #include <arch/thread.h>
+
 #include <arch/user_debugger.h>
 #include <arch_cpu.h>
-#include <kernel.h>
 #include <debug.h>
+#include <kernel.h>
 #include <int.h>
-#include <vm_address_space.h>
+#include <thread.h>
 #include <tls.h>
+#include <vm_address_space.h>
+#include <vm_types.h>
 
 #include <string.h>
 

@@ -24,7 +24,9 @@
 #include <tls.h>
 #include <user_runtime.h>
 #include <vfs.h>
+#include <vm.h>
 #include <vm_address_space.h>
+#include <vm_types.h>
 
 #include <boot/kernel_args.h>
 #include <util/khash.h>

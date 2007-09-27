@@ -7,17 +7,19 @@
  */
 
 
+#include <arch/debug.h>
+
+#include <stdlib.h>
+
 #include <debug.h>
 #include <elf.h>
 #include <kernel.h>
 #include <kimage.h>
 #include <thread.h>
 #include <vm.h>
+#include <vm_types.h>
 
-#include <arch/debug.h>
 #include <arch_cpu.h>
-
-#include <stdlib.h>
 
 
 struct stack_frame {

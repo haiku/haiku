@@ -35,6 +35,7 @@
 #include <thread.h>
 #include <team.h>
 #include <util/AutoLock.h>
+#include <util/khash.h>
 
 #include <boot/stage2.h>
 #include <boot/elf.h>

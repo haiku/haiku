@@ -10,20 +10,20 @@
 
 #include "slab_private.h"
 
+#include <algorithm>
+#include <new>
 #include <stdlib.h>
 #include <string.h>
 
 #include <KernelExport.h>
+
+#include <smp.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
-
-#include <smp.h>
 #include <vm.h>
+#include <vm_types.h>
 #include <vm_low_memory.h>
-
-#include <algorithm> // swap
-#include <new>
 
 
 // TODO kMagazineCapacity should be dynamically tuned per cache.

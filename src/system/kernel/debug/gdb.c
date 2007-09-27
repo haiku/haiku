@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2005-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Manuel J. Petit. All rights reserved.
@@ -13,10 +13,13 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <vm.h>
-#include <smp.h>
-#include <debug.h>
+
+#include <ByteOrder.h>
+
 #include <arch/debug_console.h>
+#include <debug.h>
+#include <smp.h>
+#include <vm.h>
 
 
 enum { INIT = 0, CMDREAD, CKSUM1, CKSUM2, WAITACK, QUIT, GDBSTATES };

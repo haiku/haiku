@@ -16,8 +16,8 @@
 
 
 struct device_store {
-	vm_store	vm;
-	addr_t		base_address;
+	struct vm_store	vm;
+	addr_t			base_address;
 };
 
 
@@ -63,7 +63,8 @@ device_write(struct vm_store *store, off_t offset, const iovec *vecs, size_t cou
 
 
 static status_t
-device_fault(struct vm_store *_store, struct vm_address_space *aspace, off_t offset)
+device_fault(struct vm_store *_store, struct vm_address_space *aspace,
+	off_t offset)
 {
 	// devices are mapped in completely, so we shouldn't experience faults
 	return B_BAD_ADDRESS;
@@ -82,7 +83,7 @@ static vm_store_ops device_ops = {
 };
 
 
-vm_store *
+struct vm_store *
 vm_store_create_device(addr_t baseAddress)
 {
 	struct device_store *store = malloc(sizeof(struct device_store));

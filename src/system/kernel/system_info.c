@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004-2006, Haiku, Inc.
+ * Copyright (c) 2004-2007, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -8,14 +8,14 @@
  */
 
 
+#include <system_info.h>
+
 #include <OS.h>
 #include <KernelExport.h>
 
-#include <system_info.h>
-#include <arch/system_info.h>
-
 #include <cpu.h>
 #include <debug.h>
+#include <kernel.h>
 #include <port.h>
 #include <real_time_clock.h>
 #include <sem.h>
@@ -24,6 +24,8 @@
 #include <thread.h>
 #include <vm.h>
 #include <vm_page.h>
+
+#include <arch/system_info.h>
 
 #include <string.h>
 

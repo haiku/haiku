@@ -10,6 +10,7 @@
 
 #include <vm_address_space.h>
 #include <vm_page.h>
+#include <vm_types.h>
 #include <util/AutoLock.h>
 #include <util/khash.h>
 

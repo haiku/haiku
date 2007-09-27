@@ -8,8 +8,9 @@
 #ifndef _KERNEL_VM_PRIV_H
 #define _KERNEL_VM_PRIV_H
 
-#include <vm.h>
-#include <util/khash.h>
+
+#include <vm_types.h>
+
 
 /* should make these scale with the system */
 #define DEFAULT_KERNEL_WORKING_SET  1024

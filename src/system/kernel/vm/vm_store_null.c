@@ -35,25 +35,27 @@ null_has_page(struct vm_store *store, off_t offset)
 
 
 static status_t
-null_read(struct vm_store *store, off_t offset, const iovec *vecs, size_t count,
-	size_t *_numBytes, bool fsReenter)
+null_read(struct vm_store *store, off_t offset, const iovec *vecs,
+	size_t count, size_t *_numBytes, bool fsReenter)
 {
 	return -1;
 }
 
 
 static status_t
-null_write(struct vm_store *store, off_t offset, const iovec *vecs, size_t count,
-	size_t *_numBytes, bool fsReenter)
+null_write(struct vm_store *store, off_t offset, const iovec *vecs,
+	size_t count, size_t *_numBytes, bool fsReenter)
 {
 	return -1;
 }
 
 
 static status_t
-null_fault(struct vm_store *store, struct vm_address_space *aspace, off_t offset)
+null_fault(struct vm_store *store, struct vm_address_space *aspace,
+	off_t offset)
 {
-	/* we can't fault on this region, that's pretty much the point of the null store object */
+	/* we can't fault on this region, that's pretty much the point of the
+	   null store object */
 	return B_BAD_ADDRESS;
 }
 
@@ -70,12 +72,12 @@ static vm_store_ops null_ops = {
 };
 
 
-vm_store *
+struct vm_store *
 vm_store_create_null(void)
 {
-	vm_store *store;
+	struct vm_store *store;
 
-	store = malloc(sizeof(vm_store));
+	store = malloc(sizeof(struct vm_store));
 	if (store == NULL)
 		return NULL;
 

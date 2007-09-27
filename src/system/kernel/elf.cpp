@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -8,28 +8,31 @@
 
 /* Contains the ELF loader */
 
-#include <OS.h>
 #include <elf.h>
-#include <vfs.h>
-#include <vm.h>
-#include <vm_address_space.h>
-#include <thread.h>
-#include <team.h>
-#include <debug.h>
-#include <kimage.h>
-#include <util/khash.h>
-#include <syscalls.h>
 
-#include <arch/cpu.h>
-#include <arch/elf.h>
-#include <elf_priv.h>
-#include <boot/elf.h>
+#include <OS.h>
 
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
+
+#include <debug.h>
+#include <kimage.h>
+#include <syscalls.h>
+#include <team.h>
+#include <thread.h>
+#include <util/khash.h>
+#include <vfs.h>
+#include <vm.h>
+#include <vm_address_space.h>
+#include <vm_types.h>
+
+#include <arch/cpu.h>
+#include <arch/elf.h>
+#include <elf_priv.h>
+#include <boot/elf.h>
 
 //#define TRACE_ELF
 #ifdef TRACE_ELF
