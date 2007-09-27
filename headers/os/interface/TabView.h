@@ -203,8 +203,9 @@ virtual	void			_ReservedTabView12();
 		float			fTabHeight;
 		int32			fSelection;
 		int32			fInitialSelection;
-		int32			fFocus;	
-		uint32			_reserved[12];
+		int32			fFocus;
+		float			fTabOffset;	
+		uint32			_reserved[11];
 };
 
 

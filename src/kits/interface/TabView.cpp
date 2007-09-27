@@ -596,11 +596,26 @@ BTabView::Select(int32 index)
 
 	tab = TabAt(index);
 	if (tab && ContainerView()) {
+		if(index == 0)
+			fTabOffset = 0.0f;
 		tab->Select(ContainerView());
 		fSelection = index;
 	}
 
 	Invalidate();
+	
+	if(index != 0 && !Bounds().Contains(TabFrame(index))){
+		if(!Bounds().Contains(TabFrame(index).LeftTop()))
+			fTabOffset += TabFrame(index).left - Bounds().left - 20.0f;
+		else
+			fTabOffset += TabFrame(index).right - Bounds().right + 20.0f;
+
+		Invalidate();
+	}
+
+	/*MakeFocus();
+	SetFocusTab(index, true);
+	FocusTab();*/
 }
 
 
@@ -624,26 +639,29 @@ void
 BTabView::SetFocusTab(int32 tab, bool focused)
 {
 	if (tab >= CountTabs())
-		return;
+		tab = 0;
+
+	if(tab < 0)
+		tab = CountTabs() -1;
 
 	if (focused) {
 		if (tab == fFocus)
 			return;
 
 		if (fFocus != -1){
-			TabAt(fFocus)->MakeFocus(false);
+			if(TabAt (fFocus) != NULL)
+				TabAt(fFocus)->MakeFocus(false);
 			Invalidate(TabFrame(fFocus));
 		}
-		if (tab != -1) {
+		if(TabAt(tab) != NULL){
 			TabAt(tab)->MakeFocus(true);
 			Invalidate(TabFrame(tab));
+			fFocus = tab;
 		}
-
-		fFocus = tab;
 	} else if (fFocus != -1) {
 		TabAt(fFocus)->MakeFocus(false);
 		Invalidate(TabFrame(fFocus));
-//		fFocus = -1;
+		fFocus = -1;
 	}
 }
 
@@ -749,17 +767,35 @@ BTabView::TabFrame(int32 tab_index) const
 	switch (fTabWidthSetting) {
 		case B_WIDTH_FROM_LABEL:
 		{
-			float x = X_OFFSET;
+			float x = 6.0f;
+			for (int32 i = 0; i < tab_index; i++){
+				x += StringWidth(TabAt(i)->Label()) + 20.0f;
+			}
+
+			return BRect(x - fTabOffset, 0.0f,
+				x - fTabOffset + StringWidth(TabAt(tab_index)->Label()) + 20.0f , fTabHeight);
+
+			
+			/*float x = X_OFFSET;
 			for (int32 i = 0; i < tab_index; i++)
 				x += StringWidth(TabAt(i)->Label()) + 20.0f;
 
 			return BRect(x, 0.0f,
-				x + StringWidth(TabAt(tab_index)->Label()) + 20.0f, fTabHeight);
+				x + StringWidth(TabAt(tab_index)->Label()) + 20.0f, fTabHeight);*/
 		}
 
 		case B_WIDTH_FROM_WIDEST:
 		{
 			float width = 0.0f;
+
+			for (int32 i = 0; i < CountTabs(); i++) {
+				float tabWidth = StringWidth(TabAt(i)->Label()) + 20.0f;
+				if (tabWidth > width)
+					width = tabWidth;
+			}
+			return BRect((6.0f + tab_index * width) - fTabOffset, 0.0f,
+				(6.0f + tab_index * width + width) - fTabOffset, fTabHeight);
+			/*float width = 0.0f;
 
 			for (int32 i = 0; i < CountTabs(); i++) {
 				float tabWidth = StringWidth(TabAt(i)->Label()) + 20.0f;
@@ -769,13 +805,15 @@ BTabView::TabFrame(int32 tab_index) const
 			}
 
 			return BRect(X_OFFSET + tab_index * width, 0.0f,
-				X_OFFSET + tab_index * width + width, fTabHeight);
+				X_OFFSET + tab_index * width + width, fTabHeight);*/
 		}
 
 		case B_WIDTH_AS_USUAL:
 		default:
-			return BRect(X_OFFSET + tab_index * 100.0f, 0.0f,
-				X_OFFSET + tab_index * 100.0f + 100.0f, fTabHeight);
+			return BRect((6.0f + tab_index * 100.0f) - fTabOffset, 0.0f,
+						(6.0f + tab_index * 100.0f + 100.0f) - fTabOffset, fTabHeight);
+			/*return BRect(X_OFFSET + tab_index * 100.0f, 0.0f,
+				X_OFFSET + tab_index * 100.0f + 100.0f, fTabHeight);*/
 	}
 }
 
@@ -850,9 +888,12 @@ BTabView::RemoveTab(int32 index)
 	if (index <= fSelection && fSelection != 0)
 		fSelection--;
 
-	Select(fSelection);
+	if(CountTabs() == 0)
+		fFocus = -1;
+	else
+		Select(fSelection);
 
-	if (fFocus == CountTabs() - 1)
+	if (fFocus == CountTabs() - 1 || CountTabs() == 0)
 		SetFocusTab(fFocus, false);
 	else
 		SetFocusTab(fFocus, true);
@@ -939,6 +980,7 @@ BTabView::_InitObject()
 	fTabWidthSetting = B_WIDTH_AS_USUAL;
 	fSelection = 0;
 	fFocus = -1;
+	fTabOffset = 0.0f;
 
 	rgb_color color = ui_color(B_PANEL_BACKGROUND_COLOR);
 
