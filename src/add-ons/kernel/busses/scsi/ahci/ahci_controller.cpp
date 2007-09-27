@@ -82,7 +82,7 @@ AHCIController::Init()
 
 	uint16 pcicmd = gPCI->read_pci_config(fPCIDevice, PCI_command, 2);
 	TRACE("pcicmd old 0x%04x\n", pcicmd);
-	pcicmd = PCI_PCICMD_BME | PCI_PCICMD_MSE | (pcicmd & ~PCI_PCICMD_IOS);
+	pcicmd = PCI_command_master | PCI_command_memory | (pcicmd & ~PCI_command_io);
 	TRACE("pcicmd new 0x%04x\n", pcicmd);
 	gPCI->write_pci_config(fPCIDevice, PCI_command, 2, pcicmd);
 
