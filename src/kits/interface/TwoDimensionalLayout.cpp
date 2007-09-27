@@ -13,7 +13,7 @@
 #include <List.h>
 #include <View.h>
 
-#include "ConstraintSolverLayouter.h"
+#include "ComplexLayouter.h"
 #include "OneElementLayouter.h"
 #include "SimpleLayouter.h"
 
@@ -581,7 +581,7 @@ BTwoDimensionalLayout::CompoundLayouter::ValidateMinMax()
 	if (elementCount <= 1)
 		fLayouter = new OneElementLayouter();
 	else if (_HasMultiElementItems())
-		fLayouter = new ConstraintSolverLayouter(elementCount, _Spacing());
+		fLayouter = new ComplexLayouter(elementCount, _Spacing());
 	else
 		fLayouter = new SimpleLayouter(elementCount, _Spacing());
 

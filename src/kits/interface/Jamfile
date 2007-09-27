@@ -29,22 +29,6 @@ UsePrivateHeaders app input interface shared tracker ;
 UseLibraryHeaders icon ;
 
 
-# constraint solver to use
-local constraintSolverSources = ;
-switch $(LAYOUT_CONSTRAINT_SOLVER) {
-	case qoca :
-	{
-		DEFINES += USE_QOCA_CONSTRAINT_SOLVER ;
-		constraintSolverSources = QocaConstraintSolverLayouter.cpp ;
-		SubDirSysHdrs [ FDirName $(HAIKU_TOP) src libs ] ;
-		SubDirHdrs [ FDirName $(HAIKU_TOP) src libs qoca ] ;
-	}
-	case * :
-	{
-	}
-}
-
-
 SEARCH_SOURCE += [ FDirName $(SUBDIR) textview_support ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) layouter ] ;
 
@@ -138,9 +122,9 @@ MergeObject <libbe>interface_kit.o :
 	WidthBuffer.cpp
 
 	# layouter
+	ComplexLayouter.cpp
 	Layouter.cpp
+	LayoutOptimizer.cpp
 	OneElementLayouter.cpp
 	SimpleLayouter.cpp
-
-	$(constraintSolverSources)
 ;
