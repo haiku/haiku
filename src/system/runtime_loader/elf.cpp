@@ -9,6 +9,7 @@
 
 
 #include "runtime_loader_private.h"
+#include "vm.h"
 
 #include <OS.h>
 
@@ -257,7 +258,10 @@ parse_elf_header(struct Elf32_Ehdr *eheader, int32 *_pheaderSize, int32 *_sheade
 	*_pheaderSize = eheader->e_phentsize * eheader->e_phnum;
 	*_sheaderSize = eheader->e_shentsize * eheader->e_shnum;
 
-	return *_pheaderSize > 0 && *_sheaderSize > 0 ? B_OK : B_NOT_AN_EXECUTABLE;
+	if (*_pheaderSize <= 0 || *_sheaderSize <= 0)
+		return B_NOT_AN_EXECUTABLE;
+
+	return B_OK;
 }
 
 
