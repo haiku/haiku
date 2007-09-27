@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -11,7 +11,6 @@
 #include <Drivers.h>
 #include <ISA.h>
 
-#include <vm_address_space.h>
 #include <console.h>
 
 #include <string.h>
@@ -28,8 +27,8 @@
 #define TEXT_CURSOR_LO 0x0f
 #define TEXT_CURSOR_HI 0x0e
 
-static uint16 *gOrigin;
-static isa_module_info *isa;
+static uint16 *sOrigin;
+static isa_module_info *sISA;
 
 
 static int
@@ -37,20 +36,18 @@ text_init(void)
 {
 	addr_t i;
 
-	if (get_module(B_ISA_MODULE_NAME, (module_info **)&isa) < 0) {
+	if (get_module(B_ISA_MODULE_NAME, (module_info **)&sISA) < 0) {
 		dprintf("text module_init: no isa bus found..\n");
 		return -1;
 	}
 
-	/* we always succeede, so init our stuff */
-	dprintf("console/text: mapping vid mem\n");
-	vm_map_physical_memory(vm_kernel_address_space_id(), "vid_mem", (void *)&gOrigin,
-		B_ANY_KERNEL_ADDRESS, SCREEN_END - SCREEN_START,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, SCREEN_START);
-	dprintf("console/text: mapped vid mem to virtual address %p\n", gOrigin);
+	map_physical_memory("video_mem", (void *)SCREEN_START, SCREEN_END - SCREEN_START,
+		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void *)&sOrigin);
+	dprintf("console/text: mapped vid mem to virtual address %p\n", sOrigin);
 
 	/* pre-touch all of the memory so that we dont fault while deep inside the kernel and displaying something */
-	for(i = (addr_t)gOrigin; i < (addr_t)gOrigin + (SCREEN_END - SCREEN_START); i += B_PAGE_SIZE) {
+	for (i = (addr_t)sOrigin; i < (addr_t)sOrigin + (SCREEN_END - SCREEN_START);
+			i += B_PAGE_SIZE) {
 		uint16 val = *(volatile uint16 *)i;
 		*(volatile uint16 *)i = val;
 	}
@@ -87,10 +84,10 @@ move_cursor(int32 x, int32 y)
 	else
 		pos = y * COLUMNS + x;
 
-	isa->write_io_8(TEXT_INDEX, TEXT_CURSOR_LO);
-	isa->write_io_8(TEXT_DATA, (char)pos);
-	isa->write_io_8(TEXT_INDEX, TEXT_CURSOR_HI);
-	isa->write_io_8(TEXT_DATA, (char)(pos >> 8));
+	sISA->write_io_8(TEXT_INDEX, TEXT_CURSOR_LO);
+	sISA->write_io_8(TEXT_DATA, (char)pos);
+	sISA->write_io_8(TEXT_INDEX, TEXT_CURSOR_HI);
+	sISA->write_io_8(TEXT_DATA, (char)(pos >> 8));
 }
 
 
@@ -98,7 +95,7 @@ static void
 put_glyph(int32 x, int32 y, uint8 glyph, uint8 attr)
 {
 	uint16 pair = ((uint16)attr << 8) | (uint16)glyph;
-	uint16 *p = gOrigin+(y*COLUMNS)+x;
+	uint16 *p = sOrigin + (y * COLUMNS) + x;
 	*p = pair;
 }
 
@@ -110,7 +107,7 @@ fill_glyph(int32 x, int32 y, int32 width, int32 height, uint8 glyph, uint8 attr)
 	int32 y_limit = y + height;
 
 	while (y < y_limit) {
-		uint16 *p = gOrigin + (y * COLUMNS) + x;
+		uint16 *p = sOrigin + (y * COLUMNS) + x;
 		uint16 *p_limit = p + width;
 		while (p < p_limit) *p++ = pair;
 		y++;
@@ -123,7 +120,7 @@ blit(int32 srcx, int32 srcy, int32 width, int32 height, int32 destx, int32 desty
 {
 	if ((srcx == 0) && (width == COLUMNS)) {
 		// whole lines
-		memmove(gOrigin + (desty * COLUMNS), gOrigin + (srcy * COLUMNS), height * COLUMNS * 2);
+		memmove(sOrigin + (desty * COLUMNS), sOrigin + (srcy * COLUMNS), height * COLUMNS * 2);
 	} else {
 		// FIXME
 	}
@@ -133,7 +130,7 @@ blit(int32 srcx, int32 srcy, int32 width, int32 height, int32 destx, int32 desty
 static void
 clear(uint8 attr)
 {
-	uint16 *base = (uint16 *)gOrigin;
+	uint16 *base = (uint16 *)sOrigin;
 	uint32 i;
 
 	for (i = 0; i < COLUMNS * LINES; i++)
