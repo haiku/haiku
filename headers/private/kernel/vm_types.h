@@ -9,9 +9,10 @@
 #define _KERNEL_VM_TYPES_H
 
 
-#include <kernel.h>
 #include <arch/vm_types.h>
 #include <arch/vm_translation_map.h>
+#include <condition_variable.h>
+#include <kernel.h>
 #include <util/DoublyLinkedQueue.h>
 
 #include <sys/uio.h>
@@ -31,9 +32,6 @@
 #ifdef __cplusplus
 struct vm_page_mapping;
 typedef DoublyLinkedListLink<vm_page_mapping> vm_page_mapping_link;
-#else
-typedef struct { void *previous; void *next; } vm_page_mapping_link;
-#endif
 
 typedef struct vm_page_mapping {
 	vm_page_mapping_link page_link;
@@ -42,7 +40,6 @@ typedef struct vm_page_mapping {
 	struct vm_area *area;
 } vm_page_mapping;
 
-#ifdef __cplusplus
 class DoublyLinkedPageLink {
 	public:
 		inline vm_page_mapping_link *operator()(vm_page_mapping *element) const
@@ -71,10 +68,6 @@ class DoublyLinkedAreaLink {
 
 typedef class DoublyLinkedQueue<vm_page_mapping, DoublyLinkedPageLink> vm_page_mappings;
 typedef class DoublyLinkedQueue<vm_page_mapping, DoublyLinkedAreaLink> vm_area_mappings;
-#else	// !__cplusplus
-typedef struct vm_page_mapping *vm_page_mappings;
-typedef struct vm_page_mapping *vm_area_mappings;
-#endif
 
 // vm page
 typedef struct vm_page {
@@ -137,15 +130,9 @@ enum {
 	CACHE_TYPE_NULL
 };
 
-#ifdef __cplusplus
-
-#include <condition_variable.h>
-
 struct vm_dummy_page : vm_page {
 	ConditionVariable<vm_page>	busy_condition;
 };
-
-#endif	// __cplusplus
 
 // vm_cache
 typedef struct vm_cache {
@@ -200,6 +187,13 @@ typedef struct vm_area {
 	struct vm_area		*cache_prev;
 	struct vm_area		*hash_next;
 } vm_area;
+
+#else	// !__cplusplus
+// these are just opaque types in C
+typedef struct vm_page vm_page;
+typedef struct vm_cache vm_cache;
+typedef struct vm_area vm_area;
+#endif
 
 enum {
 	VM_ASPACE_STATE_NORMAL = 0,

@@ -9,6 +9,7 @@
 
 #include <KernelExport.h>
 #include <smp.h>
+#include <util/AutoLock.h>
 #include <vm.h>
 #include <vm_page.h>
 #include <vm_priv.h>
@@ -37,33 +38,24 @@ void *gDmaAddress;
 
 static uint32 sMemoryTypeBitmap;
 static int32 sMemoryTypeIDs[kMaxMemoryTypeRegisters];
-static int32 sMemoryTypeRegisterCount;
+static uint32 sMemoryTypeRegisterCount;
 static spinlock sMemoryTypeLock;
 
 
 static int32
 allocate_mtrr(void)
 {
-	int32 index;
-
-	cpu_status state = disable_interrupts();
-	acquire_spinlock(&sMemoryTypeLock);
+	InterruptsSpinLocker _(&sMemoryTypeLock);
 
 	// find free bit
 
-	for (index = 0; index < sMemoryTypeRegisterCount; index++) {
+	for (uint32 index = 0; index < sMemoryTypeRegisterCount; index++) {
 		if (sMemoryTypeBitmap & (1UL << index))
 			continue;
 
 		sMemoryTypeBitmap |= 1UL << index;
-
-		release_spinlock(&sMemoryTypeLock);
-		restore_interrupts(state);
 		return index;
 	}
-
-	release_spinlock(&sMemoryTypeLock);
-	restore_interrupts(state);
 
 	return -1;
 }
@@ -72,13 +64,9 @@ allocate_mtrr(void)
 static void
 free_mtrr(int32 index)
 {
-	cpu_status state = disable_interrupts();
-	acquire_spinlock(&sMemoryTypeLock);
+	InterruptsSpinLocker _(&sMemoryTypeLock);
 
 	sMemoryTypeBitmap &= ~(1UL << index);
-
-	release_spinlock(&sMemoryTypeLock);
-	restore_interrupts(state);
 }
 
 
@@ -204,8 +192,7 @@ arch_vm_init_end(kernel_args *args)
 status_t
 arch_vm_init_post_modules(kernel_args *args)
 {
-	void *cookie;
-	int32 i;
+//	void *cookie;
 
 	// the x86 CPU modules are now accessible
 
@@ -219,13 +206,13 @@ arch_vm_init_post_modules(kernel_args *args)
 
 	// init memory type ID table
 
-	for (i = 0; i < sMemoryTypeRegisterCount; i++) {
+	for (uint32 i = 0; i < sMemoryTypeRegisterCount; i++) {
 		sMemoryTypeIDs[i] = -1;
 	}
 
 	// set the physical memory ranges to write-back mode
 
-	for (i = 0; i < args->num_physical_memory_ranges; i++) {
+	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
 		set_memory_type(-1, args->physical_memory_range[i].start,
 			args->physical_memory_range[i].size, B_MTR_WB);
 	}
@@ -237,14 +224,16 @@ arch_vm_init_post_modules(kernel_args *args)
 void
 arch_vm_aspace_swap(vm_address_space *aspace)
 {
-	i386_swap_pgdir((addr_t)i386_translation_map_get_pgdir(&aspace->translation_map));
+	i386_swap_pgdir((addr_t)i386_translation_map_get_pgdir(
+		&aspace->translation_map));
 }
 
 
 bool
 arch_vm_supports_protection(uint32 protection)
 {
-	// x86 always has the same read/write properties for userland and the kernel.
+	// x86 always has the same read/write properties for userland and the
+	// kernel.
 	// That's why we do not support user-read/kernel-write access. While the
 	// other way around is not supported either, we don't care in this case
 	// and give the kernel full access.
@@ -259,7 +248,7 @@ arch_vm_supports_protection(uint32 protection)
 void
 arch_vm_unset_memory_type(struct vm_area *area)
 {
-	int32 index;
+	uint32 index;
 
 	if (area->memory_type == 0)
 		return;
@@ -279,7 +268,8 @@ arch_vm_unset_memory_type(struct vm_area *area)
 
 
 status_t
-arch_vm_set_memory_type(struct vm_area *area, addr_t physicalBase, uint32 type)
+arch_vm_set_memory_type(struct vm_area *area, addr_t physicalBase,
+	uint32 type)
 {
 	area->memory_type = type >> MEMORY_TYPE_SHIFT;
 	return set_memory_type(area->id, physicalBase, area->size, type);

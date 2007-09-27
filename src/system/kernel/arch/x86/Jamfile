@@ -12,7 +12,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
 KernelStaticLibrary libx86 :
 	arch_cpu.c
-	arch_debug.c
+	arch_debug.cpp
 	arch_debug_console.c
 	arch_elf.c
 	arch_int.c
@@ -22,8 +22,8 @@ KernelStaticLibrary libx86 :
 	arch_smp.c
 	arch_thread.c
 	arch_timer.c
-	arch_vm.c
-	arch_vm_translation_map.c
+	arch_vm.cpp
+	arch_vm_translation_map.cpp
 	arch_x86.S
 	arch_interrupts.S
 	arch_system_info.c

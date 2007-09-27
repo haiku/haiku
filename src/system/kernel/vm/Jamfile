@@ -4,12 +4,12 @@ UsePrivateHeaders shared ;
 
 KernelMergeObject kernel_vm.o :
 	vm.cpp
-	vm_address_space.c
+	vm_address_space.cpp
 	vm_cache.cpp
 	vm_daemons.cpp
 	vm_low_memory.cpp
 	vm_page.cpp
-	vm_store_anonymous_noswap.c
+	vm_store_anonymous_noswap.cpp
 	vm_store_device.c
 	vm_store_null.c
 	#vm_tests.c

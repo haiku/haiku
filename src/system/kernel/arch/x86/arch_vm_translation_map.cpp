@@ -787,7 +787,8 @@ arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
 	if (!kernel) {
 		// user
 		// allocate a pgdir
-		map->arch_data->pgdir_virt = memalign(B_PAGE_SIZE, B_PAGE_SIZE);
+		map->arch_data->pgdir_virt = (page_directory_entry *)memalign(
+			B_PAGE_SIZE, B_PAGE_SIZE);
 		if (map->arch_data->pgdir_virt == NULL) {
 			free(map->arch_data);
 			recursive_lock_destroy(&map->lock);
