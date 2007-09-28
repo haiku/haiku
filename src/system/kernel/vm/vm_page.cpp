@@ -680,7 +680,7 @@ page_writer(void* /*unused*/)
 		vm_page *pages[kNumPages];
 		uint32 numPages = 0;
 
-		// TODO: once the I/O scheduler is there, we should write back
+		// TODO: once the I/O scheduler is there, we should write
 		// a lot more pages back.
 		// TODO: make this laptop friendly, too (ie. only start doing
 		// something if someone else did something or there is really
@@ -730,7 +730,7 @@ page_writer(void* /*unused*/)
 			writeStatus[i] = write_page(pages[i], false);
 		}
 
-		// mark pages depending on if they could be written or not
+		// mark pages depending on whether they could be written or not
 
 		for (uint32 i = 0; i < numPages; i++) {
 			vm_cache *cache = pages[i]->cache;
@@ -854,8 +854,10 @@ vm_page_write_modified_pages(vm_cache *cache, bool fsReenter)
 			InterruptsSpinLocker locker(&sPageLock);
 			remove_page_from_queue(&sModifiedPageQueue, page);
 			dequeuedPage = true;
-		} else if (!vm_test_map_modification(page))
+		} else if (page->state == PAGE_STATE_BUSY
+				|| !vm_test_map_modification(page)) {
 			continue;
+		}
 
 		page->state = PAGE_STATE_BUSY;
 
