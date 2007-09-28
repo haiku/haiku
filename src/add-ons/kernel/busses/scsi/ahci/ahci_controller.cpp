@@ -235,16 +235,10 @@ AHCIController::ResetController()
 	uint32 saveCaps = fRegs->cap & (CAP_SMPS | CAP_SSS | CAP_SPM | CAP_EMS | CAP_SXS);
 	uint32 savePI = fRegs->pi;
 	
-#if 1
 	fRegs->ghc |= GHC_HR;
 	FlushPostedWrites();
 	if (wait_until_clear(&fRegs->ghc, GHC_HR, 1000000) < B_OK)
 		return B_TIMED_OUT;
-#else
-	fRegs->ghc &= ~GHC_AE;
-	fRegs->is = 0xffffffff;
-	FlushPostedWrites();
-#endif
 
 	fRegs->ghc |= GHC_AE;
 	FlushPostedWrites();

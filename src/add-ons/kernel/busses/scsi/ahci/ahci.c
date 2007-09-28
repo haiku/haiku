@@ -83,19 +83,11 @@ ahci_supports_device(device_node_handle parent, bool *_noConnection)
 			PCI_DEVICE_DEVICE_ID_ITEM, &deviceID, false) != B_OK)
 		return B_ERROR;
 
-#if 1
 	if (strcmp(bus, "pci") || baseClass != PCI_mass_storage
 		|| subClass != PCI_sata || classAPI != PCI_sata_ahci) {
 		free(bus);
 		return 0.0f;
 	}
-#else
-	if (strcmp(bus, "pci") || baseClass != PCI_mass_storage
-		|| subClass != PCI_ide) {
-		free(bus);
-		return 0.0;
-	}
-#endif
 
 	TRACE("controller found! vendor 0x%04x, device 0x%04x\n",
 		vendorID, deviceID);
