@@ -27,6 +27,8 @@
 #include <vm_page.h>
 #include <vm_cache.h>
 
+#include "PageCacheLocker.h"
+
 
 //#define TRACE_VM_PAGE
 #ifdef TRACE_VM_PAGE
@@ -59,23 +61,23 @@ static size_t sReservedPages;
 static ConditionVariable<page_queue> sFreePageCondition;
 static spinlock sPageLock;
 
-static sem_id modified_pages_available;
+static sem_id sWriterWaitSem;
 
 
-/*!	Dequeues a page from the tail of the given queue */
+/*!	Dequeues a page from the head of the given queue */
 static vm_page *
 dequeue_page(page_queue *queue)
 {
 	vm_page *page;
 
-	page = queue->tail;
+	page = queue->head;
 	if (page != NULL) {
-		if (queue->head == page)
-			queue->head = NULL;
-		if (page->queue_prev != NULL)
-			page->queue_prev->queue_next = NULL;
+		if (queue->tail == page)
+			queue->tail = NULL;
+		if (page->queue_next != NULL)
+			page->queue_next->queue_prev = NULL;
 
-		queue->tail = page->queue_prev;
+		queue->head = page->queue_next;
 		queue->count--;
 
 #ifdef DEBUG_PAGE_QUEUE
@@ -92,13 +94,39 @@ dequeue_page(page_queue *queue)
 }
 
 
-/*!	Enqueues a page to the head of the given queue */
+/*!	Enqueues a page to the tail of the given queue */
 static void
 enqueue_page(page_queue *queue, vm_page *page)
 {
 #ifdef DEBUG_PAGE_QUEUE
 	if (page->queue != NULL) {
 		panic("enqueue_page(queue: %p, page: %p): page thinks it is "
+			"already in queue %p", queue, page, page->queue);
+	}
+#endif	// DEBUG_PAGE_QUEUE
+
+	if (queue->tail != NULL)
+		queue->tail->queue_next = page;
+	page->queue_prev = queue->tail;
+	queue->tail = page;
+	page->queue_next = NULL;
+	if (queue->head == NULL)
+		queue->head = page;
+	queue->count++;
+
+#ifdef DEBUG_PAGE_QUEUE
+	page->queue = queue;
+#endif
+}
+
+
+/*!	Enqueues a page to the head of the given queue */
+static void
+enqueue_page_to_head(page_queue *queue, vm_page *page)
+{
+#ifdef DEBUG_PAGE_QUEUE
+	if (page->queue != NULL) {
+		panic("enqueue_page_to_head(queue: %p, page: %p): page thinks it is "
 			"already in queue %p", queue, page, page->queue);
 	}
 #endif	// DEBUG_PAGE_QUEUE
@@ -128,15 +156,15 @@ remove_page_from_queue(page_queue *queue, vm_page *page)
 	}
 #endif	// DEBUG_PAGE_QUEUE
 
-	if (page->queue_prev != NULL)
-		page->queue_prev->queue_next = page->queue_next;
-	else
-		queue->head = page->queue_next;
-
 	if (page->queue_next != NULL)
 		page->queue_next->queue_prev = page->queue_prev;
 	else
 		queue->tail = page->queue_prev;
+
+	if (page->queue_prev != NULL)
+		page->queue_prev->queue_next = page->queue_next;
+	else
+		queue->head = page->queue_next;
 
 	queue->count--;
 
@@ -610,85 +638,6 @@ page_scrubber(void *unused)
 }
 
 
-#if 0
-static int pageout_daemon()
-{
-	int state;
-	vm_page *page;
-	vm_region *region;
-	IOVECS(vecs, 1);
-	ssize_t err;
-
-	dprintf("pageout daemon starting\n");
-
-	for (;;) {
-		acquire_sem(modified_pages_available);
-
-		dprintf("here\n");
-
-		state = disable_interrupts();
-		acquire_spinlock(&sPageLock);
-		page = dequeue_page(&sModifiedPageQueue);
-		page->state = PAGE_STATE_BUSY;
-		vm_cache_acquire_ref(page->cache_ref, true);
-		release_spinlock(&sPageLock);
-		restore_interrupts(state);
-
-		dprintf("got page %p\n", page);
-
-		if (page->cache_ref->cache->temporary && !trimming_cycle) {
-			// unless we're in the trimming cycle, dont write out pages
-			// that back anonymous stores
-			state = disable_interrupts();
-			acquire_spinlock(&sPageLock);
-			enqueue_page(&sModifiedPageQueue, page);
-			page->state = PAGE_STATE_MODIFIED;
-			release_spinlock(&sPageLock);
-			restore_interrupts(state);
-			vm_cache_release_ref(page->cache_ref);
-			continue;
-		}
-
-		/* clear the modified flag on this page in all it's mappings */
-		mutex_lock(&page->cache_ref->lock);
-		for (region = page->cache_ref->region_list; region; region = region->cache_next) {
-			if (page->offset > region->cache_offset
-			  && page->offset < region->cache_offset + region->size) {
-				vm_translation_map *map = &region->aspace->translation_map;
-				map->ops->lock(map);
-				map->ops->clear_flags(map, page->offset - region->cache_offset + region->base, PAGE_MODIFIED);
-				map->ops->unlock(map);
-			}
-		}
-		mutex_unlock(&page->cache_ref->lock);
-
-		/* write the page out to it's backing store */
-		vecs->num = 1;
-		vecs->total_len = PAGE_SIZE;
-		vm_get_physical_page(page->physical_page_number * PAGE_SIZE, (addr_t *)&vecs->vec[0].iov_base, PHYSICAL_PAGE_CAN_WAIT);
-		vecs->vec[0].iov_len = PAGE_SIZE;
-
-		err = page->cache_ref->cache->store->ops->write(page->cache_ref->cache->store, page->offset, vecs);
-
-		vm_put_physical_page((addr_t)vecs->vec[0].iov_base);
-
-		state = disable_interrupts();
-		acquire_spinlock(&sPageLock);
-		if (page->ref_count > 0) {
-			page->state = PAGE_STATE_ACTIVE;
-		} else {
-			page->state = PAGE_STATE_INACTIVE;
-		}
-		enqueue_page(&sActivePageQueue, page);
-		release_spinlock(&sPageLock);
-		restore_interrupts(state);
-
-		vm_cache_release_ref(page->cache_ref);
-	}
-}
-#endif
-
-
 static status_t
 write_page(vm_page *page, bool fsReenter)
 {
@@ -716,6 +665,97 @@ write_page(vm_page *page, bool fsReenter)
 	}
 
 	return status;
+}
+
+
+status_t
+page_writer(void* /*unused*/)
+{
+	while (true) {
+		acquire_sem_etc(sWriterWaitSem, 1, B_RELATIVE_TIMEOUT, 3000000);
+			// all 3 seconds when no one triggers us
+
+		const uint32 kNumPages = 32;
+		ConditionVariable<vm_page> busyConditions[kNumPages];
+		vm_page *pages[kNumPages];
+		uint32 numPages = 0;
+
+		// TODO: once the I/O scheduler is there, we should write back
+		// a lot more pages back.
+		// TODO: make this laptop friendly, too (ie. only start doing
+		// something if someone else did something or there is really
+		// enough to do).
+
+		// collect pages to be written
+
+		while (numPages < kNumPages) {
+			InterruptsSpinLocker locker(sPageLock);
+
+			vm_page *page = sModifiedPageQueue.head;
+			while (page != NULL && page->state == PAGE_STATE_BUSY) {
+				// skip busy pages
+				page = page->queue_next;
+			}
+			if (page == NULL)
+				break;
+
+			locker.Unlock();
+
+			PageCacheLocker cacheLocker(page);
+			if (!cacheLocker.IsLocked())
+				continue;
+
+			locker.Lock();
+			remove_page_from_queue(&sModifiedPageQueue, page);
+			page->state = PAGE_STATE_BUSY;
+
+			busyConditions[numPages].Publish(page, "page");
+
+			locker.Unlock();
+
+			//dprintf("write page %p\n", page);
+			vm_clear_map_flags(page, PAGE_MODIFIED);
+			vm_cache_acquire_ref(page->cache);
+			pages[numPages++] = page;
+		}
+
+		if (numPages == 0)
+			continue;
+
+		// write pages to disk
+
+		// TODO: put this as requests into the I/O scheduler
+		status_t writeStatus[kNumPages];
+		for (uint32 i = 0; i < numPages; i++) {
+			writeStatus[i] = write_page(pages[i], false);
+		}
+
+		// mark pages depending on if they could be written or not
+
+		for (uint32 i = 0; i < numPages; i++) {
+			vm_cache *cache = pages[i]->cache;
+			mutex_lock(&cache->lock);
+
+			if (writeStatus[i] == B_OK) {
+				// put it into the active queue
+				InterruptsSpinLocker locker(sPageLock);
+				move_page_to_active_or_inactive_queue(pages[i], true);
+			} else {
+				// We don't have to put the PAGE_MODIFIED bit back, as it's
+				// still in the modified pages list.
+				InterruptsSpinLocker locker(sPageLock);
+				pages[i]->state = PAGE_STATE_MODIFIED;
+				enqueue_page(&sModifiedPageQueue, pages[i]);
+			}
+
+			busyConditions[i].Unpublish();
+
+			mutex_unlock(&cache->lock);
+			vm_cache_release_ref(cache);
+		}
+	}
+
+	return B_OK;
 }
 
 
@@ -751,7 +791,7 @@ page_thief(void* /*unused*/, int32 level)
 		// find a candidate to steal from the inactive queue
 
 		for (int32 i = sActivePageQueue.count; i-- > 0;) {
-			// move page to the head of the queue so that we don't
+			// move page to the tail of the queue so that we don't
 			// scan it again directly
 			page = dequeue_page(&sActivePageQueue);
 			enqueue_page(&sActivePageQueue, page);
@@ -800,96 +840,29 @@ page_thief(void* /*unused*/, int32 level)
 
 /*!
 	You need to hold the vm_cache lock when calling this function.
-	And \a page must obviously be in that cache.
-	Note that the cache lock is released in this function.
-*/
-status_t
-vm_page_write_modified_page(vm_cache *cache, vm_page *page, bool fsReenter)
-{
-	ASSERT(page->state == PAGE_STATE_MODIFIED);
-	ASSERT(page->cache == cache);
-
-	ConditionVariable<vm_page> busyCondition;
-	InterruptsSpinLocker locker(&sPageLock);
-
-	remove_page_from_queue(&sModifiedPageQueue, page);
-	page->state = PAGE_STATE_BUSY;
-
-	busyCondition.Publish(page, "page");
-
-	locker.Unlock();
-
-	off_t pageOffset = (off_t)page->cache_offset << PAGE_SHIFT;
-
-	for (vm_area *area = cache->areas; area; area = area->cache_next) {
-		if (pageOffset >= area->cache_offset
-			&& pageOffset < area->cache_offset + area->size) {
-			vm_translation_map *map = &area->address_space->translation_map;
-			// clear the modified flag
-			map->ops->lock(map);
-			map->ops->clear_flags(map, pageOffset - area->cache_offset
-				+ area->base, PAGE_MODIFIED);
-			map->ops->unlock(map);
-		}
-	}
-
-	mutex_unlock(&cache->lock);
-
-	status_t status = write_page(page, fsReenter);
-
-	mutex_lock(&cache->lock);
-
-	locker.Lock();
-
-	if (status == B_OK) {
-		// put it into the active queue
-		move_page_to_active_or_inactive_queue(page, true);
-	} else {
-		// We don't have to put the PAGE_MODIFIED bit back, as it's still
-		// in the modified pages list.
-		page->state = PAGE_STATE_MODIFIED;
-		enqueue_page(&sModifiedPageQueue, page);
-	}
-
-	busyCondition.Unpublish();
-
-	return status;
-}
-
-
-/*!
-	You need to hold the vm_cache lock when calling this function.
 	Note that the cache lock is released in this function.
 */
 status_t
 vm_page_write_modified_pages(vm_cache *cache, bool fsReenter)
 {
-	vm_page *page = cache->page_list;
-
 	// ToDo: join adjacent pages into one vec list
 
-	for (; page; page = page->cache_next) {
-		bool gotPage = false;
-		bool dequeuedPage = true;
-		off_t pageOffset;
-		status_t status;
-		vm_area *area;
-		ConditionVariable<vm_page> busyCondition;
-
-		cpu_status state = disable_interrupts();
-		acquire_spinlock(&sPageLock);
+	for (vm_page *page = cache->page_list; page; page = page->cache_next) {
+		bool dequeuedPage = false;
 
 		if (page->state == PAGE_STATE_MODIFIED) {
+			InterruptsSpinLocker locker(&sPageLock);
 			remove_page_from_queue(&sModifiedPageQueue, page);
-			page->state = PAGE_STATE_BUSY;
-			busyCondition.Publish(page, "page");
-			gotPage = true;
-		}
+			dequeuedPage = true;
+		} else if (!vm_test_map_modification(page))
+			continue;
 
-		release_spinlock(&sPageLock);
-		restore_interrupts(state);
+		page->state = PAGE_STATE_BUSY;
 
-		// We may have a modified page - however, while we're writing it back,
+		ConditionVariable<vm_page> busyCondition;
+		busyCondition.Publish(page, "page");
+
+		// We have a modified page - however, while we're writing it back,
 		// the page is still mapped. In order not to lose any changes to the
 		// page, we mark it clean before actually writing it back; if writing
 		// the page fails for some reason, we just keep it in the modified page
@@ -899,76 +872,50 @@ vm_page_write_modified_pages(vm_cache *cache, bool fsReenter)
 		// had the chance to write it back, then we'll write it again later -
 		// that will probably not happen that often, though.
 
-		pageOffset = (off_t)page->cache_offset << PAGE_SHIFT;
-
-		for (area = cache->areas; area; area = area->cache_next) {
-			if (pageOffset >= area->cache_offset
-				&& pageOffset < area->cache_offset + area->size) {
-				vm_translation_map *map = &area->address_space->translation_map;
-				map->ops->lock(map);
-
-				if (!gotPage) {
-					// Check if the PAGE_MODIFIED bit hasn't been propagated yet
-					addr_t physicalAddress;
-					uint32 flags;
-					map->ops->query(map, pageOffset - area->cache_offset + area->base,
-						&physicalAddress, &flags);
-					if (flags & PAGE_MODIFIED) {
-						page->state = PAGE_STATE_BUSY;
-						busyCondition.Publish(page, "page");
-						gotPage = true;
-						dequeuedPage = false;
-					}
-				}
-				if (gotPage) {
-					// clear the modified flag
-					map->ops->clear_flags(map, pageOffset - area->cache_offset
-						+ area->base, PAGE_MODIFIED);
-				}
-				map->ops->unlock(map);
-			}
-		}
-
-		if (!gotPage)
-			continue;
+		// clear the modified flag
+		vm_clear_map_flags(page, PAGE_MODIFIED);
 
 		mutex_unlock(&cache->lock);
 
-		status = write_page(page, fsReenter);
+		status_t status = write_page(page, fsReenter);
 
 		mutex_lock(&cache->lock);
 
+		InterruptsSpinLocker locker(&sPageLock);
+
 		if (status == B_OK) {
 			// put it into the active/inactive queue
-
-			state = disable_interrupts();
-			acquire_spinlock(&sPageLock);
-
 			move_page_to_active_or_inactive_queue(page, dequeuedPage);
-			busyCondition.Unpublish();
-
-			release_spinlock(&sPageLock);
-			restore_interrupts(state);
 		} else {
 			// We don't have to put the PAGE_MODIFIED bit back, as it's still
 			// in the modified pages list.
-			state = disable_interrupts();
-			acquire_spinlock(&sPageLock);
-
 			if (dequeuedPage) {
 				page->state = PAGE_STATE_MODIFIED;
 				enqueue_page(&sModifiedPageQueue, page);
 			} else
 				set_page_state_nolock(page, PAGE_STATE_MODIFIED);
-
-			busyCondition.Unpublish();
-
-			release_spinlock(&sPageLock);
-			restore_interrupts(state);
 		}
+
+		busyCondition.Unpublish();
 	}
 
 	return B_OK;
+}
+
+
+/*!	Schedules the page writer to write back the specified \a page.
+	Note, however, that it doesn't do this immediately, and it might
+	take several seconds until the page is actually written out.
+*/
+void
+vm_page_schedule_write_page(vm_page *page)
+{
+	ASSERT(page->state == PAGE_STATE_MODIFIED);
+
+	vm_page_requeue(page, false);
+
+	release_sem_etc(sWriterWaitSem, 1,
+		B_RELEASE_IF_WAITING_ONLY | B_DO_NOT_RESCHEDULE);
 }
 
 
@@ -1086,17 +1033,17 @@ vm_page_init_post_thread(kernel_args *args)
 	thread = spawn_kernel_thread(&page_scrubber, "page scrubber", B_LOWEST_ACTIVE_PRIORITY, NULL);
 	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
 
-	modified_pages_available = create_sem(0, "modified_pages_avail_sem");
-#if 0
-	// create a kernel thread to schedule modified pages to write
-	tid = thread_create_kernel_thread("pageout daemon", &pageout_daemon, B_FIRST_REAL_TIME_PRIORITY + 1);
-	thread_resume_thread(tid);
-#endif
-
 	new (&sFreePageCondition) ConditionVariable<page_queue>;
 	sFreePageCondition.Publish(&sFreePageQueue, "free page");
 
 	register_low_memory_handler(page_thief, NULL, 0);
+
+	sWriterWaitSem = create_sem(0, "page writer");
+
+	thread = spawn_kernel_thread(&page_writer, "page writer",
+		B_LOW_PRIORITY, NULL);
+	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
+
 	return B_OK;
 }
 
@@ -1374,15 +1321,47 @@ vm_lookup_page(addr_t pageNumber)
 status_t
 vm_page_set_state(vm_page *page, int pageState)
 {
-	cpu_status state = disable_interrupts();
-	acquire_spinlock(&sPageLock);
+	InterruptsSpinLocker _(sPageLock);
 
-	status_t status = set_page_state_nolock(page, pageState);
+	return set_page_state_nolock(page, pageState);
+}
 
-	release_spinlock(&sPageLock);
-	restore_interrupts(state);
 
-	return status;
+void
+vm_page_requeue(struct vm_page *page, bool tail)
+{
+	InterruptsSpinLocker _(sPageLock);
+	page_queue *queue = NULL;
+
+	switch (page->state) {
+		case PAGE_STATE_BUSY:
+		case PAGE_STATE_ACTIVE:
+		case PAGE_STATE_INACTIVE:
+		case PAGE_STATE_WIRED:
+		case PAGE_STATE_UNUSED:
+			queue = &sActivePageQueue;
+			break;
+		case PAGE_STATE_MODIFIED:
+			queue = &sModifiedPageQueue;
+			break;
+		case PAGE_STATE_FREE:
+			queue = &sFreePageQueue;
+			break;
+		case PAGE_STATE_CLEAR:
+			queue = &sClearPageQueue;
+			break;
+		default:
+			panic("vm_page_touch: vm_page %p in invalid state %d\n",
+				page, page->state);
+			break;
+	}
+
+	remove_page_from_queue(queue, page);
+
+	if (tail)
+		enqueue_page(queue, page);
+	else
+		enqueue_page_to_head(queue, page);
 }
 
 

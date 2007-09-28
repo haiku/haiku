@@ -4,6 +4,8 @@
  */
 
 
+#include "PageCacheLocker.h"
+
 #include <signal.h>
 
 #include <OS.h>
@@ -23,23 +25,6 @@ const static bigtime_t kMaxScanWaitInterval = 1000000LL;	// 1 sec
 static uint32 sLowPagesCount;
 static sem_id sPageDaemonSem;
 static uint32 sNumPages;
-
-
-class PageCacheLocker {
-public:
-	PageCacheLocker(vm_page* page);
-	~PageCacheLocker();
-
-	bool IsLocked() { return fPage != NULL; }
-
-	bool Lock(vm_page* page);
-	void Unlock();
-
-private:
-	bool _IgnorePage(vm_page* page);
-
-	vm_page*	fPage;
-};
 
 
 PageCacheLocker::PageCacheLocker(vm_page* page)
@@ -118,7 +103,7 @@ clear_page_activation(int32 index)
 		return;
 
 	if (page->state == PAGE_STATE_ACTIVE)
-		vm_clear_map_activation(page);
+		vm_clear_map_flags(page, PAGE_ACCESSED);
 }
 
 
@@ -155,9 +140,9 @@ check_page_activation(int32 index)
 
 	if (page->usage_count < 0) {
 		vm_remove_all_page_mappings(page);
-		if (page->state == PAGE_STATE_MODIFIED) {
-			// TODO: schedule to write back!
-		} else
+		if (page->state == PAGE_STATE_MODIFIED)
+			vm_page_schedule_write_page(page);
+		else
 			vm_page_set_state(page, PAGE_STATE_INACTIVE);
 		//dprintf("page %p -> move to inactive\n", page);
 	}
@@ -193,6 +178,8 @@ page_daemon(void* /*unused*/)
 			* pagesLeft / sLowPagesCount;
 		uint32 leftToFree = 32 + (scanPagesCount - 32)
 			* pagesLeft / sLowPagesCount;
+dprintf("wait interval %Ld, scan pages %lu, free %lu, target %lu\n",
+	scanWaitInterval, scanPagesCount, pagesLeft, leftToFree);
 
 		for (uint32 i = 0; i < scanPagesCount && leftToFree > 0; i++) {
 			if (clearPage == 0)

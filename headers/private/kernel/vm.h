@@ -89,7 +89,6 @@ void vm_free_unused_boot_loader_range(addr_t start, addr_t end);
 addr_t vm_allocate_early(struct kernel_args *args, size_t virtualSize,
 			size_t physicalSize, uint32 attributes);
 
-
 void slab_init(struct kernel_args *args, addr_t initialBase,
 	size_t initialSize);
 void slab_init_post_sem();
@@ -128,8 +127,9 @@ struct vm_area *vm_area_lookup(struct vm_address_space *addressSpace,
 			addr_t address);
 status_t vm_set_area_memory_type(area_id id, addr_t physicalBase, uint32 type);
 status_t vm_get_page_mapping(team_id team, addr_t vaddr, addr_t *paddr);
+bool vm_test_map_modification(struct vm_page *page);
 int32 vm_test_map_activation(struct vm_page *page, bool *_modified);
-void vm_clear_map_activation(struct vm_page *page);
+void vm_clear_map_flags(struct vm_page *page, uint32 flags);
 void vm_remove_all_page_mappings(struct vm_page *page);
 status_t vm_unmap_pages(struct vm_area *area, addr_t base, size_t length);
 status_t vm_map_page(struct vm_area *area, struct vm_page *page, addr_t address,

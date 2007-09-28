@@ -27,14 +27,14 @@ status_t vm_page_init_post_thread(struct kernel_args *args);
 status_t vm_mark_page_inuse(addr_t page);
 status_t vm_mark_page_range_inuse(addr_t startPage, addr_t length);
 status_t vm_page_set_state(struct vm_page *page, int state);
+void vm_page_requeue(struct vm_page *page, bool tail);
 
 // get some data about the number of pages in the system
 size_t vm_page_num_pages(void);
 size_t vm_page_num_free_pages(void);
 
-status_t vm_page_write_modified_page(struct vm_cache *cache,
-	struct vm_page *page, bool fsReenter);
 status_t vm_page_write_modified_pages(struct vm_cache *cache, bool fsReenter);
+void vm_page_schedule_write_page(struct vm_page *page);
 
 void vm_page_unreserve_pages(uint32 count);
 void vm_page_reserve_pages(uint32 count);

@@ -2354,6 +2354,32 @@ vm_get_page_mapping(team_id team, addr_t vaddr, addr_t *paddr)
 }
 
 
+bool
+vm_test_map_modification(vm_page *page)
+{
+	MutexLocker locker(sMappingLock);
+
+	vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
+	vm_page_mapping *mapping;
+	while ((mapping = iterator.Next()) != NULL) {
+		vm_area *area = mapping->area;
+		vm_translation_map *map = &area->address_space->translation_map;
+
+		addr_t physicalAddress;
+		uint32 flags;
+		map->ops->lock(map);
+		addr_t address = area->base + (page->cache_offset << PAGE_SHIFT);
+		map->ops->query_interrupt(map, address, &physicalAddress, &flags);
+		map->ops->unlock(map);
+
+		if (flags & PAGE_MODIFIED)
+			return true;
+	}
+
+	return false;
+}
+
+
 int32
 vm_test_map_activation(vm_page *page, bool *_modified)
 {
@@ -2389,7 +2415,7 @@ vm_test_map_activation(vm_page *page, bool *_modified)
 
 
 void
-vm_clear_map_activation(vm_page *page)
+vm_clear_map_flags(vm_page *page, uint32 flags)
 {
 	MutexLocker locker(sMappingLock);
 
@@ -2401,7 +2427,7 @@ vm_clear_map_activation(vm_page *page)
 
 		map->ops->lock(map);
 		addr_t address = area->base + (page->cache_offset << PAGE_SHIFT);
-		map->ops->clear_flags(map, address, PAGE_ACCESSED);
+		map->ops->clear_flags(map, address, flags);
 		map->ops->unlock(map);
 	}
 }
