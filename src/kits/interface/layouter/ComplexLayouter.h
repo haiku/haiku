@@ -74,7 +74,7 @@ private:
 			float				fMin;
 			float				fMax;
 			int32				fUnlimited;
-			bool				fLayoutValid;
+			bool				fMinMaxValid;
 			bool				fOptimizerConstraintsAdded;
 };
 

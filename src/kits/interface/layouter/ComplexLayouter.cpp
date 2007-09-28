@@ -166,7 +166,7 @@ ComplexLayouter::ComplexLayouter(int32 elementCount, int32 spacing)
 	  fSumBackups(new(nothrow) SumItemBackup[elementCount + 1]),
 	  fOptimizer(new(nothrow) LayoutOptimizer(elementCount)),
 	  fUnlimited(B_SIZE_UNLIMITED / (elementCount == 0 ? 1 : elementCount)),
-	  fLayoutValid(false),
+	  fMinMaxValid(false),
 	  fOptimizerConstraintsAdded(false)
 {
 	if (fConstraints)
@@ -247,6 +247,8 @@ ComplexLayouter::AddConstraints(int32 element, int32 length,
 		constraint->next = *slot;
 		*slot = constraint;
 	}
+
+	fMinMaxValid = false;
 }
 
 
@@ -386,7 +388,7 @@ ComplexLayouter::CloneLayouter()
 		(fElementCount + 1) * sizeof(SumItemBackup));
 	layouter->fMin = fMin;
 	layouter->fMax = fMax;
-	layouter->fLayoutValid = fLayoutValid;
+	layouter->fMinMaxValid = fMinMaxValid;
 
 	return layouterDeleter.Detach();
 }
@@ -577,7 +579,7 @@ ComplexLayouter::_ValidateLayout()
 	// incorporated, the resulting minc[n] and maxc[n] are the min and max
 	// limits we wanted to compute.
 
-	if (fLayoutValid)
+	if (fMinMaxValid)
 		return;
 
 	fSums[0].min = 0;
@@ -656,7 +658,7 @@ ComplexLayouter::_ValidateLayout()
 	}
 
 	fOptimizerConstraintsAdded = false;
-	fLayoutValid = true;
+	fMinMaxValid = true;
 }
 
 
