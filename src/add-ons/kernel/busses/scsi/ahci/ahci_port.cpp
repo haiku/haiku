@@ -350,8 +350,13 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 
 	TRACE("AHCIPort::ScsiExecuteRequest port %d, opcode %u, length %u\n", fIndex, request->cdb[0], request->cdb_length);
 
-	if (request->cdb[0] == 18)
-		IdentifyDevice();
+	switch (request->cdb[0]) {
+		case 0x00:
+			break;
+		case 0x12:
+			IdentifyDevice();
+			break;
+	}
 
 	request->subsys_status = SCSI_DEV_NOT_THERE;
 	gSCSI->finished(request, 1);
