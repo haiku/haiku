@@ -95,7 +95,7 @@ protected:
 };
 
 
-template<typename Type>
+template<typename Type = void>
 class ConditionVariable : private PrivateConditionVariable {
 public:
 	inline	void				Publish(const Type* object,
@@ -107,7 +107,7 @@ public:
 };
 
 
-template<typename Type>
+template<typename Type = void>
 class ConditionVariableEntry : public PrivateConditionVariableEntry {
 public:
 	inline	bool				Add(const Type* object,
