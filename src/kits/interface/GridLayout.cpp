@@ -123,6 +123,7 @@ private:
 				info->weight = 1;
 				info->minSize = 0;
 				info->maxSize = B_SIZE_UNLIMITED;
+				fInfos.AddItem(info);
 			}
 		}
 	
