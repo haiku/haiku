@@ -1,5 +1,8 @@
 SubDir HAIKU_TOP src add-ons kernel busses scsi ahci ;
 
+UsePrivateHeaders drivers kernel ;
+UsePrivateHeaders [ FDirName kernel arch $(TARGET_ARCH) ] ;
+
 KernelAddon ahci :
 	ahci.c
 	ahci_controller.cpp

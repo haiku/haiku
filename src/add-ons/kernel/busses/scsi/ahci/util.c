@@ -6,6 +6,7 @@
 
 #include <KernelExport.h>
 #include <OS.h>
+#include <vm.h>
 #include <string.h>
 
 
@@ -73,4 +74,29 @@ map_mem(void **virt, void *phy, size_t size, uint32 protection, const char *name
 		phy, *virt, offset, phyadr, mapadr, size, area);
 	
 	return area;
+}
+
+
+status_t
+sg_memcpy(const physical_entry *sgTable, int sgCount, const void *data, size_t dataSize)
+{
+	int i;
+	for (i = 0; i < sgCount && dataSize > 0; i++) {
+		size_t size = min_c(dataSize, sgTable[i].size);
+		addr_t address;
+
+		if (vm_get_physical_page((addr_t)sgTable[i].address, &address, PHYSICAL_PAGE_CAN_WAIT) < B_OK)
+			return B_ERROR;
+
+		TRACE("sg_memcpy phyAddr %p, addr %p, size %lu\n", sgTable[i].address, (void *)address, size);
+		
+		memcpy((void *)address, data, size);
+		vm_put_physical_page(address);
+
+		data = (char *)data + size;
+		dataSize -= size;
+	}
+	if (dataSize != 0)
+		return B_ERROR;
+	return B_OK;
 }
