@@ -6,6 +6,8 @@
 #include "ahci_port.h"
 #include "ahci_controller.h"
 #include "util.h"
+#include "ata_cmds.h"
+#include "scsi_cmds.h"
 
 #include <KernelExport.h>
 #include <stdio.h>
@@ -104,9 +106,7 @@ AHCIPort::Init2()
 
 	FlushPostedWrites();
 
-	if (1 /* fRegs->sig == 0xffffffff */)
-		ResetDevice();
-
+	ResetDevice();
 	PostResetDevice();
 
 	TRACE("ie   0x%08lx\n", fRegs->ie);
@@ -260,15 +260,61 @@ AHCIPort::Interrupt()
 	fRegs->is = is;
 }
 
-char c(int i)
+
+status_t
+AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const void *data, size_t dataSize, bool ioc)
 {
-	if (i == '\n' || i == '\r' || i == '\b')
-		return '?';
-	return i;
+	int peMax = prdMax + 1;
+	physical_entry pe[peMax];
+	if (get_memory_map(data, dataSize, pe, peMax ) < B_OK) {
+		TRACE("AHCIPort::FillPrdTable get_memory_map failed\n");
+		return B_ERROR;
+	}
+	int peUsed;
+	for (peUsed = 0; pe[peUsed].size; peUsed++)
+		;
+	return FillPrdTable(prdTable, prdCount, prdMax, pe, peUsed, ioc);
 }
 
+
+status_t
+AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const physical_entry *sgTable, int sgCount, bool ioc)
+{
+	*prdCount = 0;
+	while (sgCount > 0) {
+		size_t size = sgTable->size;
+		void *address = sgTable->address;
+		if ((uint32)address & 1) {
+			TRACE("AHCIPort::FillPrdTable: data alignment error\n");
+			return B_ERROR;
+		}
+		while (size > 0) {
+			size_t bytes = min_c(size, PRD_MAX_DATA_LENGTH);
+			if (*prdCount == prdMax) {
+				TRACE("AHCIPort::FillPrdTable: prd table exhausted\n");
+				return B_ERROR;
+			}
+			prdTable->dba  = LO32(address);
+			prdTable->dbau = HI32(address);
+			prdTable->res  = 0;
+			prdTable->dbc  = bytes - 1;
+			*prdCount += 1;
+			prdTable++;
+			address = (char *)address + bytes;
+			size -= bytes;
+		}
+		sgTable++;
+		sgCount--;
+	}
+	if (ioc)
+		prdTable->dbc |= DBC_I;
+	return B_OK;
+}
+
+
+/*
 void
-AHCIPort::IdentifyDevice()
+AHCIPort::IdentifyDevice(scsi_ccb *request)
 {
 	TRACE("AHCIPort::IdentifyDevice port %d\n", fIndex);
 
@@ -341,6 +387,124 @@ AHCIPort::IdentifyDevice()
 	}
 
 	delete_area(id);
+
+	request->subsys_status = SCSI_REQ_CMP;
+	gSCSI->finished(request, 1);
+
+}
+*/
+
+void
+AHCIPort::ScsiTestUnitReady(scsi_ccb *request)
+{
+	TRACE("AHCIPort::ScsiTestUnitReady port %d\n", fIndex);
+	if ((fRegs->ssts & 0xf) == 0x3)
+		request->subsys_status = SCSI_REQ_CMP;
+	else
+		request->subsys_status = SCSI_DEV_NOT_THERE;
+	gSCSI->finished(request, 1);
+}
+
+
+void
+AHCIPort::ScsiInquiry(scsi_ccb *request)
+{
+	TRACE("AHCIPort::ScsiInquiry port %d\n", fIndex);
+
+	scsi_cmd_inquiry *cmd = (scsi_cmd_inquiry *)request->cdb;
+	scsi_res_inquiry scsiData;
+	ata_res_identify_device	ataData;
+
+	if (cmd->evpd || cmd->page_code) {
+		TRACE("invalid request\n");
+		return;
+	}
+
+	memset(&ataData, 0, sizeof(ataData));
+
+	int prdEntrys;
+	FillPrdTable(fPRDTable, &prdEntrys, PRD_TABLE_ENTRY_COUNT, &ataData, sizeof(ataData), true);
+
+
+	TRACE("prdEntrys %d\n", prdEntrys);
+	
+	memset((void *)fCommandTable->cfis, 0, 5 * 4);
+	fCommandTable->cfis[0] = 0x27;
+	fCommandTable->cfis[1] = 0x80;
+	fCommandTable->cfis[2] = 0xec;
+
+
+	fCommandList->prdtl_flags_cfl = 0;
+	fCommandList->prdtl = prdEntrys;
+//	fCommandList->c = 1;
+	fCommandList->cfl = 5;
+	fCommandList->prdbc = 0;
+
+	fRegs->ci |= 1;
+	FlushPostedWrites();
+
+	snooze(500000);
+
+	TRACE("prdbc %ld\n", fCommandList->prdbc);
+
+	TRACE("ci   0x%08lx\n", fRegs->ci);
+	TRACE("ie   0x%08lx\n", fRegs->ie);
+	TRACE("is   0x%08lx\n", fRegs->is);
+	TRACE("cmd  0x%08lx\n", fRegs->cmd);
+	TRACE("ssts 0x%08lx\n", fRegs->ssts);
+	TRACE("sctl 0x%08lx\n", fRegs->sctl);
+	TRACE("serr 0x%08lx\n", fRegs->serr);
+	TRACE("sact 0x%08lx\n", fRegs->sact);
+	TRACE("tfd  0x%08lx\n", fRegs->tfd);
+
+	uint8 *data = (uint8*) &ataData;
+	for (int i = 0; i < 512; i += 8) {
+		TRACE("  %02x %02x %02x %02x %02x %02x %02x %02x\n", data[i], data[i+1], data[i+2], data[i+3], data[i+4], data[i+5], data[i+6], data[i+7]);
+	}
+
+	scsiData.device_type = scsi_dev_direct_access;
+	scsiData.device_qualifier = scsi_periph_qual_connected;
+	scsiData.device_type_modifier = 0;
+	scsiData.removable_medium = false;
+	scsiData.ansi_version = 2;
+	scsiData.ecma_version = 0;
+	scsiData.iso_version = 0;
+	scsiData.response_data_format = 2;
+	scsiData.term_iop = false;
+	scsiData.additional_length = sizeof(scsiData) - 4;
+	scsiData.soft_reset = false;
+	scsiData.cmd_queue = false;
+	scsiData.linked = false;
+	scsiData.sync = false;
+	scsiData.write_bus16 = true;
+	scsiData.write_bus32 = false;
+	scsiData.relative_address = false;
+
+	bool lba			= (ataData.words[49] & (1 << 9)) != 0;
+	bool lba48			= (ataData.words[83] & (1 << 10)) != 0;
+	uint32 sectors		= *(uint32*)&ataData.words[60];
+	uint64 sectors48	= *(uint64*)&ataData.words[100];
+	uint64 size = !(lba || sectors) ? 0 : lba48 ? (sectors48 * 512) : (sectors * 512ull);
+
+	TRACE("model_number: %40.40s\n", ataData.model_number);
+	TRACE("serial_number: %20.20s\n", ataData.serial_number);
+	TRACE("firmware_revision: %8.8s\n", ataData.firmware_revision);
+	TRACE("lba %d, lba48 %d, sectors %lu, sectors48 %llu, size %llu\n",
+		lba, lba48, sectors, sectors48, size);
+
+	memcpy(scsiData.vendor_ident, ataData.model_number, sizeof(scsiData.vendor_ident));
+	memcpy(scsiData.product_ident, ataData.model_number + 8, sizeof(scsiData.product_ident));
+	memcpy(scsiData.product_rev, ataData.serial_number, sizeof(scsiData.product_rev));
+
+	if (sg_memcpy(request->sg_list, request->sg_count, &scsiData, sizeof(scsiData)) < B_OK) {
+		request->subsys_status = SCSI_DATA_RUN_ERR;
+	} else {
+		request->subsys_status = SCSI_REQ_CMP;
+		request->data_resid = request->data_length - sizeof(scsiData);// ???
+		request->data_length = sizeof(scsiData); // ???
+	}
+
+	gSCSI->finished(request, 1);
 }
 
 
@@ -348,22 +512,28 @@ void
 AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 {
 
-	TRACE("AHCIPort::ScsiExecuteRequest port %d, opcode %u, length %u\n", fIndex, request->cdb[0], request->cdb_length);
+	TRACE("AHCIPort::ScsiExecuteRequest port %d, opcode 0x%02x, length %u\n", fIndex, request->cdb[0], request->cdb_length);
+
+	if (request->cdb[0] == SCSI_OP_REQUEST_SENSE) {
+		TRACE("SCSI_OP_REQUEST_SENSE\n");
+		request->subsys_status = SCSI_DEV_NOT_THERE;
+		gSCSI->finished(request, 1);
+		return;
+	}
+	
+	request->subsys_status = SCSI_REQ_CMP;
 
 	switch (request->cdb[0]) {
-		case 0x00:
+		case SCSI_OP_TEST_UNIT_READY:
+			ScsiTestUnitReady(request);
 			break;
-		case 0x12:
-			IdentifyDevice();
+		case SCSI_OP_INQUIRY:
+			ScsiInquiry(request);
 			break;
+		default:
+		request->subsys_status = SCSI_DEV_NOT_THERE;
+		gSCSI->finished(request, 1);
 	}
-
-	request->subsys_status = SCSI_DEV_NOT_THERE;
-	gSCSI->finished(request, 1);
-	return;
-
-	request->subsys_status = SCSI_REQ_CMP;
-	gSCSI->finished(request, 1);
 }
 
 

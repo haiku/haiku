@@ -208,6 +208,7 @@ typedef struct {
 } _PACKED prd;
 
 #define PRD_TABLE_ENTRY_COUNT 168
+#define PRD_MAX_DATA_LENGTH 0x400000 /* 4 MB */
 
 
 extern scsi_sim_interface gAHCISimInterface;
