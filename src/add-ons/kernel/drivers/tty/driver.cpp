@@ -11,7 +11,6 @@
 
 #include <lock.h>
 
-#include "SemaphorePool.h"
 #include "tty_private.h"
 
 
@@ -34,8 +33,6 @@ static char *sDeviceNames[kNumTTYs * 2 + 1];
 struct mutex gGlobalTTYLock;
 struct mutex gTTYCookieLock;
 struct recursive_lock gTTYRequestLock;
-static char sSemaphorePoolBuffer[sizeof(SemaphorePool)];
-SemaphorePool *gSemaphorePool = 0;
 
 
 status_t
@@ -70,15 +67,6 @@ init_driver(void)
 	if (error != B_OK) {
 		mutex_destroy(&gTTYCookieLock);
 		mutex_destroy(&gGlobalTTYLock);
-		return error;
-	}
-
-	// create the semaphore pool
-	gSemaphorePool
-		= new(sSemaphorePoolBuffer) SemaphorePool(kMaxCachedSemaphores);
-	error = gSemaphorePool->Init();
-	if (error != B_OK) {
-		uninit_driver();
 		return error;
 	}
 
@@ -123,11 +111,6 @@ uninit_driver(void)
 
 	for (int32 i = 0; i < (int32)kNumTTYs * 2; i++)
 		free(sDeviceNames[i]);
-
-	if (gSemaphorePool) {
-		gSemaphorePool->~SemaphorePool();
-		gSemaphorePool = NULL;
-	}
 
 	recursive_lock_destroy(&gTTYRequestLock);
 	mutex_destroy(&gTTYCookieLock);

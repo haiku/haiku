@@ -5,14 +5,15 @@
 #ifndef TTY_PRIVATE_H
 #define TTY_PRIVATE_H
 
-
-#include <KernelExport.h>
-#include <Drivers.h>
-#include <lock.h>
-#include <fs/select_sync_pool.h>
-#include <util/DoublyLinkedList.h>
-
 #include <termios.h>
+
+#include <Drivers.h>
+#include <KernelExport.h>
+
+#include <condition_variable.h>
+#include <fs/select_sync_pool.h>
+#include <lock.h>
+#include <util/DoublyLinkedList.h>
 
 #include "line_buffer.h"
 
@@ -29,7 +30,6 @@ typedef status_t (*tty_service_func)(struct tty *tty, uint32 op);
 
 class RequestOwner;
 class Semaphore;
-class SemaphorePool;
 struct tty;
 struct tty_cookie;
 
@@ -87,7 +87,7 @@ class RequestOwner {
 		void SetBytesNeeded(size_t bytesNeeded);
 		size_t BytesNeeded() const	{ return fBytesNeeded; }
 
-		status_t Wait(bool interruptable, Semaphore *sem = NULL);
+		status_t Wait(bool interruptable);
 
 		bool IsFirstInQueues();
 
@@ -97,12 +97,12 @@ class RequestOwner {
 		status_t Error() const	{ return fError; }
 
 	private:
-		Semaphore		*fSemaphore;
-		tty_cookie		*fCookie;
-		status_t		fError;
-		RequestQueue	*fRequestQueues[2];
-		Request			fRequests[2];
-		size_t			fBytesNeeded;
+		ConditionVariable<>*	fConditionVariable;
+		tty_cookie*				fCookie;
+		status_t				fError;
+		RequestQueue*			fRequestQueues[2];
+		Request					fRequests[2];
+		size_t					fBytesNeeded;
 };
 
 
@@ -151,7 +151,6 @@ extern device_hooks gSlaveTTYHooks;
 extern struct mutex gGlobalTTYLock;
 extern struct mutex gTTYCookieLock;
 extern struct recursive_lock gTTYRequestLock;
-extern SemaphorePool *gSemaphorePool;
 
 
 // functions available for master/slave TTYs

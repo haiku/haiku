@@ -8,6 +8,5 @@ KernelAddon <driver>tty :
 	line_buffer.cpp
 	master.cpp
 	slave.cpp
-	SemaphorePool.cpp
-	;
+;
 

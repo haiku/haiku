@@ -19,7 +19,6 @@
 
 #include <team.h>
 
-#include "SemaphorePool.h"
 #include "tty_private.h"
 
 
@@ -134,7 +133,8 @@ class ReaderLocker : public AbstractLocker {
 		status_t AcquireReader(bool dontBlock);
 
 	private:
-	status_t _CheckBackgroundRead() const;
+		size_t _CheckAvailableBytes() const;
+		status_t _CheckBackgroundRead() const;
 
 		struct tty		*fTTY;
 		RequestOwner	fRequestOwner;
@@ -295,7 +295,7 @@ RequestQueue::NotifyError(tty_cookie *cookie, status_t error)
 
 RequestOwner::RequestOwner()
 	:
-	fSemaphore(NULL),
+	fConditionVariable(NULL),
 	fCookie(NULL),
 	fError(B_OK),
 	fBytesNeeded(1)
@@ -364,20 +364,11 @@ RequestOwner::SetBytesNeeded(size_t bytesNeeded)
  *	The request lock MUST NOT be held!
  */
 status_t
-RequestOwner::Wait(bool interruptable, Semaphore *sem)
+RequestOwner::Wait(bool interruptable)
 {
-	TRACE(("%p->RequestOwner::Wait(%d, %p)\n", this, interruptable, sem));
+	TRACE(("%p->RequestOwner::Wait(%d)\n", this, interruptable));
 
-	// get a semaphore (if not supplied or invalid)
 	status_t error = B_OK;
-	bool ownsSem = false;
-	if (!sem || sem->InitCheck() != B_OK) {
-		error = gSemaphorePool->Get(sem);
-		if (error != B_OK)
-			return error;
-
-		ownsSem = true;
-	}
 
 	RecursiveLocker locker(gTTYRequestLock);
 
@@ -386,34 +377,34 @@ RequestOwner::Wait(bool interruptable, Semaphore *sem)
 		&& (!fRequests[0].WasNotified() || !fRequests[1].WasNotified())) {
 		// not yet done
 
-		// set the semaphore
-		fSemaphore = sem;
+		// publish the condition variable
+		ConditionVariable<> conditionVariable;
+		conditionVariable.Publish(this, "tty request");
+		fConditionVariable = &conditionVariable;
+
+		// add an entry to wait on
+		ConditionVariableEntry<> entry;
+		entry.Add(this);
 
 		locker.Unlock();
 
 		// wait
-		TRACE(("%p->RequestOwner::Wait(): acquiring semaphore...\n", this));
+		TRACE(("%p->RequestOwner::Wait(): waiting for condition...\n", this));
 
-		error = acquire_sem_etc(sem->ID(), 1,
-			(interruptable ? B_CAN_INTERRUPT : 0), 0);
+		error = entry.Wait(interruptable ? B_CAN_INTERRUPT : 0);
 
-		TRACE(("%p->RequestOwner::Wait(): semaphore acquired: %lx\n", this,
+		TRACE(("%p->RequestOwner::Wait(): condition occurred: %lx\n", this,
 			error));
 
-		// remove the semaphore
-		locker.SetTo(gTTYRequestLock, false);
-		fSemaphore = NULL;
+		// remove the condition variable
+		locker.Lock();
+		fConditionVariable = NULL;
+		conditionVariable.Unpublish();
 	}
 
 	// get the result
 	if (error == B_OK)
 		error = fError;
-
-	locker.Unlock();
-
-	// return the semaphore to the pool
-	if (ownsSem)
-		gSemaphorePool->Put(sem);
 
 	return error;
 }
@@ -439,18 +430,18 @@ RequestOwner::Notify(Request *request)
 	TRACE(("%p->RequestOwner::Notify(%p)\n", this, request));
 
 	if (fError == B_OK && !request->WasNotified()) {
-		bool releaseSem = false;
+		bool notify = false;
 
 		if (&fRequests[0] == request) {
-			releaseSem = fRequests[1].WasNotified();
+			notify = fRequests[1].WasNotified();
 		} else if (&fRequests[1] == request) {
-			releaseSem = fRequests[0].WasNotified();
+			notify = fRequests[0].WasNotified();
 		} else {
 			// spurious call
 		}
 
-		if (releaseSem && fSemaphore)
-			release_sem(fSemaphore->ID());
+		if (notify && fConditionVariable)
+			fConditionVariable->NotifyOne();
 	}
 }
 
@@ -464,8 +455,8 @@ RequestOwner::NotifyError(Request *request, status_t error)
 		fError = error;
 
 		if (!fRequests[0].WasNotified() || !fRequests[1].WasNotified()) {
-			if (fSemaphore)
-				release_sem(fSemaphore->ID());
+			if (fConditionVariable)
+				fConditionVariable->NotifyOne();
 		}
 	}
 }
@@ -667,7 +658,7 @@ ReaderLocker::AcquireReader(bool dontBlock)
 
 	// check, if we're first in queue, and if there is something to read
 	if (fRequestOwner.IsFirstInQueues()) {
-		fBytes = line_buffer_readable(fTTY->input_buffer);
+		fBytes = _CheckAvailableBytes();
 		if (fBytes > 0)
 			return B_OK;
 	}
@@ -686,9 +677,24 @@ ReaderLocker::AcquireReader(bool dontBlock)
 		status = _CheckBackgroundRead();
 
 	if (status == B_OK)
-		fBytes = line_buffer_readable(fTTY->input_buffer);
+		fBytes = _CheckAvailableBytes();
 
 	return status;
+}
+
+
+size_t
+ReaderLocker::_CheckAvailableBytes() const
+{
+	// Reading from the slave with canonical input processing enabled means
+	// that we read at max until hitting a line end or EOF.
+	if (!fTTY->is_master && (fTTY->settings->termios.c_lflag & ICANON) != 0) {
+		return line_buffer_readable_line(fTTY->input_buffer,
+			fTTY->settings->termios.c_cc[VEOL],
+			fTTY->settings->termios.c_cc[VEOF]);
+	}
+
+	return line_buffer_readable(fTTY->input_buffer);
 }
 
 
@@ -1028,11 +1034,8 @@ tty_close_cookie(struct tty_cookie *cookie)
 
 			ttyLocker.Unlock();
 
-			// wait for our turn (we reuse the blocking semaphore, so Wait()
-			// can't fail due to not being able to get a semaphore)
-			Semaphore sem(cookie->blocking_semaphore);
-			cookie->blocking_semaphore = -1;
-			requestOwner.Wait(false, &sem);
+			// wait for our turn
+			requestOwner.Wait(false);
 
 			// re-lock
 			ttyLocker.SetTo(cookie->tty->lock, false);
@@ -1402,11 +1405,17 @@ tty_input_read(tty_cookie *cookie, void *buffer, size_t *_length)
 			return status;
 		}
 
+		size_t toRead = locker.AvailableBytes();
+		if (toRead == 0)
+			continue;
+		if (toRead > length)
+			toRead = length;
+
 		bool _hitEOF = false;
 		bool* hitEOF = (tty->pending_eof > 0 ? &_hitEOF : NULL);
 
 		bytesRead = line_buffer_user_read(tty->input_buffer, (char *)buffer,
-			length, tty->settings->termios.c_cc[VEOF], hitEOF);
+			toRead, tty->settings->termios.c_cc[VEOF], hitEOF);
 		if (bytesRead < B_OK) {
 			*_length = 0;
 			return bytesRead;

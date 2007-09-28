@@ -50,6 +50,24 @@ line_buffer_readable(struct line_buffer &buffer)
 
 
 int32
+line_buffer_readable_line(struct line_buffer &buffer, char eol, char eof)
+{
+	size_t size = buffer.in;
+	if (size == 0)
+		return 0;
+
+	// find EOL or EOF char
+	for (size_t i = 0; i < size; i++) {
+		char c = buffer.buffer[(buffer.first + i) % buffer.size];
+		if (c == eol || c == '\n' || c == '\r' || c == eof)
+			return i + 1;
+	}
+
+	return 0;
+}
+
+
+int32
 line_buffer_writable(struct line_buffer &buffer)
 {
 	return buffer.size - buffer.in;

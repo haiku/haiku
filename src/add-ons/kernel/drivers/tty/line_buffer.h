@@ -20,6 +20,7 @@ status_t init_line_buffer(struct line_buffer &buffer, size_t size);
 status_t uninit_line_buffer(struct line_buffer &buffer);
 status_t clear_line_buffer(struct line_buffer &buffer);
 int32 line_buffer_readable(struct line_buffer &buffer);
+int32 line_buffer_readable_line(struct line_buffer &buffer, char eol, char eof);
 int32 line_buffer_writable(struct line_buffer &buffer);
 ssize_t line_buffer_user_read(struct line_buffer &buffer, char *data,
 			size_t length, char eof = 0, bool* hitEOF = NULL);
