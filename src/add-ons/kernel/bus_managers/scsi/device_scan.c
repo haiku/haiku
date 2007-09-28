@@ -31,7 +31,7 @@ scsi_scan_send_tur(scsi_ccb *worker_req)
 	SHOW_FLOW0( 3, "" );
 	
 	memset( cmd, 0, sizeof( *cmd ));
-	cmd->opcode = SCSI_OP_TUR;
+	cmd->opcode = SCSI_OP_TEST_UNIT_READY;
 	
 	worker_req->sg_list = NULL;
 	worker_req->data = NULL;

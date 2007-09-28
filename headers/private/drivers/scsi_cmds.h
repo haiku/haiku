@@ -122,7 +122,7 @@
 #define SCSIS_ASC_REMOVAL_REQUESTED 0x5a01	// operator requests medium removal
 
 // some scsi op-codes
-#define	SCSI_OP_TUR 0x00
+#define	SCSI_OP_TEST_UNIT_READY 0x00
 #define SCSI_OP_REQUEST_SENSE 0x03
 #define SCSI_OP_FORMAT 0x04
 #define	SCSI_OP_READ_6 0x08

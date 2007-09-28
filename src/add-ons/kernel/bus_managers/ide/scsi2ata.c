@@ -396,7 +396,7 @@ ata_exec_io(ide_device_info *device, ide_qrequest *qrequest)
 		start_request(device, qrequest);
 
 	switch (request->cdb[0]) {
-		case SCSI_OP_TUR:
+		case SCSI_OP_TEST_UNIT_READY:
 			ata_test_unit_ready(device, qrequest);
 			break;
 

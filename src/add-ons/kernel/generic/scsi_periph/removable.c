@@ -98,7 +98,7 @@ send_tur(scsi_periph_device_info *device, scsi_ccb *request)
 	request->sg_list = NULL;
 
 	memset(cmd, 0, sizeof(*cmd));
-	cmd->opcode = SCSI_OP_TUR;
+	cmd->opcode = SCSI_OP_TEST_UNIT_READY;
 
 	request->cdb_length = sizeof(*cmd);
 
