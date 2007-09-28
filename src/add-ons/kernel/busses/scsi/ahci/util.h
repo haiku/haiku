@@ -16,6 +16,8 @@ area_id map_mem(void **virt, void *phy, size_t size, uint32 protection, const ch
 
 status_t sg_memcpy(const physical_entry *sgTable, int sgCount, const void *data, size_t dataSize);
 
+void swap_words(void *data, size_t size);
+
 #ifdef __cplusplus
 }
 #endif

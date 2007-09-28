@@ -100,3 +100,15 @@ sg_memcpy(const physical_entry *sgTable, int sgCount, const void *data, size_t d
 		return B_ERROR;
 	return B_OK;
 }
+
+
+void
+swap_words(void *data, size_t size)
+{
+	uint16 *word = data;
+	size_t count = size / 2;
+	while (count--) {
+		*word = (*word << 8) | (*word >> 8);
+		word++;
+	}
+}

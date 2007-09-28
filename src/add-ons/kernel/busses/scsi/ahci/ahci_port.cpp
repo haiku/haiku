@@ -10,6 +10,7 @@
 #include "scsi_cmds.h"
 
 #include <KernelExport.h>
+#include <ByteOrder.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -21,12 +22,20 @@ AHCIPort::AHCIPort(AHCIController *controller, int index)
 	: fIndex(index)
 	, fRegs(&controller->fRegs->port[index])
 	, fArea(-1)
+	, fRequestSem(-1)
+	, fResponseSem(-1)
+	, fCommandActive(false)
+	, fHarddiskSize(0)
 {
+	fRequestSem = create_sem(1, "ahci request");
+	fResponseSem = create_sem(1, "ahci response");
 }
 				
 
 AHCIPort::~AHCIPort()
 {
+	delete_sem(fRequestSem);
+	delete_sem(fResponseSem);
 }
 
 	
@@ -256,6 +265,9 @@ AHCIPort::Interrupt()
 	uint32 is = fRegs->is;
 	TRACE("AHCIPort::Interrupt port %d, status %#08lx\n", fIndex, is);
 
+	if (fCommandActive)	
+		release_sem_etc(fResponseSem, 1, B_RELEASE_IF_WAITING_ONLY | B_DO_NOT_RESCHEDULE);
+
 	// clear interrupts
 	fRegs->is = is;
 }
@@ -284,6 +296,7 @@ AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const 
 	while (sgCount > 0) {
 		size_t size = sgTable->size;
 		void *address = sgTable->address;
+		TRACE("FillPrdTable: sg-entry addr %p, size %lu\n", address, size);
 		if ((uint32)address & 1) {
 			TRACE("AHCIPort::FillPrdTable: data alignment error\n");
 			return B_ERROR;
@@ -294,6 +307,7 @@ AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const 
 				TRACE("AHCIPort::FillPrdTable: prd table exhausted\n");
 				return B_ERROR;
 			}
+			TRACE("FillPrdTable: prd-entry %u, addr %p, size %lu\n", *prdCount, address, bytes);
 			prdTable->dba  = LO32(address);
 			prdTable->dbau = HI32(address);
 			prdTable->res  = 0;
@@ -311,6 +325,32 @@ AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const 
 	return B_OK;
 }
 
+
+void
+AHCIPort::StartTransfer()
+{
+	acquire_sem(fRequestSem);
+	fCommandActive = true;
+}
+				
+
+status_t
+AHCIPort::WaitForTransfer(int *status, bigtime_t timeout)
+{
+	status_t result = B_OK;
+	if (acquire_sem_etc(fResponseSem, 1, B_RELATIVE_TIMEOUT, timeout) < B_OK) {
+		result = B_TIMED_OUT;
+	}
+	fCommandActive = false;
+	return result;
+}
+
+
+void
+AHCIPort::FinishTransfer()
+{
+	release_sem(fRequestSem);
+}
 
 /*
 void
@@ -422,6 +462,8 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 
 	memset(&ataData, 0, sizeof(ataData));
 
+	StartTransfer();
+
 	int prdEntrys;
 	FillPrdTable(fPRDTable, &prdEntrys, PRD_TABLE_ENTRY_COUNT, &ataData, sizeof(ataData), true);
 
@@ -443,10 +485,12 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	fRegs->ci |= 1;
 	FlushPostedWrites();
 
-	snooze(500000);
+	int status;
+	WaitForTransfer(&status, 100000);
 
 	TRACE("prdbc %ld\n", fCommandList->prdbc);
 
+/*
 	TRACE("ci   0x%08lx\n", fRegs->ci);
 	TRACE("ie   0x%08lx\n", fRegs->ie);
 	TRACE("is   0x%08lx\n", fRegs->is);
@@ -461,7 +505,7 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	for (int i = 0; i < 512; i += 8) {
 		TRACE("  %02x %02x %02x %02x %02x %02x %02x %02x\n", data[i], data[i+1], data[i+2], data[i+3], data[i+4], data[i+5], data[i+6], data[i+7]);
 	}
-
+*/
 	scsiData.device_type = scsi_dev_direct_access;
 	scsiData.device_qualifier = scsi_periph_qual_connected;
 	scsiData.device_type_modifier = 0;
@@ -479,22 +523,28 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	scsiData.write_bus16 = true;
 	scsiData.write_bus32 = false;
 	scsiData.relative_address = false;
+	memcpy(scsiData.vendor_ident, ataData.model_number, sizeof(scsiData.vendor_ident));
+	memcpy(scsiData.product_ident, ataData.model_number + 8, sizeof(scsiData.product_ident));
+	memcpy(scsiData.product_rev, ataData.serial_number, sizeof(scsiData.product_rev));
 
 	bool lba			= (ataData.words[49] & (1 << 9)) != 0;
 	bool lba48			= (ataData.words[83] & (1 << 10)) != 0;
 	uint32 sectors		= *(uint32*)&ataData.words[60];
 	uint64 sectors48	= *(uint64*)&ataData.words[100];
-	uint64 size = !(lba || sectors) ? 0 : lba48 ? (sectors48 * 512) : (sectors * 512ull);
+	fHarddiskSize		= !(lba || sectors) ? 0 : lba48 ? (sectors48 * 512) : (sectors * 512ull);
 
-	TRACE("model_number: %40.40s\n", ataData.model_number);
-	TRACE("serial_number: %20.20s\n", ataData.serial_number);
-	TRACE("firmware_revision: %8.8s\n", ataData.firmware_revision);
+	swap_words(ataData.model_number, sizeof(ataData.model_number));
+	swap_words(ataData.serial_number, sizeof(ataData.serial_number));
+	swap_words(ataData.firmware_revision, sizeof(ataData.firmware_revision));
+
+	TRACE("model_number: %.40s\n", ataData.model_number);
+	TRACE("serial_number: %.20s\n", ataData.serial_number);
+	TRACE("firmware_revision: %.8s\n", ataData.firmware_revision);
 	TRACE("lba %d, lba48 %d, sectors %lu, sectors48 %llu, size %llu\n",
-		lba, lba48, sectors, sectors48, size);
+		lba, lba48, sectors, sectors48, fHarddiskSize);
 
-	memcpy(scsiData.vendor_ident, ataData.model_number, sizeof(scsiData.vendor_ident));
-	memcpy(scsiData.product_ident, ataData.model_number + 8, sizeof(scsiData.product_ident));
-	memcpy(scsiData.product_rev, ataData.serial_number, sizeof(scsiData.product_rev));
+	if (fHarddiskSize >= (512ull * 0xffffffff))
+		panic("ahci: SCSI emulation doesn't support harddisks larger than 2TB");
 
 	if (sg_memcpy(request->sg_list, request->sg_count, &scsiData, sizeof(scsiData)) < B_OK) {
 		request->subsys_status = SCSI_DATA_RUN_ERR;
@@ -503,6 +553,96 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 		request->data_resid = request->data_length - sizeof(scsiData);// ???
 		request->data_length = sizeof(scsiData); // ???
 	}
+
+	FinishTransfer();
+
+	gSCSI->finished(request, 1);
+}
+
+
+void
+AHCIPort::ScsiReadCapacity(scsi_ccb *request)
+{
+	TRACE("AHCIPort::ScsiReadCapacity port %d\n", fIndex);
+
+	scsi_cmd_read_capacity *cmd = (scsi_cmd_read_capacity *)request->cdb;
+	scsi_res_read_capacity scsiData;
+
+	if (cmd->pmi || cmd->lba) {
+		TRACE("invalid request\n");
+		return;
+	}
+
+	uint64 sectorCount = fHarddiskSize / 512;
+	uint32 sectorSize = 512;
+	TRACE("sectorCount 0x%llx, sectorSize %lu\n", sectorCount, sectorSize);
+/*
+	while (sectorCount > 0xffffffff) {
+		sectorCount /= 2;
+		sectorSize *= 2;
+	}
+	TRACE("sectorCount 0x%llx, sectorSize %lu\n", sectorCount, sectorSize);
+*/
+
+	scsiData.block_size = B_HOST_TO_BENDIAN_INT32(sectorSize);
+	scsiData.lba = B_HOST_TO_BENDIAN_INT32(sectorCount - 1);
+
+	if (sg_memcpy(request->sg_list, request->sg_count, &scsiData, sizeof(scsiData)) < B_OK) {
+		request->subsys_status = SCSI_DATA_RUN_ERR;
+	} else {
+		request->subsys_status = SCSI_REQ_CMP;
+		request->data_resid = request->data_length - sizeof(scsiData);// ???
+		request->data_length = sizeof(scsiData); // ???
+	}
+	gSCSI->finished(request, 1);
+}
+
+
+void
+AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 position, size_t length, bool isWrite)
+{
+	TRACE("ScsiReadWrite: pos %llu, size %lu, isWrite %d\n", position, length, isWrite);
+
+	StartTransfer();
+
+	int prdEntrys;
+	FillPrdTable(fPRDTable, &prdEntrys, PRD_TABLE_ENTRY_COUNT, request->sg_list, request->sg_count, true);
+
+	TRACE("prdEntrys %d\n", prdEntrys);
+	
+	memset((void *)fCommandTable->cfis, 0, 5 * 4);
+	fCommandTable->cfis[0] = 0x27;
+	fCommandTable->cfis[1] = 0x80;
+	fCommandTable->cfis[2] = 0x25;
+	fCommandTable->cfis[4] = position & 0xff;
+	fCommandTable->cfis[5] = (position >> 8) & 0xff;
+	fCommandTable->cfis[6] = (position >> 16) & 0xff;
+	fCommandTable->cfis[7] = 0x40; 
+	fCommandTable->cfis[8] = (position >> 24) & 0xff;
+	fCommandTable->cfis[9] = (position >> 32) & 0xff;
+	fCommandTable->cfis[10] = (position >> 40) & 0xff;
+	fCommandTable->cfis[12] = length & 0xff;
+	fCommandTable->cfis[13] = (length >> 8) & 0xff;
+
+	fCommandList->prdtl_flags_cfl = 0;
+	fCommandList->prdtl = prdEntrys;
+//	fCommandList->c = 1;
+	fCommandList->cfl = 5;
+	fCommandList->prdbc = 0;
+
+	fRegs->ci |= 1;
+	FlushPostedWrites();
+
+	int status;
+	WaitForTransfer(&status, 100000);
+
+	TRACE("prdbc %ld\n", fCommandList->prdbc);
+
+	request->subsys_status = SCSI_REQ_CMP;
+	request->data_resid = request->data_length - fCommandList->prdbc;// ???
+	request->data_length = fCommandList->prdbc; // ???
+
+	FinishTransfer();
 
 	gSCSI->finished(request, 1);
 }
@@ -530,6 +670,52 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 		case SCSI_OP_INQUIRY:
 			ScsiInquiry(request);
 			break;
+		case SCSI_OP_READ_CAPACITY:
+			ScsiReadCapacity(request);
+			break;
+		case SCSI_OP_READ_6:
+		case SCSI_OP_WRITE_6:
+		{
+			scsi_cmd_rw_6 *cmd = (scsi_cmd_rw_6 *)request->cdb;
+			uint32 position = ((uint32)cmd->high_lba << 16) | ((uint32)cmd->mid_lba << 8) | (uint32)cmd->low_lba;
+			size_t length = cmd->length != 0 ? cmd->length : 256;
+			bool isWrite = request->cdb[0] == SCSI_OP_WRITE_6;
+			ScsiReadWrite(request, position, length, isWrite);
+			break;
+		}
+		case SCSI_OP_READ_10:
+		case SCSI_OP_WRITE_10:
+		{
+			scsi_cmd_rw_10 *cmd = (scsi_cmd_rw_10 *)request->cdb;
+			uint32 position = B_BENDIAN_TO_HOST_INT32(cmd->lba);
+			size_t length = B_BENDIAN_TO_HOST_INT16(cmd->length);
+			bool isWrite = request->cdb[0] == SCSI_OP_WRITE_10;
+			if (length) {
+				ScsiReadWrite(request, position, length, isWrite);
+			} else {
+				TRACE("AHCIPort::ScsiExecuteRequest error: transfer without data!\n");
+				request->subsys_status = SCSI_DEV_NOT_THERE;
+				gSCSI->finished(request, 1);
+			}
+			break;
+		}
+		case SCSI_OP_READ_12:
+		case SCSI_OP_WRITE_12:
+		{
+			scsi_cmd_rw_10 *cmd = (scsi_cmd_rw_10 *)request->cdb;
+			uint32 position = B_BENDIAN_TO_HOST_INT32(cmd->lba);
+			size_t length = B_BENDIAN_TO_HOST_INT32(cmd->length);
+			bool isWrite = request->cdb[0] == SCSI_OP_WRITE_12;
+			if (length) {
+				ScsiReadWrite(request, position, length, isWrite);
+			} else {
+				TRACE("AHCIPort::ScsiExecuteRequest error: transfer without data!\n");
+				request->subsys_status = SCSI_DEV_NOT_THERE;
+				gSCSI->finished(request, 1);
+			}
+			break;
+		}
+
 		default:
 		request->subsys_status = SCSI_DEV_NOT_THERE;
 		gSCSI->finished(request, 1);
