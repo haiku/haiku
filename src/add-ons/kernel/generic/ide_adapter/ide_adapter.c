@@ -14,10 +14,11 @@
 #include <malloc.h>
 #include <string.h>
 
-#include <bus/IDE.h>
-#include <bus/ide/ide_adapter.h>
-#include <bus/PCI.h>
 #include <device_manager.h>
+#include <bus/PCI.h>
+#include <bus/IDE.h>
+#include <ide_types.h>
+#include <ide_adapter.h>
 #include <block_io.h>
 #include <lendian_bitfield.h>
 

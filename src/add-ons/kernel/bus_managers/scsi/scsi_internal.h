@@ -9,7 +9,7 @@
 
 
 #include <bus/SCSI.h>
-#include <bus/scsi/scsi_cmds.h>
+#include <scsi_cmds.h>
 #include <locked_pool.h>
 #include <device_manager.h>
 #include <fast_log.h>

@@ -16,8 +16,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <bus/IDE.h>
 #include <bus/ISA.h>
+#include <bus/IDE.h>
+#include <ide_types.h>
 #include <device_manager.h>
 #include <block_io.h>
 

@@ -11,7 +11,7 @@
 
 
 #include "ide_internal.h"
-#include <bus/scsi/scsi_cmds.h>
+#include <scsi_cmds.h>
 
 #include "ide_sim.h"
 #include "ide_cmds.h"

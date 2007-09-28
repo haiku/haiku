@@ -20,7 +20,7 @@
 
 #include <bus/SCSI.h>
 #include <block_io.h>
-#include <bus/scsi/scsi_cmds.h>
+#include <scsi_cmds.h>
 #include <Drivers.h>
 
 // cookie issued by module per device

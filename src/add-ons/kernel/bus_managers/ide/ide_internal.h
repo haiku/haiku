@@ -15,6 +15,7 @@
 #include <bus/IDE.h>
 #include <bus/SCSI.h>
 #include "ide_device_infoblock.h"
+#include <ide_types.h>
 #include <device_manager.h>
 #include <fast_log.h>
 

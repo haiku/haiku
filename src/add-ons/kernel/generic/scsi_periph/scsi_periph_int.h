@@ -6,7 +6,7 @@
 #define __SCSI_PERIPH_INT_H__
 
 
-#include <bus/scsi/scsi_periph.h>
+#include <scsi_periph.h>
 #include <block_io.h>
 #include <device_manager.h>
 

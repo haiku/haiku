@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel drivers disk scsi scsi_cd ;
 
-UsePrivateHeaders kernel ;
+UsePrivateHeaders drivers kernel ;
 
 KernelAddon scsi_cd :
 	device.c

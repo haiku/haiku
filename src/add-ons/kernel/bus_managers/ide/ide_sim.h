@@ -14,7 +14,7 @@
 #define __IDE_SIM_H__
 
 
-#include "bus/scsi/scsi_cmds.h"
+#include "scsi_cmds.h"
 
 extern scsi_for_sim_interface *scsi;
 extern scsi_sim_interface ide_sim_module;

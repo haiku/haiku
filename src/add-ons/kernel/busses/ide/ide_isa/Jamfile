@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel busses ide ide_isa ;
 
-UsePrivateHeaders kernel ;
+UsePrivateHeaders drivers kernel ;
 
 # disable debug output, if debugging is disabled
 if $(DEBUG) = 0 {

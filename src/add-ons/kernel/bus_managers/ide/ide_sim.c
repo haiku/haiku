@@ -25,7 +25,7 @@
 #include "ide_internal.h"
 #include "ide_sim.h"
 
-#include <bus/scsi/scsi_cmds.h>
+#include <scsi_cmds.h>
 #include <safemode.h>
 
 #include <string.h>

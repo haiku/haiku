@@ -8,7 +8,7 @@
 #include <string.h>
 #include <device_manager.h>
 #include <bus/IDE.h>
-#include <bus/ide/ide_adapter.h>
+#include <ide_adapter.h>
 #include <block_io.h>
 
 

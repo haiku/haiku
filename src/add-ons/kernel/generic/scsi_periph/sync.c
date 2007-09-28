@@ -13,7 +13,7 @@
 
 #include "scsi_periph_int.h"
 
-#include <bus/scsi/scsi_cmds.h>
+#include <scsi_cmds.h>
 
 #include <string.h>
 

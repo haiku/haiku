@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <bus/ide/ide_adapter.h>
+#include <ide_adapter.h>
 
 #define debug_level_flow 0
 #define debug_level_error 3

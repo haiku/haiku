@@ -6,7 +6,7 @@
 #define CDDA_H
 
 
-#include <bus/scsi/scsi_cmds.h>
+#include <scsi_cmds.h>
 
 
 static const uint32 kFramesPerSecond = 75;

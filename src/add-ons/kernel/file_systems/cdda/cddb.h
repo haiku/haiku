@@ -6,7 +6,7 @@
 #define CDDB_H
 
 
-#include <bus/scsi/scsi_cmds.h>
+#include <scsi_cmds.h>
 
 
 uint32 compute_cddb_disc_id(scsi_toc_toc &toc);

@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel generic scsi_periph ;
 
-UsePrivateHeaders kernel ;
+UsePrivateHeaders drivers kernel ;
 
 # disable debug output, if debugging is disabled
 if $(DEBUG) = 0 {

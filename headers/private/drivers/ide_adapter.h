@@ -19,6 +19,7 @@
 
 #include <bus/PCI.h>
 #include <bus/IDE.h>
+#include <ide_types.h>
 #include <device_manager.h>
 
 

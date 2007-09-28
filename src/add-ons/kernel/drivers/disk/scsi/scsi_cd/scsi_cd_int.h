@@ -9,7 +9,7 @@
 
 #include <device_manager.h>
 #include "scsi_cd.h"
-#include <bus/scsi/scsi_periph.h>
+#include <scsi_periph.h>
 #include <block_io.h>
 
 #define debug_level_flow 0
