@@ -482,6 +482,9 @@ vm_cache_set_minimal_commitment_locked(vm_cache *cache, off_t commitment)
 	The cache lock must be held when you call it.
 	Since removed pages don't belong to the cache any longer, they are not
 	written back before they will be removed.
+
+	Note, this function way temporarily release the cache lock in case it
+	has to wait for busy pages.
 */
 status_t
 vm_cache_resize(vm_cache *cache, off_t newSize)
@@ -499,17 +502,33 @@ vm_cache_resize(vm_cache *cache, off_t newSize)
 	newPageCount = (uint32)((newSize + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
 
 	if (newPageCount < oldPageCount) {
-		// we need to remove all pages in the cache outside of the new virtual size
-		vm_page *page, *next;
+		// we need to remove all pages in the cache outside of the new virtual
+		// size
+		vm_page *page = cache->page_list, *next;
 
-		for (page = cache->page_list; page; page = next) {
+		while (page != NULL) {
 			next = page->cache_next;
 
 			if (page->cache_offset >= newPageCount) {
+				if (page->state == PAGE_STATE_BUSY) {
+					// wait for page to become unbusy
+					ConditionVariableEntry<vm_page> entry;
+					entry.Add(page);
+					mutex_unlock(&cache->lock);
+					entry.Wait();
+					mutex_lock(&cache->lock);
+
+					// restart from the start of the list
+					page = cache->page_list;
+					continue;
+				}
+
 				// remove the page and put it into the free queue
 				vm_cache_remove_page(cache, page);
 				vm_page_set_state(page, PAGE_STATE_FREE);
 			}
+
+			page = next;
 		}
 	}
 
