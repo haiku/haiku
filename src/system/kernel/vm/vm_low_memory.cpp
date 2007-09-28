@@ -24,7 +24,6 @@
 #	define TRACE(x) ;
 #endif
 
-// TODO: the priority is currently ignored, and probably can be removed
 
 struct low_memory_handler : public DoublyLinkedListLinkImpl<low_memory_handler> {
 	low_memory_func	function;
@@ -174,22 +173,43 @@ unregister_low_memory_handler(low_memory_func function, void *data)
 }
 
 
+/*! Registers a low memory handler. The higher the \a priority, the earlier
+	the handler will be called in low memory situations.
+*/
 status_t
-register_low_memory_handler(low_memory_func function, void *data, int32 priority)
+register_low_memory_handler(low_memory_func function, void *data,
+	int32 priority)
 {
 	TRACE(("register_low_memory_handler(function = %p, data = %p)\n",
 		function, data));
 
-	low_memory_handler *handler = (low_memory_handler *)malloc(sizeof(low_memory_handler));
-	if (handler == NULL)
+	low_memory_handler *newHandler = (low_memory_handler *)malloc(
+		sizeof(low_memory_handler));
+	if (newHandler == NULL)
 		return B_NO_MEMORY;
 
-	handler->function = function;
-	handler->data = data;
-	handler->priority = priority;
+	newHandler->function = function;
+	newHandler->data = data;
+	newHandler->priority = priority;
 
 	MutexLocker locker(&sLowMemoryMutex);
-	sLowMemoryHandlers.Add(handler);
+
+	// sort it in after priority (higher priority comes first)
+
+	HandlerList::ReverseIterator iterator
+		= sLowMemoryHandlers.GetReverseIterator();
+	low_memory_handler *last = NULL;
+	while (iterator.HasNext()) {
+		low_memory_handler *handler = iterator.Next();
+
+		if (handler->priority >= priority) {
+			sLowMemoryHandlers.Insert(last, newHandler);
+			return B_OK;
+		}
+		last = handler;
+	}
+
+	sLowMemoryHandlers.Add(newHandler, false);
 	return B_OK;
 }
 
