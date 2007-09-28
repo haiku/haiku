@@ -65,8 +65,8 @@
 	Messages can be posted to the looper by using the object's PostMessage()
 	method. This method puts the message in the BMessageQueue of the looper.
 	Since PostMessage() is asynchronous, the message might not be handled
-	immediately. See \link app_messaging_overview_bmessenger BMessenger 
-	\endlink for a synchronous implementation.
+	immediately. See \ref app_messaging_overview_bmessenger "BMessenger"
+	for a synchronous implementation.
 	
 	Loopers can have a generic filter that discards messages based on
 	user-definable characteristics. The BMessageFilter class provides the
@@ -108,7 +108,7 @@
 		that the Haiku API classes handle, and not actually handling these
 		messages could lead to inconsistent internal behavior.
 	
-	\subsection app_messaging-overview-bmessenger BMessenger
+	\subsection app_messaging_overview_bmessenger BMessenger
 	
 	BMessenger objects can send messages to both local and remote targets. For
 	local targets, a BMessenger provides an advantage over directly calling
