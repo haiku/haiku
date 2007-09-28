@@ -165,6 +165,7 @@ ComplexLayouter::ComplexLayouter(int32 elementCount, int32 spacing)
 	  fSums(new(nothrow) SumItem[elementCount + 1]),
 	  fSumBackups(new(nothrow) SumItemBackup[elementCount + 1]),
 	  fOptimizer(new(nothrow) LayoutOptimizer(elementCount)),
+	  fUnlimited(B_SIZE_UNLIMITED / (elementCount == 0 ? 1 : elementCount)),
 	  fLayoutValid(false),
 	  fOptimizerConstraintsAdded(false)
 {
@@ -226,8 +227,8 @@ ComplexLayouter::AddConstraints(int32 element, int32 length,
 
 	if (min < 0)
 		min = 0;
-	if (max > B_SIZE_UNLIMITED)
-		max = B_SIZE_UNLIMITED;
+	if (max > fUnlimited)
+		max = fUnlimited;
 
 	int32 end = element + length - 1;
 	Constraint** slot = fConstraints + end;
@@ -582,10 +583,11 @@ ComplexLayouter::_ValidateLayout()
 	fSums[0].min = 0;
 	fSums[0].max = 0;
 
+	int32 maxSum = 0;
 	for (int32 i = 0; i < fElementCount; i++) {
 		SumItem& sum = fSums[i + 1];
 		sum.min = 0;
-		sum.max = B_SIZE_UNLIMITED;
+		sum.max = maxSum += fUnlimited;
 		sum.minDirty = false;
 		sum.maxDirty = false;
 	}
@@ -649,6 +651,8 @@ ComplexLayouter::_ValidateLayout()
 		int32 spacing = (fElementCount - 1) * fSpacing;
 		fMin = fSums[fElementCount].min + spacing - 1;
 		fMax = fSums[fElementCount].max + spacing - 1;
+		if (fMax >= fUnlimited)
+			fMax = B_SIZE_UNLIMITED;
 	}
 
 	fOptimizerConstraintsAdded = false;

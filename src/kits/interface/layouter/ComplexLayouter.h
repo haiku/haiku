@@ -73,6 +73,7 @@ private:
 			LayoutOptimizer*	fOptimizer;
 			float				fMin;
 			float				fMax;
+			int32				fUnlimited;
 			bool				fLayoutValid;
 			bool				fOptimizerConstraintsAdded;
 };
