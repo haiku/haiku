@@ -25,7 +25,10 @@ AHCIPort::AHCIPort(AHCIController *controller, int index)
 	, fRequestSem(-1)
 	, fResponseSem(-1)
 	, fCommandActive(false)
-	, fHarddiskSize(0)
+	, fDevicePresent(false)
+	, fUse48BitCommands(false)
+	, fSectorSize(0)
+	, fSectorCount(0)
 {
 	fRequestSem = create_sem(1, "ahci request");
 	fResponseSem = create_sem(1, "ahci response");
@@ -126,6 +129,8 @@ AHCIPort::Init2()
 	TRACE("serr 0x%08lx\n", fRegs->serr);
 	TRACE("sact 0x%08lx\n", fRegs->sact);
 	TRACE("tfd  0x%08lx\n", fRegs->tfd);
+
+	fDevicePresent = (fRegs->ssts & 0xf) == 0x3;
 
 	return B_OK;
 }
@@ -439,10 +444,7 @@ void
 AHCIPort::ScsiTestUnitReady(scsi_ccb *request)
 {
 	TRACE("AHCIPort::ScsiTestUnitReady port %d\n", fIndex);
-	if ((fRegs->ssts & 0xf) == 0x3)
-		request->subsys_status = SCSI_REQ_CMP;
-	else
-		request->subsys_status = SCSI_DEV_NOT_THERE;
+	request->subsys_status = SCSI_REQ_CMP;
 	gSCSI->finished(request, 1);
 }
 
@@ -479,7 +481,6 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 
 	fCommandList->prdtl_flags_cfl = 0;
 	fCommandList->prdtl = prdEntrys;
-//	fCommandList->c = 1;
 	fCommandList->cfl = 5;
 	fCommandList->prdbc = 0;
 
@@ -535,7 +536,16 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	bool lba48			= (ataData.words[83] & (1 << 10)) != 0;
 	uint32 sectors		= *(uint32*)&ataData.words[60];
 	uint64 sectors48	= *(uint64*)&ataData.words[100];
-	fHarddiskSize		= !(lba || sectors) ? 0 : lba48 ? (sectors48 * 512) : (sectors * 512ull);
+	fUse48BitCommands   = lba && lba48;
+	fSectorSize			= 512;
+	fSectorCount		= !(lba || sectors) ? 0 : lba48 ? sectors48 : sectors;
+
+#if 1
+	if (fSectorCount < 0x0fffffff) {
+		TRACE("disabling 48 bit commands\n");
+		fUse48BitCommands = 0;
+	}
+#endif
 
 	swap_words(ataData.model_number, sizeof(ataData.model_number));
 	swap_words(ataData.serial_number, sizeof(ataData.serial_number));
@@ -544,11 +554,8 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	TRACE("model_number: %.40s\n", ataData.model_number);
 	TRACE("serial_number: %.20s\n", ataData.serial_number);
 	TRACE("firmware_revision: %.8s\n", ataData.firmware_revision);
-	TRACE("lba %d, lba48 %d, sectors %lu, sectors48 %llu, size %llu\n",
-		lba, lba48, sectors, sectors48, fHarddiskSize);
-
-	if (fHarddiskSize >= (512ull * 0xffffffff))
-		panic("ahci: SCSI emulation doesn't support harddisks larger than 2TB");
+	TRACE("lba %d, lba48 %d, fUse48BitCommands %d, sectors %lu, sectors48 %llu, size %llu\n",
+		lba, lba48, fUse48BitCommands, sectors, sectors48, fSectorCount * fSectorSize);
 
 	if (sg_memcpy(request->sg_list, request->sg_count, &scsiData, sizeof(scsiData)) < B_OK) {
 		request->subsys_status = SCSI_DATA_RUN_ERR;
@@ -578,19 +585,13 @@ AHCIPort::ScsiReadCapacity(scsi_ccb *request)
 		return;
 	}
 
-	uint64 sectorCount = fHarddiskSize / 512;
-	uint32 sectorSize = 512;
-	TRACE("sectorCount 0x%llx, sectorSize %lu\n", sectorCount, sectorSize);
-/*
-	while (sectorCount > 0xffffffff) {
-		sectorCount /= 2;
-		sectorSize *= 2;
-	}
-	TRACE("sectorCount 0x%llx, sectorSize %lu\n", sectorCount, sectorSize);
-*/
+	TRACE("SectorSize %lu, SectorCount 0x%llx\n", fSectorSize, fSectorCount);
 
-	scsiData.block_size = B_HOST_TO_BENDIAN_INT32(sectorSize);
-	scsiData.lba = B_HOST_TO_BENDIAN_INT32(sectorCount - 1);
+	if (fSectorCount > 0xffffffff)
+		panic("ahci: SCSI emulation doesn't support harddisks larger than 2TB");
+
+	scsiData.block_size = B_HOST_TO_BENDIAN_INT32(fSectorSize);
+	scsiData.lba = B_HOST_TO_BENDIAN_INT32(fSectorCount - 1);
 
 	if (sg_memcpy(request->sg_list, request->sg_count, &scsiData, sizeof(scsiData)) < B_OK) {
 		request->subsys_status = SCSI_DATA_RUN_ERR;
@@ -608,6 +609,16 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 position, size_t length, bool 
 {
 	TRACE("ScsiReadWrite: pos %llu, size %lu, isWrite %d\n", position, length, isWrite);
 
+#if 1
+	if (isWrite) {
+		TRACE("write request ignored\n");
+		request->subsys_status = SCSI_REQ_CMP;
+		request->data_resid = 0;
+		gSCSI->finished(request, 1);
+		return;
+	}
+#endif
+
 	StartTransfer();
 
 	int prdEntrys;
@@ -616,22 +627,37 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 position, size_t length, bool 
 	TRACE("prdEntrys %d\n", prdEntrys);
 	
 	memset((void *)fCommandTable->cfis, 0, 5 * 4);
-	fCommandTable->cfis[0] = 0x27;
-	fCommandTable->cfis[1] = 0x80;
-	fCommandTable->cfis[2] = 0x25;
-	fCommandTable->cfis[4] = position & 0xff;
-	fCommandTable->cfis[5] = (position >> 8) & 0xff;
-	fCommandTable->cfis[6] = (position >> 16) & 0xff;
-	fCommandTable->cfis[7] = 0x40; 
-	fCommandTable->cfis[8] = (position >> 24) & 0xff;
-	fCommandTable->cfis[9] = (position >> 32) & 0xff;
-	fCommandTable->cfis[10] = (position >> 40) & 0xff;
-	fCommandTable->cfis[12] = length & 0xff;
-	fCommandTable->cfis[13] = (length >> 8) & 0xff;
+
+	if (fUse48BitCommands) {
+		fCommandTable->cfis[0] = 0x27;
+		fCommandTable->cfis[1] = 0x80;
+		fCommandTable->cfis[2] = isWrite ? 0x35 : 0x25;
+		fCommandTable->cfis[4] = position & 0xff;
+		fCommandTable->cfis[5] = (position >> 8) & 0xff;
+		fCommandTable->cfis[6] = (position >> 16) & 0xff;
+		fCommandTable->cfis[7] = 0x40; 
+		fCommandTable->cfis[8] = (position >> 24) & 0xff;
+		fCommandTable->cfis[9] = (position >> 32) & 0xff;
+		fCommandTable->cfis[10] = (position >> 40) & 0xff;
+		fCommandTable->cfis[12] = length & 0xff;
+		fCommandTable->cfis[13] = (length >> 8) & 0xff;
+	} else {
+		if (length > 256)
+			panic("ahci: ScsiReadWrite length too large");
+		if (position > 0x0fffffff)
+			panic("achi: ScsiReadWrite position too large for non-48-bit LBA\n");
+		fCommandTable->cfis[0] = 0x27;
+		fCommandTable->cfis[1] = 0x80;
+		fCommandTable->cfis[2] = isWrite ? 0xca : 0xc8;
+		fCommandTable->cfis[4] = position & 0xff;
+		fCommandTable->cfis[5] = (position >> 8) & 0xff;
+		fCommandTable->cfis[6] = (position >> 16) & 0xff;
+		fCommandTable->cfis[7] = 0x40 | ((position >> 24) & 0x0f);
+		fCommandTable->cfis[12] = length & 0xff;
+	}
 
 	fCommandList->prdtl_flags_cfl = 0;
 	fCommandList->prdtl = prdEntrys;
-//	fCommandList->c = 1;
 	fCommandList->cfl = 5;
 	fCommandList->prdbc = 0;
 
@@ -664,13 +690,11 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 	TRACE("AHCIPort::ScsiExecuteRequest port %d, opcode 0x%02x, length %u\n", fIndex, request->cdb[0], request->cdb_length);
 
 	if (request->cdb[0] == SCSI_OP_REQUEST_SENSE) {
-		TRACE("SCSI_OP_REQUEST_SENSE\n");
-		request->subsys_status = SCSI_DEV_NOT_THERE;
-		gSCSI->finished(request, 1);
+		panic("ahci: SCSI_OP_REQUEST_SENSE not yet supported\n");
 		return;
 	}
 
-	if ((fRegs->ssts & 0xf) != 0x3) {
+	if (!fDevicePresent) {
 		TRACE("no such device!\n");
 		request->subsys_status = SCSI_DEV_NOT_THERE;
 		gSCSI->finished(request, 1);
@@ -710,7 +734,7 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 				ScsiReadWrite(request, position, length, isWrite);
 			} else {
 				TRACE("AHCIPort::ScsiExecuteRequest error: transfer without data!\n");
-				request->subsys_status = SCSI_DEV_NOT_THERE;
+				request->subsys_status = SCSI_REQ_INVALID;
 				gSCSI->finished(request, 1);
 			}
 			break;
@@ -726,15 +750,15 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 				ScsiReadWrite(request, position, length, isWrite);
 			} else {
 				TRACE("AHCIPort::ScsiExecuteRequest error: transfer without data!\n");
-				request->subsys_status = SCSI_DEV_NOT_THERE;
+				request->subsys_status = SCSI_REQ_INVALID;
 				gSCSI->finished(request, 1);
 			}
 			break;
 		}
-
 		default:
-		request->subsys_status = SCSI_DEV_NOT_THERE;
-		gSCSI->finished(request, 1);
+			TRACE("AHCIPort::ScsiExecuteRequest port %d unsupported request opcode 0x%02x\n", fIndex, request->cdb[0]);
+			request->subsys_status = SCSI_REQ_ABORTED;
+			gSCSI->finished(request, 1);
 	}
 }
 

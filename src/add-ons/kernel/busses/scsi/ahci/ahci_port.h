@@ -53,12 +53,15 @@ private:
 	sem_id							fRequestSem;
 	sem_id							fResponseSem;
 	volatile bool					fCommandActive;
+	bool							fDevicePresent;
+	bool							fUse48BitCommands;
+	uint32							fSectorSize;
+	uint64							fSectorCount;
 
 	volatile fis *					fFIS;
 	volatile command_list_entry *	fCommandList;
 	volatile command_table *		fCommandTable;
 	volatile prd *					fPRDTable;
-	uint64							fHarddiskSize;
 };
 
 inline void
