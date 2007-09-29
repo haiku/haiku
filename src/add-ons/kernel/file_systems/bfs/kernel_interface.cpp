@@ -225,11 +225,10 @@ bfs_sync(void *_ns)
 //	#pragma mark -
 
 
-/**	Reads in the node from disk and creates an inode object from it.
- */
-
+/*!	Reads in the node from disk and creates an inode object from it.
+*/
 static status_t
-bfs_read_vnode(void *_ns, ino_t id, void **_node, bool reenter)
+bfs_get_vnode(void *_ns, ino_t id, void **_node, bool reenter)
 {
 	//FUNCTION_START(("ino_t = %Ld\n", id));
 	Volume *volume = (Volume *)_ns;
@@ -271,11 +270,9 @@ bfs_read_vnode(void *_ns, ino_t id, void **_node, bool reenter)
 
 
 static status_t
-bfs_release_vnode(void *_ns, void *_node, bool reenter)
+bfs_put_vnode(void *_volume, void *_node, bool reenter)
 {
-	//FUNCTION_START(("node = %p\n", _node));
-
-	Volume *volume = (Volume *)_ns;
+	Volume *volume = (Volume *)_volume;
 	Inode *inode = (Inode *)_node;
 
 	// since a directory's size can be changed without having it opened,
@@ -292,8 +289,7 @@ bfs_release_vnode(void *_ns, void *_node, bool reenter)
 	}
 
 	delete inode;
-
-	return B_NO_ERROR;
+	return B_OK;
 }
 
 
@@ -353,11 +349,13 @@ bfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 	if (inode->FileCache() == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	if (!reenter)
-		inode->Lock().Lock();
+	if (!reenter) {
+		if (inode->Lock().TryLock() < B_OK)
+			return B_BUSY;
+	}
 
-	status_t status = file_cache_read_pages(inode->FileCache(), pos, vecs, count,
-		_numBytes);
+	status_t status = file_cache_read_pages(inode->FileCache(), pos, vecs,
+		count, _numBytes);
 
 	if (!reenter)
 		inode->Lock().Unlock();
@@ -375,11 +373,13 @@ bfs_write_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 	if (inode->FileCache() == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	if (!reenter)
-		inode->Lock().Lock();
+	if (!reenter) {
+		if (inode->Lock().TryLock() < B_OK)
+			return B_BUSY;
+	}
 
-	status_t status = file_cache_write_pages(inode->FileCache(), pos, vecs, count,
-		_numBytes);
+	status_t status = file_cache_write_pages(inode->FileCache(), pos, vecs,
+		count, _numBytes);
 
 	if (!reenter)
 		inode->Lock().Unlock();
@@ -2161,8 +2161,8 @@ static file_system_module_info sBeFileSystem = {
 	/* vnode operations */
 	&bfs_lookup,
 	&bfs_get_vnode_name,
-	&bfs_read_vnode,
-	&bfs_release_vnode,
+	&bfs_get_vnode,
+	&bfs_put_vnode,
 	&bfs_remove_vnode,
 
 	/* VM file access */

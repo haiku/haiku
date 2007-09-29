@@ -16,7 +16,7 @@
 
 
 // Configure here if and when real benaphores should be used
-#define USE_BENAPHORE
+//#define USE_BENAPHORE
 	// if defined, benaphores are used for the Semaphore/RecursiveLock classes
 //#	define FAST_LOCK
 	// the ReadWriteLock class uses a second Semaphore to
@@ -285,16 +285,16 @@ class ReadWriteLock {
 		{
 			if (atomic_add(&fCount, -1) <= 0)
 				return acquire_sem(fSemaphore);
-			
+
 			return B_OK;
 		}
-		
+
 		void Unlock()
 		{
 			if (atomic_add(&fCount, 1) < 0)
 				release_sem(fSemaphore);
 		}
-		
+
 		status_t LockWrite()
 		{
 			if (fWriteLock.Lock() < B_OK)
@@ -313,7 +313,7 @@ class ReadWriteLock {
 
 			return status;
 		}
-		
+
 		void UnlockWrite()
 		{
 			int32 readers = atomic_add(&fCount, MAX_READERS);
@@ -377,7 +377,18 @@ class ReadWriteLock {
 			}
 			return acquire_sem(fSemaphore);
 		}
-		
+
+		status_t TryLock()
+		{
+			// This allows nested locking when holding a write lock
+			thread_id currentThread = find_thread(NULL);
+			if (currentThread == fOwner) {
+				fOwnerCount++;
+				return B_OK;
+			}
+			return acquire_sem_etc(fSemaphore, 1, B_RELATIVE_TIMEOUT, 0);
+		}
+
 		void Unlock()
 		{
 			thread_id currentThread = find_thread(NULL);
@@ -386,7 +397,7 @@ class ReadWriteLock {
 
 			release_sem(fSemaphore);
 		}
-		
+
 		status_t LockWrite()
 		{
 			thread_id currentThread = find_thread(NULL);
@@ -401,7 +412,7 @@ class ReadWriteLock {
 			}
 			return status;
 		}
-		
+
 		void UnlockWrite()
 		{
 			if (--fOwnerCount == 0) {

@@ -1002,7 +1002,7 @@ BPlusTree::_SplitNode(bplustree_node *node, off_t nodeOffset,
 	int32 keyIndex = *_keyIndex;	// can become less than zero!
 
 	if (keyIndex > node->NumKeys()) {
-		FATAL(("key index out of bounds: %d, num keys: %d\n", keyIndex,
+		FATAL(("key index out of bounds: %ld, num keys: %u\n", keyIndex,
 			node->NumKeys()));
 		return B_BAD_VALUE;
 	}
