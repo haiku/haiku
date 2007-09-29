@@ -479,7 +479,7 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 
 	fCommandList->prdtl_flags_cfl = 0;
 	fCommandList->prdtl = prdEntrys;
-	fCommandList->c = 1;
+//	fCommandList->c = 1;
 	fCommandList->cfl = 5;
 	fCommandList->prdbc = 0;
 
@@ -631,7 +631,7 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 position, size_t length, bool 
 
 	fCommandList->prdtl_flags_cfl = 0;
 	fCommandList->prdtl = prdEntrys;
-	fCommandList->c = 1;
+//	fCommandList->c = 1;
 	fCommandList->cfl = 5;
 	fCommandList->prdbc = 0;
 
