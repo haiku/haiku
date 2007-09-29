@@ -99,9 +99,21 @@ ObjectView::Draw(BRect updateRect)
 {
 	FillRect(updateRect, B_SOLID_LOW);
 
-	rgb_color noTint = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color shadow = tint_color(noTint, B_DARKEN_2_TINT);
-	rgb_color light = tint_color(noTint, B_LIGHTEN_MAX_TINT);
+//	SetHighColor(0, 0, 0);
+//	for (float i = 10; i < 200; i += 4.25) {
+//		StrokeLine(BPoint(i, 10), BPoint(i, 200));
+//		StrokeLine(BPoint(10, i), BPoint(200, i));
+//	}
+//
+//	SetHighColor(0, 0, 50);
+//	for (float i = 10; i < 200; i += 8.25) {
+//		FillRect(BRect(i, 10 + 230, i + 2, 200 + 230));
+//		FillRect(BRect(10, i + 230, 200, i + 2 + 230));
+//	}
+//
+//	rgb_color noTint = ui_color(B_PANEL_BACKGROUND_COLOR);
+//	rgb_color shadow = tint_color(noTint, B_DARKEN_2_TINT);
+//	rgb_color light = tint_color(noTint, B_LIGHTEN_MAX_TINT);
 
 	BRect r(Bounds());
 
@@ -142,7 +154,7 @@ ObjectView::Draw(BRect updateRect)
 //printf("rendering %ld small rects (region: %ld): %lld\n", counter,
 //region.CountRects(), system_time() - now);
 
-	SetDrawingMode(B_OP_COPY);
+	SetDrawingMode(B_OP_OVER);
 	SetHighColor(255, 0, 0, 128);
 
 	const char* message = "Click and drag to draw an object";
@@ -154,6 +166,20 @@ ObjectView::Draw(BRect updateRect)
 //snooze(1000);
 //
 //bigtime_t now = system_time();
+//
+//#ifdef __HAIKU__
+//	BFont font;
+//	GetFont(&font);
+//	font.SetFalseBoldWidth(1.0);
+//	SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+//	SetHighColor(0, 0, 0);
+//	DrawString(message, p);
+//
+//	font.SetFalseBoldWidth(0.0);
+//	SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
+//	SetHighColor(255, 0, 0);
+//#endif // __HAIKU__
+
 	DrawString(message, p);
 
 //Sync();
@@ -275,6 +301,10 @@ void
 ObjectView::MouseMoved(BPoint where, uint32 transit,
 					   const BMessage* dragMessage)
 {
+//	BRect dirty(where, where);
+//	dirty.InsetBy(-10, -10);
+//	Invalidate(dirty);
+	
 if (dragMessage) {
 //printf("ObjectView::MouseMoved(BPoint(%.1f, %.1f)) - DRAG MESSAGE\n", where.x, where.y);
 //Window()->CurrentMessage()->PrintToStream();
@@ -442,7 +472,7 @@ ObjectView::SetStateColor(rgb_color color)
 		color.alpha != fColor.alpha) {
 
 		fColor = color;
-	
+
 		if (fState) {
 			fState->SetColor(fColor);
 			Invalidate(fState->Bounds());

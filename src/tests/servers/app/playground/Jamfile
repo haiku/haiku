@@ -11,6 +11,7 @@ Application Playground :
 	ObjectView.cpp
 	ObjectWindow.cpp
 	States.cpp
+#	StatusView.cpp
 	: be
 ;
 

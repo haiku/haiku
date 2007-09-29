@@ -28,6 +28,7 @@
 
 #include "ObjectView.h"
 #include "States.h"
+//#include "StatusView.h"
 
 #include "ObjectWindow.h"
 
@@ -94,7 +95,7 @@ class ObjectListView : public BListView {
 
 	virtual void SelectionChanged()
 			{
-				printf("SelectionChanged() - first selected: %ld\n", CurrentSelection(0));
+//				printf("SelectionChanged() - first selected: %ld\n", CurrentSelection(0));
 			}
 };
 
@@ -171,6 +172,12 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 		scrollBar->SetRange(0.0, fObjectView->Bounds().Width());
 		scrollBar->SetProportion(0.5);
 //		scrollBar->SetRange(0.0, 0.0);
+//		b = scrollBar->Frame();
+//		b.right = b.left + 50;
+//		scrollBar->ResizeBy(-51, 0);
+//		scrollBar->MoveBy(51, 0);
+//		StatusView* statusView = new StatusView(b, scrollBar);
+//		scrollView->AddChild(statusView);
 	}
 	AddChild(scrollView);
 
@@ -444,6 +451,8 @@ ObjectWindow::MessageReceived(BMessage* message)
 		case MSG_OBJECT_SELECTED:
 			if (ObjectItem* item = (ObjectItem*)fObjectLV->ItemAt(fObjectLV->CurrentSelection(0))) {
 				fObjectView->SetState(item->Object());
+				fObjectView->SetStateColor(item->Object()->Color());
+				_UpdateControls();
 			} else
 				fObjectView->SetState(NULL);
 			break;

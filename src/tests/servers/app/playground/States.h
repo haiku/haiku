@@ -32,6 +32,8 @@ class State {
 								{ return fTracking; }
 
 			void			SetColor(rgb_color color);
+			rgb_color		Color() const
+								{ return fColor; }
 			void			SetDrawingMode(drawing_mode mode);
 			void			SetFill(bool fill);
 			void			SetPenSize(float penSize);
