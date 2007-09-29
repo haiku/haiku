@@ -479,7 +479,7 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 
 	fCommandList->prdtl_flags_cfl = 0;
 	fCommandList->prdtl = prdEntrys;
-//	fCommandList->c = 1;
+	fCommandList->c = 1;
 	fCommandList->cfl = 5;
 	fCommandList->prdbc = 0;
 
@@ -490,6 +490,9 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	WaitForTransfer(&status, 100000);
 
 	TRACE("prdbc %ld\n", fCommandList->prdbc);
+	TRACE("ci   0x%08lx\n", fRegs->ci);
+	TRACE("is   0x%08lx\n", fRegs->is);
+	TRACE("serr 0x%08lx\n", fRegs->serr);
 
 /*
 	TRACE("ci   0x%08lx\n", fRegs->ci);
@@ -555,6 +558,7 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 		request->data_length = sizeof(scsiData); // ???
 	}
 
+	fRegs->ci &= ~1;
 	FinishTransfer();
 
 	gSCSI->finished(request, 1);
