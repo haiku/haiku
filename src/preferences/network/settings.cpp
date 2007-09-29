@@ -40,7 +40,6 @@ Settings::Settings(const char *name)
 Settings::~Settings()
 {
 	close(fSocket);
-	
 }
 
 bool
@@ -48,9 +47,9 @@ Settings::_PrepareRequest(struct ifreq& request)
 {
 	//This function is used for talking direct to the stack. 
 	//It´s used by _ShowConfiguration.
-	
+
 	const char* name = fName.String();
-	
+
 	if (strlen(name) > IF_NAMESIZE)
 		return false;
 
@@ -62,82 +61,73 @@ Settings::_PrepareRequest(struct ifreq& request)
 void
 Settings::ReadConfiguration()
 {
-	
 	ifreq request;
 	if (!_PrepareRequest(request))
 		return;
-		
+
 	BString text = "dummy";
 	char address[32];
 	sockaddr_in* inetAddress = NULL;
-	
+
 	// Obtain IP.	
-	if (ioctl(fSocket, SIOCGIFADDR, &request,
-			sizeof(request)) < 0) {
+	if (ioctl(fSocket, SIOCGIFADDR, &request, sizeof(request)) < 0)
 		return;
-	}
 
 	inetAddress = (sockaddr_in*)&request.ifr_addr;
-	if (inet_ntop(AF_INET, &inetAddress->sin_addr, address,
-				sizeof(address)) == NULL) {
-			return;
-		}
-		
-	fIP = address;
+	if (inet_ntop(AF_INET, &inetAddress->sin_addr, address,	
+			sizeof(address)) == NULL) {
+		return;
+	}
 	
+	fIP = address;
+
 	// Obtain netmask.
 	if (ioctl(fSocket, SIOCGIFNETMASK, &request,
 			sizeof(request)) < 0) {
 		return;
 	}
-	
+
 	inetAddress = (sockaddr_in*)&request.ifr_mask;
 	if (inet_ntop(AF_INET, &inetAddress->sin_addr, address,
-				sizeof(address)) == NULL) {
-			return;
-		}
-		
+			sizeof(address)) == NULL) {
+		return;
+	}
+
 	fNetmask = address;
-	
+
 	// Obtain gateway
-	
-	char* gwAddress;
 	ifconf config;
 	config.ifc_len = sizeof(config.ifc_value);
 	if (ioctl(fSocket, SIOCGRTSIZE, &config, sizeof(struct ifconf)) < 0)
 		return;
-		
+
 	uint32 size = (uint32)config.ifc_value;
 	if (size == 0)
 		return;
-	
+
 	void *buffer = malloc(size);
 	if (buffer == NULL)
 		return;
-	
+
 	MemoryDeleter bufferDeleter(buffer);
 	config.ifc_len = size;
 	config.ifc_buf = buffer;
-	
+
 	if (ioctl(fSocket, SIOCGRTTABLE, &config, sizeof(struct ifconf)) < 0)
 		return;
-		
+
 	ifreq *interface = (ifreq *)buffer;
 	ifreq *end = (ifreq *)((uint8 *)buffer + size);
-	
-	
+
+
 	while (interface < end) {
 		route_entry& route = interface->ifr_route;
-	
-		
+
 		if (route.flags & RTF_GATEWAY) {
-			inetAddress = (sockaddr_in *)route.gateway;
-					
-			
-			gwAddress = inet_ntoa(inetAddress->sin_addr);
-			fGateway = gwAddress;
+			inetAddress = (sockaddr_in*)route.gateway;
+			fGateway = inet_ntoa(inetAddress->sin_addr);
 		}
-		
+
 		int32 addressSize = 0;
 		if (route.destination != NULL)
 			addressSize += route.destination->sa_len;
@@ -145,24 +135,17 @@ Settings::ReadConfiguration()
 			addressSize += route.mask->sa_len;
 		if (route.gateway != NULL)
 			addressSize += route.gateway->sa_len;
-			
+
 		interface = (ifreq *)((addr_t)interface + 
 			IF_NAMESIZE + sizeof(route_entry) + addressSize);
-	
 	}
-	
-	bufferDeleter.Detach();
-	free(buffer);	
-	
+
 	uint32 flags = 0;
 	if (ioctl(fSocket, SIOCGIFFLAGS, &request, sizeof(struct ifreq)) == 0)
 		flags = request.ifr_flags;
-		
-	if ((flags & IFF_AUTO_CONFIGURED) != 0)
-		fAuto = true;
-	else
-		fAuto = false;
-	
+
+	fAuto = flags & IFF_AUTO_CONFIGURED;
+
 	// read resolv.conf for the dns.
 	fNameservers.MakeEmpty();
 
@@ -171,7 +154,7 @@ Settings::ReadConfiguration()
 	(line[sizeof(name) - 1] == ' ' || \
 	 line[sizeof(name) - 1] == '\t'))
 
-		
+
 	register FILE *fp = fopen("/etc/resolv.conf", "r");
 	if (fp == NULL) {
 		fprintf(stderr, "failed to open '/etc/resolv.conf' to "
@@ -184,7 +167,7 @@ Settings::ReadConfiguration()
 	register char *cp; //, **pp;
 //	register int n;
 	int MAXNS = 2;
-	
+
 	// read the config file
 	while (fgets(buf, sizeof(buf), fp) != NULL) {
 		// skip comments
