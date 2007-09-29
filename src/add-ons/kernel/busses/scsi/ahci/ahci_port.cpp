@@ -285,22 +285,23 @@ AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const 
 	int peUsed;
 	for (peUsed = 0; pe[peUsed].size; peUsed++)
 		;
-	return FillPrdTable(prdTable, prdCount, prdMax, pe, peUsed, ioc);
+	return FillPrdTable(prdTable, prdCount, prdMax, pe, peUsed, dataSize, ioc);
 }
 
 
 status_t
-AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const physical_entry *sgTable, int sgCount, bool ioc)
+AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const physical_entry *sgTable, int sgCount, size_t dataSize, bool ioc)
 {
 	*prdCount = 0;
-	while (sgCount > 0) {
-		size_t size = sgTable->size;
+	while (sgCount > 0 && dataSize > 0) {
+		size_t size = min_c(sgTable->size, dataSize);
 		void *address = sgTable->address;
 		TRACE("FillPrdTable: sg-entry addr %p, size %lu\n", address, size);
 		if ((uint32)address & 1) {
 			TRACE("AHCIPort::FillPrdTable: data alignment error\n");
 			return B_ERROR;
 		}
+		dataSize -= size;
 		while (size > 0) {
 			size_t bytes = min_c(size, PRD_MAX_DATA_LENGTH);
 			if (*prdCount == prdMax) {
@@ -606,7 +607,7 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 position, size_t length, bool 
 	StartTransfer();
 
 	int prdEntrys;
-	FillPrdTable(fPRDTable, &prdEntrys, PRD_TABLE_ENTRY_COUNT, request->sg_list, request->sg_count, true);
+	FillPrdTable(fPRDTable, &prdEntrys, PRD_TABLE_ENTRY_COUNT, request->sg_list, request->sg_count, length * 512, true);
 
 	TRACE("prdEntrys %d\n", prdEntrys);
 	
@@ -626,7 +627,7 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 position, size_t length, bool 
 
 	fCommandList->prdtl_flags_cfl = 0;
 	fCommandList->prdtl = prdEntrys;
-//	fCommandList->c = 1;
+	fCommandList->c = 1;
 	fCommandList->cfl = 5;
 	fCommandList->prdbc = 0;
 
@@ -637,11 +638,15 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 position, size_t length, bool 
 	WaitForTransfer(&status, 100000);
 
 	TRACE("prdbc %ld\n", fCommandList->prdbc);
+	TRACE("ci   0x%08lx\n", fRegs->ci);
+	TRACE("is   0x%08lx\n", fRegs->is);
+	TRACE("serr 0x%08lx\n", fRegs->serr);
 
 	request->subsys_status = SCSI_REQ_CMP;
 	request->data_resid = request->data_length - fCommandList->prdbc;// ???
 	request->data_length = fCommandList->prdbc; // ???
 
+	fRegs->ci &= ~1;
 	FinishTransfer();
 
 	gSCSI->finished(request, 1);
