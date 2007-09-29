@@ -667,22 +667,30 @@ BMenuItem::_DrawMarkSymbol(rgb_color bgColor)
 	fSuper->PushState();
 
 	BRect r(fBounds);
-	r.right = r.left + r.Height();
-	r.top += 2;
-	r.bottom -= 2;
+	float leftMargin;
+	fSuper->GetItemMargins(&leftMargin, NULL, NULL, NULL);
+	r.right = r.left + leftMargin - 3;
 	r.left += 1;
-	r.right -= 5;
+
+	BPoint center(floorf((r.left + r.right) / 2.0),
+		floorf((r.top + r.bottom) / 2.0));
+
+	float size = min_c(r.Height() - 2, r.Width());
+	r.top = floorf(center.y - size / 2 + 0.5);
+	r.bottom = floorf(center.y + size / 2 + 0.5);
+	r.left = floorf(center.x - size / 2 + 0.5);
+	r.right = floorf(center.x + size / 2 + 0.5);
 
 	fSuper->SetHighColor(tint_color(bgColor, kLightBGTint));
-	fSuper->FillRect(r);
+	fSuper->FillRoundRect(r, 2, 2);
 
-	BPoint center(floorf((r.left + r.right) / 2.0) + 0.5,
-				  floorf((r.top + r.bottom) / 2.0) + 0.5);
-		// NOTE: center is on X.5, Y.5 on purpose!
 	BShape arrowShape;
-	arrowShape.MoveTo(BPoint(center.x - 4, center.y - 1.5));
-	arrowShape.LineTo(BPoint(center.x - 1, center.y + 2.0));
-	arrowShape.LineTo(BPoint(center.x + 4, center.y - 3.5));
+	center.x += 0.5;
+	center.y += 0.5;
+	size *= 0.3;
+	arrowShape.MoveTo(BPoint(center.x - size, center.y - size * 0.25));
+	arrowShape.LineTo(BPoint(center.x - size * 0.25, center.y + size));
+	arrowShape.LineTo(BPoint(center.x + size, center.y - size));
 
 	fSuper->SetDrawingMode(B_OP_OVER);
 	fSuper->SetHighColor(tint_color(bgColor, B_DARKEN_MAX_TINT));
@@ -765,23 +773,35 @@ BMenuItem::_DrawSubmenuSymbol(rgb_color bgColor)
 	fSuper->PushState();
 
 	BRect r(fBounds);
-	r.left = r.right - r.Height();
-	r.InsetBy(2.0, 2.0);
+	float rightMargin;
+	fSuper->GetItemMargins(NULL, NULL, &rightMargin, NULL);
+	r.left = r.right - rightMargin + 3;
+	r.right -= 1;
+
+	BPoint center(floorf((r.left + r.right) / 2.0),
+		floorf((r.top + r.bottom) / 2.0));
+
+	float size = min_c(r.Height() - 2, r.Width());
+	r.top = floorf(center.y - size / 2 + 0.5);
+	r.bottom = floorf(center.y + size / 2 + 0.5);
+	r.left = floorf(center.x - size / 2 + 0.5);
+	r.right = floorf(center.x + size / 2 + 0.5);
 
 	fSuper->SetHighColor(tint_color(bgColor, kLightBGTint));
-	fSuper->FillRect(r);
+	fSuper->FillRoundRect(r, 2, 2);
 
-	BPoint center(floorf((r.left + r.right) / 2.0) + 0.5,
-				  floorf((r.top + r.bottom) / 2.0) + 0.5);
-		// NOTE: center is on X.5, Y.5 on purpose!
 	BShape arrowShape;
-	arrowShape.MoveTo(BPoint(center.x - 1.5, center.y - 3));
-	arrowShape.LineTo(BPoint(center.x + 2.0, center.y));
-	arrowShape.LineTo(BPoint(center.x - 1.5, center.y + 3));
+	center.x += 0.5;
+	center.y += 0.5;
+	size *= 0.25;
+	float hSize = size * 0.7;
+	arrowShape.MoveTo(BPoint(center.x - hSize, center.y - size));
+	arrowShape.LineTo(BPoint(center.x + hSize, center.y));
+	arrowShape.LineTo(BPoint(center.x - hSize, center.y + size));
 
 	fSuper->SetDrawingMode(B_OP_OVER);
 	fSuper->SetHighColor(tint_color(bgColor, B_DARKEN_MAX_TINT));
-	fSuper->SetPenSize(2.0);
+	fSuper->SetPenSize(ceilf(size * 0.4));
 	// NOTE: StrokeShape() offsets the shape by the current pen position,
 	// it is not documented in the BeBook, but it is true!
 	fSuper->MovePenTo(B_ORIGIN);
