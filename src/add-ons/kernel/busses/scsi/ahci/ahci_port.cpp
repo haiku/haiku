@@ -669,6 +669,13 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 		gSCSI->finished(request, 1);
 		return;
 	}
+
+	if ((fRegs->ssts & 0xf) != 0x3) {
+		TRACE("no such device!\n");
+		request->subsys_status = SCSI_DEV_NOT_THERE;
+		gSCSI->finished(request, 1);
+		return;
+	}
 	
 	request->subsys_status = SCSI_REQ_CMP;
 
