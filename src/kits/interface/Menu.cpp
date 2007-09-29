@@ -1084,7 +1084,7 @@ BMenu::SetItemMargins(float left, float top, float right, float bottom)
 
 void
 BMenu::GetItemMargins(float *left, float *top, float *right,
-						   float *bottom) const
+	float *bottom) const
 {
 	if (left != NULL)
 		*left = fPad.left;
