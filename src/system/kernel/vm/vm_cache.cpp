@@ -317,19 +317,16 @@ vm_cache_acquire_page_cache_ref(vm_page* page)
 vm_page *
 vm_cache_lookup_page(vm_cache *cache, off_t offset)
 {
-	struct page_lookup_key key;
-	cpu_status state;
-	vm_page *page;
-
 	ASSERT_LOCKED_MUTEX(&cache->lock);
 
+	struct page_lookup_key key;
 	key.offset = (uint32)(offset >> PAGE_SHIFT);
 	key.cache = cache;
 
-	state = disable_interrupts();
+	cpu_status state = disable_interrupts();
 	acquire_spinlock(&sPageCacheTableLock);
 
-	page = (vm_page *)hash_lookup(sPageCacheTable, &key);
+	vm_page *page = (vm_page *)hash_lookup(sPageCacheTable, &key);
 
 	release_spinlock(&sPageCacheTableLock);
 	restore_interrupts(state);
@@ -344,8 +341,6 @@ vm_cache_lookup_page(vm_cache *cache, off_t offset)
 void
 vm_cache_insert_page(vm_cache *cache, vm_page *page, off_t offset)
 {
-	cpu_status state;
-
 	TRACE(("vm_cache_insert_page: cache %p, page %p, offset %Ld\n",
 		cache, page, offset));
 	ASSERT_LOCKED_MUTEX(&cache->lock);
@@ -367,8 +362,7 @@ vm_cache_insert_page(vm_cache *cache, vm_page *page, off_t offset)
 
 	page->usage_count = 2;
 
-	state = disable_interrupts();
-	acquire_spinlock(&sPageCacheTableLock);
+	InterruptsSpinLocker locker(sPageCacheTableLock);
 
 	page->cache = cache;
 
@@ -385,9 +379,6 @@ vm_cache_insert_page(vm_cache *cache, vm_page *page, off_t offset)
 #endif	// KDEBUG
 
 	hash_insert(sPageCacheTable, page);
-
-	release_spinlock(&sPageCacheTableLock);
-	restore_interrupts(state);
 }
 
 
@@ -399,8 +390,6 @@ vm_cache_insert_page(vm_cache *cache, vm_page *page, off_t offset)
 void
 vm_cache_remove_page(vm_cache *cache, vm_page *page)
 {
-	cpu_status state;
-
 	TRACE(("vm_cache_remove_page: cache %p, page %p\n", cache, page));
 	ASSERT_LOCKED_MUTEX(&cache->lock);
 
@@ -409,7 +398,7 @@ vm_cache_remove_page(vm_cache *cache, vm_page *page)
 			cache, page->cache);
 	}
 
-	state = disable_interrupts();
+	cpu_status state = disable_interrupts();
 	acquire_spinlock(&sPageCacheTableLock);
 
 	hash_remove(sPageCacheTable, page);
@@ -435,15 +424,13 @@ vm_cache_remove_page(vm_cache *cache, vm_page *page)
 status_t
 vm_cache_write_modified(vm_cache *cache, bool fsReenter)
 {
-	status_t status;
-
 	TRACE(("vm_cache_write_modified(cache = %p)\n", cache));
 
 	if (cache->temporary)
 		return B_OK;
 
 	mutex_lock(&cache->lock);
-	status = vm_page_write_modified_pages(cache, fsReenter);
+	status_t status = vm_page_write_modified_pages(cache, fsReenter);
 	mutex_unlock(&cache->lock);
 
 	return status;
@@ -458,10 +445,12 @@ vm_cache_write_modified(vm_cache *cache, bool fsReenter)
 status_t
 vm_cache_set_minimal_commitment_locked(vm_cache *cache, off_t commitment)
 {
-	status_t status = B_OK;
-	vm_store *store = cache->store;
-
+	TRACE(("vm_cache_set_minimal_commitment_locked(cache %p, commitment %Ld)\n",
+		cache, commitment));
 	ASSERT_LOCKED_MUTEX(&cache->lock);
+
+	vm_store *store = cache->store;
+	status_t status = B_OK;
 
 	// If we don't have enough committed space to cover through to the new end of region...
 	if (store->committed_size < commitment) {
@@ -489,17 +478,17 @@ vm_cache_set_minimal_commitment_locked(vm_cache *cache, off_t commitment)
 status_t
 vm_cache_resize(vm_cache *cache, off_t newSize)
 {
-	uint32 oldPageCount, newPageCount;
-	status_t status;
-
+	TRACE(("vm_cache_resize(cache %p, newSize %Ld) old size %Ld\n",
+		cache, newSize, cache->virtual_size));
 	ASSERT_LOCKED_MUTEX(&cache->lock);
 
-	status = cache->store->ops->commit(cache->store, newSize);
+	status_t status = cache->store->ops->commit(cache->store, newSize);
 	if (status != B_OK)
 		return status;
 
-	oldPageCount = (uint32)((cache->virtual_size + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
-	newPageCount = (uint32)((newSize + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
+	uint32 oldPageCount = (uint32)((cache->virtual_size + B_PAGE_SIZE - 1)
+		>> PAGE_SHIFT);
+	uint32 newPageCount = (uint32)((newSize + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
 
 	if (newPageCount < oldPageCount) {
 		// we need to remove all pages in the cache outside of the new virtual
@@ -615,11 +604,6 @@ vm_cache_remove_consumer(vm_cache *cache, vm_cache *consumer)
 				if (consumerPage == NULL) {
 					// the page already is not yet in the consumer cache - move
 					// it upwards
-#if 0
-if (consumer->virtual_base == 0x11000)
-	dprintf("%ld: move page %p offset %ld from cache %p to cache %p\n",
-		find_thread(NULL), page, page->cache_offset, cache, consumer);
-#endif
 					vm_cache_remove_page(cache, page);
 					vm_cache_insert_page(consumer, page,
 						(off_t)page->cache_offset << PAGE_SHIFT);
@@ -628,7 +612,7 @@ if (consumer->virtual_base == 0x11000)
 					// the page is currently busy taking a read fault - IOW,
 					// vm_soft_fault() has mapped our page so we can just
 					// move it up
-//dprintf("%ld: merged busy page %p, cache %p, offset %ld\n", find_thread(NULL), page, cacheRef->cache, page->cache_offset);
+					//dprintf("%ld: merged busy page %p, cache %p, offset %ld\n", find_thread(NULL), page, cacheRef->cache, page->cache_offset);
 					vm_cache_remove_page(consumer, consumerPage);
 					consumerPage->state = PAGE_STATE_INACTIVE;
 					((vm_dummy_page*)consumerPage)->busy_condition.Unpublish();
@@ -647,11 +631,6 @@ if (consumer->virtual_base == 0x11000)
 					consumerPage->collided_page = page;
 #endif	// DEBUG_PAGE_CACHE_TRANSITIONS
 				}
-#if 0
-else if (consumer->virtual_base == 0x11000)
-	dprintf("%ld: did not move page %p offset %ld from cache %p to cache %p because there is page %p\n",
-		find_thread(NULL), page, page->cache_offset, cache, consumer, consumerPage);
-#endif
 			}
 
 			newSource = cache->source;
@@ -717,6 +696,7 @@ vm_cache_add_consumer_locked(vm_cache *cache, vm_cache *consumer)
 status_t
 vm_cache_insert_area_locked(vm_cache *cache, vm_area *area)
 {
+	TRACE(("vm_cache_insert_area_locked(cache %p, area %p)\n", cache, area));
 	ASSERT_LOCKED_MUTEX(&cache->lock);
 
 	area->cache_next = cache->areas;
@@ -735,7 +715,9 @@ vm_cache_insert_area_locked(vm_cache *cache, vm_area *area)
 status_t
 vm_cache_remove_area(vm_cache *cache, vm_area *area)
 {
-	mutex_lock(&cache->lock);
+	TRACE(("vm_cache_remove_area(cache %p, area %p)\n", cache, area));
+
+	MutexLocker locker(cache->lock);
 
 	if (area->cache_prev)
 		area->cache_prev->cache_next = area->cache_next;
@@ -747,6 +729,5 @@ vm_cache_remove_area(vm_cache *cache, vm_area *area)
 	if (cache->store->ops->release_ref)
 		cache->store->ops->release_ref(cache->store);
 
-	mutex_unlock(&cache->lock);
 	return B_OK;
 }

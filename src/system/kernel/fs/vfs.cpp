@@ -2280,7 +2280,7 @@ _dump_vnode(struct vnode *vnode)
 	kprintf(" private_node:  %p\n", vnode->private_node);
 	kprintf(" mount:         %p\n", vnode->mount);
 	kprintf(" covered_by:    %p\n", vnode->covered_by);
-	kprintf(" cache_ref:     %p\n", vnode->cache);
+	kprintf(" cache:         %p\n", vnode->cache);
 	kprintf(" flags:         %s%s%s\n", vnode->remove ? "r" : "-",
 		vnode->busy ? "b" : "-", vnode->unpublished ? "u" : "-");
 	kprintf(" advisory_lock: %p\n", vnode->advisory_locking);
