@@ -1104,34 +1104,28 @@ BRegion::Support::miRegionOp(
  *-----------------------------------------------------------------------
  */
 int
-BRegion::Support::miUnionNonO (
-    register BRegion*	pReg,
-    register clipping_rect*	r,
-    clipping_rect*  	  	rEnd,
-    register int  	top,
-    register int  	bottom)
+BRegion::Support::miUnionNonO(register BRegion* pReg,
+	register clipping_rect* r, clipping_rect* rEnd,
+    register int top, register int bottom)
 {
-    register clipping_rect*	pNextRect;
+	register clipping_rect*	pNextRect = &pReg->fData[pReg->fCount];
 
-    pNextRect = &pReg->fData[pReg->fCount];
+	assert(top < bottom);
 
-    assert(top < bottom);
+	while (r != rEnd) {
+		assert(r->left < r->right);
+		MEMCHECK(pReg, pNextRect, pReg->fData);
+		pNextRect->left = r->left;
+		pNextRect->top = top;
+		pNextRect->right = r->right;
+		pNextRect->bottom = bottom;
+		pReg->fCount += 1;
+		pNextRect++;
 
-    while (r != rEnd)
-    {
-	assert(r->left < r->right);
-	MEMCHECK(pReg, pNextRect, pReg->fData);
-	pNextRect->left = r->left;
-	pNextRect->top = top;
-	pNextRect->right = r->right;
-	pNextRect->bottom = bottom;
-	pReg->fCount += 1;
-	pNextRect++;
-
-	assert(pReg->fCount<=pReg->fDataSize);
-	r++;
-    }
-    return 0;	/* lint */
+		assert(pReg->fCount<=pReg->fDataSize);
+		r++;
+	}
+	return 0;
 }
 
 
