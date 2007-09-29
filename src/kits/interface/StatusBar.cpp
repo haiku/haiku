@@ -91,6 +91,8 @@ BStatusBar::_InitObject()
 
 	fBarColor = kDefaultBarColor;
 	fCustomBarHeight = false;
+
+	SetFlags(Flags() | B_FRAME_EVENTS);
 }
 
 
@@ -356,12 +358,8 @@ BStatusBar::Update(float delta, const char* text, const char* trailingText)
 void
 BStatusBar::SetTo(float value, const char* text, const char* trailingText)
 {
-	if (text != NULL)
-		_SetTextData(fText, fTextWidth, text, fLabelWidth, false);
-	if (trailingText != NULL) {
-		_SetTextData(fTrailingText, fTrailingTextWidth, trailingText,
-			fTrailingLabelWidth, true);
-	}
+	SetText(text);
+	SetTrailingText(trailingText);
 
 	if (value > fMax)
 		value = fMax;
@@ -527,6 +525,7 @@ void
 BStatusBar::FrameResized(float newWidth, float newHeight)
 {
 	BView::FrameResized(newWidth, newHeight);
+	Invalidate();
 }
 
 
@@ -656,6 +655,9 @@ void
 BStatusBar::_SetTextData(BString& text, float& width, const char* source,
 	float position, bool rightAligned)
 {
+	if (source == NULL)
+		source = "";
+
 	// If there were no changes, we don't have to do anything
 	if (text == source)
 		return;
