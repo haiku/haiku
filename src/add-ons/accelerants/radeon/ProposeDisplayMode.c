@@ -152,6 +152,9 @@ Radeon_ProposeDisplayMode(shared_info *si, crtc_info *crtc,
 	SHOW_FLOW( 4, "X %d, virtX %d", target->timing.h_display,  target->virtual_width);
 	SHOW_FLOW( 4, "fpRes %dx%d", flatpanel->panel_xres,  flatpanel->panel_yres);
 
+	if (target->timing.h_total * target->timing.v_total == 0)
+		return B_BAD_VALUE;
+
 	// save refresh rate - we want to leave this (artifical) value untouched
 	// don't use floating point, we are in kernel mode
 	target_refresh = 
