@@ -4,17 +4,19 @@
  */
 
 
-#include <KernelExport.h>
-
 #include <vm_low_memory.h>
-#include <vm_page.h>
-#include <lock.h>
-#include <util/DoublyLinkedList.h>
-#include <util/AutoLock.h>
 
 #include <new>
 #include <signal.h>
 #include <stdlib.h>
+
+#include <KernelExport.h>
+
+#include <elf.h>
+#include <lock.h>
+#include <util/AutoLock.h>
+#include <util/DoublyLinkedList.h>
+#include <vm_page.h>
 
 
 //#define TRACE_LOW_MEMORY
@@ -110,6 +112,30 @@ low_memory(void *)
 }
 
 
+static int
+dump_handlers(int argc, char **argv)
+{
+	HandlerList::Iterator iterator = sLowMemoryHandlers.GetIterator();
+	kprintf("function    data       prio  function-name\n");
+
+	while (iterator.HasNext()) {
+		low_memory_handler *handler = iterator.Next();
+
+		const char* symbol = NULL;
+		elf_debug_lookup_symbol_address((addr_t)handler->function, NULL,
+			&symbol, NULL, NULL);
+
+		kprintf("%p  %p  %3ld  %s\n", handler->function, handler->data,
+			handler->priority, symbol);
+	}
+
+	return 0;
+}
+
+
+//	#pragma mark - private kernel API
+
+
 void
 vm_low_memory(size_t requirements)
 {
@@ -129,8 +155,17 @@ vm_low_memory_state(void)
 status_t
 vm_low_memory_init(void)
 {
-	thread_id thread;
+	new(&sLowMemoryHandlers) HandlerList;
+		// static initializers do not work in the kernel,
+		// so we have to do it here, manually
 
+	return B_OK;
+}
+
+
+status_t
+vm_low_memory_init_post_thread(void)
+{
 	if (mutex_init(&sLowMemoryMutex, "low memory") < B_OK)
 		return B_ERROR;
 	
@@ -138,14 +173,11 @@ vm_low_memory_init(void)
 	if (sLowMemoryWaitSem < B_OK)
 		return sLowMemoryWaitSem;
 
-	new(&sLowMemoryHandlers) HandlerList;
-		// static initializers do not work in the kernel,
-		// so we have to do it here, manually
-
-	thread = spawn_kernel_thread(&low_memory, "low memory handler",
+	thread_id thread = spawn_kernel_thread(&low_memory, "low memory handler",
 		B_LOW_PRIORITY, NULL);
 	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
 
+	add_debugger_command("low_memory", &dump_handlers, "Dump list of low memory handlers");
 	return B_OK;
 }
 

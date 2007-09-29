@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_VM_LOW_MEMORY_H
@@ -24,6 +24,7 @@ extern "C" {
 #endif
 
 status_t vm_low_memory_init(void);
+status_t vm_low_memory_init_post_thread(void);
 int32 vm_low_memory_state(void);
 void vm_low_memory(size_t requirements);
 

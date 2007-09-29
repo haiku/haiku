@@ -3405,6 +3405,8 @@ vm_init(kernel_args *args)
 	TRACE(("heap at 0x%lx\n", heapBase));
 	heap_init(heapBase, heapSize);
 
+	vm_low_memory_init();
+
 	size_t slabInitialSize = 2 * B_PAGE_SIZE;
 	addr_t slabInitialBase = vm_allocate_early(args, slabInitialSize,
 		slabInitialSize, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
@@ -3525,7 +3527,7 @@ vm_init_post_thread(kernel_args *args)
 {
 	vm_page_init_post_thread(args);
 	vm_daemon_init();
-	vm_low_memory_init();
+	vm_low_memory_init_post_thread();
 
 	return heap_init_post_thread(args);
 }

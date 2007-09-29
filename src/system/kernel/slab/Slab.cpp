@@ -449,7 +449,7 @@ object_cache_init(object_cache *cache, const char *name, size_t objectSize,
 		cache->free_pages = area_free_pages;
 	}
 
-	register_low_memory_handler(object_cache_low_memory, cache, 0);
+	register_low_memory_handler(object_cache_low_memory, cache, 5);
 
 	BenaphoreLocker _(sObjectCacheListLock);
 	sObjectCaches.Add(cache);
