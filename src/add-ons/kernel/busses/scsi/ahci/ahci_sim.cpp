@@ -10,7 +10,8 @@
 #include <new>
 
 #define TRACE(a...) dprintf("\33[34mahci:\33[0m " a)
-#define FLOW(a...)	dprintf("ahci: " a)
+//#define FLOW(a...)	dprintf("ahci: " a)
+#define FLOW(a...)
 
 
 pci_device_module_info *gPCI;
@@ -24,7 +25,7 @@ scsi_for_sim_interface *gSCSI;
 static void
 ahci_scsi_io(scsi_sim_cookie cookie, scsi_ccb *request)
 {
-	TRACE("ahci_scsi_io, cookie %p, path_id %u, target_id %u, target_lun %u\n", 
+	FLOW("ahci_scsi_io, cookie %p, path_id %u, target_id %u, target_lun %u\n", 
 		cookie, request->path_id, request->target_id, request->target_lun);
 	static_cast<AHCIController *>(cookie)->ExecuteRequest(request);
 }
@@ -105,7 +106,7 @@ ahci_get_restrictions(scsi_sim_cookie cookie, uchar targetID, bool *isATAPI,
 
 	*isATAPI = false;
 	*noAutoSense = false;
-	*maxBlocks = 255;
+	*maxBlocks = 256;
 }
 
 

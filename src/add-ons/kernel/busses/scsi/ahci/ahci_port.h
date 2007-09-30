@@ -38,21 +38,22 @@ private:
 	void		DumpD2HFis();
 
 	void		StartTransfer();
-	status_t	WaitForTransfer(int *status, bigtime_t timeout);
+	status_t	WaitForTransfer(int *tfd, bigtime_t timeout);
 	void		FinishTransfer();
 
 
 //	uint8 *		SetCommandFis(volatile command_list_entry *cmd, volatile fis *fis, const void *data, size_t dataSize);
-	status_t	FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const void *data, size_t dataSize, bool ioc = false);
-	status_t	FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const physical_entry *sgTable, int sgCount, size_t dataSize, bool ioc = false);
+	status_t	FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const void *data, size_t dataSize);
+	status_t	FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const physical_entry *sgTable, int sgCount, size_t dataSize);
 
 private:
 	int						fIndex;
 	volatile ahci_port *	fRegs;
 	area_id					fArea;
+	spinlock						fSpinlock;
+	volatile uint32					fCommandsActive;
 	sem_id							fRequestSem;
 	sem_id							fResponseSem;
-	volatile bool					fCommandActive;
 	bool							fDevicePresent;
 	bool							fUse48BitCommands;
 	uint32							fSectorSize;

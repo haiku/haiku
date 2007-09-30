@@ -23,16 +23,17 @@ AHCIPort::AHCIPort(AHCIController *controller, int index)
 	: fIndex(index)
 	, fRegs(&controller->fRegs->port[index])
 	, fArea(-1)
+	, fSpinlock(0)
+	, fCommandsActive(0)
 	, fRequestSem(-1)
 	, fResponseSem(-1)
-	, fCommandActive(false)
 	, fDevicePresent(false)
 	, fUse48BitCommands(false)
 	, fSectorSize(0)
 	, fSectorCount(0)
 {
 	fRequestSem = create_sem(1, "ahci request");
-	fResponseSem = create_sem(1, "ahci response");
+	fResponseSem = create_sem(0, "ahci response");
 }
 				
 
@@ -269,18 +270,30 @@ void
 AHCIPort::Interrupt()
 {
 	uint32 is = fRegs->is;
-	TRACE("AHCIPort::Interrupt port %d, status %#08lx\n", fIndex, is);
+	uint32 ci = fRegs->ci;
+	fRegs->is = is; // clear interrupts
 
-	if (fCommandActive)	
+	FLOW("AHCIPort::Interrupt port %d, fCommandsActive 0x%08lx, is 0x%08lx, ci 0x%08lx\n", fIndex, fCommandsActive, is, ci);
+
+	int release = 0;
+
+	acquire_spinlock(&fSpinlock);
+	if ((fCommandsActive & 1) && !(ci & 1)) {
+		release = 1;
+		fCommandsActive &= ~1;
+	}
+	release_spinlock(&fSpinlock);
+	
+	if (is & PORT_INT_FATAL)
+		panic("ahci fatal error, is 0x%08lx", is);
+
+	if (release)
 		release_sem_etc(fResponseSem, 1, B_RELEASE_IF_WAITING_ONLY | B_DO_NOT_RESCHEDULE);
-
-	// clear interrupts
-	fRegs->is = is;
 }
 
 
 status_t
-AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const void *data, size_t dataSize, bool ioc)
+AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const void *data, size_t dataSize)
 {
 	int peMax = prdMax + 1;
 	physical_entry pe[peMax];
@@ -291,12 +304,12 @@ AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const 
 	int peUsed;
 	for (peUsed = 0; pe[peUsed].size; peUsed++)
 		;
-	return FillPrdTable(prdTable, prdCount, prdMax, pe, peUsed, dataSize, ioc);
+	return FillPrdTable(prdTable, prdCount, prdMax, pe, peUsed, dataSize);
 }
 
 
 status_t
-AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const physical_entry *sgTable, int sgCount, size_t dataSize, bool ioc)
+AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const physical_entry *sgTable, int sgCount, size_t dataSize)
 {
 	*prdCount = 0;
 	while (sgCount > 0 && dataSize > 0) {
@@ -335,8 +348,6 @@ AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const 
 		TRACE("AHCIPort::FillPrdTable: sg table %ld bytes too small\n", dataSize);
 		return B_ERROR;
 	}
-	if (ioc)
-		(prdTable - 1)->dbc |= DBC_I;
 	return B_OK;
 }
 
@@ -345,18 +356,19 @@ void
 AHCIPort::StartTransfer()
 {
 	acquire_sem(fRequestSem);
-	fCommandActive = true;
 }
 				
 
 status_t
-AHCIPort::WaitForTransfer(int *status, bigtime_t timeout)
+AHCIPort::WaitForTransfer(int *tfd, bigtime_t timeout)
 {
 	status_t result = B_OK;
 	if (acquire_sem_etc(fResponseSem, 1, B_RELATIVE_TIMEOUT, timeout) < B_OK) {
+		fCommandsActive &= ~1;
 		result = B_TIMED_OUT;
+	} else {
+		*tfd = fRegs->tfd;
 	}
-	fCommandActive = false;
 	return result;
 }
 
@@ -398,10 +410,10 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	StartTransfer();
 
 	int prdEntrys;
-	FillPrdTable(fPRDTable, &prdEntrys, PRD_TABLE_ENTRY_COUNT, &ataData, sizeof(ataData), true);
+	FillPrdTable(fPRDTable, &prdEntrys, PRD_TABLE_ENTRY_COUNT, &ataData, sizeof(ataData));
 
 
-	TRACE("prdEntrys %d\n", prdEntrys);
+	FLOW("prdEntrys %d\n", prdEntrys);
 	
 	memset((void *)fCommandTable->cfis, 0, 5 * 4);
 	fCommandTable->cfis[0] = 0x27;
@@ -421,16 +433,22 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 		gSCSI->finished(request, 1);
 		return;
 	}
+
+	cpu_status cpu = disable_interrupts();
+	acquire_spinlock(&fSpinlock);
 	fRegs->ci |= 1;
 	FlushPostedWrites();
+	fCommandsActive |= 1;
+	release_spinlock(&fSpinlock);
+	restore_interrupts(cpu);
 
 	int status;
 	WaitForTransfer(&status, 100000);
 
-	TRACE("prdbc %ld\n", fCommandList->prdbc);
-	TRACE("ci   0x%08lx\n", fRegs->ci);
-	TRACE("is   0x%08lx\n", fRegs->is);
-	TRACE("serr 0x%08lx\n", fRegs->serr);
+	FLOW("prdbc %ld\n", fCommandList->prdbc);
+	FLOW("ci   0x%08lx\n", fRegs->ci);
+	FLOW("is   0x%08lx\n", fRegs->is);
+	FLOW("serr 0x%08lx\n", fRegs->serr);
 
 /*
 	TRACE("ci   0x%08lx\n", fRegs->ci);
@@ -484,13 +502,21 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	}
 #endif
 
-	swap_words(ataData.model_number, sizeof(ataData.model_number));
-	swap_words(ataData.serial_number, sizeof(ataData.serial_number));
-	swap_words(ataData.firmware_revision, sizeof(ataData.firmware_revision));
+	char modelNumber[sizeof(ataData.model_number) + 1];
+	char serialNumber[sizeof(ataData.serial_number) + 1];
+	char firmwareRev[sizeof(ataData.firmware_revision) + 1];
 
-	TRACE("model_number: %40s\n", ataData.model_number);
-	TRACE("serial_number: %20s\n", ataData.serial_number);
-  	TRACE("firmware_revision: %8s\n", ataData.firmware_revision);
+	strlcpy(modelNumber, ataData.model_number, sizeof(modelNumber));
+	strlcpy(serialNumber, ataData.serial_number, sizeof(serialNumber));
+	strlcpy(firmwareRev, ataData.firmware_revision, sizeof(firmwareRev));
+
+	swap_words(modelNumber, sizeof(modelNumber) - 1);
+	swap_words(serialNumber, sizeof(serialNumber) - 1);
+	swap_words(firmwareRev, sizeof(firmwareRev) - 1);
+
+	TRACE("model number:  %s\n", modelNumber);
+	TRACE("serial number: %s\n", serialNumber);
+  	TRACE("firmware rev.: %s\n", firmwareRev);
 	TRACE("lba %d, lba48 %d, fUse48BitCommands %d, sectors %lu, sectors48 %llu, size %llu\n",
 		lba, lba48, fUse48BitCommands, sectors, sectors48, fSectorCount * fSectorSize);
 
@@ -502,7 +528,6 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 		request->data_length = sizeof(scsiData); // ???
 	}
 
-	fRegs->ci &= ~1;
 	FinishTransfer();
 
 	gSCSI->finished(request, 1);
@@ -544,7 +569,9 @@ AHCIPort::ScsiReadCapacity(scsi_ccb *request)
 void
 AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 position, size_t length, bool isWrite)
 {
-	TRACE("ScsiReadWrite: pos %llu, size %lu, isWrite %d\n", position, length, isWrite);
+	uint32 bytecount = length * 512;
+
+	TRACE("ScsiReadWrite: position %llu, size %lu, isWrite %d\n", position * 512, bytecount, isWrite);
 
 #if 1
 	if (isWrite) {
@@ -559,7 +586,7 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 position, size_t length, bool 
 	StartTransfer();
 
 	int prdEntrys;
-	FillPrdTable(fPRDTable, &prdEntrys, PRD_TABLE_ENTRY_COUNT, request->sg_list, request->sg_count, length * 512, true);
+	FillPrdTable(fPRDTable, &prdEntrys, PRD_TABLE_ENTRY_COUNT, request->sg_list, request->sg_count, bytecount);
 
 	FLOW("prdEntrys %d\n", prdEntrys);
 	
@@ -605,22 +632,31 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 position, size_t length, bool 
 		gSCSI->finished(request, 1);
 		return;
 	}
+	cpu_status cpu = disable_interrupts();
+	acquire_spinlock(&fSpinlock);
 	fRegs->ci |= 1;
 	FlushPostedWrites();
+	fCommandsActive |= 1;
+	release_spinlock(&fSpinlock);
+	restore_interrupts(cpu);
 
-	int status;
-	WaitForTransfer(&status, 100000);
+	int tfd;
+	status_t status = WaitForTransfer(&tfd, 4000000);
 
-	TRACE("prdbc %ld\n", fCommandList->prdbc);
-	TRACE("ci   0x%08lx\n", fRegs->ci);
-	TRACE("is   0x%08lx\n", fRegs->is);
-	TRACE("serr 0x%08lx\n", fRegs->serr);
+	FLOW("prdbc %ld\n", fCommandList->prdbc);
 
-	request->subsys_status = SCSI_REQ_CMP;
+	if (status < B_OK || (tfd & ATA_ERR)) {
+		TRACE("device error\n");
+		request->subsys_status = SCSI_REQ_ABORTED;
+	} else if (fCommandList->prdbc != bytecount) {
+		TRACE("should never happen\n");
+		request->subsys_status = SCSI_REQ_CMP_ERR;
+	} else {
+		request->subsys_status = SCSI_REQ_CMP;
+	}
 	request->data_resid = request->data_length - fCommandList->prdbc;// ???
 	request->data_length = fCommandList->prdbc; // ???
 
-	fRegs->ci &= ~1;
 	FinishTransfer();
 
 	gSCSI->finished(request, 1);
@@ -631,7 +667,7 @@ void
 AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 {
 
-	TRACE("AHCIPort::ScsiExecuteRequest port %d, opcode 0x%02x, length %u\n", fIndex, request->cdb[0], request->cdb_length);
+//	TRACE("AHCIPort::ScsiExecuteRequest port %d, opcode 0x%02x, length %u\n", fIndex, request->cdb[0], request->cdb_length);
 
 	if (request->cdb[0] == SCSI_OP_REQUEST_SENSE) {
 		panic("ahci: SCSI_OP_REQUEST_SENSE not yet supported\n");
