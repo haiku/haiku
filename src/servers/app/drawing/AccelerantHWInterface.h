@@ -59,10 +59,12 @@ public:
 	virtual overlay_token		AcquireOverlayChannel();
 	virtual void				ReleaseOverlayChannel(overlay_token token);
 
-	virtual bool				CheckOverlayRestrictions(int32 width, int32 height,
-									color_space colorSpace);
-	virtual const overlay_buffer* AllocateOverlayBuffer(int32 width, int32 height,
-									color_space space);
+	virtual status_t			GetOverlayRestrictions(const Overlay* overlay,
+									overlay_restrictions* restrictions);
+	virtual bool				CheckOverlayRestrictions(int32 width,
+									int32 height, color_space colorSpace);
+	virtual const overlay_buffer* AllocateOverlayBuffer(int32 width,
+									int32 height, color_space space);
 	virtual void				FreeOverlayBuffer(const overlay_buffer* buffer);
 
 	virtual void				ConfigureOverlay(Overlay* overlay);

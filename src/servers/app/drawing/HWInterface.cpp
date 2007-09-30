@@ -344,8 +344,17 @@ HWInterface::ReleaseOverlayChannel(overlay_token token)
 }
 
 
+status_t
+HWInterface::GetOverlayRestrictions(const Overlay* overlay,
+	overlay_restrictions* restrictions)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
 bool
-HWInterface::CheckOverlayRestrictions(int32 width, int32 height, color_space colorSpace)
+HWInterface::CheckOverlayRestrictions(int32 width, int32 height,
+	color_space colorSpace)
 {
 	return false;
 }

@@ -754,9 +754,10 @@ BBitmap::GetOverlayRestrictions(overlay_restrictions *restrictions) const
 
 	status_t status;
 	if (link.FlushWithReply(status) < B_OK)
-		return B_ERROR;
+		return status;
 
-	return status;
+	link.Read(restrictions, sizeof(overlay_restrictions));
+	return B_OK;
 }
 
 

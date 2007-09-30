@@ -665,7 +665,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		}
 		case AS_GET_BITMAP_OVERLAY_RESTRICTIONS:
 		{
-			overlay_restrictions overlayRestrictions;
+			overlay_restrictions restrictions;
 			status_t status = B_ERROR;
 
 			int32 token;
@@ -677,12 +677,13 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				STRACE(("ServerApp %s: Get overlay restrictions for bitmap %ld\n",
 					Signature(), token));
 
-				// TODO: fill overlay restrictions
+				status = fDesktop->HWInterface()->GetOverlayRestrictions(
+					bitmap->Overlay(), &restrictions);
 			}
 
 			fLink.StartMessage(status);
 			if (status == B_OK)
-				fLink.Attach(&overlayRestrictions, sizeof(overlay_restrictions));
+				fLink.Attach(&restrictions, sizeof(overlay_restrictions));
 
 			fLink.Flush();
 			break;

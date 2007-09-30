@@ -856,6 +856,34 @@ AccelerantHWInterface::ReleaseOverlayChannel(overlay_token token)
 }
 
 
+status_t
+AccelerantHWInterface::GetOverlayRestrictions(const Overlay* overlay,
+	overlay_restrictions* restrictions)
+{
+	if (overlay == NULL || restrictions == NULL)
+		return B_BAD_VALUE;
+	if (fAccGetOverlayConstraints == NULL)
+		return B_NOT_SUPPORTED;
+
+	overlay_constraints constraints;
+	status_t status = fAccGetOverlayConstraints(&fDisplayMode,
+		overlay->OverlayBuffer(), &constraints);
+	if (status < B_OK)
+		return status;
+
+	memset(restrictions, 0, sizeof(overlay_restrictions));
+	memcpy(&restrictions->source, &constraints.view, sizeof(overlay_limits));
+	memcpy(&restrictions->destination, &constraints.window,
+		sizeof(overlay_limits));
+	restrictions->min_width_scale = constraints.h_scale.min;
+	restrictions->max_width_scale = constraints.h_scale.max;
+	restrictions->min_height_scale = constraints.v_scale.min;
+	restrictions->max_height_scale = constraints.v_scale.max;
+
+	return B_OK;
+}
+
+
 bool
 AccelerantHWInterface::CheckOverlayRestrictions(int32 width, int32 height,
 	color_space colorSpace)
