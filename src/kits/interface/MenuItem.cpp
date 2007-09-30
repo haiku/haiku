@@ -11,14 +11,17 @@
 
 //!	Display item for BMenu class
 
+#include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <Bitmap.h>
 #include <MenuItem.h>
 #include <Shape.h>
 #include <String.h>
 #include <Window.h>
 
-#include <string.h>
-#include <stdlib.h>
+#include "utf8_functions.h"
 
 const unsigned char kCtrlBits[] = {
 	0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x14,
@@ -112,13 +115,9 @@ BMenuItem::BMenuItem(BMessage *data)
 	if (data->FindBool("_marked", &marked) == B_OK)
 		SetMarked(marked);
 
-	if (data->HasInt32("_user_trig")) {
-		int32 user_trig;
-
-		data->FindInt32("_user_trig", &user_trig);
-
-		SetTrigger(user_trig);
-	}
+	int32 userTrigger;
+	if (data->FindInt32("_user_trig", &userTrigger) == B_OK)
+		SetTrigger(userTrigger);
 
 	if (data->HasInt32("_shortcut")) {
 		int32 shortcut, mods;
@@ -139,10 +138,8 @@ BMenuItem::BMenuItem(BMessage *data)
 	BMessage subMessage;
 	if (data->FindMessage("_submenu", &subMessage) == B_OK) {
 		BArchivable *object = instantiate_object(&subMessage);
-
 		if (object != NULL) {
 			BMenu *menu = dynamic_cast<BMenu *>(object);
-
 			if (menu != NULL)
 				_InitMenuData(menu);
 		}
@@ -251,7 +248,7 @@ BMenuItem::SetMarked(bool state)
 	fMark = state;
 
 	if (state && Menu() != NULL)
-		Menu()->ItemMarked(this);
+		Menu()->_ItemMarked(this);
 }
 
 
@@ -260,12 +257,18 @@ BMenuItem::SetTrigger(char trigger)
 {
 	fUserTrigger = trigger;
 
-	const char* pos = strchr(Label(), trigger);
+	// try uppercase letters first
+
+	const char* pos = strchr(Label(), toupper(trigger));
+	if (pos == NULL) {
+		// take lowercase, too
+		pos = strchr(Label(), trigger);
+	}
 	if (pos != NULL) {
-		fAutomaticTrigger = trigger;
 		fTriggerIndex = pos - Label();
+		fTrigger = tolower(UTF8ToCharCode(&pos));
 	} else {
-		fAutomaticTrigger = 0;
+		fTrigger = 0;
 		fTriggerIndex = -1;
 	}
 
@@ -369,10 +372,10 @@ BMenuItem::Frame() const
 void
 BMenuItem::GetContentSize(float *width, float *height)
 {
-	fSuper->CacheFontInfo();
-	
+	fSuper->_CacheFontInfo();
+
 	fCachedWidth = fSuper->StringWidth(fLabel);
-	
+
 	if (width)
 		*width = (float)ceil(fCachedWidth);
 	if (height)
@@ -385,9 +388,9 @@ BMenuItem::TruncateLabel(float maxWidth, char *newLabel)
 {
 	BFont font;
 	BString string(fLabel);
-	
+
 	font.TruncateString(&string, B_TRUNCATE_MIDDLE, maxWidth);
-	
+
 	string.CopyInto(newLabel, 0, string.Length());
 	newLabel[string.Length()] = '\0';
 }
@@ -396,14 +399,14 @@ BMenuItem::TruncateLabel(float maxWidth, char *newLabel)
 void
 BMenuItem::DrawContent()
 {
-	fSuper->CacheFontInfo();
+	fSuper->_CacheFontInfo();
 
 	fSuper->MovePenBy(0, fSuper->fAscent);
 	BPoint lineStart = fSuper->PenLocation();
 
 	float labelWidth, labelHeight;
 	GetContentSize(&labelWidth, &labelHeight);		
-	
+
 	// truncate if needed
 	// TODO: Actually, this is still never triggered
 	if (fBounds.Width() > labelWidth)
@@ -414,12 +417,12 @@ BMenuItem::DrawContent()
 		fSuper->DrawString(truncatedLabel);
 		delete[] truncatedLabel;
 	}
-	
+
 	if (fSuper->AreTriggersEnabled() && fTriggerIndex != -1) {
 		float escapements[fTriggerIndex + 1];
 		BFont font;
 		fSuper->GetFont(&font);
-	
+
 		font.GetEscapements(fLabel, fTriggerIndex + 1, escapements);
 
 		for (int32 i = 0; i < fTriggerIndex; i++)
@@ -427,10 +430,10 @@ BMenuItem::DrawContent()
 
 		lineStart.x--;
 		lineStart.y++;
-		
+
 		BPoint lineEnd(lineStart);
 		lineEnd.x += escapements[fTriggerIndex] * font.Size();
-						
+
 		fSuper->StrokeLine(lineStart, lineEnd);
 	}	
 }
@@ -462,8 +465,7 @@ BMenuItem::Draw()
 	if (enabled)
 		fSuper->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
 	else
-		fSuper->SetHighColor(tint_color(bgColor,
-			B_DISABLED_LABEL_TINT));
+		fSuper->SetHighColor(tint_color(bgColor, B_DISABLED_LABEL_TINT));
 
 	// draw content
 	fSuper->MovePenTo(ContentLocation());
@@ -536,7 +538,7 @@ BMenuItem::_InitData()
 	fCachedWidth = 0;
 	fTriggerIndex = -1;
 	fUserTrigger = 0;
-	fAutomaticTrigger = 0;
+	fTrigger = 0;
 	fShortcutChar = 0;
 	fMark = false;
 	fEnabled = true;
@@ -563,7 +565,7 @@ void
 BMenuItem::Install(BWindow *window)
 {
 	if (fSubmenu)
-		fSubmenu->Install(window);
+		fSubmenu->_Install(window);
 
 	fWindow = window;
 
@@ -592,7 +594,7 @@ BMenuItem::Invoke(BMessage *message)
 
 	if (!message && !notify)
 		message = Message();
-		
+
 	if (!message) {
 		if (!fSuper->IsWatched())
 			return err;
@@ -603,7 +605,7 @@ BMenuItem::Invoke(BMessage *message)
 	clone.AddInt64("when", (int64)system_time());
 	clone.AddPointer("source", this);
 	clone.AddMessenger("be:sender", BMessenger(fSuper));
-	
+
 	if (message)
 		err = BInvoker::Invoke(&clone);
 
@@ -618,12 +620,13 @@ void
 BMenuItem::Uninstall()
 {
 	if (fSubmenu != NULL)
-		fSubmenu->Uninstall();
+		fSubmenu->_Uninstall();
 
 	if (Target() == fWindow)
 		SetTarget(BMessenger());
 
-	if (fShortcutChar != 0 && (fModifiers & B_COMMAND_KEY) && fWindow != NULL)
+	if (fShortcutChar != 0 && (fModifiers & B_COMMAND_KEY) != 0
+		&& fWindow != NULL)
 		fWindow->RemoveShortcut(fShortcutChar, fModifiers);
 
 	fWindow = NULL;
@@ -643,7 +646,7 @@ BMenuItem::SetSuper(BMenu *super)
 			fSuper->fSubmenus--;	
 		fSubmenu->fSuper = super;
 	}
-		
+
 	fSuper = super;
 }
 
@@ -841,13 +844,8 @@ BMenuItem::_DrawControlChar(char shortcut, BPoint where)
 
 
 void
-BMenuItem::SetAutomaticTrigger(char trigger)
+BMenuItem::SetAutomaticTrigger(int32 index, uint32 trigger)
 {
-	fAutomaticTrigger = trigger;
-
-	const char* pos = strchr(Label(), trigger);
-	if (pos != NULL)
-		fTriggerIndex = pos - Label();
-	else
-		fTriggerIndex = -1;
+	fTriggerIndex = index;
+	fTrigger = trigger;
 }

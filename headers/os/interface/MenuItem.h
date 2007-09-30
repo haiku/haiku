@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _MENU_ITEM_H
@@ -65,7 +65,7 @@ class BMenuItem : public BArchivable, public BInvoker {
 		void				Uninstall();
 		void				SetSuper(BMenu* superMenu);
 		void				Select(bool select);
-		void				SetAutomaticTrigger(char trigger);
+		void				SetAutomaticTrigger(int32 index, uint32 trigger);
 
 	protected:
 		virtual	status_t	Invoke(BMessage *msg = NULL);
@@ -91,13 +91,13 @@ class BMenuItem : public BArchivable, public BInvoker {
 		float				fCachedWidth;
 		int16				fTriggerIndex;
 		char				fUserTrigger;
-		char				fAutomaticTrigger;
 		char				fShortcutChar;
 		bool				fMark;
 		bool				fEnabled;
 		bool				fSelected;
+		uint32				fTrigger;
 
-		uint32				_reserved[4];
+		uint32				_reserved[3];
 };
 
 // BSeparatorItem now has its own declaration file, but for source

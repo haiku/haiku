@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku, Inc.
+ * Copyright 2001-2007, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -30,61 +30,82 @@
 #include <MenuWindow.h>
 #include <ServerProtocol.h>
 
+#include "utf8_functions.h"
+
+
 using std::nothrow;
 using BPrivate::BMenuWindow;
 
+namespace BPrivate {
 
-class _ExtraMenuData_ {
+class TriggerList {
+public:
+	TriggerList() {}
+	~TriggerList() {}
+
+	// TODO: make this work with Unicode characters!
+
+	bool HasTrigger(uint32 c)
+		{ return fList.HasItem((void*)tolower(c)); }
+	bool AddTrigger(uint32 c)
+		{ return fList.AddItem((void*)tolower(c)); }
+
+private:
+	BList	fList;
+};
+
+class ExtraMenuData {
 public:
 	menu_tracking_hook trackingHook;
 	void *trackingState;
 
-	_ExtraMenuData_(menu_tracking_hook func, void *state)
+	ExtraMenuData(menu_tracking_hook func, void *state)
 	{
 		trackingHook = func;
 		trackingState = state;
-	};
+	}
 };
+
+}	// namespace BPrivate
 
 
 menu_info BMenu::sMenuInfo;
 bool BMenu::sAltAsCommandKey;
 
 
-static property_info
-sPropList[] = {
+static property_info sPropList[] = {
 	{ "Enabled", { B_GET_PROPERTY, 0 },
 		{ B_DIRECT_SPECIFIER, 0 }, "Returns true if menu or menu item is enabled; false "
 		"otherwise.", 
 		0, { B_BOOL_TYPE }
 	},
-	
+
 	{ "Enabled", { B_SET_PROPERTY, 0 },
 		{ B_DIRECT_SPECIFIER, 0 }, "Enables or disables menu or menu item.", 
 		0, { B_BOOL_TYPE }
 	},
-	
+
 	{ "Label", { B_GET_PROPERTY, 0 },
 		{ B_DIRECT_SPECIFIER, 0 }, "Returns the string label of the menu or menu item.",
 		0, { B_STRING_TYPE }
 	},
-	
+
 	{ "Label", { B_SET_PROPERTY, 0 },
 		{ B_DIRECT_SPECIFIER, 0 }, "Sets the string label of the menu or menu item.",
 		0, { B_STRING_TYPE }
 	},
-	
+
 	{ "Mark", { B_GET_PROPERTY, 0 },
 		{ B_DIRECT_SPECIFIER, 0 }, "Returns true if the menu item or the menu's superitem "
 		"is marked; false otherwise.", 
 		0, { B_BOOL_TYPE }
 	},
-	
+
 	{ "Mark", { B_SET_PROPERTY, 0 },
 		{ B_DIRECT_SPECIFIER, 0 }, "Marks or unmarks the menu item or the menu's superitem.",
 		0, { B_BOOL_TYPE }
 	},
-	
+
 	{ "Menu", { B_CREATE_PROPERTY, 0 },
 		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Adds a new menu item at the specified index with the text label found in \"data\" "
@@ -93,7 +114,7 @@ sPropList[] = {
 		{ 	{{{"data", B_STRING_TYPE}}}
 		} 
 	},
-	
+
 	{ "Menu", { B_DELETE_PROPERTY, 0 },
 		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Removes the selected menu or menus.", 0, {}
@@ -104,12 +125,12 @@ sPropList[] = {
 		"Directs scripting message to the specified menu, first popping the current "
 		"specifier off the stack.", 0, {}
 	},
-	
+
 	{ "MenuItem", { B_COUNT_PROPERTIES, 0 },
 		{ B_DIRECT_SPECIFIER, 0 }, "Counts the number of menu items in the specified menu.",
 		0, { B_INT32_TYPE }
 	},
-	
+
 	{ "MenuItem", { B_CREATE_PROPERTY, 0 },
 		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Adds a new menu item at the specified index with the text label found in \"data\" "
@@ -126,12 +147,12 @@ sPropList[] = {
 		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Removes the specified menu item from its parent menu." 
 	},
-	
+
 	{ "MenuItem", { B_EXECUTE_PROPERTY, 0 },
 		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Invokes the specified menu item." 
 	},
-	
+
 	{ "MenuItem", { },
 		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Directs scripting message to the specified menu, first popping the current "
@@ -151,80 +172,80 @@ struct BMenu::LayoutData {
 
 
 BMenu::BMenu(const char *name, menu_layout layout)
-	:	BView(BRect(0, 0, 0, 0), name, 0, B_WILL_DRAW),
-		fChosenItem(NULL),
-		fPad(14.0f, 2.0f, 20.0f, 0.0f),
-		fSelected(NULL),
-		fCachedMenuWindow(NULL),
-		fSuper(NULL),
-		fSuperitem(NULL),
-		fAscent(-1.0f),
-		fDescent(-1.0f),
-		fFontHeight(-1.0f),
-		fState(0),
-		fLayout(layout),
-		fExtraRect(NULL),
-		fMaxContentWidth(0.0f),
-		fInitMatrixSize(NULL),
-		fExtraMenuData(NULL),
-		fSubmenus(0),
-		fTrigger(0),
-		fResizeToFit(true),
-		fUseCachedMenuLayout(false),
-		fEnabled(true),
-		fDynamicName(false),
-		fRadioMode(false),
-		fTrackNewBounds(false),
-		fStickyMode(false),
-		fIgnoreHidden(true),
-		fTriggerEnabled(true),
-		fRedrawAfterSticky(false),
-		fAttachAborted(false)
+	: BView(BRect(0, 0, 0, 0), name, 0, B_WILL_DRAW),
+	fChosenItem(NULL),
+	fPad(14.0f, 2.0f, 20.0f, 0.0f),
+	fSelected(NULL),
+	fCachedMenuWindow(NULL),
+	fSuper(NULL),
+	fSuperitem(NULL),
+	fAscent(-1.0f),
+	fDescent(-1.0f),
+	fFontHeight(-1.0f),
+	fState(0),
+	fLayout(layout),
+	fExtraRect(NULL),
+	fMaxContentWidth(0.0f),
+	fInitMatrixSize(NULL),
+	fExtraMenuData(NULL),
+	fSubmenus(0),
+	fTrigger(0),
+	fResizeToFit(true),
+	fUseCachedMenuLayout(false),
+	fEnabled(true),
+	fDynamicName(false),
+	fRadioMode(false),
+	fTrackNewBounds(false),
+	fStickyMode(false),
+	fIgnoreHidden(true),
+	fTriggerEnabled(true),
+	fRedrawAfterSticky(false),
+	fAttachAborted(false)
 {
-	InitData(NULL);
+	_InitData(NULL);
 }
 
 
 BMenu::BMenu(const char *name, float width, float height)
-	:	BView(BRect(0.0f, width, 0.0f, height), name, 0, B_WILL_DRAW),
-		fChosenItem(NULL),
-		fSelected(NULL),
-		fCachedMenuWindow(NULL),
-		fSuper(NULL),
-		fSuperitem(NULL),
-		fAscent(-1.0f),
-		fDescent(-1.0f),
-		fFontHeight(-1.0f),
-		fState(0),
-		fLayout(B_ITEMS_IN_MATRIX),
-		fExtraRect(NULL),
-		fMaxContentWidth(0.0f),
-		fInitMatrixSize(NULL),
-		fExtraMenuData(NULL),
-		fSubmenus(0),
-		fTrigger(0),
-		fResizeToFit(true),
-		fUseCachedMenuLayout(false),
-		fEnabled(true),
-		fDynamicName(false),
-		fRadioMode(false),
-		fTrackNewBounds(false),
-		fStickyMode(false),
-		fIgnoreHidden(true),
-		fTriggerEnabled(true),
-		fRedrawAfterSticky(false),
-		fAttachAborted(false)
+	: BView(BRect(0.0f, width, 0.0f, height), name, 0, B_WILL_DRAW),
+	fChosenItem(NULL),
+	fSelected(NULL),
+	fCachedMenuWindow(NULL),
+	fSuper(NULL),
+	fSuperitem(NULL),
+	fAscent(-1.0f),
+	fDescent(-1.0f),
+	fFontHeight(-1.0f),
+	fState(0),
+	fLayout(B_ITEMS_IN_MATRIX),
+	fExtraRect(NULL),
+	fMaxContentWidth(0.0f),
+	fInitMatrixSize(NULL),
+	fExtraMenuData(NULL),
+	fSubmenus(0),
+	fTrigger(0),
+	fResizeToFit(true),
+	fUseCachedMenuLayout(false),
+	fEnabled(true),
+	fDynamicName(false),
+	fRadioMode(false),
+	fTrackNewBounds(false),
+	fStickyMode(false),
+	fIgnoreHidden(true),
+	fTriggerEnabled(true),
+	fRedrawAfterSticky(false),
+	fAttachAborted(false)
 {
-	InitData(NULL);
+	_InitData(NULL);
 }
 
 
 BMenu::~BMenu()
 {
-	DeleteMenuWindow();
+	_DeleteMenuWindow();
 
 	RemoveItems(0, CountItems(), true);
-		
+	
 	delete fInitMatrixSize;
 	delete fExtraMenuData;
 	delete fLayoutData;
@@ -232,46 +253,46 @@ BMenu::~BMenu()
 
 
 BMenu::BMenu(BMessage *archive)
-	:	BView(archive),
-		fChosenItem(NULL),
-		fPad(14.0f, 2.0f, 20.0f, 0.0f),
-		fSelected(NULL),
-		fCachedMenuWindow(NULL),
-		fSuper(NULL),
-		fSuperitem(NULL),
-		fAscent(-1.0f),
-		fDescent(-1.0f),
-		fFontHeight(-1.0f),
-		fState(0),
-		fLayout(B_ITEMS_IN_ROW),
-		fExtraRect(NULL),
-		fMaxContentWidth(0.0f),
-		fInitMatrixSize(NULL),
-		fExtraMenuData(NULL),
-		fSubmenus(0),
-		fTrigger(0),
-		fResizeToFit(true),
-		fUseCachedMenuLayout(false),
-		fEnabled(true),
-		fDynamicName(false),
-		fRadioMode(false),
-		fTrackNewBounds(false),
-		fStickyMode(false),
-		fIgnoreHidden(true),
-		fTriggerEnabled(true),
-		fRedrawAfterSticky(false),
-		fAttachAborted(false)
+	: BView(archive),
+	fChosenItem(NULL),
+	fPad(14.0f, 2.0f, 20.0f, 0.0f),
+	fSelected(NULL),
+	fCachedMenuWindow(NULL),
+	fSuper(NULL),
+	fSuperitem(NULL),
+	fAscent(-1.0f),
+	fDescent(-1.0f),
+	fFontHeight(-1.0f),
+	fState(0),
+	fLayout(B_ITEMS_IN_ROW),
+	fExtraRect(NULL),
+	fMaxContentWidth(0.0f),
+	fInitMatrixSize(NULL),
+	fExtraMenuData(NULL),
+	fSubmenus(0),
+	fTrigger(0),
+	fResizeToFit(true),
+	fUseCachedMenuLayout(false),
+	fEnabled(true),
+	fDynamicName(false),
+	fRadioMode(false),
+	fTrackNewBounds(false),
+	fStickyMode(false),
+	fIgnoreHidden(true),
+	fTriggerEnabled(true),
+	fRedrawAfterSticky(false),
+	fAttachAborted(false)
 {
-	InitData(archive);
+	_InitData(archive);
 }
 
 
-BArchivable *
-BMenu::Instantiate(BMessage *data)
+BArchivable*
+BMenu::Instantiate(BMessage* archive)
 {
-	if (validate_instantiation(data, "BMenu"))
-		return new (nothrow) BMenu(data);
-	
+	if (validate_instantiation(archive, "BMenu"))
+		return new (nothrow) BMenu(archive);
+
 	return NULL;
 }
 
@@ -323,7 +344,8 @@ BMenu::AttachedToWindow()
 	key_map *keys = NULL; 
 	char *chars = NULL; 
 	get_key_map(&keys, &chars);
-	if (keys == NULL || keys->left_command_key != 0x5d || keys->right_command_key != 0x5f)
+	if (keys == NULL || keys->left_command_key != 0x5d
+		|| keys->right_command_key != 0x5f)
 		sAltAsCommandKey = false;
 	free(chars);
 	free(keys);
@@ -332,7 +354,7 @@ BMenu::AttachedToWindow()
 	BMenu *superMenu = Supermenu();
 	if (AddDynamicItem(B_INITIAL_ADD)) {
 		do {
-			if (superMenu != NULL && !superMenu->OkToProceed(superItem)) {
+			if (superMenu != NULL && !superMenu->_OkToProceed(superItem)) {
 				AddDynamicItem(B_ABORT);
 				fAttachAborted = true;
 				break;
@@ -341,9 +363,9 @@ BMenu::AttachedToWindow()
 	}
 
 	if (!fAttachAborted) {
-		CacheFontInfo();
-		LayoutItems(0);
-		UpdateWindowViewSize(false);
+		_CacheFontInfo();
+		_LayoutItems(0);
+		_UpdateWindowViewSize(false);
 	}
 }
 
@@ -375,8 +397,8 @@ BMenu::AddItem(BMenuItem *item, int32 index)
 	InvalidateLayout();
 	if (LockLooper()) {
 		if (!Window()->IsHidden()) {
-			LayoutItems(index);
-			UpdateWindowViewSize(false);
+			_LayoutItems(index);
+			_UpdateWindowViewSize(false);
 			Invalidate();
 		} 
 		UnlockLooper();
@@ -404,7 +426,7 @@ BMenu::AddItem(BMenuItem *item, BRect frame)
 
 	if (LockLooper()) {
 		if (!Window()->IsHidden()) {
-			LayoutItems(index);
+			_LayoutItems(index);
 			Invalidate();
 		} 
 		UnlockLooper();
@@ -494,8 +516,8 @@ BMenu::AddList(BList *list, int32 index)
 	InvalidateLayout();
 	if (locked && Window() != NULL && !Window()->IsHidden()) {	
 		// Make sure we update the layout if needed.
-		LayoutItems(index);
-		UpdateWindowViewSize(false);
+		_LayoutItems(index);
+		_UpdateWindowViewSize(false);
 		Invalidate();		
 	}
 
@@ -522,8 +544,7 @@ BMenu::AddSeparatorItem()
 bool
 BMenu::RemoveItem(BMenuItem *item)
 {
-	// TODO: Check if item is also deleted
-	return RemoveItems(0, 0, item, false);
+	return _RemoveItems(0, 0, item, false);
 }
 
 
@@ -532,15 +553,15 @@ BMenu::RemoveItem(int32 index)
 {
 	BMenuItem *item = ItemAt(index);
 	if (item != NULL)
-		RemoveItems(0, 0, item, false);
+		_RemoveItems(0, 0, item, false);
 	return item;
 }
 
 
 bool
-BMenu::RemoveItems(int32 index, int32 count, bool del)
+BMenu::RemoveItems(int32 index, int32 count, bool deleteItems)
 {
-	return RemoveItems(index, count, NULL, del);	
+	return _RemoveItems(index, count, NULL, deleteItems);
 }
 
 
@@ -549,7 +570,7 @@ BMenu::RemoveItem(BMenu *submenu)
 {
 	for (int32 i = 0; i < fItems.CountItems(); i++) {
 		if (static_cast<BMenuItem *>(fItems.ItemAtFast(i))->Submenu() == submenu)
-			return RemoveItems(i, 1, NULL, false);
+			return _RemoveItems(i, 1, NULL, false);
 	}
 
 	return false;
@@ -800,37 +821,47 @@ BMenu::KeyDown(const char *bytes, int32 numBytes)
 	switch (bytes[0]) {
 		case B_UP_ARROW:
 			if (fLayout == B_ITEMS_IN_COLUMN)
-				SelectNextItem(fSelected, false);
+				_SelectNextItem(fSelected, false);
 			break;
 
 		case B_DOWN_ARROW:
 			if (fLayout == B_ITEMS_IN_COLUMN)
-				SelectNextItem(fSelected, true);
+				_SelectNextItem(fSelected, true);
 			break;
 
 		case B_LEFT_ARROW:
 			if (fLayout == B_ITEMS_IN_ROW)
-				SelectNextItem(fSelected, false);
+				_SelectNextItem(fSelected, false);
 			break;
 
 		case B_RIGHT_ARROW:
 			if (fLayout == B_ITEMS_IN_ROW)
-				SelectNextItem(fSelected, true);
+				_SelectNextItem(fSelected, true);
 			break;
 
 		case B_ENTER:
 		case B_SPACE:
 			if (fSelected)
 				InvokeItem(fSelected);
-
 			break;
-		
+
 		case B_ESCAPE:
 			QuitTracking();
 			break;
 
 		default:
-			BView::KeyDown(bytes, numBytes);
+		{
+			uint32 trigger = UTF8ToCharCode(&bytes);
+
+			for (uint32 i = CountItems(); i-- > 0;) {
+				BMenuItem* item = ItemAt(i);
+				if (item->fTriggerIndex < 0 || item->fTrigger != trigger)
+					continue;
+
+				InvokeItem(item);
+			}
+			break;
+		}
 	}
 }
 
@@ -838,13 +869,13 @@ BMenu::KeyDown(const char *bytes, int32 numBytes)
 void
 BMenu::Draw(BRect updateRect)
 {
-	if (RelayoutIfNeeded()) {
+	if (_RelayoutIfNeeded()) {
 		Invalidate();
 		return;
 	}
 
 	DrawBackground(updateRect);
-	DrawItems(updateRect);
+	_DrawItems(updateRect);
 }
 
 
@@ -910,7 +941,7 @@ BMenu::DoLayout()
 		return;
 	}
 
-	if (RelayoutIfNeeded())
+	if (_RelayoutIfNeeded())
 		Invalidate();
 }
 
@@ -1041,37 +1072,37 @@ BMenu::AllDetached()
 
 
 BMenu::BMenu(BRect frame, const char *name, uint32 resizingMode, uint32 flags,
-			 menu_layout layout, bool resizeToFit)
-	:	BView(frame, name, resizingMode, flags),
-		fChosenItem(NULL),
-		fSelected(NULL),
-		fCachedMenuWindow(NULL),
-		fSuper(NULL),
-		fSuperitem(NULL),
-		fAscent(-1.0f),
-		fDescent(-1.0f),
-		fFontHeight(-1.0f),
-		fState(0),
-		fLayout(layout),
-		fExtraRect(NULL),
-		fMaxContentWidth(0.0f),
-		fInitMatrixSize(NULL),
-		fExtraMenuData(NULL),
-		fSubmenus(0),
-		fTrigger(0),
-		fResizeToFit(resizeToFit),
-		fUseCachedMenuLayout(false),
-		fEnabled(true),
-		fDynamicName(false),
-		fRadioMode(false),
-		fTrackNewBounds(false),
-		fStickyMode(false),
-		fIgnoreHidden(true),
-		fTriggerEnabled(true),
-		fRedrawAfterSticky(false),
-		fAttachAborted(false)
+		menu_layout layout, bool resizeToFit)
+	: BView(frame, name, resizingMode, flags),
+	fChosenItem(NULL),
+	fSelected(NULL),
+	fCachedMenuWindow(NULL),
+	fSuper(NULL),
+	fSuperitem(NULL),
+	fAscent(-1.0f),
+	fDescent(-1.0f),
+	fFontHeight(-1.0f),
+	fState(0),
+	fLayout(layout),
+	fExtraRect(NULL),
+	fMaxContentWidth(0.0f),
+	fInitMatrixSize(NULL),
+	fExtraMenuData(NULL),
+	fSubmenus(0),
+	fTrigger(0),
+	fResizeToFit(resizeToFit),
+	fUseCachedMenuLayout(false),
+	fEnabled(true),
+	fDynamicName(false),
+	fRadioMode(false),
+	fTrackNewBounds(false),
+	fStickyMode(false),
+	fIgnoreHidden(true),
+	fTriggerEnabled(true),
+	fRedrawAfterSticky(false),
+	fAttachAborted(false)
 {
-	InitData(NULL);
+	_InitData(NULL);
 }
 
 
@@ -1114,16 +1145,16 @@ BMenu::Show()
 void
 BMenu::Show(bool selectFirst)
 {
-	Install(NULL);
-	_show(selectFirst);
+	_Install(NULL);
+	_Show(selectFirst);
 }
 
 
 void
 BMenu::Hide()
 {
-	_hide();
-	Uninstall();
+	_Hide();
+	_Uninstall();
 }
 
 
@@ -1131,7 +1162,8 @@ BMenuItem *
 BMenu::Track(bool sticky, BRect *clickToOpenRect)
 {	
 	if (sticky && LockLooper()) {
-		RedrawAfterSticky(Bounds());
+		//RedrawAfterSticky(Bounds());
+			// the call above didn't do anything, so I've removed it for now
 		UnlockLooper();
 	}
 	
@@ -1142,9 +1174,9 @@ BMenu::Track(bool sticky, BRect *clickToOpenRect)
 	}
 
 	int action;
-	BMenuItem *menuItem = _track(&action);
+	BMenuItem *menuItem = _Track(&action);
 	
-	SetStickyMode(false);
+	_SetStickyMode(false);
 	fExtraRect = NULL;
 	
 	return menuItem;
@@ -1152,7 +1184,7 @@ BMenu::Track(bool sticky, BRect *clickToOpenRect)
 
 
 bool
-BMenu::AddDynamicItem(add_state s)
+BMenu::AddDynamicItem(add_state state)
 {
 	// Implemented in subclasses
 	return false;
@@ -1173,7 +1205,7 @@ void
 BMenu::SetTrackingHook(menu_tracking_hook func, void *state)
 {
 	delete fExtraMenuData;
-	fExtraMenuData = new (nothrow) _ExtraMenuData_(func, state);
+	fExtraMenuData = new (nothrow) BPrivate::ExtraMenuData(func, state);
 }
 
 
@@ -1191,7 +1223,7 @@ BMenu::operator=(const BMenu &)
 
 
 void
-BMenu::InitData(BMessage *data)
+BMenu::_InitData(BMessage* archive)
 {
 	// TODO: Get _color, _fname, _fflt from the message, if present
 	BFont font;
@@ -1206,29 +1238,29 @@ BMenu::InitData(BMessage *data)
 
 	fTriggerEnabled = sMenuInfo.triggers_always_shown;
 
-	if (data != NULL) {
-		data->FindInt32("_layout", (int32 *)&fLayout);
-		data->FindBool("_rsize_to_fit", &fResizeToFit);
+	if (archive != NULL) {
+		archive->FindInt32("_layout", (int32 *)&fLayout);
+		archive->FindBool("_rsize_to_fit", &fResizeToFit);
 		bool disabled;
-		if (data->FindBool("_disable", &disabled) == B_OK)
+		if (archive->FindBool("_disable", &disabled) == B_OK)
 			fEnabled = !disabled;
-		data->FindBool("_radio", &fRadioMode);
-		
+		archive->FindBool("_radio", &fRadioMode);
+
 		bool disableTrigger = false;
-		data->FindBool("_trig_disabled", &disableTrigger);
+		archive->FindBool("_trig_disabled", &disableTrigger);
 		fTriggerEnabled = !disableTrigger;
-		
-		data->FindBool("_dyn_label", &fDynamicName);
-		data->FindFloat("_maxwidth", &fMaxContentWidth);
+
+		archive->FindBool("_dyn_label", &fDynamicName);
+		archive->FindFloat("_maxwidth", &fMaxContentWidth);
 
 		BMessage msg;
-        	for (int32 i = 0; data->FindMessage("_items", i, &msg) == B_OK; i++) {
+       	for (int32 i = 0; archive->FindMessage("_items", i, &msg) == B_OK; i++) {
 			BArchivable *object = instantiate_object(&msg);
 			if (BMenuItem *item = dynamic_cast<BMenuItem *>(object)) {
 				BRect bounds;
-				if ((fLayout == B_ITEMS_IN_MATRIX)
-					&& (data->FindRect("_i_frames", i, &bounds) == B_OK))
-						AddItem(item, bounds);
+				if (fLayout == B_ITEMS_IN_MATRIX
+					&& archive->FindRect("_i_frames", i, &bounds) == B_OK)
+					AddItem(item, bounds);
 				else
 					AddItem(item);
 			}
@@ -1238,7 +1270,7 @@ BMenu::InitData(BMessage *data)
 
 
 bool
-BMenu::_show(bool selectFirstItem)
+BMenu::_Show(bool selectFirstItem)
 {
 	// See if the supermenu has a cached menuwindow,
 	// and use that one if possible.
@@ -1246,7 +1278,7 @@ BMenu::_show(bool selectFirstItem)
 	bool ourWindow = false;
 	if (fSuper != NULL) {
 		fSuperbounds = fSuper->ConvertToScreen(fSuper->Bounds());
-		window = fSuper->MenuWindow();
+		window = fSuper->_MenuWindow();
 	}
 	
 	// Otherwise, create a new one
@@ -1260,11 +1292,11 @@ BMenu::_show(bool selectFirstItem)
 
 	if (window == NULL)
 		return false;
-	
+
 	if (window->Lock()) {
 		fAttachAborted = false;
 		window->AttachMenu(this);
-		
+
 		// Menu didn't have the time to add its items: aborting...
 		if (fAttachAborted) {
 			window->DetachMenu();
@@ -1275,28 +1307,28 @@ BMenu::_show(bool selectFirstItem)
 				window->Unlock();
 			return false;
 		}
-	
+
 		// Move the BMenu to 1, 1, if it's attached to a BMenuWindow,
 		// (that means it's a BMenu, BMenuBars are attached to regular BWindows).
 		// This is needed to be able to draw the frame around the BMenu.
 		if (dynamic_cast<BMenuWindow *>(window) != NULL)
 			MoveTo(1, 1);
-	
-		UpdateWindowViewSize(true);
+
+		_UpdateWindowViewSize(true);
 		window->Show();
-		
+
 		if (selectFirstItem)
 			_SelectItem(ItemAt(0));
-		
+
 		window->Unlock();
 	}
-	
+
 	return true;
 }
 
 
 void
-BMenu::_hide()
+BMenu::_Hide()
 {
 	BMenuWindow *window = static_cast<BMenuWindow *>(Window());
 	if (window == NULL || !window->Lock())
@@ -1310,7 +1342,7 @@ BMenu::_hide()
 		// we don't want to be deleted when the window is removed
 
 	// Delete the menu window used by our submenus
-	DeleteMenuWindow();
+	_DeleteMenuWindow();
 
 	if (fSuper != NULL)
 		window->Unlock();
@@ -1325,7 +1357,7 @@ const bigtime_t kHysteresis = 200000; // TODO: Test and reduce if needed.
 	
 
 BMenuItem *
-BMenu::_track(int *action, long start)
+BMenu::_Track(int *action, long start)
 {
 	// TODO: cleanup
 	BMenuItem *item = NULL;
@@ -1337,7 +1369,7 @@ BMenu::_track(int *action, long start)
 		fSuper->fState = MENU_STATE_TRACKING_SUBMENU;
 
 	while (true) {
-		if (CustomTrackingWantsToQuit())
+		if (_CustomTrackingWantsToQuit())
 			break;
 		
 		bool locked = LockLooper();
@@ -1346,7 +1378,7 @@ BMenu::_track(int *action, long start)
 
 		bigtime_t snoozeAmount = 50000;
 		BPoint location;
-		ulong buttons;
+		uint32 buttons;
 		GetMouse(&location, &buttons, true);
 
 		BMenuWindow *window = static_cast<BMenuWindow *>(Window());
@@ -1355,46 +1387,45 @@ BMenu::_track(int *action, long start)
 		if (window->CheckForScrolling(screenLocation)) {
 			item = NULL;
 		} else {
-			item = HitTestItems(location, B_ORIGIN);
+			item = _HitTestItems(location, B_ORIGIN);
 			if (item != NULL)
 				_UpdateStateOpenSelect(item, openTime, closeTime);
 		}
 
 		// Track the submenu
-		if (OverSubmenu(fSelected, screenLocation)) {
+		if (_OverSubmenu(fSelected, screenLocation)) {
 			UnlockLooper();
 			locked = false;
 			int submenuAction = MENU_STATE_TRACKING;
 			BMenu *submenu = fSelected->Submenu();
-			bool wasSticky = IsStickyMode();
+			bool wasSticky = _IsStickyMode();
 			if (wasSticky)
-				submenu->SetStickyMode(true);
-			BMenuItem *submenuItem = submenu->_track(&submenuAction);
-			
+				submenu->_SetStickyMode(true);
+			BMenuItem *submenuItem = submenu->_Track(&submenuAction);
+
 			// check if the user started holding down a mouse button in a submenu
-			if (wasSticky && !IsStickyMode()) {
+			if (wasSticky && !_IsStickyMode()) {
 				buttons = 1;
 					// buttons must have been pressed in the meantime
 			}
-			
+
 			if (submenuAction == MENU_STATE_CLOSED) {
 				item = submenuItem;
 				fState = submenuAction;
 				break;
 			}
-			
+
 			locked = LockLooper();
 			if (!locked)
 				break;
-
 		} else if (item == NULL) {
-			if (OverSuper(screenLocation)) {
+			if (_OverSuper(screenLocation)) {
 				fState = MENU_STATE_TRACKING;
 				UnlockLooper();
 				break;
 			}
 
-			if (!OverSubmenu(fSelected, screenLocation)
+			if (!_OverSubmenu(fSelected, screenLocation)
 				&& system_time() > closeTime + kHysteresis
 				&& fState != MENU_STATE_TRACKING_SUBMENU) {
 				_SelectItem(NULL);
@@ -1406,14 +1437,14 @@ BMenu::_track(int *action, long start)
 				*action = fState;
 				if (locked)
 					UnlockLooper();
-				
+
 				return NULL;
 			}
 		}
-		
+
 		if (locked)
 			UnlockLooper();
-		
+
 		_UpdateStateClose(item, location, buttons);
 
 		if (fState == MENU_STATE_CLOSED)
@@ -1430,18 +1461,19 @@ BMenu::_track(int *action, long start)
 		UnlockLooper();
 	}
 
-	if (IsStickyMode())
-		SetStickyMode(false);
-	
+	if (_IsStickyMode())
+		_SetStickyMode(false);
+
 	// delete the menu window recycled for all the child menus
-	DeleteMenuWindow();
-	
+	_DeleteMenuWindow();
+
 	return item;
 }
 
 
 void
-BMenu::_UpdateStateOpenSelect(BMenuItem *item, bigtime_t &openTime, bigtime_t &closeTime)
+BMenu::_UpdateStateOpenSelect(BMenuItem* item, bigtime_t& openTime,
+	bigtime_t& closeTime)
 {
 	if (fState == MENU_STATE_CLOSED)
 		return;
@@ -1463,23 +1495,24 @@ BMenu::_UpdateStateOpenSelect(BMenuItem *item, bigtime_t &openTime, bigtime_t &c
 
 
 void
-BMenu::_UpdateStateClose(BMenuItem *item, const BPoint &where, const uint32 &buttons)
+BMenu::_UpdateStateClose(BMenuItem* item, const BPoint& where,
+	const uint32& buttons)
 {
 	if (fState == MENU_STATE_CLOSED)
 		return;
 
-	if (buttons != 0 && IsStickyMode()) {
+	if (buttons != 0 && _IsStickyMode()) {
 		if (item == NULL)
 			fState = MENU_STATE_CLOSED;
 		else {
 			BMenu *supermenu = Supermenu();
 			for(; supermenu; supermenu = supermenu->Supermenu())
-				supermenu->SetStickyMode(false);
-			SetStickyMode(false);
+				supermenu->_SetStickyMode(false);
+			_SetStickyMode(false);
 		}		
-	} else if (buttons == 0 && !IsStickyMode()) {
+	} else if (buttons == 0 && !_IsStickyMode()) {
 		if (fExtraRect != NULL && fExtraRect->Contains(where)) {
-			SetStickyMode(true);
+			_SetStickyMode(true);
 			fExtraRect = NULL;
 				// This code should be executed only once		
 		} else
@@ -1494,10 +1527,10 @@ BMenu::_AddItem(BMenuItem *item, int32 index)
 	ASSERT(item != NULL);
 	if (index < 0 || index > fItems.CountItems())
 		return false;
-	
+
 	if (!fItems.AddItem(item, index))
 		return false;
-	
+
 	// install the item on the supermenu's window 
 	// or onto our window, if we are a root menu
 	BWindow* window = NULL;
@@ -1509,13 +1542,12 @@ BMenu::_AddItem(BMenuItem *item, int32 index)
 		item->Install(window);
 
 	item->SetSuper(this);
-
 	return true;
 }
 
 
 bool
-BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool deleteItems)
+BMenu::_RemoveItems(int32 index, int32 count, BMenuItem *item, bool deleteItems)
 {
 	bool success = false;
 	bool invalidateLayout = false;
@@ -1566,8 +1598,8 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool deleteItems)
 	if (invalidateLayout) {
 		InvalidateLayout();
 		if (locked && window != NULL) {
-			LayoutItems(0);
-			UpdateWindowViewSize(false);
+			_LayoutItems(0);
+			_UpdateWindowViewSize(false);
 			Invalidate();
 		}
 	}
@@ -1580,12 +1612,12 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *item, bool deleteItems)
 
 
 bool
-BMenu::RelayoutIfNeeded()
+BMenu::_RelayoutIfNeeded()
 {
 	if (!fUseCachedMenuLayout) {
 		fUseCachedMenuLayout = true;
-		CacheFontInfo();
-		LayoutItems(0);
+		_CacheFontInfo();
+		_LayoutItems(0);
 		return true;
 	}
 	return false;
@@ -1593,12 +1625,12 @@ BMenu::RelayoutIfNeeded()
 
 
 void
-BMenu::LayoutItems(int32 index)
+BMenu::_LayoutItems(int32 index)
 {
-	CalcTriggers();
+	_CalcTriggers();
 
 	float width, height;
-	ComputeLayout(index, fResizeToFit, true, &width, &height);
+	_ComputeLayout(index, fResizeToFit, true, &width, &height);
 
 	if (fResizeToFit)
 		ResizeTo(width, height);
@@ -1609,14 +1641,14 @@ BSize
 BMenu::_ValidatePreferredSize()
 {
 	if (!fLayoutData->preferred.IsWidthSet())
-		ComputeLayout(0, true, false, NULL, NULL);
+		_ComputeLayout(0, true, false, NULL, NULL);
 
 	return fLayoutData->preferred;
 }
 
 
 void
-BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
+BMenu::_ComputeLayout(int32 index, bool bestFit, bool moveItems,
 	float* _width, float* _height)
 {
 	// TODO: Take "bestFit", "moveItems", "index" into account,
@@ -1670,7 +1702,8 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 
 
 void
-BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems, BRect &frame)
+BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems,
+	BRect& frame)
 {
 	BFont font;
 	GetFont(&font);
@@ -1695,7 +1728,8 @@ BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems, BRect &fr
 
 			item->fBounds.left = 0.0f;
 			item->fBounds.top = frame.bottom;
-			item->fBounds.bottom = item->fBounds.top + iHeight + fPad.top + fPad.bottom;
+			item->fBounds.bottom = item->fBounds.top + iHeight + fPad.top
+				+ fPad.bottom;
 
 			if (fSubmenus)
 				iWidth += item->Frame().Height();
@@ -1725,11 +1759,13 @@ BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems, BRect &fr
 
 
 void
-BMenu::_ComputeRowLayout(int32 index, bool bestFit, bool moveItems, BRect &frame)
+BMenu::_ComputeRowLayout(int32 index, bool bestFit, bool moveItems,
+	BRect& frame)
 {
 	font_height fh;
 	GetFontHeight(&fh);
-	frame = BRect(0.0f, 0.0f, 0.0f,	ceilf(fh.ascent + fh.descent + fPad.top + fPad.bottom));	
+	frame = BRect(0.0f, 0.0f, 0.0f,	ceilf(fh.ascent + fh.descent + fPad.top
+		+ fPad.bottom));	
 
 	for (int32 i = 0; i < fItems.CountItems(); i++) {
 		BMenuItem *item = ItemAt(i);
@@ -1739,18 +1775,19 @@ BMenu::_ComputeRowLayout(int32 index, bool bestFit, bool moveItems, BRect &frame
 
 			item->fBounds.left = frame.right;
 			item->fBounds.top = 0.0f;
-			item->fBounds.right = item->fBounds.left + iWidth + fPad.left + fPad.right;
+			item->fBounds.right = item->fBounds.left + iWidth + fPad.left
+				+ fPad.right;
 
 			frame.right = item->Frame().right + 1.0f;
 			frame.bottom = max_c(frame.bottom, iHeight + fPad.top + fPad.bottom);
 		}
 	}
-	
+
 	if (moveItems) {
 		for (int32 i = 0; i < fItems.CountItems(); i++)
 			ItemAt(i)->fBounds.bottom = frame.bottom;			
 	}
-	
+
 	if (bestFit)
 		frame.right = ceilf(frame.right);
 	else
@@ -1770,22 +1807,6 @@ BMenu::_ComputeMatrixLayout(BRect &frame)
 			frame.bottom = max_c(frame.bottom, item->Frame().bottom);
 		}			
 	}		
-}
-
-
-BRect
-BMenu::Bump(BRect current, BPoint extent, int32 index) const
-{
-	// ToDo: what's this?
-	return BRect();
-}
-
-
-BPoint
-BMenu::ItemLocInRect(BRect frame) const
-{
-	// ToDo: what's this?
-	return BPoint();
 }
 
 
@@ -1814,7 +1835,7 @@ BMenu::ScreenLocation()
 
 
 BRect
-BMenu::CalcFrame(BPoint where, bool *scrollOn)
+BMenu::_CalcFrame(BPoint where, bool *scrollOn)
 {
 	// TODO: Improve me
 	BRect bounds = Bounds();
@@ -1880,21 +1901,8 @@ BMenu::CalcFrame(BPoint where, bool *scrollOn)
 }
 
 
-bool
-BMenu::ScrollMenu(BRect bounds, BPoint loc, bool *fast)
-{
-	return false;
-}
-
-
 void
-BMenu::ScrollIntoView(BMenuItem *item)
-{
-}
-
-
-void
-BMenu::DrawItems(BRect updateRect)
+BMenu::_DrawItems(BRect updateRect)
 {
 	int32 itemCount = fItems.CountItems();
 	for (int32 i = 0; i < itemCount; i++) {
@@ -1923,7 +1931,7 @@ BMenu::InvokeItem(BMenuItem *item, bool now)
 {
 	if (!item->IsEnabled())
 		return;
-	
+
 	// Do the "selected" animation
 	if (!item->Submenu() && LockLooper()) {
 		snooze(50000);
@@ -1940,13 +1948,13 @@ BMenu::InvokeItem(BMenuItem *item, bool now)
 		Sync();
 		UnlockLooper();
 	}
-	
+
 	item->Invoke();
 }
 
 
 bool
-BMenu::OverSuper(BPoint location)
+BMenu::_OverSuper(BPoint location)
 {
 	if (!Supermenu())
 		return false;
@@ -1956,7 +1964,7 @@ BMenu::OverSuper(BPoint location)
 
 
 bool
-BMenu::OverSubmenu(BMenuItem *item, BPoint loc)
+BMenu::_OverSubmenu(BMenuItem *item, BPoint loc)
 {
 	if (item == NULL)
 		return false;
@@ -1964,17 +1972,17 @@ BMenu::OverSubmenu(BMenuItem *item, BPoint loc)
 	BMenu *subMenu = item->Submenu();
 	if (subMenu == NULL || subMenu->Window() == NULL)
 		return false;
-	
+
 	// we assume that loc is in screen coords
 	if (subMenu->Window()->Frame().Contains(loc))
 		return true;
 
-	return subMenu->OverSubmenu(subMenu->fSelected, loc);
+	return subMenu->_OverSubmenu(subMenu->fSelected, loc);
 }
 
 
 BMenuWindow *
-BMenu::MenuWindow()
+BMenu::_MenuWindow()
 {
 	if (fCachedMenuWindow == NULL) {
 		char windowName[64];
@@ -1987,7 +1995,7 @@ BMenu::MenuWindow()
 
 
 void
-BMenu::DeleteMenuWindow()
+BMenu::_DeleteMenuWindow()
 {
 	if (fCachedMenuWindow != NULL) {
 		fCachedMenuWindow->Lock();
@@ -1998,15 +2006,15 @@ BMenu::DeleteMenuWindow()
 
 
 BMenuItem *
-BMenu::HitTestItems(BPoint where, BPoint slop) const
+BMenu::_HitTestItems(BPoint where, BPoint slop) const
 {
 	// TODO: Take "slop" into account ?
-	
+
 	// if the point doesn't lie within the menu's
 	// bounds, bail out immediately
 	if (!Bounds().Contains(where))
 		return NULL;
-	
+
 	int32 itemCount = CountItems();
 	for (int32 i = 0; i < itemCount; i++) {
 		BMenuItem *item = ItemAt(i);
@@ -2019,14 +2027,14 @@ BMenu::HitTestItems(BPoint where, BPoint slop) const
 
 
 BRect
-BMenu::Superbounds() const
+BMenu::_Superbounds() const
 {
 	return fSuperbounds;
 }
 
 
 void
-BMenu::CacheFontInfo()
+BMenu::_CacheFontInfo()
 {
 	font_height fh;
 	GetFontHeight(&fh);
@@ -2037,22 +2045,23 @@ BMenu::CacheFontInfo()
 
 
 void
-BMenu::ItemMarked(BMenuItem *item)
+BMenu::_ItemMarked(BMenuItem *item)
 {
 	if (IsRadioMode()) {
-		for (int32 i = 0; i < CountItems(); i++)
-			if (ItemAt(i) != item) 
+		for (int32 i = 0; i < CountItems(); i++) {
+			if (ItemAt(i) != item)
 				ItemAt(i)->SetMarked(false);
+		}
 		InvalidateLayout();
 	}
-	
+
 	if (IsLabelFromMarked() && Superitem())
 		Superitem()->SetLabel(item->Label());
 }
 
 
 void
-BMenu::Install(BWindow *target)
+BMenu::_Install(BWindow *target)
 {
 	for (int32 i = 0; i < CountItems(); i++)
 		ItemAt(i)->Install(target);
@@ -2060,7 +2069,7 @@ BMenu::Install(BWindow *target)
 
 
 void
-BMenu::Uninstall()
+BMenu::_Uninstall()
 {
 	for (int32 i = 0; i < CountItems(); i++)
 		ItemAt(i)->Uninstall();
@@ -2077,18 +2086,18 @@ BMenu::_SelectItem(BMenuItem* menuItem, bool showSubmenu, bool selectFirstItem)
 			fSelected->Select(false);
 			BMenu *subMenu = fSelected->Submenu();
 			if (subMenu != NULL && subMenu->Window() != NULL)
-				subMenu->_hide();			
+				subMenu->_Hide();			
 		}
-		
+
 		fSelected = menuItem;
 		if (fSelected != NULL)
 			fSelected->Select(true);
 	}
-	
+
 	if (fSelected != NULL && showSubmenu) {
 		BMenu *subMenu = fSelected->Submenu();
 		if (subMenu != NULL && subMenu->Window() == NULL) {
-			if (!subMenu->_show(selectFirstItem)) {
+			if (!subMenu->_Show(selectFirstItem)) {
 				// something went wrong, deselect the item
 				fSelected->Select(false);
 				fSelected = NULL;
@@ -2098,33 +2107,26 @@ BMenu::_SelectItem(BMenuItem* menuItem, bool showSubmenu, bool selectFirstItem)
 }
 
 
-BMenuItem *
-BMenu::CurrentSelection() const
-{
-	return fSelected;
-}
-
-
 bool 
-BMenu::SelectNextItem(BMenuItem *item, bool forward)
+BMenu::_SelectNextItem(BMenuItem *item, bool forward)
 {
-	BMenuItem *nextItem = NextItem(item, forward);
+	BMenuItem *nextItem = _NextItem(item, forward);
 	if (nextItem == NULL)
 		return false;
-	
+
 	_SelectItem(nextItem);
 	return true;
 }
 
 
 BMenuItem *
-BMenu::NextItem(BMenuItem *item, bool forward) const
+BMenu::_NextItem(BMenuItem *item, bool forward) const
 {
 	if (item == NULL) {
 		if (forward)
 			return ItemAt(CountItems() - 1);
-		else
-			return ItemAt(0);
+
+		return ItemAt(0);
 	}
 
 	int32 index = fItems.IndexOf(item);
@@ -2132,35 +2134,23 @@ BMenu::NextItem(BMenuItem *item, bool forward) const
 		index++;
 	else
 		index--;
-		
+
 	if (index < 0 || index >= fItems.CountItems())
 		return NULL;
 
-	return ItemAt(index);	
-}
-
-
-bool 
-BMenu::IsItemVisible(BMenuItem *item) const
-{
-	BRect itemFrame = item->Frame();
-	ConvertToScreen(&itemFrame);
-	
-	BRect visibilityFrame = Window()->Frame() & BScreen(Window()).Frame();
-		
-	return visibilityFrame.Intersects(itemFrame);
+	return ItemAt(index);
 }
 
 
 void 
-BMenu::SetIgnoreHidden(bool on)
+BMenu::_SetIgnoreHidden(bool on)
 {
 	fIgnoreHidden = on;
 }
 
 
 void
-BMenu::SetStickyMode(bool on)
+BMenu::_SetStickyMode(bool on)
 {
 	if (fStickyMode != on) {
 		// TODO: Ugly hack, but it needs to be done right here in this method
@@ -2178,70 +2168,82 @@ BMenu::SetStickyMode(bool on)
 	// If we are switching to sticky mode, propagate the status
 	// back to the super menu
 	if (on && fSuper != NULL)
-		fSuper->SetStickyMode(on);
+		fSuper->_SetStickyMode(on);
 }
 
 
 bool
-BMenu::IsStickyMode() const
+BMenu::_IsStickyMode() const
 {
 	return fStickyMode;
 }
 
 
 void
-BMenu::CalcTriggers()
+BMenu::_CalcTriggers()
 {
-	BList triggersList;
-	
-	// Gathers the existing triggers
-	// TODO: Oh great, reinterpret_cast.
+	BPrivate::TriggerList triggerList;
+
+	// Gathers the existing triggers set by the user
 	for (int32 i = 0; i < CountItems(); i++) {
 		char trigger = ItemAt(i)->Trigger();
 		if (trigger != 0)
-			triggersList.AddItem(reinterpret_cast<void *>((uint32)trigger));
+			triggerList.AddTrigger(trigger);
 	}
 
 	// Set triggers for items which don't have one yet
 	for (int32 i = 0; i < CountItems(); i++) {
 		BMenuItem *item = ItemAt(i);
 		if (item->Trigger() == 0) {
-			const char *newTrigger = ChooseTrigger(item->Label(), &triggersList);
-			if (newTrigger != NULL)
-				item->SetAutomaticTrigger(*newTrigger);			
+			uint32 trigger;
+			int32 index;
+			if (_ChooseTrigger(item->Label(), index, trigger, triggerList))
+				item->SetAutomaticTrigger(index, trigger);
 		}
 	}
 }
 
 
-const char *
-BMenu::ChooseTrigger(const char *title, BList *chars)
+bool
+BMenu::_ChooseTrigger(const char *title, int32& index, uint32& trigger,
+	BPrivate::TriggerList& triggers)
 {
-	ASSERT(chars != NULL);
-	
 	if (title == NULL)
-		return NULL;
+		return false;
 
-	char trigger;
-	// TODO: Oh great, reinterpret_cast all around
-	while ((trigger = title[0]) != '\0') {
-		if (isalpha(trigger) 
-			&& !chars->HasItem(reinterpret_cast<void *>((uint32)trigger))) {
-			chars->AddItem(reinterpret_cast<void *>((uint32)trigger));
-			return title;
+	uint32 c;
+
+	// two runs: first we look out for uppercase letters
+	// TODO: support Unicode characters correctly!
+
+	for (uint32 i = 0; (c = title[i]) != '\0'; i++) {
+		if (!IsInsideGlyph(c) && isupper(c) && !triggers.HasTrigger(c)) {
+			index = i;
+			trigger = tolower(c);
+			return triggers.AddTrigger(c);;
 		}
-
-		title++;
 	}
 
-	return NULL;
+	// then, if we still haven't found anything, we accept them all
+
+	index = 0;
+	while ((c = UTF8ToCharCode(&title)) != 0) {
+		if (!isspace(c) && !triggers.HasTrigger(c)) {
+			trigger = tolower(c);
+			return triggers.AddTrigger(c);;
+		}
+
+		index++;
+	}
+
+	return false;
 }
 
 
 void
-BMenu::UpdateWindowViewSize(bool upWind)
+BMenu::_UpdateWindowViewSize(bool updatePosition)
 {
-	BWindow *window = Window();	
+	BMenuWindow *window = static_cast<BMenuWindow *>(Window());	
 	if (window == NULL)
 		return;
 
@@ -2252,8 +2254,9 @@ BMenu::UpdateWindowViewSize(bool upWind)
 		return;
 
 	bool scroll;
-	const BPoint screenLocation = upWind ? ScreenLocation() : window->Frame().LeftTop();
-	BRect frame = CalcFrame(screenLocation, &scroll);
+	const BPoint screenLocation = updatePosition ? ScreenLocation()
+		: window->Frame().LeftTop();
+	BRect frame = _CalcFrame(screenLocation, &scroll);
 	ResizeTo(frame.Width(), frame.Height());
 
 	if (fItems.CountItems() > 0) {
@@ -2263,67 +2266,53 @@ BMenu::UpdateWindowViewSize(bool upWind)
 			BScreen screen(window);
 
 			// If we need scrolling, resize the window to fit the screen and
-			// attach scrollers to our cached MenuWindow.
+			// attach scrollers to our cached BMenuWindow.
 			if (dynamic_cast<BMenuBar *>(Supermenu()) == NULL) {
 				window->ResizeTo(Bounds().Width() + 2, screen.Frame().bottom);
 				frame.top = 0;
 			} else {
 				// Or, in case our parent was a BMenuBar enable scrolling with 
 				// normal size.
-				window->ResizeTo(Bounds().Width() + 2, screen.Frame().bottom - frame.top);
+				window->ResizeTo(Bounds().Width() + 2, screen.Frame().bottom
+					- frame.top);
 			}
-			
-			static_cast<BMenuWindow *>(window)->AttachScrollers();
+
+			window->AttachScrollers();
 		}
 	} else {
-		CacheFontInfo();
+		_CacheFontInfo();
 		window->ResizeTo(StringWidth(kEmptyMenuLabel) + fPad.left + fPad.right,
-						fFontHeight + fPad.top + fPad.bottom);
+			fFontHeight + fPad.top + fPad.bottom);
 	}
-	
-	if (upWind)
+
+	if (updatePosition)
 		window->MoveTo(frame.LeftTop());
 }
 
 
 bool
-BMenu::IsStickyPrefOn()
+BMenu::_OkToProceed(BMenuItem* item)
 {
-	return true;
-}
-
-
-void
-BMenu::RedrawAfterSticky(BRect bounds)
-{
-}
-
-
-bool
-BMenu::OkToProceed(BMenuItem* item)
-{
-	bool proceed = true;
 	BPoint where;
 	ulong buttons;
 	GetMouse(&where, &buttons, false);
-	bool stickyMode = IsStickyMode();
+	bool stickyMode = _IsStickyMode();
 	// Quit if user clicks the mouse button in sticky mode
 	// or releases the mouse button in nonsticky mode
 	// or moves the pointer over another item
 	// TODO: I added the check for BMenuBar to solve a problem with Deskbar.
-	// Beos seems to do something similar. This could also be a bug in Deskbar, though.
+	// BeOS seems to do something similar. This could also be a bug in Deskbar, though.
 	if ((buttons != 0 && stickyMode)
-		|| (dynamic_cast<BMenuBar *>(this) == NULL && (buttons == 0 && !stickyMode)
-		|| HitTestItems(where) != item))
-		proceed = false;
-	
+		|| (dynamic_cast<BMenuBar *>(this) == NULL
+			&& (buttons == 0 && !stickyMode) || _HitTestItems(where) != item))
+		return false;
 
-	return proceed;
+	return true;
 }
 
 
 bool
-BMenu::CustomTrackingWantsToQuit()
+BMenu::_CustomTrackingWantsToQuit()
 {
 	if (fExtraMenuData != NULL && fExtraMenuData->trackingHook != NULL
 		&& fExtraMenuData->trackingState != NULL) {
@@ -2346,70 +2335,7 @@ BMenu::QuitTracking()
 }
 
 
-status_t 
-BMenu::ParseMsg(BMessage *msg, int32 *sindex, BMessage *spec,
-						 int32 *form, const char **prop, BMenu **tmenu,
-						 BMenuItem **titem, int32 *user_data,
-						 BMessage *reply) const
-{
-	return B_ERROR;
-}
-
-
-status_t
-BMenu::DoMenuMsg(BMenuItem **next, BMenu *menu, BMessage *message,
-						  BMessage *r, BMessage *spec, int32 f) const
-{
-	return B_ERROR;
-}
-
-
-status_t
-BMenu::DoMenuItemMsg(BMenuItem **next, BMenu *menu, BMessage *message,
-							  BMessage *r, BMessage *spec, int32 f) const
-{
-	return B_ERROR;
-}
-
-
-status_t 
-BMenu::DoEnabledMsg(BMenuItem *ti, BMenu *tm, BMessage *m,
-							 BMessage *r) const
-{
-	return B_ERROR;
-}
-
-
-status_t
-BMenu::DoLabelMsg(BMenuItem *ti, BMenu *tm, BMessage *m,
-						   BMessage *r) const
-{
-	return B_ERROR;
-}
-
-
-status_t 
-BMenu::DoMarkMsg(BMenuItem *ti, BMenu *tm, BMessage *m,
-						  BMessage *r) const
-{
-	return B_ERROR;
-}
-
-
-status_t
-BMenu::DoDeleteMsg(BMenuItem *ti, BMenu *tm, BMessage *m,
-							BMessage *r) const
-{
-	return B_ERROR;
-}
-
-
-status_t
-BMenu::DoCreateMsg(BMenuItem *ti, BMenu *tm, BMessage *m,
-							BMessage *r, bool menu) const
-{
-	return B_ERROR;
-}
+//	#pragma mark -
 
 
 // TODO: Maybe the following two methods would fit better into InterfaceDefs.cpp

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku, Inc.
+ * Copyright 2001-2007, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -140,7 +140,7 @@ BMenuBar::Border() const
 void
 BMenuBar::Draw(BRect updateRect)
 {
-	if (RelayoutIfNeeded()) {
+	if (_RelayoutIfNeeded()) {
 		Invalidate();
 		return;
 	}
@@ -169,14 +169,14 @@ BMenuBar::Draw(BRect updateRect)
 	SetHighColor(color);
 		// revert to previous used color (cheap PushState()/PopState())
 
-	DrawItems(updateRect);
+	_DrawItems(updateRect);
 }
 
 
 void
 BMenuBar::AttachedToWindow()
 {
-	Install(Window());
+	_Install(Window());
 	Window()->SetKeyMenuBar(this);
 
 	BMenu::AttachedToWindow();
@@ -423,7 +423,7 @@ BMenuBar::TrackTask(void *arg)
 	BMenuBar *menuBar = data.menuBar;
 	if (data.useRect)
 		menuBar->fExtraRect = &data.rect;	
-	menuBar->SetStickyMode(data.sticky);
+	menuBar->_SetStickyMode(data.sticky);
 	
 	int32 action;
 	menuBar->Track(&action, data.menuIndex, data.showMenu);
@@ -481,24 +481,24 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 			break;
 
 		BPoint where;
-		ulong buttons;
+		uint32 buttons;
 		GetMouse(&where, &buttons, true);
 
-		BMenuItem *menuItem = HitTestItems(where, B_ORIGIN);
+		BMenuItem *menuItem = _HitTestItems(where, B_ORIGIN);
 		if (menuItem != NULL) {
 			// Select item if:
 			// - no previous selection
 			// - nonsticky mode and different selection,
 			// - clicked in sticky mode
 			if (fSelected == NULL
-				|| (!IsStickyMode() && menuItem != fSelected)
-				|| (buttons != 0 && IsStickyMode())) {
+				|| (!_IsStickyMode() && menuItem != fSelected)
+				|| (buttons != 0 && _IsStickyMode())) {
 				if (menuItem->Submenu() != NULL) {
 					if (menuItem->Submenu()->Window() == NULL) {
 						// open the menu if it's not opened yet
 						_SelectItem(menuItem);
-						if (IsStickyMode())
-							SetStickyMode(false);
+						if (_IsStickyMode())
+							_SetStickyMode(false);
 					} else {
 						// Menu was already opened, close it and bail
 						_SelectItem(NULL);
@@ -512,25 +512,27 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 			}
 		}
 
-		if (OverSubmenu(fSelected, ConvertToScreen(where))) {
-			// call _track() from the selected sub-menu when the mouse cursor
+		if (_OverSubmenu(fSelected, ConvertToScreen(where))) {
+			// call _Track() from the selected sub-menu when the mouse cursor
 			// is over its window
 			BMenu *menu = fSelected->Submenu();
 			window->Unlock();
 			locked = false;
 			snoozeAmount = 30000;
-			bool wasSticky = IsStickyMode();
+			bool wasSticky = _IsStickyMode();
 			if (wasSticky)
-				menu->SetStickyMode(true);
+				menu->_SetStickyMode(true);
 			int localAction;
-			fChosenItem = menu->_track(&localAction);
-			if (menu->State(NULL) == MENU_STATE_TRACKING && menu->IsStickyMode())
-				menu->SetStickyMode(false);
+			fChosenItem = menu->_Track(&localAction);
+			if (menu->State(NULL) == MENU_STATE_TRACKING
+				&& menu->_IsStickyMode())
+				menu->_SetStickyMode(false);
 
 			// check if the user started holding down a mouse button in a submenu
-			if (wasSticky && !IsStickyMode())
+			if (wasSticky && !_IsStickyMode()) {
 				buttons = 1;
 					// buttons must have been pressed in the meantime
+			}
 
 			// This code is needed to make menus
 			// that are children of BMenuFields "sticky" (see ticket #953)
@@ -541,7 +543,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 				// TODO: Maybe have a shared struct between all menus
 				// where to store the current mouse position ? 				
 				BPoint newWhere;
-				ulong newButtons;
+				uint32 newButtons;
 				if (window->Lock()) {
 					GetMouse(&newWhere, &newButtons);
 					window->Unlock();
@@ -550,50 +552,50 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 				if (fExtraRect != NULL && fExtraRect->Contains(where)
 					// 9 = 3 pixels ^ 2 (since point_distance() returns the square of the distance)					
 					&& point_distance(newWhere, where) < 9) {
-					SetStickyMode(true);
+					_SetStickyMode(true);
 					fExtraRect = NULL;				
 				} else
 					fState = MENU_STATE_CLOSED;
 			}
-			
 		} else if (menuItem == NULL && fSelected != NULL
-			&& !IsStickyMode() && fState != MENU_STATE_TRACKING_SUBMENU) {
+			&& !_IsStickyMode() && fState != MENU_STATE_TRACKING_SUBMENU) {
 			_SelectItem(NULL);
 			fState = MENU_STATE_TRACKING;
 		}
-		
+
 		if (locked)
 			window->Unlock();
 
 		if (fState == MENU_STATE_CLOSED 
-			|| (buttons != 0 && IsStickyMode() && menuItem == NULL))
+			|| (buttons != 0 && _IsStickyMode() && menuItem == NULL))
 			break;
-		else if (buttons == 0 && !IsStickyMode()) {
-			if ((fSelected != NULL && fSelected->Submenu() == NULL) || menuItem == NULL) {
+		else if (buttons == 0 && !_IsStickyMode()) {
+			if ((fSelected != NULL && fSelected->Submenu() == NULL)
+				|| menuItem == NULL) {
 				fChosenItem = fSelected;
 				break;
 			} else
-				SetStickyMode(true);
+				_SetStickyMode(true);
 		}
 
 		if (snoozeAmount > 0)
 			snooze(snoozeAmount);		
 	}
-	
+
 	if (window->Lock()) {
 		if (fSelected != NULL)
 			_SelectItem(NULL);	
-		
+
 		if (fChosenItem != NULL)
 			fChosenItem->Invoke();
 		RestoreFocus();
 		window->Unlock();
 	}
 
-	if (IsStickyMode())
-		SetStickyMode(false);
+	if (_IsStickyMode())
+		_SetStickyMode(false);
 
-	DeleteMenuWindow();
+	_DeleteMenuWindow();
 
 	if (action != NULL)
 		*action = fState;
@@ -602,13 +604,13 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 }
 
 
-void 
+void
 BMenuBar::StealFocus()
 {
 	// We already stole the focus, don't do anything
 	if (fPrevFocusToken != -1)
 		return;
-	
+
 	BWindow *window = Window();
 	if (window != NULL && window->Lock()) {
 		BView *focus = window->CurrentFocus();
@@ -646,5 +648,5 @@ BMenuBar::InitData(menu_layout layout)
 {
 	fLastBounds = new BRect(Bounds());
 	SetItemMargins(8, 2, 8, 2);
-	SetIgnoreHidden(true);
+	_SetIgnoreHidden(true);
 }
