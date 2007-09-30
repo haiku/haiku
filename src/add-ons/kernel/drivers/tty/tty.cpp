@@ -1099,7 +1099,16 @@ tty_notify_if_available(struct tty *tty, struct tty *otherTTY,
 	if (!tty)
 		return;
 
-	int32 readable = line_buffer_readable(tty->input_buffer);
+	// Check, if something is readable (depending on whether canonical input
+	// processing is enabled).
+	int32 readable;
+	if (!tty->is_master && (tty->settings->termios.c_lflag & ICANON) != 0) {
+		readable = line_buffer_readable_line(tty->input_buffer,
+			tty->settings->termios.c_cc[VEOL],
+			tty->settings->termios.c_cc[VEOF]);
+	} else
+		readable = line_buffer_readable(tty->input_buffer);
+
 	if (readable > 0) {
 		// if nobody is waiting send select events, otherwise notify the waiter
 		if (!tty->reader_queue.IsEmpty())
