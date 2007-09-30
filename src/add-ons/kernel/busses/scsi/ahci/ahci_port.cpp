@@ -15,7 +15,8 @@
 #include <string.h>
 
 #define TRACE(a...) dprintf("\33[34mahci:\33[0m " a)
-#define FLOW(a...)	dprintf("ahci: " a)
+// #define FLOW(a...)	dprintf("ahci: " a)
+#define FLOW(a...)
 
 
 AHCIPort::AHCIPort(AHCIController *controller, int index)
@@ -301,7 +302,7 @@ AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const 
 	while (sgCount > 0 && dataSize > 0) {
 		size_t size = min_c(sgTable->size, dataSize);
 		void *address = sgTable->address;
-		TRACE("FillPrdTable: sg-entry addr %p, size %lu\n", address, size);
+		FLOW("FillPrdTable: sg-entry addr %p, size %lu\n", address, size);
 		if ((uint32)address & 1) {
 			TRACE("AHCIPort::FillPrdTable: data alignment error\n");
 			return B_ERROR;
@@ -313,7 +314,7 @@ AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const 
 				TRACE("AHCIPort::FillPrdTable: prd table exhausted\n");
 				return B_ERROR;
 			}
-			TRACE("FillPrdTable: prd-entry %u, addr %p, size %lu\n", *prdCount, address, bytes);
+			FLOW("FillPrdTable: prd-entry %u, addr %p, size %lu\n", *prdCount, address, bytes);
 			prdTable->dba  = LO32(address);
 			prdTable->dbau = HI32(address);
 			prdTable->res  = 0;
@@ -326,8 +327,16 @@ AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const 
 		sgTable++;
 		sgCount--;
 	}
+	if (*prdCount == 0) {
+		TRACE("AHCIPort::FillPrdTable: count is 0\n");
+		return B_ERROR;
+	}
+	if (dataSize > 0) {
+		TRACE("AHCIPort::FillPrdTable: sg table %ld bytes too small\n", dataSize);
+		return B_ERROR;
+	}
 	if (ioc)
-		prdTable->dbc |= DBC_I;
+		(prdTable - 1)->dbc |= DBC_I;
 	return B_OK;
 }
 
@@ -358,87 +367,6 @@ AHCIPort::FinishTransfer()
 	release_sem(fRequestSem);
 }
 
-/*
-void
-AHCIPort::IdentifyDevice(scsi_ccb *request)
-{
-	TRACE("AHCIPort::IdentifyDevice port %d\n", fIndex);
-
-	void *phy; 
-	uint8 *data;
-	int size = 512;
-
-	area_id id = alloc_mem((void **)&data, &phy, size, 0, "identify device");
-
-	TRACE("virt   0x%08lx\n", data);
-	TRACE("phys   0x%08lx\n", phy);
-
-	memset(data, 0, size);
-
-	TRACE("ci   0x%08lx\n", fRegs->ci);
-	TRACE("ie   0x%08lx\n", fRegs->ie);
-	TRACE("is   0x%08lx\n", fRegs->is);
-	TRACE("cmd  0x%08lx\n", fRegs->cmd);
-	TRACE("ssts 0x%08lx\n", fRegs->ssts);
-	TRACE("sctl 0x%08lx\n", fRegs->sctl);
-	TRACE("serr 0x%08lx\n", fRegs->serr);
-	TRACE("sact 0x%08lx\n", fRegs->sact);
-	TRACE("tfd  0x%08lx\n", fRegs->tfd);
-
-
-	memset((void *)fCommandTable->cfis, 0, 5 * 4);
-	fCommandTable->cfis[0] = 0x27;
-	fCommandTable->cfis[1] = 0x80;
-	fCommandTable->cfis[2] = 0xec;
-
-
-	fCommandList->prdtl_flags_cfl = 0;
-	fCommandList->prdtl = 1;
-//	fCommandList->c = 1;
-	fCommandList->cfl = 5;
-	fCommandList->prdbc = 0;
-
-	TRACE("prdtl_flags_cfl %08x\n", fCommandList->prdtl_flags_cfl);
-	TRACE("prdbc           %08x\n", fCommandList->prdbc);
-
-
-	fPRDTable->dba = LO32(phy);
-	fPRDTable->dbau = HI32(phy);
-	fPRDTable->dbc = DBC_I | (size - 1);
-
-	TRACE("dba  %08x\n", fPRDTable->dba);
-	TRACE("dbau %08x\n", fPRDTable->dbau);
-	TRACE("dbc  %08x\n", fPRDTable->dbc);
-
-	fRegs->ci |= 1;
-	FlushPostedWrites();
-
-	snooze(500000);
-
-	TRACE("prdbc %ld\n", fCommandList->prdbc);
-
-	TRACE("ci   0x%08lx\n", fRegs->ci);
-	TRACE("ie   0x%08lx\n", fRegs->ie);
-	TRACE("is   0x%08lx\n", fRegs->is);
-	TRACE("cmd  0x%08lx\n", fRegs->cmd);
-	TRACE("ssts 0x%08lx\n", fRegs->ssts);
-	TRACE("sctl 0x%08lx\n", fRegs->sctl);
-	TRACE("serr 0x%08lx\n", fRegs->serr);
-	TRACE("sact 0x%08lx\n", fRegs->sact);
-	TRACE("tfd  0x%08lx\n", fRegs->tfd);
-
-	for (int i = 0; i < size; i += 8) {
-		TRACE("  %02x %02x %02x %02x %02x %02x %02x %02x\n", data[i], data[i+1], data[i+2], data[i+3], data[i+4], data[i+5], data[i+6], data[i+7]);
-//		TRACE("  %c%c%c%c%c%c%c%c\n", c(data[i]), c(data[i+1]), c(data[i+2]), c(data[i+3]), c(data[i+4]), c(data[i+5]), c(data[i+6]), c(data[i+7]));
-	}
-
-	delete_area(id);
-
-	request->subsys_status = SCSI_REQ_CMP;
-	gSCSI->finished(request, 1);
-
-}
-*/
 
 void
 AHCIPort::ScsiTestUnitReady(scsi_ccb *request)
@@ -460,6 +388,8 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 
 	if (cmd->evpd || cmd->page_code) {
 		TRACE("invalid request\n");
+		request->subsys_status = SCSI_REQ_ABORTED;
+		gSCSI->finished(request, 1);
 		return;
 	}
 
@@ -484,6 +414,13 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	fCommandList->cfl = 5;
 	fCommandList->prdbc = 0;
 
+	if (wait_until_clear(&fRegs->tfd, ATA_BSY | ATA_DRQ, 4000000) < B_OK) {
+		TRACE("device is busy\n");
+		FinishTransfer();
+		request->subsys_status = SCSI_REQ_ABORTED;
+		gSCSI->finished(request, 1);
+		return;
+	}
 	fRegs->ci |= 1;
 	FlushPostedWrites();
 
@@ -551,9 +488,9 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	swap_words(ataData.serial_number, sizeof(ataData.serial_number));
 	swap_words(ataData.firmware_revision, sizeof(ataData.firmware_revision));
 
-	TRACE("model_number: %.40s\n", ataData.model_number);
-	TRACE("serial_number: %.20s\n", ataData.serial_number);
-	TRACE("firmware_revision: %.8s\n", ataData.firmware_revision);
+	TRACE("model_number: %40s\n", ataData.model_number);
+	TRACE("serial_number: %20s\n", ataData.serial_number);
+  	TRACE("firmware_revision: %8s\n", ataData.firmware_revision);
 	TRACE("lba %d, lba48 %d, fUse48BitCommands %d, sectors %lu, sectors48 %llu, size %llu\n",
 		lba, lba48, fUse48BitCommands, sectors, sectors48, fSectorCount * fSectorSize);
 
@@ -624,7 +561,7 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 position, size_t length, bool 
 	int prdEntrys;
 	FillPrdTable(fPRDTable, &prdEntrys, PRD_TABLE_ENTRY_COUNT, request->sg_list, request->sg_count, length * 512, true);
 
-	TRACE("prdEntrys %d\n", prdEntrys);
+	FLOW("prdEntrys %d\n", prdEntrys);
 	
 	memset((void *)fCommandTable->cfis, 0, 5 * 4);
 
@@ -661,6 +598,13 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 position, size_t length, bool 
 	fCommandList->cfl = 5;
 	fCommandList->prdbc = 0;
 
+	if (wait_until_clear(&fRegs->tfd, ATA_BSY | ATA_DRQ, 4000000) < B_OK) {
+		TRACE("device is busy\n");
+		FinishTransfer();
+		request->subsys_status = SCSI_REQ_ABORTED;
+		gSCSI->finished(request, 1);
+		return;
+	}
 	fRegs->ci |= 1;
 	FlushPostedWrites();
 
