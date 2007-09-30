@@ -71,6 +71,9 @@ UnzipArchiveToHaikuImage develop tools
 # via wget (i.e. wget must be installed).
 AddOptionalHaikuImagePackages WonderBrush ;
 
+# Adds the optional package Vision to the image. See above.
+AddOptionalHaikuImagePackages Vision ;
+
 # Add all available optional packages.
 HAIKU_ADD_ALL_OPTIONAL_PACKAGES = 1 ;
 

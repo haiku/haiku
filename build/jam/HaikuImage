@@ -416,6 +416,16 @@ AddDirectoryToHaikuImage home config settings printers "Save as PDF"
 #pragma mark - Optional Packages
 
 
+# Vision
+if [ IsOptionalHaikuImagePackageAdded Vision ] {
+	InstallOptionalHaikuImagePackage Vision
+		: http://vision.sourceforge.net/Vision-0.9.7-SF-01052007.zip
+		: apps
+	;
+	AddSymlinkToHaikuImage home config be Applications
+		: /boot/apps/Vision-0.9.7-SF-01052007/Vision ;
+}
+
 # WonderBrush
 if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
 	InstallOptionalHaikuImagePackage WonderBrush
