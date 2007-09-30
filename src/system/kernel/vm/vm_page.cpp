@@ -61,6 +61,7 @@ static size_t sReservedPages;
 static ConditionVariable<page_queue> sFreePageCondition;
 static spinlock sPageLock;
 
+static sem_id sThiefWaitSem;
 static sem_id sWriterWaitSem;
 
 
@@ -713,7 +714,7 @@ page_writer(void* /*unused*/)
 
 			locker.Unlock();
 
-			//dprintf("write page %p\n", page);
+			//dprintf("write page %p, cache %p (%ld)\n", page, page->cache, page->cache->ref_count);
 			vm_clear_map_flags(page, PAGE_MODIFIED);
 			vm_cache_acquire_ref(page->cache);
 			pages[numPages++] = page;
@@ -759,79 +760,123 @@ page_writer(void* /*unused*/)
 }
 
 
-static void
-page_thief(void* /*unused*/, int32 level)
+static status_t
+page_thief(void* /*unused*/)
 {
-	uint32 steal;
-	int32 score;
+	bigtime_t timeout = B_INFINITE_TIMEOUT;
 
-	switch (level) {
-		default:
-		case B_LOW_MEMORY_NOTE:
-			steal = 10;
-			score = -20;
-			break;
-		case B_LOW_MEMORY_WARNING:
-			steal = 50;
-			score = -5;
-			break;
-		case B_LOW_MEMORY_CRITICAL:
-			steal = 500;
-			score = -1;
-			break;
-	}
+	while (true) {
+		acquire_sem_etc(sThiefWaitSem, 1, B_RELATIVE_TIMEOUT, timeout);
 
-	vm_page* page = NULL;
-	InterruptsSpinLocker locker(sPageLock);
+		int32 state = vm_low_memory_state();
+		uint32 steal;
+		int32 score;
+		switch (state) {
+			default:
+				timeout = B_INFINITE_TIMEOUT;
+				continue;
 
-	while (steal > 0) {
-		if (!locker.IsLocked())
-			locker.Lock();
-
-		// find a candidate to steal from the inactive queue
-
-		for (int32 i = sActivePageQueue.count; i-- > 0;) {
-			// move page to the tail of the queue so that we don't
-			// scan it again directly
-			page = dequeue_page(&sActivePageQueue);
-			enqueue_page(&sActivePageQueue, page);
-
-			if (page->state == PAGE_STATE_INACTIVE
-				&& page->usage_count <= score)
+			case B_LOW_MEMORY_NOTE:
+				steal = 10;
+				score = -20;
+				timeout = 1000000;
+				break;
+			case B_LOW_MEMORY_WARNING:
+				steal = 50;
+				score = -5;
+				timeout = 1000000;
+				break;
+			case B_LOW_MEMORY_CRITICAL:
+				steal = 500;
+				score = -1;
+				timeout = 100000;
 				break;
 		}
+		//dprintf("page thief running - target %ld...\n", steal);
 
-		if (page == NULL) {
-			if (score == 0)
-				break;
+		vm_page* page = NULL;
+		bool stealActive = false;
+		InterruptsSpinLocker locker(sPageLock);
 
-			score = 0;
-			continue;
-		}
+		while (steal > 0) {
+			if (!locker.IsLocked())
+				locker.Lock();
 
-		locker.Unlock();
+			// find a candidate to steal from the inactive queue
 
-		// try to lock the page's cache
+			for (int32 i = sActivePageQueue.count; i-- > 0;) {
+				// move page to the tail of the queue so that we don't
+				// scan it again directly
+				page = dequeue_page(&sActivePageQueue);
+				enqueue_page(&sActivePageQueue, page);
 
-		vm_cache* cache = vm_cache_acquire_page_cache_ref(page);
-		if (cache == NULL)
-			continue;
+				if ((page->state == PAGE_STATE_INACTIVE
+						|| stealActive && page->state == PAGE_STATE_ACTIVE)
+					&& page->usage_count <= score)
+					break;
+			}
 
-		if (mutex_trylock(&cache->lock) != B_OK
-			|| page->state != PAGE_STATE_INACTIVE) {
+			if (page == NULL) {
+				if (score == 0) {
+					if (state != B_LOW_MEMORY_CRITICAL)
+						break;
+					if (stealActive && score > 5)
+						break;
+
+					// when memory is really low, we really want pages
+					if (stealActive)
+						score = 127;
+					else {
+						stealActive = true;
+						score = 5;
+						steal = 5;
+					}
+					continue;
+				}
+
+				score = 0;
+				continue;
+			}
+
+			locker.Unlock();
+
+			// try to lock the page's cache
+
+			vm_cache* cache = vm_cache_acquire_page_cache_ref(page);
+			if (cache == NULL)
+				continue;
+
+			if (mutex_trylock(&cache->lock) != B_OK) {
+				vm_cache_release_ref(cache);
+				continue;
+			}
+			if (page->state != PAGE_STATE_INACTIVE) {
+				mutex_unlock(&cache->lock);
+				vm_cache_release_ref(cache);
+				continue;
+			}
+
+			// we can now steal this page
+
+			//dprintf("  steal page %p from cache %p\n", page, cache);
+			vm_remove_all_page_mappings(page);
+			vm_cache_remove_page(cache, page);
+			vm_page_set_state(page, PAGE_STATE_FREE);
+			steal--;
+
+			mutex_unlock(&cache->lock);
 			vm_cache_release_ref(cache);
-			continue;
 		}
-
-		// we can now steal this page
-
-		vm_cache_remove_page(cache, page);
-		vm_page_set_state(page, PAGE_STATE_FREE);
-		steal--;
-
-		mutex_unlock(&cache->lock);
-		vm_cache_release_ref(cache);
 	}
+
+	return B_OK;
+}
+
+
+static void
+schedule_page_thief(void* /*unused*/, int32 level)
+{
+	release_sem(sThiefWaitSem);
 }
 
 
@@ -878,9 +923,7 @@ vm_page_write_modified_pages(vm_cache *cache, bool fsReenter)
 		vm_clear_map_flags(page, PAGE_MODIFIED);
 
 		mutex_unlock(&cache->lock);
-
 		status_t status = write_page(page, fsReenter);
-
 		mutex_lock(&cache->lock);
 
 		InterruptsSpinLocker locker(&sPageLock);
@@ -1032,20 +1075,25 @@ vm_page_init_post_thread(kernel_args *args)
 	thread_id thread;
 
 	// create a kernel thread to clear out pages
-	thread = spawn_kernel_thread(&page_scrubber, "page scrubber", B_LOWEST_ACTIVE_PRIORITY, NULL);
+	thread = spawn_kernel_thread(&page_scrubber, "page scrubber",
+		B_LOWEST_ACTIVE_PRIORITY, NULL);
 	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
 
 	new (&sFreePageCondition) ConditionVariable<page_queue>;
 	sFreePageCondition.Publish(&sFreePageQueue, "free page");
 
-	register_low_memory_handler(page_thief, NULL, 0);
-
 	sWriterWaitSem = create_sem(0, "page writer");
+	sThiefWaitSem = create_sem(0, "page thief");
 
 	thread = spawn_kernel_thread(&page_writer, "page writer",
 		B_LOW_PRIORITY, NULL);
 	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
 
+	thread = spawn_kernel_thread(&page_thief, "page thief",
+		B_LOW_PRIORITY, NULL);
+	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
+
+	register_low_memory_handler(schedule_page_thief, NULL, 100);
 	return B_OK;
 }
 
