@@ -419,7 +419,7 @@ AddDirectoryToHaikuImage home config settings printers "Save as PDF"
 # WonderBrush
 if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
 	InstallOptionalHaikuImagePackage WonderBrush
-		: http://www.yellowbites.com/downloads/WonderBrush-2.0.2-demo-x86-R5.zip
+		: http://www.yellowbites.com/downloads/WonderBrush-2.1.1-demo-x86-R5.zip
 		: apps
 	;
 	AddSymlinkToHaikuImage home config be Applications
