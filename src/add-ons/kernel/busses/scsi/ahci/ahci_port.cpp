@@ -275,6 +275,12 @@ AHCIPort::Interrupt()
 
 	FLOW("AHCIPort::Interrupt port %d, fCommandsActive 0x%08lx, is 0x%08lx, ci 0x%08lx\n", fIndex, fCommandsActive, is, ci);
 
+	if (is & PORT_INT_ERROR)
+		TRACE("AHCIPort::Interrupt port %d, fCommandsActive 0x%08lx, is 0x%08lx, ci 0x%08lx\n", fIndex, fCommandsActive, is, ci);
+	
+	if (is & PORT_INT_FATAL)
+		panic("ahci fatal error, is 0x%08lx", is);
+
 	int release = 0;
 
 	acquire_spinlock(&fSpinlock);
@@ -283,9 +289,6 @@ AHCIPort::Interrupt()
 		fCommandsActive &= ~1;
 	}
 	release_spinlock(&fSpinlock);
-	
-	if (is & PORT_INT_FATAL)
-		panic("ahci fatal error, is 0x%08lx", is);
 
 	if (release)
 		release_sem_etc(fResponseSem, 1, B_RELEASE_IF_WAITING_ONLY | B_DO_NOT_RESCHEDULE);
@@ -495,7 +498,7 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	fSectorSize			= 512;
 	fSectorCount		= !(lba || sectors) ? 0 : lba48 ? sectors48 : sectors;
 
-#if 1
+#if 0
 	if (fSectorCount < 0x0fffffff) {
 		TRACE("disabling 48 bit commands\n");
 		fUse48BitCommands = 0;
@@ -573,7 +576,7 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 position, size_t length, bool 
 
 	TRACE("ScsiReadWrite: position %llu, size %lu, isWrite %d\n", position * 512, bytecount, isWrite);
 
-#if 1
+#if 0
 	if (isWrite) {
 		TRACE("write request ignored\n");
 		request->subsys_status = SCSI_REQ_CMP;
@@ -593,6 +596,8 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 position, size_t length, bool 
 	memset((void *)fCommandTable->cfis, 0, 5 * 4);
 
 	if (fUse48BitCommands) {
+		if (length > 65536)
+			panic("ahci: ScsiReadWrite length too large, %lu sectors", length);
 		fCommandTable->cfis[0] = 0x27;
 		fCommandTable->cfis[1] = 0x80;
 		fCommandTable->cfis[2] = isWrite ? 0x35 : 0x25;
@@ -607,7 +612,7 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 position, size_t length, bool 
 		fCommandTable->cfis[13] = (length >> 8) & 0xff;
 	} else {
 		if (length > 256)
-			panic("ahci: ScsiReadWrite length too large");
+			panic("ahci: ScsiReadWrite length too large, %lu sectors", length);
 		if (position > 0x0fffffff)
 			panic("achi: ScsiReadWrite position too large for non-48-bit LBA\n");
 		fCommandTable->cfis[0] = 0x27;
@@ -623,6 +628,8 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 position, size_t length, bool 
 	fCommandList->prdtl_flags_cfl = 0;
 	fCommandList->prdtl = prdEntrys;
 	fCommandList->cfl = 5;
+	if (isWrite) 
+		fCommandList->w = 1;
 	fCommandList->prdbc = 0;
 
 	if (wait_until_clear(&fRegs->tfd, ATA_BSY | ATA_DRQ, 4000000) < B_OK) {
