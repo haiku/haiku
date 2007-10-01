@@ -35,6 +35,11 @@ HAIKU_VMWARE_IMAGE_NAME	= walter.vmdk ;
 # Install Haiku in directory /Haiku.
 HAIKU_INSTALL_DIR = /Haiku ;
 
+# If the image does already exist it won't be zeroed out. It will nevertheless
+# freshly be initialized with BFS. Useful when installing Haiku on a partition.
+HAIKU_DONT_CLEAR_IMAGE = 1 ;
+
+
 # Affects the haiku-image, haiku-vmware-image, and install-haiku targets. Only
 # targets on which the HAIKU_INCLUDE_IN_IMAGE variable has been set will be
 # updated in the image file/installation directory.
