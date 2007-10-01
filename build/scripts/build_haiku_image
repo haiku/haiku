@@ -84,7 +84,7 @@ if [ $isImage ]; then
 	echo
 	if [ ! $updateOnly ]; then
 		echo "Creating image ..."
-		if [ ! -f $imagePath -o ! "$dontClearImage" ]; then
+		if [ ! -e $imagePath -o ! "$dontClearImage" ]; then
 			dd if=/dev/zero of=$imagePath bs=1048576 count=$imageSize
 		fi
 		$bfsShell --initialize $imagePath Haiku
