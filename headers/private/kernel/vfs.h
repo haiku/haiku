@@ -30,6 +30,7 @@ struct kernel_args;
 struct vm_cache;
 struct file_descriptor;
 struct selectsync;
+struct select_info;
 struct pollfd;
 struct vnode;
 
@@ -41,6 +42,7 @@ typedef struct io_context {
 	uint32		table_size;
 	uint32		num_used_fds;
 	struct file_descriptor **fds;
+	struct select_info **select_infos;
 	uint8		*fds_close_on_exec;
 	struct list node_monitors;
 	uint32		num_monitors;

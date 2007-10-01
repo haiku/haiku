@@ -5,14 +5,18 @@
  */
 
 
+#include <fd.h>
+
+#include <stdlib.h>
+#include <string.h>
+
 #include <OS.h>
 
-#include <fd.h>
-#include <vfs.h>
 #include <syscalls.h>
+#include <util/AutoLock.h>
+#include <vfs.h>
 
-#include <malloc.h>
-#include <string.h>
+#include "vfs_select.h"
 
 
 //#define TRACE_FD
@@ -21,6 +25,10 @@
 #else
 #	define TRACE(x)
 #endif
+
+
+static void deselect_select_infos(file_descriptor* descriptor,
+	select_info* infos);
 
 
 /*** General fd routines ***/
@@ -44,9 +52,8 @@ dump_fd(int fd,struct file_descriptor *descriptor)
 struct file_descriptor *
 alloc_fd(void)
 {
-	struct file_descriptor *descriptor;
-
-	descriptor = malloc(sizeof(struct file_descriptor));
+	file_descriptor *descriptor
+		= (file_descriptor*)malloc(sizeof(struct file_descriptor));
 	if (descriptor == NULL)
 		return NULL;
 
@@ -199,18 +206,13 @@ inc_fd_ref_count(struct file_descriptor *descriptor)
 }
 
 
-struct file_descriptor *
-get_fd(struct io_context *context, int fd)
+static struct file_descriptor *
+get_fd_locked(struct io_context *context, int fd)
 {
-	struct file_descriptor *descriptor = NULL;
-
-	if (fd < 0)
+	if (fd < 0 || (uint32)fd >= context->table_size)
 		return NULL;
 
-	mutex_lock(&context->io_mutex);
-
-	if ((uint32)fd < context->table_size)
-		descriptor = context->fds[fd];
+	struct file_descriptor *descriptor = context->fds[fd];
 
 	if (descriptor != NULL) {
 		// Disconnected descriptors cannot be accessed anymore
@@ -220,9 +222,16 @@ get_fd(struct io_context *context, int fd)
 			inc_fd_ref_count(descriptor);
 	}
 
-	mutex_unlock(&context->io_mutex);
-
 	return descriptor;
+}
+
+
+struct file_descriptor *
+get_fd(struct io_context *context, int fd)
+{
+	MutexLocker(context->io_mutex);
+
+	return get_fd_locked(context, fd);
 }
 
 
@@ -242,19 +251,27 @@ remove_fd(struct io_context *context, int fd)
 	if ((uint32)fd < context->table_size)
 		descriptor = context->fds[fd];
 
+	select_info* selectInfos = NULL;
+	bool disconnected = false;
+
 	if (descriptor)	{
 		// fd is valid
 		context->fds[fd] = NULL;
 		fd_set_close_on_exec(context, fd, false);
 		context->num_used_fds--;
 
-		if (descriptor->open_mode & O_DISCONNECTED)
-			descriptor = NULL;
+		selectInfos = context->select_infos[fd];
+		context->select_infos[fd] = NULL;
+
+		disconnected = (descriptor->open_mode & O_DISCONNECTED);
 	}
 
 	mutex_unlock(&context->io_mutex);
 
-	return descriptor;
+	if (selectInfos != NULL)
+		deselect_select_infos(descriptor, selectInfos);
+
+	return disconnected ? NULL : descriptor;
 }
 
 
@@ -292,7 +309,6 @@ dup_fd(int fd, bool kernel)
  *
  *	We do dup2() directly to be thread-safe.
  */
-
 static int
 dup2_fd(int oldfd, int newfd, bool kernel)
 {
@@ -321,9 +337,12 @@ dup2_fd(int oldfd, int newfd, bool kernel)
 	// Check for identity, note that it cannot be made above
 	// because we always want to return an error on invalid
 	// handles
+	select_info* selectInfos = NULL;
 	if (oldfd != newfd) {
 		// Now do the work
 		evicted = context->fds[newfd];
+		selectInfos = context->select_infos[newfd];
+		context->select_infos[newfd] = NULL;
 		atomic_add(&context->fds[oldfd]->ref_count, 1);
 		atomic_add(&context->fds[oldfd]->open_count, 1);
 		context->fds[newfd] = context->fds[oldfd];
@@ -338,6 +357,7 @@ dup2_fd(int oldfd, int newfd, bool kernel)
 
 	// Say bye bye to the evicted fd
 	if (evicted) {
+		deselect_select_infos(evicted, selectInfos);
 		close_fd(evicted);
 		put_fd(evicted);
 	}
@@ -366,50 +386,133 @@ fd_ioctl(bool kernelFD, int fd, ulong op, void *buffer, size_t length)
 }
 
 
-status_t
-select_fd(int fd, uint8 event, uint32 ref, struct select_sync *sync, bool kernel)
+static void
+deselect_select_infos(file_descriptor* descriptor, select_info* infos)
 {
-	struct file_descriptor *descriptor;
-	status_t status;
+	TRACE(("deselect_select_infos(%p, %p)\n", descriptor, infos));
 
-	TRACE(("select_fd(fd = %d, event = %u, ref = %lu, selectsync = %p)\n", fd, event, ref, sync));
+	select_info* info = infos;
+	while (info != NULL) {
+		select_sync* sync = info->sync;
 
-	descriptor = get_fd(get_current_io_context(kernel), fd);
-	if (descriptor == NULL)
-		return B_FILE_ERROR;
+		// deselect the selected events
+		if (descriptor->ops->fd_deselect && info->selected_events) {
+			for (uint16 event = 1; event < 16; event++) {
+				if (info->selected_events & SELECT_FLAG(event)) {
+					descriptor->ops->fd_deselect(descriptor, event,
+						(selectsync*)info);
+				}
+			}
+		}
 
-	if (descriptor->ops->fd_select) {
-		status = descriptor->ops->fd_select(descriptor, event, ref, sync);
-	} else {
-		// if the I/O subsystem doesn't support select(), we will
-		// immediately notify the select call
-		status = notify_select_event((void *)sync, ref, event);
+		info = info->next;
+		put_select_sync(sync);
 	}
-
-	put_fd(descriptor);
-	return status;
 }
 
 
 status_t
-deselect_fd(int fd, uint8 event, struct select_sync *sync, bool kernel)
+select_fd(int fd, struct select_sync* sync, uint32 ref, bool kernel)
 {
-	struct file_descriptor *descriptor;
-	status_t status;
+	TRACE(("select_fd(fd = %d, selectsync = %p, ref = %lu, 0x%x)\n", fd, sync, ref, sync->set[ref].selected_events));
 
-	TRACE(("deselect_fd(fd = %d, event = %u, selectsync = %p)\n", fd, event, sync));
+	select_info* info = &sync->set[ref];
+	if (info->selected_events == 0)
+		return B_OK;
 
-	descriptor = get_fd(get_current_io_context(kernel), fd);
+	io_context* context = get_current_io_context(kernel);
+	MutexLocker locker(context->io_mutex);
+
+	struct file_descriptor* descriptor = get_fd_locked(context, fd);
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
-	if (descriptor->ops->fd_deselect)
-		status = descriptor->ops->fd_deselect(descriptor, event, sync);
-	else
-		status = B_OK;
+	if (!descriptor->ops->fd_select) {
+		// if the I/O subsystem doesn't support select(), we will
+		// immediately notify the select call
+		locker.Unlock();
+		put_fd(descriptor);
+		return notify_select_events(info, info->selected_events);
+	}
+
+	// add the info to the IO context
+	info->next = context->select_infos[fd];
+	context->select_infos[fd] = info;
+
+	// as long as the info is in the list, we keep a reference to the sync
+	// object
+	atomic_add(&sync->ref_count, 1);
+
+	locker.Unlock();
+
+	// select any events asked for
+	uint32 selectedEvents = 0;
+
+	for (uint16 event = 1; event < 16; event++) {
+		if (info->selected_events & SELECT_FLAG(event)
+			&& descriptor->ops->fd_select(descriptor, event, ref,
+				(selectsync*)info) == B_OK) {
+			selectedEvents |= SELECT_FLAG(event);
+		}
+	}
+	info->selected_events = selectedEvents;
+
+	// if nothing has been selected, we deselect immediately
+	if (selectedEvents == 0)
+		deselect_fd(fd, sync, ref, kernel);
 
 	put_fd(descriptor);
-	return status;
+	return B_OK;
+}
+
+
+status_t
+deselect_fd(int fd, struct select_sync* sync, uint32 ref, bool kernel)
+{
+	TRACE(("deselect_fd(fd = %d, selectsync = %p, ref = %lu)\n", fd, sync, ref));
+
+	select_info* info = &sync->set[ref];
+	if (info->selected_events == 0)
+		return B_OK;
+
+	io_context* context = get_current_io_context(kernel);
+	MutexLocker locker(context->io_mutex);
+
+	struct file_descriptor* descriptor = get_fd_locked(context, fd);
+	if (descriptor == NULL)
+		return B_FILE_ERROR;
+
+	// remove the info from the IO context
+
+	select_info** infoLocation = &context->select_infos[fd];
+	while (*infoLocation != NULL && *infoLocation != info)
+		infoLocation = &(*infoLocation)->next;
+
+	// If not found, someone else beat us to it.
+	if (*infoLocation != info) {
+		locker.Unlock();
+		put_fd(descriptor);
+		return B_OK;
+	}
+
+	*infoLocation = info->next;
+
+	locker.Unlock();
+
+	// deselect the selected events
+	if (descriptor->ops->fd_deselect && info->selected_events) {
+		for (uint16 event = 1; event < 16; event++) {
+			if (info->selected_events & SELECT_FLAG(event)) {
+				descriptor->ops->fd_deselect(descriptor, event,
+					(selectsync*)info);
+			}
+		}
+	}
+
+	put_select_sync(sync);
+
+	put_fd(descriptor);
+	return B_OK;
 }
 
 
@@ -541,7 +644,7 @@ _user_readv(int fd, off_t pos, const iovec *userVecs, size_t count)
 		goto err1;
 	}
 
-	vecs = malloc(sizeof(iovec) * count);
+	vecs = (iovec*)malloc(sizeof(iovec) * count);
 	if (vecs == NULL) {
 		status = B_NO_MEMORY;
 		goto err1;
@@ -654,7 +757,7 @@ _user_writev(int fd, off_t pos, const iovec *userVecs, size_t count)
 		goto err1;
 	}
 
-	vecs = malloc(sizeof(iovec) * count);
+	vecs = (iovec*)malloc(sizeof(iovec) * count);
 	if (vecs == NULL) {
 		status = B_NO_MEMORY;
 		goto err1;

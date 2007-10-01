@@ -9,7 +9,7 @@ KernelMergeObject kernel_fs.o :
 	devfs.cpp
 	rootfs.c
 	pipefs.cpp
-	fd.c
+	fd.cpp
 	vfs.cpp
 	vfs_boot.cpp
 	vfs_net_boot.cpp
@@ -19,4 +19,4 @@ KernelMergeObject kernel_fs.o :
 	KPath.cpp
 
 	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
-	;
+;

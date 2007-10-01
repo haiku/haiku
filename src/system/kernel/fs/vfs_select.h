@@ -6,21 +6,29 @@
 #define VFS_SELECT_H
 
 
+#include <OS.h>
+
 #include <Select.h>
 #include <util/DoublyLinkedList.h>
 
-#include <OS.h>
+#include <lock.h>
 
+
+struct select_sync;
 
 typedef struct select_info {
-	uint16	selected_events;
-	uint16	events;
+	select_info*	next;				// next in the IO context's list
+	select_sync*	sync;
+	uint16			selected_events;
+	uint16			events;
 } select_info;
 
 typedef struct select_sync {
-	sem_id		sem;
-	uint32		count;
-	select_info *set;
+	vint32			ref_count;
+	benaphore		lock;
+	sem_id			sem;
+	uint32			count;
+	select_info*	set;
 } select_sync;
 
 #define SELECT_FLAG(type) (1L << (type - 1))
@@ -37,5 +45,9 @@ typedef DoublyLinkedList<select_sync_pool_entry> SelectSyncPoolEntryList;
 struct select_sync_pool {
 	SelectSyncPoolEntryList	entries;
 };
+
+void put_select_sync(select_sync* sync);
+
+status_t notify_select_events(select_info* info, uint16 events);
 
 #endif	/* VFS_SELECT_H */

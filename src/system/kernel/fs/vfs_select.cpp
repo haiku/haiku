@@ -1,4 +1,5 @@
 /*
+ * Copyright 2007, Ingo Weinhold, bonefish@cs.tu-berlin.de. All rights reserved.
  * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -6,16 +7,21 @@
 
 #include "vfs_select.h"
 
-#include <vfs.h>
-#include <fd.h>
-#include <syscalls.h>
-#include <fs/select_sync_pool.h>
-
 #include <new>
+
 #include <poll.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/select.h>
+
+#include <AutoDeleter.h>
+
+#include <fd.h>
+#include <fs/select_sync_pool.h>
+#include <syscalls.h>
+#include <util/AutoLock.h>
+#include <vfs.h>
 
 //#define TRACE_VFS_SELECT
 #ifdef TRACE_VFS_SELECT
@@ -27,37 +33,7 @@
 #endif
 
 
-/*! Selects all events in the mask on the specified file descriptor */
-static int
-select_events(struct select_sync *sync, int fd, int ref, uint16 selectedEvents,
-	bool kernel)
-{
-	uint32 count = 0;
-	uint16 event = 1;
-
-	// select any events asked for
-	for (; event < 16; event++) {
-		if (selectedEvents & SELECT_FLAG(event)
-			&& select_fd(fd, event, ref, sync, kernel) == B_OK)
-			count++;
-	}
-	return count;
-}
-
-
-/*! Deselects all events in the mask on the specified file descriptor */
-static void
-deselect_events(struct select_sync *sync, int fd, uint16 selectedEvents,
-	bool kernel)
-{
-	uint16 event = 1;
-
-	// deselect any events previously asked for
-	for (; event < 16; event++) {
-		if (selectedEvents & SELECT_FLAG(event))
-			deselect_fd(fd, event, sync, kernel);
-	}
-}
+using std::nothrow;
 
 
 /*!
@@ -74,18 +50,73 @@ fd_zero(fd_set *set, int numFDs)
 }
 
 
+static status_t
+create_select_sync(int numFDs, select_sync*& _sync)
+{
+	// create sync structure
+	select_sync* sync = new(nothrow) select_sync;
+	if (sync == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<select_sync> syncDeleter(sync);
+
+	// create info set
+	sync->set = new(nothrow) select_info[numFDs];
+	if (sync->set == NULL)
+		return B_NO_MEMORY;
+	ArrayDeleter<select_info> setDeleter(sync->set);
+
+	// create select event semaphore
+	sync->sem = create_sem(0, "select");
+	if (sync->sem < 0)
+		return sync->sem;
+
+	// create lock
+	status_t error = benaphore_init(&sync->lock, "select sync");
+	if (error != B_OK) {
+		delete_sem(sync->sem);
+		return error;
+	}
+
+	sync->count = numFDs;
+	sync->ref_count = 1;
+
+	for (int i = 0; i < numFDs; i++) {
+		sync->set[i].next = NULL;
+		sync->set[i].sync = sync;
+	}
+
+	setDeleter.Detach();
+	syncDeleter.Detach();
+	_sync = sync;
+
+	return B_OK;
+}
+
+
+void
+put_select_sync(select_sync* sync)
+{
+	FUNCTION(("put_select_sync(%p): -> %ld\n", sync, sync->ref_count - 1));
+
+	if (atomic_add(&sync->ref_count, -1) == 1) {
+		delete_sem(sync->sem);
+		benaphore_destroy(&sync->lock);
+		delete[] sync->set;
+		delete sync;
+	}
+}
+
+
 static int
 common_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 	bigtime_t timeout, const sigset_t *sigMask, bool kernel)
 {
-	struct select_sync sync;
 	status_t status = B_OK;
 	int fd;
 
-	FUNCTION(("common_select(%d, %p, %p, %p, %lld, %p, %d)\n", numFDs, readSet,
-		writeSet, errorSet, timeout, sigMask, kernel));
-
-	// TODO: set sigMask to make pselect() functional different from select()
+	FUNCTION(("[%ld] common_select(%d, %p, %p, %p, %lld, %p, %d)\n",
+		find_thread(NULL), numFDs, readSet, writeSet, errorSet, timeout,
+		sigMask, kernel));
 
 	// check if fds are valid before doing anything
 
@@ -97,62 +128,54 @@ common_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 			return B_FILE_ERROR;
 	}
 
-	// allocate resources
-
-	sync.sem = create_sem(0, "select");
-	if (sync.sem < B_OK)
-		return sync.sem;
-
-	set_sem_owner(sync.sem, B_SYSTEM_TEAM);
-
-	sync.set = (select_info *)malloc(sizeof(select_info) * numFDs);
-	if (sync.set == NULL) {
-		delete_sem(sync.sem);
-		return B_NO_MEMORY;
-	}
-	sync.count = numFDs;
+	// allocate sync object
+	select_sync* sync;
+	status = create_select_sync(numFDs, sync);
+	if (status != B_OK)
+		return status;
 
 	// start selecting file descriptors
 
+	BenaphoreLocker locker(sync->lock);
+
 	for (fd = 0; fd < numFDs; fd++) {
-		sync.set[fd].selected_events = 0;
-		sync.set[fd].events = 0;
+		sync->set[fd].selected_events = 0;
+		sync->set[fd].events = 0;
 
 		if (readSet && FD_ISSET(fd, readSet))
-			sync.set[fd].selected_events = SELECT_FLAG(B_SELECT_READ);
+			sync->set[fd].selected_events = SELECT_FLAG(B_SELECT_READ);
 		if (writeSet && FD_ISSET(fd, writeSet))
-			sync.set[fd].selected_events |= SELECT_FLAG(B_SELECT_WRITE);
+			sync->set[fd].selected_events |= SELECT_FLAG(B_SELECT_WRITE);
 		if (errorSet && FD_ISSET(fd, errorSet))
-			sync.set[fd].selected_events |= SELECT_FLAG(B_SELECT_ERROR);
+			sync->set[fd].selected_events |= SELECT_FLAG(B_SELECT_ERROR);
 
-		select_events(&sync, fd, fd, sync.set[fd].selected_events, kernel);
+		select_fd(fd, sync, fd, kernel);
 			// array position is the same as the fd for select()
 	}
 
-	status = acquire_sem_etc(sync.sem, 1,
+	locker.Unlock();
+
+	// set new signal mask
+	sigset_t oldSigMask;
+	if (sigMask != NULL)
+		sigprocmask(SIG_SETMASK, sigMask, &oldSigMask);
+
+	// wait for something to happen
+	status = acquire_sem_etc(sync->sem, 1,
 		B_CAN_INTERRUPT | (timeout != -1 ? B_RELATIVE_TIMEOUT : 0), timeout);
+
+	// restore the old signal mask
+	if (sigMask != NULL)
+		sigprocmask(SIG_SETMASK, &oldSigMask, NULL);
 
 	PRINT(("common_select(): acquire_sem_etc() returned: %lx\n", status));
 
 	// deselect file descriptors
 
-	for (fd = 0; fd < numFDs; fd++) {
-		deselect_events(&sync, fd, sync.set[fd].selected_events, kernel);
-		// TODO: Since we're using FD indices instead of FDs (file_descriptors),
-		// it can happen that the FD index (even the FD) on which we invoked
-		// the select() FS hook is already closed at this point.
-		// This has two main consequences:
-		// 1) deselect() is not invoked, if a currently selected FD index is
-		//    closed. Thus on close of a FD the FS would need to cleanup the
-		//    select resources it had acquired. Harmless.
-		// 2) Caused by 1): If the FS close hook invokes notify_select_event()
-		//    (which is a nice gesture, though actually undefined by the
-		//    POSIX standard), it has no means of synchronization with the
-		//    pending select() (since deselect() won't be invoked), i.e. a
-		//    second call to notify_select_event() might be too late, since
-		//    select() might already be finished. Dangerous!
-		//    notify_select_event() would operate on already free()d memory!
-	}
+	locker.Lock();
+
+	for (fd = 0; fd < numFDs; fd++)
+		deselect_fd(fd, sync, fd, kernel);
 
 	PRINT(("common_select(): events deselected\n"));
 
@@ -163,8 +186,9 @@ common_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 	if (status == B_INTERRUPTED) {
 		// We must not clear the sets in this case, as applications may
 		// rely on the contents of them.
-		count = B_INTERRUPTED;
-		goto err;
+		locker.Unlock();
+		put_select_sync(sync);
+		return B_INTERRUPTED;
 	}
 
 	// Clear sets to store the received events
@@ -176,15 +200,17 @@ common_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 
 	if (status == B_OK) {
 		for (count = 0, fd = 0;fd < numFDs; fd++) {
-			if (readSet && sync.set[fd].events & SELECT_FLAG(B_SELECT_READ)) {
+			if (readSet && sync->set[fd].events & SELECT_FLAG(B_SELECT_READ)) {
 				FD_SET(fd, readSet);
 				count++;
 			}
-			if (writeSet && sync.set[fd].events & SELECT_FLAG(B_SELECT_WRITE)) {
+			if (writeSet
+				&& sync->set[fd].events & SELECT_FLAG(B_SELECT_WRITE)) {
 				FD_SET(fd, writeSet);
 				count++;
 			}
-			if (errorSet && sync.set[fd].events & SELECT_FLAG(B_SELECT_ERROR)) {
+			if (errorSet
+				&& sync->set[fd].events & SELECT_FLAG(B_SELECT_ERROR)) {
 				FD_SET(fd, errorSet);
 				count++;
 			}
@@ -193,9 +219,8 @@ common_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 
 	// B_TIMED_OUT and B_WOULD_BLOCK are supposed to return 0
 
-err:
-	delete_sem(sync.sem);
-	free(sync.set);
+	locker.Unlock();
+	put_select_sync(sync);
 
 	return count;
 }
@@ -208,23 +233,15 @@ common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
 	int count = 0;
 	uint32 i;
 
-	// allocate resources
-
-	select_sync sync;
-	sync.sem = create_sem(0, "poll");
-	if (sync.sem < B_OK)
-		return sync.sem;
-
-	set_sem_owner(sync.sem, B_SYSTEM_TEAM);
-
-	sync.set = (select_info*)malloc(numFDs * sizeof(select_info));
-	if (sync.set == NULL) {
-		delete_sem(sync.sem);
-		return B_NO_MEMORY;
-	}
-	sync.count = numFDs;
+	// allocate sync object
+	select_sync* sync;
+	status = create_select_sync(numFDs, sync);
+	if (status != B_OK)
+		return status;
 
 	// start polling file descriptors (by selecting them)
+
+	BenaphoreLocker locker(sync->lock);
 
 	for (i = 0; i < numFDs; i++) {
 		int fd = fds[i].fd;
@@ -238,10 +255,12 @@ common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
 		// initialize events masks
 		fds[i].events &= ~POLLNVAL;
 		fds[i].revents = 0;
-		sync.set[i].selected_events = fds[i].events;
-		sync.set[i].events = 0;
+		sync->set[i].selected_events = fds[i].events;
+		sync->set[i].events = 0;
 
-		count += select_events(&sync, fd, i, fds[i].events, kernel);
+		select_fd(fd, sync, i, kernel);
+		if (sync->set[i].selected_events != 0)
+			count++;
 	}
 
 	if (count < 1) {
@@ -249,15 +268,17 @@ common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
 		goto err;
 	}
 
-	status = acquire_sem_etc(sync.sem, 1,
+	locker.Unlock();
+
+	status = acquire_sem_etc(sync->sem, 1,
 		B_CAN_INTERRUPT | (timeout != -1 ? B_RELATIVE_TIMEOUT : 0), timeout);
 
 	// deselect file descriptors
 
-	for (i = 0; i < numFDs; i++) {
-		deselect_events(&sync, fds[i].fd, sync.set[i].selected_events, kernel);
-			// TODO: same comments apply as on common_select()
-	}
+	locker.Lock();
+
+	for (i = 0; i < numFDs; i++)
+		deselect_fd(fds[i].fd, sync, i, kernel);
 
 	// collect the events that are happened in the meantime
 
@@ -268,7 +289,7 @@ common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
 					continue;
 
 				// POLLxxx flags and B_SELECT_xxx flags are compatible
-				fds[i].revents = sync.set[i].events;
+				fds[i].revents = sync->set[i].events;
 				if (fds[i].revents != 0)
 					count++;
 			}
@@ -282,10 +303,35 @@ common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
 	}
 
 err:
-	delete_sem(sync.sem);
-	free(sync.set);
+	locker.Unlock();
+	put_select_sync(sync);
 
 	return count;
+}
+
+
+// #pragma mark - VFS private
+
+
+status_t
+notify_select_events(select_info* info, uint16 events)
+{
+	FUNCTION(("notify_select_events(%p (%p), 0x%x)\n", info, info->sync,
+		events));
+
+	if (info == NULL
+		|| info->sync == NULL
+		|| info->sync->sem < B_OK)
+		return B_BAD_VALUE;
+
+	info->events |= events;
+
+	// only wake up the waiting select()/poll() call if the events
+	// match one of the selected ones
+	if (info->selected_events & events)
+		return release_sem(info->sync->sem);
+
+	return B_OK;
 }
 
 
@@ -293,25 +339,9 @@ err:
 
 
 status_t
-notify_select_event(struct selectsync *_sync, uint32 ref, uint8 event)
+notify_select_event(struct selectsync *sync, uint32 /*ref*/, uint8 event)
 {
-	select_sync *sync = (select_sync *)_sync;
-
-	FUNCTION(("notify_select_event(%p, %lu, %u)\n", _sync, ref, event));
-
-	if (sync == NULL
-		|| sync->sem < B_OK
-		|| ref > sync->count)
-		return B_BAD_VALUE;
-
-	sync->set[ref].events |= SELECT_FLAG(event);
-
-	// only wake up the waiting select()/poll() call if the event
-	// match the ones selected
-	if (sync->set[ref].selected_events & SELECT_FLAG(event))
-		return release_sem(sync->sem);
-
-	return B_OK;
+	return notify_select_events((select_info*)sync, SELECT_FLAG(event));
 }
 
 
