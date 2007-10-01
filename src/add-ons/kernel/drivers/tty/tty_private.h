@@ -110,7 +110,6 @@ struct tty_cookie : DoublyLinkedListLinkImpl<tty_cookie> {
 	struct tty			*tty;
 	struct tty			*other_tty;
 	uint32				open_mode;
-	select_sync_pool	*select_pool;
 	int32				thread_count;
 	sem_id				blocking_semaphore;
 	bool				closed;
@@ -130,6 +129,7 @@ struct tty {
 	int32				index;
 	struct mutex*		lock;
 	tty_settings*		settings;
+	select_sync_pool*	select_pool;
 	RequestQueue		reader_queue;
 	RequestQueue		writer_queue;
 	TTYCookieList		cookies;

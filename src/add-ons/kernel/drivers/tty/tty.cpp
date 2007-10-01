@@ -783,6 +783,7 @@ reset_tty(struct tty *tty, int32 index, bool isMaster)
 	tty->index = index;
 	tty->lock = NULL;
 	tty->settings = &gTTYSettings[index];
+	tty->select_pool = NULL;
 	tty->is_master = isMaster;
 	tty->pending_eof = 0;
 }
@@ -916,7 +917,6 @@ init_tty_cookie(tty_cookie *cookie, struct tty *tty, struct tty *otherTTY,
 	cookie->tty = tty;
 	cookie->other_tty = otherTTY;
 	cookie->open_mode = openMode;
-	cookie->select_pool = NULL;
 	cookie->thread_count = 0;
 	cookie->closed = false;
 
@@ -1051,16 +1051,6 @@ tty_close_cookie(struct tty_cookie *cookie)
 		tty_close(cookie->tty);
 	}
 
-	// notify all pending selects and clean up the pool
-	if (cookie->select_pool) {
-		notify_select_event_pool(cookie->select_pool, B_SELECT_READ);
-		notify_select_event_pool(cookie->select_pool, B_SELECT_WRITE);
-		notify_select_event_pool(cookie->select_pool, B_SELECT_ERROR);
-
-		delete_select_sync_pool(cookie->select_pool);
-		cookie->select_pool = NULL;
-	}
-
 	// notify a select write event on the other tty, if we've closed this tty
 	if (cookie->tty->open_count == 0 && cookie->other_tty->open_count > 0)
 		tty_notify_select_event(cookie->other_tty, B_SELECT_WRITE);
@@ -1072,13 +1062,8 @@ tty_notify_select_event(struct tty *tty, uint8 event)
 {
 	TRACE(("tty_notify_select_event(%p, %u)\n", tty, event));
 
-	for (TTYCookieList::Iterator it = tty->cookies.GetIterator();
-		 it.HasNext();) {
-		tty_cookie *cookie = it.Next();
-
-		if (cookie->select_pool)
-			notify_select_event_pool(cookie->select_pool, event);
-	}
+	if (tty->select_pool)
+		notify_select_event_pool(tty->select_pool, event);
 }
 
 
@@ -1705,7 +1690,7 @@ tty_select(tty_cookie *cookie, uint8 event, uint32 ref, selectsync *sync)
 		otherTTY = NULL;
 
 	// add the event to the TTY's pool
-	status_t error = add_select_sync_pool_entry(&cookie->select_pool, sync, ref,
+	status_t error = add_select_sync_pool_entry(&tty->select_pool, sync, ref,
 		event);
 	if (error != B_OK) {
 		TRACE(("tty_select() done: add_select_sync_pool_entry() failed: %lx\n",
@@ -1784,6 +1769,6 @@ tty_deselect(tty_cookie *cookie, uint8 event, selectsync *sync)
 	// lock the TTY (guards the select sync pool, among other things)
 	MutexLocker ttyLocker(tty->lock);
 
-	return remove_select_sync_pool_entry(&cookie->select_pool, sync, event);
+	return remove_select_sync_pool_entry(&tty->select_pool, sync, event);
 }
 
