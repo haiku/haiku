@@ -87,6 +87,7 @@ static struct death_stack *sDeathStacks;
 static unsigned int sNumDeathStacks;
 static unsigned int volatile sDeathStackBitmap;
 static sem_id sDeathStackSem;
+static spinlock sDeathStackLock = 0;
 
 static struct thread *last_thread_dumped = NULL;
 
@@ -524,14 +525,19 @@ get_death_stack(void)
 
 	acquire_sem(sDeathStackSem);
 
+	// grab the death stack and thread locks, find a free spot and release
+
 	state = disable_interrupts();
 
-	// grap the thread lock, find a free spot and release
+	acquire_spinlock(&sDeathStackLock);
 	GRAB_THREAD_LOCK();
+
 	bit = sDeathStackBitmap;
 	bit = (~bit) & ~((~bit) - 1);
 	sDeathStackBitmap |= bit;
+
 	RELEASE_THREAD_LOCK();
+	release_spinlock(&sDeathStackLock);
 
 	restore_interrupts(state);
 
@@ -553,12 +559,12 @@ get_death_stack(void)
 }
 
 
-/*!	Returns the thread's death stack to the pool. */
+/*!	Returns the thread's death stack to the pool.
+	Interrupts must be disabled and the sDeathStackLock be held.
+*/
 static void
 put_death_stack(uint32 index)
 {
-	cpu_status state;
-
 	TRACE(("put_death_stack...: passed %lu\n", index));
 
 	if (index >= sNumDeathStacks)
@@ -567,16 +573,12 @@ put_death_stack(uint32 index)
 	if (!(sDeathStackBitmap & (1 << index)))
 		panic("put_death_stack: passed invalid stack index %ld\n", index);
 
-	state = disable_interrupts();
-
 	GRAB_THREAD_LOCK();
 	sDeathStackBitmap &= ~(1 << index);
 	RELEASE_THREAD_LOCK();
 
-	restore_interrupts(state);
-
 	release_sem_etc(sDeathStackSem, 1, B_DO_NOT_RESCHEDULE);
-		// we must not have acquired the thread lock when releasing a semaphore
+		// we must not hold the thread lock when releasing a semaphore
 }
 
 
@@ -634,9 +636,14 @@ thread_exit2(void *_args)
 
 	// return the death stack and reschedule one last time
 
+	// Note that we need to hold sDeathStackLock until we've got the thread
+	// lock. Otherwise someone else might grab our stack in the meantime.
+	acquire_spinlock(&sDeathStackLock);
 	put_death_stack(args.death_stack);
 
 	GRAB_THREAD_LOCK();
+	release_spinlock(&sDeathStackLock);
+
 	scheduler_reschedule();
 		// requires thread lock to be held
 
@@ -1272,6 +1279,7 @@ thread_exit(void)
 		args.death_stack = get_death_stack();
 		args.death_sem = cachedDeathSem;
 		args.original_team_id = teamID;
+
 
 		disable_interrupts();
 
