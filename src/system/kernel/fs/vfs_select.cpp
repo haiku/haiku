@@ -149,8 +149,10 @@ common_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 		if (errorSet && FD_ISSET(fd, errorSet))
 			sync->set[fd].selected_events |= SELECT_FLAG(B_SELECT_ERROR);
 
-		select_fd(fd, sync, fd, kernel);
-			// array position is the same as the fd for select()
+		if (sync->set[fd].selected_events != 0) {
+			select_fd(fd, sync, fd, kernel);
+				// array position is the same as the fd for select()
+		}
 	}
 
 	locker.Unlock();
@@ -246,21 +248,17 @@ common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
 	for (i = 0; i < numFDs; i++) {
 		int fd = fds[i].fd;
 
-		// check if fds are valid
-		if (!fd_is_valid(fd, kernel)) {
-			fds[i].revents = POLLNVAL;
-			continue;
-		}
-
 		// initialize events masks
-		fds[i].events &= ~POLLNVAL;
-		fds[i].revents = 0;
-		sync->set[i].selected_events = fds[i].events;
+		sync->set[i].selected_events = fds[i].events & ~POLLNVAL
+			| POLLERR | POLLHUP;
 		sync->set[i].events = 0;
 
-		select_fd(fd, sync, i, kernel);
-		if (sync->set[i].selected_events != 0)
-			count++;
+		if (select_fd(fd, sync, i, kernel) == B_OK) {
+			fds[i].revents = 0;
+			if (sync->set[i].selected_events != 0)
+				count++;
+		} else
+			fds[i].revents = POLLNVAL;
 	}
 
 	if (count < 1) {
@@ -289,7 +287,8 @@ common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
 					continue;
 
 				// POLLxxx flags and B_SELECT_xxx flags are compatible
-				fds[i].revents = sync->set[i].events;
+				fds[i].revents = sync->set[i].events
+					& sync->set[i].selected_events;
 				if (fds[i].revents != 0)
 					count++;
 			}

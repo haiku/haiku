@@ -27,8 +27,51 @@
 #endif
 
 
+static struct file_descriptor* get_fd_locked(struct io_context* context,
+	int fd);
 static void deselect_select_infos(file_descriptor* descriptor,
 	select_info* infos);
+
+
+struct FDGetterLocking {
+	inline bool Lock(file_descriptor* /*lockable*/)
+	{
+		return false;
+	}
+
+	inline void Unlock(file_descriptor* lockable)
+	{
+		put_fd(lockable);
+	}
+};
+
+class FDGetter : public AutoLocker<file_descriptor, FDGetterLocking> {
+public:
+	inline FDGetter()
+		: AutoLocker<file_descriptor, FDGetterLocking>()
+	{
+	}
+
+	inline FDGetter(io_context* context, int fd, bool contextLocked = false)
+		: AutoLocker<file_descriptor, FDGetterLocking>(
+			contextLocked ? get_fd_locked(context, fd) : get_fd(context, fd))
+	{
+	}
+
+	inline file_descriptor* SetTo(io_context* context, int fd,
+		bool contextLocked = false)
+	{
+		file_descriptor* descriptor
+			= contextLocked ? get_fd_locked(context, fd) : get_fd(context, fd);
+		AutoLocker<file_descriptor, FDGetterLocking>::SetTo(descriptor, true);
+		return descriptor;
+	}
+
+	inline file_descriptor* FD() const
+	{
+		return fLockable;
+	}
+};
 
 
 /*** General fd routines ***/
@@ -416,22 +459,23 @@ select_fd(int fd, struct select_sync* sync, uint32 ref, bool kernel)
 {
 	TRACE(("select_fd(fd = %d, selectsync = %p, ref = %lu, 0x%x)\n", fd, sync, ref, sync->set[ref].selected_events));
 
-	select_info* info = &sync->set[ref];
-	if (info->selected_events == 0)
-		return B_OK;
+	FDGetter fdGetter;
+		// define before the context locker, so it will be destroyed after it
 
 	io_context* context = get_current_io_context(kernel);
 	MutexLocker locker(context->io_mutex);
 
-	struct file_descriptor* descriptor = get_fd_locked(context, fd);
+	struct file_descriptor* descriptor = fdGetter.SetTo(context, fd, true);
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
+
+	select_info* info = &sync->set[ref];
+	if (info->selected_events == 0)
+		return B_OK;
 
 	if (!descriptor->ops->fd_select) {
 		// if the I/O subsystem doesn't support select(), we will
 		// immediately notify the select call
-		locker.Unlock();
-		put_fd(descriptor);
 		return notify_select_events(info, info->selected_events);
 	}
 
@@ -461,7 +505,6 @@ select_fd(int fd, struct select_sync* sync, uint32 ref, bool kernel)
 	if (selectedEvents == 0)
 		deselect_fd(fd, sync, ref, kernel);
 
-	put_fd(descriptor);
 	return B_OK;
 }
 
@@ -475,10 +518,13 @@ deselect_fd(int fd, struct select_sync* sync, uint32 ref, bool kernel)
 	if (info->selected_events == 0)
 		return B_OK;
 
+	FDGetter fdGetter;
+		// define before the context locker, so it will be destroyed after it
+
 	io_context* context = get_current_io_context(kernel);
 	MutexLocker locker(context->io_mutex);
 
-	struct file_descriptor* descriptor = get_fd_locked(context, fd);
+	struct file_descriptor* descriptor = fdGetter.SetTo(context, fd, true);
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
@@ -489,11 +535,8 @@ deselect_fd(int fd, struct select_sync* sync, uint32 ref, bool kernel)
 		infoLocation = &(*infoLocation)->next;
 
 	// If not found, someone else beat us to it.
-	if (*infoLocation != info) {
-		locker.Unlock();
-		put_fd(descriptor);
+	if (*infoLocation != info)
 		return B_OK;
-	}
 
 	*infoLocation = info->next;
 
@@ -511,7 +554,6 @@ deselect_fd(int fd, struct select_sync* sync, uint32 ref, bool kernel)
 
 	put_select_sync(sync);
 
-	put_fd(descriptor);
 	return B_OK;
 }
 
