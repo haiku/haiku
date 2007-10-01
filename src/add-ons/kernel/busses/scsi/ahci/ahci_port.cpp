@@ -17,6 +17,8 @@
 #define TRACE(a...) dprintf("\33[34mahci:\33[0m " a)
 // #define FLOW(a...)	dprintf("ahci: " a)
 #define FLOW(a...)
+//#define RWTRACE(a...) dprintf("\33[34mahci:\33[0m " a)
+#define RWTRACE(a...)
 
 
 AHCIPort::AHCIPort(AHCIController *controller, int index)
@@ -273,7 +275,7 @@ AHCIPort::Interrupt()
 	uint32 ci = fRegs->ci;
 	fRegs->is = is; // clear interrupts
 
-	FLOW("AHCIPort::Interrupt port %d, fCommandsActive 0x%08lx, is 0x%08lx, ci 0x%08lx\n", fIndex, fCommandsActive, is, ci);
+	RWTRACE("AHCIPort::Interrupt port %d, fCommandsActive 0x%08lx, is 0x%08lx, ci 0x%08lx\n", fIndex, fCommandsActive, is, ci);
 
 	if (is & PORT_INT_ERROR)
 		TRACE("AHCIPort::Interrupt port %d, fCommandsActive 0x%08lx, is 0x%08lx, ci 0x%08lx\n", fIndex, fCommandsActive, is, ci);
@@ -574,7 +576,7 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 position, size_t length, bool 
 {
 	uint32 bytecount = length * 512;
 
-	TRACE("ScsiReadWrite: position %llu, size %lu, isWrite %d\n", position * 512, bytecount, isWrite);
+	RWTRACE("ScsiReadWrite: position %llu, size %lu, isWrite %d\n", position * 512, bytecount, isWrite);
 
 #if 0
 	if (isWrite) {
