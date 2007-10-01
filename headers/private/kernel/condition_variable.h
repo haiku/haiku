@@ -82,8 +82,7 @@ protected:
 			void				Notify(bool all, bool threadsLocked);
 
 private:
-			void				_Notify(bool all, bool threadsLocked,
-									status_t result);
+			void				_Notify(bool all, status_t result);
 
 protected:
 			const void*			fObject;

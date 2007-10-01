@@ -134,6 +134,7 @@ PrivateConditionVariableEntry::Wait(uint32 flags)
 	}
 
 	InterruptsLocker _;
+	SpinLocker threadLocker(thread_spinlock);
 	SpinLocker locker(sConditionVariablesLock);
 
 	// get first entry for this thread
@@ -159,10 +160,9 @@ PrivateConditionVariableEntry::Wait(uint32 flags)
 	thread->condition_variable_entry = firstEntry;
 	thread->sem.blocking = -1;
 
-	GRAB_THREAD_LOCK();
 	locker.Unlock();
 	scheduler_reschedule();
-	RELEASE_THREAD_LOCK();
+	threadLocker.Unlock();
 
 	return firstEntry->fResult;
 }
@@ -289,6 +289,7 @@ PrivateConditionVariable::Unpublish(bool threadsLocked)
 	ASSERT(fObject != NULL);
 
 	InterruptsLocker _;
+	SpinLocker threadLocker(threadsLocked ? NULL : &thread_spinlock);
 	SpinLocker locker(sConditionVariablesLock);
 
 #if KDEBUG
@@ -304,7 +305,7 @@ PrivateConditionVariable::Unpublish(bool threadsLocked)
 	fObjectType = NULL;
 
 	if (fEntries)
-		_Notify(true, threadsLocked, B_ENTRY_NOT_FOUND);
+		_Notify(true, B_ENTRY_NOT_FOUND);
 }
 
 
@@ -314,6 +315,7 @@ PrivateConditionVariable::Notify(bool all, bool threadsLocked)
 	ASSERT(fObject != NULL);
 
 	InterruptsLocker _;
+	SpinLocker threadLocker(threadsLocked ? NULL : &thread_spinlock);
 	SpinLocker locker(sConditionVariablesLock);
 
 #if KDEBUG
@@ -325,18 +327,17 @@ PrivateConditionVariable::Notify(bool all, bool threadsLocked)
 #endif
 
 	if (fEntries)
-		_Notify(all, threadsLocked, B_OK);
+		_Notify(all, B_OK);
 }
 
 
-//! Called with interrupts disabled and the condition variable spinlock held.
+/*! Called with interrupts disabled and the condition variable spinlock and
+	thread lock held.
+*/
 void
-PrivateConditionVariable::_Notify(bool all, bool threadsLocked, status_t result)
+PrivateConditionVariable::_Notify(bool all, status_t result)
 {
 	// dequeue and wake up the blocked threads
-	if (!threadsLocked)
-		GRAB_THREAD_LOCK();
-
 	while (PrivateConditionVariableEntry* entry = fEntries) {
 		fEntries = entry->fVariableNext;
 		entry->fVariableNext = NULL;
@@ -370,36 +371,18 @@ PrivateConditionVariable::_Notify(bool all, bool threadsLocked, status_t result)
 		if (!all)
 			break;
 	}
-
-	if (!threadsLocked)
-		RELEASE_THREAD_LOCK();
 }
 
 
 // #pragma mark -
 
 
-/*!	Interrupts must be disabled, thread lock must be held. Note, that the thread
-	lock may temporarily be released.
+/*!	Interrupts must be disabled, thread lock must be held.
 */
 status_t
 condition_variable_interrupt_thread(struct thread* thread)
 {
-	if (thread == NULL || thread->state != B_THREAD_WAITING
-		|| thread->condition_variable_entry == NULL) {
-		return B_BAD_VALUE;
-	}
-
-	thread_id threadID = thread->id;
-
-	// We also need the condition variable spin lock, so, in order to respect
-	// the locking order, we must temporarily release the thread lock.
-	RELEASE_THREAD_LOCK();
 	SpinLocker locker(sConditionVariablesLock);
-	GRAB_THREAD_LOCK();
-
-	// re-get the thread and do the checks again
-	thread = thread_get_thread_struct_locked(threadID);
 
 	if (thread == NULL || thread->state != B_THREAD_WAITING
 		|| thread->condition_variable_entry == NULL) {

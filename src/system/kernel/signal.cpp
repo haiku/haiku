@@ -274,8 +274,7 @@ is_signal_blocked(int signal)
 
 
 /*!	Tries to interrupt a thread waiting for a semaphore or a condition variable.
-	Interrupts must be disabled, the thread lock be held. Note, that the thread
-	lock may temporarily be released.
+	Interrupts must be disabled, the thread lock be held.
 */
 static status_t
 signal_interrupt_thread(struct thread* thread)
