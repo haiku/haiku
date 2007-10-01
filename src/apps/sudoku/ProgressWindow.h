@@ -19,10 +19,12 @@ class ProgressWindow : public BWindow {
 
 		virtual void MessageReceived(BMessage *message);
 
-		void Start();
+		void Start(BWindow* referenceWindow);
 		void Stop();
 
 	private:
+		void _Center(BWindow* referenceWindow);
+
 		BStatusBar*		fStatusBar;
 		BMessageRunner*	fRunner;
 		bool			fRetrievedUpdate;

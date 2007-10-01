@@ -343,7 +343,7 @@ SudokuWindow::_Generate(int32 level)
 		delete fGenerator;
 
 	fSudokuView->SetEditable(false);
-	fProgressWindow->Start();
+	fProgressWindow->Start(this);
 	fGenerator = new GenerateSudoku(*fSudokuView->Field(), level,
 		fProgressWindow, this);
 }

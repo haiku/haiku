@@ -51,15 +51,7 @@ ProgressWindow::ProgressWindow(BWindow* referenceWindow,
 	}
 
 	ResizeTo(Bounds().Width(), height + 8);
-	BRect frame;
-	if (referenceWindow != NULL)
-		frame = referenceWindow->Frame();
-	else
-		frame = BScreen().Frame();
-
-	MoveTo(frame.left + (frame.Width() - Bounds().Width()) / 2,
-		frame.top + (frame.Height() - Bounds().Height()) / 2);
-
+	_Center(referenceWindow);
 	Run();
 }
 
@@ -71,9 +63,23 @@ ProgressWindow::~ProgressWindow()
 
 
 void
-ProgressWindow::Start()
+ProgressWindow::_Center(BWindow* referenceWindow)
+{
+	BRect frame;
+	if (referenceWindow != NULL)
+		frame = referenceWindow->Frame();
+	else
+		frame = BScreen().Frame();
+
+	MoveTo(frame.left + (frame.Width() - Bounds().Width()) / 2,
+		frame.top + (frame.Height() - Bounds().Height()) / 2);
+}
+
+void
+ProgressWindow::Start(BWindow* referenceWindow)
 {
 	BAutolock _(this);
+	_Center(referenceWindow);
 
 	fRetrievedUpdate = false;
 	fRetrievedShow = false;
