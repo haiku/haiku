@@ -17,7 +17,7 @@
 #include <util/AutoLock.h>
 
 
-static const int kConditionVariableHashSize = 64;
+static const int kConditionVariableHashSize = 512;
 
 
 struct ConditionVariableHashDefinition {
@@ -429,9 +429,9 @@ condition_variable_init()
 			strerror(error));
 	}
 
-	add_debugger_command("condition_variable", &dump_condition_variable,
+	add_debugger_command("cvar", &dump_condition_variable,
 		"Dump condition_variable");
-	add_debugger_command("condition_variables", &list_condition_variables,
+	add_debugger_command("cvars", &list_condition_variables,
 		"List condition variables");
 }
 
