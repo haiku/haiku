@@ -148,7 +148,7 @@ public:
 
 	inline operator bool() const	{ return fLocked; }
 
-private:
+protected:
 	Lockable	*fLockable;
 	bool		fLocked;
 	Locking		fLocking;
