@@ -62,100 +62,121 @@ struct acpi_module_info acpi_module = {
 status_t 
 acpi_std_ops(int32 op,...) 
 {
-	ACPI_STATUS Status;
-	bool acpiDisabled = false;
-	void *settings;
-	
-	switch(op) {
+	switch (op) {
 		case B_MODULE_INIT:
-			// check if safemode settings disable DMA
-			
+		{
+			ACPI_STATUS status;
+			bool acpiDisabled = false;
+			void *settings;
+
 			settings = load_driver_settings("kernel");
 			if (settings != NULL) {
-				acpiDisabled = !get_driver_boolean_parameter(settings, "acpi", true, true);
+				acpiDisabled = !get_driver_boolean_parameter(settings, "acpi",
+					true, true);
 				unload_driver_settings(settings);
 			}
- 
-                	settings = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
-                	if (settings != NULL) {
-                        	acpiDisabled = get_driver_boolean_parameter(settings, B_SAFEMODE_DISABLE_ACPI,
-                                	acpiDisabled, acpiDisabled);
-                        	unload_driver_settings(settings);
-               		}
+
+			if (!acpiDisabled) {
+				// check if safemode settings disable DMA
+				settings = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
+				if (settings != NULL) {
+					acpiDisabled = get_driver_boolean_parameter(settings,
+						B_SAFEMODE_DISABLE_ACPI, false, false);
+					unload_driver_settings(settings);
+				}
+			}
 
 			if (acpiDisabled) {
 				ERROR("ACPI disabled");
 				return ENOSYS;
 			}
-			
-			#ifndef __HAIKU__
+
+#ifndef __HAIKU__
 			{
 				// Once upon a time, there was no module(s) dependency(ies) automatic loading feature.
 				// Let's do it the old way
 				status_t status;
-				
-				status = get_module(B_DPC_MODULE_NAME, (module_info **) &gDPC);
-				if (status != B_OK) return status;
-				
-				status = get_module(B_PCI_MODULE_NAME, (module_info **) &gPCIManager);
-				if (status != B_OK) return status;
+
+				status = get_module(B_DPC_MODULE_NAME, (module_info **)&gDPC);
+				if (status != B_OK)
+					return status;
+
+				status = get_module(B_PCI_MODULE_NAME,
+					(module_info **)&gPCIManager);
+				if (status != B_OK) {
+					put_module(B_DPC_MODULE_NAME);
+					return status;
+				}
 			}
-			#endif
-			
+#endif
+
 			gDPChandle = gDPC->new_dpc_queue("acpi_task", B_NORMAL_PRIORITY, 10);
 
-			#ifdef ACPI_DEBUG_OUTPUT
-				AcpiDbgLevel = ACPI_DEBUG_ALL | ACPI_LV_VERBOSE;
-				AcpiDbgLayer = ACPI_ALL_COMPONENTS;
-			#endif
+#ifdef ACPI_DEBUG_OUTPUT
+			AcpiDbgLevel = ACPI_DEBUG_ALL | ACPI_LV_VERBOSE;
+			AcpiDbgLayer = ACPI_ALL_COMPONENTS;
+#endif
 
-			Status = AcpiInitializeSubsystem();
-			if (Status != AE_OK) {
-				ERROR("AcpiInitializeSubsystem failed (%s)\n", AcpiFormatException(Status));
-				return B_ERROR;
-			}
-			
-			Status = AcpiInitializeTables(NULL, 0, TRUE);
-			if (Status != AE_OK) {
-				ERROR("AcpiInitializeTables failed (%s)\n", AcpiFormatException(Status));
-				return B_ERROR;
+			status = AcpiInitializeSubsystem();
+			if (status != AE_OK) {
+				ERROR("AcpiInitializeSubsystem failed (%s)\n",
+					AcpiFormatException(status));
+				goto err;
 			}
 
-			Status = AcpiLoadTables();
-			if (Status != AE_OK) {
-				ERROR("AcpiLoadTables failed (%s)\n", AcpiFormatException(Status));
-				return B_ERROR;
+			status = AcpiInitializeTables(NULL, 0, TRUE);
+			if (status != AE_OK) {
+				ERROR("AcpiInitializeTables failed (%s)\n",
+					AcpiFormatException(status));
+				goto err;
 			}
-			
-			Status = AcpiEnableSubsystem(ACPI_FULL_INITIALIZATION);
-			if (Status != AE_OK) {
-				ERROR("AcpiEnableSubsystem failed (%s)\n", AcpiFormatException(Status));
-				return B_ERROR;
+
+			status = AcpiLoadTables();
+			if (status != AE_OK) {
+				ERROR("AcpiLoadTables failed (%s)\n",
+					AcpiFormatException(status));
+				goto err;
 			}
-			
+
+			status = AcpiEnableSubsystem(ACPI_FULL_INITIALIZATION);
+			if (status != AE_OK) {
+				ERROR("AcpiEnableSubsystem failed (%s)\n",
+					AcpiFormatException(status));
+				goto err;
+			}
+
 			/* Phew. Now in ACPI mode */
 			TRACE("ACPI initialized\n");
-			break;
+			return B_OK;
 		
+		err:
+#ifndef __HAIKU__
+			put_module(B_DPC_MODULE_NAME);
+			put_module(B_PCI_MODULE_NAME);
+#endif
+			return B_ERROR;
+		}
+
 		case B_MODULE_UNINIT:
-			Status = AcpiTerminate();
-			if (Status != AE_OK)
+		{
+			if (AcpiTerminate() != AE_OK)
 				ERROR("Could not bring system out of ACPI mode. Oh well.\n");
-			
+
 				/* This isn't so terrible. We'll just fail silently */
 			if (gDPChandle != NULL) {
 				gDPC->delete_dpc_queue(gDPChandle);
 				gDPChandle = NULL;
 			}
 
-			#ifndef __HAIKU__
+#ifndef __HAIKU__
 			// Once upon a time, there was no module(s) dependency(ies) automatic UNloading feature.
 			// Let's do it the old way
 			put_module(B_DPC_MODULE_NAME);
 			put_module(B_PCI_MODULE_NAME);
-			#endif
-
+#endif
 			break;
+		}
+
 		default:
 			return B_ERROR;
 	}
