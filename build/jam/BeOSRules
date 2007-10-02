@@ -224,16 +224,21 @@ actions ResComp1
 	cat "$(2[2-])" | $(CC) -E $(CCDEFS) $(HDRS) - | egrep -v '^#' | $(2[1]) $(RCHDRS) --auto-names -o "$(1)" -
 }
 
-rule ResAttr attributeFile : _resourceFiles
+rule ResAttr attributeFile : _resourceFiles : deleteAttributeFile
 {
-	# ResAttr <attribute file> : <resource files> ;
+	# ResAttr <attribute file> : <resource files> [ : <delete file> ] ;
 	#
 	# <attribute file> and <resource files> must be gristed.
 	# <resource files> can also be .rdef files -- they will be compiled first in
 	# this case.
+	# <clear file> is a boolean that specifies wether or not the target file
+	# should be removed before writing. Defaults to true.
 
 	local resourceFiles ;
 	local resourceFile ;
+	deleteAttributeFile ?= true ;
+	deleteAttributeFile1 on $(1) = $(deleteAttributeFile) ;
+
 	for resourceFile in $(_resourceFiles) {
 		# if the specified resource file is an .rdef file, we compile it first
 		if $(resourceFile:S) = ".rdef" {
@@ -256,6 +261,8 @@ rule ResAttr attributeFile : _resourceFiles
 actions ResAttr1
 {
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	rm -f $(1)
-	$(2[1]) -o "$(1)" "$(2[2-])"
+	if [ \\"$(deleteAttributeFile1)\\" = "true" ]; then
+		rm -f $(1)
+	fi
+	$(2[1]) -O -o "$(1)" "$(2[2-])"
 }

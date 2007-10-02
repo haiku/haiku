@@ -198,6 +198,13 @@ rule Ld
 	Depends $(target) : $(objects) ;
 
 	MakeLocateDebug $(target) ;
+
+	on $(1) XRes $(1) : $(RESFILES) ;
+	if ! [ on $(1) return $(DONT_USE_BEOS_RULES) ] {
+		SetType $(1) ;
+		MimeSet $(1) ;
+		SetVersion $(1) ;
+	}
 }
 
 actions Ld

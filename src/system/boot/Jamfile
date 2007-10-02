@@ -30,6 +30,8 @@ if $(TARGET_ARCH) = x86 {
 	platformObjects += <src!system!kernel!arch!$(TARGET_ARCH)>cpuid.o ;
 }
 
+AddResources zbeos : boot_loader.rdef ;
+
 KernelLd boot_loader_$(TARGET_BOOT_PLATFORM) :
 	boot_platform_$(TARGET_BOOT_PLATFORM).o
 	boot_arch_$(TARGET_ARCH).o
@@ -61,6 +63,12 @@ rule BuildZbeos {
 
 	Depends $(zbeos) : $(bootLoader) ;
 	MakeLocateDebug $(zbeos) ;
+
+	on $(1) ResAttr $(1) : $(RESFILES) : false ;
+	if ! [ on $(1) return $(DONT_USE_BEOS_RULES) ] {
+		SetType $(1) ;
+		MimeSet $(1) ;
+	}
 }
 
 actions BuildZbeos {

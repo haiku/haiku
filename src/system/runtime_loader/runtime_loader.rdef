@@ -1,0 +1,13 @@
+resource app_signature "application/x-vnd.Haiku-RuntimeLoader";
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+
+	variety = B_APPV_DEVELOPMENT,
+	internal = 0,
+
+	short_info = "Runtime Loader",
+	long_info = "Runtime Loader ©2002-2007 Haiku Inc."
+};

@@ -270,7 +270,6 @@ local spellFiles = words geekspeak ;
 spellFiles = $(spellFiles:G=spell) ;
 SEARCH on $(spellFiles)
 	= [ FDirName $(HAIKU_TOP) src apps mail ] ;
-#AddDirectoryToHaikuImage beos etc word_dictionary ;
 AddFilesToHaikuImage beos etc word_dictionary : $(spellFiles) ;
 
 local svgFiles = "lion.svg" ;
