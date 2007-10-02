@@ -8,8 +8,11 @@
 	act as an interface to the networking stack.
 */
 
-#include <net_socket.h>
 #include <net_stack_driver.h>
+
+#include <sys/ioctl.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <Drivers.h>
 #include <KernelExport.h>
@@ -18,9 +21,7 @@
 #include <kernel.h> // IS_KERNEL_ADDRESS
 #include <fs/fd.h>	// user_fd_kernel_ioctl
 
-#include <sys/ioctl.h>
-#include <stdlib.h>
-#include <string.h>
+#include <net_socket.h>
 
 
 #define NET_STARTER_MODULE_NAME "network/stack/starter/v1"
@@ -46,6 +47,8 @@ struct net_stack_cookie {
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
 static int32 sOpenCount = 0;
+static status_t sInitializationStatus = B_NO_INIT;
+static sem_id sInitializationSem;
 static struct net_socket_module_info *sSocket = NULL;
 
 
@@ -219,18 +222,32 @@ net_stack_open(const char *name, uint32 flags, void **_cookie)
 		// networking stack
 		module_info *module;
 		status_t status = get_module(NET_STARTER_MODULE_NAME, &module);
-		if (status < B_OK) {
+		if (status == B_OK) {
+			status = get_module(NET_SOCKET_MODULE_NAME,
+				(module_info **)&sSocket);
+			if (status != B_OK) {
+				put_module(NET_STARTER_MODULE_NAME);
+				ERROR("Can't load " NET_SOCKET_MODULE_NAME " module: %ld\n",
+					status);
+			}
+		} else
 			ERROR("Can't load network stack module: %ld\n", status);
+
+		sInitializationStatus = status;
+		release_sem_etc(sInitializationSem, 1,
+			B_RELEASE_ALL | B_DO_NOT_RESCHEDULE);
+
+		if (status < B_OK) {
 			atomic_add(&sOpenCount, -1);
 			return status;
 		}
-
-		status = get_module(NET_SOCKET_MODULE_NAME, (module_info **)&sSocket);
-		if (status < B_OK) {
-			ERROR("Can't load " NET_SOCKET_MODULE_NAME " module: %ld\n", status);
-			put_module(NET_STARTER_MODULE_NAME);
+	} else {
+		while (sInitializationStatus == B_NO_INIT) {
+			acquire_sem(sInitializationSem);
+		}
+		if (sInitializationStatus != B_OK) {
 			atomic_add(&sOpenCount, -1);
-			return status;
+			return sInitializationStatus;
 		}
 	}
 
@@ -284,6 +301,7 @@ net_stack_free_cookie(void *_cookie)
 		// no interface defined)
 		put_module(NET_SOCKET_MODULE_NAME);
 		put_module(NET_STARTER_MODULE_NAME);
+		sInitializationStatus = B_NO_INIT;
 	}
 
 	return B_OK;
@@ -653,6 +671,11 @@ init_hardware(void)
 status_t
 init_driver(void)
 {
+	sInitializationSem = create_sem(1, "net stack init");
+	if (sInitializationSem < B_OK)
+		return sInitializationSem;
+
+	sInitializationStatus = B_NO_INIT;
 	return B_OK;
 }
 
@@ -660,6 +683,7 @@ init_driver(void)
 void
 uninit_driver(void)
 {
+	delete_sem(sInitializationSem);
 }
 
 
