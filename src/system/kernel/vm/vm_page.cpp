@@ -851,6 +851,10 @@ page_thief(void* /*unused*/)
 				continue;
 			}
 			if (page->state != PAGE_STATE_INACTIVE) {
+				// TODO: if this is an active page (as in stealActive), we need
+				// to unmap it and check if it's modified in an atomic operation.
+				// For now, we'll just ignore it, even though this might let
+				// vm_page_allocate_page() wait forever...
 				mutex_unlock(&cache->lock);
 				vm_cache_release_ref(cache);
 				continue;
