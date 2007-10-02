@@ -443,8 +443,10 @@ MultiLocker::WriteLock()
 		locked = true;
 	} else {
 		// new writer acquiring the lock
+#if DEBUG
 		if (IsReadLocked())
 			debugger("Reader wants to become writer!");
+#endif
 
 		status_t status;
 		do {

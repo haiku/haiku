@@ -167,7 +167,7 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 			{
 				STRACE(("Set Workspace %ld\n", key - 1));
 
-				fDesktop->SetWorkspace(key - 2);
+				fDesktop->SetWorkspaceAsync(key - 2);
 				return B_SKIP_MESSAGE;
 			}
 		}
@@ -228,6 +228,10 @@ MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken,
 	if (message->FindPoint("where", &where) != B_OK)
 		return B_DISPATCH_MESSAGE;
 
+	int32 buttons;
+	if (message->FindInt32("buttons", &buttons) != B_OK)
+		buttons = 0;
+
 	if (!fDesktop->LockAllWindows())
 		return B_DISPATCH_MESSAGE;
 
@@ -271,6 +275,8 @@ MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken,
 		*_target = NULL;
 	}
 
+	fDesktop->SetLastMouseState(where, buttons);
+
 	fDesktop->UnlockAllWindows();
 
 	return B_DISPATCH_MESSAGE;
@@ -310,10 +316,17 @@ Desktop::Desktop(uid_t userID)
 	fSubsetWindows(kSubsetList),
 	fWorkspacesLayer(NULL),
 	fActiveScreen(NULL),
+
 	fWindowLock("window lock"),
+
+	fFocusFollowsMouse(false),
+
 	fMouseEventWindow(NULL),
 	fWindowUnderMouse(NULL),
 	fViewUnderMouse(B_NULL_TOKEN),
+	fLastMousePosition(B_ORIGIN),
+	fLastMouseButtons(0),
+
 	fFocus(NULL),
 	fFront(NULL),
 	fBack(NULL)
@@ -605,6 +618,14 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				PostMessage(kMsgQuitLooper);
 			break;
 
+		case AS_ACTIVATE_WORKSPACE: {
+			int32 index;
+			link.Read<int32>(&index);
+
+			SetWorkspace(index);
+			break;
+		}
+
 		default:
 			printf("Desktop %d:%s received unexpected code %ld\n", 0, "baron", code);
 
@@ -660,11 +681,7 @@ Desktop::BroadcastToAllApps(int32 code)
 }
 
 
-ServerCursor*
-Desktop::Cursor() const
-{
-	return HWInterface()->Cursor();
-}
+// #pragma mark -
 
 
 void
@@ -679,6 +696,32 @@ Desktop::SetCursor(ServerCursor* newCursor)
 
 	HWInterface()->SetCursor(newCursor);
 }
+
+
+ServerCursor*
+Desktop::Cursor() const
+{
+	return HWInterface()->Cursor();
+}
+
+
+void
+Desktop::SetLastMouseState(const BPoint& position, int32 buttons)
+{
+	fLastMousePosition = position;
+	fLastMouseButtons = buttons;
+}
+
+
+void
+Desktop::GetLastMouseState(BPoint* position, int32* buttons) const
+{
+	*position = fLastMousePosition;
+	*buttons = fLastMouseButtons;
+}
+
+
+// #pragma mark -
 
 
 /*!
@@ -766,6 +809,20 @@ Desktop::SetWorkspacesCount(int32 newCount)
 		_SendFakeMouseMoved();
 
 	return B_OK;
+}
+
+
+/*!
+	Changes the current workspace to the one specified by \a index.
+	You must not hold any window lock when calling this method.
+*/
+void
+Desktop::SetWorkspaceAsync(int32 index)
+{
+	BPrivate::LinkSender link(MessagePort());
+	link.StartMessage(AS_ACTIVATE_WORKSPACE);
+	link.Attach<int32>(index);
+	link.Flush();
 }
 
 
@@ -1163,10 +1220,6 @@ Desktop::_WindowChanged(WindowLayer* window)
 void
 Desktop::_SendFakeMouseMoved(WindowLayer* window)
 {
-	BPoint where;
-	int32 buttons;
-	EventDispatcher().GetMouse(where, buttons);
-
 	int32 viewToken = B_NULL_TOKEN;
 	EventTarget* target = NULL;
 
@@ -1175,11 +1228,11 @@ Desktop::_SendFakeMouseMoved(WindowLayer* window)
 	if (window == NULL)
 		window = MouseEventWindow();
 	if (window == NULL)
-		window = WindowAt(where);
+		window = WindowAt(fLastMousePosition);
 
 	if (window != NULL) {
 		BMessage message;
-		window->MouseMoved(&message, where, &viewToken, true);
+		window->MouseMoved(&message, fLastMousePosition, &viewToken, true);
 
 		if (viewToken != B_NULL_TOKEN)
 			target = &window->EventTarget();

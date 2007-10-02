@@ -77,6 +77,15 @@ class Desktop : public MessageLooper, public ScreenOwner {
 
 		void					SetCursor(ServerCursor* cursor);
 		ServerCursor*			Cursor() const;
+		void					SetLastMouseState(const BPoint& position,
+									int32 buttons);
+									// for use by the mouse filter only
+									// both mouse position calls require
+									// the Desktop object to be locked
+									// already
+		void					GetLastMouseState(BPoint* position,
+									int32* buttons) const;
+									// for use by ServerWindow
 
 		void					ScreenChanged(Screen* screen, bool makeDefault);
 
@@ -92,6 +101,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 
 		// Workspace methods
 
+		void					SetWorkspaceAsync(int32 index);
 		void					SetWorkspace(int32 index);
 		int32					CurrentWorkspace()
 									{ return fCurrentWorkspace; }
@@ -263,6 +273,8 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		WindowLayer*			fMouseEventWindow;
 		const WindowLayer*		fWindowUnderMouse;
 		int32					fViewUnderMouse;
+		BPoint					fLastMousePosition;
+		int32					fLastMouseButtons;
 
 		WindowLayer*			fFocus;
 		WindowLayer*			fFront;

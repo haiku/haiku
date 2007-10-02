@@ -551,6 +551,8 @@ EventDispatcher::SetDragMessage(BMessage& message,
 {
 	ETRACE(("EventDispatcher::SetDragMessage()\n"));
 
+	BAutolock _(this);
+
 	if (fDragBitmap != bitmap) {
 		if (fDragBitmap)
 			gBitmapManager->DeleteBitmap(fDragBitmap);

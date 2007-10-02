@@ -368,11 +368,16 @@ ServerWindow::_Show()
 	if (fQuitting || !fWindowLayer->IsHidden() || fWindowLayer->IsOffscreenWindow())
 		return;
 
-// TODO: race condition? maybe we need to dispatch a message to the desktop to show/hide us
+// TODO: deadlock. Desktop::ShowWindow() will eventually lock the event thread,
+// which might be blocking on the all window lock with it's own lock already
+// head.
+// Maybe we need to dispatch a message to the desktop to show/hide us
 // instead of doing it from this thread.
-fDesktop->UnlockSingleWindow();
+//fDesktop->UnlockSingleWindow();
+fDesktop->UnlockAllWindows();
 	fDesktop->ShowWindow(fWindowLayer);
-fDesktop->LockSingleWindow();
+fDesktop->LockAllWindows();
+//fDesktop->LockSingleWindow();
 
 	if (fDirectWindowData != NULL)
 		HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESET);
@@ -394,9 +399,7 @@ ServerWindow::_Hide()
 
 // TODO: race condition? maybe we need to dispatch a message to the desktop to show/hide us
 // instead of doing it from this thread.
-fDesktop->UnlockSingleWindow();
 	fDesktop->HideWindow(fWindowLayer);
-fDesktop->LockSingleWindow();
 }
 
 
@@ -436,9 +439,9 @@ ServerWindow::SetTitle(const char* newTitle)
 	}
 
 	if (fWindowLayer != NULL) {
-fDesktop->UnlockSingleWindow();
+//fDesktop->UnlockSingleWindow();
 		fDesktop->SetWindowTitle(fWindowLayer, newTitle);
-fDesktop->LockSingleWindow();
+//fDesktop->LockSingleWindow();
 	}
 }
 
@@ -586,12 +589,18 @@ ServerWindow::_CreateLayerTree(BPrivate::LinkReceiver &link, ViewLayer **_parent
 	newLayer->SetEventMask(eventMask, eventOptions);
 
 	if (eventMask != 0 || eventOptions != 0) {
-		fDesktop->UnlockSingleWindow();
+//		fDesktop->UnlockSingleWindow();
+//		fDesktop->LockAllWindows();
+fDesktop->UnlockAllWindows();
+		// TODO: possible deadlock
 		fDesktop->EventDispatcher().AddListener(EventTarget(),
 			newLayer->Token(), eventMask, eventOptions);
-		fDesktop->LockSingleWindow();
+fDesktop->LockAllWindows();
+//		fDesktop->UnlockAllWindows();
+//		fDesktop->LockSingleWindow();
 	}
 
+	// TODO: default fonts should be created and stored in the Application
 	DesktopSettings settings(fDesktop);
 	ServerFont font;
 	settings.GetDefaultPlainFont(font);
@@ -661,12 +670,12 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 
 			link.Read<bool>(&activate);
 
-fDesktop->UnlockSingleWindow();
+//fDesktop->UnlockSingleWindow();
 			if (activate)
 				fDesktop->ActivateWindow(fWindowLayer);
 			else
 				fDesktop->SendWindowBehind(fWindowLayer, NULL);
-fDesktop->LockSingleWindow();
+//fDesktop->LockSingleWindow();
 			break;
 		}
 		case AS_SEND_BEHIND:
@@ -681,10 +690,10 @@ fDesktop->LockSingleWindow();
 
 			WindowLayer *behindOf;
 			if ((behindOf = fDesktop->FindWindowLayerByClientToken(token, teamID)) != NULL) {
-fDesktop->UnlockSingleWindow();
+//fDesktop->UnlockSingleWindow();
 // TODO: there is a big race condition when we unlock here (window could be gone by now)!
 				fDesktop->SendWindowBehind(fWindowLayer, behindOf);
-fDesktop->LockSingleWindow();
+//fDesktop->LockSingleWindow();
 				status = B_OK;
 			} else
 				status = B_NAME_NOT_FOUND;
@@ -748,11 +757,11 @@ fDesktop->LockSingleWindow();
 					|| windowLayer->Feel() != B_NORMAL_WINDOW_FEEL) {
 					status = B_BAD_VALUE;
 				} else {
-fDesktop->UnlockSingleWindow();
+//fDesktop->UnlockSingleWindow();
 // TODO: there is a big race condition when we unlock here (window could be gone by now)!
 					status = fDesktop->AddWindowToSubset(fWindowLayer, windowLayer)
 						? B_OK : B_NO_MEMORY;
-fDesktop->LockSingleWindow();
+//fDesktop->LockSingleWindow();
 				}
 			}
 
@@ -770,10 +779,10 @@ fDesktop->LockSingleWindow();
 				WindowLayer* windowLayer = fDesktop->FindWindowLayerByClientToken(
 					token, App()->ClientTeam());
 				if (windowLayer != NULL) {
-fDesktop->UnlockSingleWindow();
+//fDesktop->UnlockSingleWindow();
 // TODO: there is a big race condition when we unlock here (window could be gone by now)!
 					fDesktop->RemoveWindowFromSubset(fWindowLayer, windowLayer);
-fDesktop->LockSingleWindow();
+//fDesktop->LockSingleWindow();
 					status = B_OK;
 				} else
 					status = B_BAD_VALUE;
@@ -797,9 +806,9 @@ fDesktop->LockSingleWindow();
 			}
 
 			if (status == B_OK && !fWindowLayer->IsOffscreenWindow()) {
-fDesktop->UnlockSingleWindow();
+//fDesktop->UnlockSingleWindow();
 				fDesktop->SetWindowLook(fWindowLayer, (window_look)look);
-fDesktop->LockSingleWindow();
+//fDesktop->LockSingleWindow();
 			}
 
 			fLink.StartMessage(status);
@@ -819,9 +828,9 @@ fDesktop->LockSingleWindow();
 			}
 
 			if (status == B_OK && !fWindowLayer->IsOffscreenWindow()) {
-fDesktop->UnlockSingleWindow();
+//fDesktop->UnlockSingleWindow();
 				fDesktop->SetWindowFeel(fWindowLayer, (window_feel)feel);
-fDesktop->LockSingleWindow();
+//fDesktop->LockSingleWindow();
 			}
 
 			fLink.StartMessage(status);
@@ -841,9 +850,9 @@ fDesktop->LockSingleWindow();
 			}
 
 			if (status == B_OK && !fWindowLayer->IsOffscreenWindow()) {
-fDesktop->UnlockSingleWindow();
+//fDesktop->UnlockSingleWindow();
 				fDesktop->SetWindowFlags(fWindowLayer, flags);
-fDesktop->LockSingleWindow();
+//fDesktop->LockSingleWindow();
 			}
 
 			fLink.StartMessage(status);
@@ -886,9 +895,9 @@ fDesktop->LockSingleWindow();
 			STRACE(("ServerWindow %s: Message AS_SET_WORKSPACES %lx\n",
 				Title(), newWorkspaces));
 
-fDesktop->UnlockSingleWindow();
+//fDesktop->UnlockSingleWindow();
 			fDesktop->SetWindowWorkspaces(fWindowLayer, newWorkspaces);
-fDesktop->LockSingleWindow();
+//fDesktop->LockSingleWindow();
 			break;
 		}
 		case AS_WINDOW_RESIZE:
@@ -907,9 +916,9 @@ fDesktop->LockSingleWindow();
 				// pragmatically set window bounds
 				fLink.StartMessage(B_BUSY);
 			} else {
-fDesktop->UnlockSingleWindow();
+//fDesktop->UnlockSingleWindow();
 				fDesktop->ResizeWindowBy(fWindowLayer, xResizeBy, yResizeBy);
-fDesktop->LockSingleWindow();
+//fDesktop->LockSingleWindow();
 				fLink.StartMessage(B_OK);
 			}
 			fLink.Flush();
@@ -931,9 +940,9 @@ fDesktop->LockSingleWindow();
 				// pragmatically set window positions
 				fLink.StartMessage(B_BUSY);
 			} else {
-fDesktop->UnlockSingleWindow();
+//fDesktop->UnlockSingleWindow();
 				fDesktop->MoveWindowBy(fWindowLayer, xMoveBy, yMoveBy);
-fDesktop->LockSingleWindow();
+//fDesktop->LockSingleWindow();
 				fLink.StartMessage(B_OK);
 			}
 			fLink.Flush();
@@ -960,7 +969,7 @@ fDesktop->LockSingleWindow();
 			link.Read<int32>(&minHeight);
 			link.Read<int32>(&maxHeight);
 */
-			fDesktop->UnlockSingleWindow();
+//fDesktop->UnlockSingleWindow();
 
 			if (fDesktop->LockAllWindows()) {
 				fWindowLayer->SetSizeLimits(minWidth, maxWidth,
@@ -968,7 +977,7 @@ fDesktop->LockSingleWindow();
 				fDesktop->UnlockAllWindows();
 			}
 
-			fDesktop->LockSingleWindow();
+//fDesktop->LockSingleWindow();
 
 			// and now, sync the client to the limits that we were able to enforce
 			fWindowLayer->GetSizeLimits(&minWidth, &maxWidth,
@@ -995,9 +1004,9 @@ fDesktop->LockSingleWindow();
 				if (link.Read(buffer, size) == B_OK) {
 					BMessage settings;
 					if (settings.Unflatten(buffer) == B_OK) {
-fDesktop->UnlockSingleWindow();
+//fDesktop->UnlockSingleWindow();
 						fDesktop->SetWindowDecoratorSettings(fWindowLayer, settings);
-fDesktop->LockSingleWindow();
+//fDesktop->LockSingleWindow();
 					}
 				}
 			}
@@ -1058,15 +1067,15 @@ fDesktop->LockSingleWindow();
 		{
 			DTRACE(("ServerWindow %s: Message AS_GET_MOUSE\n", fTitle));
 
-			fDesktop->UnlockSingleWindow();
+//fDesktop->UnlockSingleWindow();
 			// Returns
 			// 1) BPoint mouse location
 			// 2) int32 button state
 
 			BPoint where;
 			int32 buttons;
-			fDesktop->EventDispatcher().GetMouse(where, buttons);
-			fDesktop->LockSingleWindow();
+			fDesktop->GetLastMouseState(&where, &buttons);
+//fDesktop->LockSingleWindow();
 
 			fLink.StartMessage(B_OK);
 			fLink.Attach<BPoint>(where);
@@ -1103,10 +1112,10 @@ fDesktop->LockSingleWindow();
 
 			status_t status = B_OK;
 			if (!fWindowLayer->IsOffscreenWindow()) {
-				fDesktop->UnlockSingleWindow();
+//fDesktop->UnlockSingleWindow();
 				fDesktop->SetWindowFeel(fWindowLayer,
 					enable ? kWindowScreenFeel : B_NORMAL_WINDOW_FEEL);
-				fDesktop->LockSingleWindow();
+//fDesktop->LockSingleWindow();
 			} else
 				status = B_BAD_TYPE;
 
@@ -1246,8 +1255,14 @@ ServerWindow::_DispatchViewMessage(int32 code,
 					parent->RemoveChild(view);
 
 					if (view->EventMask() != 0) {
-						fDesktop->EventDispatcher().RemoveListener(EventTarget(),
-							token);
+						// TODO: possible deadlock (event dispatcher already
+						// locked itself, waits for Desktop write lock, but
+						// we have it, now we are trying to lock the event
+						// dispatcher -> deadlock)
+fDesktop->UnlockSingleWindow();
+						fDesktop->EventDispatcher().RemoveListener(
+							EventTarget(), token);
+fDesktop->LockSingleWindow();
 					}
 					if (fCurrentLayer == view)
 						_SetCurrentLayer(parent);
@@ -1288,14 +1303,15 @@ ServerWindow::_DispatchViewMessage(int32 code,
 		}
 		case AS_LAYER_SET_EVENT_MASK:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_MOUSE_EVENT_MASK: ViewLayer name: %s\n", fTitle, fCurrentLayer->Name()));			
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_EVENT_MASK: ViewLayer name: %s\n", fTitle, fCurrentLayer->Name()));			
 			uint32 eventMask, options;
 
 			link.Read<uint32>(&eventMask);
 			if (link.Read<uint32>(&options) == B_OK) {
-				fDesktop->UnlockSingleWindow();
 				fCurrentLayer->SetEventMask(eventMask, options);
 
+fDesktop->UnlockSingleWindow();
+				// TODO: possible deadlock!
 				if (eventMask != 0 || options != 0) {
 					fDesktop->EventDispatcher().AddListener(EventTarget(),
 						fCurrentLayer->Token(), eventMask, options);
@@ -1303,7 +1319,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 					fDesktop->EventDispatcher().RemoveListener(EventTarget(),
 						fCurrentLayer->Token());
 				}
-				fDesktop->LockSingleWindow();
+fDesktop->LockSingleWindow();
 			}
 			break;
 		}
@@ -1314,7 +1330,8 @@ ServerWindow::_DispatchViewMessage(int32 code,
 
 			link.Read<uint32>(&eventMask);
 			if (link.Read<uint32>(&options) == B_OK) {
-				fDesktop->UnlockSingleWindow();
+fDesktop->UnlockSingleWindow();
+				// TODO: possible deadlock
 				if (eventMask != 0 || options != 0) {
 					fDesktop->EventDispatcher().AddTemporaryListener(EventTarget(),
 						fCurrentLayer->Token(), eventMask, options);
@@ -1322,7 +1339,7 @@ ServerWindow::_DispatchViewMessage(int32 code,
 					fDesktop->EventDispatcher().RemoveTemporaryListener(EventTarget(),
 						fCurrentLayer->Token());
 				}
-				fDesktop->LockSingleWindow();
+fDesktop->LockSingleWindow();
 			}
 
 			// TODO: support B_LOCK_WINDOW_FOCUS option in Desktop
@@ -1896,8 +1913,11 @@ ServerWindow::_DispatchViewMessage(int32 code,
 				if (link.Read(buffer, bufferSize) == B_OK
 					&& dragMessage.Unflatten(buffer) == B_OK) {
 						ServerBitmap* bitmap = fServerApp->FindBitmap(bitmapToken);
+						// TODO: possible deadlock
+fDesktop->UnlockSingleWindow();
 						fDesktop->EventDispatcher().SetDragMessage(dragMessage,
-																   bitmap, offset);
+							bitmap, offset);
+fDesktop->LockSingleWindow();
 				}
 				delete[] buffer;
 			}
@@ -1925,8 +1945,11 @@ ServerWindow::_DispatchViewMessage(int32 code,
 				BMessage dragMessage;
 				if (link.Read(buffer, bufferSize) == B_OK
 					&& dragMessage.Unflatten(buffer) == B_OK) {
+						// TODO: possible deadlock
+fDesktop->UnlockSingleWindow();
 						fDesktop->EventDispatcher().SetDragMessage(dragMessage,
 							NULL /* should be dragRect */, offset);
+fDesktop->LockSingleWindow();
 				}
 				delete[] buffer;
 			}
@@ -2857,6 +2880,7 @@ ServerWindow::_MessageLooper()
 
 		int32 messagesProcessed = 0;
 		bool lockedDesktop = false;
+		bool needsAllWindowsLocked = false;
 
 		while (true) {
 			if (code == AS_DELETE_WINDOW || code == kMsgQuitLooper) {
@@ -2881,10 +2905,21 @@ ServerWindow::_MessageLooper()
 				break;
 			}
 
-			if (!lockedDesktop) {
+			needsAllWindowsLocked = _MessageNeedsAllWindowsLocked(code);
+
+			if (!lockedDesktop && !needsAllWindowsLocked) {
 				// only lock it once
 				fDesktop->LockSingleWindow();
 				lockedDesktop = true;
+			} else if (lockedDesktop && !needsAllWindowsLocked) {
+				// nothing to do
+			} else if (needsAllWindowsLocked) {
+				if (lockedDesktop) {
+					// unlock single before locking all
+					fDesktop->UnlockSingleWindow();
+					lockedDesktop = false;
+				}
+				fDesktop->LockAllWindows();
 			}
 
 			if (atomic_and(&fRedrawRequested, 0) != 0) {
@@ -2902,7 +2937,6 @@ ServerWindow::_MessageLooper()
 # endif
 #endif
 			}
-		
 
 
 #ifdef PROFILE_MESSAGE_LOOP
@@ -2924,9 +2958,13 @@ ServerWindow::_MessageLooper()
 			}
 #endif
 
+			if (needsAllWindowsLocked)
+				fDesktop->UnlockAllWindows();
+
 			// only process up to 70 waiting messages at once (we have the Desktop locked)
 			if (!receiver.HasMessages() || ++messagesProcessed > 70) {
-				fDesktop->UnlockSingleWindow();
+				if (lockedDesktop)
+					fDesktop->UnlockSingleWindow();
 				break;
 			}
 
@@ -2935,7 +2973,8 @@ ServerWindow::_MessageLooper()
 			if (status < B_OK) {
 				// that shouldn't happen, it's our port
 				printf("Someone deleted our message port!\n");
-				fDesktop->UnlockSingleWindow();
+				if (lockedDesktop)
+					fDesktop->UnlockSingleWindow();
 
 				// try to let our client die happily
 				NotifyQuitRequested();
@@ -3148,6 +3187,39 @@ ServerWindow::_UpdateDrawState(ViewLayer* layer)
 		IntPoint p = layer->ScrollingOffset();
 		p += IntPoint(layer->CurrentState()->Origin());
 		drawingEngine->SetDrawState(layer->CurrentState(), p.x, p.y);
+	}
+}
+
+
+bool
+ServerWindow::_MessageNeedsAllWindowsLocked(uint32 code) const
+{
+	switch (code) {
+		case AS_SHOW_WINDOW:
+		case AS_HIDE_WINDOW:
+		case AS_MINIMIZE_WINDOW:
+		case AS_ACTIVATE_WINDOW:
+		case AS_SET_WINDOW_TITLE:
+		case AS_ADD_TO_SUBSET:
+		case AS_REMOVE_FROM_SUBSET:
+		case AS_LAYER_CREATE_ROOT:
+		case AS_LAYER_CREATE:
+		case AS_SEND_BEHIND:
+		case AS_SET_LOOK:
+		case AS_SET_FEEL:
+		case AS_SET_FLAGS:
+		case AS_SET_WORKSPACES:
+		case AS_WINDOW_MOVE:
+		case AS_WINDOW_RESIZE:
+		case AS_SET_SIZE_LIMITS:
+		case AS_SET_DECORATOR_SETTINGS:
+		case AS_GET_MOUSE:
+		case AS_DIRECT_WINDOW_SET_FULLSCREEN:
+//		case AS_LAYER_SET_EVENT_MASK:
+//		case AS_LAYER_SET_MOUSE_EVENT_MASK:
+			return true;
+		default:
+			return false;
 	}
 }
 

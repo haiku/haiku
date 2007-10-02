@@ -1289,6 +1289,9 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 }
 
 
+// #pragma mark -
+
+
 void
 ViewLayer::MouseDown(BMessage* message, BPoint where)
 {

@@ -127,6 +127,8 @@ private:
 			void				_SetCurrentLayer(ViewLayer* view);
 			void				_UpdateDrawState(ViewLayer* view);
 
+			bool				_MessageNeedsAllWindowsLocked(uint32 code) const;
+
 			// TODO: Move me elsewhere
 			status_t			PictureToRegion(ServerPicture *picture,
 												BRegion &,
@@ -158,7 +160,7 @@ private:
 			ViewLayer*			fCurrentLayer;
 			BRegion				fCurrentDrawingRegion;
 			bool				fCurrentDrawingRegionValid;
-			
+
 			direct_window_data*	fDirectWindowData;
 };
 
