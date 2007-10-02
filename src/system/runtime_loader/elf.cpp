@@ -370,6 +370,9 @@ delete_image_struct(image_t *image)
 static void
 delete_image(image_t *image)
 {
+	if (image == NULL)
+		return;
+
 	_kern_unregister_image(image->id);
 		// registered in load_container()
 
