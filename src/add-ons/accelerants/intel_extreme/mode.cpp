@@ -529,7 +529,7 @@ if (first) {
 			if ((gInfo->shared_info->device_type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_965)
 				pll |= 6 << DISPLAY_PLL_PULSE_PHASE_SHIFT;
 		} else {
-			if (divisors.post2_high)
+			if (!divisors.post2_high)
 				pll |= DISPLAY_PLL_DIVIDE_4X;
 
 			pll |= DISPLAY_PLL_2X_CLOCK;
