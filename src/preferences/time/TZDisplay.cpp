@@ -9,6 +9,8 @@
  *
  */
 
+#include <stdio.h>
+
 #include "TZDisplay.h"
 
 
@@ -125,8 +127,10 @@ TTZDisplay::SetTime(int32 hour, int32 minute)
 	if (hour > 11)
 		ap = "PM";
 
-	fTime.SetTo("");
-	fTime << ahour << ":" << minute << ":" << ap;
+	char buffer[32];
+	snprintf(buffer, sizeof(buffer), "%ld:%02ld %s", ahour, minute, ap);
+
+	fTime.SetTo(buffer);
 
 	Invalidate();
 }
