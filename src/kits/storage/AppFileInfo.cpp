@@ -831,6 +831,13 @@ BAppFileInfo::GetIconForType(const char* type, BBitmap* icon,
 	if (!icon || icon->InitCheck() != B_OK)
 		return B_BAD_VALUE;
 
+	// TODO: for consistency with attribute based icon reading, we
+	// could also prefer B_CMAP8 icons here if the provided bitmap
+	// is in that format. Right now, an existing B_CMAP8 icon resource
+	// would be ignored as soon as a vector icon is present. On the other
+	// hand, maybe this still results in a more consistent user interface,
+	// since Tracker/Deskbar would surely show the vector icon.
+
 	// try vector icon first
 	BString vectorAttributeName(kIconAttribute);
 
