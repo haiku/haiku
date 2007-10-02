@@ -76,9 +76,9 @@ notify_attribute_changed(dev_t device, ino_t node, const char *attribute,
 
 // notify_select_event
 status_t
-notify_select_event(selectsync *sync, uint32 ref, uint8 event)
+notify_select_event(selectsync *sync, uint8 event)
 {
-	return UserlandFS::KernelEmu::notify_select_event(sync, ref, event, false);
+	return UserlandFS::KernelEmu::notify_select_event(sync, event, false);
 }
 
 // notify_query_entry_created

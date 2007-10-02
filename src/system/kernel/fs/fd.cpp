@@ -4,7 +4,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include <fd.h>
 
 #include <stdlib.h>
@@ -15,8 +14,7 @@
 #include <syscalls.h>
 #include <util/AutoLock.h>
 #include <vfs.h>
-
-#include "vfs_select.h"
+#include <wait_for_objects.h>
 
 
 //#define TRACE_FD
@@ -448,6 +446,7 @@ deselect_select_infos(file_descriptor* descriptor, select_info* infos)
 			}
 		}
 
+		notify_select_events(info, B_EVENT_INVALID);
 		info = info->next;
 		put_select_sync(sync);
 	}
@@ -455,9 +454,10 @@ deselect_select_infos(file_descriptor* descriptor, select_info* infos)
 
 
 status_t
-select_fd(int fd, struct select_sync* sync, uint32 ref, bool kernel)
+select_fd(int32 fd, struct select_info* info, bool kernel)
 {
-	TRACE(("select_fd(fd = %d, selectsync = %p, ref = %lu, 0x%x)\n", fd, sync, ref, sync->set[ref].selected_events));
+	TRACE(("select_fd(fd = %d, info = %p (%p), 0x%x)\n", fd, info,
+		info->sync, info.selected_events));
 
 	FDGetter fdGetter;
 		// define before the context locker, so it will be destroyed after it
@@ -469,7 +469,6 @@ select_fd(int fd, struct select_sync* sync, uint32 ref, bool kernel)
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
-	select_info* info = &sync->set[ref];
 	if (info->selected_events == 0)
 		return B_OK;
 
@@ -485,7 +484,7 @@ select_fd(int fd, struct select_sync* sync, uint32 ref, bool kernel)
 
 	// as long as the info is in the list, we keep a reference to the sync
 	// object
-	atomic_add(&sync->ref_count, 1);
+	atomic_add(&info->sync->ref_count, 1);
 
 	locker.Unlock();
 
@@ -494,7 +493,7 @@ select_fd(int fd, struct select_sync* sync, uint32 ref, bool kernel)
 
 	for (uint16 event = 1; event < 16; event++) {
 		if (info->selected_events & SELECT_FLAG(event)
-			&& descriptor->ops->fd_select(descriptor, event, ref,
+			&& descriptor->ops->fd_select(descriptor, event,
 				(selectsync*)info) == B_OK) {
 			selectedEvents |= SELECT_FLAG(event);
 		}
@@ -503,18 +502,18 @@ select_fd(int fd, struct select_sync* sync, uint32 ref, bool kernel)
 
 	// if nothing has been selected, we deselect immediately
 	if (selectedEvents == 0)
-		deselect_fd(fd, sync, ref, kernel);
+		deselect_fd(fd, info, kernel);
 
 	return B_OK;
 }
 
 
 status_t
-deselect_fd(int fd, struct select_sync* sync, uint32 ref, bool kernel)
+deselect_fd(int32 fd, struct select_info* info, bool kernel)
 {
-	TRACE(("deselect_fd(fd = %d, selectsync = %p, ref = %lu)\n", fd, sync, ref));
+	TRACE(("deselect_fd(fd = %d, info = %p (%p), 0x%x)\n", fd, info,
+		info->sync, info.selected_events));
 
-	select_info* info = &sync->set[ref];
 	if (info->selected_events == 0)
 		return B_OK;
 
@@ -552,7 +551,7 @@ deselect_fd(int fd, struct select_sync* sync, uint32 ref, bool kernel)
 		}
 	}
 
-	put_select_sync(sync);
+	put_select_sync(info->sync);
 
 	return B_OK;
 }

@@ -627,7 +627,7 @@ UserlandRequestHandler::_HandleRequest(SelectRequest* request)
 	if (result == B_OK) {
 		RequestThreadContext context(volume);
 		result = volume->Select(request->node, request->fileCookie,
-			request->event, request->ref, request->sync);
+			request->event, 0, request->sync);
 	}
 
 	// prepare the reply

@@ -12,20 +12,19 @@
 
 #include <KernelExport.h>
 #include <NodeMonitor.h>
+#include <Select.h>
 
 #include <condition_variable.h>
-#include <util/kernel_cpp.h>
+#include <debug.h>
+#include <khash.h>
+#include <lock.h>
+#include <select_sync_pool.h>
+#include <team.h>
 #include <util/DoublyLinkedList.h>
 #include <util/AutoLock.h>
 #include <util/ring_buffer.h>
 #include <vfs.h>
-#include "vfs_select.h"
-#include <select_sync_pool.h>
-#include <debug.h>
-#include <khash.h>
-#include <lock.h>
 #include <vm.h>
-#include <team.h>
 
 
 //#define TRACE_PIPEFS
@@ -960,7 +959,7 @@ Inode::Select(uint8 event, uint32 ref, selectsync *sync, int openMode)
 	} else
 		return B_NOT_ALLOWED;
 
-	if (add_select_sync_pool_entry(pool, sync, ref, event) != B_OK)
+	if (add_select_sync_pool_entry(pool, sync, event) != B_OK)
 		return B_ERROR;
 
 	// signal right away, if the condition holds already
@@ -968,12 +967,12 @@ Inode::Select(uint8 event, uint32 ref, selectsync *sync, int openMode)
 		if (event == B_SELECT_WRITE
 				&& (fBuffer.Writable() > 0 || fReaderCount == 0)
 			|| event == B_SELECT_ERROR && fReaderCount == 0) {
-			return notify_select_event(sync, ref, event);
+			return notify_select_event(sync, event);
 		}
 	} else {
 		if (event == B_SELECT_READ
 				&& (fBuffer.Readable() > 0 || fWriterCount == 0)) {
-			return notify_select_event(sync, ref, event);
+			return notify_select_event(sync, event);
 		}
 	}
 

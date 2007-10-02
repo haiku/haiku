@@ -31,6 +31,7 @@
 #include <arch/system_info.h>
 #include <messaging.h>
 #include <frame_buffer_console.h>
+#include <wait_for_objects.h>
 
 #include <malloc.h>
 #include <string.h>

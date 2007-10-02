@@ -170,8 +170,8 @@ UserlandFS::KernelEmu::notify_listener(int32 operation, uint32 details,
 
 // notify_select_event
 status_t
-UserlandFS::KernelEmu::notify_select_event(selectsync *sync, uint32 ref,
-	uint8 event, bool unspecifiedEvent)
+UserlandFS::KernelEmu::notify_select_event(selectsync *sync, uint8 event,
+	bool unspecifiedEvent)
 {
 	// get the request port and the file system
 	RequestPort* port;
@@ -188,7 +188,6 @@ UserlandFS::KernelEmu::notify_select_event(selectsync *sync, uint32 ref,
 		return error;
 
 	request->sync = sync;
-	request->ref = ref;
 	request->event = event;
 	request->unspecifiedEvent = unspecifiedEvent;
 

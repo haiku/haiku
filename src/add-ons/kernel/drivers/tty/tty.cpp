@@ -1676,7 +1676,7 @@ tty_select(tty_cookie *cookie, uint8 event, uint32 ref, selectsync *sync)
 	if (!ttyReference.IsLocked()) {
 		TRACE(("tty_select() done: cookie %p already closed\n", cookie));
 
-		notify_select_event(sync, ref, event);
+		notify_select_event(sync, event);
 		return B_OK;
 	}
 
@@ -1690,8 +1690,7 @@ tty_select(tty_cookie *cookie, uint8 event, uint32 ref, selectsync *sync)
 		otherTTY = NULL;
 
 	// add the event to the TTY's pool
-	status_t error = add_select_sync_pool_entry(&tty->select_pool, sync, ref,
-		event);
+	status_t error = add_select_sync_pool_entry(&tty->select_pool, sync, event);
 	if (error != B_OK) {
 		TRACE(("tty_select() done: add_select_sync_pool_entry() failed: %lx\n",
 			error));
@@ -1708,7 +1707,7 @@ tty_select(tty_cookie *cookie, uint8 event, uint32 ref, selectsync *sync)
 		case B_SELECT_READ:
 			if (tty->reader_queue.IsEmpty()
 				&& line_buffer_readable(tty->input_buffer) > 0) {
-				notify_select_event(sync, ref, event);
+				notify_select_event(sync, event);
 			}
 			break;
 
@@ -1716,7 +1715,7 @@ tty_select(tty_cookie *cookie, uint8 event, uint32 ref, selectsync *sync)
 		{
 			// writes go to the other TTY
 			if (!otherTTY) {
-				notify_select_event(sync, ref, event);
+				notify_select_event(sync, event);
 				break;
 			}
 
@@ -1730,7 +1729,7 @@ tty_select(tty_cookie *cookie, uint8 event, uint32 ref, selectsync *sync)
 				if (!echo
 					|| (tty->writer_queue.IsEmpty()
 						&& line_buffer_writable(tty->input_buffer) > 0)) {
-					notify_select_event(sync, ref, event);
+					notify_select_event(sync, event);
 				}
 			}
 

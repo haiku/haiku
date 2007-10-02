@@ -547,7 +547,6 @@ public:
 	SelectRequest() : FileRequest(SELECT_REQUEST) {}
 
 	uint8		event;
-	uint32		ref;
 	selectsync*	sync;
 };
 
@@ -1394,7 +1393,6 @@ public:
 	NotifySelectEventRequest() : Request(NOTIFY_SELECT_EVENT_REQUEST) {}
 
 	selectsync*	sync;
-	uint32		ref;
 	uint8		event;
 	bool		unspecifiedEvent;
 };

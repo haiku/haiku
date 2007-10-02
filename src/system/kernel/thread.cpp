@@ -9,8 +9,19 @@
 /*! Threading routines */
 
 
+#include <thread.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/resource.h>
+
 #include <OS.h>
 
+#include <util/AutoLock.h>
+#include <util/khash.h>
+
+#include <boot/kernel_args.h>
 #include <condition_variable.h>
 #include <cpu.h>
 #include <int.h>
@@ -20,20 +31,13 @@
 #include <smp.h>
 #include <syscalls.h>
 #include <team.h>
-#include <thread.h>
 #include <tls.h>
 #include <user_runtime.h>
 #include <vfs.h>
 #include <vm.h>
 #include <vm_address_space.h>
+#include <wait_for_objects.h>
 
-#include <boot/kernel_args.h>
-#include <util/khash.h>
-
-#include <sys/resource.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 //#define TRACE_THREAD
 #ifdef TRACE_THREAD
@@ -249,6 +253,7 @@ create_thread_struct(struct thread *inthread, const char *name,
 	thread->exit.reason = 0;
 	thread->exit.signal = 0;
 	list_init(&thread->exit.waiters);
+	thread->select_infos = NULL;
 
 	sprintf(temp, "thread_0x%lx_retcode_sem", thread->id);
 	thread->exit.sem = create_sem(0, temp);
@@ -1223,10 +1228,24 @@ thread_exit(void)
 	debugInfo = thread->debug_info;
 	clear_thread_debug_info(&thread->debug_info, true);
 
+	// Remove the select infos. We notify them a little later.
+	select_info* selectInfos = thread->select_infos;
+	thread->select_infos = NULL;
+
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
 
 	destroy_thread_debug_info(&debugInfo);
+
+	// notify select infos
+	select_info* info = selectInfos;
+	while (info != NULL) {
+		select_sync* sync = info->sync;
+
+		notify_select_events(info, B_EVENT_INVALID);
+		info = info->next;
+		put_select_sync(sync);
+	}
 
 	// shutdown the thread messaging
 
@@ -1610,6 +1629,61 @@ wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
 	}
 
 	return status;
+}
+
+
+status_t
+select_thread(int32 id, struct select_info* info, bool kernel)
+{
+	InterruptsSpinLocker locker(thread_spinlock);
+
+	// get thread
+	struct thread* thread = thread_get_thread_struct_locked(id);
+	if (thread == NULL)
+		return B_BAD_THREAD_ID;
+
+	// We support only B_EVENT_INVALID at the moment.
+	info->selected_events &= B_EVENT_INVALID;
+
+	// add info to list
+	if (info->selected_events != 0) {
+		info->next = thread->select_infos;
+		thread->select_infos = info;
+
+		// we need a sync reference
+		atomic_add(&info->sync->ref_count, 1);
+	}
+
+	return B_OK;
+}
+
+
+status_t
+deselect_thread(int32 id, struct select_info* info, bool kernel)
+{
+	InterruptsSpinLocker locker(thread_spinlock);
+
+	// get thread
+	struct thread* thread = thread_get_thread_struct_locked(id);
+	if (thread == NULL)
+		return B_BAD_THREAD_ID;
+
+	// remove info from list
+	select_info** infoLocation = &thread->select_infos;
+	while (*infoLocation != NULL && *infoLocation != info)
+		infoLocation = &(*infoLocation)->next;
+
+	if (*infoLocation != info)
+		return B_OK;
+
+	*infoLocation = info->next;
+
+	locker.Unlock();
+
+	// surrender sync reference
+	put_select_sync(info->sync);
+
+	return B_OK;
 }
 
 

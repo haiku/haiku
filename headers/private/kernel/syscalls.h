@@ -53,6 +53,10 @@ extern int			_kern_setrlimit(int resource, const struct rlimit * rlp);
 extern status_t		_kern_shutdown(bool reboot);
 extern status_t		_kern_get_safemode_option(const char *parameter, char *buffer, size_t *_bufferSize);
 
+extern ssize_t		_kern_wait_for_objects(object_wait_info* infos, int numInfos,
+						uint32 flags, bigtime_t timeout);
+
+
 /* sem functions */
 extern sem_id		_kern_create_sem(int count, const char *name);
 extern status_t		_kern_delete_sem(sem_id id);

@@ -18,6 +18,7 @@
 #include <util/list.h>
 #include <arch/int.h>
 #include <cbuf.h>
+#include <wait_for_objects.h>
 
 #include <iovec.h>
 #include <string.h>
@@ -49,6 +50,7 @@ struct port_entry {
 	sem_id		read_sem;
 	sem_id		write_sem;
 	int32		total_count;	// messages read from port since creation
+	select_info	*select_infos;
 	struct list	msg_queue;
 };
 
@@ -312,6 +314,14 @@ dump_port_info(int argc, char **argv)
 }
 
 
+static void
+notify_port_select_events(int slot, uint16 events)
+{
+	if (sPorts[slot].select_infos)
+		notify_select_events_list(sPorts[slot].select_infos, events);
+}
+
+
 /** this function cycles through the ports table, deleting all
  *	the ports that are owned by the passed team_id
  */
@@ -499,6 +509,7 @@ create_port(int32 queueLength, const char *name)
 
 			list_init(&sPorts[i].msg_queue);
 			sPorts[i].total_count = 0;
+			sPorts[i].select_infos = NULL;
 			id = sPorts[i].id;
 
 			RELEASE_PORT_LOCK(sPorts[i]);
@@ -565,6 +576,9 @@ close_port(port_id id)
 	readSem = sPorts[slot].read_sem;
 	writeSem = sPorts[slot].write_sem;
 
+	notify_port_select_events(slot, B_EVENT_INVALID);
+	sPorts[slot].select_infos = NULL;
+
 	RELEASE_PORT_LOCK(sPorts[slot]);
 	restore_interrupts(state);
 
@@ -611,6 +625,9 @@ delete_port(port_id id)
 	sPorts[slot].name = NULL;
 	list_move_to_list(&sPorts[slot].msg_queue, &list);
 
+	notify_port_select_events(slot, B_EVENT_INVALID);
+	sPorts[slot].select_infos = NULL;
+
 	RELEASE_PORT_LOCK(sPorts[slot]);
 
 	// update the first free slot hint in the array	
@@ -634,6 +651,93 @@ delete_port(port_id id)
 	// read_port() will see the B_BAD_SEM_ID acq_sem() return value, and act accordingly
 	delete_sem(readSem);
 	delete_sem(writeSem);
+
+	return B_OK;
+}
+
+
+status_t
+select_port(int32 id, struct select_info *info, bool kernel)
+{
+	cpu_status state;
+	int32 slot;
+	status_t error = B_OK;
+
+	if (id < 0)
+		return B_BAD_PORT_ID;
+
+	slot = id % sMaxPorts;
+
+	state = disable_interrupts();
+	GRAB_PORT_LOCK(sPorts[slot]);
+
+	if (sPorts[slot].id != id || is_port_closed(slot)) {
+		// bad port ID
+		error = B_BAD_SEM_ID;
+	} else if (!kernel && sPorts[slot].owner == team_get_kernel_team_id()) {
+		// kernel port, but call from userland
+		error = B_NOT_ALLOWED;
+	} else {
+		info->selected_events &= B_EVENT_READ | B_EVENT_WRITE | B_EVENT_INVALID;
+
+		if (info->selected_events != 0) {
+			uint16 events = 0;
+			int32 writeCount = 0;
+
+			info->next = sPorts[slot].select_infos;
+			sPorts[slot].select_infos = info;
+
+			// check for events
+			if ((info->selected_events & B_EVENT_READ) != 0
+				&& !list_is_empty(&sPorts[slot].msg_queue)) {
+				events |= B_EVENT_READ;
+			}
+
+			if (get_sem_count(sPorts[slot].write_sem, &writeCount) == B_OK
+				&& writeCount > 0) {
+				events |= B_EVENT_WRITE;
+			}
+
+			if (events != 0)
+				notify_select_events(info, events);
+		}
+	}
+
+	RELEASE_PORT_LOCK(sPorts[slot]);
+	restore_interrupts(state);
+
+	return error;
+}
+
+
+status_t
+deselect_port(int32 id, struct select_info *info, bool kernel)
+{
+	cpu_status state;
+	int32 slot;
+
+	if (id < 0)
+		return B_BAD_PORT_ID;
+
+	if (info->selected_events == 0)
+		return B_OK;
+
+	slot = id % sMaxPorts;
+
+	state = disable_interrupts();
+	GRAB_PORT_LOCK(sPorts[slot]);
+
+	if (sPorts[slot].id == id) {
+		select_info** infoLocation = &sPorts[slot].select_infos;
+		while (*infoLocation != NULL && *infoLocation != info)
+			infoLocation = &(*infoLocation)->next;
+
+		if (*infoLocation == info)
+			*infoLocation = info->next;
+	}
+
+	RELEASE_PORT_LOCK(sPorts[slot]);
+	restore_interrupts(state);
 
 	return B_OK;
 }
@@ -988,6 +1092,8 @@ read_port_etc(port_id id, int32 *_msgCode, void *msgBuffer, size_t bufferSize,
 
 	sPorts[slot].total_count++;
 
+	notify_port_select_events(slot, B_EVENT_WRITE);
+
 	cachedSem = sPorts[slot].write_sem;
 
 	RELEASE_PORT_LOCK(sPorts[slot]);
@@ -1150,6 +1256,8 @@ writev_port_etc(port_id id, int32 msgCode, const iovec *msgVecs,
 	}
 
 	list_add_item(&sPorts[slot].msg_queue, msg);
+
+	notify_port_select_events(slot, B_EVENT_READ);
 
 	// store sem_id in local variable 
 	cachedSem = sPorts[slot].read_sem;

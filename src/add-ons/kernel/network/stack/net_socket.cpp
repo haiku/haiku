@@ -470,7 +470,7 @@ socket_request_notification(net_socket *_socket, uint8 event, uint32 ref,
 	benaphore_lock(&socket->lock);
 
 	status_t status = add_select_sync_pool_entry(&socket->select_pool, sync,
-		ref, event);
+		event);
 
 	benaphore_unlock(&socket->lock);
 
@@ -486,7 +486,7 @@ socket_request_notification(net_socket *_socket, uint8 event, uint32 ref,
 			ssize_t available = socket_read_avail(socket);
 			if ((ssize_t)socket->receive.low_water_mark <= available
 				|| available < B_OK)
-				notify_select_event(sync, ref, event);
+				notify_select_event(sync, event);
 			break;
 		}
 		case B_SELECT_WRITE:
@@ -494,7 +494,7 @@ socket_request_notification(net_socket *_socket, uint8 event, uint32 ref,
 			ssize_t available = socket_send_avail(socket);
 			if ((ssize_t)socket->send.low_water_mark <= available
 				|| available < B_OK)
-				notify_select_event(sync, ref, event);
+				notify_select_event(sync, event);
 			break;
 		}
 		case B_SELECT_ERROR:

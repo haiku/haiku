@@ -31,11 +31,7 @@ enum select_events {
 extern "C" {
 #endif
 
-#ifdef COMPILE_FOR_R5
-extern void notify_select_event(struct selectsync *sync, uint32 ref);
-#else
-extern status_t notify_select_event(struct selectsync *sync, uint32 ref, uint8 event);
-#endif
+extern status_t notify_select_event(struct selectsync *sync, uint8 event);
 
 #ifdef __cplusplus
 }

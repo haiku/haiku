@@ -658,6 +658,52 @@ extern status_t _get_system_info(system_info *info, size_t size);
 extern int32	is_computer_on(void);
 extern double	is_computer_on_fire(void);
 
+
+// WARNING: Experimental API!
+
+enum {
+	B_OBJECT_TYPE_FD		= 0,
+	B_OBJECT_TYPE_SEMAPHORE	= 1,
+	B_OBJECT_TYPE_PORT		= 2,
+	B_OBJECT_TYPE_THREAD	= 3
+};
+
+enum {
+	B_EVENT_READ				= 0x0001,	// FD/port readable
+	B_EVENT_WRITE				= 0x0002,	// FD/port writable
+	B_EVENT_ERROR				= 0x0004,	// FD error
+	B_EVENT_PRIORITY_READ		= 0x0008,	// FD priority readable
+	B_EVENT_PRIORITY_WRITE		= 0x0010,	// FD priority writable
+	B_EVENT_HIGH_PRIORITY_READ	= 0x0020,	// FD high priority readable
+	B_EVENT_HIGH_PRIORITY_WRITE	= 0x0040,	// FD high priority writable
+	B_EVENT_DISCONNECTED		= 0x0080,	// FD disconnected
+
+	B_EVENT_ACQUIRE_SEMAPHORE	= 0x0001,	// semaphore can be acquired
+
+	B_EVENT_INVALID				= 0x1000	// FD/port/sem/thread ID not or
+											// no longer valid (e.g. has been
+											// close/deleted)
+};
+
+typedef struct object_wait_info {
+	int32		object;						// ID of the object
+	uint16		type;						// type of the object
+	uint16		events;						// events mask
+} object_wait_info;
+
+// wait_for_objects[_etc]() waits until at least one of the specified events or,
+// if given, the timeout occurred. When entering the function the
+// object_wait_info::events field specifies the events for each object the
+// caller is interested in. When the function returns the fields reflect the
+// events that actually occurred. The events B_EVENT_INVALID, B_EVENT_ERROR,
+// and B_EVENT_DISCONNECTED don't need to be specified. They will always be
+// reported, when they occur.
+
+extern ssize_t 	wait_for_objects(object_wait_info* infos, int numInfos);
+extern ssize_t 	wait_for_objects_etc(object_wait_info* infos, int numInfos,
+					uint32 flags, bigtime_t timeout);
+
+
 #ifdef __cplusplus
 }
 #endif

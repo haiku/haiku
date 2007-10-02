@@ -82,7 +82,7 @@ notify_listener(int op, nspace_id nsid, ino_t vnida, ino_t vnidb,
 void
 notify_select_event(selectsync *sync, uint32 ref)
 {
-	UserlandFS::KernelEmu::notify_select_event(sync, ref, 0, true);
+	UserlandFS::KernelEmu::notify_select_event(sync, 0, true);
 }
 
 // send_notification

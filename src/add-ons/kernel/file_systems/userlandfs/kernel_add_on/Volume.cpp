@@ -736,7 +736,7 @@ Volume::Select(fs_vnode node, fs_cookie cookie, uint8 event, uint32 ref,
 {
 	// check capability
 	if (!fFileSystem->HasCapability(FS_CAPABILITY_SELECT)) {
-		notify_select_event(sync, ref, event);
+		notify_select_event(sync, event);
 		return B_OK;
 	}
 
@@ -757,7 +757,6 @@ Volume::Select(fs_vnode node, fs_cookie cookie, uint8 event, uint32 ref,
 	request->node = node;
 	request->fileCookie = cookie;
 	request->event = event;
-	request->ref = ref;
 	request->sync = sync;
 
 	// add a selectsync entry

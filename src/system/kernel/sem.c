@@ -25,9 +25,11 @@
 #include <vm_low_memory.h>
 #include <vm_page.h>
 #include <boot/kernel_args.h>
+#include <wait_for_objects.h>
 
 #include <string.h>
 #include <stdlib.h>
+
 
 //#define TRACE_SEM
 #ifdef TRACE_SEM
@@ -48,6 +50,7 @@ struct sem_entry {
 			struct thread_queue queue;
 			char				*name;
 			team_id				owner;	// if set to -1, means owned by a port
+			select_info			*select_infos;
 #ifdef DEBUG_LAST_ACQUIRER
 			thread_id			last_acquirer;
 			int32				last_acquire_count;
@@ -81,7 +84,8 @@ static spinlock sem_spinlock = 0;
 #define RELEASE_SEM_LOCK(s)      release_spinlock(&(s).lock)
 
 static int remove_thread_from_sem(struct thread *thread, struct sem_entry *sem,
-				struct thread_queue *queue, status_t acquireStatus);
+				struct thread_queue *queue, status_t acquireStatus,
+				bool hasThreadLock);
 
 struct sem_timeout_args {
 	thread_id	blocked_thread;
@@ -255,6 +259,14 @@ free_sem_slot(int slot, sem_id nextID)
 }
 
 
+static void
+notify_sem_select_events(struct sem_entry* sem, uint16 events)
+{
+	if (sem->u.used.select_infos)
+		notify_select_events_list(sem->u.used.select_infos, events);
+}
+
+
 status_t
 sem_init(kernel_args *args)
 {
@@ -358,6 +370,7 @@ create_sem_etc(int32 count, const char *name, team_id owner)
 		clear_thread_queue(&sem->u.used.queue);
 		sem->u.used.name = tempName;
 		sem->u.used.owner = owner;
+		sem->u.used.select_infos = NULL;
 		id = sem->id;
 		RELEASE_SEM_LOCK(*sem);
 
@@ -408,6 +421,9 @@ delete_sem(sem_id id)
 		return B_BAD_SEM_ID;
 	}
 
+	notify_sem_select_events(&sSems[slot], B_EVENT_INVALID);
+	sSems[slot].u.used.select_infos = NULL;
+
 	releasedThreads = 0;
 	clear_thread_queue(&releaseQueue);
 
@@ -449,6 +465,80 @@ delete_sem(sem_id id)
 }
 
 
+status_t
+select_sem(int32 id, struct select_info* info, bool kernel)
+{
+	cpu_status state;
+	int32 slot;
+	status_t error = B_OK;
+
+	if (id < 0)
+		return B_BAD_SEM_ID;
+
+	slot = id % sMaxSems;
+
+	state = disable_interrupts();
+	GRAB_SEM_LOCK(sSems[slot]);
+
+	if (sSems[slot].id != id) {
+		// bad sem ID
+		error = B_BAD_SEM_ID;
+	} else if (!kernel
+		&& sSems[slot].u.used.owner == team_get_kernel_team_id()) {
+		// kernel semaphore, but call from userland
+		error = B_NOT_ALLOWED;
+	} else {
+		info->selected_events &= B_EVENT_ACQUIRE_SEMAPHORE | B_EVENT_INVALID;
+
+		if (info->selected_events != 0) {
+			info->next = sSems[slot].u.used.select_infos;
+			sSems[slot].u.used.select_infos = info;
+
+			if (sSems[slot].u.used.count > 0)
+				notify_select_events(info, B_EVENT_ACQUIRE_SEMAPHORE);
+		}
+	}
+
+	RELEASE_SEM_LOCK(sSems[slot]);
+	restore_interrupts(state);
+
+	return error;
+}
+
+
+status_t
+deselect_sem(int32 id, struct select_info* info, bool kernel)
+{
+	cpu_status state;
+	int32 slot;
+
+	if (id < 0)
+		return B_BAD_SEM_ID;
+
+	if (info->selected_events == 0)
+		return B_OK;
+
+	slot = id % sMaxSems;
+
+	state = disable_interrupts();
+	GRAB_SEM_LOCK(sSems[slot]);
+
+	if (sSems[slot].id == id) {
+		select_info** infoLocation = &sSems[slot].u.used.select_infos;
+		while (*infoLocation != NULL && *infoLocation != info)
+			infoLocation = &(*infoLocation)->next;
+
+		if (*infoLocation == info)
+			*infoLocation = info->next;
+	}
+
+	RELEASE_SEM_LOCK(sSems[slot]);
+	restore_interrupts(state);
+
+	return B_OK;
+}
+
+
 /** Called from a timer handler. Wakes up a semaphore */
 
 static int32
@@ -481,7 +571,8 @@ sem_timeout(timer *data)
 	}
 
 	clear_thread_queue(&wakeupQueue);
-	remove_thread_from_sem(thread, &sSems[slot], &wakeupQueue, B_TIMED_OUT);
+	remove_thread_from_sem(thread, &sSems[slot], &wakeupQueue, B_TIMED_OUT,
+		false);
 
 	RELEASE_SEM_LOCK(sSems[slot]);
 
@@ -635,7 +726,8 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 			clear_thread_queue(&wakeupQueue);
 			GRAB_SEM_LOCK(sSems[slot]);
 			if (sSems[slot].id == id) {
-				remove_thread_from_sem(thread, &sSems[slot], &wakeupQueue, B_INTERRUPTED);
+				remove_thread_from_sem(thread, &sSems[slot], &wakeupQueue,
+					B_INTERRUPTED, true);
 			}
 			RELEASE_SEM_LOCK(sSems[slot]);
 			while ((thread = thread_dequeue(&wakeupQueue)) != NULL) {
@@ -770,6 +862,10 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 		sSems[slot].u.used.count += delta;
 		count -= delta;
 	}
+
+	if (sSems[slot].u.used.count > 0)
+		notify_sem_select_events(&sSems[slot], B_EVENT_ACQUIRE_SEMAPHORE);
+
 	RELEASE_SEM_LOCK(sSems[slot]);
 
 	// pull off any items in the release queue and put them in the run queue
@@ -1022,7 +1118,8 @@ sem_interrupt_thread(struct thread *thread)
 	}
 
 	clear_thread_queue(&wakeupQueue);
-	if (remove_thread_from_sem(thread, &sSems[slot], &wakeupQueue, B_INTERRUPTED) != B_OK) {
+	if (remove_thread_from_sem(thread, &sSems[slot], &wakeupQueue,
+			B_INTERRUPTED, true) != B_OK) {
 		panic("sem_interrupt_thread: thread 0x%lx not found in sem 0x%lx's wait queue\n",
 			thread->id, thread->sem.blocking);
 	}
@@ -1045,7 +1142,7 @@ sem_interrupt_thread(struct thread *thread)
 
 static int
 remove_thread_from_sem(struct thread *thread, struct sem_entry *sem,
-	struct thread_queue *queue, status_t acquireStatus)
+	struct thread_queue *queue, status_t acquireStatus, bool hasThreadLock)
 {
 	// remove the thread from the queue and place it in the supplied queue
 	if (thread_dequeue_id(&sem->u.used.queue, thread->id) != thread)
@@ -1068,6 +1165,16 @@ remove_thread_from_sem(struct thread *thread, struct sem_entry *sem,
 			thread_enqueue(thread, queue);
 		}
 		sem->u.used.count -= delta;
+	}
+
+	if (sem->u.used.count > 0 && sem->u.used.select_infos != NULL) {
+		if (hasThreadLock)
+			RELEASE_THREAD_LOCK();
+
+		notify_sem_select_events(sem, B_EVENT_ACQUIRE_SEMAPHORE);
+
+		if (hasThreadLock)
+			GRAB_THREAD_LOCK();
 	}
 
 	return B_OK;

@@ -17,14 +17,14 @@ extern "C" {
 
 struct file_descriptor;
 struct selectsync;
-struct select_sync;
+struct select_info;
 
 struct fd_ops {
 	status_t	(*fd_read)(struct file_descriptor *, off_t pos, void *buffer, size_t *length);
 	status_t	(*fd_write)(struct file_descriptor *, off_t pos, const void *buffer, size_t *length);
 	off_t		(*fd_seek)(struct file_descriptor *, off_t pos, int seekType);
 	status_t	(*fd_ioctl)(struct file_descriptor *, ulong op, void *buffer, size_t length);
-	status_t	(*fd_select)(struct file_descriptor *, uint8 event, uint32 ref,
+	status_t	(*fd_select)(struct file_descriptor *, uint8 event,
 						struct selectsync *sync);
 	status_t	(*fd_deselect)(struct file_descriptor *, uint8 event,
 						struct selectsync *sync);
@@ -77,10 +77,8 @@ extern void close_fd(struct file_descriptor *descriptor);
 extern void put_fd(struct file_descriptor *descriptor);
 extern void disconnect_fd(struct file_descriptor *descriptor);
 extern void inc_fd_ref_count(struct file_descriptor *descriptor);
-extern status_t select_fd(int fd, struct select_sync *sync, uint32 ref,
-					bool kernel);
-extern status_t deselect_fd(int fd, struct select_sync *sync, uint32 ref,
-					bool kernel);
+extern status_t select_fd(int32 fd, struct select_info *info, bool kernel);
+extern status_t deselect_fd(int32 fd, struct select_info *info, bool kernel);
 extern bool fd_is_valid(int fd, bool kernel);
 extern struct vnode *fd_vnode(struct file_descriptor *descriptor);
 

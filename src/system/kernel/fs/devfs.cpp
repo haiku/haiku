@@ -1839,7 +1839,7 @@ devfs_select(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, uint8 event,
 
 	// If the device has no select() hook, notify select() now.
 	if (!vnode->stream.u.dev.info->select)
-		return notify_select_event((selectsync*)sync, ref, event);
+		return notify_select_event((selectsync*)sync, event);
 
 	return vnode->stream.u.dev.info->select(cookie->device_cookie, event, ref,
 		(selectsync*)sync);

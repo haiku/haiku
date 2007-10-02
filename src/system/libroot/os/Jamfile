@@ -23,6 +23,7 @@ MergeObject os_main.o :
 	thread.c
 	time.c
 	syscalls.S
+	wait_for_objects.cpp
 ;
 
 # We need to specify the dependency on the generated syscalls file explicitly.

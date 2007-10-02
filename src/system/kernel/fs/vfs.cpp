@@ -201,7 +201,7 @@ static status_t file_write(struct file_descriptor *, off_t pos, const void *buff
 static off_t file_seek(struct file_descriptor *, off_t pos, int seek_type);
 static void file_free_fd(struct file_descriptor *);
 static status_t file_close(struct file_descriptor *);
-static status_t file_select(struct file_descriptor *, uint8 event, uint32 ref,
+static status_t file_select(struct file_descriptor *, uint8 event,
 	struct selectsync *sync);
 static status_t file_deselect(struct file_descriptor *, uint8 event,
 	struct selectsync *sync);
@@ -3894,7 +3894,7 @@ file_seek(struct file_descriptor *descriptor, off_t pos, int seekType)
 
 
 static status_t
-file_select(struct file_descriptor *descriptor, uint8 event, uint32 ref,
+file_select(struct file_descriptor *descriptor, uint8 event,
 	struct selectsync *sync)
 {
 	FUNCTION(("file_select(%p, %u, %lu, %p)\n", descriptor, event, ref, sync));
@@ -3903,10 +3903,10 @@ file_select(struct file_descriptor *descriptor, uint8 event, uint32 ref,
 
 	// If the FS has no select() hook, notify select() now.
 	if (FS_CALL(vnode, select) == NULL)
-		return notify_select_event(sync, ref, event);
+		return notify_select_event(sync, event);
 
 	return FS_CALL(vnode, select)(vnode->mount->cookie, vnode->private_node,
-		descriptor->cookie, event, ref, sync);
+		descriptor->cookie, event, 0, sync);
 }
 
 

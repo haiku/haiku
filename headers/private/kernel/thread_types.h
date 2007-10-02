@@ -54,6 +54,7 @@ typedef enum job_control_state {
 
 struct image;
 	// defined in image.c
+struct select_info;
 
 struct death_entry {
 	struct list_link	link;
@@ -233,6 +234,8 @@ struct thread {
 		uint16		signal;
 		struct list	waiters;
 	} exit;
+
+	struct select_info *select_infos;
 
 	struct thread_debug_info debug_info;
 

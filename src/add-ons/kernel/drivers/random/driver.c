@@ -466,7 +466,7 @@ random_select(void *cookie, uint8 event, uint32 ref, selectsync *sync)
 #ifdef COMPILE_FOR_R5
 		notify_select_event(sync, ref);
 #else
-		notify_select_event(sync, ref, event);
+		notify_select_event(sync, event);
 #endif
 	} else if (event == B_SELECT_WRITE) {
 		/* we're not writable */

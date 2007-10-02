@@ -211,13 +211,13 @@ KernelRequestHandler::_HandleRequest(NotifySelectEventRequest* request)
 		if (request->unspecifiedEvent) {
 			// old style add-ons can't provide an event argument; we shoot
 			// all events
-			notify_select_event(request->sync, request->ref, B_SELECT_READ);
-			notify_select_event(request->sync, request->ref, B_SELECT_WRITE);
-			notify_select_event(request->sync, request->ref, B_SELECT_ERROR);
+			notify_select_event(request->sync, B_SELECT_READ);
+			notify_select_event(request->sync, B_SELECT_WRITE);
+			notify_select_event(request->sync, B_SELECT_ERROR);
 		} else {
-			PRINT(("notify_select_event(%p, %lu, %d)\n", request->sync,
-				request->ref, (int)request->event));
-			notify_select_event(request->sync, request->ref, request->event);
+			PRINT(("notify_select_event(%p, %d)\n", request->sync,
+				(int)request->event));
+			notify_select_event(request->sync, request->event);
 		}
 	} else
 		result = B_BAD_VALUE;
