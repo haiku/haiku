@@ -6,11 +6,16 @@ KernelMergeObject kernel_os_main.o :
 	driver_settings.c
 	find_directory.c
 	fs_info.c
+	wait_for_objects.cpp
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
 
-SEARCH on [ FGristFiles driver_settings.c find_directory.c fs_info.c ]
-	= [ FDirName $(HAIKU_TOP) src system libroot os ] ;
+SEARCH on [ FGristFiles
+	driver_settings.c
+	find_directory.c
+	fs_info.c 
+	wait_for_objects.cpp
+	] = [ FDirName $(HAIKU_TOP) src system libroot os ] ;
 
 # kernel libroot posix files
 
