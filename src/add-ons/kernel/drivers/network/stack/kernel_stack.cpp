@@ -221,6 +221,7 @@ net_stack_open(const char *name, uint32 flags, void **_cookie)
 		status_t status = get_module(NET_STARTER_MODULE_NAME, &module);
 		if (status < B_OK) {
 			ERROR("Can't load network stack module: %ld\n", status);
+			atomic_add(&sOpenCount, -1);
 			return status;
 		}
 
@@ -228,6 +229,7 @@ net_stack_open(const char *name, uint32 flags, void **_cookie)
 		if (status < B_OK) {
 			ERROR("Can't load " NET_SOCKET_MODULE_NAME " module: %ld\n", status);
 			put_module(NET_STARTER_MODULE_NAME);
+			atomic_add(&sOpenCount, -1);
 			return status;
 		}
 	}
