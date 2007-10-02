@@ -1,32 +1,31 @@
 /*
-	
-	clock.h
-	
-*/
+ * Copyright 1999, Be Incorporated. All Rights Reserved.
+ * This file may be used under the terms of the Be Sample Code License.
+ *
+ */
+#ifndef _CLOCK_APPLICATION_H
+#define _CLOCK_APPLICATION_H
 
-/*
-	Copyright 1999, Be Incorporated.   All Rights Reserved.
-	This file may be used under the terms of the Be Sample Code License.
-*/
 
-#ifndef _APPLICATION_H
 #include <Application.h>
-#endif
 
-#include "cl_view.h"
-#include "cl_wind.h"
 
-#define SHOW_SECONDS	'ssec'
+class TClockWindow;
 
-extern const char *app_signature;
 
 class THelloApplication : public BApplication {
-
-public:
+	public:
 						THelloApplication();
-virtual	void			MessageReceived(BMessage *msg);
+		virtual			~THelloApplication();
 
-private:
-		TClockWindow*	myWindow;
-		TOnscreenView	*myView;
+		virtual	void	MessageReceived(BMessage *msg);
+
+	private:
+		TClockWindow	*myWindow;
 };
+
+
+extern const char *kAppSignature;
+
+
+#endif	// _CLOCK_APPLICATION_H

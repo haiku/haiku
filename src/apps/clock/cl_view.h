@@ -1,83 +1,75 @@
 /*
-	
-	cl_view.h
-	
-*/
-/*
-	Copyright 1999, Be Incorporated.   All Rights Reserved.
-	This file may be used under the terms of the Be Sample Code License.
-*/
-
+ * Copyright 1999, Be Incorporated. All Rights Reserved.
+ * This file may be used under the terms of the Be Sample Code License.
+ *
+ */
 #ifndef	_CL_VIEW_H_
 #define _CL_VIEW_H_
 
-#include <Application.h>
-#include <Bitmap.h>
-#include <View.h>
-#include <Window.h>
 
-#include <time.h>
+#include <View.h>
+
+
+class BBitmap;
+class BMessage;
+
 
 class TOffscreenView : public BView {
-
-public:
-			TOffscreenView(BRect frame, char *name, short mRadius,
+	public:
+					TOffscreenView(BRect frame, char *name, short mRadius,
 						short hRadius, short offset, long face, bool show); 
-	virtual		~TOffscreenView();
-	virtual	void	AttachedToWindow();
-	virtual	void	DrawX();
-		void	NextFace();
+		virtual		~TOffscreenView();
+		
+		void		DrawX();
+		void		NextFace();
 
-	BBitmap		*fClockFace[9];
-	BBitmap		*fCenter;
-	BBitmap		*fInner;
-	short		fFace;
-	BPoint		fMinutePoints[60];
-	BPoint		fHourPoints[60];
-	short		fMinutesRadius;
-	short		fHoursRadius;
-	short		fOffset;
-	short		fHours;
-	short		fMinutes;
-	short		fSeconds;
-	bool		fShowSeconds;
+		short		fHours;
+		short		fMinutes;
+		short		fSeconds;
+		
+		short		fOffset;
+		short		fHoursRadius;
+		short		fMinutesRadius;
+
+		short		fFace;
+		bool		fShowSeconds;
+
+	private:
+		BBitmap		*fInner;
+		BBitmap		*fCenter;
+		BBitmap		*fClockFace[9];
+
+		BPoint		fHourPoints[60];
+		BPoint		fMinutePoints[60];
 };
 
 
-class _EXPORT TOnscreenView : public BView {
+class TOnscreenView : public BView {
+	public:
+							TOnscreenView(BRect frame, char *name,
+								short mRadius, short hRadius, short offset); 
+							TOnscreenView(BMessage *data);
+		virtual				~TOnscreenView();
 
-public:
-				TOnscreenView(BRect frame, char *name, short mRadius,
-						short hRadius, short offset); 
-virtual			~TOnscreenView();
-						TOnscreenView(BMessage *data);
-static	BArchivable	*Instantiate(BMessage *data);
-virtual	status_t		Archive(BMessage *data, bool deep = true) const;
-		void			InitObject(BRect frame, short mRadius, short hRadius,
+		static BArchivable	*Instantiate(BMessage *data);
+		virtual	status_t	Archive(BMessage *data, bool deep = true) const;
+		void				InitObject(BRect frame, short mRadius, short hRadius,
 								short offset, long face, bool show);
 
-//+virtual	void	AllAttached();
-virtual	void	AttachedToWindow();
-virtual	void	Draw(BRect updateRect);
-virtual void	MouseDown( BPoint point);
-virtual	void	MessageReceived(BMessage *msg);
-virtual void	Pulse();
-		void	UseFace( short face );
-		void	ShowSecs( bool secs );
-		short	ReturnFace( void );
-		short	ReturnSeconds( void );
+		virtual void		Pulse();
+		virtual	void		Draw(BRect updateRect);
+		virtual void		MouseDown(BPoint point);
+		virtual	void		MessageReceived(BMessage *msg);
 
+		short				ReturnFace();
+		void				UseFace(short face);
 
-private:
+		short				ReturnSeconds();
+		void				ShowSecs(bool secs);
 
-	typedef	BView inherited;
-		
-	BBitmap	*fOffscreen;
-	TOffscreenView	*fOffscreenView;
-	short	fmRadius;
-	short	fhRadius;
-	short	fOffset;
-	BRect	fRect;
+	private:
+		BBitmap				*fOffscreen;
+		TOffscreenView		*fOffscreenView;
 };
 
 #endif

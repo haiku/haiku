@@ -1,26 +1,30 @@
 /*
-	
-	cl_wind.h
-	
-*/
+ * Copyright 1999, Be Incorporated. All Rights Reserved.
+ * This file may be used under the terms of the Be Sample Code License.
+ *
+ */
+#ifndef _CLOCK_WINDOW_H
+#define _CLOCK_WINDOW_H
 
-/*
-	Copyright 1999, Be Incorporated.   All Rights Reserved.
-	This file may be used under the terms of the Be Sample Code License.
-*/
 
-#ifndef _WINDOW_H
 #include <Window.h>
-#endif
-#ifndef	_CL_VIEW_H_
-#include "cl_view.h"
-#endif
+
+
+class TOnscreenView;
+
 
 class TClockWindow : public BWindow {
+	public:
+						TClockWindow(BRect rect, const char* name);
+		virtual			~TClockWindow();
 
-public:
-				TClockWindow(BRect, const char*);
-virtual	bool	QuitRequested( void );
+		virtual	bool	QuitRequested();
 
-TOnscreenView	*theOnscreenView;
+	private:
+		void			_InitWindow();
+
+	private:
+		TOnscreenView	*theOnscreenView;
 };
+
+#endif	// _CLOCK_WINDOW_H
