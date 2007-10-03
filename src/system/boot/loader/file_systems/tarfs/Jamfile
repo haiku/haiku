@@ -7,8 +7,9 @@ UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders kernel shared storage ;
 SubDirSysHdrs $(HAIKU_TOP) headers libs zlib ;
 
-SubDirC++Flags -fno-rtti ;
-#SubDirCcFlags -DGUNZIP=1 ;
+local defines = [ FDefines _BOOT_MODE ] ;
+SubDirCcFlags $(defines) ;
+SubDirC++Flags -fno-rtti $(defines) ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src libs zlib ] ;
 
