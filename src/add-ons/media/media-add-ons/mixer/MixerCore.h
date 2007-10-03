@@ -1,10 +1,15 @@
+/*
+ * Copyright 2007 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _MIXER_CORE_H
 #define _MIXER_CORE_H
+
+#include "MixerSettings.h"
 
 #include <Buffer.h>
 #include <Locker.h>
 #include <TimeSource.h>
-#include "MixerSettings.h"
 
 class AudioMixer;
 class MixerInput;
@@ -20,103 +25,109 @@ class Resampler;
 
 class MixerCore
 {
-public:
-	MixerCore(AudioMixer *node);
-	~MixerCore();
+	public:
+										MixerCore(AudioMixer *node);
+										~MixerCore();
 	
-	MixerSettings *Settings();
+		MixerSettings					*Settings();
 
-	// To avoid calling Settings()->AttenuateOutput() for every outgoing
-	// buffer, this setting is cached in fOutputGain and must be set by
-	// the audio mixer node using SetOutputAttenuation()
-	void SetOutputAttenuation(float gain);
-	
-	MixerInput * AddInput(const media_input &input);
-	MixerOutput * AddOutput(const media_output &output);
+		// To avoid calling Settings()->AttenuateOutput() for every outgoing
+		// buffer, this setting is cached in fOutputGain and must be set by
+		// the audio mixer node using SetOutputAttenuation()
+		void							SetOutputAttenuation(float gain);
+		MixerInput *					AddInput(const media_input &input);
+		MixerOutput *					AddOutput(const media_output &output);
 
-	bool RemoveInput(int32 inputID);
-	bool RemoveOutput();
+		bool							RemoveInput(int32 inputID);
+		bool							RemoveOutput();
+		int32							CreateInputID();
 	
-	int32 CreateInputID();
+ 		// index = 0 to count-1, NOT inputID
+		MixerInput *					Input(int index);
+		MixerOutput *					Output();
 	
-	MixerInput *Input(int index); // index = 0 to count-1, NOT inputID
-	MixerOutput *Output();
-	
-	void Lock();
-	bool LockWithTimeout(bigtime_t timeout);
-	bool LockFromMixThread();
-	void Unlock();
-	
-	void BufferReceived(BBuffer *buffer, bigtime_t lateness);
-	
-	void InputFormatChanged(int32 inputID, const media_multi_audio_format &format);
-	void OutputFormatChanged(const media_multi_audio_format &format);
+		void							Lock();
+		bool							LockWithTimeout(bigtime_t timeout);
+		bool							LockFromMixThread();
+		void							Unlock();
 
-	void SetOutputBufferGroup(BBufferGroup *group);
-	void SetTimingInfo(BTimeSource *ts, bigtime_t downstream_latency);
-	void EnableOutput(bool enabled);
-	bool Start();
-	bool Stop();
+		void							BufferReceived(BBuffer *buffer,
+														bigtime_t lateness);
 	
-	void StartMixThread();
-	void StopMixThread();
-	
-	uint32 OutputChannelCount();
+		void							InputFormatChanged(int32 inputID, 
+											const media_multi_audio_format &format);
+		void							OutputFormatChanged(
+											const media_multi_audio_format &format);
 
-private:
-	void ApplyOutputFormat();
-	static int32 _mix_thread_(void *arg);
-	void MixThread();
+		void							SetOutputBufferGroup(BBufferGroup *group);
+		void							SetTimingInfo(BTimeSource *ts, 
+											bigtime_t downstream_latency);
+		void							EnableOutput(bool enabled);
+		bool							Start();
+		bool							Stop();
 	
-private:
-	BLocker		*fLocker;
-	
-	BList		*fInputs;
-	MixerOutput	*fOutput;
-	int32		fNextInputID;
-	bool		fRunning;		// true = the mix thread is running
-	bool		fStarted;		// true = mix thread should be started of it is not running
-	bool		fOutputEnabled; // true = mix thread should be started of it is not running
+		void							StartMixThread();
+		void							StopMixThread();	
+		uint32							OutputChannelCount();
 
-	Resampler	**fResampler; // array
+	private:
+		void							ApplyOutputFormat();
+		static int32					_mix_thread_(void *arg);
+		void							MixThread();
+	
+	private:
+		BLocker							*fLocker;
+		BList							*fInputs;
+		MixerOutput						*fOutput;
+		int32							fNextInputID;
+										// true = the mix thread is running
+		bool							fRunning;
+										// true = mix thread should be 
+										// started of it is not running
+		bool							fStarted;
+										// true = mix thread should be
+										// started of it is not running
+		bool							fOutputEnabled;
+		Resampler						**fResampler; // array
+		float							*fMixBuffer;
+		int32							fMixBufferFrameRate;
+		int32							fMixBufferFrameCount;
+		int32							fMixBufferChannelCount;
+		int32							*fMixBufferChannelTypes; //array
+		bool							fDoubleRateMixing;
+		bigtime_t						fDownstreamLatency;
+		MixerSettings					*fSettings;
+		AudioMixer						*fNode;
+		BBufferGroup					*fBufferGroup;
+		BTimeSource						*fTimeSource;
+		thread_id						fMixThread;
+		sem_id							fMixThreadWaitSem;	
+		float							fOutputGain;
 
-	float		*fMixBuffer;
-	int32		fMixBufferFrameRate;
-	int32		fMixBufferFrameCount;
-	int32		fMixBufferChannelCount;
-	int32		*fMixBufferChannelTypes; //array
-	bool		fDoubleRateMixing;
-	bigtime_t	fDownstreamLatency;
-	
-	friend class MixerInput; // XXX debug only
-	
-	MixerSettings	*fSettings;
-	AudioMixer		*fNode;
-	BBufferGroup	*fBufferGroup;
-	BTimeSource		*fTimeSource;
-	thread_id	fMixThread;
-	sem_id		fMixThreadWaitSem;
-	
-	float		fOutputGain;
+		friend class 					MixerInput; // XXX debug only
 };
 
 
-inline void MixerCore::Lock()
+inline void 
+MixerCore::Lock()
 {
 	fLocker->Lock();
 }
 
-inline bool MixerCore::LockWithTimeout(bigtime_t timeout)
+inline bool 
+MixerCore::LockWithTimeout(bigtime_t timeout)
 {
 	return B_OK == fLocker->LockWithTimeout(timeout);
 }
 
-inline void MixerCore::Unlock()
+inline void 
+MixerCore::Unlock()
 {
 	fLocker->Unlock();
 }
 
-inline bool MixerCore::LockFromMixThread()
+inline bool 
+MixerCore::LockFromMixThread()
 {
 	for (;;) {
 		if (LockWithTimeout(10000))
@@ -126,5 +137,4 @@ inline bool MixerCore::LockFromMixThread()
 			return false;
 	}
 }
-
 #endif

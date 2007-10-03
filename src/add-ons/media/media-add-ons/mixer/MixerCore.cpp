@@ -1,18 +1,26 @@
-#include <RealtimeAlloc.h>
-#include <MediaNode.h>
-#include <BufferProducer.h>
-#include <TimeSource.h>
-#include <Buffer.h>
-#include <BufferGroup.h>
-#include <StopWatch.h>
-#include <string.h>
+/*
+ * Copyright 2007 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *              Marcus Overhagen
+ */
+#include "AudioMixer.h"
 #include "MixerCore.h"
 #include "MixerInput.h"
 #include "MixerOutput.h"
 #include "MixerUtils.h"
-#include "AudioMixer.h"
 #include "Resampler.h"
 #include "RtList.h"
+
+#include <Buffer.h>
+#include <BufferGroup.h>
+#include <BufferProducer.h>
+#include <MediaNode.h>
+#include <RealtimeAlloc.h>
+#include <StopWatch.h>
+#include <TimeSource.h>
+#include <string.h>
 
 #define DOUBLE_RATE_MIXING 	0
 
@@ -49,10 +57,10 @@ MixerCore::MixerCore(AudioMixer *node)
 	fMixBufferFrameCount(0),
 	fMixBufferChannelCount(0),
 	fMixBufferChannelTypes(0),
- 	fDoubleRateMixing(DOUBLE_RATE_MIXING),
- 	fDownstreamLatency(1),
- 	fSettings(new MixerSettings),
- 	fNode(node),
+	fDoubleRateMixing(DOUBLE_RATE_MIXING),
+	fDownstreamLatency(1),
+	fSettings(new MixerSettings),
+	fNode(node),
 	fBufferGroup(0),
 	fTimeSource(0),
 	fMixThread(-1),
@@ -77,7 +85,6 @@ MixerCore::~MixerCore()
 	if (fTimeSource)
 		fTimeSource->Release();
 
-	// delete resamplers
 	if (fResampler) {
 		for (int i = 0; i < fMixBufferChannelCount; i++)
 			delete fResampler[i];
@@ -104,7 +111,8 @@ MixerInput *
 MixerCore::AddInput(const media_input &input)
 {
 	ASSERT_LOCKED();
-	MixerInput *in = new MixerInput(this, input, fMixBufferFrameRate, fMixBufferFrameCount);
+	MixerInput *in = new MixerInput(this, input, fMixBufferFrameRate,
+									fMixBufferFrameCount);
 	fInputs->AddItem(in);
 	return in;
 }
@@ -120,7 +128,7 @@ MixerCore::AddOutput(const media_output &output)
 	fOutput = new MixerOutput(this, output);
 	// the output format might have been adjusted inside MixerOutput
 	ApplyOutputFormat();
-	
+
 	ASSERT(!fRunning);
 	if (fStarted && fOutputEnabled)
 		StartMixThread();
@@ -206,7 +214,6 @@ void
 MixerCore::OutputFormatChanged(const media_multi_audio_format &format)
 {
 	ASSERT_LOCKED();
-	
 	bool was_started = fStarted;
 
 	if (was_started)
@@ -247,16 +254,17 @@ MixerCore::ApplyOutputFormat()
 	fMixBuffer = (float *)rtm_alloc(NULL, sizeof(float) * fMixBufferFrameCount * fMixBufferChannelCount);
 	ASSERT(fMixBuffer);
 
-	// delete resamplers
 	if (fResampler) {
 		for (int i = 0; i < fMixBufferChannelCount; i++)
 			delete fResampler[i];
 		delete [] fResampler;
 	}
-	// create new resamplers
+
 	fResampler = new Resampler * [fMixBufferChannelCount];
 	for (int i = 0; i < fMixBufferChannelCount; i++)
-		fResampler[i] = new Resampler(media_raw_audio_format::B_AUDIO_FLOAT, format.format, format.valid_bits);
+		fResampler[i] = new Resampler(media_raw_audio_format::B_AUDIO_FLOAT, 
+										format.format,
+										format.valid_bits);
 	
 	TRACE("MixerCore::OutputFormatChanged:\n");
 	TRACE("  fMixBufferFrameRate %ld\n", fMixBufferFrameRate);
@@ -274,7 +282,6 @@ void
 MixerCore::SetOutputBufferGroup(BBufferGroup *group)
 {
 	ASSERT_LOCKED();
-
 	fBufferGroup = group;
 }
 
@@ -282,14 +289,15 @@ void
 MixerCore::SetTimingInfo(BTimeSource *ts, bigtime_t downstream_latency)
 {
 	ASSERT_LOCKED();
-
 	if (fTimeSource)
 		fTimeSource->Release();
 		
 	fTimeSource = dynamic_cast<BTimeSource *>(ts->Acquire());
 	fDownstreamLatency = downstream_latency;
 
-	TRACE("MixerCore::SetTimingInfo, now = %Ld, downstream latency %Ld\n", fTimeSource->Now(), fDownstreamLatency);
+	TRACE("MixerCore::SetTimingInfo, now = %Ld, downstream latency %Ld\n", 
+							fTimeSource->Now(),
+							fDownstreamLatency);
 }
 
 void
@@ -305,6 +313,7 @@ MixerCore::EnableOutput(bool enabled)
 	if (!fRunning && fOutput && fStarted && fOutputEnabled)
 		StartMixThread();
 }
+
 
 uint32
 MixerCore::OutputChannelCount()
@@ -563,12 +572,10 @@ MixerCore::MixThread()
 
 		// request a buffer
 		BBuffer	*buf;
-		{
-//		BStopWatch w("buffer requ");
-		buf = fBufferGroup->RequestBuffer(fOutput->MediaOutput().format.u.raw_audio.buffer_size, buffer_request_timeout);
-		}
+		buf = fBufferGroup->RequestBuffer(
+							fOutput->MediaOutput().format.u.raw_audio.buffer_size, 
+							buffer_request_timeout);
 		if (buf) {
-		
 			// copy data from mix buffer into output buffer
 			for (int i = 0; i < fMixBufferChannelCount; i++) {
 				fResampler[i]->Resample(reinterpret_cast<char *>(fMixBuffer) + i *  sizeof(float),
@@ -592,11 +599,7 @@ MixerCore::MixThread()
 			fOutput->AdjustByteOrder(buf);
 		
 			// send the buffer
-			status_t res;
-			{
-//				BStopWatch watch("buffer send");
-				res = fNode->SendBuffer(buf, fOutput->MediaOutput().destination);
-			}
+			status_t res = fNode->SendBuffer(buf, fOutput->MediaOutput().destination);
 			if (B_OK != res) {
 #if DEBUG
 				ERROR("MixerCore: SendBuffer failed for buffer %Ld\n", buffer_num);

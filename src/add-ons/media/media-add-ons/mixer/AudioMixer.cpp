@@ -1,25 +1,26 @@
-/* AudioMixer
- *
- * First implementation by David Shipman, 2002
- * Rewritten by Marcus Overhagen, 2003
+/*
+ * Copyright 2002 David Shipman,
+ * Copyright 2003-2007 Marcus Overhagen
+ * Copyright 2007 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
-#include <RealtimeAlloc.h>
-#include <Buffer.h>
-#include <TimeSource.h>
-#include <ParameterWeb.h>
-#include <MediaRoster.h>
-#include <FindDirectory.h>
-#include <Path.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
 #include "AudioMixer.h"
 #include "MixerCore.h"
 #include "MixerInput.h"
 #include "MixerOutput.h"
 #include "MixerUtils.h"
+
+#include <Buffer.h>
+#include <FindDirectory.h>
+#include <math.h>
+#include <MediaRoster.h>
+#include <ParameterWeb.h>
+#include <Path.h>
+#include <RealtimeAlloc.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <TimeSource.h>
 
 #define VERSION_STRING	"0.4"
 #define BUILD_STRING	__DATE__ " " __TIME__
@@ -34,7 +35,9 @@
 #define USE_MEDIA_FORMAT_WORKAROUND 1
 
 #if USE_MEDIA_FORMAT_WORKAROUND
-static void multi_audio_format_specialize(media_multi_audio_format *format, const media_multi_audio_format *other);
+static void 
+multi_audio_format_specialize(media_multi_audio_format *format,
+								const media_multi_audio_format *other);
 #endif
 
 #define FORMAT_USER_DATA_TYPE 		0x7294a8f3
@@ -238,9 +241,11 @@ AudioMixer::BufferReceived(BBuffer *buffer)
 
 	//PRINT(4, "buffer received at %12Ld, should arrive at %12Ld, delta %12Ld\n", TimeSource()->Now(), buffer->Header()->start_time, TimeSource()->Now() - buffer->Header()->start_time);
 
-//	HandleInputBuffer(buffer, 0);
-//	buffer->Recycle();
-//	return;
+	// Note: The following code is outcommented on purpose
+	// and is about to be modified at a later point
+	//	HandleInputBuffer(buffer, 0);
+	//	buffer->Recycle();
+	//	return;
 
 
 	// to receive the buffer at the right time,
@@ -256,7 +261,9 @@ AudioMixer::BufferReceived(BBuffer *buffer)
 void
 AudioMixer::HandleInputBuffer(BBuffer *buffer, bigtime_t lateness)
 {
-/*
+	// Note: The following code is outcommented on purpose
+	// and is about to be modified at a later point
+	/*
 	if (lateness > 5000) {
 		printf("Received buffer with way to high lateness %Ld\n", lateness);
 		if (RunMode() != B_DROP_DATA) {
@@ -267,20 +274,22 @@ AudioMixer::HandleInputBuffer(BBuffer *buffer, bigtime_t lateness)
 			return;
 		}
 	}
-*/
+	*/
 
-//	printf("Received buffer with lateness %Ld\n", lateness);
+	//	printf("Received buffer with lateness %Ld\n", lateness);
 	
 	fCore->Lock();
 	fCore->BufferReceived(buffer, lateness);
 	fCore->Unlock();
 
-/*
+	// Note: The following code is outcommented on purpose
+	// and is about to be modified at a later point
+	/*
 		if ((B_OFFLINE == RunMode()) && (B_DATA_AVAILABLE == channel->fProducerDataStatus))
 		{
 			RequestAdditionalBuffer(channel->fInput.source, buffer);
 		}
-*/
+	*/
 }
 
 void
@@ -316,10 +325,11 @@ AudioMixer::GetLatencyFor(const media_destination &for_whom,
 	*out_latency = EventLatency();
 	*out_timesource = TimeSource()->ID();
 
-	printf("AudioMixer::GetLatencyFor %Ld, timesource is %ld\n", *out_latency, *out_timesource);
+	printf("AudioMixer::GetLatencyFor %Ld, timesource is %ld\n", 
+							*out_latency,
+							*out_timesource);
 
 	return B_OK;
-
 }
 
 status_t
@@ -331,13 +341,16 @@ AudioMixer::Connected(const media_source &producer, const media_destination &whe
 	// workaround for a crashing bug in RealPlayer.  to be proper, RealPlayer's
 	// BBufferProducer::PrepareToConnect() should have removed all wildcards.
 	if (out_input->format.u.raw_audio.frame_rate == 0) {
-		fprintf(stderr, "Audio Mixer Warning: Producer (port %ld, id %ld) connected with frame_rate=0\n", producer.port, producer.id);
+		fprintf(stderr, "Audio Mixer Warning: "
+					"Producer (port %ld, id %ld) connected with frame_rate=0\n",
+					producer.port,
+					producer.id);
 		MixerOutput *output = fCore->Output();
 		float frame_rate = output ? output->MediaOutput().format.u.raw_audio.frame_rate : 44100.0f;
 		out_input->format.u.raw_audio.frame_rate = frame_rate;
 	}
 	
-	// a BBufferProducer is connection to our BBufferConsumer
+	// a BBufferProducer is connecting to our BBufferConsumer
 			
 	// incoming connections should always have an incoming ID=0,
 	// and the port number must match our ControlPort()
@@ -366,9 +379,9 @@ AudioMixer::Connected(const media_source &producer, const media_destination &whe
 	// If we want the producer to use a specific BBufferGroup, we now need to call
 	// BMediaRoster::SetOutputBuffersFor() here to set the producer's buffer group.
 	// But we have no special buffer requirements anyway...
-	
+
 	UpdateParameterWeb();
-	
+
 	return B_OK;
 }
 
@@ -376,7 +389,7 @@ void
 AudioMixer::Disconnected(const media_source &producer, const media_destination &where)
 {
 	// One of our inputs has been disconnected
-	
+
 	// check if it is really belongs to us
 	if (where.port != ControlPort()) {
 		TRACE("AudioMixer::Disconnected wrong input port\n");
@@ -390,7 +403,6 @@ AudioMixer::Disconnected(const media_source &producer, const media_destination &
 	}
 	
 	fCore->Unlock();
-	
 	UpdateParameterWeb();
 }
 
@@ -402,7 +414,7 @@ AudioMixer::FormatChanged(const media_source &producer, const media_destination 
 	// we will receive buffers in a different format
 
 	TRACE("AudioMixer::FormatChanged\n");
-	
+
 	if (consumer.port != ControlPort() || consumer.id == 0)
 		return B_MEDIA_BAD_DESTINATION;
 
@@ -467,6 +479,11 @@ AudioMixer::FormatProposal(const media_source &output, media_format *ioFormat)
 	return B_OK;
 }
 
+//	If the format isn't good, put a good format into *io_format and return error
+//	If format has wildcard, specialize to what you can do (and change).
+//	If you can change the format, return OK.
+//	The request comes from your destination sychronously, so you cannot ask it
+//	whether it likes it -- you should assume it will since it asked.
 status_t
 AudioMixer::FormatChangeRequested(const media_source &source, const media_destination &destination, 
 								  media_format *io_format, int32 *_deprecated_)
@@ -498,8 +515,6 @@ AudioMixer::FormatChangeRequested(const media_source &source, const media_destin
 		if (destination.port == output->MediaOutput().destination.port && destination.id == output->MediaOutput().destination.id + 1) {
 			ERROR("AudioMixer::FormatChangeRequested: this might be the broken R5 multi audio add-on\n");
 			goto err;
-//			fCore->Unlock();
-//			return B_OK;
 		} else {
 			goto err;
 		}
@@ -583,21 +598,23 @@ AudioMixer::GetNextOutput(int32 *cookie, media_output *out_output)
 status_t 
 AudioMixer::DisposeOutputCookie(int32 cookie)
 {
-	// nothin to do
+	// nothing to do
 	return B_OK;
 }
 
 status_t 
 AudioMixer::SetBufferGroup(const media_source &for_source, BBufferGroup *newGroup)
 {
-	printf("#############################AudioMixer::SetBufferGroup\n");
+	PRINT("AudioMixer::SetBufferGroup\n");
 	// the downstream consumer (soundcard) node asks us to use another
 	// BBufferGroup (might be NULL). We only have one output (id 0)
 	if (for_source.port != ControlPort() || for_source.id != 0)
 		return B_MEDIA_BAD_SOURCE;
 
-	if (newGroup == fBufferGroup) // we're already using this buffergroup
+	if (newGroup == fBufferGroup) {
+		// we're already using this buffergroup
 		return B_OK;
+	}
 	
 	fCore->Lock();
 	if (!newGroup)
@@ -654,11 +671,13 @@ AudioMixer::LatencyChanged(const media_source & source, const media_destination 
 }
 
 status_t
-AudioMixer::PrepareToConnect(const media_source &what, const media_destination &where, 
-							 media_format *format, media_source *out_source, char *out_name)
+AudioMixer::PrepareToConnect(const media_source &what, 
+								const media_destination &where,
+								media_format *format, 
+								media_source *out_source,
+								char *out_name)
 {
 	TRACE("AudioMixer::PrepareToConnect\n");
-
 	// PrepareToConnect() is the second stage of format negotiations that happens
 	// inside BMediaRoster::Connect(). At this point, the consumer's AcceptFormat()
 	// method has been called, and that node has potentially changed the proposed
@@ -753,14 +772,14 @@ AudioMixer::PrepareToConnect(const media_source &what, const media_destination &
 	fCore->AddOutput(output);
 
 	fCore->Unlock();
-
 	return B_OK;
 }
 
-
 void 
-AudioMixer::Connect(status_t error, const media_source &source, const media_destination &dest, 
-					const media_format &format, char *io_name)
+AudioMixer::Connect(status_t error, const media_source &source, 
+					const media_destination &dest, 
+					const media_format &format,
+					char *io_name)
 {
 	TRACE("AudioMixer::Connect\n");
 
@@ -837,17 +856,13 @@ AudioMixer::Connect(status_t error, const media_source &source, const media_dest
 	fCore->Settings()->LoadConnectionSettings(fCore->Output());
 
 	fCore->Unlock();
-
 	UpdateParameterWeb();
 }
-
 
 void 
 AudioMixer::Disconnect(const media_source &what, const media_destination &where)
 {
-
 	TRACE("AudioMixer::Disconnect\n");
-	
 	fCore->Lock();
 
 	// Make sure that our connection is the one being disconnected
@@ -858,9 +873,8 @@ AudioMixer::Disconnect(const media_source &what, const media_destination &where)
 		return;
 	}
 
-	/* Switch our prefered format back to default
-	 * frame rate and channel count.
-	 */
+	// Switch our prefered format back to default
+	// frame rate and channel count.
 	fDefaultFormat.u.raw_audio.frame_rate = 96000;
 	fDefaultFormat.u.raw_audio.channel_count = 2;
 	
@@ -875,7 +889,6 @@ AudioMixer::Disconnect(const media_source &what, const media_destination &where)
 	fCore->SetOutputBufferGroup(0);
 	
 	fCore->Unlock();
-
 	UpdateParameterWeb();
 }
 
@@ -887,8 +900,9 @@ AudioMixer::LateNoticeReceived(const media_source &what, bigtime_t how_much, big
 	// is the only runmode in which we can do anything about this
 
 	ERROR("AudioMixer::LateNoticeReceived, %Ld too late at %Ld\n", how_much, performance_time);
-
-/*	
+	// Note: The following code is outcommented on purpose
+	// and is about to be modified at a later point
+	/*	
 	if (what == fOutput.source) {
 		if (RunMode() == B_INCREASE_LATENCY) {
 			fInternalLatency += how_much;
@@ -902,7 +916,7 @@ AudioMixer::LateNoticeReceived(const media_source &what, bigtime_t how_much, big
 			PublishEventLatencyChange();
 		}
 	}
-*/
+	*/
 }
 
 
@@ -986,7 +1000,7 @@ AudioMixer::HandleEvent(const media_timed_event *event, bigtime_t lateness, bool
 	
 	}
 }
-								
+
 //
 // AudioMixer methods
 //		
@@ -1016,18 +1030,19 @@ AudioMixer::PublishEventLatencyChange()
 BBufferGroup *
 AudioMixer::CreateBufferGroup()
 {
-	// allocate enough buffers to span our downstream latency (plus one for rounding up), plus one extra
+	// allocate enough buffers to span our downstream latency 
+	// (plus one for rounding up), plus one extra
 	int32 count = int32(fDownstreamLatency / BufferDuration()) + 2;
 
 	TRACE("AudioMixer::CreateBufferGroup: fDownstreamLatency %Ld,  BufferDuration %Ld, buffer count = %ld\n", fDownstreamLatency, BufferDuration(), count);
 
 	if (count < 3)
 		count = 3;
-	
+
 	fCore->Lock();
 	uint32 size = fCore->Output()->MediaOutput().format.u.raw_audio.buffer_size;
 	fCore->Unlock();
-	
+
 	TRACE("AudioMixer: allocating %ld buffers of %ld bytes each\n", count, size);
 	return new BBufferGroup(size, count);
 }
@@ -1672,11 +1687,14 @@ AudioMixer::UpdateParameterWeb()
 
 	dp = group->MakeDiscreteParameter(PARAM_ETC(70), B_MEDIA_RAW_AUDIO, "Resampling algorithm", B_INPUT_MUX);
 	dp->AddItem(0, "Drop/repeat samples");
-/*
+
+	// Note: The following code is outcommented on purpose
+	// and is about to be modified at a later point
+	/*
 	dp->AddItem(1, "Drop/repeat samples (template based)");
 	dp->AddItem(2, "Linear interpolation");
 	dp->AddItem(3, "17th order filtering");
-*/
+	*/
 	group->MakeDiscreteParameter(PARAM_ETC(80), B_MEDIA_RAW_AUDIO, "Refuse output format changes", B_ENABLE);
 	group->MakeDiscreteParameter(PARAM_ETC(90), B_MEDIA_RAW_AUDIO, "Refuse input format changes", B_ENABLE);
 
@@ -1691,7 +1709,6 @@ AudioMixer::UpdateParameterWeb()
 		, B_GENERIC);
 
 	fCore->Unlock();
-
 	SetParameterWeb(web);
 }
 

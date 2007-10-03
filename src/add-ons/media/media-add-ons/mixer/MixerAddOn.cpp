@@ -1,11 +1,9 @@
-// MixerAddOn.cpp
-//
-// David Shipman, 2002
-// Marcus Overhagen, 2003
-//
-// Allows AudioMixer to be used as an addon.
-// The add-on will request to be auto-started.
-
+/*
+ * Copyright 2002 David Shipman,
+ * Copyright 2003-2007 Marcus Overhagen
+ * Copyright 2007 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #include <MediaRoster.h>
 #include <MediaNode.h>
 #include <cstring>
@@ -19,21 +17,15 @@ extern "C" _EXPORT BMediaAddOn* make_media_addon(image_id image) {
 	return new AudioMixerAddon(image);
 }
 
-// ------------------------------------------------------- //
-// ctor/dtor
-// -------------------------------------------------------- //
-
 AudioMixerAddon::AudioMixerAddon(image_id image)
- :	BMediaAddOn(image),
- 	fFormat(new media_format),
- 	fInfo(new flavor_info)
+	: BMediaAddOn(image),
+	fFormat(new media_format),
+	fInfo(new flavor_info)
 {
-	// Init media_format
 	memset(fFormat, 0, sizeof(*fFormat));
 	fFormat->type = B_MEDIA_RAW_AUDIO;
 	fFormat->u.raw_audio = media_raw_audio_format::wildcard;
 
-	// Init flavor_info
 	fInfo->internal_id = 0;
 	fInfo->name = "Audio Mixer (Haiku)";
 	fInfo->info = "Haiku Audio Mixer media addon";
@@ -96,13 +88,12 @@ AudioMixerAddon::GetConfigurationFor(BMediaNode* your_node,	BMessage* into_messa
 bool
 AudioMixerAddon::WantsAutoStart()
 {
-	// yes, please kick me
 	return true;
 }
 
 status_t
-AudioMixerAddon::AutoStart(int in_index, BMediaNode ** out_node,
-						   int32 * out_internal_id,	bool * out_has_more)
+AudioMixerAddon::AutoStart(int in_index, BMediaNode **out_node,
+							int32 *out_internal_id, bool *out_has_more)
 {
 	*out_has_more = false;
 

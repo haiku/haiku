@@ -1,16 +1,22 @@
-#include <string.h>
-
-#include <MediaDefs.h>
-#include <Locker.h>
-#include <Path.h>
-#include <File.h>
-#include <OS.h>
-
+/*
+ * Copyright 2007 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *              probably Marcus Overhagen
+ */
 #include "MixerCore.h"
+#include "MixerDebug.h"
 #include "MixerInput.h"
 #include "MixerOutput.h"
 #include "MixerSettings.h"
-#include "MixerDebug.h"
+
+#include <File.h>
+#include <Locker.h>
+#include <MediaDefs.h>
+#include <OS.h>
+#include <Path.h>
+#include <string.h>
 
 #define SAVE_DELAY		5000000		// delay saving of settings for 5s
 #define SAVE_RUNTIME	30000000	// stop save thread after 30s inactivity
@@ -268,7 +274,6 @@ MixerSettings::SaveConnectionSettings(MixerInput *input)
 	// XXX should save channel destinations and mixer channels
 
 	fLocker->Unlock();
-
 	StartDeferredSave();
 }
 
@@ -301,9 +306,7 @@ MixerSettings::LoadConnectionSettings(MixerInput *input)
 	// XXX should load channel destinations and mixer channels
 		
 	fInputSetting[index].ReplaceInt64("lru", system_time());
-	
 	fLocker->Unlock();
-	
 	StartDeferredSave();
 }
 
@@ -323,7 +326,6 @@ MixerSettings::SaveConnectionSettings(MixerOutput *output)
 	// XXX should save channel sources and source gains
 	
 	fLocker->Unlock();
-	
 	StartDeferredSave();
 }
 
@@ -340,7 +342,6 @@ MixerSettings::LoadConnectionSettings(MixerOutput *output)
 	}
 	
 	// XXX should load channel sources and source gains
-		
 	fLocker->Unlock();
 }
 
@@ -492,7 +493,6 @@ MixerSettings::StartDeferredSave()
 	resume_thread(fSaveThread);
 	
 	fSaveThreadRunning = true;
-
 	fLocker->Unlock();
 }
 

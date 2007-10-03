@@ -1,8 +1,16 @@
-#include <MediaNode.h>
-#include "MixerOutput.h"
+/*
+ * Copyright 2007 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *              probably Marcus Overhagen
+ */
 #include "MixerCore.h"
-#include "MixerUtils.h"
 #include "MixerDebug.h"
+#include "MixerOutput.h"
+#include "MixerUtils.h"
+
+#include <MediaNode.h>
 
 MixerOutput::MixerOutput(MixerCore *core, const media_output &output)
  :	fCore(core),
@@ -81,7 +89,7 @@ MixerOutput::UpdateOutputChannels()
 	}
 
 	AssignDefaultSources();
-	
+
 	// apply old gains and sources, overriding the 1.0 gain defaults for the old channels
 	if (oldInfo != 0 && oldCount != 0) {
 		for (int i = 0; i < fOutputChannelCount; i++) {
@@ -115,7 +123,6 @@ MixerOutput::AssignDefaultSources()
 	
 	// assign default sources for a few known setups,
 	// everything else is left unchanged (it already is 1:1)
-
 	if (count == 1 && mask & (B_CHANNEL_LEFT | B_CHANNEL_RIGHT)) {
 		// we have only one phycial output channel, and use it as a mix of
 		// left, right, rear-left, rear-right, center and sub

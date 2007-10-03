@@ -1,13 +1,13 @@
-/* Copyright (C) 2003 Marcus Overhagen
- * Released under terms of the MIT license.
- *
- * A simple byte order swapping class for the audio mixer.
+/*
+ * Copyright 2003-2007 Marcus Overhagen
+ * Copyright 2007 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
-
-#include <MediaDefs.h>
-#include <ByteOrder.h>
 #include "ByteSwap.h"
 #include "MixerDebug.h"
+
+#include <ByteOrder.h>
+#include <MediaDefs.h>
 
 static void swap_float(void *buffer, size_t bytecount);
 static void swap_int32(void *buffer, size_t bytecount);
@@ -48,13 +48,15 @@ do_nothing(void *buffer, size_t bytecount)
 void
 swap_float(void *buffer, size_t bytecount)
 {
-	swap_data(B_FLOAT_TYPE, buffer, bytecount, B_SWAP_ALWAYS); // XXX should be optimized
+	// XXX Should be optimized
+	swap_data(B_FLOAT_TYPE, buffer, bytecount, B_SWAP_ALWAYS);
 }
 
 void
 swap_int32(void *buffer, size_t bytecount)
 {
-	swap_data(B_INT32_TYPE, buffer, bytecount, B_SWAP_ALWAYS); // XXX should be optimized
+	// XXX Should be optimized
+	swap_data(B_INT32_TYPE, buffer, bytecount, B_SWAP_ALWAYS);
 }
 
 void
@@ -130,5 +132,4 @@ swap_int16(void *buffer, size_t bytecount)
 {
 	swap_data(B_INT16_TYPE, buffer, bytecount, B_SWAP_ALWAYS);
 }
-
 #endif
