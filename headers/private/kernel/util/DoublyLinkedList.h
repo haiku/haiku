@@ -9,9 +9,13 @@
 #include <SupportDefs.h>
 
 #ifdef _KERNEL_MODE
+#	include <debug.h>
 #	include <util/kernel_cpp.h>
-#endif
 
+#	if !defined(_BOOT_MODE) && KDEBUG
+#		define DEBUG_DOUBLY_LINKED_LIST KDEBUG
+#	endif
+#endif
 
 #ifdef __cplusplus
 
@@ -381,6 +385,11 @@ void
 DOUBLY_LINKED_LIST_CLASS_NAME::Insert(Element *element, bool back)
 {
 	if (element) {
+#if DEBUG_DOUBLY_LINKED_LIST
+		ASSERT_PRINT(fFirst == NULL ? fLast == NULL : fLast != NULL,
+			"list: %p\n", this);
+#endif
+
 		if (back) {
 			// append
 			Link *elLink = sGetLink(element);
@@ -417,6 +426,11 @@ DOUBLY_LINKED_LIST_CLASS_NAME::Insert(Element *before, Element *element)
 	if (element == NULL)
 		return;
 
+#if DEBUG_DOUBLY_LINKED_LIST
+	ASSERT_PRINT(fFirst == NULL ? fLast == NULL : fLast != NULL,
+		"list: %p\n", this);
+#endif
+
 	Link *beforeLink = sGetLink(before);
 	Link *link = sGetLink(element);
 
@@ -444,6 +458,12 @@ void
 DOUBLY_LINKED_LIST_CLASS_NAME::Remove(Element *element)
 {
 	if (element) {
+#if DEBUG_DOUBLY_LINKED_LIST
+		ASSERT_PRINT(fFirst != NULL && fLast != NULL
+			&& (fFirst != fLast || element == fFirst),
+			"list: %p, element: %p\n", this, element);
+#endif
+
 		Link *elLink = sGetLink(element);
 		if (elLink->previous)
 			sGetLink(elLink->previous)->next = elLink->next;
