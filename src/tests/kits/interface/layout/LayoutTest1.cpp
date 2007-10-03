@@ -350,7 +350,7 @@ struct GroupLayoutTest1 : public Test {
 				// row 3
 				.AddGroup(B_HORIZONTAL, 10, 3)
 					.Add(new TestView(), 3)
-					.Add(toggledView = new TestView(), 2)
+					.Add(new TestView(), 2)
 					.Add(new TestView(), 1)
 				.End()
 			.End()
