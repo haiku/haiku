@@ -20,6 +20,36 @@
 device_manager_info *gDeviceManager;
 
 
+device_info sSupportedDevices[] =
+{
+	{ 0x197b, 0x2360, "JMicron JMB360" },
+	{ 0x197b, 0x2361, "JMicron JMB361" },
+	{ 0x197b, 0x2362, "JMicron JMB362" },
+	{ 0x197b, 0x2363, "JMicron JMB363" },
+	{ 0x197b, 0x2366, "JMicron JMB366" },
+	{ 0x8086, 0x27c0, "Intel ICH7 (IDE mode)" },
+	{ 0x8086, 0x27c1, "Intel ICH7 (AHCI mode)" },
+	{}
+};
+
+
+status_t
+get_device_info(uint16 vendorID, uint16 deviceID, const char **name, uint32 *flags)
+{
+	device_info *info;
+	for (info = sSupportedDevices; info->vendor; info++) {
+		if (info->vendor == vendorID && info->device == deviceID) {
+			if (name)
+				*name = info->name;
+			if (flags)
+				*flags = info->flags;
+			return B_OK;
+		}
+	}
+	return B_ERROR;
+}
+
+
 static status_t
 register_sim(device_node_handle parent)
 {
@@ -58,42 +88,64 @@ register_sim(device_node_handle parent)
 
 //	#pragma mark -
 
-
 static float
 ahci_supports_device(device_node_handle parent, bool *_noConnection)
 {
 	uint8 baseClass, subClass, classAPI;
 	uint16 vendorID;
 	uint16 deviceID;
+	bool isPCI;
+	const char *name;
 	char *bus;
 
 	TRACE("ahci_supports_device\n");
 
-	if (gDeviceManager->get_attr_string(parent, B_DRIVER_BUS, &bus,
-				false) != B_OK
-		|| gDeviceManager->get_attr_uint8(parent,
-				PCI_DEVICE_BASE_CLASS_ID_ITEM, &baseClass, false) != B_OK
-		|| gDeviceManager->get_attr_uint8(parent,
-				PCI_DEVICE_SUB_CLASS_ID_ITEM, &subClass, false) != B_OK
-		|| gDeviceManager->get_attr_uint8(parent,
-				PCI_DEVICE_API_ID_ITEM, &classAPI, false) != B_OK
-		|| gDeviceManager->get_attr_uint16(parent,
-				PCI_DEVICE_VENDOR_ID_ITEM, &vendorID, false) != B_OK
-		|| gDeviceManager->get_attr_uint16(parent,
-			PCI_DEVICE_DEVICE_ID_ITEM, &deviceID, false) != B_OK)
-		return B_ERROR;
-
-	if (strcmp(bus, "pci") || baseClass != PCI_mass_storage
-		|| subClass != PCI_sata || classAPI != PCI_sata_ahci) {
-		free(bus);
+	if (gDeviceManager->get_attr_string(parent, B_DRIVER_BUS, &bus,	false) < B_OK)
 		return 0.0f;
+	isPCI = !strcmp(bus, "pci");
+	free(bus);
+	if (!isPCI)
+		return 0.0f;
+
+	if (gDeviceManager->get_attr_uint8(parent, PCI_DEVICE_BASE_CLASS_ID_ITEM, &baseClass, false) < B_OK
+		|| gDeviceManager->get_attr_uint8(parent, PCI_DEVICE_SUB_CLASS_ID_ITEM, &subClass, false) < B_OK
+		|| gDeviceManager->get_attr_uint8(parent, PCI_DEVICE_API_ID_ITEM, &classAPI, false) < B_OK
+		|| gDeviceManager->get_attr_uint16(parent, PCI_DEVICE_VENDOR_ID_ITEM, &vendorID, false) < B_OK
+		|| gDeviceManager->get_attr_uint16(parent, PCI_DEVICE_DEVICE_ID_ITEM, &deviceID, false) < B_OK)
+		return 0.0f;
+
+	if (get_device_info(vendorID, deviceID, &name, NULL) < B_OK) {
+		if (baseClass != PCI_mass_storage || subClass != PCI_sata || classAPI != PCI_sata_ahci)
+			return 0.0f;
+		TRACE("generic AHCI controller found! vendor 0x%04x, device 0x%04x\n", vendorID, deviceID);
+		return 0.8f;
 	}
 
-	TRACE("controller found! vendor 0x%04x, device 0x%04x\n",
-		vendorID, deviceID);
+	if (vendorID == PCI_VENDOR_JMICRON) {
+		// JMicron uses the same device ID for SATA and PATA controllers,
+		// check if BAR5 exists to determine if it's a AHCI controller
+		uint8 bus, device, function;
+		pci_info info;
+		pci_module_info *pci;
+		size_t size = 0;
+		int i;
+		gDeviceManager->get_attr_uint8(parent, PCI_DEVICE_BUS_ITEM, &bus, false);
+		gDeviceManager->get_attr_uint8(parent, PCI_DEVICE_DEVICE_ITEM, &device, false);
+		gDeviceManager->get_attr_uint8(parent, PCI_DEVICE_FUNCTION_ITEM, &function, false);
+		get_module(B_PCI_MODULE_NAME, (module_info **)&pci);
+		for (i = 0; B_OK == pci->get_nth_pci_info(i, &info); i++) {
+			if (info.bus == bus && info.device == device && info.function == function) {
+				size = info.u.h0.base_register_sizes[5];
+				break;
+			}
+		}
+		put_module(B_PCI_MODULE_NAME);
+		if (size == 0)
+			return 0.0f;
+	}
 
-	free(bus);
-	return 0.5;
+	TRACE("AHCI controller %s found!\n", name);
+	return 1.0f;
 }
 
 
@@ -155,6 +207,8 @@ ahci_init_driver(device_node_handle node, void *userCookie, void **_cookie)
 		(driver_module_info **)&gPCI, (void **)&pciDevice);
 	if (status != B_OK)
 		return status;
+
+	TRACE("ahci_init_driver: gPCI %p, pciDevice %p\n", gPCI, pciDevice);
 
 	gDeviceManager->put_device_node(parent);
 

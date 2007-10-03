@@ -20,6 +20,7 @@ AHCIController::AHCIController(device_node_handle node, pci_device_info *device)
 	, fPCIDevice(device)
 	, fPCIVendorID(0xffff)
 	, fPCIDeviceID(0xffff)
+	, fFlags(0)
 	, fCommandSlotCount(0)
 	, fPortCountMax(0)
 	, fPortCountAvail(0)
@@ -68,6 +69,8 @@ AHCIController::Init()
 	}
 	fInstanceCheck = create_port(1, sName);
 // --- Instance check workaround end
+
+	get_device_info(fPCIVendorID, fPCIDeviceID, NULL, &fFlags);
 
 	uchar capabilityOffset;
 	status_t res = gPCI->find_pci_capability(fPCIDevice, PCI_cap_id_sata, &capabilityOffset);

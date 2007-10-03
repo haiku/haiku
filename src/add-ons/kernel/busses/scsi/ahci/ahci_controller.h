@@ -40,6 +40,7 @@ private:
 	pci_device_info*			fPCIDevice;
 	uint16						fPCIVendorID;
 	uint16						fPCIDeviceID;
+	uint32						fFlags;
 
 	volatile ahci_hba *			fRegs;
 	area_id						fRegsArea;
@@ -48,7 +49,6 @@ private:
 	int							fPortCountAvail;
 	uint8						fIRQ;
 	AHCIPort *					fPort[32];
-
 
 // --- Instance check workaround begin
 	port_id fInstanceCheck;
@@ -63,6 +63,5 @@ AHCIController::FlushPostedWrites()
 	volatile uint32 dummy = fRegs->ghc;
 	dummy = dummy;
 }
-
 
 #endif	// _AHCI_CONTROLLER_H

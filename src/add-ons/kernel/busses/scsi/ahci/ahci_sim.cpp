@@ -130,14 +130,18 @@ ahci_sim_init_bus(device_node_handle node, void *userCookie, void **_cookie)
 	AHCIController *controller;
 	status_t status;
 
-	TRACE("ahci_sim_init_bus, userCookie %p\n", userCookie);
+	TRACE("ahci_sim_init_bus: userCookie %p\n", userCookie);
 
-	// initialize parent (the bus) to get the PCI interface and device
+	TRACE("ahci_sim_init_bus: gPCI %p\n", gPCI);
+
+	// initialize parent (the bus) to get the PCI device
 	parent = gDeviceManager->get_parent(node);
 	status = gDeviceManager->init_driver(parent, &pciDevice, NULL, NULL);
 	gDeviceManager->put_device_node(parent);
 	if (status != B_OK)
 		return status;
+
+	TRACE("ahci_sim_init_bus: pciDevice %p\n", pciDevice);
 
 	controller =  new(std::nothrow) AHCIController(node, pciDevice);
 	if (!controller)

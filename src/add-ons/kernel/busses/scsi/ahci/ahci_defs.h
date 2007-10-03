@@ -8,6 +8,10 @@
 #include <bus/PCI.h>
 #include <bus/SCSI.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define AHCI_DEVICE_MODULE_NAME "busses/scsi/ahci/device_v1"
 #define AHCI_SIM_MODULE_NAME "busses/scsi/ahci/sim/v1"
 
@@ -211,6 +215,16 @@ typedef struct {
 #define PRD_MAX_DATA_LENGTH 0x400000 /* 4 MB */
 
 
+typedef struct {
+	uint16 vendor;
+	uint16 device;
+	const char *name;
+	uint32 flags;
+} device_info;
+
+status_t get_device_info(uint16 vendorID, uint16 deviceID, const char **name, uint32 *flags);
+
+
 extern scsi_sim_interface gAHCISimInterface;
 extern device_manager_info *gDeviceManager;
 extern pci_device_module_info *gPCI;
@@ -223,6 +237,10 @@ extern scsi_for_sim_interface *gSCSI;
 #define PCI_VENDOR_INTEL	0x8086
 #define PCI_VENDOR_JMICRON	0x197b
 #define PCI_JMICRON_CONTROLLER_CONTROL_1	0x40
+
+#ifdef __cplusplus
+}
+#endif
 
 #ifdef __cplusplus
 
@@ -263,6 +281,5 @@ wait_until_clear(volatile uint32 *reg, uint32 bits, bigtime_t timeout)
 }
 
 #endif	/* __cplusplus */
-
 
 #endif	/* _AHCI_DEFS_H */
