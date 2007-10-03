@@ -63,7 +63,9 @@ line_buffer_readable_line(struct line_buffer &buffer, char eol, char eof)
 			return i + 1;
 	}
 
-	return 0;
+	// If the buffer is full, but doesn't contain a EOL or EOF, we report the
+	// full size anyway, since otherwise the reader would wait forever.
+	return buffer.in == buffer.size ? buffer.in : 0;
 }
 
 
