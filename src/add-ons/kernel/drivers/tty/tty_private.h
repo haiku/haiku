@@ -47,6 +47,8 @@ class Request : public DoublyLinkedListLinkImpl<Request> {
 		bool WasNotified() const		{ return fNotified; }
 		bool HasError() const			{ return fError; }
 
+		void Dump(const char* prefix);
+
 	private:
 		RequestOwner	*fOwner;
 		tty_cookie		*fCookie;
@@ -69,6 +71,8 @@ class RequestQueue {
 		void NotifyFirst(size_t bytesAvailable);
 		void NotifyError(status_t error);
 		void NotifyError(tty_cookie *cookie, status_t error);
+
+		void Dump(const char* prefix);
 
 	private:
 		typedef DoublyLinkedList<Request> RequestList;
@@ -180,5 +184,8 @@ extern status_t tty_ioctl(tty_cookie *cookie, uint32 op, void *buffer,
 extern status_t tty_select(tty_cookie *cookie, uint8 event, uint32 ref,
 					selectsync *sync);
 extern status_t tty_deselect(tty_cookie *cookie, uint8 event, selectsync *sync);
+
+extern void tty_add_debugger_commands();
+extern void tty_remove_debugger_commands();
 
 #endif	/* TTY_PRIVATE_H */

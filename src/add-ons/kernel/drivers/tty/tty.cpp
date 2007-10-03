@@ -223,6 +223,18 @@ Request::NotifyError(status_t error)
 }
 
 
+void
+Request::Dump(const char* prefix)
+{
+	kprintf("%srequest: %p\n", prefix, this);
+	kprintf("%s  owner:        %p\n", prefix, fOwner);
+	kprintf("%s  cookie:       %p\n", prefix, fCookie);
+	kprintf("%s  bytes needed: %lu\n", prefix, fBytesNeeded);
+	kprintf("%s  notified:     %s\n", prefix, fNotified ? "true" : "false");
+	kprintf("%s  error:        %s\n", prefix, fError ? "true" : "false");
+}
+
+
 // #pragma mark -
 
 
@@ -290,6 +302,15 @@ RequestQueue::NotifyError(tty_cookie *cookie, status_t error)
 }
 
 
+void
+RequestQueue::Dump(const char* prefix)
+{
+	RequestList::Iterator it = fRequests.GetIterator();
+	while (Request* request = it.Next())
+		request->Dump(prefix);
+}
+
+
 // #pragma mark -
 
 
@@ -345,7 +366,10 @@ RequestOwner::Dequeue()
 	if (fRequestQueues[0])
 		fRequestQueues[0]->Remove(&fRequests[0]);
 	if (fRequestQueues[1])
-		fRequestQueues[1]->Remove(&fRequests[0]);
+		fRequestQueues[1]->Remove(&fRequests[1]);
+
+	fRequestQueues[0] = NULL;
+	fRequestQueues[1] = NULL;
 }
 
 
@@ -1458,12 +1482,15 @@ tty_write_to_tty_master_unsafe(tty_cookie *sourceCookie, const char *data,
 		"length = %lu%s)\n", source, target, length,
 		(echo ? ", echo mode" : "")));
 
+	// Make sure we are first in the writer queue(s) and AvailableBytes() is
+	// initialized.
 	status_t status = locker.AcquireWriter(dontBlock, 0);
 	if (status != B_OK) {
 		*_length = 0;
 		return status;
 	}
 	size_t writable = locker.AvailableBytes();
+	size_t writtenSinceLastNotify = 0;
 
 	while (bytesWritten < length) {
 		// fetch next char and do input processing
@@ -1489,6 +1516,13 @@ tty_write_to_tty_master_unsafe(tty_cookie *sourceCookie, const char *data,
 		// If there's not enough space to write what we have, we need to wait
 		// until it is available.
 		if (writable < bytesNeeded) {
+			if (writtenSinceLastNotify > 0) {
+				tty_notify_if_available(target, source, true);
+				if (echo)
+					tty_notify_if_available(source, target, true);
+				writtenSinceLastNotify = 0;
+			}
+
 			status = locker.AcquireWriter(dontBlock, bytesNeeded);
 			if (status != B_OK) {
 				*_length = bytesWritten;
@@ -1514,6 +1548,7 @@ tty_write_to_tty_master_unsafe(tty_cookie *sourceCookie, const char *data,
 		writable -= bytesNeeded;
 		data++;
 		bytesWritten++;
+		writtenSinceLastNotify++;
 	}
 
 	return B_OK;
@@ -1582,12 +1617,15 @@ tty_write_to_tty_slave_unsafe(tty_cookie *sourceCookie, const char *data,
 	TRACE(("tty_write_to_tty_slave(source = %p, target = %p, length = %lu)\n",
 		sourceCookie->tty, target, length));
 
+	// Make sure we are first in the writer queue(s) and AvailableBytes() is
+	// initialized.
 	status_t status = locker.AcquireWriter(dontBlock, 0);
 	if (status != B_OK) {
 		*_length = 0;
 		return status;
 	}
 	size_t writable = locker.AvailableBytes();
+	size_t writtenSinceLastNotify = 0;
 
 	while (bytesWritten < length) {
 		// fetch next char and do output processing
@@ -1598,6 +1636,11 @@ tty_write_to_tty_slave_unsafe(tty_cookie *sourceCookie, const char *data,
 		// If there's not enough space to write what we have, we need to wait
 		// until it is available.
 		if (writable < bytesNeeded) {
+			if (writtenSinceLastNotify > 0) {
+				tty_notify_if_available(target, sourceCookie->tty, true);
+				writtenSinceLastNotify = 0;
+			}
+
 			status = locker.AcquireWriter(dontBlock, bytesNeeded);
 			if (status != B_OK) {
 				*_length = bytesWritten;
@@ -1618,6 +1661,7 @@ tty_write_to_tty_slave_unsafe(tty_cookie *sourceCookie, const char *data,
 		writable -= bytesNeeded;
 		data++;
 		bytesWritten++;
+		writtenSinceLastNotify++;
 	}
 
 	return B_OK;
@@ -1771,3 +1815,80 @@ tty_deselect(tty_cookie *cookie, uint8 event, selectsync *sync)
 	return remove_select_sync_pool_entry(&tty->select_pool, sync, event);
 }
 
+
+static void
+dump_tty_settings(struct tty_settings& settings)
+{
+	kprintf("  pgrp_id:      %ld\n", settings.pgrp_id);
+	kprintf("  session_id:   %ld\n", settings.session_id);
+	// struct termios		termios;
+	// struct winsize		window_size;
+
+}
+
+static void
+dump_tty_struct(struct tty& tty)
+{
+	kprintf("  index:        %ld\n", tty.index);
+	kprintf("  is_master:    %s\n", tty.is_master ? "true" : "false");
+	kprintf("  open_count:   %ld\n", tty.open_count);
+	kprintf("  select_pool:  %p\n", tty.select_pool);
+	kprintf("  pending_eof:  %lu\n", tty.pending_eof);
+	kprintf("  lock.sem:     %ld\n", tty.lock->sem);
+
+	kprintf("  input_buffer:\n");
+	kprintf("    first:      %ld\n", tty.input_buffer.first);
+	kprintf("    in:         %lu\n", tty.input_buffer.in);
+	kprintf("    size:       %lu\n", tty.input_buffer.size);
+	kprintf("    buffer:     %p\n", tty.input_buffer.buffer);
+
+	kprintf("  reader queue:\n");
+	tty.reader_queue.Dump("    ");
+	kprintf("  writer queue:\n");
+	tty.writer_queue.Dump("    ");
+
+	kprintf("  cookies:     ");
+	TTYCookieList::Iterator it = tty.cookies.GetIterator();
+	while (tty_cookie* cookie = it.Next())
+		kprintf(" %p", cookie);
+	kprintf("\n");
+}
+
+
+static int
+dump_tty(int argc, char** argv)
+{
+	if (argc < 2) {
+		kprintf("Usage: %s <tty index>\n", argv[0]);
+		return 0;
+	}
+
+	int32 index = atol(argv[1]);
+	if (index < 0 || index >= (int32)kNumTTYs) {
+		kprintf("Invalid tty index.\n");
+		return 0;
+	}
+
+	kprintf("master:\n");
+	dump_tty_struct(gMasterTTYs[index]);
+	kprintf("slave:\n");
+	dump_tty_struct(gSlaveTTYs[index]);
+	kprintf("settings:\n");
+	dump_tty_settings(gTTYSettings[index]);
+
+	return 0;
+}
+
+
+void
+tty_add_debugger_commands()
+{
+	add_debugger_command("tty", &dump_tty, "Dump info on a tty");
+}
+
+
+void
+tty_remove_debugger_commands()
+{
+	remove_debugger_command("tty", &dump_tty);
+}

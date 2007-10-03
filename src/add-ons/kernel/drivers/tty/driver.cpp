@@ -100,6 +100,8 @@ init_driver(void)
 		}
 	}
 
+	tty_add_debugger_commands();
+
 	return B_OK;
 }
 
@@ -108,6 +110,8 @@ void
 uninit_driver(void)
 {
 	TRACE((DRIVER_NAME ": uninit_driver()\n"));
+
+	tty_remove_debugger_commands();
 
 	for (int32 i = 0; i < (int32)kNumTTYs * 2; i++)
 		free(sDeviceNames[i]);
