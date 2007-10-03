@@ -402,6 +402,15 @@ reparent_children(struct team *team)
 		remove_team_from_parent(team, child);
 		insert_team_into_parent(sKernelTeam, child);
 	}
+
+	// move job control entries too
+	sKernelTeam->stopped_children->entries.MoveFrom(
+		&team->stopped_children->entries);
+	sKernelTeam->continued_children->entries.MoveFrom(
+		&team->continued_children->entries);
+
+	// Note, we don't move the dead children entries. Those will be deleted
+	// when the team structure is deleted.
 }
 
 
@@ -2050,7 +2059,7 @@ team_get_address_space(team_id id, vm_address_space **_addressSpace)
 
 
 /*!	Sets the team's job control state.
-	Interrupts must be disabled and the team lock being held.
+	Interrupts must be disabled and the team lock be held.
 	\a threadsLocked indicates whether the thread lock is being held, too.
 */
 void
