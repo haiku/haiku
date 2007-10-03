@@ -9,7 +9,7 @@
 #define _KERNEL_DEBUG_H
 
 
-#include <OS.h>
+#include <KernelExport.h>
 
 #define KDEBUG 1
 
@@ -27,7 +27,7 @@
 #define ASSERT_ALWAYS_PRINT(x, format...) \
 	do {																	\
 		if (!(x)) {															\
-			dprintf(format);												\
+			dprintf_no_syslog(format);										\
 			panic("ASSERT FAILED (%s:%d): %s\n", __FILE__, __LINE__, #x);	\
 		}																	\
 	} while (0)
@@ -55,6 +55,9 @@ extern void debug_early_boot_message(const char *string);
 extern void debug_puts(const char *s, int32 length);
 extern bool debug_debugger_running(void);
 extern void debug_stop_screen_debug_output(void);
+
+extern void dprintf_no_syslog(const char *format, ...)
+				__attribute__ ((format (__printf__, 1, 2)));
 
 extern void _user_debug_output(const char *userString);
 

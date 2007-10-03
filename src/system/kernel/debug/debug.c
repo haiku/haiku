@@ -972,15 +972,11 @@ check_pending_repeats(void *data, int iter)
 }
 
 
-void
-dprintf(const char *format, ...)
+static void
+dprintf_args(const char *format, va_list args, bool syslogOutput)
 {
 	cpu_status state;
-	va_list args;
 	int32 length;
-
-	if (!sSerialDebugEnabled && !sSyslogOutputEnabled && !sBlueScreenEnabled)
-		return;
 
 	// ToDo: maybe add a non-interrupt buffer and path that only
 	//	needs to acquire a semaphore instead of needing to disable
@@ -989,9 +985,7 @@ dprintf(const char *format, ...)
 	state = disable_interrupts();
 	acquire_spinlock(&sSpinlock);
 
-	va_start(args, format);
 	length = vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE, format, args);
-	va_end(args);
 
 	if (length >= OUTPUT_BUFFER_SIZE)
 		length = OUTPUT_BUFFER_SIZE - 1;
@@ -1005,7 +999,7 @@ dprintf(const char *format, ...)
 
 		if (sSerialDebugEnabled)
 			arch_debug_serial_puts(sOutputBuffer);
-		if (sSyslogOutputEnabled)
+		if (syslogOutput)
 			syslog_write(sOutputBuffer, length);
 		if (sBlueScreenEnabled || sDebugScreenEnabled)
 			blue_screen_puts(sOutputBuffer);
@@ -1016,6 +1010,34 @@ dprintf(const char *format, ...)
 
 	release_spinlock(&sSpinlock);
 	restore_interrupts(state);
+}
+
+
+void
+dprintf(const char *format, ...)
+{
+	va_list args;
+
+	if (!sSerialDebugEnabled && !sSyslogOutputEnabled && !sBlueScreenEnabled)
+		return;
+
+	va_start(args, format);
+	dprintf_args(format, args, sSyslogOutputEnabled);
+	va_end(args);
+}
+
+
+void
+dprintf_no_syslog(const char *format, ...)
+{
+	va_list args;
+
+	if (!sSerialDebugEnabled && !sBlueScreenEnabled)
+		return;
+
+	va_start(args, format);
+	dprintf_args(format, args, false);
+	va_end(args);
 }
 
 
