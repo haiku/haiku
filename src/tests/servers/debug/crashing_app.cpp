@@ -14,6 +14,7 @@ static const char *kUsage =
 	"\n"
 	"Options:\n"
 	"  -h, --help           - print this info text\n"
+	"  --thread             - crash in a separate thread\n"
 	"\n"
 	"Modes:\n"
 	"[general]\n"
@@ -45,18 +46,19 @@ print_usage_and_exit(bool error)
 }
 
 
-static void
+static int
 crash_segv()
 {
 	int *a = 0;
 	*a = 0;
+	return 0;
 }
 
-static void
+static int
 crash_segv2()
 {
 	const char *str = (const char*)0x1;
-	strcmp(str, "Test");
+	return strcmp(str, "Test");
 }
 
 static int
@@ -67,33 +69,72 @@ crash_div()
 	return i;
 }
 
-static void
+static int
 crash_debugger()
 {
 	debugger("crashing_app() invoked debugger()");
+	return 0;
 }
 
 #if __INTEL__
 
-static void
+static int
 crash_int3()
 {
 	asm("int3");
+	return 0;
 }
 
-static void
+static int
 crash_protection()
 {
 	asm("movl %0, %%dr7" : : "r"(0));
+	return 0;
 }
 
 #endif	// __INTEL__
 
 
-int
-main(int argc, const char *const *argv)
+typedef int crash_function_t();
+
+
+static crash_function_t*
+get_crash_function(const char* mode)
 {
-	const char *mode = "segv";
+	if (strcmp(mode, "segv") == 0) {
+		return crash_segv;
+	} else if (strcmp(mode, "segv2") == 0) {
+		return crash_segv2;
+	} else if (strcmp(mode, "div") == 0) {
+		return (crash_function_t*)crash_div;
+	} else if (strcmp(mode, "debugger") == 0) {
+		return crash_debugger;
+#if __INTEL__
+	} else if (strcmp(mode, "int3") == 0) {
+		return crash_int3;
+	} else if (strcmp(mode, "protection") == 0) {
+		return crash_protection;
+#endif	// __INTEL__
+	}
+
+	return NULL;
+}
+
+
+static status_t
+crashing_thread(void* data)
+{
+	crash_function_t* doCrash = (crash_function_t*)data;
+	snooze(100000);
+	doCrash();
+}
+
+
+int
+main(int argc, const char* const* argv)
+{
+	bool inThread = false;
+	const char* mode = "segv";
 
 	// parse args
 	int argi = 1;
@@ -103,6 +144,8 @@ main(int argc, const char *const *argv)
 		if (arg[0] == '-') {
 			if (strcmp(arg, "-h") == 0 || strcmp(arg, "--help") == 0) {
 				print_usage_and_exit(false);
+			} else if (strcmp(arg, "--thread") == 0) {
+				inThread = true;
 			} else {
 				fprintf(stderr, "Invalid option \"%s\"\n", arg);
 				print_usage_and_exit(true);
@@ -112,23 +155,27 @@ main(int argc, const char *const *argv)
 		}
 	}
 
-	if (strcmp(mode, "segv") == 0) {
-		crash_segv();
-	} else if (strcmp(mode, "segv2") == 0) {
-		crash_segv2();
-	} else if (strcmp(mode, "div") == 0) {
-		crash_div();
-	} else if (strcmp(mode, "debugger") == 0) {
-		crash_debugger();
-#if __INTEL__
-	} else if (strcmp(mode, "int3") == 0) {
-		crash_int3();
-	} else if (strcmp(mode, "protection") == 0) {
-		crash_protection();
-#endif	// __INTEL__
-	} else {
+	crash_function_t* doCrash = get_crash_function(mode);
+	if (doCrash == NULL) {
 		fprintf(stderr, "Invalid mode \"%s\"\n", mode);
 		print_usage_and_exit(true);
+	}
+
+	if (inThread) {
+		thread_id thread = spawn_thread(crashing_thread, "crashing thread",
+			B_NORMAL_PRIORITY, (void*)doCrash);
+		if (thread < 0) {
+			fprintf(stderr, "Error: Failed to spawn thread: %s\n",
+				strerror(thread));
+			exit(1);
+		}
+
+		resume_thread(thread);
+		status_t result;
+		while (wait_for_thread(thread, &result) == B_INTERRUPTED) {
+		}
+	} else {
+		doCrash();
 	}
 
 	return 0;
