@@ -271,8 +271,26 @@ Partition::Scan(bool mountFileSystems, bool isBootDevice)
 		bestPriority = priority;
 	}
 
+
+	// find the best FS module
+	const file_system_module_info *bestFSModule = NULL;
+	float bestFSPriority = -1;
+	for (int32 i = 0; i < sNumFileSystemModules; i++) {
+		if (sFileSystemModules[i]->identify_file_system == NULL)
+			continue;
+
+		float priority = sFileSystemModules[i]->identify_file_system(this);
+		if (priority <= 0)
+			continue;
+
+		if (priority > bestFSPriority) {
+			bestFSModule = sFileSystemModules[i];
+			bestFSPriority = priority;
+		}
+	}
+
 	// now let the best matching disk system scan the partition
-	if (bestModule) {
+	if (bestModule && bestPriority >= bestFSPriority) {
 		NodeOpener opener(this, O_RDONLY);
 		status_t status = bestModule->scan_partition(opener.Descriptor(), this,
 			bestCookie);
@@ -323,8 +341,11 @@ Partition::Scan(bool mountFileSystems, bool isBootDevice)
 
 	// scan for file systems
 
-	if (mountFileSystems)
+	if (mountFileSystems) {
+		// TODO: Use the FS module we've got, if any. Requires to implement the
+		// identify_file_system() hook in every FS.
 		return Mount();
+	}
 
 	return B_ENTRY_NOT_FOUND; 
 }

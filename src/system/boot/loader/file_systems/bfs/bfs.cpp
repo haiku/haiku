@@ -132,6 +132,15 @@ Volume::ToBlockRun(off_t block) const
 //	#pragma mark -
 
 
+float
+bfs_identify_file_system(boot::Partition *partition)
+{
+	Volume volume(partition);
+
+	return volume.InitCheck() < B_OK ? 0 : 0.8;
+}
+
+
 static status_t
 bfs_get_file_system(boot::Partition *partition, ::Directory **_root)
 {
@@ -152,6 +161,7 @@ bfs_get_file_system(boot::Partition *partition, ::Directory **_root)
 file_system_module_info gBFSFileSystemModule = {
 	"file_systems/bfs/v1",
 	kPartitionTypeBFS,
+	bfs_identify_file_system,
 	bfs_get_file_system
 };
 

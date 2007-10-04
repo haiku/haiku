@@ -813,6 +813,7 @@ tarfs_get_file_system(boot::Partition *partition, ::Directory **_root)
 file_system_module_info gTarFileSystemModule = {
 	"file_systems/tarfs/v1",
 	kPartitionTypeTarFS,
+	NULL,	// identify_file_system
 	tarfs_get_file_system
 };
 

@@ -55,6 +55,7 @@ hfs_plus_get_file_system(boot::Partition *partition, ::Directory **_root)
 file_system_module_info gAmigaFFSFileSystemModule = {
 	"file_systems/hfs_plus/v1",
 	kPartitionTypeHFSPlus,
+	NULL,
 	hfs_plus_get_file_system
 };
 

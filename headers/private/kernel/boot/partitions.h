@@ -88,6 +88,7 @@ extern partition_module_info gIntelExtendedPartitionModule;
 struct file_system_module_info {
 	const char	*module_name;
 	const char	*pretty_name;
+	float		(*identify_file_system)(boot::Partition *device);
 	status_t	(*get_file_system)(boot::Partition *device, Directory **_root);
 };
 
