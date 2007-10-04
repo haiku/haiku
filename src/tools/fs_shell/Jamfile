@@ -14,6 +14,10 @@ if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 UsePrivateHeaders fs_shell ;
 UsePrivateHeaders shared ;
 
+local defines = [ FDefines FS_SHELL=1 ] ;
+SubDirCcFlags $(defines) ;
+SubDirC++Flags $(defines) ;
+
 # platform specific sources
 local fsShellCommandSources ;
 local externalCommandsSources ;
@@ -58,6 +62,9 @@ BuildPlatformStaticLibrary <build>fs_shell.a :
 
 	fssh.cpp
 ;
+
+SEARCH on [ FGristFiles rootfs.cpp ]
+	= [ FDirName $(HAIKU_TOP) src system kernel fs ] ;
 
 BuildPlatformMain <build>fs_shell_command
 	: fs_shell_command.cpp $(fsShellCommandSources)

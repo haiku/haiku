@@ -35,9 +35,9 @@
 extern fssh_module_info *modules[];
 
 
-namespace FSShell {
-
 extern fssh_file_system_module_info gRootFileSystem;
+
+namespace FSShell {
 
 const char* kMountPoint = "/myfs";
 

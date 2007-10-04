@@ -7,7 +7,7 @@ UsePrivateHeaders shared storage ;
 
 KernelMergeObject kernel_fs.o : 
 	devfs.cpp
-	rootfs.c
+	rootfs.cpp
 	pipefs.cpp
 	fd.cpp
 	vfs.cpp
