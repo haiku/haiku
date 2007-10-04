@@ -179,9 +179,9 @@ static fssh_status_t vm_cache_resize(file_cache_ref *cacheRef, fssh_off_t newSiz
 static fssh_status_t vm_cache_write_modified(file_cache_ref *ref, bool fsReenter);
 
 static fssh_status_t vfs_read_pages(int fd, fssh_off_t pos, const fssh_iovec *vecs,
-	fssh_size_t count, fssh_size_t *_numBytes, bool fsReenter);
+	fssh_size_t count, fssh_size_t *_numBytes, bool mayBlock, bool fsReenter);
 static fssh_status_t vfs_write_pages(int fd, fssh_off_t pos, const fssh_iovec *vecs,
-	fssh_size_t count, fssh_size_t *_numBytes, bool fsReenter);
+	fssh_size_t count, fssh_size_t *_numBytes, bool mayBlock, bool fsReenter);
 
 static fssh_status_t pages_io(file_cache_ref *ref, fssh_off_t offset, const fssh_iovec *vecs,
 	fssh_size_t count, fssh_size_t *_numBytes, bool doWrite);
@@ -741,7 +741,7 @@ vm_cache_write_modified(file_cache_ref *cache, bool fsReenter)
 
 fssh_status_t
 vfs_read_pages(int fd, fssh_off_t pos, const fssh_iovec *vecs, fssh_size_t count,
-	fssh_size_t *_numBytes, bool fsReenter)
+	fssh_size_t *_numBytes, bool mayBlock, bool fsReenter)
 {
 	// check how much the iovecs allow us to read
 	fssh_size_t toRead = 0;
@@ -781,7 +781,7 @@ vfs_read_pages(int fd, fssh_off_t pos, const fssh_iovec *vecs, fssh_size_t count
 
 fssh_status_t
 vfs_write_pages(int fd, fssh_off_t pos, const fssh_iovec *vecs, fssh_size_t count,
-	fssh_size_t *_numBytes, bool fsReenter)
+	fssh_size_t *_numBytes, bool mayBlock, bool fsReenter)
 {
 	// check how much the iovecs allow us to write
 	fssh_size_t toWrite = 0;
@@ -1122,7 +1122,7 @@ pages_io(file_cache_ref *ref, fssh_off_t offset, const fssh_iovec *vecs, fssh_si
 			size = numBytes;
 
 		status = vfs_read_pages(ref->deviceFD, fileVecs[0].offset, vecs,
-			count, &size, false);
+			count, &size, true, false);
 		if (status < FSSH_B_OK)
 			return status;
 
@@ -1219,10 +1219,10 @@ pages_io(file_cache_ref *ref, fssh_off_t offset, const fssh_iovec *vecs, fssh_si
 				fssh_size_t bytes = size;
 				if (doWrite) {
 					status = vfs_write_pages(ref->deviceFD, fileOffset,
-						tempVecs, tempCount, &bytes, false);
+						tempVecs, tempCount, &bytes, true, false);
 				} else {
 					status = vfs_read_pages(ref->deviceFD, fileOffset,
-						tempVecs, tempCount, &bytes, false);
+						tempVecs, tempCount, &bytes, true, false);
 				}
 				if (status < FSSH_B_OK)
 					return status;

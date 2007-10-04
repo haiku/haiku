@@ -772,16 +772,18 @@ rootfs_can_page(fssh_fs_volume _fs, fssh_fs_vnode _v, fssh_fs_cookie cookie)
 
 
 static fssh_status_t
-rootfs_read_pages(fssh_fs_volume _fs, fssh_fs_vnode _v, fssh_fs_cookie cookie, fssh_off_t pos,
-	const fssh_iovec *vecs, fssh_size_t count, fssh_size_t *_numBytes, bool reenter)
+rootfs_read_pages(fssh_fs_volume _fs, fssh_fs_vnode _v, fssh_fs_cookie cookie,
+	fssh_off_t pos, const fssh_iovec *vecs, fssh_size_t count,
+	fssh_size_t *_numBytes, bool mayBlock, bool reenter)
 {
 	return FSSH_B_NOT_ALLOWED;
 }
 
 
 static fssh_status_t
-rootfs_write_pages(fssh_fs_volume _fs, fssh_fs_vnode _v, fssh_fs_cookie cookie, fssh_off_t pos,
-	const fssh_iovec *vecs, fssh_size_t count, fssh_size_t *_numBytes, bool reenter)
+rootfs_write_pages(fssh_fs_volume _fs, fssh_fs_vnode _v, fssh_fs_cookie cookie,
+	fssh_off_t pos, const fssh_iovec *vecs, fssh_size_t count,
+	fssh_size_t *_numBytes, bool mayBlock, bool reenter)
 {
 	return FSSH_B_NOT_ALLOWED;
 }
