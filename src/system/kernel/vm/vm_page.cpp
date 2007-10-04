@@ -842,34 +842,67 @@ page_thief(void* /*unused*/)
 
 			// try to lock the page's cache
 
-			vm_cache* cache = vm_cache_acquire_page_cache_ref(page);
-			if (cache == NULL)
+			class PageCacheTryLocker {
+			public:
+				PageCacheTryLocker(vm_page *page)
+					: fIsLocked(false)
+				{
+					fCache = vm_cache_acquire_page_cache_ref(page);
+					if (fCache != NULL
+						&& mutex_trylock(&fCache->lock) == B_OK) {
+						if (fCache == page->cache)
+							fIsLocked = true;
+						else
+							mutex_unlock(&fCache->lock);
+					}
+				}
+
+				~PageCacheTryLocker()
+				{
+					if (fIsLocked)
+						mutex_unlock(&fCache->lock);
+						
+					vm_cache_release_ref(fCache);
+				}
+
+				bool IsLocked() { return fIsLocked; }
+
+			private:
+				vm_cache *fCache;
+				bool fIsLocked;
+			} cacheLocker(page);
+			
+			if (!cacheLocker.IsLocked())
 				continue;
 
-			if (mutex_trylock(&cache->lock) != B_OK) {
-				vm_cache_release_ref(cache);
-				continue;
-			}
 			if (page->state != PAGE_STATE_INACTIVE) {
 				// TODO: if this is an active page (as in stealActive), we need
 				// to unmap it and check if it's modified in an atomic operation.
 				// For now, we'll just ignore it, even though this might let
 				// vm_page_allocate_page() wait forever...
-				mutex_unlock(&cache->lock);
-				vm_cache_release_ref(cache);
+				continue;
+			}
+
+			// recheck eventual last minute changes
+			uint32 flags;
+			vm_remove_all_page_mappings(page, &flags);
+			if ((flags & PAGE_MODIFIED) != 0) {
+				// page was modified, don't steal it
+				vm_page_set_state(page, PAGE_STATE_MODIFIED);
+				continue;
+			} else if ((flags & PAGE_ACCESSED) != 0) {
+				// page is in active use, don't steal it
+				vm_page_set_state(page, PAGE_STATE_ACTIVE);
 				continue;
 			}
 
 			// we can now steal this page
 
 			//dprintf("  steal page %p from cache %p\n", page, cache);
-			vm_remove_all_page_mappings(page);
-			vm_cache_remove_page(cache, page);
+
+			vm_cache_remove_page(page->cache, page);
 			vm_page_set_state(page, PAGE_STATE_FREE);
 			steal--;
-
-			mutex_unlock(&cache->lock);
-			vm_cache_release_ref(cache);
 		}
 	}
 

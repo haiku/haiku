@@ -2433,9 +2433,14 @@ vm_clear_map_flags(vm_page *page, uint32 flags)
 }
 
 
+/*!	Removes all mappings from a page.
+	After you've called this function, the page is unmapped from memory.
+	The accumulated page flags of all mappings can be found in \a _flags.
+*/
 void
-vm_remove_all_page_mappings(vm_page *page)
+vm_remove_all_page_mappings(vm_page *page, uint32 *_flags)
 {
+	uint32 accumulatedFlags = 0;
 	MutexLocker locker(sMappingLock);
 
 	vm_page_mappings queue;
@@ -2446,13 +2451,19 @@ vm_remove_all_page_mappings(vm_page *page)
 	while ((mapping = iterator.Next()) != NULL) {
 		vm_area *area = mapping->area;
 		vm_translation_map *map = &area->address_space->translation_map;
+		addr_t physicalAddress;
+		uint32 flags;
 
 		map->ops->lock(map);
 		addr_t base = area->base + (page->cache_offset << PAGE_SHIFT);
 		map->ops->unmap(map, base, base + (B_PAGE_SIZE - 1));
+		map->ops->flush(map);
+		map->ops->query(map, base, &physicalAddress, &flags);
 		map->ops->unlock(map);
 
 		area->mappings.Remove(mapping);
+
+		accumulatedFlags |= flags;
 	}
 
 	locker.Unlock();
@@ -2462,6 +2473,9 @@ vm_remove_all_page_mappings(vm_page *page)
 	while ((mapping = queue.RemoveHead()) != NULL) {
 		free(mapping);
 	}
+
+	if (_flags != NULL)
+		*_flags = accumulatedFlags;
 }
 
 

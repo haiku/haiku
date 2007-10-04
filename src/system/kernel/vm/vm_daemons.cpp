@@ -139,7 +139,15 @@ check_page_activation(int32 index)
 		page->usage_count--;
 
 	if (page->usage_count < 0) {
-		vm_remove_all_page_mappings(page);
+		uint32 flags;
+		vm_remove_all_page_mappings(page, &flags);
+
+		// recheck eventual last minute changes
+		if ((flags & PAGE_MODIFIED) != 0 && page->state != PAGE_STATE_MODIFIED)
+			vm_page_set_state(page, PAGE_STATE_MODIFIED);
+		if ((flags & PAGE_ACCESSED) != 0 && ++page->usage_count >= 0)
+			return false;
+
 		if (page->state == PAGE_STATE_MODIFIED)
 			vm_page_schedule_write_page(page);
 		else
