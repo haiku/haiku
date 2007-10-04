@@ -175,6 +175,9 @@ remove_page_from_queue(page_queue *queue, vm_page *page)
 }
 
 
+/*!	Moves a page to the tail of the given queue, but only does so if
+	the page is currently in another queue.
+*/
 static void
 move_page_to_queue(page_queue *fromQueue, page_queue *toQueue, vm_page *page)
 {
@@ -422,56 +425,6 @@ dump_page_stats(int argc, char **argv)
 }
 
 
-#if 0
-static int dump_free_page_table(int argc, char **argv)
-{
-	unsigned int i = 0;
-	unsigned int free_start = END_OF_LIST;
-	unsigned int inuse_start = PAGE_INUSE;
-
-	dprintf("dump_free_page_table():\n");
-	dprintf("first_free_page_index = %d\n", first_free_page_index);
-
-	while(i < free_page_table_size) {
-		if (free_page_table[i] == PAGE_INUSE) {
-			if (inuse_start != PAGE_INUSE) {
-				i++;
-				continue;
-			}
-			if (free_start != END_OF_LIST) {
-				dprintf("free from %d -> %d\n", free_start + free_page_table_base, i-1 + free_page_table_base);
-				free_start = END_OF_LIST;
-			}
-			inuse_start = i;
-		} else {
-			if (free_start != END_OF_LIST) {
-				i++;
-				continue;
-			}
-			if (inuse_start != PAGE_INUSE) {
-				dprintf("inuse from %d -> %d\n", inuse_start + free_page_table_base, i-1 + free_page_table_base);
-				inuse_start = PAGE_INUSE;
-			}
-			free_start = i;
-		}
-		i++;
-	}
-	if (inuse_start != PAGE_INUSE) {
-		dprintf("inuse from %d -> %d\n", inuse_start + free_page_table_base, i-1 + free_page_table_base);
-	}
-	if (free_start != END_OF_LIST) {
-		dprintf("free from %d -> %d\n", free_start + free_page_table_base, i-1 + free_page_table_base);
-	}
-/*
-	for (i = 0; i < free_page_table_size; i++) {
-		dprintf("%d->%d ", i, free_page_table[i]);
-	}
-*/
-	return 0;
-}
-#endif
-
-
 static status_t
 set_page_state_nolock(vm_page *page, int pageState)
 {
@@ -669,6 +622,12 @@ write_page(vm_page *page, bool mayBlock, bool fsReenter)
 }
 
 
+/*!	The page writer continuously takes some pages from the modified
+	queue, writes them back, and moves them back to the active queue.
+	It runs in its own thread, and is only there to keep the number
+	of modified pages low, so that more pages can be reused with
+	fewer costs.
+*/
 status_t
 page_writer(void* /*unused*/)
 {
@@ -760,6 +719,12 @@ page_writer(void* /*unused*/)
 }
 
 
+/*! The page thief is a "service" that runs in its own thread, and only
+	gets active in low memory situations.
+	Its job is to remove unused pages from caches and recycle it. When
+	low memory is critical, this is potentially the only source of free
+	pages for the system, so it cannot block on an external service.
+*/
 static status_t
 page_thief(void* /*unused*/)
 {
@@ -910,6 +875,10 @@ page_thief(void* /*unused*/)
 }
 
 
+/*!	This triggers a run of the page thief - depending on the memory
+	pressure, it might not actually do anything, though.
+	This function is registered as a low memory handler.
+*/
 static void
 schedule_page_thief(void* /*unused*/, int32 level)
 {
@@ -920,8 +889,7 @@ schedule_page_thief(void* /*unused*/, int32 level)
 //	#pragma mark - private kernel API
 
 
-/*!
-	You need to hold the vm_cache lock when calling this function.
+/*!	You need to hold the vm_cache lock when calling this function.
 	Note that the cache lock is released in this function.
 */
 status_t
@@ -1109,15 +1077,16 @@ vm_page_init_post_area(kernel_args *args)
 status_t
 vm_page_init_post_thread(kernel_args *args)
 {
-	thread_id thread;
-
 	// create a kernel thread to clear out pages
-	thread = spawn_kernel_thread(&page_scrubber, "page scrubber",
+
+	thread_id thread = spawn_kernel_thread(&page_scrubber, "page scrubber",
 		B_LOWEST_ACTIVE_PRIORITY, NULL);
 	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
 
 	new (&sFreePageCondition) ConditionVariable<page_queue>;
 	sFreePageCondition.Publish(&sFreePageQueue, "free page");
+
+	// start page writer and page thief
 
 	sWriterWaitSem = create_sem(0, "page writer");
 	sThiefWaitSem = create_sem(0, "page thief");
@@ -1191,6 +1160,11 @@ vm_mark_page_range_inuse(addr_t startPage, addr_t length)
 }
 
 
+/*!	Unreserve pages previously reserved with vm_page_reserve_pages().
+	Note, you specify the same \a count here that you specified when
+	reserving the pages - you don't need to keep track how many pages
+	you actually needed of that upfront allocation.
+*/
 void
 vm_page_unreserve_pages(uint32 count)
 {
@@ -1204,6 +1178,11 @@ vm_page_unreserve_pages(uint32 count)
 }
 
 
+/*!	With this call, you can reserve a number of free pages in the system.
+	They will only be handed out to someone who has actually reserved them.
+	This call returns as soon as the number of requested pages has been
+	reached.
+*/
 void
 vm_page_reserve_pages(uint32 count)
 {
@@ -1305,8 +1284,7 @@ vm_page_allocate_page(int pageState, bool reserved)
 }
 
 
-/*!
-	Allocates a number of pages and puts their pointers into the provided
+/*!	Allocates a number of pages and puts their pointers into the provided
 	array. All pages are marked busy.
 	Returns B_OK on success, and B_NO_MEMORY when there aren't any free
 	pages left to allocate.
@@ -1334,6 +1312,7 @@ vm_page_allocate_pages(int pageState, vm_page **pages, uint32 numPages)
 vm_page *
 vm_page_allocate_page_run(int pageState, addr_t length)
 {
+	// TODO: make sure this one doesn't steal reserved pages!
 	vm_page *firstPage = NULL;
 	uint32 start = 0;
 
@@ -1414,6 +1393,9 @@ vm_page_set_state(vm_page *page, int pageState)
 }
 
 
+/*!	Moves a page to either the tail of the head of its current queue,
+	depending on \a tail.
+*/
 void
 vm_page_requeue(struct vm_page *page, bool tail)
 {
