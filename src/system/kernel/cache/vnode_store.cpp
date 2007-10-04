@@ -6,11 +6,11 @@
 
 #include "vnode_store.h"
 
-#include <file_cache.h>
-#include <vfs.h>
-
 #include <stdlib.h>
 #include <string.h>
+
+#include <file_cache.h>
+#include <vfs.h>
 
 
 static void
@@ -41,18 +41,19 @@ store_has_page(struct vm_store *_store, off_t offset)
 
 
 static status_t
-store_read(struct vm_store *_store, off_t offset, const iovec *vecs, size_t count,
-	size_t *_numBytes, bool fsReenter)
+store_read(struct vm_store *_store, off_t offset, const iovec *vecs,
+	size_t count, size_t *_numBytes, bool mayBlock, bool fsReenter)
 {
 	vnode_store *store = (vnode_store *)_store;
 	size_t bytesUntouched = *_numBytes;
 
 	status_t status = vfs_read_pages(store->vnode, NULL, offset, vecs, count,
-		_numBytes, fsReenter);
+		_numBytes, mayBlock, fsReenter);
 
 	bytesUntouched -= *_numBytes;
 
-	// if the request could be filled completely, or an error occured, we're done here
+	// If the request could be filled completely, or an error occured,
+	// we're done here
 	if (status < B_OK || bytesUntouched == 0)
 		return status;
 
@@ -63,7 +64,8 @@ store_read(struct vm_store *_store, off_t offset, const iovec *vecs, size_t coun
 		size_t length = min_c(bytesUntouched, vecs[i].iov_len);
 
 		// ToDo: will have to map the pages in later (when we switch to physical pages)
-		memset((void *)((addr_t)vecs[i].iov_base + vecs[i].iov_len - length), 0, length);
+		memset((void *)((addr_t)vecs[i].iov_base + vecs[i].iov_len - length),
+			0, length);
 		bytesUntouched -= length;
 	}
 
@@ -72,11 +74,12 @@ store_read(struct vm_store *_store, off_t offset, const iovec *vecs, size_t coun
 
 
 static status_t
-store_write(struct vm_store *_store, off_t offset, const iovec *vecs, size_t count,
-	size_t *_numBytes, bool fsReenter)
+store_write(struct vm_store *_store, off_t offset, const iovec *vecs,
+	size_t count, size_t *_numBytes, bool mayBlock, bool fsReenter)
 {
 	vnode_store *store = (vnode_store *)_store;
-	return vfs_write_pages(store->vnode, NULL, offset, vecs, count, _numBytes, fsReenter);
+	return vfs_write_pages(store->vnode, NULL, offset, vecs, count, _numBytes,
+		mayBlock, fsReenter);
 }
 
 

@@ -1,6 +1,5 @@
-/* Debug - debug stuff
- *
- * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef DEBUG_H
@@ -60,7 +59,9 @@
 	#define FUNCTION() ;
 //	#define FUNCTION_START(x) ;
 	#define D(x) {x;};
-	#define ASSERT(x) { if (!(x)) DEBUGGER(("bfs: assert failed: " #x "\n")); }
+	#ifndef ASSERT
+	#	define ASSERT(x) { if (!(x)) DEBUGGER(("bfs: assert failed: " #x "\n")); }
+	#endif
 #else
 	#define PRINT(x) ;
 	#define REPORT_ERROR(status) \
@@ -72,7 +73,9 @@
 	#define FUNCTION() ;
 	#define FUNCTION_START(x) ;
 	#define D(x) ;
-	#define ASSERT(x) ;
+	#ifndef ASSERT
+	#	define ASSERT(x) ;
+	#endif
 #endif
 
 #ifdef DEBUG

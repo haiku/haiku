@@ -772,7 +772,8 @@ rootfs_can_page(fs_volume _fs, fs_vnode _v, fs_cookie cookie)
 
 static status_t
 rootfs_read_pages(fs_volume _fs, fs_vnode _v, fs_cookie cookie, off_t pos,
-	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
+	const iovec *vecs, size_t count, size_t *_numBytes, bool mayBlock,
+	bool reenter)
 {
 	return B_NOT_ALLOWED;
 }
@@ -780,7 +781,8 @@ rootfs_read_pages(fs_volume _fs, fs_vnode _v, fs_cookie cookie, off_t pos,
 
 static status_t
 rootfs_write_pages(fs_volume _fs, fs_vnode _v, fs_cookie cookie, off_t pos,
-	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
+	const iovec *vecs, size_t count, size_t *_numBytes, bool mayBlock,
+	bool reenter)
 {
 	return B_NOT_ALLOWED;
 }

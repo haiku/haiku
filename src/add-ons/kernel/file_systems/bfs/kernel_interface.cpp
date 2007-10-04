@@ -342,7 +342,8 @@ bfs_can_page(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
 
 static status_t
 bfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
-	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
+	const iovec *vecs, size_t count, size_t *_numBytes, bool mayBlock,
+	bool reenter)
 {
 	Inode *inode = (Inode *)_node;
 
@@ -350,7 +351,9 @@ bfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 		RETURN_ERROR(B_BAD_VALUE);
 
 	if (!reenter) {
-		if (inode->Lock().TryLock() < B_OK)
+		if (mayBlock)
+			inode->Lock().Lock();
+		else if (inode->Lock().TryLock() < B_OK)
 			return B_BUSY;
 	}
 
@@ -366,7 +369,8 @@ bfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 
 static status_t
 bfs_write_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
-	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
+	const iovec *vecs, size_t count, size_t *_numBytes, bool mayBlock,
+	bool reenter)
 {
 	Inode *inode = (Inode *)_node;
 
@@ -374,7 +378,9 @@ bfs_write_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 		RETURN_ERROR(B_BAD_VALUE);
 
 	if (!reenter) {
-		if (inode->Lock().TryLock() < B_OK)
+		if (mayBlock)
+			inode->Lock().Lock();
+		else if (inode->Lock().TryLock() < B_OK)
 			return B_BUSY;
 	}
 

@@ -640,7 +640,7 @@ page_scrubber(void *unused)
 
 
 static status_t
-write_page(vm_page *page, bool fsReenter)
+write_page(vm_page *page, bool mayBlock, bool fsReenter)
 {
 	vm_store *store = page->cache->store;
 	size_t length = B_PAGE_SIZE;
@@ -656,7 +656,7 @@ write_page(vm_page *page, bool fsReenter)
 	vecs->iov_len = B_PAGE_SIZE;
 
 	status = store->ops->write(store, (off_t)page->cache_offset << PAGE_SHIFT,
-		vecs, 1, &length, fsReenter);
+		vecs, 1, &length, mayBlock, fsReenter);
 
 	vm_put_physical_page((addr_t)vecs[0].iov_base);
 
@@ -728,7 +728,7 @@ page_writer(void* /*unused*/)
 		// TODO: put this as requests into the I/O scheduler
 		status_t writeStatus[kNumPages];
 		for (uint32 i = 0; i < numPages; i++) {
-			writeStatus[i] = write_page(pages[i], false);
+			writeStatus[i] = write_page(pages[i], false, false);
 		}
 
 		// mark pages depending on whether they could be written or not
@@ -927,7 +927,7 @@ vm_page_write_modified_pages(vm_cache *cache, bool fsReenter)
 		vm_clear_map_flags(page, PAGE_MODIFIED);
 
 		mutex_unlock(&cache->lock);
-		status_t status = write_page(page, fsReenter);
+		status_t status = write_page(page, true, fsReenter);
 		mutex_lock(&cache->lock);
 
 		InterruptsSpinLocker locker(&sPageLock);

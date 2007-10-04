@@ -3809,7 +3809,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 
 			// read it in
 			status_t status = store->ops->read(store, cacheOffset, &vec, 1,
-				&bytesRead, false);
+				&bytesRead, true, false);
 
 			map->ops->put_physical_page((addr_t)vec.iov_base);
 

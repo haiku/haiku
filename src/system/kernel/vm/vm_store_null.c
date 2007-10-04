@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -36,17 +36,17 @@ null_has_page(struct vm_store *store, off_t offset)
 
 static status_t
 null_read(struct vm_store *store, off_t offset, const iovec *vecs,
-	size_t count, size_t *_numBytes, bool fsReenter)
+	size_t count, size_t *_numBytes, bool mayBlock, bool fsReenter)
 {
-	return -1;
+	return B_ERROR;
 }
 
 
 static status_t
 null_write(struct vm_store *store, off_t offset, const iovec *vecs,
-	size_t count, size_t *_numBytes, bool fsReenter)
+	size_t count, size_t *_numBytes, bool mayBlock, bool fsReenter)
 {
-	return -1;
+	return B_ERROR;
 }
 
 

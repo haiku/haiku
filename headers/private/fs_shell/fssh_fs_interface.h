@@ -1,10 +1,11 @@
-/* File System Interface Layer Definition
- *
- * Copyright 2004-2006, Haiku Inc. All Rights Reserved.
+/*
+ * Copyright 2004-2007, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FSSH_FS_INTERFACE_H
 #define _FSSH_FS_INTERFACE_H
+
+/*! File System Interface Layer Definition */
 
 
 #include "fssh_disk_device_defs.h"
@@ -95,10 +96,12 @@ typedef struct fssh_file_system_module_info {
 				fssh_fs_cookie cookie);
 	fssh_status_t (*read_pages)(fssh_fs_volume fs, fssh_fs_vnode vnode,
 				fssh_fs_cookie cookie, fssh_off_t pos, const fssh_iovec *vecs,
-				fssh_size_t count, fssh_size_t *_numBytes, bool reenter);
+				fssh_size_t count, fssh_size_t *_numBytes, bool mayBlock,
+				bool reenter);
 	fssh_status_t (*write_pages)(fssh_fs_volume fs, fssh_fs_vnode vnode,
 				fssh_fs_cookie cookie, fssh_off_t pos, const fssh_iovec *vecs,
-				fssh_size_t count, fssh_size_t *_numBytes, bool reenter);
+				fssh_size_t count, fssh_size_t *_numBytes, bool mayBlock,
+				bool reenter);
 
 	/* cache file access */
 	fssh_status_t (*get_file_map)(fssh_fs_volume fs, fssh_fs_vnode vnode,
