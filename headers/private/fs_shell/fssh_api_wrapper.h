@@ -343,6 +343,8 @@
 #define delete_partition		fssh_delete_partition
 #define partition_modified		fssh_partition_modified
 
+#define scan_partition			fssh_scan_partition
+
 // disk systems
 #define find_disk_system		fssh_find_disk_system
 

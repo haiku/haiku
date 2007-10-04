@@ -488,9 +488,28 @@ KDiskDeviceManager::WriteLockPartition(partition_id id)
 	return NULL;
 }
 
+
+// ScanPartition
+status_t
+KDiskDeviceManager::ScanPartition(KPartition* partition, bool async)
+{
+// TODO: This won't do. Locking the DDM while scanning the partition is not a
+// good idea. Even locking the device doesn't feels right. Marking the partition
+// busy and passing the disk system a temporary clone of the partition_data
+// should work as well.
+	if (DeviceWriteLocker deviceLocker = partition->Device()) {
+		if (ManagerLocker locker = this)
+			return _ScanPartition(partition, async);
+	}
+
+	return B_ERROR;
+}
+
+
 // CreateFileDevice
 partition_id
-KDiskDeviceManager::CreateFileDevice(const char *filePath, bool *newlyCreated, bool async)
+KDiskDeviceManager::CreateFileDevice(const char *filePath, bool *newlyCreated,
+	bool async)
 {
 	if (!filePath)
 		return B_BAD_VALUE;
@@ -716,7 +735,8 @@ KDiskDeviceManager::RemoveJobQueue(KDiskDeviceJobQueue *jobQueue)
 		return jobQueue->InitCheck();
 	if (jobQueue->IsExecuting())
 		return B_BAD_VALUE;
-	return (_RemoveJobQueue(jobQueue) ? B_OK : B_ENTRY_NOT_FOUND);
+	return (_RemoveJobQueue(jobQueue)
+		? (status_t)B_OK : (status_t)B_ENTRY_NOT_FOUND);
 }
 
 // DeleteJobQueue

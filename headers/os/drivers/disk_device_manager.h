@@ -102,22 +102,25 @@ partition_data *get_child_partition(partition_id partitionID, int32 index);
 // partition write access
 // (write lock required)
 partition_data *create_child_partition(partition_id partitionID, int32 index,
-									   partition_id childID);
+		partition_id childID);
 	// childID is an optional input parameter -- -1 to be ignored
 bool delete_partition(partition_id partitionID);
 void partition_modified(partition_id partitionID);
 	// tells the disk device manager, that the parition has been modified
+
+status_t scan_partition(partition_id partitionID);
+	// Service method for disks systems: Synchronously scans the partition.
+	// Device must not be locked.
 
 // disk systems
 disk_system_id find_disk_system(const char *name);
 
 // jobs
 bool update_disk_device_job_progress(disk_job_id jobID, float progress);
-bool update_disk_device_job_extra_progress(disk_job_id jobID,
-										   const char *info);
+bool update_disk_device_job_extra_progress(disk_job_id jobID, const char *info);
 bool set_disk_device_job_error_message(disk_job_id jobID, const char *message);
 uint32 update_disk_device_job_interrupt_properties(disk_job_id jobID,
-												   uint32 interruptProperties);
+		uint32 interruptProperties);
 	// returns one of B_DISK_DEVICE_JOB_{CONTINUE,CANCEL,REVERSE}
 
 #ifdef __cplusplus

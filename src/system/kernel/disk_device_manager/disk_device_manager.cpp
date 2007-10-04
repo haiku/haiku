@@ -178,8 +178,25 @@ delete_partition(partition_id partitionID)
 void
 partition_modified(partition_id partitionID)
 {
-	// not implemented
+	// TODO: implemented
 }
+
+
+// scan_partition
+status_t
+scan_partition(partition_id partitionID)
+{
+	// get the partition
+	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
+	KPartition* partition = manager->RegisterPartition(partitionID);
+	if (partition == NULL)
+		return B_ENTRY_NOT_FOUND;
+	PartitionRegistrar _(partition, true);
+
+	// scan it
+	return manager->ScanPartition(partition, false);
+}
+
 
 // find_disk_system
 disk_system_id

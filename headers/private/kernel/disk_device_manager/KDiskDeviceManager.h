@@ -66,6 +66,8 @@ public:
 		// Both the device and the partition is also registered and must be
 		// unregistered by the caller.
 
+	status_t ScanPartition(KPartition* partition, bool async);
+
 	partition_id CreateFileDevice(const char *filePath,
 		bool *newlyCreated = NULL, bool async = true);
 	status_t DeleteFileDevice(const char *filePath);

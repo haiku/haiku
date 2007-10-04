@@ -113,6 +113,10 @@ bool					fssh_delete_partition(fssh_partition_id partitionID);
 void					fssh_partition_modified(fssh_partition_id partitionID);
 	// tells the disk device manager, that the parition has been modified
 
+fssh_status_t fssh_scan_partition(fssh_partition_id partitionID);
+	// Service method for disks systems: Synchronously scans the partition.
+	// Device must not be locked.
+
 // disk systems
 fssh_disk_system_id		fssh_find_disk_system(const char *name);
 
