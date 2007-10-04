@@ -255,6 +255,7 @@ virtual	void			Undo(BClipboard *clipboard);
 		undo_state		UndoState(bool *isRedo) const;
 
 protected:
+void			_ScrollToOffset(int32 nOffset, bool useHorz, bool useVert);
 virtual	void			GetDragParameters(BMessage	*drag, 
 										  BBitmap	**bitmap,
 										  BPoint	*point,

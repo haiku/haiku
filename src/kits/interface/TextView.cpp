@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <new>
 using namespace std;
-
+#define DEBUG 1
 #include <Application.h>
 #include <Beep.h>
 #include <Bitmap.h>
@@ -806,6 +806,7 @@ BTextView::MessageReceived(BMessage *message)
 				switch (opcode) {
 					case B_INPUT_METHOD_STARTED:
 					{
+						PRINT(("B_INPUT_METHOD_STARTED\n"));
 						BMessenger messenger;
 						if (message->FindMessenger("be:reply_to", &messenger) == B_OK) {
 							ASSERT(fInline == NULL);
@@ -815,16 +816,21 @@ BTextView::MessageReceived(BMessage *message)
 					}	
 					
 					case B_INPUT_METHOD_STOPPED:
+						PRINT(("B_INPUT_METHOD_STOPPED\n"));
 						delete fInline;
 						fInline = NULL;
 						break;
 					
 					case B_INPUT_METHOD_CHANGED:
-						HandleInputMethodChanged(message);
+						PRINT(("B_INPUT_METHOD_CHANGED\n"));
+						if (fInline != NULL)
+							HandleInputMethodChanged(message);
 						break;
 		
 					case B_INPUT_METHOD_LOCATION_REQUEST:
-						HandleInputMethodLocationRequest();
+						PRINT(("B_INPUT_METHOD_LOCATION_REQUEST\n"));
+						if (fInline != NULL)
+							HandleInputMethodLocationRequest();
 						break;
 					
 					default:
@@ -1929,24 +1935,39 @@ BTextView::GetTextRegion(int32 startOffset, int32 endOffset, BRegion *outRegion)
 void
 BTextView::ScrollToOffset(int32 inOffset)
 {
+	_ScrollToOffset(inOffset, ScrollBar(B_HORIZONTAL) != NULL, ScrollBar(B_VERTICAL) != NULL);
+}
+
+void
+BTextView::_ScrollToOffset(int32 inOffset, bool useHorz, bool useVert)
+{
 	BRect bounds = Bounds();
 	float lineHeight = 0.0;
+	float xdiff = 0.0;
+	float ydiff = 0.0;
         BPoint point = PointAt(inOffset, &lineHeight);
 
-	// TODO: We should do the following, since otherwise the textview
-	// won't scroll unless it's attached to a scrollview.
-	/*if (!bounds.Contains(point))
-		ScrollTo(point); */
-
-	if (ScrollBar(B_HORIZONTAL) != NULL) {
-		if (point.x < bounds.left || point.x >= bounds.right)
-			ScrollBar(B_HORIZONTAL)->SetValue(point.x - (bounds.IntegerWidth() / 2));
+	if (useHorz) {
+		if (point.x < bounds.left) {
+			xdiff = -1 * (bounds.IntegerWidth() / 2);
+			// normalize scroll value to prevent scrolling past left boundary of view
+			if (bounds.left < fabs(xdiff))
+				xdiff = -1 * bounds.left;
+		} else if (point.x >= bounds.right)
+			xdiff = bounds.IntegerWidth() / 2;
 	}
 
-	if (ScrollBar(B_VERTICAL) != NULL) {
-		if (point.y < bounds.top || (point.y + lineHeight) >= bounds.bottom)
-			ScrollBar(B_VERTICAL)->SetValue(point.y - (bounds.IntegerHeight() / 2));
+	if (useVert) {
+		if (point.y < bounds.top) {
+			ydiff = -1 * (bounds.IntegerHeight() / 2);
+			// normalize scroll value to prevent scrolling past top of view
+			if (bounds.top < fabs(ydiff))
+			ydiff = -1 * bounds.top;
+		} else if (point.y >= bounds.bottom)
+			ydiff = bounds.IntegerHeight() / 2;
 	}
+
+	ScrollBy(xdiff, ydiff);
 }
 
 
@@ -4398,8 +4419,7 @@ void
 BTextView::HandleInputMethodChanged(BMessage *message)
 {
 	// TODO: block input if not editable (Andrew)
-	if (!fInline)
-		return;
+	ASSERT(fInline != NULL);
 
 	const char *string = NULL;
 	if (message->FindString("be:string", &string) < B_OK || string == NULL)
@@ -4470,8 +4490,7 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 void
 BTextView::HandleInputMethodLocationRequest()
 {
-	if (!fInline)
-		return;
+	ASSERT(fInline != NULL);
 	
 	int32 offset = fInline->Offset();
 	const int32 limit = offset + fInline->Length();
