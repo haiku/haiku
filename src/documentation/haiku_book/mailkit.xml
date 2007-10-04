@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<chapter id="st-mailkit">
-<title>The Mail Kit</title>
-
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="mail/intro.xml" />
-
-</chapter>
