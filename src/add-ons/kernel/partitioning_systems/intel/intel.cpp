@@ -127,14 +127,6 @@ pm_identify_partition(int fd, partition_data *partition, void **cookie)
 		return -1;
 	}
 
-	// check block size
-	uint32 blockSize = partition->block_size;
-	if (blockSize < sizeof(partition_table_sector)) {
-		TRACE(("intel: read_partition_map: bad block size: %ld, should be "
-			">= %ld\n", blockSize, sizeof(partition_table_sector)));
-		return -1;
-	}
-
 	// allocate a PartitionMap
 	PartitionMapCookie *map = new(nothrow) PartitionMapCookie;
 	if (!map)
@@ -142,16 +134,40 @@ pm_identify_partition(int fd, partition_data *partition, void **cookie)
 	map->ref_count = 1;
 
 	// read the partition structure
-	PartitionMapParser parser(fd, 0, partition->size, blockSize);
+	PartitionMapParser parser(fd, 0, partition->size);
 	status_t error = parser.Parse(NULL, map);
-	if (error == B_OK) {
-		*cookie = map;
+	if (error != B_OK) {
+		// cleanup, if not detected
+		delete map;
+		return -1;
+	}
+
+	*cookie = map;
+
+	// Depending on whether we actually have recognized child partitions and
+	// whether we are installed directly on a device (the by far most common
+	// setup), we determine the priority.
+	bool hasChildren = (map->CountNonEmptyPartitions() > 0);
+	bool hasParent = (get_parent_partition(partition->id) != NULL);
+
+	if (!hasParent) {
+		if (hasChildren) {
+			// This value overrides BFS.
+			return 0.81;
+		}
+
+		// No children -- might be a freshly initialized disk. But it could
+		// also be an image file. So we give BFS a chance to override us.
 		return 0.5;
 	}
 
-	// cleanup, if not detected
-	delete map;
-	return -1;
+	// We have a parent. That's a very unlikely setup.
+	if (hasChildren)
+		return 0.4;
+
+	// No children. Extremely unlikely, that this is a desired. But if no one
+	// else claims the partition, we take it anyway.
+	return 0.1;
 }
 
 // pm_scan_partition
@@ -173,6 +189,7 @@ pm_scan_partition(int fd, partition_data *partition, void *cookie)
 	partition->content_size = partition->size;
 	// (no content_name and content_parameters)
 	// (content_type is set by the system)
+	partition->block_size = SECTOR_SIZE;
 
 	partition->content_cookie = map;
 	// children
@@ -192,7 +209,7 @@ pm_scan_partition(int fd, partition_data *partition, void *cookie)
 
 			child->offset = partition->offset + primary->Offset();
 			child->size = primary->Size();
-			child->block_size = partition->block_size;
+			child->block_size = SECTOR_SIZE;
 			// (no name)
 			char type[B_FILE_NAME_LENGTH];
 			primary->GetTypeString(type);
@@ -320,6 +337,7 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 	partition->content_size = partition->size;
 	// (no content_name and content_parameters)
 	// (content_type is set by the system)
+	partition->block_size = SECTOR_SIZE;
 	
 	partition->content_cookie = primary;
 	// children
@@ -339,7 +357,7 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 		}
 		child->offset = parent->offset + logical->Offset();
 		child->size = logical->Size();
-		child->block_size = partition->block_size;
+		child->block_size = SECTOR_SIZE;
 		// (no name)
 		char type[B_FILE_NAME_LENGTH];
 		logical->GetTypeString(type);

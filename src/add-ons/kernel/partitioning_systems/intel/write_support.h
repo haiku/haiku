@@ -46,7 +46,7 @@ status_t	pm_move_child(int fd, partition_id partitionID,
 status_t	pm_set_type(int fd, partition_id partitionID, const char *type,
 				disk_job_id job);
 status_t	pm_initialize(int fd, partition_id partitionID, const char *name,
-				const char *parameters, disk_job_id job);
+				const char *parameters, off_t partitionSize, disk_job_id job);
 status_t	pm_create_child(int fd, partition_id partitionID, off_t offset,
 				off_t size, const char *type, const char *parameters,
 				disk_job_id job, partition_id *childID);
@@ -90,7 +90,7 @@ status_t	ep_move_child(int fd, partition_id partitionID,
 status_t	ep_set_type(int fd, partition_id partitionID, const char *type,
 				disk_job_id job);
 status_t	ep_initialize(int fd, partition_id partitionID, const char *name,
-				const char *parameters, disk_job_id job);
+				const char *parameters, off_t partitionSize, disk_job_id job);
 status_t	ep_create_child(int fd, partition_id partitionID, off_t offset,
 				off_t size, const char *type, const char *parameters,
 				disk_job_id job, partition_id *childID);

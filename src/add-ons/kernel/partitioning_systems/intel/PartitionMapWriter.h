@@ -35,13 +35,13 @@ struct partition_table_sector;
 */
 class PartitionMapWriter {
 public:
-	PartitionMapWriter(int deviceFD, off_t sessionOffset, off_t sessionSize,
-		int32 blockSize);
+	PartitionMapWriter(int deviceFD, off_t sessionOffset, off_t sessionSize);
 	~PartitionMapWriter();
 
-	status_t WriteMBR(uint8 *block, const PartitionMap *map);
-	status_t WriteLogical(uint8 *block, const LogicalPartition *partition);
-	status_t WriteExtendedHead(uint8 *block,
+	status_t WriteMBR(const PartitionMap *map, bool clearSectors);
+	status_t WriteLogical(partition_table_sector *pts,
+		const LogicalPartition *partition);
+	status_t WriteExtendedHead(partition_table_sector *pts,
 		const LogicalPartition *first_partition);
 
 private:
@@ -49,13 +49,12 @@ private:
 	status_t _WriteExtended(partition_table_sector *pts,
 		const LogicalPartition *partition, const LogicalPartition *next);
 	status_t _ReadPTS(off_t offset, partition_table_sector *pts = NULL);
-	status_t _WritePTS(off_t offset, const partition_table_sector *pts = NULL);
+	status_t _WriteSector(off_t offset, const void* pts = NULL);
 
 private:
 	int						fDeviceFD;
 	off_t					fSessionOffset;
 	off_t					fSessionSize;
-	int32					fBlockSize;
 	partition_table_sector	*fPTS;	// while writing
 	const PartitionMap		*fMap;
 };

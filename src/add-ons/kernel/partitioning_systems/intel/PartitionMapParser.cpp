@@ -38,11 +38,10 @@ static const int32 kMaxLogicalPartitionCount = 128;
 
 // constructor
 PartitionMapParser::PartitionMapParser(int deviceFD, off_t sessionOffset,
-									   off_t sessionSize, int32 blockSize)
+		off_t sessionSize)
 	: fDeviceFD(deviceFD),
 	  fSessionOffset(sessionOffset),
 	  fSessionSize(sessionSize),
-	  fBlockSize(blockSize),
 	  fPTS(NULL),
 	  fMap(NULL)
 {
@@ -72,13 +71,9 @@ PartitionMapParser::Parse(const uint8 *block, PartitionMap *map)
 				error = _ParsePrimary(&pts);
 		}
 
-		// If we don't have any partitions it might also just be an
-		// empty partition map, but we still can't do much with it
-		if (error == B_OK
-			&& (fMap->CountNonEmptyPartitions() == 0
-				|| !fMap->Check(fSessionSize, fBlockSize))) {
+		if (error == B_OK && !fMap->Check(fSessionSize))
 			error = B_BAD_DATA;
-		}
+
 		fMap = NULL;
 	}
 	return error;
@@ -101,14 +96,14 @@ PartitionMapParser::_ParsePrimary(const partition_table_sector *pts)
 	for (int32 i = 0; i < 4; i++) {
 		const partition_descriptor *descriptor = &pts->table[i];
 		PrimaryPartition *partition = fMap->PrimaryPartitionAt(i);
-		partition->SetTo(descriptor, 0, fBlockSize);
+		partition->SetTo(descriptor, 0);
 
 #ifdef _BOOT_MODE
 		// work-around potential BIOS problems
 		partition->AdjustSize(fSessionSize);
 #endif
 		// ignore, if location is bad
-		if (!partition->CheckLocation(fSessionSize, fBlockSize)) {
+		if (!partition->CheckLocation(fSessionSize)) {
 			TRACE(("intel: _ParsePrimary(): partition %ld: bad location, "
 				"ignoring\n", i));
 			partition->Unset();
@@ -177,8 +172,7 @@ PartitionMapParser::_ParseExtended(PrimaryPartition *primary, off_t offset)
 				if (!descriptor->is_empty()) {
 					if (descriptor->is_extended()) {
 						if (extended.IsEmpty()) {
-							extended.SetTo(descriptor, offset, fBlockSize,
-										   primary);
+							extended.SetTo(descriptor, offset, primary);
 							partition = &extended;
 						} else {
 							// only one extended partition allowed
@@ -188,8 +182,7 @@ PartitionMapParser::_ParseExtended(PrimaryPartition *primary, off_t offset)
 						}
 					} else {
 						if (nonExtended.IsEmpty()) {
-							nonExtended.SetTo(descriptor, offset, fBlockSize,
-											  primary);
+							nonExtended.SetTo(descriptor, offset, primary);
 							partition = &nonExtended;
 						} else {
 							// only one non-extended partition allowed
@@ -204,8 +197,7 @@ PartitionMapParser::_ParseExtended(PrimaryPartition *primary, off_t offset)
 						partition->AdjustSize(fSessionSize);
 #endif
 					// check the partition's location
-					if (partition && !partition->CheckLocation(fSessionSize,
-															   fBlockSize)) {
+					if (partition && !partition->CheckLocation(fSessionSize)) {
 						error = B_BAD_DATA;
 						TRACE(("intel: _ParseExtended(): Invalid partition "
 							"location: pts: %lld, offset: %lld, size: %lld\n",

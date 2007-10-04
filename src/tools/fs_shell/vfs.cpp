@@ -5200,9 +5200,10 @@ _kern_initialize_volume(const char* fsName, const char *partition,
 	// initialize
 	fssh_status_t status;
 	if (fsModule->initialize) {
-		status = (*fsModule->initialize)(fd, -1, name, parameters, -1);
+		status = (*fsModule->initialize)(fd, -1, name, parameters, 0, -1);
 			// We've got no partition or job IDs -- the FS will hopefully
 			// ignore that.
+			// TODO: Get the actual size!
 	} else
 		status = FSSH_B_NOT_SUPPORTED;
 

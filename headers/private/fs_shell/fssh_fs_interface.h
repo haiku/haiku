@@ -273,7 +273,8 @@ typedef struct fssh_file_system_module_info {
 	fssh_status_t (*set_content_parameters)(int fd, fssh_partition_id partition,
 				const char *parameters, fssh_disk_job_id job);
 	fssh_status_t (*initialize)(int fd, fssh_partition_id partition,
-				const char *name, const char *parameters, fssh_disk_job_id job);
+				const char *name, const char *parameters,
+				fssh_off_t partitionSize, fssh_disk_job_id job);
 } fssh_file_system_module_info;
 
 

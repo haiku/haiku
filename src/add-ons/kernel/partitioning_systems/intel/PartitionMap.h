@@ -1,9 +1,6 @@
 /*
- * Copyright 2003-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Ingo Weinhold, bonefish@cs.tu-berlin.de
  */
 
 /*!
@@ -29,6 +26,9 @@
 #define INTEL_EXTENDED_PARTITION_NAME "Intel Extended Partition"
 #define BFS_NAME "BFS Filesystem"
 
+enum {
+	SECTOR_SIZE = 512
+};
 
 // is_empty_type
 static inline bool
@@ -123,10 +123,10 @@ class Partition {
 public:
 	Partition();
 	Partition(const partition_descriptor *descriptor, off_t ptsOffset,
-		off_t baseOffset, int32 blockSize);
+		off_t baseOffset);
 
 	void SetTo(const partition_descriptor *descriptor, off_t ptsOffset,
-		off_t baseOffset, int32 blockSize);
+		off_t baseOffset);
 	void Unset();
 
 	bool IsEmpty() const	{ return is_empty_type(fType); }
@@ -140,7 +140,7 @@ public:
 	void GetTypeString(char *buffer) const
 		{ get_partition_type_string(fType, buffer); }
 	void GetPartitionDescriptor(partition_descriptor *descriptor,
-								off_t baseOffset, int32 blockSize) const;
+								off_t baseOffset) const;
 
 	void SetPTSOffset(off_t offset)	{ fPTSOffset = offset; }
 	void SetOffset(off_t offset)	{ fOffset = offset; }
@@ -148,7 +148,7 @@ public:
 	void SetType(uint8 type)		{ fType = type; }
 	void SetActive(bool active)		{ fActive = active; }
 
-	bool CheckLocation(off_t sessionSize, int32 blockSize) const;
+	bool CheckLocation(off_t sessionSize) const;
 #ifdef _BOOT_MODE
 	void AdjustSize(off_t sessionSize);
 #endif
@@ -165,11 +165,9 @@ private:
 class PrimaryPartition : public Partition {
 public:
 	PrimaryPartition();
-	PrimaryPartition(const partition_descriptor *descriptor, off_t ptsOffset,
-		int32 blockSize);
+	PrimaryPartition(const partition_descriptor *descriptor, off_t ptsOffset);
 
-	void SetTo(const partition_descriptor *descriptor, off_t ptsOffset,
-		int32 blockSize);
+	void SetTo(const partition_descriptor *descriptor, off_t ptsOffset);
 	void Unset();
 
 	// only if extended
@@ -189,10 +187,10 @@ class LogicalPartition : public Partition {
 public:
 	LogicalPartition();
 	LogicalPartition(const partition_descriptor *descriptor, off_t ptsOffset,
-		int32 blockSize, PrimaryPartition *primary);
+		PrimaryPartition *primary);
 
 	void SetTo(const partition_descriptor *descriptor, off_t ptsOffset,
-		int32 blockSize, PrimaryPartition *primary);
+		PrimaryPartition *primary);
 	void Unset();
 
 	void SetPrimaryPartition(PrimaryPartition *primary) { fPrimary = primary; }
@@ -226,7 +224,7 @@ public:
 	Partition *PartitionAt(int32 index);
 	const Partition *PartitionAt(int32 index) const;
 
-	bool Check(off_t sessionSize, int32 blockSize) const;
+	bool Check(off_t sessionSize) const;
 
 private:
 	PrimaryPartition		fPrimaries[4];

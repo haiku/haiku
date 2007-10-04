@@ -298,25 +298,25 @@ Partition::Partition()
 
 // constructor
 Partition::Partition(const partition_descriptor *descriptor,off_t ptsOffset,
-					 off_t baseOffset, int32 blockSize)
+					 off_t baseOffset)
 	: fPTSOffset(0),
 	  fOffset(0),
 	  fSize(0),
 	  fType(0),
 	  fActive(false)
 {
-	SetTo(descriptor, ptsOffset, baseOffset, blockSize);
+	SetTo(descriptor, ptsOffset, baseOffset);
 }
 
 // SetTo
 void
 Partition::SetTo(const partition_descriptor *descriptor, off_t ptsOffset,
-				 off_t baseOffset, int32 blockSize)
+				 off_t baseOffset)
 {
 TRACE(("Partition::SetTo(): active: %x\n", descriptor->active));
 	fPTSOffset = ptsOffset;
-	fOffset = baseOffset + (off_t)descriptor->start * blockSize;
-	fSize = (off_t)descriptor->size * blockSize;
+	fOffset = baseOffset + (off_t)descriptor->start * SECTOR_SIZE;
+	fSize = (off_t)descriptor->size * SECTOR_SIZE;
 	fType = descriptor->type;
 	fActive = descriptor->active;
 	if (fSize == 0)
@@ -337,10 +337,10 @@ Partition::Unset()
 // GetPartitionDescriptor
 void
 Partition::GetPartitionDescriptor(partition_descriptor *descriptor,
-								  off_t baseOffset, int32 blockSize) const
+								  off_t baseOffset) const
 {
-	descriptor->start = (fOffset - baseOffset) / blockSize;
-	descriptor->size = fSize / blockSize;
+	descriptor->start = (fOffset - baseOffset) / SECTOR_SIZE;
+	descriptor->size = fSize / SECTOR_SIZE;
 	descriptor->type = fType;
 	descriptor->active = fActive ? 0x80 : 0x00;
 	descriptor->begin.Unset();
@@ -362,13 +362,13 @@ Partition::AdjustSize(off_t sessionSize)
 
 
 bool
-Partition::CheckLocation(off_t sessionSize, int32 blockSize) const
+Partition::CheckLocation(off_t sessionSize) const
 {
 	// offsets and size must be block aligned, PTS and partition must lie
 	// within the session
-	return fPTSOffset % blockSize == 0
-		&& fOffset % blockSize == 0
-		&& fSize % blockSize == 0
+	return fPTSOffset % SECTOR_SIZE == 0
+		&& fOffset % SECTOR_SIZE == 0
+		&& fSize % SECTOR_SIZE == 0
 		&& fPTSOffset >= 0 && fPTSOffset < sessionSize
 		&& fOffset >= 0 && fOffset + fSize <= sessionSize;
 }
@@ -388,22 +388,21 @@ PrimaryPartition::PrimaryPartition()
 
 // constructor
 PrimaryPartition::PrimaryPartition(const partition_descriptor *descriptor,
-								   off_t ptsOffset, int32 blockSize)
+								   off_t ptsOffset)
 	: Partition(),
 	  fHead(NULL),
 	  fTail(NULL),
 	  fLogicalPartitionCount(0)
 {
-	SetTo(descriptor, ptsOffset, blockSize);
+	SetTo(descriptor, ptsOffset);
 }
 
 // SetTo
 void
-PrimaryPartition::SetTo(const partition_descriptor *descriptor,
-						off_t ptsOffset, int32 blockSize)
+PrimaryPartition::SetTo(const partition_descriptor *descriptor, off_t ptsOffset)
 {
 	Unset();
-	Partition::SetTo(descriptor, ptsOffset, 0, blockSize);
+	Partition::SetTo(descriptor, ptsOffset, 0);
 }
 
 // Unset
@@ -488,27 +487,25 @@ LogicalPartition::LogicalPartition()
 
 // constructor
 LogicalPartition::LogicalPartition(const partition_descriptor *descriptor,
-								   off_t ptsOffset, int32 blockSize,
-								   PrimaryPartition *primary)
+		off_t ptsOffset, PrimaryPartition *primary)
 	: Partition(),
 	  fPrimary(NULL),
 	  fNext(NULL),
 	  fPrevious(NULL)
 {
-	SetTo(descriptor, ptsOffset, blockSize, primary);
+	SetTo(descriptor, ptsOffset, primary);
 }
 
 // SetTo
 void
 LogicalPartition::SetTo(const partition_descriptor *descriptor,
-						off_t ptsOffset, int32 blockSize,
-						PrimaryPartition *primary)
+	off_t ptsOffset, PrimaryPartition *primary)
 {
 	Unset();
 	if (descriptor && primary) {
 		off_t baseOffset = (descriptor->is_extended() ? primary->Offset()
 													  : ptsOffset);
-		Partition::SetTo(descriptor, ptsOffset, baseOffset, blockSize);
+		Partition::SetTo(descriptor, ptsOffset, baseOffset);
 		fPrimary = primary;
 	}
 }
@@ -619,12 +616,12 @@ PartitionMap::PartitionAt(int32 index) const
 
 // Check
 bool
-PartitionMap::Check(off_t sessionSize, int32 blockSize) const
+PartitionMap::Check(off_t sessionSize) const
 {
 	int32 partitionCount = CountPartitions();
 	// 1. check partition locations
 	for (int32 i = 0; i < partitionCount; i++) {
-		if (!PartitionAt(i)->CheckLocation(sessionSize, blockSize))
+		if (!PartitionAt(i)->CheckLocation(sessionSize))
 			return false;
 	}
 	// 2. check overlapping of partitions and location of PTSs

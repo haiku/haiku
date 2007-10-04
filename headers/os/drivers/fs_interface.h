@@ -235,7 +235,7 @@ typedef struct file_system_module_info {
 	status_t (*set_content_parameters)(int fd, partition_id partition,
 				const char *parameters, disk_job_id job);
 	status_t (*initialize)(int fd, partition_id partition, const char *name,
-				const char *parameters, disk_job_id job);
+				const char *parameters, off_t partitionSize, disk_job_id job);
 } file_system_module_info;
 
 

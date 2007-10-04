@@ -263,11 +263,13 @@ KFileSystem::Initialize(KPartition *partition, const char *name,
 	if (result != B_OK)
 		return result;
 
+	off_t partitionSize = partition->Size();
+
 	locker.Unlock();
 
 	// call the module hook
 	result = fModule->initialize(fd, partition->ID(), name, parameters,
-		job->ID());
+		partitionSize, job->ID());
 
 	close(fd);
 	return result;

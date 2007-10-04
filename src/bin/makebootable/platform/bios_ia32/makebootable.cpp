@@ -326,7 +326,7 @@ main(int argc, const char *const *argv)
 						* geometry.cylinders * 512;
 
 					// parse the partition map
-					PartitionMapParser parser(baseFD, 0, deviceSize, 512);
+					PartitionMapParser parser(baseFD, 0, deviceSize);
 					PartitionMap map;
 					error = parser.Parse(NULL, &map);
 					if (error != B_OK) {

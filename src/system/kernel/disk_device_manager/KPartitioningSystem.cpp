@@ -795,10 +795,12 @@ KPartitioningSystem::Initialize(KPartition *partition, const char *name,
 
 	// lock partition and open partition device
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+// TODO: This looks overly complicated.
 	KPartition *_partition = manager->WriteLockPartition(partition->ID());
 	if (!_partition)
 		return B_ERROR;
 	int fd = -1;
+	off_t partitionSize;
 	{
 		PartitionRegistrar registrar(_partition, true);
 		PartitionRegistrar deviceRegistrar(_partition->Device(), true);
@@ -808,12 +810,13 @@ KPartitioningSystem::Initialize(KPartition *partition, const char *name,
 		status_t result = partition->Open(O_RDWR, &fd);
 		if (result != B_OK)
 			return result;
+
+		partitionSize = partition->Size();
 	}
 
 	// let the module do its job
-// TODO: The partition must not be locked at this point!
 	status_t result = fModule->initialize(fd, partition->ID(), name, parameters,
-		job->ID());
+		partitionSize, job->ID());
 
 	// cleanup and return
 	close(fd);

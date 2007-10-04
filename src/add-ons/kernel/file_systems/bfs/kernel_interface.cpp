@@ -2092,7 +2092,7 @@ bfs_validate_initialize(partition_data *partition, char *name,
 
 static status_t
 bfs_initialize(int fd, partition_id partitionID, const char *name,
-	const char *parameterString, disk_job_id job)
+	const char *parameterString, off_t /*partitionSize*/, disk_job_id job)
 {
 	// parse parameters
 	initialize_parameters parameters;
