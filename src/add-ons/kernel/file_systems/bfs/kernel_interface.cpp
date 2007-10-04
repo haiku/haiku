@@ -196,18 +196,6 @@ bfs_write_fs_stat(void *_ns, const struct fs_info *info, uint32 mask)
 	return status;
 }
 
-#if 0
-static status_t
-bfs_initialize(const char *deviceName, void *parms, size_t len)
-{
-	FUNCTION_START(("deviceName = %s, parameter len = %ld\n", deviceName, len));
-
-	// The backend (to create the file system) is already done; just
-	// call Volume::Initialize().
-
-	return B_ERROR;
-}
-#endif
 
 static status_t
 bfs_sync(void *_ns)
@@ -2026,6 +2014,49 @@ bfs_rewind_query(void */*fs*/, void *cookie)
 //	#pragma mark -
 
 
+struct initialize_parameters {
+	uint32	blockSize;
+	uint32	flags;
+	bool	verbose;
+};
+
+
+static status_t
+parse_initialize_parameters(const char* parameterString,
+	initialize_parameters& parameters)
+{
+	parameters.flags = 0;
+	parameters.verbose = false;
+
+	void *handle = parse_driver_settings_string(parameterString);
+	if (handle == NULL)
+		return B_ERROR;
+
+	if (get_driver_boolean_parameter(handle, "noindex", false, true))
+		parameters.flags |= VOLUME_NO_INDICES;
+	if (get_driver_boolean_parameter(handle, "verbose", false, true))
+		parameters.verbose = true;
+
+	const char *string = get_driver_parameter(handle, "block_size",
+		NULL, NULL);
+	uint32 blockSize = 1024;
+	if (string != NULL)
+		blockSize = strtoul(string, NULL, 0);
+
+	delete_driver_settings(handle);
+
+	if (blockSize != 1024 && blockSize != 2048 && blockSize != 4096
+		&& blockSize != 8192) {
+		INFORM(("valid block sizes are: 1024, 2048, 4096, and 8192\n"));
+		return B_BAD_VALUE;
+	}
+
+	parameters.blockSize = blockSize;
+
+	return B_OK;
+}
+
+
 static uint32
 bfs_get_supported_operations(partition_data* partition, uint32 mask)
 {
@@ -2037,50 +2068,58 @@ bfs_get_supported_operations(partition_data* partition, uint32 mask)
 
 static bool
 bfs_validate_initialize(partition_data *partition, char *name,
-	const char *parameters)
+	const char *parameterString)
 {
-	// TODO: Actual checks.
-	return true;
+	if (name == NULL)
+		return B_BAD_VALUE;
+
+	// truncate the name, if it is too long
+	size_t nameLen = strlen(name);
+	if (nameLen >= BFS_DISK_NAME_LENGTH) {
+		nameLen = BFS_DISK_NAME_LENGTH - 1;
+		name[nameLen] = '\0';
+	}
+
+	// replace '/' by '-'
+	while ((name = strchr(name, '/')) != NULL)
+		*name = '-';
+
+	// parse parameters
+	initialize_parameters parameters;
+	return (parse_initialize_parameters(parameterString, parameters) == B_OK);
 }
 
 
 static status_t
-bfs_initialize(int fd, partition_id partition, const char *name,
-	const char *parameters, disk_job_id job)
+bfs_initialize(int fd, partition_id partitionID, const char *name,
+	const char *parameterString, disk_job_id job)
 {
-	uint32 blockSize = 1024;
-	uint32 flags = 0;
-	bool verbose = false;
+	// parse parameters
+	initialize_parameters parameters;
+	status_t status = parse_initialize_parameters(parameterString, parameters);
+	if (status != B_OK)
+		return status;
 
-	void *handle = parse_driver_settings_string(parameters);
-	if (handle != NULL) {
-		if (get_driver_boolean_parameter(handle, "noindex", false, true))
-			flags |= VOLUME_NO_INDICES;
-		if (get_driver_boolean_parameter(handle, "verbose", false, true))
-			verbose = true;
+	update_disk_device_job_progress(job, 0);
 
-		const char *string = get_driver_parameter(handle, "block_size",
-			NULL, NULL);
-		if (string != NULL)
-			blockSize = strtoul(string, NULL, 0);
-
-		delete_driver_settings(handle);
-	}
-
-	if (blockSize != 1024 && blockSize != 2048 && blockSize != 4096
-		&& blockSize != 8192) {
-		INFORM(("valid block sizes are: 1024, 2048, 4096, and 8192\n"));
-		return B_BAD_VALUE;
-	}
-
+	// initialize the volume
 	Volume volume(-1);
-	status_t status = volume.Initialize(fd, name, blockSize, flags);
+	status = volume.Initialize(fd, name, parameters.blockSize,
+		parameters.flags);
 	if (status < B_OK) {
 		INFORM(("Initializing volume failed: %s\n", strerror(status)));
 		return status;
 	}
 
-	if (verbose) {
+	// rescan partition
+	status = scan_partition(partitionID);
+	if (status != B_OK)
+		return status;
+
+	update_disk_device_job_progress(job, 1);
+
+	// print some info, if desired
+	if (parameters.verbose) {
 		disk_super_block super = volume.SuperBlock();
 
 		INFORM(("Disk was initialized successfully.\n"));
