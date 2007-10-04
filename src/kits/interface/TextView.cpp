@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <new>
 using namespace std;
-#define DEBUG 1
+
 #include <Application.h>
 #include <Beep.h>
 #include <Bitmap.h>
