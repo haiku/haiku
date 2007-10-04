@@ -11,7 +11,8 @@ KernelAddon intel :
 	PartitionMap.cpp
 	PartitionMapParser.cpp
 	PartitionMapWriter.cpp
-	;
+	write_support.cpp
+;
 
 # Also build a userland version
 # ToDo: it's probably not a good idea to build them into the same directory
