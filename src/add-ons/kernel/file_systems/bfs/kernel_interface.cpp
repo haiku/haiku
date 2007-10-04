@@ -354,7 +354,7 @@ bfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 		if (mayBlock)
 			inode->Lock().Lock();
 		else if (inode->Lock().TryLock() < B_OK)
-			return B_BUSY;
+			return B_WOULD_BLOCK;
 	}
 
 	status_t status = file_cache_read_pages(inode->FileCache(), pos, vecs,
@@ -381,7 +381,7 @@ bfs_write_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 		if (mayBlock)
 			inode->Lock().Lock();
 		else if (inode->Lock().TryLock() < B_OK)
-			return B_BUSY;
+			return B_WOULD_BLOCK;
 	}
 
 	status_t status = file_cache_write_pages(inode->FileCache(), pos, vecs,
