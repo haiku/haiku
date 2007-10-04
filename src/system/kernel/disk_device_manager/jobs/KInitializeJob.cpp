@@ -8,6 +8,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 #include <KernelExport.h>
 #include <DiskDeviceDefs.h>
@@ -59,66 +60,79 @@ KInitializeJob::Do()
 DBG(OUT("KInitializeJob::Do(%ld)\n", PartitionID()));
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	KPartition *partition = manager->WriteLockPartition(PartitionID());
-	if (partition) {
-		PartitionRegistrar registrar(partition, true);
-		PartitionRegistrar deviceRegistrar(partition->Device(), true);
-
-		DeviceWriteLocker locker(partition->Device(), true);
-		// basic checks
-
-// 		if (!partition->ParentDiskSystem()) {
-// 			SetErrorMessage("Partition has no parent disk system!");
-// 			return B_BAD_VALUE;
-// 		}
-
-		// all descendants should be marked busy/descendant busy
-		if (IsPartitionNotBusy(partition)) {
-			SetErrorMessage("Can't initialize non-busy partition!");
-			return B_ERROR;
-		}
-
-/*		if (!fParameters) {
-			//no parameters for the operation
-			SetErrorMessage( "No parameters for partition initialization." );
-			return B_ERROR;
-		}*/
-
-		// TODO shouldn't we load the disk system AFTER the validation?
-		KDiskSystem *diskSystemToInit = manager->LoadDiskSystem(fDiskSystemID);
-		if (!diskSystemToInit) {
-			SetErrorMessage("Given DiskSystemID doesn't correspond to any "
-				"known DiskSystem.");
-			return B_BAD_VALUE;
-		}
-		DiskSystemLoader loader2(diskSystemToInit);
-
-// TODO: The parameters are already validated and should not be changed again!
-		status_t validationResult = validate_initialize_partition(partition,
-			partition->ChangeCounter(), diskSystemToInit->Name(), fName,
-			fParameters, false);
-
-		if (validationResult != B_OK) {
-			SetErrorMessage("Validation of initializing partition failed!");
-			return validationResult;
-		}
-
-		// everything seems OK -> let's do the job
-		locker.Unlock();
-
-		status_t initResult = diskSystemToInit->Initialize(partition, fName,
-			fParameters, this);
-
-		if (initResult != B_OK) {
-			SetErrorMessage("Initialization of partition failed!");
-			return initResult;
-		}
-
-		partition->SetDiskSystem(diskSystemToInit);
-
-		return B_OK;
-
-	} else {
+	if (!partition) {
 		SetErrorMessage("Couldn't find partition.");
 		return B_ENTRY_NOT_FOUND;
 	}
+
+	PartitionRegistrar registrar(partition, true);
+	PartitionRegistrar deviceRegistrar(partition->Device(), true);
+
+	DeviceWriteLocker locker(partition->Device(), true);
+
+	// basic checks
+
+	// all descendants should be marked busy/descendant busy
+	if (IsPartitionNotBusy(partition)) {
+		SetErrorMessage("Can't initialize non-busy partition!");
+		return B_ERROR;
+	}
+
+	if (partition->DiskSystem()) {
+		SetErrorMessage("Partition is already initialized.");
+		return B_BAD_VALUE;
+	}
+
+	// get the disk system
+	KDiskSystem *diskSystemToInit = manager->LoadDiskSystem(fDiskSystemID);
+	if (!diskSystemToInit) {
+		SetErrorMessage("Given DiskSystemID doesn't correspond to any "
+			"known DiskSystem.");
+		return B_BAD_VALUE;
+	}
+	DiskSystemLoader loader(diskSystemToInit, true);
+
+	// check the parameters
+	char name[B_DISK_DEVICE_NAME_LENGTH];
+	if (fName)
+		strlcpy(name, fName, sizeof(name));
+
+	status_t error = validate_initialize_partition(partition,
+		partition->ChangeCounter(), diskSystemToInit->Name(),
+		fName ? name : NULL, fParameters, false);
+
+	if (error != B_OK) {
+		SetErrorMessage("Validation of initializing partition failed.");
+		return error;
+	}
+
+	if (fName != NULL && strcmp(fName, name) != 0) {
+		SetErrorMessage("Requested name not valid.");
+		return B_BAD_VALUE;
+	}
+
+	// everything seems OK -> let's do the job
+	locker.Unlock();
+
+	error = diskSystemToInit->Initialize(partition, fName, fParameters, this);
+	if (error != B_OK) {
+		SetErrorMessage("Initialization of partition failed!");
+		return error;
+	}
+
+	locker.Lock();
+
+	if (partition->DiskSystem()) {
+		// The disk system might have triggered a rescan after initializing, in
+		// which case the disk system is already set. Just check, if it is the
+		// right one.
+		if (partition->DiskSystem() != diskSystemToInit) {
+			SetErrorMessage("Partition has wrong disk system after "
+				"initialization.");
+			return B_ERROR;
+		}
+	} else
+		partition->SetDiskSystem(diskSystemToInit);
+
+	return B_OK;
 }
