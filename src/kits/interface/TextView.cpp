@@ -806,7 +806,6 @@ BTextView::MessageReceived(BMessage *message)
 				switch (opcode) {
 					case B_INPUT_METHOD_STARTED:
 					{
-						PRINT(("B_INPUT_METHOD_STARTED\n"));
 						BMessenger messenger;
 						if (message->FindMessenger("be:reply_to", &messenger) == B_OK) {
 							ASSERT(fInline == NULL);
@@ -816,19 +815,16 @@ BTextView::MessageReceived(BMessage *message)
 					}	
 					
 					case B_INPUT_METHOD_STOPPED:
-						PRINT(("B_INPUT_METHOD_STOPPED\n"));
 						delete fInline;
 						fInline = NULL;
 						break;
 					
 					case B_INPUT_METHOD_CHANGED:
-						PRINT(("B_INPUT_METHOD_CHANGED\n"));
 						if (fInline != NULL)
 							HandleInputMethodChanged(message);
 						break;
 		
 					case B_INPUT_METHOD_LOCATION_REQUEST:
-						PRINT(("B_INPUT_METHOD_LOCATION_REQUEST\n"));
 						if (fInline != NULL)
 							HandleInputMethodLocationRequest();
 						break;
@@ -3102,8 +3098,6 @@ BTextView::HandleAlphaKey(const char *bytes, int32 numBytes)
 void
 BTextView::Refresh(int32 fromOffset, int32 toOffset, bool erase, bool scroll)
 {
-	PRINT(("Refresh(fromOffset: %ld, toOffset: %ld, erase: %d, scroll: %d\n",
-			fromOffset, toOffset, erase, scroll));
 	// TODO: Cleanup
 	float saveHeight = fTextRect.Height();
 	int32 fromLine = LineAt(fromOffset);
@@ -3643,9 +3637,6 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset, bool era
 {
 	if (!Window())
 		return;
-
-	PRINT(("DrawLines(startLine: %ld, endLine: %ld, startOffset: %ld, erase: %d\n",
-		startLine, endLine, startOffset, erase));
 
 	// clip the text
 	BRect clipRect = Bounds() & fTextRect;
@@ -4438,7 +4429,7 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 	// Delete the previously inserted text (if any)
 	if (fInline->IsActive()) {
 		int32 oldOffset = fInline->Offset();
-		DeleteText(oldOffset, oldOffset + fInline->Length());
+		BTextView::DeleteText(oldOffset, oldOffset + fInline->Length());
 		fClickOffset = fSelStart = fSelEnd = oldOffset;
 
 		if (confirmed)
@@ -4474,7 +4465,13 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 	fInline->SetSelectionLength(selectionEnd - selectionStart);
 	
 	// Insert the new text
-	InsertText(string, stringLen, fSelStart, NULL);
+	// We call the base InsertText(), because inherited method could do bad things:
+	// Mail, for example, does call InsertText() with a runarray parameter
+	// (even if we pass NULL here). That causes SetRunArray() to be called,
+	// which in turn calls CancelInputMethod(), which would destroy fInline
+	// (and we call some of its functions later). Bug #1022.
+	// TODO: Check if R5 really does this 
+	BTextView::InsertText(string, stringLen, fSelStart, NULL);
 	fSelStart += stringLen;
 	fClickOffset = fSelEnd = fSelStart;
 
@@ -4522,22 +4519,24 @@ BTextView::CancelInputMethod()
 	if (!fInline)
 		return;
 
-	BMessage message(B_INPUT_METHOD_EVENT);
-	message.AddInt32("be:opcode", B_INPUT_METHOD_STOPPED);
-	fInline->Method()->SendMessage(&message);
+	_BInlineInput_ *inlineInput = fInline;
+	fInline = NULL;
 
 	// Delete the previously inserted text (if any)
-	if (fInline->IsActive()) {
-		int32 oldOffset = fInline->Offset();
-		DeleteText(oldOffset, oldOffset + fInline->Length());
+	if (inlineInput->IsActive()) {
+		int32 oldOffset = inlineInput->Offset();
+		DeleteText(oldOffset, oldOffset + inlineInput->Length());
 		fClickOffset = fSelStart = fSelEnd = oldOffset;
 	}
 
-	delete fInline;
-	fInline = NULL;
-
 	if (Window())
 		Refresh(0, fText->Length(), true, false);
+
+	BMessage message(B_INPUT_METHOD_EVENT);
+	message.AddInt32("be:opcode", B_INPUT_METHOD_STOPPED);
+	inlineInput->Method()->SendMessage(&message);
+
+	delete inlineInput;
 }
 
 
