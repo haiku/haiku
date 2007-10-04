@@ -88,7 +88,7 @@ KScanPartitionJob::_ScanPartition(KPartition *partition)
 	)
 
 	// publish the partition
-	status_t error;
+	status_t error = B_OK;
 	if (!partition->IsPublished()) {
 		error = partition->PublishDevice();
 		if (error != B_OK)
