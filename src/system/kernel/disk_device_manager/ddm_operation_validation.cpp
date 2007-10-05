@@ -401,20 +401,25 @@ BPrivate::DiskDevice::validate_initialize_partition(KPartition *partition,
 	int32 changeCounter, const char *diskSystemName, char *name,
 	const char *parameters, bool requireShadow)
 {
-	if (!partition || !diskSystemName || !name)
+	if (!partition || !diskSystemName)
 		return B_BAD_VALUE;
+
 	// truncate name to maximal size
-	name[B_OS_NAME_LENGTH] = '\0';
+	if (name)
+		name[B_OS_NAME_LENGTH] = '\0';
+
 	// check the partition
 	status_t error = check_partition(partition, changeCounter, requireShadow);
 	if (error != B_OK)
 		return error;
+
 	// get the disk system
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	KDiskSystem *diskSystem = manager->LoadDiskSystem(diskSystemName);
 	if (!diskSystem)
 		return B_ENTRY_NOT_FOUND;
 	DiskSystemLoader loader(diskSystem, true);
+
 	// get the info
 	if (diskSystem->ValidateInitialize(partition, name, parameters))
 		return B_OK;

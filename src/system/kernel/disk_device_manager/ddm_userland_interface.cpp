@@ -1022,40 +1022,52 @@ _user_validate_initialize_partition(partition_id partitionID,
 	int32 changeCounter, const char *_diskSystemName, char *_name,
 	const char *_parameters, size_t parametersSize)
 {
-	if (!_diskSystemName || !_name
-		|| parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE) {
+	if (!_diskSystemName || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE)
 		return B_BAD_VALUE;
-	}
+
+	// copy disk system name
 	char diskSystemName[B_DISK_SYSTEM_NAME_LENGTH];
-	char name[B_DISK_DEVICE_NAME_LENGTH];
-	char *parameters = NULL;
 	status_t error = ddm_strlcpy(diskSystemName, _diskSystemName,
 		B_DISK_SYSTEM_NAME_LENGTH);
-	if (!error) 
+
+	// copy name
+	char name[B_DISK_DEVICE_NAME_LENGTH];
+	if (!error && _name) 
 		error = ddm_strlcpy(name, _name, B_DISK_DEVICE_NAME_LENGTH, true);
-	if (error)
+
+	if (error != B_OK)
 		return error;
+
+	// copy parameters
+	char *parameters = NULL;
+	MemoryDeleter parameterDeleter;
 	if (_parameters) {
 		parameters = static_cast<char*>(malloc(parametersSize));
-		if (parameters)
-			user_memcpy(parameters, _parameters, parametersSize);
-		else
+		if (!parameters)
 			return B_NO_MEMORY;
+		parameterDeleter.SetTo(parameters);
+
+		if (user_memcpy(parameters, _parameters, parametersSize) != B_OK)
+			return B_BAD_ADDRESS;
 	}
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+
 	// get the partition
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	KPartition *partition = manager->ReadLockPartition(partitionID);
-	error = partition ? (status_t)B_OK : (status_t)B_ENTRY_NOT_FOUND;
-	if (!error) {
-		PartitionRegistrar registrar1(partition, true);
-		PartitionRegistrar registrar2(partition->Device(), true);
-		DeviceReadLocker locker(partition->Device(), true);
-		error = validate_initialize_partition(partition, changeCounter,
-			diskSystemName, name, parameters);
-	}
-	if (!error) 
+	if (!partition)
+		return B_ENTRY_NOT_FOUND;
+
+	// validate
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	error = validate_initialize_partition(partition, changeCounter,
+		diskSystemName, _name ? name : NULL, parameters);
+
+	// copy back the modified name
+	if (!error && _name)
 		error = ddm_strlcpy(_name, name, B_DISK_DEVICE_NAME_LENGTH);
-	free(parameters);
+
 	return error;
 }
 
@@ -1591,71 +1603,83 @@ _user_initialize_partition(partition_id partitionID, int32 changeCounter,
 	const char *_diskSystemName, const char *_name, const char *_parameters,
 	size_t parametersSize)
 {
-	if (!_diskSystemName || !_name
-		|| parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE) {
+	if (!_diskSystemName || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE)
 		return B_BAD_VALUE;
-	}
+
+	// copy disk system name
 	char diskSystemName[B_DISK_SYSTEM_NAME_LENGTH];
-	char name[B_DISK_DEVICE_NAME_LENGTH];
-	char *parameters = NULL;
 	status_t error = ddm_strlcpy(diskSystemName, _diskSystemName,
 		B_DISK_SYSTEM_NAME_LENGTH);
-	if (!error)
+
+	// copy name
+	char name[B_DISK_DEVICE_NAME_LENGTH];
+	if (!error && _name)
 		error = ddm_strlcpy(name, _name, B_DISK_DEVICE_NAME_LENGTH);
+
 	if (error)
 		return error;
+
+	// copy parameters
+	MemoryDeleter parameterDeleter;
+	char *parameters = NULL;
 	if (_parameters) {
 		parameters = static_cast<char*>(malloc(parametersSize));
-		if (parameters)
-			user_memcpy(parameters, _parameters, parametersSize);
-		else
+		if (!parameters)
 			return B_NO_MEMORY;
+		parameterDeleter.SetTo(parameters);
+
+		if (user_memcpy(parameters, _parameters, parametersSize) != B_OK)
+			return B_BAD_ADDRESS;
 	}
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+
 	// get the partition
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	KPartition *partition = manager->WriteLockPartition(partitionID);
-	error = partition ? (status_t)B_OK : (status_t)B_ENTRY_NOT_FOUND;
-	if (!error) {
-		PartitionRegistrar registrar1(partition, true);
-		PartitionRegistrar registrar2(partition->Device(), true);
-		DeviceWriteLocker locker(partition->Device(), true);
-		// get the disk system
-		KDiskSystem *diskSystem = manager->LoadDiskSystem(diskSystemName);
-		error = diskSystem ? (status_t)B_OK : (status_t)B_ENTRY_NOT_FOUND;
-		if (!error) {
-			DiskSystemLoader loader(diskSystem, true);
-			// check parameters
-			char proposedName[B_DISK_DEVICE_NAME_LENGTH];
-			strcpy(proposedName, name);
-			error = validate_initialize_partition(partition, changeCounter,
-				diskSystemName, proposedName, parameters);
-			if (!error) {
-				error = !strcmp(name, proposedName) ? B_OK : B_BAD_VALUE;
-			}
-			if (!error) {
-				// unitialize the partition's contents and set the new
-				// parameters
-				error = partition->UninitializeContents(true);
-			}
-			if (!error) {
-				partition->SetDiskSystem(diskSystem);
-				error = partition->SetContentName(name);
-			}
-			if (!error) {
-				partition->Changed(B_PARTITION_CHANGED_CONTENT_NAME);
-				error = partition->SetContentParameters(parameters);
-			}
-			if (!error) {
-				partition->Changed(B_PARTITION_CHANGED_CONTENT_PARAMETERS);
-				partition->Changed(B_PARTITION_CHANGED_INITIALIZATION);
-				// implicit content disk system changes
-				error = partition->DiskSystem()->ShadowPartitionChanged(
-					partition, B_PARTITION_INITIALIZE);
-			}
-		}
-	}
-	free(parameters);
-	return error;
+	if (!partition)
+		return B_ENTRY_NOT_FOUND;
+
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceWriteLocker locker(partition->Device(), true);
+
+	// get the disk system
+	KDiskSystem *diskSystem = manager->LoadDiskSystem(diskSystemName);
+	if (!diskSystem)
+		return B_ENTRY_NOT_FOUND;
+	DiskSystemLoader loader(diskSystem, true);
+
+	// check parameters
+	char proposedName[B_DISK_DEVICE_NAME_LENGTH];
+	if (_name)
+		strcpy(proposedName, name);
+
+	error = validate_initialize_partition(partition, changeCounter,
+		diskSystemName, _name ? proposedName : NULL, parameters);
+	if (error != B_OK)
+		return error;
+	if (_name && strcmp(name, proposedName) != 0)
+		return B_BAD_VALUE;
+
+	// unitialize the partition's contents and set the new
+	// parameters
+	if ((error = partition->UninitializeContents(true)) != B_OK)
+		return error;
+
+	partition->SetDiskSystem(diskSystem);
+
+	if ((error = partition->SetContentName(_name ? name : NULL)) != B_OK)
+		return error;
+	partition->Changed(B_PARTITION_CHANGED_CONTENT_NAME);
+
+	if ((error = partition->SetContentParameters(parameters)) != B_OK)
+		return error;
+	partition->Changed(B_PARTITION_CHANGED_CONTENT_PARAMETERS);
+
+	partition->Changed(B_PARTITION_CHANGED_INITIALIZATION);
+
+	// implicit content disk system changes
+	return partition->DiskSystem()->ShadowPartitionChanged(
+		partition, B_PARTITION_INITIALIZE);
 }
 
 

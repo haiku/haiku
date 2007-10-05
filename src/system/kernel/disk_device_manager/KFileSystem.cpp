@@ -165,9 +165,9 @@ bool
 KFileSystem::ValidateInitialize(KPartition *partition, char *name,
 								const char *parameters)
 {
-	return (partition && name && fModule && fModule->validate_initialize
-			&& fModule->validate_initialize(partition->PartitionData(), name,
-											parameters));
+	return (partition && fModule && fModule->validate_initialize
+		&& fModule->validate_initialize(partition->PartitionData(), name,
+				parameters));
 }
 
 

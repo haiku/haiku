@@ -314,7 +314,7 @@ bool
 KPartitioningSystem::ValidateInitialize(KPartition *partition, char *name,
 	const char *parameters)
 {
-	return (partition && name && fModule && fModule->validate_initialize
+	return (partition && fModule && fModule->validate_initialize
 		&& fModule->validate_initialize(partition->PartitionData(), name,
 				parameters));
 }
@@ -788,7 +788,7 @@ KPartitioningSystem::Initialize(KPartition *partition, const char *name,
 	const char *parameters, KDiskDeviceJob *job)
 {
 	// check parameters
-	if (!partition || !job || !name /*|| !parameters*/)
+	if (!partition || !job /*|| !parameters*/)
 		return B_BAD_VALUE;
 	if (!fModule->initialize)
 		return B_ENTRY_NOT_FOUND;

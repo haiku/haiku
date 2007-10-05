@@ -980,11 +980,11 @@ status_t
 BPartition::ValidateInitialize(const char *diskSystem, char *name,
 							   const char *parameters)
 {
-	if (!fPartitionData || !_IsShadow() || !diskSystem || !name)
+	if (!fPartitionData || !_IsShadow() || !diskSystem)
 		return B_BAD_VALUE;
 	return _kern_validate_initialize_partition(_ShadowID(), _ChangeCounter(),
-											   diskSystem, name, parameters,
-											   (parameters ? strlen(parameters)+1 : 0));
+		diskSystem, name, parameters,
+		(parameters ? strlen(parameters) + 1 : 0));
 }
 
 // Initialize
@@ -992,11 +992,11 @@ status_t
 BPartition::Initialize(const char *diskSystem, const char *name,
 					   const char *parameters)
 {
-	if (!fPartitionData || !_IsShadow() || !diskSystem || !name)
+	if (!fPartitionData || !_IsShadow() || !diskSystem)
 		return B_BAD_VALUE;
 	status_t error = _kern_initialize_partition(_ShadowID(), _ChangeCounter(),
-												diskSystem, name, parameters,
-												(parameters ? strlen(parameters)+1 : 0));
+		diskSystem, name, parameters,
+		(parameters ? strlen(parameters) + 1 : 0));
 	if (error == B_OK)
 		error = Device()->Update();
 	return error;
