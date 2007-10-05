@@ -1487,25 +1487,28 @@ resolve_volume_root_to_mount_point(struct vnode *vnode)
 }
 
 
-/**	\brief Gets the directory path and leaf name for a given path.
- *
- *	The supplied \a path is transformed to refer to the directory part of
- *	the entry identified by the original path, and into the buffer \a filename
- *	the leaf name of the original entry is written.
- *	Neither the returned path nor the leaf name can be expected to be
- *	canonical.
- *
- *	\param path The path to be analyzed. Must be able to store at least one
- *		   additional character.
- *	\param filename The buffer into which the leaf name will be written.
- *		   Must be of size B_FILE_NAME_LENGTH at least.
- *	\return \c B_OK, if everything went fine, \c B_NAME_TOO_LONG, if the leaf
- *		   name is longer than \c B_FILE_NAME_LENGTH.
- */
+/*!	\brief Gets the directory path and leaf name for a given path.
 
+	The supplied \a path is transformed to refer to the directory part of
+	the entry identified by the original path, and into the buffer \a filename
+	the leaf name of the original entry is written.
+	Neither the returned path nor the leaf name can be expected to be
+	canonical.
+
+	\param path The path to be analyzed. Must be able to store at least one
+		   additional character.
+	\param filename The buffer into which the leaf name will be written.
+		   Must be of size B_FILE_NAME_LENGTH at least.
+	\return \c B_OK, if everything went fine, \c B_NAME_TOO_LONG, if the leaf
+		   name is longer than \c B_FILE_NAME_LENGTH, or \c B_ENTRY_NOT_FOUND,
+		   if the given path name is empty.
+*/
 static status_t
 get_dir_path_and_leaf(char *path, char *filename)
 {
+	if (*path == '\0')
+		return B_ENTRY_NOT_FOUND;
+
 	char *p = strrchr(path, '/');
 		// '/' are not allowed in file names!
 
@@ -1537,7 +1540,8 @@ get_dir_path_and_leaf(char *path, char *filename)
 
 
 static status_t
-entry_ref_to_vnode(dev_t mountID, ino_t directoryID, const char *name, struct vnode **_vnode)
+entry_ref_to_vnode(dev_t mountID, ino_t directoryID, const char *name,
+	struct vnode **_vnode)
 {
 	char clonedName[B_FILE_NAME_LENGTH + 1];
 	if (strlcpy(clonedName, name, B_FILE_NAME_LENGTH) >= B_FILE_NAME_LENGTH)
@@ -1550,18 +1554,18 @@ entry_ref_to_vnode(dev_t mountID, ino_t directoryID, const char *name, struct vn
 	if (status < 0)
 		return status;
 
-	return vnode_path_to_vnode(directory, clonedName, false, 0, _vnode, NULL, NULL);
+	return vnode_path_to_vnode(directory, clonedName, false, 0, _vnode, NULL,
+		NULL);
 }
 
 
-/**	Returns the vnode for the relative path starting at the specified \a vnode.
- *	\a path must not be NULL.
- *	If it returns successfully, \a path contains the name of the last path
- *	component.
- *	Note, this reduces the ref_count of the starting \a vnode, no matter if
- *	it is successful or not!
- */
-
+/*!	Returns the vnode for the relative path starting at the specified \a vnode.
+	\a path must not be NULL.
+	If it returns successfully, \a path contains the name of the last path
+	component.
+	Note, this reduces the ref_count of the starting \a vnode, no matter if
+	it is successful or not!
+*/
 static status_t
 vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 	int count, struct vnode **_vnode, ino_t *_parentID, int *_type)
@@ -1575,6 +1579,11 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 	if (path == NULL) {
 		put_vnode(vnode);
 		return B_BAD_VALUE;
+	}
+
+	if (*path == '\0') {
+		put_vnode(vnode);
+		return B_ENTRY_NOT_FOUND;
 	}
 
 	while (true) {
@@ -1683,6 +1692,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 			// directory ("vnode" still points to that one).
 			// Cut off all leading slashes if it's the root directory
 			path = buffer;
+			bool absoluteSymlink = false;
 			if (path[0] == '/') {
 				// we don't need the old directory anymore
 				put_vnode(vnode);
@@ -1691,13 +1701,21 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 					;
 				vnode = sRoot;
 				inc_vnode_ref_count(vnode);
-			}
-			inc_vnode_ref_count(vnode);
-				// balance the next recursion - we will decrement the ref_count
-				// of the vnode, no matter if we succeeded or not
 
-			status = vnode_path_to_vnode(vnode, path, traverseLeafLink, count + 1,
-				&nextVnode, &lastParentID, _type);
+				absoluteSymlink = true;
+			}
+
+			inc_vnode_ref_count(vnode);
+				// balance the next recursion - we will decrement the
+				// ref_count of the vnode, no matter if we succeeded or not
+
+			if (absoluteSymlink && *path == '\0') {
+				// symlink was just "/"
+				nextVnode = vnode;
+			} else {
+				status = vnode_path_to_vnode(vnode, path, traverseLeafLink,
+					count + 1, &nextVnode, &lastParentID, _type);
+			}
 
 			free(buffer);
 
@@ -1743,6 +1761,9 @@ path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode,
 	if (!path)
 		return B_BAD_VALUE;
 
+	if (*path == '\0')
+		return B_ENTRY_NOT_FOUND;
+
 	// figure out if we need to start at root or at cwd
 	if (*path == '/') {
 		if (sRoot == NULL) {
@@ -1754,6 +1775,12 @@ path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode,
 			;
 		start = sRoot;
 		inc_vnode_ref_count(start);
+
+		if (*path == '\0') {
+			*_vnode = start;
+			return B_OK;
+		}
+
 	} else {
 		struct io_context *context = get_current_io_context(kernel);
 
@@ -1771,11 +1798,10 @@ path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode,
 }
 
 
-/** Returns the vnode in the next to last segment of the path, and returns
- *	the last portion in filename.
- *	The path buffer must be able to store at least one additional character.
- */
-
+/*! Returns the vnode in the next to last segment of the path, and returns
+	the last portion in filename.
+	The path buffer must be able to store at least one additional character.
+*/
 static status_t
 path_to_dir_vnode(char *path, struct vnode **_vnode, char *filename, bool kernel)
 {
@@ -1787,37 +1813,38 @@ path_to_dir_vnode(char *path, struct vnode **_vnode, char *filename, bool kernel
 }
 
 
-/**	\brief Retrieves the directory vnode and the leaf name of an entry referred
- *		   to by a FD + path pair.
- *
- *	\a path must be given in either case. \a fd might be omitted, in which
- *	case \a path is either an absolute path or one relative to the current
- *	directory. If both a supplied and \a path is relative it is reckoned off
- *	of the directory referred to by \a fd. If \a path is absolute \a fd is
- *	ignored.
- *
- *	The caller has the responsibility to call put_vnode() on the returned
- *	directory vnode.
- *
- *	\param fd The FD. May be < 0.
- *	\param path The absolute or relative path. Must not be \c NULL. The buffer
- *	       is modified by this function. It must have at least room for a
- *	       string one character longer than the path it contains.
- *	\param _vnode A pointer to a variable the directory vnode shall be written
- *		   into.
- *	\param filename A buffer of size B_FILE_NAME_LENGTH or larger into which
- *		   the leaf name of the specified entry will be written.
- *	\param kernel \c true, if invoked from inside the kernel, \c false if
- *		   invoked from userland.
- *	\return \c B_OK, if everything went fine, another error code otherwise.
- */
+/*!	\brief Retrieves the directory vnode and the leaf name of an entry referred
+		   to by a FD + path pair.
 
+	\a path must be given in either case. \a fd might be omitted, in which
+	case \a path is either an absolute path or one relative to the current
+	directory. If both a supplied and \a path is relative it is reckoned off
+	of the directory referred to by \a fd. If \a path is absolute \a fd is
+	ignored.
+
+	The caller has the responsibility to call put_vnode() on the returned
+	directory vnode.
+
+	\param fd The FD. May be < 0.
+	\param path The absolute or relative path. Must not be \c NULL. The buffer
+	       is modified by this function. It must have at least room for a
+	       string one character longer than the path it contains.
+	\param _vnode A pointer to a variable the directory vnode shall be written
+		   into.
+	\param filename A buffer of size B_FILE_NAME_LENGTH or larger into which
+		   the leaf name of the specified entry will be written.
+	\param kernel \c true, if invoked from inside the kernel, \c false if
+		   invoked from userland.
+	\return \c B_OK, if everything went fine, another error code otherwise.
+*/
 static status_t
 fd_and_path_to_dir_vnode(int fd, char *path, struct vnode **_vnode,
 	char *filename, bool kernel)
 {
 	if (!path)
 		return B_BAD_VALUE;
+	if (*path == '\0')
+		return B_ENTRY_NOT_FOUND;
 	if (fd < 0)
 		return path_to_dir_vnode(path, _vnode, filename, kernel);
 
@@ -1829,9 +1856,8 @@ fd_and_path_to_dir_vnode(int fd, char *path, struct vnode **_vnode,
 }
 
 
-/** Returns a vnode's name in the d_name field of a supplied dirent buffer.
- */
-
+/*! Returns a vnode's name in the d_name field of a supplied dirent buffer.
+*/
 static status_t
 get_vnode_name(struct vnode *vnode, struct vnode *parent, struct dirent *buffer,
 	size_t bufferSize)
@@ -2049,12 +2075,11 @@ out:
 }
 
 
-/**	Checks the length of every path component, and adds a '.'
- *	if the path ends in a slash.
- *	The given path buffer must be able to store at least one
- *	additional character.
- */
-
+/*!	Checks the length of every path component, and adds a '.'
+	if the path ends in a slash.
+	The given path buffer must be able to store at least one
+	additional character.
+*/
 static status_t
 check_path(char *to)
 {
@@ -2131,19 +2156,21 @@ get_vnode_from_fd(int fd, bool kernel)
 }
 
 
-/**	Gets the vnode from an FD + path combination. If \a fd is lower than zero,
- *	only the path will be considered. In this case, the \a path must not be
- *	NULL.
- *	If \a fd is a valid file descriptor, \a path may be NULL for directories,
- *	and should be NULL for files.
- */
-
+/*!	Gets the vnode from an FD + path combination. If \a fd is lower than zero,
+	only the path will be considered. In this case, the \a path must not be
+	NULL.
+	If \a fd is a valid file descriptor, \a path may be NULL for directories,
+	and should be NULL for files.
+*/
 static status_t
 fd_and_path_to_vnode(int fd, char *path, bool traverseLeafLink,
 	struct vnode **_vnode, ino_t *_parentID, bool kernel)
 {
 	if (fd < 0 && !path)
 		return B_BAD_VALUE;
+
+	if (path != NULL && *path == '\0')
+		return B_ENTRY_NOT_FOUND;
 
 	if (fd < 0 || (path != NULL && path[0] == '/')) {
 		// no FD or absolute path
@@ -6256,18 +6283,11 @@ status_t
 _kern_create_symlink(int fd, const char *path, const char *toPath, int mode)
 {
 	KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
-	KPath toPathBuffer(toPath, false, B_PATH_NAME_LENGTH + 1);
-	if (pathBuffer.InitCheck() != B_OK || toPathBuffer.InitCheck() != B_OK)
+	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
-	char *toBuffer = toPathBuffer.LockBuffer();
-
-	status_t status = check_path(toBuffer);
-	if (status < B_OK)
-		return status;
-
 	return common_create_symlink(fd, pathBuffer.LockBuffer(), 
-		toBuffer, mode, true);
+		toPath, mode, true);
 }
 
 
@@ -7096,10 +7116,6 @@ _user_create_symlink(int fd, const char *userPath, const char *userToPath,
 		|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK
 		|| user_strlcpy(toPath, userToPath, B_PATH_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
-
-	status_t status = check_path(toPath);
-	if (status < B_OK)
-		return status;
 
 	return common_create_symlink(fd, path, toPath, mode, false);
 }
