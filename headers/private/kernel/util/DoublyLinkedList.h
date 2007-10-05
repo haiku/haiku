@@ -523,7 +523,7 @@ DOUBLY_LINKED_LIST_CLASS_NAME::MoveFrom(DOUBLY_LINKED_LIST_CLASS_NAME *fromList)
 	if (fromList && fromList->fFirst) {
 		if (fFirst) {
 			sGetLink(fLast)->next = fromList->fFirst;
-			sGetLink(fFirst)->previous = fLast;
+			sGetLink(fromList->fFirst)->previous = fLast;
 			fLast = fromList->fLast;
 		} else {
 			fFirst = fromList->fFirst;
