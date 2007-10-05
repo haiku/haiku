@@ -1,4 +1,4 @@
-/** 	\file ddm_userland_interface.cpp
+/** \file ddm_userland_interface.cpp
  *
  * 	\brief Interface for userspace calls.
  */
@@ -34,18 +34,21 @@ using namespace BPrivate::DiskDevice;
 	       \a from is longer than \to. If \c false, returns \c B_NAME_TOO_LONG
 	       if \a from is longer than \to.
 */
-static
-status_t
-ddm_strlcpy(char *to, const char *from, size_t size, bool allowTruncation = false) {
-	int error = user_strlcpy(to, from, size);
-	error = (0 <= error && size_t(error) < size) ? B_OK
-	        : (error < B_OK ? error : (allowTruncation ? B_OK : B_NAME_TOO_LONG));
-	return status_t(error);
+static status_t
+ddm_strlcpy(char *to, const char *from, size_t size,
+	bool allowTruncation = false)
+{
+	ssize_t fromLen = user_strlcpy(to, from, size);
+	if (fromLen < 0)
+		return fromLen;
+	if ((size_t)fromLen >= size && !allowTruncation)
+		return B_NAME_TOO_LONG;
+	return B_OK;
 }
 
+
 // move_descendants
-static
-void
+static void
 move_descendants(KPartition *partition, off_t moveBy)
 {
 	if (!partition)
@@ -56,9 +59,9 @@ move_descendants(KPartition *partition, off_t moveBy)
 		move_descendants(child, moveBy);
 }
 
+
 // move_descendants_contents
-static
-status_t
+static status_t
 move_descendants_contents(KPartition *partition)
 {
 	if (!partition)
@@ -79,6 +82,7 @@ move_descendants_contents(KPartition *partition)
 	}
 	return B_OK;
 }
+
 
 // _user_get_next_disk_device_id
 partition_id
@@ -110,6 +114,7 @@ _user_get_next_disk_device_id(int32 *_cookie, size_t *neededSize)
 	return id;
 }
 
+
 // _user_find_disk_device
 partition_id
 _user_find_disk_device(const char *_filename, size_t *neededSize)
@@ -140,6 +145,7 @@ _user_find_disk_device(const char *_filename, size_t *neededSize)
 	}
 	return id;
 }
+
 
 // _user_find_partition
 partition_id
@@ -176,6 +182,7 @@ _user_find_partition(const char *_filename, size_t *neededSize)
 	}
 	return id;
 }
+
 
 // _user_get_disk_device_data
 /*!	\brief Writes data describing the disk device identified by ID and all
@@ -221,8 +228,7 @@ _user_find_partition(const char *_filename, size_t *neededSize)
 */
 status_t
 _user_get_disk_device_data(partition_id id, bool deviceOnly, bool shadow,
-						   user_disk_device_data *buffer, size_t bufferSize,
-						   size_t *_neededSize)
+	user_disk_device_data *buffer, size_t bufferSize, size_t *_neededSize)
 {
 	if (!buffer && bufferSize > 0)
 		return B_BAD_VALUE;
@@ -272,42 +278,45 @@ _user_get_disk_device_data(partition_id id, bool deviceOnly, bool shadow,
 	return B_ENTRY_NOT_FOUND;
 }
 
+
 // _user_get_partitionable_spaces
 status_t
 _user_get_partitionable_spaces(partition_id partitionID, int32 changeCounter,
-							   partitionable_space_data *_buffer,
-							   int32 count, int32 *_actualCount)
+	partitionable_space_data *_buffer, int32 count, int32 *_actualCount)
 {
 	if (!_buffer && count > 0)
 		return B_BAD_VALUE;	
 	// copy in
 	int32 bufferSize = count * sizeof(partitionable_space_data);
 	partitionable_space_data *buffer = count > 0
-	                                   ? reinterpret_cast<partitionable_space_data*>(malloc(bufferSize))
-	                                   : NULL;
+		? reinterpret_cast<partitionable_space_data*>(malloc(bufferSize))
+		: NULL;
 	if (buffer)
 		user_memcpy(buffer, _buffer, bufferSize);	
 	status_t error = B_OK;
 	// get the partition
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	KPartition *partition = manager->ReadLockPartition(partitionID);
-	error = partition ? B_OK : B_ENTRY_NOT_FOUND;
+	error = partition ? (status_t)B_OK : (status_t)B_ENTRY_NOT_FOUND;
 	if (!error) {
 		PartitionRegistrar registrar1(partition, true);
 		PartitionRegistrar registrar2(partition->Device(), true);
 		DeviceReadLocker locker(partition->Device(), true);
-		error = check_shadow_partition(partition, changeCounter) ? B_OK : B_BAD_VALUE;
+		error = check_shadow_partition(partition, changeCounter)
+			? B_OK : B_BAD_VALUE;
 		if (!error) {
 			// get the disk system
 			KDiskSystem *diskSystem = partition->DiskSystem();
-			error = diskSystem ? B_OK : B_ENTRY_NOT_FOUND;
+			error = diskSystem ? (status_t)B_OK : (status_t)B_ENTRY_NOT_FOUND;
 			if (!error) {
 				// get the info
 				int32 actualCount;
 				error = diskSystem->GetPartitionableSpaces(partition, buffer,
 				                                           count, &actualCount);
-				if (!error && _actualCount)
-					user_memcpy(_actualCount, &actualCount, sizeof(actualCount));
+				if (!error && _actualCount) {
+					user_memcpy(_actualCount, &actualCount,
+						sizeof(actualCount));
+				}
 			}
 		}
 	}	
@@ -317,6 +326,7 @@ _user_get_partitionable_spaces(partition_id partitionID, int32 changeCounter,
 	free(buffer);	
 	return error;
 }
+
 
 // _user_register_file_device
 partition_id
@@ -337,6 +347,7 @@ _user_register_file_device(const char *_filename)
 	return B_ERROR;
 }
 
+
 // _user_unregister_file_device
 status_t
 _user_unregister_file_device(partition_id deviceID, const char *_filename)
@@ -354,6 +365,7 @@ _user_unregister_file_device(partition_id deviceID, const char *_filename)
 		return manager->DeleteFileDevice(filename);
 	}
 }
+
 
 // _user_get_disk_system_info
 status_t
@@ -373,6 +385,7 @@ _user_get_disk_system_info(disk_system_id id, user_disk_system_info *_info)
 	}
 	return B_ENTRY_NOT_FOUND;
 }
+
 
 // _user_get_next_disk_system_info
 status_t
@@ -397,6 +410,7 @@ _user_get_next_disk_system_info(int32 *_cookie, user_disk_system_info *_info)
 	return result;
 }
 
+
 // _user_find_disk_system
 status_t
 _user_find_disk_system(const char *_name, user_disk_system_info *_info)
@@ -420,10 +434,11 @@ _user_find_disk_system(const char *_name, user_disk_system_info *_info)
 	return B_ENTRY_NOT_FOUND;
 }
 
+
 // _user_supports_defragmenting_partition
 bool
 _user_supports_defragmenting_partition(partition_id partitionID,
-									   int32 changeCounter, bool *_whileMounted)
+	int32 changeCounter, bool *_whileMounted)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -435,17 +450,17 @@ _user_supports_defragmenting_partition(partition_id partitionID,
 	DeviceReadLocker locker(partition->Device(), true);
 	bool whileMounted;
 	bool result = validate_defragment_partition(partition, changeCounter,
-										        &whileMounted) == B_OK;
+		&whileMounted) == B_OK;
 	if (result && _whileMounted)
 		user_memcpy(_whileMounted, &whileMounted, sizeof(whileMounted));
 	return result;										   
 }
 
+
 // _user_supports_repairing_partition
 bool
 _user_supports_repairing_partition(partition_id partitionID,
-								   int32 changeCounter, bool checkOnly,
-								   bool *_whileMounted)
+	int32 changeCounter, bool checkOnly, bool *_whileMounted)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -457,17 +472,17 @@ _user_supports_repairing_partition(partition_id partitionID,
 	DeviceReadLocker locker(partition->Device(), true);
 	bool whileMounted;
 	bool result = validate_repair_partition(partition, changeCounter, checkOnly,
-									        &whileMounted) == B_OK;
+		&whileMounted) == B_OK;
 	if (result && _whileMounted)
 		user_memcpy(_whileMounted, &whileMounted, sizeof(whileMounted));
 	return result;										   
 }
 
+
 // _user_supports_resizing_partition
 bool
-_user_supports_resizing_partition(partition_id partitionID,
-								  int32 changeCounter, bool *_canResizeContents,
-								  bool *_whileMounted)
+_user_supports_resizing_partition(partition_id partitionID, int32 changeCounter,
+	bool *_canResizeContents, bool *_whileMounted)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 
@@ -523,12 +538,11 @@ _user_supports_resizing_partition(partition_id partitionID,
 	return result;
 }
 
+
 // _user_supports_moving_partition
 bool
 _user_supports_moving_partition(partition_id partitionID, int32 changeCounter,
-								partition_id *_unmovable,
-								partition_id *_needUnmounting,
-								size_t bufferSize)
+	partition_id *_unmovable, partition_id *_needUnmounting, size_t bufferSize)
 {
 	if ((!_unmovable || !_needUnmounting) && bufferSize > 0)
 		return false;
@@ -555,10 +569,10 @@ _user_supports_moving_partition(partition_id partitionID, int32 changeCounter,
 		PartitionRegistrar registrar2(partition->Device(), true);
 		DeviceReadLocker locker(partition->Device(), true);
 		result = check_shadow_partition(partition, changeCounter)
-			     && partition->Parent();
+			&& partition->Parent();
 		if (result) {
 			result = !partition->Parent()->IsBusy()
-			         && !partition->Parent()->IsDescendantBusy();
+				&& !partition->Parent()->IsDescendantBusy();
 		}
 		if (result) {
 			// get the parent disk system
@@ -574,8 +588,7 @@ _user_supports_moving_partition(partition_id partitionID, int32 changeCounter,
 				size_t unmovableSize = bufferSize; 
 				size_t needUnmountingSize = bufferSize; 
 				result = get_unmovable_descendants(partition, unmovable,
-												   unmovableSize, needUnmounting,
-												   needUnmountingSize);
+					unmovableSize, needUnmounting, needUnmountingSize);
 			}
 		}
 	}
@@ -588,10 +601,11 @@ _user_supports_moving_partition(partition_id partitionID, int32 changeCounter,
 	return result;
 }
 
+
 // _user_supports_setting_partition_name
 bool
 _user_supports_setting_partition_name(partition_id partitionID,
-									  int32 changeCounter)
+	int32 changeCounter)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -623,8 +637,7 @@ _user_supports_setting_partition_name(partition_id partitionID,
 // _user_supports_setting_partition_content_name
 bool
 _user_supports_setting_partition_content_name(partition_id partitionID,
-											  int32 changeCounter,
-											  bool *_whileMounted)
+	int32 changeCounter, bool *_whileMounted)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -658,10 +671,11 @@ _user_supports_setting_partition_content_name(partition_id partitionID,
 	return result;
 }
 
+
 // _user_supports_setting_partition_type
 bool
 _user_supports_setting_partition_type(partition_id partitionID,
-									  int32 changeCounter)
+	int32 changeCounter)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -688,10 +702,11 @@ _user_supports_setting_partition_type(partition_id partitionID,
 		B_DISK_SYSTEM_SUPPORTS_SETTING_TYPE);
 }
 
+
 // _user_supports_setting_partition_parameters
 bool
 _user_supports_setting_partition_parameters(partition_id partitionID,
-											int32 changeCounter)
+	int32 changeCounter)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -718,11 +733,11 @@ _user_supports_setting_partition_parameters(partition_id partitionID,
 		B_DISK_SYSTEM_SUPPORTS_SETTING_PARAMETERS);
 }
 
+
 // _user_supports_setting_partition_content_parameters
 bool
 _user_supports_setting_partition_content_parameters(partition_id partitionID,
-													int32 changeCounter,
-													bool *_whileMounted)
+	int32 changeCounter, bool *_whileMounted)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -754,11 +769,11 @@ _user_supports_setting_partition_content_parameters(partition_id partitionID,
 	return result;
 }
 
+
 // _user_supports_initializing_partition
 bool
 _user_supports_initializing_partition(partition_id partitionID,
-									  int32 changeCounter,
-									  const char *_diskSystemName)
+	int32 changeCounter, const char *_diskSystemName)
 {
 	if (!_diskSystemName)
 		return false;
@@ -806,10 +821,11 @@ _user_supports_initializing_partition(partition_id partitionID,
 		diskSystemName);
 }
 
+
 // _user_supports_creating_child_partition
 bool
 _user_supports_creating_child_partition(partition_id partitionID,
-										int32 changeCounter)
+	int32 changeCounter)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -832,10 +848,11 @@ _user_supports_creating_child_partition(partition_id partitionID,
 		B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD);
 }
 
+
 // _user_supports_deleting_child_partition
 bool
 _user_supports_deleting_child_partition(partition_id partitionID,
-										int32 changeCounter)
+	int32 changeCounter)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -848,10 +865,11 @@ _user_supports_deleting_child_partition(partition_id partitionID,
 	return (validate_delete_child_partition(partition, changeCounter) == B_OK);
 }
 
+
 // _user_is_sub_disk_system_for
 bool
 _user_is_sub_disk_system_for(disk_system_id diskSystemID,
-							 partition_id partitionID, int32 changeCounter)
+	partition_id partitionID, int32 changeCounter)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -871,10 +889,11 @@ _user_is_sub_disk_system_for(disk_system_id diskSystemID,
 	return diskSystem->IsSubSystemFor(partition);
 }
 
+
 // _user_validate_resize_partition
 status_t
 _user_validate_resize_partition(partition_id partitionID, int32 changeCounter,
-								off_t *_size)
+	off_t *_size)
 {
 	if (!_size)
 		return B_BAD_VALUE;
@@ -890,16 +909,17 @@ _user_validate_resize_partition(partition_id partitionID, int32 changeCounter,
 	DeviceReadLocker locker(partition->Device(), true);
 	off_t contentSize = 0;
 	bool result = validate_resize_partition(partition, changeCounter, &size,
-											&contentSize);
+		&contentSize);
 	if (result)
 		user_memcpy(_size, &size, sizeof(size));
 	return result;								        
 }
 
+
 // _user_validate_move_partition
 status_t
 _user_validate_move_partition(partition_id partitionID, int32 changeCounter,
-							  off_t *_newOffset)
+	off_t *_newOffset)
 {
 	if (!_newOffset)
 		return B_BAD_VALUE;
@@ -913,16 +933,18 @@ _user_validate_move_partition(partition_id partitionID, int32 changeCounter,
 	PartitionRegistrar registrar1(partition, true);
 	PartitionRegistrar registrar2(partition->Device(), true);
 	DeviceReadLocker locker(partition->Device(), true);
-	status_t result = validate_move_partition(partition, changeCounter, &newOffset);
+	status_t result = validate_move_partition(partition, changeCounter,
+		&newOffset);
 	if (result)
 		user_memcpy(_newOffset, &newOffset, sizeof(newOffset));
 	return result;
 }
 
+
 // _user_validate_set_partition_name
 status_t
 _user_validate_set_partition_name(partition_id partitionID,
-								  int32 changeCounter, char *_name)
+	int32 changeCounter, char *_name)
 {
 	if (!_name)
 		return B_BAD_VALUE;
@@ -943,6 +965,7 @@ _user_validate_set_partition_name(partition_id partitionID,
 		error = ddm_strlcpy(_name, name, B_DISK_DEVICE_NAME_LENGTH);
 	return error;
 }
+
 
 // _user_validate_set_partition_content_name
 status_t
@@ -969,10 +992,11 @@ _user_validate_set_partition_content_name(partition_id partitionID,
 	return error;
 }
 
+
 // _user_validate_set_partition_type
 status_t
 _user_validate_set_partition_type(partition_id partitionID,
-								  int32 changeCounter, const char *_type)
+	int32 changeCounter, const char *_type)
 {
 	if (!_type)
 		return B_BAD_VALUE;
@@ -991,20 +1015,22 @@ _user_validate_set_partition_type(partition_id partitionID,
 	return validate_set_partition_type(partition, changeCounter, type);
 }
 
+
 // _user_validate_initialize_partition
 status_t
 _user_validate_initialize_partition(partition_id partitionID,
-									int32 changeCounter,
-									const char *_diskSystemName, char *_name,
-									const char *_parameters,
-									size_t parametersSize)
+	int32 changeCounter, const char *_diskSystemName, char *_name,
+	const char *_parameters, size_t parametersSize)
 {
-	if (!_diskSystemName || !_name || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE)
+	if (!_diskSystemName || !_name
+		|| parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE) {
 		return B_BAD_VALUE;
+	}
 	char diskSystemName[B_DISK_SYSTEM_NAME_LENGTH];
 	char name[B_DISK_DEVICE_NAME_LENGTH];
 	char *parameters = NULL;
-	status_t error = ddm_strlcpy(diskSystemName, _diskSystemName, B_DISK_SYSTEM_NAME_LENGTH);
+	status_t error = ddm_strlcpy(diskSystemName, _diskSystemName,
+		B_DISK_SYSTEM_NAME_LENGTH);
 	if (!error) 
 		error = ddm_strlcpy(name, _name, B_DISK_DEVICE_NAME_LENGTH, true);
 	if (error)
@@ -1019,13 +1045,13 @@ _user_validate_initialize_partition(partition_id partitionID,
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->ReadLockPartition(partitionID);
-	error = partition ? B_OK : B_ENTRY_NOT_FOUND;
+	error = partition ? (status_t)B_OK : (status_t)B_ENTRY_NOT_FOUND;
 	if (!error) {
 		PartitionRegistrar registrar1(partition, true);
 		PartitionRegistrar registrar2(partition->Device(), true);
 		DeviceReadLocker locker(partition->Device(), true);
 		error = validate_initialize_partition(partition, changeCounter,
-											  diskSystemName, name, parameters);
+			diskSystemName, name, parameters);
 	}
 	if (!error) 
 		error = ddm_strlcpy(_name, name, B_DISK_DEVICE_NAME_LENGTH);
@@ -1033,17 +1059,15 @@ _user_validate_initialize_partition(partition_id partitionID,
 	return error;
 }
 
+
 // _user_validate_create_child_partition
 status_t
 _user_validate_create_child_partition(partition_id partitionID,
-									  int32 changeCounter, off_t *_offset,
-									  off_t *_size, const char *_type,
-									  const char *_parameters,
-									  size_t parametersSize)
+	int32 changeCounter, off_t *_offset, off_t *_size, const char *_type,
+	const char *_parameters, size_t parametersSize)
 {
 	if (!_offset || !_size || !_type
-	    || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE)
-	{
+	    || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE) {
 		return B_BAD_VALUE;
 	}
 	off_t offset;
@@ -1065,13 +1089,13 @@ _user_validate_create_child_partition(partition_id partitionID,
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->ReadLockPartition(partitionID);
-	error = partition ? B_OK : B_ENTRY_NOT_FOUND;
+	error = partition ? (status_t)B_OK : (status_t)B_ENTRY_NOT_FOUND;
 	if (!error) {
 		PartitionRegistrar registrar1(partition, true);
 		PartitionRegistrar registrar2(partition->Device(), true);
 		DeviceReadLocker locker(partition->Device(), true);
-		error = validate_create_child_partition(partition, changeCounter, &offset,
-											    &size, type, parameters);
+		error = validate_create_child_partition(partition, changeCounter,
+			&offset, &size, type, parameters);
 	}
 	if (!error) {
 		user_memcpy(_offset, &offset, sizeof(offset));
@@ -1081,11 +1105,11 @@ _user_validate_create_child_partition(partition_id partitionID,
 	return error;
 }
 
+
 // _user_get_next_supported_partition_type
 status_t
 _user_get_next_supported_partition_type(partition_id partitionID,
-										int32 changeCounter, int32 *_cookie,
-										char *_type)
+	int32 changeCounter, int32 *_cookie, char *_type)
 {
 	if (!_cookie || !_type)
 		return B_BAD_VALUE;
@@ -1094,20 +1118,22 @@ _user_get_next_supported_partition_type(partition_id partitionID,
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->ReadLockPartition(partitionID);
-	status_t error = partition ? B_OK : B_ENTRY_NOT_FOUND;
+	status_t error = partition ? (status_t)B_OK : (status_t)B_ENTRY_NOT_FOUND;
 	if (!error) {
 		PartitionRegistrar registrar1(partition, true);
 		PartitionRegistrar registrar2(partition->Device(), true);
 		DeviceReadLocker locker(partition->Device(), true);
-		error = check_shadow_partition(partition, changeCounter) ? B_OK : B_BAD_VALUE;
+		error = check_shadow_partition(partition, changeCounter)
+			? B_OK : B_BAD_VALUE;
 		if (!error) {
 			// get the disk system
 			KDiskSystem *diskSystem = partition->DiskSystem();
-			error = diskSystem ? B_OK : B_ENTRY_NOT_FOUND;
+			error = diskSystem ? (status_t)B_OK : (status_t)B_ENTRY_NOT_FOUND;
 			if (!error) {
 				// get the info
 				char type[B_DISK_DEVICE_TYPE_LENGTH];
-				error = diskSystem->GetNextSupportedType(partition, &cookie, type);
+				error = diskSystem->GetNextSupportedType(partition, &cookie,
+					type);
 				if (!error) {
 					error = ddm_strlcpy(_type, type, B_DISK_DEVICE_TYPE_LENGTH);
 				}
@@ -1119,15 +1145,17 @@ _user_get_next_supported_partition_type(partition_id partitionID,
 	return error;
 }
 
+
 // _user_get_partition_type_for_content_type
 status_t
 _user_get_partition_type_for_content_type(disk_system_id diskSystemID,
-										  const char *_contentType, char *_type)
+	const char *_contentType, char *_type)
 {
 	if (!_contentType || !_type)
 		return B_BAD_VALUE;
 	char contentType[B_DISK_DEVICE_TYPE_LENGTH];
-	status_t error = ddm_strlcpy(contentType, _contentType, B_DISK_DEVICE_TYPE_LENGTH);
+	status_t error = ddm_strlcpy(contentType, _contentType,
+			B_DISK_DEVICE_TYPE_LENGTH);
 	if (error)
 		return error;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
@@ -1138,11 +1166,11 @@ _user_get_partition_type_for_content_type(disk_system_id diskSystemID,
 	DiskSystemLoader loader(diskSystem, true);
 	// get the info
 	char type[B_DISK_DEVICE_TYPE_LENGTH];
-	if (diskSystem->GetTypeForContentType(contentType, type)) {
+	if (diskSystem->GetTypeForContentType(contentType, type))
 		return ddm_strlcpy(_type, type, B_DISK_DEVICE_TYPE_LENGTH);
-	}
 	return B_ERROR;
 }
+
 
 // _user_prepare_disk_device_modifications
 status_t
@@ -1165,7 +1193,7 @@ _user_prepare_disk_device_modifications(partition_id deviceID)
 // _user_commit_disk_device_modifications
 status_t
 _user_commit_disk_device_modifications(partition_id deviceID, port_id port,
-									   int32 token, bool completeProgress)
+	int32 token, bool completeProgress)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the device
@@ -1195,6 +1223,7 @@ _user_commit_disk_device_modifications(partition_id deviceID, port_id port,
 	return B_ENTRY_NOT_FOUND;
 }
 
+
 // _user_cancel_disk_device_modifications
 status_t
 _user_cancel_disk_device_modifications(partition_id deviceID)
@@ -1213,6 +1242,7 @@ _user_cancel_disk_device_modifications(partition_id deviceID)
 	return B_ENTRY_NOT_FOUND;
 }
 
+
 // _user_is_disk_device_modified
 bool
 _user_is_disk_device_modified(partition_id deviceID)
@@ -1224,12 +1254,13 @@ _user_is_disk_device_modified(partition_id deviceID)
 		if (DeviceReadLocker locker = device) {
 			// check whether there's a shadow device and whether it's changed
 			return (device->ShadowOwner() == get_current_team()
-					&& device->ShadowPartition()
-					&& device->ShadowPartition()->ChangeFlags() != 0);
+				&& device->ShadowPartition()
+				&& device->ShadowPartition()->ChangeFlags() != 0);
 		}
 	}
 	return B_ENTRY_NOT_FOUND;
 }
+
 
 // _user_defragment_partition
 status_t
@@ -1252,10 +1283,11 @@ _user_defragment_partition(partition_id partitionID, int32 changeCounter)
 	return B_OK;
 }
 
+
 // _user_repair_partition
 status_t
 _user_repair_partition(partition_id partitionID, int32 changeCounter,
-					   bool checkOnly)
+	bool checkOnly)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -1267,7 +1299,7 @@ _user_repair_partition(partition_id partitionID, int32 changeCounter,
 	DeviceWriteLocker locker(partition->Device(), true);
 	// check whether the disk system supports defragmenting
 	status_t error = validate_repair_partition(partition, changeCounter,
-											   checkOnly);
+		checkOnly);
 	if (error != B_OK)
 		return error;
 	// set the respective flag
@@ -1278,10 +1310,11 @@ _user_repair_partition(partition_id partitionID, int32 changeCounter,
 	return B_OK;
 }
 
+
 // _user_resize_partition
 status_t
 _user_resize_partition(partition_id partitionID, int32 changeCounter,
-					   off_t size)
+	off_t size)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -1297,7 +1330,7 @@ _user_resize_partition(partition_id partitionID, int32 changeCounter,
 	off_t proposedSize = size;
 	off_t contentSize = 0;
 	status_t error = validate_resize_partition(partition, changeCounter,
-											   &proposedSize, &contentSize);
+		&proposedSize, &contentSize);
 	if (error != B_OK)
 		return error;
 	if (proposedSize != size)
@@ -1318,10 +1351,11 @@ _user_resize_partition(partition_id partitionID, int32 changeCounter,
 	return error;
 }
 
+
 // _user_move_partition
 status_t
 _user_move_partition(partition_id partitionID, int32 changeCounter,
-					 off_t newOffset)
+	off_t newOffset)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -1336,7 +1370,7 @@ _user_move_partition(partition_id partitionID, int32 changeCounter,
 		return B_OK;
 	off_t proposedOffset = newOffset;
 	status_t error = validate_move_partition(partition, changeCounter,
-											 &proposedOffset, true);
+		&proposedOffset, true);
 	if (error != B_OK)
 		return error;
 	if (proposedOffset != newOffset)
@@ -1354,10 +1388,11 @@ _user_move_partition(partition_id partitionID, int32 changeCounter,
 	return move_descendants_contents(partition);
 }
 
+
 // _user_set_partition_name
 status_t
 _user_set_partition_name(partition_id partitionID, int32 changeCounter,
-						 const char *_name)
+	const char *_name)
 {
 	if (!_name)
 		return B_BAD_VALUE;
@@ -1376,8 +1411,7 @@ _user_set_partition_name(partition_id partitionID, int32 changeCounter,
 	// check name
 	char proposedName[B_DISK_DEVICE_NAME_LENGTH];
 	strcpy(proposedName, name);
-	error = validate_set_partition_name(partition, changeCounter,
-												 proposedName);
+	error = validate_set_partition_name(partition, changeCounter, proposedName);
 	if (error != B_OK)
 		return error;
 	if (strcmp(name, proposedName))
@@ -1392,10 +1426,11 @@ _user_set_partition_name(partition_id partitionID, int32 changeCounter,
 		partition, B_PARTITION_SET_NAME);
 }
 
+
 // _user_set_partition_content_name
 status_t
 _user_set_partition_content_name(partition_id partitionID, int32 changeCounter,
-								 const char *_name)
+	const char *_name)
 {
 	if (!_name)
 		return B_BAD_VALUE;
@@ -1430,10 +1465,11 @@ _user_set_partition_content_name(partition_id partitionID, int32 changeCounter,
 		partition, B_PARTITION_SET_CONTENT_NAME);
 }
 
+
 // _user_set_partition_type
 status_t
 _user_set_partition_type(partition_id partitionID, int32 changeCounter,
-						 const char *_type)
+	const char *_type)
 {
 	if (!_type)
 		return B_BAD_VALUE;
@@ -1450,8 +1486,7 @@ _user_set_partition_type(partition_id partitionID, int32 changeCounter,
 	PartitionRegistrar registrar2(partition->Device(), true);
 	DeviceWriteLocker locker(partition->Device(), true);
 	// check type
-	error = validate_set_partition_type(partition, changeCounter,
-									    type);
+	error = validate_set_partition_type(partition, changeCounter, type);
 	if (error != B_OK)
 		return error;
 	// set type
@@ -1464,10 +1499,11 @@ _user_set_partition_type(partition_id partitionID, int32 changeCounter,
 		partition, B_PARTITION_SET_TYPE);
 }
 
+
 // _user_set_partition_parameters
 status_t
 _user_set_partition_parameters(partition_id partitionID, int32 changeCounter,
-							   const char *_parameters, size_t parametersSize)
+	const char *_parameters, size_t parametersSize)
 {
 	if (!_parameters || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE)
 		return B_BAD_VALUE;
@@ -1482,7 +1518,7 @@ _user_set_partition_parameters(partition_id partitionID, int32 changeCounter,
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->WriteLockPartition(partitionID);
-	status_t error = partition ? B_OK : B_ENTRY_NOT_FOUND;
+	status_t error = partition ? (status_t)B_OK : (status_t)B_ENTRY_NOT_FOUND;
 	if (!error) {
 		PartitionRegistrar registrar1(partition, true);
 		PartitionRegistrar registrar2(partition->Device(), true);
@@ -1496,8 +1532,9 @@ _user_set_partition_parameters(partition_id partitionID, int32 changeCounter,
 			if (!error) {
 				partition->Changed(B_PARTITION_CHANGED_PARAMETERS);
 				// implicit partitioning system changes
-				error = partition->Parent()->DiskSystem()->ShadowPartitionChanged(
-					partition, B_PARTITION_SET_PARAMETERS);
+				error = partition->Parent()->DiskSystem()
+					->ShadowPartitionChanged(partition,
+						B_PARTITION_SET_PARAMETERS);
 			}
 		}
 	}
@@ -1505,12 +1542,11 @@ _user_set_partition_parameters(partition_id partitionID, int32 changeCounter,
 	return error;
 }
 
+
 // _user_set_partition_content_parameters
 status_t
 _user_set_partition_content_parameters(partition_id partitionID,
-									   int32 changeCounter,
-									   const char *_parameters,
-									   size_t parametersSize)
+	int32 changeCounter, const char *_parameters, size_t parametersSize)
 {
 	if (!_parameters || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE)
 		return B_BAD_VALUE;
@@ -1525,7 +1561,7 @@ _user_set_partition_content_parameters(partition_id partitionID,
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->WriteLockPartition(partitionID);
-	status_t error = partition ? B_OK : B_ENTRY_NOT_FOUND;
+	status_t error = partition ? (status_t)B_OK : (status_t)B_ENTRY_NOT_FOUND;
 	if (!error) {
 		PartitionRegistrar registrar1(partition, true);
 		PartitionRegistrar registrar2(partition->Device(), true);
@@ -1548,18 +1584,22 @@ _user_set_partition_content_parameters(partition_id partitionID,
 	return error;
 }
 
+
 // _user_initialize_partition
 status_t
 _user_initialize_partition(partition_id partitionID, int32 changeCounter,
-						   const char *_diskSystemName, const char *_name,
-						   const char *_parameters, size_t parametersSize)
+	const char *_diskSystemName, const char *_name, const char *_parameters,
+	size_t parametersSize)
 {
-	if (!_diskSystemName || !_name || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE)
+	if (!_diskSystemName || !_name
+		|| parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE) {
 		return B_BAD_VALUE;
+	}
 	char diskSystemName[B_DISK_SYSTEM_NAME_LENGTH];
 	char name[B_DISK_DEVICE_NAME_LENGTH];
 	char *parameters = NULL;
-	status_t error = ddm_strlcpy(diskSystemName, _diskSystemName, B_DISK_SYSTEM_NAME_LENGTH);
+	status_t error = ddm_strlcpy(diskSystemName, _diskSystemName,
+		B_DISK_SYSTEM_NAME_LENGTH);
 	if (!error)
 		error = ddm_strlcpy(name, _name, B_DISK_DEVICE_NAME_LENGTH);
 	if (error)
@@ -1574,14 +1614,14 @@ _user_initialize_partition(partition_id partitionID, int32 changeCounter,
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->WriteLockPartition(partitionID);
-	error = partition ? B_OK : B_ENTRY_NOT_FOUND;
+	error = partition ? (status_t)B_OK : (status_t)B_ENTRY_NOT_FOUND;
 	if (!error) {
 		PartitionRegistrar registrar1(partition, true);
 		PartitionRegistrar registrar2(partition->Device(), true);
 		DeviceWriteLocker locker(partition->Device(), true);
 		// get the disk system
 		KDiskSystem *diskSystem = manager->LoadDiskSystem(diskSystemName);
-		error = diskSystem ? B_OK : B_ENTRY_NOT_FOUND;
+		error = diskSystem ? (status_t)B_OK : (status_t)B_ENTRY_NOT_FOUND;
 		if (!error) {
 			DiskSystemLoader loader(diskSystem, true);
 			// check parameters
@@ -1593,7 +1633,8 @@ _user_initialize_partition(partition_id partitionID, int32 changeCounter,
 				error = !strcmp(name, proposedName) ? B_OK : B_BAD_VALUE;
 			}
 			if (!error) {
-				// unitialize the partition's contents and set the new parameters
+				// unitialize the partition's contents and set the new
+				// parameters
 				error = partition->UninitializeContents(true);
 			}
 			if (!error) {
@@ -1617,6 +1658,7 @@ _user_initialize_partition(partition_id partitionID, int32 changeCounter,
 	return error;
 }
 
+
 // _user_uninitialize_partition
 status_t
 _user_uninitialize_partition(partition_id partitionID, int32 changeCounter)
@@ -1633,12 +1675,12 @@ _user_uninitialize_partition(partition_id partitionID, int32 changeCounter)
 	return partition->UninitializeContents(true);
 }
 
+
 // _user_create_child_partition
 status_t
 _user_create_child_partition(partition_id partitionID, int32 changeCounter,
-							 off_t offset, off_t size, const char *_type,
-							 const char *_parameters, size_t parametersSize,
-							 partition_id *_childID)
+	off_t offset, off_t size, const char *_type, const char *_parameters,
+	size_t parametersSize, partition_id *_childID)
 {
 	if (!_type || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE)
 		return B_BAD_VALUE;
@@ -1657,7 +1699,7 @@ _user_create_child_partition(partition_id partitionID, int32 changeCounter,
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->WriteLockPartition(partitionID);
-	error = partition ? B_OK : B_ENTRY_NOT_FOUND;
+	error = partition ? (status_t)B_OK : (status_t)B_ENTRY_NOT_FOUND;
 	if (!error) {
 		PartitionRegistrar registrar1(partition, true);
 		PartitionRegistrar registrar2(partition->Device(), true);
@@ -1701,6 +1743,7 @@ _user_create_child_partition(partition_id partitionID, int32 changeCounter,
 	return error;
 }
 
+
 // _user_delete_partition
 status_t
 _user_delete_partition(partition_id partitionID, int32 changeCounter)
@@ -1725,10 +1768,11 @@ _user_delete_partition(partition_id partitionID, int32 changeCounter)
 	return B_OK;
 }
 
+
 // _user_get_next_disk_device_job_info
 status_t
 _user_get_next_disk_device_job_info(int32 *_cookie,
-									user_disk_device_job_info *_info)
+	user_disk_device_job_info *_info)
 {
 	if (!_cookie || !_info)
 		return B_BAD_VALUE;
@@ -1761,6 +1805,7 @@ _user_get_next_disk_device_job_info(int32 *_cookie,
 	return error;
 }
 
+
 // _user_get_disk_device_job_info
 status_t
 _user_get_disk_device_job_info(disk_job_id id, user_disk_device_job_info *_info)
@@ -1780,10 +1825,11 @@ _user_get_disk_device_job_info(disk_job_id id, user_disk_device_job_info *_info)
 	return error;
 }
 
+
 // _user_get_disk_device_job_status
 status_t
 _user_get_disk_device_job_progress_info(disk_job_id id,
-										disk_device_job_progress_info *_info)
+	disk_device_job_progress_info *_info)
 {
 	if (!_info)
 		return B_BAD_VALUE;
@@ -1799,6 +1845,7 @@ _user_get_disk_device_job_progress_info(disk_job_id id,
 		user_memcpy(_info, &info, sizeof(info));
 	return error;
 }
+
 
 // _user_pause_disk_device_job
 status_t
@@ -1818,6 +1865,7 @@ _user_pause_disk_device_job(disk_job_id id)
 	}
 	return B_ENTRY_NOT_FOUND;
 }
+
 
 // _user_cancel_disk_device_job
 status_t
