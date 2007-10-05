@@ -310,7 +310,7 @@ test_executable(const char *name, uid_t user, gid_t group, char *invoker)
 		// test for shell scripts
 		if (!strncmp(buffer, "#!", 2)) {
 			char *end;
-			buffer[length - 1] = '\0';
+			buffer[min_c((size_t)length, sizeof(buffer) - 1)] = '\0';
 
 			end = strchr(buffer, '\n');
 			if (end == NULL) {
