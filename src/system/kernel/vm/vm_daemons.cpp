@@ -46,7 +46,8 @@ PageCacheLocker::_IgnorePage(vm_page* page)
 {
 	if (page->state == PAGE_STATE_WIRED || page->state == PAGE_STATE_BUSY
 		|| page->state == PAGE_STATE_FREE || page->state == PAGE_STATE_CLEAR
-		|| page->state == PAGE_STATE_UNUSED || page->cache == NULL)
+		|| page->state == PAGE_STATE_UNUSED || page->wired_count > 0
+		|| page->cache == NULL)
 		return true;
 
 	return false;
