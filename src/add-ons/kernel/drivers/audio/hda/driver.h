@@ -8,7 +8,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#ifdef COMPILE_FOR_R5
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
 	#define DEVFS_PATH_FORMAT	"audio/multi/hda/%lu"
 	#include <multi_audio.h>
 #else

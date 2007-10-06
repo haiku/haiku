@@ -463,7 +463,7 @@ random_select(void *cookie, uint8 event, uint32 ref, selectsync *sync)
 
 	if (event == B_SELECT_READ) {
 		/* tell there is already data to read */
-#ifdef COMPILE_FOR_R5
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
 		notify_select_event(sync, ref);
 #else
 		notify_select_event(sync, event);
