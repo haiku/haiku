@@ -1193,20 +1193,19 @@ load_kernel_add_on(const char *path)
 	struct Elf32_Ehdr *elfHeader;
 	struct elf_image_info *image;
 	const char *fileName;
-	void *vnode = NULL;
 	void *reservedAddress;
 	addr_t start;
 	size_t reservedSize;
 	status_t status;
-	int fd;
 	ssize_t length;
 
 	TRACE(("elf_load_kspace: entry path '%s'\n", path));
 
-	fd = _kern_open(-1, path, O_RDONLY, 0);
+	int fd = _kern_open(-1, path, O_RDONLY, 0);
 	if (fd < 0)
 		return fd;
 
+	struct vnode *vnode;
 	status = vfs_get_vnode_from_fd(fd, true, &vnode);
 	if (status < B_OK)
 		goto error0;

@@ -1812,11 +1812,6 @@ _vm_map_file(team_id team, const char *name, void **_address, uint32 addressSpec
 	size_t size, uint32 protection, uint32 mapping, const char *path,
 	off_t offset, bool kernel)
 {
-	vm_cache *cache;
-	vm_area *area;
-	void *vnode;
-	status_t status;
-
 	// ToDo: maybe attach to an FD, not a path (or both, like VFS calls)
 	// ToDo: check file access permissions (would be already done if the above were true)
 	// ToDo: for binary files, we want to make sure that they get the
@@ -1830,7 +1825,8 @@ _vm_map_file(team_id team, const char *name, void **_address, uint32 addressSpec
 	size = PAGE_ALIGN(size);
 
 	// get the vnode for the object, this also grabs a ref to it
-	status = vfs_get_vnode_from_path(path, kernel, &vnode);
+	struct vnode *vnode;
+	status_t status = vfs_get_vnode_from_path(path, kernel, &vnode);
 	if (status < B_OK)
 		return status;
 
@@ -1841,6 +1837,7 @@ _vm_map_file(team_id team, const char *name, void **_address, uint32 addressSpec
 	}
 
 	// ToDo: this only works for file systems that use the file cache
+	vm_cache *cache;
 	status = vfs_get_vnode_cache(vnode, &cache, false);
 	if (status < B_OK) {
 		vfs_put_vnode(vnode);
@@ -1849,6 +1846,7 @@ _vm_map_file(team_id team, const char *name, void **_address, uint32 addressSpec
 
 	mutex_lock(&cache->lock);
 
+	vm_area *area;
 	status = map_backing_store(locker.AddressSpace(), cache, _address,
 		offset, size, addressSpec, 0, protection, mapping, &area, name);
 

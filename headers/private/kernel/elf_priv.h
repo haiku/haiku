@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2007, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -25,7 +25,7 @@ struct elf_image_info {
 	char		*name;
 	image_id	id;
 	int32		ref_count;
-	void		*vnode;
+	struct vnode *vnode;
 	elf_region	text_region;
 	elf_region	data_region;
 	addr_t		dynamic_section;		// pointer to the dynamic section

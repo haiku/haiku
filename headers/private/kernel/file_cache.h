@@ -26,10 +26,10 @@
 struct cache_module_info {
 	module_info	info;
 
-	void (*node_opened)(void *vnode, int32 fdType, dev_t mountID, ino_t parentID,
-				ino_t vnodeID, const char *name, off_t size);
-	void (*node_closed)(void *vnode, int32 fdType, dev_t mountID, ino_t vnodeID,
-				int32 accessType);
+	void (*node_opened)(struct vnode *vnode, int32 fdType, dev_t mountID,
+				ino_t parentID, ino_t vnodeID, const char *name, off_t size);
+	void (*node_closed)(struct vnode *vnode, int32 fdType, dev_t mountID,
+				ino_t vnodeID, int32 accessType);
 	void (*node_launched)(size_t argCount, char * const *args);
 };
 
@@ -37,12 +37,12 @@ struct cache_module_info {
 extern "C" {
 #endif
 
-extern void cache_node_opened(void *vnode, int32 fdType, vm_cache *cache,
+extern void cache_node_opened(struct vnode *vnode, int32 fdType, vm_cache *cache,
 				dev_t mountID, ino_t parentID, ino_t vnodeID, const char *name);
-extern void cache_node_closed(void *vnode, int32 fdType, vm_cache *cache,
+extern void cache_node_closed(struct vnode *vnode, int32 fdType, vm_cache *cache,
 				dev_t mountID, ino_t vnodeID);
 extern void cache_node_launched(size_t argCount, char * const *args);
-extern void cache_prefetch_vnode(void *vnode, off_t offset, size_t size);
+extern void cache_prefetch_vnode(struct vnode *vnode, off_t offset, size_t size);
 extern void cache_prefetch(dev_t mountID, ino_t vnodeID, off_t offset, size_t size);
 extern status_t file_cache_init_post_boot_device(void);
 extern status_t file_cache_init(void);

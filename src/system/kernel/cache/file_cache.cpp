@@ -62,8 +62,8 @@ struct file_map {
 
 struct file_cache_ref {
 	vm_cache		*cache;
-	void			*vnode;
-	void			*device;
+	struct vnode	*vnode;
+	struct vnode	*device;
 	void			*cookie;
 	file_map		map;
 };
@@ -1063,7 +1063,7 @@ file_cache_control(const char *subsystem, uint32 function, void *buffer,
 
 
 extern "C" void
-cache_prefetch_vnode(void *vnode, off_t offset, size_t size)
+cache_prefetch_vnode(struct vnode *vnode, off_t offset, size_t size)
 {
 	vm_cache *cache;
 	if (vfs_get_vnode_cache(vnode, &cache, false) != B_OK)
@@ -1137,13 +1137,12 @@ out:
 extern "C" void
 cache_prefetch(dev_t mountID, ino_t vnodeID, off_t offset, size_t size)
 {
-	void *vnode;
-
 	// ToDo: schedule prefetch
 
 	TRACE(("cache_prefetch(vnode %ld:%Ld)\n", mountID, vnodeID));
 
 	// get the vnode for the object, this also grabs a ref to it
+	struct vnode *vnode;
 	if (vfs_get_vnode(mountID, vnodeID, &vnode) != B_OK)
 		return;
 
@@ -1153,8 +1152,8 @@ cache_prefetch(dev_t mountID, ino_t vnodeID, off_t offset, size_t size)
 
 
 extern "C" void
-cache_node_opened(void *vnode, int32 fdType, vm_cache *cache, dev_t mountID,
-	ino_t parentID, ino_t vnodeID, const char *name)
+cache_node_opened(struct vnode *vnode, int32 fdType, vm_cache *cache,
+	dev_t mountID, ino_t parentID, ino_t vnodeID, const char *name)
 {
 	if (sCacheModule == NULL || sCacheModule->node_opened == NULL)
 		return;
@@ -1173,7 +1172,7 @@ cache_node_opened(void *vnode, int32 fdType, vm_cache *cache, dev_t mountID,
 
 
 extern "C" void
-cache_node_closed(void *vnode, int32 fdType, vm_cache *cache,
+cache_node_closed(struct vnode *vnode, int32 fdType, vm_cache *cache,
 	dev_t mountID, ino_t vnodeID)
 {
 	if (sCacheModule == NULL || sCacheModule->node_closed == NULL)
