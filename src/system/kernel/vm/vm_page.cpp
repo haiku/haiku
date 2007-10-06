@@ -760,7 +760,7 @@ page_thief(void* /*unused*/)
 		//dprintf("page thief running - target %ld...\n", steal);
 
 		vm_page* page = NULL;
-		bool stealActive = false;
+		bool stealActive = false, desperate = false;
 		InterruptsSpinLocker locker(sPageLock);
 
 		while (steal > 0) {
@@ -790,9 +790,10 @@ page_thief(void* /*unused*/)
 						break;
 
 					// when memory is really low, we really want pages
-					if (stealActive)
+					if (stealActive) {
 						score = 127;
-					else {
+						desperate = true;
+					} else {
 						stealActive = true;
 						score = 5;
 						steal = 5;
@@ -841,13 +842,11 @@ page_thief(void* /*unused*/)
 			if (!cacheLocker.IsLocked())
 				continue;
 
-			if (page->state != PAGE_STATE_INACTIVE) {
-				// TODO: if this is an active page (as in stealActive), we need
-				// to unmap it and check if it's modified in an atomic operation.
-				// For now, we'll just ignore it, even though this might let
-				// vm_page_allocate_page() wait forever...
+			// check again if that page is still a candidate
+			if (page->state != PAGE_STATE_INACTIVE
+				&& (!stealActive || page->state != PAGE_STATE_ACTIVE
+					|| page->wired_count != 0))
 				continue;
-			}
 
 			// recheck eventual last minute changes
 			uint32 flags;
@@ -856,7 +855,7 @@ page_thief(void* /*unused*/)
 				// page was modified, don't steal it
 				vm_page_set_state(page, PAGE_STATE_MODIFIED);
 				continue;
-			} else if ((flags & PAGE_ACCESSED) != 0) {
+			} else if ((flags & PAGE_ACCESSED) != 0 && !desperate) {
 				// page is in active use, don't steal it
 				vm_page_set_state(page, PAGE_STATE_ACTIVE);
 				continue;
