@@ -73,6 +73,10 @@ struct heap_page {
 	uint16	in_use : 1;
 } PACKED;
 
+// used for bin==bin_count allocations
+#define allocation_id free_count
+
+static vint32 current_alloc_id = 0;
 static struct heap_page *heap_alloc_table;
 static addr_t heap_base_ptr;
 static addr_t heap_base;
@@ -367,6 +371,13 @@ heap_init_post_thread(kernel_args *args)
 }
 
 
+static inline int32
+next_alloc_id(void)
+{
+	return atomic_add(&current_alloc_id, 1) & ((1<<(9-1))-1);
+}
+
+
 static char *
 raw_alloc(unsigned int size, int bin_index)
 {
@@ -451,9 +462,37 @@ memalign(size_t alignment, size_t size)
 			break;
 
 	if (bin_index == bin_count) {
-		address = raw_alloc(size, bin_index);
-		dprintf("heap: allocated big chunk (%ld bytes), it will never be freed!\n",
-			size);
+		int32 alloc_id;
+		alloc_id = next_alloc_id();
+
+		// try to find freed blocks first...
+		if (size < (heap_base_ptr - heap_base) / 10) { // but don't try too hard
+			int first = -1;
+			page = heap_alloc_table;
+			for (i = 0; i < (heap_base_ptr-heap_base)/B_PAGE_SIZE; i++) {
+				if (page[i].in_use) {
+					first = -1;
+					continue;
+				}
+				if (first > 0) {
+					if ((1 + i - first)*B_PAGE_SIZE > size)
+						break;
+				}
+				first = i;
+			}
+			if (first > -1)
+				address = (void *)(heap_base + first * B_PAGE_SIZE);
+				
+		}
+		if (address == NULL)
+			address = raw_alloc(size, bin_index);
+		page = &heap_alloc_table[((unsigned int)address - heap_base) / B_PAGE_SIZE];
+		for (i = 0; i < (size+B_PAGE_SIZE-1)/B_PAGE_SIZE; i++) {
+			page[i].in_use = 1;
+			page[i].cleaning = 0;
+			page[i].bin_index = bin_count;
+			page[i].allocation_id = alloc_id;
+		}
 	} else {
 		if (bins[bin_index].free_list != NULL) {
 			address = bins[bin_index].free_list;
@@ -600,6 +639,21 @@ free(void *address)
 		// TODO: since the heap must be replaced anyway, we don't
 		//	free this allocation anymore... (tracking them would
 		//	require some extra stuff)
+
+		for (i = 1; i <= (heap_base_ptr-heap_base)/B_PAGE_SIZE; i++) {
+			if (!page[i].in_use)
+				break;
+			if (page[i].bin_index != bin_count)
+				break;
+			if (page[i].allocation_id != page[0].allocation_id)
+				break;
+			page[i].in_use = 0;
+			page[i].cleaning = 0;
+			page[i].allocation_id = 0;
+		}
+		page[0].in_use = 0;
+		page[0].cleaning = 0;
+		page[0].allocation_id = 0;
 	}
 
 	mutex_unlock(&heap_lock);
@@ -644,11 +698,25 @@ realloc(void *address, size_t newSize)
 
 		TRACE(("realloc(): page %p: bin_index %d, free_count %d\n", page, page->bin_index, page->free_count));
 
-		if (page[0].bin_index >= bin_count)
+		if (page[0].bin_index > bin_count)
 			panic("realloc(): page %p: invalid bin_index %d\n", page, page->bin_index);
 
-		maxSize = bins[page[0].bin_index].element_size;
-		minSize = page[0].bin_index > 0 ? bins[page[0].bin_index - 1].element_size : 0;
+		if (page[0].bin_index < bin_count) {
+			maxSize = bins[page[0].bin_index].element_size;
+			minSize = page[0].bin_index > 0 ? bins[page[0].bin_index - 1].element_size : 0;
+		} else {
+			int i;
+			for (i = 1; (addr_t)&page[i] < heap_base; i++) {
+				if (!page[i].in_use)
+					break;
+				if (page[i].bin_index != bin_count)
+					break;
+				if (page[i].allocation_id != page[0].allocation_id)
+					break;
+			}
+			minSize = 0;
+			maxSize = i * B_PAGE_SIZE;
+		}
 
 		mutex_unlock(&heap_lock);
 
