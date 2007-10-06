@@ -44,9 +44,7 @@ int32 ice_1712_int(void *arg);
 
 //------------------------------------------------------
 
-static char pci_name[] = B_PCI_MODULE_NAME;
 pci_module_info *pci;
-static char mpu401_name[] = B_MPU_401_MODULE_NAME;
 generic_mpu401_module *mpu401;
 
 int32 num_cards = 0;
@@ -59,7 +57,7 @@ char *names[NUM_CARDS*20+1];
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
-#define MODULE_TEST_PATH "audio/multi/ice1712"
+#define MODULE_TEST_PATH "audio/hmulti/ice1712"
 
 //------------------------------------------------------
 //------------------------------------------------------
@@ -81,20 +79,20 @@ status_t init_hardware(void)
 	LOG_CREATE_ICE();
 	TRACE_ICE(("===init_hardware()===\n"));
 	
-	if (get_module(pci_name, (module_info **)&pci))
+	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci))
 		return ENOSYS;
 	
 	while ((*pci->get_nth_pci_info)(ix, &info) == B_OK) {
 		if ((info.vendor_id == ICE1712_VENDOR_ID) && 
 			(info.device_id == ICE1712_DEVICE_ID)) {
 			TRACE_ICE(("Found at least 1 card\n"));
-			put_module(pci_name);
+			put_module(B_PCI_MODULE_NAME);
 			return B_OK;
 		}
 		ix++;
 	}
-	put_module(pci_name);
-	return B_ERROR;
+	put_module(B_PCI_MODULE_NAME);
+	return ENODEV;
 }
 
 
@@ -308,11 +306,11 @@ init_driver(void)
 
 	TRACE_ICE(("===init_driver()===\n"));
 
-	if (get_module(pci_name, (module_info **)&pci))
+	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci))
 		return ENOSYS;
 
-	if (get_module(mpu401_name, (module_info **) &mpu401)) {
-		put_module(pci_name);
+	if (get_module(B_MPU_401_MODULE_NAME, (module_info **) &mpu401)) {
+		put_module(B_PCI_MODULE_NAME);
 		return ENOSYS;
 	}
 
@@ -343,8 +341,8 @@ init_driver(void)
 	TRACE_ICE(("Number of succesfully initialised card : %d\n", num_cards));
 
 	if (num_cards == 0) {
-		put_module(pci_name);
-		put_module(mpu401_name);
+		put_module(B_PCI_MODULE_NAME);
+		put_module(B_MPU_401_MODULE_NAME);
 		return ENODEV;
 	}	
 	return B_OK;
@@ -385,8 +383,8 @@ uninit_driver(void)
 		ice_1712_shutdown(&cards[ix]);
 	}
 	memset(&cards, 0, sizeof(cards));
-	put_module(mpu401_name);
-	put_module(pci_name);
+	put_module(B_MPU_401_MODULE_NAME);
+	put_module(B_PCI_MODULE_NAME);
 }
 
 //------------------------------------------------------
