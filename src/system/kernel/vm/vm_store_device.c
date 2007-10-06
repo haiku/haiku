@@ -78,8 +78,9 @@ static vm_store_ops device_ops = {
 	&device_read,
 	&device_write,
 	&device_fault,
-	NULL,
-	NULL
+	NULL,		// acquire unreferenced ref
+	NULL,		// acquire ref
+	NULL		// release ref
 };
 
 

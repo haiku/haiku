@@ -83,6 +83,15 @@ store_write(struct vm_store *_store, off_t offset, const iovec *vecs,
 }
 
 
+static status_t
+store_acquire_unreferenced_ref(struct vm_store *_store)
+{
+	vnode_store *store = (vnode_store *)_store;
+	struct vnode *vnode;
+	return vfs_get_vnode(store->device, store->inode, &vnode);
+}
+
+
 static void
 store_acquire_ref(struct vm_store *_store)
 {
@@ -106,6 +115,7 @@ static vm_store_ops sStoreOps = {
 	&store_read,
 	&store_write,
 	NULL,	/* fault */
+	&store_acquire_unreferenced_ref,
 	&store_acquire_ref,
 	&store_release_ref
 };
@@ -128,6 +138,7 @@ vm_create_vnode_store(struct vnode *vnode)
 	store->vnode = vnode;
 	store->file_cache_ref = NULL;
 
+	vfs_vnode_to_node_ref(vnode, &store->device, &store->inode);
 	return &store->vm;
 }
 

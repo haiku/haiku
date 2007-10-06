@@ -154,6 +154,7 @@ static vm_store_ops anonymous_ops = {
 	&anonymous_read,
 	&anonymous_write,
 	&anonymous_fault,
+	NULL,		// acquire unreferenced ref
 	NULL,		// acquire ref
 	NULL		// release ref
 };

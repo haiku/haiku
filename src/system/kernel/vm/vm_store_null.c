@@ -67,8 +67,9 @@ static vm_store_ops null_ops = {
 	&null_read,
 	&null_write,
 	&null_fault,
-	NULL,
-	NULL
+	NULL,		// acquire unreferenced ref
+	NULL,		// acquire ref
+	NULL		// release ref
 };
 
 

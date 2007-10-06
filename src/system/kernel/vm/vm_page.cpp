@@ -665,6 +665,15 @@ page_writer(void* /*unused*/)
 			if (!cacheLocker.IsLocked())
 				continue;
 
+			vm_cache *cache = page->cache;
+			if (cache->store->ops->acquire_unreferenced_ref != NULL) {
+				// we need our own reference to the store, as it might
+				// currently be destructed
+				if (cache->store->ops->acquire_unreferenced_ref(cache->store)
+						!= B_OK)
+					continue;
+			}
+
 			locker.Lock();
 			remove_page_from_queue(&sModifiedPageQueue, page);
 			page->state = PAGE_STATE_BUSY;
@@ -675,7 +684,7 @@ page_writer(void* /*unused*/)
 
 			//dprintf("write page %p, cache %p (%ld)\n", page, page->cache, page->cache->ref_count);
 			vm_clear_map_flags(page, PAGE_MODIFIED);
-			vm_cache_acquire_ref(page->cache);
+			vm_cache_acquire_ref(cache);
 			pages[numPages++] = page;
 		}
 
@@ -711,6 +720,8 @@ page_writer(void* /*unused*/)
 			busyConditions[i].Unpublish();
 
 			mutex_unlock(&cache->lock);
+			if (cache->store->ops->release_ref != NULL)
+				cache->store->ops->release_ref(cache->store);
 			vm_cache_release_ref(cache);
 		}
 	}

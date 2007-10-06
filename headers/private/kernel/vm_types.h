@@ -219,19 +219,20 @@ struct vm_store {
 };
 
 typedef struct vm_store_ops {
-	void (*destroy)(struct vm_store *backing_store);
-	status_t (*commit)(struct vm_store *backing_store, off_t size);
-	bool (*has_page)(struct vm_store *backing_store, off_t offset);
-	status_t (*read)(struct vm_store *backing_store, off_t offset,
+	void (*destroy)(struct vm_store *backingStore);
+	status_t (*commit)(struct vm_store *backingStore, off_t size);
+	bool (*has_page)(struct vm_store *backingStore, off_t offset);
+	status_t (*read)(struct vm_store *backingStore, off_t offset,
 		const iovec *vecs, size_t count, size_t *_numBytes, bool mayBlock,
 		bool fsReenter);
-	status_t (*write)(struct vm_store *backing_store, off_t offset,
+	status_t (*write)(struct vm_store *backingStore, off_t offset,
 		const iovec *vecs, size_t count, size_t *_numBytes, bool mayBlock,
 		bool fsReenter);
-	status_t (*fault)(struct vm_store *backing_store,
+	status_t (*fault)(struct vm_store *backingStore,
 		struct vm_address_space *aspace, off_t offset);
-	void (*acquire_ref)(struct vm_store *backing_store);
-	void (*release_ref)(struct vm_store *backing_store);
+	status_t (*acquire_unreferenced_ref)(struct vm_store *backingStore);
+	void (*acquire_ref)(struct vm_store *backingStore);
+	void (*release_ref)(struct vm_store *backingStore);
 } vm_store_ops;
 
 #endif	/* _KERNEL_VM_TYPES_H */

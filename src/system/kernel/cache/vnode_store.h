@@ -12,6 +12,8 @@
 struct vnode_store {
 	vm_store		vm;
 	struct vnode*	vnode;
+	dev_t			device;
+	ino_t			inode;
 	void*			file_cache_ref;
 };
 
