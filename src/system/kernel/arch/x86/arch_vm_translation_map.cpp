@@ -325,6 +325,13 @@ put_page_table_entry_in_pgtable(page_table_entry *entry,
 }
 
 
+static size_t
+map_max_pages_need(vm_translation_map */*map*/, addr_t start, addr_t end)
+{
+	return VADDR_TO_PDENT(end) + 1 - VADDR_TO_PDENT(start);
+}
+
+
 static status_t
 map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 {
@@ -352,7 +359,7 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 		vm_page *page;
 
 		// we need to allocate a pgtable
-		page = vm_page_allocate_page(PAGE_STATE_CLEAR, false);
+		page = vm_page_allocate_page(PAGE_STATE_CLEAR, true);
 
 		// mark the page WIRED
 		vm_page_set_state(page, PAGE_STATE_WIRED);
@@ -737,6 +744,7 @@ static vm_translation_map_ops tmap_ops = {
 	destroy_tmap,
 	lock_tmap,
 	unlock_tmap,
+	map_max_pages_need,
 	map_tmap,
 	unmap_tmap,
 	query_tmap,

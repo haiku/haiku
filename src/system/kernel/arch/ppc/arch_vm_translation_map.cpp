@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -202,6 +202,13 @@ fill_page_table_entry(page_table_entry *entry, uint32 virtualSegmentID,
 	entry->valid = true;
 
 	ppc_sync();
+}
+
+
+static size_t
+map_max_pages_need(vm_translation_map *map, addr_t start, addr_t end)
+{
+	return 0;
 }
 
 
@@ -454,6 +461,7 @@ static vm_translation_map_ops tmap_ops = {
 	destroy_tmap,
 	lock_tmap,
 	unlock_tmap,
+	map_max_pages_need,
 	map_tmap,
 	unmap_tmap,
 	query_tmap,

@@ -1483,6 +1483,11 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 
 		case B_FULL_LOCK:
 		{
+			vm_translation_map *map = &addressSpace->translation_map;
+			size_t reservePages = map->ops->map_max_pages_need(map,
+				area->base, area->base + (area->size - 1));
+			vm_page_reserve_pages(reservePages);
+
 			// Allocate and map all pages for this area
 			mutex_lock(&cache->lock);
 
@@ -1510,6 +1515,7 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 			}
 
 			mutex_unlock(&cache->lock);
+			vm_page_unreserve_pages(reservePages);
 			break;
 		}
 
@@ -1561,9 +1567,12 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 			// map them in the address space
 			vm_translation_map *map = &addressSpace->translation_map;
 			addr_t physicalAddress = page->physical_page_number * B_PAGE_SIZE;
-			addr_t virtualAddress;
+			addr_t virtualAddress = area->base;
+			size_t reservePages = map->ops->map_max_pages_need(map,
+				virtualAddress, virtualAddress + (area->size - 1));
 			off_t offset = 0;
 
+			vm_page_reserve_pages(reservePages);
 			mutex_lock(&cache->lock);
 			map->ops->lock(map);
 
@@ -1587,6 +1596,7 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 
 			map->ops->unlock(map);
 			mutex_unlock(&cache->lock);
+			vm_page_unreserve_pages(reservePages);
 			break;
 		}
 
@@ -1687,6 +1697,10 @@ vm_map_physical_memory(team_id team, const char *name, void **_address,
 		// make sure our area is mapped in completely
 
 		vm_translation_map *map = &locker.AddressSpace()->translation_map;
+		size_t reservePages = map->ops->map_max_pages_need(map, area->base,
+			area->base + (size - 1));
+
+		vm_page_reserve_pages(reservePages);
 		map->ops->lock(map);
 
 		for (addr_t offset = 0; offset < size; offset += B_PAGE_SIZE) {
@@ -1695,6 +1709,7 @@ vm_map_physical_memory(team_id team, const char *name, void **_address,
 		}
 
 		map->ops->unlock(map);
+		vm_page_unreserve_pages(reservePages);
 	}
 
 	if (status < B_OK)
@@ -1966,6 +1981,10 @@ vm_clone_area(team_id team, const char *name, void **address,
 			map->ops->unlock(map);
 
 			map = &targetAddressSpace->translation_map;
+			size_t reservePages = map->ops->map_max_pages_need(map,
+				newArea->base, newArea->base + (newArea->size - 1));
+
+			vm_page_reserve_pages(reservePages);
 			map->ops->lock(map);
 
 			for (addr_t offset = 0; offset < newArea->size;
@@ -1975,7 +1994,13 @@ vm_clone_area(team_id team, const char *name, void **address,
 			}
 
 			map->ops->unlock(map);
+			vm_page_unreserve_pages(reservePages);
 		} else {
+			vm_translation_map *map = &targetAddressSpace->translation_map;
+			size_t reservePages = map->ops->map_max_pages_need(map,
+				newArea->base, newArea->base + (newArea->size - 1));
+			vm_page_reserve_pages(reservePages);
+
 			// map in all pages from source
 			for (vm_page *page = cache->page_list; page != NULL;
 					page = page->cache_next) {
@@ -1983,6 +2008,8 @@ vm_clone_area(team_id team, const char *name, void **address,
 					+ ((page->cache_offset << PAGE_SHIFT) - newArea->cache_offset),
 					protection);
 			}
+
+			vm_page_unreserve_pages(reservePages);
 		}
 	}
 	if (status == B_OK)
@@ -2549,6 +2576,7 @@ vm_unmap_pages(vm_area *area, addr_t base, size_t size)
 }
 
 
+/*!	When calling this function, you need to have pages reserved! */
 status_t
 vm_map_page(vm_area *area, vm_page *page, addr_t address, uint32 protection)
 {
@@ -4193,12 +4221,14 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	// The top most cache has no fault handler, so let's see if the cache or its sources
 	// already have the page we're searching for (we're going from top to bottom)
 
-	vm_page_reserve_pages(2);
+	vm_translation_map *map = &addressSpace->translation_map;
+	size_t reservePages = 2 + map->ops->map_max_pages_need(map,
+		originalAddress, originalAddress);
+	vm_page_reserve_pages(reservePages);
 		// we may need up to 2 pages - reserving them upfront makes sure
 		// we don't have any cache locked, so that the page daemon/thief
 		// can do their job without problems
 
-	vm_translation_map *map = &addressSpace->translation_map;
 	vm_dummy_page dummyPage;
 	dummyPage.cache = NULL;
 	dummyPage.state = PAGE_STATE_INACTIVE;
@@ -4252,7 +4282,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	}
 
 	vm_cache_release_ref(topCache);
-	vm_page_unreserve_pages(2);
+	vm_page_unreserve_pages(reservePages);
 
 	return status;
 }

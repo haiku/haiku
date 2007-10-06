@@ -776,7 +776,8 @@ page_thief(void* /*unused*/)
 				enqueue_page(&sActivePageQueue, page);
 
 				if ((page->state == PAGE_STATE_INACTIVE
-						|| stealActive && page->state == PAGE_STATE_ACTIVE)
+						|| (stealActive && page->state == PAGE_STATE_ACTIVE
+							&& page->wired_count == 0))
 					&& page->usage_count <= score)
 					break;
 			}
@@ -826,8 +827,8 @@ page_thief(void* /*unused*/)
 				{
 					if (fIsLocked)
 						mutex_unlock(&fCache->lock);
-						
-					vm_cache_release_ref(fCache);
+					if (fCache != NULL)
+						vm_cache_release_ref(fCache);
 				}
 
 				bool IsLocked() { return fIsLocked; }
@@ -836,7 +837,7 @@ page_thief(void* /*unused*/)
 				vm_cache *fCache;
 				bool fIsLocked;
 			} cacheLocker(page);
-			
+
 			if (!cacheLocker.IsLocked())
 				continue;
 
@@ -863,7 +864,7 @@ page_thief(void* /*unused*/)
 
 			// we can now steal this page
 
-			//dprintf("  steal page %p from cache %p\n", page, cache);
+			//dprintf("  steal page %p from cache %p\n", page, page->cache);
 
 			vm_cache_remove_page(page->cache, page);
 			vm_page_set_state(page, PAGE_STATE_FREE);

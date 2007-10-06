@@ -30,6 +30,7 @@ typedef struct vm_translation_map_ops {
 	void (*destroy)(vm_translation_map *map);
 	status_t (*lock)(vm_translation_map *map);
 	status_t (*unlock)(vm_translation_map *map);
+	size_t (*map_max_pages_need)(vm_translation_map *map, addr_t start, addr_t end);
 	status_t (*map)(vm_translation_map *map, addr_t va, addr_t pa,
 				uint32 attributes);
 	status_t (*unmap)(vm_translation_map *map, addr_t start, addr_t end);
