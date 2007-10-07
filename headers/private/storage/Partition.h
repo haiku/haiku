@@ -48,6 +48,9 @@ public:
 	const char *ContentType() const;	// See DiskDeviceTypes.h
 	partition_id ID() const;
 
+	const char* Parameters() const;
+	const char* ContentParameters() const;
+
 	status_t GetDiskSystem(BDiskSystem *diskSystem) const;
 	
 	virtual status_t GetPath(BPath *path) const;

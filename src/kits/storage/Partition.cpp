@@ -295,6 +295,23 @@ BPartition::ID() const
 	return (fPartitionData ? fPartitionData->id : -1);
 }
 
+
+// Parameters
+const char*
+BPartition::Parameters() const
+{
+	return fPartitionData ? fPartitionData->parameters : NULL;
+}
+
+
+// ContentParameters
+const char*
+BPartition::ContentParameters() const
+{
+	return fPartitionData ? fPartitionData->content_parameters : NULL;
+}
+
+
 // GetDiskSystem
 status_t
 BPartition::GetDiskSystem(BDiskSystem *diskSystem) const
