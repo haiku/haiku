@@ -67,24 +67,28 @@ status_t
 BPartitioningInfo::_SetTo(partition_id partition, int32 changeCounter)
 {
 	Unset();
+
 	status_t error = B_OK;
-	partitionable_space_data *buffer = NULL;
+	partitionable_space_data* buffer = NULL;
 	int32 count = 0;
 	int32 actualCount = 0;
-	do {
+	while (true) {
 		error = _kern_get_partitionable_spaces(partition, changeCounter,
-											   buffer, count, &actualCount);
-		if (error == B_BUFFER_OVERFLOW) {
-			// buffer to small re-allocate it
-			if (buffer)
-				delete[] buffer;
-			buffer = new(nothrow) partitionable_space_data[actualCount];
-			if (buffer)
-				count = actualCount;
-			else
-				error = B_NO_MEMORY;
+			buffer, count, &actualCount);
+		if (error != B_BUFFER_OVERFLOW)
+			break;
+
+		// buffer too small re-allocate it
+		delete[] buffer;
+		buffer = new(nothrow) partitionable_space_data[actualCount];
+		if (!buffer) {
+			error = B_NO_MEMORY;
+			break;
 		}
-	} while (error == B_BUFFER_OVERFLOW);
+
+		count = actualCount;
+	}
+
 	// set data / cleanup on failure
 	if (error == B_OK) {
 		fPartitionID = partition;
@@ -92,6 +96,7 @@ BPartitioningInfo::_SetTo(partition_id partition, int32 changeCounter)
 		fCount = actualCount;
 	} else if (buffer)
 		delete[] buffer;
+
 	return error;
 }
 
