@@ -12,10 +12,12 @@
 #include "KDiskSystem.h"
 #include "KPartition.h"
 
+
 // debugging
 //#define DBG(x)
 #define DBG(x) x
 #define OUT dprintf
+
 
 // write_lock_disk_device
 disk_device_data *
@@ -32,6 +34,7 @@ write_lock_disk_device(partition_id partitionID)
 	return NULL;
 }
 
+
 // write_unlock_disk_device
 void
 write_unlock_disk_device(partition_id partitionID)
@@ -46,6 +49,7 @@ write_unlock_disk_device(partition_id partitionID)
 		device->Unregister();
 	}
 }
+
 
 // read_lock_disk_device
 disk_device_data *
@@ -62,6 +66,7 @@ read_lock_disk_device(partition_id partitionID)
 	return NULL;
 }
 
+
 // read_unlock_disk_device
 void
 read_unlock_disk_device(partition_id partitionID)
@@ -77,6 +82,7 @@ read_unlock_disk_device(partition_id partitionID)
 	}
 }
 
+
 // find_disk_device
 int32
 find_disk_device(const char *path)
@@ -89,6 +95,7 @@ find_disk_device(const char *path)
 	}
 	return id;
 }
+
 
 // find_partition
 int32
@@ -103,6 +110,7 @@ find_partition(const char *path)
 	return id;
 }
 
+
 // get_disk_device
 disk_device_data *
 get_disk_device(partition_id partitionID)
@@ -112,14 +120,26 @@ get_disk_device(partition_id partitionID)
 	return (device ? device->DeviceData() : NULL);
 }
 
+
+// get_physical_partition
+partition_data*
+get_physical_partition(partition_id partitionID)
+{
+	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
+	KPartition* partition = manager->FindPartition(partitionID, true);
+	return (partition ? partition->PartitionData() : NULL);
+}
+
+
 // get_partition
 partition_data *
 get_partition(partition_id partitionID)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	KPartition *partition = manager->FindPartition(partitionID);
+	KPartition *partition = manager->FindPartition(partitionID, false);
 	return (partition ? partition->PartitionData() : NULL);
 }
+
 
 // get_parent_partition
 partition_data *
@@ -132,6 +152,7 @@ get_parent_partition(partition_id partitionID)
 	return NULL;
 }
 
+
 // get_child_partition
 partition_data *
 get_child_partition(partition_id partitionID, int32 index)
@@ -143,6 +164,21 @@ get_child_partition(partition_id partitionID, int32 index)
 	}
 	return NULL;
 }
+
+
+// compare_partition_data_offset
+static int
+compare_partition_data_offset(const void* _a, const void* _b)
+{
+	const partition_data* a = *(const partition_data**)_a;
+	const partition_data* b = *(const partition_data**)_b;
+
+	if (a->offset == b->offset)
+		return 0;
+
+	return a->offset < b->offset ? -1 : 1;
+}
+
 
 // create_child_partition
 partition_data *
@@ -162,6 +198,7 @@ DBG(OUT("  partition %ld not found\n", partitionID));
 	return NULL;
 }
 
+
 // delete_partition
 bool
 delete_partition(partition_id partitionID)
@@ -173,6 +210,7 @@ delete_partition(partition_id partitionID)
 	}
 	return false;
 }
+
 
 // partition_modified
 void
@@ -210,6 +248,7 @@ find_disk_system(const char *name)
 	return -1;
 }
 
+
 // update_disk_device_job_progress
 bool
 update_disk_device_job_progress(disk_job_id jobID, float progress)
@@ -223,6 +262,7 @@ update_disk_device_job_progress(disk_job_id jobID, float progress)
 	}
 	return false;
 }
+
 
 // update_disk_device_job_extra_progress
 bool
@@ -238,6 +278,7 @@ update_disk_device_job_extra_progress(disk_job_id jobID, const char *info)
 	return false;
 }
 
+
 // set_disk_device_job_error_message
 bool
 set_disk_device_job_error_message(disk_job_id jobID, const char *message)
@@ -251,6 +292,7 @@ set_disk_device_job_error_message(disk_job_id jobID, const char *message)
 	}
 	return false;
 }
+
 
 // update_disk_device_job_interrupt_properties
 uint32

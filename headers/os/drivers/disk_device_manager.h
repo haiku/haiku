@@ -57,6 +57,8 @@ typedef struct partitionable_space_data {
 
 // operations on partitions
 enum {
+	B_PARTITION_SHADOW,			// indicates creation of a shadow partition
+	B_PARTITION_SHADOW_CHILD,	//
 	B_PARTITION_DEFRAGMENT,
 	B_PARTITION_REPAIR,
 	B_PARTITION_RESIZE,
@@ -95,6 +97,7 @@ int32 find_partition(const char *path);
 // disk device/partition read access
 // (read lock required)
 disk_device_data *get_disk_device(partition_id partitionID);
+partition_data *get_physical_partition(partition_id partitionID);
 partition_data *get_partition(partition_id partitionID);
 partition_data *get_parent_partition(partition_id partitionID);
 partition_data *get_child_partition(partition_id partitionID, int32 index);
@@ -106,7 +109,7 @@ partition_data *create_child_partition(partition_id partitionID, int32 index,
 	// childID is an optional input parameter -- -1 to be ignored
 bool delete_partition(partition_id partitionID);
 void partition_modified(partition_id partitionID);
-	// tells the disk device manager, that the parition has been modified
+	// tells the disk device manager, that the partition has been modified
 
 status_t scan_partition(partition_id partitionID);
 	// Service method for disks systems: Synchronously scans the partition.
