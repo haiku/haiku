@@ -4,11 +4,19 @@
 */
 
 #include <unistd.h>
+
+#include <errno.h>
+
 #include <syscalls.h>
 
 
 off_t
 lseek(int fd, off_t pos, int whence)
 {
-	return _kern_seek(fd, pos, whence);
+	off_t result = _kern_seek(fd, pos, whence);
+	if (result < 0) {
+		errno = result;
+		return -1;
+	}
+	return result;
 }
