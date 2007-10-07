@@ -6,6 +6,7 @@
  *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  */
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -118,12 +119,15 @@ public:
 		printf("%s  read only:      %d\n", prefix, partition->IsReadOnly());
 		printf("%s  mounted:        %d\n", prefix, partition->IsMounted());
 		printf("%s  flags:          %lx\n", prefix, partition->Flags());
-		printf("%s  name:           `%s'\n", prefix, partition->Name());
+		printf("%s  name:           \"%s\"\n", prefix, partition->Name());
 		printf("%s  content name:   \"%s\"\n", prefix,
 			partition->ContentName());
 		printf("%s  type:           \"%s\"\n", prefix, partition->Type());
 		printf("%s  content type:   \"%s\"\n", prefix,
 			partition->ContentType());
+		printf("%s  params:         \"%s\"\n", prefix, partition->Parameters());
+		printf("%s  content params: \"%s\"\n", prefix,
+			partition->ContentParameters());
 		// volume, icon,...
 		return false;
 	}
@@ -262,7 +266,7 @@ public:
 		// main input loop
 		while (true) {
 			BString line;
-			if (!_ReadLine("> ", line))
+			if (!_ReadLine("party> ", line))
 				return;
 
 			if (line == "") {
@@ -361,25 +365,20 @@ private:
 		printf("\n");
 
 		// get the disk system
-		BDiskSystem* diskSystem = NULL;
 		int64 diskSystemIndex;
-		do {
-			_ReadNumber("disk system index [-1 to abort]: ", diskSystemIndex);
-			if (diskSystemIndex < 0)
-				return;
+		if (!_ReadNumber("disk system index [-1 to abort]: ", 0,
+				diskSystems.CountItems() - 1, -1, "invalid index",
+				diskSystemIndex)) {
+			return;
+		}
+		BDiskSystem* diskSystem = diskSystems.ItemAt(diskSystemIndex);
 
-			diskSystem = diskSystems.ItemAt(diskSystemIndex);
-			if (!diskSystem)
-				printf("invalid index\n");
-		} while (!diskSystem);
-
+		bool supportsName = diskSystem->SupportsContentName();
 		BString name;
 		BString parameters;
 		while (true) {
 			// let the user enter name and parameters
-// TODO: Obviously we should be able to check whether the disk system supports
-//  naming at all.
-			if (!_ReadLine("partition name: ", name)
+			if (supportsName && !_ReadLine("partition name: ", name)
 				|| !_ReadLine("partition parameters: ", parameters)) {
 				return;
 			}
@@ -387,15 +386,16 @@ private:
 			// validate parameters
 			char validatedName[B_OS_NAME_LENGTH];
 			strlcpy(validatedName, name.String(), sizeof(validatedName));
-			if (partition->ValidateInitialize(diskSystem->Name(), validatedName,
-					parameters.String()) != B_OK) {
+			if (partition->ValidateInitialize(diskSystem->Name(),
+					supportsName ? validatedName : NULL, parameters.String())
+					!= B_OK) {
 				printf("Validation of the given values failed. Sorry, can't "
-					"continue.");
+					"continue.\n");
 				return;
 			}
 
 			// did the disk system change the name?
-			if (name == validatedName) {
+			if (!supportsName || name == validatedName) {
 				printf("Everything looks dandy.\n");
 			} else {
 				printf("The disk system adjusted the file name to \"%s\".\n",
@@ -408,8 +408,7 @@ private:
 			bool changeParameters = false;
 			while (true) {
 				BString line;
-				_ReadLine("Everything looks dandy. [c]ontinue, change "
-					"[p]arameters, or [a]bort? ", line);
+				_ReadLine("[c]ontinue, change [p]arameters, or [a]bort? ", line);
 				if (line == "a")
 					return;
 				if (line == "p") {
@@ -428,7 +427,7 @@ private:
 
 		// initialize
 		status_t error = partition->Initialize(diskSystem->Name(),
-			name.String(), parameters.String());
+			supportsName ? name.String() : NULL, parameters.String());
 		if (error != B_OK)
 			printf("Initialization failed: %s\n", strerror(error));
 	}
@@ -472,7 +471,7 @@ private:
 
 		// get supported types
 		BObjectList<BString> supportedTypes(20, true);
-		char typeBuffer[B_OS_NAME_LENGTH];
+		char typeBuffer[B_DISK_DEVICE_TYPE_LENGTH];
 		int32 cookie = 0;
 		while (diskSystem.GetNextSupportedType(partition, &cookie, typeBuffer)
 				== B_OK) {
@@ -501,6 +500,23 @@ private:
 			return;
 		}
 
+		// let the user select the partition type, if there's more than one
+		int64 typeIndex = 0;
+		int32 supportedTypesCount = supportedTypes.CountItems();
+		if (supportedTypesCount > 1) {
+			// list them
+			printf("Possible partition types:\n");
+			for (int32 i = 0; i < supportedTypesCount; i++)
+				printf("%2ld  %s\n", i, supportedTypes.ItemAt(i)->String());
+
+			if (!_ReadNumber("supported type index [-1 to abort]: ", 0,
+					supportedTypesCount - 1, -1, "invalid index", typeIndex)) {
+				return;
+			}
+		}
+
+		const char* type = supportedTypes.ItemAt(typeIndex)->String();
+
 		// list partitionable spaces
 		printf("Unused regions where the new partition could be created:\n");
 		for (int32 i = 0; i < spacesCount; i++) {
@@ -510,11 +526,117 @@ private:
 			BString offset, size;
 			get_size_string(_offset, offset);
 			get_size_string(_size, size);
-			printf("%2ld  start: %8s,  size:  %8s", i, offset.String(),
+			printf("%2ld  start: %8s,  size:  %8s\n", i, offset.String(),
 				size.String());
 		}
 
-		// TODO:...
+		// let the user select the partitionable space, if there's more than one
+		int64 spaceIndex = 0;
+		if (spacesCount > 1) {
+			if (!_ReadNumber("unused region index [-1 to abort]: ", 0,
+					spacesCount - 1, -1, "invalid index", spaceIndex)) {
+				return;
+			}
+		}
+
+		off_t spaceOffset;
+		off_t spaceSize;
+		partitioningInfo.GetPartitionableSpaceAt(spaceIndex, &spaceOffset,
+			&spaceSize);
+
+		off_t start;
+		off_t size;
+		BString parameters;
+		while (true) {
+			// let the user enter start, size, and parameters
+
+			// start
+			while (true) {
+				BString spaceOffsetString;
+				get_size_string(spaceOffset, spaceOffsetString);
+				BString prompt("partition start [default: ");
+				prompt << spaceOffsetString << "]: ";
+				if (!_ReadSize(prompt.String(), spaceOffset, start))
+					return;
+
+				if (start >= spaceOffset && start <= spaceOffset + spaceSize)
+					break;
+
+				printf("invalid partition start\n");
+			}
+
+			// size
+			off_t maxSize = spaceOffset + spaceSize - start;
+			while (true) {
+				BString maxSizeString;
+				get_size_string(maxSize, maxSizeString);
+				BString prompt("partition size [default: ");
+				prompt << maxSizeString << "]: ";
+				if (!_ReadSize(prompt.String(), maxSize, size))
+					return;
+
+				if (size >= 0 && start + size <= spaceOffset + spaceSize)
+					break;
+
+				printf("invalid partition size\n");
+			}
+
+			// parameters
+			if (!_ReadLine("partition parameters: ", parameters))
+				return;
+
+			// validate parameters
+			off_t validatedStart = start;
+			off_t validatedSize = size;
+			if (partition->ValidateCreateChild(&start, &size, type,
+					parameters.String()) != B_OK) {
+				printf("Validation of the given values failed. Sorry, can't "
+					"continue.\n");
+				return;
+			}
+
+			// did the disk system change offset or size?
+			if (validatedStart == start && validatedSize == size) {
+				printf("Everything looks dandy.\n");
+			} else {
+				BString startString, sizeString;
+				get_size_string(validatedStart, startString);
+				get_size_string(validatedSize, sizeString);
+				printf("The disk system adjusted the partition start and "
+					"size to %lld (%s) and %lld (%s).\n",
+					validatedStart, startString.String(), validatedSize,
+					sizeString.String());
+				start = validatedStart;
+				size = validatedSize;
+			}
+
+			// let the user decide whether to continue, change parameters, or
+			// abort
+			bool changeParameters = false;
+			while (true) {
+				BString line;
+				_ReadLine("[c]ontinue, change [p]arameters, or [a]bort? ", line);
+				if (line == "a")
+					return;
+				if (line == "p") {
+					changeParameters = true;
+					break;
+				}
+				if (line == "c")
+					break;
+
+				printf("invalid input\n");
+			}
+
+			if (!changeParameters)
+				break;
+		}
+
+		// create child
+		error = partition->CreateChild(start, size, type,
+			parameters.String());
+		if (error != B_OK)
+			printf("Creating the partiiton failed: %s\n", strerror(error));
 	}
 
 	void _WriteChanges()
@@ -554,11 +676,12 @@ private:
 		}
 
 		// otherwise let the user select
+		_PrintPartitionsShort();
+
 		partition = NULL;
 		int64 partitionIndex;
 		while (true) {
-			_ReadNumber(prompt, partitionIndex);
-			if (partitionIndex < 0)
+			if (!_ReadNumber(prompt, partitionIndex) || partitionIndex < 0)
 				return false;
 
 			FindPartitionByIndexVisitor visitor(partitionIndex);
@@ -600,6 +723,100 @@ private:
 
 			char buffer[256];
 			if (sscanf(line.String(), "%lld%s", &number, buffer) == 1)
+				return true;
+
+			printf("invalid input\n");
+		}
+	}
+
+	bool _ReadNumber(const char* prompt, int64 minNumber, int64 maxNumber,
+		int64 abortNumber, const char* invalidNumberMessage, int64& number)
+	{
+		while (true) {
+			BString line;
+			if (!_ReadLine(prompt, line))
+				return false;
+
+			char buffer[256];
+			if (sscanf(line.String(), "%lld%s", &number, buffer) != 1) {
+				printf("invalid input\n");
+				continue;
+			}
+
+			if (number == abortNumber)
+				return false;
+
+			if (number >= minNumber && number <= maxNumber)
+				return true;
+
+			puts(invalidNumberMessage);
+		}
+	}
+
+	bool _ReadSize(const char* prompt, off_t defaultValue, off_t& size)
+	{
+		while (true) {
+			BString _line;
+			if (!_ReadLine(prompt, _line))
+				return false;
+			const char* line = _line.String();
+
+			// skip whitespace
+			while (isspace(*line))
+				line++;
+
+			if (*line == '\0') {
+				size = defaultValue;
+				return true;
+			}
+
+			// get the number
+			int32 endIndex = 0;
+			while (isdigit(line[endIndex]))
+				endIndex++;
+
+			if (endIndex == 0) {
+				printf("invalid input\n");
+				continue;
+			}
+
+			size = atoll(BString(line, endIndex).String());
+
+			// skip whitespace
+			line += endIndex;
+			while (isspace(*line))
+				line++;
+
+			// get the size modifier
+			if (*line != '\0') {
+				switch (*line) {
+					case 'K':
+						size *= 1024;
+						break;
+					case 'M':
+						size *= 1024 * 1024;
+						break;
+					case 'G':
+						size *= 1024LL * 1024 * 1024;
+						break;
+					case 'T':
+						size *= 1024LL * 1024 * 1024 * 1024;
+						break;
+					default:
+						line--;
+				}
+		
+				line++;
+			}
+
+			if (*line == 'B')
+				line++;
+
+			// skip whitespace
+			while (isspace(*line))
+				line++;
+
+			if (*line == '\0')
 				return true;
 
 			printf("invalid input\n");
