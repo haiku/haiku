@@ -430,23 +430,30 @@ BPrivate::DiskDevice::validate_initialize_partition(KPartition *partition,
 status_t
 BPrivate::DiskDevice::validate_create_child_partition(KPartition *partition,
 	int32 changeCounter, off_t *offset, off_t *size, const char *type,
-	const char *parameters, int32 *index, bool requireShadow)
+	const char *parameters, int32 *_index, bool requireShadow)
 {
 	if (!partition || !offset || !size || !type)
 		return B_BAD_VALUE;
+
 	// check the partition
 	status_t error = check_partition(partition, changeCounter, requireShadow);
 	if (error != B_OK)
 		return error;
+
 	// get the disk system
 	KDiskSystem *diskSystem = partition->DiskSystem();
 	if (!diskSystem)
 		return B_ENTRY_NOT_FOUND;
+
 	// get the info
+	int32 index;
 	if (diskSystem->ValidateCreateChild(partition, offset, size, type,
-										parameters, index)) {
+			parameters, &index)) {
+		if (_index)
+			*_index = index;
 		return B_OK;
 	}
+
 	return B_ERROR;
 }
 
