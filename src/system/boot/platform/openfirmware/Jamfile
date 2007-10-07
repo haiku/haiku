@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src system boot platform openfirmware ;
 
-SubDirC++Flags -fno-rtti ;
+SubDirC++Flags -D_BOOT_MODE -fno-rtti ;
 
 KernelMergeObject boot_platform_openfirmware.o :
 	console.cpp

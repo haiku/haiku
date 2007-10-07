@@ -39,14 +39,3 @@ dprintf(const char *format, ...)
 	va_end(list);
 }
 
-
-void
-dprintf_no_syslog(const char *format, ...)
-{
-	va_list list;
-
-	va_start(list, format);
-	vprintf(format, list);
-	va_end(list);
-}
-
