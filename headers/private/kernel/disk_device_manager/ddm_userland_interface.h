@@ -46,7 +46,7 @@ typedef struct user_disk_device_data {
 	user_partition_data	device_partition_data;
 } user_disk_device_data;
 
-// userland partitionable space representation
+// userland disk system representation
 typedef struct user_disk_system_info {
 	disk_system_id	id;
 	char			name[B_FILE_NAME_LENGTH];	// better B_PATH_NAME_LENGTH?
