@@ -167,27 +167,54 @@ KPhysicalPartition::CreateShadowPartition()
 {
 	if (fShadowPartition)
 		return B_BAD_VALUE;
+
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
 		// create shadow partition
 		fShadowPartition = new(nothrow) KShadowPartition(this);
 		if (!fShadowPartition)
 			return B_NO_MEMORY;
+
 		// make it known to the manager
 		if (!manager->PartitionAdded(fShadowPartition)) {
 			delete fShadowPartition;
 			fShadowPartition = NULL;
 			return B_NO_MEMORY;
 		}
+
+		// notify the disk systems
+		// parent disk system
+		status_t error;
+		if (Parent()) {
+			error = Parent()->DiskSystem()->ShadowPartitionChanged(
+				Parent()->ShadowPartition(), fShadowPartition,
+				B_PARTITION_SHADOW_CHILD);
+			if (error != B_OK) {
+				UnsetShadowPartition(true);
+				return error;
+			}
+		}
+
+		// this partition's disk system
+		if (fShadowPartition->DiskSystem()) {
+			error = fShadowPartition->DiskSystem()->ShadowPartitionChanged(
+				fShadowPartition, NULL, B_PARTITION_SHADOW);
+			if (error != B_OK) {
+				UnsetShadowPartition(true);
+				return error;
+			}
+		}
 	}
+
 	// create shadows for children
 	for (int32 i = 0; KPartition *child = ChildAt(i); i++) {
 		status_t error = child->CreateShadowPartition();
 		if (error == B_OK)
 			error = fShadowPartition->AddChild(child->ShadowPartition(), i);
+
 		// cleanup on error
 		if (error != B_OK) {
-			for (int32 k = 0; k <= i; i++)
+			for (int32 k = 0; k <= i; k++)
 				ChildAt(k)->UnsetShadowPartition(true);
 			UnsetShadowPartition(true);
 			return error;

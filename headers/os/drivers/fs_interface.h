@@ -219,7 +219,7 @@ typedef struct file_system_module_info {
 
 	/* shadow partition modification (device is write locked) */
 	status_t (*shadow_changed)(partition_data *partition,
-				uint32 operation);
+				partition_data *child, uint32 operation);
 
 	/* writing (the device is NOT locked) */
 	status_t (*defragment)(int fd, partition_id partition,

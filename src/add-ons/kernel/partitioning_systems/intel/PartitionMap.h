@@ -165,10 +165,15 @@ private:
 class PrimaryPartition : public Partition {
 public:
 	PrimaryPartition();
-	PrimaryPartition(const partition_descriptor *descriptor, off_t ptsOffset);
 
 	void SetTo(const partition_descriptor *descriptor, off_t ptsOffset);
 	void Unset();
+
+	status_t Assign(const PrimaryPartition& other);
+
+	int32 Index() const			{ return fIndex; }
+	void SetIndex(int32 index)	{ fIndex = index; }
+		// private
 
 	// only if extended
 	int32 CountLogicalPartitions() const { return fLogicalPartitionCount; }
@@ -180,6 +185,7 @@ private:
 	LogicalPartition	*fHead;
 	LogicalPartition	*fTail;
 	int32				fLogicalPartitionCount;
+	int32				fIndex;
 };
 
 // LogicalPartition
@@ -216,8 +222,11 @@ public:
 
 	void Unset();
 
+	status_t Assign(const PartitionMap& other);
+
 	PrimaryPartition *PrimaryPartitionAt(int32 index);
 	const PrimaryPartition *PrimaryPartitionAt(int32 index) const;
+	int32 IndexOfPrimaryPartition(const PrimaryPartition* partition) const;
 
 	int32 CountPartitions() const;
 	int32 CountNonEmptyPartitions() const;

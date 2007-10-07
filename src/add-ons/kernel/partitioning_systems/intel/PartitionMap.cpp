@@ -386,17 +386,6 @@ PrimaryPartition::PrimaryPartition()
 {
 }
 
-// constructor
-PrimaryPartition::PrimaryPartition(const partition_descriptor *descriptor,
-								   off_t ptsOffset)
-	: Partition(),
-	  fHead(NULL),
-	  fTail(NULL),
-	  fLogicalPartitionCount(0)
-{
-	SetTo(descriptor, ptsOffset);
-}
-
 // SetTo
 void
 PrimaryPartition::SetTo(const partition_descriptor *descriptor, off_t ptsOffset)
@@ -418,6 +407,34 @@ PrimaryPartition::Unset()
 	fLogicalPartitionCount = 0;
 	Partition::Unset();
 }
+
+
+// Assign
+status_t
+PrimaryPartition::Assign(const PrimaryPartition& other)
+{
+	partition_descriptor descriptor;
+	other.GetPartitionDescriptor(&descriptor, 0);
+	SetTo(&descriptor, 0);
+
+	const LogicalPartition* otherLogical = other.fHead;
+	while (otherLogical) {
+		off_t ptsOffset = otherLogical->PTSOffset();
+		otherLogical->GetPartitionDescriptor(&descriptor, ptsOffset);
+
+		LogicalPartition* logical = new(nothrow) LogicalPartition(
+			&descriptor, ptsOffset, this);
+		if (!logical)
+			return B_NO_MEMORY;
+
+		AddLogicalPartition(logical);
+
+		otherLogical = otherLogical->Next();
+	}
+
+	return B_OK;
+}
+
 
 // LogicalPartitionAt
 LogicalPartition *
@@ -527,6 +544,8 @@ LogicalPartition::Unset()
 // constructor
 PartitionMap::PartitionMap()
 {
+	for (int32 i = 0; i < 4; i++)
+		fPrimaries[i].SetIndex(i);
 }
 
 // destructor
@@ -541,6 +560,21 @@ PartitionMap::Unset()
 	for (int32 i = 0; i < 4; i++)
 		fPrimaries[i].Unset();
 }
+
+
+// Assign
+status_t
+PartitionMap::Assign(const PartitionMap& other)
+{
+	for (int32 i = 0; i < 4; i++) {
+		status_t error = fPrimaries[i].Assign(other.fPrimaries[i]);
+		if (error != B_OK)
+			return error;
+	}
+
+	return B_OK;
+}
+
 
 // PrimaryPartitionAt
 PrimaryPartition *
@@ -561,6 +595,7 @@ PartitionMap::PrimaryPartitionAt(int32 index) const
 		partition = fPrimaries + index;
 	return partition;
 }
+
 
 // CountPartitions
 int32

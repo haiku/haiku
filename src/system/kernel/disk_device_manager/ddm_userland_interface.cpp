@@ -26,6 +26,10 @@ using namespace BPrivate::DiskDevice;
 // debugging
 #define ERROR(x)
 
+
+// TODO: Add user address checks and check return values of user_memcpy()!
+
+
 // ddm_strlcpy
 /*! \brief Wrapper around user_strlcpy() that returns a status_t
 	indicating appropriate success or failure.
@@ -70,7 +74,7 @@ move_descendants_contents(KPartition *partition)
 	KDiskSystem *diskSystem = partition->DiskSystem();
 	if (diskSystem || partition->AlgorithmData()) {
 		status_t error = diskSystem->ShadowPartitionChanged(partition,
-			B_PARTITION_RESIZE);
+			NULL, B_PARTITION_MOVE);
 		if (error != B_OK)
 			return error;
 	}
@@ -284,46 +288,58 @@ status_t
 _user_get_partitionable_spaces(partition_id partitionID, int32 changeCounter,
 	partitionable_space_data *_buffer, int32 count, int32 *_actualCount)
 {
-	if (!_buffer && count > 0)
+	if (count > 0 && !_buffer)
 		return B_BAD_VALUE;	
-	// copy in
+
+	if (count > 0 && !IS_USER_ADDRESS(_buffer)
+		|| _actualCount && !IS_USER_ADDRESS(_actualCount)) {
+		return B_BAD_ADDRESS;
+	}
+
+	// allocate buffer
 	int32 bufferSize = count * sizeof(partitionable_space_data);
-	partitionable_space_data *buffer = count > 0
-		? reinterpret_cast<partitionable_space_data*>(malloc(bufferSize))
-		: NULL;
-	if (buffer)
-		user_memcpy(buffer, _buffer, bufferSize);	
+	partitionable_space_data *buffer = NULL;
+	MemoryDeleter bufferDeleter;
+	if (count > 0) {
+		buffer = (partitionable_space_data*)malloc(bufferSize);
+		if (!buffer)
+			return B_NO_MEMORY;
+		bufferDeleter.SetTo(buffer);
+	}
+
 	status_t error = B_OK;
+
 	// get the partition
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	KPartition *partition = manager->ReadLockPartition(partitionID);
-	error = partition ? (status_t)B_OK : (status_t)B_ENTRY_NOT_FOUND;
-	if (!error) {
-		PartitionRegistrar registrar1(partition, true);
-		PartitionRegistrar registrar2(partition->Device(), true);
-		DeviceReadLocker locker(partition->Device(), true);
-		error = check_shadow_partition(partition, changeCounter)
-			? B_OK : B_BAD_VALUE;
-		if (!error) {
-			// get the disk system
-			KDiskSystem *diskSystem = partition->DiskSystem();
-			error = diskSystem ? (status_t)B_OK : (status_t)B_ENTRY_NOT_FOUND;
-			if (!error) {
-				// get the info
-				int32 actualCount;
-				error = diskSystem->GetPartitionableSpaces(partition, buffer,
-				                                           count, &actualCount);
-				if (!error && _actualCount) {
-					user_memcpy(_actualCount, &actualCount,
-						sizeof(actualCount));
-				}
-			}
-		}
-	}	
+	if (!partition)
+		return B_ENTRY_NOT_FOUND;
+
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+
+	if (!check_shadow_partition(partition, changeCounter))
+		return B_BAD_VALUE;
+		
+	// get the disk system
+	KDiskSystem *diskSystem = partition->DiskSystem();
+	if (!diskSystem)
+		return B_ENTRY_NOT_FOUND;
+
+	// get the info
+	int32 actualCount;
+	error = diskSystem->GetPartitionableSpaces(partition, buffer, count,
+		&actualCount);
+
 	// copy out
-	if (!error && buffer)
+	if (_actualCount)
+		user_memcpy(_actualCount, &actualCount, sizeof(actualCount));
+			// copy even on error
+
+	if (error == B_OK && buffer)
 		user_memcpy(_buffer, buffer, bufferSize);
-	free(buffer);	
+
 	return error;
 }
 
@@ -376,7 +392,6 @@ _user_get_disk_system_info(disk_system_id id, user_disk_system_info *_info)
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
 		if (KDiskSystem *diskSystem = manager->FindDiskSystem(id)) {
-			DiskSystemLoader _(diskSystem, true);
 			user_disk_system_info info;
 			diskSystem->GetInfo(&info);
 			user_memcpy(_info, &info, sizeof(info));
@@ -399,7 +414,6 @@ _user_get_next_disk_system_info(int32 *_cookie, user_disk_system_info *_info)
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
 		if (KDiskSystem *diskSystem = manager->NextDiskSystem(&cookie)) {
-			DiskSystemLoader _(diskSystem, true);
 			user_disk_system_info info;
 			diskSystem->GetInfo(&info);
 			user_memcpy(_info, &info, sizeof(info));
@@ -424,7 +438,6 @@ _user_find_disk_system(const char *_name, user_disk_system_info *_info)
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
 		if (KDiskSystem *diskSystem = manager->FindDiskSystem(name)) {
-			DiskSystemLoader _(diskSystem, true);
 			user_disk_system_info info;
 			diskSystem->GetInfo(&info);
 			user_memcpy(_info, &info, sizeof(info));
@@ -1146,9 +1159,8 @@ _user_get_next_supported_partition_type(partition_id partitionID,
 				char type[B_DISK_DEVICE_TYPE_LENGTH];
 				error = diskSystem->GetNextSupportedType(partition, &cookie,
 					type);
-				if (!error) {
+				if (!error)
 					error = ddm_strlcpy(_type, type, B_DISK_DEVICE_TYPE_LENGTH);
-				}
 			}
 		}
 	}
@@ -1352,13 +1364,13 @@ _user_resize_partition(partition_id partitionID, int32 changeCounter,
 	partition->Changed(B_PARTITION_CHANGED_SIZE);
 	// implicit partitioning system changes
 	error = partition->Parent()->DiskSystem()->ShadowPartitionChanged(
-		partition, B_PARTITION_RESIZE_CHILD);
+		partition->Parent(), partition, B_PARTITION_RESIZE_CHILD);
 	if (error != B_OK)
 		return error;
 	// implicit content disk system changes
 	if (partition->DiskSystem()) {
 		error = partition->DiskSystem()->ShadowPartitionChanged(
-			partition, B_PARTITION_RESIZE);
+			partition, NULL, B_PARTITION_RESIZE);
 	}
 	return error;
 }
@@ -1393,7 +1405,7 @@ _user_move_partition(partition_id partitionID, int32 changeCounter,
 	partition->Changed(B_PARTITION_CHANGED_OFFSET);
 	// implicit partitioning system changes
 	error = partition->Parent()->DiskSystem()->ShadowPartitionChanged(
-		partition, B_PARTITION_MOVE_CHILD);
+		partition->Parent(), partition, B_PARTITION_MOVE_CHILD);
 	if (error != B_OK)
 		return error;
 	// implicit descendants' content disk system changes
@@ -1435,7 +1447,7 @@ _user_set_partition_name(partition_id partitionID, int32 changeCounter,
 	partition->Changed(B_PARTITION_CHANGED_NAME);
 	// implicit partitioning system changes
 	return partition->Parent()->DiskSystem()->ShadowPartitionChanged(
-		partition, B_PARTITION_SET_NAME);
+		partition->Parent(), partition, B_PARTITION_SET_NAME);
 }
 
 
@@ -1474,7 +1486,7 @@ _user_set_partition_content_name(partition_id partitionID, int32 changeCounter,
 	partition->Changed(B_PARTITION_CHANGED_CONTENT_NAME);
 	// implicit content disk system changes
 	return partition->DiskSystem()->ShadowPartitionChanged(
-		partition, B_PARTITION_SET_CONTENT_NAME);
+		partition, NULL, B_PARTITION_SET_CONTENT_NAME);
 }
 
 
@@ -1508,7 +1520,7 @@ _user_set_partition_type(partition_id partitionID, int32 changeCounter,
 	partition->Changed(B_PARTITION_CHANGED_TYPE);
 	// implicit partitioning system changes
 	return partition->Parent()->DiskSystem()->ShadowPartitionChanged(
-		partition, B_PARTITION_SET_TYPE);
+		partition->Parent(), partition, B_PARTITION_SET_TYPE);
 }
 
 
@@ -1545,7 +1557,7 @@ _user_set_partition_parameters(partition_id partitionID, int32 changeCounter,
 				partition->Changed(B_PARTITION_CHANGED_PARAMETERS);
 				// implicit partitioning system changes
 				error = partition->Parent()->DiskSystem()
-					->ShadowPartitionChanged(partition,
+					->ShadowPartitionChanged(partition->Parent(), partition,
 						B_PARTITION_SET_PARAMETERS);
 			}
 		}
@@ -1588,7 +1600,7 @@ _user_set_partition_content_parameters(partition_id partitionID,
 				partition->Changed(B_PARTITION_CHANGED_CONTENT_PARAMETERS);
 				// implicit content disk system changes
 				error = partition->DiskSystem()->ShadowPartitionChanged(
-					partition, B_PARTITION_SET_CONTENT_PARAMETERS);
+					partition, NULL, B_PARTITION_SET_CONTENT_PARAMETERS);
 			}
 		}
 	}
@@ -1679,7 +1691,7 @@ _user_initialize_partition(partition_id partitionID, int32 changeCounter,
 
 	// implicit content disk system changes
 	return partition->DiskSystem()->ShadowPartitionChanged(
-		partition, B_PARTITION_INITIALIZE);
+		partition, NULL, B_PARTITION_INITIALIZE);
 }
 
 
@@ -1749,16 +1761,16 @@ _user_create_child_partition(partition_id partitionID, int32 changeCounter,
 					}				
 					// set the parameters
 					child->SetOffset(offset);
-					child->SetSize(offset);
+					child->SetSize(size);
 					error = child->SetType(type);
 				}
 				if (!error) {
-					error = partition->SetParameters(parameters);
+					error = child->SetParameters(parameters);
 				}
 				if (!error) {
 					// implicit partitioning system changes
 					error = partition->DiskSystem()->ShadowPartitionChanged(
-							partition, B_PARTITION_CREATE_CHILD);
+							partition, child, B_PARTITION_CREATE_CHILD);
 				}
 			}
 		}

@@ -13,6 +13,8 @@
 
 // A PartitionMap with reference count.
 struct PartitionMapCookie : PartitionMap {
+	PartitionMapCookie() : ref_count(1) {}
+
 	int32	ref_count;
 };
 

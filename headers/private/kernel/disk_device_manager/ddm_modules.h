@@ -68,7 +68,8 @@ typedef struct partition_module_info {
 
 	// shadow partition modification
 	// (device is write locked)
-	status_t (*shadow_changed)(partition_data* partition, uint32 operation);
+	status_t (*shadow_changed)(partition_data* partition,
+				partition_data *child, uint32 operation);
 
 
 	// writing

@@ -77,7 +77,8 @@ pm_get_supported_operations(partition_data* partition, uint32 mask = ~0)
 	int32 countSpaces = 0;
 	if (partition->child_count < 4
 		// free space check
-		&& pm_get_partitionable_spaces(partition, NULL, 0, &countSpaces) == B_OK
+		&& pm_get_partitionable_spaces(partition, NULL, 0, &countSpaces)
+			== B_BUFFER_OVERFLOW
 		&& countSpaces > 0) {
 		flags |= B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD;
 	}
@@ -661,8 +662,12 @@ get_partitionable_spaces(partition_data *partition,
 	if (positions)
 		delete[] positions;
 
-	*_actualCount = actualCount;
 	TRACE(("intel: get_partitionable_spaces - found: %ld\n", actualCount));
+
+	*_actualCount = actualCount;
+
+	if (count < actualCount)
+		return B_BUFFER_OVERFLOW;
 	return B_OK;
 }
 
@@ -725,15 +730,162 @@ pm_get_next_supported_type(partition_data *partition, int32 *cookie,
 
 // pm_shadow_changed
 status_t
-pm_shadow_changed(partition_data *partition, uint32 operation)
+pm_shadow_changed(partition_data *partition, partition_data *child,
+	uint32 operation)
 {
-	TRACE(("intel: pm_shadow_changed\n"));
+	TRACE(("intel: pm_shadow_changed(%p, %p, %lu)\n", partition, child,
+		operation));
 	
-	if (!partition)
-		return B_BAD_VALUE;
+	switch (operation) {
+		case B_PARTITION_SHADOW:
+		{
+			// get the physical partition
+			partition_data* physicalPartition = get_physical_partition(
+				partition->id);
+			if (!physicalPartition) {
+				dprintf("intel: pm_shadow_changed(B_PARTITION_SHADOW): no "
+					"physical partition with ID %ld\n", partition->id);
+				return B_ERROR;
+			}
 
-	// nothing to do here
-	return B_OK;
+			// clone the map
+			if (!physicalPartition->content_cookie) {
+				dprintf("intel: pm_shadow_changed(B_PARTITION_SHADOW): no "
+					"content cookie, physical partition: %ld\n", partition->id);
+				return B_ERROR;
+			}
+
+			PartitionMapCookie* map = new(nothrow) PartitionMapCookie;
+			if (!map)
+				return B_NO_MEMORY;
+
+			status_t error = map->Assign(
+				*(PartitionMapCookie*)physicalPartition->content_cookie);
+			if (error != B_OK) {
+				delete map;
+				return error;
+			}
+
+			partition->content_cookie = map;
+
+			return B_OK;
+		}
+
+		case B_PARTITION_SHADOW_CHILD:
+		{
+			// get the physical child partition
+			partition_data* physical = get_physical_partition(child->id);
+			if (!physical) {
+				dprintf("intel: pm_shadow_changed(B_PARTITION_SHADOW_CHILD): "
+					"no physical partition with ID %ld\n", child->id);
+				return B_ERROR;
+			}
+
+			if (!physical->cookie) {
+				dprintf("intel: pm_shadow_changed(B_PARTITION_SHADOW_CHILD): "
+					"no cookie, physical partition: %ld\n", child->id);
+				return B_ERROR;
+			}
+
+			// primary partition index
+			int32 index = ((PrimaryPartition*)physical->cookie)->Index();
+
+			if (!partition->content_cookie) {
+				dprintf("intel: pm_shadow_changed(B_PARTITION_SHADOW_CHILD): "
+					"no content cookie, physical partition: %ld\n",
+					partition->id);
+				return B_ERROR;
+			}
+
+			// get the primary partition
+			PartitionMapCookie* map
+				= ((PartitionMapCookie*)partition->content_cookie);
+			PrimaryPartition* primary = map->PrimaryPartitionAt(index);
+
+			if (!primary || primary->IsEmpty()) {
+				dprintf("intel: pm_shadow_changed(B_PARTITION_SHADOW_CHILD): "
+					"partition %ld is empty, primary index: %ld\n", child->id,
+					index);
+				return B_BAD_VALUE;
+			}
+
+			child->cookie = primary;
+
+			return B_OK;
+		}
+
+		case B_PARTITION_INITIALIZE:
+		{
+			// create an empty partition map
+			PartitionMapCookie* map = new(nothrow) PartitionMapCookie;
+			if (!map)
+				return B_NO_MEMORY;
+
+			partition->content_cookie = map;
+
+			return B_OK;
+		}
+
+		case B_PARTITION_CREATE_CHILD:
+		{
+			if (!partition->content_cookie) {
+				dprintf("intel: pm_shadow_changed(B_PARTITION_CREATE_CHILD): "
+					"no content cookie, partition: %ld\n", partition->id);
+				return B_ERROR;
+			}
+
+			PartitionMapCookie* map
+				= ((PartitionMapCookie*)partition->content_cookie);
+
+			// find an empty primary partition slot
+			PrimaryPartition* primary = NULL;
+			for (int32 i = 0; i < 4; i++) {
+				if (map->PrimaryPartitionAt(i)->IsEmpty()) {
+					primary = map->PrimaryPartitionAt(i);
+					break;
+				}
+			}
+
+			if (!primary) {
+				dprintf("intel: pm_shadow_changed(B_PARTITION_CREATE_CHILD): "
+					"no empty primary slot, partition: %ld\n", partition->id);
+				return B_ERROR;
+			}
+
+			// apply type
+			PartitionType type;
+			type.SetType(child->type);
+			if (!type.IsValid()) {
+				dprintf("intel: pm_shadow_changed(B_PARTITION_CREATE_CHILD): "
+					"invalid partition type, partition: %ld\n", partition->id);
+				return B_ERROR;
+			}
+
+			primary->SetType(type.Type());
+
+			// TODO: Apply parameters!
+
+			child->cookie = primary;
+
+			return B_OK;
+		}
+
+		case B_PARTITION_DEFRAGMENT:
+		case B_PARTITION_REPAIR:
+		case B_PARTITION_RESIZE:
+		case B_PARTITION_RESIZE_CHILD:
+		case B_PARTITION_MOVE:
+		case B_PARTITION_MOVE_CHILD:
+		case B_PARTITION_SET_NAME:
+		case B_PARTITION_SET_CONTENT_NAME:
+		case B_PARTITION_SET_TYPE:
+		case B_PARTITION_SET_PARAMETERS:
+		case B_PARTITION_SET_CONTENT_PARAMETERS:
+		case B_PARTITION_DELETE_CHILD:
+			break;
+	}
+
+	return B_ERROR;
 }
 
 
@@ -1249,7 +1401,8 @@ ep_get_supported_operations(partition_data* partition, uint32 mask = ~0)
 
 	// creating child
 	int32 countSpaces = 0;
-	if (pm_get_partitionable_spaces(partition, NULL, 0, &countSpaces) == B_OK
+	if (pm_get_partitionable_spaces(partition, NULL, 0, &countSpaces)
+			== B_BUFFER_OVERFLOW
 		&& countSpaces > 0) {
 		flags |= B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD;
 	}
@@ -1500,7 +1653,8 @@ ep_get_next_supported_type(partition_data *partition, int32 *cookie,
 
 // ep_shadow_changed
 status_t
-ep_shadow_changed(partition_data *partition, uint32 operation)
+ep_shadow_changed(partition_data *partition, partition_data *child,
+	uint32 operation)
 {
 	TRACE(("intel: ep_shadow_changed\n"));
 	

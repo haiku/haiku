@@ -118,6 +118,7 @@ status_t
 KDiskSystem::Load()
 {
 	ManagerLocker locker(KDiskDeviceManager::Default());
+dprintf("KDiskSystem::Load(): %s -> %ld\n", Name(), fLoadCounter + 1);
 	status_t error = B_OK;
 	if (fLoadCounter == 0)
 		error = LoadModule();
@@ -132,6 +133,7 @@ void
 KDiskSystem::Unload()
 {
 	ManagerLocker locker(KDiskDeviceManager::Default());
+dprintf("KDiskSystem::Unload(): %s -> %ld\n", Name(), fLoadCounter - 1);
 	if (fLoadCounter > 0 && --fLoadCounter == 0)
 		UnloadModule();
 }
@@ -361,7 +363,8 @@ KDiskSystem::GetNextSupportedType(KPartition *partition, int32 *cookie,
 
 // ShadowPartitionChanged
 status_t
-KDiskSystem::ShadowPartitionChanged(KPartition *partition, uint32 operation)
+KDiskSystem::ShadowPartitionChanged(KPartition *partition, KPartition *child,
+	uint32 operation)
 {
 	// to be implemented by derived classes
 	return B_ENTRY_NOT_FOUND;

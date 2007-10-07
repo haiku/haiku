@@ -33,7 +33,8 @@ status_t	pm_get_partitionable_spaces(partition_data *partition,
 				int32 *actualCount);
 status_t	pm_get_next_supported_type(partition_data *partition, int32 *cookie,
 				char *_type);
-status_t	pm_shadow_changed(partition_data *partition, uint32 operation);
+status_t	pm_shadow_changed(partition_data *partition, partition_data *child,
+				uint32 operation);
 
 status_t	pm_resize(int fd, partition_id partitionID, off_t size,
 				disk_job_id job);
@@ -77,7 +78,8 @@ status_t	ep_get_partitionable_spaces(partition_data *partition,
 				int32 *actualCount);
 status_t	ep_get_next_supported_type(partition_data *partition, int32 *cookie,
 				char *_type);
-status_t	ep_shadow_changed(partition_data *partition, uint32 operation);
+status_t	ep_shadow_changed(partition_data *partition, partition_data *child,
+				uint32 operation);
 
 status_t	ep_resize(int fd, partition_id partitionID, off_t size,
 				disk_job_id job);

@@ -408,7 +408,7 @@ KPartitioningSystem::GetTypeForContentType(const char *contentType, char *type)
 //! Calls for additional modifications when shadow partition is changed
 status_t
 KPartitioningSystem::ShadowPartitionChanged(KPartition *partition,
-	uint32 operation)
+	KPartition *child, uint32 operation)
 {
 	if (!partition)
 		return B_BAD_VALUE;
@@ -418,7 +418,8 @@ KPartitioningSystem::ShadowPartitionChanged(KPartition *partition,
 	// have to make any additional changes.
 	if (!fModule->shadow_changed)
 		return B_OK;
-	return fModule->shadow_changed(partition->PartitionData(), operation);
+	return fModule->shadow_changed(partition->PartitionData(),
+		child ? child->PartitionData() : NULL, operation);
 }
 
 

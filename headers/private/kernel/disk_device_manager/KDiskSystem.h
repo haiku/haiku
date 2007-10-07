@@ -100,7 +100,7 @@ public:
 	// Device must be write locked.
 
 	virtual status_t ShadowPartitionChanged(KPartition *partition,
-											uint32 operation);
+		KPartition *child, uint32 operation);
 
 	// Writing
 	// Device should not be locked.

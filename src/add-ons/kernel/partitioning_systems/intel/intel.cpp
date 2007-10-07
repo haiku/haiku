@@ -131,7 +131,6 @@ pm_identify_partition(int fd, partition_data *partition, void **cookie)
 	PartitionMapCookie *map = new(nothrow) PartitionMapCookie;
 	if (!map)
 		return -1;
-	map->ref_count = 1;
 
 	// read the partition structure
 	PartitionMapParser parser(fd, 0, partition->size);

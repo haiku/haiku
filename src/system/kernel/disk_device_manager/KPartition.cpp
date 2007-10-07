@@ -680,7 +680,7 @@ KPartition::RemoveChild(int32 index)
 		partition->SetParent(NULL);
 		partition->SetDevice(NULL);
 		// notify listeners
-		FireChildAdded(partition, index);
+		FireChildRemoved(partition, index);
 		return true;
 	}
 	return false;

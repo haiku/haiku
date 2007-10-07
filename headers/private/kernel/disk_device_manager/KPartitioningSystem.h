@@ -74,7 +74,7 @@ public:
 	// Shadow partition modification
 
 	virtual status_t ShadowPartitionChanged(KPartition *partition,
-											uint32 operation);
+		KPartition *child, uint32 operation);
 
 	// Writing
 

@@ -257,7 +257,7 @@ typedef struct fssh_file_system_module_info {
 
 	/* shadow partition modification (device is write locked) */
 	fssh_status_t (*shadow_changed)(fssh_partition_data *partition,
-				uint32_t operation);
+				fssh_partition_data *child, uint32_t operation);
 
 	/* writing (the device is NOT locked) */
 	fssh_status_t (*defragment)(int fd, fssh_partition_id partition,

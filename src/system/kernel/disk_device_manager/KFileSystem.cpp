@@ -173,7 +173,8 @@ KFileSystem::ValidateInitialize(KPartition *partition, char *name,
 
 // ShadowPartitionChanged
 status_t
-KFileSystem::ShadowPartitionChanged(KPartition *partition, uint32 operation)
+KFileSystem::ShadowPartitionChanged(KPartition *partition, KPartition *child,
+	uint32 operation)
 {
 	if (!partition)
 		return B_BAD_VALUE;
@@ -183,7 +184,8 @@ KFileSystem::ShadowPartitionChanged(KPartition *partition, uint32 operation)
 	// make any additional changes.
 	if (!fModule->shadow_changed)
 		return B_OK;
-	return fModule->shadow_changed(partition->PartitionData(), operation);
+	return fModule->shadow_changed(partition->PartitionData(),
+		child ? child->PartitionData() : NULL, operation);
 }
 
 
