@@ -29,10 +29,10 @@ Window::Window()
 	: BWindow(BRect(100, 100, 400, 400), "Menu Trigger Test",
 			B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
-	BMenuBar *bar = new BMenuBar(BRect(0, 0, 10, 10), "menuBar");
+	BMenuBar* bar = new BMenuBar(BRect(0, 0, 10, 10), "menuBar");
 	AddChild(bar);
 
-	BMenu *menu = new BMenu("File");
+	BMenu* menu = new BMenu("File");
 	menu->AddItem(new BMenuItem("Bart", NULL));
 	menu->AddItem(new BMenuItem("bart", NULL));
 	menu->AddItem(new BMenuItem("bart", NULL));
@@ -51,7 +51,12 @@ Window::Window()
 	menu->AddItem(new BMenuItem("3 a", NULL));
 	menu->AddItem(new BMenuItem("3 aöa", NULL));
 	bar->AddItem(menu);
-	
+
+	menu = new BMenu("Extra");
+	BMenuItem* item = new BMenuItem("\xe3\x81\x82 haiku", NULL);
+	item->SetTrigger('h');
+	menu->AddItem(item);
+	bar->AddItem(menu);
 }
 
 Window::~Window()
