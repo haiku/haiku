@@ -3842,7 +3842,32 @@ file_seek(struct file_descriptor *descriptor, off_t pos, int seekType)
 	off_t offset;
 
 	FUNCTION(("file_seek(pos = %Ld, seekType = %d)\n", pos, seekType));
-	// ToDo: seek should fail for pipes and FIFOs...
+
+	// stat() the node
+	struct vnode *vnode = descriptor->u.vnode;
+	if (FS_CALL(vnode, read_stat) == NULL)
+		return EOPNOTSUPP;
+
+	struct stat stat;
+	status_t status = FS_CALL(vnode, read_stat)(vnode->mount->cookie,
+		vnode->private_node, &stat);
+	if (status < B_OK)
+		return status;
+
+	// some kinds of files are not seekable
+	switch (stat.st_mode & S_IFMT) {
+		case S_IFIFO:
+			return ESPIPE;
+// TODO: We don't catch sockets here, but they are not seekable either (ESPIPE)!
+		// The Open Group Base Specs don't mention any file types besides pipes,
+		// fifos, and sockets specially, so we allow seeking them.
+		case S_IFREG:
+		case S_IFBLK:
+		case S_IFDIR:
+		case S_IFLNK:
+		case S_IFCHR:
+			break;
+	}
 
 	switch (seekType) {
 		case SEEK_SET:
@@ -3852,21 +3877,8 @@ file_seek(struct file_descriptor *descriptor, off_t pos, int seekType)
 			offset = descriptor->pos;
 			break;
 		case SEEK_END:
-		{
-			struct vnode *vnode = descriptor->u.vnode;
-			struct stat stat;
-			status_t status;
-
-			if (FS_CALL(vnode, read_stat) == NULL)
-				return EOPNOTSUPP;
-
-			status = FS_CALL(vnode, read_stat)(vnode->mount->cookie, vnode->private_node, &stat);
-			if (status < B_OK)
-				return status;
-
 			offset = stat.st_size;
 			break;
-		}
 		default:
 			return B_BAD_VALUE;
 	}
