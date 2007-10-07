@@ -52,6 +52,8 @@ private:
 	status_t _Update(bool shadow, bool *updated);
 	status_t _Update(user_disk_device_data *data, bool *updated);
 
+	static void _ClearUserData(user_partition_data* data);
+
 	virtual bool _AcceptVisitor(BDiskDeviceVisitor *visitor, int32 level);
 
 	user_disk_device_data	*fDeviceData;

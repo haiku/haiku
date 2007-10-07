@@ -377,11 +377,16 @@ BDiskDevice::_Update(user_disk_device_data *data, bool *updated)
 	if (!updated)
 		updated = &_updated;
 	*updated = false;
+
+	// clear the user_data fields first
+	_ClearUserData(&data->device_partition_data);
+
 	// remove obsolete partitions
 	status_t error = _RemoveObsoleteDescendants(&data->device_partition_data,
-												updated);
+		updated);
 	if (error != B_OK)
 		return error;
+
 	// update existing partitions and add new ones
 	error = BPartition::_Update(&data->device_partition_data, updated);
 	if (error == B_OK) {
@@ -404,3 +409,14 @@ BDiskDevice::_AcceptVisitor(BDiskDeviceVisitor *visitor, int32 level)
 	return visitor->Visit(this);
 }
 
+
+// _ClearUserData
+void
+BDiskDevice::_ClearUserData(user_partition_data* data)
+{
+	data->user_data = NULL;
+
+	// recurse
+	for (int i = 0; i < data->child_count; i++)
+		_ClearUserData(data->children[i]);
+}
