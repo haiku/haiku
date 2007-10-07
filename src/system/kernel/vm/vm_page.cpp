@@ -1179,11 +1179,14 @@ vm_mark_page_range_inuse(addr_t startPage, addr_t length)
 void
 vm_page_unreserve_pages(uint32 count)
 {
+	if (count == 0)
+		return;
+
 	InterruptsSpinLocker locker(sPageLock);
 	ASSERT(sReservedPages >= count);
 
 	sReservedPages -= count;
-	
+
 	if (vm_page_num_free_pages() <= sReservedPages)
 		sFreePageCondition.NotifyAll();
 }
@@ -1197,6 +1200,9 @@ vm_page_unreserve_pages(uint32 count)
 void
 vm_page_reserve_pages(uint32 count)
 {
+	if (count == 0)
+		return;
+
 	InterruptsSpinLocker locker(sPageLock);
 
 	sReservedPages += count;

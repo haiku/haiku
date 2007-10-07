@@ -520,7 +520,8 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 */
 static inline status_t
 read_into_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
-	int32 pageOffset, addr_t buffer, size_t bufferSize)
+	int32 pageOffset, addr_t buffer, size_t bufferSize,
+	size_t lastReservedPages, size_t reservePages)
 {
 	TRACE(("read_into_cache(offset = %Ld, size = %lu, pageOffset = %ld, buffer "
 		"= %#lx, bufferSize = %lu\n", offset, size, pageOffset, buffer,
@@ -540,7 +541,7 @@ read_into_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 	// allocate pages for the cache and mark them busy
 	for (size_t pos = 0; pos < numBytes; pos += B_PAGE_SIZE) {
 		vm_page *page = pages[pageIndex++] = vm_page_allocate_page(
-			PAGE_STATE_FREE, false);
+			PAGE_STATE_FREE, true);
 		if (page == NULL)
 			panic("no more pages!");
 
@@ -558,6 +559,7 @@ read_into_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 	}
 
 	mutex_unlock(&cache->lock);
+	vm_page_unreserve_pages(lastReservedPages);
 
 	// read file into reserved pages
 	status_t status = pages_io(ref, offset, vecs, vecCount, &numBytes, false);
@@ -609,6 +611,7 @@ read_into_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 		}
 	}
 
+	vm_page_reserve_pages(reservePages);
 	mutex_lock(&cache->lock);
 
 	// make the pages accessible in the cache
@@ -629,7 +632,8 @@ read_into_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 */
 static inline status_t
 write_to_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
-	int32 pageOffset, addr_t buffer, size_t bufferSize)
+	int32 pageOffset, addr_t buffer, size_t bufferSize,
+	size_t lastReservedPages, size_t reservePages)
 {
 	// TODO: We're using way too much stack! Rather allocate a sufficiently
 	// large chunk on the heap.
@@ -651,7 +655,7 @@ write_to_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 		// TODO: the pages we allocate here should have been reserved upfront
 		//	in cache_io()
 		vm_page *page = pages[pageIndex++] = vm_page_allocate_page(
-			PAGE_STATE_FREE, false);
+			PAGE_STATE_FREE, true);
 		busyConditions[pageIndex - 1].Publish(page, "page");
 
 		vm_cache_insert_page(ref->cache, page, offset + pos);
@@ -665,6 +669,7 @@ write_to_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 	}
 
 	mutex_unlock(&ref->cache->lock);
+	vm_page_unreserve_pages(lastReservedPages);
 
 	// copy contents (and read in partially written pages first)
 
@@ -730,6 +735,9 @@ write_to_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 		}
 	}
 
+	if (status == B_OK)
+		vm_page_reserve_pages(reservePages);
+
 	mutex_lock(&ref->cache->lock);
 
 	// unmap the pages again
@@ -759,22 +767,27 @@ write_to_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 
 static status_t
 satisfy_cache_io(file_cache_ref *ref, off_t offset, addr_t buffer,
-	int32 &pageOffset, size_t bytesLeft, off_t &lastOffset, addr_t &lastBuffer,
-	int32 &lastPageOffset, size_t &lastLeft, bool doWrite)
+	int32 &pageOffset, size_t bytesLeft, size_t &reservePages,
+	off_t &lastOffset, addr_t &lastBuffer, int32 &lastPageOffset,
+	size_t &lastLeft, size_t &lastReservedPages, bool doWrite)
 {
 	if (lastBuffer == buffer)
 		return B_OK;
 
 	size_t requestSize = buffer - lastBuffer;
+	reservePages = min_c(MAX_IO_VECS,
+		(bytesLeft - requestSize + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
+
 	status_t status;
 	if (doWrite) {
 		status = write_to_cache(ref, lastOffset, requestSize, lastPageOffset,
-			lastBuffer, requestSize);
+			lastBuffer, requestSize, lastReservedPages, reservePages);
 	} else {
 		status = read_into_cache(ref, lastOffset, requestSize, lastPageOffset,
-			lastBuffer, requestSize);
+			lastBuffer, requestSize, lastReservedPages, reservePages);
 	}
 	if (status == B_OK) {
+		lastReservedPages = reservePages;
 		lastBuffer = buffer;
 		lastLeft = bytesLeft;
 		lastOffset = offset;
@@ -826,7 +839,11 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
 	int32 lastPageOffset = pageOffset;
 	addr_t lastBuffer = buffer;
 	off_t lastOffset = offset;
+	size_t lastReservedPages = min_c(MAX_IO_VECS,
+		(bytesLeft + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
+	size_t reservePages = 0;
 
+	vm_page_reserve_pages(lastReservedPages);
 	mutex_lock(&cache->lock);
 
 	while (bytesLeft > 0) {
@@ -838,8 +855,8 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
 			// we didn't get yet (to make sure no one else interferes in the
 			// mean time).
 			status_t status = satisfy_cache_io(ref, offset, buffer, pageOffset,
-				bytesLeft, lastOffset, lastBuffer, lastPageOffset, lastLeft,
-				doWrite);
+				bytesLeft, reservePages, lastOffset, lastBuffer, lastPageOffset,
+				lastLeft, lastReservedPages, doWrite);
 			if (status != B_OK) {
 				mutex_unlock(&cache->lock);
 				return status;
@@ -887,6 +904,7 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
 			if (bytesLeft <= bytesInPage) {
 				// we've read the last page, so we're done!
 				mutex_unlock(&cache->lock);
+				vm_page_unreserve_pages(lastReservedPages);
 				return B_OK;
 			}
 
@@ -907,8 +925,8 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
 
 		if (buffer - lastBuffer + lastPageOffset >= kMaxChunkSize) {
 			status_t status = satisfy_cache_io(ref, offset, buffer, pageOffset,
-				bytesLeft, lastOffset, lastBuffer, lastPageOffset, lastLeft,
-				doWrite);
+				bytesLeft, reservePages, lastOffset, lastBuffer, lastPageOffset,
+				lastLeft, lastReservedPages, doWrite);
 			if (status != B_OK) {
 				mutex_unlock(&cache->lock);
 				return status;
@@ -921,10 +939,10 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
 	status_t status;
 	if (doWrite) {
 		status = write_to_cache(ref, lastOffset, lastLeft, lastPageOffset,
-			lastBuffer, lastLeft);
+			lastBuffer, lastLeft, lastReservedPages, 0);
 	} else {
 		status = read_into_cache(ref, lastOffset, lastLeft, lastPageOffset,
-			lastBuffer, lastLeft);
+			lastBuffer, lastLeft, lastReservedPages, 0);
 	}
 
 	mutex_unlock(&cache->lock);
