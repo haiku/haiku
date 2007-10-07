@@ -265,7 +265,7 @@ BMenuItem::SetTrigger(char trigger)
 		pos = strchr(Label(), trigger);
 	}
 	if (pos != NULL) {
-		fTriggerIndex = pos - Label();
+		fTriggerIndex = UTF8CountChars(Label(), pos - Label());
 		fTrigger = tolower(UTF8ToCharCode(&pos));
 	} else {
 		fTrigger = 0;
