@@ -243,18 +243,22 @@ BDiskSystem::SupportsInitializing() const
 // GetNextSupportedType
 status_t
 BDiskSystem::GetNextSupportedType(BPartition *partition, int32 *cookie,
-								  char *type) const
+	char *type) const
 {
+// TODO: We probably need a second method for and modify the partitioning
+// system module hook a little. This method takes the parent partition of
+// a partition to be created for which we want to get supported types. It
+// should also be possible to invoke it for the partition whose type to change
+// though.
 	if (InitCheck() != B_OK)
 		return InitCheck();
 	if (!cookie || !type || !partition || !partition->_IsShadow()
-		|| !partition->Parent() || partition->Parent()->_DiskSystem() != fID
-		|| !IsPartitioningSystem()) {
+		|| partition->_DiskSystem() != fID || !IsPartitioningSystem()) {
 		return B_BAD_VALUE;
 	}
+
 	return _kern_get_next_supported_partition_type(partition->_ShadowID(),
-												   partition->_ChangeCounter(),
-												   cookie, type);
+		partition->_ChangeCounter(), cookie, type);
 }
 
 // GetTypeForContentType
