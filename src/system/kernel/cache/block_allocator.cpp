@@ -363,6 +363,10 @@ block_range::Allocate(block_cache *cache, block_chunk **_chunk)
 
 		vm_address_space *addressSpace = vm_kernel_address_space();
 		vm_translation_map *map = &addressSpace->translation_map;
+		size_t reservePages = map->ops->map_max_pages_need(map,
+			0, numPages * B_PAGE_SIZE);
+
+		vm_page_reserve_pages(reservePages);
 		map->ops->lock(map);
 
 		for (uint32 i = 0; i < numPages; i++) {
@@ -372,6 +376,7 @@ block_range::Allocate(block_cache *cache, block_chunk **_chunk)
 		}
 
 		map->ops->unlock(map);
+		vm_page_unreserve_pages(reservePages);
 
 		chunks[chunk].mapped = true;
 	}
