@@ -4422,8 +4422,6 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 	// TODO: block input if not editable (Andrew)
 	ASSERT(fInline != NULL);
 
-	printf("HandleInputMethodChanged()\n");
-	message->PrintToStream();
 	const char *string = NULL;
 	if (message->FindString("be:string", &string) < B_OK || string == NULL)
 		return;
@@ -4528,7 +4526,6 @@ BTextView::CancelInputMethod()
 	if (!fInline)
 		return;
 
-	printf("CancelInputMethod()\n");
 	_BInlineInput_ *inlineInput = fInline;
 	fInline = NULL;
 
