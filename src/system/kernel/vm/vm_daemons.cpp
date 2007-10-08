@@ -223,7 +223,7 @@ vm_daemon_init()
 
 	// create a kernel thread to select pages for pageout
 	thread_id thread = spawn_kernel_thread(&page_daemon, "page daemon",
-		B_LOW_PRIORITY, NULL);
+		B_LOW_PRIORITY + 1, NULL);
 	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
 
 	return B_OK;

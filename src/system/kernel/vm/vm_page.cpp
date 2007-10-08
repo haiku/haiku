@@ -375,12 +375,30 @@ dump_page_queue(int argc, char **argv)
 
 	if (argc == 3) {
 		struct vm_page *page = queue->head;
+		const char *type = "unknown";
 		int i;
 
-		kprintf("page        cache          state  wired  usage\n");
+		switch (page->cache->type) {
+			case CACHE_TYPE_RAM:
+				type = "RAM";
+				break;
+			case CACHE_TYPE_DEVICE:
+				type = "device";
+				break;
+			case CACHE_TYPE_VNODE:
+				type = "vnode";
+				break;
+			case CACHE_TYPE_NULL:
+				type = "null";
+				break;
+			default:
+				break;
+		}
+
+		kprintf("page        cache       type       state  wired  usage\n");
 		for (i = 0; page; i++, page = page->queue_next) {
-			kprintf("%p  %p  %8s  %5d  %5d\n", page, page->cache,
-				page_state_to_string(page->state),
+			kprintf("%p  %p  %-7s %8s  %5d  %5d\n", page, page->cache,
+				type, page_state_to_string(page->state),
 				page->wired_count, page->usage_count);
 		}
 	}
@@ -411,16 +429,16 @@ dump_page_stats(int argc, char **argv)
 	kprintf("wired: %lu\nmodified: %lu\nfree: %lu\nclear: %lu\n",
 		counter[PAGE_STATE_WIRED], counter[PAGE_STATE_MODIFIED],
 		counter[PAGE_STATE_FREE], counter[PAGE_STATE_CLEAR]);
+	kprintf("reserved pages: %lu\n", sReservedPages);
 
-	kprintf("\nfree_queue: %p, count = %ld\n", &sFreePageQueue,
+	kprintf("\nfree queue: %p, count = %ld\n", &sFreePageQueue,
 		sFreePageQueue.count);
-	kprintf("clear_queue: %p, count = %ld\n", &sClearPageQueue,
+	kprintf("clear queue: %p, count = %ld\n", &sClearPageQueue,
 		sClearPageQueue.count);
-	kprintf("modified_queue: %p, count = %ld\n", &sModifiedPageQueue,
+	kprintf("modified queue: %p, count = %ld\n", &sModifiedPageQueue,
 		sModifiedPageQueue.count);
-	kprintf("active_queue: %p, count = %ld\n", &sActivePageQueue,
+	kprintf("active queue: %p, count = %ld\n", &sActivePageQueue,
 		sActivePageQueue.count);
-
 	return 0;
 }
 
@@ -612,12 +630,12 @@ write_page(vm_page *page, bool mayBlock, bool fsReenter)
 		vecs, 1, &length, mayBlock, fsReenter);
 
 	vm_put_physical_page((addr_t)vecs[0].iov_base);
-
+#if 0
 	if (status < B_OK) {
 		dprintf("write_page(page = %p): offset = %lx, status = %ld\n",
 			page, page->cache_offset, status);
 	}
-
+#endif
 	return status;
 }
 
@@ -751,12 +769,10 @@ page_thief(void* /*unused*/)
 			default:
 				timeout = B_INFINITE_TIMEOUT;
 				continue;
-
 			case B_LOW_MEMORY_NOTE:
-				steal = 10;
-				score = -20;
 				timeout = 1000000;
-				break;
+				continue;
+
 			case B_LOW_MEMORY_WARNING:
 				steal = 50;
 				score = -5;
@@ -768,7 +784,6 @@ page_thief(void* /*unused*/)
 				timeout = 100000;
 				break;
 		}
-		//dprintf("page thief running - target %ld...\n", steal);
 
 		vm_page* page = NULL;
 		bool stealActive = false, desperate = false;
@@ -780,7 +795,8 @@ page_thief(void* /*unused*/)
 
 			// find a candidate to steal from the inactive queue
 
-			for (int32 i = sActivePageQueue.count; i-- > 0;) {
+			int32 i = sActivePageQueue.count;
+			while (i-- > 0) {
 				// move page to the tail of the queue so that we don't
 				// scan it again directly
 				page = dequeue_page(&sActivePageQueue);
@@ -793,7 +809,7 @@ page_thief(void* /*unused*/)
 					break;
 			}
 
-			if (page == NULL) {
+			if (i < 0) {
 				if (score == 0) {
 					if (state != B_LOW_MEMORY_CRITICAL)
 						break;
@@ -805,6 +821,8 @@ page_thief(void* /*unused*/)
 						score = 127;
 						desperate = true;
 					} else {
+						// TODO: for now, we never steal active pages
+						break;
 						stealActive = true;
 						score = 5;
 						steal = 5;
@@ -965,7 +983,7 @@ vm_page_write_modified_pages(vm_cache *cache, bool fsReenter)
 
 
 /*!	Schedules the page writer to write back the specified \a page.
-	Note, however, that it doesn't do this immediately, and it might
+	Note, however, that it might not do this immediately, and it can well
 	take several seconds until the page is actually written out.
 */
 void
@@ -975,8 +993,7 @@ vm_page_schedule_write_page(vm_page *page)
 
 	vm_page_requeue(page, false);
 
-	release_sem_etc(sWriterWaitSem, 1,
-		B_RELEASE_IF_WAITING_ONLY | B_DO_NOT_RESCHEDULE);
+	release_sem_etc(sWriterWaitSem, 1, B_DO_NOT_RESCHEDULE);
 }
 
 
@@ -1103,7 +1120,7 @@ vm_page_init_post_thread(kernel_args *args)
 	sThiefWaitSem = create_sem(0, "page thief");
 
 	thread = spawn_kernel_thread(&page_writer, "page writer",
-		B_LOW_PRIORITY, NULL);
+		B_LOW_PRIORITY + 2, NULL);
 	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
 
 	thread = spawn_kernel_thread(&page_thief, "page thief",
@@ -1187,7 +1204,9 @@ vm_page_unreserve_pages(uint32 count)
 
 	sReservedPages -= count;
 
-	if (vm_page_num_free_pages() <= sReservedPages)
+	// TODO: find out why the line below won't work correctly
+	//if (vm_page_num_free_pages() <= sReservedPages + count)
+	if (!kernel_startup)
 		sFreePageCondition.NotifyAll();
 }
 
@@ -1207,17 +1226,23 @@ vm_page_reserve_pages(uint32 count)
 
 	sReservedPages += count;
 	size_t freePages = vm_page_num_free_pages();
-	if (sReservedPages < freePages)
+	if (sReservedPages <= freePages)
 		return;
 
 	ConditionVariableEntry<page_queue> freeConditionEntry;
-	freeConditionEntry.Add(&sFreePageQueue);
 	vm_low_memory(sReservedPages - freePages);
 
-	// we need to wait until new pages become available
-	locker.Unlock();
+	while (true) {
+		// we need to wait until new pages become available
+		freeConditionEntry.Add(&sFreePageQueue);
+		locker.Unlock();
+	
+		freeConditionEntry.Wait();
 
-	freeConditionEntry.Wait();
+		locker.Lock();
+		if (sReservedPages <= vm_page_num_free_pages())
+			break;
+	}
 }
 
 
@@ -1260,6 +1285,8 @@ vm_page_allocate_page(int pageState, bool reserved)
 		}
 
 		if (page == NULL) {
+			if (reserved)
+				panic("Had reserved page, but there is none!");
 #ifdef DEBUG
 			if (otherQueue->count != 0) {
 				panic("other queue %p corrupted, count = %d\n", otherQueue,
@@ -1329,12 +1356,15 @@ vm_page_allocate_pages(int pageState, vm_page **pages, uint32 numPages)
 vm_page *
 vm_page_allocate_page_run(int pageState, addr_t length)
 {
-	// TODO: make sure this one doesn't steal reserved pages!
 	vm_page *firstPage = NULL;
 	uint32 start = 0;
 
-	cpu_status state = disable_interrupts();
-	acquire_spinlock(&sPageLock);
+	InterruptsSpinLocker locker(sPageLock);
+
+	if (sFreePageQueue.count + sClearPageQueue.count - sReservedPages < length) {
+		// no free space
+		return NULL;
+	}
 
 	for (;;) {
 		bool foundRun = true;
@@ -1364,8 +1394,8 @@ vm_page_allocate_page_run(int pageState, addr_t length)
 			start += i;
 		}
 	}
-	release_spinlock(&sPageLock);
-	restore_interrupts(state);
+
+	locker.Unlock();
 
 	if (firstPage != NULL && pageState == PAGE_STATE_CLEAR) {
 		for (uint32 i = 0; i < length; i++) {
