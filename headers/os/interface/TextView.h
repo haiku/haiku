@@ -359,7 +359,7 @@ virtual void			_ReservedTextView12();
 									   
 		void			PerformAutoScrolling();									
 		void			UpdateScrollbars();
-		void			AutoResize(bool doredraw=true);
+		void			AutoResize(bool doRedraw = true);
 		
 		void			NewOffscreen(float padding = 0.0F);
 		void			DeleteOffscreen();
@@ -368,6 +368,9 @@ virtual void			_ReservedTextView12();
 		void			Deactivate();
 
 		void			NormalizeFont(BFont *font);
+
+		void			_SetRunArray(int32 startOffset, int32 endOffset, 
+								const text_run_array *inRuns);
 
 		uint32			CharClassification(int32 offset) const;
 		int32			NextInitialByte(int32 offset) const;

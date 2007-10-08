@@ -1506,44 +1506,12 @@ void
 BTextView::SetRunArray(int32 startOffset, int32 endOffset, const text_run_array *inRuns)
 {
 	CALLED();
-	if (startOffset > endOffset)
-		return;
 
 	CancelInputMethod();
-	
-	const int32 textLength = fText->Length();
-		
-	// pin offsets at reasonable values
-	if (startOffset < 0)
-		startOffset = 0;
-	else if (startOffset > textLength)
-		startOffset = textLength;
 
-	if (endOffset < 0)
-		endOffset = 0;
-	else if (endOffset > textLength)
-		endOffset = textLength;
-	
-	long numStyles = inRuns->count;
-	if (numStyles > 0) {	
-		const text_run *theRun = &inRuns->runs[0];
-		for (long index = 0; index < numStyles; index++) {
-			long fromOffset = theRun->offset + startOffset;
-			long toOffset = endOffset;
-			if (index + 1 < numStyles) {
-				toOffset = (theRun + 1)->offset + startOffset;
-				toOffset = (toOffset > endOffset) ? endOffset : toOffset;
-			}
+	_SetRunArray(startOffset, endOffset, inRuns);
 
-			fStyles->SetStyleRange(fromOffset, toOffset, textLength,
-							  	  B_FONT_ALL, &theRun->font, &theRun->color);
-							
-			theRun++;
-		}
-		fStyles->InvalidateNullStyle();
-		
-		Refresh(startOffset, endOffset, true, false);
-	}
+	Refresh(startOffset, endOffset, true, false);
 }
 
 
@@ -2604,9 +2572,9 @@ BTextView::InsertText(const char *inText, int32 inLength, int32 inOffset,
 	// update the style runs
 	fStyles->BumpOffset(inLength, fStyles->OffsetToRun(inOffset - 1) + 1);
 	
-	if (inRuns != NULL)
-		SetRunArray(inOffset, inOffset + inLength, inRuns);
-	else {
+	if (inRuns != NULL) {
+		_SetRunArray(inOffset, inOffset + inLength, inRuns);
+	} else {
 		// apply nullStyle to inserted text
 		fStyles->SyncNullStyle(inOffset);
 		fStyles->SetStyleRange(inOffset, inOffset + inLength, 
@@ -4227,6 +4195,48 @@ BTextView::NormalizeFont(BFont *font)
 }
 
 
+void
+BTextView::_SetRunArray(int32 startOffset, int32 endOffset, const text_run_array *inRuns)
+{
+	if (startOffset > endOffset)
+		return;
+
+	const int32 textLength = fText->Length();
+		
+	// pin offsets at reasonable values
+	if (startOffset < 0)
+		startOffset = 0;
+	else if (startOffset > textLength)
+		startOffset = textLength;
+
+	if (endOffset < 0)
+		endOffset = 0;
+	else if (endOffset > textLength)
+		endOffset = textLength;
+	
+	const int32 numStyles = inRuns->count;
+	if (numStyles > 0) {	
+		const text_run *theRun = &inRuns->runs[0];
+		for (int32 index = 0; index < numStyles; index++) {
+			int32 fromOffset = theRun->offset + startOffset;
+			int32 toOffset = endOffset;
+			if (index + 1 < numStyles) {
+				toOffset = (theRun + 1)->offset + startOffset;
+				toOffset = (toOffset > endOffset) ? endOffset : toOffset;
+			}
+
+			BFont font = theRun->font;
+			NormalizeFont(&font);
+			fStyles->SetStyleRange(fromOffset, toOffset, textLength,
+							  	  B_FONT_ALL, &theRun->font, &theRun->color);
+							
+			theRun++;
+		}
+		fStyles->InvalidateNullStyle();
+	}
+}
+
+
 /*! \brief Returns a value which tells if the given character is a separator
 	character or not.
 	\param offset The offset where the wanted character can be found.
@@ -4412,9 +4422,13 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 	// TODO: block input if not editable (Andrew)
 	ASSERT(fInline != NULL);
 
+	printf("HandleInputMethodChanged()\n");
+	message->PrintToStream();
 	const char *string = NULL;
 	if (message->FindString("be:string", &string) < B_OK || string == NULL)
 		return;
+
+	_HideCaret();
 
 	be_app->ObscureCursor();
 
@@ -4428,19 +4442,21 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 
 	// Delete the previously inserted text (if any)
 	if (fInline->IsActive()) {
-		int32 oldOffset = fInline->Offset();
-		BTextView::DeleteText(oldOffset, oldOffset + fInline->Length());
-		fClickOffset = fSelStart = fSelEnd = oldOffset;
-
+		const int32 oldOffset = fInline->Offset();
+		DeleteText(oldOffset, oldOffset + fInline->Length());
 		if (confirmed)
 			fInline->SetActive(false);
+		fClickOffset = fSelStart = fSelEnd = oldOffset;
 	}
 
-	int32 stringLen = strlen(string);
+	const int32 stringLen = strlen(string);
 
 	fInline->SetOffset(fSelStart);
 	fInline->SetLength(stringLen);
 	fInline->ResetClauses();
+
+	if (!confirmed && !fInline->IsActive())
+		fInline->SetActive(true);
 
 	// Get the clauses, and pass them to the _BInlineInput_ object
 	// TODO: Find out if what we did it's ok, currently we don't consider clauses
@@ -4464,21 +4480,14 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 	fInline->SetSelectionOffset(selectionStart);
 	fInline->SetSelectionLength(selectionEnd - selectionStart);
 	
-	// Insert the new text
-	// We call the base InsertText(), because inherited method could do bad things:
-	// Mail, for example, does call InsertText() with a runarray parameter
-	// (even if we pass NULL here). That causes SetRunArray() to be called,
-	// which in turn calls CancelInputMethod(), which would destroy fInline
-	// (and we call some of its functions later). Bug #1022.
-	// TODO: Check if R5 really does this 
-	BTextView::InsertText(string, stringLen, fSelStart, NULL);
+	const int32 inlineOffset = fInline->Offset();
+	InsertText(string, stringLen, fSelStart, NULL);
 	fSelStart += stringLen;
 	fClickOffset = fSelEnd = fSelStart;
 
-	if (!confirmed && !fInline->IsActive())
-		fInline->SetActive(true);
-
-	Refresh(fInline->Offset(), fSelEnd, true, false);
+	Refresh(inlineOffset, fSelEnd, true, true);
+	
+	_ShowCaret();
 }
 
 
@@ -4519,18 +4528,12 @@ BTextView::CancelInputMethod()
 	if (!fInline)
 		return;
 
+	printf("CancelInputMethod()\n");
 	_BInlineInput_ *inlineInput = fInline;
 	fInline = NULL;
 
-	// Delete the previously inserted text (if any)
-	if (inlineInput->IsActive()) {
-		int32 oldOffset = inlineInput->Offset();
-		DeleteText(oldOffset, oldOffset + inlineInput->Length());
-		fClickOffset = fSelStart = fSelEnd = oldOffset;
-	}
-
-	if (Window())
-		Refresh(0, fText->Length(), true, false);
+	if (inlineInput->IsActive() && Window())
+		Refresh(inlineInput->Offset(), fText->Length() - inlineInput->Offset(), true, false);
 
 	BMessage message(B_INPUT_METHOD_EVENT);
 	message.AddInt32("be:opcode", B_INPUT_METHOD_STOPPED);
