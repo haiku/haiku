@@ -40,12 +40,13 @@ static const bigtime_t kLowMemoryInterval = 3000000;	// 3 secs
 static const bigtime_t kWarnMemoryInterval = 500000;	// 0.5 secs
 
 // page limits
-static const size_t kNoteLimit = 1024;
+static const size_t kNoteLimit = 2048;
 static const size_t kWarnLimit = 256;
 static const size_t kCriticalLimit = 32;
 
 
 static int32 sLowMemoryState = B_NO_LOW_MEMORY;
+static bigtime_t sLastMeasurement;
 
 static mutex sLowMemoryMutex;
 static sem_id sLowMemoryWaitSem;
@@ -69,6 +70,8 @@ call_handlers(int32 level)
 static int32
 compute_state(void)
 {
+	sLastMeasurement = system_time();
+
 	uint32 freePages = vm_page_num_free_pages();
 	if (freePages >= kNoteLimit)
 		return B_NO_LOW_MEMORY;
@@ -148,6 +151,9 @@ vm_low_memory(size_t requirements)
 int32
 vm_low_memory_state(void)
 {
+	if (system_time() - sLastMeasurement > 500000)
+		sLowMemoryState = compute_state();
+
 	return sLowMemoryState;
 }
 
