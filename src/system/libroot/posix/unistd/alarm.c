@@ -15,17 +15,12 @@ uint
 alarm(unsigned int sec)
 {
 	struct itimerval value, oldValue;
-	int result;
 
 	value.it_interval.tv_sec = value.it_interval.tv_usec = 0;
 	value.it_value.tv_sec = sec;
 	value.it_value.tv_usec = 0;
-
-	result = setitimer(ITIMER_REAL, &value, &oldValue);
-	if (result < 0) {
-		errno = result;
+	if (setitimer(ITIMER_REAL, &value, &oldValue) < 0)
 		return -1;
-	}
 
 	if (oldValue.it_value.tv_usec)
 		oldValue.it_value.tv_sec++;
