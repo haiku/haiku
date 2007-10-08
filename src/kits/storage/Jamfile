@@ -78,6 +78,7 @@ MergeObject <libbe>storage_kit.o :
 	DiskDeviceTypes.cpp
 	DiskDeviceVisitor.cpp
 	DiskSystem.cpp
+	DiskSystemAddOn.cpp
 	Partition.cpp
 	PartitioningInfo.cpp 
 ;
