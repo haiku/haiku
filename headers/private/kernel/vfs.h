@@ -81,7 +81,8 @@ int vfs_setrlimit(int resource, const struct rlimit * rlp);
 int vfs_get_vnode_from_fd(int fd, bool kernel, struct vnode **_vnode);
 status_t vfs_get_vnode_from_path(const char *path, bool kernel,
 			struct vnode **_vnode);
-status_t vfs_get_vnode(dev_t mountID, ino_t vnodeID, struct vnode **_vnode);
+status_t vfs_get_vnode(dev_t mountID, ino_t vnodeID, bool canWait,
+			struct vnode **_vnode);
 status_t vfs_entry_ref_to_vnode(dev_t mountID, ino_t directoryID,
 			const char *name, struct vnode **_vnode);
 void vfs_vnode_to_node_ref(struct vnode *vnode, dev_t *_mountID,

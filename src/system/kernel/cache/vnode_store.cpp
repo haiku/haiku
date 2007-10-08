@@ -88,7 +88,7 @@ store_acquire_unreferenced_ref(struct vm_store *_store)
 {
 	vnode_store *store = (vnode_store *)_store;
 	struct vnode *vnode;
-	return vfs_get_vnode(store->device, store->inode, &vnode);
+	return vfs_get_vnode(store->device, store->inode, false, &vnode);
 }
 
 

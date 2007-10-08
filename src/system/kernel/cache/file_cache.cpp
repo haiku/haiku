@@ -518,13 +518,13 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 	The cache_ref lock must be hold when calling this function; during
 	operation it will unlock the cache, though.
 */
-static inline status_t
+static status_t
 read_into_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 	int32 pageOffset, addr_t buffer, size_t bufferSize,
 	size_t lastReservedPages, size_t reservePages)
 {
 	TRACE(("read_into_cache(offset = %Ld, size = %lu, pageOffset = %ld, buffer "
-		"= %#lx, bufferSize = %lu\n", offset, size, pageOffset, buffer,
+		"= %#lx, bufferSize = %lu\n", offset, numBytes, pageOffset, buffer,
 		bufferSize));
 
 	vm_cache *cache = ref->cache;
@@ -630,7 +630,7 @@ read_into_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 	though, if only a partial page gets written.
 	The same restrictions apply.
 */
-static inline status_t
+static status_t
 write_to_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 	int32 pageOffset, addr_t buffer, size_t bufferSize,
 	size_t lastReservedPages, size_t reservePages)
@@ -1086,7 +1086,7 @@ cache_prefetch(dev_t mountID, ino_t vnodeID, off_t offset, size_t size)
 
 	// get the vnode for the object, this also grabs a ref to it
 	struct vnode *vnode;
-	if (vfs_get_vnode(mountID, vnodeID, &vnode) != B_OK)
+	if (vfs_get_vnode(mountID, vnodeID, true, &vnode) != B_OK)
 		return;
 
 	cache_prefetch_vnode(vnode, offset, size);

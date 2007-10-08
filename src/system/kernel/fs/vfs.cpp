@@ -825,21 +825,22 @@ lookup_vnode(dev_t mountID, ino_t vnodeID)
 	\return \c B_OK, if everything when fine, an error code otherwise.
 */
 static status_t
-get_vnode(dev_t mountID, ino_t vnodeID, struct vnode **_vnode, int reenter)
+get_vnode(dev_t mountID, ino_t vnodeID, struct vnode **_vnode, bool canWait,
+	int reenter)
 {
 	FUNCTION(("get_vnode: mountid %ld vnid 0x%Lx %p\n", mountID, vnodeID, _vnode));
 
 	mutex_lock(&sVnodeMutex);
 
-	int32 tries = 300;
-		// try for 3 secs
+	int32 tries = 1000;
+		// try for 10 secs
 restart:
 	struct vnode *vnode = lookup_vnode(mountID, vnodeID);
 	if (vnode && vnode->busy) {
 		mutex_unlock(&sVnodeMutex);
-		if (--tries < 0) {
+		if (!canWait || --tries < 0) {
 			// vnode doesn't seem to become unbusy
-			panic("vnode %ld:%Ld is not becoming unbusy!\n", mountID, vnodeID);
+			dprintf("vnode %ld:%Ld is not becoming unbusy!\n", mountID, vnodeID);
 			return B_BUSY;
 		}
 		snooze(10000); // 10 ms
@@ -867,7 +868,8 @@ restart:
 		vnode->busy = true;
 		mutex_unlock(&sVnodeMutex);
 
-		status = FS_CALL(vnode, get_vnode)(vnode->mount->cookie, vnodeID, &vnode->private_node, reenter);
+		status = FS_CALL(vnode, get_vnode)(vnode->mount->cookie, vnodeID,
+			&vnode->private_node, reenter);
 		if (status == B_OK && vnode->private_node == NULL)
 			status = B_BAD_VALUE;
 
@@ -1422,7 +1424,7 @@ resolve_mount_point_to_volume_root(dev_t mountID, ino_t nodeID,
 {
 	// get the node
 	struct vnode *node;
-	status_t error = get_vnode(mountID, nodeID, &node, false);
+	status_t error = get_vnode(mountID, nodeID, &node, true, false);
 	if (error != B_OK)
 		return error;
 
@@ -1534,7 +1536,7 @@ entry_ref_to_vnode(dev_t mountID, ino_t directoryID, const char *name,
 	// get the directory vnode and let vnode_path_to_vnode() do the rest
 	struct vnode *directory;
 
-	status_t status = get_vnode(mountID, directoryID, &directory, false);
+	status_t status = get_vnode(mountID, directoryID, &directory, true, false);
 	if (status < 0)
 		return status;
 
@@ -2532,7 +2534,7 @@ dump_vnode_usage(int argc, char **argv)
 #endif	// ADD_DEBUGGER_COMMANDS
 
 
-//	#pragma mark - public VFS API
+//	#pragma mark - public API for file systems
 
 
 extern "C" status_t
@@ -2603,7 +2605,7 @@ get_vnode(dev_t mountID, ino_t vnodeID, fs_vnode *_fsNode)
 {
 	struct vnode *vnode;
 
-	status_t status = get_vnode(mountID, vnodeID, &vnode, true);
+	status_t status = get_vnode(mountID, vnodeID, &vnode, true, true);
 	if (status < B_OK)
 		return status;
 
@@ -2771,11 +2773,11 @@ vfs_get_vnode_from_path(const char *path, bool kernel, struct vnode **_vnode)
 
 
 extern "C" status_t
-vfs_get_vnode(dev_t mountID, ino_t vnodeID, struct vnode **_vnode)
+vfs_get_vnode(dev_t mountID, ino_t vnodeID, bool canWait, struct vnode **_vnode)
 {
 	struct vnode *vnode;
 
-	status_t status = get_vnode(mountID, vnodeID, &vnode, false);
+	status_t status = get_vnode(mountID, vnodeID, &vnode, canWait, false);
 	if (status < B_OK)
 		return status;
 
@@ -3068,7 +3070,7 @@ vfs_disconnect_vnode(dev_t mountID, ino_t vnodeID)
 {
 	struct vnode *vnode;
 
-	status_t status = get_vnode(mountID, vnodeID, &vnode, true);
+	status_t status = get_vnode(mountID, vnodeID, &vnode, true, true);
 	if (status < B_OK)
 		return status;
 
@@ -3697,7 +3699,7 @@ file_create_entry_ref(dev_t mountID, ino_t directoryID, const char *name,
 	FUNCTION(("file_create_entry_ref: name = '%s', omode %x, perms %d, kernel %d\n", name, openMode, perms, kernel));
 
 	// get directory to put the new file in	
-	status = get_vnode(mountID, directoryID, &directory, false);
+	status = get_vnode(mountID, directoryID, &directory, true, false);
 	if (status < B_OK)
 		return status;
 
@@ -3938,7 +3940,7 @@ dir_create_entry_ref(dev_t mountID, ino_t parentID, const char *name, int perms,
 
 	FUNCTION(("dir_create_entry_ref(dev = %ld, ino = %Ld, name = '%s', perms = %d)\n", mountID, parentID, name, perms));
 	
-	status = get_vnode(mountID, parentID, &vnode, kernel);
+	status = get_vnode(mountID, parentID, &vnode, true, false);
 	if (status < B_OK)
 		return status;
 
@@ -3991,7 +3993,7 @@ dir_open_entry_ref(dev_t mountID, ino_t parentID, const char *name, bool kernel)
 	if (name)
 		status = entry_ref_to_vnode(mountID, parentID, name, &vnode);
 	else
-		status = get_vnode(mountID, parentID, &vnode, false);
+		status = get_vnode(mountID, parentID, &vnode, true, false);
 	if (status < B_OK)
 		return status;
 
@@ -4088,7 +4090,8 @@ fix_dirent(struct vnode *parent, struct dirent *entry)
 	} else {
 		// resolve mount points
 		struct vnode *vnode = NULL;
-		status_t status = get_vnode(entry->d_dev, entry->d_ino, &vnode, false);
+		status_t status = get_vnode(entry->d_dev, entry->d_ino, &vnode, true,
+			false);
 		if (status != B_OK)
 			return;
 
@@ -5725,7 +5728,7 @@ fs_sync(dev_t device)
 
 		// acquire a reference to the vnode
 
-		if (get_vnode(mount->id, id, &vnode, true) == B_OK) {
+		if (get_vnode(mount->id, id, &vnode, true, false) == B_OK) {
 			if (previousVnode != NULL)
 				put_vnode(previousVnode);
 
@@ -6773,7 +6776,7 @@ _user_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
 		status = entry_ref_to_vnode(device, inode, leaf, &vnode);
 		leaf = NULL;
 	} else
-		status = get_vnode(device, inode, &vnode, false);
+		status = get_vnode(device, inode, &vnode, true, false);
 	if (status < B_OK)
 		return status;
 
