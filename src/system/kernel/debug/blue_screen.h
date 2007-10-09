@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef BLUE_SCREEN_H
@@ -14,7 +14,7 @@ extern "C" {
 #endif
 
 status_t blue_screen_init(void);
-void blue_screen_enter(bool debugOutput);
+status_t blue_screen_enter(bool debugOutput);
 
 char blue_screen_getchar(void);
 void blue_screen_putchar(char c);

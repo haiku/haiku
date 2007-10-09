@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -486,7 +486,7 @@ blue_screen_init(void)
 }
 
 
-void
+status_t
 blue_screen_enter(bool debugOutput)
 {
 	sScreen.attr = debugOutput ? 0xf0 : 0x0f;
@@ -494,12 +494,16 @@ blue_screen_enter(bool debugOutput)
 	sScreen.x = sScreen.y = 0;
 	sScreen.state = CONSOLE_STATE_NORMAL;
 
+	if (sModule == NULL)
+		return B_NO_INIT;
+
 	sModule->get_size(&sScreen.columns, &sScreen.rows);
 #if !NO_CLEAR
 	sModule->clear(sScreen.attr);
 #else
 	sModule->fill_glyph(0, sScreen.y, sScreen.columns, 3, ' ', sScreen.attr);
 #endif
+	return B_OK;
 }
 
 

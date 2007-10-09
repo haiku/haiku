@@ -893,8 +893,8 @@ kernel_debugger(const char *message)
 	}
 
 	if (sBlueScreenOutput) {
-		sBlueScreenEnabled = true;
-		blue_screen_enter(false);
+		if (blue_screen_enter(false) == B_OK)
+			sBlueScreenEnabled = true;
 	}
 
 	if (message)
