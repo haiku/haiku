@@ -688,8 +688,14 @@ page_writer(void* /*unused*/)
 				// we need our own reference to the store, as it might
 				// currently be destructed
 				if (cache->store->ops->acquire_unreferenced_ref(cache->store)
-						!= B_OK)
+						!= B_OK) {
+					// put it to the tail of the queue, then, so that we
+					// won't touch it too soon again
+					vm_page_requeue(page, true);
+					cacheLocker.Unlock();
+					thread_yield();
 					continue;
+				}
 			}
 
 			locker.Lock();
@@ -821,12 +827,13 @@ page_thief(void* /*unused*/)
 						score = 127;
 						desperate = true;
 					} else {
-						// TODO: for now, we never steal active pages
-						break;
 						stealActive = true;
 						score = 5;
 						steal = 5;
 					}
+
+					// let the page writer clear some pages for reuse
+					release_sem_etc(sWriterWaitSem, 1, B_DO_NOT_RESCHEDULE);
 					continue;
 				}
 

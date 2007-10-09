@@ -2061,10 +2061,10 @@ delete_area(vm_address_space *addressSpace, vm_area *area)
 	// still exists in the area list.
 
 	// Unmap the virtual address space the area occupied
-	vm_unmap_pages(area, area->base, area->size);
+	vm_unmap_pages(area, area->base, area->size, !area->cache->temporary);
 
-	// TODO: do that only for vnode stores
-	vm_cache_write_modified(area->cache, false);
+	if (!area->cache->temporary)
+		vm_cache_write_modified(area->cache, false);
 
 	arch_vm_unset_memory_type(area);
 	remove_area_from_address_space(addressSpace, area);
@@ -2333,7 +2333,7 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection)
 				while (page) {
 					addr_t address = area->base
 						+ (page->cache_offset << PAGE_SHIFT);
-					map->ops->protect(map, area->base, area->base + area->size,
+					map->ops->protect(map, address, address - 1 + B_PAGE_SIZE,
 						newProtection);
 					page = page->cache_next;
 				}
@@ -2505,7 +2505,7 @@ vm_remove_all_page_mappings(vm_page *page, uint32 *_flags)
 
 
 status_t
-vm_unmap_pages(vm_area *area, addr_t base, size_t size)
+vm_unmap_pages(vm_area *area, addr_t base, size_t size, bool preserveModified)
 {
 	vm_translation_map *map = &area->address_space->translation_map;
 	addr_t end = base + (size - 1);
@@ -2535,6 +2535,29 @@ vm_unmap_pages(vm_area *area, addr_t base, size_t size)
 	}
 
 	map->ops->unmap(map, base, end);
+	if (preserveModified) {
+		map->ops->flush(map);
+
+		for (addr_t virtualAddress = base; virtualAddress < end;
+				virtualAddress += B_PAGE_SIZE) {
+			addr_t physicalAddress;
+			uint32 flags;
+			status_t status = map->ops->query(map, virtualAddress,
+				&physicalAddress, &flags);
+			if (status < B_OK || (flags & PAGE_PRESENT) == 0)
+				continue;
+
+			vm_page *page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
+			if (page == NULL) {
+				panic("area %p looking up page failed for pa 0x%lx\n", area,
+					physicalAddress);
+			}
+
+			if ((flags & PAGE_MODIFIED) != 0
+				&& page->state != PAGE_STATE_MODIFIED)
+				vm_page_set_state(page, PAGE_STATE_MODIFIED);
+		}
+	}
 	map->ops->unlock(map);
 
 	if (area->wiring == B_NO_LOCK) {
@@ -4251,7 +4274,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 
 		// In case this is a copy-on-write page, we need to unmap it from the area now
 		if (isWrite && page->cache == topCache)
-			vm_unmap_pages(area, address, B_PAGE_SIZE);
+			vm_unmap_pages(area, address, B_PAGE_SIZE, true);
 
 		// TODO: there is currently no mechanism to prevent a page being mapped
 		//	more than once in case of a second page fault!
@@ -4907,8 +4930,10 @@ resize_area(area_id areaID, size_t newSize)
 		current->size = newSize;
 
 		// we also need to unmap all pages beyond the new size, if the area has shrinked
-		if (newSize < oldSize)
-			vm_unmap_pages(current, current->base + newSize, oldSize - newSize);
+		if (newSize < oldSize) {
+			vm_unmap_pages(current, current->base + newSize, oldSize - newSize,
+				false);
+		}
 	}
 
 	if (status == B_OK)
