@@ -5,8 +5,11 @@
 #endif
 #include <OS.h>
 #include <image.h>
+#include <ctype.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 
 /* as driver or module */
@@ -63,6 +66,10 @@ char bigbuffer[BIGBUFFSZ];
 #define BIT_FROM_LETTER(l) (0x1 << (l - 'a'))
 
 status_t init_words(char *from);
+void print_hangman(int fails);
+void display_word(int current, uint32 tried_letters);
+int play_hangman(void);
+int kdlhangman(int argc, char **argv);
 
 #ifdef _KERNEL_MODE
 
@@ -375,7 +382,7 @@ device_hooks *find_device(const char *name) {
 }
 
 #  else /* as module */
-
+status_t std_ops(int32 op, ...);
 status_t std_ops(int32 op, ...)
 {
 	status_t err;
