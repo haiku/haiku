@@ -14,7 +14,7 @@ MergeObject posix_unistd.o :
 	_exit.c
 	fcntl.c
 	fork.c
-	hostname.c
+	hostname.cpp
 	ioctl.c
 	link.c
 	lseek.c

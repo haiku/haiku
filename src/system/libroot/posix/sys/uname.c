@@ -1,15 +1,17 @@
 /*
- * Copyright 2004, Jérôme Duval jerome.duval@free.fr. All rights reserved.
+ * Copyright 2004-2007, Jérôme Duval jerome.duval@free.fr. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
 
-#include <OS.h>
-
 #include <sys/utsname.h>
+
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+
+#include <OS.h>
 
 
 // Haiku SVN revision. Will be set when copying libroot.so to the image.
@@ -61,8 +63,8 @@ uname(struct utsname *info)
 	}
 	strlcpy(info->machine, platform, sizeof(info->machine));
 
-	// TODO fill nodename field when we have hostname info
-	strlcpy(info->nodename, "unknown", sizeof(info->nodename));
+	if (gethostname(info->nodename, sizeof(info->nodename)) != 0)
+		strlcpy(info->nodename, "unknown", sizeof(info->nodename));
 
 	return 0;
 }
