@@ -72,7 +72,6 @@ KernelMergeObject kernel_posix.o :
 	directory.c
 	dup.c
 	fcntl.c
-	hostname.c
 	ioctl.c
 	link.c
 	lseek.c
