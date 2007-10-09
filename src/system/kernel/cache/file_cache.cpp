@@ -6,21 +6,22 @@
 
 #include "vnode_store.h"
 
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <KernelExport.h>
 #include <fs_cache.h>
 
 #include <condition_variable.h>
 #include <file_cache.h>
 #include <generic_syscall.h>
+#include <util/AutoLock.h>
 #include <util/kernel_cpp.h>
 #include <vfs.h>
 #include <vm.h>
 #include <vm_page.h>
 #include <vm_cache.h>
-
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
 
 
 //#define TRACE_FILE_CACHE
@@ -221,7 +222,7 @@ get_file_map(file_cache_ref *ref, off_t offset, size_t size,
 		// we don't yet have the map of this file, so let's grab it
 		// (ordered by offset, so that we can do a binary search on them)
 
-		mutex_lock(&ref->cache->lock);
+		MutexLocker _(ref->cache->lock);
 
 		// the file map could have been requested in the mean time
 		if (ref->map.count == 0) {
@@ -231,10 +232,8 @@ get_file_map(file_cache_ref *ref, off_t offset, size_t size,
 			while (true) {
 				status = vfs_get_file_map(ref->vnode, mapOffset, ~0UL, vecs,
 					&vecCount);
-				if (status < B_OK && status != B_BUFFER_OVERFLOW) {
-					mutex_unlock(&ref->cache->lock);
+				if (status < B_OK && status != B_BUFFER_OVERFLOW)
 					return status;
-				}
 
 				status_t addStatus = ref->map.Add(vecs, vecCount, mapOffset);
 				if (addStatus != B_OK) {
@@ -250,8 +249,6 @@ get_file_map(file_cache_ref *ref, off_t offset, size_t size,
 				vecCount = maxVecs;
 			}
 		}
-
-		mutex_unlock(&ref->cache->lock);
 	}
 
 	if (status != B_OK) {
@@ -776,7 +773,7 @@ satisfy_cache_io(file_cache_ref *ref, off_t offset, addr_t buffer,
 
 	size_t requestSize = buffer - lastBuffer;
 	reservePages = min_c(MAX_IO_VECS,
-		(bytesLeft - requestSize + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
+		(lastLeft - requestSize + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
 
 	status_t status;
 	if (doWrite) {
@@ -844,7 +841,7 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
 	size_t reservePages = 0;
 
 	vm_page_reserve_pages(lastReservedPages);
-	mutex_lock(&cache->lock);
+	MutexLocker locker(cache->lock);
 
 	while (bytesLeft > 0) {
 		// check if this page is already in memory
@@ -857,17 +854,15 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
 			status_t status = satisfy_cache_io(ref, offset, buffer, pageOffset,
 				bytesLeft, reservePages, lastOffset, lastBuffer, lastPageOffset,
 				lastLeft, lastReservedPages, doWrite);
-			if (status != B_OK) {
-				mutex_unlock(&cache->lock);
+			if (status != B_OK)
 				return status;
-			}
 
 			if (page->state == PAGE_STATE_BUSY) {
 				ConditionVariableEntry<vm_page> entry;
 				entry.Add(page);
-				mutex_unlock(&cache->lock);
+				locker.Unlock();
 				entry.Wait();
-				mutex_lock(&cache->lock);
+				locker.Lock();
 				continue;
 			}
 		}
@@ -903,7 +898,7 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
 
 			if (bytesLeft <= bytesInPage) {
 				// we've read the last page, so we're done!
-				mutex_unlock(&cache->lock);
+				locker.Unlock();
 				vm_page_unreserve_pages(lastReservedPages);
 				return B_OK;
 			}
@@ -927,10 +922,8 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
 			status_t status = satisfy_cache_io(ref, offset, buffer, pageOffset,
 				bytesLeft, reservePages, lastOffset, lastBuffer, lastPageOffset,
 				lastLeft, lastReservedPages, doWrite);
-			if (status != B_OK) {
-				mutex_unlock(&cache->lock);
+			if (status != B_OK)
 				return status;
-			}
 		}
 	}
 
@@ -945,7 +938,6 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
 			lastBuffer, lastLeft, lastReservedPages, 0);
 	}
 
-	mutex_unlock(&cache->lock);
 	return status;
 }
 
@@ -1333,8 +1325,7 @@ file_cache_invalidate_file_map(void *_cacheRef, off_t offset, off_t size)
 	TRACE(("file_cache_invalidate_file_map(offset = %Ld, size = %Ld)\n", offset,
 		size));
 
-	mutex_lock(&ref->cache->lock);
+	MutexLocker _(ref->cache->lock);
 	ref->map.Free();
-	mutex_unlock(&ref->cache->lock);
 	return B_OK;
 }
