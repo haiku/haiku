@@ -43,15 +43,24 @@ BDiskSystemAddOn::Flags() const
 
 // CanInitialize
 bool
-BDiskSystemAddOn::CanInitialize(BMutablePartition* partition)
+BDiskSystemAddOn::CanInitialize(const BMutablePartition* partition)
 {
 	return false;
 }
 
 
+// GetInitializationParameterEditor
+status_t
+BDiskSystemAddOn::GetInitializationParameterEditor(
+	const BMutablePartition* partition, BDiskDeviceParameterEditor** editor)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
 // ValidateInitialize
 bool
-BDiskSystemAddOn::ValidateInitialize(BMutablePartition* partition,
+BDiskSystemAddOn::ValidateInitialize(const BMutablePartition* partition,
 	BString* name, const char* parameters)
 {
 	return false;
@@ -101,7 +110,7 @@ BPartitionHandle::SupportedOperations(uint32 mask)
 
 // SupportedChildOperations
 uint32
-BPartitionHandle::SupportedChildOperations(BMutablePartition* child,
+BPartitionHandle::SupportedChildOperations(const BMutablePartition* child,
 	uint32 mask)
 {
 	return 0;
@@ -110,7 +119,7 @@ BPartitionHandle::SupportedChildOperations(BMutablePartition* child,
 
 // SupportsInitializingChild
 bool
-BPartitionHandle::SupportsInitializingChild(BMutablePartition* child,
+BPartitionHandle::SupportsInitializingChild(const BMutablePartition* child,
 	const char* diskSystem)
 {
 	return false;
@@ -119,7 +128,7 @@ BPartitionHandle::SupportsInitializingChild(BMutablePartition* child,
 
 // IsSubSystemFor
 bool
-BPartitionHandle::IsSubSystemFor(BMutablePartition* child)
+BPartitionHandle::IsSubSystemFor(const BMutablePartition* child)
 {
 	return false;
 }
@@ -127,8 +136,8 @@ BPartitionHandle::IsSubSystemFor(BMutablePartition* child)
 
 // GetNextSupportedType
 status_t
-BPartitionHandle::GetNextSupportedType(BMutablePartition* child, int32* cookie,
-	BString* type)
+BPartitionHandle::GetNextSupportedType(const BMutablePartition* child,
+	int32* cookie, BString* type)
 {
 	return B_ENTRY_NOT_FOUND;
 }
@@ -145,6 +154,14 @@ BPartitionHandle::GetTypeForContentType(const char* contentType, BString* type)
 // GetPartitioningInfo
 status_t
 BPartitionHandle::GetPartitioningInfo(BPartitioningInfo* info)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+// Defragment
+status_t
+BPartitionHandle::Defragment()
 {
 	return B_NOT_SUPPORTED;
 }
@@ -168,7 +185,8 @@ BPartitionHandle::ValidateResize(off_t* size)
 
 // ValidateResizeChild
 bool
-BPartitionHandle::ValidateResizeChild(BMutablePartition* child, off_t* size)
+BPartitionHandle::ValidateResizeChild(const BMutablePartition* child,
+	off_t* size)
 {
 	return false;
 }
@@ -202,7 +220,8 @@ BPartitionHandle::ValidateMove(off_t* offset)
 
 // ValidateMoveChild
 bool
-BPartitionHandle::ValidateMoveChild(BMutablePartition* child, off_t* offset)
+BPartitionHandle::ValidateMoveChild(const BMutablePartition* child,
+	off_t* offset)
 {
 	return false;
 }
@@ -236,7 +255,8 @@ BPartitionHandle::ValidateSetContentName(BString* name)
 
 // ValidateSetName
 bool
-BPartitionHandle::ValidateSetName(BMutablePartition* child, BString* name)
+BPartitionHandle::ValidateSetName(const BMutablePartition* child,
+	BString* name)
 {
 	return false;
 }
@@ -260,7 +280,8 @@ BPartitionHandle::SetName(BMutablePartition* child, const char* name)
 
 // ValidateSetType
 bool
-BPartitionHandle::ValidateSetType(BMutablePartition* child, const char* type)
+BPartitionHandle::ValidateSetType(const BMutablePartition* child,
+	const char* type)
 {
 	return false;
 }
@@ -269,6 +290,23 @@ BPartitionHandle::ValidateSetType(BMutablePartition* child, const char* type)
 // SetType
 status_t
 BPartitionHandle::SetType(BMutablePartition* child, const char* type)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+// GetContentParameterEditor
+status_t
+BPartitionHandle::GetContentParameterEditor(BDiskDeviceParameterEditor** editor)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+// GetParameterEditor
+status_t
+BPartitionHandle::GetParameterEditor(const BMutablePartition* child,
+	BDiskDeviceParameterEditor** editor)
 {
 	return B_NOT_SUPPORTED;
 }
@@ -284,7 +322,7 @@ BPartitionHandle::ValidateSetContentParameters(const char* parameters)
 
 // ValidateSetParameters
 bool
-BPartitionHandle::ValidateSetParameters(BMutablePartition* child,
+BPartitionHandle::ValidateSetParameters(const BMutablePartition* child,
 	const char* parameters)
 {
 	return false;
@@ -308,6 +346,15 @@ BPartitionHandle::SetParameters(BMutablePartition* child,
 }
 
 
+// GetChildCreationParameterEditor
+status_t
+BPartitionHandle::GetChildCreationParameterEditor(const char* type,
+	BDiskDeviceParameterEditor** editor)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
 // ValidateCreateChild
 bool
 BPartitionHandle::ValidateCreateChild(off_t* offset, off_t* size,
@@ -319,7 +366,8 @@ BPartitionHandle::ValidateCreateChild(off_t* offset, off_t* size,
 
 // CreateChild
 status_t
-BPartitionHandle::CreateChild(BMutablePartition* child)
+BPartitionHandle::CreateChild(off_t offset, off_t size, const char* type,
+	const char* parameters, BMutablePartition** child)
 {
 	return B_NOT_SUPPORTED;
 }

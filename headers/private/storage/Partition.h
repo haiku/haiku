@@ -140,6 +140,10 @@ public:
 	status_t DeleteChild(int32 index);
 	
 private:
+	class Delegate;
+	class ImmutableDelegate;
+	class MutableDelegate;
+
 	BPartition();
 	BPartition(const BPartition &);
 	virtual ~BPartition();

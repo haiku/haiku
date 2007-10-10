@@ -1,0 +1,572 @@
+/*
+ * Copyright 2007, Ingo Weinhold, bonefish@users.sf.net.
+ * Distributed under the terms of the MIT License.
+ */
+
+#include "PartitionDelegate.h"
+
+#include <DiskSystemAddOn.h>
+
+#include "DiskSystemAddOnManager.h"
+
+
+// #pragma mark - Delegate
+
+
+// constructor
+BPartition::Delegate::Delegate(BPartition* partition)
+	: fPartition(partition)
+{
+}
+
+
+// destructor
+BPartition::Delegate::~Delegate()
+{
+}
+
+
+// #pragma mark - MutableDelegate
+
+
+// constructor
+BPartition::MutableDelegate::MutableDelegate(BPartition* partition)
+	: Delegate(partition),
+	  fMutablePartition(this),
+	  fDiskSystem(NULL),
+	  fPartitionHandle(NULL)
+{
+}
+
+
+// destructor
+BPartition::MutableDelegate::~MutableDelegate()
+{
+}
+
+
+// MutablePartition
+BMutablePartition*
+BPartition::MutableDelegate::MutablePartition()
+{
+	return &fMutablePartition;
+}
+
+
+// MutablePartition
+const BMutablePartition*
+BPartition::MutableDelegate::MutablePartition() const
+{
+	return &fMutablePartition;
+}
+
+
+// Init
+status_t
+BPartition::MutableDelegate::Init(const user_partition_data* partitionData)
+{
+	status_t error = fMutablePartition.Init(partitionData);
+	if (error != B_OK)
+		return error;
+
+	if (!fMutablePartition.ContentType())
+		return B_OK;
+
+	// init disk system and handle
+	DiskSystemAddOnManager* manager = DiskSystemAddOnManager::Default();
+	BDiskSystemAddOn* addOn = manager->GetAddOn(
+		fMutablePartition.ContentType());
+	if (!addOn)
+		return B_ENTRY_NOT_FOUND;
+
+	BPartitionHandle* handle;
+	error = addOn->CreatePartitionHandle(&fMutablePartition, &handle);
+	if (error != B_OK) {
+		manager->PutAddOn(addOn);
+		return error;
+	}
+
+	// everything went fine --keep the disk system add-on reference and the
+	// handle
+	fDiskSystem = addOn;
+	fPartitionHandle = handle;
+
+	return B_OK;
+}
+
+
+// PartitionData
+const user_partition_data*
+BPartition::MutableDelegate::PartitionData() const
+{
+	return fMutablePartition.PartitionData();
+}
+
+
+// ChildAt
+BPartition::Delegate*
+BPartition::MutableDelegate::ChildAt(int32 index) const
+{
+	BMutablePartition* child = fMutablePartition.ChildAt(index);
+	return child ? child->GetDelegate() : NULL;
+}
+
+
+// CountChildren
+int32
+BPartition::MutableDelegate::CountChildren() const
+{
+	return fMutablePartition.CountChildren();
+}
+
+
+// SupportedOperations
+uint32
+BPartition::MutableDelegate::SupportedOperations(uint32 mask)
+{
+	if (!fPartitionHandle)
+		return 0;
+
+	return fPartitionHandle->SupportedOperations(mask);
+}
+
+
+// SupportedChildOperations
+uint32
+BPartition::MutableDelegate::SupportedChildOperations(Delegate* child,
+	uint32 mask)
+{
+	if (!fPartitionHandle)
+		return 0;
+
+	return fPartitionHandle->SupportedChildOperations(
+		((MutableDelegate*)child)->MutablePartition(), mask);
+}
+
+
+// Defragment
+status_t
+BPartition::MutableDelegate::Defragment()
+{
+// TODO: Implement!
+	return B_BAD_VALUE;
+}
+
+
+// Repair
+status_t
+BPartition::MutableDelegate::Repair(bool checkOnly)
+{
+// TODO: Implement!
+	return B_BAD_VALUE;
+}
+
+
+// ValidateResize
+status_t
+BPartition::MutableDelegate::ValidateResize(off_t* size) const
+{
+	if (!fPartitionHandle)
+		return B_NO_INIT;
+
+	return fPartitionHandle->ValidateResize(size) ? B_OK : B_BAD_VALUE;
+}
+
+
+// ValidateResizeChild
+status_t
+BPartition::MutableDelegate::ValidateResizeChild(Delegate* _child,
+	off_t* size) const
+{
+	MutableDelegate* child = dynamic_cast<MutableDelegate*>(_child);
+
+	if (!fPartitionHandle || !child)
+		return B_NO_INIT;
+
+	return fPartitionHandle->ValidateResizeChild(&child->fMutablePartition,
+		size) ? B_OK : B_BAD_VALUE;
+}
+
+
+// Resize
+status_t
+BPartition::MutableDelegate::Resize(off_t size)
+{
+	if (!fPartitionHandle)
+		return B_NO_INIT;
+
+	return fPartitionHandle->Resize(size);
+}
+
+
+// ResizeChild
+status_t
+BPartition::MutableDelegate::ResizeChild(Delegate* _child, off_t size)
+{
+	MutableDelegate* child = dynamic_cast<MutableDelegate*>(_child);
+
+	if (!fPartitionHandle || !child)
+		return B_NO_INIT;
+
+	return fPartitionHandle->ResizeChild(&child->fMutablePartition, size);
+}
+
+
+// ValidateMove
+status_t
+BPartition::MutableDelegate::ValidateMove(off_t* offset) const
+{
+	if (!fPartitionHandle)
+		return B_NO_INIT;
+
+	return fPartitionHandle->ValidateMove(offset) ? B_OK : B_BAD_VALUE;
+}
+
+
+// ValidateMoveChild
+status_t
+BPartition::MutableDelegate::ValidateMoveChild(Delegate* _child,
+	off_t* offset) const
+{
+	MutableDelegate* child = dynamic_cast<MutableDelegate*>(_child);
+
+	if (!fPartitionHandle || !child)
+		return B_NO_INIT;
+
+	return fPartitionHandle->ValidateMoveChild(&child->fMutablePartition,
+		offset) ? B_OK : B_BAD_VALUE;
+}
+
+
+// Move
+status_t
+BPartition::MutableDelegate::Move(off_t offset)
+{
+	if (!fPartitionHandle)
+		return B_NO_INIT;
+
+	return fPartitionHandle->Move(offset);
+}
+
+
+// MoveChild
+status_t
+BPartition::MutableDelegate::MoveChild(Delegate* _child, off_t offset)
+{
+	MutableDelegate* child = dynamic_cast<MutableDelegate*>(_child);
+
+	if (!fPartitionHandle || !child)
+		return B_NO_INIT;
+
+	return fPartitionHandle->MoveChild(&child->fMutablePartition, offset);
+}
+
+
+// ValidateSetContentName
+status_t
+BPartition::MutableDelegate::ValidateSetContentName(BString* name) const
+{
+	if (!fPartitionHandle)
+		return B_NO_INIT;
+
+	return fPartitionHandle->ValidateSetContentName(name) ? B_OK : B_BAD_VALUE;
+}
+
+
+// ValidateSetName
+status_t
+BPartition::MutableDelegate::ValidateSetName(Delegate* _child,
+	BString* name) const
+{
+	MutableDelegate* child = dynamic_cast<MutableDelegate*>(_child);
+
+	if (!fPartitionHandle || !child)
+		return B_NO_INIT;
+
+	return fPartitionHandle->ValidateSetName(&child->fMutablePartition, name)
+		? B_OK : B_BAD_VALUE;
+}
+
+
+// SetContentName
+status_t
+BPartition::MutableDelegate::SetContentName(const char* name)
+{
+	if (!fPartitionHandle)
+		return B_NO_INIT;
+
+	return fPartitionHandle->SetContentName(name);
+}
+
+
+// SetName
+status_t
+BPartition::MutableDelegate::SetName(Delegate* _child, const char* name)
+{
+	MutableDelegate* child = dynamic_cast<MutableDelegate*>(_child);
+
+	if (!fPartitionHandle || !child)
+		return B_NO_INIT;
+
+	return fPartitionHandle->SetName(&child->fMutablePartition, name);
+}
+
+
+// ValidateSetType
+status_t
+BPartition::MutableDelegate::ValidateSetType(Delegate* _child,
+	const char* type) const
+{
+	MutableDelegate* child = dynamic_cast<MutableDelegate*>(_child);
+
+	if (!fPartitionHandle || !child)
+		return B_NO_INIT;
+
+	return fPartitionHandle->ValidateSetType(&child->fMutablePartition, type)
+		? B_OK : B_BAD_VALUE;
+}
+
+
+// SetType
+status_t
+BPartition::MutableDelegate::SetType(Delegate* _child, const char* type)
+{
+	MutableDelegate* child = dynamic_cast<MutableDelegate*>(_child);
+
+	if (!fPartitionHandle || !child)
+		return B_NO_INIT;
+
+	return fPartitionHandle->SetType(&child->fMutablePartition, type);
+}
+
+
+// GetContentParameterEditor
+status_t
+BPartition::MutableDelegate::GetContentParameterEditor(
+	BDiskDeviceParameterEditor** editor) const
+{
+	if (!fPartitionHandle)
+		return B_NO_INIT;
+
+	return fPartitionHandle->GetContentParameterEditor(editor);
+}
+
+
+// GetParameterEditor
+status_t
+BPartition::MutableDelegate::GetParameterEditor(Delegate* _child,
+	BDiskDeviceParameterEditor** editor) const
+{
+	MutableDelegate* child = dynamic_cast<MutableDelegate*>(_child);
+
+	if (!fPartitionHandle || !child)
+		return B_NO_INIT;
+
+	return fPartitionHandle->GetParameterEditor(&child->fMutablePartition,
+		editor);
+}
+
+
+// SetContentParameters
+status_t
+BPartition::MutableDelegate::SetContentParameters(const char* parameters)
+{
+	if (!fPartitionHandle)
+		return B_NO_INIT;
+
+	return fPartitionHandle->SetContentParameters(parameters);
+}
+
+
+// SetParameters
+status_t
+BPartition::MutableDelegate::SetParameters(Delegate* _child,
+	const char* parameters)
+{
+	MutableDelegate* child = dynamic_cast<MutableDelegate*>(_child);
+
+	if (!fPartitionHandle || !child)
+		return B_NO_INIT;
+
+	return fPartitionHandle->SetParameters(&child->fMutablePartition,
+		parameters);
+}
+
+
+// CanInitialize
+bool
+BPartition::MutableDelegate::CanInitialize(const char* diskSystem) const
+{
+	// get the disk system add-on
+	DiskSystemAddOnManager* manager = DiskSystemAddOnManager::Default();
+	BDiskSystemAddOn* addOn = manager->GetAddOn(diskSystem);
+	if (!addOn)
+		return false;
+
+	bool result = addOn->CanInitialize(&fMutablePartition);
+
+	// put the add-on
+	manager->PutAddOn(addOn);
+
+	return result;
+}
+
+
+// GetInitializationParameterEditor
+status_t
+BPartition::MutableDelegate::GetInitializationParameterEditor(
+	const char* diskSystem, BDiskDeviceParameterEditor** editor) const
+{
+	// get the disk system add-on
+	DiskSystemAddOnManager* manager = DiskSystemAddOnManager::Default();
+	BDiskSystemAddOn* addOn = manager->GetAddOn(diskSystem);
+	if (!addOn)
+		return B_ENTRY_NOT_FOUND;
+
+	status_t result = addOn->GetInitializationParameterEditor(
+		&fMutablePartition, editor);
+
+	// put the add-on
+	manager->PutAddOn(addOn);
+
+	return result;
+}
+
+
+// ValidateInitialize
+status_t
+BPartition::MutableDelegate::ValidateInitialize(const char* diskSystem,
+	BString* name, const char* parameters)
+{
+	// get the disk system add-on
+	DiskSystemAddOnManager* manager = DiskSystemAddOnManager::Default();
+	BDiskSystemAddOn* addOn = manager->GetAddOn(diskSystem);
+	if (!addOn)
+		return B_ENTRY_NOT_FOUND;
+
+	bool result = addOn->ValidateInitialize(&fMutablePartition,
+		name, parameters);
+
+	// put the add-on
+	manager->PutAddOn(addOn);
+
+	return result ? B_OK : B_BAD_VALUE;
+}
+
+
+// Initialize
+status_t
+BPartition::MutableDelegate::Initialize(const char* diskSystem,
+	const char* name, const char* parameters)
+{
+	// get the disk system add-on
+	DiskSystemAddOnManager* manager = DiskSystemAddOnManager::Default();
+	BDiskSystemAddOn* addOn = manager->GetAddOn(diskSystem);
+	if (!addOn)
+		return B_ENTRY_NOT_FOUND;
+
+	BPartitionHandle* handle;
+	status_t result = addOn->Initialize(&fMutablePartition, name, parameters,
+		&handle);
+
+	// keep the add-on or put it on error
+	if (result == B_OK) {
+		// TODO: This won't suffice. If this partition had children, we have
+		// to delete them before the new disk system plays with it.
+		_FreeHandle();
+		fDiskSystem = addOn;
+		fPartitionHandle = handle;
+	} else {
+		manager->PutAddOn(addOn);
+	}
+
+	return result;
+}
+
+
+// Uninitialize
+status_t
+BPartition::MutableDelegate::Uninitialize()
+{
+	if (fPartitionHandle) {
+		_FreeHandle();
+
+		// TODO: Uninitialize fMutablePartition!
+	}
+
+	return B_OK;
+}
+
+
+// GetChildCreationParameterEditor
+status_t
+BPartition::MutableDelegate::GetChildCreationParameterEditor(const char* type,
+	BDiskDeviceParameterEditor** editor) const
+{
+	if (!fPartitionHandle)
+		return B_NO_INIT;
+
+	return fPartitionHandle->GetChildCreationParameterEditor(type, editor);
+}
+
+
+// ValidateCreateChild
+status_t
+BPartition::MutableDelegate::ValidateCreateChild(off_t* start, off_t* size,
+	const char* type, const char* parameters) const
+{
+	if (!fPartitionHandle)
+		return B_NO_INIT;
+
+	return fPartitionHandle->ValidateCreateChild(start, size, type, parameters)
+		? B_OK : B_BAD_VALUE;
+}
+
+
+// CreateChild
+status_t
+BPartition::MutableDelegate::CreateChild(off_t start, off_t size,
+	const char* type, const char* parameters, BPartition** child)
+{
+	if (!fPartitionHandle)
+		return B_NO_INIT;
+
+	BMutablePartition* mutableChild;
+	status_t error = fPartitionHandle->CreateChild(start, size, type,
+		parameters, &mutableChild);
+	if (error != B_OK)
+		return error;
+
+	if (child)
+		*child = mutableChild->GetDelegate()->Partition();
+
+	return B_OK;
+}
+
+
+// DeleteChild
+status_t
+BPartition::MutableDelegate::DeleteChild(Delegate* _child)
+{
+	MutableDelegate* child = dynamic_cast<MutableDelegate*>(_child);
+
+	if (!fPartitionHandle || !child)
+		return B_NO_INIT;
+
+	return fPartitionHandle->DeleteChild(&child->fMutablePartition);
+}
+
+
+// _FreeHandle
+void
+BPartition::MutableDelegate::_FreeHandle()
+{
+	if (fPartitionHandle) {
+		delete fPartitionHandle;
+		fPartitionHandle = NULL;
+
+		DiskSystemAddOnManager* manager = DiskSystemAddOnManager::Default();
+		manager->PutAddOn(fDiskSystem);
+		fDiskSystem = NULL;
+	}
+}

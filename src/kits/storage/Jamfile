@@ -79,7 +79,10 @@ MergeObject <libbe>storage_kit.o :
 	DiskDeviceVisitor.cpp
 	DiskSystem.cpp
 	DiskSystemAddOn.cpp
+	DiskSystemAddOnManager.cpp
+	MutablePartition.cpp
 	Partition.cpp
+	PartitionDelegate.cpp
 	PartitioningInfo.cpp 
 ;
 

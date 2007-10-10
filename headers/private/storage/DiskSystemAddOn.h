@@ -9,6 +9,7 @@
 #include <SupportDefs.h>
 
 
+class BDiskDeviceParameterEditor;
 class BList;
 class BMutablePartition;
 class BPartitionHandle;
@@ -28,8 +29,13 @@ public:
 									BMutablePartition* partition,
 									BPartitionHandle** handle) = 0;
 
-	virtual	bool				CanInitialize(BMutablePartition* partition);
-	virtual	bool				ValidateInitialize(BMutablePartition* partition,
+	virtual	bool				CanInitialize(
+									const BMutablePartition* partition);
+	virtual	status_t			GetInitializationParameterEditor(
+									const BMutablePartition* partition,
+									BDiskDeviceParameterEditor** editor);
+	virtual	bool				ValidateInitialize(
+									const BMutablePartition* partition,
 									BString* name, const char* parameters);
 	virtual	status_t			Initialize(BMutablePartition* partition,
 									const char* name, const char* parameters,
@@ -50,14 +56,16 @@ public:
 
 	virtual	uint32				SupportedOperations(uint32 mask);
 	virtual	uint32				SupportedChildOperations(
-									BMutablePartition* child, uint32 mask);
+									const BMutablePartition* child,
+									uint32 mask);
 
 	virtual	bool				SupportsInitializingChild(
-									BMutablePartition* child,
+									const BMutablePartition* child,
 									const char* diskSystem);
-	virtual	bool				IsSubSystemFor(BMutablePartition* child);
+	virtual	bool				IsSubSystemFor(const BMutablePartition* child);
 
-	virtual	status_t			GetNextSupportedType(BMutablePartition* child,
+	virtual	status_t			GetNextSupportedType(
+									const BMutablePartition* child,
 									int32* cookie, BString* type);
 									// child can be NULL
 	virtual	status_t			GetTypeForContentType(const char* contentType,
@@ -66,47 +74,60 @@ public:
 	virtual	status_t			GetPartitioningInfo(BPartitioningInfo* info);
 
 
+	virtual	status_t			Defragment();
 	virtual	status_t			Repair(bool checkOnly);
-		// TODO: How is this supposed to work?
 
 	virtual	bool				ValidateResize(off_t* size);
-	virtual	bool				ValidateResizeChild(BMutablePartition* child,
+	virtual	bool				ValidateResizeChild(
+									const BMutablePartition* child,
 									off_t* size);
 	virtual	status_t			Resize(off_t size);
 	virtual	status_t			ResizeChild(BMutablePartition* child,
 									off_t size);
 
 	virtual	bool				ValidateMove(off_t* offset);
-	virtual	bool				ValidateMoveChild(BMutablePartition* child,
+	virtual	bool				ValidateMoveChild(
+									const BMutablePartition* child,
 									off_t* offset);
 	virtual	status_t			Move(off_t offset);
 	virtual	status_t			MoveChild(BMutablePartition* child,
 									off_t offset);
 
 	virtual	bool				ValidateSetContentName(BString* name);
-	virtual	bool				ValidateSetName(BMutablePartition* child,
+	virtual	bool				ValidateSetName(const BMutablePartition* child,
 									BString* name);
 	virtual	status_t			SetContentName(const char* name);
 	virtual	status_t			SetName(BMutablePartition* child,
 									const char* name);
 
-	virtual	bool				ValidateSetType(BMutablePartition* child,
+	virtual	bool				ValidateSetType(const BMutablePartition* child,
 									const char* type);
 	virtual	status_t			SetType(BMutablePartition* child,
 									const char* type);
 
+	virtual	status_t			GetContentParameterEditor(
+									BDiskDeviceParameterEditor** editor);
+	virtual	status_t			GetParameterEditor(
+									const BMutablePartition* child,
+									BDiskDeviceParameterEditor** editor);
 	virtual	bool				ValidateSetContentParameters(
 									const char* parameters);
-	virtual	bool				ValidateSetParameters(BMutablePartition* child,
+	virtual	bool				ValidateSetParameters(
+									const BMutablePartition* child,
 									const char* parameters);
 	virtual	status_t			SetContentParameters(const char* parameters);
 	virtual	status_t			SetParameters(BMutablePartition* child,
 									const char* parameters);
 
+	virtual	status_t			GetChildCreationParameterEditor(
+									const char* type,
+									BDiskDeviceParameterEditor** editor);
 	virtual	bool				ValidateCreateChild(off_t* offset,
 									off_t* size, const char* type,
 									const char* parameters);
-	virtual	status_t			CreateChild(BMutablePartition* child);
+	virtual	status_t			CreateChild(off_t offset, off_t size,
+									const char* type, const char* parameters,
+									BMutablePartition** child);
 
 	virtual	status_t			DeleteChild(BMutablePartition* child);
 
