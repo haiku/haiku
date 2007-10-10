@@ -2379,6 +2379,14 @@ vm_get_page_mapping(team_id team, addr_t vaddr, addr_t *paddr)
 }
 
 
+static inline addr_t
+virtual_page_address(vm_area *area, vm_page *page)
+{
+	return area->base
+		+ ((page->cache_offset << PAGE_SHIFT) - area->cache_offset);
+}
+
+
 bool
 vm_test_map_modification(vm_page *page)
 {
@@ -2393,8 +2401,8 @@ vm_test_map_modification(vm_page *page)
 		addr_t physicalAddress;
 		uint32 flags;
 		map->ops->lock(map);
-		addr_t address = area->base + (page->cache_offset << PAGE_SHIFT);
-		map->ops->query_interrupt(map, address, &physicalAddress, &flags);
+		map->ops->query(map, virtual_page_address(area, page),
+			&physicalAddress, &flags);
 		map->ops->unlock(map);
 
 		if (flags & PAGE_MODIFIED)
@@ -2422,8 +2430,8 @@ vm_test_map_activation(vm_page *page, bool *_modified)
 		addr_t physicalAddress;
 		uint32 flags;
 		map->ops->lock(map);
-		addr_t address = area->base + (page->cache_offset << PAGE_SHIFT);
-		map->ops->query_interrupt(map, address, &physicalAddress, &flags);
+		map->ops->query(map, virtual_page_address(area, page),
+			&physicalAddress, &flags);
 		map->ops->unlock(map);
 
 		if (flags & PAGE_ACCESSED)
@@ -2451,8 +2459,7 @@ vm_clear_map_flags(vm_page *page, uint32 flags)
 		vm_translation_map *map = &area->address_space->translation_map;
 
 		map->ops->lock(map);
-		addr_t address = area->base + (page->cache_offset << PAGE_SHIFT);
-		map->ops->clear_flags(map, address, flags);
+		map->ops->clear_flags(map, virtual_page_address(area, page), flags);
 		map->ops->unlock(map);
 	}
 }
@@ -2480,10 +2487,10 @@ vm_remove_all_page_mappings(vm_page *page, uint32 *_flags)
 		uint32 flags;
 
 		map->ops->lock(map);
-		addr_t base = area->base + (page->cache_offset << PAGE_SHIFT);
-		map->ops->unmap(map, base, base + (B_PAGE_SIZE - 1));
+		addr_t address = virtual_page_address(area, page);
+		map->ops->unmap(map, address, address + (B_PAGE_SIZE - 1));
 		map->ops->flush(map);
-		map->ops->query(map, base, &physicalAddress, &flags);
+		map->ops->query(map, address, &physicalAddress, &flags);
 		map->ops->unlock(map);
 
 		area->mappings.Remove(mapping);
