@@ -527,7 +527,7 @@ query_tmap(vm_translation_map *map, addr_t va, addr_t *_physical, uint32 *_flags
 
 	*_physical = ADDR_REVERSE_SHIFT(pt[index].addr);
 
-	// read in the page state flags, clearing the modified and accessed flags in the process
+	// read in the page state flags
 	if (pt[index].user)
 		*_flags |= (pt[index].rw ? B_WRITE_AREA : 0) | B_READ_AREA;
 
