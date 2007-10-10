@@ -74,7 +74,8 @@ static char sLastOutputBuffer[OUTPUT_BUFFER_SIZE];
 static void flush_pending_repeats(void);
 static void check_pending_repeats(void *data, int iter);
 
-static int64 sMessageRepeatTime = 0;
+static int64 sMessageRepeatFirstTime = 0;
+static int64 sMessageRepeatLastTime = 0;
 static int32 sMessageRepeatCount = 0;
 
 #define LINE_BUFFER_SIZE 1024
@@ -665,10 +666,12 @@ debug_puts(const char *string, int32 length)
 	if (length >= OUTPUT_BUFFER_SIZE)
 		length = OUTPUT_BUFFER_SIZE - 1;
 
-	if (strncmp(string, sLastOutputBuffer, length) == 0
-		&& length > 1 && string[length - 1] == '\n') {
+	if (length > 1 && string[length - 1] == '\n'
+		&& strncmp(string, sLastOutputBuffer, length) == 0) {
 		sMessageRepeatCount++;
-		sMessageRepeatTime = system_time();
+		sMessageRepeatLastTime = system_time();
+		if (sMessageRepeatFirstTime == 0)
+			sMessageRepeatFirstTime = sMessageRepeatLastTime;
 	} else {
 		flush_pending_repeats();
 		kputs(string);
@@ -949,6 +952,7 @@ flush_pending_repeats(void)
 				blue_screen_puts(sLastOutputBuffer);
 		}
 
+		sMessageRepeatFirstTime = 0;
 		sMessageRepeatCount = 0;
 	}
 }
@@ -960,7 +964,8 @@ check_pending_repeats(void *data, int iter)
 	(void)data;
 	(void)iter;
 	if (sMessageRepeatCount > 0
-		&& (system_time() - sMessageRepeatTime) > 1000000) {
+		&& ((system_time() - sMessageRepeatLastTime) > 1000000
+		|| (system_time() - sMessageRepeatFirstTime) > 3000000)) {
 		cpu_status state = disable_interrupts();
 		acquire_spinlock(&sSpinlock);
 
@@ -990,10 +995,12 @@ dprintf_args(const char *format, va_list args, bool syslogOutput)
 	if (length >= OUTPUT_BUFFER_SIZE)
 		length = OUTPUT_BUFFER_SIZE - 1;
 
-	if (strncmp(sOutputBuffer, sLastOutputBuffer, length) == 0
-		&& length > 1 && sOutputBuffer[length - 1] == '\n') {
+	if (length > 1 && sOutputBuffer[length - 1] == '\n'
+		&& strncmp(sOutputBuffer, sLastOutputBuffer, length) == 0) {
 		sMessageRepeatCount++;
-		sMessageRepeatTime = system_time();
+		sMessageRepeatLastTime = system_time();
+		if (sMessageRepeatFirstTime == 0)
+			sMessageRepeatFirstTime = sMessageRepeatLastTime;
 	} else {
 		flush_pending_repeats();
 
