@@ -44,6 +44,8 @@ public:
 								   uint8 &blue, uint8 &alpha) const;
 	inline uint8 GrayColorForIndex(uint8 index) const;
 
+	static status_t InitializeDefault(bool useServer = false);
+
 private:
 	const color_map	*fColorMap;
 	color_map		*fOwnColorMap;

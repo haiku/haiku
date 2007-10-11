@@ -13,6 +13,7 @@
 
 #include "ColorConversion.h"
 
+#include <InterfaceDefs.h>
 #include <Locker.h>
 #include <Point.h>
 
@@ -27,6 +28,8 @@ namespace BPrivate {
 
 // TODO: system palette -- hard-coded for now, when the app server is ready
 // we should use system_colors() or BScreen::ColorMap().
+// Stefano: We cannot do that, since this code is also used by client-side only BBitmaps,
+// and also by the app_server
 const rgb_color kSystemPalette[] = {
  {   0,   0,   0, 255 }, {   8,   8,   8, 255 }, {  16,  16,  16, 255 },
  {  24,  24,  24, 255 }, {  32,  32,  32, 255 }, {  40,  40,  40, 255 },
@@ -526,24 +529,27 @@ PaletteConverter::GrayColorForIndex(uint8 index) const
 }
 
 
-// TODO: Remove these and palette_converter() when BScreen is available.
 static BLocker			gPaletteConverterLock("PalConvLock");
 static PaletteConverter	gPaletteConverter;
 
 
-/*!	\brief Returns a PaletteConverter using the system color palette.
-	\return A PaletteConverter.
+/*!	\brief Initialize the global instance of PaletteConverter using the system color palette.
+	\return B_OK.
 */
-static
-const PaletteConverter*
-palette_converter()
+/* static */
+status_t
+PaletteConverter::InitializeDefault(bool useServer)
 {
 	if (gPaletteConverterLock.Lock()) {
-		if (gPaletteConverter.InitCheck() != B_OK)
-			gPaletteConverter.SetTo(kSystemPalette);
+		if (gPaletteConverter.InitCheck() != B_OK) {
+			if (useServer)
+				gPaletteConverter.SetTo(system_colors());
+			else
+				gPaletteConverter.SetTo(kSystemPalette);
+		}
 		gPaletteConverterLock.Unlock();
 	}
-	return &gPaletteConverter;
+	return B_OK;
 }
 
 
@@ -909,7 +915,7 @@ ConvertBits(const srcByte *srcBits, void *dstBits, int32 srcBitsLength,
 			break;
 
 		case B_CMAP8:
-			BPrivate::palette_converter();
+			PaletteConverter::InitializeDefault();
 			ConvertBits(srcBits, (uint8 *)dstBits, srcBitsLength,
 				dstBitsLength, redShift - 15, greenShift - 10, blueShift - 5,
 				0, 0, 0x7c00, 0x03e0, 0x001f, 0x0000, srcBytesPerRow,
@@ -1063,7 +1069,7 @@ ConvertBits(const void *srcBits, void *dstBits, int32 srcBitsLength,
 			break;
 
 		case B_CMAP8:
-			palette_converter();
+			PaletteConverter::InitializeDefault();
 			return ConvertBits((const uint8 *)srcBits, dstBits, srcBitsLength,
 				dstBitsLength, 24, 16, 8, 32, 8, srcBytesPerRow,
 				dstBytesPerRow, 8, srcColorSpace, dstColorSpace, srcOffset,

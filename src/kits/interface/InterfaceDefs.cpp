@@ -16,6 +16,7 @@
 
 #include <ApplicationPrivate.h>
 #include <AppServerLink.h>
+#include <ColorConversion.h>
 #include <DefaultColors.h>
 #include <InputServerTypes.h>
 #include <input_globals.h>
@@ -794,6 +795,10 @@ shift_color(rgb_color color, float shift)
 extern "C" status_t
 _init_interface_kit_()
 {
+	status_t status = BPrivate::PaletteConverter::InitializeDefault(true);
+	if (status < B_OK)
+		return status;
+
 	sem_id widthSem = create_sem(0, "BTextView WidthBuffer Sem");
 	if (widthSem < 0)
 		return widthSem;
@@ -804,7 +809,8 @@ _init_interface_kit_()
 	_init_global_fonts_();
 
 	_menu_info_ptr_ = &BMenu::sMenuInfo;
-	status_t status = get_menu_info(&BMenu::sMenuInfo);
+	
+	status = get_menu_info(&BMenu::sMenuInfo);
 
 	general_info.background_color = ui_color(B_PANEL_BACKGROUND_COLOR);
 	general_info.mark_color.set_to(0, 0, 0);
