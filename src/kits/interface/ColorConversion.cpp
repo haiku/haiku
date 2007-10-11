@@ -529,8 +529,8 @@ PaletteConverter::GrayColorForIndex(uint8 index) const
 }
 
 
-static BLocker			gPaletteConverterLock("PalConvLock");
-static PaletteConverter	gPaletteConverter;
+static BLocker		sPaletteConverterLock("PalConvLock");
+static PaletteConverter	sPaletteConverter;
 
 
 /*!	\brief Initialize the global instance of PaletteConverter using the system color palette.
@@ -540,14 +540,14 @@ static PaletteConverter	gPaletteConverter;
 status_t
 PaletteConverter::InitializeDefault(bool useServer)
 {
-	if (gPaletteConverterLock.Lock()) {
-		if (gPaletteConverter.InitCheck() != B_OK) {
+	if (sPaletteConverterLock.Lock()) {
+		if (sPaletteConverter.InitCheck() != B_OK) {
 			if (useServer)
-				gPaletteConverter.SetTo(system_colors());
+				sPaletteConverter.SetTo(system_colors());
 			else
-				gPaletteConverter.SetTo(kSystemPalette);
+				sPaletteConverter.SetTo(kSystemPalette);
 		}
-		gPaletteConverterLock.Unlock();
+		sPaletteConverterLock.Unlock();
 	}
 	return B_OK;
 }
@@ -620,7 +620,7 @@ ReadGray1(const uint8 **source, int32 index)
 void
 WriteCMAP8(uint8 **dest, uint8 *data, int32 index)
 {
-	**dest = gPaletteConverter.IndexForRGB15(*(uint16 *)data);
+	**dest = sPaletteConverter.IndexForRGB15(*(uint16 *)data);
 	(*dest)++;
 }
 
@@ -628,7 +628,7 @@ WriteCMAP8(uint8 **dest, uint8 *data, int32 index)
 uint32
 ReadCMAP8(const uint8 **source, int32 index)
 {
-	uint32 result = gPaletteConverter.RGBA32ColorForIndex(**source);
+	uint32 result = sPaletteConverter.RGBA32ColorForIndex(**source);
 	(*source)++;
 	return result;
 }
