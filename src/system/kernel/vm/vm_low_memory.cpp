@@ -17,6 +17,7 @@
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <vm_page.h>
+#include <vm_priv.h>
 
 
 //#define TRACE_LOW_MEMORY
@@ -144,6 +145,7 @@ vm_low_memory(size_t requirements)
 {
 	// TODO: take requirements into account
 
+	vm_schedule_page_scanner(requirements);
 	release_sem(sLowMemoryWaitSem);
 }
 

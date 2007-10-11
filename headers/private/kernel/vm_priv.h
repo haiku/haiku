@@ -49,6 +49,7 @@ status_t vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite,
 	bool isUser, addr_t *newip);
 void vm_unreserve_memory(size_t bytes);
 status_t vm_try_reserve_memory(size_t bytes);
+void vm_schedule_page_scanner(uint32 target);
 status_t vm_daemon_init(void);
 
 const char *page_state_to_string(int state);

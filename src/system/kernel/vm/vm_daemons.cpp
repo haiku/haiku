@@ -65,7 +65,14 @@ PageCacheLocker::Lock(vm_page* page)
 	if (cache == NULL)
 		return false;
 
+#if 0
 	mutex_lock(&cache->lock);
+#else
+	if (mutex_trylock(&cache->lock) != B_OK) {
+		vm_cache_release_ref(cache);
+		return false;
+	}
+#endif
 
 	if (cache != page->cache || _IgnorePage(page)) {
 		mutex_unlock(&cache->lock);
@@ -185,8 +192,7 @@ page_daemon(void* /*unused*/)
 		scanPagesCount = kMaxScanPagesCount
 			- (kMaxScanPagesCount - kMinScanPagesCount)
 			* pagesLeft / sLowPagesCount;
-		uint32 leftToFree = 32 + (scanPagesCount - 32)
-			* pagesLeft / sLowPagesCount;
+		uint32 leftToFree = sLowPagesCount - pagesLeft;
 dprintf("wait interval %Ld, scan pages %lu, free %lu, target %lu\n",
 	scanWaitInterval, scanPagesCount, pagesLeft, leftToFree);
 
@@ -210,6 +216,13 @@ dprintf("wait interval %Ld, scan pages %lu, free %lu, target %lu\n",
 }
 
 
+void
+vm_schedule_page_scanner(uint32 target)
+{
+	release_sem(sPageDaemonSem);
+}
+
+
 status_t
 vm_daemon_init()
 {
@@ -223,7 +236,7 @@ vm_daemon_init()
 
 	// create a kernel thread to select pages for pageout
 	thread_id thread = spawn_kernel_thread(&page_daemon, "page daemon",
-		B_LOW_PRIORITY + 1, NULL);
+		B_NORMAL_PRIORITY, NULL);
 	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
 
 	return B_OK;
