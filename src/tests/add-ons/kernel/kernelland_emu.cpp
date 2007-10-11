@@ -820,7 +820,7 @@ user_strlcpy(char *to, const char *from, size_t size)
 //	#pragma mark - Private locking functions
 
 
-int
+int32
 recursive_lock_get_recursion(recursive_lock *lock)
 {
 	thread_id thid = find_thread(NULL);
@@ -863,38 +863,33 @@ recursive_lock_destroy(recursive_lock *lock)
 }
 
 
-bool
+status_t
 recursive_lock_lock(recursive_lock *lock)
 {
-	thread_id thid = find_thread(NULL);
-	bool retval = false;
+	thread_id thread = find_thread(NULL);
 
-	if (thid != lock->holder) {
-		acquire_sem(lock->sem);
-		
-		lock->holder = thid;
-		retval = true;
+	if (thread != lock->holder) {
+		status_t status = acquire_sem(lock->sem);
+		if (status < B_OK)
+			return status;
+
+		lock->holder = thread;
 	}
 	lock->recursion++;
-	return retval;
+	return B_OK;
 }
 
 
-bool
+void
 recursive_lock_unlock(recursive_lock *lock)
 {
-	thread_id thid = find_thread(NULL);
-	bool retval = false;
-
-	if (thid != lock->holder)
+	if (find_thread(NULL) != lock->holder)
 		panic("recursive_lock %p unlocked by non-holder thread!\n", lock);
 
 	if (--lock->recursion == 0) {
 		lock->holder = -1;
-		release_sem(lock->sem);
-		retval = true;
+		release_sem_etc(lock->sem, 1, 0/*B_DO_NOT_RESCHEDULE*/);
 	}
-	return retval;
 }
 
 
@@ -934,19 +929,22 @@ mutex_destroy(mutex *mutex)
 }
 
 
-void
+status_t
 mutex_lock(mutex *mutex)
 {
 	thread_id me = find_thread(NULL);
 
 	// ToDo: if acquire_sem() fails, we shouldn't panic - but we should definitely
 	//	change the mutex API to actually return the status code
-	if (acquire_sem(mutex->sem) == B_OK) {
-		if (me == mutex->holder)
-			panic("mutex_lock failure: mutex %p (sem = 0x%lx) acquired twice by thread 0x%lx\n", mutex, mutex->sem, me);
-	}
+	status_t status = acquire_sem(mutex->sem);
+	if (status < B_OK)
+		return status;
+
+	if (me == mutex->holder)
+		panic("mutex_lock failure: mutex %p (sem = 0x%lx) acquired twice by thread 0x%lx\n", mutex, mutex->sem, me);
 
 	mutex->holder = me;
+	return B_OK;
 }
 
 
