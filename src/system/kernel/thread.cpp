@@ -255,7 +255,7 @@ create_thread_struct(struct thread *inthread, const char *name,
 	list_init(&thread->exit.waiters);
 	thread->select_infos = NULL;
 
-	sprintf(temp, "thread_0x%lx_retcode_sem", thread->id);
+	sprintf(temp, "thread_%lx_retcode_sem", thread->id);
 	thread->exit.sem = create_sem(0, temp);
 	if (thread->exit.sem < B_OK)
 		goto err1;
@@ -558,7 +558,7 @@ get_death_stack(void)
 		bit >>= 1;
 	}
 
-	TRACE(("get_death_stack: returning 0x%lx\n", sDeathStacks[i].address));
+	TRACE(("get_death_stack: returning %#lx\n", sDeathStacks[i].address));
 
 	return (uint32)i;
 }
@@ -599,16 +599,16 @@ thread_exit2(void *_args)
 	// we can't let the interrupts disabled at this point
 	enable_interrupts();
 
-	TRACE(("thread_exit2, running on death stack 0x%lx\n", args.death_stack));
+	TRACE(("thread_exit2, running on death stack %#lx\n", args.death_stack));
 
 	// delete the old kernel stack area
-	TRACE(("thread_exit2: deleting old kernel stack id 0x%lx for thread 0x%lx\n",
+	TRACE(("thread_exit2: deleting old kernel stack id %ld for thread %ld\n",
 		args.old_kernel_stack, args.thread->id));
 
 	delete_area(args.old_kernel_stack);
 
 	// remove this thread from all of the global lists
-	TRACE(("thread_exit2: removing thread 0x%lx from global lists\n",
+	TRACE(("thread_exit2: removing thread %ld from global lists\n",
 		args.thread->id));
 
 	disable_interrupts();
@@ -683,7 +683,7 @@ make_thread_unreal(int argc, char **argv)
 
 		if (thread->priority > B_DISPLAY_PRIORITY) {
 			thread->priority = thread->next_priority = B_NORMAL_PRIORITY;
-			kprintf("thread 0x%lx made unreal\n", thread->id);
+			kprintf("thread %ld made unreal\n", thread->id);
 		}
 	}
 
@@ -722,11 +722,11 @@ set_thread_prio(int argc, char **argv)
 		if (thread->id != id)
 			continue;
 		thread->priority = thread->next_priority = prio;
-		kprintf("thread 0x%lx set to priority %ld\n", id, prio);
+		kprintf("thread %ld set to priority %ld\n", id, prio);
 		break;
 	}
 	if (!thread)
-		kprintf("thread 0x%lx not found\n", id);
+		kprintf("thread %ld (%#lx) not found\n", id, id);
 
 	hash_close(sThreadHash, &i, false);
 	return 0;
@@ -757,11 +757,11 @@ make_thread_suspended(int argc, char **argv)
 			continue;
 
 		thread->state = thread->next_state = B_THREAD_SUSPENDED;
-		kprintf("thread 0x%lx suspended\n", id);
+		kprintf("thread %ld suspended\n", id);
 		break;
 	}
 	if (!thread)
-		kprintf("thread 0x%lx not found\n", id);
+		kprintf("thread %ld (%#lx) not found\n", id, id);
 
 	hash_close(sThreadHash, &i, false);
 	return 0;
@@ -793,12 +793,12 @@ make_thread_resumed(int argc, char **argv)
 		if (thread->state == B_THREAD_SUSPENDED) {
 			thread->state = thread->next_state = B_THREAD_READY;
 			scheduler_enqueue_in_run_queue(thread);
-			kprintf("thread 0x%lx resumed\n", thread->id);
+			kprintf("thread %ld resumed\n", thread->id);
 		}
 		break;
 	}
 	if (!thread)
-		kprintf("thread 0x%lx not found\n", id);
+		kprintf("thread %ld (%#lx) not found\n", id, id);
 
 	hash_close(sThreadHash, &i, false);
 	return 0;
@@ -825,7 +825,7 @@ drop_into_debugger(int argc, char **argv)
 	if (err)
 		kprintf("drop failed\n");
 	else
-		kprintf("thread 0x%lx dropped into user debugger\n", id);
+		kprintf("thread %ld dropped into user debugger\n", id);
 	
 	return 0;
 }
@@ -867,7 +867,7 @@ _dump_thread_info(struct thread *thread)
 	struct death_entry *death = NULL;
 
 	kprintf("THREAD: %p\n", thread);
-	kprintf("id:                 0x%lx\n", thread->id);
+	kprintf("id:                 %ld (%#lx)\n", thread->id, thread->id);
 	kprintf("name:               \"%s\"\n", thread->name);
 	kprintf("all_next:           %p\nteam_next:          %p\nq_next:             %p\n",
 		thread->all_next, thread->team_next, thread->queue_next);
@@ -879,12 +879,12 @@ _dump_thread_info(struct thread *thread)
 		kprintf("(%d)\n", thread->cpu->cpu_num);
 	else
 		kprintf("\n");
-	kprintf("sig_pending:        0x%lx\n", thread->sig_pending);
+	kprintf("sig_pending:        %#lx\n", thread->sig_pending);
 	kprintf("in_kernel:          %d\n", thread->in_kernel);
-	kprintf("  sem.blocking:     0x%lx\n", thread->sem.blocking);
-	kprintf("  sem.count:        0x%lx\n", thread->sem.count);
-	kprintf("  sem.acquire_status: 0x%lx\n", thread->sem.acquire_status);
-	kprintf("  sem.flags:        0x%lx\n", thread->sem.flags);
+	kprintf("  sem.blocking:     %ld\n", thread->sem.blocking);
+	kprintf("  sem.count:        %ld\n", thread->sem.count);
+	kprintf("  sem.acquire_status: %#lx\n", thread->sem.acquire_status);
+	kprintf("  sem.flags:        %#lx\n", thread->sem.flags);
 
 	kprintf("condition variables:");
 	PrivateConditionVariableEntry* entry = thread->condition_variable_entry;
@@ -898,22 +898,23 @@ _dump_thread_info(struct thread *thread)
 	kprintf("args:               %p %p\n", thread->args1, thread->args2);
 	kprintf("entry:              %p\n", (void *)thread->entry);
 	kprintf("team:               %p, \"%s\"\n", thread->team, thread->team->name);
-	kprintf("  exit.sem:         0x%lx\n", thread->exit.sem);
-	kprintf("  exit.status:      0x%lx (%s)\n", thread->exit.status, strerror(thread->exit.status));
-	kprintf("  exit.reason:      0x%x\n", thread->exit.reason);
-	kprintf("  exit.signal:      0x%x\n", thread->exit.signal);
+	kprintf("  exit.sem:         %ld\n", thread->exit.sem);
+	kprintf("  exit.status:      %#lx (%s)\n", thread->exit.status, strerror(thread->exit.status));
+	kprintf("  exit.reason:      %#x\n", thread->exit.reason);
+	kprintf("  exit.signal:      %#x\n", thread->exit.signal);
 	kprintf("  exit.waiters:\n");
 	while ((death = (struct death_entry*)list_get_next_item(
 			&thread->exit.waiters, death)) != NULL) {
-		kprintf("\t%p (group 0x%lx, thread 0x%lx)\n", death, death->group_id, death->thread);
+		kprintf("\t%p (group %ld, thread %ld)\n", death, death->group_id, death->thread);
 	}
 
-	kprintf("kernel_stack_area:  0x%lx\n", thread->kernel_stack_area);
+	kprintf("kernel_stack_area:  %ld\n", thread->kernel_stack_area);
 	kprintf("kernel_stack_base:  %p\n", (void *)thread->kernel_stack_base);
-	kprintf("user_stack_area:    0x%lx\n", thread->user_stack_area);
+	kprintf("user_stack_area:    %ld\n", thread->user_stack_area);
 	kprintf("user_stack_base:    %p\n", (void *)thread->user_stack_base);
 	kprintf("user_local_storage: %p\n", (void *)thread->user_local_storage);
-	kprintf("kernel_errno:       %d\n", thread->kernel_errno);
+	kprintf("kernel_errno:       %#x (%s)\n", thread->kernel_errno,
+		strerror(thread->kernel_errno));
 	kprintf("kernel_time:        %Ld\n", thread->kernel_time);
 	kprintf("user_time:          %Ld\n", thread->user_time);
 	kprintf("architecture dependant section:\n");
@@ -1010,7 +1011,7 @@ dump_thread_list(int argc, char **argv)
 			|| (realTimeOnly && thread->priority < B_REAL_TIME_DISPLAY_PRIORITY))
 			continue;
 
-		kprintf("%p %6lx  %-9s", thread, thread->id, state_to_text(thread,
+		kprintf("%p %6ld  %-9s", thread, thread->id, state_to_text(thread,
 			thread->state));
 
 		// does it block on a semaphore or a condition variable?
@@ -1018,7 +1019,7 @@ dump_thread_list(int argc, char **argv)
 			if (thread->condition_variable_entry)
 				kprintf("%p  ", thread->condition_variable_entry->Variable());
 			else
-				kprintf("%10lx  ", thread->sem.blocking);
+				kprintf("%10ld  ", thread->sem.blocking);
 		} else
 			kprintf("      -     ");
 
@@ -1028,7 +1029,7 @@ dump_thread_list(int argc, char **argv)
 		else
 			kprintf(" -");
 
-		kprintf("%4ld  %p%5lx  %s\n", thread->priority,
+		kprintf("%4ld  %p%5ld  %s\n", thread->priority,
 			(void *)thread->kernel_stack_base, thread->team->id,
 			thread->name != NULL ? thread->name : "<NULL>");
 	}
@@ -1114,9 +1115,9 @@ thread_exit(void)
 	struct thread_debug_info debugInfo;
 	team_id teamID = team->id;
 
-	TRACE(("thread 0x%lx exiting %s w/return code 0x%x\n", thread->id,
-		thread->exit.reason == THREAD_RETURN_INTERRUPTED ? "due to signal" : "normally",
-		(int)thread->exit.status));
+	TRACE(("thread %ld exiting %s w/return code %#lx\n", thread->id,
+		thread->exit.reason == THREAD_RETURN_INTERRUPTED
+			? "due to signal" : "normally", thread->exit.status));
 
 	if (!are_interrupts_enabled())
 		panic("thread_exit() called with interrupts disabled!\n");
@@ -1201,7 +1202,7 @@ thread_exit(void)
 		vm_swap_address_space(vm_kernel_address_space());
 		restore_interrupts(state);
 
-		TRACE(("thread_exit: thread 0x%lx now a kernel thread!\n", thread->id));
+		TRACE(("thread_exit: thread %ld now a kernel thread!\n", thread->id));
 	}
 
 	// delete the team if we're its main thread
@@ -1358,7 +1359,7 @@ thread_at_kernel_entry(void)
 	cpu_status state;
 	bigtime_t now;
 
-	TRACE(("thread_atkernel_entry: entry thread 0x%lx\n", thread->id));
+	TRACE(("thread_atkernel_entry: entry thread %ld\n", thread->id));
 
 	state = disable_interrupts();
 
@@ -1384,7 +1385,7 @@ thread_at_kernel_exit(void)
 	cpu_status state;
 	bigtime_t now;
 
-	TRACE(("thread_atkernel_exit: exit thread 0x%lx\n", thread->id));
+	TRACE(("thread_atkernel_exit: exit thread %ld\n", thread->id));
 
 	if (handle_signals(thread)) {
 		state = disable_interrupts();
@@ -1603,7 +1604,7 @@ wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
 
 	if (status == B_OK) {
 		// this should never happen as the thread deletes the semaphore on exit
-		panic("could acquire exit_sem for thread %lx\n", id);
+		panic("could acquire exit_sem for thread %ld\n", id);
 	} else if (status == B_BAD_SEM_ID) {
 		// this is the way the thread normally exits
 		status = B_OK;
