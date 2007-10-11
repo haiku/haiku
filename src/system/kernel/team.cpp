@@ -6,7 +6,7 @@
  * Distributed under the terms of the NewOS License.
  */
 
-/* Team functions */
+/*!	Team functions */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -88,27 +88,27 @@ static void
 _dump_team_info(struct team *team)
 {
 	kprintf("TEAM: %p\n", team);
-	kprintf("id:          0x%lx\n", team->id);
+	kprintf("id:          %ld (%#lx)\n", team->id, team->id);
 	kprintf("name:        '%s'\n", team->name);
 	kprintf("args:        '%s'\n", team->args);
 	kprintf("next:        %p\n", team->next);
 	kprintf("parent:      %p", team->parent);
 	if (team->parent != NULL) {
-		kprintf(" (id = 0x%lx)\n", team->parent->id);
+		kprintf(" (id = %ld)\n", team->parent->id);
 	} else
 		kprintf("\n");
 
 	kprintf("children:    %p\n", team->children);
 	kprintf("num_threads: %d\n", team->num_threads);
 	kprintf("state:       %d\n", team->state);
-	kprintf("pending_signals: 0x%x\n", team->pending_signals);
+	kprintf("pending_signals: %#x\n", team->pending_signals);
 	kprintf("io_context:  %p\n", team->io_context);
 	if (team->address_space)
-		kprintf("address_space: %p (id = 0x%lx)\n", team->address_space, team->address_space->id);
+		kprintf("address_space: %p\n", team->address_space);
 	kprintf("main_thread: %p\n", team->main_thread);
 	kprintf("thread_list: %p\n", team->thread_list);
-	kprintf("group_id:    0x%lx\n", team->group_id);
-	kprintf("session_id:  0x%lx\n", team->session_id);
+	kprintf("group_id:    %ld\n", team->group_id);
+	kprintf("session_id:  %ld\n", team->session_id);
 }
 
 
@@ -167,12 +167,11 @@ dump_teams(int argc, char **argv)
 }
 
 
-/**	Frees an array of strings in kernel space.
- *
- *	\param strings strings array
- *	\param count number of strings in array
- */
+/*!	Frees an array of strings in kernel space.
 
+	\param strings strings array
+	\param count number of strings in array
+*/
 static void
 free_strings_array(char **strings, int32 count)
 {
@@ -188,15 +187,14 @@ free_strings_array(char **strings, int32 count)
 }
 
 
-/**	Copy an array of strings in kernel space
- *
- *	\param strings strings array to be copied
- *	\param count number of strings in array
- *	\param kstrings	pointer to the kernel copy
- *	\return \c B_OK on success, or an appropriate error code on
- *		failure.
- */
+/*!	Copy an array of strings in kernel space
 
+	\param strings strings array to be copied
+	\param count number of strings in array
+	\param kstrings	pointer to the kernel copy
+	\return \c B_OK on success, or an appropriate error code on
+		failure.
+*/
 static status_t
 kernel_copy_strings_array(char * const *in, int32 count, char ***_strings)
 {
@@ -227,15 +225,14 @@ error:
 }
 
 
-/**	Copy an array of strings from user space to kernel space
- *
- *	\param strings userspace strings array
- *	\param count number of strings in array
- *	\param kstrings	pointer to the kernel copy
- *	\return \c B_OK on success, or an appropriate error code on
- *		failure.
- */
+/*!	Copy an array of strings from user space to kernel space
 
+	\param strings userspace strings array
+	\param count number of strings in array
+	\param kstrings	pointer to the kernel copy
+	\return \c B_OK on success, or an appropriate error code on
+		failure.
+*/
 static status_t
 user_copy_strings_array(char * const *userStrings, int32 count, char ***_strings)
 {
@@ -365,9 +362,7 @@ insert_team_into_parent(struct team *parent, struct team *team)
 }
 
 
-/**	Note: must have TEAM lock held
- */
-
+/*!	Note: must have team lock held */
 static void
 remove_team_from_parent(struct team *parent, struct team *team)
 {
@@ -388,10 +383,9 @@ remove_team_from_parent(struct team *parent, struct team *team)
 }
 
 
-/**	Reparent each of our children
- *	Note: must have TEAM lock held
- */
-
+/*!	Reparent each of our children
+	Note: must have team lock held
+*/
 static void
 reparent_children(struct team *team)
 {
@@ -421,8 +415,7 @@ is_process_group_leader(struct team *team)
 }
 
 
-/**	You must hold the team lock when calling this function. */
-
+/*!	You must hold the team lock when calling this function. */
 static void
 insert_group_into_session(struct process_session *session, struct process_group *group)
 {
@@ -435,8 +428,7 @@ insert_group_into_session(struct process_session *session, struct process_group 
 }
 
 
-/**	You must hold the team lock when calling this function. */
-
+/*!	You must hold the team lock when calling this function. */
 static void
 insert_team_into_group(struct process_group *group, struct team *team)
 {
@@ -449,11 +441,10 @@ insert_team_into_group(struct process_group *group, struct team *team)
 }
 
 
-/** Removes a group from a session, and puts the session object
- *	back into the session cache, if it's not used anymore.
- *	You must hold the team lock when calling this function.
- */
-
+/*!	Removes a group from a session, and puts the session object
+	back into the session cache, if it's not used anymore.
+	You must hold the team lock when calling this function.
+*/
 static void
 remove_group_from_session(struct process_group *group)
 {
@@ -472,18 +463,15 @@ remove_group_from_session(struct process_group *group)
 }
 
 
+/*!	Removes the team from the group. If that group becomes therefore
+	unused, it will set \a _freeGroup to point to the group - otherwise
+	it will be \c NULL.
+	It cannot be freed here because this function has to be called
+	with having the team lock held.
 
-
-/**	Removes the team from the group. If that group becomes therefore
- *	unused, it will set \a _freeGroup to point to the group - otherwise
- *	it will be \c NULL.
- *	It cannot be freed here because this function has to be called
- *	with having the team lock held.
- *
- *	\param team the team that'll be removed from it's group
- *	\param _freeGroup points to the group to be freed or NULL
- */
-
+	\param team the team that'll be removed from it's group
+	\param _freeGroup points to the group to be freed or NULL
+*/
 static void
 remove_team_from_group(struct team *team, struct process_group **_freeGroup)
 {
@@ -865,7 +853,7 @@ team_create_thread_start(void *args)
 		return err;
 	}
 
-	TRACE(("team_create_thread_start: loaded elf. entry = 0x%lx\n", entry));
+	TRACE(("team_create_thread_start: loaded elf. entry = %#lx\n", entry));
 
 	team->state = TEAM_STATE_NORMAL;
 
@@ -875,10 +863,9 @@ team_create_thread_start(void *args)
 }
 
 
-/** The BeOS kernel exports a function with this name, but most probably with
- *	different parameters; we should not make it public.
- */
-
+/*!	The BeOS kernel exports a function with this name, but most probably with
+	different parameters; we should not make it public.
+*/
 static thread_id
 load_image_etc(int32 argCount, char * const *args, int32 envCount,
 	char * const *env, int32 priority, uint32 flags,
@@ -1023,12 +1010,11 @@ err1:
 }
 
 
-/**	Almost shuts down the current team and loads a new image into it.
- *	If successful, this function does not return and will takeover ownership of
- *	the arguments provided.
- *	This function may only be called from user space.
- */
-
+/*!	Almost shuts down the current team and loads a new image into it.
+	If successful, this function does not return and will takeover ownership of
+	the arguments provided.
+	This function may only be called from user space.
+*/
 static status_t
 exec_team(const char *path, int32 argCount, char * const *args,
 	int32 envCount, char * const *env)
@@ -1041,7 +1027,7 @@ exec_team(const char *path, int32 argCount, char * const *args,
 	struct thread *thread;
 	thread_id nubThreadID = -1;
 
-	TRACE(("exec_team(path = \"%s\", argc = %ld, envCount = %ld): team %lx\n",
+	TRACE(("exec_team(path = \"%s\", argc = %ld, envCount = %ld): team %ld\n",
 		args[0], argCount, envCount, team->id));
 
 	// switching the kernel at run time is probably not a good idea :)
@@ -1128,12 +1114,11 @@ exec_team(const char *path, int32 argCount, char * const *args,
 }
 
 
-/** This is the first function to be called from the newly created
- *	main child thread.
- *	It will fill in everything what's left to do from fork_arg, and
- *	return from the parent's fork() syscall to the child.
- */
-
+/*! This is the first function to be called from the newly created
+	main child thread.
+	It will fill in everything what's left to do from fork_arg, and
+	return from the parent's fork() syscall to the child.
+*/
 static int32
 fork_team_thread_start(void *_args)
 {
@@ -1175,7 +1160,7 @@ fork_team(void)
 	status_t status;
 	int32 cookie;
 
-	TRACE(("fork_team(): team %lx\n", parentTeam->id));
+	TRACE(("fork_team(): team %ld\n", parentTeam->id));
 
 	if (parentTeam == team_get_kernel_team())
 		return B_NOT_ALLOWED;
@@ -1288,10 +1273,10 @@ err1:
 }
 
 
-/**	Returns if the specified \a team has any children belonging to the specified \a group.
- *	Must be called with the team lock held.
- */
-
+/*!	Returns if the specified \a team has any children belonging to the
+	specified \a group.
+	Must be called with the team lock held.
+*/
 static bool
 has_children_in_group(struct team *parent, pid_t groupID)
 {
@@ -1504,11 +1489,10 @@ wait_for_child(pid_t child, uint32 flags, int32 *_reason,
 }
 
 
-/** Fills the team_info structure with information from the specified
- *	team.
- *	The team lock must be held when called.
- */
-
+/*! Fills the team_info structure with information from the specified
+	team.
+	The team lock must be held when called.
+*/
 static status_t
 fill_team_info(struct team *team, team_info *info, size_t size)
 {
@@ -1675,9 +1659,7 @@ team_get_death_entry(struct team *team, thread_id child, bool* _deleteEntry)
 }
 
 
-/** Quick check to see if we have a valid team ID.
- */
-
+/*! Quick check to see if we have a valid team ID. */
 bool
 team_is_valid(team_id id)
 {
@@ -1709,10 +1691,9 @@ team_get_team_struct_locked(team_id id)
 }
 
 
-/** This searches the session of the team for the specified group ID.
- *	You must hold the team lock when you call this function.
- */
-
+/*! This searches the session of the team for the specified group ID.
+	You must hold the team lock when you call this function.
+*/
 struct process_group *
 team_get_process_group_locked(struct process_session *session, pid_t id)
 {
@@ -2126,11 +2107,10 @@ team_set_job_control_state(struct team* team, job_control_state newState,
 }
 
 
-/** Adds a hook to the team that is called as soon as this
- *	team goes away.
- *	This call might get public in the future.
- */
-
+/*! Adds a hook to the team that is called as soon as this
+	team goes away.
+	This call might get public in the future.
+*/
 status_t
 start_watching_team(team_id teamID, void (*hook)(team_id, void *), void *data)
 {

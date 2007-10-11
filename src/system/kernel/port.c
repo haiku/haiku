@@ -6,7 +6,7 @@
  * Distributed under the terms of the NewOS License.
  */
 
-/* ports for IPC */
+/*!	Ports for IPC */
 
 
 #include <OS.h>
@@ -54,18 +54,13 @@ struct port_entry {
 	struct list	msg_queue;
 };
 
-// internal API
-static int dump_port_list(int argc, char **argv);
-static int dump_port_info(int argc, char **argv);
-static void _dump_port_info(struct port_entry *port);
 
+#define MAX_QUEUE_LENGTH 4096
+#define PORT_MAX_MESSAGE_SIZE 65536
 
 // sMaxPorts must be power of 2
 static int32 sMaxPorts = 4096;
 static int32 sUsedPorts = 0;
-
-#define MAX_QUEUE_LENGTH 4096
-#define PORT_MAX_MESSAGE_SIZE 65536
 
 static struct port_entry *sPorts = NULL;
 static area_id sPortArea = 0;
@@ -81,143 +76,7 @@ static spinlock sPortSpinlock = 0;
 #define RELEASE_PORT_LOCK(s) release_spinlock(&(s).lock)
 
 
-status_t
-port_init(kernel_args *args)
-{
-	size_t size = sizeof(struct port_entry) * sMaxPorts;
-	int32 i;
-
-	// create and initialize ports table
-	sPortArea = create_area("port_table", (void **)&sPorts, B_ANY_KERNEL_ADDRESS,
-		size, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	if (sPortArea < 0) {
-		panic("unable to allocate kernel port table!\n");
-	}
-
-	// ToDo: investigate preallocating a list of port_msgs to
-	//	speed up actual message sending/receiving, a slab allocator
-	//	might do it as well, though :-)
-
-	memset(sPorts, 0, size);
-	for (i = 0; i < sMaxPorts; i++)
-		sPorts[i].id = -1;
-
-	// add debugger commands
-	add_debugger_command("ports", &dump_port_list, "Dump a list of all active ports");
-	add_debugger_command("port", &dump_port_info, "Dump info about a particular port");
-
-	sPortsActive = true;
-
-	return 0;
-}
-
-
-#ifdef DEBUG
-// ToDo: the test code does not belong here!
-// the same code is present in the test_app in kernel/apps 
-// so I guess we can remove this
-/*
- * testcode
- */
-
-static int32 port_test_thread_func(void *arg);
-
-port_id test_p1, test_p2, test_p3, test_p4;
-
-void
-port_test()
-{
-	char testdata[5];
-	thread_id t;
-	int res;
-	int32 dummy;
-	int32 dummy2;
-
-	strcpy(testdata, "abcd");
-
-	dprintf("porttest: create_port()\n");
-	test_p1 = create_port(1,    "test port #1");
-	test_p2 = create_port(10,   "test port #2");
-	test_p3 = create_port(1024, "test port #3");
-	test_p4 = create_port(1024, "test port #4");
-
-	dprintf("porttest: find_port()\n");
-	dprintf("'test port #1' has id %ld (should be %ld)\n", find_port("test port #1"), test_p1);
-
-	dprintf("porttest: write_port() on 1, 2 and 3\n");
-	write_port(test_p1, 1, &testdata, sizeof(testdata));
-	write_port(test_p2, 666, &testdata, sizeof(testdata));
-	write_port(test_p3, 999, &testdata, sizeof(testdata));
-	dprintf("porttest: port_count(test_p1) = %ld\n", port_count(test_p1));
-
-	dprintf("porttest: write_port() on 1 with timeout of 1 sec (blocks 1 sec)\n");
-	write_port_etc(test_p1, 1, &testdata, sizeof(testdata), B_TIMEOUT, 1000000);
-	dprintf("porttest: write_port() on 2 with timeout of 1 sec (wont block)\n");
-	res = write_port_etc(test_p2, 777, &testdata, sizeof(testdata), B_TIMEOUT, 1000000);
-	dprintf("porttest: res=%d, %s\n", res, res == 0 ? "ok" : "BAD");
-
-	dprintf("porttest: read_port() on empty port 4 with timeout of 1 sec (blocks 1 sec)\n");
-	res = read_port_etc(test_p4, &dummy, &dummy2, sizeof(dummy2), B_TIMEOUT, 1000000);
-	dprintf("porttest: res=%d, %s\n", res, res == B_TIMED_OUT ? "ok" : "BAD");
-
-	dprintf("porttest: spawning thread for port 1\n");
-	t = spawn_kernel_thread(port_test_thread_func, "port_test", B_NORMAL_PRIORITY, NULL);
-	resume_thread(t);
-
-	dprintf("porttest: write\n");
-	write_port(test_p1, 1, &testdata, sizeof(testdata));
-
-	// now we can write more (no blocking)
-	dprintf("porttest: write #2\n");
-	write_port(test_p1, 2, &testdata, sizeof(testdata));
-	dprintf("porttest: write #3\n");
-	write_port(test_p1, 3, &testdata, sizeof(testdata));
-
-	dprintf("porttest: waiting on spawned thread\n");
-	wait_for_thread(t, NULL);
-
-	dprintf("porttest: close p1\n");
-	close_port(test_p2);
-	dprintf("porttest: attempt write p1 after close\n");
-	res = write_port(test_p2, 4, &testdata, sizeof(testdata));
-	dprintf("porttest: write_port ret %d\n", res);
-
-	dprintf("porttest: testing delete p2\n");
-	delete_port(test_p2);
-
-	dprintf("porttest: end test main thread\n");
-	
-}
-
-
-static int32
-port_test_thread_func(void *arg)
-{
-	int32 msg_code;
-	int n;
-	char buf[6];
-	buf[5] = '\0';
-
-	dprintf("porttest: port_test_thread_func()\n");
-	
-	n = read_port(test_p1, &msg_code, &buf, 3);
-	dprintf("read_port #1 code %ld len %d buf %s\n", msg_code, n, buf);
-	n = read_port(test_p1, &msg_code, &buf, 4);
-	dprintf("read_port #1 code %ld len %d buf %s\n", msg_code, n, buf);
-	buf[4] = 'X';
-	n = read_port(test_p1, &msg_code, &buf, 5);
-	dprintf("read_port #1 code %ld len %d buf %s\n", msg_code, n, buf);
-
-	dprintf("porttest: testing delete p1 from other thread\n");
-	delete_port(test_p1);
-	dprintf("porttest: end port_test_thread_func()\n");
-	
-	return 0;
-}
-#endif	/* DEBUG */
-
-
-int
+static int
 dump_port_list(int argc, char **argv)
 {
 	const char *name = NULL;
@@ -241,8 +100,9 @@ dump_port_list(int argc, char **argv)
 			|| (name != NULL && strstr(port->name, name) == NULL))
 			continue;
 
-		kprintf("%p %6lx %4ld %6lx %6lx %6lx  %s\n", port, port->id, port->capacity,
-			port->read_sem, port->write_sem, port->owner, port->name);
+		kprintf("%p %6ld %4ld %6ld %6ld %6ld  %s\n", port, port->id,
+			port->capacity, port->read_sem, port->write_sem, port->owner,
+			port->name);
 	}
 	return 0;
 }
@@ -293,7 +153,7 @@ dump_port_info(int argc, char **argv)
 		uint32 num = strtoul(argv[1], NULL, 0);
 		uint32 slot = num % sMaxPorts;
 		if (sPorts[slot].id != (int)num) {
-			kprintf("port 0x%lx doesn't exist!\n", num);
+			kprintf("port %ld (%#lx) doesn't exist!\n", num, num);
 			return 0;
 		}
 		_dump_port_info(&sPorts[slot]);
@@ -303,8 +163,10 @@ dump_port_info(int argc, char **argv)
 
 	// walk through the ports list, trying to match name
 	for (i = 0; i < sMaxPorts; i++) {
-		if ((name != NULL && sPorts[i].name != NULL && !strcmp(name, sPorts[i].name))
-			|| (sem != -1 && (sPorts[i].read_sem == sem || sPorts[i].write_sem == sem))) {
+		if ((name != NULL && sPorts[i].name != NULL
+				&& !strcmp(name, sPorts[i].name))
+			|| (sem != -1 && (sPorts[i].read_sem == sem
+				|| sPorts[i].write_sem == sem))) {
 			_dump_port_info(&sPorts[i]);
 			return 0;
 		}
@@ -322,10 +184,77 @@ notify_port_select_events(int slot, uint16 events)
 }
 
 
-/** this function cycles through the ports table, deleting all
- *	the ports that are owned by the passed team_id
- */
+static void
+put_port_msg(port_msg *msg)
+{
+	cbuf_free_chain(msg->buffer_chain);
+	free(msg);
+}
 
+
+static port_msg *
+get_port_msg(int32 code, size_t bufferSize)
+{
+	// ToDo: investigate preallocation of port_msgs (or use a slab allocator)
+	cbuf *bufferChain = NULL;
+
+	port_msg *msg = (port_msg *)malloc(sizeof(port_msg));
+	if (msg == NULL)
+		return NULL;
+
+	if (bufferSize > 0) {
+		bufferChain = cbuf_get_chain(bufferSize);
+		if (bufferChain == NULL) {
+			free(msg);
+			return NULL;
+		}
+	}
+
+	msg->code = code;
+	msg->buffer_chain = bufferChain;
+	msg->size = bufferSize;
+	return msg;
+}
+
+
+/*!	You need to own the port's lock when calling this function */
+static bool
+is_port_closed(int32 slot)
+{
+	return sPorts[slot].capacity == 0;
+}
+
+
+/*!	Fills the port_info structure with information from the specified
+	port.
+	The port lock must be held when called.
+*/
+static void
+fill_port_info(struct port_entry *port, port_info *info, size_t size)
+{
+	int32 count;
+
+	info->port = port->id;
+	info->team = port->owner;
+	info->capacity = port->capacity;
+
+	get_sem_count(port->read_sem, &count);
+	if (count < 0)
+		count = 0;
+
+	info->queue_count = count;
+	info->total_count = port->total_count;
+
+	strlcpy(info->name, port->name, B_OS_NAME_LENGTH);
+}
+
+
+//	#pragma mark - private kernel API
+
+
+/*! This function cycles through the ports table, deleting all
+	the ports that are owned by the passed team_id
+*/
 int
 delete_owned_ports(team_id owner)
 {
@@ -365,48 +294,6 @@ delete_owned_ports(team_id owner)
 }
 
 
-static void
-put_port_msg(port_msg *msg)
-{
-	cbuf_free_chain(msg->buffer_chain);
-	free(msg);
-}
-
-
-static port_msg *
-get_port_msg(int32 code, size_t bufferSize)
-{
-	// ToDo: investigate preallocation of port_msgs (or use a slab allocator)
-	cbuf *bufferChain = NULL;
-
-	port_msg *msg = (port_msg *)malloc(sizeof(port_msg));
-	if (msg == NULL)
-		return NULL;
-
-	if (bufferSize > 0) {
-		bufferChain = cbuf_get_chain(bufferSize);
-		if (bufferChain == NULL) {
-			free(msg);
-			return NULL;
-		}
-	}
-
-	msg->code = code;
-	msg->buffer_chain = bufferChain;
-	msg->size = bufferSize;
-	return msg;
-}
-
-
-/**	You need to own the port's lock when calling this function */
-
-static bool
-is_port_closed(int32 slot)
-{
-	return sPorts[slot].capacity == 0;
-}
-
-
 int32
 port_max_ports(void)
 {
@@ -418,6 +305,37 @@ int32
 port_used_ports(void)
 {
 	return sUsedPorts;
+}
+
+
+status_t
+port_init(kernel_args *args)
+{
+	size_t size = sizeof(struct port_entry) * sMaxPorts;
+	int32 i;
+
+	// create and initialize ports table
+	sPortArea = create_area("port_table", (void **)&sPorts, B_ANY_KERNEL_ADDRESS,
+		size, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (sPortArea < 0) {
+		panic("unable to allocate kernel port table!\n");
+		return sPortArea;
+	}
+
+	// ToDo: investigate preallocating a list of port_msgs to
+	//	speed up actual message sending/receiving, a slab allocator
+	//	might do it as well, though :-)
+
+	memset(sPorts, 0, size);
+	for (i = 0; i < sMaxPorts; i++)
+		sPorts[i].id = -1;
+
+	// add debugger commands
+	add_debugger_command("ports", &dump_port_list, "Dump a list of all active ports");
+	add_debugger_command("port", &dump_port_info, "Dump info about a particular port");
+
+	sPortsActive = true;
+	return B_OK;
 }
 
 
@@ -775,31 +693,6 @@ find_port(const char *name)
 	}
 
 	return portFound;
-}
-
-
-/** Fills the port_info structure with information from the specified
- *	port.
- *	The port lock must be held when called.
- */
-
-static void
-fill_port_info(struct port_entry *port, port_info *info, size_t size)
-{
-	int32 count;
-
-	info->port = port->id;
-	info->team = port->owner;
-	info->capacity = port->capacity;
-
-	get_sem_count(port->read_sem, &count);
-	if (count < 0)
-		count = 0;
-
-	info->queue_count = count;
-	info->total_count = port->total_count;
-
-	strlcpy(info->name, port->name, B_OS_NAME_LENGTH);
 }
 
 
