@@ -126,7 +126,7 @@ BTextControl::BTextControl(BMessage* archive)
 	SetAlignment((alignment)labelAlignment, (alignment)textAlignment);
 
 	if (archive->HasFloat("_divide"))
-		archive->FindFloat("_a_text", &fDivider);
+		archive->FindFloat("_divide", &fDivider);
 
 	if (archive->HasMessage("_mod_msg")) {
 		BMessage* message = new BMessage;
