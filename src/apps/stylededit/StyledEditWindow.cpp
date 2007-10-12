@@ -1115,26 +1115,30 @@ StyledEditWindow::Print(const char* documentName)
 		lastLine = currentLine - 1;
 	}
 
+	
 	printJob.BeginJob();
-	int32 printLine = firstLine;
-	while (printLine < lastLine) {
-		float currentHeight = 0;
-		int32 firstLineOnPage = printLine;
-		while (currentHeight < printableRect.Height() && printLine < lastLine) {
-			currentHeight += fTextView->LineHeight(printLine);
-			if (currentHeight < printableRect.Height())
-				printLine++;
+	if (fTextView->CountLines() > 0 && fTextView->TextLength() > 0) {
+		int32 printLine = firstLine;
+		while (printLine <= lastLine) {
+			float currentHeight = 0;
+			int32 firstLineOnPage = printLine;
+			while (currentHeight < printableRect.Height() && printLine <= lastLine) {
+				currentHeight += fTextView->LineHeight(printLine);
+				if (currentHeight < printableRect.Height())
+					printLine++;
+			}
+
+			float top = 0;
+			if (firstLineOnPage != 0)
+				top = fTextView->TextHeight(0, firstLineOnPage - 1);
+
+			float bottom = fTextView->TextHeight(0, printLine - 1);
+			BRect textRect(0.0, top + TEXT_INSET, printableRect.Width(), bottom + TEXT_INSET);
+			printJob.DrawView(fTextView, textRect, B_ORIGIN);
+			printJob.SpoolPage();
 		}
-
-		float top = 0;
-		if (firstLineOnPage != 0)
-			top = fTextView->TextHeight(0, firstLineOnPage - 1);
-
-		float bottom = fTextView->TextHeight(0, printLine - 1);
-		BRect textRect(0.0, top + TEXT_INSET, printableRect.Width(), bottom + TEXT_INSET);
-		printJob.DrawView(fTextView, textRect, BPoint(0.0,0.0));
-		printJob.SpoolPage();
 	}
+	
 
 	printJob.CommitJob();
 }
