@@ -30,10 +30,11 @@ class Screen {
 
 			int32				ID() const { return fID; }
 
-			status_t			SetMode(display_mode mode, bool makeDefault);
+			status_t			SetMode(const display_mode& mode, bool makeDefault);
 			status_t			SetMode(uint16 width, uint16 height,
 									uint32 colorspace, float frequency,
 									bool makeDefault);
+			status_t			SetPreferredMode();
 
 			void				GetMode(display_mode* mode) const;
 			void				GetMode(uint16 &width,

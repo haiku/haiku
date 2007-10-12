@@ -89,6 +89,20 @@ HWInterface::GetDriverPath(BString &path)
 }
 
 
+status_t
+HWInterface::GetPreferredMode(display_mode* mode)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+HWInterface::GetMonitorInfo(BString& name, BString& serial)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
 // #pragma mark -
 
 

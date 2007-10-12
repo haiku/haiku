@@ -86,7 +86,7 @@ Screen::Shutdown()
 
 
 status_t
-Screen::SetMode(display_mode mode, bool makeDefault)
+Screen::SetMode(const display_mode& mode, bool makeDefault)
 {
 	gBitmapManager->SuspendOverlays();
 
@@ -140,6 +140,18 @@ Screen::SetMode(uint16 width, uint16 height, uint32 colorspace,
 }
 
 
+status_t
+Screen::SetPreferredMode()
+{
+	display_mode mode;
+	status_t status = fHWInterface->GetPreferredMode(&mode);
+	if (status < B_OK)
+		return status;
+
+	return SetMode(mode, false);
+}
+
+
 void
 Screen::GetMode(display_mode* mode) const
 {
@@ -149,7 +161,7 @@ Screen::GetMode(display_mode* mode) const
 
 void
 Screen::GetMode(uint16 &width, uint16 &height, uint32 &colorspace,
-				float &frequency) const
+	float &frequency) const
 {
 	display_mode mode;
 	fHWInterface->GetMode(&mode);
@@ -183,7 +195,7 @@ Screen::ColorSpace() const
 
 status_t
 Screen::_FindMode(uint16 width, uint16 height, uint32 colorspace,
-				  float frequency, display_mode* mode) const
+	float frequency, display_mode* mode) const
 {
 	display_mode* modes = NULL;
 	uint32 count;

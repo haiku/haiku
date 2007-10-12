@@ -41,6 +41,8 @@ enum {
 	B_DPMS_CAPABILITIES,		/* required if driver supports DPMS */
 	B_DPMS_MODE,				/* required if driver supports DPMS */
 	B_SET_DPMS_MODE,			/* required if driver supports DPMS */
+	B_GET_PREFERRED_DISPLAY_MODE,	/* optional */
+	B_GET_EDID_INFO,			/* optional */
 
 	/* cursor managment */
 	B_MOVE_CURSOR = 0x200,		/* optional */
@@ -213,6 +215,8 @@ typedef void (*set_indexed_colors)(uint count, uint8 first, uint8 *color_data, u
 typedef uint32 (*dpms_capabilities)(void);
 typedef uint32 (*dpms_mode)(void);
 typedef status_t (*set_dpms_mode)(uint32 dpms_flags);
+typedef status_t (*get_preferred_display_mode)(display_mode *preferredMode);
+typedef status_t (*get_edid_info)(void *info, uint32 size, uint32 *_version);
 typedef sem_id (*accelerant_retrace_semaphore)(void);
 
 typedef status_t (*set_cursor_shape)(uint16 width, uint16 height, uint16 hot_x, uint16 hot_y, uint8 *andMask, uint8 *xorMask);

@@ -133,7 +133,8 @@ VirtualScreen::AddScreen(Screen* screen)
 	}
 	if (status < B_OK) {
 		// TODO: more intelligent standard mode (monitor preference, desktop default, ...)
-		screen->SetMode(800, 600, B_RGB32, 60.f, false);
+		if (screen->SetPreferredMode() != B_OK)
+			screen->SetMode(800, 600, B_RGB32, 60.f, false);
 	}
 
 	// TODO: this works only for single screen configurations

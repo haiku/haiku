@@ -22,6 +22,7 @@
 #include "ServerProtocol.h"
 #include "SystemPalette.h"
 
+#include <edid.h>
 #include <safemode.h>
 
 #include <Accelerant.h>
@@ -349,6 +350,8 @@ AccelerantHWInterface::_SetupDefaultHooks()
 	// optional
 	fAccGetTimingConstraints = (get_timing_constraints)fAccelerantHook(B_GET_TIMING_CONSTRAINTS, NULL);
 	fAccProposeDisplayMode = (propose_display_mode)fAccelerantHook(B_PROPOSE_DISPLAY_MODE, NULL);
+	fAccGetPreferredDisplayMode = (get_preferred_display_mode)fAccelerantHook(B_GET_PREFERRED_DISPLAY_MODE, NULL);
+	fAccGetEDIDInfo = (get_edid_info)fAccelerantHook(B_GET_EDID_INFO, NULL);
 
 	// cursor
 	fAccSetCursorShape = (set_cursor_shape)fAccelerantHook(B_SET_CURSOR_SHAPE, NULL);
@@ -713,6 +716,102 @@ AccelerantHWInterface::ProposeMode(display_mode *candidate, const display_mode *
 	this_low = *low;
 	
 	return fAccProposeDisplayMode(candidate, &this_low, &this_high);
+}
+
+
+status_t
+AccelerantHWInterface::GetPreferredMode(display_mode* mode)
+{
+	status_t status = B_NOT_SUPPORTED;
+
+	if (fAccGetPreferredDisplayMode != NULL) {
+		status = fAccGetPreferredDisplayMode(mode);
+		if (status == B_OK)
+			return B_OK;
+	}
+
+	if (fAccGetEDIDInfo != NULL) {
+		edid1_info info;
+		uint32 version;
+		status_t status = fAccGetEDIDInfo(&info, sizeof(info), &version);
+		if (status < B_OK)
+			return status;
+		if (version != EDID_VERSION_1)
+			return B_NOT_SUPPORTED;
+
+		status = B_ERROR;
+
+		// find preferred mode from EDID info
+		for (uint32 i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; ++i) {
+			if (info.detailed_monitor[i].monitor_desc_type != EDID1_IS_DETAILED_TIMING)
+				continue;
+
+			// TODO: we could also just look for this mode in the most list
+			// TODO: handle sync and flags correctly!
+			const edid1_detailed_timing& timing = info.detailed_monitor[i].data.detailed_timing;
+			mode->timing.pixel_clock = timing.pixel_clock * 10;
+			mode->timing.h_display = timing.h_active;
+			mode->timing.h_sync_start = timing.h_blank;
+			mode->timing.h_sync_end = timing.h_sync_off;
+			mode->timing.h_total = timing.h_sync_width;
+			mode->timing.v_display = timing.v_active;
+			mode->timing.v_sync_start = timing.v_blank;
+			mode->timing.v_sync_end = timing.v_sync_off;
+			mode->timing.v_total = timing.v_sync_width;
+			mode->timing.flags = B_POSITIVE_HSYNC | B_POSITIVE_VSYNC;
+			mode->space = B_RGB32;
+			mode->virtual_width = timing.h_active;
+			mode->virtual_height = timing.v_active;
+			mode->h_display_start = 0;
+			mode->v_display_start = 0;
+			if (fModeCount > 0)
+				mode->flags = fModeList[0].flags;
+			else
+				mode->flags = B_8_BIT_DAC | B_PARALLEL_ACCESS;
+			status = B_OK;
+		}
+	}
+
+	return status;
+}
+
+
+status_t
+AccelerantHWInterface::GetMonitorInfo(BString& name, BString& serial)
+{
+	if (fAccGetEDIDInfo == NULL)
+		return B_NOT_SUPPORTED;
+
+	edid1_info info;
+	uint32 version;
+	status_t status = fAccGetEDIDInfo(&info, sizeof(info), &version);
+	if (status < B_OK)
+		return status;
+	if (version != EDID_VERSION_1)
+		return B_NOT_SUPPORTED;
+
+	uint32 found = 0;
+
+	for (uint32 i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; ++i) {
+		edid1_detailed_monitor *monitor = &info.detailed_monitor[i];
+
+		switch (monitor->monitor_desc_type) {
+			case EDID1_SERIAL_NUMBER:
+				serial.SetTo(monitor->data.serial_number);
+				found++;
+				break;
+
+			case EDID1_MONITOR_NAME:
+				name.SetTo(monitor->data.monitor_name);
+				found++;
+				break;
+
+			default:
+				break;
+		}
+	}
+
+	return found > 0 ? B_OK : B_NAME_NOT_FOUND;
 }
 
 

@@ -77,6 +77,8 @@ class HWInterface : protected MultiLocker {
 	virtual status_t			ProposeMode(display_mode *candidate,
 											const display_mode *low,
 											const display_mode *high) = 0;
+	virtual	status_t			GetPreferredMode(display_mode* mode);
+	virtual status_t			GetMonitorInfo(BString& name, BString& serial);
 
 	virtual sem_id				RetraceSemaphore() = 0;
 	virtual status_t			WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT) = 0;

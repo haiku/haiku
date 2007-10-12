@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src servers app drawing ;
 
 UseLibraryHeaders agg ;
 UsePrivateHeaders app graphics kernel interface shared ;
+UsePrivateHeaders [ FDirName graphics common ] ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter ] ;
