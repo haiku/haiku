@@ -1486,32 +1486,27 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 			fShell->Signal(SIGINT);
 	}
 
-	//printf("rawKey: %c\n", (char)rawChar);
-
 	// Terminal filters RET, ENTER, F1...F12, and ARROW key code.
 	// TODO: Cleanup
 	if (numBytes == 1) {
 		switch (*bytes) {
 			case B_RETURN:
-				if (key == RETURN_KEY || key == ENTER_KEY) {
+				if (rawChar == B_RETURN) {
 					char c = 0x0d;
 					fShell->Write(&c, 1);
-					return;
-				} else {
-					fShell->Write(bytes, numBytes);
 					return;
 				}
 				break;
 			
 			case B_LEFT_ARROW:
-				if (key == LEFT_ARROW_KEY) {
+				if (rawChar == B_LEFT_ARROW) {
 					fShell->Write(LEFT_ARROW_KEY_CODE, sizeof(LEFT_ARROW_KEY_CODE) - 1);
 					return;
 				}
 				break;
 
 			case B_RIGHT_ARROW:
-				if (key == RIGHT_ARROW_KEY) {
+				if (rawChar == B_RIGHT_ARROW) {
 					fShell->Write(RIGHT_ARROW_KEY_CODE, sizeof(RIGHT_ARROW_KEY_CODE) - 1);
 					return;
 				}
@@ -1525,7 +1520,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 					}
 					return;
 				}
-				if (key == UP_ARROW_KEY) {
+				if (rawChar == B_UP_ARROW) {
 					fShell->Write(UP_ARROW_KEY_CODE, sizeof(UP_ARROW_KEY_CODE) - 1);
 					return;
 				}
@@ -1538,28 +1533,28 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 					return;
 				}
 
-				if (key == DOWN_ARROW_KEY) {
+				if (rawChar == B_DOWN_ARROW) {
 					fShell->Write(DOWN_ARROW_KEY_CODE, sizeof(DOWN_ARROW_KEY_CODE) - 1);
 					return;
 				}
 				break;
 
 			case B_INSERT:
-				if (key == INSERT_KEY) {
+				if (rawChar == B_INSERT) {
 					fShell->Write(INSERT_KEY_CODE, sizeof(INSERT_KEY_CODE) - 1);
 					return;
 				}
 				break;
 
 			case B_HOME:
-				if (key == HOME_KEY) {
+				if (rawChar == B_HOME) {
 					fShell->Write(HOME_KEY_CODE, sizeof(HOME_KEY_CODE) - 1);
 					return;
 				}
 				break;
 
 			case B_END:
-				if (key == END_KEY) {
+				if (rawChar == B_END) {
 					fShell->Write(END_KEY_CODE, sizeof(END_KEY_CODE) - 1);
 					return;
 				}
@@ -1573,7 +1568,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 					}					
 					return;
 				}
-				if (key == PAGE_UP_KEY) {
+				if (rawChar == B_PAGE_UP) {
 					fShell->Write(PAGE_UP_KEY_CODE, sizeof(PAGE_UP_KEY_CODE) - 1);
 					return;
 				}
@@ -1586,7 +1581,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 					return;
 				}
 	 
-				if (key == PAGE_DOWN_KEY) {
+				if (rawChar == B_PAGE_DOWN) {
 					fShell->Write(PAGE_DOWN_KEY_CODE, sizeof(PAGE_DOWN_KEY_CODE) - 1);
 					return;
 				}
