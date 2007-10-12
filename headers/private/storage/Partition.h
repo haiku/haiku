@@ -16,6 +16,7 @@ class BDiskDevice;
 class BDiskDeviceParameterEditor;
 class BDiskDeviceVisitor;
 class BDiskSystem;
+class BMutablePartition;
 class BPartitioningInfo;
 class BPath;
 class BVolume;
@@ -170,6 +171,7 @@ private:
 
 	friend class BDiskDevice;
 	friend class BDiskSystem;
+	friend class BMutablePartition;
 
 	BDiskDevice				*fDevice;
 	BPartition				*fParent;
