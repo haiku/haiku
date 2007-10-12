@@ -1,24 +1,11 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2005, Jan-Rixt Van Hoye
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2005-2008, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jan-Rixt Van Hoye
+ *		Salvatore Benedetto <salvatore.benedetto@gmail.com>
+ */
 
 #ifndef OHCI_HARD_H
 #define OHCI_HARD_H
@@ -31,9 +18,9 @@
 //	Revision register (section 7.1.1)
 // --------------------------------
 
-#define	OHCI_REVISION				0x00	// OHCI revision 
-#define		OHCI_REV_LO(rev)		((rev)&0x0f)
-#define		OHCI_REV_HI(rev)		(((rev)>>4)&0x03)
+#define	OHCI_REVISION				0x00
+#define		OHCI_REV_LO(rev)		((rev) & 0x0f)
+#define		OHCI_REV_HI(rev)		(((rev) >> 4) & 0x03)
 #define		OHCI_REV_LEGACY(rev)	((rev) & 0x10)
 
 // --------------------------------
@@ -71,7 +58,7 @@
 #define		OHCI_SOC_MASK			0x00030000 // Scheduling Overrun Count 
 
 // --------------------------------
-//	Interupt status register (section 7.1.4)
+//	Interrupt status register (section 7.1.4)
 // --------------------------------
 
 #define OHCI_INTERRUPT_STATUS	0x0c
@@ -273,11 +260,11 @@ typedef uint32 ohci_physaddr_t;
 //	HCCA structure (section 4.4)
 // --------------------------------
 
-#define OHCI_NO_INTRS				32
+#define OHCI_NUMBER_OF_INTERRUPTS	32
 
-struct ohci_hcca 
+typedef struct ohci_hcca 
 {
-	addr_t		hcca_interrupt_table[OHCI_NO_INTRS];
+	addr_t		hcca_interrupt_table[OHCI_NUMBER_OF_INTERRUPTS];
 	uint32		hcca_frame_number;
 	addr_t		hcca_done_head;
 	uint8		hcca_reserved_for_hc[116];
@@ -297,114 +284,113 @@ struct ohci_hcca
 typedef struct ohci_endpoint_descriptor
 {
 	uint32		flags;
-	addr_t		tailp;				// Queue tail pointer
-	addr_t		headp;				// Queue head pointer
-	addr_t		next_endpoint;		// Next endpoint in the list
+	uint32		tail_pointer;		// Queue tail pointer
+	uint32		head_pointer;		// Queue head pointer
+	uint32		next_endpoint;		// Next endpoint in the list
 };
 
-#define OHCI_ENDPOINT_GET_FA(s)		((s) & 0x7f)
-#define OHCI_ENDPOINT_ADDRMASK		0x0000007f
-#define OHCI_ENDPOINT_SET_FA(s)		(s)
-#define OHCI_ENDPOINT_GET_EN(s)		(((s) >> 7) & 0xf)
-#define OHCI_ENDPOINT_SET_EN(s)		((s) << 7)
-#define OHCI_ENDPOINT_DIR_MASK		0x00001800
-#define  	OHCI_ENDPOINT_DIR_TD	0x00000000
-#define  	OHCI_ENDPOINT_DIR_OUT	0x00000800
-#define  	OHCI_ENDPOINT_DIR_IN	0x00001000
-#define OHCI_ENDPOINT_SPEED			0x00002000
-#define OHCI_ENDPOINT_SKIP			0x00004000
-#define OHCI_ENDPOINT_FORMAT_GEN	0x00000000
-#define OHCI_ENDPOINT_FORMAT_ISO	0x00008000
-#define OHCI_ENDPOINT_GET_MAXP(s)	(((s) >> 16) & 0x07ff)
-#define OHCI_ENDPOINT_SET_MAXP(s)	((s) << 16)
-#define OHCI_ENDPOINT_MAXPMASK		(0x7ff << 16)
-
-#define OHCI_HALTED					0x00000001
-#define OHCI_TOGGLECARRY			0x00000002
-#define OHCI_HEADMASK				0xfffffffc
+#define OHCI_ENDPOINT_ADDRESS_MASK				0x0000007f
+#define OHCI_ENDPOINT_GET_DEVICE_ADDRESS(s)		((s) & 0x7f)
+#define OHCI_ENDPOINT_SET_DEVICE_ADDRESS(s)		(s)
+#define OHCI_ENDPOINT_GET_ENDPOINT_NUMBER(s)	(((s) >> 7) & 0xf)
+#define OHCI_ENDPOINT_SET_ENDPOINT_NUMBER(s)	((s) << 7)
+#define OHCI_ENDPOINT_DIRECTION_MASK			0x00001800
+#define	OHCI_ENDPOINT_DIRECTION_DESCRIPTOR		0x00000000
+#define	OHCI_ENDPOINT_DIRECTION_OUT				0x00000800
+#define	OHCI_ENDPOINT_DIRECTION_IN				0x00001000
+#define OHCI_ENDPOINT_SPEED						0x00002000
+#define OHCI_ENDPOINT_SKIP						0x00004000
+#define OHCI_ENDPOINT_GENERAL_FORMAT			0x00000000
+#define OHCI_ENDPOINT_ISOCHRONOUS_FORMAT		0x00008000
+#define OHCI_ENDPOINT_MAX_PACKET_SIZE_MASK		(0x7ff << 16)
+#define OHCI_ENDPOINT_GET_MAX_PACKET_SIZE(s)	(((s) >> 16) & 0x07ff)
+#define OHCI_ENDPOINT_SET_MAX_PACKET_SIZE(s)	((s) << 16)
+#define OHCI_ENDPOINT_HALTED					0x00000001
+#define OHCI_ENDPOINT_TOGGLE_CARRY				0x00000002
+#define OHCI_ENDPOINT_HEAD_MASK					0xfffffffc
 
 
 // --------------------------------
 //	General transfer descriptor structure (section 4.3.1)
 // --------------------------------
 
-typedef struct ohci_transfer_descriptor
+typedef struct ohci_general_transfer_descriptor
 {
 	uint32		flags;
-	addr_t		td_cbp;			// Current Buffer Pointer 
-	addr_t 		td_nexttd;		// Next Transfer Descriptor 
-	addr_t 		td_be;			// Buffer End 
-} ;
+	uint32		buffer_phy;			// Physical buffer pointer 
+	uint32 		next_descriptor;	// Next transfer descriptor 
+	uint32 		last_byte_address;	// Physical buffer end 
+};
 
-#define OHCI_TD_R					0x00040000		// Buffer Rounding 
-#define OHCI_TD_DP_MASK				0x00180000		// Direction / PID 
-#define  	OHCI_TD_SETUP			0x00000000
-#define  	OHCI_TD_OUT				0x00080000
-#define  	OHCI_TD_IN				0x00100000
-#define OHCI_TD_GET_DI(x)			(((x) >> 21) & 7)	// Delay Interrupt 
-#define OHCI_TD_SET_DI(x)			((x) << 21)
-#define  	OHCI_TD_NOINTR			0x00e00000
-#define  	OHCI_TD_INTR_MASK		0x00e00000
-#define OHCI_TD_TOGGLE_CARRY		0x00000000
-#define OHCI_TD_TOGGLE_0			0x02000000
-#define OHCI_TD_TOGGLE_1			0x03000000
-#define OHCI_TD_TOGGLE_MASK			0x03000000
-#define OHCI_TD_GET_EC(x)			(((x) >> 26) & 3)	// Error Count 
-#define OHCI_TD_GET_CC(x)			((x) >> 28)			// Condition Code 
-#define  	OHCI_TD_NOCC			0xf0000000
+#define OHCI_BUFFER_ROUNDING			0x00040000		// Buffer Rounding 
+#define OHCI_TD_DIRECTION_PID_MASK		0x00180000		// Direction / PID 
+#define OHCI_TD_DIRECTION_PID_SETUP		0x00000000
+#define OHCI_TD_DIRECTION_PID_OUT		0x00080000
+#define OHCI_TD_DIRECTION_PID_IN		0x00100000
+#define OHCI_TD_GET_DELAY_INTERRUPT(x)	(((x) >> 21) & 7)	// Delay Interrupt 
+#define OHCI_TD_SET_DELAY_INTERRUPT(x)	((x) << 21)
+#define OHCI_TD_NO_INTERRUPT			0x00e00000
+#define OHCI_TD_INTERRUPT_MASK			0x00e00000
+#define OHCI_TD_TOGGLE_CARRY			0x00000000
+#define OHCI_TD_TOGGLE_0				0x02000000
+#define OHCI_TD_TOGGLE_1				0x03000000
+#define OHCI_TD_TOGGLE_MASK				0x03000000
+#define OHCI_TD_GET_ERROR_COUNT(x)		(((x) >> 26) & 3)	// Error Count 
+#define OHCI_TD_GET_CONDITION_CODE(x)	((x) >> 28)			// Condition Code 
+#define OHCI_TD_NO_CONDITION_CODE		0xf0000000
 
-#define OHCI_TD_ALIGN 16
+#define OHCI_GENERAL_TD_ALIGN 16
 
 // --------------------------------
 //	Isonchronous transfer descriptor structure (section 4.3.2)
 // --------------------------------
 
 #define OHCI_ITD_NOFFSET 8
-typedef struct hc_itransfer_descriptor
+typedef struct ohci_isochronous_transfer_descriptor
 {
-	uint32		itd_flags;
-	addr_t		itd_bp0;						// Buffer Page 0
-	addr_t		itd_nextitd;					// Next Isochronous Transfer Descriptor
-	addr_t		itd_be;							// Buffer End
-	uint16		itd_offset[OHCI_ITD_NOFFSET];	// Buffer offsets
-
+	uint32		flags;
+	uint32		buffer_page_byte_0;			// Physical page number of byte 0
+	uint32		next_descriptor;			// Next isochronous transfer descriptor
+	uint32		last_byte_address;			// Physical buffer end
+	uint16		offset[OHCI_ITD_NOFFSET];	// Buffer offsets
 };
 
-#define OHCI_ITD_GET_SF(x)			((x) & 0x0000ffff)
-#define OHCI_ITD_SET_SF(x)			((x) & 0xffff)
-#define OHCI_ITD_GET_DI(x)			(((x) >> 21) & 7)		// Delay Interrupt 
-#define OHCI_ITD_SET_DI(x)			((x) << 21)
-#define  	OHCI_ITD_NOINTR			0x00e00000
-#define OHCI_ITD_GET_FC(x)			((((x) >> 24) & 7)+1)	// Frame Count 
-#define OHCI_ITD_SET_FC(x)			(((x)-1) << 24)
-#define OHCI_ITD_GET_CC(x)			((x) >> 28)				// Condition Code
-#define  	OHCI_ITD_NOCC			0xf0000000
+#define OHCI_ITD_GET_STARTING_FRAME(x)			((x) & 0x0000ffff)
+#define OHCI_ITD_SET_STARTING_FRAME(x)			((x) & 0xffff)
+#define OHCI_ITD_GET_DELAY_INTERRUPT(x)			(((x) >> 21) & 7)
+#define OHCI_ITD_SET_DELAY_INTERRUPT(x)			((x) << 21)
+#define OHCI_ITD_NO_INTERRUPT					0x00e00000
+#define OHCI_ITD_GET_FRAME_COUNT(x)				((((x) >> 24) & 7) + 1)
+#define OHCI_ITD_SET_FRAME_COUNT(x)				(((x) - 1) << 24)
+#define OHCI_ITD_GET_CONDITION_CODE(x)			((x) >> 28)
+#define OHCI_ITD_NO_CONDITION_CODE				0xf0000000
 
-#define itd_pswn itd_offset									// Packet Status Word
-#define OHCI_ITD_PAGE_SELECT		0x00001000
-#define OHCI_ITD_MK_OFFS(len)		(0xe000 | ((len) & 0x1fff))
-#define OHCI_ITD_PSW_LENGTH(x)		((x) & 0xfff)		// Transfer length
-#define OHCI_ITD_PSW_GET_CC(x)		((x) >> 12)			// Condition Code
+// TO FIX
+#define itd_pswn itd_offset						// Packet Status Word
+#define OHCI_ITD_PAGE_SELECT					0x00001000
+#define OHCI_ITD_MK_OFFS(len)					(0xe000 | ((len) & 0x1fff))
+#define OHCI_ITD_GET_BUFFER_LENGTH(x)			((x) & 0xfff)		// Transfer length
+#define OHCI_ITD_GET_BUFFER_CONDITION_CODE(x)	((x) >> 12)			// Condition Code
 
-#define OHCI_ITD_ALIGN 32
+#define OHCI_ISOCHRONOUS_TD_ALIGN 32
 
 // --------------------------------
 //	Completion Codes (section 4.3.3)
 // --------------------------------
 
-#define OHCI_CC_NO_ERROR				0
-#define OHCI_CC_CRC						1
-#define OHCI_CC_BIT_STUFFING			2
-#define OHCI_CC_DATA_TOGGLE_MISMATCH	3
-#define OHCI_CC_STALL					4
-#define OHCI_CC_DEVICE_NOT_RESPONDING	5
-#define OHCI_CC_PID_CHECK_FAILURE		6
-#define OHCI_CC_UNEXPECTED_PID			7
-#define OHCI_CC_DATA_OVERRUN			8
-#define OHCI_CC_DATA_UNDERRUN			9
-#define OHCI_CC_BUFFER_OVERRUN			12
-#define OHCI_CC_BUFFER_UNDERRUN			13
-#define OHCI_CC_NOT_ACCESSED			15
+#define OHCI_NO_ERROR				0
+#define OHCI_CRC					1
+#define OHCI_BIT_STUFFING			2
+#define OHCI_DATA_TOGGLE_MISMATCH	3
+#define OHCI_STALL					4
+#define OHCI_DEVICE_NOT_RESPONDING	5
+#define OHCI_PID_CHECK_FAILURE		6
+#define OHCI_UNEXPECTED_PID			7
+#define OHCI_DATA_OVERRUN			8
+#define OHCI_DATA_UNDERRUN			9
+#define OHCI_BUFFER_OVERRUN			12
+#define OHCI_BUFFER_UNDERRUN		13
+#define OHCI_NOT_ACCESSED			15
 
 // --------------------------------
 // 	Some delay needed when changing 
