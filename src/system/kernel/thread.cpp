@@ -93,8 +93,6 @@ static unsigned int volatile sDeathStackBitmap;
 static sem_id sDeathStackSem;
 static spinlock sDeathStackLock = 0;
 
-static struct thread *last_thread_dumped = NULL;
-
 // The dead queue is used as a pool from which to retrieve and reuse previously
 // allocated thread structs when creating a new thread. It should be gone once
 // the slab allocator is in.
@@ -919,8 +917,6 @@ _dump_thread_info(struct thread *thread)
 	kprintf("user_time:          %Ld\n", thread->user_time);
 	kprintf("architecture dependant section:\n");
 	arch_thread_dump_info(&thread->arch_info);
-
-	last_thread_dumped = thread;
 }
 
 
@@ -1034,66 +1030,6 @@ dump_thread_list(int argc, char **argv)
 			thread->name != NULL ? thread->name : "<NULL>");
 	}
 	hash_close(sThreadHash, &i, false);
-	return 0;
-}
-
-
-static int
-dump_next_thread_in_q(int argc, char **argv)
-{
-	struct thread *thread = last_thread_dumped;
-
-	if (thread == NULL) {
-		kprintf("no thread previously dumped. Examine a thread first.\n");
-		return 0;
-	}
-
-	kprintf("next thread in queue after thread @ %p\n", thread);
-	if (thread->queue_next != NULL)
-		_dump_thread_info(thread->queue_next);
-	else
-		kprintf("NULL\n");
-
-	return 0;
-}
-
-
-static int
-dump_next_thread_in_all_list(int argc, char **argv)
-{
-	struct thread *thread = last_thread_dumped;
-
-	if (thread == NULL) {
-		kprintf("no thread previously dumped. Examine a thread first.\n");
-		return 0;
-	}
-
-	kprintf("next thread in global list after thread @ %p\n", thread);
-	if (thread->all_next != NULL)
-		_dump_thread_info(thread->all_next);
-	else
-		kprintf("NULL\n");
-
-	return 0;
-}
-
-
-static int
-dump_next_thread_in_team(int argc, char **argv)
-{
-	struct thread *thread = last_thread_dumped;
-
-	if (thread == NULL) {
-		kprintf("no thread previously dumped. Examine a thread first.\n");
-		return 0;
-	}
-
-	kprintf("next thread in team after thread @ %p\n", thread);
-	if (thread->team_next != NULL)
-		_dump_thread_info(thread->team_next);
-	else
-		kprintf("NULL\n");
-
 	return 0;
 }
 
@@ -1801,9 +1737,6 @@ thread_init(kernel_args *args)
 	add_debugger_command("waiting", &dump_thread_list, "list all waiting threads (optionally for a specific semaphore)");
 	add_debugger_command("realtime", &dump_thread_list, "list all realtime threads");
 	add_debugger_command("thread", &dump_thread_info, "list info about a particular thread");
-	add_debugger_command("next_q", &dump_next_thread_in_q, "dump the next thread in the queue of last thread viewed");
-	add_debugger_command("next_all", &dump_next_thread_in_all_list, "dump the next thread in the global list of the last thread viewed");
-	add_debugger_command("next_team", &dump_next_thread_in_team, "dump the next thread in the team of the last thread viewed");
 	add_debugger_command("unreal", &make_thread_unreal, "set realtime priority threads to normal priority");
 	add_debugger_command("suspend", &make_thread_suspended, "suspend a thread");
 	add_debugger_command("resume", &make_thread_resumed, "resume a thread");
