@@ -57,5 +57,6 @@ SimpleTest set_area_protection_test1 : set_area_protection_test1.cpp ;
 SubInclude HAIKU_TOP src tests system kernel cache ;
 #SubInclude HAIKU_TOP src tests system kernel disk_device_manager ;
 SubInclude HAIKU_TOP src tests system kernel device_manager ;
+SubInclude HAIKU_TOP src tests system kernel scheduler ;
 SubInclude HAIKU_TOP src tests system kernel slab ;
 SubInclude HAIKU_TOP src tests system kernel util ;
