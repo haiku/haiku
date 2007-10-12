@@ -90,15 +90,15 @@ edid_dump(edid1_info *edid)
 		edid1_detailed_monitor *monitor = &edid->detailed_monitor[i];
 
 		switch(monitor->monitor_desc_type) {
-			case edid1_serial_number:
+			case EDID1_SERIAL_NUMBER:
 				dprintf("Serial Number: %s\n", monitor->data.serial_number);
 				break;
 
-			case edid1_ascii_data:
+			case EDID1_ASCII_DATA:
 				dprintf(" %s\n", monitor->data.serial_number);
 				break;
 
-			case edid1_monitor_ranges:
+			case EDID1_MONITOR_RANGES:
 			{
 				edid1_monitor_range monitor_range = monitor->data.monitor_range;
 
@@ -110,11 +110,11 @@ edid_dump(edid1_info *edid)
 				break;
 			}
 
-			case edid1_monitor_name:
-				dprintf("Monitor Name: %s\n", monitor->data.serial_number);
+			case EDID1_MONITOR_NAME:
+				dprintf("Monitor Name: %s\n", monitor->data.monitor_name);
 				break;
 
-			case edid1_add_colour_pointer:
+			case EDID1_ADD_COLOUR_POINTER:
 			{
 				for (j = 0; j < EDID1_NUM_EXTRA_WHITEPOINTS; ++j) {
 					edid1_whitepoint *whitepoint = &monitor->data.whitepoint[j];
@@ -131,7 +131,7 @@ edid_dump(edid1_info *edid)
 				break;
 			}
 
-			case edid1_add_std_timing:
+			case EDID1_ADD_STD_TIMING:
 			{		
 				for (j = 0; j < EDID1_NUM_EXTRA_STD_TIMING; ++j) {
 					edid1_std_timing *timing = &monitor->data.std_timing[j];
@@ -146,7 +146,7 @@ edid_dump(edid1_info *edid)
 				break;
 			}
 
-			case edid1_is_detailed_timing:
+			case EDID1_IS_DETAILED_TIMING:
 			{
 				edid1_detailed_timing *timing = &monitor->data.detailed_timing;
 

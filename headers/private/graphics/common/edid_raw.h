@@ -147,13 +147,13 @@ typedef struct _PACKED {
 
 // types of detailed monitor description
 enum {
-	edid1_serial_number = 0xff,
-	edid1_ascii_data = 0xfe,
-	edid1_monitor_ranges = 0xfd,
-	edid1_monitor_name = 0xfc,
-	edid1_add_colour_pointer = 0xfb,
-	edid1_add_std_timing = 0xfa,
-	edid1_is_detailed_timing = 1
+	EDID1_SERIAL_NUMBER = 0xff,
+	EDID1_ASCII_DATA = 0xfe,
+	EDID1_MONITOR_RANGES = 0xfd,
+	EDID1_MONITOR_NAME = 0xfc,
+	EDID1_ADD_COLOUR_POINTER = 0xfb,
+	EDID1_ADD_STD_TIMING = 0xfa,
+	EDID1_IS_DETAILED_TIMING = 1
 };
 
 

@@ -179,7 +179,7 @@ decode_detailed_monitor(edid1_detailed_monitor *monitor,
 	int i, j;
 
 	for (i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; ++i, ++monitor, ++raw) {
-		monitor->monitor_desc_type = edid1_is_detailed_timing;
+		monitor->monitor_desc_type = EDID1_IS_DETAILED_TIMING;
 
 		// workaround: normally, all four bytes must be zero for detailed
 		// description, but at least some Formac monitors violate that:
@@ -192,31 +192,31 @@ decode_detailed_monitor(edid1_detailed_monitor *monitor,
 			monitor->monitor_desc_type = raw->extra.monitor_desc_type;
 
 			switch (raw->extra.monitor_desc_type) {
-				case edid1_serial_number:
-					copy_str( monitor->data.serial_number, 
-						raw->extra.data.serial_number, EDID1_EXTRA_STRING_LEN );
+				case EDID1_SERIAL_NUMBER:
+					copy_str(monitor->data.serial_number, 
+						raw->extra.data.serial_number, EDID1_EXTRA_STRING_LEN);
 					break;
 
-				case edid1_ascii_data:
-					copy_str( monitor->data.ascii_data, 
-						raw->extra.data.ascii_data, EDID1_EXTRA_STRING_LEN );
+				case EDID1_ASCII_DATA:
+					copy_str(monitor->data.ascii_data, 
+						raw->extra.data.ascii_data, EDID1_EXTRA_STRING_LEN);
 					break;
 
-				case edid1_monitor_ranges:
+				case EDID1_MONITOR_RANGES:
 					monitor->data.monitor_range = raw->extra.data.monitor_range;
 					break;
 
-				case edid1_monitor_name:
-					copy_str( monitor->data.monitor_name, 
-						raw->extra.data.monitor_name, EDID1_EXTRA_STRING_LEN );
+				case EDID1_MONITOR_NAME:
+					copy_str(monitor->data.monitor_name, 
+						raw->extra.data.monitor_name, EDID1_EXTRA_STRING_LEN);
 					break;
 
-				case edid1_add_colour_pointer:
-					decode_whitepoint( monitor->data.whitepoint, 
-						&raw->extra.data.whitepoint );
+				case EDID1_ADD_COLOUR_POINTER:
+					decode_whitepoint(monitor->data.whitepoint, 
+						&raw->extra.data.whitepoint);
 					break;
 
-				case edid1_add_std_timing:
+				case EDID1_ADD_STD_TIMING:
 					for (j = 0; j < EDID1_NUM_EXTRA_STD_TIMING; ++j) {
 						decode_std_timing(&monitor->data.std_timing[j],
 							&raw->extra.data.std_timing[j]);

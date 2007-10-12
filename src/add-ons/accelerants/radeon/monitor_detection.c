@@ -696,7 +696,7 @@ Radeon_FindFPTiming_DetailedMonitorDesc(const edid1_info *edid, fp_info *fp,
 	int i;
 
 	for (i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; ++i) {
-		if (edid->detailed_monitor[i].monitor_desc_type == edid1_is_detailed_timing) {
+		if (edid->detailed_monitor[i].monitor_desc_type == EDID1_IS_DETAILED_TIMING) {
 			const edid1_detailed_timing *timing = &edid->detailed_monitor[i].data.detailed_timing;
 
 			SHOW_FLOW(2, "Found detailed timing for mode %dx%d in DDC data", 

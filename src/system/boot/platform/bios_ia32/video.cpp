@@ -289,10 +289,10 @@ vesa_get_vbe_info_block(vbe_info_block *info)
 	if (info->signature != VESA_SIGNATURE)
 		return B_ERROR;
 
-	dprintf("VESA version = %lx\n", info->version);
+	dprintf("VESA version = %d.%d\n", info->version.major, info->version.minor);
 
 	if (info->version.major < 2) {
-		dprintf("VESA support too old\n", info->version);
+		dprintf("VESA support too old\n");
 		return B_ERROR;
 	}
 
@@ -824,7 +824,7 @@ platform_init_video(void)
 		for (int32 i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; i++) {
 			edid1_detailed_monitor &monitor = info.detailed_monitor[i];
 
-			if (monitor.monitor_desc_type == edid1_is_detailed_timing) {
+			if (monitor.monitor_desc_type == EDID1_IS_DETAILED_TIMING) {
 				defaultMode = find_video_mode(monitor.data.detailed_timing.h_active,
 					monitor.data.detailed_timing.v_active);
 				if (defaultMode != NULL)

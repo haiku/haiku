@@ -5,7 +5,7 @@
 #ifndef _EDID_H
 #define _EDID_H
 
-//!	EDID handling, including decoded EDID data block definition.
+//!	Extended Display Identification Data (EDID)
 
 #include "edid_raw.h"
 
@@ -116,19 +116,20 @@ typedef struct {
 } edid1_detailed_monitor;
 
 // EDID data block
-typedef struct{  
+typedef struct edid1_info {  
 	edid1_vendor vendor;
 	edid1_version version;
 	edid1_display display;	
 	edid1_established_timing established_timing;
 	edid1_std_timing std_timing[EDID1_NUM_STD_TIMING];
-	
+
 	// since EDID version 1.2
 	edid1_detailed_monitor detailed_monitor[EDID1_NUM_DETAILED_MONITOR_DESC];
-	
+
 	uint8 num_sections;
 } edid1_info;
 
+#define EDID_VERSION_1 1
 
 #ifdef __cplusplus
 extern "C" {
