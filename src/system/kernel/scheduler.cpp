@@ -7,7 +7,7 @@
  * Distributed under the terms of the NewOS License.
  */
  
-/* The thread scheduler */
+/*! The thread scheduler */
 
 
 #include <OS.h>
@@ -29,10 +29,6 @@
 #	define TRACE(x) ;
 #endif
 
-
-// prototypes
-static int dump_run_queue(int argc, char **argv);
-static int _rand(void);
 
 // The run queue. Holds the threads ready to run ordered by priority.
 static struct thread *sRunQueue = NULL;
@@ -58,10 +54,12 @@ dump_run_queue(int argc, char **argv)
 
 	thread = sRunQueue;
 	if (!thread)
-		dprintf("Run queue is empty!\n");
+		kprintf("Run queue is empty!\n");
 	else {
+		kprintf("thread    id      priority name\n");
 		while (thread) {
-			dprintf("Thread id: %ld - priority: %ld\n", thread->id, thread->priority);
+			kprintf("%p  %-7ld %-8ld %s\n", thread, thread->id,
+				thread->priority, thread->name);
 			thread = thread->queue_next;
 		}
 	}
@@ -70,10 +68,9 @@ dump_run_queue(int argc, char **argv)
 }
 
 
-/** Enqueues the thread into the run queue.
- *	Note: thread lock must be held when entering this function
- */
-
+/*!	Enqueues the thread into the run queue.
+	Note: thread lock must be held when entering this function
+*/
 void
 scheduler_enqueue_in_run_queue(struct thread *thread)
 {
@@ -98,17 +95,17 @@ scheduler_enqueue_in_run_queue(struct thread *thread)
 }
 
 
-/** Removes a thread from the run queue.
- *	Note: thread lock must be held when entering this function
- */
-
+/*!	Removes a thread from the run queue.
+	Note: thread lock must be held when entering this function
+*/
 void
 scheduler_remove_from_run_queue(struct thread *thread)
 {
 	struct thread *item, *prev;
 
 	// find thread in run queue
-	for (item = sRunQueue, prev = NULL; item && item != thread; item = item->queue_next) {
+	for (item = sRunQueue, prev = NULL; item && item != thread;
+			item = item->queue_next) {
 		if (prev)
 			prev = prev->queue_next;
 		else
@@ -145,10 +142,9 @@ reschedule_event(timer *unused)
 }
 
 
-/** Runs the scheduler.
- *	Note: expects thread spinlock to be held
- */
-
+/*!	Runs the scheduler.
+	Note: expects thread spinlock to be held
+*/
 void
 scheduler_reschedule(void)
 {
@@ -206,17 +202,18 @@ scheduler_reschedule(void)
 			if (nextThread->queue_next && nextThread->queue_next->priority == B_IDLE_PRIORITY)
 				break;
 
-			// skip normal threads sometimes (roughly 16%)
-			if (_rand() > 0x2000)
+			// skip normal threads sometimes (roughly 20%)
+			if (_rand() > 0x1a00)
 				break;
 
 			// skip until next lower priority
 			int32 priority = nextThread->priority;
-			while (nextThread->queue_next && priority == nextThread->queue_next->priority
-				&& nextThread->queue_next->priority > B_IDLE_PRIORITY) {
+			do {
 				prevThread = nextThread;
 				nextThread = nextThread->queue_next;
-			}
+			} while (nextThread->queue_next != NULL
+				&& priority == nextThread->queue_next->priority
+				&& nextThread->queue_next->priority > B_IDLE_PRIORITY);
 		}
 	}
 
@@ -273,10 +270,9 @@ scheduler_init(void)
 }
 
 
-/** This starts the scheduler. Must be run under the context of
- *	the initial idle thread.
- */
-
+/*!	This starts the scheduler. Must be run under the context of
+	the initial idle thread.
+*/
 void
 scheduler_start(void)
 {
