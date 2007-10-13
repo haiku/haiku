@@ -19,7 +19,7 @@
    02111-1307 USA.  */
 
 #include <limits.h>
-#include <search.h>
+//#include <search.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/param.h>
@@ -28,6 +28,8 @@
 #include <dlfcn.h>
 #include <gconv_int.h>
 #include <gconv_charset.h>
+
+#define STATIC_GCONV
 
 
 /* Simple data structure for alias mapping.  We have two names, `from'
@@ -214,6 +216,7 @@ __gconv_release_step (struct __gconv_step *step)
     }
 }
 
+#if 0
 static int
 internal_function
 gen_steps (struct derivation_step *best, const char *toset,
@@ -635,7 +638,7 @@ find_derivation (const char *toset, const char *toset_expand,
 
   return result;
 }
-
+#endif
 
 /* Control of initialization.  */
 __libc_once_define (static, once);
@@ -676,6 +679,8 @@ __gconv_find_transform (const char *toset, const char *fromset,
 			struct __gconv_step **handle, size_t *nsteps,
 			int flags)
 {
+	return __GCONV_NOCONV;
+#if 0
   const char *fromset_expand;
   const char *toset_expand;
   int result;
@@ -732,6 +737,7 @@ __gconv_find_transform (const char *toset, const char *fromset,
   return (result == __GCONV_OK
 	  ? (*handle == NULL ? __GCONV_NOCONV : __GCONV_OK)
 	  : result);
+#endif
 }
 
 

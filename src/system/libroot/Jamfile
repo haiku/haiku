@@ -22,8 +22,10 @@ local librootObjects =
 	posix_gnu_arch_$(TARGET_ARCH).o
 	posix_gnu_ctype.o
 	posix_gnu_ext.o
+	posix_gnu_iconv.o
 	posix_gnu_libio.o
 	posix_gnu_locale.o
+	posix_gnu_misc.o
 	posix_gnu_regex.o
 	posix_gnu_stdio.o
 	posix_gnu_stdlib.o

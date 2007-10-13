@@ -67,6 +67,8 @@ struct __gconv_loaded_object *
 internal_function
 __gconv_find_shlib (const char *name)
 {
+	return NULL;
+#if 0
   struct __gconv_loaded_object *found;
   void *keyp;
 
@@ -142,6 +144,7 @@ __gconv_find_shlib (const char *name)
     }
 
   return found;
+#endif
 }
 
 

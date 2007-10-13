@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/mman.h>
+//#include <sys/mman.h>
 #include <sys/stat.h>
 
 #include <gconv_int.h>
@@ -53,10 +53,11 @@ __gconv_load_cache (void)
 
   /* We cannot use the cache if the GCONV_PATH environment variable is
      set.  */
-  __gconv_path_envvar = getenv ("GCONV_PATH");
-  if (__gconv_path_envvar != NULL)
+//  __gconv_path_envvar = getenv ("GCONV_PATH");
+//  if (__gconv_path_envvar != NULL)
     return -1;
 
+#if 0
   /* See whether the cache file exists.  */
   fd = __open (GCONV_MODULES_CACHE, O_RDONLY);
   if (__builtin_expect (fd, 0) == -1)
@@ -137,6 +138,7 @@ __gconv_load_cache (void)
 
   /* That worked.  */
   return 0;
+#endif
 }
 
 
@@ -177,7 +179,7 @@ find_module_idx (const char *str, size_t *idxp)
   return -1;
 }
 
-
+#if 0
 #ifndef STATIC_GCONV
 static int
 internal_function
@@ -213,6 +215,7 @@ find_module (const char *directory, const char *filename,
   return status;
 }
 #endif
+#endif
 
 
 int
@@ -240,6 +243,8 @@ internal_function
 __gconv_lookup_cache (const char *toset, const char *fromset,
 		      struct __gconv_step **handle, size_t *nsteps, int flags)
 {
+	return __GCONV_NODB;
+#if 0
   const struct gconvcache_header *header;
   const char *strtab;
   size_t fromidx;
@@ -433,6 +438,7 @@ __gconv_lookup_cache (const char *toset, const char *fromset,
     }
 
   return __GCONV_OK;
+#endif
 }
 
 

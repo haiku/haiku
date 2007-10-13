@@ -1,5 +1,5 @@
 /* Simple transformations functions.
-   Copyright (C) 1997-2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1997-2003, 2004 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1997.
 
@@ -72,6 +72,7 @@ __gconv_btwoc_ascii (struct __gconv_step *step, unsigned char c)
 
 
 static inline int
+__attribute ((always_inline))
 internal_ucs4_loop (struct __gconv_step *step,
 		    struct __gconv_step_data *step_data,
 		    const unsigned char **inptrp, const unsigned char *inend,
@@ -86,12 +87,13 @@ internal_ucs4_loop (struct __gconv_step *step,
 #if __BYTE_ORDER == __LITTLE_ENDIAN
   /* Sigh, we have to do some real work.  */
   size_t cnt;
+  uint32_t *outptr32 = (uint32_t *) outptr;
 
   for (cnt = 0; cnt < n_convert; ++cnt, inptr += 4)
-    *((uint32_t *) outptr)++ = bswap_32 (*(const uint32_t *) inptr);
+    *outptr32++ = bswap_32 (*(const uint32_t *) inptr);
 
   *inptrp = inptr;
-  *outptrp = outptr;
+  *outptrp = (unsigned char *) outptr32;
 #elif __BYTE_ORDER == __BIG_ENDIAN
   /* Simply copy the data.  */
   *inptrp = inptr + n_convert * 4;
@@ -113,6 +115,7 @@ internal_ucs4_loop (struct __gconv_step *step,
 
 #ifndef _STRING_ARCH_unaligned
 static inline int
+__attribute ((always_inline))
 internal_ucs4_loop_unaligned (struct __gconv_step *step,
 			      struct __gconv_step_data *step_data,
 			      const unsigned char **inptrp,
@@ -161,6 +164,7 @@ internal_ucs4_loop_unaligned (struct __gconv_step *step,
 
 
 static inline int
+__attribute ((always_inline))
 internal_ucs4_loop_single (struct __gconv_step *step,
 			   struct __gconv_step_data *step_data,
 			   const unsigned char **inptrp,
@@ -189,13 +193,16 @@ internal_ucs4_loop_single (struct __gconv_step *step,
   (*outptrp)[2] = state->__value.__wchb[1];
   (*outptrp)[3] = state->__value.__wchb[0];
 
-  *outptrp += 4;
 #elif __BYTE_ORDER == __BIG_ENDIAN
   /* XXX unaligned */
-  *(*((uint32_t **) outptrp)++) = state->__value.__wch;
+  (*outptrp)[0] = state->__value.__wchb[0];
+  (*outptrp)[1] = state->__value.__wchb[1];
+  (*outptrp)[2] = state->__value.__wchb[2];
+  (*outptrp)[3] = state->__value.__wchb[3];
 #else
 # error "This endianess is not supported."
 #endif
+  *outptrp += 4;
 
   /* Clear the state buffer.  */
   state->__count &= ~7;
@@ -219,6 +226,7 @@ internal_ucs4_loop_single (struct __gconv_step *step,
 
 
 static inline int
+__attribute ((always_inline))
 ucs4_internal_loop (struct __gconv_step *step,
 		    struct __gconv_step_data *step_data,
 		    const unsigned char **inptrp, const unsigned char *inend,
@@ -264,7 +272,8 @@ ucs4_internal_loop (struct __gconv_step *step,
 	  return __GCONV_ILLEGAL_INPUT;
 	}
 
-      *((uint32_t *) outptr)++ = inval;
+      *((uint32_t *) outptr) = inval;
+      outptr += sizeof (uint32_t);
     }
 
   *inptrp = inptr;
@@ -283,6 +292,7 @@ ucs4_internal_loop (struct __gconv_step *step,
 
 #ifndef _STRING_ARCH_unaligned
 static inline int
+__attribute ((always_inline))
 ucs4_internal_loop_unaligned (struct __gconv_step *step,
 			      struct __gconv_step_data *step_data,
 			      const unsigned char **inptrp,
@@ -352,6 +362,7 @@ ucs4_internal_loop_unaligned (struct __gconv_step *step,
 
 
 static inline int
+__attribute ((always_inline))
 ucs4_internal_loop_single (struct __gconv_step *step,
 			   struct __gconv_step_data *step_data,
 			   const unsigned char **inptrp,
@@ -426,6 +437,7 @@ ucs4_internal_loop_single (struct __gconv_step *step,
 
 
 static inline int
+__attribute ((always_inline))
 internal_ucs4le_loop (struct __gconv_step *step,
 		      struct __gconv_step_data *step_data,
 		      const unsigned char **inptrp, const unsigned char *inend,
@@ -440,9 +452,11 @@ internal_ucs4le_loop (struct __gconv_step *step,
 #if __BYTE_ORDER == __BIG_ENDIAN
   /* Sigh, we have to do some real work.  */
   size_t cnt;
+  uint32_t *outptr32 = (uint32_t *) outptr;
 
   for (cnt = 0; cnt < n_convert; ++cnt, inptr += 4)
-    *((uint32_t *) outptr)++ = bswap_32 (*(const uint32_t *) inptr);
+    *outptr32++ = bswap_32 (*(const uint32_t *) inptr);
+  outptr = (unsigned char *) outptr32;
 
   *inptrp = inptr;
   *outptrp = outptr;
@@ -467,6 +481,7 @@ internal_ucs4le_loop (struct __gconv_step *step,
 
 #ifndef _STRING_ARCH_unaligned
 static inline int
+__attribute ((always_inline))
 internal_ucs4le_loop_unaligned (struct __gconv_step *step,
 				struct __gconv_step_data *step_data,
 				const unsigned char **inptrp,
@@ -518,6 +533,7 @@ internal_ucs4le_loop_unaligned (struct __gconv_step *step,
 
 
 static inline int
+__attribute ((always_inline))
 internal_ucs4le_loop_single (struct __gconv_step *step,
 			     struct __gconv_step_data *step_data,
 			     const unsigned char **inptrp,
@@ -546,11 +562,16 @@ internal_ucs4le_loop_single (struct __gconv_step *step,
   (*outptrp)[2] = state->__value.__wchb[1];
   (*outptrp)[3] = state->__value.__wchb[0];
 
-  *outptrp += 4;
 #else
   /* XXX unaligned */
-  *(*((uint32_t **) outptrp)++) = state->__value.__wch;
+  (*outptrp)[0] = state->__value.__wchb[0];
+  (*outptrp)[1] = state->__value.__wchb[1];
+  (*outptrp)[2] = state->__value.__wchb[2];
+  (*outptrp)[3] = state->__value.__wchb[3];
+
 #endif
+
+  *outptrp += 4;
 
   /* Clear the state buffer.  */
   state->__count &= ~7;
@@ -573,6 +594,7 @@ internal_ucs4le_loop_single (struct __gconv_step *step,
 
 
 static inline int
+__attribute ((always_inline))
 ucs4le_internal_loop (struct __gconv_step *step,
 		      struct __gconv_step_data *step_data,
 		      const unsigned char **inptrp, const unsigned char *inend,
@@ -616,7 +638,8 @@ ucs4le_internal_loop (struct __gconv_step *step,
 	  return __GCONV_ILLEGAL_INPUT;
 	}
 
-      *((uint32_t *) outptr)++ = inval;
+      *((uint32_t *) outptr) = inval;
+      outptr += sizeof (uint32_t);
     }
 
   *inptrp = inptr;
@@ -638,6 +661,7 @@ ucs4le_internal_loop (struct __gconv_step *step,
 
 #ifndef _STRING_ARCH_unaligned
 static inline int
+__attribute ((always_inline))
 ucs4le_internal_loop_unaligned (struct __gconv_step *step,
 				struct __gconv_step_data *step_data,
 				const unsigned char **inptrp,
@@ -711,6 +735,7 @@ ucs4le_internal_loop_unaligned (struct __gconv_step *step,
 
 
 static inline int
+__attribute ((always_inline))
 ucs4le_internal_loop_single (struct __gconv_step *step,
 			     struct __gconv_step_data *step_data,
 			     const unsigned char **inptrp,
@@ -796,7 +821,8 @@ ucs4le_internal_loop_single (struct __gconv_step *step,
       }									      \
     else								      \
       /* It's an one byte sequence.  */					      \
-      *((uint32_t *) outptr)++ = *inptr++;				      \
+      *((uint32_t *) outptr) = *inptr++;				      \
+      outptr += sizeof (uint32_t);					      \
   }
 #define LOOP_NEED_FLAGS
 #include <iconv/loop.c>
@@ -826,7 +852,8 @@ ucs4le_internal_loop_single (struct __gconv_step *step,
       }									      \
     else								      \
       /* It's an one byte sequence.  */					      \
-      *outptr++ = *((const uint32_t *) inptr)++;			      \
+      *outptr++ = *((const uint32_t *) inptr);				      \
+      inptr += sizeof (uint32_t);					      \
   }
 #define LOOP_NEED_FLAGS
 #include <iconv/loop.c>
@@ -875,13 +902,12 @@ ucs4le_internal_loop_single (struct __gconv_step *step,
 	start = outptr;							      \
 	*outptr = (unsigned char) (~0xff >> step);			      \
 	outptr += step;							      \
-	--step;								      \
 	do								      \
 	  {								      \
-	    start[step] = 0x80 | (wc & 0x3f);				      \
+	    start[--step] = 0x80 | (wc & 0x3f);				      \
 	    wc >>= 6;							      \
 	  }								      \
-	while (--step > 0);						      \
+	while (step > 1);						      \
 	start[0] |= wc;							      \
       }									      \
     else								      \
@@ -963,18 +989,17 @@ ucs4le_internal_loop_single (struct __gconv_step *step,
 	  }								      \
 	else								      \
 	  {								      \
-	    int skipped;						      \
-									      \
 	    /* Search the end of this ill-formed UTF-8 character.  This	      \
 	       is the next byte with (x & 0xc0) != 0x80.  */		      \
-	    skipped = 0;						      \
+	    i = 0;							      \
 	    do								      \
-	      ++skipped;						      \
-	    while (inptr + skipped < inend				      \
-		   && (*(inptr + skipped) & 0xc0) == 0x80		      \
-		   && skipped < 5);					      \
+	      ++i;							      \
+	    while (inptr + i < inend					      \
+		   && (*(inptr + i) & 0xc0) == 0x80			      \
+		   && i < 5);						      \
 									      \
-	    STANDARD_FROM_LOOP_ERR_HANDLER (skipped);			      \
+	  errout:							      \
+	    STANDARD_FROM_LOOP_ERR_HANDLER (i);				      \
 	  }								      \
 									      \
 	if (__builtin_expect (inptr + cnt > inend, 0))			      \
@@ -991,7 +1016,7 @@ ucs4le_internal_loop_single (struct __gconv_step *step,
 		break;							      \
 	      }								      \
 									      \
-	    STANDARD_FROM_LOOP_ERR_HANDLER (i);				      \
+	    goto errout;						      \
 	  }								      \
 									      \
 	/* Read the possible remaining bytes.  */			      \
@@ -1013,14 +1038,15 @@ ucs4le_internal_loop_single (struct __gconv_step *step,
 	if (i < cnt || (cnt > 2 && (ch >> (5 * cnt - 4)) == 0))		      \
 	  {								      \
 	    /* This is an illegal encoding.  */				      \
-	    STANDARD_FROM_LOOP_ERR_HANDLER (i);				      \
+	    goto errout;						      \
 	  }								      \
 									      \
 	inptr += cnt;							      \
       }									      \
 									      \
     /* Now adjust the pointers and store the result.  */		      \
-    *((uint32_t *) outptr)++ = ch;					      \
+    *((uint32_t *) outptr) = ch;					      \
+    outptr += sizeof (uint32_t);					      \
   }
 #define LOOP_NEED_FLAGS
 
@@ -1132,7 +1158,7 @@ ucs4le_internal_loop_single (struct __gconv_step *step,
 #define LOOPFCT			FROM_LOOP
 #define BODY \
   {									      \
-    uint16_t u1 = *((const uint16_t *) inptr);				      \
+    uint16_t u1 = get16 (inptr);					      \
 									      \
     if (__builtin_expect (u1 >= 0xd800 && u1 < 0xe000, 0))		      \
       {									      \
@@ -1141,7 +1167,8 @@ ucs4le_internal_loop_single (struct __gconv_step *step,
 	STANDARD_FROM_LOOP_ERR_HANDLER (2);				      \
       }									      \
 									      \
-    *((uint32_t *) outptr)++ = u1;					      \
+    *((uint32_t *) outptr) = u1;					      \
+    outptr += sizeof (uint32_t);					      \
     inptr += 2;								      \
   }
 #define LOOP_NEED_FLAGS
@@ -1189,7 +1216,8 @@ ucs4le_internal_loop_single (struct __gconv_step *step,
       }									      \
     else								      \
       {									      \
-	*((uint16_t *) outptr)++ = val;					      \
+	put16 (outptr, val);						      \
+        outptr += sizeof (uint16_t);					      \
 	inptr += 4;							      \
       }									      \
   }
@@ -1214,7 +1242,7 @@ ucs4le_internal_loop_single (struct __gconv_step *step,
 #define LOOPFCT			FROM_LOOP
 #define BODY \
   {									      \
-    uint16_t u1 = bswap_16 (*((const uint16_t *) inptr));		      \
+    uint16_t u1 = bswap_16 (get16 (inptr));				      \
 									      \
     if (__builtin_expect (u1 >= 0xd800 && u1 < 0xe000, 0))		      \
       {									      \
@@ -1230,7 +1258,8 @@ ucs4le_internal_loop_single (struct __gconv_step *step,
 	continue;							      \
       }									      \
 									      \
-    *((uint32_t *) outptr)++ = u1;					      \
+    *((uint32_t *) outptr) = u1;					      \
+    outptr += sizeof (uint32_t);					      \
     inptr += 2;								      \
   }
 #define LOOP_NEED_FLAGS
@@ -1279,7 +1308,8 @@ ucs4le_internal_loop_single (struct __gconv_step *step,
       }									      \
     else								      \
       {									      \
-	*((uint16_t *) outptr)++ = bswap_16 (val);			      \
+	put16 (outptr, bswap_16 (val));					      \
+	outptr += sizeof (uint16_t);					      \
 	inptr += 4;							      \
       }									      \
   }

@@ -22,4 +22,7 @@
 #define __unlink(buf) \
 	unlink(buf)
 
+#define __getcwd(buf, size) \
+	getcwd(buf, size)
+
 #endif	/* _LIBC_UNISTD_H */

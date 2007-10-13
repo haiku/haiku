@@ -28,16 +28,6 @@
 #include <bits/libc-lock.h>
 #include <iconv/gconv_int.h>
 
-void
-internal_function
-__wcsmbs_load_conv (const struct locale_data *new_category)
-{
-}
-
-static void __attribute__ ((unused))
-free_mem (void)
-{
-}
 
 /* Last loaded locale for LC_CTYPE.  We initialize for the C locale
    which is enabled at startup.  */
@@ -53,7 +43,7 @@ static struct __gconv_step to_wc =
   .__counter = INT_MAX,
   .__from_name = (char *) "ANSI_X3.4-1968//TRANSLIT",
   .__to_name = (char *) "INTERNAL",
-  .__fct = NULL, // __gconv_transform_ascii_internal,
+  .__fct = __gconv_transform_ascii_internal,
   .__init_fct = NULL,
   .__end_fct = NULL,
   .__min_needed_from = 1,
@@ -71,7 +61,7 @@ static struct __gconv_step to_mb =
   .__counter = INT_MAX,
   .__from_name = (char *) "INTERNAL",
   .__to_name = (char *) "ANSI_X3.4-1968//TRANSLIT",
-  .__fct = NULL, // __gconv_transform_internal_ascii,
+  .__fct = __gconv_transform_internal_ascii,
   .__init_fct = NULL,
   .__end_fct = NULL,
   .__min_needed_from = 4,
@@ -92,7 +82,6 @@ struct gconv_fcts __wcsmbs_gconv_fcts =
   .tomb_nsteps = 1
 };
 
-#if 0
 
 static inline struct __gconv_step *
 getfct (const char *to, const char *from, size_t *nstepsp)
@@ -308,6 +297,5 @@ free_mem (void)
     }
 }
 
-#endif
 
 text_set_element (__libc_subfreeres, free_mem);

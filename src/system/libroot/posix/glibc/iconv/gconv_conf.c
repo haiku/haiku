@@ -35,9 +35,8 @@
 #include <bits/libc-lock.h>
 #include <gconv_int.h>
 
-
 /* This is the default path where we look for module lists.  */
-static const char default_gconv_path[] = GCONV_PATH;
+static const char default_gconv_path[] = ""; //GCONV_PATH;
 
 /* The path elements, as determined by the __gconv_get_path function.
    All path elements end in a slash.  */

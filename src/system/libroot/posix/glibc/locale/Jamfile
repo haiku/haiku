@@ -7,7 +7,7 @@ SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 
-SubDirCcFlags -DLOCALEDIR=\'\"/share/locale\"\' ;
+SubDirCcFlags -D_GNU_SOURCE -DUSE_IN_LIBIO -DLOCALEDIR=\'\"/share/locale\"\' ;
 
 MergeObject posix_gnu_locale.o :
 	C-address.c
@@ -39,4 +39,5 @@ MergeObject posix_gnu_locale.o :
 #	lc-time.c
 	mb_cur_max.c
 #	setlocale.c
+	xlocale.c
 ;

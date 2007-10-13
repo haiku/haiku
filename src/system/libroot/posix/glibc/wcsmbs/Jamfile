@@ -9,6 +9,7 @@ SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc wcsmbs ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc iconv ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc stdlib ;
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ctype ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 
 SubDirCcFlags -D_GNU_SOURCE -DUSE_IN_LIBIO ;
