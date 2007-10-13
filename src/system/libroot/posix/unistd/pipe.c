@@ -1,7 +1,7 @@
 /* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <OS.h>
@@ -34,4 +34,3 @@ pipe(int streams[2])
 
 	return 0;
 }
-

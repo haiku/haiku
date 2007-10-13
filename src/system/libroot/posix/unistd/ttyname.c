@@ -1,8 +1,8 @@
 /* 
-** Copyright 2003, Daniel Reinhold, danielre@users.sf.net. All rights reserved.
-** Copyright 2007, François Revol, mmu_man@users.sf.net. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003, Daniel Reinhold, danielre@users.sf.net. All rights reserved.
+ * Copyright 2007, François Revol, mmu_man@users.sf.net. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <SupportDefs.h>

@@ -1,17 +1,17 @@
 /* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <string.h>
 #include <stdlib.h>
 
 
-char *
+char*
 strdup(const char *string)
 {
-	char *copied;
+	char* copied;
 	size_t length;
 
 	// unlike the standard strdup() function, the BeOS implementation
@@ -27,4 +27,3 @@ strdup(const char *string)
 	memcpy(copied, string, length);
 	return copied;
 }
-

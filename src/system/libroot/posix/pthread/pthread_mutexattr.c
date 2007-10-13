@@ -1,7 +1,7 @@
 /* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <pthread.h>
@@ -155,4 +155,3 @@ pthread_mutexattr_setprotocol(pthread_mutexattr_t *_mutexAttr, int protocol)
 	// not implemented
 	return B_NOT_ALLOWED;
 }
-

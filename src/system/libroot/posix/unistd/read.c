@@ -1,12 +1,12 @@
 /* 
-** Copyright 2001, Manuel J. Petit. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2001, Manuel J. Petit. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 /* 
-** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <unistd.h>
@@ -23,7 +23,7 @@
 
 
 ssize_t
-read(int fd, void *buffer, size_t bufferSize)
+read(int fd, void* buffer, size_t bufferSize)
 {
 	ssize_t status = _kern_read(fd, -1, buffer, bufferSize);
 
@@ -32,7 +32,7 @@ read(int fd, void *buffer, size_t bufferSize)
 
 
 ssize_t
-read_pos(int fd, off_t pos, void *buffer, size_t bufferSize)
+read_pos(int fd, off_t pos, void* buffer, size_t bufferSize)
 {
 	ssize_t status;
 	if (pos < 0) {
@@ -46,7 +46,7 @@ read_pos(int fd, off_t pos, void *buffer, size_t bufferSize)
 
 
 ssize_t
-pread(int fd, void *buffer, size_t bufferSize, off_t pos)
+pread(int fd, void* buffer, size_t bufferSize, off_t pos)
 {
 	ssize_t status;
 	if (pos < 0) {
@@ -57,4 +57,3 @@ pread(int fd, void *buffer, size_t bufferSize, off_t pos)
 
 	RETURN_AND_SET_ERRNO(status);
 }
-

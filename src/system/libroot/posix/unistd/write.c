@@ -1,10 +1,10 @@
 /* 
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-** 
-** Copyright 2001, Manuel J. Petit. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ * 
+ * Copyright 2001, Manuel J. Petit. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 
 #include <unistd.h>
@@ -55,4 +55,3 @@ pwrite(int fd, const void *buffer, size_t bufferSize, off_t pos)
 
 	RETURN_AND_SET_ERRNO(status);
 }
-

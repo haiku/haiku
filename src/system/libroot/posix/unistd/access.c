@@ -1,7 +1,7 @@
 /* 
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <unistd.h>
@@ -18,10 +18,9 @@
 
 
 int
-access(const char *path, int accessMode)
+access(const char* path, int accessMode)
 {
 	status_t status = _kern_access(path, accessMode);
 
 	RETURN_AND_SET_ERRNO(status);
 }
-

@@ -1,15 +1,15 @@
 /* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <time.h>
 #include <stdio.h>
 
 
-static char *
-print_time(char *buffer, size_t bufferSize, const struct tm *tm)
+static char*
+print_time(char* buffer, size_t bufferSize, const struct tm* tm)
 {
 	// ToDo: this should probably use the locale kit to get these names
 
@@ -31,8 +31,8 @@ print_time(char *buffer, size_t bufferSize, const struct tm *tm)
 }
 
 
-char *
-asctime(const struct tm *tm)
+char*
+asctime(const struct tm* tm)
 {
 	static char buffer[28];
 		// is enough to hold normal dates
@@ -41,10 +41,9 @@ asctime(const struct tm *tm)
 }
 
 
-char *
-asctime_r(const struct tm *tm, char *buffer)
+char*
+asctime_r(const struct tm* tm, char* buffer)
 {
 	return print_time(buffer, 26, tm);
 		// 26 bytes seems to be required by the standard, so we can't write more
 }
-
