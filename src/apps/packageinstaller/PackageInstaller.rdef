@@ -1,0 +1,22 @@
+
+resource app_signature "application/x-vnd.Haiku-PackageInstaller";
+
+resource file_types message {
+	"types" = "application/x-scode-UPkg"
+};
+
+resource app_version {
+	major  = 0,
+	middle = 2,
+	minor  = 0,
+
+	variety = B_APPV_ALPHA,
+
+	internal = 0,
+
+	short_info = "Package Installer",
+	long_info = "Package Installer ©2007 Haiku, Inc."
+};
+
+resource app_flags B_SINGLE_LAUNCH;
+
