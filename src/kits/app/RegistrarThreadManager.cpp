@@ -94,12 +94,13 @@ RegistrarThreadManager::LaunchThread(RegistrarThread *thread)
 		err = thread->Run();
 		if (err) {
 			std::list<RegistrarThread*>::iterator i;
-			for (i = fThreads.begin(); i != fThreads.end(); i++) {
+			for (i = fThreads.begin(); i != fThreads.end();) {
 				if ((*i) == thread) {
-					fThreads.erase(i);
+					i = fThreads.erase(i);
 					fThreadCount--;
 					break;
-				}
+				} else
+					++i;
 			}
 		}
 	}
@@ -120,22 +121,19 @@ RegistrarThreadManager::CleanupThreads()
 {
 	std::list<RegistrarThread*>::iterator i;
 	for (i = fThreads.begin(); i != fThreads.end(); ) {
-		std::list<RegistrarThread*>::iterator next = i;
-		next++;
-
 		if (*i) {
 			if ((*i)->IsFinished()) {
 				DBG(OUT("RegistrarThreadManager::CleanupThreads(): Cleaning up thread %ld\n",
 					(*i)->Id()));
 				RemoveThread(i);
-			}
+					// adjusts i
+			} else
+				++i;
 		} else {
 			OUT("WARNING: RegistrarThreadManager::CleanupThreads(): NULL mime_update_thread_shared_data "
 				"pointer found in and removed from RegistrarThreadManager::fThreads list\n");
-			fThreads.erase(i);
+			i = fThreads.erase(i);
 		}
-
-		i = next;	
 	}			
 	return B_OK;
 }
@@ -152,26 +150,23 @@ RegistrarThreadManager::ShutdownThreads()
 {
 	std::list<RegistrarThread*>::iterator i;
 	for (i = fThreads.begin(); i != fThreads.end(); ) {
-		std::list<RegistrarThread*>::iterator next = i;
-		next++;
-
 		if (*i) {
 			if ((*i)->IsFinished()) {
 				DBG(OUT("RegistrarThreadManager::ShutdownThreads(): Cleaning up thread %ld\n",
 					(*i)->Id()));
 				RemoveThread(i);
+					// adjusts i
 			} else {
 				DBG(OUT("RegistrarThreadManager::ShutdownThreads(): Shutting down thread %ld\n",
 					(*i)->Id()));
 				(*i)->AskToExit();
+				++i;
 			}
 		} else {
 			OUT("WARNING: RegistrarThreadManager::ShutdownThreads(): NULL mime_update_thread_shared_data "
 				"pointer found in and removed from RegistrarThreadManager::fThreads list\n");
-			fThreads.erase(i);
+			i = fThreads.erase(i);
 		}
-
-		i = next;
 	}
 	
 	/*! \todo We may want to iterate back through the list at this point,
@@ -193,9 +188,6 @@ RegistrarThreadManager::KillThreads()
 {
 	std::list<RegistrarThread*>::iterator i;
 	for (i = fThreads.begin(); i != fThreads.end(); ) {
-		std::list<RegistrarThread*>::iterator next = i;
-		next++;
-
 		if (*i) {
 			if (!(*i)->IsFinished()) {
 				DBG(OUT("RegistrarThreadManager::KillThreads(): Killing thread %ld\n",
@@ -208,13 +200,12 @@ RegistrarThreadManager::KillThreads()
 			DBG(OUT("RegistrarThreadManager::KillThreads(): Cleaning up thread %ld\n",
 				(*i)->Id()));
 			RemoveThread(i);
+				// adjusts i
 		} else {
 			OUT("WARNING: RegistrarThreadManager::KillThreads(): NULL mime_update_thread_shared_data "
 				"pointer found in and removed from RegistrarThreadManager::fThreads list\n");
-			fThreads.erase(i);
+			i = fThreads.erase(i);
 		}
-
-		i = next;
 	}
 	return B_OK;
 }
