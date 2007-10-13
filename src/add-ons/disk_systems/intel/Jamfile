@@ -1,0 +1,24 @@
+SubDir HAIKU_TOP src add-ons disk_systems intel ;
+
+UsePrivateHeaders shared ;
+UsePrivateHeaders storage ;
+
+SEARCH_SOURCE
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel partitioning_systems intel ] ;
+
+{
+	local defines = [ FDefines _USER_MODE ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+}
+
+Addon <disk_system>intel :
+	IntelDiskSystem.cpp
+	ExtendedPartitionAddOn.cpp
+	PartitionMapAddOn.cpp
+
+	# kernel sources
+	PartitionMap.cpp
+
+	: be
+;
