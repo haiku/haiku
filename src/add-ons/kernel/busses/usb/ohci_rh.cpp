@@ -25,19 +25,22 @@
 
 static usb_device_descriptor sOHCIRootHubDevice =
 {
-	0x12,					//Descriptor size
-	USB_DESCRIPTOR_DEVICE ,	//Type of descriptor
-	0x110,					//USB 1.1
-	0x09 ,					//Hub type
-	0 ,						//Subclass
-	0 ,						//Protocol
-	64 ,					//Max packet size
-	0 ,						//Vendor
-	0 ,						//Product
-	0x110 ,					//Version
-	1 , 2 , 0 ,				//Other data
-	1						//Number of configurations
+	0x12,					// Descriptor size
+	USB_DESCRIPTOR_DEVICE,	// Type of descriptor
+	0x110,					// USB 1.1
+	0x09,					// Hub type
+	0,						// Subclass
+	0,						// Protocol
+	64,						// Max packet size
+	0,						// Vendor
+	0,						// Product
+	0x110,					// Version
+	1,						// Index of manufacture string
+	2,						// Index of product string
+	0,						// Index of serial number string
+	1						// Number of configurations
 };
+
 
 struct ohci_root_hub_configuration_s {
 	usb_configuration_descriptor	configuration;
@@ -46,47 +49,50 @@ struct ohci_root_hub_configuration_s {
 	usb_hub_descriptor				hub;
 } _PACKED;
 
-static ohci_root_hub_configuration_s sOHCIRootHubConfig = {
+
+static ohci_root_hub_configuration_s sOHCIRootHubConfig =
+{
 	{ // configuration descriptor
-		9,						//Size
-		USB_DESCRIPTOR_CONFIGURATION,
-		34,						//Total size of the configuration
-		1,						//Number interfaces
-		1,						//Value of configuration
-		0,						//Number of configuration
-		0x40,					//Self powered
-		0						//Max power (0, because of self power)
+		9,								// Descriptor length
+		USB_DESCRIPTOR_CONFIGURATION,	// Descriptor type
+		34,								// Total size of the configuration
+		1,								// Number interfaces
+		1,								// Value of configuration
+		0,								// Number of configuration
+		0x40,							// Self powered
+		0								// Max power (0, because of self power)
 	},
 
 	{ // interface descriptor
-		9,						//Size
-		USB_DESCRIPTOR_INTERFACE,
-		0,						//Interface number
-		0,						//Alternate setting
-		1,						//Num endpoints
-		0x09,					//Interface class
-		0,						//Interface subclass
-		0,						//Interface protocol
-		0						//Interface
+		9,								// Size
+		USB_DESCRIPTOR_INTERFACE,		// Type
+		0,								// Interface number
+		0,								// Alternate setting
+		1,								// Num endpoints
+		0x09,							// Interface class
+		0,								// Interface subclass
+		0,								// Interface protocol
+		0								// Interface
 	},
 
 	{ // endpoint descriptor
-		7,						//Size
-		USB_DESCRIPTOR_ENDPOINT,
-		USB_REQTYPE_DEVICE_IN | 1, //1 from freebsd driver
-		0x3,					// Interrupt
-		8,						// Max packet size
-		0xFF					// Interval 256
+		7,								// Size
+		USB_DESCRIPTOR_ENDPOINT,		// Type
+		USB_REQTYPE_DEVICE_IN | 1, 		// Endpoint address (first in IN endpoint)
+		0x03,							// Attributes (0x03 = interrupt endpoint)
+		8,								// Max packet size
+		0xFF							// Interval 256
 	},
 	
-	{
-		9,						//Including deprecated powerctrlmask
-		USB_DESCRIPTOR_HUB,
-		0,						//Number of ports
-		0x0000,					//Hub characteristics FIXME
-		50,						//Power on to power good
+	{ // hub descriptor	
+		9,						// Lenght (including deprecated power
+								// control mask)
+		USB_DESCRIPTOR_HUB,		// Type
+		0,						// Number of ports
+		0x0000,					// Hub characteristics
+		50,						// Power on to power good
 		0,						// Current
-		0x00,					//Both ports are removable
+		0x00,					// Both ports are removable
 		0xff					// Depricated power control mask
 	}
 };
@@ -128,44 +134,44 @@ static ohci_root_hub_string_s sOHCIRootHubStrings[3] = {
 };
 
 
-OHCIRootHub::OHCIRootHub(OHCI *ohci, int8 deviceAddress)
-		   : Hub(ohci->RootObject(), sOHCIRootHubDevice, deviceAddress , USB_SPEED_FULLSPEED )
+OHCIRootHub::OHCIRootHub(Object *rootObject, int8 deviceAddress)
+   :	Hub(rootObject, sOHCIRootHubDevice, deviceAddress, USB_SPEED_FULLSPEED)
 {
 }
 
 status_t
-OHCIRootHub::ProcessTransfer(Transfer *t, OHCI *ohci)
+OHCIRootHub::ProcessTransfer(OHCI *ohci, Transfer *transfer)
 {
-	if ((t->TransferPipe()->Type() & USB_OBJECT_CONTROL_PIPE) == 0)
+	if ((transfer->TransferPipe()->Type() & USB_OBJECT_CONTROL_PIPE) == 0)
 		return B_ERROR;
 
-	usb_request_data *request = t->RequestData();
-	TRACE(("OHCIRootHub::ProcessTransfer(): request: %d\n", request->Request));
+	usb_request_data *request = transfer->RequestData();
 
-	uint32 status = B_TIMED_OUT;
+	TRACE(("usb_ohci_roothub(): request: %d\n", request->Request));
+
+	status_t status = B_TIMED_OUT;
 	size_t actualLength = 0;
 	switch (request->Request) {
 		case USB_REQUEST_GET_STATUS: {
 			if (request->Index == 0) {
 				// get hub status
 				actualLength = MIN(sizeof(usb_port_status),
-					t->DataLength());
+					transfer->DataLength());
 				// the hub reports whether the local power failed (bit 0)
 				// and if there is a over-current condition (bit 1).
 				// everything as 0 means all is ok.
 				// TODO (?) actually check for the value
-				memset(t->Data(), 0, actualLength);
+				memset(transfer->Data(), 0, actualLength);
 				status = B_OK;
 				break;
 			}
 
 			usb_port_status portStatus;
-			if (ohci->GetPortStatus(request->Index, &portStatus) >= B_OK) {
-				actualLength = MIN(sizeof(usb_port_status), t->DataLength());
-				memcpy(t->Data(), (void *)&portStatus, actualLength);
+			if (ohci->GetPortStatus(request->Index - 1, &portStatus) >= B_OK) {
+				actualLength = MIN(sizeof(usb_port_status), transfer->DataLength());
+				memcpy(transfer->Data(), (void *)&portStatus, actualLength);
 				status = B_OK;
 			}
-
 			break;
 		}
 
@@ -175,30 +181,28 @@ OHCIRootHub::ProcessTransfer(Transfer *t, OHCI *ohci)
 				break;
 			}
 
-			TRACE(("OHCIRootHub::ProcessTransfer():  set address: %d\n", request->Value));
+			TRACE(("usb_ohci_roothub():  set address: %d\n", request->Value));
 			status = B_OK;
 			break;
 
 		case USB_REQUEST_GET_DESCRIPTOR:
-			TRACE(("OHCIRootHub::ProcessTransfer(): get descriptor: %d\n", request->Value >> 8));
+			TRACE(("usb_ohci_roothub(): get descriptor: %d\n", request->Value >> 8));
 
 			switch (request->Value >> 8) {
 				case USB_DESCRIPTOR_DEVICE: {
 					actualLength = MIN(sizeof(usb_device_descriptor),
-						t->DataLength());
-					memcpy(t->Data(), (void *)&sOHCIRootHubDevice,
+						transfer->DataLength());
+					memcpy(transfer->Data(), (void *)&sOHCIRootHubDevice,
 						actualLength);
 					status = B_OK;
 					break;
 				}
 
 				case USB_DESCRIPTOR_CONFIGURATION: {
-					//Make sure we have the correct number of ports
+					actualLength = MIN(sizeof(ohci_root_hub_configuration_s),
+						transfer->DataLength());
 					sOHCIRootHubConfig.hub.num_ports = ohci->PortCount();
-					
-					actualLength = MIN(sizeof(sOHCIRootHubConfig),
-						t->DataLength());
-					memcpy(t->Data(), (void *)&(sOHCIRootHubConfig),
+					memcpy(transfer->Data(), (void *)&sOHCIRootHubConfig,
 						actualLength);
 					status = B_OK;
 					break;
@@ -210,20 +214,18 @@ OHCIRootHub::ProcessTransfer(Transfer *t, OHCI *ohci)
 						break;
 
 					actualLength = MIN(sOHCIRootHubStrings[index].length,
-						t->DataLength());
-					memcpy(t->Data(), (void *)&sOHCIRootHubStrings[index],
+						transfer->DataLength());
+					memcpy(transfer->Data(), (void *)&sOHCIRootHubStrings[index],
 						actualLength);
 					status = B_OK;
 					break;
 				}
 
 				case USB_DESCRIPTOR_HUB: {
-					//Make sure we have the correct number of ports
-					sOHCIRootHubConfig.hub.num_ports = ohci->PortCount();
-					
 					actualLength = MIN(sizeof(usb_hub_descriptor),
-						t->DataLength());
-					memcpy(t->Data(), (void *)&sOHCIRootHubConfig.hub,
+						transfer->DataLength());
+					sOHCIRootHubConfig.hub.num_ports = ohci->PortCount();
+					memcpy(transfer->Data(), (void *)&sOHCIRootHubConfig.hub,
 						actualLength);
 					status = B_OK;
 					break;
@@ -238,12 +240,12 @@ OHCIRootHub::ProcessTransfer(Transfer *t, OHCI *ohci)
 		case USB_REQUEST_CLEAR_FEATURE: {
 			if (request->Index == 0) {
 				// we don't support any hub changes
-				TRACE_ERROR(("OHCIRootHub::ProcessTransfer(): clear feature: no hub changes\n"));
+				TRACE_ERROR(("usb_ohci_roothub(): clear feature: no hub changes\n"));
 				break;
 			}
 
-			TRACE(("OHCIRootHub::ProcessTransfer(): clear feature: %d\n", request->Value));
-			if (ohci->ClearPortFeature(request->Index, request->Value) >= B_OK)
+			TRACE(("usb_ohci_roothub(): clear feature: %d\n", request->Value));
+			if (ohci->ClearPortFeature(request->Index - 1, request->Value) >= B_OK)
 				status = B_OK;
 			break;
 		}
@@ -251,19 +253,18 @@ OHCIRootHub::ProcessTransfer(Transfer *t, OHCI *ohci)
 		case USB_REQUEST_SET_FEATURE: {
 			if (request->Index == 0) {
 				// we don't support any hub changes
-				TRACE_ERROR(("OHCIRootHub::ProcessTransfer(): set feature: no hub changes\n"));
+				TRACE_ERROR(("usb_ohci_roothub(): set feature: no hub changes\n"));
 				break;
 			}
 
-			TRACE(("OHCIRootHub::ProcessTransfer(): set feature: %d\n", request->Value));
-			if (ohci->SetPortFeature(request->Index, request->Value) >= B_OK)
+			TRACE(("usb_ohci_roothub(): set feature: %d\n", request->Value));
+			if (ohci->SetPortFeature(request->Index - 1, request->Value) >= B_OK)
 				status = B_OK;
 			break;
 		}
 	}
 
-	t->Finished(status, actualLength);
-	delete t;
+	transfer->Finished(status, actualLength);
+	delete transfer;
 	return B_OK;
-} 
-
+}
