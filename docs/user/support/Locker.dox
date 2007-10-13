@@ -46,7 +46,7 @@
   Flower::Grow(int length)
   {
     if (fLock->Lock()) {
-      fLength += lenght;
+      fLength += length;
       fLock->Unlock();
       return B_OK;
     } else {
