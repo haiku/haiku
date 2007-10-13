@@ -6,9 +6,10 @@
  *		Ingo Weinhold, bonefish@cs.tu-berlin.de
  */
 
-
-#include <syscalls.h>
-#include <disk_device_manager/ddm_userland_interface.h>
+#include <errno.h>
+#include <new>
+#include <unistd.h>
+#include <sys/stat.h>
 
 #include <Directory.h>
 #include <DiskDevice.h>
@@ -23,10 +24,10 @@
 #include <String.h>
 #include <Volume.h>
 
-#include <errno.h>
-#include <new>
-#include <unistd.h>
-#include <sys/stat.h>
+#include <AutoDeleter.h>
+
+#include <disk_device_manager/ddm_userland_interface.h>
+#include <syscalls.h>
 
 
 using std::nothrow;
@@ -41,32 +42,6 @@ using std::nothrow;
 	(\see IsEmpty()).
 */
 
-// AutoDeleter
-/*!	\brief Helper class deleting objects automatically.
-*/
-template<typename C>
-class AutoDeleter {
-public:
-	inline AutoDeleter(C *data = NULL, bool array = false)
-		: fData(data), fArray(array) {}
-
-	inline ~AutoDeleter()
-	{
-		if (fArray)
-			delete[] fData;
-		else
-			delete fData;
-	}
-
-	inline void SetTo(C *data, bool array = false)
-	{
-		fData = data;
-		fArray = array;
-	}
-
-	C		*fData;
-	bool	fArray;
-};
 
 // compare_string
 /*!	\brief \c NULL aware strcmp().
@@ -97,7 +72,8 @@ compare_string(const char *str1, const char *str2)
 BPartition::BPartition()
 	: fDevice(NULL),
 	  fParent(NULL),
-	  fPartitionData(NULL)
+	  fPartitionData(NULL),
+	  fDelegate(NULL)
 {
 }
 
@@ -739,14 +715,14 @@ BPartition::CanMove(BObjectList<BPartition> *unmovableDescendants,
 	int32 descendantCount = _CountDescendants();
 	partition_id *unmovableIDs = NULL;
 	partition_id *needUnmountingIDs = NULL;
-	AutoDeleter<partition_id> deleter1;
-	AutoDeleter<partition_id> deleter2;
+	ArrayDeleter<partition_id> deleter1;
+	ArrayDeleter<partition_id> deleter2;
 	if (descendantCount > 0) {
 		// allocate arrays
 		unmovableIDs = new(nothrow) partition_id[descendantCount];
 		needUnmountingIDs = new(nothrow) partition_id[descendantCount];
-		deleter1.SetTo(unmovableIDs, true);
-		deleter2.SetTo(needUnmountingIDs, true);
+		deleter1.SetTo(unmovableIDs);
+		deleter2.SetTo(needUnmountingIDs);
 		if (!unmovableIDs || !needUnmountingIDs)
 			return false;
 		// init arrays

@@ -173,9 +173,10 @@ private:
 	friend class BDiskSystem;
 	friend class BMutablePartition;
 
-	BDiskDevice				*fDevice;
-	BPartition				*fParent;
-	user_partition_data		*fPartitionData;
+	BDiskDevice*			fDevice;
+	BPartition*				fParent;
+	user_partition_data*	fPartitionData;
+	Delegate*				fDelegate;
 };
 
 #endif	// _PARTITION_H
