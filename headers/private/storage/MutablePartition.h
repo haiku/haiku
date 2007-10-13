@@ -55,10 +55,16 @@ public:
 
 			status_t			CreateChild(int32 index,
 									BMutablePartition** child);
+			status_t			CreateChild(int32 index, const char* type,
+									const char* name, const char* parameters,
+									BMutablePartition** child);
 			status_t			DeleteChild(int32 index);
+			status_t			DeleteChild(BMutablePartition* child);
 
+			BMutablePartition*	Parent() const;
 			BMutablePartition*	ChildAt(int32 index) const;
 			int32				CountChildren() const;
+			int32				IndexOfChild(BMutablePartition* child) const;
 
 			// for the partitioning system managing the parent
 			void*				ChildCookie() const;
@@ -69,7 +75,8 @@ private:
 									BPartition::MutableDelegate* delegate);
 								~BMutablePartition();
 
-			status_t			Init(const user_partition_data* partitionData);
+			status_t			Init(const user_partition_data* partitionData,
+									BMutablePartition* parent);
 
 			const user_partition_data* PartitionData() const;
 
@@ -80,6 +87,7 @@ private:
 
 			BPartition::MutableDelegate* fDelegate;
 			user_partition_data* fData;
+			BMutablePartition*	fParent;
 			BList				fChildren;
 			void*				fChildCookie;
 };

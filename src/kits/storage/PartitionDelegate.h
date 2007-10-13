@@ -18,8 +18,10 @@ public:
 								Delegate(BPartition* partition);
 	virtual						~Delegate();
 
-	virtual	status_t			Init(const user_partition_data* partitionData)
-									= 0;
+	virtual	status_t			InitHierarchy(
+									const user_partition_data* partitionData,
+									Delegate* parent) = 0;
+	virtual	status_t			InitAfterHierarchy() = 0;
 
 			BPartition*			Partition() const	{ return fPartition; }
 
@@ -89,10 +91,11 @@ public:
 									BDiskDeviceParameterEditor** editor)
 									const = 0;
 	virtual	status_t			ValidateCreateChild(off_t* start, off_t* size,
-									const char* type,
+									const char* type, BString* name,
 									const char* parameters) const = 0;
 	virtual	status_t			CreateChild(off_t start, off_t size,
-									const char* type, const char* parameters,
+									const char* type, const char* name,
+									const char* parameters,
 									BPartition** child) = 0;
 	
 	virtual	status_t			DeleteChild(Delegate* child) = 0;
@@ -103,7 +106,7 @@ protected:
 };
 
 
-class BPartition::MutableDelegate : BPartition::Delegate {
+class BPartition::MutableDelegate : public BPartition::Delegate {
 public:
 								MutableDelegate(BPartition* partition);
 	virtual						~MutableDelegate();
@@ -111,7 +114,10 @@ public:
 			BMutablePartition*	MutablePartition();
 			const BMutablePartition* MutablePartition() const;
 
-	virtual	status_t			Init(const user_partition_data* partitionData);
+	virtual	status_t			InitHierarchy(
+									const user_partition_data* partitionData,
+									Delegate* parent);
+	virtual	status_t			InitAfterHierarchy();
 
 	virtual	const user_partition_data* PartitionData() const;
 
@@ -127,17 +133,17 @@ public:
 	virtual	status_t			Defragment();
 	virtual	status_t			Repair(bool checkOnly);
 
-	virtual	status_t			ValidateResize(off_t* size) const = 0;
+	virtual	status_t			ValidateResize(off_t* size) const;
 	virtual	status_t			ValidateResizeChild(Delegate* child,
-									off_t* size) const = 0;
-	virtual	status_t			Resize(off_t size) = 0;
-	virtual	status_t			ResizeChild(Delegate* child, off_t size) = 0;
+									off_t* size) const;
+	virtual	status_t			Resize(off_t size);
+	virtual	status_t			ResizeChild(Delegate* child, off_t size);
 
-	virtual	status_t			ValidateMove(off_t* offset) const = 0;
+	virtual	status_t			ValidateMove(off_t* offset) const;
 	virtual	status_t			ValidateMoveChild(Delegate* child,
-									off_t* offset) const = 0;
-	virtual	status_t			Move(off_t offset) = 0;
-	virtual	status_t			MoveChild(Delegate* child, off_t offset) = 0;
+									off_t* offset) const;
+	virtual	status_t			Move(off_t offset);
+	virtual	status_t			MoveChild(Delegate* child, off_t offset);
 
 	virtual	status_t			ValidateSetContentName(BString* name) const;
 	virtual	status_t			ValidateSetName(Delegate* child,
@@ -174,11 +180,11 @@ public:
 									const char* system,
 									BDiskDeviceParameterEditor** editor) const;
 	virtual	status_t			ValidateCreateChild(off_t* start, off_t* size,
-									const char* type,
+									const char* type, BString* name,
 									const char* parameters) const;
 	virtual	status_t			CreateChild(off_t start, off_t size,
-									const char* type, const char* parameters,
-									BPartition** child);
+									const char* type, const char* name,
+									const char* parameters, BPartition** child);
 	
 	virtual	status_t			DeleteChild(Delegate* child);
 

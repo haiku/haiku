@@ -34,7 +34,7 @@ public:
 	virtual	status_t			GetInitializationParameterEditor(
 									const BMutablePartition* partition,
 									BDiskDeviceParameterEditor** editor);
-	virtual	bool				ValidateInitialize(
+	virtual	status_t			ValidateInitialize(
 									const BMutablePartition* partition,
 									BString* name, const char* parameters);
 	virtual	status_t			Initialize(BMutablePartition* partition,
@@ -77,30 +77,30 @@ public:
 	virtual	status_t			Defragment();
 	virtual	status_t			Repair(bool checkOnly);
 
-	virtual	bool				ValidateResize(off_t* size);
-	virtual	bool				ValidateResizeChild(
+	virtual	status_t			ValidateResize(off_t* size);
+	virtual	status_t			ValidateResizeChild(
 									const BMutablePartition* child,
 									off_t* size);
 	virtual	status_t			Resize(off_t size);
 	virtual	status_t			ResizeChild(BMutablePartition* child,
 									off_t size);
 
-	virtual	bool				ValidateMove(off_t* offset);
-	virtual	bool				ValidateMoveChild(
+	virtual	status_t			ValidateMove(off_t* offset);
+	virtual	status_t			ValidateMoveChild(
 									const BMutablePartition* child,
 									off_t* offset);
 	virtual	status_t			Move(off_t offset);
 	virtual	status_t			MoveChild(BMutablePartition* child,
 									off_t offset);
 
-	virtual	bool				ValidateSetContentName(BString* name);
-	virtual	bool				ValidateSetName(const BMutablePartition* child,
+	virtual	status_t			ValidateSetContentName(BString* name);
+	virtual	status_t			ValidateSetName(const BMutablePartition* child,
 									BString* name);
 	virtual	status_t			SetContentName(const char* name);
 	virtual	status_t			SetName(BMutablePartition* child,
 									const char* name);
 
-	virtual	bool				ValidateSetType(const BMutablePartition* child,
+	virtual	status_t			ValidateSetType(const BMutablePartition* child,
 									const char* type);
 	virtual	status_t			SetType(BMutablePartition* child,
 									const char* type);
@@ -110,9 +110,9 @@ public:
 	virtual	status_t			GetParameterEditor(
 									const BMutablePartition* child,
 									BDiskDeviceParameterEditor** editor);
-	virtual	bool				ValidateSetContentParameters(
+	virtual	status_t			ValidateSetContentParameters(
 									const char* parameters);
-	virtual	bool				ValidateSetParameters(
+	virtual	status_t			ValidateSetParameters(
 									const BMutablePartition* child,
 									const char* parameters);
 	virtual	status_t			SetContentParameters(const char* parameters);
@@ -122,11 +122,12 @@ public:
 	virtual	status_t			GetChildCreationParameterEditor(
 									const char* type,
 									BDiskDeviceParameterEditor** editor);
-	virtual	bool				ValidateCreateChild(off_t* offset,
+	virtual	status_t			ValidateCreateChild(off_t* offset,
 									off_t* size, const char* type,
-									const char* parameters);
+									BString* name, const char* parameters);
 	virtual	status_t			CreateChild(off_t offset, off_t size,
-									const char* type, const char* parameters,
+									const char* type, const char* name,
+									const char* parameters,
 									BMutablePartition** child);
 
 	virtual	status_t			DeleteChild(BMutablePartition* child);

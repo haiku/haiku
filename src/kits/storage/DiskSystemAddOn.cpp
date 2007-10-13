@@ -59,11 +59,11 @@ BDiskSystemAddOn::GetInitializationParameterEditor(
 
 
 // ValidateInitialize
-bool
+status_t
 BDiskSystemAddOn::ValidateInitialize(const BMutablePartition* partition,
 	BString* name, const char* parameters)
 {
-	return false;
+	return B_BAD_VALUE;
 }
 
 
@@ -176,19 +176,19 @@ BPartitionHandle::Repair(bool checkOnly)
 
 
 // ValidateResize
-bool
+status_t
 BPartitionHandle::ValidateResize(off_t* size)
 {
-	return false;
+	return B_BAD_VALUE;
 }
 
 
 // ValidateResizeChild
-bool
+status_t
 BPartitionHandle::ValidateResizeChild(const BMutablePartition* child,
 	off_t* size)
 {
-	return false;
+	return B_BAD_VALUE;
 }
 
 
@@ -209,21 +209,21 @@ BPartitionHandle::ResizeChild(BMutablePartition* child, off_t size)
 
 
 // ValidateMove
-bool
+status_t
 BPartitionHandle::ValidateMove(off_t* offset)
 {
 	// Usually moving a disk system is a no-op for the content disk system,
 	// so we default to true here.
-	return true;
+	return B_OK;
 }
 
 
 // ValidateMoveChild
-bool
+status_t
 BPartitionHandle::ValidateMoveChild(const BMutablePartition* child,
 	off_t* offset)
 {
-	return false;
+	return B_BAD_VALUE;
 }
 
 
@@ -246,19 +246,19 @@ BPartitionHandle::MoveChild(BMutablePartition* child, off_t offset)
 
 
 // ValidateSetContentName
-bool
+status_t
 BPartitionHandle::ValidateSetContentName(BString* name)
 {
-	return false;
+	return B_BAD_VALUE;
 }
 
 
 // ValidateSetName
-bool
+status_t
 BPartitionHandle::ValidateSetName(const BMutablePartition* child,
 	BString* name)
 {
-	return false;
+	return B_BAD_VALUE;
 }
 
 
@@ -279,11 +279,11 @@ BPartitionHandle::SetName(BMutablePartition* child, const char* name)
 
 
 // ValidateSetType
-bool
+status_t
 BPartitionHandle::ValidateSetType(const BMutablePartition* child,
 	const char* type)
 {
-	return false;
+	return B_BAD_VALUE;
 }
 
 
@@ -313,19 +313,19 @@ BPartitionHandle::GetParameterEditor(const BMutablePartition* child,
 
 
 // ValidateSetContentParameters
-bool
+status_t
 BPartitionHandle::ValidateSetContentParameters(const char* parameters)
 {
-	return false;
+	return B_BAD_VALUE;
 }
 
 
 // ValidateSetParameters
-bool
+status_t
 BPartitionHandle::ValidateSetParameters(const BMutablePartition* child,
 	const char* parameters)
 {
-	return false;
+	return B_BAD_VALUE;
 }
 
 
@@ -356,18 +356,18 @@ BPartitionHandle::GetChildCreationParameterEditor(const char* type,
 
 
 // ValidateCreateChild
-bool
+status_t
 BPartitionHandle::ValidateCreateChild(off_t* offset, off_t* size,
-	const char* type, const char* parameters)
+	const char* type, BString* name, const char* parameters)
 {
-	return false;
+	return B_BAD_VALUE;
 }
 
 
 // CreateChild
 status_t
 BPartitionHandle::CreateChild(off_t offset, off_t size, const char* type,
-	const char* parameters, BMutablePartition** child)
+	const char* name, const char* parameters, BMutablePartition** child)
 {
 	return B_NOT_SUPPORTED;
 }

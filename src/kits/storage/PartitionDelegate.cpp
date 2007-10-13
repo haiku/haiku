@@ -61,14 +61,21 @@ BPartition::MutableDelegate::MutablePartition() const
 }
 
 
-// Init
+// InitHierarchy
 status_t
-BPartition::MutableDelegate::Init(const user_partition_data* partitionData)
+BPartition::MutableDelegate::InitHierarchy(
+	const user_partition_data* partitionData, Delegate* _parent)
 {
-	status_t error = fMutablePartition.Init(partitionData);
-	if (error != B_OK)
-		return error;
+	MutableDelegate* parent = dynamic_cast<MutableDelegate*>(_parent);
+	return fMutablePartition.Init(partitionData,
+		parent ? &parent->fMutablePartition : NULL);
+}
 
+
+// InitAfterHierarchy
+status_t
+BPartition::MutableDelegate::InitAfterHierarchy()
+{
 	if (!fMutablePartition.ContentType())
 		return B_OK;
 
@@ -80,13 +87,13 @@ BPartition::MutableDelegate::Init(const user_partition_data* partitionData)
 		return B_ENTRY_NOT_FOUND;
 
 	BPartitionHandle* handle;
-	error = addOn->CreatePartitionHandle(&fMutablePartition, &handle);
+	status_t error = addOn->CreatePartitionHandle(&fMutablePartition, &handle);
 	if (error != B_OK) {
 		manager->PutAddOn(addOn);
 		return error;
 	}
 
-	// everything went fine --keep the disk system add-on reference and the
+	// everything went fine -- keep the disk system add-on reference and the
 	// handle
 	fDiskSystem = addOn;
 	fPartitionHandle = handle;
@@ -169,7 +176,7 @@ BPartition::MutableDelegate::ValidateResize(off_t* size) const
 	if (!fPartitionHandle)
 		return B_NO_INIT;
 
-	return fPartitionHandle->ValidateResize(size) ? B_OK : B_BAD_VALUE;
+	return fPartitionHandle->ValidateResize(size);
 }
 
 
@@ -184,7 +191,7 @@ BPartition::MutableDelegate::ValidateResizeChild(Delegate* _child,
 		return B_NO_INIT;
 
 	return fPartitionHandle->ValidateResizeChild(&child->fMutablePartition,
-		size) ? B_OK : B_BAD_VALUE;
+		size);
 }
 
 
@@ -219,7 +226,7 @@ BPartition::MutableDelegate::ValidateMove(off_t* offset) const
 	if (!fPartitionHandle)
 		return B_NO_INIT;
 
-	return fPartitionHandle->ValidateMove(offset) ? B_OK : B_BAD_VALUE;
+	return fPartitionHandle->ValidateMove(offset);
 }
 
 
@@ -234,7 +241,7 @@ BPartition::MutableDelegate::ValidateMoveChild(Delegate* _child,
 		return B_NO_INIT;
 
 	return fPartitionHandle->ValidateMoveChild(&child->fMutablePartition,
-		offset) ? B_OK : B_BAD_VALUE;
+		offset);
 }
 
 
@@ -269,7 +276,7 @@ BPartition::MutableDelegate::ValidateSetContentName(BString* name) const
 	if (!fPartitionHandle)
 		return B_NO_INIT;
 
-	return fPartitionHandle->ValidateSetContentName(name) ? B_OK : B_BAD_VALUE;
+	return fPartitionHandle->ValidateSetContentName(name);
 }
 
 
@@ -283,8 +290,7 @@ BPartition::MutableDelegate::ValidateSetName(Delegate* _child,
 	if (!fPartitionHandle || !child)
 		return B_NO_INIT;
 
-	return fPartitionHandle->ValidateSetName(&child->fMutablePartition, name)
-		? B_OK : B_BAD_VALUE;
+	return fPartitionHandle->ValidateSetName(&child->fMutablePartition, name);
 }
 
 
@@ -322,8 +328,7 @@ BPartition::MutableDelegate::ValidateSetType(Delegate* _child,
 	if (!fPartitionHandle || !child)
 		return B_NO_INIT;
 
-	return fPartitionHandle->ValidateSetType(&child->fMutablePartition, type)
-		? B_OK : B_BAD_VALUE;
+	return fPartitionHandle->ValidateSetType(&child->fMutablePartition, type);
 }
 
 
@@ -444,13 +449,13 @@ BPartition::MutableDelegate::ValidateInitialize(const char* diskSystem,
 	if (!addOn)
 		return B_ENTRY_NOT_FOUND;
 
-	bool result = addOn->ValidateInitialize(&fMutablePartition,
+	status_t result = addOn->ValidateInitialize(&fMutablePartition,
 		name, parameters);
 
 	// put the add-on
 	manager->PutAddOn(addOn);
 
-	return result ? B_OK : B_BAD_VALUE;
+	return result;
 }
 
 
@@ -513,26 +518,27 @@ BPartition::MutableDelegate::GetChildCreationParameterEditor(const char* type,
 // ValidateCreateChild
 status_t
 BPartition::MutableDelegate::ValidateCreateChild(off_t* start, off_t* size,
-	const char* type, const char* parameters) const
+	const char* type, BString* name, const char* parameters) const
 {
 	if (!fPartitionHandle)
 		return B_NO_INIT;
 
-	return fPartitionHandle->ValidateCreateChild(start, size, type, parameters)
-		? B_OK : B_BAD_VALUE;
+	return fPartitionHandle->ValidateCreateChild(start, size, type, name,
+		parameters);
 }
 
 
 // CreateChild
 status_t
 BPartition::MutableDelegate::CreateChild(off_t start, off_t size,
-	const char* type, const char* parameters, BPartition** child)
+	const char* type, const char* name, const char* parameters,
+	BPartition** child)
 {
 	if (!fPartitionHandle)
 		return B_NO_INIT;
 
 	BMutablePartition* mutableChild;
-	status_t error = fPartitionHandle->CreateChild(start, size, type,
+	status_t error = fPartitionHandle->CreateChild(start, size, type, name,
 		parameters, &mutableChild);
 	if (error != B_OK)
 		return error;
