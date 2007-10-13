@@ -60,12 +60,13 @@ extern long setEvent(sem_id event);
 
 
 GLObject::GLObject(ObjectView *ov)
-	: rotX(0),
+	:
+	rotX(0),
 	rotY(0),
-	lastRotX(0),
-	lastRotY(0),
 	spinX(2),
 	spinY(2),
+	lastRotX(0),
+	lastRotY(0),
 	x(0),
 	y(0),
 	z(-2.0),
