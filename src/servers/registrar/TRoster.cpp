@@ -1279,13 +1279,16 @@ TRoster::CheckSanity()
 		if (!(*it)->IsRunning())
 			obsoleteApps.AddInfo(*it);
 	}
+
 	// remove the apps
 	for (AppInfoList::Iterator it = obsoleteApps.It(); it.IsValid(); ++it) {
 		RemoveApp(*it);
 		delete *it;
 	}
+	obsoleteApps.MakeEmpty(false);
+		// don't delete infos a second time
+
 	// early pre-registered applications
-	obsoleteApps.MakeEmpty();
 	bigtime_t timeLimit = system_time() - kMaximalEarlyPreRegistrationPeriod;
 	for (AppInfoList::Iterator it = fEarlyPreRegisteredApps.It();
 		 it.IsValid();
@@ -1293,11 +1296,14 @@ TRoster::CheckSanity()
 		if ((*it)->registration_time < timeLimit)
 			obsoleteApps.AddInfo(*it);
 	}
+
 	// remove the apps
 	for (AppInfoList::Iterator it = obsoleteApps.It(); it.IsValid(); ++it) {
 		fEarlyPreRegisteredApps.RemoveInfo(*it);
 		delete *it;
 	}
+	obsoleteApps.MakeEmpty(false);
+		// don't delete infos a second time
 }
 
 // SetShuttingDown
