@@ -101,9 +101,9 @@ class PartitionType {
 public:
 	PartitionType();
 
-	void SetType(uint8 type);
-	void SetType(const char *typeName);
-	void SetContentType(const char *contentType);
+	bool SetType(uint8 type);
+	bool SetType(const char *typeName);
+	bool SetContentType(const char *contentType);
 
 	bool IsValid() const	{ return fValid; }
 	bool IsEmpty() const	{ return is_empty_type(fType); }
@@ -127,6 +127,8 @@ public:
 
 	void SetTo(const partition_descriptor *descriptor, off_t ptsOffset,
 		off_t baseOffset);
+	void SetTo(off_t offset, off_t size, uint8 type, bool active,
+		off_t ptsOffset);
 	void Unset();
 
 	bool IsEmpty() const	{ return is_empty_type(fType); }
@@ -167,6 +169,7 @@ public:
 	PrimaryPartition();
 
 	void SetTo(const partition_descriptor *descriptor, off_t ptsOffset);
+	void SetTo(off_t offset, off_t size, uint8 type, bool active);
 	void Unset();
 
 	status_t Assign(const PrimaryPartition& other);
@@ -197,6 +200,8 @@ public:
 
 	void SetTo(const partition_descriptor *descriptor, off_t ptsOffset,
 		PrimaryPartition *primary);
+	void SetTo(off_t offset, off_t size, uint8 type, bool active,
+		off_t ptsOffset, PrimaryPartition *primary);
 	void Unset();
 
 	void SetPrimaryPartition(PrimaryPartition *primary) { fPrimary = primary; }
@@ -227,6 +232,9 @@ public:
 	PrimaryPartition *PrimaryPartitionAt(int32 index);
 	const PrimaryPartition *PrimaryPartitionAt(int32 index) const;
 	int32 IndexOfPrimaryPartition(const PrimaryPartition* partition) const;
+	int32 CountNonEmptyPrimaryPartitions() const;
+
+	int32 ExtendedPartitionIndex() const;
 
 	int32 CountPartitions() const;
 	int32 CountNonEmptyPartitions() const;

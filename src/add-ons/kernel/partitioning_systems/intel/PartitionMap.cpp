@@ -193,11 +193,12 @@ PartitionType::PartitionType()
 	\brief Sets the \a type via its ID.
 	\param type ID of the partition type, it is in the range [0..255].
 */
-void
+bool
 PartitionType::SetType(uint8 type)
 {
 	fType = type;
 	fValid = partition_type_string(type);
+	return fValid;
 }
 
 // SetType
@@ -205,17 +206,18 @@ PartitionType::SetType(uint8 type)
 	\brief Sets the type via its string name.
 	\param typeName Name of the partition type.
 */
-void
+bool
 PartitionType::SetType(const char *typeName)
 {
 	for (int32 i = 0; kPartitionTypes[i].name ; i++) {
 		if (!strcmp(typeName, kPartitionTypes[i].name)) {
 			fType = kPartitionTypes[i].type;
 			fValid = true;
-			return;
+			return fValid;
 		}
 	}
 	fValid = false;
+	return fValid;
 }
 
 // SetContentType
@@ -223,17 +225,18 @@ PartitionType::SetType(const char *typeName)
 	\brief Converts content type to the partition type that fits best.
 	\param content_type Name of the content type, it is standardized by system.
 */
-void
+bool
 PartitionType::SetContentType(const char *contentType)
 {
 	for (int32 i = 0; kPartitionContentTypes[i].name ; i++) {
 		if (!strcmp(contentType, kPartitionContentTypes[i].name)) {
 			fType = kPartitionContentTypes[i].type;
 			fValid = true;
-			return;
+			return fValid;
 		}
 	}
 	fValid = false;
+	return fValid;
 }
 
 // FindNext
@@ -314,14 +317,29 @@ Partition::SetTo(const partition_descriptor *descriptor, off_t ptsOffset,
 				 off_t baseOffset)
 {
 TRACE(("Partition::SetTo(): active: %x\n", descriptor->active));
+	SetTo(baseOffset + (off_t)descriptor->start * SECTOR_SIZE,
+		(off_t)descriptor->size * SECTOR_SIZE,
+		descriptor->type,
+		descriptor->active,
+		ptsOffset);
+}
+
+
+// SetTo
+void
+Partition::SetTo(off_t offset, off_t size, uint8 type, bool active,
+	off_t ptsOffset)
+{
 	fPTSOffset = ptsOffset;
-	fOffset = baseOffset + (off_t)descriptor->start * SECTOR_SIZE;
-	fSize = (off_t)descriptor->size * SECTOR_SIZE;
-	fType = descriptor->type;
-	fActive = descriptor->active;
+	fOffset = offset;
+	fSize = size;
+	fType = type;
+	fActive = active;
+
 	if (fSize == 0)
 		Unset();
 }
+
 
 // Unset
 void
@@ -393,6 +411,16 @@ PrimaryPartition::SetTo(const partition_descriptor *descriptor, off_t ptsOffset)
 	Unset();
 	Partition::SetTo(descriptor, ptsOffset, 0);
 }
+
+
+// SetTo
+void
+PrimaryPartition::SetTo(off_t offset, off_t size, uint8 type, bool active)
+{
+	Unset();
+	Partition::SetTo(offset, size, type, active, 0);
+}
+
 
 // Unset
 void
@@ -527,6 +555,20 @@ LogicalPartition::SetTo(const partition_descriptor *descriptor,
 	}
 }
 
+
+// SetTo
+void
+LogicalPartition::SetTo(off_t offset, off_t size, uint8 type, bool active,
+	off_t ptsOffset, PrimaryPartition *primary)
+{
+	Unset();
+	if (primary) {
+		Partition::SetTo(offset, size, type, active, ptsOffset);
+		fPrimary = primary;
+	}
+}
+
+
 // Unset
 void
 LogicalPartition::Unset()
@@ -594,6 +636,33 @@ PartitionMap::PrimaryPartitionAt(int32 index) const
 	if (index >= 0 && index < 4)
 		partition = fPrimaries + index;
 	return partition;
+}
+
+
+// CountNonEmptyPrimaryPartitions
+int32
+PartitionMap::CountNonEmptyPrimaryPartitions() const
+{
+	int32 count = 0;
+	for (int32 i = 0; i < 4; i++) {
+		if (!fPrimaries[i].IsEmpty())
+			count++;
+	}
+
+	return count;
+}
+
+
+// ExtendedPartitionIndex
+int32
+PartitionMap::ExtendedPartitionIndex() const
+{
+	for (int32 i = 0; i < 4; i++) {
+		if (fPrimaries[i].IsExtended())
+			return i;
+	}
+
+	return -1;
 }
 
 
