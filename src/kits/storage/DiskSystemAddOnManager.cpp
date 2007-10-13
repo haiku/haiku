@@ -5,9 +5,17 @@
 
 #include "DiskSystemAddOnManager.h"
 
+#include <exception>
+#include <set>
+#include <string>
+
+#include <Directory.h>
+#include <Entry.h>
 #include <image.h>
+#include <Path.h>
 
 #include <AppMisc.h>
+#include <AutoDeleter.h>
 #include <AutoLocker.h>
 
 #include <DiskSystemAddOn.h>
@@ -19,6 +27,17 @@ DiskSystemAddOnManager* DiskSystemAddOnManager::sManager = NULL;
 
 // AddOnImage
 struct DiskSystemAddOnManager::AddOnImage {
+	AddOnImage(image_id image)
+		: image(image),
+		  refCount(0)
+	{
+	}
+
+	~AddOnImage()
+	{
+		unload_add_on(image);
+	}
+
 	image_id			image;
 	int32				refCount;
 };
@@ -26,9 +45,20 @@ struct DiskSystemAddOnManager::AddOnImage {
 
 // AddOn
 struct DiskSystemAddOnManager::AddOn {
+	AddOn(AddOnImage* image, BDiskSystemAddOn* addOn)
+		: image(image),
+		  addOn(addOn)
+	{
+	}
+
 	AddOnImage*			image;
 	BDiskSystemAddOn*	addOn;
 	int32				refCount;
+};
+
+
+// StringSet
+struct DiskSystemAddOnManager::StringSet : std::set<std::string> {
 };
 
 
@@ -74,15 +104,27 @@ DiskSystemAddOnManager::Unlock()
 
 
 // LoadDiskSystems
-void
+status_t
 DiskSystemAddOnManager::LoadDiskSystems()
 {
 	AutoLocker<BLocker> _(fLock);
 
 	if (++fLoadCount > 1)
-		return;
+		return B_OK;
 
-	// TODO: Load the add-ons ...
+	StringSet alreadyLoaded;
+	status_t error = _LoadAddOns(alreadyLoaded, B_USER_ADDONS_DIRECTORY);
+
+	if (error == B_OK)
+		error = _LoadAddOns(alreadyLoaded, B_COMMON_ADDONS_DIRECTORY);
+
+	if (error == B_OK)
+		error = _LoadAddOns(alreadyLoaded, B_BEOS_ADDONS_DIRECTORY);
+
+	if (error != B_OK)
+		UnloadDiskSystems();
+
+	return error;
 }
 
 
@@ -92,10 +134,16 @@ DiskSystemAddOnManager::UnloadDiskSystems()
 {
 	AutoLocker<BLocker> _(fLock);
 
-	if (--fLoadCount == 0)
+	if (fLoadCount == 0 || --fLoadCount > 0)
 		return;
 
-	// TODO: Unload the add-ons ...
+	fAddOnsToBeUnloaded.AddList(&fAddOns);
+	fAddOns.MakeEmpty();
+
+	// put all add-ons -- that will cause them to be deleted as soon as they're
+	// unused
+	for (int32 i = fAddOnsToBeUnloaded.CountItems() - 1; i >= 0; i--)
+		_PutAddOn(i);
 }
 
 
@@ -147,13 +195,24 @@ DiskSystemAddOnManager::PutAddOn(BDiskSystemAddOn* _addOn)
 
 	for (int32 i = 0; AddOn* addOn = _AddOnAt(i); i++) {
 		if (_addOn == addOn->addOn) {
-			if (addOn->refCount == 0)
-				debugger("DiskSystemAddOnManager: unbalanced PutAddOn()");
-			else
+			if (addOn->refCount > 1) {
 				addOn->refCount--;
+			} else {
+				debugger("Unbalanced call to "
+					"DiskSystemAddOnManager::PutAddOn()");
+			}
+			return;
+		}
+
+	for (int32 i = 0;
+		 AddOn* addOn = (AddOn*)fAddOnsToBeUnloaded.ItemAt(i); i++) {
+		if (_addOn == addOn->addOn)
+			_PutAddOn(i);
 			return;
 		}
 	}
+
+	debugger("DiskSystemAddOnManager::PutAddOn(): disk system not found");
 }
 
 
@@ -161,6 +220,7 @@ DiskSystemAddOnManager::PutAddOn(BDiskSystemAddOn* _addOn)
 DiskSystemAddOnManager::DiskSystemAddOnManager()
 	: fLock("disk system add-ons manager"),
 	  fAddOns(),
+	  fAddOnsToBeUnloaded(),
 	  fLoadCount(0)
 {
 }
@@ -171,5 +231,116 @@ DiskSystemAddOnManager::AddOn*
 DiskSystemAddOnManager::_AddOnAt(int32 index) const
 {
 	return (AddOn*)fAddOns.ItemAt(index);
+}
+
+
+// _PutAddOn
+void
+DiskSystemAddOnManager::_PutAddOn(int32 index)
+{
+	AddOn* addOn = (AddOn*)fAddOnsToBeUnloaded.ItemAt(index);
+	if (!addOn)
+		return;
+
+	if (--addOn->refCount == 0) {
+		if (--addOn->image->refCount == 0)
+			delete addOn->image;
+
+		fAddOnsToBeUnloaded.RemoveItem(index);
+		delete addOn;
+	}
+}
+
+
+// _LoadAddOns
+status_t
+DiskSystemAddOnManager::_LoadAddOns(StringSet& alreadyLoaded,
+	directory_which addOnDir)
+{
+	// get the add-on directory path
+	BPath path;
+	status_t error = find_directory(addOnDir, &path, false);
+	if (error != B_OK)
+		return error;
+
+	error = path.Append("disk_systems");
+	if (error != B_OK)
+		return error;
+
+	if (!BEntry(path.Path()).Exists())
+		return B_OK;
+
+	// open the directory and iterate through its entries
+	BDirectory directory;
+	error = directory.SetTo(path.Path());
+	if (error != B_OK)
+		return error;
+
+	entry_ref ref;
+	while (directory.GetNextRef(&ref) == B_OK) {
+		// skip, if already loaded
+		if (alreadyLoaded.find(ref.name) != alreadyLoaded.end())
+			continue;
+
+		// get the entry path
+		BPath entryPath;
+		error = entryPath.SetTo(&ref);
+		if (error != B_OK) {
+			if (error == B_NO_MEMORY)
+				return error;
+			continue;
+		}
+
+		// load the add-on
+		image_id image = load_add_on(entryPath.Path());
+		if (image < 0)
+			continue;
+
+		AddOnImage* addOnImage = new(nothrow) AddOnImage(image);
+		if (!addOnImage) {
+			unload_add_on(image);
+			return B_NO_MEMORY;
+		}
+		ObjectDeleter<AddOnImage> addOnImageDeleter(addOnImage);
+
+		// get the add-on objects
+		status_t (*getAddOns)(BList*);
+		error = get_image_symbol(image, "get_disk_system_add_ons",
+			B_SYMBOL_TYPE_TEXT, (void**)&getAddOns);
+		if (error != B_OK)
+			continue;
+
+		BList addOns;
+		error = getAddOns(&addOns);
+		if (error != B_OK || addOns.IsEmpty())
+			continue;
+
+		// create and add AddOn objects
+		int32 count = addOns.CountItems();
+		for (int32 i = 0; i < count; i++) {
+			BDiskSystemAddOn* diskSystemAddOn
+				= (BDiskSystemAddOn*)addOns.ItemAt(i);
+			AddOn* addOn = new(nothrow) AddOn(addOnImage, diskSystemAddOn);
+			if (!addOn)
+				return B_NO_MEMORY;
+
+			if (fAddOns.AddItem(addOn)) {
+				addOnImage->refCount++;
+				addOnImageDeleter.Detach();
+			} else {
+				delete addOn;
+				return B_NO_MEMORY;
+			}
+		}
+
+		// add the add-on name to the set of already loaded add-ons
+		try {
+			alreadyLoaded.insert(ref.name);
+		} catch (std::bad_alloc& exception) {
+			return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
 }
 

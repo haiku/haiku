@@ -5,6 +5,7 @@
 #ifndef _DISK_SYSTEM_ADD_ON_MANAGER_H
 #define _DISK_SYSTEM_ADD_ON_MANAGER_H
 
+#include <FindDirectory.h>
 #include <List.h>
 #include <Locker.h>
 
@@ -23,7 +24,7 @@ public:
 			void				Unlock();
 
 			// load/unload all disk system add-ons
-			void				LoadDiskSystems();
+			status_t			LoadDiskSystems();
 			void				UnloadDiskSystems();
 
 			// manager must be locked
@@ -37,14 +38,20 @@ public:
 private:
 			struct AddOnImage;
 			struct AddOn;
+			struct StringSet;
 
 								DiskSystemAddOnManager();
 
 			AddOn*				_AddOnAt(int32 index) const;
+			void				_PutAddOn(int32 index);
+
+			status_t			_LoadAddOns(StringSet& alreadyLoaded,
+									directory_which directory);
 
 private:
 			mutable BLocker		fLock;
 			BList				fAddOns;
+			BList				fAddOnsToBeUnloaded;
 			int32				fLoadCount;
 
 	static	DiskSystemAddOnManager* sManager;
