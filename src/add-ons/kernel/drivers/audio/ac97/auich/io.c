@@ -112,7 +112,7 @@ auich_codec_wait(device_config *config)
 		if ((auich_reg_read_8(config, AUICH_REG_ACC_SEMA) & 0x01) == 0)
 			return B_OK;
 		if (i > 100)
-			snooze(1);
+			snooze(10);
 	}
 	return B_TIMED_OUT;
 }
