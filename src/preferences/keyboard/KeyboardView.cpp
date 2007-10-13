@@ -19,6 +19,9 @@
 #include "KeyboardView.h"
 #include "KeyboardMessages.h"
 
+// user interface
+const uint32 kBorderSpace = 10;
+const uint32 kItemSpace = 7;
 
 KeyboardView::KeyboardView(BRect rect)
  :	BView(rect, "keyboard_view", B_FOLLOW_LEFT | B_FOLLOW_TOP,
@@ -40,7 +43,7 @@ KeyboardView::KeyboardView(BRect rect)
 						fontHeight.leading;
 	
 	// Create the "Key repeat rate" slider...
-	frame.Set(10,10,10 + labelwidth,10 + (labelheight*2) + 20);
+	frame.Set(kBorderSpace,kBorderSpace,kBorderSpace + labelwidth,kBorderSpace + (labelheight*2) + (kBorderSpace*2));
 	fRepeatSlider = new BSlider(frame,"key_repeat_rate",
 										"Key repeat rate",
 										new BMessage(SLIDER_REPEAT_RATE),
@@ -52,7 +55,7 @@ KeyboardView::KeyboardView(BRect rect)
 	
 	
 	// Create the "Delay until key repeat" slider...
-	frame.OffsetBy(0,frame.Height() + 10);
+	frame.OffsetBy(0,frame.Height() + kBorderSpace);
 	fDelaySlider = new BSlider(frame,"delay_until_key_repeat",
 						"Delay until key repeat",
 						new BMessage(SLIDER_DELAY_RATE),250000,1000000,
@@ -64,7 +67,7 @@ KeyboardView::KeyboardView(BRect rect)
 	// Create the "Typing test area" text box...
 	frame.OffsetBy(0,frame.Height() + 15);
 	frame.right = fDelaySlider->Frame().right + fIconBitmap->Bounds().Width() +
-				  10;
+				  kBorderSpace;
 	BTextControl *textcontrol = new BTextControl(frame,"typing_test_area",NULL,
 									"Typing test area",
 									new BMessage('TTEA'),
@@ -76,10 +79,10 @@ KeyboardView::KeyboardView(BRect rect)
 	textcontrol->ResizeTo(frame.Width(),height);
 	
 	// Create the box for the sliders...
-	frame.left = frame.top = 10;
+	frame.left = frame.top = kBorderSpace;
 	frame.right = frame.left + fDelaySlider->Frame().right + 
-				fClockBitmap->Bounds().Width() + 20;
-	frame.bottom = textcontrol->Frame().bottom + 20;
+				fClockBitmap->Bounds().Width() + (kBorderSpace*2);
+	frame.bottom = textcontrol->Frame().bottom + (kBorderSpace*2);
 	fBox = new BBox(frame,"keyboard_box",B_FOLLOW_LEFT,B_WILL_DRAW,
 					B_FANCY_BORDER);
 	AddChild(fBox);
@@ -89,8 +92,8 @@ KeyboardView::KeyboardView(BRect rect)
 	fBox->AddChild(textcontrol);	
 
 	//Add the "Default" button..	
-	frame.left = 10;
-	frame.top = fBox->Frame().bottom + 10;
+	frame.left = kBorderSpace;
+	frame.top = fBox->Frame().bottom + kBorderSpace;
 	frame.right = frame.left + 1;
 	frame.bottom = frame.top + 1;
 	BButton *button = new BButton(frame,"keyboard_defaults","Defaults",
@@ -100,13 +103,14 @@ KeyboardView::KeyboardView(BRect rect)
 	
 	// Add the "Revert" button...
 	frame = button->Frame();
-	frame.OffsetBy(frame.Width() + 10, 0);
+	frame.OffsetBy(frame.Width() + kItemSpace, 0);
 	button = new BButton(frame,"keyboard_revert","Revert",
 						new BMessage(BUTTON_REVERT));
+	button->ResizeToPreferred();
 	button->SetEnabled(false);
 	AddChild(button);
 	
-	ResizeTo(fBox->Frame().right + 10, button->Frame().bottom + 10);
+	ResizeTo(fBox->Frame().right + kBorderSpace, button->Frame().bottom + kBorderSpace);
 }
 
 void

@@ -48,7 +48,7 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
-	BRect rect(Bounds().InsetByCopy(10,10));
+	BRect rect(Bounds().InsetByCopy(kBorderSpace,kBorderSpace));
 	
 	#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	
@@ -139,7 +139,7 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	rect.right = wellrect.right;
 	rect.OffsetTo((Bounds().Width()-rect.Width())/2,rect.top);
 	
-	fPicker = new BColorControl(BPoint(10,fScrollView->Frame().bottom+20),B_CELLS_32x8,5.0,"fPicker",
+	fPicker = new BColorControl(BPoint(fScrollView->Frame().left,fScrollView->Frame().bottom+kBorderSpace),B_CELLS_32x8,5.0,"fPicker",
 								new BMessage(UPDATE_COLOR));
 	AddChild(fPicker);
 	
@@ -148,19 +148,19 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 							B_FOLLOW_LEFT |B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
 	fDefaults->ResizeToPreferred();
 	fDefaults->SetEnabled(false);
-	fDefaults->MoveTo((fPicker->Frame().right-(fDefaults->Frame().Width()*2)-20)/2,fPicker->Frame().bottom+20);
+	fDefaults->MoveTo(fPicker->Frame().left,fPicker->Frame().bottom+kBorderSpace);
 	AddChild(fDefaults);
 	
 	
 	BRect cvrect(fDefaults->Frame());
-	cvrect.OffsetBy(cvrect.Width() + 20,0);
+	cvrect.OffsetBy(cvrect.Width() + kItemSpace,0);
 
 	fRevert = new BButton(cvrect,"RevertButton","Revert", 
 						new BMessage(REVERT_SETTINGS),
 						B_FOLLOW_LEFT |B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
+	fRevert->ResizeToPreferred();
 	fRevert->SetEnabled(false);
 	AddChild(fRevert);
-	
 }
 
 APRView::~APRView(void)

@@ -35,4 +35,9 @@
 
 #define SET_UI_COLORS 'suic'
 #define PREFS_CHOSEN 'prch'
+
+// user interface
+const uint32 kBorderSpace = 10;
+const uint32 kItemSpace = 7;
+
 #endif
