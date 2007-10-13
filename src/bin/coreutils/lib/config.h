@@ -1824,37 +1824,37 @@
 #define putenv rpl_putenv
 
 /* Define to rpl_re_comp if the replacement should be used. */
-#define re_comp rpl_re_comp
+/* #undef re_comp rpl_re_comp */
 
 /* Define to rpl_re_compile_fastmap if the replacement should be used. */
-#define re_compile_fastmap rpl_re_compile_fastmap
+/* #undef re_compile_fastmap rpl_re_compile_fastmap */
 
 /* Define to rpl_re_compile_pattern if the replacement should be used. */
-#define re_compile_pattern rpl_re_compile_pattern
+/* #undef re_compile_pattern rpl_re_compile_pattern */
 
 /* Define to rpl_re_exec if the replacement should be used. */
-#define re_exec rpl_re_exec
+/* #undef re_exec rpl_re_exec */
 
 /* Define to rpl_re_match if the replacement should be used. */
-#define re_match rpl_re_match
+/* #undef re_match rpl_re_match */
 
 /* Define to rpl_re_match_2 if the replacement should be used. */
-#define re_match_2 rpl_re_match_2
+/* #undef re_match_2 rpl_re_match_2 */
 
 /* Define to rpl_re_search if the replacement should be used. */
-#define re_search rpl_re_search
+/* #undef re_search rpl_re_search */
 
 /* Define to rpl_re_search_2 if the replacement should be used. */
-#define re_search_2 rpl_re_search_2
+/* #undef re_search_2 rpl_re_search_2 */
 
 /* Define to rpl_re_set_registers if the replacement should be used. */
-#define re_set_registers rpl_re_set_registers
+/* #undef re_set_registers rpl_re_set_registers */
 
 /* Define to rpl_re_set_syntax if the replacement should be used. */
-#define re_set_syntax rpl_re_set_syntax
+/* #undef re_set_syntax rpl_re_set_syntax */
 
 /* Define to rpl_re_syntax_options if the replacement should be used. */
-#define re_syntax_options rpl_re_syntax_options
+/* #undef re_syntax_options rpl_re_syntax_options */
 
 /* Define to rpl_realloc if the replacement function should be used. */
 /* #undef realloc */

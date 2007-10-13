@@ -134,7 +134,7 @@ StaticLibrary libfetish.a :
 	readtokens.c
 	readtokens0.c
 #	realloc.c
-	regex.c
+#	regex.c
 	rename-dest-slash.c
 	rename.c
 	root-dev-ino.c
