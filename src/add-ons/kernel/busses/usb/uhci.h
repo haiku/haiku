@@ -138,12 +138,10 @@ static int32						FinishIsochronousThread(void *data);
 		void						FinishIsochronousTransfers();
 		isochronous_transfer_data	*FindIsochronousTransfer(uhci_td *descriptor);
 
-		void						LinkIsochronousDescriptor(
+		status_t					LinkIsochronousDescriptor(
 										uhci_td *descriptor,
 										uint16 frame);
-		void						UnlinkIsochronousDescriptor(
-										uhci_td *descriptor,
-										uint16 frame);
+		uhci_td						*UnlinkIsochronousDescriptor(uint16 frame);
 
 		// Transfer queue functions
 		uhci_qh						*CreateTransferQueue(uhci_td *descriptor);
