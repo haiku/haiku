@@ -3,6 +3,9 @@ SubDir HAIKU_TOP src preferences time ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
+UsePrivateHeaders kernel ;
+UseArchHeaders $(TARGET_ARCH) ;
+
 Preference Time : 
 	AnalogClock.cpp 
 	BaseView.cpp 

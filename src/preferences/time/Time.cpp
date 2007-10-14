@@ -18,6 +18,9 @@
 #include <Message.h>
 
 
+#include <unistd.h>
+
+
 TimeApplication::TimeApplication()
 	: BApplication(HAIKU_APP_SIGNATURE),
 	  fWindow(NULL)
@@ -72,6 +75,7 @@ int
 main(int argc, char** argv)
 {
 	TimeApplication app;
+	setuid(0);
 	app.Run();
 
 	return 0;

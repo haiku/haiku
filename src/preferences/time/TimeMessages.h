@@ -36,7 +36,7 @@ const uint32 H_TM_CHANGED = 'obTC';
 const uint32 H_USER_CHANGE = 'obUC';
 
 // local/ gmt radiobuttons
-const uint32 H_RTC_CHANGE = 'obRC';
+const uint32 kRTCUpdate = '_rtc';
 
 // sunday/ monday radio button
 const uint32 kWeekStart = '_kws';

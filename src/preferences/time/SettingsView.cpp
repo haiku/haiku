@@ -27,6 +27,17 @@
 #include <Window.h>
 
 
+#include <stdlib.h>
+
+
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+#include <syscalls.h>
+#else
+void _kset_tzfilename_(const char *name, size_t length, bool isGMT);
+#define _kern_set_tzfilename _kset_tzfilename_
+#endif
+
+
 TSettingsView::TSettingsView(BRect frame)
 	: BView(frame,"Settings", B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP),
@@ -105,6 +116,10 @@ TSettingsView::MessageReceived(BMessage *message)
 			msg.AddBool("time", false);
 			Window()->PostMessage(&msg);
 		}	break;
+
+		case kRTCUpdate:
+			_UpdateGmtSettings();
+			break;
 
 		default:
 			BView::MessageReceived(message);
@@ -186,16 +201,18 @@ TSettingsView::_InitView()
 	frameRight.top = text->Frame().bottom + 5.0;
 
 	fLocalTime = new BRadioButton(frameRight, "local", "Local time",
-		new BMessage(H_RTC_CHANGE));
+		new BMessage(kRTCUpdate));
 	AddChild(fLocalTime);
 	fLocalTime->ResizeToPreferred();
+	fLocalTime->SetTarget(this);
 
 	frameRight.left = fLocalTime->Frame().right +10.0f;
 
-	fGmtTime = new BRadioButton(frameRight, "gmt", "GMT", new BMessage(H_RTC_CHANGE));
+	fGmtTime = new BRadioButton(frameRight, "gmt", "GMT", new BMessage(kRTCUpdate));
 	AddChild(fGmtTime);
 	fGmtTime->ResizeToPreferred();
-
+	fGmtTime->SetTarget(this);
+	
 	if (fIsLocalTime)
 		fLocalTime->SetValue(B_CONTROL_ON);
 	else
@@ -250,6 +267,29 @@ TSettingsView::_WriteRTCSettings()
 		else
 			file.Write("gmt", 3);
 	}
+}
+
+
+void
+TSettingsView::_UpdateGmtSettings()
+{
+	_WriteRTCSettings();
+
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
+		return;
+
+	path.Append("timezone");
+	BEntry entry(path.Path(), true);
+
+	if (!entry.Exists())
+		return;
+
+	entry.GetPath(&path);
+
+	// take the existing timezone and set it's gmt use
+	_kern_set_tzfilename(path.Path(), B_PATH_NAME_LENGTH
+		, fGmtTime->Value() == B_CONTROL_ON);
 }
 
 

@@ -35,6 +35,7 @@ class TSettingsView : public BView {
 		void 			_InitView();
 		void 			_ReadRTCSettings();
 		void			_WriteRTCSettings();
+		void			_UpdateGmtSettings();
 		void 			_UpdateDateTime(BMessage *message);
 
 	private:
