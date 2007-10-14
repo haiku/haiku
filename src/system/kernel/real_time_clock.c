@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2003, Jeff Ward, jeff@r2d2.stcloudstate.edu. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -30,22 +30,20 @@ static bigtime_t sTimezoneOffset = 0;
 static bool sDaylightSavingTime = false;
 
 
-/** Write the system time to CMOS. */
-
+/*! Write the system time to CMOS. */
 static void
 rtc_system_to_hw(void)
 {
 	uint32 seconds;
 
-	seconds = (arch_rtc_get_system_time_offset(sRealTimeData) + system_time() 
+	seconds = (arch_rtc_get_system_time_offset(sRealTimeData) + system_time()
 		+ (sIsGMT ? 0 : sTimezoneOffset)) / 1000000;
-	
+
 	arch_rtc_set_hw_time(seconds);
 }
 
 
-/** Read the CMOS clock and update the system time accordingly. */
-
+/*! Read the CMOS clock and update the system time accordingly. */
 static void
 rtc_hw_to_system(void)
 {
@@ -71,7 +69,7 @@ rtc_debug(int argc, char **argv)
 		uint32 currentTime;
 		bigtime_t systemTimeOffset
 			= arch_rtc_get_system_time_offset(sRealTimeData);
-	
+
 		currentTime = (systemTimeOffset + system_time()) / 1000000;
 		dprintf("system_time:  %Ld\n", system_time());
 		dprintf("system_time_offset:    %Ld\n", systemTimeOffset);
@@ -90,22 +88,22 @@ rtc_init(kernel_args *args)
 {
 	void *clonedRealTimeData;
 
-	area_id area = create_area("real time data", (void **)&sRealTimeData, B_ANY_KERNEL_ADDRESS,
-		PAGE_ALIGN(sizeof(struct real_time_data)), B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	area_id area = create_area("real time data", (void **)&sRealTimeData,
+		B_ANY_KERNEL_ADDRESS, PAGE_ALIGN(sizeof(struct real_time_data)),
+		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (area < B_OK) {
 		panic("rtc_init: error creating real time data area\n");
 		return area;
 	}
 
-	// On some systems like x86, a page cannot be read-only in userland and writable
-	// in the kernel. Therefore, we clone the real time data area here for user
-	// access; it doesn't hurt on other platforms, too.
+	// On some systems like x86, a page cannot be read-only in userland and
+	// writable in the kernel. Therefore, we clone the real time data area
+	// here for user access; it doesn't hurt on other platforms, too.
 	// The area is used to share time critical information, such as the system
 	// time conversion factor which can change at any time.
 
-	if (clone_area("real time data userland", &clonedRealTimeData, B_ANY_KERNEL_ADDRESS, 
-		B_READ_AREA, area) < B_OK) {
+	if (clone_area("real time data userland", &clonedRealTimeData,
+			B_ANY_KERNEL_ADDRESS, B_READ_AREA, area) < B_OK) {
 		dprintf("rtc_init: error creating real time data userland area\n");
 		// we don't panic because it's not kernel critical
 	}
@@ -150,6 +148,7 @@ get_rtc_info(rtc_info *info)
 {
 	if (info == NULL)
 		return B_BAD_VALUE;
+
 	info->time = real_time_clock();
 	info->is_gmt = sIsGMT;
 	info->tz_minuteswest = sTimezoneOffset / 1000000LL;
@@ -193,7 +192,7 @@ secs_this_year(uint32 year)
 {
 	if (leap_year(year))
 		return 31622400;
-	
+
 	return 31536000;
 }
 
@@ -292,10 +291,9 @@ rtc_secs_to_tm(uint32 seconds, struct tm *t)
 //	#pragma mark -
 
 
-/**	This is called from the gettimeofday() implementation that's part of the
- *	kernel.
- */
-
+/*!	This is called from the gettimeofday() implementation that's part of the
+	kernel.
+*/
 status_t
 _kern_get_timezone(time_t *_timezoneOffset, bool *_daylightSavingTime)
 {
@@ -336,15 +334,16 @@ _user_set_timezone(time_t timezoneOffset, bool daylightSavingTime)
 		return B_NOT_ALLOWED;
 
 	TRACE(("old system_time_offset %Ld old %Ld new %Ld gmt %d\n",
-		arch_rtc_get_system_time_offset(sRealTimeData), sTimezoneOffset, offset,
-		sIsGMT));
+		arch_rtc_get_system_time_offset(sRealTimeData), sTimezoneOffset,
+		offset, sIsGMT));
 
 	// We only need to update our time offset if the hardware clock
 	// does not run in the local timezone.
 	// Since this is shared data, we need to update it atomically.
 	if (!sIsGMT) {
 		arch_rtc_set_system_time_offset(sRealTimeData,
-			arch_rtc_get_system_time_offset(sRealTimeData) + sTimezoneOffset - offset);
+			arch_rtc_get_system_time_offset(sRealTimeData) + sTimezoneOffset
+				- offset);
 	}
 
 	sTimezoneOffset = offset;
@@ -362,9 +361,11 @@ _user_get_timezone(time_t *_timezoneOffset, bool *_daylightSavingTime)
 {
 	time_t offset = (time_t)(sTimezoneOffset / 1000000LL);
 
-	if (!IS_USER_ADDRESS(_timezoneOffset) || !IS_USER_ADDRESS(_daylightSavingTime)
+	if (!IS_USER_ADDRESS(_timezoneOffset)
+		|| !IS_USER_ADDRESS(_daylightSavingTime)
 		|| user_memcpy(_timezoneOffset, &offset, sizeof(time_t)) < B_OK
-		|| user_memcpy(_daylightSavingTime, &sDaylightSavingTime, sizeof(bool)) < B_OK)
+		|| user_memcpy(_daylightSavingTime, &sDaylightSavingTime,
+				sizeof(bool)) < B_OK)
 		return B_BAD_ADDRESS;
 
 	return B_OK;
@@ -379,7 +380,8 @@ _user_set_tzfilename(const char *filename, size_t length, bool isGMT)
 
 	if (!IS_USER_ADDRESS(filename)
 		|| filename == NULL
-		|| user_strlcpy(sTimezoneFilename, filename, B_PATH_NAME_LENGTH) < B_OK)
+		|| user_strlcpy(sTimezoneFilename, filename,
+				B_PATH_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
 
 	// ToDo: Shouldn't this update the system_time_offset as well?
