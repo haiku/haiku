@@ -476,7 +476,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 
 	while (true) {
 		bigtime_t snoozeAmount = 40000;
-		bool locked = window->Lock();//WithTimeout(200000)
+		bool locked = (Window() != NULL && window->Lock());//WithTimeout(200000)
 		if (!locked)
 			break;
 
