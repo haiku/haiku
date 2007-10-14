@@ -1,27 +1,11 @@
-//------------------------------------------------------------------------------
-//     Copyright (c) 2005, Jan-Rixt Van Hoye
-//
-//     Permission is hereby granted, free of charge, to any person obtaining a
-//     copy of this software and associated documentation files (the "Software"),
-//     to deal in the Software without restriction, including without limitation
-//     the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//     and/or sell copies of the Software, and to permit persons to whom the
-//     Software is furnished to do so, subject to the following conditions:
-//
-//     The above copyright notice and this permission notice shall be included in
-//     all copies or substantial portions of the Software.
-//
-//     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//     DEALINGS IN THE SOFTWARE.
-//
-//     ------------------------------------------------------------------------
-//     Authors:
-//     		Salvatore Benedetto <salvatore.benedetto@gmail.com>
+/*
+ * Copyright 2005-2008, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *             Jan-Rixt Van Hoye
+ *             Salvatore Benedetto <salvatore.benedetto@gmail.com>
+ */
 
 #include <module.h>
 #include <PCI.h>
@@ -32,6 +16,40 @@
 #include "ohci.h"
 
 pci_module_info *OHCI::sPCIModule = NULL;
+ 
+
+static int32
+ohci_std_ops( int32 op , ... )
+{
+	switch (op)	{
+		case B_MODULE_INIT:
+			TRACE(("usb_ohci_module: init module\n"));
+			return B_OK;
+		case B_MODULE_UNINIT:
+			TRACE(("usb_ohci_module: uninit module\n"));
+			return B_OK;
+	}
+
+	return EINVAL;
+}
+
+
+host_controller_info ohci_module = {
+	{
+		"busses/usb/ohci",
+		0,
+		ohci_std_ops
+	},
+	NULL,
+	OHCI::AddTo
+};
+
+
+module_info *modules[] = {
+	(module_info *) &ohci_module,
+	NULL
+};
+
 
 //------------------------------------------------------
 //	OHCI:: 	Reverse the bits in a value between 0 and 31
@@ -42,146 +60,12 @@ static uint8 revbits[OHCI_NUMBER_OF_INTERRUPTS] =
     0x02, 0x12, 0x0a, 0x1a, 0x06, 0x16, 0x0e, 0x1e,
     0x01, 0x11, 0x09, 0x19, 0x05, 0x15, 0x0d, 0x1d,
     0x03, 0x13, 0x0b, 0x1b, 0x07, 0x17, 0x0f, 0x1f };
-    
-
-static int32
-ohci_std_ops( int32 op , ... )
-{
-	switch (op)
-	{
-		case B_MODULE_INIT:
-			TRACE(("usb_ohci_module: init module\n"));
-			return B_OK;
-		case B_MODULE_UNINIT:
-			TRACE(("usb_ohci_module: uninit module\n"));
-			break;
-		default:
-			return EINVAL;
-	}
-
-	return B_OK;
-}	
-
-//------------------------------------------------------------------------
-//	OHCI::	Give an reference of a stack instance to the OHCI module
-//		
-//		parameters:	
-//					- &stack: reference to a stack instance form stack.cpp
-//------------------------------------------------------------------------
-
-status_t
-OHCI::AddTo(Stack *stack)
-{
-#ifdef TRACE_USB
-	set_dprintf_enabled(true); 
-	load_driver_symbols("ohci");
-#endif
-	
-	if (!sPCIModule) {
-		status_t status = get_module(B_PCI_MODULE_NAME, (module_info **)&sPCIModule);
-		if (status < B_OK) {
-			TRACE_ERROR(("usb_ohci: AddTo(): getting pci module failed! 0x%08lx\n",
-				status));
-			return status;
-		}
-	}
-
-	TRACE(("usb_ohci: AddTo(): setting up hardware\n"));
-
-	bool found = false;
-	pci_info *item = new(std::nothrow) pci_info;
-	if (!item) {
-		sPCIModule = NULL;
-		put_module(B_PCI_MODULE_NAME);
-		return B_NO_MEMORY;
-	}
-
-	for (uint32 i = 0 ; sPCIModule->get_nth_pci_info(i, item) >= B_OK; i++) {
-
-		if (item->class_base == PCI_serial_bus && item->class_sub == PCI_usb
-			&& item->class_api == PCI_usb_ohci) {
-			if (item->u.h0.interrupt_line == 0
-				|| item->u.h0.interrupt_line == 0xFF) {
-				TRACE_ERROR(("usb_ohci: AddTo(): found with invalid IRQ -"
-					" check IRQ assignement\n"));
-				continue;
-			}
-
-			TRACE(("usb_ohci: AddTo(): found at IRQ %u\n",
-				item->u.h0.interrupt_line));
-			OHCI *bus = new(std::nothrow) OHCI(item, stack);
-			if (!bus) {
-				delete item;
-				sPCIModule = NULL;
-				put_module(B_PCI_MODULE_NAME);
-				return B_NO_MEMORY;
-			}
-
-			if (bus->InitCheck() < B_OK) {
-				TRACE_ERROR(("usb_ohci: AddTo(): InitCheck() failed 0x%08lx\n",
-					bus->InitCheck()));
-				delete bus;
-				continue;
-			}
-
-			// the bus took it away
-			item = new(std::nothrow) pci_info;
-
-			bus->Start();
-			stack->AddBusManager(bus);
-			found = true;
-		}
-	}
-
-	if (!found) {
-		TRACE_ERROR(("usb_ohci: no devices found\n"));
-		delete item;
-		put_module(B_PCI_MODULE_NAME);
-		return ENODEV;
-	}
-
-	delete item;
-	return B_OK;
-}
-
-
-//------------------------------------------------------------------------
-//	OHCI::	Host controller information
-//		
-//		parameters:	none
-//------------------------------------------------------------------------
-
-host_controller_info ohci_module = {
-	{
-		"busses/usb/ohci", 
-		0,
-		ohci_std_ops
-	},
-	NULL,
-	OHCI::AddTo
-};
-
-//------------------------------------------------------------------------
-//	OHCI::	Module information
-//		
-//		parameters:	none
-//------------------------------------------------------------------------
-
-module_info *modules[] = { 
-	(module_info *) &ohci_module,
-	NULL 
-};
-
-//------------------------------------------------------------------------
-//	OHCI::	Constructor/Initialisation
-//		
-//		parameters:	
-//					- info:		pointer to a pci information structure
-//					- stack:	pointer to a stack instance
-//------------------------------------------------------------------------
+ 
 
 OHCI::OHCI(pci_info *info, Stack *stack)
 	:	BusManager(stack),
+		fPCIInfo(info),
+		fStack(stack),
 		fRegisterArea(-1),
 		fHccaArea(-1),
 		fDummyControl(0),
@@ -191,14 +75,13 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		fRootHubAddress(0),
 		fNumPorts(0)
 {
-	fPCIInfo = info;
-	fStack = stack;
 	int i;
 	TRACE(("usb_ohci: constructing new BusManager\n"));
 	
 	fInitOK = false;
 	
-	for(i = 0; i < OHCI_NO_EDS; i++) //Clear the interrupt list
+	fInterruptEndpoints = new(std::nothrow) uint32[OHCI_NUMBER_OF_INTERRUPTS];
+	for(i = 0; i < OHCI_NUMBER_OF_INTERRUPTS; i++) //Clear the interrupt list
 		fInterruptEndpoints[i] = 0;
 
 	// enable busmaster and memory mapped access 
@@ -338,6 +221,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	fInitOK = true;
 }
 
+
 OHCI::~OHCI()
 {
 	if (fHccaArea > 0)
@@ -356,6 +240,7 @@ OHCI::~OHCI()
 		if (fInterruptEndpoints[i])
 			FreeEndpoint(fInterruptEndpoints[i]);
 }
+
 
 status_t
 OHCI::Start()
@@ -388,7 +273,9 @@ OHCI::Start()
 	return B_OK;
 }
 
-status_t OHCI::SubmitTransfer( Transfer *t )
+
+status_t
+OHCI::SubmitTransfer(Transfer *t)
 {
 	TRACE(("usb OHCI::SubmitTransfer: called for device %d\n", t->TransferPipe()->DeviceAddress()));
 
@@ -397,6 +284,7 @@ status_t OHCI::SubmitTransfer( Transfer *t )
 
 	return B_ERROR;
 }
+
 
 status_t
 OHCI::NotifyPipeChange(Pipe *pipe, usb_change change)
@@ -418,11 +306,88 @@ OHCI::NotifyPipeChange(Pipe *pipe, usb_change change)
 	return B_ERROR; //We should never go here
 }
 
+
+status_t
+OHCI::AddTo(Stack *stack)
+{
+#ifdef TRACE_USB
+	set_dprintf_enabled(true); 
+	load_driver_symbols("ohci");
+#endif
+	
+	if (!sPCIModule) {
+		status_t status = get_module(B_PCI_MODULE_NAME, (module_info **)&sPCIModule);
+		if (status < B_OK) {
+			TRACE_ERROR(("usb_ohci: AddTo(): getting pci module failed! 0x%08lx\n",
+				status));
+			return status;
+		}
+	}
+
+	TRACE(("usb_ohci: AddTo(): setting up hardware\n"));
+
+	bool found = false;
+	pci_info *item = new(std::nothrow) pci_info;
+	if (!item) {
+		sPCIModule = NULL;
+		put_module(B_PCI_MODULE_NAME);
+		return B_NO_MEMORY;
+	}
+
+	for (uint32 i = 0 ; sPCIModule->get_nth_pci_info(i, item) >= B_OK; i++) {
+
+		if (item->class_base == PCI_serial_bus && item->class_sub == PCI_usb
+			&& item->class_api == PCI_usb_ohci) {
+			if (item->u.h0.interrupt_line == 0
+				|| item->u.h0.interrupt_line == 0xFF) {
+				TRACE_ERROR(("usb_ohci: AddTo(): found with invalid IRQ -"
+					" check IRQ assignement\n"));
+				continue;
+			}
+
+			TRACE(("usb_ohci: AddTo(): found at IRQ %u\n",
+				item->u.h0.interrupt_line));
+			OHCI *bus = new(std::nothrow) OHCI(item, stack);
+			if (!bus) {
+				delete item;
+				sPCIModule = NULL;
+				put_module(B_PCI_MODULE_NAME);
+				return B_NO_MEMORY;
+			}
+
+			if (bus->InitCheck() < B_OK) {
+				TRACE_ERROR(("usb_ohci: AddTo(): InitCheck() failed 0x%08lx\n",
+					bus->InitCheck()));
+				delete bus;
+				continue;
+			}
+
+			// the bus took it away
+			item = new(std::nothrow) pci_info;
+
+			bus->Start();
+			stack->AddBusManager(bus);
+			found = true;
+		}
+	}
+
+	if (!found) {
+		TRACE_ERROR(("usb_ohci: no devices found\n"));
+		delete item;
+		put_module(B_PCI_MODULE_NAME);
+		return ENODEV;
+	}
+
+	delete item;
+	return B_OK;
+}
+
+
 status_t
 OHCI::GetPortStatus(uint8 index, usb_port_status *status)
 {
 	TRACE(("OHCI::%s(%ud, )\n", __FUNCTION__, index));
-	if (index > fNumPorts)
+	if (index >= fNumPorts)
 		return B_BAD_INDEX;
 	
 	status->status = status->change = 0;
@@ -462,6 +427,7 @@ OHCI::GetPortStatus(uint8 index, usb_port_status *status)
 	return B_OK;
 }
 
+
 status_t
 OHCI::SetPortFeature(uint8 index, uint16 feature)
 {
@@ -482,6 +448,7 @@ OHCI::SetPortFeature(uint8 index, uint16 feature)
 	return B_BAD_VALUE;
 }
 
+
 status_t
 OHCI::ClearPortFeature(uint8 index, uint16 feature)
 {
@@ -501,6 +468,7 @@ OHCI::ClearPortFeature(uint8 index, uint16 feature)
 	
 	return B_BAD_VALUE;
 }
+
 
 Endpoint *
 OHCI::AllocateEndpoint()
@@ -527,6 +495,7 @@ OHCI::AllocateEndpoint()
 	return endpoint;
 }
 
+
 void
 OHCI::FreeEndpoint(Endpoint *end)
 {
@@ -534,6 +503,7 @@ OHCI::FreeEndpoint(Endpoint *end)
 	fStack->FreeChunk((void *)end->ed, (void *) end->physicaladdress, sizeof(ohci_endpoint_descriptor));
 	delete end;
 }
+
 
 TransferDescriptor *
 OHCI::AllocateTransfer()
@@ -549,7 +519,8 @@ OHCI::AllocateTransfer()
 	memset((void *)transfer->td, 0, sizeof(ohci_general_transfer_descriptor));
 	return transfer;
 }	
-	
+
+
 void
 OHCI::FreeTransfer(TransferDescriptor *trans)
 {
@@ -557,6 +528,7 @@ OHCI::FreeTransfer(TransferDescriptor *trans)
 	fStack->FreeChunk((void *)trans->td, (void *) trans->physicaladdress, sizeof(ohci_general_transfer_descriptor));
 	delete trans;
 }
+
 
 status_t
 OHCI::InsertEndpointForPipe(Pipe *p)
@@ -650,7 +622,6 @@ OHCI::InsertEndpointForPipe(Pipe *p)
 	return B_OK;
 }
 
-pci_module_info *sPCIModule = 0;
 
 void
 OHCI::WriteReg(uint32 reg, uint32 value)
@@ -659,6 +630,7 @@ OHCI::WriteReg(uint32 reg, uint32 value)
 	*(volatile uint32 *)(fRegisterBase + reg) = value;
 }
 
+
 uint32
 OHCI::ReadReg(uint32 reg)
 {
@@ -666,9 +638,9 @@ OHCI::ReadReg(uint32 reg)
 	return *(volatile uint32 *)(fRegisterBase + reg);
 }
 
+
 status_t
 OHCI::CancelQueuedTransfers(Pipe *pipe)
 {
 	return B_ERROR;
 }
-

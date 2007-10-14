@@ -1,27 +1,11 @@
-//------------------------------------------------------------------------------
-//     Copyright (c) 2005, Jan-Rixt Van Hoye
-//
-//     Permission is hereby granted, free of charge, to any person obtaining a
-//     copy of this software and associated documentation files (the "Software"),
-//     to deal in the Software without restriction, including without limitation
-//     the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//     and/or sell copies of the Software, and to permit persons to whom the
-//     Software is furnished to do so, subject to the following conditions:
-//
-//     The above copyright notice and this permission notice shall be included in
-//     all copies or substantial portions of the Software.
-//
-//     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//     DEALINGS IN THE SOFTWARE.
-//-------------------------------------------------------------------------------
-//     Authors:
-//     		Salvatore Benedetto <salvatore.benedetto@gmail.com>
-
+/*
+ * Copyright 2005-2008, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *             Jan-Rixt Van Hoye
+ *             Salvatore Benedetto <salvatore.benedetto@gmail.com>
+ */
 
 #ifndef OHCI_H
 #define OHCI_H
@@ -63,14 +47,40 @@ typedef struct hcd_soft_itransfer
 
 #define OHCI_NO_EDS (2 * OHCI_NUMBER_OF_INTERRUPTS - 1)
 
-// --------------------------------
-//	OHCI: 	The OHCI class derived 
-//			from the BusManager
-// --------------------------------
+//
+// Endpoint: wrapper around the hardware endpoints
+//
+
+struct Endpoint
+{
+	addr_t						physicaladdress;//Point to the physical address
+	ohci_endpoint_descriptor	*ed;			//Logical 'endpoint'
+	Endpoint					*next;			//Pointer to the 'next' endpoint
+	TransferDescriptor			*head, *tail;	//Pointers to the 'head' and 'tail' transfer descriptors
+
+	//Utility functions
+	void SetNext(Endpoint *end) {
+		next = end;
+		if (end == 0)
+			ed->next_endpoint = 0;
+		else
+			ed->next_endpoint = end->physicaladdress;
+	}; 
+	
+	//Constructor (or better: initialiser)
+	Endpoint() : physicaladdress(0), ed(0), next(0), head(0), tail(0) {};
+};
+
+
+struct TransferDescriptor
+{
+	addr_t						physicaladdress;
+	ohci_general_transfer_descriptor	*td;
+};
+
 
 class OHCI : public BusManager
 {
-	friend class OHCIRootHub;
 public:
 
 									OHCI(pci_info *info, Stack *stack);
@@ -97,7 +107,7 @@ private:
 inline	void						WriteReg(uint32 reg, uint32 value);
 inline	uint32						ReadReg(uint32 reg);
 
-	// Global
+		// Global
 static	pci_module_info				*sPCIModule;
 
 		uint32						*fRegisterBase;
@@ -106,21 +116,21 @@ static	pci_module_info				*sPCIModule;
 
 		area_id						fRegisterArea;
 
-	// HCCA
-	area_id						fHccaArea;
-	struct ohci_hcca			*fHcca;					// The HCCA structure for the interupt communication
-	Endpoint					*fInterruptEndpoints[OHCI_NO_EDS];	// The interrupt endpoint list
-	// Dummy endpoints
-	Endpoint					*fDummyControl;
-	Endpoint					*fDummyBulk;
-	Endpoint					*fDummyIsochronous;
-	// functions
-	Endpoint					*AllocateEndpoint(); 	// allocate memory for an endpoint
-	void						FreeEndpoint(Endpoint *end); // Free endpoint
-	TransferDescriptor			*AllocateTransfer();    // create a NULL transfer
-	void						FreeTransfer(TransferDescriptor *trans); // Free transfer
+		// HCCA
+		area_id						fHccaArea;
+		struct ohci_hcca			*fHcca;	
+		Endpoint					*fInterruptEndpoints[OHCI_NO_EDS];
+		// Dummy endpoints
+		Endpoint					*fDummyControl;
+		Endpoint					*fDummyBulk;
+		Endpoint					*fDummyIsochronous;
+		// functions
+		Endpoint					*AllocateEndpoint(); 
+		void						FreeEndpoint(Endpoint *end);
+		TransferDescriptor			*AllocateTransfer();
+		void						FreeTransfer(TransferDescriptor *trans);
 
-	status_t					InsertEndpointForPipe(Pipe *p);
+		status_t					InsertEndpointForPipe(Pipe *p);
 
 		// Root Hub
 		OHCIRootHub 				*fRootHub;
@@ -128,47 +138,15 @@ static	pci_module_info				*sPCIModule;
 		uint8						fNumPorts;
 };
 
-// --------------------------------
-//	OHCI:	The root hub of the OHCI 
-//			controller derived from 
-//			the Hub class
-// --------------------------------
 
-class OHCIRootHub : public Hub
-{
-	public:
-		OHCIRootHub(OHCI *ohci, int8 deviceAddress);
-		status_t 			ProcessTransfer(Transfer *t, OHCI *ohci);
+class OHCIRootHub : public Hub {
+public:
+									OHCIRootHub(Object *rootObject,
+										int8 deviceAddress);
+
+static	status_t	 				ProcessTransfer(OHCI *ohci,
+										Transfer *transfer);
 };
 
-//
-// Endpoint: wrapper around the hardware endpoints
-//
-
-struct Endpoint
-{
-	addr_t						physicaladdress;//Point to the physical address
-	ohci_endpoint_descriptor	*ed;			//Logical 'endpoint'
-	Endpoint					*next;			//Pointer to the 'next' endpoint
-	TransferDescriptor			*head, *tail;	//Pointers to the 'head' and 'tail' transfer descriptors
-
-	//Utility functions
-	void SetNext(Endpoint *end) {
-		next = end;
-		if (end == 0)
-			ed->next_endpoint = 0;
-		else
-			ed->next_endpoint = end->physicaladdress;
-	}; 
-	
-	//Constructor (or better: initialiser)
-	Endpoint() : physicaladdress(0), ed(0), next(0), head(0), tail(0) {};
-};
-
-struct TransferDescriptor
-{
-	addr_t						physicaladdress;
-	ohci_general_transfer_descriptor	*td;
-};
 
 #endif // OHCI_H
