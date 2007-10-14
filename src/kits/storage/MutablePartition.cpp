@@ -260,9 +260,9 @@ BMutablePartition::CreateChild(int32 index, BMutablePartition** _child)
 	if (!partition)
 		return B_NO_MEMORY;
 
-	// create the MutableDelegate
-	BPartition::MutableDelegate* delegate
-		= new(nothrow) BPartition::MutableDelegate(partition);
+	// create the delegate
+	BPartition::Delegate* delegate
+		= new(nothrow) BPartition::Delegate(partition);
 	if (!delegate) {
 		delete partition;
 		return B_NO_MEMORY;
@@ -386,7 +386,7 @@ BMutablePartition::SetChildCookie(void* cookie)
 
 
 // constructor
-BMutablePartition::BMutablePartition(BPartition::MutableDelegate* delegate)
+BMutablePartition::BMutablePartition(BPartition::Delegate* delegate)
 	: fDelegate(delegate),
 	  fData(NULL),
 	  fParent(NULL),
@@ -467,7 +467,7 @@ BMutablePartition::PartitionData() const
 
 
 // GetDelegate
-BPartition::MutableDelegate*
+BPartition::Delegate*
 BMutablePartition::GetDelegate() const
 {
 	return fDelegate;

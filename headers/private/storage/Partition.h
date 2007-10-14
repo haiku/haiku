@@ -142,8 +142,6 @@ public:
 	
 private:
 	class Delegate;
-	class ImmutableDelegate;
-	class MutableDelegate;
 
 	BPartition();
 	BPartition(const BPartition &);

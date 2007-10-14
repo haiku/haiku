@@ -72,7 +72,7 @@ public:
 
 private:
 								BMutablePartition(
-									BPartition::MutableDelegate* delegate);
+									BPartition::Delegate* delegate);
 								~BMutablePartition();
 
 			status_t			Init(const user_partition_data* partitionData,
@@ -81,11 +81,11 @@ private:
 			const user_partition_data* PartitionData() const;
 
 private:
-			friend class BPartition::MutableDelegate;
+			friend class BPartition::Delegate;
 
-			BPartition::MutableDelegate* GetDelegate() const;
+			BPartition::Delegate* GetDelegate() const;
 
-			BPartition::MutableDelegate* fDelegate;
+			BPartition::Delegate* fDelegate;
 			user_partition_data* fData;
 			BMutablePartition*	fParent;
 			BList				fChildren;

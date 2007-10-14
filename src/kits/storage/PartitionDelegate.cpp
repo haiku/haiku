@@ -10,12 +10,12 @@
 #include "DiskSystemAddOnManager.h"
 
 
-// #pragma mark - Delegate
-
-
 // constructor
 BPartition::Delegate::Delegate(BPartition* partition)
-	: fPartition(partition)
+	: fPartition(partition),
+	  fMutablePartition(this),
+	  fDiskSystem(NULL),
+	  fPartitionHandle(NULL)
 {
 }
 
@@ -26,28 +26,9 @@ BPartition::Delegate::~Delegate()
 }
 
 
-// #pragma mark - MutableDelegate
-
-
-// constructor
-BPartition::MutableDelegate::MutableDelegate(BPartition* partition)
-	: Delegate(partition),
-	  fMutablePartition(this),
-	  fDiskSystem(NULL),
-	  fPartitionHandle(NULL)
-{
-}
-
-
-// destructor
-BPartition::MutableDelegate::~MutableDelegate()
-{
-}
-
-
 // MutablePartition
 BMutablePartition*
-BPartition::MutableDelegate::MutablePartition()
+BPartition::Delegate::MutablePartition()
 {
 	return &fMutablePartition;
 }
@@ -55,7 +36,7 @@ BPartition::MutableDelegate::MutablePartition()
 
 // MutablePartition
 const BMutablePartition*
-BPartition::MutableDelegate::MutablePartition() const
+BPartition::Delegate::MutablePartition() const
 {
 	return &fMutablePartition;
 }
@@ -63,10 +44,9 @@ BPartition::MutableDelegate::MutablePartition() const
 
 // InitHierarchy
 status_t
-BPartition::MutableDelegate::InitHierarchy(
-	const user_partition_data* partitionData, Delegate* _parent)
+BPartition::Delegate::InitHierarchy(
+	const user_partition_data* partitionData, Delegate* parent)
 {
-	MutableDelegate* parent = dynamic_cast<MutableDelegate*>(_parent);
 	return fMutablePartition.Init(partitionData,
 		parent ? &parent->fMutablePartition : NULL);
 }
@@ -74,7 +54,7 @@ BPartition::MutableDelegate::InitHierarchy(
 
 // InitAfterHierarchy
 status_t
-BPartition::MutableDelegate::InitAfterHierarchy()
+BPartition::Delegate::InitAfterHierarchy()
 {
 	if (!fMutablePartition.ContentType())
 		return B_OK;
@@ -104,7 +84,7 @@ BPartition::MutableDelegate::InitAfterHierarchy()
 
 // PartitionData
 const user_partition_data*
-BPartition::MutableDelegate::PartitionData() const
+BPartition::Delegate::PartitionData() const
 {
 	return fMutablePartition.PartitionData();
 }
@@ -112,7 +92,7 @@ BPartition::MutableDelegate::PartitionData() const
 
 // ChildAt
 BPartition::Delegate*
-BPartition::MutableDelegate::ChildAt(int32 index) const
+BPartition::Delegate::ChildAt(int32 index) const
 {
 	BMutablePartition* child = fMutablePartition.ChildAt(index);
 	return child ? child->GetDelegate() : NULL;
@@ -121,7 +101,7 @@ BPartition::MutableDelegate::ChildAt(int32 index) const
 
 // CountChildren
 int32
-BPartition::MutableDelegate::CountChildren() const
+BPartition::Delegate::CountChildren() const
 {
 	return fMutablePartition.CountChildren();
 }
@@ -129,7 +109,7 @@ BPartition::MutableDelegate::CountChildren() const
 
 // SupportedOperations
 uint32
-BPartition::MutableDelegate::SupportedOperations(uint32 mask)
+BPartition::Delegate::SupportedOperations(uint32 mask)
 {
 	if (!fPartitionHandle)
 		return 0;
@@ -140,20 +120,20 @@ BPartition::MutableDelegate::SupportedOperations(uint32 mask)
 
 // SupportedChildOperations
 uint32
-BPartition::MutableDelegate::SupportedChildOperations(Delegate* child,
+BPartition::Delegate::SupportedChildOperations(Delegate* child,
 	uint32 mask)
 {
 	if (!fPartitionHandle)
 		return 0;
 
-	return fPartitionHandle->SupportedChildOperations(
-		((MutableDelegate*)child)->MutablePartition(), mask);
+	return fPartitionHandle->SupportedChildOperations(child->MutablePartition(),
+		mask);
 }
 
 
 // Defragment
 status_t
-BPartition::MutableDelegate::Defragment()
+BPartition::Delegate::Defragment()
 {
 // TODO: Implement!
 	return B_BAD_VALUE;
@@ -162,7 +142,7 @@ BPartition::MutableDelegate::Defragment()
 
 // Repair
 status_t
-BPartition::MutableDelegate::Repair(bool checkOnly)
+BPartition::Delegate::Repair(bool checkOnly)
 {
 // TODO: Implement!
 	return B_BAD_VALUE;
@@ -171,7 +151,7 @@ BPartition::MutableDelegate::Repair(bool checkOnly)
 
 // ValidateResize
 status_t
-BPartition::MutableDelegate::ValidateResize(off_t* size) const
+BPartition::Delegate::ValidateResize(off_t* size) const
 {
 	if (!fPartitionHandle)
 		return B_NO_INIT;
@@ -182,11 +162,8 @@ BPartition::MutableDelegate::ValidateResize(off_t* size) const
 
 // ValidateResizeChild
 status_t
-BPartition::MutableDelegate::ValidateResizeChild(Delegate* _child,
-	off_t* size) const
+BPartition::Delegate::ValidateResizeChild(Delegate* child, off_t* size) const
 {
-	MutableDelegate* child = dynamic_cast<MutableDelegate*>(_child);
-
 	if (!fPartitionHandle || !child)
 		return B_NO_INIT;
 
@@ -197,7 +174,7 @@ BPartition::MutableDelegate::ValidateResizeChild(Delegate* _child,
 
 // Resize
 status_t
-BPartition::MutableDelegate::Resize(off_t size)
+BPartition::Delegate::Resize(off_t size)
 {
 	if (!fPartitionHandle)
 		return B_NO_INIT;
@@ -208,10 +185,8 @@ BPartition::MutableDelegate::Resize(off_t size)
 
 // ResizeChild
 status_t
-BPartition::MutableDelegate::ResizeChild(Delegate* _child, off_t size)
+BPartition::Delegate::ResizeChild(Delegate* child, off_t size)
 {
-	MutableDelegate* child = dynamic_cast<MutableDelegate*>(_child);
-
 	if (!fPartitionHandle || !child)
 		return B_NO_INIT;
 
@@ -221,7 +196,7 @@ BPartition::MutableDelegate::ResizeChild(Delegate* _child, off_t size)
 
 // ValidateMove
 status_t
-BPartition::MutableDelegate::ValidateMove(off_t* offset) const
+BPartition::Delegate::ValidateMove(off_t* offset) const
 {
 	if (!fPartitionHandle)
 		return B_NO_INIT;
@@ -232,11 +207,8 @@ BPartition::MutableDelegate::ValidateMove(off_t* offset) const
 
 // ValidateMoveChild
 status_t
-BPartition::MutableDelegate::ValidateMoveChild(Delegate* _child,
-	off_t* offset) const
+BPartition::Delegate::ValidateMoveChild(Delegate* child, off_t* offset) const
 {
-	MutableDelegate* child = dynamic_cast<MutableDelegate*>(_child);
-
 	if (!fPartitionHandle || !child)
 		return B_NO_INIT;
 
@@ -247,7 +219,7 @@ BPartition::MutableDelegate::ValidateMoveChild(Delegate* _child,
 
 // Move
 status_t
-BPartition::MutableDelegate::Move(off_t offset)
+BPartition::Delegate::Move(off_t offset)
 {
 	if (!fPartitionHandle)
 		return B_NO_INIT;
@@ -258,10 +230,8 @@ BPartition::MutableDelegate::Move(off_t offset)
 
 // MoveChild
 status_t
-BPartition::MutableDelegate::MoveChild(Delegate* _child, off_t offset)
+BPartition::Delegate::MoveChild(Delegate* child, off_t offset)
 {
-	MutableDelegate* child = dynamic_cast<MutableDelegate*>(_child);
-
 	if (!fPartitionHandle || !child)
 		return B_NO_INIT;
 
@@ -271,7 +241,7 @@ BPartition::MutableDelegate::MoveChild(Delegate* _child, off_t offset)
 
 // ValidateSetContentName
 status_t
-BPartition::MutableDelegate::ValidateSetContentName(BString* name) const
+BPartition::Delegate::ValidateSetContentName(BString* name) const
 {
 	if (!fPartitionHandle)
 		return B_NO_INIT;
@@ -282,11 +252,8 @@ BPartition::MutableDelegate::ValidateSetContentName(BString* name) const
 
 // ValidateSetName
 status_t
-BPartition::MutableDelegate::ValidateSetName(Delegate* _child,
-	BString* name) const
+BPartition::Delegate::ValidateSetName(Delegate* child, BString* name) const
 {
-	MutableDelegate* child = dynamic_cast<MutableDelegate*>(_child);
-
 	if (!fPartitionHandle || !child)
 		return B_NO_INIT;
 
@@ -296,7 +263,7 @@ BPartition::MutableDelegate::ValidateSetName(Delegate* _child,
 
 // SetContentName
 status_t
-BPartition::MutableDelegate::SetContentName(const char* name)
+BPartition::Delegate::SetContentName(const char* name)
 {
 	if (!fPartitionHandle)
 		return B_NO_INIT;
@@ -307,10 +274,8 @@ BPartition::MutableDelegate::SetContentName(const char* name)
 
 // SetName
 status_t
-BPartition::MutableDelegate::SetName(Delegate* _child, const char* name)
+BPartition::Delegate::SetName(Delegate* child, const char* name)
 {
-	MutableDelegate* child = dynamic_cast<MutableDelegate*>(_child);
-
 	if (!fPartitionHandle || !child)
 		return B_NO_INIT;
 
@@ -320,11 +285,8 @@ BPartition::MutableDelegate::SetName(Delegate* _child, const char* name)
 
 // ValidateSetType
 status_t
-BPartition::MutableDelegate::ValidateSetType(Delegate* _child,
-	const char* type) const
+BPartition::Delegate::ValidateSetType(Delegate* child, const char* type) const
 {
-	MutableDelegate* child = dynamic_cast<MutableDelegate*>(_child);
-
 	if (!fPartitionHandle || !child)
 		return B_NO_INIT;
 
@@ -334,10 +296,8 @@ BPartition::MutableDelegate::ValidateSetType(Delegate* _child,
 
 // SetType
 status_t
-BPartition::MutableDelegate::SetType(Delegate* _child, const char* type)
+BPartition::Delegate::SetType(Delegate* child, const char* type)
 {
-	MutableDelegate* child = dynamic_cast<MutableDelegate*>(_child);
-
 	if (!fPartitionHandle || !child)
 		return B_NO_INIT;
 
@@ -347,7 +307,7 @@ BPartition::MutableDelegate::SetType(Delegate* _child, const char* type)
 
 // GetContentParameterEditor
 status_t
-BPartition::MutableDelegate::GetContentParameterEditor(
+BPartition::Delegate::GetContentParameterEditor(
 	BDiskDeviceParameterEditor** editor) const
 {
 	if (!fPartitionHandle)
@@ -359,11 +319,9 @@ BPartition::MutableDelegate::GetContentParameterEditor(
 
 // GetParameterEditor
 status_t
-BPartition::MutableDelegate::GetParameterEditor(Delegate* _child,
+BPartition::Delegate::GetParameterEditor(Delegate* child,
 	BDiskDeviceParameterEditor** editor) const
 {
-	MutableDelegate* child = dynamic_cast<MutableDelegate*>(_child);
-
 	if (!fPartitionHandle || !child)
 		return B_NO_INIT;
 
@@ -374,7 +332,7 @@ BPartition::MutableDelegate::GetParameterEditor(Delegate* _child,
 
 // SetContentParameters
 status_t
-BPartition::MutableDelegate::SetContentParameters(const char* parameters)
+BPartition::Delegate::SetContentParameters(const char* parameters)
 {
 	if (!fPartitionHandle)
 		return B_NO_INIT;
@@ -385,11 +343,8 @@ BPartition::MutableDelegate::SetContentParameters(const char* parameters)
 
 // SetParameters
 status_t
-BPartition::MutableDelegate::SetParameters(Delegate* _child,
-	const char* parameters)
+BPartition::Delegate::SetParameters(Delegate* child, const char* parameters)
 {
-	MutableDelegate* child = dynamic_cast<MutableDelegate*>(_child);
-
 	if (!fPartitionHandle || !child)
 		return B_NO_INIT;
 
@@ -400,7 +355,7 @@ BPartition::MutableDelegate::SetParameters(Delegate* _child,
 
 // CanInitialize
 bool
-BPartition::MutableDelegate::CanInitialize(const char* diskSystem) const
+BPartition::Delegate::CanInitialize(const char* diskSystem) const
 {
 	// get the disk system add-on
 	DiskSystemAddOnManager* manager = DiskSystemAddOnManager::Default();
@@ -419,7 +374,7 @@ BPartition::MutableDelegate::CanInitialize(const char* diskSystem) const
 
 // GetInitializationParameterEditor
 status_t
-BPartition::MutableDelegate::GetInitializationParameterEditor(
+BPartition::Delegate::GetInitializationParameterEditor(
 	const char* diskSystem, BDiskDeviceParameterEditor** editor) const
 {
 	// get the disk system add-on
@@ -440,7 +395,7 @@ BPartition::MutableDelegate::GetInitializationParameterEditor(
 
 // ValidateInitialize
 status_t
-BPartition::MutableDelegate::ValidateInitialize(const char* diskSystem,
+BPartition::Delegate::ValidateInitialize(const char* diskSystem,
 	BString* name, const char* parameters)
 {
 	// get the disk system add-on
@@ -461,7 +416,7 @@ BPartition::MutableDelegate::ValidateInitialize(const char* diskSystem,
 
 // Initialize
 status_t
-BPartition::MutableDelegate::Initialize(const char* diskSystem,
+BPartition::Delegate::Initialize(const char* diskSystem,
 	const char* name, const char* parameters)
 {
 	// get the disk system add-on
@@ -491,7 +446,7 @@ BPartition::MutableDelegate::Initialize(const char* diskSystem,
 
 // Uninitialize
 status_t
-BPartition::MutableDelegate::Uninitialize()
+BPartition::Delegate::Uninitialize()
 {
 	if (fPartitionHandle) {
 		_FreeHandle();
@@ -505,7 +460,7 @@ BPartition::MutableDelegate::Uninitialize()
 
 // GetChildCreationParameterEditor
 status_t
-BPartition::MutableDelegate::GetChildCreationParameterEditor(const char* type,
+BPartition::Delegate::GetChildCreationParameterEditor(const char* type,
 	BDiskDeviceParameterEditor** editor) const
 {
 	if (!fPartitionHandle)
@@ -517,7 +472,7 @@ BPartition::MutableDelegate::GetChildCreationParameterEditor(const char* type,
 
 // ValidateCreateChild
 status_t
-BPartition::MutableDelegate::ValidateCreateChild(off_t* start, off_t* size,
+BPartition::Delegate::ValidateCreateChild(off_t* start, off_t* size,
 	const char* type, BString* name, const char* parameters) const
 {
 	if (!fPartitionHandle)
@@ -530,9 +485,8 @@ BPartition::MutableDelegate::ValidateCreateChild(off_t* start, off_t* size,
 
 // CreateChild
 status_t
-BPartition::MutableDelegate::CreateChild(off_t start, off_t size,
-	const char* type, const char* name, const char* parameters,
-	BPartition** child)
+BPartition::Delegate::CreateChild(off_t start, off_t size, const char* type,
+	const char* name, const char* parameters, BPartition** child)
 {
 	if (!fPartitionHandle)
 		return B_NO_INIT;
@@ -552,10 +506,8 @@ BPartition::MutableDelegate::CreateChild(off_t start, off_t size,
 
 // DeleteChild
 status_t
-BPartition::MutableDelegate::DeleteChild(Delegate* _child)
+BPartition::Delegate::DeleteChild(Delegate* child)
 {
-	MutableDelegate* child = dynamic_cast<MutableDelegate*>(_child);
-
 	if (!fPartitionHandle || !child)
 		return B_NO_INIT;
 
@@ -565,7 +517,7 @@ BPartition::MutableDelegate::DeleteChild(Delegate* _child)
 
 // _FreeHandle
 void
-BPartition::MutableDelegate::_FreeHandle()
+BPartition::Delegate::_FreeHandle()
 {
 	if (fPartitionHandle) {
 		delete fPartitionHandle;
