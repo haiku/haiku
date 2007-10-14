@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2006, Haiku, Inc.
+ * Copyright (c) 2001-2007, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:	
@@ -737,10 +737,16 @@ BListView::CountItems() const
 void
 BListView::MakeEmpty()
 {
+	if (fList.IsEmpty())
+		return;
+
 	_DeselectAll(-1, -1);
 	fList.MakeEmpty();
 
-	Invalidate();
+	if (Window()) {
+		_FixupScrollBar();
+		Invalidate();
+	}
 }
 
 // IsEmpty
