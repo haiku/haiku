@@ -22,18 +22,18 @@ if $(INCLUDE_GPL_ADDONS) = 1 {
 	GPL_ONLY = "" ;
 }
 
-BEOS_BIN = "[" addattr alert arp base64 basename bc beep bison bzip2 cat cardctl catattr
+BEOS_BIN = "[" addattr alert arp base64 basename bc beep bison bzip2 cat catattr
 	chgrp chmod chop chown cksum clear clockconfig cmp comm compress cp copyattr
 	$(X86_ONLY)CortexAddOnHost
 	csplit ctags cut date dc dd desklink df diff diff3 dircolors dirname
-	driveinfo dstcheck du dump_cis dump_cisreg echo eject env error expand expr
+	driveinfo dstcheck du echo eject env error expand expr
 	expr factor false fdinfo ffm find finddir fmt fold fortune frcode ftp funzip fwcontrol
 	gawk $(X86_ONLY)gdb grep groups gzip gzexe hd head hey hostname id ident
 	ideinfo idestatus ifconfig <bin>install installsound iroster isvolume join
 	keymap kill less lessecho lesskey link listarea listattr listdev listimage
 	listport listres listsem ln locate logger login logname ls lsindex m4 make
 	makebootable md5sum merge mimeset mkdos mkdir mkindex modifiers mount
-	mount_nfs mountvolume mv nc netstat nl nohup od open pack_cis paste patch pathchk pc
+	mount_nfs mountvolume mv nc netstat nl nohup od open paste patch pathchk pc
 	ping play playfile playsound playwav pr prio printenv printf ps ptx pwd
 	query quit readlink release renice rescan rlog rm rmattr rmindex rmdir roster route
 	safemode screen_blanker sed setdecor settype setversion setvolume seq sh sha1sum shar 
