@@ -29,3 +29,4 @@ extern const char *kAppSignature;
 
 
 #endif	// _CLOCK_APPLICATION_H
+

@@ -369,3 +369,4 @@ TOnscreenView::MessageReceived(BMessage *msg)
 			BView::MessageReceived(msg);
 	}
 }
+

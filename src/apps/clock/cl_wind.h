@@ -24,7 +24,8 @@ class TClockWindow : public BWindow {
 		void			_InitWindow();
 
 	private:
-		TOnscreenView	*theOnscreenView;
+		TOnscreenView	*fOnScreenView;
 };
 
 #endif	// _CLOCK_WINDOW_H
+
