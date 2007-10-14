@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2005-2007, Axel Dörfler, axeld@pinc-software.de
  * Copyright 2003, Jeff Ward, jeff@r2d2.stcloudstate.edu. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -141,7 +141,7 @@ cmos_to_secs(const cmos_time *cmos)
 {
 	struct tm t;
 	t.tm_year = bcd_to_int(cmos->century) * 100 + bcd_to_int(cmos->year)
-		- RTC_EPOCHE_BASE_YEAR;
+		- RTC_EPOCH_BASE_YEAR;
 	t.tm_mon = bcd_to_int(cmos->month) - 1;
 	t.tm_mday = bcd_to_int(cmos->day);
 	t.tm_hour = bcd_to_int(cmos->hour);
@@ -160,7 +160,7 @@ secs_to_cmos(uint32 seconds, cmos_time *cmos)
 	struct tm t;
 	rtc_secs_to_tm(seconds, &t);
 
-	wholeYear = t.tm_year + RTC_EPOCHE_BASE_YEAR;
+	wholeYear = t.tm_year + RTC_EPOCH_BASE_YEAR;
 
 	cmos->century = int_to_bcd(wholeYear / 100);
 	cmos->year = int_to_bcd(wholeYear % 100);

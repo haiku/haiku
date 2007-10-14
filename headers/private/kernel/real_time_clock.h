@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2003, Jeff Ward, jeff@r2d2.stcloudstate.edu. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -13,7 +13,7 @@
 #include <time.h>
 
 
-#define RTC_EPOCHE_BASE_YEAR	1970
+#define RTC_EPOCH_BASE_YEAR	1970
 
 typedef struct rtc_info {
 	uint32	time;

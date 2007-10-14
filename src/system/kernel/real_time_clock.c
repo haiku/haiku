@@ -23,6 +23,10 @@
 #endif
 
 
+#define RTC_SECONDS_DAY 86400
+#define RTC_EPOCH_JULIAN_DAY 2440588
+	// January 1st, 1970
+
 static struct real_time_data *sRealTimeData;
 static bool sIsGMT = false;
 static char sTimezoneFilename[B_PATH_NAME_LENGTH] = "";
@@ -161,130 +165,58 @@ get_rtc_info(rtc_info *info)
 // #pragma mark -
 
 
-#define SECONDS_31 2678400
-#define SECONDS_30 2592000
-#define SECONDS_28 2419200
-#define SECONDS_DAY 86400
-
-static uint32 sSecsPerMonth[12] = {SECONDS_31, SECONDS_28, SECONDS_31, SECONDS_30, 
-	SECONDS_31, SECONDS_30, SECONDS_31, SECONDS_31, SECONDS_30, SECONDS_31, SECONDS_30,
-	SECONDS_31};
-
-
-static bool
-leap_year(uint32 year)
-{
-	if (year % 400 == 0)
-		return true;
-
-	if (year % 100 == 0)
-		return false;
-
-	if (year % 4 == 0)
-		return true;
-
-	return false;
-}
-
-
-static inline uint32
-secs_this_year(uint32 year)
-{
-	if (leap_year(year))
-		return 31622400;
-
-	return 31536000;
-}
-
-
+/*!	Converts the \a tm data to seconds. Note that the base year is not
+	1900 as in POSIX, but 1970.
+*/
 uint32
-rtc_tm_to_secs(const struct tm *t)
+rtc_tm_to_secs(const struct tm *tm)
 {
-	uint32 wholeYear;
-	uint32 time = 0;
-	uint32 i;
+	uint32 days;
+	int year, month;
 
-	wholeYear = RTC_EPOCHE_BASE_YEAR + t->tm_year;
+	month = tm->tm_mon + 1;
+	year = tm->tm_year + RTC_EPOCH_BASE_YEAR;
 
-	// ToDo: get rid of these loops and compute the correct value
-	//	i.e. days = (long)(year > 0) + year*365 + --year/4 - year/100 + year/400;
-	//	let sSecsPerMonth[] have the values already added up
+	// Reference: Fliegel, H. F. and van Flandern, T. C. (1968).
+	// Communications of the ACM, Vol. 11, No. 10 (October, 1968).
+	days = tm->tm_mday - 32075 - RTC_EPOCH_JULIAN_DAY
+		+ 1461 * (year + 4800 + (month - 14) / 12) / 4
+		+ 367 * (month - 2 - 12 * ((month - 14) / 12)) / 12
+		- 3 * ((year + 4900 + (month - 14) / 12) / 100) / 4;
 
-	// Add up the seconds from all years since 1970 that have elapsed.
-	for (i = RTC_EPOCHE_BASE_YEAR; i < wholeYear; ++i) {
-		time += secs_this_year(i);
-	}
-
-	// Add up the seconds from all months passed this year.
-	for (i = 0; i < t->tm_mon && i < 12; ++i)
-		time += sSecsPerMonth[i];
-
-	// Add up the seconds from all days passed this month.
-	if (leap_year(wholeYear) && t->tm_mon >= 2)
-		time += SECONDS_DAY;
-
-	time += (t->tm_mday - 1) * SECONDS_DAY;
-	time += t->tm_hour * 3600;
-	time += t->tm_min * 60;
-	time += t->tm_sec;
-
-	return time;
+	return days * RTC_SECONDS_DAY + tm->tm_hour * 3600 + tm->tm_min * 60
+		+ tm->tm_sec;
 }
 
 
 void
 rtc_secs_to_tm(uint32 seconds, struct tm *t)
 {
-	uint32 wholeYear = RTC_EPOCHE_BASE_YEAR;
-	uint32 secsThisYear;
-	bool keepLooping;
-	bool isLeapYear;
-	int temp;
-	int month;
+	uint32 year, month, day, l, n;
 
-	keepLooping = 1;
+	// Reference: Fliegel, H. F. and van Flandern, T. C. (1968).
+	// Communications of the ACM, Vol. 11, No. 10 (October, 1968).
+	l = seconds / 86400 + 68569 + RTC_EPOCH_JULIAN_DAY;
+	n = 4 * l / 146097;
+	l = l - (146097 * n + 3) / 4;
+	year = 4000 * (l + 1) / 1461001;
+	l = l - 1461 * year / 4 + 31;
+	month = 80 * l / 2447;
+	day = l - 2447 * month / 80;
+	l = month / 11;
+	month = month + 2 - 12 * l;
+	year = 100 * (n - 49) + year + l;
 
-	// Determine the current year by starting at 1970 and incrementing whole_year as long as
-	// we can keep subtracting secs_this_year from seconds.
-	while (keepLooping) {
-		secsThisYear = secs_this_year(wholeYear);
+	t->tm_mday = day;
+	t->tm_mon = month - 1;
+	t->tm_year = year - RTC_EPOCH_BASE_YEAR;
 
-		if (seconds >= secsThisYear) {
-			seconds -= secsThisYear;
-			++wholeYear;
-		} else
-			keepLooping = false;
-	}
-
-	t->tm_year = wholeYear - RTC_EPOCHE_BASE_YEAR;
-
-	// Determine the current month
-	month = 0;
-	isLeapYear = leap_year(wholeYear);
-	do {
-		temp = seconds - sSecsPerMonth[month];
-
-		if (isLeapYear && month == 1)
-			temp -= SECONDS_DAY;
-
-		if (temp >= 0) {
-			seconds = temp;
-			++month;
-		}
-	} while (temp >= 0 && month < 12);
-
-	t->tm_mon = month;
-
-	t->tm_mday = seconds / SECONDS_DAY + 1;
-	seconds = seconds % SECONDS_DAY;
-
+	seconds = seconds % RTC_SECONDS_DAY;
 	t->tm_hour = seconds / 3600;
+ 
 	seconds = seconds % 3600;
-
 	t->tm_min = seconds / 60;
-	seconds = seconds % 60;
-
-	t->tm_sec = seconds;
+	t->tm_sec = seconds % 60;
 }
 
 
