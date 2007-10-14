@@ -9,7 +9,6 @@ Preference Time :
 	Bitmaps.cpp 
 	CalendarView.cpp 
 	DateTimeEdit.cpp 
-	DateUtils.cpp 
 	SectionEdit.cpp 
 	SettingsView.cpp 
 	Time.cpp 
@@ -17,6 +16,7 @@ Preference Time :
 	TimeWindow.cpp
 	TZDisplay.cpp 
 	ZoneView.cpp 
+	DateTime.cpp 
 	: be
 	: Time.rdef
 	;

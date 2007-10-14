@@ -5,6 +5,7 @@
  * Authors:
  *		Andrew McCall <mccall@@digitalparadise.co.uk>
  *		Julun <host.haiku@gmx.de>
+ *
  */
 #ifndef TIME_WINDOW_H
 #define TIME_WINDOW_H

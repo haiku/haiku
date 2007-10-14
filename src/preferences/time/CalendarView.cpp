@@ -1,466 +1,1234 @@
 /*
- * Copyright 2004-2007, Haiku.
+ * Copyright 2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Michael Berg <mike@agamemnon.homelinux.net>
+ *		Julun <host.haiku@gmx.de>
  */
 
-#include <String.h>
+#include "CalendarView.h"
+
+
 #include <Window.h>
 
-#include "CalendarView.h"
-#include "DateUtils.h"
-#include "TimeMessages.h"
 
-#include <stdio.h>
+#include <stdlib.h>
 
 
-#define SEGMENT_CHANGE 'ostd'
+namespace {
+	float
+	FontHeight(const BView *view)
+	{
+		if (!view)
+			return 0.0;
 
-
-// ToDo: read these out of the locale
-static const char kDays[7] = { 'S', 'M', 'T', 'W', 'T', 'F', 'S' };
-
-
-static float
-FontHeight(BView* target, bool full)
-{
-	font_height finfo;		
-	target->GetFontHeight(&finfo);
-	float h = ceil(finfo.ascent) + ceil(finfo.descent);
-
-	if (full)
-		h += ceil(finfo.leading);
-	
-	return h;
+		BFont font;
+		view->GetFont(&font);
+		font_height fheight;
+		font.GetHeight(&fheight);
+		return ceilf(fheight.ascent + fheight.descent + fheight.leading);
+	}
 }
 
 
-//	#pragma mark -
-
-
-TDay::TDay(BRect frame, int day) 
-	: BControl(frame, B_EMPTY_STRING, NULL, NULL, B_FOLLOW_NONE, B_WILL_DRAW)
-	, f_day(day)
+BCalendarView::BCalendarView(BRect frame, const char *name,
+		uint32 resizeMask, uint32 flags)
+	: BView(frame, name, resizeMask, flags),
+	  BInvoker(),
+	  fSelectionMessage(NULL),
+	  fDay(0),
+	  fYear(0),
+	  fMonth(0),
+	  fFocusChanged(false),
+	  fSelectionChanged(false),
+	  fWeekStart(B_WEEK_START_SUNDAY),
+	  fDayNameHeaderVisible(true),
+	  fWeekNumberHeaderVisible(true)
 {
+	_InitObject();
 }
 
 
-TDay::~TDay()
+BCalendarView::BCalendarView(BRect frame, const char *name, week_start start,
+		uint32 resizeMask, uint32 flags)
+	: BView(frame, name, resizeMask, flags),
+	  BInvoker(),
+	  fSelectionMessage(NULL),
+	  fDay(0),
+	  fYear(0),
+	  fMonth(0),
+	  fFocusChanged(false),
+	  fSelectionChanged(false),
+	  fWeekStart(start),
+	  fDayNameHeaderVisible(true),
+	  fWeekNumberHeaderVisible(true)
 {
+	_InitObject();
+}
+
+
+BCalendarView::~BCalendarView()
+{
+	SetSelectionMessage(NULL);
+}
+
+
+BCalendarView::BCalendarView(BMessage *archive)
+	: BView(archive),
+	  BInvoker(),
+	  fSelectionMessage(NULL),
+	  fDay(0),
+	  fYear(0),
+	  fMonth(0),
+	  fFocusChanged(false),
+	  fSelectionChanged(false),
+	  fWeekStart(B_WEEK_START_SUNDAY),
+	  fDayNameHeaderVisible(true),
+	  fWeekNumberHeaderVisible(true)
+{
+	if (archive->HasMessage("_invokeMsg")) {
+		BMessage *invokationMessage = new BMessage;
+		archive->FindMessage("_invokeMsg", invokationMessage);
+		SetInvocationMessage(invokationMessage);
+	}
+
+	if (archive->HasMessage("_selectMsg")) {
+		BMessage *selectionMessage = new BMessage;
+		archive->FindMessage("selectMsg", selectionMessage);
+		SetSelectionMessage(selectionMessage);
+	}
+
+	if (archive->FindInt32("_day", &fDay) != B_OK
+		|| archive->FindInt32("_month", &fMonth) != B_OK
+		|| archive->FindInt32("_year", &fYear) != B_OK) {
+			BDate date = BDate::CurrentDate(B_LOCAL_TIME);
+			fDay = date.Day();
+			fMonth = date.Month();
+			fYear = date.Year();
+	}
+
+	int32 start;
+	if (archive->FindInt32("_weekStart", &start) == B_OK)
+		fWeekStart = week_start(start);
+
+	if (archive->FindBool("_dayHeader", &fDayNameHeaderVisible) != B_OK)
+		fDayNameHeaderVisible = true;
+
+	if (archive->FindBool("_weekHeader", &fWeekNumberHeaderVisible) != B_OK)
+		fWeekNumberHeaderVisible = true;
+
+	_SetupDayNames();
+	_SetupDayNumbers();
+	_SetupWeekNumbers();
+}
+
+
+BArchivable*
+BCalendarView::Instantiate(BMessage *archive)
+{
+	if (validate_instantiation(archive, "BCalendarView"))
+		return new BCalendarView(archive);
+
+	return NULL;
+}
+
+
+status_t
+BCalendarView::Archive(BMessage *archive, bool deep) const
+{
+	status_t status = BView::Archive(archive, deep);
+
+	if (status == B_OK && InvocationMessage())
+		status = archive->AddMessage("_invokeMsg", InvocationMessage());
+
+	if (status == B_OK && SelectionMessage())
+		status = archive->AddMessage("_selectMsg", SelectionMessage());
+
+	if (status == B_OK)
+		status = archive->AddInt32("_day", fDay);
+
+	if (status == B_OK)
+		status = archive->AddInt32("_month", fMonth);
+
+	if (status == B_OK)
+		status = archive->AddInt32("_year", fYear);
+
+	if (status == B_OK)
+		status = archive->AddInt32("_weekStart", int32(fWeekStart));
+
+	if (status == B_OK)
+		status = archive->AddBool("_dayHeader", fDayNameHeaderVisible);
+
+	if (status == B_OK)
+		status = archive->AddBool("_weekHeader", fWeekNumberHeaderVisible);
+
+	return status;
 }
 
 
 void
-TDay::AttachedToWindow()
+BCalendarView::AttachedToWindow()
 {
-	if (Parent())
-		SetViewColor(Parent()->ViewColor());
+	BView::AttachedToWindow();
+
+	if (!Messenger().IsValid())
+		SetTarget(Window(), NULL);
 }
 
 
 void
-TDay::MouseDown(BPoint where)
+BCalendarView::DetachedFromWindow()
 {
-	if (f_day> 0) {
-		// only allow if not currently selected
-		if (Value() == B_CONTROL_ON)
+	BView::DetachedFromWindow();
+}
+
+
+void
+BCalendarView::AllAttached()
+{
+	BView::AllAttached();
+}
+
+
+void
+BCalendarView::AllDetached()
+{
+	BView::AllDetached();
+}
+
+
+void
+BCalendarView::FrameMoved(BPoint newPosition)
+{
+	BView::FrameMoved(newPosition);
+}
+
+
+void
+BCalendarView::FrameResized(float width, float height)
+{
+	Invalidate(Bounds());
+}
+
+
+void
+BCalendarView::Draw(BRect updateRect)
+{
+	if (LockLooper()) {
+		if (fFocusChanged) {
+			_DrawFocusRect();
+			UnlockLooper();
 			return;
-		
-		SetValue(B_CONTROL_ON);
-		Invoke(); 
-
-		//update display
-		Draw(Bounds());	
-	}
-}
-
-
-void
-TDay::KeyDown(const char *bytes, int32 numbytes)
-{
-	BControl::KeyDown(bytes, numbytes);
-	Parent()->KeyDown(bytes, numbytes);
-}
-
-
-void
-TDay::MakeFocus(bool focused)
-{
-	if (focused != IsFocus()) {
-		BView::MakeFocus(focused);
-		Draw(Bounds());
-		Flush();
-	}
-}
-
-
-void
-TDay::Stroke3dFrame(BRect frame, rgb_color light, rgb_color dark, bool inset)
-{
-	rgb_color color1;
-	rgb_color color2;
-	
-	if (inset) {
-		color1 = dark;
-		color2 = light;
-	} else {
-		color1 = light;
-		color2 = dark;
-	}
-	
-	BeginLineArray(4);
-		AddLine(frame.LeftTop(), frame.RightTop(), color1);
-		AddLine(frame.LeftTop(), frame.LeftBottom(), color1);
-		AddLine(frame.LeftBottom(), frame.RightBottom(), color2);
-		AddLine(frame.RightBottom(), frame.RightTop(), color2);
-	EndLineArray();
-}
-
-
-void
-TDay::Draw(BRect updaterect)
-{
-	BRect bounds(Bounds());
-	
-	SetHighColor(ViewColor());
-	FillRect(Bounds(), B_SOLID_HIGH);
-	
-	rgb_color bgcolor;
-	rgb_color dark;
-	rgb_color light;
-	
-	BString text;
-	
-	if (Value() == 1) {
-		bgcolor = tint_color(ViewColor(), B_DARKEN_2_TINT);		
-	} else {
-		bgcolor = tint_color(ViewColor(), B_DARKEN_1_TINT);
-	}
-	text << f_day;
-
-	dark = tint_color(bgcolor, B_DARKEN_1_TINT);
-	light = tint_color(bgcolor, B_LIGHTEN_MAX_TINT);
-	
-	SetHighColor(bgcolor);
-	FillRect(bounds);
-
-	if (f_day > 0) {
-		if (!(Value() == 1))
-			SetHighColor(0, 0, 0, 255);
-		else
-			SetHighColor(255, 255, 255, 255);
-			
-		SetLowColor(bgcolor);
-		
-		// calc font size;
-		float width = be_plain_font->StringWidth(text.String());
-		font_height finfo;
-		be_plain_font->GetHeight(&finfo);
-		float height = finfo.descent +finfo.ascent +finfo.leading;
-
-		BPoint drawpt((bounds.Width()/2.0) -(width/2.0) +1, (bounds.Height()/2.0) +(height/2.0) -2);
-		DrawString(text.String(), drawpt);
-	}
-	
-	if (IsFocus()) {
-		rgb_color nav_color = keyboard_navigation_color();
-		SetHighColor(nav_color);
-		StrokeRect(bounds);
-		
-	} else {
-		SetHighColor(bgcolor);
-		StrokeRect(bounds);
-		if (Value() == 1)
-			Stroke3dFrame(bounds, light, dark, true);
-	}
-}
-
-
-void
-TDay::SetValue(int32 value)
-{
-	BControl::SetValue(value);
-	
-	if (Value() == 1) {
-		SetFlags(Flags() & ~B_NAVIGABLE);
-	} else {
-		SetFlags(Flags()|B_NAVIGABLE); 
-	}
-	Draw(Bounds());
-}
-
-
-void 
-TDay::SetTo(BRect frame, int day)
-{
-	MoveTo(frame.LeftTop());
-	f_day = day;
-	Draw(Bounds());
-}
-
-
-void
-TDay::SetTo(int day, bool selected)
-{
-	f_day = day;
-	SetValue(selected);
-	if (Value() == 1) {
-		SetFlags(Flags() | B_NAVIGABLE);
-	} else {
-		SetFlags(Flags() & ~B_NAVIGABLE);
-	}
-	Draw(Bounds());
-}
-
-
-//	#pragma mark -
-
-
-TCalendarView::TCalendarView(BRect frame, const char *name, 
-		uint32 resizingmode, uint32 flags)
-	: BView(frame, name, resizingmode, flags)
-	, f_firstday(0)
-	, f_month(0)
-	, f_day(0)
-	, f_year(0)
-{
-	InitView();
-}
-
-
-TCalendarView::~TCalendarView()
-{
-}
-
-
-void
-TCalendarView::AttachedToWindow()
-{
-	if (Parent())
-		SetViewColor(Parent()->ViewColor());
-}
-
-
-void
-TCalendarView::MessageReceived(BMessage *message)
-{
-	switch(message->what) {
-		case H_DAY_CHANGED:
-		{
-			TDay *day;
-			message->FindPointer("source", (void **)&day);
-			if (f_cday != NULL)
-				f_cday->SetValue(B_CONTROL_OFF);
-			f_cday = day;
-			
-			DispatchMessage();
 		}
-		break;
-		
+
+		if (fSelectionChanged) {
+			_UpdateSelection();
+			UnlockLooper();
+			return;
+
+		}
+
+		_DrawDays();
+		_DrawDayHeader();
+		_DrawWeekHeader();
+
+		rgb_color background = ui_color(B_PANEL_BACKGROUND_COLOR);
+		SetHighColor(tint_color(background, B_DARKEN_3_TINT));
+		StrokeRect(Bounds());
+
+		UnlockLooper();
+	}
+}
+
+
+void
+BCalendarView::DrawDay(BView *owner, BRect frame, const char *text,
+	bool isSelected, bool isEnabled, bool focus)
+{
+	_DrawItem(owner, frame, text, isSelected, isEnabled, focus);
+}
+
+
+void
+BCalendarView::DrawDayName(BView *owner, BRect frame, const char *text)
+{
+	// we get the full rect, fake this as the internal function
+	// shrinks the frame to work properly when drawing a day item
+	_DrawItem(owner, frame.InsetByCopy(-1.0, -1.0), text, true);
+}
+
+
+void
+BCalendarView::DrawWeekNumber(BView *owner, BRect frame, const char *text)
+{
+	// we get the full rect, fake this as the internal function
+	// shrinks the frame to work properly when drawing a day item
+	_DrawItem(owner, frame.InsetByCopy(-1.0, -1.0), text, true);
+}
+
+
+void
+BCalendarView::MessageReceived(BMessage *message)
+{
+	BView::MessageReceived(message);
+}
+
+
+uint32
+BCalendarView::SelectionCommand() const
+{
+	if (SelectionMessage())
+		return SelectionMessage()->what;
+
+	return 0;
+}
+
+
+BMessage*
+BCalendarView::SelectionMessage() const
+{
+	return fSelectionMessage;
+}
+
+
+void
+BCalendarView::SetSelectionMessage(BMessage *message)
+{
+	delete fSelectionMessage;
+	fSelectionMessage = message;
+}
+
+
+uint32
+BCalendarView::InvocationCommand() const
+{
+	return BInvoker::Command();
+}
+
+
+BMessage*
+BCalendarView::InvocationMessage() const
+{
+	return BInvoker::Message();
+}
+
+
+void
+BCalendarView::SetInvocationMessage(BMessage *message)
+{
+	BInvoker::SetMessage(message);
+}
+
+
+void
+BCalendarView::WindowActivated(bool state)
+{
+	BView::WindowActivated(state);
+}
+
+
+void
+BCalendarView::MakeFocus(bool state)
+{
+	if (IsFocus() == state)
+		return;
+
+	BView::MakeFocus(state);
+	
+	fFocusChanged = true;
+	Draw(_RectOfDay(fFocusedDay));
+	fFocusChanged = false;
+}
+
+
+status_t
+BCalendarView::Invoke(BMessage *message)
+{
+	bool notify = false;
+	uint32 kind = InvokeKind(&notify);
+
+	BMessage clone(kind);
+	status_t status = B_BAD_VALUE;
+
+	if (!message && !notify)
+		message = Message();
+
+	if (!message) {
+		if (!IsWatched())
+			return status;
+	} else
+		clone = *message;
+
+	clone.AddPointer("source", this);
+	clone.AddInt64("when", (int64)system_time());
+	clone.AddMessenger("be:sender", BMessenger(this));
+
+	int32 year;
+	int32 month;
+	_GetYearMonth(&year, &month);
+
+	clone.AddInt32("year", year);
+	clone.AddInt32("month", month);
+	clone.AddInt32("day", fDay);
+
+	if (message)
+		status = BInvoker::Invoke(&clone);
+
+	SendNotices(kind, &clone);
+
+	return status;
+}
+
+
+void
+BCalendarView::MouseUp(BPoint point)
+{
+	BView::MouseUp(point);
+}
+
+
+void
+BCalendarView::MouseDown(BPoint where)
+{
+	if (!IsFocus()) {
+		MakeFocus();
+		Sync();
+		Window()->UpdateIfNeeded();
+	}
+
+	BRect frame = Bounds();
+	if (fDayNameHeaderVisible)
+		frame.top += frame.Height() / 7 - 1.0;
+
+	if (fWeekNumberHeaderVisible)
+		frame.left += frame.Width() / 8 - 1.0;
+
+	if (!frame.Contains(where))
+		return;
+
+	// try to set to new day
+	frame = _SetNewSelectedDay(where);
+	
+	// on success
+	if (fSelectedDay != fNewSelectedDay) {
+		// update focus
+		fFocusChanged = true;
+		fNewFocusedDay = fNewSelectedDay;
+		Draw(_RectOfDay(fFocusedDay));
+		fFocusChanged = false;
+
+		// update selection
+		fSelectionChanged = true;
+		Draw(frame);
+		Draw(_RectOfDay(fSelectedDay));
+		fSelectionChanged = false;
+
+		// notify that selection changed
+		InvokeNotify(SelectionMessage(), B_CONTROL_MODIFIED);
+	}
+
+	int32 clicks;
+	// on double click invoke 
+	BMessage *message = Looper()->CurrentMessage();
+	if (message->FindInt32("clicks", &clicks) == B_OK && clicks > 1)
+		Invoke();
+}
+
+
+void
+BCalendarView::MouseMoved(BPoint point, uint32 code, const BMessage *dragMessage)
+{
+	BView::MouseMoved(point, code, dragMessage);
+}
+
+
+void
+BCalendarView::KeyDown(const char *bytes, int32 numBytes)
+{
+	const int32 kRows = 6;
+	const int32 kColumns = 7;
+
+	int32 row = fFocusedDay.row;
+	int32 column = fFocusedDay.column;
+
+	switch (bytes[0]) {
+		case B_LEFT_ARROW:
+		{
+			column -= 1;
+			if (column < 0) {
+				column = kColumns -1;
+				row -= 1;
+				if (row >= 0)
+					fFocusChanged = true;
+			} else
+				fFocusChanged = true;
+		}	break;
+
+		case B_RIGHT_ARROW:
+		{
+			column += 1;
+			if (column == kColumns) {
+				column = 0;
+				row += 1;
+				if (row < kRows)
+					fFocusChanged = true;
+			} else
+				fFocusChanged = true;
+		}	break;
+
+		case B_UP_ARROW:
+		{
+			row -= 1;
+			if (row >= 0)
+				fFocusChanged = true;
+		}	break;
+
+		case B_DOWN_ARROW:
+		{
+			row += 1;
+			if (row < kRows)
+				fFocusChanged = true;
+		}	break;
+
+		case B_RETURN:
+		case B_SPACE: {
+			fSelectionChanged = true;
+			BPoint pt = _RectOfDay(fFocusedDay).LeftTop();
+			Draw(_SetNewSelectedDay(pt + BPoint(4.0, 4.0)));
+			Draw(_RectOfDay(fSelectedDay));
+			fSelectionChanged = false;
+
+			Invoke();
+		}	break;
+
 		default:
-			BView::MessageReceived(message);
+			BView::KeyDown(bytes, numBytes);
 			break;
 	}
+
+	if (fFocusChanged) {
+		fNewFocusedDay.SetTo(row, column);
+		Draw(_RectOfDay(fFocusedDay));
+		Draw(_RectOfDay(fNewFocusedDay));
+		fFocusChanged = false;
+	}
+}
+
+
+BHandler*
+BCalendarView::ResolveSpecifier(BMessage *message, int32 index,
+	BMessage *specifier, int32 form, const char *property)
+{
+	return BView::ResolveSpecifier(message, index, specifier, form, property);
+}
+
+
+status_t
+BCalendarView::GetSupportedSuites(BMessage *data)
+{
+	return BView::GetSupportedSuites(data);
+}
+
+
+status_t
+BCalendarView::Perform(perform_code code, void *arg)
+{
+	return BView::Perform(code, arg);
 }
 
 
 void
-TCalendarView::KeyDown(const char *bytes, int32 numbytes)
+BCalendarView::ResizeToPreferred()
 {
-	if (f_focused == NULL)
-		f_focused = f_cday;
-		
-	switch(bytes[0]) {
-		case B_LEFT_ARROW: {
-			TDay *newfocus = dynamic_cast<TDay *>(f_focused->PreviousSibling());
-			if (newfocus == NULL || newfocus->Day() == 0)
-				break;
-			f_focused->MakeFocus(false);
-			f_focused = newfocus;
-			f_focused->MakeFocus(true);
-		}
-		break;
-		
-		case B_RIGHT_ARROW: {
-			TDay *newfocus = dynamic_cast<TDay *>(f_focused->NextSibling());
-			if (newfocus == NULL || newfocus->Day() == 0)
-				break;
-			f_focused->MakeFocus(false);
-			f_focused = newfocus;
-			f_focused->MakeFocus(true);
-		}
-		break;
-		
-		case B_UP_ARROW: {
-			int32 idx = IndexOf(f_focused) -7;
-			if (idx> f_daybound.x -1 ) {
-				f_focused->MakeFocus(false);
-				f_focused = dynamic_cast<TDay  *>(ChildAt(idx));
-				f_focused->MakeFocus(true);
-			}
-		}
-		break;
-		
-		case B_DOWN_ARROW: {
-			int32 idx = IndexOf(f_focused) +7;
-			if (idx < f_daybound.y +1) {
-				f_focused->MakeFocus(false);
-				f_focused = dynamic_cast<TDay *>(ChildAt(idx));
-				f_focused->MakeFocus(true);
-			}
-		}
-		break;
-		
-		default:
-		break;
-	}
+	float width;
+	float height;
+
+	GetPreferredSize(&width, &height);
+	BView::ResizeTo(width, height);
+}
+
+
+void
+BCalendarView::GetPreferredSize(float *width, float *height)
+{
+	_GetPreferredSize(width, height);
 }
 
 
 int32
-TCalendarView::IndexOf(BView *child) const
+BCalendarView::Day() const
 {
-	BView *test;
-	for (int32 index = 0; index < CountChildren(); index++) {
-		test = ChildAt(index);
-		if (test == child)
-			return index;
+	return fDay;
+}
+
+
+int32
+BCalendarView::Year() const
+{
+	int32 year;
+	int32 month;
+	_GetYearMonth(&year, &month);
+
+	return year;
+}
+
+
+int32
+BCalendarView::Month() const
+{
+	int32 year;
+	int32 month;
+	_GetYearMonth(&year, &month);
+
+	return month;
+}
+
+
+BDate
+BCalendarView::Date() const
+{
+	int32 year;
+	int32 month;
+	_GetYearMonth(&year, &month);
+	return BDate(year, month, fDay);
+}
+
+
+bool
+BCalendarView::SetDate(const BDate &date)
+{
+	return SetDate(date.Year(), date.Month(), date.Day());
+}
+
+
+bool
+BCalendarView::SetDate(int32 year, int32 month, int32 day)
+{
+	if (!BDate(year, month, day).IsValid())
+		return false;
+
+	if (fYear == year && fMonth == month && fDay == day)
+		return true;
+
+	fDay = day;
+	if (fYear == year && fMonth == month) {
+		_SetToDay();
+		// update focus
+		fFocusChanged = true;
+		Draw(_RectOfDay(fFocusedDay));
+		fFocusChanged = false;
+
+		// update selection
+		fSelectionChanged = true;
+		Draw(_RectOfDay(fSelectedDay));
+		Draw(_RectOfDay(fNewSelectedDay));
+		fSelectionChanged = false;
+	} else {
+		fYear = year;
+		fMonth = month;
+
+		_SetupDayNumbers();
+		_SetupWeekNumbers();
+
+		BRect frame = Bounds();
+		if (fDayNameHeaderVisible)
+			frame.top += frame.Height() / 7 - 1.0;
+
+		if (fWeekNumberHeaderVisible)
+			frame.left += frame.Width() / 8 - 1.0;
+
+		Invalidate(frame.InsetBySelf(4.0, 4.0));
 	}
 
-	return -1;
+	return true;
+}
+
+
+week_start
+BCalendarView::WeekStart() const
+{
+	return fWeekStart;
 }
 
 
 void
-TCalendarView::Draw(BRect updaterect)
-{	
-	BRect bounds(0.0, 0.0, f_dayrect.Width(), f_dayrect.Height());
+BCalendarView::SetWeekStart(week_start start)
+{
+	if (fWeekStart == start)
+		return;
 
-	SetLowColor(ViewColor());
-	SetHighColor(0, 0, 0);
-	
-	BPoint drawpt;
-	drawpt.y = (bounds.top + bounds.bottom + FontHeight(this, true)) / 2.0;
-	
-	float width = 0;	
-	float x = bounds.Width() / 2.0;
-	BString day;
-	for (int i = 0; i < 7; i++) {
-		day = BString(&kDays[i], 1);
-		width = be_plain_font->StringWidth(day.String());
-		drawpt.x = bounds.left + (x - width / 2.0 + 2);
-		DrawString(day.String(), drawpt);	
-		bounds.OffsetBy(bounds.Width() + 1, 0);
-	}
+	fWeekStart = start;
+
+	_SetupDayNames();
+	_SetupDayNumbers();
+	_SetupWeekNumbers();
+
+	Invalidate(Bounds().InsetBySelf(1.0, 1.0));
+}
+
+
+bool
+BCalendarView::IsDayNameHeaderVisible() const
+{
+	return fDayNameHeaderVisible;
 }
 
 
 void
-TCalendarView::InitView()
+BCalendarView::SetDayNameHeaderVisible(bool visible)
 {
-	font_height finfo;
-	be_plain_font->GetHeight(&finfo);
-	float text_height = finfo.ascent +finfo.descent +finfo.leading;
-	
-	BRect bounds(Bounds());
-	float width = (bounds.Width() -7)/7;
-	float height = ((bounds.Height() -(text_height +4)) -6)/6;
-	f_dayrect.Set(0.0, text_height +6, width, text_height +6 +height);
+	if (fDayNameHeaderVisible == visible)
+		return;
 
-	BRect dayrect(f_dayrect);
-	TDay *day;
-	for (int row = 0; row < 6; row++) {
-		for (int col = 0; col < 7; col++) {
-			day = new TDay(dayrect.InsetByCopy(1, 1), 0);
-			AddChild(day);
-			dayrect.OffsetBy(width +1, 0);
-		}
-		dayrect.OffsetBy(0, height +1);
-		dayrect.OffsetTo(0, dayrect.top);
-	}
-	
-	f_cday = NULL;
+	fDayNameHeaderVisible = visible;
+	Invalidate(Bounds().InsetBySelf(1.0, 1.0));
 }
 
-void
-TCalendarView::InitDates()
-{
-	TDay *day;
-	
-	int32 label = 0;
-	int idx = 0;
-	f_firstday = getFirstDay(f_month, f_year);
-	int daycnt = getDaysInMonth(f_month, f_year);
-	bool cday = false;
-	for (int row = 0; row < 6; row++) {
-		for (int col = 0; col < 7; col++) {
-			day = dynamic_cast<TDay *>(ChildAt((row *7) +col));
-			
-			if (idx < f_firstday || idx > daycnt + f_firstday - 1)
-				label = 0;
-			else
-				label = idx - (f_firstday - 1);
-			
-			idx++;
-			cday = label == f_day;
-			day->SetTo(label, cday);
 
-			if (label> 0) {
-				BMessage *message = new BMessage(H_DAY_CHANGED);
-				message->AddInt32("Day", label);
-				
-				day->SetTarget(this);
-				day->SetMessage(message);
-				if (label == 1)
-					f_daybound.x = row *7 +col;
-				if (label == daycnt)
-					f_daybound.y = row *7 +col;
+bool
+BCalendarView::IsWeekNumberHeaderVisible() const
+{
+	return fWeekNumberHeaderVisible;
+}
+
+
+void
+BCalendarView::SetWeekNumberHeaderVisible(bool visible)
+{
+	if (fWeekNumberHeaderVisible == visible)
+		return;
+
+	fWeekNumberHeaderVisible = visible;
+	Invalidate(Bounds().InsetBySelf(1.0, 1.0));
+}
+
+
+void
+BCalendarView::_InitObject()
+{
+	BDate date = BDate::CurrentDate(B_LOCAL_TIME);
+	fDay = date.Day();
+	fYear = date.Year();
+	fMonth = date.Month();
+
+	_SetupDayNames();
+	_SetupDayNumbers();
+	_SetupWeekNumbers();
+}
+
+
+void
+BCalendarView::_SetToDay()
+{
+	BDate date(fYear, fMonth, 1);
+	if (!date.IsValid())
+		return;
+
+	fNewFocusedDay.SetTo(0, 0);
+	fNewSelectedDay.SetTo(0, 0);
+
+	const int32 dayCountCurrent = date.DaysInMonth();
+
+	int32 firstDay = date.DayOfWeek();
+	if (fWeekStart == B_WEEK_START_MONDAY)
+		firstDay = ((firstDay - 1) < 0) ? 6 : firstDay -1;
+
+	int32 counter = 0;
+	for (int32 row = 0; row < 6; ++row) {
+		for (int32 column = 0; column < 7; ++column) {
+			int32 day = counter - (firstDay - 1);
+			if (counter >= firstDay && counter <= dayCountCurrent + firstDay - 1) {
+				if (day == fDay) {
+					fNewFocusedDay.SetTo(row, column);
+					fNewSelectedDay.SetTo(row, column);
+					return;
+				}
 			}
-			
-			if (cday) {
-				f_cday = day;
-			}
-			cday = false;		
+			counter++;
 		}
 	}
-	if (f_focused == NULL)
-		f_focused = f_cday;
 }
 
 
 void
-TCalendarView::SetTo(int32 year, int32 month, int32 day)
+BCalendarView::_GetYearMonth(int32 *year, int32 *month) const
 {
-	if (f_month != month||f_year != year) {
-		f_month = month;
-		f_day = day;
-		f_year = year;
-		InitDates();
-	} else if (f_day != day) {
-		f_day = day;
-		int idx = ((f_day/7)*7) + (f_day%7 +f_firstday - 1);
-		TDay *day = dynamic_cast<TDay *>(ChildAt(idx));
-		f_cday->SetValue(B_CONTROL_OFF);
-		f_cday = day;
-		day->SetValue(B_CONTROL_ON);		
+	BDate date(fYear, fMonth, 1);
+
+	const int32 dayCountCurrent = date.DaysInMonth();
+
+	int32 firstDay = date.DayOfWeek();
+	if (fWeekStart == B_WEEK_START_MONDAY)
+		firstDay = ((firstDay - 1) < 0) ? 6 : firstDay -1;
+
+	// set the date to one month before
+	if (date.Month() == 1)
+		date.SetDate(date.Year() -1, 12, fDay);
+	else
+		date.SetDate(date.Year(), date.Month() - 1, fDay);
+
+	const int32 currRow = fSelectedDay.row;
+	const int32 currColumn = fSelectedDay.column;
+
+	*year = fYear;
+	*month = fMonth;
+
+	int32 counter = 0;
+	for (int32 row = 0; row < 6; ++row) {
+		for (int32 column = 0; column < 7; ++column) {
+			if (counter < firstDay || counter > dayCountCurrent + firstDay - 1) {
+				if (counter - firstDay < 0) {
+					if (row == currRow && column == currColumn) {
+						*year = date.Year();
+						*month = date.Month();
+						break;
+					}
+				} else {
+					if (row == currRow && column == currColumn) {
+						*year = fYear;
+						*month = fMonth +1;
+						if (fMonth == 12) {
+							*year = fYear +1;
+							*month = 1;
+						}
+						break;
+					}
+				}
+			} else {
+				if (row == currRow && column == currColumn)
+					break;
+			}
+			counter++;
+		}
 	}
 }
 
 
 void
-TCalendarView::DispatchMessage()
+BCalendarView::_GetPreferredSize(float *_width, float *_height)
 {
-	// send message to update timedate
-	BMessage msg(H_USER_CHANGE);
-	msg.AddBool("time", false);
-	msg.AddInt32("month", f_month);
-	msg.AddInt32("year", f_year);
+	BFont font;
+	GetFont(&font);
+	font_height fontHeight;
+	font.GetHeight(&fontHeight);
 
-	if (f_cday != NULL)
-		msg.AddInt32("day", f_cday->Day());
-		
-	Window()->PostMessage(&msg);
+	const float height = FontHeight(this) + 4.0;
+
+	int32 rows = 7;
+	if (!fDayNameHeaderVisible)
+		rows = 6;
+
+	// height = font height * rows + 8 px border
+	*_height = height * rows + 8.0;
+
+	float width = 0.0;
+	for (int32 column = 0; column < 7; ++column) {
+		float tmp = StringWidth(fDayNames[column].String()) + 2.0;
+		width = tmp > width ? tmp : width;
+	}
+
+	int32 columns = 8;
+	if (!fWeekNumberHeaderVisible)
+		columns = 7;
+
+	// width = max width day name * 8 column + 8 px border
+	*_width = width * columns + 8.0;
 }
 
+
+void
+BCalendarView::_SetupDayNames()
+{
+	const BDate date(fYear, fMonth, fDay);
+	if (!date.IsValid())
+		return;
+
+	if (fWeekStart == B_WEEK_START_MONDAY) {
+		for (int32 i = 1; i <= 7; ++i) {
+			fDayNames[i -1] = date.ShortDayName(i);
+		}
+	} else {
+		fDayNames[0] = date.ShortDayName(7);
+		for (int32 i = 1; i < 7; ++i) {
+			fDayNames[i] = date.ShortDayName(i);
+		}
+	}
+}
+
+
+void
+BCalendarView::_SetupDayNumbers()
+{
+	BDate date(fYear, fMonth, 1);
+	if (!date.IsValid())
+		return;
+
+	fFocusedDay.SetTo(0, 0);
+	fSelectedDay.SetTo(0, 0);
+	fNewFocusedDay.SetTo(0, 0);
+
+	const int32 dayCountCurrent = date.DaysInMonth();
+
+	int32 firstDay = date.DayOfWeek();
+	if (fWeekStart == B_WEEK_START_MONDAY)
+		firstDay = ((firstDay - 1) < 0) ? 6 : firstDay -1;
+
+	// calc the last day one month before
+	if (date.Month() == 1)
+		date.SetDate(date.Year() -1, 12, fDay);
+	else
+		date.SetDate(date.Year(), date.Month() - 1, fDay);
+	const int32 lastDayBefore = date.DaysInMonth();
+
+	int32 counter = 0;
+	int32 firstDayAfter = 1;
+	for (int32 row = 0; row < 6; ++row) {
+		for (int32 column = 0; column < 7; ++column) {
+			int32 day = counter - (firstDay - 1);
+			if (counter < firstDay || counter > dayCountCurrent + firstDay - 1) {
+				if (counter - firstDay < 0)
+					day += lastDayBefore;
+				else
+					day = firstDayAfter++;
+			} else {
+				if (day == fDay) {
+					fFocusedDay.SetTo(row, column);
+					fSelectedDay.SetTo(row, column);
+					fNewFocusedDay.SetTo(row, column);
+				}
+			}
+			counter++;
+			fDayNumbers[row][column].SetTo("");
+			fDayNumbers[row][column] << day;
+		}
+	}
+}
+
+
+void
+BCalendarView::_SetupWeekNumbers()
+{
+	BDate date(fYear, fMonth, fDay);
+	if (!date.IsValid())
+		return;
+
+	date.SetDate(fYear, fMonth, 1);
+	int32 firstDay = date.DayOfWeek();
+	if (fWeekStart == B_WEEK_START_MONDAY)
+		firstDay -= 1;
+
+	const int32 kWeekNumber = date.WeekNumber();
+	int32 dateWeekNumber = kWeekNumber;
+	if (kWeekNumber == 52 && firstDay == 0)
+		dateWeekNumber = 1;
+
+	for (int32 row = 0; row < 6; ++row) {
+		int32 weekNumber = dateWeekNumber + row;
+		if (kWeekNumber == 52 && firstDay != 0 || kWeekNumber == 53)
+			dateWeekNumber = 0;
+		fWeekNumbers[row].SetTo("");
+		fWeekNumbers[row] << weekNumber;
+	}
+}
+
+
+void
+BCalendarView::_DrawDay(int32 currRow, int32 currColumn, int32 row, int32 column,
+	int32 counter, BRect frame, const char *text, bool focus)
+{
+	const BDate date(fYear, fMonth, 1);
+	const int32 daysMonth = date.DaysInMonth();
+
+	int32 firstDay = date.DayOfWeek();
+	if (fWeekStart == B_WEEK_START_MONDAY)
+		firstDay = ((firstDay - 1) < 0) ? 6 : firstDay -1;
+
+	bool enabled = true;
+	bool selected = false;
+	// check for the current date
+	if (currRow == row  && currColumn == column) {
+		selected = true;	// draw current date selected
+		if (counter <= firstDay || counter > firstDay + daysMonth) {
+			enabled = false;	// days of month before or after
+			selected = false;	// not selected but able to get focus
+		}
+	} else {
+		if (counter <= firstDay || counter > firstDay + daysMonth)
+			enabled = false;	// days of month before or after
+	}
+
+	DrawDay(this, frame, text, selected, enabled, focus);
+}
+
+
+void
+BCalendarView::_DrawDays()
+{
+	BRect frame = _FirstCalendarItemFrame();
+
+	const int32 currRow = fSelectedDay.row;
+	const int32 currColumn = fSelectedDay.column;
+
+	const bool isFocus = IsFocus();
+	const int32 focusRow = fFocusedDay.row;
+	const int32 focusColumn = fFocusedDay.column;
+
+	int32 counter = 0;
+	for (int32 row = 0; row < 6; ++row) {
+		BRect tmp = frame;
+		for (int32 column = 0; column < 7; ++column) {
+			counter++;
+			const char *day = fDayNumbers[row][column].String();
+			bool focus = isFocus && focusRow == row && focusColumn == column;
+			_DrawDay(currRow, currColumn, row, column, counter, tmp, day, focus);
+			
+			tmp.OffsetBy(tmp.Width(), 0.0);
+		}
+		frame.OffsetBy(0.0, frame.Height());
+	}
+}
+
+
+void
+BCalendarView::_DrawFocusRect()
+{
+	BRect frame = _FirstCalendarItemFrame();
+
+	const int32 currRow = fSelectedDay.row;
+	const int32 currColumn = fSelectedDay.column;
+
+	const int32 focusRow = fFocusedDay.row;
+	const int32 focusColumn = fFocusedDay.column;
+
+	int32 counter = 0;
+	for (int32 row = 0; row < 6; ++row) {
+		BRect tmp = frame;
+		for (int32 column = 0; column < 7; ++column) {
+			counter++;
+			if (fNewFocusedDay.row == row && fNewFocusedDay.column == column) {
+				fFocusedDay.SetTo(row, column);
+
+				bool focus = IsFocus() && true;
+				const char *day = fDayNumbers[row][column].String();
+				_DrawDay(currRow, currColumn, row, column, counter, tmp, day, focus);
+			}
+			else if (focusRow == row && focusColumn == column) {
+				const char *day = fDayNumbers[row][column].String();
+				_DrawDay(currRow, currColumn, row, column, counter, tmp, day, false);
+			}
+			tmp.OffsetBy(tmp.Width(), 0.0);
+		}
+		frame.OffsetBy(0.0, frame.Height());
+	}
+}
+
+
+void
+BCalendarView::_DrawDayHeader()
+{
+	if (!fDayNameHeaderVisible)
+		return;
+
+	int32 offset = 1;
+	int32 columns = 8;
+	if (!fWeekNumberHeaderVisible) {
+		offset = 0;
+		columns = 7;
+	}
+
+	BRect frame = Bounds();
+	frame.right = frame.Width() / columns - 1.0;
+	frame.bottom = frame.Height() / 7.0 - 2.0;
+	frame.OffsetBy(4.0, 4.0);
+
+	for (int32 i = 0; i < columns; ++i) {
+		if (i == 0 && fWeekNumberHeaderVisible) {
+			DrawDayName(this, frame, "");
+			frame.OffsetBy(frame.Width(), 0.0);
+			continue;
+		}
+		DrawDayName(this, frame, fDayNames[i - offset].String());
+		frame.OffsetBy(frame.Width(), 0.0);
+	}
+}
+
+
+void
+BCalendarView::_DrawWeekHeader()
+{
+	if (!fWeekNumberHeaderVisible)
+		return;
+
+	int32 rows = 7;
+	if (!fDayNameHeaderVisible)
+		rows = 6;
+
+	BRect frame = Bounds();
+	frame.right = frame.Width() / 8.0 - 2.0;
+	frame.bottom = frame.Height() / rows - 1.0;
+
+	float offsetY = 4.0;
+	if (fDayNameHeaderVisible)
+		offsetY += frame.Height();
+
+	frame.OffsetBy(4.0, offsetY);
+
+	for (int32 row = 0; row < 6; ++row) {
+		DrawWeekNumber(this, frame, fWeekNumbers[row].String());
+		frame.OffsetBy(0.0, frame.Height());
+	}
+}
+
+
+void
+BCalendarView::_DrawItem(BView *owner, BRect frame, const char *text,
+	bool isSelected, bool isEnabled, bool focus)
+{
+	rgb_color lColor = LowColor();
+	rgb_color highColor = HighColor();
+	
+	rgb_color lowColor = { 255, 255, 255, 255 };
+	
+	if (isSelected) {
+		SetHighColor(tint_color(lowColor, B_DARKEN_2_TINT));
+		SetLowColor(HighColor());
+	} else
+		SetHighColor(lowColor);
+
+	FillRect(frame.InsetByCopy(1.0, 1.0));
+
+	if (focus) {
+		SetHighColor(keyboard_navigation_color());
+		StrokeRect(frame.InsetByCopy(1.0, 1.0));
+	}
+
+	rgb_color black = { 0, 0, 0, 255 };
+	SetHighColor(black);
+	if (!isEnabled)
+		SetHighColor(tint_color(black, B_LIGHTEN_2_TINT));
+
+	float offsetH = frame.Width() / 2.0;
+	float offsetV = (frame.Height() / 2.0) + (FontHeight(owner) / 2.0) - 2.0;
+
+	DrawString(text, BPoint(frame.right - offsetH
+		- (StringWidth(text) / 2.0), frame.top + offsetV));
+
+	SetLowColor(lColor);
+	SetHighColor(highColor);
+}
+
+
+void
+BCalendarView::_UpdateSelection()
+{
+	BRect frame = _FirstCalendarItemFrame();
+
+	const int32 currRow = fSelectedDay.row;
+	const int32 currColumn = fSelectedDay.column;
+
+	const int32 focusRow = fFocusedDay.row;
+	const int32 focusColumn = fFocusedDay.column;
+
+	int32 counter = 0;
+	for (int32 row = 0; row < 6; ++row) {
+		BRect tmp = frame;
+		for (int32 column = 0; column < 7; ++column) {
+			counter++;
+			if (fNewSelectedDay.row == row && fNewSelectedDay.column == column) {
+				fSelectedDay.SetTo(row, column);
+
+				const char *day = fDayNumbers[row][column].String();
+				bool focus = IsFocus() && focusRow == row && focusColumn == column;
+				_DrawDay(row, column, row, column, counter, tmp, day, focus);
+			}
+			else if (currRow == row && currColumn == column) {
+				const char *day = fDayNumbers[row][column].String();
+				bool focus = IsFocus() && focusRow == row && focusColumn == column;
+				_DrawDay(currRow, currColumn, -1, -1, counter, tmp, day, focus);
+			}
+			tmp.OffsetBy(tmp.Width(), 0.0);
+		}
+		frame.OffsetBy(0.0, frame.Height());
+	}
+}
+
+
+BRect
+BCalendarView::_FirstCalendarItemFrame() const
+{
+	int32 rows = 7;
+	int32 columns = 8;
+
+	if (!fDayNameHeaderVisible)
+		rows = 6;
+
+	if (!fWeekNumberHeaderVisible)
+		columns = 7;
+
+	BRect frame = Bounds();
+	frame.right = frame.Width() / columns - 1.0;
+	frame.bottom = frame.Height() / rows - 1.0;
+
+	float offsetY = 4.0;
+	if (fDayNameHeaderVisible)
+		offsetY += frame.Height();
+
+	float offsetX = 4.0;
+	if (fWeekNumberHeaderVisible)
+		offsetX += frame.Width();
+
+	return frame.OffsetBySelf(offsetX, offsetY);
+}
+
+
+BRect
+BCalendarView::_SetNewSelectedDay(const BPoint &where)
+{
+	BRect frame = _FirstCalendarItemFrame();
+
+	int32 counter = 0;
+	for (int32 row = 0; row < 6; ++row) {
+		BRect tmp = frame;
+		for (int32 column = 0; column < 7; ++column) {
+			counter++;
+			if (tmp.Contains(where)) {
+				fNewSelectedDay.SetTo(row, column);
+				fDay = atoi(fDayNumbers[row][column].String());
+				return tmp;
+			}
+			tmp.OffsetBy(tmp.Width(), 0.0);
+		}
+		frame.OffsetBy(0.0, frame.Height());
+	}
+
+	return frame;
+}
+
+
+BRect
+BCalendarView::_RectOfDay(const Selection &selection) const
+{
+	BRect frame = _FirstCalendarItemFrame();
+
+	int32 counter = 0;
+	for (int32 row = 0; row < 6; ++row) {
+		BRect tmp = frame;
+		for (int32 column = 0; column < 7; ++column) {
+			counter++;
+			if (selection.row == row && selection.column == column) {
+				return tmp;
+			}
+			tmp.OffsetBy(tmp.Width(), 0.0);
+		}
+		frame.OffsetBy(0.0, frame.Height());
+	}
+
+	return frame;
+}
+
+
+BCalendarView&
+BCalendarView::operator=(const BCalendarView &view)
+{
+	return *this;
+}

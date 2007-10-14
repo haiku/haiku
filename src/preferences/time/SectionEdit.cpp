@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		probably Mike Berg <mike@agamemnon.homelinux.net>
+ *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
  *
  */
@@ -19,7 +19,6 @@
 
 
 const uint32 kArrowAreaWidth = 16;
-const uint32 kSeperatorWidth = 8;
 
 
 TSectionEdit::TSectionEdit(BRect frame, const char *name, uint32 sections)
@@ -60,13 +59,12 @@ TSectionEdit::AttachedToWindow()
 
 
 void
-TSectionEdit::Draw(BRect updaterect)
+TSectionEdit::Draw(BRect updateRect)
 {
 	DrawBorder();
-	for (uint32 idx = 0; idx < fSectionCount; idx++)
-	{
+	for (uint32 idx = 0; idx < fSectionCount; idx++) {
 		DrawSection(idx, ((uint32)fFocus == idx) && IsFocus());
-		if (idx <fSectionCount -1)
+		if (idx < fSectionCount -1)
 			DrawSeperator(idx);
 	}
 }
@@ -76,6 +74,7 @@ void
 TSectionEdit::MouseDown(BPoint where)
 {
 	MakeFocus(true);
+	
 	if (fUpRect.Contains(where))
 		DoUpPress();
 	else if (fDownRect.Contains(where))
@@ -90,6 +89,21 @@ TSectionEdit::MouseDown(BPoint where)
 			}
 		}	
 	}
+}
+
+
+void
+TSectionEdit::MakeFocus(bool focused)
+{
+	if (focused == IsFocus())
+		return;
+
+	BControl::MakeFocus(focused);
+	
+	if (fFocus == -1)
+		SectionFocus(0);
+	else
+		SectionFocus(fFocus);
 }
 
 
@@ -133,9 +147,9 @@ TSectionEdit::KeyDown(const char *bytes, int32 numbytes)
 void
 TSectionEdit::DispatchMessage()
 {
-	BMessage *msg = new BMessage(H_USER_CHANGE);
-	BuildDispatch(msg);
-	Window()->PostMessage(msg);
+	BMessage message(H_USER_CHANGE);
+	BuildDispatch(&message);
+	Window()->PostMessage(&message);
 }
 
 
@@ -157,13 +171,15 @@ void
 TSectionEdit::InitView()
 {
 	// create arrow bitmaps
+	BRect rect(0, 0, kUpArrowWidth -1, kUpArrowHeight -1);
+	fUpArrow = new BBitmap(rect, kUpArrowColorSpace);
+	fUpArrow->SetBits(kUpArrowBits, (kUpArrowWidth) *(kUpArrowHeight+1), 0
+		, kUpArrowColorSpace);
 	
-	fUpArrow = new BBitmap(BRect(0, 0, kUpArrowWidth -1, kUpArrowHeight -1), kUpArrowColorSpace);
-	fUpArrow->SetBits(kUpArrowBits, (kUpArrowWidth) *(kUpArrowHeight+1), 0, kUpArrowColorSpace);
-	
-	fDownArrow = new BBitmap(BRect(0, 0, kDownArrowWidth -1, kDownArrowHeight -2), kDownArrowColorSpace);
-	fDownArrow->SetBits(kDownArrowBits, (kDownArrowWidth) *(kDownArrowHeight), 0, kDownArrowColorSpace);
-	
+	rect = BRect(0, 0, kDownArrowWidth -1, kDownArrowHeight -2);
+	fDownArrow = new BBitmap(rect, kDownArrowColorSpace);
+	fDownArrow->SetBits(kDownArrowBits, (kDownArrowWidth) *(kDownArrowHeight)
+		, 0, kDownArrowColorSpace);
 
 	// setup sections
 	fSectionList = new BList(fSectionCount);

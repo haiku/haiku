@@ -3,8 +3,8 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		probably Mike Berg <mike@agamemnon.homelinux.net>
- *		and/or Andrew McCall <mccall@@digitalparadise.co.uk>
+ *		Andrew McCall <mccall@@digitalparadise.co.uk>
+ *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
  *
  */

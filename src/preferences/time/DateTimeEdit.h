@@ -3,8 +3,8 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		probably Mike Berg <mike@agamemnon.homelinux.net>
- *		and/or Andrew McCall <mccall@@digitalparadise.co.uk>
+ *		McCall <mccall@@digitalparadise.co.uk>
+ *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
  *
  */
@@ -12,6 +12,7 @@
 #define DATETIME_H
 
 
+#include "DateTime.h"
 #include "SectionEdit.h"
 
 
@@ -28,14 +29,19 @@ class TTimeEdit : public TSectionEdit {
 		virtual void	SectionFocus(uint32 index);
 		virtual float	SeperatorWidth() const;
 
-		void			CheckRange();
-
 		virtual void	DoUpPress();
 		virtual void	DoDownPress();
 
 		virtual void	BuildDispatch(BMessage *message);
 
-		void			SetTime(uint32 hour, uint32 minute, uint32 second);
+		void			SetTime(int32 hour, int32 minute, int32 second);
+
+	private:
+		void			_CheckRange();
+		int32			_SectionValue(int32 index) const;
+
+	private:
+		BTime			fTime;
 };
 
 
@@ -52,14 +58,19 @@ class TDateEdit : public TSectionEdit {
 		virtual void	SectionFocus(uint32 index);
 		virtual float	SeperatorWidth() const;
 		
-		void			CheckRange();
-		
 		virtual void	DoUpPress();
 		virtual void	DoDownPress();
 		
 		virtual void	BuildDispatch(BMessage *message);
 		
-		void			SetDate(uint32 year, uint32 month, uint32 day);
+		void			SetDate(int32 year, int32 month, int32 day);
+
+	private:
+		void			_CheckRange();
+		int32			_SectionValue(int32 index) const;
+
+	private:
+		BDate			fDate;
 };
 
 #endif // DATETIME_H

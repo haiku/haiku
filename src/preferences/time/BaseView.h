@@ -3,15 +3,15 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Mike Berg (inseculous)
+ *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
  */
 #ifndef TIMEBASE_H
 #define TIMEBASE_H
 
 
-#include <View.h>
 #include <Message.h>
+#include <View.h>
 
 
 class TTimeBaseView: public BView {
@@ -22,14 +22,12 @@ class TTimeBaseView: public BView {
 		virtual void 	Pulse();
 		virtual void 	AttachedToWindow();
 
-		void 			SetGMTime(bool gmtTime);
 		void 			ChangeTime(BMessage *message);
 
-	protected:
-		virtual void 	DispatchMessage();
+	private:
+		void			_SendNotices();
 
 	private:
-		bool 			fIsGMT;
 		BMessage 		fMessage;
 };
 

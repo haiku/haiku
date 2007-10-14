@@ -4,8 +4,9 @@
  *
  * Authors:
  *		Andrew McCall, mccall@digitalparadise.co.uk
- *		Mike Berg <mike@agamemnon.homelinux.net>
+ *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
+ *
  */
  
 #include "TimeSettings.h"

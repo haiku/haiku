@@ -3,8 +3,8 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		probably Mike Berg <mike@agamemnon.homelinux.net>
- *		and/or Andrew McCall <mccall@@digitalparadise.co.uk>
+ *		Andrew McCall <mccall@@digitalparadise.co.uk>
+ *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
  */
 #ifndef SETTINGS_VIEW_H
@@ -16,9 +16,9 @@
 
 class TDateEdit;
 class TTimeEdit;
-class TCalendarView;
-class TAnalogClock;
+class BCalendarView;
 class BRadioButton;
+class TAnalogClock;
 
 
 class TSettingsView : public BView {
@@ -31,21 +31,22 @@ class TSettingsView : public BView {
 		virtual void 	MessageReceived(BMessage *message);
 		virtual void	GetPreferredSize(float *width, float *height);
 
-		bool 			GMTime();
+	private:
+		void 			_InitView();
+		void 			_ReadRTCSettings();
+		void			_WriteRTCSettings();
+		void 			_UpdateDateTime(BMessage *message);
 
 	private:
-		void 			InitView();
-		void 			ReadRTCSettings();
-		void			WriteRTCSettings();
-		void 			UpdateDateTime(BMessage *message);
-
 		BRadioButton 	*fLocalTime;
 		BRadioButton 	*fGmtTime;
 		TDateEdit 		*fDateEdit;
 		TTimeEdit 		*fTimeEdit;
-		TCalendarView 	*fCalendar;
+		BCalendarView 	*fCalendarView;
 		TAnalogClock 	*fClock;
+
 		bool 			fIsLocalTime;
+		bool			fInitialized;
 };
 
 #endif	// SETTINGS_VIEW_H

@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Mike Berg (inseculous)
+ *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
  *		Stephan Aßmus <superstippi@gmx.de>
  */

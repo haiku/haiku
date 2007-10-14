@@ -4,7 +4,7 @@
  *
  * Authors:
  *		Andrew McCall, mccall@digitalparadise.co.uk
- *		Mike Berg <mike@agamemnon.homelinux.net>
+ *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
  */
 #ifndef TIME_MESSAGES_H
@@ -29,20 +29,20 @@ const uint32 RTC_SETTINGS = 'RTse';
 // clock tick message
 const uint32 H_TIME_UPDATE ='obTU';
 
-// clicked on day in claendar
-const uint32 H_DAY_CHANGED = 'obDC';
-
 //notice for clock ticks
 const uint32 H_TM_CHANGED = 'obTC';
 
 //notice for user changes
 const uint32 H_USER_CHANGE = 'obUC';
 
-// local/gmt radiobuttons
+// local/ gmt radiobuttons
 const uint32 H_RTC_CHANGE = 'obRC';
 
-// sunday/monday radio button
+// sunday/ monday radio button
 const uint32 kWeekStart = '_kws';
+
+// clicked on day in calendar
+const uint32 kDayChanged = '_kdc';
 
 #endif //TIME_MESSAGES_H
 

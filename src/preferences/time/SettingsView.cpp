@@ -3,8 +3,8 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		probably Mike Berg <mike@agamemnon.homelinux.net>
- *		and/or Andrew McCall <mccall@@digitalparadise.co.uk>
+ *		Andrew McCall <mccall@@digitalparadise.co.uk>
+ *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
  */
 
@@ -15,29 +15,31 @@
 #include "TimeMessages.h"
 
 
+#include <CheckBox.h>
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <Message.h>
 #include <Path.h>
 #include <RadioButton.h>
 #include <String.h>
 #include <StringView.h>
+#include <Window.h>
 
-#include <stdio.h>
-#include <stdlib.h>
 
 TSettingsView::TSettingsView(BRect frame)
 	: BView(frame,"Settings", B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP),
-	  fGmtTime(NULL)
+	  fGmtTime(NULL),
+	  fInitialized(false)
 {
-	InitView();
+	_ReadRTCSettings();
 }
 
 
 TSettingsView::~TSettingsView()
 {
-	WriteRTCSettings();
+	_WriteRTCSettings();
 }
 
 
@@ -46,6 +48,35 @@ TSettingsView::AttachedToWindow()
 {
 	if (Parent())
 		SetViewColor(Parent()->ViewColor());
+
+	if (!fInitialized) {
+		_InitView();
+		fInitialized = true;
+	}
+}
+
+
+void
+TSettingsView::Draw(BRect /*updateRect*/)
+{
+	rgb_color viewcolor = ViewColor();
+	rgb_color dark = tint_color(viewcolor, B_DARKEN_4_TINT);
+	rgb_color light = tint_color(viewcolor, B_LIGHTEN_MAX_TINT);
+
+	//draw a separator line
+	BRect bounds(Bounds());
+	BPoint start(bounds.Width() / 2.0f + 2.0f, bounds.top + 2.0f);
+	BPoint end(bounds.Width() / 2.0 + 2.0f, bounds.bottom - 2.0f);
+
+	BeginLineArray(2);
+		AddLine(start, end, dark);
+		start.x++;
+		end.x++;
+		AddLine(start, end, light);
+	EndLineArray();
+
+	fTimeEdit->Draw(bounds);
+	fDateEdit->Draw(bounds);
 }
 
 
@@ -56,10 +87,9 @@ TSettingsView::MessageReceived(BMessage *message)
 	switch(message->what) {
 		case B_OBSERVER_NOTICE_CHANGE:
 			message->FindInt32(B_OBSERVE_WHAT_CHANGE, &change);
-			switch(change)
-			{
+			switch(change) {
 				case H_TM_CHANGED:
-					UpdateDateTime(message);
+					_UpdateDateTime(message);
 				break;
 
 				default:
@@ -67,6 +97,14 @@ TSettingsView::MessageReceived(BMessage *message)
 				break;
 			}
 		break;
+
+		case kDayChanged:
+		{
+			BMessage msg(*message);
+			msg.what = H_USER_CHANGE;
+			msg.AddBool("time", false);
+			Window()->PostMessage(&msg);
+		}	break;
 
 		default:
 			BView::MessageReceived(message);
@@ -79,10 +117,10 @@ void
 TSettingsView::GetPreferredSize(float *width, float *height)
 {
 	// hardcode in TimeWindow ...
-	*width = 361.0f;
+	*width = 470.0f;
 	*height = 227.0f;
 
-	if (fGmtTime) {
+	if (fInitialized) {
 		// we are initialized
 		*width = Bounds().Width();
 		*height = fGmtTime->Frame().bottom;
@@ -91,19 +129,17 @@ TSettingsView::GetPreferredSize(float *width, float *height)
 
 
 void
-TSettingsView::InitView()
+TSettingsView::_InitView()
 {
-	ReadRTCSettings();
-
 	font_height fontHeight;
 	be_plain_font->GetHeight(&fontHeight);
 	float textHeight = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
 
 	// left side
 	BRect frameLeft(Bounds());
-	frameLeft.right = frameLeft.Width() / 2;
+	frameLeft.right = frameLeft.Width() / 2.0;
 	frameLeft.InsetBy(10.0f, 10.0f);
-	frameLeft.bottom = frameLeft.top + textHeight +6;
+	frameLeft.bottom = frameLeft.top + textHeight + 6.0;
 
 	fDateEdit = new TDateEdit(frameLeft, "date_edit", 3);
 	AddChild(fDateEdit);
@@ -111,24 +147,28 @@ TSettingsView::InitView()
 	frameLeft.top = fDateEdit->Frame().bottom + 10;
 	frameLeft.bottom = Bounds().bottom - 10;
 
-	fCalendar = new TCalendarView(frameLeft, "calendar", B_FOLLOW_NONE, B_WILL_DRAW);
-	AddChild(fCalendar);
+	fCalendarView = new BCalendarView(frameLeft, "calendar");
+	fCalendarView->SetWeekNumberHeaderVisible(false);
+	AddChild(fCalendarView);
+	fCalendarView->SetSelectionMessage(new BMessage(kDayChanged));
+	fCalendarView->SetInvocationMessage(new BMessage(kDayChanged));
+	fCalendarView->SetTarget(this);
 
-	// right side
+	// right side	
 	BRect frameRight(Bounds());
-	frameRight.left = frameRight.Width() / 2;
+	frameRight.left = frameRight.Width() / 2.0;
 	frameRight.InsetBy(10.0f, 10.0f);
-	frameRight.bottom = frameRight.top + textHeight +6;
+	frameRight.bottom = frameRight.top + textHeight + 6.0;
 
 	fTimeEdit = new TTimeEdit(frameRight, "time_edit", 4);
 	AddChild(fTimeEdit);
 
-	frameRight.top = fTimeEdit->Frame().bottom + 10;
-	frameRight.bottom = Bounds().bottom - 10;
+	frameRight.top = fTimeEdit->Frame().bottom + 10.0;
+	frameRight.bottom = Bounds().bottom - 10.0;
 
 	float left = fTimeEdit->Frame().left;
 	float tmp = MIN(frameRight.Width(), frameRight.Height());
-	frameRight.left = left + (fTimeEdit->Bounds().Width() - tmp) /2;
+	frameRight.left = left + (fTimeEdit->Bounds().Width() - tmp) / 2.0;
 	frameRight.bottom = frameRight.top + tmp;
 	frameRight.right = frameRight.left + tmp;
 
@@ -137,13 +177,13 @@ TSettingsView::InitView()
 
 	// clock radio buttons
 	frameRight.left = left;
-	frameRight.top = fClock->Frame().bottom + 10;
+	frameRight.top = fClock->Frame().bottom + 10.0;
 	BStringView *text = new BStringView(frameRight, "clockis", "Clock set to:");
 	AddChild(text);
 	text->ResizeToPreferred();
 
 	frameRight.left += 10.0f;
-	frameRight.top = text->Frame().bottom + 5;
+	frameRight.top = text->Frame().bottom + 5.0;
 
 	fLocalTime = new BRadioButton(frameRight, "local", "Local time",
 		new BMessage(H_RTC_CHANGE));
@@ -164,66 +204,7 @@ TSettingsView::InitView()
 
 
 void
-TSettingsView::Draw(BRect /*updateRect*/)
-{
-	//draw a separator line
-	BRect bounds(Bounds());
-
-	rgb_color viewcolor = ViewColor();
-	rgb_color dark = tint_color(viewcolor, B_DARKEN_4_TINT);
-	rgb_color light = tint_color(viewcolor, B_LIGHTEN_MAX_TINT);
-
-	BPoint start(bounds.Width() / 2.0f +2.0f, bounds.top +1.0f);
-	BPoint end(bounds.Width() / 2.0 +2.0f, bounds.bottom -1.0f);
-
-	BeginLineArray(2);
-		AddLine(start, end, dark);
-		start.x++;
-		end.x++;
-		AddLine(start, end, light);
-	EndLineArray();
-
-	fTimeEdit->Draw(bounds);
-	fDateEdit->Draw(bounds);
-}
-
-
-bool
-TSettingsView::GMTime()
-{
-	return fGmtTime->Value() == B_CONTROL_ON;
-}
-
-
-void
-TSettingsView::UpdateDateTime(BMessage *message)
-{
-	int32 day;
-	int32 month;
-	int32 year;
-	if (message->FindInt32("month", &month) == B_OK
-		&& message->FindInt32("day", &day) == B_OK
-		&& message->FindInt32("year", &year) == B_OK)
-	{
-		fDateEdit->SetDate(year, month, day);
-		fCalendar->SetTo(year, month, day);
-	}
-
-	int32 hour;
-	int32 minute;
-	int32 second;
-	if (message->FindInt32("hour", &hour) == B_OK
-		&& message->FindInt32("minute", &minute) == B_OK
-		&& message->FindInt32("second", &second) == B_OK)
-	{
-		fTimeEdit->SetTime(hour, minute, second);
-		fClock->SetTime(hour, minute, second);
-	}
-}
-
-
-void
-TSettingsView::ReadRTCSettings()
+TSettingsView::_ReadRTCSettings()
 {
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
@@ -254,7 +235,7 @@ TSettingsView::ReadRTCSettings()
 
 
 void
-TSettingsView::WriteRTCSettings()
+TSettingsView::_WriteRTCSettings()
 {
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
@@ -268,5 +249,32 @@ TSettingsView::WriteRTCSettings()
 			file.Write("local", 5);
 		else
 			file.Write("gmt", 3);
+	}
+}
+
+
+void
+TSettingsView::_UpdateDateTime(BMessage *message)
+{
+	int32 day;
+	int32 month;
+	int32 year;
+	if (message->FindInt32("month", &month) == B_OK
+		&& message->FindInt32("day", &day) == B_OK
+		&& message->FindInt32("year", &year) == B_OK)
+	{
+		fDateEdit->SetDate(year, month, day);
+		fCalendarView->SetDate(year, month, day);
+	}
+
+	int32 hour;
+	int32 minute;
+	int32 second;
+	if (message->FindInt32("hour", &hour) == B_OK
+		&& message->FindInt32("minute", &minute) == B_OK
+		&& message->FindInt32("second", &second) == B_OK)
+	{
+		fTimeEdit->SetTime(hour, minute, second);
+		fClock->SetTime(hour, minute, second);
 	}
 }

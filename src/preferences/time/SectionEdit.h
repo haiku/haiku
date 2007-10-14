@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		probably Mike Berg <mike@agamemnon.homelinux.net>
+ *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
  *
  */
@@ -48,6 +48,7 @@ class TSectionEdit: public BControl {
 		virtual void 	AttachedToWindow();
 		virtual void 	Draw(BRect updateRect);
 		virtual void 	MouseDown(BPoint point);
+		virtual void	MakeFocus(bool focused = true);
 		virtual void 	KeyDown(const char *bytes, int32 numBytes);
 		
 		uint32			CountSections() const;

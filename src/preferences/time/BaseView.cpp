@@ -3,21 +3,20 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Mike Berg (inseculous)
+ *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
  */
 
 #include "BaseView.h"
+#include "DateTime.h"
 #include "TimeMessages.h"
 
 
-#include <Message.h>
 #include <OS.h>
 
 
 TTimeBaseView::TTimeBaseView(BRect frame, const char *name)
 	: BView(frame, name, B_FOLLOW_ALL_SIDES, B_PULSE_NEEDED),
-	  fIsGMT(false),
 	  fMessage(H_TIME_UPDATE)
 {
 }
@@ -32,7 +31,7 @@ void
 TTimeBaseView::Pulse()
 {
 	if (IsWatched())
-		DispatchMessage();
+		_SendNotices();
 }
 
 
@@ -44,77 +43,68 @@ TTimeBaseView::AttachedToWindow()
 
 
 void
-TTimeBaseView::SetGMTime(bool gmt)
-{
-	fIsGMT = gmt;
-}
-
-
-void
 TTimeBaseView::ChangeTime(BMessage *message)
 {
 	bool isTime;
 	if (message->FindBool("time", &isTime) != B_OK)
 		return;
 
-	time_t tmp = time(NULL);
-	struct tm *tm_struct = localtime(&tmp);
-	
+	BDateTime dateTime = BDateTime::CurrentDateTime(B_LOCAL_TIME);
+
 	if (isTime) {
-		int32 hour = 0;
-		if (message->FindInt32("hour", &hour) == B_OK)
-			tm_struct->tm_hour = hour;
+		BTime time = dateTime.Time();
+		int32 hour;
+		if (message->FindInt32("hour", &hour) != B_OK)
+			hour  = time.Hour();
 
-		int32 minute = 0;
-		if (message->FindInt32("minute", &minute) == B_OK)
-			tm_struct->tm_min = minute;
+		int32 minute;
+		if (message->FindInt32("minute", &minute) != B_OK)
+			minute = time.Minute();
 
-		int32 second = 0;
-		if (message->FindInt32("second", &second) == B_OK)
-			tm_struct->tm_sec = second;
+		int32 second;
+		if (message->FindInt32("second", &second) != B_OK)
+			second = time.Second();
 
-		bool isAM = false;
-		if (message->FindBool("isam", &isAM) == B_OK) {
-			if (!isAM) 
-				tm_struct->tm_hour += 12;
-		}		
+		time.SetTime(hour, minute, second);
+		dateTime.SetTime(time);
 	} else {
-		int32 month = 0;
-		if (message->FindInt32("month", &month) == B_OK)
-			tm_struct->tm_mon = month;
+		BDate date = dateTime.Date();
+		int32 day;
+		if (message->FindInt32("day", &day) != B_OK)
+			day = date.Day();
 
-		int32 day = 0;
-		if (message->FindInt32("day", &day) == B_OK)
-			tm_struct->tm_mday = day;
+		int32 year;
+		if (message->FindInt32("year", &year) != B_OK)
+			year = date.Year();
 
-		int32 year = 0;
-		if (message->FindInt32("year", &year) == B_OK)
-			tm_struct->tm_year = year;
+		int32 month;
+		if (message->FindInt32("month", &month) != B_OK)
+			month = date.Month();
+
+		if (year >= 1970 && year <= 2037) {
+			date.SetDate(year, month, day);
+			dateTime.SetDate(date);
+		}
 	}
-	
-	tmp = mktime(tm_struct);
-	set_real_time_clock(tmp);
+
+	set_real_time_clock(dateTime.Time_t());
 }
 
 
 void
-TTimeBaseView::DispatchMessage()
+TTimeBaseView::_SendNotices()
 {
-	time_t tmp = time(NULL);
-	struct tm *tm_struct = localtime(&tmp);
-
-	if (fIsGMT)
-		tm_struct = gmtime(&tmp);
-	
 	fMessage.MakeEmpty();
+	
+	BDate date = BDate::CurrentDate(B_LOCAL_TIME);
+	fMessage.AddInt32("day", date.Day());
+	fMessage.AddInt32("year", date.Year());
+	fMessage.AddInt32("month", date.Month());
 
-	fMessage.AddInt32("month", tm_struct->tm_mon);
-	fMessage.AddInt32("day", tm_struct->tm_mday);
-	fMessage.AddInt32("year", tm_struct->tm_year);
-
-	fMessage.AddInt32("hour", tm_struct->tm_hour);
-	fMessage.AddInt32("minute", tm_struct->tm_min);
-	fMessage.AddInt32("second", tm_struct->tm_sec);
+	BTime time = BTime::CurrentTime(B_LOCAL_TIME);
+	fMessage.AddInt32("hour", time.Hour());
+	fMessage.AddInt32("minute", time.Minute());
+	fMessage.AddInt32("second", time.Second());
 
 	SendNotices(H_TM_CHANGED, &fMessage);
 }

@@ -5,6 +5,7 @@
  * Authors:
  *		Andrew McCall <mccall@@digitalparadise.co.uk>
  *		Julun <host.haiku@gmx.de>
+ *
  */
 
 #include "TimeWindow.h"
@@ -20,7 +21,7 @@
 #include <TabView.h>
 
 
-#define WINDOW_RIGHT	400
+#define WINDOW_RIGHT	470
 #define WINDOW_BOTTOM	227
 
 
@@ -46,17 +47,9 @@ TTimeWindow::MessageReceived(BMessage *message)
 {
 	switch(message->what) {
 		case H_USER_CHANGE:
-		{
-			bool isTime;
-			if (message->FindBool("time", &isTime) == B_OK)
-				fBaseView->ChangeTime(message);
+			fBaseView->ChangeTime(message);
 			break;
-		}
 		
-		case H_RTC_CHANGE:
-			fBaseView->SetGMTime(fTimeSettings->GMTime());
-			break;
-
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -114,8 +107,8 @@ TTimeWindow::_InitWindow()
 
 	float width;
 	float height;
-	fTimeSettings->GetPreferredSize(&width, &height);
 	// width/ height from settingsview + all InsetBy etc..
-	ResizeTo(width +5, height + tabview->TabHeight() +25);
+	fTimeSettings->GetPreferredSize(&width, &height);
+	ResizeTo(width +10, height + tabview->TabHeight() +25);
 }
 
