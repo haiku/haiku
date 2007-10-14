@@ -6,6 +6,7 @@
 #include "DiskSystemAddOnManager.h"
 
 #include <exception>
+#include <new>
 #include <set>
 #include <string>
 
@@ -19,6 +20,9 @@
 #include <AutoLocker.h>
 
 #include <DiskSystemAddOn.h>
+
+
+using std::nothrow;
 
 
 // sManager
