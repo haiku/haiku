@@ -9,6 +9,7 @@
 #include <edid.h>
 
 #include <Accelerant.h>
+#include <GraphicsDefs.h>
 
 
 typedef bool (*check_display_mode_hook)(display_mode *mode);

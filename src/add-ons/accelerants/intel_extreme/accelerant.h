@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,6 +11,7 @@
 
 #include "intel_extreme.h"
 
+#include <edid.h>
 #include <video_overlay.h>
 
 
@@ -49,6 +50,9 @@ struct accelerant_info {
 
 	hardware_status	*status;
 	uint8			*cursor_memory;
+
+	edid1_info		edid_info;
+	bool			has_edid;
 
 	int				device;
 	uint8			head_mode;

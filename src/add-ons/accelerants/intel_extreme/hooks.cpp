@@ -42,6 +42,10 @@ get_accelerant_hook(uint32 feature, void *data)
 			return (void*)intel_set_display_mode;
 		case B_GET_DISPLAY_MODE:
 			return (void*)intel_get_display_mode;
+#ifdef __HAIKU__
+		case B_GET_EDID_INFO:
+			return (void*)intel_get_edid_info;
+#endif
 		case B_GET_FRAME_BUFFER_CONFIG:
 			return (void*)intel_get_frame_buffer_config;
 		case B_GET_PIXEL_CLOCK_LIMITS:

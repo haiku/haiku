@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Support for i915 chipset and up based on the X driver,
- * Copyright 2006 Intel Corporation.
+ * Copyright 2006-2007 Intel Corporation.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
@@ -18,6 +18,7 @@
 #include <string.h>
 #include <math.h>
 
+#include <create_display_modes.h>
 #include <ddc.h>
 #include <edid.h>
 
@@ -29,12 +30,6 @@ extern "C" void _sPrintf(const char *format, ...);
 #else
 #	define TRACE(x) ;
 #endif
-
-
-#define	POSITIVE_SYNC \
-	(B_POSITIVE_HSYNC | B_POSITIVE_VSYNC)
-#define MODE_FLAGS \
-	(B_8_BIT_DAC | B_HARDWARE_CURSOR | B_PARALLEL_ACCESS | B_DPMS | B_SUPPORTS_OVERLAYS)
 
 
 struct display_registers {
@@ -72,45 +67,6 @@ struct pll_limits {
 	uint32			min_vco;
 	uint32			max_vco;
 };
-
-static const display_mode kBaseModeList[] = {
-	{{25175, 640, 656, 752, 800, 350, 387, 389, 449, B_POSITIVE_HSYNC}, B_CMAP8, 640, 350, 0, 0, MODE_FLAGS}, /* 640x350 - www.epanorama.net/documents/pc/vga_timing.html) */
-	{{25175, 640, 656, 752, 800, 400, 412, 414, 449, B_POSITIVE_VSYNC}, B_CMAP8, 640, 400, 0, 0, MODE_FLAGS}, /* 640x400 - www.epanorama.net/documents/pc/vga_timing.html) */
-	{{25175, 640, 656, 752, 800, 480, 490, 492, 525, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(640X480X8.Z1) */
-	{{27500, 640, 672, 768, 864, 480, 488, 494, 530, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* 640X480X60Hz */
-	{{30500, 640, 672, 768, 864, 480, 517, 523, 588, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* SVGA_640X480X60HzNI */
-	{{31500, 640, 664, 704, 832, 480, 489, 492, 520, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@70-72Hz_(640X480X8.Z1) */
-	{{31500, 640, 656, 720, 840, 480, 481, 484, 500, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(640X480X8.Z1) */
-	{{36000, 640, 696, 752, 832, 480, 481, 484, 509, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(640X480X8.Z1) */
-	{{38100, 800, 832, 960, 1088, 600, 602, 606, 620, 0}, B_CMAP8, 800, 600, 0, 0, MODE_FLAGS}, /* SVGA_800X600X56HzNI */
-	{{40000, 800, 840, 968, 1056, 600, 601, 605, 628, POSITIVE_SYNC}, B_CMAP8, 800, 600, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(800X600X8.Z1) */
-	{{49500, 800, 816, 896, 1056, 600, 601, 604, 625, POSITIVE_SYNC}, B_CMAP8, 800, 600, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(800X600X8.Z1) */
-	{{50000, 800, 856, 976, 1040, 600, 637, 643, 666, POSITIVE_SYNC}, B_CMAP8, 800, 600, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@70-72Hz_(800X600X8.Z1) */
-	{{56250, 800, 832, 896, 1048, 600, 601, 604, 631, POSITIVE_SYNC}, B_CMAP8, 800, 600, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(800X600X8.Z1) */
-	{{65000, 1024, 1048, 1184, 1344, 768, 771, 777, 806, 0}, B_CMAP8, 1024, 768, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1024X768X8.Z1) */
-	{{75000, 1024, 1048, 1184, 1328, 768, 771, 777, 806, 0}, B_CMAP8, 1024, 768, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@70-72Hz_(1024X768X8.Z1) */
-	{{78750, 1024, 1040, 1136, 1312, 768, 769, 772, 800, POSITIVE_SYNC}, B_CMAP8, 1024, 768, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(1024X768X8.Z1) */
-	{{94500, 1024, 1072, 1168, 1376, 768, 769, 772, 808, POSITIVE_SYNC}, B_CMAP8, 1024, 768, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(1024X768X8.Z1) */
-	{{94200, 1152, 1184, 1280, 1472, 864, 865, 868, 914, POSITIVE_SYNC}, B_CMAP8, 1152, 864, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@70Hz_(1152X864X8.Z1) */
-	{{108000, 1152, 1216, 1344, 1600, 864, 865, 868, 900, POSITIVE_SYNC}, B_CMAP8, 1152, 864, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(1152X864X8.Z1) */
-	{{121500, 1152, 1216, 1344, 1568, 864, 865, 868, 911, POSITIVE_SYNC}, B_CMAP8, 1152, 864, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(1152X864X8.Z1) */
-	{{108000, 1280, 1328, 1440, 1688, 1024, 1025, 1028, 1066, POSITIVE_SYNC}, B_CMAP8, 1280, 1024, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1280X1024X8.Z1) */
-	{{135000, 1280, 1296, 1440, 1688, 1024, 1025, 1028, 1066, POSITIVE_SYNC}, B_CMAP8, 1280, 1024, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(1280X1024X8.Z1) */
-	{{157500, 1280, 1344, 1504, 1728, 1024, 1025, 1028, 1072, POSITIVE_SYNC}, B_CMAP8, 1280, 1024, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(1280X1024X8.Z1) */
-
-	{{106500, 1440, 1520, 1672, 1904, 900, 901, 904, 932, POSITIVE_SYNC}, B_CMAP8, 1440, 900, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1440X900) */
-
-	{{162000, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1600X1200X8.Z1) */
-	{{175500, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@65Hz_(1600X1200X8.Z1) */
-	{{189000, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@70Hz_(1600X1200X8.Z1) */
-	{{202500, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(1600X1200X8.Z1) */
-	{{216000, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@80Hz_(1600X1200X8.Z1) */
-	{{229500, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(1600X1200X8.Z1) */
-
-	{{147100, 1680, 1784, 1968, 2256, 1050, 1051, 1054, 1087, POSITIVE_SYNC}, B_CMAP8, 1680, 1050, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1680X1050) */
-};
-static const uint32 kNumBaseModes = sizeof(kBaseModeList) / sizeof(display_mode);
-static const uint32 kMaxNumModes = kNumBaseModes * 4;
 
 
 static status_t
@@ -189,54 +145,36 @@ set_frame_buffer_base()
 }
 
 
-/*!
-	Creates the initial mode list of the primary accelerant.
+/*!	Creates the initial mode list of the primary accelerant.
 	It's called from intel_init_accelerant().
 */
 status_t
 create_mode_list(void)
 {
-	color_space spaces[4] = {B_RGB32_LITTLE, B_RGB16_LITTLE, B_RGB15_LITTLE, B_CMAP8};
-	size_t size = ROUND_TO_PAGE_SIZE(kMaxNumModes * sizeof(display_mode));
-	display_mode *list;
-
-	gInfo->mode_list_area = create_area("intel extreme modes", (void **)&list, B_ANY_ADDRESS,
-		size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
-	if (gInfo->mode_list_area < B_OK)
-		return gInfo->mode_list_area;
-
-	// for now, just copy all of the modes with different color spaces
-
-	const display_mode *source = kBaseModeList;
-	uint32 count = 0;
-
-	for (uint32 i = 0; i < kNumBaseModes; i++) {
-		for (uint32 j = 0; j < (sizeof(spaces) / sizeof(color_space)); j++) {
-			list[count] = *source;
-			list[count].space = spaces[j];
-
-			count++;
-		}
-
-		source++;
-	}
-
-	gInfo->mode_list = list;
-	gInfo->shared_info->mode_list_area = gInfo->mode_list_area;
-	gInfo->shared_info->mode_count = count;
-
-	edid1_info edid;
 	i2c_bus bus;
 	bus.cookie = (void*)INTEL_I2C_IO_A;
 	bus.set_signals = &set_i2c_signals;
 	bus.get_signals = &get_i2c_signals;
 	ddc2_init_timing(&bus);
 
-	if (ddc2_read_edid1(&bus, &edid, NULL, NULL) == B_OK) {
-		edid_dump(&edid);
+	if (ddc2_read_edid1(&bus, &gInfo->edid_info, NULL, NULL) == B_OK) {
+		edid_dump(&gInfo->edid_info);
+		gInfo->has_edid = true;
 	} else {
 		TRACE(("intel_extreme: getting EDID failed!\n"));
 	}
+
+	display_mode *list;
+	uint32 count = 0;
+	gInfo->mode_list_area = create_display_modes("intel extreme modes",
+		gInfo->has_edid ? &gInfo->edid_info : NULL, NULL, 0, NULL, 0, NULL,
+		&list, &count);
+	if (gInfo->mode_list_area < B_OK)
+		return gInfo->mode_list_area;
+
+	gInfo->mode_list = list;
+	gInfo->shared_info->mode_list_area = gInfo->mode_list_area;
+	gInfo->shared_info->mode_count = count;
 
 	return B_OK;
 }
@@ -454,7 +392,6 @@ intel_set_display_mode(display_mode *mode)
 	uint32 colorMode, bytesPerRow, bitsPerPixel;
 	get_color_space_format(target, colorMode, bytesPerRow, bitsPerPixel);
 
-debug_printf("new resolution: %ux%ux%lu\n", target.timing.h_display, target.timing.v_display, bitsPerPixel);
 #if 0
 static bool first = true;
 if (first) {
@@ -472,7 +409,6 @@ if (first) {
 	first = false;
 }
 #endif
-	//return B_ERROR;
 
 	intel_shared_info &sharedInfo = *gInfo->shared_info;
 	Autolock locker(sharedInfo.accelerant_lock);
@@ -541,7 +477,6 @@ if (first) {
 				pll |= DISPLAY_PLL_POST1_DIVIDE_2;
 		}
 
-		debug_printf("PLL is %#lx, write: %#lx\n", read32(INTEL_DISPLAY_A_PLL), pll);
 		write32(INTEL_DISPLAY_A_PLL, pll);
 		read32(INTEL_DISPLAY_A_PLL);
 		spin(150);
@@ -710,6 +645,22 @@ intel_get_display_mode(display_mode *_currentMode)
 	return B_OK;
 }
 
+#ifdef __HAIKU__
+
+status_t
+intel_get_edid_info(void* info, size_t size, uint32* _version)
+{
+	if (!gInfo->has_edid)
+		return B_ERROR;
+	if (size < sizeof(struct edid1_info))
+		return B_BUFFER_OVERFLOW;
+
+	memcpy(info, &gInfo->edid_info, sizeof(struct edid1_info));
+	*_version = EDID_VERSION_1;
+	return B_OK;
+}
+
+#endif	// __HAIKU__
 
 status_t
 intel_get_frame_buffer_config(frame_buffer_config *config)
