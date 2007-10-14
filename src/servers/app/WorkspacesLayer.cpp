@@ -476,7 +476,7 @@ WorkspacesLayer::MouseMoved(BMessage* message, BPoint where)
 	workspaceFrame.InsetBy(1, 1);
 
 	if (index != fSelectedWorkspace) {
-		if (!fSelectedWindow->InWorkspace(index) && fSelectedWindow->IsNormal()) {
+		if (fSelectedWindow->IsNormal() && !fSelectedWindow->InWorkspace(index)) {
 			// move window to this new workspace
 			uint32 newWorkspaces = fSelectedWindow->Workspaces()
 				& ~(1UL << fSelectedWorkspace) | (1UL << index);

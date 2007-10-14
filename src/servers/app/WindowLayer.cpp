@@ -68,10 +68,8 @@ using std::nothrow;
 
 
 WindowLayer::WindowLayer(const BRect& frame, const char *name,
-						 window_look look, window_feel feel,
-						 uint32 flags, uint32 workspaces,
-						 ::ServerWindow* window,
-						 DrawingEngine* drawingEngine)
+		window_look look, window_feel feel, uint32 flags, uint32 workspaces,
+		::ServerWindow* window, DrawingEngine* drawingEngine)
 	:
 	fTitle(name),
 	fFrame(frame),
@@ -1358,47 +1356,13 @@ WindowLayer::SetFlags(uint32 flags, BRegion* updateRegion)
 }
 
 
-/*!
-	\brief Returns wether or not the window is visible on the specified
-		workspace.
-
-	A modal or floating window may be visible on a workscreen if one
-	of its subset windows is visible there.
+/*!	Returns wether or not a window is in the workspace list with the
+	specified \a index.
 */
 bool
 WindowLayer::InWorkspace(int32 index) const
 {
-	if (IsNormal())
-		return (fWorkspaces & (1UL << index)) != 0;
-
-	if (fFeel == B_MODAL_ALL_WINDOW_FEEL
-		|| fFeel == B_FLOATING_ALL_WINDOW_FEEL)
-		return true;
-
-	if (fFeel == B_FLOATING_APP_WINDOW_FEEL)
-		return ServerWindow()->App()->InWorkspace(index);
-
-	if (fFeel == B_MODAL_APP_WINDOW_FEEL) {
-		uint32 workspaces = ServerWindow()->App()->Workspaces();
-		if (workspaces == 0) {
-			// The application doesn't seem to have any other windows
-			// open or visible - but we'd like to see modal windows
-			// anyway, at least when they are first opened.
-			return index == fDesktop->CurrentWorkspace();
-		}
-		return (workspaces & (1UL << index)) != 0;
-	}
-
-	if (fFeel == B_MODAL_SUBSET_WINDOW_FEEL
-		|| fFeel == B_FLOATING_SUBSET_WINDOW_FEEL) {
-		for (int32 i = 0; i < fSubsets.CountItems(); i++) {
-			WindowLayer* window = fSubsets.ItemAt(i);
-			if (!window->IsHidden() && window->InWorkspace(index))
-				return true;
-		}
-	}
-
-	return false;
+	return (fWorkspaces & (1UL << index)) != 0;
 }
 
 
@@ -1451,8 +1415,7 @@ WindowLayer::HasModal() const
 }
 
 
-/*!
-	\brief Returns the windows that's in behind of the backmost position
+/*!	\brief Returns the windows that's in behind of the backmost position
 		this window can get.
 		Returns NULL is this window can be the backmost window.
 */
@@ -1481,8 +1444,7 @@ WindowLayer::Backmost(WindowLayer* window, int32 workspace)
 }
 
 
-/*!
-	\brief Returns the windows that's in front of the frontmost position
+/*!	\brief Returns the windows that's in front of the frontmost position
 		this window can get.
 		Returns NULL if this window can be the frontmost window.
 */
@@ -1552,6 +1514,7 @@ WindowLayer::HasInSubset(const WindowLayer* window) const
 	}
 
 	if (fFeel == B_FLOATING_APP_WINDOW_FEEL
+			&& window->Feel() != B_MODAL_APP_WINDOW_FEEL
 		|| fFeel == B_MODAL_APP_WINDOW_FEEL)
 		return window->ServerWindow()->App() == ServerWindow()->App();
 
@@ -1559,34 +1522,12 @@ WindowLayer::HasInSubset(const WindowLayer* window) const
 }
 
 
-bool
-WindowLayer::SameSubset(WindowLayer* window)
-{
-	// TODO: this is probably not needed at all, but it doesn't hurt to have it in svn
-	if (fFeel == B_MODAL_ALL_WINDOW_FEEL || window->Feel() == B_MODAL_ALL_WINDOW_FEEL)
-		return fFeel == window->Feel();
+/*!	\brief Returns on which workspaces the window should be visible.
 
-	if (fFeel == B_MODAL_APP_WINDOW_FEEL || window->Feel() == B_MODAL_APP_WINDOW_FEEL)
-		return ServerWindow()->App() == window->ServerWindow()->App();
-
-	if (fFeel == B_MODAL_SUBSET_WINDOW_FEEL) {
-		// we basically need to check if the subsets have anything in common
-		for (int32 i = fSubsets.CountItems(); i-- > 0;) {
-			if (window->HasInSubset(fSubsets.ItemAt(i)))
-				return true;
-		}
-	}
-	if (window->Feel() == B_MODAL_SUBSET_WINDOW_FEEL) {
-		for (int32 i = window->fSubsets.CountItems(); i-- > 0;) {
-			if (HasInSubset(window->fSubsets.ItemAt(i)))
-				return true;
-		}
-	}
-
-	return false;
-}
-
-
+	A modal or floating window may be visible on a workscreen if one
+	of its subset windows is visible there. Floating windows also need
+	to have a subset as front window to be visible.
+*/
 uint32
 WindowLayer::SubsetWorkspaces() const
 {
@@ -1594,8 +1535,14 @@ WindowLayer::SubsetWorkspaces() const
 		|| fFeel == B_FLOATING_ALL_WINDOW_FEEL)
 		return B_ALL_WORKSPACES;
 
-	if (fFeel == B_FLOATING_APP_WINDOW_FEEL)
-		return ServerWindow()->App()->Workspaces();
+	if (fFeel == B_FLOATING_APP_WINDOW_FEEL) {
+		WindowLayer* front = fDesktop->FrontWindow();
+		if (front != NULL && front->IsNormal()
+			&& front->ServerWindow()->App() == ServerWindow()->App())
+			return ServerWindow()->App()->Workspaces();
+
+		return 0;
+	}
 
 	if (fFeel == B_MODAL_APP_WINDOW_FEEL) {
 		uint32 workspaces = ServerWindow()->App()->Workspaces();
@@ -1611,12 +1558,18 @@ WindowLayer::SubsetWorkspaces() const
 	if (fFeel == B_MODAL_SUBSET_WINDOW_FEEL
 		|| fFeel == B_FLOATING_SUBSET_WINDOW_FEEL) {
 		uint32 workspaces = 0;
+		bool hasNormalFront = false;
 		for (int32 i = 0; i < fSubsets.CountItems(); i++) {
 			WindowLayer* window = fSubsets.ItemAt(i);
 
 			if (!window->IsHidden())
 				workspaces |= window->Workspaces();
+			if (window == fDesktop->FrontWindow() && window->IsNormal())
+				hasNormalFront = true;
 		}
+
+		if (fFeel == B_FLOATING_SUBSET_WINDOW_FEEL && !hasNormalFront)
+			return 0;
 
 		return workspaces;
 	}
@@ -1717,7 +1670,7 @@ WindowLayer::ValidWindowFlags(window_feel feel)
 // _ShiftPartOfRegion
 void
 WindowLayer::_ShiftPartOfRegion(BRegion* region, BRegion* regionToShift,
-								int32 xOffset, int32 yOffset)
+	int32 xOffset, int32 yOffset)
 {
 	BRegion* common = fRegionPool.GetRegion(*regionToShift);
 	if (!common)
@@ -1870,6 +1823,7 @@ WindowLayer::_SendUpdateMessage()
 	fUpdateRequested = true;
 	fEffectiveDrawingRegionValid = false;
 }
+
 
 void
 WindowLayer::BeginUpdate(BPrivate::PortLink& link)
@@ -2059,9 +2013,10 @@ WindowLayer::_ObeySizeLimits()
 		ResizeBy(xDiff, yDiff, NULL);
 }
 
+
 // #pragma mark - UpdateSession
 
-// constructor
+
 WindowLayer::UpdateSession::UpdateSession()
 	: fDirtyRegion(),
 	  fInUse(false),
@@ -2069,12 +2024,12 @@ WindowLayer::UpdateSession::UpdateSession()
 {
 }
 
-// destructor
+
 WindowLayer::UpdateSession::~UpdateSession()
 {
 }
 
-// Include
+
 void
 WindowLayer::UpdateSession::Include(BRegion* additionalDirty)
 {
@@ -2122,6 +2077,4 @@ WindowLayer::UpdateSession::operator=(const WindowLayer::UpdateSession& other)
 	fCause = other.fCause;
 	return *this;
 }
-
-
 
