@@ -458,6 +458,17 @@ BPartition::Delegate::Uninitialize()
 }
 
 
+// GetPartitioningInfo
+status_t
+BPartition::Delegate::GetPartitioningInfo(BPartitioningInfo* info)
+{
+	if (!fPartitionHandle)
+		return B_NO_INIT;
+
+	return fPartitionHandle->GetPartitioningInfo(info);
+}
+
+
 // GetChildCreationParameterEditor
 status_t
 BPartition::Delegate::GetChildCreationParameterEditor(const char* type,

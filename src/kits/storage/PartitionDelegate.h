@@ -85,6 +85,8 @@ public:
 	
 			// Modification of child partitions
 
+			status_t			GetPartitioningInfo(BPartitioningInfo* info);
+
 			status_t			GetChildCreationParameterEditor(
 									const char* system,
 									BDiskDeviceParameterEditor** editor) const;

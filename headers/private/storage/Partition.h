@@ -25,7 +25,7 @@ struct user_partition_data;
 class BPartition {
 public:
 	// Partition Info
-	
+
 	off_t Offset() const;		// 0 for devices
 	off_t Size() const;
 	off_t ContentSize() const;	// 0 if uninitialized
@@ -95,12 +95,12 @@ public:
 	status_t Move(off_t newOffset);
 
 	bool CanSetName() const;
-	status_t ValidateSetName(char *name) const;
+	status_t ValidateSetName(BString* name) const;
 		// adjusts name to be suitable
 	status_t SetName(const char *name);
 
 	bool CanSetContentName(bool *whileMounted = NULL) const;
-	status_t ValidateSetContentName(char *name) const;
+	status_t ValidateSetContentName(BString* name) const;
 		// adjusts name to be suitable
 	status_t SetContentName(const char *name);
 
@@ -121,7 +121,7 @@ public:
 	bool CanInitialize(const char *diskSystem) const;
 	status_t GetInitializationParameterEditor(const char *system,       
                BDiskDeviceParameterEditor **editor) const;
-	status_t ValidateInitialize(const char *diskSystem, char *name,
+	status_t ValidateInitialize(const char *diskSystem, BString* name,
 								const char *parameters);
 	status_t Initialize(const char *diskSystem, const char *name,
 						const char *parameters);
@@ -130,12 +130,12 @@ public:
 	// Modification of child partitions
 
 	bool CanCreateChild() const;
-	status_t GetChildCreationParameterEditor(const char *system,
+	status_t GetChildCreationParameterEditor(const char *type,
                BDiskDeviceParameterEditor **editor) const;
-	status_t ValidateCreateChild(off_t *start, off_t *size,
-				const char *type, const char *parameters) const;
-	status_t CreateChild(off_t start, off_t size, const char *type,
-				const char *parameters, BPartition **child = NULL);
+	status_t ValidateCreateChild(off_t* start, off_t* size,
+				const char* type, BString* name, const char* parameters) const;
+	status_t CreateChild(off_t start, off_t size, const char* type,
+		const char* name, const char* parameters, BPartition** child = NULL);
 	
 	bool CanDeleteChild(int32 index) const;
 	status_t DeleteChild(int32 index);
@@ -166,6 +166,13 @@ private:
 	virtual bool _AcceptVisitor(BDiskDeviceVisitor *visitor, int32 level);
 	BPartition *_VisitEachDescendant(BDiskDeviceVisitor *visitor,
 									 int32 level = -1);
+
+	const user_partition_data* _PartitionData() const;
+
+	bool _HasContent() const;
+	bool _SupportsOperation(uint32 flag, uint32 whileMountedFlag,
+		bool* whileMounted) const;
+	bool _SupportsChildOperation(const BPartition* child, uint32 flag) const;
 
 	friend class BDiskDevice;
 	friend class BDiskSystem;
