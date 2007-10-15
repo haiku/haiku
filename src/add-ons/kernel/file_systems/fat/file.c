@@ -1479,12 +1479,13 @@ dosfs_can_page(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
 
 status_t
 dosfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
-	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
+	const iovec *vecs, size_t count, size_t *_numBytes, bool mayBlock,
+	bool reenter)
 {
-	nspace  *vol = (nspace *)_fs;
-	vnode   *node = (vnode *)_node;
+	nspace *vol = (nspace *)_fs;
+	vnode *node = (vnode *)_node;
 	status_t status;
-	
+
 	if (check_nspace_magic(vol, "dosfs_read_pages")
 		|| check_vnode_magic(node, "dosfs_read_pages"))
 		return EINVAL;
@@ -1492,6 +1493,7 @@ dosfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 	if (node->cache == NULL)
 		return(B_BAD_VALUE);
 
+	// TODO: respect "mayBlock"!
 	LOCK_VOL(vol);
 	status = file_cache_read_pages(node->cache, pos, vecs, count,
 		_numBytes);
@@ -1503,10 +1505,11 @@ dosfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 
 status_t
 dosfs_write_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
-	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
+	const iovec *vecs, size_t count, size_t *_numBytes, bool mayBlock,
+	bool reenter)
 {
-	nspace  *vol = (nspace *)_fs;
-	vnode   *node = (vnode *)_node;
+	nspace *vol = (nspace *)_fs;
+	vnode *node = (vnode *)_node;
 	status_t status;
 
 	if (check_nspace_magic(vol, "dosfs_write_pages")
@@ -1516,6 +1519,7 @@ dosfs_write_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 	if (node->cache == NULL)
 		return B_BAD_VALUE;
 
+	// TODO: respect "mayBlock"!
 	LOCK_VOL(vol);
 	status = file_cache_write_pages(node->cache, pos, vecs, count,
 		_numBytes);

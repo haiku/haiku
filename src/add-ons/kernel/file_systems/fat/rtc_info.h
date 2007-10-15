@@ -18,6 +18,6 @@ typedef struct {
 
 #define RTC_SETTINGS_FILE	"RTC_time_settings"
 
-extern _IMPEXP_KERNEL status_t get_rtc_info(rtc_info *);
+extern status_t get_rtc_info(rtc_info *);
 
 #endif /* _RTC_INFO_H */
