@@ -4,6 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders shared ;
+UsePublicHeaders [ FDirName be_apps Tracker ] ;
 
 Preference Backgrounds : 
 	BackgroundImage.cpp
