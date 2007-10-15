@@ -1904,7 +1904,9 @@
 /* #undef utime */
 
 /* Define as a macro for copying va_list variables. */
+#if __GNUC__ < 3
 #define va_copy __va_copy
+#endif
 
 /* Define to empty if the keyword `volatile' does not work. Warning: valid
    code using `volatile' can become incorrect without. Disable with care. */

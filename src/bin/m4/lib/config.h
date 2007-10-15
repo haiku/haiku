@@ -604,4 +604,6 @@
 /* #undef stack_t */
 
 /* Define as a macro for copying va_list variables. */
+#if __GNUC__ < 3
 #define va_copy gl_va_copy
+#endif
