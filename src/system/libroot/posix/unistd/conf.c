@@ -1,16 +1,21 @@
-/* 
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <unistd.h>
-#include <sys/resource.h>
-#include <stdio.h>
+
 #include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/resource.h>
+
+#include <SupportDefs.h>
 
 
-int 
+int
 getdtablesize(void)
 {
 	struct rlimit rlimit;
@@ -21,10 +26,10 @@ getdtablesize(void)
 }
 
 
-long 
+long
 sysconf(int name)
 {
-	// This is about what BeOS does, better POSIX conformance would be nice, though
+	// TODO: This is about what BeOS does, better POSIX conformance would be nice, though
 
 	switch (name) {
 		case _SC_ARG_MAX:
@@ -53,7 +58,7 @@ sysconf(int name)
 }
 
 
-long 
+long
 fpathconf(int fd, int name)
 {
 	switch (name) {
@@ -94,20 +99,19 @@ fpathconf(int fd, int name)
 }
 
 
-long 
+long
 pathconf(const char *path, int name)
 {
 	return fpathconf(-1, name);
 }
 
 
-#define min_c(a,b) ((a)>(b)?(b):(a))
-
-size_t 
-confstr(int name, char *buf, size_t len)
+size_t
+confstr(int name, char *buffer, size_t length)
 {
-	size_t string_len = 1;
+	size_t stringLength = 1;
 	char *string = "";
+
 	switch (name) {
 		case 0:
 			break;
@@ -115,8 +119,10 @@ confstr(int name, char *buf, size_t len)
 			errno = EINVAL;
 			return 0;
 	}
-	if (buf != NULL)
-		strncpy(buf, string, min_c(len, string_len));
-	return string_len;
+
+	if (buffer != NULL)
+		strlcpy(buffer, string, min_c(length, stringLength));
+
+	return stringLength;
 }
 
