@@ -71,8 +71,16 @@ SampleGLApp::SampleGLApp()
 
 
 SampleGLWindow::SampleGLWindow(BRect frame, uint32 type)
-   : BDirectWindow(frame, "OpenGL Test", B_TITLED_WINDOW, 0)
+   : BDirectWindow(frame, "GLDirectMode", B_TITLED_WINDOW, 0)
 {
+   float minWidth = 0.0f; 
+   float maxWidth = 0.0f; 
+   float minHeight = 0.0f; 
+   float maxHeight = 0.0f; 
+ 	
+   GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight); 
+   SetSizeLimits(50.0f, maxWidth, 50.0f, maxHeight); 
+	
    BRect r = Bounds();
 	
    r.InsetBy(10, 10);
@@ -208,10 +216,12 @@ void SampleGLView::gDraw(float rotation)
 void SampleGLView::gReshape(int width, int height)
 {
    glViewport(0, 0, width, height);
-   glMatrixMode(GL_PROJECTION);
-   glLoadIdentity();
-   gluPerspective(45, width / (float) height, 1, 500);
-   glMatrixMode(GL_MODELVIEW);
+   if (height) {  // Avoid Divide By Zero error...
+      glMatrixMode(GL_PROJECTION);
+      glLoadIdentity();
+      gluPerspective(45, width / (float) height, 1, 500);
+      glMatrixMode(GL_MODELVIEW);
+   }
 }
 
 
