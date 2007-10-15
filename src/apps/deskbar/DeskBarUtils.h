@@ -37,6 +37,8 @@ All rights reserved.
 
 #include "tracker_private.h"
 
+class BFilePanel;
+
 enum {
 	msg_be_container
 };

@@ -21,6 +21,7 @@
 #include <ListView.h>
 
 class BButton;
+class BTabView;
 
 class ModulesView;
 class ScreenCornerSelector;

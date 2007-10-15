@@ -1,5 +1,3 @@
-// AddOnHost.cpp
-
 #include "AddOnHost.h"
 #include "AddOnHostProtocol.h"
 
@@ -240,4 +238,3 @@ status_t AddOnHost::ReleaseInternalNode(
 	return (reply.FindInt32("error", &err) == B_OK) ? err : B_ERROR;
 }
 
-// END -- AddOnHost.cpp --

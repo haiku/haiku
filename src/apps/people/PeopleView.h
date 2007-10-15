@@ -19,6 +19,7 @@
 #define NAME_V				 10
 #define STATE_WIDTH			175
 
+class BPopUpMenu;
 class TTextControl;
 
 

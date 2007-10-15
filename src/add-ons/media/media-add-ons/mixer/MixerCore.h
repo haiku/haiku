@@ -12,6 +12,7 @@
 #include <TimeSource.h>
 
 class AudioMixer;
+class BBufferGroup;
 class MixerInput;
 class MixerOutput;
 class Resampler;

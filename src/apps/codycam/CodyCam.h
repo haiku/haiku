@@ -16,6 +16,10 @@
 #include "Settings.h"
 #include"VideoConsumer.h"
 
+
+class BMediaRoster;
+
+
 enum {
 	msg_filename	= 'file',
 
