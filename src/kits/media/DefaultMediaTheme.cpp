@@ -1,7 +1,7 @@
-/* 
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "DefaultMediaTheme.h"
@@ -108,7 +108,8 @@ class MessageFilter : public BMessageFilter {
 
 class ContinuousMessageFilter : public MessageFilter {
 	public:
-		ContinuousMessageFilter(BControl *control, BContinuousParameter &parameter);
+		ContinuousMessageFilter(BControl *control,
+			BContinuousParameter &parameter);
 		virtual ~ContinuousMessageFilter();
 
 		virtual filter_result Filter(BMessage *message, BHandler **target);
@@ -254,7 +255,8 @@ DynamicScrollView::UpdateBars()
 		if (vertical || fIsDocumentScroller)
 			rect.right -= B_V_SCROLL_BAR_WIDTH;
 
-		fHorizontalScrollBar = new BScrollBar(rect, "horizontal", fTarget, 0, width, B_HORIZONTAL);
+		fHorizontalScrollBar = new BScrollBar(rect, "horizontal", fTarget, 0,
+			width, B_HORIZONTAL);
 		fTarget->ResizeBy(0, -B_H_SCROLL_BAR_HEIGHT);
 		AddChild(fHorizontalScrollBar);
 		horizontalChanged = true;
@@ -266,7 +268,8 @@ DynamicScrollView::UpdateBars()
 		if (horizontal || fIsDocumentScroller)
 			rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
 
-		fVerticalScrollBar = new BScrollBar(rect, "vertical", fTarget, 0, height, B_VERTICAL);
+		fVerticalScrollBar = new BScrollBar(rect, "vertical", fTarget, 0,
+			height, B_VERTICAL);
 		fTarget->ResizeBy(-B_V_SCROLL_BAR_WIDTH, 0);
 		AddChild(fVerticalScrollBar);
 		verticalChanged = true;
@@ -274,10 +277,14 @@ DynamicScrollView::UpdateBars()
 
 	// adapt the scroll bars, so that they don't overlap each other
 	if (!fIsDocumentScroller) {
-		if (horizontalChanged && !verticalChanged && vertical)
-			fVerticalScrollBar->ResizeBy(0, (horizontal ? -1 : 1) * B_H_SCROLL_BAR_HEIGHT);
-		if (verticalChanged && !horizontalChanged && horizontal)
-			fHorizontalScrollBar->ResizeBy((vertical ? -1 : 1) * B_V_SCROLL_BAR_WIDTH, 0);
+		if (horizontalChanged && !verticalChanged && vertical) {
+			fVerticalScrollBar->ResizeBy(0, (horizontal ? -1 : 1)
+				* B_H_SCROLL_BAR_HEIGHT);
+		}
+		if (verticalChanged && !horizontalChanged && horizontal) {
+			fHorizontalScrollBar->ResizeBy((vertical ? -1 : 1)
+				* B_V_SCROLL_BAR_WIDTH, 0);
+		}
 	}
 
 	// update the scroll bar range & proportions
@@ -481,7 +488,8 @@ TitleView::GetPreferredSize(float *_width, float *_height)
 		font_height fontHeight;
 		GetFontHeight(&fontHeight);
 
-		*_height = fontHeight.ascent + fontHeight.descent + fontHeight.leading + 8;
+		*_height = fontHeight.ascent + fontHeight.descent + fontHeight.leading
+			+ 8;
 	}
 }
 
@@ -504,11 +512,13 @@ MessageFilter::FilterFor(BView *view, BParameter &parameter)
 
 	switch (parameter.Type()) {
 		case BParameter::B_CONTINUOUS_PARAMETER:
-			return new ContinuousMessageFilter(control, static_cast<BContinuousParameter &>(parameter));
+			return new ContinuousMessageFilter(control,
+				static_cast<BContinuousParameter &>(parameter));
 
 		case BParameter::B_DISCRETE_PARAMETER:
-			return new DiscreteMessageFilter(control, static_cast<BDiscreteParameter &>(parameter));
-			
+			return new DiscreteMessageFilter(control,
+				static_cast<BDiscreteParameter &>(parameter));
+
 		case BParameter::B_NULL_PARAMETER: /* fall through */
 		default:
 			return NULL;
@@ -519,7 +529,8 @@ MessageFilter::FilterFor(BView *view, BParameter &parameter)
 //	#pragma mark -
 
 
-ContinuousMessageFilter::ContinuousMessageFilter(BControl *control, BContinuousParameter &parameter)
+ContinuousMessageFilter::ContinuousMessageFilter(BControl *control,
+		BContinuousParameter &parameter)
 	: MessageFilter(),
 	fParameter(parameter)
 {
@@ -589,7 +600,8 @@ ContinuousMessageFilter::Filter(BMessage *message, BHandler **target)
 //	#pragma mark -
 
 
-DiscreteMessageFilter::DiscreteMessageFilter(BControl *control, BDiscreteParameter &parameter)
+DiscreteMessageFilter::DiscreteMessageFilter(BControl *control,
+		BDiscreteParameter &parameter)
 	: MessageFilter(),
 	fParameter(parameter)
 {
@@ -653,7 +665,7 @@ DiscreteMessageFilter::Filter(BMessage *message, BHandler **target)
 
 
 DefaultMediaTheme::DefaultMediaTheme()
-	: BMediaTheme("BeOS Theme", "BeOS built-in theme version 0.1")
+	: BMediaTheme("Haiku Theme", "Haiku built-in theme version 0.1")
 {
 	CALLED();
 }
@@ -698,7 +710,7 @@ DefaultMediaTheme::MakeViewFor(BParameterWeb *web, const BRect *hintRect)
 		if (group == NULL)
 			continue;
 
-		BView *groupView = MakeViewFor(*group, rect);
+		BView *groupView = MakeViewFor(*group, hintRect ? &rect : NULL);
 		if (groupView == NULL)
 			continue;
 
@@ -706,7 +718,8 @@ DefaultMediaTheme::MakeViewFor(BParameterWeb *web, const BRect *hintRect)
 			// the top-level group views must not be larger than their hintRect,
 			// but unlike their children, they should follow all sides when
 			// their parent is resized
-			view->ResizeTo(rect.Width() - 10, rect.Height() - 10);
+			if (hintRect != NULL)
+				view->ResizeTo(rect.Width() - 10, rect.Height() - 10);
 			view->SetResizingMode(B_FOLLOW_ALL);
 		}
 
@@ -728,14 +741,17 @@ DefaultMediaTheme::MakeViewFor(BParameterWeb *web, const BRect *hintRect)
 
 
 BView *
-DefaultMediaTheme::MakeViewFor(BParameterGroup &group, const BRect &hintRect)
+DefaultMediaTheme::MakeViewFor(BParameterGroup& group, const BRect* hintRect)
 {
 	CALLED();
 
 	if (group.Flags() & B_HIDDEN_PARAMETER)
 		return NULL;
 
-	BRect rect(hintRect);
+	BRect rect;
+	if (hintRect != NULL)
+		rect = *hintRect;
+
 	GroupView *view = new GroupView(rect, group.Name());
 
 	// Create the parameter views - but don't add them yet
@@ -749,7 +765,8 @@ DefaultMediaTheme::MakeViewFor(BParameterGroup &group, const BRect &hintRect)
 		if (parameter == NULL)
 			continue;
 
-		BView *parameterView = MakeSelfHostingViewFor(*parameter, rect);
+		BView *parameterView = MakeSelfHostingViewFor(*parameter,
+			hintRect ? &rect : NULL);
 		if (parameterView == NULL)
 			continue;
 
@@ -779,7 +796,7 @@ DefaultMediaTheme::MakeViewFor(BParameterGroup &group, const BRect &hintRect)
 		if (subGroup == NULL)
 			continue;
 
-		BView *groupView = MakeViewFor(*subGroup, rect);
+		BView *groupView = MakeViewFor(*subGroup, &rect);
 		if (groupView == NULL)
 			continue;
 
@@ -864,18 +881,18 @@ DefaultMediaTheme::MakeViewFor(BParameterGroup &group, const BRect &hintRect)
 }
 
 
-/** This creates a view that handles all incoming messages itself - that's
- *	what is meant with self-hosting.
- */
-
+/*!	This creates a view that handles all incoming messages itself - that's
+	what is meant with self-hosting.
+*/
 BView *
-DefaultMediaTheme::MakeSelfHostingViewFor(BParameter &parameter, const BRect &hintRect)
+DefaultMediaTheme::MakeSelfHostingViewFor(BParameter& parameter,
+	const BRect* hintRect)
 {
 	if (parameter.Flags() & B_HIDDEN_PARAMETER
 		|| parameter_should_be_hidden(parameter))
 		return NULL;
 
-	BView *view = MakeViewFor(&parameter, &hintRect);
+	BView *view = MakeViewFor(&parameter, hintRect);
 	if (view == NULL) {
 		// The MakeViewFor() method above returns a BControl - which we
 		// don't need for a null parameter; that's why it returns NULL.
@@ -886,12 +903,13 @@ DefaultMediaTheme::MakeSelfHostingViewFor(BParameter &parameter, const BRect &hi
 				// this is the first parameter in this group, so
 				// let's use a nice title view
 
-				TitleView *titleView = new TitleView(hintRect, parameter.Name());
+				TitleView *titleView = new TitleView(BRect(0, 0, 10, 10), parameter.Name());
 				titleView->ResizeToPreferred();
 
 				return titleView;
 			}
-			BStringView *stringView = new BStringView(hintRect, parameter.Name(), parameter.Name());
+			BStringView *stringView = new BStringView(BRect(0, 0, 10, 10),
+				parameter.Name(), parameter.Name());
 			stringView->SetAlignment(B_ALIGN_CENTER);
 			stringView->ResizeToPreferred();
 
@@ -932,14 +950,15 @@ DefaultMediaTheme::MakeViewFor(BParameter *parameter, const BRect *hintRect)
 				|| discrete.CountItems() == 0) {
 				// create a checkbox item
 
-				BCheckBox *checkBox = new BCheckBox(rect, discrete.Name(), discrete.Name(), NULL);
+				BCheckBox *checkBox = new BCheckBox(rect, discrete.Name(),
+					discrete.Name(), NULL);
 				checkBox->ResizeToPreferred();
 
 				return checkBox;
 			} else {
 				// create a pop up menu field
 
-				// ToDo: replace BOptionPopUp (or fix it in OpenBeOS...)
+				// ToDo: replace BOptionPopUp (or fix it in Haiku...)
 				// this is a workaround for a bug in BOptionPopUp - you need to
 				// know the actual width before creating the object - very nice...
 
@@ -953,7 +972,8 @@ DefaultMediaTheme::MakeViewFor(BParameter *parameter, const BRect *hintRect)
 				width += font.StringWidth(discrete.Name()) + 55;
 				rect.right = rect.left + width;
 
-				BOptionPopUp *popUp = new BOptionPopUp(rect, discrete.Name(), discrete.Name(), NULL);
+				BOptionPopUp *popUp = new BOptionPopUp(rect, discrete.Name(),
+					discrete.Name(), NULL);
 
 				for (int32 i = 0; i < discrete.CountItems(); i++) {
 					popUp->AddOption(discrete.ItemNameAt(i), discrete.ItemValueAt(i));
@@ -970,8 +990,7 @@ DefaultMediaTheme::MakeViewFor(BParameter *parameter, const BRect *hintRect)
 			BContinuousParameter &continuous = static_cast<BContinuousParameter &>(*parameter);
 
 			if (!strcmp(continuous.Kind(), B_MASTER_GAIN)
-				|| !strcmp(continuous.Kind(), B_GAIN))
-			{
+				|| !strcmp(continuous.Kind(), B_GAIN)) {
 				BChannelSlider *slider = new BChannelSlider(rect, continuous.Name(),
 					continuous.Name(), NULL, B_VERTICAL, continuous.CountChannels());
 
@@ -994,8 +1013,10 @@ DefaultMediaTheme::MakeViewFor(BParameter *parameter, const BRect *hintRect)
 
 				// ToDo: take BContinuousParameter::GetResponse() & ValueStep() into account!
 
-				for (int32 i = 0; i < continuous.CountChannels(); i++)
-					slider->SetLimitsFor(i, int32(continuous.MinValue() * 1000), int32(continuous.MaxValue() * 1000));
+				for (int32 i = 0; i < continuous.CountChannels(); i++) {
+					slider->SetLimitsFor(i, int32(continuous.MinValue() * 1000),
+						int32(continuous.MaxValue() * 1000));
+				}
 
 				return slider;
 			}
