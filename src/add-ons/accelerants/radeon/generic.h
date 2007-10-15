@@ -27,6 +27,7 @@ status_t GET_PIXEL_CLOCK_LIMITS(display_mode *dm, uint32 *low, uint32 *high);
 status_t MOVE_DISPLAY(uint16 h_display_start, uint16 v_display_start);
 status_t GET_TIMING_CONSTRAINTS(display_timing_constraints *dtc);
 void SET_INDEXED_COLORS(uint count, uint8 first, uint8 *color_data, uint32 flags);
+status_t radeon_get_edid_info(void* info, size_t size, uint32* _version);
 
 uint32 DPMS_CAPABILITIES(void);
 uint32 DPMS_MODE(void);

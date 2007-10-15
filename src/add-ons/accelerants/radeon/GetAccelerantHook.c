@@ -1,13 +1,12 @@
 /*
-	Copyright (c) 2002, Thomas Kurschel
-	
+ * Copyright (c) 2002, Thomas Kurschel
+ * Distributed under the terms of the MIT License.
+ */
 
-	Part of Radeon accelerant
-		
+/*!	
 	Contains entry point to get public functions.
 	(directly copied from sample driver)
 */
-
 
 #include "generic.h"
 
@@ -22,9 +21,11 @@ is available.  Any extra information available to choose the function will be
 noted on a case by case below.
 
 */
-void *	get_accelerant_hook(uint32 feature, void *data) {
+void *
+get_accelerant_hook(uint32 feature, void *data)
+{
 	(void)data;
-	
+
 	switch (feature) {
 /*
 These definitions are out of pure lazyness.
@@ -59,6 +60,8 @@ initialization process.
 		HOOK(MOVE_DISPLAY);
 		HOOK(SET_INDEXED_COLORS);
 		//HOOK(GET_TIMING_CONSTRAINTS);
+		case B_GET_EDID_INFO:
+			return (void*)radeon_get_edid_info;
 
 		HOOK(DPMS_CAPABILITIES);
 		HOOK(DPMS_MODE);
@@ -103,8 +106,6 @@ the same function all the time.
 #undef HOOK
 #undef ZERO
 	}
-/*
-Return a null pointer for any feature we don't understand.
-*/
-	return 0;
+
+	return NULL;
 }
