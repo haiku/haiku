@@ -527,6 +527,16 @@ inline void ModelPPM::ClearMask()
 
 
 
+// reset PPM variables after data error allowing safe resuming
+// of further data processing
+void ModelPPM::CleanUp()
+{
+  SubAlloc.StopSubAllocator();
+  SubAlloc.StartSubAllocator(1);
+  StartModelRare(2);
+}
+
+
 bool ModelPPM::DecodeInit(Unpack *UnpackRead,int &EscChar)
 {
   int MaxOrder=UnpackRead->GetChar();

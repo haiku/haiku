@@ -5,9 +5,9 @@ resource app_flags B_MULTIPLE_LAUNCH | B_BACKGROUND_APP;
 resource app_version {
 	major = 3,
 	middle = 7,
-	minor = 6,
+	minor = 8,
 	variety = 0,
 	internal = 0,
-	short_info = "3.76", 
-    long_info = "3.76 Alexander Roshal"
+	short_info = "3.78", 
+    long_info = "3.78 Alexander Roshal"
 };

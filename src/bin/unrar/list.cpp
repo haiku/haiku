@@ -38,6 +38,11 @@ void ListArchive(CommandData *Cmd)
         if (!Bare)
         {
           Arc.ViewComment();
+
+          // RAR can close a corrupt encrypted archive
+          if (!Arc.IsOpened())
+            break;
+
           mprintf("\n");
           if (Arc.Solid)
             mprintf(St(MListSolid));

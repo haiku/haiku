@@ -159,7 +159,6 @@ class Unpack:private BitInput
     bool UnpSomeRead;
     Int64 WrittenFileSize;
     bool FileExtracted;
-    bool PPMError;
 
     int PrevLowDist,LowDistRepCount;
 

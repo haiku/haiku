@@ -43,7 +43,7 @@ MKDIR_CODE MakeDir(const char *Name,const wchar *NameW,uint Attr)
 
 bool CreatePath(const char *Path,const wchar *PathW,bool SkipLastName)
 {
-#ifdef _WIN_32
+#if defined(_WIN_32) || defined(_EMX)
   uint DirAttr=0;
 #else
   uint DirAttr=0777;
@@ -211,6 +211,7 @@ Int64 GetFreeDisk(const char *Name)
   return(1457664);
 #elif defined(_EMX)
   int Drive=(!isalpha(Name[0]) || Name[1]!=':') ? 0:etoupper(Name[0])-'A'+1;
+#ifndef _DJGPP
   if (_osmode == OS2_MODE)
   {
     FSALLOCATE fsa;
@@ -221,12 +222,17 @@ Int64 GetFreeDisk(const char *Name)
     return(FreeSize);
   }
   else
+#endif
   {
     union REGS regs,outregs;
     memset(&regs,0,sizeof(regs));
     regs.h.ah=0x36;
     regs.h.dl=Drive;
+#ifdef _DJGPP
+    int86 (0x21,&regs,&outregs);
+#else
     _int86 (0x21,&regs,&outregs);
+#endif
     if (outregs.x.ax==0xffff)
       return(1457664);
     Int64 FreeSize=outregs.x.ax*outregs.x.cx;

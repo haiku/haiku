@@ -269,10 +269,12 @@ void Unpack::UnpInitData20(int Solid)
 {
   if (!Solid)
   {
-    UnpChannelDelta=UnpCurChannel=0;
+    UnpAudioBlock=UnpChannelDelta=UnpCurChannel=0;
     UnpChannels=1;
+
     memset(AudV,0,sizeof(AudV));
     memset(UnpOldTable20,0,sizeof(UnpOldTable20));
+    memset(MD,0,sizeof(MD));
   }
 }
 

@@ -97,7 +97,7 @@ bool MergeArchive(Archive &Arc,ComprDataIO *DataIO,bool ShowFileName,char Comman
         break;
       }
     }
-#else
+#else // RARDLL
 
 #if !defined(SFX_MODULE) && !defined(_WIN_CE)
     if (!RecoveryDone)
@@ -123,8 +123,8 @@ bool MergeArchive(Archive &Arc,ComprDataIO *DataIO,bool ShowFileName,char Comman
       FailedOpen=true;
       break;
     }
+#endif // RARDLL
     *NextNameW=0;
-#endif
   }
   if (FailedOpen)
   {

@@ -43,6 +43,12 @@ void Unpack::Init(byte *Window)
     ExternalWindow=true;
   }
   UnpInitData(false);
+
+#ifndef SFX_MODULE
+  // RAR 1.5 decompression initialization
+  OldUnpInitData(false);
+  InitHuff();
+#endif
 }
 
 
@@ -190,9 +196,6 @@ void Unpack::Unpack29(bool Solid)
       return;
   }
 
-  if (PPMError)
-    return;
-
   while (true)
   {
     UnpPtr&=MAXWINMASK;
@@ -218,7 +221,11 @@ void Unpack::Unpack29(bool Solid)
       int Ch=PPM.DecodeChar();
       if (Ch==-1)
       {
-        PPMError=true;
+        PPM.CleanUp();
+
+        // turn off PPM compression mode in case of error, so UnRAR will
+        // call PPM.DecodeInit in case it needs to turn it on back later.
+        UnpBlockType=BLOCK_LZ;
         break;
       }
       if (Ch==PPMEscChar)
@@ -935,13 +942,18 @@ void Unpack::UnpInitData(int Solid)
     LastDist=LastLength=0;
 //    memset(Window,0,MAXWINSIZE);
     memset(UnpOldTable,0,sizeof(UnpOldTable));
+    memset(&LD,0,sizeof(LD));
+    memset(&DD,0,sizeof(DD));
+    memset(&LDD,0,sizeof(LDD));
+    memset(&RD,0,sizeof(RD));
+    memset(&BD,0,sizeof(BD));
     UnpPtr=WrPtr=0;
     PPMEscChar=2;
+    UnpBlockType=BLOCK_LZ;
 
     InitFilters();
   }
   InitBitInput();
-  PPMError=false;
   WrittenFileSize=0;
   ReadTop=0;
   ReadBorder=0;

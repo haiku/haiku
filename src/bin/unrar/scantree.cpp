@@ -154,8 +154,19 @@ int ScanTree::FindProc(FindData *FindData)
     bool Error=FindData->Error;
 
 #ifdef _WIN_32
-    if (Error && strstr(CurMask,"System Volume Information\\")!=NULL)
-      Error=false;
+    if (Error)
+    {
+      // Do not display an error if we cannot scan contents of reparse
+      // point. Vista contains a lot of reparse (or junction) points,
+      // which are not accessible.
+      if ((FindData->FileAttr & FILE_ATTRIBUTE_REPARSE_POINT)!=0)
+        Error=false;
+
+      // Do not display an error if we cannot scan contents of
+      // "System Volume Information" folder. Normally it is not accessible.
+      if (strstr(CurMask,"System Volume Information\\")!=NULL)
+        Error=false;
+    }
 #endif
 
     if (Cmd!=NULL && Cmd->ExclCheck(CurMask,true))

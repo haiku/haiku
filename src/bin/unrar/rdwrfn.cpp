@@ -62,9 +62,13 @@ int ComprDataIO::UnpRead(byte *Addr,uint Count)
         PackedCRC=CRC(PackedCRC,ReadAddr,ReadSize);
     }
     CurUnpRead+=RetCode;
-    ReadAddr+=RetCode;
     TotalRead+=RetCode;
+#ifndef NOVOLUME
+    // these variable are not used below in NOVOLUME mode, so it is better
+    // to exclude these commands to avoid compiler warnings
+    ReadAddr+=RetCode;
     Count-=RetCode;
+#endif
     UnpPackedSize-=RetCode;
     if (UnpPackedSize == 0 && UnpVolume)
     {
@@ -230,7 +234,7 @@ void ComprDataIO::SetEncryption(int Method,char *Password,byte *Salt,bool Encryp
 }
 
 
-#ifndef SFX_MODULE
+#if !defined(SFX_MODULE) && !defined(NOCRYPT)
 void ComprDataIO::SetAV15Encryption()
 {
   Decryption=15;
@@ -239,7 +243,7 @@ void ComprDataIO::SetAV15Encryption()
 #endif
 
 
-#ifndef SFX_MODULE
+#if !defined(SFX_MODULE) && !defined(NOCRYPT)
 void ComprDataIO::SetCmt13Encryption()
 {
   Decryption=13;

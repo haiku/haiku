@@ -162,7 +162,7 @@ bool FindFile::FastFind(const char *FindMask,const wchar *FindMaskW,struct FindD
       return(false);
     }
 #ifdef _DJGPP
-  fd->FileAttr=chmod(FindMask,0);
+  fd->FileAttr=_chmod(FindMask,0);
 #elif defined(_EMX)
   fd->FileAttr=st.st_attr;
 #else

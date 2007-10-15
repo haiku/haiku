@@ -179,8 +179,10 @@ bool RarVM::ExecuteCode(VM_PreparedCommand *PreparedCode,int CodeSize)
   VM_PreparedCommand *Cmd=PreparedCode;
   while (1)
   {
+#ifndef NORARVM
     uint *Op1=GetOperand(&Cmd->Op1);
     uint *Op2=GetOperand(&Cmd->Op2);
+#endif
     switch(Cmd->OpCode)
     {
 #ifndef NORARVM
@@ -506,7 +508,7 @@ bool RarVM::ExecuteCode(VM_PreparedCommand *PreparedCode,int CodeSize)
           SET_VALUE(Cmd->ByteMode,Op1,Result);
         }
         break;
-#endif
+#endif  // for #ifndef NORARVM
       case VM_RET:
         if (R[7]>=VM_MEMSIZE)
           return(true);
@@ -767,6 +769,8 @@ void RarVM::Optimize(VM_PreparedProgram *Prg)
       case VM_CMP:
         Cmd->OpCode=Cmd->ByteMode ? VM_CMPB:VM_CMPD;
         continue;
+      default:
+        break;
     }
     if ((VM_CmdFlags[Cmd->OpCode] & VMCF_CHFLAGS)==0)
       continue;
@@ -801,6 +805,8 @@ void RarVM::Optimize(VM_PreparedProgram *Prg)
       case VM_NEG:
         Cmd->OpCode=Cmd->ByteMode ? VM_NEGB:VM_NEGD;
         continue;
+      default:
+        break;
     }
   }
 }
@@ -843,12 +849,12 @@ void RarVM::ExecuteStandardFilter(VM_StandardFilters FilterType)
         int DataSize=R[4];
         uint FileOffset=R[6];
 
-        if (DataSize>=VM_GLOBALMEMADDR)
+        if (DataSize>=VM_GLOBALMEMADDR || DataSize<4)
           break;
 
         const int FileSize=0x1000000;
         byte CmpByte2=FilterType==VMSF_E8E9 ? 0xe9:0xe8;
-        for (uint CurPos=0;CurPos<DataSize-4;)
+        for (int CurPos=0;CurPos<DataSize-4;)
         {
           byte CurByte=*(Data++);
           CurPos++;
@@ -889,10 +895,10 @@ void RarVM::ExecuteStandardFilter(VM_StandardFilters FilterType)
         int DataSize=R[4];
         uint FileOffset=R[6];
 
-        if (DataSize>=VM_GLOBALMEMADDR)
+        if (DataSize>=VM_GLOBALMEMADDR || DataSize<21)
           break;
 
-        uint CurPos=0;
+        int CurPos=0;
 
         FileOffset>>=4;
 

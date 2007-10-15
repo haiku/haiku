@@ -466,7 +466,7 @@ void CommandData::ProcessSwitch(char *Switch)
     case 'N':
     case 'X':
       if (Switch[1]!=0)
-      {      
+      {
         StringList *Args=etoupper(Switch[0])=='N' ? InclArgs:ExclArgs;
         if (Switch[1]=='@' && !IsWildcard(Switch))
         {
@@ -957,7 +957,7 @@ void CommandData::OutHelp()
 #endif
 #ifndef _WIN_32
     static MSGID Win32Only[]={
-      MCHelpSwIEML,MCHelpSwVD,MCHelpSwAC,MCHelpSwAO,MCHelpSwOS,MCHelpSwIOFF,
+      MCHelpSwIEML,MCHelpSwVD,MCHelpSwAO,MCHelpSwOS,MCHelpSwIOFF,
       MCHelpSwEP2,MCHelpSwOC
     };
     bool Found=false;
@@ -972,6 +972,10 @@ void CommandData::OutHelp()
 #endif
 #if !defined(_UNIX) && !defined(_WIN_32)
     if (Help[I]==MCHelpSwOW)
+      continue;
+#endif
+#if !defined(_WIN_32) && !defined(_EMX)
+    if (Help[I]==MCHelpSwAC)
       continue;
 #endif
 #ifndef SAVE_LINKS
@@ -1035,7 +1039,7 @@ bool CommandData::ExclCheck(char *CheckName,bool CheckFullPath)
     return(true);
   if (InclArgs->ItemsCount()==0)
     return(false);
-  if (ExclCheckArgs(InclArgs,CheckName,CheckFullPath,MATCH_WILDSUBPATH))
+  if (ExclCheckArgs(InclArgs,CheckName,false,MATCH_WILDSUBPATH))
     return(false);
   return(true);
 }

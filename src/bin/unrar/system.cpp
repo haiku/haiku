@@ -12,11 +12,6 @@ void InitSystemOptions(int SleepTime)
 
 #if !defined(SFX_MODULE) && !defined(_WIN_CE)
 
-#if defined(_WIN_32) && !defined(BELOW_NORMAL_PRIORITY_CLASS)
-#define BELOW_NORMAL_PRIORITY_CLASS 0x00004000
-#define ABOVE_NORMAL_PRIORITY_CLASS 0x00008000
-#endif
-
 void SetPriority(int Priority)
 {
 #ifdef _WIN_32
@@ -61,6 +56,11 @@ void SetPriority(int Priority)
           }
   SetPriorityClass(GetCurrentProcess(),PriorityClass);
   SetThreadPriority(GetCurrentThread(),PriorityLevel);
+
+//  background mode for Vista, too slow for real life use
+//  if (WinNT()>=6 && Priority==1)
+//    SetPriorityClass(GetCurrentProcess(),PROCESS_MODE_BACKGROUND_BEGIN);
+
 #endif
 }
 #endif
@@ -78,12 +78,6 @@ void Wait()
 
 
 #if defined(_WIN_32) && !defined(_WIN_CE) && !defined(SFX_MODULE) && !defined(SHELL_EXT)
-
-#ifndef SHTDN_REASON_MAJOR_APPLICATION
-#define SHTDN_REASON_MAJOR_APPLICATION 0x00040000
-#define SHTDN_REASON_FLAG_PLANNED      0x80000000
-#define SHTDN_REASON_MINOR_MAINTENANCE 0x00000001
-#endif
 
 void Shutdown()
 {

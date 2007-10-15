@@ -326,12 +326,13 @@ void PASCAL RARSetProcessDataProc(HANDLE hArcData,PROCESSDATAPROC ProcessDataPro
   Data->Cmd.ProcessDataProc=ProcessDataProc;
 }
 
-
+#ifndef NOCRYPT
 void PASCAL RARSetPassword(HANDLE hArcData,char *Password)
 {
   DataSet *Data=(DataSet *)hArcData;
   strncpyz(Data->Cmd.Password,Password,ASIZE(Data->Cmd.Password));
 }
+#endif
 
 
 int PASCAL RARGetDllVersion()

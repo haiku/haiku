@@ -143,6 +143,11 @@ EXTRACT_ARC_CODE CmdExtract::ExtractArchive(CommandData *Cmd)
 
   Arc.ViewComment();
 
+  // RAR can close a corrupt encrypted archive
+  if (!Arc.IsOpened())
+    return(EXTRACT_ARC_NEXT);
+
+
   while (1)
   {
     int Size=Arc.ReadHeader();

@@ -47,6 +47,7 @@
    Steve Reid         SHA-1 hash function
    Marcus Herbert     makefile.unix file
    Tomasz Klim        fixes for libunrar.so
+   Robert Riebisch    makefile.dj and patches for DJGPP
 
 
    4. Legal stuff

@@ -253,10 +253,12 @@ void File::Flush()
 
 bool File::Delete()
 {
-  if (HandleType!=FILE_HANDLENORMAL || !AllowDelete)
+  if (HandleType!=FILE_HANDLENORMAL)
     return(false);
   if (hFile!=BAD_HANDLE)
     Close();
+  if (!AllowDelete)
+    return(false);
   return(DelFile(FileName,FileNameW));
 }
 
