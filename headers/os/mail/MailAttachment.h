@@ -11,6 +11,8 @@
 #include <MailContainer.h>
 #include <MailComponent.h>
 
+class BFile;
+
 class BMailAttachment : public BMailComponent {
 	public:
 		virtual void SetFileName(const char *name) = 0;

@@ -9,6 +9,7 @@
 #include <Statable.h>
 
 class BDirectory;
+class BEntry;
 class BString;
 struct entry_ref;
 

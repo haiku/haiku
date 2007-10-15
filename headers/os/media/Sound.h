@@ -8,6 +8,7 @@
 
 class BMediaFile;
 class BSoundFile;
+class BSoundPlayer;
 struct entry_ref;
 
 namespace BPrivate {

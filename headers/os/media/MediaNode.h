@@ -20,6 +20,7 @@
 #include <new>
 
 class BBufferConsumer;
+class BBufferProducer;
 class BControllable;
 class BFileInterface;
 class BMediaAddOn;

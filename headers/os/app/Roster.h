@@ -13,6 +13,7 @@
 #include <Messenger.h>
 #include <OS.h>
 
+class BFile;
 class BMimeType;
 class BNodeInfo;
 

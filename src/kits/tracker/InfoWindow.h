@@ -44,6 +44,7 @@ All rights reserved.
 #include "Utilities.h"
 
 
+class BFilePanel;
 class BMenuField;
 
 namespace BPrivate {

@@ -10,6 +10,9 @@
 #include <Node.h>
 
 
+class BEntry;
+
+
 class BFile : public BNode, public BPositionIO {
 	public:
 		BFile();

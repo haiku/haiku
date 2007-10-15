@@ -54,6 +54,7 @@ class BTextControl;
 class BCheckBox;
 class BMenuField;
 class BFile;
+class BPopUpMenu;
 
 namespace BPrivate {
 

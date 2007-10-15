@@ -10,6 +10,7 @@
 #include <EntryList.h>
 #include <StorageDefs.h>
 
+class BFile;
 class BSymLink;
 
 
