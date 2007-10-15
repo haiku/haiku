@@ -18,6 +18,9 @@
 #include "PrivateScreen.h"
 #include "ServerProtocol.h"
 
+#include <new>
+#include <stdlib.h>
+
 #include <Application.h>
 #include <Autolock.h>
 #include <Bitmap.h>
@@ -25,18 +28,14 @@
 #include <ObjectList.h>
 #include <Window.h>
 
-#include <new>
 
-#include <stdlib.h>
-
+using namespace BPrivate;
 
 static BObjectList<BPrivateScreen> sScreens(2, true);
 
 // used to synchronize creation/deletion of the sScreen object
 static BLocker sScreenLock("screen lock");
 
-
-using namespace BPrivate;
 
 BPrivateScreen *
 BPrivateScreen::Get(BWindow *window)
@@ -507,6 +506,26 @@ BPrivateScreen::GetDeviceInfo(accelerant_device_info *info)
 	status_t status = B_ERROR;
 	if (link.FlushWithReply(status) == B_OK && status == B_OK) {
 		link.Read<accelerant_device_info>(info);
+		return B_OK;
+	}
+
+	return status;
+}
+
+
+status_t
+BPrivateScreen::GetMonitorInfo(monitor_info* info)
+{
+	if (info == NULL)
+		return B_BAD_VALUE;
+
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_GET_MONITOR_INFO);
+	link.Attach<screen_id>(ID());
+
+	status_t status = B_ERROR;
+	if (link.FlushWithReply(status) == B_OK && status == B_OK) {
+		link.Read<monitor_info>(info);
 		return B_OK;
 	}
 

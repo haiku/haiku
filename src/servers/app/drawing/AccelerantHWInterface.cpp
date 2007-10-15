@@ -351,6 +351,7 @@ AccelerantHWInterface::_SetupDefaultHooks()
 	fAccGetTimingConstraints = (get_timing_constraints)fAccelerantHook(B_GET_TIMING_CONSTRAINTS, NULL);
 	fAccProposeDisplayMode = (propose_display_mode)fAccelerantHook(B_PROPOSE_DISPLAY_MODE, NULL);
 	fAccGetPreferredDisplayMode = (get_preferred_display_mode)fAccelerantHook(B_GET_PREFERRED_DISPLAY_MODE, NULL);
+	fAccGetMonitorInfo = (get_monitor_info)fAccelerantHook(B_GET_MONITOR_INFO, NULL);
 	fAccGetEDIDInfo = (get_edid_info)fAccelerantHook(B_GET_EDID_INFO, NULL);
 
 	// cursor
@@ -777,34 +778,70 @@ AccelerantHWInterface::GetPreferredMode(display_mode* mode)
 
 
 status_t
-AccelerantHWInterface::GetMonitorInfo(BString& name, BString& serial)
+AccelerantHWInterface::GetMonitorInfo(monitor_info* info)
 {
-	if (fAccGetEDIDInfo == NULL)
-		return B_NOT_SUPPORTED;
+	status_t status = B_NOT_SUPPORTED;
 
-	edid1_info info;
+	if (fAccGetMonitorInfo != NULL) {
+		status = fAccGetMonitorInfo(info);
+		if (status == B_OK)
+			return B_OK;
+	}
+
+	if (fAccGetEDIDInfo == NULL)
+		return status;
+
+	edid1_info edid;
 	uint32 version;
-	status_t status = fAccGetEDIDInfo(&info, sizeof(info), &version);
+	status = fAccGetEDIDInfo(&edid, sizeof(edid), &version);
 	if (status < B_OK)
 		return status;
 	if (version != EDID_VERSION_1)
 		return B_NOT_SUPPORTED;
 
-	uint32 found = 0;
+	memset(info, 0, sizeof(monitor_info));
+	strlcpy(info->vendor, edid.vendor.manufacturer, sizeof(info->vendor));
+	snprintf(info->serial_number, sizeof(info->serial_number), "%lu",
+		edid.vendor.serial);
+	info->product_id = edid.vendor.prod_id;
+	info->width = edid.display.h_size;
+	info->height = edid.display.v_size;
 
+	uint32 found = 0;
 	for (uint32 i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; ++i) {
-		edid1_detailed_monitor *monitor = &info.detailed_monitor[i];
+		edid1_detailed_monitor *monitor = &edid.detailed_monitor[i];
 
 		switch (monitor->monitor_desc_type) {
 			case EDID1_SERIAL_NUMBER:
-				serial.SetTo(monitor->data.serial_number);
+				strlcpy(info->serial_number, monitor->data.serial_number,
+					sizeof(info->serial_number));
 				found++;
 				break;
 
 			case EDID1_MONITOR_NAME:
-				name.SetTo(monitor->data.monitor_name);
+				strlcpy(info->name, monitor->data.monitor_name,
+					sizeof(info->name));
 				found++;
 				break;
+
+			case EDID1_MONITOR_RANGES:
+			{
+				edid1_monitor_range& range = monitor->data.monitor_range;
+
+				info->min_horizontal_frequency = range.min_h;
+				info->max_horizontal_frequency = range.max_h;
+				info->min_vertical_frequency = range.min_v;
+				info->max_vertical_frequency = range.max_v;
+				info->max_pixel_clock = range.max_clock * 10000;
+				break;
+			}
+
+			case EDID1_IS_DETAILED_TIMING:
+			{
+				edid1_detailed_timing& timing = monitor->data.detailed_timing;
+				info->width = timing.h_size / 10.0;
+				info->height = timing.v_size / 10.0;
+			}
 
 			default:
 				break;

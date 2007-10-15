@@ -97,7 +97,7 @@ HWInterface::GetPreferredMode(display_mode* mode)
 
 
 status_t
-HWInterface::GetMonitorInfo(BString& name, BString& serial)
+HWInterface::GetMonitorInfo(monitor_info* info)
 {
 	return B_NOT_SUPPORTED;
 }

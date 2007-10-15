@@ -1,4 +1,4 @@
-#if !defined(_ACCELERANT_H_)
+#ifndef _ACCELERANT_H_
 #define _ACCELERANT_H_
 
 #include <BeBuild.h>
@@ -15,7 +15,7 @@ extern "C" {
 
 typedef void * (*GetAccelerantHook)(uint32, void *);
 
-_EXPORT	void *	get_accelerant_hook(uint32 feature, void *data);	
+void *get_accelerant_hook(uint32 feature, void *data);	
 
 enum {
 	/* initialization */
@@ -42,6 +42,7 @@ enum {
 	B_DPMS_MODE,				/* required if driver supports DPMS */
 	B_SET_DPMS_MODE,			/* required if driver supports DPMS */
 	B_GET_PREFERRED_DISPLAY_MODE,	/* optional */
+	B_GET_MONITOR_INFO,			/* optional */
 	B_GET_EDID_INFO,			/* optional */
 
 	/* cursor managment */
@@ -120,6 +121,26 @@ typedef struct {
 	uint16	v_blank_min;	/* min/max vertical blank pulse width in linex, a multiple of v_res */
 	uint16	v_blank_max;
 } display_timing_constraints;
+
+// TODO: experimental API
+typedef struct {
+	uint32	version;
+	char	vendor[128];
+	char	name[128];
+	char	serial_number[128];
+	uint32	product_id;
+	struct {
+		uint16	week;
+		uint16	year;
+	}		produced;
+	float	width;
+	float	height;
+	uint32	min_horizontal_frequency;	// in kHz
+	uint32	max_horizontal_frequency;
+	uint32	min_vertical_frequency;		// in Hz
+	uint32	max_vertical_frequency;
+	uint32	max_pixel_clock;			// in kHz
+} monitor_info;
 
 enum { /* mode flags */
 	B_SCROLL = 1 << 0,
@@ -216,6 +237,7 @@ typedef uint32 (*dpms_capabilities)(void);
 typedef uint32 (*dpms_mode)(void);
 typedef status_t (*set_dpms_mode)(uint32 dpms_flags);
 typedef status_t (*get_preferred_display_mode)(display_mode *preferredMode);
+typedef status_t (*get_monitor_info)(monitor_info *info);
 typedef status_t (*get_edid_info)(void *info, uint32 size, uint32 *_version);
 typedef sem_id (*accelerant_retrace_semaphore)(void);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Haiku Inc.
+ * Copyright 2002-2007, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -20,6 +20,8 @@ class BBitmap;
 class BApplication;
 class BWindow;
 
+
+namespace BPrivate {
 
 class BPrivateScreen {
 	// Constructor and destructor are private. Use the static methods
@@ -59,6 +61,7 @@ class BPrivateScreen {
 		status_t SetMode(uint32 workspace, display_mode *mode, bool makeDefault);
 
 		status_t GetDeviceInfo(accelerant_device_info *info);
+		status_t GetMonitorInfo(monitor_info* info);
 		status_t GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high);
 		status_t GetTimingConstraints(display_timing_constraints *constraints);
 
@@ -94,5 +97,7 @@ class BPrivateScreen {
 		BRect		fFrame;
 		bigtime_t	fLastUpdate;
 };
+
+}	// namespace BPrivate
 
 #endif // _PRIVATE_SCREEN_H_

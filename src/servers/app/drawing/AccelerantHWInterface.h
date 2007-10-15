@@ -42,7 +42,7 @@ public:
 									const display_mode *low,
 									const display_mode *high);
 	virtual	status_t			GetPreferredMode(display_mode* mode);
-	virtual status_t			GetMonitorInfo(BString& name, BString& serial);
+	virtual status_t			GetMonitorInfo(monitor_info* info);
 
 	virtual sem_id				RetraceSemaphore();
 	virtual status_t			WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT);
@@ -131,6 +131,7 @@ private:
 		get_timing_constraints	fAccGetTimingConstraints;
 		propose_display_mode	fAccProposeDisplayMode;
 		get_preferred_display_mode fAccGetPreferredDisplayMode;
+		get_monitor_info		fAccGetMonitorInfo;
 		get_edid_info			fAccGetEDIDInfo;
 		fill_rectangle			fAccFillRect;
 		invert_rectangle		fAccInvertRect;

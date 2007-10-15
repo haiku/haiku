@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Haiku Inc.
+ * Copyright 2003-2007, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,13 +7,15 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
-/**	BScreen lets you retrieve and change the display settings. */
+/*!	BScreen lets you retrieve and change the display settings. */
 
 
 #include "PrivateScreen.h"
 
 #include <Screen.h>
 #include <Window.h>
+
+using namespace BPrivate;
 
 
 static const uint32 kCurrentWorkspaceIndex = ~0;
@@ -385,6 +387,15 @@ BScreen::GetDeviceInfo(accelerant_device_info *info)
 }
 
 
+status_t
+BScreen::GetMonitorInfo(monitor_info* info)
+{
+	if (fScreen != NULL)
+		return fScreen->GetMonitorInfo(info);
+	return B_ERROR;
+}
+
+
 /*!	\brief Returns, in low and high, the minimum and maximum pixel clock rates 
 		that are possible for the given mode.
 	\param mode A pointer to a display_mode.
@@ -455,39 +466,25 @@ BScreen::DPMSCapabilites()
 }
 
 
+//	#pragma mark - Deprecated methods
+
+
 /*!	\brief Returns the BPrivateScreen used by the BScreen object.
 	\return A pointer to the BPrivateScreen class internally used by the BScreen object.
 */
-BPrivateScreen*
+BPrivate::BPrivateScreen*
 BScreen::private_screen()
 {
 	return fScreen;
 }
 
 
-/*----- Private or reserved -----------------------------------------*/
 /*!	\brief Deprecated, use ProposeMode() instead.
 */
 status_t
 BScreen::ProposeDisplayMode(display_mode *target, const display_mode *low, const display_mode *high)
 {
 	return ProposeMode(target, low, high);
-}
-
-
-/*!	\brief Copy not allowed.
-*/
-BScreen&
-BScreen::operator=(const BScreen&)
-{
-	return *this;
-}
-
-
-/*!	\brief Copy not allowed.
-*/
-BScreen::BScreen(const BScreen &screen)
-{
 }
 
 

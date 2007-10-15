@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,8 +13,11 @@
 #include <InterfaceDefs.h>
 #include <Rect.h>
 
-class BPrivateScreen;
+class BView;
 class BWindow;
+namespace BPrivate {
+	class BPrivateScreen;
+}
 
 enum {
 	B_BITMAP_CLEAR_TO_WHITE				= 0x00000001,
@@ -91,15 +94,12 @@ class BBitmap : public BArchivable {
 
 		BBitmap& operator=(const BBitmap& source);
 
-		//----- Private or reserved -----------------------------------------//
-	
-		virtual status_t Perform(perform_code d, void *arg);
-
 	private:
 		friend class BView;
 		friend class BApplication;
-		friend class BPrivateScreen;
+		friend class BPrivate::BPrivateScreen;
 
+		virtual status_t Perform(perform_code d, void *arg);
 		virtual void _ReservedBitmap1();
 		virtual void _ReservedBitmap2();
 		virtual void _ReservedBitmap3();

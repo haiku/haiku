@@ -2287,6 +2287,27 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
+		case AS_GET_MONITOR_INFO:
+		{
+			STRACE(("ServerApp %s: get monitor info\n", Signature()));
+
+			// We aren't using the screen_id for now...
+			screen_id id;
+			link.Read<screen_id>(&id);
+
+			monitor_info info;
+			// TODO: I wonder if there should be a "desktop" lock...
+			status_t status = fDesktop->HWInterface()->GetMonitorInfo(&info);
+			if (status == B_OK) {
+				fLink.StartMessage(B_OK);
+				fLink.Attach<monitor_info>(info);
+			} else
+				fLink.StartMessage(status);
+
+			fLink.Flush();
+			break;
+		}
+
 		case AS_GET_FRAME_BUFFER_CONFIG:
 		{
 			STRACE(("ServerApp %s: get frame buffer config\n", Signature()));
