@@ -1,16 +1,17 @@
 /*
  * Copyright 2007, François Revol, revol@free.fr.
- *
  * Distributed under the terms of the MIT license.
  */
 
 
 #include <stdio.h>
+
 #include <Application.h>
 #include <InterfaceDefs.h>
 #include <String.h>
 
-// this isn't public yet ?
+class BBitmap;
+
 namespace BPrivate {
 int32 count_decorators(void);
 int32 get_decorator(void);

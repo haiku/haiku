@@ -13,6 +13,9 @@
 #include <Messenger.h>
 #include <OS.h>
 
+class BMimeType;
+class BNodeInfo;
+
 
 struct app_info {
 	app_info();

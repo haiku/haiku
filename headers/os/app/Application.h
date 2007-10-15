@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -20,10 +20,12 @@
 
 class BCursor;
 class BList;
-class BWindow;
-class BResources;
+class BLocker;
 class BMessageRunner;
+class BResources;
 class BServer;
+class BWindow;
+struct app_info;
 
 namespace BPrivate {
 	class PortLink;
@@ -163,7 +165,7 @@ private:
 
 // Global Objects
 
-extern _IMPEXP_BE BApplication*	be_app;
-extern _IMPEXP_BE BMessenger be_app_messenger;
+extern BApplication* be_app;
+extern BMessenger be_app_messenger;
 
 #endif	// _APPLICATION_H

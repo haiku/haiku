@@ -48,7 +48,7 @@ All rights reserved.
 
 #include <GraphicsDefs.h>
 
-#if B_BEOS_VERSION <= B_BEOS_VERSION_MAUI
+#if B_BEOS_VERSION <= B_BEOS_VERSION_5
 
 namespace BExperimental {
 

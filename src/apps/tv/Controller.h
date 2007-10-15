@@ -21,19 +21,20 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-
 #ifndef __CONTROLLER_H
 #define __CONTROLLER_H
+
 
 #include <Entry.h>
 #include <MediaDefs.h>
 #include <MediaNode.h>
 
+class BDiscreteParameter;
+class BParameterWeb;
 class VideoView;
 class VideoNode;
 
-class Controller
-{
+class Controller {
 public:
 							Controller();
 	virtual 				~Controller();
@@ -71,5 +72,4 @@ private:
 	media_output			fOutput;
 };
 
-
-#endif
+#endif	// __CONTROLLER_H

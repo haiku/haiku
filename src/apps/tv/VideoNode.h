@@ -21,17 +21,18 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-
 #ifndef __VIDEO_NODE_H_
 #define __VIDEO_NODE_H_
+
 
 #include <BufferConsumer.h>
 #include <MediaEventLooper.h>
 
+class BLocker;
 class VideoView;
 
-class VideoNode : public BMediaEventLooper, public BBufferConsumer
-{
+
+class VideoNode : public BMediaEventLooper, public BBufferConsumer {
 public:
 					VideoNode(const char *name, VideoView *view);
 					~VideoNode();
@@ -53,45 +54,30 @@ protected:
 	status_t		GetNextInput(int32 *cookie,	media_input *out_input);
 	void			DisposeInputCookie(int32 cookie);
 
-	status_t		HandleMessage(
-							int32 message,
-							const void *data,
-							size_t size);
+	status_t		HandleMessage(int32 message, const void *data, size_t size);
 
-	void			HandleEvent(
-							const media_timed_event *event,
-							bigtime_t lateness,
-							bool realTimeEvent);
+	void			HandleEvent(const media_timed_event *event,
+						bigtime_t lateness, bool realTimeEvent);
 
-	status_t		AcceptFormat(
-							const media_destination &dst,
-							media_format *format);
+	status_t		AcceptFormat(const media_destination &dst,
+						media_format *format);
 
-	void			ProducerDataStatus(
-							const media_destination &dst,
-							int32 status,
-							bigtime_t at_media_time);
+	void			ProducerDataStatus(const media_destination &dst,
+						int32 status, bigtime_t at_media_time);
 															
-	status_t		GetLatencyFor(
-							const media_destination &dst,
-							bigtime_t *out_latency,
-							media_node_id *out_id);
+	status_t		GetLatencyFor(const media_destination &dst,
+						bigtime_t *out_latency, media_node_id *out_id);
 
-	status_t		Connected(
-							const media_source &src,
-							const media_destination &dst,
-							const media_format &format,
-							media_input *out_input);
+	status_t		Connected(const media_source &src,
+						const media_destination &dst,
+						const media_format &format, media_input *out_input);
 
-	void			Disconnected(
-							const media_source &src,
-							const media_destination &dst);
+	void			Disconnected(const media_source &src,
+						const media_destination &dst);
 
-	status_t		FormatChanged(
-							const media_source &src,
-							const media_destination &dst,
-							int32 from_change_count,
-							const media_format &format);
+	status_t		FormatChanged(const media_source &src,
+						const media_destination &dst, int32 from_change_count,
+						const media_format &format);
 
 protected:
 	void			HandleBuffer(BBuffer *buffer);
@@ -108,4 +94,4 @@ protected:
 	BLocker	*		fBitmapLocker;
 };
 
-#endif
+#endif	// __VIDEO_NODE_H_

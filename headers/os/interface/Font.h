@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku, Inc. All Rights Reserved.
+ * Copyright 2005-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FONT_H_
@@ -8,6 +8,8 @@
 
 #include <SupportDefs.h>
 #include <InterfaceDefs.h>
+
+class BPoint;
 
 
 #define B_FONT_FAMILY_LENGTH 63

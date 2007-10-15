@@ -18,17 +18,14 @@
 
 typedef sem_id sound_handle;
 
-_IMPEXP_MEDIA
 sound_handle play_sound(const entry_ref *soundRef,
 						bool mix,
 						bool queue,
 						bool background
 						);
 
-_IMPEXP_MEDIA
 status_t stop_sound(sound_handle handle);
 
-_IMPEXP_MEDIA
 status_t wait_for_sound(sound_handle handle);
 
 #endif			/* #ifndef _PLAY_SOUND_H*/

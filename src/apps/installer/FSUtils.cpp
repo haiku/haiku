@@ -2876,11 +2876,7 @@ _TrackerLaunchAppWithDocuments(const entry_ref *appRef, const BMessage *refs, bo
 }
 
 extern "C" char** environ;
-extern "C"
-#if !B_BEOS_VERSION_DANO
-_IMPEXP_ROOT
-#endif
-status_t _kload_image_etc_(int argc, char **argv, char **envp,
+extern "C" status_t _kload_image_etc_(int argc, char **argv, char **envp,
 	char *buf, int bufsize);
 
 
@@ -3103,9 +3099,6 @@ LaunchBrokenLink(const char *signature, const BMessage *refs)
 
 // external launch calls; need to be robust, work if Tracker is not running
 
-#if !B_BEOS_VERSION_DANO
-_IMPEXP_TRACKER
-#endif
 status_t 
 FSLaunchItem(const entry_ref *application, const BMessage *refsReceived,
 	bool async, bool openWithOK)
@@ -3114,9 +3107,6 @@ FSLaunchItem(const entry_ref *application, const BMessage *refsReceived,
 }
 
 
-#if !B_BEOS_VERSION_DANO
-_IMPEXP_TRACKER
-#endif
 status_t 
 FSOpenWith(BMessage *listOfRefs)
 {

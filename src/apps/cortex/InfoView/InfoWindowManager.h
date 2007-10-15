@@ -13,15 +13,20 @@
 #ifndef __InfoWindowManager_H__
 #define __InfoWindowManager_H__
 
-// Application Kit
 #include <Looper.h>
-// Interface Kit
 #include <Point.h>
 
 class BList;
 class BWindow;
 
 #include "cortex_defs.h"
+
+struct dormant_node_info;
+struct media_destination;
+struct media_input;
+struct media_output;
+struct media_source;
+
 __BEGIN_CORTEX_NAMESPACE
 
 class Connection;

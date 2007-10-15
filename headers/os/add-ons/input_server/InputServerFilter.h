@@ -15,6 +15,7 @@
 #include <MessageFilter.h>
 #include <SupportDefs.h>
 
+class BRegion;
 
 class BInputServerFilter {
 public:

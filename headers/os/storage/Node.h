@@ -9,6 +9,9 @@
 #include <Statable.h>
 
 class BDirectory;
+class BString;
+struct entry_ref;
+
 
 //! Reference structure to a particular vnode on a particular device
 /*! <b>node_ref</b> - A node reference.

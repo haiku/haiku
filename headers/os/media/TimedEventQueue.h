@@ -44,10 +44,10 @@ struct media_timed_event {
 	uint32			_reserved_media_timed_event_[8];
 };
 
-_IMPEXP_MEDIA bool operator==(const media_timed_event & a, const media_timed_event & b);
-_IMPEXP_MEDIA bool operator!=(const media_timed_event & a, const media_timed_event & b);
-_IMPEXP_MEDIA bool operator<(const media_timed_event & a, const media_timed_event & b);
-_IMPEXP_MEDIA bool operator>(const media_timed_event & a, const media_timed_event &b);
+bool operator==(const media_timed_event & a, const media_timed_event & b);
+bool operator!=(const media_timed_event & a, const media_timed_event & b);
+bool operator<(const media_timed_event & a, const media_timed_event & b);
+bool operator>(const media_timed_event & a, const media_timed_event &b);
 
 
 class BTimedEventQueue {

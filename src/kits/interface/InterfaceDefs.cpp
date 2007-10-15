@@ -191,14 +191,14 @@ get_mode_parameter(uint32 mode, int32& width, int32& height, uint32& colorSpace)
 }
 
 
-_IMPEXP_BE const color_map *
+const color_map *
 system_colors()
 {
 	return BScreen(B_MAIN_SCREEN_ID).ColorMap();
 }
 
 
-_IMPEXP_BE status_t
+status_t
 set_screen_space(int32 index, uint32 space, bool stick)
 {
 	int32 width;
@@ -225,7 +225,7 @@ set_screen_space(int32 index, uint32 space, bool stick)
 }
 
 
-_IMPEXP_BE status_t
+status_t
 get_scroll_bar_info(scroll_bar_info *info)
 {
 	if (info == NULL)
@@ -245,7 +245,7 @@ get_scroll_bar_info(scroll_bar_info *info)
 }
 
 
-_IMPEXP_BE status_t
+status_t
 set_scroll_bar_info(scroll_bar_info *info)
 {
 	if (info == NULL)
@@ -265,7 +265,7 @@ set_scroll_bar_info(scroll_bar_info *info)
 }
 
 
-_IMPEXP_BE status_t
+status_t
 get_mouse_type(int32 *type)
 {
 	BMessage command(IS_GET_MOUSE_TYPE);
@@ -280,7 +280,7 @@ get_mouse_type(int32 *type)
 }
 
 
-_IMPEXP_BE status_t
+status_t
 set_mouse_type(int32 type)
 {
 	BMessage command(IS_SET_MOUSE_TYPE);
@@ -291,7 +291,7 @@ set_mouse_type(int32 type)
 }
 
 
-_IMPEXP_BE status_t
+status_t
 get_mouse_map(mouse_map *map)
 {
 	BMessage command(IS_GET_MOUSE_MAP);
@@ -310,7 +310,7 @@ get_mouse_map(mouse_map *map)
 }
 
 
-_IMPEXP_BE status_t
+status_t
 set_mouse_map(mouse_map *map)
 {
 	BMessage command(IS_SET_MOUSE_MAP);
@@ -321,7 +321,7 @@ set_mouse_map(mouse_map *map)
 }
 
 
-_IMPEXP_BE status_t
+status_t
 get_click_speed(bigtime_t *speed)
 {
 	BMessage command(IS_GET_CLICK_SPEED);
@@ -336,7 +336,7 @@ get_click_speed(bigtime_t *speed)
 }
 
 
-_IMPEXP_BE status_t
+status_t
 set_click_speed(bigtime_t speed)
 {
 	BMessage command(IS_SET_CLICK_SPEED);
@@ -346,7 +346,7 @@ set_click_speed(bigtime_t speed)
 }
 
 
-_IMPEXP_BE status_t
+status_t
 get_mouse_speed(int32 *speed)
 {
 	BMessage command(IS_GET_MOUSE_SPEED);
@@ -361,7 +361,7 @@ get_mouse_speed(int32 *speed)
 }
 
 
-_IMPEXP_BE status_t
+status_t
 set_mouse_speed(int32 speed)
 {
 	BMessage command(IS_SET_MOUSE_SPEED);
@@ -371,7 +371,7 @@ set_mouse_speed(int32 speed)
 }
 
 
-_IMPEXP_BE status_t
+status_t
 get_mouse_acceleration(int32 *speed)
 {
 	BMessage command(IS_GET_MOUSE_ACCELERATION);
@@ -386,7 +386,7 @@ get_mouse_acceleration(int32 *speed)
 }
 
 
-_IMPEXP_BE status_t
+status_t
 set_mouse_acceleration(int32 speed)
 {
 	BMessage command(IS_SET_MOUSE_ACCELERATION);
@@ -396,7 +396,7 @@ set_mouse_acceleration(int32 speed)
 }
 
 
-_IMPEXP_BE status_t
+status_t
 get_key_repeat_rate(int32 *rate)
 {
 	BMessage command(IS_GET_KEY_REPEAT_RATE);
@@ -411,7 +411,7 @@ get_key_repeat_rate(int32 *rate)
 }
 
 
-_IMPEXP_BE status_t
+status_t
 set_key_repeat_rate(int32 rate)
 {
 	BMessage command(IS_SET_KEY_REPEAT_RATE);
@@ -421,7 +421,7 @@ set_key_repeat_rate(int32 rate)
 }
 
 
-_IMPEXP_BE status_t
+status_t
 get_key_repeat_delay(bigtime_t *delay)
 {
 	BMessage command(IS_GET_KEY_REPEAT_DELAY);
@@ -436,7 +436,7 @@ get_key_repeat_delay(bigtime_t *delay)
 }
 
 
-_IMPEXP_BE status_t
+status_t
 set_key_repeat_delay(bigtime_t  delay)
 {
 	BMessage command(IS_SET_KEY_REPEAT_DELAY);
@@ -446,7 +446,7 @@ set_key_repeat_delay(bigtime_t  delay)
 }
 
 
-_IMPEXP_BE uint32
+uint32
 modifiers()
 {
 	BMessage command(IS_GET_MODIFIERS);
@@ -465,7 +465,7 @@ modifiers()
 }
 
 
-_IMPEXP_BE status_t
+status_t
 get_key_info(key_info *info)
 {
 	BMessage command(IS_GET_KEY_INFO);
@@ -487,14 +487,14 @@ get_key_info(key_info *info)
 }
 
 
-_IMPEXP_BE void
+void
 get_key_map(key_map **map, char **key_buffer)
 {
 	_get_key_map(map, key_buffer, NULL);
 }
 
 
-_IMPEXP_BE void
+void
 _get_key_map(key_map **map, char **key_buffer, ssize_t *key_buffer_size)
 {
 	BMessage command(IS_GET_KEY_MAP);
@@ -523,7 +523,7 @@ _get_key_map(key_map **map, char **key_buffer, ssize_t *key_buffer_size)
 }
 
 
-_IMPEXP_BE status_t
+status_t
 get_keyboard_id(uint16 *id)
 {
 	BMessage command(IS_GET_KEYBOARD_ID);
@@ -539,7 +539,7 @@ get_keyboard_id(uint16 *id)
 }
 
 
-_IMPEXP_BE void
+void
 set_modifier_key(uint32 modifier, uint32 key)
 {
 	BMessage command(IS_SET_MODIFIER_KEY);
@@ -551,7 +551,7 @@ set_modifier_key(uint32 modifier, uint32 key)
 }
 
 
-_IMPEXP_BE void
+void
 set_keyboard_locks(uint32 modifiers)
 {
 	BMessage command(IS_SET_KEYBOARD_LOCKS);
@@ -562,7 +562,7 @@ set_keyboard_locks(uint32 modifiers)
 }
 
 
-_IMPEXP_BE status_t
+status_t
 _restore_key_map_()
 {
 	BMessage message(IS_RESTORE_KEY_MAP);
@@ -572,7 +572,7 @@ _restore_key_map_()
 }
 
 
-_IMPEXP_BE rgb_color
+rgb_color
 keyboard_navigation_color()
 {
 	// Queries the app_server
@@ -580,7 +580,7 @@ keyboard_navigation_color()
 }
 
 
-_IMPEXP_BE int32
+int32
 count_workspaces()
 {
 	int32 count = 1;
@@ -596,7 +596,7 @@ count_workspaces()
 }
 
 
-_IMPEXP_BE void
+void
 set_workspace_count(int32 count)
 {
 	BPrivate::AppServerLink link;
@@ -606,7 +606,7 @@ set_workspace_count(int32 count)
 }
 
 
-_IMPEXP_BE int32
+int32
 current_workspace()
 {
 	int32 index = 0;
@@ -622,7 +622,7 @@ current_workspace()
 }
 
 
-_IMPEXP_BE void
+void
 activate_workspace(int32 workspace)
 {
 	BPrivate::AppServerLink link;
@@ -632,7 +632,7 @@ activate_workspace(int32 workspace)
 }
 
 
-_IMPEXP_BE bigtime_t
+bigtime_t
 idle_time()
 {
 	bigtime_t idletime = 0;
@@ -648,7 +648,7 @@ idle_time()
 }
 
 
-_IMPEXP_BE void
+void
 run_select_printer_panel()
 {
 	if (be_roster == NULL)
@@ -659,7 +659,7 @@ run_select_printer_panel()
 }
 
 
-_IMPEXP_BE void
+void
 run_add_printer_panel()
 {
 	// Launches the Printer prefs app via the Roster and asks it to 
@@ -671,7 +671,7 @@ run_add_printer_panel()
 }
 
 
-_IMPEXP_BE void
+void
 run_be_about()
 {
 	if (be_roster != NULL)
@@ -679,7 +679,7 @@ run_be_about()
 }
 
 
-_IMPEXP_BE void
+void
 set_focus_follows_mouse(bool follow)
 {
 	// obviously deprecated API
@@ -687,14 +687,14 @@ set_focus_follows_mouse(bool follow)
 }
 
 
-_IMPEXP_BE bool
+bool
 focus_follows_mouse()
 {
 	return mouse_mode() != B_NORMAL_MOUSE;
 }
 
 
-_IMPEXP_BE void
+void
 set_mouse_mode(mode_mouse mode)
 {
 	BPrivate::AppServerLink link;
@@ -704,7 +704,7 @@ set_mouse_mode(mode_mouse mode)
 }
 
 
-_IMPEXP_BE mode_mouse
+mode_mouse
 mouse_mode()
 {
 	// Gets the focus-follows-mouse style, such as normal, B_WARP_MOUSE, etc.
@@ -721,7 +721,7 @@ mouse_mode()
 }
 
 
-_IMPEXP_BE rgb_color
+rgb_color
 ui_color(color_which which)
 {
 	int32 index = color_which_to_index(which);
@@ -739,7 +739,7 @@ ui_color(color_which which)
 }
 
 
-_IMPEXP_BE void
+void
 set_ui_color(const color_which &which, const rgb_color &color)
 {
 	int32 index = color_which_to_index(which);
@@ -756,7 +756,7 @@ set_ui_color(const color_which &which, const rgb_color &color)
 }
 
 
-_IMPEXP_BE rgb_color
+rgb_color
 tint_color(rgb_color color, float tint)
 {
 	rgb_color result;

@@ -28,6 +28,7 @@
 #include <Mime.h>
 
 class BRegion;
+struct dormant_flavor_info;
 
 #include "cortex_defs.h"
 __BEGIN_CORTEX_NAMESPACE

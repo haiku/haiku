@@ -18,6 +18,7 @@
 
 class _BMethodAddOn_;
 class AddOnManager;
+class BMenu;
 class InputServer;
 
 class BInputServerMethod : public BInputServerFilter {

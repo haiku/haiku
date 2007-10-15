@@ -21,11 +21,11 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-
 #ifndef __DVB_MEDIA_NODE_H
 #define __DVB_MEDIA_NODE_H
 
-#include <kernel/OS.h>
+
+#include <OS.h>
 #include <media/BufferProducer.h>
 #include <media/Controllable.h>
 #include <media/MediaDefs.h>
@@ -39,14 +39,13 @@
 #include "StringList.h"
 
 class BDiscreteParameter;
+class BParameterGroup;
 class PacketQueue;
 class DVBCard;
 
-class DVBMediaNode :
-	public virtual BBufferProducer,
-	public virtual BControllable,
-	public virtual BMediaEventLooper
-{
+
+class DVBMediaNode : public virtual BBufferProducer,
+	public virtual BControllable, public virtual BMediaEventLooper {
 public:
 						DVBMediaNode(BMediaAddOn *addon,
 								const char *name, int32 internal_id, DVBCard *card);
@@ -287,4 +286,4 @@ private:
 		int					fRawAudioFile;
 };
 
-#endif
+#endif	// __DVB_MEDIA_NODE_H

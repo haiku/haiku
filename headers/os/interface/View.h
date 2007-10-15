@@ -422,11 +422,7 @@ public:
 
 	virtual void            SetFont(const BFont* font, uint32 mask = B_FONT_ALL);
 
-	#if !_PR3_COMPATIBLE_
 			void            GetFont(BFont* font) const;
-	#else
-			void            GetFont(BFont* font);
-	#endif
 			void			TruncateString(BString* in_out,
 										   uint32 mode,
 										   float width) const;

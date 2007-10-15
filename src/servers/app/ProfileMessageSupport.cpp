@@ -138,6 +138,7 @@ string_for_message_code(uint32 code, BString& string)
 
 		case AS_GET_RETRACE_SEMAPHORE: string = "AS_GET_RETRACE_SEMAPHORE"; break;
 		case AS_GET_ACCELERANT_INFO: string = "AS_GET_ACCELERANT_INFO"; break;
+		case AS_GET_MONITOR_INFO: string = "AS_GET_MONITOR_INFO"; break;
 		case AS_GET_FRAME_BUFFER_CONFIG: string = "AS_GET_FRAME_BUFFER_CONFIG"; break;
 	
 		case AS_SET_DPMS: string = "AS_SET_DPMS"; break;

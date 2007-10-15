@@ -16,6 +16,7 @@
 class BLooper;
 class BMessageFilter;
 class BMessage;
+class BMessenger;
 class BList;
 
 #define B_OBSERVE_WHAT_CHANGE "be:observe_change_what"

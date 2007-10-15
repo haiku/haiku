@@ -5,7 +5,7 @@
 // where noted, are licensed under the MIT License, and have been written 
 // and are:
 //
-// Copyright (c) 2001-2003 OpenBeOS Project
+// Copyright (c) 2001-2007 Haiku Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -25,10 +25,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
+#ifndef PRINTERS_WINDOW_H
+#define PRINTERS_WINDOW_H
 
-#ifndef PRINTERSWINDOW_H
-#define PRINTERSWINDOW_H
 
+#include <Window.h>
+
+class BBox;
 class PrintersWindow;
 class PrinterListView;
 class JobListView;
@@ -36,11 +39,8 @@ class Job;
 class SpoolFolder;
 class PrinterItem;
 
-#include <Window.h>
 
-class PrintersWindow : public BWindow
-{
-	typedef BWindow Inherited;
+class PrintersWindow : public BWindow {
 public:
 	PrintersWindow(BRect frame);
 	
@@ -56,6 +56,8 @@ private:
 	bool IsSelected(PrinterItem* printer);
 	void UpdatePrinterButtons();
 	void UpdateJobButtons();
+
+	typedef BWindow Inherited;
 	
 	PrinterListView*	fPrinterListView;
 	BButton*	fMakeDefault;
@@ -72,4 +74,4 @@ private:
 	bool fAddingPrinter;
 };
 
-#endif
+#endif	// PRINTERS_WINDOW_H

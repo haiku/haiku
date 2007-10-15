@@ -25,18 +25,21 @@
 #ifndef _FALLBACK_INDEX_H
 #define _FALLBACK_INDEX_H
 
+
 #include "Index.h"
 
-class FallbackIndex : public Index
-{
+
+class FallbackIndex : public Index {
 public:
-						FallbackIndex(BPositionIO *source, OpenDMLParser *parser);
-						~FallbackIndex();
+					FallbackIndex(BPositionIO *source, OpenDMLParser *parser);
+					~FallbackIndex();
 
-	status_t			Init();
+	status_t		Init();
 
-	status_t			GetNextChunkInfo(int stream_index, int64 *start, uint32 *size, bool *keyframe);
-	status_t			Seek(int stream_index, uint32 seekTo, int64 *frame, bigtime_t *time);
+	status_t		GetNextChunkInfo(int stream_index, int64 *start,
+						uint32 *size, bool *keyframe);
+	status_t		Seek(int stream_index, uint32 seekTo, int64 *frame,
+						bigtime_t *time);
 };
 
-#endif
+#endif	// _FALLBACK_INDEX_H

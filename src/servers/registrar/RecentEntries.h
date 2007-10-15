@@ -37,6 +37,7 @@
 #include <stdio.h>
 #include <string>
 
+class BMessage;
 class TRoster;
 
 struct recent_entry {

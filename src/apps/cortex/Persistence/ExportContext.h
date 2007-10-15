@@ -20,49 +20,43 @@
 #include "cortex_defs.h"
 __BEGIN_CORTEX_NAMESPACE
 
+class BDataIO;
 class IPersistent;
 class ExportContext;
 
 // writeAttr() helper
-inline BString& _pad_with_spaces(
-	BString&											out,
-	const char*										text,
-	ExportContext&								context,
-	uint16												column);
-	
+inline BString& _pad_with_spaces(BString& out, const char* text,
+	ExportContext& context, uint16 column);
+
 
 class ExportContext {
-public:													// *** ctor/dtor
-	virtual ~ExportContext();
+public:
 	ExportContext();
-	ExportContext(
-		BDataIO*										_stream);
-
-public:													// *** public members
+	ExportContext(BDataIO* stream);
+	virtual ~ExportContext();
 
 	// the output stream
-	BDataIO*											stream;
-	
+	BDataIO* stream;
+
 	// the element stack
 	struct element_entry {
 		element_entry() : hasAttributes(false), hasContent(false) {}
-		
-		BString				name;
-		bool					hasAttributes;
-		bool					hasContent;
+
+		BString	name;
+		bool	hasAttributes;
+		bool	hasContent;
 	};
 
-	typedef std::list<element_entry>		element_list;
-	element_list									m_elementStack;
-		
+	typedef std::list<element_entry> element_list;
+	element_list m_elementStack;
+
 public:													// *** XML formatting helpers
 
 	// writes a start tag.  should be called from
 	// IPersistent::xmlExportBegin()
 	// (or xmlExportContent(), if you're writing nested elements)
 
-	void beginElement(
-		const char*									name);
+	void beginElement(const char* name);
 	
 	// writes an end tag corresponding to the current element.
 	// should only be called from IPersistent::xmlExportEnd() or

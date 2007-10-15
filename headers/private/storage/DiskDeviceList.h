@@ -11,11 +11,12 @@
 #include <Handler.h>
 #include <ObjectList.h>
 
-
 class BDiskDevice;
 class BDiskDeviceRoster;
+class BLocker;
 class BPartition;
 class BSession;
+
 
 class BDiskDeviceList : public BHandler {
 public:

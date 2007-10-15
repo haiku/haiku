@@ -60,6 +60,7 @@ enum WINDOW_TYPES {
 
 
 class BFile;
+class BMenu;
 class Words;
 
 

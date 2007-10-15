@@ -165,7 +165,7 @@ static const char * unicode2aliases[] = {
 	// IANA aliases
 	"csUnicode",
 	// java aliases
-	"UTF-16BE", "X-UTF-16BE", "UnicodeBigUnmarked",
+	"UTF-16BE", "UTF_16BE", "X-UTF-16BE", "UnicodeBigUnmarked",
 	NULL
 };
 static const BCharacterSet unicode2(16,1000,"Unicode (UCS-2)","ISO-10646-UCS-2",NULL,unicode2aliases);

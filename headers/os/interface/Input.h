@@ -15,6 +15,8 @@
 #include <Messenger.h>
 #include <SupportDefs.h>
 
+class BList;
+
 
 enum input_method_op {
 	B_INPUT_METHOD_STARTED			= 0,
@@ -47,9 +49,9 @@ enum input_device_notification {
 class BInputDevice;
 
 
-_IMPEXP_BE BInputDevice*	find_input_device(const char *name);
-_IMPEXP_BE status_t			get_input_devices(BList *list);
-_IMPEXP_BE status_t			watch_input_devices(BMessenger target, bool start);
+BInputDevice*	find_input_device(const char *name);
+status_t		get_input_devices(BList *list);
+status_t		watch_input_devices(BMessenger target, bool start);
 
 
 class BInputDevice {

@@ -18,20 +18,20 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-	extern _IMPEXP_ROOT bool _rtDebugFlag;
+	extern bool _rtDebugFlag;
 
-	_IMPEXP_ROOT bool _debugFlag(void);
-	_IMPEXP_ROOT bool _setDebugFlag(bool);
+	bool _debugFlag(void);
+	bool _setDebugFlag(bool);
 
 #if __GNUC__
-	int _debugPrintf(const char *, ...) __attribute__ ((format (__printf__, 1, 2)));
-	int _sPrintf(const char *, ...) __attribute__ ((format (__printf__, 1, 2)));
+	int _debugPrintf(const char *, ...) _PRINTFLIKE(1, 2);
+	int _sPrintf(const char *, ...) _PRINTFLIKE(1, 2);
 #else
 	int _debugPrintf(const char *, ...);
 	int _sPrintf(const char *, ...);
 #endif
-	_IMPEXP_ROOT int _xdebugPrintf(const char *, ...);
-	_IMPEXP_ROOT int _debuggerAssert(const char *, int, char *);
+	int _xdebugPrintf(const char *, ...);
+	int _debuggerAssert(const char *, int, char *);
 #ifdef __cplusplus
 }
 #endif

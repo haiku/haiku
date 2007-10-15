@@ -14,6 +14,10 @@
 #include <MediaDefs.h>
 #include <MediaNode.h>
 
+class BBuffer;
+class BBufferGroup;
+class BRegion;
+
 namespace BPrivate { namespace media {
 	class BMediaRosterEx;
 }}

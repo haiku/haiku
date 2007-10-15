@@ -14,6 +14,8 @@
 #include <BeBuild.h>
 #include <View.h>
 
+class BMessageRunner;
+
 /*----------------------------------------------------------------*/
 /*----- BTextView structures and definitions ---------------------*/
 
@@ -36,16 +38,6 @@ enum undo_state {
 	B_UNDO_CLEAR,
 	B_UNDO_DROP
 };
-
-
-#if _PR2_COMPATIBLE_
-extern "C" void _ReservedTextView2__9BTextViewFv(BTextView	*object, 
-												 BMessage	*drag, 
-												 BBitmap	**bitmap, 
-												 BPoint		*point, 
-												 BHandler	**handler);
-#endif
-
 
 class BBitmap;
 class BClipboard;
@@ -266,27 +258,16 @@ private:
 friend status_t	_init_interface_kit_();
 friend class _BTextTrackState_;
 
-#if _PR2_COMPATIBLE_
-friend void		_ReservedTextView2__9BTextViewFv(BTextView	*object, 
-												 BMessage	*drag, 
-												 BBitmap	**bitmap, 
-												 BPoint		*point, 
-												 BHandler	**handler);
-#endif
-
 virtual void			_ReservedTextView3();
 virtual void			_ReservedTextView4();
 virtual void			_ReservedTextView5();
 virtual void			_ReservedTextView6();
 virtual void			_ReservedTextView7();
 virtual void			_ReservedTextView8();
-
-#if !_PR3_COMPATIBLE_
 virtual void			_ReservedTextView9();
 virtual void			_ReservedTextView10();
 virtual void			_ReservedTextView11();
 virtual void			_ReservedTextView12();
-#endif
 
 		void			InitObject(BRect			textRect, 
 								   const BFont		*initialFont,
@@ -423,17 +404,14 @@ static	void			UnlockWidthBuffer();
 		color_space				fColorSpace;
 		bool					fResizable;
 		BView*					fContainerView;
-		_BUndoBuffer_*			fUndo;			/* was _reserved[0] */
-		_BInlineInput_*			fInline;		/* was _reserved[1] */
-		BMessageRunner *		fDragRunner;	/* was _reserved[2] */
-		BMessageRunner *		fClickRunner;	/* was _reserved[3] */
+		_BUndoBuffer_*			fUndo;
+		_BInlineInput_*			fInline;
+		BMessageRunner *		fDragRunner;
+		BMessageRunner *		fClickRunner;
 		BPoint					fWhere;
-		_BTextTrackState_*		fTrackingMouse;	/* was _reserved[6] */
-		_BTextChangeResult_*	fTextChange;	/* was _reserved[7] */
-		uint32					_reserved[1];	/* was 8 */
-#if !_PR3_COMPATIBLE_
-		uint32					_more_reserved[8];
-#endif
+		_BTextTrackState_*		fTrackingMouse;
+		_BTextChangeResult_*	fTextChange;
+		uint32					_reserved[9];
 
 static	_BWidthBuffer_*			sWidths;
 static	sem_id					sWidthSem;

@@ -147,7 +147,7 @@ typedef void (*graphics_card_hook) ();
 extern "C" {
 #endif
 
-_EXPORT		int32	control_graphics_card(uint32, void*);	
+int32	control_graphics_card(uint32, void*);	
 
 #ifdef __cplusplus
 }

@@ -1,8 +1,10 @@
 #ifndef _PRINTER_DRIVER_H
 #define _PRINTER_DRIVER_H
 
+
 #include <SupportDefs.h>
- 
+
+
 class BFile;
 class BMessage;
 class BNode;
@@ -50,6 +52,6 @@ private:
 	GraphicsDriver* fGraphicsDriver;
 };
 
-_IMPEXP_BE PrinterDriver* instantiate_printer_driver(BNode* printerFolder = NULL);
+PrinterDriver* instantiate_printer_driver(BNode* printerFolder = NULL);
 
-#endif
+#endif	// _PRINTER_DRIVER_H

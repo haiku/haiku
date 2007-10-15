@@ -19,6 +19,7 @@
 #include <InterfaceDefs.h>
 #include <Region.h>
 
+class BMessage;
 class BView;
 
 #include "cortex_defs.h"

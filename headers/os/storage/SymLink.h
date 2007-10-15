@@ -1,23 +1,17 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  File Name: SymLink.h
-//---------------------------------------------------------------------
-/*!
-	\file SymLink.h
-	BSymLink interface declaration.
-*/
-
+/*
+ * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _SYM_LINK_H
 #define _SYM_LINK_H
+
 
 #include <Node.h>
 #include <StorageDefs.h>
 
-#ifdef USE_OPENBEOS_NAMESPACE
-namespace OpenBeOS {
-#endif
+class BDirectory;
+class BPath;
+
 
 /*!
 	\class BSymLink
@@ -60,9 +54,5 @@ private:
 private:
 	int get_fd() const;
 };
-
-#ifdef USE_OPENBEOS_NAMESPACE
-};		// namespace OpenBeOS
-#endif
 
 #endif	// _SYM_LINK_H

@@ -26,6 +26,7 @@
 // Media Kit
 #include <MediaNode.h>
 
+class BMediaTheme;
 class BMessenger;
 
 #include "cortex_defs.h"

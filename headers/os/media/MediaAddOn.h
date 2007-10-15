@@ -17,6 +17,9 @@
 #include <MediaDefs.h>
 #include <Flattenable.h>
 
+class BMediaNode;
+class BMimeType;
+struct entry_ref;
 
 struct dormant_node_info {
 	dormant_node_info();

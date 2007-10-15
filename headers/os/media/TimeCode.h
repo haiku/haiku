@@ -36,12 +36,12 @@ struct timecode_info {
 	char format[32];	/* for sprintf(fmt, h, m, s, f) */
 	char _reserved_[64];
 };
-_IMPEXP_MEDIA status_t us_to_timecode(bigtime_t micros, int * hours, int * minutes, int * seconds, int * frames, const timecode_info * code = NULL);
-_IMPEXP_MEDIA status_t timecode_to_us(int hours, int minutes, int seconds, int frames, bigtime_t * micros, const timecode_info * code = NULL);
-_IMPEXP_MEDIA status_t frames_to_timecode(int32 l_frames, int * hours, int * minutes, int * seconds, int * frames, const timecode_info * code = NULL);
-_IMPEXP_MEDIA status_t timecode_to_frames(int hours, int minutes, int seconds, int frames, int32 * l_frames, const timecode_info * code = NULL);
-_IMPEXP_MEDIA status_t get_timecode_description(timecode_type type, timecode_info * out_timecode);
-_IMPEXP_MEDIA status_t count_timecodes();
+status_t us_to_timecode(bigtime_t micros, int * hours, int * minutes, int * seconds, int * frames, const timecode_info * code = NULL);
+status_t timecode_to_us(int hours, int minutes, int seconds, int frames, bigtime_t * micros, const timecode_info * code = NULL);
+status_t frames_to_timecode(int32 l_frames, int * hours, int * minutes, int * seconds, int * frames, const timecode_info * code = NULL);
+status_t timecode_to_frames(int hours, int minutes, int seconds, int frames, int32 * l_frames, const timecode_info * code = NULL);
+status_t get_timecode_description(timecode_type type, timecode_info * out_timecode);
+status_t count_timecodes();
 /* we may want a set_default_timecode, too -- but that's bad from a thread standpoint */
 
 

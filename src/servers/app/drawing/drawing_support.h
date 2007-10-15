@@ -1,14 +1,18 @@
-//------------------------------------------------------------------------------
-// Copyright 2005, Haiku, Inc. All rights reserved.
-// Distributed under the terms of the MIT License.
-//
-//	Author:			Stephan Aßmus, <superstippi@gmx.de>
-//------------------------------------------------------------------------------
-
+/*
+ * Copyright 2005-2007, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
 #ifndef SUPPORT_H
 #define SUPPORT_H
 
+
 #include <SupportDefs.h>
+
+class BRect;
+
 
 // gfxcpy
 static inline void

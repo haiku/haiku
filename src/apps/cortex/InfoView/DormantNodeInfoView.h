@@ -16,6 +16,10 @@
 #include "InfoView.h"
 
 #include "cortex_defs.h"
+
+
+struct dormant_node_info;
+
 __BEGIN_CORTEX_NAMESPACE
 
 class NodeRef;

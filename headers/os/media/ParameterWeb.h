@@ -16,17 +16,10 @@
 #if !defined(_CONTROL_WEB_H)
 #define _CONTROL_WEB_H
 
-#include <MediaDefs.h>
 #include <Flattenable.h>
+#include <MediaDefs.h>
 #include <MediaNode.h>
-
-#if !defined(_PR3_COMPATIBLE_)
-enum {
-    B_MEDIA_PARAMETER_TYPE      = 'BMCT',
-    B_MEDIA_PARAMETER_WEB_TYPE  = 'BMCW',
-    B_MEDIA_PARAMETER_GROUP_TYPE= 'BMCG'
-};
-#endif
+#include <TypeConstants.h>
 
 
 //	It is highly unfortunate that a linker bug forces these symbols out
@@ -34,50 +27,50 @@ enum {
 
 /* These are control KINDs */
 	/* kind used when you don't know or care */
-extern _IMPEXP_MEDIA const char * const B_GENERIC;
+extern const char * const B_GENERIC;
 	/* kinds used for sliders */
-extern _IMPEXP_MEDIA const char * const B_MASTER_GAIN;	/* Main Volume */
-extern _IMPEXP_MEDIA const char * const B_GAIN;
-extern _IMPEXP_MEDIA const char * const B_BALANCE;
-extern _IMPEXP_MEDIA const char * const B_FREQUENCY;	/* like a radio tuner */
-extern _IMPEXP_MEDIA const char * const B_LEVEL;		/* like for effects */
-extern _IMPEXP_MEDIA const char * const B_SHUTTLE_SPEED;	/* Play, SloMo, Scan 1.0 == regular */
-extern _IMPEXP_MEDIA const char * const B_CROSSFADE;		/* 0 == first input, +100 == second input */
-extern _IMPEXP_MEDIA const char * const B_EQUALIZATION;		/* depth (dB) */
+extern const char * const B_MASTER_GAIN;	/* Main Volume */
+extern const char * const B_GAIN;
+extern const char * const B_BALANCE;
+extern const char * const B_FREQUENCY;	/* like a radio tuner */
+extern const char * const B_LEVEL;		/* like for effects */
+extern const char * const B_SHUTTLE_SPEED;	/* Play, SloMo, Scan 1.0 == regular */
+extern const char * const B_CROSSFADE;		/* 0 == first input, +100 == second input */
+extern const char * const B_EQUALIZATION;		/* depth (dB) */
 
 	/* kinds used for compressors */
-extern _IMPEXP_MEDIA const char * const B_COMPRESSION;	/* 0% == no compression, 99% == 100:1 compression */
-extern _IMPEXP_MEDIA const char * const B_QUALITY;		/* 0% == full compression, 100% == no compression */
-extern _IMPEXP_MEDIA const char * const B_BITRATE;		/* in bits/second */
-extern _IMPEXP_MEDIA const char * const B_GOP_SIZE;			/* Group Of Pictures. a k a "Keyframe every N frames" */
+extern const char * const B_COMPRESSION;	/* 0% == no compression, 99% == 100:1 compression */
+extern const char * const B_QUALITY;		/* 0% == full compression, 100% == no compression */
+extern const char * const B_BITRATE;		/* in bits/second */
+extern const char * const B_GOP_SIZE;			/* Group Of Pictures. a k a "Keyframe every N frames" */
 	/* kinds used for selectors */
-extern _IMPEXP_MEDIA const char * const B_MUTE;		/* 0 == thru, 1 == mute */
-extern _IMPEXP_MEDIA const char * const B_ENABLE;		/* 0 == disable, 1 == enable */
-extern _IMPEXP_MEDIA const char * const B_INPUT_MUX;	/* "value" 1-N == input selected */
-extern _IMPEXP_MEDIA const char * const B_OUTPUT_MUX;	/* "value" 1-N == output selected */
-extern _IMPEXP_MEDIA const char * const B_TUNER_CHANNEL;		/* like cable TV */
-extern _IMPEXP_MEDIA const char * const B_TRACK;		/* like a CD player; "value" should be 1-N */
-extern _IMPEXP_MEDIA const char * const B_RECSTATE;	/* like mutitrack tape deck, 0 == silent, 1 == play, 2 == record */
-extern _IMPEXP_MEDIA const char * const B_SHUTTLE_MODE;	/* -1 == backwards, 0 == stop, 1 == play, 2 == pause/cue */
-extern _IMPEXP_MEDIA const char * const B_RESOLUTION;
-extern _IMPEXP_MEDIA const char * const B_COLOR_SPACE;		/* "value" should be color_space */
-extern _IMPEXP_MEDIA const char * const B_FRAME_RATE;
-extern _IMPEXP_MEDIA const char * const B_VIDEO_FORMAT;	/* 1 == NTSC-M, 2 == NTSC-J, 3 == PAL-BDGHI, 4 == PAL-M, 5 == PAL-N, 6 == SECAM, 7 == MPEG-1, 8 == MPEG-2 */
+extern const char * const B_MUTE;		/* 0 == thru, 1 == mute */
+extern const char * const B_ENABLE;		/* 0 == disable, 1 == enable */
+extern const char * const B_INPUT_MUX;	/* "value" 1-N == input selected */
+extern const char * const B_OUTPUT_MUX;	/* "value" 1-N == output selected */
+extern const char * const B_TUNER_CHANNEL;		/* like cable TV */
+extern const char * const B_TRACK;		/* like a CD player; "value" should be 1-N */
+extern const char * const B_RECSTATE;	/* like mutitrack tape deck, 0 == silent, 1 == play, 2 == record */
+extern const char * const B_SHUTTLE_MODE;	/* -1 == backwards, 0 == stop, 1 == play, 2 == pause/cue */
+extern const char * const B_RESOLUTION;
+extern const char * const B_COLOR_SPACE;		/* "value" should be color_space */
+extern const char * const B_FRAME_RATE;
+extern const char * const B_VIDEO_FORMAT;	/* 1 == NTSC-M, 2 == NTSC-J, 3 == PAL-BDGHI, 4 == PAL-M, 5 == PAL-N, 6 == SECAM, 7 == MPEG-1, 8 == MPEG-2 */
 	/* kinds used for junctions */
 	//	the prefix of "WEB" is to avoid collission with an enum in Defs.h
-extern _IMPEXP_MEDIA const char * const B_WEB_PHYSICAL_INPUT;		/* a jack on the back of the card */
-extern _IMPEXP_MEDIA const char * const B_WEB_PHYSICAL_OUTPUT;
-extern _IMPEXP_MEDIA const char * const B_WEB_ADC_CONVERTER;		/* from analog to digital signals */
-extern _IMPEXP_MEDIA const char * const B_WEB_DAC_CONVERTER;		/* from digital to analog signals */
-extern _IMPEXP_MEDIA const char * const B_WEB_LOGICAL_INPUT;		/* an "input" that may not be physical */
-extern _IMPEXP_MEDIA const char * const B_WEB_LOGICAL_OUTPUT;
-extern _IMPEXP_MEDIA const char * const B_WEB_LOGICAL_BUS;			/* a logical connection point that is neither input nor output; auxilliary bus */
-extern _IMPEXP_MEDIA const char * const B_WEB_BUFFER_INPUT;		/* an input that corresponds to a media_input */
-extern _IMPEXP_MEDIA const char * const B_WEB_BUFFER_OUTPUT;
+extern const char * const B_WEB_PHYSICAL_INPUT;		/* a jack on the back of the card */
+extern const char * const B_WEB_PHYSICAL_OUTPUT;
+extern const char * const B_WEB_ADC_CONVERTER;		/* from analog to digital signals */
+extern const char * const B_WEB_DAC_CONVERTER;		/* from digital to analog signals */
+extern const char * const B_WEB_LOGICAL_INPUT;		/* an "input" that may not be physical */
+extern const char * const B_WEB_LOGICAL_OUTPUT;
+extern const char * const B_WEB_LOGICAL_BUS;			/* a logical connection point that is neither input nor output; auxilliary bus */
+extern const char * const B_WEB_BUFFER_INPUT;		/* an input that corresponds to a media_input */
+extern const char * const B_WEB_BUFFER_OUTPUT;
 
 	// a simple transport control is a discrete parameter with five values (states):
 	// rewinding, stopped, playing, paused, and fast-forwarding
-extern _IMPEXP_MEDIA const char * const B_SIMPLE_TRANSPORT;
+extern const char * const B_SIMPLE_TRANSPORT;
 
 class BList;
 class BParameterGroup;

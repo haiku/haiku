@@ -9,6 +9,7 @@
 #include <View.h>
 
 class SudokuField;
+struct entry_ref;
 
 
 enum {

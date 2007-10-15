@@ -33,7 +33,7 @@
 #include <Rect.h>
 #include <Archivable.h>
 
-
+class BDataIO;
 class BView;
 struct _BPictureExtent_;
 

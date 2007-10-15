@@ -1,7 +1,11 @@
 #ifndef _COLOR_CONVERSION_H_
 #define _COLOR_CONVERSION_H_
 
+
 #include <GraphicsDefs.h>
+
+class BPoint;
+
 
 namespace BPrivate {
 

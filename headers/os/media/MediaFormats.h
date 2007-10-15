@@ -203,11 +203,11 @@ class BMediaFormats {
 		uint32	_reserved[30];
 };
 
-_IMPEXP_MEDIA bool operator==(const media_format_description & a, const media_format_description & b);
-_IMPEXP_MEDIA bool operator<(const media_format_description & a, const media_format_description & b);
+bool operator==(const media_format_description & a, const media_format_description & b);
+bool operator<(const media_format_description & a, const media_format_description & b);
 
-_IMPEXP_MEDIA bool operator==(const GUID & a, const GUID & b);
-_IMPEXP_MEDIA bool operator<(const GUID & a, const GUID & b);
+bool operator==(const GUID & a, const GUID & b);
+bool operator<(const GUID & a, const GUID & b);
 
 #endif	/* __cplusplus */
 

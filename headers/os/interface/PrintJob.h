@@ -15,6 +15,7 @@
 #include <Picture.h>		/* For convenience */
 #include <Rect.h>
 
+class BFile;
 class BView;
 
 /*----------------------------------------------------------------*/

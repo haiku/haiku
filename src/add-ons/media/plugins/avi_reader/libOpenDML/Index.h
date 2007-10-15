@@ -25,22 +25,28 @@
 #ifndef _INDEX_H
 #define _INDEX_H
 
+
+#include <SupportDefs.h>
+
+class BPositionIO;
 class OpenDMLParser;
 
-class Index
-{
+
+class Index {
 public:
 						Index(BPositionIO *source, OpenDMLParser *parser);
 	virtual				~Index();
 
 	virtual status_t	Init() = 0;
 
-	virtual status_t	GetNextChunkInfo(int stream_index, int64 *start, uint32 *size, bool *keyframe) = 0;
-	virtual status_t	Seek(int stream_index, uint32 seekTo, int64 *frame, bigtime_t *time) = 0;
+	virtual status_t	GetNextChunkInfo(int stream_index, int64 *start,
+							uint32 *size, bool *keyframe) = 0;
+	virtual status_t	Seek(int stream_index, uint32 seekTo, int64 *frame,
+							bigtime_t *time) = 0;
 
 protected:
 	BPositionIO *		fSource;
 	OpenDMLParser *		fParser;
 };
 
-#endif
+#endif	// _INDEX_H

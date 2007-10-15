@@ -13,11 +13,12 @@
 #include <List.h>
 #include <OS.h>
 
+class AreaLinkHeader;
+class BPoint;
+
 
 #define MAX_ATTACHMENT_SIZE 65535	// in bytes
 #define SIZE_SIZE 2					// size of the size records in an AreaLink area
-
-class AreaLinkHeader;
 
 
 class AreaLink {

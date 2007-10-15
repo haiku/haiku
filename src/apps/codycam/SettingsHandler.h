@@ -9,6 +9,7 @@
 
 class BFile;
 class BDirectory;
+class BRect;
 class Settings;
 
 

@@ -10,8 +10,9 @@
 #include <List.h>
 #include <View.h>
 
-class BMenuItem;
+class BMenu;
 class BMenuBar;
+class BMenuItem;
 
 
 namespace BPrivate {

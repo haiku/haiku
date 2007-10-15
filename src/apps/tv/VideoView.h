@@ -21,23 +21,25 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-
 #ifndef __VIDEO_VIEW_H
 #define __VIDEO_VIEW_H
 
+
 #include <View.h>
 
+class BMessageRunner;
 class VideoNode;
 
-class VideoView : public BView
-{
+
+class VideoView : public BView {
 public:
-					VideoView(BRect frame, const char *name, uint32 resizeMask, uint32 flags);
+					VideoView(BRect frame, const char *name, uint32 resizeMask,
+						uint32 flags);
 					~VideoView();
-	
+
 	void			RemoveVideoDisplay();
 	void			RemoveOverlay();
-					
+
 	VideoNode *		Node();
 
 	bool			IsOverlaySupported();
@@ -47,18 +49,17 @@ public:
 
 	void			OverlayScreenshotPrepare();
 	void			OverlayScreenshotCleanup();
-	
+
 	void			DrawFrame();
 
 private:
 	void			AttachedToWindow();
 	void			MessageReceived(BMessage *msg);
 	void			Draw(BRect updateRect);
-	
-	void			DrawTestImage();
 
+	void			DrawTestImage();
 	void			CheckActivity();
-	
+
 private:
 	VideoNode *		fVideoNode;
 	bool			fVideoActive;
@@ -68,4 +69,4 @@ private:
 	bigtime_t		fLastFrame;
 };
 
-#endif
+#endif	// __VIDEO_VIEW_H

@@ -3,8 +3,11 @@
 
 #include "ReaderPlugin.h"
 #include "ogg/ogg.h"
+
 #include <map>
 #include <vector>
+
+class BFile;
 
 namespace BPrivate { namespace media {
 
@@ -13,8 +16,7 @@ class OggTrack;
 typedef std::map<long,OggTrack*> serialno_OggTrack_map;
 typedef std::vector<long> serialno_vector;
 
-class OggReader : public Reader
-{
+class OggReader : public Reader {
 public:
 				OggReader();
 				~OggReader();
@@ -59,8 +61,7 @@ public:
 	};
 };
 
-class OggReaderPlugin : public ReaderPlugin
-{
+class OggReaderPlugin : public ReaderPlugin {
 public:
 	Reader *NewReader();
 };
@@ -69,4 +70,4 @@ public:
 
 using namespace BPrivate::media;
 
-#endif
+#endif	// _OGG_READER_PLUGIN_H

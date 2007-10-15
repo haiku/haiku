@@ -19,8 +19,11 @@
 
 #include <new>
 
+class BBufferConsumer;
+class BControllable;
+class BFileInterface;
 class BMediaAddOn;
-
+class BTimeSource;
 
 
 class media_node {

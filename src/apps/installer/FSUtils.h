@@ -145,26 +145,23 @@ TrackerCopyLoopControl::TrackerCopyLoopControl(thread_id thread)
 
 #define B_DESKTOP_DIR_NAME "Desktop"
 
-#if B_BEOS_VERSION_DANO
-#define _IMPEXP_TRACKER
-#endif
-_IMPEXP_TRACKER status_t FSCopyAttributesAndStats(BNode *, BNode *);
+status_t FSCopyAttributesAndStats(BNode *, BNode *);
 
-_IMPEXP_TRACKER status_t FSCopyFile(BEntry* srcFile, StatStruct *srcStat, BDirectory* destDir,
+status_t FSCopyFile(BEntry* srcFile, StatStruct *srcStat, BDirectory* destDir,
 	CopyLoopControl *loopControl, BPoint *loc, bool makeOriginalName, Undo &undo);
-_IMPEXP_TRACKER status_t FSCopyFolder(BEntry *srcEntry, BDirectory *destDir, CopyLoopControl *loopControl,
+status_t FSCopyFolder(BEntry *srcEntry, BDirectory *destDir, CopyLoopControl *loopControl,
 	BPoint *loc, bool makeOriginalName, Undo &undo);
-_IMPEXP_TRACKER void FSDuplicate(BObjectList<entry_ref> *srcList, BList *pointList);
-_IMPEXP_TRACKER void FSMoveToFolder(BObjectList<entry_ref> *srcList, BEntry *, uint32 moveMode,
+void FSDuplicate(BObjectList<entry_ref> *srcList, BList *pointList);
+void FSMoveToFolder(BObjectList<entry_ref> *srcList, BEntry *, uint32 moveMode,
 	BList *pointList = NULL);
-_IMPEXP_TRACKER void FSMakeOriginalName(char *name, BDirectory *destDir, const char *suffix);
-_IMPEXP_TRACKER bool FSIsTrashDir(const BEntry *);
-_IMPEXP_TRACKER bool FSIsPrintersDir(const BEntry *);
-_IMPEXP_TRACKER bool FSIsDeskDir(const BEntry *);
-_IMPEXP_TRACKER bool FSIsSystemDir(const BEntry *);
-_IMPEXP_TRACKER bool FSIsBeOSDir(const BEntry *);
-_IMPEXP_TRACKER bool FSIsHomeDir(const BEntry *);
-_IMPEXP_TRACKER void FSMoveToTrash(BObjectList<entry_ref> *srcList, BList *pointList = NULL,
+void FSMakeOriginalName(char *name, BDirectory *destDir, const char *suffix);
+bool FSIsTrashDir(const BEntry *);
+bool FSIsPrintersDir(const BEntry *);
+bool FSIsDeskDir(const BEntry *);
+bool FSIsSystemDir(const BEntry *);
+bool FSIsBeOSDir(const BEntry *);
+bool FSIsHomeDir(const BEntry *);
+void FSMoveToTrash(BObjectList<entry_ref> *srcList, BList *pointList = NULL,
 	bool async = true);
 	// Deprecated
 
@@ -172,23 +169,23 @@ void FSDeleteRefList(BObjectList<entry_ref> *, bool, bool confirm = true);
 void FSDelete(entry_ref *, bool, bool confirm = true);
 void FSRestoreRefList(BObjectList<entry_ref> *list, bool async);
 
-_IMPEXP_TRACKER status_t FSLaunchItem(const entry_ref *application, const BMessage *refsReceived,
+status_t FSLaunchItem(const entry_ref *application, const BMessage *refsReceived,
 	bool async, bool openWithOK);
 	// Preferred way of launching; only pass an actual application in <application>, not
 	// a document; to open documents with the preferred app, pase 0 in <application> and
 	// stuff all the document refs into <refsReceived>
 	// Consider having silent mode that does not show alerts, just returns error code
 	
-_IMPEXP_TRACKER status_t FSOpenWith(BMessage *listOfRefs);
+status_t FSOpenWith(BMessage *listOfRefs);
 	// runs the Open With window; pas a list of refs
 
-_IMPEXP_TRACKER void FSEmptyTrash();
-_IMPEXP_TRACKER status_t FSCreateNewFolderIn(const node_ref *destDir, entry_ref *newRef,
+void FSEmptyTrash();
+status_t FSCreateNewFolderIn(const node_ref *destDir, entry_ref *newRef,
 	node_ref *new_node);
-_IMPEXP_TRACKER void FSCreateTrashDirs();
-_IMPEXP_TRACKER status_t FSGetTrashDir(BDirectory *trashDir, dev_t volume);
-_IMPEXP_TRACKER status_t FSGetDeskDir(BDirectory *deskDir, dev_t volume);
-_IMPEXP_TRACKER status_t FSRecursiveCalcSize(BInfoWindow *, BDirectory *,
+void FSCreateTrashDirs();
+status_t FSGetTrashDir(BDirectory *trashDir, dev_t volume);
+status_t FSGetDeskDir(BDirectory *deskDir, dev_t volume);
+status_t FSRecursiveCalcSize(BInfoWindow *, BDirectory *,
 	off_t *runningSize, int32 *fileCount, int32 *dirCount);
 
 bool FSInTrashDir(const entry_ref *);
@@ -236,12 +233,12 @@ bool ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *action,
 	bool dontAsk = false, int32 *confirmedAlready = NULL);
 
 // Deprecated calls use newer calls above instead
-_IMPEXP_TRACKER void FSLaunchItem(const entry_ref *, BMessage * = NULL, int32 workspace = -1);
-_IMPEXP_TRACKER status_t FSLaunchItem(const entry_ref *, BMessage *,
+void FSLaunchItem(const entry_ref *, BMessage * = NULL, int32 workspace = -1);
+status_t FSLaunchItem(const entry_ref *, BMessage *,
 	int32 workspace, bool asynch);
-_IMPEXP_TRACKER void FSOpenWithDocuments(const entry_ref *executableToLaunch,
+void FSOpenWithDocuments(const entry_ref *executableToLaunch,
 	BMessage *documentEntryRefs);
-_IMPEXP_TRACKER status_t FSLaunchUsing(const entry_ref *ref, BMessage *listOfRefs);
+status_t FSLaunchUsing(const entry_ref *ref, BMessage *listOfRefs);
 
 
 // some extra directory_which values

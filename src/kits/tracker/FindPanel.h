@@ -70,7 +70,7 @@ const uint32 kByForumlaItem = 'Fbyq';
 const uint32 kAddItem = 'Fadd';
 const uint32 kRemoveItem = 'Frem';
 
-#if !B_BEOS_VERSION_DANO
+#ifdef _IMPEXP_TRACKER
 _IMPEXP_TRACKER
 #endif
 BMenu *TrackerBuildRecentFindItemsMenu(const char *);

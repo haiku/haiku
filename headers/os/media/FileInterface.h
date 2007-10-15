@@ -15,6 +15,8 @@
 #include <MediaDefs.h>
 #include <MediaNode.h>
 
+struct entry_ref;
+
 
 class BFileInterface :
 	public virtual BMediaNode

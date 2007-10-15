@@ -41,13 +41,13 @@ enum be_task_flags { /* bitmasks for "what" */
 };
 #if defined(__cplusplus)
 extern "C" {
-_IMPEXP_ROOT int32 suggest_thread_priority(uint32 task_flags = B_DEFAULT_MEDIA_PRIORITY, 
+int32 suggest_thread_priority(uint32 task_flags = B_DEFAULT_MEDIA_PRIORITY, 
 	int32 period = 0, bigtime_t jitter = 0, bigtime_t length = 0);
-_IMPEXP_ROOT bigtime_t estimate_max_scheduling_latency(thread_id th = -1);	/* default is current thread */
+bigtime_t estimate_max_scheduling_latency(thread_id th = -1);	/* default is current thread */
 }
 #else
-_IMPEXP_ROOT int32 suggest_thread_priority(uint32 what, int32 period, bigtime_t jitter, bigtime_t length);
-_IMPEXP_ROOT bigtime_t estimate_max_scheduling_latency(thread_id th);	/* default is current thread */
+int32 suggest_thread_priority(uint32 what, int32 period, bigtime_t jitter, bigtime_t length);
+bigtime_t estimate_max_scheduling_latency(thread_id th);	/* default is current thread */
 #endif
 
 #endif /* SCHEDULER_H */

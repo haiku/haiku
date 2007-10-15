@@ -204,6 +204,7 @@ ModeList::AddModes(edid1_info* info)
 		if (info->detailed_monitor[i].monitor_desc_type != EDID1_IS_DETAILED_TIMING)
 			continue;
 
+		// TODO: handle sync and flags correctly!
 		const edid1_detailed_timing& timing = info->detailed_monitor[i].data.detailed_timing;
 		display_mode mode;
 		mode.timing.pixel_clock = timing.pixel_clock * 10;

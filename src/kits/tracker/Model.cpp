@@ -77,7 +77,7 @@ BObjectList<Model> *readOnlyOpenModelList = NULL;
 
 namespace BPrivate {
 extern
-#if !B_BEOS_VERSION_DANO
+#ifdef _IMPEXP_BE
 _IMPEXP_BE
 #endif
 bool CheckNodeIconHintPrivate(const BNode *, bool);

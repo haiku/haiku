@@ -88,10 +88,10 @@ All rights reserved.
 
 
 const uint32 kRedo = 'REDO';
-	// this is the same as B_REDO in Dano/Zeta/OpenBeOS
+	// this is the same as B_REDO in Dano/Zeta/Haiku
 
 
-#if !B_BEOS_VERSION_DANO
+#ifdef _IMPEXP_BE
 _IMPEXP_BE
 #endif
 void do_minimize_team(BRect zoomRect, team_id team, bool zoom);

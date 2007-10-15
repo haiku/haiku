@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -15,8 +15,8 @@
 #include <LinkReceiver.h>
 #include <LinkSender.h>
 
+class BShape;
 class BString;
-
 
 /*
  * Error checking rules: (for if you don't want to check every return code)

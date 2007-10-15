@@ -145,7 +145,7 @@ TrackerCopyLoopControl::TrackerCopyLoopControl(thread_id thread)
 
 #define B_DESKTOP_DIR_NAME "Desktop"
 
-#if B_BEOS_VERSION_DANO
+#ifndef _IMPEXP_TRACKER
 #define _IMPEXP_TRACKER
 #endif
 _IMPEXP_TRACKER status_t FSCopyAttributesAndStats(BNode *, BNode *);

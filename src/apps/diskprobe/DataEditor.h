@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DATA_EDITOR_H
@@ -13,6 +13,7 @@
 
 class BHandler;
 class BLooper;
+class BMessage;
 class BMessenger;
 
 class DataChange;

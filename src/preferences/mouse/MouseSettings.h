@@ -1,26 +1,22 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2003, OpenBeOS
-//
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//
-//  File:			MouseSettings.h
-//  Authors:		Jérôme Duval,
-//					Andrew McCall (mccall@digitalparadise.co.uk)
-//					Axel Dörfler (axeld@pinc-software.de)
-//  Description:	Mouse Preferences
-//  Created:		December 10, 2003
-// 
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2003-2007, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jérôme Duval
+ *		Andrew McCall (mccall@digitalparadise.co.uk)
+ *		Axel Dörfler (axeld@pinc-software.de)
+ */
+#ifndef MOUSE_SETTINGS_H
+#define MOUSE_SETTINGS_H
 
-#ifndef MOUSE_SETTINGS_H_
-#define MOUSE_SETTINGS_H_
+
+#include "kb_mouse_settings.h"
 
 #include <SupportDefs.h>
 #include <InterfaceDefs.h>
-#include "kb_mouse_settings.h"
+
+class BPath;
 
 
 class MouseSettings {
@@ -66,4 +62,4 @@ class MouseSettings {
 		BPoint			fWindowPosition;
 };
 
-#endif
+#endif	// MOUSE_SETTINGS_H

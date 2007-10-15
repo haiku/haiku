@@ -158,11 +158,7 @@ virtual BHandler		*ResolveSpecifier(BMessage *message, int32 index,
 virtual	status_t		GetSupportedSuites(BMessage *message);
 
 virtual	void			AddTab(BView *target, BTab *tab = NULL);
-#if !_PR3_COMPATIBLE_
 virtual	BTab			*RemoveTab(int32 tabIndex);
-#else
-virtual	BTab			*RemoveTab(int32 tabIndex) const;
-#endif
 
 virtual	BTab			*TabAt ( int32 tab_index ) const;
 
@@ -208,6 +204,4 @@ virtual	void			_ReservedTabView12();
 		uint32			_reserved[11];
 };
 
-
 #endif // _TAB_VIEW_H
-

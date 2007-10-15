@@ -15,9 +15,13 @@
 #include <MediaNode.h>
 #include <config_manager.h>
 
-class BMimeType;
-struct dormant_flavor_info;
+class BBufferGroup;
 class BMediaAddOn;
+class BMimeType;
+class BParameterWeb;
+class BString;
+struct dormant_flavor_info;
+struct entry_ref;
 
 namespace BPrivate { namespace media {
 	class DefaultDeleter;

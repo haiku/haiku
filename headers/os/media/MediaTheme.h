@@ -9,7 +9,12 @@
 #include <Entry.h>
 #include <MediaDefs.h>
 
+class BBitmap;
+class BControl;
+class BParameter;
 class BParameterWeb;
+class BRect;
+class BView;
 
 
 class BMediaTheme {

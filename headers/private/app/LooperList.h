@@ -15,6 +15,7 @@
 
 #include <vector>
 
+class BList;
 class BLooper;
 
 

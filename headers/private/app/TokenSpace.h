@@ -60,7 +60,7 @@ class BTokenSpace : public BLocker {
 		int32		fTokenCount;
 };
 
-extern _IMPEXP_BE BTokenSpace gDefaultTokens;
+extern BTokenSpace gDefaultTokens;
 
 }	// namespace BPrivate
 

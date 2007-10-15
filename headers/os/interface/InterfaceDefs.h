@@ -251,54 +251,54 @@ enum overlay_options {
 
 /*----------------------------------------------------------------*/
 
-_IMPEXP_BE status_t		get_deskbar_frame(BRect *frame);
+status_t		get_deskbar_frame(BRect *frame);
 
-_IMPEXP_BE const color_map *system_colors();
+const color_map *system_colors();
 
-_IMPEXP_BE status_t		set_screen_space(int32 index, uint32 res,
-							bool stick = true);
+status_t		set_screen_space(int32 index, uint32 res,
+					bool stick = true);
 
-_IMPEXP_BE status_t		get_scroll_bar_info(scroll_bar_info *info);
-_IMPEXP_BE status_t		set_scroll_bar_info(scroll_bar_info *info);
+status_t		get_scroll_bar_info(scroll_bar_info *info);
+status_t		set_scroll_bar_info(scroll_bar_info *info);
 
-_IMPEXP_BE status_t		get_mouse_type(int32 *type);
-_IMPEXP_BE status_t		set_mouse_type(int32 type);
-_IMPEXP_BE status_t		get_mouse_map(mouse_map *map);
-_IMPEXP_BE status_t		set_mouse_map(mouse_map *map);
-_IMPEXP_BE status_t		get_click_speed(bigtime_t *speed);
-_IMPEXP_BE status_t		set_click_speed(bigtime_t speed);
-_IMPEXP_BE status_t		get_mouse_speed(int32 *speed);
-_IMPEXP_BE status_t		set_mouse_speed(int32 speed);
-_IMPEXP_BE status_t		get_mouse_acceleration(int32 *speed);
-_IMPEXP_BE status_t		set_mouse_acceleration(int32 speed);
+status_t		get_mouse_type(int32 *type);
+status_t		set_mouse_type(int32 type);
+status_t		get_mouse_map(mouse_map *map);
+status_t		set_mouse_map(mouse_map *map);
+status_t		get_click_speed(bigtime_t *speed);
+status_t		set_click_speed(bigtime_t speed);
+status_t		get_mouse_speed(int32 *speed);
+status_t		set_mouse_speed(int32 speed);
+status_t		get_mouse_acceleration(int32 *speed);
+status_t		set_mouse_acceleration(int32 speed);
 
-_IMPEXP_BE status_t		get_key_repeat_rate(int32 *rate);
-_IMPEXP_BE status_t		set_key_repeat_rate(int32 rate);
-_IMPEXP_BE status_t		get_key_repeat_delay(bigtime_t *delay);
-_IMPEXP_BE status_t		set_key_repeat_delay(bigtime_t  delay);
+status_t		get_key_repeat_rate(int32 *rate);
+status_t		set_key_repeat_rate(int32 rate);
+status_t		get_key_repeat_delay(bigtime_t *delay);
+status_t		set_key_repeat_delay(bigtime_t  delay);
 
-_IMPEXP_BE uint32		modifiers();
-_IMPEXP_BE status_t		get_key_info(key_info *info);
-_IMPEXP_BE void			get_key_map(key_map **map, char **key_buffer);
-_IMPEXP_BE status_t		get_keyboard_id(uint16 *id);
-_IMPEXP_BE void			set_modifier_key(uint32 modifier, uint32 key);
-_IMPEXP_BE void			set_keyboard_locks(uint32 modifiers);
+uint32			modifiers();
+status_t		get_key_info(key_info *info);
+void			get_key_map(key_map **map, char **key_buffer);
+status_t		get_keyboard_id(uint16 *id);
+void			set_modifier_key(uint32 modifier, uint32 key);
+void			set_keyboard_locks(uint32 modifiers);
 
-_IMPEXP_BE rgb_color	keyboard_navigation_color();
+rgb_color		keyboard_navigation_color();
 
-_IMPEXP_BE int32		count_workspaces();
-_IMPEXP_BE void			set_workspace_count(int32 count);
-_IMPEXP_BE int32		current_workspace();
-_IMPEXP_BE void			activate_workspace(int32 workspace);
+int32			count_workspaces();
+void			set_workspace_count(int32 count);
+int32			current_workspace();
+void			activate_workspace(int32 workspace);
 
-_IMPEXP_BE bigtime_t	idle_time();
+bigtime_t		idle_time();
 
-_IMPEXP_BE void			run_select_printer_panel();	
-_IMPEXP_BE void			run_add_printer_panel();	
-_IMPEXP_BE void			run_be_about();	
+void			run_select_printer_panel();	
+void			run_add_printer_panel();	
+void			run_be_about();	
 
-_IMPEXP_BE void			set_focus_follows_mouse(bool follow);	
-_IMPEXP_BE bool			focus_follows_mouse();	
+void			set_focus_follows_mouse(bool follow);	
+bool			focus_follows_mouse();	
 
 enum mode_mouse {
 	B_NORMAL_MOUSE 			= 0,
@@ -307,8 +307,8 @@ enum mode_mouse {
 	B_INSTANT_WARP_MOUSE	= 7
 };
 
-_IMPEXP_BE void			set_mouse_mode(mode_mouse mode);	
-_IMPEXP_BE mode_mouse	mouse_mode();	
+void			set_mouse_mode(mode_mouse mode);	
+mode_mouse		mouse_mode();	
 
 enum color_which {
 	B_PANEL_BACKGROUND_COLOR = 1,
@@ -350,10 +350,10 @@ enum color_which {
 	B_WINDOW_INACTIVE_TEXT_COLOR = 24
 };
 
-_IMPEXP_BE rgb_color	ui_color(color_which which);
-_IMPEXP_BE void			set_ui_color(const color_which &which, 
+rgb_color	ui_color(color_which which);
+void		set_ui_color(const color_which &which, 
 									 const rgb_color &color);
-_IMPEXP_BE rgb_color	tint_color(rgb_color color, float tint);
+rgb_color	tint_color(rgb_color color, float tint);
 
 extern "C" status_t	_init_interface_kit_();
 											/* effects on standard gray level */

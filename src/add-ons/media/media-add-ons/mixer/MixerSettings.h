@@ -5,16 +5,18 @@
 #ifndef _MIXER_SETTINGS_H
 #define _MIXER_SETTINGS_H
 
+
 #include <Message.h>
 #include <Path.h>
 
+class BLocker;
 class MixerInput;
 class MixerOutput;
 
+
 #define MAX_INPUT_SETTINGS	50
 
-class MixerSettings
-{
+class MixerSettings {
 	public:
 										MixerSettings();
 										~MixerSettings();
@@ -63,7 +65,7 @@ class MixerSettings
 
 		static int32 					_save_thread_(void *arg);
 		void 							SaveThread();
-	
+
 		BLocker							*fLocker;
 		BPath							*fSettingsFile;
 		volatile bool					fSettingsDirty;
@@ -72,8 +74,7 @@ class MixerSettings
 		volatile sem_id					fSaveThreadWaitSem;
 		volatile bool					fSaveThreadRunning;
 
-		struct settings
-		{
+		struct settings {
 			bool	AttenuateOutput;
 			bool	NonLinearGainSlider;
 			bool	UseBalanceControl;
@@ -91,4 +92,4 @@ class MixerSettings
 		BMessage						fInputSetting[MAX_INPUT_SETTINGS];
 };
 
-#endif
+#endif	// _MIXER_SETTINGS_H

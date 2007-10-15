@@ -1,13 +1,13 @@
 /*
- * Copyright 2006, Haiku Inc.
+ * Copyright 2006-2007, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stefano Ceccherini (burton666@libero.it)
  */
- 
-#ifndef __PICTUREDATAWRITER_H
-#define __PICTUREDATAWRITER_H
+#ifndef _PICTURE_DATA_WRITER_H
+#define _PICTURE_DATA_WRITER_H
+
 
 #include <InterfaceDefs.h>
 #include <Font.h>
@@ -16,6 +16,9 @@
 #include <stack>
 
 class BPositionIO;
+class BRegion;
+
+
 class PictureDataWriter {
 public:
 	PictureDataWriter();
@@ -80,4 +83,4 @@ private:
 	std::stack<off_t> fStack;
 };
 
-#endif // __PICTUREDATAWRITER_H
+#endif // _PICTURE_DATA_WRITER_H

@@ -21,6 +21,7 @@
 #include <Looper.h>
 #endif
 
+struct media_node;
 
 #define B_MEDIA_NAME_LENGTH 64
 
@@ -208,15 +209,15 @@ private:
 	uint32 _reserved_media_source_[2];
 };
 
-_IMPEXP_MEDIA bool operator==(const media_destination & a, const media_destination & b);
-_IMPEXP_MEDIA bool operator!=(const media_destination & a, const media_destination & b);
-_IMPEXP_MEDIA bool operator<(const media_destination & a, const media_destination & b);
-_IMPEXP_MEDIA bool operator==(const media_source & a, const media_source & b);
-_IMPEXP_MEDIA bool operator!=(const media_source & a, const media_source & b);
-_IMPEXP_MEDIA bool operator<(const media_source & a, const media_source & b);
-_IMPEXP_MEDIA bool operator==(const media_node & a, const media_node & b);
-_IMPEXP_MEDIA bool operator!=(const media_node & a, const media_node & b);
-_IMPEXP_MEDIA bool operator<(const media_node & a, const media_node & b);
+bool operator==(const media_destination & a, const media_destination & b);
+bool operator!=(const media_destination & a, const media_destination & b);
+bool operator<(const media_destination & a, const media_destination & b);
+bool operator==(const media_source & a, const media_source & b);
+bool operator!=(const media_source & a, const media_source & b);
+bool operator<(const media_source & a, const media_source & b);
+bool operator==(const media_node & a, const media_node & b);
+bool operator!=(const media_node & a, const media_node & b);
+bool operator<(const media_node & a, const media_node & b);
 
 
 
@@ -518,21 +519,21 @@ struct media_format {	/* no more than 192 bytes */
 	media_format &	operator=(const media_format & clone);
 };
 
-_IMPEXP_MEDIA bool operator==(const media_raw_audio_format & a, const media_raw_audio_format & b);
-_IMPEXP_MEDIA bool operator==(const media_multi_audio_info & a, const media_multi_audio_info & b);
-_IMPEXP_MEDIA bool operator==(const media_multi_audio_format & a, const media_multi_audio_format & b);
-_IMPEXP_MEDIA bool operator==(const media_encoded_audio_format & a, const media_encoded_audio_format & b);
-_IMPEXP_MEDIA bool operator==(const media_video_display_info & a, const media_video_display_info & b);
-_IMPEXP_MEDIA bool operator==(const media_raw_video_format & a, const media_raw_video_format & b);
-_IMPEXP_MEDIA bool operator==(const media_encoded_video_format & a, const media_encoded_video_format & b);
-_IMPEXP_MEDIA bool operator==(const media_multistream_format::vid_info & a, const media_multistream_format::vid_info & b);
-_IMPEXP_MEDIA bool operator==(const media_multistream_format::avi_info & a, const media_multistream_format::avi_info & b);
-_IMPEXP_MEDIA bool operator==(const media_multistream_format & a, const media_multistream_format & b);
-_IMPEXP_MEDIA bool operator==(const media_format & a, const media_format & b);
+bool operator==(const media_raw_audio_format & a, const media_raw_audio_format & b);
+bool operator==(const media_multi_audio_info & a, const media_multi_audio_info & b);
+bool operator==(const media_multi_audio_format & a, const media_multi_audio_format & b);
+bool operator==(const media_encoded_audio_format & a, const media_encoded_audio_format & b);
+bool operator==(const media_video_display_info & a, const media_video_display_info & b);
+bool operator==(const media_raw_video_format & a, const media_raw_video_format & b);
+bool operator==(const media_encoded_video_format & a, const media_encoded_video_format & b);
+bool operator==(const media_multistream_format::vid_info & a, const media_multistream_format::vid_info & b);
+bool operator==(const media_multistream_format::avi_info & a, const media_multistream_format::avi_info & b);
+bool operator==(const media_multistream_format & a, const media_multistream_format & b);
+bool operator==(const media_format & a, const media_format & b);
 
 /* return true if a and b are compatible (accounting for wildcards) */
-_IMPEXP_MEDIA bool format_is_compatible(const media_format & a, const media_format & b);	/* a is the format you want to feed to something accepting b */
-_IMPEXP_MEDIA bool string_for_format(const media_format & f, char * buf, size_t size);
+bool format_is_compatible(const media_format & a, const media_format & b);	/* a is the format you want to feed to something accepting b */
+bool string_for_format(const media_format & f, char * buf, size_t size);
 
 struct media_seek_tag {
 	char data[16];
@@ -587,8 +588,8 @@ struct media_file_format_id {
 	dev_t	device;
 	uint32	internal_id;
 };
-_IMPEXP_MEDIA bool operator==(const media_file_format_id & a, const media_file_format_id & b);
-_IMPEXP_MEDIA bool operator<(const media_file_format_id & a, const media_file_format_id & b);
+bool operator==(const media_file_format_id & a, const media_file_format_id & b);
+bool operator<(const media_file_format_id & a, const media_file_format_id & b);
 
 typedef enum {
 	B_ANY_FORMAT_FAMILY = 0,
@@ -644,7 +645,7 @@ status_t get_next_file_format(int32 *cookie, media_file_format *mfi);
 /* In your thread, read_port() into this struct, and call HandleMessage() on it. */
 const size_t B_MEDIA_MESSAGE_SIZE = 16384;
 
-_IMPEXP_MEDIA extern const char * B_MEDIA_SERVER_SIGNATURE;
+extern const char * B_MEDIA_SERVER_SIGNATURE;
 
 class media_node;	/* found in MediaNode.h */
 struct media_input;

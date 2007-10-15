@@ -46,10 +46,11 @@ All rights reserved.
 #include <View.h>
 
 class BButton;
+class BComboBox;
 class BList;
 class BTextControl;
+class BTextView;
 class BWindow;
-class BComboBox;
 struct text_run_array;
 
 typedef const char* (*text_input_filter_hook)(const char* inText, int32& length,

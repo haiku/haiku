@@ -17,8 +17,10 @@
 #include <OS.h>
 
 class BList;
+class BString;
+struct entry_ref;
 struct _extended_joystick;
-class _IMPEXP_DEVICE _BJoystickTweaker;
+class _BJoystickTweaker;
 
 /* -----------------------------------------------------------------------*/
 class BJoystick {
@@ -107,12 +109,10 @@ virtual	void		_ReservedJoystick3();
 		BList *		_fDevices;
 		_joystick_info * m_info;
 		char * m_dev_name;
-#if !_PR3_COMPATIBLE_
 virtual	status_t	_Reserved_Joystick_4(void *, ...);
 virtual	status_t	_Reserved_Joystick_5(void *, ...);
 virtual	status_t	_Reserved_Joystick_6(void *, ...);
 		uint32		_reserved_Joystick_[10];
-#endif
 };
 
 #endif

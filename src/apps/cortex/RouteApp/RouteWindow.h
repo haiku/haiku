@@ -21,6 +21,9 @@
 #include "IStateArchivable.h"
 
 #include "cortex_defs.h"
+
+class BMenu;
+
 __BEGIN_CORTEX_NAMESPACE
 
 class MediaRoutingView;

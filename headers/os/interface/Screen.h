@@ -12,6 +12,7 @@
 #include <OS.h>
 
 
+class BBitmap;
 class BWindow;
 
 namespace BPrivate {

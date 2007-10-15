@@ -80,8 +80,6 @@ void BRecentAppsList::_r38() {}
 void BRecentAppsList::_r39() {}
 void BRecentAppsList::_r310() {}
 
-#if !_PR3_COMPATIBLE_
-
 void BFilePanel::_ReservedFilePanel1() {}
 void BFilePanel::_ReservedFilePanel2() {}
 void BFilePanel::_ReservedFilePanel3() {}
@@ -90,8 +88,6 @@ void BFilePanel::_ReservedFilePanel5() {}
 void BFilePanel::_ReservedFilePanel6() {}
 void BFilePanel::_ReservedFilePanel7() {}
 void BFilePanel::_ReservedFilePanel8() {}
-
-#endif
 
 // deprecated cruft
 

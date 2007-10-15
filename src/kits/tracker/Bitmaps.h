@@ -147,7 +147,7 @@ private:
  		
 
 extern
-#if !B_BEOS_VERSION_DANO
+#ifdef _IMPEXP_TRACKER
 _IMPEXP_TRACKER
 #endif
 BImageResources* GetTrackerResources();
@@ -156,4 +156,4 @@ BImageResources* GetTrackerResources();
 
 using namespace BPrivate;
 
-#endif
+#endif	// __BITS__

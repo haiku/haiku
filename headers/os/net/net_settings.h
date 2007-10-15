@@ -46,11 +46,11 @@ typedef struct _net_settings {
 /*
  * For finding and setting network preferences
  */
-extern _IMPEXP_NET 
+extern
 char *find_net_setting(net_settings *ncw, 
 					   const char *heading, const char *name, char *value,
 					   unsigned nbytes);
-extern _IMPEXP_NET 
+extern
 status_t set_net_setting(net_settings *ncw, 
 						 const char *heading, const char *name, 
 						 const char *value);

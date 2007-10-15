@@ -78,12 +78,13 @@ All rights reserved.
 #define BCC_FIELD_WIDTH		197
 #define BCC_FIELD_HEIGHT	 16
 
-class TTextControl;
 class BFile;
 class BMenuField;
 class BMenuItem;
-class BPopupMenu;
+class BPopUpMenu;
+class BStringView;
 class QPopupMenu;
+class TTextControl;
 
 
 class THeaderView : public BBox {

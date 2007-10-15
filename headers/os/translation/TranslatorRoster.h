@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _TRANSLATOR_ROSTER_H
@@ -12,10 +12,14 @@
 struct translation_format;
 
 class BBitmap;
-class BView;
+class BMessage;
+class BMessenger;
 class BPositionIO;
 class BQuery;
-class BMessage;
+class BRect;
+class BTranslator;
+class BView;
+struct entry_ref;
 
 
 class BTranslatorRoster : public BArchivable {

@@ -1,14 +1,10 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
-/*!
-	\file database_support.h
-	Private mime database function and constant declarations
-*/
-
+/*
+ * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _MIME_DATABASE_SUPPORT_H
 #define _MIME_DATABASE_SUPPORT_H
+
 
 #include <StorageDefs.h>
 
@@ -16,6 +12,8 @@
 
 class BNode;
 class BMessage;
+class BString;
+
 
 namespace BPrivate {
 namespace Storage {

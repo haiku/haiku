@@ -1,26 +1,27 @@
+/* ConfigViews - config views for the account, protocols, and filters
+ *
+ * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
+ */
 #ifndef CONFIG_VIEWS_H
 #define CONFIG_VIEWS_H
-/* ConfigViews - config views for the account, protocols, and filters
-**
-** Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
-*/
 
 
-#include <interface/Box.h>
-#include <kernel/image.h>
+#include <Box.h>
+#include <image.h>
 
 class BTextControl;
 class BListView;
+class BMailChain;
 class BMenuField;
 class BButton;
-
-class BMailChain;
+struct entry_ref;
 
 class Account;
+class ProtocolsConfigView;
+class FiltersConfigView;
 
 
-class AccountConfigView : public BBox
-{
+class AccountConfigView : public BBox {
 	public:
 		AccountConfigView(BRect rect,Account *account);
 
@@ -36,16 +37,10 @@ class AccountConfigView : public BBox
 		Account			*fAccount;
 };
 
-
-//--------------------------------------------------------------------------------
-
-class ProtocolsConfigView;
-class FiltersConfigView;
-
-class FilterConfigView : public BBox
-{
+class FilterConfigView : public BBox {
 	public:
-		FilterConfigView(BMailChain *chain,int32 index,BMessage *msg,entry_ref *ref);
+		FilterConfigView(BMailChain *chain, int32 index, BMessage *msg,
+			entry_ref *ref);
 		~FilterConfigView();
 
 		status_t InitCheck();
@@ -56,7 +51,7 @@ class FilterConfigView : public BBox
 	protected:
 		friend class FiltersConfigView;
 
-		void		Load(BMessage *msg,entry_ref *ref);
+		void		Load(BMessage *msg, entry_ref *ref);
 		void		Remove(bool deleteMessage = true);
 
 		BView		*fConfigView;
@@ -68,14 +63,10 @@ class FilterConfigView : public BBox
 		image_id	fImage;
 };
 
-
-//--------------------------------------------------------------------------------
-
-
-class ProtocolsConfigView : public FilterConfigView
-{
+class ProtocolsConfigView : public FilterConfigView {
 	public:
-		ProtocolsConfigView(BMailChain *chain, int32 index, BMessage *msg, entry_ref *ref);
+		ProtocolsConfigView(BMailChain *chain, int32 index, BMessage *msg,
+			entry_ref *ref);
 
 		void AttachedToWindow();
 		void MessageReceived(BMessage *msg);
@@ -84,12 +75,7 @@ class ProtocolsConfigView : public FilterConfigView
 		BMenuField	*fProtocolsMenuField;
 };
 
-
-//--------------------------------------------------------------------------------
-
-
-class FiltersConfigView : public BBox
-{
+class FiltersConfigView : public BBox {
 	public:
 		FiltersConfigView(BRect rect,Account *account);
 		~FiltersConfigView();

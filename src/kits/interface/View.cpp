@@ -2179,13 +2179,8 @@ BView::SetFont(const BFont* font, uint32 mask)
 }
 
 
-#if !_PR3_COMPATIBLE_
 void
 BView::GetFont(BFont *font) const
-#else
-void
-BView:GetFont(BFont *font)
-#endif
 {
 	*font = fState->font;
 }

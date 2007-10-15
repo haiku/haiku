@@ -1,22 +1,20 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
-/*!
-	\file SnifferRules.h
-	SnifferRules class declarations
-*/
-
+/*
+ * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _MIME_SNIFFER_RULES_H
 #define _MIME_SNIFFER_RULES_H
+
 
 #include <SupportDefs.h>
 
 #include <list>
 #include <string>
 
-struct entry_ref;
+class BFile;
 class BString;
+struct entry_ref;
+
 
 namespace BPrivate {
 namespace Storage {

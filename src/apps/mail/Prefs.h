@@ -31,18 +31,18 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
-//--------------------------------------------------------------------
-//	
-//	Prefs.h
-//
-//--------------------------------------------------------------------
-
 #ifndef _PREFS_H
 #define _PREFS_H
 
+
 #include <Font.h>
 #include <Window.h>
+
+class BButton;
+class BMenu;
+class BPopUpMenu;
+class BTextControl;
+
 
 #define ACCOUNT_USE_DEFAULT	0
 #define ACCOUNT_FROM_MAIL	1
@@ -53,18 +53,13 @@ All rights reserved.
 #define SIG_NONE			MDR_DIALECT_CHOICE ("None", "無し")
 #define SIG_RANDOM			MDR_DIALECT_CHOICE ("Random", "自動選択")
 
-struct EncodingItem
-{
+struct EncodingItem {
 	char	*name;
 	uint32	flavor;
 };
 
 extern const EncodingItem kEncodings[];
 
-
-class Button;
-
-//====================================================================
 
 class TPrefsWindow : public BWindow {
 	public:

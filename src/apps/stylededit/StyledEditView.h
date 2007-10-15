@@ -14,10 +14,10 @@
 #include <String.h>
 #include <TextView.h>
 
-
 class BFile;
 class BHandler;
 class BMessenger;
+class BPositionIO;
 
 
 class StyledEditView : public BTextView {
@@ -33,8 +33,8 @@ class StyledEditView : public BTextView {
 							const text_run_array *runs = NULL);
 	
 		void		Reset();
-		status_t	GetStyledText(BPositionIO * stream);
-		status_t	WriteStyledEditFile(BFile * file);
+		status_t	GetStyledText(BPositionIO* stream);
+		status_t	WriteStyledEditFile(BFile* file);
 
 		void 		SetEncoding(uint32 encoding);
 		uint32 		GetEncoding() const;

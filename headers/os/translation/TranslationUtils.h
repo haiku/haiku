@@ -10,9 +10,13 @@
 #include <SupportDefs.h>
 
 class BBitmap;
-class BTranslatorRoster;
-class BPositionIO;
+class BFile;
 class BMenu;
+class BMessage;
+class BPositionIO;
+class BTextView;
+class BTranslatorRoster;
+struct entry_ref;
 
 
 class BTranslationUtils {

@@ -13,7 +13,7 @@ namespace BPrivate {
 	namespace media {
 		class MediaExtractor;
 	}
-	class _IMPEXP_MEDIA MediaWriter;
+	class MediaWriter;
 	class _AddonManager;
 }
 

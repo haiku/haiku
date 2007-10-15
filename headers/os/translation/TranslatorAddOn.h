@@ -15,9 +15,10 @@
 #ifndef _TRANSLATOR_ADD_ON_H
 #define _TRANSLATOR_ADD_ON_H
 
+
 #include <TranslationDefs.h>
 
-
+class BMessage;
 class BView;
 class BRect;
 class BPositionIO;

@@ -43,7 +43,7 @@ All rights reserved.
 
 namespace BPrivate {
 
-#if !B_BEOS_VERSION_DANO
+#ifdef _IMPEXP_TRACKER
 _IMPEXP_TRACKER
 #endif
 void InitIconPreloader();

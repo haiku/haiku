@@ -16,6 +16,8 @@
 
 #include <Application.h>
 
+class BFile;
+
 
 #define	B_PERSON_MIMETYPE	"application/x-person"
 #define APP_SIG				"application/x-vnd.Be-PEPL"

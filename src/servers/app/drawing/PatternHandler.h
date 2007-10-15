@@ -5,13 +5,17 @@
  * Author:	DarkWyrm <bpmagic@columbus.rr.com>
  *			Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef PATTERNHANDLER_H
 #define PATTERNHANDLER_H
 
+
 #include <stdio.h>
 #include <string.h>
+
 #include <GraphicsDefs.h>
+
+class BPoint;
+
 
 class Pattern {
  public:

@@ -1,18 +1,20 @@
-/***********************************************************************
+/*
  * Copyright (c) 2002 Marcus Overhagen. All Rights Reserved.
  * This file may be used under the terms of the MIT License.
- *
- ***********************************************************************/
+ */
 #ifndef _TIME_SOURCE_OBJECT_MANAGER_H_
 #define _TIME_SOURCE_OBJECT_MANAGER_H_
 
+
 #include "TMap.h"
+
+class BLocker;
+
 
 namespace BPrivate {
 namespace media {
 
-class TimeSourceObjectManager
-{
+class TimeSourceObjectManager {
 public:
 	TimeSourceObjectManager();
 	~TimeSourceObjectManager();
@@ -21,13 +23,13 @@ public:
 	void ObjectDeleted(BTimeSource *timesource);
 
 private:
-	Map<media_node_id,BTimeSource *> *fMap;
+	Map<media_node_id, BTimeSource *> *fMap;
 	BLocker *fLock;
 };
 
-}; // namespace media
-}; // namespace BPrivate
+} // namespace media
+} // namespace BPrivate
 
 extern BPrivate::media::TimeSourceObjectManager *_TimeSourceObjectManager;
 
-#endif
+#endif	// _TIME_SOURCE_OBJECT_MANAGER_H_

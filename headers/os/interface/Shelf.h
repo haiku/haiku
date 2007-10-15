@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku Inc.
+ * Copyright 2001-2007, Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SHELF_H
@@ -10,6 +10,7 @@
 #include <List.h>
 
 class BDataIO;
+class BPoint;
 class BView;
 class BEntry;
 struct entry_ref;

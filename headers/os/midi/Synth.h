@@ -104,6 +104,6 @@ private:
 	uint32 _reserved[10];
 };
 
-extern _IMPEXP_MIDI BSynth* be_synth;
+extern BSynth* be_synth;
 
 #endif // _SYNTH_H

@@ -64,20 +64,20 @@ enum {
 								// doesn't exist.
 };
 
-extern _IMPEXP_ROOT thread_id	load_image(int32 argc, const char **argv,
+extern thread_id	load_image(int32 argc, const char **argv,
 									const char **envp);
-extern _IMPEXP_ROOT image_id	load_add_on(const char *path);
-extern _IMPEXP_ROOT status_t	unload_add_on(image_id imageID);
+extern image_id	load_add_on(const char *path);
+extern status_t	unload_add_on(image_id imageID);
 
 /* private; use the macros, below */
-extern _IMPEXP_ROOT status_t	_get_image_info (image_id imageID,
-									image_info *info, size_t size);
-extern _IMPEXP_ROOT status_t	_get_next_image_info (team_id team, int32 *cookie,
-									image_info *info, size_t size);
+extern status_t	_get_image_info (image_id imageID,
+					image_info *info, size_t size);
+extern status_t	_get_next_image_info (team_id team, int32 *cookie,
+					image_info *info, size_t size);
 /* use these */
-#define get_image_info(image, info)                        \
+#define get_image_info(image, info) \
               _get_image_info((image), (info), sizeof(*(info)))
-#define get_next_image_info(team, cookie, info)   \
+#define get_next_image_info(team, cookie, info) \
 	          _get_next_image_info((team), (cookie), (info), sizeof(*(info)))
 
 
@@ -88,11 +88,11 @@ extern _IMPEXP_ROOT status_t	_get_next_image_info (team_id team, int32 *cookie,
 #define	B_SYMBOL_TYPE_TEXT		0x2
 #define B_SYMBOL_TYPE_ANY		0x5
 
-extern _IMPEXP_ROOT status_t	get_image_symbol(image_id imid,
-									const char *name, int32 sclass,	void **ptr);
-extern _IMPEXP_ROOT status_t	get_nth_image_symbol(image_id imid, int32 index,
-									char *buf, int32 *bufsize, int32 *sclass,
-									void **ptr);
+extern status_t	get_image_symbol(image_id imid,
+					const char *name, int32 sclass,	void **ptr);
+extern status_t	get_nth_image_symbol(image_id imid, int32 index,
+					char *buf, int32 *bufsize, int32 *sclass,
+					void **ptr);
 
 
 /*---------------------------------------------------------*/
@@ -103,7 +103,7 @@ extern _IMPEXP_ROOT status_t	get_nth_image_symbol(image_id imid, int32 index,
 #define B_INVALIDATE_DCACHE    0x0002	 
 #define B_INVALIDATE_ICACHE    0x0008   
 
-extern _IMPEXP_ROOT void	clear_caches(void *addr, size_t len, uint32 flags);
+extern void	clear_caches(void *addr, size_t len, uint32 flags);
 
 /*---------------------------------------------------------*/
 

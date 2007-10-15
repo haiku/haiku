@@ -44,8 +44,10 @@ All rights reserved.
 
 
 // prototypes for some private kernel calls that will some day be public
-#if B_BEOS_VERSION_DANO
+#ifndef _IMPEXP_ROOT
 #	define _IMPEXP_ROOT
+#endif
+#ifndef _IMPEXP_TRACKER
 #	define _IMPEXP_TRACKER
 #endif
 extern "C" _IMPEXP_ROOT int _kset_fd_limit_(int num);
@@ -53,11 +55,6 @@ extern "C" _IMPEXP_ROOT int _kset_fd_limit_(int num);
 // these two calls are deprecated
 extern _IMPEXP_TRACKER void run_open_panel();
 extern _IMPEXP_TRACKER void run_save_panel();
-
-#if B_BEOS_VERSION_DANO
-#	undef _IMPEXP_ROOT
-#	undef _IMPEXP_TRACKER
-#endif
 
 
 void

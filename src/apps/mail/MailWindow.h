@@ -57,6 +57,7 @@ class BEmailMessage;
 class BFile;
 class BFilePanel;
 class BMailMessage;
+class BMenu;
 class BMenuBar;
 class BMenuItem;
 class BmapButton;

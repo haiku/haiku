@@ -1,19 +1,29 @@
 #ifndef _CAM_DEVICE_H
 #define _CAM_DEVICE_H
 
+
 #include <OS.h>
 #include <image.h>
 #ifdef __HAIKU__
-#  include <USB3.h>
-#  include <USBKit.h>
+#	include <USB3.h>
+#	include <USBKit.h>
 #else
-#  include <USB.h>
-#  include <usb/USBKit.h>
+#	include <USB.h>
+#	include <usb/USBKit.h>
 #endif
 #include <Locker.h>
 #include <MediaAddOn.h>
 #include <String.h>
 #include <Rect.h>
+
+class BBitmap;
+class BBuffer;
+class BDataIO;
+class CamRoster;
+class CamDeviceAddon;
+class CamSensor;
+class CamDeframer;
+class WebCamMediaAddOn;
 
 
 typedef struct {
@@ -22,17 +32,8 @@ typedef struct {
 	const char *product;
 } usb_named_support_descriptor;
 
-class CamRoster;
-class CamDeviceAddon;
-class CamSensor;
-class CamDeframer;
-class WebCamMediaAddOn;
-class BBitmap;
-class BBuffer;
-
 // This class represents each webcam
-class CamDevice
-{
+class CamDevice {
 	public: 
 						CamDevice(CamDeviceAddon &_addon, BUSBDevice* _device);
 	virtual				~CamDevice();
@@ -109,7 +110,7 @@ class CamDevice
 		const BUSBEndpoint*	fBulkIn;
 
 	private:
-friend class CamDeviceAddon;
+		friend class CamDeviceAddon;
 		CamDeviceAddon&	fCamDeviceAddon;
 		BUSBDevice*		fDevice;
 		int				fSupportedDeviceIndex;
@@ -124,8 +125,7 @@ friend class CamDeviceAddon;
 
 // the addon itself, that instanciate
 
-class CamDeviceAddon
-{
+class CamDeviceAddon {
 	public:
 						CamDeviceAddon(WebCamMediaAddOn* webcam);
 	virtual 			~CamDeviceAddon();
@@ -135,7 +135,8 @@ class CamDeviceAddon
 	virtual CamDevice*	Instantiate(CamRoster &roster, BUSBDevice *from);
 
 	void				SetSupportedDevices(const usb_named_support_descriptor *devs);
-	const usb_named_support_descriptor*	SupportedDevices() const { return fSupportedDevices; };
+	const usb_named_support_descriptor*	SupportedDevices() const
+		{ return fSupportedDevices; };
 	WebCamMediaAddOn*	WebCamAddOn() const { return fWebCamAddOn; };
 
 	private:
@@ -148,8 +149,8 @@ class CamDeviceAddon
 get_webcam_addon_##modname
 
 // external addons -- UNIMPLEMENTED
-extern "C" status_t get_webcam_addon(WebCamMediaAddOn* webcam, CamDeviceAddon **addon);
+extern "C" status_t get_webcam_addon(WebCamMediaAddOn* webcam,
+	CamDeviceAddon **addon);
 #define B_WEBCAM_ADDON_INSTANTIATION_FUNC_NAME "get_webcam_addon"
-
 
 #endif // _CAM_DEVICE_H

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _TRANSLATOR_H
@@ -69,7 +69,7 @@ class BTranslator : public BArchivable {
 // API. You will be called for values of n starting at 0 and increasing;
 // return 0 when you can't make another kind of translator (i.e. for n=1
 // if you only implement one subclass of BTranslator). Ignore flags for now.
-extern "C" _EXPORT BTranslator *make_nth_translator(int32 n, image_id you,
+extern "C" BTranslator *make_nth_translator(int32 n, image_id you,
 	uint32 flags, ...);
 
 #endif /* _TRANSLATOR_H */

@@ -14,6 +14,7 @@
 
 #include <MediaDefs.h>
 
+class BBuffer;
 struct _shared_buffer_list;
 
 class BBufferGroup

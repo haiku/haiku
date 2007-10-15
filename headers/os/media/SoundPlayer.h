@@ -11,6 +11,8 @@
 #include <exception>
 
 
+class BContinuousParameter;
+class BParameterWeb;
 class BSound;
 class _SoundPlayNode;
 

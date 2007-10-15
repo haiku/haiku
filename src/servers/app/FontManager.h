@@ -18,7 +18,9 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+class BEntry;
 class BPath;
+struct node_ref;
 
 class FontFamily;
 class FontStyle;

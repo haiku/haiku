@@ -38,6 +38,8 @@ All rights reserved.
 #include <Messenger.h>
 #include <Window.h>
 
+class BTextControl;
+
 
 #define INDEX_STATUS		"_status"
 

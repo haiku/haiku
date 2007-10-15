@@ -66,14 +66,11 @@ All rights reserved.
 #include <stdarg.h>
 
 
-#if B_BEOS_VERSION_DANO
+#ifndef _IMPEXP_BE
 #	define _IMPEXP_BE
 #endif
 extern _IMPEXP_BE const uint32	LARGE_ICON_TYPE;
 extern _IMPEXP_BE const uint32	MINI_ICON_TYPE;
-#if B_BEOS_VERSION_DANO
-#	undef _IMPEXP_BE
-#endif
 
 
 FILE *logFile = NULL;

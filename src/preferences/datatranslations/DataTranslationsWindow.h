@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku, Inc.
+ * Copyright 2002-2007, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -16,6 +16,7 @@
 #include <Window.h>
 
 class BBox;
+class BStringView;
 class BView;
 
 class IconView;

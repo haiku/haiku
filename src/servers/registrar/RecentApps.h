@@ -36,9 +36,10 @@
 #include <stdio.h>
 #include <string>
 
+class BMessage;
 class TRoster;
-
 struct entry_ref;
+
 
 class RecentApps {
 public:

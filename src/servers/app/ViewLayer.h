@@ -20,6 +20,7 @@
 #include <String.h>
 
 class BList;
+class BMessage;
 
 namespace BPrivate {
 	class PortLink;

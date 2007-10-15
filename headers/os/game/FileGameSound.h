@@ -23,28 +23,18 @@
 //	Author:			Christopher ML Zumwalt May (zummy@users.sf.net)
 //	Description:	BFileGameSound is a class that streams data out of a file.
 //------------------------------------------------------------------------------
-
 #ifndef _FILEGAMESOUND_H
 #define _FILEGAMESOUND_H
 
-// Standard Includes -----------------------------------------------------------
 
-// System Includes -------------------------------------------------------------
 #include <StreamingGameSound.h>
 
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
+struct entry_ref;
 struct _gs_media_tracker;
 struct _gs_ramp;
 
-// FileGameSound -------------------------------------------------------------
-class BFileGameSound : public BStreamingGameSound
-{
+
+class BFileGameSound : public BStreamingGameSound {
 public:
 							BFileGameSound(const entry_ref * file,
 											bool looping = true,
@@ -74,7 +64,6 @@ public:
 			int32			IsPaused();
 
 private:
-
 			_gs_media_tracker *	fAudioStream;
 			
 			bool				fStopping;
@@ -133,4 +122,4 @@ virtual	status_t _Reserved_BFileGameSound_22(int32 arg, ...);
 virtual	status_t _Reserved_BFileGameSound_23(int32 arg, ...);
 };
 
-#endif
+#endif	// _FILEGAMESOUND_H

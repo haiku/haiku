@@ -65,9 +65,9 @@ operator!=(const pattern& a, const pattern& b)
 
 #endif // __cplusplus
 
-extern _IMPEXP_BE const pattern B_SOLID_HIGH;
-extern _IMPEXP_BE const pattern B_MIXED_COLORS;
-extern _IMPEXP_BE const pattern B_SOLID_LOW;
+extern const pattern B_SOLID_HIGH;
+extern const pattern B_MIXED_COLORS;
+extern const pattern B_SOLID_LOW;
 
 //------------------------------------------------------------------------------
 
@@ -115,15 +115,15 @@ make_color(uint8 red, uint8 green, uint8 blue, uint8 alpha = 255)
 
 //------------------------------------------------------------------------------
 
-extern _IMPEXP_BE const rgb_color 	B_TRANSPARENT_COLOR;
-extern _IMPEXP_BE const uint8		B_TRANSPARENT_MAGIC_CMAP8;
-extern _IMPEXP_BE const uint16		B_TRANSPARENT_MAGIC_RGBA15;
-extern _IMPEXP_BE const uint16		B_TRANSPARENT_MAGIC_RGBA15_BIG;
-extern _IMPEXP_BE const uint32		B_TRANSPARENT_MAGIC_RGBA32;
-extern _IMPEXP_BE const uint32		B_TRANSPARENT_MAGIC_RGBA32_BIG;
+extern const rgb_color 	B_TRANSPARENT_COLOR;
+extern const uint8		B_TRANSPARENT_MAGIC_CMAP8;
+extern const uint16		B_TRANSPARENT_MAGIC_RGBA15;
+extern const uint16		B_TRANSPARENT_MAGIC_RGBA15_BIG;
+extern const uint32		B_TRANSPARENT_MAGIC_RGBA32;
+extern const uint32		B_TRANSPARENT_MAGIC_RGBA32_BIG;
 
-extern _IMPEXP_BE const uint8 		B_TRANSPARENT_8_BIT;
-extern _IMPEXP_BE const rgb_color	B_TRANSPARENT_32_BIT;
+extern const uint8 		B_TRANSPARENT_8_BIT;
+extern const rgb_color	B_TRANSPARENT_32_BIT;
 
 //------------------------------------------------------------------------------
 
@@ -160,7 +160,7 @@ typedef struct overlay_restrictions {
 
 struct screen_id { int32 id; };
 
-extern _IMPEXP_BE const struct screen_id B_MAIN_SCREEN_ID;
+extern const struct screen_id B_MAIN_SCREEN_ID;
 
 //------------------------------------------------------------------------------
 
@@ -272,7 +272,7 @@ enum {
 	B_VIEWS_SUPPORT_DRAW_BITMAP = 0x1,
 	B_BITMAPS_SUPPORT_ATTACHED_VIEWS = 0x2
 };
-_IMPEXP_BE bool bitmaps_support_space(color_space space, uint32 * support_flags);
+bool bitmaps_support_space(color_space space, uint32 * support_flags);
 
 //------------------------------------------------------------------------------
 // "pixel_chunk" is the native increment from one pixel starting on an integral byte
@@ -281,7 +281,7 @@ _IMPEXP_BE bool bitmaps_support_space(color_space space, uint32 * support_flags)
 // sets pixel_chunk to 1, row_alignment to 4 and pixels_per_chunk to 8, whereas
 // B_RGB24 sets pixel_chunk to 3, row_alignment to 4 and pixels_per_chunk to 1.
 //------------------------------------------------------------------------------
-_IMPEXP_BE status_t get_pixel_size_for(color_space space, size_t * pixel_chunk, 
+status_t get_pixel_size_for(color_space space, size_t * pixel_chunk, 
 	size_t * row_alignment, size_t * pixels_per_chunk);
 
 

@@ -4,20 +4,23 @@
  *
  * Author:
  *		Andre Alves Garzia, andre@andregarzia.com
- * With code from:
- *		Axel Dorfler
+ *		Axel Dörfler
  *		Hugo Santos
  */
 #ifndef ETHERNET_SETTINGS_VIEW_H
 #define ETHERNET_SETTINGS_VIEW_H
 
+
 #include "settings.h"
+
 #include <ObjectList.h>
 #include <View.h>
 
 class BButton;
 class BMenuField;
+class BPath;
 class BTextControl;
+
 
 static const uint32 kMsgApply = 'aply';
 static const uint32 kMsgRevert = 'rvrt';

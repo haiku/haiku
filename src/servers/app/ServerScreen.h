@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2006, Haiku, Inc.
+ * Copyright (c) 2001-2007, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -29,6 +29,7 @@ class Screen {
 			void				Shutdown();
 
 			int32				ID() const { return fID; }
+			status_t			GetMonitorInfo(monitor_info& info);
 
 			status_t			SetMode(const display_mode& mode, bool makeDefault);
 			status_t			SetMode(uint16 width, uint16 height,

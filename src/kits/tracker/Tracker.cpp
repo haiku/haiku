@@ -87,14 +87,11 @@ All rights reserved.
 #include "AboutBox.cpp"
 
 // prototypes for some private kernel calls that will some day be public
-#if B_BEOS_VERSION_DANO
-#define _IMPEXP_ROOT
+#ifndef _IMPEXP_ROOT
+#	define _IMPEXP_ROOT
 #endif
 extern "C" _IMPEXP_ROOT int _kset_fd_limit_(int num);
 extern "C" _IMPEXP_ROOT int _kset_mon_limit_(int num);
-#if B_BEOS_VERSION_DANO
-#undef _IMPEXP_ROOT
-#endif
 	// from priv_syscalls.h
 
 const int32 DEFAULT_MON_NUM = 4096;

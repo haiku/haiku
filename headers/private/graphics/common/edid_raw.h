@@ -1,21 +1,20 @@
 /*
-	Copyright (c) 2003, Thomas Kurschel
-
-
-	Part of DDC driver
-		
-	Raw EDID data block.
-	
-	Raw data are packed in a really weird way. Never even
-	think about using it directly, instead translate it via decode_edidpixel_clock
-	first. I did my best to make the code endian-independant, but
-	I cannot guarantee that I haven't missed something.
-*/
-
+ * Copyright 2003, Thomas Kurschel. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _EDID_RAW_H
 #define _EDID_RAW_H
 
+
 #include "bendian_bitfield.h"
+
+
+/*!	Raw EDID data block.
+	
+	Raw data are packed in a really weird way. Never even
+	think about using it directly, instead translate it via decode_edid()
+	first.
+*/
 
 #define EDID1_NUM_DETAILED_MONITOR_DESC 4
 #define EDID1_NUM_STD_TIMING 8
@@ -249,7 +248,6 @@ typedef union _PACKED {
 			edid1_monitor_range monitor_range;
 			edid1_whitepoint_raw whitepoint;
 			edid1_std_timing_raw std_timing[EDID1_NUM_EXTRA_STD_TIMING];
-			
 		} data;
 	} extra;
 } edid1_detailed_monitor_raw;
@@ -266,11 +264,11 @@ typedef struct _PACKED {
 	edid1_established_timing established_timing;	// 3 bytes
 	edid1_std_timing_raw std_timing[EDID1_NUM_STD_TIMING];
 													// 8 a 2 bytes -> 16 bytes
-	
+
 	// since EDID version 1.2
 	edid1_detailed_monitor_raw detailed_monitor[EDID1_NUM_DETAILED_MONITOR_DESC];	
 													// 4 a 18 bytes -> 72 bytes
-	
+
 	uint8 num_sections; 							// 1 byte
 	uint8 check_sum;								// 1 byte
 } edid1_raw;										// total: 128 bytes

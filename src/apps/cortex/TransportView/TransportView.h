@@ -15,6 +15,7 @@
 #include <PopUpMenu.h>
 
 class BButton;
+class BInvoker;
 class BStringView;
 class BTextControl;
 class BMenuField;

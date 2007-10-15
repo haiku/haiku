@@ -10,26 +10,25 @@
  *      Michael Pfeiffer
  *      Ryan Leavengood
  */
-#ifndef _resizer_window_h
-#define _resizer_window_h
+#ifndef _RESIZER_WINDOW_H
+#define _RESIZER_WINDOW_H
 
 
 #include <Window.h>
 #include <View.h>
 
-
-class BTextControl;
 class BCheckBox;
+class BControl;
+class BTextControl;
 
 
-class ResizerWindow : public BWindow
-{
+class ResizerWindow : public BWindow {
    public:			
 						ResizerWindow(BMessenger target, int32 width, int32 height );
-					
+
 		virtual void	MessageReceived(BMessage* msg);
 		virtual	bool	QuitRequested();
-		
+
 		virtual			~ResizerWindow();
 
 		// the public message command constants ('what')
@@ -39,6 +38,7 @@ class ResizerWindow : public BWindow
 			kUpdateMsg,
 				// provides the new size of the image in two "int32" fields "width" and "height"
 		};
+
    private:
 		enum {
 			kResolutionMsg = 'Rszr',
@@ -46,11 +46,12 @@ class ResizerWindow : public BWindow
 			kHeightModifiedMsg,
 			kApplyMsg,
 		};
-		
-		void AddControl(BView* parent, BControl* control, float column2, BRect& rect);
+
+		void AddControl(BView* parent, BControl* control, float column2,
+			BRect& rect);
 		void AddSeparatorLine(BView* parent, BRect& rect);
 		void LeftAlign(BControl* control);
-		
+
    		BTextControl*	fWidth;
    		BTextControl*	fHeight;
    		BCheckBox*		fAspectRatio;
@@ -62,4 +63,4 @@ class ResizerWindow : public BWindow
    		BMessenger		fTarget;
 };
 
-#endif
+#endif	// _RESIZER_WINDOW_H
