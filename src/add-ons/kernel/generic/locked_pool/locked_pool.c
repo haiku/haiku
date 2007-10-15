@@ -586,7 +586,6 @@ locked_pool_interface interface = {
 };
 
 #if !_BUILDING_kernel && !BOOT
-_EXPORT 
 module_info *modules[] = {
 	&interface.minfo,
 	NULL

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005 Marcus Overhagen
+ * Copyright 2005-2007 Marcus Overhagen
  * Distributed under the terms of the MIT License.
  *
  * PS/2 bus manager
@@ -8,17 +8,20 @@
  *		Marcus Overhagen (marcus@overhagen.de)
  */
 
+
 #include "PS2.h"
 #include "ps2_common.h"
 
 
-static int32 function1()
+static int32
+function1()
 {
 	return 0;
 }
 
 
-static int32 function2()
+static int32
+function2()
 {
 	return 0;
 }
@@ -41,8 +44,7 @@ std_ops(int32 op, ...)
 }
 
 
-static ps2_module_info ps2_module =
-{
+static ps2_module_info ps2_module = {
 	.binfo = {
 		.minfo = { 
 			.name    = B_PS2_MODULE_NAME,
@@ -56,8 +58,7 @@ static ps2_module_info ps2_module =
 };
 
 
-_EXPORT module_info *modules[] =
-{ 
-	(module_info *) &ps2_module, 
+module_info *modules[] = { 
+	(module_info *)&ps2_module, 
 	NULL
 };
