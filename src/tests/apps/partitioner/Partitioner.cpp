@@ -384,10 +384,9 @@ private:
 			}
 
 			// validate parameters
-			char validatedName[B_OS_NAME_LENGTH];
-			strlcpy(validatedName, name.String(), sizeof(validatedName));
+			BString validatedName(name);
 			if (partition->ValidateInitialize(diskSystem->Name(),
-					supportsName ? validatedName : NULL, parameters.String())
+					supportsName ? &validatedName : NULL, parameters.String())
 					!= B_OK) {
 				printf("Validation of the given values failed. Sorry, can't "
 					"continue.\n");
@@ -399,7 +398,7 @@ private:
 				printf("Everything looks dandy.\n");
 			} else {
 				printf("The disk system adjusted the file name to \"%s\".\n",
-					validatedName);
+					validatedName.String());
 				name = validatedName;
 			}
 
@@ -588,7 +587,8 @@ private:
 			// validate parameters
 			off_t validatedStart = start;
 			off_t validatedSize = size;
-			if (partition->ValidateCreateChild(&start, &size, type,
+// TODO: Support the name parameter!
+			if (partition->ValidateCreateChild(&start, &size, type, NULL,
 					parameters.String()) != B_OK) {
 				printf("Validation of the given values failed. Sorry, can't "
 					"continue.\n");
@@ -633,7 +633,7 @@ private:
 		}
 
 		// create child
-		error = partition->CreateChild(start, size, type,
+		error = partition->CreateChild(start, size, type, NULL,
 			parameters.String());
 		if (error != B_OK)
 			printf("Creating the partiiton failed: %s\n", strerror(error));
