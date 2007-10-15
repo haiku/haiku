@@ -23,7 +23,7 @@
 
 // constructor
 App::App()
-	: BApplication("application/x.vnd-YellowBites.LaunchBox")
+	: BApplication("application/x-vnd.Haiku-LaunchBox")
 {
 }
 
