@@ -181,7 +181,7 @@ PPCOpenFirmware::SetHardwareRTC(uint32 seconds)
 	struct tm t;
 	rtc_secs_to_tm(seconds, &t);
 
-	t.tm_year += RTC_EPOCHE_BASE_YEAR;
+	t.tm_year += RTC_EPOCH_BASE_YEAR;
 	t.tm_mon++;
 
 	if (of_call_method(fRTC, "set-time", 6, 0, t.tm_year, t.tm_mon, t.tm_mday,
@@ -201,7 +201,7 @@ PPCOpenFirmware::GetHardwareRTC()
 		return 0;
 	}
 
-	t.tm_year -= RTC_EPOCHE_BASE_YEAR;
+	t.tm_year -= RTC_EPOCH_BASE_YEAR;
 	t.tm_mon--;
 
 	return rtc_tm_to_secs(&t);
