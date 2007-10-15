@@ -13,8 +13,10 @@
 	One of the foundations of the Haiku API is the messaging system. This
 	framework is the basis for the efficient multithreaded Haiku applications,
 	because it solves one of the fundamental issues of multithreading: it
-	allows you to easily and securely communicate between threads. But the
-	framework goes even further: it allows inter-application communication!
+	allows you to easily and securely communicate between threads. The
+	framework allows inter-application messaging as well as 
+	intra-application messaging, and it will always use the most effective
+	mechanism for the communication automatically.
 	
 	This page will introduce you to the subject of messaging. It is meant as a
 	broad overview to the classes, rather than a tutorial. If you are looking
@@ -39,7 +41,9 @@
 	- Zero or more data objects. BMessage is a powerful data container that
 	  keeps track of different sorts of data. BMessage provides many convenient
 	  Add*() methods, for example BMessage::AddBool(). With the corresponding
-	  Find*() method (in this example, FindBook()) you can retrieve the data.
+	  Find*() method (in this example,
+	  \link BMessage::FindBool(const char *, int32, bool *) const FindBool() \endlink)
+	  you can retrieve the data.
 
 	BMessage itself is generic, its syntax and semantics are determined by the
 	context. The Haiku API defines several messages and their required data
@@ -50,9 +54,9 @@
 	
 	Objects of the BLooper type are objects that run message loops. Every
 	object runs in its own thread. The BLooper objects continually check for
-	incoming messages, and they try to find a BHandler to actually handle the
-	messages within their thread context. Message handling within a thread is
-	synchronous.
+	incoming messages. To process the messages, the looper looks for message
+	handlers that handle the messages within the thread's context. Message
+	handling within a looper is synchronous.
 	
 	BLooper inherits BHandler, the base class for message handling. However, it
 	is possible to chain additional handlers to the object. For example, if you
@@ -101,12 +105,12 @@
 	If your handler cannot handle the object, it will pass the message on to
 	the parent class. 
 	
-	\warning Don't forget to actuall call 
-		<em>baseclass</em>::MessageReceived(). Failing to do this will mean
-		that the message chain will not completely be followed, which can lead
-		to unhandled messages. There might be some internal system messages
-		that the Haiku API classes handle, and not actually handling these
-		messages could lead to inconsistent internal behavior.
+	\warning Don't forget to actuall call the MessageReceived() method of the
+		base class. Failing to do this will mean that the message chain will
+		not completely be followed, which can lead to unhandled messages. There
+		might be some internal system messages that the Haiku API classes
+		handle, and not actually handling these messages could lead to
+		inconsistent internal behavior.
 	
 	\subsection app_messaging_overview_bmessenger BMessenger
 	
@@ -138,7 +142,8 @@
 	- BMessageFilter is the base class of the filters. Filters can be applied
 	  to BLoopers to filter all incoming messages, or to BHandlers to filter
 	  messages that could be handled by that object. The filter object can be
-	  subclassed and extended by overriding the Filter() method.
+	  subclassed and extended by overriding the \link BMessageFilter::Filter() 
+	  Filter() \endlink method.
 
 	\section app-messaging-receiving Receiving Messages
 	
