@@ -8,12 +8,13 @@
 
 
 #include "InstalledPackageInfo.h"
-#include <Directory.h>
-#include <FindDirectory.h>
-#include <Entry.h>
+
 #include <stdio.h>
 #include <string.h>
-#include <posix/string.h>
+
+#include <Directory.h>
+#include <Entry.h>
+#include <FindDirectory.h>
 
 
 const char * kPackagesDir = "packages";
@@ -215,7 +216,7 @@ InstalledPackageInfo::Uninstall()
 	// Try to remove all entries that are present in the list
 	for (i = 0; i < count; i++) {
 		iter = static_cast<BString *>(fInstalledItems.ItemAt(count - i - 1));
-		fprintf(stderr, "Removing: %s (%d/%d)\n", iter->String(), i, count);
+		fprintf(stderr, "Removing: %s (%ld/%ld)\n", iter->String(), i, count);
 		ret = entry.SetTo(iter->String());
 		if (ret == B_BUSY) {
 			// The entry's directory is locked - wait a few cycles for it to

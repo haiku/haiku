@@ -5,16 +5,22 @@
  * Author:
  *		Łukasz 'Sil2100' Zemczak <sil2100@vexillium.org>
  */
-#ifndef PACKAGEVIEW_H
-#define PACKAGEVIEW_H
+#ifndef PACKAGE_VIEW_H
+#define PACKAGE_VIEW_H
+
 
 #include "PackageInfo.h"
 #include "PackageStatus.h"
+
 #include <View.h>
 #include <Box.h>
 #include <Button.h>
 #include <MenuField.h>
 #include <FilePanel.h>
+
+class BPopUpMenu;
+class BTextView;
+
 
 enum {
 	P_MSG_GROUP_CHANGED = 'gpch',
@@ -22,7 +28,6 @@ enum {
 	P_MSG_OPEN_PANEL,
 	P_MSG_INSTALL
 };
-
 
 class PackageView : public BView {
 	public:
@@ -54,6 +59,5 @@ class PackageView : public BView {
 		PackageStatus *fStatusWindow;
 };
 
-
-#endif
+#endif	// PACKAGE_VIEW_H
 
