@@ -48,8 +48,8 @@ actions MkUpdateDb1
 	 $(2[1]) > $(1) ;
 }
 
-MkUpdateDb updatedb : updatedb.sh [ FGristFiles version.c ] ;
+MkUpdateDb updatedbgen : updatedb.sh [ FGristFiles version.c ] ;
 MakeLocatePlatform <bin>updatedb ;
-Shell <bin>updatedb : updatedb ;
+Shell <bin>updatedb : updatedbgen ;
 
 SEARCH on [ FGristFiles version.c ] = [ FDirName $(SUBDIR) $(DOTDOT) find ] ;
