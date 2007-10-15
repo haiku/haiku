@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -131,9 +131,6 @@ FontDemoView::_DrawView(BView* view)
 	for (size_t i = 0; i < size; i++) {
 		xCoordArray[i] = 0.0f;
 		yCoordArray[i] = 0.0f;
-
-		const float height = boundBoxes[i].Height();
-		const float	width = boundBoxes[i].Width();
 
 		yCoordArray[i] = sinus * (xCoord - xCoordArray[i]);
 		xCoordArray[i] = cosinus * xCoord;
