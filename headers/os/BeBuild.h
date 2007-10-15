@@ -219,7 +219,7 @@ class _IMPEXP_BE _BTextInput_;
 class _IMPEXP_BE _BMCMenuBar_;
 class _IMPEXP_BE _BMCItem_;
 class _IMPEXP_BE _BWidthBuffer_;
-class _IMPEXP_BE BPrivateScreen;
+//class _IMPEXP_BE BPrivateScreen;
 
 /* net kit */
 class _IMPEXP_NET _Allocator;
