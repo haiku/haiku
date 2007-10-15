@@ -136,6 +136,7 @@
 
 /*!
 	\class BMessageFilter
+	\ingroup app
 	\brief Describes a message filter for BLooper and BHandler.
 
 	Objects of this class serve as a description of properties that incoming
