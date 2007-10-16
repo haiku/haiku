@@ -191,7 +191,7 @@ determine_stolen_memory_size(intel_info &info)
 static void
 set_gtt_entry(intel_info &info, uint32 offset, uint8 *physicalAddress)
 {
-	write32(info.registers + INTEL_GTT_BASE + (offset >> 10),
+	write32(info.gtt_base + (offset >> 10),
 		(uint32)physicalAddress | GTT_ENTRY_VALID);
 }
 
@@ -391,6 +391,21 @@ intel_extreme_init(intel_info &info)
 	if (info.memory_manager == NULL)
 		return B_NO_MEMORY;
 
+	if ((info.device_type & INTEL_TYPE_9xx) != 0) {
+		if ((info.device_type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_965) {
+			info.gtt_base = info.registers + i965_GTT_BASE;
+			info.gtt_size = i965_GTT_SIZE;
+		} else {
+			// TODO: map it in???
+			info.gtt_base = (uint8*)info.pci->u.h0.base_register_sizes[3];
+			info.gtt_size = i830_GTT_SIZE;
+				// TODO: for now...
+		}
+	} else {
+		info.gtt_base = info.registers + i830_GTT_BASE;
+		info.gtt_size = i830_GTT_SIZE;
+	}
+
 	// reserve ring buffer memory (currently, this memory is placed in
 	// the graphics memory), but this could bring us problems with
 	// write combining...
@@ -474,11 +489,11 @@ intel_extreme_init(intel_info &info)
 			physical_entry physicalEntry;
 			get_memory_map(additionalMemory + offset - stolenSize,
 				totalSize - offset, &physicalEntry, 1);
-	
+
 			for (size_t i = 0; i < physicalEntry.size; i += B_PAGE_SIZE) {
 				set_gtt_entry(info, offset + i, (uint8 *)physicalEntry.address + i);
 			}
-	
+
 			offset += physicalEntry.size;
 		}
 	}

@@ -158,7 +158,10 @@ struct intel_free_graphics_memory {
 #define INTEL_PAGE_TABLE_CONTROL		0x02020
 #define INTEL_PAGE_TABLE_ERROR			0x02024
 #define INTEL_HARDWARE_STATUS_PAGE		0x02080
-#define INTEL_GTT_BASE					0x10000	// (- 0x2ffff)
+#define i830_GTT_BASE					0x10000	// (- 0x2ffff)
+#define i830_GTT_SIZE					0x20000
+#define i965_GTT_BASE					0x80000	// (- 0xfffff)
+#define i965_GTT_SIZE					0x80000
 #define GTT_ENTRY_VALID					0x01
 #define GTT_ENTRY_LOCAL_MEMORY			0x02
 

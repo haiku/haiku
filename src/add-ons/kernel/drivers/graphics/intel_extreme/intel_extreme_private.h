@@ -29,6 +29,8 @@ struct intel_info {
 	struct overlay_registers *overlay_registers;
 		// update buffer, shares an area with shared_info
 
+	uint8			*gtt_base;
+	size_t			gtt_size;
 	uint8			*graphics_memory;
 	area_id			graphics_memory_area;
 	area_id			additional_memory_area;
