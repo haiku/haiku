@@ -1,9 +1,6 @@
 /*
- * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Ingo Weinhold, bonefish@cs.tu-berlin.de
  */
 
 #include <errno.h>
@@ -57,9 +54,8 @@ using std::nothrow;
 			0, if they are equal, or a value greater than 0, if
 			\a str1 is greater \a str2.
 */
-static inline
-int
-compare_string(const char *str1, const char *str2)
+static inline int
+compare_string(const char* str1, const char* str2)
 {
 	if (str1 == NULL) {
 		if (str2 == NULL)
@@ -236,7 +232,7 @@ BPartition::Flags() const
 	\return The name of the partition, or \c NULL, if the partitioning system
 			does not support names.
 */
-const char *
+const char*
 BPartition::Name() const
 {
 	return _PartitionData()->name;
@@ -244,7 +240,7 @@ BPartition::Name() const
 
 
 // ContentName
-const char *
+const char*
 BPartition::ContentName() const
 {
 	return _PartitionData()->content_name;
@@ -255,7 +251,7 @@ BPartition::ContentName() const
 /*!	\brief Returns a human readable string for the type of the partition.
 	\return A human readable string for the type of the partition.
 */
-const char *
+const char*
 BPartition::Type() const
 {
 	return _PartitionData()->type;
@@ -263,7 +259,7 @@ BPartition::Type() const
 
 
 // ContentType
-const char *
+const char*
 BPartition::ContentType() const
 {
 	return _PartitionData()->content_type;
@@ -305,7 +301,7 @@ BPartition::ContentParameters() const
 
 // GetDiskSystem
 status_t
-BPartition::GetDiskSystem(BDiskSystem *diskSystem) const
+BPartition::GetDiskSystem(BDiskSystem* diskSystem) const
 {
 	const user_partition_data* data = _PartitionData();
 	if (!data || !diskSystem)
@@ -320,7 +316,7 @@ BPartition::GetDiskSystem(BDiskSystem *diskSystem) const
 
 // GetPath
 status_t
-BPartition::GetPath(BPath *path) const
+BPartition::GetPath(BPath* path) const
 {
 	// The path is constructed on the fly using our parent
 	if (path == NULL || Parent() == NULL || Index() < 0)
@@ -335,7 +331,7 @@ BPartition::GetPath(BPath *path) const
 
 	if (Parent()->IsDevice()) {
 		// Our parent is a device, so we replace `raw' by our index.
-		const char *leaf = path->Leaf();
+		const char* leaf = path->Leaf();
 		if (!leaf || strcmp(leaf, "raw") != B_OK)
 			return B_ERROR;
 
@@ -364,7 +360,7 @@ BPartition::GetPath(BPath *path) const
 			accordingly, another error code otherwise.
 */
 status_t
-BPartition::GetVolume(BVolume *volume) const
+BPartition::GetVolume(BVolume* volume) const
 {
 	if (volume)
 		return B_BAD_VALUE;
@@ -387,7 +383,7 @@ BPartition::GetVolume(BVolume *volume) const
 	\return \c B_OK, if everything went fine, another error code otherwise.
 */
 status_t
-BPartition::GetIcon(BBitmap *icon, icon_size which) const
+BPartition::GetIcon(BBitmap* icon, icon_size which) const
 {
 /*
 	status_t error = (icon ? B_OK : B_BAD_VALUE);
@@ -400,7 +396,7 @@ BPartition::GetIcon(BBitmap *icon, icon_size which) const
 				error = volume.GetIcon(icon, which);
 		} else {
 			// not mounted: retrieve the icon ourselves
-			if (BDiskDevice *device = Device()) {
+			if (BDiskDevice* device = Device()) {
 				// get the icon
 				if (error == B_OK)
 					error = get_device_icon(device->Path(), icon, which);
@@ -430,7 +426,7 @@ BPartition::GetIcon(BBitmap *icon, icon_size which) const
 	\return \c B_OK, if everything went fine, an error code otherwise.
 */
 status_t
-BPartition::GetMountPoint(BPath *mountPoint) const
+BPartition::GetMountPoint(BPath* mountPoint) const
 {
 	if (!mountPoint || !ContainsFileSystem())
 		return B_BAD_VALUE;
@@ -447,7 +443,7 @@ BPartition::GetMountPoint(BPath *mountPoint) const
 
 	// partition not mounted
 	// get the volume name
-	const char *volumeName = ContentName();
+	const char* volumeName = ContentName();
 	if (!volumeName || strlen(volumeName) == 0)
 		volumeName = Name();
 	if (!volumeName || strlen(volumeName) == 0)
@@ -498,8 +494,8 @@ BPartition::GetMountPoint(BPath *mountPoint) const
 	\return \c B_OK, if everything went fine, another error code otherwise.
 */
 dev_t
-BPartition::Mount(const char *mountPoint, uint32 mountFlags,
-	const char *parameters)
+BPartition::Mount(const char* mountPoint, uint32 mountFlags,
+	const char* parameters)
 {
 	if (IsMounted() || !ContainsFileSystem())
 		return B_BAD_VALUE;
@@ -582,7 +578,7 @@ BPartition::Unmount(uint32 unmountFlags)
 /*!	\brief Returns the device this partition resides on.
 	\return The device this partition resides on.
 */
-BDiskDevice *
+BDiskDevice*
 BPartition::Device() const
 {
 	return fDevice;
@@ -590,7 +586,7 @@ BPartition::Device() const
 
 
 // Parent
-BPartition *
+BPartition*
 BPartition::Parent() const
 {
 	return fParent;
@@ -598,7 +594,7 @@ BPartition::Parent() const
 
 
 // ChildAt
-BPartition *
+BPartition*
 BPartition::ChildAt(int32 index) const
 {
 	if (fDelegate) {
@@ -624,7 +620,7 @@ BPartition::CountChildren() const
 
 
 // FindDescendant
-BPartition *
+BPartition*
 BPartition::FindDescendant(partition_id id) const
 {
 	IDFinderVisitor visitor(id);
@@ -634,7 +630,7 @@ BPartition::FindDescendant(partition_id id) const
 
 // GetPartitioningInfo
 status_t
-BPartition::GetPartitioningInfo(BPartitioningInfo *info) const
+BPartition::GetPartitioningInfo(BPartitioningInfo* info) const
 {
 	if (!fDelegate || !info)
 		return B_BAD_VALUE;
@@ -644,12 +640,12 @@ BPartition::GetPartitioningInfo(BPartitioningInfo *info) const
 
 
 // VisitEachChild
-BPartition *
-BPartition::VisitEachChild(BDiskDeviceVisitor *visitor)
+BPartition*
+BPartition::VisitEachChild(BDiskDeviceVisitor* visitor)
 {
 	if (visitor) {
 		int32 level = _Level();
-		for (int32 i = 0; BPartition *child = ChildAt(i); i++) {
+		for (int32 i = 0; BPartition* child = ChildAt(i); i++) {
 			if (child->_AcceptVisitor(visitor, level))
 				return child;
 		}
@@ -659,8 +655,8 @@ BPartition::VisitEachChild(BDiskDeviceVisitor *visitor)
 
 
 // VisitEachDescendant
-BPartition *
-BPartition::VisitEachDescendant(BDiskDeviceVisitor *visitor)
+BPartition*
+BPartition::VisitEachDescendant(BDiskDeviceVisitor* visitor)
 {
 	if (visitor)
 		return _VisitEachDescendant(visitor);
@@ -670,7 +666,7 @@ BPartition::VisitEachDescendant(BDiskDeviceVisitor *visitor)
 
 // CanDefragment
 bool
-BPartition::CanDefragment(bool *whileMounted) const
+BPartition::CanDefragment(bool* whileMounted) const
 {
 	return _SupportsOperation(B_DISK_SYSTEM_SUPPORTS_DEFRAGMENTING,
 		B_DISK_SYSTEM_SUPPORTS_DEFRAGMENTING_WHILE_MOUNTED, whileMounted);
@@ -690,7 +686,7 @@ BPartition::Defragment() const
 
 // CanRepair
 bool
-BPartition::CanRepair(bool checkOnly, bool *whileMounted) const
+BPartition::CanRepair(bool checkOnly, bool* whileMounted) const
 {
 	uint32 flag;
 	uint32 whileMountedFlag;
@@ -719,7 +715,7 @@ BPartition::Repair(bool checkOnly) const
 
 // CanResize
 bool
-BPartition::CanResize(bool *canResizeContents, bool *whileMounted) const
+BPartition::CanResize(bool* canResizeContents, bool* whileMounted) const
 {
 	BPartition* parent = Parent();
 	if (!parent)
@@ -740,7 +736,7 @@ BPartition::CanResize(bool *canResizeContents, bool *whileMounted) const
 
 // ValidateResize
 status_t
-BPartition::ValidateResize(off_t *size) const
+BPartition::ValidateResize(off_t* size) const
 {
 	BPartition* parent = Parent();
 	if (!parent || !fDelegate)
@@ -809,8 +805,8 @@ BPartition::Resize(off_t size)
 
 // CanMove
 bool
-BPartition::CanMove(BObjectList<BPartition> *unmovableDescendants,
-					BObjectList<BPartition> *movableOnlyIfUnmounted) const
+BPartition::CanMove(BObjectList<BPartition>* unmovableDescendants,
+	BObjectList<BPartition>* movableOnlyIfUnmounted) const
 {
 	BPartition* parent = Parent();
 	if (!parent || !fDelegate)
@@ -823,7 +819,7 @@ BPartition::CanMove(BObjectList<BPartition> *unmovableDescendants,
 
 	bool whileMounted;
 	bool movable = _SupportsOperation(B_DISK_SYSTEM_SUPPORTS_MOVING,
-			B_DISK_SYSTEM_SUPPORTS_MOVING_WHILE_MOUNTED, &whileMounted);
+		B_DISK_SYSTEM_SUPPORTS_MOVING_WHILE_MOUNTED, &whileMounted);
 	if (!movable)
 		return false;
 
@@ -842,7 +838,7 @@ BPartition::CanMove(BObjectList<BPartition> *unmovableDescendants,
 
 // ValidateMove
 status_t
-BPartition::ValidateMove(off_t *offset) const
+BPartition::ValidateMove(off_t* offset) const
 {
 	BPartition* parent = Parent();
 	if (!parent || !fDelegate)
@@ -897,7 +893,7 @@ BPartition::CanSetName() const
 		return false;
 
 	return parent->_SupportsChildOperation(this,
-			B_DISK_SYSTEM_SUPPORTS_SETTING_NAME);
+		B_DISK_SYSTEM_SUPPORTS_SETTING_NAME);
 }
 
 
@@ -915,7 +911,7 @@ BPartition::ValidateSetName(BString* name) const
 
 // SetName
 status_t
-BPartition::SetName(const char *name)
+BPartition::SetName(const char* name)
 {
 	BPartition* parent = Parent();
 	if (!parent || !fDelegate)
@@ -927,7 +923,7 @@ BPartition::SetName(const char *name)
 
 // CanSetContentName
 bool
-BPartition::CanSetContentName(bool *whileMounted) const
+BPartition::CanSetContentName(bool* whileMounted) const
 {
 	return _SupportsOperation(B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME,
 		B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME_WHILE_MOUNTED,
@@ -948,7 +944,7 @@ BPartition::ValidateSetContentName(BString* name) const
 
 // SetContentName
 status_t
-BPartition::SetContentName(const char *name)
+BPartition::SetContentName(const char* name)
 {
 	if (!fDelegate)
 		return B_BAD_VALUE;
@@ -966,13 +962,13 @@ BPartition::CanSetType() const
 		return false;
 
 	return parent->_SupportsChildOperation(this,
-			B_DISK_SYSTEM_SUPPORTS_SETTING_TYPE);
+		B_DISK_SYSTEM_SUPPORTS_SETTING_TYPE);
 }
 
 
 // ValidateSetType
 status_t
-BPartition::ValidateSetType(const char *type) const
+BPartition::ValidateSetType(const char* type) const
 {
 	BPartition* parent = Parent();
 	if (!parent || !fDelegate)
@@ -984,7 +980,7 @@ BPartition::ValidateSetType(const char *type) const
 
 // SetType
 status_t
-BPartition::SetType(const char *type)
+BPartition::SetType(const char* type)
 {
 	BPartition* parent = Parent();
 	if (!parent || !fDelegate)
@@ -1003,13 +999,13 @@ BPartition::CanEditParameters() const
 		return false;
 
 	return parent->_SupportsChildOperation(this,
-			B_DISK_SYSTEM_SUPPORTS_SETTING_PARAMETERS);
+		B_DISK_SYSTEM_SUPPORTS_SETTING_PARAMETERS);
 }
 
 
 // GetParameterEditor
 status_t
-BPartition::GetParameterEditor(BDiskDeviceParameterEditor **editor)
+BPartition::GetParameterEditor(BDiskDeviceParameterEditor** editor)
 {
 	BPartition* parent = Parent();
 	if (!parent || !fDelegate)
@@ -1021,7 +1017,7 @@ BPartition::GetParameterEditor(BDiskDeviceParameterEditor **editor)
 
 // SetParameters
 status_t
-BPartition::SetParameters(const char *parameters)
+BPartition::SetParameters(const char* parameters)
 {
 	BPartition* parent = Parent();
 	if (!parent || !fDelegate)
@@ -1033,7 +1029,7 @@ BPartition::SetParameters(const char *parameters)
 
 // CanEditContentParameters
 bool
-BPartition::CanEditContentParameters(bool *whileMounted) const
+BPartition::CanEditContentParameters(bool* whileMounted) const
 {
 	return _SupportsOperation(B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS,
 		B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS_WHILE_MOUNTED,
@@ -1043,7 +1039,7 @@ BPartition::CanEditContentParameters(bool *whileMounted) const
 
 // GetContentParameterEditor
 status_t
-BPartition::GetContentParameterEditor(BDiskDeviceParameterEditor **editor)
+BPartition::GetContentParameterEditor(BDiskDeviceParameterEditor** editor)
 {
 	if (!fDelegate)
 		return B_BAD_VALUE;
@@ -1054,7 +1050,7 @@ BPartition::GetContentParameterEditor(BDiskDeviceParameterEditor **editor)
 
 // SetContentParameters
 status_t
-BPartition::SetContentParameters(const char *parameters)
+BPartition::SetContentParameters(const char* parameters)
 {
 	if (!fDelegate)
 		return B_BAD_VALUE;
@@ -1065,7 +1061,7 @@ BPartition::SetContentParameters(const char *parameters)
 
 // CanInitialize
 bool
-BPartition::CanInitialize(const char *diskSystem) const
+BPartition::CanInitialize(const char* diskSystem) const
 {
 	return fDelegate && fDelegate->CanInitialize(diskSystem);
 }
@@ -1086,7 +1082,7 @@ BPartition::GetInitializationParameterEditor(const char* diskSystem,
 // ValidateInitialize
 status_t
 BPartition::ValidateInitialize(const char* diskSystem, BString* name,
-							   const char* parameters)
+	const char* parameters)
 {
 	if (!fDelegate)
 		return B_BAD_VALUE;
@@ -1097,8 +1093,8 @@ BPartition::ValidateInitialize(const char* diskSystem, BString* name,
 
 // Initialize
 status_t
-BPartition::Initialize(const char *diskSystem, const char *name,
-					   const char *parameters)
+BPartition::Initialize(const char* diskSystem, const char* name,
+	const char* parameters)
 {
 	if (!fDelegate)
 		return B_BAD_VALUE;
@@ -1150,8 +1146,8 @@ BPartition::ValidateCreateChild(off_t* offset, off_t* size, const char* type,
 
 // CreateChild
 status_t
-BPartition::CreateChild(off_t offset, off_t size, const char *type,
-	const char* name, const char *parameters, BPartition **child)
+BPartition::CreateChild(off_t offset, off_t size, const char* type,
+	const char* name, const char* parameters, BPartition** child)
 {
 	if (!fDelegate)
 		return B_BAD_VALUE;
@@ -1205,8 +1201,8 @@ BPartition::operator=(const BPartition &)
 
 // _SetTo
 status_t
-BPartition::_SetTo(BDiskDevice *device, BPartition *parent,
-				   user_partition_data *data)
+BPartition::_SetTo(BDiskDevice* device, BPartition* parent,
+	user_partition_data* data)
 {
 	_Unset();
 	if (!device || !data)
@@ -1215,10 +1211,11 @@ BPartition::_SetTo(BDiskDevice *device, BPartition *parent,
 	fDevice = device;
 	fParent = parent;
 	fPartitionData->user_data = this;
+
 	// create and init children
 	status_t error = B_OK;
 	for (int32 i = 0; error == B_OK && i < fPartitionData->child_count; i++) {
-		BPartition *child = new(nothrow) BPartition;
+		BPartition* child = new(nothrow) BPartition;
 		if (child) {
 			error = child->_SetTo(fDevice, this, fPartitionData->children[i]);
 			if (error != B_OK)
@@ -1226,6 +1223,7 @@ BPartition::_SetTo(BDiskDevice *device, BPartition *parent,
 		} else
 			error = B_NO_MEMORY;
 	}
+
 	// cleanup on error
 	if (error != B_OK)
 		_Unset();
@@ -1240,11 +1238,12 @@ BPartition::_Unset()
 	// delete children
 	if (fPartitionData) {
 		for (int32 i = 0; i < fPartitionData->child_count; i++) {
-			if (BPartition *child = ChildAt(i))
+			if (BPartition* child = ChildAt(i))
 				delete child;
 		}
 		fPartitionData->user_data = NULL;
 	}
+
 	fDevice = NULL;
 	fParent = NULL;
 	fPartitionData = NULL;
@@ -1253,8 +1252,7 @@ BPartition::_Unset()
 
 // _RemoveObsoleteDescendants
 status_t
-BPartition::_RemoveObsoleteDescendants(user_partition_data *data,
-									   bool *updated)
+BPartition::_RemoveObsoleteDescendants(user_partition_data* data, bool* updated)
 {
 	// remove all children not longer persistent
 	// Not exactly efficient: O(n^2), considering BList::RemoveItem()
@@ -1263,7 +1261,7 @@ BPartition::_RemoveObsoleteDescendants(user_partition_data *data,
 	// BPartition to remove, which makes the list operation definitely O(n).
 	int32 count = CountChildren();
 	for (int32 i = count - 1; i >= 0; i--) {
-		BPartition *child = ChildAt(i);
+		BPartition* child = ChildAt(i);
 		bool found = false;
 		for (int32 k = data->child_count - 1; k >= 0; k--) {
 			if (data->children[k]->id == child->ID()) {
@@ -1273,12 +1271,14 @@ BPartition::_RemoveObsoleteDescendants(user_partition_data *data,
 					data->children[k], updated);
 				if (error != B_OK)
 					return error;
+
 				// set the user data to the BPartition object to find it
 				// quicker later
 				data->children[k]->user_data = child;
 				break;
 			}
 		}
+
 		// if partition is obsolete, remove it
 		if (!found) {
 			*updated = true;
@@ -1291,9 +1291,9 @@ BPartition::_RemoveObsoleteDescendants(user_partition_data *data,
 
 // _Update
 status_t
-BPartition::_Update(user_partition_data *data, bool *updated)
+BPartition::_Update(user_partition_data* data, bool* updated)
 {
-	user_partition_data *oldData = fPartitionData;
+	user_partition_data* oldData = fPartitionData;
 	fPartitionData = data;
 	// check for changes
 	if (data->offset != oldData->offset
@@ -1312,11 +1312,12 @@ BPartition::_Update(user_partition_data *data, bool *updated)
 						  oldData->content_parameters)) {
 		*updated = true;
 	}
+
 	// add new children and update existing ones
 	status_t error = B_OK;
 	for (int32 i = 0; i < data->child_count; i++) {
-		user_partition_data *childData = data->children[i];
-		BPartition *child = (BPartition*)childData->user_data;
+		user_partition_data* childData = data->children[i];
+		BPartition* child = (BPartition*)childData->user_data;
 		if (child) {
 			// old partition
 			error = child->_Update(childData, updated);
@@ -1326,12 +1327,15 @@ BPartition::_Update(user_partition_data *data, bool *updated)
 			// new partition
 			*updated = true;
 			child = new(nothrow) BPartition;
-			if (child) {
-				error = child->_SetTo(fDevice, this, data->children[i]);
-				if (error != B_OK)
-					delete child;
-			} else
+			if (!child)
 				return B_NO_MEMORY;
+
+			error = child->_SetTo(fDevice, this, data->children[i]);
+			if (error != B_OK) {
+				delete child;
+				return error;
+			}
+
 			childData->user_data = child;
 		}
 	}
@@ -1346,8 +1350,10 @@ BPartition::_RemoveChild(int32 index)
 	int32 count = CountChildren();
 	if (!fPartitionData || index < 0 || index >= count)
 		return;
+
 	// delete the BPartition and its children
 	delete ChildAt(index);
+
 	// compact the children array
 	for (int32 i = index + 1; i < count; i++)
 		fPartitionData->children[i - 1] = fPartitionData->children[i];
@@ -1392,7 +1398,7 @@ int32
 BPartition::_CountDescendants() const
 {
 	int32 count = 1;
-	for (int32 i = 0; BPartition *child = ChildAt(i); i++)
+	for (int32 i = 0; BPartition* child = ChildAt(i); i++)
 		count += child->_CountDescendants();
 	return count;
 }
@@ -1403,7 +1409,7 @@ int32
 BPartition::_Level() const
 {
 	int32 level = 0;
-	const BPartition *ancestor = this;
+	const BPartition* ancestor = this;
 	while ((ancestor = ancestor->Parent()))
 		level++;
 	return level;
@@ -1412,23 +1418,23 @@ BPartition::_Level() const
 
 // _AcceptVisitor
 bool
-BPartition::_AcceptVisitor(BDiskDeviceVisitor *visitor, int32 level)
+BPartition::_AcceptVisitor(BDiskDeviceVisitor* visitor, int32 level)
 {
 	return visitor->Visit(this, level);
 }
 
 
 // _VisitEachDescendant
-BPartition *
-BPartition::_VisitEachDescendant(BDiskDeviceVisitor *visitor, int32 level)
+BPartition*
+BPartition::_VisitEachDescendant(BDiskDeviceVisitor* visitor, int32 level)
 {
 	if (level < 0)
 		level = _Level();
 	if (_AcceptVisitor(visitor, level))
 		return this;
-	for (int32 i = 0; BPartition *child = ChildAt(i); i++) {
-		if (BPartition *result = child->_VisitEachDescendant(visitor,
-															 level + 1)) {
+	for (int32 i = 0; BPartition* child = ChildAt(i); i++) {
+		if (BPartition* result = child->_VisitEachDescendant(visitor,
+				level + 1)) {
 			return result;
 		}
 	}
