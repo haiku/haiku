@@ -66,6 +66,37 @@ GET_PIXEL_CLOCK_LIMITS(display_mode *dm, uint32 *low, uint32 *high)
 #ifdef __HAIKU__
 
 status_t
+radeon_get_preferred_display_mode(display_mode* mode)
+{
+	fp_info *fpInfo = &ai->si->flatpanels[0];
+	disp_entity* routes = &ai->si->routing;
+	uint32 i;
+
+	if (routes->port_info[0].edid_valid || routes->port_info[1].edid_valid) {
+		// prefer EDID data in this case
+		return B_ERROR;
+	}
+
+	if ((ai->vc->connected_displays & (dd_dvi | dd_dvi_ext | dd_lvds)) == 0)
+		return B_NOT_SUPPORTED;
+
+	// Mode has already been added by addFPMode(), just return it
+
+	for (i = 0; i < ai->si->mode_count; ++i) {
+		if (ai->mode_list[i].timing.h_display == fpInfo->panel_xres
+			&& ai->mode_list[i].timing.v_display == fpInfo->panel_yres
+			&& ai->mode_list[i].virtual_width == fpInfo->panel_xres
+			&& ai->mode_list[i].virtual_height == fpInfo->panel_yres) {
+			memcpy(mode, &ai->mode_list[i], sizeof(display_mode));
+			return B_OK;
+		}
+	}
+
+	return B_ERROR;
+}
+
+
+status_t
 radeon_get_edid_info(void* info, size_t size, uint32* _version)
 {
 	disp_entity* routes = &ai->si->routing;

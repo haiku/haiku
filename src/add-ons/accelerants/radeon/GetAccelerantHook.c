@@ -61,6 +61,8 @@ initialization process.
 		HOOK(SET_INDEXED_COLORS);
 		//HOOK(GET_TIMING_CONSTRAINTS);
 #ifdef __HAIKU__
+		case B_GET_PREFERRED_DISPLAY_MODE:
+			return (void*)radeon_get_preferred_display_mode;
 		case B_GET_EDID_INFO:
 			return (void*)radeon_get_edid_info;
 #endif
