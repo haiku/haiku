@@ -15,6 +15,10 @@
 #include <Locker.h>
 #include <Messenger.h>
 
+
+class BSubscriber;
+
+
 /* ================
    Per-subscriber information.
    ================ */
