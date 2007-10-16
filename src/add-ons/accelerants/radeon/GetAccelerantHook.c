@@ -60,8 +60,10 @@ initialization process.
 		HOOK(MOVE_DISPLAY);
 		HOOK(SET_INDEXED_COLORS);
 		//HOOK(GET_TIMING_CONSTRAINTS);
+#ifdef __HAIKU__
 		case B_GET_EDID_INFO:
 			return (void*)radeon_get_edid_info;
+#endif
 
 		HOOK(DPMS_CAPABILITIES);
 		HOOK(DPMS_MODE);
