@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2007, Haiku, Inc. All rights reserved.
  * Copyright 2003-2004, Ingo Weinhold, bonefish@cs.tu-berlin.de. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -8,8 +8,8 @@
 #define _K_DISK_DEVICE_MANAGER_H
 
 
-#include "disk_device_manager.h"
-#include "Locker.h"
+#include <disk_device_manager.h>
+#include <Locker.h>
 
 
 namespace BPrivate {
@@ -125,6 +125,9 @@ public:
 	status_t RescanDiskSystems();
 
 private:
+	static void _CheckMediaStatusDaemon(void* self, int iteration);
+	void _CheckMediaStatus();
+
 	status_t _RescanDiskSystems(bool fileSystems);
 
 	status_t _AddPartitioningSystem(const char *name);

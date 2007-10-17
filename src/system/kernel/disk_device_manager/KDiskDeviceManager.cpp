@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2007, Haiku, Inc. All rights reserved.
  * Copyright 2003-2004, Ingo Weinhold, bonefish@cs.tu-berlin.de. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -133,6 +133,9 @@ KDiskDeviceManager::KDiskDeviceManager()
 
 	RescanDiskSystems();
 
+	register_kernel_daemon(&_CheckMediaStatusDaemon, this, 10);
+		// once every second
+
 	DBG(OUT("number of disk systems: %ld\n", CountDiskSystems()));
 	// TODO: Watch the disk systems and the relevant directories.
 }
@@ -140,6 +143,8 @@ KDiskDeviceManager::KDiskDeviceManager()
 
 KDiskDeviceManager::~KDiskDeviceManager()
 {
+	unregister_kernel_daemon(&_CheckMediaStatusDaemon, this);
+
 	// TODO: terminate and remove all jobs
 	// remove all devices
 	for (int32 cookie = 0; KDiskDevice *device = NextDevice(&cookie);) {
@@ -1243,3 +1248,51 @@ KDiskDeviceManager::_ScanPartition(KPartition *partition, bool async)
 	return status;
 }
 
+
+void
+KDiskDeviceManager::_CheckMediaStatus()
+{
+	ManagerLocker locker(this);
+	if (!locker.IsLocked())
+		return;
+
+	int32 cookie = 0;
+	while (true) {
+		KDiskDevice* device = NextDevice(&cookie);
+		if (device == NULL)
+			break;
+
+		status_t mediaStatus;
+		if (device->GetMediaStatus(&mediaStatus) == B_OK) {
+			bool removed = false;
+			bool changed = false;
+
+			switch (mediaStatus) {
+				case B_DEV_MEDIA_CHANGED:
+					changed = true;
+					break;
+				case B_DEV_NO_MEDIA:
+				case B_DEV_DOOR_OPEN:
+					removed = true;
+					break;
+				case B_DEV_MEDIA_CHANGE_REQUESTED:
+				case B_DEV_NOT_READY:
+				case B_OK:
+					break;
+			}
+
+			// TODO: propagate changes!
+			if (removed)
+				dprintf("Media removed from %s\n", device->Path());
+			if (changed)
+				dprintf("Media changed from %s\n", device->Path());
+		}
+	}
+}
+
+
+void
+KDiskDeviceManager::_CheckMediaStatusDaemon(void* self, int iteration)
+{
+	((KDiskDeviceManager*)self)->_CheckMediaStatus();
+}
