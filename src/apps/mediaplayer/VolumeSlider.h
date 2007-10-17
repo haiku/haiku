@@ -25,6 +25,7 @@ class VolumeSlider : public BControl {
 								// BControl
 	virtual	void				AttachedToWindow();
 	virtual	void				SetValue(int32 value);
+			void				SetValueNoInvoke(int32 value);
 	virtual void				SetEnabled(bool enable);
 	virtual void				Draw(BRect updateRect);
 	virtual void				MouseDown(BPoint where);

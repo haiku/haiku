@@ -429,13 +429,12 @@ TransportControlGroup::SetMuted(bool mute)
 void
 TransportControlGroup::SetVolume(float value)
 {
-	if (B_OK != LockLooperWithTimeout(50000))
-		return;
+	float db = _GainToDb(value);
+	float exponential = _LinearToExponential(db);
+	float gain = _DbToGain(exponential);
+	int32 pos = (int32)(floorf(gain * kVolumeFactor + 0.5));
 
-	fVolumeSlider->SetValue(_DbToGain(_ExponentialToLinear(
-		_GainToDb(value))) * kVolumeFactor);
-
-	UnlockLooper();
+	fVolumeSlider->SetValueNoInvoke(pos);
 }
 
 

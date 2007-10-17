@@ -36,11 +36,6 @@ public:
 							Playlist* playlist);
 						~ControllerView();
 					
-private:
-	void				AttachedToWindow();
-	void				MessageReceived(BMessage *msg);
-	void				Draw(BRect updateRect);
-
 	// TransportControlGroup interface
 	virtual	uint32		EnabledButtons();
 	virtual	void		TogglePlaying();
@@ -52,6 +47,11 @@ private:
 	virtual	void		VolumeChanged(float value);
 	virtual	void		ToggleMute();
 	virtual	void		PositionChanged(float value);
+
+private:
+	void				AttachedToWindow();
+	void				MessageReceived(BMessage* message);
+	void				Draw(BRect updateRect);
 
 	// ControllerView
 			void		CheckSkippable();

@@ -57,6 +57,7 @@ public:
 		virtual	void		PlaybackStateChanged(uint32 state);
 		virtual	void		PositionChanged(float position);
 		virtual	void		VolumeChanged(float volume);
+		virtual	void		MutedChanged(bool muted);
 	};
 
 							Controller();
@@ -89,6 +90,9 @@ public:
 
 	void					SetVolume(float value);
 	float					Volume() const;
+	void					VolumeUp();
+	void					VolumeDown();
+	void					ToggleMute();
 	void					SetPosition(float value);
 
 	bool					HasFile();
@@ -146,6 +150,7 @@ private:
 	void					_NotifyPlaybackStateChanged();
 	void					_NotifyPositionChanged(float position);
 	void					_NotifyVolumeChanged(float volume);
+	void					_NotifyMutedChanged(bool muted);
 
 	friend class InfoWin;
 
@@ -169,6 +174,7 @@ private:
 	volatile bool			fPaused;
 	volatile bool			fStopped;
 	float					fVolume;
+	bool					fMuted;
 
 	entry_ref				fRef;
 	BMediaFile *			fMediaFile;

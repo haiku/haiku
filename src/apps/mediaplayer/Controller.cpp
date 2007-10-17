@@ -76,6 +76,7 @@ void Controller::Listener::AudioStatsChanged() {}
 void Controller::Listener::PlaybackStateChanged(uint32) {}
 void Controller::Listener::PositionChanged(float) {}
 void Controller::Listener::VolumeChanged(float) {}
+void Controller::Listener::MutedChanged(bool) {}
 
 
 // #pragma mark -
@@ -86,6 +87,7 @@ Controller::Controller()
  ,	fPaused(false)
  ,	fStopped(true)
  ,	fVolume(1.0)
+ ,	fMuted(false)
 
  ,	fRef()
  ,	fMediaFile(0)
@@ -494,12 +496,57 @@ void
 Controller::SetVolume(float value)
 {
 	printf("Controller::SetVolume %.4f\n", value);
-	if (Lock()) {
+	if (!Lock())
+		return;
+
+	value = max_c(0.0, min_c(2.0, value));
+
+	if (fVolume != value) {
+		if (fMuted)
+			ToggleMute();
+
 		fVolume = value;
 		if (fSoundOutput)
 			fSoundOutput->SetVolume(fVolume);
-		Unlock();
+
+		_NotifyVolumeChanged(fVolume);
 	}
+
+	Unlock();
+}
+
+void
+Controller::VolumeUp()
+{
+	// TODO: linear <-> exponential
+	SetVolume(Volume() + 0.05);
+}
+
+void
+Controller::VolumeDown()
+{
+	// TODO: linear <-> exponential
+	SetVolume(Volume() - 0.05);
+}
+
+void
+Controller::ToggleMute()
+{	
+	if (!Lock())
+		return;
+
+	fMuted = !fMuted;
+	
+	if (fSoundOutput) {
+		if (fMuted)
+			fSoundOutput->SetVolume(0.0);
+		else
+			fSoundOutput->SetVolume(fVolume);
+	}
+
+	_NotifyMutedChanged(fMuted);
+
+	Unlock();
 }
 
 
@@ -1330,3 +1377,14 @@ Controller::_NotifyVolumeChanged(float volume)
 	}
 }
 
+
+void
+Controller::_NotifyMutedChanged(bool muted)
+{
+	BList listeners(fListeners);
+	int32 count = listeners.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		Listener* listener = (Listener*)listeners.ItemAtFast(i);
+		listener->MutedChanged(muted);
+	}
+}

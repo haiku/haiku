@@ -23,7 +23,8 @@ enum {
 
 	MSG_CONTROLLER_PLAYBACK_STATE_CHANGED	= 'cnps',
 	MSG_CONTROLLER_POSITION_CHANGED			= 'cnpc',
-	MSG_CONTROLLER_VOLUME_CHANGED			= 'cnvc'
+	MSG_CONTROLLER_VOLUME_CHANGED			= 'cnvc',
+	MSG_CONTROLLER_MUTED_CHANGED			= 'cnmc'
 };
 
 enum {
@@ -57,6 +58,7 @@ class ControllerObserver : public Controller::Listener,
 	virtual	void		PlaybackStateChanged(uint32 state);
 	virtual	void		PositionChanged(float position);
 	virtual	void		VolumeChanged(float volume);
+	virtual	void		MutedChanged(bool muted);
 
  private:
 			uint32		fObserveFlags;

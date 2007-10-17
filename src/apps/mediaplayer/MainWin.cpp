@@ -72,8 +72,8 @@ enum {
 	M_PREFERENCES,
 	M_VOLUME_UP,
 	M_VOLUME_DOWN,
-	M_CHANNEL_NEXT,
-	M_CHANNEL_PREV,
+	M_SKIP_NEXT,
+	M_SKIP_PREV,
 	M_ASPECT_100000_1,
 	M_ASPECT_106666_1,
 	M_ASPECT_109091_1,
@@ -105,7 +105,8 @@ MainWin::MainWin()
  ,	fController(new Controller)
  ,	fControllerObserver(new ControllerObserver(this,
  		OBSERVE_FILE_CHANGES | OBSERVE_TRACK_CHANGES
- 			| OBSERVE_PLAYBACK_STATE_CHANGES | OBSERVE_POSITION_CHANGES))
+ 			| OBSERVE_PLAYBACK_STATE_CHANGES | OBSERVE_POSITION_CHANGES
+ 			| OBSERVE_VOLUME_CHANGES))
  ,	fIsFullscreen(false)
  ,	fKeepAspectRatio(true)
  ,	fAlwaysOnTop(false)
@@ -168,8 +169,7 @@ MainWin::MainWin()
 
 	// setup the playlist window now, we need to have it 
 	// running for the undo/redo playlist editing
-	fPlaylistWindow = new PlaylistWindow(BRect(150, 150, 400, 500),
-		fPlaylist, fController);
+	fPlaylistWindow = new PlaylistWindow(BRect(150, 150, 400, 500), fPlaylist, fController);
 	fPlaylistWindow->Hide();
 	fPlaylistWindow->Show();
 		// this makes sure the window thread is running without
@@ -315,6 +315,7 @@ MainWin::DispatchMessage(BMessage *msg, BHandler *handler)
 void
 MainWin::MessageReceived(BMessage *msg)
 {
+//	msg->PrintToStream();
 	switch (msg->what) {
 		case B_REFS_RECEIVED:
 			printf("MainWin::MessageReceived: B_REFS_RECEIVED\n");
@@ -397,6 +398,18 @@ MainWin::MessageReceived(BMessage *msg)
 				fControls->SetPosition(position);
 			break;
 		}
+		case MSG_CONTROLLER_VOLUME_CHANGED: {
+			float volume;
+			if (msg->FindFloat("volume", &volume) == B_OK)
+				fControls->SetVolume(volume);
+			break;
+		}
+		case MSG_CONTROLLER_MUTED_CHANGED: {
+			bool muted;
+			if (msg->FindBool("muted", &muted) == B_OK)
+				fControls->SetMuted(muted);
+			break;
+		}
 
 		// menu item messages
 		case M_FILE_NEWPLAYER:
@@ -437,32 +450,26 @@ MainWin::MessageReceived(BMessage *msg)
 
 		case M_TOGGLE_FULLSCREEN:
 			_ToggleFullscreen();
-//			fSettingsMenu->ItemAt(1)->SetMarked(fIsFullscreen);
 			break;
 
 		case M_TOGGLE_NO_MENU:
 			_ToggleNoMenu();
-//			fSettingsMenu->ItemAt(3)->SetMarked(fNoMenu);
 			break;
 			
 		case M_TOGGLE_NO_CONTROLS:
 			_ToggleNoControls();
-//			fSettingsMenu->ItemAt(3)->SetMarked(fNoControls);
 			break;
 		
 		case M_TOGGLE_NO_BORDER:
 			_ToggleNoBorder();
-//			fSettingsMenu->ItemAt(4)->SetMarked(fNoBorder);
 			break;
 			
 		case M_TOGGLE_ALWAYS_ON_TOP:
 			_ToggleAlwaysOnTop();
-//			fSettingsMenu->ItemAt(5)->SetMarked(fAlwaysOnTop);
 			break;
 	
 		case M_TOGGLE_KEEP_ASPECT_RATIO:
 			_ToggleKeepAspectRatio();
-//			fSettingsMenu->ItemAt(6)->SetMarked(fKeepAspectRatio);
 			break;
 
 		case M_TOGGLE_NO_BORDER_NO_MENU_NO_CONTROLS:
@@ -527,47 +534,28 @@ MainWin::MessageReceived(BMessage *msg)
 			float dx = msg->FindFloat("be:wheel_delta_x");
 			float dy = msg->FindFloat("be:wheel_delta_y");
 			bool inv = modifiers() & B_COMMAND_KEY;
-			if (dx > 0.1)	PostMessage(inv ? M_VOLUME_DOWN : M_CHANNEL_PREV);
-			if (dx < -0.1)	PostMessage(inv ? M_VOLUME_UP : M_CHANNEL_NEXT);
-			if (dy > 0.1)	PostMessage(inv ? M_CHANNEL_PREV : M_VOLUME_DOWN);
-			if (dy < -0.1)	PostMessage(inv ? M_CHANNEL_NEXT : M_VOLUME_UP);
+			if (dx > 0.1)	PostMessage(inv ? M_VOLUME_DOWN : M_SKIP_PREV);
+			if (dx < -0.1)	PostMessage(inv ? M_VOLUME_UP : M_SKIP_NEXT);
+			if (dy > 0.1)	PostMessage(inv ? M_SKIP_PREV : M_VOLUME_DOWN);
+			if (dy < -0.1)	PostMessage(inv ? M_SKIP_NEXT : M_VOLUME_UP);
 			break;
 		}
+*/
+		case M_SKIP_NEXT:
+			fControls->SkipForward();
+			break;
 
-		case M_CHANNEL_NEXT:
-		{
-			printf("M_CHANNEL_NEXT\n");
-			int chan = fController->CurrentChannel();
-			if (chan != -1) {
-				chan++;
-				if (chan < fController->ChannelCount())
-					SelectChannel(chan);
-			}
+		case M_SKIP_PREV:
+			fControls->SkipBackward();
 			break;
-		}
-
-		case M_CHANNEL_PREV:
-		{
-			printf("M_CHANNEL_PREV\n");
-			int chan = fController->CurrentChannel();
-			if (chan != -1) {
-				chan--;
-				if (chan >= 0)
-					SelectChannel(chan);
-			}
-			break;
-		}
 
 		case M_VOLUME_UP:
-			printf("M_VOLUME_UP\n");
 			fController->VolumeUp();
 			break;
 
 		case M_VOLUME_DOWN:
-			printf("M_VOLUME_DOWN\n");
 			fController->VolumeDown();
 			break;
-*/
 
 		case M_ASPECT_100000_1:
 			VideoFormatChange(fSourceWidth, fSourceHeight, 1.0, 1.0);
@@ -1145,7 +1133,7 @@ MainWin::_KeyDown(BMessage *msg)
 		
 		case B_UP_ARROW:
 			if (modifiers & B_COMMAND_KEY) {
-				PostMessage(M_CHANNEL_NEXT);
+				PostMessage(M_SKIP_NEXT);
 			} else {
 				PostMessage(M_VOLUME_UP);
 			}
@@ -1153,7 +1141,7 @@ MainWin::_KeyDown(BMessage *msg)
 
 		case B_DOWN_ARROW:
 			if (modifiers & B_COMMAND_KEY) {
-				PostMessage(M_CHANNEL_PREV);
+				PostMessage(M_SKIP_PREV);
 			} else {
 				PostMessage(M_VOLUME_DOWN);
 			}
@@ -1163,7 +1151,7 @@ MainWin::_KeyDown(BMessage *msg)
 			if (modifiers & B_COMMAND_KEY) {
 				PostMessage(M_VOLUME_UP);
 			} else {
-				PostMessage(M_CHANNEL_NEXT);
+				PostMessage(M_SKIP_NEXT);
 			}
 			return B_OK;
 
@@ -1171,16 +1159,16 @@ MainWin::_KeyDown(BMessage *msg)
 			if (modifiers & B_COMMAND_KEY) {
 				PostMessage(M_VOLUME_DOWN);
 			} else {
-				PostMessage(M_CHANNEL_PREV);
+				PostMessage(M_SKIP_PREV);
 			}
 			return B_OK;
 
 		case B_PAGE_UP:
-			PostMessage(M_CHANNEL_NEXT);
+			PostMessage(M_SKIP_NEXT);
 			return B_OK;
 			
 		case B_PAGE_DOWN:
-			PostMessage(M_CHANNEL_PREV);
+			PostMessage(M_SKIP_PREV);
 			return B_OK;
 	}
 
@@ -1213,12 +1201,12 @@ MainWin::_KeyDown(BMessage *msg)
 			
 		case 0x39:			// numeric keypad page up
 		case 0x4a:			// numeric keypad right arrow
-			PostMessage(M_CHANNEL_NEXT);
+			PostMessage(M_SKIP_NEXT);
 			return B_OK;
 			
 		case 0x5a:			// numeric keypad page down
 		case 0x48:			// numeric keypad left arrow
-			PostMessage(M_CHANNEL_PREV);
+			PostMessage(M_SKIP_PREV);
 			return B_OK;
 	}
 	
@@ -1281,6 +1269,8 @@ MainWin::_ToggleFullscreen()
 		Show();
 	}
 
+	_MarkSettingsItem(M_TOGGLE_FULLSCREEN, fIsFullscreen);
+
 	printf("_ToggleFullscreen leave\n");
 }
 
@@ -1303,6 +1293,8 @@ MainWin::_ToggleNoControls()
 	} else {
 		ResizeBy(0, fControlsHeight);
 	}
+
+	_MarkSettingsItem(M_TOGGLE_NO_CONTROLS, fNoControls);
 
 	printf("_ToggleNoControls leave\n");
 }
@@ -1329,6 +1321,8 @@ MainWin::_ToggleNoMenu()
 		ResizeBy(0, fMenuBarHeight);
 	}
 
+	_MarkSettingsItem(M_TOGGLE_NO_MENU, fNoMenu);
+
 	printf("_ToggleNoMenu leave\n");
 }
 
@@ -1336,30 +1330,30 @@ MainWin::_ToggleNoMenu()
 void
 MainWin::_ToggleNoBorder()
 {
-	printf("_ToggleNoBorder enter\n");
 	fNoBorder = !fNoBorder;
 	SetLook(fNoBorder ? B_BORDERED_WINDOW_LOOK : B_TITLED_WINDOW_LOOK);
-	printf("_ToggleNoBorder leave\n");
+
+	_MarkSettingsItem(M_TOGGLE_NO_BORDER, fNoBorder);
 }
 
 
 void
 MainWin::_ToggleAlwaysOnTop()
 {
-	printf("_ToggleAlwaysOnTop enter\n");
 	fAlwaysOnTop = !fAlwaysOnTop;
 	SetFeel(fAlwaysOnTop ? B_FLOATING_ALL_WINDOW_FEEL : B_NORMAL_WINDOW_FEEL);
-	printf("_ToggleAlwaysOnTop leave\n");
+
+	_MarkSettingsItem(M_TOGGLE_ALWAYS_ON_TOP, fAlwaysOnTop);
 }
 
 
 void
 MainWin::_ToggleKeepAspectRatio()
 {
-	printf("_ToggleKeepAspectRatio enter\n");
 	fKeepAspectRatio = !fKeepAspectRatio;
 	FrameResized(Bounds().Width(), Bounds().Height());
-	printf("_ToggleKeepAspectRatio leave\n");
+
+	_MarkSettingsItem(M_TOGGLE_KEEP_ASPECT_RATIO, fKeepAspectRatio);
 }
 
 
@@ -1439,6 +1433,14 @@ MainWin::_MarkPlaylistItem(int32 index)
 			fPlaylistMenu->UnlockLooper();
 		}
 	}
+}
+
+
+void
+MainWin::_MarkSettingsItem(uint32 command, bool mark)
+{
+	if (BMenuItem* item = fSettingsMenu->FindItem(command))
+		item->SetMarked(mark);
 }
 
 

@@ -91,6 +91,7 @@ private:
 									int32 index);
 			void				_RemovePlaylistItem(int32 index);
 			void				_MarkPlaylistItem(int32 index);
+			void				_MarkSettingsItem(uint32 command, bool mark);
 		
 			BMenuBar*			fMenuBar;
 			BView*				fBackground;

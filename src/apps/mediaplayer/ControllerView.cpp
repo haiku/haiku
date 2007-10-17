@@ -145,7 +145,7 @@ ControllerView::VolumeChanged(float value)
 void
 ControllerView::ToggleMute()
 {
-	printf("ControllerView::ToggleMute()\n");
+	fController->ToggleMute();
 }
 
 

@@ -90,6 +90,16 @@ VolumeSlider::SetValue(int32 value)
 	Invoke();
 }
 
+// SetValueNoInvoke
+void
+VolumeSlider::SetValueNoInvoke(int32 value)
+{
+	if (value == Value())
+		return;
+
+	BControl::SetValue(value);
+}
+
 // SetEnabled
 void
 VolumeSlider::SetEnabled(bool enable)

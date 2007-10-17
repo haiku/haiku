@@ -137,3 +137,16 @@ ControllerObserver::VolumeChanged(float volume)
 }
 
 
+void
+ControllerObserver::MutedChanged(bool muted)
+{
+	if (!(fObserveFlags & OBSERVE_VOLUME_CHANGES))
+		return;
+
+	BMessage message(MSG_CONTROLLER_MUTED_CHANGED);
+	message.AddBool("muted", muted);
+
+	DeliverMessage(message);
+}
+
+
