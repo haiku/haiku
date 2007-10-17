@@ -404,13 +404,11 @@ AccelerantHWInterface::Shutdown()
 	Basically we try to set all modes as found in the mode list the driver
 	returned, but we start with the one that best fits the originally
 	desired mode.
+	The mode list must have been retrieved already.
 */
 status_t
 AccelerantHWInterface::_SetFallbackMode(display_mode& newMode) const
 {
-	if (fModeList == NULL)
-		return B_ERROR;
-
 	// At first, we search the closest display mode from the list of
 	// supported modes - if that fails, we just take one
 
@@ -484,6 +482,12 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 		ATRACE(("setting display mode failed\n"));
 		if (!fInitialModeSwitch)
 			return status;
+
+		if (fModeList == NULL) {
+			status = _UpdateModeList();
+			if (status < B_OK)
+				return status;
+		}
 
 		// If this is the initial mode switch, we try a number of fallback
 		// modes first, before we have to fail
@@ -609,7 +613,7 @@ AccelerantHWInterface::_UpdateModeList()
 		ATRACE(("unable to get mode list\n"));
 		return B_ERROR;
 	}
-	
+
 	return B_OK;
 }
 
@@ -650,37 +654,41 @@ AccelerantHWInterface::GetFrameBufferConfig(frame_buffer_config& config)
 
 
 status_t
-AccelerantHWInterface::GetModeList(display_mode** modes, uint32 *count)
+AccelerantHWInterface::GetModeList(display_mode** _modes, uint32 *_count)
 {
 	AutoReadLocker _(this);
 
-	if (!count || !modes)
+	if (_count == NULL || _modes == NULL)
 		return B_BAD_VALUE;
 
-	status_t ret = fModeList ? B_OK : _UpdateModeList();	
+	status_t status = B_OK;
 
-	if (ret >= B_OK) {
-		*modes = new(nothrow) display_mode[fModeCount];
-		if (*modes) {
-			*count = fModeCount;
-			memcpy(*modes, fModeList, sizeof(display_mode) * fModeCount);
+	if (fModeList == NULL)
+		status = _UpdateModeList();
+
+	if (status >= B_OK) {
+		*_modes = new(nothrow) display_mode[fModeCount];
+		if (*_modes) {
+			*_count = fModeCount;
+			memcpy(*_modes, fModeList, sizeof(display_mode) * fModeCount);
 		} else {
-			*count = 0;
-			ret = B_NO_MEMORY;
+			*_count = 0;
+			status = B_NO_MEMORY;
 		}
 	}
-	return ret;
+	return status;
 }
 
 
 status_t
-AccelerantHWInterface::GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high)
+AccelerantHWInterface::GetPixelClockLimits(display_mode *mode, uint32 *low,
+	uint32 *high)
 {
 	AutoReadLocker _(this);
 
 	if (!mode || !low || !high)
 		return B_BAD_VALUE;
-	
+
 	return fAccGetPixelClockLimits(mode, low, high);
 }
 
@@ -692,10 +700,10 @@ AccelerantHWInterface::GetTimingConstraints(display_timing_constraints *dtc)
 
 	if (!dtc)
 		return B_BAD_VALUE;
-	
+
 	if (fAccGetTimingConstraints)
 		return fAccGetTimingConstraints(dtc);
-	
+
 	return B_UNSUPPORTED;
 }
 
@@ -740,14 +748,15 @@ AccelerantHWInterface::GetPreferredMode(display_mode* mode)
 		if (version != EDID_VERSION_1)
 			return B_NOT_SUPPORTED;
 
-		status = B_ERROR;
+		if (fModeList == NULL)
+			_UpdateModeList();
 
 		// find preferred mode from EDID info
 		for (uint32 i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; ++i) {
 			if (info.detailed_monitor[i].monitor_desc_type != EDID1_IS_DETAILED_TIMING)
 				continue;
 
-			// TODO: we could also just look for this mode in the most list
+			// TODO: we could also just look for this mode in the mode list
 			// TODO: handle sync and flags correctly!
 			const edid1_detailed_timing& timing = info.detailed_monitor[i].data.detailed_timing;
 			mode->timing.pixel_clock = timing.pixel_clock * 10;
@@ -1235,9 +1244,6 @@ AccelerantHWInterface::MoveCursorTo(const float& x, const float& y)
 RenderingBuffer *
 AccelerantHWInterface::FrontBuffer() const
 {
-	if (!fModeList)
-		return NULL;
-	
 	return fFrontBuffer;
 }
 
@@ -1245,9 +1251,6 @@ AccelerantHWInterface::FrontBuffer() const
 RenderingBuffer *
 AccelerantHWInterface::BackBuffer() const
 {
-	if (!fModeList)
-		return NULL;
-	
 	return fBackBuffer;
 }
 
