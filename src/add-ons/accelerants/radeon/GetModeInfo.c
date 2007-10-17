@@ -86,7 +86,8 @@ radeon_get_preferred_display_mode(display_mode* mode)
 		if (ai->mode_list[i].timing.h_display == fpInfo->panel_xres
 			&& ai->mode_list[i].timing.v_display == fpInfo->panel_yres
 			&& ai->mode_list[i].virtual_width == fpInfo->panel_xres
-			&& ai->mode_list[i].virtual_height == fpInfo->panel_yres) {
+			&& ai->mode_list[i].virtual_height == fpInfo->panel_yres
+			&& ai->mode_list[i].space == B_RGB32_LITTLE) {
 			memcpy(mode, &ai->mode_list[i], sizeof(display_mode));
 			return B_OK;
 		}
