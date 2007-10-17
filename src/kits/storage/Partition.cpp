@@ -1059,6 +1059,42 @@ BPartition::SetContentParameters(const char* parameters)
 }
 
 
+// GetNextSupportedType
+status_t
+BPartition::GetNextSupportedType(int32 *cookie, BString* type) const
+{
+	BPartition* parent = Parent();
+	if (!parent || !fDelegate)
+		return false;
+
+	return parent->fDelegate->GetNextSupportedChildType(fDelegate, cookie,
+		type);
+}
+
+
+// GetNextSupportedChildType
+status_t
+BPartition::GetNextSupportedChildType(int32 *cookie, BString* type) const
+{
+	if (!fDelegate)
+		return B_BAD_VALUE;
+
+	return fDelegate->GetNextSupportedChildType(NULL, cookie, type);
+}
+
+
+// IsSubSystem
+bool
+BPartition::BPartition::IsSubSystem(const char* diskSystem) const
+{
+	BPartition* parent = Parent();
+	if (!parent || !fDelegate)
+		return false;
+
+	return parent->fDelegate->IsSubSystem(fDelegate, diskSystem);
+}
+
+
 // CanInitialize
 bool
 BPartition::CanInitialize(const char* diskSystem) const

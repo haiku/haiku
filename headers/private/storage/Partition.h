@@ -128,6 +128,18 @@ public:
 									BDiskDeviceParameterEditor** editor);
 			status_t			SetContentParameters(const char* parameters);
 
+			status_t			GetNextSupportedType(int32 *cookie,
+									BString* type) const;
+									// Returns all partition types for this
+									// partition supported by the parent disk
+									// system.
+			status_t			GetNextSupportedChildType(int32 *cookie,
+									BString* type) const;
+									// Returns all partition types for a child
+									// of this partition supported by its disk
+									// system.
+			bool				IsSubSystem(const char* diskSystem) const;
+
 			bool				CanInitialize(const char* diskSystem) const;
 			status_t			GetInitializationParameterEditor(
 									const char* system,       

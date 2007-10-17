@@ -353,6 +353,38 @@ BPartition::Delegate::SetParameters(Delegate* child, const char* parameters)
 }
 
 
+// GetNextSupportedChildType
+status_t
+BPartition::Delegate::GetNextSupportedChildType(Delegate* child, int32 *cookie,
+	BString* type) const
+{
+	if (!fPartitionHandle)
+		return B_NO_INIT;
+
+	return fPartitionHandle->GetNextSupportedType(
+		child ? &child->fMutablePartition : NULL, cookie, type);
+}
+
+
+// IsSubSystem
+bool
+BPartition::Delegate::IsSubSystem(Delegate* child, const char* diskSystem) const
+{
+	// get the disk system add-on
+	DiskSystemAddOnManager* manager = DiskSystemAddOnManager::Default();
+	BDiskSystemAddOn* addOn = manager->GetAddOn(diskSystem);
+	if (!addOn)
+		return false;
+
+	bool result = addOn->IsSubSystemFor(&child->fMutablePartition);
+
+	// put the add-on
+	manager->PutAddOn(addOn);
+
+	return result;
+}
+
+
 // CanInitialize
 bool
 BPartition::Delegate::CanInitialize(const char* diskSystem) const

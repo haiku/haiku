@@ -76,6 +76,22 @@ BDiskSystemAddOn::Initialize(BMutablePartition* partition, const char* name,
 }
 
 
+// GetTypeForContentType
+status_t
+BDiskSystemAddOn::GetTypeForContentType(const char* contentType, BString* type)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+// IsSubSystemFor
+bool
+BDiskSystemAddOn::IsSubSystemFor(const BMutablePartition* child)
+{
+	return false;
+}
+
+
 // #pragma mark - BPartitionHandle
 
 
@@ -126,28 +142,12 @@ BPartitionHandle::SupportsInitializingChild(const BMutablePartition* child,
 }
 
 
-// IsSubSystemFor
-bool
-BPartitionHandle::IsSubSystemFor(const BMutablePartition* child)
-{
-	return false;
-}
-
-
 // GetNextSupportedType
 status_t
 BPartitionHandle::GetNextSupportedType(const BMutablePartition* child,
 	int32* cookie, BString* type)
 {
 	return B_ENTRY_NOT_FOUND;
-}
-
-
-// GetTypeForContentType
-status_t
-BPartitionHandle::GetTypeForContentType(const char* contentType, BString* type)
-{
-	return B_NOT_SUPPORTED;
 }
 
 

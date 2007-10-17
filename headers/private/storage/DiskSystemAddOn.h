@@ -41,6 +41,10 @@ public:
 									const char* name, const char* parameters,
 									BPartitionHandle** handle);
 
+	virtual	status_t			GetTypeForContentType(const char* contentType,
+									BString* type);
+	virtual	bool				IsSubSystemFor(const BMutablePartition* child);
+
 private:
 			BString				fName;
 			uint32				fFlags;
@@ -62,14 +66,11 @@ public:
 	virtual	bool				SupportsInitializingChild(
 									const BMutablePartition* child,
 									const char* diskSystem);
-	virtual	bool				IsSubSystemFor(const BMutablePartition* child);
 
 	virtual	status_t			GetNextSupportedType(
 									const BMutablePartition* child,
 									int32* cookie, BString* type);
 									// child can be NULL
-	virtual	status_t			GetTypeForContentType(const char* contentType,
-									BString* type);
 
 	virtual	status_t			GetPartitioningInfo(BPartitioningInfo* info);
 

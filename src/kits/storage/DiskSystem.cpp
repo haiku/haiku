@@ -4,10 +4,14 @@
  */
 
 #include <DiskSystem.h>
+
+#include <DiskSystemAddOn.h>
 #include <Partition.h>
 
-#include <syscalls.h>
 #include <disk_device_manager/ddm_userland_interface.h>
+#include <syscalls.h>
+
+#include "DiskSystemAddOnManager.h"
 
 
 // constructor
@@ -277,37 +281,28 @@ BDiskSystem::SupportsInitializing() const
 }
 
 
-// GetNextSupportedType
-status_t
-BDiskSystem::GetNextSupportedType(BPartition* partition, int32* cookie,
-	char* type) const
-{
-// TODO: We probably need a second method for and modify the partitioning
-// system module hook a little. This method takes the parent partition of
-// a partition to be created for which we want to get supported types. It
-// should also be possible to invoke it for the partition whose type to change
-// though.
-	if (InitCheck() != B_OK)
-		return InitCheck();
-	if (!cookie || !type || !partition || !partition->_IsShadow()
-		|| partition->_DiskSystem() != fID || !IsPartitioningSystem()) {
-		return B_BAD_VALUE;
-	}
-
-	return _kern_get_next_supported_partition_type(partition->_ShadowID(),
-		partition->_ChangeCounter(), cookie, type);
-}
-
-
 // GetTypeForContentType
 status_t
-BDiskSystem::GetTypeForContentType(const char* contentType, char* type) const
+BDiskSystem::GetTypeForContentType(const char* contentType, BString* type) const
 {
 	if (InitCheck() != B_OK)
 		return InitCheck();
+
 	if (!contentType || !type || !IsPartitioningSystem())
 		return B_BAD_VALUE;
-	return _kern_get_partition_type_for_content_type(fID, contentType, type);
+
+	// get the disk system add-on
+	DiskSystemAddOnManager* manager = DiskSystemAddOnManager::Default();
+	BDiskSystemAddOn* addOn = manager->GetAddOn(fName.String());
+	if (!addOn)
+		return B_ENTRY_NOT_FOUND;
+
+	status_t result = addOn->GetTypeForContentType(contentType, type);
+
+	// put the add-on
+	manager->PutAddOn(addOn);
+
+	return result;
 }
 
 
@@ -324,17 +319,6 @@ bool
 BDiskSystem::IsFileSystem() const
 {
 	return (InitCheck() == B_OK && (fFlags & B_DISK_SYSTEM_IS_FILE_SYSTEM));
-}
-
-
-// IsSubSystemFor
-bool
-BDiskSystem::IsSubSystemFor(BPartition* parent) const
-{
-	return (InitCheck() == B_OK
-		&& parent && parent->_IsShadow()
-		&& _kern_is_sub_disk_system_for(fID, parent->_ShadowID(),
-			parent->_ChangeCounter()));
 }
 
 
@@ -371,7 +355,7 @@ BDiskSystem::_SetTo(disk_system_id id)
 
 // _SetTo
 status_t
-BDiskSystem::_SetTo(user_disk_system_info* info)
+BDiskSystem::_SetTo(const user_disk_system_info* info)
 {
 	_Unset();
 

@@ -72,6 +72,11 @@ public:
 			status_t			SetParameters(Delegate* child,
 									const char* parameters);
 
+			status_t			GetNextSupportedChildType(Delegate* child,
+									int32 *cookie, BString* type) const;
+			bool				IsSubSystem(Delegate* child,
+									const char* diskSystem) const;
+
 			bool				CanInitialize(const char* diskSystem) const;
 			status_t			GetInitializationParameterEditor(
 									const char* system,

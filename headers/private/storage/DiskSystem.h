@@ -9,8 +9,11 @@
 #include <DiskDeviceDefs.h>
 #include <String.h>
 
+
 class BPartition;
+class BString;
 struct user_disk_system_info;
+
 
 class BDiskSystem {
 public:
@@ -40,21 +43,17 @@ public:
 	bool SupportsDeletingChild() const;
 	bool SupportsInitializing() const;
 
-	status_t GetNextSupportedType(BPartition *partition, int32 *cookie,
-								  char *type) const;
-		// Returns all types the disk system supports for children of the
-		// supplied partition.
-	status_t GetTypeForContentType(const char *contentType, char *type) const;
+	status_t GetTypeForContentType(const char *contentType,
+		BString* type) const;
 
 	bool IsPartitioningSystem() const;
 	bool IsFileSystem() const;
-	bool IsSubSystemFor(BPartition *parent) const;
 
 	BDiskSystem& operator=(const BDiskSystem& other);
 
 private:
 	status_t _SetTo(disk_system_id id);
-	status_t _SetTo(user_disk_system_info *info);
+	status_t _SetTo(const user_disk_system_info *info);
 	void _Unset();
 
 	friend class BDiskDeviceRoster;
