@@ -1,5 +1,6 @@
 /*
- * Copyright 2003-2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2003-2007, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2003, Tyler Akidau, haiku@akidau.net.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PARTITION_H

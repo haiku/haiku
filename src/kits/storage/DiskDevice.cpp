@@ -1,7 +1,7 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2003-2007, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include <DiskDevice.h>
 
@@ -28,6 +28,7 @@
 	\brief A BDiskDevice object represents a storage device.
 */
 
+
 // constructor
 /*!	\brief Creates an uninitialized BDiskDevice object.
 */
@@ -35,6 +36,7 @@ BDiskDevice::BDiskDevice()
 	: fDeviceData(NULL)
 {
 }
+
 
 // destructor
 /*!	\brief Frees all resources associated with this object.
@@ -44,6 +46,7 @@ BDiskDevice::~BDiskDevice()
 	CancelModifications();
 }
 
+
 // HasMedia
 /*!	\brief Returns whether the device contains a media.
 	\return \c true, if the device contains a media, \c false otherwise.
@@ -52,8 +55,9 @@ bool
 BDiskDevice::HasMedia() const
 {
 	return (fDeviceData
-			&& fDeviceData->device_flags & B_DISK_DEVICE_HAS_MEDIA);
+		&& fDeviceData->device_flags & B_DISK_DEVICE_HAS_MEDIA);
 }
+
 
 // IsRemovableMedia
 /*!	\brief Returns whether the device media are removable.
@@ -63,24 +67,27 @@ bool
 BDiskDevice::IsRemovableMedia() const
 {
 	return (fDeviceData
-			&& fDeviceData->device_flags & B_DISK_DEVICE_REMOVABLE);
+		&& fDeviceData->device_flags & B_DISK_DEVICE_REMOVABLE);
 }
+
 
 // IsReadOnlyMedia
 bool
 BDiskDevice::IsReadOnlyMedia() const
 {
 	return (fDeviceData
-			&& fDeviceData->device_flags & B_DISK_DEVICE_READ_ONLY);
+		&& fDeviceData->device_flags & B_DISK_DEVICE_READ_ONLY);
 }
+
 
 // IsWriteOnceMedia
 bool
 BDiskDevice::IsWriteOnceMedia() const
 {
 	return (fDeviceData
-			&& fDeviceData->device_flags & B_DISK_DEVICE_WRITE_ONCE);
+		&& fDeviceData->device_flags & B_DISK_DEVICE_WRITE_ONCE);
 }
+
 
 // Eject
 /*!	\brief Eject the device's media.
@@ -99,7 +106,7 @@ status_t
 BDiskDevice::Eject(bool update)
 {
 /*	// get path
-	const char *path = Path();
+	const char* path = Path();
 	status_t error = (path ? B_OK : B_NO_INIT);
 	// check whether the device media is removable
 	if (error == B_OK && !IsRemovable())
@@ -120,12 +127,14 @@ BDiskDevice::Eject(bool update)
 	return B_ERROR;
 }
 
+
 // SetTo
 status_t
 BDiskDevice::SetTo(partition_id id)
 {
 	return _SetTo(id, true, false, 0);
 }
+
 
 // Update
 /*!	\brief Updates the object to reflect the latest changes to the device.
@@ -141,10 +150,11 @@ BDiskDevice::SetTo(partition_id id)
 	\return \c B_OK, if the update went fine, another error code otherwise.
 */
 status_t
-BDiskDevice::Update(bool *updated)
+BDiskDevice::Update(bool* updated)
 {
 	return _Update(_IsShadow(), updated);
 }
+
 
 // Unset
 void
@@ -155,6 +165,7 @@ BDiskDevice::Unset()
 	fDeviceData = NULL;
 }
 
+
 // InitCheck
 status_t
 BDiskDevice::InitCheck() const
@@ -162,22 +173,25 @@ BDiskDevice::InitCheck() const
 	return (fDeviceData ? B_OK : B_NO_INIT);
 }
 
+
 // GetPath
 status_t
-BDiskDevice::GetPath(BPath *path) const
+BDiskDevice::GetPath(BPath* path) const
 {
 	if (!path || !fDeviceData)
 		return B_BAD_VALUE;
 	return path->SetTo(fDeviceData->path);
 }
 
+
 // IsModified
 bool
 BDiskDevice::IsModified() const
 {
 	return (InitCheck() == B_OK && _IsShadow()
-			&& _kern_is_disk_device_modified(ID()));
+		&& _kern_is_disk_device_modified(ID()));
 }
+
 
 // PrepareModifications
 /*!	\brief Initializes the partition hierarchy for modifications.
@@ -197,18 +211,22 @@ BDiskDevice::PrepareModifications()
 		return error;
 	if (_IsShadow())
 		return B_ERROR;
+
 	// ask kernel to prepare for modifications
 	error = _kern_prepare_disk_device_modifications(ID());
 	if (error != B_OK)
 		return error;
+
 	// update
 	error = _Update(true, NULL);
 	if (error != B_OK) {
 		// bad -- cancelling the modifications is all we can do
 		_kern_cancel_disk_device_modifications(ID());
 	}
+
 	return error;
 }
+
 
 // CommitModifications
 /*!	\brief Commits modifications to device.
@@ -219,14 +237,14 @@ BDiskDevice::PrepareModifications()
  */
 status_t
 BDiskDevice::CommitModifications(bool synchronously,
-								 BMessenger progressMessenger,
-								 bool receiveCompleteProgressUpdates)
+	BMessenger progressMessenger, bool receiveCompleteProgressUpdates)
 {
 	status_t error = InitCheck();
 	if (error != B_OK)
 		return error;
 	if (!_IsShadow())
 		return B_BAD_VALUE;
+
 	// TODO: Get port and token from the progressMessenger
 	// TODO: Respect "synchronously"!
 	port_id port = -1;
@@ -235,8 +253,10 @@ BDiskDevice::CommitModifications(bool synchronously,
 		receiveCompleteProgressUpdates);
 	if (error == B_OK)
 		error = _SetTo(ID(), true, false, 0);
+
 	return error;
 }
+
 
 // CancelModifications
 /*!	\brief Cancels all modifications performed on the device.
@@ -251,35 +271,40 @@ BDiskDevice::CancelModifications()
 		return error;
 	if (!_IsShadow())
 		return B_BAD_VALUE;
+
 	error = _kern_cancel_disk_device_modifications(ID());
 	if (error == B_OK)
 		error = _SetTo(ID(), true, false, 0);
+
 	return error;
 }
+
 
 // copy constructor
 /*!	\brief Privatized copy constructor to avoid usage.
 */
-BDiskDevice::BDiskDevice(const BDiskDevice &)
+BDiskDevice::BDiskDevice(const BDiskDevice&)
 {
 }
+
 
 // =
 /*!	\brief Privatized assignment operator to avoid usage.
 */
-BDiskDevice &
-BDiskDevice::operator=(const BDiskDevice &)
+BDiskDevice&
+BDiskDevice::operator=(const BDiskDevice&)
 {
 	return *this;
 }
 
+
 // _GetData
 status_t
 BDiskDevice::_GetData(partition_id id, bool deviceOnly, bool shadow,
-					  size_t neededSize, user_disk_device_data **data)
+	size_t neededSize, user_disk_device_data** data)
 {
 	// get the device data
-	void *buffer = NULL;
+	void* buffer = NULL;
 	size_t bufferSize = 0;
 	if (neededSize > 0) {
 		// allocate initial buffer
@@ -288,6 +313,7 @@ BDiskDevice::_GetData(partition_id id, bool deviceOnly, bool shadow,
 			return B_NO_MEMORY;
 		bufferSize = neededSize;
 	}
+
 	status_t error = B_OK;
 	do {
 		error = _kern_get_disk_device_data(id, deviceOnly, shadow,
@@ -297,20 +323,25 @@ BDiskDevice::_GetData(partition_id id, bool deviceOnly, bool shadow,
 			// buffer to small re-allocate it
 			if (buffer)
 				free(buffer);
+
 			buffer = malloc(neededSize);
+
 			if (buffer)
 				bufferSize = neededSize;
 			else
 				error = B_NO_MEMORY;
 		}
 	} while (error == B_BUFFER_OVERFLOW);
+
 	// set result / cleanup on error
 	if (error == B_OK)
 		*data = (user_disk_device_data*)buffer;
 	else if (buffer)
 		free(buffer);
+
 	return error;
 }
+
 
 // _SetTo
 status_t
@@ -318,58 +349,73 @@ BDiskDevice::_SetTo(partition_id id, bool deviceOnly, bool shadow,
 					size_t neededSize)
 {
 	Unset();
+
 	// get the device data
-	user_disk_device_data *data = NULL;
+	user_disk_device_data* data = NULL;
 	status_t error = _GetData(id, deviceOnly, shadow, neededSize, &data);
+
 	// set the data
 	if (error == B_OK)
 		error = _SetTo(data);
+
 	// cleanup on error
 	if (error != B_OK && data)
 		free(data);
+
 	return error;
 }
 
+
 // _SetTo
 status_t
-BDiskDevice::_SetTo(user_disk_device_data *data)
+BDiskDevice::_SetTo(user_disk_device_data* data)
 {
 	Unset();
+
 	if (!data)
 		return B_BAD_VALUE;
+
 	fDeviceData = data;
+
 	status_t error = BPartition::_SetTo(this, NULL,
-										&fDeviceData->device_partition_data);
+		&fDeviceData->device_partition_data);
 	if (error != B_OK) {
 		// If _SetTo() fails, the caller retains ownership of the supplied
 		// data. So, unset fDeviceData before calling Unset().
 		fDeviceData = NULL;
 		Unset();
 	}
+
 	return error;
 }
 
+
 // _Update
 status_t
-BDiskDevice::_Update(bool shadow, bool *updated)
+BDiskDevice::_Update(bool shadow, bool* updated)
 {
 	if (InitCheck() != B_OK)
 		return InitCheck();
+
 	// get the device data
-	user_disk_device_data *data = NULL;
+	user_disk_device_data* data = NULL;
 	status_t error = _GetData(ID(), true, shadow, 0, &data);
+
 	// set the data
 	if (error == B_OK)
 		error = _Update(data, updated);
+
 	// cleanup on error
 	if (error != B_OK && data)
 		free(data);
+
 	return error;
 }
 
+
 // _Update
 status_t
-BDiskDevice::_Update(user_disk_device_data *data, bool *updated)
+BDiskDevice::_Update(user_disk_device_data* data, bool* updated)
 {
 	if (!data || !fDeviceData || ID() != data->device_partition_data.id)
 		return B_BAD_VALUE;
@@ -390,7 +436,7 @@ BDiskDevice::_Update(user_disk_device_data *data, bool *updated)
 	// update existing partitions and add new ones
 	error = BPartition::_Update(&data->device_partition_data, updated);
 	if (error == B_OK) {
-		user_disk_device_data *oldData = fDeviceData;
+		user_disk_device_data* oldData = fDeviceData;
 		fDeviceData = data;
 		// check for changes
 		if (data->device_flags != oldData->device_flags
@@ -399,12 +445,14 @@ BDiskDevice::_Update(user_disk_device_data *data, bool *updated)
 		}
 		free(oldData);
 	}
+
 	return error;
 }
 
+
 // _AcceptVisitor
 bool
-BDiskDevice::_AcceptVisitor(BDiskDeviceVisitor *visitor, int32 level)
+BDiskDevice::_AcceptVisitor(BDiskDeviceVisitor* visitor, int32 level)
 {
 	return visitor->Visit(this);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2003-2007, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
