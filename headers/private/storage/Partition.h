@@ -76,9 +76,10 @@ public:
 			status_t			GetPartitioningInfo(
 									BPartitioningInfo* info) const;
 	
-			BPartition*			VisitEachChild(BDiskDeviceVisitor* visitor);
+			BPartition*			VisitEachChild(BDiskDeviceVisitor* visitor)
+									const;
 	virtual BPartition*			VisitEachDescendant(
-									BDiskDeviceVisitor* visitor);
+									BDiskDeviceVisitor* visitor) const;
 
 	// Self Modification
 
@@ -204,6 +205,11 @@ private:
 									bool* whileMounted) const;
 			bool				_SupportsChildOperation(const BPartition* child,
 									uint32 flag) const;
+
+			status_t			_CreateDelegates();
+			status_t			_InitDelegates();
+			void				_DeleteDelegates();
+			bool				_IsModified() const;
 
 			friend class BDiskDevice;
 			friend class BDiskSystem;

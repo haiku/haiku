@@ -641,7 +641,7 @@ BPartition::GetPartitioningInfo(BPartitioningInfo* info) const
 
 // VisitEachChild
 BPartition*
-BPartition::VisitEachChild(BDiskDeviceVisitor* visitor)
+BPartition::VisitEachChild(BDiskDeviceVisitor* visitor) const
 {
 	if (visitor) {
 		int32 level = _Level();
@@ -656,10 +656,10 @@ BPartition::VisitEachChild(BDiskDeviceVisitor* visitor)
 
 // VisitEachDescendant
 BPartition*
-BPartition::VisitEachDescendant(BDiskDeviceVisitor* visitor)
+BPartition::VisitEachDescendant(BDiskDeviceVisitor* visitor) const
 {
 	if (visitor)
-		return _VisitEachDescendant(visitor);
+		return const_cast<BPartition*>(this)->_VisitEachDescendant(visitor);
 	return NULL;
 }
 
@@ -1500,3 +1500,85 @@ BPartition::_SupportsChildOperation(const BPartition* child, uint32 flag) const
 	return supported & flag;
 }
 
+
+// _CreateDelegates
+status_t
+BPartition::_CreateDelegates()
+{
+	if (fDelegate || !fPartitionData)
+		return B_BAD_VALUE;
+
+	// create and init delegate
+	fDelegate = new(nothrow) Delegate(this);
+	if (!fDelegate)
+		return B_NO_MEMORY;
+
+	status_t error = fDelegate->InitHierarchy(fPartitionData,
+		fParent ? fParent->fDelegate : NULL);
+	if (error != B_OK)
+		return error;
+
+	// create child delegates
+	int32 count = fPartitionData->child_count;
+	for (int32 i = 0; i < count; i++) {
+		BPartition* child = (BPartition*)fPartitionData->children[i]->user_data;
+		error = child->_CreateDelegates();
+		if (error != B_OK)
+			return error;
+	}
+
+	return B_OK;
+}
+
+
+// _InitDelegates
+status_t
+BPartition::_InitDelegates()
+{
+	// init delegate
+	status_t error = fDelegate->InitAfterHierarchy();
+	if (error != B_OK)
+		return error;
+
+	// recursively init child delegates
+	int32 count = CountChildren();
+	for (int32 i = 0; i < count; i++) {
+		error = ChildAt(i)->_InitDelegates();
+		if (error != B_OK)
+			return error;
+	}
+
+	return B_OK;
+}
+
+
+// _DeleteDelegates
+void
+BPartition::_DeleteDelegates()
+{
+	// recursively delete child delegates
+	int32 count = CountChildren();
+	for (int32 i = count - 1; i >= 0; i--)
+		ChildAt(i)->_DeleteDelegates();
+
+	// delete delegate
+	delete fDelegate;
+	fDelegate = NULL;
+
+	// Commit suicide, if the delegate was our only link to reality (i.e.
+	// there's no physically existing partition we represent).
+	if (fPartitionData == NULL)
+		delete this;
+}
+
+
+// _IsModified
+bool
+BPartition::_IsModified() const
+{
+	if (!fDelegate)
+		return false;
+
+	// TODO: Implement!
+	return false;
+}

@@ -188,8 +188,22 @@ BDiskDevice::GetPath(BPath* path) const
 bool
 BDiskDevice::IsModified() const
 {
-	return (InitCheck() == B_OK && _IsShadow()
-		&& _kern_is_disk_device_modified(ID()));
+	if (InitCheck() != B_OK)
+		return false;
+
+	struct IsModifiedVisitor : public BDiskDeviceVisitor {
+		virtual bool Visit(BDiskDevice *device)
+		{
+			return Visit(device, 0);
+		}
+		
+		virtual bool Visit(BPartition *partition, int32 level)
+		{
+			return partition->_IsModified();
+		}
+	} visitor;
+
+	return (VisitEachDescendant(&visitor) != NULL);
 }
 
 
@@ -209,20 +223,19 @@ BDiskDevice::PrepareModifications()
 	status_t error = InitCheck();
 	if (error != B_OK)
 		return error;
-	if (_IsShadow())
-		return B_ERROR;
+	if (fDelegate)
+		return B_BAD_VALUE;
 
-	// ask kernel to prepare for modifications
-	error = _kern_prepare_disk_device_modifications(ID());
+	// recursively create the delegates
+	error = _CreateDelegates();
+
+	// init them
+	if (error == B_OK)
+		error = _InitDelegates();
+
+	// delete all of them, if something went wrong
 	if (error != B_OK)
-		return error;
-
-	// update
-	error = _Update(true, NULL);
-	if (error != B_OK) {
-		// bad -- cancelling the modifications is all we can do
-		_kern_cancel_disk_device_modifications(ID());
-	}
+		_DeleteDelegates();
 
 	return error;
 }
@@ -242,15 +255,14 @@ BDiskDevice::CommitModifications(bool synchronously,
 	status_t error = InitCheck();
 	if (error != B_OK)
 		return error;
-	if (!_IsShadow())
+
+	if (!fDelegate)
 		return B_BAD_VALUE;
 
-	// TODO: Get port and token from the progressMessenger
-	// TODO: Respect "synchronously"!
-	port_id port = -1;
-	int32 token = -1;
-	error = _kern_commit_disk_device_modifications(ID(), port, token,
-		receiveCompleteProgressUpdates);
+	// TODO: Implement!
+
+	_DeleteDelegates();
+
 	if (error == B_OK)
 		error = _SetTo(ID(), true, false, 0);
 
@@ -269,10 +281,12 @@ BDiskDevice::CancelModifications()
 	status_t error = InitCheck();
 	if (error != B_OK)
 		return error;
-	if (!_IsShadow())
+
+	if (!fDelegate)
 		return B_BAD_VALUE;
 
-	error = _kern_cancel_disk_device_modifications(ID());
+	_DeleteDelegates();
+
 	if (error == B_OK)
 		error = _SetTo(ID(), true, false, 0);
 
@@ -317,8 +331,7 @@ BDiskDevice::_GetData(partition_id id, bool deviceOnly, bool shadow,
 	status_t error = B_OK;
 	do {
 		error = _kern_get_disk_device_data(id, deviceOnly, shadow,
-										   (user_disk_device_data*)buffer,
-										   bufferSize, &neededSize);
+			(user_disk_device_data*)buffer, bufferSize, &neededSize);
 		if (error == B_BUFFER_OVERFLOW) {
 			// buffer to small re-allocate it
 			if (buffer)
@@ -346,7 +359,7 @@ BDiskDevice::_GetData(partition_id id, bool deviceOnly, bool shadow,
 // _SetTo
 status_t
 BDiskDevice::_SetTo(partition_id id, bool deviceOnly, bool shadow,
-					size_t neededSize)
+	size_t neededSize)
 {
 	Unset();
 
