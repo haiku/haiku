@@ -10,6 +10,11 @@
 #include "DiskSystemAddOnManager.h"
 
 
+#undef TRACE
+//#define TRACE(format...)
+#define TRACE(format...)	printf(format)
+
+
 // constructor
 BPartition::Delegate::Delegate(BPartition* partition)
 	: fPartition(partition),
@@ -63,12 +68,18 @@ BPartition::Delegate::InitAfterHierarchy()
 	DiskSystemAddOnManager* manager = DiskSystemAddOnManager::Default();
 	BDiskSystemAddOn* addOn = manager->GetAddOn(
 		fMutablePartition.ContentType());
-	if (!addOn)
+	if (!addOn) {
+		TRACE("BPartition::Delegate::InitAfterHierarchy(): add-on for disk "
+			"system \"%s\" not found\n", fMutablePartition.ContentType());
 		return B_ENTRY_NOT_FOUND;
+	}
 
 	BPartitionHandle* handle;
 	status_t error = addOn->CreatePartitionHandle(&fMutablePartition, &handle);
 	if (error != B_OK) {
+		TRACE("BPartition::Delegate::InitAfterHierarchy(): Failed to create "
+			"partition handle for partition %ld, disk system: \"%s\": %s\n",
+			Partition()->ID(), addOn->Name(), strerror(error));
 		manager->PutAddOn(addOn);
 		return error;
 	}

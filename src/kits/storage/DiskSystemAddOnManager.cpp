@@ -10,6 +10,8 @@
 #include <set>
 #include <string>
 
+#include <stdio.h>
+
 #include <Directory.h>
 #include <Entry.h>
 #include <image.h>
@@ -20,6 +22,11 @@
 #include <AutoLocker.h>
 
 #include <DiskSystemAddOn.h>
+
+
+#undef TRACE
+//#define TRACE(format...)
+#define TRACE(format...)	printf(format)
 
 
 using std::nothrow;
@@ -267,6 +274,8 @@ DiskSystemAddOnManager::_LoadAddOns(StringSet& alreadyLoaded,
 	if (error != B_OK)
 		return error;
 
+	TRACE("DiskSystemAddOnManager::_LoadAddOns(): %s\n", path.Path());
+
 	error = path.Append("disk_systems");
 	if (error != B_OK)
 		return error;
@@ -283,8 +292,10 @@ DiskSystemAddOnManager::_LoadAddOns(StringSet& alreadyLoaded,
 	entry_ref ref;
 	while (directory.GetNextRef(&ref) == B_OK) {
 		// skip, if already loaded
-		if (alreadyLoaded.find(ref.name) != alreadyLoaded.end())
+		if (alreadyLoaded.find(ref.name) != alreadyLoaded.end()) {
+			TRACE("  skipping \"%s\" -- already loaded\n", ref.name);
 			continue;
+		}
 
 		// get the entry path
 		BPath entryPath;
@@ -292,13 +303,16 @@ DiskSystemAddOnManager::_LoadAddOns(StringSet& alreadyLoaded,
 		if (error != B_OK) {
 			if (error == B_NO_MEMORY)
 				return error;
+			TRACE("  skipping \"%s\" -- failed to get path\n", ref.name);
 			continue;
 		}
 
 		// load the add-on
 		image_id image = load_add_on(entryPath.Path());
-		if (image < 0)
+		if (image < 0) {
+			TRACE("  skipping \"%s\" -- failed to load add-on\n", ref.name);
 			continue;
+		}
 
 		AddOnImage* addOnImage = new(nothrow) AddOnImage(image);
 		if (!addOnImage) {
@@ -311,13 +325,17 @@ DiskSystemAddOnManager::_LoadAddOns(StringSet& alreadyLoaded,
 		status_t (*getAddOns)(BList*);
 		error = get_image_symbol(image, "get_disk_system_add_ons",
 			B_SYMBOL_TYPE_TEXT, (void**)&getAddOns);
-		if (error != B_OK)
+		if (error != B_OK) {
+			TRACE("  skipping \"%s\" -- function symbol not found\n", ref.name);
 			continue;
+		}
 
 		BList addOns;
 		error = getAddOns(&addOns);
-		if (error != B_OK || addOns.IsEmpty())
+		if (error != B_OK || addOns.IsEmpty()) {
+			TRACE("  skipping \"%s\" -- getting add-ons failed\n", ref.name);
 			continue;
+		}
 
 		// create and add AddOn objects
 		int32 count = addOns.CountItems();
@@ -336,6 +354,9 @@ DiskSystemAddOnManager::_LoadAddOns(StringSet& alreadyLoaded,
 				return B_NO_MEMORY;
 			}
 		}
+
+		TRACE("  got %ld BDiskSystemAddOn(s) from add-on \"%s\"\n", count,
+			ref.name);
 
 		// add the add-on name to the set of already loaded add-ons
 		try {
