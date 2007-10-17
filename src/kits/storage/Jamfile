@@ -71,7 +71,6 @@ MergeObject <libbe>storage_kit.o :
 
 	# disk device API
 	DiskDevice.cpp
-	DiskDeviceJob.cpp
 	DiskDeviceList.cpp
 	DiskDevicePrivate.cpp
 	DiskDeviceRoster.cpp

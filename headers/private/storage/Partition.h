@@ -187,8 +187,6 @@ private:
 									bool* updated);
 			void				_RemoveChild(int32 index);
 
-			bool				_IsShadow() const;
-
 			int32				_CountDescendants() const;
 			int32				_Level() const;
 			virtual	bool		_AcceptVisitor(BDiskDeviceVisitor* visitor,

@@ -1397,14 +1397,6 @@ BPartition::_RemoveChild(int32 index)
 }
 
 
-// _IsShadow
-bool
-BPartition::_IsShadow() const
-{
-	return (fPartitionData && fPartitionData->shadow_id >= 0);
-}
-
-
 // _CountDescendants
 int32
 BPartition::_CountDescendants() const

@@ -134,7 +134,7 @@ BDiskDevice::Eject(bool update)
 status_t
 BDiskDevice::SetTo(partition_id id)
 {
-	return _SetTo(id, true, false, 0);
+	return _SetTo(id, true, 0);
 }
 
 
@@ -154,7 +154,22 @@ BDiskDevice::SetTo(partition_id id)
 status_t
 BDiskDevice::Update(bool* updated)
 {
-	return _Update(_IsShadow(), updated);
+	if (InitCheck() != B_OK)
+		return InitCheck();
+
+	// get the device data
+	user_disk_device_data* data = NULL;
+	status_t error = _GetData(ID(), true, 0, &data);
+
+	// set the data
+	if (error == B_OK)
+		error = _Update(data, updated);
+
+	// cleanup on error
+	if (error != B_OK && data)
+		free(data);
+
+	return error;
 }
 
 
@@ -274,7 +289,7 @@ BDiskDevice::CommitModifications(bool synchronously,
 	DiskSystemAddOnManager::Default()->UnloadDiskSystems();
 
 	if (error == B_OK)
-		error = _SetTo(ID(), true, false, 0);
+		error = _SetTo(ID(), true, 0);
 
 	return error;
 }
@@ -299,7 +314,7 @@ BDiskDevice::CancelModifications()
 	DiskSystemAddOnManager::Default()->UnloadDiskSystems();
 
 	if (error == B_OK)
-		error = _SetTo(ID(), true, false, 0);
+		error = _SetTo(ID(), true, 0);
 
 	return error;
 }
@@ -325,8 +340,8 @@ BDiskDevice::operator=(const BDiskDevice&)
 
 // _GetData
 status_t
-BDiskDevice::_GetData(partition_id id, bool deviceOnly, bool shadow,
-	size_t neededSize, user_disk_device_data** data)
+BDiskDevice::_GetData(partition_id id, bool deviceOnly, size_t neededSize,
+	user_disk_device_data** data)
 {
 	// get the device data
 	void* buffer = NULL;
@@ -341,7 +356,7 @@ BDiskDevice::_GetData(partition_id id, bool deviceOnly, bool shadow,
 
 	status_t error = B_OK;
 	do {
-		error = _kern_get_disk_device_data(id, deviceOnly, shadow,
+		error = _kern_get_disk_device_data(id, deviceOnly, false,
 			(user_disk_device_data*)buffer, bufferSize, &neededSize);
 		if (error == B_BUFFER_OVERFLOW) {
 			// buffer to small re-allocate it
@@ -369,14 +384,13 @@ BDiskDevice::_GetData(partition_id id, bool deviceOnly, bool shadow,
 
 // _SetTo
 status_t
-BDiskDevice::_SetTo(partition_id id, bool deviceOnly, bool shadow,
-	size_t neededSize)
+BDiskDevice::_SetTo(partition_id id, bool deviceOnly, size_t neededSize)
 {
 	Unset();
 
 	// get the device data
 	user_disk_device_data* data = NULL;
-	status_t error = _GetData(id, deviceOnly, shadow, neededSize, &data);
+	status_t error = _GetData(id, deviceOnly, neededSize, &data);
 
 	// set the data
 	if (error == B_OK)
@@ -409,29 +423,6 @@ BDiskDevice::_SetTo(user_disk_device_data* data)
 		fDeviceData = NULL;
 		Unset();
 	}
-
-	return error;
-}
-
-
-// _Update
-status_t
-BDiskDevice::_Update(bool shadow, bool* updated)
-{
-	if (InitCheck() != B_OK)
-		return InitCheck();
-
-	// get the device data
-	user_disk_device_data* data = NULL;
-	status_t error = _GetData(ID(), true, shadow, 0, &data);
-
-	// set the data
-	if (error == B_OK)
-		error = _Update(data, updated);
-
-	// cleanup on error
-	if (error != B_OK && data)
-		free(data);
 
 	return error;
 }

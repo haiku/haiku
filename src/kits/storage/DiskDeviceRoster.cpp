@@ -7,7 +7,6 @@
 
 #include <Directory.h>
 #include <DiskDevice.h>
-#include <DiskDeviceJob.h>
 #include <DiskDevicePrivate.h>
 #include <DiskDeviceRoster.h>
 #include <DiskSystem.h>
@@ -86,7 +85,7 @@ BDiskDeviceRoster::GetNextDevice(BDiskDevice *device)
 													&neededSize);
 	if (id < 0)
 		return id;
-	return device->_SetTo(id, true, false, neededSize);
+	return device->_SetTo(id, true, neededSize);
 }
 
 // RewindDevices
@@ -122,26 +121,6 @@ BDiskDeviceRoster::RewindDiskSystems()
 	return B_OK;
 }
 
-// GetNextActiveJob
-status_t
-BDiskDeviceRoster::GetNextActiveJob(BDiskDeviceJob *job)
-{
-	if (!job)
-		return B_BAD_VALUE;
-	user_disk_device_job_info info;
-	status_t error = _kern_get_next_disk_device_job_info(&fJobCookie, &info);
-	if (error == B_OK)
-		error = job->_SetTo(&info);
-	return error;
-}
-
-// RewindActiveJobs
-status_t
-BDiskDeviceRoster::RewindActiveJobs()
-{
-	fJobCookie = 0;
-	return B_OK;
-}
 
 // RegisterFileDevice
 partition_id
@@ -334,7 +313,7 @@ BDiskDeviceRoster::GetDeviceWithID(int32 id, BDiskDevice *device) const
 {
 	if (!device)
 		return B_BAD_VALUE;
-	return device->_SetTo(id, true, false, 0);
+	return device->_SetTo(id, true, 0);
 }
 
 // GetPartitionWithID
@@ -361,7 +340,7 @@ BDiskDeviceRoster::GetPartitionWithID(int32 id, BDiskDevice *device,
 	if (!device || !partition)
 		return B_BAD_VALUE;
 	// download the device data
-	status_t error = device->_SetTo(id, false, false, 0);
+	status_t error = device->_SetTo(id, false, 0);
 	if (error != B_OK)
 		return error;
 	// find the partition object
@@ -383,7 +362,7 @@ BDiskDeviceRoster::GetDeviceForPath(const char *filename, BDiskDevice *device)
 	if (id < 0)
 		return id;
 	// download the device data
-	return device->_SetTo(id, true, false, neededSize);
+	return device->_SetTo(id, true, neededSize);
 }
 
 // GetPartitionForPath
@@ -400,7 +379,7 @@ BDiskDeviceRoster::GetPartitionForPath(const char *filename,
 	if (id < 0)
 		return id;
 	// download the device data
-	status_t error = device->_SetTo(id, false, false, neededSize);
+	status_t error = device->_SetTo(id, false, neededSize);
 	if (error != B_OK)
 		return error;
 	// find the partition object
@@ -454,14 +433,6 @@ BDiskDeviceRoster::StartWatching(BMessenger target, uint32 eventMask)
 	return B_ERROR;
 }
 
-// StartWatchingJob
-status_t
-BDiskDeviceRoster::StartWatchingJob(BDiskDeviceJob *job, BMessenger target,
-									uint32 eventMask)
-{
-	// not implemented
-	return B_ERROR;
-}
 
 // StopWatching
 /*!	\brief Remove a target from the list of targets to be notified on disk

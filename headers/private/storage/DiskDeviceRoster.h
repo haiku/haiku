@@ -14,7 +14,6 @@
 
 class BDirectory;
 class BDiskDevice;
-class BDiskDeviceJob;
 class BDiskDeviceVisiting;
 class BDiskDeviceVisitor;
 class BDiskScannerPartitionAddOn;
@@ -95,10 +94,6 @@ public:
 	status_t GetNextDiskSystem(BDiskSystem *system);
 	status_t RewindDiskSystems();
 
-	// Active jobs are those that are scheduled or in-progress
-	status_t GetNextActiveJob(BDiskDeviceJob *job);
-	status_t RewindActiveJobs();
-
 	partition_id RegisterFileDevice(const char *filename);
 		// publishes: /dev/disk/virtual/files/<disk device ID>/raw
 	status_t UnregisterFileDevice(const char *filename);
@@ -127,9 +122,6 @@ public:
 
 	status_t StartWatching(BMessenger target,
 						   uint32 eventMask = B_DEVICE_REQUEST_ALL);
-	status_t StartWatchingJob(BDiskDeviceJob *job, BMessenger target,
-	                          uint32 eventMask = B_DEVICE_REQUEST_JOB_COMPLETE_PROGRESS);
-		// TODO: Maybe better a BDiskDeviceJob::{Start,Stop}Watching()?
 	status_t StopWatching(BMessenger target);
 
 private:
