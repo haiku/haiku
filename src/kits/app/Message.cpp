@@ -1867,6 +1867,8 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 		size = sizeof(message_header);
 
 #ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+		// TODO: this is not yet finished - the target needs to get the
+		// address (and ID) of the area
 		port_info info;
 		get_port_info(port, &info);
 		void *address = NULL;
