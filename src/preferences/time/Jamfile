@@ -20,6 +20,7 @@ Preference Time :
 	TZDisplay.cpp 
 	ZoneView.cpp 
 	DateTime.cpp 
+	SettingsView.cpp 
 	: be
 	: Time.rdef
 	;

@@ -13,6 +13,7 @@
 #include "DateTimeView.h"
 #include "TimeMessages.h"
 #include "ZoneView.h"
+#include "SettingsView.h"
 
 
 #include <Application.h>
@@ -91,18 +92,23 @@ TTimeWindow::_InitWindow()
 	fDateTimeView = new DateTimeView(bounds);
 	fBaseView->StartWatchingAll(fDateTimeView);
 
-	fTimeZones = new TZoneView(bounds);
-	fBaseView->StartWatchingAll(fTimeZones);
-
-	// add tabs
 	BTab *tab = new BTab();
 	tabview->AddTab(fDateTimeView, tab);
 	tab->SetLabel("Date & Time");
-	
+
+	fTimeZones = new TZoneView(bounds);
+	fBaseView->StartWatchingAll(fTimeZones);
+
 	tab = new BTab();
 	tabview->AddTab(fTimeZones, tab);
 	tab->SetLabel("Time Zone");
-	
+
+	fSettingsView = new SettingsView(bounds);
+
+	tab = new BTab();
+	tabview->AddTab(fSettingsView, tab);
+	tab->SetLabel("Settings");
+
 	fBaseView->AddChild(tabview);
 
 	float width;
