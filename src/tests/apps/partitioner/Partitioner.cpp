@@ -459,20 +459,11 @@ private:
 			return;
 		}
 
-		// get the disk system
-		BDiskSystem diskSystem;
-		status_t error = partition->GetDiskSystem(&diskSystem);
-		if (error != B_OK) {
-			printf("Failed to get disk system for partition: %s\n",
-				strerror(error));
-			return;
-		}
-
 		// get supported types
 		BObjectList<BString> supportedTypes(20, true);
-		char typeBuffer[B_DISK_DEVICE_TYPE_LENGTH];
+		BString typeBuffer;
 		int32 cookie = 0;
-		while (diskSystem.GetNextSupportedType(partition, &cookie, typeBuffer)
+		while (partition->GetNextSupportedChildType(&cookie, &typeBuffer)
 				== B_OK) {
 			supportedTypes.AddItem(new BString(typeBuffer));
 		}
@@ -485,7 +476,7 @@ private:
 
 		// get partitioning info
 		BPartitioningInfo partitioningInfo;
-		error = partition->GetPartitioningInfo(&partitioningInfo);
+		status_t error = partition->GetPartitioningInfo(&partitioningInfo);
 		if (error != B_OK) {
 			printf("Failed to get partitioning info for partition: %s\n",
 				strerror(error));
