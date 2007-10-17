@@ -1,13 +1,14 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2003-2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include <DiskSystem.h>
 #include <Partition.h>
 
 #include <syscalls.h>
 #include <disk_device_manager/ddm_userland_interface.h>
+
 
 // constructor
 BDiskSystem::BDiskSystem()
@@ -18,6 +19,7 @@ BDiskSystem::BDiskSystem()
 {
 }
 
+
 // copy constructor
 BDiskSystem::BDiskSystem(const BDiskSystem& other)
 	: fID(other.fID),
@@ -27,10 +29,12 @@ BDiskSystem::BDiskSystem(const BDiskSystem& other)
 {
 }
 
+
 // destructor
 BDiskSystem::~BDiskSystem()
 {
 }
+
 
 // InitCheck
 status_t
@@ -39,23 +43,26 @@ BDiskSystem::InitCheck() const
 	return (fID > 0 ? B_OK : fID);
 }
 
+
 // Name
-const char *
+const char*
 BDiskSystem::Name() const
 {
 	return fName.String();
 }
 
+
 // PrettyName
-const char *
+const char*
 BDiskSystem::PrettyName() const
 {
 	return fPrettyName.String();
 }
 
+
 // SupportsDefragmenting
 bool
-BDiskSystem::SupportsDefragmenting(bool *whileMounted) const
+BDiskSystem::SupportsDefragmenting(bool* whileMounted) const
 {
 	if (InitCheck() != B_OK
 		|| !(fFlags & B_DISK_SYSTEM_SUPPORTS_DEFRAGMENTING)) {
@@ -63,36 +70,44 @@ BDiskSystem::SupportsDefragmenting(bool *whileMounted) const
 			*whileMounted = false;
 		return false;
 	}
+
 	if (whileMounted) {
 		*whileMounted = (IsFileSystem()
 			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_DEFRAGMENTING_WHILE_MOUNTED));
 	}
+
 	return true;
 }
 
+
 // SupportsRepairing
 bool
-BDiskSystem::SupportsRepairing(bool checkOnly, bool *whileMounted) const
+BDiskSystem::SupportsRepairing(bool checkOnly, bool* whileMounted) const
 {
 	uint32 mainBit = B_DISK_SYSTEM_SUPPORTS_REPAIRING;
 	uint32 mountedBit = B_DISK_SYSTEM_SUPPORTS_REPAIRING_WHILE_MOUNTED;
+
 	if (checkOnly) {
 		mainBit = B_DISK_SYSTEM_SUPPORTS_CHECKING;
 		mountedBit = B_DISK_SYSTEM_SUPPORTS_CHECKING_WHILE_MOUNTED;
 	}
+
 	if (InitCheck() != B_OK || !(fFlags & mainBit)) {
 		if (whileMounted)
 			*whileMounted = false;
 		return false;
 	}
+
 	if (whileMounted)
 		*whileMounted = (IsFileSystem() && (fFlags & mountedBit));
+
 	return true;
 }
 
+
 // SupportsResizing
 bool
-BDiskSystem::SupportsResizing(bool *whileMounted) const
+BDiskSystem::SupportsResizing(bool* whileMounted) const
 {
 	if (InitCheck() != B_OK
 		|| !(fFlags & B_DISK_SYSTEM_SUPPORTS_RESIZING)) {
@@ -100,24 +115,28 @@ BDiskSystem::SupportsResizing(bool *whileMounted) const
 			*whileMounted = false;
 		return false;
 	}
+
 	if (whileMounted) {
 		*whileMounted = (IsFileSystem()
 			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_RESIZING_WHILE_MOUNTED));
 	}
+
 	return true;
 }
+
 
 // SupportsResizingChild
 bool
 BDiskSystem::SupportsResizingChild() const
 {
 	return (InitCheck() == B_OK && IsPartitioningSystem()
-			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_RESIZING_CHILD));
+		&& (fFlags & B_DISK_SYSTEM_SUPPORTS_RESIZING_CHILD));
 }
+
 
 // SupportsMoving
 bool
-BDiskSystem::SupportsMoving(bool *whileMounted) const
+BDiskSystem::SupportsMoving(bool* whileMounted) const
 {
 	if (InitCheck() != B_OK
 		|| !(fFlags & B_DISK_SYSTEM_SUPPORTS_MOVING)) {
@@ -125,28 +144,33 @@ BDiskSystem::SupportsMoving(bool *whileMounted) const
 			*whileMounted = false;
 		return false;
 	}
+
 	if (whileMounted) {
 		*whileMounted = (IsFileSystem()
 			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_MOVING_WHILE_MOUNTED));
 	}
+
 	return true;
 }
+
 
 // SupportsMovingChild
 bool
 BDiskSystem::SupportsMovingChild() const
 {
 	return (InitCheck() == B_OK && IsPartitioningSystem()
-			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_MOVING_CHILD));
+		&& (fFlags & B_DISK_SYSTEM_SUPPORTS_MOVING_CHILD));
 }
+
 
 // SupportsName
 bool
 BDiskSystem::SupportsName() const
 {
 	return (InitCheck() == B_OK && IsPartitioningSystem()
-			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_NAME));
+		&& (fFlags & B_DISK_SYSTEM_SUPPORTS_NAME));
 }
+
 
 // SupportsContentName
 bool
@@ -156,17 +180,19 @@ BDiskSystem::SupportsContentName() const
 		&& (fFlags & B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME));
 }
 
+
 // SupportsSettingName
 bool
 BDiskSystem::SupportsSettingName() const
 {
 	return (InitCheck() == B_OK && IsPartitioningSystem()
-			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_SETTING_NAME));
+		&& (fFlags & B_DISK_SYSTEM_SUPPORTS_SETTING_NAME));
 }
+
 
 // SupportsSettingContentName
 bool
-BDiskSystem::SupportsSettingContentName(bool *whileMounted) const
+BDiskSystem::SupportsSettingContentName(bool* whileMounted) const
 {
 	if (InitCheck() != B_OK
 		|| !(fFlags & B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME)) {
@@ -174,33 +200,38 @@ BDiskSystem::SupportsSettingContentName(bool *whileMounted) const
 			*whileMounted = false;
 		return false;
 	}
+
 	if (whileMounted) {
 		*whileMounted = (IsFileSystem()
 			&& (fFlags
 				& B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME_WHILE_MOUNTED));
 	}
+
 	return true;
 }
+
 
 // SupportsSettingType
 bool
 BDiskSystem::SupportsSettingType() const
 {
 	return (InitCheck() == B_OK && IsPartitioningSystem()
-			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_SETTING_TYPE));
+		&& (fFlags & B_DISK_SYSTEM_SUPPORTS_SETTING_TYPE));
 }
+
 
 // SupportsSettingParameters
 bool
 BDiskSystem::SupportsSettingParameters() const
 {
 	return (InitCheck() == B_OK && IsPartitioningSystem()
-			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_SETTING_PARAMETERS));
+		&& (fFlags & B_DISK_SYSTEM_SUPPORTS_SETTING_PARAMETERS));
 }
+
 
 // SupportsSettingContentParameters
 bool
-BDiskSystem::SupportsSettingContentParameters(bool *whileMounted) const
+BDiskSystem::SupportsSettingContentParameters(bool* whileMounted) const
 {
 	if (InitCheck() != B_OK
 		|| !(fFlags & B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS)) {
@@ -208,42 +239,48 @@ BDiskSystem::SupportsSettingContentParameters(bool *whileMounted) const
 			*whileMounted = false;
 		return false;
 	}
+
 	if (whileMounted) {
-		*whileMounted = (IsFileSystem()
-			&& (fFlags
-		& B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS_WHILE_MOUNTED));
+		uint32 whileMountedFlag
+			= B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS_WHILE_MOUNTED;
+		*whileMounted = (IsFileSystem() && (fFlags & whileMountedFlag));
 	}
+
 	return true;
 }
+
 
 // SupportsCreatingChild
 bool
 BDiskSystem::SupportsCreatingChild() const
 {
 	return (InitCheck() == B_OK && IsPartitioningSystem()
-			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD));
+		&& (fFlags & B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD));
 }
+
 
 // SupportsDeletingChild
 bool
 BDiskSystem::SupportsDeletingChild() const
 {
 	return (InitCheck() == B_OK && IsPartitioningSystem()
-			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_DELETING_CHILD));
+		&& (fFlags & B_DISK_SYSTEM_SUPPORTS_DELETING_CHILD));
 }
+
 
 // SupportsInitializing
 bool
 BDiskSystem::SupportsInitializing() const
 {
 	return (InitCheck() == B_OK
-			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_INITIALIZING));
+		&& (fFlags & B_DISK_SYSTEM_SUPPORTS_INITIALIZING));
 }
+
 
 // GetNextSupportedType
 status_t
-BDiskSystem::GetNextSupportedType(BPartition *partition, int32 *cookie,
-	char *type) const
+BDiskSystem::GetNextSupportedType(BPartition* partition, int32* cookie,
+	char* type) const
 {
 // TODO: We probably need a second method for and modify the partitioning
 // system module hook a little. This method takes the parent partition of
@@ -261,9 +298,10 @@ BDiskSystem::GetNextSupportedType(BPartition *partition, int32 *cookie,
 		partition->_ChangeCounter(), cookie, type);
 }
 
+
 // GetTypeForContentType
 status_t
-BDiskSystem::GetTypeForContentType(const char *contentType, char *type) const
+BDiskSystem::GetTypeForContentType(const char* contentType, char* type) const
 {
 	if (InitCheck() != B_OK)
 		return InitCheck();
@@ -272,12 +310,14 @@ BDiskSystem::GetTypeForContentType(const char *contentType, char *type) const
 	return _kern_get_partition_type_for_content_type(fID, contentType, type);
 }
 
+
 // IsPartitioningSystem
 bool
 BDiskSystem::IsPartitioningSystem() const
 {
 	return (InitCheck() == B_OK && !(fFlags & B_DISK_SYSTEM_IS_FILE_SYSTEM));
 }
+
 
 // IsFileSystem
 bool
@@ -286,15 +326,17 @@ BDiskSystem::IsFileSystem() const
 	return (InitCheck() == B_OK && (fFlags & B_DISK_SYSTEM_IS_FILE_SYSTEM));
 }
 
+
 // IsSubSystemFor
 bool
-BDiskSystem::IsSubSystemFor(BPartition *parent) const
+BDiskSystem::IsSubSystemFor(BPartition* parent) const
 {
 	return (InitCheck() == B_OK
-			&& parent && parent->_IsShadow()
-			&& _kern_is_sub_disk_system_for(fID, parent->_ShadowID(),
-											parent->_ChangeCounter()));
+		&& parent && parent->_IsShadow()
+		&& _kern_is_sub_disk_system_for(fID, parent->_ShadowID(),
+			parent->_ChangeCounter()));
 }
+
 
 // =
 BDiskSystem&
@@ -308,33 +350,42 @@ BDiskSystem::operator=(const BDiskSystem& other)
 	return *this;
 }
 
+
 // _SetTo
 status_t
 BDiskSystem::_SetTo(disk_system_id id)
 {
 	_Unset();
+
 	if (id < 0)
 		return fID;
+
 	user_disk_system_info info;
 	status_t error = _kern_get_disk_system_info(id, &info);
 	if (error != B_OK)
 		return (fID = error);
+
 	return _SetTo(&info);
 }
 
+
 // _SetTo
 status_t
-BDiskSystem::_SetTo(user_disk_system_info *info)
+BDiskSystem::_SetTo(user_disk_system_info* info)
 {
 	_Unset();
+
 	if (!info)
 		return (fID = B_BAD_VALUE);
+
 	fID = info->id;
 	fName = info->name;
 	fPrettyName = info->pretty_name;
 	fFlags = info->flags;
+
 	return B_OK;
 }
+
 
 // _Unset
 void
@@ -345,4 +396,3 @@ BDiskSystem::_Unset()
 	fPrettyName = (const char*)NULL;
 	fFlags = 0;
 }
-
