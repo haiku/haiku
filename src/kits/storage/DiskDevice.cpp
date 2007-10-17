@@ -23,6 +23,8 @@
 #include <syscalls.h>
 #include <disk_device_manager/ddm_userland_interface.h>
 
+#include "DiskSystemAddOnManager.h"
+
 
 /*!	\class BDiskDevice
 	\brief A BDiskDevice object represents a storage device.
@@ -226,6 +228,11 @@ BDiskDevice::PrepareModifications()
 	if (fDelegate)
 		return B_BAD_VALUE;
 
+	// make sure the disk system add-ons are loaded
+	error = DiskSystemAddOnManager::Default()->LoadDiskSystems();
+	if (error != B_OK)
+		return error;
+
 	// recursively create the delegates
 	error = _CreateDelegates();
 
@@ -234,8 +241,10 @@ BDiskDevice::PrepareModifications()
 		error = _InitDelegates();
 
 	// delete all of them, if something went wrong
-	if (error != B_OK)
+	if (error != B_OK) {
 		_DeleteDelegates();
+		DiskSystemAddOnManager::Default()->UnloadDiskSystems();
+	}
 
 	return error;
 }
@@ -262,6 +271,7 @@ BDiskDevice::CommitModifications(bool synchronously,
 	// TODO: Implement!
 
 	_DeleteDelegates();
+	DiskSystemAddOnManager::Default()->UnloadDiskSystems();
 
 	if (error == B_OK)
 		error = _SetTo(ID(), true, false, 0);
@@ -286,6 +296,7 @@ BDiskDevice::CancelModifications()
 		return B_BAD_VALUE;
 
 	_DeleteDelegates();
+	DiskSystemAddOnManager::Default()->UnloadDiskSystems();
 
 	if (error == B_OK)
 		error = _SetTo(ID(), true, false, 0);
