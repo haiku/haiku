@@ -11,6 +11,7 @@ UseArchHeaders $(TARGET_ARCH) ;
 # for libbe_test
 UsePublicHeaders [ FDirName add-ons registrar ] ;
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) disk_device ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) mime ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) sniffer ] ;
 
