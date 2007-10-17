@@ -1405,30 +1405,6 @@ BPartition::_IsShadow() const
 }
 
 
-// _ShadowID
-partition_id
-BPartition::_ShadowID() const
-{
-	return (fPartitionData ? fPartitionData->shadow_id : -1);
-}
-
-
-// _DiskSystem
-disk_system_id
-BPartition::_DiskSystem() const
-{
-	return (fPartitionData ? fPartitionData->disk_system : -1);
-}
-
-
-// _ChangeCounter
-int32
-BPartition::_ChangeCounter() const
-{
-	return (fPartitionData ? fPartitionData->change_counter : -1);
-}
-
-
 // _CountDescendants
 int32
 BPartition::_CountDescendants() const

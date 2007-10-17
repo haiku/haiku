@@ -186,9 +186,6 @@ private:
 			void				_RemoveChild(int32 index);
 
 			bool				_IsShadow() const;
-			partition_id		_ShadowID() const;
-			disk_system_id		_DiskSystem() const;
-			int32				_ChangeCounter() const;
 
 			int32				_CountDescendants() const;
 			int32				_Level() const;
