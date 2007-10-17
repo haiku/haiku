@@ -11,8 +11,10 @@
 
 #include <Window.h>
 
-class PictureTestWindow : public BWindow
-{
+class BListView;
+class BStringView;
+
+class PictureTestWindow : public BWindow {
 	typedef BWindow Inherited;
 
 public:
