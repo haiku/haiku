@@ -10,7 +10,7 @@
 
 #include "TimeWindow.h"
 #include "BaseView.h"
-#include "SettingsView.h"
+#include "DateTimeView.h"
 #include "TimeMessages.h"
 #include "ZoneView.h"
 
@@ -27,7 +27,7 @@
 
 TTimeWindow::TTimeWindow(const BPoint leftTop)
 	: BWindow(BRect(leftTop, leftTop + BPoint(WINDOW_RIGHT, WINDOW_BOTTOM)),
-		"Time & Date", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
+		"Time", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 {
 	BRect frame = Frame();
 	BRect bounds = Bounds();
@@ -64,8 +64,8 @@ TTimeWindow::QuitRequested()
 	msg.AddPoint("LeftTop", Frame().LeftTop());
 	be_app->PostMessage(&msg);
 	
-	fBaseView->StopWatchingAll(fTimeSettings);
 	fBaseView->StopWatchingAll(fTimeZones);
+	fBaseView->StopWatchingAll(fDateTimeView);
 	
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	
@@ -88,16 +88,16 @@ TTimeWindow::_InitWindow()
 	bounds.InsetBy(4, 6);
 	bounds.bottom -= tabview->TabHeight();
 	
-	fTimeSettings = new TSettingsView(bounds);
-	fBaseView->StartWatchingAll(fTimeSettings);
+	fDateTimeView = new DateTimeView(bounds);
+	fBaseView->StartWatchingAll(fDateTimeView);
 
 	fTimeZones = new TZoneView(bounds);
 	fBaseView->StartWatchingAll(fTimeZones);
 
 	// add tabs
 	BTab *tab = new BTab();
-	tabview->AddTab(fTimeSettings, tab);
-	tab->SetLabel("Settings");
+	tabview->AddTab(fDateTimeView, tab);
+	tab->SetLabel("Date & Time");
 	
 	tab = new BTab();
 	tabview->AddTab(fTimeZones, tab);
@@ -107,8 +107,9 @@ TTimeWindow::_InitWindow()
 
 	float width;
 	float height;
-	// width/ height from settingsview + all InsetBy etc..
-	fTimeSettings->GetPreferredSize(&width, &height);
+	fDateTimeView->GetPreferredSize(&width, &height);
+
+	// width/ height from DateTimeView + all InsetBy etc..
 	ResizeTo(width +10, height + tabview->TabHeight() +25);
 }
 

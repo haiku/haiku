@@ -15,7 +15,7 @@
 
 
 class BMessage;
-class TSettingsView;
+class DateTimeView;
 class TTimeBaseView;
 class TZoneView;
 
@@ -32,7 +32,7 @@ class TTimeWindow : public BWindow {
 		void 			_InitWindow();
 
 		TTimeBaseView 	*fBaseView;
-		TSettingsView 	*fTimeSettings;
+		DateTimeView 	*fDateTimeView;
 		TZoneView 		*fTimeZones;
 };
 

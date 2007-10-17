@@ -13,7 +13,7 @@ Preference Time :
 	CalendarView.cpp 
 	DateTimeEdit.cpp 
 	SectionEdit.cpp 
-	SettingsView.cpp 
+	DateTimeView.cpp 
 	Time.cpp 
 	TimeSettings.cpp 
 	TimeWindow.cpp

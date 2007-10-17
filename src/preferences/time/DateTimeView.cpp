@@ -8,7 +8,7 @@
  *		Julun <host.haiku@gmx.de>
  */
 
-#include "SettingsView.h"
+#include "DateTimeView.h"
 #include "AnalogClock.h"
 #include "CalendarView.h"
 #include "DateTimeEdit.h"
@@ -38,7 +38,7 @@ void _kset_tzfilename_(const char *name, size_t length, bool isGMT);
 #endif
 
 
-TSettingsView::TSettingsView(BRect frame)
+DateTimeView::DateTimeView(BRect frame)
 	: BView(frame,"Settings", B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP),
 	  fGmtTime(NULL),
@@ -48,14 +48,14 @@ TSettingsView::TSettingsView(BRect frame)
 }
 
 
-TSettingsView::~TSettingsView()
+DateTimeView::~DateTimeView()
 {
 	_WriteRTCSettings();
 }
 
 
 void
-TSettingsView::AttachedToWindow()
+DateTimeView::AttachedToWindow()
 {
 	if (Parent())
 		SetViewColor(Parent()->ViewColor());
@@ -68,7 +68,7 @@ TSettingsView::AttachedToWindow()
 
 
 void
-TSettingsView::Draw(BRect /*updateRect*/)
+DateTimeView::Draw(BRect /*updateRect*/)
 {
 	rgb_color viewcolor = ViewColor();
 	rgb_color dark = tint_color(viewcolor, B_DARKEN_4_TINT);
@@ -92,7 +92,7 @@ TSettingsView::Draw(BRect /*updateRect*/)
 
 
 void
-TSettingsView::MessageReceived(BMessage *message)
+DateTimeView::MessageReceived(BMessage *message)
 {
 	int32 change;
 	switch(message->what) {
@@ -129,7 +129,7 @@ TSettingsView::MessageReceived(BMessage *message)
 
 
 void
-TSettingsView::GetPreferredSize(float *width, float *height)
+DateTimeView::GetPreferredSize(float *width, float *height)
 {
 	// hardcode in TimeWindow ...
 	*width = 470.0f;
@@ -144,7 +144,7 @@ TSettingsView::GetPreferredSize(float *width, float *height)
 
 
 void
-TSettingsView::_InitView()
+DateTimeView::_InitView()
 {
 	font_height fontHeight;
 	be_plain_font->GetHeight(&fontHeight);
@@ -221,7 +221,7 @@ TSettingsView::_InitView()
 
 
 void
-TSettingsView::_ReadRTCSettings()
+DateTimeView::_ReadRTCSettings()
 {
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
@@ -252,7 +252,7 @@ TSettingsView::_ReadRTCSettings()
 
 
 void
-TSettingsView::_WriteRTCSettings()
+DateTimeView::_WriteRTCSettings()
 {
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
@@ -271,7 +271,7 @@ TSettingsView::_WriteRTCSettings()
 
 
 void
-TSettingsView::_UpdateGmtSettings()
+DateTimeView::_UpdateGmtSettings()
 {
 	_WriteRTCSettings();
 
@@ -294,7 +294,7 @@ TSettingsView::_UpdateGmtSettings()
 
 
 void
-TSettingsView::_UpdateDateTime(BMessage *message)
+DateTimeView::_UpdateDateTime(BMessage *message)
 {
 	int32 day;
 	int32 month;

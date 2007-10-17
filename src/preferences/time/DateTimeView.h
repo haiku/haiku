@@ -7,8 +7,8 @@
  *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
  */
-#ifndef SETTINGS_VIEW_H
-#define SETTINGS_VIEW_H
+#ifndef DATE_TIME_VIEW_H
+#define DATE_TIME_VIEW_H
 
 
 #include <View.h>
@@ -21,10 +21,10 @@ class BRadioButton;
 class TAnalogClock;
 
 
-class TSettingsView : public BView {
+class DateTimeView : public BView {
 	public:
-						TSettingsView(BRect frame);
-		virtual 		~TSettingsView();
+						DateTimeView(BRect frame);
+		virtual 		~DateTimeView();
 
 		virtual void 	AttachedToWindow();
 		virtual void 	Draw(BRect updaterect);
@@ -50,5 +50,5 @@ class TSettingsView : public BView {
 		bool			fInitialized;
 };
 
-#endif	// SETTINGS_VIEW_H
+#endif	// DATE_TIME_VIEW_H
 
