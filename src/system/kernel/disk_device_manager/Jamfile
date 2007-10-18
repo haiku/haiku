@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src system kernel disk_device_manager ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) jobs ] ;
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits storage ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits storage disk_device ] ;
 	# DiskDeviceTypes.cpp
 
 UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
