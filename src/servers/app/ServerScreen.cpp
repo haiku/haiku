@@ -109,12 +109,8 @@ Screen::SetMode(uint16 width, uint16 height, uint32 colorspace,
 	// search for a matching mode
 	display_mode mode;
 	status_t status = _FindMode(width, height, colorspace, frequency, &mode);
-	if (status < B_OK) {
-		// TODO: Move fallback elsewhere, this function should simply
-		// fail if requested to set unsupported mode.
-		// Ups. Not good. Ignore the requested mode and use fallback params.
-		status = _FindMode(640, 480, B_CMAP8, 60.0, &mode);
-	}
+	if (status < B_OK)
+		return status;
 
 	if (status >= B_OK) {
 		float modeFrequency = get_mode_frequency(mode);
