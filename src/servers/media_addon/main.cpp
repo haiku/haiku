@@ -34,7 +34,6 @@
 #include <Entry.h>
 #include <Path.h>
 #include <Directory.h>
-#include <Looper.h>
 #include "debug.h"
 #include "TMap.h"
 #include "ServerInterface.h"
