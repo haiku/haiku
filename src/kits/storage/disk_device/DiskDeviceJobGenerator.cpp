@@ -1,0 +1,571 @@
+/*
+ * Copyright 2003-2007, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
+
+#include "DiskDeviceJobGenerator.h"
+
+#include <new>
+
+#include <string.h>
+
+#include <DiskDevice.h>
+#include <MutablePartition.h>
+
+#include <disk_device_manager/ddm_userland_interface.h>
+
+#include "PartitionDelegate.h"
+
+
+using std::nothrow;
+
+
+// compare_string
+/*!	\brief \c NULL aware strcmp().
+
+	\c NULL is considered the least of all strings. \c NULL equals \c NULL.
+
+	\param str1 First string.
+	\param str2 Second string.
+	\return A value less than 0, if \a str1 is less than \a str2,
+			0, if they are equal, or a value greater than 0, if
+			\a str1 is greater \a str2.
+*/
+static inline int
+compare_string(const char* str1, const char* str2)
+{
+	if (str1 == NULL) {
+		if (str2 == NULL)
+			return 0;
+		return 1;
+	} else if (str2 == NULL)
+		return -1;
+
+	return strcmp(str1, str2);
+}
+
+
+// move_info
+struct DiskDeviceJobGenerator::move_info {
+	BPartition*	partition;
+	off_t		position;
+	off_t		target_position;
+	off_t		size;
+};
+
+
+// constructor
+DiskDeviceJobGenerator::DiskDeviceJobGenerator(BDiskDevice* device,
+		DiskDeviceJobQueue* jobQueue)
+	: fDevice(device),
+	  fJobQueue(jobQueue),
+	  fMoveInfos(NULL)
+{
+	fMoveInfoCount = fDevice->CountDescendants();
+
+	fMoveInfos = new(nothrow) move_info[fMoveInfoCount];
+//	fPartitionIDs = new(nothrow) partition_id[fMoveInfoCount];
+}
+
+
+// destructor
+DiskDeviceJobGenerator::~DiskDeviceJobGenerator()
+{
+	delete[] fMoveInfos;
+//	delete[] fPartitionIDs;
+}
+
+
+// GenerateJobs
+status_t
+DiskDeviceJobGenerator::GenerateJobs()
+{
+	// check parameters
+	if (!fDevice || !fJobQueue /*|| !fMoveInfos || !fPartitionIDs
+		|| fJobQueue->Device() != fDevice || !fDevice->ShadowPartition()*/) {
+		return B_BAD_VALUE;
+	}
+
+	// 1) Generate jobs for all physical partitions that don't have an
+	// associated shadow partition, i.e. those that shall be deleted.
+	// 2) Generate uninitialize jobs for all partition whose initialization
+	// changes, also those that shall be initialized with a disk system.
+	// This simplifies moving and resizing.
+	status_t error = _GenerateCleanupJobs(fDevice);
+	if (error != B_OK)
+		return error;
+
+	// Generate jobs that move and resize the remaining physical partitions
+	// to their final position/size.
+	error = _GeneratePlacementJobs(fDevice);
+	if (error != B_OK)
+		return error;
+
+	// Generate the remaining jobs in one run: initialization, creation of
+	// partitions, and changing of name, content name, type, parameters, and
+	// content parameters.
+	error = _GenerateRemainingJobs(NULL, fDevice);
+	if (error != B_OK)
+		return error;
+
+	return B_OK;
+}
+
+
+// _AddJob
+status_t
+DiskDeviceJobGenerator::_AddJob(DiskDeviceJob* job)
+{
+// TODO: Implement!
+	return B_BAD_VALUE;
+}
+
+
+// _GenerateCleanupJobs
+status_t
+DiskDeviceJobGenerator::_GenerateCleanupJobs(BPartition* partition)
+{
+// TODO: Depending on how this shall be handled, we might want to unmount
+// all descendants of a partition to be uninitialized or removed.
+	if (BMutablePartition* shadow = _GetMutablePartition(partition)) {
+		if (shadow->ChangeFlags() & B_PARTITION_CHANGED_INITIALIZATION) {
+			// partition changes initialization
+			status_t error = _GenerateUninitializeJob(partition);
+			if (error != B_OK)
+				return error;
+		} else {
+			// recurse
+			for (int32 i = 0; BPartition* child = partition->_ChildAt(i); i++) {
+				status_t error = _GenerateCleanupJobs(child);
+				if (error != B_OK)
+					return error;
+			}
+		}
+	} else if (BPartition* parent = partition->Parent()) {
+		// create job and add it to the queue
+		status_t error = _GenerateDeleteChildJob(parent, partition);
+		if (error != B_OK)
+			return error;
+	}
+	return B_OK;
+}
+
+
+// _GeneratePlacementJobs
+status_t
+DiskDeviceJobGenerator::_GeneratePlacementJobs(BPartition* partition)
+{
+	if (BMutablePartition* shadow = _GetMutablePartition(partition)) {
+		// Don't resize/move partitions that have an unrecognized contents.
+		// They must have been uninitialized before.
+		if (shadow->Status() == B_PARTITION_UNRECOGNIZED
+			&& (shadow->Size() != partition->Size()
+				|| shadow->Offset() != partition->Offset())) {
+			return B_ERROR;
+		}
+
+		if (shadow->Size() > partition->Size()) {
+			// size grows: resize first
+			status_t error = _GenerateResizeJob(partition);
+			if (error != B_OK)
+				return error;
+		}
+
+		// place the children
+		status_t error = _GenerateChildPlacementJobs(partition);
+		if (error != B_OK)
+			return error;
+
+		if (shadow->Size() < partition->Size()) {
+			// size shrinks: resize now
+			status_t error = _GenerateResizeJob(partition);
+			if (error != B_OK)
+				return error;
+		}
+	}
+
+	return B_OK;
+}
+
+
+// _GenerateChildPlacementJobs
+status_t
+DiskDeviceJobGenerator::_GenerateChildPlacementJobs(BPartition* partition)
+{
+	BMutablePartition* shadow = _GetMutablePartition(partition);
+
+	// nothing to do, if the partition contains no partitioning system or
+	// shall be re-initialized
+	if (!shadow->ContentType()
+		|| (shadow->ChangeFlags() & B_PARTITION_CHANGED_INITIALIZATION)) {
+		return B_OK;
+	}
+
+	// first resize all children that shall shrink and place their descendants
+	int32 childCount = 0;
+	int32 moveForth = 0;
+	int32 moveBack = 0;
+
+	for (int32 i = 0; BPartition* child = partition->_ChildAt(i); i++) {
+		if (BMutablePartition* childShadow = _GetMutablePartition(child)) {
+			// add a move_info for the child
+			move_info& info = fMoveInfos[childCount];
+			childCount++;
+			info.partition = child;
+			info.position = child->Offset();
+			info.target_position = childShadow->Offset();
+			info.size = child->Size();
+
+			if (info.position < info.target_position)
+				moveForth++;
+			else if (info.position > info.target_position)
+				moveBack++;
+
+			// resize the child, if it shall shrink
+			if (childShadow->Size() < child->Size()) {
+				status_t error = _GeneratePlacementJobs(child);
+				if (error != B_OK)
+					return error;
+				info.size = childShadow->Size();
+			}
+		}
+	}
+
+	// sort the move infos
+	if (childCount > 0 && moveForth + moveBack > 0) {
+		qsort(fMoveInfos, childCount, sizeof(move_info),
+			  _CompareMoveInfoPosition);
+	}
+
+	// move the children to their final positions
+	while (moveForth + moveBack > 0) {
+		int32 moved = 0;
+		if (moveForth < moveBack) {
+			// move children back
+			for (int32 i = 0; i < childCount; i++) {
+				move_info &info = fMoveInfos[i];
+				if (info.position > info.target_position) {
+					if (i == 0
+						|| info.target_position >= fMoveInfos[i - 1].position
+							+ fMoveInfos[i - 1].size) {
+						// check OK -- the partition wouldn't be moved before
+						// the end of the preceding one
+						status_t error = _GenerateMoveJob(info.partition);
+						if (error != B_OK)
+							return error;
+						info.position = info.target_position;
+						moved++;
+						moveBack--;
+					}
+				}
+			}
+		} else {
+			// move children forth
+			for (int32 i = childCount - 1; i >= 0; i--) {
+				move_info &info = fMoveInfos[i];
+				if (info.position > info.target_position) {
+					if (i == childCount - 1
+						|| info.target_position + info.size
+							<= fMoveInfos[i - 1].position) {
+						// check OK -- the partition wouldn't be moved before
+						// the end of the preceding one
+						status_t error = _GenerateMoveJob(info.partition);
+						if (error != B_OK)
+							return error;
+						info.position = info.target_position;
+						moved++;
+						moveForth--;
+					}
+				}
+			}
+		}
+
+		// terminate, if no partition could be moved
+		if (moved == 0)
+			return B_ERROR;
+	}
+
+	// now resize all children that shall grow/keep their size and place
+	// their descendants
+	for (int32 i = 0; BPartition* child = partition->_ChildAt(i); i++) {
+		if (BMutablePartition* childShadow = _GetMutablePartition(child)) {
+			if (childShadow->Size() >= child->Size()) {
+				status_t error = _GeneratePlacementJobs(child);
+				if (error != B_OK)
+					return error;
+			}
+		}
+	}
+
+	return B_OK;
+}
+
+
+// _GenerateRemainingJobs
+status_t
+DiskDeviceJobGenerator::_GenerateRemainingJobs(BPartition* parent,
+	BPartition* partition)
+{
+	user_partition_data* partitionData = partition->fPartitionData;
+
+	uint32 changeFlags
+		= partition->fDelegate->MutablePartition()->ChangeFlags();
+
+	// create the partition, if not existing yet
+	if (!partitionData) {
+		if (!parent)
+			return B_BAD_VALUE;
+
+		status_t error = _GenerateCreateChildJob(parent, partition);
+		if (error != B_OK)
+			return error;
+	} else {
+		// partition already exists: set non-content properties
+		
+
+		// name
+		if ((changeFlags & B_PARTITION_CHANGED_NAME)
+			|| compare_string(partition->Name(), partitionData->name)) {
+			if (!parent)
+				return B_BAD_VALUE;
+
+			status_t error = _GenerateSetNameJob(parent, partition);
+			if (error != B_OK)
+				return error;
+		}
+
+		// type
+		if ((changeFlags & B_PARTITION_CHANGED_TYPE)
+			|| compare_string(partition->Type(), partitionData->type)) {
+			if (!parent)
+				return B_BAD_VALUE;
+
+			status_t error = _GenerateSetTypeJob(parent, partition);
+			if (error != B_OK)
+				return error;
+		}
+
+		// parameters
+		if ((changeFlags & B_PARTITION_CHANGED_PARAMETERS)
+			|| compare_string(partition->Parameters(),
+				partitionData->parameters)) {
+			if (!parent)
+				return B_BAD_VALUE;
+
+			status_t error = _GenerateSetParametersJob(parent, partition);
+			if (error != B_OK)
+				return error;
+		}
+	}
+
+	if (partition->ContentType()) {
+		// initialize the partition, if required
+		if (changeFlags & B_PARTITION_CHANGED_INITIALIZATION) {
+			status_t error = _GenerateInitializeJob(partition);
+			if (error != B_OK)
+				return error;
+		} else {
+			// partition not (re-)initialized, set content properties
+
+			// content name
+			if ((changeFlags & B_PARTITION_CHANGED_NAME)
+				|| compare_string(partition->ContentName(),
+					partitionData->content_name)) {
+				status_t error = _GenerateSetContentNameJob(partition);
+				if (error != B_OK)
+					return error;
+			}
+
+			// content parameters
+			if ((changeFlags & B_PARTITION_CHANGED_PARAMETERS)
+				|| compare_string(partition->ContentParameters(),
+					partitionData->content_parameters)) {
+				status_t error = _GenerateSetContentParametersJob(partition);
+				if (error != B_OK)
+					return error;
+			}
+
+			// defragment
+			if (changeFlags & B_PARTITION_CHANGED_DEFRAGMENTATION) {
+				status_t error = _GenerateDefragmentJob(partition);
+				if (error != B_OK)
+					return error;
+			}
+
+			// check / repair
+			bool repair = (changeFlags & B_PARTITION_CHANGED_REPAIR);
+			if ((changeFlags & B_PARTITION_CHANGED_CHECK)
+				|| repair) {
+				status_t error = _GenerateRepairJob(partition, repair);
+				if (error != B_OK)
+					return error;
+			}
+		}
+	}
+
+	// recurse
+	for (int32 i = 0; BPartition* child = partition->ChildAt(i); i++) {
+		status_t error = _GenerateRemainingJobs(partition, child);
+		if (error != B_OK)
+			return error;
+	}
+
+	return B_OK;
+}
+
+
+// _GetMutablePartition
+BMutablePartition*
+DiskDeviceJobGenerator::_GetMutablePartition(BPartition* partition)
+{
+	if (!partition)
+		return NULL;
+
+	return partition->fDelegate
+		? partition->fDelegate->MutablePartition() : NULL;
+}
+
+
+// _GenerateInitializeJob
+status_t
+DiskDeviceJobGenerator::_GenerateInitializeJob(BPartition* partition)
+{
+// TODO: Implement!
+	return B_BAD_VALUE;
+}
+
+
+// _GenerateUninitializeJob
+status_t
+DiskDeviceJobGenerator::_GenerateUninitializeJob(BPartition* partition)
+{
+// TODO: Implement!
+	return B_BAD_VALUE;
+}
+
+
+// _GenerateSetContentNameJob
+status_t
+DiskDeviceJobGenerator::_GenerateSetContentNameJob(BPartition* partition)
+{
+// TODO: Implement!
+	return B_BAD_VALUE;
+}
+
+
+// _GenerateSetContentParametersJob
+status_t
+DiskDeviceJobGenerator::_GenerateSetContentParametersJob(BPartition* partition)
+{
+// TODO: Implement!
+	return B_BAD_VALUE;
+}
+
+
+// _GenerateDefragmentJob
+status_t
+DiskDeviceJobGenerator::_GenerateDefragmentJob(BPartition* partition)
+{
+// TODO: Implement!
+	return B_BAD_VALUE;
+}
+
+
+// _GenerateRepairJob
+status_t
+DiskDeviceJobGenerator::_GenerateRepairJob(BPartition* partition, bool repair)
+{
+// TODO: Implement!
+	return B_BAD_VALUE;
+}
+
+
+// _GenerateCreateChildJob
+status_t
+DiskDeviceJobGenerator::_GenerateCreateChildJob(BPartition* parent,
+	BPartition* partition)
+{
+// TODO: Implement!
+	return B_BAD_VALUE;
+}
+
+
+// _GenerateDeleteChildJob
+status_t
+DiskDeviceJobGenerator::_GenerateDeleteChildJob(BPartition* parent,
+	BPartition* child)
+{
+// TODO: Implement!
+	return B_BAD_VALUE;
+}
+
+
+// _GenerateResizeJob
+status_t
+DiskDeviceJobGenerator::_GenerateResizeJob(BPartition* partition)
+{
+// TODO: Implement!
+	return B_BAD_VALUE;
+}
+
+
+// _GenerateMoveJob
+status_t
+DiskDeviceJobGenerator::_GenerateMoveJob(BPartition* partition)
+{
+// TODO: Implement!
+	return B_BAD_VALUE;
+}
+
+
+// _GenerateSetNameJob
+status_t
+DiskDeviceJobGenerator::_GenerateSetNameJob(BPartition* parent,
+	BPartition* partition)
+{
+// TODO: Implement!
+	return B_BAD_VALUE;
+}
+
+
+// _GenerateSetTypeJob
+status_t
+DiskDeviceJobGenerator::_GenerateSetTypeJob(BPartition* parent,
+	BPartition* partition)
+{
+// TODO: Implement!
+	return B_BAD_VALUE;
+}
+
+
+// _GenerateSetParametersJob
+status_t
+DiskDeviceJobGenerator::_GenerateSetParametersJob(BPartition* parent,
+	BPartition* partition)
+{
+// TODO: Implement!
+	return B_BAD_VALUE;
+}
+
+
+// _CollectContentsToMove
+status_t
+DiskDeviceJobGenerator::_CollectContentsToMove(BPartition* partition)
+{
+// TODO: Implement!
+	return B_BAD_VALUE;
+}
+
+
+// _CompareMoveInfoOffset
+int
+DiskDeviceJobGenerator::_CompareMoveInfoPosition(const void* _a, const void* _b)
+{
+	const move_info* a = static_cast<const move_info*>(_a);
+	const move_info* b = static_cast<const move_info*>(_b);
+	if (a->position < b->position)
+		return -1;
+	if (a->position > b->position)
+		return 1;
+	return 0;
+}
