@@ -1,6 +1,6 @@
 /*
  * Copyright 2004-2007 Haiku, Inc.
- * Distributed under the terms of the Haiku License.
+ * Distributed under the terms of the MIT License.
  *
  * Authors (in chronological order):
  *		Stefano Ceccherini (burton666@libero.it)
@@ -16,12 +16,12 @@
 #include "ps2_service.h"
 #include "ps2_dev.h"
 
+
 isa_module_info *gIsa = NULL;
+bool gActiveMultiplexingEnabled = false;
+sem_id gControllerSem;
 
 static int32 sIgnoreInterrupts = 0;
-
-bool	gActiveMultiplexingEnabled = false;
-sem_id	gControllerSem;
 
 
 uint8
@@ -84,6 +84,7 @@ ps2_wait_write(void)
 
 //	#pragma mark -
 
+
 void
 ps2_flush(void)
 {
@@ -133,7 +134,8 @@ ps2_setup_command_byte()
 	if (res != B_OK)
 		cmdbyte = 0x47;
 		
-	cmdbyte |= PS2_BITS_TRANSLATE_SCANCODES | PS2_BITS_KEYBOARD_INTERRUPT | PS2_BITS_AUX_INTERRUPT;
+	cmdbyte |= PS2_BITS_TRANSLATE_SCANCODES | PS2_BITS_KEYBOARD_INTERRUPT
+		| PS2_BITS_AUX_INTERRUPT;
 	cmdbyte &= ~(PS2_BITS_KEYBOARD_DISABLED | PS2_BITS_MOUSE_DISABLED);
 		
 	res = ps2_command(PS2_CTRL_WRITE_CMD, &cmdbyte, 1, NULL, 0);
@@ -192,8 +194,9 @@ no_support:
 	*enabled = false;
 
 done:
-	// Some controllers get upset by the d3 command and will continue data loopback,
-	// thus we need to send a harmless command (enable keyboard interface) next
+	// Some controllers get upset by the d3 command and will continue data
+	// loopback, thus we need to send a harmless command (enable keyboard
+	// interface) next.
 	// This fixes bug report #1175
 	res = ps2_command(0xae, NULL, 0, NULL, 0);
 	if (res != B_OK) {
@@ -206,17 +209,12 @@ fail:
 	*enabled = false;
 	// this should revert the controller into legacy mode, 
 	// just in case it has switched to multiplexed mode
-	res = ps2_command(PS2_CTRL_SELF_TEST, NULL, 0, &in, 1);
-	if (res != B_OK || in != 0x55) {
-		INFO("ps2: controller self test failed, status 0x%08lx, data 0x%02x\n", res, in);
-		return B_ERROR;
-	}
-	return B_OK;
+	return ps2_selftest();
 }
 
 
 status_t
-ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
+ps2_command(uint8 cmd, const uint8 *out, int outCount, uint8 *in, int inCount)
 {
 	status_t res;
 	int i;
@@ -224,15 +222,17 @@ ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
 	acquire_sem(gControllerSem);
 	atomic_add(&sIgnoreInterrupts, 1);
 
-	TRACE("ps2: ps2_command cmd 0x%02x, out %d, in %d\n", cmd, out_count, in_count);
-	for (i = 0; i < out_count; i++)
+#ifdef TRACE_PS2
+	TRACE("ps2: ps2_command cmd 0x%02x, out %d, in %d\n", cmd, outCount, inCount);
+	for (i = 0; i < outCount; i++)
 		TRACE("ps2: ps2_command out 0x%02x\n", out[i]);
+#endif
 
 	res = ps2_wait_write();
 	if (res == B_OK)
 		ps2_write_ctrl(cmd);
 	
-	for (i = 0; res == B_OK && i < out_count; i++) {
+	for (i = 0; res == B_OK && i < outCount; i++) {
 		res = ps2_wait_write();
 		if (res == B_OK)
 			ps2_write_data(out[i]);
@@ -240,7 +240,7 @@ ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
 			TRACE("ps2: ps2_command out byte %d failed\n", i);
 	}
 
-	for (i = 0; res == B_OK && i < in_count; i++) {
+	for (i = 0; res == B_OK && i < inCount; i++) {
 		res = ps2_wait_read();
 		if (res == B_OK)
 			in[i] = ps2_read_data();
@@ -248,9 +248,11 @@ ps2_command(uint8 cmd, const uint8 *out, int out_count, uint8 *in, int in_count)
 			TRACE("ps2: ps2_command in byte %d failed\n", i);
 	}
 
-	for (i = 0; i < in_count; i++)
+#ifdef TRACE_PS2
+	for (i = 0; i < inCount; i++)
 		TRACE("ps2: ps2_command in 0x%02x\n", in[i]);
 	TRACE("ps2: ps2_command result 0x%08lx\n", res);
+#endif
 
 	atomic_add(&sIgnoreInterrupts, -1);
 	release_sem(gControllerSem);
@@ -338,16 +340,18 @@ ps2_init(void)
 	if (status < B_OK)
 		goto err2;
 
-	status = install_io_interrupt_handler(INT_PS2_KEYBOARD, &ps2_interrupt, NULL, 0);
+	status = install_io_interrupt_handler(INT_PS2_KEYBOARD, &ps2_interrupt,
+		NULL, 0);
 	if (status)
 		goto err3;
 	
-	status = install_io_interrupt_handler(INT_PS2_MOUSE,    &ps2_interrupt, NULL, 0);
+	status = install_io_interrupt_handler(INT_PS2_MOUSE, &ps2_interrupt, NULL,
+		0);
 	if (status)
 		goto err4;
 
 	ps2_selftest();
-		
+
 	status = ps2_setup_command_byte();
 	if (status) {
 		INFO("ps2: setting up command byte failed\n");
@@ -361,7 +365,8 @@ ps2_init(void)
 	}
 
 	if (gActiveMultiplexingEnabled) {
-		if (B_TIMED_OUT == ps2_dev_command_timeout(&ps2_device[PS2_DEVICE_MOUSE], 0xe6, NULL, 0, NULL, 0, 100000)) {
+		if (ps2_dev_command_timeout(&ps2_device[PS2_DEVICE_MOUSE], 0xe6,
+				NULL, 0, NULL, 0, 100000) == B_TIMED_OUT) {
 			INFO("ps2: accessing multiplexed mouse port 0 timed out, ignoring it!\n");
 		} else {
 			ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE]);
@@ -374,13 +379,12 @@ ps2_init(void)
 		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE]);
 		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_KEYB]);
 	}
-		
+
 	TRACE("ps2: init done!\n");
-	
 	return B_OK;
 
 err5:
-	remove_io_interrupt_handler(INT_PS2_MOUSE,    &ps2_interrupt, NULL);
+	remove_io_interrupt_handler(INT_PS2_MOUSE, &ps2_interrupt, NULL);
 err4:	
 	remove_io_interrupt_handler(INT_PS2_KEYBOARD, &ps2_interrupt, NULL);
 err3:
