@@ -66,6 +66,9 @@ public:
 			int32				CountChildren() const;
 			int32				IndexOfChild(BMutablePartition* child) const;
 
+			void				SetChangeFlags(uint32 flags);
+			uint32				ChangeFlags() const;
+
 			// for the partitioning system managing the parent
 			void*				ChildCookie() const;
 			void				SetChildCookie(void* cookie);
@@ -89,6 +92,7 @@ private:
 			user_partition_data* fData;
 			BMutablePartition*	fParent;
 			BList				fChildren;
+			uint32				fChangeFlags;
 			void*				fChildCookie;
 };
 

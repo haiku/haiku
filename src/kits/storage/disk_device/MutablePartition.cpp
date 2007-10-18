@@ -321,7 +321,10 @@ BMutablePartition::DeleteChild(int32 index)
 	if (!child)
 		return B_BAD_VALUE;
 
-	delete child->fDelegate->Partition();
+	// This will delete not only all delegates in the child's hierarchy, but
+	// also the respective partitions themselves, if they are no longer
+	// referenced.
+	child->fDelegate->Partition()->_DeleteDelegates();
 
 	return B_OK;
 }
@@ -369,6 +372,22 @@ BMutablePartition::IndexOfChild(BMutablePartition* child) const
 }
 
 
+// SetChangeFlags
+void
+BMutablePartition::SetChangeFlags(uint32 flags)
+{
+	fChangeFlags = flags;
+}
+
+
+// ChangeFlags
+uint32
+BMutablePartition::ChangeFlags() const
+{
+	return fChangeFlags;
+}
+
+
 // ChildCookie
 void*
 BMutablePartition::ChildCookie() const
@@ -390,6 +409,7 @@ BMutablePartition::BMutablePartition(BPartition::Delegate* delegate)
 	: fDelegate(delegate),
 	  fData(NULL),
 	  fParent(NULL),
+	  fChangeFlags(0),
 	  fChildCookie(NULL)
 {
 }
