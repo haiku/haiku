@@ -350,7 +350,10 @@ ps2_init(void)
 	if (status)
 		goto err4;
 
-	ps2_selftest();
+	// While this might have fixed bug #1185, we can't do this unconditionally
+	// as it obviously messes up many controllers which couldn't reboot anymore
+	// after that
+	//ps2_selftest();
 
 	status = ps2_setup_command_byte();
 	if (status) {
