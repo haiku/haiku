@@ -602,9 +602,7 @@ BPartition::ChildAt(int32 index) const
 		return child ? child->Partition() : NULL;
 	}
 
-	if (index < 0 || index >= fPartitionData->child_count)
-		return NULL;
-	return (BPartition*)fPartitionData->children[index]->user_data;
+	return _ChildAt(index);
 }
 
 
@@ -615,7 +613,18 @@ BPartition::CountChildren() const
 	if (fDelegate)
 		return fDelegate->CountChildren();
 
-	return fPartitionData->child_count;
+	return _CountChildren();
+}
+
+
+// CountDescendants
+int32
+BPartition::CountDescendants() const
+{
+	int32 count = 1;
+	for (int32 i = 0; BPartition* child = ChildAt(i); i++)
+		count += child->CountDescendants();
+	return count;
 }
 
 
@@ -624,7 +633,7 @@ BPartition*
 BPartition::FindDescendant(partition_id id) const
 {
 	IDFinderVisitor visitor(id);
-	return const_cast<BPartition*>(this)->VisitEachDescendant(&visitor);
+	return VisitEachDescendant(&visitor);
 }
 
 
@@ -1283,6 +1292,7 @@ BPartition::_Unset()
 	fDevice = NULL;
 	fParent = NULL;
 	fPartitionData = NULL;
+	fDelegate = NULL;
 }
 
 
@@ -1397,14 +1407,21 @@ BPartition::_RemoveChild(int32 index)
 }
 
 
-// _CountDescendants
-int32
-BPartition::_CountDescendants() const
+// _ChildAt
+BPartition*
+BPartition::_ChildAt(int32 index) const
 {
-	int32 count = 1;
-	for (int32 i = 0; BPartition* child = ChildAt(i); i++)
-		count += child->_CountDescendants();
-	return count;
+	if (index < 0 || index >= fPartitionData->child_count)
+		return NULL;
+	return (BPartition*)fPartitionData->children[index]->user_data;
+}
+
+
+// _CountChildren
+int32
+BPartition::_CountChildren() const
+{
+	return fPartitionData->child_count;
 }
 
 
@@ -1511,9 +1528,9 @@ BPartition::_CreateDelegates()
 		return error;
 
 	// create child delegates
-	int32 count = fPartitionData->child_count;
+	int32 count = _CountChildren();
 	for (int32 i = 0; i < count; i++) {
-		BPartition* child = (BPartition*)fPartitionData->children[i]->user_data;
+		BPartition* child = _ChildAt(i);
 		error = child->_CreateDelegates();
 		if (error != B_OK)
 			return error;

@@ -24,6 +24,10 @@ class BVolume;
 struct user_partition_data;
 
 
+namespace BPrivate {
+	class DiskDeviceJobGenerator;
+}
+
 class BPartition {
 public:
 	// Partition Info
@@ -71,6 +75,7 @@ public:
 			BPartition*			Parent() const;
 			BPartition*			ChildAt(int32 index) const;
 			int32				CountChildren() const;
+			int32				CountDescendants() const;
 			BPartition*			FindDescendant(partition_id id) const;
 
 			status_t			GetPartitioningInfo(
@@ -187,7 +192,9 @@ private:
 									bool* updated);
 			void				_RemoveChild(int32 index);
 
-			int32				_CountDescendants() const;
+			BPartition*			_ChildAt(int32 index) const;
+			int32				_CountChildren() const;
+
 			int32				_Level() const;
 			virtual	bool		_AcceptVisitor(BDiskDeviceVisitor* visitor,
 									int32 level);
@@ -212,6 +219,7 @@ private:
 			friend class BDiskDevice;
 			friend class BDiskSystem;
 			friend class BMutablePartition;
+			friend class BPrivate::DiskDeviceJobGenerator;
 
 			BDiskDevice*		fDevice;
 			BPartition*			fParent;
