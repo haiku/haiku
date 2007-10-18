@@ -28,6 +28,8 @@ class SettingsView : public BView {
 
 	private:
 		void 			_InitView();
+		void			_UpdateDateSettings(const uint32 what);
+		void			_UpdateTimeSettings(const uint32 what) const;
 
 	private:
 		BCheckBox		*fShow24Hours;
@@ -35,14 +37,15 @@ class SettingsView : public BView {
 		BRadioButton 	*fGmtTime;
 		BRadioButton 	*fLocalTime;
 
-		BCheckBox		*fYearMonthDay;
-		BCheckBox		*fDayMonthYear;
-		BCheckBox		*fMonthDayYear;
+		BRadioButton	*fYearMonthDay;
+		BRadioButton	*fDayMonthYear;
+		BRadioButton	*fMonthDayYear;
 		BCheckBox		*fStartWeekMonday;
 
 		BPopUpMenu 		*fDateSeparator;
 
 		bool			fInitialized;
+		uint32			fRecentDateWhat;
 };
 
 #endif	// SETTINGS_VIEW_H

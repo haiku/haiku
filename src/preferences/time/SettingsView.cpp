@@ -19,20 +19,25 @@
 
 
 const uint32 kMsgMilTime = 'MilT';
-const uint32 kMsgEuroDate = 'EDat';
 const uint32 kMsgShowSeconds = 'ShSc';
 
-const uint32 kYearMonthDay = '_ymd';
-const uint32 kDayMonthYear = '_dmy';
+
+const uint32 kMsgIsoDate = 'IDat';
+const uint32 kMsgEuroDate = 'EDat';
 const uint32 kMonthDayYear = '_mdy';
 const uint32 kSeparatorChanged = '_tsc';
 const uint32 kTrackerDateFormatChanged = 'TDFC';
 
 
+const char* kDeskbarSignature = "application/x-vnd.Be-TSKB";
+const char* kTrackerSignature = "application/x-vnd.Be-TRAK";
+
+
 SettingsView::SettingsView(BRect frame)
-	: BView(frame,"Settings", B_FOLLOW_ALL,
+	: BView(frame, "Settings", B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP),
-	  fInitialized(false)
+	  fInitialized(false),
+	  fRecentDateWhat(kMonthDayYear)
 {
 }
 
@@ -58,7 +63,22 @@ SettingsView::AttachedToWindow()
 void
 SettingsView::MessageReceived(BMessage *message)
 {
-	BView::MessageReceived(message);
+	switch (message->what) {
+		case kMsgMilTime:
+		case kMsgIsoDate:
+			_UpdateTimeSettings(message->what);
+			break;
+
+		case kMsgEuroDate:
+		case kMonthDayYear:
+		case kMsgShowSeconds:
+			_UpdateDateSettings(message->what);
+			break;
+
+		default:
+			BView::MessageReceived(message);
+			break;
+	}
 }
 
 
@@ -80,12 +100,14 @@ SettingsView::_InitView()
 	fShow24Hours = new BCheckBox(frameLeft, "show24Hours", "24 Hour Clock"
 		, new BMessage(kMsgMilTime));
 	AddChild(fShow24Hours);
+	fShow24Hours->SetTarget(this);
 	fShow24Hours->ResizeToPreferred();
 	
 	frameLeft.OffsetBy(0.0, fShow24Hours->Bounds().Height() + 5.0);
 	fShowSeconds = new BCheckBox(frameLeft, "showSeconds", "Show Seconds"
 		, new BMessage(kMsgShowSeconds));
 	AddChild(fShowSeconds);
+	fShowSeconds->SetTarget(this);
 	fShowSeconds->ResizeToPreferred();
 
 	frameLeft.OffsetBy(0.0, 2 * fShowSeconds->Bounds().Height() + 5.0);
@@ -105,33 +127,44 @@ SettingsView::_InitView()
 	frameRight.left = frameRight.Width() / 2;
 	frameRight.InsetBy(10.0f, 10.0f);
 
+	BView *dateView = new BView(frameRight, "dateView", B_FOLLOW_ALL,
+		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP);
+	AddChild(dateView);
+	if (Parent())
+		dateView->SetViewColor(Parent()->ViewColor());
+
+	frameRight.OffsetTo(B_ORIGIN);
 	BStringView *dateSettings = new BStringView(frameRight, "date", "Date:");
-	AddChild(dateSettings);
+	dateView->AddChild(dateSettings);
 	dateSettings->ResizeToPreferred();
 
 	frameRight.OffsetBy(10.0, dateSettings->Bounds().Height() + 5.0);
-	fYearMonthDay = new BCheckBox(frameRight, "yearMonthDay", "Year-Month-Day"
-		, new BMessage(kYearMonthDay));
-	AddChild(fYearMonthDay);
+	fYearMonthDay = new BRadioButton(frameRight, "yearMonthDay", "Year-Month-Day"
+		, new BMessage(kMsgIsoDate));
+	dateView->AddChild(fYearMonthDay);
+	fYearMonthDay->SetTarget(this);
 	fYearMonthDay->ResizeToPreferred();
 
 	frameRight.OffsetBy(0.0, fYearMonthDay->Bounds().Height() + 5.0);
-	fDayMonthYear = new BCheckBox(frameRight, "dayMonthYear", "Day-Month-Year"
-		, new BMessage(kDayMonthYear));
-	AddChild(fDayMonthYear);
+	fDayMonthYear = new BRadioButton(frameRight, "dayMonthYear", "Day-Month-Year"
+		, new BMessage(kMsgEuroDate));
+	dateView->AddChild(fDayMonthYear);
+	fDayMonthYear->SetTarget(this);
 	fDayMonthYear->ResizeToPreferred();
 
 	frameRight.OffsetBy(0.0, fDayMonthYear->Bounds().Height() + 5.0);
-	fMonthDayYear = new BCheckBox(frameRight, "monthDayYear", "Month-Day-Year"
+	fMonthDayYear = new BRadioButton(frameRight, "monthDayYear", "Month-Day-Year"
 		, new BMessage(kMonthDayYear));
-	AddChild(fMonthDayYear);
+	dateView->AddChild(fMonthDayYear);
+	fMonthDayYear->SetTarget(this);
 	fMonthDayYear->ResizeToPreferred();
 	fMonthDayYear->SetValue(B_CONTROL_ON);
 
 	frameRight.OffsetBy(0.0, fMonthDayYear->Bounds().Height() + 5.0);
 	fStartWeekMonday = new BCheckBox(frameRight, "startWeekMonday"
 		, "Start week with Monday", new BMessage(kWeekStart));
-	AddChild(fStartWeekMonday);
+	dateView->AddChild(fStartWeekMonday);
+	fStartWeekMonday->SetTarget(this);
 	fStartWeekMonday->ResizeToPreferred();
 
 	fDateSeparator = new BPopUpMenu("Separator");
@@ -147,6 +180,28 @@ SettingsView::_InitView()
 	frameRight.OffsetBy(0.0, fStartWeekMonday->Bounds().Height() + 5.0);
 	BMenuField *menuField = new BMenuField(frameRight, "regions", "Date separator:"
 		, fDateSeparator, false);
-	AddChild(menuField);
+	dateView->AddChild(menuField);
 	menuField->ResizeToPreferred();
+}
+
+
+void
+SettingsView::_UpdateDateSettings(const uint32 _what)
+{
+	uint32 what = _what;
+	if (_what == kMonthDayYear)
+		what = fRecentDateWhat;
+
+	fRecentDateWhat = _what;
+
+	BMessenger messenger(kDeskbarSignature);
+	messenger.SendMessage(what);
+}
+
+
+void
+SettingsView::_UpdateTimeSettings(const uint32 what) const
+{
+	BMessenger messenger(kDeskbarSignature);
+	messenger.SendMessage(what);
 }
