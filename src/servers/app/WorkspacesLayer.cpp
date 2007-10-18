@@ -432,7 +432,7 @@ WorkspacesLayer::MouseUp(BMessage* message, BPoint where)
 		int32 index;
 		_WorkspaceAt(where, index);
 		if (index >= 0)
-			Window()->Desktop()->SetWorkspace(index);
+			Window()->Desktop()->SetWorkspaceAsync(index);
 	}
 
 	if (fSelectedWindow != NULL) {

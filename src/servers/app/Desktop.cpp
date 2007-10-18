@@ -618,7 +618,8 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 				PostMessage(kMsgQuitLooper);
 			break;
 
-		case AS_ACTIVATE_WORKSPACE: {
+		case AS_ACTIVATE_WORKSPACE:
+		{
 			int32 index;
 			link.Read<int32>(&index);
 
@@ -814,7 +815,6 @@ Desktop::SetWorkspacesCount(int32 newCount)
 
 /*!
 	Changes the current workspace to the one specified by \a index.
-	You must not hold any window lock when calling this method.
 */
 void
 Desktop::SetWorkspaceAsync(int32 index)
@@ -836,7 +836,8 @@ Desktop::SetWorkspace(int32 index)
 	LockAllWindows();
 	DesktopSettings settings(this);
 
-	if (index < 0 || index >= settings.WorkspacesCount() || index == fCurrentWorkspace) {
+	if (index < 0 || index >= settings.WorkspacesCount()
+		|| index == fCurrentWorkspace) {
 		UnlockAllWindows();
 		return;
 	}
@@ -1390,29 +1391,15 @@ Desktop::ActivateWindow(WindowLayer* window)
 		fFront = NULL;
 		return;
 	}
-
-	bool windowOnOtherWorkspace = !window->InWorkspace(fCurrentWorkspace);
-
-	if (windowOnOtherWorkspace
-		&& (window->Flags() & B_NO_WORKSPACE_ACTIVATION)
-		&& !(window->Flags() & B_NOT_ANCHORED_ON_ACTIVATE))
+	if (window->Workspaces() == 0)
 		return;
 
 	// TODO: take care about floating windows
 
-	if (!LockAllWindows())
-		return;
-
+	bool windowOnOtherWorkspace = !window->InWorkspace(fCurrentWorkspace);
 	if (windowOnOtherWorkspace) {
-		// if the window wants to come to the current workspace,
-		// do so here - else activate the workspace on which this
-		// window is
-		if (window->Flags() & B_NOT_ANCHORED_ON_ACTIVATE) {
-			// bring the window to the current workspace
-			// TODO: what if this window is on multiple workspaces?!?
-			uint32 workspaces = workspace_to_workspaces(fCurrentWorkspace);
-			SetWindowWorkspaces(window, workspaces);
-		} else {
+		if ((window->Flags() & B_NO_WORKSPACE_ACTIVATION) == 0
+			&& (window->Flags() & B_NOT_ANCHORED_ON_ACTIVATE) == 0) {
 			// switch to the workspace on which this window is
 			// (we'll take the first one that the window is on)
 			uint32 workspaces = window->Workspaces();
@@ -1420,10 +1407,23 @@ Desktop::ActivateWindow(WindowLayer* window)
 				uint32 workspace = workspace_to_workspaces(i);
 				if (workspaces & workspace) {
 					SetWorkspace(i);
+					windowOnOtherWorkspace = false;
 					break;
 				}
 			}
-		}
+		} else if ((window->Flags() & B_NOT_ANCHORED_ON_ACTIVATE) == 0)
+			return;
+	}
+
+	if (!LockAllWindows())
+		return;
+
+	if (windowOnOtherWorkspace
+		&& (window->Flags() & B_NOT_ANCHORED_ON_ACTIVATE) != 0) {
+		// bring the window to the current workspace
+		// TODO: what if this window is on multiple workspaces?!?
+		uint32 workspaces = workspace_to_workspaces(fCurrentWorkspace);
+		SetWindowWorkspaces(window, workspaces);
 	}
 
 	if (window == FrontWindow()) {

@@ -368,16 +368,11 @@ ServerWindow::_Show()
 	if (fQuitting || !fWindowLayer->IsHidden() || fWindowLayer->IsOffscreenWindow())
 		return;
 
-// TODO: deadlock. Desktop::ShowWindow() will eventually lock the event thread,
-// which might be blocking on the all window lock with it's own lock already
-// head.
-// Maybe we need to dispatch a message to the desktop to show/hide us
-// instead of doing it from this thread.
-//fDesktop->UnlockSingleWindow();
-fDesktop->UnlockAllWindows();
+	// TODO: Maybe we need to dispatch a message to the desktop to show/hide us
+	// instead of doing it from this thread.
+	fDesktop->UnlockSingleWindow();
 	fDesktop->ShowWindow(fWindowLayer);
-fDesktop->LockAllWindows();
-//fDesktop->LockSingleWindow();
+	fDesktop->LockSingleWindow();
 
 	if (fDirectWindowData != NULL)
 		HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESET);
@@ -397,9 +392,9 @@ ServerWindow::_Hide()
 	if (fDirectWindowData != NULL)
 		HandleDirectConnection(B_DIRECT_STOP);
 
-// TODO: race condition? maybe we need to dispatch a message to the desktop to show/hide us
-// instead of doing it from this thread.
+	fDesktop->UnlockSingleWindow();
 	fDesktop->HideWindow(fWindowLayer);
+	fDesktop->LockSingleWindow();
 }
 
 
@@ -3195,9 +3190,6 @@ bool
 ServerWindow::_MessageNeedsAllWindowsLocked(uint32 code) const
 {
 	switch (code) {
-		case AS_SHOW_WINDOW:
-		case AS_HIDE_WINDOW:
-		case AS_MINIMIZE_WINDOW:
 		case AS_ACTIVATE_WINDOW:
 		case AS_SET_WINDOW_TITLE:
 		case AS_ADD_TO_SUBSET:
