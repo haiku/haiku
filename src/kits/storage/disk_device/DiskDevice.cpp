@@ -23,6 +23,9 @@
 #include <syscalls.h>
 #include <disk_device_manager/ddm_userland_interface.h>
 
+#include "DiskDeviceJob.h"
+#include "DiskDeviceJobGenerator.h"
+#include "DiskDeviceJobQueue.h"
 #include "DiskSystemAddOnManager.h"
 
 
@@ -276,6 +279,7 @@ status_t
 BDiskDevice::CommitModifications(bool synchronously,
 	BMessenger progressMessenger, bool receiveCompleteProgressUpdates)
 {
+// TODO: Support parameters!
 	status_t error = InitCheck();
 	if (error != B_OK)
 		return error;
@@ -283,7 +287,13 @@ BDiskDevice::CommitModifications(bool synchronously,
 	if (!fDelegate)
 		return B_BAD_VALUE;
 
-	// TODO: Implement!
+	// generate jobs
+	DiskDeviceJobQueue jobQueue;
+	error = DiskDeviceJobGenerator(this, &jobQueue).GenerateJobs();
+
+	// do the jobs
+	if (error == B_OK)
+		error = jobQueue.Execute();
 
 	_DeleteDelegates();
 	DiskSystemAddOnManager::Default()->UnloadDiskSystems();

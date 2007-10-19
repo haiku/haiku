@@ -12,6 +12,7 @@ UseArchHeaders $(TARGET_ARCH) ;
 UsePublicHeaders [ FDirName add-ons registrar ] ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) disk_device ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) disk_device jobs ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) mime ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) sniffer ] ;
 
@@ -72,6 +73,9 @@ MergeObject <libbe>storage_kit.o :
 
 	# disk device API
 	DiskDevice.cpp
+	DiskDeviceJob.cpp
+	DiskDeviceJobGenerator.cpp
+	DiskDeviceJobQueue.cpp
 	DiskDeviceList.cpp
 	DiskDevicePrivate.cpp
 	DiskDeviceRoster.cpp
@@ -84,6 +88,9 @@ MergeObject <libbe>storage_kit.o :
 	Partition.cpp
 	PartitionDelegate.cpp
 	PartitioningInfo.cpp 
+	PartitionReference.cpp
+
+	InitializeJob.cpp
 ;
 
 

@@ -14,36 +14,11 @@
 
 #include <disk_device_manager/ddm_userland_interface.h>
 
+#include "DiskDeviceUtils.h"
 #include "PartitionDelegate.h"
 
 
 using std::nothrow;
-
-
-// set_string
-static status_t
-set_string(char*& location, const char* newString)
-{
-	char* string = NULL;
-	if (newString) {
-		string = strdup(newString);
-		if (!string)
-			return B_NO_MEMORY;
-	}
-
-	free(location);
-	location = string;
-
-	return B_OK;
-}
-
-
-#define SET_STRING_RETURN_ON_ERROR(location, string)	\
-{														\
-	status_t error = set_string(location, string);		\
-	if (error != B_OK)									\
-		return error;									\
-}
 
 
 // Offset

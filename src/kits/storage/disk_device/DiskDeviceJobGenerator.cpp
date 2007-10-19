@@ -14,7 +14,12 @@
 
 #include <disk_device_manager/ddm_userland_interface.h>
 
+#include "DiskDeviceJob.h"
+#include "DiskDeviceJobQueue.h"
 #include "PartitionDelegate.h"
+#include "PartitionReference.h"
+
+#include "InitializeJob.h"
 
 
 using std::nothrow;
@@ -45,12 +50,31 @@ compare_string(const char* str1, const char* str2)
 }
 
 
-// move_info
-struct DiskDeviceJobGenerator::move_info {
+// MoveInfo
+struct DiskDeviceJobGenerator::MoveInfo {
 	BPartition*	partition;
 	off_t		position;
 	off_t		target_position;
 	off_t		size;
+};
+
+
+// PartitionRefInfo 
+struct DiskDeviceJobGenerator::PartitionRefInfo {
+	PartitionRefInfo()
+		: partition(NULL),
+		  reference(NULL)
+	{
+	}
+
+	~PartitionRefInfo()
+	{
+		if (reference)
+			reference->RemoveReference();
+	}
+
+	BPartition*			partition;
+	PartitionReference*	reference;
 };
 
 
@@ -59,12 +83,14 @@ DiskDeviceJobGenerator::DiskDeviceJobGenerator(BDiskDevice* device,
 		DiskDeviceJobQueue* jobQueue)
 	: fDevice(device),
 	  fJobQueue(jobQueue),
-	  fMoveInfos(NULL)
+	  fMoveInfos(NULL),
+	  fPartitionRefs(NULL)
 {
-	fMoveInfoCount = fDevice->CountDescendants();
+	fPartitionCount = fDevice->CountDescendants();
 
-	fMoveInfos = new(nothrow) move_info[fMoveInfoCount];
-//	fPartitionIDs = new(nothrow) partition_id[fMoveInfoCount];
+	fMoveInfos = new(nothrow) MoveInfo[fPartitionCount];
+//	fPartitionIDs = new(nothrow) partition_id[fPartitionCount];
+	fPartitionRefs = new(nothrow) PartitionRefInfo[fPartitionCount];
 }
 
 
@@ -73,6 +99,7 @@ DiskDeviceJobGenerator::~DiskDeviceJobGenerator()
 {
 	delete[] fMoveInfos;
 //	delete[] fPartitionIDs;
+	delete[] fPartitionRefs;
 }
 
 
@@ -81,10 +108,11 @@ status_t
 DiskDeviceJobGenerator::GenerateJobs()
 {
 	// check parameters
-	if (!fDevice || !fJobQueue /*|| !fMoveInfos || !fPartitionIDs
-		|| fJobQueue->Device() != fDevice || !fDevice->ShadowPartition()*/) {
+	if (!fDevice || !fJobQueue)
 		return B_BAD_VALUE;
-	}
+
+	if (!fMoveInfos /*|| !fPartitionIDs*/ || !fPartitionRefs)
+		return B_NO_MEMORY;
 
 	// 1) Generate jobs for all physical partitions that don't have an
 	// associated shadow partition, i.e. those that shall be deleted.
@@ -116,8 +144,14 @@ DiskDeviceJobGenerator::GenerateJobs()
 status_t
 DiskDeviceJobGenerator::_AddJob(DiskDeviceJob* job)
 {
-// TODO: Implement!
-	return B_BAD_VALUE;
+	if (!job)
+		return B_NO_MEMORY;
+
+	status_t error = fJobQueue->AddJob(job);
+	if (error != B_OK)
+		delete job;
+
+	return error;
 }
 
 
@@ -208,8 +242,8 @@ DiskDeviceJobGenerator::_GenerateChildPlacementJobs(BPartition* partition)
 
 	for (int32 i = 0; BPartition* child = partition->_ChildAt(i); i++) {
 		if (BMutablePartition* childShadow = _GetMutablePartition(child)) {
-			// add a move_info for the child
-			move_info& info = fMoveInfos[childCount];
+			// add a MoveInfo for the child
+			MoveInfo& info = fMoveInfos[childCount];
 			childCount++;
 			info.partition = child;
 			info.position = child->Offset();
@@ -233,7 +267,7 @@ DiskDeviceJobGenerator::_GenerateChildPlacementJobs(BPartition* partition)
 
 	// sort the move infos
 	if (childCount > 0 && moveForth + moveBack > 0) {
-		qsort(fMoveInfos, childCount, sizeof(move_info),
+		qsort(fMoveInfos, childCount, sizeof(MoveInfo),
 			  _CompareMoveInfoPosition);
 	}
 
@@ -243,7 +277,7 @@ DiskDeviceJobGenerator::_GenerateChildPlacementJobs(BPartition* partition)
 		if (moveForth < moveBack) {
 			// move children back
 			for (int32 i = 0; i < childCount; i++) {
-				move_info &info = fMoveInfos[i];
+				MoveInfo &info = fMoveInfos[i];
 				if (info.position > info.target_position) {
 					if (i == 0
 						|| info.target_position >= fMoveInfos[i - 1].position
@@ -262,7 +296,7 @@ DiskDeviceJobGenerator::_GenerateChildPlacementJobs(BPartition* partition)
 		} else {
 			// move children forth
 			for (int32 i = childCount - 1; i >= 0; i--) {
-				move_info &info = fMoveInfos[i];
+				MoveInfo &info = fMoveInfos[i];
 				if (info.position > info.target_position) {
 					if (i == childCount - 1
 						|| info.target_position + info.size
@@ -430,8 +464,23 @@ DiskDeviceJobGenerator::_GetMutablePartition(BPartition* partition)
 status_t
 DiskDeviceJobGenerator::_GenerateInitializeJob(BPartition* partition)
 {
-// TODO: Implement!
-	return B_BAD_VALUE;
+	PartitionReference* reference;
+	status_t error = _GetPartitionReference(partition, reference);
+	if (error != B_OK)
+		return error;
+
+	InitializeJob* job = new(nothrow) InitializeJob(reference);
+	if (!job)
+		return B_NO_MEMORY;
+
+	error = job->Init(partition->ContentType(),
+		partition->ContentName(), partition->ContentParameters());
+	if (error != B_OK) {
+		delete job;
+		return error;
+	}
+
+	return _AddJob(job);
 }
 
 
@@ -557,12 +606,52 @@ DiskDeviceJobGenerator::_CollectContentsToMove(BPartition* partition)
 }
 
 
+// _GetPartitionReference
+status_t
+DiskDeviceJobGenerator::_GetPartitionReference(BPartition* partition,
+	PartitionReference*& reference)
+{
+	if (!partition)
+		return B_BAD_VALUE;
+
+	for (int32 i = 0; i < fPartitionCount; i++) {
+		PartitionRefInfo& info = fPartitionRefs[i];
+
+		if (info.partition == partition) {
+			reference = info.reference;
+			return B_OK;
+		}
+
+		if (info.partition == NULL) {
+			// create partition reference
+			info.reference = new(nothrow) PartitionReference();
+			if (!info.reference)
+				return B_NO_MEMORY;
+
+			// set partition ID and change counter
+			user_partition_data* partitionData = partition->fPartitionData;
+			if (partitionData) {
+				info.reference->SetPartitionID(partitionData->id);
+				info.reference->SetChangeCounter(partitionData->change_counter);
+			}
+
+			info.partition = partition;
+			reference = info.reference;
+			return B_OK;
+		}
+	}
+
+	// Out of slots -- that can't happen.
+	return B_ERROR;
+}
+
+
 // _CompareMoveInfoOffset
 int
 DiskDeviceJobGenerator::_CompareMoveInfoPosition(const void* _a, const void* _b)
 {
-	const move_info* a = static_cast<const move_info*>(_a);
-	const move_info* b = static_cast<const move_info*>(_b);
+	const MoveInfo* a = static_cast<const MoveInfo*>(_a);
+	const MoveInfo* b = static_cast<const MoveInfo*>(_b);
 	if (a->position < b->position)
 		return -1;
 	if (a->position > b->position)

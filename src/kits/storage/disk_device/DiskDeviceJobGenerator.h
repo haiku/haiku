@@ -18,6 +18,7 @@ namespace BPrivate {
 
 class DiskDeviceJob;
 class DiskDeviceJobQueue;
+class PartitionReference;
 
 
 class DiskDeviceJobGenerator {
@@ -65,16 +66,21 @@ private:
 
 			status_t			_CollectContentsToMove(BPartition* partition);
 
+			status_t			_GetPartitionReference(BPartition* partition,
+									PartitionReference*& reference);
+
 	static	int					_CompareMoveInfoPosition(const void* _a,
 									const void* _b);
 
 private:
-			struct move_info;
+			struct MoveInfo;
+			struct PartitionRefInfo;
 
 			BDiskDevice*		fDevice;
 			DiskDeviceJobQueue*	fJobQueue;
-			move_info*			fMoveInfos;
-			int32				fMoveInfoCount;
+			MoveInfo*			fMoveInfos;
+			int32				fPartitionCount;
+			PartitionRefInfo*	fPartitionRefs;
 };
 
 
