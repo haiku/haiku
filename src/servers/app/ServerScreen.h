@@ -29,19 +29,22 @@ class Screen {
 			void				Shutdown();
 
 			int32				ID() const { return fID; }
-			status_t			GetMonitorInfo(monitor_info& info);
+			status_t			GetMonitorInfo(monitor_info& info) const;
 
-			status_t			SetMode(const display_mode& mode, bool makeDefault);
+			status_t			SetMode(const display_mode& mode,
+									bool makeDefault);
 			status_t			SetMode(uint16 width, uint16 height,
 									uint32 colorspace, float frequency,
+									bool makeDefault);
+			status_t			SetMode(uint16 width, uint16 height,
+									uint32 colorspace,
+									const display_timing& timing,
 									bool makeDefault);
 			status_t			SetPreferredMode();
 
 			void				GetMode(display_mode* mode) const;
-			void				GetMode(uint16 &width,
-										uint16 &height,
-										uint32 &colorspace,
-										float &frequency) const;
+			void				GetMode(uint16 &width, uint16 &height,
+									uint32 &colorspace, float &frequency) const;
 			BRect				Frame() const;
 			color_space			ColorSpace() const;
 
@@ -53,15 +56,13 @@ class Screen {
 									{ return fHWInterface; }
 
  private:
-			status_t			_FindMode(uint16 width,
-										  uint16 height,
-										  uint32 colorspace,
-										  float frequency,
-										  display_mode* mode) const;
+			status_t			_FindMode(uint16 width, uint16 height,
+									uint32 colorspace, float frequency,
+									display_mode* mode) const;
 
 			int32				_FindMode(const display_mode* modeList,
-										  uint32 count, uint16 width, uint16 height,
-										  uint32 colorspace, float frequency) const;
+									uint32 count, uint16 width, uint16 height,
+									uint32 colorspace, float frequency) const;
 
 			int32				fID;
 			DrawingEngine*		fDriver;

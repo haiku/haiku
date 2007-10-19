@@ -31,7 +31,8 @@ class VirtualScreen {
 		::HWInterface*		HWInterface() const
 								{ return fHWInterface; }
 
-		status_t			RestoreConfiguration(Desktop& desktop, const BMessage* settings);
+		status_t			RestoreConfiguration(Desktop& desktop,
+								const BMessage* settings);
 		status_t			StoreConfiguration(BMessage& settings);
 
 		status_t			AddScreen(Screen* screen);
@@ -49,7 +50,8 @@ class VirtualScreen {
 		int32				CountScreens() const;
 
 	private:
-		status_t			_FindConfiguration(Screen* screen, BMessage& settings);
+		status_t			_FindConfiguration(Screen* screen,
+								BMessage& settings);
 		void				_Reset();
 
 		struct screen_item {

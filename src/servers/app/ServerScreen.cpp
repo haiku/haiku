@@ -103,12 +103,27 @@ Screen::SetMode(const display_mode& mode, bool makeDefault)
 
 
 status_t
-Screen::SetMode(uint16 width, uint16 height, uint32 colorspace,
+Screen::SetMode(uint16 width, uint16 height, uint32 colorSpace,
+	const display_timing& timing, bool makeDefault)
+{
+	display_mode mode;
+	mode.virtual_width = width;
+	mode.virtual_height = height;
+	mode.space = colorSpace;
+	mode.timing = timing;
+	mode.flags = 0;
+
+	return SetMode(mode, makeDefault);
+}
+
+
+status_t
+Screen::SetMode(uint16 width, uint16 height, uint32 colorSpace,
 	float frequency, bool makeDefault)
 {
 	// search for a matching mode
 	display_mode mode;
-	status_t status = _FindMode(width, height, colorspace, frequency, &mode);
+	status_t status = _FindMode(width, height, colorSpace, frequency, &mode);
 	if (status < B_OK)
 		return status;
 
@@ -166,6 +181,13 @@ Screen::GetMode(uint16 &width, uint16 &height, uint32 &colorspace,
 	height = mode.virtual_height;
 	colorspace = mode.space;
 	frequency = get_mode_frequency(mode);
+}
+
+
+status_t
+Screen::GetMonitorInfo(monitor_info& info) const
+{
+	return fHWInterface->GetMonitorInfo(&info);
 }
 
 

@@ -62,7 +62,8 @@ VirtualScreen::RestoreConfiguration(Desktop& desktop, const BMessage* settings)
 		fSettings = *settings;
 
 	ScreenList list;
-	status_t status = gScreenManager->AcquireScreens(&desktop, NULL, 0, false, list);
+	status_t status = gScreenManager->AcquireScreens(&desktop, NULL, 0, false,
+		list);
 	if (status < B_OK) {
 		// TODO: we would try again here with force == true
 		return status;
@@ -81,6 +82,8 @@ VirtualScreen::RestoreConfiguration(Desktop& desktop, const BMessage* settings)
 status_t
 VirtualScreen::StoreConfiguration(BMessage& settings)
 {
+	// store the configuration of all current screens
+
 	for (int32 i = 0; i < fScreenList.CountItems(); i++) {
 		screen_item* item = fScreenList.ItemAt(i);
 		Screen* screen = item->screen;
@@ -89,20 +92,36 @@ VirtualScreen::StoreConfiguration(BMessage& settings)
 
 		BMessage screenSettings;
 		screenSettings.AddInt32("id", screen->ID());
-		//screenSettings.AddString("name", "-");
+
+		monitor_info info;
+		if (screen->GetMonitorInfo(info) == B_OK) {
+			screenSettings.AddString("vendor", info.vendor);
+			screenSettings.AddString("name", info.name);
+			screenSettings.AddInt32("product id", info.product_id);
+			screenSettings.AddString("serial", info.serial_number);
+			screenSettings.AddInt32("produced week", info.produced.week);
+			screenSettings.AddInt32("produced year", info.produced.year);
+		}
+
 		screenSettings.AddRect("frame", item->frame);
 
-		// TODO: or just store a display_mode completely?
-		uint16 width, height;
-		uint32 colorSpace;
-		float frequency;
-		screen->GetMode(width, height, colorSpace, frequency);
+		display_mode mode;
+		screen->GetMode(&mode);
 
-		screenSettings.AddInt32("width", width);
-		screenSettings.AddInt32("height", height);
-		screenSettings.AddInt32("color space", colorSpace);
-		screenSettings.AddFloat("frequency", frequency);
+		screenSettings.AddInt32("width", mode.virtual_width);
+		screenSettings.AddInt32("height", mode.virtual_height);
+		screenSettings.AddInt32("color space", mode.space);
+		screenSettings.AddData("timing", B_RAW_TYPE, &mode.timing,
+			sizeof(display_timing));
 
+		settings.AddMessage("screen", &screenSettings);
+	}
+
+	// store the configuration of all monitors currently not attached
+
+	BMessage screenSettings;
+	for (uint32 i = 0; fSettings.FindMessage("screen", i,
+			&screenSettings) == B_OK; i++) {
 		settings.AddMessage("screen", &screenSettings);
 	}
 
@@ -124,12 +143,15 @@ VirtualScreen::AddScreen(Screen* screen)
 	if (_FindConfiguration(screen, settings) == B_OK) {
 		// we found settings for this screen, and try to apply them now
 		int32 width, height, colorSpace;
-		float frequency;
+		const display_timing* timing;
+		ssize_t size;
 		if (settings.FindInt32("width", &width) == B_OK
 			&& settings.FindInt32("height", &height) == B_OK
 			&& settings.FindInt32("color space", &colorSpace) == B_OK
-			&& settings.FindFloat("frequency", &frequency) == B_OK)
-			status = screen->SetMode(width, height, colorSpace, frequency, true);
+			&& settings.FindData("timing", B_RAW_TYPE, (const void**)&timing,
+					&size) == B_OK
+			&& size == sizeof(display_timing))
+			status = screen->SetMode(width, height, colorSpace, *timing, true);
 	}
 	if (status < B_OK) {
 		// TODO: more intelligent standard mode (monitor preference, desktop default, ...)
@@ -220,18 +242,67 @@ VirtualScreen::CountScreens() const
 status_t
 VirtualScreen::_FindConfiguration(Screen* screen, BMessage& settings)
 {
-	// TODO: we probably want to identify the resolution by connected monitor,
-	//		and not the display driver used...
-	//		For now, we just use the screen ID, which is almost nothing, anyway...
+	monitor_info info;
+	bool hasInfo = screen->GetMonitorInfo(info) == B_OK;
+	if (!hasInfo) {
+		// only look for a matching ID - this is all we have
+		for (uint32 i = 0; fSettings.FindMessage("screen", i,
+				&settings) == B_OK; i++) {
+			int32 id;
+			if (settings.FindInt32("id", &id) != B_OK
+				|| screen->ID() != id)
+				continue;
 
-	uint32 i = 0;
-	while (fSettings.FindMessage("screen", i++, &settings) == B_OK) {
+			// we found our match
+			fSettings.RemoveData("screen", i);
+			return B_OK;
+		}
+	}
+
+	// look for a monitor configuration that matches ours
+
+	int32 bestScore = 0;
+	int32 bestIndex = -1;
+	BMessage stored;
+	for (uint32 i = 0; fSettings.FindMessage("screen", i, &stored) == B_OK;
+			i++) {
+		int32 score = 0;
 		int32 id;
-		if (settings.FindInt32("id", &id) != B_OK
-			|| screen->ID() != id)
-			continue;
+		if (stored.FindInt32("id", &id) == B_OK && screen->ID() == id)
+			score++;
 
-		// we found our match
+		const char* vendor;
+		const char* name;
+		uint32 productID;
+		const char* serial;
+		int32 week, year;
+		if (stored.FindString("vendor", &vendor) == B_OK
+			&& stored.FindString("name", &name) == B_OK
+			&& stored.FindInt32("product id", (int32*)&productID) == B_OK
+			&& stored.FindString("serial", &serial) == B_OK
+			&& stored.FindInt32("produced week", &week) == B_OK
+			&& stored.FindInt32("produced year", &year) == B_OK) {
+			if (!strcasecmp(vendor, info.vendor)
+				&& !strcasecmp(name, info.name)
+				&& productID == info.product_id) {
+				score += 2;
+				if (!strcmp(serial, info.serial_number))
+					score += 2;
+				if (info.produced.year == year && info.produced.week == week)
+					score++;
+			} else
+				score -= 2;
+		}
+
+		if (score > bestScore) {
+			settings = stored;
+			bestScore = score;
+			bestIndex = i;
+		}
+	}
+
+	if (bestIndex >= 0) {
+		fSettings.RemoveData("screen", bestIndex);
 		return B_OK;
 	}
 
