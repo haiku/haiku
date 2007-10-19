@@ -51,8 +51,9 @@ public:
 	bool IsWriteOnce() const;
 	bool IsRemovable() const;
 	bool HasMedia() const;
+	bool MediaChanged() const;
 
-	virtual status_t GetMediaStatus(status_t *mediaStatus);
+	void UpdateMediaStatusIfNeeded();
 
 	status_t SetPath(const char *path);
 		// TODO: Remove this method or make it private. Once initialized the
@@ -81,6 +82,7 @@ public:
 	virtual void Dump(bool deep = true, int32 level = 0);
 
 protected:
+	virtual status_t GetMediaStatus(status_t *mediaStatus);
 	virtual status_t GetGeometry(device_geometry *geometry);
 
 private:

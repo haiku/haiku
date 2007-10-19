@@ -1252,8 +1252,7 @@ KDiskDeviceManager::_ScanPartition(KPartition *partition, bool async)
 void
 KDiskDeviceManager::_CheckMediaStatus()
 {
-	ManagerLocker locker(this);
-	if (!locker.IsLocked())
+	if (fLock.LockWithTimeout(0) != B_OK)
 		return;
 
 	int32 cookie = 0;
@@ -1262,32 +1261,18 @@ KDiskDeviceManager::_CheckMediaStatus()
 		if (device == NULL)
 			break;
 
-		status_t mediaStatus;
-		if (device->GetMediaStatus(&mediaStatus) == B_OK) {
-			bool removed = false;
-			bool changed = false;
+		bool hadMedia = device->HasMedia();
+		device->UpdateMediaStatusIfNeeded();
 
-			switch (mediaStatus) {
-				case B_DEV_MEDIA_CHANGED:
-					changed = true;
-					break;
-				case B_DEV_NO_MEDIA:
-				case B_DEV_DOOR_OPEN:
-					removed = true;
-					break;
-				case B_DEV_MEDIA_CHANGE_REQUESTED:
-				case B_DEV_NOT_READY:
-				case B_OK:
-					break;
-			}
-
-			// TODO: propagate changes!
-			if (removed)
-				dprintf("Media removed from %s\n", device->Path());
-			if (changed)
+		// TODO: propagate changes!
+		if (device->MediaChanged()) {
 				dprintf("Media changed from %s\n", device->Path());
+		} else if (!device->HasMedia() && hadMedia) {
+			dprintf("Media removed from %s\n", device->Path());
 		}
 	}
+
+	fLock.Unlock();
 }
 
 

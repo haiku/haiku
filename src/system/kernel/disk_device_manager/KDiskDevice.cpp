@@ -239,8 +239,25 @@ KDiskDevice::IsRemovable() const
 bool
 KDiskDevice::HasMedia() const
 {
-	return (fMediaStatus == B_OK);
+	return fMediaStatus == B_OK || fMediaStatus == B_DEV_MEDIA_CHANGED;
 }
+
+
+bool
+KDiskDevice::MediaChanged() const
+{
+	return fMediaStatus == B_DEV_MEDIA_CHANGED;
+}
+
+
+void
+KDiskDevice::UpdateMediaStatusIfNeeded()
+{
+	// TODO: allow a device to notify us about its media status!
+	// This will then also need to clear any B_DEV_MEDIA_CHANGED
+	GetMediaStatus(&fMediaStatus);
+}
+
 
 // SetPath
 status_t
