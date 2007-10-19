@@ -47,6 +47,10 @@ typedef int socklen_t;
 #	define B_FIRST_REAL_TIME_PRIORITY B_REAL_TIME_DISPLAY_PRIORITY
 #endif
 
+#if __GNUC__
+#	define _PRINTFLIKE(_format_, _args_) \
+		__attribute__((format(__printf__, _format_, _args_)))
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -114,6 +118,27 @@ extern float	roundf(float value);
 #define	B_MPEG_2_5_AUDIO_LAYER_1 (enum mpeg_id)0x301
 #define	B_MPEG_2_5_AUDIO_LAYER_2 (enum mpeg_id)0x302
 #define	B_MPEG_2_5_AUDIO_LAYER_3 (enum mpeg_id)0x303
+
+// TODO: experimental API (keep in sync with Accelerant.h)
+typedef struct {
+	uint32	version;
+	char	vendor[128];
+	char	name[128];
+	char	serial_number[128];
+	uint32	product_id;
+	struct {
+		uint16	week;
+		uint16	year;
+	}		produced;
+	float	width;
+	float	height;
+	uint32	min_horizontal_frequency;	// in kHz
+	uint32	max_horizontal_frequency;
+	uint32	min_vertical_frequency;		// in Hz
+	uint32	max_vertical_frequency;
+	uint32	max_pixel_clock;			// in kHz
+} monitor_info;
+
 
 #endif	// HAIKU_BUILD_COMPATIBILITY_H
 
