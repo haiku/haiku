@@ -14,7 +14,6 @@
 #include <Application.h>
 
 
-class BMessage;
 class TTimeWindow;
 
 
@@ -23,7 +22,6 @@ class TimeApplication : public BApplication {
 						TimeApplication();
 		virtual 		~TimeApplication();
 
-		virtual void 	MessageReceived(BMessage* message);
 		virtual void 	ReadyToRun();
 		virtual void 	AboutRequested();
 

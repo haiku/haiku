@@ -12,6 +12,7 @@
 #include "BaseView.h"
 #include "DateTimeView.h"
 #include "TimeMessages.h"
+#include "TimeSettings.h"
 #include "ZoneView.h"
 
 
@@ -21,24 +22,18 @@
 #include <TabView.h>
 
 
-#define WINDOW_RIGHT	470
-#define WINDOW_BOTTOM	227
-
-
-TTimeWindow::TTimeWindow(const BPoint leftTop)
-	: BWindow(BRect(leftTop, leftTop + BPoint(WINDOW_RIGHT, WINDOW_BOTTOM)),
-		"Time", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
+TTimeWindow::TTimeWindow(BRect rect)
+	: BWindow(rect, "Time", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 {
-	BRect frame = Frame();
-	BRect bounds = Bounds();
-	BRect screenFrame = BScreen().Frame();
-	// Code to make sure that the window doesn't get drawn off screen...
-	if (!(screenFrame.right >= frame.right && screenFrame.bottom >= frame.bottom))
-		MoveTo((screenFrame.right - bounds.right) * 0.5f, 
-			(screenFrame.bottom - bounds.bottom) * 0.5f);
-	
-	_InitWindow(); 
-	SetPulseRate(500000);
+	_InitWindow();
+	_AlignWindow();
+
+	AddShortcut('A', B_COMMAND_KEY, new BMessage(B_ABOUT_REQUESTED));
+}
+
+
+TTimeWindow::~TTimeWindow()
+{
 }
 
 
@@ -50,6 +45,10 @@ TTimeWindow::MessageReceived(BMessage *message)
 			fBaseView->ChangeTime(message);
 			break;
 		
+		case B_ABOUT_REQUESTED:
+			be_app->PostMessage(B_ABOUT_REQUESTED);
+			break;
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -60,10 +59,8 @@ TTimeWindow::MessageReceived(BMessage *message)
 bool 
 TTimeWindow::QuitRequested()
 {
-	BMessage msg(UPDATE_SETTINGS);
-	msg.AddPoint("LeftTop", Frame().LeftTop());
-	be_app->PostMessage(&msg);
-	
+	TimeSettings().SetLeftTop(Frame().LeftTop());
+
 	fBaseView->StopWatchingAll(fTimeZones);
 	fBaseView->StopWatchingAll(fDateTimeView);
 	
@@ -76,6 +73,8 @@ TTimeWindow::QuitRequested()
 void 
 TTimeWindow::_InitWindow()
 {
+	SetPulseRate(500000);
+
 	BRect bounds(Bounds());
 	
 	fBaseView = new TTimeBaseView(bounds, "background view");
@@ -112,3 +111,20 @@ TTimeWindow::_InitWindow()
 	ResizeTo(width +10, height + tabview->TabHeight() +25);
 }
 
+
+void
+TTimeWindow::_AlignWindow()
+{
+	BPoint pt = TimeSettings().LeftTop();
+	MoveTo(pt);
+
+	BRect frame = Frame();
+	BRect screen = BScreen().Frame();
+	if (!frame.Intersects(screen.InsetByCopy(50.0, 50.0))) {
+		BRect bounds(Bounds());
+		BPoint leftTop((screen.Width() - bounds.Width()) / 2.0,
+			(screen.Height() - bounds.Height()) / 2.0);
+
+		MoveTo(leftTop);
+	}
+}

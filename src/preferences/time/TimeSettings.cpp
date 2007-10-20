@@ -33,7 +33,7 @@ BPoint
 TimeSettings::LeftTop() const
 {
 	BPath path;
-	BPoint leftTop(50.0, 50.0);
+	BPoint leftTop(-1000.0, -1000.0);
 
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
 		path.Append(fSettingsFile.String());

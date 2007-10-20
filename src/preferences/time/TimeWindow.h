@@ -22,15 +22,17 @@ class TZoneView;
 
 class TTimeWindow : public BWindow {
 	public:
-						TTimeWindow(const BPoint topLeft);
-		virtual			~TTimeWindow() {}
+						TTimeWindow(BRect rect);
+		virtual			~TTimeWindow();
 
 		virtual bool	QuitRequested();
 		virtual void	MessageReceived(BMessage *message);
 
 	private:
 		void 			_InitWindow();
+		void			_AlignWindow();
 
+	private:
 		TTimeBaseView 	*fBaseView;
 		DateTimeView 	*fDateTimeView;
 		TZoneView 		*fTimeZones;

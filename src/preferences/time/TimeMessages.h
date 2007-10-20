@@ -10,10 +10,6 @@
 #ifndef TIME_MESSAGES_H
 #define TIME_MESSAGES_H
 
-#define HAIKU_APP_SIGNATURE "application/x-vnd.Be-TIME"
-
-const uint32 UPDATE_SETTINGS = 'TDUS';
-
 //Timezone messages
 const uint32 H_REGION_CHANGED = 'h_RC';
 const uint32 H_CITY_CHANGED = 'h_CC';

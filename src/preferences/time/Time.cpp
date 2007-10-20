@@ -9,47 +9,28 @@
  */
 
 #include "Time.h"
-#include "TimeMessages.h"
-#include "TimeSettings.h"
 #include "TimeWindow.h"
 
 
 #include <Alert.h>
-#include <Message.h>
 
 
 #include <unistd.h>
 
 
+const char* kAppSignature = "application/x-vnd.Be-TIME";
+
+
 TimeApplication::TimeApplication()
-	: BApplication(HAIKU_APP_SIGNATURE),
+	: BApplication(kAppSignature),
 	  fWindow(NULL)
 {
-	BPoint pt = TimeSettings().LeftTop();
-	fWindow = new TTimeWindow(pt);
+	fWindow = new TTimeWindow(BRect(100, 100, 570, 327));
 }
 
 
 TimeApplication::~TimeApplication()
 {
-}
-
-
-void
-TimeApplication::MessageReceived(BMessage *message)
-{
-	switch (message->what) {
-		case UPDATE_SETTINGS:
-		{
-			BPoint pt;
-			if (message->FindPoint("LeftTop", &pt) == B_OK)
-				TimeSettings().SetLeftTop(pt);
-		}	break;			
-
-		default:
-			BApplication::MessageReceived(message);
-			break;
-	}
 }
 
 
@@ -63,8 +44,10 @@ TimeApplication::ReadyToRun()
 void
 TimeApplication::AboutRequested()
 {
-	BAlert alert("about", "Time & Date, by\n\nAndrew Edward McCall\nMike Berg", "OK");
-	alert.Go();
+	BAlert *alert = new BAlert("about", 
+		"Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\t"
+		"Julun\n\nCopyright 2004-2007, Haiku.", "OK");
+	alert->Go();
 }
 
 
