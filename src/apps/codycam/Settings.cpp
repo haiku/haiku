@@ -1,90 +1,101 @@
-#include <Debug.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-
 #include "Settings.h"
 
-Settings *settings = NULL;
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-// generic setting handler classes
+#include <Debug.h>
 
 
-StringValueSetting::StringValueSetting(const char *name, const char *defaultValue,
-	const char *valueExpectedErrorString, const char *wrongValueErrorString)
-	:	SettingsArgvDispatcher(name),
-		defaultValue(defaultValue),
-		valueExpectedErrorString(valueExpectedErrorString),
-		wrongValueErrorString(wrongValueErrorString),
-		value(strdup(defaultValue))
+Settings* settings = NULL;
+
+
+StringValueSetting::StringValueSetting(const char* name, const char* defaultValue,
+	const char* valueExpectedErrorString, const char* wrongValueErrorString)
+	: SettingsArgvDispatcher(name),
+	fDefaultValue(defaultValue),
+	fValueExpectedErrorString(valueExpectedErrorString),
+	fWrongValueErrorString(wrongValueErrorString),
+	fValue(strdup(defaultValue))
 {
 }
 
 
 StringValueSetting::~StringValueSetting()
 {
-	free(value);
+	free(fValue);
 }
 
+
 void 
-StringValueSetting::ValueChanged(const char *newValue)
+StringValueSetting::ValueChanged(const char* newValue)
 {
-	if (newValue == value)
+	if (newValue == fValue)
 		// guard against self assingment
 		return;
 		
-	free(value);
-	value = strdup(newValue);
+	free(fValue);
+	fValue = strdup(newValue);
 }
 
-const char *
+
+const char*
 StringValueSetting::Value() const
 {
-	return value;
+	return fValue;
 }
 
+
 void 
-StringValueSetting::SaveSettingValue(Settings *settings)
+StringValueSetting::SaveSettingValue(Settings* settings)
 {
-printf("-------StringValueSetting::SaveSettingValue %s %s\n", Name(), value);
-	settings->Write("\"%s\"", value);
+	printf("-------StringValueSetting::SaveSettingValue %s %s\n", Name(), fValue);
+	settings->Write("\"%s\"", fValue);
 }
+
 
 bool 
 StringValueSetting::NeedsSaving() const
 {
 	// needs saving if different than default
-	return strcmp(value, defaultValue) != 0;
+	return strcmp(fValue, fDefaultValue) != 0;
 }
 
-const char *
+
+const char*
 StringValueSetting::Handle(const char *const *argv)
 {
 	if (!*++argv) 
-		return valueExpectedErrorString;
+		return fValueExpectedErrorString;
 	
 	ValueChanged(*argv);	
 	return 0;
 }
 
-EnumeratedStringValueSetting::EnumeratedStringValueSetting(const char *name,
-	const char *defaultValue, const char *const *values, const char *valueExpectedErrorString,
-	const char *wrongValueErrorString)
-	:	StringValueSetting(name, defaultValue, valueExpectedErrorString, wrongValueErrorString),
-		values(values)
+
+//	#pragma mark -
+
+
+EnumeratedStringValueSetting::EnumeratedStringValueSetting(const char* name,
+	const char* defaultValue, const char *const *values,
+	const char* valueExpectedErrorString,
+	const char* wrongValueErrorString)
+	: StringValueSetting(name, defaultValue, valueExpectedErrorString, wrongValueErrorString),
+	fValues(values)
 {
 }
 
+
 void 
-EnumeratedStringValueSetting::ValueChanged(const char *newValue)
+EnumeratedStringValueSetting::ValueChanged(const char* newValue)
 {
 #if DEBUG
 	// must be one of the enumerated values
 	bool found = false;
 	for (int32 index = 0; ; index++) {
-		if (!values[index])
+		if (!fValues[index])
 			break;
-		if (strcmp(values[index], newValue) != 0) 
+		if (strcmp(fValues[index], newValue) != 0) 
 			continue;
 		found = true;
 		break;
@@ -94,120 +105,136 @@ EnumeratedStringValueSetting::ValueChanged(const char *newValue)
 	StringValueSetting::ValueChanged(newValue);
 }
 
-const char *
+
+const char*
 EnumeratedStringValueSetting::Handle(const char *const *argv)
 {
 	if (!*++argv) 
-		return valueExpectedErrorString;
+		return fValueExpectedErrorString;
 
-printf("-----EnumeratedStringValueSetting::Handle %s %s\n", *(argv-1), *argv);
+	printf("-----EnumeratedStringValueSetting::Handle %s %s\n", *(argv-1), *argv);
 	bool found = false;
 	for (int32 index = 0; ; index++) {
-		if (!values[index])
+		if (!fValues[index])
 			break;
-		if (strcmp(values[index], *argv) != 0) 
+		if (strcmp(fValues[index], *argv) != 0) 
 			continue;
 		found = true;
 		break;
 	}	
 				
 	if (!found)
-		return wrongValueErrorString;
+		return fWrongValueErrorString;
 	
 	ValueChanged(*argv);	
 	return 0;
 }
 
-ScalarValueSetting::ScalarValueSetting(const char *name, int32 defaultValue,
-	const char *valueExpectedErrorString, const char *wrongValueErrorString,
+
+//	#pragma mark -
+
+
+ScalarValueSetting::ScalarValueSetting(const char* name, int32 defaultValue,
+	const char* valueExpectedErrorString, const char* wrongValueErrorString,
 	int32 min, int32 max)
-	:	SettingsArgvDispatcher(name),
-		defaultValue(defaultValue),
-		value(defaultValue),
-		max(max),
-		min(min),
-		valueExpectedErrorString(valueExpectedErrorString),
-		wrongValueErrorString(wrongValueErrorString)
+	: SettingsArgvDispatcher(name),
+	fDefaultValue(defaultValue),
+	fValue(defaultValue),
+	fMax(max),
+	fMin(min),
+	fValueExpectedErrorString(valueExpectedErrorString),
+	fWrongValueErrorString(wrongValueErrorString)
 {
 }
+
 
 void 
 ScalarValueSetting::ValueChanged(int32 newValue)
 {
-	ASSERT(newValue > min);
-	ASSERT(newValue < max);
-	value = newValue;
+	ASSERT(newValue > fMin);
+	ASSERT(newValue < fMax);
+	fValue = newValue;
 }
+
 
 int32
 ScalarValueSetting::Value() const
 {
-	return value;
+	return fValue;
 }
+
 
 void 
-ScalarValueSetting::GetValueAsString(char *buffer) const
+ScalarValueSetting::GetValueAsString(char* buffer) const
 {
-	sprintf(buffer, "%ld", value);
+	sprintf(buffer, "%ld", fValue);
 }
 
-const char *
+
+const char*
 ScalarValueSetting::Handle(const char *const *argv)
 {
 	if (!*++argv) 
-		return valueExpectedErrorString;
+		return fValueExpectedErrorString;
 
 	int32 newValue = atoi(*argv);
-	if (newValue < min || newValue > max)
-		return wrongValueErrorString;
-	
-	value = newValue;	
+	if (newValue < fMin || newValue > fMax)
+		return fWrongValueErrorString;
+
+	fValue = newValue;	
 	return 0;
 }
 
+
 void 
-ScalarValueSetting::SaveSettingValue(Settings *settings)
+ScalarValueSetting::SaveSettingValue(Settings* settings)
 {
-	settings->Write("%d", value);
+	settings->Write("%d", fValue);
 }
+
 
 bool 
 ScalarValueSetting::NeedsSaving() const
 {
-	return value != defaultValue;
+	return fValue != fDefaultValue;
 }
 
 
-BooleanValueSetting::BooleanValueSetting(const char *name, bool defaultValue )
-	:	ScalarValueSetting(name, defaultValue, 0, 0)
+//	#pragma mark -
+
+
+BooleanValueSetting::BooleanValueSetting(const char* name, bool defaultValue)
+	: ScalarValueSetting(name, defaultValue, 0, 0)
 {
 }
+
 
 bool 
 BooleanValueSetting::Value() const
 {
-	return value;
+	return fValue;
 }
 
-const char *
+
+const char*
 BooleanValueSetting::Handle(const char *const *argv)
 {
 	if (!*++argv) 
-		return "or or off expected";
+		return "on or off expected";
 
 	if (strcmp(*argv, "on") == 0)
-		value = true;
+		fValue = true;
 	else if (strcmp(*argv, "off") == 0)
-		value = false;
+		fValue = false;
 	else
-		return "or or off expected";
+		return "on or off expected";
 
 	return 0;
 }
 
-void 
-BooleanValueSetting::SaveSettingValue(Settings *settings)
-{
-	settings->Write(value ? "on" : "off");
-}
 
+void 
+BooleanValueSetting::SaveSettingValue(Settings* settings)
+{
+	settings->Write(fValue ? "on" : "off");
+}

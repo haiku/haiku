@@ -1,73 +1,101 @@
-
-#include <Directory.h>
-#include <Entry.h>
-#include <FindDirectory.h>
-#include <File.h>
-#include <Path.h>
-#include <StopWatch.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdarg.h>
-
-#include <Debug.h>
-
 #include "SettingsHandler.h"
 
-ArgvParser::ArgvParser(const char *name)
-	:	file(0),
-		buffer(0),
-		pos(-1),
-		argc(0),
-		currentArgv(0),
-		currentArgsPos(-1),
-		sawBackslash(false),
-		eatComment(false),
-		inDoubleQuote(false),
-		inSingleQuote(false),
-		lineNo(0),
-		fileName(name)
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <Debug.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <File.h>
+#include <FindDirectory.h>
+#include <Path.h>
+#include <StopWatch.h>
+
+
+#if 0
+static int
+Compare(const SettingsArgvDispatcher* p1, const SettingsArgvDispatcher* p2)
 {
-	file = fopen(fileName, "r");
-	if (!file) {
-		PRINT(("Error opening %s\n", fileName));
+	return strcmp(p1->Name(), p2->Name());
+}
+#endif
+
+
+#if 0
+static int
+CompareByNameOne(const SettingsArgvDispatcher* item1,
+	const SettingsArgvDispatcher* item2)
+{
+	return strcmp(item1->Name(), item2->Name());
+}
+#endif
+
+
+/*! \class ArgvParser
+	ArgvParser class opens a text file and passes the context in argv
+	format to a specified handler
+*/
+
+
+ArgvParser::ArgvParser(const char* name)
+	:
+	fFile(0),
+	fBuffer(0),
+	fPos(-1),
+	fArgc(0),
+	fCurrentArgv(0),
+	fCurrentArgsPos(-1),
+	fSawBackslash(false),
+	fEatComment(false),
+	fInDoubleQuote(false),
+	fInSingleQuote(false),
+	fLineNo(0),
+	fFileName(name)
+{
+	fFile = fopen(fFileName, "r");
+	if (!fFile) {
+		PRINT(("Error opening %s\n", fFileName));
 		return;
 	}
-	buffer = new char [kBufferSize];
-	currentArgv = new char * [1024];
+	fBuffer = new char [kBufferSize];
+	fCurrentArgv = new char* [1024];
 }
 
 
 ArgvParser::~ArgvParser()
 {
-	delete [] buffer;
+	delete[] fBuffer;
 
 	MakeArgvEmpty();
-	delete [] currentArgv;
+	delete [] fCurrentArgv;
 
-	if (file)
-		fclose(file);
+	if (fFile)
+		fclose(fFile);
 }
+
 
 void 
 ArgvParser::MakeArgvEmpty()
 {
 	// done with current argv, free it up
-	for (int32 index = 0; index < argc; index++)
-		delete currentArgv[index];
+	for (int32 index = 0; index < fArgc; index++)
+		delete fCurrentArgv[index];
 	
-	argc = 0;
+	fArgc = 0;
 }
 
+
 status_t 
-ArgvParser::SendArgv(ArgvHandler argvHandlerFunc, void *passThru)
+ArgvParser::SendArgv(ArgvHandler argvHandlerFunc, void* passThru)
 {
-	if (argc) {
+	if (fArgc) {
 		NextArgv();
-		currentArgv[argc] = 0;
-		const char *result = (argvHandlerFunc)(argc, currentArgv, passThru);
+		fCurrentArgv[fArgc] = 0;
+		const char *result = (argvHandlerFunc)(fArgc, fCurrentArgv, passThru);
 		if (result)
-			printf("File %s; Line %ld # %s", fileName, lineNo, result);
+			printf("File %s; Line %ld # %s", fFileName, fLineNo, result);
 		MakeArgvEmpty();
 		if (result)
 			return B_ERROR;
@@ -76,54 +104,60 @@ ArgvParser::SendArgv(ArgvHandler argvHandlerFunc, void *passThru)
 	return B_NO_ERROR;
 }
 
+
 void 
 ArgvParser::NextArgv()
 {
-	if (sawBackslash) {
-		currentArgs[++currentArgsPos] = '\\';
-		sawBackslash = false;
+	if (fSawBackslash) {
+		fCurrentArgs[++fCurrentArgsPos] = '\\';
+		fSawBackslash = false;
 	}
-	currentArgs[++currentArgsPos] = '\0';
-	// terminate current arg pos
+	fCurrentArgs[++fCurrentArgsPos] = '\0';
+		// terminate current arg pos
 	
 	// copy it as a string to the current argv slot
-	currentArgv[argc] = new char [strlen(currentArgs) + 1];
-	strcpy(currentArgv[argc], currentArgs);
-	currentArgsPos = -1;
-	argc++;
+	fCurrentArgv[fArgc] = new char [strlen(fCurrentArgs) + 1];
+	strcpy(fCurrentArgv[fArgc], fCurrentArgs);
+	fCurrentArgsPos = -1;
+	fArgc++;
 }
+
 
 void 
 ArgvParser::NextArgvIfNotEmpty()
 {
-	if (!sawBackslash && currentArgsPos < 0)
+	if (!fSawBackslash && fCurrentArgsPos < 0)
 		return;
 
 	NextArgv();
 }
 
+
 char 
 ArgvParser::GetCh()
 {
-	if (pos < 0 || buffer[pos] == 0) {
-		if (file == 0)
+	if (fPos < 0 || fBuffer[fPos] == 0) {
+		if (fFile == 0)
 			return EOF;
-		if (fgets(buffer, kBufferSize, file) == 0)
+		if (fgets(fBuffer, kBufferSize, fFile) == 0)
 			return EOF;
-		pos = 0;
+		fPos = 0;
 	}
-	return buffer[pos++];
+	return fBuffer[fPos++];
 }
 
+
 status_t 
-ArgvParser::EachArgv(const char *name, ArgvHandler argvHandlerFunc, void *passThru)
+ArgvParser::EachArgv(const char* name, ArgvHandler argvHandlerFunc, void* passThru)
 {
 	ArgvParser parser(name);
 	return parser.EachArgvPrivate(name, argvHandlerFunc, passThru);
 }
 
+
 status_t 
-ArgvParser::EachArgvPrivate(const char *name, ArgvHandler argvHandlerFunc, void *passThru)
+ArgvParser::EachArgvPrivate(const char* name, ArgvHandler argvHandlerFunc,
+	void* passThru)
 {
 	status_t result;
 
@@ -131,7 +165,7 @@ ArgvParser::EachArgvPrivate(const char *name, ArgvHandler argvHandlerFunc, void 
 		char ch = GetCh();
 		if (ch == EOF) {
 			// done with file
-			if (inDoubleQuote || inSingleQuote) {
+			if (fInDoubleQuote || fInSingleQuote) {
 				printf("File %s # unterminated quote at end of file\n", name);
 				result = B_ERROR;
 				break;
@@ -142,15 +176,15 @@ ArgvParser::EachArgvPrivate(const char *name, ArgvHandler argvHandlerFunc, void 
 
 		if (ch == '\n' || ch == '\r') {
 			// handle new line
-			eatComment = false;
-			if (!sawBackslash && (inDoubleQuote || inSingleQuote)) {
-				printf("File %s ; Line %ld # unterminated quote\n", name, lineNo);
+			fEatComment = false;
+			if (!fSawBackslash && (fInDoubleQuote || fInSingleQuote)) {
+				printf("File %s ; Line %ld # unterminated quote\n", name, fLineNo);
 				result = B_ERROR;
 				break;
 			}
-			lineNo++; 
-			if (sawBackslash) {
-				sawBackslash = false;
+			fLineNo++; 
+			if (fSawBackslash) {
+				fSawBackslash = false;
 				continue;
 			}
 			// end of line, flush all argv
@@ -160,11 +194,11 @@ ArgvParser::EachArgvPrivate(const char *name, ArgvHandler argvHandlerFunc, void 
 			continue;
 		}
 		
-		if (eatComment)
+		if (fEatComment)
 			continue;
 
-		if (!sawBackslash) {
-			if (!inDoubleQuote && !inSingleQuote) {
+		if (!fSawBackslash) {
+			if (!fInDoubleQuote && !fInSingleQuote) {
 				if (ch == ';') {
 					// semicolon is a command separator, pass on the whole argv
 					result = SendArgv(argvHandlerFunc, passThru);
@@ -173,47 +207,52 @@ ArgvParser::EachArgvPrivate(const char *name, ArgvHandler argvHandlerFunc, void 
 					continue;
 				} else if (ch == '#') {
 					// ignore everything on this line after this character
-					eatComment = true;
+					fEatComment = true;
 					continue;
 				} else if (ch == ' ' || ch == '\t') {
 					// space or tab separates the individual arg strings
 					NextArgvIfNotEmpty();
 					continue;
-				} else if (!sawBackslash && ch == '\\') {
+				} else if (!fSawBackslash && ch == '\\') {
 					// the next character is escaped
-					sawBackslash = true;
+					fSawBackslash = true;
 					continue;
 				}
 			}
-			if (!inSingleQuote && ch == '"') {
+			if (!fInSingleQuote && ch == '"') {
 				// enter/exit double quote handling
-				inDoubleQuote = !inDoubleQuote;
+				fInDoubleQuote = !fInDoubleQuote;
 				continue;
 			}
-			if (!inDoubleQuote && ch == '\'') {
+			if (!fInDoubleQuote && ch == '\'') {
 				// enter/exit single quote handling
-				inSingleQuote = !inSingleQuote;
+				fInSingleQuote = !fInSingleQuote;
 				continue;
 			}
 		} else {
 			// we just pass through the escape sequence as is
-			currentArgs[++currentArgsPos] = '\\';
-			sawBackslash = false;
+			fCurrentArgs[++fCurrentArgsPos] = '\\';
+			fSawBackslash = false;
 		}
-		currentArgs[++currentArgsPos] = ch;
+		fCurrentArgs[++fCurrentArgsPos] = ch;
 	}
 
 	return result;
 }
 
 
-SettingsArgvDispatcher::SettingsArgvDispatcher(const char *name)
-	:	name(name)
+//	#pragma mark -
+
+
+SettingsArgvDispatcher::SettingsArgvDispatcher(const char* name)
+	:
+	fName(name)
 {
 }
 
+
 void 
-SettingsArgvDispatcher::SaveSettings(Settings *settings, bool onlyIfNonDefault)
+SettingsArgvDispatcher::SaveSettings(Settings* settings, bool onlyIfNonDefault)
 {
 	if (!onlyIfNonDefault || NeedsSaving()) {
 		settings->Write("%s ", Name());
@@ -222,8 +261,9 @@ SettingsArgvDispatcher::SaveSettings(Settings *settings, bool onlyIfNonDefault)
 	}
 }
 
+
 bool 
-SettingsArgvDispatcher::HandleRectValue(BRect &result, const char *const *argv,
+SettingsArgvDispatcher::HandleRectValue(BRect &result, const char* const *argv,
 	bool printError)
 {
 	if (!*argv) {
@@ -253,158 +293,165 @@ SettingsArgvDispatcher::HandleRectValue(BRect &result, const char *const *argv,
 	return true;
 }
 
+
 void 
-SettingsArgvDispatcher::WriteRectValue(Settings *setting, BRect rect)
+SettingsArgvDispatcher::WriteRectValue(Settings* setting, BRect rect)
 {
 	setting->Write("%d %d %d %d", (int32)rect.left, (int32)rect.top,
 		(int32)rect.right, (int32)rect.bottom);
 }
 
-#if 0
-static int
-CompareByNameOne(const SettingsArgvDispatcher *item1, const SettingsArgvDispatcher *item2)
-{
-	return strcmp(item1->Name(), item2->Name());
-}
-#endif
 
-Settings::Settings(const char *filename, const char *settingsDirName)
-	:	fileName(filename),
-		settingsDir(settingsDirName),
-		list(0),
-		count(0),
-		listSize(30),
-		currentSettings(0)
+//	#pragma mark -
+
+
+/*!	\class Settings
+	this class represents a list of all the settings handlers, reads and
+	saves the settings file
+*/
+
+
+Settings::Settings(const char* filename, const char* settingsDirName)
+	:
+	fFileName(filename),
+	fSettingsDir(settingsDirName),
+	fList(0),
+	fCount(0),
+	fListSize(30),
+	fCurrentSettings(0)
 {
 #ifdef SINGLE_SETTING_FILE
 	settingsHandler = this;
 #endif
-	list = (SettingsArgvDispatcher **)calloc(listSize, sizeof(SettingsArgvDispatcher *));
+	fList = (SettingsArgvDispatcher**)calloc(fListSize, sizeof(SettingsArgvDispatcher *));
 }
 
 
 Settings::~Settings()
 {
-	for (int32 index = 0; index < count; index++)
-		delete list[index];
+	for (int32 index = 0; index < fCount; index++)
+		delete fList[index];
 	
-	free(list);
+	free(fList);
 }
 
 
-const char *
-Settings::ParseUserSettings(int, const char *const *argv, void *castToThis)
+const char*
+Settings::_ParseUserSettings(int, const char* const *argv, void* castToThis)
 {
 	if (!*argv)
 		return 0;
 
 #ifdef SINGLE_SETTING_FILE
-	Settings *settings = settingsHandler;
+	Settings* settings = settingsHandler;
 #else
-	Settings *settings = (Settings *)castToThis;
+	Settings* settings = (Settings*)castToThis;
 #endif
 
-	SettingsArgvDispatcher *handler = settings->Find(*argv);
+	SettingsArgvDispatcher* handler = settings->_Find(*argv);
 	if (!handler)
 		return "unknown command";
 	return handler->Handle(argv);
 }
 
 
-#if 0
-static int
-Compare(const SettingsArgvDispatcher *p1, const SettingsArgvDispatcher *p2)
-{
-	return strcmp(p1->Name(), p2->Name());
-}
-#endif
-
-bool 
-Settings::Add(SettingsArgvDispatcher *setting)
+/*!
+	Returns false if argv dispatcher with the same name already
+	registered
+*/
+bool
+Settings::Add(SettingsArgvDispatcher* setting)
 {
 	// check for uniqueness
-	if (Find(setting->Name()))
+	if (_Find(setting->Name()))
 		return false;
 
-	if (count >= listSize) {
-		listSize += 30;
-		list = (SettingsArgvDispatcher **)realloc(list,
-			listSize * sizeof(SettingsArgvDispatcher *));
+	if (fCount >= fListSize) {
+		fListSize += 30;
+		fList = (SettingsArgvDispatcher **)realloc(fList,
+			fListSize * sizeof(SettingsArgvDispatcher *));
 	}
-	list[count++] = setting;
+	fList[fCount++] = setting;
 	return true;
 }
 
-SettingsArgvDispatcher *
-Settings::Find(const char *name)
+
+SettingsArgvDispatcher*
+Settings::_Find(const char* name)
 {
-	for (int32 index = 0; index < count; index++)
-		if (strcmp(name, list[index]->Name()) == 0)
-			return list[index];
+	for (int32 index = 0; index < fCount; index++)
+		if (strcmp(name, fList[index]->Name()) == 0)
+			return fList[index];
 
 	return 0;
 }
 
-void 
+
+void
 Settings::TryReadingSettings()
 {
 	BPath prefsPath;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &prefsPath, true) == B_OK) {
-		prefsPath.Append(settingsDir);
+		prefsPath.Append(fSettingsDir);
 
 		BPath path(prefsPath);
-		path.Append(fileName);
-		ArgvParser::EachArgv(path.Path(), Settings::ParseUserSettings, this);
+		path.Append(fFileName);
+		ArgvParser::EachArgv(path.Path(), Settings::_ParseUserSettings, this);
 	}
 }
+
 
 void 
 Settings::SaveSettings(bool onlyIfNonDefault)
 {
 	ASSERT(SettingsHandler());
-	SettingsHandler()->SaveCurrentSettings(onlyIfNonDefault);
+	SettingsHandler()->_SaveCurrentSettings(onlyIfNonDefault);
 }
 
+
 void 
-Settings::MakeSettingsDirectory(BDirectory *resultingSettingsDir)
+Settings::_MakeSettingsDirectory(BDirectory *resultingSettingsDir)
 {
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK)
 		return;
 	
 	// make sure there is a directory
-	path.Append(settingsDir);
+	path.Append(fSettingsDir);
 	mkdir(path.Path(), 0777);
 	resultingSettingsDir->SetTo(path.Path());
 }
 
-void 
-Settings::SaveCurrentSettings(bool onlyIfNonDefault)
-{
-	BDirectory settingsDir;
-	MakeSettingsDirectory(&settingsDir);
 
-	if (settingsDir.InitCheck() != B_OK)
+void 
+Settings::_SaveCurrentSettings(bool onlyIfNonDefault)
+{
+	BDirectory fSettingsDir;
+	_MakeSettingsDirectory(&fSettingsDir);
+
+	if (fSettingsDir.InitCheck() != B_OK)
 		return;
-printf("+++++++++++ Settings::SaveCurrentSettings %s\n", fileName);
+
+	printf("+++++++++++ Settings::_SaveCurrentSettings %s\n", fFileName);
 	// nuke old settings
-	BEntry entry(&settingsDir, fileName);
+	BEntry entry(&fSettingsDir, fFileName);
 	entry.Remove();
 	
 	BFile prefs(&entry, O_RDWR | O_CREAT);
 	if (prefs.InitCheck() != B_OK)
 		return;
 
-	currentSettings = &prefs;
-	for (int32 index = 0; index < count; index++) {
-		list[index]->SaveSettings(this, onlyIfNonDefault);
+	fCurrentSettings = &prefs;
+	for (int32 index = 0; index < fCount; index++) {
+		fList[index]->SaveSettings(this, onlyIfNonDefault);
 	}
 
-	currentSettings = 0;
+	fCurrentSettings = 0;
 }
 
+
 void 
-Settings::Write(const char *format, ...)
+Settings::Write(const char* format, ...)
 {
 	va_list args;
 
@@ -413,15 +460,17 @@ Settings::Write(const char *format, ...)
 	va_end(args);
 }
 
+
 void 
-Settings::VSWrite(const char *format, va_list arg)
+Settings::VSWrite(const char* format, va_list arg)
 {
 	char buffer[2048];
 	vsprintf(buffer, format, arg);
-	ASSERT(currentSettings && currentSettings->InitCheck() == B_OK);
-	currentSettings->Write(buffer, strlen(buffer));
+	ASSERT(fCurrentSettings && fCurrentSettings->InitCheck() == B_OK);
+	fCurrentSettings->Write(buffer, strlen(buffer));
 }
 
+
 #ifdef SINGLE_SETTING_FILE
-Settings *Settings::settingsHandler = 0;
+Settings* Settings::settingsHandler = 0;
 #endif

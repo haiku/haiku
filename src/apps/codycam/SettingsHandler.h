@@ -1,11 +1,14 @@
-#ifndef __SETTINGS_FILE__
-#define __SETTINGS_FILE__
+#ifndef SETTINGS_HANDLER_H
+#define SETTINGS_HANDLER_H
 
-#include <SupportDefs.h>
+
 #include <stdarg.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
+
+#include <SupportDefs.h>
+
 
 class BFile;
 class BDirectory;
@@ -13,136 +16,139 @@ class BRect;
 class Settings;
 
 
-typedef const char *(*ArgvHandler)(int argc, const char *const *argv, void *params);
+typedef const char* (*ArgvHandler)(int argc, const char *const *argv, void *params);
 	// return 0 or error string if parsing failed
-	
+
 
 const int32 kBufferSize = 1024;
 
+
 class ArgvParser {
-	// this class opens a text file and passes the context in argv
-	// format to a specified handler
-public:
-	static status_t EachArgv(const char *name,
-		ArgvHandler argvHandlerFunc, void *passThru);
+	public:
+		static status_t EachArgv(const char* name,
+			ArgvHandler argvHandlerFunc, void* passThru);
 
-private:
-	ArgvParser(const char *name);
-	~ArgvParser();
+	private:
+		ArgvParser(const char* name);
+		~ArgvParser();
 
-	status_t EachArgvPrivate(const char *name,
-		ArgvHandler argvHandlerFunc, void *passThru);
-	char GetCh();
-	
-	status_t SendArgv(ArgvHandler argvHandlerFunc, void *passThru);
-		// done with a whole line of argv, send it off and get ready
-		// to build a new one
+		status_t EachArgvPrivate(const char* name,
+			ArgvHandler argvHandlerFunc, void* passThru);
+		char GetCh();
 
-	void NextArgv();
-		// done with current string, get ready to start building next
-	void NextArgvIfNotEmpty();
-		// as above, don't commint current string if empty
+		status_t SendArgv(ArgvHandler argvHandlerFunc, void* passThru);
+			// done with a whole line of argv, send it off and get ready
+			// to build a new one
 
-	void MakeArgvEmpty();
+		void NextArgv();
+			// done with current string, get ready to start building next
+		void NextArgvIfNotEmpty();
+			// as above, don't commint current string if empty
 
-	FILE *file;
-	char *buffer;
-	int32 pos;
-	int32 numAvail;
-	
-	int argc;
-	char **currentArgv;
+		void MakeArgvEmpty();
 
-	int32 currentArgsPos;
-	char currentArgs [1024];
+		FILE*	fFile;
+		char*	fBuffer;
+		int32	fPos;
+		int32	fNumAvail;
 
-	bool sawBackslash;
-	bool eatComment;
-	bool inDoubleQuote;
-	bool inSingleQuote;
+		int		fArgc;
+		char**	fCurrentArgv;
 
-	int32 lineNo;
-	const char *fileName;
+		int32	fCurrentArgsPos;
+		char	fCurrentArgs[1024];
+
+		bool	fSawBackslash;
+		bool	fEatComment;
+		bool	fInDoubleQuote;
+		bool	fInSingleQuote;
+
+		int32	fLineNo;
+		const char* fFileName;
 };
+
 
 class SettingsArgvDispatcher {
-	// base class for a single setting item
-public:
-	SettingsArgvDispatcher(const char *name);
+		// base class for a single setting item
+	public:
+		SettingsArgvDispatcher(const char* name);
 
-	void SaveSettings(Settings *settings, bool onlyIfNonDefault);
+		void SaveSettings(Settings* settings, bool onlyIfNonDefault);
 	
-	const char *Name() const
-		{ return name; }
-		// name as it appears in the settings file
+		const char* Name() const
+		{
+			return fName;
+		}
 
-	virtual const char *Handle(const char *const *argv) = 0;
-		// override this adding an argv parser that reads in the
-		// values in argv format for this setting
-		// return a pointer to an error message or null if parsed OK
-
+		virtual const char* Handle(const char* const *argv) = 0;
+			// override this adding an argv parser that reads in the
+			// values in argv format for this setting
+			// return a pointer to an error message or null if parsed OK
 	
-	// some handy reader/writer calls
-	bool HandleRectValue(BRect &, const char *const *argv, bool printError = true);
-	// static bool HandleColorValue(rgb_color &, const char *const *argv, bool printError = true);
-	void WriteRectValue(Settings *, BRect);
-	// void WriteColorValue(BRect);
+		bool HandleRectValue(BRect&, const char* const *argv,
+			bool printError = true);
 
-protected:
-	virtual void SaveSettingValue(Settings *settings) = 0;
-		// override this to save the current value of this setting in a
-		// text format
-		
-	virtual bool NeedsSaving() const
-		{ return true; }
+		// static bool HandleColorValue(rgb_color &, const char *const *argv, bool printError = true);
+		void WriteRectValue(Settings*, BRect);
+		// void WriteColorValue(BRect);
+
+	protected:
+		virtual void SaveSettingValue(Settings* settings) = 0;
+			// override this to save the current value of this setting in a
+			// text format
+
+		virtual bool NeedsSaving() const
+		{
+			return true;
+		}
 		// override to return false if current value is equal to the default
 		// and does not need saving
-private:
-	const char *name;
+	private:
+		const char* fName;
 };
+
 
 class Settings {
-	// this class is a list of all the settings handlers, reads and
-	// saves the settings file
-public:
-	Settings(const char *filename, const char *settingsDirName);
-	~Settings();
-	void TryReadingSettings();
-	void SaveSettings(bool onlyIfNonDefault = true);
+	public:
+		Settings(const char* filename, const char* settingsDirName);
+		~Settings();
+		void TryReadingSettings();
+		void SaveSettings(bool onlyIfNonDefault = true);
 
 #ifdef SINGLE_SETTING_FILE
-	static Settings *SettingsHandler()
-		{ return settingsHandler; }
+		static Settings* SettingsHandler()
+		{
+			return settingsHandler;
+		}
 #else
-	Settings *SettingsHandler()
-		{ return this; }
+		Settings* SettingsHandler()
+		{
+			return this;
+		}
 #endif
 
-	bool Add(SettingsArgvDispatcher *);
-		// return false if argv dispatcher with the same name already
-		// registered
+		bool Add(SettingsArgvDispatcher *);
 
-	void Write(const char *format, ...);
-	void VSWrite(const char *, va_list);
+		void Write(const char* format, ...);
+		void VSWrite(const char*, va_list);
 
 #ifdef SINGLE_SETTING_FILE
-	static Settings *settingsHandler;
+		static Settings* settingsHandler;
 #endif
 
-private:
-	void MakeSettingsDirectory(BDirectory *);
+	private:
+		void _MakeSettingsDirectory(BDirectory*);
 
-	SettingsArgvDispatcher *Find(const char *);
-	static const char *ParseUserSettings(int, const char *const *argv, void *);
-	void SaveCurrentSettings(bool onlyIfNonDefault);
+		SettingsArgvDispatcher* _Find(const char*);
+		static const char* _ParseUserSettings(int, const char *const *argv, void*);
+		void _SaveCurrentSettings(bool onlyIfNonDefault);
 
-	const char *fileName;
-	const char *settingsDir;
-	SettingsArgvDispatcher **list;
-	int32 count;
-	int32 listSize;
-	BFile *currentSettings;
+		const char* fFileName;
+		const char* fSettingsDir;
+		SettingsArgvDispatcher** fList;
+		int32 fCount;
+		int32 fListSize;
+		BFile* fCurrentSettings;
 };
 
-
-#endif
+#endif	// SETTINGS_HANDLER_H

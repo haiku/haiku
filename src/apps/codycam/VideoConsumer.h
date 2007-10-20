@@ -1,176 +1,148 @@
 //	Copyright (c) 1998-99, Be Incorporated, All Rights Reserved.
 //	SMS
 /*	VideoConsumer.h	*/
+#ifndef VIDEO_CONSUMER_H
+#define VIDEO_CONSUMER_H
 
-#if !defined(VID_CONSUMER_H)
-#define VID_CONSUMER_H
 
-#include <View.h>
 #include <Bitmap.h>
-#include <Window.h>
-#include <MediaNode.h>
-#include <TranslationKit.h>
 #include <BufferConsumer.h>
-#include <TimedEventQueue.h>
 #include <MediaEventLooper.h>
+#include <MediaNode.h>
+#include <TimedEventQueue.h>
+#include <TranslationKit.h>
+#include <View.h>
+#include <Window.h>
 
-typedef struct
-{
-	port_id					port;
-	bigtime_t				rate;
-	uint32					imageFormat;
-	int32					translator;
-	bool					passiveFtp;
-	char					fileNameText[64];
-	char					serverText[64];
-	char					loginText[64];
-	char					passwordText[64];	
-	char					directoryText[64];
+
+typedef struct {
+	port_id		port;
+	bigtime_t	rate;
+	uint32		imageFormat;
+	int32		translator;
+	bool		passiveFtp;
+	char		fileNameText[64];
+	char		serverText[64];
+	char		loginText[64];
+	char		passwordText[64];	
+	char		directoryText[64];
 } ftp_msg_info;
 
-#define FTP_INFO			0x60000001
+#define FTP_INFO 0x60000001
 
-class VideoConsumer : 
-	public BMediaEventLooper,
-	public BBufferConsumer
-{
-public:
-						VideoConsumer(
-							const char * name,
-							BView * view,
-							BStringView	* statusLine,
-							BMediaAddOn *addon,
-							const uint32 internal_id);
-						~VideoConsumer();
-	
-/*	BMediaNode */
-public:
-	
-	virtual	BMediaAddOn	*AddOn(long *cookie) const;
-	
-protected:
+class BStringView;
 
-	virtual void		Start(bigtime_t performance_time);
-	virtual void		Stop(bigtime_t performance_time, bool immediate);
-	virtual void		Seek(bigtime_t media_time, bigtime_t performance_time);
-	virtual void		TimeWarp(bigtime_t at_real_time, bigtime_t to_performance_time);
 
-	virtual void		NodeRegistered();
-	virtual	status_t 	RequestCompleted(
-							const media_request_info & info);
+
+class VideoConsumer : public BMediaEventLooper, public BBufferConsumer {
+	public:
+		VideoConsumer(const char* name, BView* view, BStringView* statusLine,
+			BMediaAddOn *addon, const uint32 internalId);
+		~VideoConsumer();
+
+	/*	BMediaNode */
+	public:
+		virtual	BMediaAddOn* AddOn(long* cookie) const;
+
+	protected:
+		virtual void Start(bigtime_t performanceTime);
+		virtual void Stop(bigtime_t performanceTime, bool immediate);
+		virtual void Seek(bigtime_t mediaTime, bigtime_t performanceTime);
+		virtual void TimeWarp(bigtime_t atRealTime,
+			bigtime_t toPerformanceTime);
+
+		virtual void NodeRegistered();
+		virtual	status_t RequestCompleted(const media_request_info& info);
+
+		virtual	status_t HandleMessage(int32 message, const void* data,
+			size_t size);
+
+		virtual status_t DeleteHook(BMediaNode* node);
+
+	/*  BMediaEventLooper */
+	protected:
+		virtual void HandleEvent(const media_timed_event* event,
+			bigtime_t lateness, bool realTimeEvent);
+
+	/*	BBufferConsumer */
+	public:
+		virtual	status_t AcceptFormat(const media_destination& dest,
+			media_format* format);
+
+		virtual	status_t GetNextInput(int32* cookie, media_input* outInput);
+
+		virtual	void DisposeInputCookie(int32 cookie);
+
+	protected:
+		virtual	void BufferReceived(BBuffer* buffer);
+
+	private:
+		virtual	void ProducerDataStatus(const media_destination &forWhom,
+			int32 status, bigtime_t atMediaTime);
+						
+		virtual	status_t GetLatencyFor(const media_destination& forWhom,
+			bigtime_t* outLatency, media_node_id* outId);
+	
+		virtual	status_t Connected(const media_source& producer,
+			const media_destination& where, const media_format& withFormat,
+			media_input* outInput);
+
+		virtual	void Disconnected(const media_source& producer,
+			const media_destination& where);
+
+		virtual	status_t FormatChanged(const media_source& producer,
+			const media_destination& consumer, int32 fromChangeCount,
+			const media_format& format);
+
+	/*	implementation */
+
+	public:
+		status_t CreateBuffers(const media_format& withFormat);
+
+		void DeleteBuffers();
+				
+		static status_t FtpRun(void* data);
+
+		void FtpThread();
 							
-	virtual	status_t 	HandleMessage(
-							int32 message,
-							const void * data,
-							size_t size);
+		void UpdateFtpStatus(char* status);
 
-	virtual status_t	DeleteHook(BMediaNode * node);
+		status_t LocalSave(char* filename, BBitmap* bitmap);
 
-/*  BMediaEventLooper */
-protected:
-	virtual void		HandleEvent(
-							const media_timed_event *event,
-							bigtime_t lateness,
-							bool realTimeEvent);
-/*	BBufferConsumer */
-public:
-	
-	virtual	status_t	AcceptFormat(
-							const media_destination &dest,
-							media_format * format);
-	virtual	status_t	GetNextInput(
-							int32 * cookie,
-							media_input * out_input);
-							
-	virtual	void		DisposeInputCookie(
-							int32 cookie);
-	
-protected:
+		status_t FtpSave(char* filename);
 
-	virtual	void		BufferReceived(
-							BBuffer * buffer);
-	
-private:
+	private:
+		BStringView*		fStatusLine;
+		uint32				fInternalID;
+		BMediaAddOn*		fAddOn;
 
-	virtual	void		ProducerDataStatus(
-							const media_destination &for_whom,
-							int32 status,
-							bigtime_t at_media_time);									
-	virtual	status_t	GetLatencyFor(
-							const media_destination &for_whom,
-							bigtime_t * out_latency,
-							media_node_id * out_id);	
-	virtual	status_t	Connected(
-							const media_source &producer,
-							const media_destination &where,
-							const media_format & with_format,
-							media_input * out_input);							
-	virtual	void		Disconnected(
-							const media_source &producer,
-							const media_destination &where);							
-	virtual	status_t	FormatChanged(
-							const media_source & producer,
-							const media_destination & consumer, 
-							int32 from_change_count,
-							const media_format & format);
-							
-/*	implementation */
+		thread_id			fFtpThread;
 
-public:
-			status_t	CreateBuffers(
-							const media_format & with_format);
-							
-			void		DeleteBuffers();
-							
-	static	status_t	FtpRun(
-							void *data);
-														
-	void				FtpThread(
-							void);
-							
-	void				UpdateFtpStatus(
-							char *status);
-	
-	status_t			LocalSave(
-							char *filename,
-							BBitmap *bitmap);
+		bool				fConnectionActive;
+		media_input			fIn;
+		media_destination	fDestination;
+		bigtime_t			fMyLatency;
 
-	status_t			FtpSave(
-							char *filename);
+		BWindow*			fWindow;
+		BView*				fView;
+		BBitmap*			fBitmap[3];
+		bool				fOurBuffers;
+		BBufferGroup*		fBuffers;
+		uint32				fBufferMap[3];	
 
-private:
+		BBitmap*			fFtpBitmap;
+		volatile bool		fTimeToFtp;	
+		volatile bool		fFtpComplete;	
 
-	BStringView	*		mStatusLine;
-	uint32				mInternalID;
-	BMediaAddOn			*mAddOn;
-
-	thread_id			mFtpThread;
-	
-	bool					mConnectionActive;
-	media_input				mIn;
-	media_destination		mDestination;
-	bigtime_t				mMyLatency;
-
-	BWindow					*mWindow;
-	BView					*mView;
-	BBitmap					*mBitmap[3];
-	bool					mOurBuffers;
-	BBufferGroup			*mBuffers;
-	uint32					mBufferMap[3];	
-	
-	BBitmap					*mFtpBitmap;
-	volatile bool			mTimeToFtp;	
-	volatile bool			mFtpComplete;	
-
-	bigtime_t				mRate;
-	uint32					mImageFormat;
-	int32					mTranslator;
-	bool					mPassiveFtp;
-	char					mFileNameText[64];
-	char					mServerText[64];
-	char					mLoginText[64];
-	char					mPasswordText[64];	
-	char					mDirectoryText[64];
+		bigtime_t			fRate;
+		uint32				fImageFormat;
+		int32				fTranslator;
+		bool				fPassiveFtp;
+		char				fFileNameText[64];
+		char				fServerText[64];
+		char				fLoginText[64];
+		char				fPasswordText[64];	
+		char				fDirectoryText[64];
 };
 
-#endif
+#endif	// VIDEO_CONSUMER_H
