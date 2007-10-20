@@ -19,58 +19,58 @@
 // --------------------------------
 
 #define	OHCI_REVISION				0x00
-#define		OHCI_REV_LO(rev)		((rev) & 0x0f)
-#define		OHCI_REV_HI(rev)		(((rev) >> 4) & 0x03)
-#define		OHCI_REV_LEGACY(rev)	((rev) & 0x10)
+#define	OHCI_REVISION_LOW(rev)		((rev) & 0x0f)
+#define	OHCI_REVISION_HIGH(rev)		(((rev) >> 4) & 0x03)
+#define	OHCI_REVISION_LEGACY(rev)	((rev) & 0x10)
 
 // --------------------------------
 //	Control register (section 7.1.2)
 // --------------------------------
 
-#define	OHCI_CONTROL				0x04
-#define		OHCI_CBSR_MASK			0x00000003 // Control-Bulk Service Ratio
-#define			OHCI_RATIO_1_1		0x00000000
-#define			OHCI_RATIO_1_2		0x00000001
-#define			OHCI_RATIO_1_3		0x00000002
-#define			OHCI_RATIO_1_4		0x00000003
-#define		OHCI_PLE				0x00000004 // Periodic List Enable 
-#define		OHCI_IE					0x00000008 // Isochronous Enable 
-#define		OHCI_CLE				0x00000010 // Control List Enable 
-#define		OHCI_BLE				0x00000020 // Bulk List Enable 
-#define		OHCI_HCFS_MASK			0x000000c0 // HostControllerFunctionalState 
-#define		OHCI_HCFS_RESET			0x00000000
-#define		OHCI_HCFS_RESUME		0x00000040
-#define		OHCI_HCFS_OPERATIONAL	0x00000080
-#define		OHCI_HCFS_SUSPEND		0x000000c0
-#define		OHCI_IR					0x00000100 // Interrupt Routing 
-#define		OHCI_RWC				0x00000200 // Remote Wakeup Connected 
-#define		OHCI_RWE				0x00000400 // Remote Wakeup Enabled 
+#define	OHCI_CONTROL							0x04
+#define	OHCI_CONTROL_BULK_SERVICE_RATIO_MASK	0x00000003
+#define	OHCI_CONTROL_BULK_RATIO_1_1				0x00000000
+#define	OHCI_CONTROL_BULK_RATIO_1_2				0x00000001
+#define	OHCI_CONTROL_BULK_RATIO_1_3				0x00000002
+#define	OHCI_CONTROL_BULK_RATIO_1_4				0x00000003
+#define	OHCI_PERIODIC_LIST_ENABLE				0x00000004
+#define	OHCI_ISOCHRONOUS_ENABLE					0x00000008
+#define	OHCI_CONTROL_LIST_ENABLE				0x00000010
+#define	OHCI_BULK_LIST_ENABLE					0x00000020
+#define	OHCI_HC_FUNCTIONAL_STATE_MASK			0x000000c0
+#define	OHCI_HC_FUNCTIONAL_STATE_RESET			0x00000000
+#define	OHCI_HC_FUNCTIONAL_STATE_RESUME			0x00000040
+#define	OHCI_HC_FUNCTIONAL_STATE_OPERATIONAL	0x00000080
+#define	OHCI_HC_FUNCTIONAL_STATE_SUSPEND		0x000000c0
+#define	OHCI_INTERRUPT_ROUTING					0x00000100
+#define	OHCI_REMOTE_WAKEUP_CONNECTED			0x00000200
+#define	OHCI_REMORE_WAKEUP_ENABLED				0x00000400
 
 // --------------------------------
 //	Command status register (section 7.1.3)
 // --------------------------------
 
-#define OHCI_COMMAND_STATUS	0x08
-#define		OHCI_HCR				0x00000001 // Host Controller Reset 
-#define		OHCI_CLF				0x00000002 // Control List Filled 
-#define		OHCI_BLF				0x00000004 // Bulk List Filled 
-#define		OHCI_OCR				0x00000008 // Ownership Change Request 
-#define		OHCI_SOC_MASK			0x00030000 // Scheduling Overrun Count 
+#define	OHCI_COMMAND_STATUS						0x08
+#define	OHCI_HOST_CONTROLLER_RESET				0x00000001
+#define	OHCI_CONTROL_LIST_FILLED				0x00000002
+#define	OHCI_BULK_LIST_FILLED					0x00000004
+#define	OHCI_OWNERSHIP_CHANGE_REQUEST			0x00000008
+#define	OHCI_SCHEDULING_OVERRUN_COUNT_MASK		0x00030000
 
 // --------------------------------
 //	Interrupt status register (section 7.1.4)
 // --------------------------------
 
-#define OHCI_INTERRUPT_STATUS	0x0c
-#define		OHCI_SO					0x00000001 // Scheduling Overrun
-#define		OHCI_WDH				0x00000002 // Writeback Done Head 
-#define		OHCI_SF					0x00000004 // Start of Frame 
-#define		OHCI_RD					0x00000008 // Resume Detected 
-#define		OHCI_UE					0x00000010 // Unrecoverable Error 
-#define		OHCI_FNO				0x00000020 // Frame Number Overflow 
-#define		OHCI_RHSC				0x00000040 // Root Hub Status Change 
-#define		OHCI_OC					0x40000000 // Ownership Change 
-#define		OHCI_MIE				0x80000000 // Master Interrupt Enable 
+#define	OHCI_INTERRUPT_STATUS			0x0c
+#define	OHCI_SCHEDULING_OVERRUN			0x00000001
+#define	OHCI_WRITEBACK_DONE_HEAD		0x00000002
+#define	OHCI_START_OF_FRAME				0x00000004
+#define	OHCI_RESUME_DETECTED			0x00000008
+#define	OHCI_UNRECOVERABLE_ERROR		0x00000010
+#define	OHCI_FRAME_NUMBER_OVERFLOW		0x00000020
+#define	OHCI_ROOT_HUB_STATUS_CHANGE		0x00000040
+#define	OHCI_OWNERSHIP_CHANGE			0x40000000
+#define	OHCI_MASTER_INTERRUPT_ENABLE	0x80000000
 
 // --------------------------------
 //	Interupt enable register (section 7.1.5)
@@ -138,34 +138,34 @@
 //	Frame interval register (section 7.3.1)
 // --------------------------------
 
-#define OHCI_FM_INTERVAL			0x34
-#define		OHCI_GET_IVAL(s)		((s) & 0x3fff)
-#define		OHCI_GET_FSMPS(s)		(((s) >> 16) & 0x7fff)
-#define		OHCI_FIT				0x80000000
+#define	OHCI_FRAME_INTERVAL					0x34
+#define	OHCI_GET_INTERVAL_VALUE(s)			((s) & 0x3fff)
+#define	OHCI_GET_FS_LARGEST_DATA_PACKET(s)	(((s) >> 16) & 0x7fff)
+#define	OHCI_FRAME_INTERVAL_TOGGLE			0x80000000
 
 // --------------------------------
 //	Frame remaining register (section 7.3.2)
 // --------------------------------
 
-#define OHCI_FM_REMAINING			0x38
+#define	OHCI_FRAME_REMAINING			0x38
 
 // --------------------------------
 //	Frame number register	(section 7.3.3)
 // --------------------------------
 
-#define OHCI_FM_NUMBER				0x3c
+#define	OHCI_FRAME_NUMBER				0x3c
 
 // --------------------------------
 //	Periodic start register (section 7.3.4)
 // --------------------------------
 
-#define OHCI_PERIODIC_START			0x40
+#define	OHCI_PERIODIC_START				0x40
 
 // --------------------------------
-//	LS treshold register (section 7.3.5)
+//	Low Speed (LS) treshold register (section 7.3.5)
 // --------------------------------
 
-#define OHCI_LS_THRESHOLD			0x44
+#define	OHCI_LOW_SPEED_THRESHOLD		0x44
 
 // --------------------------------
 //	Root Hub Partition (section 7.4)
@@ -175,14 +175,14 @@
 //	Root Hub Descriptor A register (section 7.4.1)
 // --------------------------------
 
-#define OHCI_RH_DESCRIPTOR_A		0x48
-#define		OHCI_GET_PORT_COUNT(s)	((s) & 0xff)
-#define		OHCI_PSM				0x0100     // Power Switching Mode
-#define		OHCI_NPS				0x0200	   // No Power Switching
-#define		OHCI_DT					0x0400     // Device Type
-#define		OHCI_OCPM				0x0800     // Overcurrent Protection Mode 
-#define		OHCI_NOCP				0x1000     // No Overcurrent Protection 
-#define		OHCI_GET_POTPGT(s)		((s) >> 24)
+#define	OHCI_RH_DESCRIPTOR_A						0x48
+#define	OHCI_RH_GET_PORT_COUNT(s)					((s) & 0xff)
+#define	OHCI_RH_POWER_SWITCHING_MODE				0x0100
+#define	OHCI_RH_NO_POWER_SWITCHING					0x0200
+#define	OHCI_RH_DEVICE_TYPE							0x0400
+#define	OHCI_RH_OVER_CURRENT_PROTECTION_MODE		0x0800
+#define	OHCI_RH_NO_OVER_CURRENT_PROTECTION_MODE		0x1000
+#define	OHCI_RH_GET_POWER_ON_TO_POWER_GOOD_TIME(s)	((s) >> 24)
 
 // --------------------------------
 //	Root Hub Descriptor B register (section 7.4.2)
@@ -194,61 +194,61 @@
 //	Root Hub status register (section 7.4.3)
 // --------------------------------
 
-#define OHCI_RH_STATUS				0x50
-#define		OHCI_LPS				0x00000001 // Local Power Status 
-#define		OHCI_OCI				0x00000002 // OverCurrent Indicator 
-#define		OHCI_DRWE				0x00008000 // Device Remote Wakeup Enable 
-#define		OHCI_LPSC				0x00010000 // Local Power Status Change
-#define		OHCI_CCIC				0x00020000 // OverCurrent Indicator Change
-#define		OHCI_CRWE				0x80000000 // Clear Remote Wakeup Enable
+#define	OHCI_RH_STATUS							0x50
+#define	OHCI_RH_LOCAL_POWER_STATUS				0x00000001
+#define	OHCI_RH_OVER_CURRENT_INDICATOR			0x00000002
+#define	OHCI_RH_DEVICE_REMOTE_WAKEUP_ENABLE		0x00008000
+#define	OHCI_RH_LOCAL_POWER_STATUS_CHANGE		0x00010000
+#define	OHCI_RH_OVER_CURRENT_INDICATOR_CHANGE	0x00020000
+#define	OHCI_RH_CLEAR_REMOTE_WAKEUP_ENABLE		0x80000000
 
 // --------------------------------
 //	Root Hub port status (n) register (section 7.4.4)
 // --------------------------------
 
-#define OHCI_RH_PORT_STATUS(n)		(0x50 + (n)*4) // 1 based indexing
-#define     OHCI_PORTSTATUS_CCS     0x00000001 // Current Connection Status
-#define     OHCI_PORTSTATUS_PES     0x00000002 // Port Enable Status
-#define     OHCI_PORTSTATUS_PSS     0x00000004 // Port Suspend Status
-#define     OHCI_PORTSTATUS_POCI    0x00000008 // Port Overcurrent Indicator
-#define     OHCI_PORTSTATUS_PRS     0x00000010 // Port Reset Status
-#define     OHCI_PORTSTATUS_PPS     0x00000100 // Port Power Status
-#define     OHCI_PORTSTATUS_LSDA    0x00000200 // Low Speed Device Attached
-#define     OHCI_PORTSTATUS_CSC     0x00010000 // Connection Status Change
-#define     OHCI_PORTSTATUS_PESC    0x00020000 // Port Enable Status Change
-#define     OHCI_PORTSTATUS_PSSC    0x00040000 // Port Suspend Status change
-#define     OHCI_PORTSTATUS_OCIC    0x00080000 // Port Overcurrent Change
-#define     OHCI_PORTSTATUS_PRSC    0x00100000 // Port Reset Status Change
+#define	OHCI_RH_PORT_STATUS(n)		(0x50 + (n) * 4) // 1 based indexing
+#define	OHCI_RH_PORTSTATUS_CCS		0x00000001		 // Current Connection Status
+#define	OHCI_RH_PORTSTATUS_PES		0x00000002		 // Port Enable Status
+#define	OHCI_RH_PORTSTATUS_PSS		0x00000004		 // Port Suspend Status
+#define	OHCI_RH_PORTSTATUS_POCI		0x00000008		 // Port Overcurrent Indicator
+#define	OHCI_RH_PORTSTATUS_PRS		0x00000010		 // Port Reset Status
+#define	OHCI_RH_PORTSTATUS_PPS		0x00000100		 // Port Power Status
+#define	OHCI_RH_PORTSTATUS_LSDA		0x00000200		 // Low Speed Device Attached
+#define	OHCI_RH_PORTSTATUS_CSC		0x00010000		 // Connection Status Change
+#define	OHCI_RH_PORTSTATUS_PESC		0x00020000		 // Port Enable Status Change
+#define	OHCI_RH_PORTSTATUS_PSSC		0x00040000		 // Port Suspend Status change
+#define	OHCI_RH_PORTSTATUS_OCIC		0x00080000		 // Port Overcurrent Change
+#define	OHCI_RH_PORTSTATUS_PRSC		0x00100000		 // Port Reset Status Change
 
 // --------------------------------
 //	????
 // --------------------------------
 
-#define OHCI_LES					(OHCI_PLE | OHCI_IE | OHCI_CLE | OHCI_BLE)
+#define	OHCI_LES					(OHCI_PLE | OHCI_IE | OHCI_CLE | OHCI_BLE)
 
 // --------------------------------
 //	All interupts
 // --------------------------------
 
-#define OHCI_ALL_INTRS				(OHCI_SO | OHCI_WDH | OHCI_SF | OHCI_RD | OHCI_UE | OHCI_FNO | OHCI_RHSC | OHCI_OC)
+#define	OHCI_ALL_INTRS				(OHCI_SO | OHCI_WDH | OHCI_SF | OHCI_RD | OHCI_UE | OHCI_FNO | OHCI_RHSC | OHCI_OC)
 
 // --------------------------------
 //	All normal interupts
 // --------------------------------	
 					
-#define OHCI_NORMAL_INTRS			(OHCI_SO | OHCI_WDH | OHCI_RD | OHCI_UE | OHCI_RHSC)
+#define	OHCI_NORMAL_INTRS			(OHCI_SO | OHCI_WDH | OHCI_RD | OHCI_UE | OHCI_RHSC)
 
 // --------------------------------
 //	FSMPS
 // --------------------------------
 
-#define OHCI_FSMPS(i)				(((i-210)*6/7) << 16)
+#define	OHCI_FSMPS(i)				(((i - 210) * 6 / 7) << 16)
 
 // --------------------------------
 //	Periodic
 // --------------------------------
 
-#define OHCI_PERIODIC(i)			((i)*9/10)
+#define	OHCI_PERIODIC(i)			((i) * 9 / 10)
 
 // --------------------------------
 //	OHCI physical address
@@ -264,9 +264,9 @@ typedef uint32 ohci_physaddr_t;
 
 typedef struct ohci_hcca 
 {
-	addr_t		hcca_interrupt_table[OHCI_NUMBER_OF_INTERRUPTS];
-	uint32		hcca_frame_number;
-	addr_t		hcca_done_head;
+	uint32		hcca_interrupt_table[OHCI_NUMBER_OF_INTERRUPTS];
+	uint16		hcca_frame_number;
+	uint32		hcca_done_head;
 	uint8		hcca_reserved_for_hc[116];
 };
 
@@ -322,22 +322,22 @@ typedef struct ohci_general_transfer_descriptor
 	uint32 		last_byte_address;	// Physical buffer end 
 };
 
-#define OHCI_BUFFER_ROUNDING			0x00040000		// Buffer Rounding 
-#define OHCI_TD_DIRECTION_PID_MASK		0x00180000		// Direction / PID 
-#define OHCI_TD_DIRECTION_PID_SETUP		0x00000000
-#define OHCI_TD_DIRECTION_PID_OUT		0x00080000
-#define OHCI_TD_DIRECTION_PID_IN		0x00100000
-#define OHCI_TD_GET_DELAY_INTERRUPT(x)	(((x) >> 21) & 7)	// Delay Interrupt 
-#define OHCI_TD_SET_DELAY_INTERRUPT(x)	((x) << 21)
-#define OHCI_TD_NO_INTERRUPT			0x00e00000
-#define OHCI_TD_INTERRUPT_MASK			0x00e00000
-#define OHCI_TD_TOGGLE_CARRY			0x00000000
-#define OHCI_TD_TOGGLE_0				0x02000000
-#define OHCI_TD_TOGGLE_1				0x03000000
-#define OHCI_TD_TOGGLE_MASK				0x03000000
-#define OHCI_TD_GET_ERROR_COUNT(x)		(((x) >> 26) & 3)	// Error Count 
-#define OHCI_TD_GET_CONDITION_CODE(x)	((x) >> 28)			// Condition Code 
-#define OHCI_TD_NO_CONDITION_CODE		0xf0000000
+#define	OHCI_BUFFER_ROUNDING			0x00040000
+#define	OHCI_TD_DIRECTION_PID_MASK		0x00180000
+#define	OHCI_TD_DIRECTION_PID_SETUP		0x00000000
+#define	OHCI_TD_DIRECTION_PID_OUT		0x00080000
+#define	OHCI_TD_DIRECTION_PID_IN		0x00100000
+#define	OHCI_TD_GET_DELAY_INTERRUPT(x)	(((x) >> 21) & 7)
+#define	OHCI_TD_SET_DELAY_INTERRUPT(x)	((x) << 21)
+#define	OHCI_TD_NO_INTERRUPT			0x00e00000
+#define	OHCI_TD_INTERRUPT_MASK			0x00e00000
+#define	OHCI_TD_TOGGLE_CARRY			0x00000000
+#define	OHCI_TD_TOGGLE_0				0x02000000
+#define	OHCI_TD_TOGGLE_1				0x03000000
+#define	OHCI_TD_TOGGLE_MASK				0x03000000
+#define	OHCI_TD_GET_ERROR_COUNT(x)		(((x) >> 26) & 3)
+#define	OHCI_TD_GET_CONDITION_CODE(x)	((x) >> 28)
+#define	OHCI_TD_NO_CONDITION_CODE		0xf0000000
 
 #define OHCI_GENERAL_TD_ALIGN 16
 
@@ -355,22 +355,22 @@ typedef struct ohci_isochronous_transfer_descriptor
 	uint16		offset[OHCI_ITD_NOFFSET];	// Buffer offsets
 };
 
-#define OHCI_ITD_GET_STARTING_FRAME(x)			((x) & 0x0000ffff)
-#define OHCI_ITD_SET_STARTING_FRAME(x)			((x) & 0xffff)
-#define OHCI_ITD_GET_DELAY_INTERRUPT(x)			(((x) >> 21) & 7)
-#define OHCI_ITD_SET_DELAY_INTERRUPT(x)			((x) << 21)
-#define OHCI_ITD_NO_INTERRUPT					0x00e00000
-#define OHCI_ITD_GET_FRAME_COUNT(x)				((((x) >> 24) & 7) + 1)
-#define OHCI_ITD_SET_FRAME_COUNT(x)				(((x) - 1) << 24)
-#define OHCI_ITD_GET_CONDITION_CODE(x)			((x) >> 28)
-#define OHCI_ITD_NO_CONDITION_CODE				0xf0000000
+#define	OHCI_ITD_GET_STARTING_FRAME(x)			((x) & 0x0000ffff)
+#define	OHCI_ITD_SET_STARTING_FRAME(x)			((x) & 0xffff)
+#define	OHCI_ITD_GET_DELAY_INTERRUPT(x)			(((x) >> 21) & 7)
+#define	OHCI_ITD_SET_DELAY_INTERRUPT(x)			((x) << 21)
+#define	OHCI_ITD_NO_INTERRUPT					0x00e00000
+#define	OHCI_ITD_GET_FRAME_COUNT(x)				((((x) >> 24) & 7) + 1)
+#define	OHCI_ITD_SET_FRAME_COUNT(x)				(((x) - 1) << 24)
+#define	OHCI_ITD_GET_CONDITION_CODE(x)			((x) >> 28)
+#define	OHCI_ITD_NO_CONDITION_CODE				0xf0000000
 
 // TO FIX
 #define itd_pswn itd_offset						// Packet Status Word
 #define OHCI_ITD_PAGE_SELECT					0x00001000
 #define OHCI_ITD_MK_OFFS(len)					(0xe000 | ((len) & 0x1fff))
-#define OHCI_ITD_GET_BUFFER_LENGTH(x)			((x) & 0xfff)		// Transfer length
-#define OHCI_ITD_GET_BUFFER_CONDITION_CODE(x)	((x) >> 12)			// Condition Code
+#define OHCI_ITD_GET_BUFFER_LENGTH(x)			((x) & 0xfff)
+#define OHCI_ITD_GET_BUFFER_CONDITION_CODE(x)	((x) >> 12)	
 
 #define OHCI_ISOCHRONOUS_TD_ALIGN 32
 
@@ -378,26 +378,26 @@ typedef struct ohci_isochronous_transfer_descriptor
 //	Completion Codes (section 4.3.3)
 // --------------------------------
 
-#define OHCI_NO_ERROR				0
-#define OHCI_CRC					1
-#define OHCI_BIT_STUFFING			2
-#define OHCI_DATA_TOGGLE_MISMATCH	3
-#define OHCI_STALL					4
-#define OHCI_DEVICE_NOT_RESPONDING	5
-#define OHCI_PID_CHECK_FAILURE		6
-#define OHCI_UNEXPECTED_PID			7
-#define OHCI_DATA_OVERRUN			8
-#define OHCI_DATA_UNDERRUN			9
-#define OHCI_BUFFER_OVERRUN			12
-#define OHCI_BUFFER_UNDERRUN		13
-#define OHCI_NOT_ACCESSED			15
+#define	OHCI_NO_ERROR				0
+#define	OHCI_CRC					1
+#define	OHCI_BIT_STUFFING			2
+#define	OHCI_DATA_TOGGLE_MISMATCH	3
+#define	OHCI_STALL					4
+#define	OHCI_DEVICE_NOT_RESPONDING	5
+#define	OHCI_PID_CHECK_FAILURE		6
+#define	OHCI_UNEXPECTED_PID			7
+#define	OHCI_DATA_OVERRUN			8
+#define	OHCI_DATA_UNDERRUN			9
+#define	OHCI_BUFFER_OVERRUN			12
+#define	OHCI_BUFFER_UNDERRUN		13
+#define	OHCI_NOT_ACCESSED			15
 
 // --------------------------------
 // 	Some delay needed when changing 
 //	certain registers.
 // --------------------------------
 
-#define OHCI_ENABLE_POWER_DELAY			5
-#define OHCI_READ_DESC_DELAY			5
+#define	OHCI_ENABLE_POWER_DELAY			5
+#define	OHCI_READ_DESC_DELAY			5
 
 #endif // OHCI_HARD_H 
