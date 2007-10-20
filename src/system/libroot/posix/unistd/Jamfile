@@ -17,6 +17,7 @@ MergeObject posix_unistd.o :
 	hostname.cpp
 	ioctl.c
 	link.c
+	lockf.cpp
 	lseek.c
 	mknod.c
 	mount.c

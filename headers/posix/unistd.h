@@ -21,6 +21,12 @@
 #define STDOUT_FILENO	1
 #define STDERR_FILENO	2
 
+/* function arguments needed by lockf() */
+#define F_ULOCK		0	/* unlock locked sections */
+#define F_LOCK		1	/* lock a section for exclusive use */
+#define F_TLOCK		2	/* test and lock a section for exclusive use */
+#define F_TEST		3	/* test a section for locks by other processes */
+
 /* POSIX version support */
 #define _POSIX_VERSION			(199009L)
 
@@ -111,7 +117,8 @@ extern int      getdtablesize(void);
 extern long		sysconf(int name);
 extern long		fpathconf(int fd, int name);
 extern long		pathconf(const char *path, int name);
-extern size_t		confstr(int name, char *buf, size_t len);
+extern size_t	confstr(int name, char *buf, size_t len);
+extern int		lockf(int fd, int function, off_t size);
 
 /* process functions */
 extern pid_t	fork(void);
