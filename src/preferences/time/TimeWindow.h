@@ -18,7 +18,6 @@ class BMessage;
 class DateTimeView;
 class TTimeBaseView;
 class TZoneView;
-class SettingsView;
 
 
 class TTimeWindow : public BWindow {
@@ -35,7 +34,6 @@ class TTimeWindow : public BWindow {
 		TTimeBaseView 	*fBaseView;
 		DateTimeView 	*fDateTimeView;
 		TZoneView 		*fTimeZones;
-		SettingsView	*fSettingsView;
 };
 
 #endif	// TIME_WINDOW_H
