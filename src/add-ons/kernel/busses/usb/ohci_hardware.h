@@ -181,7 +181,7 @@
 #define	OHCI_RH_NO_POWER_SWITCHING					0x0200
 #define	OHCI_RH_DEVICE_TYPE							0x0400
 #define	OHCI_RH_OVER_CURRENT_PROTECTION_MODE		0x0800
-#define	OHCI_RH_NO_OVER_CURRENT_PROTECTION_MODE		0x1000
+#define	OHCI_RH_NO_OVER_CURRENT_PROTECTION			0x1000
 #define	OHCI_RH_GET_POWER_ON_TO_POWER_GOOD_TIME(s)	((s) >> 24)
 
 // --------------------------------
@@ -221,22 +221,36 @@
 #define	OHCI_RH_PORTSTATUS_PRSC		0x00100000		 // Port Reset Status Change
 
 // --------------------------------
-//	????
+//	Enable List
 // --------------------------------
 
-#define	OHCI_LES					(OHCI_PLE | OHCI_IE | OHCI_CLE | OHCI_BLE)
+#define	OHCI_ENABLE_LIST		(OHCI_PERIODIC_LIST_ENABLE \
+								| OHCI_ISOCHRONOUS_ENABLE \
+								| OHCI_CONTROL_LIST_ENABLE \
+								| OHCI_BULK_LIST_ENABLE)
 
 // --------------------------------
 //	All interupts
 // --------------------------------
 
-#define	OHCI_ALL_INTRS				(OHCI_SO | OHCI_WDH | OHCI_SF | OHCI_RD | OHCI_UE | OHCI_FNO | OHCI_RHSC | OHCI_OC)
+#define	OHCI_ALL_INTERRUPTS		(OHCI_SCHEDULING_OVERRUN \
+								| OHCI_WRITEBACK_DONE_HEAD \
+								| OHCI_START_OF_FRAME \
+								| OHCI_RESUME_DETECTED \
+								| OHCI_UNRECOVERABLE_ERROR \
+								| OHCI_FRAME_NUMBER_OVERFLOW \
+								| OHCI_ROOT_HUB_STATUS_CHANGE \
+								| OHCI_OWNERSHIP_CHANGE)
 
 // --------------------------------
 //	All normal interupts
 // --------------------------------	
 					
-#define	OHCI_NORMAL_INTRS			(OHCI_SO | OHCI_WDH | OHCI_RD | OHCI_UE | OHCI_RHSC)
+#define	OHCI_NORMAL_INTERRUPTS		(OHCI_SCHEDULING_OVERRUN \
+									| OHCI_WRITEBACK_DONE_HEAD \
+									| OHCI_RESUME_DETECTED \
+									| OHCI_UNRECOVERABLE_ERROR \
+									| OHCI_ROOT_HUB_STATUS_CHANGE)
 
 // --------------------------------
 //	FSMPS
@@ -397,7 +411,7 @@ typedef struct ohci_isochronous_transfer_descriptor
 //	certain registers.
 // --------------------------------
 
-#define	OHCI_ENABLE_POWER_DELAY			5
-#define	OHCI_READ_DESC_DELAY			5
+#define	OHCI_ENABLE_POWER_DELAY			5000
+#define	OHCI_READ_DESC_DELAY			5000
 
 #endif // OHCI_HARD_H 

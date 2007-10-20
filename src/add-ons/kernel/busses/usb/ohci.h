@@ -53,7 +53,7 @@ typedef struct hcd_soft_itransfer
 
 struct Endpoint
 {
-	addr_t						physicaladdress;//Point to the physical address
+	addr_t						physical_address;//Point to the physical address
 	ohci_endpoint_descriptor	*ed;			//Logical 'endpoint'
 	Endpoint					*next;			//Pointer to the 'next' endpoint
 	TransferDescriptor			*head, *tail;	//Pointers to the 'head' and 'tail' transfer descriptors
@@ -64,17 +64,17 @@ struct Endpoint
 		if (end == 0)
 			ed->next_endpoint = 0;
 		else
-			ed->next_endpoint = end->physicaladdress;
+			ed->next_endpoint = end->physical_address;
 	}; 
 	
 	//Constructor (or better: initialiser)
-	Endpoint() : physicaladdress(0), ed(0), next(0), head(0), tail(0) {};
+	Endpoint() : physical_address(0), ed(0), next(0), head(0), tail(0) {};
 };
 
 
 struct TransferDescriptor
 {
-	addr_t						physicaladdress;
+	addr_t						physical_address;
 	ohci_general_transfer_descriptor	*td;
 };
 
@@ -110,7 +110,7 @@ inline	uint32						ReadReg(uint32 reg);
 		// Global
 static	pci_module_info				*sPCIModule;
 
-		uint32						*fRegisterBase;
+		uint32						*fOperationalRegisters;
 		pci_info 					*fPCIInfo;
 		Stack						*fStack;
 
@@ -120,17 +120,18 @@ static	pci_module_info				*sPCIModule;
 		area_id						fHccaArea;
 		struct ohci_hcca			*fHcca;	
 		Endpoint					*fInterruptEndpoints[OHCI_NO_EDS];
+
 		// Dummy endpoints
 		Endpoint					*fDummyControl;
 		Endpoint					*fDummyBulk;
 		Endpoint					*fDummyIsochronous;
 		// functions
-		Endpoint					*AllocateEndpoint(); 
-		void						FreeEndpoint(Endpoint *end);
-		TransferDescriptor			*AllocateTransfer();
-		void						FreeTransfer(TransferDescriptor *trans);
+		Endpoint					*_AllocateEndpoint(); 
+		void						_FreeEndpoint(Endpoint *end);
+		TransferDescriptor			*_AllocateTransfer();
+		void						_FreeTransfer(TransferDescriptor *trans);
 
-		status_t					InsertEndpointForPipe(Pipe *p);
+		status_t					_InsertEndpointForPipe(Pipe *p);
 
 		// Root Hub
 		OHCIRootHub 				*fRootHub;
