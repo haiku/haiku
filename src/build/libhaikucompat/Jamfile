@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src build libhaikucompat ;
 
 SetSubDirSupportedPlatforms libbe_test r5 dano bone ;
 
+UseHeaders [ FDirName $(HAIKU_TOP) headers build private ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers build private kernel ] : true ;
 
 local libbeTestSources ;
