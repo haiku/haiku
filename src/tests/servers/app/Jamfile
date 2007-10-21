@@ -116,8 +116,8 @@ Server haiku_app_server :
 	ServerWindow.cpp
 
 	# DrawingEngine Classes
-	AccelerantBuffer.cpp
-	AccelerantHWInterface.cpp
+#	AccelerantBuffer.cpp
+#	AccelerantHWInterface.cpp
 	BitmapBuffer.cpp
 	drawing_support.cpp
 	DrawingEngine.cpp
