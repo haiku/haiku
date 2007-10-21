@@ -1,0 +1,45 @@
+SubDir HAIKU_TOP src tests kits net tcp_shell ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+SubDirHdrs [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons kernel network protocols tcp ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons kernel network stack ] ;
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
+UsePrivateHeaders kernel net shared ;
+
+SimpleTest tcp_shell :
+	tcp_tester.cpp
+
+	# stack
+	net_buffer.cpp
+	utility.cpp
+
+	# tcp
+	tcp.cpp
+	TCPEndpoint.cpp
+	BufferQueue.cpp
+	EndpointManager.cpp
+
+	# misc
+	argv.c
+	ipv4_address.cpp
+
+	: be libkernelland_emu.so
+;
+
+SEARCH on [ FGristFiles 
+		tcp.cpp TCPEndpoint.cpp BufferQueue.cpp EndpointManager.cpp
+	] = [ FDirName $(HAIKU_TOP) src add-ons kernel network protocols tcp ] ;
+
+SEARCH on [ FGristFiles 
+		ipv4_address.cpp
+	] = [ FDirName $(HAIKU_TOP) src add-ons kernel network protocols ipv4 ] ;
+
+SEARCH on [ FGristFiles 
+		net_buffer.cpp utility.cpp
+	] = [ FDirName $(HAIKU_TOP) src add-ons kernel network stack ] ;
+
+SEARCH on [ FGristFiles 
+		argv.c
+	] = [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell ] ;

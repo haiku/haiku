@@ -2,22 +2,6 @@ SubDir HAIKU_TOP src tests kits net ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-SubDirHdrs [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell ] ;
-SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons kernel network protocols tcp ] ;
-SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons kernel network stack ] ;
-UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
-UsePrivateHeaders net ;
-
-# bonefish: Tried to get the first test compiling. It complained about not
-# being able to find some headers, thus I added the respective include dirs
-# until it was asking for headers we currently don't have
-# (sys/select.h, sys/sockio.h).
-
-#SubDirHdrs [ FDirName $(HAIKU_TOP) headers posix sys ] ;
-#SubDirHdrs [ FDirName $(HAIKU_TOP) headers posix net ] ;
-#UsePrivateHeaders kernel ;
-#UseArchHeaders $(TARGET_ARCH) ;
-
 SimpleTest udp_client : udp_client.c : $(TARGET_NETWORK_LIBS) ;
 SimpleTest udp_echo : udp_echo.c : $(TARGET_NETWORK_LIBS) ;
 SimpleTest udp_server : udp_server.c : $(TARGET_NETWORK_LIBS) ;
@@ -25,45 +9,9 @@ SimpleTest udp_server : udp_server.c : $(TARGET_NETWORK_LIBS) ;
 SimpleTest tcp_server : tcp_server.c : $(TARGET_NETWORK_LIBS) ;
 SimpleTest tcp_client : tcp_client.c : $(TARGET_NETWORK_LIBS) ;
 
-SimpleTest tcp_tester :
-	tcp_tester.cpp
-	
-	# stack
-	net_buffer.cpp
-	utility.cpp
-
-	# tcp
-	tcp.cpp
-	TCPEndpoint.cpp
-	BufferQueue.cpp
-	EndpointManager.cpp
-
-	# misc
-	argv.c
-	ipv4_address.cpp
-
-	: be libkernelland_emu.so
-;
-
-SEARCH on [ FGristFiles 
-		tcp.cpp TCPEndpoint.cpp BufferQueue.cpp EndpointManager.cpp
-	] = [ FDirName $(HAIKU_TOP) src add-ons kernel network protocols tcp ] ;
-
-SEARCH on [ FGristFiles 
-		ipv4_address.cpp
-	] = [ FDirName $(HAIKU_TOP) src add-ons kernel network protocols ipv4 ] ;
-
-SEARCH on [ FGristFiles 
-		net_buffer.cpp utility.cpp
-	] = [ FDirName $(HAIKU_TOP) src add-ons kernel network stack ] ;
-
-SEARCH on [ FGristFiles 
-		argv.c
-	] = [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell ] ;
-
 SubInclude HAIKU_TOP src tests kits net DialUpPreflet ;
 SubInclude HAIKU_TOP src tests kits net multicast ;
 SubInclude HAIKU_TOP src tests kits net netperf ;
-# SubInclude HAIKU_TOP src tests kits net new_stack ;
 SubInclude HAIKU_TOP src tests kits net preflet ;
+SubInclude HAIKU_TOP src tests kits net tcp_shell ;
 SubInclude HAIKU_TOP src tests kits net tcptester ;

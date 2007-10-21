@@ -1,3 +1,0 @@
-SubDir HAIKU_TOP src tests kits net new_stack framings ;
-
-SubInclude HAIKU_TOP src tests kits net new_stack framings ethernet ;

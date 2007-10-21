@@ -1,8 +1,0 @@
-SubDir HAIKU_TOP src tests kits net new_stack interfaces ether_drivers ;
-
-UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net new_stack headers ] ;
-
-Addon <v2>ether_drivers :
-	ether_drivers.c
-	: <installed>new_stack_tester be
-;

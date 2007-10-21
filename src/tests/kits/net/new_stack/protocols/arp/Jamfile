@@ -1,8 +1,0 @@
-SubDir HAIKU_TOP src tests kits net new_stack protocols arp ;
-
-UseHeaders [ FDirName $(HAIKU_TOP) src tests kits net new_stack headers ] ;
-
-Addon <v2>arp :
-	arp.c
-	: <installed>new_stack_tester be
-;

@@ -1,8 +1,0 @@
-SubDir HAIKU_TOP src tests kits net new_stack atomizer ;
-
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel generic atomizer ] ;
-
-Addon <userland>atomizer :
-	atomizer.c
-	: <installed>new_stack_tester
-;
