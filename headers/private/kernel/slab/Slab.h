@@ -9,8 +9,6 @@
 #define _SLAB_SLAB_H_
 
 
-#include <slab/Depot.h>
-
 #include <KernelExport.h>
 #include <OS.h>
 

@@ -6,7 +6,6 @@
  *      Hugo Santos, hugosantos@gmail.com
  */
 
-#include <Slab.h>
 
 #include "slab_private.h"
 
@@ -17,7 +16,9 @@
 
 #include <KernelExport.h>
 
+#include <Depot.h>
 #include <kernel.h>
+#include <Slab.h>
 #include <smp.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
