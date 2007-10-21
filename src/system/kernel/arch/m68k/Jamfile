@@ -1,0 +1,35 @@
+SubDir HAIKU_TOP src system kernel arch m68k ;
+
+SubDirHdrs $(SUBDIR) $(DOTDOT) generic ;
+#UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) ;
+#	for some reason, this doesn't work
+UsePrivateHeaders kernel [ FDirName kernel arch $(TARGET_ARCH) ] 
+	[ FDirName kernel boot platform $(HAIKU_BOOT_PLATFORM) ] ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
+
+KernelStaticLibrary libm68k :
+	arch_atomic.c
+	arch_cpu.cpp
+	arch_cpu_asm.S
+	arch_debug_console.cpp
+	arch_debug.cpp
+	arch_elf.cpp
+	arch_exceptions.S
+	arch_int.cpp
+	arch_mmu.cpp
+	arch_platform.cpp
+	arch_real_time_clock.cpp
+	arch_smp.c
+	arch_system_info.c
+	arch_thread.c
+	arch_timer.c
+	arch_user_debugger.cpp
+	arch_vm.cpp
+	arch_vm_translation_map.cpp
+	arch_asm.S
+
+	generic_vm_physical_page_mapper.cpp
+	:
+	$(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
+;
