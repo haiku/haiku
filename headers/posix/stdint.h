@@ -1,6 +1,7 @@
-/* 
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2003-2007, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _STDINT_H_
 #define _STDINT_H_
 
@@ -27,8 +28,8 @@ typedef unsigned short uint16_t;
 #define INT32_MIN 	(-INT32_MAX-1)
 #define UINT32_MAX	(4294967295UL)
 
-typedef signed long int32_t;
-typedef unsigned long uint32_t;
+typedef signed int int32_t;
+typedef unsigned int uint32_t;
 
 #define INT64_MAX	(9223372036854775807LL)
 #define INT64_MIN	(-INT64_MAX-1)

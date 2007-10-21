@@ -78,9 +78,10 @@ struct net_stack_module_info {
 	status_t (*register_domain_receiving_protocol)(int family, int type,
 					const char *moduleName);
 
-	status_t (*get_domain_receiving_protocol)(struct net_domain *domain, uint32 type,
-					struct net_protocol_module_info **_module);
-	status_t (*put_domain_receiving_protocol)(struct net_domain *domain, uint32 type);
+	status_t (*get_domain_receiving_protocol)(struct net_domain *domain,
+					uint32 type, struct net_protocol_module_info **_module);
+	status_t (*put_domain_receiving_protocol)(struct net_domain *domain,
+					uint32 type);
 
 	// devices
 	status_t (*register_device_deframer)(struct net_device *device,
@@ -94,33 +95,37 @@ struct net_stack_module_info {
 	status_t (*unregister_device_handler)(struct net_device *device, int32 type);
 
 	status_t (*register_device_monitor)(struct net_device *device,
-		struct net_device_monitor *monitor);
+					struct net_device_monitor *monitor);
 	status_t (*unregister_device_monitor)(struct net_device *device,
-		struct net_device_monitor *monitor);
+					struct net_device_monitor *monitor);
 
 	status_t (*device_link_changed)(struct net_device *device);
 	status_t (*device_removed)(struct net_device *device);
 
 	status_t (*device_enqueue_buffer)(struct net_device *device,
-				struct net_buffer *buffer);
+					struct net_buffer *buffer);
 
 	// Utility Functions
 
 	// notification
-	status_t	(*notify_socket)(struct net_socket *socket, uint8 event, int32 value);
+	status_t (*notify_socket)(struct net_socket *socket, uint8 event,
+					int32 value);
 
 	// checksum
 	uint16 (*checksum)(uint8 *buffer, size_t length);
 
 	// fifo
-	status_t (*init_fifo)(struct net_fifo *fifo, const char *name, size_t maxBytes);
+	status_t (*init_fifo)(struct net_fifo *fifo, const char *name,
+					size_t maxBytes);
 	void (*uninit_fifo)(struct net_fifo *fifo);
-	status_t (*fifo_enqueue_buffer)(struct net_fifo *fifo, struct net_buffer *buffer);
+	status_t (*fifo_enqueue_buffer)(struct net_fifo *fifo,
+					struct net_buffer *buffer);
 	ssize_t (*fifo_dequeue_buffer)(struct net_fifo *fifo, uint32 flags,
 					bigtime_t timeout, struct net_buffer **_buffer);
 	status_t (*clear_fifo)(struct net_fifo *fifo);
-	status_t (*fifo_socket_enqueue_buffer)(struct net_fifo *, struct net_socket *,
-					uint8 event, struct net_buffer *);
+	status_t (*fifo_socket_enqueue_buffer)(struct net_fifo *fifo,
+					struct net_socket *socket, uint8 event,
+					struct net_buffer *buffer);
 
 	// timer
 	void (*init_timer)(struct net_timer *timer, net_timer_func hook, void *data);

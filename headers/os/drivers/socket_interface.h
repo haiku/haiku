@@ -14,7 +14,7 @@
 
 #define B_SOCKET_MODULE_NAME "network/socket/v1"
 
-typedef struct socket_module_info {
+struct socket_module_info {
 	struct module_info	info;
 
 	int 	(*accept)(int socket, struct sockaddr *address, socklen_t *_addressLength);

@@ -14,6 +14,7 @@
 #include <net_stat.h>
 
 #include <KernelExport.h>
+#include <Select.h>
 #include <team.h>
 #include <util/AutoLock.h>
 #include <util/list.h>

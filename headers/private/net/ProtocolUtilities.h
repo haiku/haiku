@@ -5,20 +5,21 @@
  * Authors:
  *      Hugo Santos, hugosantos@gmail.com
  */
-
 #ifndef PROTOCOL_UTILITIES_H
 #define PROTOCOL_UTILITIES_H
 
+
 #include <lock.h>
+#include <Select.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 
+#include <AddressUtilities.h>
 #include <net_buffer.h>
 #include <net_protocol.h>
 #include <net_socket.h>
 #include <net_stack.h>
 
-#include <AddressUtilities.h>
 
 class BenaphoreLocking {
 public:

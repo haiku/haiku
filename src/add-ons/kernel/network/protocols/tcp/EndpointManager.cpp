@@ -9,13 +9,15 @@
 
 
 #include "EndpointManager.h"
-#include "TCPEndpoint.h"
 
-#include <NetUtilities.h>
-
-#include <util/AutoLock.h>
+#include <unistd.h>
 
 #include <KernelExport.h>
+
+#include <NetUtilities.h>
+#include <util/AutoLock.h>
+
+#include "TCPEndpoint.h"
 
 
 //#define TRACE_ENDPOINT_MANAGER

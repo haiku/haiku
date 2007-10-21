@@ -80,7 +80,13 @@ enum message_type {
 };
 
 struct dhcp_option_cookie {
-	dhcp_option_cookie() : state(0), file_has_options(false), server_name_has_options(false) {}
+	dhcp_option_cookie()
+		:
+		state(0),
+		file_has_options(false),
+		server_name_has_options(false)
+	{
+	}
 
 	const uint8* next;
 	uint8	state;
@@ -122,7 +128,8 @@ struct dhcp_message {
 	uint8* PutOption(uint8* options, message_option option, uint8 data);
 	uint8* PutOption(uint8* options, message_option option, uint16 data);
 	uint8* PutOption(uint8* options, message_option option, uint32 data);
-	uint8* PutOption(uint8* options, message_option option, const uint8* data, uint32 size);
+	uint8* PutOption(uint8* options, message_option option, const uint8* data,
+		uint32 size);
 	uint8* FinishOptions(uint8 *);
 } _PACKED;
 
@@ -263,7 +270,8 @@ dhcp_message::PrepareMessage(uint8 type)
 {
 	uint8 *next = options;
 	next = PutOption(next, OPTION_MESSAGE_TYPE, type);
-	next = PutOption(next, OPTION_MESSAGE_SIZE, (uint16)htons(sizeof(dhcp_message)));
+	next = PutOption(next, OPTION_MESSAGE_SIZE,
+		(uint16)htons(sizeof(dhcp_message)));
 	return next;
 }
 
@@ -298,7 +306,8 @@ dhcp_message::PutOption(uint8* options, message_option option, uint32 data)
 
 
 uint8*
-dhcp_message::PutOption(uint8* options, message_option option, const uint8* data, uint32 size)
+dhcp_message::PutOption(uint8* options, message_option option,
+	const uint8* data, uint32 size)
 {
 	options[0] = option;
 	options[1] = size;
@@ -438,9 +447,10 @@ DHCPClient::_Negotiate(dhcp_state state)
 
 			if (state == INIT)
 				status = _SendMessage(socket, discover, broadcast);
-			else
+			else {
 				status = _SendMessage(socket, request, state != RENEWAL
 					? broadcast : fServer);
+			}
 
 			if (status < B_OK)
 				break;
@@ -490,13 +500,15 @@ DHCPClient::_Negotiate(dhcp_state state)
 				_PrepareMessage(request, state);
 
 				status = _SendMessage(socket, request, broadcast);
-					// we're sending a broadcast so that all potential offers get an answer
+					// we're sending a broadcast so that all potential offers
+					// get an answer
 				break;
 			}
 
 			case DHCP_ACK:
 			{
-				if (state != REQUESTING && state != REBINDING && state != RENEWAL)
+				if (state != REQUESTING && state != REBINDING
+					&& state != RENEWAL)
 					continue;
 
 				// TODO: we might want to configure the stuff, don't we?
@@ -520,7 +532,8 @@ DHCPClient::_Negotiate(dhcp_state state)
 				if (state != REQUESTING)
 					continue;
 
-				// try again (maybe we should prefer other servers if this happens more than once)
+				// try again (maybe we should prefer other servers if this
+				// happens more than once)
 				status = _SendMessage(socket, discover, broadcast);
 				if (status == B_OK)
 					state = INIT;
@@ -591,8 +604,10 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address)
 				FILE* file = fopen("/etc/resolv.conf", "w");
 				for (uint32 i = 0; i < size / 4; i++) {
 					printf("DNS: %s\n", _ToString(&data[i*4]).String());
-					if (file != NULL)
-						fprintf(file, "nameserver %s\n", _ToString(&data[i*4]).String());
+					if (file != NULL) {
+						fprintf(file, "nameserver %s\n",
+							_ToString(&data[i*4]).String());
+					}
 				}
 				fclose(file);
 				break;
@@ -652,7 +667,8 @@ DHCPClient::_PrepareMessage(dhcp_message& message, dhcp_state state)
 	message.hardware_type = ARP_HARDWARE_TYPE_ETHER;
 	message.hardware_address_length = 6;
 	message.transaction_id = htonl(fTransactionID);
-	message.seconds_since_start = htons(min_c((fStartTime - system_time()) / 1000000LL, 65535));
+	message.seconds_since_start = htons(min_c((fStartTime - system_time())
+		/ 1000000LL, 65535));
 	memcpy(message.mac_address, fMAC, 6);
 
 	message_type type = message.Type();
@@ -669,9 +685,10 @@ DHCPClient::_PrepareMessage(dhcp_message& message, dhcp_state state)
 			// In RENEWAL or REBINDING state, we must set the client_address field, and not
 			// use OPTION_REQUEST_IP_ADDRESS for DHCP_REQUEST messages
 			if (type == DHCP_REQUEST && (state == INIT || state == REQUESTING)) {
-				next = message.PutOption(next, OPTION_REQUEST_IP_ADDRESS, fAssignedAddress);
+				next = message.PutOption(next, OPTION_REQUEST_IP_ADDRESS,
+					(uint32)fAssignedAddress);
 				next = message.PutOption(next, OPTION_REQUEST_PARAMETERS,
-										 kRequiredParameters, sizeof(kRequiredParameters));
+					kRequiredParameters, sizeof(kRequiredParameters));
 			} else
 				message.client_address = fAssignedAddress;
 
@@ -683,7 +700,7 @@ DHCPClient::_PrepareMessage(dhcp_message& message, dhcp_state state)
 		{
 			uint8 *next = message.PrepareMessage(type);
 			next = message.PutOption(next, OPTION_REQUEST_PARAMETERS,
-									 kRequiredParameters, sizeof(kRequiredParameters));
+				kRequiredParameters, sizeof(kRequiredParameters));
 			message.FinishOptions(next);
 			break;
 		}

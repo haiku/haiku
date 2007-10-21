@@ -418,7 +418,7 @@ sendmsg(int socket, const struct msghdr *message, int flags)
 
 
 extern "C" int
-getsockopt(int socket, int level, int option, void *value, size_t *_length)
+getsockopt(int socket, int level, int option, void *value, socklen_t *_length)
 {
 	if (check_r5_compatibility()) {
 		if (option == R5_SO_FIONREAD) {
@@ -447,7 +447,8 @@ getsockopt(int socket, int level, int option, void *value, size_t *_length)
 
 
 extern "C" int
-setsockopt(int socket, int level, int option, const void *value, size_t length)
+setsockopt(int socket, int level, int option, const void *value,
+	socklen_t length)
 {
 	if (check_r5_compatibility())
 		convert_from_r5_sockopt(level, option);

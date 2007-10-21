@@ -91,9 +91,13 @@ UserBuffer::Copy(void *source, size_t length)
 		return NULL;
 	}
 
+#ifdef _KERNEL_MODE
 	fStatus = user_memcpy(fBuffer, source, length);
 	if (fStatus < B_OK)
 		return NULL;
+#else
+	memcpy(fBuffer, source, length);
+#endif
 
 	void *current = fBuffer;
 
@@ -242,7 +246,11 @@ Fifo::Clear()
 void
 Fifo::WakeAll()
 {
+#ifdef __HAIKU__
 	release_sem_etc(notify, 0, B_RELEASE_ALL);
+#else
+	release_sem_etc(notify, 0, waiting);
+#endif
 }
 
 

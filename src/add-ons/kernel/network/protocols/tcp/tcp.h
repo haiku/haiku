@@ -1,9 +1,11 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
  *		Andrew Galante, haiku.galante@gmail.com
+ *		Hugo Santos, hugosantos@gmail.com
  */
 #ifndef TCP_H
 #define TCP_H
@@ -115,13 +117,13 @@ struct tcp_option {
 	uint8	kind;
 	uint8	length;
 	union {
-		uint8	window_shift;
-		uint16	max_segment_size;
+		uint8		window_shift;
+		uint16		max_segment_size;
 		struct {
-			uint32 timestamp_value;
-			uint32 timestamp_reply;
-		} timestamp;
-		tcp_sack sack[0];
+			uint32	value;
+			uint32	reply;
+		}			timestamp;
+		tcp_sack	sack[0];
 	};
 } _PACKED;
 

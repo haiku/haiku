@@ -280,7 +280,7 @@ dst_s_build_filename(char *filename, const char *name, u_int16_t id,
 	if (filename_length < 1 + strlen(name) + 4 + 6 + 1 + strlen(suffix))
 		return (-1);
 	my_id = id;
-	sprintf(filename, "K%s+%03d+%05ld.%s", name, alg, my_id,
+	sprintf(filename, "K%s+%03d+%05d.%s", name, alg, my_id,
 		(const char *) suffix);
 	if (strrchr(filename, '/'))
 		return (-1);

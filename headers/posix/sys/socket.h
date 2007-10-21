@@ -83,13 +83,12 @@ struct sockaddr {
 	uint8_t		sa_data[30];
 };
 
-/* this can hold ANY sockaddr we care to throw at it! */
 struct sockaddr_storage {
-	uint8_t       ss_len;		/* total length */
-	uint8_t       ss_family;	/* address family */
-	uint8_t       __ss_pad1[6];	/* align to quad */
-	uint64_t      __ss_pad2;	/* force alignment for stupid compilers */
-	uint8_t       __ss_pad3[112]; /* pad to a total of 128 bytes */
+	uint8_t		ss_len;			/* total length */
+	uint8_t		ss_family;		/* address family */
+	uint8_t		__ss_pad1[6];	/* align to quad */
+	uint64_t	__ss_pad2;		/* force alignment to 64 bit */
+	uint8_t		__ss_pad3[112];	/* pad to a total of 128 bytes */
 };
 
 struct msghdr {

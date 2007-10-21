@@ -24,6 +24,7 @@
 #include <util/list.h>
 
 #include <KernelExport.h>
+#include <Select.h>
 
 #include <netinet/in.h>
 #include <netinet/ip.h>
@@ -196,9 +197,10 @@ WaitList::Wait(MutexLocker &locker, bigtime_t timeout, bool wakeNext)
 
 	status_t status = B_OK;
 
-	while (status == B_OK && !atomic_test_and_set(&fCondition, 0, 1))
+	while (status == B_OK && !atomic_test_and_set(&fCondition, 0, 1)) {
 		status = acquire_sem_etc(fSem, 1, B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT,
 			timeout);
+	}
 
 	locker.Lock();
 	if (status == B_OK && wakeNext)
@@ -212,7 +214,13 @@ void
 WaitList::Signal()
 {
 	atomic_or(&fCondition, 1);
+#ifdef __HAIKU__
 	release_sem_etc(fSem, 1, B_DO_NOT_RESCHEDULE | B_RELEASE_IF_WAITING_ONLY);
+#else
+	int32 count;
+	if (get_sem_count(fSem, &count) == B_OK && count < 0)
+		release_sem_etc(fSem, 1, B_DO_NOT_RESCHEDULE);
+#endif
 }
 
 

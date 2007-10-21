@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef NET_SOCKET_H
@@ -9,8 +9,9 @@
 #include <net_buffer.h>
 #include <sys/socket.h>
 
-#include <Select.h>
 #include <lock.h>
+
+struct selectsync;
 
 
 #define NET_SOCKET_MODULE_NAME "network/stack/socket/v1"
@@ -42,32 +43,36 @@ typedef struct net_socket {
 struct net_socket_module_info {
 	struct module_info info;
 
-	status_t	(*open_socket)(int family, int type, int protocol, net_socket **_socket);
+	status_t	(*open_socket)(int family, int type, int protocol,
+					net_socket **_socket);
 	status_t	(*close)(net_socket *socket);
 	status_t	(*free)(net_socket *socket);
 
-	status_t	(*readv)(net_socket *socket, const iovec *vecs, size_t vecCount,
-					size_t *_length);
-	status_t	(*writev)(net_socket *socket, const iovec *vecs, size_t vecCount,
-					size_t *_length);
-	status_t	(*control)(net_socket *socket, int32 op, void *data, size_t length);
+	status_t	(*readv)(net_socket *socket, const iovec *vecs,
+					size_t vecCount, size_t *_length);
+	status_t	(*writev)(net_socket *socket, const iovec *vecs,
+					size_t vecCount, size_t *_length);
+	status_t	(*control)(net_socket *socket, int32 op, void *data,
+					size_t length);
 
 	ssize_t		(*read_avail)(net_socket *socket);
 	ssize_t		(*send_avail)(net_socket *socket);
 
 	status_t	(*send_data)(net_socket *socket, net_buffer *buffer);
-	status_t	(*receive_data)(net_socket *socket, size_t length, uint32 flags,
-					net_buffer **_buffer);
+	status_t	(*receive_data)(net_socket *socket, size_t length,
+					uint32 flags, net_buffer **_buffer);
 
 	status_t	(*get_option)(net_socket *socket, int level, int option,
 					void *value, int *_length);
 	status_t	(*set_option)(net_socket *socket, int level, int option,
 					const void *value, int length);
 
-	status_t	(*get_next_stat)(uint32 *cookie, int family, struct net_stat *stat);
+	status_t	(*get_next_stat)(uint32 *cookie, int family,
+					struct net_stat *stat);
 
 	// connections
-	status_t	(*spawn_pending_socket)(net_socket *parent, net_socket **_socket);
+	status_t	(*spawn_pending_socket)(net_socket *parent,
+					net_socket **_socket);
 	void		(*delete_socket)(net_socket *socket);
 	status_t	(*dequeue_connected)(net_socket *parent, net_socket **_socket);
 	ssize_t		(*count_connected)(net_socket *parent);
@@ -75,10 +80,10 @@ struct net_socket_module_info {
 	status_t	(*set_connected)(net_socket *socket);
 
 	// notifications
-	status_t	(*request_notification)(net_socket *socket, uint8 event, uint32 ref,
-					selectsync *sync);
+	status_t	(*request_notification)(net_socket *socket, uint8 event,
+					uint32 ref, struct selectsync *sync);
 	status_t	(*cancel_notification)(net_socket *socket, uint8 event,
-					selectsync *sync);
+					struct selectsync *sync);
 	status_t	(*notify)(net_socket *socket, uint8 event, int32 value);
 
 	// standard socket API

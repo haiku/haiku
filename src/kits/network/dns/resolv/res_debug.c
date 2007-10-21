@@ -190,7 +190,7 @@ do_section(const res_state statp,
 		else if (section == ns_s_ar && ns_rr_type(rr) == ns_t_opt) {
 			u_int32_t ttl = ns_rr_ttl(rr);
 			fprintf(file,
-				"; EDNS: version: %lu, udp=%u, flags=%04lx\n",
+				"; EDNS: version: %u, udp=%u, flags=%04x\n",
 				(ttl>>16)&0xff, ns_rr_class(rr), ttl&0xffff);
 		} else {
 			n = ns_sprintrr(handle, &rr, NULL, NULL,
@@ -642,7 +642,7 @@ p_time(u_int32_t value) {
 	static char nbuf[40];		/* XXX nonreentrant */
 
 	if (ns_format_ttl(value, nbuf, sizeof nbuf) < 0)
-		sprintf(nbuf, "%lu", value);
+		sprintf(nbuf, "%u", value);
 	return (nbuf);
 }
 

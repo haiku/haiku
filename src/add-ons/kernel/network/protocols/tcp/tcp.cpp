@@ -1,10 +1,11 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  *		Andrew Galante, haiku.galante@gmail.com
+ *		Hugo Santos, hugosantos@gmail.com
  */
 
 
@@ -134,9 +135,9 @@ add_options(tcp_segment_header &segment, uint8 *buffer, size_t bufferSize)
 		bump_option(option, length);
 		option->kind = TCP_OPTION_TIMESTAMP;
 		option->length = 10;
-		option->timestamp.timestamp_value = htonl(segment.timestamp_value);
+		option->timestamp.value = htonl(segment.timestamp_value);
 		// TSecr is opaque to us, we send it as we received it.
-		option->timestamp.timestamp_reply = segment.timestamp_reply;
+		option->timestamp.reply = segment.timestamp_reply;
 		bump_option(option, length);
 	}
 
@@ -307,9 +308,9 @@ process_options(tcp_segment_header &segment, net_buffer *buffer, size_t size)
 			case TCP_OPTION_TIMESTAMP:
 				if (option->length == 10 && (size - 10) >= 0) {
 					segment.options |= TCP_HAS_TIMESTAMPS;
-					segment.timestamp_value = option->timestamp.timestamp_value;
+					segment.timestamp_value = option->timestamp.value;
 					segment.timestamp_reply =
-						ntohl(option->timestamp.timestamp_reply);
+						ntohl(option->timestamp.reply);
 				}
 				break;
 			case TCP_OPTION_SACK_PERMITTED:
@@ -384,6 +385,33 @@ dump_tcp_header(tcp_header &header)
 	dprintf("  urgent offset: %u\n", header.UrgentOffset());
 }
 #endif
+
+
+static int
+dump_endpoints(int argc, char *argv[])
+{
+	EndpointManagerList::Iterator it = sEndpointManagers.GetIterator();
+
+	while (it.HasNext())
+		it.Next()->DumpEndpoints();
+
+	return 0;
+}
+
+
+static int
+dump_endpoint(int argc, char *argv[])
+{
+	if (argc < 2) {
+		kprintf("usage: tcp_endpoint [address]\n");
+		return 0;
+	}
+
+	TCPEndpoint *endpoint = (TCPEndpoint *)strtoul(argv[1], NULL, 16);
+	endpoint->DumpInternalState();
+
+	return 0;
+}
 
 
 //	#pragma mark - protocol API
@@ -671,33 +699,6 @@ tcp_error_reply(net_protocol *protocol, net_buffer *causedError, uint32 code,
 	void *errorData)
 {
 	return B_ERROR;
-}
-
-
-static int
-dump_endpoints(int argc, char *argv[])
-{
-	EndpointManagerList::Iterator it = sEndpointManagers.GetIterator();
-
-	while (it.HasNext())
-		it.Next()->DumpEndpoints();
-
-	return 0;
-}
-
-
-static int
-dump_endpoint(int argc, char *argv[])
-{
-	if (argc < 2) {
-		kprintf("usage: tcp_endpoint [address]\n");
-		return 0;
-	}
-
-	TCPEndpoint *endpoint = (TCPEndpoint *)strtoul(argv[1], NULL, 16);
-	endpoint->DumpInternalState();
-
-	return 0;
 }
 
 

@@ -611,7 +611,7 @@ dst_s_write_public_key(const DST_KEY *key)
 		b64_ntop(&out_key[6], len - 6, enc_key, sizeof(enc_key));
 	else
 		b64_ntop(&out_key[4], len - 4, enc_key, sizeof(enc_key));
-	fprintf(fp, "%s IN KEY %ld %d %d %s\n",
+	fprintf(fp, "%s IN KEY %d %d %d %s\n",
 		key->dk_key_name,
 		key->dk_flags, key->dk_proto, key->dk_alg, enc_key);
 	fclose(fp);

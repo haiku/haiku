@@ -221,7 +221,7 @@ sendmsg(int socket, const struct msghdr *message, int flags)
 
 
 int
-getsockopt(int socket, int level, int option, void *value, size_t *_length)
+getsockopt(int socket, int level, int option, void *value, socklen_t *_length)
 {
 	sockopt_args args;
 	args.level = level;
@@ -240,7 +240,7 @@ getsockopt(int socket, int level, int option, void *value, size_t *_length)
 
 
 int
-setsockopt(int socket, int level, int option, const void *value, size_t length)
+setsockopt(int socket, int level, int option, const void *value, socklen_t length)
 {
 	sockopt_args args;
 	args.level = level;
