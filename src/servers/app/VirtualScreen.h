@@ -50,7 +50,7 @@ class VirtualScreen {
 		int32				CountScreens() const;
 
 	private:
-		status_t			_FindConfiguration(Screen* screen,
+		status_t			_GetConfiguration(Screen* screen,
 								BMessage& settings);
 		void				_Reset();
 

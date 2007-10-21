@@ -140,7 +140,7 @@ VirtualScreen::AddScreen(Screen* screen)
 
 	status_t status = B_ERROR;
 	BMessage settings;
-	if (_FindConfiguration(screen, settings) == B_OK) {
+	if (_GetConfiguration(screen, settings) == B_OK) {
 		// we found settings for this screen, and try to apply them now
 		int32 width, height, colorSpace;
 		const display_timing* timing;
@@ -152,6 +152,7 @@ VirtualScreen::AddScreen(Screen* screen)
 					&size) == B_OK
 			&& size == sizeof(display_timing))
 			status = screen->SetMode(width, height, colorSpace, *timing, true);
+		// TODO: named settings will get lost if setting the mode failed!
 	}
 	if (status < B_OK) {
 		// TODO: more intelligent standard mode (monitor preference, desktop default, ...)
@@ -240,32 +241,39 @@ VirtualScreen::CountScreens() const
 
 
 status_t
-VirtualScreen::_FindConfiguration(Screen* screen, BMessage& settings)
+VirtualScreen::_GetConfiguration(Screen* screen, BMessage& settings)
 {
 	monitor_info info;
 	bool hasInfo = screen->GetMonitorInfo(info) == B_OK;
 	if (!hasInfo) {
 		// only look for a matching ID - this is all we have
-		for (uint32 i = 0; fSettings.FindMessage("screen", i,
-				&settings) == B_OK; i++) {
-			int32 id;
-			if (settings.FindInt32("id", &id) != B_OK
-				|| screen->ID() != id)
-				continue;
+		for (uint32 k = 0; k < 2; k++) {
+			for (uint32 i = 0; fSettings.FindMessage("screen", i,
+					&settings) == B_OK; i++) {
+				int32 id;
+				if (k == 0 && settings.HasString("name")
+					|| settings.FindInt32("id", &id) != B_OK
+					|| screen->ID() != id)
+					continue;
 
-			// we found our match
-			fSettings.RemoveData("screen", i);
-			return B_OK;
+				// we found our match, only remove unnamed settings
+				if (k == 0)
+					fSettings.RemoveData("screen", i);
+				return B_OK;
+			}
 		}
+		return B_NAME_NOT_FOUND;
 	}
 
 	// look for a monitor configuration that matches ours
 
+	bool exactMatch = false;
 	int32 bestScore = 0;
 	int32 bestIndex = -1;
 	BMessage stored;
 	for (uint32 i = 0; fSettings.FindMessage("screen", i, &stored) == B_OK;
 			i++) {
+		// TODO: should we ignore unnamed settings here completely?
 		int32 score = 0;
 		int32 id;
 		if (stored.FindInt32("id", &id) == B_OK && screen->ID() == id)
@@ -286,8 +294,10 @@ VirtualScreen::_FindConfiguration(Screen* screen, BMessage& settings)
 				&& !strcasecmp(name, info.name)
 				&& productID == info.product_id) {
 				score += 2;
-				if (!strcmp(serial, info.serial_number))
+				if (!strcmp(serial, info.serial_number)) {
+					exactMatch = true;
 					score += 2;
+				}
 				if (info.produced.year == year && info.produced.week == week)
 					score++;
 			} else
@@ -302,7 +312,8 @@ VirtualScreen::_FindConfiguration(Screen* screen, BMessage& settings)
 	}
 
 	if (bestIndex >= 0) {
-		fSettings.RemoveData("screen", bestIndex);
+		if (exactMatch)
+			fSettings.RemoveData("screen", bestIndex);
 		return B_OK;
 	}
 
