@@ -52,6 +52,30 @@ typedef int socklen_t;
 		__attribute__((format(__printf__, _format_, _args_)))
 #endif
 
+// BeOS version of BeBuild.h defines this
+#define _IMPEXP_ROOT		__declspec(dllimport)
+#define	_IMPEXP_BE			__declspec(dllimport)
+#define	_IMPEXP_MEDIA		__declspec(dllimport)
+#define	_IMPEXP_TRACKER		__declspec(dllimport)
+#define _IMPEXP_TRANSLATION	__declspec(dllimport)
+#define _IMPEXP_DEVICE		__declspec(dllimport)
+
+#ifdef __cplusplus
+class BBuffer;
+class BBufferConsumer;
+class BBufferGroup;
+class BContinuousParameter;
+class BControllable;
+class BFileInterface;
+class BParameterWeb;
+class BTextView;
+class BTranslator;
+class BTimeSource;
+class BRegion;
+struct entry_ref;
+struct media_node;
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
