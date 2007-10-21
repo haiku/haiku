@@ -209,14 +209,16 @@ ModeList::AddModes(edid1_info* info)
 		display_mode mode;
 		mode.timing.pixel_clock = timing.pixel_clock * 10;
 		mode.timing.h_display = timing.h_active;
-		mode.timing.h_sync_start = timing.h_blank;
-		mode.timing.h_sync_end = timing.h_sync_off;
-		mode.timing.h_total = timing.h_sync_width;
+		mode.timing.h_sync_start = timing.h_active + timing.h_sync_off;
+		mode.timing.h_sync_end = mode.timing.h_sync_start + timing.h_sync_width;
+		mode.timing.h_total = timing.h_active + timing.h_blank;
 		mode.timing.v_display = timing.v_active;
-		mode.timing.v_sync_start = timing.v_blank;
-		mode.timing.v_sync_end = timing.v_sync_off;
-		mode.timing.v_total = timing.v_sync_width;
+		mode.timing.v_sync_start = timing.v_active + timing.v_sync_off;
+		mode.timing.v_sync_end = mode.timing.v_sync_start + timing.v_sync_width;
+		mode.timing.v_total = timing.v_active + timing.v_blank;
 		mode.timing.flags = POSITIVE_SYNC;
+		if (timing.interlaced)
+			mode.timing.flags |= B_TIMING_INTERLACED;
 		mode.space = B_RGB32;
 		mode.virtual_width = timing.h_active;
 		mode.virtual_height = timing.v_active;
