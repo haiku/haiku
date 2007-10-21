@@ -19,8 +19,7 @@ class OffscreenClock;
 
 class TAnalogClock : public BView {
 	public:
-						TAnalogClock(BRect frame, const char *name, 
-							uint32 resizeMask, uint32 flags);
+						TAnalogClock(BRect frame, const char *name);
 		virtual 		~TAnalogClock();
 
 		virtual void 	AttachedToWindow();		

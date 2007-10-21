@@ -61,7 +61,7 @@ TTimeWindow::QuitRequested()
 {
 	TimeSettings().SetLeftTop(Frame().LeftTop());
 
-	fBaseView->StopWatchingAll(fTimeZones);
+	fBaseView->StopWatchingAll(fTimeZoneView);
 	fBaseView->StopWatchingAll(fDateTimeView);
 	
 	be_app->PostMessage(B_QUIT_REQUESTED);
@@ -75,40 +75,35 @@ TTimeWindow::_InitWindow()
 {
 	SetPulseRate(500000);
 
-	BRect bounds(Bounds());
+	fDateTimeView = new DateTimeView(Bounds());
 	
-	fBaseView = new TTimeBaseView(bounds, "background view");
+	BRect bounds = fDateTimeView->Bounds();
+	fTimeZoneView = new TimeZoneView(bounds);
+
+	fBaseView = new TTimeBaseView(bounds, "baseView");
 	AddChild(fBaseView);
 	
-	bounds.top = 9;
-	BTabView *tabview = new BTabView(bounds, "tab_view");
-	
-	bounds = tabview->Bounds();
-	bounds.InsetBy(4, 6);
-	bounds.bottom -= tabview->TabHeight();
-	
-	fDateTimeView = new DateTimeView(bounds);
 	fBaseView->StartWatchingAll(fDateTimeView);
+	fBaseView->StartWatchingAll(fTimeZoneView);
 
+	bounds.OffsetBy(10.0, 10.0);
+	BTabView *tabView = new BTabView(bounds.InsetByCopy(-5.0, -5.0),
+		"tabView" , B_WIDTH_AS_USUAL, B_FOLLOW_NONE);
+	
 	BTab *tab = new BTab();
-	tabview->AddTab(fDateTimeView, tab);
+	tabView->AddTab(fDateTimeView, tab);
 	tab->SetLabel("Date & Time");
 
-	fTimeZones = new TZoneView(bounds);
-	fBaseView->StartWatchingAll(fTimeZones);
-
 	tab = new BTab();
-	tabview->AddTab(fTimeZones, tab);
-	tab->SetLabel("Time Zone");
+	tabView->AddTab(fTimeZoneView, tab);
+	tab->SetLabel("Timezone");
 
-	fBaseView->AddChild(tabview);
+	fBaseView->AddChild(tabView);
+	tabView->ResizeBy(0.0, tabView->TabHeight());
+	fBaseView->ResizeTo(tabView->Bounds().Width() + 10.0, 
+		tabView->Bounds().Height() + 10.0);
 
-	float width;
-	float height;
-	fDateTimeView->GetPreferredSize(&width, &height);
-
-	// width/ height from DateTimeView + all InsetBy etc..
-	ResizeTo(width +10, height + tabview->TabHeight() +25);
+	ResizeTo(fBaseView->Bounds().Width(), fBaseView->Bounds().Height());
 }
 
 

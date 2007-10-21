@@ -16,7 +16,7 @@
 
 
 TTimeBaseView::TTimeBaseView(BRect frame, const char *name)
-	: BView(frame, name, B_FOLLOW_ALL_SIDES, B_PULSE_NEEDED),
+	: BView(frame, name, B_FOLLOW_NONE, B_PULSE_NEEDED),
 	  fMessage(H_TIME_UPDATE)
 {
 }

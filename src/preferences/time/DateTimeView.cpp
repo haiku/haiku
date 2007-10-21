@@ -27,9 +27,6 @@
 #include <Window.h>
 
 
-#include <stdlib.h>
-
-
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 #include <syscalls.h>
 #else
@@ -39,12 +36,13 @@ void _kset_tzfilename_(const char *name, size_t length, bool isGMT);
 
 
 DateTimeView::DateTimeView(BRect frame)
-	: BView(frame,"Settings", B_FOLLOW_ALL,
-		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP),
+	: BView(frame, "dateTimeView", B_FOLLOW_NONE, B_WILL_DRAW | B_NAVIGABLE_JUMP),
 	  fGmtTime(NULL),
+	  fUseGmtTime(false),
 	  fInitialized(false)
 {
 	_ReadRTCSettings();
+	_InitView();
 }
 
 
@@ -61,8 +59,11 @@ DateTimeView::AttachedToWindow()
 		SetViewColor(Parent()->ViewColor());
 
 	if (!fInitialized) {
-		_InitView();
 		fInitialized = true;
+
+		fGmtTime->SetTarget(this);
+		fLocalTime->SetTarget(this);
+		fCalendarView->SetTarget(this);		
 	}
 }
 
@@ -76,8 +77,8 @@ DateTimeView::Draw(BRect /*updateRect*/)
 
 	//draw a separator line
 	BRect bounds(Bounds());
-	BPoint start(bounds.Width() / 2.0f + 2.0f, bounds.top + 2.0f);
-	BPoint end(bounds.Width() / 2.0 + 2.0f, bounds.bottom - 2.0f);
+	BPoint start(bounds.Width() / 2.0f, bounds.top + 5.0f);
+	BPoint end(bounds.Width() / 2.0, bounds.bottom - 5.0f);
 
 	BeginLineArray(2);
 		AddLine(start, end, dark);
@@ -118,6 +119,7 @@ DateTimeView::MessageReceived(BMessage *message)
 		}	break;
 
 		case kRTCUpdate:
+			fUseGmtTime = !fUseGmtTime;
 			_UpdateGmtSettings();
 			break;
 
@@ -129,94 +131,68 @@ DateTimeView::MessageReceived(BMessage *message)
 
 
 void
-DateTimeView::GetPreferredSize(float *width, float *height)
-{
-	// hardcode in TimeWindow ...
-	*width = 470.0f;
-	*height = 227.0f;
-
-	if (fInitialized) {
-		// we are initialized
-		*width = Bounds().Width();
-		*height = fGmtTime->Frame().bottom;
-	}
-}
-
-
-void
 DateTimeView::_InitView()
 {
 	font_height fontHeight;
 	be_plain_font->GetHeight(&fontHeight);
-	float textHeight = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
+	float textHeight = fontHeight.descent + fontHeight.ascent 
+		+ fontHeight.leading + 6.0;	// 6px border
 
 	// left side
-	BRect frameLeft(Bounds());
-	frameLeft.right = frameLeft.Width() / 2.0;
-	frameLeft.InsetBy(10.0f, 10.0f);
-	frameLeft.bottom = frameLeft.top + textHeight + 6.0;
+	BRect bounds = Bounds();
+	bounds.InsetBy(10.0, 10.0);
+	bounds.top += textHeight + 10.0;
 
-	fDateEdit = new TDateEdit(frameLeft, "date_edit", 3);
-	AddChild(fDateEdit);
-
-	frameLeft.top = fDateEdit->Frame().bottom + 10;
-	frameLeft.bottom = Bounds().bottom - 10;
-
-	fCalendarView = new BCalendarView(frameLeft, "calendar");
+	fCalendarView = new BCalendarView(bounds, "calendar");
 	fCalendarView->SetWeekNumberHeaderVisible(false);
-	AddChild(fCalendarView);
+	fCalendarView->ResizeToPreferred();
 	fCalendarView->SetSelectionMessage(new BMessage(kDayChanged));
 	fCalendarView->SetInvocationMessage(new BMessage(kDayChanged));
-	fCalendarView->SetTarget(this);
 
-	// right side	
-	BRect frameRight(Bounds());
-	frameRight.left = frameRight.Width() / 2.0;
-	frameRight.InsetBy(10.0f, 10.0f);
-	frameRight.bottom = frameRight.top + textHeight + 6.0;
+	bounds.top -= textHeight + 10.0;
+	bounds.bottom = bounds.top + textHeight;
+	bounds.right = fCalendarView->Frame().right;
 
-	fTimeEdit = new TTimeEdit(frameRight, "time_edit", 4);
+	fDateEdit = new TDateEdit(bounds, "dateEdit", 3);
+	AddChild(fDateEdit);
+	AddChild(fCalendarView);
+
+	// right side, 2px extra for separator
+	bounds.OffsetBy(bounds.Width() + 22.0, 0.0);
+	fTimeEdit = new TTimeEdit(bounds, "timeEdit", 4);
 	AddChild(fTimeEdit);
 
-	frameRight.top = fTimeEdit->Frame().bottom + 10.0;
-	frameRight.bottom = Bounds().bottom - 10.0;
+	bounds = fCalendarView->Frame();
+	bounds.OffsetBy(bounds.Width() + 22.0, 0.0);
 
-	float left = fTimeEdit->Frame().left;
-	float tmp = MIN(frameRight.Width(), frameRight.Height());
-	frameRight.left = left + (fTimeEdit->Bounds().Width() - tmp) / 2.0;
-	frameRight.bottom = frameRight.top + tmp;
-	frameRight.right = frameRight.left + tmp;
-
-	fClock = new TAnalogClock(frameRight, "analog clock", B_FOLLOW_NONE, B_WILL_DRAW);
+	fClock = new TAnalogClock(bounds, "analogClock");
 	AddChild(fClock);
 
 	// clock radio buttons
-	frameRight.left = left;
-	frameRight.top = fClock->Frame().bottom + 10.0;
-	BStringView *text = new BStringView(frameRight, "clockis", "Clock set to:");
+	bounds.top = fClock->Frame().bottom + 10.0;
+	BStringView *text = new BStringView(bounds, "clockSetTo", "Clock set to:");
 	AddChild(text);
 	text->ResizeToPreferred();
 
-	frameRight.left += 10.0f;
-	frameRight.top = text->Frame().bottom + 5.0;
-
-	fLocalTime = new BRadioButton(frameRight, "local", "Local time",
+	bounds.left += 10.0f;
+	bounds.top = text->Frame().bottom;
+	fLocalTime = new BRadioButton(bounds, "localTime", "Local Time", 
 		new BMessage(kRTCUpdate));
 	AddChild(fLocalTime);
 	fLocalTime->ResizeToPreferred();
-	fLocalTime->SetTarget(this);
 
-	frameRight.left = fLocalTime->Frame().right +10.0f;
-
-	fGmtTime = new BRadioButton(frameRight, "gmt", "GMT", new BMessage(kRTCUpdate));
+	bounds.left = fLocalTime->Frame().right + 10.0;
+	fGmtTime = new BRadioButton(bounds, "greenwichMeanTime", "GMT",
+		new BMessage(kRTCUpdate));
 	AddChild(fGmtTime);
 	fGmtTime->ResizeToPreferred();
-	fGmtTime->SetTarget(this);
 	
-	if (fIsLocalTime)
-		fLocalTime->SetValue(B_CONTROL_ON);
-	else
+	if (fUseGmtTime)
 		fGmtTime->SetValue(B_CONTROL_ON);
+	else
+		fLocalTime->SetValue(B_CONTROL_ON);
+
+	ResizeTo(fClock->Frame().right + 10.0, fGmtTime->Frame().bottom + 10.0);
 }
 
 
@@ -228,26 +204,18 @@ DateTimeView::_ReadRTCSettings()
 		return;
 
 	path.Append("RTC_time_settings");
-
-	BFile file;
+	
 	BEntry entry(path.Path());
 	if (entry.Exists()) {
-		file.SetTo(&entry, B_READ_ONLY);
+		BFile file(&entry, B_READ_ONLY);
 		if (file.InitCheck() == B_OK) {
-			char localTime[6];
-			file.Read(localTime, 6);
-			BString	text(localTime);
-			if (text.Compare("local", 4) == 0)
-				fIsLocalTime = true;
-			else
-				fIsLocalTime = false;
+			char buffer[6];
+			file.Read(buffer, 6);
+			if (strncmp(buffer, "gmt", 3) == 0)
+				fUseGmtTime = true;
 		}
-	} else {
-		// create set to local
-		fIsLocalTime = true;
-		file.SetTo(&entry, B_CREATE_FILE | B_READ_WRITE);
-		file.Write("local", 5);
-	}
+	} else
+		_UpdateGmtSettings();
 }
 
 
@@ -262,10 +230,10 @@ DateTimeView::_WriteRTCSettings()
 
 	BFile file(path.Path(), B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY);
 	if (file.InitCheck() == B_OK) {
-		if (fLocalTime->Value() == B_CONTROL_ON)
-			file.Write("local", 5);
-		else
+		if (fUseGmtTime)
 			file.Write("gmt", 3);
+		else
+			file.Write("local", 5);
 	}
 }
 
@@ -288,8 +256,7 @@ DateTimeView::_UpdateGmtSettings()
 	entry.GetPath(&path);
 
 	// take the existing timezone and set it's gmt use
-	_kern_set_tzfilename(path.Path(), B_PATH_NAME_LENGTH
-		, fGmtTime->Value() == B_CONTROL_ON);
+	_kern_set_tzfilename(path.Path(), B_PATH_NAME_LENGTH, fUseGmtTime);
 }
 
 
@@ -314,7 +281,7 @@ DateTimeView::_UpdateDateTime(BMessage *message)
 		&& message->FindInt32("minute", &minute) == B_OK
 		&& message->FindInt32("second", &second) == B_OK)
 	{
-		fTimeEdit->SetTime(hour, minute, second);
 		fClock->SetTime(hour, minute, second);
+		fTimeEdit->SetTime(hour, minute, second);
 	}
 }

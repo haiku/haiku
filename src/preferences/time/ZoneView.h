@@ -21,15 +21,13 @@ class BButton;
 class TTZDisplay;
 
 
-class TZoneView : public BView {
+class TimeZoneView : public BView {
 	public:
-						TZoneView(BRect frame);
-		virtual 		~TZoneView();
+						TimeZoneView(BRect frame);
+		virtual 		~TimeZoneView();
 		
 		virtual void 	AttachedToWindow();
 		virtual void 	MessageReceived(BMessage *message);
-	
-		const char* 	TimeZone();
 
 	private:
 		void 			UpdateDateTime(BMessage *message);
@@ -55,7 +53,7 @@ class TZoneView : public BView {
 		int32 			fHour;
 		int32 			fMinute;
 		BPath 			fCurrentZone;
-		bool 			fNotInitialized;
+		bool 			fInitialized;
 };
 
 #endif //Zone_View_H

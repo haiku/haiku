@@ -19,8 +19,8 @@ namespace {
 	{
 		font_height fontHeight;
 		be_plain_font->GetHeight(&fontHeight);
-		float height = ceil(fontHeight.descent) + ceil(fontHeight.ascent) 
-			+ ceil(fontHeight.leading);
+		float height = ceil(fontHeight.descent + fontHeight.ascent
+			+ fontHeight.leading);
 		return height;
 	}
 }
@@ -51,28 +51,28 @@ TTZDisplay::AttachedToWindow()
 void
 TTZDisplay::ResizeToPreferred()
 {
-	float height = _FontHeight();
-	ResizeTo(Bounds().Width(), height *2);
+	ResizeTo(Bounds().Width(), _FontHeight() * 2.0 + 4.0);
 }
 
 
 void
 TTZDisplay::Draw(BRect /* updateRect */)
 {
-	BRect bounds(Bounds());
 	SetLowColor(ViewColor());
-	FillRect(bounds, B_SOLID_LOW);
-	
-	float height = _FontHeight();
 
-	BPoint drawpt(bounds.left +2, height /2.0 +1);
-	DrawString(fLabel.String(), drawpt);
-
-	drawpt.y += height +2;
-	DrawString(fText.String(), drawpt);
+	BRect bounds = Bounds();
+	FillRect(Bounds(), B_SOLID_LOW);
 	
-	drawpt.x = bounds.right -be_plain_font->StringWidth(fTime.String()) - 2;
-	DrawString(fTime.String(), drawpt);
+	float fontHeight = _FontHeight();
+
+	BPoint pt(bounds.left + 2.0, fontHeight / 2.0 + 2.0);
+	DrawString(fLabel.String(), pt);
+
+	pt.y += fontHeight;
+	DrawString(fText.String(), pt);
+	
+	pt.x = bounds.right - StringWidth(fTime.String()) - 2.0;
+	DrawString(fTime.String(), pt);
 }
 
 

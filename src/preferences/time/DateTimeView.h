@@ -29,7 +29,6 @@ class DateTimeView : public BView {
 		virtual void 	AttachedToWindow();
 		virtual void 	Draw(BRect updaterect);
 		virtual void 	MessageReceived(BMessage *message);
-		virtual void	GetPreferredSize(float *width, float *height);
 
 	private:
 		void 			_InitView();
@@ -46,7 +45,7 @@ class DateTimeView : public BView {
 		BCalendarView 	*fCalendarView;
 		TAnalogClock 	*fClock;
 
-		bool 			fIsLocalTime;
+		bool 			fUseGmtTime;
 		bool			fInitialized;
 };
 

@@ -183,8 +183,8 @@ OffscreenClock::_DrawHands(float x, float y, float radius,
 //	#pragma mark -
 
 
-TAnalogClock::TAnalogClock(BRect frame, const char *name, uint32 resizeMask, uint32 flags)
-	: BView(frame, name, resizeMask, flags | B_DRAW_ON_CHILDREN),
+TAnalogClock::TAnalogClock(BRect frame, const char *name)
+	: BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW | B_DRAW_ON_CHILDREN),
 	fBitmap(NULL),
 	fClock(NULL)
 {

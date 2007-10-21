@@ -58,32 +58,33 @@ class TZoneItem : public BStringItem {
 };
 
 
-TZoneView::TZoneView(BRect frame)
-	: BView(frame, B_EMPTY_STRING, B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE_JUMP),
-	  fNotInitialized(true)
+TimeZoneView::TimeZoneView(BRect frame)
+	: BView(frame, "timeZoneView", B_FOLLOW_NONE, B_WILL_DRAW | B_NAVIGABLE_JUMP),
+	  fInitialized(false)
 {
 	ReadTimeZoneLink();
 	InitView();
 }
 
 
-TZoneView::~TZoneView()
+TimeZoneView::~TimeZoneView()
 {
 }
 
 
 void
-TZoneView::AttachedToWindow()
+TimeZoneView::AttachedToWindow()
 {
 	if (Parent())
 		SetViewColor(Parent()->ViewColor());
 
-	if (fNotInitialized) {
-		// stupid hack
-		fRegionPopUp->SetTargetForItems(this);
+	if (!fInitialized) {
+		fInitialized = true;
+
 		fSetZone->SetTarget(this);
 		fCityList->SetTarget(this);
-		
+		fRegionPopUp->SetTargetForItems(this);
+
 		// update displays	
 		BPath parent;
 		fCurrentZone.GetParent(&parent);
@@ -92,15 +93,13 @@ TZoneView::AttachedToWindow()
 			fCityList->Select(czone);
 			fCurrent->SetText(((TZoneItem *)fCityList->ItemAt(czone))->Text());
 		}
-		fNotInitialized = false;
-		ResizeTo(Bounds().Width(), Bounds().Height() +40);
 	}
 	fCityList->ScrollToSelection();
 }
 
 
 void
-TZoneView::MessageReceived(BMessage *message)
+TimeZoneView::MessageReceived(BMessage *message)
 {
 	int32 change;
 	switch(message->what) {
@@ -135,15 +134,8 @@ TZoneView::MessageReceived(BMessage *message)
 }
 
 
-const char*
-TZoneView::TimeZone()
-{
-	return fCurrent->Text();
-}
-
-
 void
-TZoneView::UpdateDateTime(BMessage *message)
+TimeZoneView::UpdateDateTime(BMessage *message)
 {
 	int32 hour;
 	int32 minute;
@@ -165,58 +157,53 @@ TZoneView::UpdateDateTime(BMessage *message)
 
 
 void
-TZoneView::InitView()
+TimeZoneView::InitView()
 {
-	font_height fontHeight;
-	be_plain_font->GetHeight(&fontHeight);
-	float textHeight = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
-
 	// Zone menu
-	fRegionPopUp = new BPopUpMenu(B_EMPTY_STRING, true, true, B_ITEMS_IN_COLUMN);
+	fRegionPopUp = new BPopUpMenu("", true, true, B_ITEMS_IN_COLUMN);
 
 	BuildRegionMenu();
 
 	// left side
 	BRect frameLeft(Bounds());
-	frameLeft.right = frameLeft.Width() / 2;
+	frameLeft.right = frameLeft.Width() / 2.0;
 	frameLeft.InsetBy(10.0f, 10.0f);
 	
 	BMenuField *menuField = new BMenuField(frameLeft, "regions", NULL, fRegionPopUp, false);
 	AddChild(menuField);
 	menuField->ResizeToPreferred();
 
-	frameLeft.top = menuField->Frame().bottom +10;
+	frameLeft.top = menuField->Frame().bottom + 10.0;
 	frameLeft.right -= B_V_SCROLL_BAR_WIDTH;
 
 	// City Listing
-	fCityList = new BListView(frameLeft, "cityList", B_SINGLE_SELECTION_LIST, 
-		B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS);
+	fCityList = new BListView(frameLeft, "cityList", B_SINGLE_SELECTION_LIST);
 	fCityList->SetSelectionMessage(new BMessage(H_CITY_CHANGED));
 	fCityList->SetInvocationMessage(new BMessage(H_SET_TIME_ZONE));
 	
-	BScrollView *scrollList = new BScrollView("scroll_list", fCityList,
+	BScrollView *scrollList = new BScrollView("scrollList", fCityList,
 		B_FOLLOW_ALL, 0, false, true);
 	AddChild(scrollList);
 	
 	// right side
 	BRect frameRight(Bounds());
-	frameRight.left = frameRight.Width() / 2;
+	frameRight.left = frameRight.Width() / 2.0;
 	frameRight.InsetBy(10.0f, 10.0f);
 	frameRight.top = frameLeft.top;
 
 	// Time Displays
-	fCurrent = new TTZDisplay(frameRight, "current", "Current time:");
+	fCurrent = new TTZDisplay(frameRight, "currentTime", "Current time:");
 	AddChild(fCurrent);
 	fCurrent->ResizeToPreferred();
 	
-	frameRight.OffsetBy(0, (textHeight) * 3 +10.0);
-	fPreview = new TTZDisplay(frameRight, "preview", "Preview time:");
+	frameRight.top = fCurrent->Frame().bottom + 10.0;
+	fPreview = new TTZDisplay(frameRight, "previewTime", "Preview time:");
 	AddChild(fPreview);
 	fPreview->ResizeToPreferred();
 	
 	// set button
-	fSetZone = new BButton(frameRight, "set", "Set Timezone", 
-		new BMessage(H_SET_TIME_ZONE), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	fSetZone = new BButton(frameRight, "setTimeZone", "Set Time Zone", 
+		new BMessage(H_SET_TIME_ZONE));
 	AddChild(fSetZone);
 	fSetZone->SetEnabled(false);
 	fSetZone->ResizeToPreferred();
@@ -227,7 +214,7 @@ TZoneView::InitView()
 
 
 void
-TZoneView::BuildRegionMenu()
+TimeZoneView::BuildRegionMenu()
 {
 	BPath path;
 	if (find_directory(B_BEOS_ETC_DIRECTORY, &path) != B_OK)
@@ -280,7 +267,7 @@ TZoneView::BuildRegionMenu()
 
 
 int32
-TZoneView::FillCityList(const char *area)
+TimeZoneView::FillCityList(const char *area)
 {
 	// clear list
 	int32 count = fCityList->CountItems();
@@ -334,7 +321,7 @@ TZoneView::FillCityList(const char *area)
 
 
 void
-TZoneView::ChangeRegion(BMessage *message)
+TimeZoneView::ChangeRegion(BMessage *message)
 {
 	BString area;
 	message->FindString("region", &area);
@@ -344,7 +331,7 @@ TZoneView::ChangeRegion(BMessage *message)
 
 
 void
-TZoneView::ReadTimeZoneLink()
+TimeZoneView::ReadTimeZoneLink()
 {
 	BEntry tzLink;
 
@@ -387,7 +374,7 @@ TZoneView::ReadTimeZoneLink()
 
 
 void
-TZoneView::SetPreview()
+TimeZoneView::SetPreview()
 {
 	int32 selection = fCityList->CurrentSelection();
 	if (selection >= 0) {
@@ -413,7 +400,7 @@ TZoneView::SetPreview()
 
 
 void
-TZoneView::SetCurrent(const char *text)
+TimeZoneView::SetCurrent(const char *text)
 {
 	SetTimeZone(fCurrentZone.Path());
 	
@@ -426,7 +413,7 @@ TZoneView::SetCurrent(const char *text)
 
 
 void
-TZoneView::SetTimeZone()
+TimeZoneView::SetTimeZone()
 {
 	/*	set time based on supplied timezone. How to do this?
 		1) replace symlink "timezone" in B_USER_SETTINGS_DIR with a link to the new timezone
@@ -486,7 +473,7 @@ TZoneView::SetTimeZone()
 
 
 void
-TZoneView::SetTimeZone(const char *zone)
+TimeZoneView::SetTimeZone(const char *zone)
 {
 	putenv(BString("TZ=").Append(zone).String());
 	tzset();
