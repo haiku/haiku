@@ -28,10 +28,10 @@
 
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
-#include <syscalls.h>
+#	include <syscalls.h>
 #else
-void _kset_tzfilename_(const char *name, size_t length, bool isGMT);
-#define _kern_set_tzfilename _kset_tzfilename_
+extern "C" void _kset_tzfilename_(const char *name, size_t length, bool isGMT);
+#	define _kern_set_tzfilename _kset_tzfilename_
 #endif
 
 
