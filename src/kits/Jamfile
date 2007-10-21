@@ -82,6 +82,7 @@ SEARCH on [ FGristFiles syslog.cpp ]
 
 
 SubInclude HAIKU_TOP src kits app ;
+SubInclude HAIKU_TOP src kits bluetooth ;
 SubInclude HAIKU_TOP src kits debug ;
 SubInclude HAIKU_TOP src kits device ;
 SubInclude HAIKU_TOP src kits game ;
