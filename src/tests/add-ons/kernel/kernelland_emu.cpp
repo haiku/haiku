@@ -697,6 +697,39 @@ devfs_publish_partition(const char *path, const partition_info *info)
 }
 
 
+extern "C" int32
+atomic_test_and_set(vint32 *value, int32 newValue, int32 testAgainst)
+{
+#if __INTEL__
+	int32 oldValue;
+	asm volatile("lock; cmpxchg %%ecx, (%%edx)"
+		: "=a" (oldValue) : "a" (testAgainst), "c" (newValue), "d" (value));
+	return oldValue;
+#else
+#warn "atomic_test_and_set() won't work correctly!"
+	int32 oldValue = *value;
+	if (oldValue == testAgainst)
+		*value = newValue;
+
+	return oldValue;
+#endif
+}
+
+
+extern "C" int
+add_debugger_command(char *name, int (*func)(int, char **), char *desc)
+{
+	return B_OK;
+}
+
+
+extern "C" int
+remove_debugger_command(char * name, int (*func)(int, char **))
+{
+	return B_OK;
+}
+
+
 extern "C" void
 panic(const char *format, ...)
 {
@@ -721,6 +754,19 @@ dprintf(const char *format,...)
 	va_list args;
 	va_start(args, format);
 	printf("\33[34m");
+	vprintf(format, args);
+	printf("\33[0m");
+	fflush(stdout);
+	va_end(args);
+}
+
+
+extern "C" void
+kprintf(const char *format,...)
+{
+	va_list args;
+	va_start(args, format);
+	printf("\33[35m");
 	vprintf(format, args);
 	printf("\33[0m");
 	fflush(stdout);
