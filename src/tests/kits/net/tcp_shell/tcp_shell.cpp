@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -17,11 +17,13 @@
 #include <net_protocol.h>
 #include <net_socket.h>
 #include <net_stack.h>
+#include <slab/Slab.h>
+#include <util/AutoLock.h>
 
 #include <KernelExport.h>
+#include <Select.h>
 #include <module.h>
 #include <Locker.h>
-#include <util/AutoLock.h>
 
 #include <ctype.h>
 #include <netinet/in.h>
@@ -111,14 +113,45 @@ is_server(const sockaddr* addr)
 bool
 is_syn(net_buffer* buffer)
 {
-	NetBufferHeader<tcp_header> bufferHeader(buffer);
+	NetBufferHeaderReader<tcp_header> bufferHeader(buffer);
 	if (bufferHeader.Status() < B_OK)
 		return bufferHeader.Status();
 
 	tcp_header &header = bufferHeader.Data();
-	bufferHeader.Detach();
 
 	return (header.flags & TCP_FLAG_SYNCHRONIZE) != 0;
+}
+
+
+//	#pragma mark - misc kernel
+
+
+void *
+object_cache_alloc(object_cache *cache, uint32 flags)
+{
+	return malloc((size_t)cache);
+}
+
+
+void
+object_cache_free(object_cache *cache, void *object)
+{
+	free(object);
+}
+
+
+object_cache *
+create_object_cache(const char *name, size_t objectSize,
+	size_t alignment, void *cookie, object_cache_constructor constructor,
+	object_cache_destructor)
+{
+	return (object_cache*)objectSize;
+}
+
+
+void
+delete_object_cache(object_cache *cache)
+{
 }
 
 
@@ -184,7 +217,9 @@ static net_stack_module_info gNetStackModule = {
 	NULL, //unregister_device_handler,
 	NULL, //register_device_monitor,
 	NULL, //unregister_device_monitor,
+	NULL, //device_link_changed,
 	NULL, //device_removed,
+	NULL, //device_enqueue_buffer,
 
 	notify_socket,
 
@@ -195,6 +230,7 @@ static net_stack_module_info gNetStackModule = {
 	fifo_enqueue_buffer,
 	fifo_dequeue_buffer,
 	clear_fifo,
+	fifo_socket_enqueue_buffer,
 
 	init_timer,
 	set_timer,
@@ -469,6 +505,24 @@ socket_dequeue_connected(net_socket *_parent, net_socket **_socket)
 }
 
 
+ssize_t
+socket_count_connected(net_socket *_parent)
+{
+	net_socket_private *parent = (net_socket_private *)_parent;
+
+	BenaphoreLocker _(parent->lock);
+
+	ssize_t count = 0;
+	void *item = NULL;
+	while ((item = list_get_next_item(&parent->connected_children,
+			item)) != NULL) {
+		count++;
+	}
+
+	return count;
+}
+
+
 status_t
 socket_set_max_backlog(net_socket *_socket, uint32 backlog)
 {
@@ -576,12 +630,15 @@ net_socket_module_info gNetSocketModule = {
 	NULL, //socket_send_data,
 	NULL, //socket_receive_data,
 
+	NULL, //get_option,
+	NULL, //set_option,
 	NULL, //socket_get_next_stat,
 
 	// connections
 	socket_spawn_pending,
 	socket_delete,
 	socket_dequeue_connected,
+	socket_count_connected,
 	socket_set_max_backlog,
 	socket_connected,
 
@@ -599,9 +656,7 @@ net_socket_module_info gNetSocketModule = {
 	NULL, //socket_getsockopt,
 	NULL, //socket_listen,
 	NULL, //socket_recv,
-	NULL, //socket_recvfrom,
 	NULL, //socket_send,
-	NULL, //socket_sendto,
 	NULL, //socket_setsockopt,
 	NULL, //socket_shutdown,
 };
@@ -656,6 +711,15 @@ datalink_send_data(struct net_route *route, net_buffer *buffer)
 }
 
 
+status_t
+datalink_send_datagram(net_protocol *protocol, net_domain *domain,
+	net_buffer *buffer)
+{
+	panic("called");
+	return B_ERROR;
+}
+
+
 struct net_route *
 get_route(struct net_domain *_domain, const struct sockaddr *address)
 {
@@ -677,8 +741,11 @@ net_datalink_module_info gNetDatalinkModule = {
 
 	NULL, //datalink_control,
 	datalink_send_data,
+	datalink_send_datagram,
 
 	NULL, //is_local_address,
+	NULL, //datalink_get_interface,
+	NULL, //datalink_get_interface_with_address,
 
 	NULL, //add_route,
 	NULL, //remove_route,
@@ -737,7 +804,7 @@ domain_control(net_protocol *protocol, int level, int option, void *value,
 
 
 status_t
-domain_bind(net_protocol *protocol, struct sockaddr *address)
+domain_bind(net_protocol *protocol, const struct sockaddr *address)
 {
 	return B_OK;
 }
@@ -844,7 +911,7 @@ domain_receive_data(net_buffer *buffer)
 	}
 
 	if (sTCPDump) {
-		NetBufferHeader<tcp_header> bufferHeader(buffer);
+		NetBufferHeaderReader<tcp_header> bufferHeader(buffer);
 		if (bufferHeader.Status() < B_OK)
 			return bufferHeader.Status();
 
@@ -914,7 +981,7 @@ domain_receive_data(net_buffer *buffer)
 						length = 3;
 						break;
 					case TCP_OPTION_TIMESTAMP:
-						printf(" <ts %lu:%lu>", option->timestamp, option->timestamp_reply);
+						printf(" <ts %lu:%lu>", option->timestamp.value, option->timestamp.reply);
 						length = 10;
 						break;
 
@@ -934,8 +1001,6 @@ domain_receive_data(net_buffer *buffer)
 		if (drop)
 			printf(" <DROPPED>");
 		printf("\33[0m\n");
-
-		bufferHeader.Detach();
 	} else if (drop)
 		printf("<**** DROPPED %ld ****>\n", packetNumber);
 
@@ -977,6 +1042,8 @@ net_protocol_module_info gDomainModule = {
 	domain_connect,
 	domain_accept,
 	domain_control,
+	NULL, // getsockopt
+	NULL, // setsockopt
 	domain_bind,
 	domain_unbind,
 	domain_listen,
@@ -989,6 +1056,7 @@ net_protocol_module_info gDomainModule = {
 	domain_get_domain,
 	domain_get_mtu,
 	domain_receive_data,
+	NULL, // deliver_data
 	domain_error,
 	domain_error_reply,
 };
@@ -1063,7 +1131,7 @@ server_thread(void*)
 		// main accept() loop
 		net_socket* connectionSocket;
 		sockaddr_in address;
-		uint32 size = sizeof(struct sockaddr_in);
+		socklen_t size = sizeof(struct sockaddr_in);
 		status_t status = socket_accept(gServerSocket, (struct sockaddr *)&address,
 			&size, &connectionSocket);
 		if (status < B_OK) {
@@ -1071,7 +1139,7 @@ server_thread(void*)
 			break;
 		}
 
-		printf("server: got connection from %08lx\n", address.sin_addr.s_addr);
+		printf("server: got connection from %08x\n", address.sin_addr.s_addr);
 
 		char buffer[1024];
 		ssize_t bytesRead;

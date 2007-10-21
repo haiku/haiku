@@ -5,11 +5,11 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons kernel network protocols tcp ] ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons kernel network stack ] ;
-UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
-UsePrivateHeaders kernel net shared ;
+UseHeaders $(HAIKU_PRIVATE_KERNEL_HEADERS) : true ;
+UsePrivateHeaders net shared ;
 
 SimpleTest tcp_shell :
-	tcp_tester.cpp
+	tcp_shell.cpp
 
 	# stack
 	net_buffer.cpp
