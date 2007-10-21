@@ -10,6 +10,7 @@
 
 
 class BButton;
+class BControl;
 class BFont;
 class LabeledCheckBox;
 class View;
