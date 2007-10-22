@@ -54,6 +54,7 @@ private:
 	BList	fList;
 };
 
+
 class ExtraMenuData {
 public:
 	menu_tracking_hook trackingHook;
@@ -1655,7 +1656,9 @@ BMenu::_ComputeLayout(int32 index, bool bestFit, bool moveItems,
 	// Recalculate only the needed items,
 	// not the whole layout every time
 
-	BRect frame(0, 0, 0, 0);	
+	BRect frame(0, 0, 0, 0);
+	if (index > 0)
+		frame = Bounds();	
 	switch (fLayout) {
 		case B_ITEMS_IN_COLUMN:
 			_ComputeColumnLayout(index, bestFit, moveItems, frame);
@@ -1710,7 +1713,7 @@ BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems,
 	bool command = false;
 	bool control = false;
 	bool shift = false;
-	for (int32 i = 0; i < fItems.CountItems(); i++) {
+	for (int32 i = index; i < fItems.CountItems(); i++) {
 		BMenuItem *item = ItemAt(i);	
 		if (item != NULL) {
 			float iWidth, iHeight;			
@@ -1798,6 +1801,7 @@ BMenu::_ComputeRowLayout(int32 index, bool bestFit, bool moveItems,
 void
 BMenu::_ComputeMatrixLayout(BRect &frame)
 {
+	frame.Set(0, 0, 0, 0);
 	for (int32 i = 0; i < CountItems(); i++) {
 		BMenuItem *item = ItemAt(i);
 		if (item != NULL) {
