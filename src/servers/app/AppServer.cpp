@@ -17,7 +17,6 @@
 #include "InputManager.h"
 #include "ScreenManager.h"
 #include "ServerProtocol.h"
-#include "SystemPalette.h"
 
 #include <PortLink.h>
 
@@ -71,10 +70,6 @@ AppServer::AppServer()
 
 	gScreenManager = new ScreenManager();
 	gScreenManager->Run();
-
-	// the system palette needs to be initialized before the desktop,
-	// since it is used there already
-	InitializeColorMap();
 	
 	// Create the bitmap allocator. Object declared in BitmapManager.cpp
 	gBitmapManager = new BitmapManager();

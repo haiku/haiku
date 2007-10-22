@@ -23,6 +23,7 @@
 #include "ServerCursor.h"
 #include "ServerScreen.h"
 #include "ServerWindow.h"
+#include "SystemPalette.h"
 #include "WindowPrivate.h"
 #include "WindowLayer.h"
 #include "Workspace.h"
@@ -358,10 +359,15 @@ Desktop::Init()
 	if (fMessagePort < B_OK)
 		return fMessagePort;
 
+	// the system palette needs to be initialized before the
+	// desktop settings, since it is used there already
+	InitializeColorMap();
+
+	const size_t areaSize = B_PAGE_SIZE;
 	char name[B_OS_NAME_LENGTH];
 	snprintf(name, sizeof(name), "d:%d:shared read only", /*id*/0);
 	fSharedReadOnlyArea = create_area(name, (void **)&fServerReadOnlyMemory,
-		B_ANY_ADDRESS, B_PAGE_SIZE, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+		B_ANY_ADDRESS, areaSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (fSharedReadOnlyArea < B_OK)
 		return fSharedReadOnlyArea;
 
