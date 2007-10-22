@@ -75,7 +75,7 @@ public:
 			bool				AddListener(Listener* listener);
 			void				RemoveListener(Listener* listener);
 
-			// support functions
+			// support functions			
 			void				AppendRefs(const BMessage* refsReceivedMessage,
 									int32 appendIndex = -1);
 	static	void				AppendToPlaylistRecursive(const entry_ref& ref,
@@ -83,6 +83,9 @@ public:
 
 private:
 			static int			playlist_cmp(const void* p1, const void* p2);
+			static bool 		_IsMediaFile(const BString& mimeString);
+			static bool			_IsPlaylist(const BString& mimeString);
+			static BString		_MIMEString(const entry_ref* entry);
 
 			void				_NotifyRefAdded(const entry_ref& ref,
 									int32 index) const;

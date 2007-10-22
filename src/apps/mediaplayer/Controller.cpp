@@ -3,6 +3,7 @@
  *
  * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
  * Copyright (C) 2007 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright (C) 2007 Fredrik Modéen <fredrik@modeen.se>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

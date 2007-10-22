@@ -3,6 +3,7 @@
  *
  * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
  * Copyright (C) 2007 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright (C) 2007 Fredrik Modéen <fredrik@modeen.se>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -23,7 +24,10 @@
 #include <debugger.h>
 #include <new.h>
 #include <stdio.h>
-#include <string.h>
+#include <String.h>
+#include <NodeInfo.h>
+#include <File.h>
+#include <Mime.h>
 
 #include <Autolock.h>
 #include <Directory.h>
@@ -276,8 +280,8 @@ Playlist::AppendRefs(const BMessage* refsReceivedMessage, int32 appendIndex)
 	Playlist* playlist = add ? &temporaryPlaylist : this;
 
 	entry_ref ref;
-	for (int i = 0; refsReceivedMessage->FindRef("refs", i, &ref) == B_OK; i++)
-		AppendToPlaylistRecursive(ref, playlist);
+	for (int i = 0; refsReceivedMessage->FindRef("refs", i, &ref) == B_OK; i++) 
+		AppendToPlaylistRecursive(ref, playlist);	
 
 	playlist->Sort();
 
@@ -309,7 +313,13 @@ Playlist::AppendToPlaylistRecursive(const entry_ref& ref, Playlist* playlist)
 		while (dir.GetNextRef(&subRef) == B_OK)
 			AppendToPlaylistRecursive(subRef, playlist);
 	} else if (entry.IsFile()) {
-		playlist->AddRef(ref);
+		BString mimeString = _MIMEString(&ref);
+		if (_IsMediaFile(mimeString))
+			playlist->AddRef(ref);
+		else if (_IsPlaylist(mimeString)) {
+			printf("Playlist::AppendToPlaylistRecursive() - "
+				"TODO: implement playlist file loading\n");
+		}
 	}
 }
 
@@ -329,6 +339,47 @@ Playlist::playlist_cmp(const void *p1, const void *p2)
 	BPath bPath(&b);
 
 	return strcmp(aPath.Path(), bPath.Path());
+}
+
+
+/*static*/ bool
+Playlist::_IsMediaFile(const BString& mimeString)
+{
+	BMimeType superType;
+	BMimeType fileType(mimeString.String()); 
+
+	if (fileType.GetSupertype(&superType) != B_OK)
+		return false;
+
+	// TODO: some media files have other super types, I think
+	// for example ASF has "application" super type... so it would
+	// need special handling
+	return (superType == "audio" || superType == "video");
+}
+
+
+/*static*/ bool
+Playlist::_IsPlaylist(const BString& mimeString)
+{    	
+	return mimeString.Compare("text/x-playlist") == 0;
+}
+
+
+/*static*/ BString
+Playlist::_MIMEString(const entry_ref* ref)
+{
+	BFile file(ref, B_READ_ONLY);
+	BNodeInfo nodeInfo(&file);
+	char mimeString[B_MIME_TYPE_LENGTH];
+	if (nodeInfo.GetType(mimeString) != B_OK) {
+		BMimeType type;
+		if (BMimeType::GuessMimeType(ref, &type) != B_OK)
+			return BString();
+
+		strlcpy(mimeString, type.Type(), B_MIME_TYPE_LENGTH);
+		nodeInfo.SetType(type.Type());
+	}
+	return BString(mimeString);	
 }
 
 
