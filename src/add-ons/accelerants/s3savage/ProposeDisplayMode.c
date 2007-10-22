@@ -8,6 +8,8 @@
 
 #include "GlobalData.h"
 #include "AccelerantPrototypes.h"
+#include "savage.h"
+
 #include <string.h>
 
 
@@ -17,8 +19,6 @@
 
 static const display_mode mode_list[] = {
 	{ { 25175, 640, 656, 752, 800, 480, 490, 492, 525, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(640X480X8.Z1) */
-	{ { 27500, 640, 672, 768, 864, 480, 488, 494, 530, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* 640X480X60Hz */
-	{ { 30500, 640, 672, 768, 864, 480, 517, 523, 588, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* SVGA_640X480X60HzNI */
 	{ { 31500, 640, 664, 704, 832, 480, 489, 492, 520, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@70-72Hz_(640X480X8.Z1) */
 	{ { 31500, 640, 656, 720, 840, 480, 481, 484, 500, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(640X480X8.Z1) */
 	{ { 36000, 640, 696, 752, 832, 480, 481, 484, 509, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(640X480X8.Z1) */
@@ -35,6 +35,7 @@ static const display_mode mode_list[] = {
 	{ { 78750, 1024, 1040, 1136, 1312, 768, 769, 772, 800, T_POSITIVE_SYNC}, B_CMAP8, 1024, 768, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(1024X768X8.Z1) */
 	{ { 94500, 1024, 1072, 1168, 1376, 768, 769, 772, 808, T_POSITIVE_SYNC}, B_CMAP8, 1024, 768, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(1024X768X8.Z1) */
 
+	{ { 81642, 1152, 1216, 1336, 1520, 864, 865, 868, 895, T_POSITIVE_SYNC}, B_CMAP8, 1152, 864, 0, 0, MODE_FLAGS}, // 1152x864x60Hz
 	{ { 94200, 1152, 1184, 1280, 1472, 864, 865, 868, 914, T_POSITIVE_SYNC}, B_CMAP8, 1152, 864, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@70Hz_(1152X864X8.Z1) */
 	{ { 97800, 1152, 1216, 1344, 1552, 864, 865, 868, 900, T_POSITIVE_SYNC}, B_CMAP8, 1152, 864, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@70Hz_(1152X864X8.Z1) */
 	{ { 108000, 1152, 1216, 1344, 1600, 864, 865, 868, 900, T_POSITIVE_SYNC}, B_CMAP8, 1152, 864, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(1152X864X8.Z1) */
@@ -59,14 +60,13 @@ static const display_mode mode_list[] = {
 
 	{ { 218250, 1856, 1952, 2176, 2528, 1392, 1393, 1396, 1439, B_POSITIVE_VSYNC}, B_CMAP8, 1856, 1392, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1856X1392) */
 	{ { 288000, 1856, 1984, 2208, 2560, 1392, 1393, 1396, 1500, B_POSITIVE_VSYNC}, B_CMAP8, 1856, 1392, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(1856X1392) */
+	
+	// widescreen resolutions, 16:10
+	{ { 83500, 1280, 1344, 1480, 1680, 800, 801, 804, 828, T_POSITIVE_SYNC}, B_CMAP8, 1280, 800, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1280X800) */
+	{ { 106500, 1440, 1520, 1672, 1904, 900, 901, 904, 932, T_POSITIVE_SYNC}, B_CMAP8, 1440, 900, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1440X900) */
 
-	{ { 234000, 1920, 2048, 2256, 2600, 1440, 1441, 1444, 1500, B_POSITIVE_VSYNC}, B_CMAP8, 1920, 1440, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1920X1440) */
-	{ { 297000, 1920, 2064, 2288, 2640, 1440, 1441, 1444, 1500, B_POSITIVE_VSYNC}, B_CMAP8, 1920, 1440, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(1920X1440) */
-	{ { 341350, 1920, 2072, 2288, 2656, 1440, 1441, 1444, 1512, B_POSITIVE_VSYNC}, B_CMAP8, 1920, 1440, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(1920X1440) */
-
-	{ { 266950, 2048, 2200, 2424, 2800, 1536, 1537, 1540, 1589, B_POSITIVE_VSYNC}, B_CMAP8, 2048, 1536, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(2048x1536) */
-	{ { 340480, 2048, 2216, 2440, 2832, 1536, 1537, 1540, 1603, B_POSITIVE_VSYNC}, B_CMAP8, 2048, 1536, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(2048x1536) */
-	{ { 388040, 2048, 2216, 2440, 2832, 1536, 1537, 1540, 1612, B_POSITIVE_VSYNC}, B_CMAP8, 2048, 1536, 0, 0, MODE_FLAGS}  /* Vesa_Monitor_@85Hz_(2048x1536) */
+	// widescreen resolutions, 16:9
+	{ { 74520, 1280, 1368, 1424, 1656, 720, 724, 730, 750, T_POSITIVE_SYNC}, B_CMAP8, 1280, 720, 0, 0, MODE_FLAGS} /* Vesa_Monitor_@60Hz_(1280X720) */
 };
 
 
@@ -213,12 +213,13 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const displa
 		result = B_BAD_VALUE;
 	
 	// If the video is connected directly to an LCD display (ie, notebook
-	// computer), restrict the display mode to the resolution of the LCD
-	// display.
+	// computer), restrict the display mode to resolutions where the width and
+	// height of the mode are less than or equal to the width and height of the
+	// LCD display.
 	
 	if (MT_LCD == si->displayType && si->panelX > 0 && si->panelY > 0 &&
-		(target->timing.h_display != si->panelX
-			|| target->timing.v_display != si->panelY)) {
+		(target->timing.h_display > si->panelX
+			|| target->timing.v_display > si->panelY)) {
 		return B_ERROR;
 	}
 
@@ -399,3 +400,19 @@ create_mode_list(void)
 	return B_OK;
 }
 
+
+bool
+IsDisplaySizeValid(int width, int height)
+{
+	// Search the mode list for a mode which has the width and height passed
+	// by the caller, and return true if a match is found.
+
+	uint32 i;
+	
+	for (i = 0; i < MODE_COUNT; i++) {
+		if (mode_list[i].virtual_width == width && mode_list[i].virtual_height == height)
+			return true;
+	}
+	
+	return false;		// match not found
+}

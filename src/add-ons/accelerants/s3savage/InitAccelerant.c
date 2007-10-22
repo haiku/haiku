@@ -142,10 +142,6 @@ INIT_ACCELERANT(int the_fd)
 	/* count of issued parameters or commands */
 	si->engine.lastIdle = si->engine.count = 0;
 
-	/* set the cursor colors.	You may or may not have to do this, depending
-	on the device. */
-	SavageSetCursorColors(~0, 0);
-
 	/* ensure cursor state */
 	SHOW_CURSOR(false);
 

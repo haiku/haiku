@@ -245,8 +245,9 @@ typedef struct
 
 
 
+bool IsDisplaySizeValid(int width, int height);
+
 bool SavageLoadCursorImage(int width, int height, uint8* and_mask, uint8* xor_mask);
-void SavageSetCursorColors(int bg, int fg);
 void SavageSetCursorPosition(int x, int y);
 void SavageShowCursor(void);
 void SavageHideCursor(void);

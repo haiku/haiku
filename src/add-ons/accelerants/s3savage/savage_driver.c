@@ -189,7 +189,8 @@ WaitIdleEmpty2K()
 }
 
 
-static void SavageGetPanelInfo()
+static void
+SavageGetPanelInfo()
 {
 	uint8 cr6b;
 	int panelX, panelY;
@@ -209,14 +210,20 @@ static void SavageGetPanelInfo()
 	panelX = (ReadSeq(0x61) + ((ReadSeq(0x66) & 0x02) << 7) + 1) * 8;
 	panelY =  ReadSeq(0x69) + ((ReadSeq(0x6e) & 0x70) << 4) + 1;
 
-	/* OK, I admit it.  I don't know how to limit the max dot clock
-	 * for LCD panels of various sizes.  I thought I copied the formula
-	 * from the BIOS, but many users have informed me of my folly.
-	 *
-	 * Instead, I'll abandon any attempt to automatically limit the
-	 * clock, and add an LCDClock option to XF86Config.  Some day,
-	 * I should come back to this.
-	 */
+	if ( ! IsDisplaySizeValid(panelX, panelY)) {
+		
+		// Some chips such as the Savage IX/MV in a Thinkpad T-22 will return
+		// a width that is 8 pixels too wide probably because reg SR61 is set
+		// to a value +1 higher than it should be.  Subtract 8 from the width,
+		// and check if that is a valid width.
+
+		panelX -= 8;
+		if ( ! IsDisplaySizeValid(panelX, panelY)) {
+			TRACE(("%dx%d LCD panel size invalid.  No matching video mode\n", panelX + 8, panelY));
+			si->displayType = MT_CRT;
+			return;
+		}
+	}
 
 	if ((ReadSeq(0x39) & 0x03) == 0)
 		sTechnology = "TFT";
@@ -229,7 +236,7 @@ static void SavageGetPanelInfo()
 			 cr6b & ActiveLCD ? "and active" : "but not active"));
 
 	if (cr6b & ActiveLCD) {
-		TRACE(("Limiting video mode to %dx%d\n", panelX, panelY));
+		TRACE(("Limiting max video mode to %dx%d\n", panelX, panelY));
 
 		si->panelX = panelX;
 		si->panelY = panelY;

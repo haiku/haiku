@@ -1,8 +1,6 @@
 /*
-	Haiku S3 Savage driver adapted from the original BeSavage driver by
-	Erdi Chen and the X.org Savage driver.
+	Haiku S3 Savage driver adapted from the X.org Savage driver.
 
-	Copyright 1999  Erdi Chen
 	Copyright (C) 1994-2000 The XFree86 Project, Inc.  All Rights Reserved.
 	Copyright (c) 2003-2006, X.Org Foundation
 
@@ -101,7 +99,7 @@ SavageSetCursorPosition(int x, int y)
 }
 
 
-void 
+static void 
 SavageSetCursorColors(int bg, int fg)
 {
 	/* With the streams engine on HW Cursor seems to be 24bpp ALWAYS */
@@ -127,73 +125,43 @@ SavageSetCursorColors(int bg, int fg)
 /* Assume width and height are byte-aligned. */
 
 bool 
-SavageLoadCursorImage(int width, int height, uint8* and_mask, uint8* xor_mask)
+SavageLoadCursorImage(int width, int height, uint8* andMask, uint8* xorMask)
 {
-	int i, x, y, bit_shift;
-	uint8 and_buf[64*64 / 8];
-	uint8 xor_buf[64*64 / 8];
-	uint8* and_ptr = and_mask;
-	uint8* xor_ptr = xor_mask;
-	uint16* pFB;
+	int i, colByte, row;
+	uint8*  fbCursor;
+	uint16* fbCursor16;
 
-//@	TRACE(("SavageLoadCursorImage\n"));
+//	TRACE(("SavageLoadCursorImage, width: %ld  height: %ld\n", width, height));
 
-	if ( ! and_mask || ! xor_mask)
+	if ( ! andMask || ! xorMask)
 		return false;
 
-	bit_shift = width & 7;
-	width /= 8;
-
-	if (width != 64 || height != 64) {
-		and_ptr = (uint8*)and_buf;
-		xor_ptr = (uint8*)xor_buf;
-
-		for (y = 0; y < height; y++) {
-			for (x = 0; x < width; x++) {
-				*and_ptr++ = *and_mask++;
-				*xor_ptr++ = *xor_mask++;
-			}
-
-			if (bit_shift) {
-				x++;
-				*and_ptr++ = 0xFF ^ ((*and_mask++) & (~(0xFF >> bit_shift)));
-				*xor_ptr++ = (*xor_mask++) & (~(0xFF >> bit_shift));
-			}
-
-			for (; x < 8; x++) {
-				*and_ptr++ = 0xFF;
-				*xor_ptr++ = 0x00;
-			}
-		}
-
-		for (; y < 64; y++) {
-			*(uint32 *)and_ptr = ~0;
-			and_ptr += 4;
-			*(uint32 *)and_ptr = ~0;
-			and_ptr += 4;
-			*(uint32 *)xor_ptr = 0;
-			xor_ptr += 4;
-			*(uint32 *)xor_ptr = 0;
-			xor_ptr += 4;
-		}
-
-		and_ptr = (uint8 *)and_buf;
-		xor_ptr = (uint8 *)xor_buf;
+	// Initialize the hardware cursor as completely transparent.
+	
+	fbCursor16 = (void *)((addr_t)si->videoMemAddr + si->cursorOffset);
+	
+	for (i = 0; i < 1024 / 4; i++) {
+		*fbCursor16++ = ~0;		// and bits
+		*fbCursor16++ = 0;		// xor bits
 	}
+	
+	// Now load the AND & XOR masks for the cursor image into the cursor
+	// buffer.
+	
+	fbCursor = (void *)((addr_t)si->videoMemAddr + si->cursorOffset);
+	
+	for (row = 0; row < height; row++) {
+		for (colByte = 0; colByte < width / 8; colByte++) {
+			fbCursor[row * 16 + colByte] = *andMask++;
+			fbCursor[row * 16 + colByte + 2] = *xorMask++;
+		}
+	}
+	
+	SavageSetCursorColors(~0, 0);	// set cursor colors to black & white
 
 	/* Set cursor location in video memory.  */
 	WriteCrtc(0x4d, (0xff & si->cursorOffset / 1024));
 	WriteCrtc(0x4c, (0xff00 & si->cursorOffset / 1024) >> 8);
-
-	pFB = (void *)((addr_t)si->videoMemAddr + si->cursorOffset);
-
-	for (i = 0; i < 64 * 64 / 16; i++) {
-		*pFB++ = *(uint16*)and_ptr;
-		*pFB++ = *(uint16*)xor_ptr;
-
-		and_ptr += 2;
-		xor_ptr += 2;
-	}
 
 	if (S3_SAVAGE4_SERIES(si->chipset)) {
 		/*
