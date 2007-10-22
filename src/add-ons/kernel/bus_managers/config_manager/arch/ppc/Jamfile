@@ -1,0 +1,10 @@
+SubDir HAIKU_TOP src add-ons kernel bus_managers config_manager arch ppc ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
+
+UsePrivateHeaders kernel [ FDirName kernel arch ppc ] ;
+
+KernelStaticLibrary config_manager_arch : 
+	config_manager_arch.c
+	;
+
