@@ -49,7 +49,7 @@ public:
 
 	const char *Name()	{ return fName.String(); }
 
-	void Get();
+	status_t Get();
 	bool Put();
 
 	module_info **ModuleInfos() const { return fInfos; }
@@ -62,7 +62,83 @@ private:
 	BString		fName;
 };
 
-// constructor
+class Module {
+public:
+	Module(ModuleAddOn *addon, module_info *info);
+	~Module();
+
+	status_t Init();
+	status_t Uninit();
+
+	status_t Get();
+	bool Put();
+
+	ModuleAddOn *AddOn() const	{ return fAddOn; }
+	module_info *Info() const	{ return fInfo; }
+
+private:
+	ModuleAddOn	*fAddOn;
+	module_info	*fInfo;
+	int32		fReferenceCount;
+	bool		fInitialized;
+};
+
+class ModuleList : public BLocker {
+public:
+	ModuleList();
+	~ModuleList();
+
+	int32 CountModules() const;
+	Module *ModuleAt(int32 index) const;
+
+	bool AddModule(Module *module);
+	bool RemoveModule(Module *module);
+	Module *FindModule(const char *path);
+
+private:
+	BList	fModules;
+};
+
+class ModuleManager {
+public:
+	ModuleManager();
+	~ModuleManager();
+
+	static ModuleManager *Default() { return &sDefaultManager; }
+
+	status_t GetModule(const char *path, module_info **infop);
+	status_t PutModule(const char *path);
+
+	status_t GetNextLoadedModuleName(uint32 *cookie, char *buffer,
+									 size_t *bufferSize);
+
+	module_name_list *OpenModuleList(const char *prefix);
+	status_t ReadNextModuleName(module_name_list *list, char *buffer,
+								size_t *bufferSize);
+	status_t CloseModuleList(module_name_list *list);
+
+	status_t AddBuiltInModule(module_info *info);
+
+	status_t GetDependencies(image_id image);
+	void PutDependencies(image_id image);
+
+private:
+	void _FindModules(BDirectory &dir, const char *moduleDir,
+					  module_name_list *list);
+
+	status_t _GetAddOn(const char *path, ModuleAddOn **addon);
+	void _PutAddOn(ModuleAddOn *addon);
+
+private:
+	static ModuleManager		sDefaultManager;
+	ModuleList					fModules;
+	BObjectList<ModuleAddOn>	fAddOns;
+};
+
+
+//	#pragma mark - ModuleAddOn
+
+
 ModuleAddOn::ModuleAddOn()
 	: fAddOn(-1),
 	  fInfos(NULL),
@@ -70,7 +146,7 @@ ModuleAddOn::ModuleAddOn()
 {
 }
 
-// destructor
+
 ModuleAddOn::~ModuleAddOn()
 {
 	Unload();
@@ -131,11 +207,19 @@ ModuleAddOn::Unload()
 }
 
 // Get
-void
+status_t
 ModuleAddOn::Get()
 {
-	if (fAddOn >= 0)
+	if (fAddOn >= 0) {
+		if (fReferenceCount == 0) {
+			status_t status = ModuleManager::Default()->GetDependencies(fAddOn);
+			if (status < B_OK)
+				return status;
+		}
 		fReferenceCount++;
+	}
+
+	return B_OK;
 }
 
 // Put
@@ -144,7 +228,12 @@ ModuleAddOn::Put()
 {
 	if (fAddOn >= 0)
 		fReferenceCount--;
-	return (fReferenceCount == 0);
+
+	if (fReferenceCount == 0) {
+		ModuleManager::Default()->PutDependencies(fAddOn);
+		return true;
+	}
+	return false;
 }
 
 // FindModuleInfo
@@ -161,30 +250,9 @@ ModuleAddOn::FindModuleInfo(const char *name) const
 }
 
 
-// Module
+//	#pragma mark - Module
 
-class Module {
-public:
-	Module(ModuleAddOn *addon, module_info *info);
-	~Module();
 
-	status_t Init();
-	status_t Uninit();
-
-	status_t Get();
-	bool Put();
-
-	ModuleAddOn *AddOn() const	{ return fAddOn; }
-	module_info *Info() const	{ return fInfo; }
-
-private:
-	ModuleAddOn	*fAddOn;
-	module_info	*fInfo;
-	int32		fReferenceCount;
-	bool		fInitialized;
-};
-
-// constructor
 Module::Module(ModuleAddOn *addon, module_info *info)
 	: fAddOn(addon),
 	  fInfo(info),
@@ -249,30 +317,14 @@ Module::Put()
 }
 
 
-// ModuleList
+//	#pragma mark - ModuleList
 
-class ModuleList : public BLocker {
-public:
-	ModuleList();
-	~ModuleList();
 
-	int32 CountModules() const;
-	Module *ModuleAt(int32 index) const;
-
-	bool AddModule(Module *module);
-	bool RemoveModule(Module *module);
-	Module *FindModule(const char *path);
-
-private:
-	BList	fModules;
-};
-
-// constructor
 ModuleList::ModuleList()
 {
 }
 
-// destructor
+
 ModuleList::~ModuleList()
 {
 }
@@ -322,42 +374,9 @@ ModuleList::FindModule(const char *path)
 }
 
 
-// ModuleManager
+//	#pragma mark - ModuleManager
 
-class ModuleManager {
-public:
-	ModuleManager();
-	~ModuleManager();
 
-	static ModuleManager *Default() { return &sDefaultManager; }
-
-	status_t GetModule(const char *path, module_info **infop);
-	status_t PutModule(const char *path);
-
-	status_t GetNextLoadedModuleName(uint32 *cookie, char *buffer,
-									 size_t *bufferSize);
-
-	module_name_list *OpenModuleList(const char *prefix);
-	status_t ReadNextModuleName(module_name_list *list, char *buffer,
-								size_t *bufferSize);
-	status_t CloseModuleList(module_name_list *list);
-
-	status_t AddBuiltInModule(module_info *info);
-
-private:
-	void _FindModules(BDirectory &dir, const char *moduleDir,
-					  module_name_list *list);
-
-	status_t _GetAddOn(const char *path, ModuleAddOn **addon);
-	void _PutAddOn(ModuleAddOn *addon);
-
-private:
-	static ModuleManager		sDefaultManager;
-	ModuleList					fModules;
-	BObjectList<ModuleAddOn>	fAddOns;
-};
-
-// constructor
 ModuleManager::ModuleManager()
 	: fModules()
 {
@@ -515,10 +534,46 @@ ModuleManager::AddBuiltInModule(module_info *info)
 }
 
 
-// _FindModules
+status_t
+ModuleManager::GetDependencies(image_id image)
+{
+	module_dependency *dependencies;
+	status_t status = get_image_symbol(image, "module_dependencies",
+		B_SYMBOL_TYPE_DATA, (void**)&dependencies);
+	if (status < B_OK) {
+		// no dependencies means we don't have to do anything
+		return B_OK;
+	}
+
+	for (uint32 i = 0; dependencies[i].name != NULL; i++) {
+		status = GetModule(dependencies[i].name, dependencies[i].info);
+		if (status < B_OK)
+			return status;
+	}
+	return B_OK;
+}
+
+
+void
+ModuleManager::PutDependencies(image_id image)
+{
+	module_dependency *dependencies;
+	status_t status = get_image_symbol(image, "module_dependencies",
+		B_SYMBOL_TYPE_DATA, (void**)&dependencies);
+	if (status < B_OK) {
+		// no dependencies means we don't have to do anything
+		return;
+	}
+
+	for (uint32 i = 0; dependencies[i].name != NULL; i++) {
+		PutModule(dependencies[i].name);
+	}
+}
+
+
 void
 ModuleManager::_FindModules(BDirectory &dir, const char *moduleDir,
-							module_name_list *list)
+	module_name_list *list)
 {
 	BEntry entry;
 	while (dir.GetNextEntry(&entry) == B_OK) {
@@ -569,8 +624,13 @@ ModuleManager::_GetAddOn(const char *name, ModuleAddOn **_addon)
 					if (entry.IsFile()) {
 						ModuleAddOn *addon = new ModuleAddOn;
 						if (addon->Load(path.Path(), gModuleDirs[i]) == B_OK) {
+							status_t status = addon->Get();
+							if (status < B_OK) {
+								delete addon;
+								return status;
+							}
+
 							fAddOns.AddItem(addon);
-							addon->Get();
 							*_addon = addon;
 							return B_OK;
 						}
@@ -604,8 +664,7 @@ ModuleManager::_PutAddOn(ModuleAddOn *addon)
 ModuleManager ModuleManager::sDefaultManager;
 
 
-//	#pragma mark -
-//	private emulation functions
+//	#pragma mark - Private emulation functions
 
 
 extern "C" status_t
@@ -615,11 +674,25 @@ _add_builtin_module(module_info *info)
 }
 
 
-//	#pragma mark -
-//	the functions to be emulated follow
+extern "C" status_t
+_get_builtin_dependencies(void)
+{
+	image_info info;
+	int32 cookie = 0;
+	while (get_next_image_info(B_CURRENT_TEAM, &cookie, &info) == B_OK) {
+		if (info.type != B_APP_IMAGE)
+			continue;
+
+		return ModuleManager::Default()->GetDependencies(info.id);
+	}
+
+	return B_OK;
+}
 
 
-// get_module
+//	#pragma mark - Emulated kernel functions
+
+
 status_t
 get_module(const char *path, module_info **_info)
 {
@@ -627,7 +700,7 @@ get_module(const char *path, module_info **_info)
 	return ModuleManager::Default()->GetModule(path, _info);
 }
 
-// put_module
+
 status_t
 put_module(const char *path)
 {
@@ -635,16 +708,16 @@ put_module(const char *path)
 	return ModuleManager::Default()->PutModule(path);
 }
 
-// get_next_loaded_module_name
+
 status_t
-get_next_loaded_module_name(uint32 *cookie, char *buf, size_t *bufsize)
+get_next_loaded_module_name(uint32 *cookie, char *name, size_t *nameLength)
 {
 	TRACE(("get_next_loaded_module_name(%lu)\n", *cookie));
-	return ModuleManager::Default()->GetNextLoadedModuleName(cookie, buf,
-															 bufsize);
+	return ModuleManager::Default()->GetNextLoadedModuleName(cookie, name,
+		nameLength);
 }
 
-// open_module_list
+
 void *
 open_module_list(const char *prefix)
 {

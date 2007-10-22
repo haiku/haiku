@@ -63,6 +63,7 @@ struct net_socket_private : net_socket {
 
 
 extern "C" status_t _add_builtin_module(module_info *info);
+extern "C" status_t _get_builtin_dependencies(void);
 extern bool gDebugOutputEnabled;
 	// from libkernelland_emu.so
 
@@ -1507,6 +1508,11 @@ main(int argc, char** argv)
 	_add_builtin_module((module_info *)&gNetSocketModule);
 	_add_builtin_module((module_info *)&gNetDatalinkModule);
 	_add_builtin_module(modules[0]);
+	if (_get_builtin_dependencies() < B_OK) {
+		fprintf(stderr, "tcp_tester: Could not initialize modules: %s\n",
+			strerror(status));
+		return 1;
+	}
 
 	sDomainProtocol.module = &gDomainModule;
 	sockaddr_in interfaceAddress;
