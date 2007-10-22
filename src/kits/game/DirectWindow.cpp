@@ -1,12 +1,11 @@
 /* 
- * Copyright 2003-2006, Haiku Inc.
+ * Copyright 2003-2007, Haiku Inc.
  * Authors:
- *		Stefano Ceccherini (burton666@libero.it).
- *		Carwyn Jones (turok2@currantbun.com)
+ *		Stefano Ceccherini <stefano.ceccherini@gmail.com>
+ *		Carwyn Jones <turok2@currantbun.com>
  * 
  * Distributed under the terms of the MIT License.
  */
-
 
 #include <DirectWindow.h>
 #include <Screen.h>
@@ -89,7 +88,7 @@ BDirectWindow::BDirectWindow(BRect frame, const char *title, window_type type,
 	uint32 flags, uint32 workspace)
 	: BWindow(frame, title, type, flags, workspace)
 {
-	InitData();
+	_InitData();
 }
 
 
@@ -97,13 +96,13 @@ BDirectWindow::BDirectWindow(BRect frame, const char *title, window_look look,
 	window_feel feel, uint32 flags, uint32 workspace)
 	: BWindow(frame, title, look, feel, flags, workspace)
 {
-	InitData();
+	_InitData();
 }
 
 
 BDirectWindow::~BDirectWindow()
 {
-	DisposeData();
+	_DisposeData();
 }
 
 
@@ -144,30 +143,30 @@ BDirectWindow::MessageReceived(BMessage *message)
 
 
 void
-BDirectWindow::FrameMoved(BPoint new_position)
+BDirectWindow::FrameMoved(BPoint newPosition)
 {
-	inherited::FrameMoved(new_position);
+	inherited::FrameMoved(newPosition);
 }
 
 
 void
-BDirectWindow::WorkspacesChanged(uint32 old_ws, uint32 new_ws)
+BDirectWindow::WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces)
 {
-	inherited::WorkspacesChanged(old_ws, new_ws);
+	inherited::WorkspacesChanged(oldWorkspaces, newWorkspaces);
 }
 
 
 void
-BDirectWindow::WorkspaceActivated(int32 ws, bool state)
+BDirectWindow::WorkspaceActivated(int32 index, bool state)
 {
-	inherited::WorkspaceActivated(ws, state);
+	inherited::WorkspaceActivated(index, state);
 }
 
 
 void
-BDirectWindow::FrameResized(float new_width, float new_height)
+BDirectWindow::FrameResized(float newWidth, float newHeight)
 {
-	inherited::FrameResized(new_width, new_height);
+	inherited::FrameResized(newWidth, newHeight);
 }
 
 
@@ -179,16 +178,16 @@ BDirectWindow::Minimize(bool minimize)
 
 
 void
-BDirectWindow::Zoom(BPoint rec_position, float rec_width, float rec_height)
+BDirectWindow::Zoom(BPoint recPosition, float recWidth, float recHeight)
 {
-	inherited::Zoom(rec_position, rec_width, rec_height);
+	inherited::Zoom(recPosition, recWidth, recHeight);
 }
 
 
 void
-BDirectWindow::ScreenChanged(BRect screen_size, color_space depth)
+BDirectWindow::ScreenChanged(BRect screenFrame, color_space depth)
 {
-	inherited::ScreenChanged(screen_size, depth);
+	inherited::ScreenChanged(screenFrame, depth);
 }
 
 
@@ -279,11 +278,11 @@ BDirectWindow::GetClippingRegion(BRegion *region, BPoint *origin) const
 	if (region == NULL)
 		return B_BAD_VALUE;
 
-	if (IsLocked() || !LockDirect())
+	if (IsLocked() || !_LockDirect())
 		return B_ERROR;
 	
 	if (fInDirectConnect) {
-		UnlockDirect();
+		_UnlockDirect();
 		return B_ERROR;
 	}
 		
@@ -304,7 +303,7 @@ BDirectWindow::GetClippingRegion(BRegion *region, BPoint *origin) const
 	// for every clipping_rect in our clip_list, and that would be much
 	// more overkill than this (tested ).
 	if (!region->_SetSize(fBufferDesc->clip_list_count)) {
-		UnlockDirect();
+		_UnlockDirect();
 		return B_NO_MEMORY;
 	}
 	region->fCount = fBufferDesc->clip_list_count;
@@ -318,7 +317,7 @@ BDirectWindow::GetClippingRegion(BRegion *region, BPoint *origin) const
 	region->OffsetBy(-originX, -originY);		
 #endif
 
-	UnlockDirect();
+	_UnlockDirect();
 
 	return B_OK;
 
@@ -376,14 +375,14 @@ BDirectWindow::SupportsWindowMode(screen_id id)
 
 /* static */
 int32
-BDirectWindow::_DaemonStarter(void *arg)
+BDirectWindow::_daemon_thread(void *arg)
 {
-	return static_cast<BDirectWindow *>(arg)->DirectDaemonFunc();
+	return static_cast<BDirectWindow *>(arg)->_DirectDaemon();
 }
 
 
 int32
-BDirectWindow::DirectDaemonFunc()
+BDirectWindow::_DirectDaemon()
 {
 	while (!fDaemonKiller) {
 		// This sem is released by the app_server when our
@@ -401,7 +400,7 @@ BDirectWindow::DirectDaemonFunc()
 		print_direct_buffer_info(*fBufferDesc);
 #endif
 
-		if (LockDirect()) {
+		if (_LockDirect()) {
 			if ((fBufferDesc->buffer_state & B_DIRECT_MODE_MASK) == B_DIRECT_START)
 				fConnectionEnable = true;
 
@@ -412,7 +411,7 @@ BDirectWindow::DirectDaemonFunc()
 			if ((fBufferDesc->buffer_state & B_DIRECT_MODE_MASK) == B_DIRECT_STOP)
 				fConnectionEnable = false;
 
-			UnlockDirect();	
+			_UnlockDirect();
 		}
 
 		// The app_server then waits (with a timeout) on this sem.
@@ -428,14 +427,10 @@ BDirectWindow::DirectDaemonFunc()
 
 // LockDirect() and UnlockDirect() are no-op on R5. I tried to call (R5's) LockDirect()
 // repeatedly, from the same thread and from different threads, nothing happened.
-// I implemented them anyway, as they were the first methods I wrote
-// in this class (As you can see, I even needed to cast away their constness
-// to make them do something useful). 
 // They're not needed though, as the direct_daemon_thread doesn't change
-// any shared data. They are probably here for future enhancements (see also the 
-// comment in DriverSetup()
+// any shared data. They are probably here for future enhancements
 bool
-BDirectWindow::LockDirect() const
+BDirectWindow::_LockDirect() const
 {
 	status_t status = B_OK;
 
@@ -444,7 +439,7 @@ BDirectWindow::LockDirect() const
 	
 	if (atomic_add(&casted->fDirectLock, 1) > 0) {
 		do {
-			status = acquire_sem(fDirectSem);
+			status = acquire_sem(casted->fDirectSem);
 		} while (status == B_INTERRUPTED);
 	}
 		
@@ -459,7 +454,7 @@ BDirectWindow::LockDirect() const
 
 
 void
-BDirectWindow::UnlockDirect() const
+BDirectWindow::_UnlockDirect() const
 {
 #if DW_NEEDS_LOCKING
 	BDirectWindow *casted = const_cast<BDirectWindow *>(this);
@@ -473,7 +468,7 @@ BDirectWindow::UnlockDirect() const
 
 
 void
-BDirectWindow::InitData()
+BDirectWindow::_InitData()
 {
 	fConnectionEnable = false;
 	fIsFullScreen = false;
@@ -481,11 +476,6 @@ BDirectWindow::InitData()
 	
 	fInitStatus = 0;
 	
-	fDirectDriverReady = false;
-	fDirectDriverType = 0;
-	fDirectDriverToken = 0;	
-	direct_driver = NULL;
-
 	status_t status = B_ERROR;
 	struct direct_window_sync_data syncData;
 	if (Lock()) {
@@ -519,7 +509,7 @@ BDirectWindow::InitData()
 	if (fClonedClippingArea > 0) {			
 		fInitStatus |= DW_STATUS_AREA_CLONED;
 
-		fDirectDaemonId = spawn_thread(_DaemonStarter, "direct daemon",
+		fDirectDaemonId = spawn_thread(_daemon_thread, "direct daemon",
 				B_DISPLAY_PRIORITY, this);
 
 		if (fDirectDaemonId > 0) {
@@ -534,7 +524,7 @@ BDirectWindow::InitData()
 
 
 void
-BDirectWindow::DisposeData()
+BDirectWindow::_DisposeData()
 {
 	// wait until the connection terminates: we can't destroy
 	// the object until the client receives the B_DIRECT_STOP
@@ -542,7 +532,7 @@ BDirectWindow::DisposeData()
 	while (fConnectionEnable)
 		snooze(50000);
 	
-	LockDirect();
+	_LockDirect();
 	
 	if (fInitStatus & DW_STATUS_THREAD_STARTED) {
 		fDaemonKiller = true;
@@ -560,19 +550,6 @@ BDirectWindow::DisposeData()
 
 	if (fInitStatus & DW_STATUS_AREA_CLONED)
 		delete_area(fClonedClippingArea);
-}
-
-
-status_t
-BDirectWindow::DriverSetup() const
-{
-	// Unimplemented in R5.
-	// This function is probably here because they wanted, in a future time,
-	// to implement graphic acceleration within BDirectWindow
-	// (in fact, there is also a BDirectDriver member in BDirectWindow,
-	// though it's not used).
-
-	return B_OK;
 }
 
 
