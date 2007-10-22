@@ -7,13 +7,26 @@
 
 
 #include <bluetooth/LocalDevice.h>
+#include <bluetooth/DeviceClass.h>
+#include <bluetooth/DiscoveryAgent.h>
+#include <bluetooth/RemoteDevice.h>
+
 #include <bluetooth/bdaddrUtils.h>
 
 namespace Bluetooth {
 
 
 	LocalDevice*
-	LocalDevice::getLocalDevice() {
+	LocalDevice::GetLocalDevice()
+	{
+	
+		return NULL;
+	}
+	
+	
+	LocalDevice*
+	LocalDevice::GetLocalDevice(uint8 dev)
+	{
 	
 		return NULL;
 	
@@ -21,15 +34,8 @@ namespace Bluetooth {
 	
 	
 	LocalDevice*
-	LocalDevice::getLocalDevice(uint8 dev) {
-	
-		return NULL;
-	
-	}
-	
-	
-	LocalDevice*
-	LocalDevice::getLocalDevice(bdaddr_t bdaddr){
+	LocalDevice::GetLocalDevice(bdaddr_t bdaddr)
+	{
 	
 		return NULL;
 		
@@ -37,35 +43,40 @@ namespace Bluetooth {
 	
 	
 	DiscoveryAgent*
-	LocalDevice::getDiscoveryAgent() {
+	LocalDevice::GetDiscoveryAgent()
+	{
 	
 		return NULL;
 	}
 	
 	
 	BString 
-	LocalDevice::getFriendlyName() {
+	LocalDevice::GetFriendlyName()
+	{
 	
 		return NULL;
 	}
 	
 	
 	DeviceClass 
-	LocalDevice::getDeviceClass() {
+	LocalDevice::GetDeviceClass()
+	{
 	
 		return NULL;
 	}
 	
 	
 	bool 
-	LocalDevice::setDiscoverable(int mode) {
+	LocalDevice::SetDiscoverable(int mode)
+	{
 	
 		return false;
 	}
 	
 	
 	BString
-	LocalDevice::getProperty(const char* property) {
+	LocalDevice::GetProperty(const char* property)
+	{
 	
 		return NULL;
 	
@@ -73,22 +84,24 @@ namespace Bluetooth {
 	
 	
 	void 
-	LocalDevice::getProperty(const char* property, uint32* value) {
+	LocalDevice::GetProperty(const char* property, uint32* value)
+	{
 	
 		*value = 0;
-	
 	}
 	
 	
 	int 
-	LocalDevice::getDiscoverable() {
+	LocalDevice::GetDiscoverable()
+	{
 	
 		return 0;
 	}
 	
 	
 	BString 
-	LocalDevice::getBluetoothAddress() {
+	LocalDevice::GetBluetoothAddress()
+	{
 	
 		return NULL;
 	}
@@ -105,7 +118,8 @@ namespace Bluetooth {
 	
 	}
 	*/
-	LocalDevice::LocalDevice() {
+	LocalDevice::LocalDevice()
+	{
 	
 	}
 
