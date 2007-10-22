@@ -26,6 +26,8 @@
 #include <Locker.h>
 
 class BMessage;
+class BString;
+
 
 class Playlist : public BLocker {
 public:
