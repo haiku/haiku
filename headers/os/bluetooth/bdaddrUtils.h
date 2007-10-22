@@ -9,33 +9,44 @@
 #ifndef _BDADDR_UTILS_H
 #define _BDADDR_UTILS_H
 
+#include <bluetooth/bluetooth.h>
 
 namespace Bluetooth {
 
-	class bdaddrUtils {
-    
-        public:
-			static inline bdaddr_t nullAddress() {
+class bdaddrUtils {
+   
+       public:
+		static inline bdaddr_t MullAddress() 
+		{
+		
+			return ((bdaddr_t) {{0, 0, 0, 0, 0, 0}});
+		}
+		
+		
+		static inline bdaddr_t LocalAddress() 
+		{
+		
+			return ((bdaddr_t) {{0, 0, 0, 0xff, 0xff, 0xff}});
+		}
+		
+		
+		static inline bdaddr_t BroadcastAddress() 
+		{
+		
+			return ((bdaddr_t) {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}});
+		}
+		
+		
+		static const char* ToString(bdaddr_t bdaddr) 
+		{
+			// TODO: 
+			static char str[12];
 			
-				return ((bdaddr_t) {{0, 0, 0, 0, 0, 0}});
-			}
-			static inline bdaddr_t localAddress() {
+			return str;
+		}
 			
-				return ((bdaddr_t) {{0, 0, 0, 0xff, 0xff, 0xff}});
-			}
-			
-			static inline bdaddr_t broadcastAddress() {
-			
-				return ((bdaddr_t) {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}});
-			}
-			
-			static const char* ToString(bdaddr_t bdaddr) {
-				static char str[12];
-				
-				return str;
-			}
-			
-	};
+};
+
 }
 
 #endif

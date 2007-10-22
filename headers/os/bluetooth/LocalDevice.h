@@ -15,34 +15,34 @@
 
 namespace Bluetooth {
 
-	class DiscoveryAgent;
+class DiscoveryAgent;
 
-    class LocalDevice {
-       
-        public:
-            /* Possible throwing */
-            static   LocalDevice* getLocalDevice();
-            static   LocalDevice* getLocalDevice(uint8 dev);
-            static   LocalDevice* getLocalDevice(bdaddr_t bdaddr);
-            
-                     DiscoveryAgent* getDiscoveryAgent();
-                     BString getFriendlyName();
-                     DeviceClass getDeviceClass();
-            /* Possible throwing */
-                     bool setDiscoverable(int mode);
-                     
-                     BString getProperty(const char* property);                     
-                     void getProperty(const char* property, uint32* value);
-                     
-                     int getDiscoverable();
-                     BString getBluetoothAddress();
-/*                     
-                     ServiceRecord getRecord(Connection notifier);
-                     void updateRecord(ServiceRecord srvRecord);
-*/                 
-        private:
-            LocalDevice();
-    };
+class LocalDevice {
+   
+    public:
+        /* Possible throwing */
+        static   LocalDevice* GetLocalDevice();
+        static   LocalDevice* GetLocalDevice(uint8 dev);
+        static   LocalDevice* GetLocalDevice(bdaddr_t bdaddr);
+        
+                 DiscoveryAgent* GetDiscoveryAgent();
+                 BString GetFriendlyName();
+                 DeviceClass GetDeviceClass();
+        /* Possible throwing */
+                 bool SetDiscoverable(int mode);
+                 
+                 BString GetProperty(const char* property);                     
+                 void GetProperty(const char* property, uint32* value);
+                 
+                 int GetDiscoverable();
+                 BString GetBluetoothAddress();
+				 /*                     
+                 ServiceRecord getRecord(Connection notifier);
+                 void updateRecord(ServiceRecord srvRecord);
+				 */                 
+    private:
+        LocalDevice();
+};
     
 }
 

@@ -12,36 +12,49 @@
 
 namespace Bluetooth {
 
-	class DeviceClass {
-    
-        public:
-            DeviceClass(int record) {
-                this->record = record;
-            }
-    
-            int getServiceClasses() {
-       			return (record & 0x00FFE000) >> 13;
-            }
-    
-            int getMajorDeviceClass() {
-       			return (record & 0x00001F00) >> 8;
-            }
+class DeviceClass {
 
-            void getMajorDeviceClass(BString* str) {
+    public:
 
-            }
-    
-            int getMinorDeviceClass() {
-    			return (record & 0x000000FF) >> 2;
-            }
+        DeviceClass(int record) 
+        {
+            this->record = record;
+        }
 
-            void getMinorDeviceClass(BString* str) {
 
-            }
-            
-        private:
-            int record;        
-    };
+        int GetServiceClasses() 
+        {
+   			return (record & 0x00FFE000) >> 13;
+        }
+
+
+        int GetMajorDeviceClass() 
+        {
+   			return (record & 0x00001F00) >> 8;
+        }
+
+
+        void GetMajorDeviceClass(BString* str) 
+        {
+
+        }
+
+
+        int GetMinorDeviceClass()
+        {
+			return (record & 0x000000FF) >> 2;
+        }
+
+
+        void GetMinorDeviceClass(BString* str)
+        {
+
+        }
+        
+    private:
+        int record;        
+};
+
 }
 
 #endif
