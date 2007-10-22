@@ -1,9 +1,9 @@
 /*
- * Copyright 2003-2005, Haiku, Inc.
+ * Copyright 2003-2007, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
- *		Stefano Ceccherini (burton666@libero.it)
+ *		Stefano Ceccherini <stefano.ceccherini@gmail.com>
  */
 
 
@@ -38,8 +38,8 @@ BOptionPopUp::BOptionPopUp(BRect frame, const char *name, const char *label,
 	: BOptionControl(frame, name, label, message, resize, flags)
 {
 	BPopUpMenu *popUp = new BPopUpMenu(label, true, true);
-	_mField = new BMenuField(Bounds(), "_menu", label, popUp);
-	AddChild(_mField);
+	fMenuField = new BMenuField(Bounds(), "_menu", label, popUp);
+	AddChild(fMenuField);
 }
 
 
@@ -58,8 +58,8 @@ BOptionPopUp::BOptionPopUp(BRect frame, const char *name, const char *label,
 	: BOptionControl(frame, name, label, message, resize, flags)
 {
 	BPopUpMenu *popUp = new BPopUpMenu(label, true, true);
-	_mField = new BMenuField(Bounds(), "_menu", label, popUp, fixed);
-	AddChild(_mField);
+	fMenuField = new BMenuField(Bounds(), "_menu", label, popUp, fixed);
+	AddChild(fMenuField);
 }
 
 
@@ -74,7 +74,7 @@ BOptionPopUp::~BOptionPopUp()
 BMenuField *
 BOptionPopUp::MenuField()
 {
-	return _mField;
+	return fMenuField;
 }
 
 
@@ -91,7 +91,7 @@ bool
 BOptionPopUp::GetOptionAt(int32 index, const char **outName, int32 *outValue)
 {
 	bool result = false;
-	BMenu *menu = _mField->Menu();
+	BMenu *menu = fMenuField->Menu();
 
 	if (menu != NULL) {
 		BMenuItem *item = menu->ItemAt(index);
@@ -115,7 +115,7 @@ BOptionPopUp::GetOptionAt(int32 index, const char **outName, int32 *outValue)
 void
 BOptionPopUp::RemoveOptionAt(int32 index)
 {
-	BMenu *menu = _mField->Menu();
+	BMenu *menu = fMenuField->Menu();
 	if (menu != NULL) {
 		BMenuItem *item = menu->ItemAt(index);
 		if (item != NULL) {
@@ -131,7 +131,7 @@ BOptionPopUp::RemoveOptionAt(int32 index)
 int32
 BOptionPopUp::CountOptions() const
 {
-	BMenu *menu = _mField->Menu();	
+	BMenu *menu = fMenuField->Menu();	
 	return (menu != NULL) ? menu->CountItems() : 0;
 }
 
@@ -147,7 +147,7 @@ BOptionPopUp::CountOptions() const
 status_t
 BOptionPopUp::AddOptionAt(const char *name, int32 value, int32 index)
 {
-	BMenu *menu = _mField->Menu();
+	BMenu *menu = fMenuField->Menu();
 	if (menu == NULL)
 		return B_ERROR;
 	
@@ -182,10 +182,10 @@ BOptionPopUp::AddOptionAt(const char *name, int32 value, int32 index)
 void
 BOptionPopUp::AllAttached()
 {
-	BMenu *menu = _mField->Menu();
+	BMenu *menu = fMenuField->Menu();
 	if (menu != NULL) {
-		float labelWidth = _mField->StringWidth(_mField->Label());
-		_mField->SetDivider(labelWidth + kLabelSpace);
+		float labelWidth = fMenuField->StringWidth(fMenuField->Label());
+		fMenuField->SetDivider(labelWidth + kLabelSpace);
 		menu->SetTargetForItems(this);
 	}
 }
@@ -205,11 +205,11 @@ void
 BOptionPopUp::SetLabel(const char *text)
 {
 	BControl::SetLabel(text);
-	_mField->SetLabel(text);
+	fMenuField->SetLabel(text);
 	// We are not sure the menu can keep the whole
 	// string as label, so we ask it what label it's got
-	float newWidth = _mField->StringWidth(_mField->Label());
-	_mField->SetDivider(newWidth + kLabelSpace);
+	float newWidth = fMenuField->StringWidth(fMenuField->Label());
+	fMenuField->SetDivider(newWidth + kLabelSpace);
 }
 
 
@@ -221,7 +221,7 @@ void
 BOptionPopUp::SetValue(int32 value)
 {
 	BControl::SetValue(value);
-	BMenu *menu = _mField->Menu();
+	BMenu *menu = fMenuField->Menu();
 	if (menu == NULL)
 		return;
 
@@ -267,7 +267,7 @@ BOptionPopUp::GetPreferredSize(float* _width, float* _height)
 	// Calculate control's height, looking at the BMenuField font's height
 	if (_height != NULL) {
 		font_height fontHeight;
-		_mField->GetFontHeight(&fontHeight);
+		fMenuField->GetFontHeight(&fontHeight);
 
 		*_height = fontHeight.ascent + fontHeight.descent
 			+ fontHeight.leading + kHeightModifier;
@@ -275,7 +275,7 @@ BOptionPopUp::GetPreferredSize(float* _width, float* _height)
 
 	if (_width != NULL) {
 		float maxWidth = 0;
-		BMenu *menu = _mField->Menu();
+		BMenu *menu = fMenuField->Menu();
 		if (menu == NULL)
 			return;
 
@@ -291,7 +291,7 @@ BOptionPopUp::GetPreferredSize(float* _width, float* _height)
 			}	
 		}
 
-		maxWidth += _mField->StringWidth(BControl::Label()) + kLabelSpace + kWidthModifier;
+		maxWidth += fMenuField->StringWidth(BControl::Label()) + kLabelSpace + kWidthModifier;
 		*_width = maxWidth;
 	}
 }
@@ -309,8 +309,8 @@ BOptionPopUp::ResizeToPreferred()
 	GetPreferredSize(&width, &height);
 	ResizeTo(width, height);
 	
-	float newWidth = _mField->StringWidth(BControl::Label());
-	_mField->SetDivider(newWidth + kLabelSpace);
+	float newWidth = fMenuField->StringWidth(BControl::Label());
+	fMenuField->SetDivider(newWidth + kLabelSpace);
 }
 
 
@@ -322,7 +322,7 @@ BOptionPopUp::ResizeToPreferred()
 int32
 BOptionPopUp::SelectedOption(const char **outName, int32 *outValue) const
 {
-	BMenu *menu = _mField->Menu();
+	BMenu *menu = fMenuField->Menu();
 	if (menu != NULL) {
 		BMenuItem *marked = menu->FindMarked();
 		if (marked != NULL) {
