@@ -1,0 +1,41 @@
+#include "pci_controller.h"
+
+#include <arch_platform.h>
+
+#include "pci_priv.h"
+
+/*
+ * As we don't have any real PCI bus in any of the supported m68k platforms, 
+ * we fake one, with hardcoded devices.
+ */
+
+#include "amiga/pci_amiga.h"
+#include "apple/pci_apple.h"
+#include "atari/pci_atari.h"
+
+
+status_t
+pci_controller_init(void)
+{
+	switch (PPCPlatform::Default()->PlatformType()) {
+/*		case M68K_PLATFORM_AMIGA:
+			return m68k_amiga_pci_controller_init();
+			break;
+		case M68K_PLATFORM_APPLE:
+			return m68k_apple_pci_controller_init();
+			break;*/
+		case M68K_PLATFORM_ATARI:
+			return m68k_atari_pci_controller_init();
+			break;
+		default:
+			return EINVAL;
+	}
+	return B_OK;
+}
+
+
+void *
+pci_ram_address(const void *physical_address_in_system_memory)
+{
+	return (void *)physical_address_in_system_memory;
+}
