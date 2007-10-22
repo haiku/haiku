@@ -1,18 +1,11 @@
 /*
- *  Copyright (c) 2002, OpenBeOS Project.
- *  All rights reserved.
- *  Distributed under the terms of the OpenBeOS license.
+ * Copyright 2002-2007, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
- *
- *  abs.c:
- *  implements the standard C library functions:
- *    abs, labs, llabs
- *
- *
- *  Author(s):
- *  Daniel Reinhold (danielre@users.sf.net)
- *
+ * Author:
+ * 		Daniel Reinhold, danielre@users.sf.net
  */
+
 
 #include <stdlib.h>
 
@@ -36,4 +29,3 @@ llabs(long long i)
 {
 	return (i < 0) ? -i : i;
 }
-

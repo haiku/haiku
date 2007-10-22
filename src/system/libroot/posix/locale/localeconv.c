@@ -1,19 +1,12 @@
 /*
- *  Copyright (c) 2002, OpenBeOS Project.
- *  All rights reserved.
- *  Distributed under the terms of the OpenBeOS license.
+ * Copyright 2002-2007, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
- *
- *  localeconv.c:
- *  defines the structure containing the current locale
- *  and the single access function 'localeconv()'
- *
- *
- *  Author(s):
- *  Daniel Reinhold (danielre@users.sf.net)
- *
+ * Author:
+ * 		Daniel Reinhold, danielre@users.sf.net
  */
- 
+
+
 #include <locale.h>
 #include <limits.h>
 
@@ -48,10 +41,9 @@ struct lconv _Locale = {
 
 
 
-struct lconv *
+struct lconv*
 localeconv(void)
 {
 	// return pointer to the current locale
 	return &_Locale;
 }
-

@@ -1,26 +1,17 @@
 /*
- *  Copyright (c) 2002, OpenBeOS Project.
- *  All rights reserved.
- *  Distributed under the terms of the OpenBeOS license.
+ * Copyright 2002-2007, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
- *
- *  atof.c:
- *  implements the standard C library function atof()
- *  (merely a wrapper for strtod(), actually)
- *
- *
- *  Author(s):
- *  Daniel Reinhold (danielre@users.sf.net)
- *
+ * Author:
+ * 		Daniel Reinhold, danielre@users.sf.net
  */
- 
+
+
 #include <stdlib.h>
 
 
 double
-atof(const char *num)
+atof(const char* num)
 {
 	return strtod(num, NULL);
 }
-
-

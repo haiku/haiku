@@ -1,18 +1,11 @@
 /*
- *  Copyright (c) 2002, OpenBeOS Project.
- *  All rights reserved.
- *  Distributed under the terms of the OpenBeOS license.
+ * Copyright 2002-2007, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
- *
- *  div.c:
- *  implements the standard C library functions:
- *    div, ldiv
- *
- *
- *  Author(s):
- *  Daniel Reinhold (danielre@users.sf.net)
- *
+ * Author:
+ * 		Daniel Reinhold, danielre@users.sf.net
  */
+
 
 #include <stdlib.h>
 
@@ -25,7 +18,7 @@ div(int numerator, int denominator)
 	val.quot = numerator / denominator;
 	val.rem  = numerator - denominator * val.quot;
 	
-	if ((val.rem > 0) && (val.quot < 0)) {
+	if (val.rem > 0 && val.quot < 0) {
 		val.rem -= denominator;
 		++val.quot;
 	}
@@ -42,11 +35,10 @@ ldiv(long numerator, long denominator)
 	val.quot = numerator / denominator;
 	val.rem  = numerator - denominator * val.quot;
 	
-	if ((val.rem > 0) && (val.quot < 0)) {
+	if (val.rem > 0 && val.quot < 0) {
 		val.rem -= denominator;
 		++val.quot;
 	}
 
 	return val;
 }
-
