@@ -23,16 +23,19 @@ struct iframe *m68k_get_user_iframe(void);
 extern inline struct thread *
 arch_thread_get_current_thread(void)
 {
-    struct thread *t;
-    asm volatile("mfsprg2 %0" : "=r"(t));
-    return t;
+	uint64 v = 0;
+	asm volatile("pmove %%srp,(%0)" : : "a"(&v));
+	return (struct thread *)(v & 0xffffffff);
 }
 
 
 extern inline void
 arch_thread_set_current_thread(struct thread *t)
 {
-    asm volatile("mtsprg2 %0" : : "r"(t));
+	uint64 v;
+	asm volatile("pmove %%srp,(%0)\n" \
+			"move %1,(4,%0)\n" \
+			"pmove (%0),%%srp" : : "a"(&v), "d"(t));
 }
 
 
