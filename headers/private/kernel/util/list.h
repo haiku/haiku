@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef KERNEL_LIST_H
@@ -27,8 +27,8 @@ typedef struct list_link list_link;
  */
 
 struct list_link {
-	list_link *next;
-	list_link *prev;
+	list_link	*next;
+	list_link	*prev;
 };
 
 struct list {
