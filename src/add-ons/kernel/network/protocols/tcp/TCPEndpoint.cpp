@@ -1236,7 +1236,7 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 
 		status_t status = B_OK;
 		if (segmentLength > 0)
-			fSendQueue.Get(buffer, fSendNext, segmentLength);
+			status = fSendQueue.Get(buffer, fSendNext, segmentLength);
 		if (status < B_OK) {
 			gBufferModule->free(buffer);
 			return status;
