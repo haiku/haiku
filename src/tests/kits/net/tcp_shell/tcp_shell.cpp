@@ -76,7 +76,6 @@ extern module_info *modules[];
 
 
 extern struct net_protocol_module_info gDomainModule;
-static struct net_protocol sDomainProtocol;
 struct net_interface gInterface;
 extern struct net_socket_module_info gNetSocketModule;
 struct net_protocol_module_info *gTCPModule;
@@ -246,6 +245,8 @@ static net_stack_module_info gNetStackModule = {
 status_t
 socket_create(int family, int type, int protocol, net_socket **_socket)
 {
+	net_protocol* domainProtocol;
+
 	struct net_socket_private *socket = new (std::nothrow) net_socket_private;
 	if (socket == NULL)
 		return B_NO_MEMORY;
@@ -278,7 +279,11 @@ socket_create(int family, int type, int protocol, net_socket **_socket)
 
 	socket->first_info = gTCPModule;
 
-	socket->first_protocol->next = &sDomainProtocol;
+	domainProtocol = new net_protocol;
+	domainProtocol->module = &gDomainModule;
+	domainProtocol->socket = socket;
+
+	socket->first_protocol->next = domainProtocol;
 	socket->first_protocol->module = gTCPModule;
 	socket->first_protocol->socket = socket;
 
@@ -414,10 +419,8 @@ socket_send(net_socket *socket, const void *data, size_t length, int flags)
 	}
 
 	buffer->flags = flags;
-	//buffer->source = (sockaddr *)&socket->address;
-	//buffer->destination = (sockaddr *)&socket->peer;
-	memcpy(&buffer->source, &socket->address, socket->address.ss_len);
-	memcpy(&buffer->destination, &socket->peer, socket->peer.ss_len);
+	memcpy(buffer->source, &socket->address, socket->address.ss_len);
+	memcpy(buffer->destination, &socket->peer, socket->peer.ss_len);
 
 	status_t status = socket->first_info->send_data(socket->first_protocol, buffer);
 	if (status < B_OK) {
@@ -703,6 +706,8 @@ datalink_send_data(struct net_route *route, net_buffer *buffer)
 {
 	struct context* context = (struct context*)route->gateway;
 
+	buffer->interface = &gInterface;
+
 	context->lock.Lock();
 	list_add_item(&context->list, buffer);
 	context->lock.Unlock();
@@ -807,6 +812,10 @@ domain_control(net_protocol *protocol, int level, int option, void *value,
 status_t
 domain_bind(net_protocol *protocol, const struct sockaddr *address)
 {
+	memcpy(&protocol->socket->address, address, sizeof(struct sockaddr_in));
+	protocol->socket->address.ss_len = sizeof(struct sockaddr_in);
+		// explicitly set length, as our callers can't be trusted to
+		// always provide the correct length!
 	return B_OK;
 }
 
@@ -926,7 +935,7 @@ domain_receive_data(net_buffer *buffer)
 			(now - lastTime) / 1000000.0);
 		lastTime = now;
 
-		if (is_server((sockaddr *)&buffer->source))
+		if (is_server((sockaddr *)buffer->source))
 			printf("\33[31mserver > client: ");
 		else
 			printf("client > server: ");
@@ -1174,13 +1183,16 @@ setup_server()
 	}
 	status = socket_listen(gServerSocket, 40);
 	if (status < B_OK) {
-		fprintf(stderr, "tcp_tester: server cannot listen: %s\n", strerror(status));
+		fprintf(stderr, "tcp_tester: server cannot listen: %s\n",
+			strerror(status));
 		exit(1);
 	}
 
-	thread_id serverThread = spawn_thread(server_thread, "server", B_NORMAL_PRIORITY, NULL);
+	thread_id serverThread = spawn_thread(server_thread, "server",
+		B_NORMAL_PRIORITY, NULL);
 	if (serverThread < B_OK) {
-		fprintf(stderr, "tcp_tester: cannot start server: %s\n", strerror(serverThread));
+		fprintf(stderr, "tcp_tester: cannot start server: %s\n",
+			strerror(serverThread));
 		exit(1);
 	}
 
@@ -1200,7 +1212,8 @@ setup_context(struct context& context, bool server)
 	context.wait_sem = create_sem(0, "receive wait");
 
 	context.thread = spawn_thread(receiving_thread,
-		server ? "server receiver" : "client receiver", B_NORMAL_PRIORITY, &context);
+		server ? "server receiver" : "client receiver", B_NORMAL_PRIORITY,
+		&context);
 	resume_thread(context.thread);
 }
 
@@ -1261,10 +1274,7 @@ do_connect(int argc, char** argv)
 	memset(&address, 0, sizeof(address));
 	address.sin_family = AF_INET;
 	address.sin_port = htons(port);
-	if (sSimultaneousConnect)
-		address.sin_addr.s_addr = htonl(0xc0a80001);
-	else
-		address.sin_addr.s_addr = INADDR_ANY;
+	address.sin_addr.s_addr = htonl(0xc0a80001);
 
 	status_t status = socket_connect(gClientSocket, (struct sockaddr *)&address,
 		sizeof(struct sockaddr));
@@ -1324,6 +1334,9 @@ do_drop(int argc, char** argv)
 {
 	if (argc == 1) {
 		// show list of dropped packets
+		if (sRandomDrop > 0.0)
+			printf("Drop probability is %f\n", sRandomDrop);
+
 		printf("Drop pakets:\n");
 
 		set<uint32>::iterator iterator = sDropList.begin();
@@ -1514,12 +1527,12 @@ main(int argc, char** argv)
 		return 1;
 	}
 
-	sDomainProtocol.module = &gDomainModule;
 	sockaddr_in interfaceAddress;
 	interfaceAddress.sin_len = sizeof(sockaddr_in);
 	interfaceAddress.sin_family = AF_INET;
 	interfaceAddress.sin_addr.s_addr = htonl(0xc0a80001);
 	gInterface.address = (sockaddr*)&interfaceAddress;
+	gInterface.domain = &sDomain;
 
 	status = get_module("network/protocols/tcp/v1", (module_info **)&gTCPModule);
 	if (status < B_OK) {
