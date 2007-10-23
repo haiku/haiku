@@ -42,6 +42,9 @@ class RemoteDevice {
                 
     protected:
         RemoteDevice(BString address);
+    
+    /* Instances of this class only will be done by Discovery[Listener|Agent] TODO */
+    friend class DiscoveryListener;
         
 };
 
