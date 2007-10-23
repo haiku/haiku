@@ -15,6 +15,10 @@
 	#include <arch/x86/arch_debugger.h>
 #elif __POWERPC__
 	#include <arch/ppc/arch_debugger.h>
+#elif __M68K__
+	#include <arch/m68k/arch_debugger.h>
+#else
+	#error you need to write a <arch/<cpu>/arch_debugger.h>
 #endif
 
 typedef struct debug_cpu_state debug_cpu_state;

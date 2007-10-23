@@ -371,6 +371,11 @@ extern void debug_vprintf(const char *format, va_list args);
 #	define B_MAX_CPU_COUNT	8
 #elif __POWERPC__
 #	define B_MAX_CPU_COUNT	8
+#elif __M68K__
+#	define B_MAX_CPU_COUNT	1
+#else
+#	warning Unknown cpu
+#	define B_MAX_CPU_COUNT	1
 #endif
 
 #define OBOS_CPU_TYPES
