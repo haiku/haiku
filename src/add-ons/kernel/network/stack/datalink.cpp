@@ -47,13 +47,16 @@ device_reader_thread(void *_interface)
 	net_device *device = interface->device;
 	status_t status = B_OK;
 
-	RecursiveLocker rx_lock(interface->rx_lock);
+	RecursiveLocker locker(interface->rx_lock);
 
 	while (device->flags & IFF_UP) {
+		locker.Unlock();
+
 		net_buffer *buffer;
-		rx_lock.Unlock();
 		status = device->module->receive_data(device, &buffer);
-		rx_lock.Lock();
+
+		locker.Lock();
+
 		if (status == B_OK) {
 			// feed device monitors
 			DeviceMonitorList::Iterator iterator =

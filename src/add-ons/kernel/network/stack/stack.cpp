@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -785,10 +785,6 @@ init_stack()
 		goto err8;
 	}
 
-	status = init_net_buffers();
-	if (status < B_OK)
-		goto err9;
-
 	sInitialized = true;
 
 	link_init();
@@ -806,8 +802,6 @@ init_stack()
 
 	return B_OK;
 
-err9:
-	hash_uninit(sReceivingProtocolChains);
 err8:
 	hash_uninit(sDatalinkProtocolChains);
 err7:
@@ -836,8 +830,6 @@ uninit_stack()
 	uninit_timers();
 	uninit_interfaces();
 	uninit_domains();
-
-	uninit_net_buffers();
 
 	benaphore_destroy(&sChainLock);
 	benaphore_destroy(&sInitializeChainLock);

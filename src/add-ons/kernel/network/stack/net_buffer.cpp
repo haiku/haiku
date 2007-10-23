@@ -309,7 +309,24 @@ get_node_at_offset(net_buffer_private *buffer, size_t offset)
 }
 
 
-//	#pragma mark -
+static void
+copy_metadata(net_buffer *destination, const net_buffer *source)
+{
+	memcpy(destination->source, source->source,
+		min_c(source->source->sa_len, sizeof(sockaddr_storage)));
+	memcpy(destination->destination, source->destination,
+		min_c(source->destination->sa_len, sizeof(sockaddr_storage)));
+
+	destination->flags = source->flags;
+	destination->interface = source->interface;
+	destination->offset = source->offset;
+	destination->size = source->size;
+	destination->protocol = source->protocol;
+	destination->type = source->type;
+}
+
+
+//	#pragma mark - module API
 
 
 static net_buffer *
@@ -364,23 +381,6 @@ free_buffer(net_buffer *_buffer)
 	}
 
 	free_net_buffer(buffer);
-}
-
-
-static void
-copy_metadata(net_buffer *destination, const net_buffer *source)
-{
-	memcpy(destination->source, source->source,
-		min_c(source->source->sa_len, sizeof(sockaddr_storage)));
-	memcpy(destination->destination, source->destination,
-		min_c(source->destination->sa_len, sizeof(sockaddr_storage)));
-
-	destination->flags = source->flags;
-	destination->interface = source->interface;
-	destination->offset = source->offset;
-	destination->size = source->size;
-	destination->protocol = source->protocol;
-	destination->type = source->type;
 }
 
 
@@ -1185,44 +1185,31 @@ swap_addresses(net_buffer *buffer)
 }
 
 
-status_t
-init_net_buffers()
-{
-	// TODO improve our code a bit so we can add constructors
-	//		and keep around half-constructed buffers in the slab
-
-	sNetBufferCache = create_object_cache("net buffer cache",
-		sizeof(net_buffer_private), 8, NULL, NULL, NULL);
-	if (sNetBufferCache == NULL)
-		return B_NO_MEMORY;
-
-	sDataNodeCache = create_object_cache("data node cache", BUFFER_SIZE, 0,
-		NULL, NULL, NULL);
-	if (sDataNodeCache == NULL) {
-		delete_object_cache(sNetBufferCache);
-		return B_NO_MEMORY;
-	}
-
-	return B_OK;
-}
-
-
-status_t
-uninit_net_buffers()
-{
-	delete_object_cache(sNetBufferCache);
-	delete_object_cache(sDataNodeCache);
-
-	return B_OK;
-}
-
-
 static status_t
 std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
+			// TODO: improve our code a bit so we can add constructors
+			//	and keep around half-constructed buffers in the slab
+
+			sNetBufferCache = create_object_cache("net buffer cache",
+				sizeof(net_buffer_private), 8, NULL, NULL, NULL);
+			if (sNetBufferCache == NULL)
+				return B_NO_MEMORY;
+
+			sDataNodeCache = create_object_cache("data node cache", BUFFER_SIZE,
+				0, NULL, NULL, NULL);
+			if (sDataNodeCache == NULL) {
+				delete_object_cache(sNetBufferCache);
+				return B_NO_MEMORY;
+			}
+
+			return B_OK;
+
 		case B_MODULE_UNINIT:
+			delete_object_cache(sNetBufferCache);
+			delete_object_cache(sDataNodeCache);
 			return B_OK;
 
 		default:

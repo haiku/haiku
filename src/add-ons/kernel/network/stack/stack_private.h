@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,9 +32,5 @@ status_t get_domain_protocols(net_socket *socket);
 status_t put_domain_protocols(net_socket *socket);
 status_t get_domain_datalink_protocols(net_interface *interface);
 status_t put_domain_datalink_protocols(net_interface *interface);
-
-// net_buffer.cpp
-status_t init_net_buffers();
-status_t uninit_net_buffers();
 
 #endif	// STACK_PRIVATE_H
