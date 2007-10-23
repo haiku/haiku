@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-9/2007
+   Rudolf Cornelissen 10/2002-10/2007
 */
 
 #define MODULE_BIT 0x00008000
@@ -1951,6 +1951,9 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	{
 		/* check if we can setup this mode with acceleration */
 		*acc_mode = true;
+		//no acc support for G8x yet!
+		if (si->ps.card_arch >= NV50A) *acc_mode = false;
+
 		/* virtual_width */
 		if (target->virtual_width > max_acc_width) *acc_mode = false;
 		/* virtual_height */
@@ -1983,6 +1986,8 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	{
 		/* check if we can setup this mode with acceleration */
 		*acc_mode = true;
+		//no acc support for G8x yet!
+		if (si->ps.card_arch >= NV50A) *acc_mode = false;
 		/* (we already know virtual_width will be no problem) */
 		/* virtual_height */
 		/* (NV cards can even do more than this(?)...
