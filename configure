@@ -254,6 +254,7 @@ while [ $# -gt 0 ] ; do
 						case "$2" in
 							x86)	haikuGCCMachine=i586-pc-haiku;;
 							ppc)	haikuGCCMachine=powerpc-apple-haiku;;
+							m68k)	haikuGCCMachine=m68k-unknown-haiku;;
 							*)		echo "Unsupported target architecture: $2"
 									exit 1;;
 						esac

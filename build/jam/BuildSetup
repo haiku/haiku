@@ -139,6 +139,7 @@ switch $(HAIKU_GCC_MACHINE) {
 	case i586-*		: HAIKU_CPU = x86 ;
 	case i686-*		: HAIKU_CPU = x86 ;
 	case powerpc-*	: HAIKU_CPU = ppc ;
+	case m68k-*	: HAIKU_CPU = m68k ;
 	case * : Exit "Unsupported gcc target machine:" $(HAIKU_GCC_MACHINE) ;
 }
 
@@ -152,6 +153,11 @@ switch $(HAIKU_CPU) {
 	{
 		HAIKU_DEFINES += __INTEL__ ;
 		HAIKU_BOOT_PLATFORM = bios_ia32 ;
+	}
+	case m68k :
+	{
+		HAIKU_DEFINES += __M68K__ ;
+		HAIKU_BOOT_PLATFORM = atari ;
 	}
 	case * :
 		Exit "Currently unsupported target CPU:" $(HAIKU_CPU) ;
@@ -537,6 +543,8 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 		HOST_DEFINES += __INTEL__ ;
 	} else if $(HOST_CPU) = ppc {
 		HOST_DEFINES += __POWERPC__ ;
+	} else if $(HOST_CPU) = m68k {
+		HOST_DEFINES += __M68K__ ;
 	}
 
 	# Supposing this is a glibc platform, let's try to get features like large
