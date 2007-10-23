@@ -921,7 +921,7 @@ vnode_low_memory_handler(void */*data*/, int32 level)
 {
 	TRACE(("vnode_low_memory_handler(level = %ld)\n", level));
 
-	int32 count = 1;
+	uint32 count = 1;
 	switch (level) {
 		case B_NO_LOW_MEMORY:
 			return;
@@ -936,10 +936,44 @@ vnode_low_memory_handler(void */*data*/, int32 level)
 			break;
 	}
 
-	for (int32 i = 0; i < count; i++) {
+	if (count > sUnusedVnodes)
+		count = sUnusedVnodes;
+
+	// first, write back the modified pages of some unused vnodes
+
+	uint32 freeCount = count;
+
+	for (uint32 i = 0; i < count; i++) {
+		mutex_lock(&sVnodeMutex);
+		struct vnode *vnode = (struct vnode *)list_remove_head_item(
+			&sUnusedVnodeList);
+		if (vnode == NULL) {
+			mutex_unlock(&sVnodeMutex);
+			break;
+		}
+
+		inc_vnode_ref_count(vnode);
+		sUnusedVnodes--;
+
+		mutex_unlock(&sVnodeMutex);
+
+		if (vnode->cache != NULL)
+			vm_cache_write_modified(vnode->cache, false);
+
+		dec_vnode_ref_count(vnode, false);
+	}
+
+	// and then free them
+
+	for (uint32 i = 0; i < freeCount; i++) {
 		mutex_lock(&sVnodeMutex);
 
-		struct vnode *vnode = (struct vnode *)list_remove_head_item(&sUnusedVnodeList);
+		// We're removing vnodes from the tail of the list - hoping it's
+		// one of those we have just written back; otherwise we'll write
+		// back the vnode with the busy flag turned on, and that might
+		// take some time.
+		struct vnode *vnode = (struct vnode *)list_remove_tail_item(
+			&sUnusedVnodeList);
 		if (vnode == NULL) {
 			mutex_unlock(&sVnodeMutex);
 			break;
