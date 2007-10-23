@@ -46,9 +46,6 @@ class DiscoveryListener : BLooper {
     private:                
         DiscoveryListener();
         void MessageReceived(BMessage* msg);
-
-
-    friend class RemoteDevice;
         
 };
 
