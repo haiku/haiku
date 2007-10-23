@@ -2,5 +2,6 @@ SubDir HAIKU_TOP src kits bluetooth ;
 
 SharedLibrary libbluetooth.so :
 	LocalDevice.cpp
+	DiscoveryListener.cpp
 	: be
 ;
