@@ -64,7 +64,7 @@
 
 #ifdef PROBE_TCP
 #	define PROBE(buffer, window) \
-	dprintf("TCP PROBE %llu %s %s %ld %lu %lu %lu %lu %lu %lu %lu %lu %lu %llu\n", \
+	dprintf("TCP PROBE %llu %s %s %ld snxt %lu suna %lu cw %lu sst %lu win %lu swin %lu smax-suna %lu savail %lu sqused %lu rto %llu\n", \
 		system_time(), PrintAddress(buffer->source), \
 		PrintAddress(buffer->destination), buffer->size, (uint32)fSendNext, \
 		(uint32)fSendUnacknowledged, fCongestionWindow, fSlowStartThreshold, \
@@ -1320,7 +1320,7 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 
 
 int
-TCPEndpoint::_GetMSS(const sockaddr *address) const
+TCPEndpoint::_MaxSegmentSize(const sockaddr *address) const
 {
 	return next->module->get_mtu(next, address) - sizeof(tcp_header);
 }
@@ -1714,7 +1714,7 @@ TCPEndpoint::_PrepareSendPath(const sockaddr *peer)
 	// we are counting the SYN here
 	fSendQueue.SetInitialSequence(fSendNext + 1);
 
-	fReceiveMaxSegmentSize = _GetMSS(peer);
+	fReceiveMaxSegmentSize = _MaxSegmentSize(peer);
 
 	// Compute the window shift we advertise to our peer - if it doesn't support
 	// this option, this will be reset to 0 (when its SYN is received)

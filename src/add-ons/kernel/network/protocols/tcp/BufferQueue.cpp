@@ -72,7 +72,8 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 {
 	TRACE(("BufferQueue@%p::Add(buffer %p, size %lu, sequence %lu)\n",
 		this, buffer, buffer->size, (uint32)sequence));
-	TRACE(("  in: first: %lu, last: %lu, num: %lu, cont: %lu\n", (uint32)fFirstSequence, (uint32)fLastSequence, fNumBytes, fContiguousBytes));
+	TRACE(("  in: first: %lu, last: %lu, num: %lu, cont: %lu\n",
+		(uint32)fFirstSequence, (uint32)fLastSequence, fNumBytes, fContiguousBytes));
 
 	buffer->sequence = sequence;
 
@@ -80,14 +81,18 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 		// we usually just add the buffer to the end of the queue
 		fList.Add(buffer);
 
-		if (sequence == fLastSequence && fLastSequence - fFirstSequence == fNumBytes) {
-			// there is no hole in the buffer, we can make the whole buffer available
+		if (sequence == fLastSequence
+			&& fLastSequence - fFirstSequence == fNumBytes) {
+			// there is no hole in the buffer, we can make the whole buffer
+			// available
 			fContiguousBytes += buffer->size;
 		}
 
 		fLastSequence = sequence + buffer->size;
 		fNumBytes += buffer->size;
-		TRACE(("  out0: first: %lu, last: %lu, num: %lu, cont: %lu\n", (uint32)fFirstSequence, (uint32)fLastSequence, fNumBytes, fContiguousBytes));
+
+		TRACE(("  out0: first: %lu, last: %lu, num: %lu, cont: %lu\n",
+			(uint32)fFirstSequence, (uint32)fLastSequence, fNumBytes, fContiguousBytes));
 		return;
 	}
 
@@ -100,7 +105,7 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 		sequence = fFirstSequence;
 	}
 
-	// find for the place where to insert the buffer into the queue
+	// find the place where to insert the buffer into the queue
 
 	SegmentList::ReverseIterator iterator = fList.GetReverseIterator();
 	net_buffer *previous = NULL;
@@ -117,9 +122,9 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 	// check if we have duplicate data, and remove it if that is the case
 	if (previous != NULL) {
 		if (sequence == previous->sequence) {
-			// we already have at least part of this data - ignore new data whenever
-			// it makes sense (because some TCP implementations send bogus data when
-			// probing the window)
+			// we already have at least part of this data - ignore new data
+			// whenever it makes sense (because some TCP implementations send
+			// bogus data when probing the window)
 			if (previous->size >= buffer->size) {
 				gBufferModule->free(buffer);
 				buffer = NULL;
@@ -127,8 +132,10 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 				fList.Remove(previous);
 				gBufferModule->free(previous);
 			}
-		} else if (tcp_sequence(previous->sequence + previous->size) > sequence)
-			gBufferModule->remove_header(buffer, previous->sequence + previous->size - sequence);
+		} else if (tcp_sequence(previous->sequence + previous->size) > sequence) {
+			gBufferModule->remove_header(buffer,
+				previous->sequence + previous->size - sequence);
+		}
 	}
 
 	if (buffer != NULL && next != NULL
@@ -140,12 +147,15 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 
 			fList.Remove(remove);
 			gBufferModule->free(remove);
-		} else
-			gBufferModule->remove_trailer(buffer, next->sequence - (sequence + buffer->size));
+		} else {
+			gBufferModule->remove_trailer(buffer,
+				sequence + buffer->size - next->sequence);
+		}
 	}
 
 	if (buffer == NULL) {
-		TRACE(("  out1: first: %lu, last: %lu, num: %lu, cont: %lu\n", (uint32)fFirstSequence, (uint32)fLastSequence, fNumBytes, fContiguousBytes));
+		TRACE(("  out1: first: %lu, last: %lu, num: %lu, cont: %lu\n",
+			(uint32)fFirstSequence, (uint32)fLastSequence, fNumBytes, fContiguousBytes));
 		return;
 	}
 
@@ -164,10 +174,12 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 			fContiguousBytes += buffer->size;
 
 			buffer = (struct net_buffer *)buffer->link.next;
-		} while (buffer != NULL && fFirstSequence + fContiguousBytes == buffer->sequence);
+		} while (buffer != NULL
+			&& fFirstSequence + fContiguousBytes == buffer->sequence);
 	}
 
-	TRACE(("  out2: first: %lu, last: %lu, num: %lu, cont: %lu\n", (uint32)fFirstSequence, (uint32)fLastSequence, fNumBytes, fContiguousBytes));
+	TRACE(("  out2: first: %lu, last: %lu, num: %lu, cont: %lu\n",
+		(uint32)fFirstSequence, (uint32)fLastSequence, fNumBytes, fContiguousBytes));
 }
 
 

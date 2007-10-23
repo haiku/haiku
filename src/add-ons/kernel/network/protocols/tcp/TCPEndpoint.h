@@ -94,7 +94,7 @@ class TCPEndpoint : public net_protocol, public ProtocolSocket {
 			uint32 segmentMaxSize, uint32 flightSize);
 		status_t _SendQueued(bool force = false);
 		status_t _SendQueued(bool force, uint32 sendWindow);
-		int _GetMSS(const struct sockaddr *) const;
+		int _MaxSegmentSize(const struct sockaddr *) const;
 		status_t _ShutdownEgress(bool closing);
 		ssize_t _AvailableData() const;
 		void _NotifyReader();
