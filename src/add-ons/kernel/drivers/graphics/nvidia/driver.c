@@ -324,6 +324,7 @@ static uint16 nvidia_device_list[] = {
 	0x03d2, /* Nvidia GeForce 6100 nForce 400 */
 	0x0400, /* Nvidia GeForce 8600 GTS */
 	0x0402, /* Nvidia GeForce 8600 GT */
+	0x0407, /* Nvidia GeForce 8600M GT */
 	0x0421, /* Nvidia GeForce 8500 GT */
 	0x0422, /* Nvidia GeForce 8400 GS */
 	0x0423, /* Nvidia GeForce 8300 GS */
