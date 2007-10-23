@@ -3671,11 +3671,12 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 #if 1
 			if (area) {
 				struct stack_frame {
-					#if defined(__INTEL__) || defined(__POWERPC__)
+					#if defined(__INTEL__) || defined(__POWERPC__) || defined(__M68K__)
 						struct stack_frame*	previous;
 						void*				return_address;
 					#else
 						// ...
+					#warning writeme
 					#endif
 				} frame;
 #ifdef __INTEL__
@@ -3693,7 +3694,7 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 				status_t status = user_memcpy(&frame, (void *)iframe->r1,
 					sizeof(struct stack_frame));
 #else
-#	warn "vm_page_fault() stack trace won't work"
+#	warning "vm_page_fault() stack trace won't work"
 				status = B_ERROR;
 #endif
 
