@@ -91,7 +91,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.82 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.83 running.\n"));
 
 	/* log VBLANK INT usability status */
 	if (si->ps.int_assigned)
@@ -157,15 +157,16 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "NV40");
 		status = nvxx_general_powerup();
 		break;
-	case 0x004310de: /* Nvidia unknown FX */
+	case 0x004310de: /* Nvidia GeForce 6800 XE */
 		si->ps.card_type = NV40;
 		si->ps.card_arch = NV40A;
-		sprintf(si->adi.name, "Nvidia unknown FX");
+		sprintf(si->adi.name, "Nvidia GeForce 6800 XE");
 		sprintf(si->adi.chipset, "NV40");
 		status = nvxx_general_powerup();
 		break;
 	case 0x004510de: /* Nvidia GeForce FX 6800 GT */
 	case 0x004610de: /* Nvidia GeForce FX 6800 GT */
+	case 0x004710de: /* Nvidia GeForce FX 6800 GS */
 	case 0x004810de: /* Nvidia GeForce FX 6800 XT */
 		si->ps.card_type = NV40;
 		si->ps.card_arch = NV40A;
@@ -219,10 +220,10 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "NV05");
 		status = nvxx_general_powerup();
 		break;
-	case 0x00c010de: /* Nvidia unknown FX */
+	case 0x00c010de: /* Nvidia GeForce 6800 GS */
 		si->ps.card_type = NV41;
 		si->ps.card_arch = NV40A;
-		sprintf(si->adi.name, "Nvidia unknown FX");
+		sprintf(si->adi.name, "Nvidia GeForce 6800 GS");
 		sprintf(si->adi.chipset, "NV41");
 		status = nvxx_general_powerup();
 		break;
@@ -288,11 +289,25 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
+	case 0x00f410de: /* Nvidia GeForce 6600 LE */
+		si->ps.card_type = NV43;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia GeForce 6600 LE");
+		sprintf(si->adi.chipset, "NV43");
+		status = nvxx_general_powerup();
+		break;
 	case 0x00f510de: /* Nvidia GeForce FX 7800 GS AGP */
 		si->ps.card_type = G70;
 		si->ps.card_arch = NV40A;
 		sprintf(si->adi.name, "Nvidia GeForce 7800 GS AGP");
 		sprintf(si->adi.chipset, "G70");
+		status = nvxx_general_powerup();
+		break;
+	case 0x00f610de: /* Nvidia GeForce 6800 GS */
+		si->ps.card_type = NV43;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia GeForce 6800 GS");
+		sprintf(si->adi.chipset, "NV43");
 		status = nvxx_general_powerup();
 		break;
 	case 0x00f810de: /* Nvidia Quadro FX 3400/4400 PCIe */
@@ -399,10 +414,10 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "NV43");
 		status = nvxx_general_powerup();
 		break;
-	case 0x014310de: /* Nvidia unknown FX */
+	case 0x014310de: /* Nvidia GeForce 6600 VE */
 		si->ps.card_type = NV43;
 		si->ps.card_arch = NV40A;
-		sprintf(si->adi.name, "Nvidia unknown FX");
+		sprintf(si->adi.name, "Nvidia GeForce 6600 VE");
 		sprintf(si->adi.chipset, "NV43");
 		status = nvxx_general_powerup();
 		break;
@@ -439,11 +454,11 @@ status_t nv_general_powerup()
 		status = nvxx_general_powerup();
 		break;
 	case 0x014b10de: /* Nvidia unknown FX */
-	case 0x014c10de: /* Nvidia unknown FX */
+	case 0x014c10de: /* Nvidia Quadro FX 540 MXM */
 	case 0x014d10de: /* Nvidia unknown FX */
 		si->ps.card_type = NV43;
 		si->ps.card_arch = NV40A;
-		sprintf(si->adi.name, "Nvidia unknown FX");
+		sprintf(si->adi.name, "Nvidia Quadro FX");
 		sprintf(si->adi.chipset, "NV43");
 		status = nvxx_general_powerup();
 		break;
@@ -673,6 +688,14 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "NV18");
 		status = nvxx_general_powerup();
 		break;
+	case 0x019110de: /* Nvidia GeForce 8800 GTX */
+	case 0x019310de: /* Nvidia GeForce 8800 GTS */
+		si->ps.card_type = G80;
+		si->ps.card_arch = NV50A;
+		sprintf(si->adi.name, "Nvidia GeForce 8800");
+		sprintf(si->adi.chipset, "G80");
+		status = nvxx_general_powerup();
+		break;
 	case 0x01a010de: /* Nvidia GeForce2 Integrated GPU */
 		si->ps.card_type = NV11;
 		si->ps.card_arch = NV10A;
@@ -681,6 +704,7 @@ status_t nv_general_powerup()
 		status = nvxx_general_powerup();
 		break;
 	case 0x01d110de: /* Nvidia GeForce 7300 LE */
+	case 0x01d310de: /* Nvidia GeForce 7300 SE */
 	case 0x01df10de: /* Nvidia GeForce 7300 GS */
 		si->ps.card_type = G72;
 		si->ps.card_arch = NV40A;
@@ -692,6 +716,13 @@ status_t nv_general_powerup()
 		si->ps.card_type = G72;
 		si->ps.card_arch = NV40A;
 		sprintf(si->adi.name, "Nvidia GeForce 7400 Go");
+		sprintf(si->adi.chipset, "G72");
+		status = nvxx_general_powerup();
+		break;
+	case 0x01dd10de: /* Nvidia GeForce 7500 LE */
+		si->ps.card_type = G72;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia GeForce 7500 LE");
 		sprintf(si->adi.chipset, "G72");
 		status = nvxx_general_powerup();
 		break;
@@ -725,6 +756,13 @@ status_t nv_general_powerup()
 		si->ps.card_arch = NV40A;
 		sprintf(si->adi.name, "Nvidia GeForce FX 6800");
 		sprintf(si->adi.chipset, "NV48");
+		status = nvxx_general_powerup();
+		break;
+	case 0x021810de: /* Nvidia GeForce 6800 XT */
+		si->ps.card_type = NV40;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia GeForce 6800 XT");
+		sprintf(si->adi.chipset, "NV40");
 		status = nvxx_general_powerup();
 		break;
 	case 0x022010de: /* Nvidia unknown FX */
@@ -768,6 +806,13 @@ status_t nv_general_powerup()
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
 		sprintf(si->adi.name, "Nvidia GeForce 6100");
+		sprintf(si->adi.chipset, "NV44");
+		status = nvxx_general_powerup();
+		break;
+	case 0x024510de: /* Nvidia Quadro NVS 210S / NVIDIA GeForce 6150LE (NFORCE4 Integr.GPU) */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia GeForce 6150");
 		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
@@ -831,10 +876,42 @@ status_t nv_general_powerup()
 		break;
 	case 0x029010de: /* Nvidia GeForce 7900 GTX */
 	case 0x029110de: /* Nvidia GeForce 7900 GT */
+	case 0x029310de: /* Nvidia GeForce 7900 GX2 */
 		si->ps.card_type = G71;
 		si->ps.card_arch = NV40A;
-		sprintf(si->adi.name, "Nvidia GeForce 7900 GT(X)");
+		sprintf(si->adi.name, "Nvidia GeForce 7900");
 		sprintf(si->adi.chipset, "G71");
+		status = nvxx_general_powerup();
+		break;
+	case 0x029410de: /* Nvidia GeForce 7950 GX2 */
+	case 0x029510de: /* Nvidia GeForce 7950 GT */
+		si->ps.card_type = G71;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia GeForce 7950");
+		sprintf(si->adi.chipset, "G71");
+		status = nvxx_general_powerup();
+		break;
+	case 0x029810de: /* Nvidia GeForce Go 7900 GS */
+	case 0x029910de: /* Nvidia GeForce Go 7900 GTX */
+		si->ps.card_type = G71;
+		si->ps.card_arch = NV40A;
+		si->ps.laptop = true;
+		sprintf(si->adi.name, "Nvidia GeForce Go 7900");
+		sprintf(si->adi.chipset, "G71");
+		status = nvxx_general_powerup();
+		break;
+	case 0x029c10de: /* Nvidia Quadro FX 5500 */
+		si->ps.card_type = G71;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia Quadro FX 5500");
+		sprintf(si->adi.chipset, "G71");
+		status = nvxx_general_powerup();
+		break;
+	case 0x029f10de: /* Nvidia Quadro FX 4500 X2 */
+		si->ps.card_type = G70;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia Quadro FX 4500 X2");
+		sprintf(si->adi.chipset, "G70");
 		status = nvxx_general_powerup();
 		break;
 	case 0x02a010de: /* Nvidia GeForce3 Integrated GPU */
@@ -1140,6 +1217,13 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "G73");
 		status = nvxx_general_powerup();
 		break;
+	case 0x039410de: /* Nvidia GeForce 7600 LE */
+		si->ps.card_type = G70;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia GeForce 7600 LE");
+		sprintf(si->adi.chipset, "G70");
+		status = nvxx_general_powerup();
+		break;
 	case 0x039810de: /* Nvidia GeForce 7600 GO */
 		si->ps.card_type = G73;
 		si->ps.card_arch = NV40A;
@@ -1148,11 +1232,50 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "G73");
 		status = nvxx_general_powerup();
 		break;
+	case 0x03d010de: /* Nvidia GeForce 6100 nForce 430 */
 	case 0x03d110de: /* Nvidia GeForce 6100 nForce 405 */
+	case 0x03d210de: /* Nvidia GeForce 6100 nForce 400 */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
-		sprintf(si->adi.name, "Nvidia GeForce 6100");
+		sprintf(si->adi.name, "Nvidia GeForce 6100 nForce");
 		sprintf(si->adi.chipset, "NV44");
+		status = nvxx_general_powerup();
+		break;
+	case 0x040010de: /* Nvidia GeForce 8600 GTS */
+	case 0x040210de: /* Nvidia GeForce 8600 GT */
+		si->ps.card_type = G84;
+		si->ps.card_arch = NV50A;
+		sprintf(si->adi.name, "Nvidia GeForce 8600");
+		sprintf(si->adi.chipset, "G84");
+		status = nvxx_general_powerup();
+		break;
+	case 0x040710de: /* Nvidia GeForce 8600M GT */
+		si->ps.card_type = G86;
+		si->ps.card_arch = NV50A;
+		si->ps.laptop = true;
+		sprintf(si->adi.name, "Nvidia GeForce 8600M GT");
+		sprintf(si->adi.chipset, "G86");
+		status = nvxx_general_powerup();
+		break;
+	case 0x042110de: /* Nvidia GeForce 8500 GT */
+		si->ps.card_type = G86;
+		si->ps.card_arch = NV50A;
+		sprintf(si->adi.name, "Nvidia GeForce 8500 GT");
+		sprintf(si->adi.chipset, "G86");
+		status = nvxx_general_powerup();
+		break;
+	case 0x042210de: /* Nvidia GeForce 8400 GS */
+		si->ps.card_type = G86;
+		si->ps.card_arch = NV50A;
+		sprintf(si->adi.name, "Nvidia GeForce 8400 GS");
+		sprintf(si->adi.chipset, "G86");
+		status = nvxx_general_powerup();
+		break;
+	case 0x042310de: /* Nvidia GeForce 8300 GS */
+		si->ps.card_type = G86;
+		si->ps.card_arch = NV50A;
+		sprintf(si->adi.name, "Nvidia GeForce 8300 GS");
+		sprintf(si->adi.chipset, "G86");
 		status = nvxx_general_powerup();
 		break;
 	/* Vendor Elsa GmbH */
