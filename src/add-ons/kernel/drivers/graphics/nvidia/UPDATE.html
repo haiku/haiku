@@ -4,10 +4,15 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (SVN 0.82, Rudolf)</h1></p>
+<p><h1>head (SVN 0.83, Rudolf)</h1></p>
 <ul>
 <li>Fixed driver assuming enabling AGP mode succeeded on some occasions if it did not block it itself. Blocking AGP mode completely via the AGP busmanager (option 'block_agp') resulted in a crashing acceleration engine because it was setup for AGP transfers instead of using PCI transfers. Error was solved with help from user kraton.
 <li>Fixed shared_info struct problem occuring when 3D 'accelerant' is used (tested Alpha 4.1): the TVencoder type definition list apparantly gets some memory assigned these days when done inside the definition of shared_info. Moved encoder list outside the shared_info definition.
+<li>Updated naming for some previous unknown cards, added 25 new cards for support/recognition in the kernel driver and accelerant, being GF 6xxx, 7xxx and 8xxx types. Also two more nforce 6100 4x0 cards are recognized now. All cards listed in nvidia's official april 2007 ID list are now recognized.<br>
+<strong>Note please:</strong><br>
+<ul>
+<li>GF8xxx support is experimental, and without acceleration. Reports are welcome..
+</ul>
 </ul>
 <p><h1>nv_driver 0.80 (Rudolf)</h1></p>
 <ul>
