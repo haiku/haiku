@@ -119,7 +119,7 @@ class PathHandler : public BHandler {
 
 
 static WatcherMap sWatchers;
-static BLocker* sLocker;
+static BLocker* sLocker = NULL;
 
 
 static status_t
