@@ -48,6 +48,9 @@ All rights reserved.
 #include <Debug.h>
 #include <E-mail.h>
 #include <InterfaceKit.h>
+#ifdef __HAIKU__
+#  include <PathMonitor.h>
+#endif
 #include <Roster.h>
 #include <Screen.h>
 #include <StorageKit.h>
@@ -117,6 +120,16 @@ static const char *kSpamMenuItemTextArray[] = {
 	"Unmark this Message",					// M_UNTRAIN
 	"Mark as Genuine"						// M_TRAIN_GENUINE
 };
+
+static const char *kQueriesDirectory = "mail/queries";
+static const char *kAttrQueryInitialMode = "_trk/qryinitmode"; // taken from src/kits/tracker/Attributes.h
+static const char *kAttrQueryInitialString = "_trk/qryinitstr";
+static const char *kAttrQueryInitialNumAttrs = "_trk/qryinitnumattrs";
+static const char *kAttrQueryInitialAttrs = "_trk/qryinitattrs";
+static const uint32 kAttributeItemMain = 'Fatr'; // taken from src/kits/tracker/FindPanel.h
+static const uint32 kByNameItem = 'Fbyn'; // taken from src/kits/tracker/FindPanel.h
+static const uint32 kByAttributeItem = 'Fbya'; // taken from src/kits/tracker/FindPanel.h
+static const uint32 kByForumlaItem = 'Fbyq'; // taken from src/kits/tracker/FindPanel.h
 
 
 // static list for tracking of Windows
@@ -270,9 +283,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 			INDEX_STATUS, M_STATUS, false, false), new BMessage(M_CLOSE_CUSTOM)));
 #endif
 		menu->AddItem(subMenu);
-	}
-	else
-	{
+	} else {
 		menu->AddSeparatorItem();
 		menu->AddItem(new BMenuItem(
 			MDR_DIALECT_CHOICE ("Close", "W) 閉じる"),
@@ -343,9 +354,11 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		new BMessage(M_PREFS),','));
 	item->SetTarget(be_app);
 	menu_bar->AddItem(menu);
-	
+
+	//	
 	// View Menu
-	
+	//
+
 	if (!resending && fIncoming) {
 		menu = new BMenu("View");
 		menu->AddItem(fHeader = new BMenuItem(MDR_DIALECT_CHOICE ("Show Header","H) ヘッダーを表示"),	new BMessage(M_HEADER), 'H'));
@@ -461,6 +474,17 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		menu_bar->AddItem(menu);
 	}
 	
+	//
+	// Queries Menu
+	//
+	fQueryMenu = new BMenu(MDR_DIALECT_CHOICE("Queries","???"));
+	menu_bar->AddItem(fQueryMenu);
+
+	_RebuildQueryMenu(true);
+
+	//
+	// Menu Bar
+	//
 	AddChild(menu_bar);
 	height = menu_bar->Bounds().bottom + 1;
 
@@ -1486,6 +1510,51 @@ TMailWindow::MessageReceived(BMessage *msg)
 				fContentView->fTextView->EnableSpellCheck(fSpelling->IsMarked());
 			}
 			break;
+			
+		case M_EDIT_QUERIES:
+		{
+			BPath path;
+			if (_GetQueryPath(&path) < B_OK)
+				break;
+
+			// the user used this command, make sure the folder actually
+			// exists - if it didn't inform the user what to do with it
+			BEntry entry(path.Path());
+			bool showAlert = false;
+			if (!entry.Exists()) {
+				showAlert = true;
+				create_directory(path.Path(), 0777);
+			}
+
+			BEntry folderEntry;
+			if (folderEntry.SetTo(path.Path()) == B_OK
+				&& folderEntry.Exists()) {
+				BMessage openFolderCommand(B_REFS_RECEIVED);
+				BMessenger tracker("application/x-vnd.Be-TRAK");
+
+				entry_ref ref;
+				folderEntry.GetRef(&ref);
+				openFolderCommand.AddRef("refs", &ref);
+				tracker.SendMessage(&openFolderCommand);
+			}
+
+			if (showAlert) {
+				// just some patience before Tracker pops up the folder
+				snooze(250000);
+				BAlert* alert = new BAlert("helpful message",
+					"Place your favorite e-mail queries into your "
+					"this folder. These may also be templates.",
+					"Ok", NULL, NULL, B_WIDTH_AS_USUAL, B_IDEA_ALERT);
+				alert->Go(NULL);
+			}
+
+			break;
+		}
+#ifdef __HAIKU__
+		case B_PATH_MONITOR:
+			_RebuildQueryMenu();
+			break;
+#endif
 
 		default:
 			BWindow::MessageReceived(msg);
@@ -1610,6 +1679,10 @@ TMailWindow::QuitRequested()
 		//	...Otherwise just set the message read
 		SetCurrentMessageRead();
 	}
+
+#ifdef __HAIKU__
+	BPrivate::BPathMonitor::StopWatching(BMessenger(this, this));
+#endif
 
 	return true;
 }
@@ -2782,6 +2855,39 @@ TMailWindow::FrontmostWindow()
 }
 
 
+/*
+// Copied from src/kits/tracker/FindPanel.cpp.
+uint32 
+TMailWindow::InitialMode(const BNode *node)
+{
+	if (!node || node->InitCheck() != B_OK)
+		return kByNameItem;
+	
+	uint32 result;
+	if (node->ReadAttr(kAttrQueryInitialMode, B_INT32_TYPE, 0,
+		(int32 *)&result, sizeof(int32)) <= 0)
+		return kByNameItem;
+
+	return result;
+}
+
+
+// Copied from src/kits/tracker/FindPanel.cpp.
+int32 
+TMailWindow::InitialAttrCount(const BNode *node)
+{
+	if (!node || node->InitCheck() != B_OK)
+		return 1;
+	
+	int32 result;
+	if (node->ReadAttr(kAttrQueryInitialNumAttrs, B_INT32_TYPE, 0,
+		&result, sizeof(int32)) <= 0)
+		return 1;
+	
+	return result;
+}*/
+
+
 // #pragma mark -
 
 
@@ -2807,3 +2913,175 @@ TMailWindow::_UpdateSizeLimits()
 
 	SetSizeLimits(minWidth, RIGHT_BOUNDARY, minHeight, RIGHT_BOUNDARY);
 }
+
+
+status_t
+TMailWindow::_GetQueryPath(BPath* queryPath) const
+{
+	// get the user home directory and from there the query folder
+	status_t ret = find_directory(B_USER_DIRECTORY, queryPath);
+	if (ret == B_OK)
+		ret = queryPath->Append(kQueriesDirectory);
+
+	return ret;
+}
+
+
+void
+TMailWindow::_RebuildQueryMenu(bool firstTime)
+{
+	while (BMenuItem* item = fQueryMenu->ItemAt(0L))
+		delete item;
+
+	fQueryMenu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE("Edit Queries...","???..."),
+		new BMessage(M_EDIT_QUERIES), 'E', B_SHIFT_KEY));
+
+	bool queryItemsAdded = false;
+
+	BPath queryPath;
+	if (_GetQueryPath(&queryPath) < B_OK)
+		return;
+	
+	BDirectory queryDir(queryPath.Path());
+
+	if (firstTime) {
+#ifdef __HAIKU__
+		BPrivate::BPathMonitor::StartWatching(queryPath.Path(),
+			B_WATCH_RECURSIVELY, BMessenger(this, this));
+#endif
+	}
+
+	//	If we find the named query, add it to the menu.
+	BEntry entry;
+	while (queryDir.GetNextEntry(&entry) == B_OK) {
+
+		char name[B_FILE_NAME_LENGTH + 1];
+		entry.GetName(name);
+		
+		char* queryString = _BuildQueryString(&entry);
+		if (queryString == NULL)
+			continue;
+		
+		queryItemsAdded = true;
+
+		QueryMenu* queryMenu = new QueryMenu(name, false);
+		queryMenu->SetTargetForItems(be_app);
+		queryMenu->SetPredicate(queryString);
+		fQueryMenu->AddItem(queryMenu);
+
+		free(queryString);
+	}
+
+	if (queryItemsAdded)
+		fQueryMenu->AddItem(new BSeparatorItem(), 1);
+}
+
+
+char*
+TMailWindow::_BuildQueryString(BEntry* entry) const
+{
+	BNode node(entry);
+	if (node.InitCheck() != B_OK)
+		return NULL;
+
+	uint32 mode;
+	if (node.ReadAttr(kAttrQueryInitialMode, B_INT32_TYPE, 0, (int32*)&mode,
+		sizeof(int32)) <= 0) {
+		mode = kByNameItem;
+	}
+	
+	BString queryString;
+	switch(mode) {
+		case kByForumlaItem:
+		{
+			BString buffer;
+			if (node.ReadAttrString(kAttrQueryInitialString, &buffer) == B_OK)
+				queryString << buffer;
+			break;
+		}
+			
+		case kByNameItem:
+		{
+			BString buffer;
+			if (node.ReadAttrString(kAttrQueryInitialString, &buffer) == B_OK)
+				queryString << "(name==*" << buffer << "*)";
+			break;
+		}
+		
+		case kByAttributeItem:
+		{
+			int32 count = 1;
+			if (node.ReadAttr(kAttrQueryInitialNumAttrs, B_INT32_TYPE, 0,
+				(int32 *)&mode, sizeof(int32)) <= 0) {
+				count = 1;
+			}
+				
+			attr_info info; 
+			if (node.GetAttrInfo(kAttrQueryInitialAttrs, &info) != B_OK)
+				break;
+		
+			if (count > 1 )
+				queryString << "(";
+
+			char *buffer = new char[info.size];
+			if (node.ReadAttr(kAttrQueryInitialAttrs, B_MESSAGE_TYPE, 0,
+				buffer, (size_t)info.size) == info.size) {
+				BMessage message;
+				if (message.Unflatten(buffer) == B_OK) {
+					for (int32 index = 0; /*index < count*/; index++) {
+
+						const char *field;
+						const char *value;
+						if (message.FindString("menuSelection",
+							index, &field) != B_OK
+							|| message.FindString("attrViewText",
+							index, &value) != B_OK) {
+							break;
+						}
+							
+						// ignore the mime type, we'll force it to be email
+						// later
+						if (strcmp(field, "BEOS:TYPE") != 0) {
+							// TODO: check if subMenu contains the type of
+							// comparison we are suppose to make here
+							queryString << "(" << field << "==\""
+								<< value << "\")";
+
+							int32 logicMenuSelectedIndex;
+							if (message.FindInt32("logicalRelation", index,
+								&logicMenuSelectedIndex) == B_OK) {
+								if (logicMenuSelectedIndex == 0)
+									queryString << "&&";
+								else if (logicMenuSelectedIndex == 1)
+									queryString << "||";
+							} else
+								break;
+						}
+					}
+				}
+			}
+			
+			if (count > 1 )
+				queryString << ")";
+
+			delete [] buffer;
+			break;
+		}
+			
+		default:
+			break;
+	}
+	
+	if (queryString.Length() == 0)
+		return NULL;
+		
+	// force it to check for email only		
+	if (queryString.FindFirst("text/x-email") < 0 ) {
+		BString temp;
+		temp << "(" << queryString << "&&(BEOS:TYPE==\"text/x-email\"))";
+		queryString = temp;
+	}
+	
+	return strdup(queryString.String());
+}
+

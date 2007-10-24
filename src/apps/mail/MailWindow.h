@@ -121,6 +121,10 @@ class TMailWindow : public BWindow {
 	private:
 				void			_UpdateSizeLimits();
 
+				status_t		_GetQueryPath(BPath* path) const;
+				void			_RebuildQueryMenu(bool firstTime = false);
+				char*			_BuildQueryString(BEntry* entry) const;
+ 
 				TMailApp*		fApp;
 
 				BEmailMessage*	fMail;
@@ -149,6 +153,8 @@ class TMailWindow : public BWindow {
 				BMenuItem*		fDeleteNext;
 				BMenuItem*		fSpelling;
 				BMenu*			fSaveAddrMenu;
+
+				BMenu*			fQueryMenu;
 		
 				ButtonBar*		fButtonBar;
 				BmapButton*		fSendButton;
@@ -161,6 +167,7 @@ class TMailWindow : public BWindow {
 				THeaderView*	fHeaderView;
 				TEnclosuresView* fEnclosuresView;
 				TMenu*			fSignature;
+
 				BMessenger		fTrackerMessenger;
 					// Talks to tracker window that this was launched from.
 				BMessenger		fMessengerToSpamServer;

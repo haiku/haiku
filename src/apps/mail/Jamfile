@@ -10,6 +10,7 @@ if $(TARGET_PLATFORM) != haiku {
 UsePrivateHeaders mail ;
 UsePrivateHeaders textencoding ;
 UsePrivateHeaders shared ;
+UsePrivateHeaders storage ;
 
 AddResources Mail : Mail.rdef pictures.rdef  ;
 Application Mail : 

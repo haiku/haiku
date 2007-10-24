@@ -54,7 +54,7 @@ enum TEXT {
 };
 
 enum MENUS {
-	/* app */
+	// app
 	M_NEW = SUBJECT_FIELD + 64,
 	M_PREFS,
 	M_EDIT_SIGNATURE,
@@ -63,7 +63,8 @@ enum MENUS {
 	M_SIZE,
 	M_BEGINNER,
 	M_EXPERT,
-	/* file */
+
+	// file
 	M_REPLY,
 	M_REPLY_TO_SENDER,
 	M_REPLY_ALL,
@@ -88,7 +89,8 @@ enum MENUS {
 	M_STATUS,
 	M_OPEN_MAIL_BOX,
 	M_OPEN_MAIL_FOLDER,
-	/* edit */
+
+	// edit
 	M_SELECT,
 	M_QUOTE,
 	M_REMOVE_QUOTE,
@@ -98,16 +100,23 @@ enum MENUS {
 	M_SIG_MENU,
 	M_FIND,
 	M_FIND_AGAIN,
-	/* encls */
+
+	// queries
+	M_EDIT_QUERIES,
+	M_EXECUTE_QUERY,
+
+	// encls
 	M_ADD,
 	M_REMOVE,
 	M_OPEN,
 	M_COPY,
-	/* nav */
+
+	// nav
 	M_NEXTMSG,
 	M_PREVMSG,
 	M_SAVE_POSITION,
-	/* Spam GUI button and menu items.  Order is important. */
+
+	// Spam GUI button and menu items.  Order is important.
 	M_SPAM_BUTTON,
 	M_TRAIN_SPAM_AND_DELETE,
 	M_TRAIN_SPAM,
