@@ -4,6 +4,7 @@ UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
 MergeObject posix_signal.o :
 	kill.c
+	killpg.cpp
 	raise.c
 	send_signal.c
 	set_signal_stack.c

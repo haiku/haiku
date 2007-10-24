@@ -150,6 +150,7 @@ sighandler_t signal(int sig, sighandler_t signalHandler);
 int     raise(int sig);
 int     kill(pid_t pid, int sig);
 int     send_signal(pid_t tid, unsigned int sig);
+int		killpg(pid_t processGroupID, int sig);
 
 int     sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
 int     sigprocmask(int how, const sigset_t *set, sigset_t *oset);
