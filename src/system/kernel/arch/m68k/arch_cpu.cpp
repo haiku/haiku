@@ -85,15 +85,13 @@ arch_cpu_sync_icache(void *address, size_t len)
 void 
 arch_cpu_invalidate_TLB_range(addr_t start, addr_t end)
 {
-	asm volatile("sync");
+	m68k_nop();
 	while (start < end) {
-		asm volatile("tlbie %0" :: "r" (start));
-		asm volatile("eieio");
-		asm volatile("sync");
+		pflush(start);
+		m68k_nop();
 		start += B_PAGE_SIZE;
 	}
-	asm volatile("tlbsync");
-	asm volatile("sync");
+	m68k_nop();
 }
 
 
@@ -102,39 +100,22 @@ arch_cpu_invalidate_TLB_list(addr_t pages[], int num_pages)
 {
 	int i;
 
-	asm volatile("sync");
+	m68k_nop();
 	for (i = 0; i < num_pages; i++) {
 		asm volatile("tlbie %0" :: "r" (pages[i]));
-		asm volatile("eieio");
-		asm volatile("sync");
+		pflush(pages[i]);
+		m68k_nop();
 	}
-	asm volatile("tlbsync");
-	asm volatile("sync");
+	m68k_nop();
 }
 
 
 void 
 arch_cpu_global_TLB_invalidate(void)
 {
-	if (sHasTlbia) {
-		m68k_sync();
-		tlbia();
-		m68k_sync();
-	} else {
-		addr_t address = 0;
-		unsigned long i;
-
-		m68k_sync();
-		for (i = 0; i < 0x100000; i++) {
-			tlbie(address);
-			eieio();
-			m68k_sync();
-	
-			address += B_PAGE_SIZE;
-		}
-		tlbsync();
-		m68k_sync();
-	}
+	m68k_nop();
+	pflush();
+	m68k_nop();
 }
 
 

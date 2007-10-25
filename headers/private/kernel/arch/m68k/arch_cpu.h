@@ -142,7 +142,7 @@ enum machine_state {
 	MSR_DATA_ADDRESS_TRANSLATION	= 1L << 4,		// DR
 };
 
-struct block_address_translation;
+//struct block_address_translation;
 
 typedef struct arch_cpu_info {
 	int null;
@@ -153,6 +153,8 @@ typedef struct arch_cpu_info {
 extern "C" {
 #endif
 
+#if 0
+//PPC stuff
 extern uint32 get_sdr1(void);
 extern void set_sdr1(uint32 value);
 extern uint32 get_sr(void *virtualAddress);
@@ -181,6 +183,7 @@ extern void get_dbat3(struct block_address_translation *bat);
 
 extern void reset_ibats(void);
 extern void reset_dbats(void);
+#endif
 
 //extern void sethid0(unsigned int val);
 //extern unsigned int getl2cr(void);
@@ -201,6 +204,12 @@ extern bool m68k_set_fault_handler(addr_t *handlerLocation, addr_t handler)
 }
 #endif
 
+#define m68k_nop() asm volatile("nop") /* flushes insn pipeline */
+#define pflush(addr) asm volatile("pflush (%0)" :: "a" (addr))
+#define pflusha() asm volatile("pflusha")
+//#define
+
+#if 0
 #define eieio()	asm volatile("eieio")
 #define isync() asm volatile("isync")
 #define tlbsync() asm volatile("tlbsync")
@@ -243,11 +252,17 @@ enum m68k_processor_version {
 	MPC7410		= 0x800c,
 	MPC8245		= 0x8081,
 };
+#endif
 
 
 /*
 	Use of (some) special purpose registers.
 
+	SRP[63-32]: current struct thread*
+	SRP[31-0] :
+	CAAR      : can we use it ??
+
+	PPC:
 	SPRG0: per CPU physical address pointer to an ppc_cpu_exception_context
 	       structure
 	SPRG1: scratch
