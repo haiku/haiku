@@ -24,7 +24,7 @@ struct debug_cpu_state {
 	uint32	a7;
 	uint32	pc;
 	uint16	sr;
-#warning XXX: missing members!
+#warning M68K: missing members!
 	uint32	dummy;
 } __attribute__((aligned(8)));
 
