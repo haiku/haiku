@@ -53,6 +53,26 @@ net_route_private::~net_route_private()
 //	#pragma mark -
 
 
+#if 0
+static void
+dump_routes(net_domain_private *domain)
+{
+	RouteList::Iterator iterator = domain->routes.GetIterator();
+	uint32 count = 1;
+
+	while (iterator.HasNext()) {
+		net_route_private *route = iterator.Next();
+
+		dprintf("  [%lu] dest %s, mask %s, gw %s, flags %lx\n", count++,
+			AddressString(domain, route->destination ? route->destination : NULL).Data(),
+			AddressString(domain, route->mask ? route->mask : NULL).Data(),
+			AddressString(domain, route->gateway ? route->gateway : NULL).Data(),
+			route->flags);
+	}
+}
+#endif
+
+
 static status_t
 user_copy_address(const sockaddr *from, sockaddr **to)
 {
@@ -115,11 +135,11 @@ find_route(struct net_domain *_domain, const net_route *description)
 
 		if ((route->flags & (RTF_GATEWAY | RTF_HOST | RTF_LOCAL)) ==
 				(description->flags & (RTF_GATEWAY | RTF_HOST | RTF_LOCAL))
-			&& domain->address_module->equal_masked_addresses(route->destination, 
+			&& domain->address_module->equal_masked_addresses(route->destination,
 				description->destination, description->mask)
-			&& domain->address_module->equal_addresses(route->mask, 
+			&& domain->address_module->equal_addresses(route->mask,
 				description->mask)
-			&& domain->address_module->equal_addresses(route->gateway, 
+			&& domain->address_module->equal_addresses(route->gateway,
 				description->gateway))
 			return route;
 	}
@@ -146,17 +166,17 @@ find_route(struct net_domain *_domain, const struct sockaddr *address)
 		net_route_private *route = iterator.Next();
 
 		bool found;
- 		if (route->mask != NULL) {
+		if (route->mask != NULL) {
 			sockaddr maskedAddress;
-			domain->address_module->mask_address(address, route->mask, 
+			domain->address_module->mask_address(address, route->mask,
 				&maskedAddress);
-			found = domain->address_module->equal_addresses(&maskedAddress, 
+			found = domain->address_module->equal_addresses(&maskedAddress,
 				route->destination);
 		} else {
-			found = domain->address_module->equal_addresses(address, 
+			found = domain->address_module->equal_addresses(address,
 				route->destination);
- 		}
- 
+		}
+
 		if (found) {
 			TRACE(("  found route: %s, flags %lx\n",
 				AddressString(domain, route->destination).Data(), route->flags));
@@ -182,8 +202,9 @@ put_route_internal(struct net_domain_private *domain, net_route *_route)
 }
 
 
-struct net_route *
-get_route_internal(struct net_domain_private *domain, const struct sockaddr *address)
+static struct net_route *
+get_route_internal(struct net_domain_private *domain,
+	const struct sockaddr *address)
 {
 	net_route_private *route = find_route(domain, address);
 	if (route != NULL && atomic_add(&route->ref_count, 1) == 0) {
@@ -195,14 +216,14 @@ get_route_internal(struct net_domain_private *domain, const struct sockaddr *add
 }
 
 
-void
+static void
 update_route_infos(struct net_domain_private *domain)
 {
 	RouteInfoList::Iterator iterator = domain->route_infos.GetIterator();
 
 	while (iterator.HasNext()) {
 		net_route_info *info = iterator.Next();
-		
+
 		put_route_internal(domain, info->route);
 		info->route = get_route_internal(domain, &info->address);
 	}
@@ -371,12 +392,12 @@ add_route(struct net_domain *_domain, const struct net_route *newRoute)
 	if (route == NULL)
 		return B_NO_MEMORY;
 
-	if (domain->address_module->copy_address(newRoute->destination, 
-		&route->destination, (newRoute->flags & RTF_DEFAULT) != 0, 
-		newRoute->mask) != B_OK
+	if (domain->address_module->copy_address(newRoute->destination,
+			&route->destination, (newRoute->flags & RTF_DEFAULT) != 0,
+			newRoute->mask) != B_OK
 		|| domain->address_module->copy_address(newRoute->mask, &route->mask,
-				(newRoute->flags & RTF_DEFAULT) != 0, NULL) != B_OK
-		|| domain->address_module->copy_address(newRoute->gateway, 
+			(newRoute->flags & RTF_DEFAULT) != 0, NULL) != B_OK
+		|| domain->address_module->copy_address(newRoute->gateway,
 			&route->gateway, false, NULL) != B_OK) {
 		delete route;
 		return B_NO_MEMORY;
@@ -396,10 +417,10 @@ add_route(struct net_domain *_domain, const struct net_route *newRoute)
 	net_route_private *before = NULL;
 
 	while ((before = iterator.Next()) != NULL) {
-		// if the before mask is less specific than the one of the route, 
+		// if the before mask is less specific than the one of the route,
 		// we can insert it before that route.
-		if (domain->address_module->first_mask_bit(before->mask) 
-			> domain->address_module->first_mask_bit(route->mask))
+		if (domain->address_module->first_mask_bit(before->mask)
+				> domain->address_module->first_mask_bit(route->mask))
 			break;
 	}
 
@@ -431,6 +452,7 @@ remove_route(struct net_domain *_domain, const struct net_route *removeRoute)
 
 	put_route_internal(domain, route);
 	update_route_infos(domain);
+
 	return B_OK;
 }
 
