@@ -1,101 +1,96 @@
-/*******************************************************************************
-/
-/	File:			Screen.h
-/
-/   Description:    BScreen provides information about a screen's current
-/                   display settings.  It also lets you set the Desktop color.
-/
-/	Copyright 1993-98, Be Incorporated, All Rights Reserved
-/
-*******************************************************************************/
-
+/*
+ * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _SCREEN_H
 #define _SCREEN_H
 
-#include <BeBuild.h>
+
 #include <Accelerant.h>
 #include <GraphicsDefs.h>
 #include <Rect.h>
 #include <OS.h>
 
-/*----------------------------------------------------------------*/
-/*----- BScreen structures and declarations ----------------------*/
 
+class BBitmap;
 class BWindow;
-class BPrivateScreen;
 
-/*----------------------------------------------------------------*/
-/*----- BScreen class --------------------------------------------*/
+namespace BPrivate {
+	class BPrivateScreen;
+}
 
 class BScreen {
-public:  
-        BScreen( screen_id id=B_MAIN_SCREEN_ID );
-        BScreen( BWindow *win );
-        ~BScreen();
+	public:  
+		BScreen(screen_id id = B_MAIN_SCREEN_ID);
+		BScreen(BWindow* window);
+		~BScreen();
 
-        bool   			IsValid();
-        status_t		SetToNext();
-  
-        color_space		ColorSpace();
-        BRect			Frame();
-        screen_id		ID();
+		bool		IsValid();
+		status_t	SetToNext();
 
-        status_t		WaitForRetrace();
-        status_t		WaitForRetrace(bigtime_t timeout);
-  
-        uint8			IndexForColor( rgb_color rgb );
-        uint8			IndexForColor( uint8 r, uint8 g, uint8 b, uint8 a=255 );
-        rgb_color		ColorForIndex( const uint8 index );
-        uint8			InvertIndex( uint8 index );
+		color_space	ColorSpace();
+		BRect		Frame();
+		screen_id	ID();
 
-const   color_map*		ColorMap();
+		status_t	WaitForRetrace();
+		status_t	WaitForRetrace(bigtime_t timeout);
 
-		status_t		GetBitmap(	BBitmap		**screen_shot,
-									bool		draw_cursor = true,
-									BRect		*bound = NULL); 
-		status_t		ReadBitmap(	BBitmap		*buffer,
-									bool		draw_cursor = true,
-									BRect		*bound = NULL); 
-        
-        rgb_color		DesktopColor();
-        rgb_color		DesktopColor(uint32 index);
-        void			SetDesktopColor( rgb_color rgb, bool stick=true );
-        void			SetDesktopColor( rgb_color rgb, uint32 index, bool stick=true );
+		uint8		IndexForColor(rgb_color color);
+		uint8		IndexForColor(uint8 red, uint8 green, uint8 blue,
+						uint8 alpha = 255);
+		rgb_color	ColorForIndex(uint8 index);
+		uint8		InvertIndex(uint8 index);
 
-		status_t		ProposeMode(display_mode *target, const display_mode *low, const display_mode *high);
-		status_t		GetModeList(display_mode **mode_list, uint32 *count);
-		status_t		GetMode(display_mode *mode);
-		status_t		GetMode(uint32 workspace, display_mode *mode);
-		status_t		SetMode(display_mode *mode, bool makeDefault = false);
-		status_t		SetMode(uint32 workspace, display_mode *mode, bool makeDefault = false);
-		status_t		GetDeviceInfo(accelerant_device_info *adi);
-		status_t		GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high);
-		status_t		GetTimingConstraints(display_timing_constraints *dtc);
-		status_t		SetDPMS(uint32 dpms_state);
-		uint32			DPMSState(void);
-		uint32			DPMSCapabilites(void);
+		const color_map* ColorMap();
 
-        BPrivateScreen*	private_screen();
+		status_t	GetBitmap(BBitmap** _bitmap, bool drawCursor = true,
+						BRect* frame = NULL);
+		status_t	ReadBitmap(BBitmap* bitmap, bool drawCursor = true,
+						BRect* frame = NULL);
 
-/*----- Private or reserved -----------------------------------------*/
-private:
-		status_t		ProposeDisplayMode(display_mode *target, const display_mode *low, const display_mode *high);
-		BScreen			&operator=(const BScreen &screen);
-						BScreen(const BScreen &screen);
-        void*			BaseAddress();
-        uint32			BytesPerRow();
+		rgb_color	DesktopColor();
+		rgb_color	DesktopColor(uint32 index);
+		void		SetDesktopColor(rgb_color color, bool makeDefault = true);
+		void		SetDesktopColor(rgb_color color, uint32 index,
+						bool makeDefault = true);
 
-        BPrivateScreen 	*screen;
+		status_t	ProposeMode(display_mode* target, const display_mode* low,
+						const display_mode* high);
+		status_t	GetModeList(display_mode** _modeList, uint32* _count);
+		status_t	GetMode(display_mode* mode);
+		status_t	GetMode(uint32 workspace, display_mode* mode);
+		status_t	SetMode(display_mode* mode, bool makeDefault = false);
+		status_t	SetMode(uint32 workspace, display_mode* mode,
+						bool makeDefault = false);
+		status_t	GetDeviceInfo(accelerant_device_info* info);
+		status_t	GetMonitorInfo(monitor_info* info);
+		status_t	GetPixelClockLimits(display_mode* mode, uint32* low,
+						uint32* high);
+		status_t	GetTimingConstraints(
+						display_timing_constraints* timingConstraints);
+		status_t	SetDPMS(uint32 state);
+		uint32		DPMSState();
+		uint32		DPMSCapabilites();
+
+	private:
+		BScreen&	operator=(const BScreen& other);
+		BScreen(const BScreen& other);
+
+		// old and deprecated methods - should be faded out
+		BPrivate::BPrivateScreen* private_screen();
+		status_t	ProposeDisplayMode(display_mode* target,
+						const display_mode* low, const display_mode* high);
+		void*		BaseAddress();
+		uint32		BytesPerRow();
+
+		BPrivate::BPrivateScreen* fScreen;
 };
 
 
-/*----------------------------------------------------------------*/
-/*----- inline definitions ---------------------------------------*/
+inline uint8
+BScreen::IndexForColor(rgb_color color)
+{
+	return IndexForColor(color.red, color.green, color.blue, color.alpha);
+}
 
-inline uint8 BScreen::IndexForColor( rgb_color rgb )
-  { return IndexForColor(rgb.red,rgb.green,rgb.blue,rgb.alpha); }
-
-/*-------------------------------------------------------------*/
-/*-------------------------------------------------------------*/
-
-#endif /* _SCREEN_H */
+#endif	// _SCREEN_H
