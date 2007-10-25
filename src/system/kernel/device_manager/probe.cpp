@@ -983,7 +983,7 @@ get_nodes_for_device_type(device_node_info *node, struct list *list, const char 
 			matches = true;
 	}
 
-	if (matches) {
+	if (matches && list_get_first_item(&node->children) == NULL) {
 #ifdef TRACE_PROBE
 		dprintf("** NODE MATCHES TYPE %s\n", type);
 		dm_dump_node(node, 0);
