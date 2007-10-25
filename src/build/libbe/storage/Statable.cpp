@@ -24,6 +24,11 @@
 	- \c B_NOT_ALLOWED: Read only node or volume.
 */
 
+
+BStatable::~BStatable()
+{
+}
+
 /*!	\brief Returns if the current node is a file.
 	\return \c true, if the BNode is properly initialized and is a file,
 			\c false otherwise.
