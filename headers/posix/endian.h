@@ -14,7 +14,7 @@
 #	define LITTLE_ENDIAN	1234
 #	define BIG_ENDIAN		0
 #	define BYTE_ORDER		LITTLE_ENDIAN
-#elif defined(__POWERPC__)
+#elif defined(__POWERPC__) || defined(__M68K__)
 #	define BIG_ENDIAN		4321
 #	define LITTLE_ENDIAN	0
 #	define BYTE_ORDER		BIG_ENDIAN

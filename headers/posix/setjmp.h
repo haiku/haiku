@@ -12,6 +12,10 @@
 	#include <arch/x86/arch_setjmp.h>
 #elif __POWERPC__
 	#include <arch/ppc/arch_setjmp.h>
+#elif __M68K__
+	#include <arch/m68k/arch_setjmp.h>
+#else
+	#error #include <arch/<cpu>/arch_setjmp.h>
 #endif
 
 typedef struct __jmp_buf_tag {
