@@ -263,7 +263,7 @@ ide_timeout_dpc(void *arg)
 	qrequest = bus->active_qrequest;
 	device = qrequest->device;
 
-	dprintf("ide: ide_timeout_dpc() bus %p, decide %p\n", bus, device);
+	dprintf("ide: ide_timeout_dpc() bus %p, device %p\n", bus, device);
 
 	FAST_LOG1(bus->log, ev_ide_timeout_dpc, (uint32)qrequest);
 
