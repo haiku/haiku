@@ -86,7 +86,9 @@ FUNCTION(atomic_get):
 FUNCTION(atomic_add64):
 		move.l	%d2,-(%a7)
 		move.l	%d3,-(%a7)
+		move.l	%a2,-(%a7)
 		move.l	(4,%a7),%a1
+		lea.l	(4,%a1),%a2
 		// addValue
 		move.l	(12,%a7),%d2	/*LSB*/
 		move.l	(8,%a7),%d3		/*MSB*/
@@ -95,11 +97,12 @@ miss5:	// old value
 		move.l	(%a1),%d1		/*MSB*/
 		add.l	%d0,%d2
 		addx.l	%d1,%d3
-		cas2.l	%d0:%d1,%d2:%d3,(4,%a1):(%a1)
+		cas2.l	%d0:%d1,%d2:%d3,(%a2):(%a1)
 		bne		miss5
 		// return value
 		move.l	%d0,(4,%a0)
 		move.l	%d1,(%a0)
+		move.l	(%a7)+,%a2
 		move.l	(%a7)+,%d3
 		move.l	(%a7)+,%d2
 		rts
@@ -108,7 +111,9 @@ miss5:	// old value
 FUNCTION(atomic_and64):
 		move.l	%d2,-(%a7)
 		move.l	%d3,-(%a7)
+		move.l	%a2,-(%a7)
 		move.l	(4,%a7),%a1
+		lea.l	(4,%a1),%a2
 		// addValue
 		move.l	(12,%a7),%d2	/*LSB*/
 		move.l	(8,%a7),%d3		/*MSB*/
@@ -117,11 +122,12 @@ miss6:	// old value
 		move.l	(%a1),%d1		/*MSB*/
 		and.l	%d0,%d2
 		and.l	%d1,%d3
-		cas2.l	%d0:%d1,%d2:%d3,(4,%a1):(%a1)
+		cas2.l	%d0:%d1,%d2:%d3,(%a2):(%a1)
 		bne		miss6
 		// return value
 		move.l	%d0,(4,%a0)
 		move.l	%d1,(%a0)
+		move.l	(%a7)+,%a2
 		move.l	(%a7)+,%d3
 		move.l	(%a7)+,%d2
 		rts
@@ -130,7 +136,9 @@ miss6:	// old value
 FUNCTION(atomic_or64):
 		move.l	%d2,-(%a7)
 		move.l	%d3,-(%a7)
+		move.l	%a2,-(%a7)
 		move.l	(4,%a7),%a1
+		lea.l	(4,%a1),%a2
 		// addValue
 		move.l	(12,%a7),%d2	/*LSB*/
 		move.l	(8,%a7),%d3		/*MSB*/
@@ -139,11 +147,12 @@ miss7:	// old value
 		move.l	(%a1),%d1		/*MSB*/
 		or.l	%d0,%d2
 		or.l	%d1,%d3
-		cas2.l	%d0:%d1,%d2:%d3,(4,%a1):(%a1)
+		cas2.l	%d0:%d1,%d2:%d3,(%a2):(%a1)
 		bne		miss7
 		// return value
 		move.l	%d0,(4,%a0)
 		move.l	%d1,(%a0)
+		move.l	(%a7)+,%a2
 		move.l	(%a7)+,%d3
 		move.l	(%a7)+,%d2
 		rts
@@ -152,18 +161,21 @@ miss7:	// old value
 FUNCTION(atomic_set64):
 		move.l	%d2,-(%a7)
 		move.l	%d3,-(%a7)
+		move.l	%a2,-(%a7)
 		move.l	(4,%a7),%a1
+		lea.l	(4,%a1),%a2
 		// new value
 		move.l	(12,%a7),%d2	/*LSB*/
 		move.l	(8,%a7),%d3		/*MSB*/
 		// old value
 		move.l	(4,%a1),%d0		/*LSB*/
 		move.l	(%a1),%d1		/*MSB*/
-miss8:	cas2.l	%d0:%d1,%d2:%d3,(4,%a1):(%a1)
+miss8:	cas2.l	%d0:%d1,%d2:%d3,(%a2):(%a1)
 		bne		miss8
 		// return value
 		move.l	%d0,(4,%a0)
 		move.l	%d1,(%a0)
+		move.l	(%a7)+,%a2
 		move.l	(%a7)+,%d3
 		move.l	(%a7)+,%d2
 		rts
@@ -172,17 +184,20 @@ miss8:	cas2.l	%d0:%d1,%d2:%d3,(4,%a1):(%a1)
 FUNCTION(atomic_test_and_set64):
 		move.l	%d2,-(%a7)
 		move.l	%d3,-(%a7)
+		move.l	%a2,-(%a7)
 		move.l	(4,%a7),%a1
+		lea.l	(4,%a1),%a2
 		// new value
 		move.l	(12,%a7),%d2	/*LSB*/
 		move.l	(8,%a7),%d3		/*MSB*/
 		// test against value
 		move.l	(20,%a7),%d0	/*LSB*/
 		move.l	(16,%a7),%d1	/*MSB*/
-		cas2.l	%d0:%d1,%d2:%d3,(4,%a1):(%a1)
+		cas2.l	%d0:%d1,%d2:%d3,(%a2):(%a1)
 		// return value
 		move.l	%d0,(4,%a0)
 		move.l	%d1,(%a0)
+		move.l	(%a7)+,%a2
 		move.l	(%a7)+,%d3
 		move.l	(%a7)+,%d2
 		rts
@@ -191,17 +206,20 @@ FUNCTION(atomic_test_and_set64):
 FUNCTION(atomic_get64):
 		move.l	%d2,-(%a7)
 		move.l	%d3,-(%a7)
+		move.l	%a2,-(%a7)
 		move.l	(4,%a7),%a1
+		lea.l	(4,%a1),%a2
 		move.l	(4,%a1),%d0	/*LSB*/
 		move.l	(%a1),%d1		/*MSB*/
 		move.l	%d0,%d2
 		move.l	%d1,%d3
 		// we must use cas... so we change to the same value if matching,
 		// else we get the correct one anyway
-		cas2.l	%d0:%d1,%d2:%d3,(4,%a1):(%a1)
+		cas2.l	%d0:%d1,%d2:%d3,(%a2):(%a1)
 		// return value
 		move.l	%d0,(4,%a0)
 		move.l	%d1,(%a0)
+		move.l	(%a7)+,%a2
 		move.l	(%a7)+,%d3
 		move.l	(%a7)+,%d2
 		rts
