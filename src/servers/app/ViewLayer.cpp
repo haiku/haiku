@@ -1270,6 +1270,20 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 			// this version of FillRegion ignores any
 			// clipping, that's why "redraw" needs to
 			// be correct
+// see #634
+//			if (redraw->Frame().left < 0 || redraw->Frame().top < 0) {
+//				char message[1024];
+//				BRect c = effectiveClipping->Frame();
+//				BRect w = windowContentClipping->Frame();
+//				BRect r = redraw->Frame();
+//				sprintf(message, "invalid background: current clipping: (%d, %d)->(%d, %d), "
+//					"window content: (%d, %d)->(%d, %d), redraw: (%d, %d)->(%d, %d)",
+//					(int)c.left, (int)c.top, (int)c.right, (int)c.bottom,
+//					(int)w.left, (int)w.top, (int)w.right, (int)w.bottom,
+//					(int)r.left, (int)r.top, (int)r.right, (int)r.bottom);
+//				debugger(message);
+//			}
+
 			drawingEngine->FillRegion(*redraw, overlayCookie != NULL
 				? overlayCookie->Color() : fViewColor);
 		}
