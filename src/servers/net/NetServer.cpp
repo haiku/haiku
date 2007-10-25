@@ -586,9 +586,6 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface, bool fromMessage
 		route.flags = RTF_STATIC | RTF_DEFAULT;
 
 		request.ifr_route = route;
-		ioctl(socket, SIOCDELRT, &request, sizeof(request));
-			// Try to remove a previous default route, doesn't matter
-			// if it fails.
 
 		if (autoConfig) {
 			// add a default route to make the interface accessible, even without an address
@@ -602,6 +599,11 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface, bool fromMessage
 		} else if (addressMessage.FindString("gateway", &string) == B_OK
 			&& parse_address(familyIndex, string, gateway)) {
 			// add gateway route, if we're asked for it
+
+			ioctl(socket, SIOCDELRT, &request, sizeof(request));
+				// Try to remove a previous default route, doesn't matter
+				// if it fails.
+
 			route.flags = RTF_STATIC | RTF_DEFAULT | RTF_GATEWAY;
 			route.gateway = &gateway;
 
