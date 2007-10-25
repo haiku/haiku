@@ -60,7 +60,7 @@ _kset_fd_limit_(int num)
 int
 _klock_node_(int fd)
 {
-	return B_ERROR;
+	return _kern_lock_node(fd);
 }
 
 
