@@ -204,9 +204,12 @@ extern bool m68k_set_fault_handler(addr_t *handlerLocation, addr_t handler)
 }
 #endif
 
-#define m68k_nop() asm volatile("nop") /* flushes insn pipeline */
-#define pflush(addr) asm volatile("pflush (%0)" :: "a" (addr))
+/* flushes insn pipeline */
+#define m68k_nop() asm volatile("nop")
+/* no FC bit needed */
+#define pflush(addr) asm volatile("pflush #0,#0,(%0)" :: "a" (addr))
 #define pflusha() asm volatile("pflusha")
+
 //#define
 
 #if 0

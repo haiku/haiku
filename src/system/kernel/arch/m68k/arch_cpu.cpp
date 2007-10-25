@@ -14,13 +14,12 @@
 #include <arch/cpu.h>
 #include <boot/kernel_args.h>
 
-static bool sHasTlbia;
 
 status_t 
 arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 {
 	// enable FPU
-	set_msr(get_msr() | MSR_FP_AVAILABLE);
+	//ppc:set_msr(get_msr() | MSR_FP_AVAILABLE);
 
 	// The current thread must be NULL for all CPUs till we have threads.
 	// Some boot code relies on this.
@@ -33,10 +32,6 @@ arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 status_t
 arch_cpu_init(kernel_args *args)
 {
-	// TODO: Let the boot loader put that info into the kernel args
-	// (property "tlbia" in the CPU node).
-	sHasTlbia = false;
-
 	return B_OK;
 }
 
@@ -60,25 +55,21 @@ arch_cpu_sync_icache(void *address, size_t len)
 {
 	int l, off;
 	char *p;
+	uint32 cacr;
 
 	off = (unsigned int)address & (CACHELINE - 1);
 	len += off;
-
+	
 	l = len;
 	p = (char *)address - off;
+	asm volatile ("movec %%cacr,%0" : "=r"(cacr):);
+	cacr |= 0x00000004; /* ClearInstructionCacheEntry */
 	do {
-		asm volatile ("dcbst 0,%0" :: "r"(p));
+		asm volatile ("movec %0,%%caar" :: "r"(p));
+		asm volatile ("movec %0,%%cacr" :: "r"(cacr));
 		p += CACHELINE;
 	} while ((l -= CACHELINE) > 0);
-	asm volatile ("sync");
-
-	p = (char *)address - off;
-	do {
-		asm volatile ("icbi 0,%0" :: "r"(p));
-		p += CACHELINE;
-	} while ((len -= CACHELINE) > 0);
-	asm volatile ("sync");
-	isync();
+	m68k_nop();
 }
 
 
@@ -99,10 +90,9 @@ void
 arch_cpu_invalidate_TLB_list(addr_t pages[], int num_pages)
 {
 	int i;
-
+	
 	m68k_nop();
 	for (i = 0; i < num_pages; i++) {
-		asm volatile("tlbie %0" :: "r" (pages[i]));
 		pflush(pages[i]);
 		m68k_nop();
 	}
@@ -114,7 +104,7 @@ void
 arch_cpu_global_TLB_invalidate(void)
 {
 	m68k_nop();
-	pflush();
+	pflusha();
 	m68k_nop();
 }
 
@@ -122,6 +112,7 @@ arch_cpu_global_TLB_invalidate(void)
 void 
 arch_cpu_user_TLB_invalidate(void)
 {
+	// pflushfd ?
 	arch_cpu_global_TLB_invalidate();
 }
 
