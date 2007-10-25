@@ -7,6 +7,7 @@
 
 .text
 
+#if 0 /* PPC stuff ahead... */
 /* uint32 get_sdr1(void);
  */
 FUNCTION(get_sdr1):
@@ -175,4 +176,4 @@ FUNCTION(reset_dbats):
 FUNCTION(__eieio):
 	eieio
 	blr
-
+#endif

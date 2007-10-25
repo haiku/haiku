@@ -48,7 +48,7 @@ arch_cpu_init_post_modules(kernel_args *args)
 	return B_OK;
 }
 
-#define CACHELINE 32
+#define CACHELINE 16
 
 void 
 arch_cpu_sync_icache(void *address, size_t len)
@@ -65,8 +65,20 @@ arch_cpu_sync_icache(void *address, size_t len)
 	asm volatile ("movec %%cacr,%0" : "=r"(cacr):);
 	cacr |= 0x00000004; /* ClearInstructionCacheEntry */
 	do {
-		asm volatile ("movec %0,%%caar" :: "r"(p));
-		asm volatile ("movec %0,%%cacr" :: "r"(cacr));
+		/* the 030 invalidates only 1 long of the cache line */
+		//XXX: what about 040 and 060 ?
+		asm volatile ("movec %0,%%caar\n"		\
+					  "movec %1,%%cacr\n"		\
+					  "addq.l #4,%0\n"			\
+					  "movec %0,%%caar\n"		\
+					  "movec %1,%%cacr\n"		\
+					  "addq.l #4,%0\n"			\
+					  "movec %0,%%caar\n"		\
+					  "movec %1,%%cacr\n"		\
+					  "addq.l #4,%0\n"			\
+					  "movec %0,%%caar\n"		\
+					  "movec %1,%%cacr\n"		\
+					  :: "r"(p), "r"(cacr));
 		p += CACHELINE;
 	} while ((l -= CACHELINE) > 0);
 	m68k_nop();
