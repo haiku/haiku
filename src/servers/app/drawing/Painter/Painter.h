@@ -41,6 +41,7 @@ class Painter {
 								// frame buffer stuff
 			void				AttachToBuffer(RenderingBuffer* buffer);
 			void				DetachFromBuffer();
+			BRect				Bounds() const;
 
 			void				ConstrainClipping(const BRegion* region);
 			const BRegion*		ClippingRegion() const
@@ -130,7 +131,7 @@ class Painter {
 			void				FillRect(		const BRect& r,
 												const rgb_color& c) const;
 			// fills a solid rect with color c, no blending, no clipping
-			void				FillRectNoClipping(const BRect& r,
+			void				FillRectNoClipping(const clipping_rect& r,
 												const rgb_color& c) const;
 
 								// round rects

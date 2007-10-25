@@ -117,6 +117,13 @@ Painter::DetachFromBuffer()
 {
 }
 
+// Bounds
+BRect
+Painter::Bounds() const
+{
+	return BRect(0, 0, fBuffer.width() - 1, fBuffer.height() - 1);
+}
+
 // #pragma mark -
 
 // SetDrawState
@@ -719,15 +726,13 @@ gfxset32(offset + y1 * bpr, color.data32, (x2 - x1 + 1) * 4);
 
 // FillRectNoClipping
 void
-Painter::FillRectNoClipping(const BRect& r, const rgb_color& c) const
+Painter::FillRectNoClipping(const clipping_rect& r, const rgb_color& c) const
 {
-	int32 left = (int32)r.left;
 	int32 y = (int32)r.top;
-	int32 right = (int32)r.right;
-	int32 bottom = (int32)r.bottom;
 
-	uint8* dst = fBuffer.row_ptr(y);
+	uint8* dst = fBuffer.row_ptr(y) + r.left * 4;
 	uint32 bpr = fBuffer.stride();
+	int32 bytes = (r.right - r.left + 1) * 4;
 
 	// get a 32 bit pixel ready with the color
 	pixel32 color;
@@ -736,14 +741,12 @@ Painter::FillRectNoClipping(const BRect& r, const rgb_color& c) const
 	color.data8[2] = c.red;
 	color.data8[3] = c.alpha;
 
-	dst += left * 4;
-
-	for (; y <= bottom; y++) {
+	for (; y <= r.bottom; y++) {
 //			uint32* handle = (uint32*)dst;
 //			for (int32 x = left; x <= right; x++) {
 //				*handle++ = color.data32;
 //			}
-gfxset32(dst, color.data32, (right - left + 1) * 4);
+gfxset32(dst, color.data32, bytes);
 		dst += bpr;
 	}
 }
