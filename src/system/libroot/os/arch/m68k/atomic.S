@@ -79,6 +79,8 @@ FUNCTION(atomic_get):
 
 /* m68k elf convention is to return structs in (a0) */
 /* other conventions use d0/d1 but which is MSB ?? */
+#warning M68K: 68060 doesn't have CAS2: use spinlock ??
+/* see http://retropc.net/x68000/software/develop/as/has060/m68k.htm */
 
 /* int64	atomic_add64(vint64 *value, int64 addValue) */
 FUNCTION(atomic_add64):
