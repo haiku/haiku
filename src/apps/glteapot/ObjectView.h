@@ -36,12 +36,12 @@ class ResScroll;
 
 class ObjectView : public BGLView {
 	public:
-						ObjectView(BRect r, char *name, 
-							ulong resizingMode, ulong options);
+						ObjectView(BRect r, char* name, ulong resizingMode,
+							ulong options);
 						~ObjectView();
 
 		virtual	void	MouseDown(BPoint p);
-		virtual	void	MessageReceived(BMessage *msg);
+		virtual	void	MessageReceived(BMessage* msg);
 		virtual	void	AttachedToWindow();
 		virtual	void	DetachedFromWindow();
 		virtual	void	FrameResized(float width, float height);
@@ -51,31 +51,24 @@ class ObjectView : public BGLView {
 		virtual	void	Pulse();
 				void	EnforceState();
 				bool	RepositionView();
-
+		
 		sem_id			drawEvent;
 		sem_id			quittingSem;
-		thread_id		drawThread;
-		ResScroll *		resScroll;
 		
-		BList			objects;
-		BLocker         objListLock;
-		
-		float           yxRatio,lastYXRatio;
-		uint64          lastFrame;
-		float           fpsHistory[HISTSIZE];
-		int32           histEntries,oldestEntry;
-		bool            fps;
-		bool			gouraud, lastGouraud;
-		bool			zbuf,lastZbuf;
-		bool			culling,lastCulling;
-		bool			lighting,lastLighting;
-		bool			filled,lastFilled;
-		bool			persp,lastPersp;
-		bool			lastTextured,textured;
-		bool			lastFog,fog;
-		bool			forceRedraw;
-		float			objectDistance,lastObjectDistance;
-
+	private:				
+		thread_id		fDrawThread;
+		ResScroll*		fResScroll;
+		BList			fObjects;
+		BLocker			fObjListLock;
+		uint64			fLastFrame;
+		int32			fHistEntries,fOldestEntry;
+		bool			fFps, fLastGouraud, fGouraud;
+		bool			fLastZbuf, fZbuf, fLastCulling, fCulling;
+		bool			fLastLighting, fLighting, fLastFilled, fFilled;
+		bool			fLastPersp, fPersp, fLastTextured, fTextured;
+		bool			fLastFog, fFog, fForceRedraw;
+		float			fLastYXRatio, fYxRatio, fFpsHistory[HISTSIZE];
+		float			fObjectDistance,fLastObjectDistance;
 };
 
 #endif // OBJECT_VIEW_H

@@ -26,32 +26,36 @@ struct quadStrip {
 
 class GLObject {
 	public:
-						GLObject(ObjectView *ov);
+						GLObject(ObjectView* ov);
 		virtual			~GLObject();
-
 		virtual void	Draw(bool forID, float IDcolor[]);
 		virtual bool	SpinIt();
 		virtual void	MenuInvoked(BPoint point);
 		virtual void	DoDrawing(bool forID) {};
 
-		float 			rotX,rotY,spinX,spinY,lastRotX,lastRotY;
-		float			x,y,z;
-		int				color;
+		float			rotX, rotY, spinX, spinY;
+		float			x, y, z;
 		int				solidity;
+
+	protected:
+		float			lastRotX, lastRotY;
+		int				color;
 		bool			changed;
-		ObjectView *	objView;
+
+	private:
+		ObjectView*		fObjView;
 };
 
 class TriangleObject : public GLObject {
 	public:
-							TriangleObject(ObjectView *ov, char *filename);
-		virtual				~TriangleObject();
-		
+							TriangleObject(ObjectView* ov, char* filename);
+		virtual				~TriangleObject();		
 		virtual void		DoDrawing(bool forID);
 
-		BufferArray<point>		points;
-		BufferArray<tri>		triangles;
-		BufferArray<quadStrip>	qs;
+	private:
+		BufferArray<point>		fPoints;
+		BufferArray<tri>		fTriangles;
+		BufferArray<quadStrip>	fQs;
 };
 
 #endif // GL_OBJECT_H

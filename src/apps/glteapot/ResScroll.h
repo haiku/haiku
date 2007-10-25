@@ -6,17 +6,19 @@
 #ifndef RESSCROLL_H
 #define RESSCROLL_H
 
-#include <interface/ScrollBar.h>
+#include <ScrollBar.h>
 
 class ObjectView;
 
 class ResScroll : public BScrollBar {
-	public:
-			ObjectView *	objectView;
-			
-							ResScroll(BRect r, const char *name,
-								ObjectView *target, orientation posture);
-			virtual	void	ValueChanged(float value);
+public:
+								ResScroll(BRect r, const char* name,
+									ObjectView* target, orientation posture);
+
+	virtual	void				ValueChanged(float value);
+
+private:
+			ObjectView*			fObjectView;
 };
 
-#endif
+#endif // RESSCROLL_H
