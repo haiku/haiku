@@ -226,13 +226,13 @@ if $(DEBUG_PRINTF) {
 }
 
 # warning flags
-HAIKU_WARNING_CCFLAGS = -Wall -Wmissing-prototypes -Wpointer-arith -Wcast-align
+HAIKU_WARNING_CCFLAGS = -Wall -Wno-trigraphs -Wmissing-prototypes -Wpointer-arith -Wcast-align
 	-Wsign-compare ;
-HAIKU_WARNING_C++FLAGS = -Wall -Wno-ctor-dtor-privacy
+HAIKU_WARNING_C++FLAGS = -Wall -Wno-trigraphs -Wno-ctor-dtor-privacy
 	-Woverloaded-virtual -Wpointer-arith -Wcast-align -Wsign-compare ;
 
-HAIKU_KERNEL_WARNING_CCFLAGS = -Wall -Wmissing-prototypes ;
-HAIKU_KERNEL_WARNING_C++FLAGS = -Wall ;
+HAIKU_KERNEL_WARNING_CCFLAGS = -Wall -Wno-trigraphs -Wmissing-prototypes ;
+HAIKU_KERNEL_WARNING_C++FLAGS = -Wall -Wno-trigraphs ;
 
 # debug flags
 HAIKU_DEBUG_FLAGS ?= -ggdb ;
@@ -444,13 +444,13 @@ if $(HOST_ARCH) = ppc {
 }
 
 # warning flags
-HOST_WARNING_CCFLAGS = -Wall -Wmissing-prototypes -Wpointer-arith -Wcast-align
+HOST_WARNING_CCFLAGS = -Wall -Wno-trigraphs -Wmissing-prototypes -Wpointer-arith -Wcast-align
 	-Wsign-compare ;
-HOST_WARNING_C++FLAGS = -Wall -Wno-ctor-dtor-privacy
+HOST_WARNING_C++FLAGS = -Wall -Wno-trigraphs -Wno-ctor-dtor-privacy
 	-Woverloaded-virtual -Wpointer-arith -Wcast-align -Wsign-compare ;
 
-HOST_KERNEL_WARNING_CCFLAGS = -Wall -Wmissing-prototypes ;
-HOST_KERNEL_WARNING_C++FLAGS = -Wall ;
+HOST_KERNEL_WARNING_CCFLAGS = -Wall -Wno-trigraphs -Wmissing-prototypes ;
+HOST_KERNEL_WARNING_C++FLAGS = -Wall -Wno-trigraphs ;
 
 # debug flags
 switch $(HOST_PLATFORM) {
