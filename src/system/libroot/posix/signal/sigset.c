@@ -7,8 +7,8 @@
  */
 
 
+#include <errno.h>
 #include <signal.h>
-
 #include <syscalls.h>
 
 
@@ -31,7 +31,14 @@ sigfillset(sigset_t *set)
 int
 sigismember(const sigset_t *set, int sig)
 {
-	sigset_t mask = (((sigset_t) 1) << (( sig ) - 1)) ;
+	sigset_t mask;
+
+	if (sig <= 0 || sig >= NSIG) {
+			errno = EINVAL;
+			return -1;
+	}
+
+	mask = (((sigset_t)1) << (sig - 1)) ;
 	return (*set & mask) ? 1 : 0 ;
 }
 
@@ -39,7 +46,14 @@ sigismember(const sigset_t *set, int sig)
 int
 sigaddset(sigset_t *set, int sig)
 {
-	sigset_t mask = (((sigset_t) 1) << (( sig ) - 1)) ;
+	sigset_t mask;
+
+	if (sig <= 0 || sig >= NSIG) {
+			errno = EINVAL;
+			return -1;
+	}
+
+	mask = (((sigset_t)1) << (sig - 1)) ;
 	*set |= mask;
 	return 0;
 }
@@ -48,8 +62,14 @@ sigaddset(sigset_t *set, int sig)
 int
 sigdelset(sigset_t *set, int sig)
 {
-	sigset_t mask = (((sigset_t) 1) << (( sig ) - 1)) ;
+	sigset_t mask;
+
+	if (sig <= 0 || sig >= NSIG) {
+			errno = EINVAL;
+			return -1;
+	}
+
+	mask = (((sigset_t)1) << (sig - 1)) ;
 	*set &= ~mask;
 	return 0;
 }
-
