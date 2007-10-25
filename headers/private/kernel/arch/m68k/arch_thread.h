@@ -25,7 +25,7 @@ arch_thread_get_current_thread(void)
 {
 	uint64 v = 0;
 	asm volatile("pmove %%srp,(%0)" : : "a"(&v));
-	return (struct thread *)(v & 0xffffffff);
+	return (struct thread *)(uint32)(v & 0xffffffff);
 }
 
 
