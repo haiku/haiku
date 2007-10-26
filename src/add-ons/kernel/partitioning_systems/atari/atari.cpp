@@ -176,11 +176,22 @@ atari_scan_partition(int fd, partition_data *partition, void *_cookie)
 			TRACE(("atari: child partition exceeds existing space (%Ld bytes)\n", p->Size()*SECTSZ));
 			continue;
 		}
+		if (!isalnum(p->id[0]))
+			continue;
+		if (!isalnum(p->id[1]))
+			continue;
+		if (!isalnum(p->id[2]))
+			continue;
+		
 		partition_data *child = create_child_partition(partition->id, index, -1);
 		if (child == NULL) {
 			TRACE(("atari: Creating child at index %ld failed\n", index - 1));
 			return B_ERROR;
 		}
+#warning M68K: use a lookup table ?
+		char type[] = "??? Partition";
+		memcpy(type, p->id, 3);
+		child->type = strdup(type);
 		child->offset = partition->offset + p->Start() * (uint64)SECTSZ;
 		child->size = p->Size() * (uint64)SECTSZ;
 		child->block_size = SECTSZ;

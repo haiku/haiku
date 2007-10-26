@@ -14,7 +14,13 @@ struct atari_partition_entry {
 #define ATARI_PART_EXISTS	0x01
 #define ATARI_PART_BOOTABLE	0x80
 	uint8	flags;
-	char	id[3];	/* "GEM", ... should use "BFS" ? */
+	/* some known types */
+#define ATARI_PART_TYEP_GEM 'G', 'E', 'M'
+#define ATARI_PART_TYEP_LNX 'L', 'N', 'X'
+#define ATARI_PART_TYEP_OS9 'O', 'S', '9'
+	/* the one we'll use */
+#define ATARI_PART_TYEP_BFS 'B', 'F', 'S'
+	char	id[3];
 	uint32	start;
 	uint32	size;
 
