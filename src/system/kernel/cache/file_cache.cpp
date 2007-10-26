@@ -22,6 +22,7 @@
 #include <vm.h>
 #include <vm_page.h>
 #include <vm_cache.h>
+#include <vm_low_memory.h>
 
 
 //#define TRACE_FILE_CACHE
@@ -39,6 +40,8 @@
 #define CACHED_FILE_EXTENTS	2
 	// must be smaller than MAX_FILE_IO_VECS
 	// ToDo: find out how much of these are typically used
+
+#define LAST_ACCESSES		3
 
 struct file_extent {
 	off_t			offset;
@@ -67,6 +70,12 @@ struct file_cache_ref {
 	struct vnode	*device;
 	void			*cookie;
 	file_map		map;
+	off_t			last_access[LAST_ACCESSES];
+		// TODO: it would probably be enough to only store the least
+		//	significant 31 bits, and make this uint32 (one bit for
+		//	write vs. read)
+	int32			last_access_index;
+	bool			last_access_was_write;
 };
 
 
@@ -304,6 +313,85 @@ get_file_map(file_cache_ref *ref, off_t offset, size_t size,
 }
 
 
+static inline bool
+access_is_sequential(file_cache_ref *ref)
+{
+	return ref->last_access[ref->last_access_index] != 0;
+}
+
+
+static inline void
+push_access(file_cache_ref *ref, off_t offset, size_t bytes, bool isWrite)
+{
+	TRACE(("%p: push %Ld, %ld, %s\n", ref, offset, bytes,
+		isWrite ? "write" : "read"));
+
+	int32 index = ref->last_access_index;
+	int32 previous = index - 1;
+	if (previous < 0)
+		previous = LAST_ACCESSES - 1;
+
+	if (offset != ref->last_access[previous])
+		ref->last_access[previous] = 0;
+
+	// we remember writes as negative offsets
+	if (isWrite)
+		ref->last_access[index] = -offset - bytes;
+	else
+		ref->last_access[index] = offset + bytes;
+
+	if (++index >= LAST_ACCESSES)
+		index = 0;
+	ref->last_access_index = index;
+}
+
+
+static void
+reserve_pages(file_cache_ref *ref, size_t reservePages, bool isWrite)
+{
+	if (vm_low_memory_state() != B_NO_LOW_MEMORY) {
+		vm_cache *cache = ref->cache;
+		mutex_lock(&cache->lock);
+
+		if (list_is_empty(&cache->consumers) && cache->areas == NULL
+			&& access_is_sequential(ref)) {
+			// we are not mapped, and we're accessed sequentially
+
+			if (isWrite) {
+				// just schedule some pages to be written back
+				for (vm_page *page = cache->page_list; page != NULL;
+						page = page->cache_next) {
+					if (page->state == PAGE_STATE_MODIFIED) {
+						// TODO: for now, we only schedule one
+						vm_page_schedule_write_page(page);
+						break;
+					}
+				}
+			} else {
+				// free some pages from our cache
+				// TODO: start with oldest (requires the page list to be a real list)!
+				uint32 left = reservePages;
+				vm_page *next;
+				for (vm_page *page = cache->page_list;
+						page != NULL && left > 0; page = next) {
+					next = page->cache_next;
+
+					if (page->state != PAGE_STATE_MODIFIED
+						&& page->state != PAGE_STATE_BUSY) {
+						vm_cache_remove_page(cache, page);
+						vm_page_set_state(page, PAGE_STATE_FREE);
+						left--;
+					}
+				}
+			}
+		}
+		mutex_unlock(&cache->lock);
+	}
+
+	vm_page_reserve_pages(reservePages);
+}
+
+
 /*!
 	Does the dirty work of translating the request into actual disk offsets
 	and reads to or writes from the supplied iovecs as specified by \a doWrite.
@@ -319,6 +407,8 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 	file_io_vec fileVecs[MAX_FILE_IO_VECS];
 	size_t fileVecCount = MAX_FILE_IO_VECS;
 	size_t numBytes = *_numBytes;
+
+	push_access(ref, offset, numBytes, doWrite);
 
 	status_t status = get_file_map(ref, offset, numBytes, fileVecs,
 		&fileVecCount);
@@ -608,7 +698,7 @@ read_into_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 		}
 	}
 
-	vm_page_reserve_pages(reservePages);
+	reserve_pages(ref, reservePages, false);
 	mutex_lock(&cache->lock);
 
 	// make the pages accessible in the cache
@@ -733,7 +823,7 @@ write_to_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 	}
 
 	if (status == B_OK)
-		vm_page_reserve_pages(reservePages);
+		reserve_pages(ref, reservePages, true);
 
 	mutex_lock(&ref->cache->lock);
 
@@ -840,7 +930,7 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
 		(bytesLeft + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
 	size_t reservePages = 0;
 
-	vm_page_reserve_pages(lastReservedPages);
+	reserve_pages(ref, lastReservedPages, doWrite);
 	MutexLocker locker(cache->lock);
 
 	while (bytesLeft > 0) {
@@ -1165,6 +1255,9 @@ file_cache_create(dev_t mountID, ino_t vnodeID, off_t size, int fd)
 	file_cache_ref *ref = new file_cache_ref;
 	if (ref == NULL)
 		return NULL;
+
+	memset(ref->last_access, 0, sizeof(ref->last_access));
+	ref->last_access_index = 0;
 
 	// TODO: delay vm_cache creation until data is
 	//	requested/written for the first time? Listing lots of
