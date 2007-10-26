@@ -12,12 +12,27 @@
 
 #define PAGE_SIZE 4096
 
+#warning M68K: check for missing regs/movem
 struct iframe {
-	uint32 d7;
 	/* XXX: order depends on movem */
+	uint32 d0;
+	uint32 d1;
+	uint32 d2;
+	uint32 d3;
+	uint32 d4;
+	uint32 d5;
+	uint32 d6;
+	uint32 d7;
 	uint32 a0;
+	uint32 a1;
+	uint32 a2;
+	uint32 a3;
+	uint32 a4;
+	uint32 a5;
+	uint32 a6;
+	uint32 a7;
 	/* 030 ex frame: */
-	uint16 sr;
+	uint16 sr; /* contains ccr */
 	uint32 pc;
 	uint16 vector; /* [12:15] frame type */
 	/* other stuff depending on frame type... do we really need that ? */
