@@ -7,15 +7,9 @@
 
 .text
 
-/* int64 __ppc_get_time_base(void)
- * r3/r4
+/* int64 __m68k_get_time_base(void)
  */
-FUNCTION(__ppc_get_time_base):
-		/* get TB (time base) register */
-carry:	mftbu	%r3
-		mftb	%r4
-		mftbu	%r5			// read the upper half again
-		cmpw	%r3, %r5	// and check if the values have changed
-		bne		carry		// try again, if they had
-		blr
+FUNCTION(__m68k_get_time_base):
+#warning M68K: implement __m68k_get_time_base()
+		rts
 

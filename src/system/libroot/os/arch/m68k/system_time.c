@@ -13,7 +13,7 @@
 static vint32 *sConversionFactor;
 
 void
-__ppc_setup_system_time(vint32 *cvFactor)
+__m68k_setup_system_time(vint32 *cvFactor)
 {
 	sConversionFactor = cvFactor;
 }
@@ -22,7 +22,7 @@ __ppc_setup_system_time(vint32 *cvFactor)
 bigtime_t
 system_time(void)
 {
-	uint64 timeBase = __ppc_get_time_base();
+	uint64 timeBase = __m68k_time_base();
 
 	uint32 cv = *sConversionFactor;
 	return (timeBase >> 32) * cv + (((timeBase & 0xffffffff) * cv) >> 32);

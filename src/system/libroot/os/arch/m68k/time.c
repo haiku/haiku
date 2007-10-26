@@ -23,7 +23,7 @@ __arch_init_time(struct real_time_data *data, bool setDefaults)
 		sRealTimeData->version = 0;
 	}
 
-	__ppc_setup_system_time(&sRealTimeData->system_time_conversion_factor);
+	__m68k_setup_system_time(&sRealTimeData->system_time_conversion_factor);
 }
 
 
