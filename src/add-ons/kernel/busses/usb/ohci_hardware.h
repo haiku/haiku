@@ -297,10 +297,16 @@ typedef struct ohci_hcca
 
 typedef struct ohci_endpoint_descriptor
 {
-	uint32		flags;
-	uint32		tail_pointer;		// Queue tail pointer
-	uint32		head_pointer;		// Queue head pointer
-	uint32		next_endpoint;		// Next endpoint in the list
+	// Hardware part
+	uint32	flags;						// Flags field
+	uint32	tail_physical_descriptor;	// Queue tail physical pointer
+	uint32	head_physical_descriptor;	// Queue head physical pointer
+	uint32	next_physical_endpoint;		// Physical pointer to the next endpoint
+	// Software part
+	addr_t	this_physical;				// Physical pointer to this address
+	void	*tail_logical_descriptor;	// Queue tail logical pointer
+	void	*head_logical_descriptor;	// Queue head logical pointer
+	void	*next_logical_endpoint;		// Logical pointer to the next endpoint
 };
 
 #define OHCI_ENDPOINT_ADDRESS_MASK				0x0000007f
@@ -330,10 +336,16 @@ typedef struct ohci_endpoint_descriptor
 
 typedef struct ohci_general_transfer_descriptor
 {
-	uint32		flags;
-	uint32		buffer_phy;			// Physical buffer pointer 
-	uint32 		next_descriptor;	// Next transfer descriptor 
-	uint32 		last_byte_address;	// Physical buffer end 
+	// Hardware part
+	uint32	flags;						// Flags field
+	uint32	buffer_physical;			// Physical buffer pointer
+	uint32 	next_physical_descriptor;	// Physical pointer next descriptor
+	uint32 	last_physical_byte_address;	// Physical pointer to buffer end
+	// Software part
+	addr_t	this_physical;				// Physical pointer to this address
+	void	*buffer_logical;			// Logical pointer to the buffer
+	void	*next_logical_descriptor;	// Logical pointer next descriptor
+	void	*last_logical_byte_address;	// Logical pointer buffer end
 };
 
 #define	OHCI_BUFFER_ROUNDING			0x00040000
