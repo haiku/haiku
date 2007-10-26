@@ -8,6 +8,14 @@
  * d0,d1,a0,a1 are scratch regs, not to be saved.
  */
 
+/*
+ * see http://mail-index.netbsd.org/amiga/1995/06/
+ * for concerns about TAS, CAS and Amiga.
+ * I suppose as long as we don't use it on a variable in 
+ * chip ram it shouldn't be a problem, and since we don't
+ * have any SMP Amiga anyway it should be ok.
+ */
+
 #define FUNCTION(x) .global x; .type x,@function; x
 
 .text
