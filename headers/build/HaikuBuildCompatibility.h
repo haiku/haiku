@@ -69,11 +69,12 @@ class BBufferGroup;
 class BContinuousParameter;
 class BControllable;
 class BFileInterface;
+class BMimeType;
 class BParameterWeb;
+class BRegion;
 class BTextView;
 class BTranslator;
 class BTimeSource;
-class BRegion;
 struct entry_ref;
 struct media_node;
 #endif
