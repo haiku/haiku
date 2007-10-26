@@ -83,11 +83,9 @@ struct atari_boot_block {
 	uint16	num_sectors;
 	uint32	load_addr;
 	uint32	fat_buffer;
-/*(0x003a-0x002e)*/
-#define ATARI_BB_FILENAME_SZ 0xc
+#define ATARI_BB_FILENAME_SZ (0x003a - 0x002e)
 	char	filename[ATARI_BB_FILENAME_SZ];
-/*(0x01fe-0x003a)*/
-#define ATARI_BB_BOOTCODE_SZ 0x1c4
+#define ATARI_BB_BOOTCODE_SZ (0x01fe - 0x003a)
 	uint8	bootcode[ATARI_BB_BOOTCODE_SZ];
 	uint16	checksum;	/* 0x1234 if bootable */
 };
