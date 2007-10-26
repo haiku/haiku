@@ -20,6 +20,7 @@ if $(OPTIM) = -O0 {
 DEBUG = 0 ;
 
 SubDirCcFlags -D_GNU_SOURCE -D_IEEE_LIBM ;
+SubDirAsFlags -DMOTOROLA_SYNTAX ;
 
 # Note: There is no *l() support yet. Our compiler says sizeof(long double) = 8,
 # while there are only 96 and 128 bit implementation in glibc.
@@ -111,6 +112,9 @@ local genericSources =
 	w_remainder.c w_remainderf.c # w_remainderl.c
 	w_scalb.c w_scalbf.c # w_scalbl.c
 	w_sinh.c w_sinhf.c # w_sinhl.c
+	# no asm for m68k in glibc
+	strlen.c
+	w_sqrt.c w_sqrtf.c # w_sqrtl.c
 ;
 
 MergeObject posix_gnu_arch_$(TARGET_ARCH)_generic.o :
@@ -119,15 +123,15 @@ MergeObject posix_gnu_arch_$(TARGET_ARCH)_generic.o :
 
 MergeObject posix_gnu_arch_$(TARGET_ARCH)_other.o :
 
-#	add_n.S
-#	addmul_1.S
+	add_n.S
+	addmul_1.S
 	feholdexcpt.c fraiseexcpt.c fesetenv.c fesetround.c ftestexcept.c
 #	ldbl2mpn.c
-#	lshift.S rshift.S
-#	mul_1.S
+	lshift.S rshift.S
+	mul_1.S
 #	strlen.S
-#	sub_n.S
-#	submul_1.S
+	sub_n.S
+	submul_1.S
 #
 #	e_sqrt.c e_sqrtf.c # e_sqrtl.c
 #	s_copysign.S s_copysignf.S # s_copysignl.S
