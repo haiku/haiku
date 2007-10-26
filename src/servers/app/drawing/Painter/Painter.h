@@ -261,13 +261,14 @@ mutable agg::path_storage		fPath;
 mutable agg::conv_curve<agg::path_storage> fCurve;
 
 	// for internal coordinate rounding/transformation
-	bool						fSubpixelPrecise;
+	bool						fSubpixelPrecise : 1;
+	bool						fValidClipping : 1;
+	bool						fDrawingText : 1;
+	bool						fAttached : 1;
 
 	float						fPenSize;
 	const BRegion*				fClippingRegion;
-	bool						fValidClipping;
 	drawing_mode				fDrawingMode;
-	bool						fDrawingText;
 	source_alpha				fAlphaSrcMode;
 	alpha_function				fAlphaFncMode;
 	cap_mode					fLineCapMode;

@@ -64,12 +64,13 @@ Painter::Painter()
 	  fCurve(fPath),
 
 	  fSubpixelPrecise(false),
+	  fValidClipping(false),
+	  fDrawingText(false),
+	  fAttached(false),
 
 	  fPenSize(1.0),
 	  fClippingRegion(NULL),
-	  fValidClipping(false),
 	  fDrawingMode(B_OP_COPY),
-	  fDrawingText(false),
 	  fAlphaSrcMode(B_PIXEL_ALPHA),
 	  fAlphaFncMode(B_ALPHA_OVERLAY),
 	  fLineCapMode(B_BUTT_CAP),
@@ -98,11 +99,18 @@ void
 Painter::AttachToBuffer(RenderingBuffer* buffer)
 {
 	if (buffer && buffer->InitCheck() >= B_OK &&
-		// TODO: implement drawing on B_RGB24, B_RGB15, B_RGB16, B_CMAP8 and B_GRAY8 :-[
 		(buffer->ColorSpace() == B_RGBA32 || buffer->ColorSpace() == B_RGB32)) {
+		// TODO: implement drawing on B_RGB24, B_RGB15, B_RGB16,
+		// B_CMAP8 and B_GRAY8 :-[
+		// (if ever we want to support some devices where this gives
+		// a great speed up, right now it seems fine, even in emulation)
+
 		fBuffer.attach((uint8*)buffer->Bits(),
 			buffer->Width(), buffer->Height(), buffer->BytesPerRow());
 
+		fAttached = true;
+		fValidClipping = fClippingRegion
+			&& fClippingRegion->Frame().IsValid();
 
 		// These are the AGG renderes and rasterizes which
 		// will be used for stroking paths
@@ -115,6 +123,9 @@ Painter::AttachToBuffer(RenderingBuffer* buffer)
 void
 Painter::DetachFromBuffer()
 {
+	fBuffer.attach(NULL, 0, 0, 0);
+	fAttached = false;
+	fValidClipping = false;
 }
 
 // Bounds
@@ -174,7 +185,7 @@ Painter::ConstrainClipping(const BRegion* region)
 {
 	fClippingRegion = region;
 	fBaseRenderer.set_clipping_region(const_cast<BRegion*>(region));
-	fValidClipping = region->Frame().IsValid();
+	fValidClipping = region->Frame().IsValid() && fAttached;
 
 	if (fValidClipping) {
 		clipping_rect cb = fClippingRegion->FrameInt();
