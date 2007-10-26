@@ -1,0 +1,18 @@
+SubDir HAIKU_TOP src add-ons kernel partitioning_systems atari ;
+
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName kernel ] ;
+UsePrivateHeaders [ FDirName storage ] ;
+
+KernelAddon atari :
+	atari.cpp
+	;
+
+#Addon <partitioning_system>atari :
+#	atari.cpp
+#	;
+#
+#LinkAgainst <partitioning_system>atari :
+#	libkernelland_emu.so
+#	libdisk_device_manager.so
+#	;
