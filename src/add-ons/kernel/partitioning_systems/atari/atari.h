@@ -5,6 +5,12 @@
 #ifndef ATARI_PARTITION_H
 #define ATARI_PARTITION_H
 
+/*
+ * An extented partition scheme exists, (several actually), cf.
+ * http://people.debian.org/~smarenka/d-i/atari-fdisk-README
+ * boot sector stuff:
+ * http://leonard.oxg.free.fr/articles/multi_atari/multi_atari.html
+ */
 
 #include "SupportDefs.h"
 #include "ByteOrder.h"
