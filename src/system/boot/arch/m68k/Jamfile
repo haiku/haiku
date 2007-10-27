@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src system boot arch ppc ;
+SubDir HAIKU_TOP src system boot arch m68k ;
 
 {
 	local defines =
@@ -10,7 +10,7 @@ SubDir HAIKU_TOP src system boot arch ppc ;
 	SubDirC++Flags $(defines) -Wall -Wno-multichar -fno-rtti ;
 }
 
-KernelMergeObject boot_arch_ppc.o :
+KernelMergeObject boot_arch_m68k.o :
 	arch_elf.cpp
 ;
 

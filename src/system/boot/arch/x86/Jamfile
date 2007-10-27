@@ -1,7 +1,18 @@
 SubDir HAIKU_TOP src system boot arch x86 ;
 
-SubDirC++Flags -fno-rtti ;
+{
+	local defines =
+		_BOOT_MODE
+	;
+
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
+	SubDirC++Flags $(defines) -Wall -Wno-multichar -fno-rtti ;
+}
 
 KernelMergeObject boot_arch_x86.o :
-	elf.cpp
+	arch_elf.c
 ;
+
+SEARCH on [ FGristFiles arch_elf.c ]
+    = [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_ARCH) ] ;
