@@ -224,6 +224,8 @@ arch_cpu_shutdown(bool reboot)
 void
 arch_cpu_idle(void)
 {
+#warning M68K: use LPSTOP ?
+	//asm volatile ("lpstop");
 }
 
 
