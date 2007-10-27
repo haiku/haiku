@@ -4,6 +4,10 @@
 */
 
 
+#ifdef _BOOT_MODE
+#include <boot/arch.h>
+#endif
+
 #include <KernelExport.h>
 
 #include <elf_priv.h>
@@ -35,9 +39,15 @@ static const char *kRelocations[] = {
 #endif
 
 
+#ifdef _BOOT_MODE
+status_t
+boot_arch_elf_relocate_rel(struct preloaded_image *image,
+	struct Elf32_Rel *rel, int rel_len)
+#else
 int
 arch_elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 	struct elf_image_info *resolve_image, struct Elf32_Rel *rel, int rel_len)
+#endif
 {
 	struct Elf32_Sym *sym;
 	addr_t S;
@@ -63,7 +73,11 @@ arch_elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 
 				sym = SYMBOL(image, ELF32_R_SYM(rel[i].r_info));
 
+#ifdef _BOOT_MODE
+				vlErr = boot_elf_resolve_symbol(image, sym, &S);
+#else
 				vlErr = elf_resolve_symbol(image, sym, resolve_image, sym_prepend, &S);
+#endif
 				if (vlErr < 0)
 					return vlErr;
 				TRACE(("S %p (%s)\n", (void *)S, SYMNAME(image, sym)));
@@ -123,9 +137,15 @@ arch_elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 }
 
 
+#ifdef _BOOT_MODE
+status_t
+boot_arch_elf_relocate_rela(struct preloaded_image *image,
+	struct Elf32_Rela *rel, int rel_len)
+#else
 int
 arch_elf_relocate_rela(struct elf_image_info *image, const char *sym_prepend,
 	struct elf_image_info *resolve_image, struct Elf32_Rela *rel, int rel_len)
+#endif
 {
 	dprintf("arch_elf_relocate_rela: not supported on x86\n");
 	return B_ERROR;
