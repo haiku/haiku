@@ -118,6 +118,7 @@ PackageInstaller::MessageReceived(BMessage *msg)
 	switch (msg->what) {
 		case P_WINDOW_QUIT:
 			fWindowCount--;
+		case B_CANCEL:
 			if (fWindowCount == 0) {
 				BAutolock lock(this);
 				if (lock.IsLocked())
