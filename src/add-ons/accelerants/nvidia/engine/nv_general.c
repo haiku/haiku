@@ -91,7 +91,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.83 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.84 running.\n"));
 
 	/* log VBLANK INT usability status */
 	if (si->ps.int_assigned)
@@ -1552,6 +1552,12 @@ static status_t nvxx_general_powerup()
 {
 	LOG(4, ("INIT: NV powerup\n"));
 	LOG(4,("POWERUP: Detected %s (%s)\n", si->adi.name, si->adi.chipset));
+
+	if (si->ps.card_arch >= NV50A)
+	{
+		LOG(8,("POWERUP: G80 and higher support not implemented: different architecture!\n"));
+		return B_ERROR;
+	}
 
 	/* setup cardspecs */
 	/* note:
