@@ -167,6 +167,7 @@ SubInclude HAIKU_TOP src tests servers app cursor_test ;
 SubInclude HAIKU_TOP src tests servers app desktop_window ;
 SubInclude HAIKU_TOP src tests servers app event_mask ;
 SubInclude HAIKU_TOP src tests servers app following ;
+SubInclude HAIKU_TOP src tests servers app idle_test ;
 SubInclude HAIKU_TOP src tests servers app look_and_feel ;
 SubInclude HAIKU_TOP src tests servers app menu_crash ;
 SubInclude HAIKU_TOP src tests servers app no_pointer_history ;
