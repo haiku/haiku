@@ -15,6 +15,7 @@
 #include <string.h>
 #include <String.h>
 #include <TranslationUtils.h>
+#include <TranslatorFormats.h>
 #include "InstallerWindow.h"
 #include "PartitionMenuItem.h"
 
@@ -38,9 +39,10 @@ class LogoView : public BBox {
 
 
 LogoView::LogoView(const BRect &r)
-	: BBox(r, "logoview", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW, B_NO_BORDER)
+	: BBox(r, "logoview", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW,
+		B_NO_BORDER)
 {
-	fLogo = BTranslationUtils::GetBitmap('PNG ', "haikulogo.png");
+	fLogo = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "haikulogo.png");
 	if (fLogo) {
 		fDrawPoint.x = (r.Width() - fLogo->Bounds().Width()) / 2;
 		fDrawPoint.y = 0;
@@ -62,8 +64,12 @@ LogoView::Draw(BRect update)
 }
 
 
+// #pragma mark -
+
+
 InstallerWindow::InstallerWindow(BRect frame_rect)
-	: BWindow(frame_rect, "Installer", B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
+	: BWindow(frame_rect, "Installer", B_TITLED_WINDOW,
+		B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
 	fDriveSetupLaunched(false),
 	fLastSrcItem(NULL),
 	fLastTargetItem(NULL)
@@ -73,7 +79,8 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 	BRect bounds = Bounds();
 	bounds.bottom += 1;
 	bounds.right += 1;
-	fBackBox = new BBox(bounds, NULL, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS, B_FANCY_BORDER);
+	fBackBox = new BBox(bounds, NULL, B_FOLLOW_ALL,
+		B_WILL_DRAW | B_FRAME_EVENTS, B_FANCY_BORDER);
 	AddChild(fBackBox);
 
 	BRect logoRect = fBackBox->Bounds();
@@ -84,7 +91,8 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 	LogoView *logoView = new LogoView(logoRect);
 	fBackBox->AddChild(logoView);
 
-	BRect statusRect(bounds.right - 222, logoRect.top + 2, bounds.right - 14, logoRect.bottom - B_H_SCROLL_BAR_HEIGHT + 4);
+	BRect statusRect(bounds.right - 222, logoRect.top + 2, bounds.right - 14,
+		logoRect.bottom - B_H_SCROLL_BAR_HEIGHT + 4);
 	BRect textRect(statusRect);
 	textRect.OffsetTo(B_ORIGIN);
 	textRect.InsetBy(2, 2);
@@ -93,34 +101,42 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 	fStatusView->MakeEditable(false);
 	fStatusView->MakeSelectable(false);
 
-	BScrollView *scroll = new BScrollView("statusScroll", fStatusView, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_FRAME_EVENTS);
+	BScrollView *scroll = new BScrollView("statusScroll", fStatusView,
+		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_FRAME_EVENTS);
 	fBackBox->AddChild(scroll);
 
-	fBeginButton = new BButton(BRect(bounds.right - 90, bounds.bottom - 35, bounds.right - 11, bounds.bottom - 11),
-		"begin_button", "Begin", new BMessage(BEGIN_MESSAGE), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	fBeginButton = new BButton(BRect(bounds.right - 90, bounds.bottom - 35,
+		bounds.right - 11, bounds.bottom - 11),
+		"begin_button", "Begin", new BMessage(BEGIN_MESSAGE),
+		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	fBeginButton->MakeDefault(true);
 	fBackBox->AddChild(fBeginButton);
 
 	fSetupButton = new BButton(BRect(bounds.left + 11, bounds.bottom - 35,
-		bounds.left + be_plain_font->StringWidth("Setup partitions") + 36, bounds.bottom - 22),
-		"setup_button", "Setup partitions" B_UTF8_ELLIPSIS, new BMessage(SETUP_MESSAGE), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+		bounds.left + be_plain_font->StringWidth("Setup partitions") + 36,
+		bounds.bottom - 22), "setup_button", "Setup partitions" B_UTF8_ELLIPSIS,
+		new BMessage(SETUP_MESSAGE), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	fBackBox->AddChild(fSetupButton);
 	fSetupButton->Hide();
 
-	fPackagesView = new PackagesView(BRect(bounds.left + 12, bounds.top + 4, bounds.right - 15 - B_V_SCROLL_BAR_WIDTH, bounds.bottom - 61), "packages_view");
-	fPackagesScrollView = new BScrollView("packagesScroll", fPackagesView, B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW,
-		false, true);
+	fPackagesView = new PackagesView(BRect(bounds.left + 12, bounds.top + 4,
+		bounds.right - 15 - B_V_SCROLL_BAR_WIDTH, bounds.bottom - 61),
+		"packages_view");
+	fPackagesScrollView = new BScrollView("packagesScroll", fPackagesView,
+		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW, false, true);
 	fBackBox->AddChild(fPackagesScrollView);
 	fPackagesScrollView->Hide();
 
-	fDrawButton = new DrawButton(BRect(bounds.left + 12, bounds.bottom - 33, bounds.left + 120, bounds.bottom - 20),
-		"options_button", "Fewer options", "More options", new BMessage(SHOW_BOTTOM_MESSAGE));
+	fDrawButton = new DrawButton(BRect(bounds.left + 12, bounds.bottom - 33,
+		bounds.left + 120, bounds.bottom - 20), "options_button",
+		"Fewer options", "More options", new BMessage(SHOW_BOTTOM_MESSAGE));
 	fBackBox->AddChild(fDrawButton);
 
 	fDestMenu = new BPopUpMenu("scanning" B_UTF8_ELLIPSIS, true, false);
 	fSrcMenu = new BPopUpMenu("scanning" B_UTF8_ELLIPSIS, true, false);
 
-	BRect fieldRect(bounds.left + 50, bounds.top + 70, bounds.right - 13, bounds.top + 90);
+	BRect fieldRect(bounds.left + 50, bounds.top + 70, bounds.right - 13,
+		bounds.top + 90);
 	fSrcMenuField = new BMenuField(fieldRect, "srcMenuField",
 		"Install from: ", fSrcMenu);
 	fSrcMenuField->SetDivider(bounds.right - 274);
@@ -138,8 +154,11 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 	sizeRect.top = 105;
 	sizeRect.bottom = sizeRect.top + 15;
 	sizeRect.right -= 12;
-	sizeRect.left = sizeRect.right - be_plain_font->StringWidth("Disk space required: 0.0 KB") - 40;
-	fSizeView = new BStringView(sizeRect, "size_view", "Disk space required: 0.0 KB", B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	const char* requiredDiskSpaceString = "Disk space required: 0.0 KB";
+	sizeRect.left = sizeRect.right - be_plain_font->StringWidth(
+		requiredDiskSpaceString) - 40;
+	fSizeView = new BStringView(sizeRect, "size_view",
+		requiredDiskSpaceString, B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	fSizeView->SetAlignment(B_ALIGN_RIGHT);
 	fBackBox->AddChild(fSizeView);
 	fSizeView->Hide();
@@ -224,7 +243,9 @@ InstallerWindow::MessageReceived(BMessage *msg)
 				fDriveSetupLaunched = msg->what == B_SOME_APP_LAUNCHED;
 				DisableInterface(fDriveSetupLaunched);
 				if (fDriveSetupLaunched)
-					SetStatusMessage("Running DriveSetup" B_UTF8_ELLIPSIS "\nClose DriveSetup to continue with the\ninstallation.");
+					SetStatusMessage("Running DriveSetup" B_UTF8_ELLIPSIS
+						"\nClose DriveSetup to continue with the\n"
+						"installation.");
 				else
 					StartScan();
 			}
@@ -241,7 +262,8 @@ InstallerWindow::QuitRequested()
 {
 	if (fDriveSetupLaunched) {
 		(new BAlert("driveSetup",
-			"Please close the DriveSetup window before closing the\nInstaller window.", "OK"))->Go();
+			"Please close the DriveSetup window before closing the\n"
+			"Installer window.", "OK"))->Go();
 		return false;
 	}
 	be_app->PostMessage(B_QUIT_REQUESTED);
@@ -308,7 +330,8 @@ InstallerWindow::StartScan()
 		PublishPackages();
 	}
 	AdjustMenus();
-	SetStatusMessage("Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".");
+	SetStatusMessage("Choose the disk you want to install onto from the "
+		"pop-up menu. Then click \"Begin\".");
 }
 
 
@@ -321,8 +344,10 @@ InstallerWindow::AdjustMenus()
 	} else {
 		if (fSrcMenu->CountItems() == 0)
 			fSrcMenuField->MenuItem()->SetLabel("<none>");
-		else
-			fSrcMenuField->MenuItem()->SetLabel(((PartitionMenuItem *)fSrcMenu->ItemAt(0))->MenuLabel());
+		else {
+			fSrcMenuField->MenuItem()->SetLabel(
+				((PartitionMenuItem *)fSrcMenu->ItemAt(0))->MenuLabel());
+		}
 	}
 
 	PartitionMenuItem *item2 = (PartitionMenuItem *)fDestMenu->FindMarked();
@@ -331,8 +356,10 @@ InstallerWindow::AdjustMenus()
 	} else {
 		if (fDestMenu->CountItems() == 0)
 			fDestMenuField->MenuItem()->SetLabel("<none>");
-		else
-			fDestMenuField->MenuItem()->SetLabel(((PartitionMenuItem *)fDestMenu->ItemAt(0))->MenuLabel());
+		else {
+			fDestMenuField->MenuItem()->SetLabel(
+				((PartitionMenuItem *)fDestMenu->ItemAt(0))->MenuLabel());
+		}
 	}
 	char message[255];
 	sprintf(message, "Press the Begin button to install from '%s' onto '%s'",

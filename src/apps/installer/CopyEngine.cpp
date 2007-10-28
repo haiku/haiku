@@ -18,9 +18,9 @@
 
 //#define COPY_TRACE
 #ifdef COPY_TRACE
-#define CALLED() 			printf("CALLED %s\n",__PRETTY_FUNCTION__)
-#define ERR2(x, y...)			fprintf(stderr, "CopyEngine: "x" %s\n", y, strerror(err))
-#define ERR(x)					fprintf(stderr, "CopyEngine: "x" %s\n", strerror(err))
+#define CALLED() 		printf("CALLED %s\n",__PRETTY_FUNCTION__)
+#define ERR2(x, y...)	fprintf(stderr, "CopyEngine: "x" %s\n", y, strerror(err))
+#define ERR(x)			fprintf(stderr, "CopyEngine: "x" %s\n", strerror(err))
 #else
 #define CALLED()
 #define ERR(x)
@@ -49,7 +49,7 @@ class TargetVisitor : public BDiskDeviceVisitor
 		virtual bool Visit(BDiskDevice *device);
 		virtual bool Visit(BPartition *partition, int32 level);
 	private:
-		void MakeLabel(BPartition *partition, char *label, char *menuLabel);
+		void _MakeLabel(BPartition *partition, char *label, char *menuLabel);
 		BMenu *fMenu;
 };
 
@@ -71,10 +71,13 @@ CopyEngine::MessageReceived(BMessage*msg)
 	CALLED();
 	switch (msg->what) {
 		case ENGINE_START:
-			status_t err = Start(fWindow->GetSourceMenu(), fWindow->GetTargetMenu());
+		{
+			status_t err = Start(fWindow->GetSourceMenu(),
+				fWindow->GetTargetMenu());
 			if (err != B_OK)
 				ERR("Start failed");
 			break;
+		}
 	}
 }
 
@@ -139,7 +142,8 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 	if (fDDRoster.GetPartitionWithID(targetItem->ID(), &device, &partition) == B_OK) {
 		if (!partition->IsMounted()) {
 			if ((err = partition->Mount()) < B_OK) {
-				SetStatusMessage("The disk can't be mounted. Please choose a different disk.");
+				SetStatusMessage("The disk can't be mounted. Please choose a "
+					"different disk.");
 				ERR("BPartition::Mount");
 				return err;
 			}
@@ -155,7 +159,8 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 	} else if (fDDRoster.GetDeviceWithID(targetItem->ID(), &device) == B_OK) {
 		if (!device.IsMounted()) {
 			if ((err = device.Mount()) < B_OK) {
-				SetStatusMessage("The disk can't be mounted. Please choose a different disk.");
+				SetStatusMessage("The disk can't be mounted. Please choose a "
+					"different disk.");
 				ERR("BDiskDevice::Mount");
 				return err;
 			}
@@ -173,8 +178,9 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 
 	// check if target has enough space
 	if ((fSpaceRequired > 0 && targetVolume.FreeBytes() < fSpaceRequired)
-		&& ((new BAlert("", "The destination disk may not have enough space. Try choosing a different disk or \
-choose to not install optional items.", "Try installing anyway", "Cancel", 0,
+		&& ((new BAlert("", "The destination disk may not have enough space. "
+			"Try choosing a different disk or choose to not install optional "
+			"items.", "Try installing anyway", "Cancel", 0,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0)) {
 		return B_OK;
 	}
@@ -195,14 +201,16 @@ choose to not install optional items.", "Try installing anyway", "Cancel", 0,
 
 	// check not installing on itself
 	if (strcmp(srcDirectory.Path(), targetDirectory.Path()) == 0) {
-		SetStatusMessage("You can't install the contents of a disk onto itself. Please choose a different disk.");
+		SetStatusMessage("You can't install the contents of a disk onto "
+			"itself. Please choose a different disk.");
 		return B_OK;
 	}
 
 	// check not installing on boot volume
 	if ((strncmp(BOOT_PATH, targetDirectory.Path(), strlen(BOOT_PATH)) == 0)
-		&& ((new BAlert("", "Are you sure you want to install onto the current boot disk? \
-The installer will have to reboot your machine if you proceed.", "OK", "Cancel", 0,
+		&& ((new BAlert("", "Are you sure you want to install onto the "
+			"current boot disk? The installer will have to reboot your "
+			"machine if you proceed.", "OK", "Cancel", 0,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0)) {
 		SetStatusMessage("Installation stopped.");
 		return B_OK;
@@ -255,7 +263,8 @@ CopyEngine::CopyFolder(BDirectory &srcDir, BDirectory &targetDir)
 			}
 			err = FSCopyFolder(&entry, &targetDir, fControl, NULL, false, undo);
 		} else {
-			err = FSCopyFile(&entry, &statbuf, &targetDir, fControl, NULL, false, undo);
+			err = FSCopyFile(&entry, &statbuf, &targetDir, fControl, NULL,
+				false, undo);
 		}
 		if (err != B_OK) {
 			BPath path;
@@ -290,6 +299,9 @@ CopyEngine::SetPackagesList(BList *list)
 }
 
 
+// #pragma mark -
+
+
 SourceVisitor::SourceVisitor(BMenu *menu)
 	: fMenu(menu)
 {
@@ -298,12 +310,14 @@ SourceVisitor::SourceVisitor(BMenu *menu)
 bool
 SourceVisitor::Visit(BDiskDevice *device)
 {
-	if (!device->ContentType() || strcmp(device->ContentType(), kPartitionTypeBFS) != 0)
+	if (!device->ContentType()
+		|| strcmp(device->ContentType(), kPartitionTypeBFS) != 0)
 		return false;
 	BPath path;
 	if (device->GetPath(&path) == B_OK)
-		printf("SourceVisitor::Visit(BDiskDevice *) : %s type:%s, contentType:%s\n",
-			path.Path(), device->Type(), device->ContentType());
+		printf("SourceVisitor::Visit(BDiskDevice *) : %s type:%s, "
+			"contentType:%s\n", path.Path(), device->Type(),
+			device->ContentType());
 	PartitionMenuItem *item = new PartitionMenuItem(NULL, device->ContentName(), NULL, new BMessage(SRC_PARTITION), device->ID());
 	if (device->IsMounted()) {
 		BPath mountPoint;
@@ -319,13 +333,16 @@ SourceVisitor::Visit(BDiskDevice *device)
 bool
 SourceVisitor::Visit(BPartition *partition, int32 level)
 {
-	if (!partition->ContentType() || strcmp(partition->ContentType(), kPartitionTypeBFS) != 0)
+	if (!partition->ContentType()
+		|| strcmp(partition->ContentType(), kPartitionTypeBFS) != 0)
 		return false;
 	BPath path;
 	if (partition->GetPath(&path) == B_OK)
 		printf("SourceVisitor::Visit(BPartition *) : %s\n", path.Path());
 	printf("SourceVisitor::Visit(BPartition *) : %s\n", partition->Name());
-	PartitionMenuItem *item = new PartitionMenuItem(NULL, partition->ContentName(), NULL, new BMessage(SRC_PARTITION), partition->ID());
+	PartitionMenuItem *item = new PartitionMenuItem(NULL,
+		partition->ContentName(), NULL, new BMessage(SRC_PARTITION),
+		partition->ID());
 	if (partition->IsMounted()) {
 		BPath mountPoint;
 		partition->GetMountPoint(&mountPoint);
@@ -335,6 +352,9 @@ SourceVisitor::Visit(BPartition *partition, int32 level)
 	fMenu->AddItem(item);
 	return false;
 }
+
+
+// #pragma mark -
 
 
 TargetVisitor::TargetVisitor(BMenu *menu)
@@ -352,8 +372,9 @@ TargetVisitor::Visit(BDiskDevice *device)
 	if (device->GetPath(&path) == B_OK)
 		printf("TargetVisitor::Visit(BDiskDevice *) : %s\n", path.Path());
 	char label[255], menuLabel[255];
-	MakeLabel(device, label, menuLabel);
-	fMenu->AddItem(new PartitionMenuItem(device->ContentName(), label, menuLabel, new BMessage(TARGET_PARTITION), device->ID()));
+	_MakeLabel(device, label, menuLabel);
+	fMenu->AddItem(new PartitionMenuItem(device->ContentName(), label,
+		menuLabel, new BMessage(TARGET_PARTITION), device->ID()));
 	return false;
 }
 
@@ -368,14 +389,15 @@ TargetVisitor::Visit(BPartition *partition, int32 level)
 		printf("TargetVisitor::Visit(BPartition *) : %s\n", path.Path());
 	printf("TargetVisitor::Visit(BPartition *) : %s\n", partition->Name());
 	char label[255], menuLabel[255];
-	MakeLabel(partition, label, menuLabel);
-	fMenu->AddItem(new PartitionMenuItem(partition->ContentName(), label, menuLabel, new BMessage(TARGET_PARTITION), partition->ID()));
+	_MakeLabel(partition, label, menuLabel);
+	fMenu->AddItem(new PartitionMenuItem(partition->ContentName(), label,
+		menuLabel, new BMessage(TARGET_PARTITION), partition->ID()));
 	return false;
 }
 
 
 void
-TargetVisitor::MakeLabel(BPartition *partition, char *label, char *menuLabel)
+TargetVisitor::_MakeLabel(BPartition *partition, char *label, char *menuLabel)
 {
 	char size[15];
 	SizeAsString(partition->ContentSize(), size);
@@ -383,9 +405,10 @@ TargetVisitor::MakeLabel(BPartition *partition, char *label, char *menuLabel)
 	if (partition->Parent())
 		partition->Parent()->GetPath(&path);
 
-	sprintf(label, "%s - %s [%s] [%s partition:%li]", partition->ContentName(), size, partition->ContentType(),
-		path.Path(), partition->ID());
-	sprintf(menuLabel, "%s - %s [%s]", partition->ContentName(), size, partition->ContentType());
+	sprintf(label, "%s - %s [%s] [%s partition:%li]", partition->ContentName(),
+		size, partition->ContentType(), path.Path(), partition->ID());
+	sprintf(menuLabel, "%s - %s [%s]", partition->ContentName(), size,
+		partition->ContentType());
 
 }
 
