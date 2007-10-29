@@ -165,7 +165,7 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	margin.bottom = page.bottom - margin.bottom;
 
 	fMarginView = new MarginView(BRect(20,20,200,160), (int32)width, (int32)height,
-			margin, units);
+			margin, (MarginUnit)units);
 	panel->AddChild(fMarginView);
 	
 	// add page format menu
@@ -414,7 +414,7 @@ PageSetupWindow::UpdateSetupMessage()
 		fSetupMsg->ReplaceRect("printable_rect", margin);
 
 		// save the units used
-		int32 units = fMarginView->GetUnits();
+		int32 units = fMarginView->GetMarginUnit();
 		if (fSetupMsg->HasInt32("units")) {
 			fSetupMsg->ReplaceInt32("units", units);
 		} else {

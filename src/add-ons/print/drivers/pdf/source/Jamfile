@@ -26,7 +26,6 @@ Addon PDF\ Writer :
 	JobSetupWindow.cpp
 	LinePathBuilder.cpp
 	Link.cpp
-	MarginView.cpp
 	Mask.cpp
 	PDFLinePathBuilder.cpp
 	PDFText.cpp
