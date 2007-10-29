@@ -139,5 +139,4 @@ SubInclude HAIKU_TOP src tests kits interface flatten_picture ;
 SubInclude HAIKU_TOP src tests kits interface layout ;
 SubInclude HAIKU_TOP src tests kits interface picture ;
 SubInclude HAIKU_TOP src tests kits interface pictureprint ;
-SubInclude HAIKU_TOP src tests kits interface NewRegion ;
 
