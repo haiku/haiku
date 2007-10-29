@@ -808,6 +808,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
+		case AS_IDLE_TIME:
+			STRACE(("ServerApp %s: idle time\n", Signature()));
+
+			fLink.StartMessage(B_OK);
+			fLink.Attach<bigtime_t>(fDesktop->EventDispatcher().IdleTime());
+			fLink.Flush();
+			break;
+
 		case AS_SHOW_CURSOR:
 		{
 			STRACE(("ServerApp %s: Show Cursor\n", Signature()));

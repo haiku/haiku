@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2005-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -237,6 +237,8 @@ EventDispatcher::EventDispatcher()
 	fKeyboardFilter(NULL),
 	fTargets(10),
 	fNextLatestMouseMoved(NULL),
+	fLastButtons(0),
+	fLastUpdate(system_time()),
 	fCursorLock("cursor loop lock"),
 	fHWInterface(NULL),
 	fDesktop(NULL)
@@ -521,6 +523,14 @@ EventDispatcher::SendFakeMouseMoved(EventTarget& target, int32 viewToken)
 }
 
 
+bigtime_t
+EventDispatcher::IdleTime()
+{
+	BAutolock _(this);
+	return system_time() - fLastUpdate;
+}
+
+
 bool
 EventDispatcher::HasCursorThread()
 {
@@ -714,6 +724,7 @@ EventDispatcher::_EventLoop()
 		}
 
 		BAutolock _(this);
+		fLastUpdate = system_time();
 
 		EventTarget* current = NULL;
 		EventTarget* previous = NULL;

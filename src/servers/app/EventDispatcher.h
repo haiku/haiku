@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2005-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -84,12 +84,13 @@ class EventDispatcher : public BLocker {
 
 		void GetMouse(BPoint& where, int32& buttons);
 		void SendFakeMouseMoved(EventTarget& target, int32 viewToken);
+		bigtime_t IdleTime();
 
 		bool HasCursorThread();
 		void SetHWInterface(HWInterface* interface);
 
 		void SetDragMessage(BMessage& message, ServerBitmap* bitmap,
-							const BPoint& offsetFromCursor);
+				const BPoint& offsetFromCursor);
 			// the message should be delivered on the next
 			// "mouse up".
 			// if the mouse is not pressed, it should
@@ -101,7 +102,8 @@ class EventDispatcher : public BLocker {
 		status_t _Run();
 		void _Unset();
 
-		bool _SendMessage(BMessenger& messenger, BMessage* message, float importance);
+		bool _SendMessage(BMessenger& messenger, BMessage* message,
+				float importance);
 
 		bool _AddTokens(BMessage* message, EventTarget* target, uint32 eventMask,
 				BMessage* nextMouseMoved = NULL, int32* _viewToken = NULL);
@@ -141,6 +143,7 @@ class EventDispatcher : public BLocker {
 		BMessage*		fNextLatestMouseMoved;
 		BPoint			fLastCursorPosition;
 		int32			fLastButtons;
+		bigtime_t		fLastUpdate;
 
 		BMessage		fDragMessage;
 		bool			fDraggingMessage;
