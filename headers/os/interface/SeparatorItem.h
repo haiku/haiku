@@ -1,3 +1,8 @@
+/*
+ * Copyright 2001-2007, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ */
 #ifndef _SEPARATOR_ITEM_H
 #define _SEPARATOR_ITEM_H
  

@@ -2162,7 +2162,7 @@ BMenu::_SetStickyMode(bool on)
 		if (on && menuBar != NULL && menuBar->LockLooper()) {
 			// Steal the focus from the current focus view
 			// (needed to handle keyboard navigation)
-			menuBar->StealFocus();
+			menuBar->_StealFocus();
 			menuBar->UnlockLooper();
 		}
 		
@@ -2332,7 +2332,7 @@ BMenu::QuitTracking()
 {
 	_SelectItem(NULL);
 	if (BMenuBar *menuBar = dynamic_cast<BMenuBar *>(this))
-		menuBar->RestoreFocus();
+		menuBar->_RestoreFocus();
 
 	fChosenItem = NULL;
 	fState = MENU_STATE_CLOSED;

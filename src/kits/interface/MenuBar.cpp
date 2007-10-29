@@ -47,7 +47,7 @@ BMenuBar::BMenuBar(BRect frame, const char *title, uint32 resizeMask,
 	fLastBounds(NULL),
 	fTracking(false)
 {
-	InitData(layout);
+	_InitData(layout);
 }
 
 
@@ -62,7 +62,7 @@ BMenuBar::BMenuBar(const char *title, menu_layout layout, uint32 flags)
 	fLastBounds(NULL),
 	fTracking(false)
 {
-	InitData(layout);
+	_InitData(layout);
 }
 
 
@@ -83,7 +83,7 @@ BMenuBar::BMenuBar(BMessage *data)
 	menu_layout layout = B_ITEMS_IN_COLUMN;
 	data->FindInt32("_layout", (int32 *)&layout);
 	
-	InitData(layout);	
+	_InitData(layout);	
 }
 
 
@@ -390,7 +390,7 @@ BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool showMenu, BRect *speci
 	fMenuSem = create_sem(0, "window close sem");
 	_set_menu_sem_(window, fMenuSem);
 	
-	fTrackingPID = spawn_thread(TrackTask, "menu_tracking", B_DISPLAY_PRIORITY, NULL);
+	fTrackingPID = spawn_thread(_TrackTask, "menu_tracking", B_DISPLAY_PRIORITY, NULL);
 	if (fTrackingPID >= 0) {
 		menubar_data data;	
 		data.menuBar = this;
@@ -412,21 +412,21 @@ BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool showMenu, BRect *speci
 }
 
 
-long 
-BMenuBar::TrackTask(void *arg)
+/* static */
+int32
+BMenuBar::_TrackTask(void *arg)
 {
 	menubar_data data;
 	thread_id id;
-	
 	receive_data(&id, &data, sizeof(data));
-	
+
 	BMenuBar *menuBar = data.menuBar;
 	if (data.useRect)
 		menuBar->fExtraRect = &data.rect;	
 	menuBar->_SetStickyMode(data.sticky);
 	
 	int32 action;
-	menuBar->Track(&action, data.menuIndex, data.showMenu);
+	menuBar->_Track(&action, data.menuIndex, data.showMenu);
 	
 	menuBar->fTracking = false;
 	menuBar->fExtraRect = NULL;
@@ -458,7 +458,7 @@ point_distance(const BPoint &pointA, const BPoint &pointB)
 
 
 BMenuItem *
-BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
+BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 {	
 	// TODO: Cleanup, merge some "if" blocks if possible
 	fChosenItem = NULL;
@@ -588,7 +588,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 
 		if (fChosenItem != NULL)
 			fChosenItem->Invoke();
-		RestoreFocus();
+		_RestoreFocus();
 		window->Unlock();
 	}
 
@@ -605,7 +605,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 
 
 void
-BMenuBar::StealFocus()
+BMenuBar::_StealFocus()
 {
 	// We already stole the focus, don't do anything
 	if (fPrevFocusToken != -1)
@@ -623,7 +623,7 @@ BMenuBar::StealFocus()
 
 
 void 
-BMenuBar::RestoreFocus()
+BMenuBar::_RestoreFocus()
 {
 	BWindow *window = Window();
 	if (window != NULL && window->Lock()) {
@@ -644,7 +644,7 @@ BMenuBar::RestoreFocus()
 
 
 void 
-BMenuBar::InitData(menu_layout layout)
+BMenuBar::_InitData(menu_layout layout)
 {
 	fLastBounds = new BRect(Bounds());
 	SetItemMargins(8, 2, 8, 2);
