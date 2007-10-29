@@ -103,6 +103,11 @@ freely, subject to the following restrictions:
 #    define UNIX
 #  endif
 #endif /* CONVEX || MINIX || _AIX || __QNX__ */
+#if (defined(__APPLE__))
+#  ifndef UNIX
+#    define UNIX
+#  endif
+#endif /* __APPLE__ */
 
 #if (defined(VM_CMS) || defined(MVS))
 #  define CMS_MVS
