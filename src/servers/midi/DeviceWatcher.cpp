@@ -51,10 +51,10 @@ DeviceWatcher::DeviceWatcher()
 		size_t size;
 		const void* bits;
 
-		bits = res.LoadResource('ICON', 10, &size);
+		bits = res.LoadResource(B_LARGE_ICON_TYPE, 10, &size);
 		largeIcon->SetBits(bits, size, 0, B_CMAP8);
 
-		bits = res.LoadResource('MICN', 11, &size);
+		bits = res.LoadResource(B_MINI_ICON_TYPE, 11, &size);
 		miniIcon->SetBits(bits, size, 0, B_CMAP8);
 	}
 }
@@ -132,10 +132,10 @@ void DeviceWatcher::SetIcons(BMidiEndpoint* endp)
 	BMessage msg;
 
 	msg.AddData(
-		"be:large_icon", 'ICON', largeIcon->Bits(), largeIcon->BitsLength());
+		"be:large_icon", B_LARGE_ICON_TYPE, largeIcon->Bits(), largeIcon->BitsLength());
 	
 	msg.AddData(
-		"be:mini_icon", 'MICN', miniIcon->Bits(), miniIcon->BitsLength());
+		"be:mini_icon", B_MINI_ICON_TYPE, miniIcon->Bits(), miniIcon->BitsLength());
 
 	endp->SetProperties(&msg);
 }

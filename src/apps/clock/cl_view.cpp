@@ -65,7 +65,7 @@ dummy_label:
 			}
 
 			theRect.Set(0,0,15,15);
-			if ((picH = rsrcs.FindResource('MICN', "center", &len))) {
+			if ((picH = rsrcs.FindResource(B_MINI_ICON_TYPE, "center", &len))) {
 				fCenter = new BBitmap(theRect, B_CMAP8);
 				fCenter->SetBits(picH, len, 0, B_CMAP8);
 				free(picH);

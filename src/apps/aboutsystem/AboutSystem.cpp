@@ -21,9 +21,10 @@
 #include <Screen.h>
 #include <ScrollView.h>
 #include <String.h>
+#include <StringView.h>
 #include <TextView.h>
 #include <TranslationUtils.h>
-#include <StringView.h>
+#include <TranslatorFormats.h>
 #include <View.h>
 #include <Window.h>
 
@@ -118,7 +119,7 @@ AboutView::AboutView(const BRect &rect)
 	fLastActionTime(system_time()),
 	fScrollRunner(NULL)
 {
-	fLogo = BTranslationUtils::GetBitmap('PNG ', "haikulogo.png");
+	fLogo = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "haikulogo.png");
 	if (fLogo) {
 		fDrawPoint.x = (225-fLogo->Bounds().Width()) / 2;
 		fDrawPoint.y = 0;

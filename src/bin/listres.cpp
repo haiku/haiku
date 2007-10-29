@@ -49,9 +49,9 @@ get_type(type_code type)
 		case B_DOUBLE_TYPE:
 			return "Double";
 
-		case 'MICN':
+		case B_MINI_ICON_TYPE:
 			return "Mini Icon";
-		case 'ICON':
+		case B_LARGE_ICON_TYPE:
 			return "Icon";
 
 		default:

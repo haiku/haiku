@@ -130,7 +130,7 @@ BBitmap* MediaAlert::InitIcon()
 				// Load the raw icon data
 				size_t size;
 				const void* rawIcon =
-					Resources.LoadResource('ICON', iconName, &size);
+					Resources.LoadResource(B_LARGE_ICON_TYPE, iconName, &size);
 
 				if (rawIcon)
 				{

@@ -443,7 +443,7 @@ ConfigWindow::MakeHowToView()
 	BResources *resources = BApplication::AppResources();
 	if (resources) {
 		size_t length;
-		char *buffer = (char *)resources->FindResource('ICON', 101, &length);
+		char *buffer = (char *)resources->FindResource(B_LARGE_ICON_TYPE, 101, &length);
 		if (buffer) {
 			BBitmap *bitmap = new BBitmap(BRect(0, 0, 63, 63), B_CMAP8);
 			if (bitmap && bitmap->InitCheck() == B_OK) {

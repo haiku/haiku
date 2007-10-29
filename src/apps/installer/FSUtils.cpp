@@ -2140,13 +2140,13 @@ FSGetDeskDir(BDirectory *deskDir, dev_t dev)
 
 	size_t size;
 	const void* data = GetTrackerResources()->
-		LoadResource('ICON', kResDeskIcon, &size);
+		LoadResource(B_LARGE_ICON_TYPE, kResDeskIcon, &size);
 
 	if (data)
 		deskDir->WriteAttr(kAttrLargeIcon, B_COLOR_8_BIT_TYPE, 0, data, size);
 
 	data = GetTrackerResources()->
-		LoadResource('MICN', kResDeskIcon, &size);
+		LoadResource(B_MINI_ICON_TYPE, kResDeskIcon, &size);
 
 	if (data)
 		deskDir->WriteAttr(kAttrMiniIcon, B_COLOR_8_BIT_TYPE, 0, data, size);
@@ -2639,13 +2639,13 @@ FSCreateTrashDirs()
 		if (FSGetTrashDir(&trashDir, volume.Device()) == B_OK) {
 			size_t size;
 			const void* data = GetTrackerResources()->
-				LoadResource('ICON', kResTrashIcon, &size);
+				LoadResource(B_LARGE_ICON_TYPE, kResTrashIcon, &size);
 			if (data) {
 				trashDir.WriteAttr(kAttrLargeIcon, B_COLOR_8_BIT_TYPE, 0,
 					data, size);
 			}
 			data = GetTrackerResources()->
-				LoadResource('MICN', kResTrashIcon, &size);
+				LoadResource(B_MINI_ICON_TYPE, kResTrashIcon, &size);
 			if (data) {
 				trashDir.WriteAttr(kAttrMiniIcon, B_COLOR_8_BIT_TYPE, 0,
 					data, size);

@@ -144,7 +144,7 @@ AlertView::InitIcon()
 			&& resources.SetTo(&file) == B_OK) {
 			// Load the raw icon data
 			size_t size;
-			const void* data = resources.LoadResource('ICON', "warn", &size);
+			const void* data = resources.LoadResource(B_LARGE_ICON_TYPE, "warn", &size);
 			if (data) {
 				// Now build the bitmap
 				icon = new BBitmap(BRect(0, 0, 31, 31), 0, B_CMAP8);

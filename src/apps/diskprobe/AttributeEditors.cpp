@@ -25,6 +25,7 @@
 #include <TextControl.h>
 #include <TextView.h>
 #include <TranslationUtils.h>
+#include <TranslatorFormats.h>
 
 #include <stdlib.h>
 
@@ -772,7 +773,7 @@ ImageView::ImageView(BRect rect, DataEditor &editor)
 	fBitmap(NULL),
 	fScaleSlider(NULL)
 {
-	if (editor.Type() == 'MICN' || editor.Type() == 'ICON'
+	if (editor.Type() == B_MINI_ICON_TYPE || editor.Type() == B_LARGE_ICON_TYPE 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		|| editor.Type() == B_VECTOR_ICON_TYPE
 #endif
@@ -878,7 +879,7 @@ ImageView::UpdateImage()
 		return;
 	}
 
-	if (fBitmap != NULL && (fEditor.Type() == 'MICN' || fEditor.Type() == 'ICON')) {
+	if (fBitmap != NULL && (fEditor.Type() == B_MINI_ICON_TYPE || fEditor.Type() == B_LARGE_ICON_TYPE)) {
 		// optimize icon update...
 		fBitmap->SetBits(data, fEditor.FileSize(), 0, B_CMAP8);
 		fEditor.SetViewSize(viewSize);
@@ -899,12 +900,12 @@ ImageView::UpdateImage()
 	fBitmap = NULL;
 
 	switch (fEditor.Type()) {
-		case 'MICN':
+		case B_MINI_ICON_TYPE:
 			fBitmap = new BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
 			if (fBitmap->InitCheck() == B_OK)
 				fBitmap->SetBits(data, fEditor.FileSize(), 0, B_CMAP8);
 			break;
-		case 'ICON':
+		case B_LARGE_ICON_TYPE:
 			fBitmap = new BBitmap(BRect(0, 0, 31, 31), B_CMAP8);
 			if (fBitmap->InitCheck() == B_OK)
 				fBitmap->SetBits(data, fEditor.FileSize(), 0, B_CMAP8);
@@ -921,13 +922,13 @@ ImageView::UpdateImage()
 			}
 			break;
 #endif
-		case 'PNG ':
+		case B_PNG_FORMAT:
 		{
 			BMemoryIO stream(data, fEditor.FileSize());
 			fBitmap = BTranslationUtils::GetBitmap(&stream);
 			break;
 		}
-		case 'MSGG':
+		case B_MESSAGE_TYPE:
 		{
 			BMessage message;
 			// ToDo: this could be problematic if the data is not large
@@ -950,17 +951,17 @@ ImageView::UpdateImage()
 		char buffer[256];
 		const char *type = "Unknown Type";
 		switch (fEditor.Type()) {
-			case 'MICN':
-			case 'ICON':
+			case B_MINI_ICON_TYPE:
+			case B_LARGE_ICON_TYPE:
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 			case B_VECTOR_ICON_TYPE:
 #endif
 				type = "Icon";
 				break;
-			case 'PNG ':
+			case B_PNG_FORMAT:
 				type = "PNG Format";
 				break;
-			case 'MSGG':
+			case B_MESSAGE_TYPE:
 				type = "Flattened Bitmap";
 				break;
 			default:	
@@ -1083,10 +1084,10 @@ GetTypeEditorFor(BRect rect, DataEditor &editor)
 		case B_OFF_T_TYPE:
 		case B_POINTER_TYPE:
 			return new NumberEditor(rect, editor);
-		case 'MICN':
-		case 'ICON':
-		case 'PNG ':
-		case 'MSGG':
+		case B_MINI_ICON_TYPE:
+		case B_LARGE_ICON_TYPE:
+		case B_PNG_FORMAT:
+		case B_MESSAGE_TYPE:
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		case B_VECTOR_ICON_TYPE:
 #endif

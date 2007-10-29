@@ -96,8 +96,8 @@ MouseView::MouseView(BRect rect, const MouseSettings &settings)
 	fMouseDownBitmap->SetBits(kMouseDownBits, sizeof(kMouseDownBits), 0, kMouseDownColorSpace);
 
 	// ToDo: move these images to the resources as well
-	//fMouseBitmap = BTranslationUtils::GetBitmap('PNG ', "mouse_bmap");
-	//fMouseDownBitmap = BTranslationUtils::GetBitmap('PNG ', "pressed_mouse_bmap");
+	//fMouseBitmap = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "mouse_bmap");
+	//fMouseDownBitmap = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "pressed_mouse_bmap");
 
   	if (fMouseDownBitmap != NULL)
   		fMouseDownBounds = fMouseDownBitmap->Bounds();
