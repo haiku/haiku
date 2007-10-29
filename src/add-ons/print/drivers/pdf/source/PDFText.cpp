@@ -279,7 +279,7 @@ PDFWriter::FindFont(char* fontName, bool embed, font_encoding encoding)
 		cache = new Font(fontName, font, encoding);
 		fFontCache.AddItem(cache);
 	} else {
-		REPORT(kError, fPage, "Could not create font '%s'", fontName);
+		REPORT(kError, fPage, "Could not create font '%s': %s", fontName, PDF_get_errmsg(fPdf));
 	}
 	return font;
 }
@@ -623,7 +623,7 @@ PDFWriter::EmbedFont(const char* name)
 		FontFile* f = fFonts->At(i);
 		if (strcmp(f->Name(), name) == 0) {
 			cache = f;
-			return f->Embed(); // Size() < fEmbedMaxFontSize;
+			return f->Embed();
 		}
 	}
 	return false;
