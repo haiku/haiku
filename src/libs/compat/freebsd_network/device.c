@@ -263,7 +263,7 @@ compat_control(void *cookie, uint32 op, void *arg, size_t len)
 			return B_OK;
 
 		case ETHER_GETADDR:
-			return user_memcpy(arg, IF_LLADDR(dev->ifp), ETHER_ADDR_LEN);
+			return user_memcpy(arg, IF_LLADDR(ifp), ETHER_ADDR_LEN);
 
 		case ETHER_NONBLOCK:
 		{

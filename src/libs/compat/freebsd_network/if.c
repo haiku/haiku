@@ -11,12 +11,14 @@
 #include "device.h"
 
 #include <stdio.h>
+#include <net/if_types.h>
 #include <sys/sockio.h>
 
 #include <compat/sys/bus.h>
 #include <compat/sys/kernel.h>
 
 #include <compat/net/if.h>
+#include <compat/net/if_arp.h>
 #include <compat/net/if_var.h>
 #include <compat/sys/malloc.h>
 
@@ -29,8 +31,15 @@ if_alloc(u_char type)
 	if (ifp == NULL)
 		return NULL;
 
-	ifp->if_type = type;
+	if (type == IFT_ETHER) {
+		ifp->if_l2com = _kernel_malloc(sizeof(struct arpcom), M_ZERO);
+		if (ifp->if_l2com == NULL) {
+			_kernel_free(ifp);
+			return NULL;
+		}
+	}
 
+	ifp->if_type = type;
 	IF_ADDR_LOCK_INIT(ifp);
 	return ifp;
 }
@@ -40,6 +49,9 @@ void
 if_free(struct ifnet *ifp)
 {
 	IF_ADDR_LOCK_DESTROY(ifp);
+	if (ifp->if_type == IFT_ETHER)
+		_kernel_free(ifp->if_l2com);
+
 	_kernel_free(ifp);
 }
 
@@ -306,17 +318,17 @@ ether_ioctl(struct ifnet *ifp, int command, caddr_t data)
 	struct ifreq *ifr = (struct ifreq *)data;
 
 	switch (command) {
-	case SIOCSIFMTU:
-		if (ifr->ifr_mtu > ETHERMTU)
-			return EINVAL;
-		else
-			;
-			/* need to fix our ifreq to work with C... */
-			/* ifp->ifr_mtu = ifr->ifr_mtu; */
-		break;
+		case SIOCSIFMTU:
+			if (ifr->ifr_mtu > ETHERMTU)
+				return EINVAL;
+			else
+				;
+				/* need to fix our ifreq to work with C... */
+				/* ifp->ifr_mtu = ifr->ifr_mtu; */
+			break;
 
-	default:
-		return EINVAL;
+		default:
+			return EINVAL;
 	}
 
 	return 0;
