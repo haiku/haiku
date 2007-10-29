@@ -90,7 +90,15 @@ MergeObject <libbe>storage_kit.o :
 	PartitioningInfo.cpp 
 	PartitionReference.cpp
 
+	CreateChildJob.cpp
+	DeleteChildJob.cpp
+	DefragmentJob.cpp
 	InitializeJob.cpp
+	MoveJob.cpp
+	RepairJob.cpp
+	ResizeJob.cpp
+	SetStringJob.cpp
+	UninitializeJob.cpp
 ;
 
 
