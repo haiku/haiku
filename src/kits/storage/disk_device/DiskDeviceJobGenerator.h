@@ -54,7 +54,7 @@ private:
 			status_t			_GenerateCreateChildJob(BPartition* parent,
 									BPartition* partition);
 			status_t			_GenerateDeleteChildJob(BPartition* parent,
-									BPartition* child);
+									BPartition* partition);
 			status_t			_GenerateResizeJob(BPartition* partition);
 			status_t			_GenerateMoveJob(BPartition* partition);
 			status_t 			_GenerateSetNameJob(BPartition* parent,
@@ -65,6 +65,7 @@ private:
 									BPartition* partition);
 
 			status_t			_CollectContentsToMove(BPartition* partition);
+			status_t			_PushContentsToMove(BPartition* partition);
 
 			status_t			_GetPartitionReference(BPartition* partition,
 									PartitionReference*& reference);
@@ -81,6 +82,8 @@ private:
 			MoveInfo*			fMoveInfos;
 			int32				fPartitionCount;
 			PartitionRefInfo*	fPartitionRefs;
+			PartitionReference** fContentsToMove;
+			int32				fContentsToMoveCount;
 };
 
 

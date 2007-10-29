@@ -1425,6 +1425,17 @@ BPartition::_CountChildren() const
 }
 
 
+// _CountDescendants
+int32
+BPartition::_CountDescendants() const
+{
+	int32 count = 1;
+	for (int32 i = 0; BPartition* child = _ChildAt(i); i++)
+		count += child->_CountDescendants();
+	return count;
+}
+
+
 // _Level
 int32
 BPartition::_Level() const

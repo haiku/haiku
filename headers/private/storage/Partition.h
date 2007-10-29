@@ -194,6 +194,7 @@ private:
 
 			BPartition*			_ChildAt(int32 index) const;
 			int32				_CountChildren() const;
+			int32				_CountDescendants() const;
 
 			int32				_Level() const;
 			virtual	bool		_AcceptVisitor(BDiskDeviceVisitor* visitor,

@@ -19,7 +19,15 @@
 #include "PartitionDelegate.h"
 #include "PartitionReference.h"
 
+#include "CreateChildJob.h"
+#include "DeleteChildJob.h"
+#include "DefragmentJob.h"
 #include "InitializeJob.h"
+#include "MoveJob.h"
+#include "RepairJob.h"
+#include "ResizeJob.h"
+#include "SetStringJob.h"
+#include "UninitializeJob.h"
 
 
 using std::nothrow;
@@ -84,13 +92,18 @@ DiskDeviceJobGenerator::DiskDeviceJobGenerator(BDiskDevice* device,
 	: fDevice(device),
 	  fJobQueue(jobQueue),
 	  fMoveInfos(NULL),
-	  fPartitionRefs(NULL)
+	  fPartitionRefs(NULL),
+	  fContentsToMove(NULL),
+	  fContentsToMoveCount(0)
 {
-	fPartitionCount = fDevice->CountDescendants();
+	// Make sure the arrays are big enough (worst case: all old partitions have
+	// been deleted and new ones been created).
+	fPartitionCount = fDevice->CountDescendants()
+		+ fDevice->_CountDescendants();
 
 	fMoveInfos = new(nothrow) MoveInfo[fPartitionCount];
-//	fPartitionIDs = new(nothrow) partition_id[fPartitionCount];
 	fPartitionRefs = new(nothrow) PartitionRefInfo[fPartitionCount];
+	fContentsToMove = new(nothrow) PartitionReference*[fPartitionCount];
 }
 
 
@@ -98,8 +111,8 @@ DiskDeviceJobGenerator::DiskDeviceJobGenerator(BDiskDevice* device,
 DiskDeviceJobGenerator::~DiskDeviceJobGenerator()
 {
 	delete[] fMoveInfos;
-//	delete[] fPartitionIDs;
 	delete[] fPartitionRefs;
+	delete[] fContentsToMove;
 }
 
 
@@ -111,7 +124,7 @@ DiskDeviceJobGenerator::GenerateJobs()
 	if (!fDevice || !fJobQueue)
 		return B_BAD_VALUE;
 
-	if (!fMoveInfos /*|| !fPartitionIDs*/ || !fPartitionRefs)
+	if (!fMoveInfos || !fPartitionRefs || !fContentsToMove)
 		return B_NO_MEMORY;
 
 	// 1) Generate jobs for all physical partitions that don't have an
@@ -268,7 +281,7 @@ DiskDeviceJobGenerator::_GenerateChildPlacementJobs(BPartition* partition)
 	// sort the move infos
 	if (childCount > 0 && moveForth + moveBack > 0) {
 		qsort(fMoveInfos, childCount, sizeof(MoveInfo),
-			  _CompareMoveInfoPosition);
+			_CompareMoveInfoPosition);
 	}
 
 	// move the children to their final positions
@@ -277,7 +290,7 @@ DiskDeviceJobGenerator::_GenerateChildPlacementJobs(BPartition* partition)
 		if (moveForth < moveBack) {
 			// move children back
 			for (int32 i = 0; i < childCount; i++) {
-				MoveInfo &info = fMoveInfos[i];
+				MoveInfo& info = fMoveInfos[i];
 				if (info.position > info.target_position) {
 					if (i == 0
 						|| info.target_position >= fMoveInfos[i - 1].position
@@ -488,8 +501,12 @@ DiskDeviceJobGenerator::_GenerateInitializeJob(BPartition* partition)
 status_t
 DiskDeviceJobGenerator::_GenerateUninitializeJob(BPartition* partition)
 {
-// TODO: Implement!
-	return B_BAD_VALUE;
+	PartitionReference* reference;
+	status_t error = _GetPartitionReference(partition, reference);
+	if (error != B_OK)
+		return error;
+
+	return _AddJob(new(nothrow) UninitializeJob(reference));
 }
 
 
@@ -497,8 +514,23 @@ DiskDeviceJobGenerator::_GenerateUninitializeJob(BPartition* partition)
 status_t
 DiskDeviceJobGenerator::_GenerateSetContentNameJob(BPartition* partition)
 {
-// TODO: Implement!
-	return B_BAD_VALUE;
+	PartitionReference* reference;
+	status_t error = _GetPartitionReference(partition, reference);
+	if (error != B_OK)
+		return error;
+
+	SetStringJob* job = new(nothrow) SetStringJob(reference);
+	if (!job)
+		return B_NO_MEMORY;
+
+	error = job->Init(partition->ContentName(),
+		B_DISK_DEVICE_JOB_SET_CONTENT_NAME);
+	if (error != B_OK) {
+		delete job;
+		return error;
+	}
+
+	return _AddJob(job);
 }
 
 
@@ -506,8 +538,23 @@ DiskDeviceJobGenerator::_GenerateSetContentNameJob(BPartition* partition)
 status_t
 DiskDeviceJobGenerator::_GenerateSetContentParametersJob(BPartition* partition)
 {
-// TODO: Implement!
-	return B_BAD_VALUE;
+	PartitionReference* reference;
+	status_t error = _GetPartitionReference(partition, reference);
+	if (error != B_OK)
+		return error;
+
+	SetStringJob* job = new(nothrow) SetStringJob(reference);
+	if (!job)
+		return B_NO_MEMORY;
+
+	error = job->Init(partition->ContentParameters(),
+		B_DISK_DEVICE_JOB_SET_CONTENT_PARAMETERS);
+	if (error != B_OK) {
+		delete job;
+		return error;
+	}
+
+	return _AddJob(job);
 }
 
 
@@ -515,8 +562,12 @@ DiskDeviceJobGenerator::_GenerateSetContentParametersJob(BPartition* partition)
 status_t
 DiskDeviceJobGenerator::_GenerateDefragmentJob(BPartition* partition)
 {
-// TODO: Implement!
-	return B_BAD_VALUE;
+	PartitionReference* reference;
+	status_t error = _GetPartitionReference(partition, reference);
+	if (error != B_OK)
+		return error;
+
+	return _AddJob(new(nothrow) DefragmentJob(reference));
 }
 
 
@@ -524,8 +575,12 @@ DiskDeviceJobGenerator::_GenerateDefragmentJob(BPartition* partition)
 status_t
 DiskDeviceJobGenerator::_GenerateRepairJob(BPartition* partition, bool repair)
 {
-// TODO: Implement!
-	return B_BAD_VALUE;
+	PartitionReference* reference;
+	status_t error = _GetPartitionReference(partition, reference);
+	if (error != B_OK)
+		return error;
+
+	return _AddJob(new(nothrow) RepairJob(reference, repair));
 }
 
 
@@ -534,18 +589,48 @@ status_t
 DiskDeviceJobGenerator::_GenerateCreateChildJob(BPartition* parent,
 	BPartition* partition)
 {
-// TODO: Implement!
-	return B_BAD_VALUE;
+	PartitionReference* parentReference;
+	status_t error = _GetPartitionReference(parent, parentReference);
+	if (error != B_OK)
+		return error;
+
+	PartitionReference* reference;
+	error = _GetPartitionReference(partition, reference);
+	if (error != B_OK)
+		return error;
+
+	CreateChildJob* job = new(nothrow) CreateChildJob(parentReference,
+		reference);
+	if (!job)
+		return B_NO_MEMORY;
+
+	error = job->Init(partition->Offset(), partition->Size(), partition->Type(),
+		partition->Name(), partition->Parameters());
+	if (error != B_OK) {
+		delete job;
+		return error;
+	}
+
+	return _AddJob(job);
 }
 
 
 // _GenerateDeleteChildJob
 status_t
 DiskDeviceJobGenerator::_GenerateDeleteChildJob(BPartition* parent,
-	BPartition* child)
+	BPartition* partition)
 {
-// TODO: Implement!
-	return B_BAD_VALUE;
+	PartitionReference* parentReference;
+	status_t error = _GetPartitionReference(parent, parentReference);
+	if (error != B_OK)
+		return error;
+
+	PartitionReference* reference;
+	error = _GetPartitionReference(partition, reference);
+	if (error != B_OK)
+		return error;
+
+	return _AddJob(new(nothrow) DeleteChildJob(parentReference, reference));
 }
 
 
@@ -553,8 +638,22 @@ DiskDeviceJobGenerator::_GenerateDeleteChildJob(BPartition* parent,
 status_t
 DiskDeviceJobGenerator::_GenerateResizeJob(BPartition* partition)
 {
-// TODO: Implement!
-	return B_BAD_VALUE;
+	BPartition* parent = partition->Parent();
+	if (!parent)
+		return B_BAD_VALUE;
+
+	PartitionReference* parentReference;
+	status_t error = _GetPartitionReference(parent, parentReference);
+	if (error != B_OK)
+		return error;
+
+	PartitionReference* reference;
+	error = _GetPartitionReference(partition, reference);
+	if (error != B_OK)
+		return error;
+
+	return _AddJob(new(nothrow) ResizeJob(parentReference, reference,
+		partition->Size(), partition->ContentSize()));
 }
 
 
@@ -562,8 +661,39 @@ DiskDeviceJobGenerator::_GenerateResizeJob(BPartition* partition)
 status_t
 DiskDeviceJobGenerator::_GenerateMoveJob(BPartition* partition)
 {
-// TODO: Implement!
-	return B_BAD_VALUE;
+	BPartition* parent = partition->Parent();
+	if (!parent)
+		return B_BAD_VALUE;
+
+	PartitionReference* parentReference;
+	status_t error = _GetPartitionReference(parent, parentReference);
+	if (error != B_OK)
+		return error;
+
+	PartitionReference* reference;
+	error = _GetPartitionReference(partition, reference);
+	if (error != B_OK)
+		return error;
+
+	// collect all descendants whose contents need to be moved
+	fContentsToMoveCount = 0;
+	error = _CollectContentsToMove(partition);
+	if (error != B_OK)
+		return B_OK;
+
+	// create and init the job
+	MoveJob* job = new(nothrow) MoveJob(parentReference, reference);
+	if (!job)
+		return B_NO_MEMORY;
+
+	error = job->Init(partition->Offset(), fContentsToMove,
+		fContentsToMoveCount);
+	if (error != B_OK) {
+		delete job;
+		return error;
+	}
+
+	return _AddJob(job);
 }
 
 
@@ -572,8 +702,27 @@ status_t
 DiskDeviceJobGenerator::_GenerateSetNameJob(BPartition* parent,
 	BPartition* partition)
 {
-// TODO: Implement!
-	return B_BAD_VALUE;
+	PartitionReference* parentReference;
+	status_t error = _GetPartitionReference(parent, parentReference);
+	if (error != B_OK)
+		return error;
+
+	PartitionReference* reference;
+	error = _GetPartitionReference(partition, reference);
+	if (error != B_OK)
+		return error;
+
+	SetStringJob* job = new(nothrow) SetStringJob(parentReference, reference);
+	if (!job)
+		return B_NO_MEMORY;
+
+	error = job->Init(partition->Name(), B_DISK_DEVICE_JOB_SET_NAME);
+	if (error != B_OK) {
+		delete job;
+		return error;
+	}
+
+	return _AddJob(job);
 }
 
 
@@ -582,8 +731,27 @@ status_t
 DiskDeviceJobGenerator::_GenerateSetTypeJob(BPartition* parent,
 	BPartition* partition)
 {
-// TODO: Implement!
-	return B_BAD_VALUE;
+	PartitionReference* parentReference;
+	status_t error = _GetPartitionReference(parent, parentReference);
+	if (error != B_OK)
+		return error;
+
+	PartitionReference* reference;
+	error = _GetPartitionReference(partition, reference);
+	if (error != B_OK)
+		return error;
+
+	SetStringJob* job = new(nothrow) SetStringJob(parentReference, reference);
+	if (!job)
+		return B_NO_MEMORY;
+
+	error = job->Init(partition->Type(), B_DISK_DEVICE_JOB_SET_TYPE);
+	if (error != B_OK) {
+		delete job;
+		return error;
+	}
+
+	return _AddJob(job);
 }
 
 
@@ -592,8 +760,28 @@ status_t
 DiskDeviceJobGenerator::_GenerateSetParametersJob(BPartition* parent,
 	BPartition* partition)
 {
-// TODO: Implement!
-	return B_BAD_VALUE;
+	PartitionReference* parentReference;
+	status_t error = _GetPartitionReference(parent, parentReference);
+	if (error != B_OK)
+		return error;
+
+	PartitionReference* reference;
+	error = _GetPartitionReference(partition, reference);
+	if (error != B_OK)
+		return error;
+
+	SetStringJob* job = new(nothrow) SetStringJob(parentReference, reference);
+	if (!job)
+		return B_NO_MEMORY;
+
+	error = job->Init(partition->Parameters(),
+		B_DISK_DEVICE_JOB_SET_PARAMETERS);
+	if (error != B_OK) {
+		delete job;
+		return error;
+	}
+
+	return _AddJob(job);
 }
 
 
@@ -601,8 +789,43 @@ DiskDeviceJobGenerator::_GenerateSetParametersJob(BPartition* parent,
 status_t
 DiskDeviceJobGenerator::_CollectContentsToMove(BPartition* partition)
 {
-// TODO: Implement!
-	return B_BAD_VALUE;
+	BMutablePartition* shadow = _GetMutablePartition(partition);
+	if (shadow->Status() == B_PARTITION_UNRECOGNIZED)
+		return B_ERROR;
+
+	// if the partition has contents, push its ID
+	if (shadow->ContentType()
+		&& !(shadow->ChangeFlags() & B_PARTITION_CHANGED_INITIALIZATION)) {
+		status_t error = _PushContentsToMove(partition);
+		if (error != B_OK)
+			return error;
+	}
+
+	// recurse
+	for (int32 i = 0; BPartition* child = partition->ChildAt(i); i++) {
+		status_t error = _CollectContentsToMove(child);
+		if (error != B_OK)
+			return error;
+	}
+	return B_OK;
+}
+
+
+// _PushContentsToMove
+status_t
+DiskDeviceJobGenerator::_PushContentsToMove(BPartition* partition)
+{
+	if (fContentsToMoveCount >= fPartitionCount)
+		return B_ERROR;
+
+	PartitionReference* reference;
+	status_t error = _GetPartitionReference(partition, reference);
+	if (error != B_OK)
+		return error;
+
+	fContentsToMove[fContentsToMoveCount++] = reference;
+
+	return B_OK;
 }
 
 
