@@ -537,7 +537,7 @@ status_t Printer::PrintSpooledJob(BFile* spoolFile)
 		if ((rc=get_image_symbol(id, "take_job", B_SYMBOL_TYPE_TEXT, (void**)&func)) == B_OK) {
 				// This seems to be required for legacy?
 				// HP PCL3 add-on crashes without it!
-			BMessage params('_RRC');
+			BMessage params(B_REFS_RECEIVED);
 			params.AddInt32("file", (int32)spoolFile);
 			params.AddInt32("printer", (int32)SpoolDir());
 				// call the function and check its result
