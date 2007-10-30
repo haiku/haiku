@@ -59,7 +59,6 @@ All rights reserved.
 #include <Window.h>
 
 #include <ctype.h>
-#include <malloc.h>
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>

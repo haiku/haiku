@@ -5,7 +5,7 @@
  * A pool of kernel ports
  ***********************************************************************/
 #include <OS.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include "PortPool.h"
 #include "debug.h"
 

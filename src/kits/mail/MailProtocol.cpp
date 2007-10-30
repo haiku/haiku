@@ -17,7 +17,7 @@
 
 #include <stdio.h>
 #include <fs_attr.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <assert.h>
 
 #include <MDRLanguage.h>

@@ -61,7 +61,7 @@ All rights reserved.
 // ALTERED VERSION: Adapted to ANSI C and C++ for the OpenTracker
 // project (www.opentracker.org), Jul 11, 2000.
 
-#include <malloc.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 

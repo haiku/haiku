@@ -7,8 +7,8 @@
 #include <String.h>
 #include <Mime.h>
 
-#include <malloc.h>
 #include <ctype.h>
+#include <stdlib.h>
 
 class _EXPORT BMailComponent;
 class _EXPORT BTextMailComponent;

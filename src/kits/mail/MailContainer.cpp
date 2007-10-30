@@ -8,9 +8,9 @@
 #include <List.h>
 #include <Mime.h>
 
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <malloc.h>
 
 class _EXPORT BMIMEMultipartMailContainer;
 

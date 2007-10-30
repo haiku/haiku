@@ -32,7 +32,7 @@
 #include <BufferGroup.h>
 #include <Buffer.h>
 #include <TimeSource.h> //for debugging
-#include <malloc.h>
+#include <stdlib.h>
 #include "debug.h"
 #include "MediaMisc.h"
 #include "DataExchange.h"

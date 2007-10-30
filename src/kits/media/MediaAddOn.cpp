@@ -29,7 +29,7 @@
 
 #include <MediaAddOn.h>
 #include <string.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include "debug.h"
 #include "DataExchange.h"
 

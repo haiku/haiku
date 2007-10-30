@@ -74,7 +74,7 @@ SOFTWARE.
 
 #include "RegionSupport.h"
 
-#include <malloc.h>
+#include <stdlib.h>
 #include <new>
 
 using std::nothrow;

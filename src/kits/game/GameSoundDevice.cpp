@@ -26,7 +26,7 @@
 //					this time. Use at your own risk.
 //------------------------------------------------------------------------------
 
-#include <malloc.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 

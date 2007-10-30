@@ -12,7 +12,7 @@
 #include <ByteOrder.h>
 #include <NodeInfo.h>
 
-#include <malloc.h>
+#include <stdlib.h>
 
 class _EXPORT BSimpleMailAttachment;
 class _EXPORT BAttributedMailAttachment;

@@ -38,7 +38,6 @@ All rights reserved.
 // Consider moving iconFrom logic to BPose
 // use a more efficient way of storing file type and preferred app strings
 
-#include <malloc.h>
 #include <stdlib.h>
 #include <string.h>
 
