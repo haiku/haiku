@@ -2286,11 +2286,16 @@ xl_intr(void *arg)
 	}
 #endif
 
+#ifndef __HAIKU__
 	while ((status = CSR_READ_2(sc, XL_STATUS)) & XL_INTRS &&
 	    status != 0xFFFF) {
 		CSR_WRITE_2(sc, XL_COMMAND,
 		    XL_CMD_INTR_ACK|(status & XL_INTRS));
-
+#else
+	status = atomic_and(&sc->xl_intr_status, 0);
+	dprintf("GOT %x\n", status & XL_INTRS);
+	if ((status & XL_INTRS) != 0 && status != 0xFFFF) {
+#endif
 		if (status & XL_STAT_UP_COMPLETE) {
 			int	curpkts;
 

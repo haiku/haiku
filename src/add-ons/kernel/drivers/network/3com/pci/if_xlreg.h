@@ -611,6 +611,9 @@ struct xl_softc {
 #ifdef DEVICE_POLLING
 	int			rxcycles;
 #endif
+#ifdef __HAIKU__
+	u_int32_t		xl_intr_status;
+#endif
 };
 
 #define XL_LOCK(_sc)		mtx_lock(&(_sc)->xl_mtx)
