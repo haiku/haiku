@@ -390,7 +390,7 @@ bus_generic_attach(device_t dev)
 {
 	device_t child = NULL;
 
-	for (; child != NULL; child = list_get_next_item(&dev->children, child)) {
+	while ((child = list_get_next_item(&dev->children, child)) != NULL) {
 		if (child->driver == NULL) {
 			if (dev->driver == &miibus_driver) {
 				driver_t *driver = __haiku_select_miibus_driver(child);

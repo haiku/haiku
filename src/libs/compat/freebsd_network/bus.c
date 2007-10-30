@@ -176,7 +176,7 @@ intr_wrapper(void *data)
 {
 	struct internal_intr *intr = data;
 
-	device_printf(intr->dev, "in interrupt handler.\n");
+	//device_printf(intr->dev, "in interrupt handler.\n");
 
 	if (!HAIKU_CHECK_DISABLE_INTERRUPTS(intr->dev))
 		return B_UNHANDLED_INTERRUPT;
@@ -209,7 +209,7 @@ intr_handler(void *data)
 		if (status < B_OK)
 			break;
 
-		device_printf(intr->dev, "in soft interrupt handler.\n");
+		//device_printf(intr->dev, "in soft interrupt handler.\n");
 
 		intr->handler(intr->arg);
 		HAIKU_REENABLE_INTERRUPTS(intr->dev);

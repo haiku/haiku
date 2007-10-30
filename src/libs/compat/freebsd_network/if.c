@@ -37,6 +37,7 @@ if_alloc(u_char type)
 			_kernel_free(ifp);
 			return NULL;
 		}
+		IFP2AC(ifp)->ac_ifp = ifp;
 	}
 
 	ifp->if_type = type;

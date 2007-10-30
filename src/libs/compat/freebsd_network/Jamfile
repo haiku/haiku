@@ -5,7 +5,7 @@ UsePrivateHeaders kernel net ;
 UseHeaders [ FDirName $(SUBDIR) ] : true ;
 UseHeaders [ FDirName $(SUBDIR) compat ] : true ;
 
-SubDirCcFlags [ FDefines _KERNEL=1 KTR=1 ] ;
+SubDirCcFlags [ FDefines _KERNEL=1 ] ;
 
 KernelStaticLibrary libfreebsd_network.a :
 	bus.c
