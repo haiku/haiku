@@ -11,10 +11,10 @@
 #include "device.h"
 
 #include <stdlib.h>
+#include <sys/sockio.h>
+
 #include <Drivers.h>
 #include <ether_driver.h>
-
-#include <sys/sockio.h>
 
 #include <compat/sys/haiku-module.h>
 
@@ -239,7 +239,7 @@ compat_write(void *cookie, off_t position, const void *buffer,
 	device_printf(DEVNET(dev), "compat_write(%lld, %p, [%lu])\n", position,
 		buffer, *numBytes);
 
-	mb = m_getcl(0, MT_DATA, 0);
+	mb = m_getcl(0, MT_DATA, M_PKTHDR);
 	if (mb == NULL)
 		return ENOBUFS;
 

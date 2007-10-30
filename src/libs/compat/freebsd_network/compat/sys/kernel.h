@@ -14,9 +14,9 @@
 #define bootverbose		1
 
 #define KASSERT(cond,msg) do { \
-	if (!cond) \
+	if (!(cond)) \
 		panic msg; \
-} while(0)
+} while (0)
 
 typedef void (*system_init_func_t)(void *);
 

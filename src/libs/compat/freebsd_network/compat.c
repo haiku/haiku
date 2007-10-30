@@ -283,6 +283,7 @@ device_set_driver(device_t dev, driver_t *driver)
 	if (dev->softc == NULL)
 		return -1;
 
+	memset(dev->softc, 0, driver->softc_size);
 	dev->driver = driver;
 
 	for (i = 0; method == NULL && driver->methods[i].name != NULL; i++) {
@@ -387,10 +388,9 @@ __haiku_probe_miibus(device_t dev, driver_t *drivers[], int count)
 void
 bus_generic_attach(device_t dev)
 {
-	device_t child;
+	device_t child = NULL;
 
-	for (child = list_get_first_item(&dev->children);
-			child; child = list_get_next_item(&dev->children, child)) {
+	for (; child != NULL; child = list_get_next_item(&dev->children, child)) {
 		if (child->driver == NULL) {
 			if (dev->driver == &miibus_driver) {
 				driver_t *driver = __haiku_select_miibus_driver(child);
