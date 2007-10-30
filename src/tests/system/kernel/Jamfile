@@ -53,6 +53,7 @@ SetSupportedPlatformsForTarget set_area_protection_test1
 	: $(HAIKU_BEOS_COMPATIBLE_PLATFORMS) ;
 SimpleTest set_area_protection_test1 : set_area_protection_test1.cpp ;
 
+SimpleTest sigsuspend_test : sigsuspend_test.cpp ;
 
 SubInclude HAIKU_TOP src tests system kernel cache ;
 #SubInclude HAIKU_TOP src tests system kernel disk_device_manager ;
