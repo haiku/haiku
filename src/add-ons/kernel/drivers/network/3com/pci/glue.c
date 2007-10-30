@@ -37,7 +37,7 @@ __haiku_disable_interrupts(device_t dev)
 	if (status == 0xffff || (status & XL_INTRS) == 0)
 		return 0;
 
-	atomic_or(&sc->xl_intr_status, status);
+	atomic_or((int32 *)&sc->xl_intr_status, status);
 	CSR_WRITE_2(sc, XL_COMMAND, XL_CMD_INTR_ACK | (status & XL_INTRS));
 	return 1;
 }

@@ -2292,8 +2292,9 @@ xl_intr(void *arg)
 		CSR_WRITE_2(sc, XL_COMMAND,
 		    XL_CMD_INTR_ACK|(status & XL_INTRS));
 #else
-	status = atomic_and(&sc->xl_intr_status, 0);
-	dprintf("GOT %x\n", status & XL_INTRS);
+	status = atomic_and((int32 *)&sc->xl_intr_status, 0);
+//	if (status & XL_INTRS)
+//		dprintf("GOT %x\n", status & XL_INTRS);
 	if ((status & XL_INTRS) != 0 && status != 0xFFFF) {
 #endif
 		if (status & XL_STAT_UP_COMPLETE) {
@@ -2874,7 +2875,8 @@ xl_init_locked(struct xl_softc *sc)
 	rxfilt |= XL_RXFILTER_INDIVIDUAL;
 
 	/* If we want promiscuous mode, set the allframes bit. */
-	if (ifp->if_flags & IFF_PROMISC) {
+// TODO: temporarily set IFF_PROMISC, as the driver doesn't seem to work with the usual filtering
+	if (1/*ifp->if_flags & IFF_PROMISC*/) {
 		rxfilt |= XL_RXFILTER_ALLFRAMES;
 		CSR_WRITE_2(sc, XL_COMMAND, XL_CMD_RX_SET_FILT|rxfilt);
 	} else {
