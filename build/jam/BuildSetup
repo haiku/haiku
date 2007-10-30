@@ -526,7 +526,9 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	}
 
 	if $(HOST_PLATFORM) = darwin {
-		HOST_LIBSUPC++ = gcc_s.1 ;
+		# part of the C++ runtime lives in libstdc++ on Darwin
+		HOST_LIBSUPC++ = gcc_s.1 stdc++ ;
+		HOST_LIBSTDC++ = ;
 	}
 
 	# Unlike glibc FreeBSD's libc doesn't have built-in regex support.
