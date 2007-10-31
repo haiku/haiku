@@ -106,6 +106,8 @@ private:
 		void					_RegionToRectParams(/*const*/ BRegion* region,
 													uint32* count) const;
 		uint32					_NativeColor(const rgb_color& color) const;
+		status_t				_FindBestMode(const display_mode& compareMode,
+									display_mode& modeFound) const;
 		status_t				_SetFallbackMode(display_mode& mode) const;
 		void					_SetSystemPalette();
 		void					_SetGrayscalePalette();

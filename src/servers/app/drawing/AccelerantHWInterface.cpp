@@ -398,6 +398,40 @@ AccelerantHWInterface::Shutdown()
 }
 
 
+/*! Finds the mode in the mode list that is closest to the mode specified.
+	As long as the mode list is not empty, this method will always succeed.
+*/
+status_t
+AccelerantHWInterface::_FindBestMode(const display_mode& compareMode,
+	display_mode& modeFound) const
+{
+	int32 bestDiff = 0;
+	int32 bestIndex = -1;
+	for (int32 i = 0; i < fModeCount; i++) {
+		display_mode& mode = fModeList[i];
+
+		// compute some random equality score
+		int32 diff = 1000 * abs(mode.timing.h_display - compareMode.timing.h_display)
+			+ 1000 * abs(mode.timing.v_display - compareMode.timing.v_display)
+			+ abs(mode.timing.h_total * mode.timing.v_total
+				- compareMode.timing.h_total * compareMode.timing.v_total) / 100
+			+ abs(mode.timing.pixel_clock - compareMode.timing.pixel_clock) / 100
+			+ 100000 * abs(mode.space - compareMode.space);
+
+		if (bestIndex == -1 || diff < bestDiff) {
+			bestDiff = diff;
+			bestIndex = i;
+		}
+	}
+
+	if (bestIndex < 0)
+		return B_ERROR;
+
+	modeFound = fModeList[bestIndex];
+	return B_OK;
+}
+
+
 /*!
 	This method is used for the initial mode set only - because that one
 	should really not fail.
@@ -412,38 +446,17 @@ AccelerantHWInterface::_SetFallbackMode(display_mode& newMode) const
 	// At first, we search the closest display mode from the list of
 	// supported modes - if that fails, we just take one
 
-	int32 bestDiff = 0;
-	int32 bestIndex = -1;
-	for (int32 i = 0; i < fModeCount; i++) {
-		display_mode& mode = fModeList[i];
-
-		// compute some random equality score
-		int32 diff = abs(mode.virtual_width - newMode.virtual_width)
-			+ abs(mode.virtual_height - newMode.virtual_height)
-			+ 10 * abs(mode.space - newMode.space);
-
-		if (bestIndex == -1 || diff < bestDiff) {
-			bestDiff = diff;
-			bestIndex = i;
-		}
-	}
-
-	if (bestIndex < 0)
-		return B_ERROR;
-
-	newMode = fModeList[bestIndex];
-	status_t status = fAccSetDisplayMode(&newMode);
-	if (status == B_OK)
+	if (_FindBestMode(newMode, newMode) == B_OK
+		&& fAccSetDisplayMode(&newMode) == B_OK)
 		return B_OK;
 
 	// That failed as well, this looks like a bug in the graphics
 	// driver, but we have to try to be as forgiving as possible
-	// here - just take the first mode that fits!
+	// here - just take the first mode that works!
 
 	for (int32 i = 0; i < fModeCount; i++) {
 		newMode = fModeList[i];
-		status = fAccSetDisplayMode(&newMode);
-		if (status == B_OK)
+		if (fAccSetDisplayMode(&newMode) == B_OK)
 			return B_OK;
 	}
 
@@ -709,32 +722,32 @@ AccelerantHWInterface::GetTimingConstraints(display_timing_constraints *dtc)
 
 
 status_t
-AccelerantHWInterface::ProposeMode(display_mode *candidate, const display_mode *low, const display_mode *high)
+AccelerantHWInterface::ProposeMode(display_mode *candidate,
+	const display_mode *_low, const display_mode *_high)
 {
 	AutoReadLocker _(this);
 
-	if (!candidate || !low || !high)
+	if (candidate == NULL || _low == NULL || _high == NULL)
 		return B_BAD_VALUE;
-	
-	if (!fAccProposeDisplayMode)
+	if (fAccProposeDisplayMode == NULL)
 		return B_UNSUPPORTED;
-	
+
 	// avoid const issues
-	display_mode this_high, this_low;
-	this_high = *high;
-	this_low = *low;
-	
-	return fAccProposeDisplayMode(candidate, &this_low, &this_high);
+	display_mode high, low;
+	high = *_high;
+	low = *_low;
+
+	return fAccProposeDisplayMode(candidate, &low, &high);
 }
 
 
 status_t
-AccelerantHWInterface::GetPreferredMode(display_mode* mode)
+AccelerantHWInterface::GetPreferredMode(display_mode* preferredMode)
 {
 	status_t status = B_NOT_SUPPORTED;
 
 	if (fAccGetPreferredDisplayMode != NULL) {
-		status = fAccGetPreferredDisplayMode(mode);
+		status = fAccGetPreferredDisplayMode(preferredMode);
 		if (status == B_OK)
 			return B_OK;
 	}
@@ -742,7 +755,7 @@ AccelerantHWInterface::GetPreferredMode(display_mode* mode)
 	if (fAccGetEDIDInfo != NULL) {
 		edid1_info info;
 		uint32 version;
-		status_t status = fAccGetEDIDInfo(&info, sizeof(info), &version);
+		status = fAccGetEDIDInfo(&info, sizeof(info), &version);
 		if (status < B_OK)
 			return status;
 		if (version != EDID_VERSION_1)
@@ -751,34 +764,30 @@ AccelerantHWInterface::GetPreferredMode(display_mode* mode)
 		if (fModeList == NULL)
 			_UpdateModeList();
 
+		status = B_NOT_SUPPORTED;
+
 		// find preferred mode from EDID info
 		for (uint32 i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; ++i) {
 			if (info.detailed_monitor[i].monitor_desc_type != EDID1_IS_DETAILED_TIMING)
 				continue;
 
-			// TODO: we could also just look for this mode in the mode list
-			// TODO: handle sync and flags correctly!
+			// construct basic mode and find it in the mode list
 			const edid1_detailed_timing& timing = info.detailed_monitor[i].data.detailed_timing;
-			mode->timing.pixel_clock = timing.pixel_clock * 10;
-			mode->timing.h_display = timing.h_active;
-			mode->timing.h_sync_start = timing.h_blank;
-			mode->timing.h_sync_end = timing.h_sync_off;
-			mode->timing.h_total = timing.h_sync_width;
-			mode->timing.v_display = timing.v_active;
-			mode->timing.v_sync_start = timing.v_blank;
-			mode->timing.v_sync_end = timing.v_sync_off;
-			mode->timing.v_total = timing.v_sync_width;
-			mode->timing.flags = B_POSITIVE_HSYNC | B_POSITIVE_VSYNC;
-			mode->space = B_RGB32;
-			mode->virtual_width = timing.h_active;
-			mode->virtual_height = timing.v_active;
-			mode->h_display_start = 0;
-			mode->v_display_start = 0;
-			if (fModeCount > 0)
-				mode->flags = fModeList[0].flags;
-			else
-				mode->flags = B_8_BIT_DAC | B_PARALLEL_ACCESS;
-			status = B_OK;
+			display_mode mode;
+			mode.timing.pixel_clock = timing.pixel_clock * 10;
+			mode.timing.h_display = timing.h_active;
+			mode.timing.h_sync_start = timing.h_active + timing.h_sync_off;
+			mode.timing.h_sync_end = mode.timing.h_sync_start + timing.h_sync_width;
+			mode.timing.h_total = timing.h_active + timing.h_blank;
+			mode.timing.v_display = timing.v_active;
+			mode.timing.v_sync_start = timing.v_active + timing.v_sync_off;
+			mode.timing.v_sync_end = mode.timing.v_sync_start + timing.v_sync_width;
+			mode.timing.v_total = timing.v_active + timing.v_blank;
+			mode.space = B_RGB32;
+			mode.virtual_width = timing.h_active;
+			mode.virtual_height = timing.v_active;
+
+			status = _FindBestMode(mode, *preferredMode);
 		}
 	}
 
