@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2007, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _MUTABLE_PARTITION_H
@@ -14,6 +14,8 @@ struct user_partition_data;
 
 class BMutablePartition {
 public:
+			void				UninitializeContents();
+
 			off_t				Offset() const;
 			void				SetOffset(off_t offset);
 
@@ -27,11 +29,14 @@ public:
 			void				SetBlockSize(off_t blockSize);
 
 			uint32				Status() const;
+			void				SetStatus(uint32 status);
 
 			uint32				Flags() const;
 			void				SetFlags(uint32 flags);
+			void				ClearFlags(uint32 flags);
 
-			dev_t				Volume() const;
+			dev_t				VolumeID() const;
+			void				SetVolumeID(dev_t volumeID);
 
 			int32				Index() const;
 
@@ -42,10 +47,10 @@ public:
 			status_t			SetContentName(const char* name);
 
 			const char*			Type() const;
-			status_t			SetType(const char* type) const;
+			status_t			SetType(const char* type);
 
 			const char*			ContentType() const;
-			status_t			SetContentType(const char* type) const;
+			status_t			SetContentType(const char* type);
 
 			const char*			Parameters() const;
 			status_t			SetParameters(const char* parameters);
@@ -60,6 +65,7 @@ public:
 									BMutablePartition** child);
 			status_t			DeleteChild(int32 index);
 			status_t			DeleteChild(BMutablePartition* child);
+			void				DeleteAllChildren();
 
 			BMutablePartition*	Parent() const;
 			BMutablePartition*	ChildAt(int32 index) const;
@@ -68,6 +74,7 @@ public:
 
 			void				SetChangeFlags(uint32 flags);
 			uint32				ChangeFlags() const;
+			void				Changed(uint32 flags, uint32 clearFlags = 0);
 
 			// for the partitioning system managing the parent
 			void*				ChildCookie() const;

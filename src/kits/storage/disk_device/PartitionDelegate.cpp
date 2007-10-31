@@ -494,7 +494,7 @@ BPartition::Delegate::Uninitialize()
 	if (fPartitionHandle) {
 		_FreeHandle();
 
-		// TODO: Uninitialize fMutablePartition!
+		fMutablePartition.UninitializeContents();
 	}
 
 	return B_OK;

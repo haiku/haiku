@@ -40,8 +40,20 @@ set_string(char*& location, const char* newString)
 }
 
 
+static inline int
+compare_string(const char* a, const char* b)
+{
+	if (a == NULL)
+		return (b == NULL ? 0 : -1);
+	if (b == NULL)
+		return 1;
+	return strcmp(a, b);
+}
+
+
 }	// namespace BPrivate
 
 using BPrivate::set_string;
+using BPrivate::compare_string;
 
 #endif	// _DISK_DEVICE_UTILS_H

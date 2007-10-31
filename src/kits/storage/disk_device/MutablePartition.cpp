@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2007, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -21,6 +21,24 @@
 using std::nothrow;
 
 
+// UninitializeContents
+void
+BMutablePartition::UninitializeContents()
+{
+	DeleteAllChildren();
+	SetVolumeID(-1);
+	SetContentName(NULL);
+	SetContentParameters(NULL);
+	SetContentSize(0);
+	SetBlockSize(Parent()->BlockSize());
+	SetContentType(NULL);
+	SetStatus(B_PARTITION_UNINITIALIZED);
+	ClearFlags(B_PARTITION_FILE_SYSTEM | B_PARTITION_PARTITIONING_SYSTEM);
+//	if (!Device()->IsReadOnlyMedia())
+//		ClearFlags(B_PARTITION_READ_ONLY);
+}
+
+
 // Offset
 off_t
 BMutablePartition::Offset() const
@@ -33,7 +51,10 @@ BMutablePartition::Offset() const
 void
 BMutablePartition::SetOffset(off_t offset)
 {
-	fData->offset = offset;
+	if (fData->offset != offset) {
+		fData->offset = offset;
+		Changed(B_PARTITION_CHANGED_OFFSET);
+	}
 }
 
 
@@ -49,7 +70,10 @@ BMutablePartition::Size() const
 void
 BMutablePartition::SetSize(off_t size)
 {
-	fData->size = size;
+	if (fData->size != size) {
+		fData->size = size;
+		Changed(B_PARTITION_CHANGED_SIZE);
+	}
 }
 
 
@@ -65,7 +89,10 @@ BMutablePartition::ContentSize() const
 void
 BMutablePartition::SetContentSize(off_t size)
 {
-	fData->content_size = size;
+	if (fData->content_size != size) {
+		fData->content_size = size;
+		Changed(B_PARTITION_CHANGED_CONTENT_SIZE);
+	}
 }
 
 
@@ -81,7 +108,10 @@ BMutablePartition::BlockSize() const
 void
 BMutablePartition::SetBlockSize(off_t blockSize)
 {
-	fData->block_size = blockSize;
+	if (fData->block_size != blockSize) {
+		fData->block_size = blockSize;
+		Changed(B_PARTITION_CHANGED_BLOCK_SIZE);
+	}
 }
 
 
@@ -90,6 +120,17 @@ uint32
 BMutablePartition::Status() const
 {
 	return fData->status;
+}
+
+
+// SetStatus
+void
+BMutablePartition::SetStatus(uint32 status)
+{
+	if (fData->status != status) {
+		fData->status = status;
+		Changed(B_PARTITION_CHANGED_STATUS);
+	}
 }
 
 
@@ -105,15 +146,40 @@ BMutablePartition::Flags() const
 void
 BMutablePartition::SetFlags(uint32 flags)
 {
-	fData->flags = flags;
+	if (fData->flags != flags) {
+		fData->flags = flags;
+		Changed(B_PARTITION_CHANGED_FLAGS);
+	}
 }
 
 
-// Volume
+// ClearFlags
+void
+BMutablePartition::ClearFlags(uint32 flags)
+{
+	if (flags & fData->flags) {
+		fData->flags &= ~flags;
+		Changed(B_PARTITION_CHANGED_FLAGS);
+	}
+}
+
+
+// VolumeID
 dev_t
-BMutablePartition::Volume() const
+BMutablePartition::VolumeID() const
 {
 	return fData->volume;
+}
+
+
+// SetVolumeID
+void
+BMutablePartition::SetVolumeID(dev_t volumeID)
+{
+	if (fData->volume != volumeID) {
+		fData->volume = volumeID;
+		Changed(B_PARTITION_CHANGED_VOLUME);
+	}
 }
 
 
@@ -137,7 +203,14 @@ BMutablePartition::Name() const
 status_t
 BMutablePartition::SetName(const char* name)
 {
-	return set_string(fData->name, name);
+	if (compare_string(name, fData->name) == 0)
+		return B_OK;
+
+	if (set_string(fData->name, name) != B_OK)
+		return B_NO_MEMORY;
+
+	Changed(B_PARTITION_CHANGED_NAME);
+	return B_OK;
 }
 
 
@@ -153,7 +226,14 @@ BMutablePartition::ContentName() const
 status_t
 BMutablePartition::SetContentName(const char* name)
 {
-	return set_string(fData->content_name, name);
+	if (compare_string(name, fData->content_name) == 0)
+		return B_OK;
+
+	if (set_string(fData->content_name, name) != B_OK)
+		return B_NO_MEMORY;
+
+	Changed(B_PARTITION_CHANGED_CONTENT_NAME);
+	return B_OK;
 }
 
 
@@ -167,9 +247,16 @@ BMutablePartition::Type() const
 
 // SetType
 status_t
-BMutablePartition::SetType(const char* type) const
+BMutablePartition::SetType(const char* type)
 {
-	return set_string(fData->type, type);
+	if (compare_string(type, fData->type) == 0)
+		return B_OK;
+
+	if (set_string(fData->type, type) != B_OK)
+		return B_NO_MEMORY;
+
+	Changed(B_PARTITION_CHANGED_TYPE);
+	return B_OK;
 }
 
 
@@ -183,9 +270,17 @@ BMutablePartition::ContentType() const
 
 // SetContentType
 status_t
-BMutablePartition::SetContentType(const char* type) const
+BMutablePartition::SetContentType(const char* type)
 {
-	return set_string(fData->content_type, type);
+	if (compare_string(type, fData->content_type) == 0)
+		return B_OK;
+
+	if (set_string(fData->content_type, type) != B_OK)
+		return B_NO_MEMORY;
+
+	Changed(B_PARTITION_CHANGED_CONTENT_TYPE
+		| B_PARTITION_CHANGED_INITIALIZATION);
+	return B_OK;
 }
 
 
@@ -201,7 +296,14 @@ BMutablePartition::Parameters() const
 status_t
 BMutablePartition::SetParameters(const char* parameters)
 {
-	return set_string(fData->parameters, parameters);
+	if (compare_string(parameters, fData->parameters) == 0)
+		return B_OK;
+
+	if (set_string(fData->parameters, parameters) != B_OK)
+		return B_NO_MEMORY;
+
+	Changed(B_PARTITION_CHANGED_PARAMETERS);
+	return B_OK;
 }
 
 
@@ -217,7 +319,14 @@ BMutablePartition::ContentParameters() const
 status_t
 BMutablePartition::SetContentParameters(const char* parameters)
 {
-	return set_string(fData->content_parameters, parameters);
+	if (compare_string(parameters, fData->content_parameters) == 0)
+		return B_OK;
+
+	if (set_string(fData->content_parameters, parameters) != B_OK)
+		return B_NO_MEMORY;
+
+	Changed(B_PARTITION_CHANGED_CONTENT_PARAMETERS);
+	return B_OK;
 }
 
 
@@ -255,6 +364,7 @@ BMutablePartition::CreateChild(int32 index, BMutablePartition** _child)
 
 	*_child = child;
 
+	Changed(B_PARTITION_CHANGED_CHILDREN);
 	return B_OK;
 }
 
@@ -284,6 +394,8 @@ BMutablePartition::CreateChild(int32 index, const char* type, const char* name,
 	}
 
 	*_child = child;
+
+	Changed(B_PARTITION_CHANGED_CHILDREN);
 	return B_OK;
 }
 
@@ -301,6 +413,7 @@ BMutablePartition::DeleteChild(int32 index)
 	// referenced.
 	child->fDelegate->Partition()->_DeleteDelegates();
 
+	Changed(B_PARTITION_CHANGED_CHILDREN);
 	return B_OK;
 }
 
@@ -310,6 +423,16 @@ status_t
 BMutablePartition::DeleteChild(BMutablePartition* child)
 {
 	return DeleteChild(IndexOfChild(child));
+}
+
+
+// DeleteAllChildren
+void
+BMutablePartition::DeleteAllChildren()
+{
+	int32 count = CountChildren();
+	for (int32 i = count - 1; i >= 0; i--)
+		DeleteChild(i);
 }
 
 
@@ -360,6 +483,18 @@ uint32
 BMutablePartition::ChangeFlags() const
 {
 	return fChangeFlags;
+}
+
+
+// Changed
+void
+BMutablePartition::Changed(uint32 flags, uint32 clearFlags)
+{
+	fChangeFlags &= ~clearFlags;
+	fChangeFlags |= flags;
+
+	if (Parent())
+		Parent()->Changed(B_PARTITION_CHANGED_DESCENDANTS);
 }
 
 
