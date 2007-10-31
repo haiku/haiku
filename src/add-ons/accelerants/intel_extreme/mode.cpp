@@ -483,12 +483,7 @@ if (first) {
 		write32(INTEL_DISPLAY_A_PLL, pll);
 		read32(INTEL_DISPLAY_A_PLL);
 		spin(150);
-#if 0
-		write32(INTEL_DISPLAY_A_PLL, DISPLAY_PLL_ENABLED | DISPLAY_PLL_2X_CLOCK
-			| DISPLAY_PLL_NO_VGA_CONTROL | DISPLAY_PLL_DIVIDE_4X
-			| (((divisors.post1 - 2) << DISPLAY_PLL_POST1_DIVISOR_SHIFT) & DISPLAY_PLL_POST1_DIVISOR_MASK)
-			| (divisorRegister == INTEL_DISPLAY_A_PLL_DIVISOR_1 ? DISPLAY_PLL_DIVISOR_1 : 0));
-#endif
+
 		// update timing parameters
 		write32(INTEL_DISPLAY_A_HTOTAL, ((uint32)(target.timing.h_total - 1) << 16)
 			| ((uint32)target.timing.h_display - 1));
@@ -512,6 +507,9 @@ if (first) {
 			| ((target.timing.flags & B_POSITIVE_HSYNC) != 0 ? DISPLAY_MONITOR_POSITIVE_HSYNC : 0)
 			| ((target.timing.flags & B_POSITIVE_VSYNC) != 0 ? DISPLAY_MONITOR_POSITIVE_VSYNC : 0));
 	}
+
+	// TODO: verify the two comments below: the X driver doesn't seem to
+	//		care about both of them!
 
 	// These two have to be set for display B, too - this obviously means
 	// that the second head always must adopt the color space of the first
@@ -650,6 +648,8 @@ intel_get_display_mode(display_mode *_currentMode)
 status_t
 intel_get_edid_info(void* info, size_t size, uint32* _version)
 {
+	TRACE(("intel_get_edid_info()\n"));
+
 	if (!gInfo->has_edid)
 		return B_ERROR;
 	if (size < sizeof(struct edid1_info))
