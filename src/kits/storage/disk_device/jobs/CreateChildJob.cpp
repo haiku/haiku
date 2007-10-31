@@ -5,6 +5,8 @@
 
 #include "CreateChildJob.h"
 
+#include <syscalls.h>
+
 #include "DiskDeviceUtils.h"
 #include "PartitionReference.h"
 
@@ -51,7 +53,18 @@ CreateChildJob::Init(off_t offset, off_t size, const char* type,
 status_t
 CreateChildJob::Do()
 {
-// Implement!
-	return B_BAD_VALUE;
+	int32 changeCounter = fPartition->ChangeCounter();
+	partition_id childID;
+	int32 childChangeCounter;
+	status_t error = _kern_create_child_partition(fPartition->PartitionID(),
+		&changeCounter, fOffset, fSize, fType, fName, fParameters,
+		fParameters ? strlen(fParameters) : 0, &childID, &childChangeCounter);
+	if (error != B_OK)
+		return error;
+
+	fPartition->SetChangeCounter(changeCounter);
+	fChild->SetTo(childID, childChangeCounter);
+
+	return B_OK;
 }
 

@@ -16,18 +16,20 @@ namespace BPrivate {
 class PartitionReference : public Referenceable {
 public:
 								PartitionReference(partition_id id = -1,
-									uint32 changeCounter = 0);
+									int32 changeCounter = 0);
 								~PartitionReference();
+
+			void				SetTo(partition_id id, int32 changeCounter);
 
 			partition_id		PartitionID() const;
 			void				SetPartitionID(partition_id id);
 
-			uint32				ChangeCounter() const;
-			void				SetChangeCounter(uint32 counter);
+			int32				ChangeCounter() const;
+			void				SetChangeCounter(int32 counter);
 
 private:
 			partition_id		fID;
-			uint32				fChangeCounter;
+			int32				fChangeCounter;
 };
 
 

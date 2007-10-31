@@ -5,6 +5,8 @@
 
 #include "RepairJob.h"
 
+#include <syscalls.h>
+
 #include "PartitionReference.h"
 
 
@@ -26,7 +28,14 @@ RepairJob::~RepairJob()
 status_t
 RepairJob::Do()
 {
-// Implement!
-	return B_BAD_VALUE;
+	int32 changeCounter = fPartition->ChangeCounter();
+	status_t error = _kern_repair_partition(fPartition->PartitionID(),
+		&changeCounter, fCheckOnly);
+	if (error != B_OK)
+		return error;
+
+	fPartition->SetChangeCounter(changeCounter);
+
+	return B_OK;
 }
 

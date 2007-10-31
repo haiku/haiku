@@ -7,7 +7,7 @@
 
 
 // constructor
-PartitionReference::PartitionReference(partition_id id, uint32 changeCounter)
+PartitionReference::PartitionReference(partition_id id, int32 changeCounter)
 	: Referenceable(true),	// delete when unreferenced
 	  fID(id),
 	  fChangeCounter(changeCounter)
@@ -18,6 +18,15 @@ PartitionReference::PartitionReference(partition_id id, uint32 changeCounter)
 // destructor
 PartitionReference::~PartitionReference()
 {
+}
+
+
+// SetTo
+void
+PartitionReference::SetTo(partition_id id, int32 changeCounter)
+{
+	fID = id;
+	fChangeCounter = changeCounter;
 }
 
 
@@ -38,7 +47,7 @@ PartitionReference::SetPartitionID(partition_id id)
 
 
 // ChangeCounter
-uint32
+int32
 PartitionReference::ChangeCounter() const
 {
 	return fChangeCounter;
@@ -47,7 +56,7 @@ PartitionReference::ChangeCounter() const
 
 // SetChangeCounter
 void
-PartitionReference::SetChangeCounter(uint32 counter)
+PartitionReference::SetChangeCounter(int32 counter)
 {
 	fChangeCounter = counter;
 }

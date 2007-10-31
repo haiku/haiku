@@ -5,6 +5,8 @@
 
 #include "DeleteChildJob.h"
 
+#include <syscalls.h>
+
 #include "DiskDeviceUtils.h"
 #include "PartitionReference.h"
 
@@ -27,7 +29,15 @@ DeleteChildJob::~DeleteChildJob()
 status_t
 DeleteChildJob::Do()
 {
-// Implement!
-	return B_BAD_VALUE;
+	int32 changeCounter = fPartition->ChangeCounter();
+	status_t error = _kern_delete_child_partition(fPartition->PartitionID(),
+		&changeCounter, fChild->PartitionID(), fChild->ChangeCounter());
+	if (error != B_OK)
+		return error;
+
+	fPartition->SetChangeCounter(changeCounter);
+	fChild->SetTo(-1, 0);
+
+	return B_OK;
 }
 

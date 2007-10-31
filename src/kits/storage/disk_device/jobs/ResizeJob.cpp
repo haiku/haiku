@@ -5,6 +5,8 @@
 
 #include "ResizeJob.h"
 
+#include <syscalls.h>
+
 #include "DiskDeviceUtils.h"
 #include "PartitionReference.h"
 
@@ -29,7 +31,17 @@ ResizeJob::~ResizeJob()
 status_t
 ResizeJob::Do()
 {
-// Implement!
-	return B_BAD_VALUE;
+	int32 changeCounter = fPartition->ChangeCounter();
+	int32 childChangeCounter = fChild->ChangeCounter();
+	status_t error = _kern_resize_partition(fPartition->PartitionID(),
+		&changeCounter, fChild->PartitionID(), &childChangeCounter, fSize,
+		fContentSize);
+	if (error != B_OK)
+		return error;
+
+	fPartition->SetChangeCounter(changeCounter);
+	fChild->SetChangeCounter(childChangeCounter);
+
+	return B_OK;
 }
 

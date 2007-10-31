@@ -5,6 +5,8 @@
 
 #include "UninitializeJob.h"
 
+#include <syscalls.h>
+
 #include "PartitionReference.h"
 
 
@@ -25,7 +27,15 @@ UninitializeJob::~UninitializeJob()
 status_t
 UninitializeJob::Do()
 {
-// Implement!
-	return B_BAD_VALUE;
+	int32 changeCounter = fPartition->ChangeCounter();
+	status_t error = _kern_uninitialize_partition(fPartition->PartitionID(),
+		&changeCounter);
+
+	if (error != B_OK)
+		return error;
+
+	fPartition->SetChangeCounter(changeCounter);
+
+	return B_OK;
 }
 

@@ -448,848 +448,11 @@ _user_find_disk_system(const char *_name, user_disk_system_info *_info)
 }
 
 
-// _user_supports_defragmenting_partition
-bool
-_user_supports_defragmenting_partition(partition_id partitionID,
-	int32 changeCounter, bool *_whileMounted)
-{
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	// get the partition
-	KPartition *partition = manager->ReadLockPartition(partitionID);
-	if (!partition)
-		return false;
-	PartitionRegistrar registrar1(partition, true);
-	PartitionRegistrar registrar2(partition->Device(), true);
-	DeviceReadLocker locker(partition->Device(), true);
-	bool whileMounted;
-	bool result = validate_defragment_partition(partition, changeCounter,
-		&whileMounted) == B_OK;
-	if (result && _whileMounted)
-		user_memcpy(_whileMounted, &whileMounted, sizeof(whileMounted));
-	return result;										   
-}
-
-
-// _user_supports_repairing_partition
-bool
-_user_supports_repairing_partition(partition_id partitionID,
-	int32 changeCounter, bool checkOnly, bool *_whileMounted)
-{
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	// get the partition
-	KPartition *partition = manager->ReadLockPartition(partitionID);
-	if (!partition)
-		return false;
-	PartitionRegistrar registrar1(partition, true);
-	PartitionRegistrar registrar2(partition->Device(), true);
-	DeviceReadLocker locker(partition->Device(), true);
-	bool whileMounted;
-	bool result = validate_repair_partition(partition, changeCounter, checkOnly,
-		&whileMounted) == B_OK;
-	if (result && _whileMounted)
-		user_memcpy(_whileMounted, &whileMounted, sizeof(whileMounted));
-	return result;										   
-}
-
-
-// _user_supports_resizing_partition
-bool
-_user_supports_resizing_partition(partition_id partitionID, int32 changeCounter,
-	bool *_canResizeContents, bool *_whileMounted)
-{
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-
-	// get the partition
-	KPartition *partition = manager->ReadLockPartition(partitionID);
-	if (!partition)
-		return false;
-	PartitionRegistrar registrar1(partition, true);
-	PartitionRegistrar registrar2(partition->Device(), true);
-	DeviceReadLocker locker(partition->Device(), true);
-	if (!check_shadow_partition(partition, changeCounter)
-		|| !partition->Parent()) {
-		return false;
-	}
-	if (partition->Parent()->IsBusy()
-		|| partition->Parent()->IsDescendantBusy()) {
-		return false;
-	}
-
-	// get the parent disk system
-	KDiskSystem *parentDiskSystem = partition->Parent()->DiskSystem();
-	if (!parentDiskSystem)
-		return false;
-	bool result = parentDiskSystem->SupportsChildOperations(partition,
-		B_DISK_SYSTEM_SUPPORTS_RESIZING_CHILD);
-	if (!result)
-		return false;
-
-	// get the child disk system
-	KDiskSystem *childDiskSystem = partition->DiskSystem();
-	if (_canResizeContents) {
-		bool canResizeContents = false;
-		bool whileMounted = false;
-		if (childDiskSystem) {
-			uint32 operations = childDiskSystem->GetSupportedOperations(
-				partition, B_DISK_SYSTEM_SUPPORTS_RESIZING
-					| B_DISK_SYSTEM_SUPPORTS_RESIZING_WHILE_MOUNTED);
-
-			if (operations & B_DISK_SYSTEM_SUPPORTS_RESIZING) {
-				canResizeContents = true;
-				if (operations & B_DISK_SYSTEM_SUPPORTS_RESIZING_WHILE_MOUNTED)
-					whileMounted = true;
-			}
-		}
-
-		user_memcpy(_canResizeContents, &canResizeContents, sizeof(canResizeContents));
-		if (_whileMounted)
-			user_memcpy(_whileMounted, &whileMounted, sizeof(whileMounted));
-	}
-// TODO: Currently we report that we cannot resize the contents, if the
-// partition's disk system is unknown. I found this more logical. It doesn't
-// really matter, though, since the API user can check for this situation.
-	return result;
-}
-
-
-// _user_supports_moving_partition
-bool
-_user_supports_moving_partition(partition_id partitionID, int32 changeCounter,
-	partition_id *_unmovable, partition_id *_needUnmounting, size_t bufferSize)
-{
-	if ((!_unmovable || !_needUnmounting) && bufferSize > 0)
-		return false;
-	partition_id *unmovable = NULL; 
-	partition_id *needUnmounting = NULL;
-	if (bufferSize > 0) {
-		unmovable = static_cast<partition_id*>(malloc(bufferSize));	
-		needUnmounting = static_cast<partition_id*>(malloc(bufferSize));
-		if (unmovable && needUnmounting) {
-			user_memcpy(unmovable, _unmovable, bufferSize);
-			user_memcpy(needUnmounting, _needUnmounting, bufferSize);
-		} else {
-			free(unmovable);
-			free(needUnmounting);
-			return false;
-		}
-	}	
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	// get the partition
-	KPartition *partition = manager->ReadLockPartition(partitionID);
-	bool result = partition;
-	if (result) {
-		PartitionRegistrar registrar1(partition, true);
-		PartitionRegistrar registrar2(partition->Device(), true);
-		DeviceReadLocker locker(partition->Device(), true);
-		result = check_shadow_partition(partition, changeCounter)
-			&& partition->Parent();
-		if (result) {
-			result = !partition->Parent()->IsBusy()
-				&& !partition->Parent()->IsDescendantBusy();
-		}
-		if (result) {
-			// get the parent disk system
-			KDiskSystem *parentDiskSystem = partition->Parent()->DiskSystem();
-			result = parentDiskSystem;
-			if (result) {
-				result = parentDiskSystem->SupportsChildOperations(partition,
-					B_DISK_SYSTEM_SUPPORTS_MOVING_CHILD);
-			}
-
-			if (result) {
-				// check the movability of the descendants' contents
-				size_t unmovableSize = bufferSize; 
-				size_t needUnmountingSize = bufferSize; 
-				result = get_unmovable_descendants(partition, unmovable,
-					unmovableSize, needUnmounting, needUnmountingSize);
-			}
-		}
-	}
-	if (result && bufferSize > 0) {
-		user_memcpy(_unmovable, unmovable, bufferSize);
-		user_memcpy(_needUnmounting, needUnmounting, bufferSize);
-	}
-	free(unmovable);
-	free(needUnmounting);
-	return result;
-}
-
-
-// _user_supports_setting_partition_name
-bool
-_user_supports_setting_partition_name(partition_id partitionID,
-	int32 changeCounter)
-{
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	// get the partition
-	KPartition *partition = manager->ReadLockPartition(partitionID);
-	if (!partition)
-		return false;
-	PartitionRegistrar registrar1(partition, true);
-	PartitionRegistrar registrar2(partition->Device(), true);
-	DeviceReadLocker locker(partition->Device(), true);
-	if (!check_shadow_partition(partition, changeCounter)
-		|| !partition->Parent()) {
-		return false;
-	}
-	if (partition->Parent()->IsBusy()
-		|| partition->Parent()->IsDescendantBusy()) {
-		return false;
-	}
-
-	// get the disk system
-	KDiskSystem *diskSystem = partition->Parent()->DiskSystem();
-	if (!diskSystem)
-		return false;
-
-	// get the info
-	return diskSystem->SupportsChildOperations(partition,
-		B_DISK_SYSTEM_SUPPORTS_SETTING_NAME);
-}
-
-// _user_supports_setting_partition_content_name
-bool
-_user_supports_setting_partition_content_name(partition_id partitionID,
-	int32 changeCounter, bool *_whileMounted)
-{
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	// get the partition
-	KPartition *partition = manager->ReadLockPartition(partitionID);
-	if (!partition)
-		return false;
-	PartitionRegistrar registrar1(partition, true);
-	PartitionRegistrar registrar2(partition->Device(), true);
-	DeviceReadLocker locker(partition->Device(), true);
-	if (!check_shadow_partition(partition, changeCounter))
-		return false;
-	if (partition->IsBusy() || partition->IsDescendantBusy())
-		return false;
-	// get the disk system
-	KDiskSystem *diskSystem = partition->DiskSystem();
-	if (!diskSystem)
-		return false;
-
-	// get the info
-	uint32 operations = diskSystem->GetSupportedOperations(partition,
-		B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME
-		| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME_WHILE_MOUNTED);
-
-	bool result = (operations & B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME);
-	if (result && _whileMounted) {
-		bool whileMounted = (operations
-			& B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME_WHILE_MOUNTED);
-		user_memcpy(_whileMounted, &whileMounted, sizeof(whileMounted));
-	}
-
-	return result;
-}
-
-
-// _user_supports_setting_partition_type
-bool
-_user_supports_setting_partition_type(partition_id partitionID,
-	int32 changeCounter)
-{
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	// get the partition
-	KPartition *partition = manager->ReadLockPartition(partitionID);
-	if (!partition)
-		return false;
-	PartitionRegistrar registrar1(partition, true);
-	PartitionRegistrar registrar2(partition->Device(), true);
-	DeviceReadLocker locker(partition->Device(), true);
-	if (!check_shadow_partition(partition, changeCounter)
-		|| !partition->Parent()) {
-		return false;
-	}
-	if (partition->Parent()->IsBusy()
-		|| partition->Parent()->IsDescendantBusy()) {
-		return false;
-	}
-	// get the disk system
-	KDiskSystem *diskSystem = partition->Parent()->DiskSystem();
-	if (!diskSystem)
-		return false;
-	// get the info
-	return diskSystem->SupportsChildOperations(partition,
-		B_DISK_SYSTEM_SUPPORTS_SETTING_TYPE);
-}
-
-
-// _user_supports_setting_partition_parameters
-bool
-_user_supports_setting_partition_parameters(partition_id partitionID,
-	int32 changeCounter)
-{
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	// get the partition
-	KPartition *partition = manager->ReadLockPartition(partitionID);
-	if (!partition)
-		return false;
-	PartitionRegistrar registrar1(partition, true);
-	PartitionRegistrar registrar2(partition->Device(), true);
-	DeviceReadLocker locker(partition->Device(), true);
-	if (!check_shadow_partition(partition, changeCounter)
-		|| !partition->Parent()) {
-		return false;
-	}
-	if (partition->Parent()->IsBusy()
-		|| partition->Parent()->IsDescendantBusy()) {
-		return false;
-	}
-	// get the disk system
-	KDiskSystem *diskSystem = partition->Parent()->DiskSystem();
-	if (!diskSystem)
-		return false;
-	// get the info
-	return diskSystem->SupportsChildOperations(partition,
-		B_DISK_SYSTEM_SUPPORTS_SETTING_PARAMETERS);
-}
-
-
-// _user_supports_setting_partition_content_parameters
-bool
-_user_supports_setting_partition_content_parameters(partition_id partitionID,
-	int32 changeCounter, bool *_whileMounted)
-{
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	// get the partition
-	KPartition *partition = manager->ReadLockPartition(partitionID);
-	if (!partition)
-		return false;
-	PartitionRegistrar registrar1(partition, true);
-	PartitionRegistrar registrar2(partition->Device(), true);
-	DeviceReadLocker locker(partition->Device(), true);
-	if (!check_shadow_partition(partition, changeCounter))
-		return false;
-	if (partition->IsBusy() || partition->IsDescendantBusy())
-		return false;
-	// get the disk system
-	KDiskSystem *diskSystem = partition->DiskSystem();
-	if (!diskSystem)
-		return false;
-	// get the info
-	uint32 operations = diskSystem->GetSupportedOperations(partition,
-		B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS
-		| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS_WHILE_MOUNTED);
-	bool result = (operations
-		& B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS);
-	if (result && _whileMounted) {
-		bool whileMounted = (operations
-			& B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS_WHILE_MOUNTED);
-		user_memcpy(_whileMounted, &whileMounted, sizeof(whileMounted));
-	}
-	return result;
-}
-
-
-// _user_supports_initializing_partition
-bool
-_user_supports_initializing_partition(partition_id partitionID,
-	int32 changeCounter, const char *_diskSystemName)
-{
-	if (!_diskSystemName)
-		return false;
-	char diskSystemName[B_DISK_SYSTEM_NAME_LENGTH];
-	status_t error = ddm_strlcpy(diskSystemName, _diskSystemName, B_DISK_SYSTEM_NAME_LENGTH);
-	if (error)
-		return error;
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-
-	// get the partition
-	KPartition *partition = manager->ReadLockPartition(partitionID);
-	if (!partition)
-		return false;
-	PartitionRegistrar registrar1(partition, true);
-	PartitionRegistrar registrar2(partition->Device(), true);
-	DeviceReadLocker locker(partition->Device(), true);
-	if (!check_shadow_partition(partition, changeCounter))
-		return false;
-	if (partition->IsBusy() || partition->IsDescendantBusy())
-		return false;
-
-	// get the disk system
-	KDiskSystem *diskSystem = manager->LoadDiskSystem(diskSystemName);
-	if (!diskSystem)
-		return false;
-	DiskSystemLoader loader(diskSystem, true);
-
-	// get the info
-	if (!diskSystem->SupportsOperations(partition,
-		B_DISK_SYSTEM_SUPPORTS_INITIALIZING)) {
-		return false;
-	}
-
-	// get the parent partition's disk system
-	KPartition* parentPartition = partition->Parent();
-	if (!parentPartition)
-		return true;
-
-	KDiskSystem* parentDiskSystem = parentPartition->DiskSystem();
-	if (!parentDiskSystem)
-		return false;	// something's fishy!
-
-	// ask the parent disk system
-	return parentDiskSystem->SupportsInitializingChild(partition,
-		diskSystemName);
-}
-
-
-// _user_supports_creating_child_partition
-bool
-_user_supports_creating_child_partition(partition_id partitionID,
-	int32 changeCounter)
-{
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	// get the partition
-	KPartition *partition = manager->ReadLockPartition(partitionID);
-	if (!partition)
-		return false;
-	PartitionRegistrar registrar1(partition, true);
-	PartitionRegistrar registrar2(partition->Device(), true);
-	DeviceReadLocker locker(partition->Device(), true);
-	if (!check_shadow_partition(partition, changeCounter))
-		return false;
-	if (partition->IsBusy() || partition->IsDescendantBusy())
-		return false;
-	// get the disk system
-	KDiskSystem *diskSystem = partition->DiskSystem();
-	if (!diskSystem)
-		return false;
-	// get the info
-	return diskSystem->SupportsOperations(partition,
-		B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD);
-}
-
-
-// _user_supports_deleting_child_partition
-bool
-_user_supports_deleting_child_partition(partition_id partitionID,
-	int32 changeCounter)
-{
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	// get the partition
-	KPartition *partition = manager->ReadLockPartition(partitionID);
-	if (!partition)
-		return false;
-	PartitionRegistrar registrar1(partition, true);
-	PartitionRegistrar registrar2(partition->Device(), true);
-	DeviceReadLocker locker(partition->Device(), true);
-	return (validate_delete_child_partition(partition, changeCounter) == B_OK);
-}
-
-
-// _user_is_sub_disk_system_for
-bool
-_user_is_sub_disk_system_for(disk_system_id diskSystemID,
-	partition_id partitionID, int32 changeCounter)
-{
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	// get the partition
-	KPartition *partition = manager->ReadLockPartition(partitionID);
-	if (!partition)
-		return false;
-	PartitionRegistrar registrar1(partition, true);
-	PartitionRegistrar registrar2(partition->Device(), true);
-	DeviceReadLocker locker(partition->Device(), true);
-	if (!check_shadow_partition(partition, changeCounter))
-		return false;
-	// get the disk system
-	KDiskSystem *diskSystem = partition->DiskSystem();
-	if (!diskSystem || diskSystem->ID() != diskSystemID)
-		return false;
-	// get the info
-	return diskSystem->IsSubSystemFor(partition);
-}
-
-
-// _user_validate_resize_partition
-status_t
-_user_validate_resize_partition(partition_id partitionID, int32 changeCounter,
-	off_t *_size)
-{
-	if (!_size)
-		return B_BAD_VALUE;
-	off_t size;
-	user_memcpy(&size, _size, sizeof(size));
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	// get the partition
-	KPartition *partition = manager->ReadLockPartition(partitionID);
-	if (!partition)
-		return B_ENTRY_NOT_FOUND;
-	PartitionRegistrar registrar1(partition, true);
-	PartitionRegistrar registrar2(partition->Device(), true);
-	DeviceReadLocker locker(partition->Device(), true);
-	off_t contentSize = 0;
-	bool result = validate_resize_partition(partition, changeCounter, &size,
-		&contentSize);
-	if (result)
-		user_memcpy(_size, &size, sizeof(size));
-	return result;								        
-}
-
-
-// _user_validate_move_partition
-status_t
-_user_validate_move_partition(partition_id partitionID, int32 changeCounter,
-	off_t *_newOffset)
-{
-	if (!_newOffset)
-		return B_BAD_VALUE;
-	off_t newOffset;
-	user_memcpy(&newOffset, _newOffset, sizeof(newOffset));
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	// get the partition
-	KPartition *partition = manager->ReadLockPartition(partitionID);
-	if (!partition)
-		return B_ENTRY_NOT_FOUND;
-	PartitionRegistrar registrar1(partition, true);
-	PartitionRegistrar registrar2(partition->Device(), true);
-	DeviceReadLocker locker(partition->Device(), true);
-	status_t result = validate_move_partition(partition, changeCounter,
-		&newOffset);
-	if (result)
-		user_memcpy(_newOffset, &newOffset, sizeof(newOffset));
-	return result;
-}
-
-
-// _user_validate_set_partition_name
-status_t
-_user_validate_set_partition_name(partition_id partitionID,
-	int32 changeCounter, char *_name)
-{
-	if (!_name)
-		return B_BAD_VALUE;
-	char name[B_DISK_DEVICE_NAME_LENGTH];
-	status_t error = ddm_strlcpy(name, _name, B_DISK_DEVICE_NAME_LENGTH, true);
-	if (error)
-		return error;
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	// get the partition
-	KPartition *partition = manager->ReadLockPartition(partitionID);
-	if (!partition)
-		return B_ENTRY_NOT_FOUND;
-	PartitionRegistrar registrar1(partition, true);
-	PartitionRegistrar registrar2(partition->Device(), true);
-	DeviceReadLocker locker(partition->Device(), true);
-	error = validate_set_partition_name(partition, changeCounter, name);
-	if (!error)
-		error = ddm_strlcpy(_name, name, B_DISK_DEVICE_NAME_LENGTH);
-	return error;
-}
-
-
-// _user_validate_set_partition_content_name
-status_t
-_user_validate_set_partition_content_name(partition_id partitionID,
-										  int32 changeCounter, char *_name)
-{
-	if (!_name)
-		return B_BAD_VALUE;
-	char name[B_DISK_DEVICE_NAME_LENGTH];
-	status_t error = ddm_strlcpy(name, _name, B_DISK_DEVICE_NAME_LENGTH, true);
-	if (error)
-		return error;
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	// get the partition
-	KPartition *partition = manager->ReadLockPartition(partitionID);
-	if (!partition)
-		return B_ENTRY_NOT_FOUND;
-	PartitionRegistrar registrar1(partition, true);
-	PartitionRegistrar registrar2(partition->Device(), true);
-	DeviceReadLocker locker(partition->Device(), true);
-	error = validate_set_partition_content_name(partition, changeCounter, name);
-	if (!error)
-		error = ddm_strlcpy(_name, name, B_DISK_DEVICE_NAME_LENGTH);
-	return error;
-}
-
-
-// _user_validate_set_partition_type
-status_t
-_user_validate_set_partition_type(partition_id partitionID,
-	int32 changeCounter, const char *_type)
-{
-	if (!_type)
-		return B_BAD_VALUE;
-	char type[B_DISK_DEVICE_TYPE_LENGTH];
-	status_t error = ddm_strlcpy(type, _type, B_DISK_DEVICE_TYPE_LENGTH);
-	if (error)
-		return error;
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	// get the partition
-	KPartition *partition = manager->ReadLockPartition(partitionID);
-	if (!partition)
-		return B_ENTRY_NOT_FOUND;
-	PartitionRegistrar registrar1(partition, true);
-	PartitionRegistrar registrar2(partition->Device(), true);
-	DeviceReadLocker locker(partition->Device(), true);
-	return validate_set_partition_type(partition, changeCounter, type);
-}
-
-
-// _user_validate_initialize_partition
-status_t
-_user_validate_initialize_partition(partition_id partitionID,
-	int32 changeCounter, const char *_diskSystemName, char *_name,
-	const char *_parameters, size_t parametersSize)
-{
-	if (!_diskSystemName || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE)
-		return B_BAD_VALUE;
-
-	// copy disk system name
-	char diskSystemName[B_DISK_SYSTEM_NAME_LENGTH];
-	status_t error = ddm_strlcpy(diskSystemName, _diskSystemName,
-		B_DISK_SYSTEM_NAME_LENGTH);
-
-	// copy name
-	char name[B_DISK_DEVICE_NAME_LENGTH];
-	if (!error && _name) 
-		error = ddm_strlcpy(name, _name, B_DISK_DEVICE_NAME_LENGTH, true);
-
-	if (error != B_OK)
-		return error;
-
-	// copy parameters
-	char *parameters = NULL;
-	MemoryDeleter parameterDeleter;
-	if (_parameters) {
-		parameters = static_cast<char*>(malloc(parametersSize));
-		if (!parameters)
-			return B_NO_MEMORY;
-		parameterDeleter.SetTo(parameters);
-
-		if (user_memcpy(parameters, _parameters, parametersSize) != B_OK)
-			return B_BAD_ADDRESS;
-	}
-
-	// get the partition
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	KPartition *partition = manager->ReadLockPartition(partitionID);
-	if (!partition)
-		return B_ENTRY_NOT_FOUND;
-
-	// validate
-	PartitionRegistrar registrar1(partition, true);
-	PartitionRegistrar registrar2(partition->Device(), true);
-	DeviceReadLocker locker(partition->Device(), true);
-	error = validate_initialize_partition(partition, changeCounter,
-		diskSystemName, _name ? name : NULL, parameters);
-
-	// copy back the modified name
-	if (!error && _name)
-		error = ddm_strlcpy(_name, name, B_DISK_DEVICE_NAME_LENGTH);
-
-	return error;
-}
-
-
-// _user_validate_create_child_partition
-status_t
-_user_validate_create_child_partition(partition_id partitionID,
-	int32 changeCounter, off_t *_offset, off_t *_size, const char *_type,
-	const char *_parameters, size_t parametersSize)
-{
-	if (!_offset || !_size || !_type
-	    || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE) {
-		return B_BAD_VALUE;
-	}
-	off_t offset;
-	off_t size;
-	char type[B_DISK_DEVICE_TYPE_LENGTH];
-	char *parameters = NULL;
-	user_memcpy(&offset, _offset, sizeof(offset));
-	user_memcpy(&size, _size, sizeof(size));
-	status_t error = ddm_strlcpy(type, _type, B_DISK_DEVICE_TYPE_LENGTH);
-	if (error)
-		return error;
-	if (_parameters) {
-		parameters = static_cast<char*>(malloc(parametersSize));
-		if (parameters)
-			user_memcpy(parameters, _parameters, parametersSize);
-		else
-			return B_NO_MEMORY;
-	}	
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	// get the partition
-	KPartition *partition = manager->ReadLockPartition(partitionID);
-	error = partition ? (status_t)B_OK : (status_t)B_ENTRY_NOT_FOUND;
-	if (!error) {
-		PartitionRegistrar registrar1(partition, true);
-		PartitionRegistrar registrar2(partition->Device(), true);
-		DeviceReadLocker locker(partition->Device(), true);
-		error = validate_create_child_partition(partition, changeCounter,
-			&offset, &size, type, parameters);
-	}
-	if (!error) {
-		user_memcpy(_offset, &offset, sizeof(offset));
-		user_memcpy(_size, &size, sizeof(size));
-	}
-	free(parameters);
-	return error;
-}
-
-
-// _user_get_next_supported_partition_type
-status_t
-_user_get_next_supported_partition_type(partition_id partitionID,
-	int32 changeCounter, int32 *_cookie, char *_type)
-{
-	if (!_cookie || !_type)
-		return B_BAD_VALUE;
-	int32 cookie;
-	user_memcpy(&cookie, _cookie, sizeof(cookie));
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	// get the partition
-	KPartition *partition = manager->ReadLockPartition(partitionID);
-	status_t error = partition ? (status_t)B_OK : (status_t)B_ENTRY_NOT_FOUND;
-	if (!error) {
-		PartitionRegistrar registrar1(partition, true);
-		PartitionRegistrar registrar2(partition->Device(), true);
-		DeviceReadLocker locker(partition->Device(), true);
-		error = check_shadow_partition(partition, changeCounter)
-			? B_OK : B_BAD_VALUE;
-		if (!error) {
-			// get the disk system
-			KDiskSystem *diskSystem = partition->DiskSystem();
-			error = diskSystem ? (status_t)B_OK : (status_t)B_ENTRY_NOT_FOUND;
-			if (!error) {
-				// get the info
-				char type[B_DISK_DEVICE_TYPE_LENGTH];
-				error = diskSystem->GetNextSupportedType(partition, &cookie,
-					type);
-				if (!error)
-					error = ddm_strlcpy(_type, type, B_DISK_DEVICE_TYPE_LENGTH);
-			}
-		}
-	}
-	if (!error)
-		user_memcpy(_cookie, &cookie, sizeof(cookie));
-	return error;
-}
-
-
-// _user_get_partition_type_for_content_type
-status_t
-_user_get_partition_type_for_content_type(disk_system_id diskSystemID,
-	const char *_contentType, char *_type)
-{
-	if (!_contentType || !_type)
-		return B_BAD_VALUE;
-	char contentType[B_DISK_DEVICE_TYPE_LENGTH];
-	status_t error = ddm_strlcpy(contentType, _contentType,
-			B_DISK_DEVICE_TYPE_LENGTH);
-	if (error)
-		return error;
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	// get the disk system
-	KDiskSystem *diskSystem = manager->LoadDiskSystem(diskSystemID);
-	if (!diskSystem)
-		return false;
-	DiskSystemLoader loader(diskSystem, true);
-	// get the info
-	char type[B_DISK_DEVICE_TYPE_LENGTH];
-	if (diskSystem->GetTypeForContentType(contentType, type))
-		return ddm_strlcpy(_type, type, B_DISK_DEVICE_TYPE_LENGTH);
-	return B_ERROR;
-}
-
-
-// _user_prepare_disk_device_modifications
-status_t
-_user_prepare_disk_device_modifications(partition_id deviceID)
-{
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	// get the device
-	if (KDiskDevice *device = manager->RegisterDevice(deviceID, true)) {
-		PartitionRegistrar _(device, true);
-		if (DeviceWriteLocker locker = device) {
-			if (device->ShadowOwner() >= 0)
-				return B_BUSY;
-			// create shadow device
-			return device->CreateShadowDevice(get_current_team());
-		}
-	}
-	return B_ENTRY_NOT_FOUND;
-}
-
-// _user_commit_disk_device_modifications
-status_t
-_user_commit_disk_device_modifications(partition_id deviceID, port_id port,
-	int32 token, bool completeProgress)
-{
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	// get the device
-	if (KDiskDevice *device = manager->RegisterDevice(deviceID, true)) {
-		PartitionRegistrar _(device, true);
-		if (DeviceWriteLocker locker = device) {
-			if (device->ShadowOwner() != get_current_team())
-				return B_BAD_VALUE;
-			// generate the jobs
-			KDiskDeviceJobGenerator generator(manager->JobFactory(), device);
-			status_t error = generator.GenerateJobs();
-			if (error != B_OK)
-				return error;
-			// add the jobs to the manager
-			if (ManagerLocker locker2 = manager) {
-				error = manager->AddJobQueue(generator.JobQueue());
-				if (error == B_OK)
-					generator.DetachJobQueue();
-				else
-					return error;
-			} else
-				return B_ERROR;
-			// TODO: notification stuff
-			return device->DeleteShadowDevice();
-		}
-	}
-	return B_ENTRY_NOT_FOUND;
-}
-
-
-// _user_cancel_disk_device_modifications
-status_t
-_user_cancel_disk_device_modifications(partition_id deviceID)
-{
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	// get the device
-	if (KDiskDevice *device = manager->RegisterDevice(deviceID, true)) {
-		PartitionRegistrar _(device, true);
-		if (DeviceWriteLocker locker = device) {
-			if (device->ShadowOwner() != get_current_team())
-				return B_BAD_VALUE;
-			// delete shadow device
-			return device->DeleteShadowDevice();
-		}
-	}
-	return B_ENTRY_NOT_FOUND;
-}
-
-
-// _user_is_disk_device_modified
-bool
-_user_is_disk_device_modified(partition_id deviceID)
-{
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	// get the device
-	if (KDiskDevice *device = manager->RegisterDevice(deviceID, true)) {
-		PartitionRegistrar _(device, true);
-		if (DeviceReadLocker locker = device) {
-			// check whether there's a shadow device and whether it's changed
-			return (device->ShadowOwner() == get_current_team()
-				&& device->ShadowPartition()
-				&& device->ShadowPartition()->ChangeFlags() != 0);
-		}
-	}
-	return B_ENTRY_NOT_FOUND;
-}
-
-
 // _user_defragment_partition
 status_t
-_user_defragment_partition(partition_id partitionID, int32 changeCounter)
+_user_defragment_partition(partition_id partitionID, int32* changeCounter)
 {
+#if 0
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->WriteLockPartition(partitionID);
@@ -1305,14 +468,17 @@ _user_defragment_partition(partition_id partitionID, int32 changeCounter)
 	// set the defragmenting flag
 	partition->Changed(B_PARTITION_CHANGED_DEFRAGMENTATION);
 	return B_OK;
+#endif
+return B_BAD_VALUE;
 }
 
 
 // _user_repair_partition
 status_t
-_user_repair_partition(partition_id partitionID, int32 changeCounter,
+_user_repair_partition(partition_id partitionID, int32* changeCounter,
 	bool checkOnly)
 {
+#if 0
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->WriteLockPartition(partitionID);
@@ -1332,14 +498,18 @@ _user_repair_partition(partition_id partitionID, int32 changeCounter,
 	else
 		partition->Changed(B_PARTITION_CHANGED_REPAIR);
 	return B_OK;
+#endif
+return B_BAD_VALUE;
 }
 
 
 // _user_resize_partition
 status_t
-_user_resize_partition(partition_id partitionID, int32 changeCounter,
-	off_t size)
+_user_resize_partition(partition_id partitionID, int32* changeCounter,
+	partition_id childID, int32* childChangeCounter, off_t size,
+	off_t contentSize)
 {
+#if 0
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->WriteLockPartition(partitionID);
@@ -1373,14 +543,19 @@ _user_resize_partition(partition_id partitionID, int32 changeCounter,
 			partition, NULL, B_PARTITION_RESIZE);
 	}
 	return error;
+#endif
+return B_BAD_VALUE;
 }
 
 
 // _user_move_partition
 status_t
-_user_move_partition(partition_id partitionID, int32 changeCounter,
-	off_t newOffset)
+_user_move_partition(partition_id partitionID, int32* changeCounter,
+	partition_id childID, int32* childChangeCounter, off_t newOffset,
+	partition_id* descendantIDs, int32* descendantChangeCounters,
+	int32 descendantCount)
 {
+#if 0
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->WriteLockPartition(partitionID);
@@ -1410,14 +585,17 @@ _user_move_partition(partition_id partitionID, int32 changeCounter,
 		return error;
 	// implicit descendants' content disk system changes
 	return move_descendants_contents(partition);
+#endif
+return B_BAD_VALUE;
 }
 
 
 // _user_set_partition_name
 status_t
-_user_set_partition_name(partition_id partitionID, int32 changeCounter,
-	const char *_name)
+_user_set_partition_name(partition_id partitionID, int32* changeCounter,
+	partition_id childID, int32* childChangeCounter, const char* name)
 {
+#if 0
 	if (!_name)
 		return B_BAD_VALUE;
 	char name[B_DISK_DEVICE_NAME_LENGTH];
@@ -1448,14 +626,17 @@ _user_set_partition_name(partition_id partitionID, int32 changeCounter,
 	// implicit partitioning system changes
 	return partition->Parent()->DiskSystem()->ShadowPartitionChanged(
 		partition->Parent(), partition, B_PARTITION_SET_NAME);
+#endif
+return B_BAD_VALUE;
 }
 
 
 // _user_set_partition_content_name
 status_t
-_user_set_partition_content_name(partition_id partitionID, int32 changeCounter,
-	const char *_name)
+_user_set_partition_content_name(partition_id partitionID, int32* changeCounter,
+	const char* name)
 {
+#if 0
 	if (!_name)
 		return B_BAD_VALUE;
 	char name[B_DISK_DEVICE_NAME_LENGTH];
@@ -1487,14 +668,17 @@ _user_set_partition_content_name(partition_id partitionID, int32 changeCounter,
 	// implicit content disk system changes
 	return partition->DiskSystem()->ShadowPartitionChanged(
 		partition, NULL, B_PARTITION_SET_CONTENT_NAME);
+#endif
+return B_BAD_VALUE;
 }
 
 
 // _user_set_partition_type
 status_t
-_user_set_partition_type(partition_id partitionID, int32 changeCounter,
-	const char *_type)
+_user_set_partition_type(partition_id partitionID, int32* changeCounter,
+	partition_id childID, int32* childChangeCounter, const char* type)
 {
+#if 0
 	if (!_type)
 		return B_BAD_VALUE;
 	char type[B_DISK_DEVICE_TYPE_LENGTH];
@@ -1521,14 +705,18 @@ _user_set_partition_type(partition_id partitionID, int32 changeCounter,
 	// implicit partitioning system changes
 	return partition->Parent()->DiskSystem()->ShadowPartitionChanged(
 		partition->Parent(), partition, B_PARTITION_SET_TYPE);
+#endif
+return B_BAD_VALUE;
 }
 
 
 // _user_set_partition_parameters
 status_t
-_user_set_partition_parameters(partition_id partitionID, int32 changeCounter,
-	const char *_parameters, size_t parametersSize)
+_user_set_partition_parameters(partition_id partitionID, int32* changeCounter,
+	partition_id childID, int32* childChangeCounter, const char* parameters,
+	size_t parametersSize)
 {
+#if 0
 	if (!_parameters || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE)
 		return B_BAD_VALUE;
 	char *parameters = NULL;
@@ -1564,14 +752,17 @@ _user_set_partition_parameters(partition_id partitionID, int32 changeCounter,
 	}
 	free(parameters);
 	return error;
+#endif
+return B_BAD_VALUE;
 }
 
 
 // _user_set_partition_content_parameters
 status_t
 _user_set_partition_content_parameters(partition_id partitionID,
-	int32 changeCounter, const char *_parameters, size_t parametersSize)
+	int32* changeCounter, const char* parameters, size_t parametersSize)
 {
+#if 0
 	if (!_parameters || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE)
 		return B_BAD_VALUE;
 	char *parameters = NULL;
@@ -1606,15 +797,18 @@ _user_set_partition_content_parameters(partition_id partitionID,
 	}
 	free(partition);
 	return error;
+#endif
+return B_BAD_VALUE;
 }
 
 
 // _user_initialize_partition
 status_t
-_user_initialize_partition(partition_id partitionID, int32 changeCounter,
-	const char *_diskSystemName, const char *_name, const char *_parameters,
+_user_initialize_partition(partition_id partitionID, int32* changeCounter,
+	const char* diskSystemName, const char* name, const char* parameters,
 	size_t parametersSize)
 {
+#if 0
 	if (!_diskSystemName || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE)
 		return B_BAD_VALUE;
 
@@ -1692,13 +886,16 @@ _user_initialize_partition(partition_id partitionID, int32 changeCounter,
 	// implicit content disk system changes
 	return partition->DiskSystem()->ShadowPartitionChanged(
 		partition, NULL, B_PARTITION_INITIALIZE);
+#endif
+return B_BAD_VALUE;
 }
 
 
 // _user_uninitialize_partition
 status_t
-_user_uninitialize_partition(partition_id partitionID, int32 changeCounter)
+_user_uninitialize_partition(partition_id partitionID, int32* changeCounter)
 {
+#if 0
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->WriteLockPartition(partitionID);
@@ -1709,15 +906,20 @@ _user_uninitialize_partition(partition_id partitionID, int32 changeCounter)
 	DeviceWriteLocker locker(partition->Device(), true);
 	// unitialize the partition's contents and set the new parameters
 	return partition->UninitializeContents(true);
+#endif
+return B_BAD_VALUE;
 }
 
 
 // _user_create_child_partition
 status_t
-_user_create_child_partition(partition_id partitionID, int32 changeCounter,
-	off_t offset, off_t size, const char *_type, const char *_parameters,
-	size_t parametersSize, partition_id *_childID)
+_user_create_child_partition(partition_id partitionID, int32* changeCounter,
+	off_t offset, off_t size, const char* type, const char* name,
+	const char* parameters, size_t parametersSize, partition_id* childID,
+	int32* childChangeCounter)
+
 {
+#if 0
 	if (!_type || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE)
 		return B_BAD_VALUE;
 	char type[B_DISK_DEVICE_TYPE_LENGTH];
@@ -1777,13 +979,17 @@ _user_create_child_partition(partition_id partitionID, int32 changeCounter,
 	}
 	free(parameters);
 	return error;
+#endif
+return B_BAD_VALUE;
 }
 
 
-// _user_delete_partition
+// _user_delete_child_partition
 status_t
-_user_delete_partition(partition_id partitionID, int32 changeCounter)
+_user_delete_child_partition(partition_id partitionID, int32* changeCounter,
+	partition_id childID, int32 childChangeCounter)
 {
+#if 0
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->WriteLockPartition(partitionID);
@@ -1802,123 +1008,6 @@ _user_delete_partition(partition_id partitionID, int32 changeCounter)
 		return B_ERROR;
 	parent->Changed(B_PARTITION_CHANGED_CHILDREN);
 	return B_OK;
+#endif
+return B_BAD_VALUE;
 }
-
-
-// _user_get_next_disk_device_job_info
-status_t
-_user_get_next_disk_device_job_info(int32 *_cookie,
-	user_disk_device_job_info *_info)
-{
-	if (!_cookie || !_info)
-		return B_BAD_VALUE;
-	int32 cookie;
-	user_disk_device_job_info info;
-	user_memcpy(&cookie, _cookie, sizeof(cookie));
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	status_t error = B_ENTRY_NOT_FOUND;
-	if (ManagerLocker locker = manager) {
-		// get the next job and an info
-		while (KDiskDeviceJob *job = manager->NextJob(&cookie)) {
-			// return info only on job scheduled or in progress
-			switch (job->Status()) {
-				case B_DISK_DEVICE_JOB_SCHEDULED:
-				case B_DISK_DEVICE_JOB_IN_PROGRESS:
-					error = job->GetInfo(&info);
-					break;
-				case B_DISK_DEVICE_JOB_UNINITIALIZED:
-				case B_DISK_DEVICE_JOB_SUCCEEDED:
-				case B_DISK_DEVICE_JOB_FAILED:
-				case B_DISK_DEVICE_JOB_CANCELED:
-					break;
-			}
-		}
-	}
-	if (!error) {
-		user_memcpy(_cookie, &cookie, sizeof(cookie));
-		user_memcpy(_info, &info, sizeof(info));
-	}
-	return error;
-}
-
-
-// _user_get_disk_device_job_info
-status_t
-_user_get_disk_device_job_info(disk_job_id id, user_disk_device_job_info *_info)
-{
-	if (!_info)
-		return B_BAD_VALUE;
-	user_disk_device_job_info info;		
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	status_t error = B_ENTRY_NOT_FOUND;
-	if (ManagerLocker locker = manager) {
-		// find the job and get the info
-		if (KDiskDeviceJob *job = manager->FindJob(id))
-			error = job->GetInfo(&info);
-	}
-	if (!error)
-		user_memcpy(_info, &info, sizeof(info));
-	return error;
-}
-
-
-// _user_get_disk_device_job_status
-status_t
-_user_get_disk_device_job_progress_info(disk_job_id id,
-	disk_device_job_progress_info *_info)
-{
-	if (!_info)
-		return B_BAD_VALUE;
-	disk_device_job_progress_info info;		
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	status_t error = B_ENTRY_NOT_FOUND;
-	if (ManagerLocker locker = manager) {
-		// find the job and get the info
-		if (KDiskDeviceJob *job = manager->FindJob(id))
-			error = job->GetProgressInfo(&info);
-	}
-	if (!error)
-		user_memcpy(_info, &info, sizeof(info));
-	return error;
-}
-
-
-// _user_pause_disk_device_job
-status_t
-_user_pause_disk_device_job(disk_job_id id)
-{
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	if (ManagerLocker locker = manager) {
-		// get the job and the respective job queue
-		if (KDiskDeviceJob *job = manager->FindJob(id)) {
-			if (KDiskDeviceJobQueue *jobQueue = job->JobQueue()) {
-				// only the active job in progress can be paused
-				if (jobQueue->ActiveJob() != job)
-					return B_BAD_VALUE;
-				return jobQueue->Pause();
-			}
-		}
-	}
-	return B_ENTRY_NOT_FOUND;
-}
-
-
-// _user_cancel_disk_device_job
-status_t
-_user_cancel_disk_device_job(disk_job_id id, bool reverse)
-{
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	if (ManagerLocker locker = manager) {
-		// get the job and the respective job queue
-		if (KDiskDeviceJob *job = manager->FindJob(id)) {
-			if (KDiskDeviceJobQueue *jobQueue = job->JobQueue()) {
-				// only the active job in progress can be canceled
-				if (jobQueue->ActiveJob() != job)
-					return B_BAD_VALUE;
-				return jobQueue->Cancel(reverse);
-			}
-		}
-	}
-	return B_ENTRY_NOT_FOUND;
-}
-

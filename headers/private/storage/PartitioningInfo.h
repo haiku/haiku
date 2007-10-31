@@ -29,9 +29,6 @@ public:
 			int32				CountPartitionableSpaces() const;
 
 private:
-			status_t			_SetTo(partition_id partition,
-									int32 changeCounter);
-
 			status_t			_InsertSpaces(int32 index, int32 count);
 			void				_RemoveSpaces(int32 index, int32 count);
 

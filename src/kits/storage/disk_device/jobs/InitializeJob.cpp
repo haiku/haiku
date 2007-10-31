@@ -5,6 +5,8 @@
 
 #include "InitializeJob.h"
 
+#include <syscalls.h>
+
 #include "DiskDeviceUtils.h"
 #include "PartitionReference.h"
 
@@ -45,7 +47,16 @@ InitializeJob::Init(const char* diskSystem, const char* name,
 status_t
 InitializeJob::Do()
 {
-// Implement!
-	return B_BAD_VALUE;
+	int32 changeCounter = fPartition->ChangeCounter();
+	status_t error = _kern_initialize_partition(fPartition->PartitionID(),
+		&changeCounter, fDiskSystem, fName, fParameters,
+		fParameters ? strlen(fParameters) : 0);
+
+	if (error != B_OK)
+		return error;
+
+	fPartition->SetChangeCounter(changeCounter);
+
+	return B_OK;
 }
 

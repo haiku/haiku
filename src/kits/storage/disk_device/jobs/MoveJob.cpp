@@ -3,9 +3,13 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include "MoveJob.h"
+
 #include <new>
 
-#include "MoveJob.h"
+#include <AutoDeleter.h>
+
+#include <syscalls.h>
 
 #include "DiskDeviceUtils.h"
 #include "PartitionReference.h"
@@ -58,7 +62,35 @@ MoveJob::Init(off_t offset, PartitionReference** contents, int32 contentsCount)
 status_t
 MoveJob::Do()
 {
-// Implement!
-	return B_BAD_VALUE;
+	int32 changeCounter = fPartition->ChangeCounter();
+	int32 childChangeCounter = fChild->ChangeCounter();
+
+	partition_id* descendantIDs = new(nothrow) partition_id[fContentsCount];
+	int32* descendantChangeCounters = new(nothrow) int32[fContentsCount];
+	ArrayDeleter<partition_id> _(descendantIDs);
+	ArrayDeleter<int32> _2(descendantChangeCounters);
+
+	if (!descendantIDs || !descendantChangeCounters)
+		return B_NO_MEMORY;
+
+	for (int32 i = 0; i < fContentsCount; i++) {
+		descendantIDs[i] = fContents[i]->PartitionID();
+		descendantChangeCounters[i] = fContents[i]->ChangeCounter();
+	}
+
+	status_t error = _kern_move_partition(fPartition->PartitionID(),
+		&changeCounter, fChild->PartitionID(), &childChangeCounter, fOffset,
+		descendantIDs, descendantChangeCounters, fContentsCount);
+
+	if (error != B_OK)
+		return error;
+
+	fPartition->SetChangeCounter(changeCounter);
+	fChild->SetChangeCounter(childChangeCounter);
+
+	for (int32 i = 0; i < fContentsCount; i++)
+		fContents[i]->SetChangeCounter(descendantChangeCounters[i]);
+
+	return B_OK;
 }
 
