@@ -2,28 +2,7 @@
  * multiaudio replacement media addon for BeOS
  *
  * Copyright (c) 2002, 2003 Jerome Duval (jerome.duval@free.fr)
- *
- * All rights reserved.
- * Redistribution and use in source and binary forms, with or without modification, 
- * are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice, 
- *   this list of conditions and the following disclaimer.
- * - Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation 
- *   and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR 
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES 
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS 
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY 
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ * Distributed under the terms of the MIT License.
  */
 #include <MediaDefs.h>
 #include <MediaNode.h>
@@ -1621,7 +1600,21 @@ MultiAudioNode::FillNextBuffer(node_input &input, BBuffer* buffer)
 		case media_raw_audio_format::B_AUDIO_FLOAT:
 
 			switch(input.fFormat.u.raw_audio.format) {
-			case media_raw_audio_format::B_AUDIO_FLOAT:
+			case media_raw_audio_format::B_AUDIO_FLOAT: {
+					size_t frame_size = input.fInput.format.u.raw_audio.channel_count * sizeof(float);
+					size_t stride = fDevice->MBL.playback_buffers[input.fBufferCycle][input.fChannelId].stride;
+					//PRINT(("stride : %i, frame_size : %i, return_playback_buffer_size : %i\n", stride, frame_size, fDevice->MBL.return_playback_buffer_size));
+					for(uint32 channel = 0; channel < input.fInput.format.u.raw_audio.channel_count; channel++) {
+						char *sample_dest = fDevice->MBL.playback_buffers[input.fBufferCycle][input.fChannelId + channel].base;
+						//char *sample_src = (char*)buffer->Data() + (input.fInput.format.u.raw_audio.channel_count - 1 - channel) * sizeof(int16);
+						char *sample_src = (char*)buffer->Data() + channel * sizeof(float);
+						for(uint32 i=fDevice->MBL.return_playback_buffer_size; i>0; i--) {
+							*(float *)sample_dest = *(float *)sample_src;
+							sample_dest += stride;
+							sample_src += frame_size;
+						}
+					}
+				}
 				break;
 			case media_raw_audio_format::B_AUDIO_INT:
 				break;
@@ -1688,7 +1681,7 @@ MultiAudioNode::FillNextBuffer(node_input &input, BBuffer* buffer)
 						//char *sample_src = (char*)buffer->Data() + (input.fInput.format.u.raw_audio.channel_count - 1 - channel) * sizeof(int16);
 						char *sample_src = (char*)buffer->Data() + channel * sizeof(int32);
 						for(uint32 i=fDevice->MBL.return_playback_buffer_size; i>0; i--) {
-							*(int32*)sample_dest = *(int32*)sample_src;
+							*(int32 *)sample_dest = *(int32 *)sample_src;
 							sample_dest += stride;
 							sample_src += frame_size;
 						}
@@ -1745,7 +1738,7 @@ MultiAudioNode::FillNextBuffer(node_input &input, BBuffer* buffer)
 						//char *sample_src = (char*)buffer->Data() + (input.fInput.format.u.raw_audio.channel_count - 1 - channel) * sizeof(int16);
 						char *sample_src = (char*)buffer->Data() + channel * sizeof(int16);
 						for(uint32 i=fDevice->MBL.return_playback_buffer_size; i>0; i--) {
-							*(int16*)sample_dest = *(int16*)sample_src;
+							*(int16 *)sample_dest = *(int16 *)sample_src;
 							sample_dest += stride;
 							sample_src += frame_size;
 						}
@@ -1819,10 +1812,10 @@ MultiAudioNode::UpdateTimeSource(multi_buffer_info &MBI, multi_buffer_info &oldM
 	//CALLED();
 	if(fTimeSourceStarted) {
 		bigtime_t perf_time = (bigtime_t)(MBI.played_frames_count / 
-						input.fInput.format.u.raw_audio.frame_rate * 1000000);
+						input.fInput.format.u.raw_audio.frame_rate * 1000000LL);
 		bigtime_t real_time = MBI.played_real_time;
 		float drift = ((MBI.played_frames_count - oldMBI.played_frames_count)
-						/ input.fInput.format.u.raw_audio.frame_rate * 1000000)
+						/ input.fInput.format.u.raw_audio.frame_rate * 1000000LL)
 						/ (MBI.played_real_time - oldMBI.played_real_time);
 	
 		PublishTime(perf_time, real_time, drift);
