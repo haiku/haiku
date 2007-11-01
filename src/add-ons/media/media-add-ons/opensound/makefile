@@ -73,7 +73,7 @@ LIBPATHS :=
 #	additional paths to look for system headers
 #	thes use the form: #include <header>
 #	source file directories are NOT auto-included here
-SYSTEM_INCLUDE_PATHS := ../../include
+SYSTEM_INCLUDE_PATHS := ../../include ../../../../../headers/private/media
 
 #	additional paths to look for local headers
 #	thes use the form: #include "header"
