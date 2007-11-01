@@ -1291,7 +1291,7 @@ ESDSinkNode::MakeParameterWeb()
 	BParameterGroup *group = web->MakeGroup("Server");
 	BParameter *p;
 	fWebHostId = fWebPortId = -1;
-#ifdef B_BEOS_VERSION_DANO /* not yet in Haiku */
+#if defined(B_BEOS_VERSION_DANO) || defined(__HAIKU__)
 	fWebHostId = id++;
 	p = group->MakeTextParameter(fWebHostId, B_MEDIA_RAW_AUDIO, "Hostname", B_GENERIC, 128);
 	fWebPortId = id++;
