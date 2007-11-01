@@ -86,6 +86,7 @@ StdBinCommands
 	hey.cpp
 	iroster.cpp
 	listattr.cpp
+	listfont.cpp
 	listres.cpp
 	mimeset.cpp
 	mkindex.cpp
