@@ -13,6 +13,7 @@
 #include <NodeInfo.h>
 
 #include <stdlib.h>
+#include <stdio.h>
 
 class _EXPORT BSimpleMailAttachment;
 class _EXPORT BAttributedMailAttachment;
