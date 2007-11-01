@@ -205,7 +205,7 @@ _BTextGapBuffer_::GetString(int32 fromOffset, int32 *_numBytes)
 		uint32 numChars = UTF8CountChars(result, numBytes);
 		uint32 charLen = UTF8CountBytes(B_UTF8_BULLET, 1);
 		uint32 newSize = numChars * charLen;
-		
+
 		if ((uint32)fScratchSize < newSize) {
 			fScratchBuffer = (char *)realloc(fScratchBuffer, newSize);
 			fScratchSize = newSize;
@@ -217,7 +217,8 @@ _BTextGapBuffer_::GetString(int32 fromOffset, int32 *_numBytes)
 			memcpy(scratchPtr, B_UTF8_BULLET, charLen);
 			scratchPtr += charLen;
 		}
-		*_numBytes = newSize - 1;	
+
+		*_numBytes = newSize;	
 	}
 
 	return result;

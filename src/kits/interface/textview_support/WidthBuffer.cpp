@@ -148,7 +148,8 @@ float
 _BWidthBuffer_::StringWidth(_BTextGapBuffer_ &inBuffer, int32 fromOffset, int32 length,
 		const BFont *inStyle)
 {
-	return StringWidth(inBuffer.Text(), fromOffset, length, inStyle);
+	const char* text = inBuffer.GetString(fromOffset, &length);
+	return StringWidth(text, 0, length, inStyle);
 }
 
 

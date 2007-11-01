@@ -1233,8 +1233,9 @@ BTextView::Copy(BClipboard *clipboard)
 
 		BMessage *clip = clipboard->Data();
 		if (clip != NULL) {
-			clip->AddData("text/plain", B_MIME_TYPE, Text() + fSelStart,
-				fSelEnd - fSelStart);
+			int32 numBytes = fSelEnd - fSelStart;
+			const char* text = fText->GetString(fSelStart, &numBytes);
+			clip->AddData("text/plain", B_MIME_TYPE, text, numBytes);
 
 			int32 size;
 			if (fStylable) {
@@ -2642,9 +2643,10 @@ BTextView::GetDragParameters(BMessage *drag, BBitmap **bitmap, BPoint *point,
 	drag->AddInt32("be_actions", B_TRASH_TARGET);
 	
 	// add the text
-	drag->AddData("text/plain", B_MIME_TYPE, fText->RealText() + fSelStart,
-		fSelEnd - fSelStart);
-	
+	int32 numBytes = fSelEnd - fSelStart;
+	const char* text = fText->GetString(fSelStart, &numBytes);
+	drag->AddData("text/plain", B_MIME_TYPE, text, numBytes);
+
 	// add the corresponding styles
 	int32 size = 0;
 	text_run_array *styles = RunArray(fSelStart, fSelEnd, &size);
@@ -3422,10 +3424,15 @@ BTextView::_StyledWidth(int32 fromOffset, int32 length, float *outAscent,
 			LockWidthBuffer();
 			result += sWidths->StringWidth(*fText, fromOffset, numChars, font);
 			UnlockWidthBuffer();
-		} else
+		} else {
 #endif
-			result += font->StringWidth(fText->RealText() + fromOffset, numChars);
-		
+			const char* text = fText->GetString(fromOffset, &numChars);
+			result += font->StringWidth(text, numChars);
+
+#if USE_WIDTHBUFFER
+		}
+#endif
+
 		fromOffset += numChars;
 		length -= numChars;
 	}
