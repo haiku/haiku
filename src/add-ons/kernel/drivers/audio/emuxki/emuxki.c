@@ -2751,25 +2751,35 @@ init_driver(void)
 		char       *end;
 		uint32      value;
 
-		item = get_driver_parameter (settings_handle, "channels", "0", "0");
-		value = strtoul (item, &end, 0);
-		if (*end == '\0') current_settings.channels = value;
+		item = get_driver_parameter (settings_handle, "channels", NULL, NULL);
+		if (item) {
+			value = strtoul (item, &end, 0);
+			if (*end == '\0') current_settings.channels = value;
+		}
 
-		item = get_driver_parameter (settings_handle, "bitsPerSample", "0", "0");
-		value = strtoul (item, &end, 0);
-		if (*end == '\0') current_settings.bitsPerSample = value;
+		item = get_driver_parameter (settings_handle, "bitsPerSample", NULL, NULL);
+		if (item) {
+			value = strtoul (item, &end, 0);
+			if (*end == '\0') current_settings.bitsPerSample = value;
+		}
 
-		item = get_driver_parameter (settings_handle, "sample_rate", "0", "0");
-		value = strtoul (item, &end, 0);
-		if (*end == '\0') current_settings.sample_rate = value;
+		item = get_driver_parameter (settings_handle, "sample_rate", NULL, NULL);
+		if (item) {
+			value = strtoul (item, &end, 0);
+			if (*end == '\0') current_settings.sample_rate = value;
+		}
 
-		item = get_driver_parameter (settings_handle, "buffer_frames", "0", "0");
-		value = strtoul (item, &end, 0);
-		if (*end == '\0') current_settings.buffer_frames = value;
+		item = get_driver_parameter (settings_handle, "buffer_frames", NULL, NULL);
+		if (item) {
+			value = strtoul (item, &end, 0);
+			if (*end == '\0') current_settings.buffer_frames = value;
+		}
 
-		item = get_driver_parameter (settings_handle, "buffer_count", "0", "0");
-		value = strtoul (item, &end, 0);
-		if (*end == '\0') current_settings.buffer_count = value;
+		item = get_driver_parameter (settings_handle, "buffer_count", NULL, NULL);
+		if (item) {
+			value = strtoul (item, &end, 0);
+			if (*end == '\0') current_settings.buffer_count = value;
+		}
 
 		unload_driver_settings (settings_handle);
 	}
