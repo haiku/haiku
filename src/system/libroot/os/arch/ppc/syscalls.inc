@@ -68,3 +68,21 @@ name:
 .align 4; \
 name:
 
+#define SYSCALL11(name, n) \
+.globl name; \
+.type name,@function; \
+.align 4; \
+name:
+
+#define SYSCALL12(name, n) \
+.globl name; \
+.type name,@function; \
+.align 4; \
+name:
+
+#define SYSCALL13(name, n) \
+.globl name; \
+.type name,@function; \
+.align 4; \
+name:
+
