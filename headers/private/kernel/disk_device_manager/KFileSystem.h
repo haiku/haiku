@@ -33,25 +33,9 @@ public:
 	virtual void FreeIdentifyCookie(KPartition *partition, void *cookie);
 	virtual void FreeContentCookie(KPartition *partition);
 
-	// Querying
-
-	virtual uint32 GetSupportedOperations(KPartition* partition, uint32 mask);
-
-	virtual bool ValidateResize(KPartition *partition, off_t *size);
-	virtual bool ValidateMove(KPartition *partition, off_t *start);
-	virtual bool ValidateSetContentName(KPartition *partition, char *name);
-	virtual bool ValidateSetContentParameters(KPartition *partition,
-											  const char *parameters);
-	virtual bool ValidateInitialize(KPartition *partition, char *name,
-									const char *parameters);
-
-	// Shadow partition modification
-
-	virtual status_t ShadowPartitionChanged(KPartition *partition,
-		KPartition *child, uint32 operation);
-
 	// Writing
 
+#if 0
 	virtual status_t Defragment(KPartition *partition, KDiskDeviceJob *job);
 	virtual status_t Repair(KPartition *partition, bool checkOnly,
 							KDiskDeviceJob *job);
@@ -66,6 +50,7 @@ public:
 										  KDiskDeviceJob *job);
 	virtual status_t Initialize(KPartition *partition, const char *name,
 								const char *parameters, KDiskDeviceJob *job);
+#endif	// 0
 
 protected:
 	virtual status_t LoadModule();

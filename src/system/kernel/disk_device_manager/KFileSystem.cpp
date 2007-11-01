@@ -7,7 +7,7 @@
 #include <fs_interface.h>
 
 #include "ddm_modules.h"
-#include "KDiskDeviceJob.h"
+//#include "KDiskDeviceJob.h"
 #include "KDiskDeviceUtils.h"
 #include "KFileSystem.h"
 #include "KPartition.h"
@@ -97,97 +97,7 @@ KFileSystem::FreeContentCookie(KPartition *partition)
 }
 
 
-// GetSupportedOperations
-uint32
-KFileSystem::GetSupportedOperations(KPartition* partition, uint32 mask)
-{
-	ASSERT(partition != NULL);
-
-	// Note, that for initialization, the partition's disk system does not
-	// need to be this disk system.
-
-	if (!fModule)
-		return 0;
-
-	if (!fModule->get_supported_operations)
-		return (Flags() & mask);
-
-	return fModule->get_supported_operations(partition->PartitionData(), mask)
-		& mask;
-}
-
-
-// ValidateResize
-bool
-KFileSystem::ValidateResize(KPartition *partition, off_t *size)
-{
-	return (partition && size && partition->DiskSystem() == this && fModule
-			&& fModule->validate_resize
-			&& fModule->validate_resize(partition->PartitionData(), size));
-}
-
-
-// ValidateMove
-bool
-KFileSystem::ValidateMove(KPartition *partition, off_t *start)
-{
-	return (partition && start && partition->DiskSystem() == this && fModule
-			&& fModule->validate_move
-			&& fModule->validate_move(partition->PartitionData(), start));
-}
-
-
-// ValidateSetContentName
-bool
-KFileSystem::ValidateSetContentName(KPartition *partition, char *name)
-{
-	return (partition && name && partition->DiskSystem() == this
-			&& fModule && fModule->validate_set_content_name
-			&& fModule->validate_set_content_name(partition->PartitionData(),
-												  name));
-}
-
-
-// ValidateSetContentParameters
-bool
-KFileSystem::ValidateSetContentParameters(KPartition *partition,
-										  const char *parameters)
-{
-	return (partition && partition->DiskSystem() == this && fModule
-			&& fModule->validate_set_content_parameters
-			&& fModule->validate_set_content_parameters(
-					partition->PartitionData(), parameters));
-}
-
-
-// ValidateInitialize
-bool
-KFileSystem::ValidateInitialize(KPartition *partition, char *name,
-								const char *parameters)
-{
-	return (partition && fModule && fModule->validate_initialize
-		&& fModule->validate_initialize(partition->PartitionData(), name,
-				parameters));
-}
-
-
-// ShadowPartitionChanged
-status_t
-KFileSystem::ShadowPartitionChanged(KPartition *partition, KPartition *child,
-	uint32 operation)
-{
-	if (!partition)
-		return B_BAD_VALUE;
-	if (!fModule)
-		return B_ERROR;
-	// If not implemented, we assume, that the file system doesn't have to
-	// make any additional changes.
-	if (!fModule->shadow_changed)
-		return B_OK;
-	return fModule->shadow_changed(partition->PartitionData(),
-		child ? child->PartitionData() : NULL, operation);
-}
-
+#if 0
 
 // Defragment
 status_t
@@ -276,6 +186,8 @@ KFileSystem::Initialize(KPartition *partition, const char *name,
 	close(fd);
 	return result;
 }
+
+#endif	// 0
 
 
 // LoadModule

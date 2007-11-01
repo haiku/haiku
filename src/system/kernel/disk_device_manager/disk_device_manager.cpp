@@ -5,8 +5,6 @@
 
 #include "disk_device_manager.h"
 #include "KDiskDevice.h"
-#include "KDiskDeviceJob.h"
-#include "KDiskDeviceJobQueue.h"
 #include "KDiskDeviceManager.h"
 #include "KDiskDeviceUtils.h"
 #include "KDiskSystem.h"
@@ -232,7 +230,7 @@ scan_partition(partition_id partitionID)
 	PartitionRegistrar _(partition, true);
 
 	// scan it
-	return manager->ScanPartition(partition, false);
+	return manager->ScanPartition(partition);
 }
 
 
@@ -253,6 +251,7 @@ find_disk_system(const char *name)
 bool
 update_disk_device_job_progress(disk_job_id jobID, float progress)
 {
+#if 0
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
 		if (KDiskDeviceJob *job = manager->FindJob(jobID)) {
@@ -260,6 +259,7 @@ update_disk_device_job_progress(disk_job_id jobID, float progress)
 			return true;
 		}
 	}
+#endif
 	return false;
 }
 
@@ -268,6 +268,7 @@ update_disk_device_job_progress(disk_job_id jobID, float progress)
 bool
 update_disk_device_job_extra_progress(disk_job_id jobID, const char *info)
 {
+#if 0
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
 		if (KDiskDeviceJob *job = manager->FindJob(jobID)) {
@@ -275,6 +276,7 @@ update_disk_device_job_extra_progress(disk_job_id jobID, const char *info)
 			return true;
 		}
 	}
+#endif
 	return false;
 }
 
@@ -283,6 +285,7 @@ update_disk_device_job_extra_progress(disk_job_id jobID, const char *info)
 bool
 set_disk_device_job_error_message(disk_job_id jobID, const char *message)
 {
+#if 0
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
 		if (KDiskDeviceJob *job = manager->FindJob(jobID)) {
@@ -290,6 +293,7 @@ set_disk_device_job_error_message(disk_job_id jobID, const char *message)
 			return true;
 		}
 	}
+#endif
 	return false;
 }
 
@@ -299,6 +303,7 @@ uint32
 update_disk_device_job_interrupt_properties(disk_job_id jobID,
 											uint32 interruptProperties)
 {
+#if 0
 	bool paused = false;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	do {
@@ -329,6 +334,7 @@ update_disk_device_job_interrupt_properties(disk_job_id jobID,
 			pauseSemaphore = -1;
 		}
 	} while (paused);
+#endif
 	return B_DISK_DEVICE_JOB_CONTINUE;
 }
 

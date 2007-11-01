@@ -13,14 +13,9 @@ UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 
 KernelMergeObject kernel_disk_device_manager.o :
-	ddm_operation_validation.cpp
 	ddm_userland_interface.cpp
 	disk_device_manager.cpp
 	KDiskDevice.cpp
-	KDiskDeviceJob.cpp
-	KDiskDeviceJobFactory.cpp
-	KDiskDeviceJobGenerator.cpp
-	KDiskDeviceJobQueue.cpp
 	KDiskDeviceManager.cpp
 	KFileDiskDevice.cpp
 	KDiskSystem.cpp
@@ -32,20 +27,6 @@ KernelMergeObject kernel_disk_device_manager.o :
 	KPhysicalPartition.cpp
 	KShadowPartition.cpp
 	UserDataWriter.cpp
-
-	# jobs
-	KCreateChildJob.cpp
-	KDefragmentJob.cpp
-	KDeleteChildJob.cpp
-	KInitializeJob.cpp
-	KMoveJob.cpp
-	KRepairJob.cpp
-	KResizeJob.cpp
-	KScanPartitionJob.cpp
-	KSetNameJob.cpp
-	KSetParametersJob.cpp
-	KSetTypeJob.cpp
-	KUninitializeJob.cpp
 
 	# utilities
 	Locker.cpp

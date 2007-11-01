@@ -15,7 +15,7 @@ struct user_disk_system_info;
 namespace BPrivate {
 namespace DiskDevice {
 
-class KDiskDeviceJob;
+//class KDiskDeviceJob;
 class KPartition;
 
 //!	\brief Common ancestor for disk system add-on wrappers
@@ -51,60 +51,10 @@ public:
 	virtual void FreeCookie(KPartition *partition);
 	virtual void FreeContentCookie(KPartition *partition);
 
-	// Querying
-	// Device must be read locked.
-
-	virtual uint32 GetSupportedOperations(KPartition* partition, uint32 mask);
-	virtual uint32 GetSupportedChildOperations(KPartition* child, uint32 mask);
-
-	// for convenience
-	bool SupportsOperations(KPartition* partition, uint32 operations)
-		{ return (GetSupportedOperations(partition, operations) & operations)
-			== operations; }
-	bool SupportsChildOperations(KPartition* child, uint32 operations)
-		{ return (GetSupportedChildOperations(child, operations) & operations)
-			== operations; }
-
-	virtual bool SupportsInitializingChild(KPartition *child,
-		const char *diskSystem);
-	virtual bool IsSubSystemFor(KPartition *partition);
-
-	virtual bool ValidateResize(KPartition *partition, off_t *size);
-	virtual bool ValidateResizeChild(KPartition *child, off_t *size);
-	virtual bool ValidateMove(KPartition *partition, off_t *start);
-	virtual bool ValidateMoveChild(KPartition *child, off_t *start);
-	virtual bool ValidateSetName(KPartition *partition, char *name);
-	virtual bool ValidateSetContentName(KPartition *partition, char *name);
-	virtual bool ValidateSetType(KPartition *partition, const char *type);
-	virtual bool ValidateSetParameters(KPartition *partition,
-									   const char *parameters);
-	virtual bool ValidateSetContentParameters(KPartition *parameters,
-											  const char *parameters);
-	virtual bool ValidateInitialize(KPartition *partition, char *name,
-									const char *parameters);
-	virtual bool ValidateCreateChild(KPartition *partition, off_t *start,
-									 off_t *size, const char *type,
-									 const char *parameters, int32 *index);
-	virtual int32 CountPartitionableSpaces(KPartition *partition);
-	virtual status_t GetPartitionableSpaces(KPartition *partition,
-											partitionable_space_data *buffer,
-											int32 count,
-											int32 *actualCount = NULL);
-
-	virtual status_t GetNextSupportedType(KPartition *partition, int32 *cookie,
-										  char *type);
-	virtual status_t GetTypeForContentType(const char *contentType,
-										   char *type);
-
-	// Shadow partition modification
-	// Device must be write locked.
-
-	virtual status_t ShadowPartitionChanged(KPartition *partition,
-		KPartition *child, uint32 operation);
-
 	// Writing
 	// Device should not be locked.
 
+#if 0
 	virtual status_t Defragment(KPartition *partition, KDiskDeviceJob *job);
 	virtual status_t Repair(KPartition *partition, bool checkOnly,
 							KDiskDeviceJob *job);
@@ -140,6 +90,7 @@ public:
 // since the device will not be locked, when they are called. The KPartition
 // is registered though, so that it is at least guaranteed that the object
 // won't go away.
+#endif // 0
 
 protected:
 	virtual status_t LoadModule();

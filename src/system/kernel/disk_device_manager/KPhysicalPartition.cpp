@@ -182,6 +182,7 @@ KPhysicalPartition::CreateShadowPartition()
 			return B_NO_MEMORY;
 		}
 
+#if 0
 		// notify the disk systems
 		// parent disk system
 		status_t error;
@@ -204,6 +205,7 @@ KPhysicalPartition::CreateShadowPartition()
 				return error;
 			}
 		}
+#endif	// 0
 	}
 
 	// create shadows for children

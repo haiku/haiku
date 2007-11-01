@@ -16,9 +16,6 @@ namespace BPrivate {
 namespace DiskDevice {
 
 class KDiskDevice;
-class KDiskDeviceJob;
-class KDiskDeviceJobFactory;
-class KDiskDeviceJobQueue;
 class KDiskSystem;
 class KFileDiskDevice;
 class KPartition;
@@ -66,10 +63,10 @@ public:
 		// Both the device and the partition is also registered and must be
 		// unregistered by the caller.
 
-	status_t ScanPartition(KPartition* partition, bool async);
+	status_t ScanPartition(KPartition* partition);
 
-	partition_id CreateFileDevice(const char *filePath,
-		bool *newlyCreated = NULL, bool async = true);
+	partition_id CreateFileDevice(const char* filePath,
+		bool* newlyCreated = NULL);
 	status_t DeleteFileDevice(const char *filePath);
 	status_t DeleteFileDevice(partition_id id);
 
@@ -80,29 +77,6 @@ public:
 	bool PartitionAdded(KPartition *partition);		// implementation internal
 	bool PartitionRemoved(KPartition *partition);	//
 	bool DeletePartition(KPartition *partition);	//
-
-	// Jobs
-
-	// manager must be locked
-	KDiskDeviceJob *FindJob(disk_job_id id);
-	int32 CountJobs();
-	KDiskDeviceJob *NextJob(int32 *cookie);
-
-	// manager must be locked
-	status_t AddJobQueue(KDiskDeviceJobQueue *jobQueue);
-		// the device must be write locked
-	status_t RemoveJobQueue(KDiskDeviceJobQueue *jobQueue);
-	status_t DeleteJobQueue(KDiskDeviceJobQueue *jobQueue);
-		// called when the execution is done
-	int32 CountJobQueues();
-	KDiskDeviceJobQueue *NextJobQueue(int32 *cookie);
-
-	KDiskDeviceJobFactory *JobFactory() const;
-
-	// manager must *not* be locked
-	status_t UpdateBusyPartitions(KDiskDevice *device);
-	status_t UpdateJobStatus(KDiskDeviceJob *job, uint32 status,
-							 bool updateBusyPartitions);
 
 	// Disk Systems
 
@@ -137,20 +111,14 @@ private:
 	bool _AddDevice(KDiskDevice *device);
 	bool _RemoveDevice(KDiskDevice *device);
 
-	bool _RemoveJobQueue(KDiskDeviceJobQueue *jobQueue);
-
-	status_t _UpdateBusyPartitions(KDiskDevice *device);
-	status_t _UpdateJobStatus(KDiskDeviceJob *job, uint32 status,
-							  bool updateBusyPartitions);
-
 	status_t _Scan(const char *path);
 	status_t _ScanPartition(KPartition *partition, bool async);
 		// the manager must be locked and the device write locked
+	status_t _ScanPartition(KPartition *partition);
+		// used by the other _ScanPartition() version only
 
 	struct DeviceMap;
 	struct DiskSystemMap;
-	struct JobMap;
-	struct JobQueueVector;
 	struct PartitionMap;
 	struct PartitionSet;
 
@@ -159,9 +127,6 @@ private:
 	PartitionMap				*fPartitions;
 	DiskSystemMap				*fDiskSystems;
 	PartitionSet				*fObsoletePartitions;
-	JobMap						*fJobs;
-	JobQueueVector				*fJobQueues;
-	KDiskDeviceJobFactory		*fJobFactory;
 
 	static KDiskDeviceManager	*sDefaultManager;
 };

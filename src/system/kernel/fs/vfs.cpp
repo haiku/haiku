@@ -5350,7 +5350,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 			// an invalid path, or the path refers to an image file. We try
 			// to let the DDM create a file device for the path.
 			partition_id deviceID = ddm->CreateFileDevice(normalizedDevice.Path(),
-				&newlyCreatedFileDevice, false);
+				&newlyCreatedFileDevice);
 			if (deviceID >= 0) {
 				partition = ddm->RegisterPartition(deviceID, true);
 				if (newlyCreatedFileDevice)

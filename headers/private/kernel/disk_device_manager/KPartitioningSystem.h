@@ -35,49 +35,9 @@ public:
 	virtual void FreeCookie(KPartition *partition);
 	virtual void FreeContentCookie(KPartition *partition);
 
-	// Querying
-
-	virtual uint32 GetSupportedOperations(KPartition* partition, uint32 mask);
-	virtual uint32 GetSupportedChildOperations(KPartition* child, uint32 mask);
-
-	virtual bool SupportsInitializingChild(KPartition *child,
-		const char *diskSystem);
-	virtual bool IsSubSystemFor(KPartition *partition);
-
-	virtual bool ValidateResize(KPartition *partition, off_t *size);
-	virtual bool ValidateResizeChild(KPartition *child, off_t *size);
-	virtual bool ValidateMove(KPartition *partition, off_t *start);
-	virtual bool ValidateMoveChild(KPartition *child, off_t *start);
-	virtual bool ValidateSetName(KPartition *partition, char *name);
-	virtual bool ValidateSetContentName(KPartition *partition, char *name);
-	virtual bool ValidateSetType(KPartition *partition, const char *type);
-	virtual bool ValidateSetParameters(KPartition *partition,
-									   const char *parameters);
-	virtual bool ValidateSetContentParameters(KPartition *parameters,
-											  const char *parameters);
-	virtual bool ValidateInitialize(KPartition *partition, char *name,
-									const char *parameters);
-	virtual bool ValidateCreateChild(KPartition *partition, off_t *start,
-									 off_t *size, const char *type,
-									 const char *parameters, int32 *index);
-	virtual int32 CountPartitionableSpaces(KPartition *partition);
-	virtual status_t GetPartitionableSpaces(KPartition *partition,
-											partitionable_space_data *buffer,
-											int32 count,
-											int32 *actualCount = NULL);
-
-	virtual status_t GetNextSupportedType(KPartition *partition, int32 *cookie,
-										  char *type);
-	virtual status_t GetTypeForContentType(const char *contentType,
-										   char *type);
-
-	// Shadow partition modification
-
-	virtual status_t ShadowPartitionChanged(KPartition *partition,
-		KPartition *child, uint32 operation);
-
 	// Writing
 
+#if 0
 	virtual status_t Repair(KPartition *partition, bool checkOnly,
 							KDiskDeviceJob *job);
 	virtual status_t Resize(KPartition *partition, off_t size,
@@ -108,6 +68,7 @@ public:
 	virtual status_t DeleteChild(KPartition *child, KDiskDeviceJob *job);
 	virtual status_t Initialize(KPartition *partition, const char *name,
 								const char *parameters, KDiskDeviceJob *job);
+#endif	// 0
 
 protected:
 	virtual status_t LoadModule();

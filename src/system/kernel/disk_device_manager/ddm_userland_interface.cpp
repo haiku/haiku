@@ -8,8 +8,6 @@
 #include <AutoDeleter.h>
 #include <ddm_userland_interface.h>
 #include <KDiskDevice.h>
-#include <KDiskDeviceJob.h>
-#include <KDiskDeviceJobQueue.h>
 #include <KDiskDeviceManager.h>
 #include <KDiskDeviceUtils.h>
 #include <KDiskSystem.h>
@@ -17,8 +15,6 @@
 #include <KShadowPartition.h>
 #include <syscall_args.h>
 
-#include "ddm_operation_validation.h"
-#include "KDiskDeviceJobGenerator.h"
 #include "UserDataWriter.h"
 
 using namespace BPrivate::DiskDevice;
@@ -51,6 +47,7 @@ ddm_strlcpy(char *to, const char *from, size_t size,
 }
 
 
+#if 0
 // move_descendants
 static void
 move_descendants(KPartition *partition, off_t moveBy)
@@ -86,6 +83,7 @@ move_descendants_contents(KPartition *partition)
 	}
 	return B_OK;
 }
+#endif // 0
 
 
 // _user_get_next_disk_device_id
@@ -280,67 +278,6 @@ _user_get_disk_device_data(partition_id id, bool deviceOnly, bool shadow,
 			return B_ERROR;
 	}
 	return B_ENTRY_NOT_FOUND;
-}
-
-
-// _user_get_partitionable_spaces
-status_t
-_user_get_partitionable_spaces(partition_id partitionID, int32 changeCounter,
-	partitionable_space_data *_buffer, int32 count, int32 *_actualCount)
-{
-	if (count > 0 && !_buffer)
-		return B_BAD_VALUE;	
-
-	if (count > 0 && !IS_USER_ADDRESS(_buffer)
-		|| _actualCount && !IS_USER_ADDRESS(_actualCount)) {
-		return B_BAD_ADDRESS;
-	}
-
-	// allocate buffer
-	int32 bufferSize = count * sizeof(partitionable_space_data);
-	partitionable_space_data *buffer = NULL;
-	MemoryDeleter bufferDeleter;
-	if (count > 0) {
-		buffer = (partitionable_space_data*)malloc(bufferSize);
-		if (!buffer)
-			return B_NO_MEMORY;
-		bufferDeleter.SetTo(buffer);
-	}
-
-	status_t error = B_OK;
-
-	// get the partition
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	KPartition *partition = manager->ReadLockPartition(partitionID);
-	if (!partition)
-		return B_ENTRY_NOT_FOUND;
-
-	PartitionRegistrar registrar1(partition, true);
-	PartitionRegistrar registrar2(partition->Device(), true);
-	DeviceReadLocker locker(partition->Device(), true);
-
-	if (!check_shadow_partition(partition, changeCounter))
-		return B_BAD_VALUE;
-		
-	// get the disk system
-	KDiskSystem *diskSystem = partition->DiskSystem();
-	if (!diskSystem)
-		return B_ENTRY_NOT_FOUND;
-
-	// get the info
-	int32 actualCount;
-	error = diskSystem->GetPartitionableSpaces(partition, buffer, count,
-		&actualCount);
-
-	// copy out
-	if (_actualCount)
-		user_memcpy(_actualCount, &actualCount, sizeof(actualCount));
-			// copy even on error
-
-	if (error == B_OK && buffer)
-		user_memcpy(_buffer, buffer, bufferSize);
-
-	return error;
 }
 
 
