@@ -132,7 +132,7 @@ display_io(int argc, char **argv)
 {
 	int32 displayWidth;
 	int32 itemSize;
-	int32 num = -1;
+	int32 num = 1;
 	int address;
 	int i = 1, j;
 
@@ -141,6 +141,7 @@ display_io(int argc, char **argv)
 		num = atoi(argv[2]);
 	case 2:
 		address = strtoul(argv[1], NULL, 0);
+		break;
 	default:
 		kprintf("usage: %s <address> [num]\n", argv[0]);
 		return 0;
@@ -160,9 +161,6 @@ display_io(int argc, char **argv)
 		kprintf("display_io called in an invalid way!\n");
 		return 0;
 	}
-
-	if (num <= 0)
-		num = displayWidth;
 
 	for (i = 0; i < num; i++) {
 		if ((i % displayWidth) == 0) {
@@ -198,6 +196,54 @@ display_io(int argc, char **argv)
 }
 
 
+static int
+write_io(int argc, char **argv)
+{
+	int32 itemSize;
+	uint32 value;
+	int address;
+	int i = 1;
+
+	if (argc < 3) {
+		kprintf("usage: %s <address> <value> [value [...]]\n", argv[0]);
+		return 0;
+	}
+
+	address = strtoul(argv[1], NULL, 0);
+
+	if (strcmp(argv[0], "outb") == 0 || strcmp(argv[0], "out8") == 0) {
+		itemSize = 1;
+	} else if (strcmp(argv[0], "outs") == 0 || strcmp(argv[0], "out16") == 0) {
+		itemSize = 2;
+	} else if (strcmp(argv[0], "outw") == 0 || strcmp(argv[0], "out32") == 0) {
+		itemSize = 4;
+	} else {
+		kprintf("write_io called in an invalid way!\n");
+		return 0;
+	}
+
+	// skip cmd name and address
+	argv += 2;
+	argc -= 2;
+
+	for (i = 0; i < argc; i++) {
+		value = strtoul(argv[i], NULL, 0);
+		switch (itemSize) {
+			case 1:
+				pci_write_io_8(address + i * itemSize, value);
+				break;
+			case 2:
+				pci_write_io_16(address + i * itemSize, value);
+				break;
+			case 4:
+				pci_write_io_32(address + i * itemSize, value);
+				break;
+		}
+	}
+
+	return 0;
+}
+
 
 // #pragma mark bus manager init/uninit
 
@@ -218,6 +264,13 @@ pci_init(void)
 	add_debugger_command("inb", &display_io, "dump io bytes (8-bit)");
 	add_debugger_command("in8", &display_io, "dump io bytes (8-bit)");
 
+	add_debugger_command("outw", &write_io, "write io words (32-bit)");
+	add_debugger_command("out32", &write_io, "write io words (32-bit)");
+	add_debugger_command("outs", &write_io, "write io shorts (16-bit)");
+	add_debugger_command("out16", &write_io, "write io shorts (16-bit)");
+	add_debugger_command("outb", &write_io, "write io bytes (8-bit)");
+	add_debugger_command("out8", &write_io, "write io bytes (8-bit)");
+
 	if (pci_controller_init() != B_OK) {
 		TRACE(("PCI: pci_controller_init failed\n"));
 		return B_ERROR;
@@ -233,12 +286,20 @@ pci_init(void)
 void
 pci_uninit(void)
 {
+	remove_debugger_command("outw", &write_io);
+	remove_debugger_command("out32", &write_io);
+	remove_debugger_command("outs", &write_io);
+	remove_debugger_command("out16", &write_io);
+	remove_debugger_command("outb", &write_io);
+	remove_debugger_command("out8", &write_io);
+
 	remove_debugger_command("inw", &display_io);
 	remove_debugger_command("in32", &display_io);
 	remove_debugger_command("ins", &display_io);
 	remove_debugger_command("in16", &display_io);
 	remove_debugger_command("inb", &display_io);
 	remove_debugger_command("in8", &display_io);
+
 	delete sPCI;
 }
 
