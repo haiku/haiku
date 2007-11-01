@@ -85,150 +85,116 @@ FUNCTION(atomic_get):
 		// else we get the correct one anyway
 		rts
 
-/* m68k elf convention is to return structs in (a0) */
-/* other conventions use d0/d1 but which is MSB ?? */
+/* m68k elf convention is to return structs in (a0)
+ * but use d0/d1 for int64 and small structs.
+ * d0 MSB, d1 LSB
+ */
 #warning M68K: 68060 doesn't have CAS2: use spinlock ??
 /* see http://retropc.net/x68000/software/develop/as/has060/m68k.htm */
 
 /* int64	atomic_add64(vint64 *value, int64 addValue) */
 FUNCTION(atomic_add64):
-		move.l	%d2,-(%a7)
-		move.l	%d3,-(%a7)
-		move.l	%a2,-(%a7)
-		move.l	(4,%a7),%a1
-		lea.l	(4,%a1),%a2
+		movem.l	%d2-%d3/%a2,-(%a7)
+		move.l	(4,%a7),%a2
+		lea.l	(4,%a2),%a1
 		// addValue
-		move.l	(12,%a7),%d2	/*LSB*/
-		move.l	(8,%a7),%d3		/*MSB*/
+		move.l	(12,%a7),%d3	/*LSB*/
+		move.l	(8,%a7),%d2		/*MSB*/
 miss5:	// old value
-		move.l	(4,%a1),%d0		/*LSB*/
-		move.l	(%a1),%d1		/*MSB*/
-		add.l	%d0,%d2
-		addx.l	%d1,%d3
+		move.l	(%a1),%d1		/*LSB*/
+		move.l	(%a2),%d0		/*MSB*/
+		add.l	%d1,%d3
+		addx.l	%d0,%d2
 		cas2.l	%d0:%d1,%d2:%d3,(%a2):(%a1)
 		bne		miss5
-		// return value
-		move.l	%d0,(4,%a0)
-		move.l	%d1,(%a0)
-		move.l	(%a7)+,%a2
-		move.l	(%a7)+,%d3
-		move.l	(%a7)+,%d2
+		// return value d0:d1
+		movem.l	(%a7)+,%d2-%d3/%a2
 		rts
 
 /* int64	atomic_and64(vint64 *value, int64 andValue) */
 FUNCTION(atomic_and64):
-		move.l	%d2,-(%a7)
-		move.l	%d3,-(%a7)
-		move.l	%a2,-(%a7)
-		move.l	(4,%a7),%a1
-		lea.l	(4,%a1),%a2
+		movem.l	%d2-%d3/%a2,-(%a7)
+		move.l	(4,%a7),%a2
+		lea.l	(4,%a2),%a1
 		// addValue
-		move.l	(12,%a7),%d2	/*LSB*/
-		move.l	(8,%a7),%d3		/*MSB*/
+		move.l	(12,%a7),%d3	/*LSB*/
+		move.l	(8,%a7),%d2		/*MSB*/
 miss6:	// old value
-		move.l	(4,%a1),%d0		/*LSB*/
-		move.l	(%a1),%d1		/*MSB*/
-		and.l	%d0,%d2
+		move.l	(%a1),%d1		/*LSB*/
+		move.l	(%a2),%d0		/*MSB*/
 		and.l	%d1,%d3
+		and.l	%d0,%d2
 		cas2.l	%d0:%d1,%d2:%d3,(%a2):(%a1)
 		bne		miss6
-		// return value
-		move.l	%d0,(4,%a0)
-		move.l	%d1,(%a0)
-		move.l	(%a7)+,%a2
-		move.l	(%a7)+,%d3
-		move.l	(%a7)+,%d2
+		// return value d0:d1
+		movem.l	(%a7)+,%d2-%d3/%a2
 		rts
 
 /* int64	atomic_or64(vint64 *value, int64 orValue) */
 FUNCTION(atomic_or64):
-		move.l	%d2,-(%a7)
-		move.l	%d3,-(%a7)
-		move.l	%a2,-(%a7)
-		move.l	(4,%a7),%a1
-		lea.l	(4,%a1),%a2
+		movem.l	%d2-%d3/%a2,-(%a7)
+		move.l	(4,%a7),%a2
+		lea.l	(4,%a2),%a1
 		// addValue
-		move.l	(12,%a7),%d2	/*LSB*/
-		move.l	(8,%a7),%d3		/*MSB*/
+		move.l	(12,%a7),%d3	/*LSB*/
+		move.l	(8,%a7),%d2		/*MSB*/
 miss7:	// old value
-		move.l	(4,%a1),%d0		/*LSB*/
-		move.l	(%a1),%d1		/*MSB*/
-		or.l	%d0,%d2
+		move.l	(%a1),%d1		/*LSB*/
+		move.l	(%a2),%d0		/*MSB*/
 		or.l	%d1,%d3
+		or.l	%d0,%d2
 		cas2.l	%d0:%d1,%d2:%d3,(%a2):(%a1)
 		bne		miss7
-		// return value
-		move.l	%d0,(4,%a0)
-		move.l	%d1,(%a0)
-		move.l	(%a7)+,%a2
-		move.l	(%a7)+,%d3
-		move.l	(%a7)+,%d2
+		// return value d0:d1
+		movem.l	(%a7)+,%d2-%d3/%a2
 		rts
 
 /* int64	atomic_set64(vint64 *value, int64 newValue) */
 FUNCTION(atomic_set64):
-		move.l	%d2,-(%a7)
-		move.l	%d3,-(%a7)
-		move.l	%a2,-(%a7)
-		move.l	(4,%a7),%a1
-		lea.l	(4,%a1),%a2
+		movem.l	%d2-%d3/%a2,-(%a7)
+		move.l	(4,%a7),%a2
+		lea.l	(4,%a2),%a1
 		// new value
-		move.l	(12,%a7),%d2	/*LSB*/
-		move.l	(8,%a7),%d3		/*MSB*/
+		move.l	(12,%a7),%d3	/*LSB*/
+		move.l	(8,%a7),%d2		/*MSB*/
 		// old value
-		move.l	(4,%a1),%d0		/*LSB*/
-		move.l	(%a1),%d1		/*MSB*/
+		move.l	(%a1),%d1		/*LSB*/
+		move.l	(%a2),%d0		/*MSB*/
 miss8:	cas2.l	%d0:%d1,%d2:%d3,(%a2):(%a1)
 		bne		miss8
-		// return value
-		move.l	%d0,(4,%a0)
-		move.l	%d1,(%a0)
-		move.l	(%a7)+,%a2
-		move.l	(%a7)+,%d3
-		move.l	(%a7)+,%d2
+		// return value d0:d1
+		movem.l	(%a7)+,%d2-%d3/%a2
 		rts
 
 /* int64	atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst) */
 FUNCTION(atomic_test_and_set64):
-		move.l	%d2,-(%a7)
-		move.l	%d3,-(%a7)
-		move.l	%a2,-(%a7)
-		move.l	(4,%a7),%a1
-		lea.l	(4,%a1),%a2
+		movem.l	%d2-%d3/%a2,-(%a7)
+		move.l	(4,%a7),%a2
+		lea.l	(4,%a2),%a1
 		// new value
-		move.l	(12,%a7),%d2	/*LSB*/
-		move.l	(8,%a7),%d3		/*MSB*/
+		move.l	(12,%a7),%d3	/*LSB*/
+		move.l	(8,%a7),%d2		/*MSB*/
 		// test against value
-		move.l	(20,%a7),%d0	/*LSB*/
-		move.l	(16,%a7),%d1	/*MSB*/
+		move.l	(20,%a7),%d1	/*LSB*/
+		move.l	(16,%a7),%d0	/*MSB*/
 		cas2.l	%d0:%d1,%d2:%d3,(%a2):(%a1)
-		// return value
-		move.l	%d0,(4,%a0)
-		move.l	%d1,(%a0)
-		move.l	(%a7)+,%a2
-		move.l	(%a7)+,%d3
-		move.l	(%a7)+,%d2
+		// return value d0:d1
+		movem.l	(%a7)+,%d2-%d3/%a2
 		rts
 
 /* int64	atomic_get64(vint64 *value) */
 FUNCTION(atomic_get64):
-		move.l	%d2,-(%a7)
-		move.l	%d3,-(%a7)
-		move.l	%a2,-(%a7)
-		move.l	(4,%a7),%a1
-		lea.l	(4,%a1),%a2
-		move.l	(4,%a1),%d0	/*LSB*/
-		move.l	(%a1),%d1		/*MSB*/
-		move.l	%d0,%d2
+		movem.l	%d2-%d3/%a2,-(%a7)
+		move.l	(4,%a7),%a2
+		lea.l	(4,%a2),%a1
+		move.l	(%a1),%d1	/*LSB*/
+		move.l	(%a2),%d0		/*MSB*/
 		move.l	%d1,%d3
+		move.l	%d0,%d2
 		// we must use cas... so we change to the same value if matching,
 		// else we get the correct one anyway
 		cas2.l	%d0:%d1,%d2:%d3,(%a2):(%a1)
 		// return value
-		move.l	%d0,(4,%a0)
-		move.l	%d1,(%a0)
-		move.l	(%a7)+,%a2
-		move.l	(%a7)+,%d3
-		move.l	(%a7)+,%d2
+		movem.l	(%a7)+,%d2-%d3/%a2
 		rts
 
