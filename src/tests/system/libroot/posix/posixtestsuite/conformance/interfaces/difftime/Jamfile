@@ -2,5 +2,5 @@ SubDir HAIKU_TOP src tests system libroot posix posixtestsuite conformance inter
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) $(DOTDOT) include ] ;
 
-SimpleTest 1-1.test : 1-1.c ;
+SimpleTest difftime_1-1 : 1-1.c ;
 
