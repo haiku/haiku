@@ -34,8 +34,8 @@ sigismember(const sigset_t *set, int sig)
 	sigset_t mask;
 
 	if (sig <= 0 || sig >= NSIG) {
-			errno = EINVAL;
-			return -1;
+		errno = EINVAL;
+		return -1;
 	}
 
 	mask = (((sigset_t)1) << (sig - 1)) ;
@@ -49,8 +49,8 @@ sigaddset(sigset_t *set, int sig)
 	sigset_t mask;
 
 	if (sig <= 0 || sig >= NSIG) {
-			errno = EINVAL;
-			return -1;
+		errno = EINVAL;
+		return -1;
 	}
 
 	mask = (((sigset_t)1) << (sig - 1)) ;
@@ -65,8 +65,8 @@ sigdelset(sigset_t *set, int sig)
 	sigset_t mask;
 
 	if (sig <= 0 || sig >= NSIG) {
-			errno = EINVAL;
-			return -1;
+		errno = EINVAL;
+		return -1;
 	}
 
 	mask = (((sigset_t)1) << (sig - 1)) ;
