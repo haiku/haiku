@@ -403,6 +403,9 @@ extern status_t		_kern_create_child_partition(partition_id partitionID,
 						const char *parameters, size_t parametersSize,
 						partition_id *childID);
 extern status_t		_kern_delete_partition(partition_id partitionID, int32 changeCounter);
+extern status_t		_kern_delete_child_partition(partition_id partitionID,
+						int32* changeCounter, partition_id childID,
+						int32 childChangeCounter);
 
 // jobs
 extern status_t		_kern_get_next_disk_device_job_info(int32 *cookie,

@@ -395,7 +395,17 @@ _kern_delete_partition(partition_id partitionID, int32 changeCounter)
 	return B_ERROR;
 }
 
+
+status_t
+_kern_delete_child_partition(partition_id partitionID, int32* changeCounter,
+	partition_id childID, int32 childChangeCounter)
+{
+	return B_ERROR;
+}
+
+
 // #pragma mark - jobs
+
 
 status_t
 _kern_get_next_disk_device_job_info(int32 *cookie,
