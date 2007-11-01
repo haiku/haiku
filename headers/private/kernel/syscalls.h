@@ -324,8 +324,8 @@ extern status_t		_kern_get_cpuid(cpuid_info *info, uint32 eax, uint32 cpu);
 extern partition_id	_kern_get_next_disk_device_id(int32 *cookie, size_t *neededSize);
 extern partition_id	_kern_find_disk_device(const char *filename, size_t *neededSize);
 extern partition_id	_kern_find_partition(const char *filename, size_t *neededSize);
-extern status_t		_kern_get_disk_device_data(partition_id deviceID, bool deviceOnly,
-						bool shadow, struct user_disk_device_data *buffer,
+extern status_t		_kern_get_disk_device_data(partition_id deviceID,
+						bool deviceOnly, struct user_disk_device_data *buffer,
 						size_t bufferSize, size_t *neededSize);
 extern partition_id	_kern_register_file_device(const char *filename);
 extern status_t		_kern_unregister_file_device(partition_id deviceID,

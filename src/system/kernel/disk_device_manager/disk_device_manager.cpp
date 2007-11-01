@@ -119,22 +119,12 @@ get_disk_device(partition_id partitionID)
 }
 
 
-// get_physical_partition
-partition_data*
-get_physical_partition(partition_id partitionID)
-{
-	KDiskDeviceManager* manager = KDiskDeviceManager::Default();
-	KPartition* partition = manager->FindPartition(partitionID, true);
-	return (partition ? partition->PartitionData() : NULL);
-}
-
-
 // get_partition
 partition_data *
 get_partition(partition_id partitionID)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	KPartition *partition = manager->FindPartition(partitionID, false);
+	KPartition *partition = manager->FindPartition(partitionID);
 	return (partition ? partition->PartitionData() : NULL);
 }
 

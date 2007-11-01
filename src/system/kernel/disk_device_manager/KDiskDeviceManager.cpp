@@ -16,7 +16,6 @@
 #include "KPartitioningSystem.h"
 #include "KPartitionVisitor.h"
 #include "KPath.h"
-#include "KShadowPartition.h"
 
 #include <VectorMap.h>
 #include <VectorSet.h>
@@ -252,36 +251,34 @@ KDiskDeviceManager::FindDevice(partition_id id, bool deviceOnly)
 
 // FindPartition
 KPartition *
-KDiskDeviceManager::FindPartition(const char *path, bool noShadow)
+KDiskDeviceManager::FindPartition(const char *path)
 {
 // TODO: Optimize!
 	KPath partitionPath;
 	if (partitionPath.InitCheck() != B_OK)
 		return NULL;
+
 	for (PartitionMap::Iterator it = fPartitions->Begin();
 		 it != fPartitions->End();
 		 ++it) {
 		KPartition *partition = it->Value();
 		if (partition->GetPath(&partitionPath) == B_OK
 			&& partitionPath == path) {
-			if (noShadow && partition->IsShadowPartition())
-				return partition->PhysicalPartition();
 			return partition;
 		}
 	}
+
 	return NULL;
 }
 
 // FindPartition
 KPartition *
-KDiskDeviceManager::FindPartition(partition_id id, bool noShadow)
+KDiskDeviceManager::FindPartition(partition_id id)
 {
 	PartitionMap::Iterator it = fPartitions->Find(id);
-	if (it != fPartitions->End()) {
-		if (noShadow && it->Value()->IsShadowPartition())
-			return it->Value()->PhysicalPartition();
+	if (it != fPartitions->End())
 		return it->Value();
-	}
+
 	return NULL;
 }
 
@@ -342,10 +339,10 @@ KDiskDeviceManager::RegisterNextDevice(int32 *cookie)
 
 // RegisterPartition
 KPartition *
-KDiskDeviceManager::RegisterPartition(const char *path, bool noShadow)
+KDiskDeviceManager::RegisterPartition(const char *path)
 {
 	if (ManagerLocker locker = this) {
-		if (KPartition *partition = FindPartition(path, noShadow)) {
+		if (KPartition *partition = FindPartition(path)) {
 			partition->Register();
 			return partition;
 		}
@@ -355,10 +352,10 @@ KDiskDeviceManager::RegisterPartition(const char *path, bool noShadow)
 
 // RegisterPartition
 KPartition *
-KDiskDeviceManager::RegisterPartition(partition_id id, bool noShadow)
+KDiskDeviceManager::RegisterPartition(partition_id id)
 {
 	if (ManagerLocker locker = this) {
-		if (KPartition *partition = FindPartition(id, noShadow)) {
+		if (KPartition *partition = FindPartition(id)) {
 			partition->Register();
 			return partition;
 		}

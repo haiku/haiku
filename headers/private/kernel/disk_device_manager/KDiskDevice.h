@@ -7,15 +7,18 @@
 
 #include <OS.h>
 
-#include "KPhysicalPartition.h"
+#include "KPartition.h"
 #include "RWLocker.h"
+
 
 namespace BPrivate {
 namespace DiskDevice {
 
+
 class UserDataWriter;
 
-class KDiskDevice : public KPhysicalPartition {
+
+class KDiskDevice : public KPartition {
 public:
 	KDiskDevice(partition_id id = -1);
 	virtual ~KDiskDevice();
@@ -37,8 +40,6 @@ public:
 	bool WriteLock();
 	void WriteUnlock();
 	bool IsWriteLocked();
-
-	virtual bool PrepareForRemoval();
 
 	virtual void SetID(partition_id id);
 
@@ -70,14 +71,9 @@ public:
 	disk_device_data *DeviceData();
 	const disk_device_data *DeviceData() const;
 
-	status_t CreateShadowDevice(team_id team);
-	status_t DeleteShadowDevice();
-	void SetShadowOwner(team_id team);
-	team_id ShadowOwner() const;
-
 	virtual void WriteUserData(UserDataWriter &writer,
 		user_partition_data *data);
-	void WriteUserData(UserDataWriter &writer, bool shadow);
+	void WriteUserData(UserDataWriter &writer);
 
 	virtual void Dump(bool deep = true, int32 level = 0);
 
@@ -92,8 +88,8 @@ private:
 	RWLocker			fLocker;
 	int					fFD;
 	status_t			fMediaStatus;
-	team_id				fShadowOwner;
 };
+
 
 } // namespace DiskDevice
 } // namespace BPrivate

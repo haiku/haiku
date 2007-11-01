@@ -366,7 +366,7 @@ BDiskDevice::_GetData(partition_id id, bool deviceOnly, size_t neededSize,
 
 	status_t error = B_OK;
 	do {
-		error = _kern_get_disk_device_data(id, deviceOnly, false,
+		error = _kern_get_disk_device_data(id, deviceOnly,
 			(user_disk_device_data*)buffer, bufferSize, &neededSize);
 		if (error == B_BUFFER_OVERFLOW) {
 			// buffer to small re-allocate it

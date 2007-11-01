@@ -740,7 +740,7 @@ pm_shadow_changed(partition_data *partition, partition_data *child,
 		case B_PARTITION_SHADOW:
 		{
 			// get the physical partition
-			partition_data* physicalPartition = get_physical_partition(
+			partition_data* physicalPartition = get_partition(
 				partition->id);
 			if (!physicalPartition) {
 				dprintf("intel: pm_shadow_changed(B_PARTITION_SHADOW): no "
@@ -774,7 +774,7 @@ pm_shadow_changed(partition_data *partition, partition_data *child,
 		case B_PARTITION_SHADOW_CHILD:
 		{
 			// get the physical child partition
-			partition_data* physical = get_physical_partition(child->id);
+			partition_data* physical = get_partition(child->id);
 			if (!physical) {
 				dprintf("intel: pm_shadow_changed(B_PARTITION_SHADOW_CHILD): "
 					"no physical partition with ID %ld\n", child->id);

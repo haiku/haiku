@@ -17,7 +17,6 @@ extern "C" {
 typedef struct user_partition_data user_partition_data;
 struct user_partition_data {
 	partition_id		id;
-	partition_id		shadow_id;
 	off_t				offset;
 	off_t				size;
 	off_t				content_size;
@@ -70,8 +69,8 @@ partition_id _user_get_next_disk_device_id(int32 *cookie, size_t *neededSize);
 partition_id _user_find_disk_device(const char *filename, size_t *neededSize);
 partition_id _user_find_partition(const char *filename, size_t *neededSize);
 status_t _user_get_disk_device_data(partition_id deviceID, bool deviceOnly,
-									bool shadow, user_disk_device_data *buffer,
-									size_t bufferSize, size_t *neededSize);
+				user_disk_device_data *buffer, size_t bufferSize,
+				size_t *neededSize);
 
 partition_id _user_register_file_device(const char *filename);
 status_t _user_unregister_file_device(partition_id deviceID,

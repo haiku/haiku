@@ -11,7 +11,6 @@
 #include "ddm_userland_interface.h"
 #include "KDiskDevice.h"
 #include "KDiskDeviceUtils.h"
-#include "KShadowPartition.h"
 #include "KPath.h"
 #include "UserDataWriter.h"
 
@@ -22,12 +21,11 @@
 
 // constructor
 KDiskDevice::KDiskDevice(partition_id id)
-	: KPhysicalPartition(id),
+	: KPartition(id),
 	  fDeviceData(),
 	  fLocker("diskdevice"),
 	  fFD(-1),
-	  fMediaStatus(B_ERROR),
-	  fShadowOwner(-1)
+	  fMediaStatus(B_ERROR)
 {
 	Unset();
 	fDevice = this;
@@ -98,7 +96,6 @@ KDiskDevice::Unset()
 		fFD = -1;
 	}
 	fMediaStatus = B_ERROR;
-	fShadowOwner = -1;
 	fDeviceData.id = -1;
 	fDeviceData.flags = 0;
 	if (fDeviceData.path) {
@@ -164,20 +161,12 @@ KDiskDevice::IsWriteLocked()
 	return fLocker.IsWriteLocked();
 }
 
-// PrepareForRemoval
-bool
-KDiskDevice::PrepareForRemoval()
-{
-	if (ShadowOwner() >= 0)
-		DeleteShadowDevice();
-	return KPhysicalPartition::PrepareForRemoval();
-}
 
 // SetID
 void
 KDiskDevice::SetID(partition_id id)
 {
-	KPhysicalPartition::SetID(id);
+	KPartition::SetID(id);
 	fDeviceData.id = id;
 }
 
@@ -312,58 +301,19 @@ KDiskDevice::DeviceData() const
 	return &fDeviceData;
 }
 
-// CreateShadowDevice
-status_t
-KDiskDevice::CreateShadowDevice(team_id team)
-{
-	if (fShadowOwner >= 0 || team < 0 || !HasMedia())
-		return B_BAD_VALUE;
-	// create the shadow partitions
-	status_t error = CreateShadowPartition();
-	if (error == B_OK)
-		SetShadowOwner(team);
-	return error;
-}
-
-// DeleteShadowDevice
-status_t
-KDiskDevice::DeleteShadowDevice()
-{
-	if (fShadowOwner < 0)
-		return B_BAD_VALUE;
-	UnsetShadowPartition(true);
-	SetShadowOwner(-1);
-	return B_OK;
-}
-
-// SetShadowOwner
-void
-KDiskDevice::SetShadowOwner(team_id team)
-{
-	fShadowOwner = team;
-}
-
-// ShadowOwner
-team_id
-KDiskDevice::ShadowOwner() const
-{
-	return fShadowOwner;
-}
 
 // WriteUserData
 void
 KDiskDevice::WriteUserData(UserDataWriter &writer, user_partition_data *data)
 {
-	return KPhysicalPartition::WriteUserData(writer, data);
+	return KPartition::WriteUserData(writer, data);
 }
 
 // WriteUserData
 void
-KDiskDevice::WriteUserData(UserDataWriter &writer, bool shadow)
+KDiskDevice::WriteUserData(UserDataWriter &writer)
 {
-	KPartition *partition = shadow ? ShadowPartition() : static_cast<KPartition *>(this);
-	if (!partition)
-		partition = this;
+	KPartition *partition = this;
 	user_disk_device_data *data
 		= writer.AllocateDeviceData(partition->CountChildren());
 	char *path = writer.PlaceString(Path());
@@ -384,7 +334,7 @@ KDiskDevice::Dump(bool deep, int32 level)
 	OUT("  media status:      %s\n", strerror(fMediaStatus));
 	OUT("  device flags:      %lx\n", DeviceFlags());
 	if (fMediaStatus == B_OK)
-		KPhysicalPartition::Dump(deep, 0);
+		KPartition::Dump(deep, 0);
 }
 
 // GetMediaStatus

@@ -5343,7 +5343,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 			return status;
 
 		// get a corresponding partition from the DDM
-		partition = ddm->RegisterPartition(normalizedDevice.Path(), true);
+		partition = ddm->RegisterPartition(normalizedDevice.Path());
 
 		if (!partition) {
 			// Partition not found: This either means, the user supplied
@@ -5352,7 +5352,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 			partition_id deviceID = ddm->CreateFileDevice(normalizedDevice.Path(),
 				&newlyCreatedFileDevice);
 			if (deviceID >= 0) {
-				partition = ddm->RegisterPartition(deviceID, true);
+				partition = ddm->RegisterPartition(deviceID);
 				if (newlyCreatedFileDevice)
 					fileDeviceDeleter.id = deviceID;
 			}

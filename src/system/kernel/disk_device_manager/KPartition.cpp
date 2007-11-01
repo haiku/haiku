@@ -12,6 +12,7 @@
 #include <util/kernel_cpp.h>
 
 #include <ddm_userland_interface.h>
+#include <fs/devfs.h>
 #include <KDiskDevice.h>
 #include <KDiskDeviceManager.h>
 #include <KDiskDeviceUtils.h>
@@ -147,22 +148,75 @@ KPartition::PrepareForDeletion()
 status_t
 KPartition::Open(int flags, int *fd)
 {
-	return B_BAD_VALUE;
+	if (!fd)
+		return B_BAD_VALUE;
+
+	// get the path
+	KPath path;
+	status_t error = GetPath(&path);
+	if (error != B_OK)
+		return error;
+
+	// open the device
+	*fd = open(path.Path(), flags);
+	if (*fd < 0)
+		return errno;
+
+	return B_OK;
 }
 
 // PublishDevice
 status_t
 KPartition::PublishDevice()
 {
-	// we're just a stupid base class, what do we know?
-	return B_ERROR;
+	if (fPublished)
+		return B_OK;
+
+	// get the path
+	KPath path;
+	status_t error = GetPath(&path);
+	if (error != B_OK)
+		return error;
+
+	// prepare a partition_info
+	partition_info info;
+	info.offset = Offset();
+	info.size = Size();
+	info.logical_block_size = BlockSize();
+	info.session = 0;
+	info.partition = ID();
+	if (strlcpy(info.device, Device()->Path(), B_PATH_NAME_LENGTH)
+		>= B_PATH_NAME_LENGTH) {
+		return B_NAME_TOO_LONG;
+	}
+
+	error = devfs_publish_partition(path.Path() + 5, &info);
+		// we need to remove the "/dev/" part from the path
+	if (error != B_OK)
+		return error;
+
+	fPublished = true;
+
+	return B_OK;
 }
 
 // UnpublishDevice
 status_t
 KPartition::UnpublishDevice()
 {
-	return B_ERROR;
+	if (!fPublished)
+		return B_OK;
+
+	// get the path
+	KPath path;
+	status_t error = GetPath(&path);
+	if (error != B_OK)
+		return error;
+
+	fPublished = false;
+
+	return devfs_unpublish_partition(path.Path() + 5);
+		// we need to remove the "/dev/" part from the path
 }
 
 
@@ -660,6 +714,35 @@ KPartition::AddChild(KPartition *partition, int32 index)
 	return B_ERROR;
 }
 
+
+// CreateChild
+status_t
+KPartition::CreateChild(partition_id id, int32 index, KPartition **_child)
+{
+	// check parameters
+	int32 count = fPartitionData.child_count;
+	if (index == -1)
+		index = count;
+	if (index < 0 || index > count)
+		return B_BAD_VALUE;
+
+	// create and add partition
+	KPartition *child = new(nothrow) KPartition(id);
+	if (!child)
+		return B_NO_MEMORY;
+
+	status_t error = AddChild(child, index);
+
+	// cleanup / set result
+	if (error != B_OK)
+		delete child;
+	else if (_child)
+		*_child = child;
+
+	return error;
+}
+
+
 // RemoveChild
 bool
 KPartition::RemoveChild(int32 index)
@@ -752,20 +835,6 @@ KPartition::VisitEachDescendant(KPartitionVisitor *visitor)
 	return NULL;	
 }
 
-// CreateShadowPartition
-status_t
-KPartition::CreateShadowPartition()
-{
-	// implemented by derived classes
-	return B_ERROR;
-}
-
-// UnsetShadowPartition
-void
-KPartition::UnsetShadowPartition(bool doDelete)
-{
-	// implemented by derived classes
-}
 
 // SetDiskSystem
 void
@@ -991,7 +1060,6 @@ KPartition::WriteUserData(UserDataWriter &writer, user_partition_data *data)
 	// fill in data
 	if (data) {
 		data->id = ID();
-		data->shadow_id = -1;
 		data->offset = Offset();
 		data->size = Size();
 		data->content_size = ContentSize();

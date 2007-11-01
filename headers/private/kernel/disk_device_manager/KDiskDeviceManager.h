@@ -43,15 +43,15 @@ public:
 	// manager must be locked
 	KDiskDevice *FindDevice(const char *path);
 	KDiskDevice *FindDevice(partition_id id, bool deviceOnly = true);
-	KPartition *FindPartition(const char *path, bool noShadow = false);
-	KPartition *FindPartition(partition_id id, bool noShadow = false);
+	KPartition *FindPartition(const char *path);
+	KPartition *FindPartition(partition_id id);
 	KFileDiskDevice *FindFileDevice(const char *filePath);
 
 	KDiskDevice *RegisterDevice(const char *path);
 	KDiskDevice *RegisterDevice(partition_id id, bool deviceOnly = true);
 	KDiskDevice *RegisterNextDevice(int32 *cookie);
-	KPartition *RegisterPartition(const char *path, bool noShadow = false);
-	KPartition *RegisterPartition(partition_id id, bool noShadow = false);
+	KPartition *RegisterPartition(const char *path);
+	KPartition *RegisterPartition(partition_id id);
 	KFileDiskDevice *RegisterFileDevice(const char *filePath);
 
 	KDiskDevice *ReadLockDevice(partition_id id, bool deviceOnly = true);

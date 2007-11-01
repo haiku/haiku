@@ -24,8 +24,6 @@ KernelMergeObject kernel_disk_device_manager.o :
 	KPartitioningSystem.cpp
 	KPartitionListener.cpp
 	KPartitionVisitor.cpp
-	KPhysicalPartition.cpp
-	KShadowPartition.cpp
 	UserDataWriter.cpp
 
 	# utilities

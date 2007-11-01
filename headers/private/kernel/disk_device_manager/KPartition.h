@@ -24,7 +24,6 @@ class KPartitionListener;
 class KPartitionVisitor;
 class KPath;
 class KPhysicalPartition;
-class KShadowPartition;
 
 //!	\brief Class representing a single partition.
 class KPartition {
@@ -139,7 +138,7 @@ public:
 
 	status_t AddChild(KPartition *partition, int32 index = -1);
 	virtual status_t CreateChild(partition_id id, int32 index,
-								 KPartition **child = NULL) = 0;
+		KPartition **child = NULL);
 	bool RemoveChild(int32 index);
 	bool RemoveChild(KPartition *child);
 	bool RemoveAllChildren();
@@ -148,14 +147,6 @@ public:
 	int32 CountDescendants() const;
 
 	KPartition *VisitEachDescendant(KPartitionVisitor *visitor);
-
-	// Shadow Partition
-
-	virtual status_t CreateShadowPartition();	// creates a complete tree
-	virtual void UnsetShadowPartition(bool doDelete);
-	virtual KShadowPartition *ShadowPartition() const = 0;
-	virtual bool IsShadowPartition() const = 0;
-	virtual KPhysicalPartition *PhysicalPartition() const = 0;
 
 	// DiskSystem
 

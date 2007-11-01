@@ -97,7 +97,6 @@ int32 find_partition(const char *path);
 // disk device/partition read access
 // (read lock required)
 disk_device_data *get_disk_device(partition_id partitionID);
-partition_data *get_physical_partition(partition_id partitionID);
 partition_data *get_partition(partition_id partitionID);
 partition_data *get_parent_partition(partition_id partitionID);
 partition_data *get_child_partition(partition_id partitionID, int32 index);

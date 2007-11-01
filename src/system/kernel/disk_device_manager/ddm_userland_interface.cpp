@@ -12,7 +12,6 @@
 #include <KDiskDeviceUtils.h>
 #include <KDiskSystem.h>
 #include <KFileDiskDevice.h>
-#include <KShadowPartition.h>
 #include <syscall_args.h>
 
 #include "UserDataWriter.h"
@@ -105,7 +104,7 @@ _user_get_next_disk_device_id(int32 *_cookie, size_t *neededSize)
 			if (DeviceReadLocker locker = device) {
 				// get the needed size
 				UserDataWriter writer;
-				device->WriteUserData(writer, false);
+				device->WriteUserData(writer);
 				*neededSize = writer.AllocatedSize();
 			} else {
 				id = B_ERROR;
@@ -139,7 +138,7 @@ _user_find_disk_device(const char *_filename, size_t *neededSize)
 			if (DeviceReadLocker locker = device) {
 				// get the needed size
 				UserDataWriter writer;
-				device->WriteUserData(writer, false);
+				device->WriteUserData(writer);
 				*neededSize = writer.AllocatedSize();
 			} else
 				return B_ERROR;
@@ -176,7 +175,7 @@ _user_find_partition(const char *_filename, size_t *neededSize)
 			if (DeviceReadLocker locker = device) {
 				// get the needed size
 				UserDataWriter writer;
-				device->WriteUserData(writer, false);
+				device->WriteUserData(writer);
 				*neededSize = writer.AllocatedSize();
 			} else
 				return B_ERROR;
@@ -206,9 +205,6 @@ _user_find_partition(const char *_filename, size_t *neededSize)
 		   itself (if \a deviceOnly is true).
 	\param deviceOnly Specifies whether only IDs of disk devices (\c true),
 		   or also IDs of partitions (\c false) are accepted for \a id.
-	\param shadow If \c true, the data of the shadow disk device is returned,
-		   otherwise of the physical device. If there is no shadow device,
-		   the parameter is ignored.
 	\param buffer The buffer into which the disk device data shall be written.
 		   May be \c NULL.
 	\param bufferSize The size of \a buffer.
@@ -229,7 +225,7 @@ _user_find_partition(const char *_filename, size_t *neededSize)
 	- another error code...
 */
 status_t
-_user_get_disk_device_data(partition_id id, bool deviceOnly, bool shadow,
+_user_get_disk_device_data(partition_id id, bool deviceOnly,
 	user_disk_device_data *buffer, size_t bufferSize, size_t *_neededSize)
 {
 	if (!buffer && bufferSize > 0)
@@ -241,7 +237,7 @@ _user_get_disk_device_data(partition_id id, bool deviceOnly, bool shadow,
 		if (DeviceReadLocker locker = device) {
 			// do a dry run first to get the needed size
 			UserDataWriter writer;
-			device->WriteUserData(writer, shadow);
+			device->WriteUserData(writer);
 			size_t neededSize = writer.AllocatedSize();
 			if (_neededSize) {
 				status_t error = copy_ref_var_to_user(neededSize, _neededSize);
@@ -260,7 +256,7 @@ _user_get_disk_device_data(partition_id id, bool deviceOnly, bool shadow,
 			MemoryDeleter deleter(kernelBuffer);
 			// write the device data into the buffer
 			writer.SetTo(kernelBuffer, bufferSize);
-			device->WriteUserData(writer, shadow);
+			device->WriteUserData(writer);
 			// sanity check
 			if (writer.AllocatedSize() != neededSize) {
 				ERROR(("Size of written disk device user data changed from "
