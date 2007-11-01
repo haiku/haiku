@@ -1,10 +1,10 @@
 /*
-  Copyright (c) 1990-1999 Info-ZIP.  All rights reserved.
+  Copyright (c) 1990-2005 Info-ZIP.  All rights reserved.
 
-  See the accompanying file LICENSE, version 1999-Oct-05 or later
+  See the accompanying file LICENSE, version 2005-Feb-10 or later
   (the contents of which are also included in zip.h) for terms of use.
   If, for some reason, both of these files are missing, the Info-ZIP license
-  also may be found at:  ftp://ftp.cdrom.com/pub/infozip/license.html
+  also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
 */
 /*
  *  ziperr.h by Mark Adler
@@ -19,7 +19,7 @@
 #define ZE_FORM         3       /* zip file structure error */
 #define ZE_MEM          4       /* out of memory */
 #define ZE_LOGIC        5       /* internal logic error */
-#define ZE_BIG          6       /* entry too large to split */
+#define ZE_BIG          6       /* entry too large to split, read, or write */
 #define ZE_NOTE         7       /* invalid comment format */
 #define ZE_TEST         8       /* zip test (-T) failed or out of memory */
 #define ZE_ABORT        9       /* user interrupt or termination */
@@ -39,13 +39,13 @@
 
 #ifdef GLOBALS
 /* Error messages for the ziperr() function in the zip programs */
-char *errors[ZE_MAXERR] = {
+char *ziperrors[ZE_MAXERR] = {
 /*  1 */  "",
 /*  2 */  "Unexpected end of zip file",
 /*  3 */  "Zip file structure invalid",
 /*  4 */  "Out of memory",
 /*  5 */  "Internal logic error",
-/*  6 */  "Entry too big to split",
+/*  6 */  "Entry too big to split, read, or write",
 /*  7 */  "Invalid comment format",
 /*  8 */  "Zip file invalid or could not spawn unzip",
 /*  9 */  "Interrupted",
@@ -63,5 +63,5 @@ char *errors[ZE_MAXERR] = {
 #  endif
 };
 #else /* !GLOBALS */
-extern char *errors[ZE_MAXERR]; /* Error messages for ziperr() */
+extern char *ziperrors[ZE_MAXERR]; /* Error messages for ziperr() */
 #endif /* ?GLOBALS */

@@ -1,17 +1,17 @@
 /*
-  Copyright (c) 1990-1999 Info-ZIP.  All rights reserved.
+  Copyright (c) 1990-2005 Info-ZIP.  All rights reserved.
 
-  See the accompanying file LICENSE, version 1999-Oct-05 or later
+  See the accompanying file LICENSE, version 2004-May-22 or later
   (the contents of which are also included in zip.h) for terms of use.
   If, for some reason, both of these files are missing, the Info-ZIP license
-  also may be found at:  ftp://ftp.cdrom.com/pub/infozip/license.html
+  also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
 */
 /* crc32.c -- compute the CRC-32 of a data stream
  * Copyright (C) 1995 Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
-/* $Id: crc32.c,v 1.1 2002/09/21 16:08:49 darkwyrm Exp $ */
+/* $Id$ */
 
 #define __CRC32_C       /* identifies this source module */
 

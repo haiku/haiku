@@ -1,10 +1,10 @@
 /*
-  Copyright (c) 1990-1999 Info-ZIP.  All rights reserved.
+  Copyright (c) 1990-2005 Info-ZIP.  All rights reserved.
 
-  See the accompanying file LICENSE, version 1999-Oct-05 or later
+  See the accompanying file LICENSE, version 2004-May-22 or later
   (the contents of which are also included in zip.h) for terms of use.
   If, for some reason, both of these files are missing, the Info-ZIP license
-  also may be found at:  ftp://ftp.cdrom.com/pub/infozip/license.html
+  also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
 */
 /*---------------------------------------------------------------------------
 
@@ -58,6 +58,31 @@ ZIPUSERFUNCTIONS ZipUserFunctions, far * lpZipUserFunctions;
 
 int ZipRet;
 
+/* ------------------------------------------------- */
+/* Visual Basic converts strings from VB native Unicode to
+   byte strings when passing to dlls.  It seems that any
+   strings pointed to in structures are converted and the
+   conversion passed to the dll, but when the dll call
+   returns the converted strings are garbage collected
+   unless the debugger prevents it.  This leaves the
+   pointers going to memory that may have been reused
+   by the time the following dll call is made.  This
+   affects the strings in the Options stucture.
+
+   The following kluge stores the strings locally in
+   the dll between calls.  A better fix is to redesign
+   the api interface so that strings in structures are
+   removed or are passed in the same call they are used.  EG
+
+/* oversized to be sure */
+#define MAX_ZIP_DATE_LEN 50
+#define MAX_ZIP_DIR_PATH_LEN 4098
+
+char szDate[MAX_ZIP_DATE_LEN + 1];
+char szRootDir[MAX_ZIP_DIR_PATH_LEN + 1];
+char szTempDir[MAX_ZIP_DIR_PATH_LEN + 1];   
+/* ------------------------------------------------- */
+
 /* Local forward declarations */
 extern int  zipmain OF((int, char **));
 int AllocMemory(int, char *, char *);
@@ -106,7 +131,27 @@ return TRUE;
 
 BOOL EXPENTRY ZpSetOptions(LPZPOPT Opts)
 {
+/* copy the structure including pointers to strings */
 Options = *Opts;
+
+/* fix for calling dll from VB - 2002-11-25 */
+/* make copies of strings in structure if not NULL passed for empty string */
+if (Options.Date) {
+  szDate[0] = '\0';
+  strncat(szDate, Options.Date, MAX_ZIP_DATE_LEN);
+  Options.Date = szDate;
+}
+if (Options.szRootDir) {
+  szRootDir[0] = '\0';
+  strncat(szRootDir, Options.szRootDir, MAX_ZIP_DIR_PATH_LEN);
+  Options.szRootDir = szRootDir;
+}
+if (Options.szTempDir) {
+  szTempDir[0] = '\0';
+  strncat(szTempDir, Options.szTempDir, MAX_ZIP_DIR_PATH_LEN);
+  Options.szTempDir = szTempDir;
+}
+
 return TRUE;
 }
 
@@ -258,18 +303,6 @@ if (Options.fQuiet) /* quiet operation -q */
       return ZE_MEM;
    argCee++;
    }
-if (Options.fRecurse == 1) /* recurse into subdirectories -r */
-   {
-   if (AllocMemory(argCee, "-r", "Recurse -r") != ZE_OK)
-      return ZE_MEM;
-   argCee++;
-   }
-else if (Options.fRecurse == 2) /* recurse into subdirectories -R */
-   {
-   if (AllocMemory(argCee, "-R", "Recurse -R") != ZE_OK)
-      return ZE_MEM;
-   argCee++;
-   }
 if (Options.fSystem)  /* include system and hidden files -S */
    {
    if (AllocMemory(argCee, "-S", "System") != ZE_OK)
@@ -320,7 +353,7 @@ if (Options.fVolume)  /* Include volume label -$ */
       return ZE_MEM;
    argCee++;
    }
-#ifdef WIN32
+#ifdef NTSD_EAS /* was WIN32 1/22/2005 EG */
 if (Options.fPrivilege)  /* Use privileges -! */
    {
    if (AllocMemory(argCee, "-!", "Privileges") != ZE_OK)
@@ -341,6 +374,19 @@ if ((Options.szTempDir != NULL) && (Options.szTempDir[0] != '\0')
       return ZE_MEM;
    argCee++;
    if (AllocMemory(argCee, Options.szTempDir, "Temporary directory") != ZE_OK)
+      return ZE_MEM;
+   argCee++;
+   }
+/* -r and -R moved down here to avoid VB problem 1/31/2005 EG */
+if (Options.fRecurse == 1) /* recurse into subdirectories -r */
+   {
+   if (AllocMemory(argCee, "-r", "Recurse -r") != ZE_OK)
+      return ZE_MEM;
+   argCee++;
+   }
+else if (Options.fRecurse == 2) /* recurse into subdirectories -R */
+   {
+   if (AllocMemory(argCee, "-R", "Recurse -R") != ZE_OK)
       return ZE_MEM;
    argCee++;
    }

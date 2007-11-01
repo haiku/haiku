@@ -1,10 +1,10 @@
 /*
-  Copyright (c) 1990-1999 Info-ZIP.  All rights reserved.
+  Copyright (c) 1990-2006 Info-ZIP.  All rights reserved.
 
-  See the accompanying file LICENSE, version 1999-Oct-05 or later
+  See the accompanying file LICENSE, version 2005-Feb-10 or later
   (the contents of which are also included in zip.h) for terms of use.
-  If, for some reason, both of these files are missing, the Info-ZIP license
-  also may be found at:  ftp://ftp.cdrom.com/pub/infozip/license.html
+  If, for some reason, all these files are missing, the Info-ZIP license
+  also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
 */
 /*
  *  util.c by Mark Adler.
@@ -26,7 +26,7 @@ uch upper[256], lower[256];
 #ifndef UTIL /* UTIL picks out namecmp code (all utils) */
 
 /* Local functions */
-local int recmatch OF((ZCONST uch *, ZCONST uch *, int));
+local int recmatch OF((ZCONST char *, ZCONST char *, int));
 local int count_args OF((char *s));
 
 #ifdef MSDOS16
@@ -34,7 +34,10 @@ local int count_args OF((char *s));
 #endif
 
 #ifdef NO_MKTIME
-#include "mktime.c"
+#  ifndef IZ_MKTIME_ONLY
+#    define IZ_MKTIME_ONLY      /* only mktime() related code is pulled in */
+#  endif
+#  include "timezone.c"
 #endif
 
 #ifndef HAVE_FSEEKABLE
@@ -74,15 +77,15 @@ char *p;                /* candidate sh expression */
 
 
 local int recmatch(p, s, cs)
-ZCONST uch *p;  /* sh pattern to match */
-ZCONST uch *s;  /* string to match it to */
-int cs;         /* flag: force case-sensitive matching */
+ZCONST char *p;  /* sh pattern to match */
+ZCONST char *s;  /* string to match it to */
+int cs;          /* flag: force case-sensitive matching */
 /* Recursively compare the sh pattern p with the string s and return 1 if
    they match, and 0 or 2 if they don't or if there is a syntax error in the
    pattern.  This routine recurses on itself no deeper than the number of
    characters in the pattern. */
 {
-  unsigned int c;       /* pattern char or start of range in [-] loop */
+  int c;        /* pattern char or start of range in [-] loop */
   /* Get first character, the pattern for new recmatch calls follows */
   c = *POSTINCSTR(p);
 
@@ -118,14 +121,62 @@ int cs;         /* flag: force case-sensitive matching */
 #ifdef WILD_STOP_AT_DIR
     for (; *s && *s != '/'; INCSTR(s))
       if ((c = recmatch(p, s, cs)) != 0)
-        return (int)c;
+        return c;
     return (*p == '/' || (*p == '\\' && p[1] == '/'))
       ? recmatch(p, s, cs) : 2;
 #else /* !WILD_STOP_AT_DIR */
-    for (; *s; INCSTR(s))
-      if ((c = recmatch(p, s, cs)) != 0)
-        return (int)c;
-    return 2;           /* 2 means give up--shmatch will return false */
+    if (!isshexp((char *)p))
+    {
+      /* optimization for rest of pattern being a literal string */
+
+      /* optimization to handle patterns like *.txt */
+      /* if the first char in the pattern is '*' and there */
+      /* are no other shell expression chars, i.e. a literal string */
+      /* then just compare the literal string at the end */
+
+      ZCONST char *srest;
+
+      srest = s + (strlen(s) - strlen(p));
+      if (srest - s < 0)
+        /* remaining literal string from pattern is longer than rest of
+           test string, there can't be a match
+         */
+        return 0;
+      else
+        /* compare the remaining literal pattern string with the last bytes
+           of the test string to check for a match */
+#ifdef _MBCS
+      {
+        ZCONST char *q = s;
+
+        /* MBCS-aware code must not scan backwards into a string from
+         * the end.
+         * So, we have to move forward by character from our well-known
+         * character position s in the test string until we have advanced
+         * to the srest position.
+         */
+        while (q < srest)
+          INCSTR(q);
+        /* In case the byte *srest is a trailing byte of a multibyte
+         * character, we have actually advanced past the position (srest).
+         * For this case, the match has failed!
+         */
+        if (q != srest)
+          return 0;
+        return ((cs ? strcmp(p, q) : namecmp(p, q)) == 0);
+      }
+#else /* !_MBCS */
+        return ((cs ? strcmp(p, srest) : namecmp(p, srest)) == 0);
+#endif /* ?_MBCS */
+    }
+    else
+    {
+      /* pattern contains more wildcards, continue with recursion... */
+      for (; *s; INCSTR(s))
+        if ((c = recmatch(p, s, cs)) != 0)
+          return (int)c;
+      return 2;           /* 2 means give up--shmatch will return false */
+    }
 #endif /* ?WILD_STOP_AT_DIR */
   }
 
@@ -134,7 +185,7 @@ int cs;         /* flag: force case-sensitive matching */
   if (c == '[')
   {
     int e;              /* flag true if next char to be taken literally */
-    ZCONST uch *q;      /* pointer to end of [-] group */
+    ZCONST char *q;     /* pointer to end of [-] group */
     int r;              /* flag true to match anything but the range */
 
     if (*s == 0)                        /* need a character to match */
@@ -158,11 +209,12 @@ int cs;         /* flag: force case-sensitive matching */
         c = *(p-1);
       else
       {
-        uch cc = (cs ? *s : case_map(*s));
+        uch cc = (cs ? (uch)*s : case_map((uch)*s));
+        uch uc = (uch) c;
         if (*(p+1) != '-')
-          for (c = c ? c : (unsigned)*p; c <= (unsigned)*p; c++)
+          for (uc = uc ? uc : (uch)*p; uc <= (uch)*p; uc++)
             /* compare range */
-            if ((cs ? c : case_map(c)) == cc)
+            if ((cs ? uc : case_map(uc)) == cc)
               return r ? 0 : recmatch(q + CLEN(q), s + CLEN(s), cs);
         c = e = 0;                      /* clear range, escape flags */
       }
@@ -177,8 +229,36 @@ int cs;         /* flag: force case-sensitive matching */
     if ((c = *p++) == '\0')             /* if \ at end, then syntax error */
       return 0;
 
+#ifdef VMS
+  /* 2005-11-06 SMS.
+     Handle "..." wildcard in p with "." or "]" in s.
+  */
+  if ((c == '.') && (*p == '.') && (*(p+ CLEN( p)) == '.') &&
+   ((*s == '.') || (*s == ']')))
+  {
+    /* Match "...]" with "]".  Continue after "]" in both. */
+    if ((*(p+ 2* CLEN( p)) == ']') && (*s == ']'))
+      return recmatch( (p+ 3* CLEN( p)), (s+ CLEN( s)), cs);
+
+    /* Else, look for a reduced match in s, until "]" in or end of s. */
+    for (; *s && (*s != ']'); INCSTR(s))
+      if (*s == '.')
+        /* If reduced match, then continue after "..." in p, "." in s. */
+        if ((c = recmatch( (p+ CLEN( p)), s, cs)) != 0)
+          return (int)c;
+
+    /* Match "...]" with "]".  Continue after "]" in both. */
+    if ((*(p+ 2* CLEN( p)) == ']') && (*s == ']'))
+      return recmatch( (p+ 3* CLEN( p)), (s+ CLEN( s)), cs);
+
+    /* No reduced match.  Quit. */
+    return 2;
+  }
+
+#endif /* def VMS */
+
   /* Just a character--compare it */
-  return (cs ? c == *s : case_map(c) == case_map(*s)) ?
+  return (cs ? c == *s : case_map((uch)c) == case_map((uch)*s)) ?
           recmatch(p, s + CLEN(s), cs) : 0;
 }
 
@@ -190,7 +270,7 @@ int cs;                 /* force case-sensitive match if TRUE */
 /* Compare the sh pattern p with the string s and return true if they match,
    false if they don't or if there is a syntax error in the pattern. */
 {
-  return recmatch((ZCONST uch *) p, (ZCONST uch *) s, cs) == 1;
+  return recmatch(p, s, cs) == 1;
 }
 
 
@@ -206,14 +286,21 @@ int cs;                 /* force case-sensitive match if TRUE */
   char *s1;             /* revised string to match */
   int r;                /* result */
 
-  if ((s1 = malloc(strlen(s) + 2)) == NULL)
-    /* will usually be OK */
-    return recmatch((ZCONST uch *) p, (ZCONST uch *) s, cs) == 1;
-  strcpy(s1, s);
-  if (strchr(p, '.') && !strchr(s1, '.'))
+  if (strchr(p, '.') && !strchr(s, '.') &&
+      ((s1 = malloc(strlen(s) + 2)) != NULL))
+  {
+    strcpy(s1, s);
     strcat(s1, ".");
-  r = recmatch((ZCONST uch *)p, (ZCONST uch *)s1, cs);
-  free((zvoid *)s1);
+  }
+  else
+  {
+    /* will usually be OK */
+    s1 = (char *)s;
+  }
+
+  r = recmatch(p, s1, cs) == 1;
+  if (s != s1)
+    free((zvoid *)s1);
   return r == 1;
 }
 
@@ -447,8 +534,6 @@ unsigned char *zmbsrchr(str, c)
 
 
 #ifndef UTIL
-
-extern char *getenv();
 
 /*****************************************************************
  | envargs - add default options from environment to command line

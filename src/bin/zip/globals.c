@@ -1,10 +1,10 @@
 /*
-  Copyright (c) 1990-1999 Info-ZIP.  All rights reserved.
+  Copyright (c) 1990-2005 Info-ZIP.  All rights reserved.
 
-  See the accompanying file LICENSE, version 1999-Oct-05 or later
+  See the accompanying file LICENSE, version 2004-May-22 or later
   (the contents of which are also included in zip.h) for terms of use.
   If, for some reason, both of these files are missing, the Info-ZIP license
-  also may be found at:  ftp://ftp.cdrom.com/pub/infozip/license.html
+  also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
 */
 /*
  *  globals.c by Mark Adler
@@ -49,7 +49,7 @@ int dirnames = 1;       /* include directory entries by default */
 int linkput = 0;        /* 1=store symbolic links as such */
 int noisy = 1;          /* 0=quiet operation */
 int extra_fields = 1;   /* 0=do not create extra fields */
-#ifdef WIN32
+#ifdef NTSD_EAS
     int use_privileges = 0; /* 1=use security privilege overrides */
 #endif
 #ifndef RISCOS
@@ -90,6 +90,7 @@ extent fcount;          /* Count of files in list */
 struct plist *patterns = NULL;  /* List of patterns to be matched */
 unsigned pcount = 0;            /* number of patterns */
 unsigned icount = 0;            /* number of include only patterns */
+unsigned Rcount = 0;            /* number of -R include patterns */
 
 #ifdef IZ_CHECK_TZ
 int zp_tz_is_valid;     /* signals "timezone info is available" */

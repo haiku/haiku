@@ -1,10 +1,10 @@
 /*
-  Copyright (c) 1990-1999 Info-ZIP.  All rights reserved.
+  Copyright (c) 1990-2006 Info-ZIP.  All rights reserved.
 
-  See the accompanying file LICENSE, version 1999-Oct-05 or later
+  See the accompanying file LICENSE, version 2005-Feb-10 or later
   (the contents of which are also included in zip.h) for terms of use.
-  If, for some reason, both of these files are missing, the Info-ZIP license
-  also may be found at:  ftp://ftp.cdrom.com/pub/infozip/license.html
+  If, for some reason, all these files are missing, the Info-ZIP license
+  also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
 */
 /*
  *  zipfile.c by Mark Adler.
@@ -16,7 +16,6 @@
 
 #ifdef VMS
 #  include <rms.h>
-#  include <starlet.h>
 #  include "vms/vmsmunch.h"
 #  include "vms/vmsdefs.h"
 #endif
@@ -167,7 +166,7 @@ ZCONST char *n;         /* name to find */
 
 #endif /* !UTIL */
 
-#ifndef VMS
+#ifndef VMS     /* See vms/vms.c for VMS-specific ziptyp(). */
 #  ifndef PATHCUT
 #    define PATHCUT '/'
 #  endif
@@ -260,62 +259,7 @@ char *s;                /* file name to force to zip */
 #endif /* !RISCOS */
   return t;
 }
-
-#else /* VMS */
-
-# define PATHCUT ']'
-
-char *ziptyp(s)
-char *s;
-{   int status;
-    struct FAB fab;
-    struct NAM nam;
-    static char zero=0;
-    char result[NAM$C_MAXRSS+1],exp[NAM$C_MAXRSS+1];
-    char *p;
-
-    fab = cc$rms_fab;
-    nam = cc$rms_nam;
-
-    fab.fab$l_fna = s;
-    fab.fab$b_fns = strlen(fab.fab$l_fna);
-
-    fab.fab$l_dna = "sys$disk:[].zip";          /* Default fspec */
-    fab.fab$b_dns = strlen(fab.fab$l_dna);
-
-    fab.fab$l_nam = &nam;
-
-    nam.nam$l_rsa = result;                     /* Put resultant name of */
-    nam.nam$b_rss = sizeof(result)-1;           /* existing zipfile here */
-
-    nam.nam$l_esa = exp;                        /* For full spec of */
-    nam.nam$b_ess = sizeof(exp)-1;              /* file to create */
-
-    status = sys$parse(&fab);
-    if( (status & 1) == 0 )
-        return &zero;
-
-    status = sys$search(&fab);
-    if( status & 1 )
-    {               /* Existing ZIP file */
-        int l;
-        if( (p=malloc( (l=nam.nam$b_rsl) + 1 )) != NULL )
-        {       result[l] = 0;
-                strcpy(p,result);
-        }
-    }
-    else
-    {               /* New ZIP file */
-        int l;
-        if( (p=malloc( (l=nam.nam$b_esl) + 1 )) != NULL )
-        {       exp[l] = 0;
-                strcpy(p,exp);
-        }
-    }
-    return p;
-}
-
-#endif  /* VMS */
+#endif /* !VMS */
 
 #ifndef UTIL
 
@@ -684,7 +628,8 @@ local int scanzipf_reg(f)
  * XXX far pointer arithmetic in DOS
  */
         while (t >= buf) {
-          /* Check for ENDSIG ("PK\5\6" in ASCII) */
+          /* Check for ENDSIG the End Of Central Directory Record signature
+             ("PK\5\6" in ASCII) */
           if (LG(t) == ENDSIG) {
             found = 1;
 /*
@@ -737,6 +682,10 @@ local int scanzipf_reg(f)
       zipwarn("remember to use binary mode when you transferred it?)", "");
       return ZE_FORM;
     }
+
+/*
+ * Read the End Of Central Directory Record
+ */
     /* Read end header */
     if (fread(b, ENDHEAD, 1, f) != 1)
       return ferror(f) ? ZE_READ : ZE_EOF;
@@ -1207,7 +1156,7 @@ FILE *f;                /* file to write to */
 
 
 int putend(n, s, c, m, z, f)
-int n;                  /* number of entries in central directory */
+unsigned n;             /* number of entries in central directory */
 ulg s;                  /* size of central directory */
 ulg c;                  /* offset of central directory */
 extent m;               /* length of zip file comment (0 if none) */

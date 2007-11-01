@@ -1,10 +1,10 @@
 /*
-  Copyright (c) 1990-1999 Info-ZIP.  All rights reserved.
+  Copyright (c) 1990-2005 Info-ZIP.  All rights reserved.
 
-  See the accompanying file LICENSE, version 1999-Oct-05 or later
+  See the accompanying file LICENSE, version 2005-Feb-10 or later
   (the contents of which are also included in zip.h) for terms of use.
-  If, for some reason, both of these files are missing, the Info-ZIP license
-  also may be found at:  ftp://ftp.cdrom.com/pub/infozip/license.html
+  If, for some reason, all these files are missing, the Info-ZIP license
+  also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
 */
 /*---------------------------------------------------------------------------
 
@@ -18,8 +18,8 @@
   Contains:  echo()         (VMS only)
              Echon()        (Unix only)
              Echoff()       (Unix only)
-             screenlines()  (Unix only)
-             zgetch()       (Unix and non-Unix versions)
+             screensize()   (Unix only)
+             zgetch()       (Unix, VMS, and non-Unix/VMS versions)
              getp()         ("PC," Unix/Atari/Be, VMS/VMCMS/MVS)
 
   ---------------------------------------------------------------------------*/
@@ -50,7 +50,7 @@
 #  define GLOBAL(g) G.g
 #endif
 
-#ifdef __BEOS__                /* why yes, we do */
+#if (defined(__ATHEOS__) || defined(__BEOS__))  /* why yes, we do */
 #  define HAVE_TERMIOS_H
 #endif
 
@@ -178,6 +178,10 @@
 #ifndef HAVE_WORKING_GETCH
 #ifdef VMS
 
+static struct dsc$descriptor_s DevDesc =
+        {11, DSC$K_DTYPE_T, DSC$K_CLASS_S, "SYS$COMMAND"};
+     /* {dsc$w_length, dsc$b_dtype, dsc$b_class, dsc$a_pointer}; */
+
 /*
  * Turn keyboard echoing on or off (VMS).  Loosely based on VMSmunch.c
  * and hence on Joe Meadows' file.c code.
@@ -196,13 +200,9 @@ int echo(opt)
      * Greg Roelofs, 15 Aug 91
      */
 
-    /* SKM: make global? */
-    static struct dsc$descriptor_s DevDesc =
-        {11, DSC$K_DTYPE_T, DSC$K_CLASS_S, "SYS$COMMAND"};
-     /* {dsc$w_length, dsc$b_dtype, dsc$b_class, dsc$a_pointer}; */
-    static short           DevChan, iosb[4];
-    static long            status;
-    static unsigned long   oldmode[2], newmode[2];   /* each = 8 bytes */
+    short           DevChan, iosb[4];
+    long            status;
+    unsigned long   ttmode[2];  /* space for 8 bytes */
 
 
     /* assign a channel to standard input */
@@ -215,26 +215,24 @@ int echo(opt)
      * instead, but echo on/off will be more general)
      */
     status = sys$qiow(0, DevChan, IO$_SENSEMODE, &iosb, 0, 0,
-                     oldmode, 8, 0, 0, 0, 0);
+                     ttmode, 8, 0, 0, 0, 0);
     if (!(status & 1))
         return status;
     status = iosb[0];
     if (!(status & 1))
         return status;
 
-    /* copy old mode into new-mode buffer, then modify to be either NOECHO or
-     * ECHO (depending on function argument opt)
+    /* modify mode buffer to be either NOECHO or ECHO
+     * (depending on function argument opt)
      */
-    newmode[0] = oldmode[0];
-    newmode[1] = oldmode[1];
     if (opt == 0)   /* off */
-        newmode[1] |= TT$M_NOECHO;                      /* set NOECHO bit */
+        ttmode[1] |= TT$M_NOECHO;                       /* set NOECHO bit */
     else
-        newmode[1] &= ~((unsigned long) TT$M_NOECHO);   /* clear NOECHO bit */
+        ttmode[1] &= ~((unsigned long) TT$M_NOECHO);    /* clear NOECHO bit */
 
     /* use the IO$_SETMODE function to change the tty status */
     status = sys$qiow(0, DevChan, IO$_SETMODE, &iosb, 0, 0,
-                     newmode, 8, 0, 0, 0, 0);
+                     ttmode, 8, 0, 0, 0, 0);
     if (!(status & 1))
         return status;
     status = iosb[0];
@@ -249,6 +247,42 @@ int echo(opt)
     return SS$_NORMAL;   /* we be happy */
 
 } /* end function echo() */
+
+
+/*
+ * Read a single character from keyboard in non-echoing mode (VMS).
+ * (returns EOF in case of errors)
+ */
+int tt_getch()
+{
+    short           DevChan, iosb[4];
+    long            status;
+    char            kbbuf[16];  /* input buffer with - some - excess length */
+
+    /* assign a channel to standard input */
+    status = sys$assign(&DevDesc, &DevChan, 0, 0);
+    if (!(status & 1))
+        return EOF;
+
+    /* read a single character from SYS$COMMAND (no-echo) and
+     * wait for completion
+     */
+    status = sys$qiow(0,DevChan,
+                      IO$_READVBLK|IO$M_NOECHO|IO$M_NOFILTR,
+                      &iosb, 0, 0,
+                      &kbbuf, 1, 0, 0, 0, 0);
+    if ((status&1) == 1)
+        status = iosb[0];
+
+    /* deassign the sys$input channel by way of clean-up
+     * (for this step, we do not need to check the completion status)
+     */
+    sys$dassgn(DevChan);
+
+    /* return the first char read, or EOF in case the read request failed */
+    return (int)(((status&1) == 1) ? (uch)kbbuf[0] : EOF);
+
+} /* end function tt_getch() */
 
 
 #else /* !VMS:  basically Unix */
@@ -298,7 +332,7 @@ void Echon(__G)
 
 #if (defined(UNZIP) && !defined(FUNZIP))
 
-#if (defined(UNIX) || defined(__BEOS__))
+#ifdef ATH_BEO_UNX
 #ifdef MORE
 
 /*
@@ -311,7 +345,9 @@ void Echon(__G)
 
 #if (defined(TIOCGWINSZ) && !defined(M_UNIX))
 
-int screenlines()
+int screensize(tt_rows, tt_cols)
+    int *tt_rows;
+    int *tt_cols;
 {
     struct winsize wsz;
 #ifdef DEBUG_WINSZ
@@ -323,40 +359,69 @@ int screenlines()
 #ifdef DEBUG_WINSZ
         if (firsttime) {
             firsttime = FALSE;
-            fprintf(stderr, "ttyio.c screenlines():  ws_row = %d\n",
+            fprintf(stderr, "ttyio.c screensize():  ws_row = %d\n",
               wsz.ws_row);
+            fprintf(stderr, "ttyio.c screensize():  ws_col = %d\n",
+              wsz.ws_col);
         }
 #endif
-        /* number of columns = ws_col */
-        return (wsz.ws_row > 0)? wsz.ws_row : 24;   /* number of rows */
-
+        /* number of rows */
+        if (tt_rows != NULL)
+            *tt_rows = (int)((wsz.ws_row > 0) ? wsz.ws_row : 24);
+        /* number of columns */
+        if (tt_cols != NULL)
+            *tt_cols = (int)((wsz.ws_col > 0) ? wsz.ws_col : 80);
+        return 0;    /* signal success */
     } else {         /* this happens when piping to more(1), for example */
 #ifdef DEBUG_WINSZ
         if (firsttime) {
             firsttime = FALSE;
             fprintf(stderr,
-              "ttyio.c screenlines():  ioctl(TIOCGWINSZ) failed\n"));
+              "ttyio.c screensize():  ioctl(TIOCGWINSZ) failed\n"));
         }
 #endif
-        return 24;   /* VT-100 assumed to be minimal hardware */
+        /* VT-100 assumed to be minimal hardware */
+        if (tt_rows != NULL)
+            *tt_rows = 24;
+        if (tt_cols != NULL)
+            *tt_cols = 80;
+        return 1;       /* signal failure */
     }
 }
 
 #else /* !TIOCGWINSZ: service not available, fall back to semi-bogus method */
 
-int screenlines()
+int screensize(tt_rows, tt_cols)
+    int *tt_rows;
+    int *tt_cols;
 {
     char *envptr, *getenv();
     int n;
+    int errstat = 0;
 
     /* GRR:  this is overly simplistic, but don't have access to stty/gtty
      * system anymore
      */
-    envptr = getenv("LINES");
-    if (envptr == (char *)NULL || (n = atoi(envptr)) < 5)
-        return 24;   /* VT-100 assumed to be minimal hardware */
-    else
-        return n;
+    if (tt_rows != NULL) {
+        envptr = getenv("LINES");
+        if (envptr == (char *)NULL || (n = atoi(envptr)) < 5) {
+            /* VT-100 assumed to be minimal hardware */
+            *tt_rows = 24;
+            errstat = 1;    /* signal failure */
+        } else {
+            *tt_rows = n;
+        }
+    }
+    if (tt_cols != NULL) {
+        envptr = getenv("COLUMNS");
+        if (envptr == (char *)NULL || (n = atoi(envptr)) < 5) {
+            *tt_cols = 80;
+            errstat = 1;    /* signal failure */
+        } else {
+            *tt_cols = n;
+        }
+    }
+    return errstat;
 }
 
 #endif /* ?(TIOCGWINSZ && !M_UNIX) */
@@ -403,11 +468,12 @@ int zgetch(__G__ f)
     STTY(f, &sg);               /* restore canonical mode */
     GLOBAL(echofd) = -1;
 
-    return (int)c;
+    return (int)(uch)c;
 }
 
 
-#else /* !UNIX && !__BEOS__ */
+#else /* !ATH_BEO_UNX */
+#ifndef VMS     /* VMS supplies its own variant of getch() */
 
 
 int zgetch(__G__ f)
@@ -432,7 +498,8 @@ int zgetch(__G__ f)
     return (int)c;
 }
 
-#endif /* ?(UNIX || __BEOS__) */
+#endif /* !VMS */
+#endif /* ?ATH_BEO_UNX */
 
 #endif /* UNZIP && !FUNZIP */
 #endif /* !HAVE_WORKING_GETCH */
@@ -517,7 +584,7 @@ char *getp(__G__ m, p, n)
 #else /* !HAVE_WORKING_GETCH */
 
 
-#if (defined(UNIX) || defined(__MINT__) || defined(__BEOS__))
+#if (defined(ATH_BEO_UNX) || defined(__MINT__))
 
 #ifndef _PATH_TTY
 #  ifdef __MINT__
@@ -574,7 +641,7 @@ char *getp(__G__ m, p, n)
 
 } /* end function getp() */
 
-#endif /* UNIX || __MINT__ || __BEOS__ */
+#endif /* ATH_BEO_UNX || __MINT__ */
 
 
 

@@ -1,18 +1,18 @@
 /*
-  Copyright (c) 1990-1999 Info-ZIP.  All rights reserved.
+  Copyright (c) 1990-2006 Info-ZIP.  All rights reserved.
 
-  See the accompanying file LICENSE, version 1999-Oct-05 or later
+  See the accompanying file LICENSE, version 2005-Feb-10 or later
   (the contents of which are also included in zip.h) for terms of use.
-  If, for some reason, both of these files are missing, the Info-ZIP license
-  also may be found at:  ftp://ftp.cdrom.com/pub/infozip/license.html
+  If, for some reason, all these files are missing, the Info-ZIP license
+  also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
 */
 /*
  *  zipup.c by Mark Adler and Jean-loup Gailly.
  */
 #define __ZIPUP_C
 
-#include <ctype.h>
 #include "zip.h"
+#include <ctype.h>
 
 #ifndef UTIL            /* This module contains no code for Zip Utilities */
 
@@ -55,6 +55,10 @@
 #ifdef __BEOS__
 #  include "beos/zipup.h"
 #endif
+
+#ifdef __ATHEOS__
+#  include "atheos/zipup.h"
+#endif /* __ATHEOS__ */
 
 #ifdef __human68k__
 #  include "human68k/zipup.h"
@@ -292,12 +296,13 @@ FILE *y;                /* output file */
   extent k = 0;         /* result of zread */
   int l = 0;            /* true if this file is a symbolic link */
   int m;                /* method for this entry */
-  ulg o, p;             /* offsets in zip file */
+  ulg o = 0, p;         /* offsets in zip file */
   long q = -3L;         /* size returned by filetime */
   int r;                /* temporary variable */
   ulg s = 0L;           /* size of compressed data */
   int isdir;            /* set for a directory name */
   int set_type = 0;     /* set if file type (ascii/binary) unknown */
+  ulg last_o;           /* used to check if we wrapped beyond what fseek can handle */
 
   z->nam = strlen(z->iname);
   isdir = z->iname[z->nam-1] == (char)0x2f; /* ascii[(unsigned)('/')] */
@@ -366,8 +371,10 @@ FILE *y;                /* output file */
     }
 #endif /* !(VMS && VMS_PK_EXTRA) */
     l = issymlnk(a);
-    if (l)
+    if (l) {
       ifile = fbad;
+      m = STORE;
+    }
     else if (isdir) { /* directory */
       ifile = fbad;
       m = STORE;
@@ -402,10 +409,12 @@ FILE *y;                /* output file */
     }
 #endif /* VMS && VMS_PK_EXTRA */
 
-#ifdef MMAP
+#if defined(MMAP) || defined(BIG_MEM)
     /* Map ordinary files but not devices. This code should go in fileio.c */
-    if (!translate_eol && q != -1L && (ulg)q > 0 &&
+    if (!translate_eol && m != STORE && q != -1L && (ulg)q > 0 &&
         (ulg)q + MIN_LOOKAHEAD > (ulg)q) {
+# ifdef MMAP
+      /* Map the whole input file in memory */
       if (window != NULL)
         free(window);  /* window can't be a mapped file here */
       window_size = (ulg)q + MIN_LOOKAHEAD;
@@ -432,12 +441,8 @@ FILE *y;                /* output file */
       } else {
         remain = (ulg)q;
       }
-    }
-#else /* !MMAP */
-# ifdef BIG_MEM
-    /* Read the whole input file at once */
-    if (!translate_eol && q != -1L && (ulg)q > 0 &&
-        (ulg)q + MIN_LOOKAHEAD > (ulg)q) {
+# else /* !MMAP, must be BIG_MEM */
+      /* Read the whole input file at once */
       window_size = (ulg)q + MIN_LOOKAHEAD;
       window = window ? (uch*) realloc(window, (unsigned)window_size)
                       : (uch*) malloc((unsigned)window_size);
@@ -451,13 +456,13 @@ FILE *y;                /* output file */
       } else {
         window_size = 0L;
       }
+# endif /* ?MMAP */
     }
-# endif /* BIG_MEM */
-#endif /* ?MMAP */
+#endif /* MMAP || BIG_MEM */
 
   } /* strcmp(z->name, "-") == 0 */
 
-  if (l || q == 0)
+  if (q == 0)
     m = STORE;
   if (m == BEST)
     m = DEFLATE;
@@ -536,9 +541,15 @@ FILE *y;                /* output file */
     ZIPERR(ZE_WRITE, "unexpected error on zip file");
   }
 
+  last_o = o;
   o = ftell(y); /* for debugging only, ftell can fail on pipes */
   if (ferror(y))
     clearerr(y);
+
+  if (last_o > o) {
+    /* could be wrap around */
+    ZIPERR(ZE_BIG, "seek wrap - zip file too big to write");
+  }
 
   /* Write stored or deflated file to zip file */
   isize = 0L;
@@ -588,6 +599,7 @@ FILE *y;                /* output file */
         }
 #ifndef WINDLL
         if (verbose) putc('.', stderr);
+        fflush(stderr);
 #else
         if (verbose) fprintf(stdout,"%c",'.');
 #endif
@@ -813,6 +825,11 @@ local unsigned file_read(buf, size)
   }
   crc = crc32(crc, (uch *) buf, len);
   isize += (ulg)len;
+  /* added check for file size - 2/20/05 */
+  if ((isize & (ulg)0xffffffffL) < (ulg)len) {
+    /* fatal error: file size exceeds Zip limit */
+    ZIPERR(ZE_BIG, "file exceeds Zip's 4GB uncompressed size limit");
+  }
   return len;
 }
 
@@ -1029,6 +1046,7 @@ local ulg filecompress(z_entry, zipfile, cmpr_method)
                     mrk_cnt++;
 #ifndef WINDLL
                     putc('.', stderr);
+                    fflush(stderr);
 #else
                     fprintf(stdout,"%c",'.');
 #endif
@@ -1115,6 +1133,7 @@ ulg memcompress(tgt, tgtsize, src, srcsize)
 {
     ulg crc;
     unsigned out_total;
+    int method   = DEFLATE;
 #ifdef USE_ZLIB
     int err      = Z_OK;
 #else
@@ -1153,7 +1172,7 @@ ulg memcompress(tgt, tgtsize, src, srcsize)
     window_size = 0L;
 
     bi_init(tgt + (2 + 4), (unsigned)(tgtsize - (2 + 4)), FALSE);
-    ct_init(&att, NULL);
+    ct_init(&att, &method);
     lm_init((level != 0 ? level : 1), &flags);
     out_total += (unsigned)deflate();
     window_size = 0L; /* was updated by lm_init() */
@@ -1163,8 +1182,8 @@ ulg memcompress(tgt, tgtsize, src, srcsize)
     crc = crc32(crc, (uch *)src, (extent)srcsize);
 
     /* For portability, force little-endian order on all machines: */
-    tgt[0] = (char)(DEFLATE & 0xff);
-    tgt[1] = (char)((DEFLATE >> 8) & 0xff);
+    tgt[0] = (char)(method & 0xff);
+    tgt[1] = (char)((method >> 8) & 0xff);
     tgt[2] = (char)(crc & 0xff);
     tgt[3] = (char)((crc >> 8) & 0xff);
     tgt[4] = (char)((crc >> 16) & 0xff);

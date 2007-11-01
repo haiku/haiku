@@ -1,10 +1,10 @@
 /*
-  Copyright (c) 1990-1999 Info-ZIP.  All rights reserved.
+  Copyright (c) 1990-2005 Info-ZIP.  All rights reserved.
 
-  See the accompanying file LICENSE, version 1999-Oct-05 or later
+  See the accompanying file LICENSE, version 2005-Feb-10 or later
   (the contents of which are also included in zip.h) for terms of use.
-  If, for some reason, both of these files are missing, the Info-ZIP license
-  also may be found at:  ftp://ftp.cdrom.com/pub/infozip/license.html
+  If, for some reason, all these files are missing, the Info-ZIP license
+  also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
 */
 /*
    ttyio.h
@@ -55,6 +55,12 @@
 #if (defined(DOS_H68_OS2_W32) || defined(FLEXOS))
 #  ifndef DOS_FLX_H68_OS2_W32
 #    define DOS_FLX_H68_OS2_W32
+#  endif
+#endif
+
+#if (defined(__ATHEOS__) || defined(__BEOS__) || defined(UNIX))
+#  ifndef ATH_BEO_UNX
+#    define ATH_BEO_UNX
 #  endif
 #endif
 
@@ -176,7 +182,10 @@
 #ifdef VMS
 #  define echoff(f)  echo(0)
 #  define echon()    echo(1)
+#  define getch()    tt_getch()
+#  define FGETCH(f)  tt_getch()
    int echo OF((int));
+   int tt_getch OF((void));
 #endif
 
 /* For all other systems, ttyio.c supplies the two functions Echoff() and

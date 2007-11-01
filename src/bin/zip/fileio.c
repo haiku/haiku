@@ -1,10 +1,10 @@
 /*
-  Copyright (c) 1990-1999 Info-ZIP.  All rights reserved.
+  Copyright (c) 1990-2005 Info-ZIP.  All rights reserved.
 
-  See the accompanying file LICENSE, version 1999-Oct-05 or later
+  See the accompanying file LICENSE, version 2005-Feb-10 or later
   (the contents of which are also included in zip.h) for terms of use.
-  If, for some reason, both of these files are missing, the Info-ZIP license
-  also may be found at:  ftp://ftp.cdrom.com/pub/infozip/license.html
+  If, for some reason, all these files are missing, the Info-ZIP license
+  also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
 */
 /*
  *  fileio.c by Mark Adler
@@ -276,43 +276,82 @@ int check_dup()
 int filter(name, casesensitive)
   char *name;
   int casesensitive;
-  /* Scan the -i and -x lists for matches to the given name.
-     Return true if the name must be included, false otherwise.
-     Give precedence to -x over -i.
+  /* Scan the -R, -i and -x lists for matches to the given name.
+     Return TRUE if the name must be included, FALSE otherwise.
+     Give precedence to -x over -i and -R.
+     Note that if both R and i patterns are given then must
+     have a match for both.
+     This routine relies on the following global variables:
+       patterns                 array of match pattern structures
+       pcount                   total number of patterns
+       icount                   number of -i patterns
+       Rcount                   number of -R patterns
+     These data are set up by the command line parsing code.
    */
 {
    unsigned int n;
    int slashes;
-   int include = icount ? 0 : 1;
    char *p, *q;
+   /* without -i patterns, every name matches the "-i select rules" */
+   int imatch = (icount == 0);
+   /* without -R patterns, every name matches the "-R select rules" */
+   int Rmatch = (Rcount == 0);
 
-   if (pcount == 0) return 1;
+   if (pcount == 0) return TRUE;
 
    for (n = 0; n < pcount; n++) {
       if (!patterns[n].zname[0])        /* it can happen... */
-          continue;
+         continue;
       p = name;
-      if (patterns[n].select == 'R') {
-         /* With -R patterns, if the pattern has N path components (that is, */
-         /* N-1 slashes), then we test only the last N components of name.   */
+      switch (patterns[n].select) {
+       case 'R':
+         if (Rmatch)
+            /* one -R match is sufficient, skip this pattern */
+            continue;
+         /* With -R patterns, if the pattern has N path components (that is,
+            N-1 slashes), then we test only the last N components of name.
+          */
          slashes = 0;
          for (q = patterns[n].zname; (q = MBSCHR(q, '/')) != NULL; INCSTR(q))
             slashes++;
+         /* The name may have M path components (M-1 slashes) */
          for (q = p; (q = MBSCHR(q, '/')) != NULL; INCSTR(q))
             slashes--;
+         /* Now, "slashes" contains the difference "N-M" between the number
+            of path components in the pattern (N) and in the name (M).
+          */
          if (slashes < 0)
+            /* We found "M > N"
+                --> skip the first (M-N) path components of the name.
+             */
             for (q = p; (q = MBSCHR(q, '/')) != NULL; INCSTR(q))
-               if (slashes++ == 0) {
-                  p = q + CLEN(q);
+               if (++slashes == 0) {
+                  p = q + 1;    /* q points at '/', mblen("/") is 1 */
                   break;
                }
+         break;
+       case 'i':
+         if (imatch)
+            /* one -i match is sufficient, skip this pattern */
+            continue;
+         break;
       }
       if (MATCH(patterns[n].zname, p, casesensitive)) {
-         if (patterns[n].select == 'x') return 0;
-         include = 1;
+         switch (patterns[n].select) {
+            case 'x':
+               /* The -x match takes precedence over everything else */
+               return FALSE;
+            case 'R':
+               Rmatch = TRUE;
+               break;
+            default:
+               /* this must be a type -i match */
+               imatch = TRUE;
+               break;
+         }
       }
    }
-   return include;
+   return imatch && Rmatch;
 }
 
 int newname(name, isdir, casesensitive)
@@ -721,6 +760,7 @@ int a;                  /* attributes returned by getfileattr() */
 #endif
 }
 
+#ifndef VMS /* VMS-specific function is in VMS.C. */
 
 char *tempname(zip)
 char *zip;              /* path name of zip file to generate temp name for */
@@ -779,6 +819,8 @@ char *zip;              /* path name of zip file to generate temp name for */
   char *cptr = &cur_subvol[0];
   char *tptr = &temp_subvol[0];
   short err;
+  FILE *tempf;
+  int attempts;
 
   t = (char *)malloc(NAMELEN); /* malloc here as you cannot free */
                                /* tmpnam allocated storage later */
@@ -793,15 +835,33 @@ char *zip;              /* path name of zip file to generate temp name for */
     strcat(cptr, getenv("DEFAULTS"));
 
     strncat(tptr, zip, _min(FILENAME_MAX, (zptr - zip)) ); /* temp subvol */
-    strncat(t,zip, _min(NAMELEN, ((zptr - zip) + 1)) );    /* temp stem   */
+    strncat(t, zip, _min(NAMELEN, ((zptr - zip) + 1)) );   /* temp stem   */
 
     err = chvol(tptr);
     ptr = t + strlen(t);  /* point to end of stem */
-    tmpnam(ptr);          /* Add filename part to temp subvol */
-    err = chvol(cptr);
   }
   else
-    t = tmpnam(t);
+    ptr = t;
+
+  /* If two zips are running in same subvol then we can get contention problems
+     with the temporary filename.  As a work around we attempt to create
+     the file here, and if it already exists we get a new temporary name */
+
+  attempts = 0;
+  do {
+    attempts++;
+    tmpnam(ptr);  /* Add filename */
+    tempf = fopen(ptr, FOPW_TMP);    /* Attempt to create file */
+  } while (tempf == NULL && attempts < 100);
+
+  if (attempts >= 100) {
+    ziperr(ZE_TEMP, "Could not get unique temp file name");
+  }
+  fclose(tempf);
+
+  if (zptr != NULL) {
+    err = chvol(cptr);  /* Put ourself back to where we came in */
+  }
 
   return t;
 
@@ -865,12 +925,13 @@ char *zip;              /* path name of zip file to generate temp name for */
 #endif /* CMS_MVS */
 }
 
+#endif /* !VMS */
 
 int fcopy(f, g, n)
 FILE *f, *g;            /* source and destination files */
 ulg n;                  /* number of bytes to copy or -1 for all */
-/* Copy n bytes from file *f to file *g, or until EOF if n == -1.  Return
-   an error code in the ZE_ class. */
+/* Copy n bytes from file *f to file *g, or until EOF if (long)n == -1.
+   Return an error code in the ZE_ class. */
 {
   char *b;              /* malloc'ed buffer for copying */
   extent k;             /* result of fread() */

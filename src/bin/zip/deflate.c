@@ -1,10 +1,10 @@
 /*
-  Copyright (c) 1990-1999 Info-ZIP.  All rights reserved.
+  Copyright (c) 1990-2005 Info-ZIP.  All rights reserved.
 
-  See the accompanying file LICENSE, version 1999-Oct-05 or later
+  See the accompanying file LICENSE, version 2005-Feb-10 or later
   (the contents of which are also included in zip.h) for terms of use.
-  If, for some reason, both of these files are missing, the Info-ZIP license
-  also may be found at:  ftp://ftp.cdrom.com/pub/infozip/license.html
+  If, for some reason, all these files are missing, the Info-ZIP license
+  also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
 */
 /*
  *  deflate.c by Jean-loup Gailly.
@@ -569,6 +569,14 @@ local void check_match(start, match, length)
 #endif
 
 /* ===========================================================================
+ * Flush the current block, with given end-of-file flag.
+ * IN assertion: strstart is set to the end of the current match.
+ */
+#define FLUSH_BLOCK(eof) \
+   flush_block(block_start >= 0L ? (char*)&window[(unsigned)block_start] : \
+                (char*)NULL, (ulg)strstart - (ulg)block_start, (eof))
+
+/* ===========================================================================
  * Fill the window when the lookahead becomes insufficient.
  * Updates strstart and lookahead, and sets eofile if end of input file.
  *
@@ -600,6 +608,12 @@ local void fill_window()
          */
         } else if (strstart >= WSIZE+MAX_DIST && sliding) {
 
+#ifdef FORCE_METHOD
+            /* When methods "stored" or "store_block" are requested, the
+             * current block must be flushed before sliding the window.
+             */
+            if (level <= 2) FLUSH_BLOCK(0), block_start = strstart;
+#endif
             /* By the IN assertion, the window is not empty so we can't confuse
              * more == 0 with more == 64K on a 16 bit machine.
              */
@@ -650,14 +664,6 @@ local void fill_window()
         }
     } while (lookahead < MIN_LOOKAHEAD && !eofile);
 }
-
-/* ===========================================================================
- * Flush the current block, with given end-of-file flag.
- * IN assertion: strstart is set to the end of the current match.
- */
-#define FLUSH_BLOCK(eof) \
-   flush_block(block_start >= 0L ? (char*)&window[(unsigned)block_start] : \
-                (char*)NULL, (long)strstart - block_start, (eof))
 
 /* ===========================================================================
  * Processes a new input file and return its compressed length. This

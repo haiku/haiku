@@ -1,11 +1,30 @@
 /*
-  Copyright (c) 1990-1999 Info-ZIP.  All rights reserved.
+  Copyright (c) 1990-2005 Info-ZIP.  All rights reserved.
 
-  See the accompanying file LICENSE, version 1999-Oct-05 or later
+  See the accompanying file LICENSE, version 2004-May-22 or later
   (the contents of which are also included in zip.h) for terms of use.
   If, for some reason, both of these files are missing, the Info-ZIP license
-  also may be found at:  ftp://ftp.cdrom.com/pub/infozip/license.html
+  also may be found at:  ftp://ftp.info-zip.org/pub/infozip/license.html
 */
+
+/* Some compiler distributions for Win32/i386 systems try to emulate
+ * a Unix (POSIX-compatible) environment.
+ */
+#if (defined(WIN32) && defined(UNIX))
+   /* Zip does not support merging both ports in a single executable. */
+#  if (defined(FORCE_WIN32_OVER_UNIX) && defined(FORCE_UNIX_OVER_WIN32))
+     /* conflicting choice requests -> we prefer the Win32 environment */
+#    undef FORCE_UNIX_OVER_WIN32
+#  endif
+#  ifdef FORCE_WIN32_OVER_UNIX
+     /* native Win32 support was explicitely requested... */
+#    undef UNIX
+#  else
+     /* use the POSIX (Unix) emulation features by default... */
+#    undef WIN32
+#  endif
+#endif
+
 #ifdef AMIGA
 #include "amiga/osdep.h"
 #endif
@@ -20,6 +39,10 @@
 
 #ifdef __BEOS__
 #include "beos/osdep.h"
+#endif
+
+#ifdef __ATHEOS__
+#include "atheos/osdep.h"
 #endif
 
 #ifdef DOS
@@ -184,11 +207,12 @@ char *getenv();
 long atol();
 #endif /* NO_STDLIB_H */
 
-#endif /* NO_PROTO */
-
 #ifndef NO_MKTEMP
 char *mktemp();
 #endif /* !NO_MKTEMP */
+
+/* moved to include mktemp - Cosmin 2/18/05 */
+#endif /* NO_PROTO */
 
 /*
  * SEEK_* macros, should be defined in stdio.h
@@ -354,6 +378,11 @@ typedef struct ztimbuf {
 #  define Far far
 #endif
 
+/* MMAP and BIG_MEM cannot be used together -> let MMAP take precedence */
+#if (defined(MMAP) && defined(BIG_MEM))
+#  undef BIG_MEM
+#endif
+
 #if (defined(BIG_MEM) || defined(MMAP)) && !defined(DYN_ALLOC)
 #   define DYN_ALLOC
 #endif
@@ -428,8 +457,11 @@ typedef struct ztimbuf {
 #ifdef THEOS
 #  define OS_CODE  0x1200
 #endif
+#ifdef __ATHEOS__
+#  define OS_CODE  0x1E00
+#endif
 
-#define NUM_HOSTS 19
+#define NUM_HOSTS 31
 /* Number of operating systems. Should be updated when new ports are made */
 
 #if defined(DOS) && !defined(OS_CODE)

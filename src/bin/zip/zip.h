@@ -1,21 +1,22 @@
 /*
-This is version 1999-Oct-05 of the Info-ZIP copyright and license.
+This is version 2005-Feb-10 of the Info-ZIP copyright and license.
 The definitive version of this document should be available at
-ftp://ftp.cdrom.com/pub/infozip/license.html indefinitely.
+ftp://ftp.info-zip.org/pub/infozip/license.html indefinitely.
 
 
-Copyright (c) 1990-1999 Info-ZIP.  All rights reserved.
+Copyright (c) 1990-2005 Info-ZIP.  All rights reserved.
 
 For the purposes of this copyright and license, "Info-ZIP" is defined as
 the following set of individuals:
 
    Mark Adler, John Bush, Karl Davis, Harald Denker, Jean-Michel Dubois,
-   Jean-loup Gailly, Hunter Goatley, Ian Gorman, Chris Herborth, Dirk Haase,
-   Greg Hartwig, Robert Heath, Jonathan Hudson, Paul Kienitz, David Kirschbaum,
-   Johnny Lee, Onno van der Linden, Igor Mandrichenko, Steve P. Miller,
-   Sergio Monesi, Keith Owens, George Petrov, Greg Roelofs, Kai Uwe Rommel,
-   Steve Salisbury, Dave Smith, Christian Spieler, Antoine Verheijen,
-   Paul von Behren, Rich Wales, Mike White
+   Jean-loup Gailly, Hunter Goatley, Ed Gordon, Ian Gorman, Chris Herborth,
+   Dirk Haase, Greg Hartwig, Robert Heath, Jonathan Hudson, Paul Kienitz,
+   David Kirschbaum, Johnny Lee, Onno van der Linden, Igor Mandrichenko,
+   Steve P. Miller, Sergio Monesi, Keith Owens, George Petrov, Greg Roelofs,
+   Kai Uwe Rommel, Steve Salisbury, Dave Smith, Steven M. Schweda,
+   Christian Spieler, Cosmin Truta, Antoine Verheijen, Paul von Behren,
+   Rich Wales, Mike White
 
 This software is provided "as is," without warranty of any kind, express
 or implied.  In no event shall Info-ZIP or its contributors be held liable
@@ -29,9 +30,14 @@ freely, subject to the following restrictions:
     1. Redistributions of source code must retain the above copyright notice,
        definition, disclaimer, and this list of conditions.
 
-    2. Redistributions in binary form must reproduce the above copyright
-       notice, definition, disclaimer, and this list of conditions in
-       documentation and/or other materials provided with the distribution.
+    2. Redistributions in binary form (compiled executables) must reproduce
+       the above copyright notice, definition, disclaimer, and this list of
+       conditions in documentation and/or other materials provided with the
+       distribution.  The sole exception to this condition is redistribution
+       of a standard UnZipSFX binary (including SFXWiz) as part of a
+       self-extracting archive; that is permitted without inclusion of this
+       license, as long as the normal SFX banner has not been removed from
+       the binary or disabled.
 
     3. Altered versions--including, but not limited to, ports to new operating
        systems, existing ports with new graphical interfaces, and dynamic,
@@ -46,8 +52,8 @@ freely, subject to the following restrictions:
        Zip-Bugs or Info-ZIP e-mail addresses or of the Info-ZIP URL(s).
 
     4. Info-ZIP retains the right to use the names "Info-ZIP," "Zip," "UnZip,"
-       "WiZ," "Pocket UnZip," "Pocket Zip," and "MacZip" for its own source and
-       binary releases.
+       "UnZipSFX," "WiZ," "Pocket UnZip," "Pocket Zip," and "MacZip" for its
+       own source and binary releases.
 */
 
 /*
@@ -165,6 +171,7 @@ struct plist {
 #define EF_ACL       0x4C41   /* ACL Extra Field ID (access control list, "AL") */
 #define EF_NTSD      0x4453   /* NT Security Descriptor Extra Field ID, ("SD") */
 #define EF_BEOS      0x6542   /* BeOS Extra Field ID ("Be") */
+#define EF_ATHEOS    0x7441   /* AtheOS Extra Field ID ("At") */
 #define EF_QDOS      0xfb4a   /* SMS/QDOS ("J\373") */
 #define EF_AOSVS     0x5356   /* AOS/VS ("VS") */
 #define EF_SPARK     0x4341   /* David Pilling's Acorn/SparkFS ("AC") */
@@ -176,6 +183,8 @@ struct plist {
 #define EB_HEADSIZE       4     /* length of a extra field block header */
 #define EB_ID             0     /* offset of block ID in header */
 #define EB_LEN            2     /* offset of data length field in header */
+#define EB_MEMCMPR_HSIZ   6     /* header length for memcompressed data */
+#define EB_DEFLAT_EXTRA  10     /* overhead for 64kByte "undeflatable" data */
 
 #define EB_UX_MINLEN      8     /* minimal "UX" field contains atime, mtime */
 #define EB_UX_ATIME       0     /* offset of atime in "UX" extra field data */
@@ -277,7 +286,7 @@ extern int dirnames;            /* include directory names */
 extern int linkput;             /* Store symbolic links as such */
 extern int noisy;               /* False for quiet operation */
 extern int extra_fields;        /* do not create extra fields */
-#ifdef WIN32
+#ifdef NTSD_EAS
     extern int use_privileges;  /* use security privilege overrides */
 #endif
 extern char *key;               /* Scramble password or NULL */
@@ -299,6 +308,7 @@ extern extent fcount;           /* Count of names in found list */
 extern struct plist *patterns;  /* List of patterns to be matched */
 extern unsigned pcount;         /* number of patterns */
 extern unsigned icount;         /* number of include only patterns */
+extern unsigned Rcount;         /* number of -R include patterns */
 
 #ifdef IZ_CHECK_TZ
 extern int zp_tz_is_valid;      /* signals "timezone info is available" */
@@ -358,13 +368,12 @@ extern int aflag;
 #ifdef CMS_MVS
 extern int bflag;
 #endif /* CMS_MVS */
-void zipwarn  OF((char *, char *));
-void ziperr   OF((int, char *));
+void zipwarn  OF((ZCONST char *, ZCONST char *));
+void ziperr   OF((int, ZCONST char *));
 #ifdef UTIL
 #  define error(msg)    ziperr(ZE_LOGIC, msg)
 #else
-/*   void error OF((char *));*/
-   void error(char *);
+   void error OF((ZCONST char *));
 #  ifdef VMSCLI
      void help OF((void));
 #  endif
@@ -400,7 +409,7 @@ int readzipfile OF((void));
 int putlocal OF((struct zlist far *, FILE *));
 int putextended OF((struct zlist far *, FILE *));
 int putcentral OF((struct zlist far *, FILE *));
-int putend OF((int, ulg, ulg, extent, char *, FILE *));
+int putend OF((unsigned, ulg, ulg, extent, char *, FILE *));
 int zipcopy OF((struct zlist far *, FILE *, FILE *));
 
         /* in fileio.c */
