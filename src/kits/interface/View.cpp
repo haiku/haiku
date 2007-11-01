@@ -3215,16 +3215,19 @@ BView::ClearViewOverlay()
 void
 BView::CopyBits(BRect src, BRect dst)
 {
+	if (fOwner == NULL)
+		return;
+
 	if (!src.IsValid() || !dst.IsValid())
 		return;
 
-	if (do_owner_check()) {
-		fOwner->fLink->StartMessage(AS_LAYER_COPY_BITS);
-		fOwner->fLink->Attach<BRect>(src);
-		fOwner->fLink->Attach<BRect>(dst);
+	check_lock();
 
-		_FlushIfNotInTransaction();
-	}
+	fOwner->fLink->StartMessage(AS_LAYER_COPY_BITS);
+	fOwner->fLink->Attach<BRect>(src);
+	fOwner->fLink->Attach<BRect>(dst);
+
+	_FlushIfNotInTransaction();
 }
 
 
