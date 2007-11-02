@@ -26,7 +26,7 @@ void _kernel_contigfree(void *addr, unsigned long size);
 #define kernel_malloc(size, base, flags) \
 	_kernel_malloc(size, flags)
 
-#define kernel_free( ptr, base) \
+#define kernel_free(ptr, base) \
 	_kernel_free(ptr)
 
 #define kernel_contigmalloc(size, type, flags, low, high, alignment, boundary) \
@@ -42,6 +42,8 @@ void _kernel_contigfree(void *addr, unsigned long size);
 #	define contigmalloc(size, type, flags, low, high, alignment, boundary) \
 		_kernel_contigmalloc(__FILE__, __LINE__, size, flags, low, high, \
 			alignment, boundary)
+#	define contigfree(addr, size, base) \
+		_kernel_contigfree(addr, size)
 #endif
 
 #endif	/* _FBSD_COMPAT_SYS_MALLOC_H_ */
