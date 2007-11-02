@@ -1,11 +1,8 @@
 /*
  * Copyright 2007, Hugo Santos. All Rights Reserved.
+ * Copyright 2004, Marcus Overhagen. All Rights Reserved.
+ *
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *      Hugo Santos, hugosantos@gmail.com
- *
- * Some of this code is based on previous work by Marcus Overhagen.
  */
 
 #include "device.h"
@@ -18,6 +15,13 @@
 #include <compat/sys/rman.h>
 
 
+//#define DEBUG_BUS_SPACE_RW
+#ifdef DEBUG_BUS_SPACE_RW
+#	define TRACE_BUS_SPACE_RW(x) driver_printf x
+#else
+#	define TRACE_BUS_SPACE_RW(x)
+#endif
+
 #define ROUNDUP(a, b) (((a) + ((b)-1)) & ~((b)-1))
 
 
@@ -25,10 +29,8 @@ struct resource {
 	int					type;
 	bus_space_tag_t		tag;
 	bus_space_handle_t	handle;
-
 	area_id				mapped_area;
 };
-
 
 struct internal_intr {
 	device_t dev;
@@ -347,15 +349,6 @@ bus_generic_driver_added(device_t dev, driver_t *driver)
 {
 	UNIMPLEMENTED();
 }
-
-
-#define DEBUG_BUS_SPACE_RW
-
-#ifdef DEBUG_BUS_SPACE_RW
-#define TRACE_BUS_SPACE_RW(x) driver_printf x
-#else
-#define TRACE_BUS_SPACE_RW(x)
-#endif
 
 
 #define BUS_SPACE_READ(size, type, fun) \
