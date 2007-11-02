@@ -41,4 +41,8 @@ name: \
 #define SYSCALL14(name, n) _SYSCALL(name, n)
 #define SYSCALL15(name, n) _SYSCALL(name, n)
 #define SYSCALL16(name, n) _SYSCALL(name, n)
+#define SYSCALL17(name, n) _SYSCALL(name, n)
+#define SYSCALL18(name, n) _SYSCALL(name, n)
+#define SYSCALL19(name, n) _SYSCALL(name, n)
+#define SYSCALL20(name, n) _SYSCALL(name, n)
 
