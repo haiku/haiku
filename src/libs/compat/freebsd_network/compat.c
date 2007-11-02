@@ -17,7 +17,7 @@
 
 #include <compat/dev/mii/miivar.h>
 
-#define DEBUG_PCI
+//#define DEBUG_PCI
 #ifdef DEBUG_PCI
 #	define TRACE_PCI(dev, format, args...) device_printf(dev, format , ##args)
 #else
@@ -111,14 +111,14 @@ pci_enable_io(device_t dev, int space)
 	int bit = 0;
 
 	switch (space) {
-	case SYS_RES_IOPORT:
-		bit = PCI_command_io;
-		break;
-	case SYS_RES_MEMORY:
-		bit = PCI_command_memory;
-		break;
-	default:
-		return EINVAL;
+		case SYS_RES_IOPORT:
+			bit = PCI_command_io;
+			break;
+		case SYS_RES_MEMORY:
+			bit = PCI_command_memory;
+			break;
+		default:
+			return EINVAL;
 	}
 
 	pci_set_command_bit(dev, bit);
@@ -352,6 +352,7 @@ device_add_child(device_t dev, const char *name, int order)
 	if (child == NULL)
 		return NULL;
 
+	snprintf(child->dev_name, sizeof(child->dev_name), "%s", name);
 	child->parent = dev;
 	list_add_item(&dev->children, child);
 
@@ -370,10 +371,12 @@ __haiku_probe_miibus(device_t dev, driver_t *drivers[], int count)
 			_resolve_method(drivers[i], "device_probe");
 		if (probe) {
 			int result = probe(dev);
-			if (result >= 0) {
+			// the ukphy driver (fallback for unknown PHYs) return -100 here
+			if (result >= -100) {
 				if (selected == NULL || result > selcost) {
 					selected = drivers[i];
 					selcost = result;
+					device_printf(dev, "Found MII: %s\n", selected->name);
 				}
 			}
 		}
@@ -392,16 +395,21 @@ bus_generic_attach(device_t dev)
 		if (child->driver == NULL) {
 			if (dev->driver == &miibus_driver) {
 				driver_t *driver = __haiku_select_miibus_driver(child);
-
 				if (driver)
 					device_set_driver(child, driver);
-			}
+				else {
+					struct mii_attach_args *ma = device_get_ivars(child);
 
-			if (dev->driver == NULL)
-				panic("can't attach unknown driver");
+					device_printf(dev, "No PHY module found (%x/%x)!\n", ma->mii_id1,
+						ma->mii_id2);
+				}
+			}
+		} else if (child->driver == &miibus_driver) {
+			child->methods.probe(child);
 		}
 
-		child->methods.attach(child);
+		if (child->driver != NULL)
+			child->methods.attach(child);
 	}
 }
 
