@@ -1,11 +1,8 @@
 /*
- * Copyright 2007, Hugo Santos. All Rights Reserved.
+ * Copyright 2007, Hugo Santos, hugosantos@gmail.com. All Rights Reserved.
+ * Copyright 2004, Marcus Overhagen. All Rights Reserved.
+ *
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *      Hugo Santos, hugosantos@gmail.com
- *
- * Some of this code is based on previous work by Marcus Overhagen.
  */
 
 #include "device.h"
@@ -21,17 +18,18 @@
 #include <compat/dev/mii/miivar.h>
 
 #define DEBUG_PCI
-
 #ifdef DEBUG_PCI
-#define TRACE_PCI(dev, format, args...) device_printf(dev, format , ##args)
+#	define TRACE_PCI(dev, format, args...) device_printf(dev, format , ##args)
 #else
-#define TRACE_PCI(dev, format, args...) do { } while (0)
+#	define TRACE_PCI(dev, format, args...) do { } while (0)
 #endif
+
 
 spinlock __haiku_intr_spinlock;
 
 struct net_stack_module_info *gStack;
 pci_module_info *gPci;
+
 
 uint32_t
 pci_read_config(device_t dev, int offset, int size)
@@ -39,7 +37,7 @@ pci_read_config(device_t dev, int offset, int size)
 	uint32_t value = gPci->read_pci_config(NETDEV(dev)->pci_info.bus,
 		NETDEV(dev)->pci_info.device, NETDEV(dev)->pci_info.function,
 		offset, size);
-	TRACE_PCI(dev, "pci_read_config(%i, %i) = 0x%lx\n", offset, size, value);
+	TRACE_PCI(dev, "pci_read_config(%i, %i) = 0x%x\n", offset, size, value);
 	return value;
 }
 
@@ -47,7 +45,7 @@ pci_read_config(device_t dev, int offset, int size)
 void
 pci_write_config(device_t dev, int offset, uint32_t value, int size)
 {
-	TRACE_PCI(dev, "pci_write_config(%i, 0x%lx, %i)\n", offset, value, size);
+	TRACE_PCI(dev, "pci_write_config(%i, 0x%x, %i)\n", offset, value, size);
 
 	gPci->write_pci_config(NETDEV(dev)->pci_info.bus,
 		NETDEV(dev)->pci_info.device, NETDEV(dev)->pci_info.function,
@@ -517,19 +515,17 @@ _kernel_contigfree(void *addr, size_t size)
 }
 
 
-/* Marcus' vtophys */
-unsigned long
-vtophys(vm_offset_t vaddr)
+vm_paddr_t
+pmap_kextract(vm_offset_t virtualAddress)
 {
-	physical_entry pe;
-	status_t status;
-
-	status = get_memory_map((void *)vaddr, 1, &pe, 1);
-	if (status < 0)
+	physical_entry entry;
+	status_t status = get_memory_map((void *)virtualAddress, 1, &entry, 1);
+	if (status < B_OK) {
 		panic("fbsd compat: get_memory_map failed for %p, error %08lx\n",
-			(void *)vaddr, status);
+			(void *)virtualAddress, status);
+	}
 
-	return (unsigned long)pe.address;
+	return (vm_paddr_t)entry.address;
 }
 
 

@@ -1,3 +1,7 @@
+/*
+ * Copyright 2007, Hugo Santos. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _FBSD_COMPAT_VM_VM_H_
 #define _FBSD_COMPAT_VM_VM_H_
 
@@ -15,8 +19,8 @@ typedef void *		pmap_t;
 #define pmap_extract(...)		NULL
 
 
-#define pmap_kextract(vaddr)	vtophys(vaddr)
+vm_paddr_t pmap_kextract(vm_offset_t virtualAddress);
 
-unsigned long vtophys(vm_offset_t vaddr);
+#define vtophys(vaddr) pmap_kextract(virtualAddress)
 
-#endif
+#endif	/* _FBSD_COMPAT_VM_VM_H_ */

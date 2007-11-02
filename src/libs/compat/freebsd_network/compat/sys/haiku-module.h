@@ -1,19 +1,19 @@
 /*
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *      Hugo Santos, hugosantos@gmail.com
  */
 #ifndef _FBSD_COMPAT_SYS_HAIKU_MODULE_H_
 #define _FBSD_COMPAT_SYS_HAIKU_MODULE_H_
 
-#include <Drivers.h> /* for device_hooks */
+
+#include <Drivers.h>
 #include <KernelExport.h>
 
-#include <lock.h> /* mutex, recursive_lock for mtx */
-#include <net_stack.h> /* net_timer, for callout */
-#undef ASSERT /* private/kernel/debug.h sets it */
+#include <lock.h>
+#include <net_stack.h>
+
+#undef ASSERT
+	/* private/kernel/debug.h sets it */
 
 typedef struct device *device_t;
 typedef struct devclass *devclass_t;
@@ -148,7 +148,7 @@ enum {
 	driver_t driver = { #name, methods, size }
 
 #define DRIVER_MODULE(name, busname, driver, devclass, evh, arg) \
-	driver_t *DRIVER_MODULE_NAME(name, busname) = &(driver)
+	driver_t *DRIVER_MODULE_NAME(name, busname) = &(driver); \
+	devclass_t *__class_ ## busname ## _ ## devclass = &(devclass)
 
-
-#endif
+#endif	/* _FBSD_COMPAT_SYS_HAIKU_MODULE_H_ */

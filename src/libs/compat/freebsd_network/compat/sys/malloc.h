@@ -1,3 +1,7 @@
+/*
+ * Copyright 2007, Hugo Santos. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _FBSD_COMPAT_SYS_MALLOC_H_
 #define _FBSD_COMPAT_SYS_MALLOC_H_
 
@@ -9,6 +13,7 @@
 #define M_WAITOK		0x0002
 #define M_ZERO			0x0100
 
+#define M_DEVBUF
 
 void *_kernel_malloc(size_t size, int flags);
 void _kernel_free(void *ptr);
@@ -24,7 +29,7 @@ void _kernel_contigfree(void *addr, unsigned long size);
 #define kernel_free( ptr, base) \
 	_kernel_free(ptr)
 
-#define kernel_contigmalloc(size, base, flags, low, high, alignment, boundary) \
+#define kernel_contigmalloc(size, type, flags, low, high, alignment, boundary) \
 	_kernel_contigmalloc(__FILE__, __LINE__, size, flags, low, high, \
 		alignment, boundary)
 
@@ -32,8 +37,11 @@ void _kernel_contigfree(void *addr, unsigned long size);
 	_kernel_contigfree(addr, size)
 
 #ifdef FBSD_DRIVER
-#define malloc(size, tag, flags)	kernel_malloc(size, tag, flags)
-#define free(pointer, tag)			kernel_free(pointer, tag)
+#	define malloc(size, tag, flags)	kernel_malloc(size, tag, flags)
+#	define free(pointer, tag)		kernel_free(pointer, tag)
+#	define contigmalloc(size, type, flags, low, high, alignment, boundary) \
+		_kernel_contigmalloc(__FILE__, __LINE__, size, flags, low, high, \
+			alignment, boundary)
 #endif
 
-#endif
+#endif	/* _FBSD_COMPAT_SYS_MALLOC_H_ */
