@@ -21,6 +21,6 @@ typedef void *		pmap_t;
 
 vm_paddr_t pmap_kextract(vm_offset_t virtualAddress);
 
-#define vtophys(vaddr) pmap_kextract(virtualAddress)
+#define vtophys(virtualAddress) pmap_kextract(virtualAddress)
 
 #endif	/* _FBSD_COMPAT_VM_VM_H_ */
