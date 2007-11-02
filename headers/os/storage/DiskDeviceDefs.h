@@ -21,7 +21,6 @@ enum {
 	B_PARTITION_READ_ONLY			= 0x08,
 	B_PARTITION_MOUNTED				= 0x10,	// needed?
 	B_PARTITION_BUSY				= 0x20,
-	B_PARTITION_DESCENDANT_BUSY		= 0x40,
 };
 
 // partition statuses

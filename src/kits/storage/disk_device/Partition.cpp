@@ -197,8 +197,7 @@ BPartition::IsMounted() const
 bool
 BPartition::IsBusy() const
 {
-	return _PartitionData()->flags
-		& (B_PARTITION_BUSY | B_PARTITION_DESCENDANT_BUSY);
+	return _PartitionData()->flags & B_PARTITION_BUSY;
 }
 
 

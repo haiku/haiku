@@ -52,12 +52,8 @@ public:
 
 	void SetBusy(bool busy);
 	bool IsBusy() const;
-		// == jobs which may affect this partition are scheduled/in progress
-	void SetDescendantBusy(bool busy);
-	bool IsDescendantBusy() const;
-		// == jobs which may affect a descendant of this partition are
-		// scheduled/in progress; IsBusy() => IsDescendantBusy()
-		// In the userland API, both can probably be mapped to one flag.
+	bool CheckAndMarkBusy(bool includeDescendants);
+	void UnmarkBusy(bool includeDescendants);
 
 	void SetOffset(off_t offset);
 	off_t Offset() const;		// 0 for devices

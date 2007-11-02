@@ -58,7 +58,7 @@ KPartition::KPartition(partition_id id)
 	fPartitionData.child_count = 0;
 	fPartitionData.index = -1;
 	fPartitionData.status = B_PARTITION_UNRECOGNIZED;
-	fPartitionData.flags = B_PARTITION_BUSY | B_PARTITION_DESCENDANT_BUSY;
+	fPartitionData.flags = B_PARTITION_BUSY;
 	fPartitionData.volume = -1;
 	fPartitionData.mount_cookie = NULL;
 	fPartitionData.name = NULL;
@@ -238,6 +238,7 @@ KPartition::SetBusy(bool busy)
 		ClearFlags(B_PARTITION_BUSY);
 }
 
+
 // IsBusy
 bool
 KPartition::IsBusy() const
@@ -245,22 +246,62 @@ KPartition::IsBusy() const
 	return (fPartitionData.flags & B_PARTITION_BUSY);
 }
 
-// SetDescendantBusy
-void
-KPartition::SetDescendantBusy(bool busy)
+
+// CheckAndMarkBusy
+bool
+KPartition::CheckAndMarkBusy(bool includeDescendants)
 {
-	if (busy)
-		SetFlags(B_PARTITION_DESCENDANT_BUSY);
-	else
-		ClearFlags(B_PARTITION_DESCENDANT_BUSY);
+	if (includeDescendants) {
+		// check
+		struct IsBusyVisitor : KPartitionVisitor {
+			virtual bool VisitPre(KPartition* partition)
+			{
+				return partition->IsBusy();
+			}
+		} checkVisitor;
+
+		if (VisitEachDescendant(&checkVisitor))
+			return false;
+
+		// mark busy
+		struct MarkBusyVisitor : KPartitionVisitor {
+			virtual bool VisitPre(KPartition* partition)
+			{
+				partition->AddFlags(B_PARTITION_BUSY);
+				return false;
+			}
+		} markVisitor;
+
+		VisitEachDescendant(&markVisitor);
+	} else {
+		if (IsBusy())
+			return false;
+
+		SetBusy(true);
+	}
+
+	return true;
 }
 
-// IsDescendantBusy
-bool
-KPartition::IsDescendantBusy() const
+
+// UnmarkBusy
+void
+KPartition::UnmarkBusy(bool includeDescendants)
 {
-	return (fPartitionData.flags & B_PARTITION_DESCENDANT_BUSY);
+	if (includeDescendants) {
+		struct UnmarkBusyVisitor : KPartitionVisitor {
+			virtual bool VisitPre(KPartition* partition)
+			{
+				partition->ClearFlags(B_PARTITION_BUSY);
+				return false;
+			}
+		} visitor;
+
+		VisitEachDescendant(&visitor);
+	} else
+		SetBusy(false);
 }
+
 
 // SetOffset
 void

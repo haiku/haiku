@@ -5387,7 +5387,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 
 	if (partition) {
 		// make sure, that the partition is not busy
-		if (partition->IsBusy() || partition->IsDescendantBusy()) {
+		if (partition->IsBusy()) {
 			TRACE(("fs_mount(): Partition is busy.\n"));
 			return B_BUSY;
 		}
@@ -5601,7 +5601,7 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 
 	// make sure, that the partition is not busy
 	if (partition) {
-		if (partition->IsBusy() || partition->IsDescendantBusy()) {
+		if (partition->IsBusy()) {
 			TRACE(("fs_unmount(): Partition is busy.\n"));
 			return B_BUSY;
 		}

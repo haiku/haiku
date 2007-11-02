@@ -1032,16 +1032,7 @@ KDiskDeviceManager::_ScanPartition(KPartition *partition, bool async)
 // TODO: This is not quite correct here. Partitions are created marked "busy",
 // hence the one creating it should be responsible for clearing the flag, not
 // us.
-	struct UnmarkBusyVisitor : KPartitionVisitor {
-		virtual bool VisitPre(KPartition* partition)
-		{
-			partition->ClearFlags(B_PARTITION_BUSY
-				| B_PARTITION_DESCENDANT_BUSY);
-			return false;
-		}
-	} visitor;
-
-	partition->VisitEachDescendant(&visitor);
+	partition->UnmarkBusy(true);
 
 	return error;
 }
