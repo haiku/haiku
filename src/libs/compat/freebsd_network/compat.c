@@ -31,6 +31,9 @@ struct net_stack_module_info *gStack;
 pci_module_info *gPci;
 
 
+//	#pragma mark - PCI
+
+
 uint32_t
 pci_read_config(device_t dev, int offset, int size)
 {
@@ -129,6 +132,9 @@ pci_enable_io(device_t dev, int space)
 
 	return ENXIO;
 }
+
+
+//	#pragma mark - Device
 
 
 void
@@ -387,26 +393,43 @@ __haiku_probe_miibus(device_t dev, driver_t *drivers[], int count)
 
 
 void
+__haiku_scan_miibus(device_t dev)
+{
+	device_t miibus = NULL;
+	device_t child = NULL;
+
+	// find miibus
+
+	while ((miibus = list_get_next_item(&dev->children, miibus)) != NULL) {
+		if (miibus->driver == &miibus_driver)
+			break;
+	}
+
+	while ((child = list_get_next_item(&miibus->children, child)) != NULL) {
+		if (child->driver == NULL) {
+			driver_t *driver = __haiku_select_miibus_driver(child);
+			if (driver) {
+				device_set_driver(child, driver);
+				child->methods.attach(child);
+			} else {
+				struct mii_attach_args *ma = device_get_ivars(child);
+
+				device_printf(dev, "No PHY module found (%x/%x)!\n", ma->mii_id1,
+					ma->mii_id2);
+			}
+		}
+	}
+}
+
+
+void
 bus_generic_attach(device_t dev)
 {
 	device_t child = NULL;
 
 	while ((child = list_get_next_item(&dev->children, child)) != NULL) {
-		if (child->driver == NULL) {
-			if (dev->driver == &miibus_driver) {
-				driver_t *driver = __haiku_select_miibus_driver(child);
-				if (driver)
-					device_set_driver(child, driver);
-				else {
-					struct mii_attach_args *ma = device_get_ivars(child);
-
-					device_printf(dev, "No PHY module found (%x/%x)!\n", ma->mii_id1,
-						ma->mii_id2);
-				}
-			}
-		} else if (child->driver == &miibus_driver) {
+		if (child->driver == &miibus_driver)
 			child->methods.probe(child);
-		}
 
 		if (child->driver != NULL)
 			child->methods.attach(child);
@@ -428,6 +451,9 @@ device_is_attached(device_t dev)
 	UNIMPLEMENTED();
 	return -1;
 }
+
+
+//	#pragma mark - Misc, Malloc
 
 
 int

@@ -127,6 +127,8 @@ compat_open(const char *name, uint32 flags, void **cookie)
 		struct ifnet *ifp = dev->ifp;
 		struct ifreq ifr;
 
+		__haiku_scan_miibus(DEVNET(dev));
+
 		ifp->if_flags &= ~IFF_UP;
 		ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
 
