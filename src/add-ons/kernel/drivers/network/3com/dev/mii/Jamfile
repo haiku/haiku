@@ -11,6 +11,7 @@ KernelStaticLibrary 3com_mii.a
 	:
 	bmtphy.c
 	exphy.c
+	ukphy.c
 	ukphy_subr.c
 	;
 
