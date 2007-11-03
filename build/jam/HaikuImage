@@ -115,8 +115,8 @@ BEOS_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon $(X86_ONLY)nvidia
 	$(X86_ONLY)s3savage $(X86_ONLY)via vesa #$(X86_ONLY)vmware
 ;
 BEOS_ADD_ONS_DRIVERS_MIDI = emuxki ;
-BEOS_ADD_ONS_DRIVERS_NET = etherpci ipro1000 rtl8139 rtl8169 sis900
-	via-rhine wb840 net_stack #vlance
+BEOS_ADD_ONS_DRIVERS_NET = 3com etherpci ipro1000 rtl8139 rtl8169 sis900
+	via_rhine wb840 net_stack #vlance
 	$(GPL_ONLY)bcm440x $(GPL_ONLY)bcm570x
 ;
 #BEOS_ADD_ONS_DRIVERS_ACPI = $(X86_ONLY)acpi_button ;
