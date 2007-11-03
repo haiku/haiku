@@ -11,139 +11,114 @@
 
 #include <arch_cpu.h>
 
+/*
+ * cf.
+ * "mc68030 Enhanced 32-bit Microprocessor User's Manual"
+ * (3rd edition), Section 9
+ * "mc68040 Enhanced 32-bit Microprocessor User's Manual"
+ * Section 9
+ *
+ * The 030 pmmu can support up to 6-level translation tree,
+ * each level using an size-selectable index from the
+ * virtual address, short (4-bit) and long (8-bit) page table
+ * and page entry descriptors, early tree termination, and selectable
+ * page size from 256 bytes to 32K.
+ * There is optionally a separate Supervisor Root Pointer to separate
+ * the user and kernel trees.
+ *
+ * The 040 pmmu however is way more limited in its abilities.
+ * It has a fixed 3-level page tree, with 7/7/6 bit splitting for
+ * 4K pages. The opcodes are also different so we will need specific
+ * routines. Both supervisor and root pointers must be used so we can't
+ * reuse one of them.
+ * 
+ *
+ * We settle to:
+ * - 1 bit index for the first level to easily split kernel and user
+ * part of the tree, with the possibility to force supervisor only for
+ * the kernel tree. The use of SRP to point to a 2nd tree is avoided as
+ * it is not available on 68060, plus that makes a spare 64bit reg to
+ * stuff things in.
+ * - 9 bit page directory
+ * - 10 bit page tables
+ * - 12 bit page index (4K pages, a common value).
+ */
 
-/*** BAT - block address translation ***/
 
-enum bat_length {
-	BAT_LENGTH_128kB	= 0x0000,
-	BAT_LENGTH_256kB	= 0x0001,
-	BAT_LENGTH_512kB	= 0x0003,
-	BAT_LENGTH_1MB		= 0x0007,
-	BAT_LENGTH_2MB		= 0x000f,
-	BAT_LENGTH_4MB		= 0x001f,
-	BAT_LENGTH_8MB		= 0x003f,
-	BAT_LENGTH_16MB		= 0x007f,
-	BAT_LENGTH_32MB		= 0x00ff,
-	BAT_LENGTH_64MB		= 0x01ff,
-	BAT_LENGTH_128MB	= 0x03ff,
-	BAT_LENGTH_256MB	= 0x07ff,
+
+enum descriptor_types {
+	DT_INVALID = 0,			// invalid entry
+	DT_PAGE,				// page descriptor
+	DT_VALID_4,				// short page table descriptor
+	DT_VALID_8,				// long page table descriptor
 };
 
-enum bat_protection {
-	BAT_READ_ONLY = 1,
-	BAT_READ_WRITE = 2,
+#if 0
+/* This is the normal layout of the descriptors, as per documentation.
+ * When page size > 256, several bits are unused in the LSB of page
+ * addresses, which we can use in addition of other unused bits.
+ * the structs dedlared later reflect this for 4K pages.
+ */
+
+struct short_page_directory_entry {
+	// upper 32 bits
+	uint32 type : 2;
+	uint32 write_protect : 1;
+	uint32 used : 1;
+	uint32 address : 28;
 };
 
-struct block_address_translation {
-	// upper 32 bit
-	uint32	page_index : 15;				// BEPI, block effective page index
-	uint32	_reserved0 : 4;
-	uint32	length : 11;
-	uint32	kernel_valid : 1;				// Vs, Supervisor-state valid
-	uint32	user_valid : 1;					// Vp, User-state valid
-	// lower 32 bit
-	uint32	physical_block_number : 15;		// BPRN
-	uint32	write_through : 1;				// WIMG
-	uint32	caching_inhibited : 1;
-	uint32	memory_coherent : 1;
-	uint32	guarded : 1;
-	uint32	_reserved1 : 1;
-	uint32	protection : 2;
-
-	block_address_translation()
-	{
-		Clear();
-	}
-
-	void SetVirtualAddress(void *address)
-	{
-		page_index = uint32(address) >> 17;
-	}
-
-	void SetPhysicalAddress(void *address)
-	{
-		physical_block_number = uint32(address) >> 17;
-	}
-
-	void Clear()
-	{
-		memset((void *)this, 0, sizeof(block_address_translation));
-	}
+struct long_page_directory_entry {
+	// upper 32 bits
+	uint32 type : 2;
+	uint32 write_protect : 1;
+	uint32 used : 1;
+	uint32 _zero1 : 4;
+	uint32 supervisor : 1;
+	uint32 _zero2 : 1;
+	uint32 _ones : 6;
+	uint32 limit : 15;
+	uint32 low_up : 1;						// limit is lower(1)/upper(0)
+	// lower 32 bits
+	uint32 unused : 4;						// 
+	uint32 address : 28;
 };
 
-struct segment_descriptor {
-	uint32	type : 1;						// 0 for page translation descriptors
-	uint32	kernel_protection_key : 1;		// Ks, Supervisor-state protection key
-	uint32	user_protection_key : 1;		// Kp, User-state protection key
-	uint32	no_execute_protection : 1;
-	uint32	_reserved : 4;
-	uint32	virtual_segment_id : 24;
-
-	segment_descriptor()
-	{
-		Clear();
-	}
-
-	segment_descriptor(uint32 value)
-	{
-		*((uint32 *)this) = value;
-	}
-
-	void Clear()
-	{
-		memset((void *)this, 0, sizeof(segment_descriptor));
-	}
+struct short_page_table_entry {
+	uint32 type : 2;
+	uint32 write_protect : 1;
+	uint32 used : 1;
+	uint32 modified : 1;
+	uint32 _zero1 : 1;
+	uint32 cache_inhibit : 1;
+	uint32 _zero2 : 1;
+	uint32 address : 24;
 };
 
-
-/*** PTE - page table entry ***/
-
-enum pte_protection {
-	PTE_READ_ONLY	= 3,
-	PTE_READ_WRITE	= 2,
+struct long_page_table_entry {
+	// upper 32 bits
+	uint32 type : 2;
+	uint32 write_protect : 1;
+	uint32 used : 1;
+	uint32 modified : 1;
+	uint32 _zero1 : 1;
+	uint32 cache_inhibit : 1;
+	uint32 _zero2 : 1;
+	uint32 supervisor : 1;
+	uint32 _zero3 : 1;
+	uint32 _ones : 6;
+	// limit only used on early table terminators, else unused
+	uint32 limit : 15;
+	uint32 low_up : 1;						// limit is lower(1)/upper(0)
+	// lower 32 bits
+	uint32 unused : 8;						// 
+	uint32 address : 24;
 };
+#endif
 
-struct page_table_entry {
-	// upper 32 bit
-	uint32	valid : 1;
-	uint32	virtual_segment_id : 24;
-	uint32	secondary_hash : 1;
-	uint32	abbr_page_index : 6;
-	// lower 32 bit
-	uint32	physical_page_number : 20;
-	uint32	_reserved0 : 3;
-	uint32	referenced : 1;
-	uint32	changed : 1;
-	uint32	write_through : 1;				// WIMG
-	uint32	caching_inhibited : 1;
-	uint32	memory_coherent : 1;
-	uint32	guarded : 1;
-	uint32	_reserved1 : 1;
-	uint32	page_protection : 2;
-
-	static uint32 PrimaryHash(uint32 virtualSegmentID, uint32 virtualAddress);
-	static uint32 SecondaryHash(uint32 virtualSegmentID, uint32 virtualAddress);
-	static uint32 SecondaryHash(uint32 primaryHash);
-};
-
-struct page_table_entry_group {
-	struct page_table_entry entry[8];
-};
 
 extern void m68k_get_page_table(page_table_entry_group **_pageTable, size_t *_size);
 extern void m68k_set_page_table(page_table_entry_group *pageTable, size_t size);
 
-static inline segment_descriptor
-m68k_get_segment_register(void *virtualAddress)
-{
-	return (segment_descriptor)get_sr(virtualAddress);
-}
-
-
-static inline void
-m68k_set_segment_register(void *virtualAddress, segment_descriptor segment)
-{
-	set_sr(virtualAddress, *(uint32 *)&segment);
-}
 
 #endif	/* _KERNEL_ARCH_M68K_MMU_H */

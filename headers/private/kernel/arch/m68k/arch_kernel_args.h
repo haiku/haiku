@@ -15,6 +15,10 @@
 
 // kernel args
 typedef struct {
+	int			cpu_type;
+	int			fpu_type;
+	int			mmu_type;
+	int			platform;
 	// architecture specific
 	uint64		cpu_frequency;
 	uint64		bus_frequency;

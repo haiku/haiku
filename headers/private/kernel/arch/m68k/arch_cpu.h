@@ -219,11 +219,17 @@ extern bool m68k_set_fault_handler(addr_t *handlerLocation, addr_t handler)
 }
 #endif
 
-/* flushes insn pipeline */
-#define m68k_nop() asm volatile("nop")
-/* no FC bit needed */
-#define pflush(addr) asm volatile("pflush #0,#0,(%0)" :: "a" (addr))
-#define pflusha() asm volatile("pflusha")
+struct m68k_cpu_ops {
+	void (*flush_insn_pipeline)(void);
+	void (*flush_atc_all)(void);
+	void (*flush_atc_user)(void);
+	void (*flush_atc_addr)(void *addr);
+	void (*flush_dcache)(void *address, size_t len);
+	void (*flush_icache)(void *address, size_t len);
+	void (*idle)(void);
+};
+
+extern struct m68k_cpu_ops cpu_ops;
 
 //#define
 
@@ -234,51 +240,56 @@ extern bool m68k_set_fault_handler(addr_t *handlerLocation, addr_t handler)
 #define ppc_sync() asm volatile("sync")
 #define tlbia() asm volatile("tlbia")
 #define tlbie(addr) asm volatile("tlbie %0" :: "r" (addr))
-
-
-// PowerPC processor version (the upper 16 bits of the PVR).
-enum m68k_processor_version {
-	MPC601		= 0x0001,
-	MPC603		= 0x0003,
-	MPC604		= 0x0004,
-	MPC602		= 0x0005,
-	MPC603e		= 0x0006,
-	MPC603ev	= 0x0007,
-	MPC750		= 0x0008,
-	MPC604ev	= 0x0009,
-	MPC7400		= 0x000c,
-	MPC620		= 0x0014,
-	IBM403		= 0x0020,
-	IBM401A1	= 0x0021,
-	IBM401B2	= 0x0022,
-	IBM401C2	= 0x0023,
-	IBM401D2	= 0x0024,
-	IBM401E2	= 0x0025,
-	IBM401F2	= 0x0026,
-	IBM401G2	= 0x0027,
-	IBMPOWER3	= 0x0041,
-	MPC860		= 0x0050,
-	MPC8240		= 0x0081,
-	IBM405GP	= 0x4011,
-	IBM405L		= 0x4161,
-	IBM750FX	= 0x7000,
-	MPC7450		= 0x8000,
-	MPC7455		= 0x8001,
-	MPC7457		= 0x8002,
-	MPC7447A	= 0x8003,
-	MPC7448		= 0x8004,
-	MPC7410		= 0x800c,
-	MPC8245		= 0x8081,
-};
 #endif
 
+// m68k processor version.
+enum m68k_processor_version {
+	/* those two we don't support */
+	CPU_68000		= 0x0000,
+	CPU_68010		= 0x0001,
+	/* maybe with a pmmu and fpu */
+	CPU_68020		= 0x0002,
+	/* should work */
+	CPU_68030		= 0x0003,
+	CPU_68040		= 0x0004,
+	CPU_68060		= 0x0006,
+	/* mask */
+	CPU_MASK		= 0x000F
+};
+
+enum m68k_fpu_version {
+	/* we don't support */
+	FPU_NONE		= 0x0000,
+	FPU_68881		= 0x0010,
+	FPU_68882		= 0x0020,
+	FPU_030			= 0x0030,
+	FPU_040			= 0x0040,
+	FPU_060			= 0x0060,
+	FPU_MASK		= 0x00F0
+};
+
+enum m68k_mmu_version {
+	MMU_NONE		= 0x0000,
+	MMU_68551		= 0x0100,
+	MMU_68030		= 0x0300,
+	MMU_68040		= 0x0400,
+	MMU_68060		= 0x0600,
+	MMU_MASK		= 0x0F00
+};
+
+extern int arch_cpu_type;
+extern int arch_fpu_type;
+extern int arch_mmu_type;
+extern int arch_platform;
 
 /*
 	Use of (some) special purpose registers.
+	XXX: those regs aren't implemented/accessed the same way on different cpus...
 
 	SRP[63-32]: current struct thread*
 	SRP[31-0] :
 	CAAR      : can we use it ??
+	MSP       :
 
 	PPC:
 	SPRG0: per CPU physical address pointer to an ppc_cpu_exception_context
