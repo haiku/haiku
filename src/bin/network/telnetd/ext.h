@@ -212,7 +212,11 @@ extern struct {
 #    ifdef __FreeBSD__
 #     define DEFAULT_IM  "\r\n\r\nFreeBSD (%h) (%t)\r\n\r\r\n\r"
 #    else
-#    define DEFAULT_IM	"\r\n\r\n4.4 BSD UNIX (%h) (%t)\r\n\r\r\n\r"
+#     ifdef __HAIKU__
+#      define DEFAULT_IM	"\r\n\r\nHaiku (%h) (%t)\r\n\r\r\n\r"
+#     else
+#      define DEFAULT_IM	"\r\n\r\n4.4 BSD UNIX (%h) (%t)\r\n\r\r\n\r"
+#     endif
 #    endif
 #   endif
 #endif
