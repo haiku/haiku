@@ -149,13 +149,9 @@ find_route(struct net_domain *_domain, const net_route *description)
 
 
 static net_route_private *
-find_route(struct net_domain *_domain, const struct sockaddr *address)
+find_route(net_domain *_domain, const sockaddr *address)
 {
-	struct net_domain_private *domain = (net_domain_private *)_domain;
-
-	// TODO: the following only works for IPv4 routes!
-	if (domain->family != AF_INET)
-		panic("you should have known better...");
+	net_domain_private *domain = (net_domain_private *)_domain;
 
 	// find last matching route
 
@@ -165,23 +161,21 @@ find_route(struct net_domain *_domain, const struct sockaddr *address)
 	while (iterator.HasNext()) {
 		net_route_private *route = iterator.Next();
 
-		bool found;
-		if (route->mask != NULL) {
+		if (route->mask) {
 			sockaddr maskedAddress;
 			domain->address_module->mask_address(address, route->mask,
 				&maskedAddress);
-			found = domain->address_module->equal_addresses(&maskedAddress,
-				route->destination);
-		} else {
-			found = domain->address_module->equal_addresses(address,
-				route->destination);
-		}
+			if (!domain->address_module->equal_addresses(&maskedAddress,
+					route->destination))
+				continue;
+		} else if (!domain->address_module->equal_addresses(address,
+				route->destination))
+			continue
 
-		if (found) {
-			TRACE(("  found route: %s, flags %lx\n",
-				AddressString(domain, route->destination).Data(), route->flags));
-			return route;
-		}
+		TRACE(("  found route: %s, flags %lx\n",
+			AddressString(domain, route->destination).Data(), route->flags));
+
+		return route;
 	}
 
 	return NULL;
