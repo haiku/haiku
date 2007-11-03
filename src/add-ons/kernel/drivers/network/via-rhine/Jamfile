@@ -43,3 +43,5 @@ HaikuInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/dri
 	installed-symlink 
 ;
 
+SubInclude HAIKU_TOP src add-ons kernel drivers network via-rhine dev ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network via-rhine pci ;
