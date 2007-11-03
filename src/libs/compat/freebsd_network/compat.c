@@ -405,15 +405,13 @@ bus_generic_attach(device_t dev)
 	while ((child = list_get_next_item(&dev->children, child)) != NULL) {
 		if (child->driver == NULL) {
 			driver_t *driver = __haiku_select_miibus_driver(child);
-			if (driver) {
-				device_set_driver(child, driver);
-				child->methods.attach(child);
-			} else {
+			if (driver == NULL) {
 				struct mii_attach_args *ma = device_get_ivars(child);
 
 				device_printf(dev, "No PHY module found (%x/%x)!\n", ma->mii_id1,
 					ma->mii_id2);
-			}
+			} else
+				device_set_driver(child, driver);
 		} else if (child->driver == &miibus_driver)
 			child->methods.probe(child);
 
