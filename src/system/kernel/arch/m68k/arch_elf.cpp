@@ -1,4 +1,7 @@
 /*
+ * Copyright 2007, François Revol, revol@free.fr.
+ * Distributed under the terms of the MIT License.
+ *
  * Copyright 2005, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  *
@@ -7,6 +10,9 @@
  * Distributed under the terms of the NewOS License.
  */
 
+#ifdef _BOOT_MODE
+#include <boot/arch.h>
+#endif
 
 #include <KernelExport.h>
 
@@ -16,10 +22,15 @@
 
 #define CHATTY 0
 
-
+#ifdef _BOOT_MODE
+status_t
+boot_arch_elf_relocate_rel(struct preloaded_image *image,
+	struct Elf32_Rel *rel, int rel_len)
+#else
 int 
 arch_elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 	struct elf_image_info *resolve_image, struct Elf32_Rel *rel, int rel_len)
+#endif
 {
 	// there are no rel entries in PPC elf
 	return B_NO_ERROR;
@@ -105,9 +116,15 @@ ha(Elf32_Word value)
 }
 
 
+#ifdef _BOOT_MODE
+status_t
+boot_arch_elf_relocate_rela(struct preloaded_image *image,
+	struct Elf32_Rela *rel, int rel_len)
+#else
 int 
 arch_elf_relocate_rela(struct elf_image_info *image, const char *sym_prepend,
 	struct elf_image_info *resolve_image, struct Elf32_Rela *rel, int rel_len)
+#endif
 {
 	int i;
 	struct Elf32_Sym *sym;
@@ -128,7 +145,7 @@ arch_elf_relocate_rela(struct elf_image_info *image, const char *sym_prepend,
 			dprintf("arch_elf_relocate_rela(): Failed to get GOT address!\n"); \
 			return B_ERROR;	\
 		}
-	
+
 	// TODO: Get the PLT address!
 	#define REQUIRE_PLT	\
 		if (L == 0) {	\
@@ -172,12 +189,16 @@ arch_elf_relocate_rela(struct elf_image_info *image, const char *sym_prepend,
 			case R_PPC_JMP_SLOT:
 				sym = SYMBOL(image, ELF32_R_SYM(rel[i].r_info));
 
+#ifdef _BOOT_MODE
+				vlErr = boot_elf_resolve_symbol(image, sym, &S);
+#else
 				vlErr = elf_resolve_symbol(image, sym, resolve_image,
 					sym_prepend, &S);
+#endif
 				if (vlErr < 0) {
-					dprintf("arch_elf_relocate_rela(): Failed to relocate "
+					dprintf("%s(): Failed to relocate "
 						"entry index %d, rel type %d, offset 0x%lx, sym 0x%lx, "
-						"addend 0x%lx\n", i, ELF32_R_TYPE(rel[i].r_info),
+						"addend 0x%lx\n", __FUNCTION__, i, ELF32_R_TYPE(rel[i].r_info),
 						rel[i].r_offset, ELF32_R_SYM(rel[i].r_info),
 						rel[i].r_addend);
 					return vlErr;

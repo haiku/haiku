@@ -1,4 +1,7 @@
 /*
+ * Copyright 2007, François Revol, revol@free.fr.
+ * Distributed under the terms of the MIT License.
+ *
  * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -14,6 +17,16 @@
 #include <arch/cpu.h>
 #include <boot/kernel_args.h>
 
+extern struct m68k_cpu_ops cpu_ops_030;
+extern struct m68k_cpu_ops cpu_ops_040;
+extern struct m68k_cpu_ops cpu_ops_060;
+
+struct m68k_cpu_ops cpu_ops;
+
+int cpu_type;
+int fpu_type;
+int mmu_type;
+int platform;
 
 status_t 
 arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
@@ -32,6 +45,47 @@ arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 status_t
 arch_cpu_init(kernel_args *args)
 {
+	cpu_type = args->arch_args.cpu_type;
+	fpu_type = args->arch_args.fpu_type;
+	mmu_type = args->arch_args.mmu_type;
+	platform = args->arch_args.platform;
+
+	switch (cpu_type) {
+	case CPU_68020:
+	case CPU_68030:
+		cpu_ops.flush_insn_pipeline = cpu_ops_030.flush_insn_pipeline;
+		cpu_ops.flush_atc_all = cpu_ops_030.flush_atc_all;
+		cpu_ops.flush_atc_user = cpu_ops_030.flush_atc_user;
+		cpu_ops.flush_atc_addr = cpu_ops_030.flush_atc_addr;
+		cpu_ops.flush_cache_line = cpu_ops_030.flush_cache_line;
+		cpu_ops.idle = cpu_ops_030.idle; // NULL
+		//cpu_ops. = cpu_ops_030.;
+		break;
+#ifdef SUPPORTS_040
+	case CPU_68040:
+		cpu_ops.flush_insn_pipeline = cpu_ops_040.flush_insn_pipeline;
+		cpu_ops.flush_atc_all = cpu_ops_040.flush_atc_all;
+		cpu_ops.flush_atc_user = cpu_ops_040.flush_atc_user;
+		cpu_ops.flush_atc_addr = cpu_ops_040.flush_atc_addr;
+		cpu_ops.flush_cache_line = cpu_ops_040.flush_cache_line;
+		cpu_ops.idle = cpu_ops_040.idle; // NULL
+		//cpu_ops. = cpu_ops_040.;
+		break;
+#endif
+#ifdef SUPPORTS_060
+	case CPU_68060:
+		cpu_ops.flush_insn_pipeline = cpu_ops_060.flush_insn_pipeline;
+		cpu_ops.flush_atc_all = cpu_ops_060.flush_atc_all;
+		cpu_ops.flush_atc_user = cpu_ops_060.flush_atc_user;
+		cpu_ops.flush_atc_addr = cpu_ops_060.flush_atc_addr;
+		cpu_ops.flush_cache_line = cpu_ops_060.flush_cache_line;
+		cpu_ops.idle = cpu_ops_060.idle;
+		//cpu_ops. = cpu_ops_060.;
+		break;
+#endif
+	default:
+		panic("unknown cpu_type 0x%08lx\n", args->arch_args.cpu_type);
+	}
 	return B_OK;
 }
 
@@ -48,53 +102,24 @@ arch_cpu_init_post_modules(kernel_args *args)
 	return B_OK;
 }
 
-#define CACHELINE 16
 
 void 
 arch_cpu_sync_icache(void *address, size_t len)
 {
-	int l, off;
-	char *p;
-	uint32 cacr;
-
-	off = (unsigned int)address & (CACHELINE - 1);
-	len += off;
-	
-	l = len;
-	p = (char *)address - off;
-	asm volatile ("movec %%cacr,%0" : "=r"(cacr):);
-	cacr |= 0x00000004; /* ClearInstructionCacheEntry */
-	do {
-		/* the 030 invalidates only 1 long of the cache line */
-		//XXX: what about 040 and 060 ?
-		asm volatile ("movec %0,%%caar\n"		\
-					  "movec %1,%%cacr\n"		\
-					  "addq.l #4,%0\n"			\
-					  "movec %0,%%caar\n"		\
-					  "movec %1,%%cacr\n"		\
-					  "addq.l #4,%0\n"			\
-					  "movec %0,%%caar\n"		\
-					  "movec %1,%%cacr\n"		\
-					  "addq.l #4,%0\n"			\
-					  "movec %0,%%caar\n"		\
-					  "movec %1,%%cacr\n"		\
-					  :: "r"(p), "r"(cacr));
-		p += CACHELINE;
-	} while ((l -= CACHELINE) > 0);
-	m68k_nop();
+	cpu_ops.flush_icache(address, len);
 }
 
 
 void 
 arch_cpu_invalidate_TLB_range(addr_t start, addr_t end)
 {
-	m68k_nop();
+	cpu_ops.flush_insn_pipeline();
 	while (start < end) {
-		pflush(start);
-		m68k_nop();
+		cpu_ops.flush_atc_addr(start);
+		cpu_ops.flush_insn_pipeline();
 		start += B_PAGE_SIZE;
 	}
-	m68k_nop();
+	cpu_ops.flush_insn_pipeline();
 }
 
 
@@ -103,29 +128,30 @@ arch_cpu_invalidate_TLB_list(addr_t pages[], int num_pages)
 {
 	int i;
 	
-	m68k_nop();
+	cpu_ops.flush_insn_pipeline();
 	for (i = 0; i < num_pages; i++) {
-		pflush(pages[i]);
-		m68k_nop();
+		cpu_ops.flush_atc_addr(pages[i]);
+		cpu_ops.flush_insn_pipeline();
 	}
-	m68k_nop();
+	cpu_ops.flush_insn_pipeline();
 }
 
 
 void 
 arch_cpu_global_TLB_invalidate(void)
 {
-	m68k_nop();
-	pflusha();
-	m68k_nop();
+	cpu_ops.flush_insn_pipeline();
+	cpu_ops.flush_atc_all();
+	cpu_ops.flush_insn_pipeline();
 }
 
 
 void 
 arch_cpu_user_TLB_invalidate(void)
 {
-	// pflushfd ?
-	arch_cpu_global_TLB_invalidate();
+	cpu_ops.flush_insn_pipeline();
+	cpu_ops.flush_atc_user();
+	cpu_ops.flush_insn_pipeline();
 }
 
 
@@ -224,6 +250,8 @@ arch_cpu_shutdown(bool reboot)
 void
 arch_cpu_idle(void)
 {
+	if (cpu_ops.idle)
+		cpu_ops.idle();
 #warning M68K: use LPSTOP ?
 	//asm volatile ("lpstop");
 }

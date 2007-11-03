@@ -1,10 +1,11 @@
 /* 
- * Copyright 2003-2006, Haiku Inc. All rights reserved.
+ * Copyright 2003-2007, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  * 		Axel Dörfler <axeld@pinc-software.de>
  * 		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ * 		François Revol <revol@free.fr>
  */
 
 
@@ -56,7 +57,8 @@ static inline stack_frame *
 get_current_stack_frame()
 {
 	stack_frame *frame;
-	asm volatile("mr %0, %%r1" : "=r"(frame));
+#warning M68K: a6 or a7 ?
+	asm volatile("move.l %%a6,%0" : "=r"(frame));
 	return frame;
 }
 
@@ -69,7 +71,7 @@ get_next_frame(addr_t framePointer, addr_t *next, addr_t *ip)
 
 	// set fault handler, so that we can safely access user stacks
 	if (thread) {
-		if (ppc_set_fault_handler(&thread->fault_handler, (addr_t)&&error))
+		if (m68k_set_fault_handler(&thread->fault_handler, (addr_t)&&error))
 			goto error;
 	}
 
@@ -202,31 +204,23 @@ return 0;
 
 		if (frame) {
 			kprintf("iframe at %p\n", frame);
-			kprintf("   r0 0x%08lx    r1 0x%08lx    r2 0x%08lx    r3 0x%08lx\n",
-				frame->r0, frame->r1, frame->r2, frame->r3);
-			kprintf("   r4 0x%08lx    r5 0x%08lx    r6 0x%08lx    r7 0x%08lx\n",
-				frame->r4, frame->r5, frame->r6, frame->r7);
-			kprintf("   r8 0x%08lx    r9 0x%08lx   r10 0x%08lx   r11 0x%08lx\n",
-				frame->r8, frame->r9, frame->r10, frame->r11);
-			kprintf("  r12 0x%08lx   r13 0x%08lx   r14 0x%08lx   r15 0x%08lx\n",
-				frame->r12, frame->r13, frame->r14, frame->r15);
-			kprintf("  r16 0x%08lx   r17 0x%08lx   r18 0x%08lx   r19 0x%08lx\n",
-				frame->r16, frame->r17, frame->r18, frame->r19);
-			kprintf("  r20 0x%08lx   r21 0x%08lx   r22 0x%08lx   r23 0x%08lx\n",
-				frame->r20, frame->r21, frame->r22, frame->r23);
-			kprintf("  r24 0x%08lx   r25 0x%08lx   r26 0x%08lx   r27 0x%08lx\n",
-				frame->r24, frame->r25, frame->r26, frame->r27);
-			kprintf("  r28 0x%08lx   r29 0x%08lx   r30 0x%08lx   r31 0x%08lx\n",
-				frame->r28, frame->r29, frame->r30, frame->r31);
-			kprintf("   lr 0x%08lx    cr 0x%08lx   xer 0x%08lx   ctr 0x%08lx\n",
-				frame->lr, frame->cr, frame->xer, frame->ctr);
-			kprintf("fpscr 0x%08lx\n", frame->fpscr);
-			kprintf(" srr0 0x%08lx  srr1 0x%08lx   dar 0x%08lx dsisr 0x%08lx\n",
-				frame->srr0, frame->srr1, frame->dar, frame->dsisr);
-			kprintf(" vector: 0x%lx\n", frame->vector);
+			kprintf("   d0 0x%08lx    d1 0x%08lx    d2 0x%08lx    d3 0x%08lx\n",
+				frame->d0, frame->d1, frame->d2, frame->d3);
+			kprintf("   d4 0x%08lx    d5 0x%08lx    d6 0x%08lx    d7 0x%08lx\n",
+				frame->d4, frame->d5, frame->d6, frame->d7);
+			kprintf("   a0 0x%08lx    a1 0x%08lx    a2 0x%08lx    a3 0x%08lx\n",
+				frame->a0, frame->a1, frame->a2, frame->a3);
+			kprintf("   a4 0x%08lx    a5 0x%08lx    a6 0x%08lx    a7 0x%08lx (sp)\n",
+				frame->a4, frame->a5, frame->a6, frame->a7);
 
-			print_stack_frame(thread, frame->srr0, framePointer, frame->r1);
- 			framePointer = frame->r1;
+			/*kprintf("   pc 0x%08lx   ccr 0x%02x\n",
+			  frame->pc, frame->ccr);*/
+			kprintf("   pc 0x%08lx        sr 0x%04x\n",
+				frame->pc, frame->sr);
+#warning M68K: missing regs
+
+			print_stack_frame(thread, frame->pc, framePointer, frame->a6);
+ 			framePointer = frame->a6;
 		} else {
 			addr_t ip, nextFramePointer;
 

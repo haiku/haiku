@@ -1,4 +1,7 @@
 /*
+ * Copyright 2007, François Revol, revol@free.fr.
+ * Distributed under the terms of the MIT License.
+ *
  * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -37,58 +40,9 @@ arch_vm_init2(kernel_args *args)
 //	int bats[8];
 //	int i;
 
-#if 0
-	// print out any bat mappings
-	getibats(bats);
-	dprintf("ibats:\n");
-	for(i = 0; i < 4; i++)
-		dprintf("0x%x 0x%x\n", bats[i*2], bats[i*2+1]);
-	getdbats(bats);
-	dprintf("dbats:\n");
-	for(i = 0; i < 4; i++)
-		dprintf("0x%x 0x%x\n", bats[i*2], bats[i*2+1]);
-#endif
+	/**/
+#warning M68K: disable TT0 and TT1, set up pmmu
 
-#if 1
-	// turn off the first 2 BAT mappings (3 & 4 are used by the lower level code)
-	block_address_translation bat;
-	bat.Clear();
-
-	set_ibat0(&bat);
-	set_ibat1(&bat);
-	set_dbat0(&bat);
-	set_dbat1(&bat);
-/*	getibats(bats);
-	memset(bats, 0, 2 * 2);
-	setibats(bats);
-	getdbats(bats);
-	memset(bats, 0, 2 * 2);
-	setdbats(bats);
-*/
-#endif
-#if 0
-	// just clear the first BAT mapping (0 - 256MB)
-	dprintf("msr 0x%x\n", getmsr());
-	{
-		unsigned int reg;
-		asm("mr	%0,1" : "=r"(reg));
-		dprintf("sp 0x%x\n", reg);
-	}
-	dprintf("ka %p\n", ka);
-
-	getibats(bats);
-	dprintf("ibats:\n");
-	for(i = 0; i < 4; i++)
-		dprintf("0x%x 0x%x\n", bats[i*2], bats[i*2+1]);
-	bats[0] = bats[1] = 0;
-	setibats(bats);
-	getdbats(bats);
-	dprintf("dbats:\n");
-	for(i = 0; i < 4; i++)
-		dprintf("0x%x 0x%x\n", bats[i*2], bats[i*2+1]);
-	bats[0] = bats[1] = 0;
-	setdbats(bats);
-#endif
 	return B_OK;
 }
 

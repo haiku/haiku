@@ -1,4 +1,10 @@
 /*
+ * Copyright 2007, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ * 		François Revol <revol@free.fr>
+ *
  * Copyright 2003, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the OpenBeOS License.
  */

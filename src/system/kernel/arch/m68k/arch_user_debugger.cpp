@@ -1,4 +1,7 @@
 /*
+ * Copyright 2007, François Revol, revol@free.fr.
+ * Distributed under the terms of the MIT License.
+ *
  * Copyright 2005, Axel Dörfler, axeld@pinc-softare.de
  * Distributed under the terms of the MIT License.
  */

@@ -1,4 +1,7 @@
 /*
+ * Copyright 2007, François Revol, revol@free.fr.
+ * Distributed under the terms of the MIT License.
+ *
  * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */

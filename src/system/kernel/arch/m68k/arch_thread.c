@@ -5,6 +5,7 @@
  * Authors:
  * 		Axel Dörfler <axeld@pinc-software.de>
  * 		Ingo Weinhold <bonefish@cs.tu-berlin.de>
+ * 		François Revol <revol@free.fr>
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
@@ -22,19 +23,20 @@
 
 #include <string.h>
 
+#warning M68K: writeme!
 // Valid initial arch_thread state. We just memcpy() it when initializing
 // a new thread structure.
 static struct arch_thread sInitialState;
 
 // Helper function for thread creation, defined in arch_asm.S.
-extern void ppc_kernel_thread_root();
+extern void m68k_kernel_thread_root();
 
-extern void ppc_switch_stack_and_call(addr_t newKstack, void (*func)(void *),
+extern void m68k_switch_stack_and_call(addr_t newKstack, void (*func)(void *),
 	void *arg);
 
 
 void
-ppc_push_iframe(struct iframe_stack *stack, struct iframe *frame)
+m68k_push_iframe(struct iframe_stack *stack, struct iframe *frame)
 {
 	ASSERT(stack->index < IFRAME_TRACE_DEPTH);
 	stack->frames[stack->index++] = frame;
@@ -42,7 +44,7 @@ ppc_push_iframe(struct iframe_stack *stack, struct iframe *frame)
 
 
 void
-ppc_pop_iframe(struct iframe_stack *stack)
+m68k_pop_iframe(struct iframe_stack *stack)
 {
 	ASSERT(stack->index > 0);
 	stack->index--;
@@ -55,7 +57,7 @@ ppc_pop_iframe(struct iframe_stack *stack)
  *	from standard kernel threads.
  */
 static struct iframe *
-ppc_get_current_iframe(void)
+m68k_get_current_iframe(void)
 {
 	struct thread *thread = thread_get_current_thread();
 
@@ -71,15 +73,15 @@ ppc_get_current_iframe(void)
  *          the thread is a kernel thread).
  */
 struct iframe *
-ppc_get_user_iframe(void)
+m68k_get_user_iframe(void)
 {
 	struct thread *thread = thread_get_current_thread();
 	int i;
 
 	for (i = thread->arch_info.iframes.index - 1; i >= 0; i--) {
 		struct iframe *frame = thread->arch_info.iframes.frames[i];
-		if (frame->srr1 & MSR_PRIVILEGE_LEVEL)
-			return frame;
+//		if (frame->srr1 & MSR_PRIVILEGE_LEVEL)
+//			return frame;
 	}
 
 	return NULL;
@@ -141,13 +143,13 @@ arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void),
 	kstackTop -= 2;
 	kstackTop = (addr_t*)((addr_t)kstackTop & ~0xf);
 
-	// LR, CR, r2, r13-r31, f13-f31, as pushed by ppc_context_switch()
+	// LR, CR, r2, r13-r31, f13-f31, as pushed by m68k_context_switch()
 	kstackTop -= 22 + 2 * 19;
 
-	// let LR point to ppc_kernel_thread_root()
-	kstackTop[0] = (addr_t)&ppc_kernel_thread_root;
+	// let LR point to m68k_kernel_thread_root()
+	kstackTop[0] = (addr_t)&m68k_kernel_thread_root;
 
-	// the arguments of ppc_kernel_thread_root() are the functions to call,
+	// the arguments of m68k_kernel_thread_root() are the functions to call,
 	// provided in registers r13-r15
 	kstackTop[3] = (addr_t)entry_func;
 	kstackTop[4] = (addr_t)start_func;
@@ -172,7 +174,7 @@ void
 arch_thread_switch_kstack_and_call(struct thread *t, addr_t newKstack,
 	void (*func)(void *), void *arg)
 {
-	ppc_switch_stack_and_call(newKstack, func, arg);
+	m68k_switch_stack_and_call(newKstack, func, arg);
 }
 
 
@@ -189,11 +191,11 @@ arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 		// the target thread has is user space
 		if (t_from->team != t_to->team) {
 			// switching to a new address space
-			ppc_translation_map_change_asid(&t_to->team->address_space->translation_map);
+			m68k_translation_map_change_asid(&t_to->team->address_space->translation_map);
 		}
 	}
 
-	ppc_context_switch(&t_from->arch_info.sp, t_to->arch_info.sp);
+	m68k_context_switch(&t_from->arch_info.sp, t_to->arch_info.sp);
 }
 
 

@@ -1,7 +1,13 @@
 /* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2007, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ * 		François Revol <revol@free.fr>
+ *
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de
+ * Distributed under the terms of the OpenBeOS License.
+ */
 
 
 #include <KernelExport.h>

@@ -8,6 +8,24 @@ UsePrivateHeaders kernel [ FDirName kernel arch $(TARGET_ARCH) ]
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
+# cpu-specific stuff
+KernelMergeObject arch_m68k_030.o :
+	arch_030_cpu.cpp
+	arch_030_mmu.cpp
+	arch_030_asm.S
+	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused -m68030
+;
+
+KernelMergeObject arch_m68k_040.o :
+	arch_040.cpp
+	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused -m68040
+;
+
+KernelMergeObject arch_m68k_060.o :
+	arch_060.cpp
+	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused -m68060
+;
+
 KernelStaticLibrary libm68k :
 	arch_atomic.c
 	arch_cpu.cpp
@@ -30,6 +48,10 @@ KernelStaticLibrary libm68k :
 	arch_asm.S
 
 	generic_vm_physical_page_mapper.cpp
+
+	arch_m68k_030.o
+#	arch_m68k_040.a
+#	arch_m68k_060.a
 	:
 	$(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
 ;
