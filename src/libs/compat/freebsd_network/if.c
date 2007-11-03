@@ -289,7 +289,7 @@ ether_input(struct ifnet *ifp, struct mbuf *m)
 
 
 void
-ether_ifattach(struct ifnet *ifp, const uint8_t *mac_address)
+ether_ifattach(struct ifnet *ifp, const uint8_t *macAddress)
 {
 	ifp->if_addrlen = ETHER_ADDR_LEN;
 	ifp->if_hdrlen = ETHER_HDR_LEN;
@@ -300,7 +300,12 @@ ether_ifattach(struct ifnet *ifp, const uint8_t *mac_address)
 	ifp->if_resolvemulti = NULL; /* done in the stack */
 
 	ifp->if_lladdr.sdl_family = AF_LINK;
-	memcpy(IF_LLADDR(ifp), mac_address, ETHER_ADDR_LEN);
+	memcpy(IF_LLADDR(ifp), macAddress, ETHER_ADDR_LEN);
+
+	// TODO: according to FreeBSD's if_ethersubr.c, this should be removed
+	//		once all drivers are cleaned up.
+	if (macAddress != IFP2ENADDR(ifp))
+		memcpy(IFP2ENADDR(ifp), macAddress, ETHER_ADDR_LEN);
 
 	ifp->if_init(ifp->if_softc);
 }
