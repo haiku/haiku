@@ -1,47 +1,4 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network via-rhine ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
-# set some additional flags
-SubDirCcFlags -Wall ;
-
-# For ether_driver.h
-UsePrivateHeaders net ;
-
-KernelAddon via-rhine :
-	entry.c
-	hook.c
-	cmd.c
-	mdio.c
-	pci.c
-	res.c
-	ring.c
-	util.c
-	;
-
-# Package haiku-via-rhine-cvs :
-# 	via-rhine : 
-# 	boot home config add-ons kernel drivers bin ;
-# Package haiku-via-rhine-cvs :
-# 	<kernel!drivers!dev!net>via-rhine :
-#	boot home config add-ons kernel drivers dev net ;
-
-Package haiku-networkingkit-cvs :
-	via-rhine :
-	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-networkingkit-cvs : net via-rhine ;
-
-
-# Installation
-
-HaikuInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
- 	via-rhine 
-;
-
-HaikuInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
-	<installed>via-rhine : 
-	installed-symlink 
-;
-
 SubInclude HAIKU_TOP src add-ons kernel drivers network via-rhine dev ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network via-rhine pci ;
