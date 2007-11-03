@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons kernel drivers network via-rhine pci ;
+SubDir HAIKU_TOP src add-ons kernel drivers network via_rhine pci ;
 
 SubDirCcFlags -Wall ;
 

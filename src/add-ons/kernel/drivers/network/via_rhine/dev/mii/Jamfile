@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons kernel drivers network via-rhine dev mii ;
+SubDir HAIKU_TOP src add-ons kernel drivers network via_rhine dev mii ;
 
 UsePrivateHeaders kernel net ;
 
