@@ -177,16 +177,16 @@ compat_free(void *cookie)
 
 
 static status_t
-compat_read(void *cookie, off_t position, void *buf, size_t *numBytes)
+compat_read(void *cookie, off_t position, void *buffer, size_t *numBytes)
 {
 	struct network_device *dev = cookie;
 	uint32 semFlags = B_CAN_INTERRUPT;
 	status_t status;
 	struct mbuf *mb;
-	size_t len;
+	size_t length;
 
-	device_printf(DEVNET(dev), "compat_read(%lld, %p, [%lu])\n", position, buf,
-		*numBytes);
+	//device_printf(DEVNET(dev), "compat_read(%lld, %p, [%lu])\n", position,
+	//	buffer, *numBytes);
 
 	if (DEVNET(dev)->flags & DEVICE_CLOSED)
 		return B_INTERRUPTED;
@@ -208,7 +208,7 @@ compat_read(void *cookie, off_t position, void *buf, size_t *numBytes)
 		IF_DEQUEUE(&dev->receive_queue, mb);
 	} while (mb == NULL);
 
-	len = min_c(max_c((size_t)mb->m_len, 0), *numBytes);
+	length = min_c(max_c((size_t)mb->m_len, 0), *numBytes);
 
 #if 0
 	mb = m_defrag(mb, 0);
@@ -218,8 +218,8 @@ compat_read(void *cookie, off_t position, void *buf, size_t *numBytes)
 	}
 #endif
 
-	memcpy(buf, mtod(mb, const void *), len);
-	*numBytes = len;
+	memcpy(buffer, mtod(mb, const void *), length);
+	*numBytes = length;
 
 	m_freem(mb);
 	return B_OK;
@@ -233,8 +233,8 @@ compat_write(void *cookie, off_t position, const void *buffer,
 	struct network_device *dev = cookie;
 	struct mbuf *mb;
 
-	device_printf(DEVNET(dev), "compat_write(%lld, %p, [%lu])\n", position,
-		buffer, *numBytes);
+	//device_printf(DEVNET(dev), "compat_write(%lld, %p, [%lu])\n", position,
+	//	buffer, *numBytes);
 
 	mb = m_getcl(0, MT_DATA, M_PKTHDR);
 	if (mb == NULL)
@@ -250,10 +250,13 @@ compat_write(void *cookie, off_t position, const void *buffer,
 
 
 static status_t
-compat_control(void *cookie, uint32 op, void *arg, size_t len)
+compat_control(void *cookie, uint32 op, void *arg, size_t length)
 {
 	struct network_device *dev = cookie;
 	struct ifnet *ifp = dev->ifp;
+
+	//device_printf(DEVNET(dev), "compat_control(op %lu, %p, [%lu])\n", op,
+	//	arg, length);
 
 	switch (op) {
 		case ETHER_INIT:
@@ -265,7 +268,7 @@ compat_control(void *cookie, uint32 op, void *arg, size_t len)
 		case ETHER_NONBLOCK:
 		{
 			int32 value;
-			if (len < 4)
+			if (length < 4)
 				return B_BAD_VALUE;
 			if (user_memcpy(&value, arg, sizeof(int32)) < B_OK)
 				return B_BAD_ADDRESS;
@@ -279,7 +282,7 @@ compat_control(void *cookie, uint32 op, void *arg, size_t len)
 		case ETHER_SETPROMISC:
 		{
 			int32 value;
-			if (len < 4)
+			if (length < 4)
 				return B_BAD_VALUE;
 			if (user_memcpy(&value, arg, sizeof(int32)) < B_OK)
 				return B_BAD_ADDRESS;
@@ -293,7 +296,7 @@ compat_control(void *cookie, uint32 op, void *arg, size_t len)
 		case ETHER_GETFRAMESIZE:
 		{
 			uint32 frame_size;
-			if (len < 4)
+			if (length < 4)
 				return B_BAD_VALUE;
 			frame_size = dev->ifp->if_mtu + ETHER_HDR_LEN;
 			return user_memcpy(arg, &frame_size, 4);
@@ -313,8 +316,8 @@ compat_control(void *cookie, uint32 op, void *arg, size_t len)
 
 			if (op == ETHER_ADDMULTI)
 				return if_addmulti(ifp, (struct sockaddr *)&address, NULL);
-			else
-				return if_delmulti(ifp, (struct sockaddr *)&address);
+
+			return if_delmulti(ifp, (struct sockaddr *)&address);
 		}
 
 		case ETHER_GET_LINK_STATE:
@@ -323,7 +326,7 @@ compat_control(void *cookie, uint32 op, void *arg, size_t len)
 			ether_link_state_t state;
 			status_t status;
 
-			if (len < sizeof(ether_link_state_t))
+			if (length < sizeof(ether_link_state_t))
 				return EINVAL;
 
 			memset(&mediareq, 0, sizeof(mediareq));
