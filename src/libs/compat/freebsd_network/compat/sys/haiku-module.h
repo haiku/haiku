@@ -54,7 +54,6 @@ void _fbsd_uninit_driver(driver_t *);
 extern const char gDriverName[];
 driver_t *__haiku_select_miibus_driver(device_t dev);
 driver_t *__haiku_probe_miibus(device_t dev, driver_t *drivers[], int count);
-void __haiku_scan_miibus(device_t dev);
 
 /* we define the driver methods with HAIKU_FBSD_DRIVER_GLUE to
  * force the rest of the stuff to be linked back with the driver.

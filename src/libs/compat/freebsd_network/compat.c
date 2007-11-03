@@ -1,5 +1,6 @@
 /*
  * Copyright 2007, Hugo Santos, hugosantos@gmail.com. All Rights Reserved.
+ * Copyright 2007, Axel Dörfler, axeld@pinc-software.de. All Rights Reserved.
  * Copyright 2004, Marcus Overhagen. All Rights Reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -310,6 +311,10 @@ device_set_driver(device_t dev, driver_t *driver)
 			dev->methods.miibus_writereg = (void *)mth->method;
 		else if (strcmp(mth->name, "miibus_statchg") == 0)
 			dev->methods.miibus_statchg = (void *)mth->method;
+		else if (!strcmp(mth->name, "miibus_linkchg"))
+			dev->methods.miibus_linkchg = (void *)mth->method;
+		else if (!strcmp(mth->name, "miibus_mediainit"))
+			dev->methods.miibus_mediainit = (void *)mth->method;
 	}
 
 	return 0;
@@ -393,19 +398,11 @@ __haiku_probe_miibus(device_t dev, driver_t *drivers[], int count)
 
 
 void
-__haiku_scan_miibus(device_t dev)
+bus_generic_attach(device_t dev)
 {
-	device_t miibus = NULL;
 	device_t child = NULL;
 
-	// find miibus
-
-	while ((miibus = list_get_next_item(&dev->children, miibus)) != NULL) {
-		if (miibus->driver == &miibus_driver)
-			break;
-	}
-
-	while ((child = list_get_next_item(&miibus->children, child)) != NULL) {
+	while ((child = list_get_next_item(&dev->children, child)) != NULL) {
 		if (child->driver == NULL) {
 			driver_t *driver = __haiku_select_miibus_driver(child);
 			if (driver) {
@@ -417,18 +414,7 @@ __haiku_scan_miibus(device_t dev)
 				device_printf(dev, "No PHY module found (%x/%x)!\n", ma->mii_id1,
 					ma->mii_id2);
 			}
-		}
-	}
-}
-
-
-void
-bus_generic_attach(device_t dev)
-{
-	device_t child = NULL;
-
-	while ((child = list_get_next_item(&dev->children, child)) != NULL) {
-		if (child->driver == &miibus_driver)
+		} else if (child->driver == &miibus_driver)
 			child->methods.probe(child);
 
 		if (child->driver != NULL)

@@ -1,11 +1,8 @@
 /*
  * Copyright 2007, Hugo Santos. All Rights Reserved.
+ * Copyright 2004, Marcus Overhagen. All Rights Reserved.
+ *
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *      Hugo Santos, hugosantos@gmail.com
- *
- * Some of this code is based on previous work by Marcus Overhagen.
  */
 
 #include "device.h"
@@ -126,8 +123,6 @@ compat_open(const char *name, uint32 flags, void **cookie)
 	if (status == 0) {
 		struct ifnet *ifp = dev->ifp;
 		struct ifreq ifr;
-
-		__haiku_scan_miibus(DEVNET(dev));
 
 		ifp->if_flags &= ~IFF_UP;
 		ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
