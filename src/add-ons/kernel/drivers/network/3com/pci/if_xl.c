@@ -2875,8 +2875,7 @@ xl_init_locked(struct xl_softc *sc)
 	rxfilt |= XL_RXFILTER_INDIVIDUAL;
 
 	/* If we want promiscuous mode, set the allframes bit. */
-// TODO: temporarily set IFF_PROMISC, as the driver doesn't seem to work with the usual filtering
-	if (1/*ifp->if_flags & IFF_PROMISC*/) {
+	if (ifp->if_flags & IFF_PROMISC) {
 		rxfilt |= XL_RXFILTER_ALLFRAMES;
 		CSR_WRITE_2(sc, XL_COMMAND, XL_CMD_RX_SET_FILT|rxfilt);
 	} else {
