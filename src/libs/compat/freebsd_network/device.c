@@ -390,6 +390,15 @@ _fbsd_init_hardware(driver_t *driver)
 
 	memset(&fakeDevice, 0, sizeof(struct device));
 
+	// Some drivers, like the rtl8139 one require softc to be initialized
+	// before probe() is called.
+	// TODO(bga): Check if the fact that whatever initialization that is
+	// made here is essential as fakeDevice is local to this function and
+	// ceases to exist after we return. 
+	DEVNET(&fakeDevice)->softc = malloc(driver->softc_size);
+	if (DEVNET(&fakeDevice)->softc == NULL)
+		return B_NO_MEMORY;
+
 	for (i = 0; gPci->get_nth_pci_info(i, &fakeDevice.pci_info) == B_OK; i++) {
 		int result;
 		result = probe(DEVNET(&fakeDevice));
@@ -399,12 +408,18 @@ _fbsd_init_hardware(driver_t *driver)
 			if (DEVNET(&fakeDevice)->flags & DEVICE_DESC_ALLOCED)
 				free((char *)DEVNET(&fakeDevice)->description);
 			put_module(B_PCI_MODULE_NAME);
+
+			// Clean up softc.
+			free(DEVNET(&fakeDevice)->softc);
 			return B_OK;
 		}
 	}
 
 	dprintf("%s: no hardware found.\n", gDriverName);
 	put_module(B_PCI_MODULE_NAME);
+
+	// Clean up softc.
+	free(DEVNET(&fakeDevice)->softc);
 
 	return B_ERROR;
 }
