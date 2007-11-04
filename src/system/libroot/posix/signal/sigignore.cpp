@@ -4,23 +4,12 @@
  */
 
 
-#include <errno.h>
 #include <signal.h>
-
-#include <syscalls.h>
 
 
 int
 sigignore(int signal)
 {
-	// check for invalid signals or for signals
-	// that can not be ignored (SIGKILL, SIGSTOP)
-	if (signal <= 0 || signal >= NSIG || signal == SIGKILL
-		|| signal == SIGSTOP) {
-		errno = EINVAL;
-		return -1;
-	}
-
 	struct sigaction ignoreSignalAction;
 		// create an action to ignore the signal
 
