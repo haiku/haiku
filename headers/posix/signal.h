@@ -173,27 +173,6 @@ int		sigaltstack(const stack_t *ss, stack_t *oss);
 /* pthread extension : equivalent of sigprocmask()  */
 int		pthread_sigmask(int how, const sigset_t *set, sigset_t *oset); 
 
-extern inline int
-sigismember(const sigset_t *set, int sig)
-{
-	sigset_t mask = (((sigset_t) 1) << (( sig ) - 1)) ;	
-	return   (*set & mask) ? 1 : 0 ;	
-}
-
-extern inline int
-sigaddset(sigset_t *set, int sig)	
-{
-	sigset_t mask = (((sigset_t) 1) << (( sig ) - 1)) ;	
-	return   ((*set |= mask), 0) ;	
-}
-
-extern inline int
-sigdelset(sigset_t *set, int sig)	
-{
-	sigset_t mask = (((sigset_t) 1) << (( sig ) - 1)) ;	
-	return   ((*set &= ~mask), 0) ;	
-}
-
 #ifdef __cplusplus
 }
 #endif
