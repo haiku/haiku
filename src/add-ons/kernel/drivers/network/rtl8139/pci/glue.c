@@ -5,7 +5,17 @@
 HAIKU_FBSD_DRIVER_GLUE(rtl8139exp, rl, pci);
 HAIKU_DRIVER_REQUIREMENTS(0);
 
-HAIKU_FBSD_MII_DRIVER(rlphy);
+extern driver_t *DRIVER_MODULE_NAME(rlphy, miibus);
+
+driver_t *
+__haiku_select_miibus_driver(device_t dev)
+{
+	driver_t *drivers[] = {
+		DRIVER_MODULE_NAME(rlphy, miibus)
+	};
+
+	return __haiku_probe_miibus(dev, drivers, 1);
+}
 
 int
 HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev) {
