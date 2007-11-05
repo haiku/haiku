@@ -3,14 +3,15 @@
  * Distributed under the terms of the MIT License.
  */
 #include <Application.h>
-#include <OS.h>
+#include <Directory.h>
+#include <File.h>
+#include <FindDirectory.h>
 #include <MediaNode.h>
 #include <MediaRoster.h>
+#include <OS.h>
+#include <Path.h>
 #include <TimeSource.h>
 #include <string.h>
-#include <storage/File.h>
-#include <storage/FindDirectory.h>
-#include <storage/Path.h>
 #include "DefaultManager.h"
 #include "DormantNodeManager.h"
 #include "NodeManager.h"
@@ -36,7 +37,8 @@ const char *kDefaultManagerFlavorName 		= "be:_flavor_name";
 const char *kDefaultManagerPath 			= "be:_path";
 const char *kDefaultManagerInput 			= "be:_input_id";
 
-const char *kDefaultManagerSettings			= "Media/MDefaultManager";
+const char *kDefaultManagerSettingsDirectory			= "Media";
+const char *kDefaultManagerSettingsFile				= "MDefaultManager";
 
 
 DefaultManager::DefaultManager()
@@ -73,12 +75,13 @@ DefaultManager::LoadState()
 	if((err = find_directory(B_USER_SETTINGS_DIRECTORY, &path))!=B_OK)
 		return err;
 		
-	path.Append(kDefaultManagerSettings);
+	path.Append(kDefaultManagerSettingsDirectory);
+	path.Append(kDefaultManagerSettingsFile);
 	
 	BFile file(path.Path(), B_READ_ONLY);
 		
 	uint32 category_count;
-    if (file.Read(fBeginHeader, sizeof(uint32)*3) < (int32)sizeof(uint32)*3)
+	if (file.Read(fBeginHeader, sizeof(uint32)*3) < (int32)sizeof(uint32)*3)
 		return B_ERROR;
 	TRACE("0x%08lx %ld\n", fBeginHeader[0], fBeginHeader[0]);
 	TRACE("0x%08lx %ld\n", fBeginHeader[1], fBeginHeader[1]);
@@ -110,16 +113,18 @@ DefaultManager::SaveState(NodeManager *node_manager)
 	status_t err = B_OK;
 	BPath path;
 	BList list;
-	if((err = find_directory(B_USER_SETTINGS_DIRECTORY, &path))!=B_OK)
+	if ((err = find_directory(B_USER_SETTINGS_DIRECTORY, &path, true)) != B_OK)
 		return err;
-		
-	path.Append(kDefaultManagerSettings);
+	path.Append(kDefaultManagerSettingsDirectory);
+	if ((err = create_directory(path.Path(), 0755)) != B_OK)
+		return err;
+	path.Append(kDefaultManagerSettingsFile);
 	
 	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE);
 	
 	uint32 default_types[] = {kMsgTypeVideoIn, kMsgTypeVideoOut, kMsgTypeAudioIn, kMsgTypeAudioOut};
 	uint32 media_node_ids[] = {fPhysicalVideoIn, fPhysicalVideoOut, fPhysicalAudioIn, fPhysicalAudioOut};
-	for(uint32 i=0; i<sizeof(default_types)/sizeof(default_types[0]); i++) {
+	for (uint32 i=0; i<sizeof(default_types)/sizeof(default_types[0]); i++) {
 		BMessage *settings = new BMessage();
 		settings->AddInt32(kDefaultManagerType, default_types[i]);
 		
@@ -150,7 +155,7 @@ DefaultManager::SaveState(NodeManager *node_manager)
 	if (file.Write(fBeginHeader, sizeof(uint32)*3) < (int32)sizeof(uint32)*3)
 		return B_ERROR;
 	int32 category_count = list.CountItems();
-    if (file.Write(&category_count, sizeof(uint32)) < (int32)sizeof(uint32))
+	if (file.Write(&category_count, sizeof(uint32)) < (int32)sizeof(uint32))
 		return B_ERROR;
 	
 	for (int32 i = 0; i < category_count; i++) {
