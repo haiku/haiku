@@ -3,11 +3,13 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include <KernelExport.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <KernelExport.h>
 #include <device_manager.h>
 #include <bus/IDE.h>
+
 #include <ide_adapter.h>
 #include <block_io.h>
 
@@ -25,16 +27,18 @@ enum asic_type {
 	ASIC_SI3114 = 1,
 };
 
+#if 0
 static const char *adapter_asic_names[] = {
 	"si3112",
 	"si3114",
 	NULL
 };
+#endif
 
 static const struct {
 	uint16 channel_count;
 	uint32 mmio_bar_size;
-} asic_data[2] = {
+} kASICData[2] = {
 	{ 2, 0x200 },
 	{ 4, 0x400 },
 };
@@ -46,7 +50,7 @@ static const struct {
 	uint16 sien;
 	uint16 stat;
 	const char *name;
-} controller_channel_data[] = {
+} kControllerChannelData[] = {
 	{  0x80,  0x8A,  0x00, 0x148,  0xA0, "Primary Channel" },
 	{  0xC0,  0xCA,  0x08, 0x1C8,  0xE0, "Secondary Channel" },
 	{ 0x280, 0x28A, 0x200, 0x348, 0x2A0, "Tertiary Channel" },
@@ -66,7 +70,7 @@ typedef struct controller_data {
 	pci_device device;
 
 	device_node_handle node;
-	
+
 	struct channel_data *channel[4]; // XXX only for interrupt workaround
 	int channel_count; // XXX only for interrupt workaround
 
@@ -75,14 +79,13 @@ typedef struct controller_data {
 
 	area_id mmio_area;
 	uint32 mmio_addr;
-	
+
 	uint32 lost;			// != 0 if device got removed, i.e. if it must not
 							// be accessed anymore
 } controller_data;
 
 
 typedef struct channel_data {
-
 	pci_device_module_info *pci;
 	device_node_handle	node;
 	pci_device 			device;
@@ -103,7 +106,6 @@ typedef struct channel_data {
 	void *				prdt_phys;
 	uint32 				dma_active;
 	uint32 				lost;
-	
 } channel_data;
 
 
@@ -114,13 +116,14 @@ static device_manager_info *			dm;
 static status_t device_control_write(void *channel_cookie, uint8 val);
 static int32 handle_interrupt(void *arg);
 
+
 static float
 controller_supports(device_node_handle parent, bool *_noConnection)
 {
 	char *bus;
-	uint16 vendor_id;
-	uint16 device_id;
-	
+	uint16 vendorID;
+	uint16 deviceID;
+
 	// get the bus (should be PCI)
 	if (dm->get_attr_string(parent, B_DRIVER_BUS, &bus, false) != B_OK)
 		return B_ERROR;
@@ -129,16 +132,15 @@ controller_supports(device_node_handle parent, bool *_noConnection)
 		return B_ERROR;
 	}
 	free(bus);
-	
+
 	// get vendor and device ID
-	if (dm->get_attr_uint16(parent, PCI_DEVICE_VENDOR_ID_ITEM, &vendor_id, false) != B_OK
-		|| dm->get_attr_uint16(parent, PCI_DEVICE_DEVICE_ID_ITEM, &device_id, false) != B_OK) {
+	if (dm->get_attr_uint16(parent, PCI_DEVICE_VENDOR_ID_ITEM, &vendorID, false) != B_OK
+		|| dm->get_attr_uint16(parent, PCI_DEVICE_DEVICE_ID_ITEM, &deviceID, false) != B_OK) {
 		return B_ERROR;
 	}
-	
 
-	#define ID(v,d) (((v)<< 16) | (d))
-	switch (ID(vendor_id, device_id)) {
+	#define ID(v, d) (((v) << 16) | (d))
+	switch (ID(vendorID, deviceID)) {
 		case ID(0x1095, 0x3112):
 		case ID(0x1095, 0x3114):
 			break;
@@ -146,7 +148,7 @@ controller_supports(device_node_handle parent, bool *_noConnection)
 			return 0.0f;
 	}
 
-	TRACE("controller found! vendor 0x%04x, device 0x%04x\n", vendor_id, device_id);
+	TRACE("controller found! vendor 0x%04x, device 0x%04x\n", vendorID, deviceID);
 
 	return 0.8f;
 }
@@ -158,41 +160,42 @@ controller_probe(device_node_handle parent)
 	pci_device device;
 	pci_device_module_info *pci;
 	device_node_handle controller_node;
-	uint32 mmio_base;
-	uint16 device_id;
-	uint8 int_num;
-	int asic_index;
-	int chan_index;
+	uint32 mmioBase;
+	uint16 deviceID;
+	uint8 interruptNumber;
+	int asicIndex;
+	int channelIndex;
 	status_t res;
 	
 	TRACE("controller_probe\n");
 
-	if (dm->init_driver(parent, NULL, (driver_module_info **)&pci, (void **)&device) != B_OK)
+	if (dm->init_driver(parent, NULL, (driver_module_info **)&pci,
+			(void **)&device) != B_OK)
 		return B_ERROR;
-		
-	device_id = pci->read_pci_config(device, PCI_device_id, 2);
-	int_num = pci->read_pci_config(device, PCI_interrupt_line, 1);
-	mmio_base = pci->read_pci_config(device, PCI_base_registers + 20, 4);
-	mmio_base &= PCI_address_io_mask;
-	
-	switch (device_id) {
+
+	deviceID = pci->read_pci_config(device, PCI_device_id, 2);
+	interruptNumber = pci->read_pci_config(device, PCI_interrupt_line, 1);
+	mmioBase = pci->read_pci_config(device, PCI_base_registers + 20, 4)
+		& PCI_address_io_mask;
+
+	switch (deviceID) {
 		case 0x3112:
-			asic_index = ASIC_SI3112;
+			asicIndex = ASIC_SI3112;
 			break;
 		case 0x3114: 
-			asic_index = ASIC_SI3114;
+			asicIndex = ASIC_SI3114;
 			break;
 		default:
 			TRACE("unsupported asic\n");
 			goto err;
 	}
 
-	if (!mmio_base) {
+	if (!mmioBase) {
 		TRACE("mmio not configured\n");
 		goto err;
 	}
 
-	if (int_num == 0 || int_num == 0xff) {
+	if (interruptNumber == 0 || interruptNumber == 0xff) {
 		TRACE("irq not configured\n");
 		goto err;
 	}
@@ -200,7 +203,7 @@ controller_probe(device_node_handle parent)
 	{
 	io_resource_handle resource_handles[2];
 	io_resource resources[2] = {
-		{ IO_MEM, mmio_base, asic_data[asic_index].mmio_bar_size },
+		{ IO_MEM, mmioBase, kASICData[asicIndex].mmio_bar_size },
 		{}
 	};
 
@@ -219,7 +222,7 @@ controller_probe(device_node_handle parent)
 		// there are always max. 2 devices 
 		// (unless this is a Compact Flash Card with a built-in IDE controller,
 		//  which has exactly 1 device)
-		{ IDE_CONTROLLER_MAX_DEVICES_ITEM, B_UINT8_TYPE, { ui8: asic_data[asic_index].channel_count }},
+		{ IDE_CONTROLLER_MAX_DEVICES_ITEM, B_UINT8_TYPE, { ui8: kASICData[asicIndex].channel_count }},
 		// of course we can DMA
 		{ IDE_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { ui8: true }},
 		// command queuing always works
@@ -239,9 +242,9 @@ controller_probe(device_node_handle parent)
 		{ B_BLOCK_DEVICE_MAX_SG_BLOCKS, B_UINT32_TYPE, { ui32: IDE_ADAPTER_MAX_SG_COUNT }},
 
 		// private data to find controller
-		{ "silicon_image_3112/asic_index", B_UINT32_TYPE, { ui32: asic_index }},
-		{ "silicon_image_3112/mmio_base", B_UINT32_TYPE, { ui32: mmio_base }},
-		{ "silicon_image_3112/int_num", B_UINT32_TYPE, { ui32: int_num }},
+		{ "silicon_image_3112/asic_index", B_UINT32_TYPE, { ui32: asicIndex }},
+		{ "silicon_image_3112/mmio_base", B_UINT32_TYPE, { ui32: mmioBase }},
+		{ "silicon_image_3112/int_num", B_UINT32_TYPE, { ui32: interruptNumber }},
 		{ NULL }
 	};
 	
@@ -256,23 +259,23 @@ controller_probe(device_node_handle parent)
 	}
 
 	// publish channel nodes
-	for (chan_index = 0; chan_index < asic_data[asic_index].channel_count; chan_index++) {
+	for (channelIndex = 0; channelIndex < kASICData[asicIndex].channel_count; channelIndex++) {
 		device_attr channel_attrs[] = {
 			// info about ourself and our consumer
 			{ B_DRIVER_MODULE, B_STRING_TYPE, { string: CHANNEL_MODULE_NAME }},
 			{ B_DRIVER_PRETTY_NAME, B_STRING_TYPE, { string: DRIVER_PRETTY_NAME }},
-			{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: controller_channel_data[chan_index].name }},
+			{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: kControllerChannelData[channelIndex].name }},
 			{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: IDE_FOR_CONTROLLER_MODULE_NAME }},
 
 			// private data to identify channel
 			{ IDE_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { ui8: true }},
-			{ "silicon_image_3112/chan_index", B_UINT32_TYPE, { ui32: chan_index }},
+			{ "silicon_image_3112/chan_index", B_UINT32_TYPE, { ui32: channelIndex }},
 			{ NULL }
 		};
 
 		device_node_handle channel_node;
 
-		TRACE("publishing %s\n", controller_channel_data[chan_index].name );
+		TRACE("publishing %s\n", kControllerChannelData[channelIndex].name );
 
 		dm->register_device(controller_node, channel_attrs, resource_handles, &channel_node);
 	}
@@ -293,27 +296,28 @@ err:
 
 
 static status_t 
-controller_init(device_node_handle node, void *user_cookie, void **controller_cookie)
+controller_init(device_node_handle node, void *userCookie,
+	void **_controllerCookie)
 {
 	controller_data *controller;
 	pci_device_module_info *pci;
 	pci_device device;
-	uint32 asic_index;
-	uint32 mmio_base;
-	uint32 mmio_addr;
-	area_id mmio_area;
-	uint32 int_num;
+	uint32 asicIndex;
+	uint32 mmioBase;
+	uint32 mmioAddr;
+	area_id mmioArea;
+	uint32 interruptNumber;
 	status_t res;
 	uint32 temp;
 	int i;
 	
 	TRACE("controller_init\n");
 	
-	if (dm->get_attr_uint32(node, "silicon_image_3112/asic_index", &asic_index, false) != B_OK)
+	if (dm->get_attr_uint32(node, "silicon_image_3112/asic_index", &asicIndex, false) != B_OK)
 		return B_ERROR;
-	if (dm->get_attr_uint32(node, "silicon_image_3112/mmio_base", &mmio_base, false) != B_OK)
+	if (dm->get_attr_uint32(node, "silicon_image_3112/mmio_base", &mmioBase, false) != B_OK)
 		return B_ERROR;
-	if (dm->get_attr_uint32(node, "silicon_image_3112/int_num", &int_num, false) != B_OK)
+	if (dm->get_attr_uint32(node, "silicon_image_3112/int_num", &interruptNumber, false) != B_OK)
 		return B_ERROR;
 
 	controller = malloc(sizeof(controller_data));
@@ -322,10 +326,10 @@ controller_init(device_node_handle node, void *user_cookie, void **controller_co
 
 	FLOW("controller %p\n", controller);	
 
-	mmio_area = map_physical_memory("Silicon Image SATA regs", (void *)mmio_base, 
-									asic_data[asic_index].mmio_bar_size, 
-									B_ANY_KERNEL_ADDRESS, 0, (void **)&mmio_addr);
-	if (mmio_area < B_OK) {
+	mmioArea = map_physical_memory("Silicon Image SATA regs",
+		(void *)mmioBase, kASICData[asicIndex].mmio_bar_size, 
+		B_ANY_KERNEL_ADDRESS, 0, (void **)&mmioAddr);
+	if (mmioArea < B_OK) {
 		TRACE("controller_init: mapping memory failed\n");
 		free(controller);
 		return B_ERROR;
@@ -334,56 +338,56 @@ controller_init(device_node_handle node, void *user_cookie, void **controller_co
 
 	if (dm->init_driver(dm->get_parent(node), NULL, (driver_module_info **)&pci, (void **)&device) < B_OK) {
 		TRACE("controller_init: init parent failed\n");
-		delete_area(mmio_area);
+		delete_area(mmioArea);
 		free(controller);
 		return B_ERROR;
 	}
 	
-	TRACE("asic %ld\n", asic_index);
-	TRACE("int_num %ld\n", int_num);
-	TRACE("mmio_addr %p\n", (void *)mmio_addr);
+	TRACE("asic %ld\n", asicIndex);
+	TRACE("int_num %ld\n", interruptNumber);
+	TRACE("mmio_addr %p\n", (void *)mmioAddr);
 
-	controller->pci        = pci;
-	controller->device     = device;
-	controller->node       = node;
-	controller->asic_index = asic_index;
-	controller->int_num    = int_num;
-	controller->mmio_area  = mmio_area;
-	controller->mmio_addr  = mmio_addr;
-	controller->lost       = 0;
+	controller->pci = pci;
+	controller->device = device;
+	controller->node = node;
+	controller->asic_index = asicIndex;
+	controller->int_num = interruptNumber;
+	controller->mmio_area = mmioArea;
+	controller->mmio_addr = mmioAddr;
+	controller->lost = 0;
 
-	controller->channel_count = asic_data[asic_index].channel_count;
-	for (i = 0; i < asic_data[asic_index].channel_count; i++)
+	controller->channel_count = kASICData[asicIndex].channel_count;
+	for (i = 0; i < kASICData[asicIndex].channel_count; i++)
 		controller->channel[i] = 0;
 
-	if (asic_index == ASIC_SI3114) {
+	if (asicIndex == ASIC_SI3114) {
 		// I put a magic spell on you
-		temp = *(volatile uint32 *)(mmio_addr + SI_BMDMA2);
-		*(volatile uint32 *)(mmio_addr + SI_BMDMA2) = temp | SI_INT_STEERING;
-		*(volatile uint32 *)(mmio_addr + SI_BMDMA2); // flush
+		temp = *(volatile uint32 *)(mmioAddr + SI_BMDMA2);
+		*(volatile uint32 *)(mmioAddr + SI_BMDMA2) = temp | SI_INT_STEERING;
+		*(volatile uint32 *)(mmioAddr + SI_BMDMA2); // flush
 	}
 
 	// disable all sata phy interrupts
-	for (i = 0; i < asic_data[asic_index].channel_count; i++)
-		*(volatile uint32 *)(mmio_addr + controller_channel_data[i].sien) = 0;
-	*(volatile uint32 *)(mmio_addr + controller_channel_data[0].sien); // flush
+	for (i = 0; i < kASICData[asicIndex].channel_count; i++)
+		*(volatile uint32 *)(mmioAddr + kControllerChannelData[i].sien) = 0;
+	*(volatile uint32 *)(mmioAddr + kControllerChannelData[0].sien); // flush
 	
 	// install interrupt handler
-	res = install_io_interrupt_handler(int_num, handle_interrupt, controller, 0);
+	res = install_io_interrupt_handler(interruptNumber, handle_interrupt, controller, 0);
 	if (res <  B_OK) {
 		TRACE("controller_init: installing interrupt handler failed\n");
 		dm->uninit_driver(dm->get_parent(node));
-		delete_area(mmio_area);
+		delete_area(mmioArea);
 		free(controller);
 	}
 
 	// unmask interrupts
-	temp = *(volatile uint32 *)(mmio_addr + SI_SYSCFG);
-	temp &= (asic_index == ASIC_SI3114) ? (~SI_MASK_4PORT) : (~SI_MASK_2PORT);
-	*(volatile uint32 *)(mmio_addr + SI_SYSCFG) = temp;
-	*(volatile uint32 *)(mmio_addr + SI_SYSCFG); // flush
+	temp = *(volatile uint32 *)(mmioAddr + SI_SYSCFG);
+	temp &= (asicIndex == ASIC_SI3114) ? (~SI_MASK_4PORT) : (~SI_MASK_2PORT);
+	*(volatile uint32 *)(mmioAddr + SI_SYSCFG) = temp;
+	*(volatile uint32 *)(mmioAddr + SI_SYSCFG); // flush
 	
-	*controller_cookie = controller;
+	*_controllerCookie = controller;
 
 	TRACE("controller_init success\n");
 	return B_OK;
@@ -391,9 +395,9 @@ controller_init(device_node_handle node, void *user_cookie, void **controller_co
 
 
 static status_t
-controller_uninit(void *controller_cookie)
+controller_uninit(void *controllerCookie)
 {
-	controller_data *controller = controller_cookie;
+	controller_data *controller = controllerCookie;
 	uint32 temp;
 
 	TRACE("controller_uninit enter\n");
@@ -416,9 +420,9 @@ controller_uninit(void *controller_cookie)
 
 
 static void
-controller_removed(device_node_handle node, void *controller_cookie)
+controller_removed(device_node_handle node, void *controllerCookie)
 {
-	controller_data *controller = controller_cookie;
+	controller_data *controller = controllerCookie;
 	controller->lost = 1;
 }
 
@@ -435,14 +439,14 @@ controller_get_paths(const char ***_bus, const char ***_device)
 
 
 static status_t
-channel_init(device_node_handle node, void *user_cookie, void **channel_cookie)
+channel_init(device_node_handle node, void *userCookie, void **_channelCookie)
 {
-	ide_channel ide_channel = user_cookie;
+	ide_channel ide_channel = userCookie;
 	controller_data *controller;
 	channel_data *channel;
-	physical_entry pe[1];
-	size_t prdt_size;
-	uint32 chan_index;
+	physical_entry entry;
+	size_t prdtSize;
+	uint32 channelIndex;
 	
 	TRACE("channel_init enter\n");
 	
@@ -452,11 +456,11 @@ channel_init(device_node_handle node, void *user_cookie, void **channel_cookie)
 
 	TRACE("channel %p\n", channel);	
 
-	if (dm->get_attr_uint32(node, "silicon_image_3112/chan_index", &chan_index, false) != B_OK)
+	if (dm->get_attr_uint32(node, "silicon_image_3112/chan_index", &channelIndex, false) != B_OK)
 		goto err;
 
-	TRACE("channel_index %ld\n", chan_index);
-	TRACE("channel name: %s\n", controller_channel_data[chan_index].name);
+	TRACE("channel_index %ld\n", channelIndex);
+	TRACE("channel name: %s\n", kControllerChannelData[channelIndex].name);
 		
 	if (dm->init_driver(dm->get_parent(node), NULL, NULL, (void **)&controller) != B_OK)
 		goto err;
@@ -465,45 +469,43 @@ channel_init(device_node_handle node, void *user_cookie, void **channel_cookie)
 	TRACE("mmio_addr %p\n", (void *)controller->mmio_addr);
 
 	// PRDT must be contiguous, dword-aligned and must not cross 64K boundary 
-	prdt_size = (IDE_ADAPTER_MAX_SG_COUNT * sizeof(prd_entry) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1);
-	channel->prd_area = create_area("prd", (void **)&channel->prdt, B_ANY_KERNEL_ADDRESS, prdt_size, B_FULL_LOCK | B_CONTIGUOUS, 0);
+	prdtSize = (IDE_ADAPTER_MAX_SG_COUNT * sizeof(prd_entry) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1);
+	channel->prd_area = create_area("prd", (void **)&channel->prdt, B_ANY_KERNEL_ADDRESS, prdtSize, B_FULL_LOCK | B_CONTIGUOUS, 0);
 	if (channel->prd_area < B_OK) {
 		TRACE("creating prd_area failed\n");
 		goto err2;
 	}
 
-	get_memory_map(channel->prdt, prdt_size, pe, 1);
-	channel->prdt_phys = (void *)(uint32)pe[0].address;
+	get_memory_map(channel->prdt, prdtSize, &entry, 1);
+	channel->prdt_phys = entry.address;
 
 	channel->pci = controller->pci;
 	channel->device = controller->device;
 	channel->node = node;
 	channel->ide_channel = ide_channel;
 
-	channel->task_file = (volatile uint8 *)(controller->mmio_addr + controller_channel_data[chan_index].cmd + 1);
-	channel->control_block = (volatile uint8 *)(controller->mmio_addr + controller_channel_data[chan_index].ctl);
-	channel->command_block = (volatile uint8 *)(controller->mmio_addr + controller_channel_data[chan_index].cmd);
-	channel->dev_ctrl = (volatile uint8 *)(controller->mmio_addr + controller_channel_data[chan_index].ctl);
-	channel->bm_prdt_address = (volatile uint32 *)(controller->mmio_addr + controller_channel_data[chan_index].bmdma + ide_bm_prdt_address);
-	channel->bm_status_reg = (volatile uint8 *)(controller->mmio_addr + controller_channel_data[chan_index].bmdma + ide_bm_status_reg);
-	channel->bm_command_reg = (volatile uint8 *)(controller->mmio_addr + controller_channel_data[chan_index].bmdma + ide_bm_command_reg);
-	channel->stat = (volatile uint32 *)(controller->mmio_addr + controller_channel_data[chan_index].stat);
+	channel->task_file = (volatile uint8 *)(controller->mmio_addr + kControllerChannelData[channelIndex].cmd + 1);
+	channel->control_block = (volatile uint8 *)(controller->mmio_addr + kControllerChannelData[channelIndex].ctl);
+	channel->command_block = (volatile uint8 *)(controller->mmio_addr + kControllerChannelData[channelIndex].cmd);
+	channel->dev_ctrl = (volatile uint8 *)(controller->mmio_addr + kControllerChannelData[channelIndex].ctl);
+	channel->bm_prdt_address = (volatile uint32 *)(controller->mmio_addr + kControllerChannelData[channelIndex].bmdma + IDE_BM_PRDT_ADDRESS);
+	channel->bm_status_reg = (volatile uint8 *)(controller->mmio_addr + kControllerChannelData[channelIndex].bmdma + IDE_BM_STATUS_REG);
+	channel->bm_command_reg = (volatile uint8 *)(controller->mmio_addr + kControllerChannelData[channelIndex].bmdma + IDE_BM_COMMAND_REG);
+	channel->stat = (volatile uint32 *)(controller->mmio_addr + kControllerChannelData[channelIndex].stat);
 
 	channel->lost = 0;
 	channel->dma_active = 0;
 	
-	controller->channel[chan_index] = channel;
+	controller->channel[channelIndex] = channel;
 
 	// enable interrupts so the channel is ready to run
 	device_control_write(channel, ide_devctrl_bit3);
 
-	*channel_cookie = channel;
+	*_channelCookie = channel;
 
 	TRACE("channel_init leave\n");
 	return B_OK;
 
-err3:
-	delete_area(channel->prd_area);
 err2:
 	dm->uninit_driver(dm->get_parent(node));
 err:
@@ -513,9 +515,9 @@ err:
 
 
 static status_t
-channel_uninit(void *channel_cookie)
+channel_uninit(void *channelCookie)
 {
-	channel_data *channel = channel_cookie;
+	channel_data *channel = channelCookie;
 
 	TRACE("channel_uninit enter\n");
 
@@ -538,17 +540,17 @@ channel_uninit(void *channel_cookie)
 
 
 static void
-channel_removed(device_node_handle node, void *channel_cookie)
+channel_removed(device_node_handle node, void *channelCookie)
 {
-	channel_data *channel = channel_cookie;
+	channel_data *channel = channelCookie;
 	channel->lost = 1;
 }
 
 
 static status_t
-task_file_write(void *channel_cookie, ide_task_file *tf, ide_reg_mask mask)
+task_file_write(void *channelCookie, ide_task_file *tf, ide_reg_mask mask)
 {
-	channel_data *channel = channel_cookie;
+	channel_data *channel = channelCookie;
 	int i;
 
 	FLOW("task_file_write\n");
@@ -574,9 +576,9 @@ task_file_write(void *channel_cookie, ide_task_file *tf, ide_reg_mask mask)
 
 
 static status_t
-task_file_read(void *channel_cookie, ide_task_file *tf, ide_reg_mask mask)
+task_file_read(void *channelCookie, ide_task_file *tf, ide_reg_mask mask)
 {
-	channel_data *channel = channel_cookie;
+	channel_data *channel = channelCookie;
 	int i;
 
 	FLOW("task_file_read\n");
@@ -596,9 +598,9 @@ task_file_read(void *channel_cookie, ide_task_file *tf, ide_reg_mask mask)
 
 
 static uint8
-altstatus_read(void *channel_cookie)
+altstatus_read(void *channelCookie)
 {
-	channel_data *channel = channel_cookie;
+	channel_data *channel = channelCookie;
 
 	FLOW("altstatus_read\n");
 
@@ -610,9 +612,9 @@ altstatus_read(void *channel_cookie)
 
 
 static status_t 
-device_control_write(void *channel_cookie, uint8 val)
+device_control_write(void *channelCookie, uint8 val)
 {
-	channel_data *channel = channel_cookie;
+	channel_data *channel = channelCookie;
 
 	FLOW("device_control_write %x\n", val);
 	
@@ -627,9 +629,9 @@ device_control_write(void *channel_cookie, uint8 val)
 
 
 static status_t
-pio_write(void *channel_cookie, uint16 *data, int count, bool force_16bit)
+pio_write(void *channelCookie, uint16 *data, int count, bool force_16bit)
 {
-	channel_data *channel = channel_cookie;
+	channel_data *channel = channelCookie;
 	if (channel->lost)
 		return B_ERROR;
 
@@ -655,9 +657,9 @@ pio_write(void *channel_cookie, uint16 *data, int count, bool force_16bit)
 
 
 static status_t
-pio_read(void *channel_cookie, uint16 *data, int count, bool force_16bit)
+pio_read(void *channelCookie, uint16 *data, int count, bool force_16bit)
 {
-	channel_data *channel = channel_cookie;
+	channel_data *channel = channelCookie;
 	if (channel->lost)
 		return B_ERROR;
 
@@ -683,47 +685,55 @@ pio_read(void *channel_cookie, uint16 *data, int count, bool force_16bit)
 
 
 static status_t
-dma_prepare(void *channel_cookie, const physical_entry *sg_list, size_t sg_list_count, bool write)
+dma_prepare(void *channelCookie, const physical_entry *sg_list,
+	size_t sg_list_count, bool write)
 {
-	channel_data *channel = channel_cookie;
+	channel_data *channel = channelCookie;
 	pci_device_module_info *pci = channel->pci;
 	pci_device device = channel->device;
 	prd_entry *prd = channel->prdt;
-	ide_bm_command command;
-	ide_bm_status status;
+	uint8 command;
+	uint8 status;
 	uint32 temp;
 	int i;
-	
+
 	FLOW("dma_prepare enter\n");
-	
-	for (i = sg_list_count - 1, prd = channel->prdt; i >= 0; --i, ++prd, ++sg_list ) {
-		prd->address = B_HOST_TO_LENDIAN_INT32(pci->ram_address(device, sg_list->address));
-		// 0 means 64K - this is done automatically be discarding upper 16 bits
+
+	for (i = sg_list_count - 1, prd = channel->prdt; i >= 0;
+			--i, ++prd, ++sg_list ) {
+		prd->address = B_HOST_TO_LENDIAN_INT32(pci->ram_address(device,
+			sg_list->address));
+
+		// 0 means 64K - this is done automatically by discarding upper 16 bits
 		prd->count = B_HOST_TO_LENDIAN_INT16((uint16)sg_list->size);
 		prd->EOT = i == 0;
-		
-		FLOW("%x, %x, %d\n", (int)prd->address, prd->count, prd->EOT );
+
+		FLOW("%x, %x, %d\n", (int)prd->address, prd->count, prd->EOT);
 	}
 
 	// XXX move this to chan init?
 	temp = (*channel->bm_prdt_address) & 3;
-	temp |= B_HOST_TO_LENDIAN_INT32(pci->ram_address(device, (void *)channel->prdt_phys)) & ~3;
+	temp |= B_HOST_TO_LENDIAN_INT32(pci->ram_address(device,
+		(void *)channel->prdt_phys)) & ~3;
 	*channel->bm_prdt_address = temp;
 
 	*channel->dev_ctrl; // read altstatus to flush
 
 	// reset interrupt and error signal
-	*(uint8 *)&status = *channel->bm_status_reg;
-	status.interrupt = 1;
-	status.error = 1;
-	*channel->bm_status_reg = *(uint8 *)&status;
+	status = *channel->bm_status_reg | IDE_BM_STATUS_INTERRUPT
+		| IDE_BM_STATUS_ERROR;
+	*channel->bm_status_reg = status;
 
 	*channel->dev_ctrl; // read altstatus to flush
-		
+
 	// set data direction
-	*(uint8 *)&command = *channel->bm_command_reg;
-	command.from_device = !write;
-	*channel->bm_command_reg = *(uint8 *)&command;
+	command = *channel->bm_command_reg;
+	if (write)
+		command &= ~IDE_BM_COMMAND_READ_FROM_DEVICE;
+	else
+		command |= IDE_BM_COMMAND_READ_FROM_DEVICE;
+
+	*channel->bm_command_reg = command;
 
 	*channel->dev_ctrl; // read altstatus to flush
 
@@ -734,19 +744,16 @@ dma_prepare(void *channel_cookie, const physical_entry *sg_list, size_t sg_list_
 
 
 static status_t
-dma_start(void *channel_cookie)
+dma_start(void *channelCookie)
 {
-	channel_data *channel = channel_cookie;
-	ide_bm_command command;
+	channel_data *channel = channelCookie;
+	uint8 command;
 
 	FLOW("dma_start enter\n");
-	
-	*(uint8 *)&command = *channel->bm_command_reg;
 
-	command.start_stop = 1;
+	command = *channel->bm_command_reg | IDE_BM_COMMAND_START_STOP;
 	channel->dma_active = true;
-
-	*channel->bm_command_reg = *(uint8 *)&command;
+	*channel->bm_command_reg = command;
 
 	*channel->dev_ctrl; // read altstatus to flush
 	
@@ -757,38 +764,33 @@ dma_start(void *channel_cookie)
 
 
 static status_t
-dma_finish(void *channel_cookie)
+dma_finish(void *channelCookie)
 {
-	channel_data *channel = channel_cookie;
-	ide_bm_command command;
-	ide_bm_status status, new_status;
+	channel_data *channel = channelCookie;
+	uint8 command;
+	uint8 status;
 
 	FLOW("dma_finish enter\n");
 
-	*(uint8 *)&command = *channel->bm_command_reg;
-
-	command.start_stop = 0;
+	command = *channel->bm_command_reg & ~IDE_BM_COMMAND_START_STOP;
 	channel->dma_active = false;
-	
-	*channel->bm_command_reg = *(uint8 *)&command;
 
-	*(uint8 *)&status = *channel->bm_status_reg;
+	*channel->bm_command_reg = command;
 
-	new_status = status;	
-	new_status.interrupt = 1;
-	new_status.error = 1;
+	status = *channel->bm_status_reg;
 
-	*channel->bm_status_reg = *(uint8 *)&new_status;
+	*channel->bm_status_reg = status | IDE_BM_STATUS_INTERRUPT
+		| IDE_BM_STATUS_ERROR;
 
 	*channel->dev_ctrl; // read altstatus to flush
 	
-	if (status.error) {
+	if ((status & IDE_BM_STATUS_ERROR) != 0) {
 		FLOW("dma_finish: failed\n");
 		return B_ERROR;
 	}
 
-	if (!status.interrupt) {
-		if (status.active) {
+	if ((status & IDE_BM_STATUS_INTERRUPT) == 0) {
+		if ((status & IDE_BM_STATUS_ACTIVE) != 0) {
 			FLOW("dma_finish: transfer aborted\n");
 			return B_ERROR;
 		} else {
@@ -796,7 +798,7 @@ dma_finish(void *channel_cookie)
 			return B_DEV_DATA_UNDERRUN;
 		}
 	} else {
-		if (status.active) {
+		if ((status & IDE_BM_STATUS_ACTIVE) != 0) {
 			FLOW("dma_finish: buffer too large\n");
 			return B_DEV_DATA_OVERRUN;
 		} else {
@@ -811,7 +813,6 @@ static int32
 handle_interrupt(void *arg)
 {
 	controller_data *controller = arg;
-	ide_bm_status bm_status;
 	uint8 status;
 	int32 result, ret;
 	int i;
@@ -826,11 +827,11 @@ handle_interrupt(void *arg)
 			continue;
 
 		if (channel->dma_active) {
-			*(uint8 *)&bm_status = *channel->bm_status_reg;
-			if (!bm_status.interrupt)
+			if ((*channel->bm_status_reg & IDE_BM_STATUS_INTERRUPT) == 0)
 				continue;
 		} else {
-			// for PIO, read the "Task File Configuration + Status" Interrupt status
+			// for PIO, read the "Task File Configuration + Status" Interrupt
+			// status
 			if (!(*channel->stat & (1 << 11)))
 				continue;
 		}
@@ -877,24 +878,24 @@ static ide_controller_interface channel_interface = {
 			std_ops
 		},
 		
-		.supports_device						= NULL,
-		.register_device						= NULL,
-		.init_driver							= &channel_init,
-		.uninit_driver							= &channel_uninit,
-		.device_removed							= &channel_removed,
-		.device_cleanup							= NULL,
-		.get_supported_paths					= NULL,
+		.supports_device			= NULL,
+		.register_device			= NULL,
+		.init_driver				= &channel_init,
+		.uninit_driver				= &channel_uninit,
+		.device_removed				= &channel_removed,
+		.device_cleanup				= NULL,
+		.get_supported_paths		= NULL,
 	},
 
-	.write_command_block_regs					= &task_file_write,
-	.read_command_block_regs					= &task_file_read,
-	.get_altstatus								= &altstatus_read,
-	.write_device_control						= &device_control_write,
-	.write_pio									= &pio_write,
-	.read_pio									= &pio_read,
-	.prepare_dma								= &dma_prepare,
-	.start_dma									= &dma_start,
-	.finish_dma									= &dma_finish,
+	.write_command_block_regs		= &task_file_write,
+	.read_command_block_regs		= &task_file_read,
+	.get_altstatus					= &altstatus_read,
+	.write_device_control			= &device_control_write,
+	.write_pio						= &pio_write,
+	.read_pio						= &pio_read,
+	.prepare_dma					= &dma_prepare,
+	.start_dma						= &dma_start,
+	.finish_dma						= &dma_finish,
 };
 
 
@@ -905,13 +906,13 @@ static driver_module_info controller_interface = {
 		std_ops
 	},
 
-	.supports_device							= &controller_supports,
-	.register_device							= &controller_probe,
-	.init_driver								= &controller_init,
-	.uninit_driver								= &controller_uninit,
-	.device_removed								= &controller_removed,
-	.device_cleanup								= NULL,
-	.get_supported_paths							= &controller_get_paths,
+	.supports_device				= &controller_supports,
+	.register_device				= &controller_probe,
+	.init_driver					= &controller_init,
+	.uninit_driver					= &controller_uninit,
+	.device_removed					= &controller_removed,
+	.device_cleanup					= NULL,
+	.get_supported_paths			= &controller_get_paths,
 };
 
 module_info *modules[] = {
