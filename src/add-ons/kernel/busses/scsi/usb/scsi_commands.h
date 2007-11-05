@@ -1,19 +1,16 @@
-/**
+/*
+ * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
+ * Distributed under the terms of the MIT License.
  *
- * TODO: description
- * 
- * This file is a part of USB SCSI CAM for Haiku OS.
- * May be used under terms of the MIT License
- *
- * Author(s):
- * 	Siarzhuk Zharski <imker@gmx.li>
- * 	
- * 	
+ * Author:
+ *		Siarzhuk Zharski <imker@gmx.li>
  */
-/** definitions for SCSI commands, structures etc. */
-
 #ifndef _SCSI_COMMANDS_H_ 
-	#define _SCSI_COMMANDS_H_
+#define _SCSI_COMMANDS_H_
+
+/*!	Definitions for SCSI commands, structures etc. */
+
+#include <lendian_bitfield.h>
 
 /* References:
  * http://www.t10.org/ftp/t10/drafts/rbc/rbc-r10a.pdf
@@ -189,18 +186,23 @@ typedef struct{
 }scsi_cmd_generic_12;
 /* READ_6 / WRITE_6 */
 typedef scsi_cmd_generic_6 scsi_cmd_rw_6;
+
 /* READ_10 / WRITE_10 */
-typedef struct{
+typedef struct {
 	uint8 opcode;
-	uint8 byte2; 
-#define CMD_RW_10_RELADDR	0x01
-#define CMD_RW_10_FUA		0x08 
-#define CMD_RW_10_DPO		0x10 
-	uint8 addr[4];
-	uint8 reserved;
-	uint8 len[2];
-	uint8 ctrl;
-}scsi_cmd_rw_10;
+	LBITFIELD8_5(
+		relative_address : 1,		// relative address
+		_res1_1 : 2,
+		force_unit_access : 1,		// force unit access (1 = safe, cacheless access)
+		disable_page_out : 1,		// disable page out (1 = not worth caching)
+		lun : 3
+	);
+	uint32 lba;			// big endian
+	uint8 _reserved;
+	uint16 length;		// big endian
+	uint8 control;
+} scsi_cmd_rw_10;
+
 /* MODE_SELECT_6 */
 typedef struct{
 	uint8 opcode;

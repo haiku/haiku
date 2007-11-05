@@ -6,6 +6,8 @@ if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders [ FDirName drivers ] ;
 }
 
+UsePrivateHeaders drivers ;
+
 KernelAddon usb_scsi :
 	usb_scsi.c
 	tracing.c
