@@ -974,7 +974,7 @@ steal_pages(vm_page **pages, size_t count, bool reserve)
 				break;
 
 			if (steal_page(page, false)) {
-				if (reserve) {
+				if (reserve || stolen >= maxCount) {
 					InterruptsSpinLocker _(sPageLock);
 					enqueue_page(&sFreePageQueue, page);
 					page->state = PAGE_STATE_FREE;
@@ -1374,10 +1374,8 @@ vm_page_allocate_page(int pageState, bool reserved)
 		size_t stolen = steal_pages(&page, 1, false);
 		locker.Lock();
 
-		if (stolen == 0) {
-			// just try again
-			continue;
-		}
+		if (stolen > 0)
+			break;
 	}
 
 	if (page->cache != NULL)
