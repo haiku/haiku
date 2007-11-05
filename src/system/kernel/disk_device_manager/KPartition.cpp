@@ -247,23 +247,32 @@ KPartition::IsBusy() const
 }
 
 
+// IsBusy
+bool
+KPartition::IsBusy(bool includeDescendants)
+{
+	if (!includeDescendants)
+		return IsBusy();
+
+	struct IsBusyVisitor : KPartitionVisitor {
+		virtual bool VisitPre(KPartition* partition)
+		{
+			return partition->IsBusy();
+		}
+	} checkVisitor;
+
+	return VisitEachDescendant(&checkVisitor) != NULL;
+}
+
+
 // CheckAndMarkBusy
 bool
 KPartition::CheckAndMarkBusy(bool includeDescendants)
 {
+	if (IsBusy(includeDescendants))
+		return false;
+
 	if (includeDescendants) {
-		// check
-		struct IsBusyVisitor : KPartitionVisitor {
-			virtual bool VisitPre(KPartition* partition)
-			{
-				return partition->IsBusy();
-			}
-		} checkVisitor;
-
-		if (VisitEachDescendant(&checkVisitor))
-			return false;
-
-		// mark busy
 		struct MarkBusyVisitor : KPartitionVisitor {
 			virtual bool VisitPre(KPartition* partition)
 			{
@@ -273,12 +282,8 @@ KPartition::CheckAndMarkBusy(bool includeDescendants)
 		} markVisitor;
 
 		VisitEachDescendant(&markVisitor);
-	} else {
-		if (IsBusy())
-			return false;
-
+	} else
 		SetBusy(true);
-	}
 
 	return true;
 }
@@ -1014,64 +1019,77 @@ KPartition::ChangeCounter() const
 	return fChangeCounter;
 }
 
+
 // UninitializeContents
 status_t
 KPartition::UninitializeContents(bool logChanges)
 {
 	if (DiskSystem()) {
 		uint32 flags = B_PARTITION_CHANGED_INITIALIZATION
-					   | B_PARTITION_CHANGED_CONTENT_TYPE
-					   | B_PARTITION_CHANGED_STATUS
-					   | B_PARTITION_CHANGED_FLAGS;
+			| B_PARTITION_CHANGED_CONTENT_TYPE
+			| B_PARTITION_CHANGED_STATUS
+			| B_PARTITION_CHANGED_FLAGS;
+
 		// children
 		if (CountChildren() > 0) {
 			if (!RemoveAllChildren())
 				return B_ERROR;
 			flags |= B_PARTITION_CHANGED_CHILDREN;
 		}
+
 		// volume
 		if (VolumeID() >= 0) {
+// TODO: Unmount?
 			SetVolumeID(-1);
 			flags |= B_PARTITION_CHANGED_VOLUME;
 		}
+
 		// content name
 		if (ContentName()) {
 			SetContentName(NULL);
 			flags |= B_PARTITION_CHANGED_CONTENT_NAME;
 		}
+
 		// content parameters
 		if (ContentParameters()) {
 			SetContentParameters(NULL);
 			flags |= B_PARTITION_CHANGED_CONTENT_PARAMETERS;
 		}
+
 		// content size
 		if (ContentSize() > 0) {
 			SetContentSize(0);
 			flags |= B_PARTITION_CHANGED_CONTENT_SIZE;
 		}
+
 		// block size
 		if (Parent() && Parent()->BlockSize() != BlockSize()) {
 			SetBlockSize(Parent()->BlockSize());
 			flags |= B_PARTITION_CHANGED_BLOCK_SIZE;
 		}
+
 		// disk system
 		DiskSystem()->FreeContentCookie(this);
 		SetDiskSystem(NULL);
+
 		// status
 		SetStatus(B_PARTITION_UNINITIALIZED);
+
 		// flags
 		ClearFlags(B_PARTITION_FILE_SYSTEM | B_PARTITION_PARTITIONING_SYSTEM);
 		if (!Device()->IsReadOnlyMedia())
 			ClearFlags(B_PARTITION_READ_ONLY);
+
 		// log changes
 		if (logChanges) {
 			Changed(flags, B_PARTITION_CHANGED_DEFRAGMENTATION
-						   | B_PARTITION_CHANGED_CHECK
-						   | B_PARTITION_CHANGED_REPAIR);
+				| B_PARTITION_CHANGED_CHECK | B_PARTITION_CHANGED_REPAIR);
 		}
 	}
+
 	return B_OK;
 }
+
 
 // SetAlgorithmData
 void

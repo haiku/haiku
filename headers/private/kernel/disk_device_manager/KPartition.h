@@ -52,6 +52,7 @@ public:
 
 	void SetBusy(bool busy);
 	bool IsBusy() const;
+	bool IsBusy(bool includeDescendants);
 	bool CheckAndMarkBusy(bool includeDescendants);
 	void UnmarkBusy(bool includeDescendants);
 
