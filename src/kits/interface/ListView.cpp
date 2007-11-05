@@ -187,11 +187,19 @@ BListView::Archive(BMessage *archive, bool deep) const
 void
 BListView::Draw(BRect updateRect)
 {
-	for (int i = 0; i < CountItems(); i++) {
-		BRect itemFrame = ItemFrame(i);
+	int32 count = CountItems();
+	if (count == 0)
+		return;
+
+	BRect itemFrame(Bounds().left, 0, Bounds().right, -1);
+	for (int i = 0; i < count; i++) {
+		BListItem* item = ItemAt(i);
+		itemFrame.bottom = itemFrame.top + ceilf(item->Height()) - 1;
 
 		if (itemFrame.Intersects(updateRect))
-			DrawItem(((BListItem*)ItemAt(i)), itemFrame);
+			DrawItem(item, itemFrame);
+
+		itemFrame.top = itemFrame.bottom + 1;
 	}
 }
 
@@ -696,7 +704,7 @@ BListView::IndexOf(BPoint point) const
 
 	// TODO: somehow binary search, but items don't know their frame
 	for (int i = 0; i < fList.CountItems(); i++) {
-		y += ItemAt(i)->Height();
+		y += ceilf(ItemAt(i)->Height());
 
 		if (point.y < y)
 			return i;
@@ -1010,7 +1018,7 @@ BListView::FrameMoved(BPoint new_position)
 BRect
 BListView::ItemFrame(int32 index)
 {
-	BRect frame(0, 0, Bounds().Width(), -1);
+	BRect frame(Bounds().left, 0, Bounds().right, -1);
 
 	if (index < 0 || index >= CountItems())
 		return frame;
@@ -1018,7 +1026,7 @@ BListView::ItemFrame(int32 index)
 	// TODO: this is very expensive, the (last) offsets could be cached
 	for (int32 i = 0; i <= index; i++) {
 		frame.top = frame.bottom + 1;
-		frame.bottom += (float)ceil(ItemAt(i)->Height());
+		frame.bottom = frame.top + ceilf(ItemAt(i)->Height()) - 1;
 	}
 
 	return frame;
@@ -1200,9 +1208,8 @@ BListView::_FixupScrollBar()
 	int32 count = CountItems();
 
 	float itemHeight = 0;
-	for (int32 i = 0; BListItem* item = ItemAt(i); i++) {
-		itemHeight += item->Height();
-	}
+	for (int32 i = 0; i < count; i++)
+		itemHeight += ceilf(ItemAt(i)->Height());
 
 	if (bounds.Height() > itemHeight) {
 		// no scrolling
@@ -1218,10 +1225,8 @@ BListView::_FixupScrollBar()
 		}
 	}
 
-	if (count != 0) {
-		vertScroller->SetSteps((float)ceil(FirstItem()->Height()),
-			bounds.Height());
-	}
+	if (count != 0)
+		vertScroller->SetSteps(ceilf(FirstItem()->Height()), bounds.Height());
 }
 
 // _InvalidateFrom
