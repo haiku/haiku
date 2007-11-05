@@ -190,11 +190,9 @@ KDiskSystem::FreeContentCookie(KPartition *partition)
 }
 
 
-#if 0
-
 // Defragment
 status_t
-KDiskSystem::Defragment(KPartition *partition, KDiskDeviceJob *job)
+KDiskSystem::Defragment(KPartition* partition, disk_job_id job)
 {
 	// to be implemented by derived classes
 	return B_ERROR;
@@ -203,8 +201,7 @@ KDiskSystem::Defragment(KPartition *partition, KDiskDeviceJob *job)
 
 // Repair
 status_t
-KDiskSystem::Repair(KPartition *partition, bool checkOnly,
-					KDiskDeviceJob *job)
+KDiskSystem::Repair(KPartition* partition, bool checkOnly, disk_job_id job)
 {
 	// to be implemented by derived classes
 	return B_ERROR;
@@ -213,7 +210,7 @@ KDiskSystem::Repair(KPartition *partition, bool checkOnly,
 
 // Resize
 status_t
-KDiskSystem::Resize(KPartition *partition, off_t size, KDiskDeviceJob *job)
+KDiskSystem::Resize(KPartition* partition, off_t size, disk_job_id job)
 {
 	// to be implemented by derived classes
 	return B_ERROR;
@@ -222,7 +219,7 @@ KDiskSystem::Resize(KPartition *partition, off_t size, KDiskDeviceJob *job)
 
 // ResizeChild
 status_t
-KDiskSystem::ResizeChild(KPartition *child, off_t size, KDiskDeviceJob *job)
+KDiskSystem::ResizeChild(KPartition* child, off_t size, disk_job_id job)
 {
 	// to be implemented by derived classes
 	return B_ERROR;
@@ -231,7 +228,7 @@ KDiskSystem::ResizeChild(KPartition *child, off_t size, KDiskDeviceJob *job)
 
 // Move
 status_t
-KDiskSystem::Move(KPartition *partition, off_t offset, KDiskDeviceJob *job)
+KDiskSystem::Move(KPartition* partition, off_t offset, disk_job_id job)
 {
 	// to be implemented by derived classes
 	return B_ERROR;
@@ -240,7 +237,7 @@ KDiskSystem::Move(KPartition *partition, off_t offset, KDiskDeviceJob *job)
 
 // MoveChild
 status_t
-KDiskSystem::MoveChild(KPartition *child, off_t offset, KDiskDeviceJob *job)
+KDiskSystem::MoveChild(KPartition* child, off_t offset, disk_job_id job)
 {
 	// to be implemented by derived classes
 	return B_ERROR;
@@ -249,7 +246,7 @@ KDiskSystem::MoveChild(KPartition *child, off_t offset, KDiskDeviceJob *job)
 
 // SetName
 status_t
-KDiskSystem::SetName(KPartition *partition, char *name, KDiskDeviceJob *job)
+KDiskSystem::SetName(KPartition* partition, const char* name, disk_job_id job)
 {
 	// to be implemented by derived classes
 	return B_ERROR;
@@ -258,8 +255,8 @@ KDiskSystem::SetName(KPartition *partition, char *name, KDiskDeviceJob *job)
 
 // SetContentName
 status_t
-KDiskSystem::SetContentName(KPartition *partition, char *name,
-							KDiskDeviceJob *job)
+KDiskSystem::SetContentName(KPartition* partition, const char* name,
+	disk_job_id job)
 {
 	// to be implemented by derived classes
 	return B_ERROR;
@@ -268,7 +265,7 @@ KDiskSystem::SetContentName(KPartition *partition, char *name,
 
 // SetType
 status_t
-KDiskSystem::SetType(KPartition *partition, char *type, KDiskDeviceJob *job)
+KDiskSystem::SetType(KPartition* partition, const char *type, disk_job_id job)
 {
 	// to be implemented by derived classes
 	return B_ERROR;
@@ -277,8 +274,8 @@ KDiskSystem::SetType(KPartition *partition, char *type, KDiskDeviceJob *job)
 
 // SetParameters
 status_t
-KDiskSystem::SetParameters(KPartition *partition, const char *parameters,
-						   KDiskDeviceJob *job)
+KDiskSystem::SetParameters(KPartition* partition, const char* parameters,
+	disk_job_id job)
 {
 	// to be implemented by derived classes
 	return B_ERROR;
@@ -287,8 +284,8 @@ KDiskSystem::SetParameters(KPartition *partition, const char *parameters,
 
 // SetContentParameters
 status_t
-KDiskSystem::SetContentParameters(KPartition *partition,
-								  const char *parameters, KDiskDeviceJob *job)
+KDiskSystem::SetContentParameters(KPartition* partition,
+	const char* parameters, disk_job_id job)
 {
 	// to be implemented by derived classes
 	return B_ERROR;
@@ -297,8 +294,8 @@ KDiskSystem::SetContentParameters(KPartition *partition,
 
 // Initialize
 status_t
-KDiskSystem::Initialize(KPartition *partition, const char *name,
-						const char *parameters, KDiskDeviceJob *job)
+KDiskSystem::Initialize(KPartition* partition, const char* name,
+	const char* parameters, disk_job_id job)
 {
 	// to be implemented by derived classes
 	return B_ERROR;
@@ -307,10 +304,9 @@ KDiskSystem::Initialize(KPartition *partition, const char *name,
 
 // CreateChild
 status_t
-KDiskSystem::CreateChild(KPartition *partition, off_t offset, off_t size,
-						 const char *type, const char *parameters,
-						 KDiskDeviceJob *job, KPartition **child,
-						 partition_id childID)
+KDiskSystem::CreateChild(KPartition* partition, off_t offset, off_t size,
+	const char* type, const char* name, const char* parameters, disk_job_id job,
+	KPartition **child, partition_id childID)
 {
 	// to be implemented by derived classes
 	return B_ERROR;
@@ -319,13 +315,11 @@ KDiskSystem::CreateChild(KPartition *partition, off_t offset, off_t size,
 
 // DeleteChild
 status_t
-KDiskSystem::DeleteChild(KPartition *child, KDiskDeviceJob *job)
+KDiskSystem::DeleteChild(KPartition* child, disk_job_id job)
 {
 	// to be implemented by derived classes
 	return B_ERROR;
 }
-
-#endif	// 0
 
 
 // LoadModule

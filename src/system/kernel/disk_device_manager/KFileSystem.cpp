@@ -97,11 +97,9 @@ KFileSystem::FreeContentCookie(KPartition *partition)
 }
 
 
-#if 0
-
 // Defragment
 status_t
-KFileSystem::Defragment(KPartition *partition, KDiskDeviceJob *job)
+KFileSystem::Defragment(KPartition* partition, disk_job_id job)
 {
 	// to be implemented
 	return B_ERROR;
@@ -110,7 +108,7 @@ KFileSystem::Defragment(KPartition *partition, KDiskDeviceJob *job)
 
 // Repair
 status_t
-KFileSystem::Repair(KPartition *partition, bool checkOnly, KDiskDeviceJob *job)
+KFileSystem::Repair(KPartition* partition, bool checkOnly, disk_job_id job)
 {
 	// to be implemented
 	return B_ERROR;
@@ -119,7 +117,7 @@ KFileSystem::Repair(KPartition *partition, bool checkOnly, KDiskDeviceJob *job)
 
 // Resize
 status_t
-KFileSystem::Resize(KPartition *partition, off_t size, KDiskDeviceJob *job)
+KFileSystem::Resize(KPartition* partition, off_t size, disk_job_id job)
 {
 	// to be implemented
 	return B_ERROR;
@@ -128,7 +126,7 @@ KFileSystem::Resize(KPartition *partition, off_t size, KDiskDeviceJob *job)
 
 // Move
 status_t
-KFileSystem::Move(KPartition *partition, off_t offset, KDiskDeviceJob *job)
+KFileSystem::Move(KPartition* partition, off_t offset, disk_job_id job)
 {
 	// to be implemented
 	return B_ERROR;
@@ -137,57 +135,49 @@ KFileSystem::Move(KPartition *partition, off_t offset, KDiskDeviceJob *job)
 
 // SetContentName
 status_t
-KFileSystem::SetContentName(KPartition *partition, char *name,
-							KDiskDeviceJob *job)
+KFileSystem::SetContentName(KPartition* partition, const char* name,
+	disk_job_id job)
 {
 	// to be implemented
 	return B_ERROR;
 }
 
 
+// SetContentParameters
 status_t
-KFileSystem::SetContentParameters(KPartition *partition,
-	const char *parameters, KDiskDeviceJob *job)
+KFileSystem::SetContentParameters(KPartition* partition,
+	const char* parameters, disk_job_id job)
 {
 	// to be implemented
 	return B_ERROR;
 }
 
 
+// Initialize
 status_t
-KFileSystem::Initialize(KPartition *partition, const char *name,
-	const char *parameters, KDiskDeviceJob *job)
+KFileSystem::Initialize(KPartition* partition, const char* name,
+	const char* parameters, disk_job_id job)
 {
 	// check parameters
-	if (!partition || !job || !fModule)
+	if (!partition || !fModule)
 		return B_BAD_VALUE;
 	if (!fModule->initialize)
 		return B_NOT_SUPPORTED;
 
-	// open partition device (we need a temporary read-lock)
-	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	if (!manager->ReadLockPartition(partition->ID()))
-		return B_ERROR;
-	DeviceReadLocker locker(partition->Device(), true);
-
+	// open partition device
 	int fd = -1;
 	status_t result = partition->Open(O_RDWR, &fd);
 	if (result != B_OK)
 		return result;
 
-	off_t partitionSize = partition->Size();
-
-	locker.Unlock();
-
-	// call the module hook
+	// let the module do its job
 	result = fModule->initialize(fd, partition->ID(), name, parameters,
-		partitionSize, job->ID());
+		partition->Size(), job);
 
+	// cleanup and return
 	close(fd);
 	return result;
 }
-
-#endif	// 0
 
 
 // LoadModule
