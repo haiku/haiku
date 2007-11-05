@@ -20,8 +20,7 @@
 device_manager_info *gDeviceManager;
 
 
-device_info sSupportedDevices[] =
-{
+const device_info kSupportedDevices[] = {
 	{ 0x1002, 0x4380, "ATI SB600" },
 	{ 0x1002, 0x4390, "ATI SB700/800" },
 	{ 0x1002, 0x4391, "ATI IXP700" },
@@ -92,6 +91,7 @@ device_info sSupportedDevices[] =
 	{ 0x8086, 0x2683, "Intel ESB2" },
 	{ 0x8086, 0x27c1, "Intel ICH7R (AHCI mode)" },
 	{ 0x8086, 0x27c3, "Intel ICH7R (RAID mode)" },
+	{ 0x8086, 0x27c4, "Intel ICH7 (AHCI mode)" },
 	{ 0x8086, 0x27c5, "Intel ICH7-M (AHCI mode)" },
 	{ 0x8086, 0x27c6, "Intel ICH7-M DH (RAID mode)" },
 	{ 0x8086, 0x2821, "Intel ICH8 (AHCI mode)" },
@@ -116,10 +116,11 @@ device_info sSupportedDevices[] =
 
 
 status_t
-get_device_info(uint16 vendorID, uint16 deviceID, const char **name, uint32 *flags)
+get_device_info(uint16 vendorID, uint16 deviceID, const char **name,
+	uint32 *flags)
 {
-	device_info *info;
-	for (info = sSupportedDevices; info->vendor; info++) {
+	const device_info *info;
+	for (info = kSupportedDevices; info->vendor; info++) {
 		if (info->vendor == vendorID && info->device == deviceID) {
 			if (name)
 				*name = info->name;
@@ -169,6 +170,7 @@ register_sim(device_node_handle parent)
 
 
 //	#pragma mark -
+
 
 static float
 ahci_supports_device(device_node_handle parent, bool *_noConnection)
