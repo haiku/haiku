@@ -368,7 +368,7 @@ atapi_transform(usb_device_info *udi, uint8 *cmd, uint8 len, uint8 **rcmd,
 		case MODE_SENSE_6:
 		case MODE_SELECT_6:
 			// TODO: not transform_cmd_*()?
-			transform_6_to_10(cmd, len, rcmd, rlen))
+			transform_6_to_10(cmd, len, rcmd, rlen);
 			break;
 		case TEST_UNIT_READY:
 			if (transform_cmd_test_unit_ready(udi, cmd, len, rcmd, rlen))
