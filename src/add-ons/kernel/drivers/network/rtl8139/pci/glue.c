@@ -2,7 +2,7 @@
 
 #include <pci/if_rlreg.h>
 
-HAIKU_FBSD_DRIVER_GLUE(rtl8139exp, rl, pci);
+HAIKU_FBSD_DRIVER_GLUE(rtl8139, rl, pci);
 HAIKU_DRIVER_REQUIREMENTS(0);
 
 extern driver_t *DRIVER_MODULE_NAME(rlphy, miibus);

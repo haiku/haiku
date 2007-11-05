@@ -7,7 +7,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : tr
 
 SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
 
-KernelStaticLibrary rtl8139exp_mii.a
+KernelStaticLibrary rtl8139_mii.a
 	: rlphy.c
 	;
 
