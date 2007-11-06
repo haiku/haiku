@@ -7,6 +7,7 @@ SubInclude HAIKU_TOP src tests system libroot posix posixtestsuite conformance i
 SubInclude HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces pthread_key_delete ;
 SubInclude HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces pthread_getspecific ;
 SubInclude HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces pthread_setspecific ;
+SubInclude HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces sighold ;
 SubInclude HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces sigignore ;
 SubInclude HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces sigprocmask ;
 SubInclude HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces signal ;
