@@ -89,8 +89,13 @@ driver_t *__haiku_probe_miibus(device_t dev, driver_t *drivers[], int count);
 
 #define HAIKU_FBSD_MII_DRIVER(name)								\
 	extern driver_t *DRIVER_MODULE_NAME(name, miibus);			\
-	HAIKU_FBSD_RETURN_MII_DRIVER(								\
-		&DRIVER_MODULE_NAME(name, miibus), 1)
+	driver_t *__haiku_select_miibus_driver(device_t dev)		\
+	{															\
+		driver_t *drivers[] = {									\
+			DRIVER_MODULE_NAME(name, miibus)					\
+		};														\
+		return __haiku_probe_miibus(dev, drivers, 1);			\
+	}
 
 #define NO_HAIKU_FBSD_MII_DRIVER()								\
 	HAIKU_FBSD_RETURN_MII_DRIVER(NULL, 0)
