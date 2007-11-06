@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2002-04, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -11,7 +11,7 @@
 	IDE adapter library
 
 	Module to simplify writing an IDE adapter driver.
-	
+
 	The interface is not very abstract, i.e. the actual driver is
 	free to access any controller or channel data of this library.
 */
@@ -36,47 +36,33 @@ typedef struct prd_entry {
 	);
 } prd_entry;
 
+// IDE bus master command register
+#define IDE_BM_COMMAND_START_STOP		0x01
+#define IDE_BM_COMMAND_READ_FROM_DEVICE	0x08
 
-// command register
-typedef struct ide_bm_command {
-	LBITFIELD8_4(
-		start_stop	: 1,		// start BM by changing from 0 to 1; 
-								// stop BM by changing from 1 to 0
-		res0_1		: 2,
-		from_device	: 1,		// true - read from device, false - write to device
-		res0_4		: 4
-	);
-} ide_bm_command;
-
-
-// status register
-typedef struct ide_bm_status {
-	LBITFIELD8_7(
-		active		: 1,		// 1, if BM is active
-		error		: 1,		// 1, if error occured; write 1 to reset
-		interrupt	: 1,		// 1, if INTRQ was raised, write 1 to reset
-		res0_3		: 2,
-		device0_dma	: 1,		// 1, if BIOS/driver has setup DMA for device 0
-		device1_dma	: 1,		// 1, if BIOS/driver has setup DMA for device 1
-		simplex		: 1			// 1, if only one channel can use DMA at a time
-	);
-} ide_bm_status;
-
+// IDE bus master status register
+#define IDE_BM_STATUS_ACTIVE		0x01
+#define IDE_BM_STATUS_ERROR			0x02
+#define IDE_BM_STATUS_INTERRUPT		0x04
+#define IDE_BM_STATUS_MASTER_DMA	0x20
+#define IDE_BM_STATUS_SLAVE_DMA		0x40
+#define IDE_BM_STATUS_SIMPLEX_DMA	0x80
 
 // offset of bus master registers
 enum {
-	ide_bm_command_reg	= 0,	// see ide_bm_command
-	ide_bm_status_reg	= 2,	// see ide_bm_status
-	ide_bm_prdt_address	= 4		// offset of PRDT register; content must be dword-aligned
+	IDE_BM_COMMAND_REG	= 0,
+	IDE_BM_STATUS_REG	= 2,
+	IDE_BM_PRDT_ADDRESS	= 4
+		// offset of PRDT register; content must be dword-aligned
 };
 
 // bit mask in class_api of PCI configuration
 // (for adapters that can run in compatability mode)
 enum {
-	ide_api_primary_native		= 1,	// primary channel is in native mode
-	ide_api_primary_fixed		= 2,	// primary channel can be switched to native mode
-	ide_api_secondary_native	= 4,	// secondary channel is in native mode
-	ide_api_secondary_fixed		= 8		// secondary channel can be switched to native mode
+	IDE_API_PRIMARY_NATIVE		= 1,	// primary channel is in native mode
+	IDE_API_PRIMARY_FIXED		= 2,	// primary channel can be switched to native mode
+	IDE_API_SECONDARY_NATIVE	= 4,	// secondary channel is in native mode
+	IDE_API_SECONDARY_FIXED		= 8		// secondary channel can be switched to native mode
 };
 
 

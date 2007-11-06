@@ -180,10 +180,9 @@ ide_adapter_inthand(void *arg)
 	ide_adapter_channel_info *channel = (ide_adapter_channel_info *)arg;
 	pci_device_module_info *pci = channel->pci;
 	pci_device device = channel->device;
-	ide_bm_status bm_status;
 	uint8 status;
 
-	SHOW_FLOW0( 3, "" );
+	SHOW_FLOW0(3, "");
 
 	if (channel->lost)
 		return B_UNHANDLED_INTERRUPT;
@@ -192,10 +191,9 @@ ide_adapter_inthand(void *arg)
 	if (channel->dmaing) {
 		// in DMA mode, there is a safe test
 		// in PIO mode, this don't work
-		*(uint8 *)&bm_status = pci->read_io_8(device, 
-			channel->bus_master_base + ide_bm_status_reg);
-
-		if (!bm_status.interrupt)
+		status = pci->read_io_8(device, channel->bus_master_base
+			+ IDE_BM_STATUS_REG);
+		if ((status & IDE_BM_STATUS_INTERRUPT) == 0)
 			return B_UNHANDLED_INTERRUPT;
 	}
 
@@ -207,47 +205,45 @@ ide_adapter_inthand(void *arg)
 
 
 static status_t
-ide_adapter_prepare_dma(ide_adapter_channel_info *channel, const physical_entry *sg_list,
-	size_t sg_list_count, bool to_device)
+ide_adapter_prepare_dma(ide_adapter_channel_info *channel,
+	const physical_entry *sgList, size_t sgListCount, bool writeToDevice)
 {
 	pci_device_module_info *pci = channel->pci;
 	pci_device device = channel->device;
-	ide_bm_command command;
-	ide_bm_status status;
+	uint8 command;
+	uint8 status;
 	prd_entry *prd = channel->prdt;
 	int i;
 
-	for (i = sg_list_count - 1, prd = channel->prdt; i >= 0; --i, ++prd, ++sg_list) {
-		prd->address = B_HOST_TO_LENDIAN_INT32(pci->ram_address(device, sg_list->address));
+	for (i = sgListCount - 1, prd = channel->prdt; i >= 0; --i, ++prd, ++sgList) {
+		prd->address = B_HOST_TO_LENDIAN_INT32(pci->ram_address(device, sgList->address));
 		// 0 means 64K - this is done automatically be discarding upper 16 bits
-		prd->count = B_HOST_TO_LENDIAN_INT16((uint16)sg_list->size);
+		prd->count = B_HOST_TO_LENDIAN_INT16((uint16)sgList->size);
 		prd->EOT = i == 0;
 
 		SHOW_FLOW( 4, "%x, %x, %d", (int)prd->address, prd->count, prd->EOT);
 	}
 
-	pci->write_io_32(device, channel->bus_master_base + ide_bm_prdt_address, 
-		(pci->read_io_32(device, channel->bus_master_base + ide_bm_prdt_address) & 3)
+	pci->write_io_32(device, channel->bus_master_base + IDE_BM_PRDT_ADDRESS, 
+		(pci->read_io_32(device, channel->bus_master_base + IDE_BM_PRDT_ADDRESS) & 3)
 		| (B_HOST_TO_LENDIAN_INT32(pci->ram_address(device, (void *)channel->prdt_phys)) & ~3));
 
 	// reset interrupt and error signal
-	*(uint8 *)&status = pci->read_io_8(device, 
-		channel->bus_master_base + ide_bm_status_reg);
-
-	status.interrupt = 1;
-	status.error = 1;
-
+	status = pci->read_io_8(device, channel->bus_master_base
+		+ IDE_BM_STATUS_REG) | IDE_BM_STATUS_INTERRUPT | IDE_BM_STATUS_ERROR;
 	pci->write_io_8(device, 
-		channel->bus_master_base + ide_bm_status_reg, *(uint8 *)&status);
+		channel->bus_master_base + IDE_BM_STATUS_REG, status);
 
 	// set data direction
-	*(uint8 *)&command = pci->read_io_8(device,
-		channel->bus_master_base + ide_bm_command_reg);
+	command = pci->read_io_8(device, channel->bus_master_base
+		+ IDE_BM_COMMAND_REG);
+	if (writeToDevice)
+		command &= ~IDE_BM_COMMAND_READ_FROM_DEVICE;
+	else
+		command |= IDE_BM_COMMAND_READ_FROM_DEVICE;
 
-	command.from_device = !to_device;
-
-	pci->write_io_8(device, 
-		channel->bus_master_base + ide_bm_command_reg, *(uint8 *)&command);
+	pci->write_io_8(device, channel->bus_master_base + IDE_BM_COMMAND_REG,
+		command);
 
 	return B_OK;
 }
@@ -258,14 +254,16 @@ ide_adapter_start_dma(ide_adapter_channel_info *channel)
 {
 	pci_device_module_info *pci = channel->pci;
 	pci_device device = channel->device;
-	ide_bm_command command;
+	uint8 command;
 
-	*(uint8 *)&command = pci->read_io_8(device, channel->bus_master_base + ide_bm_command_reg);
+	command = pci->read_io_8(device, channel->bus_master_base
+		+ IDE_BM_COMMAND_REG);
 
-	command.start_stop = 1;
+	command |= IDE_BM_COMMAND_START_STOP;
 	channel->dmaing = true;
 
-	pci->write_io_8(device, channel->bus_master_base + ide_bm_command_reg, *(uint8 *)&command);
+	pci->write_io_8(device, channel->bus_master_base + IDE_BM_COMMAND_REG,
+		command);
 
 	return B_OK;
 }
@@ -276,30 +274,31 @@ ide_adapter_finish_dma(ide_adapter_channel_info *channel)
 {
 	pci_device_module_info *pci = channel->pci;
 	pci_device device = channel->device;
-	ide_bm_command command;
-	ide_bm_status status, new_status;
+	uint8 command;
+	uint8 status, newStatus;
 
-	*(uint8 *)&command = pci->read_io_8(device, channel->bus_master_base + ide_bm_command_reg);
+	command = pci->read_io_8(device, channel->bus_master_base
+		+ IDE_BM_COMMAND_REG);
 
-	command.start_stop = 0;
+	command &= ~IDE_BM_COMMAND_START_STOP;
 	channel->dmaing = false;
 
-	pci->write_io_8(device, channel->bus_master_base + ide_bm_command_reg, *(uint8 *)&command);
+	pci->write_io_8(device, channel->bus_master_base + IDE_BM_COMMAND_REG,
+		command);
 
-	*(uint8 *)&status = pci->read_io_8(device, channel->bus_master_base + ide_bm_status_reg);
+	status = pci->read_io_8(device, channel->bus_master_base
+		+ IDE_BM_STATUS_REG);
 
-	new_status = status;
-	new_status.interrupt = 1;
-	new_status.error = 1;
+	// reset interrupt/error flags
+	newStatus = status | IDE_BM_STATUS_INTERRUPT | IDE_BM_STATUS_ERROR;
+	pci->write_io_8(device, channel->bus_master_base + IDE_BM_STATUS_REG,
+		newStatus);
 
-	pci->write_io_8(device, channel->bus_master_base + ide_bm_status_reg,
-		*(uint8 *)&new_status);
-	
-	if (status.error)
+	if ((status & IDE_BM_STATUS_ERROR) != 0)
 		return B_ERROR;
 
-	if (!status.interrupt) {
-		if (status.active) {
+	if ((status & IDE_BM_STATUS_INTERRUPT) == 0) {
+		if ((status & IDE_BM_STATUS_ACTIVE) != 0) {
 			SHOW_ERROR0( 2, "DMA transfer aborted" );
 			return B_ERROR;
 		}
@@ -308,7 +307,7 @@ ide_adapter_finish_dma(ide_adapter_channel_info *channel)
 		return B_DEV_DATA_UNDERRUN;
 	}
 
-	if (status.active) {
+	if ((status & IDE_BM_STATUS_ACTIVE) != 0) {
 		SHOW_ERROR0( 2, "DMA transfer: buffer too large" );
 		return B_DEV_DATA_OVERRUN;
 	}
@@ -473,7 +472,6 @@ ide_adapter_detect_channel(pci_device_module_info *pci, pci_device pci_device,
 	device_node_handle *node, bool supports_compatibility_mode)
 {
 	uint8 api;
-	ide_bm_status status;
 	io_resource_handle resource_handles[3];
 
 	SHOW_FLOW0( 3, "" );
@@ -482,12 +480,12 @@ ide_adapter_detect_channel(pci_device_module_info *pci, pci_device pci_device,
 	api = pci->read_pci_config(pci_device, PCI_class_api, 1);
 
 	if (supports_compatibility_mode
-		&& is_primary && (api & ide_api_primary_native) == 0) {
+		&& is_primary && (api & IDE_API_PRIMARY_NATIVE) == 0) {
 		command_block_base = 0x1f0;
 		control_block_base = 0x3f6;
 		intnum = 14;
 	} else if (supports_compatibility_mode
-		&& !is_primary && (api & ide_api_primary_native) == 0) {
+		&& !is_primary && (api & IDE_API_PRIMARY_NATIVE) == 0) {
 		command_block_base = 0x170;
 		control_block_base = 0x376;
 		intnum = 15;
@@ -509,9 +507,10 @@ ide_adapter_detect_channel(pci_device_module_info *pci, pci_device pci_device,
 
 	if (supports_compatibility_mode) {
 		// read status of primary(!) channel to detect simplex
-		*(uint8 *)&status = pci->read_io_8(pci_device, bus_master_base + ide_bm_status_reg);
+		uint8 status = pci->read_io_8(pci_device, bus_master_base
+			+ IDE_BM_STATUS_REG);
 
-		if (status.simplex && !is_primary) {
+		if (status & IDE_BM_STATUS_SIMPLEX_DMA && !is_primary) {
 			// in simplex mode, channels cannot operate independantly of each other;
 			// we simply disable bus mastering of second channel to satisfy that;
 			// better were to use a controller lock, but this had to be done in the IDE
@@ -588,9 +587,10 @@ ide_adapter_uninit_controller(ide_adapter_controller_info *controller)
 
 
 static void
-ide_adapter_controller_removed(device_node_handle node, ide_adapter_controller_info *controller)
+ide_adapter_controller_removed(device_node_handle node,
+	ide_adapter_controller_info *controller)
 {
-	SHOW_FLOW0( 3, "" );
+	SHOW_FLOW0(3, "");
 
 	if (controller != NULL)
 		// disable access instantly; unit_device takes care of unregistering ioports
