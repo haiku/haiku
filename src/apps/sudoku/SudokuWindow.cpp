@@ -37,6 +37,8 @@ const uint32 kMsgAbortSudokuGenerator = 'asgn';
 const uint32 kMsgSudokuGenerated = 'sugn';
 const uint32 kMsgMarkInvalid = 'minv';
 const uint32 kMsgMarkValidHints = 'mvht';
+const uint32 kMsgStoreState = 'stst';
+const uint32 kMsgRestoreState = 'rest';
 const uint32 kMsgNew = 'new ';
 const uint32 kMsgStartAgain = 'stag';
 const uint32 kMsgExportAsText = 'extx';
@@ -133,7 +135,8 @@ GenerateSudoku::_GenerateThread(void* _self)
 SudokuWindow::SudokuWindow()
 	: BWindow(BRect(100, 100, 500, 520), "Sudoku", B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS),
-	fGenerator(NULL)
+	fGenerator(NULL),
+	fStoredState(NULL)
 {
 	BMessage settings;
 	_LoadSettings(settings);
@@ -145,6 +148,14 @@ SudokuWindow::SudokuWindow()
 		frame.OffsetTo(B_ORIGIN);
 	} else
 		frame = Bounds();
+
+	if (settings.HasMessage("stored state")) {
+		fStoredState = new BMessage;
+		if (settings.FindMessage("stored state", fStoredState) != B_OK) {
+			delete fStoredState;
+			fStoredState = NULL;
+		}
+	}
 
 	// create GUI
 
@@ -167,6 +178,7 @@ SudokuWindow::SudokuWindow()
 
 	// add menu
 
+	// "File" menu
 	BMenu* menu = new BMenu("File");
 	menu->AddItem(new BMenuItem("New", new BMessage(kMsgNew)));
 	menu->AddItem(new BMenuItem("Start Again", new BMessage(kMsgStartAgain)));
@@ -204,6 +216,7 @@ SudokuWindow::SudokuWindow()
 	item->SetTarget(be_app);
 	menuBar->AddItem(menu);
 
+	// "View" menu
 	menu = new BMenu("View");
 	menu->AddItem(item = new BMenuItem("Mark Invalid Values",
 		new BMessage(kMsgMarkInvalid)));
@@ -216,7 +229,14 @@ SudokuWindow::SudokuWindow()
 	menu->SetTargetForItems(this);
 	menuBar->AddItem(menu);
 
+	// "Help" menu
 	menu = new BMenu("Help");
+	menu->AddItem(new BMenuItem("Store Current", new BMessage(kMsgStoreState)));
+	menu->AddItem(fRestoreStateItem = new BMenuItem("Restore Saved",
+		new BMessage(kMsgRestoreState)));
+	fRestoreStateItem->SetEnabled(fStoredState != NULL);
+	menu->AddSeparatorItem();
+
 	menu->AddItem(new BMenuItem("Solve", new BMessage(kMsgSolveSudoku)));
 	menu->AddItem(new BMenuItem("Solve Single Field",
 		new BMessage(kMsgSolveSingle)));
@@ -282,10 +302,21 @@ SudokuWindow::_SaveSettings()
 	status = settings.AddRect("window frame", Frame());
 	if (status == B_OK)
 		status = fSudokuView->SaveState(settings);
+	if (status == B_OK && fStoredState != NULL)
+		status = settings.AddMessage("stored state", fStoredState);
 	if (status == B_OK)
 		status = settings.Flatten(&file);
 
 	return status;
+}
+
+
+void
+SudokuWindow::_ResetStoredState()
+{
+	delete fStoredState;
+	fStoredState = NULL;
+	fRestoreStateItem->SetEnabled(false);
 }
 
 
@@ -344,6 +375,8 @@ SudokuWindow::_Generate(int32 level)
 
 	fSudokuView->SetEditable(false);
 	fProgressWindow->Start(this);
+	_ResetStoredState();
+
 	fGenerator = new GenerateSudoku(*fSudokuView->Field(), level,
 		fProgressWindow, this);
 }
@@ -417,6 +450,7 @@ SudokuWindow::MessageReceived(BMessage* message)
 		}
 
 		case kMsgNew:
+			_ResetStoredState();
 			fSudokuView->ClearAll();
 			break;
 
@@ -439,6 +473,23 @@ SudokuWindow::MessageReceived(BMessage* message)
 				fSudokuView->SetHintFlags(fSudokuView->HintFlags() | flag);
 			else
 				fSudokuView->SetHintFlags(fSudokuView->HintFlags() & ~flag);
+			break;
+		}
+
+		case kMsgStoreState:
+			delete fStoredState;
+			fStoredState = new BMessage;
+			fSudokuView->Field()->Archive(fStoredState, true);
+			fRestoreStateItem->SetEnabled(true);
+			break;
+
+		case kMsgRestoreState:
+		{
+			if (fStoredState == NULL)
+				break;
+
+			SudokuField* field = new SudokuField(fStoredState);
+			fSudokuView->SetTo(field);
 			break;
 		}
 

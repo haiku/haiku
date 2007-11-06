@@ -10,6 +10,7 @@
 
 class BFile;
 class BFilePanel;
+class BMenuItem;
 class GenerateSudoku;
 class ProgressWindow;
 class SudokuView;
@@ -28,6 +29,7 @@ private:
 	status_t _LoadSettings(BMessage& settings);
 	status_t _SaveSettings();
 
+	void _ResetStoredState();
 	void _MessageDropped(BMessage *message);
 	void _Generate(int32 level);
 
@@ -36,6 +38,8 @@ private:
 	ProgressWindow*	fProgressWindow;
 	SudokuView*		fSudokuView;
 	GenerateSudoku*	fGenerator;
+	BMenuItem*		fRestoreStateItem;
+	BMessage*		fStoredState;
 };
 
 #endif	// SUDOKU_WINDOW_H
