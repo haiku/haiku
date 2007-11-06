@@ -607,13 +607,15 @@ BackgroundsView::Save()
 						fCurrentInfo = NULL;
 					}
 				}
-			} else if (fLastImageIndex > -1) {
+			} else {
 				fCurrent->RemoveAll();
-				fCurrentInfo = new BackgroundImage::BackgroundImageInfo(
-					B_ALL_WORKSPACES, fLastImageIndex, mode, offset,
-					textWidgetLabelOutline, fCurrent->GetShowingImageSet(),
-					fCurrentInfo->fCacheMode);
-				fCurrent->Add(fCurrentInfo);
+				if (fLastImageIndex > -1) {
+					fCurrentInfo = new BackgroundImage::BackgroundImageInfo(
+						B_ALL_WORKSPACES, fLastImageIndex, mode, offset,
+						textWidgetLabelOutline, fCurrent->GetShowingImageSet(),
+						fCurrentInfo->fCacheMode);
+					fCurrent->Add(fCurrentInfo);
+				}
 			}
 		} else if (fLastImageIndex > -1) {
 			if (fWorkspaceMenu->FindItem(kMsgCurrentWorkspace)->IsMarked()) {
