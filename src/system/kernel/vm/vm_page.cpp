@@ -37,6 +37,10 @@
 #	define TRACE(x) ;
 #endif
 
+//#define TRACK_PAGE_ALLOCATIONS 1
+	// [Debugging feature] Enables a small history of page allocation operations
+	// that can be listed in KDL via "page_allocations".
+
 #define SCRUB_SIZE 16
 	// this many pages will be cleared at once in the page scrubber thread
 
@@ -62,6 +66,114 @@ static ConditionVariable<page_queue> sFreePageCondition;
 static spinlock sPageLock;
 
 static sem_id sWriterWaitSem;
+
+
+#if TRACK_PAGE_ALLOCATIONS
+
+
+enum {
+	NO_PAGE_OPERATION = 0,
+	RESERVE_PAGES,
+	UNRESERVE_PAGES,
+	ALLOCATE_PAGE,
+	ALLOCATE_PAGE_RUN,
+	FREE_PAGE,
+	SCRUBBING_PAGES,
+	SCRUBBED_PAGES,
+	STOLEN_PAGE
+};
+
+
+struct allocation_history_entry {
+	bigtime_t	time;
+	thread_id	thread;
+	uint32		operation;
+	uint32		count;
+	uint32		flags;
+	uint32		free;
+	uint32		reserved;
+};
+
+
+static const int kAllocationHistoryCapacity = 512;
+static allocation_history_entry sAllocationHistory[kAllocationHistoryCapacity];
+static int kAllocationHistoryIndex = 0;
+
+
+/*!	sPageLock must be held.
+*/
+static void
+add_allocation_history_entry(uint32 operation, uint32 count, uint32 flags)
+{
+	allocation_history_entry& entry
+		= sAllocationHistory[kAllocationHistoryIndex];
+	kAllocationHistoryIndex = (kAllocationHistoryIndex + 1)
+		% kAllocationHistoryCapacity;
+
+	entry.time = system_time();
+	entry.thread = find_thread(NULL);
+	entry.operation = operation;
+	entry.count = count;
+	entry.flags = flags;
+	entry.free = sFreePageQueue.count + sClearPageQueue.count;
+	entry.reserved = sReservedPages;
+}
+
+
+static int
+dump_page_allocations(int argc, char **argv)
+{
+	kprintf("thread  operation  count  flags      free  reserved        time\n");
+	kprintf("---------------------------------------------------------------\n");
+
+	for (int i = 0; i < kAllocationHistoryCapacity; i++) {
+		int index = (kAllocationHistoryIndex + i) % kAllocationHistoryCapacity;
+		allocation_history_entry& entry = sAllocationHistory[index];
+
+		const char* operation;
+		switch (entry.operation) {
+			case NO_PAGE_OPERATION:
+				operation = "no op";
+				break;
+			case RESERVE_PAGES:
+				operation = "reserve";
+				break;
+			case UNRESERVE_PAGES:
+				operation = "unreserve";
+				break;
+			case ALLOCATE_PAGE:
+				operation = "alloc";
+				break;
+			case ALLOCATE_PAGE_RUN:
+				operation = "alloc run";
+				break;
+			case FREE_PAGE:
+				operation = "free";
+				break;
+			case SCRUBBING_PAGES:
+				operation = "scrubbing";
+				break;
+			case SCRUBBED_PAGES:
+				operation = "scrubbed";
+				break;
+			case STOLEN_PAGE:
+				operation = "stolen";
+				break;
+			default:
+				operation = "invalid";
+				break;
+		}
+
+		kprintf("%6ld  %-9s  %5ld  %5lx  %8ld  %8ld  %10lld\n",
+			entry.thread, operation, entry.count, entry.flags, entry.free,
+			entry.reserved, entry.time);
+	}
+
+	return 0;
+}
+
+
+#endif	// TRACK_PAGE_ALLOCATIONS
 
 
 /*!	Dequeues a page from the head of the given queue */
@@ -548,6 +660,14 @@ set_page_state_nolock(vm_page *page, int pageState)
 			panic("to be freed page %p has cache", page);
 	}
 
+#if TRACK_PAGE_ALLOCATIONS
+	if ((pageState == PAGE_STATE_CLEAR || pageState == PAGE_STATE_FREE)
+		&& page->state != PAGE_STATE_CLEAR && page->state != PAGE_STATE_FREE) {
+		add_allocation_history_entry(FREE_PAGE, 1, 0);
+		
+	}
+#endif	// TRACK_PAGE_ALLOCATIONS
+
 	page->state = pageState;
 	move_page_to_queue(fromQueue, toQueue, page);
 
@@ -614,19 +734,36 @@ page_scrubber(void *unused)
 			state = disable_interrupts();
 			acquire_spinlock(&sPageLock);
 
-			for (i = 0; i < SCRUB_SIZE; i++) {
+			// Since we temporarily remove pages from the free pages reserve,
+			// we must make sure we don't cause a violation of the page
+			// reservation warranty. The following is usually stricter than
+			// necessary, because we don't have information on how many of the
+			// reserved pages have already been allocated.
+			scrubCount = SCRUB_SIZE;
+			uint32 freeCount = free_page_queue_count();
+			if (freeCount < sReservedPages)
+				scrubCount = 0;
+			else if ((uint32)scrubCount > freeCount - sReservedPages)
+				scrubCount = freeCount - sReservedPages;
+
+			for (i = 0; i < scrubCount; i++) {
 				page[i] = dequeue_page(&sFreePageQueue);
 				if (page[i] == NULL)
 					break;
 				page[i]->state = PAGE_STATE_BUSY;
 			}
 
+			scrubCount = i;
+
+#if TRACK_PAGE_ALLOCATIONS
+			if (scrubCount > 0)
+				add_allocation_history_entry(SCRUBBING_PAGES, scrubCount, 0);
+#endif
+
 			release_spinlock(&sPageLock);
 			restore_interrupts(state);
 
 			// clear them
-
-			scrubCount = i;
 
 			for (i = 0; i < scrubCount; i++) {
 				clear_page(page[i]);
@@ -641,6 +778,11 @@ page_scrubber(void *unused)
 				page[i]->state = PAGE_STATE_CLEAR;
 				enqueue_page(&sClearPageQueue, page[i]);
 			}
+
+#if TRACK_PAGE_ALLOCATIONS
+			if (scrubCount > 0)
+				add_allocation_history_entry(SCRUBBED_PAGES, scrubCount, 0);
+#endif
 
 			release_spinlock(&sPageLock);
 			restore_interrupts(state);
@@ -978,6 +1120,10 @@ steal_pages(vm_page **pages, size_t count, bool reserve)
 					InterruptsSpinLocker _(sPageLock);
 					enqueue_page(&sFreePageQueue, page);
 					page->state = PAGE_STATE_FREE;
+
+#if TRACK_PAGE_ALLOCATIONS
+					add_allocation_history_entry(STOLEN_PAGE, 1, 0);
+#endif
 				} else if (stolen < maxCount) {
 					pages[stolen] = page;
 				}
@@ -1193,6 +1339,10 @@ vm_page_init_post_area(kernel_args *args)
 	add_debugger_command("page_queue", &dump_page_queue, "Dump page queue");
 	add_debugger_command("find_page", &find_page,
 		"Find out which queue a page is actually in");
+#if TRACK_PAGE_ALLOCATIONS
+	add_debugger_command("page_allocations", &dump_page_allocations,
+		"Dump page allocation history");
+#endif
 
 	return B_OK;
 }
@@ -1292,6 +1442,10 @@ vm_page_unreserve_pages(uint32 count)
 	InterruptsSpinLocker locker(sPageLock);
 	ASSERT(sReservedPages >= count);
 
+#if TRACK_PAGE_ALLOCATIONS
+	add_allocation_history_entry(UNRESERVE_PAGES, count, 0);
+#endif
+
 	sReservedPages -= count;
 
 	if (sPageDeficit > 0)
@@ -1311,6 +1465,10 @@ vm_page_reserve_pages(uint32 count)
 		return;
 
 	InterruptsSpinLocker locker(sPageLock);
+
+#if TRACK_PAGE_ALLOCATIONS
+	add_allocation_history_entry(RESERVE_PAGES, count, 0);
+#endif
 
 	sReservedPages += count;
 	size_t freePages = free_page_queue_count();
@@ -1346,6 +1504,10 @@ vm_page_allocate_page(int pageState, bool reserved)
 	}
 
 	InterruptsSpinLocker locker(sPageLock);
+
+#if TRACK_PAGE_ALLOCATIONS
+	add_allocation_history_entry(ALLOCATE_PAGE, 1, reserved ? 1 : 0);
+#endif
 
 	vm_page *page = NULL;
 	while (true) {
@@ -1463,6 +1625,10 @@ vm_page_allocate_page_run(int pageState, addr_t length)
 			start += i;
 		}
 	}
+
+#if TRACK_PAGE_ALLOCATIONS
+	add_allocation_history_entry(ALLOCATE_PAGE_RUN, length, 0);
+#endif
 
 	locker.Unlock();
 
