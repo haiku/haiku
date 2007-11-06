@@ -164,6 +164,7 @@ int 	sigaddset(sigset_t *set, int signo);
 int 	sigdelset(sigset_t *set, int signo);
 int 	sigismember(const sigset_t *set, int signo);
 int		sigignore(int signo);
+int		sighold(int signo);
 
 const char *strsignal(int sig);
 

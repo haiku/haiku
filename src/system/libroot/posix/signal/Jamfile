@@ -10,6 +10,7 @@ MergeObject posix_signal.o :
 	set_signal_stack.c
 	sigaction.c
 	sigaltstack.c
+	sighold.cpp
 	sigignore.cpp
 	signal.c
 	sigpending.c
