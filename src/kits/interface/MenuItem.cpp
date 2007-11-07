@@ -640,10 +640,6 @@ BMenuItem::SetSuper(BMenu *super)
 		debugger("Error - can't add menu or menu item to more than 1 container (either menu or menubar).");
 
 	if (fSubmenu != NULL) {
-		if (super)
-			super->fSubmenus++;
-		else if (fSuper)
-			fSuper->fSubmenus--;	
 		fSubmenu->fSuper = super;
 	}
 
@@ -715,8 +711,9 @@ BMenuItem::_DrawShortcutSymbol()
 	menu->GetFont(&font);
 	BPoint where = ContentLocation();
 	where.x = fBounds.right - font.Size();
-	if (menu->fSubmenus)
-		where.x -= fBounds.Height() - 4;
+	
+	if (fSubmenu)	
+		where.x -= fBounds.Height() - 3;
 
 	switch (fShortcutChar) {
 		case B_DOWN_ARROW:

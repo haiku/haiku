@@ -259,7 +259,7 @@ private:
 
 			LayoutData*		fLayoutData;
 
-			int32			fSubmenus;
+			int32			_reserved;
 
 			char			fTrigger;
 			bool			fResizeToFit;
