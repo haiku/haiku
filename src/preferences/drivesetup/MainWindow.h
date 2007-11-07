@@ -10,9 +10,9 @@
 #include <Window.h>
 
 
-class PosSettings;
-class BPartition;
 class BDiskDevice;
+class BPartition;
+class BMenu;
 class PartitionListView;
 
 
@@ -35,10 +35,13 @@ public:
 
 private:
 			void				_ScanDrives();
+			void				_ScanFileSystems();
 
 
 			BDiskDeviceRoster	fDDRoster;
 			PartitionListView*	fListView;
+
+			BMenu*				fInitMenu;
 };
 
 

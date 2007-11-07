@@ -95,6 +95,9 @@ enum {
 	MSG_MOUNT					= 'mnts',
 	MSG_UNMOUNT					= 'unmt',
 	MSG_FORMAT					= 'frmt',
+	MSG_CREATE_PRIMARY			= 'crpr',
+	MSG_CREATE_EXTENDED			= 'crex',
+	MSG_CREATE_LOGICAL			= 'crlg',
 	MSG_INITIALIZE				= 'init',
 	MSG_EJECT					= 'ejct',
 	MSG_SURFACE_TEST			= 'sfct',
@@ -120,8 +123,10 @@ MainWindow::MainWindow(BRect frame)
 
 	// Parition menu
 	menu = new BMenu("Partition");
-		BMenu* initMenu = new BMenu("Initialize");
-		menu->AddItem(initMenu);
+		BMenu* createMenu = new BMenu("Create");
+		menu->AddItem(createMenu);
+		fInitMenu = new BMenu("Initialize");
+		menu->AddItem(fInitMenu);
 		menu->AddSeparatorItem();
 		menu->AddItem(new BMenuItem("Mount", new BMessage(MSG_MOUNT), 'M'));
 		menu->AddItem(new BMenuItem("Unmount", new BMessage(MSG_UNMOUNT), 'U'));
@@ -132,23 +137,20 @@ MainWindow::MainWindow(BRect frame)
 
 	AddChild(rootMenu);
 
+	createMenu->AddItem(new BMenuItem("Primary",
+		new BMessage(MSG_CREATE_PRIMARY)));
+	createMenu->AddItem(new BMenuItem("Extended",
+		new BMessage(MSG_CREATE_EXTENDED)));
+	createMenu->AddItem(new BMenuItem("Logical",
+		new BMessage(MSG_CREATE_LOGICAL)));
+
 	BRect r(Bounds());
 	r.top = rootMenu->Frame().bottom + 1;
 	fListView = new PartitionListView(r);
 	AddChild(fListView);
 
 	// Populate the Initialiaze menu with the available file systems
-	BDiskSystem diskSystem;
-	fDDRoster.RewindDiskSystems();
-	while(fDDRoster.GetNextDiskSystem(&diskSystem) == B_OK) {
-		if (diskSystem.IsFileSystem()) {
-			BMessage* message = new BMessage(MSG_INITIALIZE);
-			message->AddString("format", diskSystem.Name());
-			BString label = diskSystem.PrettyName();
-			label << B_UTF8_ELLIPSIS;
-			initMenu->AddItem(new BMenuItem(label.String(), message));
-		}
-	}
+	_ScanFileSystems();
 
 	// Visit all disks in the system and show their contents
 	_ScanDrives();
@@ -162,31 +164,37 @@ MainWindow::MessageReceived(BMessage* message)
 		case MSG_MOUNT_ALL:
 			printf("MSG_MOUNT_ALL\n");
 			break;
-			
 		case MSG_MOUNT:
 			printf("MSG_MOUNT\n");
 			break;
-			
 		case MSG_UNMOUNT:
 			printf("MSG_UNMOUNT\n");
 			break;
-		
+
 		case MSG_FORMAT:
 			printf("MSG_FORMAT\n");
 			break;
-			
+
+		case MSG_CREATE_PRIMARY:
+			printf("MSG_CREATE_PRIMARY\n");
+			break;
+		case MSG_CREATE_EXTENDED:
+			printf("MSG_CREATE_EXTENDED\n");
+			break;
+		case MSG_CREATE_LOGICAL:
+			printf("MSG_CREATE_LOGICAL\n");
+			break;
+
 		case MSG_INITIALIZE:
 			printf("MSG_INITIALIZE\n");
 			break;
-			
+
 		case MSG_EJECT:
 			printf("MSG_EJECT\n");
 			break;
-			
 		case MSG_SURFACE_TEST:
 			printf("MSG_SURFACE_TEST\n");
 			break;
-			
 		case MSG_RESCAN:
 			_ScanDrives();
 			break;
@@ -203,7 +211,8 @@ MainWindow::QuitRequested()
 {
 	// TODO: ask about any unsaved changes
    	be_app->PostMessage(B_QUIT_REQUESTED);
-	return true;
+   	Hide();
+	return false;
 }
 
 
@@ -246,6 +255,26 @@ MainWindow::_ScanDrives()
 	BPartition* partition = NULL;
 	BDiskDevice device;
 	fDDRoster.VisitEachPartition(&driveVisitor, &device, &partition);
+}
+
+
+void
+MainWindow::_ScanFileSystems()
+{
+	while (BMenuItem* item = fInitMenu->RemoveItem(0L))
+		delete item;
+
+	BDiskSystem diskSystem;
+	fDDRoster.RewindDiskSystems();
+	while(fDDRoster.GetNextDiskSystem(&diskSystem) == B_OK) {
+		if (diskSystem.IsFileSystem() && diskSystem.SupportsInitializing()) {
+			BMessage* message = new BMessage(MSG_INITIALIZE);
+			message->AddString("format", diskSystem.Name());
+			BString label = diskSystem.PrettyName();
+			label << B_UTF8_ELLIPSIS;
+			fInitMenu->AddItem(new BMenuItem(label.String(), message));
+		}
+	}
 }
 
 

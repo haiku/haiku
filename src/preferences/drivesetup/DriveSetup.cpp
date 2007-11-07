@@ -78,15 +78,23 @@ DriveSetup::_StoreSettings()
 		fWindow->Unlock();
 	}
 
-	if (ret < B_OK)
+	if (ret < B_OK) {
+		fprintf(stderr, "failed to store settings: %s\n", strerror(ret));
 		return ret;
+	}
 
 	BFile file;
 	ret = _GetSettingsFile(file, true);
 	if (ret < B_OK)
 		return ret;
 
-	return fSettings.Flatten(&file);
+	ret = fSettings.Flatten(&file);
+	if (ret < B_OK) {
+		fprintf(stderr, "failed to flatten settings: %s\n", strerror(ret));
+		return ret;
+	}
+
+	return B_OK;
 }
 
 
@@ -95,14 +103,23 @@ DriveSetup::_RestoreSettings()
 {
 	BFile file;
 	status_t ret = _GetSettingsFile(file, false);
+	if (ret < B_OK)
+		return ret;
 
-	if (ret >= B_OK)
-		ret = fSettings.Unflatten(&file);
+	ret = fSettings.Unflatten(&file);
+	if (ret < B_OK) {
+		fprintf(stderr, "failed to unflatten settings: %s\n", strerror(ret));
+		return ret;
+	}
+fSettings.PrintToStream();
 
-	if (ret >= B_OK)
-		ret = fWindow->RestoreSettings(&fSettings);
+	ret = fWindow->RestoreSettings(&fSettings);
+	if (ret < B_OK) {
+		fprintf(stderr, "failed to restore settings: %s\n", strerror(ret));
+		return ret;
+	}
 
-	return ret;
+	return B_OK;
 }
 
 

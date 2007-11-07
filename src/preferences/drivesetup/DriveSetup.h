@@ -2,8 +2,8 @@
  * Copyright 2002-2007 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  */
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef DRIVE_SETUP_H
+#define DRIVE_SETUP_H
 
 	
 #include <Application.h>
@@ -34,4 +34,4 @@ private:
 };
 
 
-#endif // MAIN_H
+#endif // DRIVE_SETUP_H
