@@ -577,8 +577,8 @@ dump_page_stats(int argc, char **argv)
 		sFreePageQueue.count);
 	kprintf("clear queue: %p, count = %ld\n", &sClearPageQueue,
 		sClearPageQueue.count);
-	kprintf("modified queue: %p, count = %ld\n", &sModifiedPageQueue,
-		sModifiedPageQueue.count);
+	kprintf("modified queue: %p, count = %ld (%ld temporary)\n",
+		&sModifiedPageQueue, sModifiedPageQueue.count, sModifiedTemporaryPages);
 	kprintf("active queue: %p, count = %ld\n", &sActivePageQueue,
 		sActivePageQueue.count);
 	kprintf("inactive queue: %p, count = %ld\n", &sInactivePageQueue,
