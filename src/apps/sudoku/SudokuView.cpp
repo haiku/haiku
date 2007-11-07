@@ -33,6 +33,8 @@ SudokuView::SudokuView(BRect frame, const char* name,
 	fShowHintX(~0UL),
 	fLastHintValue(~0UL),
 	fLastField(~0UL),
+	fKeyboardX(0),
+	fKeyboardY(0),
 	fShowKeyboardFocus(false),
 	fEditable(true)
 {
