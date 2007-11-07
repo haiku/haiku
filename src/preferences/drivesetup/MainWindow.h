@@ -1,52 +1,45 @@
-/*! \file MainWindow.h
-    \brief Header for the MainWindow class.
-    
-*/
-
+/*
+ * Copyright 2002-2007 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
+ */
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H
 
-	#define MOUNT_MOUNT_ALL_MSG					'mall'
-	#define MOUNT_MOUNT_SELECTED_MSG			'msel'
-	#define UNMOUNT_UNMOUNT_SELECTED_MSG	'usel'
-	#define SETUP_FORMAT_MSG							'sfor'
-	#define SETUP_PARTITION_SELECTED_MSG		'spsl'
-	#define SETUP_INITIALIZE_MSG							'sini'
-	#define OPTIONS_EJECT_MSG							'oeje'
-	#define OPTIONS_SURFACE_TEST_MSG			'osut'
-	#define RESCAN_IDE_MSG								'ride'
-	#define RESCAN_SCSI_MSG								'rscs'
 
-	#include <interface/Window.h>
-	#include <storage/DiskDeviceRoster.h>
+#include <DiskDeviceRoster.h>
+#include <Window.h>
 
-	// Forward declarations
-	class PosSettings;
-	class BPartition;
-	class BDiskDevice;
-	class PartitionListView;
-	
-	/**
-	 * The main window of the app.
-	 *
-	 * Sets up and displays everything you need for the app.
-	 */
 
-	class MainWindow : public BWindow
-	{
-		private:
-			PosSettings*				fSettings;
-			BDiskDeviceRoster		fDDRoster;
-			PartitionListView*		fListView;
-		public:
-			MainWindow(BRect frame, PosSettings *fSettings);
-			
-			bool QuitRequested();
-			void MessageReceived(BMessage *message);
-			
-			// These are public for visitor....
-			void AddPartition(BPartition* partition, int32 level);
-			void AddDrive(BDiskDevice* device);
-	};
-	
-#endif
+class PosSettings;
+class BPartition;
+class BDiskDevice;
+class PartitionListView;
+
+
+class MainWindow : public BWindow {
+public:
+								MainWindow(BRect frame);
+
+	// BWindow interface
+	virtual	bool				QuitRequested();
+	virtual	void				MessageReceived(BMessage* message);
+
+	// MainWindow
+			status_t			StoreSettings(BMessage* archive) const;
+			status_t			RestoreSettings(BMessage* archive);
+
+	// These are public for visitor....
+			void				AddPartition(BPartition* partition,
+									int32 level);
+			void				AddDrive(BDiskDevice* device);
+
+private:
+			void				_ScanDrives();
+
+
+			BDiskDeviceRoster	fDDRoster;
+			PartitionListView*	fListView;
+};
+
+
+#endif // MAIN_WINDOW_H

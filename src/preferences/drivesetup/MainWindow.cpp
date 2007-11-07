@@ -1,36 +1,38 @@
-/*! \file MainWindow.cpp
- *  \brief Code for the MainWindow class.
- *  
- *  Displays the main window, the essence of the app.
+/*
+ * Copyright 2002-2007 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
  *
-*/
-
+ * Authors:
+ *		Erik Jaesler <ejakowatz@users.sourceforge.net>
+ *		Ithamar R. Adema <ithamar@unet.nl>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
 #include "MainWindow.h"
 #include "PartitionList.h"
-#include "PosSettings.h"
 
-#include <interface/MenuItem.h>
-#include <interface/MenuBar.h>
-#include <interface/Menu.h>
+#include <Application.h>
 
-#include <interface/ColumnListView.h>
-#include <interface/ColumnTypes.h>
+#include <DiskDeviceVisitor.h>
+#include <DiskSystem.h>
+#include <DiskDevice.h>
+#include <Partition.h>
+#include <Path.h>
 
-#include <app/Application.h>
+#include <ColumnListView.h>
+#include <ColumnTypes.h>
+#include <MenuItem.h>
+#include <MenuBar.h>
+#include <Menu.h>
+#include <Screen.h>
 
-#include <storage/DiskDeviceVisitor.h>
-#include <storage/DiskSystem.h>
-#include <storage/DiskDevice.h>
-#include <storage/Partition.h>
-#include <storage/Path.h>
 
-class DriveVisitor : public BDiskDeviceVisitor 
-{
+class DriveVisitor : public BDiskDeviceVisitor {
 public:
 	DriveVisitor(PartitionListView* list);
 
-	bool Visit(BDiskDevice *device);
-	bool Visit(BPartition *partition, int32 level);
+	virtual	bool Visit(BDiskDevice* device);
+	virtual	bool Visit(BPartition* partition, int32 level);
+
 private:
 	PartitionListView* fPartitionList;
 };
@@ -62,7 +64,7 @@ SizeAsString(off_t size, char *string)
 	return string;
 }
 
-#if DEBUG
+
 static void
 dump_partition_info(BPartition* partition)
 {
@@ -86,187 +88,202 @@ dump_partition_info(BPartition* partition)
 	printf("\tContentType(): %s\n", partition->ContentType());
 	printf("\tID(): %lx\n\n", partition->ID());
 }
-#endif
 
-/**
- * Constructor.
- * @param frame The size to make the window.
- */	
-MainWindow::MainWindow(BRect frame, PosSettings *Settings)
-	: BWindow(frame, "DriveSetup", B_DOCUMENT_WINDOW,  B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
+
+enum {
+	MSG_MOUNT_ALL				= 'mnta',
+	MSG_MOUNT					= 'mnts',
+	MSG_UNMOUNT					= 'unmt',
+	MSG_FORMAT					= 'frmt',
+	MSG_INITIALIZE				= 'init',
+	MSG_EJECT					= 'ejct',
+	MSG_SURFACE_TEST			= 'sfct',
+	MSG_RESCAN					= 'rscn',
+};
+
+
+MainWindow::MainWindow(BRect frame)
+	: BWindow(frame, "DriveSetup", B_DOCUMENT_WINDOW,
+		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
 {
-	BMenu *partitionMenu, *initMenu;
-	BMenu *menu;
-
-	fSettings = Settings;
-	
 	BMenuBar* rootMenu = new BMenuBar(Bounds(), "root menu");
-	//Setup Mount menu
-	menu = new BMenu("Mount");
-	menu->AddItem(new BMenuItem("Mount All Partitions", new BMessage(MOUNT_MOUNT_ALL_MSG), 'M'));
-	menu->AddSeparatorItem();
+
+	// Disk menu
+	BMenu* menu = new BMenu("Disk");
+		menu->AddItem(new BMenuItem("Format", new BMessage(MSG_FORMAT), 'F'));
+		menu->AddItem(new BMenuItem("Eject", new BMessage(MSG_EJECT), 'E'));
+		menu->AddItem(new BMenuItem("Surface Test",
+			new BMessage(MSG_SURFACE_TEST), 'T'));
+		menu->AddSeparatorItem();
+		menu->AddItem(new BMenuItem("Rescan", new BMessage(MSG_RESCAN)));
 	rootMenu->AddItem(menu);
-	
-	//Setup Unmount menu
-	menu = new BMenu("Unmount");
-	rootMenu->AddItem(menu);
-	
-	//Setup Setup menu
-	menu = new BMenu("Setup");
-		menu->AddItem(new BMenuItem("Format", new BMessage(SETUP_FORMAT_MSG), 'F'));
-		partitionMenu = new BMenu("Partition");
-		menu->AddItem(partitionMenu);
-		initMenu = new BMenu("Initialize");
-		//add menu for formats
+
+	// Parition menu
+	menu = new BMenu("Partition");
+		BMenu* initMenu = new BMenu("Initialize");
 		menu->AddItem(initMenu);
+		menu->AddSeparatorItem();
+		menu->AddItem(new BMenuItem("Mount", new BMessage(MSG_MOUNT), 'M'));
+		menu->AddItem(new BMenuItem("Unmount", new BMessage(MSG_UNMOUNT), 'U'));
+		menu->AddSeparatorItem();
+		menu->AddItem(new BMenuItem("Mount All",
+			new BMessage(MSG_MOUNT_ALL), 'M', B_SHIFT_KEY));
 	rootMenu->AddItem(menu);
-	
-	//Setup Options menu
-	menu = new BMenu("Options");
-		menu->AddItem(new BMenuItem("Eject", new BMessage(OPTIONS_EJECT_MSG), 'E'));
-		menu->AddItem(new BMenuItem("Surface Test", new BMessage(OPTIONS_SURFACE_TEST_MSG), 'T'));
-	rootMenu->AddItem(menu);
-	
-	//Setup Rescan menu
-	menu = new BMenu("Rescan");
-		menu->AddItem(new BMenuItem("IDE", new BMessage(RESCAN_IDE_MSG)));
-		menu->AddItem(new BMenuItem("SCSI", new BMessage(RESCAN_SCSI_MSG)));
-	rootMenu->AddItem(menu);
-		
+
 	AddChild(rootMenu);
 
 	BRect r(Bounds());
-	r.top = rootMenu->Frame().bottom +1;
+	r.top = rootMenu->Frame().bottom + 1;
 	fListView = new PartitionListView(r);
 	AddChild(fListView);
 
-	// Now update filesystem/partition menus with values
+	// Populate the Initialiaze menu with the available file systems
 	BDiskSystem diskSystem;
 	fDDRoster.RewindDiskSystems();
 	while(fDDRoster.GetNextDiskSystem(&diskSystem) == B_OK) {
-		if (diskSystem.IsPartitioningSystem()) {
-			BMessage* msg = new BMessage(SETUP_PARTITION_SELECTED_MSG);
-			msg->AddString("bdisksystem:name", diskSystem.Name());
-			partitionMenu->AddItem(new BMenuItem(diskSystem.PrettyName(), msg));
-		} else if (diskSystem.IsFileSystem()) {
-			BMessage* msg = new BMessage(SETUP_INITIALIZE_MSG);
-			msg->AddString("bdisksystem:name", diskSystem.Name());
-			initMenu->AddItem(new BMenuItem(diskSystem.PrettyName(), msg));
+		if (diskSystem.IsFileSystem()) {
+			BMessage* message = new BMessage(MSG_INITIALIZE);
+			message->AddString("format", diskSystem.Name());
+			BString label = diskSystem.PrettyName();
+			label << B_UTF8_ELLIPSIS;
+			initMenu->AddItem(new BMenuItem(label.String(), message));
 		}
 	}
 
-	// Now visit all disks in the system and show their contents
+	// Visit all disks in the system and show their contents
+	_ScanDrives();
+}
+
+
+void
+MainWindow::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case MSG_MOUNT_ALL:
+			printf("MSG_MOUNT_ALL\n");
+			break;
+			
+		case MSG_MOUNT:
+			printf("MSG_MOUNT\n");
+			break;
+			
+		case MSG_UNMOUNT:
+			printf("MSG_UNMOUNT\n");
+			break;
+		
+		case MSG_FORMAT:
+			printf("MSG_FORMAT\n");
+			break;
+			
+		case MSG_INITIALIZE:
+			printf("MSG_INITIALIZE\n");
+			break;
+			
+		case MSG_EJECT:
+			printf("MSG_EJECT\n");
+			break;
+			
+		case MSG_SURFACE_TEST:
+			printf("MSG_SURFACE_TEST\n");
+			break;
+			
+		case MSG_RESCAN:
+			_ScanDrives();
+			break;
+			
+		default:
+			BWindow::MessageReceived(message);
+			break;
+	}
+}
+
+
+bool 
+MainWindow::QuitRequested()
+{
+	// TODO: ask about any unsaved changes
+   	be_app->PostMessage(B_QUIT_REQUESTED);
+	return true;
+}
+
+
+// #pragma mark -
+
+
+status_t
+MainWindow::StoreSettings(BMessage* archive) const
+{
+	if (archive->ReplaceRect("window frame", Frame()) < B_OK)
+		archive->AddRect("window frame", Frame());
+	// TODO: store column list settings
+	return B_OK;
+}
+
+
+status_t
+MainWindow::RestoreSettings(BMessage* archive)
+{
+	BRect frame;
+	if (archive->FindRect("window frame", &frame) == B_OK) {
+		BScreen screen(this);
+		if (frame.Intersects(screen.Frame())) {
+			MoveTo(frame.LeftTop());
+			ResizeTo(frame.Width(), frame.Height());
+		}
+	}
+	// TODO: restore column list settings
+	return B_OK;
+}
+
+
+// #pragma mark -
+
+
+void
+MainWindow::_ScanDrives()
+{
 	DriveVisitor driveVisitor(fListView);
-	BPartition *partition = NULL;
+	BPartition* partition = NULL;
 	BDiskDevice device;
 	fDDRoster.VisitEachPartition(&driveVisitor, &device, &partition);
 }
 
-/**
- * Handles messages.
- * @param message The message recieved by the window.
- */	
-void MainWindow::MessageReceived(BMessage *message){
 
-	switch(message->what){
-	
-		case MOUNT_MOUNT_ALL_MSG:
-		
-			printf("MOUNT_MOUNT_ALL_MSG\n");
-			break;
-			
-		case MOUNT_MOUNT_SELECTED_MSG:
-		
-			printf("MOUNT_MOUNT_SELECTED_MSG\n");
-			break;
-			
-		case UNMOUNT_UNMOUNT_SELECTED_MSG:
-		
-			printf("UNMOUNT_UNMOUNT_SELECTED_MSG\n");
-			break;
-		
-		case SETUP_FORMAT_MSG:
-		
-			printf("SETUP_FORMAT_MSG\n");
-			break;
-			
-		case SETUP_INITIALIZE_MSG:
-		
-			printf("SETUP_INITIALIZE_MSG\n");
-			break;
-			
-		case OPTIONS_EJECT_MSG:
-		
-			printf("OPTIONS_EJECT_MSG\n");
-			break;
-			
-		case OPTIONS_SURFACE_TEST_MSG:
-		
-			printf("OPTIONS_SURFACE_TEST_MSG\n");
-			break;
-			
-		case RESCAN_IDE_MSG:
-		
-			printf("RESCAN_IDE_MSG\n");
-			break;
-			
-		case RESCAN_SCSI_MSG:
-		
-			printf("RESCAN_SCSI_MSG\n");
-			break;
-			
-		default:
-		
-			BWindow::MessageReceived(message);
-			
-	}//switch
-	
-}
+// #pragma mark - DriveVisitor
 
-/**
- * Quits and Saves settings.
- */	
-bool 
-MainWindow::QuitRequested()
-{
-	bool accepted = BWindow::QuitRequested();
-	if (accepted) {
-		fSettings->SetWindowPosition(Frame());
-    	be_app->PostMessage(B_QUIT_REQUESTED);
-	}
-	
-	return accepted;
-}
 
 DriveVisitor::DriveVisitor(PartitionListView* list)
 	: fPartitionList(list)
 {
+	// start with an empty list
+	int32 rows = fPartitionList->CountRows();
+	for (int32 i = rows - 1; i >= 0; i--) {
+		BRow* row = fPartitionList->RowAt(i);
+		fPartitionList->RemoveRow(row);
+		delete row;
+	}
 }
+
 
 bool
 DriveVisitor::Visit(BDiskDevice* device)
 {
-	if (fPartitionList != NULL)
-		fPartitionList->AddPartition(device);
+	fPartitionList->AddPartition(device);
 
-DEBUG_ONLY(
 	printf("Visit(%p)\n", device);
 	dump_partition_info(device);
-);
 
 	return false; // Don't stop yet!
 }
 
+
 bool
 DriveVisitor::Visit(BPartition* partition, int32 level)
 {
-	if (fPartitionList != NULL)
-		fPartitionList->AddPartition(partition);
+	fPartitionList->AddPartition(partition);
 
-DEBUG_ONLY(
-	printf("Visit(%p, %d)\n", partition, level);
+	printf("Visit(%p, %ld)\n", partition, level);
 	dump_partition_info(partition);
-);
 
 	return false; // Don't stop yet!
 }

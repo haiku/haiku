@@ -1,33 +1,37 @@
-/*! \file main.h
-    \brief Header file for the main class.
-    
-*/
-
+/*
+ * Copyright 2002-2007 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
+ */
 #ifndef MAIN_H
 #define MAIN_H
+
 	
-	#include <Application.h>
+#include <Application.h>
+#include <Message.h>
+
+
+class BFile;
+class MainWindow;
+
 	
-	class PosSettings;
-	
-	
-	/**
-	 * Main class.
-	 *
-	 * Gets everything going.
-	 */
-	class DriveSetup : public BApplication
-	{	
-		public:
-		
-			/**
-			 * Constructor.
-			 */
-			DriveSetup();
-			virtual ~DriveSetup();
-		
-		private:
-			PosSettings	*fSettings;
-	};
-	
-#endif
+class DriveSetup : public BApplication {	
+public:
+								DriveSetup();
+	virtual						~DriveSetup();
+
+	virtual	void				ReadyToRun();
+	virtual	bool				QuitRequested();
+
+private:
+			status_t			_StoreSettings();
+			status_t			_RestoreSettings();
+			status_t			_GetSettingsFile(BFile& file,
+									bool forWriting) const;
+
+			MainWindow*			fWindow;
+
+			BMessage			fSettings;
+};
+
+
+#endif // MAIN_H

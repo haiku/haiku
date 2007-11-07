@@ -1,9 +1,15 @@
 SubDir HAIKU_TOP src preferences drivesetup ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 UsePrivateHeaders interface storage shared ;
 
 AddResources DriveSetup : DriveSetup.rdef ;
 
-Preference DriveSetup : main.cpp MainWindow.cpp PartitionList.cpp PosSettings.cpp ;
-
-LinkAgainst DriveSetup : be ;
+Preference DriveSetup :
+	main.cpp
+	MainWindow.cpp
+	PartitionList.cpp
+	:
+	be
+;

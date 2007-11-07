@@ -19,7 +19,7 @@
 #include "InstallerWindow.h"
 #include "PartitionMenuItem.h"
 
-#define DRIVESETUP_SIG "application/x-vnd.Be-DRV$"
+#define DRIVESETUP_SIG "application/x-vnd.Haiku-DriveSetup"
 
 const uint32 BEGIN_MESSAGE = 'iBGN';
 const uint32 SHOW_BOTTOM_MESSAGE = 'iSBT';
