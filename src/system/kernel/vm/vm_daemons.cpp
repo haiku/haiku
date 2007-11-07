@@ -27,7 +27,7 @@ static sem_id sPageDaemonSem;
 static uint32 sNumPages;
 
 
-PageCacheLocker::PageCacheLocker(vm_page* page)
+PageCacheLocker::PageCacheLocker(vm_page* page, bool dontWait)
 	:
 	fPage(NULL)
 {
@@ -55,7 +55,7 @@ PageCacheLocker::_IgnorePage(vm_page* page)
 
 
 bool
-PageCacheLocker::Lock(vm_page* page)
+PageCacheLocker::Lock(vm_page* page, bool dontWait)
 {
 	if (_IgnorePage(page))
 		return false;
@@ -65,14 +65,13 @@ PageCacheLocker::Lock(vm_page* page)
 	if (cache == NULL)
 		return false;
 
-#if 0
-	mutex_lock(&cache->lock);
-#else
-	if (mutex_trylock(&cache->lock) != B_OK) {
-		vm_cache_release_ref(cache);
-		return false;
-	}
-#endif
+	if (dontWait) {
+		if (mutex_trylock(&cache->lock) != B_OK) {
+			vm_cache_release_ref(cache);
+			return false;
+		}
+	} else
+		mutex_lock(&cache->lock);
 
 	if (cache != page->cache || _IgnorePage(page)) {
 		mutex_unlock(&cache->lock);

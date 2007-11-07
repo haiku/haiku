@@ -61,6 +61,7 @@ static addr_t sPhysicalPageOffset;
 static size_t sNumPages;
 static size_t sReservedPages;
 static vint32 sPageDeficit;
+static size_t sModifiedTemporaryPages;
 
 static ConditionVariable<page_queue> sFreePageCondition;
 static spinlock sPageLock;
@@ -596,6 +597,9 @@ free_page_queue_count(void)
 static status_t
 set_page_state_nolock(vm_page *page, int pageState)
 {
+	if (pageState == page->state)
+		return B_OK;
+
 	page_queue *fromQueue = NULL;
 	page_queue *toQueue = NULL;
 
@@ -658,7 +662,10 @@ set_page_state_nolock(vm_page *page, int pageState)
 
 		if (pageState != PAGE_STATE_INACTIVE && page->cache != NULL)
 			panic("to be freed page %p has cache", page);
-	}
+	} else if (pageState == PAGE_STATE_MODIFIED && page->cache->temporary)
+		sModifiedTemporaryPages++;
+	else if (page->state == PAGE_STATE_MODIFIED && page->cache->temporary)
+		sModifiedTemporaryPages--;
 
 #if TRACK_PAGE_ALLOCATIONS
 	if ((pageState == PAGE_STATE_CLEAR || pageState == PAGE_STATE_FREE)
@@ -690,6 +697,8 @@ move_page_to_active_or_inactive_queue(vm_page *page, bool dequeued)
 		page->state = state;
 		enqueue_page(state == PAGE_STATE_ACTIVE
 			? &sActivePageQueue : &sInactivePageQueue, page);
+		if (page->cache->temporary)
+			sModifiedTemporaryPages--;
 	} else
 		set_page_state_nolock(page, state);
 }
@@ -823,6 +832,61 @@ write_page(vm_page *page, bool mayBlock, bool fsReenter)
 }
 
 
+static void
+remove_page_marker(struct vm_page &marker)
+{
+	if (marker.state == PAGE_STATE_UNUSED)
+		return;
+
+	page_queue *queue;
+	vm_page *page;
+
+	switch (marker.state) {
+		case PAGE_STATE_ACTIVE:
+			queue = &sActivePageQueue;
+			break;
+		case PAGE_STATE_INACTIVE:
+			queue = &sInactivePageQueue;
+			break;
+		case PAGE_STATE_MODIFIED:
+			queue = &sModifiedPageQueue;
+			break;
+
+		default:
+			return;
+	}
+
+	remove_page_from_queue(queue, &marker);
+	marker.state = PAGE_STATE_UNUSED;
+}
+
+
+static vm_page *
+next_modified_page(struct vm_page &marker)
+{
+	InterruptsSpinLocker locker(sPageLock);
+	vm_page *page;
+
+	if (marker.state == PAGE_STATE_MODIFIED) {
+		page = marker.queue_next;
+		remove_page_from_queue(&sModifiedPageQueue, &marker);
+		marker.state = PAGE_STATE_UNUSED;
+	} else
+		page = sModifiedPageQueue.head;
+
+	for (; page != NULL; page = page->queue_next) {
+		if (page->type != PAGE_TYPE_DUMMY && page->state != PAGE_STATE_BUSY) {
+			// insert marker
+			marker.state = PAGE_STATE_MODIFIED;
+			insert_page_after(&sModifiedPageQueue, page, &marker);
+			return page;
+		}
+	}
+
+	return NULL;
+}
+
+
 /*!	The page writer continuously takes some pages from the modified
 	queue, writes them back, and moves them back to the active queue.
 	It runs in its own thread, and is only there to keep the number
@@ -832,14 +896,22 @@ write_page(vm_page *page, bool mayBlock, bool fsReenter)
 status_t
 page_writer(void* /*unused*/)
 {
-	while (true) {
-		int32 count = 0;
-		get_sem_count(sWriterWaitSem, &count);
-		if (count == 0)
-			count = 1;
+	vm_page marker;
+	marker.type = PAGE_TYPE_DUMMY;
+	marker.cache = NULL;
+	marker.state = PAGE_STATE_UNUSED;
 
-		acquire_sem_etc(sWriterWaitSem, count, B_RELATIVE_TIMEOUT, 3000000);
-			// all 3 seconds when no one triggers us
+	while (true) {
+		if (sModifiedPageQueue.count - sModifiedTemporaryPages < 1024
+			|| free_page_queue_count() > 1024) {
+			int32 count = 0;
+			get_sem_count(sWriterWaitSem, &count);
+			if (count == 0)
+				count = 1;
+
+			acquire_sem_etc(sWriterWaitSem, count, B_RELATIVE_TIMEOUT, 3000000);
+				// all 3 seconds when no one triggers us
+		}
 
 		const uint32 kNumPages = 32;
 		ConditionVariable<vm_page> busyConditions[kNumPages];
@@ -855,38 +927,31 @@ page_writer(void* /*unused*/)
 		// collect pages to be written
 
 		while (numPages < kNumPages) {
-			InterruptsSpinLocker locker(sPageLock);
-
-			vm_page *page = sModifiedPageQueue.head;
-			while (page != NULL && page->state == PAGE_STATE_BUSY) {
-				// skip busy pages
-				page = page->queue_next;
-			}
+			vm_page *page = next_modified_page(marker);
 			if (page == NULL)
 				break;
 
-			locker.Unlock();
-
-			PageCacheLocker cacheLocker(page);
+			PageCacheLocker cacheLocker(page, false);
 			if (!cacheLocker.IsLocked())
 				continue;
 
 			vm_cache *cache = page->cache;
+			// TODO: write back temporary ones as soon as we have swap file support
+			if (cache->temporary/* && vm_low_memory_state() == B_NO_LOW_MEMORY*/)
+				continue;
+
 			if (cache->store->ops->acquire_unreferenced_ref != NULL) {
 				// we need our own reference to the store, as it might
 				// currently be destructed
 				if (cache->store->ops->acquire_unreferenced_ref(cache->store)
 						!= B_OK) {
-					// put it to the tail of the queue, then, so that we
-					// won't touch it too soon again
-					vm_page_requeue(page, true);
 					cacheLocker.Unlock();
 					thread_yield();
 					continue;
 				}
 			}
 
-			locker.Lock();
+			InterruptsSpinLocker locker(sPageLock);
 			remove_page_from_queue(&sModifiedPageQueue, page);
 			page->state = PAGE_STATE_BUSY;
 
@@ -938,7 +1003,60 @@ page_writer(void* /*unused*/)
 		}
 	}
 
+	remove_page_marker(marker);
 	return B_OK;
+}
+
+
+static vm_page *
+find_page_candidate(struct vm_page &marker, bool stealActive)
+{
+	InterruptsSpinLocker locker(sPageLock);
+	page_queue *queue;
+	vm_page *page;
+
+	switch (marker.state) {
+		case PAGE_STATE_ACTIVE:
+			queue = &sActivePageQueue;
+			page = marker.queue_next;
+			remove_page_from_queue(queue, &marker);
+			marker.state = PAGE_STATE_UNUSED;
+			break;
+		case PAGE_STATE_INACTIVE:
+			queue = &sInactivePageQueue;
+			page = marker.queue_next;
+			remove_page_from_queue(queue, &marker);
+			marker.state = PAGE_STATE_UNUSED;
+			break;
+		default:
+			queue = &sInactivePageQueue;
+			page = sInactivePageQueue.head;
+			if (page == NULL && stealActive) {
+				queue = &sActivePageQueue;
+				page = sActivePageQueue.head;
+			}
+			break;
+	}
+
+	while (page != NULL) {
+		if (page->type != PAGE_TYPE_DUMMY
+			&& (page->state == PAGE_STATE_INACTIVE
+				|| (stealActive && page->state == PAGE_STATE_ACTIVE
+					&& page->wired_count == 0))) {
+			// insert marker
+			marker.state = queue == &sActivePageQueue ? PAGE_STATE_ACTIVE : PAGE_STATE_INACTIVE;
+			insert_page_after(queue, page, &marker);
+			return page;
+		}
+
+		page = page->queue_next;
+		if (page == NULL && stealActive && queue != &sActivePageQueue) {
+			queue = &sActivePageQueue;
+			page = sActivePageQueue.head;
+		}
+	}
+
+	return NULL;
 }
 
 
@@ -1015,84 +1133,6 @@ steal_page(vm_page *page, bool stealActive)
 	remove_page_from_queue(page->state == PAGE_STATE_ACTIVE
 		? &sActivePageQueue : &sInactivePageQueue, page);
 	return true;
-}
-
-
-static void
-remove_page_marker(struct vm_page &marker)
-{
-	if (marker.state == PAGE_STATE_UNUSED)
-		return;
-
-	page_queue *queue;
-	vm_page *page;
-
-	switch (marker.state) {
-		case PAGE_STATE_ACTIVE:
-			queue = &sActivePageQueue;
-			break;
-		case PAGE_STATE_INACTIVE:
-			queue = &sInactivePageQueue;
-			break;
-
-		default:
-			return;
-	}
-
-	remove_page_from_queue(queue, &marker);
-	marker.state = PAGE_STATE_UNUSED;
-}
-
-
-static vm_page *
-find_page_candidate(struct vm_page &marker, bool stealActive)
-{
-	InterruptsSpinLocker locker(sPageLock);
-	page_queue *queue;
-	vm_page *page;
-
-	switch (marker.state) {
-		case PAGE_STATE_ACTIVE:
-			queue = &sActivePageQueue;
-			page = marker.queue_next;
-			remove_page_from_queue(queue, &marker);
-			marker.state = PAGE_STATE_UNUSED;
-			break;
-		case PAGE_STATE_INACTIVE:
-			queue = &sInactivePageQueue;
-			page = marker.queue_next;
-			remove_page_from_queue(queue, &marker);
-			marker.state = PAGE_STATE_UNUSED;
-			break;
-		default:
-			queue = &sInactivePageQueue;
-			page = sInactivePageQueue.head;
-			if (page == NULL && stealActive) {
-				queue = &sActivePageQueue;
-				page = sActivePageQueue.head;
-			}
-			break;
-	}
-
-	while (page != NULL) {
-		if (page->type != PAGE_TYPE_DUMMY
-			&& (page->state == PAGE_STATE_INACTIVE
-				|| (stealActive && page->state == PAGE_STATE_ACTIVE
-					&& page->wired_count == 0))) {
-			// insert marker
-			marker.state = queue == &sActivePageQueue ? PAGE_STATE_ACTIVE : PAGE_STATE_INACTIVE;
-			insert_page_after(queue, page, &marker);
-			return page;
-		}
-
-		page = page->queue_next;
-		if (page == NULL && stealActive && queue != &sActivePageQueue) {
-			queue = &sActivePageQueue;
-			page = sActivePageQueue.head;
-		}
-	}
-
-	return NULL;
 }
 
 
@@ -1351,21 +1391,21 @@ vm_page_init_post_area(kernel_args *args)
 status_t
 vm_page_init_post_thread(kernel_args *args)
 {
+	new (&sFreePageCondition) ConditionVariable<page_queue>;
+	sFreePageCondition.Publish(&sFreePageQueue, "free page");
+
 	// create a kernel thread to clear out pages
 
 	thread_id thread = spawn_kernel_thread(&page_scrubber, "page scrubber",
 		B_LOWEST_ACTIVE_PRIORITY, NULL);
 	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
 
-	new (&sFreePageCondition) ConditionVariable<page_queue>;
-	sFreePageCondition.Publish(&sFreePageQueue, "free page");
-
-	// start page writer and page thief
+	// start page writer
 
 	sWriterWaitSem = create_sem(0, "page writer");
 
 	thread = spawn_kernel_thread(&page_writer, "page writer",
-		B_NORMAL_PRIORITY, NULL);
+		B_NORMAL_PRIORITY + 1, NULL);
 	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
 
 	return B_OK;
@@ -1593,6 +1633,7 @@ vm_page_allocate_page_run(int pageState, addr_t length)
 	InterruptsSpinLocker locker(sPageLock);
 
 	if (sFreePageQueue.count + sClearPageQueue.count - sReservedPages < length) {
+		// TODO: add more tries, ie. free some inactive, ...
 		// no free space
 		return NULL;
 	}

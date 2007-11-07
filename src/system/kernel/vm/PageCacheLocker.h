@@ -13,12 +13,12 @@ struct vm_page;
 
 class PageCacheLocker {
 public:
-	PageCacheLocker(vm_page* page);
+	PageCacheLocker(vm_page* page, bool dontWait = true);
 	~PageCacheLocker();
 
 	bool IsLocked() { return fPage != NULL; }
 
-	bool Lock(vm_page* page);
+	bool Lock(vm_page* page, bool dontWait = true);
 	void Unlock();
 
 private:
