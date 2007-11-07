@@ -7,7 +7,7 @@
  *		Ithamar R. Adema <ithamar@unet.nl>
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-#include "main.h"
+#include "DriveSetup.h"
 #include "MainWindow.h"
 
 #include <stdio.h>

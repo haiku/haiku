@@ -7,7 +7,7 @@ UsePrivateHeaders interface storage shared ;
 AddResources DriveSetup : DriveSetup.rdef ;
 
 Preference DriveSetup :
-	main.cpp
+	DriveSetup.cpp
 	MainWindow.cpp
 	PartitionList.cpp
 	:
