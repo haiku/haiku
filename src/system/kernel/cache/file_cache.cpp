@@ -41,6 +41,7 @@
 	// must be smaller than MAX_FILE_IO_VECS
 	// ToDo: find out how much of these are typically used
 
+#define BYPASS_IO_SIZE		65536
 #define LAST_ACCESSES		3
 
 struct file_extent {
@@ -79,7 +80,7 @@ struct file_cache_ref {
 };
 
 typedef status_t (*cache_func)(file_cache_ref *ref, off_t offset,
-	size_t numBytes, int32 pageOffset, addr_t buffer, size_t bufferSize,
+	int32 pageOffset, addr_t buffer, size_t bufferSize,
 	size_t lastReservedPages, size_t reservePages);
 
 
@@ -610,13 +611,12 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 	operation it will unlock the cache, though.
 */
 static status_t
-read_into_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
-	int32 pageOffset, addr_t buffer, size_t bufferSize,
-	size_t lastReservedPages, size_t reservePages)
+read_into_cache(file_cache_ref *ref, off_t offset, int32 pageOffset,
+	addr_t buffer, size_t bufferSize, size_t lastReservedPages,
+	size_t reservePages)
 {
-	TRACE(("read_into_cache(offset = %Ld, size = %lu, pageOffset = %ld, buffer "
-		"= %#lx, bufferSize = %lu\n", offset, numBytes, pageOffset, buffer,
-		bufferSize));
+	TRACE(("read_into_cache(offset = %Ld, pageOffset = %ld, buffer = %#lx, "
+		"bufferSize = %lu\n", offset, pageOffset, buffer, bufferSize));
 
 	vm_cache *cache = ref->cache;
 
@@ -625,6 +625,7 @@ read_into_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 	iovec vecs[MAX_IO_VECS];
 	int32 vecCount = 0;
 
+	size_t numBytes = PAGE_ALIGN(pageOffset + bufferSize);
 	vm_page *pages[MAX_IO_VECS];
 	ConditionVariable<vm_page> busyConditions[MAX_IO_VECS];
 	int32 pageIndex = 0;
@@ -716,20 +717,43 @@ read_into_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 }
 
 
+static status_t
+read_from_file(file_cache_ref *ref, off_t offset, int32 pageOffset,
+	addr_t buffer, size_t bufferSize, size_t lastReservedPages,
+	size_t reservePages)
+{
+	iovec vec;
+	vec.iov_base = (void *)buffer;
+	vec.iov_len = bufferSize;
+
+	mutex_unlock(&ref->cache->lock);
+	vm_page_unreserve_pages(lastReservedPages);
+
+	status_t status = pages_io(ref, offset, &vec, 1, &bufferSize, false);
+	if (status == B_OK)
+		reserve_pages(ref, reservePages, false);
+
+	mutex_lock(&ref->cache->lock);
+
+	return status;
+}
+
+
 /*!	Like read_into_cache() but writes data into the cache.
 	To preserve data consistency, it might also read pages into the cache,
 	though, if only a partial page gets written.
 	The same restrictions apply.
 */
 static status_t
-write_to_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
-	int32 pageOffset, addr_t buffer, size_t bufferSize,
-	size_t lastReservedPages, size_t reservePages)
+write_to_cache(file_cache_ref *ref, off_t offset, int32 pageOffset,
+	addr_t buffer, size_t bufferSize, size_t lastReservedPages,
+	size_t reservePages)
 {
 	// TODO: We're using way too much stack! Rather allocate a sufficiently
 	// large chunk on the heap.
 	iovec vecs[MAX_IO_VECS];
 	int32 vecCount = 0;
+	size_t numBytes = PAGE_ALIGN(pageOffset + bufferSize);
 	vm_page *pages[MAX_IO_VECS];
 	int32 pageIndex = 0;
 	status_t status = B_OK;
@@ -786,17 +810,22 @@ write_to_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 			// the space in the page after this write action needs to be cleaned
 			memset((void *)(last + lastPageOffset), 0,
 				B_PAGE_SIZE - lastPageOffset);
-		} else if (vecCount > 1) {
+		} else {
 			// the end of this write does not happen on a page boundary, so we
 			// need to fetch the last page before we can update it
 			iovec readVec = { (void *)last, B_PAGE_SIZE };
 			size_t bytesRead = B_PAGE_SIZE;
 
-			status = pages_io(ref, offset + numBytes - B_PAGE_SIZE, &readVec, 1,
-				&bytesRead, false);
+			status = pages_io(ref, PAGE_ALIGN(offset + pageOffset + bufferSize)
+				- B_PAGE_SIZE, &readVec, 1, &bytesRead, false);
 			// ToDo: handle errors for real!
 			if (status < B_OK)
 				panic("pages_io() failed: %s!\n", strerror(status));
+
+			if (bytesRead < B_PAGE_SIZE) {
+				// the space beyond the file size needs to be cleaned
+				memset((void *)(last + bytesRead), 0, B_PAGE_SIZE - bytesRead);
+			}
 		}
 	}
 
@@ -857,9 +886,9 @@ write_to_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 
 
 static status_t
-write_to_file(file_cache_ref *ref, off_t offset, size_t numBytes,
-	int32 pageOffset, addr_t buffer, size_t bufferSize,
-	size_t lastReservedPages, size_t reservePages)
+write_to_file(file_cache_ref *ref, off_t offset, int32 pageOffset,
+	addr_t buffer, size_t bufferSize, size_t lastReservedPages,
+	size_t reservePages)
 {
 	iovec vec;
 	vec.iov_base = (void *)buffer;
@@ -868,7 +897,7 @@ write_to_file(file_cache_ref *ref, off_t offset, size_t numBytes,
 	mutex_unlock(&ref->cache->lock);
 	vm_page_unreserve_pages(lastReservedPages);
 
-	status_t status = pages_io(ref, offset, &vec, 1, &numBytes, true);
+	status_t status = pages_io(ref, offset, &vec, 1, &bufferSize, true);
 	if (status == B_OK)
 		reserve_pages(ref, reservePages, true);
 
@@ -891,8 +920,8 @@ satisfy_cache_io(file_cache_ref *ref, cache_func function, off_t offset,
 	reservePages = min_c(MAX_IO_VECS,
 		(lastLeft - requestSize + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
 
-	status_t status = function(ref, lastOffset, requestSize, lastPageOffset,
-		lastBuffer, requestSize, lastReservedPages, reservePages);
+	status_t status = function(ref, lastOffset, lastPageOffset, lastBuffer,
+		requestSize, lastReservedPages, reservePages);
 	if (status == B_OK) {
 		lastReservedPages = reservePages;
 		lastBuffer = buffer;
@@ -939,12 +968,18 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
 
 	cache_func function;
 	if (doWrite) {
-		if (size >= 65536)
+		// in low memory situations, we bypass the cache beyond a
+		// certain I/O size
+		if (size >= BYPASS_IO_SIZE && vm_low_memory_state() != B_NO_LOW_MEMORY)
 			function = write_to_file;
 		else
 			function = write_to_cache;
-	} else
-		function = read_into_cache;
+	} else {
+		if (size >= BYPASS_IO_SIZE && vm_low_memory_state() != B_NO_LOW_MEMORY)
+			function = read_from_file;
+		else
+			function = read_into_cache;
+	}
 
 	// "offset" and "lastOffset" are always aligned to B_PAGE_SIZE,
 	// the "last*" variables always point to the end of the last
@@ -1048,8 +1083,8 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
 
 	// fill the last remaining bytes of the request (either write or read)
 
-	return function(ref, lastOffset, lastLeft, lastPageOffset,
-		lastBuffer, lastLeft, lastReservedPages, 0);
+	return function(ref, lastOffset, lastPageOffset, lastBuffer, lastLeft,
+		lastReservedPages, 0);
 }
 
 
@@ -1340,7 +1375,7 @@ file_cache_set_size(void *_cacheRef, off_t newSize)
 {
 	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
 
-	TRACE(("file_cache_set_size(ref = %p, size = %Ld)\n", ref, size));
+	TRACE(("file_cache_set_size(ref = %p, size = %Ld)\n", ref, newSize));
 
 	if (ref == NULL)
 		return B_OK;
