@@ -31,7 +31,7 @@ PageCacheLocker::PageCacheLocker(vm_page* page, bool dontWait)
 	:
 	fPage(NULL)
 {
-	Lock(page);
+	Lock(page, dontWait);
 }
 
 
