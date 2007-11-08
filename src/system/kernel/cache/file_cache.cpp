@@ -78,6 +78,10 @@ struct file_cache_ref {
 	bool			last_access_was_write;
 };
 
+typedef status_t (*cache_func)(file_cache_ref *ref, off_t offset,
+	size_t numBytes, int32 pageOffset, addr_t buffer, size_t bufferSize,
+	size_t lastReservedPages, size_t reservePages);
+
 
 static struct cache_module_info *sCacheModule;
 
@@ -853,10 +857,32 @@ write_to_cache(file_cache_ref *ref, off_t offset, size_t numBytes,
 
 
 static status_t
-satisfy_cache_io(file_cache_ref *ref, off_t offset, addr_t buffer,
-	int32 &pageOffset, size_t bytesLeft, size_t &reservePages,
+write_to_file(file_cache_ref *ref, off_t offset, size_t numBytes,
+	int32 pageOffset, addr_t buffer, size_t bufferSize,
+	size_t lastReservedPages, size_t reservePages)
+{
+	iovec vec;
+	vec.iov_base = (void *)buffer;
+	vec.iov_len = bufferSize;
+
+	mutex_unlock(&ref->cache->lock);
+	vm_page_unreserve_pages(lastReservedPages);
+
+	status_t status = pages_io(ref, offset, &vec, 1, &numBytes, true);
+	if (status == B_OK)
+		reserve_pages(ref, reservePages, true);
+
+	mutex_lock(&ref->cache->lock);
+
+	return status;
+}
+
+
+static inline status_t
+satisfy_cache_io(file_cache_ref *ref, cache_func function, off_t offset,
+	addr_t buffer, int32 &pageOffset, size_t bytesLeft, size_t &reservePages,
 	off_t &lastOffset, addr_t &lastBuffer, int32 &lastPageOffset,
-	size_t &lastLeft, size_t &lastReservedPages, bool doWrite)
+	size_t &lastLeft, size_t &lastReservedPages)
 {
 	if (lastBuffer == buffer)
 		return B_OK;
@@ -865,14 +891,8 @@ satisfy_cache_io(file_cache_ref *ref, off_t offset, addr_t buffer,
 	reservePages = min_c(MAX_IO_VECS,
 		(lastLeft - requestSize + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
 
-	status_t status;
-	if (doWrite) {
-		status = write_to_cache(ref, lastOffset, requestSize, lastPageOffset,
-			lastBuffer, requestSize, lastReservedPages, reservePages);
-	} else {
-		status = read_into_cache(ref, lastOffset, requestSize, lastPageOffset,
-			lastBuffer, requestSize, lastReservedPages, reservePages);
-	}
+	status_t status = function(ref, lastOffset, requestSize, lastPageOffset,
+		lastBuffer, requestSize, lastReservedPages, reservePages);
 	if (status == B_OK) {
 		lastReservedPages = reservePages;
 		lastBuffer = buffer;
@@ -917,6 +937,15 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
 	if (size == 0)
 		return B_OK;
 
+	cache_func function;
+	if (doWrite) {
+		if (size >= 65536)
+			function = write_to_file;
+		else
+			function = write_to_cache;
+	} else
+		function = read_into_cache;
+
 	// "offset" and "lastOffset" are always aligned to B_PAGE_SIZE,
 	// the "last*" variables always point to the end of the last
 	// satisfied request part
@@ -941,9 +970,9 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
 			// in the near future, we need to satisfy the request of the pages
 			// we didn't get yet (to make sure no one else interferes in the
 			// mean time).
-			status_t status = satisfy_cache_io(ref, offset, buffer, pageOffset,
-				bytesLeft, reservePages, lastOffset, lastBuffer, lastPageOffset,
-				lastLeft, lastReservedPages, doWrite);
+			status_t status = satisfy_cache_io(ref, function, offset, buffer,
+				pageOffset, bytesLeft, reservePages, lastOffset, lastBuffer,
+				lastPageOffset, lastLeft, lastReservedPages);
 			if (status != B_OK)
 				return status;
 
@@ -1009,9 +1038,9 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
 		offset += B_PAGE_SIZE;
 
 		if (buffer - lastBuffer + lastPageOffset >= kMaxChunkSize) {
-			status_t status = satisfy_cache_io(ref, offset, buffer, pageOffset,
-				bytesLeft, reservePages, lastOffset, lastBuffer, lastPageOffset,
-				lastLeft, lastReservedPages, doWrite);
+			status_t status = satisfy_cache_io(ref, function, offset, buffer,
+				pageOffset, bytesLeft, reservePages, lastOffset, lastBuffer,
+				lastPageOffset, lastLeft, lastReservedPages);
 			if (status != B_OK)
 				return status;
 		}
@@ -1019,16 +1048,8 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
 
 	// fill the last remaining bytes of the request (either write or read)
 
-	status_t status;
-	if (doWrite) {
-		status = write_to_cache(ref, lastOffset, lastLeft, lastPageOffset,
-			lastBuffer, lastLeft, lastReservedPages, 0);
-	} else {
-		status = read_into_cache(ref, lastOffset, lastLeft, lastPageOffset,
-			lastBuffer, lastLeft, lastReservedPages, 0);
-	}
-
-	return status;
+	return function(ref, lastOffset, lastLeft, lastPageOffset,
+		lastBuffer, lastLeft, lastReservedPages, 0);
 }
 
 
