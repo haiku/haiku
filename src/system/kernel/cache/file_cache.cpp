@@ -917,8 +917,8 @@ satisfy_cache_io(file_cache_ref *ref, cache_func function, off_t offset,
 		return B_OK;
 
 	size_t requestSize = buffer - lastBuffer;
-	reservePages = min_c(MAX_IO_VECS,
-		(lastLeft - requestSize + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
+	reservePages = min_c(MAX_IO_VECS, (lastLeft - requestSize
+		+ lastPageOffset + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
 
 	status_t status = function(ref, lastOffset, lastPageOffset, lastBuffer,
 		requestSize, lastReservedPages, reservePages);
@@ -990,8 +990,8 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
 	int32 lastPageOffset = pageOffset;
 	addr_t lastBuffer = buffer;
 	off_t lastOffset = offset;
-	size_t lastReservedPages = min_c(MAX_IO_VECS,
-		(bytesLeft + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
+	size_t lastReservedPages = min_c(MAX_IO_VECS, (pageOffset + bytesLeft
+		+ B_PAGE_SIZE - 1) >> PAGE_SHIFT);
 	size_t reservePages = 0;
 
 	reserve_pages(ref, lastReservedPages, doWrite);
