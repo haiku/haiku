@@ -13,8 +13,9 @@
 #include <ide_adapter.h>
 #include <block_io.h>
 
-#define TRACE(a...) dprintf("si-3112: " a)
-#define FLOW(a...)	dprintf("si-3112: " a)
+#define TRACE(x...) dprintf("si-3112: " x)
+//#define FLOW(x...)	dprintf("si-3112: " x)
+#define FLOW(x...)
 
 
 #define DRIVER_PRETTY_NAME		"Silicon Image SATA"
@@ -628,7 +629,7 @@ device_control_write(void *channelCookie, uint8 val)
 {
 	channel_data *channel = channelCookie;
 
-	FLOW("device_control_write %x\n", val);
+	FLOW("device_control_write 0x%x\n", val);
 	
 	if (channel->lost)
 		return B_ERROR;
@@ -803,15 +804,15 @@ dma_finish(void *channelCookie)
 
 	if ((status & IDE_BM_STATUS_INTERRUPT) == 0) {
 		if ((status & IDE_BM_STATUS_ACTIVE) != 0) {
-			FLOW("dma_finish: transfer aborted\n");
+			TRACE("dma_finish: transfer aborted\n");
 			return B_ERROR;
 		} else {
-			FLOW("dma_finish: buffer underrun\n");
+			TRACE("dma_finish: buffer underrun\n");
 			return B_DEV_DATA_UNDERRUN;
 		}
 	} else {
 		if ((status & IDE_BM_STATUS_ACTIVE) != 0) {
-			FLOW("dma_finish: buffer too large\n");
+			TRACE("dma_finish: buffer too large\n");
 			return B_DEV_DATA_OVERRUN;
 		} else {
 			FLOW("dma_finish leave\n");
