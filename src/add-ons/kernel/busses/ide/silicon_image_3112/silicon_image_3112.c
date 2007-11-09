@@ -141,8 +141,13 @@ controller_supports(device_node_handle parent, bool *_noConnection)
 
 	#define ID(v, d) (((v) << 16) | (d))
 	switch (ID(vendorID, deviceID)) {
+		case ID(0x1095, 0x0240):
 		case ID(0x1095, 0x3112):
 		case ID(0x1095, 0x3114):
+		case ID(0x1095, 0x3512):
+		case ID(0x1002, 0x436e): // ATI
+		case ID(0x1002, 0x4379): // ATI
+		case ID(0x1002, 0x437a): // ATI
 			break;
 		default:
 			return 0.0f;
@@ -162,6 +167,7 @@ controller_probe(device_node_handle parent)
 	device_node_handle controller_node;
 	uint32 mmioBase;
 	uint16 deviceID;
+	uint16 vendorID;
 	uint8 interruptNumber;
 	int asicIndex;
 	int channelIndex;
@@ -174,15 +180,21 @@ controller_probe(device_node_handle parent)
 		return B_ERROR;
 
 	deviceID = pci->read_pci_config(device, PCI_device_id, 2);
+	vendorID = pci->read_pci_config(device, PCI_vendor_id, 2);
 	interruptNumber = pci->read_pci_config(device, PCI_interrupt_line, 1);
 	mmioBase = pci->read_pci_config(device, PCI_base_registers + 20, 4)
 		& PCI_address_io_mask;
 
-	switch (deviceID) {
-		case 0x3112:
+	switch (ID(vendorID, deviceID)) {
+		case ID(0x1095, 0x0240):
+		case ID(0x1095, 0x3112):
+		case ID(0x1095, 0x3512):
+		case ID(0x1002, 0x436e): // ATI
+		case ID(0x1002, 0x4379): // ATI
+		case ID(0x1002, 0x437a): // ATI
 			asicIndex = ASIC_SI3112;
 			break;
-		case 0x3114: 
+		case ID(0x1095, 0x3114):
 			asicIndex = ASIC_SI3114;
 			break;
 		default:
