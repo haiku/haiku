@@ -38,7 +38,7 @@ class BPolygon {
 
 	private:
 		BRect	fBounds;
-		int32	fCount;
+		uint32	fCount;
 		BPoint	*fPoints;
 };
 
