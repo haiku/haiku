@@ -19,8 +19,16 @@
 static void
 jmicron_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function, uint16 deviceId)
 {
-	if (deviceId != 0x2360 && deviceId != 0x2361 && deviceId != 0x2362 && deviceId != 0x2363 && deviceId != 0x2366)
-		return;
+	switch (deviceId) {
+		case 0x2360:
+		case 0x2361:
+		case 0x2362:
+		case 0x2363:
+		case 0x2366:
+			break;
+		default:
+			return;
+	}
 
 	dprintf("jmicron_fixup_ahci: domain %u, bus %u, device %u, function %u, deviceId 0x%04x\n",
 		domain, bus, device, function, deviceId);
@@ -48,6 +56,56 @@ jmicron_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function
 static void
 intel_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function, uint16 deviceId)
 {
+	switch (deviceId) {
+		case 0x2825: // ICH8 Desktop when in IDE emulation mode
+			dprintf("intel_fixup_ahci: WARNING found ICH8 device id 0x2825");
+			return;
+		case 0x2926: // ICH9 Desktop when in IDE emulation mode
+			dprintf("intel_fixup_ahci: WARNING found ICH9 device id 0x2926");
+			return;
+
+		case 0x27c0: // ICH7 Desktop non-AHCI and non-RAID mode
+		case 0x27c4: // ICH7 Mobile non-AHCI and non-RAID mode
+		case 0x2820: // ICH8 Desktop non-AHCI and non-RAID mode
+		case 0x2828: // ICH8 Mobile non-AHCI and non-RAID mode
+		case 0x2920: // ICH9 Desktop non-AHCI and non-RAID mode (4 ports)
+		case 0x2921: // ICH9 Desktop non-AHCI and non-RAID mode (2 ports)
+			break;
+		default:
+			return;
+	}
+
+	dprintf("intel_fixup_ahci: domain %u, bus %u, device %u, function %u, deviceId 0x%04x\n",
+		domain, bus, device, function, deviceId);
+
+	dprintf("0x24: 0x%08lx\n", pci->ReadPciConfig(domain, bus, device, function, 0x24, 4));
+	dprintf("0x90: 0x%02lx\n", pci->ReadPciConfig(domain, bus, device, function, 0x90, 1));
+
+	uint8 map = pci->ReadPciConfig(domain, bus, device, function, 0x90, 1);
+	uint32 bar5 = pci->ReadPciConfig(domain, bus, device, function, 0x24, 4);
+	if ((map >> 6) == 0) {
+		dprintf("intel_fixup_ahci: switching from IDE to AHCI mode\n");
+		map &= ~0x03;
+		map |= 0x40;
+		pci->WritePciConfig(domain, bus, device, function, 0x90, 1, map);
+
+		uint16 pcicmd = pci->ReadPciConfig(domain, bus, device, function, PCI_command, 2);
+		pci->WritePciConfig(domain, bus, device, function, PCI_command, 2, 
+			pcicmd & ~(PCI_command_io | PCI_command_memory));
+
+		pci->WritePciConfig(domain, bus, device, function, 0x24, 4, 0xffffffff);
+		dprintf("intel_fixup_ahci: bar5 bits-1: 0x%08lx\n", pci->ReadPciConfig(domain, bus, device, function, 0x24, 4));
+		pci->WritePciConfig(domain, bus, device, function, 0x24, 4, 0);
+		dprintf("intel_fixup_ahci: bar5 bits-0: 0x%08lx\n", pci->ReadPciConfig(domain, bus, device, function, 0x24, 4));
+
+		if (deviceId == 0x27c0 || deviceId == 0x27c4) // restore on ICH7
+			pci->WritePciConfig(domain, bus, device, function, 0x24, 4, bar5);
+
+		pci->WritePciConfig(domain, bus, device, function, PCI_command, 2, pcicmd);
+	}
+
+	dprintf("0x24: 0x%08lx\n", pci->ReadPciConfig(domain, bus, device, function, 0x24, 4));
+	dprintf("0x90: 0x%02lx\n", pci->ReadPciConfig(domain, bus, device, function, 0x90, 1));
 }
 
 
