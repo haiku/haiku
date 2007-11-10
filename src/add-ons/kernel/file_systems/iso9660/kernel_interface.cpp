@@ -462,7 +462,8 @@ fs_read_vnode(void *_ns, ino_t vnid, void **node, bool reenter)
 		result = ENOMEM;
 
 	if (result == B_OK && !(newNode->flags & ISO_ISDIR)) {
-		newNode->cache = file_cache_create(ns->id, vnid, newNode->dataLen[FS_DATA_FORMAT], ns->fdOfSession);
+		newNode->cache = file_cache_create(ns->id, vnid,
+			newNode->dataLen[FS_DATA_FORMAT]);
 	}
 
 	TRACE(("fs_read_vnode - EXIT, result is %s\n", strerror(result)));
@@ -567,7 +568,7 @@ fs_get_file_map(fs_volume _fs, fs_vnode _node, off_t pos, size_t reqLen,
 
 	// Read in the middle blocks.
 	if (numBlocks > 0) {
-		for (int32 i=startBlock; i<startBlock+numBlocks; i++) {
+		for (int32 i = startBlock; i < startBlock + numBlocks; i++) {
 			vecs[index].offset = i * blockSize;
 			vecs[index].length = blockSize;
 			index++;
@@ -762,8 +763,8 @@ fs_read(void *_ns, void *_node, void *cookie, off_t pos, void *buf, size_t *len)
 		// If pos >= file length, return length of 0.
 		*len = 0;
 		return B_OK;
-        }
-	return file_cache_read(node->cache, pos, buf, len);
+	}
+	return file_cache_read(node->cache, NULL, pos, buf, len);
 #endif
 }
 

@@ -65,12 +65,12 @@ typedef recursive_lock lock;
 
 #define VNODE_MAGIC 'treB'
 
-typedef struct vnode
-{
+typedef struct vnode {
 	uint32		magic;
 	ino_t		vnid; 			// self id
 	ino_t	 	dir_vnid;		// parent vnode id (directory containing entry)
-	void		*cache;			// for file cache
+	void		*cache;
+	void		*file_map;
 
 	uint32		disk_image;		// 0 = no, 1 = BEOS, 2 = IMAGE.BE
 

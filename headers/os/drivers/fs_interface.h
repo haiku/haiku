@@ -92,10 +92,10 @@ typedef struct file_system_module_info {
 	bool (*can_page)(fs_volume fs, fs_vnode vnode, fs_cookie cookie);
 	status_t (*read_pages)(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
 				off_t pos, const iovec *vecs, size_t count, size_t *_numBytes,
-				bool mayBlock, bool reenter);
+				bool reenter);
 	status_t (*write_pages)(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
 				off_t pos, const iovec *vecs, size_t count, size_t *_numBytes,
-				bool mayBlock, bool reenter);
+				bool reenter);
 
 	/* cache file access */
 	status_t (*get_file_map)(fs_volume fs, fs_vnode vnode, off_t offset,
@@ -251,6 +251,18 @@ extern status_t remove_vnode(dev_t mountID, ino_t vnodeID);
 extern status_t unremove_vnode(dev_t mountID, ino_t vnodeID);
 extern status_t get_vnode_removed(dev_t mountID, ino_t vnodeID,
 					bool* removed);
+extern status_t read_pages(int fd, off_t pos, const struct iovec *vecs,
+					size_t count, size_t *_numBytes, bool fsReenter);
+extern status_t write_pages(int fd, off_t pos, const struct iovec *vecs,
+					size_t count, size_t *_numBytes, bool fsReenter);
+extern status_t read_file_io_vec_pages(int fd,
+					const struct file_io_vec *fileVecs, size_t fileVecCount,
+					const struct iovec *vecs, size_t vecCount,
+					uint32 *_vecIndex, size_t *_vecOffset, size_t *_bytes);
+extern status_t write_file_io_vec_pages(int fd,
+					const struct file_io_vec *fileVecs, size_t fileVecCount,
+					const struct iovec *vecs, size_t vecCount,
+					uint32 *_vecIndex, size_t *_vecOffset, size_t *_bytes);
 
 // Deprecated! Will disappear soon!
 extern status_t notify_listener(int op, dev_t device, ino_t parentNode,

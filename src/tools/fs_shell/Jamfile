@@ -39,6 +39,7 @@ BuildPlatformStaticLibrary <build>fs_shell.a :
 	fcntl.cpp
 	fd.cpp
 	file_cache.cpp
+	file_map.cpp
 	kernel_export.cpp
 	KPath.cpp
 	hash.cpp

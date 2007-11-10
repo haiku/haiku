@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -10,6 +10,7 @@
 
 #include "vfs.h"
 
+#include <new>
 #include <stdlib.h>
 
 #include "fd.h"
@@ -25,12 +26,12 @@
 #include "fssh_stat.h"
 #include "fssh_stdio.h"
 #include "fssh_string.h"
+#include "fssh_uio.h"
 #include "fssh_unistd.h"
 #include "hash.h"
 #include "KPath.h"
 #include "posix_compatibility.h"
 #include "syscalls.h"
-
 
 //#define TRACE_VFS
 #ifdef TRACE_VFS
@@ -165,6 +166,8 @@ static struct vnode *sRoot;
 #define MOUNTS_HASH_TABLE_SIZE 16
 static hash_table *sMountsTable;
 static fssh_mount_id sNextMountID = 1;
+
+#define MAX_TEMP_IO_VECS 8
 
 fssh_mode_t __fssh_gUmask = 022;
 
@@ -1724,6 +1727,158 @@ get_new_fd(int type, struct fs_mount *mount, struct vnode *vnode,
 }
 
 
+/*!	Does the dirty work of combining the file_io_vecs with the iovecs
+	and calls the file system hooks to read/write the request to disk.
+*/
+static fssh_status_t
+common_file_io_vec_pages(int fd, const fssh_file_io_vec *fileVecs,
+	fssh_size_t fileVecCount, const fssh_iovec *vecs, fssh_size_t vecCount,
+	uint32_t *_vecIndex, fssh_size_t *_vecOffset, fssh_size_t *_numBytes,
+	bool doWrite)
+{
+	if (fileVecCount == 0) {
+		// There are no file vecs at this offset, so we're obviously trying
+		// to access the file outside of its bounds
+		return FSSH_B_BAD_VALUE;
+	}
+
+	fssh_size_t numBytes = *_numBytes;
+	uint32_t fileVecIndex;
+	fssh_size_t vecOffset = *_vecOffset;
+	uint32_t vecIndex = *_vecIndex;
+	fssh_status_t status;
+	fssh_size_t size;
+
+	if (!doWrite) {
+		// now directly read the data from the device
+		// the first file_io_vec can be read directly
+
+		size = fileVecs[0].length;
+		if (size > numBytes)
+			size = numBytes;
+
+		status = fssh_read_pages(fd, fileVecs[0].offset, vecs, vecCount,
+			&size, false);
+		if (status < FSSH_B_OK)
+			return status;
+
+		// TODO: this is a work-around for buggy device drivers!
+		//	When our own drivers honour the length, we can:
+		//	a) also use this direct I/O for writes (otherwise, it would
+		//	   overwrite precious data)
+		//	b) panic if the term below is true (at least for writes)
+		if (size > fileVecs[0].length) {
+			//dprintf("warning: device driver %p doesn't respect total length in read_pages() call!\n", ref->device);
+			size = fileVecs[0].length;
+		}
+
+		ASSERT(size <= fileVecs[0].length);
+
+		// If the file portion was contiguous, we're already done now
+		if (size == numBytes)
+			return FSSH_B_OK;
+
+		// if we reached the end of the file, we can return as well
+		if (size != fileVecs[0].length) {
+			*_numBytes = size;
+			return FSSH_B_OK;
+		}
+
+		fileVecIndex = 1;
+
+		// first, find out where we have to continue in our iovecs
+		for (; vecIndex < vecCount; vecIndex++) {
+			if (size < vecs[vecIndex].iov_len)
+				break;
+	
+			size -= vecs[vecIndex].iov_len;
+		}
+	} else {
+		fileVecIndex = 0;
+		size = 0;
+	}
+
+	// Too bad, let's process the rest of the file_io_vecs
+
+	fssh_size_t totalSize = size;
+	fssh_size_t bytesLeft = numBytes - size;
+
+	for (; fileVecIndex < fileVecCount; fileVecIndex++) {
+		const fssh_file_io_vec &fileVec = fileVecs[fileVecIndex];
+		fssh_off_t fileOffset = fileVec.offset;
+		fssh_off_t fileLeft = fssh_min_c(fileVec.length, bytesLeft);
+
+		TRACE(("FILE VEC [%lu] length %Ld\n", fileVecIndex, fileLeft));
+
+		// process the complete fileVec
+		while (fileLeft > 0) {
+			fssh_iovec tempVecs[MAX_TEMP_IO_VECS];
+			uint32_t tempCount = 0;
+
+			// size tracks how much of what is left of the current fileVec
+			// (fileLeft) has been assigned to tempVecs 
+			size = 0;
+
+			// assign what is left of the current fileVec to the tempVecs
+			for (size = 0; size < fileLeft && vecIndex < vecCount
+					&& tempCount < MAX_TEMP_IO_VECS;) {
+				// try to satisfy one iovec per iteration (or as much as
+				// possible)
+
+				// bytes left of the current iovec
+				fssh_size_t vecLeft = vecs[vecIndex].iov_len - vecOffset;
+				if (vecLeft == 0) {
+					vecOffset = 0;
+					vecIndex++;
+					continue;
+				}
+
+				TRACE(("fill vec %ld, offset = %lu, size = %lu\n",
+					vecIndex, vecOffset, size));
+
+				// actually available bytes
+				fssh_size_t tempVecSize = fssh_min_c(vecLeft, fileLeft - size);
+
+				tempVecs[tempCount].iov_base
+					= (void *)((fssh_addr_t)vecs[vecIndex].iov_base + vecOffset);
+				tempVecs[tempCount].iov_len = tempVecSize;
+				tempCount++;
+
+				size += tempVecSize;
+				vecOffset += tempVecSize;
+			}
+
+			fssh_size_t bytes = size;
+			if (doWrite) {
+				status = fssh_write_pages(fd, fileOffset, tempVecs,
+					tempCount, &bytes, false);
+			} else {
+				status = fssh_read_pages(fd, fileOffset, tempVecs,
+					tempCount, &bytes, false);
+			}
+			if (status < FSSH_B_OK)
+				return status;
+
+			totalSize += bytes;
+			bytesLeft -= size;
+			fileOffset += size;
+			fileLeft -= size;
+
+			if (size != bytes || vecIndex >= vecCount) {
+				// there are no more bytes or iovecs, let's bail out
+				*_numBytes = totalSize;
+				return FSSH_B_OK;
+			}
+		}
+	}
+
+	*_vecIndex = vecIndex;
+	*_vecOffset = vecOffset;
+	*_numBytes = totalSize;
+	return FSSH_B_OK;
+}
+
+
 //	#pragma mark - public VFS API
 
 
@@ -1895,6 +2050,110 @@ fssh_get_vnode_removed(fssh_mount_id mountID, fssh_vnode_id vnodeID,
 }
 
 
+//! Works directly on the host's file system
+extern "C" fssh_status_t
+fssh_read_pages(int fd, fssh_off_t pos, const fssh_iovec *vecs,
+	fssh_size_t count, fssh_size_t *_numBytes, bool fsReenter)
+{
+	// check how much the iovecs allow us to read
+	fssh_size_t toRead = 0;
+	for (fssh_size_t i = 0; i < count; i++)
+		toRead += vecs[i].iov_len;
+
+	fssh_iovec* newVecs = NULL;
+	if (*_numBytes < toRead) {
+		// We're supposed to read less than specified by the vecs. Since
+		// readv_pos() doesn't support this, we need to clone the vecs.
+		newVecs = new(nothrow) fssh_iovec[count];
+		if (!newVecs)
+			return FSSH_B_NO_MEMORY;
+
+		fssh_size_t newCount = 0;
+		for (fssh_size_t i = 0; i < count && toRead > 0; i++) {
+			fssh_size_t vecLen = fssh_min_c(vecs[i].iov_len, toRead);
+			newVecs[i].iov_base = vecs[i].iov_base;
+			newVecs[i].iov_len = vecLen;
+			toRead -= vecLen;
+			newCount++;
+		}
+
+		vecs = newVecs;
+		count = newCount;
+	}
+
+	fssh_ssize_t bytesRead = fssh_readv_pos(fd, pos, vecs, count);
+	delete[] newVecs;
+	if (bytesRead < 0)
+		return fssh_get_errno();
+
+	*_numBytes = bytesRead;
+	return FSSH_B_OK;
+}
+
+
+//! Works directly on the host's file system
+extern "C" fssh_status_t
+fssh_write_pages(int fd, fssh_off_t pos, const fssh_iovec *vecs,
+	fssh_size_t count, fssh_size_t *_numBytes, bool fsReenter)
+{
+	// check how much the iovecs allow us to write
+	fssh_size_t toWrite = 0;
+	for (fssh_size_t i = 0; i < count; i++)
+		toWrite += vecs[i].iov_len;
+
+	fssh_iovec* newVecs = NULL;
+	if (*_numBytes < toWrite) {
+		// We're supposed to write less than specified by the vecs. Since
+		// writev_pos() doesn't support this, we need to clone the vecs.
+		newVecs = new(nothrow) fssh_iovec[count];
+		if (!newVecs)
+			return FSSH_B_NO_MEMORY;
+
+		fssh_size_t newCount = 0;
+		for (fssh_size_t i = 0; i < count && toWrite > 0; i++) {
+			fssh_size_t vecLen = fssh_min_c(vecs[i].iov_len, toWrite);
+			newVecs[i].iov_base = vecs[i].iov_base;
+			newVecs[i].iov_len = vecLen;
+			toWrite -= vecLen;
+			newCount++;
+		}
+
+		vecs = newVecs;
+		count = newCount;
+	}
+
+	fssh_ssize_t bytesWritten = fssh_writev_pos(fd, pos, vecs, count);
+	delete[] newVecs;
+	if (bytesWritten < 0)
+		return fssh_get_errno();
+
+	*_numBytes = bytesWritten;
+	return FSSH_B_OK;
+}
+
+
+//! Works directly on the host's file system
+extern "C" fssh_status_t
+fssh_read_file_io_vec_pages(int fd, const fssh_file_io_vec *fileVecs,
+	fssh_size_t fileVecCount, const fssh_iovec *vecs, fssh_size_t vecCount,
+	uint32_t *_vecIndex, fssh_size_t *_vecOffset, fssh_size_t *_bytes)
+{
+	return common_file_io_vec_pages(fd, fileVecs, fileVecCount,
+		vecs, vecCount, _vecIndex, _vecOffset, _bytes, false);
+}
+
+
+//! Works directly on the host's file system
+extern "C" fssh_status_t
+fssh_write_file_io_vec_pages(int fd, const fssh_file_io_vec *fileVecs,
+	fssh_size_t fileVecCount, const fssh_iovec *vecs, fssh_size_t vecCount,
+	uint32_t *_vecIndex, fssh_size_t *_vecOffset, fssh_size_t *_bytes)
+{
+	return common_file_io_vec_pages(fd, fileVecs, fileVecCount,
+		vecs, vecCount, _vecIndex, _vecOffset, _bytes, true);
+}
+
+
 //	#pragma mark - private VFS API
 //	Functions the VFS exports for other parts of the kernel
 
@@ -1981,15 +2240,41 @@ vfs_get_vnode(fssh_mount_id mountID, fssh_vnode_id vnodeID, void **_vnode)
 
 
 fssh_status_t
+vfs_read_pages(void *_vnode, void *cookie, fssh_off_t pos,
+	const fssh_iovec *vecs, fssh_size_t count, fssh_size_t *_numBytes,
+	bool fsReenter)
+{
+	struct vnode *vnode = (struct vnode *)_vnode;
+
+	return FS_CALL(vnode, read_pages)(vnode->mount->cookie, vnode->private_node,
+		cookie, pos, vecs, count, _numBytes, fsReenter);
+}
+
+
+fssh_status_t
+vfs_write_pages(void *_vnode, void *cookie, fssh_off_t pos,
+	const fssh_iovec *vecs, fssh_size_t count, fssh_size_t *_numBytes,
+	bool fsReenter)
+{
+	struct vnode *vnode = (struct vnode *)_vnode;
+
+	return FS_CALL(vnode, write_pages)(vnode->mount->cookie, vnode->private_node,
+		cookie, pos, vecs, count, _numBytes, fsReenter);
+}
+
+
+fssh_status_t
 vfs_entry_ref_to_vnode(fssh_mount_id mountID, fssh_vnode_id directoryID,
 	const char *name, void **_vnode)
 {
-	return entry_ref_to_vnode(mountID, directoryID, name, (struct vnode **)_vnode);
+	return entry_ref_to_vnode(mountID, directoryID, name,
+		(struct vnode **)_vnode);
 }
 
 
 void
-vfssh_fs_vnode_to_node_ref(void *_vnode, fssh_mount_id *_mountID, fssh_vnode_id *_vnodeID)
+vfs_fs_vnode_to_node_ref(void *_vnode, fssh_mount_id *_mountID,
+	fssh_vnode_id *_vnodeID)
 {
 	struct vnode *vnode = (struct vnode *)_vnode;
 

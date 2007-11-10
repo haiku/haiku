@@ -141,8 +141,8 @@ dosfs_release_vnode(void *_vol, void *_node, bool reenter)
 		
 		if (node->vnid != vol->root_vnode.vnid) {
 			node->magic = ~VNODE_MAGIC; // munge magic number to be safe
-			if (node->cache != NULL)
-				file_cache_delete(node->cache);
+			file_cache_delete(node->cache);
+			file_map_delete(node->file_map);
 			free(node);
 		}
 	}
@@ -245,6 +245,7 @@ dosfs_wstat(void *_vol, void *_node, const struct stat *st, uint32 mask)
 				node->iteration++;
 				dirty = true;
 				file_cache_set_size(node->cache, node->st_size);
+				file_map_set_size(node->file_map, node->st_size);
 			}
 		}
 	}
@@ -393,7 +394,7 @@ dosfs_read(void *_vol, void *_node, void *_cookie, off_t pos,
 	if (pos + *len >= node->st_size)
 		*len = node->st_size - pos;
 		
-	result = file_cache_read(node->cache, pos, buf, len);
+	result = file_cache_read(node->cache, cookie, pos, buf, len);
 
 #if 0
 
@@ -595,9 +596,10 @@ dosfs_write(void *_vol, void *_node, void *_cookie, off_t pos,
 		DPRINTF(0, ("setting file size to %Lx (%lx clusters)\n", node->st_size, clusters));
 		node->dirty = true;
 		file_cache_set_size(node->cache, node->st_size);
+		file_map_set_size(node->file_map, node->st_size);
 	}
 	
-	result = file_cache_write(node->cache, pos, buf, len);
+	result = file_cache_write(node->cache, cookie, pos, buf, len);
 	
 #if 0
 	if (cluster1 == 0xffffffff) {
@@ -1479,11 +1481,13 @@ dosfs_can_page(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
 
 status_t
 dosfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
-	const iovec *vecs, size_t count, size_t *_numBytes, bool mayBlock,
-	bool reenter)
+	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
 {
 	nspace *vol = (nspace *)_fs;
 	vnode *node = (vnode *)_node;
+	uint32 vecIndex = 0;
+	size_t vecOffset = 0;
+	size_t bytesLeft = *_numBytes;
 	status_t status;
 
 	if (check_nspace_magic(vol, "dosfs_read_pages")
@@ -1493,23 +1497,49 @@ dosfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 	if (node->cache == NULL)
 		return(B_BAD_VALUE);
 
-	// TODO: respect "mayBlock"!
-	LOCK_VOL(vol);
-	status = file_cache_read_pages(node->cache, pos, vecs, count,
-		_numBytes);
-	UNLOCK_VOL(vol);
+	if (!reenter) {
+		LOCK_VOL(vol);
+	}
 
-	return status;
+	while (true) {
+		struct file_io_vec fileVecs[8];
+		uint32 fileVecCount = 8;
+		bool bufferOverflow;
+		size_t bytes;
+
+		status = file_map_translate(node->file_map, pos, bytesLeft, fileVecs,
+			&fileVecCount);
+		if (status != B_OK && status != B_BUFFER_OVERFLOW)
+			break;
+
+		bufferOverflow = status == B_BUFFER_OVERFLOW;
+
+		status = read_file_io_vec_pages(vol->fd, fileVecs,
+			fileVecCount, vecs, count, &vecIndex, &vecOffset, &bytes);
+		if (status != B_OK || !bufferOverflow)
+			break;
+
+		pos += bytes;
+		bytesLeft -= bytes;
+	}
+
+	if (!reenter) {
+		UNLOCK_VOL(vol);
+	}
+
+	return B_ERROR;
 }
 
 
 status_t
 dosfs_write_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
-	const iovec *vecs, size_t count, size_t *_numBytes, bool mayBlock,
-	bool reenter)
+	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
 {
 	nspace *vol = (nspace *)_fs;
 	vnode *node = (vnode *)_node;
+	uint32 vecIndex = 0;
+	size_t vecOffset = 0;
+	size_t bytesLeft = *_numBytes;
 	status_t status;
 
 	if (check_nspace_magic(vol, "dosfs_write_pages")
@@ -1519,19 +1549,43 @@ dosfs_write_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 	if (node->cache == NULL)
 		return B_BAD_VALUE;
 
-	// TODO: respect "mayBlock"!
-	LOCK_VOL(vol);
-	status = file_cache_write_pages(node->cache, pos, vecs, count,
-		_numBytes);
-	UNLOCK_VOL(vol);
+	if (!reenter) {
+		LOCK_VOL(vol);
+	}
 
-	return status;
+	while (true) {
+		struct file_io_vec fileVecs[8];
+		uint32 fileVecCount = 8;
+		bool bufferOverflow;
+		size_t bytes;
+
+		status = file_map_translate(node->file_map, pos, bytesLeft, fileVecs,
+			&fileVecCount);
+		if (status != B_OK && status != B_BUFFER_OVERFLOW)
+			break;
+
+		bufferOverflow = status == B_BUFFER_OVERFLOW;
+
+		status = write_file_io_vec_pages(vol->fd, fileVecs,
+			fileVecCount, vecs, count, &vecIndex, &vecOffset, &bytes);
+		if (status != B_OK || !bufferOverflow)
+			break;
+
+		pos += bytes;
+		bytesLeft -= bytes;
+	}
+
+	if (!reenter) {
+		UNLOCK_VOL(vol);
+	}
+
+	return B_ERROR;
 }
 
 
 status_t
 dosfs_get_file_map(void *_fs, void *_node, off_t pos, size_t len,
-						struct file_io_vec *vecs, size_t *_count)
+	struct file_io_vec *vecs, size_t *_count)
 {
 	nspace	*vol = (nspace *)_fs;
 	vnode	*node = (vnode *)_node;

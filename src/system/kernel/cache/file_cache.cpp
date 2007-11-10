@@ -35,42 +35,13 @@
 // maximum number of iovecs per request
 #define MAX_IO_VECS			32	// 128 kB
 #define MAX_FILE_IO_VECS	32
-#define MAX_TEMP_IO_VECS	8
-
-#define CACHED_FILE_EXTENTS	2
-	// must be smaller than MAX_FILE_IO_VECS
-	// ToDo: find out how much of these are typically used
 
 #define BYPASS_IO_SIZE		65536
 #define LAST_ACCESSES		3
 
-struct file_extent {
-	off_t			offset;
-	file_io_vec		disk;
-};
-
-struct file_map {
-	file_map();
-	~file_map();
-
-	file_extent *operator[](uint32 index);
-	file_extent *ExtentAt(uint32 index);
-	status_t Add(file_io_vec *vecs, size_t vecCount, off_t &lastOffset);
-	void Free();
-
-	union {
-		file_extent	direct[CACHED_FILE_EXTENTS];
-		file_extent	*array;
-	};
-	size_t			count;
-};
-
 struct file_cache_ref {
 	vm_cache		*cache;
 	struct vnode	*vnode;
-	struct vnode	*device;
-	void			*cookie;
-	file_map		map;
 	off_t			last_access[LAST_ACCESSES];
 		// TODO: it would probably be enough to only store the least
 		//	significant 31 bits, and make this uint32 (one bit for
@@ -79,107 +50,12 @@ struct file_cache_ref {
 	bool			last_access_was_write;
 };
 
-typedef status_t (*cache_func)(file_cache_ref *ref, off_t offset,
+typedef status_t (*cache_func)(file_cache_ref *ref, void *cookie, off_t offset,
 	int32 pageOffset, addr_t buffer, size_t bufferSize,
 	size_t lastReservedPages, size_t reservePages);
 
 
 static struct cache_module_info *sCacheModule;
-
-
-file_map::file_map()
-{
-	array = NULL;
-	count = 0;
-}
-
-
-file_map::~file_map()
-{
-	Free();
-}
-
-
-file_extent *
-file_map::operator[](uint32 index)
-{
-	return ExtentAt(index);
-}
-
-
-file_extent *
-file_map::ExtentAt(uint32 index)
-{
-	if (index >= count)
-		return NULL;
-
-	if (count > CACHED_FILE_EXTENTS)
-		return &array[index];
-
-	return &direct[index];
-}
-
-
-status_t
-file_map::Add(file_io_vec *vecs, size_t vecCount, off_t &lastOffset)
-{
-	TRACE(("file_map::Add(vecCount = %ld)\n", vecCount));
-
-	off_t offset = 0;
-
-	if (vecCount <= CACHED_FILE_EXTENTS && count == 0) {
-		// just use the reserved area in the file_cache_ref structure
-	} else {
-		// TODO: once we can invalidate only parts of the file map,
-		//	we might need to copy the previously cached file extends
-		//	from the direct range
-		file_extent *newMap = (file_extent *)realloc(array,
-			(count + vecCount) * sizeof(file_extent));
-		if (newMap == NULL)
-			return B_NO_MEMORY;
-
-		array = newMap;
-
-		if (count != 0) {
-			file_extent *extent = ExtentAt(count - 1);
-			offset = extent->offset + extent->disk.length;
-		}
-	}
-
-	int32 start = count;
-	count += vecCount;
-
-	for (uint32 i = 0; i < vecCount; i++) {
-		file_extent *extent = ExtentAt(start + i);
-
-		extent->offset = offset;
-		extent->disk = vecs[i];
-
-		offset += extent->disk.length;
-	}
-
-#ifdef TRACE_FILE_CACHE
-	for (uint32 i = 0; i < count; i++) {
-		file_extent *extent = ExtentAt(i);
-		dprintf("[%ld] extend offset %Ld, disk offset %Ld, length %Ld\n",
-			i, extent->offset, extent->disk.offset, extent->disk.length);
-	}
-#endif
-
-	lastOffset = offset;
-	return B_OK;
-}
-
-
-void
-file_map::Free()
-{
-	if (count > CACHED_FILE_EXTENTS)
-		free(array);
-
-	array = NULL;
-	count = 0;
-}
 
 
 //	#pragma mark -
@@ -202,119 +78,6 @@ add_to_iovec(iovec *vecs, int32 &index, int32 max, addr_t address, size_t size)
 	vecs[index].iov_base = (void *)address;
 	vecs[index].iov_len = size;
 	index++;
-}
-
-
-static file_extent *
-find_file_extent(file_cache_ref *ref, off_t offset, uint32 *_index)
-{
-	// TODO: do binary search
-
-	for (uint32 index = 0; index < ref->map.count; index++) {
-		file_extent *extent = ref->map[index];
-
-		if (extent->offset <= offset
-			&& extent->offset + extent->disk.length > offset) {
-			if (_index)
-				*_index = index;
-			return extent;
-		}
-	}
-
-	return NULL;
-}
-
-
-static status_t
-get_file_map(file_cache_ref *ref, off_t offset, size_t size,
-	file_io_vec *vecs, size_t *_count)
-{
-	size_t maxVecs = *_count;
-	status_t status = B_OK;
-
-	if (ref->map.count == 0) {
-		// we don't yet have the map of this file, so let's grab it
-		// (ordered by offset, so that we can do a binary search on them)
-
-		MutexLocker _(ref->cache->lock);
-
-		// the file map could have been requested in the mean time
-		if (ref->map.count == 0) {
-			size_t vecCount = maxVecs;
-			off_t mapOffset = 0;
-
-			while (true) {
-				status = vfs_get_file_map(ref->vnode, mapOffset, ~0UL, vecs,
-					&vecCount);
-				if (status < B_OK && status != B_BUFFER_OVERFLOW)
-					return status;
-
-				status_t addStatus = ref->map.Add(vecs, vecCount, mapOffset);
-				if (addStatus != B_OK) {
-					// only clobber the status in case of failure
-					status = addStatus;
-				}
-
-				if (status != B_BUFFER_OVERFLOW)
-					break;
-
-				// when we are here, the map has been stored in the array, and
-				// the array size was still too small to cover the whole file
-				vecCount = maxVecs;
-			}
-		}
-	}
-
-	if (status != B_OK) {
-		// We must invalidate the (part of the) map we already
-		// have, as we cannot know if it's complete or not
-		ref->map.Free();
-		return status;
-	}
-
-	// We now have cached the map of this file, we now need to
-	// translate it for the requested access.
-
-	uint32 index;
-	file_extent *fileExtent = find_file_extent(ref, offset, &index);
-	if (fileExtent == NULL) {
-		// access outside file bounds? But that's not our problem
-		*_count = 0;
-		return B_OK;
-	}
-
-	offset -= fileExtent->offset;
-	vecs[0].offset = fileExtent->disk.offset + offset;
-	vecs[0].length = fileExtent->disk.length - offset;
-
-	if (vecs[0].length >= size || index >= ref->map.count - 1) {
-		*_count = 1;
-		return B_OK;
-	}
-
-	// copy the rest of the vecs
-
-	size -= vecs[0].length;
-
-	for (index = 1; index < ref->map.count;) {
-		fileExtent++;
-
-		vecs[index] = fileExtent->disk;
-		index++;
-
-		if (size <= fileExtent->disk.length)
-			break;
-
-		if (index >= maxVecs) {
-			*_count = index;
-			return B_BUFFER_OVERFLOW;
-		}
-
-		size -= fileExtent->disk.length;
-	}
-
-	*_count = index;
-	return B_OK;
 }
 
 
@@ -397,212 +160,6 @@ reserve_pages(file_cache_ref *ref, size_t reservePages, bool isWrite)
 }
 
 
-/*!
-	Does the dirty work of translating the request into actual disk offsets
-	and reads to or writes from the supplied iovecs as specified by \a doWrite.
-*/
-static status_t
-pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
-	size_t *_numBytes, bool doWrite)
-{
-	TRACE(("pages_io: ref = %p, offset = %Ld, size = %lu, vecCount = %lu, %s\n",
-		ref, offset, *_numBytes, count, doWrite ? "write" : "read"));
-
-	// translate the iovecs into direct device accesses
-	file_io_vec fileVecs[MAX_FILE_IO_VECS];
-	size_t fileVecCount = MAX_FILE_IO_VECS;
-	size_t numBytes = *_numBytes;
-
-	push_access(ref, offset, numBytes, doWrite);
-
-	status_t status = get_file_map(ref, offset, numBytes, fileVecs,
-		&fileVecCount);
-	if (status < B_OK && status != B_BUFFER_OVERFLOW) {
-		TRACE(("get_file_map(offset = %Ld, numBytes = %lu) failed: %s\n",
-			offset, numBytes, strerror(status)));
-		return status;
-	}
-
-	bool bufferOverflow = status == B_BUFFER_OVERFLOW;
-
-#ifdef TRACE_FILE_CACHE
-	dprintf("got %lu file vecs for %Ld:%lu%s:\n", fileVecCount, offset,
-		numBytes, bufferOverflow ? " (array too small)" : "");
-	for (size_t i = 0; i < fileVecCount; i++) {
-		dprintf("  [%lu] offset = %Ld, size = %Ld\n",
-			i, fileVecs[i].offset, fileVecs[i].length);
-	}
-#endif
-
-	if (fileVecCount == 0) {
-		// There are no file vecs at this offset, so we're obviously trying
-		// to access the file outside of its bounds
-		TRACE(("pages_io: access outside of vnode %p at offset %Ld\n",
-			ref->vnode, offset));
-		return B_BAD_VALUE;
-	}
-
-	uint32 fileVecIndex;
-	size_t size;
-
-	if (!doWrite) {
-		// now directly read the data from the device
-		// the first file_io_vec can be read directly
-
-		size = fileVecs[0].length;
-		if (size > numBytes)
-			size = numBytes;
-
-		status = vfs_read_pages(ref->device, ref->cookie, fileVecs[0].offset,
-			vecs, count, &size, true, false);
-		if (status < B_OK)
-			return status;
-
-		// TODO: this is a work-around for buggy device drivers!
-		//	When our own drivers honour the length, we can:
-		//	a) also use this direct I/O for writes (otherwise, it would
-		//	   overwrite precious data)
-		//	b) panic if the term below is true (at least for writes)
-		if (size > fileVecs[0].length) {
-			//dprintf("warning: device driver %p doesn't respect total length in read_pages() call!\n", ref->device);
-			size = fileVecs[0].length;
-		}
-
-		ASSERT(size <= fileVecs[0].length);
-
-		// If the file portion was contiguous, we're already done now
-		if (size == numBytes)
-			return B_OK;
-
-		// if we reached the end of the file, we can return as well
-		if (size != fileVecs[0].length) {
-			*_numBytes = size;
-			return B_OK;
-		}
-
-		fileVecIndex = 1;
-	} else {
-		fileVecIndex = 0;
-		size = 0;
-	}
-
-	// Too bad, let's process the rest of the file_io_vecs
-
-	size_t totalSize = size;
-
-	// first, find out where we have to continue in our iovecs
-	uint32 i = 0;
-	for (; i < count; i++) {
-		if (size < vecs[i].iov_len)
-			break;
-
-		size -= vecs[i].iov_len;
-	}
-
-	size_t vecOffset = size;
-	size_t bytesLeft = numBytes - size;
-
-	while (true) {
-		for (; fileVecIndex < fileVecCount; fileVecIndex++) {
-			file_io_vec &fileVec = fileVecs[fileVecIndex];
-			off_t fileOffset = fileVec.offset;
-			off_t fileLeft = min_c(fileVec.length, bytesLeft);
-
-			TRACE(("FILE VEC [%lu] length %Ld\n", fileVecIndex, fileLeft));
-
-			// process the complete fileVec
-			while (fileLeft > 0) {
-				iovec tempVecs[MAX_TEMP_IO_VECS];
-				uint32 tempCount = 0;
-
-				// size tracks how much of what is left of the current fileVec
-				// (fileLeft) has been assigned to tempVecs 
-				size = 0;
-
-				// assign what is left of the current fileVec to the tempVecs
-				for (size = 0; size < fileLeft && i < count
-						&& tempCount < MAX_TEMP_IO_VECS;) {
-					// try to satisfy one iovec per iteration (or as much as
-					// possible)
-
-					// bytes left of the current iovec
-					size_t vecLeft = vecs[i].iov_len - vecOffset;
-					if (vecLeft == 0) {
-						vecOffset = 0;
-						i++;
-						continue;
-					}
-
-					TRACE(("fill vec %ld, offset = %lu, size = %lu\n",
-						i, vecOffset, size));
-
-					// actually available bytes
-					size_t tempVecSize = min_c(vecLeft, fileLeft - size);
-
-					tempVecs[tempCount].iov_base
-						= (void *)((addr_t)vecs[i].iov_base + vecOffset);
-					tempVecs[tempCount].iov_len = tempVecSize;
-					tempCount++;
-
-					size += tempVecSize;
-					vecOffset += tempVecSize;
-				}
-
-				size_t bytes = size;
-				if (doWrite) {
-					status = vfs_write_pages(ref->device, ref->cookie,
-						fileOffset, tempVecs, tempCount, &bytes, true, false);
-				} else {
-					status = vfs_read_pages(ref->device, ref->cookie,
-						fileOffset, tempVecs, tempCount, &bytes, true, false);
-				}
-				if (status < B_OK)
-					return status;
-
-				totalSize += bytes;
-				bytesLeft -= size;
-				fileOffset += size;
-				fileLeft -= size;
-				//dprintf("-> file left = %Lu\n", fileLeft);
-
-				if (size != bytes || i >= count) {
-					// there are no more bytes or iovecs, let's bail out
-					*_numBytes = totalSize;
-					return B_OK;
-				}
-			}
-		}
-
-		if (bufferOverflow) {
-			status = get_file_map(ref, offset + totalSize, bytesLeft, fileVecs,
-				&fileVecCount);
-			if (status < B_OK && status != B_BUFFER_OVERFLOW) {
-				TRACE(("get_file_map(offset = %Ld, numBytes = %lu) failed: %s\n",
-					offset, numBytes, strerror(status)));
-				return status;
-			}
-
-			bufferOverflow = status == B_BUFFER_OVERFLOW;
-			fileVecIndex = 0;
-
-#ifdef TRACE_FILE_CACHE
-			dprintf("got %lu file vecs for %Ld:%lu%s:\n", fileVecCount,
-				offset + totalSize, numBytes,
-				bufferOverflow ? " (array too small)" : "");
-			for (size_t i = 0; i < fileVecCount; i++) {
-				dprintf("  [%lu] offset = %Ld, size = %Ld\n",
-					i, fileVecs[i].offset, fileVecs[i].length);
-			}
-#endif
-		} else
-			break;
-	}
-
-	*_numBytes = totalSize;
-	return B_OK;
-}
-
-
 /*!	Reads the requested amount of data into the cache, and allocates
 	pages needed to fulfill that request. This function is called by cache_io().
 	It can only handle a certain amount of bytes, and the caller must make
@@ -611,9 +168,9 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 	operation it will unlock the cache, though.
 */
 static status_t
-read_into_cache(file_cache_ref *ref, off_t offset, int32 pageOffset,
-	addr_t buffer, size_t bufferSize, size_t lastReservedPages,
-	size_t reservePages)
+read_into_cache(file_cache_ref *ref, void *cookie, off_t offset,
+	int32 pageOffset, addr_t buffer, size_t bufferSize,
+	size_t lastReservedPages, size_t reservePages)
 {
 	TRACE(("read_into_cache(offset = %Ld, pageOffset = %ld, buffer = %#lx, "
 		"bufferSize = %lu\n", offset, pageOffset, buffer, bufferSize));
@@ -650,11 +207,13 @@ read_into_cache(file_cache_ref *ref, off_t offset, int32 pageOffset,
 			// TODO: check if the array is large enough (currently panics)!
 	}
 
+	push_access(ref, offset, bufferSize, false);
 	mutex_unlock(&cache->lock);
 	vm_page_unreserve_pages(lastReservedPages);
 
 	// read file into reserved pages
-	status_t status = pages_io(ref, offset, vecs, vecCount, &numBytes, false);
+	status_t status = vfs_read_pages(ref->vnode, cookie, offset, vecs,
+		vecCount, &numBytes, false);
 	if (status < B_OK) {
 		// reading failed, free allocated pages
 
@@ -718,18 +277,20 @@ read_into_cache(file_cache_ref *ref, off_t offset, int32 pageOffset,
 
 
 static status_t
-read_from_file(file_cache_ref *ref, off_t offset, int32 pageOffset,
-	addr_t buffer, size_t bufferSize, size_t lastReservedPages,
-	size_t reservePages)
+read_from_file(file_cache_ref *ref, void *cookie, off_t offset,
+	int32 pageOffset, addr_t buffer, size_t bufferSize,
+	size_t lastReservedPages, size_t reservePages)
 {
 	iovec vec;
 	vec.iov_base = (void *)buffer;
 	vec.iov_len = bufferSize;
 
+	push_access(ref, offset, bufferSize, false);
 	mutex_unlock(&ref->cache->lock);
 	vm_page_unreserve_pages(lastReservedPages);
 
-	status_t status = pages_io(ref, offset, &vec, 1, &bufferSize, false);
+	status_t status = vfs_read_pages(ref->vnode, cookie, offset, &vec, 1,
+		&bufferSize, false);
 	if (status == B_OK)
 		reserve_pages(ref, reservePages, false);
 
@@ -745,9 +306,9 @@ read_from_file(file_cache_ref *ref, off_t offset, int32 pageOffset,
 	The same restrictions apply.
 */
 static status_t
-write_to_cache(file_cache_ref *ref, off_t offset, int32 pageOffset,
-	addr_t buffer, size_t bufferSize, size_t lastReservedPages,
-	size_t reservePages)
+write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
+	int32 pageOffset, addr_t buffer, size_t bufferSize,
+	size_t lastReservedPages, size_t reservePages)
 {
 	// TODO: We're using way too much stack! Rather allocate a sufficiently
 	// large chunk on the heap.
@@ -783,6 +344,7 @@ write_to_cache(file_cache_ref *ref, off_t offset, int32 pageOffset,
 		// ToDo: check if the array is large enough!
 	}
 
+	push_access(ref, offset, bufferSize, true);
 	mutex_unlock(&ref->cache->lock);
 	vm_page_unreserve_pages(lastReservedPages);
 
@@ -794,10 +356,11 @@ write_to_cache(file_cache_ref *ref, off_t offset, int32 pageOffset,
 		iovec readVec = { vecs[0].iov_base, B_PAGE_SIZE };
 		size_t bytesRead = B_PAGE_SIZE;
 
-		status = pages_io(ref, offset, &readVec, 1, &bytesRead, false);
+		status = vfs_read_pages(ref->vnode, cookie, offset, &readVec, 1,
+			&bytesRead, false);
 		// ToDo: handle errors for real!
 		if (status < B_OK)
-			panic("1. pages_io() failed: %s!\n", strerror(status));
+			panic("1. vfs_read_pages() failed: %s!\n", strerror(status));
 	}
 
 	addr_t lastPageOffset = (pageOffset + bufferSize) & (B_PAGE_SIZE - 1);
@@ -816,11 +379,12 @@ write_to_cache(file_cache_ref *ref, off_t offset, int32 pageOffset,
 			iovec readVec = { (void *)last, B_PAGE_SIZE };
 			size_t bytesRead = B_PAGE_SIZE;
 
-			status = pages_io(ref, PAGE_ALIGN(offset + pageOffset + bufferSize)
-				- B_PAGE_SIZE, &readVec, 1, &bytesRead, false);
+			status = vfs_read_pages(ref->vnode, cookie,
+				PAGE_ALIGN(offset + pageOffset + bufferSize) - B_PAGE_SIZE,
+				&readVec, 1, &bytesRead, false);
 			// ToDo: handle errors for real!
 			if (status < B_OK)
-				panic("pages_io() failed: %s!\n", strerror(status));
+				panic("vfs_read_pages() failed: %s!\n", strerror(status));
 
 			if (bytesRead < B_PAGE_SIZE) {
 				// the space beyond the file size needs to be cleaned
@@ -846,8 +410,8 @@ write_to_cache(file_cache_ref *ref, off_t offset, int32 pageOffset,
 
 	if (writeThrough) {
 		// write cached pages back to the file if we were asked to do that
-		status_t status = pages_io(ref, offset, vecs, vecCount, &numBytes,
-			true);
+		status_t status = vfs_write_pages(ref->vnode, cookie, offset, vecs,
+			vecCount, &numBytes, false);
 		if (status < B_OK) {
 			// ToDo: remove allocated pages, ...?
 			panic("file_cache: remove allocated pages! write pages failed: %s\n",
@@ -886,7 +450,7 @@ write_to_cache(file_cache_ref *ref, off_t offset, int32 pageOffset,
 
 
 static status_t
-write_to_file(file_cache_ref *ref, off_t offset, int32 pageOffset,
+write_to_file(file_cache_ref *ref, void *cookie, off_t offset, int32 pageOffset,
 	addr_t buffer, size_t bufferSize, size_t lastReservedPages,
 	size_t reservePages)
 {
@@ -894,10 +458,12 @@ write_to_file(file_cache_ref *ref, off_t offset, int32 pageOffset,
 	vec.iov_base = (void *)buffer;
 	vec.iov_len = bufferSize;
 
+	push_access(ref, offset, bufferSize, true);
 	mutex_unlock(&ref->cache->lock);
 	vm_page_unreserve_pages(lastReservedPages);
 
-	status_t status = pages_io(ref, offset, &vec, 1, &bufferSize, true);
+	status_t status = vfs_write_pages(ref->vnode, cookie, offset, &vec, 1,
+		&bufferSize, false);
 	if (status == B_OK)
 		reserve_pages(ref, reservePages, true);
 
@@ -908,10 +474,10 @@ write_to_file(file_cache_ref *ref, off_t offset, int32 pageOffset,
 
 
 static inline status_t
-satisfy_cache_io(file_cache_ref *ref, cache_func function, off_t offset,
-	addr_t buffer, int32 &pageOffset, size_t bytesLeft, size_t &reservePages,
-	off_t &lastOffset, addr_t &lastBuffer, int32 &lastPageOffset,
-	size_t &lastLeft, size_t &lastReservedPages)
+satisfy_cache_io(file_cache_ref *ref, void *cookie, cache_func function,
+	off_t offset, addr_t buffer, int32 &pageOffset, size_t bytesLeft,
+	size_t &reservePages, off_t &lastOffset, addr_t &lastBuffer,
+	int32 &lastPageOffset, size_t &lastLeft, size_t &lastReservedPages)
 {
 	if (lastBuffer == buffer)
 		return B_OK;
@@ -920,8 +486,8 @@ satisfy_cache_io(file_cache_ref *ref, cache_func function, off_t offset,
 	reservePages = min_c(MAX_IO_VECS, (lastLeft - requestSize
 		+ lastPageOffset + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
 
-	status_t status = function(ref, lastOffset, lastPageOffset, lastBuffer,
-		requestSize, lastReservedPages, reservePages);
+	status_t status = function(ref, cookie, lastOffset, lastPageOffset,
+		lastBuffer, requestSize, lastReservedPages, reservePages);
 	if (status == B_OK) {
 		lastReservedPages = reservePages;
 		lastBuffer = buffer;
@@ -935,8 +501,8 @@ satisfy_cache_io(file_cache_ref *ref, cache_func function, off_t offset,
 
 
 static status_t
-cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
-	bool doWrite)
+cache_io(void *_cacheRef, void *cookie, off_t offset, addr_t buffer,
+	size_t *_size, bool doWrite)
 {
 	if (_cacheRef == NULL)
 		panic("cache_io() called with NULL ref!\n");
@@ -1005,9 +571,9 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
 			// in the near future, we need to satisfy the request of the pages
 			// we didn't get yet (to make sure no one else interferes in the
 			// mean time).
-			status_t status = satisfy_cache_io(ref, function, offset, buffer,
-				pageOffset, bytesLeft, reservePages, lastOffset, lastBuffer,
-				lastPageOffset, lastLeft, lastReservedPages);
+			status_t status = satisfy_cache_io(ref, cookie, function, offset,
+				buffer, pageOffset, bytesLeft, reservePages, lastOffset,
+				lastBuffer, lastPageOffset, lastLeft, lastReservedPages);
 			if (status != B_OK)
 				return status;
 
@@ -1073,9 +639,9 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
 		offset += B_PAGE_SIZE;
 
 		if (buffer - lastBuffer + lastPageOffset >= kMaxChunkSize) {
-			status_t status = satisfy_cache_io(ref, function, offset, buffer,
-				pageOffset, bytesLeft, reservePages, lastOffset, lastBuffer,
-				lastPageOffset, lastLeft, lastReservedPages);
+			status_t status = satisfy_cache_io(ref, cookie, function, offset,
+				buffer, pageOffset, bytesLeft, reservePages, lastOffset,
+				lastBuffer, lastPageOffset, lastLeft, lastReservedPages);
 			if (status != B_OK)
 				return status;
 		}
@@ -1083,8 +649,8 @@ cache_io(void *_cacheRef, off_t offset, addr_t buffer, size_t *_size,
 
 	// fill the last remaining bytes of the request (either write or read)
 
-	return function(ref, lastOffset, lastPageOffset, lastBuffer, lastLeft,
-		lastReservedPages, 0);
+	return function(ref, cookie, lastOffset, lastPageOffset, lastBuffer,
+		lastLeft, lastReservedPages, 0);
 }
 
 
@@ -1303,10 +869,10 @@ file_cache_init(void)
 
 
 extern "C" void *
-file_cache_create(dev_t mountID, ino_t vnodeID, off_t size, int fd)
+file_cache_create(dev_t mountID, ino_t vnodeID, off_t size)
 {
-	TRACE(("file_cache_create(mountID = %ld, vnodeID = %Ld, size = %Ld, "
-		"fd = %d)\n", mountID, vnodeID, size, fd));
+	TRACE(("file_cache_create(mountID = %ld, vnodeID = %Ld, size = %Ld)\n",
+		mountID, vnodeID, size));
 
 	file_cache_ref *ref = new file_cache_ref;
 	if (ref == NULL)
@@ -1325,29 +891,19 @@ file_cache_create(dev_t mountID, ino_t vnodeID, off_t size, int fd)
 	//	use atomic_test_and_set(), and free the resources again
 	//	when that fails...
 
-	// Get the vnode of the underlying device
-	if (vfs_get_vnode_from_fd(fd, true, &ref->device) != B_OK)
-		goto err1;
-
-	// We also need the cookie of the underlying device to properly access it
-	if (vfs_get_cookie_from_fd(fd, &ref->cookie) != B_OK)
-		goto err2;
-
 	// Get the vnode for the object
 	// (note, this does not grab a reference to the node)
 	if (vfs_lookup_vnode(mountID, vnodeID, &ref->vnode) != B_OK)
-		goto err2;
+		goto err1;
 
 	// Gets (usually creates) the cache for the node
 	if (vfs_get_vnode_cache(ref->vnode, &ref->cache, true) != B_OK)
-		goto err2;
+		goto err1;
 
 	ref->cache->virtual_size = size;
 	((vnode_store *)ref->cache->store)->file_cache_ref = ref;
 	return ref;
 
-err2:
-	vfs_put_vnode(ref->device);
 err1:
 	delete ref;
 	return NULL;
@@ -1365,7 +921,6 @@ file_cache_delete(void *_cacheRef)
 	TRACE(("file_cache_delete(ref = %p)\n", ref));
 
 	vm_cache_release_ref(ref->cache);
-	vfs_put_vnode(ref->device);
 	delete ref;
 }
 
@@ -1380,7 +935,7 @@ file_cache_set_size(void *_cacheRef, off_t newSize)
 	if (ref == NULL)
 		return B_OK;
 
-	mutex_lock(&ref->cache->lock);
+	MutexLocker _(ref->cache->lock);
 
 	off_t offset = ref->cache->virtual_size;
 	off_t size = newSize;
@@ -1390,12 +945,7 @@ file_cache_set_size(void *_cacheRef, off_t newSize)
 	} else
 		size = newSize - offset;
 
-	status_t status = vm_cache_resize(ref->cache, newSize);
-	mutex_unlock(&ref->cache->lock);
-
-	file_cache_invalidate_file_map(_cacheRef, offset, size);
-
-	return status;
+	return vm_cache_resize(ref->cache, newSize);
 }
 
 
@@ -1411,51 +961,26 @@ file_cache_sync(void *_cacheRef)
 
 
 extern "C" status_t
-file_cache_read_pages(void *_cacheRef, off_t offset, const iovec *vecs,
-	size_t count, size_t *_numBytes)
-{
-	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
-
-	return pages_io(ref, offset, vecs, count, _numBytes, false);
-}
-
-
-extern "C" status_t
-file_cache_write_pages(void *_cacheRef, off_t offset, const iovec *vecs,
-	size_t count, size_t *_numBytes)
-{
-	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
-
-	status_t status = pages_io(ref, offset, vecs, count, _numBytes, true);
-
-	TRACE(("file_cache_write_pages(ref = %p, offset = %Ld, vecs = %p, "
-		"count = %lu, bytes = %lu) = %ld\n", ref, offset, vecs, count,
-		*_numBytes, status));
-
-	return status;
-}
-
-
-extern "C" status_t
-file_cache_read(void *_cacheRef, off_t offset, void *bufferBase, size_t *_size)
-{
-	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
-
-	TRACE(("file_cache_read(ref = %p, offset = %Ld, buffer = %p, size = %lu)\n",
-		ref, offset, bufferBase, *_size));
-
-	return cache_io(ref, offset, (addr_t)bufferBase, _size, false);
-}
-
-
-extern "C" status_t
-file_cache_write(void *_cacheRef, off_t offset, const void *buffer,
+file_cache_read(void *_cacheRef, void *cookie, off_t offset, void *buffer,
 	size_t *_size)
 {
 	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
 
-	status_t status = cache_io(ref, offset, (addr_t)const_cast<void *>(buffer),
-		_size, true);
+	TRACE(("file_cache_read(ref = %p, offset = %Ld, buffer = %p, size = %lu)\n",
+		ref, offset, buffer, *_size));
+
+	return cache_io(ref, cookie, offset, (addr_t)buffer, _size, false);
+}
+
+
+extern "C" status_t
+file_cache_write(void *_cacheRef, void *cookie, off_t offset,
+	const void *buffer, size_t *_size)
+{
+	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
+
+	status_t status = cache_io(ref, cookie, offset,
+		(addr_t)const_cast<void *>(buffer), _size, true);
 
 	TRACE(("file_cache_write(ref = %p, offset = %Ld, buffer = %p, size = %lu)"
 		" = %ld\n", ref, offset, buffer, *_size, status));
@@ -1463,18 +988,3 @@ file_cache_write(void *_cacheRef, off_t offset, const void *buffer,
 	return status;
 }
 
-
-extern "C" status_t
-file_cache_invalidate_file_map(void *_cacheRef, off_t offset, off_t size)
-{
-	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
-
-	// ToDo: honour offset/size parameters
-
-	TRACE(("file_cache_invalidate_file_map(offset = %Ld, size = %Ld)\n", offset,
-		size));
-
-	MutexLocker _(ref->cache->lock);
-	ref->map.Free();
-	return B_OK;
-}

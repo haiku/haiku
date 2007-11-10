@@ -191,6 +191,8 @@ static struct vnode *sRoot;
 static hash_table *sMountsTable;
 static dev_t sNextMountID = 1;
 
+#define MAX_TEMP_IO_VECS 8
+
 mode_t __gUmask = 022;
 
 /* function declarations */
@@ -2567,6 +2569,161 @@ dump_vnode_usage(int argc, char **argv)
 
 #endif	// ADD_DEBUGGER_COMMANDS
 
+/*!	Does the dirty work of combining the file_io_vecs with the iovecs
+	and calls the file system hooks to read/write the request to disk.
+*/
+static status_t
+common_file_io_vec_pages(struct vnode *vnode, void *cookie,
+	const file_io_vec *fileVecs, size_t fileVecCount, const iovec *vecs,
+	size_t vecCount, uint32 *_vecIndex, size_t *_vecOffset, size_t *_numBytes,
+	bool doWrite)
+{
+	if (fileVecCount == 0) {
+		// There are no file vecs at this offset, so we're obviously trying
+		// to access the file outside of its bounds
+		return B_BAD_VALUE;
+	}
+
+	size_t numBytes = *_numBytes;
+	uint32 fileVecIndex;
+	size_t vecOffset = *_vecOffset;
+	uint32 vecIndex = *_vecIndex;
+	status_t status;
+	size_t size;
+
+	if (!doWrite) {
+		// now directly read the data from the device
+		// the first file_io_vec can be read directly
+
+		size = fileVecs[0].length;
+		if (size > numBytes)
+			size = numBytes;
+
+		status = FS_CALL(vnode, read_pages)(vnode->mount->cookie,
+			vnode->private_node, cookie, fileVecs[0].offset, vecs, vecCount,
+			&size, false);
+		if (status < B_OK)
+			return status;
+
+		// TODO: this is a work-around for buggy device drivers!
+		//	When our own drivers honour the length, we can:
+		//	a) also use this direct I/O for writes (otherwise, it would
+		//	   overwrite precious data)
+		//	b) panic if the term below is true (at least for writes)
+		if (size > fileVecs[0].length) {
+			//dprintf("warning: device driver %p doesn't respect total length in read_pages() call!\n", ref->device);
+			size = fileVecs[0].length;
+		}
+
+		ASSERT(size <= fileVecs[0].length);
+
+		// If the file portion was contiguous, we're already done now
+		if (size == numBytes)
+			return B_OK;
+
+		// if we reached the end of the file, we can return as well
+		if (size != fileVecs[0].length) {
+			*_numBytes = size;
+			return B_OK;
+		}
+
+		fileVecIndex = 1;
+
+		// first, find out where we have to continue in our iovecs
+		for (; vecIndex < vecCount; vecIndex++) {
+			if (size < vecs[vecIndex].iov_len)
+				break;
+	
+			size -= vecs[vecIndex].iov_len;
+		}
+	} else {
+		fileVecIndex = 0;
+		size = 0;
+	}
+
+	// Too bad, let's process the rest of the file_io_vecs
+
+	size_t totalSize = size;
+	size_t bytesLeft = numBytes - size;
+
+	for (; fileVecIndex < fileVecCount; fileVecIndex++) {
+		const file_io_vec &fileVec = fileVecs[fileVecIndex];
+		off_t fileOffset = fileVec.offset;
+		off_t fileLeft = min_c(fileVec.length, bytesLeft);
+
+		TRACE(("FILE VEC [%lu] length %Ld\n", fileVecIndex, fileLeft));
+
+		// process the complete fileVec
+		while (fileLeft > 0) {
+			iovec tempVecs[MAX_TEMP_IO_VECS];
+			uint32 tempCount = 0;
+
+			// size tracks how much of what is left of the current fileVec
+			// (fileLeft) has been assigned to tempVecs 
+			size = 0;
+
+			// assign what is left of the current fileVec to the tempVecs
+			for (size = 0; size < fileLeft && vecIndex < vecCount
+					&& tempCount < MAX_TEMP_IO_VECS;) {
+				// try to satisfy one iovec per iteration (or as much as
+				// possible)
+
+				// bytes left of the current iovec
+				size_t vecLeft = vecs[vecIndex].iov_len - vecOffset;
+				if (vecLeft == 0) {
+					vecOffset = 0;
+					vecIndex++;
+					continue;
+				}
+
+				TRACE(("fill vec %ld, offset = %lu, size = %lu\n",
+					vecIndex, vecOffset, size));
+
+				// actually available bytes
+				size_t tempVecSize = min_c(vecLeft, fileLeft - size);
+
+				tempVecs[tempCount].iov_base
+					= (void *)((addr_t)vecs[vecIndex].iov_base + vecOffset);
+				tempVecs[tempCount].iov_len = tempVecSize;
+				tempCount++;
+
+				size += tempVecSize;
+				vecOffset += tempVecSize;
+			}
+
+			size_t bytes = size;
+			if (doWrite) {
+				status = FS_CALL(vnode, write_pages)(vnode->mount->cookie,
+					vnode->private_node, cookie, fileOffset, tempVecs,
+					tempCount, &bytes, false);
+			} else {
+				status = FS_CALL(vnode, read_pages)(vnode->mount->cookie,
+					vnode->private_node, cookie, fileOffset, tempVecs,
+					tempCount, &bytes, false);
+			}
+			if (status < B_OK)
+				return status;
+
+			totalSize += bytes;
+			bytesLeft -= size;
+			fileOffset += size;
+			fileLeft -= size;
+			//dprintf("-> file left = %Lu\n", fileLeft);
+
+			if (size != bytes || vecIndex >= vecCount) {
+				// there are no more bytes or iovecs, let's bail out
+				*_numBytes = totalSize;
+				return B_OK;
+			}
+		}
+	}
+
+	*_vecIndex = vecIndex;
+	*_vecOffset = vecOffset;
+	*_numBytes = totalSize;
+	return B_OK;
+}
+
 
 //	#pragma mark - public API for file systems
 
@@ -2733,6 +2890,88 @@ get_vnode_removed(dev_t mountID, ino_t vnodeID, bool* removed)
 
 	mutex_unlock(&sVnodeMutex);
 	return result;
+}
+
+
+extern "C" status_t
+read_pages(int fd, off_t pos, const iovec *vecs, size_t count,
+	size_t *_numBytes, bool fsReenter)
+{
+	struct file_descriptor *descriptor;
+	struct vnode *vnode;
+
+	descriptor = get_fd_and_vnode(fd, &vnode, true);
+	if (descriptor == NULL)
+		return B_FILE_ERROR;
+
+	status_t status = FS_CALL(vnode, read_pages)(vnode->mount->cookie,
+		vnode->private_node, descriptor->cookie, pos, vecs, count, _numBytes,
+		fsReenter);
+
+	put_fd(descriptor);
+	return status;
+}
+
+
+extern "C" status_t
+write_pages(int fd, off_t pos, const iovec *vecs, size_t count,
+	size_t *_numBytes, bool fsReenter)
+{
+	struct file_descriptor *descriptor;
+	struct vnode *vnode;
+
+	descriptor = get_fd_and_vnode(fd, &vnode, true);
+	if (descriptor == NULL)
+		return B_FILE_ERROR;
+
+	status_t status = FS_CALL(vnode, write_pages)(vnode->mount->cookie,
+		vnode->private_node, descriptor->cookie, pos, vecs, count, _numBytes,
+		fsReenter);
+
+	put_fd(descriptor);
+	return status;
+}
+
+
+extern "C" status_t
+read_file_io_vec_pages(int fd, const file_io_vec *fileVecs, size_t fileVecCount,
+	const iovec *vecs, size_t vecCount, uint32 *_vecIndex, size_t *_vecOffset,
+	size_t *_bytes)
+{
+	struct file_descriptor *descriptor;
+	struct vnode *vnode;
+
+	descriptor = get_fd_and_vnode(fd, &vnode, true);
+	if (descriptor == NULL)
+		return B_FILE_ERROR;
+
+	status_t status = common_file_io_vec_pages(vnode, descriptor->cookie,
+		fileVecs, fileVecCount, vecs, vecCount, _vecIndex, _vecOffset, _bytes,
+		false);
+
+	put_fd(descriptor);
+	return status;
+}
+
+
+extern "C" status_t
+write_file_io_vec_pages(int fd, const file_io_vec *fileVecs, size_t fileVecCount,
+	const iovec *vecs, size_t vecCount, uint32 *_vecIndex, size_t *_vecOffset,
+	size_t *_bytes)
+{
+	struct file_descriptor *descriptor;
+	struct vnode *vnode;
+
+	descriptor = get_fd_and_vnode(fd, &vnode, true);
+	if (descriptor == NULL)
+		return B_FILE_ERROR;
+
+	status_t status = common_file_io_vec_pages(vnode, descriptor->cookie,
+		fileVecs, fileVecCount, vecs, vecCount, _vecIndex, _vecOffset, _bytes,
+		true);
+
+	put_fd(descriptor);
+	return status;
 }
 
 
@@ -3135,23 +3374,23 @@ vfs_can_page(struct vnode *vnode, void *cookie)
 
 extern "C" status_t
 vfs_read_pages(struct vnode *vnode, void *cookie, off_t pos, const iovec *vecs,
-	size_t count, size_t *_numBytes, bool mayBlock, bool fsReenter)
+	size_t count, size_t *_numBytes, bool fsReenter)
 {
 	FUNCTION(("vfs_read_pages: vnode %p, vecs %p, pos %Ld\n", vnode, vecs, pos));
 
 	return FS_CALL(vnode, read_pages)(vnode->mount->cookie, vnode->private_node,
-		cookie, pos, vecs, count, _numBytes, mayBlock, fsReenter);
+		cookie, pos, vecs, count, _numBytes, fsReenter);
 }
 
 
 extern "C" status_t
 vfs_write_pages(struct vnode *vnode, void *cookie, off_t pos, const iovec *vecs,
-	size_t count, size_t *_numBytes, bool mayBlock, bool fsReenter)
+	size_t count, size_t *_numBytes, bool fsReenter)
 {
 	FUNCTION(("vfs_write_pages: vnode %p, vecs %p, pos %Ld\n", vnode, vecs, pos));
 
 	return FS_CALL(vnode, write_pages)(vnode->mount->cookie, vnode->private_node,
-		cookie, pos, vecs, count, _numBytes, mayBlock, fsReenter);
+		cookie, pos, vecs, count, _numBytes, fsReenter);
 }
 
 

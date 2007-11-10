@@ -69,25 +69,29 @@ extern void				fssh_block_cache_put(void *_cache,
 
 /* file cache */
 extern void *			fssh_file_cache_create(fssh_mount_id mountID,
-							fssh_vnode_id vnodeID, fssh_off_t size, int fd);
+							fssh_vnode_id vnodeID, fssh_off_t size);
 extern void				fssh_file_cache_delete(void *_cacheRef);
 extern fssh_status_t	fssh_file_cache_set_size(void *_cacheRef,
 							fssh_off_t size);
 extern fssh_status_t	fssh_file_cache_sync(void *_cache);
-extern fssh_status_t	fssh_file_cache_invalidate_file_map(void *_cacheRef,
-							fssh_off_t offset, fssh_off_t size);
 
-extern fssh_status_t	fssh_file_cache_read_pages(void *_cacheRef,
-							fssh_off_t offset, const fssh_iovec *vecs,
-							fssh_size_t count, fssh_size_t *_numBytes);
-extern fssh_status_t	fssh_file_cache_write_pages(void *_cacheRef,
-							fssh_off_t offset, const fssh_iovec *vecs,
-							fssh_size_t count, fssh_size_t *_numBytes);
-extern fssh_status_t	fssh_file_cache_read(void *_cacheRef, fssh_off_t offset,
-							void *bufferBase, fssh_size_t *_size);
-extern fssh_status_t	fssh_file_cache_write(void *_cacheRef,
+extern fssh_status_t	fssh_file_cache_read(void *_cacheRef, void *cookie,
+							fssh_off_t offset, void *bufferBase,
+							fssh_size_t *_size);
+extern fssh_status_t	fssh_file_cache_write(void *_cacheRef, void *cookie,
 							fssh_off_t offset, const void *buffer,
 							fssh_size_t *_size);
+
+/* file map */
+extern void *			fssh_file_map_create(fssh_mount_id mountID,
+							fssh_vnode_id vnodeID);
+extern void				fssh_file_map_delete(void *_map);
+extern void				fssh_file_map_set_size(void *_map, fssh_off_t size);
+extern void				fssh_file_map_invalidate(void *_map, fssh_off_t offset,
+							fssh_off_t size);
+extern fssh_status_t	fssh_file_map_translate(void *_map, fssh_off_t offset,
+							fssh_size_t size, struct fssh_file_io_vec *vecs,
+							fssh_size_t *_count);
 
 #ifdef __cplusplus
 }

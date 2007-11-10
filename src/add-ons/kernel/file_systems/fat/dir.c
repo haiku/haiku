@@ -1038,8 +1038,9 @@ dosfs_read_vnode(void *_vol, ino_t vnid, void **_node, bool reenter)
 	entry->filename = malloc(sizeof(filename) + 1);
 	if (entry->filename) strcpy(entry->filename, filename);
 #endif
-	entry->cache = file_cache_create(vol->id, vnid, entry->st_size, vol->fd);
-	if(!(entry->mode & FAT_SUBDIR))
+	entry->cache = file_cache_create(vol->id, vnid, entry->st_size);
+	entry->file_map = file_map_create(vol->id, vnid);
+	if (!(entry->mode & FAT_SUBDIR))
 		set_mime_type(entry, filename);
 
 	*_node = entry;

@@ -820,13 +820,16 @@
 #define file_cache_delete				fssh_file_cache_delete
 #define file_cache_set_size				fssh_file_cache_set_size
 #define file_cache_sync					fssh_file_cache_sync
-#define file_cache_invalidate_file_map	fssh_file_cache_invalidate_file_map
 
-#define file_cache_read_pages			fssh_file_cache_read_pages
-#define file_cache_write_pages			fssh_file_cache_write_pages
 #define file_cache_read					fssh_file_cache_read
 #define file_cache_write				fssh_file_cache_write
 
+/* file map */
+#define file_map_create					fssh_file_map_create
+#define file_map_delete					fssh_file_map_delete
+#define file_map_set_size				fssh_file_map_set_size
+#define file_map_invalidate				fssh_file_map_invalidate
+#define file_map_translate				fssh_file_map_translate
 
 ////////////////////////////////////////////////////////////////////////////////
 // #pragma mark - fssh_fs_index.h
@@ -893,6 +896,10 @@
 #define remove_vnode				fssh_remove_vnode
 #define unremove_vnode				fssh_unremove_vnode
 #define get_vnode_removed			fssh_get_vnode_removed
+#define read_pages					fssh_read_pages
+#define write_pages					fssh_write_pages
+#define read_file_io_vec_pages		fssh_read_file_io_vec_pages
+#define write_file_io_vec_pages		fssh_write_file_io_vec_pages
 
 #define notify_entry_created		fssh_notify_entry_created
 #define notify_entry_removed		fssh_notify_entry_removed

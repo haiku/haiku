@@ -440,16 +440,24 @@ class ReadLocked {
 		{
 			fStatus = lock.Lock();
 		}
-		
+
 		~ReadLocked()
 		{
 			if (fStatus == B_OK)
 				fLock.Unlock();
 		}
-	
-		status_t IsLocked()
+
+		status_t
+		IsLocked()
 		{
 			return fStatus;
+		}
+
+		void
+		Unlock()
+		{
+			fLock.Unlock();
+			fStatus = B_NO_INIT;
 		}
 
 	private:
@@ -480,9 +488,17 @@ class WriteLocked {
 				fLock->UnlockWrite();
 		}
 
-		status_t IsLocked()
+		status_t
+		IsLocked()
 		{
 			return fStatus;
+		}
+
+		void
+		Unlock()
+		{
+			fLock->UnlockWrite();
+			fStatus = B_NO_INIT;
 		}
 
 	private:

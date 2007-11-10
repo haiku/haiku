@@ -36,7 +36,7 @@ null_has_page(struct vm_store *store, off_t offset)
 
 static status_t
 null_read(struct vm_store *store, off_t offset, const iovec *vecs,
-	size_t count, size_t *_numBytes, bool mayBlock, bool fsReenter)
+	size_t count, size_t *_numBytes, bool fsReenter)
 {
 	return B_ERROR;
 }
@@ -44,7 +44,7 @@ null_read(struct vm_store *store, off_t offset, const iovec *vecs,
 
 static status_t
 null_write(struct vm_store *store, off_t offset, const iovec *vecs,
-	size_t count, size_t *_numBytes, bool mayBlock, bool fsReenter)
+	size_t count, size_t *_numBytes, bool fsReenter)
 {
 	return B_ERROR;
 }

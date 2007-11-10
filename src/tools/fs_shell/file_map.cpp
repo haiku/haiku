@@ -4,28 +4,18 @@
  */
 
 
-#include <unistd.h>
+#include "fssh_fs_cache.h"
+
+#include <new>
 #include <stdlib.h>
-#include <string.h>
 
-#include <KernelExport.h>
-#include <fs_cache.h>
-
-#include <condition_variable.h>
-#include <file_cache.h>
-#include <generic_syscall.h>
-#include <util/AutoLock.h>
-#include <util/kernel_cpp.h>
-#include <vfs.h>
-#include <vm.h>
-#include <vm_page.h>
-#include <vm_cache.h>
-#include <vm_low_memory.h>
+#include "fssh_kernel_export.h"
+#include "vfs.h"
 
 
 //#define TRACE_FILE_MAP
 #ifdef TRACE_FILE_MAP
-#	define TRACE(x) dprintf x
+#	define TRACE(x) fssh_dprintf x
 #else
 #	define TRACE(x) ;
 #endif
@@ -34,26 +24,31 @@
 	// must be smaller than MAX_FILE_IO_VECS
 	// ToDo: find out how much of these are typically used
 
+using namespace FSShell;
+
+namespace FSShell {
+
 struct file_extent {
-	off_t			offset;
-	file_io_vec		disk;
+	fssh_off_t			offset;
+	fssh_file_io_vec	disk;
 };
 
 struct file_map {
 	file_map();
 	~file_map();
 
-	file_extent *operator[](uint32 index);
-	file_extent *ExtentAt(uint32 index);
-	status_t Add(file_io_vec *vecs, size_t vecCount, off_t &lastOffset);
+	file_extent *operator[](uint32_t index);
+	file_extent *ExtentAt(uint32_t index);
+	fssh_status_t Add(fssh_file_io_vec *vecs, fssh_size_t vecCount,
+		fssh_off_t &lastOffset);
 	void Free();
 
 	union {
 		file_extent	direct[CACHED_FILE_EXTENTS];
 		file_extent	*array;
 	};
-	size_t			count;
-	struct vnode	*vnode;
+	fssh_size_t		count;
+	void			*vnode;
 };
 
 
@@ -71,14 +66,14 @@ file_map::~file_map()
 
 
 file_extent *
-file_map::operator[](uint32 index)
+file_map::operator[](uint32_t index)
 {
 	return ExtentAt(index);
 }
 
 
 file_extent *
-file_map::ExtentAt(uint32 index)
+file_map::ExtentAt(uint32_t index)
 {
 	if (index >= count)
 		return NULL;
@@ -90,12 +85,13 @@ file_map::ExtentAt(uint32 index)
 }
 
 
-status_t
-file_map::Add(file_io_vec *vecs, size_t vecCount, off_t &lastOffset)
+fssh_status_t
+file_map::Add(fssh_file_io_vec *vecs, fssh_size_t vecCount,
+	fssh_off_t &lastOffset)
 {
 	TRACE(("file_map::Add(vecCount = %ld)\n", vecCount));
 
-	off_t offset = 0;
+	fssh_off_t offset = 0;
 
 	if (vecCount <= CACHED_FILE_EXTENTS && count == 0) {
 		// just use the reserved area in the file_cache_ref structure
@@ -106,7 +102,7 @@ file_map::Add(file_io_vec *vecs, size_t vecCount, off_t &lastOffset)
 		file_extent *newMap = (file_extent *)realloc(array,
 			(count + vecCount) * sizeof(file_extent));
 		if (newMap == NULL)
-			return B_NO_MEMORY;
+			return FSSH_B_NO_MEMORY;
 
 		array = newMap;
 
@@ -116,10 +112,10 @@ file_map::Add(file_io_vec *vecs, size_t vecCount, off_t &lastOffset)
 		}
 	}
 
-	int32 start = count;
+	int32_t start = count;
 	count += vecCount;
 
-	for (uint32 i = 0; i < vecCount; i++) {
+	for (uint32_t i = 0; i < vecCount; i++) {
 		file_extent *extent = ExtentAt(start + i);
 
 		extent->offset = offset;
@@ -129,15 +125,15 @@ file_map::Add(file_io_vec *vecs, size_t vecCount, off_t &lastOffset)
 	}
 
 #ifdef TRACE_FILE_MAP
-	for (uint32 i = 0; i < count; i++) {
+	for (uint32_t i = 0; i < count; i++) {
 		file_extent *extent = ExtentAt(i);
-		dprintf("[%ld] extend offset %Ld, disk offset %Ld, length %Ld\n",
+		fssh_dprintf("[%ld] extend offset %Ld, disk offset %Ld, length %Ld\n",
 			i, extent->offset, extent->disk.offset, extent->disk.length);
 	}
 #endif
 
 	lastOffset = offset;
-	return B_OK;
+	return FSSH_B_OK;
 }
 
 
@@ -156,11 +152,11 @@ file_map::Free()
 
 
 static file_extent *
-find_file_extent(file_map &map, off_t offset, uint32 *_index)
+find_file_extent(file_map &map, fssh_off_t offset, uint32_t *_index)
 {
 	// TODO: do binary search
 
-	for (uint32 index = 0; index < map.count; index++) {
+	for (uint32_t index = 0; index < map.count; index++) {
 		file_extent *extent = map[index];
 
 		if (extent->offset <= offset
@@ -175,11 +171,14 @@ find_file_extent(file_map &map, off_t offset, uint32 *_index)
 }
 
 
+}	// namespace FSShell
+
+
 //	#pragma mark - public FS API
 
 
 extern "C" void *
-file_map_create(dev_t mountID, ino_t vnodeID)
+fssh_file_map_create(fssh_mount_id mountID, fssh_vnode_id vnodeID)
 {
 	TRACE(("file_map_create(mountID = %ld, vnodeID = %Ld)\n", mountID, vnodeID));
 
@@ -189,7 +188,7 @@ file_map_create(dev_t mountID, ino_t vnodeID)
 
 	// Get the vnode for the object
 	// (note, this does not grab a reference to the node)
-	if (vfs_lookup_vnode(mountID, vnodeID, &map->vnode) != B_OK) {
+	if (vfs_lookup_vnode(mountID, vnodeID, &map->vnode) != FSSH_B_OK) {
 		delete map;
 		return NULL;
 	}
@@ -199,7 +198,7 @@ file_map_create(dev_t mountID, ino_t vnodeID)
 
 
 extern "C" void
-file_map_delete(void *_map)
+fssh_file_map_delete(void *_map)
 {
 	file_map *map = (file_map *)_map;
 	if (map == NULL)
@@ -211,7 +210,7 @@ file_map_delete(void *_map)
 
 
 extern "C" void
-file_map_set_size(void *_map, off_t size)
+fssh_file_map_set_size(void *_map, fssh_off_t size)
 {
 	if (_map == NULL)
 		return;
@@ -223,7 +222,7 @@ file_map_set_size(void *_map, off_t size)
 
 
 extern "C" void
-file_map_invalidate(void *_map, off_t offset, off_t size)
+fssh_file_map_invalidate(void *_map, fssh_off_t offset, fssh_off_t size)
 {
 	if (_map == NULL)
 		return;
@@ -234,36 +233,36 @@ file_map_invalidate(void *_map, off_t offset, off_t size)
 }
 
 
-extern "C" status_t
-file_map_translate(void *_map, off_t offset, size_t size, file_io_vec *vecs,
-	size_t *_count)
+extern "C" fssh_status_t
+fssh_file_map_translate(void *_map, fssh_off_t offset, fssh_size_t size,
+	fssh_file_io_vec *vecs, fssh_size_t *_count)
 {
 	if (_map == NULL)
-		return B_BAD_VALUE;
+		return FSSH_B_BAD_VALUE;
 
 	file_map &map = *(file_map *)_map;
-	size_t maxVecs = *_count;
-	status_t status = B_OK;
+	fssh_size_t maxVecs = *_count;
+	fssh_status_t status = FSSH_B_OK;
 
 	if (map.count == 0) {
 		// we don't yet have the map of this file, so let's grab it
 		// (ordered by offset, so that we can do a binary search on them)
-		size_t vecCount = maxVecs;
-		off_t mapOffset = 0;
+		fssh_size_t vecCount = maxVecs;
+		fssh_off_t mapOffset = 0;
 
 		while (true) {
 			status = vfs_get_file_map(map.vnode, mapOffset, ~0UL, vecs,
 				&vecCount);
-			if (status < B_OK && status != B_BUFFER_OVERFLOW)
+			if (status < FSSH_B_OK && status != FSSH_B_BUFFER_OVERFLOW)
 				return status;
 
-			status_t addStatus = map.Add(vecs, vecCount, mapOffset);
-			if (addStatus != B_OK) {
+			fssh_status_t addStatus = map.Add(vecs, vecCount, mapOffset);
+			if (addStatus != FSSH_B_OK) {
 				// only clobber the status in case of failure
 				status = addStatus;
 			}
 
-			if (status != B_BUFFER_OVERFLOW)
+			if (status != FSSH_B_BUFFER_OVERFLOW)
 				break;
 
 			// when we are here, the map has been stored in the array, and
@@ -272,7 +271,7 @@ file_map_translate(void *_map, off_t offset, size_t size, file_io_vec *vecs,
 		}
 	}
 
-	if (status != B_OK) {
+	if (status != FSSH_B_OK) {
 		// We must invalidate the (part of the) map we already
 		// have, as we cannot know if it's complete or not
 		map.Free();
@@ -282,12 +281,12 @@ file_map_translate(void *_map, off_t offset, size_t size, file_io_vec *vecs,
 	// We now have cached the map of this file, we now need to
 	// translate it for the requested access.
 
-	uint32 index;
+	uint32_t index;
 	file_extent *fileExtent = find_file_extent(map, offset, &index);
 	if (fileExtent == NULL) {
 		// access outside file bounds? But that's not our problem
 		*_count = 0;
-		return B_OK;
+		return FSSH_B_OK;
 	}
 
 	offset -= fileExtent->offset;
@@ -296,7 +295,7 @@ file_map_translate(void *_map, off_t offset, size_t size, file_io_vec *vecs,
 
 	if (vecs[0].length >= size || index >= map.count - 1) {
 		*_count = 1;
-		return B_OK;
+		return FSSH_B_OK;
 	}
 
 	// copy the rest of the vecs
@@ -314,13 +313,13 @@ file_map_translate(void *_map, off_t offset, size_t size, file_io_vec *vecs,
 
 		if (index >= maxVecs) {
 			*_count = index;
-			return B_BUFFER_OVERFLOW;
+			return FSSH_B_BUFFER_OVERFLOW;
 		}
 
 		size -= fileExtent->disk.length;
 	}
 
 	*_count = index;
-	return B_OK;
+	return FSSH_B_OK;
 }
 

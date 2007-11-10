@@ -331,23 +331,42 @@ bfs_can_page(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
 
 static status_t
 bfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
-	const iovec *vecs, size_t count, size_t *_numBytes, bool mayBlock,
-	bool reenter)
+	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
 {
+	Volume *volume = (Volume *)_fs;
 	Inode *inode = (Inode *)_node;
 
 	if (inode->FileCache() == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	if (!reenter) {
-		if (mayBlock)
-			inode->Lock().Lock();
-		else if (inode->Lock().TryLock() < B_OK)
-			return B_WOULD_BLOCK;
-	}
+	if (!reenter)
+		inode->Lock().Lock();
 
-	status_t status = file_cache_read_pages(inode->FileCache(), pos, vecs,
-		count, _numBytes);
+	uint32 vecIndex = 0;
+	size_t vecOffset = 0;
+	size_t bytesLeft = *_numBytes;
+	status_t status;
+
+	while (true) {
+		file_io_vec fileVecs[8];
+		uint32 fileVecCount = 8;
+
+		status = file_map_translate(inode->Map(), pos, bytesLeft, fileVecs,
+			&fileVecCount);
+		if (status != B_OK && status != B_BUFFER_OVERFLOW)
+			break;
+
+		bool bufferOverflow = status == B_BUFFER_OVERFLOW;
+
+		size_t bytes;
+		status = read_file_io_vec_pages(volume->Device(), fileVecs,
+			fileVecCount, vecs, count, &vecIndex, &vecOffset, &bytes);
+		if (status != B_OK || !bufferOverflow)
+			break;
+
+		pos += bytes;
+		bytesLeft -= bytes;
+	}
 
 	if (!reenter)
 		inode->Lock().Unlock();
@@ -358,23 +377,42 @@ bfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 
 static status_t
 bfs_write_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
-	const iovec *vecs, size_t count, size_t *_numBytes, bool mayBlock,
-	bool reenter)
+	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
 {
+	Volume *volume = (Volume *)_fs;
 	Inode *inode = (Inode *)_node;
 
 	if (inode->FileCache() == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	if (!reenter) {
-		if (mayBlock)
-			inode->Lock().Lock();
-		else if (inode->Lock().TryLock() < B_OK)
-			return B_WOULD_BLOCK;
-	}
+	if (!reenter)
+		inode->Lock().Lock();
 
-	status_t status = file_cache_write_pages(inode->FileCache(), pos, vecs,
-		count, _numBytes);
+	uint32 vecIndex = 0;
+	size_t vecOffset = 0;
+	size_t bytesLeft = *_numBytes;
+	status_t status;
+
+	while (true) {
+		file_io_vec fileVecs[8];
+		uint32 fileVecCount = 8;
+
+		status = file_map_translate(inode->Map(), pos, bytesLeft, fileVecs,
+			&fileVecCount);
+		if (status != B_OK && status != B_BUFFER_OVERFLOW)
+			break;
+
+		bool bufferOverflow = status == B_BUFFER_OVERFLOW;
+
+		size_t bytes;
+		status = write_file_io_vec_pages(volume->Device(), fileVecs,
+			fileVecCount, vecs, count, &vecIndex, &vecOffset, &bytes);
+		if (status != B_OK || !bufferOverflow)
+			break;
+
+		pos += bytes;
+		bytesLeft -= bytes;
+	}
 
 	if (!reenter)
 		inode->Lock().Unlock();
@@ -818,8 +856,8 @@ bfs_create_symlink(void *_ns, void *_directory, const char *name,
 			| INODE_LOGGED);
 
 		// links usually don't have a file cache attached - but we now need one
-		link->SetFileCache(file_cache_create(volume->ID(), link->ID(), 0,
-			volume->Device()));
+		link->SetFileCache(file_cache_create(volume->ID(), link->ID(), 0));
+		link->SetMap(file_map_create(volume->ID(), link->ID()));
 
 		// The following call will have to write the inode back, so
 		// we don't have to do that here...
@@ -1067,9 +1105,6 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 }
 
 
-/**	Opens the file with the specified mode.
- */
-
 static status_t
 bfs_open(void *_fs, void *_node, int openMode, void **_cookie)
 {
@@ -1133,12 +1168,9 @@ bfs_open(void *_fs, void *_node, int openMode, void **_cookie)
 }
 
 
-/**	Read a file specified by node, using information in cookie
- *	and at offset specified by pos. read len bytes into buffer buf.
- */
-
 static status_t
-bfs_read(void *_ns, void *_node, void *_cookie, off_t pos, void *buffer, size_t *_length)
+bfs_read(void *_ns, void *_node, void *_cookie, off_t pos, void *buffer,
+	size_t *_length)
 {
 	//FUNCTION();
 	Inode *inode = (Inode *)_node;
@@ -1148,19 +1180,15 @@ bfs_read(void *_ns, void *_node, void *_cookie, off_t pos, void *buffer, size_t 
 		RETURN_ERROR(B_BAD_VALUE);
 	}
 
-	ReadLocked locked(inode->Lock());
 	return inode->ReadAt(pos, (uint8 *)buffer, _length);
 }
 
 
 static status_t
-bfs_write(void *_ns, void *_node, void *_cookie, off_t pos, const void *buffer, size_t *_length)
+bfs_write(void *_ns, void *_node, void *_cookie, off_t pos, const void *buffer,
+	size_t *_length)
 {
 	//FUNCTION();
-	// uncomment to be more robust against a buggy vnode layer ;-)
-	//if (_ns == NULL || _node == NULL || _cookie == NULL)
-	//	return B_BAD_VALUE;
-
 	Volume *volume = (Volume *)_ns;
 	Inode *inode = (Inode *)_node;
 
@@ -1174,21 +1202,20 @@ bfs_write(void *_ns, void *_node, void *_cookie, off_t pos, const void *buffer, 
 	if (cookie->open_mode & O_APPEND)
 		pos = inode->Size();
 
-	WriteLocked locked(inode->Lock());
-	if (locked.IsLocked() < B_OK)
-		RETURN_ERROR(B_ERROR);
-
 	Transaction transaction;
 		// We are not starting the transaction here, since
 		// it might not be needed at all (the contents of
 		// regular files aren't logged)
 
-	status_t status = inode->WriteAt(transaction, pos, (const uint8 *)buffer, _length);
+	status_t status = inode->WriteAt(transaction, pos, (const uint8 *)buffer,
+		_length);
 
 	if (status == B_OK)
 		transaction.Done();
 
 	if (status == B_OK) {
+		ReadLocked locker(inode->Lock());
+
 		// periodically notify if the file size has changed
 		// ToDo: should we better test for a change in the last_modified time only?
 		if (!inode->IsDeleted() && cookie->last_size != inode->Size()

@@ -96,12 +96,10 @@ typedef struct fssh_file_system_module_info {
 				fssh_fs_cookie cookie);
 	fssh_status_t (*read_pages)(fssh_fs_volume fs, fssh_fs_vnode vnode,
 				fssh_fs_cookie cookie, fssh_off_t pos, const fssh_iovec *vecs,
-				fssh_size_t count, fssh_size_t *_numBytes, bool mayBlock,
-				bool reenter);
+				fssh_size_t count, fssh_size_t *_numBytes, bool reenter);
 	fssh_status_t (*write_pages)(fssh_fs_volume fs, fssh_fs_vnode vnode,
 				fssh_fs_cookie cookie, fssh_off_t pos, const fssh_iovec *vecs,
-				fssh_size_t count, fssh_size_t *_numBytes, bool mayBlock,
-				bool reenter);
+				fssh_size_t count, fssh_size_t *_numBytes, bool reenter);
 
 	/* cache file access */
 	fssh_status_t (*get_file_map)(fssh_fs_volume fs, fssh_fs_vnode vnode,
@@ -293,6 +291,22 @@ extern fssh_status_t fssh_unremove_vnode(fssh_mount_id mountID,
 				fssh_vnode_id vnodeID);
 extern fssh_status_t fssh_get_vnode_removed(fssh_mount_id mountID,
 				fssh_vnode_id vnodeID, bool* removed);
+extern fssh_status_t fssh_read_pages(int fd, fssh_off_t pos,
+				const struct fssh_iovec *vecs, fssh_size_t count,
+				fssh_size_t *_numBytes, bool fsReenter);
+extern fssh_status_t fssh_write_pages(int fd, fssh_off_t pos,
+				const struct fssh_iovec *vecs, fssh_size_t count,
+				fssh_size_t *_numBytes, bool fsReenter);
+extern fssh_status_t fssh_read_file_io_vec_pages(int fd,
+				const struct fssh_file_io_vec *fileVecs,
+				fssh_size_t fileVecCount, const struct fssh_iovec *vecs,
+				fssh_size_t vecCount, uint32_t *_vecIndex,
+				fssh_size_t *_vecOffset, fssh_size_t *_bytes);
+extern fssh_status_t fssh_write_file_io_vec_pages(int fd,
+				const struct fssh_file_io_vec *fileVecs,
+				fssh_size_t fileVecCount, const struct fssh_iovec *vecs,
+				fssh_size_t vecCount, uint32_t *_vecIndex,
+				fssh_size_t *_vecOffset, fssh_size_t *_bytes);
 
 extern fssh_status_t fssh_notify_entry_created(fssh_mount_id device,
 				fssh_vnode_id directory, const char *name, fssh_vnode_id node);

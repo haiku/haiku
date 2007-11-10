@@ -47,7 +47,7 @@
 //	D()
 //		the statements in D() are only included if DEBUG is defined
 
-#ifdef DEBUG
+#if 0//DEBUG
 	#define PRINT(x) { __out("bfs: "); __out x; }
 	#define REPORT_ERROR(status) \
 		__out("bfs: %s:%d: %s\n", __FUNCTION__, __LINE__, strerror(status));

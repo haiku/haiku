@@ -223,11 +223,9 @@ typedef struct vm_store_ops {
 	status_t (*commit)(struct vm_store *backingStore, off_t size);
 	bool (*has_page)(struct vm_store *backingStore, off_t offset);
 	status_t (*read)(struct vm_store *backingStore, off_t offset,
-		const iovec *vecs, size_t count, size_t *_numBytes, bool mayBlock,
-		bool fsReenter);
+		const iovec *vecs, size_t count, size_t *_numBytes, bool fsReenter);
 	status_t (*write)(struct vm_store *backingStore, off_t offset,
-		const iovec *vecs, size_t count, size_t *_numBytes, bool mayBlock,
-		bool fsReenter);
+		const iovec *vecs, size_t count, size_t *_numBytes, bool fsReenter);
 	status_t (*fault)(struct vm_store *backingStore,
 		struct vm_address_space *aspace, off_t offset);
 	status_t (*acquire_unreferenced_ref)(struct vm_store *backingStore);

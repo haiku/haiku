@@ -156,6 +156,8 @@ class Inode {
 		// file cache
 		void *FileCache() const { return fCache; }
 		void SetFileCache(void *cache) { fCache = cache; }
+		void *Map() const { return fMap; }
+		void SetMap(void *map) { fMap = map; }
 
 	private:
 		Inode(const Inode &);
@@ -198,6 +200,7 @@ class Inode {
 		BPlusTree		*fTree;
 		Inode			*fAttributes;
 		void			*fCache;
+		void			*fMap;
 		bfs_inode		fNode;
 
 		off_t			fOldSize;

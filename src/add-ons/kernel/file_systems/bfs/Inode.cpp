@@ -171,7 +171,8 @@ Inode::Inode(Volume *volume, ino_t id)
 	fID(id),
 	fTree(NULL),
 	fAttributes(NULL),
-	fCache(NULL)
+	fCache(NULL),
+	fMap(NULL)
 {
 	PRINT(("Inode::Inode(volume = %p, id = %Ld) @ %p\n", volume, id, this));
 
@@ -189,8 +190,10 @@ Inode::Inode(Volume *volume, ino_t id)
 
 	if (IsContainer())
 		fTree = new BPlusTree(this);
-	if (IsFile() || IsAttribute())
-		SetFileCache(file_cache_create(fVolume->ID(), ID(), Size(), fVolume->Device()));
+	if (IsFile() || IsAttribute()) {
+		SetFileCache(file_cache_create(fVolume->ID(), ID(), Size()));
+		SetMap(file_map_create(volume->ID(), ID()));
+	}
 }
 
 
@@ -201,7 +204,8 @@ Inode::Inode(Volume *volume, Transaction &transaction, ino_t id, mode_t mode,
 	fID(id),
 	fTree(NULL),
 	fAttributes(NULL),
-	fCache(NULL)
+	fCache(NULL),
+	fMap(NULL)
 {
 	PRINT(("Inode::Inode(volume = %p, transaction = %p, id = %Ld) @ %p\n",
 		volume, &transaction, id, this));
@@ -242,6 +246,7 @@ Inode::~Inode()
 	PRINT(("Inode::~Inode() @ %p\n", this));
 
 	file_cache_delete(FileCache());
+	file_map_delete(Map());
 	delete fTree;
 }
 
@@ -384,8 +389,8 @@ Inode::_MakeSpaceForSmallData(Transaction &transaction, bfs_inode *node,
 		// Luckily, this doesn't cause any index updates
 
 		Inode *attribute;
-		status_t status = CreateAttribute(transaction, item->Name(), item->Type(),
-			&attribute);
+		status_t status = CreateAttribute(transaction, item->Name(),
+			item->Type(), &attribute);
 		if (status < B_OK)
 			RETURN_ERROR(status);
 
@@ -1233,12 +1238,16 @@ Inode::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 	if (pos < 0)
 		return B_BAD_VALUE;
 
+	ReadLocked locker(Lock());
+
 	if (pos >= Size() || length == 0) {
 		*_length = 0;
 		return B_NO_ERROR;
 	}
 
-	return file_cache_read(FileCache(), pos, buffer, _length);
+	locker.Unlock();
+
+	return file_cache_read(FileCache(), NULL, pos, buffer, _length);
 }
 
 
@@ -1246,6 +1255,10 @@ status_t
 Inode::WriteAt(Transaction &transaction, off_t pos, const uint8 *buffer,
 	size_t *_length)
 {
+	WriteLocked locker(Lock());
+	if (locker.IsLocked() < B_OK)
+		RETURN_ERROR(B_ERROR);
+
 	// update the last modification time in memory, it will be written
 	// back to the inode, and the index when the file is closed
 	// ToDo: should update the internal last modified time only at this point!
@@ -1298,7 +1311,9 @@ Inode::WriteAt(Transaction &transaction, off_t pos, const uint8 *buffer,
 	if (length == 0)
 		return B_OK;
 
-	return file_cache_write(FileCache(), pos, buffer, _length);
+	locker.Unlock();
+
+	return file_cache_write(FileCache(), NULL, pos, buffer, _length);
 }
 
 
@@ -1945,6 +1960,8 @@ Inode::SetFileSize(Transaction &transaction, off_t size)
 		return status;
 
 	file_cache_set_size(FileCache(), size);
+	file_map_set_size(Map(), size);
+
 	return WriteBack(transaction);
 }
 
@@ -2400,7 +2417,8 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name,
 
 	if (inode->IsFile() || inode->IsAttribute()) {
 		inode->SetFileCache(file_cache_create(volume->ID(), inode->ID(),
-			inode->Size(), volume->Device()));
+			inode->Size()));
+		inode->SetMap(file_map_create(volume->ID(), inode->ID()));
 	}
 
 	if (_created)
