@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src add-ons disk_systems bfs ;
+
+UsePrivateHeaders kernel ;
+UsePrivateHeaders shared ;
+UsePrivateHeaders storage ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems bfs ] ;
+
+Addon <disk_system>bfs :
+	BFSAddOn.cpp
+
+	bfs_disk_system.cpp
+
+	: be
+;
