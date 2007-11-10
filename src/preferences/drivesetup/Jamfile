@@ -10,6 +10,7 @@ Preference DriveSetup :
 	DriveSetup.cpp
 	MainWindow.cpp
 	PartitionList.cpp
+	Support.cpp
 	:
 	be
 ;

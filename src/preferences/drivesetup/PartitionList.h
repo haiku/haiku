@@ -22,7 +22,8 @@ class PartitionListRow : public BRow {
 public:
 								PartitionListRow(BPartition* partition);
 	
-			partition_id		ID() { return fPartitionID; }
+			partition_id		ID() const
+									{ return fPartitionID; }
 private:
 			partition_id		fPartitionID;
 };
@@ -33,7 +34,8 @@ class PartitionListView : public BColumnListView {
 public:
 								PartitionListView(const BRect& frame);
 	
-			PartitionListRow*	FindRow(partition_id id);
+			PartitionListRow*	FindRow(partition_id id,
+									PartitionListRow* parent = NULL);
 			PartitionListRow*	AddPartition(BPartition* partition);
 };
 
