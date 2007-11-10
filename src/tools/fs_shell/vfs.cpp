@@ -2064,7 +2064,7 @@ fssh_read_pages(int fd, fssh_off_t pos, const fssh_iovec *vecs,
 	if (*_numBytes < toRead) {
 		// We're supposed to read less than specified by the vecs. Since
 		// readv_pos() doesn't support this, we need to clone the vecs.
-		newVecs = new(nothrow) fssh_iovec[count];
+		newVecs = new(std::nothrow) fssh_iovec[count];
 		if (!newVecs)
 			return FSSH_B_NO_MEMORY;
 
@@ -2105,7 +2105,7 @@ fssh_write_pages(int fd, fssh_off_t pos, const fssh_iovec *vecs,
 	if (*_numBytes < toWrite) {
 		// We're supposed to write less than specified by the vecs. Since
 		// writev_pos() doesn't support this, we need to clone the vecs.
-		newVecs = new(nothrow) fssh_iovec[count];
+		newVecs = new(std::nothrow) fssh_iovec[count];
 		if (!newVecs)
 			return FSSH_B_NO_MEMORY;
 
