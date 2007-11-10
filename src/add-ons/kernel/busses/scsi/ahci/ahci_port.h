@@ -25,6 +25,7 @@ public:
 	uchar		ScsiAbortRequest(scsi_ccb *request);
 	uchar		ScsiTerminateRequest(scsi_ccb *request);
 	uchar		ScsiResetDevice();
+	void		ScsiGetRestrictions(bool *isATAPI, bool *noAutoSense, uint32 *maxBlocks);
 
 private:
 	void		ScsiTestUnitReady(scsi_ccb *request);

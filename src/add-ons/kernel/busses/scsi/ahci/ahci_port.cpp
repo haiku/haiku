@@ -772,3 +772,14 @@ AHCIPort::ScsiResetDevice()
 {
 	return SCSI_REQ_CMP;
 }
+
+	
+void
+AHCIPort::ScsiGetRestrictions(bool *isATAPI, bool *noAutoSense, uint32 *maxBlocks)
+{
+	*isATAPI = !!(fRegs->cmd & PORT_CMD_ATAPI);
+	*noAutoSense = false;
+	*maxBlocks = fUse48BitCommands ? 65536 : 256;
+	TRACE("AHCIPort::ScsiGetRestrictions port %d: isATAPI %d, noAutoSense %d, maxBlocks %lu\n",
+		fIndex, *isATAPI, *noAutoSense, *maxBlocks);
+}

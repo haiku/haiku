@@ -104,9 +104,7 @@ ahci_get_restrictions(scsi_sim_cookie cookie, uchar targetID, bool *isATAPI,
 {
 	TRACE("ahci_get_restrictions, cookie %p\n", cookie);
 
-	*isATAPI = false;
-	*noAutoSense = false;
-	*maxBlocks = 256;
+	static_cast<AHCIController *>(cookie)->GetRestrictions(targetID, isATAPI, noAutoSense, maxBlocks);
 }
 
 

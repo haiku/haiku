@@ -23,6 +23,7 @@ public:
 	uchar		AbortRequest(scsi_ccb *request);
 	uchar		TerminateRequest(scsi_ccb *request);
 	uchar		ResetDevice(uchar targetID, uchar targetLUN);
+	void		GetRestrictions(uchar targetID, bool *isATAPI, bool *noAutoSense, uint32 *maxBlocks);
 
 	device_node_handle DeviceNode() { return fNode; }
 
