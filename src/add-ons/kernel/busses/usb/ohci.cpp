@@ -67,9 +67,9 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		fStack(stack),
 		fRegisterArea(-1),
 		fHccaArea(-1),
-		fDummyControl(0),
-		fDummyBulk(0),
-		fDummyIsochronous(0),
+		fDummyControl(NULL),
+		fDummyBulk(NULL),
+		fDummyIsochronous(NULL),
 		fRootHub(NULL),
 		fRootHubAddress(0),
 		fNumPorts(0)
@@ -109,7 +109,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		*fOperationalRegisters));
 
 	// Check the revision of the controller, which should be 10h
-	uint32 revision = ReadReg(OHCI_REVISION) & 0xff;
+	uint32 revision = _ReadReg(OHCI_REVISION) & 0xff;
 	TRACE(("usb_ohci: version %ld.%ld%s\n", OHCI_REVISION_HIGH(revision),
 		OHCI_REVISION_LOW(revision), OHCI_REVISION_LEGACY(revision) 
 		? ", legacy support" : ""));
@@ -135,42 +135,67 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	fDummyControl = _AllocateEndpoint();
 	if (!fDummyControl)
 		return;
+	fDummyControl->flags |= OHCI_ENDPOINT_SKIP;
+
 	fDummyBulk = _AllocateEndpoint();
-	if (!fDummyBulk)
+	if (!fDummyBulk) {
+		_FreeEndpoint(fDummyControl);
 		return;
+	}
+	fDummyBulk->flags |= OHCI_ENDPOINT_SKIP;
+
 	fDummyIsochronous = _AllocateEndpoint();
-	if (!fDummyIsochronous)
+	if (!fDummyIsochronous) {
+		_FreeEndpoint(fDummyControl);
+		_FreeEndpoint(fDummyBulk);
 		return;
+	}
+	fDummyIsochronous->flags |= OHCI_ENDPOINT_SKIP;
 
 	// Create the interrupt tree
 	// Algorithm kindly borrowed from NetBSD code
-	for( uint32 i = 0; i < OHCI_NUMBER_OF_INTERRUPTS; i++) {
-		fInterruptEndpoints[i] = _AllocateEndpoint();
-		if (!fInterruptEndpoints[i])
+	// TODO: Check it once again
+	ohci_endpoint_descriptor *current, *previous;
+	for( uint32 i = 0; i < OHCI_NUMBER_OF_ENDPOINTS; i++) {
+		current = _AllocateEndpoint();
+		if (!current) {
+			TRACE_ERROR(("usb_ohci: failed to create interrupts tree\n"));
+			while (--i >= 0)
+				_FreeEndpoint(fInterruptEndpoints[i]);
+			_FreeEndpoint(fDummyBulk);
+			_FreeEndpoint(fDummyControl);
+			_FreeEndpoint(fDummyIsochronous);
 			return;
+		}
+		fInterruptEndpoints[i] = current;
+		current->flags |= OHCI_ENDPOINT_SKIP;
 		if (i != 0)
-			fInterruptEndpoints[i]->SetNext(fInterruptEndpoints[(i-1) / 2]);
+			previous = fInterruptEndpoints[(i - 1) / 2];
 		else
-			fInterruptEndpoints[i]->SetNext(fDummyIsochronous);
+			previous = fDummyIsochronous;
+		current->next_logical_endpoint = previous;
+		current->next_physical_endpoint = previous->this_physical;
 	}
 
+	// Fill HCCA interrupt table. The bit reversal is to get
+	// the tree set up properly to spread the interrupts.
 	for (uint32 i = 0; i < OHCI_NUMBER_OF_INTERRUPTS; i++)
 		fHcca->hcca_interrupt_table[revbits[i]] =
-			fInterruptEndpoints[OHCI_NO_EDS-OHCI_NUMBER_OF_INTERRUPTS+i]->physical_address;
-	
+			fInterruptEndpoints[OHCI_NUMBER_OF_ENDPOINTS - OHCI_NUMBER_OF_INTERRUPTS + i]->physical_address;
+
 
 	// Determine in what context we are running (Kindly copied from FreeBSD)
-	uint32 control = ReadReg(OHCI_CONTROL);
+	uint32 control = _ReadReg(OHCI_CONTROL);
 	if (control & OHCI_INTERRUPT_ROUTING) {
 		TRACE(("usb_ohci: SMM is in control of the host controller\n"));
-		WriteReg(OHCI_COMMAND_STATUS, OHCI_OWNERSHIP_CHANGE_REQUEST);
+		_WriteReg(OHCI_COMMAND_STATUS, OHCI_OWNERSHIP_CHANGE_REQUEST);
 		for (uint32 i = 0; i < 100 	&& (control & OHCI_INTERRUPT_ROUTING); i++) {
 			snooze(1000);
-			control = ReadReg(OHCI_CONTROL);
+			control = _ReadReg(OHCI_CONTROL);
 		}
 		if (!(control & OHCI_INTERRUPT_ROUTING)) {
 			TRACE(("usb_ohci: SMM does not respond. Resetting...\n"));
-			WriteReg(OHCI_CONTROL, OHCI_HC_FUNCTIONAL_STATE_RESET);
+			_WriteReg(OHCI_CONTROL, OHCI_HC_FUNCTIONAL_STATE_RESET);
 			snooze(USB_DELAY_BUS_RESET);
 		}
 	} else if ((control & OHCI_HC_FUNCTIONAL_STATE_MASK)
@@ -178,7 +203,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		TRACE(("usb_ohci: BIOS is in control of the host controller\n"));
 		if ((control & OHCI_HC_FUNCTIONAL_STATE_MASK)
 			!= OHCI_HC_FUNCTIONAL_STATE_OPERATIONAL) {
-			WriteReg(OHCI_CONTROL, OHCI_HC_FUNCTIONAL_STATE_OPERATIONAL);
+			_WriteReg(OHCI_CONTROL, OHCI_HC_FUNCTIONAL_STATE_OPERATIONAL);
 			// TOFIX: shorter delay
 			snooze(USB_DELAY_BUS_RESET);
 		}
@@ -186,21 +211,21 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 
 	// This reset should not be necessary according to the OHCI spec, but
 	// without it some controllers do not start.
-	WriteReg(OHCI_CONTROL, OHCI_HC_FUNCTIONAL_STATE_RESET);
+	_WriteReg(OHCI_CONTROL, OHCI_HC_FUNCTIONAL_STATE_RESET);
 	snooze(USB_DELAY_BUS_RESET);
 
 	// We now own the host controller and the bus has been reset
-	uint32 frameInterval = ReadReg(OHCI_FRAME_INTERVAL);
+	uint32 frameInterval = _ReadReg(OHCI_FRAME_INTERVAL);
 	uint32 intervalValue = OHCI_GET_INTERVAL_VALUE(frameInterval);
-	WriteReg(OHCI_COMMAND_STATUS, OHCI_HOST_CONTROLLER_RESET);
+	_WriteReg(OHCI_COMMAND_STATUS, OHCI_HOST_CONTROLLER_RESET);
 
 	for (uint32 i = 0; i < 10; i++) {
 		snooze(10);
-		if (!(ReadReg(OHCI_COMMAND_STATUS) & OHCI_HOST_CONTROLLER_RESET))
+		if (!(_ReadReg(OHCI_COMMAND_STATUS) & OHCI_HOST_CONTROLLER_RESET))
 			break;
 	}
 
-	if (ReadReg(OHCI_COMMAND_STATUS) & OHCI_HOST_CONTROLLER_RESET) {
+	if (_ReadReg(OHCI_COMMAND_STATUS) & OHCI_HOST_CONTROLLER_RESET) {
 		TRACE_ERROR(("usb_ohci: Error resetting the host controller (timeout)\n"));
 		return;
 	}
@@ -208,46 +233,50 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	// The controller is now in SUSPEND state, we have 2ms to finish
 	// TODO: maybe add spinlock protection???
 	// Set up host controller register
-	WriteReg(OHCI_HCCA, (uint32)hccaPhysicalAddress);
-	WriteReg(OHCI_CONTROL_HEAD_ED, (uint32)fDummyControl->physical_address);
-	WriteReg(OHCI_BULK_HEAD_ED, (uint32)fDummyBulk->physical_address);
+	_WriteReg(OHCI_HCCA, (uint32)hccaPhysicalAddress);
+	_WriteReg(OHCI_CONTROL_HEAD_ED, (uint32)fDummyControl->physical_address);
+	_WriteReg(OHCI_BULK_HEAD_ED, (uint32)fDummyBulk->physical_address);
 	// Disable all interrupts and then switch on all desired interrupts
-	WriteReg(OHCI_INTERRUPT_DISABLE, OHCI_ALL_INTERRUPTS);
-	WriteReg(OHCI_INTERRUPT_ENABLE, OHCI_NORMAL_INTERRUPTS
+	_WriteReg(OHCI_INTERRUPT_DISABLE, OHCI_ALL_INTERRUPTS);
+	_WriteReg(OHCI_INTERRUPT_ENABLE, OHCI_NORMAL_INTERRUPTS
 		| OHCI_MASTER_INTERRUPT_ENABLE);
 	// Switch on desired functional features
-	control = ReadReg(OHCI_CONTROL);
+	control = _ReadReg(OHCI_CONTROL);
 	control &= ~(OHCI_CONTROL_BULK_SERVICE_RATIO_MASK | OHCI_ENABLE_LIST
 		| OHCI_HC_FUNCTIONAL_STATE_MASK | OHCI_INTERRUPT_ROUTING);
 	control |= OHCI_ENABLE_LIST | OHCI_CONTROL_BULK_RATIO_1_4
 		| OHCI_HC_FUNCTIONAL_STATE_OPERATIONAL;
 	// And finally start the controller
-	WriteReg(OHCI_CONTROL, control);
+	_WriteReg(OHCI_CONTROL, control);
 	
 	// The controller is now OPERATIONAL.
-	frameInterval = (ReadReg(OHCI_FRAME_INTERVAL) & OHCI_FRAME_INTERVAL_TOGGLE)
+	frameInterval = (_ReadReg(OHCI_FRAME_INTERVAL) & OHCI_FRAME_INTERVAL_TOGGLE)
 		^ OHCI_FRAME_INTERVAL_TOGGLE;
 	frameInterval |= OHCI_FSMPS(intervalValue) | intervalValue;
-	WriteReg(OHCI_FRAME_INTERVAL, frameInterval);
+	_WriteReg(OHCI_FRAME_INTERVAL, frameInterval);
 	// 90% periodic
 	uint32 periodic = OHCI_PERIODIC(intervalValue);
-	WriteReg(OHCI_PERIODIC_START, periodic);
+	_WriteReg(OHCI_PERIODIC_START, periodic);
 	
 	// Fiddle the No Over Current Protection bit to avoid chip bug
-	uint32 desca = ReadReg(OHCI_RH_DESCRIPTOR_A);
-	WriteReg(OHCI_RH_DESCRIPTOR_A, desca | OHCI_RH_NO_OVER_CURRENT_PROTECTION);
-	WriteReg(OHCI_RH_STATUS, OHCI_RH_LOCAL_POWER_STATUS_CHANGE);
+	uint32 desca = _ReadReg(OHCI_RH_DESCRIPTOR_A);
+	_WriteReg(OHCI_RH_DESCRIPTOR_A, desca | OHCI_RH_NO_OVER_CURRENT_PROTECTION);
+	_WriteReg(OHCI_RH_STATUS, OHCI_RH_LOCAL_POWER_STATUS_CHANGE);
 	snooze(OHCI_ENABLE_POWER_DELAY);
-	WriteReg(OHCI_RH_DESCRIPTOR_A, desca);
+	_WriteReg(OHCI_RH_DESCRIPTOR_A, desca);
 
 	// The AMD756 requires a delay before re-reading the register,
 	// otherwise it will occasionally report 0 ports.
 	uint32 numberOfPorts = 0;
 	for (uint32 i = 0; i < 10 && numberOfPorts == 0; i++) {
 		snooze(OHCI_READ_DESC_DELAY);
-		uint32 descriptor = ReadReg(OHCI_RH_DESCRIPTOR_A);
+		uint32 descriptor = _ReadReg(OHCI_RH_DESCRIPTOR_A);
 		numberOfPorts = OHCI_RH_GET_PORT_COUNT(descriptor);
 	}
+
+	// TODO: Add Finisher Thread.
+
+	TRACE(("usb_ohci: OHCI Host Controller Driver constructed\n")); 
 
 	fInitOK = true;
 }
@@ -280,13 +309,13 @@ OHCI::Start()
 	if (InitCheck())
 		return B_ERROR;
 	
-	if (!(ReadReg(OHCI_CONTROL) & OHCI_HC_FUNCTIONAL_STATE_OPERATIONAL)) {
+	if (!(_ReadReg(OHCI_CONTROL) & OHCI_HC_FUNCTIONAL_STATE_OPERATIONAL)) {
 		TRACE(("usb_ohci::Start(): Controller not started. TODO: find out what happens.\n"));
 		return B_ERROR;
 	}
 	
 	fRootHubAddress = AllocateAddress();
-	fNumPorts = OHCI_RH_GET_PORT_COUNT(ReadReg(OHCI_RH_DESCRIPTOR_A));
+	fNumPorts = OHCI_RH_GET_PORT_COUNT(_ReadReg(OHCI_RH_DESCRIPTOR_A));
 	
 	fRootHub = new(std::nothrow) OHCIRootHub(RootObject(), fRootHubAddress);
 	if (!fRootHub) {
@@ -420,7 +449,7 @@ OHCI::GetPortStatus(uint8 index, usb_port_status *status)
 		return B_BAD_INDEX;
 	
 	status->status = status->change = 0;
-	uint32 portStatus = ReadReg(OHCI_RH_PORT_STATUS(index));
+	uint32 portStatus = _ReadReg(OHCI_RH_PORT_STATUS(index));
 	
 	TRACE(("usb_ohci: RootHub::GetPortStatus: Port %i Value 0x%lx\n", OHCI_RH_PORT_STATUS(index), portStatus));
 	
@@ -466,11 +495,11 @@ OHCI::SetPortFeature(uint8 index, uint16 feature)
 	
 	switch (feature) {
 		case PORT_RESET:
-			WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_RH_PORTSTATUS_PRS);
+			_WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_RH_PORTSTATUS_PRS);
 			return B_OK;
 		
 		case PORT_POWER:
-			WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_RH_PORTSTATUS_PPS);
+			_WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_RH_PORTSTATUS_PPS);
 			return B_OK;
 	}
 	
@@ -487,11 +516,11 @@ OHCI::ClearPortFeature(uint8 index, uint16 feature)
 	
 	switch (feature) {
 		case C_PORT_RESET:
-			WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_RH_PORTSTATUS_CSC);
+			_WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_RH_PORTSTATUS_CSC);
 			return B_OK;
 		
 		case C_PORT_CONNECTION:
-			WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_RH_PORTSTATUS_CSC);
+			_WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_RH_PORTSTATUS_CSC);
 			return B_OK;
 	}
 	
@@ -499,34 +528,35 @@ OHCI::ClearPortFeature(uint8 index, uint16 feature)
 }
 
 
-Endpoint *
+ohci_endpoint_descriptor*
 OHCI::_AllocateEndpoint()
 {
-	TRACE(("OHCI::%s()\n", __FUNCTION__));
+	ohci_endpoint_descriptor *endpoint;
+	void* physicalAddress;
+
 	//Allocate memory chunk
-	Endpoint *endpoint = new(std::nothrow) Endpoint;
-	void *phy;
-	if (fStack->AllocateChunk((void **)&endpoint->ed, &phy, sizeof(ohci_endpoint_descriptor)) != B_OK) {
-		TRACE(("OHCI::AllocateEndpoint(): Error Allocating Endpoint\n"));
-		return 0;
+	if (fStack->AllocateChunk((void **)&endpoint, &physicalAddress,
+		sizeof(ohci_endpoint_descriptor)) < B_OK) {
+		TRACE_ERROR(("usb_uhci: failed to allocate endpoint descriptor\n"));
+		return NULL;
 	}
-	endpoint->physical_address = (addr_t)phy;
-	
-	//Initialize the physical part
-	memset((void *)endpoint->ed, 0, sizeof(ohci_endpoint_descriptor));
-	endpoint->ed->flags = OHCI_ENDPOINT_SKIP;
-	
-	//Add a NULL list by creating one TransferDescriptor
-	TransferDescriptor *trans = new(std::nothrow) TransferDescriptor;
-	endpoint->head = endpoint->tail = trans;
-	endpoint->ed->head_pointer = endpoint->ed->tail_pointer = trans->physical_address; 
-	
+
+	endpoint->this_physical = (addr_t)physicalAddress;
+
+	// Add an empty list by creating a general descriptor
+	ohci_general_transfer_descriptor *descriptor = _CreateGeneralDescriptor();
+	endpoint->head_physical_descriptor = descriptor->this_physical;
+	endpoint->tail_physical_descriptor = descriptor->this_physical;
+
+	endpoint->head_logical_descriptor = descriptor;
+	endpoint->tail_logical_descriptor = descriptor;
+
 	return endpoint;
 }
 
 
 void
-OHCI::_FreeEndpoint(Endpoint *end)
+OHCI::_FreeEndpoint(ohci_endpoint_descriptor *endpoint)
 {
 	TRACE(("OHCI::%s(%p)\n", __FUNCTION__, end));
 	fStack->FreeChunk((void *)end->ed, (void *) end->physical_address, sizeof(ohci_endpoint_descriptor));
@@ -653,14 +683,14 @@ OHCI::_InsertEndpointForPipe(Pipe *p)
 
 
 inline void
-OHCI::WriteReg(uint32 reg, uint32 value)
+OHCI::_WriteReg(uint32 reg, uint32 value)
 {
 	*(volatile uint32 *)(fOperationalRegisters + reg) = value;
 }
 
 
 inline uint32
-OHCI::ReadReg(uint32 reg)
+OHCI::_ReadReg(uint32 reg)
 {
 	return *(volatile uint32 *)(fOperationalRegisters + reg);
 }

@@ -81,15 +81,15 @@ static	pci_module_info				*sPCIModule;
 		// Host Controller Communication Area related stuff
 		area_id						fHccaArea;
 		struct ohci_hcca			*fHcca;
-		Endpoint					*fInterruptEndpoints[OHCI_NUMBER_OF_ENDPOINTS];
+		ohci_endpoint_descriptor	*fInterruptEndpoints[OHCI_NUMBER_OF_ENDPOINTS];
 
 		// Dummy endpoints
-		Endpoint					*fDummyControl;
-		Endpoint					*fDummyBulk;
-		Endpoint					*fDummyIsochronous;
+		ohci_endpoint_descriptor	*fDummyControl;
+		ohci_endpoint_descriptor	*fDummyBulk;
+		ohci_endpoint_descriptor	*fDummyIsochronous;
 
 		// Endpoint related methods
-		Endpoint					*_AllocateEndpoint(); 
+		ohci_endpoint_descriptor	*_AllocateEndpoint(); 
 		void						_FreeEndpoint(Endpoint *end);
 		TransferDescriptor			*_AllocateTransfer();
 		void						_FreeTransfer(TransferDescriptor *trans);
