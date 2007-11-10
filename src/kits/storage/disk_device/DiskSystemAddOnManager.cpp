@@ -58,7 +58,8 @@ struct DiskSystemAddOnManager::AddOnImage {
 struct DiskSystemAddOnManager::AddOn {
 	AddOn(AddOnImage* image, BDiskSystemAddOn* addOn)
 		: image(image),
-		  addOn(addOn)
+		  addOn(addOn),
+		  refCount(1)
 	{
 	}
 
