@@ -91,7 +91,6 @@ const device_info kSupportedDevices[] = {
 	{ 0x8086, 0x2683, "Intel ESB2" },
 	{ 0x8086, 0x27c1, "Intel ICH7R (AHCI mode)" },
 	{ 0x8086, 0x27c3, "Intel ICH7R (RAID mode)" },
-	{ 0x8086, 0x27c4, "Intel ICH7 (AHCI mode)" },
 	{ 0x8086, 0x27c5, "Intel ICH7-M (AHCI mode)" },
 	{ 0x8086, 0x27c6, "Intel ICH7-M DH (RAID mode)" },
 	{ 0x8086, 0x2821, "Intel ICH8 (AHCI mode)" },
