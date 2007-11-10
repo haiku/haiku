@@ -98,11 +98,21 @@ AHCIController::Init()
 		gPCI->write_pci_config(fPCIDevice, PCI_JMICRON_CONTROLLER_CONTROL_1, 4, ctrl);
 	}
 
+	fIRQ = pciInfo.u.h0.interrupt_line;
+	if (fIRQ == 0 || fIRQ == 0xff) {
+		TRACE("PCI IRQ not assigned\n");
+		return B_ERROR;
+	}
+
 	void *addr = (void *)pciInfo.u.h0.base_registers[5];
 	size_t size = pciInfo.u.h0.base_register_sizes[5];
 
 	TRACE("registers at %p, size %#lx\n", addr, size);
-	
+	if (!addr) {
+		TRACE("PCI base address register 5 not assigned\n");
+		return B_ERROR;
+	}
+
 	fRegsArea = map_mem((void **)&fRegs, addr, size, 0, "AHCI HBA regs");
 	if (fRegsArea < B_OK) {
 		TRACE("mapping registers failed\n");
@@ -120,12 +130,6 @@ AHCIController::Init()
 
 	if (fRegs->pi == 0) {
 		TRACE("controller doesn't implement any ports\n");
-		goto err;
-	}
-
-	fIRQ = gPCI->read_pci_config(fPCIDevice, PCI_interrupt_line, 1);
-	if (fIRQ == 0 || fIRQ == 0xff) {
-		TRACE("no IRQ assigned\n");
 		goto err;
 	}
 
