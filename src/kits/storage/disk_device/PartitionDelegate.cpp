@@ -118,6 +118,14 @@ BPartition::Delegate::CountChildren() const
 }
 
 
+// IsModified
+bool
+BPartition::Delegate::IsModified() const
+{
+	return fMutablePartition.ChangeFlags() != 0;
+}
+
+
 // SupportedOperations
 uint32
 BPartition::Delegate::SupportedOperations(uint32 mask)

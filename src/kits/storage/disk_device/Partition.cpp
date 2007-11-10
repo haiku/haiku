@@ -1598,6 +1598,5 @@ BPartition::_IsModified() const
 	if (!fDelegate)
 		return false;
 
-	// TODO: Implement!
-	return false;
+	return fDelegate->IsModified();
 }

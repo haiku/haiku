@@ -33,6 +33,8 @@ public:
 			Delegate*			ChildAt(int32 index) const;
 			int32				CountChildren() const;
 
+			bool				IsModified() const;
+
 			uint32				SupportedOperations(uint32 mask);
 			uint32				SupportedChildOperations(Delegate* child,
 									uint32 mask);
