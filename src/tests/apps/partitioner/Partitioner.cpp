@@ -346,7 +346,7 @@ private:
 		{
 			BDiskSystem diskSystem;
 			while (roster.GetNextDiskSystem(&diskSystem) == B_OK) {
-				if (partition->CanInitialize(diskSystem.Name()))
+				if (partition->CanInitialize(diskSystem.PrettyName()))
 					diskSystems.AddItem(new BDiskSystem(diskSystem));
 			}
 		}
@@ -360,7 +360,7 @@ private:
 		// print the available disk systems
 		printf("\ndisk systems that can initialize the selected partition:\n");
 		for (int32 i = 0; BDiskSystem* diskSystem = diskSystems.ItemAt(i); i++)
-			printf("%2ld  %s\n", i, diskSystem->Name());
+			printf("%2ld  %s\n", i, diskSystem->PrettyName());
 
 		printf("\n");
 
@@ -385,7 +385,7 @@ private:
 
 			// validate parameters
 			BString validatedName(name);
-			if (partition->ValidateInitialize(diskSystem->Name(),
+			if (partition->ValidateInitialize(diskSystem->PrettyName(),
 					supportsName ? &validatedName : NULL, parameters.String())
 					!= B_OK) {
 				printf("Validation of the given values failed. Sorry, can't "
@@ -425,7 +425,7 @@ private:
 		}
 
 		// initialize
-		status_t error = partition->Initialize(diskSystem->Name(),
+		status_t error = partition->Initialize(diskSystem->PrettyName(),
 			supportsName ? name.String() : NULL, parameters.String());
 		if (error != B_OK)
 			printf("Initialization failed: %s\n", strerror(error));
