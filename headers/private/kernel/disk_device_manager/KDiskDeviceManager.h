@@ -81,12 +81,12 @@ public:
 	// Disk Systems
 
 	// manager must be locked
-	KDiskSystem *FindDiskSystem(const char *name);
+	KDiskSystem *FindDiskSystem(const char *name, bool byPrettyName = false);
 	KDiskSystem *FindDiskSystem(disk_system_id id);
 	int32 CountDiskSystems();
 	KDiskSystem *NextDiskSystem(int32 *cookie);
 
-	KDiskSystem *LoadDiskSystem(const char *name);
+	KDiskSystem *LoadDiskSystem(const char *name, bool byPrettyName = false);
 	KDiskSystem *LoadDiskSystem(disk_system_id id);
 	KDiskSystem *LoadNextDiskSystem(int32 *cookie);
 

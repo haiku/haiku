@@ -630,12 +630,17 @@ KDiskDeviceManager::DeletePartition(KPartition *partition)
 
 // FindDiskSystem
 KDiskSystem *
-KDiskDeviceManager::FindDiskSystem(const char *name)
+KDiskDeviceManager::FindDiskSystem(const char *name, bool byPrettyName)
 {
 	for (int32 cookie = 0;
 		 KDiskSystem *diskSystem = NextDiskSystem(&cookie); ) {
-		if (!strcmp(name, diskSystem->Name()))
-			return diskSystem;
+		if (byPrettyName) {
+			if (strcmp(name, diskSystem->PrettyName()) == 0)
+				return diskSystem;
+		} else {
+			if (strcmp(name, diskSystem->Name()) == 0)
+				return diskSystem;
+		}
 	}
 	return NULL;
 }
@@ -674,11 +679,11 @@ KDiskDeviceManager::NextDiskSystem(int32 *cookie)
 
 // LoadDiskSystem
 KDiskSystem *
-KDiskDeviceManager::LoadDiskSystem(const char *name)
+KDiskDeviceManager::LoadDiskSystem(const char *name, bool byPrettyName)
 {
 	KDiskSystem *diskSystem = NULL;
 	if (ManagerLocker locker = this) {
-		diskSystem = FindDiskSystem(name);
+		diskSystem = FindDiskSystem(name, byPrettyName);
 		if (diskSystem && diskSystem->Load() != B_OK)
 			diskSystem = NULL;
 	}

@@ -1162,7 +1162,8 @@ _user_initialize_partition(partition_id partitionID, int32* _changeCounter,
 		return B_BAD_VALUE;
 
 	// load the new disk system
-	KDiskSystem *diskSystem = manager->LoadDiskSystem(diskSystemName.value);
+	KDiskSystem *diskSystem = manager->LoadDiskSystem(diskSystemName.value,
+		true);
 	if (!diskSystem)
 		return B_ENTRY_NOT_FOUND;
 	DiskSystemLoader loader(diskSystem, true);
