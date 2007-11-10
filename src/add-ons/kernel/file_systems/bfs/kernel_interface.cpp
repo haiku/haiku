@@ -14,6 +14,7 @@
 #include "Query.h"
 #include "Attribute.h"
 #include "bfs_control.h"
+#include "bfs_disk_system.h"
 
 
 #define BFS_IO_SIZE	65536
@@ -2014,49 +2015,6 @@ bfs_rewind_query(void */*fs*/, void *cookie)
 //	#pragma mark -
 
 
-struct initialize_parameters {
-	uint32	blockSize;
-	uint32	flags;
-	bool	verbose;
-};
-
-
-static status_t
-parse_initialize_parameters(const char* parameterString,
-	initialize_parameters& parameters)
-{
-	parameters.flags = 0;
-	parameters.verbose = false;
-
-	void *handle = parse_driver_settings_string(parameterString);
-	if (handle == NULL)
-		return B_ERROR;
-
-	if (get_driver_boolean_parameter(handle, "noindex", false, true))
-		parameters.flags |= VOLUME_NO_INDICES;
-	if (get_driver_boolean_parameter(handle, "verbose", false, true))
-		parameters.verbose = true;
-
-	const char *string = get_driver_parameter(handle, "block_size",
-		NULL, NULL);
-	uint32 blockSize = 1024;
-	if (string != NULL)
-		blockSize = strtoul(string, NULL, 0);
-
-	delete_driver_settings(handle);
-
-	if (blockSize != 1024 && blockSize != 2048 && blockSize != 4096
-		&& blockSize != 8192) {
-		INFORM(("valid block sizes are: 1024, 2048, 4096, and 8192\n"));
-		return B_BAD_VALUE;
-	}
-
-	parameters.blockSize = blockSize;
-
-	return B_OK;
-}
-
-
 static uint32
 bfs_get_supported_operations(partition_data* partition, uint32 mask)
 {
@@ -2066,37 +2024,18 @@ bfs_get_supported_operations(partition_data* partition, uint32 mask)
 }
 
 
-static bool
-bfs_validate_initialize(partition_data *partition, char *name,
-	const char *parameterString)
-{
-	if (name == NULL)
-		return B_BAD_VALUE;
-
-	// truncate the name, if it is too long
-	size_t nameLen = strlen(name);
-	if (nameLen >= BFS_DISK_NAME_LENGTH) {
-		nameLen = BFS_DISK_NAME_LENGTH - 1;
-		name[nameLen] = '\0';
-	}
-
-	// replace '/' by '-'
-	while ((name = strchr(name, '/')) != NULL)
-		*name = '-';
-
-	// parse parameters
-	initialize_parameters parameters;
-	return (parse_initialize_parameters(parameterString, parameters) == B_OK);
-}
-
-
 static status_t
 bfs_initialize(int fd, partition_id partitionID, const char *name,
 	const char *parameterString, off_t /*partitionSize*/, disk_job_id job)
 {
+	// check name
+	status_t status = check_volume_name(name);
+	if (status != B_OK)
+		return status;
+
 	// parse parameters
 	initialize_parameters parameters;
-	status_t status = parse_initialize_parameters(parameterString, parameters);
+	status = parse_initialize_parameters(parameterString, parameters);
 	if (status != B_OK)
 		return status;
 
@@ -2296,7 +2235,7 @@ static file_system_module_info sBeFileSystem = {
 	NULL,	// validate_move
 	NULL,	// validate_set_content_name
 	NULL,	// validate_set_content_parameters
-	&bfs_validate_initialize,
+	NULL,	// validate_initialize,
 
 	/* shadow partition modification */
 	NULL,	// shadow_changed

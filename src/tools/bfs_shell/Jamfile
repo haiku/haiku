@@ -28,6 +28,7 @@ UsePrivateHeaders fs_shell ;
 
 BuildPlatformMain <build>bfs_shell
 	:
+	bfs_disk_system.cpp
 	BlockAllocator.cpp
 	BPlusTree.cpp
 	Attribute.cpp

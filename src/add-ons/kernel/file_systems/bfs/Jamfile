@@ -28,6 +28,7 @@ UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName storage ] ;
 
 KernelAddon bfs :
+	bfs_disk_system.cpp
 	BlockAllocator.cpp
 	BPlusTree.cpp
 	kernel_cpp.cpp
