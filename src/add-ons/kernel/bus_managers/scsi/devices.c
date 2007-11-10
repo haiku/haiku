@@ -117,6 +117,9 @@ scsi_register_device(scsi_bus_info *bus, uchar target_id,
 	// ask for restrictions	
 	bus->interface->get_restrictions(bus->sim_cookie, 
 		target_id, &is_atapi, &manual_autosense, &max_blocks);
+	if (target_lun != 0)
+		dprintf("WARNING: SCSI target %d lun %d getting restrictions without lun\n",
+			target_id, target_lun);
 
 	// find maximum transfer blocks
 	// set default value to max (need something like ULONG_MAX here)
