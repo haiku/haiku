@@ -30,6 +30,11 @@
 #include "UninitializeJob.h"
 
 
+#undef TRACE
+//#define TRACE(x...)
+#define TRACE(x...)	printf(x)
+
+
 using std::nothrow;
 
 
@@ -133,21 +138,32 @@ DiskDeviceJobGenerator::GenerateJobs()
 	// changes, also those that shall be initialized with a disk system.
 	// This simplifies moving and resizing.
 	status_t error = _GenerateCleanupJobs(fDevice);
-	if (error != B_OK)
+	if (error != B_OK) {
+		TRACE("DiskDeviceJobGenerator::GenerateJobs(): _GenerateCleanupJobs() "
+			"failed\n");
 		return error;
+	}
 
 	// Generate jobs that move and resize the remaining physical partitions
 	// to their final position/size.
 	error = _GeneratePlacementJobs(fDevice);
-	if (error != B_OK)
+	if (error != B_OK) {
+		TRACE("DiskDeviceJobGenerator::GenerateJobs(): "
+			"_GeneratePlacementJobs() failed\n");
 		return error;
+	}
 
 	// Generate the remaining jobs in one run: initialization, creation of
 	// partitions, and changing of name, content name, type, parameters, and
 	// content parameters.
 	error = _GenerateRemainingJobs(NULL, fDevice);
-	if (error != B_OK)
+	if (error != B_OK) {
+		TRACE("DiskDeviceJobGenerator::GenerateJobs(): "
+			"_GenerateRemainingJobs() failed\n");
 		return error;
+	}
+
+	TRACE("DiskDeviceJobGenerator::GenerateJobs(): succeeded\n");
 
 	return B_OK;
 }
@@ -175,7 +191,8 @@ DiskDeviceJobGenerator::_GenerateCleanupJobs(BPartition* partition)
 // TODO: Depending on how this shall be handled, we might want to unmount
 // all descendants of a partition to be uninitialized or removed.
 	if (BMutablePartition* shadow = _GetMutablePartition(partition)) {
-		if (shadow->ChangeFlags() & B_PARTITION_CHANGED_INITIALIZATION) {
+		if ((shadow->ChangeFlags() & B_PARTITION_CHANGED_INITIALIZATION)
+			&& partition->fPartitionData->content_type) {
 			// partition changes initialization
 			status_t error = _GenerateUninitializeJob(partition);
 			if (error != B_OK)
@@ -368,7 +385,6 @@ DiskDeviceJobGenerator::_GenerateRemainingJobs(BPartition* parent,
 			return error;
 	} else {
 		// partition already exists: set non-content properties
-		
 
 		// name
 		if ((changeFlags & B_PARTITION_CHANGED_NAME)

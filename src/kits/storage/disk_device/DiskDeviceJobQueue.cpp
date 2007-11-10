@@ -5,7 +5,14 @@
 
 #include "DiskDeviceJobQueue.h"
 
+#include <typeinfo>
+
 #include "DiskDeviceJob.h"
+
+
+#undef TRACE
+//#define TRACE(x...)
+#define TRACE(x...)	printf(x)
 
 
 // constructor
@@ -39,9 +46,15 @@ DiskDeviceJobQueue::Execute()
 	int32 count = fJobs.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		DiskDeviceJob* job = fJobs.ItemAt(i);
+
+		TRACE("DiskDeviceJobQueue::Execute(): executing job: %s\n",
+			typeid(*job).name());
+
 		status_t error = job->Do();
-		if (error != B_OK)
+		if (error != B_OK) {
+			TRACE("DiskDeviceJobQueue::Execute(): executing job failed\n");
 			return error;
+		}
 	}
 
 	return B_OK;
