@@ -396,6 +396,9 @@ AddFilesToHaikuImage beos system add-ons Print transport
 AddFilesToHaikuImage beos system add-ons Screen\ Savers
 	: $(BEOS_ADD_ONS_SCREENSAVERS) ;
 
+AddFilesToHaikuImage beos system add-ons disk_systems
+	: <disk_system>intel <disk_system>bfs ;
+
 AddDirectoryToHaikuImage home config add-ons Tracker ;
 AddDirectoryToHaikuImage home config add-ons Screen\ Savers ;
 AddDirectoryToHaikuImage home config add-ons Translators ;
