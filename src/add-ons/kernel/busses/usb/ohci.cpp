@@ -537,7 +537,7 @@ OHCI::_AllocateEndpoint()
 	//Allocate memory chunk
 	if (fStack->AllocateChunk((void **)&endpoint, &physicalAddress,
 		sizeof(ohci_endpoint_descriptor)) < B_OK) {
-		TRACE_ERROR(("usb_uhci: failed to allocate endpoint descriptor\n"));
+		TRACE_ERROR(("usb_ohci: failed to allocate endpoint descriptor\n"));
 		return NULL;
 	}
 
