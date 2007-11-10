@@ -5,6 +5,7 @@ UsePrivateHeaders [ FDirName kernel util ] ;
 
 KernelAddon pci :
 	pci.cpp
+	pci_fixup.cpp
 	pci_info.cpp
 	pci_module.c
 	pci_device.c

@@ -13,6 +13,7 @@
 #include <PCI.h>
 
 #include "util/kernel_cpp.h"
+#include "pci_fixup.h"
 #include "pci_priv.h"
 #include "pci.h"
 
@@ -328,12 +329,8 @@ PCI::InitBus()
 		ppnext = &bus->next;
 	}
 	
-	bool bus_enumeration = true;
-
-	if (bus_enumeration) {
-		for (int i = 0; i < fDomainCount; i++) {
-			EnumerateBus(i, 0);
-		}
+	for (int i = 0; i < fDomainCount; i++) {
+		EnumerateBus(i, 0);
 	}
 	
 	if (fRootBus) {
@@ -510,6 +507,8 @@ PCI::EnumerateBus(int domain, uint8 bus, uint8 *subordinate_bus)
 			uint16 device_id = ReadPciConfig(domain, bus, dev, func, PCI_device_id, 2);
 			if (device_id == 0xffff)
 				continue;
+
+			pci_fixup_device(this, domain, bus, dev, func);
 
 			uint8 base_class = ReadPciConfig(domain, bus, dev, func, PCI_class_base, 1);
 			uint8 sub_class	 = ReadPciConfig(domain, bus, dev, func, PCI_class_sub, 1);
