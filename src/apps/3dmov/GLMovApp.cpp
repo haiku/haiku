@@ -12,7 +12,7 @@
 #include "GLMovWindow.h"
 
 GLMovApp::GLMovApp()
-	: BApplication("application/x-vnd.Be-3DM2")
+	: BApplication("application/x-vnd.Haiku-3DMov")
 {
 }
 
