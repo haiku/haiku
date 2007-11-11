@@ -219,7 +219,7 @@ file_ascmagic(const unsigned char *buf, size_t nbytes, BMimeType* mimeType,
 		encoding = NULL; // "UTF-8";
 		type = "text";
 		rv = 1;
-	} else 	if (looks_ascii(buf, nbytes, ubuf, &ulen)) {
+	} else if (looks_ascii(buf, nbytes, ubuf, &ulen)) {
 		code = "ASCII";
 		encoding = NULL; //"us-ascii";
 		type = "text";
