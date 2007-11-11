@@ -218,10 +218,15 @@ file_ascmagic(const unsigned char *buf, size_t nbytes, BMimeType* mimeType,
 		code = "ASCII";
 		encoding = NULL; //"us-ascii";
 		type = "text";
-	} else if (looks_utf8(buf, nbytes, ubuf, &ulen)) {
+	} else if (nbytes == 0 || looks_utf8(buf, nbytes, ubuf, &ulen)) {
 		code = "UTF-8 Unicode";
 		encoding = NULL; // "UTF-8";
 		type = "text";
+		if (nbytes == 0) {
+			// this is also the Haiku default encoding
+			// in case we have an empty buffer
+			rv = 1;
+		}
 	} else if ((i = looks_unicode(buf, nbytes, ubuf, &ulen)) != 0) {
 		if (i == 1) {
 			code = "Little-endian UTF-16 Unicode";
@@ -258,7 +263,6 @@ file_ascmagic(const unsigned char *buf, size_t nbytes, BMimeType* mimeType,
 	}
 
 	if (nbytes <= 1) {
-		rv = 0;
 		goto done;
 	}
 
