@@ -241,6 +241,9 @@ file_map_translate(void *_map, off_t offset, size_t size, file_io_vec *vecs,
 	if (_map == NULL)
 		return B_BAD_VALUE;
 
+	TRACE(("file_map_translate(map %p, offset %Ld, size %ld)\n",
+		_map, offset, size));
+
 	file_map &map = *(file_map *)_map;
 	size_t maxVecs = *_count;
 	status_t status = B_OK;
