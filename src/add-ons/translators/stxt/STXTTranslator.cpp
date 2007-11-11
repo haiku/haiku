@@ -218,6 +218,8 @@ file_ascmagic(const unsigned char *buf, size_t nbytes, BMimeType* mimeType,
 		code = "ASCII";
 		encoding = NULL; //"us-ascii";
 		type = "text";
+		if (nbytes == 1)
+			rv = 1;
 	} else if (nbytes == 0 || looks_utf8(buf, nbytes, ubuf, &ulen)) {
 		code = "UTF-8 Unicode";
 		encoding = NULL; // "UTF-8";
@@ -263,6 +265,8 @@ file_ascmagic(const unsigned char *buf, size_t nbytes, BMimeType* mimeType,
 	}
 
 	if (nbytes <= 1) {
+		if (rv == -1)
+			rv = 0;
 		goto done;
 	}
 
