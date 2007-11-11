@@ -214,21 +214,23 @@ file_ascmagic(const unsigned char *buf, size_t nbytes, BMimeType* mimeType,
 	 * the text converted into one-my_unichar-per-character Unicode in
 	 * ubuf, and the number of characters converted in ulen.
 	 */
-	if (looks_ascii(buf, nbytes, ubuf, &ulen)) {
-		code = "ASCII";
-		encoding = NULL; //"us-ascii";
-		type = "text";
-		if (nbytes == 1)
-			rv = 1;
-	} else if (nbytes == 0 || looks_utf8(buf, nbytes, ubuf, &ulen)) {
+	if (nbytes == 0) {
 		code = "UTF-8 Unicode";
 		encoding = NULL; // "UTF-8";
 		type = "text";
-		if (nbytes == 0) {
-			// this is also the Haiku default encoding
-			// in case we have an empty buffer
+		rv = 1;
+	} else 	if (looks_ascii(buf, nbytes, ubuf, &ulen)) {
+		code = "ASCII";
+		encoding = NULL; //"us-ascii";
+		type = "text";
+		if (nbytes == 1) {
+			// no further tests
 			rv = 1;
 		}
+	} else if (looks_utf8(buf, nbytes, ubuf, &ulen)) {
+		code = "UTF-8 Unicode";
+		encoding = NULL; // "UTF-8";
+		type = "text";
 	} else if ((i = looks_unicode(buf, nbytes, ubuf, &ulen)) != 0) {
 		if (i == 1) {
 			code = "Little-endian UTF-16 Unicode";
