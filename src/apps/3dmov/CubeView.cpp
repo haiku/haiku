@@ -19,7 +19,8 @@ CubeView::~CubeView()
 {
 }
 
-void CubeView::AttachedToWindow()
+void
+CubeView::AttachedToWindow()
 {
 	
 }

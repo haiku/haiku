@@ -27,7 +27,8 @@ GLMovWindow::~GLMovWindow()
 {
 }
 
-bool GLMovWindow::QuitRequested()
+bool
+GLMovWindow::QuitRequested()
 {
 	be_app->Lock();
 	if (be_app->CountWindows() < 2)
@@ -36,7 +37,8 @@ bool GLMovWindow::QuitRequested()
 	return true;
 }
 
-void GLMovWindow::MessageReceived(BMessage *message)
+void
+GLMovWindow::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 	case MSG_OBJ1:
@@ -52,13 +54,15 @@ void GLMovWindow::MessageReceived(BMessage *message)
 	}
 }
 
-void GLMovWindow::DirectConnected(direct_buffer_info *info)
+void
+GLMovWindow::DirectConnected(direct_buffer_info *info)
 {
 	fGLView->DirectConnected(info);
 }
 
 
-GLMovWindow *GLMovWindow::MakeWindow(object_type obj)
+GLMovWindow *
+GLMovWindow::MakeWindow(object_type obj)
 {
 	GLMovWindow *win;
 	GLMovView *view;

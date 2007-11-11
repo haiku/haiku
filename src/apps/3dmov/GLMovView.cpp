@@ -19,7 +19,8 @@ GLMovView::~GLMovView()
 {
 }
 
-void GLMovView::AttachedToWindow()
+void
+GLMovView::AttachedToWindow()
 {
 	
 }

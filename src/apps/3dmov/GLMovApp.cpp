@@ -20,7 +20,8 @@ GLMovApp::~GLMovApp()
 {
 }
 
-void GLMovApp::ReadyToRun()
+void
+GLMovApp::ReadyToRun()
 {
 	GLMovWindow *win = GLMovWindow::MakeWindow(OBJ_CUBE);
 }
@@ -36,7 +37,8 @@ void GLMovApp::MessageReceived(BMessage *message)
 {
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
 	GLMovApp app;
 	app.Run();
