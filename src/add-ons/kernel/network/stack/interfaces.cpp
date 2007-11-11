@@ -137,7 +137,7 @@ allocate_device_interface(net_device *device, net_device_module_info *module)
 
 	interface->reader_thread   = -1;
 	interface->consumer_thread = spawn_kernel_thread(device_consumer_thread,
-		name, B_REAL_TIME_DISPLAY_PRIORITY - 10, interface);
+		name, B_DISPLAY_PRIORITY, interface);
 	if (interface->consumer_thread < B_OK)
 		goto error_3;
 	resume_thread(interface->consumer_thread);
