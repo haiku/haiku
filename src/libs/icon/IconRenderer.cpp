@@ -142,7 +142,7 @@ StyleHandler::generate_span(agg::rgba8* span, int x, int y,
 							  styleItem->transformation);
 			break;
 		}
-		case GRADIENT_DIAMONT: {
+		case GRADIENT_DIAMOND: {
 		    agg::gradient_diamond function;
 			_GenerateGradient(span, x, y, len, function, 0, 64, colors,
 							  styleItem->transformation);

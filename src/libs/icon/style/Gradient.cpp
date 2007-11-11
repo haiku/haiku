@@ -582,8 +582,8 @@ string_for_type(gradient_type type)
 			return "GRADIENT_LINEAR";
 		case GRADIENT_CIRCULAR:
 			return "GRADIENT_CIRCULAR";
-		case GRADIENT_DIAMONT:
-			return "GRADIENT_DIAMONT";
+		case GRADIENT_DIAMOND:
+			return "GRADIENT_DIAMOND";
 		case GRADIENT_CONIC:
 			return "GRADIENT_CONIC";
 		case GRADIENT_XY:
@@ -615,7 +615,7 @@ Gradient::GradientArea() const
 	switch (fType) {
 		case GRADIENT_LINEAR:
 		case GRADIENT_CIRCULAR:
-		case GRADIENT_DIAMONT:
+		case GRADIENT_DIAMOND:
 		case GRADIENT_CONIC:
 		case GRADIENT_XY:
 		case GRADIENT_SQRT_XY:

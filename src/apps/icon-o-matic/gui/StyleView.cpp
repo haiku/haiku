@@ -101,8 +101,8 @@ StyleView::StyleView(BRect frame)
 	message->AddInt32("type", GRADIENT_CIRCULAR);
 	menu->AddItem(new BMenuItem("Radial", message));
 	message = new BMessage(MSG_SET_GRADIENT_TYPE);
-	message->AddInt32("type", GRADIENT_DIAMONT);
-	menu->AddItem(new BMenuItem("Diamont", message));
+	message->AddInt32("type", GRADIENT_DIAMOND);
+	menu->AddItem(new BMenuItem("Diamond", message));
 	message = new BMessage(MSG_SET_GRADIENT_TYPE);
 	message->AddInt32("type", GRADIENT_CONIC);
 	menu->AddItem(new BMenuItem("Conic", message));
