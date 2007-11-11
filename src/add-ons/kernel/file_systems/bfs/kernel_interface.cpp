@@ -358,7 +358,7 @@ bfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 
 		bool bufferOverflow = status == B_BUFFER_OVERFLOW;
 
-		size_t bytes;
+		size_t bytes = bytesLeft;
 		status = read_file_io_vec_pages(volume->Device(), fileVecs,
 			fileVecCount, vecs, count, &vecIndex, &vecOffset, &bytes);
 		if (status != B_OK || !bufferOverflow)
@@ -404,7 +404,7 @@ bfs_write_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 
 		bool bufferOverflow = status == B_BUFFER_OVERFLOW;
 
-		size_t bytes;
+		size_t bytes = bytesLeft;
 		status = write_file_io_vec_pages(volume->Device(), fileVecs,
 			fileVecCount, vecs, count, &vecIndex, &vecOffset, &bytes);
 		if (status != B_OK || !bufferOverflow)

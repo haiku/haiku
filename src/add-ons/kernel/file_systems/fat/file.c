@@ -1505,7 +1505,7 @@ dosfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 		struct file_io_vec fileVecs[8];
 		uint32 fileVecCount = 8;
 		bool bufferOverflow;
-		size_t bytes;
+		size_t bytes = bytesLeft;
 
 		status = file_map_translate(node->file_map, pos, bytesLeft, fileVecs,
 			&fileVecCount);
@@ -1557,7 +1557,7 @@ dosfs_write_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 		struct file_io_vec fileVecs[8];
 		uint32 fileVecCount = 8;
 		bool bufferOverflow;
-		size_t bytes;
+		size_t bytes = bytesLeft;
 
 		status = file_map_translate(node->file_map, pos, bytesLeft, fileVecs,
 			&fileVecCount);
