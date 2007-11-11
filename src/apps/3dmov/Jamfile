@@ -1,0 +1,12 @@
+SubDir HAIKU_TOP src apps 3dmov ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+Application 3DMov :
+	CubeView.cpp
+	GLMovApp.cpp
+	GLMovView.cpp
+	GLMovWindow.cpp
+	: be GL game
+	: 3dmov.rdef
+;
