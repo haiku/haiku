@@ -479,13 +479,21 @@ class WriteLocked {
 			:
 			fLock(lock)
 		{
-			fStatus = lock != NULL ? lock->LockWrite() : B_ERROR;
+			fStatus = lock != NULL ? lock->LockWrite() : B_NO_INIT;
 		}
 
 		~WriteLocked()
 		{
 			if (fStatus == B_OK)
 				fLock->UnlockWrite();
+		}
+
+		status_t
+		Lock()
+		{
+			if (fStatus == B_OK)
+				return B_ERROR;
+			return fStatus = fLock->LockWrite();
 		}
 
 		status_t
@@ -497,8 +505,9 @@ class WriteLocked {
 		void
 		Unlock()
 		{
-			fLock->UnlockWrite();
-			fStatus = B_NO_INIT;
+			if (fStatus == B_OK)
+				fLock->UnlockWrite();
+			fStatus = B_ERROR;
 		}
 
 	private:

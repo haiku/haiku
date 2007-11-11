@@ -694,19 +694,18 @@ bfs_write_stat(void *_ns, void *_node, const struct stat *stat, uint32 mask)
 	Volume *volume = (Volume *)_ns;
 	Inode *inode = (Inode *)_node;
 
-	// that may be incorrect here - I don't think we need write access to
-	// change most of the stat...
-	// we should definitely check a bit more if the new stats are correct and valid...
+	// TODO: we should definitely check a bit more if the new stats are
+	//	valid - or even better, the VFS should check this before calling us
 	
 	status_t status = inode->CheckPermissions(W_OK);
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
+	Transaction transaction(volume, inode->BlockNumber());
+
 	WriteLocked locked(inode->Lock());
 	if (locked.IsLocked() < B_OK)
 		RETURN_ERROR(B_ERROR);
-
-	Transaction transaction(volume, inode->BlockNumber());
 
 	bfs_inode &node = inode->Node();
 
@@ -737,7 +736,8 @@ bfs_write_stat(void *_ns, void *_node, const struct stat *stat, uint32 mask)
 
 	if (mask & B_STAT_MODE) {
 		PRINT(("original mode = %ld, stat->st_mode = %d\n", node.Mode(), stat->st_mode));
-		node.mode = HOST_ENDIAN_TO_BFS_INT32(node.Mode() & ~S_IUMSK | stat->st_mode & S_IUMSK);
+		node.mode = HOST_ENDIAN_TO_BFS_INT32(node.Mode() & ~S_IUMSK
+			| stat->st_mode & S_IUMSK);
 	}
 
 	if (mask & B_STAT_UID)
@@ -762,7 +762,8 @@ bfs_write_stat(void *_ns, void *_node, const struct stat *stat, uint32 mask)
 			(bigtime_t)stat->st_crtime << INODE_TIME_SHIFT);
 	}
 
-	if ((status = inode->WriteBack(transaction)) == B_OK)
+	status = inode->WriteBack(transaction);
+	if (status == B_OK)
 		transaction.Done();
 
 	notify_stat_changed(volume->ID(), inode->ID(), mask);
@@ -772,8 +773,8 @@ bfs_write_stat(void *_ns, void *_node, const struct stat *stat, uint32 mask)
 
 
 status_t 
-bfs_create(void *_ns, void *_directory, const char *name, int openMode, int mode,
-	void **_cookie, ino_t *_vnodeID)
+bfs_create(void *_ns, void *_directory, const char *name, int openMode,
+	int mode, void **_cookie, ino_t *_vnodeID)
 {
 	FUNCTION_START(("name = \"%s\", perms = %d, openMode = %d\n", name, mode, openMode));
 
@@ -1147,8 +1148,8 @@ bfs_open(void *_fs, void *_node, int openMode, void **_cookie)
 
 	// Should we truncate the file?
 	if (openMode & O_TRUNC) {
-		WriteLocked locked(inode->Lock());
 		Transaction transaction(volume, inode->BlockNumber());
+		WriteLocked locked(inode->Lock());
 
 		status_t status = inode->SetFileSize(transaction, 0);
 		if (status >= B_OK)
@@ -1255,25 +1256,32 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 		return B_BAD_VALUE;
 
 	file_cookie *cookie = (file_cookie *)_cookie;
-
 	Volume *volume = (Volume *)_ns;
 	Inode *inode = (Inode *)_node;
 
-	WriteLocked locked(inode->Lock());
+	Transaction transaction;
+	bool needsTrimming;
 
-	bool needsTrimming = inode->NeedsTrimming();
+	{
+		ReadLocked locker(inode->Lock());
+		needsTrimming = inode->NeedsTrimming();
 
-	if ((cookie->open_mode & O_RWMASK) != 0
-		&& !inode->IsDeleted()
-		&& (needsTrimming
-			|| inode->OldLastModified() != inode->LastModified()
-			|| inode->OldSize() != inode->Size())) {
+		if ((cookie->open_mode & O_RWMASK) != 0
+			&& !inode->IsDeleted()
+			&& (needsTrimming
+				|| inode->OldLastModified() != inode->LastModified()
+				|| inode->OldSize() != inode->Size())) {
+			locker.Unlock();
+			transaction.Start(volume, inode->BlockNumber());
+		}
+	}
 
+	WriteLocked locker(inode->Lock());
+	status_t status = B_ERROR;
+
+	if (transaction.IsStarted()) {
 		// trim the preallocated blocks and update the size,
 		// and last_modified indices if needed
-
-		Transaction transaction(volume, inode->BlockNumber());
-		status_t status = B_OK;
 		bool changedSize = false, changedTime = false;
 		Index index(volume);
 
@@ -1299,14 +1307,14 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 			inode->WriteBack(transaction);
 		}
 
-		if (status == B_OK)
-			transaction.Done();
-
 		if (changedSize || changedTime) {
 			notify_stat_changed(volume->ID(), inode->ID(),
-				(changedTime ? B_STAT_MODIFICATION_TIME : 0) | (changedSize ? B_STAT_SIZE : 0));
+				(changedTime ? B_STAT_MODIFICATION_TIME : 0)
+				| (changedSize ? B_STAT_SIZE : 0));
 		}
 	}
+	if (status == B_OK)
+		transaction.Done();
 
 	if (inode->Flags() & INODE_CHKBFS_RUNNING) {
 		// "chkbfs" exited abnormally, so we have to stop it here...

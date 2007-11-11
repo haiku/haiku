@@ -55,11 +55,13 @@ InodeAllocator::~InodeAllocator()
 
 
 status_t 
-InodeAllocator::New(block_run *parentRun, mode_t mode, block_run &run, Inode **_inode)
+InodeAllocator::New(block_run *parentRun, mode_t mode, block_run &run,
+	Inode **_inode)
 {
 	Volume *volume = fTransaction->GetVolume();
 
-	status_t status = volume->AllocateForInode(*fTransaction, parentRun, mode, fRun);
+	status_t status = volume->AllocateForInode(*fTransaction, parentRun, mode,
+		fRun);
 	if (status < B_OK) {
 		// don't free the space in the destructor, because
 		// the allocation failed
@@ -101,7 +103,8 @@ InodeAllocator::CreateTree()
 
 	if (fInode->IsRegularNode()) {
 		if (tree->Insert(*fTransaction, ".", fInode->ID()) < B_OK
-			|| tree->Insert(*fTransaction, "..", volume->ToVnode(fInode->Parent())) < B_OK)
+			|| tree->Insert(*fTransaction, "..",
+					volume->ToVnode(fInode->Parent())) < B_OK)
 			return B_ERROR;
 	}
 	return B_OK;
@@ -833,11 +836,7 @@ Inode::ReadAttribute(const char *name, int32 type, off_t pos, uint8 *buffer,
 	Inode *attribute;
 	status_t status = GetAttribute(name, &attribute);
 	if (status == B_OK) {
-		if (attribute->Lock().Lock() == B_OK) {
-			status = attribute->ReadAt(pos, (uint8 *)buffer, _length);
-			attribute->Lock().Unlock();
-		} else
-			status = B_ERROR;
+		status = attribute->ReadAt(pos, (uint8 *)buffer, _length);
 
 		ReleaseAttribute(attribute);
 	}
@@ -862,6 +861,8 @@ Inode::WriteAttribute(Transaction &transaction, const char *name, int32 type,
 	// TODO: we actually depend on that the contents of "buffer" are constant.
 	// If they get changed during the write (hey, user programs), we may mess
 	// up our index trees!
+	// TODO: for attribute files, we need to log the first BPLUSTREE_MAX_KEY_LENGTH
+	// bytes of the data stream, or the same as above might happen.
 
 	Index index(fVolume);
 	index.SetTo(name);
@@ -916,19 +917,24 @@ Inode::WriteAttribute(Transaction &transaction, const char *name, int32 type,
 
 			// check if the data fits into the small_data section again
 			NodeGetter node(fVolume, transaction, this);
-			status = _AddSmallData(transaction, node, name, type, buffer, *_length);
+			status = _AddSmallData(transaction, node, name, type, buffer,
+				*_length);
+
 			if (status == B_OK) {
 				// it does - remove its file
+				attribute->Lock().UnlockWrite();
 				status = _RemoveAttribute(transaction, name, false, NULL);
 			} else {
-				status = attribute->WriteAt(transaction, pos, buffer, _length);
-				if (status == B_OK) {
-					// The attribute type might have been changed - we need to adopt
-					// the new one - the attribute's inode will be written back on close
-					attribute->Node().type = HOST_ENDIAN_TO_BFS_INT32(type);
-				}
-
+				// The attribute type might have been changed - we need to
+				// adopt the new one
+				attribute->Node().type = HOST_ENDIAN_TO_BFS_INT32(type);
+				status = attribute->WriteBack(transaction);
 				attribute->Lock().UnlockWrite();
+
+				if (status == B_OK) {
+					status = attribute->WriteAt(transaction, pos, buffer,
+						_length);
+				}
 			}
 		} else
 			status = B_ERROR;
@@ -976,8 +982,8 @@ Inode::RemoveAttribute(Transaction &transaction, const char *name)
 			uint32 length = smallData->DataSize();
 			if (length > BPLUSTREE_MAX_KEY_LENGTH)
 				length = BPLUSTREE_MAX_KEY_LENGTH;
-			index.Update(transaction, name, smallData->Type(), smallData->Data(),
-				length, NULL, 0, this);
+			index.Update(transaction, name, smallData->Type(),
+				smallData->Data(), length, NULL, 0, this);
 		}
 		fSmallDataLock.Unlock();
 	}
@@ -1224,14 +1230,6 @@ Inode::FindBlockRun(off_t pos, block_run &run, off_t &offset)
 status_t
 Inode::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 {
-#if 0
-	// call the right ReadAt() method, depending on the inode flags
-
-	if (Flags() & INODE_LOGGED)
-		return ((Stream<Access::Logged> *)this)->ReadAt(pos, buffer, _length);
-
-	return ((Stream<Access::Cached> *)this)->ReadAt(pos, buffer, _length);
-#endif
 	size_t length = *_length;
 
 	// set/check boundaries for pos/length
@@ -1266,26 +1264,27 @@ Inode::WriteAt(Transaction &transaction, off_t pos, const uint8 *buffer,
 		<< INODE_TIME_SHIFT);
 
 	// TODO: support INODE_LOGGED!
-#if 0
-	if (Flags() & INODE_LOGGED)
-		return ((Stream<Access::Logged> *)this)->WriteAt(transaction, pos, buffer, _length);
 
-	return ((Stream<Access::Cached> *)this)->WriteAt(transaction, pos, buffer, _length);
-#endif
 	size_t length = *_length;
+	bool changeSize = false;
 
 	// set/check boundaries for pos/length
 	if (pos < 0)
 		return B_BAD_VALUE;
 
+	if (pos + length > Size())
+		changeSize = true;
+
+	locker.Unlock();
+
+	// the transaction doesn't have to be started already
+	if (changeSize && !transaction.IsStarted())
+		transaction.Start(fVolume, BlockNumber());
+
+	locker.Lock();
+
 	if (pos + length > Size()) {
 		off_t oldSize = Size();
-
-		// the transaction doesn't have to be started already
-		// ToDo: what's that INODE_NO_TRANSACTION flag good for again?
-		if ((Flags() & INODE_NO_TRANSACTION) == 0
-			&& !transaction.IsStarted())
-			transaction.Start(fVolume, BlockNumber());
 
 		// let's grow the data stream to the size needed
 		status_t status = SetFileSize(transaction, pos + length);
