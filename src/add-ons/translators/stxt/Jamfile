@@ -24,7 +24,7 @@ Translator STXTTranslator :
 	: true
 ;
 
-Package haiku-translationkit-cvs :
-	STXTTranslator :
-	boot home config add-ons Translators ;
+#Package haiku-translationkit-cvs :
+#	STXTTranslator :
+#	boot home config add-ons Translators ;
 
