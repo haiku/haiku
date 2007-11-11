@@ -1,20 +1,10 @@
-/*
-  -----------------------------------------------------------------------------
-
-	File:	GLMovView.cpp
-	
-	Date:	10/20/2004
-
-	Description:	3DMov reloaded...
-	
-	Author:	François Revol.
-	
-	
-	Copyright 2004, yellowTAB GmbH, All rights reserved.
-	
-
-  -----------------------------------------------------------------------------
-*/
+/* 
+ * Copyright 2004-2007, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ * 		François Revol <revol@free.fr>
+ */
 
 #include <opengl/GL/gl.h>
 #include <opengl/GL/glu.h>
