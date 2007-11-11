@@ -1,6 +1,5 @@
-/* Journal - transaction and logging
- *
- * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef JOURNAL_H
@@ -119,14 +118,16 @@ class Transaction {
 		status_t Start(Volume *volume, off_t refBlock);
 		bool IsStarted() const { return fJournal != NULL; }
 
-		void Done()
+		void
+		Done()
 		{
 			if (fJournal != NULL)
 				fJournal->Unlock(this, true);
 			fJournal = NULL;
 		}
 
-		bool HasParent()
+		bool
+		HasParent()
 		{
 			if (fJournal != NULL)
 				return fJournal->CurrentTransaction() == this;
@@ -134,7 +135,8 @@ class Transaction {
 			return false;
 		}
 
-		status_t WriteBlocks(off_t blockNumber, const uint8 *buffer, size_t numBlocks = 1)
+		status_t
+		WriteBlocks(off_t blockNumber, const uint8 *buffer, size_t numBlocks = 1)
 		{
 			if (fJournal == NULL)
 				return B_NO_INIT;
@@ -148,8 +150,10 @@ class Transaction {
 			return B_ERROR;
 		}
 
-		Volume	*GetVolume() { return fJournal != NULL ? fJournal->GetVolume() : NULL; }
-		int32 ID() const { return fJournal->TransactionID(); }
+		Volume	*GetVolume()
+			{ return fJournal != NULL ? fJournal->GetVolume() : NULL; }
+		int32 ID() const
+			{ return fJournal->TransactionID(); }
 
 	private:
 		Transaction(const Transaction &);

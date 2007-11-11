@@ -1,8 +1,9 @@
-/* Journal - transaction and logging
- *
- * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
+
+//! Transaction and logging
 
 
 #include "Journal.h"
@@ -74,10 +75,11 @@ class LogEntry : public DoublyLinkedListLinkImpl<LogEntry> {
 
 
 static void
-add_to_iovec(iovec *vecs, int32 &index, int32 max, const void *address, size_t size)
+add_to_iovec(iovec *vecs, int32 &index, int32 max, const void *address,
+	size_t size)
 {
-	if (index > 0
-		&& (addr_t)vecs[index - 1].iov_base + vecs[index - 1].iov_len == (addr_t)address) {
+	if (index > 0 && (addr_t)vecs[index - 1].iov_base
+			+ vecs[index - 1].iov_len == (addr_t)address) {
 		// the iovec can be combined with the previous one
 		vecs[index - 1].iov_len += size;
 		return;
@@ -143,7 +145,8 @@ RunArrays::_ContainsRun(block_run &run)
 				continue;
 
 			if (run.Start() >= arrayRun.Start()
-				&& run.Start() + run.Length() <= arrayRun.Start() + arrayRun.Length())
+				&& run.Start() + run.Length()
+					<= arrayRun.Start() + arrayRun.Length())
 				return true;
 		}
 	}
@@ -152,11 +155,10 @@ RunArrays::_ContainsRun(block_run &run)
 }
 
 
-/**	Adds the specified block_run into the array.
- *	Note: it doesn't support overlapping - it must only be used
- *	with block_runs of length 1!
- */
-
+/*!	Adds the specified block_run into the array.
+	Note: it doesn't support overlapping - it must only be used
+	with block_runs of length 1!
+*/
 bool
 RunArrays::_AddRun(block_run &run)
 {
@@ -279,7 +281,8 @@ RunArrays::PrepareForWriting()
 	int32 blockSize = fJournal->GetVolume()->BlockSize();
 
 	for (int32 i = 0; i < CountArrays(); i++) {
-		ArrayAt(i)->max_runs = HOST_ENDIAN_TO_BFS_INT32(run_array::MaxRuns(blockSize));
+		ArrayAt(i)->max_runs = HOST_ENDIAN_TO_BFS_INT32(
+			run_array::MaxRuns(blockSize));
 	}
 }
 
@@ -348,11 +351,10 @@ Journal::_CheckRunArray(const run_array *array)
 }
 
 
-/**	Replays an entry in the log.
- *	\a _start points to the entry in the log, and will be bumped to the next
- *	one if replaying succeeded.
- */
-
+/*!	Replays an entry in the log.
+	\a _start points to the entry in the log, and will be bumped to the next
+	one if replaying succeeded.
+*/
 status_t
 Journal::_ReplayRunArray(int32 *_start)
 {
@@ -365,7 +367,8 @@ Journal::_ReplayRunArray(int32 *_start)
 
 	CachedBlock cachedArray(fVolume);
 
-	const run_array *array = (const run_array *)cachedArray.SetTo(logOffset + blockNumber);
+	const run_array *array = (const run_array *)cachedArray.SetTo(logOffset
+		+ blockNumber);
 	if (array == NULL)
 		return B_IO_ERROR;
 
@@ -377,8 +380,8 @@ Journal::_ReplayRunArray(int32 *_start)
 	CachedBlock cached(fVolume);
 	for (int32 index = 0; index < array->CountRuns(); index++) {
 		const block_run &run = array->RunAt(index);
-		PRINT(("replay block run %lu:%u:%u in log at %Ld!\n", run.AllocationGroup(),
-			run.Start(), run.Length(), blockNumber));
+		PRINT(("replay block run %lu:%u:%u in log at %Ld!\n",
+			run.AllocationGroup(), run.Start(), run.Length(), blockNumber));
 
 		off_t offset = fVolume->ToOffset(run);
 		for (int32 i = 0; i < run.Length(); i++) {
@@ -401,13 +404,12 @@ Journal::_ReplayRunArray(int32 *_start)
 }
 
 
-/**	Replays all log entries - this will put the disk into a
- *	consistent and clean state, if it was not correctly unmounted
- *	before.
- *	This method is called by Journal::InitCheck() if the log start
- *	and end pointer don't match.
- */
-
+/*!	Replays all log entries - this will put the disk into a
+	consistent and clean state, if it was not correctly unmounted
+	before.
+	This method is called by Journal::InitCheck() if the log start
+	and end pointer don't match.
+*/
 status_t
 Journal::ReplayLog()
 {
@@ -443,12 +445,11 @@ Journal::ReplayLog()
 }
 
 
-/**	This is a callback function that is called by the cache, whenever
- *	a block is flushed to disk that was updated as part of a transaction.
- *	This is necessary to keep track of completed transactions, to be
- *	able to update the log start pointer.
- */
-
+/*!	This is a callback function that is called by the cache, whenever
+	a block is flushed to disk that was updated as part of a transaction.
+	This is necessary to keep track of completed transactions, to be
+	able to update the log start pointer.
+*/
 void
 Journal::_blockNotify(int32 transactionID, void *arg)
 {
@@ -470,7 +471,8 @@ Journal::_blockNotify(int32 transactionID, void *arg)
 			int32 length = next->Start() - logEntry->Start();
 				// log entries inbetween could have been already released, so
 				// we can't just use LogEntry::Length() here
-			superBlock.log_start = (superBlock.log_start + length) % journal->fLogSize;
+			superBlock.log_start = (superBlock.log_start + length)
+				% journal->fLogSize;
 		} else
 			superBlock.log_start = journal->fVolume->LogEnd();
 
@@ -521,8 +523,8 @@ Journal::_WriteTransactionToLog()
 
 	uint32 cookie = 0;
 	off_t blockNumber;
-	while (cache_next_block_in_transaction(fVolume->BlockCache(), fTransactionID,
-			&cookie, &blockNumber, NULL, NULL) == B_OK) {
+	while (cache_next_block_in_transaction(fVolume->BlockCache(),
+			fTransactionID, &cookie, &blockNumber, NULL, NULL) == B_OK) {
 		status = runArrays.Insert(blockNumber);
 		if (status < B_OK) {
 			FATAL(("filling log entry failed!"));
@@ -592,10 +594,12 @@ Journal::_WriteTransactionToLog()
 				// make blocks available in the cache
 				const void *data;
 				if (j == 0) {
-					data = block_cache_get_etc(fVolume->BlockCache(), blockNumber,
-						blockNumber, run.Length());
-				} else
-					data = block_cache_get(fVolume->BlockCache(), blockNumber + j);
+					data = block_cache_get_etc(fVolume->BlockCache(),
+						blockNumber, blockNumber, run.Length());
+				} else {
+					data = block_cache_get(fVolume->BlockCache(),
+						blockNumber + j);
+				}
 
 				if (data == NULL)
 					return B_IO_ERROR;
@@ -608,8 +612,8 @@ Journal::_WriteTransactionToLog()
 		// write back log entry
 		if (count > 0) {
 			logPosition = logStart + count;
-			if (writev_pos(fVolume->Device(), logOffset + (logStart << blockShift),
-				vecs, index) < 0)
+			if (writev_pos(fVolume->Device(), logOffset
+					+ (logStart << blockShift), vecs, index) < 0)
 				FATAL(("could not write log area: %s!\n", strerror(errno)));
 		}
 
@@ -624,7 +628,8 @@ Journal::_WriteTransactionToLog()
 		}
 	}
 
-	LogEntry *logEntry = new LogEntry(this, fVolume->LogEnd(), runArrays.Length());
+	LogEntry *logEntry = new LogEntry(this, fVolume->LogEnd(),
+		runArrays.Length());
 	if (logEntry == NULL) {
 		FATAL(("no memory to allocate log entries!"));
 		return B_NO_MEMORY;
@@ -651,7 +656,8 @@ Journal::_WriteTransactionToLog()
 	fUsed += logEntry->Length();
 	fEntriesLock.Unlock();
 
-	cache_end_transaction(fVolume->BlockCache(), fTransactionID, _blockNotify, logEntry);
+	cache_end_transaction(fVolume->BlockCache(), fTransactionID, _blockNotify,
+		logEntry);
 
 	// If the log goes to the next round (the log is written as a
 	// circular buffer), all blocks will be flushed out which is
@@ -754,7 +760,8 @@ Journal::Unlock(Transaction *owner, bool success)
 uint32
 Journal::_TransactionSize() const
 {
-	int32 count = cache_blocks_in_transaction(fVolume->BlockCache(), fTransactionID);
+	int32 count = cache_blocks_in_transaction(fVolume->BlockCache(),
+		fTransactionID);
 	if (count < 0)
 		return 0;
 
