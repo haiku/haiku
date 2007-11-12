@@ -107,7 +107,9 @@ private:
 													uint32* count) const;
 		uint32					_NativeColor(const rgb_color& color) const;
 		status_t				_FindBestMode(const display_mode& compareMode,
-									display_mode& modeFound) const;
+									float compareAspectRatio,
+									display_mode& modeFound,
+									int32 *_diff = NULL) const;
 		status_t				_SetFallbackMode(display_mode& mode) const;
 		void					_SetSystemPalette();
 		void					_SetGrayscalePalette();

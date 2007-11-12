@@ -403,20 +403,26 @@ AccelerantHWInterface::Shutdown()
 */
 status_t
 AccelerantHWInterface::_FindBestMode(const display_mode& compareMode,
-	display_mode& modeFound) const
+	float compareAspectRatio, display_mode& modeFound, int32 *_diff) const
 {
 	int32 bestDiff = 0;
 	int32 bestIndex = -1;
 	for (int32 i = 0; i < fModeCount; i++) {
 		display_mode& mode = fModeList[i];
+		float aspectRatio = 0;
+
+		if (compareAspectRatio != 0 && mode.timing.v_display != 0)
+			aspectRatio = mode.timing.h_display / mode.timing.v_display;
 
 		// compute some random equality score
+		// TODO: check if these scores make sense
 		int32 diff = 1000 * abs(mode.timing.h_display - compareMode.timing.h_display)
 			+ 1000 * abs(mode.timing.v_display - compareMode.timing.v_display)
 			+ abs(mode.timing.h_total * mode.timing.v_total
 				- compareMode.timing.h_total * compareMode.timing.v_total) / 100
 			+ abs(mode.timing.pixel_clock - compareMode.timing.pixel_clock) / 100
-			+ 100000 * abs(mode.space - compareMode.space);
+			+ (int32)(500 * fabs(aspectRatio - compareAspectRatio))
+			+ 100 * abs(mode.space - compareMode.space);
 
 		if (bestIndex == -1 || diff < bestDiff) {
 			bestDiff = diff;
@@ -428,6 +434,9 @@ AccelerantHWInterface::_FindBestMode(const display_mode& compareMode,
 		return B_ERROR;
 
 	modeFound = fModeList[bestIndex];
+	if (_diff != 0)
+		*_diff = bestDiff;
+
 	return B_OK;
 }
 
@@ -446,7 +455,7 @@ AccelerantHWInterface::_SetFallbackMode(display_mode& newMode) const
 	// At first, we search the closest display mode from the list of
 	// supported modes - if that fails, we just take one
 
-	if (_FindBestMode(newMode, newMode) == B_OK
+	if (_FindBestMode(newMode, 0, newMode) == B_OK
 		&& fAccSetDisplayMode(&newMode) == B_OK)
 		return B_OK;
 
@@ -765,6 +774,8 @@ AccelerantHWInterface::GetPreferredMode(display_mode* preferredMode)
 			_UpdateModeList();
 
 		status = B_NOT_SUPPORTED;
+		display_mode bestMode;
+		int32 bestDiff = INT_MAX;
 
 		// find preferred mode from EDID info
 		for (uint32 i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; ++i) {
@@ -773,6 +784,14 @@ AccelerantHWInterface::GetPreferredMode(display_mode* preferredMode)
 
 			// construct basic mode and find it in the mode list
 			const edid1_detailed_timing& timing = info.detailed_monitor[i].data.detailed_timing;
+			if (timing.h_active < 640 || timing.v_active < 350)
+				continue;
+
+			float aspectRatio = 0.0f;
+			if (timing.h_size > 0 && timing.v_size > 0)
+				aspectRatio = 1.0f * timing.h_size / timing.v_size;
+
+			display_mode modeFound;
 			display_mode mode;
 			mode.timing.pixel_clock = timing.pixel_clock * 10;
 			mode.timing.h_display = timing.h_active;
@@ -787,8 +806,20 @@ AccelerantHWInterface::GetPreferredMode(display_mode* preferredMode)
 			mode.virtual_width = timing.h_active;
 			mode.virtual_height = timing.v_active;
 
-			status = _FindBestMode(mode, *preferredMode);
+			// TODO: eventually ignore detailed modes for the preferred one
+			// if there are more than one usable?
+			int32 diff;
+			status = _FindBestMode(mode, aspectRatio, modeFound, &diff);
+			if (status == B_OK) {
+				if (diff < bestDiff) {
+					bestMode = modeFound;
+					bestDiff = diff;
+				}
+			}
 		}
+
+		if (status == B_OK)
+			*preferredMode = bestMode;
 	}
 
 	return status;
