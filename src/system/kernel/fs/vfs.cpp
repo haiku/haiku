@@ -244,6 +244,9 @@ static status_t fd_and_path_to_vnode(int fd, char *path, bool traverseLeafLink,
 static void inc_vnode_ref_count(struct vnode *vnode);
 static status_t dec_vnode_ref_count(struct vnode *vnode, bool reenter);
 static inline void put_vnode(struct vnode *vnode);
+static status_t fs_unmount(char *path, dev_t mountID, uint32 flags,
+	bool kernel);
+
 
 static struct fd_ops sFileOps = {
 	file_read,
@@ -3338,6 +3341,13 @@ vfs_get_cwd(dev_t *_mountID, ino_t *_vnodeID)
 }
 
 
+status_t
+vfs_unmount(dev_t mountID, uint32 flags)
+{
+	return fs_unmount(NULL, mountID, flags, true);
+}
+
+
 extern "C" status_t
 vfs_disconnect_vnode(dev_t mountID, ino_t vnodeID)
 {
@@ -5800,7 +5810,7 @@ err1:
 
 
 static status_t
-fs_unmount(char *path, uint32 flags, bool kernel)
+fs_unmount(char *path, dev_t mountID, uint32 flags, bool kernel)
 {
 	struct fs_mount *mount;
 	struct vnode *vnode;
@@ -5808,9 +5818,11 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 
 	FUNCTION(("vfs_unmount: entry. path = '%s', kernel %d\n", path, kernel));
 
-	err = path_to_vnode(path, true, &vnode, NULL, kernel);
-	if (err < 0)
-		return B_ENTRY_NOT_FOUND;
+	if (path != NULL) {
+		err = path_to_vnode(path, true, &vnode, NULL, kernel);
+		if (err != B_OK)
+			return B_ENTRY_NOT_FOUND;
+	}
 
 	RecursiveLocker mountOpLocker(sMountOpLock);
 
@@ -5818,10 +5830,13 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 	if (!mount)
 		panic("vfs_unmount: find_mount() failed on root vnode @%p of mount\n", vnode);
 
-	if (mount->root_vnode != vnode) {
-		// not mountpoint
+	if (path != NULL) {
 		put_vnode(vnode);
-		return B_BAD_VALUE;
+
+		if (mount->root_vnode != vnode) {
+			// not mountpoint
+			return B_BAD_VALUE;
+		}
 	}
 
 	// if the volume is associated with a partition, lock the device of the
@@ -5840,7 +5855,7 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 
 	// make sure, that the partition is not busy
 	if (partition) {
-		if (partition->IsBusy()) {
+		if ((flags & B_UNMOUNT_BUSY_PARTITION) == 0 && partition->IsBusy()) {
 			TRACE(("fs_unmount(): Partition is busy.\n"));
 			return B_BUSY;
 		}
@@ -5859,11 +5874,11 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 		// make sure all of them are not busy or have refs on them
 		vnode = NULL;
 		while ((vnode = (struct vnode *)list_get_next_item(&mount->vnodes, vnode)) != NULL) {
-			// The root vnode ref_count needs to be 2 here: one for the file
-			// system, one from the path_to_vnode() call above
+			// The root vnode ref_count needs to be 1 here (the mount has a
+			// reference).
 			if (vnode->busy
 				|| ((vnode->ref_count != 0 && mount->root_vnode != vnode)
-					|| (vnode->ref_count != 2 && mount->root_vnode == vnode))) {
+					|| (vnode->ref_count != 1 && mount->root_vnode == vnode))) {
 				// there are still vnodes in use on this mount, so we cannot
 				// unmount yet
 				busy = true;
@@ -5919,8 +5934,8 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 		}
 	}
 
-	// The ref_count of the root node is 2 at this point, see above why this is
-	mount->root_vnode->ref_count -= 2;
+	// The ref_count of the root node is 1 at this point, see above why this is
+	mount->root_vnode->ref_count--;
 
 	mutex_unlock(&sVnodeMutex);
 
@@ -6197,7 +6212,7 @@ _kern_unmount(const char *path, uint32 flags)
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
-	return fs_unmount(pathBuffer.LockBuffer(), flags, true);
+	return fs_unmount(pathBuffer.LockBuffer(), -1, flags, true);
 }
 
 
@@ -6908,7 +6923,7 @@ _user_unmount(const char *userPath, uint32 flags)
 	if (user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
 
-	return fs_unmount(path, flags, false);
+	return fs_unmount(path, -1, flags & ~B_UNMOUNT_BUSY_PARTITION, false);
 }
 
 
