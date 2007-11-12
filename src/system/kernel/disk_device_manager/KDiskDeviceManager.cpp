@@ -531,6 +531,7 @@ KDiskDeviceManager::CreateFileDevice(const char *filePath, bool* newlyCreated)
 		// scan device
 		if (error == B_OK) {
 			_ScanPartition(device, false);
+			device->UnmarkBusy(true);
 
 			if (newlyCreated)
 				*newlyCreated = true;
@@ -746,6 +747,7 @@ KDiskDeviceManager::InitialDeviceScan()
 		if (DeviceWriteLocker deviceLocker = device) {
 			if (ManagerLocker locker = this) {
 				error = _ScanPartition(device, false);
+				device->UnmarkBusy(true);
 				if (error != B_OK)
 					break;
 			} else
@@ -1034,18 +1036,7 @@ KDiskDeviceManager::_ScanPartition(KPartition *partition, bool async)
 
 	// scan synchronously
 
-	if (!partition->Device()->HasMedia())
-		return B_OK;
-
-	status_t error = _ScanPartition(partition);
-
-	// mark all partitions un-busy
-// TODO: This is not quite correct here. Partitions are created marked "busy",
-// hence the one creating it should be responsible for clearing the flag, not
-// us.
-	partition->UnmarkBusy(true);
-
-	return error;
+	return _ScanPartition(partition);
 }
 
 
@@ -1055,6 +1046,8 @@ KDiskDeviceManager::_ScanPartition(KPartition *partition)
 	// the partition's device must be write-locked
 	if (!partition)
 		return B_BAD_VALUE;
+	if (!partition->Device()->HasMedia())
+		return B_OK;
 	if (partition->DiskSystem() != NULL) {
 		// TODO: this is more or less a hack to allow rescanning a partition
 		for (int32 i = 0; KPartition *child = partition->ChildAt(i); i++)
@@ -1151,7 +1144,7 @@ KDiskDeviceManager::_CheckMediaStatus()
 				continue;
 
 			device->MarkBusy(true);
-			device->UninitializeContents(true);
+			device->UninitializeMedia();
 
 			if (device->MediaChanged()) {
 				dprintf("Media changed from %s\n", device->Path());

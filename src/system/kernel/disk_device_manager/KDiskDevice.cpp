@@ -71,7 +71,8 @@ KDiskDevice::SetTo(const char *path)
 	} else {
 		// no media: try to get the device geometry, but don't fail, if
 		// we can't get it
-		GetGeometry(&fDeviceData.geometry);
+		if (GetGeometry(&fDeviceData.geometry) != B_OK)
+			_ResetGeometry();
 	}
 	// set device flags
 	if (fDeviceData.geometry.removable)
@@ -102,14 +103,7 @@ KDiskDevice::Unset()
 		free(fDeviceData.path);
 		fDeviceData.path = NULL;
 	}
-	fDeviceData.geometry.bytes_per_sector = 0;
-	fDeviceData.geometry.sectors_per_track = 0;
-	fDeviceData.geometry.cylinder_count = 0;
-	fDeviceData.geometry.head_count = 0;
-	fDeviceData.geometry.device_type = B_DISK;
-	fDeviceData.geometry.removable = true;
-	fDeviceData.geometry.read_only = true;
-	fDeviceData.geometry.write_once = false;
+	_ResetGeometry();
 }
 
 // InitCheck
@@ -248,6 +242,14 @@ KDiskDevice::UpdateMediaStatusIfNeeded()
 }
 
 
+void
+KDiskDevice::UninitializeMedia()
+{
+	UninitializeContents();
+	_ResetGeometry();
+}
+
+
 // SetPath
 status_t
 KDiskDevice::SetPath(const char *path)
@@ -381,5 +383,19 @@ KDiskDevice::_InitPartitionData()
 		* fDeviceData.geometry.cylinder_count
 		* fDeviceData.geometry.head_count;
 	fPartitionData.flags |= B_PARTITION_IS_DEVICE;
+}
+
+
+void
+KDiskDevice::_ResetGeometry()
+{
+	fDeviceData.geometry.bytes_per_sector = 0;
+	fDeviceData.geometry.sectors_per_track = 0;
+	fDeviceData.geometry.cylinder_count = 0;
+	fDeviceData.geometry.head_count = 0;
+	fDeviceData.geometry.device_type = B_DISK;
+	fDeviceData.geometry.removable = true;
+	fDeviceData.geometry.read_only = true;
+	fDeviceData.geometry.write_once = false;
 }
 

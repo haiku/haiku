@@ -55,6 +55,7 @@ public:
 	bool MediaChanged() const;
 
 	void UpdateMediaStatusIfNeeded();
+	void UninitializeMedia();
 
 	status_t SetPath(const char *path);
 		// TODO: Remove this method or make it private. Once initialized the
@@ -82,6 +83,7 @@ protected:
 	virtual status_t GetGeometry(device_geometry *geometry);
 
 private:
+	void _ResetGeometry();
 	void _InitPartitionData();
 
 	disk_device_data	fDeviceData;
