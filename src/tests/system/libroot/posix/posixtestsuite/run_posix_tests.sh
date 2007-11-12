@@ -3,14 +3,17 @@
 usage()
 {
     cat <<EOF 
-Usage: $0 [AIO|MEM|MSG|SEM|SIG|THR|TMR|TPS]
-	Run the tests for POSIX area specified by the 3 letter tag
-	in the POSIX spec
+Usage: $0 all
+	to run all the available tests
 
+	$0 standard
+	to run all the standard tests
 	or
-	$0 all
-	to run all the available tests.
-
+	you can run the tests for optional Posix
+	functionality areas as specified by the
+	letter tag in the posix spec
+	$0 [AIO|MEM|MSG|SEM|SIG|THR|TMR|TPS]
+	
 EOF
 }
 
@@ -18,6 +21,21 @@ EOF
 targets()
 {
 	$1
+}
+
+
+standard_tests()
+{
+	echo "difftime()"
+	conformance/interfaces/difftime/difftime_1-1
+	echo ""
+	echo "fork()"
+	conformance/interfaces/fork/fork_3-1
+	conformance/interfaces/fork/fork_4-1
+	conformance/interfaces/fork/fork_6-1
+	conformance/interfaces/fork/fork_8-1
+	conformance/interfaces/fork/fork_9-1
+	conformance/interfaces/fork/fork_12-1
 }
 
 
@@ -79,6 +97,7 @@ signals_tests()
 
 all_tests()
 {
+	standard_tests
 	asynchronous_input_output_tests
 	signals_tests
 }
@@ -90,6 +109,9 @@ sleep 1
 	case $1 in
   all) echo "Executing all tests:"
   	all_tests
+  	;;
+  standard) echo "Executing standard tests:"
+  	standard_tests
   	;;
   AIO) echo "Executing asynchronous I/O tests"
 	asynchronous_input_output_tests

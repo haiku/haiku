@@ -130,3 +130,7 @@ HAIKU_DONT_INCLUDE_SRC = 1 ;
 DeferredSubInclude HAIKU_TOP src tests add-ons kernel file_systems
 	userlandfs ;
 
+
+# Copy the posix test suite onto the image (or on the installation) into 
+# "home/posixtestsuite" directory, including the run script.
+HAIKU_ADD_POSIX_TEST_SUITE_TO_IMAGE = 1 ;
