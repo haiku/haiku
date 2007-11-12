@@ -99,8 +99,8 @@ public:
 	status_t RescanDiskSystems();
 
 private:
-	static void _CheckMediaStatusDaemon(void* self, int iteration);
-	void _CheckMediaStatus();
+	static status_t _CheckMediaStatusDaemon(void* self);
+	status_t _CheckMediaStatus();
 
 	status_t _RescanDiskSystems(bool fileSystems);
 
@@ -127,6 +127,8 @@ private:
 	PartitionMap				*fPartitions;
 	DiskSystemMap				*fDiskSystems;
 	PartitionSet				*fObsoletePartitions;
+	thread_id					fMediaChecker;
+	volatile bool				fTerminating;
 
 	static KDiskDeviceManager	*sDefaultManager;
 };

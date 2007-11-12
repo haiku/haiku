@@ -1225,7 +1225,7 @@ _user_uninitialize_partition(partition_id partitionID, int32* _changeCounter)
 		return B_BAD_VALUE;
 
 	// check busy
-	if (partition->IsBusy(true))
+	if (!partition->CheckAndMarkBusy(true))
 		return B_BUSY;
 
 // TODO: We should also check, if any partition is mounted!

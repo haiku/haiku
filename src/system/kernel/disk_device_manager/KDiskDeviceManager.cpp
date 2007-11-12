@@ -103,15 +103,19 @@ KDiskDeviceManager::KDiskDeviceManager()
 	  fDevices(new(nothrow) DeviceMap),
 	  fPartitions(new(nothrow) PartitionMap),
 	  fDiskSystems(new(nothrow) DiskSystemMap),
-	  fObsoletePartitions(new(nothrow) PartitionSet)
+	  fObsoletePartitions(new(nothrow) PartitionSet),
+	  fMediaChecker(-1),
+	  fTerminating(false)
 {
 	if (InitCheck() != B_OK)
 		return;
 
 	RescanDiskSystems();
 
-	register_kernel_daemon(&_CheckMediaStatusDaemon, this, 10);
-		// once every second
+	fMediaChecker = spawn_kernel_thread(_CheckMediaStatusDaemon,
+		"media checker", B_NORMAL_PRIORITY, this);
+	if (fMediaChecker >= 0)
+		resume_thread(fMediaChecker);
 
 	DBG(OUT("number of disk systems: %ld\n", CountDiskSystems()));
 	// TODO: Watch the disk systems and the relevant directories.
@@ -120,9 +124,11 @@ KDiskDeviceManager::KDiskDeviceManager()
 
 KDiskDeviceManager::~KDiskDeviceManager()
 {
-	unregister_kernel_daemon(&_CheckMediaStatusDaemon, this);
+	fTerminating = true;
 
-	// TODO: terminate and remove all jobs
+	status_t result;
+	wait_for_thread(fMediaChecker, &result);
+
 	// remove all devices
 	for (int32 cookie = 0; KDiskDevice *device = NextDevice(&cookie);) {
 		PartitionRegistrar _(device);
@@ -1127,35 +1133,45 @@ KDiskDeviceManager::_ScanPartition(KPartition *partition)
 }
 
 
-void
+status_t
 KDiskDeviceManager::_CheckMediaStatus()
 {
-	if (fLock.LockWithTimeout(0) != B_OK)
-		return;
-
-	int32 cookie = 0;
 	while (true) {
-		KDiskDevice* device = NextDevice(&cookie);
-		if (device == NULL)
-			break;
+		int32 cookie = 0;
+		while (KDiskDevice* device = RegisterNextDevice(&cookie)) {
+			DeviceWriteLocker locker(device);
 
-		bool hadMedia = device->HasMedia();
-		device->UpdateMediaStatusIfNeeded();
+			if (device->IsBusy(true))
+				continue;
 
-		// TODO: propagate changes!
-		if (device->MediaChanged()) {
+			bool hadMedia = device->HasMedia();
+			device->UpdateMediaStatusIfNeeded();
+
+			if (!device->MediaChanged() && (device->HasMedia() || !hadMedia))
+				continue;
+
+			device->MarkBusy(true);
+			device->UninitializeContents(true);
+
+			if (device->MediaChanged()) {
 				dprintf("Media changed from %s\n", device->Path());
-		} else if (!device->HasMedia() && hadMedia) {
-			dprintf("Media removed from %s\n", device->Path());
+				_ScanPartition(device, false);
+			} else if (!device->HasMedia() && hadMedia) {
+				dprintf("Media removed from %s\n", device->Path());
+			}
+
+			device->UnmarkBusy(true);
 		}
+
+		snooze(1000000);
 	}
 
-	fLock.Unlock();
+	return 0;
 }
 
 
-void
-KDiskDeviceManager::_CheckMediaStatusDaemon(void* self, int iteration)
+status_t
+KDiskDeviceManager::_CheckMediaStatusDaemon(void* self)
 {
-	((KDiskDeviceManager*)self)->_CheckMediaStatus();
+	return ((KDiskDeviceManager*)self)->_CheckMediaStatus();
 }

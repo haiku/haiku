@@ -54,6 +54,7 @@ public:
 	bool IsBusy() const;
 	bool IsBusy(bool includeDescendants);
 	bool CheckAndMarkBusy(bool includeDescendants);
+	void MarkBusy(bool includeDescendants);
 	void UnmarkBusy(bool includeDescendants);
 
 	void SetOffset(off_t offset);

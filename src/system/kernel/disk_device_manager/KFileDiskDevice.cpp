@@ -13,7 +13,6 @@
 #include <KFileDiskDevice.h>
 #include <KPath.h>
 
-#include "virtualdrive.h"
 
 // debugging
 //#define DBG(x)
@@ -166,7 +165,6 @@ KFileDiskDevice::GetGeometry(device_geometry *geometry)
 	geometry->write_once = false;
 
 	return B_OK;
-
 }
 
 // _RegisterDevice
@@ -175,48 +173,6 @@ KFileDiskDevice::_RegisterDevice(const char *file, const char *device)
 {
 	return devfs_publish_file_device(device + 5, file);
 		// we need to remove the "/dev/" part from the path
-
-	// TODO: For now we use the virtualdrive driver to register a file
-	// as a device and then simply symlink the assigned device to the
-	// desired device location. Replace that with the
-	// respective kernel magic for the OBOS kernel!
-	// -> Well, we could simply symlink the file there. Doesn't work for R5,
-	// but we should be able to deal with it properly.
-//
-//	// open the virtualdrive control device
-//	int fd = open(VIRTUAL_DRIVE_CONTROL_DEVICE, O_RDONLY);
-//	if (fd < 0) {
-//		DBG(OUT("Failed to open virtualdrive control device: %s\n",
-//				strerror(errno)));
-//		return errno;
-//	}
-//	// set up the info
-//	virtual_drive_info info;
-//	strcpy(info.file_name, file);
-//	info.use_geometry = false;
-//	status_t error = B_OK;
-//	if (ioctl(fd, VIRTUAL_DRIVE_REGISTER_FILE, &info) != 0) {
-//		error = errno;
-//		DBG(OUT("Failed to install file device: %s\n", strerror(error)));
-//	}
-//	// close the control device
-//	close(fd);
-//	// create a symlink
-//	if (error == B_OK) {
-//		if (symlink(info.device_name, device) != 0) {
-//			DBG(OUT("Failed to create file device symlink: %s\n",
-//					strerror(error)));
-//			error = errno;
-//			// unregister the file device
-//			// open the device
-//			int deviceFD = open(info.device_name, O_RDONLY);
-//			if (deviceFD >= 0) {
-//				ioctl(deviceFD, VIRTUAL_DRIVE_UNREGISTER_FILE);
-//				close(deviceFD);
-//			}
-//		}
-//	}
-//	return error;
 }
 
 // _UnregisterDevice
@@ -225,29 +181,6 @@ KFileDiskDevice::_UnregisterDevice(const char *_device)
 {
 	return devfs_unpublish_file_device(_device + 5);
 		// we need to remove the "/dev/" part from the path
-
-//	// read the symlink to get the path of the virtualdrive device
-//	char device[B_PATH_NAME_LENGTH];
-//	ssize_t bytesRead = readlink(_device, device, sizeof(device) - 1);
-//	if (bytesRead < 0)
-//		return errno;
-//	device[bytesRead] = '\0';
-//	// open the device
-//	int fd = open(device, O_RDONLY);
-//	if (fd < 0)
-//		return errno;
-//	// issue the ioctl
-//	status_t error = B_OK;
-//	if (ioctl(fd, VIRTUAL_DRIVE_UNREGISTER_FILE) != 0)
-//		error = errno;
-//	// close the control device
-//	close(fd);
-//	// remove the symlink
-//	if (error == B_OK) {
-//		if (remove(_device) < 0)
-//			error = errno;
-//	}
-//	return error;
 }
 
 // _GetDirectoryPath

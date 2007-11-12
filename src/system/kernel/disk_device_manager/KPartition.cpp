@@ -9,6 +9,7 @@
 #include <KernelExport.h>
 #include <Drivers.h>
 #include <Errors.h>
+#include <fs_volume.h>
 #include <util/kernel_cpp.h>
 
 #include <ddm_userland_interface.h>
@@ -22,6 +23,7 @@
 #include <KPartitionVisitor.h>
 #include <KPath.h>
 #include <VectorSet.h>
+#include <vfs.h>
 
 #include "UserDataWriter.h"
 
@@ -272,6 +274,16 @@ KPartition::CheckAndMarkBusy(bool includeDescendants)
 	if (IsBusy(includeDescendants))
 		return false;
 
+	MarkBusy(includeDescendants);
+
+	return true;
+}
+
+
+// MarkBusy
+void
+KPartition::MarkBusy(bool includeDescendants)
+{
 	if (includeDescendants) {
 		struct MarkBusyVisitor : KPartitionVisitor {
 			virtual bool VisitPre(KPartition* partition)
@@ -284,8 +296,6 @@ KPartition::CheckAndMarkBusy(bool includeDescendants)
 		VisitEachDescendant(&markVisitor);
 	} else
 		SetBusy(true);
-
-	return true;
 }
 
 
@@ -1039,7 +1049,13 @@ KPartition::UninitializeContents(bool logChanges)
 
 		// volume
 		if (VolumeID() >= 0) {
-// TODO: Unmount?
+			status_t error = vfs_unmount(VolumeID(),
+				B_FORCE_UNMOUNT | B_UNMOUNT_BUSY_PARTITION);
+			if (error != B_OK) {
+				dprintf("KPartition::UninitializeContents(): Failed to unmount "
+					"device %ld: %s\n", VolumeID(), strerror(error));
+			}
+
 			SetVolumeID(-1);
 			flags |= B_PARTITION_CHANGED_VOLUME;
 		}
