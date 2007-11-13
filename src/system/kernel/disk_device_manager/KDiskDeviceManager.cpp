@@ -1129,7 +1129,7 @@ KDiskDeviceManager::_ScanPartition(KPartition *partition)
 status_t
 KDiskDeviceManager::_CheckMediaStatus()
 {
-	while (true) {
+	while (!fTerminating) {
 		int32 cookie = 0;
 		while (KDiskDevice* device = RegisterNextDevice(&cookie)) {
 			DeviceWriteLocker locker(device);
