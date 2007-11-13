@@ -5812,11 +5812,12 @@ err1:
 static status_t
 fs_unmount(char *path, dev_t mountID, uint32 flags, bool kernel)
 {
+	struct vnode *vnode = NULL;
 	struct fs_mount *mount;
-	struct vnode *vnode;
 	status_t err;
 
-	FUNCTION(("vfs_unmount: entry. path = '%s', kernel %d\n", path, kernel));
+	FUNCTION(("fs_unmount(path '%s', dev %ld, kernel %d\n", path, mountID,
+		kernel));
 
 	if (path != NULL) {
 		err = path_to_vnode(path, true, &vnode, NULL, kernel);
@@ -5826,9 +5827,11 @@ fs_unmount(char *path, dev_t mountID, uint32 flags, bool kernel)
 
 	RecursiveLocker mountOpLocker(sMountOpLock);
 
-	mount = find_mount(vnode->device);
-	if (!mount)
-		panic("vfs_unmount: find_mount() failed on root vnode @%p of mount\n", vnode);
+	mount = find_mount(path != NULL ? vnode->device : mountID);
+	if (mount == NULL) {
+		panic("fs_unmount: find_mount() failed on root vnode @%p of mount\n",
+			vnode);
+	}
 
 	if (path != NULL) {
 		put_vnode(vnode);
@@ -5845,6 +5848,10 @@ fs_unmount(char *path, dev_t mountID, uint32 flags, bool kernel)
 	KPartition *partition = mount->partition;
 	KDiskDevice *diskDevice = NULL;
 	if (partition) {
+		if (partition->Device() == NULL) {
+			dprintf("fs_unmount(): There is no device!\n");
+			return B_ERROR;
+		}
 		diskDevice = ddm->WriteLockDevice(partition->Device()->ID());
 		if (!diskDevice) {
 			TRACE(("fs_unmount(): Failed to lock disk device!\n"));
@@ -5873,7 +5880,8 @@ fs_unmount(char *path, dev_t mountID, uint32 flags, bool kernel)
 		// cycle through the list of vnodes associated with this mount and
 		// make sure all of them are not busy or have refs on them
 		vnode = NULL;
-		while ((vnode = (struct vnode *)list_get_next_item(&mount->vnodes, vnode)) != NULL) {
+		while ((vnode = (struct vnode *)list_get_next_item(&mount->vnodes,
+				vnode)) != NULL) {
 			// The root vnode ref_count needs to be 1 here (the mount has a
 			// reference).
 			if (vnode->busy
@@ -5947,7 +5955,8 @@ fs_unmount(char *path, dev_t mountID, uint32 flags, bool kernel)
 	// Free all vnodes associated with this mount.
 	// They will be removed from the mount list by free_vnode(), so
 	// we don't have to do this.
-	while ((vnode = (struct vnode *)list_get_first_item(&mount->vnodes)) != NULL) {
+	while ((vnode = (struct vnode *)list_get_first_item(&mount->vnodes))
+			!= NULL) {
 		free_vnode(vnode, false);
 	}
 
