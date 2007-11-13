@@ -5,3 +5,4 @@ SubInclude HAIKU_TOP src add-ons screen_savers haiku ;
 SubInclude HAIKU_TOP src add-ons screen_savers ifs ;
 SubInclude HAIKU_TOP src add-ons screen_savers message ;
 SubInclude HAIKU_TOP src add-ons screen_savers slideshowsaver ;
+SubInclude HAIKU_TOP src add-ons screen_savers spider ;
