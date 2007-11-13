@@ -1039,7 +1039,7 @@ dosfs_read_vnode(void *_vol, ino_t vnid, void **_node, bool reenter)
 	if (entry->filename) strcpy(entry->filename, filename);
 #endif
 	entry->cache = file_cache_create(vol->id, vnid, entry->st_size);
-	entry->file_map = file_map_create(vol->id, vnid);
+	entry->file_map = file_map_create(vol->id, vnid, entry->st_size);
 	if (!(entry->mode & FAT_SUBDIR))
 		set_mime_type(entry, filename);
 

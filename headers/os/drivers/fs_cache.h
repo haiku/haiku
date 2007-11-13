@@ -67,7 +67,7 @@ extern status_t file_cache_write(void *_cacheRef, void *cookie, off_t offset,
 					const void *buffer, size_t *_size);
 
 /* file map */
-extern void *file_map_create(dev_t mountID, ino_t vnodeID);
+extern void *file_map_create(dev_t mountID, ino_t vnodeID, off_t size);
 extern void file_map_delete(void *_map);
 extern void file_map_set_size(void *_map, off_t size);
 extern void file_map_invalidate(void *_map, off_t offset, off_t size);

@@ -40,7 +40,7 @@ struct file_extent {
 };
 
 struct file_map {
-	file_map();
+	file_map(off_t size);
 	~file_map();
 
 	file_extent *operator[](uint32 index);
@@ -54,13 +54,15 @@ struct file_map {
 	};
 	size_t			count;
 	struct vnode	*vnode;
+	off_t			size;
 };
 
 
-file_map::file_map()
+file_map::file_map(off_t _size)
 {
 	array = NULL;
 	count = 0;
+	size = _size;
 }
 
 
@@ -179,11 +181,12 @@ find_file_extent(file_map &map, off_t offset, uint32 *_index)
 
 
 extern "C" void *
-file_map_create(dev_t mountID, ino_t vnodeID)
+file_map_create(dev_t mountID, ino_t vnodeID, off_t size)
 {
-	TRACE(("file_map_create(mountID = %ld, vnodeID = %Ld)\n", mountID, vnodeID));
+	TRACE(("file_map_create(mountID = %ld, vnodeID = %Ld, size = %Ld)\n",
+		mountID, vnodeID, size));
 
-	file_map *map = new file_map;
+	file_map *map = new file_map(size);
 	if (map == NULL)
 		return NULL;
 
@@ -218,7 +221,9 @@ file_map_set_size(void *_map, off_t size)
 
 	// TODO: honour offset/size parameters
 	file_map *map = (file_map *)_map;
-	map->Free();
+	if (size < map->size)
+		map->Free();
+	map->size = size;
 }
 
 
@@ -247,6 +252,13 @@ file_map_translate(void *_map, off_t offset, size_t size, file_io_vec *vecs,
 	file_map &map = *(file_map *)_map;
 	size_t maxVecs = *_count;
 	status_t status = B_OK;
+
+	if (offset > map.size) {
+		*_count = 0;
+		return B_OK;
+	}
+	if (offset + size > map.size)
+		size = map.size - offset;
 
 	if (map.count == 0) {
 		// we don't yet have the map of this file, so let's grab it

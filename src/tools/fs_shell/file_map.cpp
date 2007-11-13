@@ -34,7 +34,7 @@ struct file_extent {
 };
 
 struct file_map {
-	file_map();
+	file_map(fssh_off_t size);
 	~file_map();
 
 	file_extent *operator[](uint32_t index);
@@ -49,13 +49,15 @@ struct file_map {
 	};
 	fssh_size_t		count;
 	void			*vnode;
+	fssh_off_t		size;
 };
 
 
-file_map::file_map()
+file_map::file_map(fssh_off_t _size)
 {
 	array = NULL;
 	count = 0;
+	size = size;
 }
 
 
@@ -178,11 +180,12 @@ find_file_extent(file_map &map, fssh_off_t offset, uint32_t *_index)
 
 
 extern "C" void *
-fssh_file_map_create(fssh_mount_id mountID, fssh_vnode_id vnodeID)
+fssh_file_map_create(fssh_mount_id mountID, fssh_vnode_id vnodeID,
+	fssh_off_t size)
 {
 	TRACE(("file_map_create(mountID = %ld, vnodeID = %Ld)\n", mountID, vnodeID));
 
-	file_map *map = new file_map;
+	file_map *map = new file_map(size);
 	if (map == NULL)
 		return NULL;
 
@@ -217,7 +220,9 @@ fssh_file_map_set_size(void *_map, fssh_off_t size)
 
 	// TODO: honour offset/size parameters
 	file_map *map = (file_map *)_map;
-	map->Free();
+	if (size < map->size)
+		map->Free();
+	map->size = size;
 }
 
 
@@ -243,6 +248,13 @@ fssh_file_map_translate(void *_map, fssh_off_t offset, fssh_size_t size,
 	file_map &map = *(file_map *)_map;
 	fssh_size_t maxVecs = *_count;
 	fssh_status_t status = FSSH_B_OK;
+
+	if (offset > map.size) {
+		*_count = 0;
+		return FSSH_B_OK;
+	}
+	if (offset + size > map.size)
+		size = map.size - offset;
 
 	if (map.count == 0) {
 		// we don't yet have the map of this file, so let's grab it

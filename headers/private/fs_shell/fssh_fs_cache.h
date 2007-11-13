@@ -84,7 +84,7 @@ extern fssh_status_t	fssh_file_cache_write(void *_cacheRef, void *cookie,
 
 /* file map */
 extern void *			fssh_file_map_create(fssh_mount_id mountID,
-							fssh_vnode_id vnodeID);
+							fssh_vnode_id vnodeID, fssh_off_t size);
 extern void				fssh_file_map_delete(void *_map);
 extern void				fssh_file_map_set_size(void *_map, fssh_off_t size);
 extern void				fssh_file_map_invalidate(void *_map, fssh_off_t offset,

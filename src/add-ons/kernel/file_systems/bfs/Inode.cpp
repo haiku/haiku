@@ -195,7 +195,7 @@ Inode::Inode(Volume *volume, ino_t id)
 		fTree = new BPlusTree(this);
 	if (IsFile() || IsAttribute()) {
 		SetFileCache(file_cache_create(fVolume->ID(), ID(), Size()));
-		SetMap(file_map_create(volume->ID(), ID()));
+		SetMap(file_map_create(volume->ID(), ID(), Size()));
 	}
 }
 
@@ -2417,7 +2417,8 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name,
 	if (inode->IsFile() || inode->IsAttribute()) {
 		inode->SetFileCache(file_cache_create(volume->ID(), inode->ID(),
 			inode->Size()));
-		inode->SetMap(file_map_create(volume->ID(), inode->ID()));
+		inode->SetMap(file_map_create(volume->ID(), inode->ID(),
+			inode->Size()));
 	}
 
 	if (_created)

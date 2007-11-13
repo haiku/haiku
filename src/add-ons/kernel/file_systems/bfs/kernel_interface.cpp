@@ -858,7 +858,7 @@ bfs_create_symlink(void *_ns, void *_directory, const char *name,
 
 		// links usually don't have a file cache attached - but we now need one
 		link->SetFileCache(file_cache_create(volume->ID(), link->ID(), 0));
-		link->SetMap(file_map_create(volume->ID(), link->ID()));
+		link->SetMap(file_map_create(volume->ID(), link->ID(), 0));
 
 		// The following call will have to write the inode back, so
 		// we don't have to do that here...
