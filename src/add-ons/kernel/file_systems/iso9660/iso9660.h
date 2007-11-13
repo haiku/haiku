@@ -4,8 +4,8 @@
  *
  * Copyright 2001, pinc Software.  All Rights Reserved.
  */
-#ifndef _ISO_H
-#define _ISO_H
+#ifndef ISO_9660_H
+#define ISO_9660_H
 
 
 #include "lock.h"
@@ -224,13 +224,15 @@ typedef struct nspace {
 extern "C" {
 #endif
 
-int 		ISOMount(const char *path, const int flags, nspace** newVol, bool allow_joliet);
-int			ISOReadDirEnt(nspace* ns, dircookie* cookie, struct dirent* buf, size_t bufsize);
-int			InitNode(vnode* rec, char* buf, int* bytesRead, uint8 joliet_level);
-int			ConvertRecDate(ISORecDate* inDate, time_t* outDate);
+int ISOMount(const char *path, const int flags, nspace** newVolume,
+	bool allowJoliet);
+int	ISOReadDirEnt(nspace* ns, dircookie* cookie, struct dirent* buffer,
+	size_t bufferSize);
+int	InitNode(vnode* rec, char* buf, int* bytesRead, uint8 jolietLevel);
+int	ConvertRecDate(ISORecDate* inDate, time_t* outDate);
 
 #ifdef __cplusplus
 }
 #endif 
 
-#endif	/* _ISO_H */
+#endif	/* ISO_9660_H */
