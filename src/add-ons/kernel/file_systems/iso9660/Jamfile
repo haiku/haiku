@@ -1,27 +1,13 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems iso9660 ;
 
-# save original optimization level
-oldOPTIM = $(OPTIM) ;
-
-# set some additional defines
-{
-	SubDirCcFlags -Wall -Wno-multichar ;
-	SubDirC++Flags -Wall -Wno-multichar -fno-rtti ;
-}
-
 UsePrivateHeaders kernel ;
 
+# set some additional defines
+SubDirCcFlags -Wall -Wno-multichar ;
+SubDirC++Flags -Wall -Wno-multichar -fno-rtti ;
+
 KernelAddon iso9660 :
-	iso.c
-	iso9660.cpp
+	iso9660.c
+	iso9660_identify.cpp
 	kernel_interface.cpp
-	kernel_cpp.cpp
 	;
-
-SEARCH on [ FGristFiles
-		kernel_cpp.cpp
-	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
-
-# restore original optimization level
-OPTIM = $(oldOPTIM) ;
-

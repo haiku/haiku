@@ -1,10 +1,15 @@
 /* 
+ * Copyright 2007, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Tyler Dauwalder.
+ *
  * This file may be used under the terms of the MIT License.
  */
+#ifndef ISO9660_IDENTIFY_H
+#define ISO9660_IDENTIFY_H
 
-#ifndef _ISO9660_H
-#define _ISO9660_H
+
+#include <SupportDefs.h>
+
 
 /*! \brief Contains all the info of interest pertaining to an
 	iso9660 volume.
@@ -18,22 +23,23 @@ struct iso9660_info {
 	iso9660_info();
 	~iso9660_info();
 
-	bool is_valid();
+	bool IsValid();
 
-	void set_iso9660_volume_name(const char *name, uint32 length);
-	void set_joliet_volume_name(const char *name, uint32 length);
+	void SetISO9660Name(const char *name, uint32 length);
+	void SetJolietName(const char *name, uint32 length);
 
-	const char* get_preferred_volume_name();
+	const char* PreferredName();
 
-	char *iso9660_volume_name;
-	char *joliet_volume_name;
-	
-	off_t maxBlocks;
+	char *iso9660_name;
+	char *joliet_name;
 
-	void set_string(char **string, const char *new_string, uint32 new_length);
+	off_t max_blocks;
+
+private:
+	void _SetString(char **string, const char *newString, uint32 newLength);
 };
 
 status_t iso9660_fs_identify(int deviceFD, iso9660_info *info);
 
-#endif
+#endif	// ISO9660_IDENTIFY_H
 

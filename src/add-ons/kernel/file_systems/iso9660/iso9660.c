@@ -6,7 +6,6 @@
  */
 
 
-#include "rock.h"
 #include "iso.h"
 
 #include <ByteOrder.h>
@@ -23,6 +22,8 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
+
+#include "rock_ridge.h"
 
 //#define TRACE_ISO9660 1
 #if TRACE_ISO9660
@@ -139,7 +140,7 @@ unicode_to_utf8(const char	*src, int32	*srcLen, char *dst, int32 *dstLen)
 	int32 dstLimit = *dstLen;
 	int32 srcCount = 0;
 	int32 dstCount = 0;
-	
+
 	for (srcCount = 0; srcCount < srcLimit; srcCount += 2) {
 		uint16  *UNICODE = (uint16 *)&src[srcCount];
 		uchar	utf8[4];
@@ -161,7 +162,7 @@ unicode_to_utf8(const char	*src, int32	*srcLen, char *dst, int32 *dstLen)
 	*srcLen = srcCount;
 	*dstLen = dstCount;
 	
-	return ((dstCount > 0) ? B_NO_ERROR : B_ERROR);
+	return dstCount > 0 ? B_NO_ERROR : B_ERROR;
 }
 
 

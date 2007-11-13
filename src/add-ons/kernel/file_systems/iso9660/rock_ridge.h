@@ -1,13 +1,10 @@
-// rock.h
-
 /*
 	Copyright 1999, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
 
 // Altername name field flags.
-enum
-{
+enum {
 	NM_CONTINUE = 1,
 	NM_CURRENT = 2,
 	NM_PARENT = 4,
@@ -15,14 +12,12 @@ enum
 } NMFLAGS;
 
 // Symbolic link field flags
-enum
-{
+enum {
 	SL_CONTINUE = 1
 } SLFLAGS;
 
 // Symbolic link field component flags
-enum
-{
+enum {
 	SLCP_CONTINUE = 1,
 	SLCP_CURRENT = 2, 
 	SLCP_PARENT = 4, 
