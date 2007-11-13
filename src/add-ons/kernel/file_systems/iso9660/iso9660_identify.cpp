@@ -48,7 +48,7 @@
 #include <fs_info.h>
 #include <KernelExport.h>
 
-#include "iso.h"
+#include "iso9660.h"
 
 //#define TRACE(x) ;
 #define TRACE(x) dprintf x
