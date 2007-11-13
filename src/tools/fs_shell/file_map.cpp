@@ -220,7 +220,7 @@ fssh_file_map_set_size(void *_map, fssh_off_t size)
 
 	// TODO: honour offset/size parameters
 	file_map *map = (file_map *)_map;
-	if (size < map->size)
+	//if (size < map->size)
 		map->Free();
 	map->size = size;
 }
