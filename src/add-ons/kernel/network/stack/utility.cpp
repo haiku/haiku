@@ -505,6 +505,25 @@ is_timer_active(net_timer *timer)
 }
 
 
+static int
+dump_timer(int argc, char **argv)
+{
+	kprintf("timer       hook        data        due in\n");
+
+	struct net_timer *timer = NULL;
+	while (true) {
+		timer = (net_timer *)list_get_next_item(&sTimers, timer);
+		if (timer == NULL)
+			break;
+
+		kprintf("%p  %p  %p  %Ld\n", timer, timer->hook, timer->data,
+			timer->due > 0 ? timer->due - system_time() : -1);
+	}
+
+	return 0;
+}
+
+
 status_t
 init_timers(void)
 {
@@ -527,6 +546,9 @@ init_timers(void)
 		status = sTimerThread;
 		goto err2;
 	}
+
+	add_debugger_command("net_timer", dump_timer,
+		"Lists all active network timer");
 
 	return resume_thread(sTimerThread);
 
