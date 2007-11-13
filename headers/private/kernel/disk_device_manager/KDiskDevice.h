@@ -57,6 +57,8 @@ public:
 	void UpdateMediaStatusIfNeeded();
 	void UninitializeMedia();
 
+	void UpdateGeometry();
+
 	status_t SetPath(const char *path);
 		// TODO: Remove this method or make it private. Once initialized the
 		// path must not be changed.
@@ -85,6 +87,7 @@ protected:
 private:
 	void _ResetGeometry();
 	void _InitPartitionData();
+	void _UpdateDeviceFlags();
 
 	disk_device_data	fDeviceData;
 	RWLocker			fLocker;

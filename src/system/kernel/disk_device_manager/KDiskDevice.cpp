@@ -74,15 +74,9 @@ KDiskDevice::SetTo(const char *path)
 		if (GetGeometry(&fDeviceData.geometry) != B_OK)
 			_ResetGeometry();
 	}
+
 	// set device flags
-	if (fDeviceData.geometry.removable)
-		SetDeviceFlags(DeviceFlags() | B_DISK_DEVICE_REMOVABLE);
-	if (fMediaStatus == B_OK)
-		SetDeviceFlags(DeviceFlags() | B_DISK_DEVICE_HAS_MEDIA);
-	if (fDeviceData.geometry.read_only)
-		SetDeviceFlags(DeviceFlags() | B_DISK_DEVICE_READ_ONLY);
-	if (fDeviceData.geometry.write_once)
-		SetDeviceFlags(DeviceFlags() | B_DISK_DEVICE_WRITE_ONCE);
+	_UpdateDeviceFlags();
 	// update partition data
 	_InitPartitionData();
 	return B_OK;
@@ -247,6 +241,19 @@ KDiskDevice::UninitializeMedia()
 {
 	UninitializeContents();
 	_ResetGeometry();
+	_UpdateDeviceFlags();
+	_InitPartitionData();
+}
+
+
+void
+KDiskDevice::UpdateGeometry()
+{
+	if (GetGeometry(&fDeviceData.geometry) != B_OK)
+		return;
+
+	_UpdateDeviceFlags();
+	_InitPartitionData();
 }
 
 
@@ -397,5 +404,22 @@ KDiskDevice::_ResetGeometry()
 	fDeviceData.geometry.removable = true;
 	fDeviceData.geometry.read_only = true;
 	fDeviceData.geometry.write_once = false;
+}
+
+
+void
+KDiskDevice::_UpdateDeviceFlags()
+{
+	if (fDeviceData.geometry.removable)
+		SetDeviceFlags(DeviceFlags() | B_DISK_DEVICE_REMOVABLE);
+	if (HasMedia())
+		SetDeviceFlags(DeviceFlags() | B_DISK_DEVICE_HAS_MEDIA);
+	else
+		SetDeviceFlags(DeviceFlags() & ~B_DISK_DEVICE_HAS_MEDIA);
+
+	if (fDeviceData.geometry.read_only)
+		SetDeviceFlags(DeviceFlags() | B_DISK_DEVICE_READ_ONLY);
+	if (fDeviceData.geometry.write_once)
+		SetDeviceFlags(DeviceFlags() | B_DISK_DEVICE_WRITE_ONCE);
 }
 

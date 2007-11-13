@@ -1148,6 +1148,7 @@ KDiskDeviceManager::_CheckMediaStatus()
 
 			if (device->MediaChanged()) {
 				dprintf("Media changed from %s\n", device->Path());
+				device->UpdateGeometry();
 				_ScanPartition(device, false);
 			} else if (!device->HasMedia() && hadMedia) {
 				dprintf("Media removed from %s\n", device->Path());
