@@ -222,11 +222,18 @@ Registrar::_MessageReceived(BMessage *message)
 			break;
 		}
 
+		// shutdown process
 		case B_REG_SHUT_DOWN:
 		{
 			PRINT(("B_REG_SHUT_DOWN\n"));
 
 			_HandleShutDown(message);
+			break;
+		}
+		case B_REG_TEAM_DEBUGGER_ALERT:
+		{
+			if (fShutdownProcess != NULL)
+				fShutdownProcess->PostMessage(message);
 			break;
 		}
 

@@ -19,6 +19,7 @@
 #include <Entry.h>
 #include <Invoker.h>
 
+#include <RegistrarDefs.h>
 #include <RosterPrivate.h>
 #include <Server.h>
 
@@ -115,6 +116,7 @@ private:
 		const void *address, char *buffer, int32 bufferSize);
 	void _PrintStackTrace(thread_id thread);
 	void _NotifyAppServer(team_id team);
+	void _NotifyRegistrar(team_id team, bool openAlert, bool stopShutdown);
 
 	status_t _InitGUI();
 
@@ -258,8 +260,7 @@ TeamDebugHandlerRoster *TeamDebugHandlerRoster::sRoster = NULL;
 
 
 // DebugServer
-class DebugServer : public BServer
-{
+class DebugServer : public BServer {
 public:
 	DebugServer(status_t &error);
 
@@ -558,16 +559,20 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 	} else if (USE_GUI && _AreGUIServersAlive() && _InitGUI() == B_OK) {
 		// normal app -- tell the user
 		_NotifyAppServer(fTeam);
+		_NotifyRegistrar(fTeam, true, false);
 
 		char buffer[1024];
 		snprintf(buffer, sizeof(buffer), "The application:\n\n      %s\n\n"
 			"has encountered an error which prevents it from continuing. Haiku "
 			"will terminate the application and clean up.", fTeamInfo.args);
 
+		// TODO: It would be nice if the alert would go away automatically
+		// if someone else kills our teams.
 		BAlert *alert = new BAlert(NULL, buffer, "Debug", "OK", NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		int32 result = alert->Go();
 		kill = (result == 1);
+		_NotifyRegistrar(fTeam, false, !kill);
 	}
 
 	return kill;
@@ -687,6 +692,22 @@ TeamDebugHandler::_NotifyAppServer(team_id team)
 	BRoster::Private roster;
 	roster.ApplicationCrashed(team);
 }
+
+
+void
+TeamDebugHandler::_NotifyRegistrar(team_id team, bool openAlert,
+	bool stopShutdown)
+{
+	BMessage notify(BPrivate::B_REG_TEAM_DEBUGGER_ALERT);
+	notify.AddInt32("team", team);
+	notify.AddBool("open", openAlert);
+	notify.AddBool("stop shutdown", stopShutdown);
+
+	BRoster::Private roster;
+	BMessage reply;
+	roster.SendTo(&notify, &reply, false);
+}
+
 
 // _InitGUI
 status_t
@@ -895,7 +916,7 @@ DebugServer::Init()
 	return B_OK;
 }
 
-// QuitRequested
+
 bool
 DebugServer::QuitRequested()
 {

@@ -70,6 +70,7 @@ private:
 	status_t _Worker();
 
 	void _WorkerDoShutdown();
+	bool _WaitForApp(team_id team, AppInfoList *list, bool systemApps);
 	void _QuitApps(AppInfoList &list, bool systemApps);
 	void _QuitBackgroundApps();
 	void _WaitForBackgroundApps();
@@ -78,6 +79,7 @@ private:
 	void _QuitBlockingApp(AppInfoList &list, team_id team, const char *appName,
 		bool cancelAllowed);
 	void _DisplayAbortingApp(team_id team);
+	void _WaitForDebuggedTeams();
 
 private:
 	class TimeoutEvent;
@@ -97,6 +99,7 @@ private:
 	AppInfoList				fSystemApps;
 	AppInfoList				fUserApps;
 	AppInfoList				fBackgroundApps;
+	hash_set<team_id>		fDebuggedTeams;
 	TimeoutEvent			*fTimeoutEvent;
 	InternalEventList		*fInternalEvents;
 	sem_id					fInternalEventSemaphore;

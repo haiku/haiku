@@ -62,13 +62,13 @@ static const bigtime_t kNonAppQuitTimeout = 500000; // 0.5 s
 static const bigtime_t kDisplayAbortingAppTimeout = 3000000; // 3 s
 
 
-// message what fields
+// message what fields (must not clobber the registrar's message namespace)
 enum {
 	MSG_PHASE_TIMED_OUT		= 'phto',
 	MSG_DONE				= 'done',
 	MSG_KILL_APPLICATION	= 'kill',
 	MSG_CANCEL_SHUTDOWN		= 'cncl',
-	MSG_REBOOT_SYSTEM		= 'rbot',
+	MSG_REBOOT_SYSTEM		= 'lbot',
 };
 
 // internal events
@@ -79,6 +79,7 @@ enum {
 	APP_QUIT_EVENT,
 	KILL_APP_EVENT,
 	REBOOT_SYSTEM_EVENT,
+	DEBUG_EVENT
 };
 
 // phases
@@ -790,21 +791,15 @@ PRINT(("MSG_PHASE_TIMED_OUT: phase: %ld, team: %ld\n", phase, team));
 			if (message->FindInt32("team", &team) != B_OK)
 				break;
 
-			BAutolock _(fWorkerLock);
-
 			// post the event
 			_PushEvent(KILL_APP_EVENT, team, fCurrentPhase);
-
 			break;
 		}
 
 		case MSG_CANCEL_SHUTDOWN:
 		{
-			BAutolock _(fWorkerLock);
-
 			// post the event
 			_PushEvent(ABORT_EVENT, -1, fCurrentPhase);
-
 			break;
 		}
 
@@ -812,7 +807,6 @@ PRINT(("MSG_PHASE_TIMED_OUT: phase: %ld, team: %ld\n", phase, team));
 		{
 			// post the event
 			_PushEvent(REBOOT_SYSTEM_EVENT, -1, INVALID_PHASE);
-
 			break;
 		}
 
@@ -820,7 +814,34 @@ PRINT(("MSG_PHASE_TIMED_OUT: phase: %ld, team: %ld\n", phase, team));
 		{
 			// notify the registrar that we're done
 			be_app->PostMessage(B_REG_SHUTDOWN_FINISHED, be_app);
+			break;
+		}
 
+		case B_REG_TEAM_DEBUGGER_ALERT:
+		{
+			bool stopShutdown;
+			if (message->FindBool("stop shutdown", &stopShutdown) == B_OK
+				&& stopShutdown) {
+				// post abort event to the worker
+				_PushEvent(ABORT_EVENT, -1, fCurrentPhase);
+				break;
+			}
+
+			bool open;
+			team_id team;
+			if (message->FindInt32("team", &team) != B_OK
+				|| message->FindBool("open", &open) != B_OK)
+				break;
+
+			BAutolock _(fWorkerLock);
+			if (open) {
+				PRINT(("B_REG_TEAM_DEBUGGER_ALERT: insert %ld\n", team));
+				fDebuggedTeams.insert(team);
+			} else {
+				PRINT(("B_REG_TEAM_DEBUGGER_ALERT: remove %ld\n", team));
+				fDebuggedTeams.erase(team);
+				_PushEvent(DEBUG_EVENT, -1, fCurrentPhase);
+			}
 			break;
 		}
 
@@ -1145,10 +1166,9 @@ ShutdownProcess::_GetNextEvent(uint32 &eventType, thread_id &team, int32 &phase,
 			do {
 				error = acquire_sem(fInternalEventSemaphore);
 			} while (error == B_INTERRUPTED);
-	
+
 			if (error != B_OK)
 				return error;
-	
 		} else {
 			status_t error = acquire_sem_etc(fInternalEventSemaphore, 1,
 				B_RELATIVE_TIMEOUT, 0);
@@ -1157,10 +1177,10 @@ ShutdownProcess::_GetNextEvent(uint32 &eventType, thread_id &team, int32 &phase,
 				return B_OK;
 			}
 		}
-	
+
 		// get the event
 		BAutolock _(fWorkerLock);
-	
+
 		InternalEvent *event = fInternalEvents->Head();
 		fInternalEvents->Remove(event);
 
@@ -1259,14 +1279,17 @@ ShutdownProcess::_WorkerDoShutdown()
 	// phase 1: terminate the user apps
 	_SetPhase(USER_APP_TERMINATION_PHASE);
 	_QuitApps(fUserApps, false);
+	_WaitForDebuggedTeams();
 
 	// phase 2: terminate the system apps
 	_SetPhase(SYSTEM_APP_TERMINATION_PHASE);
 	_QuitApps(fSystemApps, true);
+	_WaitForDebuggedTeams();
 
 	// phase 3: terminate the background apps
 	_SetPhase(BACKGROUND_APP_TERMINATION_PHASE);
 	_QuitBackgroundApps();
+	_WaitForDebuggedTeams();
 
 	// phase 4: terminate the other processes
 	_SetPhase(OTHER_PROCESSES_TERMINATION_PHASE);
@@ -1274,6 +1297,7 @@ ShutdownProcess::_WorkerDoShutdown()
 	_ScheduleTimeoutEvent(kBackgroundAppQuitTimeout, -1);
 	_WaitForBackgroundApps();
 	_KillBackgroundApps();
+	_WaitForDebuggedTeams();
 
 	// we're through: do the shutdown
 	_SetPhase(DONE_PHASE);
@@ -1311,7 +1335,49 @@ ShutdownProcess::_WorkerDoShutdown()
 	#endif
 }
 
-// _QuitApps
+
+bool
+ShutdownProcess::_WaitForApp(team_id team, AppInfoList *list, bool systemApps)
+{
+	uint32 event;
+	do {
+		team_id eventTeam;
+		int32 phase;
+		status_t error = _GetNextEvent(event, eventTeam, phase, true);
+		if (error != B_OK)
+			throw_error(error);
+
+		if (event == APP_QUIT_EVENT && eventTeam == team)
+			return true;
+
+		if (event == TIMEOUT_EVENT && eventTeam == team)
+			return false;
+
+		if (event == ABORT_EVENT) {
+			if (systemApps) {
+				// If the app requests aborting the shutdown, we don't need
+				// to wait any longer. It has processed the request and
+				// won't quit by itself. We ignore this for system apps.
+				if (eventTeam == team)
+					return false;
+			} else {
+				PRINT(("ShutdownProcess::_QuitApps(): shutdown cancelled "
+					"by team %ld (-1 => user)\n", eventTeam));
+
+				_DisplayAbortingApp(team);
+				throw_error(B_SHUTDOWN_CANCELLED);
+			}
+		}
+
+		BAutolock _(fWorkerLock);
+		if (list != NULL && !list->InfoFor(team))
+			return true;
+	} while (event != NO_EVENT);
+
+	return false;
+}
+
+
 void
 ShutdownProcess::_QuitApps(AppInfoList &list, bool systemApps)
 {
@@ -1401,44 +1467,7 @@ ShutdownProcess::_QuitApps(AppInfoList &list, bool systemApps)
 		_ScheduleTimeoutEvent(kAppQuitTimeout, team);
 
 		// wait for the app to die or for the timeout to occur
-		bool appGone = false;
-		do {
-			team_id eventTeam;
-			int32 phase;
-			status_t error = _GetNextEvent(event, eventTeam, phase, true);
-			if (error != B_OK)
-				throw_error(error);
-
-			if ((event == APP_QUIT_EVENT)
-				&& eventTeam == team) {
-				appGone = true;
-			}
-
-			if (event == TIMEOUT_EVENT && eventTeam == team)
-				break;
-
-			if (event == ABORT_EVENT) {
-				if (systemApps) {
-					// If the app requests aborting the shutdown, we don't need
-					// to wait any longer. It has processed the request and
-					// won't quit by itself. We ignore this for system apps.
-					if (eventTeam == team)
-						break;
-				} else {
-					PRINT(("ShutdownProcess::_QuitApps(): shutdown cancelled "
-						"by team %ld (-1 => user)\n", eventTeam));
-
-					_DisplayAbortingApp(team);
-					throw_error(B_SHUTDOWN_CANCELLED);
-				}
-			}
-
-			BAutolock _(fWorkerLock);
-			if (!list.InfoFor(team))
-				break;
-
-		} while (event != NO_EVENT);
-
+		bool appGone = _WaitForApp(team, &list, systemApps);
 		if (appGone) {
 			// fine: the app finished in an orderly manner
 		} else {
@@ -1623,7 +1652,17 @@ void
 ShutdownProcess::_QuitBlockingApp(AppInfoList &list, team_id team,
 	const char *appName, bool cancelAllowed)
 {
-	if (BPrivate::is_app_showing_modal_window(team)) {
+	bool debugged = false;
+	bool modal = false;
+	{
+		BAutolock _(fWorkerLock);
+		if (fDebuggedTeams.find(team) != fDebuggedTeams.end())
+			debugged = true;
+	}
+	if (!debugged)
+		modal = BPrivate::is_app_showing_modal_window(team);
+
+	if (modal) {
 		// app blocks on a modal window
 		char buffer[1024];
 		snprintf(buffer, sizeof(buffer), "The application \"%s\" might be "
@@ -1631,7 +1670,9 @@ ShutdownProcess::_QuitBlockingApp(AppInfoList &list, team_id team,
 		_SetShutdownWindowText(buffer);
 		_SetShutdownWindowCurrentApp(team);
 		_SetShutdownWindowKillButtonEnabled(true);
+	}
 
+	if (modal || debugged) {
 		// wait for something to happen
 		bool appGone = false;
 		while (true) {
@@ -1651,7 +1692,7 @@ ShutdownProcess::_QuitBlockingApp(AppInfoList &list, team_id team,
 				break;
 
 			if (event == ABORT_EVENT) {
-				if (cancelAllowed) {
+				if (cancelAllowed || debugged) {
 					PRINT(("ShutdownProcess::_QuitBlockingApp(): shutdown "
 						"cancelled by team %ld (-1 => user)\n", eventTeam));
 
@@ -1755,6 +1796,42 @@ ShutdownProcess::_DisplayAbortingApp(team_id team)
 		if ((event == APP_QUIT_EVENT) && eventTeam == team)
 			break;
 #endif
+	}
+}
+
+
+/*!	Waits until the debugged team list is empty, ie. when there is no one
+	left to debug.
+*/
+void
+ShutdownProcess::_WaitForDebuggedTeams()
+{
+	PRINT(("ShutdownProcess::_WaitForDebuggedTeams()\n"));
+	{
+		BAutolock _(fWorkerLock);
+		if (fDebuggedTeams.empty())
+			return;
+	}
+
+	PRINT(("  not empty!\n"));
+
+	// wait for something to happen
+	while (true) {
+		uint32 event;
+		team_id eventTeam;
+		int32 phase;
+		status_t error = _GetNextEvent(event, eventTeam, phase, true);
+		if (error != B_OK)
+			throw_error(error);
+
+		if (event == ABORT_EVENT)
+			throw_error(B_SHUTDOWN_CANCELLED);
+
+		BAutolock _(fWorkerLock);
+		if (fDebuggedTeams.empty()) {
+			PRINT(("  out empty"));
+			return;
+		}
 	}
 }
 

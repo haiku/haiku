@@ -104,6 +104,9 @@ enum {
 	B_REG_UPDATE_DISK_DEVICE				= 'rgud',
 	B_REG_DEVICE_START_WATCHING				= 'rgwd',
 	B_REG_DEVICE_STOP_WATCHING				= 'rgsd',
+
+	// debug_server notifications
+	B_REG_TEAM_DEBUGGER_ALERT				= 'rtda',
 };
 
 // B_REG_MIME_SET_PARAM "which" constants 
