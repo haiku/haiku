@@ -1856,6 +1856,7 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 		copy = new BMessage(*this);
 		if (copy != NULL) {
 			header = copy->fHeader;
+			header->flags = fHeader->flags;
 			result = B_OK;
 		} else {
 			direct->Release();
@@ -1889,8 +1890,8 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 		return result;
 
 	if (!replyTo.IsValid()) {
-		BMessenger::Private(replyTo).SetTo(header->reply_team,
-			header->reply_port, header->reply_target);
+		BMessenger::Private(replyTo).SetTo(fHeader->reply_team,
+			fHeader->reply_port, fHeader->reply_target);
 
 		if (!replyTo.IsValid())
 			replyTo = be_app_messenger;
