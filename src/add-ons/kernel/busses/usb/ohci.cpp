@@ -66,13 +66,18 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		fPCIInfo(info),
 		fStack(stack),
 		fRegisterArea(-1),
+		fSpinLock(0),
 		fHccaArea(-1),
 		fDummyControl(NULL),
 		fDummyBulk(NULL),
 		fDummyIsochronous(NULL),
+		fFirstTransfer(NULL),
+		fFinishTransfer(NULL),
+		fFinishThread(-1),
+		fStopFinishThread(false),
 		fRootHub(NULL),
 		fRootHubAddress(0),
-		fNumPorts(0)
+		fPortCount(0)
 {
 	if (!fInitOK) {
 		TRACE_ERROR(("usb_ohci: bus manager failed to init\n"));
@@ -119,12 +124,13 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	}
 
 	// Set up the Host Controller Communications Area
+	// which is 256 bytes (2048 bits) and must be aligned
 	void *hccaPhysicalAddress;
 	fHccaArea = fStack->AllocateArea((void **)&fHcca, &hccaPhysicalAddress,
 		2048, "USB OHCI Host Controller Communication Area");
 
 	if (fHccaArea < B_OK) {
-		TRACE(("usb_ohci: unable to create the HCCA block area\n"));
+		TRACE_ERROR(("usb_ohci: unable to create the HCCA block area\n"));
 		return;
 	}
 
@@ -153,9 +159,35 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	fDummyIsochronous->flags |= OHCI_ENDPOINT_SKIP;
 
 	// Create the interrupt tree
-	// Algorithm kindly borrowed from NetBSD code
-	// TODO: Check it once again
-	ohci_endpoint_descriptor *current, *previous;
+	fInterruptEndpoints = new(std::nothrow)
+		ohci_endpoint_descriptor *[OHCI_NUMBER_OF_INTERRUPTS];
+	if (!fInterruptEndpoints) {
+		TRACE_ERROR(("ohci_usb: cannot allocate memory for"
+			" fInterruptEndpoints array\n"));
+		_FreeEndpoint(fDummyControl);
+		_FreeEndpoint(fDummyBulk);
+		_FreeEndpoint(fDummyIsochronous);
+		return;
+	}
+
+	// Static endpoints that get linked in the HCCA
+	for (uint32 i = 0; i < OHCI_NUMBER_OF_INTERRUPTS; i++) {
+		fInterruptEndpoints[i] = _AllocateEndpoint();
+		if (!fInterruptEndpoints[i]) {
+			while (--i >= 0)
+				_FreeEndpoint(fInterruptEndpoints[i]);
+			_FreeEndpoint(fDummyBulk);
+			_FreeEndpoint(fDummyControl);
+			_FreeEndpoint(fDummyIsochronous);
+			return;
+		}
+		fInterruptEndpoints[i]->flags |= OHCI_ENDPOINT_SKIP;
+		fInterruptEndpoints[i]->next_physical_endpoint
+			= fDummyIsochronous->physical_address;
+	}
+
+#if 0
+	ohci_endpoint_descriptor *current;
 	for( uint32 i = 0; i < OHCI_NUMBER_OF_ENDPOINTS; i++) {
 		current = _AllocateEndpoint();
 		if (!current) {
@@ -174,13 +206,14 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		else
 			previous = fDummyIsochronous;
 		current->next_logical_endpoint = previous;
-		current->next_physical_endpoint = previous->this_physical;
+		current->next_physical_endpoint = previous->physical_address;
 	}
+#endif
 
 	// Fill HCCA interrupt table. The bit reversal is to get
 	// the tree set up properly to spread the interrupts.
 	for (uint32 i = 0; i < OHCI_NUMBER_OF_INTERRUPTS; i++)
-		fHcca->hcca_interrupt_table[revbits[i]] =
+		fHcca->interrupt_table[revbits[i]] =
 			fInterruptEndpoints[OHCI_NUMBER_OF_ENDPOINTS - OHCI_NUMBER_OF_INTERRUPTS + i]->physical_address;
 
 
@@ -230,8 +263,12 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		return;
 	}
 
-	// The controller is now in SUSPEND state, we have 2ms to finish
-	// TODO: maybe add spinlock protection???
+	// The controller is now in SUSPEND state, we have 2ms to go OPERATIONAL.
+	// In order to do so we need a spinlock
+
+	cpu_status former = disable_interrupts();
+	acquire_spinlock(&fSpinLock);
+
 	// Set up host controller register
 	_WriteReg(OHCI_HCCA, (uint32)hccaPhysicalAddress);
 	_WriteReg(OHCI_CONTROL_HEAD_ED, (uint32)fDummyControl->physical_address);
@@ -248,7 +285,10 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		| OHCI_HC_FUNCTIONAL_STATE_OPERATIONAL;
 	// And finally start the controller
 	_WriteReg(OHCI_CONTROL, control);
-	
+
+	release_spinlock(&fSpinLock);
+	restore_interrupts(former);
+
 	// The controller is now OPERATIONAL.
 	frameInterval = (_ReadReg(OHCI_FRAME_INTERVAL) & OHCI_FRAME_INTERVAL_TOGGLE)
 		^ OHCI_FRAME_INTERVAL_TOGGLE;
@@ -273,11 +313,28 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		uint32 descriptor = _ReadReg(OHCI_RH_DESCRIPTOR_A);
 		numberOfPorts = OHCI_RH_GET_PORT_COUNT(descriptor);
 	}
+	fPortCount = numberOfPorts;
 
-	// TODO: Add Finisher Thread.
+	// Create semaphore the finisher thread will wait for
+	fFinishTransfersSem = create_sem(0, "OHCI Finish Transfers");
+	if (fFinishTransfersSem < B_OK) {
+		TRACE_ERROR(("usb_ohci: failed to create semaphore\n"));
+		return;
+	}
+
+	// Create the finisher service thread
+	fFinishThread = spawn_kernel_thread(_FinishThread, "ohci finish thread",
+		B_URGENT_DISPLAY_PRIORITY, (void *)this);
+	resume_thread(fFinishThread);
+
+	// Install the interrupt handler
+	TRACE(("usb_ohci: installing interrupt handler\n"));
+	install_io_interrupt_handler(fPCIInfo->u.h0.interrupt_line,
+		_InterruptHandler, (void *)this, 0);
+
+	// TODO: Enable interrupts. Maybe disable first somewhere before :)
 
 	TRACE(("usb_ohci: OHCI Host Controller Driver constructed\n")); 
-
 	fInitOK = true;
 }
 
@@ -296,41 +353,73 @@ OHCI::~OHCI()
 		_FreeEndpoint(fDummyIsochronous);
 	if (fRootHub)
 		delete fRootHub;
-	for (int i = 0; i < OHCI_NO_EDS; i++)
+	for (int i = 0; i < OHCI_NUMBER_OF_INTERRUPTS; i++)
 		if (fInterruptEndpoints[i])
 			_FreeEndpoint(fInterruptEndpoints[i]);
+	delete [] fInterruptEndpoints;
 }
 
+
+int32
+OHCI::_InterruptHandler(void *data)
+{
+	return ((OHCI *)data)->_Interrupt();
+}
+
+
+int32
+OHCI::_Interrupt()
+{
+	static spinlock lock = 0;
+	acquire_spinlock(&lock);
+
+	int32 result = B_UNHANDLED_INTERRUPT;
+
+	release_spinlock(&lock);
+
+	return result;
+}
+
+
+int32
+OHCI::_FinishThread(void *data)
+{
+	((OHCI *)data)->_FinishTransfer();
+	return B_OK;
+}
+
+
+void
+OHCI::_FinishTransfer()
+{
+	// TODO: block on the semaphore
+}
 
 status_t
 OHCI::Start()
 {
-	TRACE(("usb_ohci::%s()\n", __FUNCTION__));
-	if (InitCheck())
-		return B_ERROR;
-	
+	TRACE(("usb_ohci: starting OHCI Host Controller\n"));
+
 	if (!(_ReadReg(OHCI_CONTROL) & OHCI_HC_FUNCTIONAL_STATE_OPERATIONAL)) {
-		TRACE(("usb_ohci::Start(): Controller not started. TODO: find out what happens.\n"));
+		TRACE_ERROR(("usb_ohci: Controller not started!\n"));
 		return B_ERROR;
 	}
-	
+
 	fRootHubAddress = AllocateAddress();
-	fNumPorts = OHCI_RH_GET_PORT_COUNT(_ReadReg(OHCI_RH_DESCRIPTOR_A));
-	
 	fRootHub = new(std::nothrow) OHCIRootHub(RootObject(), fRootHubAddress);
 	if (!fRootHub) {
-		TRACE_ERROR(("usb_ohci::Start(): no memory to allocate root hub\n"));
+		TRACE_ERROR(("usb_ohci: no memory to allocate root hub\n"));
 		return B_NO_MEMORY;
 	}
 
 	if (fRootHub->InitCheck() < B_OK) {
-		TRACE_ERROR(("usb_ohci::Start(): root hub failed init check\n"));
+		TRACE_ERROR(("usb_ohci: root hub failed init check\n"));
 		return B_ERROR;
 	}
 
 	SetRootHub(fRootHub);
-	TRACE(("usb_ohci::Start(): Succesful start\n"));
-	return B_OK;
+	TRACE(("usb_ohci: Host Controller started\n"));
+	return BusManager::Start();
 }
 
 
@@ -445,7 +534,7 @@ status_t
 OHCI::GetPortStatus(uint8 index, usb_port_status *status)
 {
 	TRACE(("usb_ohci::%s(%ud, )\n", __FUNCTION__, index));
-	if (index >= fNumPorts)
+	if (index >= fPortCount)
 		return B_BAD_INDEX;
 	
 	status->status = status->change = 0;
@@ -490,7 +579,7 @@ status_t
 OHCI::SetPortFeature(uint8 index, uint16 feature)
 {
 	TRACE(("OHCI::%s(%ud, %ud)\n", __FUNCTION__, index, feature));
-	if (index > fNumPorts)
+	if (index > fPortCount)
 		return B_BAD_INDEX;
 	
 	switch (feature) {
@@ -511,7 +600,7 @@ status_t
 OHCI::ClearPortFeature(uint8 index, uint16 feature)
 {
 	TRACE(("OHCI::%s(%ud, %ud)\n", __FUNCTION__, index, feature));
-	if (index > fNumPorts)
+	if (index > fPortCount)
 		return B_BAD_INDEX;
 	
 	switch (feature) {
@@ -534,22 +623,20 @@ OHCI::_AllocateEndpoint()
 	ohci_endpoint_descriptor *endpoint;
 	void* physicalAddress;
 
-	//Allocate memory chunk
+	// Allocate memory chunk
 	if (fStack->AllocateChunk((void **)&endpoint, &physicalAddress,
 		sizeof(ohci_endpoint_descriptor)) < B_OK) {
 		TRACE_ERROR(("usb_ohci: failed to allocate endpoint descriptor\n"));
 		return NULL;
 	}
 
-	endpoint->this_physical = (addr_t)physicalAddress;
+	endpoint->physical_address = (addr_t)physicalAddress;
 
-	// Add an empty list by creating a general descriptor
-	ohci_general_transfer_descriptor *descriptor = _CreateGeneralDescriptor();
-	endpoint->head_physical_descriptor = descriptor->this_physical;
-	endpoint->tail_physical_descriptor = descriptor->this_physical;
+	endpoint->head_physical_descriptor = NULL;
+	endpoint->tail_physical_descriptor = NULL;
 
-	endpoint->head_logical_descriptor = descriptor;
-	endpoint->tail_logical_descriptor = descriptor;
+	endpoint->head_logical_descriptor = NULL;
+	endpoint->tail_logical_descriptor = NULL;
 
 	return endpoint;
 }
@@ -558,46 +645,53 @@ OHCI::_AllocateEndpoint()
 void
 OHCI::_FreeEndpoint(ohci_endpoint_descriptor *endpoint)
 {
-	TRACE(("OHCI::%s(%p)\n", __FUNCTION__, end));
-	fStack->FreeChunk((void *)end->ed, (void *) end->physical_address, sizeof(ohci_endpoint_descriptor));
-	delete end;
+	fStack->FreeChunk((void *)endpoint, (void *)endpoint->physical_address,
+		sizeof(ohci_endpoint_descriptor));
 }
 
 
-TransferDescriptor *
-OHCI::_AllocateTransfer()
+ohci_general_descriptor*
+OHCI::_CreateGeneralDescriptor()
 {
-	TRACE(("OHCI::%s()\n", __FUNCTION__));
-	TransferDescriptor *transfer = new TransferDescriptor;
-	void *phy;
-	if (fStack->AllocateChunk((void **)&transfer->td, &phy, sizeof(ohci_general_transfer_descriptor)) != B_OK) {
-		TRACE(("OHCI::AllocateTransfer(): Error Allocating Transfer\n"));
-		return 0;
+	ohci_general_descriptor *descriptor;
+	void *physicalAddress;
+
+	if (fStack->AllocateChunk((void **)&descriptor, &physicalAddress,
+		sizeof(ohci_general_descriptor)) != B_OK) {
+		TRACE_ERROR(("usb_ohci: failed to allocate general descriptor\n"));
+		return NULL;
 	}
-	transfer->physical_address = (addr_t)phy;
-	memset((void *)transfer->td, 0, sizeof(ohci_general_transfer_descriptor));
-	return transfer;
+
+	// TODO: Finish methods
+	memset((void *)descriptor, 0, sizeof(ohci_general_descriptor));
+	descriptor->physical_address = (addr_t)physicalAddress;
+
+	return descriptor;
 }	
 
 
 void
-OHCI::_FreeTransfer(TransferDescriptor *trans)
+OHCI::_FreeGeneralDescriptor(ohci_general_descriptor *descriptor)
 {
-	TRACE(("OHCI::%s(%p)\n", __FUNCTION__, trans));
-	fStack->FreeChunk((void *)trans->td, (void *) trans->physical_address, sizeof(ohci_general_transfer_descriptor));
-	delete trans;
+	if (!descriptor)
+		return;
+
+	fStack->FreeChunk((void *)descriptor, (void *)descriptor->physical_address,
+		sizeof(ohci_general_descriptor));
 }
 
 
 status_t
 OHCI::_InsertEndpointForPipe(Pipe *p)
 {
+#if 0
 	TRACE(("OHCI: Inserting Endpoint for device %u function %u\n", p->DeviceAddress(), p->EndpointAddress()));
 
 	if (InitCheck())
 		return B_ERROR;
 	
-	Endpoint *endpoint = _AllocateEndpoint();
+	//Endpoint *endpoint = _AllocateEndpoint();
+	ohci_endpoint_descriptor *endpoint = _AllocateEndpoint();
 	if (!endpoint)
 		return B_NO_MEMORY;
 	
@@ -677,7 +771,7 @@ OHCI::_InsertEndpointForPipe(Pipe *p)
 			tail = tail->next;
 		tail->SetNext(endpoint);
 	}
-
+#endif
 	return B_OK;
 }
 

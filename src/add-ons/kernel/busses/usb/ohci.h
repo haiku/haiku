@@ -18,13 +18,20 @@ struct pci_info;
 struct pci_module_info;
 class OHCIRootHub;
 
+typedef struct transfer_data_s {
+	Transfer		*transfer;
+	bool			incoming;
+	bool			canceled;
+	transfer_data_s	*link;
+} transfer_data;
+
 // --------------------------------------
 //	OHCI:: 	Software isonchronous 
 //			transfer descriptor
 // --------------------------------------
 typedef struct hcd_soft_itransfer
 {
-	ohci_isochronous_transfer_descriptor	itd;
+	ohci_isochronous_descriptor	itd;
 	struct hcd_soft_itransfer			*nextitd; 	// mirrors nexttd in ITD
 	struct hcd_soft_itransfer			*dnext; 	// next in done list
 	addr_t 								physaddr;	// physical address to the host controller isonchronous transfer
@@ -51,6 +58,7 @@ public:
 		status_t					Start();
 virtual	status_t 					SubmitTransfer(Transfer *transfer);
 virtual status_t					CancelQueuedTransfers(Pipe *pipe);
+		status_t					SubmitRequest(Transfer *transfer);
 
 virtual	status_t					NotifyPipeChange(Pipe *pipe,
 										usb_change change);
@@ -58,48 +66,73 @@ virtual	status_t					NotifyPipeChange(Pipe *pipe,
 static	status_t					AddTo(Stack *stack);
 
 		// Port operations
+		uint8 						PortCount() { return fPortCount; };
 		status_t 					GetPortStatus(uint8 index, usb_port_status *status);
 		status_t					SetPortFeature(uint8 index, uint16 feature);
 		status_t					ClearPortFeature(uint8 index, uint16 feature);
 
-		uint8 						PortCount() { return fNumPorts; };
+		status_t					ResetPort(uint8 index);
+
 
 private:
+		// Interrupt functions
+static	int32						_InterruptHandler(void *data);
+		int32						_Interrupt();
+
+static	int32						_FinishThread(void *data);
+		void						_FinishTransfer();
+		
+		// Endpoint related methods
+		status_t					_CreateEndpoint(Pipe *pipe, bool isIsochronous);
+		ohci_endpoint_descriptor	*_AllocateEndpoint();
+		void						_FreeEndpoint(
+										ohci_endpoint_descriptor *endpoint);
+		status_t					_InsertEndpointForPipe(Pipe *pipe);
+
+		// Transfer descriptor related methods
+		ohci_general_descriptor		*_CreateGeneralDescriptor();
+		void						_FreeGeneralDescriptor(
+										ohci_general_descriptor *descriptor);
+		ohci_isochronous_descriptor	*_CreateIsochronousDescriptor();
+		void						_FreeIsochronousDescriptor(
+										ohci_isochronous_descriptor *descriptor);
+
 		// Register functions
 inline	void						_WriteReg(uint32 reg, uint32 value);
 inline	uint32						_ReadReg(uint32 reg);
 
-		// Global
 static	pci_module_info				*sPCIModule;
-
-		uint32						*fOperationalRegisters;
 		pci_info 					*fPCIInfo;
 		Stack						*fStack;
 
+		uint32						*fOperationalRegisters;
 		area_id						fRegisterArea;
+
+		spinlock					fSpinLock;
 
 		// Host Controller Communication Area related stuff
 		area_id						fHccaArea;
-		struct ohci_hcca			*fHcca;
-		ohci_endpoint_descriptor	*fInterruptEndpoints[OHCI_NUMBER_OF_ENDPOINTS];
+		ohci_hcca					*fHcca;
+		ohci_endpoint_descriptor	**fInterruptEndpoints;
 
 		// Dummy endpoints
 		ohci_endpoint_descriptor	*fDummyControl;
 		ohci_endpoint_descriptor	*fDummyBulk;
 		ohci_endpoint_descriptor	*fDummyIsochronous;
 
-		// Endpoint related methods
-		ohci_endpoint_descriptor	*_AllocateEndpoint(); 
-		void						_FreeEndpoint(Endpoint *end);
-		TransferDescriptor			*_AllocateTransfer();
-		void						_FreeTransfer(TransferDescriptor *trans);
-		status_t					_InsertEndpointForPipe(Pipe *p);
-		void						_SetNext(ohci_endpoint_descriptor *endpoint);
+		// Maintain a linked list of transfer
+		transfer_data				*fFirstTransfer;
+		transfer_data				*fFinishTransfer;
+		sem_id						fFinishTransfersSem;
+		thread_id					fFinishThread;
+		bool						fStopFinishThread;
 
 		// Root Hub
 		OHCIRootHub 				*fRootHub;
 		uint8						fRootHubAddress;
-		uint8						fNumPorts;
+
+		// Port management
+		uint8						fPortCount;
 };
 
 

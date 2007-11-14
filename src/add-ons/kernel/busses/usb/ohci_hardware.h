@@ -265,26 +265,23 @@
 #define	OHCI_PERIODIC(i)			((i) * 9 / 10)
 
 // --------------------------------
-//	OHCI physical address
-// --------------------------------
-
-typedef uint32 ohci_physaddr_t;
-
-// --------------------------------
 //	HCCA structure (section 4.4)
+//	256 bytes aligned
 // --------------------------------
 
 #define OHCI_NUMBER_OF_INTERRUPTS	32
 
 typedef struct ohci_hcca 
 {
-	uint32		hcca_interrupt_table[OHCI_NUMBER_OF_INTERRUPTS];
-	uint16		hcca_frame_number;
-	uint32		hcca_done_head;
-	uint8		hcca_reserved_for_hc[116];
+	uint32		interrupt_table[OHCI_NUMBER_OF_INTERRUPTS];
+	uint32		current_frame_number;
+	uint32		done_head;
+	// The following is 120 instead of 116 because the spec
+	// only specifies 252 bytes
+	uint8		reserved_for_hc[120];
 };
 
-#define OHCI_DONE_INTRS				1
+#define OHCI_DONE_INTERRUPTS		1
 #define OHCI_HCCA_SIZE				256
 #define OHCI_HCCA_ALIGN				256
 #define OHCI_PAGE_SIZE				0x1000
@@ -303,7 +300,8 @@ typedef struct ohci_endpoint_descriptor
 	uint32	head_physical_descriptor;	// Queue head physical pointer
 	uint32	next_physical_endpoint;		// Physical pointer to the next endpoint
 	// Software part
-	addr_t	this_physical;				// Physical pointer to this address
+	// TODO: What about type, state and interval (only interrupts) ?
+	addr_t	physical_address;			// Physical pointer to this address
 	void	*tail_logical_descriptor;	// Queue tail logical pointer
 	void	*head_logical_descriptor;	// Queue head logical pointer
 	void	*next_logical_endpoint;		// Logical pointer to the next endpoint
@@ -334,7 +332,7 @@ typedef struct ohci_endpoint_descriptor
 //	General transfer descriptor structure (section 4.3.1)
 // --------------------------------
 
-typedef struct ohci_general_transfer_descriptor
+typedef struct ohci_general_descriptor
 {
 	// Hardware part
 	uint32	flags;						// Flags field
@@ -342,7 +340,7 @@ typedef struct ohci_general_transfer_descriptor
 	uint32 	next_physical_descriptor;	// Physical pointer next descriptor
 	uint32 	last_physical_byte_address;	// Physical pointer to buffer end
 	// Software part
-	addr_t	this_physical;				// Physical pointer to this address
+	addr_t	physical_address;			// Physical pointer to this address
 	void	*buffer_logical;			// Logical pointer to the buffer
 	void	*next_logical_descriptor;	// Logical pointer next descriptor
 	void	*last_logical_byte_address;	// Logical pointer buffer end
@@ -372,7 +370,7 @@ typedef struct ohci_general_transfer_descriptor
 // --------------------------------
 
 #define OHCI_ITD_NOFFSET 8
-typedef struct ohci_isochronous_transfer_descriptor
+typedef struct ohci_isochronous_descriptor
 {
 	uint32		flags;
 	uint32		buffer_page_byte_0;			// Physical page number of byte 0
