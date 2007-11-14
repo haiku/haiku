@@ -124,10 +124,6 @@ avCodec::Setup(media_format *ioEncodedFormat, const void *infoBuffer, size_t inf
 		if (BMediaFormats().GetCodeFor(*ioEncodedFormat, gCodecTable[i].family, &descr) == B_OK
 		    && gCodecTable[i].type == ioEncodedFormat->type)
 			{
-			PRINT(("  codec id = \"%c%c%c%c\"\n",	(descr.u.avi.codec >> 24) & 0xff,
-													(descr.u.avi.codec >> 16) & 0xff,
-													(descr.u.avi.codec >> 8) & 0xff,
-													descr.u.avi.codec & 0xff));
 			switch(gCodecTable[i].family) {
 				case B_WAV_FORMAT_FAMILY:
 					cid = descr.u.wav.codec;
@@ -151,6 +147,9 @@ avCodec::Setup(media_format *ioEncodedFormat, const void *infoBuffer, size_t inf
 				puts("ERR family");
 					return B_ERROR;
 			}
+			PRINT(("  codec id = \"%c%c%c%c\"\n", (cid >> 24) & 0xff,
+				(cid >> 16) & 0xff, (cid >> 8) & 0xff, cid & 0xff));
+
 			if (gCodecTable[i].family == descr.family && gCodecTable[i].fourcc == cid) {
 				fCodec = avcodec_find_decoder(gCodecTable[i].id);
 				if (!fCodec) {
