@@ -26,7 +26,7 @@ Pipe::Pipe(Object *parent, int8 deviceAddress, uint8 endpointAddress,
 
 Pipe::~Pipe()
 {
-	CancelQueuedTransfers();
+	CancelQueuedTransfers(true);
 	GetBusManager()->NotifyPipeChange(this, USB_CHANGE_DESTROYED);
 }
 
@@ -40,9 +40,9 @@ Pipe::SubmitTransfer(Transfer *transfer)
 
 
 status_t
-Pipe::CancelQueuedTransfers()
+Pipe::CancelQueuedTransfers(bool force)
 {
-	return GetBusManager()->CancelQueuedTransfers(this);
+	return GetBusManager()->CancelQueuedTransfers(this, force);
 }
 
 
@@ -309,7 +309,7 @@ ControlPipe::SendRequest(uint8 requestType, uint8 request, uint16 value,
 		if (actualLength)
 			*actualLength = 0;
 
-		CancelQueuedTransfers();
+		CancelQueuedTransfers(false);
 		return B_TIMED_OUT;
 	}
 

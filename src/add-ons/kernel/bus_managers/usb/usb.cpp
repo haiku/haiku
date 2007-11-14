@@ -318,7 +318,7 @@ cancel_queued_transfers(usb_pipe pipe)
 	if (!object || (object->Type() & USB_OBJECT_PIPE) == 0)
 		return B_DEV_INVALID_PIPE;
 
-	return ((Pipe *)object)->CancelQueuedTransfers();
+	return ((Pipe *)object)->CancelQueuedTransfers(false);
 }
 
 

@@ -15,6 +15,7 @@ Device::Device(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
 	:	Object(parent),
 		fDeviceDescriptor(desc),
 		fInitOK(false),
+		fAvailable(true),
 		fConfigurations(NULL),
 		fCurrentConfiguration(NULL),
 		fSpeed(speed),
@@ -253,9 +254,28 @@ Device::InitCheck()
 
 
 status_t
+Device::Changed(change_item **changeList, bool added)
+{
+	fAvailable = added;
+	change_item *changeItem = new(std::nothrow) change_item;
+	if (!changeItem)
+		return B_NO_MEMORY;
+
+	changeItem->added = added;
+	changeItem->device = this;
+	changeItem->link = *changeList;
+	*changeList = changeItem;
+	return B_OK;
+}
+
+
+status_t
 Device::GetDescriptor(uint8 descriptorType, uint8 index, uint16 languageID,
 	void *data, size_t dataLength, size_t *actualLength)
 {
+	if (!fAvailable)
+		return B_ERROR;
+
 	return fDefaultPipe->SendRequest(
 		USB_REQTYPE_DEVICE_IN | USB_REQTYPE_STANDARD,		// type
 		USB_REQUEST_GET_DESCRIPTOR,							// request
@@ -304,6 +324,8 @@ Device::SetConfiguration(const usb_configuration_info *configuration)
 status_t
 Device::SetConfigurationAt(uint8 index)
 {
+	if (!fAvailable)
+		return B_ERROR;
 	if (index >= fDeviceDescriptor.num_configurations)
 		return B_BAD_VALUE;
 	if (&fConfigurations[index] == fCurrentConfiguration)
@@ -382,7 +404,7 @@ Device::Unconfigure(bool atDeviceLevel)
 	// another configuration unconfigure will be called with
 	// atDevice = false. otherwise we explicitly want to unconfigure
 	// the device and have to send it the corresponding request.
-	if (atDeviceLevel) {
+	if (atDeviceLevel && fAvailable) {
 		status_t result = fDefaultPipe->SendRequest(
 			USB_REQTYPE_DEVICE_OUT | USB_REQTYPE_STANDARD,	// type
 			USB_REQUEST_SET_CONFIGURATION,					// request
@@ -426,7 +448,7 @@ Device::DeviceDescriptor() const
 status_t
 Device::ReportDevice(usb_support_descriptor *supportDescriptors,
 	uint32 supportDescriptorCount, const usb_notify_hooks *hooks,
-	usb_driver_cookie **cookies, bool added)
+	usb_driver_cookie **cookies, bool added, bool recursive)
 {
 	TRACE(("USB Device %d: reporting device\n", fDeviceAddress));
 	bool supported = false;
@@ -526,6 +548,9 @@ Device::BuildDeviceName(char *string, uint32 *index, size_t bufferSize,
 status_t
 Device::SetFeature(uint16 selector)
 {
+	if (!fAvailable)
+		return B_ERROR;
+
 	return fDefaultPipe->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_DEVICE_OUT,
 		USB_REQUEST_SET_FEATURE,
@@ -541,6 +566,9 @@ Device::SetFeature(uint16 selector)
 status_t
 Device::ClearFeature(uint16 selector)
 {
+	if (!fAvailable)
+		return B_ERROR;
+
 	return fDefaultPipe->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_DEVICE_OUT,
 		USB_REQUEST_CLEAR_FEATURE,
@@ -556,6 +584,9 @@ Device::ClearFeature(uint16 selector)
 status_t
 Device::GetStatus(uint16 *status)
 {
+	if (!fAvailable)
+		return B_ERROR;
+
 	return fDefaultPipe->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_DEVICE_IN,
 		USB_REQUEST_GET_STATUS,

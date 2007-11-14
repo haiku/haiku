@@ -30,11 +30,6 @@ Hub::Hub(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
 	// Set to false again for the hub init.
 	fInitOK = false;
 
-	if (benaphore_init(&fLock, "usb hub lock") < B_OK) {
-		TRACE_ERROR(("USB Hub %d: failed to create hub lock\n", DeviceAddress()));
-		return;
-	}
-
 	if (fDeviceDescriptor.device_class != 9) {
 		TRACE_ERROR(("USB Hub %d: wrong class! bailing out\n", DeviceAddress()));
 		return;
@@ -97,36 +92,26 @@ Hub::Hub(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
 
 Hub::~Hub()
 {
-	Lock();
-	benaphore_destroy(&fLock);
-
-	// Remove all child devices
-	for (int32 i = 0; i < fHubDescriptor.num_ports; i++) {
-		if (!fChildren[i])
-			continue;
-
-		TRACE(("USB Hub %d: removing device 0x%08lx\n", DeviceAddress(), fChildren[i]));
-		rescan_item *rescanList = NULL;
-		GetStack()->NotifyDeviceChange(fChildren[i], &rescanList, false);
-		GetBusManager()->FreeDevice(fChildren[i]);
-		GetStack()->RescanDrivers(rescanList);
-	}
-
 	delete fInterruptPipe;
 }
 
 
-bool
-Hub::Lock()
+status_t
+Hub::Changed(change_item **changeList, bool added)
 {
-	return (benaphore_lock(&fLock) == B_OK);
-}
+	status_t result = Device::Changed(changeList, added);
+	if (added || result < B_OK)
+		return result;
 
+	for (int32 i = 0; i < fHubDescriptor.num_ports; i++) {
+		if (fChildren[i] == NULL)
+			continue;
 
-void
-Hub::Unlock()
-{
-	benaphore_unlock(&fLock);
+		fChildren[i]->Changed(changeList, false);
+		fChildren[i] = NULL;
+	}
+
+	return B_OK;
 }
 
 
@@ -189,7 +174,7 @@ Hub::ResetPort(uint8 index)
 
 
 void
-Hub::Explore()
+Hub::Explore(change_item **changeList)
 {
 	for (int32 i = 0; i < fHubDescriptor.num_ports; i++) {
 		status_t result = UpdatePortStatus(i);
@@ -209,7 +194,6 @@ Hub::Explore()
 				USB_REQUEST_CLEAR_FEATURE, C_PORT_CONNECTION, i + 1,
 				0, NULL, 0, NULL);
 
-			rescan_item *rescanList = NULL;
 			if (fPortStatus[i].status & PORT_STATUS_CONNECTION) {
 				// new device attached!
 				TRACE(("USB Hub %d: new device connected\n", DeviceAddress()));
@@ -234,18 +218,8 @@ Hub::Explore()
 
 				if (fChildren[i]) {
 					TRACE_ERROR(("USB Hub %d: new device on a port that is already in use\n", DeviceAddress()));
-
-					// Remove previous device first
-					TRACE(("USB Hub %d: removing device 0x%08lx\n", DeviceAddress(), fChildren[i]));
-					GetStack()->NotifyDeviceChange(fChildren[i], &rescanList, false);
-
-					if (Lock()) {
-						GetBusManager()->FreeDevice(fChildren[i]);
-						fChildren[i] = NULL;
-						Unlock();
-					}
-
-					GetStack()->RescanDrivers(rescanList);
+					fChildren[i]->Changed(changeList, false);
+					fChildren[i] = NULL;
 				}
 
 				usb_speed speed = USB_SPEED_FULLSPEED;
@@ -256,15 +230,10 @@ Hub::Explore()
 
 				Device *newDevice = GetBusManager()->AllocateDevice(this, speed);
 
-				if (newDevice && Lock()) {
+				if (newDevice) {
+					newDevice->Changed(changeList, true);
 					fChildren[i] = newDevice;
-					Unlock();
-					GetStack()->NotifyDeviceChange(fChildren[i], &rescanList, true);
-					GetStack()->RescanDrivers(rescanList);
 				} else {
-					if (newDevice)
-						GetBusManager()->FreeDevice(newDevice);
-
 					// the device failed to setup correctly, disable the port
 					// so that the device doesn't get in the way of future
 					// addressing.
@@ -277,15 +246,8 @@ Hub::Explore()
 				TRACE(("USB Hub %d: device removed\n", DeviceAddress()));
 				if (fChildren[i]) {
 					TRACE(("USB Hub %d: removing device 0x%08lx\n", DeviceAddress(), fChildren[i]));
-					GetStack()->NotifyDeviceChange(fChildren[i], &rescanList, false);
-
-					if (Lock()) {
-						GetBusManager()->FreeDevice(fChildren[i]);
-						fChildren[i] = NULL;
-						Unlock();
-					}
-
-					GetStack()->RescanDrivers(rescanList);
+					fChildren[i]->Changed(changeList, false);
+					fChildren[i] = NULL;
 				}
 			}
 		}
@@ -325,7 +287,7 @@ Hub::Explore()
 		if (!fChildren[i] || (fChildren[i]->Type() & USB_OBJECT_HUB) == 0)
 			continue;
 
-		((Hub *)fChildren[i])->Explore();
+		((Hub *)fChildren[i])->Explore(changeList);
 	}
 }
 
@@ -357,28 +319,26 @@ Hub::GetDescriptor(uint8 descriptorType, uint8 index, uint16 languageID,
 status_t
 Hub::ReportDevice(usb_support_descriptor *supportDescriptors,
 	uint32 supportDescriptorCount, const usb_notify_hooks *hooks,
-	usb_driver_cookie **cookies, bool added)
+	usb_driver_cookie **cookies, bool added, bool recursive)
 {
 	TRACE(("USB Hub %d: reporting hub\n", DeviceAddress()));
 
 	// Report ourselfs first
 	status_t result = Device::ReportDevice(supportDescriptors,
-		supportDescriptorCount, hooks, cookies, added);
+		supportDescriptorCount, hooks, cookies, added, recursive);
 
-	// Then report all of our children
-	if (!Lock())
-		return B_ERROR;
+	if (!recursive)
+		return result;
 
 	for (int32 i = 0; i < fHubDescriptor.num_ports; i++) {
 		if (!fChildren[i])
 			continue;
 
 		if (fChildren[i]->ReportDevice(supportDescriptors,
-				supportDescriptorCount, hooks, cookies, added) == B_OK)
+				supportDescriptorCount, hooks, cookies, added, true) == B_OK)
 			result = B_OK;
 	}
 
-	Unlock();
 	return result;
 }
 

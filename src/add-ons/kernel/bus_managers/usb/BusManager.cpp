@@ -269,7 +269,7 @@ BusManager::SubmitTransfer(Transfer *transfer)
 
 
 status_t
-BusManager::CancelQueuedTransfers(Pipe *pipe)
+BusManager::CancelQueuedTransfers(Pipe *pipe, bool force)
 {
 	// virtual function to be overridden
 	return B_ERROR;

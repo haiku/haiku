@@ -603,7 +603,7 @@ UHCI::SubmitTransfer(Transfer *transfer)
 
 
 status_t
-UHCI::CancelQueuedTransfers(Pipe *pipe)
+UHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 {
 	if (pipe->Type() & USB_OBJECT_ISO_PIPE)
 		return CancelQueuedIsochronousTransfers(pipe);
@@ -621,7 +621,13 @@ UHCI::CancelQueuedTransfers(Pipe *pipe)
 				descriptor = (uhci_td *)descriptor->link_log;
 			}
 
-			current->transfer->Finished(B_CANCELED, 0);
+			if (!force) {
+				// if the transfer is canceled by force, the one causing the
+				// cancel is probably not the one who initiated the transfer
+				// and the callback is likely not safe anymore
+				current->transfer->Finished(B_CANCELED, 0);
+			}
+
 			current->canceled = true;
 		}
 		current = current->link;

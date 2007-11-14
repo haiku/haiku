@@ -60,6 +60,13 @@ struct usb_driver_info {
 };
 
 
+struct change_item {
+	bool							added;
+	Device 							*device;
+	change_item						*link;
+};
+
+
 struct rescan_item {
 	const char						*name;
 	rescan_item						*link;
@@ -141,7 +148,8 @@ static	int32							ExploreThread(void *data);
 		bool							fFirstExploreDone;
 		bool							fStopThreads;
 
-		benaphore						fLock;
+		benaphore						fStackLock;
+		benaphore						fExploreLock;
 		PhysicalMemoryAllocator			*fAllocator;
 
 		uint32							fObjectIndex;
@@ -178,7 +186,8 @@ virtual	status_t						Start();
 virtual	status_t						Stop();
 
 virtual	status_t						SubmitTransfer(Transfer *transfer);
-virtual	status_t						CancelQueuedTransfers(Pipe *pipe);
+virtual	status_t						CancelQueuedTransfers(Pipe *pipe,
+											bool force);
 
 virtual	status_t						NotifyPipeChange(Pipe *pipe,
 											usb_change change);
@@ -260,7 +269,7 @@ virtual	bool							DataToggle() { return fDataToggle; };
 virtual	void							SetDataToggle(bool toggle) { fDataToggle = toggle; };
 
 		status_t						SubmitTransfer(Transfer *transfer);
-		status_t						CancelQueuedTransfers();
+		status_t						CancelQueuedTransfers(bool force);
 
 		// Convenience functions for standard requests
 virtual	status_t						SetFeature(uint16 selector);
@@ -414,6 +423,9 @@ virtual									~Device();
 
 		status_t						InitCheck();
 
+virtual	status_t						Changed(change_item **changeList,
+											bool added);
+
 virtual	uint32							Type() { return USB_OBJECT_DEVICE; };
 
 		ControlPipe						*DefaultPipe() { return fDefaultPipe; };
@@ -437,7 +449,7 @@ virtual	status_t						ReportDevice(
 											uint32 supportDescriptorCount,
 											const usb_notify_hooks *hooks,
 											usb_driver_cookie **cookies,
-											bool added);
+											bool added, bool recursive);
 virtual	status_t						BuildDeviceName(char *string,
 											uint32 *index, size_t bufferSize,
 											Device *device);
@@ -452,6 +464,7 @@ protected:
 		bool							fInitOK;
 
 private:
+		bool							fAvailable;
 		usb_configuration_info			*fConfigurations;
 		usb_configuration_info			*fCurrentConfiguration;
 		usb_speed						fSpeed;
@@ -468,8 +481,8 @@ public:
 											usb_speed speed);
 virtual									~Hub();
 
-		bool							Lock();
-		void							Unlock();
+virtual	status_t						Changed(change_item **changeList,
+											bool added);
 
 virtual	uint32							Type() { return USB_OBJECT_DEVICE | USB_OBJECT_HUB; };
 
@@ -480,7 +493,7 @@ virtual	status_t						GetDescriptor(uint8 descriptorType,
 
 		status_t						UpdatePortStatus(uint8 index);
 		status_t						ResetPort(uint8 index);
-		void							Explore();
+		void							Explore(change_item **changeList);
 static	void							InterruptCallback(void *cookie,
 											status_t status, void *data,
 											size_t actualLength);
@@ -490,14 +503,12 @@ virtual	status_t						ReportDevice(
 											uint32 supportDescriptorCount,
 											const usb_notify_hooks *hooks,
 											usb_driver_cookie **cookies,
-											bool added);
+											bool added, bool recursive);
 virtual	status_t						BuildDeviceName(char *string,
 											uint32 *index, size_t bufferSize,
 											Device *device);
 
 private:
-		benaphore						fLock;
-
 		InterruptPipe					*fInterruptPipe;
 		usb_hub_descriptor				fHubDescriptor;
 

@@ -864,7 +864,7 @@ EHCI::AddPendingTransfer(Transfer *transfer, ehci_qh *queueHead,
 
 
 status_t
-EHCI::CancelQueuedTransfers(Pipe *pipe)
+EHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 {
 	if (!Lock())
 		return B_ERROR;
@@ -879,7 +879,13 @@ EHCI::CancelQueuedTransfers(Pipe *pipe)
 				descriptor = (ehci_qtd *)descriptor->next_log;
 			}
 
-			current->transfer->Finished(B_CANCELED, 0);
+			if (!force) {
+				// if the transfer is canceled by force, the one causing the
+				// cancel is probably not the one who initiated the transfer
+				// and the callback is likely not safe anymore
+				current->transfer->Finished(B_CANCELED, 0);
+			}
+
 			current->canceled = true;
 		}
 

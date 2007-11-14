@@ -91,7 +91,7 @@ public:
 
 		status_t					Start();
 virtual	status_t					SubmitTransfer(Transfer *transfer);
-virtual status_t					CancelQueuedTransfers(Pipe *pipe);
+virtual status_t					CancelQueuedTransfers(Pipe *pipe, bool force);
 		status_t					CancelQueuedIsochronousTransfers(Pipe *pipe);
 		status_t					SubmitRequest(Transfer *transfer);
 		status_t					SubmitIsochronous(Transfer *transfer);

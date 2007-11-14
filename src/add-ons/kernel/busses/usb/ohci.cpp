@@ -791,7 +791,7 @@ OHCI::_ReadReg(uint32 reg)
 
 
 status_t
-OHCI::CancelQueuedTransfers(Pipe *pipe)
+OHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 {
 	return B_ERROR;
 }

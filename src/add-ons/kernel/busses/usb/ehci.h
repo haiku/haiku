@@ -37,7 +37,7 @@ public:
 virtual	status_t					SubmitTransfer(Transfer *transfer);
 		status_t					SubmitPeriodicTransfer(Transfer *transfer);
 		status_t					SubmitAsyncTransfer(Transfer *transfer);
-virtual	status_t					CancelQueuedTransfers(Pipe *pipe);
+virtual	status_t					CancelQueuedTransfers(Pipe *pipe, bool force);
 
 virtual	status_t					NotifyPipeChange(Pipe *pipe,
 										usb_change change);

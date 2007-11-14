@@ -28,8 +28,13 @@ Stack::Stack()
 {
 	TRACE(("USB Stack: stack init\n"));
 
-	if (benaphore_init(&fLock, "usb stack lock") < B_OK) {
-		TRACE_ERROR(("USB Stack: failed to create benaphore lock\n"));
+	if (benaphore_init(&fStackLock, "usb stack lock") < B_OK) {
+		TRACE_ERROR(("USB Stack: failed to create stack lock\n"));
+		return;
+	}
+
+	if (benaphore_init(&fExploreLock, "usb explore lock") < B_OK) {
+		TRACE_ERROR(("USB Stack: failed to create explore lock\n"));
 		return;
 	}
 
@@ -85,8 +90,10 @@ Stack::~Stack()
 	fStopThreads = true;
 	wait_for_thread(fExploreThread, &result);
 
-	Lock();
-	benaphore_destroy(&fLock);
+	benaphore_lock(&fStackLock);
+	benaphore_destroy(&fStackLock);
+	benaphore_lock(&fExploreLock);
+	benaphore_destroy(&fExploreLock);
 
 	//Release the bus modules
 	for (Vector<BusManager *>::Iterator i = fBusManagers.Begin();
@@ -111,14 +118,14 @@ Stack::InitCheck()
 bool
 Stack::Lock()
 {
-	return (benaphore_lock(&fLock) == B_OK);
+	return (benaphore_lock(&fStackLock) == B_OK);
 }
 
 
 void
 Stack::Unlock()
 {
-	benaphore_unlock(&fLock);
+	benaphore_unlock(&fStackLock);
 }
 
 
@@ -189,13 +196,33 @@ Stack::ExploreThread(void *data)
 	Stack *stack = (Stack *)data;
 
 	while (!stack->fStopThreads) {
+		if (benaphore_lock(&stack->fExploreLock) != B_OK)
+			break;
+
+		rescan_item *rescanList = NULL;
+		change_item *changeItem = NULL;
 		for (int32 i = 0; i < stack->fBusManagers.Count(); i++) {
 			Hub *rootHub = stack->fBusManagers.ElementAt(i)->GetRootHub();
 			if (rootHub)
-				rootHub->Explore();
+				rootHub->Explore(&changeItem);
+		}
+
+		while (changeItem) {
+			stack->NotifyDeviceChange(changeItem->device, &rescanList, changeItem->added);
+			if (!changeItem->added) {
+				// everyone possibly holding a reference is now notified so we
+				// can delete the device
+				changeItem->device->GetBusManager()->FreeDevice(changeItem->device);
+			}
+
+			change_item *next = changeItem->link;
+			delete changeItem;
+			changeItem = next;
 		}
 
 		stack->fFirstExploreDone = true;
+		benaphore_unlock(&stack->fExploreLock);
+		stack->RescanDrivers(rescanList);
 		snooze(USB_DELAY_HUB_EXPLORE);
 	}
 
@@ -277,19 +304,33 @@ Stack::NotifyDeviceChange(Device *device, rescan_item **rescanList, bool added)
 	while (element) {
 		status_t result = device->ReportDevice(element->support_descriptors,
 			element->support_descriptor_count, &element->notify_hooks,
-			&element->cookies, added);
+			&element->cookies, added, false);
 
 		if (result >= B_OK) {
-			rescan_item *item = new(std::nothrow) rescan_item;
-			if (!item)
-				return;
-
-			item->name = element->driver_name;
+			const char *driverName = element->driver_name;
 			if (element->republish_driver_name)
-				item->name = element->republish_driver_name;
+				driverName = element->republish_driver_name;
 
-			item->link = *rescanList;
-			*rescanList = item;
+			bool already = false;
+			rescan_item *rescanItem = *rescanList;
+			while (rescanItem) {
+				if (strcmp(rescanItem->name, driverName) == 0) {
+					// this driver is going to be rescanned already
+					already = true;
+					break;
+				}
+				rescanItem = rescanItem->link;
+			}
+
+			if (!already) {
+				rescanItem = new(std::nothrow) rescan_item;
+				if (!rescanItem)
+					return;
+
+				rescanItem->name = driverName;
+				rescanItem->link = *rescanList;
+				*rescanList = rescanItem;
+			}
 		}
 
 		element = element->link;
@@ -403,6 +444,9 @@ Stack::InstallNotify(const char *driverName, const usb_notify_hooks *hooks)
 	usb_driver_info *element = fDriverList;
 	while (element) {
 		if (strcmp(element->driver_name, driverName) == 0) {
+			if (benaphore_lock(&fExploreLock) != B_OK)
+				return B_ERROR;
+
 			// inform driver about any already present devices
 			for (int32 i = 0; i < fBusManagers.Count(); i++) {
 				Hub *rootHub = fBusManagers.ElementAt(i)->GetRootHub();
@@ -410,12 +454,13 @@ Stack::InstallNotify(const char *driverName, const usb_notify_hooks *hooks)
 					// Report device will recurse down the whole tree
 					rootHub->ReportDevice(element->support_descriptors,
 						element->support_descriptor_count, hooks,
-						&element->cookies, true);
+						&element->cookies, true, true);
 				}
 			}
 
 			element->notify_hooks.device_added = hooks->device_added;
 			element->notify_hooks.device_removed = hooks->device_removed;
+			benaphore_unlock(&fExploreLock);
 			return B_OK;
 		}
 
@@ -434,17 +479,21 @@ Stack::UninstallNotify(const char *driverName)
 	usb_driver_info *element = fDriverList;
 	while (element) {
 		if (strcmp(element->driver_name, driverName) == 0) {
+			if (benaphore_lock(&fExploreLock) != B_OK)
+				return B_ERROR;
+
 			// trigger the device removed hook
 			for (int32 i = 0; i < fBusManagers.Count(); i++) {
 				Hub *rootHub = fBusManagers.ElementAt(i)->GetRootHub();
 				if (rootHub)
 					rootHub->ReportDevice(element->support_descriptors,
 						element->support_descriptor_count,
-						&element->notify_hooks, &element->cookies, false);
+						&element->notify_hooks, &element->cookies, false, true);
 			}
 
 			element->notify_hooks.device_added = NULL;
 			element->notify_hooks.device_removed = NULL;
+			benaphore_unlock(&fExploreLock);
 			return B_OK;
 		}
 
