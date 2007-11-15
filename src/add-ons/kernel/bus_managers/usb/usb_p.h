@@ -271,6 +271,9 @@ virtual	void							SetDataToggle(bool toggle) { fDataToggle = toggle; };
 		status_t						SubmitTransfer(Transfer *transfer);
 		status_t						CancelQueuedTransfers(bool force);
 
+		void							SetControllerCookie(void *cookie) { fControllerCookie = cookie; };
+		void							*ControllerCookie() { return fControllerCookie; };
+
 		// Convenience functions for standard requests
 virtual	status_t						SetFeature(uint16 selector);
 virtual	status_t						ClearFeature(uint16 selector);
@@ -283,6 +286,7 @@ private:
 		usb_speed						fSpeed;
 		size_t							fMaxPacketSize;
 		bool							fDataToggle;
+		void							*fControllerCookie;
 };
 
 
