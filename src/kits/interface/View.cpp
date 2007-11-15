@@ -1626,6 +1626,7 @@ BView::SetMouseEventMask(uint32 mask, uint32 options)
 		fOwner->fLink->StartMessage(AS_LAYER_SET_MOUSE_EVENT_MASK);
 		fOwner->fLink->Attach<uint32>(mask);
 		fOwner->fLink->Attach<uint32>(options);
+		fOwner->fLink->Flush();
 		return B_OK;
 	}
 
