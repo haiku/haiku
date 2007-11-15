@@ -74,3 +74,21 @@ FUNC(name) \
 	trap	#0		;  \
 	rts
 
+#define SYSCALL11(name, n) \
+FUNC(name) \
+	move.l	IMM n,%d0		;  \
+	trap	#0		;  \
+	rts
+
+#define SYSCALL12(name, n) \
+FUNC(name) \
+	move.l	IMM n,%d0		;  \
+	trap	#0		;  \
+	rts
+
+#define SYSCALL13(name, n) \
+FUNC(name) \
+	move.l	IMM n,%d0		;  \
+	trap	#0		;  \
+	rts
+
