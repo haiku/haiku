@@ -66,7 +66,6 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		fPCIInfo(info),
 		fStack(stack),
 		fRegisterArea(-1),
-		fSpinLock(0),
 		fHccaArea(-1),
 		fDummyControl(NULL),
 		fDummyBulk(NULL),
@@ -264,10 +263,9 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	}
 
 	// The controller is now in SUSPEND state, we have 2ms to go OPERATIONAL.
-	// In order to do so we need a spinlock
+	// In order to do so we need to disable interrupts.
 
 	cpu_status former = disable_interrupts();
-	acquire_spinlock(&fSpinLock);
 
 	// Set up host controller register
 	_WriteReg(OHCI_HCCA, (uint32)hccaPhysicalAddress);
@@ -286,7 +284,6 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	// And finally start the controller
 	_WriteReg(OHCI_CONTROL, control);
 
-	release_spinlock(&fSpinLock);
 	restore_interrupts(former);
 
 	// The controller is now OPERATIONAL.
@@ -429,6 +426,33 @@ OHCI::SubmitTransfer(Transfer *transfer)
 	if (transfer->TransferPipe()->DeviceAddress() == fRootHubAddress)
 		return fRootHub->ProcessTransfer(this, transfer);
 
+	uint32 type = transfer->TransferPipe()->Type();
+	if ((type & USB_OBJECT_CONTROL_PIPE) || (type & USB_OBJECT_BULK_PIPE)) {
+		TRACE(("usb_ohci: submitting async transfer\n"));
+		return _SubmitAsyncTransfer(transfer);
+	}
+
+	if ((type & USB_OBJECT_INTERRUPT_PIPE) || (type & USB_OBJECT_ISO_PIPE)) {
+		TRACE(("usb_ohci: submitting periodic transfer\n"));
+		return _SubmitPeriodicTransfer(transfer);
+	}
+
+	TRACE_ERROR(("usb_ohci: tried to submit transfer for unknow pipe"
+		" type %lu\n", type));
+	return B_ERROR;
+}
+
+
+status_t
+OHCI::_SubmitAsyncTransfer(Transfer *transfer)
+{
+	return B_ERROR;
+}
+
+
+status_t
+OHCI::_SubmitPeriodicTransfer(Transfer *transfer)
+{
 	return B_ERROR;
 }
 

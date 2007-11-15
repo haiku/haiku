@@ -59,7 +59,6 @@ public:
 virtual	status_t 					SubmitTransfer(Transfer *transfer);
 virtual status_t					CancelQueuedTransfers(Pipe *pipe,
 										bool force);
-		status_t					SubmitRequest(Transfer *transfer);
 
 virtual	status_t					NotifyPipeChange(Pipe *pipe,
 										usb_change change);
@@ -68,7 +67,8 @@ static	status_t					AddTo(Stack *stack);
 
 		// Port operations
 		uint8 						PortCount() { return fPortCount; };
-		status_t 					GetPortStatus(uint8 index, usb_port_status *status);
+		status_t 					GetPortStatus(uint8 index,
+										usb_port_status *status);
 		status_t					SetPortFeature(uint8 index, uint16 feature);
 		status_t					ClearPortFeature(uint8 index, uint16 feature);
 
@@ -82,9 +82,13 @@ static	int32						_InterruptHandler(void *data);
 
 static	int32						_FinishThread(void *data);
 		void						_FinishTransfer();
+
+		status_t					_SubmitAsyncTransfer(Transfer *transfer);
+		status_t					_SubmitPeriodicTransfer(Transfer *transfer);
 		
 		// Endpoint related methods
-		status_t					_CreateEndpoint(Pipe *pipe, bool isIsochronous);
+		status_t					_CreateEndpoint(Pipe *pipe,
+										bool isIsochronous);
 		ohci_endpoint_descriptor	*_AllocateEndpoint();
 		void						_FreeEndpoint(
 										ohci_endpoint_descriptor *endpoint);
@@ -108,8 +112,6 @@ static	pci_module_info				*sPCIModule;
 
 		uint32						*fOperationalRegisters;
 		area_id						fRegisterArea;
-
-		spinlock					fSpinLock;
 
 		// Host Controller Communication Area related stuff
 		area_id						fHccaArea;
