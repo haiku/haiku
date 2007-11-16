@@ -249,8 +249,10 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	// We now own the host controller and the bus has been reset
 	uint32 frameInterval = _ReadReg(OHCI_FRAME_INTERVAL);
 	uint32 intervalValue = OHCI_GET_INTERVAL_VALUE(frameInterval);
-	_WriteReg(OHCI_COMMAND_STATUS, OHCI_HOST_CONTROLLER_RESET);
 
+	// Disable interrupts right before we reset
+	cpu_status former = disable_interrupts();
+	_WriteReg(OHCI_COMMAND_STATUS, OHCI_HOST_CONTROLLER_RESET);
 	for (uint32 i = 0; i < 10; i++) {
 		snooze(10);
 		if (!(_ReadReg(OHCI_COMMAND_STATUS) & OHCI_HOST_CONTROLLER_RESET))
@@ -259,13 +261,12 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 
 	if (_ReadReg(OHCI_COMMAND_STATUS) & OHCI_HOST_CONTROLLER_RESET) {
 		TRACE_ERROR(("usb_ohci: Error resetting the host controller (timeout)\n"));
+		restore_interrupts(former);
 		return;
 	}
 
 	// The controller is now in SUSPEND state, we have 2ms to go OPERATIONAL.
-	// In order to do so we need to disable interrupts.
-
-	cpu_status former = disable_interrupts();
+	// Interrupts are disabled.
 
 	// Set up host controller register
 	_WriteReg(OHCI_HCCA, (uint32)hccaPhysicalAddress);
@@ -437,7 +438,7 @@ OHCI::SubmitTransfer(Transfer *transfer)
 		return _SubmitPeriodicTransfer(transfer);
 	}
 
-	TRACE_ERROR(("usb_ohci: tried to submit transfer for unknow pipe"
+	TRACE_ERROR(("usb_ohci: tried to submit transfer for unknown pipe"
 		" type %lu\n", type));
 	return B_ERROR;
 }
@@ -460,21 +461,26 @@ OHCI::_SubmitPeriodicTransfer(Transfer *transfer)
 status_t
 OHCI::NotifyPipeChange(Pipe *pipe, usb_change change)
 {
-	TRACE(("usb_ohci::%s(%p, %d)\n", __FUNCTION__, pipe, (int)change));
-	if (InitCheck())
-		return B_ERROR;
-
+	TRACE(("usb_ohci: pipe change %d for pipe 0x%08lx\n", change, (uint32)pipe));
 	switch (change) {
-	case USB_CHANGE_CREATED:
-		return _InsertEndpointForPipe(pipe);
-	case USB_CHANGE_DESTROYED:
-		// Do something
-		return B_ERROR;
-	case USB_CHANGE_PIPE_POLICY_CHANGED:
-	default:
-		break;
+		case USB_CHANGE_CREATED: {
+			TRACE(("usb_ohci: inserting endpoint\n"));
+			return _InsertEndpointForPipe(pipe);
+		}
+		case USB_CHANGE_DESTROYED: {
+			TRACE(("usb_ohci: removing endpoint\n"));
+			return _RemoveEndpointForPipe(pipe);
+		}
+		case USB_CHANGE_PIPE_POLICY_CHANGED: {
+			TRACE(("usb_ohci: pipe policy changing unhandled!\n"));
+			break;
+		}
+		default: {
+			TRACE_ERROR(("usb_ohci: unknown pipe change!\n"));
+			return B_ERROR;
+		}
 	}
-	return B_ERROR; //We should never go here
+	return B_OK;
 }
 
 
@@ -706,7 +712,7 @@ OHCI::_FreeGeneralDescriptor(ohci_general_descriptor *descriptor)
 
 
 status_t
-OHCI::_InsertEndpointForPipe(Pipe *p)
+OHCI::_InsertEndpointForPipe(Pipe *pipe)
 {
 #if 0
 	TRACE(("OHCI: Inserting Endpoint for device %u function %u\n", p->DeviceAddress(), p->EndpointAddress()));
@@ -797,6 +803,13 @@ OHCI::_InsertEndpointForPipe(Pipe *p)
 	}
 #endif
 	return B_OK;
+}
+
+
+status_t
+OHCI::_RemoveEndpointForPipe(Pipe *pipe)
+{
+	return B_ERROR;
 }
 
 

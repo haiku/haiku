@@ -85,14 +85,15 @@ static	int32						_FinishThread(void *data);
 
 		status_t					_SubmitAsyncTransfer(Transfer *transfer);
 		status_t					_SubmitPeriodicTransfer(Transfer *transfer);
-		
+
 		// Endpoint related methods
+		status_t					_InsertEndpointForPipe(Pipe *pipe);
+		status_t					_RemoveEndpointForPipe(Pipe *pipe);
 		status_t					_CreateEndpoint(Pipe *pipe,
 										bool isIsochronous);
 		ohci_endpoint_descriptor	*_AllocateEndpoint();
 		void						_FreeEndpoint(
 										ohci_endpoint_descriptor *endpoint);
-		status_t					_InsertEndpointForPipe(Pipe *pipe);
 
 		// Transfer descriptor related methods
 		ohci_general_descriptor		*_CreateGeneralDescriptor();
