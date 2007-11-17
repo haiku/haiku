@@ -383,7 +383,7 @@ Device::SetConfigurationAt(uint8 index)
 					pipe = new(std::nothrow) InterruptPipe(this, fDeviceAddress,
 						endpoint->descr->endpoint_address & 0x0f,
 						(endpoint->descr->endpoint_address & 0x80) > 0 ? Pipe::In : Pipe::Out,
-						fSpeed, endpoint->descr->max_packet_size);
+						fSpeed, endpoint->descr->max_packet_size, endpoint->descr->interval);
 					break;
 			}
 

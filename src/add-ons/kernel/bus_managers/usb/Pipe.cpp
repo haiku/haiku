@@ -102,9 +102,10 @@ Pipe::GetStatus(uint16 *status)
 
 InterruptPipe::InterruptPipe(Object *parent, int8 deviceAddress,
 	uint8 endpointAddress, pipeDirection direction, usb_speed speed,
-	size_t maxPacketSize)
+	size_t maxPacketSize, uint8 interval)
 	:	Pipe(parent, deviceAddress, endpointAddress, direction, speed,
-			maxPacketSize)
+			maxPacketSize),
+		fInterval(interval)
 {
 }
 

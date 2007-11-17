@@ -333,7 +333,8 @@ public:
 											uint8 endpointAddress,
 											pipeDirection direction,
 											usb_speed speed,
-											size_t maxPacketSize);
+											size_t maxPacketSize,
+											uint8 interval);
 
 virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_INTERRUPT_PIPE; };
 
@@ -341,6 +342,11 @@ virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_INTERRUPT_PIPE
 											size_t dataLength,
 											usb_callback_func callback,
 											void *callbackCookie);
+
+		uint8							Interval() { return fInterval; };
+
+private:
+		uint8							fInterval;
 };
 
 
