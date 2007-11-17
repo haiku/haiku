@@ -133,7 +133,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		return;
 	}
 
-	memset((void*)fHcca, 0, sizeof(ohci_hcca));
+	memset((void *)fHcca, 0, sizeof(ohci_hcca));
 
 	// Set Up Host controller
 	// Dummy endpoints
@@ -172,7 +172,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		fInterruptEndpoints[i] = _AllocateEndpoint();
 		if (!fInterruptEndpoints[i]) {
 			TRACE_ERROR(("ohci_usb: cannot allocate memory for"
-				" fInterruptEndpoints[%d] endpoint\n", i));
+				" fInterruptEndpoints[%ld] endpoint\n", i));
 			while (--i >= 0)
 				_FreeEndpoint(fInterruptEndpoints[i]);
 			_FreeEndpoint(fDummyBulk);
@@ -640,6 +640,7 @@ OHCI::_AllocateEndpoint()
 		TRACE_ERROR(("usb_ohci: failed to allocate endpoint descriptor\n"));
 		return NULL;
 	}
+	memset((void *)endpoint, 0, sizeof(ohci_endpoint_descriptor));
 
 	endpoint->physical_address = (addr_t)physicalAddress;
 
@@ -698,86 +699,97 @@ OHCI::_FreeGeneralDescriptor(ohci_general_descriptor *descriptor)
 status_t
 OHCI::_InsertEndpointForPipe(Pipe *pipe)
 {
-#if 0
-	TRACE(("OHCI: Inserting Endpoint for device %u function %u\n", p->DeviceAddress(), p->EndpointAddress()));
+	TRACE(("OHCI: Inserting Endpoint for device %u function %u\n",
+		pipe->DeviceAddress(), pipe->EndpointAddress()));
+
 	ohci_endpoint_descriptor *endpoint = _AllocateEndpoint();
 	if (!endpoint) {
 		TRACE_ERROR(("usb_ohci: cannot allocate memory for endpoint\n"));
 		return B_NO_MEMORY;
 	}
-	endpoint->flags |= OHCI_ENDPOINT_SKIP;
 
-	// Set up properties of the endpoint
-	endpoints->flags |= OHCI_ENDPOINT_SET_DEVICE_ADDRESS(pipe->DeviceAddress())
+	uint32 flags = 0;
+	flags |= OHCI_ENDPOINT_SKIP;
+
+	// Set up flag field for the endpoint
+	flags |= OHCI_ENDPOINT_SET_DEVICE_ADDRESS(pipe->DeviceAddress())
 		| OHCI_ENDPOINT_SET_ENDPOINT_NUMBER(pipe->EndpointAddress());
-		
-		//Set the direction
-		switch (pipe->Direction()) {
+
+	// Set the direction
+	switch (pipe->Direction()) {
 		case Pipe::In:
-			properties |= OHCI_ENDPOINT_DIRECTION_IN;
+			flags |= OHCI_ENDPOINT_DIRECTION_IN;
 			break;
 		case Pipe::Out:
-			properties |= OHCI_ENDPOINT_DIRECTION_OUT;
+			flags |= OHCI_ENDPOINT_DIRECTION_OUT;
 			break;
 		case Pipe::Default:
-			properties |= OHCI_ENDPOINT_DIRECTION_DESCRIPTOR;
+			flags |= OHCI_ENDPOINT_DIRECTION_DESCRIPTOR;
 			break;
 		default:
-			//TODO: error
-			break;
-		}
-		
-		//Set the speed
-		switch (p->Speed()) {
+			TRACE_ERROR(("usb_ohci: direction unknown. Wrong value!\n"));
+			_FreeEndpoint(endpoint);
+			return B_ERROR;
+	}
+
+	// Set up the speed
+	switch (pipe->Speed()) {
 		case USB_SPEED_LOWSPEED:
-			//the bit is 0
+			flags |= OHCI_ENDPOINT_LOW_SPEED;
 			break;
 		case USB_SPEED_FULLSPEED:
-			properties |= OHCI_ENDPOINT_SPEED;
+			flags |= OHCI_ENDPOINT_FULL_SPEED;
 			break;
 		case USB_SPEED_HIGHSPEED:
 		default:
-			//TODO: error
-			break;
-		}
-		
-		//Assign the format. Isochronous endpoints require this switch
-		if (p->Type() & USB_OBJECT_ISO_PIPE)
-			properties |= OHCI_ENDPOINT_ISOCHRONOUS_FORMAT;
-		
-		//Set the maximum packet size
-		properties |= OHCI_ENDPOINT_SET_MAX_PACKET_SIZE(p->MaxPacketSize());
-		
-		endpoint->ed->flags = properties;
-	}
-	
-	//Check which list we need to add the endpoint in
-	Endpoint *listhead;
-	if (p->Type() & USB_OBJECT_CONTROL_PIPE)
-		listhead = fDummyControl;
-	else if (p->Type() & USB_OBJECT_BULK_PIPE)
-		listhead = fDummyBulk;
-	else if (p->Type() & USB_OBJECT_ISO_PIPE)
-		listhead = fDummyIsochronous;
-	else {
-		_FreeEndpoint(endpoint);
-		return B_ERROR;
+			TRACE_ERROR(("usb_ohci: unaccetable speed. Wrong value!\n"));
+			_FreeEndpoint(endpoint);
+			return B_ERROR;
 	}
 
-	//Add the endpoint to the queues
-	if ((p->Type() & USB_OBJECT_ISO_PIPE) == 0) {
-		//Link the endpoint into the head of the list
-		endpoint->SetNext(listhead->next);
-		listhead->SetNext(endpoint);
-	} else { 
-		//Link the endpoint into the tail of the list
-		Endpoint *tail = listhead;
-		while (tail->next != 0)
-			tail = tail->next;
-		tail->SetNext(endpoint);
+	// Set the maximum packet size
+	flags |= OHCI_ENDPOINT_SET_MAX_PACKET_SIZE(pipe->MaxPacketSize());
+
+	endpoint->flags = flags;
+
+	// Add the endpoint to the appropriate list
+	ohci_endpoint_descriptor *head = NULL;
+	switch (pipe->Type()) {
+		case USB_OBJECT_CONTROL_PIPE:
+			head = fDummyControl;
+			break;
+		case USB_OBJECT_BULK_PIPE:
+			head = fDummyBulk;
+			break;
+		case USB_OBJECT_ISO_PIPE:
+			// Set the isochronous bit format
+			endpoint->flags = OHCI_ENDPOINT_ISOCHRONOUS_FORMAT;
+			head = fDummyIsochronous;
+			break;
+		case USB_OBJECT_INTERRUPT_PIPE:
+			head = _FindInterruptEndpoint((static_cast<InterruptPipe*>(pipe))->Interval());
+			break;
+		default: 
+			TRACE_ERROR(("usb_ohci: unknown type of pipe. Wrong value!\n"));
+			_FreeEndpoint(endpoint);
+			return B_ERROR;
 	}
-#endif
+
+	Lock();
+	endpoint->next_logical_endpoint = head->next_logical_endpoint;
+	endpoint->next_physical_endpoint = head->next_physical_endpoint;
+	head->next_logical_endpoint = (void *)endpoint;
+	head->next_physical_endpoint = (uint32)endpoint->physical_address;
+	Unlock();
+
 	return B_OK;
+}
+
+
+ohci_endpoint_descriptor*
+OHCI::_FindInterruptEndpoint(uint8 interval)
+{
+	return NULL;
 }
 
 

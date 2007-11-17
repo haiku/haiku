@@ -91,6 +91,7 @@ static	int32						_FinishThread(void *data);
 		status_t					_RemoveEndpointForPipe(Pipe *pipe);
 		status_t					_CreateEndpoint(Pipe *pipe,
 										bool isIsochronous);
+		ohci_endpoint_descriptor	*_FindInterruptEndpoint(uint8 interval);
 		ohci_endpoint_descriptor	*_AllocateEndpoint();
 		void						_FreeEndpoint(
 										ohci_endpoint_descriptor *endpoint);
