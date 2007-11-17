@@ -85,6 +85,7 @@ private:
 	float			fHintHeight, fHintWidth, fHintBaseline;
 	uint32			fShowHintX, fShowHintY;
 	uint32			fLastHintValue;
+	bool			fLastHintValueSet;			
 	uint32			fLastField;
 	uint32			fKeyboardX, fKeyboardY;
 	uint32			fHintFlags;

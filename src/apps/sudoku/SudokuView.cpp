@@ -437,7 +437,7 @@ SudokuView::MouseDown(BPoint where)
 	if (clicks == 2 && fLastHintValue == value && fLastField == field
 		|| (buttons & (B_SECONDARY_MOUSE_BUTTON
 				| B_TERTIARY_MOUSE_BUTTON)) != 0) {
-		// double click
+		// double click or other buttons set a value
 		if ((fField->FlagsAt(x, y) & kInitialValue) == 0) {
 			if (fField->ValueAt(x, y) > 0) {
 				fField->SetValueAt(x, y, 0);
@@ -449,16 +449,22 @@ SudokuView::MouseDown(BPoint where)
 			}
 
 			_InvalidateField(x, y);
+
+			// allow dragging to remove the hint from other fields
+			fLastHintValueSet = false;
+			fLastHintValue = value;
 		}
 		return;
 	}
 
 	uint32 hintMask = fField->HintMaskAt(x, y);
 	uint32 valueMask = 1UL << value;
-	if (hintMask & valueMask)
-		hintMask &= ~valueMask;
-	else
+	fLastHintValueSet = (hintMask & valueMask) == 0;
+
+	if (fLastHintValueSet)
 		hintMask |= valueMask;
+	else
+		hintMask &= ~valueMask;
 
 	fField->SetHintMaskAt(x, y, hintMask);
 	_InvalidateHintField(x, y, hintX, hintY);
@@ -492,6 +498,25 @@ SudokuView::MouseMoved(BPoint where, uint32 transit,
 
 	if (fShowHintX == x && fShowHintY == y)
 		return;
+
+	int32 buttons = 0;
+	if (Looper() != NULL && Looper()->CurrentMessage() != NULL)
+		Looper()->CurrentMessage()->FindInt32("buttons", &buttons);
+
+	uint32 field = x + y * fField->Size();
+
+	if (buttons != 0 && field != fLastField) {
+		// if a button is pressed, we drag the last hint selection
+		// (either set or removal) to the field under the mouse
+		uint32 hintMask = fField->HintMaskAt(x, y);
+		uint32 valueMask = 1UL << fLastHintValue;
+		if (fLastHintValueSet)
+			hintMask |= valueMask;
+		else
+			hintMask &= ~valueMask;
+
+		fField->SetHintMaskAt(x, y, hintMask);
+	}
 
 	_RemoveHint();
 	fShowHintX = x;
