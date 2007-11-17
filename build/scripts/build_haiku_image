@@ -56,6 +56,15 @@ else
 fi
 
 
+# attribute-safe rm -rf
+# This makes sure there are no leftover attribute file before removing each file
+attrrmrf()
+{
+	test -e "$1" || return
+	find "$1" -print0 | xargs -0 stat -c %i | awk "{ print \"$outputDir/attributes/\" \$1 }" | xargs rm -rf
+	rm -rf "$1"
+}
+
 unzipFile()
 {
 	# unzipFile <archive> <directory>
@@ -66,13 +75,13 @@ unzipFile()
 
 	if [ $isImage ]; then
 		unzipDir=$tmpDir/unzip
-		rm -rf $unzipDir
+		attrrmrf $unzipDir
 		mkdir -p $unzipDir
 
 		$unzip -q -d $unzipDir $zipFile
 		$cp -r ${sPrefix}$unzipDir/. ${tPrefix}$targetUnzipDir
 
-		rm -rf $unzipDir
+		attrrmrf $unzipDir
 	else
 		$unzip -q -d ${tPrefix}$targetUnzipDir ${sPrefix}$zipFile
 	fi
@@ -158,7 +167,7 @@ if [ ! $updateOnly ]; then
 	done
 
 	# cleanup tmp dir
-	rm -rf $mimeTmpDir
+	attrrmrf $mimeTmpDir
 fi	# ! updateOnly
 
 
