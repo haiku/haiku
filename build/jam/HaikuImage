@@ -468,6 +468,14 @@ if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
 		: /boot/apps/WonderBrush/WonderBrush ;
 }
 
+# OpenSound drivers
+if [ IsOptionalHaikuImagePackageAdded OpenSound ] {
+	InstallOptionalHaikuImagePackage OpenSound
+		: http://revolf.free.fr/beos/oss-beos-v4.1test-bin.zip
+		: 
+	;
+	#UnzipArchiveToHaikuImage home : data/vv.mp3.zip : 0 ;
+}
 
 #pragma mark - Build The Image
 
