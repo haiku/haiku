@@ -15,10 +15,10 @@
 #include "ohci.h"
 
 pci_module_info *OHCI::sPCIModule = NULL;
- 
+
 
 static int32
-ohci_std_ops( int32 op , ... )
+ohci_std_ops(int32 op, ...)
 {
 	switch (op)	{
 		case B_MODULE_INIT:
@@ -157,7 +157,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	}
 	fDummyIsochronous->flags |= OHCI_ENDPOINT_SKIP;
 
-	// Create the interrupt tree
+	// Static endpoints that get linked in the HCCA
 	fInterruptEndpoints = new(std::nothrow)
 		ohci_endpoint_descriptor *[OHCI_NUMBER_OF_INTERRUPTS];
 	if (!fInterruptEndpoints) {
@@ -168,11 +168,11 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		_FreeEndpoint(fDummyIsochronous);
 		return;
 	}
-
-	// Static endpoints that get linked in the HCCA
 	for (uint32 i = 0; i < OHCI_NUMBER_OF_INTERRUPTS; i++) {
 		fInterruptEndpoints[i] = _AllocateEndpoint();
 		if (!fInterruptEndpoints[i]) {
+			TRACE_ERROR(("ohci_usb: cannot allocate memory for"
+				" fInterruptEndpoints[%d] endpoint\n", i));
 			while (--i >= 0)
 				_FreeEndpoint(fInterruptEndpoints[i]);
 			_FreeEndpoint(fDummyBulk);
@@ -180,41 +180,15 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 			_FreeEndpoint(fDummyIsochronous);
 			return;
 		}
+		// Make them point all to the dummy isochronous endpoint
 		fInterruptEndpoints[i]->flags |= OHCI_ENDPOINT_SKIP;
 		fInterruptEndpoints[i]->next_physical_endpoint
 			= fDummyIsochronous->physical_address;
 	}
 
-#if 0
-	ohci_endpoint_descriptor *current;
-	for( uint32 i = 0; i < OHCI_NUMBER_OF_ENDPOINTS; i++) {
-		current = _AllocateEndpoint();
-		if (!current) {
-			TRACE_ERROR(("usb_ohci: failed to create interrupts tree\n"));
-			while (--i >= 0)
-				_FreeEndpoint(fInterruptEndpoints[i]);
-			_FreeEndpoint(fDummyBulk);
-			_FreeEndpoint(fDummyControl);
-			_FreeEndpoint(fDummyIsochronous);
-			return;
-		}
-		fInterruptEndpoints[i] = current;
-		current->flags |= OHCI_ENDPOINT_SKIP;
-		if (i != 0)
-			previous = fInterruptEndpoints[(i - 1) / 2];
-		else
-			previous = fDummyIsochronous;
-		current->next_logical_endpoint = previous;
-		current->next_physical_endpoint = previous->physical_address;
-	}
-#endif
-
-	// Fill HCCA interrupt table. The bit reversal is to get
-	// the tree set up properly to spread the interrupts.
+	// Fill HCCA interrupt table.
 	for (uint32 i = 0; i < OHCI_NUMBER_OF_INTERRUPTS; i++)
-		fHcca->interrupt_table[revbits[i]] =
-			fInterruptEndpoints[OHCI_NUMBER_OF_ENDPOINTS - OHCI_NUMBER_OF_INTERRUPTS + i]->physical_address;
-
+		fHcca->interrupt_table[i] = fInterruptEndpoints[i]->physical_address;
 
 	// Determine in what context we are running (Kindly copied from FreeBSD)
 	uint32 control = _ReadReg(OHCI_CONTROL);
@@ -254,7 +228,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	cpu_status former = disable_interrupts();
 	_WriteReg(OHCI_COMMAND_STATUS, OHCI_HOST_CONTROLLER_RESET);
 	for (uint32 i = 0; i < 10; i++) {
-		snooze(10);
+		spin(10);
 		if (!(_ReadReg(OHCI_COMMAND_STATUS) & OHCI_HOST_CONTROLLER_RESET))
 			break;
 	}
@@ -330,8 +304,6 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	install_io_interrupt_handler(fPCIInfo->u.h0.interrupt_line,
 		_InterruptHandler, (void *)this, 0);
 
-	// TODO: Enable interrupts. Maybe disable first somewhere before :)
-
 	TRACE(("usb_ohci: OHCI Host Controller Driver constructed\n")); 
 	fInitOK = true;
 }
@@ -339,6 +311,11 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 
 OHCI::~OHCI()
 {
+	int32 result = 0;
+	fStopFinishThread = true;
+	delete_sem(fFinishTransfersSem);
+	wait_for_thread(fFinishThread, &result);
+
 	if (fHccaArea > 0)
 		delete_area(fHccaArea);
 	if (fRegisterArea > 0)
@@ -355,6 +332,7 @@ OHCI::~OHCI()
 		if (fInterruptEndpoints[i])
 			_FreeEndpoint(fInterruptEndpoints[i]);
 	delete [] fInterruptEndpoints;
+	put_module(B_PCI_MODULE_NAME);
 }
 
 
@@ -390,8 +368,12 @@ OHCI::_FinishThread(void *data)
 void
 OHCI::_FinishTransfer()
 {
-	// TODO: block on the semaphore
+	while (!fStopFinishThread) {
+		if (acquire_sem(fFinishTransfersSem) < B_OK)
+			continue;
+	}
 }
+
 
 status_t
 OHCI::Start()
@@ -495,14 +477,13 @@ OHCI::AddTo(Stack *stack)
 	if (!sPCIModule) {
 		status_t status = get_module(B_PCI_MODULE_NAME, (module_info **)&sPCIModule);
 		if (status < B_OK) {
-			TRACE_ERROR(("usb_ohci: AddTo(): getting pci module failed! 0x%08lx\n",
+			TRACE_ERROR(("usb_ohci: getting pci module failed! 0x%08lx\n",
 				status));
 			return status;
 		}
 	}
 
-	TRACE(("usb_ohci: AddTo(): setting up hardware\n"));
-
+	TRACE(("usb_ohci: searching devices\n"));
 	bool found = false;
 	pci_info *item = new(std::nothrow) pci_info;
 	if (!item) {
@@ -517,12 +498,12 @@ OHCI::AddTo(Stack *stack)
 			&& item->class_api == PCI_usb_ohci) {
 			if (item->u.h0.interrupt_line == 0
 				|| item->u.h0.interrupt_line == 0xFF) {
-				TRACE_ERROR(("usb_ohci: AddTo(): found with invalid IRQ -"
+				TRACE_ERROR(("usb_ohci: found device with invalid IRQ -"
 					" check IRQ assignement\n"));
 				continue;
 			}
 
-			TRACE(("usb_ohci: AddTo(): found at IRQ %u\n",
+			TRACE(("usb_ohci: found device at IRQ %u\n",
 				item->u.h0.interrupt_line));
 			OHCI *bus = new(std::nothrow) OHCI(item, stack);
 			if (!bus) {
@@ -533,8 +514,7 @@ OHCI::AddTo(Stack *stack)
 			}
 
 			if (bus->InitCheck() < B_OK) {
-				TRACE_ERROR(("usb_ohci: AddTo(): InitCheck() failed 0x%08lx\n",
-					bus->InitCheck()));
+				TRACE_ERROR(("usb_ohci: bus failed init check\n"));
 				delete bus;
 				continue;
 			}
@@ -551,6 +531,7 @@ OHCI::AddTo(Stack *stack)
 	if (!found) {
 		TRACE_ERROR(("usb_ohci: no devices found\n"));
 		delete item;
+		sPCIModule = NULL;
 		put_module(B_PCI_MODULE_NAME);
 		return ENODEV;
 	}
@@ -675,6 +656,9 @@ OHCI::_AllocateEndpoint()
 void
 OHCI::_FreeEndpoint(ohci_endpoint_descriptor *endpoint)
 {
+	if (!endpoint)
+		return;
+
 	fStack->FreeChunk((void *)endpoint, (void *)endpoint->physical_address,
 		sizeof(ohci_endpoint_descriptor));
 }
@@ -716,28 +700,19 @@ OHCI::_InsertEndpointForPipe(Pipe *pipe)
 {
 #if 0
 	TRACE(("OHCI: Inserting Endpoint for device %u function %u\n", p->DeviceAddress(), p->EndpointAddress()));
-
-	if (InitCheck())
-		return B_ERROR;
-	
-	//Endpoint *endpoint = _AllocateEndpoint();
 	ohci_endpoint_descriptor *endpoint = _AllocateEndpoint();
-	if (!endpoint)
+	if (!endpoint) {
+		TRACE_ERROR(("usb_ohci: cannot allocate memory for endpoint\n"));
 		return B_NO_MEMORY;
-	
-	//Set up properties of the endpoint
-	//TODO: does this need its own utility function?
-	{
-		uint32 properties = 0;
-		
-		//Set the device address
-		properties |= OHCI_ENDPOINT_SET_DEVICE_ADDRESS(p->DeviceAddress());
-		
-		//Set the endpoint number
-		properties |= OHCI_ENDPOINT_SET_ENDPOINT_NUMBER(p->EndpointAddress());
+	}
+	endpoint->flags |= OHCI_ENDPOINT_SKIP;
+
+	// Set up properties of the endpoint
+	endpoints->flags |= OHCI_ENDPOINT_SET_DEVICE_ADDRESS(pipe->DeviceAddress())
+		| OHCI_ENDPOINT_SET_ENDPOINT_NUMBER(pipe->EndpointAddress());
 		
 		//Set the direction
-		switch (p->Direction()) {
+		switch (pipe->Direction()) {
 		case Pipe::In:
 			properties |= OHCI_ENDPOINT_DIRECTION_IN;
 			break;
