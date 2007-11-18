@@ -716,6 +716,8 @@ ide_adapter_probe_controller(device_node_handle parent, const char *controller_d
 	if (res != B_OK || controller_node == NULL)
 		goto err;
 
+	bus_master_base &= ~PCI_address_space;
+
 	// ignore errors during registration of channels - could be a simple rescan collision
 	ide_adapter_detect_channel(pci, device, controller_node, channel_module_name,
 		can_dma, command_block_base[0], control_block_base[0], bus_master_base,
