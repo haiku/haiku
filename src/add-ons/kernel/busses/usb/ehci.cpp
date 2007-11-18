@@ -410,34 +410,18 @@ EHCI::SubmitTransfer(Transfer *transfer)
 	if (transfer->TransferPipe()->DeviceAddress() == fRootHubAddress)
 		return fRootHub->ProcessTransfer(this, transfer);
 
-	uint32 type = transfer->TransferPipe()->Type();
-	if ((type & USB_OBJECT_CONTROL_PIPE) > 0
-		|| (type & USB_OBJECT_BULK_PIPE) > 0) {
-		TRACE(("usb_ehci: submitting async transfer\n"));
-		return SubmitAsyncTransfer(transfer);
+	Pipe *pipe = transfer->TransferPipe();
+	if (pipe->Type() & USB_OBJECT_ISO_PIPE) {
+		// ToDo: implement isochronous transfers...
+		return B_ERROR;
 	}
 
-	if ((type & USB_OBJECT_INTERRUPT_PIPE) > 0
-		|| (type & USB_OBJECT_ISO_PIPE) > 0) {
-		TRACE(("usb_ehci: submitting periodic transfer\n"));
-		return SubmitPeriodicTransfer(transfer);
-	}
-
-	TRACE_ERROR(("usb_ehci: tried to submit transfer for unknown pipe type %lu\n", type));
- 	return B_ERROR;
-}
-
-
-status_t
-EHCI::SubmitAsyncTransfer(Transfer *transfer)
-{
 	ehci_qh *queueHead = CreateQueueHead();
 	if (!queueHead) {
-		TRACE_ERROR(("usb_ehci: failed to allocate async queue head\n"));
+		TRACE_ERROR(("usb_ehci: failed to allocate queue head\n"));
 		return B_NO_MEMORY;
 	}
 
-	Pipe *pipe = transfer->TransferPipe();
 	status_t result = InitQueueHead(queueHead, pipe);
 	if (result < B_OK) {
 		TRACE_ERROR(("usb_ehci: failed to init queue head\n"));
@@ -447,12 +431,13 @@ EHCI::SubmitAsyncTransfer(Transfer *transfer)
 
 	bool directionIn;
 	ehci_qtd *dataDescriptor;
-	if (pipe->Type() & USB_OBJECT_CONTROL_PIPE)
+	if (pipe->Type() & USB_OBJECT_CONTROL_PIPE) {
 		result = FillQueueWithRequest(transfer, queueHead, &dataDescriptor,
 			&directionIn);
-	else
+	} else {
 		result = FillQueueWithData(transfer, queueHead, &dataDescriptor,
 			&directionIn);
+	}
 
 	if (result < B_OK) {
 		TRACE_ERROR(("usb_ehci: failed to fill transfer queue with data\n"));
@@ -472,64 +457,14 @@ EHCI::SubmitAsyncTransfer(Transfer *transfer)
 	print_queue(queueHead);
 #endif
 
-	result = LinkQueueHead(queueHead);
-	if (result < B_OK) {
-		TRACE_ERROR(("usb_ehci: failed to link queue head to the async list\n"));
-		FreeQueueHead(queueHead);
-		return result;
-	}
-
-	return B_OK;
-}
-
-
-status_t
-EHCI::SubmitPeriodicTransfer(Transfer *transfer)
-{
-	Pipe *pipe = transfer->TransferPipe();
-	if ((pipe->Type() & USB_OBJECT_INTERRUPT_PIPE) == 0)
-		return B_ERROR;
-
-	ehci_qh *queueHead = CreateQueueHead();
-	if (!queueHead) {
-		TRACE_ERROR(("usb_ehci: failed to allocate periodic queue head\n"));
-		return B_NO_MEMORY;
-	}
-
-	status_t result = InitQueueHead(queueHead, pipe);
-	if (result < B_OK) {
-		TRACE_ERROR(("usb_ehci: failed to init queue head\n"));
-		FreeQueueHead(queueHead);
-		return result;
-	}
-
-	bool directionIn;
-	ehci_qtd *dataDescriptor;
-	result = FillQueueWithData(transfer, queueHead, &dataDescriptor,
-		&directionIn);
+	if (pipe->Type() & USB_OBJECT_INTERRUPT_PIPE) {
+		uint8 interval = ((InterruptPipe *)pipe)->Interval();
+		result = LinkInterruptQueueHead(queueHead, interval);
+	} else
+		result = LinkQueueHead(queueHead);
 
 	if (result < B_OK) {
-		TRACE_ERROR(("usb_ehci: failed to fill transfer queue with data\n"));
-		FreeQueueHead(queueHead);
-		return result;
-	}
-
-	result = AddPendingTransfer(transfer, queueHead, dataDescriptor, directionIn);
-	if (result < B_OK) {
-		TRACE_ERROR(("usb_ehci: failed to add pending transfer\n"));
-		FreeQueueHead(queueHead);
-		return result;
-	}
-
-#ifdef TRACE_USB
-	TRACE(("usb_ehci: linking interrupt queue\n"));
-	print_queue(queueHead);
-#endif
-
-	result = LinkInterruptQueueHead(queueHead,
-		((InterruptPipe *)pipe)->Interval());
-	if (result < B_OK) {
-		TRACE_ERROR(("usb_ehci: failed to link queue head to the async list\n"));
+		TRACE_ERROR(("usb_ehci: failed to link queue head\n"));
 		FreeQueueHead(queueHead);
 		return result;
 	}
