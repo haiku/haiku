@@ -190,6 +190,12 @@ typedef struct {
 } ehci_qh;
 
 
+typedef struct {
+	ehci_qh		queue_head;
+	uint32		padding[2];
+} interrupt_entry;
+
+
 // Applies to ehci_qh.link_phy
 #define EHCI_QH_TYPE_ITD		(0 << 1)
 #define EHCI_QH_TYPE_QH			(1 << 1)

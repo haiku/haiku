@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku Inc. All rights reserved.
+ * Copyright 2006-2007, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -238,17 +238,68 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 
 	// allocate the periodic frame list
 	fPeriodicFrameListArea = fStack->AllocateArea((void **)&fPeriodicFrameList,
-		(void **)&physicalAddress, B_PAGE_SIZE, "USB EHCI Periodic Framelist");
+		(void **)&physicalAddress, B_PAGE_SIZE * 2, "USB EHCI Periodic Framelist");
 	if (fPeriodicFrameListArea < B_OK) {
 		TRACE_ERROR(("usb_ehci: unable to allocate periodic framelist\n"));
 		return;
 	}
 
-	// terminate all elements
-	for (int32 i = 0; i < 1024; i++)
-		fPeriodicFrameList[i] = EHCI_PFRAMELIST_TERM;
-
+	// set the periodic frame list base on the controller
 	WriteOpReg(EHCI_PERIODICLISTBASE, (uint32)physicalAddress);
+
+	// create the interrupt entries to support different polling intervals
+	TRACE(("usb_ehci: creating interrupt entries\n"));
+	addr_t physicalBase = physicalAddress + B_PAGE_SIZE;
+	uint8 *logicalBase = (uint8 *)fPeriodicFrameList + B_PAGE_SIZE;
+	memset(logicalBase, 0, B_PAGE_SIZE);
+
+	fInterruptEntries = (interrupt_entry *)logicalBase;
+	for (int32 i = 0; i < 10; i++) {
+		ehci_qh *queueHead = &fInterruptEntries[i].queue_head;
+		queueHead->this_phy = physicalBase;
+		queueHead->current_qtd_phy = EHCI_QTD_TERMINATE;
+		queueHead->overlay.next_phy = EHCI_QTD_TERMINATE;
+		queueHead->overlay.alt_next_phy = EHCI_QTD_TERMINATE;
+		queueHead->overlay.token = EHCI_QTD_STATUS_HALTED;
+
+		// set dummy endpoint information
+		queueHead->endpoint_chars = EHCI_QH_CHARS_EPS_HIGH
+			| (3 << EHCI_QH_CHARS_RL_SHIFT) | (64 << EHCI_QH_CHARS_MPL_SHIFT)
+			| EHCI_QH_CHARS_TOGGLE;
+		queueHead->endpoint_caps = (1 << EHCI_QH_CAPS_MULT_SHIFT)
+			| (0xff << EHCI_QH_CAPS_ISM_SHIFT);
+
+		physicalBase += sizeof(interrupt_entry);
+	}
+
+	// build flat interrupt tree
+	TRACE(("usb_ehci: build up interrupt links\n"));
+	uint32 interval = 1024;
+	uint32 intervalIndex = 9;
+	while (interval > 1) {
+		uint32 insertIndex = interval / 2;
+		while (insertIndex < 1024) {
+			uint32 entry = fInterruptEntries[intervalIndex].queue_head.this_phy;
+			fPeriodicFrameList[insertIndex] = entry | EHCI_PFRAMELIST_QH;
+			insertIndex += interval;
+		}
+
+		intervalIndex--;
+		interval /= 2;
+	}
+
+	// setup the empty slot in the list and linking of all -> first
+	ehci_qh *firstLogical = &fInterruptEntries[0].queue_head;
+	uint32 firstPhysical = firstLogical->this_phy | EHCI_QH_TYPE_QH;
+	fPeriodicFrameList[0] = firstPhysical;
+	for (int32 i = 1; i < 10; i++) {
+		fInterruptEntries[i].queue_head.next_phy = firstPhysical;
+		fInterruptEntries[i].queue_head.next_log = firstLogical;
+	}
+
+	// terminate the first entry
+	firstLogical->next_phy = EHCI_QH_TERMINATE;
+	firstLogical->next_log = NULL;
 
 	// allocate a queue head that will always stay in the async frame list
 	fAsyncQueueHead = CreateQueueHead();
@@ -387,36 +438,13 @@ EHCI::SubmitAsyncTransfer(Transfer *transfer)
 	}
 
 	Pipe *pipe = transfer->TransferPipe();
-	switch (pipe->Speed()) {
-		case USB_SPEED_LOWSPEED:
-			queueHead->endpoint_chars = EHCI_QH_CHARS_EPS_LOW;
-			break;
-		case USB_SPEED_FULLSPEED:
-			queueHead->endpoint_chars = EHCI_QH_CHARS_EPS_FULL;
-			break;
-		case USB_SPEED_HIGHSPEED:
-			queueHead->endpoint_chars = EHCI_QH_CHARS_EPS_HIGH;
-			break;
-		default:
-			TRACE_ERROR(("usb_ehci: unknown pipe speed\n"));
-			FreeQueueHead(queueHead);
-			return B_ERROR;
+	status_t result = InitQueueHead(queueHead, pipe);
+	if (result < B_OK) {
+		TRACE_ERROR(("usb_ehci: failed to init queue head\n"));
+		FreeQueueHead(queueHead);
+		return result;
 	}
 
-	if (pipe->Type() & USB_OBJECT_CONTROL_PIPE) {
-		queueHead->endpoint_chars |=
-			(pipe->Speed() != USB_SPEED_HIGHSPEED ? EHCI_QH_CHARS_CONTROL : 0);
-	}
-
-	queueHead->endpoint_chars |= (3 << EHCI_QH_CHARS_RL_SHIFT)
-		| (pipe->MaxPacketSize() << EHCI_QH_CHARS_MPL_SHIFT)
-		| (pipe->EndpointAddress() << EHCI_QH_CHARS_EPT_SHIFT)
-		| (pipe->DeviceAddress() << EHCI_QH_CHARS_DEV_SHIFT)
-		| EHCI_QH_CHARS_TOGGLE;
-	queueHead->endpoint_caps = (1 << EHCI_QH_CAPS_MULT_SHIFT)
-		| (0x1c << EHCI_QH_CAPS_SCM_SHIFT);
-
-	status_t result;
 	bool directionIn;
 	ehci_qtd *dataDescriptor;
 	if (pipe->Type() & USB_OBJECT_CONTROL_PIPE)
@@ -458,14 +486,62 @@ EHCI::SubmitAsyncTransfer(Transfer *transfer)
 status_t
 EHCI::SubmitPeriodicTransfer(Transfer *transfer)
 {
-	return B_ERROR;
+	Pipe *pipe = transfer->TransferPipe();
+	if ((pipe->Type() & USB_OBJECT_INTERRUPT_PIPE) == 0)
+		return B_ERROR;
+
+	ehci_qh *queueHead = CreateQueueHead();
+	if (!queueHead) {
+		TRACE_ERROR(("usb_ehci: failed to allocate periodic queue head\n"));
+		return B_NO_MEMORY;
+	}
+
+	status_t result = InitQueueHead(queueHead, pipe);
+	if (result < B_OK) {
+		TRACE_ERROR(("usb_ehci: failed to init queue head\n"));
+		FreeQueueHead(queueHead);
+		return result;
+	}
+
+	bool directionIn;
+	ehci_qtd *dataDescriptor;
+	result = FillQueueWithData(transfer, queueHead, &dataDescriptor,
+		&directionIn);
+
+	if (result < B_OK) {
+		TRACE_ERROR(("usb_ehci: failed to fill transfer queue with data\n"));
+		FreeQueueHead(queueHead);
+		return result;
+	}
+
+	result = AddPendingTransfer(transfer, queueHead, dataDescriptor, directionIn);
+	if (result < B_OK) {
+		TRACE_ERROR(("usb_ehci: failed to add pending transfer\n"));
+		FreeQueueHead(queueHead);
+		return result;
+	}
+
+#ifdef TRACE_USB
+	TRACE(("usb_ehci: linking interrupt queue\n"));
+	print_queue(queueHead);
+#endif
+
+	result = LinkInterruptQueueHead(queueHead,
+		((InterruptPipe *)pipe)->Interval());
+	if (result < B_OK) {
+		TRACE_ERROR(("usb_ehci: failed to link queue head to the async list\n"));
+		FreeQueueHead(queueHead);
+		return result;
+	}
+
+	return B_OK;
 }
 
 
 status_t
 EHCI::NotifyPipeChange(Pipe *pipe, usb_change change)
 {
-	TRACE_ERROR(("usb_ehci: pipe change %d for pipe 0x%08lx\n", change, (uint32)pipe));
+	TRACE(("usb_ehci: pipe change %d for pipe 0x%08lx\n", change, (uint32)pipe));
 	switch (change) {
 		case USB_CHANGE_CREATED:
 		case USB_CHANGE_DESTROYED: {
@@ -966,7 +1042,6 @@ EHCI::FinishTransfers()
 					// a transfer error occured
 					TRACE_ERROR(("usb_ehci: qtd (0x%08lx) error: 0x%08lx\n", descriptor->this_phy, status));
 
-					status_t callbackStatus = B_ERROR;
 					uint8 errorCount = status >> EHCI_QTD_ERRCOUNT_SHIFT;
 					errorCount &= EHCI_QTD_ERRCOUNT_MASK;
 					if (errorCount == 0) {
@@ -1177,6 +1252,43 @@ EHCI::CreateQueueHead()
 }
 
 
+status_t
+EHCI::InitQueueHead(ehci_qh *queueHead, Pipe *pipe)
+{
+	switch (pipe->Speed()) {
+		case USB_SPEED_LOWSPEED:
+			queueHead->endpoint_chars = EHCI_QH_CHARS_EPS_LOW;
+			break;
+		case USB_SPEED_FULLSPEED:
+			queueHead->endpoint_chars = EHCI_QH_CHARS_EPS_FULL;
+			break;
+		case USB_SPEED_HIGHSPEED:
+			queueHead->endpoint_chars = EHCI_QH_CHARS_EPS_HIGH;
+			break;
+		default:
+			TRACE_ERROR(("usb_ehci: unknown pipe speed\n"));
+			return B_ERROR;
+	}
+
+	if (pipe->Type() & USB_OBJECT_CONTROL_PIPE) {
+		queueHead->endpoint_chars |=
+			(pipe->Speed() != USB_SPEED_HIGHSPEED ? EHCI_QH_CHARS_CONTROL : 0);
+	}
+
+	queueHead->endpoint_chars |= (3 << EHCI_QH_CHARS_RL_SHIFT)
+		| (pipe->MaxPacketSize() << EHCI_QH_CHARS_MPL_SHIFT)
+		| (pipe->EndpointAddress() << EHCI_QH_CHARS_EPT_SHIFT)
+		| (pipe->DeviceAddress() << EHCI_QH_CHARS_DEV_SHIFT)
+		| EHCI_QH_CHARS_TOGGLE;
+	queueHead->endpoint_caps = (1 << EHCI_QH_CAPS_MULT_SHIFT);
+
+	if (pipe->Type() & USB_OBJECT_INTERRUPT_PIPE)
+		queueHead->endpoint_caps |= (0xff << EHCI_QH_CAPS_ISM_SHIFT);
+
+	return B_OK;
+}
+
+
 void
 EHCI::FreeQueueHead(ehci_qh *queueHead)
 {
@@ -1209,6 +1321,34 @@ EHCI::LinkQueueHead(ehci_qh *queueHead)
 
 
 status_t
+EHCI::LinkInterruptQueueHead(ehci_qh *queueHead, uint8 interval)
+{
+	if (!Lock())
+		return B_ERROR;
+
+	// this should not happen
+	if (interval < 1)
+		interval = 1;
+
+	// this may happen as intervals can go up to 16; we limit the value to
+	// 10 as you cannot support intervals above that with a frame list of
+	// just 1024 entries...
+	if (interval > 10)
+		interval = 10;
+
+	ehci_qh *interruptQueue = &fInterruptEntries[interval - 1].queue_head;
+	queueHead->next_log = interruptQueue->next_log;
+	queueHead->next_phy = interruptQueue->next_phy;
+	queueHead->prev_log = interruptQueue;
+	interruptQueue->next_log = queueHead;
+	interruptQueue->next_phy = queueHead->this_phy | EHCI_QH_TYPE_QH;
+
+	Unlock();
+	return B_OK;
+}
+
+
+status_t
 EHCI::UnlinkQueueHead(ehci_qh *queueHead, ehci_qh **freeListHead)
 {
 	if (!Lock())
@@ -1220,7 +1360,6 @@ EHCI::UnlinkQueueHead(ehci_qh *queueHead, ehci_qh **freeListHead)
 	prevHead->next_log = queueHead->next_log;
 	nextHead->prev_log = queueHead->prev_log;
 	queueHead->next_phy = fAsyncQueueHead->this_phy | EHCI_QH_TYPE_QH;
-	queueHead->next_log = NULL;
 	queueHead->prev_log = NULL;
 
 	queueHead->next_log = *freeListHead;

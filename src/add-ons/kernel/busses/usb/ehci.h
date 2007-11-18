@@ -76,9 +76,13 @@ static	int32						CleanupThread(void *data);
 
 		// Queue Head functions
 		ehci_qh						*CreateQueueHead();
+		status_t					InitQueueHead(ehci_qh *queueHead,
+										Pipe *pipe);
 		void						FreeQueueHead(ehci_qh *queueHead);
 
 		status_t					LinkQueueHead(ehci_qh *queueHead);
+		status_t					LinkInterruptQueueHead(ehci_qh *queueHead,
+										uint8 interval);
 		status_t					UnlinkQueueHead(ehci_qh *queueHead,
 										ehci_qh **freeList);
 
@@ -133,11 +137,12 @@ static	pci_module_info				*sPCIModule;
 		pci_info					*fPCIInfo;
 		Stack						*fStack;
 
-		// Framelist memory
+		// Periodic transfer framelist and interrupt entries
 		area_id						fPeriodicFrameListArea;
 		addr_t						*fPeriodicFrameList;
+		interrupt_entry				*fInterruptEntries;
 
-		// Async frame list management
+		// Async transfer queue management
 		ehci_qh						*fAsyncQueueHead;
 		sem_id						fAsyncAdvanceSem;
 
