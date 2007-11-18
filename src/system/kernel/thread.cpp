@@ -63,9 +63,6 @@ struct thread_key {
 	thread_id id;
 };
 
-static status_t receive_data_etc(thread_id *_sender, void *buffer,
-	size_t bufferSize, int32 flags);
-
 // global
 spinlock thread_spinlock = 0;
 
@@ -652,6 +649,152 @@ thread_exit2(void *_args)
 
 	// never get to here
 	panic("thread_exit2: made it where it shouldn't have!\n");
+}
+
+
+/*!
+	Fills the thread_info structure with information from the specified
+	thread.
+	The thread lock must be held when called.
+*/
+static void
+fill_thread_info(struct thread *thread, thread_info *info, size_t size)
+{
+	info->thread = thread->id;
+	info->team = thread->team->id;
+
+	strlcpy(info->name, thread->name, B_OS_NAME_LENGTH);
+
+	if (thread->state == B_THREAD_WAITING) {
+		if (thread->sem.blocking == sSnoozeSem)
+			info->state = B_THREAD_ASLEEP;
+		else if (thread->sem.blocking == thread->msg.read_sem)
+			info->state = B_THREAD_RECEIVING;
+		else
+			info->state = B_THREAD_WAITING;
+	} else
+		info->state = (thread_state)thread->state;
+
+	info->priority = thread->priority;
+	info->sem = thread->sem.blocking;
+	info->user_time = thread->user_time;
+	info->kernel_time = thread->kernel_time;
+	info->stack_base = (void *)thread->user_stack_base;
+	info->stack_end = (void *)(thread->user_stack_base
+		+ thread->user_stack_size);
+}
+
+
+static status_t
+send_data_etc(thread_id id, int32 code, const void *buffer,
+	size_t bufferSize, int32 flags)
+{
+	struct thread *target;
+	sem_id cachedSem;
+	cpu_status state;
+	status_t status;
+	cbuf *data;
+
+	state = disable_interrupts();
+	GRAB_THREAD_LOCK();
+	target = thread_get_thread_struct_locked(id);
+	if (!target) {
+		RELEASE_THREAD_LOCK();
+		restore_interrupts(state);
+		return B_BAD_THREAD_ID;
+	}
+	cachedSem = target->msg.write_sem;
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(state);
+
+	if (bufferSize > THREAD_MAX_MESSAGE_SIZE)
+		return B_NO_MEMORY;
+
+	status = acquire_sem_etc(cachedSem, 1, flags, 0);
+	if (status == B_INTERRUPTED) {
+		// We got interrupted by a signal
+		return status;
+	}
+	if (status != B_OK) {
+		// Any other acquisition problems may be due to thread deletion
+		return B_BAD_THREAD_ID;
+	}
+
+	if (bufferSize > 0) {
+		data = cbuf_get_chain(bufferSize);
+		if (data == NULL)
+			return B_NO_MEMORY;
+		status = cbuf_user_memcpy_to_chain(data, 0, buffer, bufferSize);
+		if (status < B_OK) {
+			cbuf_free_chain(data);
+			return B_NO_MEMORY;
+		}
+	} else
+		data = NULL;
+
+	state = disable_interrupts();
+	GRAB_THREAD_LOCK();
+
+	// The target thread could have been deleted at this point
+	target = thread_get_thread_struct_locked(id);
+	if (target == NULL) {
+		RELEASE_THREAD_LOCK();
+		restore_interrupts(state);
+		cbuf_free_chain(data);
+		return B_BAD_THREAD_ID;
+	}
+
+	// Save message informations
+	target->msg.sender = thread_get_current_thread()->id;
+	target->msg.code = code;
+	target->msg.size = bufferSize;
+	target->msg.buffer = data;
+	cachedSem = target->msg.read_sem;
+
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(state);
+
+	release_sem(cachedSem);
+	return B_OK;
+}
+
+
+static int32
+receive_data_etc(thread_id *_sender, void *buffer, size_t bufferSize,
+	int32 flags)
+{
+	struct thread *thread = thread_get_current_thread();
+	status_t status;
+	size_t size;
+	int32 code;
+
+	status = acquire_sem_etc(thread->msg.read_sem, 1, flags, 0);
+	if (status < B_OK) {
+		// Actually, we're not supposed to return error codes
+		// but since the only reason this can fail is that we
+		// were killed, it's probably okay to do so (but also
+		// meaningless).
+		return status;
+	}
+
+	if (buffer != NULL && bufferSize != 0) {
+		size = min_c(bufferSize, thread->msg.size);
+		status = cbuf_user_memcpy_from_chain(buffer, thread->msg.buffer,
+			0, size);
+		if (status < B_OK) {
+			cbuf_free_chain(thread->msg.buffer);
+			release_sem(thread->msg.write_sem);
+			return status;
+		}
+	}
+
+	*_sender = thread->msg.sender;
+	code = thread->msg.code;
+
+	cbuf_free_chain(thread->msg.buffer);
+	release_sem(thread->msg.write_sem);
+
+	return code;
 }
 
 
@@ -1789,123 +1932,10 @@ kill_thread(thread_id id)
 }
 
 
-static status_t
-send_data_etc(thread_id id, int32 code, const void *buffer,
-	size_t bufferSize, int32 flags)
-{
-	struct thread *target;
-	sem_id cachedSem;
-	cpu_status state;
-	status_t status;
-	cbuf *data;
-
-	state = disable_interrupts();
-	GRAB_THREAD_LOCK();
-	target = thread_get_thread_struct_locked(id);
-	if (!target) {
-		RELEASE_THREAD_LOCK();
-		restore_interrupts(state);
-		return B_BAD_THREAD_ID;
-	}
-	cachedSem = target->msg.write_sem;
-	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
-
-	if (bufferSize > THREAD_MAX_MESSAGE_SIZE)
-		return B_NO_MEMORY;
-
-	status = acquire_sem_etc(cachedSem, 1, flags, 0);
-	if (status == B_INTERRUPTED) {
-		// We got interrupted by a signal
-		return status;
-	}
-	if (status != B_OK) {
-		// Any other acquisition problems may be due to thread deletion
-		return B_BAD_THREAD_ID;
-	}
-
-	if (bufferSize > 0) {
-		data = cbuf_get_chain(bufferSize);
-		if (data == NULL)
-			return B_NO_MEMORY;
-		status = cbuf_user_memcpy_to_chain(data, 0, buffer, bufferSize);
-		if (status < B_OK) {
-			cbuf_free_chain(data);
-			return B_NO_MEMORY;
-		}
-	} else
-		data = NULL;
-
-	state = disable_interrupts();
-	GRAB_THREAD_LOCK();
-
-	// The target thread could have been deleted at this point
-	target = thread_get_thread_struct_locked(id);
-	if (target == NULL) {
-		RELEASE_THREAD_LOCK();
-		restore_interrupts(state);
-		cbuf_free_chain(data);
-		return B_BAD_THREAD_ID;
-	}
-
-	// Save message informations
-	target->msg.sender = thread_get_current_thread()->id;
-	target->msg.code = code;
-	target->msg.size = bufferSize;
-	target->msg.buffer = data;
-	cachedSem = target->msg.read_sem;
-
-	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
-
-	release_sem(cachedSem);
-	return B_OK;
-}
-
-
 status_t
 send_data(thread_id thread, int32 code, const void *buffer, size_t bufferSize)
 {
 	return send_data_etc(thread, code, buffer, bufferSize, 0);
-}
-
-
-static int32
-receive_data_etc(thread_id *_sender, void *buffer, size_t bufferSize,
-	int32 flags)
-{
-	struct thread *thread = thread_get_current_thread();
-	status_t status;
-	size_t size;
-	int32 code;
-
-	status = acquire_sem_etc(thread->msg.read_sem, 1, flags, 0);
-	if (status < B_OK) {
-		// Actually, we're not supposed to return error codes
-		// but since the only reason this can fail is that we
-		// were killed, it's probably okay to do so (but also
-		// meaningless).
-		return status;
-	}
-
-	if (buffer != NULL && bufferSize != 0) {
-		size = min_c(bufferSize, thread->msg.size);
-		status = cbuf_user_memcpy_from_chain(buffer, thread->msg.buffer,
-			0, size);
-		if (status < B_OK) {
-			cbuf_free_chain(thread->msg.buffer);
-			release_sem(thread->msg.write_sem);
-			return status;
-		}
-	}
-
-	*_sender = thread->msg.sender;
-	code = thread->msg.code;
-
-	cbuf_free_chain(thread->msg.buffer);
-	release_sem(thread->msg.write_sem);
-
-	return code;
 }
 
 
@@ -1926,39 +1956,6 @@ has_data(thread_id thread)
 		return false;
 
 	return count == 0 ? false : true;
-}
-
-
-/*!
-	Fills the thread_info structure with information from the specified
-	thread.
-	The thread lock must be held when called.
-*/
-static void
-fill_thread_info(struct thread *thread, thread_info *info, size_t size)
-{
-	info->thread = thread->id;
-	info->team = thread->team->id;
-
-	strlcpy(info->name, thread->name, B_OS_NAME_LENGTH);
-
-	if (thread->state == B_THREAD_WAITING) {
-		if (thread->sem.blocking == sSnoozeSem)
-			info->state = B_THREAD_ASLEEP;
-		else if (thread->sem.blocking == thread->msg.read_sem)
-			info->state = B_THREAD_RECEIVING;
-		else
-			info->state = B_THREAD_WAITING;
-	} else
-		info->state = (thread_state)thread->state;
-
-	info->priority = thread->priority;
-	info->sem = thread->sem.blocking;
-	info->user_time = thread->user_time;
-	info->kernel_time = thread->kernel_time;
-	info->stack_base = (void *)thread->user_stack_base;
-	info->stack_end = (void *)(thread->user_stack_base
-		+ thread->user_stack_size - 1);
 }
 
 
