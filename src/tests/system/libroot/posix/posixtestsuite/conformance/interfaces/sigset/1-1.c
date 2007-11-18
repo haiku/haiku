@@ -6,16 +6,18 @@
  * source tree.
 
  This program tests the assertion that the default handling of the 
- signal shall occur if the value of the func parameter is SIG_DFL.
+ signal shall occur if the value of the disp parameter is SIG_DFL.
 
  How this program tests this assertion by setting up a handler 
- "myhandler" for SIGCHLD. Then another call to signal() is made about
+ "myhandler" for SIGCHLD. Then another call to sigset() is made about
  SIGCHLD, this time with SIG_DFL as the value of the func parameter.
  The default action for SIGCHLD is to be ignored, so unless myhandler
  gets called when SIGCHLD is raised, the test passess, otherwise
  returns failure.
-     
+
 */
+
+#define _XOPEN_SOURCE 600
 
 #include <signal.h>
 #include <stdio.h>
@@ -26,18 +28,24 @@ int handler_called = 0;
 
 void myhandler(int signo)
 {
-	printf("signal_1-1: SIGCHLD called. Inside handler\n");
+	printf("sigset_1-1: SIGCHLD called. Inside handler\n");
 	handler_called = 1;
 }
 
 int main()
 {
-	if (signal(SIGCHLD, myhandler) == SIG_ERR) {
-                perror("Unexpected error while using signal()");
+
+	struct sigaction act;
+	act.sa_handler = myhandler;
+	act.sa_flags = 0;
+	sigemptyset(&act.sa_mask);
+
+	if (sigaction(SIGCHLD, &act, 0) != 0) {
+                perror("Unexpected error while using sigaction()");
                	return PTS_UNRESOLVED;
         }
 
-        if (signal(SIGCHLD,SIG_DFL) != myhandler) {
+        if (sigset(SIGCHLD,SIG_DFL) != myhandler) {
                 perror("Unexpected error while using signal()");
                	return PTS_UNRESOLVED;
         }
@@ -48,6 +56,6 @@ int main()
 		printf("Test FAILED: handler was called even though default was expected\n");
 		return PTS_FAIL;
 	}
-	printf("signal_1-1: Test PASSED\n");		
+	printf("sigset_1-1: Test PASSED\n");		
 	return PTS_PASS;
 } 

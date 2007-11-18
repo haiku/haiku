@@ -12,4 +12,5 @@ SubInclude HAIKU_TOP src tests system libroot posix posixtestsuite conformance i
 SubInclude HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces sigprocmask ;
 SubInclude HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces sigrelse ;
 SubInclude HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces signal ;
+SubInclude HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces sigset ;
 SubInclude HAIKU_TOP src tests system libroot posix posixtestsuite conformance interfaces sigsuspend ;

@@ -5,14 +5,16 @@
  * of this license, see the COPYING file at the top level of this 
  * source tree.
 
- This program tests the assertion that the signal shall be ignored
- if the value of the func parameter is SIG_IGN.
+ This program tests the assertion that the function shall be executed
+ when the signal occurs if the disp parameter is the address of a function.
 
  How this program tests this assertion is by setting up a handler 
  "myhandler" for SIGCHLD, and then raising that signal. If the 
  handler_called variable is anything but 1, then fail, otherwise pass.
      
 */
+
+#define _XOPEN_SOURCE 600
 
 #include <signal.h>
 #include <stdio.h>
@@ -23,14 +25,14 @@ int handler_called = 0;
 
 void myhandler(int signo)
 {
-	printf("signal_3-1: SIGCHLD called. Inside handler\n");
+	printf("sigset_3-1: SIGCHLD called. Inside handler\n");
 	handler_called = 1;
 }
 
 int main()
 {
-	if (signal(SIGCHLD, myhandler) == SIG_ERR) {
-                perror("Unexpected error while using signal()");
+	if (sigset(SIGCHLD, myhandler) == SIG_ERR) {
+                perror("Unexpected error while using sigset()");
                	return PTS_UNRESOLVED;
         }
 
@@ -40,6 +42,6 @@ int main()
 		printf("Test FAILED: handler was called even though default was expected\n");
 		return PTS_FAIL;
 	}
-	printf("signal_3-1: Test PASSED\n");		
+	printf("sigset_3-1: Test PASSED\n");		
 	return PTS_PASS;
 } 

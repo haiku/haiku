@@ -91,6 +91,18 @@ signals_tests()
 	conformance/interfaces/signal/signal_6-1
 	conformance/interfaces/signal/signal_7-1
 	echo ""
+	echo "sigset()"
+	conformance/interfaces/sigset/sigset_1-1
+	conformance/interfaces/sigset/sigset_2-1
+	conformance/interfaces/sigset/sigset_3-1
+	conformance/interfaces/sigset/sigset_4-1
+	conformance/interfaces/sigset/sigset_5-1
+	conformance/interfaces/sigset/sigset_6-1
+	conformance/interfaces/sigset/sigset_7-1
+	conformance/interfaces/sigset/sigset_8-1
+	conformance/interfaces/sigset/sigset_9-1
+	conformance/interfaces/sigset/sigset_10-1
+	echo ""
 	echo "sigsuspend()"
 	echo "FIXME: haiku' sigsuspend can not 'wake up' yet."
 }

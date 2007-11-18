@@ -51,7 +51,7 @@ int main()
 		printf("FAIL: Signal was not ignored\n");
 		return PTS_FAIL;
 	} 
-	printf("PASS\n");
+	printf("sigignore_1-1: Test PASSED\n");
 	return PTS_PASS;
 }
 

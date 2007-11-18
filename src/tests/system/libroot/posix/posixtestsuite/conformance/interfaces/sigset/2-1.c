@@ -6,15 +6,17 @@
  * source tree.
 
  This program tests the assertion that the signal shall be ignored
- if the value of the func parameter is SIG_IGN.
+ if the value of the dist parameter is SIG_IGN.
 
  How this program tests this assertion is by setting up a handler 
- "myhandler" for SIGCHLD. Then another call to signal() is made about
- SIGCHLD, this time with SIG_IGN as the value of the func parameter.
- SIGCHLD should be ignored now, so unless myhandler gets called when
- SIGCHLD is raised, the test passes, otherwise returns failure.
+ "myhandler" for SIGUSR1. Then another call to signal() is made about
+ SIGUSR1, this time with SIG_IGN as the value of the func parameter.
+ SIGUSR1 should be ignored now, so unless myhandler gets called when
+ SIGUSR1 is raised, the test passes, otherwise returns failure.
      
 */
+
+#define _XOPEN_SOURCE 600
 
 #include <signal.h>
 #include <stdio.h>
@@ -25,28 +27,33 @@ int handler_called = 0;
 
 void myhandler(int signo)
 {
-	printf("signal_2-1: SIGCHLD called. Inside handler\n");
+	printf("sigset_2-1: SIGUSR1 called. Inside handler\n");
 	handler_called = 1;
 }
 
 int main()
 {
-	if (signal(SIGCHLD, myhandler) == SIG_ERR) {
+	struct sigaction act;
+	act.sa_flags = 0;
+	act.sa_handler = myhandler;
+	sigemptyset(&act.sa_mask);
+
+	if (sigaction(SIGUSR1, &act, 0) != 0) {
+                perror("Unexpected error while using sigaction()");
+               	return PTS_UNRESOLVED;
+        }
+
+        if (sigset(SIGUSR1,SIG_IGN) != myhandler) {
                 perror("Unexpected error while using signal()");
                	return PTS_UNRESOLVED;
         }
 
-        if (signal(SIGCHLD,SIG_IGN) != myhandler) {
-                perror("Unexpected error while using signal()");
-               	return PTS_UNRESOLVED;
-        }
-
-	raise(SIGCHLD);
+	raise(SIGUSR1);
 	
 	if (handler_called == 1) {
 		printf("Test FAILED: handler was called even though default was expected\n");
 		return PTS_FAIL;
 	}
-	printf("signal_2-1: Test PASSED\n");		
+	printf("sigset_2-1: Test PASSED\n");		
 	return PTS_PASS;
 } 

@@ -22,6 +22,6 @@ int main()
 		perror("sigrelse failed -- returned -- test aborted");
 		return PTS_UNRESOLVED;
 	} 
-	printf("sigrelse(): Test PASSED\n");
+	printf("sigrelse_2-1: Test PASSED\n");
 	return PTS_PASS;
 }

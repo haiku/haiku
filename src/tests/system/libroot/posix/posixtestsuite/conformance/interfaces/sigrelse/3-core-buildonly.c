@@ -75,8 +75,8 @@ int main(int argc, char *argv[])
 
         if (TEST_RETURN == -1) {
                 if (EINVAL == errno) {
-                        printf ("errno set to EINVAL\n");
-                        printf("sigrelse(): Test PASSED\n");
+                        printf ("sigrelse_3-core-buildonly %s: successfully set errno to EINVAL\n", argv[1]);
+                        printf("sigrelse_3-core-buildonly %s: Test PASSED\n", argv[1]);
                         return PTS_PASS;
                 } else {
                         printf ("errno not set to EINVAL\n");

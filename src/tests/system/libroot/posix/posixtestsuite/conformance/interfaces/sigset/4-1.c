@@ -5,41 +5,43 @@
  * of this license, see the COPYING file at the top level of this 
  * source tree.
 
- This program tests the assertion that the signal shall be ignored
- if the value of the func parameter is SIG_IGN.
+ This program tests the assertion that the signal will be added to the
+ signal mask before its handler is executed.
 
- How this program tests this assertion is by setting up a handler 
- "myhandler" for SIGCHLD, and then raising that signal. If the 
- handler_called variable is anything but 1, then fail, otherwise pass.
-     
 */
+
+#define _XOPEN_SOURCE 600
 
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "posixtest.h"
 
-int handler_called = 0;
+int signal_blocked = 0;
 
 void myhandler(int signo)
 {
-	printf("signal_3-1: SIGCHLD called. Inside handler\n");
-	handler_called = 1;
+	sigset_t mask;
+	printf("sigset_4-1: SIGCHLD called. Inside handler\n");
+	sigprocmask(SIG_SETMASK, NULL, &mask);
+	if(sigismember(&mask, SIGCHLD)) {
+		signal_blocked = 1;
+	}
 }
 
 int main()
 {
-	if (signal(SIGCHLD, myhandler) == SIG_ERR) {
-                perror("Unexpected error while using signal()");
+	if (sigset(SIGCHLD, myhandler) == SIG_ERR) {
+                perror("Unexpected error while using sigset()");
                	return PTS_UNRESOLVED;
         }
 
 	raise(SIGCHLD);
 	
-	if (handler_called != 1) {
+	if (signal_blocked != 1) {
 		printf("Test FAILED: handler was called even though default was expected\n");
 		return PTS_FAIL;
 	}
-	printf("signal_3-1: Test PASSED\n");		
+	printf("sigset_4-1: Test PASSED\n");		
 	return PTS_PASS;
 } 

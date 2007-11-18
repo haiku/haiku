@@ -24,7 +24,7 @@ int main()
 		return PTS_FAIL;
 	}
 
-	printf("Test PASSED\n");
+	printf("kill_2-1: Test PASSED\n");
 	return PTS_PASS;
 }
 

@@ -23,7 +23,8 @@ int main()
 {
 	if (sigignore(SIGKILL) == -1) {
 		if (EINVAL == errno) {
-			printf ("errno set to EINVAL\n");
+			printf ("sigignore_6-1: successfully set errno to EINVAL\n");
+			printf("sigignore_6-1: Test PASSED\n");
 			return PTS_PASS;
 		} else {
 			printf ("errno not set to EINVAL\n");

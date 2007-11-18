@@ -27,7 +27,7 @@
 
 void handler(int signo)
 {
-	printf("Now inside signal handler\n");
+	printf("sigsuspend_6-1: Now inside signal handler\n");
 }
 
 int main()
@@ -89,7 +89,7 @@ int main()
                 }
 
                 if (exit_status == 2) {
-			printf("Test PASSED\n");
+			printf("sigsuspend_6-1: Test PASSED\n");
                         return PTS_PASS;
                 }
 

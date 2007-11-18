@@ -24,12 +24,12 @@
 
 void SIGUSR1_handler(int signo)
 {
-	printf("do nothing useful\n");
+	printf("signal_5-1: inside SIGUSR1_handler\n");
 }
 
 void SIGUSR2_handler(int signo)
 {
-	printf("do nothing useful\n");
+	printf("signal_5-1: inside SIGUSR2_handler\n");
 }
 
 int main()
@@ -48,6 +48,6 @@ int main()
 		printf("signal did not return the last handler that was associated with SIGUSR1\n");
                	return PTS_FAIL;
         }
-	printf("signal(): Test passed\n");
+	printf("signal_5-1: Test PASSED\n");
 	return PTS_PASS;
 } 

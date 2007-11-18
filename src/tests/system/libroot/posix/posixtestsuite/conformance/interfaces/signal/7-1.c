@@ -19,7 +19,7 @@
 
 void myhandler(int signo)
 {
-	printf("handler does nothing useful.\n");
+	printf("signal_7-1: inside handler\n");
 }
 
 int main()
@@ -35,6 +35,6 @@ int main()
 		printf("Test FAILED: errno wasn't set to EINVAL even though a non-catchable signal was passed to the signal() function\n");
                	return PTS_FAIL;
         }
-    printf("signal(): Test passed\n");
+    printf("signal_7-1: Test PASSED\n");
 	return PTS_PASS;
 } 
