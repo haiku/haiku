@@ -138,6 +138,7 @@ extern double	sinh(double x);
 extern double	sqrt(double x);
 extern double	tan(double x);
 extern double	tanh(double x);
+extern double	trunc(double x);
 
 /* long double math functions */
 extern long double	roundl(long double x);
