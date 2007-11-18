@@ -7,6 +7,7 @@ MergeObject posix_signal.o :
 	killpg.cpp
 	raise.c
 	send_signal.c
+	set_signal_disposition.cpp
 	set_signal_stack.c
 	sigaction.c
 	sigaltstack.c

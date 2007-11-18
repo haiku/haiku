@@ -147,6 +147,7 @@ extern "C" {
 #endif
 
 sighandler_t signal(int sig, sighandler_t signalHandler);
+sighandler_t sigset(int sig, sighandler_t signalHandler);
 int     raise(int sig);
 int     kill(pid_t pid, int sig);
 int     send_signal(pid_t tid, unsigned int sig);
