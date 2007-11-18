@@ -42,7 +42,7 @@ BuildPlatformSharedLibrary libroot_build.so :
 	strnlen.c
 
 	:
-	$(HOST_LIBSTDC++)
+	$(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
 ;
 
 SEARCH on [ FGristFiles $(strlSources) strnlen.c ]
