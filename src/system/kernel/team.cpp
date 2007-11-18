@@ -155,11 +155,11 @@ dump_teams(int argc, char **argv)
 	struct hash_iterator iterator;
 	struct team *team;
 
-	kprintf("team          id  parent      name\n");
+	kprintf("team           id  parent      name\n");
 	hash_open(sTeamHash, &iterator);
 
 	while ((team = (struct team*)hash_next(sTeamHash, &iterator)) != NULL) {
-		kprintf("%p%6lx  %p  %s\n", team, team->id, team->parent, team->name);
+		kprintf("%p%7ld  %p  %s\n", team, team->id, team->parent, team->name);
 	}
 
 	hash_close(sTeamHash, &iterator, false);
