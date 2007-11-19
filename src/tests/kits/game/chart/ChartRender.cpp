@@ -567,6 +567,12 @@ void RefreshStarPacket(buffer *buf, star_packet *sp, geometry *geo)
 	int32			i, min_count;
 	star			*s;
 	
+	// TODO: For some reason, when selecting the "2 threads" option under vmware,
+	// some weird timing calculations finish with setting the star packet count to
+	// a negative number. This screws all the next calculations, and the animation
+	// then comes to a stop.
+	sp->count = max_c(sp->count, 0);	
+
 	/* Calculate the number of stars that were process during the
 	   previous frame and still need to be process for that frame. */
 	min_count = sp->erase_count;
