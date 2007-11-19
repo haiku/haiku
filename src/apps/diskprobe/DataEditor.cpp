@@ -491,7 +491,8 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 
 		fSize = 1LL * geometry.head_count * geometry.cylinder_count
 			* geometry.sectors_per_track * geometry.bytes_per_sector;
-
+		if (fSize < 0)
+			fSize = 0;
 		if (!isFileSystem)
 			fBlockSize = geometry.bytes_per_sector;
 	} else if (entry.IsDirectory() || entry.IsSymLink()) {
