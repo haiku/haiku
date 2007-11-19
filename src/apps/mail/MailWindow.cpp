@@ -833,10 +833,14 @@ TMailWindow::MenusBeginning()
 	BTextView	*textView;
 
 	if (!fIncoming) {
-		enable = strlen(fHeaderView->fTo->Text())
-			|| strlen(fHeaderView->fBcc->Text());
-		fSendNow->SetEnabled(enable);
-		fSendLater->SetEnabled(enable);
+		bool gotToField = fHeaderView->fTo->Text()[0] != 0;
+		bool gotCcField = fHeaderView->fCc->Text()[0] != 0;
+		bool gotBccField = fHeaderView->fBcc->Text()[0] != 0;
+		bool gotSubjectField = fHeaderView->fSubject->Text()[0] != 0;
+		bool gotText = fContentView->fTextView->Text()[0] != 0;
+		fSendNow->SetEnabled(gotToField || gotBccField);
+		fSendLater->SetEnabled(fChanged && (gotToField || gotCcField
+			|| gotBccField || gotSubjectField || gotText));
 
 		be_clipboard->Lock();
 		fPaste->SetEnabled(be_clipboard->Data()->HasData("text/plain", B_MIME_TYPE)
