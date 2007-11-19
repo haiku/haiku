@@ -7,7 +7,7 @@ typedef uint32_t			fssh_ulong;
 typedef volatile int32_t	vint32_t;
 typedef volatile int64_t	vint64_t;
 
-#ifdef __x86_64__
+#ifdef HAIKU_HOST_PLATFORM_64_BIT
 typedef uint64_t	fssh_addr_t;
 #else
 typedef uint32_t	fssh_addr_t;
