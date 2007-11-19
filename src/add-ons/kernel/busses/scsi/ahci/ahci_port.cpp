@@ -654,11 +654,14 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 position, size_t length, bool 
 
 	FLOW("prdbc %ld\n", fCommandList->prdbc);
 
-	if (status < B_OK || (tfd & ATA_ERR)) {
-		TRACE("device error\n");
+	if (status < B_OK) {
+		TRACE("ScsiReadWrite port %d: device timeout\n", fIndex);
+		request->subsys_status = SCSI_REQ_ABORTED;
+	} else if (tfd & ATA_ERR) {
+		TRACE("ScsiReadWrite port %d: device error\n", fIndex);
 		request->subsys_status = SCSI_REQ_ABORTED;
 	} else if (fCommandList->prdbc != bytecount) {
-		TRACE("should never happen\n");
+		TRACE("ScsiReadWrite port %d: should never happen\n", fIndex);
 		request->subsys_status = SCSI_REQ_CMP_ERR;
 	} else {
 		request->subsys_status = SCSI_REQ_CMP;
