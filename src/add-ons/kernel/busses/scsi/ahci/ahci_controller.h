@@ -48,6 +48,7 @@ private:
 	int							fCommandSlotCount;
 	int							fPortCountMax;
 	int							fPortCountAvail;
+	uint32						fPortImplementedMask;
 	uint8						fIRQ;
 	AHCIPort *					fPort[32];
 

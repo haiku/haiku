@@ -24,6 +24,7 @@ AHCIController::AHCIController(device_node_handle node, pci_device_info *device)
 	, fCommandSlotCount(0)
 	, fPortCountMax(0)
 	, fPortCountAvail(0)
+	, fPortImplementedMask(0)
 	, fIRQ(0)
  	, fInstanceCheck(-1)
 {
@@ -126,12 +127,14 @@ AHCIController::Init()
 
 	fCommandSlotCount = 1 + ((fRegs->cap >> CAP_NCS_SHIFT) & CAP_NCS_MASK);
 	fPortCountMax = 1 + ((fRegs->cap >> CAP_NP_SHIFT) & CAP_NP_MASK);
-	fPortCountAvail = count_bits_set(fRegs->pi);
 
-	if (fRegs->pi == 0) {
-		TRACE("controller doesn't implement any ports\n");
-		goto err;
+	fPortImplementedMask = fRegs->pi;
+	if (fPortImplementedMask == 0) {
+		fPortImplementedMask = 0xffffffff >> (32 - fPortCountMax);
+		TRACE("ports-implemented mask is zero, using 0x%lx instead.\n", fPortImplementedMask);
 	}
+
+	fPortCountAvail = count_bits_set(fPortImplementedMask);
 
 	TRACE("cap: Interface Speed Support: generation %lu\n",	(fRegs->cap >> CAP_ISS_SHIFT) & CAP_ISS_MASK);
 	TRACE("cap: Number of Command Slots: %d (raw %#lx)\n",	fCommandSlotCount, (fRegs->cap >> CAP_NCS_SHIFT) & CAP_NCS_MASK);
@@ -152,7 +155,7 @@ AHCIController::Init()
 
 	TRACE("cap: Supports AHCI mode only: %s\n",			(fRegs->cap & CAP_SAM) ? "yes" : "no");
 	TRACE("ghc: AHCI Enable: %s\n",						(fRegs->ghc & GHC_AE) ? "yes" : "no");
-	TRACE("Ports Implemented Mask: %#08lx\n",			fRegs->pi);
+	TRACE("Ports Implemented Mask: %#08lx\n",			fPortImplementedMask);
 	TRACE("Number of Available Ports: %d\n",			fPortCountAvail);
 	TRACE("AHCI Version %lu.%lu\n",						fRegs->vs >> 16, fRegs->vs & 0xff);
 	TRACE("Interrupt %u\n",								fIRQ);
@@ -164,7 +167,7 @@ AHCIController::Init()
 	}
 
 	for (int i = 0; i <= fPortCountMax; i++) {
-		if (fRegs->pi & (1 << i)) {
+		if (fPortImplementedMask & (1 << i)) {
 			fPort[i] = new (std::nothrow)AHCIPort(this, i);
 			if (!fPort[i]) {
 				TRACE("out of memory creating port %d", i);
@@ -271,7 +274,7 @@ int32
 AHCIController::Interrupt(void *data)
 {
 	AHCIController *self = (AHCIController *)data;
-	uint32 int_stat = self->fRegs->is & self->fRegs->pi;
+	uint32 int_stat = self->fRegs->is & self->fPortImplementedMask;
 	if (int_stat == 0)
 		return B_UNHANDLED_INTERRUPT;
 
