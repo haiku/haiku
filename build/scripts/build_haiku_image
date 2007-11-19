@@ -61,7 +61,9 @@ fi
 attrrmrf()
 {
 	test -e "$1" || return
-	find "$1" -print0 | xargs -0 stat -c %i | awk "{ print \"$outputDir/attributes/\" \$1 }" | xargs rm -rf
+	if [ -d "$outputDir/attributes" ]; then
+		find "$1" -print0 | xargs -0 stat -c %i | awk "{ print \"$outputDir/attributes/\" \$1 }" | xargs rm -rf
+	fi
 	rm -rf "$1"
 }
 
