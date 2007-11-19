@@ -453,6 +453,7 @@ SudokuView::MouseDown(BPoint where)
 			// allow dragging to remove the hint from other fields
 			fLastHintValueSet = false;
 			fLastHintValue = value;
+			fLastField = field;
 		}
 		return;
 	}
