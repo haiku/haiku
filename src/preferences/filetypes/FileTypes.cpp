@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -372,6 +372,13 @@ FileTypes::MessageReceived(BMessage *message)
 			break;
 		}
 
+		case B_SILENT_RELAUNCH:
+			// In case we were launched via the add-on, there is no types
+			// window yet.
+			if (fTypesWindow == NULL)
+				PostMessage(kMsgOpenTypesWindow);
+			break;
+
 		case B_CANCEL:
 			if (fWindowCount == 0)
 				PostMessage(B_QUIT_REQUESTED);
@@ -393,7 +400,7 @@ FileTypes::AboutRequested()
 {
 	BAlert *alert = new BAlert("about", "FileTypes\n"
 		"\twritten by Axel Dörfler\n"
-		"\tCopyright 2006, Haiku.\n", "Ok");
+		"\tCopyright 2006-2007, Haiku.\n", "Ok");
 	BTextView *view = alert->TextView();
 	BFont font;
 
