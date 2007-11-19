@@ -243,6 +243,9 @@ SavePanel::SetExportMode(int32 mode)
 		case EXPORT_MODE_ICON_RDEF:
 			fRDefMI->SetMarked(true);
 			break;
+		case EXPORT_MODE_ICON_SOURCE:
+			fSourceMI->SetMarked(true);
+			break;
 	}
 
 	if (mode != EXPORT_MODE_MESSAGE)
@@ -385,6 +388,10 @@ SavePanel::_BuildMenu()
 	fRDefMI = new SaveItem("HVIF RDef", new BMessage(MSG_FORMAT),
 						   EXPORT_MODE_ICON_RDEF);
 	fFormatM->AddItem(fRDefMI);
+
+	fSourceMI = new SaveItem("HVIF Source Code", new BMessage(MSG_FORMAT),
+						   EXPORT_MODE_ICON_SOURCE);
+	fFormatM->AddItem(fSourceMI);
 
 	fFormatM->AddSeparatorItem();
 

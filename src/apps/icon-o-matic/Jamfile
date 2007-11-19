@@ -222,6 +222,7 @@ Application Icon-O-Matic :
 	# import_export/flat_icon
 	FlatIconExporter.cpp
 	RDefExporter.cpp
+	SourceExporter.cpp
 
 	# import_export/message
 	MessageExporter.cpp

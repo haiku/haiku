@@ -44,6 +44,7 @@
 #include "SavePanel.h"
 #include "ShapeContainer.h"
 #include "SimpleFileSaver.h"
+#include "SourceExporter.h"
 #include "SVGExporter.h"
 #include "SVGImporter.h"
 
@@ -531,6 +532,9 @@ IconEditorApp::_CreateSaver(const entry_ref& ref, uint32 exportMode)
 
 		case EXPORT_MODE_ICON_RDEF:
 			saver = new SimpleFileSaver(new RDefExporter(), ref);
+			break;
+		case EXPORT_MODE_ICON_SOURCE:
+			saver = new SimpleFileSaver(new SourceExporter(), ref);
 			break;
 
 		case EXPORT_MODE_BITMAP:
