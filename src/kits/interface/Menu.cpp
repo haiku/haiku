@@ -1327,7 +1327,7 @@ BMenu::_Show(bool selectFirstItem)
 void
 BMenu::_Hide()
 {
-	BMenuWindow *window = static_cast<BMenuWindow *>(Window());
+	BMenuWindow *window = dynamic_cast<BMenuWindow *>(Window());
 	if (window == NULL || !window->Lock())
 		return;
 
@@ -1338,15 +1338,15 @@ BMenu::_Hide()
 	window->DetachMenu();
 		// we don't want to be deleted when the window is removed
 
-	// Delete the menu window used by our submenus
-	_DeleteMenuWindow();
-
 	if (fSuper != NULL)
 		window->Unlock();
 	else {
 		// it's our window, quit it
 		window->Quit();
-	}
+	}	
+
+	// Delete the menu window used by our submenus
+	_DeleteMenuWindow();
 }
 
 
