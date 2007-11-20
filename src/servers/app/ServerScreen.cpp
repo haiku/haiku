@@ -107,10 +107,12 @@ Screen::SetMode(uint16 width, uint16 height, uint32 colorSpace,
 	const display_timing& timing, bool makeDefault)
 {
 	display_mode mode;
+	mode.timing = timing;
+	mode.space = colorSpace;
 	mode.virtual_width = width;
 	mode.virtual_height = height;
-	mode.space = colorSpace;
-	mode.timing = timing;
+	mode.h_display_start = 0;
+	mode.v_display_start = 0;
 	mode.flags = 0;
 
 	return SetMode(mode, makeDefault);
