@@ -252,10 +252,16 @@ _xdebugPrintf(const char * fmt, ...)
 
 
 int
-_debuggerAssert(const char * file, int line, char * message)
+_debuggerAssert(const char * file, int line, char *message)
 {
-	puts("*** _debuggerAssert call - not yet implemented ***");
-	printf("%s:%d:%s\n", file, line, message);
+	char buffer[1024];
+	snprintf(buffer, sizeof(buffer),
+		"Assert failed: File: %s, Line: %d, %s",
+		file, line, message);
+	
+	debug_printf("%ld: ASSERT: %s\n", find_thread(NULL), buffer);
+	_kern_debugger(buffer);
+
 	return 0;
 }
 
