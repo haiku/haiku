@@ -303,8 +303,8 @@ BMenuField::MouseDown(BPoint where)
 
 	fMenuBar->StartMenuBar(0, false, true, &bounds);
 
-	fMenuTaskID = spawn_thread((thread_func)MenuTask, "_m_task_", B_NORMAL_PRIORITY, this);
-	if (fMenuTaskID)
+	fMenuTaskID = spawn_thread((thread_func)_thread_entry, "_m_task_", B_NORMAL_PRIORITY, this);
+	if (fMenuTaskID >= 0)
 		resume_thread(fMenuTaskID);
 }
 
@@ -827,35 +827,41 @@ BMenuField::InitMenu(BMenu *menu)
 }
 
 
-long
-BMenuField::MenuTask(void *arg)
+/* static */
+int32
+BMenuField::_thread_entry(void *arg)
 {
-	BMenuField *menuField = static_cast<BMenuField *>(arg);
+	return static_cast<BMenuField *>(arg)->_MenuTask();
+}
 
-	if (!menuField->LockLooper())
+
+int32
+BMenuField::_MenuTask()
+{
+	if (!LockLooper())
 		return 0;
 	
-	menuField->fSelected = true;
-	menuField->fTransition = true;
-	menuField->Invalidate();
-	menuField->UnlockLooper();
+	fSelected = true;
+	fTransition = true;
+	Invalidate();
+	UnlockLooper();
 	
 	bool tracking;
 	do {
 		snooze(20000);
-		if (!menuField->LockLooper())
+		if (!LockLooper())
 			return 0;
 
-		tracking = menuField->fMenuBar->fTracking;
+		tracking = fMenuBar->fTracking;
 
-		menuField->UnlockLooper();
+		UnlockLooper();
 	} while (tracking);
 
-	if (menuField->LockLooper()) {
-		menuField->fSelected = false;
-		menuField->fTransition = true;
-		menuField->Invalidate();	
-		menuField->UnlockLooper();
+	if (LockLooper()) {
+		fSelected = false;
+		fTransition = true;
+		Invalidate();	
+		UnlockLooper();
 	}
 
 	return 0;

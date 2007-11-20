@@ -114,7 +114,10 @@ protected:
 			void			InitObject2();
 			void			DrawLabel(BRect bounds, BRect update);
 	static	void			InitMenu(BMenu* menu);
-	static	long			MenuTask(void* arg);
+	
+			int32		_MenuTask();
+	static	int32			_thread_entry(void *arg);
+	
 			void			_UpdateFrame();
 			void			_InitMenuBar(BMenu* menu,
 								BRect frame, bool fixedSize);
