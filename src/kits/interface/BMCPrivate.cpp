@@ -14,6 +14,7 @@
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Message.h>
+#include <MessageRunner.h>
 #include <Region.h>
 #include <Window.h>
 
@@ -57,18 +58,16 @@ _BMCFilter_::operator=(const _BMCFilter_ &)
 
 _BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixedSize, BMenuField *menuField)
 	: BMenuBar(frame, "_mc_mb_", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_ITEMS_IN_ROW,
-		!fixedSize)
+		!fixedSize),
+	fMenuField(menuField),
+	fFixedSize(fixedSize),
+	fRunner(NULL),
+	fShowPopUpMarker(true)
 {
 	SetFlags(Flags() | B_FRAME_EVENTS);
 	SetBorder(B_BORDER_CONTENTS);
 
-	fMenuField = menuField;
-	fFixedSize = fixedSize;
-	fRunner = NULL;
-	fShowPopUpMarker = true;
-
 	float left, top, right, bottom;
-
 	GetItemMargins(&left, &top, &right, &bottom);
 	// give a bit more space to draw the small thumb
 	left -= 1;
@@ -82,21 +81,23 @@ _BMCMenuBar_::_BMCMenuBar_(BRect frame, bool fixedSize, BMenuField *menuField)
 
 
 _BMCMenuBar_::_BMCMenuBar_(BMessage *data)
-	:	BMenuBar(data)
+	:	BMenuBar(data),
+	fMenuField(NULL),
+	fFixedSize(true),
+	fRunner(NULL),
+	fShowPopUpMarker(true)
 {
 	SetFlags(Flags() | B_FRAME_EVENTS);
 
-	bool rsize_to_fit;
-
-	if (data->FindBool("_rsize_to_fit", &rsize_to_fit) == B_OK)
-		fFixedSize = !rsize_to_fit;
-	else
-		fFixedSize = true;
+	bool resizeToFit;
+	if (data->FindBool("_rsize_to_fit", &resizeToFit) == B_OK)
+		fFixedSize = !resizeToFit;
 }
 
 
 _BMCMenuBar_::~_BMCMenuBar_()
 {
+	delete fRunner;
 }
 
 
