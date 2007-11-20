@@ -31,7 +31,7 @@ typedef struct transfer_data_s {
 // --------------------------------------
 typedef struct hcd_soft_itransfer
 {
-	ohci_isochronous_descriptor	itd;
+	ohci_isochronous_td	itd;
 	struct hcd_soft_itransfer			*nextitd; 	// mirrors nexttd in ITD
 	struct hcd_soft_itransfer			*dnext; 	// next in done list
 	addr_t 								physaddr;	// physical address to the host controller isonchronous transfer
@@ -83,26 +83,43 @@ static	int32						_InterruptHandler(void *data);
 static	int32						_FinishThread(void *data);
 		void						_FinishTransfer();
 
-		status_t					_SubmitAsyncTransfer(Transfer *transfer);
-		status_t					_SubmitPeriodicTransfer(Transfer *transfer);
+		status_t					_SubmitControlRequest(Transfer *transfer);
+		status_t					_SubmitIsochronousTransfer(
+										Transfer *transfer);
 
 		// Endpoint related methods
-		status_t					_InsertEndpointForPipe(Pipe *pipe);
-		status_t					_RemoveEndpointForPipe(Pipe *pipe);
-		status_t					_CreateEndpoint(Pipe *pipe,
-										bool isIsochronous);
-		ohci_endpoint_descriptor	*_FindInterruptEndpoint(uint8 interval);
 		ohci_endpoint_descriptor	*_AllocateEndpoint();
 		void						_FreeEndpoint(
 										ohci_endpoint_descriptor *endpoint);
+		status_t					_InsertEndpointForPipe(Pipe *pipe);
+		status_t					_RemoveEndpointForPipe(Pipe *pipe);
+		ohci_endpoint_descriptor	*_FindInterruptEndpoint(uint8 interval);
 
 		// Transfer descriptor related methods
-		ohci_general_descriptor		*_CreateGeneralDescriptor();
+		ohci_general_td				*_CreateGeneralDescriptor(
+										size_t bufferSize);
+		status_t					_CreateDescriptorChain(
+										ohci_general_td **firstDescriptor,
+										ohci_general_td **lastDescriptor,
+										uint8 direction,
+										size_t bufferSize);
+
 		void						_FreeGeneralDescriptor(
-										ohci_general_descriptor *descriptor);
-		ohci_isochronous_descriptor	*_CreateIsochronousDescriptor();
+										ohci_general_td *descriptor);
+		void						_FreeDescriptorChain(
+										ohci_general_td *topDescriptor);
+
+		void						_LinkDescriptors(ohci_general_td *first,
+										ohci_general_td *second);
+
+		ohci_isochronous_td			*_CreateIsochronousDescriptor();
 		void						_FreeIsochronousDescriptor(
-										ohci_isochronous_descriptor *descriptor);
+										ohci_isochronous_td *descriptor);
+
+		size_t						_WriteDescriptorChain(
+										ohci_general_td *topDescriptor,
+										iovec *vector,
+										size_t vectorCount);
 
 		// Register functions
 inline	void						_WriteReg(uint32 reg, uint32 value);

@@ -333,7 +333,7 @@ typedef struct ohci_endpoint_descriptor
 //	General transfer descriptor structure (section 4.3.1)
 // --------------------------------
 
-typedef struct ohci_general_descriptor
+typedef struct ohci_general_td
 {
 	// Hardware part
 	uint32	flags;						// Flags field
@@ -344,7 +344,7 @@ typedef struct ohci_general_descriptor
 	addr_t	physical_address;			// Physical pointer to this address
 	void	*buffer_logical;			// Logical pointer to the buffer
 	void	*next_logical_descriptor;	// Logical pointer next descriptor
-	void	*last_logical_byte_address;	// Logical pointer buffer end
+	size_t	buffer_size;				// Size of the buffer
 };
 
 #define	OHCI_BUFFER_ROUNDING			0x00040000
@@ -371,7 +371,7 @@ typedef struct ohci_general_descriptor
 // --------------------------------
 
 #define OHCI_ITD_NOFFSET 8
-typedef struct ohci_isochronous_descriptor
+typedef struct ohci_isochronous_td
 {
 	uint32		flags;
 	uint32		buffer_page_byte_0;			// Physical page number of byte 0

@@ -410,14 +410,19 @@ OHCI::SubmitTransfer(Transfer *transfer)
 		return fRootHub->ProcessTransfer(this, transfer);
 
 	uint32 type = transfer->TransferPipe()->Type();
-	if ((type & USB_OBJECT_CONTROL_PIPE) || (type & USB_OBJECT_BULK_PIPE)) {
-		TRACE(("usb_ohci: submitting async transfer\n"));
-		return _SubmitAsyncTransfer(transfer);
+	if ((type & USB_OBJECT_CONTROL_PIPE)) {
+		TRACE(("usb_ohci: submitting control request\n"));
+		return _SubmitControlRequest(transfer);
 	}
 
-	if ((type & USB_OBJECT_INTERRUPT_PIPE) || (type & USB_OBJECT_ISO_PIPE)) {
-		TRACE(("usb_ohci: submitting periodic transfer\n"));
-		return _SubmitPeriodicTransfer(transfer);
+	if ((type & USB_OBJECT_INTERRUPT_PIPE) || (type & USB_OBJECT_BULK_PIPE)) {
+		// TODO
+		return B_OK;
+	}
+
+	if ((type & USB_OBJECT_ISO_PIPE)) {
+		TRACE(("usb_ohci: submitting isochronous transfer\n"));
+		return _SubmitIsochronousTransfer(transfer);
 	}
 
 	TRACE_ERROR(("usb_ohci: tried to submit transfer for unknown pipe"
@@ -427,16 +432,149 @@ OHCI::SubmitTransfer(Transfer *transfer)
 
 
 status_t
-OHCI::_SubmitAsyncTransfer(Transfer *transfer)
+OHCI::_SubmitControlRequest(Transfer *transfer)
+{
+	usb_request_data *requestData = transfer->RequestData();
+	bool directionIn = (requestData->RequestType & USB_REQTYPE_DEVICE_IN) > 0;
+
+	ohci_general_td *setupDescriptor
+		= _CreateGeneralDescriptor(sizeof(usb_request_data));
+	if (!setupDescriptor) {
+		TRACE_ERROR(("usb_ohci: failed to allocate setup descriptor\n"));
+		return B_NO_MEMORY;
+	}
+	// Flags set up could be moved into _CreateGeneralDescriptor
+	setupDescriptor->flags |= OHCI_TD_DIRECTION_PID_SETUP
+		| OHCI_TD_NO_CONDITION_CODE
+		| OHCI_TD_TOGGLE_0
+		| OHCI_TD_SET_DELAY_INTERRUPT(6); // Not sure about this.
+
+	ohci_general_td *statusDescriptor
+		= _CreateGeneralDescriptor(0);
+	if (!statusDescriptor) {
+		TRACE_ERROR(("usb_ohci: failed to allocate status descriptor\n"));
+		_FreeGeneralDescriptor(setupDescriptor);
+		return B_NO_MEMORY;
+	}
+	statusDescriptor->flags 
+		|= (directionIn ? OHCI_TD_DIRECTION_PID_OUT : OHCI_TD_DIRECTION_PID_IN)
+		| OHCI_TD_NO_CONDITION_CODE
+		| OHCI_TD_TOGGLE_1
+		| OHCI_TD_SET_DELAY_INTERRUPT(1);
+
+	iovec vector;
+	vector.iov_base = requestData;
+	vector.iov_len = sizeof(usb_request_data);
+	_WriteDescriptorChain(setupDescriptor, &vector, 1);
+
+	if (transfer->VectorCount() > 0) {
+		ohci_general_td *dataDescriptor = NULL;
+		ohci_general_td *lastDescriptor = NULL;
+		status_t result = _CreateDescriptorChain(&dataDescriptor,
+			&lastDescriptor,
+			directionIn ? OHCI_TD_DIRECTION_PID_OUT : OHCI_TD_DIRECTION_PID_IN,
+			transfer->VectorLength());
+		if (result < B_OK) {
+			_FreeGeneralDescriptor(setupDescriptor);
+			_FreeGeneralDescriptor(statusDescriptor);
+			return result;
+		}
+
+		if (!directionIn) {
+			_WriteDescriptorChain(dataDescriptor, transfer->Vector(),
+				transfer->VectorCount());
+		}
+
+		_LinkDescriptors(setupDescriptor, dataDescriptor);
+		_LinkDescriptors(lastDescriptor, statusDescriptor);
+	} else {
+		_LinkDescriptors(setupDescriptor, statusDescriptor);
+	}
+
+	// TODO
+	// 1. Insert the chain descriptors to the endpoint
+	// 2. Clear the Skip bit in the enpoint
+	_WriteReg(OHCI_COMMAND_STATUS, OHCI_CONTROL_LIST_FILLED);
+
+	return B_OK;
+}
+
+
+status_t
+OHCI::_SubmitIsochronousTransfer(Transfer *transfer)
 {
 	return B_ERROR;
 }
 
 
+void
+OHCI::_LinkDescriptors(ohci_general_td *first, ohci_general_td *second)
+{
+	first->next_physical_descriptor = second->physical_address;
+	first->next_logical_descriptor = second;
+}
+
+
 status_t
-OHCI::_SubmitPeriodicTransfer(Transfer *transfer)
+OHCI::_CreateDescriptorChain(ohci_general_td **_firstDescriptor,
+	ohci_general_td **_lastDescriptor, uint8 direction, size_t bufferSize)
 {
 	return B_ERROR;
+}
+
+
+size_t
+OHCI::_WriteDescriptorChain(ohci_general_td *topDescriptor, iovec *vector,
+	size_t vectorCount)
+{
+	ohci_general_td *current = topDescriptor;
+	size_t actualLength = 0;
+	size_t vectorIndex = 0;
+	size_t vectorOffset = 0;
+	size_t bufferOffset = 0;
+
+	while (current) {
+		if (!current->buffer_logical)
+			break;
+
+		while (true) {
+			size_t length = min_c(current->buffer_size - bufferOffset,
+				vector[vectorIndex].iov_len - vectorOffset);
+
+			TRACE(("usb_ohci: copying %ld bytes to bufferOffset %ld from"
+				" vectorOffset %ld at index %ld of %ld\n", length, bufferOffset,
+				vectorOffset, vectorIndex, vectorCount));
+			memcpy((uint8 *)current->buffer_logical + bufferOffset,
+				(uint8 *)vector[vectorIndex].iov_base + vectorOffset, length);
+
+			actualLength += length;
+			vectorOffset += length;
+			bufferOffset += length;
+
+			if (vectorOffset >= vector[vectorIndex].iov_len) {
+				if (++vectorIndex >= vectorCount) {
+					TRACE(("usb_ohci: wrote descriptor chain (%ld bytes, no"
+						" more vectors)\n", actualLength));
+					return actualLength;
+				}
+
+				vectorOffset = 0;
+			}
+
+			if (bufferOffset >= current->buffer_size) {
+				bufferOffset = 0;
+				break;
+			}
+		}
+
+		if (!current->next_logical_descriptor)
+			break;
+
+		current = (ohci_general_td *)current->next_logical_descriptor;
+	}
+
+	TRACE(("usb_ohci: wrote descriptor chain (%ld bytes)\n", actualLength));
+	return actualLength;
 }
 
 
@@ -665,34 +803,54 @@ OHCI::_FreeEndpoint(ohci_endpoint_descriptor *endpoint)
 }
 
 
-ohci_general_descriptor*
-OHCI::_CreateGeneralDescriptor()
+ohci_general_td*
+OHCI::_CreateGeneralDescriptor(size_t bufferSize)
 {
-	ohci_general_descriptor *descriptor;
+	ohci_general_td *descriptor;
 	void *physicalAddress;
 
 	if (fStack->AllocateChunk((void **)&descriptor, &physicalAddress,
-		sizeof(ohci_general_descriptor)) != B_OK) {
+		sizeof(ohci_general_td)) != B_OK) {
 		TRACE_ERROR(("usb_ohci: failed to allocate general descriptor\n"));
 		return NULL;
 	}
-
-	// TODO: Finish methods
-	memset((void *)descriptor, 0, sizeof(ohci_general_descriptor));
+	memset((void *)descriptor, 0, sizeof(ohci_general_td));
 	descriptor->physical_address = (addr_t)physicalAddress;
 
+	if (!bufferSize) {
+		descriptor->buffer_physical = 0;
+		descriptor->buffer_logical = NULL;
+		descriptor->last_physical_byte_address = 0;
+		return descriptor;
+	}
+
+	if (fStack->AllocateChunk(&descriptor->buffer_logical,
+		(void **)&descriptor->buffer_physical, bufferSize) != B_OK) {
+		TRACE_ERROR(("usb_ohci: failed to allocate space for buffer\n"));
+		fStack->FreeChunk(descriptor, (void *)descriptor->physical_address,
+			sizeof(ohci_general_td));
+		return NULL;
+	}
+	descriptor->last_physical_byte_address
+		= descriptor->buffer_physical + bufferSize - 1;
+
 	return descriptor;
-}	
+}
 
 
 void
-OHCI::_FreeGeneralDescriptor(ohci_general_descriptor *descriptor)
+OHCI::_FreeGeneralDescriptor(ohci_general_td *descriptor)
 {
 	if (!descriptor)
 		return;
 
+	if (descriptor->buffer_logical) {
+		fStack->FreeChunk(descriptor->buffer_logical,
+			(void *)descriptor->buffer_physical, descriptor->buffer_size);
+	}
+
 	fStack->FreeChunk((void *)descriptor, (void *)descriptor->physical_address,
-		sizeof(ohci_general_descriptor));
+		sizeof(ohci_general_td));
 }
 
 
