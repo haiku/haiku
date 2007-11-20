@@ -30,21 +30,21 @@ BSound::InitCheck()
 {
 	UNIMPLEMENTED();
 
-	return B_OK;
+	return B_ERROR;
 }
 
 BSound * 
 BSound::AcquireRef()
 {
 	UNIMPLEMENTED();
-	return 0;
+	return NULL;
 }
 
 bool 
 BSound::ReleaseRef()
 {
 	UNIMPLEMENTED();
-	return 0;
+	return false;
 }
 
 int32 
@@ -72,7 +72,7 @@ BSound::Format() const
 BSound::Data() const
 {
 	UNIMPLEMENTED();
-	return 0;
+	return NULL;
 }	/* returns NULL for files */
 
 /* virtual */ off_t 
@@ -89,7 +89,7 @@ BSound::GetDataAt(off_t offset,
 				  size_t * out_used)
 {
 	UNIMPLEMENTED();
-	return 0;
+	return false;
 }
 
 /*************************************************************
@@ -105,7 +105,7 @@ BSound::BSound(const media_raw_audio_format & format)
 BSound::Perform(int32 code,...)
 {
 	UNIMPLEMENTED();
-	return 0;
+	return B_ERROR;
 }
 
 /*************************************************************
@@ -139,7 +139,7 @@ BSound::free_data()
 BSound::load_entry(void * arg)
 {
 	UNIMPLEMENTED();
-	return 0;
+	return B_ERROR;
 }
 
 void 
@@ -152,7 +152,7 @@ bool
 BSound::check_stop()
 {
 	UNIMPLEMENTED();
-	return 0;
+	return false;
 }
 
 /*************************************************************
@@ -164,14 +164,14 @@ BSound::BindTo(BSoundPlayer * player,
 			   const media_raw_audio_format & format)
 {
 	UNIMPLEMENTED();
-	return 0;
+	return B_ERROR;
 }
 
 /* virtual */ status_t 
 BSound::UnbindFrom(BSoundPlayer * player)
 {
 	UNIMPLEMENTED();
-	return 0;
+	return B_ERROR;
 }
 
 /*************************************************************
