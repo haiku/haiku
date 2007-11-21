@@ -95,5 +95,5 @@ const static rgb_color kSystemPalette[] = {
 	{ 255, 255, 255, 0 } // B_TRANSPARENT_MAGIC_CMAP8
 };
 
-#endif __PALETTE_H
+#endif /* __PALETTE_H */
 
