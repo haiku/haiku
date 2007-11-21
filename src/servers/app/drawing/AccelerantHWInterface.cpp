@@ -6,6 +6,7 @@
  *		Michael Lotz <mmlr@mlotz.ch>
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 /*!	Accelerant based HWInterface implementation */
@@ -94,51 +95,51 @@ use_fail_safe_video_mode()
 
 
 AccelerantHWInterface::AccelerantHWInterface()
-	:	HWInterface(),
-		fCardFD(-1),
-		fAccelerantImage(-1),
-		fAccelerantHook(NULL),
-		fEngineToken(NULL),
-		fSyncToken(),
+	:  HWInterface(),
+	fCardFD(-1),
+	fAccelerantImage(-1),
+	fAccelerantHook(NULL),
+	fEngineToken(NULL),
+	fSyncToken(),
 
-		// required hooks
-		fAccAcquireEngine(NULL),
-		fAccReleaseEngine(NULL),
-		fAccSyncToToken(NULL),
-		fAccGetModeCount(NULL),
-		fAccGetModeList(NULL),
-		fAccGetFrameBufferConfig(NULL),
-		fAccSetDisplayMode(NULL),
-		fAccGetDisplayMode(NULL),
-		fAccGetPixelClockLimits(NULL),
+	// required hooks
+	fAccAcquireEngine(NULL),
+	fAccReleaseEngine(NULL),
+	fAccSyncToToken(NULL),
+	fAccGetModeCount(NULL),
+	fAccGetModeList(NULL),
+	fAccGetFrameBufferConfig(NULL),
+	fAccSetDisplayMode(NULL),
+	fAccGetDisplayMode(NULL),
+	fAccGetPixelClockLimits(NULL),
 
-		// optional accelerant hooks
-		fAccGetTimingConstraints(NULL),
-		fAccProposeDisplayMode(NULL),
-		fAccFillRect(NULL),
-		fAccInvertRect(NULL),
-		fAccScreenBlit(NULL),
-		fAccSetCursorShape(NULL),
-		fAccMoveCursor(NULL),
-		fAccShowCursor(NULL),
+	// optional accelerant hooks
+	fAccGetTimingConstraints(NULL),
+	fAccProposeDisplayMode(NULL),
+	fAccFillRect(NULL),
+	fAccInvertRect(NULL),
+	fAccScreenBlit(NULL),
+	fAccSetCursorShape(NULL),
+	fAccMoveCursor(NULL),
+	fAccShowCursor(NULL),
 
-		// dpms hooks
-		fAccDPMSCapabilities(NULL),
-		fAccDPMSMode(NULL),
-		fAccSetDPMSMode(NULL),		
+	// dpms hooks
+	fAccDPMSCapabilities(NULL),
+	fAccDPMSMode(NULL),
+	fAccSetDPMSMode(NULL),		
 
-		fModeCount(0),
-		fModeList(NULL),
+	fModeCount(0),
+	fModeList(NULL),
 
-		fBackBuffer(NULL),
-		fFrontBuffer(new (nothrow) AccelerantBuffer()),
+	fBackBuffer(NULL),
+	fFrontBuffer(new (nothrow) AccelerantBuffer()),
 
-		fInitialModeSwitch(true),
+	fInitialModeSwitch(true),
 
-		fRectParams(new (nothrow) fill_rect_params[kDefaultParamsCount]),
-		fRectParamsCount(kDefaultParamsCount),
-		fBlitParams(new (nothrow) blit_params[kDefaultParamsCount]),
-		fBlitParamsCount(kDefaultParamsCount)
+	fRectParams(new (nothrow) fill_rect_params[kDefaultParamsCount]),
+	fRectParamsCount(kDefaultParamsCount),
+	fBlitParams(new (nothrow) blit_params[kDefaultParamsCount]),
+	fBlitParamsCount(kDefaultParamsCount)
 {
 	fDisplayMode.virtual_width = 640;
 	fDisplayMode.virtual_height = 480;
@@ -296,7 +297,8 @@ AccelerantHWInterface::_OpenAccelerant(int device)
 			}
 
 			init_accelerant initAccelerant;
-			initAccelerant = (init_accelerant)fAccelerantHook(B_INIT_ACCELERANT, NULL);
+			initAccelerant = (init_accelerant)fAccelerantHook(
+				B_INIT_ACCELERANT, NULL);
 			if (!initAccelerant || initAccelerant(device) != B_OK) {
 				ATRACE(("InitAccelerant unsuccessful\n"));
 				unload_add_on(fAccelerantImage);
@@ -383,7 +385,8 @@ status_t
 AccelerantHWInterface::Shutdown()
 {
 	if (fAccelerantHook) {
-		uninit_accelerant UninitAccelerant = (uninit_accelerant)fAccelerantHook(B_UNINIT_ACCELERANT, NULL);
+		uninit_accelerant UninitAccelerant = (uninit_accelerant)
+			fAccelerantHook(B_UNINIT_ACCELERANT, NULL);
 		if (UninitAccelerant)
 			UninitAccelerant();
 	}
@@ -547,7 +550,8 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 
 	// Update the frame buffer used by the on-screen KDL
 #ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
-	uint32 depth = (fFrameBufferConfig.bytes_per_row / fDisplayMode.virtual_width) << 3;
+	uint32 depth = (fFrameBufferConfig.bytes_per_row
+		/ fDisplayMode.virtual_width) << 3;
 	if (fDisplayMode.space == B_RGB15)
 		depth = 15;
 
@@ -578,7 +582,7 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 
 		if (doubleBuffered) {
 			fBackBuffer = new(nothrow) MallocBuffer(fDisplayMode.virtual_width,
-													fDisplayMode.virtual_height);
+				fDisplayMode.virtual_height);
 
 			status = fBackBuffer ? fBackBuffer->InitCheck() : B_NO_MEMORY;
 			if (status < B_OK) {
@@ -597,11 +601,12 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 		_SetGrayscalePalette();
 
 	// update acceleration hooks
-	fAccFillRect = (fill_rectangle)fAccelerantHook(B_FILL_RECTANGLE, (void *)&fDisplayMode);
+	fAccFillRect = (fill_rectangle)fAccelerantHook(B_FILL_RECTANGLE,
+		(void *)&fDisplayMode);
 	fAccInvertRect = (invert_rectangle)fAccelerantHook(B_INVERT_RECTANGLE,
 		(void *)&fDisplayMode);
-	fAccScreenBlit = (screen_to_screen_blit)fAccelerantHook(B_SCREEN_TO_SCREEN_BLIT,
-		(void *)&fDisplayMode);
+	fAccScreenBlit = (screen_to_screen_blit)fAccelerantHook(
+		B_SCREEN_TO_SCREEN_BLIT, (void *)&fDisplayMode);
 
 	_NotifyFrameBufferChanged();
 
@@ -657,7 +662,9 @@ AccelerantHWInterface::_UpdateFrameBufferConfig()
 status_t
 AccelerantHWInterface::GetDeviceInfo(accelerant_device_info *info)
 {
-	get_accelerant_device_info GetAccelerantDeviceInfo = (get_accelerant_device_info)fAccelerantHook(B_GET_ACCELERANT_DEVICE_INFO, NULL);
+	get_accelerant_device_info GetAccelerantDeviceInfo
+		= (get_accelerant_device_info)fAccelerantHook(
+			B_GET_ACCELERANT_DEVICE_INFO, NULL);
 	if (!GetAccelerantDeviceInfo) {
 		ATRACE(("No B_GET_ACCELERANT_DEVICE_INFO hook found\n"));
 		return B_UNSUPPORTED;
@@ -779,11 +786,13 @@ AccelerantHWInterface::GetPreferredMode(display_mode* preferredMode)
 
 		// find preferred mode from EDID info
 		for (uint32 i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; ++i) {
-			if (info.detailed_monitor[i].monitor_desc_type != EDID1_IS_DETAILED_TIMING)
+			if (info.detailed_monitor[i].monitor_desc_type
+					!= EDID1_IS_DETAILED_TIMING)
 				continue;
 
 			// construct basic mode and find it in the mode list
-			const edid1_detailed_timing& timing = info.detailed_monitor[i].data.detailed_timing;
+			const edid1_detailed_timing& timing
+				= info.detailed_monitor[i].data.detailed_timing;
 			if (timing.h_active < 640 || timing.v_active < 350)
 				continue;
 
@@ -796,11 +805,13 @@ AccelerantHWInterface::GetPreferredMode(display_mode* preferredMode)
 			mode.timing.pixel_clock = timing.pixel_clock * 10;
 			mode.timing.h_display = timing.h_active;
 			mode.timing.h_sync_start = timing.h_active + timing.h_sync_off;
-			mode.timing.h_sync_end = mode.timing.h_sync_start + timing.h_sync_width;
+			mode.timing.h_sync_end = mode.timing.h_sync_start
+				+ timing.h_sync_width;
 			mode.timing.h_total = timing.h_active + timing.h_blank;
 			mode.timing.v_display = timing.v_active;
 			mode.timing.v_sync_start = timing.v_active + timing.v_sync_off;
-			mode.timing.v_sync_end = mode.timing.v_sync_start + timing.v_sync_width;
+			mode.timing.v_sync_end = mode.timing.v_sync_start
+				+ timing.v_sync_width;
 			mode.timing.v_total = timing.v_active + timing.v_blank;
 			mode.space = B_RGB32;
 			mode.virtual_width = timing.h_active;
@@ -905,7 +916,8 @@ sem_id
 AccelerantHWInterface::RetraceSemaphore()
 {
 	accelerant_retrace_semaphore AccelerantRetraceSemaphore =
-		(accelerant_retrace_semaphore)fAccelerantHook(B_ACCELERANT_RETRACE_SEMAPHORE, NULL);
+		(accelerant_retrace_semaphore)fAccelerantHook(
+			B_ACCELERANT_RETRACE_SEMAPHORE, NULL);
 	if (!AccelerantRetraceSemaphore)
 		return B_UNSUPPORTED;
 		
@@ -918,7 +930,9 @@ AccelerantHWInterface::WaitForRetrace(bigtime_t timeout)
 {
 	AutoReadLocker _(this);
 
-	accelerant_retrace_semaphore AccelerantRetraceSemaphore = (accelerant_retrace_semaphore)fAccelerantHook(B_ACCELERANT_RETRACE_SEMAPHORE, NULL);
+	accelerant_retrace_semaphore AccelerantRetraceSemaphore
+		= (accelerant_retrace_semaphore)fAccelerantHook(
+			B_ACCELERANT_RETRACE_SEMAPHORE, NULL);
 	if (!AccelerantRetraceSemaphore)
 		return B_UNSUPPORTED;
 	
@@ -985,8 +999,9 @@ AccelerantHWInterface::GetDriverPath(BString &string)
 	//	all of our drivers)
 	char path[B_PATH_NAME_LENGTH];
 	get_accelerant_clone_info getCloneInfo;
-	getCloneInfo = (get_accelerant_clone_info)fAccelerantHook(B_GET_ACCELERANT_CLONE_INFO, NULL);
-	
+	getCloneInfo = (get_accelerant_clone_info)fAccelerantHook(
+		B_GET_ACCELERANT_CLONE_INFO, NULL);
+
 	if (getCloneInfo == NULL)
 		return B_NOT_SUPPORTED;
 
@@ -1100,7 +1115,8 @@ AccelerantHWInterface::CheckOverlayRestrictions(int32 width, int32 height,
 
 
 const overlay_buffer*
-AccelerantHWInterface::AllocateOverlayBuffer(int32 width, int32 height, color_space space)
+AccelerantHWInterface::AllocateOverlayBuffer(int32 width, int32 height,
+	color_space space)
 {
 	if (fAccAllocateOverlayBuffer == NULL)
 		return NULL;
@@ -1133,22 +1149,26 @@ AccelerantHWInterface::ConfigureOverlay(Overlay* overlay)
 void
 AccelerantHWInterface::HideOverlay(Overlay* overlay)
 {
-	fAccConfigureOverlay(overlay->OverlayToken(), overlay->OverlayBuffer(), NULL, NULL);
+	fAccConfigureOverlay(overlay->OverlayToken(), overlay->OverlayBuffer(),
+		NULL, NULL);
 }
 
 
 // CopyRegion
 void
 AccelerantHWInterface::CopyRegion(const clipping_rect* sortedRectList,
-								  uint32 count, int32 xOffset, int32 yOffset)
+	uint32 count, int32 xOffset, int32 yOffset)
 {
 	if (fAccScreenBlit && fAccAcquireEngine) {
-		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, &fSyncToken, &fEngineToken) >= B_OK) {
+		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, &fSyncToken,
+				&fEngineToken) >= B_OK) {
 			// make sure the blit_params cache is large enough
 			if (fBlitParamsCount < count) {
-				fBlitParamsCount = (count / kDefaultParamsCount + 1) * kDefaultParamsCount;
+				fBlitParamsCount = (count / kDefaultParamsCount + 1)
+					* kDefaultParamsCount;
 				// NOTE: realloc() could be used instead...
-				blit_params* params = new (nothrow) blit_params[fBlitParamsCount];
+				blit_params* params
+					= new (nothrow) blit_params[fBlitParamsCount];
 				if (params) {
 					delete[] fBlitParams;
 					fBlitParams = params;
@@ -1161,12 +1181,17 @@ AccelerantHWInterface::CopyRegion(const clipping_rect* sortedRectList,
 				fBlitParams[i].src_left = (uint16)sortedRectList[i].left;
 				fBlitParams[i].src_top = (uint16)sortedRectList[i].top;
 
-				fBlitParams[i].dest_left = (uint16)sortedRectList[i].left + xOffset;
-				fBlitParams[i].dest_top = (uint16)sortedRectList[i].top + yOffset;
+				fBlitParams[i].dest_left = (uint16)sortedRectList[i].left
+					+ xOffset;
+				fBlitParams[i].dest_top = (uint16)sortedRectList[i].top
+					+ yOffset;
 
-				// NOTE: width and height are expressed as distance, not pixel count!
-				fBlitParams[i].width = (uint16)(sortedRectList[i].right - sortedRectList[i].left);
-				fBlitParams[i].height = (uint16)(sortedRectList[i].bottom - sortedRectList[i].top);
+				// NOTE: width and height are expressed as distance, not
+				// pixel count!
+				fBlitParams[i].width = (uint16)(sortedRectList[i].right
+					- sortedRectList[i].left);
+				fBlitParams[i].height = (uint16)(sortedRectList[i].bottom
+					- sortedRectList[i].top);
 			}
 
 			// go
@@ -1190,8 +1215,7 @@ AccelerantHWInterface::FillRegion(/*const*/ BRegion& region,
 {
 	if (fAccFillRect && fAccAcquireEngine) {
 		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, &fSyncToken,
-			&fEngineToken) >= B_OK) {
-
+				&fEngineToken) >= B_OK) {
 			// convert the region
 			uint32 count;
 			_RegionToRectParams(&region, &count);
@@ -1215,20 +1239,16 @@ void
 AccelerantHWInterface::InvertRegion(/*const*/ BRegion& region)
 {
 	if (fAccInvertRect && fAccAcquireEngine) {
-		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, &fSyncToken, &fEngineToken) >= B_OK) {
-
+		if (fAccAcquireEngine(B_2D_ACCELERATION, 0xff, &fSyncToken,
+				&fEngineToken) >= B_OK) {
 			// convert the region
 			uint32 count;
 			_RegionToRectParams(&region, &count);
 
-			// go
 			fAccInvertRect(fEngineToken, fRectParams, count);
 
-			// done
 			if (fAccReleaseEngine)
 				fAccReleaseEngine(fEngineToken, &fSyncToken);
-
-			// sync
 			if (fAccSyncToToken)
 				fAccSyncToToken(&fSyncToken);
 		}
@@ -1298,10 +1318,7 @@ AccelerantHWInterface::BackBuffer() const
 bool
 AccelerantHWInterface::IsDoubleBuffered() const
 {
-	if (fModeList)
-		return fBackBuffer != NULL;
-
-	return HWInterface::IsDoubleBuffered();
+	return fBackBuffer != NULL;
 }
 
 // _DrawCursor
@@ -1318,13 +1335,15 @@ AccelerantHWInterface::_DrawCursor(BRect area) const
 // _RegionToRectParams
 void
 AccelerantHWInterface::_RegionToRectParams(/*const*/ BRegion* region,
-										   uint32* count) const
+	uint32* count) const
 {
 	*count = region->CountRects();
 	if (fRectParamsCount < *count) {
-		fRectParamsCount = (*count / kDefaultParamsCount + 1) * kDefaultParamsCount;
+		fRectParamsCount = (*count / kDefaultParamsCount + 1)
+			* kDefaultParamsCount;
 		// NOTE: realloc() could be used instead...
-		fill_rect_params* params = new (nothrow) fill_rect_params[fRectParamsCount];
+		fill_rect_params* params
+			= new (nothrow) fill_rect_params[fRectParamsCount];
 		if (params) {
 			delete[] fRectParams;
 			fRectParams = params;
@@ -1367,11 +1386,8 @@ AccelerantHWInterface::_NativeColor(const rgb_color& color) const
 		case B_RGBA32_BIG:
 		case B_RGB32_LITTLE:
 		case B_RGBA32_LITTLE: {
-			uint32 native = (color.alpha << 24) |
-							(color.red << 16) |
-							(color.green << 8) |
-							(color.blue);
-			return native;
+			return (uint32)((color.alpha << 24) | (color.red << 16)
+				| (color.green << 8) | color.blue);
 		}
 	}
 	return 0;
