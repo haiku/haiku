@@ -442,6 +442,9 @@ if $(HAIKU_ADD_POSIX_TEST_SUITE_TO_IMAGE) {
 		: sigrelse_1-1 sigrelse_2-1 sigrelse_3-core-buildonly ;
 	AddFilesToHaikuImage home posixtestsuite conformance interfaces signal
 		: signal_1-1 signal_2-1 signal_3-1 signal_5-1 signal_6-1 signal_7-1 ;
+	AddFilesToHaikuImage home posixtestsuite conformance interfaces sigset
+		: sigset_1-1 sigset_2-1 sigset_3-1 sigset_4-1 sigset_5-1 sigset_6-1
+		  sigset_7-1 sigset_8-1 sigset_9-1 sigset_10-1 ;
 }
 
 
