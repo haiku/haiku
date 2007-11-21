@@ -224,9 +224,9 @@ typedef struct {
 // Applies to ehci_qh.endpoint_caps
 #define EHCI_QH_CAPS_MULT_SHIFT	30			// Transactions per Micro-Frame
 #define EHCI_QH_CAPS_MULT_MASK	0x03
-#define EHCI_QH_CAPS_PORT_SHIFT	23			// Port Number
+#define EHCI_QH_CAPS_PORT_SHIFT	23			// Hub Port (Split-Transaction)
 #define EHCI_QH_CAPS_PORT_MASK	0x7f
-#define EHCI_QH_CAPS_HUB_SHIFT	16			// Hub Address
+#define EHCI_QH_CAPS_HUB_SHIFT	16			// Hub Address (Split-Transaction)
 #define EHCI_QH_CAPS_HUB_MASK	0x7f
 #define EHCI_QH_CAPS_SCM_SHIFT	8			// Split Completion Mask
 #define EHCI_QH_CAPS_SCM_MASK	0xff

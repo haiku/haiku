@@ -522,7 +522,6 @@ EHCI::AddTo(Stack *stack)
 	}
 
 	for (int32 i = 0; sPCIModule->get_nth_pci_info(i, item) >= B_OK; i++) {
-
 		if (item->class_base == PCI_serial_bus && item->class_sub == PCI_usb
 			&& item->class_api == PCI_usb_ehci) {
 			if (item->u.h0.interrupt_line == 0
@@ -1205,20 +1204,23 @@ EHCI::InitQueueHead(ehci_qh *queueHead, Pipe *pipe)
 			return B_ERROR;
 	}
 
-	if (pipe->Type() & USB_OBJECT_CONTROL_PIPE) {
-		queueHead->endpoint_chars |=
-			(pipe->Speed() != USB_SPEED_HIGHSPEED ? EHCI_QH_CHARS_CONTROL : 0);
-	}
-
 	queueHead->endpoint_chars |= (3 << EHCI_QH_CHARS_RL_SHIFT)
 		| (pipe->MaxPacketSize() << EHCI_QH_CHARS_MPL_SHIFT)
 		| (pipe->EndpointAddress() << EHCI_QH_CHARS_EPT_SHIFT)
 		| (pipe->DeviceAddress() << EHCI_QH_CHARS_DEV_SHIFT)
 		| EHCI_QH_CHARS_TOGGLE;
-	queueHead->endpoint_caps = (1 << EHCI_QH_CAPS_MULT_SHIFT);
 
+	queueHead->endpoint_caps = (1 << EHCI_QH_CAPS_MULT_SHIFT);
 	if (pipe->Type() & USB_OBJECT_INTERRUPT_PIPE)
 		queueHead->endpoint_caps |= (0xff << EHCI_QH_CAPS_ISM_SHIFT);
+
+	if (pipe->Speed() != USB_SPEED_HIGHSPEED) {
+		if (pipe->Type() & USB_OBJECT_CONTROL_PIPE)
+			queueHead->endpoint_chars |= EHCI_QH_CHARS_CONTROL;
+
+		queueHead->endpoint_caps |= (pipe->HubPort() << EHCI_QH_CAPS_PORT_SHIFT)
+			| (pipe->HubAddress() << EHCI_QH_CAPS_HUB_SHIFT);
+	}
 
 	return B_OK;
 }
