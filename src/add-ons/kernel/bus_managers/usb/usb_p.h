@@ -179,7 +179,7 @@ virtual	status_t						InitCheck();
 		void							FreeAddress(int8 address);
 
 		Device							*AllocateDevice(Hub *parent,
-											usb_speed speed);
+											uint8 port, usb_speed speed);
 		void							FreeDevice(Device *device);
 
 virtual	status_t						Start();
@@ -249,21 +249,29 @@ class Pipe : public Object {
 public:
 enum	pipeDirection 	{ In, Out, Default };
 
-										Pipe(Object *parent,
-											int8 deviceAddress,
-											uint8 endpointAddress,
-											pipeDirection direction,
-											usb_speed speed,
-											size_t maxPacketSize);
+										Pipe(Object *parent);
 virtual									~Pipe();
+
+		void							InitCommon(int8 deviceAddress,
+											uint8 endpointAddress,
+											usb_speed speed,
+											pipeDirection direction,
+											size_t maxPacketSize,
+											uint8 interval,
+											int8 hubAddress, uint8 hubPort);
 
 virtual	uint32							Type() { return USB_OBJECT_PIPE; };
 
 		int8							DeviceAddress() { return fDeviceAddress; };
 		usb_speed						Speed() { return fSpeed; };
 		pipeDirection					Direction() { return fDirection; };
-		int8							EndpointAddress() { return fEndpointAddress; };
+		uint8							EndpointAddress() { return fEndpointAddress; };
 		size_t							MaxPacketSize() { return fMaxPacketSize; };
+		uint8							Interval() { return fInterval; };
+
+		void							SetHubInfo(int8 address, uint8 port);
+		int8							HubAddress() { return fHubAddress; };
+		uint8							HubPort() { return fHubPort; };
 
 virtual	bool							DataToggle() { return fDataToggle; };
 virtual	void							SetDataToggle(bool toggle) { fDataToggle = toggle; };
@@ -285,6 +293,9 @@ private:
 		pipeDirection					fDirection;
 		usb_speed						fSpeed;
 		size_t							fMaxPacketSize;
+		uint8							fInterval;
+		int8							fHubAddress;
+		uint8							fHubPort;
 		bool							fDataToggle;
 		void							*fControllerCookie;
 };
@@ -292,11 +303,7 @@ private:
 
 class ControlPipe : public Pipe {
 public:
-										ControlPipe(Object *parent,
-											int8 deviceAddress,
-											uint8 endpointAddress,
-											usb_speed speed,
-											size_t maxPacketSize);
+										ControlPipe(Object *parent);
 
 virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_CONTROL_PIPE; };
 
@@ -328,13 +335,7 @@ static	void							SendRequestCallback(void *cookie,
 
 class InterruptPipe : public Pipe {
 public:
-										InterruptPipe(Object *parent,
-											int8 deviceAddress,
-											uint8 endpointAddress,
-											pipeDirection direction,
-											usb_speed speed,
-											size_t maxPacketSize,
-											uint8 interval);
+										InterruptPipe(Object *parent);
 
 virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_INTERRUPT_PIPE; };
 
@@ -342,22 +343,12 @@ virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_INTERRUPT_PIPE
 											size_t dataLength,
 											usb_callback_func callback,
 											void *callbackCookie);
-
-		uint8							Interval() { return fInterval; };
-
-private:
-		uint8							fInterval;
 };
 
 
 class BulkPipe : public Pipe {
 public:
-										BulkPipe(Object *parent,
-											int8 deviceAddress,
-											uint8 endpointAddress,
-											pipeDirection direction,
-											usb_speed speed,
-											size_t maxPacketSize);
+										BulkPipe(Object *parent);
 
 virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_BULK_PIPE; };
 
@@ -374,12 +365,7 @@ virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_BULK_PIPE; };
 
 class IsochronousPipe : public Pipe {
 public:
-										IsochronousPipe(Object *parent,
-											int8 deviceAddress,
-											uint8 endpointAddress,
-											pipeDirection direction,
-											usb_speed speed,
-											size_t maxPacketSize);
+										IsochronousPipe(Object *parent);
 
 virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_ISO_PIPE; };
 
@@ -425,7 +411,7 @@ private:
 
 class Device : public Object {
 public:
-										Device(Object *parent,
+										Device(Object *parent, int8 hubPort,
 											usb_device_descriptor &desc,
 											int8 deviceAddress,
 											usb_speed speed);
@@ -447,6 +433,7 @@ virtual	status_t						GetDescriptor(uint8 descriptorType,
 
 		int8							DeviceAddress() const { return fDeviceAddress; };
 		const usb_device_descriptor		*DeviceDescriptor() const;
+		usb_speed						Speed() const { return fSpeed; };
 
 		const usb_configuration_info	*Configuration() const;
 		const usb_configuration_info	*ConfigurationAt(uint8 index) const;
@@ -464,6 +451,8 @@ virtual	status_t						BuildDeviceName(char *string,
 											uint32 *index, size_t bufferSize,
 											Device *device);
 
+		int8							HubPort() const { return fHubPort; };
+
 		// Convenience functions for standard requests
 virtual	status_t						SetFeature(uint16 selector);
 virtual	status_t						ClearFeature(uint16 selector);
@@ -479,13 +468,14 @@ private:
 		usb_configuration_info			*fCurrentConfiguration;
 		usb_speed						fSpeed;
 		int8							fDeviceAddress;
+		int8							fHubPort;
 		ControlPipe						*fDefaultPipe;
 };
 
 
 class Hub : public Device {
 public:
-										Hub(Object *parent,
+										Hub(Object *parent, int8 hubPort,
 											usb_device_descriptor &desc,
 											int8 deviceAddress,
 											usb_speed speed);

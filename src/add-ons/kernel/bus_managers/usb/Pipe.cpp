@@ -10,17 +10,12 @@
 #include "usb_p.h"
 
 
-Pipe::Pipe(Object *parent, int8 deviceAddress, uint8 endpointAddress,
-	pipeDirection direction, usb_speed speed, size_t maxPacketSize)
+Pipe::Pipe(Object *parent)
 	:	Object(parent),
-		fDeviceAddress(deviceAddress),
-		fEndpointAddress(endpointAddress),
-		fDirection(direction),
-		fSpeed(speed),
-		fMaxPacketSize(maxPacketSize),
-		fDataToggle(false)
+		fDataToggle(false),
+		fControllerCookie(NULL)
 {
-	GetBusManager()->NotifyPipeChange(this, USB_CHANGE_CREATED);
+	// all other init is to be done in InitCommon()
 }
 
 
@@ -28,6 +23,33 @@ Pipe::~Pipe()
 {
 	CancelQueuedTransfers(true);
 	GetBusManager()->NotifyPipeChange(this, USB_CHANGE_DESTROYED);
+}
+
+
+
+
+void
+Pipe::InitCommon(int8 deviceAddress, uint8 endpointAddress, usb_speed speed,
+	pipeDirection direction, size_t maxPacketSize, uint8 interval,
+	int8 hubAddress, uint8 hubPort)
+{
+	fDeviceAddress = deviceAddress;
+	fEndpointAddress = endpointAddress;
+	fSpeed = speed;
+	fDirection = direction;
+	fMaxPacketSize = maxPacketSize;
+	fHubAddress = hubAddress;
+	fHubPort = hubPort;
+
+	GetBusManager()->NotifyPipeChange(this, USB_CHANGE_CREATED);
+}
+
+
+void
+Pipe::SetHubInfo(int8 address, uint8 port)
+{
+	fHubAddress = address;
+	fHubPort = port;
 }
 
 
@@ -100,12 +122,8 @@ Pipe::GetStatus(uint16 *status)
 //
 
 
-InterruptPipe::InterruptPipe(Object *parent, int8 deviceAddress,
-	uint8 endpointAddress, pipeDirection direction, usb_speed speed,
-	size_t maxPacketSize, uint8 interval)
-	:	Pipe(parent, deviceAddress, endpointAddress, direction, speed,
-			maxPacketSize),
-		fInterval(interval)
+InterruptPipe::InterruptPipe(Object *parent)
+	:	Pipe(parent)
 {
 }
 
@@ -133,10 +151,8 @@ InterruptPipe::QueueInterrupt(void *data, size_t dataLength,
 //
 
 
-BulkPipe::BulkPipe(Object *parent, int8 deviceAddress, uint8 endpointAddress,
-	pipeDirection direction, usb_speed speed, size_t maxPacketSize)
-	:	Pipe(parent, deviceAddress, endpointAddress, direction, speed,
-			maxPacketSize)
+BulkPipe::BulkPipe(Object *parent)
+	:	Pipe(parent)
 {
 }
 
@@ -182,11 +198,8 @@ BulkPipe::QueueBulkV(iovec *vector, size_t vectorCount,
 //
 
 
-IsochronousPipe::IsochronousPipe(Object *parent, int8 deviceAddress,
-	uint8 endpointAddress, pipeDirection direction, usb_speed speed,
-	size_t maxPacketSize)
-	:	Pipe(parent, deviceAddress, endpointAddress, direction, speed,
-			maxPacketSize),
+IsochronousPipe::IsochronousPipe(Object *parent)
+	:	Pipe(parent),
 		fMaxQueuedPackets(0),
 		fMaxBufferDuration(0),
 		fSampleSize(0)
@@ -273,10 +286,8 @@ typedef struct transfer_result_data_s {
 } transfer_result_data;
 
 
-ControlPipe::ControlPipe(Object *parent, int8 deviceAddress,
-	uint8 endpointAddress, usb_speed speed, size_t maxPacketSize)
-	:	Pipe(parent, deviceAddress, endpointAddress, Default, speed,
-			maxPacketSize)
+ControlPipe::ControlPipe(Object *parent)
+	:	Pipe(parent)
 {
 }
 

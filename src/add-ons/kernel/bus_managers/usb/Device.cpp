@@ -10,8 +10,8 @@
 #include "usb_p.h"
 
 
-Device::Device(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
-	usb_speed speed)
+Device::Device(Object *parent, int8 hubPort, usb_device_descriptor &desc,
+	int8 deviceAddress, usb_speed speed)
 	:	Object(parent),
 		fDeviceDescriptor(desc),
 		fInitOK(false),
@@ -19,16 +19,22 @@ Device::Device(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
 		fConfigurations(NULL),
 		fCurrentConfiguration(NULL),
 		fSpeed(speed),
-		fDeviceAddress(deviceAddress)
+		fDeviceAddress(deviceAddress),
+		fHubPort(hubPort)
 {
 	TRACE(("USB Device %d: creating device\n", fDeviceAddress));
 
-	fDefaultPipe = new(std::nothrow) ControlPipe(this, deviceAddress, 0,
-		fSpeed, fDeviceDescriptor.max_packet_size_0);
+	fDefaultPipe = new(std::nothrow) ControlPipe(this);
 	if (!fDefaultPipe) {
 		TRACE_ERROR(("USB Device %d: could not allocate default pipe\n", fDeviceAddress));
 		return;
 	}
+
+	int8 hubAddress = 0;
+	if (parent->Type() & USB_OBJECT_HUB)
+		hubAddress = ((Hub *)parent)->DeviceAddress();
+	fDefaultPipe->InitCommon(fDeviceAddress, 0, fSpeed, Pipe::Default,
+		fDeviceDescriptor.max_packet_size_0, 0, hubAddress, fHubPort);
 
 	// Get the device descriptor
 	// We already have a part of it, but we want it all
@@ -351,6 +357,10 @@ Device::SetConfigurationAt(uint8 index)
 	// Set current configuration
 	fCurrentConfiguration = &fConfigurations[index];
 
+	int8 hubAddress = 0;
+	if (Parent() && (Parent()->Type() & USB_OBJECT_HUB))
+		hubAddress = ((Hub *)Parent())->DeviceAddress();
+
 	// Initialize all the endpoints that are now active
 	for (size_t j = 0; j < fCurrentConfiguration->interface_count; j++) {
 		usb_interface_info *interfaceInfo = fCurrentConfiguration->interface[j].active;
@@ -358,35 +368,33 @@ Device::SetConfigurationAt(uint8 index)
 			usb_endpoint_info *endpoint = &interfaceInfo->endpoint[i];
 			Pipe *pipe = NULL;
 
+			Pipe::pipeDirection direction = Pipe::Out;
+			if (endpoint->descr->endpoint_address & 0x80)
+				direction = Pipe::In;
+
 			switch (endpoint->descr->attributes & 0x03) {
 				case 0x00: /* Control Endpoint */
-					pipe = new(std::nothrow) ControlPipe(this, fDeviceAddress,
-						endpoint->descr->endpoint_address & 0x0f, fSpeed,
-						endpoint->descr->max_packet_size);
+					pipe = new(std::nothrow) ControlPipe(this);
+					direction = Pipe::Default;
 					break;
 
 				case 0x01: /* Isochronous Endpoint */
-					pipe = new(std::nothrow) IsochronousPipe(this, fDeviceAddress,
-						endpoint->descr->endpoint_address & 0x0f,
-						(endpoint->descr->endpoint_address & 0x80) > 0 ? Pipe::In : Pipe::Out,
-						fSpeed, endpoint->descr->max_packet_size);
+					pipe = new(std::nothrow) IsochronousPipe(this);
 					break;
 
 				case 0x02: /* Bulk Endpoint */
-					pipe = new(std::nothrow) BulkPipe(this, fDeviceAddress,
-						endpoint->descr->endpoint_address & 0x0f,
-						(endpoint->descr->endpoint_address & 0x80) > 0 ? Pipe::In : Pipe::Out,
-						fSpeed, endpoint->descr->max_packet_size);
+					pipe = new(std::nothrow) BulkPipe(this);
 					break;
 
 				case 0x03: /* Interrupt Endpoint */
-					pipe = new(std::nothrow) InterruptPipe(this, fDeviceAddress,
-						endpoint->descr->endpoint_address & 0x0f,
-						(endpoint->descr->endpoint_address & 0x80) > 0 ? Pipe::In : Pipe::Out,
-						fSpeed, endpoint->descr->max_packet_size, endpoint->descr->interval);
+					pipe = new(std::nothrow) InterruptPipe(this);
 					break;
 			}
 
+			pipe->InitCommon(fDeviceAddress,
+				endpoint->descr->endpoint_address & 0x0f,
+				fSpeed, direction, endpoint->descr->max_packet_size,
+				endpoint->descr->interval, hubAddress, fHubPort);
 			endpoint->handle = pipe->USBID();
 		}
 	}

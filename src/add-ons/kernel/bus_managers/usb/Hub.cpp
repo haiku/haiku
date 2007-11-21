@@ -11,9 +11,9 @@
 #include <stdio.h>
 
 
-Hub::Hub(Object *parent, usb_device_descriptor &desc, int8 deviceAddress,
-	usb_speed speed)
-	:	Device(parent, desc, deviceAddress, speed),
+Hub::Hub(Object *parent, int8 hubPort, usb_device_descriptor &desc,
+	int8 deviceAddress, usb_speed speed)
+	:	Device(parent, hubPort, desc, deviceAddress, speed),
 		fInterruptPipe(NULL)
 {
 	TRACE(("USB Hub %d: creating hub\n", DeviceAddress()));
@@ -228,7 +228,7 @@ Hub::Explore(change_item **changeList)
 				if (fPortStatus[i].status & PORT_STATUS_HIGH_SPEED)
 					speed = USB_SPEED_HIGHSPEED;
 
-				Device *newDevice = GetBusManager()->AllocateDevice(this, speed);
+				Device *newDevice = GetBusManager()->AllocateDevice(this, i, speed);
 
 				if (newDevice) {
 					newDevice->Changed(changeList, true);

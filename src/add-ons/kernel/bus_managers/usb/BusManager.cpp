@@ -115,7 +115,7 @@ BusManager::FreeAddress(int8 address)
 
 
 Device *
-BusManager::AllocateDevice(Hub *parent, usb_speed speed)
+BusManager::AllocateDevice(Hub *parent, uint8 port, usb_speed speed)
 {
 	// Check if there is a free entry in the device map (for the device number)
 	int8 deviceAddress = AllocateAddress();
@@ -126,6 +126,7 @@ BusManager::AllocateDevice(Hub *parent, usb_speed speed)
 
 	TRACE(("USB BusManager: setting device address to %d\n", deviceAddress));
 	ControlPipe *defaultPipe = _GetDefaultPipe(speed);
+	defaultPipe->SetHubInfo(parent->DeviceAddress(), port);
 
 	if (!defaultPipe) {
 		TRACE_ERROR(("USB BusManager: error getting the default pipe for speed %d\n", (int)speed));
@@ -162,7 +163,9 @@ BusManager::AllocateDevice(Hub *parent, usb_speed speed)
 	snooze(USB_DELAY_SET_ADDRESS);
 
 	// Create a temporary pipe with the new address
-	ControlPipe pipe(parent, deviceAddress, 0, speed, 8);
+	ControlPipe pipe(fRootObject);
+	pipe.InitCommon(deviceAddress, 0, speed, Pipe::Default, 8, 0,
+		parent->DeviceAddress(), port);
 
 	// Get the device descriptor
 	// Just retrieve the first 8 bytes of the descriptor -> minimum supported
@@ -200,7 +203,7 @@ BusManager::AllocateDevice(Hub *parent, usb_speed speed)
 	// Create a new instance based on the type (Hub or Device)
 	if (deviceDescriptor.device_class == 0x09) {
 		TRACE(("USB BusManager: creating new hub\n"));
-		Hub *hub = new(std::nothrow) Hub(parent, deviceDescriptor,
+		Hub *hub = new(std::nothrow) Hub(parent, port, deviceDescriptor,
 			deviceAddress, speed);
 		if (!hub) {
 			TRACE_ERROR(("USB BusManager: no memory to allocate hub\n"));
@@ -219,7 +222,7 @@ BusManager::AllocateDevice(Hub *parent, usb_speed speed)
 	}
 
 	TRACE(("USB BusManager: creating new device\n"));
-	Device *device = new(std::nothrow) Device(parent, deviceDescriptor,
+	Device *device = new(std::nothrow) Device(parent, port, deviceDescriptor,
 		deviceAddress, speed);
 	if (!device) {
 		TRACE_ERROR(("USB BusManager: no memory to allocate device\n"));
@@ -291,8 +294,8 @@ BusManager::_GetDefaultPipe(usb_speed speed)
 		return NULL;
 
 	if (fDefaultPipes[speed] == NULL) {
-		fDefaultPipes[speed] = new(std::nothrow) ControlPipe(fRootObject,
-			0, 0, speed, 8);
+		fDefaultPipes[speed] = new(std::nothrow) ControlPipe(fRootObject);
+		fDefaultPipes[speed]->InitCommon(0, 0, speed, Pipe::Default, 8, 0, 0, 0);
 	}
 
 	if (!fDefaultPipes[speed]) {
