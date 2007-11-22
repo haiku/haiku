@@ -194,7 +194,8 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	uint32 control = _ReadReg(OHCI_CONTROL);
 	if (control & OHCI_INTERRUPT_ROUTING) {
 		TRACE(("usb_ohci: SMM is in control of the host controller\n"));
-		_WriteReg(OHCI_COMMAND_STATUS, OHCI_OWNERSHIP_CHANGE_REQUEST);
+		uint32 status = _ReadReg(OHCI_COMMAND_STATUS);
+		_WriteReg(OHCI_COMMAND_STATUS, status | OHCI_OWNERSHIP_CHANGE_REQUEST);
 		for (uint32 i = 0; i < 100 	&& (control & OHCI_INTERRUPT_ROUTING); i++) {
 			snooze(1000);
 			control = _ReadReg(OHCI_CONTROL);
@@ -204,15 +205,9 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 			_WriteReg(OHCI_CONTROL, OHCI_HC_FUNCTIONAL_STATE_RESET);
 			snooze(USB_DELAY_BUS_RESET);
 		}
-	} else if ((control & OHCI_HC_FUNCTIONAL_STATE_MASK)
-		!= OHCI_HC_FUNCTIONAL_STATE_RESET) {
-		TRACE(("usb_ohci: BIOS is in control of the host controller\n"));
-		if ((control & OHCI_HC_FUNCTIONAL_STATE_MASK)
-			!= OHCI_HC_FUNCTIONAL_STATE_OPERATIONAL) {
-			_WriteReg(OHCI_CONTROL, OHCI_HC_FUNCTIONAL_STATE_OPERATIONAL);
-			// TOFIX: shorter delay
-			snooze(USB_DELAY_BUS_RESET);
-		}
+	} else {
+		TRACE(("usb_ohci: cold started\n"));
+		snooze(USB_DELAY_BUS_RESET);
 	}
 
 	// This reset should not be necessary according to the OHCI spec, but
@@ -227,13 +222,15 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	// Disable interrupts right before we reset
 	cpu_status former = disable_interrupts();
 	_WriteReg(OHCI_COMMAND_STATUS, OHCI_HOST_CONTROLLER_RESET);
+	// Nominal time for a reset is 10 us
+	uint32 reset = 0;
 	for (uint32 i = 0; i < 10; i++) {
 		spin(10);
-		if (!(_ReadReg(OHCI_COMMAND_STATUS) & OHCI_HOST_CONTROLLER_RESET))
+		reset = _ReadReg(OHCI_COMMAND_STATUS) & OHCI_HOST_CONTROLLER_RESET;
+		if (!reset)
 			break;
 	}
-
-	if (_ReadReg(OHCI_COMMAND_STATUS) & OHCI_HOST_CONTROLLER_RESET) {
+	if (reset) {
 		TRACE_ERROR(("usb_ohci: Error resetting the host controller (timeout)\n"));
 		restore_interrupts(former);
 		return;
@@ -380,9 +377,12 @@ OHCI::Start()
 {
 	TRACE(("usb_ohci: starting OHCI Host Controller\n"));
 
-	if (!(_ReadReg(OHCI_CONTROL) & OHCI_HC_FUNCTIONAL_STATE_OPERATIONAL)) {
+	if ((_ReadReg(OHCI_CONTROL) & OHCI_HC_FUNCTIONAL_STATE_MASK)
+		!= OHCI_HC_FUNCTIONAL_STATE_OPERATIONAL) {
 		TRACE_ERROR(("usb_ohci: Controller not started!\n"));
 		return B_ERROR;
+	} else {
+		TRACE(("usb_ohci: Controller is OPERATIONAL!\n"));
 	}
 
 	fRootHubAddress = AllocateAddress();
