@@ -1097,23 +1097,20 @@ ShowImageWindow::Print(BMessage *msg)
 	BPrintJob printJob(name.String());
 	printJob.SetSettings(new BMessage(*fPrintSettings));
 	if (printJob.ConfigJob() == B_OK) {
-		int32 firstPage;
-		int32 lastPage;
 		BRect printableRect = printJob.PrintableRect();
-		float width, imageWidth, imageHeight, w1, w2;
-		BBitmap* bitmap;
-
+		float width, w1, w2;
+		
 		// first/lastPage is unused for now
-		firstPage = printJob.FirstPage();
-		lastPage = printJob.LastPage();
+		int32 firstPage = printJob.FirstPage();
+		int32 lastPage = printJob.LastPage();
 		if (firstPage < 1)
 			firstPage = 1;
 		if (lastPage < firstPage)
 			lastPage = firstPage;
 
-		bitmap = fImageView->GetBitmap();
-		imageWidth = bitmap->Bounds().Width() + 1.0;
-		imageHeight = bitmap->Bounds().Height() + 1.0;
+		BBitmap* bitmap = fImageView->GetBitmap();
+		float imageWidth = bitmap->Bounds().Width() + 1.0;
+		float imageHeight = bitmap->Bounds().Height() + 1.0;
 
 		switch (fPrintOptions.Option()) {
 			case PrintOptions::kFitToPage:
