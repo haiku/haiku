@@ -383,9 +383,18 @@ retry:
 				cur_blocks = 1;
 
 				SHOW_FLOW0(3, "partial write at beginning: reading content of first block");
+
+				// temporarily restrict the buffer's S/G list size to how much
+				// we actually want to read
+				block_io_buffer_phys_vec.total_len = block_size;
+				block_io_buffer_phys_vec.vec[0].size = block_size;
+
 				res = device->interface->read(handle->cookie, 
 					&block_io_buffer_phys_vec, block_pos, 
 					cur_blocks, block_size, &bytes_transferred);
+
+				block_io_buffer_phys_vec.total_len = block_io_buffer_size;
+				block_io_buffer_phys_vec.vec[0].size = block_io_buffer_size;
 			} else {
 				// alignment problem or partial block read - find out how many
 				// blocks are spanned by this transfer
