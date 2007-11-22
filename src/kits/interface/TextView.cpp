@@ -1909,6 +1909,7 @@ BTextView::ScrollToOffset(int32 inOffset)
 	_ScrollToOffset(inOffset, ScrollBar(B_HORIZONTAL) != NULL, ScrollBar(B_VERTICAL) != NULL);
 }
 
+
 void
 BTextView::_ScrollToOffset(int32 inOffset, bool useHorz, bool useVert)
 {
@@ -1917,25 +1918,19 @@ BTextView::_ScrollToOffset(int32 inOffset, bool useHorz, bool useVert)
 	float xdiff = 0.0;
 	float ydiff = 0.0;
         BPoint point = PointAt(inOffset, &lineHeight);
-
+	
 	if (useHorz) {
-		if (point.x < bounds.left) {
-			xdiff = -1 * (bounds.IntegerWidth() / 2);
-			// normalize scroll value to prevent scrolling past left boundary of view
-			if (bounds.left < fabs(xdiff))
-				xdiff = -1 * bounds.left;
-		} else if (point.x >= bounds.right)
-			xdiff = bounds.IntegerWidth() / 2;
+		if (point.x < bounds.left)
+			xdiff = point.x - bounds.left - bounds.IntegerWidth() / 2;
+		else if (point.x >= bounds.right)
+			xdiff = point.x - bounds.right + bounds.IntegerWidth() / 2;
 	}
 
 	if (useVert) {
-		if (point.y < bounds.top) {
-			ydiff = -1 * (bounds.IntegerHeight() / 2);
-			// normalize scroll value to prevent scrolling past top of view
-			if (bounds.top < fabs(ydiff))
-			ydiff = -1 * bounds.top;
-		} else if (point.y >= bounds.bottom)
-			ydiff = bounds.IntegerHeight() / 2;
+		if (point.y < bounds.top)
+			ydiff = point.y - bounds.top - bounds.IntegerHeight() / 2;
+		else if (point.y >= bounds.bottom)
+			ydiff = point.y - bounds.bottom + bounds.IntegerHeight() / 2;
 	}
 
 	ScrollBy(xdiff, ydiff);
