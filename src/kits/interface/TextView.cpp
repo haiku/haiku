@@ -1911,29 +1911,29 @@ BTextView::ScrollToOffset(int32 inOffset)
 
 
 void
-BTextView::_ScrollToOffset(int32 inOffset, bool useHorz, bool useVert)
+BTextView::_ScrollToOffset(int32 inOffset, bool useHorizontal, bool useVertical)
 {
 	BRect bounds = Bounds();
 	float lineHeight = 0.0;
-	float xdiff = 0.0;
-	float ydiff = 0.0;
+	float xDiff = 0.0;
+	float yDiff = 0.0;
         BPoint point = PointAt(inOffset, &lineHeight);
 	
-	if (useHorz) {
+	if (useHorizontal) {
 		if (point.x < bounds.left)
-			xdiff = point.x - bounds.left - bounds.IntegerWidth() / 2;
+			xDiff = point.x - bounds.left - bounds.IntegerWidth() / 2;
 		else if (point.x >= bounds.right)
-			xdiff = point.x - bounds.right + bounds.IntegerWidth() / 2;
+			xDiff = point.x - bounds.right + bounds.IntegerWidth() / 2;
 	}
 
-	if (useVert) {
+	if (useVertical) {
 		if (point.y < bounds.top)
-			ydiff = point.y - bounds.top - bounds.IntegerHeight() / 2;
+			yDiff = point.y - bounds.top - bounds.IntegerHeight() / 2;
 		else if (point.y >= bounds.bottom)
-			ydiff = point.y - bounds.bottom + bounds.IntegerHeight() / 2;
+			yDiff = point.y - bounds.bottom + bounds.IntegerHeight() / 2;
 	}
 
-	ScrollBy(xdiff, ydiff);
+	ScrollBy(xDiff, yDiff);
 }
 
 
