@@ -457,10 +457,9 @@ EHCI::SubmitTransfer(Transfer *transfer)
 	print_queue(queueHead);
 #endif
 
-	if (pipe->Type() & USB_OBJECT_INTERRUPT_PIPE) {
-		uint8 interval = ((InterruptPipe *)pipe)->Interval();
-		result = LinkInterruptQueueHead(queueHead, interval);
-	} else
+	if (pipe->Type() & USB_OBJECT_INTERRUPT_PIPE)
+		result = LinkInterruptQueueHead(queueHead, pipe->Interval());
+	else
 		result = LinkQueueHead(queueHead);
 
 	if (result < B_OK) {
