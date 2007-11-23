@@ -67,7 +67,8 @@ Device::Device(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 	fConfigurations = (usb_configuration_info *)malloc(
 		fDeviceDescriptor.num_configurations * sizeof(usb_configuration_info));
 	if (fConfigurations == NULL) {
-		TRACE_ERROR(("USB Device %d: out of memory during config creations!\n", fDeviceAddress));
+		TRACE_ERROR(("USB Device %d: out of memory during config creations!\n",
+			fDeviceAddress));
 		return;
 	}
 
@@ -78,7 +79,8 @@ Device::Device(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 			&actualLength);
 
 		if (status < B_OK || actualLength != sizeof(usb_configuration_descriptor)) {
-			TRACE_ERROR(("USB Device %d: error fetching configuration %ld\n", fDeviceAddress, i));
+			TRACE_ERROR(("USB Device %d: error fetching configuration %ld\n",
+				fDeviceAddress, i));
 			return;
 		}
 
@@ -97,11 +99,13 @@ Device::Device(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 			(void *)configData, configDescriptor.total_length, &actualLength);
 
 		if (status < B_OK || actualLength != configDescriptor.total_length) {
-			TRACE_ERROR(("USB Device %d: error fetching full configuration descriptor %ld\n", fDeviceAddress, i));
+			TRACE_ERROR(("USB Device %d: error fetching full configuration"
+				" descriptor %ld\n", fDeviceAddress, i));
 			return;
 		}
 
-		usb_configuration_descriptor *configuration = (usb_configuration_descriptor *)configData;
+		usb_configuration_descriptor *configuration
+			= (usb_configuration_descriptor *)configData;
 		fConfigurations[i].descr = configuration;
 		fConfigurations[i].interface_count = configuration->number_interfaces;
 		fConfigurations[i].interface = (usb_interface_list *)malloc(
@@ -115,7 +119,8 @@ Device::Device(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 			switch (configData[descriptorStart + 1]) {
 				case USB_DESCRIPTOR_INTERFACE: {
 					TRACE(("USB Device %d: got interface descriptor\n", fDeviceAddress));
-					usb_interface_descriptor *interfaceDescriptor = (usb_interface_descriptor *)&configData[descriptorStart];
+					usb_interface_descriptor *interfaceDescriptor
+						= (usb_interface_descriptor *)&configData[descriptorStart];
 					TRACE(("\tlength:.............%d\n", interfaceDescriptor->length));
 					TRACE(("\tdescriptor_type:....0x%02x\n", interfaceDescriptor->descriptor_type));
 					TRACE(("\tinterface_number:...%d\n", interfaceDescriptor->interface_number));
@@ -126,17 +131,19 @@ Device::Device(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 					TRACE(("\tinterface_protocol:.0x%02x\n", interfaceDescriptor->interface_protocol));
 					TRACE(("\tinterface:..........%d\n", interfaceDescriptor->interface));
 
-					usb_interface_list *interfaceList =
-						&fConfigurations[i].interface[interfaceDescriptor->interface_number];
+					usb_interface_list *interfaceList
+						= &fConfigurations[i].interface[interfaceDescriptor->interface_number];
 
-					/* allocate this alternate */
+					/* Allocate this alternate */
 					interfaceList->alt_count++;
 					interfaceList->alt = (usb_interface_info *)realloc(
 						interfaceList->alt, interfaceList->alt_count
 						* sizeof(usb_interface_info));
+
+					/* Set active interface always to the first one */
 					interfaceList->active = interfaceList->alt;
 
-					/* setup this alternate */
+					/* Setup this alternate */
 					usb_interface_info *interfaceInfo =
 						&interfaceList->alt[interfaceList->alt_count - 1];
 					interfaceInfo->descr = interfaceDescriptor;
@@ -145,6 +152,7 @@ Device::Device(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 					interfaceInfo->generic_count = 0;
 					interfaceInfo->generic = NULL;
 
+					// TODO: Remove all Interface class related code.
 					Interface *interface = new(std::nothrow) Interface(this,
 						interfaceDescriptor->interface_number);
 					interfaceInfo->handle = interface->USBID();
@@ -155,7 +163,8 @@ Device::Device(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 
 				case USB_DESCRIPTOR_ENDPOINT: {
 					TRACE(("USB Device %d: got endpoint descriptor\n", fDeviceAddress));
-					usb_endpoint_descriptor *endpointDescriptor = (usb_endpoint_descriptor *)&configData[descriptorStart];
+					usb_endpoint_descriptor *endpointDescriptor
+						= (usb_endpoint_descriptor *)&configData[descriptorStart];
 					TRACE(("\tlength:.............%d\n", endpointDescriptor->length));
 					TRACE(("\tdescriptor_type:....0x%02x\n", endpointDescriptor->descriptor_type));
 					TRACE(("\tendpoint_address:...0x%02x\n", endpointDescriptor->endpoint_address));
@@ -183,7 +192,8 @@ Device::Device(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 
 				default:
 					TRACE(("USB Device %d: got generic descriptor\n", fDeviceAddress));
-					usb_generic_descriptor *genericDescriptor = (usb_generic_descriptor *)&configData[descriptorStart];
+					usb_generic_descriptor *genericDescriptor
+						= (usb_generic_descriptor *)&configData[descriptorStart];
 					TRACE(("\tlength:.............%d\n", genericDescriptor->length));
 					TRACE(("\tdescriptor_type:....0x%02x\n", genericDescriptor->descriptor_type));
 
@@ -210,7 +220,8 @@ Device::Device(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 	// Set default configuration
 	TRACE(("USB Device %d: setting default configuration\n", fDeviceAddress));
 	if (SetConfigurationAt(0) < B_OK) {
-		TRACE_ERROR(("USB Device %d: failed to set default configuration\n", fDeviceAddress));
+		TRACE_ERROR(("USB Device %d: failed to set default configuration\n",
+			fDeviceAddress));
 		return;
 	}
 
@@ -357,11 +368,22 @@ Device::SetConfigurationAt(uint8 index)
 	// Set current configuration
 	fCurrentConfiguration = &fConfigurations[index];
 
+	// Initialize all the endpoints that are now active
+	InitEndpoints();
+
+	// Wait some for the configuration being finished
+	snooze(USB_DELAY_SET_CONFIGURATION);
+	return B_OK;
+}
+
+
+void
+Device::InitEndpoints()
+{
 	int8 hubAddress = 0;
 	if (Parent() && (Parent()->Type() & USB_OBJECT_HUB))
 		hubAddress = ((Hub *)Parent())->DeviceAddress();
 
-	// Initialize all the endpoints that are now active
 	for (size_t j = 0; j < fCurrentConfiguration->interface_count; j++) {
 		usb_interface_info *interfaceInfo = fCurrentConfiguration->interface[j].active;
 		for (size_t i = 0; i < interfaceInfo->endpoint_count; i++) {
@@ -398,12 +420,7 @@ Device::SetConfigurationAt(uint8 index)
 			endpoint->handle = pipe->USBID();
 		}
 	}
-
-	// Wait some for the configuration being finished
-	snooze(USB_DELAY_SET_CONFIGURATION);
-	return B_OK;
 }
-
 
 status_t
 Device::Unconfigure(bool atDeviceLevel)
@@ -431,7 +448,16 @@ Device::Unconfigure(bool atDeviceLevel)
 
 	if (!fCurrentConfiguration)
 		return B_OK;
+	ClearEndpoints();
 
+	fCurrentConfiguration = NULL;
+	return B_OK;
+}
+
+
+void
+Device::ClearEndpoints()
+{
 	for (size_t j = 0; j < fCurrentConfiguration->interface_count; j++) {
 		usb_interface_info *interfaceInfo = fCurrentConfiguration->interface[j].active;
 		for (size_t i = 0; i < interfaceInfo->endpoint_count; i++) {
@@ -440,11 +466,37 @@ Device::Unconfigure(bool atDeviceLevel)
 			endpoint->handle = 0;
 		}
 	}
-
-	fCurrentConfiguration = NULL;
-	return B_OK;
 }
 
+
+status_t
+Device::SetAltInterface(const usb_interface_info *interface)
+{
+	// Tell the device to set the alternate settings
+	status_t result = fDefaultPipe->SendRequest(
+		USB_REQTYPE_INTERFACE_OUT | USB_REQTYPE_STANDARD,	// type
+		USB_REQUEST_SET_INTERFACE,							// request
+		interface->descr->alternate_setting,				// value
+		interface->descr->interface_number,					// index
+		0,													// length
+		NULL,												// buffer
+		0,													// buffer length
+		NULL);
+
+	if (result < B_OK)
+		return result;
+
+	// Update descriptor
+	usb_interface_list *interfaceList
+		= &fCurrentConfiguration->interface[interface->descr->interface_number];
+	interfaceList->active
+		= &interfaceList->alt[interface->descr->alternate_setting];
+
+	ClearEndpoints();
+	InitEndpoints();
+
+	return result;
+}
 
 const usb_device_descriptor *
 Device::DeviceDescriptor() const

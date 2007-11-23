@@ -441,6 +441,11 @@ virtual	status_t						GetDescriptor(uint8 descriptorType,
 		status_t						SetConfigurationAt(uint8 index);
 		status_t						Unconfigure(bool atDeviceLevel);
 
+		status_t						SetAltInterface(const usb_interface_info *interface);
+
+		void							InitEndpoints();
+		void							ClearEndpoints();
+
 virtual	status_t						ReportDevice(
 											usb_support_descriptor *supportDescriptors,
 											uint32 supportDescriptorCount,

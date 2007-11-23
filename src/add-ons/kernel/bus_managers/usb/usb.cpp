@@ -151,7 +151,7 @@ set_alt_interface(usb_device device, const usb_interface_info *interface)
 	if (!object || (object->Type() & USB_OBJECT_DEVICE) == 0)
 		return B_DEV_INVALID_PIPE;
 
-	return B_ERROR;
+	return ((Device *)object)->SetAltInterface(interface);
 }
 
 
