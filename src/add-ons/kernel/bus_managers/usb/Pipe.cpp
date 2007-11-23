@@ -132,6 +132,9 @@ status_t
 InterruptPipe::QueueInterrupt(void *data, size_t dataLength,
 	usb_callback_func callback, void *callbackCookie)
 {
+	if (dataLength > 0 && data == NULL)
+		return B_BAD_VALUE;
+
 	Transfer *transfer = new(std::nothrow) Transfer(this);
 	if (!transfer)
 		return B_NO_MEMORY;
@@ -161,6 +164,9 @@ status_t
 BulkPipe::QueueBulk(void *data, size_t dataLength, usb_callback_func callback,
 	void *callbackCookie)
 {
+	if (dataLength > 0 && data == NULL)
+		return B_BAD_VALUE;
+
 	Transfer *transfer = new(std::nothrow) Transfer(this);
 	if (!transfer)
 		return B_NO_MEMORY;
@@ -179,6 +185,9 @@ status_t
 BulkPipe::QueueBulkV(iovec *vector, size_t vectorCount,
 	usb_callback_func callback, void *callbackCookie)
 {
+	if (vectorCount > 0 && vector == NULL)
+		return B_BAD_VALUE;
+
 	Transfer *transfer = new(std::nothrow) Transfer(this);
 	if (!transfer)
 		return B_NO_MEMORY;
@@ -213,7 +222,10 @@ IsochronousPipe::QueueIsochronous(void *data, size_t dataLength,
 	uint32 *startingFrameNumber, uint32 flags, usb_callback_func callback,
 	void *callbackCookie)
 {
-	// TODO: Check if values of input parameters are set correctely
+	if ((dataLength > 0 && data == NULL)
+		|| (packetCount > 0 && packetDesc == NULL))
+		return B_BAD_VALUE;
+
 	usb_isochronous_data *isochronousData
 		= new(std::nothrow) usb_isochronous_data;
 
@@ -354,6 +366,9 @@ ControlPipe::QueueRequest(uint8 requestType, uint8 request, uint16 value,
 	uint16 index, uint16 length, void *data, size_t dataLength,
 	usb_callback_func callback, void *callbackCookie)
 {
+	if (dataLength > 0 && data == NULL)
+		return B_BAD_VALUE;
+
 	usb_request_data *requestData = new(std::nothrow) usb_request_data;
 	if (!requestData)
 		return B_NO_MEMORY;
