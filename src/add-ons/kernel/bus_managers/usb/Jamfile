@@ -8,6 +8,9 @@ SubDirSysHdrs $(SUBDIR) ;
 UsePrivateHeaders [ FDirName kernel ] ;
 if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders [ FDirName drivers ] ;
+} else {
+	UseArchHeaders $(TARGET_ARCH) ;
+	UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 }
 
 KernelStaticLibrary libusb.a :

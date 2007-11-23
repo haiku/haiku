@@ -8,6 +8,9 @@
  */
 #include "usb_p.h"
 
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+ #include <kernel.h>
+#endif
 
 Transfer::Transfer(Pipe *pipe)
 	:	fPipe(pipe),
@@ -123,7 +126,6 @@ Transfer::AdvanceByFragment(size_t actualLength)
 status_t
 Transfer::InitKernelAccess()
 {
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
 	// we might need to access a buffer in userspace. this will not
 	// be possible in the kernel space finisher thread unless we
 	// get the proper area id for the space we need and then clone it
@@ -132,8 +134,11 @@ Transfer::InitKernelAccess()
 	for (size_t i = 0; i < fVectorCount; i++) {
 		if (IS_USER_ADDRESS(vector[i].iov_base)) {
 			fUserArea = area_for(vector[i].iov_base);
-			if (fUserArea < B_OK)
+			if (fUserArea < B_OK) {
+				TRACE_ERROR(("USB Transfer: failed to find area for user"
+					" space buffer!\n"));
 				return B_BAD_ADDRESS;
+			}
 			break;
 		}
 	}
@@ -143,8 +148,10 @@ Transfer::InitKernelAccess()
 		return B_OK;
 
 	area_info areaInfo;
-	if (fUserArea < B_OK || get_area_info(fUserArea, &areaInfo) < B_OK)
+	if (fUserArea < B_OK || get_area_info(fUserArea, &areaInfo) < B_OK) {
+		TRACE_ERROR(("USB Transfer: couldn't get user area info\n"));
 		return B_BAD_ADDRESS;
+	}
 
 	for (size_t i = 0; i < fVectorCount; i++) {
 		(uint8 *)vector[i].iov_base -= (uint8 *)areaInfo.address;
@@ -155,8 +162,6 @@ Transfer::InitKernelAccess()
 			return B_BAD_ADDRESS;
 		}
 	}
-#endif // !HAIKU_TARGET_PLATFORM_HAIKU
-
 	return B_OK;
 }
 
@@ -164,7 +169,6 @@ Transfer::InitKernelAccess()
 status_t
 Transfer::PrepareKernelAccess()
 {
-#ifndef HAIKU_TARGET_PLATFORM_HAIKU
 	// done if there is no userspace buffer or if we already cloned its area
 	if (fUserArea < B_OK || fClonedArea >= B_OK)
 		return B_OK;
@@ -180,8 +184,6 @@ Transfer::PrepareKernelAccess()
 
 	for (size_t i = 0; i < fVectorCount; i++)
 		(uint8 *)fVector[i].iov_base += (addr_t)clonedMemory;
-#endif // !HAIKU_TARGET_PLATFORM_HAIKU
-
 	return B_OK;
 }
 
@@ -269,7 +271,5 @@ Transfer::_CalculateBandwidth()
 	// Round up and set the value in microseconds
 	fBandwidth = (bandwidthNS + 500) / 1000;
 
-	// For debugging purposes
-	TRACE(("USB Transfer: bandwidth neded %d\n", fBandwidth));
 	return B_OK;
 }
