@@ -12,7 +12,6 @@
 #include <PCI.h>
 #include <USB3.h>
 #include <KernelExport.h>
-#include <stdlib.h>
 
 #include "uhci.h"
 
@@ -34,7 +33,7 @@ uhci_std_ops(int32 op, ...)
 	}
 
 	return B_OK;
-}	
+}
 
 
 host_controller_info uhci_module = {
@@ -318,7 +317,7 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	fRegisterBase = sPCIModule->read_pci_config(fPCIInfo->bus,
 		fPCIInfo->device, fPCIInfo->function, PCI_memory_base, 4);
 	fRegisterBase &= PCI_address_io_mask;
-	TRACE_ERROR(("usb_uhci: iospace offset: 0x%08lx\n", fRegisterBase));
+	TRACE(("usb_uhci: iospace offset: 0x%08lx\n", fRegisterBase));
 
 	if (fRegisterBase == 0) {
 		fRegisterBase = fPCIInfo->u.h0.base_registers[0];
@@ -395,7 +394,7 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	// Create the array that will keep bandwidth information
 	fFrameBandwidth = new(std::nothrow) uint16[NUMBER_OF_FRAMES];
 
-	// create lists for managing isochronous transfer descriptors
+	// Create lists for managing isochronous transfer descriptors
 	fFirstIsochronousDescriptor = new(std::nothrow) uhci_td *[NUMBER_OF_FRAMES];
 	if (!fFirstIsochronousDescriptor) {
 		TRACE_ERROR(("usb_uhci: cannot allocate memory\n"));
@@ -564,7 +563,8 @@ UHCI::SubmitTransfer(Transfer *transfer)
 	if (transfer->TransferPipe()->DeviceAddress() == fRootHubAddress)
 		return fRootHub->ProcessTransfer(this, transfer);
 
-	TRACE(("usb_uhci: submit transfer called for device %d\n", transfer->TransferPipe()->DeviceAddress()));
+	TRACE(("usb_uhci: submit transfer called for device %d\n",
+		transfer->TransferPipe()->DeviceAddress()));
 	if (transfer->TransferPipe()->Type() & USB_OBJECT_CONTROL_PIPE)
 		return SubmitRequest(transfer);
 

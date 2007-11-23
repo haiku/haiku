@@ -232,6 +232,7 @@ static	pci_module_info				*sPCIModule;
 		UHCIRootHub					*fRootHub;
 		uint8						fRootHubAddress;
 		uint8						fPortResetChange;
+
 };
 
 
