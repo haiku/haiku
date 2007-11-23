@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Sebastian Nozzi.
  *
  * Distributed under the terms of the MIT license.
@@ -17,7 +17,8 @@
 #include <string.h>
 
 
-// supported types (if you add any, make sure that writeAttr() handles them properly)
+// supported types (if you add any, make sure that writeAttr() handles
+// them properly)
 
 const struct {
 	type_code	type;
@@ -43,19 +44,19 @@ const struct {
 
 	{B_RAW_TYPE, "raw"},
 };
-const uint32 kNumSupportedTypes = sizeof(kSupportedTypes) / sizeof(kSupportedTypes[0]);
+const uint32 kNumSupportedTypes = sizeof(kSupportedTypes)
+	/ sizeof(kSupportedTypes[0]);
 
 char *gProgramName;
 
 
-/**	For the given string that the user specifies as attribute type
- *	in the command line, this function tries to figure out the
- *	corresponding Be API value.
- *
- *	On success, "result" will contain that value
- *	On failure, B_BAD_VALUE is returned and "result" is not modified
- */
+/*!	For the given string that the user specifies as attribute type
+	in the command line, this function tries to figure out the
+	corresponding Be API value.
 
+	On success, "result" will contain that value
+	On failure, B_BAD_VALUE is returned and "result" is not modified
+*/
 static status_t
 typeForString(const char *string, type_code *_result)
 {
@@ -107,9 +108,11 @@ assertArgument(int i, int argc)
 void
 invalidAttrType(const char *attrTypeName)
 {
-	fprintf(stderr, "%s: attribute type \"%s\" is not valid\n", gProgramName, attrTypeName);
+	fprintf(stderr, "%s: attribute type \"%s\" is not valid\n", gProgramName,
+		attrTypeName);
 	fprintf(stderr, "\tTry one of: string, mime, int, llong, float, double,\n");
-	fprintf(stderr, "\t\tbool, raw, or a numeric value (ie. 0x1234, 42, 'ABCD', ...)\n");
+	fprintf(stderr, "\t\tbool, raw, or a numeric value (ie. 0x1234, 42, 'ABCD'"
+		", ...)\n");
 
 	exit(1);
 }
@@ -118,7 +121,8 @@ invalidAttrType(const char *attrTypeName)
 void
 invalidBoolValue(const char *value)
 {
-	fprintf(stderr, "%s: attribute value \"%s\" is not valid\n", gProgramName, value);
+	fprintf(stderr, "%s: attribute value \"%s\" is not valid\n", gProgramName,
+		value);
 	fprintf(stderr, "\tBool accepts: 0, f, false, disabled, off,\n");
 	fprintf(stderr, "\t\t1, t, true, enabled, on\n");
 
@@ -160,6 +164,12 @@ main(int argc, char *argv[])
 
  		status = file.GetSize(&size);
  		if (status == B_OK) {
+			if (size == 0) {
+				fprintf(stderr, "%s: attribute value is empty: 0 bytes\n",
+					gProgramName);
+
+				return 1;
+			}
  			if (size > 4 * 1024 * 1024) {
 				fprintf(stderr, "%s: attribute value is too large: %Ld bytes\n",
 					gProgramName, size);
