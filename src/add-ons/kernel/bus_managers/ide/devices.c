@@ -97,8 +97,8 @@ setup_device_links(ide_bus_info *bus, ide_device_info *device)
 
 /** create device info */
 
-static
-ide_device_info *create_device(ide_bus_info *bus, bool is_device1)
+static ide_device_info *
+create_device(ide_bus_info *bus, bool is_device1)
 {
 	ide_device_info *device;
 

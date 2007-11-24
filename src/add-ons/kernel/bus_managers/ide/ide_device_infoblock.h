@@ -70,15 +70,14 @@ typedef struct tagdevice_infoblock {
 		IORDY_can_disable	: 1,
 		IORDY_supported		: 1
 	);
-	
+
 	uint16 dummy6[1];			// 64
 	LBITFIELD2 (				// 66 (51) obsolete: PIO modes?
 		_51_obs1			: 8,
 		PIO_mode			: 8
 	);
 	uint16 dummy7[1];			// 68
-	
-	
+
 	LBITFIELD3 (				// 6a (53) validity
 		_54_58_valid		: 1,
 		_64_70_valid		: 1,
@@ -87,15 +86,15 @@ typedef struct tagdevice_infoblock {
 	uint16 current_cylinders;	// 6c (54)
 	uint16 current_heads;		// 6e
 	uint16 current_sectors;		// 70
-	
+
 	uint16 capacity_low;		// 72 (57) ALIGNMENT SPLIT - don't merge
 	uint16 capacity_high;
-	
+
 	uint16 dummy8[1];
-	
+
 	uint32 LBA_total_sectors;	// 78 (60)
 	uint16 dummy9[1];			// 7c
-	
+
 	LBITFIELD7 ( 				// 7e (63) MDMA modes
 		MDMA0_supported		: 1,
 		MDMA1_supported		: 1,
