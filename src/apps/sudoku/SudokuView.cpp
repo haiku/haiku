@@ -144,6 +144,7 @@ SudokuView::SetTo(entry_ref& ref)
 		}
 	}
 
+	_PushUndo();
 	status = fField->SetTo(_BaseCharacter(), buffer);
 	Invalidate();
 	return status;
@@ -164,6 +165,7 @@ SudokuView::SetTo(const char* data)
 	if (status < B_OK)
 		return B_BAD_VALUE;
 
+	_PushUndo();
 	status = fField->SetTo(_BaseCharacter(), buffer);
 	Invalidate();
 	return status;
@@ -176,6 +178,7 @@ SudokuView::SetTo(SudokuField* field)
 	if (field == NULL || field == fField)
 		return B_BAD_VALUE;
 
+	_PushUndo();
 	delete fField;
 	fField = field;
 
@@ -222,6 +225,8 @@ SudokuView::SaveTo(entry_ref& ref, bool asText)
 void
 SudokuView::ClearChanged()
 {
+	_PushUndo();
+
 	for (uint32 y = 0; y < fField->Size(); y++) {
 		for (uint32 x = 0; x < fField->Size(); x++) {
 			if ((fField->FlagsAt(x, y) & kInitialValue) == 0)
@@ -236,6 +241,7 @@ SudokuView::ClearChanged()
 void
 SudokuView::ClearAll()
 {
+	_PushUndo();
 	fField->Reset();
 	Invalidate();
 }
@@ -414,6 +420,55 @@ SudokuView::_RemoveHint()
 
 
 void
+SudokuView::_UndoRedo(BObjectList<BMessage>& undos,
+	BObjectList<BMessage>& redos)
+{
+	if (undos.IsEmpty())
+		return;
+
+	BMessage* undo = undos.RemoveItemAt(undos.CountItems() - 1);
+
+	BMessage* redo = new BMessage;
+	if (fField->Archive(redo, true) == B_OK)
+		redos.AddItem(redo);
+
+	SudokuField field(undo);
+	delete undo;
+
+	fField->SetTo(&field);
+
+	SendNotices(kUndoRedoChanged);
+	Invalidate();
+}
+
+
+void
+SudokuView::Undo()
+{
+	_UndoRedo(fUndos, fRedos);
+}
+
+
+void
+SudokuView::Redo()
+{
+	_UndoRedo(fRedos, fUndos);
+}
+
+
+void
+SudokuView::_PushUndo()
+{
+	fRedos.MakeEmpty();
+
+	BMessage* undo = new BMessage;
+	if (fField->Archive(undo, true) == B_OK
+		&& fUndos.AddItem(undo))
+		SendNotices(kUndoRedoChanged);
+}
+
+
+void
 SudokuView::MouseDown(BPoint where)
 {
 	uint32 x, y;
@@ -433,6 +488,7 @@ SudokuView::MouseDown(BPoint where)
 
 	uint32 value = hintX + hintY * fBlockSize;
 	uint32 field = x + y * fField->Size();
+	_PushUndo();
 
 	if (clicks == 2 && fLastHintValue == value && fLastField == field
 		|| (buttons & (B_SECONDARY_MOUSE_BUTTON
@@ -540,6 +596,7 @@ SudokuView::_InsertKey(char rawKey, int32 modifiers)
 		if (value == 0)
 			return;
 
+		_PushUndo();
 		uint32 hintMask = fField->HintMaskAt(fKeyboardX, fKeyboardY);
 		uint32 valueMask = 1UL << (value - 1);
 		if (modifiers & B_OPTION_KEY)
@@ -550,6 +607,7 @@ SudokuView::_InsertKey(char rawKey, int32 modifiers)
 		fField->SetValueAt(fKeyboardX, fKeyboardY, 0);
 		fField->SetHintMaskAt(fKeyboardX, fKeyboardY, hintMask);
 	} else {
+		_PushUndo();
 		fField->SetValueAt(fKeyboardX, fKeyboardY, value);
 		if (value)
 			BMessenger(this).SendMessage(kMsgCheckSolved);
@@ -638,6 +696,14 @@ SudokuView::MessageReceived(BMessage* message)
 			}
 			break;
 
+		case B_UNDO:
+			Undo();
+			break;
+
+		case B_REDO:
+			Redo();
+			break;
+
 		case kMsgSolveSudoku:
 		{
 			SudokuSolver solver;
@@ -647,6 +713,7 @@ SudokuView::MessageReceived(BMessage* message)
 			printf("found %ld solutions in %g msecs\n",
 				solver.CountSolutions(), (system_time() - start) / 1000.0);
 			if (solver.CountSolutions() > 0) {
+				_PushUndo();
 				fField->SetTo(solver.SolutionAt(0));
 				Invalidate();
 			} else
@@ -668,6 +735,8 @@ SudokuView::MessageReceived(BMessage* message)
 			printf("found %ld solutions in %g msecs\n",
 				solver.CountSolutions(), (system_time() - start) / 1000.0);
 			if (solver.CountSolutions() > 0) {
+				_PushUndo();
+
 				// find free spot
 				uint32 x, y;
 				do {

@@ -7,6 +7,7 @@
 
 
 #include <View.h>
+#include <ObjectList.h>
 
 class SudokuField;
 struct entry_ref;
@@ -43,6 +44,11 @@ public:
 	void SetEditable(bool editable);
 	bool Editable() const { return fEditable; }
 
+	bool CanUndo() { return !fUndos.IsEmpty(); }
+	bool CanRedo() { return !fRedos.IsEmpty(); }
+	void Undo();
+	void Redo();
+
 protected:
 	virtual void AttachedToWindow();
 
@@ -75,9 +81,13 @@ private:
 	void _FitFont(BFont& font, float width, float height);
 	void _DrawKeyboardFocus();
 	void _DrawHints(uint32 x, uint32 y);
+	void _UndoRedo(BObjectList<BMessage>& undos, BObjectList<BMessage>& redos);
+	void _PushUndo();
 
 	rgb_color		fBackgroundColor;
 	SudokuField*	fField;
+	BObjectList<BMessage> fUndos;
+	BObjectList<BMessage> fRedos;
 	uint32			fBlockSize;
 	float			fWidth, fHeight, fBaseline;
 	BFont			fFieldFont;
@@ -97,5 +107,8 @@ private:
 static const uint32 kMsgSudokuSolved = 'susl';
 static const uint32 kMsgSolveSudoku = 'slvs';
 static const uint32 kMsgSolveSingle = 'slsg';
+
+// you can observe these:
+static const int32 kUndoRedoChanged = 'unre';
 
 #endif	// SUDOKU_VIEW_H

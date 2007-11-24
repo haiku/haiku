@@ -39,6 +39,8 @@ private:
 	SudokuView*		fSudokuView;
 	GenerateSudoku*	fGenerator;
 	BMenuItem*		fRestoreStateItem;
+	BMenuItem*		fUndoItem;
+	BMenuItem*		fRedoItem;
 	BMessage*		fStoredState;
 };
 

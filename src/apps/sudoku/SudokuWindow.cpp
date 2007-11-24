@@ -210,8 +210,7 @@ SudokuWindow::SudokuWindow()
 		new BMessage(B_ABOUT_REQUESTED)));
 	menu->AddSeparatorItem();
 
-	menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED),
-		'Q', B_COMMAND_KEY));
+	menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menu->SetTargetForItems(this);
 	item->SetTarget(be_app);
 	menuBar->AddItem(menu);
@@ -231,8 +230,15 @@ SudokuWindow::SudokuWindow()
 
 	// "Help" menu
 	menu = new BMenu("Help");
-	menu->AddItem(new BMenuItem("Store Current", new BMessage(kMsgStoreState)));
-	menu->AddItem(fRestoreStateItem = new BMenuItem("Restore Saved",
+	menu->AddItem(fUndoItem = new BMenuItem("Undo", new BMessage(B_UNDO), 'Z'));
+	fUndoItem->SetEnabled(false);
+	menu->AddItem(fRedoItem = new BMenuItem("Redo", new BMessage(B_REDO), 'Z',
+		B_SHIFT_KEY));
+	fRedoItem->SetEnabled(false);
+	menu->AddSeparatorItem();
+
+	menu->AddItem(new BMenuItem("Snapshot Current", new BMessage(kMsgStoreState)));
+	menu->AddItem(fRestoreStateItem = new BMenuItem("Restore Snapshot",
 		new BMessage(kMsgRestoreState)));
 	fRestoreStateItem->SetEnabled(fStoredState != NULL);
 	menu->AddSeparatorItem();
@@ -247,6 +253,9 @@ SudokuWindow::SudokuWindow()
 	fOpenPanel->SetTarget(this);
 	fSavePanel = new BFilePanel(B_SAVE_PANEL);
 	fSavePanel->SetTarget(this);
+
+	fSudokuView->StartWatching(this, kUndoRedoChanged);
+		// we like to know whenever the undo/redo state changes
 
 	fProgressWindow = new ProgressWindow(this,
 		new BMessage(kMsgAbortSudokuGenerator));
@@ -498,6 +507,19 @@ SudokuWindow::MessageReceived(BMessage* message)
 				"Sudoku solved - congratulations!", "Ok", NULL, NULL,
 				B_WIDTH_AS_USUAL, B_IDEA_ALERT))->Go();
 			break;
+
+		case B_OBSERVER_NOTICE_CHANGE:
+		{
+			int32 what;
+			if (message->FindInt32(B_OBSERVE_WHAT_CHANGE, &what) != B_OK)
+				break;
+
+			if (what == kUndoRedoChanged) {
+				fUndoItem->SetEnabled(fSudokuView->CanUndo());
+				fRedoItem->SetEnabled(fSudokuView->CanRedo());
+			}
+			break;
+		}
 
 		default:
 			BWindow::MessageReceived(message);
