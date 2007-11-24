@@ -114,7 +114,7 @@ Transfer::AdvanceByFragment(size_t actualLength)
 			continue;
 		}
 
-		fVector[i].iov_base = (void *)((uint8 *)fVector[i].iov_base + length);
+		fVector[i].iov_base = (uint8 *)fVector[i].iov_base + length;
 		fVector[i].iov_len -= length;
 		break;
 	}
@@ -154,7 +154,7 @@ Transfer::InitKernelAccess()
 	}
 
 	for (size_t i = 0; i < fVectorCount; i++) {
-		(uint8 *)vector[i].iov_base -= (uint8 *)areaInfo.address;
+		vector[i].iov_base = (uint8 *)vector[i].iov_base - (addr_t)areaInfo.address;
 
 		if ((size_t)vector[i].iov_base > areaInfo.size
 			|| (size_t)vector[i].iov_base + vector[i].iov_len > areaInfo.size) {
@@ -183,7 +183,7 @@ Transfer::PrepareKernelAccess()
 		return fClonedArea;
 
 	for (size_t i = 0; i < fVectorCount; i++)
-		(uint8 *)fVector[i].iov_base += (addr_t)clonedMemory;
+		fVector[i].iov_base = (uint8 *)fVector[i].iov_base + (addr_t)clonedMemory;
 	return B_OK;
 }
 
