@@ -23,6 +23,7 @@ vm_area:
 		mappings: guarded by the global sMappingLock (currently a spinlock)
 		address_space_next: vm_address_space::sem
 		hash_next: sAreaHashLock
+		cache: guarded by vm_area_get_locked_cache()/sAreaCacheLock
 		cache_next|prev: cache_ref::lock
 
 vm_cache_ref:

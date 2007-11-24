@@ -1,0 +1,2 @@
+- unmap the page of all areas from the cache when a newly added page shadows one
+  in a deeper cache
