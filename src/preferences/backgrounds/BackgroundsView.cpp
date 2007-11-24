@@ -11,18 +11,20 @@
 #include "BackgroundsView.h"
 #include "ImageFilePanel.h"
 
-#include <OS.h>
-#include <MenuField.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <OS.h>
+#include <MenuField.h>
 #include <StorageKit.h>
-#include <Background.h>
 #include <Window.h>
 #include <Messenger.h>
 #include <Bitmap.h>
 #include <Point.h>
 #include <TranslationKit.h>
 #include <PopUpMenu.h>
+
+#include <be_apps/Tracker/Background.h>
 
 
 static const uint32 kMsgApplySettings = 'aply';
