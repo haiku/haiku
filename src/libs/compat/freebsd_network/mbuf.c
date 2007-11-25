@@ -191,6 +191,15 @@ m_free(struct mbuf *m)
 }
 
 
+void
+m_extadd(struct mbuf *m, caddr_t buffer, u_int size,
+    void (*freeHook)(void *, void *), void *args, int flags, int type)
+{
+	// TODO: implement?
+	panic("m_extadd() called.");
+}
+
+
 status_t
 init_mbufs()
 {

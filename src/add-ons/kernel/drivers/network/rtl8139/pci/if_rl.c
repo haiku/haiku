@@ -31,7 +31,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/pci/if_rl.c,v 1.152.2.6 2006/10/13 07:39:25 glebius Exp $");
+__FBSDID("$FreeBSD: src/sys/pci/if_rl.c,v 1.170 2007/07/24 01:24:03 yongari Exp $");
 
 /*
  * RealTek 8129/8139 PCI NIC driver
@@ -121,7 +121,7 @@ MODULE_DEPEND(rl, pci, 1, 1, 1);
 MODULE_DEPEND(rl, ether, 1, 1, 1);
 MODULE_DEPEND(rl, miibus, 1, 1, 1);
 
-/* "controller miibus0" required.  See GENERIC if you get errors here. */
+/* "device miibus" required.  See GENERIC if you get errors here. */
 #include "miibus_if.h"
 
 /*
@@ -215,7 +215,7 @@ static void rl_stop(struct rl_softc *);
 static int rl_suspend(device_t);
 static void rl_tick(void *);
 static void rl_txeof(struct rl_softc *);
-static void rl_watchdog(struct ifnet *);
+static void rl_watchdog(struct rl_softc *);
 
 #ifdef RL_USEIOSPACE
 #define RL_RES			SYS_RES_IOPORT
@@ -828,10 +828,10 @@ rl_attach(device_t dev)
 
 	/* Allocate interrupt */
 	rid = 0;
-	sc->rl_irq = bus_alloc_resource_any(dev, SYS_RES_IRQ, &rid,
+	sc->rl_irq[0] = bus_alloc_resource_any(dev, SYS_RES_IRQ, &rid,
 	    RF_SHAREABLE | RF_ACTIVE);
 
-	if (sc->rl_irq == NULL) {
+	if (sc->rl_irq[0] == NULL) {
 		device_printf(dev, "couldn't map interrupt\n");
 		error = ENXIO;
 		goto fail;
@@ -885,7 +885,7 @@ rl_attach(device_t dev)
 	 * Allocate the parent bus DMA tag appropriate for PCI.
 	 */
 #define RL_NSEG_NEW 32
-	error = bus_dma_tag_create(NULL,	/* parent */
+	error = bus_dma_tag_create(bus_get_dma_tag(dev),	/* parent */
 			1, 0,			/* alignment, boundary */
 			BUS_SPACE_MAXADDR_32BIT,/* lowaddr */
 			BUS_SPACE_MAXADDR,	/* highaddr */
@@ -955,7 +955,6 @@ rl_attach(device_t dev)
 	ifp->if_flags = IFF_BROADCAST | IFF_SIMPLEX | IFF_MULTICAST;
 	ifp->if_ioctl = rl_ioctl;
 	ifp->if_start = rl_start;
-	ifp->if_watchdog = rl_watchdog;
 	ifp->if_init = rl_init;
 	ifp->if_capabilities = IFCAP_VLAN_MTU;
 	ifp->if_capenable = ifp->if_capabilities;
@@ -972,8 +971,8 @@ rl_attach(device_t dev)
 	ether_ifattach(ifp, eaddr);
 
 	/* Hook interrupt last to avoid having to lock softc */
-	error = bus_setup_intr(dev, sc->rl_irq, INTR_TYPE_NET | INTR_MPSAFE,
-	    rl_intr, sc, &sc->rl_intrhand);
+	error = bus_setup_intr(dev, sc->rl_irq[0], INTR_TYPE_NET | INTR_MPSAFE,
+	    NULL, rl_intr, sc, &sc->rl_intrhand[0]);
 	if (error) {
 		device_printf(sc->rl_dev, "couldn't set up irq\n");
 		ether_ifdetach(ifp);
@@ -1003,6 +1002,7 @@ rl_detach(device_t dev)
 	ifp = sc->rl_ifp;
 
 	KASSERT(mtx_initialized(&sc->rl_mtx), ("rl mutex not initialized"));
+
 #ifdef DEVICE_POLLING
 	if (ifp->if_capenable & IFCAP_POLLING)
 		ether_poll_deregister(ifp);
@@ -1018,18 +1018,19 @@ rl_detach(device_t dev)
 #if 0
 	sc->suspended = 1;
 #endif
-	if (ifp)
-		if_free(ifp);
 	if (sc->rl_miibus)
 		device_delete_child(dev, sc->rl_miibus);
 	bus_generic_detach(dev);
 
-	if (sc->rl_intrhand)
-		bus_teardown_intr(dev, sc->rl_irq, sc->rl_intrhand);
-	if (sc->rl_irq)
-		bus_release_resource(dev, SYS_RES_IRQ, 0, sc->rl_irq);
+	if (sc->rl_intrhand[0])
+		bus_teardown_intr(dev, sc->rl_irq[0], sc->rl_intrhand[0]);
+	if (sc->rl_irq[0])
+		bus_release_resource(dev, SYS_RES_IRQ, 0, sc->rl_irq[0]);
 	if (sc->rl_res)
 		bus_release_resource(dev, RL_RES, RL_RID, sc->rl_res);
+
+	if (ifp)
+		if_free(ifp);
 
 	if (sc->rl_tag) {
 		bus_dmamap_unload(sc->rl_tag, sc->rl_cdata.rl_rx_dmamap);
@@ -1263,9 +1264,9 @@ rl_txeof(struct rl_softc *sc)
 	} while (sc->rl_cdata.last_tx != sc->rl_cdata.cur_tx);
 
 	if (RL_LAST_TXMBUF(sc) == NULL)
-		ifp->if_timer = 0;
-	else if (ifp->if_timer == 0)
-		ifp->if_timer = 5;
+		sc->rl_watchdog_timer = 0;
+	else if (sc->rl_watchdog_timer == 0)
+		sc->rl_watchdog_timer = 5;
 }
 
 static void
@@ -1277,6 +1278,8 @@ rl_tick(void *xsc)
 	RL_LOCK_ASSERT(sc);
 	mii = device_get_softc(sc->rl_miibus);
 	mii_tick(mii);
+
+	rl_watchdog(sc);
 
 	callout_reset(&sc->rl_stat_callout, hz, rl_tick, sc);
 }
@@ -1464,7 +1467,7 @@ rl_start_locked(struct ifnet *ifp)
 		RL_INC(sc->rl_cdata.cur_tx);
 
 		/* Set a timeout in case the chip goes out to lunch. */
-		ifp->if_timer = 5;
+		sc->rl_watchdog_timer = 5;
 	}
 
 	/*
@@ -1492,6 +1495,7 @@ rl_init_locked(struct rl_softc *sc)
 	struct ifnet		*ifp = sc->rl_ifp;
 	struct mii_data		*mii;
 	uint32_t		rxcfg = 0;
+	uint32_t		eaddr[2];
 
 	RL_LOCK_ASSERT(sc);
 
@@ -1508,10 +1512,10 @@ rl_init_locked(struct rl_softc *sc)
 	 * register write enable" mode to modify the ID registers.
 	 */
 	CSR_WRITE_1(sc, RL_EECMD, RL_EEMODE_WRITECFG);
-	CSR_WRITE_STREAM_4(sc, RL_IDR0,
-	    *(uint32_t *)(&IFP2ENADDR(sc->rl_ifp)[0]));
-	CSR_WRITE_STREAM_4(sc, RL_IDR4,
-	    *(uint32_t *)(&IFP2ENADDR(sc->rl_ifp)[4]));
+	bzero(eaddr, sizeof(eaddr));
+	bcopy(IF_LLADDR(sc->rl_ifp), eaddr, ETHER_ADDR_LEN);
+	CSR_WRITE_STREAM_4(sc, RL_IDR0, eaddr[0]);
+	CSR_WRITE_STREAM_4(sc, RL_IDR4, eaddr[1]);
 	CSR_WRITE_1(sc, RL_EECMD, RL_EEMODE_OFF);
 
 	/* Init the RX buffer pointer register. */
@@ -1562,11 +1566,11 @@ rl_init_locked(struct rl_softc *sc)
 #ifdef DEVICE_POLLING
 	/* Disable interrupts if we are polling. */
 	if (ifp->if_capenable & IFCAP_POLLING)
-		HAIKU_PROTECT_INTR_REGISTER(CSR_WRITE_2(sc, RL_IMR, 0));
+		CSR_WRITE_2(sc, RL_IMR, 0);
 	else
 #endif
 	/* Enable interrupts. */
-	HAIKU_PROTECT_INTR_REGISTER(CSR_WRITE_2(sc, RL_IMR, RL_INTRS));
+	CSR_WRITE_2(sc, RL_IMR, RL_INTRS);
 
 	/* Set initial TX threshold */
 	sc->rl_txthresh = RL_TX_THRESH_INIT;
@@ -1664,7 +1668,7 @@ rl_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 				return(error);
 			RL_LOCK(sc);
 			/* Disable interrupts */
-			HAIKU_PROTECT_INTR_REGISTER(CSR_WRITE_2(sc, RL_IMR, 0x0000));
+			CSR_WRITE_2(sc, RL_IMR, 0x0000);
 			ifp->if_capenable |= IFCAP_POLLING;
 			RL_UNLOCK(sc);
 			return (error);
@@ -1675,7 +1679,7 @@ rl_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 			error = ether_poll_deregister(ifp);
 			/* Enable interrupts. */
 			RL_LOCK(sc);
-			HAIKU_PROTECT_INTR_REGISTER(CSR_WRITE_2(sc, RL_IMR, RL_INTRS));
+			CSR_WRITE_2(sc, RL_IMR, RL_INTRS);
 			ifp->if_capenable &= ~IFCAP_POLLING;
 			RL_UNLOCK(sc);
 			return (error);
@@ -1691,20 +1695,20 @@ rl_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 }
 
 static void
-rl_watchdog(struct ifnet *ifp)
+rl_watchdog(struct rl_softc *sc)
 {
-	struct rl_softc		*sc = ifp->if_softc;
 
-	RL_LOCK(sc);
+	RL_LOCK_ASSERT(sc);
 
-	if_printf(ifp, "watchdog timeout\n");
-	ifp->if_oerrors++;
+	if (sc->rl_watchdog_timer == 0 || --sc->rl_watchdog_timer >0)
+		return;
+
+	device_printf(sc->rl_dev, "watchdog timeout\n");
+	sc->rl_ifp->if_oerrors++;
 
 	rl_txeof(sc);
 	rl_rxeof(sc);
 	rl_init_locked(sc);
-
-	RL_UNLOCK(sc);
 }
 
 /*
@@ -1719,12 +1723,12 @@ rl_stop(struct rl_softc *sc)
 
 	RL_LOCK_ASSERT(sc);
 
-	ifp->if_timer = 0;
+	sc->rl_watchdog_timer = 0;
 	callout_stop(&sc->rl_stat_callout);
 	ifp->if_drv_flags &= ~(IFF_DRV_RUNNING | IFF_DRV_OACTIVE);
 
 	CSR_WRITE_1(sc, RL_COMMAND, 0x00);
-	HAIKU_PROTECT_INTR_REGISTER(CSR_WRITE_2(sc, RL_IMR, 0x0000));
+	CSR_WRITE_2(sc, RL_IMR, 0x0000);
 	bus_dmamap_unload(sc->rl_tag, sc->rl_cdata.rl_rx_dmamap);
 
 	/*

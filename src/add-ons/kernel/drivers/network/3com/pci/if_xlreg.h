@@ -29,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: src/sys/pci/if_xlreg.h,v 1.55.2.1 2005/08/26 14:46:22 jhb Exp $
+ * $FreeBSD: src/sys/pci/if_xlreg.h,v 1.59 2006/12/06 02:18:41 marius Exp $
  */
 
 #define XL_EE_READ	0x0080	/* read, 5 bit address */
@@ -581,6 +581,7 @@ struct xl_mii_frame {
 
 struct xl_softc {
 	struct ifnet		*xl_ifp;	/* interface info */
+	device_t		xl_dev;		/* device info */
 	struct ifmedia		ifmedia;	/* media info */
 	bus_space_handle_t	xl_bhandle;
 	bus_space_tag_t		xl_btag;
@@ -602,6 +603,7 @@ struct xl_softc {
 	struct xl_list_data	xl_ldata;
 	struct xl_chain_data	xl_cdata;
 	struct callout		xl_stat_callout;
+	int			xl_wdog_timer;
 	int			xl_flags;
 	struct resource		*xl_fres;
 	bus_space_handle_t	xl_fhandle;
@@ -612,7 +614,7 @@ struct xl_softc {
 	int			rxcycles;
 #endif
 #ifdef __HAIKU__
-	u_int32_t		xl_intr_status;
+	u_int32_t	xl_intr_status;
 #endif
 };
 

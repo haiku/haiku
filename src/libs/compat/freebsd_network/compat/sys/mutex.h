@@ -1,7 +1,13 @@
+/*
+ * Copyright 2007, Hugo Santos. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _FBSD_COMPAT_SYS_MUTEX_H_
 #define _FBSD_COMPAT_SYS_MUTEX_H_
 
+
 #include <sys/haiku-module.h>
+
 
 struct mtx {
 	int type;
@@ -58,4 +64,4 @@ void mtx_destroy(struct mtx *m);
 
 extern struct mtx Giant;
 
-#endif
+#endif	/* _FBSD_COMPAT_SYS_MUTEX_H_ */

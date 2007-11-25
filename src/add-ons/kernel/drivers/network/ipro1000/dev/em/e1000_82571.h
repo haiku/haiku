@@ -1,4 +1,4 @@
-$FreeBSD: src/sys/dev/em/LICENSE,v 1.6 2007/05/04 00:00:11 jfv Exp $
+/*******************************************************************************
 
   Copyright (c) 2001-2007, Intel Corporation 
   All rights reserved.
@@ -29,3 +29,19 @@ $FreeBSD: src/sys/dev/em/LICENSE,v 1.6 2007/05/04 00:00:11 jfv Exp $
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
 
+*******************************************************************************/
+/*$FreeBSD: src/sys/dev/em/e1000_82571.h,v 1.3 2007/05/16 00:14:23 jfv Exp $*/
+
+
+#ifndef _E1000_82571_H_
+#define _E1000_82571_H_
+
+#define ID_LED_RESERVED_F746 0xF746
+#define ID_LED_DEFAULT_82573 ((ID_LED_DEF1_DEF2 << 12) | \
+                              (ID_LED_OFF1_ON2  <<  8) | \
+                              (ID_LED_DEF1_DEF2 <<  4) | \
+                              (ID_LED_DEF1_DEF2))
+
+#define E1000_GCR_L1_ACT_WITHOUT_L0S_RX 0x08000000
+
+#endif

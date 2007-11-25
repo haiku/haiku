@@ -26,7 +26,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/sys/net/if_vlan_var.h,v 1.21.2.2 2006/01/13 19:21:45 glebius Exp $
+ * $FreeBSD: src/sys/net/if_vlan_var.h,v 1.26 2007/02/28 22:05:30 bms Exp $
  */
 
 #ifndef _NET_IF_VLAN_VAR_H_
@@ -40,9 +40,40 @@ struct	ether_vlan_header {
 	u_int16_t evl_proto;
 };
 
-#define EVL_VLID_MASK	0x0FFF
-#define	EVL_VLANOFTAG(tag) ((tag) & EVL_VLID_MASK)
-#define	EVL_PRIOFTAG(tag) (((tag) >> 13) & 7)
+#define	EVL_VLID_MASK		0x0FFF
+#define	EVL_PRI_MASK		0xE000
+#define	EVL_VLANOFTAG(tag)	((tag) & EVL_VLID_MASK)
+#define	EVL_PRIOFTAG(tag)	(((tag) >> 13) & 7)
+#define	EVL_CFIOFTAG(tag)	(((tag) >> 12) & 1)
+#define	EVL_MAKETAG(vlid, pri, cfi)					\
+	((((((pri) & 7) << 1) | ((cfi) & 1)) << 12) | ((vlid) & EVL_VLID_MASK))
+
+/* Set the VLAN ID in an mbuf packet header non-destructively. */
+#define EVL_APPLY_VLID(m, vlid)						\
+	do {								\
+		if ((m)->m_flags & M_VLANTAG) {				\
+			(m)->m_pkthdr.ether_vtag &= EVL_VLID_MASK;	\
+			(m)->m_pkthdr.ether_vtag |= (vlid);		\
+		} else {						\
+			(m)->m_pkthdr.ether_vtag = (vlid);		\
+			(m)->m_flags |= M_VLANTAG;			\
+		}							\
+	} while (0)
+
+/* Set the priority ID in an mbuf packet header non-destructively. */
+#define EVL_APPLY_PRI(m, pri)						\
+	do {								\
+		if ((m)->m_flags & M_VLANTAG) {				\
+			uint16_t __vlantag = (m)->m_pkthdr.ether_vtag;	\
+			(m)->m_pkthdr.ether_vtag |= EVL_MAKETAG(	\
+			    EVL_VLANOFTAG(__vlantag), (pri),		\
+			    EVL_CFIOFTAG(__vlantag));			\
+		} else {						\
+			(m)->m_pkthdr.ether_vtag =			\
+			    EVL_MAKETAG(0, (pri), 0);			\
+			(m)->m_flags |= M_VLANTAG;			\
+		}							\
+	} while (0)
 
 /* sysctl(3) tags, for compatibility purposes */
 #define	VLANCTL_PROTO	1
@@ -59,11 +90,6 @@ struct	vlanreq {
 #define	SIOCGETVLAN	SIOCGIFGENERIC
 
 #ifdef _KERNEL
-#if 1
-#define	VLAN_INPUT_TAG_NEW(_ifp, _m, _t)	do { } while (0)
-#define	VLAN_OUTPUT_TAG(_ifp, _m)			NULL
-#define	VLAN_TAG_VALUE(_mt)					0
-#else
 /*
  * Drivers that are capable of adding and removing the VLAN header
  * in hardware indicate they support this by marking IFCAP_VLAN_HWTAGGING
@@ -75,78 +101,35 @@ struct	vlanreq {
  */
 
 /*
- * Drivers that support hardware VLAN tagging pass a packet's tag
- * up through the stack by appending a packet tag with this value.
- * Output is handled likewise, the driver must locate the packet
- * tag to extract the VLAN tag.  The following macros are used to
- * do this work.  On input, do:
+ * VLAN tags are stored in host byte order.  Byte swapping may be
+ * necessary.
  *
- *	VLAN_INPUT_TAG(ifp, m, tag,);
+ * Drivers that support hardware VLAN tag stripping fill in the
+ * received VLAN tag (containing both vlan and priority information)
+ * into the ether_vtag mbuf packet header field:
+ * 
+ *	m->m_pkthdr.ether_vtag = vlan_id;	// ntohs()?
+ *	m->m_flags |= M_VLANTAG;
  *
- * to mark the packet m with the specified VLAN tag.  The last
- * parameter provides code to execute in case of an error.  On
- * output the driver should check mbuf to see if a VLAN tag is
- * present and only then check for a tag; this is done with:
+ * to mark the packet m with the specified VLAN tag.
  *
- *	struct m_tag *mtag;
- *	mtag = VLAN_OUTPUT_TAG(ifp, m);
- *	if (mtag != NULL) {
- *		... = VLAN_TAG_VALUE(mtag);
+ * On output the driver should check the mbuf for the M_VLANTAG
+ * flag to see if a VLAN tag is present and valid:
+ *
+ *	if (m->m_flags & M_VLANTAG) {
+ *		... = m->m_pkthdr.ether_vtag;	// htons()?
  *		... pass tag to hardware ...
  *	}
  *
  * Note that a driver must indicate it supports hardware VLAN
- * tagging by marking IFCAP_VLAN_HWTAGGING in if_capabilities.
+ * stripping/insertion by marking IFCAP_VLAN_HWTAGGING in
+ * if_capabilities.
  */
-#define	MTAG_VLAN	1035328035
-#define	MTAG_VLAN_TAG	0		/* tag of VLAN interface */
 
-/*
- * This macro must expand to a lvalue so that it can be used
- * to set a tag with a simple assignment.
- */
-#define	VLAN_TAG_VALUE(_mt)	(*(u_int *)((_mt) + 1))
+#define	VLAN_CAPABILITIES(_ifp) do { \
+	} while (0)
 
-/*
- * This macro is kept for API compatibility. 
- */
-#define	VLAN_INPUT_TAG(_ifp, _m, _t, _errcase) do {	\
-	struct m_tag *mtag;				\
-	mtag = m_tag_alloc(MTAG_VLAN, MTAG_VLAN_TAG,	\
-	    sizeof (u_int), M_NOWAIT);			\
-	if (mtag != NULL) {				\
-		VLAN_TAG_VALUE(mtag) = (_t);		\
-		m_tag_prepend((_m), mtag);		\
-		(_m)->m_flags |= M_VLANTAG;		\
-	} else {					\
-		(_ifp)->if_ierrors++;			\
-		m_freem(_m);				\
-		_errcase;				\
-	}						\
-} while (0)
-
-/*
- * This macro is equal to VLAN_INPUT_TAG() in HEAD.
- */
-#define	VLAN_INPUT_TAG_NEW(_ifp, _m, _t) do {			\
-	struct m_tag *mtag;					\
-	mtag = m_tag_alloc(MTAG_VLAN, MTAG_VLAN_TAG,		\
-			   sizeof (u_int), M_NOWAIT);		\
-	if (mtag != NULL) {					\
-		VLAN_TAG_VALUE(mtag) = (_t);			\
-		m_tag_prepend((_m), mtag);			\
-		(_m)->m_flags |= M_VLANTAG;			\
-	} else {						\
-		(_ifp)->if_ierrors++;				\
-		m_freem(_m);					\
-		_m = NULL;					\
-	}							\
-} while (0)
-
-#define	VLAN_OUTPUT_TAG(_ifp, _m)				\
-	((_m)->m_flags & M_VLANTAG ?				\
-		m_tag_locate((_m), MTAG_VLAN, MTAG_VLAN_TAG, NULL) : NULL)
-#endif
+extern	void (*vlan_trunk_cap_p)(struct ifnet *);
 #endif /* _KERNEL */
 
 #endif /* _NET_IF_VLAN_VAR_H_ */

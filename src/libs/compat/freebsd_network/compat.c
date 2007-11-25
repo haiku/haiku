@@ -13,6 +13,7 @@
 #include <KernelExport.h>
 
 #include <compat/machine/resource.h>
+#include <compat/dev/pci/pcireg.h>
 #include <compat/dev/pci/pcivar.h>
 #include <compat/sys/bus.h>
 
@@ -132,6 +133,81 @@ pci_enable_io(device_t dev, int space)
 	device_printf(dev, "pci_enable_io(%d) failed.\n", space);
 
 	return ENXIO;
+}
+
+
+int
+pci_find_extcap(device_t child, int capability, int *_capabilityRegister)
+{
+	uint8 capabilityPointer;
+	uint8 headerType;
+	uint16 status;
+
+	status = pci_read_config(child, PCIR_STATUS, 2);
+	if ((status & PCIM_STATUS_CAPPRESENT) == 0)
+		return ENXIO;
+
+	headerType = pci_read_config(child, PCI_header_type, 1);
+	switch (headerType & PCIM_HDRTYPE) {
+		case 0:
+		case 1:
+			capabilityPointer = PCIR_CAP_PTR;
+			break;
+		case 2:
+			capabilityPointer = PCIR_CAP_PTR_2;
+			break;
+		default:
+			return ENXIO;
+	}
+	capabilityPointer = pci_read_config(child, capabilityPointer, 1);
+
+	while (capabilityPointer != 0) {
+		if (pci_read_config(child, capabilityPointer + PCICAP_ID, 1)
+				== capability) {
+			if (_capabilityRegister != NULL)
+				*_capabilityRegister = capabilityPointer;
+			return 0;
+		}
+		capabilityPointer = pci_read_config(child,
+			capabilityPointer + PCICAP_NEXTPTR, 1);
+	}
+
+	return ENOENT;
+}
+
+
+int
+pci_msi_count(device_t dev)
+{
+	return 0;
+}
+
+
+int
+pci_alloc_msi(device_t dev, int *count)
+{
+    return ENODEV;
+}
+
+
+int
+pci_release_msi(device_t dev)
+{
+    return ENODEV;
+}
+
+
+int
+pci_msix_count(device_t dev)
+{
+	return 0;
+}
+
+
+int
+pci_alloc_msix(device_t dev, int *count)
+{
+    return ENODEV;
 }
 
 
@@ -321,6 +397,13 @@ device_set_driver(device_t dev, driver_t *driver)
 }
 
 
+int
+device_is_alive(device_t dev)
+{
+	return dev->driver != NULL;
+}
+
+
 void
 uninit_device(device_t dev)
 {
@@ -397,7 +480,7 @@ __haiku_probe_miibus(device_t dev, driver_t *drivers[], int count)
 }
 
 
-void
+int
 bus_generic_attach(device_t dev)
 {
 	device_t child = NULL;
@@ -415,9 +498,14 @@ bus_generic_attach(device_t dev)
 		} else if (child->driver == &miibus_driver)
 			child->methods.probe(child);
 
-		if (child->driver != NULL)
-			child->methods.attach(child);
+		if (child->driver != NULL) {
+			int result = child->methods.attach(child);
+			if (result != 0)
+				return result;
+		}
 	}
+
+	return 0;
 }
 
 

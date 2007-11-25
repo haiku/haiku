@@ -1,7 +1,7 @@
 /*
  * Fundamental constants relating to ethernet.
  *
- * $FreeBSD: src/sys/net/ethernet.h,v 1.24 2004/10/05 19:28:52 sam Exp $
+ * $FreeBSD: src/sys/net/ethernet.h,v 1.32 2007/05/29 12:40:45 yar Exp $
  *
  */
 
@@ -57,18 +57,23 @@
 /*
  * Structure of a 10Mb/s Ethernet header.
  */
-struct	ether_header {
+struct ether_header {
 	u_char	ether_dhost[ETHER_ADDR_LEN];
 	u_char	ether_shost[ETHER_ADDR_LEN];
 	u_short	ether_type;
-};
+} __packed;
 
 /*
  * Structure of a 48-bit Ethernet address.
  */
-struct	ether_addr {
+struct ether_addr {
 	u_char octet[ETHER_ADDR_LEN];
-};
+} __packed;
+
+#ifdef CTASSERT
+CTASSERT(sizeof (struct ether_header) == ETHER_ADDR_LEN * 2 + 2);
+CTASSERT(sizeof (struct ether_addr) == ETHER_ADDR_LEN);
+#endif
 
 #define	ETHER_IS_MULTICAST(addr) (*(addr) & 0x01) /* is address mcast/bcast? */
 
@@ -311,6 +316,7 @@ struct	ether_addr {
 #define	ETHERTYPE_IPAS		0x876C	/* IP Autonomous Systems (RFC1701) */
 #define	ETHERTYPE_SECUREDATA	0x876D	/* Secure Data (RFC1701) */
 #define	ETHERTYPE_FLOWCONTROL	0x8808	/* 802.3x flow control packet */
+#define	ETHERTYPE_SLOW		0x8809	/* 802.3ad link aggregation (LACP) */
 #define	ETHERTYPE_PPP		0x880B	/* PPP (obsolete by PPPOE) */
 #define	ETHERTYPE_HITACHI	0x8820	/* Hitachi Cable (Optoelectronic Systems Laboratory) */
 #define	ETHERTYPE_MPLS		0x8847	/* MPLS Unicast */
@@ -343,6 +349,15 @@ struct	ether_addr {
 #define	ETHERMTU	(ETHER_MAX_LEN-ETHER_HDR_LEN-ETHER_CRC_LEN)
 #define	ETHERMIN	(ETHER_MIN_LEN-ETHER_HDR_LEN-ETHER_CRC_LEN)
 #define	ETHERMTU_JUMBO	(ETHER_MAX_LEN_JUMBO - ETHER_HDR_LEN - ETHER_CRC_LEN)
+/*
+ * The ETHER_BPF_MTAP macro should be used by drivers which support hardware
+ * offload for VLAN tag processing.  It will check the mbuf to see if it has
+ * M_VLANTAG set, and if it does, will pass the packet along to
+ * ether_vlan_mtap.  This function will re-insert VLAN tags for the duration
+ * of the tap, so they show up properly for network analyzers.
+ */
+#define ETHER_BPF_MTAP(_ifp, _m) do { \
+	} while (0)
 
 #ifdef _KERNEL
 
@@ -350,17 +365,20 @@ struct ifnet;
 struct mbuf;
 struct rtentry;
 struct sockaddr;
+struct bpf_if;
 
 extern	uint32_t ether_crc32_le(const uint8_t *, size_t);
 extern	uint32_t ether_crc32_be(const uint8_t *, size_t);
 extern	void ether_demux(struct ifnet *, struct mbuf *);
 extern	void ether_ifattach(struct ifnet *, const u_int8_t *);
 extern	void ether_ifdetach(struct ifnet *);
-extern	int  ether_ioctl(struct ifnet *, int, caddr_t);
+extern	int  ether_ioctl(struct ifnet *, u_long, caddr_t);
 extern	int  ether_output(struct ifnet *,
 		   struct mbuf *, struct sockaddr *, struct rtentry *);
 extern	int  ether_output_frame(struct ifnet *, struct mbuf *);
 extern	char *ether_sprintf(const u_int8_t *);
+void	ether_vlan_mtap(struct bpf_if *, struct mbuf *,
+	    void *, u_int);
 
 #else /* _KERNEL */
 
@@ -371,9 +389,11 @@ extern	char *ether_sprintf(const u_int8_t *);
  */
 __BEGIN_DECLS
 struct	ether_addr *ether_aton(const char *);
+struct	ether_addr *ether_aton_r(const char *, struct ether_addr *);
 int	ether_hostton(const char *, struct ether_addr *);
 int	ether_line(const char *, struct ether_addr *, char *);
 char 	*ether_ntoa(const struct ether_addr *);
+char 	*ether_ntoa_r(const struct ether_addr *, char *);
 int	ether_ntohost(char *, const struct ether_addr *);
 __END_DECLS
 

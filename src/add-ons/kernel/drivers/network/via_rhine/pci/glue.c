@@ -6,8 +6,6 @@
 
 #include <sys/bus.h>
 
-#include "if_vrreg.h"
-
 
 HAIKU_FBSD_DRIVER_GLUE(via_rhine, vr, pci);
 HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_SWI_TASKQUEUE);
@@ -27,27 +25,4 @@ __haiku_select_miibus_driver(device_t dev)
 
 	return __haiku_probe_miibus(dev, drivers, 2);
 }
-
-
-int
-__haiku_disable_interrupts(device_t dev)
-{
-	struct vr_softc *sc = device_get_softc(dev);
-
-	if (CSR_READ_2(sc, VR_ISR) == 0)
-		return 0;
-
-	CSR_WRITE_2(sc, VR_IMR, 0x0000);
-	return 1;
-}
-
-
-void
-__haiku_reenable_interrupts(device_t dev)
-{
-	struct vr_softc *sc = device_get_softc(dev);
-
-	CSR_WRITE_2(sc, VR_IMR, VR_INTRS);
-}
-
 

@@ -88,7 +88,7 @@ _resolve_method(driver_t *driver, const char *name)
 static status_t
 compat_open(const char *name, uint32 flags, void **cookie)
 {
-	struct network_device *dev;
+	struct network_device *device;
 	status_t status;
 	int i;
 
@@ -106,22 +106,22 @@ compat_open(const char *name, uint32 flags, void **cookie)
 	if (gDevNameList[i] == NULL)
 		return B_ERROR;
 
-	dev = gDevices[i];
+	device = gDevices[i];
 
-	if (!atomic_test_and_set(&dev->open, 1, 0))
+	if (!atomic_test_and_set(&device->open, 1, 0))
 		return B_BUSY;
 
 	/* some drivers expect the softc to be zero'ed out */
-	memset(dev->base.softc, 0, dev->base.driver->softc_size);
+	memset(device->base.softc, 0, device->base.driver->softc_size);
 
-	status = DEVNET(dev)->methods.attach(DEVNET(dev));
+	status = DEVNET(device)->methods.attach(DEVNET(device));
 	if (status != 0)
-		atomic_and(&dev->open, 0);
+		atomic_and(&device->open, 0);
 
 	driver_printf(" ... status = 0x%ld\n", status);
 
 	if (status == 0) {
-		struct ifnet *ifp = dev->ifp;
+		struct ifnet *ifp = device->ifp;
 		struct ifreq ifr;
 
 		ifp->if_flags &= ~IFF_UP;
@@ -135,7 +135,7 @@ compat_open(const char *name, uint32 flags, void **cookie)
 		ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
 	}
 
-	*cookie = dev;
+	*cookie = device;
 	return status;
 }
 

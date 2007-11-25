@@ -7,7 +7,9 @@
 
 #include "device.h"
 
-#include <malloc.h>
+#include <stdlib.h>
+
+#include <arch/cpu.h>
 
 #include <compat/dev/pci/pcivar.h>
 #include <compat/machine/resource.h>
@@ -24,22 +26,20 @@
 
 #define ROUNDUP(a, b) (((a) + ((b)-1)) & ~((b)-1))
 
-
-struct resource {
-	int					type;
-	bus_space_tag_t		tag;
-	bus_space_handle_t	handle;
-	area_id				mapped_area;
-};
+// TODO: x86 specific!
+#define I386_BUS_SPACE_IO			0
+#define I386_BUS_SPACE_MEM			1
 
 struct internal_intr {
-	device_t dev;
-	driver_intr_t handler;
-	void *arg;
-	int irq;
+	device_t		dev;
+	driver_filter_t	filter;
+	driver_intr_t	handler;
+	void			*arg;
+	int				irq;
+	uint32			flags;
 
-	thread_id thread;
-	sem_id sem;
+	thread_id		thread;
+	sem_id			sem;
 };
 
 
@@ -73,9 +73,9 @@ bus_alloc_irq_resource(device_t dev, struct resource *res)
 	if (irq == 0 || irq == 0xff)
 		return -1;
 
-	/* XXX */
-	res->tag = 0;
-	res->handle = irq;
+	/* TODO: IRQ resources! */
+	res->r_bustag = 0;
+	res->r_bushandle = irq;
 
 	return 0;
 }
@@ -88,14 +88,13 @@ bus_alloc_mem_resource(device_t dev, struct resource *res, int regid)
 	uint32 size = 128 * 1024; /* XXX */
 	void *virtualAddr;
 
-	res->mapped_area = map_mem(&virtualAddr, (void *)addr, size, 0,
+	res->r_mapped_area = map_mem(&virtualAddr, (void *)addr, size, 0,
 		"bus_alloc_resource(MEMORY)");
-
-	if (res->mapped_area < 0)
+	if (res->r_mapped_area < B_OK)
 		return -1;
 
-	res->tag = I386_BUS_SPACE_MEM;
-	res->handle = (bus_space_handle_t)virtualAddr;
+	res->r_bustag = I386_BUS_SPACE_MEM;
+	res->r_bushandle = (bus_space_handle_t)virtualAddr;
 	return 0;
 }
 
@@ -103,8 +102,8 @@ bus_alloc_mem_resource(device_t dev, struct resource *res, int regid)
 static int
 bus_alloc_ioport_resource(device_t dev, struct resource *res, int regid)
 {
-	res->tag = I386_BUS_SPACE_IO;
-	res->handle = pci_read_config(dev, regid, 4) & PCI_address_io_mask;
+	res->r_bustag = I386_BUS_SPACE_IO;
+	res->r_bushandle = pci_read_config(dev, regid, 4) & PCI_address_io_mask;
 	return 0;
 }
 
@@ -140,7 +139,7 @@ bus_alloc_resource(device_t dev, int type, int *rid, unsigned long start,
 		return NULL;
 	}
 
-	res->type = type;
+	res->r_type = type;
 	return res;
 }
 
@@ -148,29 +147,72 @@ bus_alloc_resource(device_t dev, int type, int *rid, unsigned long start,
 int
 bus_release_resource(device_t dev, int type, int rid, struct resource *res)
 {
-	if (res->type != type)
+	if (res->r_type != type)
 		panic("bus_release_resource: mismatch");
 
 	if (type == SYS_RES_MEMORY)
-		delete_area(res->mapped_area);
+		delete_area(res->r_mapped_area);
 
 	free(res);
 	return 0;
 }
 
 
+int
+bus_alloc_resources(device_t dev, struct resource_spec *resourceSpec,
+    struct resource **resources)
+{
+	int i;
+
+	for (i = 0; resourceSpec[i].type != -1; i++) {
+		resources[i] = bus_alloc_resource_any(dev,
+			resourceSpec[i].type, &resourceSpec[i].rid, resourceSpec[i].flags);
+		if (resources[i] == NULL
+			&& (resourceSpec[i].flags & RF_OPTIONAL) == 0) {
+			for (++i; resourceSpec[i].type != -1; i++) {
+				resources[i] = NULL;
+			}
+
+			bus_release_resources(dev, resourceSpec, resources);
+			return ENXIO;
+		}
+	}
+	return 0;
+}
+
+
+void
+bus_release_resources(device_t dev, const struct resource_spec *resourceSpec,
+    struct resource **resources)
+{
+	int i;
+
+	for (i = 0; resourceSpec[i].type != -1; i++) {
+		if (resources[i] == NULL)
+			continue;
+
+		bus_release_resource(dev, resourceSpec[i].type, resourceSpec[i].rid,
+			resources[i]);
+		resources[i] = NULL;
+	}
+}
+
+
 bus_space_handle_t
 rman_get_bushandle(struct resource *res)
 {
-	return res->handle;
+	return res->r_bushandle;
 }
 
 
 bus_space_tag_t
 rman_get_bustag(struct resource *res)
 {
-	return res->tag;
+	return res->r_bustag;
 }
+
+
+//	#pragma mark - Interrupt handling
 
 
 static int32
@@ -236,7 +278,7 @@ free_internal_intr(struct internal_intr *intr)
 
 int
 bus_setup_intr(device_t dev, struct resource *res, int flags,
-	driver_intr_t handler, void *arg, void **cookiep)
+	driver_filter_t filter, driver_intr_t handler, void *arg, void **_cookie)
 {
 	/* TODO check MPSAFE etc */
 
@@ -249,16 +291,23 @@ bus_setup_intr(device_t dev, struct resource *res, int flags,
 		return B_NO_MEMORY;
 
 	intr->dev = dev;
+	intr->filter = filter;
 	intr->handler = handler;
 	intr->arg = arg;
-	intr->irq = res->handle;
+	intr->irq = res->r_bushandle;
+	intr->flags = flags;
 
 	if (flags & INTR_FAST) {
 		intr->sem = -1;
 		intr->thread = -1;
 
-		status = install_io_interrupt_handler(intr->irq,
-			intr_fast_wrapper, intr, 0);
+		if (filter != NULL) {
+			status = install_io_interrupt_handler(intr->irq,
+				(interrupt_handler)intr->filter, intr->arg, 0);
+		} else {
+			status = install_io_interrupt_handler(intr->irq,
+				intr_fast_wrapper, intr, 0);
+		}
 	} else {
 		snprintf(semName, sizeof(semName), "%s intr", dev->dev_name);
 
@@ -289,8 +338,7 @@ bus_setup_intr(device_t dev, struct resource *res, int flags,
 
 	resume_thread(intr->thread);
 
-	*cookiep = intr;
-
+	*_cookie = intr;
 	return 0;
 }
 
@@ -299,9 +347,28 @@ int
 bus_teardown_intr(device_t dev, struct resource *res, void *arg)
 {
 	struct internal_intr *intr = arg;
-	remove_io_interrupt_handler(intr->irq, intr_wrapper, intr);
+
+	if (intr->filter != NULL) {
+		remove_io_interrupt_handler(intr->irq, (interrupt_handler)intr->filter,
+			intr->arg);
+	} else if (intr->flags & INTR_FAST) {
+		remove_io_interrupt_handler(intr->irq, intr_fast_wrapper, intr);
+	} else {
+		remove_io_interrupt_handler(intr->irq, intr_wrapper, intr);
+	}
+
 	free_internal_intr(intr);
 	return 0;
+}
+
+
+//	#pragma mark - bus functions
+
+
+bus_dma_tag_t
+bus_get_dma_tag(device_t dev)
+{
+	return NULL;
 }
 
 

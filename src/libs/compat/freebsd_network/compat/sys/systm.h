@@ -5,6 +5,7 @@
 #ifndef _FBSD_COMPAT_SYS_SYSTM_H_
 #define _FBSD_COMPAT_SYS_SYSTM_H_
 
+
 #include <stdint.h>
 
 #include <sys/callout.h>
@@ -14,6 +15,9 @@
 #include <net/if_var.h>
 #include <net/if_media.h>
 
+#include <machine/atomic.h>
+
+
 #define DELAY(n) \
 	do {				\
 		if (n < 1000)	\
@@ -21,5 +25,11 @@
 		else			\
 			snooze(n);	\
 	} while (0)
+
+static inline void
+wakeup(void *identifier)
+{
+	panic("wakeup() called.");
+}
 
 #endif	/* _FBSD_COMPAT_SYS_SYSTM_H_ */

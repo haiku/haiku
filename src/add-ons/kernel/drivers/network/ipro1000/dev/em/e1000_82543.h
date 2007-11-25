@@ -1,4 +1,4 @@
-$FreeBSD: src/sys/dev/em/LICENSE,v 1.6 2007/05/04 00:00:11 jfv Exp $
+/*******************************************************************************
 
   Copyright (c) 2001-2007, Intel Corporation 
   All rights reserved.
@@ -29,3 +29,22 @@ $FreeBSD: src/sys/dev/em/LICENSE,v 1.6 2007/05/04 00:00:11 jfv Exp $
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE.
 
+*******************************************************************************/
+/*$FreeBSD: src/sys/dev/em/e1000_82543.h,v 1.3 2007/05/16 00:14:23 jfv Exp $*/
+
+
+#ifndef _E1000_82543_H_
+#define _E1000_82543_H_
+
+#define PHY_PREAMBLE      0xFFFFFFFF
+#define PHY_PREAMBLE_SIZE 32
+#define PHY_SOF           0x1
+#define PHY_OP_READ       0x2
+#define PHY_OP_WRITE      0x1
+#define PHY_TURNAROUND    0x2
+
+#define TBI_COMPAT_ENABLED 0x1 /* Global "knob" for the workaround */
+#define TBI_SBP_ENABLED    0x2 /* If TBI_COMPAT_ENABLED,
+                                * then this is the current state (on/off) */
+
+#endif

@@ -1,15 +1,19 @@
+/*
+ * Copyright 2007, Hugo Santos. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _FBSD_COMPAT_SYS_MBUF_H_
 #define _FBSD_COMPAT_SYS_MBUF_H_
 
+
 #include <sys/malloc.h>
 #include <sys/param.h>
+
 
 #define MLEN		((int)(MSIZE - sizeof(struct m_hdr)))
 #define MHLEN		((int)(MSIZE - sizeof(struct pkthdr)))
 
 #define MINCLSIZE	(MHLEN + 1)
-
-#ifdef _KERNEL
 
 struct m_hdr {
 	struct mbuf *	mh_next;
@@ -24,7 +28,9 @@ struct pkthdr {
 	struct ifnet *	rcvif;
 	int				len;
 	int				csum_flags;
-	uint16_t		csum_data;
+	int				csum_data;
+	uint16_t		tso_segsz;
+	uint16_t		ether_vtag;
 };
 
 struct m_ext {
@@ -68,16 +74,20 @@ struct mbuf {
 
 #define M_EXT			0x0001
 #define M_PKTHDR		0x0002
+#define	M_RDONLY		0x0008
 
 #define EXT_CLUSTER		1
 #define EXT_PACKET		3
+#define	EXT_NET_DRV		100
 
-#define M_BCAST			0x0200
-#define M_MCAST			0x0400
+#define M_BCAST			0x00000200
+#define M_MCAST			0x00000400
+#define	M_VLANTAG		0x00010000
 
 #define CSUM_IP			0x0001
 #define CSUM_TCP		0x0002
 #define CSUM_UDP		0x0004
+#define	CSUM_TSO		0x0020
 #define CSUM_IP_CHECKED	0x0100
 #define CSUM_IP_VALID	0x0200
 #define CSUM_DATA_VALID	0x0400
@@ -88,6 +98,9 @@ struct mbuf {
 #define MGET(m, how, type)		((m) = m_get((how), (type)))
 #define MGETHDR(m, how, type)	((m) = m_gethdr((how), (type)))
 #define MCLGET(m, how)			m_clget((m), (how))
+#define	MEXTADD(m, buf, size, free, args, flags, type) \
+    m_extadd((m), (caddr_t)(buf), (size), (free), (args), (flags), (type))
+
 
 struct mbuf *m_getcl(int how, short type, int flags);
 void m_freem(struct mbuf *mbuf);
@@ -112,6 +125,10 @@ struct mbuf *m_get(int how, short type);
 struct mbuf *m_gethdr(int how, short type);
 void m_clget(struct mbuf *m, int how);
 
+void m_extadd(struct mbuf *m, caddr_t buffer, u_int size,
+    void (*freeHook)(void *, void *), void *args, int flags, int type);
+
+
 #define mtod(m, type)	(type)((m)->m_data)
 
 #define m_tag_delete(mb, tag) \
@@ -130,6 +147,4 @@ extern int max_protohdr;
 
 #include <sys/mbuf-fbsd.h>
 
-#endif
-
-#endif
+#endif	/* _FBSD_COMPAT_SYS_MBUF_H_ */

@@ -29,7 +29,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: src/sys/pci/if_rlreg.h,v 1.51.2.7 2006/08/01 17:36:50 wpaul Exp $
+ * $FreeBSD: src/sys/pci/if_rlreg.h,v 1.67 2007/07/24 01:24:03 yongari Exp $
  */
 
 /*
@@ -312,6 +312,8 @@
 #define RL_EEMODE_WRITECFG	(0x80|0x40)
 
 /* 9346 EEPROM commands */
+#define RL_9346_ADDR_LEN	6	/* 93C46 1K: 128x16 */
+#define RL_9356_ADDR_LEN	8	/* 93C56 2K: 256x16 */
 
 #define RL_9346_WRITE          0x5
 #define RL_9346_READ           0x6
@@ -541,6 +543,7 @@ struct rl_desc {
 #define RL_TDESC_CMD_UDPCSUM	0x00020000	/* UDP checksum enable */
 #define RL_TDESC_CMD_IPCSUM	0x00040000	/* IP header checksum enable */
 #define RL_TDESC_CMD_MSSVAL	0x07FF0000	/* Large send MSS value */
+#define RL_TDESC_CMD_MSSVAL_SHIFT	16	/* Large send MSS value shift */
 #define RL_TDESC_CMD_LGSEND	0x08000000	/* TCP large send enb */
 #define RL_TDESC_CMD_EOF	0x10000000	/* end of frame marker */
 #define RL_TDESC_CMD_SOF	0x20000000	/* start of frame marker */
@@ -637,11 +640,12 @@ struct rl_stats {
  * due to the 8139C+.  We need to put the number of descriptors in the ring
  * structure and use that value instead.
  */
-#if !defined(__i386__) && !defined(__amd64__)
+#ifndef	__NO_STRICT_ALIGNMENT
 #define RE_FIXUP_RX	1
 #endif
 
 #define RL_TX_DESC_CNT		64
+#define RL_TX_DESC_THLD		4
 #define RL_RX_DESC_CNT		RL_TX_DESC_CNT
 
 #define RL_RX_LIST_SZ		(RL_RX_DESC_CNT * sizeof(struct rl_desc))
@@ -660,6 +664,8 @@ struct rl_stats {
 #define RE_RX_DESC_BUFLEN	MCLBYTES
 #endif
 
+#define	RL_MSI_MESSAGES	2
+
 #define RL_ADDR_LO(y)		((uint64_t) (y) & 0xFFFFFFFF)
 #define RL_ADDR_HI(y)		((uint64_t) (y) >> 32)
 
@@ -670,7 +676,6 @@ struct rl_stats {
 struct rl_softc;
 
 struct rl_dmaload_arg {
-	struct rl_softc		*sc;
 	int			rl_idx;
 	int			rl_maxsegs;
 	uint32_t		rl_flags;
@@ -707,8 +712,8 @@ struct rl_softc {
 	bus_space_tag_t		rl_btag;	/* bus space tag */
 	device_t		rl_dev;
 	struct resource		*rl_res;
-	struct resource		*rl_irq;
-	void			*rl_intrhand;
+	struct resource		*rl_irq[RL_MSI_MESSAGES];
+	void			*rl_intrhand[RL_MSI_MESSAGES];
 	device_t		rl_miibus;
 	bus_dma_tag_t		rl_parent_tag;
 	bus_dma_tag_t		rl_tag;
@@ -720,12 +725,14 @@ struct rl_softc {
 	struct rl_chain_data	rl_cdata;
 	struct rl_list_data	rl_ldata;
 	struct callout		rl_stat_callout;
+	int			rl_watchdog_timer;
 	struct mtx		rl_mtx;
 	struct mbuf		*rl_head;
 	struct mbuf		*rl_tail;
 	uint32_t		rl_hwrev;
 	uint32_t		rl_rxlenmask;
 	int			rl_testmode;
+	int			rl_if_flags;
 	int			suspended;	/* 0 = normal  1 = suspended */
 #ifdef DEVICE_POLLING
 	int			rxcycles;
@@ -737,6 +744,7 @@ struct rl_softc {
 	struct mtx		rl_intlock;
 	int			rl_txstart;
 	int			rl_link;
+	int			rl_msi;
 };
 
 #define	RL_LOCK(_sc)		mtx_lock(&(_sc)->rl_mtx)
