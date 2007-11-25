@@ -5,8 +5,10 @@
  *
  */
 
-#ifndef _NET_ETHERNET_H_
-#define _NET_ETHERNET_H_
+#ifndef _FBSD_COMPAT_NET_ETHERNET_H_
+#define _FBSD_COMPAT_NET_ETHERNET_H_
+
+#include <sys/kernel.h>
 
 /*
  * Somce basic Ethernet constants.
@@ -399,4 +401,4 @@ __END_DECLS
 
 #endif /* !_KERNEL */
 
-#endif /* !_NET_ETHERNET_H_ */
+#endif /* !_FBSD_COMPAT_NET_ETHERNET_H_ */
