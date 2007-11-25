@@ -22,7 +22,6 @@ struct snet_buffer {
 
 };
 
-
 snet_buffer*
 snb_create(uint16 size)
 {
@@ -63,13 +62,11 @@ snb_pull(snet_buffer* snb, uint16 size)
 
 }
 
-
 inline void
 snb_reset(snet_buffer* snb)
 {
     snb->puttingSize = snb->pullingSize = 0;
 }
-
 
 void
 snb_free(snet_buffer* snb)
@@ -86,14 +83,12 @@ snb_free(snet_buffer* snb)
 
 }
 
-
 inline void*
 snb_get(snet_buffer* snb)
 {
     /* TODO: pointer checking */
     return snb->buffer;
 }
-
 
 inline uint16
 snb_size(snet_buffer* snb)
@@ -102,14 +97,12 @@ snb_size(snet_buffer* snb)
     return snb->expectedSize;
 }
 
-
 inline void*
 snb_cookie(snet_buffer* snb)
 {
     /* TODO: pointer checking */
     return snb->cookie;
 }
-
 
 inline void
 snb_set_cookie(snet_buffer* snb, void* cookie)
@@ -118,20 +111,17 @@ snb_set_cookie(snet_buffer* snb, void* cookie)
     snb->cookie = cookie;
 }
 
-
 /* Return true if we canot "put" more data in the buffer */
 inline bool     snb_completed(snet_buffer* snb)
 {
     return (snb != NULL && (snb->expectedSize == snb->puttingSize));
 }
 
-
 /* Return true if we cannot pull more more data from the buffer */
 inline bool      snb_finished(snet_buffer* snb)
 {
     return (snb != NULL && (snb->expectedSize == snb->pullingSize));
 }
-
 
 inline bool      snb_remaining_to_put(snet_buffer* snb)
 {
@@ -144,14 +134,13 @@ inline bool      snb_remaining_to_pull(snet_buffer* snb)
     return (snb != NULL && (snb->expectedSize - snb->pullingSize));
 }
 
-
 /* ISSUE1: Number of packets in the worst case(we always need a bigger 
    buffer than before) increases, never decreases:
    
    SOL1: Delete the smallest when the queue is bigger than X elements 
    SOL2: ? 
    
-   ISSUE2: If the queue is not gonna be used for long time, Memory c
+   ISSUE2: If the queue is not gonna be used for long time. Memory c
    ould be freed
    
    SOL1: Provide purge func.
@@ -177,7 +166,6 @@ snb_attempt_reuse(snet_buffer* snb, uint16 size)
 
 }
 
-
 void
 snb_park(struct list* l, snet_buffer* snb)
 {
@@ -188,7 +176,6 @@ snb_park(struct list* l, snet_buffer* snb)
 			list_insert_item_before(l, item, snb);
 	}
 }
-
 
 snet_buffer*
 snb_fetch(struct list* l, uint16 size)
@@ -211,5 +198,13 @@ snb_fetch(struct list* l, uint16 size)
 		previous = item;
 	}
 	
-	return snb_attempt_reuse(item, size);
+	// reusing previous pointer for another proposit
+	previous = snb_attempt_reuse(item, size); 
+	
+	/* the resulting reused one is the same as we fetched? => remove it from list*/
+	if (item == previous) {
+		list_remove_item(l, item);
+	}
+	
+	return previous;
 }
