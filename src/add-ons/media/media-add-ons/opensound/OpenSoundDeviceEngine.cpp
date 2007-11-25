@@ -269,7 +269,7 @@ status_t OpenSoundDeviceEngine::SetSpeed(int speed)
 }
 
 
-size_t OpenSoundDeviceEngine::GetISpace(audio_buf_info *info=NULL)
+size_t OpenSoundDeviceEngine::GetISpace(audio_buf_info *info)
 {
 	audio_buf_info abinfo;
 	CALLED();
@@ -288,7 +288,7 @@ size_t OpenSoundDeviceEngine::GetISpace(audio_buf_info *info=NULL)
 }
 
 
-size_t OpenSoundDeviceEngine::GetOSpace(audio_buf_info *info=NULL)
+size_t OpenSoundDeviceEngine::GetOSpace(audio_buf_info *info)
 {
 	audio_buf_info abinfo;
 	//CALLED();

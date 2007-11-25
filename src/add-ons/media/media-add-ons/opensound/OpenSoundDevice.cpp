@@ -584,7 +584,7 @@ OpenSoundDevice::MixerAt(int32 i)
 }
 
 OpenSoundDeviceEngine *
-OpenSoundDevice::NextFreeEngineAt(int32 i, bool rec=false)
+OpenSoundDevice::NextFreeEngineAt(int32 i, bool rec)
 {
 	// find the first free engine in the rec or play chain
 	OpenSoundDeviceEngine *engine = EngineAt(i);
