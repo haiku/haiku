@@ -797,6 +797,7 @@ main()
 {
 	new MediaAddonServer(B_MEDIA_ADDON_SERVER_SIGNATURE);
 	be_app->Run();
+	delete be_app;
 	return 0;
 }
 
