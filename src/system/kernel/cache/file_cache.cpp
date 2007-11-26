@@ -281,6 +281,9 @@ read_from_file(file_cache_ref *ref, void *cookie, off_t offset,
 	int32 pageOffset, addr_t buffer, size_t bufferSize,
 	size_t lastReservedPages, size_t reservePages)
 {
+	TRACE(("read_from_file(offset = %Ld, pageOffset = %ld, buffer = %#lx, "
+		"bufferSize = %lu\n", offset, pageOffset, buffer, bufferSize));
+
 	iovec vec;
 	vec.iov_base = (void *)buffer;
 	vec.iov_len = bufferSize;
@@ -289,8 +292,8 @@ read_from_file(file_cache_ref *ref, void *cookie, off_t offset,
 	mutex_unlock(&ref->cache->lock);
 	vm_page_unreserve_pages(lastReservedPages);
 
-	status_t status = vfs_read_pages(ref->vnode, cookie, offset, &vec, 1,
-		&bufferSize, false);
+	status_t status = vfs_read_pages(ref->vnode, cookie, offset + pageOffset,
+		&vec, 1, &bufferSize, false);
 	if (status == B_OK)
 		reserve_pages(ref, reservePages, false);
 
@@ -462,8 +465,8 @@ write_to_file(file_cache_ref *ref, void *cookie, off_t offset, int32 pageOffset,
 	mutex_unlock(&ref->cache->lock);
 	vm_page_unreserve_pages(lastReservedPages);
 
-	status_t status = vfs_write_pages(ref->vnode, cookie, offset, &vec, 1,
-		&bufferSize, false);
+	status_t status = vfs_write_pages(ref->vnode, cookie, offset + pageOffset,
+		&vec, 1, &bufferSize, false);
 	if (status == B_OK)
 		reserve_pages(ref, reservePages, true);
 
