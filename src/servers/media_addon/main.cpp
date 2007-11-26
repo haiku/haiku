@@ -24,45 +24,50 @@
  */
 
 #define BUILDING_MEDIA_ADDON 1
-#include <Application.h>
+
+#include <stdio.h>
+
 #include <Alert.h>
+#include <Application.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <FindDirectory.h>
+#include <MediaAddOn.h>
 #include <MediaRoster.h>
 #include <NodeMonitor.h>
-#include <MediaAddOn.h>
-#include <String.h>
-#include <stdio.h>
-#include <Entry.h>
 #include <Path.h>
-#include <Directory.h>
+#include <Roster.h>
+#include <String.h>
+
 #include "debug.h"
-#include "TMap.h"
-#include "ServerInterface.h"
 #include "DataExchange.h"
 #include "DormantNodeManager.h"
-#include "Notifications.h"
+#include "MediaFilePlayer.h"
 #include "MediaMisc.h"
 #include "MediaRosterEx.h"
 #include "MediaSounds.h"
+#include "Notifications.h"
+#include "ServerInterface.h"
 #include "SystemTimeSource.h"
-#include "MediaFilePlayer.h"
+#include "TMap.h"
+
 
 //#define USER_ADDON_PATH "../add-ons/media"
 
 void DumpFlavorInfo(const flavor_info *info);
 
-struct AddOnInfo
-{
+struct AddOnInfo {
 	media_addon_id id;
 	bool wants_autostart;
 	int32 flavor_count;
 	
 	List<media_node> active_flavors;
 
-	BMediaAddOn *addon; // if != NULL, need to call _DormantNodeManager->PutAddon(id)
+	BMediaAddOn *addon;
+		// if != NULL, need to call _DormantNodeManager->PutAddon(id)
 };
 
-class MediaAddonServer : BApplication
-{
+class MediaAddonServer : BApplication {
 public:
 	MediaAddonServer(const char *sig);
 	~MediaAddonServer();
@@ -74,7 +79,6 @@ public:
 	void AddOnAdded(const char *path, ino_t file_node);
 	void AddOnRemoved(ino_t file_node);
 	void HandleMessage(int32 code, const void *data, size_t size);
-	static int32 controlthread(void *arg);
 
 	void PutAddonIfPossible(AddOnInfo *info);
 	void InstantiatePhysicalInputsAndOutputs(AddOnInfo *info);
@@ -83,53 +87,61 @@ public:
 	
 	void ScanAddOnFlavors(BMediaAddOn *addon);
 
-	Map<ino_t, media_addon_id> *filemap;
-	Map<media_addon_id, AddOnInfo> *infomap;
+	port_id ControlPort() const { return fControlPort; }
 
-	BMediaRoster *mediaroster;
-	ino_t		DirNodeSystem;
-	ino_t		DirNodeUser;
-	port_id		control_port;
-	thread_id	control_thread;
+private:
+	static int32 _ControlThread(void *arg);
+
+	Map<ino_t, media_addon_id> *fFileMap;
+	Map<media_addon_id, AddOnInfo> *fInfoMap;
+
+	BMediaRoster *fMediaRoster;
+	ino_t		fSystemAddOnsNode;
+	ino_t		fUserAddOnsNode;
+	port_id		fControlPort;
+	thread_id	fControlThread;
 	bool		fStartup;
 	
 	typedef BApplication inherited;
 };
 
-MediaAddonServer::MediaAddonServer(const char *sig) : 
-	BApplication(sig),
+
+MediaAddonServer::MediaAddonServer(const char *sig)
+	: BApplication(sig),
 	fStartup(true)
 {
 	CALLED();
-	mediaroster = BMediaRoster::Roster();
-	filemap = new Map<ino_t, media_addon_id>;
-	infomap = new Map<media_addon_id, AddOnInfo>;
-	control_port = create_port(64, MEDIA_ADDON_SERVER_PORT_NAME);
-	control_thread = spawn_thread(controlthread, "media_addon_server control", 12, this);
-	resume_thread(control_thread);
+	fMediaRoster = BMediaRoster::Roster();
+	fFileMap = new Map<ino_t, media_addon_id>;
+	fInfoMap = new Map<media_addon_id, AddOnInfo>;
+	fControlPort = create_port(64, MEDIA_ADDON_SERVER_PORT_NAME);
+	fControlThread = spawn_thread(_ControlThread, "media_addon_server control",
+		B_NORMAL_PRIORITY + 2, this);
+	resume_thread(fControlThread);
 }
+
 
 MediaAddonServer::~MediaAddonServer()
 {
 	CALLED();
-	
-	delete_port(control_port);
+
+	delete_port(fControlPort);
 	status_t err;
-	wait_for_thread(control_thread,&err);
+	wait_for_thread(fControlThread,&err);
 
 	// unregister all media add-ons
 	media_addon_id *id;
-	for (filemap->Rewind(); filemap->GetNext(&id); )
+	for (fFileMap->Rewind(); fFileMap->GetNext(&id); )
 		_DormantNodeManager->UnregisterAddon(*id);
-	
-	
-	// XXX unregister system time source
-	
-	delete filemap;
-	delete infomap;
+
+	// TODO: unregister system time source
+
+	delete fFileMap;
+	delete fInfoMap;
 }
 
-void 
+
+void
 MediaAddonServer::HandleMessage(int32 code, const void *data, size_t size)
 {
 	switch (code) {
@@ -138,7 +150,7 @@ MediaAddonServer::HandleMessage(int32 code, const void *data, size_t size)
 			const addonserver_instantiate_dormant_node_request *request = static_cast<const addonserver_instantiate_dormant_node_request *>(data);
 			addonserver_instantiate_dormant_node_reply reply;
 			status_t rv;
-			rv = MediaRosterEx(mediaroster)->InstantiateDormantNode(request->addonid, request->flavorid, request->creator_team, &reply.node);
+			rv = MediaRosterEx(fMediaRoster)->InstantiateDormantNode(request->addonid, request->flavorid, request->creator_team, &reply.node);
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
@@ -162,8 +174,9 @@ MediaAddonServer::HandleMessage(int32 code, const void *data, size_t size)
 	}
 }
 
+
 int32
-MediaAddonServer::controlthread(void *arg)
+MediaAddonServer::_ControlThread(void *arg)
 {
 	char data[B_MEDIA_MESSAGE_SIZE];
 	MediaAddonServer *app;
@@ -171,15 +184,23 @@ MediaAddonServer::controlthread(void *arg)
 	int32 code;
 	
 	app = (MediaAddonServer *)arg;
-	while ((size = read_port_etc(app->control_port, &code, data, sizeof(data), 0, 0)) > 0)
+	while ((size = read_port_etc(app->ControlPort(), &code, data, sizeof(data), 0, 0)) > 0)
 		app->HandleMessage(code, data, size);
 
 	return 0;
 }
 
-void 
+
+void
 MediaAddonServer::ReadyToRun()
 {
+	if (!be_roster->IsRunning("application/x-vnd.Be.media-server")) {
+		// the media server is not running, let's quit
+		fprintf(stderr, "The media_server is not running!\n");
+		Quit();
+		return;
+	}
+
 	// the control thread is already running at this point,
 	// so we can talk to the media server and also receive
 	// commands for instantiation
@@ -188,16 +209,18 @@ MediaAddonServer::ReadyToRun()
 	
 	// The very first thing to do is to create the system time source,
 	// register it with the server, and make it the default SYSTEM_TIME_SOURCE
-	BMediaNode *ts = new SystemTimeSource;
-	status_t result = mediaroster->RegisterNode(ts);
+	BMediaNode *timeSource = new SystemTimeSource;
+	status_t result = fMediaRoster->RegisterNode(timeSource);
 	if (result != B_OK) {
-		fprintf(stderr, "Can't register system time source : %s\n", strerror(result));
+		fprintf(stderr, "Can't register system time source : %s\n",
+			strerror(result));
 		debugger("Can't register system time source");
 	}
-	if (ts->ID() != NODE_SYSTEM_TIMESOURCE_ID)
+
+	if (timeSource->ID() != NODE_SYSTEM_TIMESOURCE_ID)
 		debugger("System time source got wrong node ID");
-	media_node node = ts->Node();
-	result = MediaRosterEx(mediaroster)->SetNode(SYSTEM_TIME_SOURCE, &node);
+	media_node node = timeSource->Node();
+	result = MediaRosterEx(fMediaRoster)->SetNode(SYSTEM_TIME_SOURCE, &node);
 	if (result != B_OK)
 		debugger("Can't setup system time source as default");
 
@@ -208,37 +231,43 @@ MediaAddonServer::ReadyToRun()
 	// any active nodes (flavors) will be unloaded.
 
 	// load dormant media nodes
+	BPath path;
+	find_directory(B_BEOS_ADDONS_DIRECTORY, &path);
+	path.Append("media");
+
 	node_ref nref;
-	BEntry e("/boot/beos/system/add-ons/media");
-	e.GetNodeRef(&nref);
-	DirNodeSystem = nref.node;
-	WatchDir(&e);
+	BEntry entry(path.Path());
+	entry.GetNodeRef(&nref);
+	fSystemAddOnsNode = nref.node;
+	WatchDir(&entry);
 
 #ifdef USER_ADDON_PATH
-	BEntry e2(USER_ADDON_PATH);
+	entry.SetTo(USER_ADDON_PATH);
 #else
-	BEntry e2("/boot/home/config/add-ons/media");
+	find_directory(B_USER_ADDONS_DIRECTORY, &path);
+	path.Append("media");
+	entry.SetTo(path.Path());
 #endif
-	e2.GetNodeRef(&nref);
-	DirNodeUser = nref.node;
-	WatchDir(&e2);
-	
+	entry.GetNodeRef(&nref);
+	fUserAddOnsNode = nref.node;
+	WatchDir(&entry);
+
 	fStartup = false;
-	
+
 	AddOnInfo *info;
-	
-	infomap->Rewind();
-	while (infomap->GetNext(&info))
+
+	fInfoMap->Rewind();
+	while (fInfoMap->GetNext(&info))
 		InstantiatePhysicalInputsAndOutputs(info);
 
-	infomap->Rewind();
-	while (infomap->GetNext(&info))
+	fInfoMap->Rewind();
+	while (fInfoMap->GetNext(&info))
 		InstantiateAutostartFlavors(info);
 
-	infomap->Rewind();
-	while (infomap->GetNext(&info))
+	fInfoMap->Rewind();
+	while (fInfoMap->GetNext(&info))
 		PutAddonIfPossible(info);
-	
+
 	server_rescan_defaults_command cmd;
 	SendToServer(SERVER_RESCAN_DEFAULTS, &cmd, sizeof(cmd));
 }
@@ -248,19 +277,19 @@ bool
 MediaAddonServer::QuitRequested()
 {
 	CALLED();
-	
+
 	AddOnInfo *info;
-	infomap->Rewind();
-	while(infomap->GetNext(&info)) {
+	fInfoMap->Rewind();
+	while(fInfoMap->GetNext(&info)) {
 		DestroyInstantiatedFlavors(info);
 		PutAddonIfPossible(info);
 	}
-	
+
 	return true;
 }
 
 
-void 
+void
 MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 {
 	AddOnInfo *info;
@@ -270,29 +299,29 @@ MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 	port_id port;
 	status_t rv;
 	bool b;
-	
+
 	ASSERT(addon);
 	ASSERT(addon->AddonID() > 0);
-	
-	TRACE("MediaAddonServer::ScanAddOnFlavors: id %ld\n",addon->AddonID());
-	
+
+	TRACE("MediaAddonServer::ScanAddOnFlavors: id %ld\n", addon->AddonID());
+
 	port = find_port(MEDIA_SERVER_PORT_NAME);
 	if (port <= B_OK) {
 		ERROR("couldn't find media_server port\n");
 		return;
 	}
-	
+
 	// cache the media_addon_id in a local variable to avoid
 	// calling BMediaAddOn::AddonID() too often
 	addon_id = addon->AddonID();
-	
+
 	// update the cached flavor count, get oldflavorcount and newflavorcount
-	b = infomap->Get(addon_id, &info);
+	b = fInfoMap->Get(addon_id, &info);
 	ASSERT(b);
 	oldflavorcount = info->flavor_count;
 	newflavorcount = addon->CountFlavors();
 	info->flavor_count = newflavorcount;
-	
+
 	TRACE("%ld old flavors, %ld new flavors\n", oldflavorcount, newflavorcount);
 
 	// during the first update (i == 0), the server removes old dormant_flavor_infos
@@ -303,29 +332,29 @@ MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 			ERROR("MediaAddonServer::ScanAddOnFlavors GetFlavorAt failed for index %d!\n", i);
 			continue;
 		}
-		
+
 		#if DEBUG >= 2
 		  DumpFlavorInfo(info);
 		#endif
-		
+
 		dormant_flavor_info dfi;
 		dfi = *info;
 		dfi.node_info.addon = addon_id;
 		dfi.node_info.flavor_id = info->internal_id;
 		strncpy(dfi.node_info.name, info->name, B_MEDIA_NAME_LENGTH - 1);
 		dfi.node_info.name[B_MEDIA_NAME_LENGTH - 1] = 0;
-		
+
 		xfer_server_register_dormant_node *msg;
 		size_t flattensize;
 		size_t msgsize;
-		
+
 		flattensize = dfi.FlattenedSize();
 		msgsize = flattensize + sizeof(xfer_server_register_dormant_node);
 		msg = (xfer_server_register_dormant_node *) malloc(msgsize);
-		
+
 		// the server should remove previously registered "dormant_flavor_info"s
-		// during the first update, but after  the first iteration, we don't want
-		// the server to anymore remove old dormant_flavor_infos;
+		// during the first update, but after  the first iteration, we don't
+		// want the server to anymore remove old dormant_flavor_infos
 		msg->purge_id = (i == 0) ? addon_id : 0;
 
 		msg->dfi_type = dfi.TypeCode();
@@ -343,10 +372,12 @@ MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 	// XXX parameter list is (media_addon_id addonid, int32 newcount, int32 gonecount)
 	// XXX we currently pretend that all old flavors have been removed, this could
 	// XXX probably be done in a smarter way
-	BPrivate::media::notifications::FlavorsChanged(addon_id, newflavorcount, oldflavorcount);
+	BPrivate::media::notifications::FlavorsChanged(addon_id, newflavorcount,
+		oldflavorcount);
 }
 
-void 
+
+void
 MediaAddonServer::AddOnAdded(const char *path, ino_t file_node)
 {
 	TRACE("\n\nMediaAddonServer::AddOnAdded: path %s\n",path);
@@ -359,7 +390,7 @@ MediaAddonServer::AddOnAdded(const char *path, ino_t file_node)
 		ERROR("MediaAddonServer::AddOnAdded: failed to register add-on %s\n", path);
 		return;
 	}
-	
+
 	TRACE("MediaAddonServer::AddOnAdded: loading addon %ld now...\n", id);
 
 	addon = _DormantNodeManager->GetAddon(id);
@@ -372,14 +403,14 @@ MediaAddonServer::AddOnAdded(const char *path, ino_t file_node)
 	TRACE("MediaAddonServer::AddOnAdded: loading finished, id %ld\n", id);
 
 	// put file's inode and addon's id into map
-	filemap->Insert(file_node, id);
-	
+	fFileMap->Insert(file_node, id);
+
 	// also create AddOnInfo struct and get a pointer so
 	// we can modify it
 	AddOnInfo tempinfo;
-	infomap->Insert(id, tempinfo);
+	fInfoMap->Insert(id, tempinfo);
 	AddOnInfo *info;
-	infomap->Get(id, &info);
+	fInfoMap->Get(id, &info);
 
 	// setup
 	info->id = id;
@@ -393,7 +424,7 @@ MediaAddonServer::AddOnAdded(const char *path, ino_t file_node)
 	// need to call BMediaNode::WantsAutoStart()
 	// after the flavors have been scanned
 	info->wants_autostart = addon->WantsAutoStart();
-	
+
 	if (info->wants_autostart)
 		TRACE("add-on %ld WantsAutoStart!\n", id);
 
@@ -419,70 +450,86 @@ MediaAddonServer::AddOnAdded(const char *path, ino_t file_node)
 	// since it is done by PutAddonIfPossible()
 }
 
+
 void
 MediaAddonServer::DestroyInstantiatedFlavors(AddOnInfo *info)
 {
 	printf("MediaAddonServer::DestroyInstantiatedFlavors\n");
 	media_node *node;
 	while (info->active_flavors.GetNext(&node)) {
-		if ((node->kind & B_TIME_SOURCE) 
-			&& (mediaroster->StopTimeSource(*node, 0, true)!=B_OK)) {
-			printf("MediaAddonServer::DestroyInstantiatedFlavors couldn't stop timesource\n");
-			continue;
-		}	
-	
-		if(mediaroster->StopNode(*node, 0, true)!=B_OK) {
-			printf("MediaAddonServer::DestroyInstantiatedFlavors couldn't stop node\n");
+		if ((node->kind & B_TIME_SOURCE) != 0
+			&& (fMediaRoster->StopTimeSource(*node, 0, true) != B_OK)) {
+			printf("MediaAddonServer::DestroyInstantiatedFlavors couldn't stop "
+				"timesource\n");
 			continue;
 		}
-		
+
+		if (fMediaRoster->StopNode(*node, 0, true) != B_OK) {
+			printf("MediaAddonServer::DestroyInstantiatedFlavors couldn't stop "
+				"node\n");
+			continue;
+		}
+
 		if (node->kind & B_BUFFER_CONSUMER) { 
 			media_input inputs[16];
 			int32 count = 0;
-			if(mediaroster->GetConnectedInputsFor(*node, inputs, 16, &count)!=B_OK) {
-				printf("MediaAddonServer::DestroyInstantiatedFlavors couldn't get connected inputs\n");
+			if (fMediaRoster->GetConnectedInputsFor(*node, inputs, 16, &count)
+					!= B_OK) {
+				printf("MediaAddonServer::DestroyInstantiatedFlavors couldn't "
+					"get connected inputs\n");
 				continue;
 			}
-			
-			for(int32 i=0; i<count; i++) {
+
+			for (int32 i = 0; i < count; i++) {
 				media_node_id sourceNode;
-				if((sourceNode = mediaroster->NodeIDFor(inputs[i].source.port)) < 0) {
-					printf("MediaAddonServer::DestroyInstantiatedFlavors couldn't get source node id\n");
+				if ((sourceNode = fMediaRoster->NodeIDFor(
+						inputs[i].source.port)) < 0) {
+					printf("MediaAddonServer::DestroyInstantiatedFlavors "
+						"couldn't get source node id\n");
 					continue;
 				}
-				
-				if(mediaroster->Disconnect(sourceNode, inputs[i].source, node->node, inputs[i].destination)!=B_OK) {
-					printf("MediaAddonServer::DestroyInstantiatedFlavors couldn't disconnect input\n");
+
+				if (fMediaRoster->Disconnect(sourceNode, inputs[i].source,
+						node->node, inputs[i].destination) != B_OK) {
+					printf("MediaAddonServer::DestroyInstantiatedFlavors "
+						"couldn't disconnect input\n");
 					continue;
 				}
 			}
 		}
-		
+
 		if (node->kind & B_BUFFER_PRODUCER) { 
 			media_output outputs[16];
 			int32 count = 0;
-			if(mediaroster->GetConnectedOutputsFor(*node, outputs, 16, &count)!=B_OK) {
-				printf("MediaAddonServer::DestroyInstantiatedFlavors couldn't get connected outputs\n");
+			if (fMediaRoster->GetConnectedOutputsFor(*node, outputs, 16,
+					&count) != B_OK) {
+				printf("MediaAddonServer::DestroyInstantiatedFlavors couldn't "
+					"get connected outputs\n");
 				continue;
 			}
 			
-			for(int32 i=0; i<count; i++) {
+			for (int32 i = 0; i < count; i++) {
 				media_node_id destNode;
-				if((destNode = mediaroster->NodeIDFor(outputs[i].destination.port)) < 0) {
-					printf("MediaAddonServer::DestroyInstantiatedFlavors couldn't get destination node id\n");
+				if ((destNode = fMediaRoster->NodeIDFor(
+						outputs[i].destination.port)) < 0) {
+					printf("MediaAddonServer::DestroyInstantiatedFlavors "
+						"couldn't get destination node id\n");
 					continue;
 				}
-				
-				if(mediaroster->Disconnect(node->node, outputs[i].source, destNode, outputs[i].destination)!=B_OK) {
-					printf("MediaAddonServer::DestroyInstantiatedFlavors couldn't disconnect output\n");
+
+				if (fMediaRoster->Disconnect(node->node, outputs[i].source,
+						destNode, outputs[i].destination) != B_OK) {
+					printf("MediaAddonServer::DestroyInstantiatedFlavors "
+						"couldn't disconnect output\n");
 					continue;
 				}
 			}
 		}
-	
+
 		info->active_flavors.RemoveCurrent();
 	}
 }
+
 
 void
 MediaAddonServer::PutAddonIfPossible(AddOnInfo *info)
@@ -493,6 +540,7 @@ MediaAddonServer::PutAddonIfPossible(AddOnInfo *info)
 	}
 }
 
+
 void
 MediaAddonServer::InstantiatePhysicalInputsAndOutputs(AddOnInfo *info)
 {
@@ -500,7 +548,7 @@ MediaAddonServer::InstantiatePhysicalInputsAndOutputs(AddOnInfo *info)
 	int count = info->addon->CountFlavors();
 	for (int i = 0; i < count; i++) {
 		const flavor_info *flavorinfo;
-		if (B_OK != info->addon->GetFlavorAt(i, &flavorinfo)) {
+		if (info->addon->GetFlavorAt(i, &flavorinfo) != B_OK) {
 			ERROR("MediaAddonServer::InstantiatePhysialInputsAndOutputs GetFlavorAt failed for index %d!\n", i);
 			continue;
 		}
@@ -514,7 +562,7 @@ MediaAddonServer::InstantiatePhysicalInputsAndOutputs(AddOnInfo *info)
 			strcpy(dni.name, flavorinfo->name);
 			
 			printf("MediaAddonServer::InstantiatePhysialInputsAndOutputs: \"%s\" is a physical input/output\n", flavorinfo->name);
-			rv = mediaroster->InstantiateDormantNode(dni, &node);
+			rv = fMediaRoster->InstantiateDormantNode(dni, &node);
 			if (rv != B_OK) {
 				ERROR("MediaAddonServer::InstantiatePhysialInputsAndOutputs Couldn't instantiate node flavor, internal_id %ld, name %s\n", flavorinfo->internal_id, flavorinfo->name);
 			} else {
@@ -524,6 +572,7 @@ MediaAddonServer::InstantiatePhysicalInputsAndOutputs(AddOnInfo *info)
 		}
 	}
 }
+
 
 void
 MediaAddonServer::InstantiateAutostartFlavors(AddOnInfo *info)
@@ -539,18 +588,19 @@ MediaAddonServer::InstantiateAutostartFlavors(AddOnInfo *info)
 		printf("trying autostart of node %ld, index %ld\n", info->id, index);
 		rv = info->addon->AutoStart(index, &outNode, &outInternalID, &outHasMore);
 		if (rv == B_OK) {
-			printf("started node %ld\n",index);
+			printf("started node %ld\n", index);
 
 			// XXX IncrementAddonFlavorInstancesCount
 
-			rv = MediaRosterEx(mediaroster)->RegisterNode(outNode, info->id, outInternalID);
+			rv = MediaRosterEx(fMediaRoster)->RegisterNode(outNode, info->id,
+				outInternalID);
 			if (rv != B_OK) {
 				printf("failed to register node %ld\n",index);
 				// XXX DecrementAddonFlavorInstancesCount
 			}
-			
+
 			info->active_flavors.Insert(outNode->Node());
-			
+
 			if (!outHasMore)
 				return;
 		} else if (rv == B_MEDIA_ADDON_FAILED && outHasMore) {
@@ -561,6 +611,7 @@ MediaAddonServer::InstantiateAutostartFlavors(AddOnInfo *info)
 	}
 }
 
+
 void
 MediaAddonServer::AddOnRemoved(ino_t file_node)
 {	
@@ -569,64 +620,66 @@ MediaAddonServer::AddOnRemoved(ino_t file_node)
 	AddOnInfo *info;
 	int32 oldflavorcount;
 	// XXX locking?
-	
-	if (!filemap->Get(file_node, &tempid)) {
+
+	if (!fFileMap->Get(file_node, &tempid)) {
 		ERROR("MediaAddonServer::AddOnRemoved: inode %Ld removed, but no media add-on found\n", file_node);
 		return;
 	}
 	id = *tempid; // tempid pointer is invalid after Removing() it from the map
-	filemap->Remove(file_node);
-	
-	if (!infomap->Get(id, &info)) {
+	fFileMap->Remove(file_node);
+
+	if (!fInfoMap->Get(id, &info)) {
 		ERROR("MediaAddonServer::AddOnRemoved: couldn't get addon info for add-on %ld\n", id);
 		oldflavorcount = 1000;
 	} else {
 		oldflavorcount = info->flavor_count; //same reason as above
-	
+
 		DestroyInstantiatedFlavors(info);
 		PutAddonIfPossible(info);
-	
+
 		if (info->addon) {
 			ERROR("MediaAddonServer::AddOnRemoved: couldn't unload addon %ld since flavors are in use\n", id);
 		}
 	}
 
-		
-	infomap->Remove(id);
+	fInfoMap->Remove(id);
 	_DormantNodeManager->UnregisterAddon(id);
-	
+
 	BPrivate::media::notifications::FlavorsChanged(id, 0, oldflavorcount);
 }
 
-void 
+
+void
 MediaAddonServer::WatchDir(BEntry *dir)
 {
-	BEntry e;
-	BDirectory d(dir);
+	// send fake notices to trigger add-on loading
+	BDirectory directory(dir);
 	node_ref nref;
 	entry_ref ref;
-	while (B_OK == d.GetNextEntry(&e, false)) {
-		e.GetRef(&ref);
-		e.GetNodeRef(&nref);
+	BEntry entry;
+	while (directory.GetNextEntry(&entry, false) == B_OK) {
+		if (entry.GetRef(&ref) != B_OK || entry.GetNodeRef(&nref) != B_OK)
+			continue;
+
 		BMessage msg(B_NODE_MONITOR);
-		msg.AddInt32("opcode",B_ENTRY_CREATED);
-		msg.AddInt32("device",ref.device);
-		msg.AddInt64("directory",ref.directory);
-		msg.AddInt64("node",nref.node);
-		msg.AddString("name",ref.name);
-		msg.AddBool("nowait",true);
+		msg.AddInt32("opcode", B_ENTRY_CREATED);
+		msg.AddInt32("device", ref.device);
+		msg.AddInt64("directory", ref.directory);
+		msg.AddInt64("node", nref.node);
+		msg.AddString("name", ref.name);
+		msg.AddBool("nowait", true);
 		MessageReceived(&msg);
 	}
 
-	dir->GetNodeRef(&nref); 
-	watch_node(&nref,B_WATCH_DIRECTORY,be_app_messenger);
+	dir->GetNodeRef(&nref);
+	watch_node(&nref, B_WATCH_DIRECTORY, be_app_messenger);
 }
 
-void 
+
+void
 MediaAddonServer::MessageReceived(BMessage *msg)
 {
-	switch (msg->what) 
-	{
+	switch (msg->what) {
 		case MEDIA_ADDON_SERVER_PLAY_MEDIA:
 		{
 			const char *name, *type;
@@ -634,16 +687,15 @@ MediaAddonServer::MessageReceived(BMessage *msg)
 				|| (msg->FindString(MEDIA_TYPE_KEY, &type) != B_OK)) {
 				msg->SendReply(B_ERROR);
 			}
-			
+
 			PlayMediaFile(type, name);
 			msg->SendReply(B_OK); // XXX don't know which reply is expected
 			return;
 		}
-		
+
 		case B_NODE_MONITOR:
 		{
-			switch (msg->FindInt32("opcode")) 
-			{
+			switch (msg->FindInt32("opcode")) {
 				case B_ENTRY_CREATED:
 				{
 					const char *name;
@@ -684,12 +736,12 @@ MediaAddonServer::MessageReceived(BMessage *msg)
 					ino_t to;
 					msg->FindInt64("from directory", &from);
 					msg->FindInt64("to directory", &to);
-					if (DirNodeSystem == from || DirNodeUser == from) {
+					if (fSystemAddOnsNode == from || fUserAddOnsNode == from) {
 						msg->ReplaceInt32("opcode",B_ENTRY_REMOVED);
 						msg->AddInt64("directory",from);
 						MessageReceived(msg);
 					}
-					if (DirNodeSystem == to || DirNodeUser == to) {
+					if (fSystemAddOnsNode == to || fUserAddOnsNode == to) {
 						msg->ReplaceInt32("opcode",B_ENTRY_CREATED);
 						msg->AddInt64("directory",to);
 						msg->AddBool("nowait",true);
@@ -700,20 +752,21 @@ MediaAddonServer::MessageReceived(BMessage *msg)
 			}
 			break;
 		}
-		default: inherited::MessageReceived(msg); break;
+
+		default:
+			inherited::MessageReceived(msg);
+			break;
 	}
 	printf("MediaAddonServer: Unhandled message:\n");
 	msg->PrintToStream();
 }
 
-int main()
-{
-	new MediaAddonServer(B_MEDIA_ADDON_SERVER_SIGNATURE);
-	be_app->Run();
-	return 0;
-}
 
-void DumpFlavorInfo(const flavor_info *info)
+//	#pragma mark -
+
+
+void
+DumpFlavorInfo(const flavor_info *info)
 {
 	printf("  name = %s\n",info->name);
 	printf("  info = %s\n",info->info);
@@ -737,3 +790,13 @@ void DumpFlavorInfo(const flavor_info *info)
 	printf("  in_format_count = %ld\n",info->in_format_count);
 	printf("  out_format_count = %ld\n",info->out_format_count);
 }
+
+
+int
+main()
+{
+	new MediaAddonServer(B_MEDIA_ADDON_SERVER_SIGNATURE);
+	be_app->Run();
+	return 0;
+}
+
