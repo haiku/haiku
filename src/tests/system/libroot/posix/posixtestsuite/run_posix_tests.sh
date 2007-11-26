@@ -30,7 +30,8 @@ standard_tests()
 	conformance/interfaces/difftime/difftime_1-1
 	echo ""
 	echo "fork()"
-	conformance/interfaces/fork/fork_3-1
+#	conformance/interfaces/fork/fork_3-1
+	echo "fork_3-1: FIXME : test sometimes fails, see bug #1639"
 	conformance/interfaces/fork/fork_4-1
 	conformance/interfaces/fork/fork_6-1
 	conformance/interfaces/fork/fork_8-1
@@ -43,6 +44,32 @@ asynchronous_input_output_tests()
 {
 	echo "asynchronous_input_output_tests: Not yet implemented."
 	#aio_* lio_listio
+}
+
+
+threads_tests()
+{
+	echo "pthread_getspecific()"
+	conformance/interfaces/pthread_getspecific/pthread_getspecific_1-1
+	conformance/interfaces/pthread_getspecific/pthread_getspecific_3-1
+	echo ""
+	echo "pthread_key_create()"
+	conformance/interfaces/pthread_key_create/pthread_key_create_1-1
+#	conformance/interfaces/pthread_key_create/pthread_key_create_1-2
+	echo "pthread_key_create_1-2: FIXME: test fails, see bug #1644"
+#	conformance/interfaces/pthread_key_create/pthread_key_create_2-1
+	echo "pthread_key_create_2-1: FIXME: test invokes the debugger, see bug #1646"
+	conformance/interfaces/pthread_key_create/pthread_key_create_3-1
+	echo ""
+	echo "pthread_key_delete()"
+	conformance/interfaces/pthread_key_delete/pthread_key_delete_1-1
+	conformance/interfaces/pthread_key_delete/pthread_key_delete_1-2
+#	conformance/interfaces/pthread_key_delete/pthread_key_delete_2-1
+	echo "pthread_key_delete_2-1: FIXME: test blocks, see bug #1642"
+	echo ""
+	echo "pthread_setspecific()"
+	conformance/interfaces/pthread_setspecific/pthread_setspecific_1-1
+	conformance/interfaces/pthread_setspecific/pthread_setspecific_1-2
 }
 
 
@@ -112,6 +139,7 @@ all_tests()
 	standard_tests
 	asynchronous_input_output_tests
 	signals_tests
+	threads_tests
 }
 
 
@@ -135,7 +163,7 @@ sleep 1
 	#TODO sem*
 	;;
   THR) echo "Executing threads tests"
-	#TODO pthread_*
+	threads_tests
 	;;
   TMR) echo "Executing timers and clocks tests"
 	#TODO time* *time clock* nanosleep
@@ -155,4 +183,4 @@ sleep 1
 esac
 
 
-echo "**** Tests Complete ****"
+echo "**** Tests Completed ****"

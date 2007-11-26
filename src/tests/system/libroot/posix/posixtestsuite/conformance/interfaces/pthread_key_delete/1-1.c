@@ -39,18 +39,18 @@ int main()
 	{
 		if(pthread_key_create(&keys[i], NULL) != 0)
 		{
-			printf("Error: pthread_key_create() failed\n");
+			printf("pthread_key_delete_1-1 Error: pthread_key_create() failed\n");
 			return PTS_UNRESOLVED;
 		}
 
 		if(pthread_key_delete(keys[i]) != 0)
 		{
-			printf("Test FAILED\n");
+			printf("pthread_key_delete_1-1 Test FAILED\n");
 			return PTS_FAIL;
 		}
 	}
 
 
-	printf("Test PASSED\n");
+	printf("pthread_key_delete_1-1: Test PASSED\n");
 	return PTS_PASS;
 }

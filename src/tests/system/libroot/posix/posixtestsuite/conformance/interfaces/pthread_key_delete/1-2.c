@@ -40,23 +40,23 @@ int main()
 	{
 		if(pthread_key_create(&keys[i], NULL) != 0)
 		{
-			printf("Error: pthread_key_create() failed\n");
+			printf("pthread_key_delete_1-2 Error: pthread_key_create() failed\n");
 			return PTS_UNRESOLVED;
 		}
 
 		if(pthread_setspecific(keys[i], (void*)(long)(KEY_VALUE + i)) != 0)
 		{
-			printf("Error: pthread_setspecific failed\n");
+			printf("pthread_key_delete_1-2 Error: pthread_setspecific failed\n");
 			return PTS_UNRESOLVED;
 		}
 
 		if(pthread_key_delete(keys[i]) != 0)
 		{
-			printf("Test FAILED\n");
+			printf("pthread_key_delete_1-2 Test FAILED\n");
 			return PTS_FAIL;
 		}
 	}
 
-	printf("Test PASSED\n");
+	printf("pthread_key_delete_1-2: Test PASSED\n");
 	return PTS_PASS;
 }

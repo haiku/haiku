@@ -40,7 +40,7 @@ void *a_thread_func()
 	 * that we bind for the main thread) */
 	if(pthread_setspecific(key, (void *)(KEY_VALUE_2)) != 0)
 	{
-		printf("Test FAILED: Could not set the value of the key to %d\n", (KEY_VALUE_2));
+		printf("pthread_setspecific_1-2 Test FAILED: Could not set the value of the key to %d\n", (KEY_VALUE_2));
 		pthread_exit((void*)PTS_FAIL);
 		return NULL;
 	}
@@ -60,21 +60,21 @@ int main()
 	/* Create the key */	
 	if(pthread_key_create(&key, NULL) != 0)
 	{
-		printf("Error: pthread_key_create() failed\n");
+		printf("pthread_setspecific_1-2 Error: pthread_key_create() failed\n");
 		return PTS_UNRESOLVED;
 	}
 	
 	/* Bind a value for this main thread */
 	if(pthread_setspecific(key, (void *)(KEY_VALUE_1)) != 0)
 	{
-		printf("Test FAILED: Could not set the value of the key to %d\n", (KEY_VALUE_1));
+		printf("pthread_setspecific_1-2 Test FAILED: Could not set the value of the key to %d\n", (KEY_VALUE_1));
 		return PTS_FAIL;
 	}
 
 	/* Create another thread.  This thread will also bind a value to the key */
 	if(pthread_create(&new_th, NULL, a_thread_func, NULL) != 0)
 	{
-		printf("Error: in pthread_create()\n");
+		printf("pthread_setspecific_1-2 Error: in pthread_create()\n");
 		return PTS_UNRESOLVED;
 	}
 			
@@ -88,16 +88,16 @@ int main()
 	 * thread, they should be different. */
 	if(rc1 != (void *)(KEY_VALUE_1))
 	{
-		printf("Test FAILED: Incorrect value bound to key, expected %d, got %ld\n", KEY_VALUE_1, (long)rc1);
+		printf("pthread_setspecific_1-2 Test FAILED: Incorrect value bound to key, expected %d, got %ld\n", KEY_VALUE_1, (long)rc1);
 		return PTS_FAIL;
 	}
 
 	if(rc2 != (void *)(KEY_VALUE_2))
 	{
-		printf("Test FAILED: Incorrect value bound to key, expected %d, got %ld\n", KEY_VALUE_2, (long)rc2);
+		printf("pthread_setspecific_1-2 Test FAILED: Incorrect value bound to key, expected %d, got %ld\n", KEY_VALUE_2, (long)rc2);
 		return PTS_FAIL;
 	}
 
-	printf("Test PASSED\n");
+	printf("pthread_setspecific_1-2: Test PASSED\n");
 	return PTS_PASS;
 }

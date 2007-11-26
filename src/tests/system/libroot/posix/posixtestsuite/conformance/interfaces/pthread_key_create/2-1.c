@@ -33,13 +33,13 @@ int main()
 	rc = pthread_getspecific(key);
 	if(rc != NULL)
 	{
-		printf("Test FAILED\n");
+		printf("pthread_key_create_2-1 Test FAILED\n");
 		return PTS_FAIL;
 	}
 
 	if(pthread_key_create(&key, NULL) != 0)
 	{
-		printf("Error: pthread_key_create() failed\n");
+		printf("pthread_key_create_2-1 pthread_key_create_2-1 Error: pthread_key_create() failed\n");
 		return PTS_UNRESOLVED;
 	} else
 	{
@@ -48,12 +48,12 @@ int main()
 		rc = pthread_getspecific(key);
 		if(rc != NULL)
 		{
-			printf("Test FAILED\n");
+			printf("pthread_key_create_2-1 Test FAILED\n");
 			return PTS_FAIL;
 		}
 		
 	}
 
-	printf("Test PASSED\n");
+	printf("pthread_key_create_2-1: Test PASSED\n");
 	return PTS_PASS;
 }
