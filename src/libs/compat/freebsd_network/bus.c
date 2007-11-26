@@ -296,18 +296,15 @@ bus_setup_intr(device_t dev, struct resource *res, int flags,
 	intr->arg = arg;
 	intr->irq = res->r_bushandle;
 	intr->flags = flags;
+	intr->sem = -1;
+	intr->thread = -1;
 
-	if (flags & INTR_FAST) {
-		intr->sem = -1;
-		intr->thread = -1;
-
-		if (filter != NULL) {
-			status = install_io_interrupt_handler(intr->irq,
-				(interrupt_handler)intr->filter, intr->arg, 0);
-		} else {
-			status = install_io_interrupt_handler(intr->irq,
-				intr_fast_wrapper, intr, 0);
-		}
+	if (filter != NULL) {
+		status = install_io_interrupt_handler(intr->irq,
+			(interrupt_handler)intr->filter, intr->arg, 0);
+	} else if (flags & INTR_FAST) {
+		status = install_io_interrupt_handler(intr->irq,
+			intr_fast_wrapper, intr, 0);
 	} else {
 		snprintf(semName, sizeof(semName), "%s intr", dev->dev_name);
 
