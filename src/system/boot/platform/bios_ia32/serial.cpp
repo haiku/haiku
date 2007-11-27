@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -34,6 +34,9 @@ static const uint32 kSerialBaudRate = 115200;
 static int32 sSerialEnabled = 0;
 static uint16 sSerialBasePort = 0x3f8;
 
+static char sBuffer[4096];
+static uint32 sBufferPosition;
+
 
 static void
 serial_putc(char c)
@@ -51,6 +54,11 @@ serial_puts(const char *string, size_t size)
 {
 	if (sSerialEnabled <= 0)
 		return;
+
+	if (sBufferPosition + size < sizeof(sBuffer)) {
+		memcpy(sBuffer + sBufferPosition, string, size);
+		sBufferPosition += size;
+	}
 
 	while (size-- != 0) {
 		char c = string[0];
@@ -81,6 +89,20 @@ extern "C" void
 serial_enable(void)
 {
 	sSerialEnabled++;
+}
+
+
+extern "C" void
+serial_cleanup(void)
+{
+	if (sSerialEnabled <= 0)
+		return;
+
+	gKernelArgs.debug_output = kernel_args_malloc(sBufferPosition);
+	if (gKernelArgs.debug_output != NULL) {
+		memcpy(gKernelArgs.debug_output, sBuffer, sBufferPosition);
+		gKernelArgs.debug_size = sBufferPosition;
+	}
 }
 
 

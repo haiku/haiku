@@ -6,7 +6,7 @@
  * Distributed under the terms of the NewOS License.
  */
 
-/* This file contains the debugger */
+/*! This file contains the debugger and debug output facilities */
 
 #include "blue_screen.h"
 #include "gdb.h"
@@ -602,7 +602,7 @@ syslog_init_post_threads(void)
 
 
 static status_t
-syslog_init(void)
+syslog_init(struct kernel_args *args)
 {
 	status_t status;
 
@@ -627,6 +627,9 @@ syslog_init(void)
 	sSyslogMessage->priority = LOG_DEBUG;
 	sSyslogMessage->ident[0] = '\0';
 	//strcpy(sSyslogMessage->ident, "KERNEL");
+
+	if (args->debug_output != NULL)
+		syslog_write(args->debug_output, args->debug_size);
 
 	return B_OK;
 
@@ -748,7 +751,7 @@ debug_init_post_vm(kernel_args *args)
 	if (sDebugScreenEnabled)
 		blue_screen_enter(true);
 
-	syslog_init();
+	syslog_init(args);
 
 	return arch_debug_init(args);
 }
@@ -1101,7 +1104,7 @@ dump_block(const char *buffer, int size, const char *prefix)
 	for (i = 0; i < size;) {
 		int start = i;
 
-		dprintf(prefix);
+		dprintf("%s%04x ", prefix, i);
 		for (; i < start + DUMPED_BLOCK_SIZE; i++) {
 			if (!(i % 4))
 				dprintf(" ");

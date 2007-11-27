@@ -75,6 +75,7 @@ platform_start_kernel(void)
 		// or I don't see something important...
 	addr_t stackTop = gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size;
 
+	serial_cleanup();
 	mmu_init_for_kernel();
 	smp_boot_other_cpus();
 

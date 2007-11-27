@@ -1,5 +1,5 @@
 /* 
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -69,6 +69,9 @@ typedef struct kernel_args {
 		int32	depth;
 		addr_range physical_buffer;
 	} frame_buffer;
+
+	void		*debug_output;
+	uint32		debug_size;
 
 	platform_kernel_args platform_args;
 	arch_kernel_args arch_args;

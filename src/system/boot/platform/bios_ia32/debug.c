@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -12,9 +12,8 @@
 #include <stdarg.h>
 
 
-/** This works only after console_init() was called.
- */
-
+/*!	This works only after console_init() was called.
+*/
 void
 panic(const char *format, ...)
 {

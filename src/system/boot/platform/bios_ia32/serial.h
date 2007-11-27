@@ -1,7 +1,7 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef SERIAL_H
 #define SERIAL_H
 
@@ -14,6 +14,7 @@ extern "C" {
 #endif
 
 extern void serial_init(void);
+extern void serial_cleanup(void);
 
 extern void serial_puts(const char *string, size_t size);
 

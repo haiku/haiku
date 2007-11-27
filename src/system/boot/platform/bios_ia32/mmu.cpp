@@ -393,7 +393,7 @@ mmu_free(void *virtualAddress, size_t size)
 	if (address < KERNEL_BASE
 		|| address + size >= KERNEL_BASE + kMaxKernelSize) {
 		panic("mmu_free: asked to unmap out of range region (%p, size %lx)\n",
-			address, size);
+			(void *)address, size);
 	}
 
 	// unmap all pages within the range
