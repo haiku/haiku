@@ -22,6 +22,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include "posixtest.h"
 
@@ -47,13 +48,15 @@ int main()
 {
 	pthread_t new_th;
 	void *value_ptr;
+	int error;
 
 	/* Create a key */
 	for(i = 0;i<NUM_OF_THREADS;i++)
 	{
-		if(pthread_key_create(&keys[i], NULL) != 0)
+		if((error = pthread_key_create(&keys[i], NULL)) != 0)
 		{
-			printf("pthread_key_create_1-2 Error: pthread_key_create() failed\n");
+			printf("pthread_key_create_1-2 Error: pthread_key_create() "
+				"failed: %s\n", strerror(error));
 			return PTS_UNRESOLVED;
 		}
 	}
@@ -63,16 +66,18 @@ int main()
 	for(i = 0;i<NUM_OF_THREADS;i++)
 	{
 		/* Create a thread */
-		if(pthread_create(&new_th, NULL, a_thread_func, NULL) != 0)
+		if((error = pthread_create(&new_th, NULL, a_thread_func, NULL)) != 0)
 		{
-			perror("pthread_key_create_1-2 Error creating thread\n");
+			printf("pthread_key_create_1-2 Error creating thread: %s\n",
+				strerror(error));
 			return PTS_UNRESOLVED;
 		}		
 		
 		/* Wait for thread to end */
-		if(pthread_join(new_th, &value_ptr) != 0)
+		if((error = pthread_join(new_th, &value_ptr)) != 0)
 		{
-			perror("pthread_key_create_1-2 Error in pthread_join\n");
+			printf("pthread_key_create_1-2 Error in pthread_join: %s\n",
+				strerror(error));
 			return PTS_UNRESOLVED;
 		}
 
