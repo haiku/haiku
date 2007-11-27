@@ -63,11 +63,12 @@ typedef struct kernel_args {
 	struct driver_settings_file *driver_settings;
 
 	struct {
-		bool	enabled;
-		int32	width;
-		int32	height;
-		int32	depth;
 		addr_range physical_buffer;
+		uint32	bytes_per_row;
+		uint16	width;
+		uint16	height;
+		uint8	depth;
+		bool	enabled;
 	} frame_buffer;
 
 	void		*debug_output;

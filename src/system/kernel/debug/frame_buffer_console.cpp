@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -222,7 +222,8 @@ console_put_glyph(int32 x, int32 y, uint8 glyph, uint8 attr)
 
 
 static void
-console_fill_glyph(int32 x, int32 y, int32 width, int32 height, uint8 glyph, uint8 attr)
+console_fill_glyph(int32 x, int32 y, int32 width, int32 height, uint8 glyph,
+	uint8 attr)
 {
 	if (x >= sConsole.columns || y >= sConsole.rows
 		|| !frame_buffer_console_available())
@@ -245,7 +246,8 @@ console_fill_glyph(int32 x, int32 y, int32 width, int32 height, uint8 glyph, uin
 
 
 static void
-console_blit(int32 srcx, int32 srcy, int32 width, int32 height, int32 destx, int32 desty)
+console_blit(int32 srcx, int32 srcy, int32 width, int32 height, int32 destx,
+	int32 desty)
 {
 	if (!frame_buffer_console_available())
 		return;
@@ -266,8 +268,10 @@ console_blit(int32 srcx, int32 srcy, int32 width, int32 height, int32 destx, int
 	}
 
 	for (int32 y = 0; y < height; y++) {
-		memmove((void *)(sConsole.frame_buffer + (desty + y) * sConsole.bytes_per_row + destx),
-			(void *)(sConsole.frame_buffer + (srcy + y) * sConsole.bytes_per_row + srcx), width);
+		memmove((void *)(sConsole.frame_buffer + (desty + y)
+				* sConsole.bytes_per_row + destx),
+			(void *)(sConsole.frame_buffer + (srcy + y) * sConsole.bytes_per_row
+				+ srcx), width);
 	}
 }
 
@@ -281,7 +285,8 @@ console_clear(uint8 attr)
 	switch (sConsole.bytes_per_pixel) {
 		case 1:
 			if (sConsole.depth >= 8) {
-				memset((void *)sConsole.frame_buffer, sPalette8[background_color(attr)],
+				memset((void *)sConsole.frame_buffer,
+					sPalette8[background_color(attr)],
 					sConsole.height * sConsole.bytes_per_row);
 			} else {
 				// special case for VGA mode
@@ -394,33 +399,22 @@ frame_buffer_console_init(kernel_args *args)
 	if (sConsole.area < B_OK)
 		return sConsole.area;
 
-	int32 bytesPerRow = args->frame_buffer.width;
-	switch (args->frame_buffer.depth) {
-		case 1:
-		case 4:
-			// special VGA mode (will always be treated as monochrome)
-			bytesPerRow /= 8;
-			break;
-		case 15:
-		case 16:
-			bytesPerRow *= 2;
-			break;
-		case 24:
-			bytesPerRow *= 3;
-			break;
-		case 32:
-			bytesPerRow *= 4;
-			break;
+	if (args->frame_buffer.depth == 4) {
+		// VGA mode will be treated as monochrome
+		args->frame_buffer.bytes_per_row /= 8;
 	}
-	frame_buffer_update((addr_t)frameBuffer, args->frame_buffer.width, args->frame_buffer.height,
-		args->frame_buffer.depth, bytesPerRow);
+
+	frame_buffer_update((addr_t)frameBuffer, args->frame_buffer.width,
+		args->frame_buffer.height, args->frame_buffer.depth,
+		args->frame_buffer.bytes_per_row);
 
 	sBootInfo.frame_buffer = (addr_t)frameBuffer;
 	sBootInfo.width = args->frame_buffer.width;
 	sBootInfo.height = args->frame_buffer.height;
 	sBootInfo.depth = args->frame_buffer.depth;
-	sBootInfo.bytes_per_row = bytesPerRow;
-	add_boot_item(FRAME_BUFFER_BOOT_INFO, &sBootInfo, sizeof(frame_buffer_boot_info));
+	sBootInfo.bytes_per_row = args->frame_buffer.bytes_per_row;
+	add_boot_item(FRAME_BUFFER_BOOT_INFO, &sBootInfo,
+		sizeof(frame_buffer_boot_info));
 
 	return B_OK;
 }
@@ -432,13 +426,13 @@ frame_buffer_console_init_post_modules(kernel_args *args)
 	mutex_init(&sConsole.lock, "console_lock");
 
 	// TODO: enable MTRR in VESA mode!
-//	if (sConsole.frame_buffer == NULL)
+	if (sConsole.frame_buffer == NULL)
 		return B_OK;
 
 	// try to set frame buffer memory to write combined
 
-//	return vm_set_area_memory_type(sConsole.area,
-//		args->frame_buffer.physical_buffer.start, B_MTR_WC);
+	return vm_set_area_memory_type(sConsole.area,
+		args->frame_buffer.physical_buffer.start, B_MTR_WC);
 }
 
 

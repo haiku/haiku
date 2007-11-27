@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -37,7 +37,8 @@
 struct video_mode {
 	list_link	link;
 	uint16		mode;
-	int32		width, height, bits_per_pixel;
+	uint16		width, height, bits_per_pixel;
+	uint32		bytes_per_row;
 };
 
 static vbe_info_block sInfo;
@@ -319,11 +320,11 @@ vesa_init(vbe_info_block *info, video_mode **_standardMode)
 		if (mode == 0xffff)
 			break;
 
-		TRACE(("  %lx: ", mode));
+		TRACE(("  %x: ", mode));
 
 		struct vbe_mode_info modeInfo;
 		if (vesa_get_mode_info(mode, &modeInfo) == B_OK) {
-			TRACE(("%ld x %ld x %ld (a = %ld, mem = %ld, phy = %lx, p = %ld, b = %ld)\n",
+			TRACE(("%u x %u x %u (a = %d, mem = %d, phy = %lx, p = %d, b = %d)\n",
 				modeInfo.width, modeInfo.height, modeInfo.bits_per_pixel, modeInfo.attributes,
 				modeInfo.memory_model, modeInfo.physical_base, modeInfo.num_planes,
 				modeInfo.num_banks));
@@ -343,9 +344,16 @@ vesa_init(vbe_info_block *info, video_mode **_standardMode)
 					continue;
 
 				videoMode->mode = mode;
+				videoMode->bytes_per_row = modeInfo.bytes_per_row;
 				videoMode->width = modeInfo.width;
 				videoMode->height = modeInfo.height;
 				videoMode->bits_per_pixel = modeInfo.bits_per_pixel;
+				if (modeInfo.bits_per_pixel == 16
+					&& modeInfo.red_mask_size + modeInfo.green_mask_size
+						+ modeInfo.blue_mask_size == 15) {
+					// this is really a 15-bit mode
+					videoMode->bits_per_pixel = 15;
+				}
 
 				if (standardMode == NULL)
 					standardMode = videoMode;
@@ -501,7 +509,8 @@ video_mode_menu()
 	video_mode *mode = NULL;
 	while ((mode = (video_mode *)list_get_next_item(&sModeList, mode)) != NULL) {
 		char label[64];
-		sprintf(label, "%ldx%ld %ld bit", mode->width, mode->height, mode->bits_per_pixel);
+		sprintf(label, "%ux%u %u bit", mode->width, mode->height,
+			mode->bits_per_pixel);
 
 		menu->AddItem(item = new(nothrow) MenuItem(label));
 		item->SetData(mode);
@@ -542,16 +551,19 @@ static void
 blit32(const uint8 *data, uint16 width, uint16 height,
 	const uint8 *palette, uint16 left, uint16 top)
 {
-	uint32 *start = (uint32 *)sFrameBuffer + gKernelArgs.frame_buffer.width * top + left;
+	uint32 *start = (uint32 *)(sFrameBuffer
+		+ gKernelArgs.frame_buffer.bytes_per_row * top + 4 * left);
 
 	for (int32 y = 0; y < height; y++) {
 		for (int32 x = 0; x < width; x++) {
 			uint16 color = data[y * width + x] * 3;
 
-			start[x] = (palette[color + 0] << 16) | (palette[color + 1] << 8) | (palette[color + 2]);
+			start[x] = (palette[color + 0] << 16) | (palette[color + 1] << 8)
+				| (palette[color + 2]);
 		}
 
-		start += gKernelArgs.frame_buffer.width;
+		start = (uint32 *)((addr_t)start
+			+ gKernelArgs.frame_buffer.bytes_per_row);
 	}
 }
 
@@ -560,7 +572,8 @@ static void
 blit24(const uint8 *data, uint16 width, uint16 height,
 	const uint8 *palette, uint16 left, uint16 top)
 {
-	uint8 *start = (uint8 *)sFrameBuffer + gKernelArgs.frame_buffer.width * 3 * top + 3 * left;
+	uint8 *start = (uint8 *)sFrameBuffer
+		+ gKernelArgs.frame_buffer.bytes_per_row * top + 3 * left;
 
 	for (int32 y = 0; y < height; y++) {
 		for (int32 x = 0; x < width; x++) {
@@ -572,7 +585,7 @@ blit24(const uint8 *data, uint16 width, uint16 height,
 			start[index + 2] = palette[color + 0];
 		}
 
-		start += gKernelArgs.frame_buffer.width * 3;
+		start = start + gKernelArgs.frame_buffer.bytes_per_row;
 	}
 }
 
@@ -581,17 +594,20 @@ static void
 blit16(const uint8 *data, uint16 width, uint16 height,
 	const uint8 *palette, uint16 left, uint16 top)
 {
-	uint16 *start = (uint16 *)sFrameBuffer + gKernelArgs.frame_buffer.width * top + left;
+	uint16 *start = (uint16 *)(sFrameBuffer
+		+ gKernelArgs.frame_buffer.bytes_per_row * top + 2 * left);
 
 	for (int32 y = 0; y < height; y++) {
 		for (int32 x = 0; x < width; x++) {
 			uint16 color = data[y * width + x] * 3;
 
-			start[x] = ((palette[color + 0] >> 3) << 11) | ((palette[color + 1] >> 2) << 5)
+			start[x] = ((palette[color + 0] >> 3) << 11)
+				| ((palette[color + 1] >> 2) << 5)
 				| ((palette[color + 2] >> 3));
 		}
 
-		start += gKernelArgs.frame_buffer.width;
+		start = (uint16 *)((addr_t)start
+			+ gKernelArgs.frame_buffer.bytes_per_row);
 	}
 }
 
@@ -600,17 +616,20 @@ static void
 blit15(const uint8 *data, uint16 width, uint16 height,
 	const uint8 *palette, uint16 left, uint16 top)
 {
-	uint16 *start = (uint16 *)sFrameBuffer + gKernelArgs.frame_buffer.width * top + left;
+	uint16 *start = (uint16 *)(sFrameBuffer
+		+ gKernelArgs.frame_buffer.bytes_per_row * top + 2 * left);
 
 	for (int32 y = 0; y < height; y++) {
 		for (int32 x = 0; x < width; x++) {
 			uint16 color = data[y * width + x] * 3;
 
-			start[x] = ((palette[color + 0] >> 3) << 10) | ((palette[color + 1] >> 3) << 5)
+			start[x] = ((palette[color + 0] >> 3) << 10)
+				| ((palette[color + 1] >> 3) << 5)
 				| ((palette[color + 2] >> 3));
 		}
 
-		start += gKernelArgs.frame_buffer.width;
+		start = (uint16 *)((addr_t)start
+			+ gKernelArgs.frame_buffer.bytes_per_row);
 	}
 }
 
@@ -622,10 +641,11 @@ blit8(const uint8 *data, uint16 width, uint16 height,
 	if (vesa_set_palette((const uint8 *)kPalette, 0, 256) != B_OK)
 		dprintf("set palette failed!\n");
 
-	addr_t start = sFrameBuffer + gKernelArgs.frame_buffer.width * top + left;
+	addr_t start = sFrameBuffer + gKernelArgs.frame_buffer.bytes_per_row * top
+		+ left;
 
 	for (int32 i = 0; i < height; i++) {
-		memcpy((void *)(start + gKernelArgs.frame_buffer.width * i),
+		memcpy((void *)(start + gKernelArgs.frame_buffer.bytes_per_row * i),
 			&data[i * width], width);
 	}
 }
@@ -713,7 +733,6 @@ platform_switch_to_logo(void)
 
 	addr_t lastBase = gKernelArgs.frame_buffer.physical_buffer.start;
 	size_t lastSize = gKernelArgs.frame_buffer.physical_buffer.size;
-	int32 bytesPerPixel = 1;
 
 	if (sVesaCompatible && sMode != NULL) {
 		if (!sModeChosen)
@@ -726,13 +745,12 @@ platform_switch_to_logo(void)
 		if (vesa_get_mode_info(sMode->mode, &modeInfo) != B_OK)
 			goto fallback;
 
-		bytesPerPixel = (modeInfo.bits_per_pixel + 7) / 8;
-
 		gKernelArgs.frame_buffer.width = modeInfo.width;
 		gKernelArgs.frame_buffer.height = modeInfo.height;
+		gKernelArgs.frame_buffer.bytes_per_row = modeInfo.bytes_per_row;
 		gKernelArgs.frame_buffer.depth = modeInfo.bits_per_pixel;
-		gKernelArgs.frame_buffer.physical_buffer.size = gKernelArgs.frame_buffer.width
-			* gKernelArgs.frame_buffer.height * bytesPerPixel;
+		gKernelArgs.frame_buffer.physical_buffer.size = modeInfo.bytes_per_row
+			* gKernelArgs.frame_buffer.height;
 		gKernelArgs.frame_buffer.physical_buffer.start = modeInfo.physical_base;
 	} else {
 fallback:
@@ -741,13 +759,14 @@ fallback:
 
 		gKernelArgs.frame_buffer.width = 640;
 		gKernelArgs.frame_buffer.height = 480;
+		gKernelArgs.frame_buffer.bytes_per_row = 640 / 2;
 		gKernelArgs.frame_buffer.depth = 4;
 		gKernelArgs.frame_buffer.physical_buffer.size = gKernelArgs.frame_buffer.width
 			* gKernelArgs.frame_buffer.height / 2;
 		gKernelArgs.frame_buffer.physical_buffer.start = 0xa0000;
 	}
 
-	gKernelArgs.frame_buffer.enabled = 1;
+	gKernelArgs.frame_buffer.enabled = true;
 
 	// If the new frame buffer is either larger than the old one or located at
 	// a different address, we need to remap it, so we first have to throw
@@ -760,8 +779,9 @@ fallback:
 	}
 	if (lastBase == 0) {
 		// the graphics memory has not been mapped yet!
-		sFrameBuffer = mmu_map_physical_memory(gKernelArgs.frame_buffer.physical_buffer.start,
-							gKernelArgs.frame_buffer.physical_buffer.size, kDefaultPageFlags);
+		sFrameBuffer = mmu_map_physical_memory(
+			gKernelArgs.frame_buffer.physical_buffer.start,
+			gKernelArgs.frame_buffer.physical_buffer.size, kDefaultPageFlags);
 	}
 
 	// clear the video memory
