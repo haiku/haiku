@@ -83,9 +83,10 @@ pthread_equal(pthread_t t1, pthread_t t2)
 int 
 pthread_join(pthread_t thread, void **value_ptr)
 {
-	wait_for_thread(thread, (status_t *)value_ptr);
-	/* the thread could be joinable and gone */
-	return B_OK;
+	status_t error = wait_for_thread(thread, (status_t *)value_ptr);
+	if (error == B_BAD_THREAD_ID)
+		return ESRCH;
+	return error;
 }
 
 
