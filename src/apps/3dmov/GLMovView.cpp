@@ -24,3 +24,31 @@ GLMovView::AttachedToWindow()
 {
 	
 }
+
+
+void
+GLMovView::MouseDown(BPoint where)
+{
+	
+}
+
+
+void
+GLMovView::MouseUp(BPoint where)
+{
+	
+}
+
+
+void
+GLMovView::MouseMoved(BPoint where, uint32 code, const BMessage *a_message)
+{
+	
+}
+
+
+void
+GLMovView::FileDropped(BPoint where, BMediaFile *file)
+{
+	
+}
