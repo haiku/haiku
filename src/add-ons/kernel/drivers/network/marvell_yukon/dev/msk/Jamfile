@@ -10,5 +10,5 @@ SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 EM_FAST_INTR=1 ] ;
 KernelAddon marvell_yukon :
 	if_msk.c
 	glue.c
-	: libfreebsd_network.a
+	: libfreebsd_network.a marvell_yukon_mii.a
 	;
