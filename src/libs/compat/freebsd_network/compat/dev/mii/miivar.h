@@ -165,6 +165,9 @@ struct mii_phydesc {
 	u_int32_t mpd_model;		/* the PHY's model */
 	const char *mpd_name;		/* the PHY's name */
 };
+#define MII_PHY_DESC(a, b) { MII_OUI_ ## a, MII_MODEL_ ## a ## _ ## b, \
+	MII_STR_ ## a ## _ ## b }
+#define MII_PHY_END	{ 0, 0, NULL }
 
 /*
  * An array of these structures map MII media types to BMCR/ANAR settings.
@@ -243,6 +246,7 @@ void	mii_phy_update(struct mii_softc *, int);
 int	mii_phy_tick(struct mii_softc *);
 
 const struct mii_phydesc * mii_phy_match(const struct mii_attach_args *ma, const struct mii_phydesc *mpd);
+int mii_phy_dev_probe(device_t dev, const struct mii_phydesc *mpd, int mrv);
 
 void	ukphy_status(struct mii_softc *);
 #endif /* _KERNEL */

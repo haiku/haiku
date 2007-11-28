@@ -542,3 +542,16 @@ mii_phy_match(const struct mii_attach_args *ma, const struct mii_phydesc *mpd)
 	}
 	return (NULL);
 }
+
+int
+mii_phy_dev_probe(device_t dev, const struct mii_phydesc *mpd, int mrv)
+{
+
+	mpd = mii_phy_match(device_get_ivars(dev), mpd);
+	if (mpd != NULL) {
+		device_set_desc(dev, mpd->mpd_name);
+		return (mrv);
+	}
+
+	return (ENXIO);
+}
