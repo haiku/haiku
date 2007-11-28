@@ -339,10 +339,11 @@ AHCIController::ResetDevice(uchar targetID, uchar targetLUN)
 
 
 void
-AHCIController::GetRestrictions(uchar targetID, bool *isATAPI, bool *noAutoSense, uint32 *maxBlocks)
+AHCIController::GetRestrictions(uchar targetID, bool *isATAPI,
+	bool *noAutoSense, uint32 *maxBlocks)
 {
 	if (!fPort[targetID])
 		return;
 
-	return fPort[targetID]->ScsiGetRestrictions(isATAPI, noAutoSense, maxBlocks);
+	fPort[targetID]->ScsiGetRestrictions(isATAPI, noAutoSense, maxBlocks);
 }
