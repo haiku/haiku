@@ -11,6 +11,7 @@
 #include <stdio.h>
 
 #include <KernelExport.h>
+#include <image.h>
 
 #include <compat/machine/resource.h>
 #include <compat/dev/pci/pcireg.h>
@@ -344,10 +345,7 @@ init_device(device_t dev, driver_t *driver)
 {
 	list_init_etc(&dev->children, offsetof(struct device, link));
 
-	if (driver == NULL)
-		return dev;
-
-	if (device_set_driver(dev, driver) < 0)
+	if (driver != NULL && device_set_driver(dev, driver) < 0)
 		return NULL;
 
 	return dev;
@@ -369,6 +367,7 @@ device_set_driver(device_t dev, driver_t *driver)
 
 	for (i = 0; method == NULL && driver->methods[i].name != NULL; i++) {
 		device_method_t *mth = &driver->methods[i];
+
 		if (strcmp(mth->name, "device_probe") == 0)
 			dev->methods.probe = (void *)mth->method;
 		else if (strcmp(mth->name, "device_attach") == 0)
@@ -432,6 +431,24 @@ new_device(driver_t *driver)
 }
 
 
+static image_id
+find_own_image()
+{
+	int32 cookie = 0;
+	image_info info;
+	while (get_next_image_info(B_SYSTEM_TEAM, &cookie, &info) == B_OK) {
+		if (((uint32)info.text <= (uint32)find_own_image
+			&& (uint32)info.text + (uint32)info.text_size
+					> (uint32)find_own_image)) {
+			// found our own image
+			return info.id;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
 device_t
 device_add_child(device_t dev, const char *name, int order)
 {
@@ -440,13 +457,27 @@ device_add_child(device_t dev, const char *name, int order)
 	if (name != NULL) {
 		if (strcmp(name, "miibus") == 0)
 			child = new_device(&miibus_driver);
+		else {
+			// find matching driver structure
+			driver_t **driver;
+			char symbol[128];
+
+			snprintf(symbol, sizeof(symbol), "__fbsd_%s%s", name, dev->driver->name);
+			if (get_image_symbol(find_own_image(), symbol, B_SYMBOL_TYPE_DATA,
+					(void **)&driver) == B_OK)
+				child = new_device(*driver);
+
+			// inherit the device name of our parent
+			name = dev->dev_name;
+		}
 	} else
 		child = new_device(NULL);
 
 	if (child == NULL)
 		return NULL;
 
-	snprintf(child->dev_name, sizeof(child->dev_name), "%s", name);
+	if (name != NULL)
+		strlcpy(child->dev_name, name, sizeof(child->dev_name));
 	child->parent = dev;
 	list_add_item(&dev->children, child);
 
