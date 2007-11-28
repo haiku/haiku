@@ -306,8 +306,6 @@ ether_ifattach(struct ifnet *ifp, const uint8_t *macAddress)
 	//		once all drivers are cleaned up.
 	if (macAddress != IFP2ENADDR(ifp))
 		memcpy(IFP2ENADDR(ifp), macAddress, ETHER_ADDR_LEN);
-
-	ifp->if_init(ifp->if_softc);
 }
 
 
