@@ -1,9 +1,9 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
-/* User Runtime Loader support in the kernel */
+/*! User Runtime Loader support in the kernel */
 
 
 #include <KernelExport.h>
@@ -28,6 +28,7 @@
 #	define TRACE(x) ;
 #endif
 
+#define ADD_DEBUGGER_COMMANDS
 
 struct image {
 	struct image	*next;
@@ -40,9 +41,8 @@ static image_id sNextImageID = 1;
 static mutex sImageMutex;
 
 
-/** Registers an image with the specified team.
- */
-
+/*!	Registers an image with the specified team.
+*/
 image_id
 register_image(struct team *team, image_info *_info, size_t size)
 {
@@ -67,9 +67,8 @@ register_image(struct team *team, image_info *_info, size_t size)
 }
 
 
-/** Unregisters an image from the specified team.
- */
-
+/*!	Unregisters an image from the specified team.
+*/
 status_t
 unregister_image(struct team *team, image_id id)
 {
@@ -99,10 +98,9 @@ unregister_image(struct team *team, image_id id)
 }
 
 
-/** Counts the registered images from the specified team.
- *	The team lock must be hold when you call this function.
- */
-
+/*!	Counts the registered images from the specified team.
+	The team lock must be hold when you call this function.
+*/
 int32
 count_images(struct team *team)
 {
@@ -117,11 +115,10 @@ count_images(struct team *team)
 }
 
 
-/** Removes all images from the specified team. Must only be called
- *	with the team lock hold or a team that has already been removed
- *	from the list (in thread_exit()).
- */
-
+/*!	Removes all images from the specified team. Must only be called
+	with the team lock hold or a team that has already been removed
+	from the list (in thread_exit()).
+*/
 status_t
 remove_images(struct team *team)
 {
@@ -136,11 +133,10 @@ remove_images(struct team *team)
 }
 
 
-/**	Unlike in BeOS, this function only returns images that belong to the
- *	current team.
- *	ToDo: we might want to rethink that one day...
- */
-
+/*!	Unlike in BeOS, this function only returns images that belong to the
+	current team.
+	TODO: we might want to rethink that one day...
+*/
 status_t
 _get_image_info(image_id id, image_info *info, size_t size)
 {
@@ -178,8 +174,11 @@ _get_next_image_info(team_id teamID, int32 *cookie, image_info *info, size_t siz
 
 	if (teamID == B_CURRENT_TEAM)
 		team = thread_get_current_thread()->team;
+	else if (teamID == B_SYSTEM_TEAM)
+		team = team_get_kernel_team();
 	else
 		team = team_get_team_struct_locked(teamID);
+
 	if (team) {
 		struct image *image = NULL;
 		int32 count = 0;
@@ -205,12 +204,22 @@ _get_next_image_info(team_id teamID, int32 *cookie, image_info *info, size_t siz
 }
 
 
-#ifdef DEBUG
+#ifdef ADD_DEBUGGER_COMMANDS
 static int
 dump_images_list(int argc, char **argv)
 {
-	struct team *team = thread_get_current_thread()->team;
 	struct image *image = NULL;
+	struct team *team;
+
+	if (argc > 1) {
+		team_id id = strtol(argv[1], NULL, 0);
+		team = team_get_team_struct_locked(id);
+		if (team == NULL) {
+			kprintf("No team with ID %ld found\n", id);
+			return 1;
+		}
+	} else
+		team = thread_get_current_thread()->team;
 
 	kprintf("Registered images of team 0x%lx\n", team->id);
 	kprintf("    ID text       size    data       size    name\n");
@@ -261,7 +270,7 @@ image_debug_lookup_user_symbol_address(struct team *team, addr_t address,
 status_t
 image_init(void)
 {
-#ifdef DEBUG
+#ifdef ADD_DEBUGGER_COMMANDS
 	add_debugger_command("team_images", &dump_images_list, "Dump all registered images from the current team");
 #endif
 
