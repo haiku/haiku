@@ -567,6 +567,10 @@ create_team_struct(const char *name, bool kernel)
 	team->dead_threads_kernel_time = 0;
 	team->dead_threads_user_time = 0;
 
+	// dead threads
+	list_init(&team->dead_threads);
+	team->dead_threads_count = 0;
+
 	// dead children
 	team->dead_children = new(nothrow) team_dead_children;
 	if (team->dead_children == NULL)
@@ -635,6 +639,11 @@ delete_team_struct(struct team *team)
 	team->continued_children->condition_variable.Unpublish();
 
 	team->dead_children->condition_variable.Unpublish();
+
+	while (death_entry* threadDeathEntry = (death_entry*)list_remove_head_item(
+			&team->dead_threads)) {
+		free(threadDeathEntry);
+	}
 
 	while (job_control_entry* entry = team->dead_children->entries.RemoveHead())
 		delete entry;

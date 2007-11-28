@@ -94,7 +94,9 @@ struct team_watcher {
 };
 
 #define MAX_DEAD_CHILDREN	32
-	// this is a soft limit for the number of dead entries in a team
+	// this is a soft limit for the number of child death entries in a team
+#define MAX_DEAD_THREADS	32
+	// this is a soft limit for the number of thread death entries in a team
 
 typedef struct team_dead_children team_dead_children;
 typedef struct team_job_control_children  team_job_control_children;
@@ -155,6 +157,8 @@ struct team {
 	int				pending_signals;
 	void			*io_context;
 	sem_id			death_sem;		// semaphore to wait on for dying threads
+	struct list		dead_threads;
+	int				dead_threads_count;
 
 	team_dead_children *dead_children;
 	team_job_control_children *stopped_children;

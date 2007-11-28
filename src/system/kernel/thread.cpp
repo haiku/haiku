@@ -1215,11 +1215,14 @@ thread_exit(void)
 	}
 
 	struct job_control_entry *death = NULL;
+	struct death_entry* threadDeathEntry = NULL;
+
 	if (team != team_get_kernel_team()) {
 		if (team->main_thread == thread) {
 			// this was the main thread in this team, so we will delete that as well
 			deleteTeam = true;
-		}
+		} else
+			threadDeathEntry = (death_entry*)malloc(sizeof(death_entry));
 
 		// remove this thread from the current team and add it to the kernel
 		// put the thread into the kernel team until it dies
@@ -1272,8 +1275,30 @@ thread_exit(void)
 				RELEASE_THREAD_LOCK();
 
 			team_remove_team(team, &freeGroup);
-		} else
+		} else {
+			// The thread is not the main thread. We store a thread death
+			// entry for it, unless someone is already waiting it.
+			if (threadDeathEntry != NULL
+				&& list_is_empty(&thread->exit.waiters)) {
+				threadDeathEntry->thread = thread->id;
+				threadDeathEntry->status = thread->exit.status;
+				threadDeathEntry->reason = thread->exit.reason;
+				threadDeathEntry->signal = thread->exit.signal;
+
+				// add entry -- remove and old one, if we hit the limit
+				list_add_item(&team->dead_threads, threadDeathEntry);
+				team->dead_threads_count++;
+				threadDeathEntry = NULL;
+
+				if (team->dead_threads_count > MAX_DEAD_THREADS) {
+					threadDeathEntry = (death_entry*)list_remove_head_item(
+						&team->dead_threads);
+					team->dead_threads_count--;
+				}
+			}
+
 			RELEASE_THREAD_LOCK();
+		}
 
 		RELEASE_TEAM_LOCK();
 
@@ -1283,6 +1308,9 @@ thread_exit(void)
 
 		TRACE(("thread_exit: thread %ld now a kernel thread!\n", thread->id));
 	}
+
+	if (threadDeathEntry != NULL)
+		free(threadDeathEntry);
 
 	// delete the team if we're its main thread
 	if (deleteTeam) {
@@ -1640,6 +1668,8 @@ wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
 		list_add_link_to_head(&thread->exit.waiters, &death);
 	}
 
+	death_entry* threadDeathEntry = NULL;
+
 	RELEASE_THREAD_LOCK();
 
 	if (thread == NULL) {
@@ -1647,15 +1677,31 @@ wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
 		// find its death entry in our team
 		GRAB_TEAM_LOCK();
 
+		struct team* team = thread_get_current_thread()->team;
+
+		// check the child death entries first (i.e. main threads of child
+		// teams)
 		bool deleteEntry;
-		freeDeath = team_get_death_entry(thread_get_current_thread()->team, id,
-			&deleteEntry);
+		freeDeath = team_get_death_entry(team, id, &deleteEntry);
 		if (freeDeath != NULL) {
 			death.status = freeDeath->status;
 			if (!deleteEntry)
 				freeDeath = NULL;
-		} else
-			status = B_BAD_THREAD_ID;
+		} else {
+			// check the thread death entries of the team (non-main threads)
+			while ((threadDeathEntry = (death_entry*)list_get_next_item(
+					&team->dead_threads, threadDeathEntry)) != NULL) {
+				if (threadDeathEntry->thread == id) {
+					list_remove_item(&team->dead_threads, threadDeathEntry);
+					team->dead_threads_count--;
+					death.status = threadDeathEntry->status;
+					break;
+				}
+			}
+
+			if (threadDeathEntry == NULL)
+				status = B_BAD_THREAD_ID;
+		}
 
 		RELEASE_TEAM_LOCK();
 	}
@@ -1668,6 +1714,7 @@ wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
 			*_returnCode = death.status;
 
 		delete freeDeath;
+		free(threadDeathEntry);
 		return B_OK;
 	}
 
