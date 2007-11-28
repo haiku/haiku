@@ -1735,7 +1735,8 @@ BMenu::_ComputeColumnLayout(int32 index, bool bestFit, bool moveItems,
 		item->fBounds.bottom = item->fBounds.top + height + fPad.top
 			+ fPad.bottom;
 
-		width += item->Frame().Height();
+		if (item->fSubmenu != NULL)
+			width += item->Frame().Height();
 
 		frame.right = max_c(frame.right, width + fPad.left + fPad.right);
 		frame.bottom = item->fBounds.bottom;
