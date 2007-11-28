@@ -10,6 +10,7 @@
 
 HAIKU_FBSD_DRIVER_GLUE(marvell_yukon, mskc, pci)
 
+extern driver_t *DRIVER_MODULE_NAME(e1000phy, miibus);
 extern driver_t *DRIVER_MODULE_NAME(ukphy, miibus);
 
 
@@ -17,10 +18,11 @@ driver_t *
 __haiku_select_miibus_driver(device_t dev)
 {
 	driver_t *drivers[] = {
+		DRIVER_MODULE_NAME(e1000phy, miibus),
 		DRIVER_MODULE_NAME(ukphy, miibus)
 	};
 
-	return __haiku_probe_miibus(dev, drivers, 1);
+	return __haiku_probe_miibus(dev, drivers, 2);
 }
 
 NO_HAIKU_CHECK_DISABLE_INTERRUPTS();

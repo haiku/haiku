@@ -9,6 +9,7 @@ SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
 
 KernelStaticLibrary marvell_yukon_mii.a
 	:
+	e1000phy.c
 	ukphy.c
 	ukphy_subr.c
 	;
