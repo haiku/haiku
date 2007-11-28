@@ -30,12 +30,12 @@ int main()
 	void* rc;
 
 	/* Verify that the value associated with "key" in a new thread is NULL */
-	rc = pthread_getspecific(key);
-	if(rc != NULL)
-	{
-		printf("pthread_key_create_2-1 Test FAILED\n");
-		return PTS_FAIL;
-	}
+// 	rc = pthread_getspecific(key);
+// 	if(rc != NULL)
+// 	{
+// 		printf("pthread_key_create_2-1 Test FAILED\n");
+// 		return PTS_FAIL;
+// 	}
 
 	if(pthread_key_create(&key, NULL) != 0)
 	{
