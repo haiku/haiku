@@ -101,6 +101,7 @@ StdBinCommands
 	setversion.cpp
 	urlwrapper.cpp
 	version.cpp
+	WindowShade.cpp
 #	yes.cpp
 	: be : $(haiku-utils_rsrc) ;
 
