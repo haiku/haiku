@@ -173,8 +173,11 @@ miibus_attach(device_t dev)
 	struct mii_data		*mii;
 
 	mii = device_get_softc(dev);
-
-	mii->mii_ifp = NETDEV(device_get_parent(dev))->ifp;
+	/*
+	 * Note that each NIC's softc must start with an ifnet pointer.
+	 * XXX: EVIL HACK!
+	 */
+	mii->mii_ifp = *(struct ifnet**)device_get_softc(device_get_parent(dev));
 	v = device_get_ivars(dev);
 	ifmedia_upd = v[0];
 	ifmedia_sts = v[1];
@@ -247,7 +250,11 @@ miibus_statchg(device_t dev)
 
 	mii = device_get_softc(dev);
 
-	ifp = NETDEV(parent)->ifp;
+	/*
+	 * Note that each NIC's softc must start with an ifnet pointer.
+	 * XXX: EVIL HACK!
+	 */
+	ifp = *(struct ifnet **)device_get_softc(parent);
 	ifp->if_baudrate = ifmedia_baudrate(mii->mii_media_active);
 	return;
 }
@@ -272,7 +279,11 @@ miibus_linkchg(device_t dev)
 	} else
 		link_state = LINK_STATE_UNKNOWN;
 
-	if_link_state_change(NETDEV(parent)->ifp, link_state);
+	/*
+	 * Note that each NIC's softc must start with an ifnet pointer.
+	 * XXX: EVIL HACK!
+	 */
+	if_link_state_change(*(struct ifnet**)device_get_softc(parent), link_state);
 }
 
 static void

@@ -14,18 +14,10 @@
 #include <image.h>
 
 #include <compat/machine/resource.h>
-#include <compat/dev/pci/pcireg.h>
-#include <compat/dev/pci/pcivar.h>
+#include <compat/dev/mii/mii.h>
 #include <compat/sys/bus.h>
 
 #include <compat/dev/mii/miivar.h>
-
-//#define DEBUG_PCI
-#ifdef DEBUG_PCI
-#	define TRACE_PCI(dev, format, args...) device_printf(dev, format , ##args)
-#else
-#	define TRACE_PCI(dev, format, args...) do { } while (0)
-#endif
 
 
 spinlock __haiku_intr_spinlock;
@@ -33,182 +25,74 @@ spinlock __haiku_intr_spinlock;
 struct net_stack_module_info *gStack;
 pci_module_info *gPci;
 
+static struct list sRootDevices;
+static int sNextUnit;
 
-//	#pragma mark - PCI
+
+//	#pragma mark - private functions
 
 
-uint32_t
-pci_read_config(device_t dev, int offset, int size)
+static device_t
+init_device(device_t device, driver_t *driver)
 {
-	uint32_t value = gPci->read_pci_config(NETDEV(dev)->pci_info.bus,
-		NETDEV(dev)->pci_info.device, NETDEV(dev)->pci_info.function,
-		offset, size);
-	TRACE_PCI(dev, "pci_read_config(%i, %i) = 0x%x\n", offset, size, value);
-	return value;
+	list_init_etc(&device->children, offsetof(struct device, link));
+	device->unit = sNextUnit++;
+
+	if (driver != NULL && device_set_driver(device, driver) < 0)
+		return NULL;
+
+	return device;
 }
 
 
-void
-pci_write_config(device_t dev, int offset, uint32_t value, int size)
+static device_t
+new_device(driver_t *driver)
 {
-	TRACE_PCI(dev, "pci_write_config(%i, 0x%x, %i)\n", offset, value, size);
+	device_t dev = malloc(sizeof(struct device));
+	if (dev == NULL)
+		return NULL;
 
-	gPci->write_pci_config(NETDEV(dev)->pci_info.bus,
-		NETDEV(dev)->pci_info.device, NETDEV(dev)->pci_info.function,
-		offset, size, value);
-}
+	memset(dev, 0, sizeof(struct device));
 
-
-uint16_t
-pci_get_vendor(device_t dev)
-{
-	return pci_read_config(dev, PCI_vendor_id, 2);
-}
-
-
-uint16_t
-pci_get_device(device_t dev)
-{
-	return pci_read_config(dev, PCI_device_id, 2);
-}
-
-
-uint16_t
-pci_get_subvendor(device_t dev)
-{
-	return pci_read_config(dev, PCI_subsystem_vendor_id, 2);
-}
-
-
-uint16_t
-pci_get_subdevice(device_t dev)
-{
-	return pci_read_config(dev, PCI_subsystem_id, 2);
-}
-
-
-uint8_t
-pci_get_revid(device_t dev)
-{
-	return pci_read_config(dev, PCI_revision, 1);
-}
-
-
-static void
-pci_set_command_bit(device_t dev, uint16_t bit)
-{
-	uint16_t command = pci_read_config(dev, PCI_command, 2);
-	pci_write_config(dev, PCI_command, command | bit, 2);
-}
-
-
-int
-pci_enable_busmaster(device_t dev)
-{
-	pci_set_command_bit(dev, PCI_command_master);
-	return 0;
-}
-
-
-int
-pci_enable_io(device_t dev, int space)
-{
-	/* adapted from FreeBSD's pci_enable_io_method */
-	int bit = 0;
-
-	switch (space) {
-		case SYS_RES_IOPORT:
-			bit = PCI_command_io;
-			break;
-		case SYS_RES_MEMORY:
-			bit = PCI_command_memory;
-			break;
-		default:
-			return EINVAL;
+	if (init_device(dev, driver) == NULL) {
+		free(dev);
+		return NULL;
 	}
 
-	pci_set_command_bit(dev, bit);
-	if (pci_read_config(dev, PCI_command, 2) & bit)
-		return 0;
-
-	device_printf(dev, "pci_enable_io(%d) failed.\n", space);
-
-	return ENXIO;
+	return dev;
 }
 
 
-int
-pci_find_extcap(device_t child, int capability, int *_capabilityRegister)
+static image_id
+find_own_image()
 {
-	uint8 capabilityPointer;
-	uint8 headerType;
-	uint16 status;
-
-	status = pci_read_config(child, PCIR_STATUS, 2);
-	if ((status & PCIM_STATUS_CAPPRESENT) == 0)
-		return ENXIO;
-
-	headerType = pci_read_config(child, PCI_header_type, 1);
-	switch (headerType & PCIM_HDRTYPE) {
-		case 0:
-		case 1:
-			capabilityPointer = PCIR_CAP_PTR;
-			break;
-		case 2:
-			capabilityPointer = PCIR_CAP_PTR_2;
-			break;
-		default:
-			return ENXIO;
-	}
-	capabilityPointer = pci_read_config(child, capabilityPointer, 1);
-
-	while (capabilityPointer != 0) {
-		if (pci_read_config(child, capabilityPointer + PCICAP_ID, 1)
-				== capability) {
-			if (_capabilityRegister != NULL)
-				*_capabilityRegister = capabilityPointer;
-			return 0;
+	int32 cookie = 0;
+	image_info info;
+	while (get_next_image_info(B_SYSTEM_TEAM, &cookie, &info) == B_OK) {
+		if (((uint32)info.text <= (uint32)find_own_image
+			&& (uint32)info.text + (uint32)info.text_size
+					> (uint32)find_own_image)) {
+			// found our own image
+			return info.id;
 		}
-		capabilityPointer = pci_read_config(child,
-			capabilityPointer + PCICAP_NEXTPTR, 1);
 	}
 
-	return ENOENT;
+	return B_ENTRY_NOT_FOUND;
 }
 
 
-int
-pci_msi_count(device_t dev)
+static device_method_signature_t
+resolve_method(driver_t *driver, const char *name)
 {
-	return 0;
-}
+	device_method_signature_t method = NULL;
+	int i;
 
+	for (i = 0; method == NULL && driver->methods[i].name != NULL; i++) {
+		if (strcmp(driver->methods[i].name, name) == 0)
+			method = driver->methods[i].method;
+	}
 
-int
-pci_alloc_msi(device_t dev, int *count)
-{
-    return ENODEV;
-}
-
-
-int
-pci_release_msi(device_t dev)
-{
-    return ENODEV;
-}
-
-
-int
-pci_msix_count(device_t dev)
-{
-	return 0;
-}
-
-
-int
-pci_alloc_msix(device_t dev, int *count)
-{
-    return ENODEV;
+	return method;
 }
 
 
@@ -251,7 +135,7 @@ device_printf(device_t dev, const char *format, ...)
 	va_list vl;
 
 	va_start(vl, format);
-	driver_vprintf_etc(dev->dev_name, format, vl);
+	driver_vprintf_etc(dev->device_name, format, vl);
 	va_end(vl);
 	return 0;
 }
@@ -300,22 +184,13 @@ device_get_ivars(device_t dev)
 }
 
 
-void
-device_sprintf_name(device_t dev, const char *format, ...)
-{
-	va_list vl;
-	va_start(vl, format);
-	vsnprintf(dev->dev_name, sizeof(dev->dev_name), format, vl);
-	va_end(vl);
-}
-
-
 const char *
 device_get_name(device_t dev)
 {
-	if (dev)
-		return dev->dev_name;
-	return NULL;
+	if (dev == NULL)
+		return NULL;
+
+	return dev->device_name;
 }
 
 
@@ -337,18 +212,6 @@ void *
 device_get_softc(device_t dev)
 {
 	return dev->softc;
-}
-
-
-device_t
-init_device(device_t dev, driver_t *driver)
-{
-	list_init_etc(&dev->children, offsetof(struct device, link));
-
-	if (driver != NULL && device_set_driver(dev, driver) < 0)
-		return NULL;
-
-	return dev;
 }
 
 
@@ -397,60 +260,14 @@ device_set_driver(device_t dev, driver_t *driver)
 
 
 int
-device_is_alive(device_t dev)
+device_is_alive(device_t device)
 {
-	return dev->driver != NULL;
-}
-
-
-void
-uninit_device(device_t dev)
-{
-	if (dev->flags & DEVICE_DESC_ALLOCED)
-		free((char *)dev->description);
-	if (dev->softc)
-		free(dev->softc);
-}
-
-
-static device_t
-new_device(driver_t *driver)
-{
-	device_t dev = malloc(sizeof(struct device));
-	if (dev == NULL)
-		return NULL;
-
-	memset(dev, 0, sizeof(struct device));
-
-	if (init_device(dev, driver) == NULL) {
-		free(dev);
-		return NULL;
-	}
-
-	return dev;
-}
-
-
-static image_id
-find_own_image()
-{
-	int32 cookie = 0;
-	image_info info;
-	while (get_next_image_info(B_SYSTEM_TEAM, &cookie, &info) == B_OK) {
-		if (((uint32)info.text <= (uint32)find_own_image
-			&& (uint32)info.text + (uint32)info.text_size
-					> (uint32)find_own_image)) {
-			// found our own image
-			return info.id;
-		}
-	}
-
-	return B_ENTRY_NOT_FOUND;
+	return (device->flags & DEVICE_ATTACHED) != 0;
 }
 
 
 device_t
-device_add_child(device_t dev, const char *name, int order)
+device_add_child(device_t parent, const char *name, int unit)
 {
 	device_t child = NULL;
 
@@ -462,13 +279,11 @@ device_add_child(device_t dev, const char *name, int order)
 			driver_t **driver;
 			char symbol[128];
 
-			snprintf(symbol, sizeof(symbol), "__fbsd_%s%s", name, dev->driver->name);
+			snprintf(symbol, sizeof(symbol), "__fbsd_%s%s", name,
+				parent->driver->name);
 			if (get_image_symbol(find_own_image(), symbol, B_SYMBOL_TYPE_DATA,
 					(void **)&driver) == B_OK)
 				child = new_device(*driver);
-
-			// inherit the device name of our parent
-			name = dev->dev_name;
 		}
 	} else
 		child = new_device(NULL);
@@ -477,37 +292,76 @@ device_add_child(device_t dev, const char *name, int order)
 		return NULL;
 
 	if (name != NULL)
-		strlcpy(child->dev_name, name, sizeof(child->dev_name));
-	child->parent = dev;
-	list_add_item(&dev->children, child);
+		strlcpy(child->device_name, name, sizeof(child->device_name));
+
+	child->parent = parent;
+
+	if (parent != NULL) {
+		list_add_item(&parent->children, child);
+		child->root = parent->root;
+	} else {
+		if (sRootDevices.link.next == NULL)
+			list_init_etc(&sRootDevices, offsetof(struct device, link));
+		list_add_item(&sRootDevices, child);
+	}
 
 	return child;
 }
 
 
-driver_t *
-__haiku_probe_miibus(device_t dev, driver_t *drivers[], int count)
+/*!	Delete the child and all of its children. Detach as necessary.
+*/
+int
+device_delete_child(device_t parent, device_t child)
 {
-	driver_t *selected = NULL;
-	int i, selcost = 0;
+	if (child == NULL)
+		return 0;
 
-	for (i = 0; i < count; i++) {
-		device_probe_t *probe = (device_probe_t *)
-			_resolve_method(drivers[i], "device_probe");
-		if (probe) {
-			int result = probe(dev);
-			// the ukphy driver (fallback for unknown PHYs) return -100 here
-			if (result >= -100) {
-				if (selected == NULL || result > selcost) {
-					selected = drivers[i];
-					selcost = result;
-					device_printf(dev, "Found MII: %s\n", selected->name);
-				}
-			}
-		}
+	if (parent != NULL)
+		list_remove_item(&parent->children, child);
+
+	parent = child;
+
+	while ((child = list_remove_head_item(&parent->children)) != NULL) {
+		device_delete_child(NULL, child);
 	}
 
-	return selected;
+	if ((atomic_and(&parent->flags, ~DEVICE_ATTACHED) & DEVICE_ATTACHED) != 0
+		&& parent->methods.detach != NULL) {
+		int status = parent->methods.detach(parent);
+		if (status != 0)
+			return status;
+	}
+
+	if (parent->flags & DEVICE_DESC_ALLOCED)
+		free((char *)parent->description);
+
+	free(parent->softc);
+	free(parent);
+	return 0;
+}
+
+
+int
+device_is_attached(device_t device)
+{
+	return (device->flags & DEVICE_ATTACHED) != 0;
+}
+
+
+int
+device_attach(device_t device)
+{
+	int result;
+
+	if (device->driver == NULL)
+		return B_ERROR;
+
+	result = device->methods.attach(device);
+	if (result == 0)
+		atomic_or(&device->flags, DEVICE_ATTACHED);
+
+	return result;
 }
 
 
@@ -522,15 +376,15 @@ bus_generic_attach(device_t dev)
 			if (driver == NULL) {
 				struct mii_attach_args *ma = device_get_ivars(child);
 
-				device_printf(dev, "No PHY module found (%x/%x)!\n", ma->mii_id1,
-					ma->mii_id2);
+				device_printf(dev, "No PHY module found (%x/%x)!\n",
+					MII_OUI(ma->mii_id1, ma->mii_id2), MII_MODEL(ma->mii_id2));
 			} else
 				device_set_driver(child, driver);
-		} else if (child->driver == &miibus_driver)
+		} else if (child->driver != &miibus_driver)
 			child->methods.probe(child);
 
 		if (child->driver != NULL) {
-			int result = child->methods.attach(child);
+			int result = device_attach(child);
 			if (result != 0)
 				return result;
 		}
@@ -540,23 +394,49 @@ bus_generic_attach(device_t dev)
 }
 
 
-int
-device_delete_child(device_t dev, device_t child)
-{
-	UNIMPLEMENTED();
-	return -1;
-}
-
-
-int
-device_is_attached(device_t dev)
-{
-	UNIMPLEMENTED();
-	return -1;
-}
-
-
 //	#pragma mark - Misc, Malloc
+
+
+device_t
+find_root_device(int unit)
+{
+	device_t device = NULL;
+
+	while ((device = list_get_next_item(&sRootDevices, device)) != NULL) {
+		if (device->unit <= unit)
+			return device;
+	}
+
+	return NULL;
+}
+
+
+driver_t *
+__haiku_probe_miibus(device_t dev, driver_t *drivers[])
+{
+	driver_t *selected = NULL;
+	int i, selectedResult = 0;
+
+	if (drivers == NULL)
+		return NULL;
+
+	for (i = 0; drivers[i]; i++) {
+		device_probe_t *probe = (device_probe_t *)
+			resolve_method(drivers[i], "device_probe");
+		if (probe) {
+			int result = probe(dev);
+			if (result >= 0) {
+				if (selected == NULL || result < selectedResult) {
+					selected = drivers[i];
+					selectedResult = result;
+					device_printf(dev, "Found MII: %s\n", selected->name);
+				}
+			}
+		}
+	}
+
+	return selected;
+}
 
 
 int
@@ -665,10 +545,3 @@ pmap_kextract(vm_offset_t virtualAddress)
 	return (vm_paddr_t)entry.address;
 }
 
-
-status_t
-init_compat_layer()
-{
-	__haiku_intr_spinlock = 0;
-	return B_OK;
-}

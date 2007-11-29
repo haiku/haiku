@@ -1,14 +1,13 @@
 /*
+ * Copyright 2007, Axel Dörfler, axeld@pinc-software.de. All Rights Reserved.
  * Copyright 2007, Hugo Santos. All Rights Reserved.
+ * Copyright 2004, Marcus Overhagen. All Rights Reserved.
+ *
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *      Hugo Santos, hugosantos@gmail.com
- *
- * Some of this code is based on previous work by Marcus Overhagen.
  */
-#ifndef _DEVICE_H_
-#define _DEVICE_H_
+#ifndef DEVICE_H
+#define DEVICE_H
+
 
 #include <stdint.h>
 #include <stdio.h>
@@ -24,22 +23,26 @@
 #include <compat/net/if.h>
 #include <compat/net/if_var.h>
 
+
+#define MAX_DEVICES	8
+
 struct ifnet;
 
 struct device {
-	struct device * parent;
-	char			dev_name[128];
+	struct device	*parent;
+	struct device	*root;
 
 	driver_t		*driver;
 	struct list		children;
 
 	int32			flags;
 
+	char			device_name[128];
 	int				unit;
 	char			nameunit[64];
-	const char *	description;
-	void *			softc;
-	void *			ivars;
+	const char		*description;
+	void			*softc;
+	void			*ivars;
 
 	struct {
 		int (*probe)(device_t dev);
@@ -59,33 +62,25 @@ struct device {
 	struct list_link link;
 };
 
-
-struct network_device {
-	struct device base;
-
-	pci_info		pci_info;
-
-	int32			open;
-
-	struct ifqueue	receive_queue;
-	sem_id			receive_sem;
-
-	sem_id			link_state_sem;
-
-	struct ifnet *	ifp;
+struct root_device_softc {
+	struct pci_info	pci_info;
 };
-
-
-#define DEVNET(dev)		((device_t)(&(dev)->base))
-#define NETDEV(base)	((struct network_device *)(base))
-
 
 enum {
 	DEVICE_OPEN			= 1 << 0,
 	DEVICE_CLOSED		= 1 << 1,
 	DEVICE_NON_BLOCK	= 1 << 2,
 	DEVICE_DESC_ALLOCED	= 1 << 3,
+	DEVICE_ATTACHED		= 1 << 4
 };
+
+
+extern struct net_stack_module_info *gStack;
+extern pci_module_info *gPci;
+
+extern const char *gDeviceNameList[];
+extern struct ifnet *gDevices[];
+extern int32 gDeviceCount;
 
 
 static inline void
@@ -105,10 +100,10 @@ void uninit_mbufs(void);
 status_t init_mutexes(void);
 void uninit_mutexes(void);
 
-status_t init_compat_layer(void);
-
 status_t init_taskqueues(void);
 void uninit_taskqueues(void);
+
+device_t find_root_device(int unit);
 
 /* busdma_machdep.c */
 void init_bounce_pages(void);
@@ -121,17 +116,7 @@ void driver_vprintf(const char *format, va_list vl);
 void device_sprintf_name(device_t dev, const char *format, ...)
 	__attribute__ ((format (__printf__, 2, 3)));
 
-device_t init_device(device_t dev, driver_t *driver);
-void uninit_device(device_t dev);
-device_method_signature_t _resolve_method(driver_t *driver, const char *name);
-
 void ifq_init(struct ifqueue *ifq, const char *name);
 void ifq_uninit(struct ifqueue *ifq);
 
-extern struct net_stack_module_info *gStack;
-extern pci_module_info *gPci;
-
-extern const char *gDevNameList[];
-extern struct network_device *gDevices[];
-
-#endif
+#endif	/* DEVICE_H */

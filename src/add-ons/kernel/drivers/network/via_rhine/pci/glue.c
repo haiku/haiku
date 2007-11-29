@@ -20,9 +20,10 @@ __haiku_select_miibus_driver(device_t dev)
 {
 	driver_t *drivers[] = {
 		DRIVER_MODULE_NAME(ciphy, miibus),
-		DRIVER_MODULE_NAME(ukphy, miibus)
+		DRIVER_MODULE_NAME(ukphy, miibus),
+		NULL
 	};
 
-	return __haiku_probe_miibus(dev, drivers, 2);
+	return __haiku_probe_miibus(dev, drivers);
 }
 

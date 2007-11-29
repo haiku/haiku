@@ -13,6 +13,7 @@ KernelStaticLibrary libfreebsd_network.a :
 	callout.c
 	compat.c
 	device.c
+	driver.c
 	fbsd_busdma_x86.c
 	fbsd_ether.c
 	fbsd_if_media.c
@@ -23,5 +24,6 @@ KernelStaticLibrary libfreebsd_network.a :
 	mbuf.c
 	mii.c
 	mutex.c
+	pci.c
 	taskqueue.c
 	;

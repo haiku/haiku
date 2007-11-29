@@ -88,6 +88,13 @@ enum intr_type {
 #define	FILTER_HANDLED			B_HANDLED_INTERRUPT
 #define	FILTER_SCHEDULE_THREAD	B_INVOKE_SCHEDULER
 
+/* Note that we reversed the original order, so whenever actual (negative)
+   numbers are used in a driver, we have to change it. */
+#define BUS_PROBE_SPECIFIC		0
+#define BUS_PROBE_LOW_PRIORITY	10
+#define BUS_PROBE_DEFAULT		20
+#define BUS_PROBE_GENERIC		100
+
 int bus_generic_detach(device_t dev);
 int bus_generic_suspend(device_t dev);
 int bus_generic_resume(device_t dev);
@@ -136,6 +143,7 @@ void *device_get_ivars(device_t dev);
 device_t device_add_child(device_t dev, const char *name, int unit);
 int device_delete_child(device_t dev, device_t child);
 int device_is_attached(device_t dev);
+int device_attach(device_t dev);
 int bus_generic_print_child(device_t dev, device_t child);
 void bus_generic_driver_added(device_t dev, driver_t *driver);
 int bus_generic_attach(device_t dev);

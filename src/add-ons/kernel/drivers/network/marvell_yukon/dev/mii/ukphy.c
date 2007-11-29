@@ -67,7 +67,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/dev/mii/ukphy.c,v 1.17 2005/01/06 01:42:56 imp Exp $");
+__FBSDID("$FreeBSD: src/sys/dev/mii/ukphy.c,v 1.20 2007/01/20 00:52:29 marius Exp $");
 
 /*
  * driver for generic unknown PHYs
@@ -114,34 +114,27 @@ DRIVER_MODULE(ukphy, miibus, ukphy_driver, ukphy_devclass, 0, 0);
 static int	ukphy_service(struct mii_softc *, struct mii_data *, int);
 
 static int
-ukphy_probe(dev)
-	device_t		dev;
+ukphy_probe(device_t dev)
 {
 
 	/*
 	 * We know something is here, so always match at a low priority.
 	 */
 	device_set_desc(dev, "Generic IEEE 802.3u media interface");
-	return (-100);
+	return (BUS_PROBE_GENERIC);
 }
 
 static int
-ukphy_attach(dev)
-	device_t		dev;
+ukphy_attach(device_t dev)
 {
 	struct mii_softc *sc;
 	struct mii_attach_args *ma;
 	struct mii_data *mii;
 
-static int ppp;
-if (ppp++ > 0)
-	panic("oops");
 	sc = device_get_softc(dev);
 	ma = device_get_ivars(dev);
 	sc->mii_dev = device_get_parent(dev);
 	mii = device_get_softc(sc->mii_dev);
-device_printf(dev, "insert into %p\n", mii);
-device_printf(sc->mii_dev, "this is the parent\n");
 	LIST_INSERT_HEAD(&mii->mii_phys, sc, mii_list);
 
 	if (bootverbose)
@@ -156,8 +149,6 @@ device_printf(sc->mii_dev, "this is the parent\n");
 
 	mii->mii_instance++;
 
-	sc->mii_flags |= MIIF_NOISOLATE;
-
 	mii_phy_reset(sc);
 
 	sc->mii_capabilities =
@@ -171,14 +162,11 @@ device_printf(sc->mii_dev, "this is the parent\n");
 	MIIBUS_MEDIAINIT(sc->mii_dev);
 	mii_phy_setmedia(sc);
 
-	return(0);
+	return (0);
 }
 
 static int
-ukphy_service(sc, mii, cmd)
-	struct mii_softc *sc;
-	struct mii_data *mii;
-	int cmd;
+ukphy_service(struct mii_softc *sc, struct mii_data *mii, int cmd)
 {
 	struct ifmedia_entry *ife = mii->mii_media.ifm_cur;
 	int reg;

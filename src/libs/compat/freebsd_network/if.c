@@ -1,12 +1,11 @@
 /*
  * Copyright 2007, Hugo Santos. All Rights Reserved.
+ * Copyright 2007, Axel Dörfler, axeld@pinc-software.de. All Rights Reserved.
+ * Copyright 2004, Marcus Overhagen. All Rights Reserved.
+ *
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *      Hugo Santos, hugosantos@gmail.com
- *
- * Some of this code is based on previous work by Marcus Overhagen.
  */
+
 
 #include "device.h"
 
@@ -24,25 +23,43 @@
 
 #include <compat/net/ethernet.h>
 
+
 struct ifnet *
 if_alloc(u_char type)
 {
+	char semName[64];
+
 	struct ifnet *ifp = _kernel_malloc(sizeof(struct ifnet), M_ZERO);
 	if (ifp == NULL)
 		return NULL;
 
+	snprintf(semName, sizeof(semName), "%s receive", gDriverName);
+
+	ifp->receive_sem = create_sem(0, semName);
+	if (ifp->receive_sem < B_OK)
+		goto err1;
+
 	if (type == IFT_ETHER) {
 		ifp->if_l2com = _kernel_malloc(sizeof(struct arpcom), M_ZERO);
-		if (ifp->if_l2com == NULL) {
-			_kernel_free(ifp);
-			return NULL;
-		}
+		if (ifp->if_l2com == NULL)
+			goto err2;
+
 		IFP2AC(ifp)->ac_ifp = ifp;
 	}
+
+	ifp->link_state_sem = -1;
+	ifp->flags = 0;
+	ifq_init(&ifp->receive_queue, semName);
 
 	ifp->if_type = type;
 	IF_ADDR_LOCK_INIT(ifp);
 	return ifp;
+
+err2:
+	delete_sem(ifp->receive_sem);
+err1:
+	_kernel_free(ifp);
+	return NULL;
 }
 
 
@@ -53,6 +70,9 @@ if_free(struct ifnet *ifp)
 	if (ifp->if_type == IFT_ETHER)
 		_kernel_free(ifp->if_l2com);
 
+	delete_sem(ifp->receive_sem);
+	ifq_uninit(&ifp->receive_queue);
+
 	_kernel_free(ifp);
 }
 
@@ -60,28 +80,29 @@ if_free(struct ifnet *ifp)
 void
 if_initname(struct ifnet *ifp, const char *name, int unit)
 {
-	int i;
-
 	dprintf("if_initname(%p, %s, %d)\n", ifp, name, unit);
 
 	if (name == NULL)
 		panic("interface goes unamed");
 
+	if (gDeviceCount >= MAX_DEVICES)
+		panic("unit too large");
+
 	ifp->if_dname = name;
 	ifp->if_dunit = unit;
+	ifp->if_index = gDeviceCount++;
 
 	strlcpy(ifp->if_xname, name, sizeof(ifp->if_xname));
 
-	for (i = 0; gDevNameList[i] != NULL; i++) {
-		if (strcmp(gDevNameList[i], name) == 0)
-			break;
-	}
+	snprintf(ifp->device_name, sizeof(ifp->device_name), "net/%s/%i",
+		gDriverName, ifp->if_index);
 
-	if (gDevNameList[i] == NULL)
-		panic("unknown interface");
+	driver_printf("%s: /dev/%s\n", gDriverName, ifp->device_name);
 
-	ifp->if_dev = DEVNET(gDevices[i]);
-	gDevices[i]->ifp = ifp;
+	gDeviceNameList[ifp->if_index] = ifp->device_name;
+	gDevices[ifp->if_index] = ifp;
+
+	ifp->root_device = find_root_device(unit);
 }
 
 
@@ -146,21 +167,19 @@ if_printf(struct ifnet *ifp, const char *format, ...)
 	vsnprintf(buf, sizeof(buf), format, vl);
 	va_end(vl);
 
-	dprintf("[%s] %s", ifp->if_xname, buf);
+	dprintf("[%s] %s", ifp->device_name, buf);
 	return 0;
 }
 
 
 void
-if_link_state_change(struct ifnet *ifp, int link_state)
+if_link_state_change(struct ifnet *ifp, int linkState)
 {
-	if (ifp->if_link_state == link_state)
+	if (ifp->if_link_state == linkState)
 		return;
 
-	ifp->if_link_state = link_state;
-
-	release_sem_etc(NETDEV(ifp->if_dev)->link_state_sem, 1,
-		B_DO_NOT_RESCHEDULE);
+	ifp->if_link_state = linkState;
+	release_sem_etc(ifp->link_state_sem, 1, B_DO_NOT_RESCHEDULE);
 }
 
 
@@ -281,10 +300,8 @@ ether_output(struct ifnet *ifp, struct mbuf *m, struct sockaddr *dst,
 static void
 ether_input(struct ifnet *ifp, struct mbuf *m)
 {
-	device_t dev = ifp->if_dev;
-
-	IF_ENQUEUE(&NETDEV(dev)->receive_queue, m);
-	release_sem_etc(NETDEV(dev)->receive_sem, 1, B_DO_NOT_RESCHEDULE);
+	IF_ENQUEUE(&ifp->receive_queue, m);
+	release_sem_etc(ifp->receive_sem, 1, B_DO_NOT_RESCHEDULE);
 }
 
 

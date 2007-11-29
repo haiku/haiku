@@ -186,8 +186,14 @@ struct ifnet {
 	struct	mtx if_addr_mtx;	/* mutex to protect address lists */
 
 	/* Haiku additions */
-	struct sockaddr_dl if_lladdr;
-	struct device *if_dev;
+	struct sockaddr_dl	if_lladdr;
+	char				device_name[128];
+	struct device		*root_device;
+	struct ifqueue		receive_queue;
+	sem_id				receive_sem;
+	sem_id				link_state_sem;
+	int32				open_count;
+	int32				flags;
 };
 
 typedef void if_init_f_t(void *);

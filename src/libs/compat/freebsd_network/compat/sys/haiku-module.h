@@ -41,19 +41,16 @@ typedef struct {
 	size_t softc_size;
 } driver_t;
 
-#define BUS_PROBE_LOW_PRIORITY	10
-#define BUS_PROBE_DEFAULT		20
-
 #define DRIVER_MODULE_NAME(name, busname) \
-	__fbsd_##name##busname
+	__fbsd_ ## name ## _ ## busname
 
-status_t _fbsd_init_hardware(driver_t *);
-status_t _fbsd_init_driver(driver_t *);
-void _fbsd_uninit_driver(driver_t *);
+status_t _fbsd_init_hardware(driver_t *driver);
+status_t _fbsd_init_driver(driver_t *driver);
+void _fbsd_uninit_driver(driver_t *driver);
 
-extern const char gDriverName[];
+extern const char *gDriverName;
 driver_t *__haiku_select_miibus_driver(device_t dev);
-driver_t *__haiku_probe_miibus(device_t dev, driver_t *drivers[], int count);
+driver_t *__haiku_probe_miibus(device_t dev, driver_t *drivers[]);
 
 /* we define the driver methods with HAIKU_FBSD_DRIVER_GLUE to
  * force the rest of the stuff to be linked back with the driver.
@@ -61,10 +58,10 @@ driver_t *__haiku_probe_miibus(device_t dev, driver_t *drivers[], int count);
  * the final binary, gcc 4.x rightfuly doesn't. */
 
 #define HAIKU_FBSD_DRIVER_GLUE(publicname, name, busname)				\
-	extern const char *gDevNameList[];									\
+	extern const char *gDeviceNameList[];								\
 	extern device_hooks gDeviceHooks;									\
 	extern driver_t *DRIVER_MODULE_NAME(name, busname);					\
-	const char gDriverName[] = #publicname;								\
+	const char *gDriverName = #publicname;								\
 	int32 api_version = B_CUR_DRIVER_API_VERSION;						\
 	status_t init_hardware()											\
 	{																	\
@@ -77,14 +74,14 @@ driver_t *__haiku_probe_miibus(device_t dev, driver_t *drivers[], int count);
 	void uninit_driver()												\
 		{ _fbsd_uninit_driver(DRIVER_MODULE_NAME(name, busname)); }		\
 	const char **publish_devices()										\
-		{ return gDevNameList; }										\
+		{ return gDeviceNameList; }										\
 	device_hooks *find_device(const char *name)							\
 		{ return &gDeviceHooks; }
 
-#define HAIKU_FBSD_RETURN_MII_DRIVER(drivers, count)			\
+#define HAIKU_FBSD_RETURN_MII_DRIVER(drivers)					\
 	driver_t *__haiku_select_miibus_driver(device_t dev)		\
 	{															\
-		return __haiku_probe_miibus(dev, drivers, count);		\
+		return __haiku_probe_miibus(dev, drivers);				\
 	}
 
 #define HAIKU_FBSD_MII_DRIVER(name)								\
@@ -92,13 +89,14 @@ driver_t *__haiku_probe_miibus(device_t dev, driver_t *drivers[], int count);
 	driver_t *__haiku_select_miibus_driver(device_t dev)		\
 	{															\
 		driver_t *drivers[] = {									\
-			DRIVER_MODULE_NAME(name, miibus)					\
+			DRIVER_MODULE_NAME(name, miibus),					\
+			NULL												\
 		};														\
-		return __haiku_probe_miibus(dev, drivers, 1);			\
+		return __haiku_probe_miibus(dev, drivers);				\
 	}
 
 #define NO_HAIKU_FBSD_MII_DRIVER()								\
-	HAIKU_FBSD_RETURN_MII_DRIVER(NULL, 0)
+	HAIKU_FBSD_RETURN_MII_DRIVER(NULL)
 
 extern spinlock __haiku_intr_spinlock;
 extern int __haiku_disable_interrupts(device_t dev);
