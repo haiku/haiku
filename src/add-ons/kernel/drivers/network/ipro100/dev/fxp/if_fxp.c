@@ -28,7 +28,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/dev/fxp/if_fxp.c,v 1.240.2.10.2.1 2006/11/20 16:21:12 rink Exp $");
+__FBSDID("$FreeBSD: src/sys/dev/fxp/if_fxp.c,v 1.266 2007/05/30 03:46:04 kevlo Exp $");
 
 /*
  * Intel EtherExpress Pro/100B PCI Fast Ethernet driver
@@ -62,7 +62,6 @@ __FBSDID("$FreeBSD: src/sys/dev/fxp/if_fxp.c,v 1.240.2.10.2.1 2006/11/20 16:21:1
 #include <net/ethernet.h>
 #include <net/if_arp.h>
 
-#include <machine/clock.h>	/* for DELAY */
 
 #include <net/if_types.h>
 #include <net/if_vlan_var.h>
@@ -179,6 +178,7 @@ static struct fxp_ident fxp_ident_table[] = {
     { 0x1065,	-1,	"Intel 82562ET/EZ/GT/GZ PRO/100 VE Ethernet" },
     { 0x1068,	-1,	"Intel 82801FBM (ICH6-M) Pro/100 VE Ethernet" },
     { 0x1069,	-1,	"Intel 82562EM/EX/GX Pro/100 Ethernet" },
+    { 0x1091,	-1,	"Intel 82562GX Pro/100 Ethernet" },
     { 0x1092,	-1,	"Intel Pro/100 VE Network Connection" },
     { 0x1093,	-1,	"Intel Pro/100 VM Network Connection" },
     { 0x1094,	-1,	"Intel Pro/100 946GZ (ICH7) Network Connection" },
@@ -229,7 +229,7 @@ static void		fxp_stop(struct fxp_softc *sc);
 static void 		fxp_release(struct fxp_softc *sc);
 static int		fxp_ioctl(struct ifnet *ifp, u_long command,
 			    caddr_t data);
-static void 		fxp_watchdog(struct ifnet *ifp);
+static void 		fxp_watchdog(struct fxp_softc *sc);
 static int		fxp_add_rfabuf(struct fxp_softc *sc,
     			    struct fxp_rx *rxp);
 static int		fxp_mc_addrs(struct fxp_softc *sc);
@@ -249,7 +249,7 @@ static void		fxp_ifmedia_sts(struct ifnet *ifp,
 static int		fxp_serial_ifmedia_upd(struct ifnet *ifp);
 static void		fxp_serial_ifmedia_sts(struct ifnet *ifp,
 			    struct ifmediareq *ifmr);
-static volatile int	fxp_miibus_readreg(device_t dev, int phy, int reg);
+static int		fxp_miibus_readreg(device_t dev, int phy, int reg);
 static void		fxp_miibus_writereg(device_t dev, int phy, int reg,
 			    int value);
 static void		fxp_load_ucode(struct fxp_softc *sc);
@@ -290,6 +290,18 @@ static devclass_t fxp_devclass;
 DRIVER_MODULE(fxp, pci, fxp_driver, fxp_devclass, 0, 0);
 DRIVER_MODULE(fxp, cardbus, fxp_driver, fxp_devclass, 0, 0);
 DRIVER_MODULE(miibus, fxp, miibus_driver, miibus_devclass, 0, 0);
+
+static struct resource_spec fxp_res_spec_mem[] = {
+	{ SYS_RES_MEMORY,	FXP_PCI_MMBA,	RF_ACTIVE },
+	{ SYS_RES_IRQ,		0,		RF_ACTIVE | RF_SHAREABLE },
+	{ -1, 0 }
+};
+
+static struct resource_spec fxp_res_spec_io[] = {
+	{ SYS_RES_IOPORT,	FXP_PCI_IOBA,	RF_ACTIVE },
+	{ SYS_RES_IRQ,		0,		RF_ACTIVE | RF_SHAREABLE },
+	{ -1, 0 }
+};
 
 /*
  * Wait for the previous command to be accepted (but not necessarily
@@ -390,7 +402,7 @@ fxp_attach(device_t dev)
 	uint32_t val;
 	uint16_t data, myea[ETHER_ADDR_LEN / 2];
 	u_char eaddr[ETHER_ADDR_LEN];
-	int i, rid, m1, m2, prefer_iomap;
+	int i, prefer_iomap;
 	int error;
 
 	error = 0;
@@ -420,48 +432,31 @@ fxp_attach(device_t dev)
 	 * We default to memory mapping. Then we accept an override from the
 	 * command line. Then we check to see which one is enabled.
 	 */
-	m1 = PCIM_CMD_MEMEN;
-	m2 = PCIM_CMD_PORTEN;
 	prefer_iomap = 0;
-	if (resource_int_value(device_get_name(dev), device_get_unit(dev),
-	    "prefer_iomap", &prefer_iomap) == 0 && prefer_iomap != 0) {
-		m1 = PCIM_CMD_PORTEN;
-		m2 = PCIM_CMD_MEMEN;
-	}
+	resource_int_value(device_get_name(dev), device_get_unit(dev),
+	    "prefer_iomap", &prefer_iomap);
+	if (prefer_iomap)
+		sc->fxp_spec = fxp_res_spec_io;
+	else
+		sc->fxp_spec = fxp_res_spec_mem;
 
-	sc->rtp = (m1 == PCIM_CMD_MEMEN)? SYS_RES_MEMORY : SYS_RES_IOPORT;
-	sc->rgd = (m1 == PCIM_CMD_MEMEN)? FXP_PCI_MMBA : FXP_PCI_IOBA;
-	sc->mem = bus_alloc_resource_any(dev, sc->rtp, &sc->rgd, RF_ACTIVE);
-	if (sc->mem == NULL) {
-		sc->rtp =
-		    (m2 == PCIM_CMD_MEMEN)? SYS_RES_MEMORY : SYS_RES_IOPORT;
-		sc->rgd = (m2 == PCIM_CMD_MEMEN)? FXP_PCI_MMBA : FXP_PCI_IOBA;
-		sc->mem = bus_alloc_resource_any(dev, sc->rtp, &sc->rgd,
-                                            RF_ACTIVE);
+	error = bus_alloc_resources(dev, sc->fxp_spec, sc->fxp_res);
+	if (error) {
+		if (sc->fxp_spec == fxp_res_spec_mem)
+			sc->fxp_spec = fxp_res_spec_io;
+		else
+			sc->fxp_spec = fxp_res_spec_mem;
+		error = bus_alloc_resources(dev, sc->fxp_spec, sc->fxp_res);
 	}
-
-	if (!sc->mem) {
+	if (error) {
+		device_printf(dev, "could not allocate resources\n");
 		error = ENXIO;
 		goto fail;
-        }
+	}
+
 	if (bootverbose) {
 		device_printf(dev, "using %s space register mapping\n",
-		   sc->rtp == SYS_RES_MEMORY? "memory" : "I/O");
-	}
-
-	sc->sc_st = rman_get_bustag(sc->mem);
-	sc->sc_sh = rman_get_bushandle(sc->mem);
-
-	/*
-	 * Allocate our interrupt.
-	 */
-	rid = 0;
-	sc->irq = bus_alloc_resource_any(dev, SYS_RES_IRQ, &rid,
-				 RF_SHAREABLE | RF_ACTIVE);
-	if (sc->irq == NULL) {
-		device_printf(dev, "could not map interrupt\n");
-		error = ENXIO;
-		goto fail;
+		   sc->fxp_spec == fxp_res_spec_mem ? "memory" : "I/O");
 	}
 
 	/*
@@ -618,19 +613,19 @@ fxp_attach(device_t dev)
 	sc->maxtxseg = FXP_NTXSEG;
 	if (sc->flags & FXP_FLAG_EXT_RFA)
 		sc->maxtxseg--;
-	error = bus_dma_tag_create(NULL, 2, 0, BUS_SPACE_MAXADDR_32BIT,
-	    BUS_SPACE_MAXADDR, NULL, NULL, MCLBYTES * sc->maxtxseg,
-	    sc->maxtxseg, MCLBYTES, 0, busdma_lock_mutex, &Giant,
-	    &sc->fxp_mtag);
+	error = bus_dma_tag_create(bus_get_dma_tag(dev), 2, 0,
+	    BUS_SPACE_MAXADDR_32BIT, BUS_SPACE_MAXADDR, NULL, NULL,
+	    MCLBYTES * sc->maxtxseg, sc->maxtxseg, MCLBYTES, 0,
+	    busdma_lock_mutex, &Giant, &sc->fxp_mtag);
 	if (error) {
 		device_printf(dev, "could not allocate dma tag\n");
 		goto fail;
 	}
 
-	error = bus_dma_tag_create(NULL, 4, 0, BUS_SPACE_MAXADDR_32BIT,
-	    BUS_SPACE_MAXADDR, NULL, NULL, sizeof(struct fxp_stats), 1,
-	    sizeof(struct fxp_stats), 0, busdma_lock_mutex, &Giant,
-	    &sc->fxp_stag);
+	error = bus_dma_tag_create(bus_get_dma_tag(dev), 4, 0,
+	    BUS_SPACE_MAXADDR_32BIT, BUS_SPACE_MAXADDR, NULL, NULL,
+	    sizeof(struct fxp_stats), 1, sizeof(struct fxp_stats), 0,
+	    busdma_lock_mutex, &Giant, &sc->fxp_stag);
 	if (error) {
 		device_printf(dev, "could not allocate dma tag\n");
 		goto fail;
@@ -647,9 +642,10 @@ fxp_attach(device_t dev)
 		goto fail;
 	}
 
-	error = bus_dma_tag_create(NULL, 4, 0, BUS_SPACE_MAXADDR_32BIT,
-	    BUS_SPACE_MAXADDR, NULL, NULL, FXP_TXCB_SZ, 1,
-	    FXP_TXCB_SZ, 0, busdma_lock_mutex, &Giant, &sc->cbl_tag);
+	error = bus_dma_tag_create(bus_get_dma_tag(dev), 4, 0,
+	    BUS_SPACE_MAXADDR_32BIT, BUS_SPACE_MAXADDR, NULL, NULL,
+	    FXP_TXCB_SZ, 1, FXP_TXCB_SZ, 0,
+	    busdma_lock_mutex, &Giant, &sc->cbl_tag);
 	if (error) {
 		device_printf(dev, "could not allocate dma tag\n");
 		goto fail;
@@ -668,10 +664,10 @@ fxp_attach(device_t dev)
 		goto fail;
 	}
 
-	error = bus_dma_tag_create(NULL, 4, 0, BUS_SPACE_MAXADDR_32BIT,
-	    BUS_SPACE_MAXADDR, NULL, NULL, sizeof(struct fxp_cb_mcs), 1,
-	    sizeof(struct fxp_cb_mcs), 0, busdma_lock_mutex, &Giant,
-	    &sc->mcs_tag);
+	error = bus_dma_tag_create(bus_get_dma_tag(dev), 4, 0,
+	    BUS_SPACE_MAXADDR_32BIT, BUS_SPACE_MAXADDR, NULL, NULL,
+	    sizeof(struct fxp_cb_mcs), 1, sizeof(struct fxp_cb_mcs), 0,
+	    busdma_lock_mutex, &Giant, &sc->mcs_tag);
 	if (error) {
 		device_printf(dev, "could not allocate dma tag\n");
 		goto fail;
@@ -772,7 +768,6 @@ fxp_attach(device_t dev)
 	ifp->if_flags = IFF_BROADCAST | IFF_SIMPLEX | IFF_MULTICAST;
 	ifp->if_ioctl = fxp_ioctl;
 	ifp->if_start = fxp_start;
-	ifp->if_watchdog = fxp_watchdog;
 
 	ifp->if_capabilities = ifp->if_capenable = 0;
 
@@ -813,8 +808,8 @@ fxp_attach(device_t dev)
 	/* 
 	 * Hook our interrupt after all initialization is complete.
 	 */
-	error = bus_setup_intr(dev, sc->irq, INTR_TYPE_NET | INTR_MPSAFE,
-			       fxp_intr, sc, &sc->ih);
+	error = bus_setup_intr(dev, sc->fxp_res[1], INTR_TYPE_NET | INTR_MPSAFE,
+			       NULL, fxp_intr, sc, &sc->ih);
 	if (error) {
 		device_printf(dev, "could not setup irq\n");
 		ether_ifdetach(sc->ifp);
@@ -858,10 +853,7 @@ fxp_release(struct fxp_softc *sc)
 		bus_dmamap_unload(sc->mcs_tag, sc->mcs_map);
 		bus_dmamem_free(sc->mcs_tag, sc->mcsp, sc->mcs_map);
 	}
-	if (sc->irq)
-		bus_release_resource(sc->dev, SYS_RES_IRQ, 0, sc->irq);
-	if (sc->mem)
-		bus_release_resource(sc->dev, sc->rtp, sc->rgd, sc->mem);
+	bus_release_resources(sc->dev, sc->fxp_spec, sc->fxp_res);
 	if (sc->fxp_mtag) {
 		for (i = 0; i < FXP_NRFABUFS; i++) {
 			rxp = &sc->fxp_desc.rx_list[i];
@@ -930,7 +922,7 @@ fxp_detach(device_t dev)
 	 * Unhook interrupt before dropping lock. This is to prevent
 	 * races with fxp_intr().
 	 */
-	bus_teardown_intr(sc->dev, sc->irq, sc->ih);
+	bus_teardown_intr(sc->dev, sc->fxp_res[1], sc->ih);
 	sc->ih = NULL;
 
 	/* Release our allocated resources. */
@@ -1417,7 +1409,7 @@ fxp_encap(struct fxp_softc *sc, struct mbuf *m_head)
 		 * Set a 5 second timer just in case we don't hear
 		 * from the card again.
 		 */
-		ifp->if_timer = 5;
+		sc->watchdog_timer = 5;
 	}
 	txp->tx_cb->tx_threshold = tx_threshold;
 
@@ -1598,7 +1590,7 @@ fxp_intr_body(struct fxp_softc *sc, struct ifnet *ifp, uint8_t statack,
 	if (statack & (FXP_SCB_STATACK_CXTNO | FXP_SCB_STATACK_CNA)) {
 		fxp_txeof(sc);
 
-		ifp->if_timer = 0;
+		sc->watchdog_timer = 0;
 		if (sc->tx_queued == 0) {
 			if (sc->need_mcsetup)
 				fxp_mc_setup(sc);
@@ -1826,6 +1818,11 @@ fxp_tick(void *xsc)
 		mii_tick(device_get_softc(sc->miibus));
 
 	/*
+	 * Check that chip hasn't hung.
+	 */
+	fxp_watchdog(sc);
+
+	/*
 	 * Schedule another timeout one second from now.
 	 */
 	callout_reset(&sc->stat_ch, hz, fxp_tick, sc);
@@ -1843,7 +1840,7 @@ fxp_stop(struct fxp_softc *sc)
 	int i;
 
 	ifp->if_drv_flags &= ~(IFF_DRV_RUNNING | IFF_DRV_OACTIVE);
-	ifp->if_timer = 0;
+	sc->watchdog_timer = 0;
 
 	/*
 	 * Cancel stats updater.
@@ -1885,16 +1882,18 @@ fxp_stop(struct fxp_softc *sc)
  * card has wedged for some reason.
  */
 static void
-fxp_watchdog(struct ifnet *ifp)
+fxp_watchdog(struct fxp_softc *sc)
 {
-	struct fxp_softc *sc = ifp->if_softc;
 
-	FXP_LOCK(sc);
+	FXP_LOCK_ASSERT(sc, MA_OWNED);
+
+	if (sc->watchdog_timer == 0 || --sc->watchdog_timer)
+		return;
+
 	device_printf(sc->dev, "device timeout\n");
-	ifp->if_oerrors++;
+	sc->ifp->if_oerrors++;
 
 	fxp_init_body(sc);
-	FXP_UNLOCK(sc);
 }
 
 /*
@@ -2099,8 +2098,7 @@ fxp_init_body(struct fxp_softc *sc)
 	cb_ias->cb_status = 0;
 	cb_ias->cb_command = htole16(FXP_CB_COMMAND_IAS | FXP_CB_COMMAND_EL);
 	cb_ias->link_addr = 0xffffffff;
-	bcopy(IFP2ENADDR(sc->ifp), cb_ias->macaddr,
-	    sizeof(IFP2ENADDR(sc->ifp)));
+	bcopy(IF_LLADDR(sc->ifp), cb_ias->macaddr, ETHER_ADDR_LEN);
 
 	/*
 	 * Start the IAS (Individual Address Setup) command/DMA.
@@ -2205,6 +2203,11 @@ fxp_ifmedia_upd(struct ifnet *ifp)
 
 	mii = device_get_softc(sc->miibus);
 	FXP_LOCK(sc);
+	if (mii->mii_instance) {                                                
+		struct mii_softc	*miisc;                                 
+		LIST_FOREACH(miisc, &mii->mii_phys, mii_list)                   
+			mii_phy_reset(miisc);                                   
+	}                                      
 	mii_mediachg(mii);
 	FXP_UNLOCK(sc);
 	return (0);
@@ -2225,7 +2228,8 @@ fxp_ifmedia_sts(struct ifnet *ifp, struct ifmediareq *ifmr)
 	ifmr->ifm_active = mii->mii_media_active;
 	ifmr->ifm_status = mii->mii_media_status;
 
-	if (ifmr->ifm_status & IFM_10_T && sc->flags & FXP_FLAG_CU_RESUME_BUG)
+	if (IFM_SUBTYPE(ifmr->ifm_active) == IFM_10_T &&
+	    sc->flags & FXP_FLAG_CU_RESUME_BUG)
 		sc->cu_resume_bug = 1;
 	else
 		sc->cu_resume_bug = 0;
@@ -2319,7 +2323,7 @@ fxp_add_rfabuf(struct fxp_softc *sc, struct fxp_rx *rxp)
 	return (0);
 }
 
-static volatile int
+static int
 fxp_miibus_readreg(device_t dev, int phy, int reg)
 {
 	struct fxp_softc *sc = device_get_softc(dev);
@@ -2515,7 +2519,6 @@ static void
 fxp_mc_setup(struct fxp_softc *sc)
 {
 	struct fxp_cb_mcs *mcsp = sc->mcsp;
-	struct ifnet *ifp = sc->ifp;
 	struct fxp_tx *txp;
 	int count;
 
@@ -2562,7 +2565,7 @@ fxp_mc_setup(struct fxp_softc *sc)
 		 * Set a 5 second timer just in case we don't hear from the
 		 * card again.
 		 */
-		ifp->if_timer = 5;
+		sc->watchdog_timer = 5;
 
 		return;
 	}
@@ -2604,7 +2607,7 @@ fxp_mc_setup(struct fxp_softc *sc)
 	CSR_WRITE_4(sc, FXP_CSR_SCB_GENERAL, sc->mcs_addr);
 	fxp_scb_cmd(sc, FXP_SCB_COMMAND_CU_START);
 
-	ifp->if_timer = 2;
+	sc->watchdog_timer = 2;
 	return;
 }
 
