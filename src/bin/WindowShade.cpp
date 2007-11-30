@@ -24,6 +24,41 @@ static struct option const kLongOptions[] = {
 	{"inactiveborder", required_argument, &sColorWhich, -1}, //XXX:??
 	{"activetitle", required_argument, &sColorWhich, B_WINDOW_TEXT_COLOR},
 	{"inactivetitle", required_argument, &sColorWhich, B_WINDOW_INACTIVE_TEXT_COLOR},
+	//temporary stuff
+	// grep '      B_.*_COLOR' headers/os/interface/InterfaceDefs.h | awk '{ print "I(" substr(tolower($1),3) ", " $1 ")," }'
+#define I(l,v) \
+	{ #l, required_argument, &sColorWhich, v }, \
+	{ #v, required_argument, &sColorWhich, v }
+
+I(panel_background_color, B_PANEL_BACKGROUND_COLOR),
+I(panel_text_color, B_PANEL_TEXT_COLOR),
+I(document_background_color, B_DOCUMENT_BACKGROUND_COLOR),
+I(document_text_color, B_DOCUMENT_TEXT_COLOR),
+I(control_background_color, B_CONTROL_BACKGROUND_COLOR),
+I(control_text_color, B_CONTROL_TEXT_COLOR),
+I(control_border_color, B_CONTROL_BORDER_COLOR),
+I(control_highlight_color, B_CONTROL_HIGHLIGHT_COLOR),
+I(navigation_base_color, B_NAVIGATION_BASE_COLOR),
+I(navigation_pulse_color, B_NAVIGATION_PULSE_COLOR),
+I(shine_color, B_SHINE_COLOR),
+I(shadow_color, B_SHADOW_COLOR),
+I(menu_background_color, B_MENU_BACKGROUND_COLOR),
+I(menu_selected_background_color, B_MENU_SELECTED_BACKGROUND_COLOR),
+I(menu_item_text_color, B_MENU_ITEM_TEXT_COLOR),
+I(menu_selected_item_text_color, B_MENU_SELECTED_ITEM_TEXT_COLOR),
+I(menu_selected_border_color, B_MENU_SELECTED_BORDER_COLOR),
+I(tooltip_background_color, B_TOOLTIP_BACKGROUND_COLOR),
+I(tooltip_text_color, B_TOOLTIP_TEXT_COLOR),
+I(success_color, B_SUCCESS_COLOR),
+I(failure_color, B_FAILURE_COLOR),
+I(keyboard_navigation_color, B_KEYBOARD_NAVIGATION_COLOR),
+I(menu_selection_background_color, B_MENU_SELECTION_BACKGROUND_COLOR),
+I(desktop_color, B_DESKTOP_COLOR),
+I(window_tab_color, B_WINDOW_TAB_COLOR),
+I(window_text_color, B_WINDOW_TEXT_COLOR),
+I(window_inactive_tab_color, B_WINDOW_INACTIVE_TAB_COLOR),
+I(window_inactive_text_color, B_WINDOW_INACTIVE_TEXT_COLOR),
+
 	{"sum", required_argument, 0, 's'},
 	{"refresh", no_argument, 0, 'r'},
 	{"help", no_argument, 0, 'h'},
