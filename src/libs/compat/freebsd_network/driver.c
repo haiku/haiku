@@ -42,6 +42,11 @@ int32 gDeviceCount;
 static status_t
 init_root_device(driver_t *driver, device_t *_root, device_t *_child)
 {
+	static driver_t sRootDriver = {
+		"pci",
+		NULL,
+		sizeof(struct root_device_softc)
+	};
 	device_t child;
 
 	device_t root = device_add_child(NULL, NULL, 0);
@@ -53,6 +58,8 @@ init_root_device(driver_t *driver, device_t *_root, device_t *_child)
 		device_delete_child(NULL, root);
 		return B_NO_MEMORY;
 	}
+
+	root->driver = &sRootDriver;
 
 	child = device_add_child(root, driver->name, 0);
 	if (child == NULL) {
