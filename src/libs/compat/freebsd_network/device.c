@@ -36,11 +36,16 @@ compat_open(const char *name, uint32 flags, void **cookie)
 	if (gDeviceNameList[i] == NULL)
 		return B_ERROR;
 
+	if (get_module(NET_STACK_MODULE_NAME, (module_info **)&gStack) != B_OK)
+		return B_ERROR;
+
 	ifp = gDevices[i];
 	if_printf(ifp, "compat_open(0x%lx)\n", flags);
 
-	if (!atomic_test_and_set(&ifp->open_count, 1, 0))
+	if (atomic_or(&ifp->open_count, 1)) {
+		put_module(NET_STACK_MODULE_NAME);
 		return B_BUSY;
+	}
 
 	ifp->if_flags &= ~IFF_UP;
 	ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
@@ -83,6 +88,7 @@ compat_free(void *cookie)
 	/* TODO: empty out the send queue */
 
 	atomic_and(&ifp->open_count, 0);
+	put_module(NET_STACK_MODULE_NAME);
 	return B_OK;
 }
 

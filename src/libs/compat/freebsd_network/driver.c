@@ -60,6 +60,7 @@ init_root_device(driver_t *driver, device_t *_root, device_t *_child)
 	}
 
 	root->driver = &sRootDriver;
+	root->root = root;
 
 	child = device_add_child(root, driver->name, 0);
 	if (child == NULL) {
@@ -138,8 +139,8 @@ _fbsd_init_hardware(driver_t *driver)
 status_t
 _fbsd_init_driver(driver_t *driver)
 {
-	int i, found = 0;
 	status_t status;
+	int i = 0;
 
 	dprintf("%s: init_driver(%p)\n", gDriverName, driver);
 
@@ -163,8 +164,6 @@ _fbsd_init_driver(driver_t *driver)
 			goto err3;
 	}
 
-	i = 0;
-
 	while (gDeviceCount < MAX_DEVICES) {
 		device_t root, device;
 		bool found = false;
@@ -180,10 +179,11 @@ _fbsd_init_driver(driver_t *driver)
 			if (device->methods.probe(device) < 0)
 				continue;
 
-			if (device_attach(device) == 0) {
+			if (device_attach(device) == 0)
 				found = true;
-				break;
-			}
+
+			i++;
+			break;
 		}
 
 		if (!found) {
@@ -192,10 +192,10 @@ _fbsd_init_driver(driver_t *driver)
 		}
 	}
 
-	if (gDeviceCount > 0) {
-		TRACE(("%s, ... %d cards.\n", gDriverName, found));
+	if (gDeviceCount > 0)
 		return B_OK;
-	} else if (status == B_OK)
+
+	if (status == B_OK)
 		status = B_ERROR;
 
 	if (HAIKU_DRIVER_REQUIRES(FBSD_TASKQUEUES))
@@ -217,7 +217,7 @@ _fbsd_uninit_driver(driver_t *driver)
 
 	TRACE(("%s: uninit_driver(%p)\n", gDriverName, driver));
 
-	for (i = 0; gDeviceNameList[i] != NULL; i++) {
+	for (i = 0; i < gDeviceCount; i++) {
 		device_delete_child(NULL, gDevices[i]->root_device);
 	}
 

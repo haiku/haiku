@@ -279,7 +279,7 @@ device_add_child(device_t parent, const char *name, int unit)
 			driver_t **driver;
 			char symbol[128];
 
-			snprintf(symbol, sizeof(symbol), "__fbsd_%s%s", name,
+			snprintf(symbol, sizeof(symbol), "__fbsd_%s_%s", name,
 				parent->driver->name);
 			if (get_image_symbol(find_own_image(), symbol, B_SYMBOL_TYPE_DATA,
 					(void **)&driver) == B_OK)
@@ -479,11 +479,11 @@ int resource_int_value(const char *name, int unit, const char *resname,
 void *
 _kernel_malloc(size_t size, int flags)
 {
-	// our kernel malloc() is insufficent, must handle M_WAIT
+	// our kernel malloc() is insufficient, must handle M_WAIT
 
 	void *ptr = malloc(size);
 	if (ptr == NULL)
-		return ptr;
+		return NULL;
 
 	if (flags & M_ZERO)
 		memset(ptr, 0, size);
@@ -518,8 +518,8 @@ _kernel_contigmalloc(const char *file, int line, size_t size, int flags,
 	if (flags & M_ZERO)
 		memset(addr, 0, size);
 
-	driver_printf("(%s) addr = %p, area = %ld, size = %lu\n",
-		name, addr, area, size);
+	//driver_printf("(%s) addr = %p, area = %ld, size = %lu\n",
+	//	name, addr, area, size);
 
 	return addr;
 }

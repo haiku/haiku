@@ -48,6 +48,7 @@ if_alloc(u_char type)
 	}
 
 	ifp->link_state_sem = -1;
+	ifp->open_count = 0;
 	ifp->flags = 0;
 	ifq_init(&ifp->receive_queue, semName);
 

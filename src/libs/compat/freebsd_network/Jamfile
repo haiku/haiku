@@ -24,6 +24,5 @@ KernelStaticLibrary libfreebsd_network.a :
 	mbuf.c
 	mii.c
 	mutex.c
-	pci.c
 	taskqueue.c
 	;
