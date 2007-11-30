@@ -1,9 +1,8 @@
 /*
- * Copyright 2007 Haiku.
- * Distributed under the terms of the MIT License.
+ * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
  *
- * Authors:
- *		Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
+ * All rights reserved. Distributed under the terms of the MIT License.
+ *
  */
 
 #ifndef _BLUETOOTH_H
