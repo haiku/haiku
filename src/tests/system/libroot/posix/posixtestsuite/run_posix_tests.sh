@@ -55,10 +55,8 @@ threads_tests()
 	echo ""
 	echo "pthread_key_create()"
 	conformance/interfaces/pthread_key_create/pthread_key_create_1-1
-#	conformance/interfaces/pthread_key_create/pthread_key_create_1-2
-	echo "pthread_key_create_1-2: FIXME: test fails, see bug #1644"
-#	conformance/interfaces/pthread_key_create/pthread_key_create_2-1
-	echo "pthread_key_create_2-1: FIXME: test invokes the debugger, see bug #1646"
+	conformance/interfaces/pthread_key_create/pthread_key_create_1-2
+	conformance/interfaces/pthread_key_create/pthread_key_create_2-1
 	conformance/interfaces/pthread_key_create/pthread_key_create_3-1
 	echo ""
 	echo "pthread_key_delete()"
