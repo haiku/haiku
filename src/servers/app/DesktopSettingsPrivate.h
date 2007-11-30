@@ -52,6 +52,8 @@ class DesktopSettingsPrivate {
 		void			SetWorkspacesMessage(int32 index, BMessage& message);
 		const BMessage*	WorkspacesMessage(int32 index) const;
 
+		void			SetUIColor(color_which which, const rgb_color color);
+		rgb_color		UIColor(color_which which) const;
 	private:
 		void			_SetDefaults();
 		status_t		_Load();

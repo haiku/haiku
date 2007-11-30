@@ -478,6 +478,29 @@ DesktopSettingsPrivate::WorkspacesMessage(int32 index) const
 }
 
 
+void
+DesktopSettingsPrivate::SetUIColor(color_which which, const rgb_color color)
+{
+	//
+	int32 index = color_which_to_index(which);
+	if (index < 0 || index >= kNumColors)
+		return;
+	fShared.colors[index] = color;
+	Save(kAppearanceSettings);
+}
+
+
+rgb_color
+DesktopSettingsPrivate::UIColor(color_which which) const
+{
+	static const rgb_color invalidColor = {0, 0, 0, 0};
+	int32 index = color_which_to_index(which);
+	if (index < 0 || index >= kNumColors)
+		return invalidColor;
+	return fShared.colors[index];
+}
+
+
 //	#pragma mark - read access
 
 
@@ -563,6 +586,13 @@ DesktopSettings::WorkspacesMessage(int32 index) const
 }
 
 
+rgb_color
+DesktopSettings::UIColor(color_which which) const
+{
+	return fSettings->UIColor(which);
+}
+
+
 //	#pragma mark - write access
 
 
@@ -632,4 +662,12 @@ LockedDesktopSettings::SetShowAllDraggers(bool show)
 {
 	fSettings->SetShowAllDraggers(show);
 }
+
+
+void
+LockedDesktopSettings::SetUIColor(color_which which, const rgb_color color)
+{
+	fSettings->SetUIColor(which, color);
+}
+
 

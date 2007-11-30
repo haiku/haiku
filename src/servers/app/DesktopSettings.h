@@ -50,6 +50,8 @@ class DesktopSettings {
 		int32			WorkspacesCount() const;
 		const BMessage*	WorkspacesMessage(int32 index) const;
 
+		rgb_color		UIColor(color_which which) const;
+
 	protected:
 		DesktopSettingsPrivate*	fSettings;
 };
@@ -69,6 +71,8 @@ class LockedDesktopSettings : public DesktopSettings {
 		void			SetMouseMode(mode_mouse mode);
 
 		void			SetShowAllDraggers(bool show);
+
+		void			SetUIColor(color_which which, const rgb_color color);
 
 	private:
 		Desktop*		fDesktop;

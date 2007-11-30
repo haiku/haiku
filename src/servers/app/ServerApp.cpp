@@ -2274,6 +2274,26 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
+		case AS_SET_UI_COLOR:
+		{
+			STRACE(("ServerApp %s: Set UI Color\n", Signature()));
+			// Attached Data:
+			// 1) color_which which
+			// 2) rgb_color color
+			color_which which;
+			rgb_color color;
+
+			link.Read<color_which>(&which);
+			if (link.Read<rgb_color>(&color) == B_OK) {
+				LockedDesktopSettings settings(fDesktop);
+				settings.SetUIColor(which, color);
+			}
+
+			fLink.StartMessage(B_OK);
+			fLink.Flush();
+			break;
+		}
+
 		case AS_GET_ACCELERANT_INFO:
 		{
 			STRACE(("ServerApp %s: get accelerant info\n", Signature()));
