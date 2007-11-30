@@ -144,6 +144,7 @@ device_t device_add_child(device_t dev, const char *name, int unit);
 int device_delete_child(device_t dev, device_t child);
 int device_is_attached(device_t dev);
 int device_attach(device_t dev);
+int device_detach(device_t dev);
 int bus_generic_print_child(device_t dev, device_t child);
 void bus_generic_driver_added(device_t dev, driver_t *driver);
 int bus_generic_attach(device_t dev);

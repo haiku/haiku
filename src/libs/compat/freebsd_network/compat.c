@@ -329,8 +329,10 @@ device_delete_child(device_t parent, device_t child)
 	if ((atomic_and(&parent->flags, ~DEVICE_ATTACHED) & DEVICE_ATTACHED) != 0
 		&& parent->methods.detach != NULL) {
 		int status = parent->methods.detach(parent);
-		if (status != 0)
+		if (status != 0) {
+			atomic_or(&parent->flags, DEVICE_ATTACHED);
 			return status;
+		}
 	}
 
 	if (parent->flags & DEVICE_DESC_ALLOCED)
@@ -366,6 +368,24 @@ device_attach(device_t device)
 
 
 int
+device_detach(device_t device)
+{
+	if (device->driver == NULL)
+		return B_ERROR;
+
+	if ((atomic_and(&device->flags, ~DEVICE_ATTACHED) & DEVICE_ATTACHED) != 0) {
+		int result = device->methods.detach(device);
+		if (result != 0) {
+			atomic_or(&device->flags, DEVICE_ATTACHED);
+			return result;
+		}
+	}
+
+	return 0;
+}
+
+
+int
 bus_generic_attach(device_t dev)
 {
 	device_t child = NULL;
@@ -388,6 +408,26 @@ bus_generic_attach(device_t dev)
 			if (result != 0)
 				return result;
 		}
+	}
+
+	return 0;
+}
+
+
+int
+bus_generic_detach(device_t device)
+{
+	device_t child = NULL;
+
+	if ((device->flags & DEVICE_ATTACHED) == 0)
+		return B_ERROR;
+
+	while (true) {
+		child = list_get_next_item(&device->children, child);
+		if (child == NULL)
+			break;
+
+		device_detach(child);
 	}
 
 	return 0;

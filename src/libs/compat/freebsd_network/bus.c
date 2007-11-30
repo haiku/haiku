@@ -379,14 +379,6 @@ bus_get_dma_tag(device_t dev)
 
 
 int
-bus_generic_detach(device_t dev)
-{
-	UNIMPLEMENTED();
-	return B_ERROR;
-}
-
-
-int
 bus_generic_suspend(device_t dev)
 {
 	UNIMPLEMENTED();
