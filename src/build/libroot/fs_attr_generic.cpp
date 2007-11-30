@@ -1,13 +1,6 @@
 
-#ifdef BUILDING_FS_SHELL
-#	include "compat.h"
-#	define B_OK			0
-#	define B_BAD_VALUE	EINVAL
-#	define B_FILE_ERROR	EBADF
-#else
-#	include <BeOSBuildCompatibility.h>
-#	include <syscalls.h>
-#endif
+#include <BeOSBuildCompatibility.h>
+#include <syscalls.h>
 
 #include <dirent.h>
 #include <errno.h>
@@ -29,6 +22,7 @@ using namespace std;
 using namespace BPrivate;
 
 static const char *sAttributeDirBasePath = HAIKU_BUILD_ATTRIBUTES_DIR;
+
 
 // init_attribute_dir_base_dir
 static status_t
@@ -195,22 +189,6 @@ get_attribute_path(NodeRef ref, const char *path, int fd,
 	return B_OK;
 }
 
-// get_attribute_path
-static status_t
-get_attribute_path(int fd, const char *attribute, string &attrPath,
-	string &typePath)
-{
-	// stat the file to get a NodeRef
-	struct stat st;
-	if (fstat(fd, &st) < 0)
-		return errno;
-	NodeRef ref(st);
-
-	return get_attribute_path(ref, NULL, fd, attribute, attrPath, typePath);
-}
-
-
-#ifndef BUILDING_FS_SHELL
 
 // get_attribute_path_virtual_fd
 static status_t
@@ -234,7 +212,30 @@ get_attribute_path_virtual_fd(int fd, const char *attribute, string &attrPath,
 		(pathValid ? -1 : fd), attribute, attrPath, typePath);
 }
 
-#endif	// ! BUILDING_FS_SHELL
+
+// get_attribute_path
+static status_t
+get_attribute_path(int fd, const char *attribute, string &attrPath,
+	string &typePath)
+{
+	if (get_descriptor(fd)) {
+		// This is a virtual file descriptor -- we have a special function
+		// for handling it.
+		return  get_attribute_path_virtual_fd(fd, attribute, attrPath,
+			typePath);
+	} else {
+		// This is a real (i.e. system) file descriptor -- fstat() it and
+		// build the path.
+
+		// stat the file to get a NodeRef
+		struct stat st;
+		if (fstat(fd, &st) < 0)
+			return errno;
+		NodeRef ref(st);
+
+		return get_attribute_path(ref, NULL, fd, attribute, attrPath, typePath);
+	}
+}
 
 
 // # pragma mark - Public API
@@ -257,15 +258,6 @@ fs_fopen_attr_dir(int fd)
 {
 	struct stat st;
 
-#ifdef BUILDING_FS_SHELL
-
-	if (fstat(fd, &st) < 0)
-		return NULL;
-
-	return open_attr_dir(NodeRef(st), NULL, fd);
-
-#else
-
 	status_t error = _kern_read_stat(fd, NULL, false, &st,
 		sizeof(struct stat));
 	if (error != B_OK) {
@@ -281,8 +273,6 @@ fs_fopen_attr_dir(int fd)
 	// get the attribute path
 	return open_attr_dir(NodeRef(st), (pathValid ? path.c_str() : NULL),
 		(pathValid ? -1 : fd));
-
-#endif
 }
 
 // fs_close_attr_dir
@@ -513,8 +503,6 @@ fs_stat_attr(int fd, const char *attribute, struct attr_info *attrInfo)
 // #pragma mark - Private Syscalls
 
 
-#ifndef BUILDING_FS_SHELL
-
 // _kern_open_attr_dir
 int
 _kern_open_attr_dir(int fd, const char *path)
@@ -610,5 +598,3 @@ _kern_remove_attr(int fd, const char *name)
 
 	return B_OK;
 }
-
-#endif	// ! BUILDING_FS_SHELL
