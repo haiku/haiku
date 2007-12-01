@@ -9,8 +9,6 @@
 
 #ifdef __HAIKU__
 #	include <syscalls.h>
-#else
-extern "C" void _kclose_(int fd);
 #endif
 
 
@@ -22,10 +20,9 @@ main(int argc, char **argv)
 
 	for (int32 i = 0; i < loops; i++) {
 #ifdef __HAIKU__
-//		_kern_null();
-		_kern_close(-1);
+		_kern_is_computer_on();
 #else
-		_kclose_(-1);
+		is_computer_on();
 #endif
 	}
 
