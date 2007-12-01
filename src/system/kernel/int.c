@@ -76,19 +76,28 @@ dump_int_statistics(int argc, char **argv)
 {
 	int i;
 	for (i = 0; i < NUM_IO_VECTORS; i++) {
+		struct io_handler *io;
+
 		if (io_vectors[i].vector_lock == 0
 			&& io_vectors[i].enable_count == 0
 			&& io_vectors[i].handled_count == 0
 			&& io_vectors[i].unhandled_count == 0
 			&& io_vectors[i].handler_list.next == &io_vectors[i].handler_list)
 			continue;
+
 		kprintf("int %3d, enabled %ld, handled %8lld, unhandled %8lld%s%s\n",
-			i, 
-			io_vectors[i].enable_count, 
-			io_vectors[i].handled_count, 
+			i, io_vectors[i].enable_count, io_vectors[i].handled_count, 
 			io_vectors[i].unhandled_count,
-			(io_vectors[i].vector_lock != 0) ? ", ACTIVE" : "",
-			(io_vectors[i].handler_list.next == &io_vectors[i].handler_list) ? ", no handler" : "");
+			io_vectors[i].vector_lock != 0 ? ", ACTIVE" : "",
+			io_vectors[i].handler_list.next == &io_vectors[i].handler_list
+				? ", no handler" : "");
+
+		for (io = io_vectors[i].handler_list.next;
+				io != &io_vectors[i].handler_list; io = io->next) {
+			kprintf("\t%p", io->func);
+		}
+		if (io_vectors[i].handler_list.next != &io_vectors[i].handler_list)
+			kprintf("\n");
 	}
 	return 0;
 }
