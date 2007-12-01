@@ -515,6 +515,50 @@ pci_get_revid(device_t dev)
 }
 
 
+uint32_t
+pci_get_domain(device_t dev)
+{
+	return 0;
+}
+
+
+uint8_t
+pci_get_bus(device_t dev)
+{
+	pci_info *info
+		= &((struct root_device_softc *)dev->root->softc)->pci_info;
+	return info->bus;
+}
+
+
+uint8_t
+pci_get_slot(device_t dev)
+{
+	pci_info *info
+		= &((struct root_device_softc *)dev->root->softc)->pci_info;
+	return info->device;
+}
+
+
+uint8_t
+pci_get_function(device_t dev)
+{
+	pci_info *info
+		= &((struct root_device_softc *)dev->root->softc)->pci_info;
+	return info->function;
+}
+
+
+device_t
+pci_find_dbsf(uint32_t domain, uint8_t bus, uint8_t slot, uint8_t func)
+{
+	// We don't support that yet - if we want to support the multi port
+	// feature of the Broadcom BCM 570x driver, we would have to change
+	// that.
+	return NULL;
+}
+
+
 static void
 pci_set_command_bit(device_t dev, uint16_t bit)
 {

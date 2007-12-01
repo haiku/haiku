@@ -1,7 +1,17 @@
+/*
+ * Copyright 2007, Hugo Santos. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _FBSD_COMPAT_SYS_PARAM_H_
 #define _FBSD_COMPAT_SYS_PARAM_H_
 
+
 #include <posix/sys/param.h>
+
+
+/* The version this compatibility layer is based on */
+#define __FreeBSD_version 700053
+
 
 #define MAXBSIZE	0x10000
 
@@ -28,11 +38,15 @@
 #define MCLSHIFT 11
 #endif
 
-#define MCLBYTES	(1 << MCLSHIFT)
+#define MCLBYTES		(1 << MCLSHIFT)
+
+#define	MJUMPAGESIZE	PAGE_SIZE
+#define	MJUM9BYTES		(9 * 1024)
+#define	MJUM16BYTES		(16 * 1024)
 
 #define ALIGN_BYTES		(sizeof(int) - 1)
 #define ALIGN(x)		((((unsigned)x) + ALIGN_BYTES) & ~ALIGN_BYTES)
 
 #define roundup2(x, y)	(((x) + ((y) - 1)) & (~((y) - 1)))
 
-#endif
+#endif	/* _FBSD_COMPAT_SYS_PARAM_H_ */
