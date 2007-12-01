@@ -314,27 +314,40 @@ device_add_child(device_t parent, const char *name, int unit)
 int
 device_delete_child(device_t parent, device_t child)
 {
+	int status;
+
 	if (child == NULL)
 		return 0;
 
 	if (parent != NULL)
 		list_remove_item(&parent->children, child);
 
+	// We differentiate from the FreeBSD logic here - it will first delete
+	// the children, and will then detach the device.
+	// This has the problem that you cannot safely call device_delete_child()
+	// as you don't know if one of the children deletes its own children this
+	// way when it is detached.
+	// Therefore, we'll detach first, and then delete whatever is left.
+
 	parent = child;
+	child = NULL;
 
-	while ((child = list_remove_head_item(&parent->children)) != NULL) {
-		device_delete_child(NULL, child);
+	// detach children
+	while ((child = list_get_next_item(&parent->children, child)) != NULL) {
+		device_detach(child);
 	}
 
-	if ((atomic_and(&parent->flags, ~DEVICE_ATTACHED) & DEVICE_ATTACHED) != 0
-		&& parent->methods.detach != NULL) {
-		int status = parent->methods.detach(parent);
-		if (status != 0) {
-			atomic_or(&parent->flags, DEVICE_ATTACHED);
-			return status;
-		}
+	// detach device
+	status = device_detach(parent);
+	if (status != 0)
+		return status;
+
+	// delete children
+	while ((child = list_get_first_item(&parent->children)) != NULL) {
+		device_delete_child(parent, child);
 	}
 
+	// delete device
 	if (parent->flags & DEVICE_DESC_ALLOCED)
 		free((char *)parent->description);
 
@@ -356,7 +369,8 @@ device_attach(device_t device)
 {
 	int result;
 
-	if (device->driver == NULL)
+	if (device->driver == NULL
+		|| device->methods.attach == NULL)
 		return B_ERROR;
 
 	result = device->methods.attach(device);
@@ -373,7 +387,8 @@ device_detach(device_t device)
 	if (device->driver == NULL)
 		return B_ERROR;
 
-	if ((atomic_and(&device->flags, ~DEVICE_ATTACHED) & DEVICE_ATTACHED) != 0) {
+	if ((atomic_and(&device->flags, ~DEVICE_ATTACHED) & DEVICE_ATTACHED) != 0
+		&& device->methods.detach != NULL) {
 		int result = device->methods.detach(device);
 		if (result != 0) {
 			atomic_or(&device->flags, DEVICE_ATTACHED);
