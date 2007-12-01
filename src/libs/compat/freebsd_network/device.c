@@ -47,6 +47,8 @@ compat_open(const char *name, uint32 flags, void **cookie)
 		return B_BUSY;
 	}
 
+	ifp->if_init(ifp->if_softc);
+
 	ifp->if_flags &= ~IFF_UP;
 	ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
 
@@ -56,8 +58,6 @@ compat_open(const char *name, uint32 flags, void **cookie)
 
 	ifp->if_flags |= IFF_UP;
 	ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
-
-	ifp->if_init(ifp->if_softc);
 
 	*cookie = ifp;
 	return B_OK;

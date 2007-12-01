@@ -415,7 +415,7 @@ bus_generic_attach(device_t dev)
 					MII_OUI(ma->mii_id1, ma->mii_id2), MII_MODEL(ma->mii_id2));
 			} else
 				device_set_driver(child, driver);
-		} else if (child->driver != &miibus_driver)
+		} else
 			child->methods.probe(child);
 
 		if (child->driver != NULL) {
