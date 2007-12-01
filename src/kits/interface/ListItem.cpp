@@ -345,10 +345,11 @@ BStringItem::Update(BView *owner, const BFont *font)
 
 	font_height fheight;
 	font->GetHeight(&fheight);
-	
-	fBaselineOffset = fheight.ascent + fheight.leading;
-	SetHeight((float)ceil(fheight.ascent + fheight.descent +
-		fheight.leading) + 4);
+
+	fBaselineOffset = fheight.ascent + 2 + floorf(fheight.leading / 2);
+
+	SetHeight(ceilf(fheight.ascent) + ceilf(fheight.descent)
+		+ ceilf(fheight.leading) + 4);
 }
 
 
