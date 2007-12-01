@@ -5,7 +5,7 @@ UsePrivateHeaders kernel net ;
 UseHeaders [ FDirName $(SUBDIR) .. .. ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
 
-SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 EM_FAST_INTR=1 ] ;
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
 
 KernelAddon marvell_yukon :
 	if_msk.c
