@@ -254,7 +254,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	memset(logicalBase, 0, B_PAGE_SIZE);
 
 	fInterruptEntries = (interrupt_entry *)logicalBase;
-	for (int32 i = 0; i < 10; i++) {
+	for (int32 i = 0; i < 11; i++) {
 		ehci_qh *queueHead = &fInterruptEntries[i].queue_head;
 		queueHead->this_phy = physicalBase;
 		queueHead->current_qtd_phy = EHCI_QTD_TERMINATE;
@@ -275,7 +275,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	// build flat interrupt tree
 	TRACE(("usb_ehci: build up interrupt links\n"));
 	uint32 interval = 1024;
-	uint32 intervalIndex = 9;
+	uint32 intervalIndex = 10;
 	while (interval > 1) {
 		uint32 insertIndex = interval / 2;
 		while (insertIndex < 1024) {
@@ -292,7 +292,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	ehci_qh *firstLogical = &fInterruptEntries[0].queue_head;
 	uint32 firstPhysical = firstLogical->this_phy | EHCI_QH_TYPE_QH;
 	fPeriodicFrameList[0] = firstPhysical;
-	for (int32 i = 1; i < 10; i++) {
+	for (int32 i = 1; i < 11; i++) {
 		fInterruptEntries[i].queue_head.next_phy = firstPhysical;
 		fInterruptEntries[i].queue_head.next_log = firstLogical;
 	}
@@ -1267,10 +1267,10 @@ EHCI::LinkInterruptQueueHead(ehci_qh *queueHead, uint8 interval)
 		interval = 1;
 
 	// this may happen as intervals can go up to 16; we limit the value to
-	// 10 as you cannot support intervals above that with a frame list of
+	// 11 as you cannot support intervals above that with a frame list of
 	// just 1024 entries...
-	if (interval > 10)
-		interval = 10;
+	if (interval > 11)
+		interval = 11;
 
 	ehci_qh *interruptQueue = &fInterruptEntries[interval - 1].queue_head;
 	queueHead->next_log = interruptQueue->next_log;
