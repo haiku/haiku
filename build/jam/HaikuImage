@@ -6,6 +6,7 @@
 AddDirectoryToHaikuImage home Desktop ;
 AddDirectoryToHaikuImage home config bin ;
 AddDirectoryToHaikuImage home config lib ;
+AddDirectoryToHaikuImage home mail ;
 AddDirectoryToHaikuImage var log ;
 AddDirectoryToHaikuImage var tmp ;
 
