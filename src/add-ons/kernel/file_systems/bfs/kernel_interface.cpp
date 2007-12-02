@@ -1277,9 +1277,9 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 	}
 
 	WriteLocked locker(inode->Lock());
-	status_t status = B_ERROR;
+	status_t status = transaction.IsStarted() ? B_OK : B_ERROR;
 
-	if (transaction.IsStarted()) {
+	if (status == B_OK) {
 		// trim the preallocated blocks and update the size,
 		// and last_modified indices if needed
 		bool changedSize = false, changedTime = false;

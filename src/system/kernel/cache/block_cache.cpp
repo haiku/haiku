@@ -40,6 +40,7 @@
 #endif
 
 #define DEBUG_BLOCK_CACHE
+//#define DEBUG_CHANGED
 
 // This macro is used for fatal situations that are acceptable in a running
 // system, like out of memory situations - should only panic for debugging.
