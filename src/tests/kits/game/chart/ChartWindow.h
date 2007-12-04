@@ -334,7 +334,7 @@ virtual void		DirectConnected(direct_buffer_info *info);
 
 private:
 	/* Pseudo-random generator state and increment function. */
-		int32		crc_alea;
+		int32		fCrcAlea;
 inline	void		CrcStep();
 		
 		
@@ -342,74 +342,70 @@ inline	void		CrcStep();
 		/* the next setting, as modified by the UI */
 		setting			fNextSettings;
 		
-		/* a boolean used to enable a work-around for a bug in
-		   the DirectWindow flags setting. Only needed for the
-		   release 3.0 */
-		bool			need_r3_buffer_reset_work_around;
 
 		/* the buffer descriptors for the offscreen bitmap and
 		   the DirectWindow buffer. */
-		buffer			bitmap_buffer;
-		buffer			direct_buffer;
+		buffer			fBitmapBuffer;
+		buffer			fDirectBuffer;
 		
 		/* current maximal dimensions of the offscreen Bitmap buffer */
-		int32			max_width, max_height;
+		int32			fMaxWidth, fMaxHeight;
 
 		/* memorize previous state for switch between fullscreen
 		   and window mode */
-		BRect			PreviousFrame;
-		int32			previous_fullscreen_mode;
+		BRect			fPreviousFrame;
+		int32			fPreviousFullscreenMode;
 		
 		/* cycling threshold for the cubic torus starfield, that
 		   guarantees that the 1x1x1 sample will contain the full
 		   pyramid of vision. */ 
-		TPoint			cut;
+		TPoint			fCut;
 		
 		/* maximal depth of the pyramid of vision */
-		float			depth_ref;
+		float			fDepthRef;
 		
-		int32			back_color_index;
+		int32			fBackColorIndex;
 		
 		/* target frame duration, in microsecond. */
-		bigtime_t		frame_delay;
+		bigtime_t		fFrameDelay;
 		
 		/* various UI object that we need to reach directly. */
-		BButton			*offwindow_button;
+		BButton			*fOffwindowButton;
 		ChartView		*fChartView;
-		BStringView		*cpu_load, *frames;
+		BStringView		*fCpuLoadView, *fFramesView;
 		InstantView		*fInstantLoad;
-		BPictureButton	*color_button, *density_button, *refresh_button;
+		BPictureButton	*fColorButton, *fDensityButton, *fRefreshButton;
 
 		/* states used to describe the camera position, rotation
 		   and dynamic (in other case than free move). */
-		float			camera_alpha, camera_theta, camera_phi;
-		float			d_alpha;
-		float			d_theta;
-		float			d_phi;
-		int32			cnt_alpha, cnt_theta, cnt_phi;
-		TPoint			origin;
-		TMatrix			camera;
-		TMatrix			camera_invert;
+		float			fCameraAlpha, fCameraTheta, fCameraPhi;
+		float			fDynamicAlpha;
+		float			fDynamicTheta;
+		float			fDynamicPhi;
+		int32			fCountAlpha, fCountTheta, fCountPhi;
+		TPoint			fOrigin;
+		TMatrix			fCamera;
+		TMatrix			fCameraInvert;
 
 		/* the camera geometry descriptor required by the embedded
 		   C-engine (just a copy of part of the previous states) */
-		geometry		geo;
+		geometry		fGeometry;
 		
 		/* states used by the free move camera animation */
-		int32			tracking_target;
-		int32			key_point_count;
-		float			speed, target_speed;
-		float			last_dynamic_delay;
-		TPoint			key_points[KEY_POINT_MAX];
+		int32			fTrackingTarget;
+		int32			fKeyPointCount;
+		float			fSpeed, fTargetSpeed;
+		float			fLastDynamicDelay;
+		TPoint			fKeyPoints[KEY_POINT_MAX];
 	
 		/* main starfield. */
-		star_packet		stars;
+		star_packet		fStars;
 
 		/* used for the special animation */
-		TPoint			comet[2];
-		TPoint			delta_comet[2];
-		special			*special_list;
-		star_packet		specials;
+		TPoint			fComet[2];
+		TPoint			fDeltaComet[2];
+		special			*fSpecialList;
+		star_packet		fSpecials;
 		
 		/* the two processing threads. */
 		thread_id		fAnimationThread;

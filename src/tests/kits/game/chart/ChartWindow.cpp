@@ -374,17 +374,6 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	BFont boldFont(be_bold_font);
 	if (boldFont.Size() > MAX_FONT_SIZE)
 		boldFont.SetSize(MAX_FONT_SIZE);
-
-	/* Check to see if we need the work-around for the case where
-	   DirectConnected is called back with B_BUFFER_RESET not set
-	   properly. This happens only with version 1.3.0 of the
-	   app_server. */
-	need_r3_buffer_reset_work_around = false;
-
-	version_info vi;
-	if (get_file_version_info(B_BEOS_SERVERS_DIRECTORY, "app_server", &vi) == B_NO_ERROR
-		&& (vi.major == 1) && (vi.middle == 3) && (vi.minor == 0))
-			need_r3_buffer_reset_work_around = true;
 	
 	/* offset the content area frame in window relative coordinate */
 	frame.OffsetTo(0.0, 0.0);
@@ -398,8 +387,8 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 
 	/* initial bitmap buffer */
 	fOffscreen = NULL;
-	max_width = WINDOW_H_STD - LEFT_WIDTH;
-	max_height = WINDOW_V_STD - TOP_LEFT_LIMIT;
+	fMaxWidth = WINDOW_H_STD - LEFT_WIDTH;
+	fMaxHeight = WINDOW_V_STD - TOP_LEFT_LIMIT;
 
 	/* initialise the default setting state */
 	for (int32 i = 0; i < 7; i++)
@@ -421,43 +410,43 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	fCurrentSettings.depth	= screen.ColorSpace();
 	fCurrentSettings.width = (int32)frame.right+1-LEFT_WIDTH;
 	fCurrentSettings.height = (int32)frame.bottom+1-TOP_LEFT_LIMIT;
-	previous_fullscreen_mode = WINDOW_MODE;
+	fPreviousFullscreenMode = WINDOW_MODE;
 	fNextSettings.Set(&fCurrentSettings);
 
 	/* initialise various global parameters */
 	fInstantLoadLevel = 0;
 	fSecondThreadThreshold = 0.5;
-	last_dynamic_delay = 0.0;
-	crc_alea = CRC_START;
+	fLastDynamicDelay = 0.0;
+	fCrcAlea = CRC_START;
 
 	/* initialise the starfield and the special structs */
-	stars.list = (star*)malloc(sizeof(star)*STAR_DENSITY_MAX);
-	specials.list = (star*)malloc(sizeof(star)*SPECIAL_COUNT_MAX);
-	special_list = (special*)malloc(sizeof(special)*SPECIAL_COUNT_MAX);
+	fStars.list = (star*)malloc(sizeof(star)*STAR_DENSITY_MAX);
+	fSpecials.list = (star*)malloc(sizeof(star)*SPECIAL_COUNT_MAX);
+	fSpecialList = (special*)malloc(sizeof(special)*SPECIAL_COUNT_MAX);
 	InitStars(SPACE_CHAOS);
-	stars.count = fCurrentSettings.star_density;
-	stars.erase_count = 0;
+	fStars.count = fCurrentSettings.star_density;
+	fStars.erase_count = 0;
 	InitSpecials(SPECIAL_NONE);
-	specials.erase_count = 0;
+	fSpecials.erase_count = 0;
 	colors[0] = 1;
 	colors[1] = 2;
 	colors[2] = 3;
 	SetStarColors(colors, 3);
 
 	/* set camera default position and rotation */
-	camera_alpha = 0.2;
-	camera_theta = 0.0;
-	camera_phi = 0.0;
-	camera.Set(camera_alpha, camera_theta, camera_phi);
-	camera_invert = camera.Transpose();
-	origin.x = 0.5;
-	origin.y = 0.5;
-	origin.z = 0.1;
+	fCameraAlpha = 0.2;
+	fCameraTheta = 0.0;
+	fCameraPhi = 0.0;
+	fCamera.Set(fCameraAlpha, fCameraTheta, fCameraPhi);
+	fCameraInvert = fCamera.Transpose();
+	fOrigin.x = 0.5;
+	fOrigin.y = 0.5;
+	fOrigin.z = 0.1;
 
 	/* initialise camera animation */
-	tracking_target = -1;
-	speed = 0.0115;
-	target_speed = speed;
+	fTrackingTarget = -1;
+	fSpeed = 0.0115;
+	fTargetSpeed = fSpeed;
 
 	/* initialise the view coordinate system */	
 	InitGeometry();
@@ -465,17 +454,17 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	SetCubeOffset();
 
 	/* init the direct buffer in a valid state */
-	direct_buffer.buffer_width = fCurrentSettings.width;
-	direct_buffer.buffer_height = fCurrentSettings.height;
-	direct_buffer.clip_list_count = 1;
-	direct_buffer.clip_bounds.top = 0;
-	direct_buffer.clip_bounds.left = 0;
-	direct_buffer.clip_bounds.right = -1;
-	direct_buffer.clip_bounds.bottom = -1;
-	direct_buffer.clip_list[0].top = 0;
-	direct_buffer.clip_list[0].left = 0;
-	direct_buffer.clip_list[0].right = -1;
-	direct_buffer.clip_list[0].bottom = -1;
+	fDirectBuffer.buffer_width = fCurrentSettings.width;
+	fDirectBuffer.buffer_height = fCurrentSettings.height;
+	fDirectBuffer.clip_list_count = 1;
+	fDirectBuffer.clip_bounds.top = 0;
+	fDirectBuffer.clip_bounds.left = 0;
+	fDirectBuffer.clip_bounds.right = -1;
+	fDirectBuffer.clip_bounds.bottom = -1;
+	fDirectBuffer.clip_list[0].top = 0;
+	fDirectBuffer.clip_list[0].left = 0;
+	fDirectBuffer.clip_list[0].right = -1;
+	fDirectBuffer.clip_list[0].bottom = -1;
 	fDirectConnected = false;
 
 	/* build the UI content of the window */
@@ -558,44 +547,44 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		   this will be used to record the content of the Picture
 		   button. */
 		r.Set(0, 0, BUTTON_WIDTH-1, TOP_LEFT_LIMIT - 1 - 2*V_BORDER);
-		offwindow_button = new BButton(r, "", "", NULL);
-		offwindow_button->Hide();
-		AddChild(offwindow_button);
-		offwindow_button->ResizeTo(r.Width(), r.Height());
+		fOffwindowButton = new BButton(r, "", "", NULL);
+		fOffwindowButton->Hide();
+		AddChild(fOffwindowButton);
+		fOffwindowButton->ResizeTo(r.Width(), r.Height());
 
 		/* refresh rate picture button */
 		r.Set(h, v, h+BUTTON_WIDTH-1, v + (TOP_LEFT_LIMIT - 1 - 2*V_BORDER));
-		refresh_button = new BPictureButton(r, "",
+		fRefreshButton = new BPictureButton(r, "",
 										  ButtonPicture(false, REFRESH_BUTTON_PICT),
 										  ButtonPicture(true, REFRESH_BUTTON_PICT),
 										  new BMessage(OPEN_REFRESH_MSG));
-		refresh_button->SetViewColor(B_TRANSPARENT_32_BIT);
-		refresh_button->ResizeToPreferred();
-		fTopView->AddChild(refresh_button);
+		fRefreshButton->SetViewColor(B_TRANSPARENT_32_BIT);
+		fRefreshButton->ResizeToPreferred();
+		fTopView->AddChild(fRefreshButton);
 
 	h += BUTTON_WIDTH+2*H_BORDER;
 
 		/* background color button */									  
 		r.Set(h, v, h+BUTTON_WIDTH-1, v + (TOP_LEFT_LIMIT - 1 - 2*V_BORDER));
-		color_button = new BPictureButton(r, "",
+		fColorButton = new BPictureButton(r, "",
 										  ButtonPicture(false, COLOR_BUTTON_PICT),
 										  ButtonPicture(true, COLOR_BUTTON_PICT),
 										  new BMessage(OPEN_COLOR_MSG));
-		color_button->SetViewColor(B_TRANSPARENT_32_BIT);
-		color_button->ResizeToPreferred();
-		fTopView->AddChild(color_button);
+		fColorButton->SetViewColor(B_TRANSPARENT_32_BIT);
+		fColorButton->ResizeToPreferred();
+		fTopView->AddChild(fColorButton);
 
 	h += BUTTON_WIDTH+2*H_BORDER;
 
 		/* star density button */											  
 		r.Set(h, v, h+BUTTON_WIDTH-1, v + (TOP_LEFT_LIMIT - 1 - 2*V_BORDER));
-		density_button = new BPictureButton(r, "",
+		fDensityButton = new BPictureButton(r, "",
 											ButtonPicture(false, DENSITY_BUTTON_PICT),
 											ButtonPicture(true, DENSITY_BUTTON_PICT),
 											new BMessage(OPEN_DENSITY_MSG));
-		density_button->SetViewColor(B_TRANSPARENT_32_BIT);
-		density_button->ResizeToPreferred();
-		fTopView->AddChild(density_button);
+		fDensityButton->SetViewColor(B_TRANSPARENT_32_BIT);
+		fDensityButton->ResizeToPreferred();
+		fTopView->AddChild(fDensityButton);
 
 	h += BUTTON_WIDTH+H_BORDER;
 
@@ -657,12 +646,12 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 
 			/* frames per second display string */
 			r.Set(h-1, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET, v+STATUS_EDIT-1);
-			frames = new BStringView(r, "", "0.0");
-			frames->SetAlignment(B_ALIGN_RIGHT);
-			frames->SetFont(be_bold_font);
-			frames->SetFontSize(24.0);
-			frames->SetViewColor(B_TRANSPARENT_32_BIT);
-			fStatusBox->AddChild(frames);
+			fFramesView = new BStringView(r, "", "0.0");
+			fFramesView->SetAlignment(B_ALIGN_RIGHT);
+			fFramesView->SetFont(be_bold_font);
+			fFramesView->SetFontSize(24.0);
+			fFramesView->SetViewColor(B_TRANSPARENT_32_BIT);
+			fStatusBox->AddChild(fFramesView);
 
 		v += STATUS_EDIT+STATUS_OFFSET;
 
@@ -677,12 +666,12 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 
 			/* CPU load pourcentage display string */
 			r.Set(h-1, v, h+LEFT_WIDTH-2*LEFT_OFFSET-2*BOX_H_OFFSET, v+STATUS_EDIT-1);
-			cpu_load = new BStringView(r, "", "0.0");
-			cpu_load->SetAlignment(B_ALIGN_RIGHT);
-			cpu_load->SetFont(be_bold_font);
-			cpu_load->SetFontSize(24.0);
-			cpu_load->SetViewColor(B_TRANSPARENT_32_BIT);
-			fStatusBox->AddChild(cpu_load);
+			fCpuLoadView = new BStringView(r, "", "0.0");
+			fCpuLoadView->SetAlignment(B_ALIGN_RIGHT);
+			fCpuLoadView->SetFont(be_bold_font);
+			fCpuLoadView->SetFontSize(24.0);
+			fCpuLoadView->SetViewColor(B_TRANSPARENT_32_BIT);
+			fStatusBox->AddChild(fCpuLoadView);
 
 	v2 += STATUS_BOX+LEFT_OFFSET*2;
 	h = h2;
@@ -901,9 +890,9 @@ ChartWindow::~ChartWindow()
 	delete_sem(fSecondThreadRelease);
 	
 	/* free the buffers used to store the starlists */
-	free(stars.list);
-	free(specials.list);
-	free(special_list);
+	free(fStars.list);
+	free(fSpecials.list);
+	free(fSpecialList);
 }
 
 
@@ -975,7 +964,7 @@ ChartWindow::MessageReceived(BMessage *message)
 			LaunchSound();
 			break;
 		case BACK_DEMO_MSG :
-			fNextSettings.fullscreen_mode = previous_fullscreen_mode;
+			fNextSettings.fullscreen_mode = fPreviousFullscreenMode;
 			break;
 		case SECOND_THREAD_MSG :
 			check_box = dynamic_cast<BCheckBox*>(handler);
@@ -1099,20 +1088,20 @@ ChartWindow::ButtonPicture(bool active, int32 button_type)
 
 	/* create and open the picture */	
 	pict = new BPicture();
-	r = offwindow_button->Bounds();
-	offwindow_button->SetValue(active);
-	offwindow_button->BeginPicture(pict);
+	r = fOffwindowButton->Bounds();
+	fOffwindowButton->SetValue(active);
+	fOffwindowButton->BeginPicture(pict);
 	/* draw the standard BButton in whatever state is required. */
-	offwindow_button->Draw(r);
+	fOffwindowButton->Draw(r);
 	if (button_type == COLOR_BUTTON_PICT) {
 		/* this button just contains a rectangle of the current background
 		   color, with a one pixel black border. */
 		r.InsetBy(6.0, 4.0);
-		offwindow_button->SetHighColor(0, 0, 0);
-		offwindow_button->StrokeRect(r);
+		fOffwindowButton->SetHighColor(0, 0, 0);
+		fOffwindowButton->StrokeRect(r);
 		r.InsetBy(1.0, 1.0);
-		offwindow_button->SetHighColor(fCurrentSettings.back_color);
-		offwindow_button->FillRect(r);
+		fOffwindowButton->SetHighColor(fCurrentSettings.back_color);
+		fOffwindowButton->FillRect(r);
 	}
 	else if (button_type == DENSITY_BUTTON_PICT) {
 		/* this button just contains a big string (using a bigger font size
@@ -1121,11 +1110,11 @@ ChartWindow::ButtonPicture(bool active, int32 button_type)
 		value = (fCurrentSettings.star_density*100 + STAR_DENSITY_MAX/2) / STAR_DENSITY_MAX;
 		sprintf(word, "%3ld", value);
 	draw_string:
-		offwindow_button->SetFont(be_bold_font);
-		offwindow_button->SetFontSize(14.0);
-		delta.x = BUTTON_WIDTH/2-(offwindow_button->StringWidth(word) * 0.5);
+		fOffwindowButton->SetFont(be_bold_font);
+		fOffwindowButton->SetFontSize(14.0);
+		delta.x = BUTTON_WIDTH/2-(fOffwindowButton->StringWidth(word) * 0.5);
 		delta.y = (TOP_LEFT_LIMIT-2*V_BORDER)/2 + 6.0;
-		offwindow_button->DrawString(word, delta); 
+		fOffwindowButton->DrawString(word, delta); 
 	}
 	else {
 		/* this button just contains a big string (using a bigger font size
@@ -1135,7 +1124,7 @@ ChartWindow::ButtonPicture(bool active, int32 button_type)
 		goto draw_string;
 	}
 	/* close and return the picture */
-	return offwindow_button->EndPicture();
+	return fOffwindowButton->EndPicture();
 }
 
 /* Create a floating window including a slightly modified version of
@@ -1323,8 +1312,8 @@ ChartWindow::PrintStatNumbers(float fps)
 		timeout = 0;
 		
 	if (LockWithTimeout(timeout) == B_OK) {
-		frames->SetText(text_frames);
-		cpu_load->SetText(text_cpu_load);
+		fFramesView->SetText(text_frames);
+		fCpuLoadView->SetText(text_cpu_load);
 		Unlock();
 	}
 }
@@ -1338,22 +1327,22 @@ ChartWindow::InitGeometry()
 {
 	/* calculate some parameters required for the 3d processing */ 
 	float dz = sqrt(1.0 - (DH_REF*DH_REF + DV_REF*DV_REF) * (0.5 + 0.5/Z_CUT_RATIO) * (0.5 + 0.5/Z_CUT_RATIO));
-	depth_ref = dz / (1.0 - 1.0/Z_CUT_RATIO);
+	fDepthRef = dz / (1.0 - 1.0/Z_CUT_RATIO);
 	
 	/* set the position of the pyramid of vision, so that it was always
 	   possible to include it into a 1x1x1 cube parallel to the 3 main
 	   axis. */
-	geo.z_max = depth_ref;
-	geo.z_min = depth_ref/Z_CUT_RATIO;
+	fGeometry.z_max = fDepthRef;
+	fGeometry.z_min = fDepthRef/Z_CUT_RATIO;
 	
 	/* used for lighting processing */
-	geo.z_max_square = geo.z_max * geo.z_max;
+	fGeometry.z_max_square = fGeometry.z_max * fGeometry.z_max;
 	
 	/* preprocess that for the fast clipping based on the pyramid of vision */
-	geo.xz_max = (0.5*DH_REF)/geo.z_max;
-	geo.xz_min = -geo.xz_max;
-	geo.yz_max = (0.5*DV_REF)/geo.z_max;
-	geo.yz_min = -geo.yz_max;
+	fGeometry.xz_max = (0.5*DH_REF)/fGeometry.z_max;
+	fGeometry.xz_min = -fGeometry.xz_max;
+	fGeometry.yz_max = (0.5*DV_REF)/fGeometry.z_max;
+	fGeometry.yz_min = -fGeometry.yz_max;
 }
 
 /* second part of the asynchronous setting mechanism. This will be
@@ -1374,15 +1363,15 @@ ChartWindow::ChangeSetting(setting new_set)
 	if (fCurrentSettings.fullscreen_mode != new_set.fullscreen_mode) {
 		switch (new_set.fullscreen_mode) {
 		case WINDOW_MODE :
-			previous_fullscreen_mode = WINDOW_MODE;
-			ResizeTo(PreviousFrame.Width(), PreviousFrame.Height());
-			MoveTo(PreviousFrame.left, PreviousFrame.top);
+			fPreviousFullscreenMode = WINDOW_MODE;
+			ResizeTo(fPreviousFrame.Width(), fPreviousFrame.Height());
+			MoveTo(fPreviousFrame.left, fPreviousFrame.top);
 			break;
 		case FULLSCREEN_MODE :
 			{
-				previous_fullscreen_mode = FULLSCREEN_MODE;
+				fPreviousFullscreenMode = FULLSCREEN_MODE;
 				if (fCurrentSettings.fullscreen_mode == WINDOW_MODE)
-					PreviousFrame = Frame();
+					fPreviousFrame = Frame();
 				BScreen	a_screen(this);
 				MoveTo(a_screen.Frame().left, a_screen.Frame().top);
 				ResizeTo(a_screen.Frame().Width(), a_screen.Frame().Height());
@@ -1390,9 +1379,9 @@ ChartWindow::ChangeSetting(setting new_set)
 			break;
 		case FULLDEMO_MODE :
 			{
-				previous_fullscreen_mode = fCurrentSettings.fullscreen_mode;
+				fPreviousFullscreenMode = fCurrentSettings.fullscreen_mode;
 				if (fCurrentSettings.fullscreen_mode == WINDOW_MODE)
-					PreviousFrame = Frame();
+					fPreviousFrame = Frame();
 				BScreen	b_screen(this);
 				ResizeTo(b_screen.Frame().Width() + LEFT_WIDTH, b_screen.Frame().Height() + TOP_LEFT_LIMIT);
 				MoveTo(b_screen.Frame().left - LEFT_WIDTH, b_screen.Frame().top - TOP_LEFT_LIMIT);
@@ -1411,13 +1400,13 @@ ChartWindow::ChangeSetting(setting new_set)
 		if (LockWithTimeout(200000) == B_OK) {
 			if (old_step != fInstantLoad->step)
 				fInstantLoad->Invalidate();
-			refresh_button->SetEnabledOff(ButtonPicture(false, REFRESH_BUTTON_PICT));
-			refresh_button->SetEnabledOn(ButtonPicture(true, REFRESH_BUTTON_PICT));
-			refresh_button->Invalidate();
+			fRefreshButton->SetEnabledOff(ButtonPicture(false, REFRESH_BUTTON_PICT));
+			fRefreshButton->SetEnabledOn(ButtonPicture(true, REFRESH_BUTTON_PICT));
+			fRefreshButton->Invalidate();
 			Unlock();
 		}
 		if (fCurrentSettings.animation != ANIMATION_OFF)
-			frame_delay = (bigtime_t)(1000000.0/new_set.refresh_rate);
+			fFrameDelay = (bigtime_t)(1000000.0/new_set.refresh_rate);
 	}
 	
 	/* check for change in the star colors list */
@@ -1446,21 +1435,21 @@ ChartWindow::ChangeSetting(setting new_set)
 			/* check the settings of the offscreen bitmap */
 			CheckBitmap(new_set.depth, new_set.width, new_set.height);
 			/* synchronise the camera geometry and the offscreen buffer geometry */
-			SetGeometry(bitmap_buffer.buffer_width, bitmap_buffer.buffer_height);	
+			SetGeometry(fBitmapBuffer.buffer_width, fBitmapBuffer.buffer_height);	
 			/* reset the offscreen background and cancel the erasing */
 			SetBitmapBackGround();
-			stars.erase_count = 0;
-			specials.erase_count = 0;
+			fStars.erase_count = 0;
+			fSpecials.erase_count = 0;
 		}
 		if (new_set.display == DISPLAY_DIRECT) {
 			/* this need to be atomic in regard of DirectConnected */
 			while (acquire_sem(fDrawingLock) == B_INTERRUPTED)
 				;
 			/* synchronise the camera geometry and the direct buffer geometry */
-			SetGeometry(direct_buffer.buffer_width, direct_buffer.buffer_height);
+			SetGeometry(fDirectBuffer.buffer_width, fDirectBuffer.buffer_height);
 			/* cancel erasing of stars not in visible part of the direct window */
-			RefreshClipping(&direct_buffer, &stars);
-			RefreshClipping(&direct_buffer, &specials);
+			RefreshClipping(&fDirectBuffer, &fStars);
+			RefreshClipping(&fDirectBuffer, &fSpecials);
 			release_sem(fDrawingLock);
 		}
 	}
@@ -1470,17 +1459,17 @@ ChartWindow::ChangeSetting(setting new_set)
 		/* when there is no camera animation, we loop only
 		   10 times per second. */
 		if (new_set.animation == ANIMATION_OFF)
-			frame_delay = 100000;
+			fFrameDelay = 100000;
 		else
-			frame_delay = (bigtime_t)(1000000.0/new_set.refresh_rate);
+			fFrameDelay = (bigtime_t)(1000000.0/new_set.refresh_rate);
 		/* reset the free camera animation context for a fresh start */
 		if (new_set.animation == ANIMATION_FREE_MOVE) {
-			d_alpha = 0.0;
-			d_theta = 0.0;
-			d_phi = 0.0;
-			cnt_alpha = 0;
-			cnt_theta = 0;
-			cnt_phi = 0;
+			fDynamicAlpha = 0.0;
+			fDynamicTheta = 0.0;
+			fDynamicPhi = 0.0;
+			fCountAlpha = 0;
+			fCountTheta = 0;
+			fCountPhi = 0;
 		}
 	}
 	
@@ -1499,25 +1488,25 @@ ChartWindow::ChangeSetting(setting new_set)
 			BScreen		screen(this);		
 			/* set the background color and it's 8 bits index equivalent */	
 			fCurrentSettings.back_color = new_set.back_color;
-			back_color_index = screen.IndexForColor(new_set.back_color);
+			fBackColorIndex = screen.IndexForColor(new_set.back_color);
 			/* set the nackground color of the view (directwindow mode) */
 			fChartView->SetViewColor(new_set.back_color);
 			/* change the color of the picture button used in the UI */
-			color_button->SetEnabledOff(ButtonPicture(false, COLOR_BUTTON_PICT));
-			color_button->SetEnabledOn(ButtonPicture(true, COLOR_BUTTON_PICT));
-			color_button->Invalidate();
+			fColorButton->SetEnabledOff(ButtonPicture(false, COLOR_BUTTON_PICT));
+			fColorButton->SetEnabledOn(ButtonPicture(true, COLOR_BUTTON_PICT));
+			fColorButton->Invalidate();
 			/* update all dependencies in the offscreen buffer descriptor */
-			SetColorSpace(&bitmap_buffer, bitmap_buffer.depth);
+			SetColorSpace(&fBitmapBuffer, fBitmapBuffer.depth);
 			/* update all dependencies in the directwindow buffer descriptor */
 			while (acquire_sem(fDrawingLock) == B_INTERRUPTED)
 				;
-			SetColorSpace(&direct_buffer, direct_buffer.depth);
+			SetColorSpace(&fDirectBuffer, fDirectBuffer.depth);
 			release_sem(fDrawingLock);
 			/* in offscreen mode, erase the background and cancel star erasing */
 			if (new_set.display == DISPLAY_BITMAP) {
 				SetBitmapBackGround();					
-				stars.erase_count = 0;
-				specials.erase_count = 0;
+				fStars.erase_count = 0;
+				fSpecials.erase_count = 0;
 			}
 			/* in directwindow mode, just force an update */
 			else
@@ -1531,12 +1520,12 @@ ChartWindow::ChangeSetting(setting new_set)
 		if (LockWithTimeout(200000) == B_OK) {
 			fCurrentSettings.star_density = new_set.star_density;
 			/* change the picture button used in the UI */
-			density_button->SetEnabledOff(ButtonPicture(false, DENSITY_BUTTON_PICT));
-			density_button->SetEnabledOn(ButtonPicture(true, DENSITY_BUTTON_PICT));
-			density_button->Invalidate();
+			fDensityButton->SetEnabledOff(ButtonPicture(false, DENSITY_BUTTON_PICT));
+			fDensityButton->SetEnabledOn(ButtonPicture(true, DENSITY_BUTTON_PICT));
+			fDensityButton->Invalidate();
 			Unlock();
 		}			
-		stars.count = new_set.star_density;
+		fStars.count = new_set.star_density;
 	}
 	
 	/* check for change in the buffer format for the offscreen bitmap.
@@ -1546,18 +1535,18 @@ ChartWindow::ChangeSetting(setting new_set)
 		/* need to reset the buffer if it's currently used for display */
 		if (new_set.display == DISPLAY_BITMAP) {
 			SetBitmapBackGround();
-			stars.erase_count = 0;
-			specials.erase_count = 0;
+			fStars.erase_count = 0;
+			fSpecials.erase_count = 0;
 		}
 	}
 		
 	/* check for change in the drawing area of the offscreen bitmap */
 	if ((new_set.width != fCurrentSettings.width) || (new_set.height != fCurrentSettings.height)) {
 		CheckBitmap(new_set.depth, new_set.width, new_set.height);
-		bitmap_buffer.buffer_width = new_set.width;
-		bitmap_buffer.buffer_height = new_set.height;
+		fBitmapBuffer.buffer_width = new_set.width;
+		fBitmapBuffer.buffer_height = new_set.height;
 		if (new_set.display == DISPLAY_BITMAP)
-			SetGeometry(bitmap_buffer.buffer_width, bitmap_buffer.buffer_height);	
+			SetGeometry(fBitmapBuffer.buffer_width, fBitmapBuffer.buffer_height);	
 		SetBitmapClipping(new_set.width, new_set.height);
 	}
 	
@@ -1580,32 +1569,32 @@ ChartWindow::InitStars(int32 space_model)
 	switch (space_model) {
 	/* Create a random starfield */
 	case SPACE_CHAOS :
-		FillStarList(stars.list, STAR_DENSITY_MAX);
-		key_point_count = 0;
+		FillStarList(fStars.list, STAR_DENSITY_MAX);
+		fKeyPointCount = 0;
 		break;
 
 	/* Create a starfield with big concentration of stars (amas) */
 	case SPACE_AMAS :
 	case SPACE_SPIRAL :
 		/* pick 8 random position for the amas */
-		FillStarList(stars.list, 8);
+		FillStarList(fStars.list, 8);
 		for (i=0; i<8; i++) {
-			amas[i].x = stars.list[i].x;
-			amas[i].y = stars.list[i].y;
-			amas[i].z = stars.list[i].z;
+			amas[i].x = fStars.list[i].x;
+			amas[i].y = fStars.list[i].y;
+			amas[i].z = fStars.list[i].z;
 			amas_select[i] = i;
-			factor[i] = ((float)(crc_alea&2047) + 0.5)*(1.0/128.0) + 16.0/3.0;
+			factor[i] = ((float)(fCrcAlea&2047) + 0.5)*(1.0/128.0) + 16.0/3.0;
 			CrcStep();
 			CrcStep();
 		}
 		/* make each amas ramdomly smaller or bigger */
 		for (i=8; i<32; i++) {
-			amas_select[i] = (crc_alea & 7);
+			amas_select[i] = (fCrcAlea & 7);
 			CrcStep();		
 		}
 		
 		/* create a random starfield */
-		FillStarList(stars.list, STAR_DENSITY_MAX);
+		FillStarList(fStars.list, STAR_DENSITY_MAX);
 		
 		/* In spiral mode, only half the star will be put into the amas.
 		   the other half will be put into the spiral galaxy. */
@@ -1613,7 +1602,7 @@ ChartWindow::InitStars(int32 space_model)
 			i_step = 1;
 		else
 			i_step = 2;
-		s = stars.list;
+		s = fStars.list;
 
 		for (i=0; i<STAR_DENSITY_MAX; i+=i_step) {
 			/* for every star, calculate its position relative to the
@@ -1638,7 +1627,7 @@ ChartWindow::InitStars(int32 space_model)
 				step++;
 			}
 
-			step -= (crc_alea&3);
+			step -= (fCrcAlea&3);
 			CrcStep();
 			fact = 1.0;
 			for (;step>=0; step--)
@@ -1665,8 +1654,8 @@ ChartWindow::InitStars(int32 space_model)
 		/* record the center of the amas as key points for the free
 		   camera animation mode. */
 		for (i=0; i<8; i++)
-			key_points[i] = amas[i];
-		key_point_count = 8;
+			fKeyPoints[i] = amas[i];
+		fKeyPointCount = 8;
 
 		/* no further processing needed in amas only mode. */		
 		if (space_model == SPACE_AMAS)
@@ -1674,11 +1663,11 @@ ChartWindow::InitStars(int32 space_model)
 
 		/* in spiral mode, the second half of the star will be distributed
 		   on random spiral like galaxy. */
-		s = stars.list+1;
+		s = fStars.list+1;
 		for (i=1; i<STAR_DENSITY_MAX; i+=2) {
 			/* some random point (probability 50 %) will be move into a
 			   big amas at the center of the spiral galaxy. */
-			if (crc_alea & 2048) {
+			if (fCrcAlea & 2048) {
 				/* for every star, calculate its position relative to the
 				   center of the galaxy. */
 				dx = s->x - 0.5;
@@ -1694,7 +1683,7 @@ ChartWindow::InitStars(int32 space_model)
 					step++;
 				}
 	
-				step -= (crc_alea&3);
+				step -= (fCrcAlea&3);
 				CrcStep();
 				fact = 0.5;
 				for (;step>=0; step--)
@@ -1707,12 +1696,12 @@ ChartWindow::InitStars(int32 space_model)
 				/* other star are put at a random place somewhere on one of
 				   teh two spiral arms... */
 				alpha = 3.4 * s->x * (s->x*0.5 + 1.0);
-				if (crc_alea & 64)
+				if (fCrcAlea & 64)
 					alpha += 3.14159;
 				r = s->x * 0.34 + 0.08;
-				r += (s->y-0.725 + 0.03 * (float)(crc_alea & 15))*0.04*(1.2+r);
+				r += (s->y-0.725 + 0.03 * (float)(fCrcAlea & 15))*0.04*(1.2+r);
 				r *= 0.5;
-				dx = (s->z-0.8 + 0.04 * (float)(crc_alea & 15)) * (2.0 - abs(s->y - 0.5)) * (0.025*0.5);
+				dx = (s->z-0.8 + 0.04 * (float)(fCrcAlea & 15)) * (2.0 - abs(s->y - 0.5)) * (0.025*0.5);
 				dy = cos(alpha) * r;
 				dz = sin(alpha) * r;
 			}
@@ -1728,26 +1717,26 @@ ChartWindow::InitStars(int32 space_model)
 
 		/* add the center of the galaxy to the key point list for free camera
 		   animation mode */
-		key_points[8].x = 0.5;
-		key_points[8].y = 0.5;
-		key_points[8].z = 0.5;
+		fKeyPoints[8].x = 0.5;
+		fKeyPoints[8].y = 0.5;
+		fKeyPoints[8].z = 0.5;
 		/* add seven other galaxy star to the key point list */
 		for (i=9; i<16; i++) {
-			key_points[i].x = stars.list[i*(STAR_DENSITY_MAX/18)].x;
-			key_points[i].y = stars.list[i*(STAR_DENSITY_MAX/18)].y;
-			key_points[i].z = stars.list[i*(STAR_DENSITY_MAX/18)].z;
+			fKeyPoints[i].x = fStars.list[i*(STAR_DENSITY_MAX/18)].x;
+			fKeyPoints[i].y = fStars.list[i*(STAR_DENSITY_MAX/18)].y;
+			fKeyPoints[i].z = fStars.list[i*(STAR_DENSITY_MAX/18)].z;
 		}
-		key_point_count = 16;
+		fKeyPointCount = 16;
 		break;
 	}
 
 	/* In all starfield modes, for all stars, peek a random brightness level */ 
 	for (i=0; i<STAR_DENSITY_MAX; i++) {
-		stars.list[i].size = (float)((crc_alea&15)+17)*(1.0/56.0);
-		if ((crc_alea & 0xc0) == 0)
-			stars.list[i].size *= 2.0;
-		if ((crc_alea & 0x3f00) == 0)
-			stars.list[i].size *= 3.0;
+		fStars.list[i].size = (float)((fCrcAlea&15)+17)*(1.0/56.0);
+		if ((fCrcAlea & 0xc0) == 0)
+			fStars.list[i].size *= 2.0;
+		if ((fCrcAlea & 0x3f00) == 0)
+			fStars.list[i].size *= 3.0;
 		CrcStep();
 	}
 }
@@ -1759,15 +1748,15 @@ ChartWindow::FillStarList(star *list, int32 count)
 	int32		i;
 	
 	for (i=0; i<count; i++) {
-		list[i].x = ((float)(crc_alea&2047) + 0.5)*(1.0/2048.0);
+		list[i].x = ((float)(fCrcAlea&2047) + 0.5)*(1.0/2048.0);
 		CrcStep();
 	}
 	for (i=0; i<count; i++) {
-		list[i].y = ((float)(crc_alea&2047) + 0.5)*(1.0/2048.0);
+		list[i].y = ((float)(fCrcAlea&2047) + 0.5)*(1.0/2048.0);
 		CrcStep();
 	}
 	for (i=0; i<count; i++) {
-		list[i].z = ((float)(crc_alea&2047) + 0.5)*(1.0/2048.0);
+		list[i].z = ((float)(fCrcAlea&2047) + 0.5)*(1.0/2048.0);
 		CrcStep();
 	}
 }
@@ -1784,55 +1773,55 @@ ChartWindow::InitSpecials(int32 code)
 	switch (code) {
 	/* turn special animation off */
 	case SPECIAL_NONE :
-		specials.count = 0;
+		fSpecials.count = 0;
 		break;
 
 	/* Initialise the pixel-comet animation */		
 	case SPECIAL_COMET :
 		/* Get a bunchof random values by getting some radom stars */
-		specials.count = 512;
-		FillStarList(specials.list, 4);
+		fSpecials.count = 512;
+		FillStarList(fSpecials.list, 4);
 		/* for both comets... */
 		for (j=0; j<2; j++) {
 			/* select the initial position of the comet head */
-			comet[j].x = specials.list[j].x;
-			comet[j].y = specials.list[j].y;
-			comet[j].z = specials.list[j].z;
-			specials.list[0].size = 1.4;
+			fComet[j].x = fSpecials.list[j].x;
+			fComet[j].y = fSpecials.list[j].y;
+			fComet[j].z = fSpecials.list[j].z;
+			fSpecials.list[0].size = 1.4;
 			
 			/* select the speed vector of the comet */
-			matrix.Set(specials.list[j+2].x * 6.28319, specials.list[j+2].y * 3.14159 - 1.5708, 0.0);
-			delta_comet[j] = matrix.Axis(0) * 0.0015;
+			matrix.Set(fSpecials.list[j+2].x * 6.28319, fSpecials.list[j+2].y * 3.14159 - 1.5708, 0.0);
+			fDeltaComet[j] = matrix.Axis(0) * 0.0015;
 			dx = matrix.Axis(1);
 			dy = matrix.Axis(2);
 		
-			for (i=j+2; i<specials.count; i+=2) {
+			for (i=j+2; i<fSpecials.count; i+=2) {
 				/* make the pixel invisible at first */
-				specials.list[i].x = -10.0;
-				specials.list[i].y = 0.0;
-				specials.list[i].z = 0.0;
+				fSpecials.list[i].x = -10.0;
+				fSpecials.list[i].y = 0.0;
+				fSpecials.list[i].z = 0.0;
 				/* spread the initial count on a linear scale (to make pixel
 				   appear progressively */
-				special_list[i].comet.count = i/2;
+				fSpecialList[i].comet.count = i/2;
 				/* spread the pixel trace count randomly on a [93-124] range */ 
-				special_list[i].comet.count0 = (crc_alea & 31) + 93;
+				fSpecialList[i].comet.count0 = (fCrcAlea & 31) + 93;
 				CrcStep();
 				/* pick a random ejection angle */
-				alpha = ((crc_alea>>8) & 1023) * (6.283159/1024.0);
+				alpha = ((fCrcAlea>>8) & 1023) * (6.283159/1024.0);
 				CrcStep();
 				
 				/* pick a random ejection speed */
-				coeff = 0.000114 + 0.0000016 * (float)((crc_alea>>17) & 31);
-				if ((crc_alea & 7) > 4) coeff *= 0.75;
-				if ((crc_alea & 7) == 7) coeff *= 0.65;
+				coeff = 0.000114 + 0.0000016 * (float)((fCrcAlea>>17) & 31);
+				if ((fCrcAlea & 7) > 4) coeff *= 0.75;
+				if ((fCrcAlea & 7) == 7) coeff *= 0.65;
 				CrcStep();
 				
 				/* calculate the ejection speed vector */
 				ksin = sin(alpha) * coeff;
 				kcos = cos(alpha) * coeff;
-				special_list[i].comet.dx = dx.x * kcos + dy.x * ksin;
-				special_list[i].comet.dy = dx.y * kcos + dy.y * ksin;
-				special_list[i].comet.dz = dx.z * kcos + dy.z * ksin;
+				fSpecialList[i].comet.dx = dx.x * kcos + dy.x * ksin;
+				fSpecialList[i].comet.dy = dx.y * kcos + dy.y * ksin;
+				fSpecialList[i].comet.dz = dx.z * kcos + dy.z * ksin;
 			}
 		}
 		break;
@@ -1841,24 +1830,24 @@ ChartWindow::InitSpecials(int32 code)
 	   brightness level in real time) close from the first stars of the
 	   starfield. */
 	case SPECIAL_NOVAS :
-		specials.count = 96;
-		for (i=0; i<specials.count; i++) {
-			special_list[i].nova.count = i + 40;
-			special_list[i].nova.count0 = (crc_alea & 63) + 28;
+		fSpecials.count = 96;
+		for (i=0; i<fSpecials.count; i++) {
+			fSpecialList[i].nova.count = i + 40;
+			fSpecialList[i].nova.count0 = (fCrcAlea & 63) + 28;
 			CrcStep();
-			specials.list[i].x = stars.list[i].x + (crc_alea & 1)*0.02 - 0.01;
+			fSpecials.list[i].x = fStars.list[i].x + (fCrcAlea & 1)*0.02 - 0.01;
 			CrcStep();
-			specials.list[i].y = stars.list[i].y + (crc_alea & 1)*0.02 - 0.01;
+			fSpecials.list[i].y = fStars.list[i].y + (fCrcAlea & 1)*0.02 - 0.01;
 			CrcStep();
-			specials.list[i].z = stars.list[i].z + (crc_alea & 1)*0.02 - 0.01;
+			fSpecials.list[i].z = fStars.list[i].z + (fCrcAlea & 1)*0.02 - 0.01;
 			CrcStep();
-			specials.list[i].size = 0.0;
+			fSpecials.list[i].size = 0.0;
 		}
 		break;
 
 	/* not implemented */	
 	case SPECIAL_BATTLE :
-		specials.count = 0;
+		fSpecials.count = 0;
 		break;
 	}
 }
@@ -1872,13 +1861,13 @@ ChartWindow::SetStarColors(int32 *color_list, int32 color_count)
 	
 	index = 0;
 	for (i=0; i<STAR_DENSITY_MAX; i++) {
-		stars.list[i].color_type = color_list[index];
+		fStars.list[i].color_type = color_list[index];
 		index++;
 		if (index >= color_count)
 			index = 0;
 	}
 	for (i=0; i<SPECIAL_COUNT_MAX; i++) {
-		specials.list[i].color_type = color_list[index];
+		fSpecials.list[i].color_type = color_list[index];
 		index++;
 		if (index >= color_count)
 			index = 0;
@@ -1892,19 +1881,19 @@ ChartWindow::SetGeometry(int32 dh, int32 dv)
 	float zoom;
 
 	/* calculate the zoom factor for the 3d projection */
-	geo.zoom_factor = (float)dh*(depth_ref/DH_REF);
-	zoom = (float)dv*(depth_ref/DV_REF);
-	if (zoom > geo.zoom_factor)
-		geo.zoom_factor = zoom;
+	fGeometry.zoom_factor = (float)dh*(fDepthRef/DH_REF);
+	zoom = (float)dv*(fDepthRef/DV_REF);
+	if (zoom > fGeometry.zoom_factor)
+		fGeometry.zoom_factor = zoom;
 
 	/* offset of the origin in the view area */
-	geo.offset_h = (float)dh * 0.5;
-	geo.offset_v = (float)dv * 0.5;
+	fGeometry.offset_h = (float)dh * 0.5;
+	fGeometry.offset_v = (float)dv * 0.5;
 
 	/* sub-pixel precision double-sampling */
-	geo.zoom_factor *= 2.0;
-	geo.offset_h = geo.offset_h * 2.0 - 1.0;
-	geo.offset_v = geo.offset_v * 2.0 - 1.0;
+	fGeometry.zoom_factor *= 2.0;
+	fGeometry.offset_h = fGeometry.offset_h * 2.0 - 1.0;
+	fGeometry.offset_v = fGeometry.offset_v * 2.0 - 1.0;
 }
 
 
@@ -2099,7 +2088,7 @@ ChartWindow::Animation(void *data)
 	
 	/* init refresh rate control */
 	timer = system_time();
-	w->frame_delay = 100000;
+	w->fFrameDelay = 100000;
 	
 	/* init performance timing control variables */
 	next_stat = timer + STAT_DELAY;
@@ -2117,14 +2106,14 @@ ChartWindow::Animation(void *data)
 		before_frame = system_time();
 		
 		/* credit the timer by the current delay between frame */
-		timer += w->frame_delay;
+		timer += w->fFrameDelay;
 	
 		/* change the settings, if needed */
 		w->ChangeSetting(w->fNextSettings);
 
 		/* draw the next frame */
 		if (w->fCurrentSettings.display == DISPLAY_BITMAP) {
-			w->RefreshStars(&w->bitmap_buffer, time_factor * 2.4);
+			w->RefreshStars(&w->fBitmapBuffer, time_factor * 2.4);
 			if (w->LockWithTimeout(200000) == B_OK) {
 				w->fChartView->DrawBitmap(w->fOffscreen);
 				w->Unlock();
@@ -2138,7 +2127,7 @@ ChartWindow::Animation(void *data)
 			while (acquire_sem(w->fDrawingLock) == B_INTERRUPTED)
 				;
 			if (w->fDirectConnected)
-				w->RefreshStars(&w->direct_buffer, time_factor * 2.4);
+				w->RefreshStars(&w->fDirectBuffer, time_factor * 2.4);
 			release_sem(w->fDrawingLock);
 		}
 
@@ -2217,8 +2206,8 @@ ChartWindow::Animation2(void *data)
 		/* the duration of the processing is needed to control the
 		   dynamic load split (see RefreshStar) */
 		bigtime_t before = system_time();
-		RefreshStarPacket(w->fSecondThreadBuffer, &w->fStars2, &w->geo);
-		RefreshStarPacket(w->fSecondThreadBuffer, &w->fSpecials2, &w->geo);
+		RefreshStarPacket(w->fSecondThreadBuffer, &w->fStars2, &w->fGeometry);
+		RefreshStarPacket(w->fSecondThreadBuffer, &w->fSpecials2, &w->fGeometry);
 		bigtime_t after = system_time();
 		
 		w->fSecondThreadDelay = after-before;
@@ -2243,9 +2232,9 @@ ChartWindow::SetCubeOffset()
 	min.x = min.y = min.z = 10.0;
 	max.x = max.y = max.z = -10.0;
 	
-	dx = camera.Axis(0)*(DH_REF*0.5);
-	dy = camera.Axis(1)*(DV_REF*0.5);
-	dz = camera.Axis(2)*depth_ref;
+	dx = fCamera.Axis(0)*(DH_REF*0.5);
+	dy = fCamera.Axis(1)*(DV_REF*0.5);
+	dz = fCamera.Axis(2)*fDepthRef;
 	
 	for (i=0; i<8; i++) {
 		/* left side / right side */
@@ -2257,7 +2246,7 @@ ChartWindow::SetCubeOffset()
 		/* rear cut plan / front cut plan */	
 		if (i&4) p1 = p1 * (1.0 / Z_CUT_RATIO);
 		/* relative to the position of the camera */
-		p1 = p1 + origin;
+		p1 = p1 + fOrigin;
 
 		if (min.x > p1.x) min.x = p1.x;	
 		if (min.y > p1.y) min.y = p1.y;	
@@ -2277,32 +2266,32 @@ ChartWindow::SetCubeOffset()
 	while (min.x < 0.0) {
 		min.x += 1.0;
 		max.x += 1.0;
-		origin.x += 1.0;
+		fOrigin.x += 1.0;
 	}
 	while (min.y < 0.0) {
 		min.y += 1.0;
 		max.y += 1.0;
-		origin.y += 1.0;
+		fOrigin.y += 1.0;
 	}
 	while (min.z < 0.0) {
 		min.z += 1.0;
 		max.z += 1.0;
-		origin.z += 1.0;
+		fOrigin.z += 1.0;
 	}
 	while (max.x >= 2.0) {
 		min.x -= 1.0;
 		max.x -= 1.0;
-		origin.x -= 1.0;
+		fOrigin.x -= 1.0;
 	}
 	while (max.y >= 2.0) {
 		min.y -= 1.0;
 		max.y -= 1.0;
-		origin.y -= 1.0;
+		fOrigin.y -= 1.0;
 	}
 	while (max.z >= 2.0) {
 		min.z -= 1.0;
 		max.z -= 1.0;
-		origin.z -= 1.0;
+		fOrigin.z -= 1.0;
 	}
 	
 	/* set the cutting plans. For example, if the bouding box of
@@ -2312,9 +2301,9 @@ ChartWindow::SetCubeOffset()
 	   in [1.0 ; 1.4] where they will be visible. Same process
 	   on other axis. That way, we have to test every star of the
 	   starfield in one position and only one. */
-	cut.x = (min.x + max.x - 1.0) * 0.5;
-	cut.y = (min.y + max.y - 1.0) * 0.5;
-	cut.z = (min.z + max.z - 1.0) * 0.5;
+	fCut.x = (min.x + max.x - 1.0) * 0.5;
+	fCut.y = (min.y + max.y - 1.0) * 0.5;
+	fCut.z = (min.z + max.z - 1.0) * 0.5;
 
 	/* Make sure those new settings are copied into the struct
 	   used by the embedded C-engine. */
@@ -2333,32 +2322,32 @@ ChartWindow::CameraAnimation(float time_factor)
 	/* Slow rotation around the "center" of the visible area. */
 	case ANIMATION_ROTATE :
 		/* turn around a point at 0.45 in front of the camera */
-		move = camera.Axis(2);
+		move = fCamera.Axis(2);
 		move = move * 0.45;
-		origin = origin + move;
+		fOrigin = fOrigin + move;
 		
 		/* turn around the alpha angle of the spheric rotation
 		   matrix */
-		camera_alpha += 0.011*time_factor;
-		if (camera_alpha > 2*3.14159)
-			camera_alpha -= 2*3.14159;
+		fCameraAlpha += 0.011*time_factor;
+		if (fCameraAlpha > 2*3.14159)
+			fCameraAlpha -= 2*3.14159;
 			
 		/* set the other two angles close from hardcoded values */	
-		if (camera_theta < 0.18)
-			camera_theta += 0.003*time_factor;
-		if (camera_theta > 0.22)
-			camera_theta -= 0.003*time_factor;
+		if (fCameraTheta < 0.18)
+			fCameraTheta += 0.003*time_factor;
+		if (fCameraTheta > 0.22)
+			fCameraTheta -= 0.003*time_factor;
 			
-		if (camera_phi < -0.02)
-			camera_phi += 0.003*time_factor;
-		if (camera_phi > 0.02)
-			camera_phi -= 0.003*time_factor;
+		if (fCameraPhi < -0.02)
+			fCameraPhi += 0.003*time_factor;
+		if (fCameraPhi > 0.02)
+			fCameraPhi -= 0.003*time_factor;
 			
-		camera.Set(camera_alpha, camera_theta, camera_phi);
-		camera_invert = camera.Transpose();
-		move = camera.Axis(2);
+		fCamera.Set(fCameraAlpha, fCameraTheta, fCameraPhi);
+		fCameraInvert = fCamera.Transpose();
+		move = fCamera.Axis(2);
 		move = move * -0.45;
-		origin = origin + move;
+		fOrigin = fOrigin + move;
 		/* As we moved or rotated the camera, we need to process
 		   again the parameters specific to the pyramid of vision. */
 		SetCubeOffset();
@@ -2366,48 +2355,48 @@ ChartWindow::CameraAnimation(float time_factor)
 		
 	case ANIMATION_SLOW_MOVE :
 		/* Just move forward, at slow speed */
-		move = camera.Axis(2);
+		move = fCamera.Axis(2);
 		move = move * 0.006*time_factor;
-		origin = origin + move;
+		fOrigin = fOrigin + move;
 		SetCubeOffset();
 		break;
 		
 	case ANIMATION_FAST_MOVE :
 		/* Just move forward, at fast speed */
-		move = camera.Axis(2);
+		move = fCamera.Axis(2);
 		move = move * 0.018*time_factor;
-		origin = origin + move;
+		fOrigin = fOrigin + move;
 		SetCubeOffset();
 		break;
 		
 	case ANIMATION_FREE_MOVE :
 		/* go into advanced selection process no more than once every
 		   0.5 time unit (average time). */
-		last_dynamic_delay += time_factor;
-		if (last_dynamic_delay > 0.5) {
-			last_dynamic_delay -= 0.5;
-			if (last_dynamic_delay > 0.2)
-				last_dynamic_delay = 0.2;
+		fLastDynamicDelay += time_factor;
+		if (fLastDynamicDelay > 0.5) {
+			fLastDynamicDelay -= 0.5;
+			if (fLastDynamicDelay > 0.2)
+				fLastDynamicDelay = 0.2;
 		
 			/* if we're not following any target, then just turn
 			   randomly (modifying only the direction of the
 			   acceleration) */
-			if (tracking_target < 0) {
-				if ((crc_alea & 0x4200) == 0) {
-					if (crc_alea & 0x8000)
-						cnt_alpha += 1 - (cnt_alpha/4);
+			if (fTrackingTarget < 0) {
+				if ((fCrcAlea & 0x4200) == 0) {
+					if (fCrcAlea & 0x8000)
+						fCountAlpha += 1 - (fCountAlpha/4);
 					else
-						cnt_alpha += -1 - (cnt_alpha/4);
+						fCountAlpha += -1 - (fCountAlpha/4);
 					CrcStep();
-					if (crc_alea & 0x8000)
-						cnt_theta += 1 - (cnt_theta/4);
+					if (fCrcAlea & 0x8000)
+						fCountTheta += 1 - (fCountTheta/4);
 					else
-						cnt_theta += -1 - (cnt_theta/4);
+						fCountTheta += -1 - (fCountTheta/4);
 					CrcStep();
-					if (crc_alea & 0x8000)
-						cnt_phi += 1 - (cnt_phi/4);
+					if (fCrcAlea & 0x8000)
+						fCountPhi += 1 - (fCountPhi/4);
 					else
-						cnt_phi += -1 - (cnt_phi/4);
+						fCountPhi += -1 - (fCountPhi/4);
 					CrcStep();
 				}
 				CrcStep();
@@ -2417,54 +2406,54 @@ ChartWindow::CameraAnimation(float time_factor)
 				FollowTarget();
 	
 			/* Change target everyonce in a while... */		
-			if ((crc_alea & 0xf80) == 0)
+			if ((fCrcAlea & 0xf80) == 0)
 				SelectNewTarget();
 	
 			/* depending the direction of acceleration, increase or
 			   reduce the angular speed of the 3 spherical angles. */
-			if (cnt_alpha < 0)
-				d_alpha += -0.0005 - d_alpha * 0.025;
-			else if (cnt_alpha > 0)
-				d_alpha += 0.0005 - d_alpha * 0.025;
+			if (fCountAlpha < 0)
+				fDynamicAlpha += -0.0005 - fDynamicAlpha * 0.025;
+			else if (fCountAlpha > 0)
+				fDynamicAlpha += 0.0005 - fDynamicAlpha * 0.025;
 				
-			if (cnt_theta < 0)
-				d_theta += -0.0002 - d_theta * 0.025;
-			else if (cnt_theta > 0)
-				d_theta += 0.0002 - d_theta * 0.025;
+			if (fCountTheta < 0)
+				fDynamicTheta += -0.0002 - fDynamicTheta * 0.025;
+			else if (fCountTheta > 0)
+				fDynamicTheta += 0.0002 - fDynamicTheta * 0.025;
 				
-			if (cnt_phi < 0)
-				d_phi += -0.00025 - d_phi * 0.025;
-			else if (cnt_phi >0)
-				d_phi += 0.00025 - d_phi * 0.025;
+			if (fCountPhi < 0)
+				fDynamicPhi += -0.00025 - fDynamicPhi * 0.025;
+			else if (fCountPhi >0)
+				fDynamicPhi += 0.00025 - fDynamicPhi * 0.025;
 		}
 
 		/* turn the camera following the specified angular speed */		
-		camera_alpha += d_alpha*time_factor;
-		if (camera_alpha < 0.0)
-			camera_alpha += 2*3.14159;
-		else if (camera_alpha > 2*3.14159)
-			camera_alpha -= 2*3.14159;
+		fCameraAlpha += fDynamicAlpha*time_factor;
+		if (fCameraAlpha < 0.0)
+			fCameraAlpha += 2*3.14159;
+		else if (fCameraAlpha > 2*3.14159)
+			fCameraAlpha -= 2*3.14159;
 			
-		camera_theta += d_theta*time_factor;
-		if (camera_theta < 0.0)
-			camera_theta += 2*3.14159;
-		else if (camera_theta > 2*3.14159)
-			camera_theta -= 2*3.14159;
+		fCameraTheta += fDynamicTheta*time_factor;
+		if (fCameraTheta < 0.0)
+			fCameraTheta += 2*3.14159;
+		else if (fCameraTheta > 2*3.14159)
+			fCameraTheta -= 2*3.14159;
 			
-		camera_phi += d_phi*time_factor;
-		if (camera_phi < 0.0)
-			camera_phi += 2*3.14159;
-		else if (camera_phi > 2*3.14159)
-			camera_phi -= 2*3.14159;
+		fCameraPhi += fDynamicPhi*time_factor;
+		if (fCameraPhi < 0.0)
+			fCameraPhi += 2*3.14159;
+		else if (fCameraPhi > 2*3.14159)
+			fCameraPhi -= 2*3.14159;
 			
 		/* Set the new rotation matrix of the camera */	
-		camera.Set(camera_alpha, camera_theta, camera_phi);
-		camera_invert = camera.Transpose();
+		fCamera.Set(fCameraAlpha, fCameraTheta, fCameraPhi);
+		fCameraInvert = fCamera.Transpose();
 		
 		/* move the camera forward at medium speed */
-		move = camera.Axis(2);
+		move = fCamera.Axis(2);
 		move = move * 0.0115*time_factor;
-		origin = origin + move;
+		fOrigin = fOrigin + move;
 		SetCubeOffset();
 		break;
 	}
@@ -2479,34 +2468,34 @@ ChartWindow::SelectNewTarget()
 	int32		i, index_min;
 	TPoint		axis, pt, vect;
 
-	axis = camera.Axis(2);
+	axis = fCamera.Axis(2);
 	ratio_min = 1e6;
 	index_min = -3;
 
-	for (i=-2; i<key_point_count; i++) {
+	for (i=-2; i<fKeyPointCount; i++) {
 		/* if they're used, the comets are two good potential
 		   targets. */
 		if (i < 0) {
 			if (fCurrentSettings.special == SPECIAL_COMET)
-				pt = comet[i+2];
+				pt = fComet[i+2];
 			else
 				continue;
 		}
 		/* other potential targets are the key_points defined
 		   in the star field. */
 		else	
-			pt = key_points[i];
+			pt = fKeyPoints[i];
 
 		/* Qualify the interest of the potential target in
 		   relationship with its distance and its proximity to
 		   the axis of the camera. */
-		if (pt.x < cut.x)
+		if (pt.x < fCut.x)
 			pt.x += 1.0;
-		if (pt.y < cut.y)
+		if (pt.y < fCut.y)
 			pt.y += 1.0;
-		if (pt.z < cut.z)
+		if (pt.z < fCut.z)
 			pt.z += 1.0;
-		pt = pt - origin;
+		pt = pt - fOrigin;
 		dist = pt.Length();
 		ftmp = 1.0/dist;
 		pt.x *= ftmp;
@@ -2525,7 +2514,7 @@ ChartWindow::SelectNewTarget()
 	}
 
 	/* record what target has been chosen */	
-	tracking_target = index_min+2;
+	fTrackingTarget = index_min+2;
 }
 
 /* Try to change the angular acceleration to aim in direction
@@ -2537,55 +2526,55 @@ ChartWindow::FollowTarget()
 	TPoint		pt;
 
 	/* get the target point */
-	if (tracking_target < 2)
-		pt = comet[tracking_target];
+	if (fTrackingTarget < 2)
+		pt = fComet[fTrackingTarget];
 	else
-		pt = key_points[tracking_target-2];
+		pt = fKeyPoints[fTrackingTarget-2];
 	/* move it in the right iteration of the cubic torus (the
 	   one iteration that is the most likely to be close from
 	   the pyramid of vision. */
-	if (pt.x < cut.x)
+	if (pt.x < fCut.x)
 		pt.x += 1.0;
-	if (pt.y < cut.y)
+	if (pt.y < fCut.y)
 		pt.y += 1.0;
-	if (pt.z < cut.z)
+	if (pt.z < fCut.z)
 		pt.z += 1.0;
 	/* convert the target coordinates in the camera referential */
-	pt = pt - origin;
-	x = camera_invert.m[0][0]*pt.x + camera_invert.m[1][0]*pt.y + camera_invert.m[2][0]*pt.z;
-	y = camera_invert.m[0][1]*pt.x + camera_invert.m[1][1]*pt.y + camera_invert.m[2][1]*pt.z;
-	z = camera_invert.m[0][2]*pt.x + camera_invert.m[1][2]*pt.y + camera_invert.m[2][2]*pt.z;
+	pt = pt - fOrigin;
+	x = fCameraInvert.m[0][0]*pt.x + fCameraInvert.m[1][0]*pt.y + fCameraInvert.m[2][0]*pt.z;
+	y = fCameraInvert.m[0][1]*pt.x + fCameraInvert.m[1][1]*pt.y + fCameraInvert.m[2][1]*pt.z;
+	z = fCameraInvert.m[0][2]*pt.x + fCameraInvert.m[1][2]*pt.y + fCameraInvert.m[2][2]*pt.z;
 	if (z <= 0.001) {
 		/* need to do a U-turn (better to do it using theta). */
-		cnt_alpha = 0;
-		cnt_theta = -1;
-		cnt_phi = 0;
+		fCountAlpha = 0;
+		fCountTheta = -1;
+		fCountPhi = 0;
 	}
 	else {
 		/* need to do a direction adjustement (play with
 		   alpha and theta) */
-		cphi = cos(camera_phi);
-		sphi = sin(camera_phi);
+		cphi = cos(fCameraPhi);
+		sphi = sin(fCameraPhi);
 		x0 = x*cphi - y*sphi;
 		y0 = x*sphi + y*cphi;
 		
 		/* need to move first on the left/right axis */
 		if (abs(x0) > abs(y0)) {
 			if (x0 > 0)
-				cnt_alpha = -1;
+				fCountAlpha = -1;
 			else
-				cnt_alpha = 1;
-			cnt_theta = 0;
-			cnt_phi = 0;
+				fCountAlpha = 1;
+			fCountTheta = 0;
+			fCountPhi = 0;
 		}	
 		/* need to move first on the top/bottom axis */
 		else {
 			if (y0 > 0)
-				cnt_theta = -1;
+				fCountTheta = -1;
 			else
-				cnt_theta = 1;
-			cnt_alpha = 0;
-			cnt_phi = 0;
+				fCountTheta = 1;
+			fCountAlpha = 0;
+			fCountPhi = 0;
 		}	
 	}
 }
@@ -2606,36 +2595,36 @@ ChartWindow::AnimSpecials(float time_step)
 		/* for both comets... */
 		for (j=0; j<2; j++) {
 			/* move the comet forward, at its specific speed */
-			comet[j] = comet[j] + delta_comet[j] * time_step;
+			fComet[j] = fComet[j] + fDeltaComet[j] * time_step;
 			/* Insure that the comet stays in the [0-1]x[0-1]x[0-1]
 			   iteration of the cubic torus. */
-			if (comet[j].x < 0.0) comet[j].x += 1.0;
-			else if (comet[j].x > 1.0) comet[j].x -= 1.0;
-			if (comet[j].y < 0.0) comet[j].y += 1.0;
-			else if (comet[j].y > 1.0) comet[j].y -= 1.0;
-			if (comet[j].z < 0.0) comet[j].z += 1.0;
-			else if (comet[j].z > 1.0) comet[j].z -= 1.0;
+			if (fComet[j].x < 0.0) fComet[j].x += 1.0;
+			else if (fComet[j].x > 1.0) fComet[j].x -= 1.0;
+			if (fComet[j].y < 0.0) fComet[j].y += 1.0;
+			else if (fComet[j].y > 1.0) fComet[j].y -= 1.0;
+			if (fComet[j].z < 0.0) fComet[j].z += 1.0;
+			else if (fComet[j].z > 1.0) fComet[j].z -= 1.0;
 			/* set the position of the star used to represent the
 			   head of the comet. */
-			specials.list[j].x = comet[j].x;
-			specials.list[j].y = comet[j].y;
-			specials.list[j].z = comet[j].z;
+			fSpecials.list[j].x = fComet[j].x;
+			fSpecials.list[j].y = fComet[j].y;
+			fSpecials.list[j].z = fComet[j].z;
 	
 			/* for other point, the ones that are ejected from the
 			   comet, depending for allow long they have been ejected... */
-			s = specials.list+j+2;
-			sp = special_list+j+2;
-			for (i=j+2; i<specials.count; i+=2) {
+			s = fSpecials.list+j+2;
+			sp = fSpecialList+j+2;
+			for (i=j+2; i<fSpecials.count; i+=2) {
 				sp->comet.count -= (int32)time_step;
 				/* they are reset and reejected again, just a little in
 				   the back of the head of the comet */
 				if (sp->comet.count <= 0.0) {
-					delta = (0.6 + (float)(crc_alea & 31) * (1.0/32.0)) * time_step;
-					s->x = comet[j].x + 6.0 * sp->comet.dx - delta_comet[j].x * delta;
-					s->y = comet[j].y + 6.0 * sp->comet.dy - delta_comet[j].y * delta;
-					s->z = comet[j].z + 6.0 * sp->comet.dz - delta_comet[j].z * delta;
+					delta = (0.6 + (float)(fCrcAlea & 31) * (1.0/32.0)) * time_step;
+					s->x = fComet[j].x + 6.0 * sp->comet.dx - fDeltaComet[j].x * delta;
+					s->y = fComet[j].y + 6.0 * sp->comet.dy - fDeltaComet[j].y * delta;
+					s->z = fComet[j].z + 6.0 * sp->comet.dz - fDeltaComet[j].z * delta;
 					s->size = 0.6;
-					sp->comet.count = (int32)(sp->comet.count0 + (crc_alea & 63));
+					sp->comet.count = (int32)(sp->comet.count0 + (fCrcAlea & 63));
 					CrcStep();
 				}
 				/* or they just move at their own (ejection) speed */
@@ -2655,18 +2644,18 @@ ChartWindow::AnimSpecials(float time_step)
 		/* Novas are just stars (usualy invisible) that periodically
 		   become much brighter during a suddent flash, then disappear
 		   again until their next cycle */ 
-		sp = special_list;
-		for (i=0; i<specials.count; i++) {
+		sp = fSpecialList;
+		for (i=0; i<fSpecials.count; i++) {
 			sp->nova.count -= time_step;
 			if (sp->nova.count <= 0.0) {
-				specials.list[i].x -= 10.0;
-				sp->nova.count = sp->nova.count0 + (crc_alea & 31);
+				fSpecials.list[i].x -= 10.0;
+				sp->nova.count = sp->nova.count0 + (fCrcAlea & 31);
 				CrcStep();
 			}
 			else if (sp->nova.count < 16.0) {
-				if (specials.list[i].x < 0.0)
-					specials.list[i].x += 10.0;
-				specials.list[i].size = sp->nova.count;
+				if (fSpecials.list[i].x < 0.0)
+					fSpecials.list[i].x += 10.0;
+				fSpecials.list[i].size = sp->nova.count;
 			}
 			sp++;
 		}
@@ -2684,13 +2673,13 @@ ChartWindow::AnimSpecials(float time_step)
 void
 ChartWindow::SyncGeo()
 {
-	geo.x = origin.x;
-	geo.y = origin.y;
-	geo.z = origin.z;
-	geo.cutx = cut.x;
-	geo.cuty = cut.y;
-	geo.cutz = cut.z;
-	memcpy(geo.m, camera_invert.m, sizeof(float)*9);
+	fGeometry.x = fOrigin.x;
+	fGeometry.y = fOrigin.y;
+	fGeometry.z = fOrigin.z;
+	fGeometry.cutx = fCut.x;
+	fGeometry.cuty = fCut.y;
+	fGeometry.cutz = fCut.z;
+	memcpy(fGeometry.m, fCameraInvert.m, sizeof(float)*9);
 }
 
 
@@ -2706,36 +2695,36 @@ ChartWindow::RefreshStars(buffer *buf, float time_step)
 	   dynamic load split between the two threads, when
 	   needed. */
 	if (fCurrentSettings.second_thread) {
-		int32 star_threshold = (int32)((float)stars.count * fSecondThreadThreshold + 0.5);
-		int32 special_threshold = (int32)((float)specials.count * fSecondThreadThreshold + 0.5);
+		int32 star_threshold = (int32)((float)fStars.count * fSecondThreadThreshold + 0.5);
+		int32 special_threshold = (int32)((float)fSpecials.count * fSecondThreadThreshold + 0.5);
 		
 		/* split the work load (star and special animation)
 		   between the two threads, proportionnaly to the
 		   last split factor determined during the last
 		   cycle. */
 		star_packet stars1;
-		stars1.list = stars.list;
+		stars1.list = fStars.list;
 		stars1.count = star_threshold;
 		stars1.erase_count = star_threshold;
-		if (stars1.erase_count > stars.erase_count)
-			stars1.erase_count = stars.erase_count;
+		if (stars1.erase_count > fStars.erase_count)
+			stars1.erase_count = fStars.erase_count;
 			
-		fStars2.list = stars.list + star_threshold;
-		fStars2.count = stars.count - star_threshold;
-		fStars2.erase_count = stars.erase_count - star_threshold;
+		fStars2.list = fStars.list + star_threshold;
+		fStars2.count = fStars.count - star_threshold;
+		fStars2.erase_count = fStars.erase_count - star_threshold;
 		if (fStars2.erase_count < 0)
 			fStars2.erase_count = 0;
 		
 		star_packet specials1;
-		specials1.list = specials.list;
+		specials1.list = fSpecials.list;
 		specials1.count = special_threshold;
 		specials1.erase_count = special_threshold;
-		if (specials1.erase_count > specials.erase_count)
-			specials1.erase_count = specials.erase_count;
+		if (specials1.erase_count > fSpecials.erase_count)
+			specials1.erase_count = fSpecials.erase_count;
 			
-		fSpecials2.list = specials.list + special_threshold;
-		fSpecials2.count = specials.count - special_threshold;
-		fSpecials2.erase_count = specials.erase_count - special_threshold;
+		fSpecials2.list = fSpecials.list + special_threshold;
+		fSpecials2.count = fSpecials.count - special_threshold;
+		fSpecials2.erase_count = fSpecials.erase_count - special_threshold;
 		if (fSpecials2.erase_count < 0)
 			fSpecials2.erase_count = 0;
 			
@@ -2746,8 +2735,8 @@ ChartWindow::RefreshStars(buffer *buf, float time_step)
 		
 		/* do its own part (time it) */
 		bigtime_t before = system_time();
-		RefreshStarPacket(buf, &stars1, &geo);
-		RefreshStarPacket(buf, &specials1, &geo);
+		RefreshStarPacket(buf, &stars1, &fGeometry);
+		RefreshStarPacket(buf, &specials1, &fGeometry);
 		bigtime_t after = system_time();
 	
 		/* wait for completion of the second thread */	
@@ -2763,14 +2752,14 @@ ChartWindow::RefreshStars(buffer *buf, float time_step)
 		
 	} else {
 		 /* In single-threaded mode, nothing fancy to be done. */
-		RefreshStarPacket(buf, &stars, &geo);
-		RefreshStarPacket(buf, &specials, &geo);
+		RefreshStarPacket(buf, &fStars, &fGeometry);
+		RefreshStarPacket(buf, &fSpecials, &fGeometry);
 	}
 	
 	/* All the stars that were drawn will have to be erased during
 	   the next frame. */
-	stars.erase_count = stars.count;
-	specials.erase_count = specials.count;
+	fStars.erase_count = fStars.count;
+	fSpecials.erase_count = fSpecials.count;
 }
 
 
@@ -2789,40 +2778,40 @@ ChartWindow::CheckBitmap(color_space depth, int32 width, int32 height)
 	if (fOffscreen == NULL)
 		cur_depth = B_NO_COLOR_SPACE;
 	else
-		cur_depth = bitmap_buffer.depth;
-	if ((cur_depth != depth) || (width > max_width) || (height > max_height)) {
+		cur_depth = fBitmapBuffer.depth;
+	if ((cur_depth != depth) || (width > fMaxWidth) || (height > fMaxHeight)) {
 		/* We free the old one if needed... */
 		if (fOffscreen)
 			delete fOffscreen;
 		/* We chose a new size (resizing are done by big step to
 		   avoid resizing to often)... */
-		while ((width > max_width) || (height > max_height)) {
-			max_width += WINDOW_H_STEP;
-			max_height += WINDOW_V_STEP;
+		while ((width > fMaxWidth) || (height > fMaxHeight)) {
+			fMaxWidth += WINDOW_H_STEP;
+			fMaxHeight += WINDOW_V_STEP;
 		}
 		/* And we try to allocate a new BBitmap at the new size. */
-		fOffscreen = new BBitmap(BRect(0, 0, max_width-1, max_height-1), depth);
+		fOffscreen = new BBitmap(BRect(0, 0, fMaxWidth-1, fMaxHeight-1), depth);
 		if (!fOffscreen->IsValid()) {
 			/* If we failed, the offscreen is released and the buffer
 			   clipping is set as empty. */
 			delete fOffscreen;
 			fOffscreen = NULL;
-			bitmap_buffer.depth = B_NO_COLOR_SPACE;
-			bitmap_buffer.clip_bounds.top = 0;
-			bitmap_buffer.clip_bounds.left = 0;
-			bitmap_buffer.clip_bounds.right = -1;
-			bitmap_buffer.clip_bounds.bottom = -1;
+			fBitmapBuffer.depth = B_NO_COLOR_SPACE;
+			fBitmapBuffer.clip_bounds.top = 0;
+			fBitmapBuffer.clip_bounds.left = 0;
+			fBitmapBuffer.clip_bounds.right = -1;
+			fBitmapBuffer.clip_bounds.bottom = -1;
 		}
 		else {
 			/* If we succeed, then initialise the generic buffer
 			   descriptor, we set the clipping to the required size,
 			   and we set the buffer background color. */
-			bitmap_buffer.bits = fOffscreen->Bits();
-			bitmap_buffer.bytes_per_row = fOffscreen->BytesPerRow();
-			bitmap_buffer.buffer_width = fCurrentSettings.width;
-			bitmap_buffer.buffer_height = fCurrentSettings.height;
-			SetColorSpace(&bitmap_buffer, fOffscreen->ColorSpace());
-			SetPatternBits(&bitmap_buffer);
+			fBitmapBuffer.bits = fOffscreen->Bits();
+			fBitmapBuffer.bytes_per_row = fOffscreen->BytesPerRow();
+			fBitmapBuffer.buffer_width = fCurrentSettings.width;
+			fBitmapBuffer.buffer_height = fCurrentSettings.height;
+			SetColorSpace(&fBitmapBuffer, fOffscreen->ColorSpace());
+			SetPatternBits(&fBitmapBuffer);
 			SetBitmapClipping(fCurrentSettings.width, fCurrentSettings.height);
 			SetBitmapBackGround();
 		}
@@ -2836,15 +2825,15 @@ ChartWindow::SetBitmapClipping(int32 width, int32 height)
 {
 	/* Set the bitmap buffer clipping to the required size of
 	   the buffer (even if the allocated buffer is larger) */
-	bitmap_buffer.clip_list_count = 1;
-	bitmap_buffer.clip_bounds.top = 0;
-	bitmap_buffer.clip_bounds.left = 0;
-	bitmap_buffer.clip_bounds.right = width-1;
-	bitmap_buffer.clip_bounds.bottom = height-1;
-	bitmap_buffer.clip_list[0].top = bitmap_buffer.clip_bounds.top;
-	bitmap_buffer.clip_list[0].left = bitmap_buffer.clip_bounds.left;
-	bitmap_buffer.clip_list[0].right = bitmap_buffer.clip_bounds.right;
-	bitmap_buffer.clip_list[0].bottom = bitmap_buffer.clip_bounds.bottom;
+	fBitmapBuffer.clip_list_count = 1;
+	fBitmapBuffer.clip_bounds.top = 0;
+	fBitmapBuffer.clip_bounds.left = 0;
+	fBitmapBuffer.clip_bounds.right = width-1;
+	fBitmapBuffer.clip_bounds.bottom = height-1;
+	fBitmapBuffer.clip_list[0].top = fBitmapBuffer.clip_bounds.top;
+	fBitmapBuffer.clip_list[0].left = fBitmapBuffer.clip_bounds.left;
+	fBitmapBuffer.clip_list[0].right = fBitmapBuffer.clip_bounds.right;
+	fBitmapBuffer.clip_list[0].bottom = fBitmapBuffer.clip_bounds.bottom;
 }
 
 
@@ -2858,7 +2847,7 @@ ChartWindow::SetBitmapBackGround()
 	/* set the bitmap buffer to the right background color */	
 	bits = (uint32*)fOffscreen->Bits();
 	count = fOffscreen->BitsLength()/4;
-	color = bitmap_buffer.back_color;
+	color = fBitmapBuffer.back_color;
 
 	for (i=0; i<count; i++)
 		bits[i] = color;	
@@ -2890,7 +2879,6 @@ ChartWindow::DirectConnected(direct_buffer_info *info)
 void
 ChartWindow::SwitchContext(direct_buffer_info *info)
 {
-	//star			*s;
 	uint32			i, j;
 
 	/* you need to use that mask to read the buffer state. */
@@ -2911,46 +2899,46 @@ ChartWindow::SwitchContext(direct_buffer_info *info)
 		/* This calculate the base address of the animation view, taking into
 		   account the base address of the screen buffer, the position of the
 		   window and the position of the view in the window */
-		direct_buffer.bits = (void*)((char*)info->bits +
+		fDirectBuffer.bits = (void*)((char*)info->bits +
 			(info->window_bounds.top + TOP_LEFT_LIMIT) * info->bytes_per_row +
 			(info->window_bounds.left + LEFT_WIDTH) * (info->bits_per_pixel>>3));
 		/* Bytes per row and pixel-format are the same than the window values */
-		direct_buffer.bytes_per_row = info->bytes_per_row;
-		SetColorSpace(&direct_buffer, info->pixel_format);
-		SetPatternBits(&direct_buffer);
+		fDirectBuffer.bytes_per_row = info->bytes_per_row;
+		SetColorSpace(&fDirectBuffer, info->pixel_format);
+		SetPatternBits(&fDirectBuffer);
 		
 		/* the width and height of the animation view are linked to the width
 		   and height of the window itself, reduced by the size of the borders
 		   reserved for the UI. */
-		direct_buffer.buffer_width =
+		fDirectBuffer.buffer_width =
 			info->window_bounds.right-info->window_bounds.left+1 - LEFT_WIDTH;
-		direct_buffer.buffer_height =
+		fDirectBuffer.buffer_height =
 			info->window_bounds.bottom-info->window_bounds.top+1 - TOP_LEFT_LIMIT;
 		
 		/* Now, we go through the clipping list and "clip" the clipping
 		   rectangle to the animation view boundary. */
 		j = 0;
 		for (i=0; i<info->clip_list_count; i++) {
-			direct_buffer.clip_list[j].top = info->clip_list[i].top - info->window_bounds.top;
-			if (direct_buffer.clip_list[j].top < TOP_LEFT_LIMIT)
-				direct_buffer.clip_list[j].top = TOP_LEFT_LIMIT;
-			direct_buffer.clip_list[j].left = info->clip_list[i].left - info->window_bounds.left;
-			if (direct_buffer.clip_list[j].left < LEFT_WIDTH)
-				direct_buffer.clip_list[j].left = LEFT_WIDTH;
-			direct_buffer.clip_list[j].right = info->clip_list[i].right - info->window_bounds.left;
-			direct_buffer.clip_list[j].bottom = info->clip_list[i].bottom - info->window_bounds.top;
+			fDirectBuffer.clip_list[j].top = info->clip_list[i].top - info->window_bounds.top;
+			if (fDirectBuffer.clip_list[j].top < TOP_LEFT_LIMIT)
+				fDirectBuffer.clip_list[j].top = TOP_LEFT_LIMIT;
+			fDirectBuffer.clip_list[j].left = info->clip_list[i].left - info->window_bounds.left;
+			if (fDirectBuffer.clip_list[j].left < LEFT_WIDTH)
+				fDirectBuffer.clip_list[j].left = LEFT_WIDTH;
+			fDirectBuffer.clip_list[j].right = info->clip_list[i].right - info->window_bounds.left;
+			fDirectBuffer.clip_list[j].bottom = info->clip_list[i].bottom - info->window_bounds.top;
 			
 			/* All clipped rectangle that are not empty are recorded in
 			   the buffer clipping list. We keep only the 64 first (as
 			   a reasonnable approximation of most cases), but the rectangle
 			   list could easily be made dynamic if needed. Those clipping
 			   rectangle are offset to animation view coordinates */
-			if ((direct_buffer.clip_list[j].top <= direct_buffer.clip_list[j].bottom) &&
-				(direct_buffer.clip_list[j].left <= direct_buffer.clip_list[j].right)) {
-				direct_buffer.clip_list[j].top -= TOP_LEFT_LIMIT;
-				direct_buffer.clip_list[j].left -= LEFT_WIDTH;
-				direct_buffer.clip_list[j].right -= LEFT_WIDTH;
-				direct_buffer.clip_list[j].bottom -= TOP_LEFT_LIMIT;
+			if ((fDirectBuffer.clip_list[j].top <= fDirectBuffer.clip_list[j].bottom) &&
+				(fDirectBuffer.clip_list[j].left <= fDirectBuffer.clip_list[j].right)) {
+				fDirectBuffer.clip_list[j].top -= TOP_LEFT_LIMIT;
+				fDirectBuffer.clip_list[j].left -= LEFT_WIDTH;
+				fDirectBuffer.clip_list[j].right -= LEFT_WIDTH;
+				fDirectBuffer.clip_list[j].bottom -= TOP_LEFT_LIMIT;
 				j++;
 				if (j == 64)
 					break;
@@ -2959,54 +2947,51 @@ ChartWindow::SwitchContext(direct_buffer_info *info)
 		/* record the count of clipping rect in the new clipping list (less
 		   or equal to the window clipping list count, as some rectangle can
 		   be made invisible by the extra animation view clipping */
-		direct_buffer.clip_list_count = j;
+		fDirectBuffer.clip_list_count = j;
 
 		/* the bounding box of the clipping list need to be calculate again
 		   from scratsh. Clipping the bounding box of the window clipping
 		   region to the animation view can give us an incorrect (larger)
 		   bounding box. Remember that the bounding box of a region is
 		   required to be minimal */
-		direct_buffer.clip_bounds.top = 20000;
-		direct_buffer.clip_bounds.left = 20000;
-		direct_buffer.clip_bounds.right = -20000;
-		direct_buffer.clip_bounds.bottom = -20000;
+		fDirectBuffer.clip_bounds.top = 20000;
+		fDirectBuffer.clip_bounds.left = 20000;
+		fDirectBuffer.clip_bounds.right = -20000;
+		fDirectBuffer.clip_bounds.bottom = -20000;
 
-		for (i=0; i<direct_buffer.clip_list_count; i++) {
-			if (direct_buffer.clip_bounds.top > direct_buffer.clip_list[i].top)
-				direct_buffer.clip_bounds.top = direct_buffer.clip_list[i].top;
-			if (direct_buffer.clip_bounds.left > direct_buffer.clip_list[i].left)
-				direct_buffer.clip_bounds.left = direct_buffer.clip_list[i].left;
-			if (direct_buffer.clip_bounds.right < direct_buffer.clip_list[i].right)
-				direct_buffer.clip_bounds.right = direct_buffer.clip_list[i].right;
-			if (direct_buffer.clip_bounds.bottom < direct_buffer.clip_list[i].bottom)
-				direct_buffer.clip_bounds.bottom = direct_buffer.clip_list[i].bottom;
+		for (i=0; i<fDirectBuffer.clip_list_count; i++) {
+			if (fDirectBuffer.clip_bounds.top > fDirectBuffer.clip_list[i].top)
+				fDirectBuffer.clip_bounds.top = fDirectBuffer.clip_list[i].top;
+			if (fDirectBuffer.clip_bounds.left > fDirectBuffer.clip_list[i].left)
+				fDirectBuffer.clip_bounds.left = fDirectBuffer.clip_list[i].left;
+			if (fDirectBuffer.clip_bounds.right < fDirectBuffer.clip_list[i].right)
+				fDirectBuffer.clip_bounds.right = fDirectBuffer.clip_list[i].right;
+			if (fDirectBuffer.clip_bounds.bottom < fDirectBuffer.clip_list[i].bottom)
+				fDirectBuffer.clip_bounds.bottom = fDirectBuffer.clip_list[i].bottom;
 		}
 
 		/* If the bounding box is empty, nothing is visible and all erasing
 		   should be canceled */
-		if ((direct_buffer.clip_bounds.top > direct_buffer.clip_bounds.bottom) ||
-			(direct_buffer.clip_bounds.left > direct_buffer.clip_bounds.right)) {
-			stars.erase_count = 0;
+		if ((fDirectBuffer.clip_bounds.top > fDirectBuffer.clip_bounds.bottom) ||
+			(fDirectBuffer.clip_bounds.left > fDirectBuffer.clip_bounds.right)) {
+			fStars.erase_count = 0;
 			goto nothing_visible;
 		}
 
 		if (fCurrentSettings.display == DISPLAY_DIRECT) {
 			/* When the direct display mode is used, the geometry changes
 			   need to be immediatly applied to the engine. */
-			SetGeometry(direct_buffer.buffer_width, direct_buffer.buffer_height);
-			/* if the buffer was reset (that includes testing the work-around
-			   for the known bug in the 1.3.0 version of the app_server), then
+			SetGeometry(fDirectBuffer.buffer_width, fDirectBuffer.buffer_height);
+			/* if the buffer was reset then
 			   we cancel the erasing of the stars for the next frame. */	
-			if ((info->buffer_state & B_BUFFER_RESET) ||
-				(need_r3_buffer_reset_work_around &&
-				 ((info->buffer_state & (B_DIRECT_MODE_MASK|B_BUFFER_MOVED)) == B_DIRECT_START))) {
-				stars.erase_count = 0;
+			if (info->buffer_state & B_BUFFER_RESET) {
+				fStars.erase_count = 0;
 			}
 			/* In the other case, we need to cancel the erasing of star that
 			   were drawn at the previous frame, but are no longer visible */
 			else if (info->buffer_state & B_CLIPPING_MODIFIED) {
-				RefreshClipping(&direct_buffer, &stars);
-				RefreshClipping(&direct_buffer, &specials);
+				RefreshClipping(&fDirectBuffer, &fStars);
+				RefreshClipping(&fDirectBuffer, &fSpecials);
 			}
 		}
 		break;
@@ -3017,15 +3002,15 @@ ChartWindow::SwitchContext(direct_buffer_info *info)
 		fDirectConnected = false;
 	nothing_visible:
 		/* set an empty clipping */
-		direct_buffer.clip_list_count = 1;
-		direct_buffer.clip_bounds.top = 0;
-		direct_buffer.clip_bounds.left = 0;
-		direct_buffer.clip_bounds.right = -1;
-		direct_buffer.clip_bounds.bottom = -1;
-		direct_buffer.clip_list[0].top = 0;
-		direct_buffer.clip_list[0].left = 0;
-		direct_buffer.clip_list[0].right = -1;
-		direct_buffer.clip_list[0].bottom = -1;
+		fDirectBuffer.clip_list_count = 1;
+		fDirectBuffer.clip_bounds.top = 0;
+		fDirectBuffer.clip_bounds.left = 0;
+		fDirectBuffer.clip_bounds.right = -1;
+		fDirectBuffer.clip_bounds.bottom = -1;
+		fDirectBuffer.clip_list[0].top = 0;
+		fDirectBuffer.clip_list[0].left = 0;
+		fDirectBuffer.clip_list[0].right = -1;
+		fDirectBuffer.clip_list[0].bottom = -1;
 		break;
 	}
 }
@@ -3043,7 +3028,7 @@ ChartWindow::setting::Set(setting *master)
 void
 ChartWindow::CrcStep()
 {
-	crc_alea <<= 1;
-	if (crc_alea < 0)
-		crc_alea ^= CRC_KEY;
+	fCrcAlea <<= 1;
+	if (fCrcAlea < 0)
+		fCrcAlea ^= CRC_KEY;
 }
