@@ -623,7 +623,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	h += SPACE_LABEL+SPACE_POPUP+2*H_BORDER;
 	
 	/* left column gray background */
-	r.Set(0.0, TOP_LEFT_LIMIT, LEFT_WIDTH-1, frame.bottom);  
+	r.Set(0.0, TOP_LEFT_LIMIT, LEFT_WIDTH - 1, frame.bottom);  
 	fLeftView = new BView(r, "top view", B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM, B_WILL_DRAW);
 	fLeftView->SetViewColor(background_color);
 	AddChild(fLeftView);
@@ -853,11 +853,11 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 			radio->ResizeToPreferred();
 			fSpecialBox->AddChild(radio);
 
-	// Note: direct window mode uses LEFT_WIDTH
+	// Note: direct window mode uses LEFT_WIDTH to calculate
+	// the left border of the animation view, so we use it here too.
 	//fLeftView->ResizeTo(max_c(boxWidth + 2, fLeftView->Bounds().Width()), fLeftView->Bounds().Height());
-
 	/* animation area */
-	r.Set(fLeftView->Frame().right, TOP_LEFT_LIMIT, frame.right, frame.bottom);
+	r.Set(LEFT_WIDTH, TOP_LEFT_LIMIT, frame.right, frame.bottom);
 	fChartView = new ChartView(r);
 	fChartView->SetViewColor(0, 0, 0);
 	AddChild(fChartView);
