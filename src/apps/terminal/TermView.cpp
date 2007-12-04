@@ -41,6 +41,7 @@
 #include <termios.h>
 
 #include <new>
+#include <algorithm>
 
 // defined VTKeyTbl.c
 extern int function_keycode_table[];
@@ -167,7 +168,7 @@ TermView::TermView(BRect frame, int32 argc, const char **argv, int32 historySize
 	fScrBot(fTermRows - 1),
 	fScrBufSize(historySize),
 	fScrRegionSet(0),
-	fPreviousMousePoint(0, 0),
+	fClickPoint(0, 0),
 	fSelStart(-1, -1),
 	fSelEnd(-1, -1),
 	fMouseTracking(false),
@@ -215,7 +216,7 @@ TermView::TermView(int rows, int columns, int32 argc, const char **argv, int32 h
 	fScrBot(fTermRows - 1),
 	fScrBufSize(historySize),
 	fScrRegionSet(0),
-	fPreviousMousePoint(0, 0),
+	fClickPoint(0, 0),
 	fSelStart(-1, -1),
 	fSelEnd(-1, -1),
 	fMouseTracking(false),
@@ -264,7 +265,7 @@ TermView::TermView(BMessage *archive)
 	fScrBot(fTermRows - 1),
 	fScrBufSize(1000),
 	fScrRegionSet(0),
-	fPreviousMousePoint(0, 0),
+	fClickPoint(0, 0),
 	fSelStart(-1, -1),
 	fSelEnd(-1, -1),
 	fMouseTracking(false),
@@ -1825,8 +1826,6 @@ TermView::_WritePTY(const uchar *text, int numBytes)
 void
 TermView::MouseDown(BPoint where)
 {
-	// TODO: Get rid of the extra thread for mouse tracking,
-	// and implement it using something like BTextView uses.
 	if (!IsFocus())
 		MakeFocus();
 
@@ -1879,7 +1878,7 @@ TermView::MouseDown(BPoint where)
 		}
 
 		// If mouse has a lot of movement, disable double/triple click.
-		/*BPoint inPoint = fPreviousMousePoint - where;
+		/*BPoint inPoint = fClickPoint - where;
 		if (abs((int)inPoint.x) > 16 || abs((int)inPoint.y) > 16)
 			clicks = 1;
 		*/
@@ -1887,7 +1886,7 @@ TermView::MouseDown(BPoint where)
 		SetMouseEventMask(B_POINTER_EVENTS | B_KEYBOARD_EVENTS,
 				B_NO_POINTER_HISTORY | B_LOCK_WINDOW_FOCUS);
 
-		fPreviousMousePoint = where;
+		fClickPoint = where;
 	    
 		if (mod & B_SHIFT_KEY)
 			_AddSelectRegion(_BPointToCurPos(where));
@@ -1927,58 +1926,32 @@ TermView::MouseMoved(BPoint where, uint32 transit, const BMessage *message)
 	if (!fMouseTracking)
 		return;
 	
-	bool selected = _HasSelection();
-
-	//int32 button;
-	//Window()->CurrentMessage()->FindInt32("buttons", &button);
-
-	CurPos startPos = _BPointToCurPos(fPreviousMousePoint);
+	CurPos startPos = _BPointToCurPos(fClickPoint);
 	CurPos endPos = _BPointToCurPos(where);
 	if (endPos.y < 0)
 		return;
 
-	if (!selected) {
-		_Select(startPos, endPos);
-		selected = true;
-	} else {
-		// Align cursor point to text.
-		if (startPos == endPos)
-			return;
+	_DeSelect();
+	_Select(startPos, endPos);
+	
+	// Scroll check
+	if (fScrollBar != NULL) {
+		// Get now scroll point
+		float scrollStart, scrollEnd;
+		fScrollBar->GetRange(&scrollStart, &scrollEnd);
+		float scrollPos = fScrollBar->Value();
 		
-		if (endPos > startPos) {
-			where.x -= fFontWidth / 2;
-			endPos = _BPointToCurPos(where);
-			//edpos.x--;
-			if (endPos.x < 0)
-				endPos.x = 0;
-		} else if (endPos < startPos) {
-			where.x += fFontWidth / 2;
-			endPos = _BPointToCurPos(where);
-			//edpos.x++;
-			if (endPos.x > fTermColumns)
-				endPos.x = fTermColumns;
-		}
+		if (where.y < Bounds().LeftTop().y ) {
+			// mouse point left of window
+			if (scrollPos != scrollStart)
+				ScrollTo(0, where.y);
+		}	
 		
-		// Scroll check
-		if (fScrollBar != NULL) {
-			// Get now scroll point
-			float scrollStart, scrollEnd;
-			fScrollBar->GetRange(&scrollStart, &scrollEnd);
-			float scrollPos = fScrollBar->Value();
-			
-			if (where.y < Bounds().LeftTop().y ) {
-				// mouse point left of window
-				if (scrollPos != scrollStart)
-					ScrollTo(0, where.y);
-			}	
-			
-			if (where.y > Bounds().LeftBottom().y) {	
-				// mouse point left of window
-				if (scrollPos != scrollEnd)
-					ScrollTo(0, where.y);
-			}
+		if (where.y > Bounds().LeftBottom().y) {	
+			// mouse point left of window
+			if (scrollPos != scrollEnd)
+				ScrollTo(0, where.y);
 		}
-		_ResizeSelectRegion(endPos);
 	}
 }
 
@@ -1995,6 +1968,9 @@ TermView::MouseUp(BPoint where)
 void
 TermView::_Select(CurPos start, CurPos end)
 {
+	if (end < start)
+		std::swap(start, end);	
+	
 	if (start.x < 0)
 		start.x = 0;
 	if (end.x >= fTermColumns)
@@ -2104,6 +2080,8 @@ TermView::_AddSelectRegion(CurPos pos)
 void
 TermView::_ResizeSelectRegion(CurPos pos)
 {
+	//TODO: Broken. Selecting from right to left doesn't work.
+
 	CurPos inPos = fSelEnd;
 	
 	// error check, and if mouse point to a plase full width character,
@@ -2127,9 +2105,10 @@ TermView::_ResizeSelectRegion(CurPos pos)
 		if (pos.x >= fTermColumns)
 			pos.x = fTermColumns - 1;
 	}
+
 	fSelEnd = pos;
-	
-	fTextBuffer->Select(fSelStart, pos);
+
+	fTextBuffer->Select(fSelStart, fSelEnd);
 	_TermDrawSelectedRegion(inPos, pos);
 }
   
@@ -2189,14 +2168,12 @@ TermView::_SelectWord(BPoint where, int mod)
 void
 TermView::_SelectLine(BPoint where, int mod)
 {
-	CurPos start, end, pos;
-	
-	pos = _BPointToCurPos(where);
+	CurPos pos = _BPointToCurPos(where);
 	
 	if (mod & B_SHIFT_KEY) {
 		
-		start = CurPos(0, pos.y);
-		end = CurPos(fTermColumns - 1, pos.y);
+		CurPos start = CurPos(0, pos.y);
+		CurPos end = CurPos(fTermColumns - 1, pos.y);
 		
 		if (start < fSelStart)
 			_AddSelectRegion(start);
@@ -2406,7 +2383,7 @@ TermView::InitiateDrag()
 	BString copyStr("");
 	fTextBuffer->GetStringFromRegion(copyStr, fSelStart, fSelEnd);
 
-	BMessage message(B_MIME_TYPE);
+	BMessage message(B_MIME_DATA);
 	message.AddData("text/plain", B_MIME_TYPE, copyStr.String(), copyStr.Length());
 
 	BPoint start = _CurPosToBPoint(fSelStart);

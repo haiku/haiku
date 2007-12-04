@@ -259,7 +259,7 @@ private:
 	int32 fScrBufSize;
 	bool fScrRegionSet;
 
-	BPoint fPreviousMousePoint;
+	BPoint fClickPoint;
 
 	// view selection
 	CurPos fSelStart;
