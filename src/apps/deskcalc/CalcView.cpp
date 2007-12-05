@@ -39,7 +39,7 @@
 
 const uint8 K_COLOR_OFFSET		= 32;
 const float K_FONT_YPROP		= 0.6f;
-const float K_DISPLAY_YPROP		= 0.2;
+const float K_DISPLAY_YPROP		= 0.2f;
 
 enum {
 	K_OPTIONS_REQUESTED			= 'opts',
@@ -404,7 +404,8 @@ void
 CalcView::MouseDown(BPoint point)
 {
 	// ensure this view is the current focus
-	MakeFocus();
+	if (!IsFocus())	
+		MakeFocus();
 
 	// read mouse buttons state
 	int32 buttons = 0;
@@ -427,8 +428,8 @@ CalcView::MouseDown(BPoint point)
 	float sizeRow = (fHeight - sizeDisp) / (float)fRows;
 	
 	// calculate location within grid
-	int gridCol = (int)(point.x / sizeCol);
-	int gridRow = (int)((point.y - sizeDisp) / sizeRow);
+	int gridCol = (int)floorf(point.x / sizeCol);
+	int gridRow = (int)floorf((point.y - sizeDisp) / sizeRow);
 	
 	// check limits
 	if ((gridCol >= 0) && (gridCol < fColums) &&
