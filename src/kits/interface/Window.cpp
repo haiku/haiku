@@ -1683,6 +1683,7 @@ BWindow::UpdateIfNeeded()
 
 	BMessage *msg;
 	for (int32 i = 0; (msg = queue->FindMessage(i)) != NULL; i++) {
+		// TODO: Dispatch more messages ?!?!? Check what beos does.
 		if (msg->what == _UPDATE_ || msg->what == B_WINDOW_ACTIVATED) {
 			BWindow::DispatchMessage(msg, this);
 				// we need to make sure that no overridden method is called 
