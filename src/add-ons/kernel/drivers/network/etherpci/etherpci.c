@@ -1363,6 +1363,7 @@ init_driver(void)
 		put_module(B_PCI_MODULE_NAME );
 		return B_ERROR;
 	}
+	dprintf("\n");
 	
 	/* Create device name list*/
 	for (i=0; i<entries; i++ )
