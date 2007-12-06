@@ -127,12 +127,54 @@ hash_uninit(struct hash_table *table)
 
 
 status_t
+hash_grow(struct hash_table *table, uint32 newSize)
+{
+	struct hash_element **newTable;
+	uint32 index;
+	void *start;
+	bool status;
+
+	if (table->table_size >= newSize)
+		return B_OK;
+
+	newTable = (struct hash_element **)malloc(sizeof(void *) * newSize);
+
+	if (newTable == NULL)
+		return B_NO_MEMORY;
+
+	for (index = 0; index < newSize; index++)
+		newTable[index] = NULL;
+
+	// rehash all the entries and add them to the new table
+	for (index = 0; index < table->table_size; index++) {
+		void *element;
+		void *next;
+
+		for (element = table->table[index]; element != NULL; element = next) {
+			uint32 hash = table->hash_func(element, NULL, newSize);
+			next = NEXT(table, element);
+			PUT_IN_NEXT(table, element, newTable[hash]);
+			newTable[hash] = (struct hash_element *)element;
+		}
+	}
+
+	free(table->table);
+
+	table->table = newTable;
+	table->table_size = newSize;
+
+	TRACE(("hash_grow: grown table %p, new size %lu\n", table, newSize));
+	return B_OK;
+}
+
+
+status_t
 hash_insert(struct hash_table *table, void *element)
 {
 	uint32 hash;
 
 	ASSERT(table != NULL && element != NULL);
-	TRACE(("hash_insert: table 0x%x, element 0x%x\n", table, element));
+	TRACE(("hash_insert: table %p, element %p\n", table, element));
 
 	hash = table->hash_func(element, NULL, table->table_size);
 	PUT_IN_NEXT(table, element, table->table[hash]);
@@ -140,8 +182,12 @@ hash_insert(struct hash_table *table, void *element)
 	table->num_elements++;
 
 	// ToDo: resize hash table if it's grown too much!
+	/*if ((uint32)table->num_elements > table->table_size * 4) {
+		dprintf("hash_insert: table has grown too much: %d in %d\n", table->num_elements, (int)table->table_size);
+		hash_grow(table, (uint32)table->num_elements);
+	}*/
 
-	return 0;
+	return B_OK;
 }
 
 
