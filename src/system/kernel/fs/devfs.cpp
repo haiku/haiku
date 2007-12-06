@@ -2476,3 +2476,34 @@ devfs_publish_directory(const char *path)
 	return publish_directory(sDeviceFileSystem, path);
 }
 
+
+extern "C" status_t
+devfs_rescan_driver(const char *driverName)
+{
+	TRACE(("devfs_rescan_driver: %s\n", driverName));
+
+	// iterate over the drivers and search a matching driverName
+	struct hash_iterator i;
+	hash_open(sDeviceFileSystem->driver_hash, &i);
+
+	driver_entry *driver = (driver_entry *)hash_next(
+		sDeviceFileSystem->driver_hash, &i);
+	while (driver) {
+		const char *name = strrchr(driver->path, '/');
+		if (name == NULL)
+			name = driver->path;
+		else
+			name++;
+
+		if (!strcmp(name, driverName)) {
+			hash_close(sDeviceFileSystem->driver_hash, &i, false);
+			// ToDo: force a uninit/init cycle on the driver if loaded
+			return load_driver(driver);
+		}
+
+		driver = (driver_entry *)hash_next(sDeviceFileSystem->driver_hash, &i);
+	}
+
+	hash_close(sDeviceFileSystem->driver_hash, &i, false);
+	return B_ENTRY_NOT_FOUND;
+}
