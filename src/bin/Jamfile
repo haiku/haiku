@@ -17,6 +17,7 @@ AddResources hey : hey.rdef ;
 
 # standard commands that don't need any additional library
 StdBinCommands
+	cal.c
 	catattr.cpp
 	chop.c
 	clear.c

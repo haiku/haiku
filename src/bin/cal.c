@@ -34,14 +34,6 @@
  * SUCH DAMAGE.
  */
 
-#ifndef lint
-static char copyright[] = "@(#) Copyright (c) 1989, 1993, 1994\n\n
-	The Regents of the University of California.  All rights reserved.\n";
-#endif /* not lint */
-#ifndef lint
-static char sccsid[] = "@(#)cal.c	8.4 (Berkeley) 4/2/94";
-#endif /* not lint */
-
 #include <sys/types.h>
 
 #include <ctype.h>
@@ -96,7 +88,7 @@ char day_headings[] = "                    ";
 char j_day_headings[] = "                           ";
 
 /* leap year -- account for gregorian reformation in 1752 */
-#define	leap_year(yr) ((yr) <= 1752 ? !((yr) % 4) : !((yr) % 4) && ((yr) % 100) || !((yr) % 400))
+#define	leap_year(yr) ((yr) <= 1752 ? !((yr) % 4) : (!((yr) % 4) && ((yr) % 100)) || !((yr) % 400))
 
 /* number of centuries since 1700, not inclusive */
 #define	centuries_since_1700(yr) ((yr) > 1700 ? (yr) / 100 - 17 : 0)
@@ -109,16 +101,16 @@ char j_day_headings[] = "                           ";
 
 int julian;
 
-void	ascii_day __P((char *, int));
-void	center __P((char *, int, int));
-void	day_array __P((int, int, int *));
-int	day_in_week __P((int, int, int));
-int	day_in_year __P((int, int, int));
-void	j_yearly __P((int));
-void	monthly __P((int, int));
-void	trim_trailing_spaces __P((char *));
-void	usage __P((void));
-void	yearly __P((int));
+void	ascii_day(char *, int);
+void	center(char *, int, int);
+void	day_array(int, int, int *);
+int	day_in_week(int, int, int);
+int	day_in_year(int, int, int);
+void	j_yearly(int);
+void	monthly(int, int);
+void	trim_trailing_spaces(char *);
+void	usage(void);
+void	yearly(int);
 
 int
 main(argc, argv)
