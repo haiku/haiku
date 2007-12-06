@@ -117,7 +117,8 @@ MenuBar::Update()
 		font.SetSize(info.font_size);
 		SetFont(&font);
 		SetViewColor(info.background_color);
-	
+		SetLowColor(ViewColor());	
+
 		// force the menu to redraw
 		InvalidateLayout();
 		Invalidate();
