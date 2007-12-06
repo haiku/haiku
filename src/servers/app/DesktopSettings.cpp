@@ -391,7 +391,9 @@ void
 DesktopSettingsPrivate::SetMenuInfo(const menu_info& info)
 {
 	fMenuInfo = info;
-	Save(kAppearanceSettings);
+	// Also update the ui_color
+	SetUIColor(B_MENU_BACKGROUND_COLOR, info.background_color);
+		// SetUIColor already saves the settings
 }
 
 
@@ -486,6 +488,10 @@ DesktopSettingsPrivate::SetUIColor(color_which which, const rgb_color color)
 	if (index < 0 || index >= kNumColors)
 		return;
 	fShared.colors[index] = color;
+	// TODO: deprecate the background_color member of the menu_info struct,
+	// otherwise we have to keep this duplication...
+	if (which == B_MENU_BACKGROUND_COLOR)
+		fMenuInfo.background_color = color;
 	Save(kAppearanceSettings);
 }
 
