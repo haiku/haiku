@@ -21,7 +21,7 @@ typedef struct  _pthread_barrier		*pthread_barrier_t;
 typedef struct  _pthread_barrierattr	*pthread_barrierattr_t;
 typedef struct  _pthread_spinlock	*pthread_spinlock_t;
 
-struct pthread_once {
+struct _pthread_once {
 	int	state;
 	pthread_mutex_t mutex;
 };
