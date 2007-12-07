@@ -456,6 +456,8 @@ if $(HAIKU_ADD_POSIX_TEST_SUITE_TO_IMAGE) {
 		  pthread_key_create_3-1 ;
 	AddFilesToHaikuImage home posixtestsuite conformance interfaces pthread_key_delete
 		: pthread_key_delete_1-1 pthread_key_delete_1-2 pthread_key_delete_2-1 ;
+	AddFilesToHaikuImage home posixtestsuite conformance interfaces pthread_once
+		: pthread_once_1-1 pthread_once_1-2 pthread_once_1-3 pthread_once_2-1 ;
 	AddFilesToHaikuImage home posixtestsuite conformance interfaces pthread_setspecific
 		: pthread_setspecific_1-1 pthread_setspecific_1-2 ;
 }

@@ -11,5 +11,6 @@ MergeObject posix_pthread.o :
 	pthread_key.c
 	pthread_mutex.c
 	pthread_mutexattr.c
+	pthread_once.c
 ;
 

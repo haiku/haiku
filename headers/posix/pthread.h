@@ -125,6 +125,7 @@ extern int pthread_condattr_setpshared(pthread_condattr_t *condAttr, int process
 
 /* misc. functions */
 extern int pthread_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void));
+extern int pthread_once(pthread_once_t *once_control, void (*init_routine)());
 
 /* thread attributes functions */
 extern int pthread_attr_destroy(pthread_attr_t *attr);

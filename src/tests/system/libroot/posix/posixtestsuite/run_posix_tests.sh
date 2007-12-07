@@ -64,7 +64,13 @@ threads_tests()
 	conformance/interfaces/pthread_key_delete/pthread_key_delete_1-2
 #	conformance/interfaces/pthread_key_delete/pthread_key_delete_2-1
 	echo "pthread_key_delete_2-1: FIXME: test blocks, see bug #1642"
-	echo ""
+	echo
+	echo "pthread_once()"
+	conformance/interfaces/pthread_once/pthread_once_1-1
+	conformance/interfaces/pthread_once/pthread_once_1-2
+	conformance/interfaces/pthread_once/pthread_once_1-3
+	conformance/interfaces/pthread_once/pthread_once_2-1
+	echo
 	echo "pthread_setspecific()"
 	conformance/interfaces/pthread_setspecific/pthread_setspecific_1-1
 	conformance/interfaces/pthread_setspecific/pthread_setspecific_1-2
