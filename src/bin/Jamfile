@@ -147,6 +147,11 @@ StdBinCommands
 	usb_dev_info.cpp
 	: be USBKit.a : $(haiku-utils_rsrc) ;
 
+# standard commands that need libbe.so, libtracker.so
+StdBinCommands
+	filepanel.cpp
+	: be tracker : $(haiku-utils_rsrc) ;
+
 SubInclude HAIKU_TOP src bin addattr ;
 SubInclude HAIKU_TOP src bin bash ;
 SubInclude HAIKU_TOP src bin bc ;
