@@ -463,6 +463,7 @@ TTracker::InstallTemporaryBackgroundImages()
 //	path.Append(kDefaultFolderTemplate);
 
 	BString defaultBackgroundImage("/HAIKU logo - white on blue - big.png");
+#if 0
 	BString defaultBackgroundTexture("/backgroundTexture.tga");
 
 	BNode node;
@@ -473,6 +474,7 @@ TTracker::InstallTemporaryBackgroundImages()
 			BackgroundImage::kTiled,
 			BPoint(0, 0), 0xffffffff, false);
 	}
+#endif
 
 	BDirectory dir;
 	if (FSGetBootDeskDir(&dir) == B_OK) {
