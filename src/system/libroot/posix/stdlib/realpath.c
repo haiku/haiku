@@ -58,6 +58,11 @@ realpath(const char *path, char *resolved)
 	char *p, *q, wbuf[MAXPATHLEN];
 	int symlinks = 0;
 
+	if (path == NULL || resolved == NULL) {
+		errno = EINVAL;
+		return NULL;
+	}
+
 	/* Save the starting point. */
 	if ((fd = open(".", O_RDONLY)) < 0) {
 		strcpy(resolved, ".");
