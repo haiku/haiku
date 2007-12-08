@@ -49,6 +49,7 @@ struct internal_intr {
 
 	thread_id		thread;
 	sem_id			sem;
+	int32			handling;
 };
 
 
@@ -235,7 +236,7 @@ intr_wrapper(void *data)
 		return B_UNHANDLED_INTERRUPT;
 
 	release_sem_etc(intr->sem, 1, B_DO_NOT_RESCHEDULE);
-	return B_INVOKE_SCHEDULER;
+	return intr->handling ? B_HANDLED_INTERRUPT : B_INVOKE_SCHEDULER;
 }
 
 
@@ -264,7 +265,9 @@ intr_handler(void *data)
 
 		//device_printf(intr->dev, "in soft interrupt handler.\n");
 
+		atomic_or(&intr->handling, 1);
 		intr->handler(intr->arg);
+		atomic_and(&intr->handling, 0);
 		HAIKU_REENABLE_INTERRUPTS(intr->dev);
 	}
 
