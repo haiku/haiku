@@ -1,12 +1,13 @@
-/* bfs - BFS definitions and helper functions
- *
- * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
  * Parts of this code is based on work previously done by Marcus Overhagen.
  *
  * This file may be used under the terms of the MIT License.
  */
 #ifndef BFS_H
 #define BFS_H
+
+//!	BFS definitions and helper functions
 
 
 #include "bfs_endian.h"
@@ -71,7 +72,9 @@ struct disk_super_block {
 	int32		magic3;
 	inode_addr	root_dir;
 	inode_addr	indices;
-	int32		pad[8];
+	int32		_reserved[8];
+	int32		pad_to_block[87];
+		// this also contains parts of the boot block
 
 	int32 Magic1() const { return BFS_ENDIAN_TO_HOST_INT32(magic1); }
 	int32 Magic2() const { return BFS_ENDIAN_TO_HOST_INT32(magic2); }

@@ -576,6 +576,17 @@ bfs_ioctl(void *_fs, void *_node, void *_cookie, ulong cmd, void *buffer,
 
 			return allocator.CheckNextNode(control);
 		}
+		case BFS_IOCTL_UPDATE_BOOT_BLOCK:
+		{
+			// let's makebootable (or anyone else) update the boot block
+			// while BFS is mounted
+			if (user_memcpy(&volume->SuperBlock().pad_to_block,
+					(uint8 *)buffer + offsetof(disk_super_block, pad_to_block),
+					sizeof(volume->SuperBlock().pad_to_block)) < B_OK)
+				return B_BAD_ADDRESS;
+
+			return volume->WriteSuperBlock();
+		}
 #ifdef DEBUG
 		case 56742:
 		{

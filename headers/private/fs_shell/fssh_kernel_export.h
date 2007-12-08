@@ -10,15 +10,18 @@
 extern "C" {
 #endif 
 
-/*-------------------------------------------------------------*/
+
 /* kernel threads */
 
 extern fssh_thread_id	fssh_spawn_kernel_thread(fssh_thread_func function,
 								const char *threadName,  int32_t priority,
 								void *arg);
 
+/* misc */
 
-/*-------------------------------------------------------------*/
+extern fssh_status_t	fssh_user_memcpy(void *dest, const void *source,
+								fssh_size_t length);
+
 /* primitive kernel debugging facilities */
 
 extern void			fssh_dprintf(const char *format, ...)	/* just like printf */

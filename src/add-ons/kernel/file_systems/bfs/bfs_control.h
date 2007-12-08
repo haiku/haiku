@@ -16,6 +16,8 @@
  */
 #define BFS_IOCTL_VERSION			14200
 
+#define BFS_IOCTL_UPDATE_BOOT_BLOCK	14204
+
 /* ioctls to use the "chkbfs" feature from the outside
  * all calls use a struct check_result as single parameter
  */

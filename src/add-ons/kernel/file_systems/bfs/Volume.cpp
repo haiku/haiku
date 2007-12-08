@@ -78,13 +78,13 @@ DeviceOpener::~DeviceOpener()
 int
 DeviceOpener::Open(const char *device, int mode)
 {
-	fDevice = open(device, mode);
+	fDevice = open(device, mode | O_NOCACHE);
 	if (fDevice < 0)
 		fDevice = errno;
 
 	if (fDevice < 0 && mode == O_RDWR) {
 		// try again to open read-only (don't rely on a specific error code)
-		return Open(device, O_RDONLY);
+		return Open(device, O_RDONLY | O_NOCACHE);
 	}
 
 	if (fDevice >= 0) {
@@ -97,7 +97,7 @@ DeviceOpener::Open(const char *device, int mode)
 				if (geometry.read_only) {
 					// reopen device read-only
 					close(fDevice);
-					return Open(device, O_RDONLY);
+					return Open(device, O_RDONLY | O_NOCACHE);
 				}
 			}
 		}
@@ -203,7 +203,8 @@ disk_super_block::IsValid()
 
 
 void
-disk_super_block::Initialize(const char *diskName, off_t numBlocks, uint32 blockSize)
+disk_super_block::Initialize(const char *diskName, off_t numBlocks,
+	uint32 blockSize)
 {
 	memset(this, 0, sizeof(disk_super_block));
 
@@ -312,7 +313,8 @@ Volume::Mount(const char *deviceName, uint32 flags)
 	flags |= B_MOUNT_READ_ONLY;
 #endif
 
-	DeviceOpener opener(deviceName, flags & B_MOUNT_READ_ONLY ? O_RDONLY : O_RDWR);
+	DeviceOpener opener(deviceName, (flags & B_MOUNT_READ_ONLY) != 0
+		? O_RDONLY : O_RDWR);
 	fDevice = opener.Device();
 	if (fDevice < B_OK)
 		RETURN_ERROR(fDevice);
@@ -325,21 +327,6 @@ Volume::Mount(const char *deviceName, uint32 flags)
 	struct stat stat;
 	if (fstat(fDevice, &stat) < 0)
 		RETURN_ERROR(B_ERROR);
-
-// TODO: allow turning off caching of the underlying file (once O_NOCACHE works)
-#if 0
-#ifndef NO_FILE_UNCACHED_IO
-	if ((stat.st_mode & S_FILE) != 0 && ioctl(fDevice, IOCTL_FILE_UNCACHED_IO, NULL) < 0) {
-		// mount read-only if the cache couldn't be disabled
-#	ifdef DEBUG
-		FATAL(("couldn't disable cache for image file - system may dead-lock!\n"));
-#	else
-		FATAL(("couldn't disable cache for image file!\n"));
-		Panic();
-#	endif
-	}
-#endif
-#endif
 
 	// read the super block
 	if (Identify(fDevice, &fSuperBlock) != B_OK) {
@@ -383,11 +370,6 @@ Volume::Mount(const char *deviceName, uint32 flags)
 		if (status == B_OK) {
 			// try to get indices root dir
 
-			// question: why doesn't get_vnode() work here??
-			// answer: we have not yet backpropagated the pointer to the
-			// volume in bfs_mount(), so bfs_read_vnode() can't get it.
-			// But it's not needed to do that anyway.
-
 			if (!Indices().IsZero())
 				fIndicesNode = new Inode(this, ToVnode(Indices()));
 
@@ -397,8 +379,8 @@ Volume::Mount(const char *deviceName, uint32 flags)
 				INFORM(("bfs: volume doesn't have indices!\n"));
 
 				if (fIndicesNode) {
-					// if this is the case, the index root node is gone bad, and
-					// BFS switch to read-only mode
+					// if this is the case, the index root node is gone bad,
+					// and BFS switch to read-only mode
 					fFlags |= VOLUME_READ_ONLY;
 					delete fIndicesNode;
 					fIndicesNode = NULL;
@@ -450,12 +432,14 @@ Volume::Sync()
 status_t
 Volume::ValidateBlockRun(block_run run)
 {
-	if (run.AllocationGroup() < 0 || run.AllocationGroup() > (int32)AllocationGroups()
+	if (run.AllocationGroup() < 0
+		|| run.AllocationGroup() > (int32)AllocationGroups()
 		|| run.Start() > (1UL << AllocationGroupShift())
 		|| run.length == 0
 		|| uint32(run.Length() + run.Start()) > (1UL << AllocationGroupShift())) {
 		Panic();
-		FATAL(("*** invalid run(%d,%d,%d)\n", (int)run.AllocationGroup(), run.Start(), run.Length()));
+		FATAL(("*** invalid run(%d,%d,%d)\n", (int)run.AllocationGroup(),
+			run.Start(), run.Length()));
 		return B_BAD_DATA;
 	}
 	return B_OK;
@@ -466,8 +450,10 @@ block_run
 Volume::ToBlockRun(off_t block) const
 {
 	block_run run;
-	run.allocation_group = HOST_ENDIAN_TO_BFS_INT32(block >> AllocationGroupShift());
-	run.start = HOST_ENDIAN_TO_BFS_INT16(block & ((1LL << AllocationGroupShift()) - 1));
+	run.allocation_group = HOST_ENDIAN_TO_BFS_INT32(
+		block >> AllocationGroupShift());
+	run.start = HOST_ENDIAN_TO_BFS_INT16(
+		block & ((1LL << AllocationGroupShift()) - 1));
 	run.length = HOST_ENDIAN_TO_BFS_INT16(1);
 	return run;
 }
@@ -489,16 +475,20 @@ Volume::CreateIndicesRoot(Transaction &transaction)
 
 
 status_t
-Volume::AllocateForInode(Transaction &transaction, const Inode *parent, mode_t type, block_run &run)
+Volume::AllocateForInode(Transaction &transaction, const Inode *parent,
+	mode_t type, block_run &run)
 {
-	return fBlockAllocator.AllocateForInode(transaction, &parent->BlockRun(), type, run);
+	return fBlockAllocator.AllocateForInode(transaction, &parent->BlockRun(),
+		type, run);
 }
 
 
 status_t
 Volume::WriteSuperBlock()
 {
-	if (write_pos(fDevice, 512, &fSuperBlock, sizeof(disk_super_block)) != sizeof(disk_super_block))
+	// TODO: this assumes a block size of 512 bytes of the underlying device
+	if (write_pos(fDevice, 512, &fSuperBlock, sizeof(disk_super_block))
+			!= sizeof(disk_super_block))
 		return B_IO_ERROR;
 
 	return B_OK;
@@ -506,15 +496,18 @@ Volume::WriteSuperBlock()
 
 
 void
-Volume::UpdateLiveQueries(Inode *inode, const char *attribute, int32 type, const uint8 *oldKey,
-	size_t oldLength, const uint8 *newKey, size_t newLength)
+Volume::UpdateLiveQueries(Inode *inode, const char *attribute, int32 type,
+	const uint8 *oldKey, size_t oldLength, const uint8 *newKey,
+	size_t newLength)
 {
 	if (fQueryLock.Lock() < B_OK)
 		return;
 
 	Query *query = NULL;
-	while ((query = fQueries.Next(query)) != NULL)
-		query->LiveUpdate(inode, attribute, type, oldKey, oldLength, newKey, newLength);
+	while ((query = fQueries.Next(query)) != NULL) {
+		query->LiveUpdate(inode, attribute, type, oldKey, oldLength, newKey,
+			newLength);
+	}
 
 	fQueryLock.Unlock();
 }
@@ -568,11 +561,10 @@ Volume::Identify(int fd, disk_super_block *superBlock)
 	if (read_pos(fd, 0, buffer, sizeof(buffer)) != sizeof(buffer))
 		return B_IO_ERROR;
 
-	// Note: that does work only for x86, for PowerPC, the super block
-	// may be located at offset 0!
 	memcpy(superBlock, buffer + 512, sizeof(disk_super_block));
 	if (!superBlock->IsValid()) {
 #ifndef BFS_LITTLE_ENDIAN_ONLY
+		// For PPC, the super block might be located at offset 0
 		memcpy(superBlock, buffer, sizeof(disk_super_block));
 		if (!superBlock->IsValid())
 			return B_BAD_VALUE;
@@ -615,7 +607,7 @@ Volume::Initialize(int fd, const char *name, uint32 blockSize,
 	// create valid super block
 
 	fSuperBlock.Initialize(name, numBlocks, blockSize);
-	
+
 	// initialize short hands to the super block (to save byte swapping)
 	fBlockSize = fSuperBlock.BlockSize();
 	fBlockShift = fSuperBlock.BlockShift();

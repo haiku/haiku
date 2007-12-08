@@ -932,8 +932,10 @@
 // #pragma mark - fssh_kernel_export.h
 
 /* kernel threads */
-
 #define spawn_kernel_thread	fssh_spawn_kernel_thread
+
+/* misc */
+#define user_memcpy			fssh_user_memcpy
 
 /* primitive kernel debugging facilities */
 #define dprintf				fssh_dprintf

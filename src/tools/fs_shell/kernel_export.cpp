@@ -20,6 +20,14 @@ fssh_spawn_kernel_thread(fssh_thread_func function, const char *threadName,
 }
 
 
+fssh_status_t
+fssh_user_memcpy(void *dest, const void *source, fssh_size_t length)
+{
+	memcpy(dest, source, length);
+	return FSSH_B_OK;
+}
+
+
 void
 fssh_dprintf(const char *format, ...)
 {
@@ -65,6 +73,7 @@ fssh_panic(const char *format, ...)
 	*badAddress = 42;
 }
 
+
 void
 fssh_kernel_debugger(const char *message)
 {
@@ -77,6 +86,7 @@ fssh_parse_expression(const char *string)
 {
 	return 0;
 }
+
 
 int
 fssh_add_debugger_command(char *name, fssh_debugger_command_hook hook,
