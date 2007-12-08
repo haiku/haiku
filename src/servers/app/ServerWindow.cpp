@@ -3179,8 +3179,8 @@ ServerWindow::_UpdateDrawState(ViewLayer* layer)
 	// "offsets" passed below would need to be updated again
 	DrawingEngine* drawingEngine = fWindowLayer->GetDrawingEngine();
 	if (layer && drawingEngine) {
-		IntPoint p = layer->ScrollingOffset();
-		p += IntPoint(layer->CurrentState()->Origin());
+		BPoint p(0, 0);
+		layer->ConvertToScreenForDrawing(&p);
 		drawingEngine->SetDrawState(layer->CurrentState(), p.x, p.y);
 	}
 }
