@@ -902,8 +902,7 @@ page_writer(void* /*unused*/)
 	marker.state = PAGE_STATE_UNUSED;
 
 	while (true) {
-		if (sModifiedPageQueue.count - sModifiedTemporaryPages < 1024
-			|| free_page_queue_count() > 1024) {
+		if (sModifiedPageQueue.count - sModifiedTemporaryPages < 1024) {
 			int32 count = 0;
 			get_sem_count(sWriterWaitSem, &count);
 			if (count == 0)
