@@ -8,6 +8,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 #include "MainWindow.h"
+#include "DiskView.h"
 #include "PartitionList.h"
 #include "Support.h"
 
@@ -51,6 +52,8 @@ enum {
 	MSG_EJECT					= 'ejct',
 	MSG_SURFACE_TEST			= 'sfct',
 	MSG_RESCAN					= 'rscn',
+
+	MSG_PARTITION_ROW_SELECTED	= 'prsl',
 };
 
 
@@ -93,10 +96,23 @@ MainWindow::MainWindow(BRect frame)
 	createMenu->AddItem(new BMenuItem("Logical",
 		new BMessage(MSG_CREATE_LOGICAL)));
 
+	// add DiskView
 	BRect r(Bounds());
 	r.top = rootMenu->Frame().bottom + 1;
-	fListView = new PartitionListView(r);
+	r.bottom = floorf(r.top + r.Height() * 0.33);
+	fDiskView = new DiskView(r, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	AddChild(fDiskView);
+
+	// add PartitionListView
+	r.top = r.bottom + 2;
+	r.bottom = Bounds().bottom;
+	r.InsetBy(-1, -1);
+	fListView = new PartitionListView(r, B_FOLLOW_ALL);
 	AddChild(fListView);
+
+	// configure PartitionListView
+	fListView->SetSelectionMessage(new BMessage(MSG_PARTITION_ROW_SELECTED));
+	fListView->SetTarget(this);
 
 	// Populate the Initialiaze menu with the available file systems
 	_ScanFileSystems();
@@ -147,7 +163,12 @@ MainWindow::MessageReceived(BMessage* message)
 		case MSG_RESCAN:
 			_ScanDrives();
 			break;
-			
+
+		case MSG_PARTITION_ROW_SELECTED:
+			printf("MSG_PARTITION_ROW_SELECTED\n");
+			_AdaptToSelectedPartition();
+			break;
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -224,6 +245,35 @@ MainWindow::_ScanFileSystems()
 			fInitMenu->AddItem(new BMenuItem(label.String(), message));
 		}
 	}
+}
+
+
+void
+MainWindow::_AdaptToSelectedPartition()
+{
+	BRow* _selectedRow = fListView->CurrentSelection();
+	if (!_selectedRow) {
+		fDiskView->SetDisk(NULL, -1);
+		return;
+	}
+
+	// recurse to top level row
+	BRow* _topLevelRow = _selectedRow;
+	BRow* parent = NULL;
+	while (fListView->FindParent(_topLevelRow, &parent, NULL))
+		_topLevelRow = parent;
+
+	PartitionListRow* topLevelRow
+		= dynamic_cast<PartitionListRow*>(_topLevelRow);
+	PartitionListRow* selectedRow
+		= dynamic_cast<PartitionListRow*>(_selectedRow);
+
+	if (!topLevelRow || !selectedRow)
+		return;
+
+	BDiskDevice* disk = new BDiskDevice();
+	disk->SetTo(topLevelRow->ID());
+	fDiskView->SetDisk(disk, selectedRow->ID());
 }
 
 

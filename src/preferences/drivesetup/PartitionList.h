@@ -32,7 +32,8 @@ private:
 class PartitionListView : public BColumnListView {
 	typedef BColumnListView Inherited;
 public:
-								PartitionListView(const BRect& frame);
+								PartitionListView(const BRect& frame,
+									uint32 resizeMode);
 	
 			PartitionListRow*	FindRow(partition_id id,
 									PartitionListRow* parent = NULL);

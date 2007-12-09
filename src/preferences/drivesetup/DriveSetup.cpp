@@ -111,7 +111,6 @@ DriveSetup::_RestoreSettings()
 		fprintf(stderr, "failed to unflatten settings: %s\n", strerror(ret));
 		return ret;
 	}
-fSettings.PrintToStream();
 
 	ret = fWindow->RestoreSettings(&fSettings);
 	if (ret < B_OK) {

@@ -1,16 +1,23 @@
 SubDir HAIKU_TOP src preferences drivesetup ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
 
-UsePrivateHeaders interface storage shared ;
-
-AddResources DriveSetup : DriveSetup.rdef ;
+UsePrivateHeaders interface shared storage ;
 
 Preference DriveSetup :
+	DiskView.cpp
 	DriveSetup.cpp
 	MainWindow.cpp
 	PartitionList.cpp
 	Support.cpp
 	:
 	be
+	:
+	DriveSetup.rdef
 ;
+
+if ( $(TARGET_PLATFORM) = libbe_test ) {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : DriveSetup
+		: tests!apps ;
+}
+

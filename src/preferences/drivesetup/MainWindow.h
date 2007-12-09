@@ -13,6 +13,7 @@
 class BDiskDevice;
 class BPartition;
 class BMenu;
+class DiskView;
 class PartitionListView;
 
 
@@ -28,18 +29,15 @@ public:
 			status_t			StoreSettings(BMessage* archive) const;
 			status_t			RestoreSettings(BMessage* archive);
 
-	// These are public for visitor....
-			void				AddPartition(BPartition* partition,
-									int32 level);
-			void				AddDrive(BDiskDevice* device);
-
 private:
 			void				_ScanDrives();
 			void				_ScanFileSystems();
+			void				_AdaptToSelectedPartition();
 
 
 			BDiskDeviceRoster	fDDRoster;
 			PartitionListView*	fListView;
+			DiskView*			fDiskView;
 
 			BMenu*				fInitMenu;
 };
