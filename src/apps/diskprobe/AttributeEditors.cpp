@@ -784,7 +784,7 @@ ImageView::ImageView(BRect rect, DataEditor &editor)
 	if (editor.Type() == B_VECTOR_ICON_TYPE) {
 		// vector icon
 		fScaleSlider = new BSlider(BRect(0, 0, 195, 20), "", NULL,
-			new BMessage(kMsgScaleChanged), 2, 16);
+			new BMessage(kMsgScaleChanged), 2, 32);
 		fScaleSlider->SetModificationMessage(new BMessage(kMsgScaleChanged));
 		fScaleSlider->ResizeToPreferred();
 		fScaleSlider->SetValue(8.0);
