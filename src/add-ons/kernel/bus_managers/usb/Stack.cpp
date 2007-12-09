@@ -86,7 +86,7 @@ Stack::Stack()
 	// is opening the module does not get rescanned while or before installing
 	// its hooks.
 	while (!fFirstExploreDone)
-		snooze(100);
+		snooze(100000);
 }
 
 
