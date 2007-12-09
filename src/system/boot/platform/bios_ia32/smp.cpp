@@ -16,6 +16,7 @@
 #include <safemode.h>
 #include <boot/stage2.h>
 #include <boot/menu.h>
+#include <arch/x86/smp_acpi.h>
 #include <arch/x86/smp_apic.h>
 #include <arch/x86/arch_system_info.h>
 
@@ -47,6 +48,11 @@ static struct smp_scan_spots_struct smp_scan_spots[] = {
 	{ 0, 0, 0 }
 };
 
+static struct smp_scan_spots_struct acpi_scan_spots[] = {
+	{ 0x0, 0x400, 0x400 - 0x0 },
+	{ 0xe0000, 0x100000, 0x100000 - 0xe0000 },
+	{ 0, 0, 0 }
+};
 
 extern "C" void execute_n_instructions(int count);
 
@@ -74,21 +80,6 @@ apic_write(uint32 offset, uint32 data)
 }
 
 
-static bool
-supports_hyper_threading(void)
-{
-	cpuid_info info;
-	if (get_current_cpuid(&info, 0) == B_OK
-		&& !strncmp(info.eax_0.vendor_id, "GenuineIntel", 12)
-		&& info.eax_0.max_eax > 0) {
-		if (get_current_cpuid(&info, 1) == B_OK)
-			return (info.eax_1.features & (1 << 28)) != 0;
-	}
-
-	return false;
-}
-
-
 static int
 smp_get_current_cpu(void)
 {
@@ -100,15 +91,15 @@ smp_get_current_cpu(void)
 
 
 static uint32 *
-smp_probe(uint32 base, uint32 limit)
+smp_mp_probe(uint32 base, uint32 limit)
 {
 	uint32 *ptr;
 
-	TRACE(("smp_probe: entry base 0x%lx, limit 0x%lx\n", base, limit));
+	TRACE(("smp_mp_probe: entry base 0x%lx, limit 0x%lx\n", base, limit));
 
 	for (ptr = (uint32 *) base; (uint32)ptr < limit; ptr++) {
 		if (*ptr == MP_FLOATING_SIGNATURE) {
-			TRACE(("smp_probe: found floating pointer structure at %p\n", ptr));
+			TRACE(("smp_mp_probe: found floating pointer structure at %p\n", ptr));
 			return ptr;
 		}
 	}
@@ -116,8 +107,23 @@ smp_probe(uint32 base, uint32 limit)
 }
 
 
+static acpi_rsdp *
+smp_acpi_probe(uint32 base, uint32 limit)
+{
+	TRACE(("smp_acpi_probe: entry base 0x%lx, limit 0x%lx\n", base, limit));
+	for (char *pointer = (char *)base; (uint32)pointer < limit; pointer += 16) {
+		if (strncmp(pointer, ACPI_RSDP_SIGNATURE, 8) == 0) {
+			TRACE(("smp_acpi_probe: found ACPI RSDP signature at %p\n", pointer));
+			return (acpi_rsdp *)pointer;
+		}
+	}
+
+	return NULL;
+}
+
+
 static void
-smp_do_config(void)
+smp_do_mp_config()
 {
 	struct mp_config_table *config;
 	char *ptr;
@@ -138,11 +144,8 @@ smp_do_config(void)
 
 	/* print out our new found configuration. */
 
-	ptr = (char *)&(config->oem[0]);
-	TRACE(("smp: oem id: %c%c%c%c%c%c%c%c product id: "
-		"%c%c%c%c%c%c%c%c%c%c%c%c\n", ptr[0], ptr[1], ptr[2], ptr[3], ptr[4],
-		ptr[5], ptr[6], ptr[7], ptr[8], ptr[9], ptr[10], ptr[11], ptr[12],
-		ptr[13], ptr[14], ptr[15], ptr[16], ptr[17], ptr[18], ptr[19]));
+	TRACE(("smp: oem id: %.8s product id: %.12s\n", config->oem,
+		config->product));
 	TRACE(("smp: base table has %d entries, extended section %d bytes\n",
 		config->num_base_entries, config->ext_length));
 
@@ -212,29 +215,89 @@ smp_do_config(void)
 		(void *)gKernelArgs.arch_args.ioapic_phys,
 		gKernelArgs.num_cpus);
 
-	// Try to detect single CPU hyper threading setup
-	// ToDo: this should be done using the ACPI APIC table
-	// ToDo: this only works with a single HT enabled CPU anyway
-
-	if (gKernelArgs.num_cpus == 1 && supports_hyper_threading()) {
-		cpuid_info info;
-		get_current_cpuid(&info, 1);
-
-		dprintf("CPU supports Hyper-Threading, %ld processors in package\n",
-			info.eax_1.logical_cpus);
-
-		// enable the second logical processor
-/*
-		gKernelArgs.num_cpus = 2;
-		gKernelArgs.arch_args.cpu_apic_id[1] = gKernelArgs.arch_args.cpu_apic_id[0] + 1;
-		gKernelArgs.arch_args.cpu_os_id[gKernelArgs.arch_args.cpu_apic_id[1]] = 1;
-		gKernelArgs.arch_args.cpu_apic_version[1] = gKernelArgs.arch_args.cpu_apic_version[0];;
-*/
-	}
-
 	// this BIOS looks broken, because it didn't report any cpus (VMWare)
 	if (gKernelArgs.num_cpus == 0)
 		gKernelArgs.num_cpus = 1;
+}
+
+
+static status_t
+smp_do_acpi_config(acpi_rsdp *rsdp)
+{
+	TRACE(("smp: using ACPI to detect MP configuration\n"));
+	TRACE(("smp: found rsdp at %p oem id: %.6s\n", rsdp, rsdp->oem_id));
+	TRACE(("smp: rsdp points to rsdt at 0x%lx\n", rsdp->rsdt_address));
+
+	// reset CPU count
+	gKernelArgs.num_cpus = 0;
+
+	// map and validate the root system description table
+	acpi_descriptor_header *rsdt
+		= (acpi_descriptor_header *)mmu_map_physical_memory(
+		rsdp->rsdt_address, B_PAGE_SIZE, kDefaultPageFlags);
+	if (!rsdt || strncmp(rsdt->signature, ACPI_RSDT_SIGNATURE, 4) != 0) {
+		TRACE(("smp: invalid root system description table\n"));
+		return B_ERROR;
+	}
+
+	int32 numEntries = (rsdt->length - sizeof(acpi_descriptor_header)) / 4;
+	if (numEntries <= 0) {
+		TRACE(("smp: root system description table is empty\n"));
+		return B_ERROR;
+	}
+
+	TRACE(("smp: searching %ld entries for APIC information\n", numEntries));
+	uint32 *pointer = (uint32 *)((uint8 *)rsdt + sizeof(acpi_descriptor_header));
+	for (int32 j = 0; j < numEntries; j++, pointer++) {
+		acpi_descriptor_header *header = (acpi_descriptor_header *)
+			mmu_map_physical_memory(*pointer, B_PAGE_SIZE, kDefaultPageFlags);
+		if (!header || strncmp(header->signature, ACPI_MADT_SIGNATURE, 4) != 0) {
+			// not interesting for us
+			TRACE(("smp: skipping uninteresting header '%.4s'\n", header->signature));
+			continue;
+		}
+
+		acpi_madt *madt = (acpi_madt *)header;
+		gKernelArgs.arch_args.apic_phys = madt->local_apic_address;
+		TRACE(("smp: local apic address is 0x%lx\n", madt->local_apic_address));
+
+		acpi_apic *apic = (acpi_apic *)((uint8 *)madt + sizeof(acpi_madt));
+		acpi_apic *end = (acpi_apic *)((uint8 *)madt + header->length);
+		while (apic < end) {
+			switch (apic->type) {
+				case ACPI_MADT_LOCAL_APIC:
+				{
+					acpi_local_apic *localApic = (acpi_local_apic *)apic;
+					TRACE(("smp: found local APIC with id %u\n", localApic->apic_id));
+					gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus] = localApic->apic_id;
+					gKernelArgs.arch_args.cpu_os_id[localApic->apic_id] = gKernelArgs.num_cpus;
+					// ToDo: how to find out? putting 0x10 in to indicate a local apic
+					gKernelArgs.arch_args.cpu_apic_version[gKernelArgs.num_cpus] = 0x10;
+					gKernelArgs.num_cpus++;
+					break;
+				}
+
+				case ACPI_MADT_IO_APIC: {
+					acpi_io_apic *ioApic = (acpi_io_apic *)apic;
+					TRACE(("smp: found io APIC with id %u and address 0x%lx\n",
+						ioApic->io_apic_id, ioApic->io_apic_address));
+					gKernelArgs.arch_args.ioapic_phys = ioApic->io_apic_address;
+					break;
+				}
+			}
+
+			apic = (acpi_apic *)((uint8 *)apic + apic->length);
+		}
+
+		if (gKernelArgs.num_cpus > 0)
+			break;
+	}
+
+	// ToDo: remove CPU limit
+	if (gKernelArgs.num_cpus > 2)
+		gKernelArgs.num_cpus = 2;
+
+	return gKernelArgs.num_cpus > 0 ? B_OK : B_ERROR;
 }
 
 
@@ -248,8 +311,18 @@ smp_find_mp_config(void)
 		return gKernelArgs.num_cpus = 1;
 #endif
 
+	// first try to find ACPI tables to get MP configuration as it handles
+	// physical as well as logical MP configurations as in multiple cpus,
+	// multiple cores or hyper threading.
+	for (i = 0; acpi_scan_spots[i].length > 0; i++) {
+		acpi_rsdp *rsdp = smp_acpi_probe(smp_scan_spots[i].start,
+			smp_scan_spots[i].stop);
+		if (rsdp != NULL && smp_do_acpi_config(rsdp) == B_OK)
+			return gKernelArgs.num_cpus;
+	}
+
 	for (i = 0; smp_scan_spots[i].length > 0; i++) {
-		sFloatingStruct = (struct mp_floating_struct *)smp_probe(smp_scan_spots[i].start,
+		sFloatingStruct = (struct mp_floating_struct *)smp_mp_probe(smp_scan_spots[i].start,
 			smp_scan_spots[i].stop);
 		if (sFloatingStruct != NULL)
 			break;
@@ -265,6 +338,7 @@ smp_find_mp_config(void)
 		if (sFloatingStruct->config_table == NULL) {
 			// XXX need to implement
 #if 1
+			TRACE(("smp: standard configuration %d unimplemented\n", sFloatingStruct->mp_feature_1));
 			gKernelArgs.num_cpus = 1;
 			return 1;
 #else
@@ -280,8 +354,9 @@ smp_find_mp_config(void)
 */
 #endif
 		} else {
-			smp_do_config();
+			smp_do_mp_config();
 		}
+
 		return gKernelArgs.num_cpus;
 	}
 
@@ -515,16 +590,9 @@ smp_add_safemode_menus(Menu *menu)
 	if (gKernelArgs.num_cpus < 2)
 		return;
 
-	// ToDo: this should work with dual CPUs with HT as well!
-	if (gKernelArgs.num_cpus > 2 || !supports_hyper_threading()) {
+	if (gKernelArgs.num_cpus > 2) {
 		menu->AddItem(item = new(nothrow) MenuItem("Disable SMP"));
 		item->SetData(B_SAFEMODE_DISABLE_SMP);
-		item->SetType(MENU_ITEM_MARKABLE);
-	}
-
-	if (supports_hyper_threading()) {
-		menu->AddItem(item = new(nothrow) MenuItem("Disable Hyper-Threading"));
-		item->SetData(B_SAFEMODE_DISABLE_HYPER_THREADING);
 		item->SetType(MENU_ITEM_MARKABLE);
 	}
 }
@@ -561,5 +629,3 @@ smp_init(void)
 		}
 	}
 }
-
-

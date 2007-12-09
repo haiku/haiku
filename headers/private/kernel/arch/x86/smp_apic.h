@@ -125,6 +125,7 @@ struct mp_config_table {
 	uint32	apic;				/* address of apic */
 	uint16	ext_length;			/* length of extended section */
 	uint8	ext_checksum;		/* checksum of extended table entries */
+	uint8	reserved;
 };
 
 struct mp_floating_struct {
