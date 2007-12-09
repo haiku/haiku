@@ -49,7 +49,7 @@ FilePanelApp::MessageReceived(BMessage *message)
 	BEntry entry;
 	BPath p;
 
-//	message->PrintToStream();
+	//message->PrintToStream();
 	switch (message->what) {
 	case B_SAVE_REQUESTED:
 		message->FindRef("directory", &e);
@@ -61,7 +61,6 @@ FilePanelApp::MessageReceived(BMessage *message)
 		break;
 	case B_CANCEL:
 		return_code = 1;
-//puts("plop");
 		be_app_messenger.SendMessage(B_QUIT_REQUESTED);
 		break;
 	default:
@@ -85,7 +84,8 @@ FilePanelApp::RefsReceived(BMessage *message)
 	be_app_messenger.SendMessage(B_QUIT_REQUESTED);
 }
 
-int usage(char *pname, int error)
+int
+usage(char *pname, int error)
 {
 	fprintf(stderr, "display a load/save file panel\n");
 	fprintf(stderr, "usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n", pname);
@@ -110,7 +110,8 @@ int usage(char *pname, int error)
 	return error;
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
 	int i;
 	file_panel_mode fpMode = B_OPEN_PANEL;
@@ -189,7 +190,7 @@ int main(int argc, char **argv)
 //	printf("rc = %d\n", return_code);
 // WTF ??
 //return 2;
-	exit(2);
+//	exit(2);
 	exit(return_code);
 	return return_code;
 }
