@@ -121,7 +121,11 @@ StrokeTransformer::WantsOpenPaths() const
 double
 StrokeTransformer::ApproximationScale() const
 {
-	return fSource.ApproximationScale() * width();
+	double scale = fSource.ApproximationScale();
+	double factor = fabs(width());
+	if (factor > 1.0)
+		scale *= factor;
+	return scale;
 }
 
 // #pragma mark -

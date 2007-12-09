@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2007, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -100,7 +100,7 @@ StyleHandler::color(unsigned styleIndex)
 {
 	StyleItem* styleItem = (StyleItem*)fStyles.ItemAt(styleIndex);
 	if (!styleItem) {
-		printf("no style at index: %d!\n", styleIndex);
+		printf("no style at index: %u!\n", styleIndex);
 		return fTransparent;
 	}
 
@@ -120,7 +120,7 @@ StyleHandler::generate_span(agg::rgba8* span, int x, int y,
 {
 	StyleItem* styleItem = (StyleItem*)fStyles.ItemAt(styleIndex);
 	if (!styleItem || !styleItem->style->Gradient()) {
-		printf("no style/gradient at index: %d!\n", styleIndex);
+		printf("no style/gradient at index: %u!\n", styleIndex);
 		// TODO: memset() span?
 		return;
 	}
@@ -397,6 +397,7 @@ IconRenderer::_Render(const BRect& r)
 		styleIndex++;
 
 		// global scale
+		shape->SetGlobalScale(max_c(1.0, transform.scale()));
 		ScaledPath scaledPath(shape->VertexSource(), transform);
 		if (shape->Hinting()) {
 			// additional hinting

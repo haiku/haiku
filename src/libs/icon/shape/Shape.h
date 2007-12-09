@@ -105,6 +105,7 @@ class Shape : public BPrivate::Icon::Transformable {
 			BRect				Bounds(bool updateLast = false) const;
 
 			::VertexSource&		VertexSource();
+			void				SetGlobalScale(double scale);
 
 			bool				AddTransformer(Transformer* transformer);
 			bool				AddTransformer(Transformer* transformer,

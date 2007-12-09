@@ -37,12 +37,17 @@ class PathSource : public VertexSource {
 
 	// PathSource
 			void				Update(bool leavePathsOpen,
-									   double approximationScale);
+									double approximationScale);
+
+			void				SetGlobalScale(double scale);
 
  private:
 		 	PathContainer*		fPaths;
 		 	AGGPath				fAGGPath;
 		 	AGGCurvedPath		fAGGCurvedPath;
+
+		 	double				fGlobalScale;
+		 	double				fLastTransformerScale;
 };
 
 }	// namespace Icon

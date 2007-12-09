@@ -482,6 +482,13 @@ Shape::VertexSource()
 	return *source;
 }
 
+// SetGlobalScale
+void
+Shape::SetGlobalScale(double scale)
+{
+	fPathSource.SetGlobalScale(scale);
+}
+
 // AddTransformer
 bool
 Shape::AddTransformer(Transformer* transformer)

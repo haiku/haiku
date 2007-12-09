@@ -13,10 +13,13 @@
 
 // constructor
 PathSource::PathSource(PathContainer* paths)
-	: VertexSource(),
-	  fPaths(paths),
-	  fAGGPath(),
-	  fAGGCurvedPath(fAGGPath)
+	: VertexSource()
+	, fPaths(paths)
+	, fAGGPath()
+	, fAGGCurvedPath(fAGGPath)
+
+	, fGlobalScale(1.0)
+	, fLastTransformerScale(1.0)
 {
 }
 
@@ -68,6 +71,15 @@ PathSource::Update(bool leavePathsOpen, double approximationScale)
 			fAGGPath.close_polygon();
 	}
 
-	fAGGCurvedPath.approximation_scale(approximationScale);
+	fLastTransformerScale = approximationScale;
+	fAGGCurvedPath.approximation_scale(fLastTransformerScale * fGlobalScale);
+}
+
+// SetGlobalScale
+void
+PathSource::SetGlobalScale(double scale)
+{
+	fGlobalScale = scale;
+	fAGGCurvedPath.approximation_scale(fLastTransformerScale * fGlobalScale);
 }
 

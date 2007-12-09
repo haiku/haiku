@@ -93,7 +93,7 @@ AffineTransformer::SetSource(VertexSource& source)
 double
 AffineTransformer::ApproximationScale() const
 {
-	return fSource.ApproximationScale() * scale();
+	return fabs(fSource.ApproximationScale() * scale());
 }
 
 // #pragma mark -
