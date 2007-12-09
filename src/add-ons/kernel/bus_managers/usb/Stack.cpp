@@ -57,7 +57,7 @@ Stack::Stack()
 	size_t bufferSize = sizeof(moduleName);
 
 	TRACE(("USB Stack: looking for host controller modules\n"));
-	while(read_next_module_name(moduleList, moduleName, &bufferSize) == B_OK) {
+	while (read_next_module_name(moduleList, moduleName, &bufferSize) == B_OK) {
 		bufferSize = sizeof(moduleName);
 		TRACE(("USB Stack: found module %s\n", moduleName));
 
@@ -81,6 +81,12 @@ Stack::Stack()
 	fExploreThread = spawn_kernel_thread(ExploreThread, "usb explore",
 		B_LOW_PRIORITY, this);
 	resume_thread(fExploreThread);
+
+	// wait for the first explore to complete. this ensures that a driver that
+	// is opening the module does not get rescanned while or before installing
+	// its hooks.
+	while (!fFirstExploreDone)
+		snooze(100);
 }
 
 
@@ -110,7 +116,6 @@ Stack::InitCheck()
 {
 	if (fBusManagers.Count() == 0)
 		return ENODEV;
-
 	return B_OK;
 }
 
@@ -355,7 +360,7 @@ Stack::RescanDrivers(rescan_item *rescanItem)
 		close(devFS);
 #else
 		// use the private devfs API under Haiku
-		//devfs_rescan_driver(name);
+		devfs_rescan_driver(rescanItem->name);
 #endif
 
 		rescan_item *next = rescanItem->link;
@@ -435,11 +440,6 @@ status_t
 Stack::InstallNotify(const char *driverName, const usb_notify_hooks *hooks)
 {
 	TRACE(("USB Stack: installing notify hooks for driver \"%s\"\n", driverName));
-
-	// wait for the first explore to complete
-	// this ensures that we get all initial devices
-	while (!fFirstExploreDone)
-		snooze(1000);
 
 	usb_driver_info *element = fDriverList;
 	while (element) {

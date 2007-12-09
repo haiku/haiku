@@ -26,8 +26,6 @@ Pipe::~Pipe()
 }
 
 
-
-
 void
 Pipe::InitCommon(int8 deviceAddress, uint8 endpointAddress, usb_speed speed,
 	pipeDirection direction, size_t maxPacketSize, uint8 interval,
