@@ -585,16 +585,14 @@ dprintf("wait for delivery\n");
 void
 smp_add_safemode_menus(Menu *menu)
 {
-	MenuItem *item;
 
 	if (gKernelArgs.num_cpus < 2)
 		return;
 
-	if (gKernelArgs.num_cpus > 2) {
-		menu->AddItem(item = new(nothrow) MenuItem("Disable SMP"));
-		item->SetData(B_SAFEMODE_DISABLE_SMP);
-		item->SetType(MENU_ITEM_MARKABLE);
-	}
+	MenuItem *item = new(nothrow) MenuItem("Disable SMP");
+	menu->AddItem(item);
+	item->SetData(B_SAFEMODE_DISABLE_SMP);
+	item->SetType(MENU_ITEM_MARKABLE);
 }
 
 
