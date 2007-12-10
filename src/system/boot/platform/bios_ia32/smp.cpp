@@ -156,6 +156,12 @@ smp_do_mp_config()
 		switch (*ptr) {
 			case MP_BASE_PROCESSOR:
 			{
+				if (gKernelArgs.num_cpus == MAX_BOOT_CPUS) {
+					TRACE(("smp: already reached maximum boot CPUs (%d)\n", MAX_BOOT_CPUS));
+					ptr += sizeof(struct mp_base_processor);
+					break;
+				}
+
 				struct mp_base_processor *processor = (struct mp_base_processor *)ptr;
 
 				gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus] = processor->apic_id;
@@ -267,6 +273,11 @@ smp_do_acpi_config(acpi_rsdp *rsdp)
 			switch (apic->type) {
 				case ACPI_MADT_LOCAL_APIC:
 				{
+					if (gKernelArgs.num_cpus == MAX_BOOT_CPUS) {
+						TRACE(("smp: already reached maximum boot CPUs (%d)\n", MAX_BOOT_CPUS));
+						break;
+					}
+
 					acpi_local_apic *localApic = (acpi_local_apic *)apic;
 					TRACE(("smp: found local APIC with id %u\n", localApic->apic_id));
 					gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus] = localApic->apic_id;
