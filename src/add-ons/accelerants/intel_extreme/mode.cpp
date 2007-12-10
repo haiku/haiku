@@ -433,6 +433,9 @@ if (first) {
 		return B_NO_MEMORY;
 	}
 
+	// clear frame buffer before using it
+	memset(sharedInfo.graphics_memory + offset, 0,
+		bytesPerRow * target.virtual_height);
 	sharedInfo.frame_buffer_offset = offset;
 
 	// make sure VGA display is disabled
