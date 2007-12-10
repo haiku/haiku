@@ -119,8 +119,8 @@ BTimeSource::PerformanceTimeFor(bigtime_t real_time)
 	bigtime_t last_real_time; 
 	float last_drift; 
 
-	while (GetTime(&last_perf_time, &last_real_time, &last_drift) != B_OK)
-		snooze(1);
+	if (GetTime(&last_perf_time, &last_real_time, &last_drift) != B_OK)
+		debugger("BTimeSource::PerformanceTimeFor: GetTime failed");
 		
 	return last_perf_time + (bigtime_t)((real_time - last_real_time) * last_drift);
 }
@@ -140,8 +140,8 @@ BTimeSource::RealTimeFor(bigtime_t performance_time,
 	bigtime_t last_real_time; 
 	float last_drift; 
 
-	while (GetTime(&last_perf_time, &last_real_time, &last_drift) != B_OK)
-		snooze(1);
+	if (GetTime(&last_perf_time, &last_real_time, &last_drift) != B_OK)
+		debugger("BTimeSource::RealTimeFor: GetTime failed");
 
 	return last_real_time - with_latency + (bigtime_t)((performance_time - last_perf_time) / last_drift);
 }
