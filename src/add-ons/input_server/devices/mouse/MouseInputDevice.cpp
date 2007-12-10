@@ -1,9 +1,11 @@
 /*
- * Copyright 2004-2006, Haiku.
+ * Copyright 2004-2007, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Stefano Ceccherini
+ *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
+ *		Jérôme Duval
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 
@@ -97,7 +99,7 @@ LOG(const char *fmt, ...)
 extern "C" BInputServerDevice *
 instantiate_input_device()
 {
-	return new MouseInputDevice();
+	return new (std::nothrow) MouseInputDevice();
 }
 
 
@@ -443,7 +445,7 @@ status_t
 MouseInputDevice::InitCheck()
 {
 	CALLED();
-	return B_OK;
+	return BInputServerDevice::InitCheck();
 }
 
 

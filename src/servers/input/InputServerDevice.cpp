@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2005, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,10 +8,11 @@
 
 #include <InputServerDevice.h>
 
+#include <new>
 
 BInputServerDevice::BInputServerDevice()
 {
-	fOwner = new _BDeviceAddOn_(this);
+	fOwner = new (std::nothrow) _BDeviceAddOn_(this);
 }
 
 
@@ -27,6 +28,8 @@ BInputServerDevice::~BInputServerDevice()
 status_t
 BInputServerDevice::InitCheck()
 {
+	if (fOwner == NULL)
+		return B_NO_MEMORY;
 	return B_OK;
 }
 

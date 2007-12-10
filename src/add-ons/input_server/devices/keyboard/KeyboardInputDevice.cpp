@@ -445,6 +445,10 @@ status_t
 KeyboardInputDevice::InitCheck()
 {
 	CALLED();
+	status_t status = BInputServerDevice::InitCheck();
+	if (status < B_OK)
+		return status;
+
 	// TODO: this doesn't belong here!
 	_RecursiveScan(kKeyboardDevicesDirectory);
 
