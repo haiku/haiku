@@ -304,10 +304,6 @@ smp_do_acpi_config(acpi_rsdp *rsdp)
 			break;
 	}
 
-	// ToDo: remove CPU limit
-	if (gKernelArgs.num_cpus > 2)
-		gKernelArgs.num_cpus = 2;
-
 	return gKernelArgs.num_cpus > 0 ? B_OK : B_ERROR;
 }
 
