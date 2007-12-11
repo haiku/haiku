@@ -66,10 +66,9 @@ compare_video_modes(video_mode *a, video_mode *b)
 }
 
 
-/**	Insert the video mode into the list, sorted by resolution and bit depth.
- *	Higher resolutions/depths come first.
- */
-
+/*!	Insert the video mode into the list, sorted by resolution and bit depth.
+	Higher resolutions/depths come first.
+*/
 static void
 add_video_mode(video_mode *videoMode)
 {
@@ -202,7 +201,6 @@ vga_enable_bright_background_colors(void)
 
 
 //	#pragma mark - vesa
-//	VESA functions
 
 
 static status_t
@@ -329,17 +327,20 @@ vesa_init(vbe_info_block *info, video_mode **_standardMode)
 				modeInfo.memory_model, modeInfo.physical_base, modeInfo.num_planes,
 				modeInfo.num_banks));
 
-			const uint32 requiredAttributes = MODE_ATTR_AVAILABLE | MODE_ATTR_GRAPHICS_MODE
-								| MODE_ATTR_COLOR_MODE | MODE_ATTR_LINEAR_BUFFER;
+			const uint32 requiredAttributes = MODE_ATTR_AVAILABLE
+				| MODE_ATTR_GRAPHICS_MODE | MODE_ATTR_COLOR_MODE
+				| MODE_ATTR_LINEAR_BUFFER;
 
 			if (modeInfo.width >= 640
 				&& modeInfo.physical_base != 0
 				&& modeInfo.num_planes == 1
 				&& (modeInfo.memory_model == MODE_MEMORY_PACKED_PIXEL
 					|| modeInfo.memory_model == MODE_MEMORY_DIRECT_COLOR)
-				&& (modeInfo.attributes & requiredAttributes) == requiredAttributes) {
+				&& (modeInfo.attributes & requiredAttributes)
+					== requiredAttributes) {
 				// this mode fits our needs
-				video_mode *videoMode = (video_mode *)malloc(sizeof(struct video_mode));
+				video_mode *videoMode = (video_mode *)malloc(
+					sizeof(struct video_mode));
 				if (videoMode == NULL)
 					continue;
 
@@ -361,9 +362,11 @@ vesa_init(vbe_info_block *info, video_mode **_standardMode)
 					// for the standard mode, we prefer a bit depth of 16
 					// switch to the one with the higher resolution
 					// ToDo: is that always a good idea? for now we'll use 800x600
-					if (modeInfo.width >= standardMode->width && modeInfo.width <= 800) {
+					if (modeInfo.width >= standardMode->width
+						&& modeInfo.width <= 800) {
 						if (modeInfo.width != standardMode->width
-							|| modeInfo.bits_per_pixel >= standardMode->bits_per_pixel)
+							|| modeInfo.bits_per_pixel
+								>= standardMode->bits_per_pixel)
 							standardMode = videoMode;
 					}
 				}
@@ -500,9 +503,9 @@ video_mode_menu()
 	menu->AddItem(item = new(nothrow) MenuItem("Default"));
 	item->SetMarked(true);
 	item->Select(true);
-	item->SetHelpText("The Default video mode is the one currently configured in "
-		"the system. If there is no mode configured yet, a viable mode will be chosen "
-		"automatically.");
+	item->SetHelpText("The Default video mode is the one currently configured "
+		"in the system. If there is no mode configured yet, a viable mode will "
+		"be chosen automatically.");
 
 	menu->AddItem(new(nothrow) MenuItem("Standard VGA"));
 
@@ -761,10 +764,14 @@ fallback:
 		gKernelArgs.frame_buffer.height = 480;
 		gKernelArgs.frame_buffer.bytes_per_row = 640 / 2;
 		gKernelArgs.frame_buffer.depth = 4;
-		gKernelArgs.frame_buffer.physical_buffer.size = gKernelArgs.frame_buffer.width
+		gKernelArgs.frame_buffer.physical_buffer.size
+			= gKernelArgs.frame_buffer.width
 			* gKernelArgs.frame_buffer.height / 2;
 		gKernelArgs.frame_buffer.physical_buffer.start = 0xa0000;
 	}
+
+	dprintf("video mode: %ux%ux%u\n", gKernelArgs.frame_buffer.width,
+		gKernelArgs.frame_buffer.height, gKernelArgs.frame_buffer.depth);
 
 	gKernelArgs.frame_buffer.enabled = true;
 
@@ -785,13 +792,11 @@ fallback:
 	}
 
 	// clear the video memory
-	// ToDo: this shouldn't be necessary on real hardware (and Bochs), but
-	//	at least booting with Qemu looks ugly when this is missing
-	memset((void *)sFrameBuffer, 0, gKernelArgs.frame_buffer.physical_buffer.size);
+	memset((void *)sFrameBuffer, 0,
+		gKernelArgs.frame_buffer.physical_buffer.size);
 
-	// ToDo: the boot image is only a temporary solution - it should be
-	//	provided by the loader itself, as well as the blitting routines.
-	//	The image should be compressed, too.
+	// TODO: The image should be compressed, and eventually added by
+	//	the build process.
 
 	blit_8bit_image(kImageData, kWidth, kHeight, kPalette,
 		gKernelArgs.frame_buffer.width - kWidth - 40,
@@ -837,7 +842,8 @@ platform_init_video(void)
 
 	edid1_info info;
 	if (vesa_get_edid(&info) == B_OK) {
-		// we got EDID information from the monitor, try to find a new default mode
+		// we got EDID information from the monitor, try to find a new default
+		// mode
 		video_mode *defaultMode = NULL;
 
 		// try detailed timing first
