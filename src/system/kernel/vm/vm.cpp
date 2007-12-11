@@ -3477,7 +3477,7 @@ vm_init(kernel_args *args)
 
 	vm_low_memory_init();
 
-	size_t slabInitialSize = 2 * B_PAGE_SIZE;
+	size_t slabInitialSize = args->num_cpus * 2 * B_PAGE_SIZE;
 	addr_t slabInitialBase = vm_allocate_early(args, slabInitialSize,
 		slabInitialSize, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	slab_init(args, slabInitialBase, slabInitialSize);
