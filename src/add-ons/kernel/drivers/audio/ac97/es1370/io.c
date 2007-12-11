@@ -68,7 +68,7 @@ es1370_codec_wait(device_config *config)
 		if ((es1370_reg_read_32(config, ES1370_REG_STATUS) & STAT_CWRIP) == 0)
 			return B_OK;
 		if (i > 100)
-			snooze(1);
+			spin(1);
 	}
 	return B_TIMED_OUT;
 }

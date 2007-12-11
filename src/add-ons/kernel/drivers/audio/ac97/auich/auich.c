@@ -205,7 +205,7 @@ auich_stream_commit_parms(auich_stream *stream)
 			LOG(("channel reset finished, %x, %d\n", stream->base, i));
 			break;
 		}
-		snooze(1);
+		spin(1);
 	}
 	
 	if(i < 0) {
@@ -375,7 +375,7 @@ auich_stream_delete(auich_stream *stream)
 			LOG(("channel reset finished, %x, %d\n", stream->base, i));
 			break;
 		}
-		snooze(1);
+		spin(1);
 	}
 	
 	if(i < 0) {

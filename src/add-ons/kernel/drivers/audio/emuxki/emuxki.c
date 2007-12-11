@@ -96,7 +96,7 @@ dump_hardware_regs(device_config *config)
 	LOG(("EMU_IPR = %#08x\n",emuxki_reg_read_32(config, EMU_IPR)));
 	LOG(("EMU_INTE = %#08x\n",emuxki_reg_read_32(config, EMU_INTE)));
 	LOG(("EMU_HCFG = %#08x\n",emuxki_reg_read_32(config, EMU_HCFG)));
-	snooze(100);	
+	snooze(1000);	
 	/*emuxki_reg_write_8(config, EMU_AC97ADDRESS, EMU_AC97ADDRESS_READY);
 	LOG(("EMU_AC97ADDRESS_READY = %#08x\n", emuxki_reg_read_16(config, EMU_AC97DATA)));*/
 	
