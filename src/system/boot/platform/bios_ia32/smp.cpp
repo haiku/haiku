@@ -280,6 +280,11 @@ smp_do_acpi_config(acpi_rsdp *rsdp)
 
 					acpi_local_apic *localApic = (acpi_local_apic *)apic;
 					TRACE(("smp: found local APIC with id %u\n", localApic->apic_id));
+					if ((localApic->flags & ACPI_LOCAL_APIC_ENABLED) == 0) {
+						TRACE(("smp: APIC is disabled and will not be used\n"));
+						break;
+					}
+
 					gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus] = localApic->apic_id;
 					gKernelArgs.arch_args.cpu_os_id[localApic->apic_id] = gKernelArgs.num_cpus;
 					// ToDo: how to find out? putting 0x10 in to indicate a local apic

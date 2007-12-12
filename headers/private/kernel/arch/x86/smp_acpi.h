@@ -9,6 +9,8 @@
 #define ACPI_RSDT_SIGNATURE		"RSDT"
 #define ACPI_MADT_SIGNATURE		"APIC"
 
+#define ACPI_LOCAL_APIC_ENABLED	0x01
+
 struct acpi_rsdp {
 	char	signature[8];			/* "RSD PTR " including blank */
 	uint8	checksum;				/* checksum of bytes 0-19 (per ACPI 1.0) */
