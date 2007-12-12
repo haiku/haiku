@@ -365,7 +365,7 @@ MouseDevice::_RemapButtons(uint32 buttons) const
 	uint32 newButtons = 0;
 	for (int32 i = 0; buttons; i++) {
 		if (buttons & 0x1) {
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+#if defined(HAIKU_TARGET_PLATFORM_HAIKU) || defined(HAIKU_TARGET_PLATFORM_DANO)
 			newButtons |= fSettings.map.button[i];
 #else
 			if (i == 0)
