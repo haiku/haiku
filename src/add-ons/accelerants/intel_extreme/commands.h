@@ -28,10 +28,10 @@ class QueueCommands {
 		void PutWaitFor(uint32 event);
 		void PutOverlayFlip(uint32 code, bool updateCoefficients);
 
-	private:
-		void _MakeSpace(uint32 size);
-		void _Write(uint32 data);
+		void MakeSpace(uint32 size);
+		void Write(uint32 data);
 
+	private:
 		ring_buffer	&fRingBuffer;
 };
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,11 +7,14 @@
  */
 
 
+#include <Debug.h>
+
 #include "accelerant.h"
 #include "accelerant_protos.h"
 #include "commands.h"
 
 
+#undef TRACE
 //#define TRACE_ENGINE
 #ifdef TRACE_ENGINE
 extern "C" void _sPrintf(const char *format, ...);
@@ -36,7 +39,7 @@ QueueCommands::~QueueCommands()
 {
 	if (fRingBuffer.position & 0x07) {
 		// make sure the command is properly aligned
-		_Write(COMMAND_NOOP);
+		Write(COMMAND_NOOP);
 	}
 
 	// We must make sure memory is written back in case the ring buffer
@@ -58,10 +61,10 @@ QueueCommands::Put(struct command &command, size_t size)
 	uint32 count = size / sizeof(uint32);
 	uint32 *data = command.Data();
 
-	_MakeSpace(count);
+	MakeSpace(count);
 
 	for (uint32 i = 0; i < count; i++) {
-		_Write(data[i]);
+		Write(data[i]);
 	}
 }
 
@@ -69,48 +72,66 @@ QueueCommands::Put(struct command &command, size_t size)
 void
 QueueCommands::PutFlush()
 {
-	_MakeSpace(2);
+	MakeSpace(2);
 
-	_Write(COMMAND_FLUSH);
-	_Write(COMMAND_NOOP);
+	Write(COMMAND_FLUSH);
+	Write(COMMAND_NOOP);
 }
 
 
 void
 QueueCommands::PutWaitFor(uint32 event)
 {
-	_MakeSpace(2);
+	MakeSpace(2);
 
-	_Write(COMMAND_WAIT_FOR_EVENT | event);
-	_Write(COMMAND_NOOP);
+	Write(COMMAND_WAIT_FOR_EVENT | event);
+	Write(COMMAND_NOOP);
 }
 
 
 void
 QueueCommands::PutOverlayFlip(uint32 mode, bool updateCoefficients)
 {
-	_MakeSpace(2);
+	MakeSpace(2);
 
-	_Write(COMMAND_OVERLAY_FLIP | mode);
-	_Write((uint32)gInfo->shared_info->physical_overlay_registers
+	Write(COMMAND_OVERLAY_FLIP | mode);
+	Write((uint32)gInfo->shared_info->physical_overlay_registers
 		| (updateCoefficients ? OVERLAY_UPDATE_COEFFICIENTS : 0));
 }
 
 
 void
-QueueCommands::_MakeSpace(uint32 size)
+QueueCommands::MakeSpace(uint32 size)
 {
-	// TODO: make sure there is enough room to write the command!
+	ASSERT((size & 1) == 0);
+	size *= sizeof(uint32);
+
+	while (fRingBuffer.space_left < size) {
+		// wait until more space is free
+		uint32 head = read32(fRingBuffer.register_base + RING_BUFFER_HEAD)
+			& INTEL_RING_BUFFER_HEAD_MASK;
+
+		if (head < fRingBuffer.position)
+			head += fRingBuffer.size;
+
+		fRingBuffer.space_left = head - fRingBuffer.position;
+
+		if (fRingBuffer.space_left < size)
+			spin(10);
+	}
+
+	fRingBuffer.space_left -= size;
 }
 
 
 void
-QueueCommands::_Write(uint32 data)
+QueueCommands::Write(uint32 data)
 {
 	uint32 *target = (uint32 *)(fRingBuffer.base + fRingBuffer.position);
 	*target = data;
 
-	fRingBuffer.position = (fRingBuffer.position + sizeof(uint32)) & (fRingBuffer.size - 1);
+	fRingBuffer.position = (fRingBuffer.position + sizeof(uint32))
+		& (fRingBuffer.size - 1);
 }
 
 
@@ -128,8 +149,8 @@ uninit_ring_buffer(ring_buffer &ringBuffer)
 void
 setup_ring_buffer(ring_buffer &ringBuffer, const char *name)
 {
-	TRACE(("Setup ring buffer %s, offset %lx, size %lx\n", name, ringBuffer.offset,
-		ringBuffer.size));
+	TRACE(("Setup ring buffer %s, offset %lx, size %lx\n", name,
+		ringBuffer.offset, ringBuffer.size));
 
 	if (init_lock(&ringBuffer.lock, name) < B_OK) {
 		// disable ring buffer
@@ -138,6 +159,9 @@ setup_ring_buffer(ring_buffer &ringBuffer, const char *name)
 	}
 
 	uint32 ring = ringBuffer.register_base;
+	ringBuffer.position = 0;
+	ringBuffer.space_left = ringBuffer.size;
+
 	write32(ring + RING_BUFFER_TAIL, 0);
 	write32(ring + RING_BUFFER_START, ringBuffer.offset);
 	write32(ring + RING_BUFFER_CONTROL,
@@ -149,8 +173,7 @@ setup_ring_buffer(ring_buffer &ringBuffer, const char *name)
 //	#pragma mark - engine management
 
 
-/** Return number of hardware engines */
-
+/*! Return number of hardware engines */
 uint32
 intel_accelerant_engine_count(void) 
 {
@@ -202,15 +225,27 @@ intel_wait_engine_idle(void)
 	// a better way to do this would be to acquire the engine's lock and
 	// sync to the latest token
 
+	bigtime_t start = system_time();
+
 	ring_buffer &ring = gInfo->shared_info->primary_ring_buffer;
 	uint32 head, tail;
-	do {
-		head = read32(ring.register_base + RING_BUFFER_HEAD) & INTEL_RING_BUFFER_HEAD_MASK;
-		tail = read32(ring.register_base + RING_BUFFER_TAIL) & INTEL_RING_BUFFER_HEAD_MASK;
+	while (true) {
+		head = read32(ring.register_base + RING_BUFFER_HEAD)
+			& INTEL_RING_BUFFER_HEAD_MASK;
+		tail = read32(ring.register_base + RING_BUFFER_TAIL)
+			& INTEL_RING_BUFFER_HEAD_MASK;
 
-		//snooze(100);
-		// Isn't a snooze() a bit too slow? At least it's called *very* often in Haiku...
-	} while (head != tail);
+		if (head == tail)
+			break;
+
+		if (system_time() > start + 1000000LL) {
+			// the engine seems to be locked up!
+			TRACE(("intel_extreme: engine locked up!\n"));
+			break;
+		}
+
+		spin(10);
+	}
 }
 
 
@@ -235,7 +270,8 @@ intel_sync_to_token(sync_token *syncToken)
 
 
 void
-intel_screen_to_screen_blit(engine_token *token, blit_params *params, uint32 count)
+intel_screen_to_screen_blit(engine_token *token, blit_params *params,
+	uint32 count)
 {
 	QueueCommands queue(gInfo->shared_info->primary_ring_buffer);
 
@@ -254,8 +290,8 @@ intel_screen_to_screen_blit(engine_token *token, blit_params *params, uint32 cou
 
 
 void
-intel_fill_rectangle(engine_token *token, uint32 color, fill_rect_params *params,
-	uint32 count)
+intel_fill_rectangle(engine_token *token, uint32 color,
+	fill_rect_params *params, uint32 count)
 {
 	QueueCommands queue(gInfo->shared_info->primary_ring_buffer);
 
@@ -273,7 +309,8 @@ intel_fill_rectangle(engine_token *token, uint32 color, fill_rect_params *params
 
 
 void
-intel_invert_rectangle(engine_token *token, fill_rect_params *params, uint32 count)
+intel_invert_rectangle(engine_token *token, fill_rect_params *params,
+	uint32 count)
 {
 	QueueCommands queue(gInfo->shared_info->primary_ring_buffer);
 
@@ -291,7 +328,8 @@ intel_invert_rectangle(engine_token *token, fill_rect_params *params, uint32 cou
 
 
 void
-intel_fill_span(engine_token *token, uint32 color, uint16* _params, uint32 count)
+intel_fill_span(engine_token *token, uint32 color, uint16* _params,
+	uint32 count)
 {
 	struct params {
 		uint16	top;

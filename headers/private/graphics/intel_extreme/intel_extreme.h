@@ -49,6 +49,7 @@ struct ring_buffer {
 	uint32			offset;
 	uint32			size;
 	uint32			position;
+	uint32			space_left;
 	uint8			*base;
 };
 
