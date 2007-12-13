@@ -112,7 +112,7 @@ QueueCommands::MakeSpace(uint32 size)
 		uint32 head = read32(fRingBuffer.register_base + RING_BUFFER_HEAD)
 			& INTEL_RING_BUFFER_HEAD_MASK;
 
-		if (head < fRingBuffer.position)
+		if (head <= fRingBuffer.position)
 			head += fRingBuffer.size;
 
 		fRingBuffer.space_left = head - fRingBuffer.position;
