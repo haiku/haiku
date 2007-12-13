@@ -105,6 +105,7 @@ QueueCommands::MakeSpace(uint32 size)
 {
 	ASSERT((size & 1) == 0);
 	size *= sizeof(uint32);
+	bigtime_t start = system_time();
 
 	while (fRingBuffer.space_left < size) {
 		// wait until more space is free
@@ -116,8 +117,13 @@ QueueCommands::MakeSpace(uint32 size)
 
 		fRingBuffer.space_left = head - fRingBuffer.position;
 
-		if (fRingBuffer.space_left < size)
+		if (fRingBuffer.space_left < size) {
+			if (system_time() > start + 1000000LL) {
+				TRACE(("intel_extreme: engine stalled\n"));
+				break;
+			}
 			spin(10);
+		}
 	}
 
 	fRingBuffer.space_left -= size;
