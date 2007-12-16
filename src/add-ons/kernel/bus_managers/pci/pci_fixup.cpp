@@ -38,6 +38,7 @@ jmicron_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function
 		dprintf("jmicron_fixup_ahci: 0xdc: 0x%08lx\n", pci->ReadPciConfig(domain, bus, device, function, 0xdc, 4));
 		uint32 val = pci->ReadPciConfig(domain, bus, device, function, 0xdc, 4);
 		if (!(val & (1 << 30))) {
+			uint8 irq = pci->ReadPciConfig(domain, bus, device, function, 0x3c, 1);
 			dprintf("jmicron_fixup_ahci: enabling split device mode\n");
 			val &= ~(1 << 24);
 			val |= (1 << 25) | (1 << 30);
@@ -46,6 +47,7 @@ jmicron_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function
 			val &= ~(1 << 16);
 			val |= (1 << 1) | (1 << 17) | (1 << 22);
 			pci->WritePciConfig(domain, bus, device, function, 0x40, 4, val);
+			pci->WritePciConfig(domain, bus, device, function, 0x3c, 1, irq);
 		}
 		dprintf("jmicron_fixup_ahci: 0x40: 0x%08lx\n", pci->ReadPciConfig(domain, bus, device, function, 0x40, 4));
 		dprintf("jmicron_fixup_ahci: 0xdc: 0x%08lx\n", pci->ReadPciConfig(domain, bus, device, function, 0xdc, 4));
