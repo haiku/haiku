@@ -1,4 +1,4 @@
-/* Copyright (C) 1991, 1996, 1997, 1998, 2002, 2003, 2004, 2006 Free
+/* Copyright (C) 1991, 1996, 1997, 1998, 2002, 2003, 2004, 2006, 2007 Free
    Software Foundation, Inc.
 
    This file is part of the GNU C Library.
@@ -19,12 +19,12 @@
 
 #ifndef _LIBC
 # include <config.h>
-/* Get specification.  */
-# include "strdup.h"
 #endif
 
-#include <stdlib.h>
+/* Get specification.  */
 #include <string.h>
+
+#include <stdlib.h>
 
 #undef __strdup
 #ifdef _LIBC

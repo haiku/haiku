@@ -43,6 +43,11 @@
 # define NAME_SIZE_DEFAULT 512
 #endif
 
+/* The results of opendir() in this file are not used with dirfd and fchdir,
+   therefore save some unnecessary work in fchdir.c.  */
+#undef opendir
+#undef closedir
+
 /* Return a freshly allocated string containing the file names
    in directory DIRP, separated by '\0' characters;
    the end is marked by two '\0' characters in a row.

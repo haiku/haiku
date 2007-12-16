@@ -1,6 +1,5 @@
-/* Formatted output to strings.
-   Copyright (C) 2004 Free Software Foundation, Inc.
-   Written by Simon Josefsson.
+/* Substitute for <netinet/in.h>.
+   Copyright (C) 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,18 +11,27 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with this program; if not, write to the Free Software Foundation,
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifndef SNPRINTF_H
-#define SNPRINTF_H
+#ifndef _GL_NETINET_IN_H
+#define _GL_NETINET_IN_H
 
-/* Get snprintf declaration, if available.  */
-#include <stdio.h>
+#if @HAVE_NETINET_IN_H@
 
-#if defined HAVE_DECL_SNPRINTF && !HAVE_DECL_SNPRINTF
-int snprintf (char *str, size_t size, const char *format, ...);
+/* On many platforms, <netinet/in.h> assumes prior inclusion of
+   <sys/types.h>.  */
+
+# include <sys/types.h>
+# include @ABSOLUTE_NETINET_IN_H@
+
+#else
+
+/* A platform that lacks <netinet/in.h>.  */
+
+# include <sys/socket.h>
+
 #endif
 
-#endif /* SNPRINTF_H */
+#endif /* _GL_NETINET_IN_H */

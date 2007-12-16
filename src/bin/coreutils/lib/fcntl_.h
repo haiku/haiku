@@ -26,6 +26,25 @@
 #include <unistd.h>
 #include @ABSOLUTE_FCNTL_H@
 
+
+/* Declare overridden functions.  */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef FCHDIR_REPLACEMENT
+# define open rpl_open
+extern int open (const char *, int, ...);
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
+
+/* Fix up the O_* macros.  */
+
 #if !defined O_DIRECT && defined O_DIRECTIO
 /* Tru64 spells it `O_DIRECTIO'.  */
 # define O_DIRECT O_DIRECTIO

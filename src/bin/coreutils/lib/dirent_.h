@@ -1,6 +1,5 @@
-/* Create a unique temporary file.
-
-   Copyright (C) 2006 Free Software Foundation, Inc.
+/* Wrapper around <dirent.h>.
+   Copyright (C) 2006-2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,16 +15,28 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-/* written by Jim Meyering */
+#ifndef _GL_DIRENT_H
+#define _GL_DIRENT_H
 
-#include <stdlib.h>
-#include <unistd.h>
+#include @ABSOLUTE_DIRENT_H@
 
-#ifdef __MKSTEMP_PREFIX
-# define _GL_CONCAT(x, y) x ## y
-# define _GL_XCONCAT(x, y) _GL_CONCAT (x, y)
-# define __MKSTEMP_ID(y) _GL_XCONCAT (__MKSTEMP_PREFIX, y)
-# undef mkstemp
-# define mkstemp __MKSTEMP_ID (mkstemp)
-int mkstemp (char *);
+
+/* Declare overridden functions.  */
+
+#ifdef __cplusplus
+extern "C" {
 #endif
+
+#if @REPLACE_FCHDIR@
+# define opendir rpl_opendir
+extern DIR * opendir (const char *);
+# define closedir rpl_closedir
+extern int closedir (DIR *);
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
+
+#endif /* _GL_DIRENT_H */

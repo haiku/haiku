@@ -21,6 +21,7 @@ StaticLibrary libfetish.a :
 	base64.c
 	basename.c
 	buffer-lcm.c
+	c-strcasecmp.c
 	c-strtod.c
 	c-strtold.c
 	calloc.c
@@ -45,6 +46,7 @@ StaticLibrary libfetish.a :
 	exitfail.c
 #	fchdir-stub.c
 	fchmodat.c
+	fchownat.c
 #	fchown-stub.c
 	fd-reopen.c
 	fd-safer.c
@@ -92,6 +94,7 @@ StaticLibrary libfetish.a :
 #	lstat-stub.c
 #	lstat.c
 #	malloc.c
+	mbscasecmp.c
 	mbswidth.c
 	md5.c
 	memcasecmp.c
@@ -110,6 +113,7 @@ StaticLibrary libfetish.a :
 #	mkstemp.c
 	mkstemp-safer.c
 	mktime.c
+	mpsort.c
 	modechange.c
 #	mountlist.c
 	nanosleep.c
@@ -153,7 +157,6 @@ StaticLibrary libfetish.a :
 	sha512.c
 	sig2str.c
 #	stpcpy.c
-	strcasecmp.c
 #	strcspn.c
 #	strdup.c
 	strftime.c
@@ -194,6 +197,7 @@ StaticLibrary libfetish.a :
 	xmemxfrm.c
 	xnanosleep.c
 	xreadlink.c
+	xreadlink-with-size.c
 	xstrndup.c
 	xstrtod.c
 	xstrtoimax.c

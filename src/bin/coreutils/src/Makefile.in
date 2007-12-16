@@ -86,15 +86,15 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/absolute-header.m4 \
 	$(top_srcdir)/m4/euidaccess-stat.m4 \
 	$(top_srcdir)/m4/euidaccess.m4 $(top_srcdir)/m4/exclude.m4 \
 	$(top_srcdir)/m4/exitfail.m4 $(top_srcdir)/m4/extensions.m4 \
-	$(top_srcdir)/m4/fcntl-safer.m4 $(top_srcdir)/m4/fcntl_h.m4 \
-	$(top_srcdir)/m4/fd-reopen.m4 $(top_srcdir)/m4/file-type.m4 \
-	$(top_srcdir)/m4/fileblocks.m4 $(top_srcdir)/m4/filemode.m4 \
-	$(top_srcdir)/m4/filenamecat.m4 $(top_srcdir)/m4/flexmember.m4 \
-	$(top_srcdir)/m4/fnmatch.m4 $(top_srcdir)/m4/fpending.m4 \
-	$(top_srcdir)/m4/fprintftime.m4 $(top_srcdir)/m4/free.m4 \
-	$(top_srcdir)/m4/fstypename.m4 $(top_srcdir)/m4/fsusage.m4 \
-	$(top_srcdir)/m4/ftruncate.m4 $(top_srcdir)/m4/fts.m4 \
-	$(top_srcdir)/m4/getaddrinfo.m4 \
+	$(top_srcdir)/m4/fchdir.m4 $(top_srcdir)/m4/fcntl-safer.m4 \
+	$(top_srcdir)/m4/fcntl_h.m4 $(top_srcdir)/m4/fd-reopen.m4 \
+	$(top_srcdir)/m4/file-type.m4 $(top_srcdir)/m4/fileblocks.m4 \
+	$(top_srcdir)/m4/filemode.m4 $(top_srcdir)/m4/filenamecat.m4 \
+	$(top_srcdir)/m4/flexmember.m4 $(top_srcdir)/m4/fnmatch.m4 \
+	$(top_srcdir)/m4/fpending.m4 $(top_srcdir)/m4/fprintftime.m4 \
+	$(top_srcdir)/m4/free.m4 $(top_srcdir)/m4/fstypename.m4 \
+	$(top_srcdir)/m4/fsusage.m4 $(top_srcdir)/m4/ftruncate.m4 \
+	$(top_srcdir)/m4/fts.m4 $(top_srcdir)/m4/getaddrinfo.m4 \
 	$(top_srcdir)/m4/getcwd-abort-bug.m4 \
 	$(top_srcdir)/m4/getcwd-path-max.m4 $(top_srcdir)/m4/getcwd.m4 \
 	$(top_srcdir)/m4/getdate.m4 $(top_srcdir)/m4/getdelim.m4 \
@@ -106,6 +106,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/absolute-header.m4 \
 	$(top_srcdir)/m4/gettime.m4 $(top_srcdir)/m4/gettimeofday.m4 \
 	$(top_srcdir)/m4/getugroups.m4 \
 	$(top_srcdir)/m4/getusershell.m4 $(top_srcdir)/m4/glibc21.m4 \
+	$(top_srcdir)/m4/gnulib-common.m4 \
 	$(top_srcdir)/m4/gnulib-comp.m4 \
 	$(top_srcdir)/m4/group-member.m4 \
 	$(top_srcdir)/m4/hard-locale.m4 $(top_srcdir)/m4/hash.m4 \
@@ -126,17 +127,18 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/absolute-header.m4 \
 	$(top_srcdir)/m4/longdouble.m4 $(top_srcdir)/m4/longlong.m4 \
 	$(top_srcdir)/m4/ls-mntd-fs.m4 $(top_srcdir)/m4/lstat.m4 \
 	$(top_srcdir)/m4/mbchar.m4 $(top_srcdir)/m4/mbiter.m4 \
-	$(top_srcdir)/m4/mbrtowc.m4 $(top_srcdir)/m4/mbstate_t.m4 \
-	$(top_srcdir)/m4/mbswidth.m4 $(top_srcdir)/m4/md5.m4 \
-	$(top_srcdir)/m4/memcasecmp.m4 $(top_srcdir)/m4/memchr.m4 \
-	$(top_srcdir)/m4/memcmp.m4 $(top_srcdir)/m4/memcoll.m4 \
-	$(top_srcdir)/m4/memcpy.m4 $(top_srcdir)/m4/memmove.m4 \
-	$(top_srcdir)/m4/mempcpy.m4 $(top_srcdir)/m4/memrchr.m4 \
-	$(top_srcdir)/m4/memset.m4 $(top_srcdir)/m4/memxfrm.m4 \
-	$(top_srcdir)/m4/mkancesdirs.m4 $(top_srcdir)/m4/mkdir-p.m4 \
-	$(top_srcdir)/m4/mkdir-slash.m4 $(top_srcdir)/m4/mkstemp.m4 \
-	$(top_srcdir)/m4/mktime.m4 $(top_srcdir)/m4/modechange.m4 \
-	$(top_srcdir)/m4/mountlist.m4 $(top_srcdir)/m4/nanosleep.m4 \
+	$(top_srcdir)/m4/mbrtowc.m4 $(top_srcdir)/m4/mbscasecmp.m4 \
+	$(top_srcdir)/m4/mbstate_t.m4 $(top_srcdir)/m4/mbswidth.m4 \
+	$(top_srcdir)/m4/md5.m4 $(top_srcdir)/m4/memcasecmp.m4 \
+	$(top_srcdir)/m4/memchr.m4 $(top_srcdir)/m4/memcmp.m4 \
+	$(top_srcdir)/m4/memcoll.m4 $(top_srcdir)/m4/memcpy.m4 \
+	$(top_srcdir)/m4/memmove.m4 $(top_srcdir)/m4/mempcpy.m4 \
+	$(top_srcdir)/m4/memrchr.m4 $(top_srcdir)/m4/memset.m4 \
+	$(top_srcdir)/m4/memxfrm.m4 $(top_srcdir)/m4/mkancesdirs.m4 \
+	$(top_srcdir)/m4/mkdir-p.m4 $(top_srcdir)/m4/mkdir-slash.m4 \
+	$(top_srcdir)/m4/mkstemp.m4 $(top_srcdir)/m4/mktime.m4 \
+	$(top_srcdir)/m4/modechange.m4 $(top_srcdir)/m4/mountlist.m4 \
+	$(top_srcdir)/m4/mpsort.m4 $(top_srcdir)/m4/nanosleep.m4 \
 	$(top_srcdir)/m4/netinet_in_h.m4 $(top_srcdir)/m4/nls.m4 \
 	$(top_srcdir)/m4/openat.m4 $(top_srcdir)/m4/pathmax.m4 \
 	$(top_srcdir)/m4/perl.m4 $(top_srcdir)/m4/physmem.m4 \
@@ -163,18 +165,20 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/absolute-header.m4 \
 	$(top_srcdir)/m4/stat-prog.m4 $(top_srcdir)/m4/stat-time.m4 \
 	$(top_srcdir)/m4/stdarg.m4 $(top_srcdir)/m4/stdbool.m4 \
 	$(top_srcdir)/m4/stdint.m4 $(top_srcdir)/m4/stdint_h.m4 \
-	$(top_srcdir)/m4/stdio-safer.m4 \
-	$(top_srcdir)/m4/stdlib-safer.m4 $(top_srcdir)/m4/stpcpy.m4 \
-	$(top_srcdir)/m4/strcase.m4 $(top_srcdir)/m4/strcspn.m4 \
+	$(top_srcdir)/m4/stdio-safer.m4 $(top_srcdir)/m4/stdio_h.m4 \
+	$(top_srcdir)/m4/stdlib-safer.m4 $(top_srcdir)/m4/stdlib_h.m4 \
+	$(top_srcdir)/m4/stpcpy.m4 $(top_srcdir)/m4/strcspn.m4 \
 	$(top_srcdir)/m4/strdup.m4 $(top_srcdir)/m4/strftime.m4 \
-	$(top_srcdir)/m4/strndup.m4 $(top_srcdir)/m4/strnlen.m4 \
-	$(top_srcdir)/m4/strnumcmp.m4 $(top_srcdir)/m4/strpbrk.m4 \
-	$(top_srcdir)/m4/strtod.m4 $(top_srcdir)/m4/strtoimax.m4 \
-	$(top_srcdir)/m4/strtol.m4 $(top_srcdir)/m4/strtoll.m4 \
-	$(top_srcdir)/m4/strtoul.m4 $(top_srcdir)/m4/strtoull.m4 \
-	$(top_srcdir)/m4/strtoumax.m4 $(top_srcdir)/m4/strverscmp.m4 \
+	$(top_srcdir)/m4/string_h.m4 $(top_srcdir)/m4/strndup.m4 \
+	$(top_srcdir)/m4/strnlen.m4 $(top_srcdir)/m4/strnumcmp.m4 \
+	$(top_srcdir)/m4/strpbrk.m4 $(top_srcdir)/m4/strtod.m4 \
+	$(top_srcdir)/m4/strtoimax.m4 $(top_srcdir)/m4/strtol.m4 \
+	$(top_srcdir)/m4/strtoll.m4 $(top_srcdir)/m4/strtoul.m4 \
+	$(top_srcdir)/m4/strtoull.m4 $(top_srcdir)/m4/strtoumax.m4 \
+	$(top_srcdir)/m4/strverscmp.m4 \
 	$(top_srcdir)/m4/sys_socket_h.m4 \
-	$(top_srcdir)/m4/sys_stat_h.m4 $(top_srcdir)/m4/tempname.m4 \
+	$(top_srcdir)/m4/sys_stat_h.m4 $(top_srcdir)/m4/sys_time_h.m4 \
+	$(top_srcdir)/m4/tempname.m4 $(top_srcdir)/m4/time_h.m4 \
 	$(top_srcdir)/m4/time_r.m4 $(top_srcdir)/m4/timespec.m4 \
 	$(top_srcdir)/m4/tm_gmtoff.m4 $(top_srcdir)/m4/tzset.m4 \
 	$(top_srcdir)/m4/unicodeio.m4 $(top_srcdir)/m4/unistd-safer.m4 \
@@ -185,13 +189,13 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/absolute-header.m4 \
 	$(top_srcdir)/m4/utimecmp.m4 $(top_srcdir)/m4/utimens.m4 \
 	$(top_srcdir)/m4/utimes-null.m4 $(top_srcdir)/m4/utimes.m4 \
 	$(top_srcdir)/m4/vasnprintf.m4 $(top_srcdir)/m4/vasprintf.m4 \
-	$(top_srcdir)/m4/wchar_t.m4 $(top_srcdir)/m4/wcwidth.m4 \
+	$(top_srcdir)/m4/wchar.m4 $(top_srcdir)/m4/wchar_t.m4 \
+	$(top_srcdir)/m4/wctype.m4 $(top_srcdir)/m4/wcwidth.m4 \
 	$(top_srcdir)/m4/wint_t.m4 $(top_srcdir)/m4/xalloc.m4 \
 	$(top_srcdir)/m4/xfts.m4 $(top_srcdir)/m4/xgetcwd.m4 \
-	$(top_srcdir)/m4/xnanosleep.m4 $(top_srcdir)/m4/xreadlink.m4 \
-	$(top_srcdir)/m4/xstrndup.m4 $(top_srcdir)/m4/xstrtod.m4 \
-	$(top_srcdir)/m4/xstrtol.m4 $(top_srcdir)/m4/yesno.m4 \
-	$(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/xnanosleep.m4 $(top_srcdir)/m4/xstrndup.m4 \
+	$(top_srcdir)/m4/xstrtod.m4 $(top_srcdir)/m4/xstrtol.m4 \
+	$(top_srcdir)/m4/yesno.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -280,7 +284,7 @@ df_DEPENDENCIES = ../lib/libcoreutils.a $(am__DEPENDENCIES_1) \
 am_dir_OBJECTS = ls.$(OBJEXT) ls-dir.$(OBJEXT)
 dir_OBJECTS = $(am_dir_OBJECTS)
 dir_DEPENDENCIES = $(am__DEPENDENCIES_2) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 dircolors_SOURCES = dircolors.c
 dircolors_OBJECTS = dircolors.$(OBJEXT)
 dircolors_LDADD = $(LDADD)
@@ -389,7 +393,7 @@ logname_DEPENDENCIES = ../lib/libcoreutils.a $(am__DEPENDENCIES_1) \
 am_ls_OBJECTS = ls.$(OBJEXT) ls-ls.$(OBJEXT)
 ls_OBJECTS = $(am_ls_OBJECTS)
 ls_DEPENDENCIES = $(am__DEPENDENCIES_2) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_md5sum_OBJECTS = md5sum-md5sum.$(OBJEXT)
 md5sum_OBJECTS = $(am_md5sum_OBJECTS)
 md5sum_LDADD = $(LDADD)
@@ -631,7 +635,7 @@ users_DEPENDENCIES = ../lib/libcoreutils.a $(am__DEPENDENCIES_1) \
 am_vdir_OBJECTS = ls.$(OBJEXT) ls-vdir.$(OBJEXT)
 vdir_OBJECTS = $(am_vdir_OBJECTS)
 vdir_DEPENDENCIES = $(am__DEPENDENCIES_2) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 wc_SOURCES = wc.c
 wc_OBJECTS = wc.$(OBJEXT)
 wc_LDADD = $(LDADD)
@@ -702,10 +706,21 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 # confusion with the `install' target.  The install rule transforms `ginstall'
 # to install before applying any user-specified name transformations.
 transform = s/ginstall/install/; @program_transform_name@
+ABSOLUTE_DIRENT_H = @ABSOLUTE_DIRENT_H@
 ABSOLUTE_FCNTL_H = @ABSOLUTE_FCNTL_H@
 ABSOLUTE_INTTYPES_H = @ABSOLUTE_INTTYPES_H@
+ABSOLUTE_NETINET_IN_H = @ABSOLUTE_NETINET_IN_H@
 ABSOLUTE_STDINT_H = @ABSOLUTE_STDINT_H@
+ABSOLUTE_STDIO_H = @ABSOLUTE_STDIO_H@
+ABSOLUTE_STDLIB_H = @ABSOLUTE_STDLIB_H@
+ABSOLUTE_STRING_H = @ABSOLUTE_STRING_H@
+ABSOLUTE_SYS_SOCKET_H = @ABSOLUTE_SYS_SOCKET_H@
 ABSOLUTE_SYS_STAT_H = @ABSOLUTE_SYS_STAT_H@
+ABSOLUTE_SYS_TIME_H = @ABSOLUTE_SYS_TIME_H@
+ABSOLUTE_TIME_H = @ABSOLUTE_TIME_H@
+ABSOLUTE_UNISTD_H = @ABSOLUTE_UNISTD_H@
+ABSOLUTE_WCHAR_H = @ABSOLUTE_WCHAR_H@
+ABSOLUTE_WCTYPE_H = @ABSOLUTE_WCTYPE_H@
 ACLOCAL = @ACLOCAL@
 ALLOCA = @ALLOCA@
 ALLOCA_H = @ALLOCA_H@
@@ -730,6 +745,7 @@ DEFAULT_POSIX2_VERSION = @DEFAULT_POSIX2_VERSION@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DF_PROG = @DF_PROG@
+DIRENT_H = @DIRENT_H@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
@@ -743,23 +759,103 @@ GETOPT_H = @GETOPT_H@
 GLIBC21 = @GLIBC21@
 GMSGFMT = @GMSGFMT@
 GMSGFMT_015 = @GMSGFMT_015@
+GNULIB_CHOWN = @GNULIB_CHOWN@
+GNULIB_DUP2 = @GNULIB_DUP2@
+GNULIB_FCHDIR = @GNULIB_FCHDIR@
+GNULIB_FPRINTF_POSIX = @GNULIB_FPRINTF_POSIX@
+GNULIB_FTRUNCATE = @GNULIB_FTRUNCATE@
+GNULIB_GETCWD = @GNULIB_GETCWD@
+GNULIB_GETLOGIN_R = @GNULIB_GETLOGIN_R@
+GNULIB_GETSUBOPT = @GNULIB_GETSUBOPT@
+GNULIB_IMAXABS = @GNULIB_IMAXABS@
+GNULIB_IMAXDIV = @GNULIB_IMAXDIV@
+GNULIB_MBSCASECMP = @GNULIB_MBSCASECMP@
+GNULIB_MBSCASESTR = @GNULIB_MBSCASESTR@
+GNULIB_MBSCHR = @GNULIB_MBSCHR@
+GNULIB_MBSCSPN = @GNULIB_MBSCSPN@
+GNULIB_MBSLEN = @GNULIB_MBSLEN@
+GNULIB_MBSNCASECMP = @GNULIB_MBSNCASECMP@
+GNULIB_MBSPBRK = @GNULIB_MBSPBRK@
+GNULIB_MBSPCASECMP = @GNULIB_MBSPCASECMP@
+GNULIB_MBSRCHR = @GNULIB_MBSRCHR@
+GNULIB_MBSSEP = @GNULIB_MBSSEP@
+GNULIB_MBSSPN = @GNULIB_MBSSPN@
+GNULIB_MBSSTR = @GNULIB_MBSSTR@
+GNULIB_MBSTOK_R = @GNULIB_MBSTOK_R@
+GNULIB_MEMMEM = @GNULIB_MEMMEM@
+GNULIB_MEMPCPY = @GNULIB_MEMPCPY@
+GNULIB_MEMRCHR = @GNULIB_MEMRCHR@
+GNULIB_MKDTEMP = @GNULIB_MKDTEMP@
+GNULIB_MKSTEMP = @GNULIB_MKSTEMP@
+GNULIB_PRINTF_POSIX = @GNULIB_PRINTF_POSIX@
+GNULIB_READLINK = @GNULIB_READLINK@
+GNULIB_SNPRINTF = @GNULIB_SNPRINTF@
+GNULIB_SPRINTF_POSIX = @GNULIB_SPRINTF_POSIX@
+GNULIB_STPCPY = @GNULIB_STPCPY@
+GNULIB_STPNCPY = @GNULIB_STPNCPY@
+GNULIB_STRCASESTR = @GNULIB_STRCASESTR@
+GNULIB_STRCHRNUL = @GNULIB_STRCHRNUL@
+GNULIB_STRDUP = @GNULIB_STRDUP@
+GNULIB_STRNDUP = @GNULIB_STRNDUP@
+GNULIB_STRNLEN = @GNULIB_STRNLEN@
+GNULIB_STRPBRK = @GNULIB_STRPBRK@
+GNULIB_STRSEP = @GNULIB_STRSEP@
+GNULIB_STRTOIMAX = @GNULIB_STRTOIMAX@
+GNULIB_STRTOK_R = @GNULIB_STRTOK_R@
+GNULIB_STRTOUMAX = @GNULIB_STRTOUMAX@
+GNULIB_VFPRINTF_POSIX = @GNULIB_VFPRINTF_POSIX@
+GNULIB_VPRINTF_POSIX = @GNULIB_VPRINTF_POSIX@
+GNULIB_VSNPRINTF = @GNULIB_VSNPRINTF@
+GNULIB_VSPRINTF_POSIX = @GNULIB_VSPRINTF_POSIX@
 GNU_PACKAGE = @GNU_PACKAGE@
 GREP = @GREP@
+HAVE_DECL_GETLOGIN_R = @HAVE_DECL_GETLOGIN_R@
 HAVE_DECL_IMAXABS = @HAVE_DECL_IMAXABS@
 HAVE_DECL_IMAXDIV = @HAVE_DECL_IMAXDIV@
+HAVE_DECL_MEMMEM = @HAVE_DECL_MEMMEM@
+HAVE_DECL_MEMRCHR = @HAVE_DECL_MEMRCHR@
+HAVE_DECL_SNPRINTF = @HAVE_DECL_SNPRINTF@
+HAVE_DECL_STRDUP = @HAVE_DECL_STRDUP@
+HAVE_DECL_STRNCASECMP = @HAVE_DECL_STRNCASECMP@
+HAVE_DECL_STRNDUP = @HAVE_DECL_STRNDUP@
+HAVE_DECL_STRNLEN = @HAVE_DECL_STRNLEN@
 HAVE_DECL_STRTOIMAX = @HAVE_DECL_STRTOIMAX@
+HAVE_DECL_STRTOK_R = @HAVE_DECL_STRTOK_R@
 HAVE_DECL_STRTOUMAX = @HAVE_DECL_STRTOUMAX@
+HAVE_DECL_VSNPRINTF = @HAVE_DECL_VSNPRINTF@
+HAVE_DUP2 = @HAVE_DUP2@
+HAVE_FTRUNCATE = @HAVE_FTRUNCATE@
+HAVE_GETSUBOPT = @HAVE_GETSUBOPT@
 HAVE_INTTYPES_H = @HAVE_INTTYPES_H@
 HAVE_LONG_LONG_INT = @HAVE_LONG_LONG_INT@
+HAVE_MEMPCPY = @HAVE_MEMPCPY@
+HAVE_MKDTEMP = @HAVE_MKDTEMP@
+HAVE_NETINET_IN_H = @HAVE_NETINET_IN_H@
+HAVE_READLINK = @HAVE_READLINK@
 HAVE_SIGNED_SIG_ATOMIC_T = @HAVE_SIGNED_SIG_ATOMIC_T@
 HAVE_SIGNED_WCHAR_T = @HAVE_SIGNED_WCHAR_T@
 HAVE_SIGNED_WINT_T = @HAVE_SIGNED_WINT_T@
 HAVE_STDINT_H = @HAVE_STDINT_H@
+HAVE_STPCPY = @HAVE_STPCPY@
+HAVE_STPNCPY = @HAVE_STPNCPY@
+HAVE_STRCASECMP = @HAVE_STRCASECMP@
+HAVE_STRCASESTR = @HAVE_STRCASESTR@
+HAVE_STRCHRNUL = @HAVE_STRCHRNUL@
+HAVE_STRNDUP = @HAVE_STRNDUP@
+HAVE_STRPBRK = @HAVE_STRPBRK@
+HAVE_STRSEP = @HAVE_STRSEP@
+HAVE_STRUCT_TIMEVAL = @HAVE_STRUCT_TIMEVAL@
 HAVE_SYS_BITYPES_H = @HAVE_SYS_BITYPES_H@
 HAVE_SYS_INTTYPES_H = @HAVE_SYS_INTTYPES_H@
+HAVE_SYS_SOCKET_H = @HAVE_SYS_SOCKET_H@
+HAVE_SYS_TIME_H = @HAVE_SYS_TIME_H@
 HAVE_SYS_TYPES_H = @HAVE_SYS_TYPES_H@
+HAVE_UNISTD_H = @HAVE_UNISTD_H@
 HAVE_UNSIGNED_LONG_LONG_INT = @HAVE_UNSIGNED_LONG_LONG_INT@
-HAVE_WCHAR_H = @HAVE_WCHAR_H@
+HAVE_WCTYPE_H = @HAVE_WCTYPE_H@
+HAVE_WINSOCK2_H = @HAVE_WINSOCK2_H@
+HAVE_WINT_T = @HAVE_WINT_T@
+HAVE_WS2TCPIP_H = @HAVE_WS2TCPIP_H@
 HAVE__BOOL = @HAVE__BOOL@
 HELP2MAN = @HELP2MAN@
 INSTALL = @INSTALL@
@@ -779,6 +875,7 @@ LIBINTL = @LIBINTL@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIB_ACL = @LIB_ACL@
+LIB_ACL_TRIVIAL = @LIB_ACL_TRIVIAL@
 LIB_CLOCK_GETTIME = @LIB_CLOCK_GETTIME@
 LIB_CRYPT = @LIB_CRYPT@
 LIB_EACCESS = @LIB_EACCESS@
@@ -813,6 +910,23 @@ PRIPTR_PREFIX = @PRIPTR_PREFIX@
 PRI_MACROS_BROKEN = @PRI_MACROS_BROKEN@
 PTRDIFF_T_SUFFIX = @PTRDIFF_T_SUFFIX@
 RANLIB = @RANLIB@
+REPLACE_CHOWN = @REPLACE_CHOWN@
+REPLACE_FCHDIR = @REPLACE_FCHDIR@
+REPLACE_FPRINTF = @REPLACE_FPRINTF@
+REPLACE_GETCWD = @REPLACE_GETCWD@
+REPLACE_GETTIMEOFDAY = @REPLACE_GETTIMEOFDAY@
+REPLACE_LOCALTIME_R = @REPLACE_LOCALTIME_R@
+REPLACE_MKSTEMP = @REPLACE_MKSTEMP@
+REPLACE_NANOSLEEP = @REPLACE_NANOSLEEP@
+REPLACE_PRINTF = @REPLACE_PRINTF@
+REPLACE_SNPRINTF = @REPLACE_SNPRINTF@
+REPLACE_SPRINTF = @REPLACE_SPRINTF@
+REPLACE_STRPTIME = @REPLACE_STRPTIME@
+REPLACE_TIMEGM = @REPLACE_TIMEGM@
+REPLACE_VFPRINTF = @REPLACE_VFPRINTF@
+REPLACE_VPRINTF = @REPLACE_VPRINTF@
+REPLACE_VSNPRINTF = @REPLACE_VSNPRINTF@
+REPLACE_VSPRINTF = @REPLACE_VSPRINTF@
 SEQ_LIBM = @SEQ_LIBM@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
@@ -823,11 +937,15 @@ STDINT_H = @STDINT_H@
 STRIP = @STRIP@
 SYS_SOCKET_H = @SYS_SOCKET_H@
 SYS_STAT_H = @SYS_STAT_H@
+SYS_TIME_H = @SYS_TIME_H@
+SYS_TIME_H_DEFINES_STRUCT_TIMESPEC = @SYS_TIME_H_DEFINES_STRUCT_TIMESPEC@
+TIME_H_DEFINES_STRUCT_TIMESPEC = @TIME_H_DEFINES_STRUCT_TIMESPEC@
 U = @U@
-UNISTD_H = @UNISTD_H@
 USE_NLS = @USE_NLS@
 VERSION = @VERSION@
+WCHAR_H = @WCHAR_H@
 WCHAR_T_SUFFIX = @WCHAR_T_SUFFIX@
+WCTYPE_H = @WCTYPE_H@
 WINT_T_SUFFIX = @WINT_T_SUFFIX@
 XGETTEXT = @XGETTEXT@
 XGETTEXT_015 = @XGETTEXT_015@
@@ -923,12 +1041,14 @@ __LDADD = $(LDADD) $(LIB_EACCESS)
 
 # for clock_gettime and fdatasync
 dd_LDADD = $(LDADD) $(LIB_GETHRXTIME) $(LIB_FDATASYNC)
-dir_LDADD = $(LDADD) $(LIB_CLOCK_GETTIME) $(LIB_ACL)
-ls_LDADD = $(LDADD) $(LIB_CLOCK_GETTIME) $(LIB_ACL)
+dir_LDADD = $(LDADD) $(LIB_CLOCK_GETTIME) $(LIB_ACL_TRIVIAL) \
+	$(LIB_ACL)
+ls_LDADD = $(LDADD) $(LIB_CLOCK_GETTIME) $(LIB_ACL_TRIVIAL) $(LIB_ACL)
 pr_LDADD = $(LDADD) $(LIB_CLOCK_GETTIME)
 shred_LDADD = $(LDADD) $(LIB_GETHRXTIME) $(LIB_FDATASYNC)
 shuf_LDADD = $(LDADD) $(LIB_GETHRXTIME)
-vdir_LDADD = $(LDADD) $(LIB_CLOCK_GETTIME) $(LIB_ACL)
+vdir_LDADD = $(LDADD) $(LIB_CLOCK_GETTIME) $(LIB_ACL_TRIVIAL) \
+	$(LIB_ACL)
 sort_LDADD = $(LDADD) $(POW_LIB) $(LIB_GETHRXTIME)
 
 # for get_date and gettime
@@ -952,6 +1072,12 @@ tail_LDADD = $(nanosec_libs)
 uptime_LDADD = $(LDADD) $(POW_LIB) $(GETLOADAVG_LIBS)
 su_LDADD = $(LDADD) $(LIB_CRYPT)
 SUFFIXES = .sh
+
+# Get the release year from ../lib/version-etc.c.
+RELEASE_YEAR = \
+  `sed -n '/.*COPYRIGHT_YEAR = \([0-9][0-9][0-9][0-9]\) };/s//\1/p' \
+    $(top_srcdir)/lib/version-etc.c`
+
 installed_su = $(DESTDIR)$(bindir)/`echo su|sed '$(transform)'`
 setuid_root_mode = a=rx,u+s
 INSTALL_SU = \
@@ -1032,9 +1158,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnits  src/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  src/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnits  src/Makefile
+	  $(AUTOMAKE) --gnu  src/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -1075,22 +1201,6 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS) > /dev/null 2>&1 || /bin/rm -f $(bin_PROGRAMS)
-
-installcheck-binPROGRAMS: $(bin_PROGRAMS)
-	bad=0; pid=$$$$; list="$(bin_PROGRAMS)"; for p in $$list; do \
-	  case ' $(AM_INSTALLCHECK_STD_OPTIONS_EXEMPT) ' in \
-	   *" $$p "* | *" $(srcdir)/$$p "*) continue;; \
-	  esac; \
-	  f=`echo "$$p" | \
-	     sed 's,^.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/'`; \
-	  for opt in --help --version; do \
-	    if "$(DESTDIR)$(bindir)/$$f" $$opt >c$${pid}_.out \
-	         2>c$${pid}_.err </dev/null \
-		 && test -n "`cat c$${pid}_.out`" \
-		 && test -z "`cat c$${pid}_.err`"; then :; \
-	    else echo "$$f does not support $$opt" 1>&2; bad=1; fi; \
-	  done; \
-	done; rm -f c$${pid}_.???; exit $$bad
 
 clean-noinstPROGRAMS:
 	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
@@ -1401,21 +1511,6 @@ uninstall-binSCRIPTS:
 	  echo " rm -f '$(DESTDIR)$(bindir)/$$f'"; \
 	  rm -f "$(DESTDIR)$(bindir)/$$f"; \
 	done
-
-installcheck-binSCRIPTS: $(bin_SCRIPTS)
-	bad=0; pid=$$$$; list="$(bin_SCRIPTS)"; for p in $$list; do \
-	  case ' $(AM_INSTALLCHECK_STD_OPTIONS_EXEMPT) ' in \
-	   *" $$p "* | *" $(srcdir)/$$p "*) continue;; \
-	  esac; \
-	  f=`echo "$$p" | sed 's,^.*/,,;$(transform)'`; \
-	  for opt in --help --version; do \
-	    if "$(DESTDIR)$(bindir)/$$f" $$opt >c$${pid}_.out \
-	         2>c$${pid}_.err </dev/null \
-		 && test -n "`cat c$${pid}_.out`" \
-		 && test -z "`cat c$${pid}_.err`"; then :; \
-	    else echo "$$f does not support $$opt" 1>&2; bad=1; fi; \
-	  done; \
-	done; rm -f c$${pid}_.???; exit $$bad
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -1771,7 +1866,7 @@ install-pdf: install-pdf-am
 
 install-ps: install-ps-am
 
-installcheck-am: installcheck-binPROGRAMS installcheck-binSCRIPTS
+installcheck-am:
 
 maintainer-clean: maintainer-clean-am
 	-rm -rf ./$(DEPDIR)
@@ -1804,8 +1899,7 @@ uninstall-am: uninstall-binPROGRAMS uninstall-binSCRIPTS \
 	install-exec-am install-exec-local install-html \
 	install-html-am install-info install-info-am install-man \
 	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am \
-	installcheck-binPROGRAMS installcheck-binSCRIPTS installdirs \
+	install-strip installcheck installcheck-am installdirs \
 	maintainer-clean maintainer-clean-generic mostlyclean \
 	mostlyclean-compile mostlyclean-generic pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-binPROGRAMS \
@@ -1818,6 +1912,7 @@ $(PROGRAMS): ../lib/libcoreutils.a
 	rm -f $@ $@-t
 	sed \
 	  -e 's!@''bindir''@!$(bindir)!' \
+	  -e 's/@''RELEASE_YEAR'@/$(RELEASE_YEAR)/ \
 	  -e 's/@''GNU_PACKAGE''@/$(GNU_PACKAGE)/' \
 	  -e 's/@''PACKAGE_BUGREPORT''@/$(PACKAGE_BUGREPORT)/' \
 	  -e 's/@''VERSION''@/$(VERSION)/' $< > $@-t

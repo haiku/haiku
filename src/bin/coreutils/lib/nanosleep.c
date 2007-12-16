@@ -1,7 +1,7 @@
 /* Provide a replacement for the POSIX nanosleep function.
 
-   Copyright (C) 1999, 2000, 2002, 2004, 2005, 2006 Free Software
-   Foundation, Inc.
+   Copyright (C) 1999, 2000, 2002, 2004, 2005, 2006, 2007 Free
+   Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,9 +21,9 @@
 
 #include <config.h>
 
-/* Undefine nanosleep here so any prototype is not redefined to be a
-   prototype for rpl_nanosleep. (they'd conflict e.g., on alpha-dec-osf3.2)  */
-#undef nanosleep
+#include <time.h>
+
+#include "timespec.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -33,22 +33,12 @@
 #endif
 #include <signal.h>
 
-#if TIME_WITH_SYS_TIME
-# include <sys/time.h>
-# include <time.h>
-#else
-# if HAVE_SYS_TIME_H
-#  include <sys/time.h>
-# else
-#  include <time.h>
-# endif
-#endif
-
+#include <sys/time.h>
 #include <errno.h>
 
 #include <unistd.h>
 
-#include "timespec.h"
+#undef nanosleep
 
 enum { BILLION = 1000 * 1000 * 1000 };
 

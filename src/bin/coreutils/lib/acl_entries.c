@@ -1,5 +1,6 @@
-/* String copying.
-   Copyright (C) 1995, 2001, 2003 Free Software Foundation, Inc.
+/* Return the number of entries in an ACL.
+
+   Copyright (C) 2002, 2003, 2005, 2006, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,29 +14,26 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-#ifndef _STPCPY_H
-#define _STPCPY_H
+   Written by Paul Eggert and Andreas Gruenbacher.  */
 
-#if HAVE_STPCPY
+#include <config.h>
 
-/* Get stpcpy() declaration.  */
-#include <string.h>
+#include "acl-internal.h"
 
-#else
+/* Return the number of entries in ACL.  */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/* Copy SRC to DST, returning the address of the terminating '\0' in DST.  */
-extern char *stpcpy (char *dst, const char *src);
-
-#ifdef __cplusplus
+int
+acl_entries (acl_t acl)
+{
+  char *t;
+  int entries = 0;
+  char *text = acl_to_text (acl, NULL);
+  if (! text)
+    return -1;
+  for (t = text; *t; t++)
+    entries += (*t == '\n');
+  acl_free (text);
+  return entries;
 }
-#endif
-
-#endif
-
-#endif /* _STPCPY_H */

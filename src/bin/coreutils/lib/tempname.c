@@ -1,7 +1,8 @@
 /* tempname.c - generate the name of a temporary file.
 
    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
-   2000, 2001, 2002, 2003, 2005, 2006 Free Software Foundation, Inc.
+   2000, 2001, 2002, 2003, 2005, 2006, 2007 Free Software Foundation,
+   Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -51,11 +52,7 @@
 #include <string.h>
 
 #include <fcntl.h>
-
-#if HAVE_SYS_TIME_H || _LIBC
-# include <sys/time.h>
-#endif
-
+#include <sys/time.h>
 #include <stdint.h>
 #include <unistd.h>
 
@@ -242,15 +239,11 @@ __gen_tempname (char *tmpl, int kind)
 #ifdef RANDOM_BITS
   RANDOM_BITS (random_time_bits);
 #else
-# if HAVE_GETTIMEOFDAY || _LIBC
   {
     struct timeval tv;
     __gettimeofday (&tv, NULL);
     random_time_bits = ((uint64_t) tv.tv_usec << 16) ^ tv.tv_sec;
   }
-# else
-  random_time_bits = time (NULL);
-# endif
 #endif
   value += random_time_bits ^ __getpid ();
 

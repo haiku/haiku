@@ -1,6 +1,6 @@
 /* Reentrant time functions like localtime_r.
 
-   Copyright (C) 2003, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2006, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 #include <config.h>
 
-#include "time_r.h"
+#include <time.h>
 
 #include <string.h>
 

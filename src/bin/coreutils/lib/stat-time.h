@@ -1,6 +1,6 @@
 /* stat-related time functions.
 
-   Copyright (C) 2005 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #ifndef STAT_TIME_H
 #define STAT_TIME_H 1
 
-#include "timespec.h"
+#include <time.h>
 
 /* STAT_TIMESPEC (ST, ST_XTIM) is the ST_XTIM member for *ST of type
    struct timespec, if available.  If not, then STAT_TIMESPEC_NS (ST,

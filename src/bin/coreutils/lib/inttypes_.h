@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 Free Software Foundation, Inc.
+/* Copyright (C) 2006-2007 Free Software Foundation, Inc.
    Written by Paul Eggert, Bruno Haible, Derek Price.
    This file is part of gnulib.
 
@@ -41,6 +41,8 @@
 #if !(INT_MIN == INT32_MIN && INT_MAX == INT32_MAX)
 # error "This file assumes that 'int' has exactly 32 bits. Please report your platform and compiler to <bug-gnulib@gnu.org>."
 #endif
+
+/* The definition of GL_LINK_WARNING is copied here.  */
 
 /* 7.8.1 Macros for format specifiers */
 
@@ -1034,20 +1036,53 @@
 extern "C" {
 #endif
 
-#if !@HAVE_DECL_IMAXABS@
+#if @GNULIB_IMAXABS@
+# if !@HAVE_DECL_IMAXABS@
 extern intmax_t imaxabs (intmax_t);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef imaxabs
+# define imaxabs(a) \
+    (GL_LINK_WARNING ("imaxabs is unportable - " \
+                      "use gnulib module imaxabs for portability"), \
+     imaxabs (a))
 #endif
 
-#if !@HAVE_DECL_IMAXDIV@
+#if @GNULIB_IMAXDIV@
+# if !@HAVE_DECL_IMAXDIV@
 typedef struct { intmax_t quot; intmax_t rem; } imaxdiv_t;
 extern imaxdiv_t imaxdiv (intmax_t, intmax_t);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef imaxdiv
+# define imaxdiv(a,b) \
+    (GL_LINK_WARNING ("imaxdiv is unportable - " \
+                      "use gnulib module imaxdiv for portability"), \
+     imaxdiv (a, b))
 #endif
 
-#if !@HAVE_DECL_STRTOIMAX@
+#if @GNULIB_STRTOIMAX@
+# if !@HAVE_DECL_STRTOIMAX@
 extern intmax_t strtoimax (const char *, char **, int);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef strtoimax
+# define strtoimax(p,e,b) \
+    (GL_LINK_WARNING ("strtoimax is unportable - " \
+                      "use gnulib module strtoimax for portability"), \
+     strtoimax (p, e, b))
 #endif
-#if !@HAVE_DECL_STRTOUMAX@
+
+#if @GNULIB_STRTOUMAX@
+# if !@HAVE_DECL_STRTOUMAX@
 extern uintmax_t strtoumax (const char *, char **, int);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef strtoumax
+# define strtoumax(p,e,b) \
+    (GL_LINK_WARNING ("strtoumax is unportable - " \
+                      "use gnulib module strtoumax for portability"), \
+     strtoumax (p, e, b))
 #endif
 
 /* Don't bother defining or declaring wcstoimax and wcstoumax, since

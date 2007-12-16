@@ -1,6 +1,6 @@
 /* Duplicate a bounded initial segment of a string, with out-of-memory
    checking.
-   Copyright (C) 2003, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2006, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 /* Specification.  */
 #include "xstrndup.h"
 
-#include "strndup.h"
+#include <string.h>
 #include "xalloc.h"
 
 /* Return a newly allocated copy of at most N bytes of STRING.

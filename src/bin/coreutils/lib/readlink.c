@@ -1,5 +1,5 @@
 /* Stub for readlink().
-   Copyright (C) 2003-2006 Free Software Foundation, Inc.
+   Copyright (C) 2003-2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,6 +16,9 @@
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #include <config.h>
+
+/* Specification.  */
+#include <unistd.h>
 
 #include <errno.h>
 #include <sys/types.h>

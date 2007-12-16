@@ -1,5 +1,5 @@
 /* Declarations for getopt.
-   Copyright (C) 1989-1994,1996-1999,2001,2003,2004,2005,2006
+   Copyright (C) 1989-1994,1996-1999,2001,2003,2004,2005,2006,2007
    Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -101,7 +101,7 @@
 # endif
 #endif
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -216,7 +216,7 @@ extern int getopt_long_only (int ___argc, char *__getopt_argv_const *___argv,
 
 #endif
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 }
 #endif
 

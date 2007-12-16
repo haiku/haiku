@@ -1,7 +1,7 @@
 /* Parse dates for touch and date.
 
    Copyright (C) 1989, 1990, 1991, 1998, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006 Free Software Foundation Inc.
+   2005, 2006, 2007 Free Software Foundation Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,20 +22,12 @@
 
 #include <config.h>
 
-#include <stdbool.h>
+#include "posixtm.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <string.h>
-
-#ifdef TM_IN_SYS_TIME
-# include <sys/time.h>
-#else
-# include <time.h>
-#endif
-
-#include "posixtm.h"
 
 #if USE_UNLOCKED_IO
 # include "unlocked-io.h"

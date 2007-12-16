@@ -1,5 +1,5 @@
 /* remove.c -- core functions for removing files and directories
-   Copyright (C) 88, 90, 91, 1994-2006 Free Software Foundation, Inc.
+   Copyright (C) 88, 90, 91, 1994-2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -419,22 +419,32 @@ ds_free (Dirstack_state *ds)
   free (ds);
 }
 
-/* Pop the active directory (AD) stack and move *DIRP `up' one level,
+/* Pop the active directory (AD) stack and prepare to move `up' one level,
    safely.  Moving `up' usually means opening `..', but when we've just
    finished recursively processing a command-line directory argument,
-   there's nothing left on the stack, so set *DIRP to NULL in that case.
-   The idea is to return with *DIRP opened on the parent directory,
+   there's nothing left on the stack, so set *FDP to AT_FDCWD in that case.
+   The idea is to return with *FDP opened on the parent directory,
    assuming there are entries in that directory that we need to remove.
+
+   Note that we must not call opendir (or fdopendir) just yet, since
+   the caller must first remove the directory we're coming from.
+   That is because some file system implementations cache readdir
+   results at opendir time; so calling opendir, rmdir, readdir would
+   return an entry for the just-removed directory.
 
    Whenever using chdir '..' (virtually, now, via openat), verify
    that the post-chdir dev/ino numbers for `.' match the saved ones.
-   If any system call fails or if dev/ino don't match then give a
+   If any system call fails or if dev/ino don't match, then give a
    diagnostic and longjump out.
    Return the name (in malloc'd storage) of the
    directory (usually now empty) from which we're coming, and which
-   corresponds to the input value of *DIRP.  */
+   corresponds to the input value of DIRP.
+
+   Finally, note that while this function's name is no longer as
+   accurate as it once was (it no longer calls chdir), it does open
+   the destination directory.  */
 static char *
-AD_pop_and_chdir (DIR **dirp, Dirstack_state *ds)
+AD_pop_and_chdir (DIR *dirp, int *fdp, Dirstack_state *ds)
 {
   struct AD_ent *leaf_dir_ent = AD_stack_top(ds);
   struct dev_ino leaf_dev_ino = leaf_dir_ent->dev_ino;
@@ -467,15 +477,15 @@ AD_pop_and_chdir (DIR **dirp, Dirstack_state *ds)
   if (1 < AD_stack_height (ds))
     {
       struct stat sb;
-      int fd = openat (dirfd (*dirp), "..", O_RDONLY);
-      if (closedir (*dirp) != 0)
+      int fd = openat (dirfd (dirp), "..", O_RDONLY);
+      if (closedir (dirp) != 0)
 	{
 	  error (0, errno, _("FATAL: failed to close directory %s"),
 		 quote (full_filename (prev_dir)));
 	  goto next_cmdline_arg;
 	}
 
-      /* The above fails with EACCES when *DIRP is readable but not
+      /* The above fails with EACCES when DIRP is readable but not
 	 searchable, when using Solaris' openat.  Without this openat
 	 call, tests/rm2 would fail to remove directories a/2 and a/3.  */
       if (fd < 0)
@@ -501,15 +511,6 @@ AD_pop_and_chdir (DIR **dirp, Dirstack_state *ds)
 	{
 	  error (0, 0, _("FATAL: directory %s changed dev/ino"),
 		 quote (full_filename (".")));
-	  goto close_and_next;
-	}
-
-      *dirp = fdopendir (fd);
-      if (*dirp == NULL)
-	{
-	  error (0, errno, _("FATAL: cannot return to .. from %s"),
-		 quote (full_filename (".")));
-
 	close_and_next:;
 	  close (fd);
 
@@ -517,16 +518,17 @@ AD_pop_and_chdir (DIR **dirp, Dirstack_state *ds)
 	  free (prev_dir);
 	  longjmp (ds->current_arg_jumpbuf, 1);
 	}
+      *fdp = fd;
     }
   else
     {
-      if (closedir (*dirp) != 0)
+      if (closedir (dirp) != 0)
 	{
 	  error (0, errno, _("FATAL: failed to close directory %s"),
 		 quote (full_filename (prev_dir)));
 	  goto next_cmdline_arg;
 	}
-      *dirp = NULL;
+      *fdp = AT_FDCWD;
     }
 
   return prev_dir;
@@ -704,20 +706,21 @@ is_empty_dir (int fd_cwd, char const *dir)
   return saved_errno == 0 ? true : false;
 }
 
-/* Return true if FILE is determined to be an unwritable non-symlink.
-   Otherwise, return false (including when lstat'ing it fails).
+/* Return -1 if FILE is an unwritable non-symlink,
+   0 if it is writable or some other type of file,
+   a positive error number if there is some problem in determining the answer.
    Set *BUF to the file status.
    This is to avoid calling euidaccess when FILE is a symlink.  */
-static bool
+static int
 write_protected_non_symlink (int fd_cwd,
 			     char const *file,
 			     Dirstack_state const *ds,
 			     struct stat *buf)
 {
   if (cache_fstatat (fd_cwd, file, buf, AT_SYMLINK_NOFOLLOW) != 0)
-    return false;
+    return errno;
   if (S_ISLNK (buf->st_mode))
-    return false;
+    return 0;
   /* Here, we know FILE is not a symbolic link.  */
 
   /* In order to be reentrant -- i.e., to avoid changing the working
@@ -771,9 +774,16 @@ write_protected_non_symlink (int fd_cwd,
     size_t file_name_len
       = obstack_object_size (&ds->dir_stack) + strlen (file);
 
-    return (file_name_len < MIN (PATH_MAX, 8192)
-	    ? euidaccess (full_filename (file), W_OK) != 0 && errno == EACCES
-	    : euidaccess_stat (buf, W_OK) != 0);
+    if (MIN (PATH_MAX, 8192) <= file_name_len)
+      return - euidaccess_stat (buf, W_OK);
+    if (euidaccess (full_filename (file), W_OK) == 0)
+      return 0;
+    if (errno == EACCES)
+      return -1;
+
+    /* Perhaps some other process has removed the file, or perhaps this
+       is a buggy NFS client.  */
+    return errno;
   }
 }
 
@@ -794,71 +804,72 @@ prompt (int fd_cwd, Dirstack_state const *ds, char const *filename,
 	struct rm_options const *x, enum Prompt_action mode,
 	Ternary *is_empty)
 {
-  bool write_protected = false;
+  int write_protected = 0;
 
   *is_empty = T_UNKNOWN;
 
-  if (((!x->ignore_missing_files & (x->interactive | x->stdin_tty))
-       && (write_protected = write_protected_non_symlink (fd_cwd, filename,
-							  ds, sbuf)))
-      || x->interactive)
+  if (x->interactive == RMI_NEVER)
+    return RM_OK;
+
+  if (!x->ignore_missing_files
+      & ((x->interactive == RMI_ALWAYS) | x->stdin_tty))
+    write_protected = write_protected_non_symlink (fd_cwd, filename, ds, sbuf);
+
+  if (write_protected || x->interactive == RMI_ALWAYS)
     {
-      if (cache_fstatat (fd_cwd, filename, sbuf, AT_SYMLINK_NOFOLLOW) != 0)
+      char const *quoted_name = quote (full_filename (filename));
+      if (write_protected <= 0
+	  && cache_fstatat (fd_cwd, filename, sbuf, AT_SYMLINK_NOFOLLOW) != 0)
 	{
 	  /* This happens, e.g., with `rm '''.  */
-	  error (0, errno, _("cannot remove %s"),
-		 quote (full_filename (filename)));
-	  return RM_ERROR;
+	  write_protected = errno;
 	}
 
-      if (S_ISDIR (sbuf->st_mode) && !x->recursive)
+      if (write_protected <= 0)
 	{
-	  error (0, EISDIR, _("cannot remove %s"),
-		 quote (full_filename (filename)));
-	  return RM_ERROR;
-	}
-
-      /* Using permissions doesn't make sense for symlinks.  */
-      if (S_ISLNK (sbuf->st_mode))
-	{
-	  if ( ! x->interactive)
+	  /* Using permissions doesn't make sense for symlinks.  */
+	  if (S_ISLNK (sbuf->st_mode) && x->interactive != RMI_ALWAYS)
 	    return RM_OK;
-	  write_protected = false;
+
+	  if (S_ISDIR (sbuf->st_mode) && !x->recursive)
+	    write_protected = EISDIR;
+	}
+
+      if (0 < write_protected)
+	{
+	  error (0, write_protected, _("cannot remove %s"), quoted_name);
+	  return RM_ERROR;
 	}
 
       /* Issue the prompt.  */
-      {
-	char const *quoted_name = quote (full_filename (filename));
-
-	/* FIXME: use a variant of error (instead of fprintf) that doesn't
-	   append a newline.  Then we won't have to declare program_name in
-	   this file.  */
-	if (S_ISDIR (sbuf->st_mode)
-	    && x->recursive
-	    && mode == PA_DESCEND_INTO_DIR
-	    && ((*is_empty = (is_empty_dir (fd_cwd, filename) ? T_YES : T_NO))
-		== T_NO))
+      /* FIXME: use a variant of error (instead of fprintf) that doesn't
+	 append a newline.  Then we won't have to declare program_name in
+	 this file.  */
+      if (S_ISDIR (sbuf->st_mode)
+	  && x->recursive
+	  && mode == PA_DESCEND_INTO_DIR
+	  && ((*is_empty = (is_empty_dir (fd_cwd, filename) ? T_YES : T_NO))
+	      == T_NO))
+	fprintf (stderr,
+		 (write_protected
+		  ? _("%s: descend into write-protected directory %s? ")
+		  : _("%s: descend into directory %s? ")),
+		 program_name, quoted_name);
+      else
+	{
+	  /* TRANSLATORS: You may find it more convenient to translate
+	     the equivalent of _("%s: remove %s (write-protected) %s? ").
+	     It should avoid grammatical problems with the output
+	     of file_type.  */
 	  fprintf (stderr,
 		   (write_protected
-		    ? _("%s: descend into write-protected directory %s? ")
-		    : _("%s: descend into directory %s? ")),
-		   program_name, quoted_name);
-	else
-	  {
-	    /* TRANSLATORS: You may find it more convenient to translate
-	       the equivalent of _("%s: remove %s (write-protected) %s? ").
-	       It should avoid grammatical problems with the output
-	       of file_type.  */
-	    fprintf (stderr,
-		     (write_protected
-		      ? _("%s: remove write-protected %s %s? ")
-		      : _("%s: remove %s %s? ")),
-		     program_name, file_type (sbuf), quoted_name);
-	  }
+		    ? _("%s: remove write-protected %s %s? ")
+		    : _("%s: remove %s %s? ")),
+		   program_name, file_type (sbuf), quoted_name);
+	}
 
-	if (!yesno ())
-	  return RM_USER_DECLINED;
-      }
+      if (!yesno ())
+	return RM_USER_DECLINED;
     }
   return RM_OK;
 }
@@ -1018,8 +1029,7 @@ remove_entry (int fd_cwd, Dirstack_state const *ds, char const *filename,
 	errno = EISDIR;
 
       if (! x->recursive
-	  || errno == ENOENT || errno == ENOTDIR
-	  || errno == ELOOP || errno == ENAMETOOLONG)
+	  || (cache_stat_ok (st) && !S_ISDIR (st->st_mode)))
 	{
 	  if (ignorable_missing (x, errno))
 	    return RM_OK;
@@ -1030,6 +1040,7 @@ remove_entry (int fd_cwd, Dirstack_state const *ds, char const *filename,
 		 quote (full_filename (filename)));
 	  return RM_ERROR;
 	}
+      assert (!cache_stat_ok (st) || S_ISDIR (st->st_mode));
     }
   else
     {
@@ -1371,7 +1382,7 @@ remove_dir (int fd_cwd, Dirstack_state *ds, char const *dir,
 	     traversal into the current directory, (known as SUBDIR, from ..),
 	     DIRP's device number is different from CURRENT_DEV.  Arrange not
 	     to do anything more with this hierarchy.  */
-	  error (0, errno, _("skipping %s, since it's on a different device"),
+	  error (0, 0, _("skipping %s, since it's on a different device"),
 		 quote (full_filename (subdir)));
 	  free (subdir);
 	  AD_mark_current_as_unremovable (ds);
@@ -1384,11 +1395,12 @@ remove_dir (int fd_cwd, Dirstack_state *ds, char const *dir,
 	 --one-file-system, when the current directory is on a
 	 different file system.  */
       {
+	int fd;
 	/* The name of the directory that we have just processed,
 	   nominally removing all of its contents.  */
-	char *empty_dir = AD_pop_and_chdir (&dirp, ds);
-	int fd = (dirp != NULL ? dirfd (dirp) : AT_FDCWD);
-	assert (dirp != NULL || AD_stack_height (ds) == 1);
+	char *empty_dir = AD_pop_and_chdir (dirp, &fd, ds);
+	dirp = NULL;
+	assert (fd != AT_FDCWD || AD_stack_height (ds) == 1);
 
 	/* Try to remove EMPTY_DIR only if remove_cwd_entries succeeded.  */
 	if (tmp_status == RM_OK)
@@ -1407,6 +1419,8 @@ remove_dir (int fd_cwd, Dirstack_state *ds, char const *dir,
 	      {
 		free (empty_dir);
 		status = s;
+		if (fd != AT_FDCWD)
+		  close (fd);
 		goto closedir_and_return;
 	      }
 
@@ -1428,8 +1442,17 @@ remove_dir (int fd_cwd, Dirstack_state *ds, char const *dir,
 
 	free (empty_dir);
 
-	if (AD_stack_height (ds) == 1)
+	if (fd == AT_FDCWD)
 	  break;
+
+	dirp = fdopendir (fd);
+	if (dirp == NULL)
+	  {
+	    error (0, errno, _("FATAL: cannot return to .. from %s"),
+		   quote (full_filename (".")));
+	    close (fd);
+	    longjmp (ds->current_arg_jumpbuf, 1);
+	  }
       }
     }
 

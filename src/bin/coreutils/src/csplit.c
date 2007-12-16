@@ -1,5 +1,5 @@
 /* csplit - split a file into sections determined by context lines
-   Copyright (C) 91, 1995-2006 Free Software Foundation, Inc.
+   Copyright (C) 91, 1995-2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -1402,7 +1402,26 @@ main (int argc, char **argv)
 
   {
     int i;
-    static int const sig[] = { SIGHUP, SIGINT, SIGQUIT, SIGTERM };
+    static int const sig[] =
+      {
+	/* The usual suspects.  */
+	SIGALRM, SIGHUP, SIGINT, SIGPIPE, SIGQUIT, SIGTERM,
+#ifdef SIGPOLL
+	SIGPOLL,
+#endif
+#ifdef SIGPROF
+	SIGPROF,
+#endif
+#ifdef SIGVTALRM
+	SIGVTALRM,
+#endif
+#ifdef SIGXCPU
+	SIGXCPU,
+#endif
+#ifdef SIGXFSZ
+	SIGXFSZ,
+#endif
+      };
     enum { nsigs = sizeof sig / sizeof sig[0] };
 
 #if SA_NOCLDSTOP
@@ -1465,7 +1484,7 @@ and output byte counts of each piece to standard output.\n\
 Mandatory arguments to long options are mandatory for short options too.\n\
 "), stdout);
       fputs (_("\
-  -b, --suffix-format=FORMAT use sprintf FORMAT instead of %02d\n\
+  -b, --suffix-format=FORMAT  use sprintf FORMAT instead of %02d\n\
   -f, --prefix=PREFIX        use PREFIX instead of `xx'\n\
   -k, --keep-files           do not remove output files on errors\n\
 "), stdout);

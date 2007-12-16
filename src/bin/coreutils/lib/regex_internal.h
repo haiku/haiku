@@ -1,5 +1,5 @@
 /* Extended regular expression matching and search library.
-   Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Isamu Hasegawa <isamu@yamato.ibm.com>.
 
@@ -27,22 +27,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef _LIBC
-# include "strcase.h"
-#endif
-
-#if defined HAVE_LANGINFO_H || defined HAVE_LANGINFO_CODESET || defined _LIBC
+#ifdef _LIBC
 # include <langinfo.h>
+#else
+# include "localcharset.h"
 #endif
 #if defined HAVE_LOCALE_H || defined _LIBC
 # include <locale.h>
 #endif
-#if defined HAVE_WCHAR_H || defined _LIBC
-# include <wchar.h>
-#endif /* HAVE_WCHAR_H || _LIBC */
-#if defined HAVE_WCTYPE_H || defined _LIBC
-# include <wctype.h>
-#endif /* HAVE_WCTYPE_H || _LIBC */
+
+#include <wchar.h>
+#include <wctype.h>
 #include <stdint.h>
 #if defined _LIBC
 # include <bits/libc-lock.h>
@@ -89,7 +84,7 @@
 # define SIZE_MAX ((size_t) -1)
 #endif
 
-#if (defined MB_CUR_MAX && HAVE_LOCALE_H && HAVE_WCTYPE_H && HAVE_WCHAR_H && HAVE_ISWCTYPE && HAVE_WCRTOMB && HAVE_MBRTOWC && HAVE_WCSCOLL) || _LIBC
+#if (defined MB_CUR_MAX && HAVE_LOCALE_H && HAVE_WCTYPE_H && HAVE_ISWCTYPE && HAVE_WCRTOMB && HAVE_MBRTOWC && HAVE_WCSCOLL) || _LIBC
 # define RE_ENABLE_I18N
 #endif
 
@@ -119,9 +114,6 @@
 # define __wctype wctype
 # define __iswctype iswctype
 # define __btowc btowc
-# ifndef __mempcpy
-#  define __mempcpy mempcpy
-# endif
 # define __wcrtomb wcrtomb
 # define __regfree regfree
 # define attribute_hidden

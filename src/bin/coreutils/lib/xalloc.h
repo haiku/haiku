@@ -1,7 +1,7 @@
 /* xalloc.h -- malloc with out-of-memory checking
 
    Copyright (C) 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
-   1999, 2000, 2003, 2004, 2006 Free Software Foundation, Inc.
+   1999, 2000, 2003, 2004, 2006, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -139,10 +139,10 @@ xnrealloc (void *p, size_t n, size_t s)
    allocating an initial block with a nonzero size, or by allocating a
    larger block.
 
-   In the following implementation, nonzero sizes are doubled so that
-   repeated reallocations have O(N log N) overall cost rather than
-   O(N**2) cost, but the specification for this function does not
-   guarantee that sizes are doubled.
+   In the following implementation, nonzero sizes are increased by a
+   factor of approximately 1.5 so that repeated reallocations have
+   O(N) overall cost rather than O(N**2) cost, but the
+   specification for this function does not guarantee that rate.
 
    Here is an example of use:
 
@@ -204,9 +204,13 @@ x2nrealloc (void *p, size_t *pn, size_t s)
     }
   else
     {
-      if (((size_t) -1) / 2 / s < n)
+      /* Set N = ceil (1.5 * N) so that progress is made if N == 1.
+	 Check for overflow, so that N * S stays in size_t range.
+	 The check is slightly conservative, but an exact check isn't
+	 worth the trouble.  */
+      if ((size_t) -1 / 3 * 2 / s <= n)
 	xalloc_die ();
-      n *= 2;
+      n += (n + 1) / 2;
     }
 
   *pn = n;

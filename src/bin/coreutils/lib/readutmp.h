@@ -1,7 +1,6 @@
 /* Declarations for GNU's read utmp module.
 
-   Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
-   2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 1992-2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -35,6 +34,11 @@
 #  if HAVE_UTMP_H
     /* HPUX 10.20 needs utmp.h, for the definition of e.g., UTMP_FILE.  */
 #   include <utmp.h>
+#  endif
+#  if defined _THREAD_SAFE && defined UTMP_DATA_INIT
+    /* When including both utmp.h and utmpx.h on AIX 4.3, with _THREAD_SAFE
+       defined, work around the duplicate struct utmp_data declaration.  */
+#   define utmp_data gl_aix_4_3_workaround_utmp_data
 #  endif
 #  include <utmpx.h>
 #  define UTMP_STRUCT_NAME utmpx

@@ -52,6 +52,7 @@ values[] =
     { EAI_SERVICE, N_("Servname not supported for ai_socktype") },
     { EAI_SOCKTYPE, N_("ai_socktype not supported") },
     { EAI_SYSTEM, N_("System error") },
+    { EAI_OVERFLOW, N_("Argument buffer too small") },
 #ifdef __USE_GNU
     { EAI_INPROGRESS, N_("Processing request in progress") },
     { EAI_CANCELED, N_("Request canceled") },

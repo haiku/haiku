@@ -47,6 +47,11 @@ struct utimbuf
 };
 #endif
 
+/* The results of open() in this file are not used with fchdir,
+   therefore save some unnecessary work in fchdir.c.  */
+#undef open
+#undef close
+
 /* Emulate utime (file, NULL) for systems (like 4.3BSD) that do not
    interpret it to set the access and modification times of FILE to
    the current time.  Return 0 if successful, -1 if not. */

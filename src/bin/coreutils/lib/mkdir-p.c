@@ -1,7 +1,7 @@
 /* mkdir-p.c -- Ensure that a directory and its parents exist.
 
-   Copyright (C) 1990, 1997, 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2006
-   Free Software Foundation, Inc.
+   Copyright (C) 1990, 1997, 1998, 1999, 2000, 2002, 2003, 2004, 2005,
+   2006, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -115,19 +115,24 @@ make_dir_parents (char *dir,
 
       if (0 <= prefix_len)
 	{
-	  /* If the ownership will change, create the directory with
+	  /* If the ownership might change, or if the directory will be
+	     writeable to other users and its special mode bits may
+	     change after the directory is created, create it with
 	     more restrictive permissions at first, so unauthorized
 	     users cannot nip in before the directory is ready.  */
+	  bool keep_owner = owner == (uid_t) -1 && group == (gid_t) -1;
+	  bool keep_special_mode_bits =
+	    ((mode_bits & (S_ISUID | S_ISGID)) | (mode & S_ISVTX)) == 0;
 	  mode_t mkdir_mode = mode;
-	  if (! (owner == (uid_t) -1 && group == (gid_t) -1))
-	    mkdir_mode &= S_IRWXU;
+	  if (! keep_owner)
+	    mkdir_mode &= ~ (S_IRWXG | S_IRWXO);
+	  else if (! keep_special_mode_bits)
+	    mkdir_mode &= ~ (S_IWGRP | S_IWOTH);
 
 	  if (mkdir (dir + prefix_len, mkdir_mode) == 0)
 	    {
 	      announce (dir, options);
-	      preserve_existing =
-		(owner == (uid_t) -1 && group == (gid_t) -1
-		 && ! ((mode_bits & (S_ISUID | S_ISGID)) | (mode & S_ISVTX)));
+	      preserve_existing = keep_owner & keep_special_mode_bits;
 	      savewd_chdir_options |=
 		(SAVEWD_CHDIR_NOFOLLOW
 		 | (mode & S_IRUSR ? SAVEWD_CHDIR_READABLE : 0));
@@ -188,7 +193,7 @@ make_dir_parents (char *dir,
 			     (! chdir_failed_unexpectedly ? errno
 			      : ! chdir_ok && (mode & S_IXUSR) ? chdir_errno
 			      : open_result[1]),
-			     _(owner == (uid_t) -1 && group == (gid_t) -1
+			     _(keep_owner
 			       ? "cannot change permissions of %s"
 			       : "cannot change owner and permissions of %s"),
 			     quote (dir));

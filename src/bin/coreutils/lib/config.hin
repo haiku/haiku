@@ -1,16 +1,49 @@
 /* lib/config.hin.  Generated from configure.ac by autoheader.  */
 
+/* Define this to an absolute name of <dirent.h>. */
+#undef ABSOLUTE_DIRENT_H
+
 /* Define this to an absolute name of <fcntl.h>. */
 #undef ABSOLUTE_FCNTL_H
 
 /* Define this to an absolute name of <inttypes.h>. */
 #undef ABSOLUTE_INTTYPES_H
 
+/* Define this to an absolute name of <netinet/in.h>. */
+#undef ABSOLUTE_NETINET_IN_H
+
 /* Define this to an absolute name of <stdint.h>. */
 #undef ABSOLUTE_STDINT_H
 
+/* Define this to an absolute name of <stdio.h>. */
+#undef ABSOLUTE_STDIO_H
+
+/* Define this to an absolute name of <stdlib.h>. */
+#undef ABSOLUTE_STDLIB_H
+
+/* Define this to an absolute name of <string.h>. */
+#undef ABSOLUTE_STRING_H
+
+/* Define this to an absolute name of <sys/socket.h>. */
+#undef ABSOLUTE_SYS_SOCKET_H
+
 /* Define this to an absolute name of <sys/stat.h>. */
 #undef ABSOLUTE_SYS_STAT_H
+
+/* Define this to an absolute name of <sys/time.h>. */
+#undef ABSOLUTE_SYS_TIME_H
+
+/* Define this to an absolute name of <time.h>. */
+#undef ABSOLUTE_TIME_H
+
+/* Define this to an absolute name of <unistd.h>. */
+#undef ABSOLUTE_UNISTD_H
+
+/* Define this to an absolute name of <wchar.h>. */
+#undef ABSOLUTE_WCHAR_H
+
+/* Define this to an absolute name of <wctype.h>. */
+#undef ABSOLUTE_WCTYPE_H
 
 /* Define to the function xargmatch calls on failures. */
 #undef ARGMATCH_DIE
@@ -89,6 +122,9 @@
 /* Define as good substitute value for EOVERFLOW. */
 #undef EOVERFLOW
 
+/* Define if gnulib's fchdir() replacement is used. */
+#undef FCHDIR_REPLACEMENT
+
 /* Define on systems for which file names may have a so-called `drive letter'
    prefix, define this to compute the length of that prefix, including the
    colon. */
@@ -119,14 +155,23 @@
    */
 #undef GETLOADAVG_PRIVILEGED
 
-/* Define to 1 when using the gnulib close-stream module. */
+/* Define if gettimeofday clobbers the localtime buffer. */
+#undef GETTIMEOFDAY_CLOBBERS_LOCALTIME
+
+/* Define to 1 when using the gnulib module canonicalize. */
+#undef GNULIB_CANONICALIZE
+
+/* Define to 1 when using the gnulib module close-stream. */
 #undef GNULIB_CLOSE_STREAM
 
-/* Define to 1 when using the gnulib fcntl-safer module. */
+/* Define to 1 when using the gnulib module fcntl-safer. */
 #undef GNULIB_FCNTL_SAFER
 
-/* Define to 1 when using the gnulib fopen-safer module. */
+/* Define to 1 when using the gnulib module fopen-safer. */
 #undef GNULIB_FOPEN_SAFER
+
+/* Define to 1 when using the gnulib module fts. */
+#undef GNULIB_FTS
 
 /* The concatenation of the strings `GNU ', and PACKAGE. */
 #undef GNU_PACKAGE
@@ -173,8 +218,8 @@
 /* Define to 1 if you have the `acl_set_file' function. */
 #undef HAVE_ACL_SET_FILE
 
-/* Define to 1 if you have the `acl_to_text' function. */
-#undef HAVE_ACL_TO_TEXT
+/* Define to 1 if you have the `acl_trivial' function. */
+#undef HAVE_ACL_TRIVIAL
 
 /* Define to 1 if you have the `alarm' function. */
 #undef HAVE_ALARM
@@ -424,10 +469,6 @@
    */
 #undef HAVE_DECL_MKDIR
 
-/* Define to 1 if you have the declaration of `nanosleep', and to 0 if you
-   don't. */
-#undef HAVE_DECL_NANOSLEEP
-
 /* Define to 1 if you have the declaration of `putchar_unlocked', and to 0 if
    you don't. */
 #undef HAVE_DECL_PUTCHAR_UNLOCKED
@@ -459,10 +500,6 @@
 /* Define to 1 if you have the declaration of `strmode', and to 0 if you
    don't. */
 #undef HAVE_DECL_STRMODE
-
-/* Define to 1 if you have the declaration of `strncasecmp', and to 0 if you
-   don't. */
-#undef HAVE_DECL_STRNCASECMP
 
 /* Define to 1 if you have the declaration of `strndup', and to 0 if you
    don't. */
@@ -527,6 +564,9 @@
 /* Define to 1 if you have the `directio' function. */
 #undef HAVE_DIRECTIO
 
+/* Define to 1 if you have the <dirent.h> header file. */
+#undef HAVE_DIRENT_H
+
 /* Define to 1 if you have the `dirfd' function. */
 #undef HAVE_DIRFD
 
@@ -557,6 +597,9 @@
 /* Define to 1 if you have the `fchmod' function. */
 #undef HAVE_FCHMOD
 
+/* Define to 1 if you have the `fchmodat' function. */
+#undef HAVE_FCHMODAT
+
 /* Define to 1 if you have the `fchown' function. */
 #undef HAVE_FCHOWN
 
@@ -575,6 +618,9 @@
 
 /* Define to 1 if you have the `flockfile' function. */
 #undef HAVE_FLOCKFILE
+
+/* Define to 1 if you have the `fork' function. */
+#undef HAVE_FORK
 
 /* Define to 1 if fseeko (and presumably ftello) exists and is declared. */
 #undef HAVE_FSEEKO
@@ -705,9 +751,6 @@
 /* Define to 1 if you have the `iswctype' function. */
 #undef HAVE_ISWCTYPE
 
-/* Define to 1 if you have the `iswprint' function. */
-#undef HAVE_ISWPRINT
-
 /* Define to 1 if you have the `iswspace' function. */
 #undef HAVE_ISWSPACE
 
@@ -819,6 +862,9 @@
 
 /* Define to 1 if you have the `microuptime' function. */
 #undef HAVE_MICROUPTIME
+
+/* Define to 1 if you have the `mkdirat' function. */
+#undef HAVE_MKDIRAT
 
 /* Define to 1 if you have the `mkfifo' function. */
 #undef HAVE_MKFIFO
@@ -966,6 +1012,9 @@
 /* Define to 1 if you have the <stdio_ext.h> header file. */
 #undef HAVE_STDIO_EXT_H
 
+/* Define to 1 if you have the <stdio.h> header file. */
+#undef HAVE_STDIO_H
+
 /* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H
 
@@ -993,9 +1042,6 @@
 
 /* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
-
-/* Define to 1 if you have the `strncasecmp' function. */
-#undef HAVE_STRNCASECMP
 
 /* Define if you have the strndup() function and it works. */
 #undef HAVE_STRNDUP
@@ -1081,9 +1127,6 @@
 
 /* Define to 1 if `st_spare1' is member of `struct stat'. */
 #undef HAVE_STRUCT_STAT_ST_SPARE1
-
-/* Define if struct timespec is declared in <time.h>. */
-#undef HAVE_STRUCT_TIMESPEC
 
 /* Define to 1 if `tm_zone' is member of `struct tm'. */
 #undef HAVE_STRUCT_TM_TM_ZONE
@@ -1252,6 +1295,9 @@
 /* Define to 1 if you have the <sys/table.h> header file. */
 #undef HAVE_SYS_TABLE_H
 
+/* Define to 1 if you have the <sys/timeb.h> header file. */
+#undef HAVE_SYS_TIMEB_H
+
 /* Define to 1 if you have the <sys/time.h> header file. */
 #undef HAVE_SYS_TIME_H
 
@@ -1282,9 +1328,8 @@
 /* Define to 1 if you have the <termios.h> header file. */
 #undef HAVE_TERMIOS_H
 
-/* Define to 1 if localtime_r, etc. have the type signatures that POSIX
-   requires. */
-#undef HAVE_TIME_R_POSIX
+/* Define to 1 if you have the <time.h> header file. */
+#undef HAVE_TIME_H
 
 /* Define if struct tm has the tm_gmtoff member. */
 #undef HAVE_TM_GMTOFF
@@ -1345,6 +1390,12 @@
 /* Define to 1 if you have the `vasprintf' function. */
 #undef HAVE_VASPRINTF
 
+/* Define to 1 if you have the `vfork' function. */
+#undef HAVE_VFORK
+
+/* Define to 1 if you have the <vfork.h> header file. */
+#undef HAVE_VFORK_H
+
 /* Define to 1 if you have the <wchar.h> header file. */
 #undef HAVE_WCHAR_H
 
@@ -1381,6 +1432,9 @@
 /* Define to 1 if you have the `wmempcpy' function. */
 #undef HAVE_WMEMPCPY
 
+/* Define to 1 if `fork' works. */
+#undef HAVE_WORKING_FORK
+
 /* Define to 1 if O_NOATIME works. */
 #undef HAVE_WORKING_O_NOATIME
 
@@ -1390,11 +1444,17 @@
 /* Define if utimes works properly. */
 #undef HAVE_WORKING_UTIMES
 
+/* Define to 1 if `vfork' works. */
+#undef HAVE_WORKING_VFORK
+
 /* Define to 1 if you have the <ws2tcpip.h> header file. */
 #undef HAVE_WS2TCPIP_H
 
 /* Define to 1 if the system has the type `_Bool'. */
 #undef HAVE__BOOL
+
+/* Define to 1 if you have the `_ftime' function. */
+#undef HAVE__FTIME
 
 /* Define to 1 if you have the external variable, _system_configuration with a
    member named physmem. */
@@ -1535,9 +1595,6 @@
 /* Define to 1 if the C compiler supports function prototypes. */
 #undef PROTOTYPES
 
-/* Define to 1 to provide canonicalize_filename_mode. */
-#undef PROVIDE_CANONICALIZE_FILENAME_MODE
-
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'ptrdiff_t'. */
 #undef PTRDIFF_T_SUFFIX
@@ -1546,13 +1603,14 @@
    like the one from SunOS 4.1.1_U1. */
 #undef RENAME_TRAILING_SLASH_BUG
 
+/* Define if vasnprintf exists but is overridden by gnulib. */
+#undef REPLACE_VASNPRINTF
+
+/* Define if vasprintf exists but is overridden by gnulib. */
+#undef REPLACE_VASPRINTF
+
 /* the value to which errno is set when rmdir fails on a nonempty directory */
 #undef RMDIR_ERRNO_NOT_EMPTY
-
-/* Define to 1 if the `setvbuf' function takes the buffering type as its
-   second argument and the buffer pointer as the third, as on System V before
-   release 3. */
-#undef SETVBUF_REVERSED
 
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'sig_atomic_t'. */
@@ -1633,7 +1691,7 @@
 #undef TYPEOF_STRUCT_STAT_ST_ATIM_IS_STRUCT_TIMESPEC
 
 /* Define if tzset clobbers localtime's static buffer. */
-#undef TZSET_CLOBBERS_LOCALTIME_BUFFER
+#undef TZSET_CLOBBERS_LOCALTIME
 
 /* Define to 1 for Encore UMAX. */
 #undef UMAX
@@ -1719,15 +1777,9 @@
 # undef _TANDEM_SOURCE
 #endif
 
-/* Define to rpl_ if the getcwd replacement function should be used. */
-#undef __GETCWD_PREFIX
-
 /* Define to rpl_ if the getopt replacement functions and variables should be
    used. */
 #undef __GETOPT_PREFIX
-
-/* Define to rpl_ if the mkstemp replacement function should be used. */
-#undef __MKSTEMP_PREFIX
 
 /* Define to rpl_ if the openat replacement function should be used. */
 #undef __OPENAT_PREFIX
@@ -1738,8 +1790,8 @@
 /* Define to rpl_calloc if the replacement function should be used. */
 #undef calloc
 
-/* Define to rpl_chown if the replacement function should be used. */
-#undef chown
+/* Define to rpl_fchownat if the replacement function should be used. */
+#undef fchownat
 
 /* Define to a replacement function name for fnmatch(). */
 #undef fnmatch
@@ -1755,9 +1807,6 @@
 
 /* Define to a replacement function name for getpass(). */
 #undef getpass
-
-/* Define to rpl_gettimeofday if the replacement function should be used. */
-#undef gettimeofday
 
 /* Define to `int' if <sys/types.h> doesn't define. */
 #undef gid_t
@@ -1809,9 +1858,6 @@
 
 /* Define to the name of the strftime replacement function. */
 #undef my_strftime
-
-/* Define to rpl_nanosleep if the replacement function should be used. */
-#undef nanosleep
 
 /* Define to `long int' if <sys/types.h> does not define. */
 #undef off_t
@@ -1904,6 +1950,9 @@
 
 /* Define as a macro for copying va_list variables. */
 #undef va_copy
+
+/* Define as `fork' if `vfork' does not work. */
+#undef vfork
 
 /* Define to empty if the keyword `volatile' does not work. Warning: valid
    code using `volatile' can become incorrect without. Disable with care. */

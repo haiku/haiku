@@ -1,5 +1,6 @@
 /* Extended regular expression matching and search library.
-   Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 Free Software
+   Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Isamu Hasegawa <isamu@yamato.ibm.com>.
 
@@ -706,7 +707,7 @@ re_string_reconstruct (re_string_t *pstr, Idx idx, int eflags)
 
 	      if (pstr->is_utf8)
 		{
-		  const unsigned char *raw, *p, *q, *end;
+		  const unsigned char *raw, *p, *end;
 
 		  /* Special case UTF-8.  Multi-byte chars start with any
 		     byte other than 0x80 - 0xbf.  */
@@ -735,13 +736,11 @@ re_string_reconstruct (re_string_t *pstr, Idx idx, int eflags)
 			  unsigned char buf[6];
 			  size_t mbclen;
 
-			  q = p;
 			  if (BE (pstr->trans != NULL, 0))
 			    {
 			      int i = mlen < 6 ? mlen : 6;
 			      while (--i >= 0)
 				buf[i] = pstr->trans[p[i]];
-			      q = buf;
 			    }
 			  /* XXX Don't use mbrtowc, we know which conversion
 			     to use (UTF-8 -> UCS4).  */

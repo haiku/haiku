@@ -1,5 +1,5 @@
 /* `dir', `vdir' and `ls' directory listing programs for GNU.
-   Copyright (C) 85, 88, 90, 91, 1995-2006 Free Software Foundation, Inc.
+   Copyright (C) 85, 88, 90, 91, 1995-2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -93,6 +93,7 @@
 #include "ls.h"
 #include "lstat.h"
 #include "mbswidth.h"
+#include "mpsort.h"
 #include "obstack.h"
 #include "quote.h"
 #include "quotearg.h"
@@ -155,21 +156,22 @@ struct fileinfo
     /* The file name.  */
     char *name;
 
-    struct stat stat;
-    bool stat_ok;
-
     /* For symbolic link, name of the file linked to, otherwise zero.  */
     char *linkname;
+
+    struct stat stat;
+
+    enum filetype filetype;
 
     /* For symbolic link and long listing, st_mode of file linked to, otherwise
        zero.  */
     mode_t linkmode;
 
+    bool stat_ok;
+
     /* For symbolic link and color printing, true if linked-to file
        exists, otherwise false.  */
     bool linkok;
-
-    enum filetype filetype;
 
 #if USE_ACL
     /* For long listings, true if the file has an access control list.  */
@@ -266,18 +268,23 @@ static Hash_table *active_dir_set;
 
 /* The table of files in the current directory:
 
-   `files' points to a vector of `struct fileinfo', one per file.
-   `nfiles' is the number of elements space has been allocated for.
-   `files_index' is the number actually in use.  */
+   `cwd_file' points to a vector of `struct fileinfo', one per file.
+   `cwd_n_alloc' is the number of elements space has been allocated for.
+   `cwd_n_used' is the number actually in use.  */
 
 /* Address of block containing the files that are described.  */
-static struct fileinfo *files;  /* FIXME: rename this to e.g. cwd_file */
+static struct fileinfo *cwd_file;
 
-/* Length of block that `files' points to, measured in files.  */
-static size_t nfiles;  /* FIXME: rename this to e.g. cwd_n_alloc */
+/* Length of block that `cwd_file' points to, measured in files.  */
+static size_t cwd_n_alloc;
 
-/* Index of first unused in `files'.  */
-static size_t files_index;  /* FIXME: rename this to e.g. cwd_n_used */
+/* Index of first unused slot in `cwd_file'.  */
+static size_t cwd_n_used;
+
+/* Vector of pointers to files, in proper sorted order, and the number
+   of entries allocated for it.  */
+static void **sorted_file;
+static size_t sorted_file_alloc;
 
 /* When true, in a color listing, color each symlink name according to the
    type of file it points to.  Otherwise, color them according to the `ln'
@@ -1118,8 +1125,29 @@ main (int argc, char **argv)
   int n_files;
 
   /* The signals that are trapped, and the number of such signals.  */
-  static int const sig[] = { SIGHUP, SIGINT, SIGPIPE,
-			     SIGQUIT, SIGTERM, SIGTSTP };
+  static int const sig[] =
+    {
+      /* This one is handled specially.  */
+      SIGTSTP,
+
+      /* The usual suspects.  */
+      SIGALRM, SIGHUP, SIGINT, SIGPIPE, SIGQUIT, SIGTERM,
+#ifdef SIGPOLL
+      SIGPOLL,
+#endif
+#ifdef SIGPROF
+      SIGPROF,
+#endif
+#ifdef SIGVTALRM
+      SIGVTALRM,
+#endif
+#ifdef SIGXCPU
+      SIGXCPU,
+#endif
+#ifdef SIGXFSZ
+      SIGXFSZ,
+#endif
+    };
   enum { nsigs = sizeof sig / sizeof sig[0] };
 
 #if ! SA_NOCLDSTOP
@@ -1236,9 +1264,9 @@ main (int argc, char **argv)
       obstack_init (&subdired_obstack);
     }
 
-  nfiles = 100;
-  files = xnmalloc (nfiles, sizeof *files);
-  files_index = 0;
+  cwd_n_alloc = 100;
+  cwd_file = xnmalloc (cwd_n_alloc, sizeof *cwd_file);
+  cwd_n_used = 0;
 
   clear_files ();
 
@@ -1256,19 +1284,19 @@ main (int argc, char **argv)
       gobble_file (argv[i++], unknown, NOT_AN_INODE_NUMBER, true, "");
     while (i < argc);
 
-  if (files_index)
+  if (cwd_n_used)
     {
       sort_files ();
       if (!immediate_dirs)
 	extract_dirs_from_files (NULL, true);
-      /* `files_index' might be zero now.  */
+      /* `cwd_n_used' might be zero now.  */
     }
 
   /* In the following if/else blocks, it is sufficient to test `pending_dirs'
      (and not pending_dirs->name) because there may be no markers in the queue
      at this point.  A marker may be enqueued when extract_dirs_from_files is
      called with a non-empty string or via print_dir.  */
-  if (files_index)
+  if (cwd_n_used)
     {
       print_current_files ();
       if (pending_dirs)
@@ -2319,6 +2347,7 @@ print_dir (char const *name, char const *realname, bool command_line_arg)
 	{
 	  file_failure (command_line_arg,
 			_("cannot determine device and inode of %s"), name);
+	  closedir (dirp);
 	  return;
 	}
 
@@ -2328,13 +2357,14 @@ print_dir (char const *name, char const *realname, bool command_line_arg)
 	{
 	  error (0, 0, _("%s: not listing already-listed directory"),
 		 quotearg_colon (name));
+	  closedir (dirp);
 	  return;
 	}
 
       DEV_INO_PUSH (dir_stat.st_dev, dir_stat.st_ino);
     }
 
-  /* Read the directory entries, and insert the subfiles into the `files'
+  /* Read the directory entries, and insert the subfiles into the `cwd_file'
      table.  */
 
   clear_files ();
@@ -2423,7 +2453,7 @@ print_dir (char const *name, char const *realname, bool command_line_arg)
       DIRED_PUTCHAR ('\n');
     }
 
-  if (files_index)
+  if (cwd_n_used)
     print_current_files ();
 }
 
@@ -2477,7 +2507,7 @@ unsigned_file_size (off_t size)
   return size + (size < 0) * ((uintmax_t) OFF_T_MAX - OFF_T_MIN + 1);
 }
 
-/* Enter and remove entries in the table `files'.  */
+/* Enter and remove entries in the table `cwd_file'.  */
 
 /* Empty the table of files.  */
 
@@ -2486,13 +2516,14 @@ clear_files (void)
 {
   size_t i;
 
-  for (i = 0; i < files_index; i++)
+  for (i = 0; i < cwd_n_used; i++)
     {
-      free (files[i].name);
-      free (files[i].linkname);
+      struct fileinfo *f = sorted_file[i];
+      free (f->name);
+      free (f->linkname);
     }
 
-  files_index = 0;
+  cwd_n_used = 0;
 #if USE_ACL
   any_has_acl = false;
 #endif
@@ -2522,13 +2553,13 @@ gobble_file (char const *name, enum filetype type, ino_t inode,
      which is not used for command line arguments.  */
   assert (! command_line_arg || inode == NOT_AN_INODE_NUMBER);
 
-  if (files_index == nfiles)
+  if (cwd_n_used == cwd_n_alloc)
     {
-      files = xnrealloc (files, nfiles, 2 * sizeof *files);
-      nfiles *= 2;
+      cwd_file = xnrealloc (cwd_file, cwd_n_alloc, 2 * sizeof *cwd_file);
+      cwd_n_alloc *= 2;
     }
 
-  f = &files[files_index];
+  f = &cwd_file[cwd_n_used];
   memset (f, '\0', sizeof *f);
   f->stat.st_ino = inode;
   f->filetype = type;
@@ -2539,14 +2570,15 @@ gobble_file (char const *name, enum filetype type, ino_t inode,
 	 direct.d_type), we have to stat it in order to indicate
 	 sticky and/or other-writable attributes.  */
       || (type == directory && print_with_color)
-      || (print_inode
-	  && (inode == NOT_AN_INODE_NUMBER
-	      /* When dereferencing symlinks, the inode must come from
-		 stat, but readdir provides the inode of lstat.  Command
-		 line dereferences are already taken care of by the above
-		 assertion that the inode number is not yet known.  */
-	      || (dereference == DEREF_ALWAYS
-		  && (type == symbolic_link || type == unknown))))
+      /* When dereferencing symlinks, the inode and type must come from
+	 stat, but readdir provides the inode and type of lstat.  */
+      || ((print_inode || format_needs_type)
+	  && (type == symbolic_link || type == unknown)
+	  && (dereference == DEREF_ALWAYS
+	      || (command_line_arg && dereference != DEREF_NEVER)))
+      /* Command line dereferences are already taken care of by the above
+	 assertion that the inode number is not yet known.  */
+      || (print_inode && inode == NOT_AN_INODE_NUMBER)
       || (format_needs_type
 	  && (type == unknown || command_line_arg
 	      /* --indicator-style=classify (aka -F)
@@ -2619,7 +2651,7 @@ gobble_file (char const *name, enum filetype type, ino_t inode,
 	    return 0;
 
 	  f->name = xstrdup (name);
-	  files_index++;
+	  cwd_n_used++;
 
 	  return 0;
 	}
@@ -2752,7 +2784,7 @@ gobble_file (char const *name, enum filetype type, ino_t inode,
     }
 
   f->name = xstrdup (name);
-  files_index++;
+  cwd_n_used++;
 
   return blocks;
 }
@@ -2771,7 +2803,7 @@ is_directory (const struct fileinfo *f)
 static void
 get_link_name (char const *filename, struct fileinfo *f, bool command_line_arg)
 {
-  f->linkname = xreadlink (filename, f->stat.st_size);
+  f->linkname = xreadlink_with_size (filename, f->stat.st_size);
   if (f->linkname == NULL)
     file_failure (command_line_arg, _("cannot read symbolic link %s"),
 		  filename);
@@ -2817,7 +2849,7 @@ basename_is_dot_or_dotdot (const char *name)
   return dot_or_dotdot (base);
 }
 
-/* Remove any entries from FILES that are for directories,
+/* Remove any entries from CWD_FILE that are for directories,
    and queue them to be listed as directories instead.
    DIRNAME is the prefix to prepend to each dirname
    to make it correct relative to ls's working dir;
@@ -2842,39 +2874,37 @@ extract_dirs_from_files (char const *dirname, bool command_line_arg)
 
   /* Queue the directories last one first, because queueing reverses the
      order.  */
-  for (i = files_index; i-- != 0; )
-    if (is_directory (&files[i])
-        && (! ignore_dot_and_dot_dot
-            || ! basename_is_dot_or_dotdot (files[i].name)))
-      {
-	if (!dirname || files[i].name[0] == '/')
-	  {
-	    queue_directory (files[i].name, files[i].linkname,
-			     command_line_arg);
-	  }
-	else
-	  {
-	    char *name = file_name_concat (dirname, files[i].name, NULL);
-	    queue_directory (name, files[i].linkname, command_line_arg);
-	    free (name);
-	  }
-	if (files[i].filetype == arg_directory)
-	  free (files[i].name);
-      }
+  for (i = cwd_n_used; i-- != 0; )
+    {
+      struct fileinfo *f = sorted_file[i];
+
+      if (is_directory (f)
+	  && (! ignore_dot_and_dot_dot
+	      || ! basename_is_dot_or_dotdot (f->name)))
+	{
+	  if (!dirname || f->name[0] == '/')
+	    queue_directory (f->name, f->linkname, command_line_arg);
+	  else
+	    {
+	      char *name = file_name_concat (dirname, f->name, NULL);
+	      queue_directory (name, f->linkname, command_line_arg);
+	      free (name);
+	    }
+	  if (f->filetype == arg_directory)
+	    free (f->name);
+	}
+    }
 
   /* Now delete the directories from the table, compacting all the remaining
      entries.  */
 
-  for (i = 0, j = 0; i < files_index; i++)
+  for (i = 0, j = 0; i < cwd_n_used; i++)
     {
-      if (files[i].filetype != arg_directory)
-	{
-	  if (j < i)
-	    files[j] = files[i];
-	  ++j;
-	}
+      struct fileinfo *f = sorted_file[i];
+      sorted_file[j] = f;
+      j += (f->filetype != arg_directory);
     }
-  files_index = j;
+  cwd_n_used = j;
 }
 
 /* Use strcoll to compare strings in this locale.  If an error occurs,
@@ -3096,6 +3126,15 @@ static qsortFunc sort_functions[][2][2][2] =
 verify (ARRAY_CARDINALITY (sort_functions)
 	== sort_numtypes + time_numtypes - 1 );
 
+/* Set up SORTED_FILE to point to the in-use entries in CWD_FILE, in order.  */
+
+static void
+initialize_ordering_vector (void)
+{
+  size_t i;
+  for (i = 0; i < cwd_n_used; i++)
+    sorted_file[i] = &cwd_file[i];
+}
 
 /* Sort the files now in the table.  */
 
@@ -3103,6 +3142,15 @@ static void
 sort_files (void)
 {
   bool use_strcmp;
+
+  if (sorted_file_alloc < cwd_n_used + cwd_n_used / 2)
+    {
+      free (sorted_file);
+      sorted_file = xnmalloc (cwd_n_used, 3 * sizeof *sorted_file);
+      sorted_file_alloc = 3 * cwd_n_used;
+    }
+
+  initialize_ordering_vector ();
 
   if (sort_type == sort_none)
     return;
@@ -3118,13 +3166,14 @@ sort_files (void)
     {
       use_strcmp = true;
       assert (sort_type != sort_version);
+      initialize_ordering_vector ();
     }
 
   /* When sort_type == sort_time, use time_type as subindex.  */
-  qsort (files, files_index, sizeof *files,
-         sort_functions[sort_type + (sort_type == sort_time ? time_type : 0)]
-		       [use_strcmp][sort_reverse]
-                       [directories_first]);
+  mpsort ((void const **) sorted_file, cwd_n_used,
+	  sort_functions[sort_type + (sort_type == sort_time ? time_type : 0)]
+			[use_strcmp][sort_reverse]
+			[directories_first]);
 }
 
 /* List all the files now in the table.  */
@@ -3137,9 +3186,9 @@ print_current_files (void)
   switch (format)
     {
     case one_per_line:
-      for (i = 0; i < files_index; i++)
+      for (i = 0; i < cwd_n_used; i++)
 	{
-	  print_file_name_and_frills (files + i);
+	  print_file_name_and_frills (sorted_file[i]);
 	  putchar ('\n');
 	}
       break;
@@ -3157,9 +3206,9 @@ print_current_files (void)
       break;
 
     case long_format:
-      for (i = 0; i < files_index; i++)
+      for (i = 0; i < cwd_n_used; i++)
 	{
-	  print_long_format (files + i);
+	  print_long_format (sorted_file[i]);
 	  DIRED_PUTCHAR ('\n');
 	}
       break;
@@ -3954,7 +4003,7 @@ print_many_per_line (void)
 
   /* Calculate the number of rows that will be in each column except possibly
      for a short column on the right.  */
-  size_t rows = files_index / cols + (files_index % cols != 0);
+  size_t rows = cwd_n_used / cols + (cwd_n_used % cols != 0);
 
   for (row = 0; row < rows; row++)
     {
@@ -3965,12 +4014,13 @@ print_many_per_line (void)
       /* Print the next row.  */
       while (1)
 	{
-	  size_t name_length = length_of_file_name_and_frills (files + filesno);
+	  struct fileinfo const *f = sorted_file[filesno];
+	  size_t name_length = length_of_file_name_and_frills (f);
 	  size_t max_name_length = line_fmt->col_arr[col++];
-	  print_file_name_and_frills (files + filesno);
+	  print_file_name_and_frills (f);
 
 	  filesno += rows;
-	  if (filesno >= files_index)
+	  if (filesno >= cwd_n_used)
 	    break;
 
 	  indent (pos + name_length, pos + max_name_length);
@@ -3987,15 +4037,16 @@ print_horizontal (void)
   size_t pos = 0;
   size_t cols = calculate_columns (false);
   struct column_info const *line_fmt = &column_info[cols - 1];
-  size_t name_length = length_of_file_name_and_frills (files);
+  size_t name_length = length_of_file_name_and_frills (cwd_file);
   size_t max_name_length = line_fmt->col_arr[0];
 
   /* Print first entry.  */
-  print_file_name_and_frills (files);
+  print_file_name_and_frills (cwd_file);
 
   /* Now the rest.  */
-  for (filesno = 1; filesno < files_index; ++filesno)
+  for (filesno = 1; filesno < cwd_n_used; ++filesno)
     {
+      struct fileinfo const *f;
       size_t col = filesno % cols;
 
       if (col == 0)
@@ -4009,9 +4060,10 @@ print_horizontal (void)
 	  pos += max_name_length;
 	}
 
-      print_file_name_and_frills (files + filesno);
+      f = sorted_file[filesno];
+      print_file_name_and_frills (f);
 
-      name_length = length_of_file_name_and_frills (files + filesno);
+      name_length = length_of_file_name_and_frills (f);
       max_name_length = line_fmt->col_arr[col];
     }
   putchar ('\n');
@@ -4023,9 +4075,10 @@ print_with_commas (void)
   size_t filesno;
   size_t pos = 0;
 
-  for (filesno = 0; filesno < files_index; filesno++)
+  for (filesno = 0; filesno < cwd_n_used; filesno++)
     {
-      size_t len = length_of_file_name_and_frills (files + filesno);
+      struct fileinfo const *f = sorted_file[filesno];
+      size_t len = length_of_file_name_and_frills (f);
 
       if (filesno != 0)
 	{
@@ -4046,7 +4099,7 @@ print_with_commas (void)
 	  putchar (separator);
 	}
 
-      print_file_name_and_frills (files + filesno);
+      print_file_name_and_frills (f);
       pos += len;
     }
   putchar ('\n');
@@ -4104,7 +4157,7 @@ static void
 init_column_info (void)
 {
   size_t i;
-  size_t max_cols = MIN (max_idx, files_index);
+  size_t max_cols = MIN (max_idx, cwd_n_used);
 
   /* Currently allocated columns in column_info.  */
   static size_t column_info_alloc;
@@ -4171,20 +4224,21 @@ init_column_info (void)
 static size_t
 calculate_columns (bool by_columns)
 {
-  size_t filesno;		/* Index into files.  */
+  size_t filesno;		/* Index into cwd_file.  */
   size_t cols;			/* Number of files across.  */
 
   /* Normally the maximum number of columns is determined by the
      screen width.  But if few files are available this might limit it
      as well.  */
-  size_t max_cols = MIN (max_idx, files_index);
+  size_t max_cols = MIN (max_idx, cwd_n_used);
 
   init_column_info ();
 
   /* Compute the maximum number of possible columns.  */
-  for (filesno = 0; filesno < files_index; ++filesno)
+  for (filesno = 0; filesno < cwd_n_used; ++filesno)
     {
-      size_t name_length = length_of_file_name_and_frills (files + filesno);
+      struct fileinfo const *f = sorted_file[filesno];
+      size_t name_length = length_of_file_name_and_frills (f);
       size_t i;
 
       for (i = 0; i < max_cols; ++i)
@@ -4192,7 +4246,7 @@ calculate_columns (bool by_columns)
 	  if (column_info[i].valid_len)
 	    {
 	      size_t idx = (by_columns
-			    ? filesno / ((files_index + i) / (i + 1))
+			    ? filesno / ((cwd_n_used + i) / (i + 1))
 			    : filesno % (i + 1));
 	      size_t real_length = name_length + (idx == i ? 0 : 2);
 
@@ -4288,7 +4342,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
                                (overridden by -a or -A)\n\
 "), stdout);
       fputs (_("\
-      --indicator-style=WORD append indicator with style WORD to entry names:\n\
+      --indicator-style=WORD  append indicator with style WORD to entry names:\n\
                                none (default), slash (-p),\n\
                                file-type (--file-type), classify (-F)\n\
   -i, --inode                print the index number of each file\n\

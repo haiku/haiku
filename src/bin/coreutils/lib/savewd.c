@@ -1,6 +1,6 @@
 /* Save and restore the working directory, possibly using a child process.
 
-   Copyright (C) 2006 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -27,11 +27,11 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "exit.h"
 #include "dirname.h"
 #include "fcntl-safer.h"
 
@@ -54,7 +54,7 @@ savewd_save (struct savewd *wd)
 	    wd->val.fd = fd;
 	    break;
 	  }
-	if (errno != EACCES)
+	if (errno != EACCES && errno != ESTALE)
 	  {
 	    wd->state = ERROR_STATE;
 	    wd->val.errnum = errno;

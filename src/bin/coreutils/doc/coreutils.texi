@@ -208,6 +208,7 @@ Common Options
 * Exit status::                 Indicating program success or failure.
 * Backup options::              Backup options
 * Block size::                  Block size
+* Disambiguating names and IDs:: chgrp and chown owner and group syntax
 * Random sources::              Sources of random data
 * Target directory::            Target directory
 * Trailing slashes::            Trailing slashes
@@ -557,8 +558,8 @@ symbolic link to a directory.  @xref{Target directory}.
 @itemx --si
 @opindex --si
 @cindex SI output
-Append an SI-style abbreviation to each size, such as @samp{MB} for
-megabytes.  Powers of 1000 are used, not 1024; @samp{MB} stands for
+Append an SI-style abbreviation to each size, such as @samp{M} for
+megabytes.  Powers of 1000 are used, not 1024; @samp{M} stands for
 1,000,000 bytes.  This option is equivalent to
 @option{--block-size=si}.  Use the @option{-h} or
 @option{--human-readable} option if
@@ -644,6 +645,7 @@ name.
 * Exit status::                 Indicating program success or failure.
 * Backup options::              -b -S, in some programs.
 * Block size::                  BLOCK_SIZE and --block-size, in some programs.
+* Disambiguating names and IDs:: chgrp and chown owner and group syntax
 * Random sources::              --random-source, in some programs.
 * Target directory::            Specifying a target directory, in some programs.
 * Trailing slashes::            --strip-trailing-slashes, in some programs.
@@ -924,6 +926,46 @@ set.  The @option{-h} or @option{--human-readable} option is equivalent to
 @option{--block-size=human-readable}.  The @option{--si} option is
 equivalent to @option{--block-size=si}.
 
+@node Disambiguating names and IDs
+@section chown and chgrp: Disambiguating user names and IDs
+@cindex user names, disambiguating
+@cindex user IDs, disambiguating
+@cindex group names, disambiguating
+@cindex group IDs, disambiguating
+@cindex disambiguating group names and IDs
+
+Since the @var{owner} and @var{group} arguments to @command{chown} and
+@command{chgrp} may be specified as names or numeric IDs, there is an
+apparent ambiguity.
+What if a user or group @emph{name} is a string of digits?
+@footnote{Using a number as a user name is common in some environments.}
+Should the command interpret it as a user name or as an ID?
+@acronym{POSIX} requires that @command{chown} and @command{chgrp}
+first attempt to resolve the specified string as a name, and
+only once that fails, then try to interpret it as an ID.
+This is troublesome when you want to specify a numeric ID, say 42,
+and it must work even in a pathological situation where
+@samp{42} is a user name that maps to some other user ID, say 1000.
+Simply invoking @code{chown 42 F}, will set @file{F}s owner ID to
+1000---not what you intended.
+
+GNU @command{chown} and @command{chgrp} provide a way to work around this,
+that at the same time may result in a significant performance improvement
+by eliminating a database look-up.
+Simply precede each numeric user ID and/or group ID with a @samp{+},
+in order to force its interpretation as an integer:
+
+@example
+chown +42 F
+chgrp +$numeric_group_id another-file
+chown +0:+0 /
+@end example
+
+GNU @command{chown} and @command{chgrp}
+skip the name look-up process for each @samp{+}-prefixed string,
+because a string containing @samp{+} is never a valid user or group name.
+This syntax is accepted on most common Unix systems, but not on Solaris 10.
+
 @node Random sources
 @section Sources of random data
 
@@ -1157,6 +1199,10 @@ to operate recursively on @file{/}, so they default to
 @option{--no-preserve-root}, but using the @option{--preserve-root}
 option makes them safer for most purposes.  For convenience you can
 specify @option{--preserve-root} in an alias or in a shell function.
+
+Note that the @option{--preserve-root} option also ensures
+that @command{chgrp} and @command{chown} do not modify @file{/}
+even when dereferencing a symlink pointing to @file{/}.
 
 @node Special built-in utilities
 @section Special built-in utilities
@@ -1845,7 +1891,8 @@ output will be the original data.
 @opindex -i
 @opindex --ignore-garbage
 @cindex Ignore garbage in base64 stream
-During decoding, ignore unrecognized characters (including newline),
+When decoding, newlines are always accepted.
+During decoding, ignore unrecognized bytes,
 to permit distorted data to be decoded.
 
 @end table
@@ -3156,6 +3203,10 @@ md5sum [@var{option}]@dots{} [@var{file}]@dots{}
 
 For each @var{file}, @samp{md5sum} outputs the MD5 checksum, a flag
 indicating a binary or text input file, and the file name.
+If @var{file} contains a backslash or newline, the
+line is started with a backslash, and each problematic character in
+the file name is escaped with a backslash, making the output
+unambiguous even in the presence of arbitrary file names.
 If @var{file} is omitted or specified as @samp{-}, standard input is read.
 
 The program accepts the following options.  Also see @ref{Common options}.
@@ -3337,12 +3388,26 @@ mode:
 
 @item -c
 @itemx --check
+@itemx --check=diagnose-first
 @opindex -c
 @opindex --check
 @cindex checking for sortedness
-Check whether the given files are already sorted: if they are not all
-sorted, print an error message and exit with a status of 1.
+Check whether the given file is already sorted: if it is not all
+sorted, print a diagnostic containing the first out-of-order line and
+exit with a status of 1.
 Otherwise, exit successfully.
+At most one input file can be given.
+
+@item -C
+@itemx --check=quiet
+@itemx --check=silent
+@opindex -c
+@opindex --check
+@cindex checking for sortedness
+Exit successfully if the given file is already sorted, and
+exit with status 1 otherwise.
+At most one input file can be given.
+This is like @option{-c}, except it does not print a diagnostic.
 
 @item -m
 @itemx --merge
@@ -3396,7 +3461,7 @@ Exit status:
 
 @display
 0 if no error occurred
-1 if invoked with @option{-c} and the input is not properly sorted
+1 if invoked with @option{-c} or @option{-C} and the input is not sorted
 2 if an error occurred
 @end display
 
@@ -3405,7 +3470,6 @@ If the environment variable @env{TMPDIR} is set, @command{sort} uses its
 value as the directory for temporary files instead of @file{/tmp}.  The
 @option{--temporary-directory} (@option{-T}) option in turn overrides
 the environment variable.
-
 
 The following options affect the ordering of output lines.  They may be
 specified globally or as part of a specific key field.  If no key
@@ -3515,26 +3579,16 @@ can change this.
 @opindex --numeric-sort
 @cindex numeric sort
 @vindex LC_NUMERIC
-Sort numerically: the number begins each line; specifically, it consists
+Sort numerically.  The number begins each line and consists
 of optional blanks, an optional @samp{-} sign, and zero or more
 digits possibly separated by thousands separators, optionally followed
-by a decimal-point character and zero or more digits.  A string of
-no digits is interpreted as @samp{0}.  The @env{LC_NUMERIC}
+by a decimal-point character and zero or more digits.  An empty
+number is treated as @samp{0}.  The @env{LC_NUMERIC}
 locale specifies the decimal-point character and thousands separator.
 By default a blank is a space or a tab, but the @env{LC_CTYPE} locale
 can change this.
 
-Numeric sort uses what might be considered an unconventional method to
-compare strings representing floating point numbers.  Rather than first
-converting each string to the C @code{double} type and then comparing
-those values, @command{sort} aligns the decimal-point characters in the
-two strings and compares the strings a character at a time.  One benefit
-of using this approach is its speed.  In practice this is much more
-efficient than performing the two corresponding string-to-double (or
-even string-to-integer) conversions and then comparing doubles.  In
-addition, there is no corresponding loss of precision.  Converting each
-string to @code{double} before comparison would limit precision to about
-16 digits on most systems.
+Comparison is exact; there is no rounding error.
 
 Neither a leading @samp{+} nor exponential notation is recognized.
 To compare such strings numerically, use the
@@ -3573,6 +3627,18 @@ Other options are:
 
 @table @samp
 
+@item --compress-program=@var{prog}
+Compress any temporary files with the program @var{prog}.
+
+With no arguments, @var{prog} must compress standard input to standard
+output, and when given the @option{-d} option it must decompress
+standard input to standard output.
+
+Terminate with an error if @var{prog} exits with nonzero status.
+
+Whitespace and the backslash character should not appear in
+@var{prog}; they are reserved for future use.
+
 @item -k @var{pos1}[,@var{pos2}]
 @itemx --key=@var{pos1}[,@var{pos2}]
 @opindex -k
@@ -3580,9 +3646,21 @@ Other options are:
 @cindex sort field
 Specify a sort field that consists of the part of the line between
 @var{pos1} and @var{pos2} (or the end of the line, if @var{pos2} is
-omitted), @emph{inclusive}.  Fields and character positions are numbered
-starting with 1.  So to sort on the second field, you'd use
-@option{--key=2,2} (@option{-k 2,2}).  See below for more examples.
+omitted), @emph{inclusive}.
+
+Each @var{pos} has the form @samp{@var{f}[.@var{c}][@var{opts}]},
+where @var{f} is the number of the field to use, and @var{c} is the number
+of the first character from the beginning of the field.  Fields and character
+positions are numbered starting with 1; a character position of zero in
+@var{pos2} indicates the field's last character.  If @samp{.@var{c}} is
+omitted from @var{pos1}, it defaults to 1 (the beginning of the field);
+if omitted from @var{pos2}, it defaults to 0 (the end of the field).
+@var{opts} are ordering options, allowing individual keys to be sorted
+according to different rules; see below for details.  Keys can span
+multiple fields.
+
+Example:  To sort on the second field, use @option{--key=2,2}
+(@option{-k 2,2}).  See below for more examples.
 
 @item -o @var{output-file}
 @itemx --output=@var{output-file}
@@ -3686,7 +3764,7 @@ disks and controllers.
 @cindex uniquifying output
 
 Normally, output only the first of a sequence of lines that compare
-equal.  For the @option{--check} (@option{-c}) option,
+equal.  For the @option{--check} (@option{-c} or @option{-C}) option,
 check that no pair of consecutive lines compares equal.
 
 This option also disables the default last-resort comparison.
@@ -3721,29 +3799,21 @@ consistency, @option{-M} has been changed in the same way.  This may
 affect the meaning of character positions in field specifications in
 obscure cases.  The only fix is to add an explicit @option{-b}.
 
-A position in a sort field specified with the @option{-k}
-option has the form @samp{@var{f}.@var{c}}, where @var{f} is the number
-of the field to use and @var{c} is the number of the first character
-from the beginning of the field.  In a start position, an omitted
-@samp{.@var{c}} stands for the field's first character.  In an end
-position, an omitted or zero @samp{.@var{c}} stands for the field's
-last character.  If the start field falls after the end of the line
-or after the end field, the field is empty.  If the
-@option{-b} option was specified, the @samp{.@var{c}} part of a field
-specification is counted from the first nonblank character of the field.
-
-A sort key position may also have any of the option letters @samp{Mbdfinr}
-appended to it, in which case the global ordering options are not used
-for that particular field.  The @option{-b} option may be independently
-attached to either or both of the start and
-end positions of a field specification, and if it is inherited
-from the global options it will be attached to both.
+A position in a sort field specified with @option{-k} may have any
+of the option letters @samp{Mbdfinr} appended to it, in which case the
+global ordering options are not used for that particular field.  The
+@option{-b} option may be independently attached to either or both of
+the start and end positions of a field specification, and if it is
+inherited from the global options it will be attached to both.
 If input lines can contain leading or adjacent blanks and @option{-t}
 is not used, then @option{-k} is typically combined with @option{-b},
 @option{-g}, @option{-M}, or @option{-n}; otherwise the varying
 numbers of leading blanks in fields can cause confusing results.
 
-Keys can span multiple fields.
+If the start position in a sort field specifier falls after the end of
+the line or after the end field, the field is empty.  If the @option{-b}
+option was specified, the @samp{.@var{c}} part of a field specification
+is counted from the first nonblank character of the field.
 
 @vindex _POSIX2_VERSION
 @vindex POSIXLY_CORRECT
@@ -4489,7 +4559,7 @@ Fold lower case letters to upper case for sorting.
 @table @samp
 
 @item -b @var{file}
-@item --break-file=@var{file}
+@itemx --break-file=@var{file}
 
 This option provides an alternative (to @option{-W}) method of describing
 which characters make up words.  It introduces the name of a
@@ -6410,6 +6480,13 @@ Assume that each tab stop is @var{cols} columns wide.  The default is 8.
 @command{ls} uses tabs where possible in the output, for efficiency.  If
 @var{cols} is zero, do not use tabs at all.
 
+@c FIXME: remove in 2009, if Apple Terminal has been fixed for long enough.
+Some terminal emulators (at least Apple Terminal 1.5 (133) from Mac OS X 10.4.8)
+do not properly align columns to the right of a TAB following a
+non-@acronym{ASCII} byte.  If you use such a terminal emulator, use the
+@option{-T0} option or put @code{TABSIZE=0} in your environment to tell
+@command{ls} to align using spaces, not tabs.
+
 @item -w
 @itemx --width=@var{cols}
 @opindex -w
@@ -6947,7 +7024,13 @@ and ordinary users
 may preserve the group ownership of a file only if they happen to be
 a member of the desired group.
 @itemx timestamps
-Preserve the times of last access and last modification.
+Preserve the times of last access and last modification, when possible.
+In general, it is not possible to preserve these attributes
+when the affected file is a symbolic link.
+However, FreeBSD now provides the @code{lutimes} function, which makes
+it possibile even for symbolic links.  However, this implementation does
+not yet take advantage of that.
+@c FIXME: once we provide lutimes support, update the above.
 @itemx links
 Preserve in the destination files
 any links between corresponding source files.
@@ -7151,25 +7234,33 @@ bytes (or the size specified with @samp{seek=}).
 @opindex ibs
 @cindex block size of input
 @cindex input block size
-Read @var{bytes} bytes at a time.
+Set the input block size to @var{bytes}.
+This makes @command{dd} read @var{bytes} per block.
 
 @item obs=@var{bytes}
 @opindex obs
 @cindex block size of output
 @cindex output block size
-Write @var{bytes} bytes at a time.
+Set the output block size to @var{bytes}.
+This makes @command{dd} write @var{bytes} per block.
 
 @item bs=@var{bytes}
 @opindex bs
 @cindex block size
-Both read and write @var{bytes} bytes at a time.  This overrides
-@samp{ibs} and @samp{obs}.
+Set both input and output block sizes to @var{bytes}.
+This makes @command{dd} read and write @var{bytes} per block,
+overriding any @samp{ibs} and @samp{obs} settings.
 
 @item cbs=@var{bytes}
 @opindex cbs
 @cindex block size of conversion
 @cindex conversion block size
-Convert @var{bytes} bytes at a time.
+@cindex fixed-length records, converting to variable-length
+@cindex variable-length records, converting to fixed-length
+Set the conversion block size to @var{bytes}.
+When converting variable-length records to fixed-length ones
+(@option{conv=block}) or the reverse (@option{conv=unblock}),
+use @var{bytes} as the fixed record length.
 
 @item skip=@var{blocks}
 @opindex skip
@@ -7346,6 +7437,8 @@ Use non-blocking I/O.
 @opindex noatime
 @cindex access time
 Do not update the file's access time.
+Some older file systems silently ignore this flag, so it is a good
+idea to test it on your files before relying on it.
 
 @item noctty
 @opindex noctty
@@ -8353,15 +8446,23 @@ overridden in this way.
 @opindex -p
 @opindex --parents
 @cindex parent directories, creating
-Make any missing parent directories for each argument.  The file permission
-bits of parent directories are set to the umask modified by @samp{u+wx}.
-@xref{Directory Setuid and Setgid}, for how the set-user-ID and
-set-group-ID bits of parent directories are inherited.
-Ignore arguments corresponding to existing directories, and do not
-change their file mode bits.
+Make any missing parent directories for each argument, setting their
+file permission bits to the umask modified by @samp{u+wx}.  Ignore
+existing parent directories, and do not change their file permission
+bits.
+
+To set the file permission bits of any newly-created parent
+directories to a value that includes @samp{u+wx}, you can set the
+umask before invoking @command{mkdir}.  For example, if the shell
+command @samp{(umask u=rwx,go=rx; mkdir -p P/Q)} creates the parent
+@file{P} it sets the parent's permission bits to @samp{u=rwx,go=rx}.
+To set a parent's special mode bits as well, you can invoke
+@command{chmod} after @command{mkdir}.  @xref{Directory Setuid and
+Setgid}, for how the set-user-ID and set-group-ID bits of
+newly-created parent directories are inherited.
 
 @item -v
-@item --verbose
+@itemx --verbose
 @opindex -v
 @opindex --verbose
 Print a message for each created directory.  This is most useful with
@@ -8608,7 +8709,7 @@ a failure does not evoke a diagnostic and does not cause @command{rmdir} to
 exit unsuccessfully.
 
 @item -v
-@item --verbose
+@itemx --verbose
 @opindex -v
 @opindex --verbose
 @cindex directory deletion, reporting
@@ -8726,6 +8827,10 @@ If only a colon is given, or if @var{new-owner} is empty, neither the
 owner nor the group is changed.
 
 @end table
+
+If @var{owner} or @var{group} is intended to represent a numeric user
+or group ID, then you may specify it with a leading @samp{+}.
+@xref{Disambiguating names and IDs}.
 
 Some older scripts may still use @samp{.} in place of the @samp{:} separator.
 @acronym{POSIX} 1003.1-2001 (@pxref{Standards conformance}) does not
@@ -8901,6 +9006,10 @@ or to the group of an existing reference file.  Synopsis:
 @example
 chgrp [@var{option}]@dots{} @{@var{group} | --reference=@var{ref_file}@} @var{file}@dots{}
 @end example
+
+If @var{group} is intended to represent a
+numeric group ID, then you may specify it with a leading @samp{+}.
+@xref{Disambiguating names and IDs}.
 
 The program accepts the following options.  Also see @ref{Common options}.
 
@@ -9151,7 +9260,7 @@ operations, for a user to change the ctime field to a user-specified value.
 Time stamps assume the time zone rules specified by the @env{TZ}
 environment variable, or by the system default rules if @env{TZ} is
 not set.  @xref{TZ Variable,, Specifying the Time Zone with @env{TZ},
-libc, The GNU C Library}.  You can avoid avoid ambiguities during
+libc, The GNU C Library}.  You can avoid ambiguities during
 daylight saving transitions by using @sc{utc} time stamps.
 
 The program accepts the following options.  Also see @ref{Common options}.
@@ -9372,6 +9481,13 @@ some network mounts), the columns are misaligned.
 
 @item
 The labels in the header output line are changed to conform to @acronym{POSIX}.
+
+@item
+The default block size and output format are unaffected by the
+@env{DF_BLOCK_SIZE}, @env{BLOCK_SIZE} and @env{BLOCKSIZE} environment
+variables.  However, the default block size is still affected by
+@env{POSIXLY_CORRECT}: it is 512 if @env{POSIXLY_CORRECT} is set, 1024
+otherwise.  @xref{Block size}.
 @end enumerate
 
 @optSi
@@ -9799,7 +9915,7 @@ $ stat --format=%d:%i / /usr
 @opindex --printf=@var{format}
 @cindex output format
 Use @var{format} rather than the default format.
-Like like @option{--format}, but interpret backslash escapes,
+Like @option{--format}, but interpret backslash escapes,
 and do not output a mandatory trailing newline.
 If you want a newline, include @samp{\n} in the @var{format}.
 Here's how you would use @option{--printf} to print the device
@@ -13817,6 +13933,12 @@ Print all numbers using @var{format}.
 @var{format} must contain exactly one of the @samp{printf}-style
 floating point conversion specifications @samp{%a}, @samp{%e},
 @samp{%f}, @samp{%g}, @samp{%A}, @samp{%E}, @samp{%F}, @samp{%G}.
+The @samp{%} may be followed by zero or more flags taken from the set
+@samp{-+#0 '}, then an optional width containing one or more digits,
+then an optional precision consisting of a @samp{.} followed by zero
+or more digits.  @var{format} may also contain any number of @samp{%%}
+conversion specifications.  All conversion specifications have the
+same meaning as with @samp{printf}.
 
 The default format is derived from @var{first}, @var{step}, and
 @var{last}.  If these all use a fixed point decimal representation,
@@ -13838,6 +13960,15 @@ decimal representation.
 (To have other kinds of padding, use @option{--format}).
 
 @end table
+
+You can get finer-grained control over output with @option{-f}:
+
+@example
+$ seq -f '(%9.2E)' -9e5 1.1e6 1.3e6
+(-9.00E+05)
+( 2.00E+05)
+( 1.30E+06)
+@end example
 
 If you want hexadecimal integer output, you can use @command{printf}
 to perform the conversion:

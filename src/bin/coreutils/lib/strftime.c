@@ -1,4 +1,4 @@
-/* Copyright (C) 1991-1999, 2000, 2001, 2003, 2004, 2005, 2006 Free Software
+/* Copyright (C) 1991-1999, 2000, 2001, 2003, 2004, 2005, 2006, 2007 Free Software
    Foundation, Inc.
 
    NOTE: The canonical source of this file is maintained with the GNU C Library.
@@ -36,18 +36,8 @@
 #endif
 
 #include <ctype.h>
-#include <sys/types.h>		/* Some systems define `time_t' here.  */
+#include <time.h>
 
-#ifdef TIME_WITH_SYS_TIME
-# include <sys/time.h>
-# include <time.h>
-#else
-# ifdef HAVE_SYS_TIME_H
-#  include <sys/time.h>
-# else
-#  include <time.h>
-# endif
-#endif
 #if HAVE_TZNAME && ! defined tzname
 extern char *tzname[];
 #endif
@@ -58,7 +48,7 @@ extern char *tzname[];
    conversion specifications.  The GNU C Library uses UTF8 multibyte
    encoding, which is safe for formats, but strftime.c can be used
    with other C libraries that use unsafe encodings.  */
-#define DO_MULTIBYTE (HAVE_MBLEN && HAVE_WCHAR_H && ! MULTIBYTE_IS_FORMAT_SAFE)
+#define DO_MULTIBYTE (HAVE_MBLEN && ! MULTIBYTE_IS_FORMAT_SAFE)
 
 #if DO_MULTIBYTE
 # if HAVE_MBRLEN
@@ -144,11 +134,10 @@ extern char *tzname[];
 #endif
 
 #if !HAVE_TM_GMTOFF
-/* Portable standalone applications should supply a "time_r.h" that
+/* Portable standalone applications should supply a "time.h" that
    declares a POSIX-compliant localtime_r, for the benefit of older
    implementations that lack localtime_r or have a nonstandard one.
    See the gnulib time_r module for one way to implement this.  */
-# include "time_r.h"
 # undef __gmtime_r
 # undef __localtime_r
 # define __gmtime_r gmtime_r

@@ -1,5 +1,8 @@
 /* vsprintf with automatic memory allocation.
-   Copyright (C) 1999, 2002-2006 Free Software Foundation, Inc.
+   This file is intended to provide exactly the same functionality
+   as the version in gnulib, but without the need for the xsize module.
+
+   Copyright (C) 1999, 2002-2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,7 +26,6 @@
 #endif
 
 #include <config.h>
-
 #ifndef IN_LIBINTL
 # include <alloca.h>
 #endif
@@ -37,6 +39,7 @@
 
 #include <stdio.h>	/* snprintf(), sprintf() */
 #include <stdlib.h>	/* abort(), malloc(), realloc(), free() */
+#include <stdint.h>	/* SIZE_MAX */
 #include <string.h>	/* memcpy(), strlen() */
 #include <errno.h>	/* errno */
 #include <limits.h>	/* CHAR_BIT, INT_MAX */
@@ -47,17 +50,8 @@
 # include "printf-parse.h"
 #endif
 
-#ifndef SIZE_MAX
-# define SIZE_MAX ((size_t) -1)
-#endif
-
-/* Some systems, like OSF/1 4.0 and Woe32, don't have EOVERFLOW.  */
-#ifndef EOVERFLOW
-# define EOVERFLOW E2BIG
-#endif
-
-#ifdef HAVE_WCHAR_T
-# ifdef HAVE_WCSLEN
+#if HAVE_WCHAR_T
+# if HAVE_WCSLEN
 #  define local_wcslen wcslen
 # else
    /* Solaris 2.5.1 has wcslen() in a separate library libw.so. To avoid
@@ -152,7 +146,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 #if HAVE_ALLOCA
     if (buf_neededlength < 4000 / sizeof (CHAR_T))
       {
-	buf = (CHAR_T *) alloca (buf_neededlength * sizeof (CHAR_T));
+	buf = alloca (buf_neededlength * sizeof (CHAR_T));
 	buf_malloced = NULL;
       }
     else
@@ -254,7 +248,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		  case TYPE_COUNT_LONGINT_POINTER:
 		    *a.arg[dp->arg_index].a.a_count_longint_pointer = length;
 		    break;
-#ifdef HAVE_LONG_LONG
+#if HAVE_LONG_LONG_INT
 		  case TYPE_COUNT_LONGLONGINT_POINTER:
 		    *a.arg[dp->arg_index].a.a_count_longlongint_pointer = length;
 		    break;
@@ -338,7 +332,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		    {
 
 		    case 'd': case 'i': case 'u':
-# ifdef HAVE_LONG_LONG
+# if HAVE_LONG_LONG_INT
 		      if (type == TYPE_LONGLONGINT || type == TYPE_ULONGLONGINT)
 			tmp_length =
 			  (unsigned int) (sizeof (unsigned long long) * CHAR_BIT
@@ -369,7 +363,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		      break;
 
 		    case 'o':
-# ifdef HAVE_LONG_LONG
+# if HAVE_LONG_LONG_INT
 		      if (type == TYPE_LONGLONGINT || type == TYPE_ULONGLONGINT)
 			tmp_length =
 			  (unsigned int) (sizeof (unsigned long long) * CHAR_BIT
@@ -397,7 +391,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		      break;
 
 		    case 'x': case 'X':
-# ifdef HAVE_LONG_LONG
+# if HAVE_LONG_LONG_INT
 		      if (type == TYPE_LONGLONGINT || type == TYPE_ULONGLONGINT)
 			tmp_length =
 			  (unsigned int) (sizeof (unsigned long long) * CHAR_BIT
@@ -421,12 +415,13 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		      if (tmp_length < precision)
 			tmp_length = precision;
 		      /* Add 2, to account for a leading sign or alternate form.  */
-		      if (tmp_length <= SIZE_MAX / 2)
-			tmp_length *= 2;
+		      tmp_length += 2;
+		      if (tmp_length < 2)
+			goto out_of_memory;
 		      break;
 
 		    case 'f': case 'F':
-# ifdef HAVE_LONG_DOUBLE
+# if HAVE_LONG_DOUBLE
 		      if (type == TYPE_LONGDOUBLE)
 			tmp_length =
 			  (unsigned int) (LDBL_MAX_EXP
@@ -450,7 +445,6 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		      break;
 
 		    case 'e': case 'E': case 'g': case 'G':
-		    case 'a': case 'A':
 		      tmp_length =
 			12; /* sign, decimal point, exponent etc. */
 		      tmp_length += precision;
@@ -458,8 +452,31 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 			goto out_of_memory;
 		      break;
 
+		    case 'a': case 'A':
+# if HAVE_LONG_DOUBLE
+		      if (type == TYPE_LONGDOUBLE)
+			tmp_length =
+			  (unsigned int) (LDBL_DIG
+					  * 0.831 /* decimal -> hexadecimal */
+					 )
+			  + 1; /* turn floor into ceil */
+		      else
+# endif
+			tmp_length =
+			  (unsigned int) (DBL_DIG
+					  * 0.831 /* decimal -> hexadecimal */
+					 )
+			  + 1; /* turn floor into ceil */
+		      if (tmp_length < precision)
+			tmp_length = precision;
+		      /* Account for sign, decimal point etc. */
+		      tmp_length += 12;
+		      if (tmp_length < 12)
+			goto out_of_memory;
+		      break;
+
 		    case 'c':
-# if defined HAVE_WINT_T && !WIDE_CHAR_VERSION
+# if HAVE_WINT_T && !WIDE_CHAR_VERSION
 		      if (type == TYPE_WIDE_CHAR)
 			tmp_length = MB_CUR_MAX;
 		      else
@@ -468,7 +485,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 		      break;
 
 		    case 's':
-# ifdef HAVE_WCHAR_T
+# if HAVE_WCHAR_T
 		      if (type == TYPE_WIDE_STRING)
 			{
 			  tmp_length =
@@ -551,7 +568,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 
 		switch (type)
 		  {
-#ifdef HAVE_LONG_LONG
+#if HAVE_LONG_LONG_INT
 		  case TYPE_LONGLONGINT:
 		  case TYPE_ULONGLONGINT:
 		    *p++ = 'l';
@@ -559,15 +576,15 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 #endif
 		  case TYPE_LONGINT:
 		  case TYPE_ULONGINT:
-#ifdef HAVE_WINT_T
+#if HAVE_WINT_T
 		  case TYPE_WIDE_CHAR:
 #endif
-#ifdef HAVE_WCHAR_T
+#if HAVE_WCHAR_T
 		  case TYPE_WIDE_STRING:
 #endif
 		    *p++ = 'l';
 		    break;
-#ifdef HAVE_LONG_DOUBLE
+#if HAVE_LONG_DOUBLE
 		  case TYPE_LONGDOUBLE:
 		    *p++ = 'L';
 		    break;
@@ -705,7 +722,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 			  SNPRINTF_BUF (arg);
 			}
 			break;
-#ifdef HAVE_LONG_LONG
+#if HAVE_LONG_LONG_INT
 		      case TYPE_LONGLONGINT:
 			{
 			  long long int arg = a.arg[dp->arg_index].a.a_longlongint;
@@ -725,7 +742,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 			  SNPRINTF_BUF (arg);
 			}
 			break;
-#ifdef HAVE_LONG_DOUBLE
+#if HAVE_LONG_DOUBLE
 		      case TYPE_LONGDOUBLE:
 			{
 			  long double arg = a.arg[dp->arg_index].a.a_longdouble;
@@ -739,7 +756,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 			  SNPRINTF_BUF (arg);
 			}
 			break;
-#ifdef HAVE_WINT_T
+#if HAVE_WINT_T
 		      case TYPE_WIDE_CHAR:
 			{
 			  wint_t arg = a.arg[dp->arg_index].a.a_wide_char;
@@ -753,7 +770,7 @@ VASNPRINTF (CHAR_T *resultbuf, size_t *lengthp, const CHAR_T *format, va_list ar
 			  SNPRINTF_BUF (arg);
 			}
 			break;
-#ifdef HAVE_WCHAR_T
+#if HAVE_WCHAR_T
 		      case TYPE_WIDE_STRING:
 			{
 			  const wchar_t *arg = a.arg[dp->arg_index].a.a_wide_string;

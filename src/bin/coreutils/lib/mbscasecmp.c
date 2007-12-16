@@ -1,5 +1,5 @@
 /* Case-insensitive string comparison function.
-   Copyright (C) 1998-1999, 2005-2006 Free Software Foundation, Inc.
+   Copyright (C) 1998-1999, 2005-2007 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2005,
    based on earlier glibc code.
 
@@ -20,7 +20,7 @@
 #include <config.h>
 
 /* Specification.  */
-#include "strcase.h"
+#include <string.h>
 
 #include <ctype.h>
 #include <limits.h>
@@ -31,13 +31,13 @@
 
 #define TOLOWER(Ch) (isupper (Ch) ? tolower (Ch) : (Ch))
 
-/* Compare strings S1 and S2, ignoring case, returning less than, equal to or
-   greater than zero if S1 is lexicographically less than, equal to or greater
-   than S2.
+/* Compare the character strings S1 and S2, ignoring case, returning less than,
+   equal to or greater than zero if S1 is lexicographically less than, equal to
+   or greater than S2.
    Note: This function may, in multibyte locales, return 0 for strings of
    different lengths!  */
 int
-strcasecmp (const char *s1, const char *s2)
+mbscasecmp (const char *s1, const char *s2)
 {
   if (s1 == s2)
     return 0;

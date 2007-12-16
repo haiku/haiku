@@ -1,5 +1,5 @@
 /* install - copy files and set attributes
-   Copyright (C) 89, 90, 91, 1995-2006 Free Software Foundation, Inc.
+   Copyright (C) 89, 90, 91, 1995-2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -566,11 +566,10 @@ strip (char const *name)
       error (EXIT_FAILURE, errno, _("cannot run strip"));
       break;
     default:			/* Parent. */
-      /* Parent process. */
-      while (pid != wait (&status))	/* Wait for kid to finish. */
-	/* Do nothing. */ ;
-      if (status)
-	error (EXIT_FAILURE, 0, _("strip failed"));
+      if (waitpid (pid, &status, 0) < 0)
+	error (EXIT_FAILURE, errno, _("waiting for strip"));
+      else if (! WIFEXITED (status) || WEXITSTATUS (status))
+	error (EXIT_FAILURE, 0, _("strip process terminated abnormally"));
       break;
     }
 }
@@ -683,7 +682,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
   -p, --preserve-timestamps   apply access/modification times of SOURCE files\n\
                         to corresponding destination files\n\
   -s, --strip         strip symbol tables\n\
-  -S, --suffix=SUFFIX override the usual backup suffix\n\
+  -S, --suffix=SUFFIX  override the usual backup suffix\n\
   -t, --target-directory=DIRECTORY  copy all SOURCE arguments into DIRECTORY\n\
   -T, --no-target-directory  treat DEST as a normal file\n\
   -v, --verbose       print the name of each directory as it is created\n\

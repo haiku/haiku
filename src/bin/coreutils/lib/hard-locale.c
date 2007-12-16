@@ -1,6 +1,6 @@
 /* hard-locale.c -- Determine whether a locale is hard.
 
-   Copyright (C) 1997, 1998, 1999, 2002, 2003, 2004, 2006 Free
+   Copyright (C) 1997, 1998, 1999, 2002, 2003, 2004, 2006, 2007 Free
    Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -24,8 +24,6 @@
 #include <locale.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "strdup.h"
 
 #ifdef __GLIBC__
 # define GLIBC_VERSION __GLIBC__

@@ -1,7 +1,7 @@
 # -*- autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-# Copyright (C) 1991, 1993-2006 Free Software Foundation, Inc.
+# Copyright (C) 1991, 1993-2007 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,15 +19,15 @@
 
 dnl Written by Jim Meyering.
 
-AC_PREREQ(2.60)
-AC_INIT([GNU coreutils],[6.7],[bug-coreutils@gnu.org])
+AC_PREREQ(2.61)
+AC_INIT([GNU coreutils],[6.9],[bug-coreutils@gnu.org])
 AC_CONFIG_SRCDIR(src/ls.c)
 
 AC_CONFIG_AUX_DIR(build-aux)
 AC_CONFIG_HEADERS([lib/config.h:lib/config.hin])
 
 AB_INIT()
-AM_INIT_AUTOMAKE([1.9.6 gnits dist-bzip2])
+AM_INIT_AUTOMAKE([1.10 dist-bzip2])
 
 AC_PROG_CC_STDC
 AM_PROG_CC_C_O
@@ -38,6 +38,8 @@ AC_PROG_LN_S
 gl_EARLY
 gl_INIT
 coreutils_MACROS
+
+AC_FUNC_FORK
 
 AC_CHECK_FUNCS(uname,
 	OPTIONAL_BIN_PROGS="$OPTIONAL_BIN_PROGS uname\$(EXEEXT)"

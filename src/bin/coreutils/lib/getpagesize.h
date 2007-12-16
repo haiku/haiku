@@ -42,6 +42,11 @@
 # endif
 #endif
 
+/* This is for AmigaOS4.0.  */
+#if !defined getpagesize && defined __amigaos4__
+# define getpagesize() 2048
+#endif
+
 #if !defined getpagesize && HAVE_SYS_PARAM_H
 # include <sys/param.h>
 # ifdef EXEC_PAGESIZE

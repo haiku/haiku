@@ -1,7 +1,7 @@
 %{
 /* Parse a string into an internal time stamp.
 
-   Copyright (C) 1999, 2000, 2002, 2003, 2004, 2005, 2006 Free Software
+   Copyright (C) 1999, 2000, 2002, 2003, 2004, 2005, 2006, 2007 Free Software
    Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -35,6 +35,7 @@
 #include <config.h>
 
 #include "getdate.h"
+#include "timespec.h"
 
 /* There's no need to extend the stack, so there's no need to involve
    alloca.  */

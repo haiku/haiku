@@ -1,6 +1,6 @@
 /* Host name canonicalization
 
-   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 
    Written by Derek Price <derek@ximbiot.com>.
 
@@ -22,8 +22,9 @@
 
 #include "canon-host.h"
 
+#include <string.h>
+
 #include "getaddrinfo.h"
-#include "strdup.h"
 
 /* Store the last error for the single-threaded version of this function.  */
 static int last_cherror;

@@ -1,4 +1,4 @@
-/* Copyright (C) 1992,1995-1999,2000-2003,2005,2006 Free Software Foundation, Inc.
+/* Copyright (C) 1992,1995-1999,2000-2003,2005-2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    This program is free software; you can redistribute it and/or modify
@@ -30,6 +30,8 @@
 #if _LIBC || HAVE_UNISTD_H
 # include <unistd.h>
 #endif
+
+#if _LIBC || !HAVE_SETENV
 
 #if !_LIBC
 # include "allocsa.h"
@@ -326,3 +328,5 @@ text_set_element (__libc_subfreeres, free_mem);
 weak_alias (__setenv, setenv)
 weak_alias (__clearenv, clearenv)
 #endif
+
+#endif /* _LIBC || !HAVE_SETENV */

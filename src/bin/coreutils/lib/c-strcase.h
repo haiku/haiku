@@ -1,5 +1,5 @@
-/* Case-insensitive string comparison functions.
-   Copyright (C) 1995-1996, 2001, 2003, 2005-2006 Free Software Foundation, Inc.
+/* Case-insensitive string comparison functions in C locale.
+   Copyright (C) 1995-1996, 2001, 2003, 2005 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,37 +15,36 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#ifndef _STRCASE_H
-#define _STRCASE_H
+#ifndef C_STRCASE_H
+#define C_STRCASE_H
 
 #include <stddef.h>
-/* Include header files with a possibly conflicting declarations of strcasecmp
-   before we define it as a macro, so that they will be no-ops if included
-   after strcasecmp is defined as a macro.  */
-#include <string.h>
+
+
+/* The functions defined in this file assume the "C" locale and a character
+   set without diacritics (ASCII-US or EBCDIC-US or something like that).
+   Even if the "C" locale on a particular system is an extension of the ASCII
+   character set (like on BeOS, where it is UTF-8, or on AmigaOS, where it
+   is ISO-8859-1), the functions in this file recognize only the ASCII
+   characters.  More precisely, one of the string arguments must be an ASCII
+   string; the other one can also contain non-ASCII characters (but then
+   the comparison result will be nonzero).  */
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
-/* No known system has a strcasecmp() function that works correctly in
-   multibyte locales.  Therefore we use our version always.  */
-#define strcasecmp rpl_strcasecmp
 /* Compare strings S1 and S2, ignoring case, returning less than, equal to or
    greater than zero if S1 is lexicographically less than, equal to or greater
-   than S2.
-   Note: This function may, in multibyte locales, return 0 for strings of
-   different lengths!  */
-extern int strcasecmp (const char *s1, const char *s2);
+   than S2.  */
+extern int c_strcasecmp (const char *s1, const char *s2);
 
 /* Compare no more than N characters of strings S1 and S2, ignoring case,
    returning less than, equal to or greater than zero if S1 is
-   lexicographically less than, equal to or greater than S2.
-   Note: This function can not work correctly in multibyte locales.  */
-#if ! HAVE_DECL_STRNCASECMP
-extern int strncasecmp (const char *s1, const char *s2, size_t n);
-#endif
+   lexicographically less than, equal to or greater than S2.  */
+extern int c_strncasecmp (const char *s1, const char *s2, size_t n);
 
 
 #ifdef __cplusplus
@@ -53,4 +52,4 @@ extern int strncasecmp (const char *s1, const char *s2, size_t n);
 #endif
 
 
-#endif /* _STRCASE_H */
+#endif /* C_STRCASE_H */

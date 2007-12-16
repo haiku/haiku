@@ -34,6 +34,11 @@
 #include "same-inode.h"
 #include "xalloc.h"
 
+/* The results of open() in this file are not used with fchdir,
+   therefore save some unnecessary work in fchdir.c.  */
+#undef open
+#undef close
+
 #define PROC_SELF_FD_FORMAT "/proc/self/fd/%d/%s"
 
 #define PROC_SELF_FD_NAME_SIZE_BOUND(len) \

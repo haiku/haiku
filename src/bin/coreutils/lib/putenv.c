@@ -1,4 +1,4 @@
-/* Copyright (C) 1991, 1994, 1997, 1998, 2000, 2003, 2004, 2005, 2006
+/* Copyright (C) 1991, 1994, 1997, 1998, 2000, 2003, 2004, 2005, 2006, 2007
    Free Software Foundation, Inc.
 
    NOTE: The canonical source of this file is maintained with the GNU C
@@ -20,6 +20,12 @@
 
 #include <config.h>
 
+/* undef putenv here, because some (e.g., Solaris 10) declare putenv in
+   with a non-const argument.  That would conflict with the declaration of
+   rpl_putenv below (due to the #define putenv rpl_putenv from config.h).  */
+#undef putenv
+int rpl_putenv (char const *);
+
 #include <stddef.h>
 
 /* Include errno.h *after* sys/types.h to work around header problems
@@ -29,15 +35,8 @@
 # define __set_errno(ev) ((errno) = (ev))
 #endif
 
-/* Don't include stdlib.h because some (e.g., Solaris 7) declare putenv
-   with a non-const argument.  That would conflict with the declaration of
-   rpl_putenv below (due to the #define putenv rpl_putenv from config.h).  */
-
-void *malloc ();
-void free ();
-
+#include <stdlib.h>
 #include <string.h>
-
 #include <unistd.h>
 
 #if HAVE_GNU_LD
@@ -58,7 +57,7 @@ __libc_lock_define_initialized (static, envlock)
 #endif
 
 static int
-unsetenv (const char *name)
+_unsetenv (const char *name)
 {
   size_t len;
   char **ep;
@@ -106,7 +105,7 @@ rpl_putenv (const char *string)
   if (name_end == NULL)
     {
       /* Remove the variable from the environment.  */
-      return unsetenv (string);
+      return _unsetenv (string);
     }
 
   size = 0;

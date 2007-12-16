@@ -1,6 +1,7 @@
 /* xnanosleep.c -- a more convenient interface to nanosleep
 
-   Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 Free Software
+   Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -32,7 +33,6 @@
 #include <time.h>
 
 #include "intprops.h"
-#include "timespec.h"
 
 #ifndef TIME_T_MAX
 # define TIME_T_MAX TYPE_MAXIMUM (time_t)

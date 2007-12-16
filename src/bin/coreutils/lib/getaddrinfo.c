@@ -1,5 +1,5 @@
 /* Get address information (partial implementation).
-   Copyright (C) 1997, 2001, 2002, 2004, 2005, 2006 Free Software
+   Copyright (C) 1997, 2001, 2002, 2004, 2005, 2006, 2007 Free Software
    Foundation, Inc.
    Contributed by Simon Josefsson <simon@josefsson.org>.
 
@@ -28,8 +28,11 @@
 /* Get calloc. */
 #include <stdlib.h>
 
-/* Get memcpy. */
+/* Get memcpy, strdup. */
 #include <string.h>
+
+/* Get snprintf. */
+#include <stdio.h>
 
 #include <stdbool.h>
 
@@ -38,8 +41,6 @@
 #define N_(String) String
 
 #include "inet_ntop.h"
-#include "snprintf.h"
-#include "strdup.h"
 
 /* BeOS has AF_INET, but not PF_INET.  */
 #ifndef PF_INET

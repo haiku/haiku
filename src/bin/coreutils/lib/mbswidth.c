@@ -1,5 +1,5 @@
 /* Determine the number of screen columns needed for a string.
-   Copyright (C) 2000-2006 Free Software Foundation, Inc.
+   Copyright (C) 2000-2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -31,26 +31,13 @@
 #include <ctype.h>
 
 /* Get mbstate_t, mbrtowc(), mbsinit().  */
-#if HAVE_WCHAR_H
-/* Tru64 with Desktop Toolkit C has a bug: <stdio.h> must be included before
-   <wchar.h>.
-   BSD/OS 4.1 has a bug: <stdio.h> and <time.h> must be included before
-   <wchar.h>.  */
-# include <stdio.h>
-# include <time.h>
-# include <wchar.h>
-#endif
+#include <wchar.h>
 
 /* Get wcwidth().  */
 #include "wcwidth.h"
 
 /* Get iswcntrl().  */
-#if HAVE_WCTYPE_H
-# include <wctype.h>
-#endif
-#if !defined iswcntrl && !HAVE_ISWCNTRL
-# define iswcntrl(wc) (((wc) & ~0x1f) == 0 || (wc) == 0x7f)
-#endif
+#include <wctype.h>
 
 #ifndef mbsinit
 # if !HAVE_MBSINIT

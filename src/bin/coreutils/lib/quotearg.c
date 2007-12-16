@@ -1,6 +1,6 @@
 /* quotearg.c - quote arguments for output
 
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004, 2005, 2006 Free
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004, 2005, 2006, 2007 Free
    Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -31,19 +31,12 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wchar.h>
+#include <wctype.h>
 
 #include "gettext.h"
 #define _(msgid) gettext (msgid)
 #define N_(msgid) msgid
-
-#if HAVE_WCHAR_H
-
-/* BSD/OS 4.1 wchar.h requires FILE and struct tm to be declared.  */
-# include <stdio.h>
-# include <time.h>
-
-# include <wchar.h>
-#endif
 
 #if !HAVE_MBRTOWC
 /* Disable multibyte processing entirely.  Since MB_CUR_MAX is 1, the
@@ -60,15 +53,6 @@
 
 #if !defined mbsinit && !HAVE_MBSINIT
 # define mbsinit(ps) 1
-#endif
-
-#ifndef iswprint
-# if HAVE_WCTYPE_H
-#  include <wctype.h>
-# endif
-# if !defined iswprint && !HAVE_ISWPRINT
-#  define iswprint(wc) 1
-# endif
 #endif
 
 #ifndef SIZE_MAX

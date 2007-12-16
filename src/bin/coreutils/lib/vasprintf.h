@@ -1,5 +1,5 @@
 /* vsprintf with automatic memory allocation.
-   Copyright (C) 2002-2003 Free Software Foundation, Inc.
+   Copyright (C) 2002-2003, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,7 +23,9 @@
 /* Get asprintf(), vasprintf() declarations.  */
 #include <stdio.h>
 
-#else
+#endif
+
+#if !HAVE_VASPRINTF || REPLACE_VASPRINTF
 
 /* Get va_list.  */
 #include <stdarg.h>
@@ -41,7 +43,7 @@
 # endif
 #endif
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -49,12 +51,16 @@ extern "C" {
    If the memory allocation succeeds, store the address of the string in
    *RESULT and return the number of resulting bytes, excluding the trailing
    NUL.  Upon memory allocation error, or some other error, return -1.  */
+#if REPLACE_VASPRINTF
+# define asprintf rpl_asprintf
+# define vasprintf rpl_vasprintf
+#endif
 extern int asprintf (char **result, const char *format, ...)
        __attribute__ ((__format__ (__printf__, 2, 3)));
 extern int vasprintf (char **result, const char *format, va_list args)
        __attribute__ ((__format__ (__printf__, 2, 0)));
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 }
 #endif
 

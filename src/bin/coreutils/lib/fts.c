@@ -1,6 +1,6 @@
 /* Traverse a file hierarchy.
 
-   Copyright (C) 2004, 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005, 2006, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -138,6 +138,18 @@ enum Fts_stat
 # define HAVE_OPENAT_SUPPORT 0
 #endif
 
+#ifdef NDEBUG
+# define fts_assert(expr) ((void) 0)
+#else
+# define fts_assert(expr)	\
+    do				\
+      {				\
+	if (!(expr))		\
+	  abort ();		\
+      }				\
+    while (false)
+#endif
+
 static FTSENT	*fts_alloc (FTS *, const char *, size_t) internal_function;
 static FTSENT	*fts_build (FTS *, int) internal_function;
 static void	 fts_lfree (FTSENT *) internal_function;
@@ -150,13 +162,13 @@ static unsigned short int fts_stat (FTS *, FTSENT *, bool) internal_function;
 static int      fts_safe_changedir (FTS *, FTSENT *, int, const char *)
      internal_function;
 
-#if _LGPL_PACKAGE
+#if GNULIB_FTS
+# include "fts-cycle.c"
+#else
 static bool enter_dir (FTS *fts, FTSENT *ent) { return true; }
 static void leave_dir (FTS *fts, FTSENT *ent) {}
 static bool setup_dir (FTS *fts) { return true; }
 static void free_dir (FTS *fts) {}
-#else
-# include "fts-cycle.c"
 #endif
 
 #ifndef MAX
@@ -236,8 +248,7 @@ fd_ring_clear (I_ring *fd_ring)
 static void
 fts_set_stat_required (FTSENT *p, bool required)
 {
-  if (p->fts_info != FTS_NSOK)
-    abort ();
+  fts_assert (p->fts_info == FTS_NSOK);
   p->fts_statp->st_size = (required
 			   ? FTS_STAT_REQUIRED
 			   : FTS_NO_STAT_REQUIRED);
@@ -274,8 +285,7 @@ internal_function
 cwd_advance_fd (FTS *sp, int fd, bool chdir_down_one)
 {
   int old = sp->fts_cwd_fd;
-  if (old == fd && old != AT_FDCWD)
-    abort ();
+  fts_assert (old != fd || old == AT_FDCWD);
 
   if (chdir_down_one)
     {
@@ -688,6 +698,7 @@ fts_read (register FTS *sp)
 	/* Move to the next node on this level. */
 next:	tmp = p;
 	if ((p = p->fts_link) != NULL) {
+		sp->fts_cur = p;
 		free(tmp);
 
 		/*
@@ -698,7 +709,6 @@ next:	tmp = p;
 		if (p->fts_level == FTS_ROOTLEVEL) {
 			if (RESTORE_INITIAL_CWD(sp)) {
 				SET(FTS_STOP);
-				sp->fts_cur = p;
 				return (NULL);
 			}
 			fts_load(sp, p);
@@ -728,22 +738,15 @@ name:		t = sp->fts_path + NAPPEND(p->fts_parent);
 		*t++ = '/';
 		memmove(t, p->fts_name, p->fts_namelen + 1);
 check_for_dir:
+		sp->fts_cur = p;
 		if (p->fts_info == FTS_NSOK)
 		  {
-		    enum Fts_stat need_stat = p->fts_statp->st_size;
-		    switch (need_stat)
-		      {
-		      case FTS_STAT_REQUIRED:
-			p->fts_info = fts_stat(sp, p, false);
-			break;
-		      case FTS_NO_STAT_REQUIRED:
-			break;
-		      default:
-			abort ();
-		      }
+		    if (p->fts_statp->st_size == FTS_STAT_REQUIRED)
+		      p->fts_info = fts_stat(sp, p, false);
+		    else
+		      fts_assert (p->fts_statp->st_size == FTS_NO_STAT_REQUIRED);
 		  }
 
-		sp->fts_cur = p;
 		if (p->fts_info == FTS_D)
 		  {
 		    /* Now that P->fts_statp is guaranteed to be valid,
@@ -763,6 +766,7 @@ check_for_dir:
 
 	/* Move up to the parent node. */
 	p = tmp->fts_parent;
+	sp->fts_cur = p;
 	free(tmp);
 
 	if (p->fts_level == FTS_ROOTPARENTLEVEL) {
@@ -775,8 +779,7 @@ check_for_dir:
 		return (sp->fts_cur = NULL);
 	}
 
-	if (p->fts_info == FTS_NSOK)
-	  abort ();
+	fts_assert (p->fts_info != FTS_NSOK);
 
 	/* NUL terminate the file name.  */
 	sp->fts_path[p->fts_pathlen] = '\0';
@@ -809,7 +812,6 @@ check_for_dir:
 	p->fts_info = p->fts_errno ? FTS_ERR : FTS_DP;
 	if (p->fts_errno == 0)
 		LEAVE_DIR (sp, p, "3");
-	sp->fts_cur = p;
 	return ISSET(FTS_STOP) ? NULL : p;
 }
 
@@ -1345,7 +1347,7 @@ fd_ring_check (FTS const *sp)
 	      error (0, errno, "parent: %s", c2);
 	      free (cwd);
 	      free (c2);
-	      abort ();
+	      fts_assert (0);
 	    }
 	  close (cwd_fd);
 	  cwd_fd = parent_fd;
@@ -1403,7 +1405,7 @@ err:		memset(sbp, 0, sizeof(struct stat));
 			return (p->fts_level == FTS_ROOTLEVEL ? FTS_D : FTS_DOT);
 		}
 
-#if _LGPL_PACKAGE
+#if !GNULIB_FTS
 		{
 		  /*
 		   * Cycle detection is done by brute force when the directory

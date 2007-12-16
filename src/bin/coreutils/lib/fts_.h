@@ -1,6 +1,6 @@
 /* Traverse a file hierarchy.
 
-   Copyright (C) 2004, 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005, 2006, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -52,7 +52,6 @@
 
 # ifdef _LIBC
 #  include <features.h>
-#  define _LGPL_PACKAGE 1
 # else
 #  undef __THROW
 #  define __THROW
@@ -142,7 +141,7 @@ typedef struct {
 # define FTS_STOP	0x2000		/* (private) unrecoverable error */
 	int fts_options;		/* fts_open options, global flags */
 
-# if !_LGPL_PACKAGE
+# if GNULIB_FTS
 	union {
 		/* This data structure is used if FTS_TIGHT_CYCLE_CHECK is
 		   specified.  It records the directories between a starting

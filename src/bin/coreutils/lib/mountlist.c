@@ -1,7 +1,7 @@
 /* mountlist.c -- return a list of mounted file systems
 
    Copyright (C) 1991, 1992, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005, 2006 Free Software Foundation, Inc.
+   2004, 2005, 2006, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -27,10 +27,6 @@
 #include <string.h>
 
 #include "xalloc.h"
-
-#ifndef strstr
-char *strstr ();
-#endif
 
 #include <errno.h>
 
@@ -142,6 +138,16 @@ char *strstr ();
 #ifndef SIZE_MAX
 # define SIZE_MAX ((size_t) -1)
 #endif
+
+/* The results of open() in this file are not used with fchdir,
+   therefore save some unnecessary work in fchdir.c.  */
+#undef open
+#undef close
+
+/* The results of opendir() in this file are not used with dirfd and fchdir,
+   therefore save some unnecessary work in fchdir.c.  */
+#undef opendir
+#undef closedir
 
 #ifndef ME_DUMMY
 # define ME_DUMMY(Fs_name, Fs_type)		\

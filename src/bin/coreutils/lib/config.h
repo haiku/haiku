@@ -120,6 +120,9 @@
    */
 /* #undef GETLOADAVG_PRIVILEGED */
 
+/* Define to 1 when using the gnulib module canonicalize. */
+#define GNULIB_CANONICALIZE 1
+
 /* Define to 1 when using the gnulib close-stream module. */
 #define GNULIB_CLOSE_STREAM 1
 
@@ -1767,7 +1770,7 @@
 #define gl_va_copy(a,b) ((a) = (b))
 
 /* Define to rpl_gmtime if the replacement function should be used. */
-#define gmtime rpl_gmtime
+/* #undef gmtime rpl_gmtime */
 
 /* Define to `__inline__' or `__inline' if that's what the C compiler
    calls it, or to nothing if 'inline' is not supported under any name.  */
@@ -1782,7 +1785,7 @@
 /* #undef intmax_t */
 
 /* Define to rpl_localtime if the replacement function should be used. */
-#define localtime rpl_localtime
+/* #undef localtime rpl_localtime */
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 #define major_t unsigned int
@@ -1869,7 +1872,7 @@
 #define regexec rpl_regexec
 
 /* Define to rpl_regfree if the replacement should be used. */
-#define regfree rpl_regfree
+/* #undef regfree rpl_regfree */
 
 /* Define to rpl_rename_dest_slash if the replacement function should be used.
    */
@@ -1895,7 +1898,7 @@
 /* #undef strtod */
 
 /* Define to rpl_tzset if the wrapper function should be used. */
-#define tzset rpl_tzset
+/* #undef tzset rpl_tzset */
 
 /* Define to `int' if <sys/types.h> doesn't define. */
 /* #undef uid_t */

@@ -1,4 +1,4 @@
-/* Copyright (C) 2001, 2002, 2003, 2006 Free Software Foundation, Inc.
+/* Copyright (C) 2001, 2002, 2003, 2006, 2007 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2001.
 
    This program is free software; you can redistribute it and/or modify
@@ -40,6 +40,9 @@
        - <stdbool.h> must be #included before the '_Bool' type can be used.
 
        - You cannot assume that _Bool is a typedef; it might be a macro.
+
+       - Bit-fields of type 'bool' are not supported.  Portable code
+         should use 'unsigned int foo : 1;' rather than 'bool foo : 1;'.
 
        - In C99, casts and automatic conversions to '_Bool' or 'bool' are
          performed in such a way that every nonzero value gets converted

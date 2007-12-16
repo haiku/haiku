@@ -1,6 +1,7 @@
 /* Convert string representation of a number into an integer value.
 
-   Copyright (C) 1991, 1992, 1994, 1995, 1996, 1997, 1998, 1999, 2003, 2005, 2006
+   Copyright (C) 1991, 1992, 1994, 1995, 1996, 1997, 1998, 1999, 2003, 2005,
+   2006, 2007
    Free Software Foundation, Inc.
 
    NOTE: The canonical source of this file is maintained with the GNU C
@@ -187,9 +188,7 @@
 # define LOCALE_PARAM_PROTO
 #endif
 
-#if defined _LIBC || defined HAVE_WCHAR_H
-# include <wchar.h>
-#endif
+#include <wchar.h>
 
 #ifdef USE_WIDE_CHAR
 # include <wctype.h>

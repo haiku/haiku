@@ -1,6 +1,6 @@
 /* acl.c - access control lists
 
-   Copyright (C) 2002, 2003, 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2005, 2006, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,97 +20,9 @@
 
 #include <config.h>
 
-#include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#ifndef S_ISLNK
-# define S_ISLNK(Mode) 0
-#endif
-
-#ifdef HAVE_ACL_LIBACL_H
-# include <acl/libacl.h>
-#endif
-
 #include "acl.h"
-#include "error.h"
-#include "quote.h"
 
-#include <errno.h>
-#ifndef ENOSYS
-# define ENOSYS (-1)
-#endif
-#ifndef ENOTSUP
-# define ENOTSUP (-1)
-#endif
-
-#if ENABLE_NLS
-# include <libintl.h>
-# define _(Text) gettext (Text)
-#else
-# define _(Text) Text
-#endif
-
-#ifndef HAVE_FCHMOD
-# define HAVE_FCHMOD false
-# define fchmod(fd, mode) (-1)
-#endif
-
-/* POSIX 1003.1e (draft 17) */
-#ifndef HAVE_ACL_GET_FD
-# define HAVE_ACL_GET_FD false
-# define acl_get_fd(fd) (NULL)
-#endif
-
-/* POSIX 1003.1e (draft 17) */
-#ifndef HAVE_ACL_SET_FD
-# define HAVE_ACL_SET_FD false
-# define acl_set_fd(fd, acl) (-1)
-#endif
-
-/* Linux-specific */
-#ifndef HAVE_ACL_EXTENDED_FILE
-# define HAVE_ACL_EXTENDED_FILE false
-# define acl_extended_file(name) (-1)
-#endif
-
-/* Linux-specific */
-#ifndef HAVE_ACL_FROM_MODE
-# define HAVE_ACL_FROM_MODE false
-# define acl_from_mode(mode) (NULL)
-#endif
-
-/* We detect the presence of POSIX 1003.1e (draft 17 -- abandoned) support
-   by checking for HAVE_ACL_GET_FILE, HAVE_ACL_SET_FILE, and HAVE_ACL_FREE.
-   Systems that have acl_get_file, acl_set_file, and acl_free must also
-   have acl_to_text, acl_from_text, and acl_delete_def_file (all defined
-   in the draft); systems that don't would hit #error statements here.  */
-
-#if USE_ACL && HAVE_ACL_GET_FILE && !HAVE_ACL_ENTRIES
-# ifndef HAVE_ACL_TO_TEXT
-#  error Must have acl_to_text (see POSIX 1003.1e draft 17).
-# endif
-
-/* Return the number of entries in ACL. Linux implements acl_entries
-   as a more efficient extension than using this workaround.  */
-
-static int
-acl_entries (acl_t acl)
-{
-  char *text = acl_to_text (acl, NULL), *t;
-  int entries;
-  if (text == NULL)
-    return -1;
-  for (entries = 0, t = text; ; t++, entries++) {
-    t = strchr (t, '\n');
-    if (t == NULL)
-      break;
-  }
-  acl_free (text);
-  return entries;
-}
-#endif
+#include "acl-internal.h"
 
 /* If DESC is a valid file descriptor use fchmod to change the
    file's mode to MODE on systems that have fchown. On systems
@@ -124,69 +36,6 @@ chmod_or_fchmod (const char *name, int desc, mode_t mode)
     return fchmod (desc, mode);
   else
     return chmod (name, mode);
-}
-
-/* Return 1 if NAME has a nontrivial access control list, 0 if
-   NAME only has no or a base access control list, and -1 on
-   error.  SB must be set to the stat buffer of FILE.  */
-
-int
-file_has_acl (char const *name, struct stat const *sb)
-{
-#if USE_ACL && HAVE_ACL && defined GETACLCNT
-  /* This implementation should work on recent-enough versions of HP-UX,
-     Solaris, and Unixware.  */
-
-# ifndef MIN_ACL_ENTRIES
-#  define MIN_ACL_ENTRIES 4
-# endif
-
-  if (! S_ISLNK (sb->st_mode))
-    {
-      int n = acl (name, GETACLCNT, 0, NULL);
-      return n < 0 ? (errno == ENOSYS ? 0 : -1) : (MIN_ACL_ENTRIES < n);
-    }
-#elif USE_ACL && HAVE_ACL_GET_FILE && HAVE_ACL_FREE
-  /* POSIX 1003.1e (draft 17 -- abandoned) specific version.  */
-
-  if (! S_ISLNK (sb->st_mode))
-    {
-      int ret;
-
-      if (HAVE_ACL_EXTENDED_FILE)
-	ret = acl_extended_file (name);
-      else
-	{
-	  acl_t acl = acl_get_file (name, ACL_TYPE_ACCESS);
-	  if (acl)
-	    {
-	      ret = (3 < acl_entries (acl));
-	      acl_free (acl);
-	      if (ret == 0 && S_ISDIR (sb->st_mode))
-		{
-		  acl = acl_get_file (name, ACL_TYPE_DEFAULT);
-		  if (acl)
-		    {
-		      ret = (0 < acl_entries (acl));
-		      acl_free (acl);
-		    }
-		  else
-		    ret = -1;
-		}
-	    }
-	  else
-	    ret = -1;
-	}
-      if (ret < 0)
-	return (errno == ENOSYS || errno == ENOTSUP) ? 0 : -1;
-      return ret;
-    }
-#endif
-
-  /* FIXME: Add support for AIX, Irix, and Tru64.  Please see Samba's
-     source/lib/sysacls.c file for fix-related ideas.  */
-
-  return 0;
 }
 
 /* Copy access control lists from one file to another. If SOURCE_DESC is
@@ -214,7 +63,7 @@ copy_acl (const char *src_name, int source_desc, const char *dst_name,
     acl = acl_get_file (src_name, ACL_TYPE_ACCESS);
   if (acl == NULL)
     {
-      if (errno == ENOSYS || errno == ENOTSUP)
+      if (ACL_NOT_WELL_SUPPORTED (errno))
 	return set_acl (dst_name, dest_desc, mode);
       else
         {
@@ -231,7 +80,7 @@ copy_acl (const char *src_name, int source_desc, const char *dst_name,
     {
       int saved_errno = errno;
 
-      if (errno == ENOSYS || errno == ENOTSUP)
+      if (ACL_NOT_WELL_SUPPORTED (errno))
         {
 	  int n = acl_entries (acl);
 
@@ -367,7 +216,7 @@ set_acl (char const *name, int desc, mode_t mode)
       int saved_errno = errno;
       acl_free (acl);
 
-      if (errno == ENOTSUP || errno == ENOSYS)
+      if (ACL_NOT_WELL_SUPPORTED (errno))
 	{
 	  if (chmod_or_fchmod (name, desc, mode) != 0)
 	    saved_errno = errno;

@@ -24,7 +24,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "getline.h"
+#if ENABLE_NLS
+# include "getline.h"
+#endif
 
 /* Return true if we read an affirmative line from standard input.  */
 
@@ -33,10 +35,12 @@ extern int rpmatch (char const *response);
 bool
 yesno (void)
 {
+  bool yes;
+
+#if ENABLE_NLS
   char *response = NULL;
   size_t response_size = 0;
   ssize_t response_len = getline (&response, &response_size, stdin);
-  bool yes;
 
   if (response_len <= 0)
     yes = false;
@@ -47,5 +51,14 @@ yesno (void)
     }
 
   free (response);
+#else
+  /* Test against "^[yY]", hardcoded to avoid requiring getline,
+     regex, and rpmatch.  */
+  int c = getchar ();
+  yes = (c == 'y' || c == 'Y');
+  while (c != '\n' && c != EOF)
+    c = getchar ();
+#endif
+
   return yes;
 }

@@ -1,5 +1,6 @@
-/* Duplicate a size-bounded string.
-   Copyright (C) 2003, 2006 Free Software Foundation, Inc.
+/* A substitute for ISO C99 <wchar.h>, for platforms that have issues.
+
+   Copyright (C) 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,18 +16,27 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-/* Get size_t.  */
-#include <stddef.h>
-/* If HAVE_STRNDUP, get the strndup declaration.
-   If !HAVE_STRNDUP, include <string.h> now so that it doesn't cause
-   trouble if included later.  */
-#include <string.h>
+/* Written by Eric Blake.  */
 
-#if !HAVE_STRNDUP
-# undef strndup
-# define strndup rpl_strndup
-# if !HAVE_DECL_STRNDUP  /* Don't risk conflicting declarations.  */
-/* Return a newly allocated copy of at most N bytes of STRING.  */
-extern char *strndup (const char *string, size_t n);
-# endif
-#endif
+/*
+ * ISO C 99 <wchar.h> for platforms that have issues.
+ * <http://www.opengroup.org/susv3xbd/wchar.h.html>
+ *
+ * For now, this just ensures proper prerequisite inclusion order.
+ */
+
+#ifndef _GL_WCHAR_H
+#define _GL_WCHAR_H
+
+/* Tru64 with Desktop Toolkit C has a bug: <stdio.h> must be included before
+   <wchar.h>.
+   BSD/OS 4.0.1 has a bug: <stddef.h>, <stdio.h> and <time.h> must be
+   included before <wchar.h>.  */
+#include <stddef.h>
+#include <stdio.h>
+#include <time.h>
+
+/* Include the original <wchar.h>.  */
+#include @ABSOLUTE_WCHAR_H@
+
+#endif /* _GL_WCHAR_H */

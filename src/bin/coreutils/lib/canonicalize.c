@@ -1,5 +1,5 @@
 /* Return the canonical absolute name of a given file.
-   Copyright (C) 1996-2006 Free Software Foundation, Inc.
+   Copyright (C) 1996-2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -246,7 +246,7 @@ canonicalize_filename_mode (const char *name, canonicalize_mode_t can_mode)
 		    goto error;
 		}
 
-	      buf = xreadlink (rname, st.st_size);
+	      buf = xreadlink_with_size (rname, st.st_size);
 	      if (!buf)
 		{
 		  if (can_mode == CAN_MISSING)

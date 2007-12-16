@@ -1,5 +1,5 @@
 /* dircolors - output commands to set the LS_COLOR environment variable
-   Copyright (C) 1996-2006 Free Software Foundation, Inc.
+   Copyright (C) 1996-2007 Free Software Foundation, Inc.
    Copyright (C) 1994, 1995, 1997, 1998, 1999, 2000 H. Peter Anvin
 
    This program is free software; you can redistribute it and/or modify
@@ -24,11 +24,11 @@
 
 #include "system.h"
 #include "dircolors.h"
+#include "c-strcase.h"
 #include "error.h"
 #include "getline.h"
 #include "obstack.h"
 #include "quote.h"
-#include "strcase.h"
 #include "xstrndup.h"
 
 /* The official name of this program (e.g., no `g' prefix).  */
@@ -296,7 +296,7 @@ dc_parse_stream (FILE *fp, const char *filename)
 	}
 
       unrecognized = false;
-      if (strcasecmp (keywd, "TERM") == 0)
+      if (c_strcasecmp (keywd, "TERM") == 0)
 	{
 	  if (STREQ (arg, term))
 	    state = ST_TERMSURE;
@@ -325,9 +325,9 @@ dc_parse_stream (FILE *fp, const char *filename)
 		  append_quoted (arg);
 		  APPEND_CHAR (':');
 		}
-	      else if (strcasecmp (keywd, "OPTIONS") == 0
-		       || strcasecmp (keywd, "COLOR") == 0
-		       || strcasecmp (keywd, "EIGHTBIT") == 0)
+	      else if (c_strcasecmp (keywd, "OPTIONS") == 0
+		       || c_strcasecmp (keywd, "COLOR") == 0
+		       || c_strcasecmp (keywd, "EIGHTBIT") == 0)
 		{
 		  /* Ignore.  */
 		}
@@ -336,7 +336,7 @@ dc_parse_stream (FILE *fp, const char *filename)
 		  int i;
 
 		  for (i = 0; slack_codes[i] != NULL; ++i)
-		    if (strcasecmp (keywd, slack_codes[i]) == 0)
+		    if (c_strcasecmp (keywd, slack_codes[i]) == 0)
 		      break;
 
 		  if (slack_codes[i] != NULL)

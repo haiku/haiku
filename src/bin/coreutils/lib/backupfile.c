@@ -82,6 +82,11 @@
    of `digit' even when the host does not conform to POSIX.  */
 #define ISDIGIT(c) ((unsigned int) (c) - '0' <= 9)
 
+/* The results of opendir() in this file are not used with dirfd and fchdir,
+   therefore save some unnecessary work in fchdir.c.  */
+#undef opendir
+#undef closedir
+
 /* The extension added to file names to produce a simple (as opposed
    to numbered) backup file name. */
 char const *simple_backup_suffix = "~";

@@ -1,5 +1,5 @@
 /* copy.c -- core functions for copying files and directories
-   Copyright (C) 89, 90, 91, 1995-2006 Free Software Foundation.
+   Copyright (C) 89, 90, 91, 1995-2007 Free Software Foundation.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@
 #include "euidaccess.h"
 #include "error.h"
 #include "fcntl--.h"
+#include "filemode.h"
 #include "filenamecat.h"
 #include "full-write.h"
 #include "getpagesize.h"
@@ -365,8 +366,8 @@ copy_reg (char const *src_name, char const *dst_name,
       goto close_src_desc;
     }
 
-  /* These semantics are required for cp.
-     The if-block will be taken in move_mode.  */
+  /* The semantics of the following open calls are mandated
+     by the specs for both cp and mv.  */
   if (! *new_dst)
     {
       dest_desc = open (dst_name, O_WRONLY | O_TRUNC | O_BINARY);
@@ -504,7 +505,17 @@ copy_reg (char const *src_name, char const *dst_name,
 	    {
 	      char *cp;
 
-	      buf[n_read] = 1;	/* Sentinel to stop loop.  */
+	      /* Sentinel to stop loop.  */
+	      buf[n_read] = '\1';
+#ifdef lint
+	      /* Usually, buf[n_read] is not the byte just before a "word"
+		 (aka uintptr_t) boundary.  In that case, the word-oriented
+		 test below (*wp++ == 0) would read some uninitialized bytes
+		 after the sentinel.  To avoid false-positive reports about
+		 this condition (e.g., from a tool like valgrind), set the
+		 remaining bytes -- to any value.  */
+	      memset (buf + n_read + 1, 0, sizeof (word) - 1);
+#endif
 
 	      /* Find first nonzero *word*, or the word with the sentinel.  */
 
@@ -861,10 +872,14 @@ overwrite_prompt (char const *dst_name, struct stat const *dst_sb)
 {
   if (euidaccess (dst_name, W_OK) != 0)
     {
+      char perms[12];		/* "-rwxrwxrwx " ls-style modes. */
+      strmode (dst_sb->st_mode, perms);
+      perms[10] = '\0';
       fprintf (stderr,
-	       _("%s: overwrite %s, overriding mode %04lo? "),
+	       _("%s: try to overwrite %s, overriding mode %04lo (%s)? "),
 	       program_name, quote (dst_name),
-	       (unsigned long int) (dst_sb->st_mode & CHMOD_MODE_BITS));
+	       (unsigned long int) (dst_sb->st_mode & CHMOD_MODE_BITS),
+	       &perms[1]);
     }
   else
     {
@@ -1079,6 +1094,7 @@ copy_internal (char const *src_name, char const *dst_name,
   struct stat dst_sb;
   mode_t src_mode;
   mode_t dst_mode IF_LINT (= 0);
+  mode_t dst_mode_bits;
   mode_t omitted_permissions;
   bool restore_dst_mode = false;
   char *earlier_file = NULL;
@@ -1591,13 +1607,16 @@ copy_internal (char const *src_name, char const *dst_name,
       new_dst = true;
     }
 
-  /* If the ownership might change, omit some permissions at first, so
-     unauthorized users cannot nip in before the file has the right
-     ownership.  */
+  /* If the ownership might change, or if it is a directory (whose
+     special mode bits may change after the directory is created),
+     omit some permissions at first, so unauthorized users cannot nip
+     in before the file is ready.  */
+  dst_mode_bits = (x->set_mode ? x->mode : src_mode) & CHMOD_MODE_BITS;
   omitted_permissions =
-    (x->preserve_ownership
-     ? (x->set_mode ? x->mode : src_mode) & (S_IRWXG | S_IRWXO)
-     : 0);
+    (dst_mode_bits
+     & (x->preserve_ownership ? S_IRWXG | S_IRWXO
+	: S_ISDIR (src_mode) ? S_IWGRP | S_IWOTH
+	: 0));
 
   delayed_ok = true;
 
@@ -1636,10 +1655,7 @@ copy_internal (char const *src_name, char const *dst_name,
 	     (src_mode & ~S_IRWXUGO) != 0.  However, common practice is
 	     to ask mkdir to copy all the CHMOD_MODE_BITS, letting mkdir
 	     decide what to do with S_ISUID | S_ISGID | S_ISVTX.  */
-	  mode_t mkdir_mode =
-	    ((x->set_mode ? x->mode : src_mode)
-	     & CHMOD_MODE_BITS & ~omitted_permissions);
-	  if (mkdir (dst_name, mkdir_mode) != 0)
+	  if (mkdir (dst_name, dst_mode_bits & ~omitted_permissions) != 0)
 	    {
 	      error (0, errno, _("cannot create directory %s"),
 		     quote (dst_name));
@@ -1680,19 +1696,20 @@ copy_internal (char const *src_name, char const *dst_name,
 	    emit_verbose (src_name, dst_name, NULL);
 	}
 
-      /* Are we crossing a file system boundary?  */
+      /* Decide whether to copy the contents of the directory.  */
       if (x->one_file_system && device != 0 && device != src_sb.st_dev)
-	return true;
-
-      /* Copy the contents of the directory.  */
-
-      if (! copy_dir (src_name, dst_name, new_dst, &src_sb, dir, x,
-		      copy_into_self))
 	{
-	  /* Don't just return here -- otherwise, the failure to read a
-	     single file in a source directory would cause the containing
-	     destination directory not to have owner/perms set properly.  */
-	  delayed_ok = false;
+	  /* Here, we are crossing a file system boundary and cp's -x option
+	     is in effect: so don't copy the contents of this directory. */
+	}
+      else
+	{
+	  /* Copy the contents of the directory.  Don't just return if
+	     this fails -- otherwise, the failure to read a single file
+	     in a source directory would cause the containing destination
+	     directory not to have owner/perms set properly.  */
+	  delayed_ok = copy_dir (src_name, dst_name, new_dst, &src_sb, dir, x,
+				 copy_into_self);
 	}
     }
   else if (x->symbolic_link)
@@ -1773,12 +1790,16 @@ copy_internal (char const *src_name, char const *dst_name,
     {
       /* Use mknod, rather than mkfifo, because the former preserves
 	 the special mode bits of a fifo on Solaris 10, while mkfifo
-	 does not.  */
+	 does not.  But fall back on mkfifo, because on some BSD systems,
+	 mknod always fails when asked to create a FIFO.  */
       if (mknod (dst_name, src_mode & ~omitted_permissions, 0) != 0)
-	{
-	  error (0, errno, _("cannot create fifo %s"), quote (dst_name));
-	  goto un_backup;
-	}
+#if HAVE_MKFIFO
+	if (mkfifo (dst_name, src_mode & ~S_IFIFO & ~omitted_permissions) != 0)
+#endif
+	  {
+	    error (0, errno, _("cannot create fifo %s"), quote (dst_name));
+	    goto un_backup;
+	  }
     }
   else if (S_ISBLK (src_mode) || S_ISCHR (src_mode) || S_ISSOCK (src_mode))
     {
@@ -1792,7 +1813,7 @@ copy_internal (char const *src_name, char const *dst_name,
     }
   else if (S_ISLNK (src_mode))
     {
-      char *src_link_val = xreadlink (src_name, src_sb.st_size);
+      char *src_link_val = xreadlink_with_size (src_name, src_sb.st_size);
       if (src_link_val == NULL)
 	{
 	  error (0, errno, _("cannot read symbolic link %s"), quote (src_name));
@@ -1812,7 +1833,8 @@ copy_internal (char const *src_name, char const *dst_name,
 		 FIXME: This behavior isn't documented, and seems wrong
 		 in some cases, e.g., if the destination symlink has the
 		 wrong ownership, permissions, or time stamps.  */
-	      char *dest_link_val = xreadlink (dst_name, dst_sb.st_size);
+	      char *dest_link_val =
+		xreadlink_with_size (dst_name, dst_sb.st_size);
 	      if (STREQ (dest_link_val, src_link_val))
 		same_link = true;
 	      free (dest_link_val);
@@ -2062,7 +2084,7 @@ chown_failure_ok (struct cp_options const *x)
 extern mode_t
 cached_umask (void)
 {
-  static mode_t mask = -1;
+  static mode_t mask = (mode_t) -1;
   if (mask == (mode_t) -1)
     {
       mask = umask (0);

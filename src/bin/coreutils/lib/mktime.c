@@ -1,7 +1,5 @@
-/* -*- buffer-read-only: t -*- vi: set ro: */
-/* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 /* Convert a `struct tm' to a time_t value.
-   Copyright (C) 1993-1999, 2002-2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 1993-1999, 2002-2005, 2006, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Paul Eggert <eggert@twinsun.com>.
 
@@ -23,7 +21,7 @@
    mktime.  */
 /* #define DEBUG 1 */
 
-#if 1
+#ifndef _LIBC
 # include <config.h>
 #endif
 
@@ -34,7 +32,6 @@
 # define LEAP_SECONDS_POSSIBLE 1
 #endif
 
-#include <sys/types.h>		/* Some systems define `time_t' here.  */
 #include <time.h>
 
 #include <limits.h>
@@ -143,11 +140,10 @@ const unsigned short int __mon_yday[2][13] =
 
 
 #ifndef _LIBC
-/* Portable standalone applications should supply a "time_r.h" that
+/* Portable standalone applications should supply a <time.h> that
    declares a POSIX-compliant localtime_r, for the benefit of older
    implementations that lack localtime_r or have a nonstandard one.
    See the gnulib time_r module for one way to implement this.  */
-# include "time_r.h"
 # undef __localtime_r
 # define __localtime_r localtime_r
 # define __mktime_internal mktime_internal

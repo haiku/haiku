@@ -1,5 +1,5 @@
 /* chown-core.c -- core functions for changing ownership.
-   Copyright (C) 2000, 2002, 2003, 2004, 2005, 2006 Free Software Foundation.
+   Copyright (C) 2000, 2002, 2003, 2004, 2005, 2006, 2007 Free Software Foundation.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -31,6 +31,12 @@
 #include "quote.h"
 #include "root-dev-ino.h"
 #include "xfts.h"
+
+#define FTSENT_IS_DIRECTORY(E)	\
+  ((E)->fts_info == FTS_D	\
+   || (E)->fts_info == FTS_DC	\
+   || (E)->fts_info == FTS_DP	\
+   || (E)->fts_info == FTS_DNR)
 
 enum RCH_status
   {
@@ -258,7 +264,20 @@ change_file_owner (FTS *fts, FTSENT *ent,
     {
     case FTS_D:
       if (chopt->recurse)
-	return true;
+	{
+	  if (ROOT_DEV_INO_CHECK (chopt->root_dev_ino, ent->fts_statp))
+	    {
+	      /* This happens e.g., with "chown -R --preserve-root 0 /"
+		 and with "chown -RH --preserve-root 0 symlink-to-root".  */
+	      ROOT_DEV_INO_WARN (file_full_name);
+	      /* Tell fts not to traverse into this hierarchy.  */
+	      fts_set (fts, ent, FTS_SKIP);
+	      /* Ensure that we do not process "/" on the second visit.  */
+	      ent = fts_read (fts);
+	      return false;
+	    }
+	  return true;
+	}
       break;
 
     case FTS_DP:
@@ -337,15 +356,13 @@ change_file_owner (FTS *fts, FTSENT *ent,
 		      || required_gid == file_stats->st_gid));
     }
 
-  if (do_chown
-      /* With FTS_NOSTAT, file_stats is valid only for directories.
-	 Don't need to check for FTS_D, since it is handled above,
-	 and same for FTS_DNR, since then do_chown is false.  */
-      && (ent->fts_info == FTS_DP || ent->fts_info == FTS_DC)
+  /* This happens when chown -LR --preserve-root encounters a symlink-to-/.  */
+  if (ok
+      && FTSENT_IS_DIRECTORY (ent)
       && ROOT_DEV_INO_CHECK (chopt->root_dev_ino, file_stats))
     {
       ROOT_DEV_INO_WARN (file_full_name);
-      ok = do_chown = false;
+      return false;
     }
 
   if (do_chown)

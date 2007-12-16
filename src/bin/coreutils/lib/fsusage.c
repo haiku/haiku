@@ -56,6 +56,11 @@
 # include "full-read.h"
 #endif
 
+/* The results of open() in this file are not used with fchdir,
+   therefore save some unnecessary work in fchdir.c.  */
+#undef open
+#undef close
+
 /* Many space usage primitives use all 1 bits to denote a value that is
    not applicable or unknown.  Propagate this information by returning
    a uintmax_t value that is all 1 bits if X is all 1 bits, even if X

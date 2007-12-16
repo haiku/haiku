@@ -1,5 +1,5 @@
 /* An interface to read() that retries after interrupts.
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,9 +17,19 @@
 
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #define SAFE_READ_ERROR ((size_t) -1)
 
 /* Read up to COUNT bytes at BUF from descriptor FD, retrying if interrupted.
    Return the actual number of bytes read, zero for EOF, or SAFE_READ_ERROR
    upon error.  */
 extern size_t safe_read (int fd, void *buf, size_t count);
+
+
+#ifdef __cplusplus
+}
+#endif

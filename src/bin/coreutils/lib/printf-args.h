@@ -1,5 +1,5 @@
 /* Decomposed printf argument list.
-   Copyright (C) 1999, 2002-2003, 2006 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2002-2003, 2006-2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,12 +22,12 @@
 #include <stddef.h>
 
 /* Get wchar_t.  */
-#ifdef HAVE_WCHAR_T
+#if HAVE_WCHAR_T
 # include <stddef.h>
 #endif
 
 /* Get wint_t.  */
-#ifdef HAVE_WINT_T
+#if HAVE_WINT_T
 # include <wchar.h>
 #endif
 
@@ -47,20 +47,20 @@ typedef enum
   TYPE_UINT,
   TYPE_LONGINT,
   TYPE_ULONGINT,
-#ifdef HAVE_LONG_LONG_INT
+#if HAVE_LONG_LONG_INT
   TYPE_LONGLONGINT,
   TYPE_ULONGLONGINT,
 #endif
   TYPE_DOUBLE,
-#ifdef HAVE_LONG_DOUBLE
+#if HAVE_LONG_DOUBLE
   TYPE_LONGDOUBLE,
 #endif
   TYPE_CHAR,
-#ifdef HAVE_WINT_T
+#if HAVE_WINT_T
   TYPE_WIDE_CHAR,
 #endif
   TYPE_STRING,
-#ifdef HAVE_WCHAR_T
+#if HAVE_WCHAR_T
   TYPE_WIDE_STRING,
 #endif
   TYPE_POINTER,
@@ -68,7 +68,7 @@ typedef enum
   TYPE_COUNT_SHORT_POINTER,
   TYPE_COUNT_INT_POINTER,
   TYPE_COUNT_LONGINT_POINTER
-#ifdef HAVE_LONG_LONG_INT
+#if HAVE_LONG_LONG_INT
 , TYPE_COUNT_LONGLONGINT_POINTER
 #endif
 } arg_type;
@@ -87,21 +87,21 @@ typedef struct
     unsigned int		a_uint;
     long int			a_longint;
     unsigned long int		a_ulongint;
-#ifdef HAVE_LONG_LONG_INT
+#if HAVE_LONG_LONG_INT
     long long int		a_longlongint;
     unsigned long long int	a_ulonglongint;
 #endif
     float			a_float;
     double			a_double;
-#ifdef HAVE_LONG_DOUBLE
+#if HAVE_LONG_DOUBLE
     long double			a_longdouble;
 #endif
     int				a_char;
-#ifdef HAVE_WINT_T
+#if HAVE_WINT_T
     wint_t			a_wide_char;
 #endif
     const char*			a_string;
-#ifdef HAVE_WCHAR_T
+#if HAVE_WCHAR_T
     const wchar_t*		a_wide_string;
 #endif
     void*			a_pointer;
@@ -109,7 +109,7 @@ typedef struct
     short *			a_count_short_pointer;
     int *			a_count_int_pointer;
     long int *			a_count_longint_pointer;
-#ifdef HAVE_LONG_LONG_INT
+#if HAVE_LONG_LONG_INT
     long long int *		a_count_longlongint_pointer;
 #endif
   }

@@ -1,5 +1,5 @@
 /* Decomposed printf argument list.
-   Copyright (C) 1999, 2002-2003, 2005-2006 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2002-2003, 2005-2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ printf_fetchargs (va_list args, arguments *a)
       case TYPE_ULONGINT:
 	ap->a.a_ulongint = va_arg (args, unsigned long int);
 	break;
-#ifdef HAVE_LONG_LONG_INT
+#if HAVE_LONG_LONG_INT
       case TYPE_LONGLONGINT:
 	ap->a.a_longlongint = va_arg (args, long long int);
 	break;
@@ -67,7 +67,7 @@ printf_fetchargs (va_list args, arguments *a)
       case TYPE_DOUBLE:
 	ap->a.a_double = va_arg (args, double);
 	break;
-#ifdef HAVE_LONG_DOUBLE
+#if HAVE_LONG_DOUBLE
       case TYPE_LONGDOUBLE:
 	ap->a.a_longdouble = va_arg (args, long double);
 	break;
@@ -75,7 +75,7 @@ printf_fetchargs (va_list args, arguments *a)
       case TYPE_CHAR:
 	ap->a.a_char = va_arg (args, int);
 	break;
-#ifdef HAVE_WINT_T
+#if HAVE_WINT_T
       case TYPE_WIDE_CHAR:
 	/* Although ISO C 99 7.24.1.(2) says that wint_t is "unchanged by
 	   default argument promotions", this is not the case in mingw32,
@@ -94,7 +94,7 @@ printf_fetchargs (va_list args, arguments *a)
 	if (ap->a.a_string == NULL)
 	  ap->a.a_string = "(NULL)";
 	break;
-#ifdef HAVE_WCHAR_T
+#if HAVE_WCHAR_T
       case TYPE_WIDE_STRING:
 	ap->a.a_wide_string = va_arg (args, const wchar_t *);
 	/* A null pointer is an invalid argument for "%ls", but in practice
@@ -128,7 +128,7 @@ printf_fetchargs (va_list args, arguments *a)
       case TYPE_COUNT_LONGINT_POINTER:
 	ap->a.a_count_longint_pointer = va_arg (args, long int *);
 	break;
-#ifdef HAVE_LONG_LONG_INT
+#if HAVE_LONG_LONG_INT
       case TYPE_COUNT_LONGLONGINT_POINTER:
 	ap->a.a_count_longlongint_pointer = va_arg (args, long long int *);
 	break;

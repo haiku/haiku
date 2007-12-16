@@ -18,12 +18,16 @@
 
    Written by Paul Eggert.  */
 
+#include <sys/types.h>
+
 #if HAVE_SYS_ACL_H
 # include <sys/acl.h>
 #endif
 #if defined HAVE_ACL && ! defined GETACLCNT && defined ACL_CNT
 # define GETACLCNT ACL_CNT
 #endif
+
+#include <sys/stat.h>
 
 int file_has_acl (char const *, struct stat const *);
 int copy_acl (char const *, int, char const *, int, mode_t);

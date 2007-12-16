@@ -1,5 +1,5 @@
 /* dd -- convert a file while copying it.
-   Copyright (C) 85, 90, 91, 1995-2006 Free Software Foundation, Inc.
+   Copyright (C) 85, 90, 91, 1995-2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -265,7 +265,7 @@ static struct symbol_value const flags[] =
   {"direct",	O_DIRECT},
   {"directory",	O_DIRECTORY},
   {"dsync",	O_DSYNC},
-  {"noatime",	HAVE_WORKING_O_NOATIME ? O_NOATIME : 0},
+  {"noatime",	O_NOATIME},
   {"noctty",	O_NOCTTY},
   {"nofollow",	HAVE_WORKING_O_NOFOLLOW ? O_NOFOLLOW : 0},
   {"nolinks",	O_NOLINKS},
@@ -452,7 +452,7 @@ Each CONV symbol may be:\n\
       fputs (_("\
   noerror   continue after read errors\n\
   sync      pad every input block with NULs to ibs-size; when used\n\
-              with block or unblock, pad with spaces rather than NULs\n\
+            with block or unblock, pad with spaces rather than NULs\n\
   fdatasync  physically write output file data before finishing\n\
   fsync     likewise, but also write metadata\n\
 "), stdout);
@@ -472,7 +472,7 @@ Each FLAG symbol may be:\n\
 	fputs (_("  sync      likewise, but also for metadata\n"), stdout);
       if (O_NONBLOCK)
 	fputs (_("  nonblock  use non-blocking I/O\n"), stdout);
-      if (HAVE_WORKING_O_NOATIME)
+      if (O_NOATIME)
 	fputs (_("  noatime   do not update access time\n"), stdout);
       if (O_NOCTTY)
 	fputs (_("  noctty    do not assign controlling terminal from file\n"),
@@ -873,6 +873,7 @@ static void
 scanargs (int argc, char **argv)
 {
   int i;
+  size_t blocksize = 0;
 
   for (i = optind; i < argc; i++)
     {
@@ -923,7 +924,7 @@ scanargs (int argc, char **argv)
 	  else if (STREQ (name, "bs"))
 	    {
 	      invalid |= ! (0 < n && n <= MAX_BLOCKSIZE (INPUT_BLOCK_SLOP));
-	      output_blocksize = input_blocksize = n;
+	      blocksize = n;
 	    }
 	  else if (STREQ (name, "cbs"))
 	    {
@@ -947,6 +948,9 @@ scanargs (int argc, char **argv)
 	    error (EXIT_FAILURE, 0, _("invalid number %s"), quote (val));
 	}
     }
+
+  if (blocksize)
+    input_blocksize = output_blocksize = blocksize;
 
   /* If bs= was given, both `input_blocksize' and `output_blocksize' will
      have been set to positive values.  If either has not been set,
@@ -1222,7 +1226,7 @@ advance_input_after_read_error (size_t nbytes)
 	    return true;
 	  diff = input_offset - offset;
 	  if (! (0 <= diff && diff <= nbytes))
-	    error (0, 0, _("warning: screwy file offset after failed read"));
+	    error (0, 0, _("warning: invalid file offset after failed read"));
 	  if (0 <= skip_via_lseek (input_file, STDIN_FILENO, diff, SEEK_CUR))
 	    return true;
 	  if (errno == 0)

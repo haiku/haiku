@@ -1,5 +1,5 @@
 /* Return the canonical absolute name of a given file.
-   Copyright (C) 1996-2006 Free Software Foundation, Inc.
+   Copyright (C) 1996-2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 #ifndef CANONICALIZE_H_
 # define CANONICALIZE_H_
 
-# ifdef PROVIDE_CANONICALIZE_FILENAME_MODE
+# if GNULIB_CANONICALIZE
 enum canonicalize_mode_t
   {
     /* All components must exist.  */

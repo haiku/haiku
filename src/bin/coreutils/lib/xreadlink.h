@@ -1,6 +1,6 @@
-/* readlink wrapper to return the link name in malloc'd storage
+/* Reading symbolic links without size limitation.
 
-   Copyright (C) 2001, 2003, 2004 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2003, 2004, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,4 +20,15 @@
 /* Written by Jim Meyering <jim@meyering.net>  */
 
 #include <stddef.h>
-char *xreadlink (char const *, size_t);
+
+/* Call readlink to get the symbolic link value of FILENAME.
+   Return a pointer to that NUL-terminated string in malloc'd storage.
+   If readlink fails, return NULL and set errno.  */
+extern char *xreadlink (char const *filename);
+
+/* Call readlink to get the symbolic link value of FILENAME.
+   SIZE_HINT is a hint as to how long the link is expected to be;
+   typically it is taken from st_size.  It need not be correct.
+   Return a pointer to that NUL-terminated string in malloc'd storage.
+   If readlink fails, return NULL and set errno.  */
+extern char *xreadlink_with_size (char const *filename, size_t size_hint);

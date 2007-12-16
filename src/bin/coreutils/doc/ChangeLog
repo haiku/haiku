@@ -1,3 +1,78 @@
+2007-03-21  Eric Blake  <ebb9@byu.net>
+
+	* coreutils.texi (md5sum invocation): Document escapes in output
+	format.  Reported by Armijn Hemel.
+
+2007-03-15  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Fix manual in response to bug reports by Dan Jacobson.
+	* coreutils.texi (sort invocation): Explain numeric sorts better.
+	Compress self-congratulation into a simple "comparison is exact"
+	notice; the --general-numeric-sort option already explains the
+	tradeoffs.
+	(seq invocation): Add example of -f.
+
+2007-03-12  Jim Meyering  <jim@meyering.net>
+
+	* coreutils.texi (cp invocation): Mention that --preserve=timestamps
+	doesn't preserve time stamps on symbolic links.
+	Reported by Polo Talnir in <https://bugzilla.redhat.com/230866>.
+
+2007-02-27  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (df invocation): With -P, the default block size
+	and output format is not affected by DF_BLOCK_SIZE, BLOCK_SIZE, or
+	BLOCKSIZE.
+
+2007-01-30  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi
+	(Input processing in ptx, mkdir invocation, rmdir invocation):
+	@item -> @itemx to fix some typos.
+
+2007-01-30  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* coreutils.texi (mkdir invocation): Say how to set the file
+	permission bits of a parent directory with mkdir -p.
+
+2007-01-29  Jim Meyering  <jim@meyering.net>
+
+	Document new syntax: "chown +0:+287 file", "chgrp +99 file"
+	* coreutils.texi (Disambiguating names and IDs): New section.
+	(chown invocation, chgrp invocation): Mention the new syntax
+	with an xref to the new section.
+
+2007-01-19  Jim Meyering  <jim@meyering.net>
+
+	* coreutils.texi (ls: General output formatting): Mention the
+	workarounds to accommodate the Apple Terminal bug.
+
+2007-01-04  Jim Meyering  <jim@meyering.net>
+
+	* coreutils.texi (base64 invocation): When decoding, newlines
+	are always accepted.
+
+2007-01-03  Jim Meyering  <jim@meyering.net>
+
+	Document what the ".0" in e.g., "-k 2,3.0" means, and...
+	* coreutils.texi (sort invocation): ... that it can be applied to the
+	field-end spec, but not the field-start one.  Patch from Evan Hunt.
+
+2006-12-21  Jim Meyering  <jim@meyering.net>
+
+	* coreutils.texi (dd invocation): Improve the documentation
+	for bs, ibs, obs, and cbs.  Suggestion from Dan Jacobson.
+	Patch by Olivier Delhomme.
+	(dd invocation): Add to the description of cbs.
+	(dd invocation): Specify that bs=N overrides only any
+	_preceding_ ibs and obs settings.  Spotted by Andreas Schwab.
+
+2006-12-14  Jim Meyering  <jim@meyering.net>
+
+	* coreutils.texi: Remove two doubled words.
+	(Treating / specially): With --preserve-root, chgrp and chown
+	will not modify "/", even through a symlink.
+
 2006-11-28  Jim Meyering  <jim@meyering.net>
 
 	* perm.texi (Mode Structure): Fix typo: s/setgid/setuid/.

@@ -1,5 +1,5 @@
 /* Determine the number of screen columns needed for a character.
-   Copyright (C) 2006 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,34 +21,10 @@
 #if HAVE_WCHAR_T
 
 /* Get wcwidth if available, along with wchar_t.  */
-# if HAVE_WCHAR_H
-/* Tru64 with Desktop Toolkit C has a bug: <stdio.h> must be included before
-   <wchar.h>.
-   BSD/OS 4.1 has a bug: <stdio.h> and <time.h> must be included before
-   <wchar.h>.  */
-#  include <stdio.h>
-#  include <time.h>
-#  include <wchar.h>
-# endif
+# include <wchar.h>
 
 /* Get iswprint.  */
-# if HAVE_WCTYPE_H
-#  include <wctype.h>
-# endif
-# if !defined iswprint && !HAVE_ISWPRINT
-static inline int
-#  if HAVE_WINT_T
-iswprint (wint_t wc)
-#  else
-iswprint (int wc)
-#  endif
-{
-  return (wc >= 0 && wc < 128
-	  ? wc >= ' ' && wc <= '~'
-	  : 1);
-}
-#  define iswprint iswprint
-# endif
+# include <wctype.h>
 
 # ifndef HAVE_DECL_WCWIDTH
 "this configure-time declaration test was not run"
@@ -76,6 +52,6 @@ int wcwidth (int /* actually wchar_t */);
 #  endif
 # endif
 
-#endif /* HAVE_WCHAR_H */
+#endif /* HAVE_WCHAR_T */
 
 #endif /* _gl_WCWIDTH_H */

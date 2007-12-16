@@ -1,7 +1,6 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
 
-## Copyright (C) 1990, 1991, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
-## 2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
+## Copyright (C) 1990, 1991, 1993-2007 Free Software Foundation, Inc.
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -105,9 +104,9 @@ uptime_LDADD = $(LDADD) $(POW_LIB) $(GETLOADAVG_LIBS)
 
 su_LDADD = $(LDADD) $(LIB_CRYPT)
 
-dir_LDADD += $(LIB_ACL)
-ls_LDADD += $(LIB_ACL)
-vdir_LDADD += $(LIB_ACL)
+dir_LDADD += $(LIB_ACL_TRIVIAL) $(LIB_ACL)
+ls_LDADD += $(LIB_ACL_TRIVIAL) $(LIB_ACL)
+vdir_LDADD += $(LIB_ACL_TRIVIAL) $(LIB_ACL)
 cp_LDADD += $(LIB_ACL)
 mv_LDADD += $(LIB_ACL)
 ginstall_LDADD += $(LIB_ACL)
@@ -116,10 +115,16 @@ $(PROGRAMS): ../lib/libcoreutils.a
 
 SUFFIXES = .sh
 
+# Get the release year from ../lib/version-etc.c.
+RELEASE_YEAR = \
+  `sed -n '/.*COPYRIGHT_YEAR = \([0-9][0-9][0-9][0-9]\) };/s//\1/p' \
+    $(top_srcdir)/lib/version-etc.c`
+
 .sh:
 	rm -f $@ $@-t
 	sed \
 	  -e 's!@''bindir''@!$(bindir)!' \
+	  -e 's/@''RELEASE_YEAR'@/$(RELEASE_YEAR)/ \
 	  -e 's/@''GNU_PACKAGE''@/$(GNU_PACKAGE)/' \
 	  -e 's/@''PACKAGE_BUGREPORT''@/$(PACKAGE_BUGREPORT)/' \
 	  -e 's/@''VERSION''@/$(VERSION)/' $< > $@-t
