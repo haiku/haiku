@@ -1512,13 +1512,13 @@
 #define PACKAGE_NAME "GNU coreutils"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GNU coreutils 6.7"
+#define PACKAGE_STRING "GNU coreutils 6.9"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "coreutils"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "6.7"
+#define PACKAGE_VERSION "6.9"
 
 /* the number of pending output bytes on stream `fp' */
 #define PENDING_OUTPUT_N_BYTES fp->_IO_write_ptr - fp->_IO_write_base
@@ -1658,7 +1658,7 @@
 #define USE_UNLOCKED_IO 1
 
 /* Version number of package */
-#define VERSION "6.7"
+#define VERSION "6.9"
 
 /* Define if unsetenv() returns void, not int. */
 /* #undef VOID_UNSETENV */
