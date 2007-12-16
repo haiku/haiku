@@ -310,7 +310,11 @@ pci_uninit(void)
 PCI::PCI()
  :	fRootBus(0)
  ,	fDomainCount(0)
+ ,	fBusEnumeration(false)
 {
+	#if defined(__POWERPC__) || defined(__M68K__)
+		fBusEnumeration = true;
+	#endif
 }
 
 
@@ -329,8 +333,16 @@ PCI::InitBus()
 		ppnext = &bus->next;
 	}
 	
-	for (int i = 0; i < fDomainCount; i++) {
-		EnumerateBus(i, 0);
+	if (fBusEnumeration) {
+		for (int i = 0; i < fDomainCount; i++) {
+			EnumerateBus(i, 0);
+		}
+	}
+
+	if (1) {
+		for (int i = 0; i < fDomainCount; i++) {
+			FixupDevices(i, 0);
+		}
 	}
 	
 	if (fRootBus) {
@@ -508,8 +520,6 @@ PCI::EnumerateBus(int domain, uint8 bus, uint8 *subordinate_bus)
 			if (device_id == 0xffff)
 				continue;
 
-			pci_fixup_device(this, domain, bus, dev, func);
-
 			uint8 base_class = ReadPciConfig(domain, bus, dev, func, PCI_class_base, 1);
 			uint8 sub_class	 = ReadPciConfig(domain, bus, dev, func, PCI_class_sub, 1);
 			if (base_class != PCI_bridge || sub_class != PCI_pci)
@@ -554,6 +564,41 @@ PCI::EnumerateBus(int domain, uint8 bus, uint8 *subordinate_bus)
 	TRACE(("PCI: EnumerateBus done: domain %u, bus %u, last used bus number %u\n", domain, bus, last_used_bus_number));
 }
 
+
+void
+PCI::FixupDevices(int domain, uint8 bus)
+{
+	TRACE(("PCI: FixupDevices domain %u, bus %u\n", domain, bus));
+
+	int maxBusDevices = GetDomainData(domain)->max_bus_devices;
+
+	for (int dev = 0; dev < maxBusDevices; dev++) {
+		uint16 vendorId = ReadPciConfig(domain, bus, dev, 0, PCI_vendor_id, 2);
+		if (vendorId == 0xffff)
+			continue;
+		
+		uint8 type = ReadPciConfig(domain, bus, dev, 0, PCI_header_type, 1);
+		int nfunc = (type & PCI_multifunction) ? 8 : 1;
+		for (int func = 0; func < nfunc; func++) {
+			uint16 deviceId = ReadPciConfig(domain, bus, dev, func, PCI_device_id, 2);
+			if (deviceId == 0xffff)
+				continue;
+
+			pci_fixup_device(this, domain, bus, dev, func);
+
+			uint8 base_class = ReadPciConfig(domain, bus, dev, func, PCI_class_base, 1);
+			if (base_class != PCI_bridge)
+				continue;
+			uint8 sub_class	 = ReadPciConfig(domain, bus, dev, func, PCI_class_sub, 1);
+			if (sub_class != PCI_pci)
+				continue;
+
+			int busBehindBridge = ReadPciConfig(domain, bus, dev, func, PCI_secondary_bus, 1);
+			
+			FixupDevices(domain, busBehindBridge);
+		}
+	}
+}
 
 
 void

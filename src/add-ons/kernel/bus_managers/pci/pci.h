@@ -83,6 +83,8 @@ class PCI {
 
 		void EnumerateBus(int domain, uint8 bus, uint8 *subordinate_bus = NULL);
 
+		void FixupDevices(int domain, uint8 bus);
+
 		void DiscoverBus(PCIBus *bus);
 		void DiscoverDevice(PCIBus *bus, uint8 dev, uint8 func);
 
@@ -111,6 +113,7 @@ class PCI {
 		
 		domain_data			fDomainData[MAX_PCI_DOMAINS];
 		int					fDomainCount;
+		bool				fBusEnumeration;
 };
 
 #endif // __cplusplus
