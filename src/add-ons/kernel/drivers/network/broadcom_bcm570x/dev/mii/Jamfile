@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network broadcom_bcm570x dev mii ;
+
+UsePrivateHeaders kernel net ;
+
+UseHeaders [ FDirName $(SUBDIR) .. .. ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
+
+KernelStaticLibrary broadcom_bcm570x_mii.a
+	:
+	ukphy.c
+	ukphy_subr.c
+	;
+
