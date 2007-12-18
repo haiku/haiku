@@ -254,7 +254,8 @@ arch_smp_send_ici(int32 target_cpu)
 	timeout = 100000000;
 	// wait for message to be sent
 	while ((apic_read(APIC_INTR_COMMAND_1) & APIC_DELIVERY_STATUS) != 0 && --timeout != 0)
-		;
+		asm volatile ("pause;");
+
 	if (timeout == 0)
 		panic("arch_smp_send_ici: timeout, target_cpu %ld", target_cpu);
 

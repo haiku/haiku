@@ -442,7 +442,7 @@ calculate_apic_timer_conversion_factor(void)
 	t1 = system_time();
 	apic_write(APIC_INITIAL_TIMER_COUNT, 0xffffffff); // start the counter
 
-	execute_n_instructions(128*20000);
+	execute_n_instructions(128 * 20000);
 
 	count = apic_read(APIC_CURRENT_TIMER_COUNT);
 	t2 = system_time();
@@ -544,7 +544,7 @@ smp_boot_other_cpus(void)
 dprintf("wait for delivery\n");
 		// wait for pending to end
 		while ((apic_read(APIC_INTR_COMMAND_1) & APIC_DELIVERY_STATUS) != 0)
-			;
+			asm volatile ("pause;");
 
 dprintf("deassert INIT\n");
 		/* deassert INIT */
@@ -558,7 +558,7 @@ dprintf("deassert INIT\n");
 dprintf("wait for delivery\n");
 		// wait for pending to end
 		while ((apic_read(APIC_INTR_COMMAND_1) & APIC_DELIVERY_STATUS) != 0)
-			;
+			asm volatile ("pause;");
 
 		/* wait 10ms */
 		spin(10000);
@@ -586,7 +586,7 @@ dprintf("send STARTUP\n");
 
 dprintf("wait for delivery\n");
 			while ((apic_read(APIC_INTR_COMMAND_1) & APIC_DELIVERY_STATUS) != 0)
-				;
+				asm volatile ("pause;");
 		}
 	}
 

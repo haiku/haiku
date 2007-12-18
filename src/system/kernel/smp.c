@@ -30,9 +30,9 @@
 #endif
 
 #if __INTEL__
-  #define PAUSE() asm volatile ("rep; nop;")
+#	define PAUSE() asm volatile ("pause;")
 #else
-  #define PAUSE()
+#	define PAUSE()
 #endif
 
 #define MSG_POOL_SIZE (SMP_MAX_CPUS * 4)
@@ -248,7 +248,7 @@ check_for_message(int currentCPU, int *source_mailbox)
 	if (msg != NULL) {
 		smp_msgs[currentCPU] = msg->next;
 		release_spinlock(&cpu_msg_spinlock[currentCPU]);
-		TRACE((" found msg %p in cpu mailbox\n", msg));
+		TRACE((" cpu %d: found msg %p in cpu mailbox\n", currentCPU, msg));
 		*source_mailbox = MAILBOX_LOCAL;
 	} else {
 		// try getting one from the broadcast mailbox
@@ -270,7 +270,7 @@ check_for_message(int currentCPU, int *source_mailbox)
 			break;
 		}
 		release_spinlock(&broadcast_msg_spinlock);
-		TRACE((" found msg %p in broadcast mailbox\n", msg));
+		TRACE((" cpu %d: found msg %p in broadcast mailbox\n", currentCPU, msg));
 	}
 	return msg;
 }
@@ -355,7 +355,7 @@ process_pending_ici(int32 currentCPU)
 	if (msg == NULL)
 		return retval;
 
-	TRACE(("  cpu %d message = %d\n", currentCPU, msg->message));
+	TRACE(("  cpu %ld message = %ld\n", currentCPU, msg->message));
 
 	switch (msg->message) {
 		case SMP_MSG_INVALIDATE_PAGE_RANGE:
@@ -396,7 +396,7 @@ process_pending_ici(int32 currentCPU)
 		cpu_status state = disable_interrupts();
 
 		while (*haltValue != 0)
-			;
+			PAUSE();
 		
 		restore_interrupts(state);
 	}
@@ -430,7 +430,7 @@ smp_send_ici(int32 targetCPU, int32 message, uint32 data, uint32 data2, uint32 d
 {
 	struct smp_msg *msg;
 
-	TRACE(("smp_send_ici: target 0x%x, mess 0x%x, data 0x%lx, data2 0x%lx, data3 0x%lx, ptr %p, flags 0x%x\n",
+	TRACE(("smp_send_ici: target 0x%lx, mess 0x%lx, data 0x%lx, data2 0x%lx, data3 0x%lx, ptr %p, flags 0x%lx\n",
 		targetCPU, message, data, data2, data3, data_ptr, flags));
 
 	if (sICIEnabled) {
@@ -489,7 +489,7 @@ smp_send_broadcast_ici(int32 message, uint32 data, uint32 data2, uint32 data3,
 {
 	struct smp_msg *msg;
 
-	TRACE(("smp_send_broadcast_ici: cpu %d mess 0x%x, data 0x%lx, data2 0x%lx, data3 0x%lx, ptr %p, flags 0x%x\n",
+	TRACE(("smp_send_broadcast_ici: cpu %ld mess 0x%lx, data 0x%lx, data2 0x%lx, data3 0x%lx, ptr %p, flags 0x%lx\n",
 		smp_get_current_cpu(), message, data, data2, data3, data_ptr, flags));
 
 	if (sICIEnabled) {
@@ -512,7 +512,7 @@ smp_send_broadcast_ici(int32 message, uint32 data, uint32 data2, uint32 data3,
 		msg->done = false;
 
 		TRACE(("smp_send_broadcast_ici%d: inserting msg %p into broadcast mbox\n",
-			smp_get_current_cpu(), msg));
+			currentCPU, msg));
 
 		// stick it in the appropriate cpu's mailbox
 		acquire_spinlock_nocheck(&broadcast_msg_spinlock);
@@ -555,7 +555,6 @@ smp_trap_non_boot_cpus(int32 cpu)
 	if (cpu > 0) {
 		boot_cpu_spin[cpu] = 1;
 		acquire_spinlock_nocheck(&boot_cpu_spin[cpu]);
-
 		return false;
 	}
 
@@ -582,10 +581,10 @@ smp_wake_up_non_boot_cpus()
 void
 smp_cpu_rendezvous(volatile uint32 *var, int current_cpu)
 {
-	atomic_or(var, 1<<current_cpu);
+	atomic_or(var, 1 << current_cpu);
 
-	while (*var != ((1<<sNumCPUs) - 1))
-		;
+	while (*var != ((1 << sNumCPUs) - 1))
+		PAUSE();
 }
 
 status_t

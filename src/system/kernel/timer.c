@@ -28,6 +28,12 @@ static spinlock sTimerSpinlock[B_MAX_CPU_COUNT] = { 0, };
 #	define TRACE(x) ;
 #endif
 
+#if __INTEL__
+#	define PAUSE() asm volatile ("pause;")
+#else
+#	define PAUSE()
+#endif
+
 
 status_t
 timer_init(kernel_args *args)
@@ -261,6 +267,5 @@ spin(bigtime_t microseconds)
 	bigtime_t time = system_time();
 
 	while((system_time() - time) < microseconds)
-		;
+		PAUSE();
 }
-

@@ -106,7 +106,7 @@ set_mtrr(void *_parameter, int cpu)
 	// wait until all CPUs have arrived here
 	atomic_add(&sWaitAllCPUs, 1);
 	while (sWaitAllCPUs != smp_get_num_cpus())
-		;
+		asm volatile ("pause;");
 
 	disable_caches();
 
@@ -118,7 +118,7 @@ set_mtrr(void *_parameter, int cpu)
 	// wait until all CPUs have arrived here
 	atomic_add(&sWaitAllCPUs, -1);
 	while (sWaitAllCPUs != 0)
-		;
+		asm volatile ("pause;");
 }
 
 
@@ -128,7 +128,7 @@ init_mtrrs(void *_unused, int cpu)
 	// wait until all CPUs have arrived here
 	atomic_add(&sWaitAllCPUs, 1);
 	while (sWaitAllCPUs != smp_get_num_cpus())
-		;
+		asm volatile ("pause;");
 
 	disable_caches();
 
@@ -139,7 +139,7 @@ init_mtrrs(void *_unused, int cpu)
 	// wait until all CPUs have arrived here
 	atomic_add(&sWaitAllCPUs, -1);
 	while (sWaitAllCPUs != 0)
-		;
+		asm volatile ("pause;");
 }
 
 
