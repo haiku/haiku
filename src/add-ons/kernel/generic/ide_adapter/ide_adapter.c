@@ -30,6 +30,8 @@
 
 #include "wrapper.h"
 
+#define TRACE dprintf
+
 
 static ide_for_controller_interface *ide;
 static device_manager_info *pnp;
@@ -330,6 +332,8 @@ ide_adapter_init_channel(device_node_handle node, ide_channel ide_channel,
 	uint8 is_primary;
 	status_t res;
 
+	TRACE("PCI-IDE: init channel...\n");
+
 	// get device data
 	if (pnp->get_attr_uint16(node, IDE_ADAPTER_COMMAND_BLOCK_BASE, &command_block_base, false) != B_OK
 		|| pnp->get_attr_uint16(node, IDE_ADAPTER_CONTROL_BLOCK_BASE, &control_block_base, false) != B_OK
@@ -380,6 +384,7 @@ ide_adapter_init_channel(device_node_handle node, ide_channel ide_channel,
 		goto err3;
 	}
 
+	TRACE("PCI-IDE: init channel done\n");
 	// enable interrupts so the channel is ready to run
 	ide_adapter_write_device_control(channel, ide_devctrl_bit3);
 	
@@ -484,25 +489,31 @@ ide_adapter_detect_channel(pci_device_module_info *pci, pci_device pci_device,
 		command_block_base = 0x1f0;
 		control_block_base = 0x3f6;
 		intnum = 14;
+		TRACE("PCI-IDE: Controller in legacy mode: cmd %#x, ctrl %#x, irq %d\n",
+			  command_block_base, control_block_base, intnum);
 	} else if (supports_compatibility_mode
 		&& !is_primary && (api & IDE_API_PRIMARY_NATIVE) == 0) {
 		command_block_base = 0x170;
 		control_block_base = 0x376;
 		intnum = 15;
+		TRACE("PCI-IDE: Controller in legacy mode: cmd %#x, ctrl %#x, irq %d\n",
+			  command_block_base, control_block_base, intnum);
 	} else {
-		if ((command_block_base & PCI_address_space) != PCI_address_space
-			|| (control_block_base & PCI_address_space) != PCI_address_space) {
-			SHOW_ERROR0( 2, "Command/Control Block base is not configured" );
+		if (command_block_base == 0 || control_block_base == 0) {
+			TRACE("PCI-IDE: Command/Control Block base is not configured\n");
 			return B_ERROR;
 		}
-
-		command_block_base &= ~PCI_address_space;
-		control_block_base &= ~PCI_address_space;
+		if (intnum == 0 || intnum == 0xff) {
+			TRACE("PCI-IDE: Interrupt is not configured\n");
+			return B_ERROR;
+		}
 
 		// historically, they start at 3f6h/376h, but PCI spec requires registers
 		// to be aligned at 4 bytes, so only 3f4h/374h can be specified; thus
 		// PCI IDE defines that control block starts at offset 2
 		control_block_base += 2;
+		TRACE("PCI-IDE: Controller in native mode: cmd %#x, ctrl %#x, irq %d\n",
+			  command_block_base, control_block_base, intnum);
 	}
 
 	if (supports_compatibility_mode) {
@@ -516,12 +527,14 @@ ide_adapter_detect_channel(pci_device_module_info *pci, pci_device pci_device,
 			// better were to use a controller lock, but this had to be done in the IDE
 			// bus manager, and I don't see any reason to add extra code for old
 			// simplex controllers
-			SHOW_INFO0( 2, "Simplex controller - disabling DMA of secondary channel" );
+			TRACE("PCI-IDE: Simplex controller - disabling DMA of secondary channel\n");
 			controller_can_dma = false;
 		}
 	}
 
 	bus_master_base += is_primary ? 0 : 8;
+
+	TRACE("PCI-IDE: bus master base %#x\n", bus_master_base);
 
 	{
 		// allocate channel's I/O resources
@@ -532,7 +545,8 @@ ide_adapter_detect_channel(pci_device_module_info *pci, pci_device pci_device,
 		};
 
 		if (pnp->acquire_io_resources(resources, resource_handles) != B_OK) {
-			SHOW_ERROR( 2, "Couldn't acquire channel resources %d and %d\n", command_block_base, control_block_base);
+			TRACE("PCI-IDE: Couldn't acquire channel resources %#x and %#x\n",
+				  command_block_base, control_block_base);
 			return B_ERROR;
 		}
 	}
@@ -658,10 +672,10 @@ ide_adapter_detect_controller(pci_device_module_info *pci, pci_device pci_device
 
 	SHOW_FLOW0( 3, "" );
 
-	if ((bus_master_base & PCI_address_space) != 1)
-		return B_OK;
-		
-	bus_master_base &= ~PCI_address_space;
+	if (bus_master_base == 0) {
+		TRACE("PCI-IDE: Controller detection failed! bus master base not configured\n");
+		return B_ERROR;
+	}
 
 	{
 		io_resource resources[2] = {
@@ -670,7 +684,7 @@ ide_adapter_detect_controller(pci_device_module_info *pci, pci_device pci_device
 		};
 
 		if (pnp->acquire_io_resources(resources, resource_handles) != B_OK) {
-			SHOW_ERROR( 2, "Couldn't acquire controller resource %d\n", bus_master_base);
+			TRACE("PCI-IDE: Couldn't acquire controller resource %#x\n", bus_master_base);
 			return B_ERROR;
 		}
 	}
@@ -708,6 +722,12 @@ ide_adapter_probe_controller(device_node_handle parent, const char *controller_d
 	bus_master_base = pci->read_pci_config(device, PCI_base_registers + 16, 4);
 	intnum = pci->read_pci_config(device, PCI_interrupt_line, 1);
 
+	command_block_base[0] &= ~PCI_address_space;
+	control_block_base[0] &= ~PCI_address_space;
+	command_block_base[1] &= ~PCI_address_space;
+	control_block_base[1] &= ~PCI_address_space;
+	bus_master_base &= ~PCI_address_space;
+
 	res = ide_adapter_detect_controller(pci, device, parent, bus_master_base, 
 		controller_driver, controller_driver_type, controller_name, can_dma,
 		can_cq, dma_alignment, dma_boundary, max_sg_block_size, &controller_node);
@@ -715,8 +735,6 @@ ide_adapter_probe_controller(device_node_handle parent, const char *controller_d
 	// (happens during rescan; registering new channels would kick out old channels)
 	if (res != B_OK || controller_node == NULL)
 		goto err;
-
-	bus_master_base &= ~PCI_address_space;
 
 	// ignore errors during registration of channels - could be a simple rescan collision
 	ide_adapter_detect_channel(pci, device, controller_node, channel_module_name,

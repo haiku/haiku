@@ -27,6 +27,7 @@
 #define debug_level_info 2
 
 #define DEBUG_MSG_PREFIX "IDE ISA -- "
+#define TRACE dprintf
 
 #include "wrapper.h"
 
@@ -262,6 +263,8 @@ init_channel(device_node_handle node, ide_channel ide_channel, channel_info **co
 	uint8 irq;
 	status_t res;
 
+	TRACE("ISA-IDE: channel init\n");
+
 	// get device data	
 	if (pnp->get_attr_uint16(node, IDE_ISA_COMMAND_BLOCK_BASE, &command_block_base, false) != B_OK
 		|| pnp->get_attr_uint16(node, IDE_ISA_CONTROL_BLOCK_BASE, &control_block_base, false) != B_OK
@@ -277,6 +280,9 @@ init_channel(device_node_handle node, ide_channel ide_channel, channel_info **co
 		goto err0;
 	}
 
+	TRACE("ISA-IDE: channel init, resources %#x %#x %d\n",
+		  command_block_base, control_block_base, irq);
+
 	channel->isa = isa;
 	channel->node = node;
 	channel->lost = false;
@@ -289,7 +295,7 @@ init_channel(device_node_handle node, ide_channel ide_channel, channel_info **co
 		inthand, channel, 0);
 
 	if (res < 0) {
-		SHOW_ERROR( 0, "couldn't install irq handler @%d", irq);
+		TRACE("ISA-IDE: couldn't install irq handler for int %d\n", irq);
 		goto err;
 	}
 
@@ -313,6 +319,9 @@ static status_t
 uninit_channel(void *channel_cookie)
 {
 	channel_info *channel = channel_cookie;
+
+	TRACE("ISA-IDE: channel uninit\n");
+
 	// disable IRQs
 	write_device_control(channel, ide_devctrl_bit3 | ide_devctrl_nien);
 
@@ -365,6 +374,9 @@ publish_channel(device_node_handle parent, io_resource_handle *resources,
 
 	SHOW_FLOW0(2, "");
 
+	TRACE("ISA-IDE: publishing %s, resources %#x %#x %d\n",
+		  name, command_block_base, control_block_base, intnum);
+
 	return pnp->register_device(parent, attrs, resources, &node);
 }
 
@@ -386,8 +398,11 @@ probe_channel(device_node_handle parent,
 
 	// we aren't upset if io-ports are in use already - only 
 	// the PCI IDE driver can own them, and if it does, we exit silently
-	if (pnp->acquire_io_resources(resources, resource_handles) != B_OK)
+	if (pnp->acquire_io_resources(resources, resource_handles) != B_OK) {
+		TRACE("ISA-IDE: can't acquire resources %#x and %#x\n",
+			  command_block_base, control_block_base);
 		return B_OK;
+	}
 
 	// we assume that every modern PC has an IDE controller, so no
 	// further testing is done (well - I don't really know how to detect the
