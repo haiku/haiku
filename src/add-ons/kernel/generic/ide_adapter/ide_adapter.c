@@ -565,6 +565,7 @@ ide_adapter_init_controller(device_node_handle node, void *user_cookie,
 	pci_device device;
 	ide_adapter_controller_info *controller;
 	uint16 bus_master_base;
+	uint16 pcicmd;
 
 	// get device data	
 	if (pnp->get_attr_uint16(node, IDE_ADAPTER_BUS_MASTER_BASE, &bus_master_base, false) != B_OK)
@@ -576,6 +577,21 @@ ide_adapter_init_controller(device_node_handle node, void *user_cookie,
 	controller = (ide_adapter_controller_info *)malloc(total_data_size);
 	if (controller == NULL)
 		return B_NO_MEMORY;
+
+#if 0
+	pcicmd = pci->read_pci_config(node, PCI_command, 2);
+	TRACE("PCI-IDE: adapter init: pcicmd old setting 0x%04x\n", pcicmd);
+	if ((pcicmd & PCI_command_io) == 0) {
+		TRACE("PCI-IDE: adapter init: enabling io decoder\n");
+		pcicmd |= PCI_command_io;
+	}
+	if ((pcicmd & PCI_command_master) == 0) {
+		TRACE("PCI-IDE: adapter init: enabling bus mastering\n");
+		pcicmd |= PCI_command_master;
+	}
+	pci->write_pci_config(node, PCI_command, 2, pcicmd);
+	TRACE("PCI-IDE: adapter init: pcicmd new setting 0x%04x\n", pci->read_pci_config(node, PCI_command, 2));
+#endif
 
 	controller->node = node;
 	controller->pci = pci;
