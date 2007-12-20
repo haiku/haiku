@@ -1,0 +1,11 @@
+SubDir HAIKU_TOP src apps bsnow ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+Application BSnow :
+	Flakes.cpp
+	SnowView.cpp
+	SnowApp.cpp
+	: be
+	: BSnow.rdef
+	;
