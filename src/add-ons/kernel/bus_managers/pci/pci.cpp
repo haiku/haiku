@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Marcus Overhagen. All rights reserved.
+ * Copyright 2006-2007, Marcus Overhagen. All rights reserved.
  * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2003, Marcus Overhagen. All rights reserved.
  *
@@ -18,6 +18,8 @@
 #include "pci.h"
 
 #define TRACE_CAP(x...) dprintf(x)
+#define FLOW(x...)
+//#define FLOW(x...) dprintf(x)
 
 static PCI *sPCI;
 
@@ -568,7 +570,7 @@ PCI::EnumerateBus(int domain, uint8 bus, uint8 *subordinate_bus)
 void
 PCI::FixupDevices(int domain, uint8 bus)
 {
-	TRACE(("PCI: FixupDevices domain %u, bus %u\n", domain, bus));
+	FLOW("PCI: FixupDevices domain %u, bus %u\n", domain, bus);
 
 	int maxBusDevices = GetDomainData(domain)->max_bus_devices;
 
@@ -604,7 +606,7 @@ PCI::FixupDevices(int domain, uint8 bus)
 void
 PCI::DiscoverBus(PCIBus *bus)
 {
-	TRACE(("PCI: DiscoverBus, domain %u, bus %u\n", bus->domain, bus->bus));
+	FLOW("PCI: DiscoverBus, domain %u, bus %u\n", bus->domain, bus->bus);
 	
 	int max_bus_devices = GetDomainData(bus->domain)->max_bus_devices;
 
@@ -627,7 +629,7 @@ PCI::DiscoverBus(PCIBus *bus)
 void
 PCI::DiscoverDevice(PCIBus *bus, uint8 dev, uint8 func)
 {
-	TRACE(("PCI: DiscoverDevice, domain %u, bus %u, dev %u, func %u\n", bus->domain, bus->bus, dev, func));
+	FLOW("PCI: DiscoverDevice, domain %u, bus %u, dev %u, func %u\n", bus->domain, bus->bus, dev, func);
 
 	uint16 device_id = ReadPciConfig(bus->domain, bus->bus, dev, func, PCI_device_id, 2);
 	if (device_id == 0xffff)
@@ -665,7 +667,7 @@ PCI::CreateBus(PCIDev *parent, int domain, uint8 bus)
 PCIDev *
 PCI::CreateDevice(PCIBus *parent, uint8 dev, uint8 func)
 {
-	TRACE(("PCI: CreateDevice, domain %u, bus %u, dev %u, func %u:\n", parent->domain, parent->bus, dev, func));
+	FLOW("PCI: CreateDevice, domain %u, bus %u, dev %u, func %u:\n", parent->domain, parent->bus, dev, func);
 	
 	PCIDev *newdev = new PCIDev;
 	newdev->next = NULL;
@@ -678,8 +680,8 @@ PCI::CreateDevice(PCIBus *parent, uint8 dev, uint8 func)
 
 	ReadPciBasicInfo(newdev);
 
-	TRACE(("PCI: vendor 0x%04x, device 0x%04x, class_base 0x%02x, class_sub 0x%02x\n",
-		newdev->info.vendor_id, newdev->info.device_id, newdev->info.class_base, newdev->info.class_sub));
+	FLOW("PCI: CreateDevice, vendor 0x%04x, device 0x%04x, class_base 0x%02x, class_sub 0x%02x\n",
+		newdev->info.vendor_id, newdev->info.device_id, newdev->info.class_base, newdev->info.class_sub);
 
 	// append
 	if (parent->child == 0) {
