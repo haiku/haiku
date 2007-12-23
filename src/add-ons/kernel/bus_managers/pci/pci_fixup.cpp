@@ -20,12 +20,12 @@ static void
 jmicron_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function, uint16 deviceId)
 {
 	switch (deviceId) {
-		case 0x2360:
-		case 0x2361:
-		case 0x2362:
-		case 0x2363:
-		case 0x2366:
+		case 0x2361: // 1 SATA, 1 PATA
+		case 0x2363: // 2 SATA, 1 PATA
+		case 0x2366: // 2 SATA, 2 PATA
 			break;
+		// case 0x2360: // 1 SATA
+		// case 0x2362: // 2 SATA
 		default:
 			return;
 	}
@@ -47,7 +47,10 @@ jmicron_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function
 			val &= ~(1 << 16);
 			val |= (1 << 1) | (1 << 17) | (1 << 22);
 			pci->WritePciConfig(domain, bus, device, function, 0x40, 4, val);
-			pci->WritePciConfig(domain, bus, device, function, 0x3c, 1, irq);
+			if (function == 0)
+				pci->WritePciConfig(domain, bus, device, 1, 0x3c, 1, irq);
+			else 
+				dprintf("jmicron_fixup_ahci: can't assign IRQ\n");
 		}
 		dprintf("jmicron_fixup_ahci: 0x40: 0x%08lx\n", pci->ReadPciConfig(domain, bus, device, function, 0x40, 4));
 		dprintf("jmicron_fixup_ahci: 0xdc: 0x%08lx\n", pci->ReadPciConfig(domain, bus, device, function, 0xdc, 4));
@@ -60,10 +63,10 @@ intel_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function, 
 {
 	switch (deviceId) {
 		case 0x2825: // ICH8 Desktop when in IDE emulation mode
-			dprintf("intel_fixup_ahci: WARNING found ICH8 device id 0x2825");
+			dprintf("intel_fixup_ahci: WARNING found ICH8 device id 0x2825\n");
 			return;
 		case 0x2926: // ICH9 Desktop when in IDE emulation mode
-			dprintf("intel_fixup_ahci: WARNING found ICH9 device id 0x2926");
+			dprintf("intel_fixup_ahci: WARNING found ICH9 device id 0x2926\n");
 			return;
 
 		case 0x27c0: // ICH7 Desktop non-AHCI and non-RAID mode
@@ -123,6 +126,8 @@ pci_fixup_device(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function)
 {
 	uint16 vendorId = pci->ReadPciConfig(domain, bus, device, function, PCI_vendor_id, 2);
 	uint16 deviceId = pci->ReadPciConfig(domain, bus, device, function, PCI_device_id, 2);
+
+//	dprintf("pci_fixup_device: domain %u, bus %u, device %u, function %u\n", domain, bus, device, function);
 
 	switch (vendorId) {
 		case 0x197b:
