@@ -61,6 +61,8 @@ jmicron_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function
 static void
 intel_fixup_ahci(PCI *pci, int domain, uint8 bus, uint8 device, uint8 function, uint16 deviceId)
 {
+	return; /* disabled until the PCI manager can assign new resources */
+
 	switch (deviceId) {
 		case 0x2825: // ICH8 Desktop when in IDE emulation mode
 			dprintf("intel_fixup_ahci: WARNING found ICH8 device id 0x2825\n");
