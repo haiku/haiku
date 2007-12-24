@@ -1,4 +1,5 @@
 /*
+** Copyright 2007, Marcus Overhagen. All rights reserved.
 ** Copyright 2002/03, Thomas Kurschel. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 */
@@ -21,6 +22,7 @@
 #include <malloc.h>
 #include <ByteOrder.h>
 
+#define TRACE(x...) dprintf("IDE: " x)
 
 /** cleanup links devices on one bus when <device> is deleted */
 
@@ -28,6 +30,8 @@ static void
 cleanup_device_links(ide_device_info *device)
 {
 	ide_bus_info *bus = device->bus;
+
+	TRACE("cleanup_device_links: device %p\n", device);
 
 	bus->devices[device->is_device1] = NULL;
 
@@ -48,7 +52,7 @@ cleanup_device_links(ide_device_info *device)
 static void
 destroy_device(ide_device_info *device)
 {
-	SHOW_FLOW( 4, "%p", device );
+	TRACE("destroy_device: device %p\n", device);
 
 	// paranoia
 	device->exec_io = NULL;
@@ -71,7 +75,7 @@ destroy_device(ide_device_info *device)
 static void
 setup_device_links(ide_bus_info *bus, ide_device_info *device)
 {
-	SHOW_FLOW0( 4, "" );
+	TRACE("setup_device_links: bus %p, device %p\n", bus, device);
 
 	device->bus = bus;
 	bus->devices[device->is_device1] = device;
@@ -102,7 +106,7 @@ create_device(ide_bus_info *bus, bool is_device1)
 {
 	ide_device_info *device;
 
-	SHOW_FLOW(4, "is_device1=%d", (int)is_device1);
+	TRACE("create_device: bus %p, device-number %d\n", bus, is_device1);
 
 	device = (ide_device_info *)malloc(sizeof(*device));
 	if (device == NULL) 
@@ -188,7 +192,7 @@ scan_device_int(ide_device_info *device, bool atapi)
 	ide_bus_info *bus = device->bus;
 	int status;
 
-	FAST_LOG1(bus->log, ev_ide_scan_device_int, (uint32)atapi);
+	TRACE("scan_device_int: device %p, atapi %d\n", device, atapi);
 
 	device->tf_param_mask = 0;
 	device->tf.write.command = atapi ? IDE_CMD_IDENTIFY_PACKET_DEVICE
@@ -203,7 +207,7 @@ scan_device_int(ide_device_info *device, bool atapi)
 	device->tf.lba.device = device->is_device1;
 
 	if (!send_command(device, NULL, atapi ? false : true, 20, ide_state_sync_waiting)) {
-		FAST_LOG0(bus->log, ev_ide_scan_device_int_cant_send);
+		TRACE("scan_device_int: send_command failed\n");
 		return false;
 	}
 
@@ -213,30 +217,32 @@ scan_device_int(ide_device_info *device, bool atapi)
 	if (acquire_sem_etc(bus->sync_wait_sem, 1, B_RELATIVE_TIMEOUT, 100000) == B_TIMED_OUT) {
 		bool cont;
 
-		SHOW_FLOW0( 3, "no fast response to inquiry" );
+		TRACE("scan_device_int: no fast response to inquiry\n");
 
 		// check the busy flag - if it's still set, there's probably no device	
 		IDE_LOCK(bus);
 
 		status = bus->controller->get_altstatus(bus->channel_cookie);
-		SHOW_FLOW(3, "status=%x", (int)status);
 		cont = (status & ide_status_bsy) == ide_status_bsy;
 
 		IDE_UNLOCK(bus);
 
+		TRACE("scan_device_int: status %#04x\n", status);
+
 		if (!cont) {
-			SHOW_FLOW0( 3, "no busy bit set after 100ms - probably noone there" );
+			TRACE("scan_device_int: busy bit not set after 100ms - probably noone there\n");
 			// no reaction -> abort waiting
 			cancel_irq_timeout(bus);
 
 			// timeout or irq may have been fired, reset semaphore just is case
 			acquire_sem_etc(bus->sync_wait_sem, 1, B_RELATIVE_TIMEOUT, 0);
 
-			FAST_LOG0(bus->log, ev_ide_scan_device_int_keeps_busy);
+			TRACE("scan_device_int: aborting because busy bit not set\n");
 			return false;
 		}
 
-		SHOW_FLOW0( 3, "busy bit set, give device more time" );
+		TRACE("scan_device_int: busy bit set, give device more time\n");
+
 		// there is something, so wait for it
 		acquire_sem(bus->sync_wait_sem);
 	}
@@ -245,8 +251,10 @@ scan_device_int(ide_device_info *device, bool atapi)
 	// we've used the wait semaphore directly	
 	cancel_irq_timeout(bus);
 
-	if (bus->sync_wait_timeout)
+	if (bus->sync_wait_timeout) {
+		TRACE("scan_device_int: aborting on sync_wait_timeout\n");
 		return false;
+	}
 
 	ide_wait(device, ide_status_drq, ide_status_bsy, true, 1000);
 
@@ -254,7 +262,7 @@ scan_device_int(ide_device_info *device, bool atapi)
 
 	if ((status & ide_status_err) != 0) {
 		// if there's no device, all bits including the error bit are set
-		SHOW_FLOW( 3, "err set - no device or wrong type (status: %x)", status );
+		TRACE("scan_device_int: error bit set - no device or wrong type (status: %#04x)\n", status);
 		return false;
 	}
 
@@ -262,12 +270,12 @@ scan_device_int(ide_device_info *device, bool atapi)
 	bus->controller->read_pio(bus->channel_cookie, (uint16 *)&device->infoblock, 
 		sizeof(device->infoblock) / sizeof(uint16), false);
 
-	if (!wait_for_drqdown(device))
+	if (!wait_for_drqdown(device)) {
+		TRACE("scan_device_int: wait_for_drqdown failed\n");
 		return false;
+	}
 
-	SHOW_FLOW0( 3, "device found" );
-
-	FAST_LOG0(bus->log, ev_ide_scan_device_int_found);
+	TRACE("scan_device_int: device found\n");
 
 	prep_infoblock(device);
 	return true;	
@@ -282,7 +290,7 @@ scan_device_worker(ide_bus_info *bus, void *arg)
 	int is_device1 = (int)arg;
 	ide_device_info *device;
 
-	SHOW_FLOW(4, "is_device1: %d", is_device1);
+	TRACE("scan_device_worker: bus %p, device-number %d\n", bus, is_device1);
 
 	// forget everything we know about the device;
 	// don't care about peripheral drivers using this device
