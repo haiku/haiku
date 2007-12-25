@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src apps launchbox ;
 
-AddSubDirSupportedPlatforms libbe_test ;
-
 UsePrivateHeaders shared ;
 
 Application LaunchBox :
@@ -18,7 +16,3 @@ Application LaunchBox :
 	: LaunchBox.rdef
 ;
 
-if $(TARGET_PLATFORM) = libbe_test {
-	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : LaunchBox
-		: tests!apps ;
-}

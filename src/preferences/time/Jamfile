@@ -1,7 +1,6 @@
 SubDir HAIKU_TOP src preferences time ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
-AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders kernel ;
 UseArchHeaders $(TARGET_ARCH) ;
@@ -24,7 +23,3 @@ Preference Time :
 	: Time.rdef
 	;
 
-if $(TARGET_PLATFORM) = libbe_test {
-	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Time
-		: tests!apps ;
-}

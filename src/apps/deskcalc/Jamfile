@@ -2,8 +2,6 @@ SubDir HAIKU_TOP src apps deskcalc ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-AddSubDirSupportedPlatforms libbe_test ;
-
 Application DeskCalc :
 	CalcApplication.cpp
 	CalcOptionsWindow.cpp
@@ -17,7 +15,3 @@ Application DeskCalc :
 	: DeskCalc.rdef
 	;
 
-if $(TARGET_PLATFORM) = libbe_test {
-	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : DeskCalc
-		: tests!apps ;
-}
