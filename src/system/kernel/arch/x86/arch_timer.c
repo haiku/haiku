@@ -25,6 +25,13 @@
 
 #include "interrupts.h"
 
+//#define TRACE_TIMER
+#ifdef TRACE_TIMER
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
 
 #define PIT_CLOCK_RATE 1193180
 #define PIT_MAX_TIMER_INTERVAL (0xffff * 1000000ll / PIT_CLOCK_RATE)
@@ -75,6 +82,7 @@ apic_timer_interrupt(void)
 void
 arch_timer_set_hardware_timer(bigtime_t timeout)
 {
+	TRACE(("arch_timer_set_hardware_timer: timeout %lld\n", timeout));
 	// try the apic timer first
 	if (arch_smp_set_apic_timer(timeout) != B_OK)
 		set_isa_hardware_timer(timeout);
@@ -84,6 +92,7 @@ arch_timer_set_hardware_timer(bigtime_t timeout)
 void
 arch_timer_clear_hardware_timer(void)
 {
+	TRACE(("arch_timer_clear_hardware_timer\n"));
 	if (arch_smp_clear_apic_timer() != B_OK)
 		clear_isa_hardware_timer();
 }

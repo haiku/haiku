@@ -93,6 +93,8 @@ restart_scan:
 
 		release_spinlock(spinlock);
 
+		TRACE(("timer_interrupt: calling hook %p for event %p\n", event->hook, event));
+
 		// call the callback
 		// note: if the event is not periodic, it is ok
 		// to delete the event structure inside the callback
@@ -139,6 +141,8 @@ add_timer(timer *event, timer_hook hook, bigtime_t period, int32 flags)
 	
 	if (event == NULL || hook == NULL || period < 0)
 		return B_BAD_VALUE;
+
+	TRACE(("add_timer: event %p\n", event));
 
 	scheduleTime = period;
 	if (flags != B_ONE_SHOT_ABSOLUTE_TIMER)
@@ -213,6 +217,8 @@ cancel_timer(timer *event)
 {
 	int currentCPU = smp_get_current_cpu();
 	cpu_status state;
+
+	TRACE(("cancel_timer: event %p\n", event));
 
 	state = disable_interrupts();
 
