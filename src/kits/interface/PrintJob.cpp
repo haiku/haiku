@@ -266,8 +266,9 @@ BPrintJob::~BPrintJob()
 	fCurrentPageHeader = NULL;
 }
 
-static
-status_t ConfigPageThread(void *data)
+
+static status_t
+ConfigPageThread(void *data)
 {
 	BPrivate::Configuration* configuration = static_cast<BPrivate::Configuration*>(data);
 	
@@ -581,6 +582,7 @@ BPrintJob::IsSettingsMessageValid(BMessage *message) const
 	return valid;
 }
 
+
 // Either SetSettings() or ConfigPage() has to be called prior
 // to any of the getters otherwise they return undefined values.
 BRect
@@ -654,10 +656,14 @@ BPrintJob::RecurseView(BView *view, BPoint origin,
                        BPicture *picture, BRect rect)
 {
 	ASSERT(picture != NULL);
-	
+	// TODO: test what happens if views don't have
+	// the B_WILL_DRAW flag or have B_DRAW_ON_CHILDREN 
+
 	view->AppendToPicture(picture);
 	view->f_is_printing = true;
+	view->PushState();
 	view->Draw(rect);
+	view->PopState();
 	view->f_is_printing = false;
 	view->EndPicture();
 	
