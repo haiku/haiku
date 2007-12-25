@@ -1,7 +1,6 @@
 SubDir HAIKU_TOP src apps mail ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
-AddSubDirSupportedPlatforms libbe_test ;
 
 if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders mail ;
@@ -41,8 +40,3 @@ Package haiku-maildaemon-cvs :
 	Mail : 
 	boot beos apps ;
 
-
-if ( $(TARGET_PLATFORM) = libbe_test ) {
-	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Mail
-		: tests!apps ;
-}
