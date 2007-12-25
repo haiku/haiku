@@ -558,7 +558,7 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 					fState = MENU_STATE_CLOSED;
 			}
 		} else if (menuItem == NULL && fSelected != NULL
-			&& !_IsStickyMode() && fState != MENU_STATE_TRACKING_SUBMENU) {
+			&& !_IsStickyMode() && Bounds().Contains(where)) {
 			_SelectItem(NULL);
 			fState = MENU_STATE_TRACKING;
 		}
