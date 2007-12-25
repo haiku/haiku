@@ -392,7 +392,7 @@ _BTypingUndoBuffer_::ForwardErase()
 		if (fTextLength < newLength) {
 			// store the erased character
 			for (int32 x = 0; x < charLen; x++)
-				buffer[fTextLength] = fTextView->ByteAt(start + x);
+				buffer[fTextLength + x] = fTextView->ByteAt(start + x);
 		}
 
 		fTextLength = newLength;
