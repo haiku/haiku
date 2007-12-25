@@ -902,11 +902,15 @@ ViewLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 		InvalidateScreenClipping();
 
 		if (dirty->CountRects() > 0) {
-			// exclude children, they are expected to
-			// include their own dirty regions in ParentResized()
-			for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
-				if (child->IsVisible()) {
-					IntRect previousChildVisible(child->Frame() & oldBounds & Bounds());
+			if ((fFlags & B_DRAW_ON_CHILDREN) == 0) {
+				// exclude children, they are expected to
+				// include their own dirty regions in ParentResized()
+				for (ViewLayer* child = FirstChild(); child;
+						child = child->NextSibling()) {
+					if (!child->IsVisible())
+						continue;
+					IntRect previousChildVisible(
+						child->Frame() & oldBounds & Bounds());
 					if (dirty->Frame().Intersects(previousChildVisible)) {
 						dirty->Exclude((clipping_rect)previousChildVisible);
 					}
@@ -1476,21 +1480,27 @@ ViewLayer::RebuildClipping(bool deep)
 	fLocalClipping.Set((clipping_rect)Bounds());
 
 	if (ViewLayer* child = FirstChild()) {
-		BRegion* childrenRegion = fWindow->GetRegion();
-		if (!childrenRegion)
-			return;
-	
+		// if this view does not draw over children,
 		// exclude all children from the clipping
-		for (; child; child = child->NextSibling()) {
-			if (child->IsVisible())
-				childrenRegion->Include((clipping_rect)child->Frame());
-	
-			if (deep)
-				child->RebuildClipping(deep);
+		if ((fFlags & B_DRAW_ON_CHILDREN) == 0) {
+			BRegion* childrenRegion = fWindow->GetRegion();
+			if (!childrenRegion)
+				return;
+
+			for (; child; child = child->NextSibling()) {
+				if (child->IsVisible())
+					childrenRegion->Include((clipping_rect)child->Frame());
+			}
+
+			fLocalClipping.Exclude(childrenRegion);
+			fWindow->RecycleRegion(childrenRegion);
 		}
-	
-		fLocalClipping.Exclude(childrenRegion);
-		fWindow->RecycleRegion(childrenRegion);
+		// if the operation is "deep", make children rebuild their
+		// clipping too
+		if (deep) {
+			for (child = FirstChild(); child; child = child->NextSibling())
+				child->RebuildClipping(true);
+		}
 	}
 
 	// add the user clipping in case there is one
@@ -1520,7 +1530,7 @@ ViewLayer::ScreenClipping(BRegion* windowContentClipping, bool force) const
 		fScreenClipping = fLocalClipping;
 		ConvertToScreen(&fScreenClipping);
 
-		// see if we parts of our bounds are hidden underneath
+		// see if parts of our bounds are hidden underneath
 		// the parent, the local clipping does not account for this
 		IntRect clippedBounds = Bounds();
 		ConvertToVisibleInTopView(&clippedBounds);

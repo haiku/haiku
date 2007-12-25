@@ -241,7 +241,7 @@ class ViewLayer {
 			int32			fToken;
 			// area within parent coordinate space
 			IntRect			fFrame;
-			// scrolling offset
+			// offset of the local area (bounds)
 			IntPoint		fScrollingOffset;
 
 			rgb_color		fViewColor;

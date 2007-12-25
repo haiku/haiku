@@ -1195,11 +1195,14 @@ FrameMoved(origin);
 						printf("_UPDATE_ - didn't find view by token: %ld\n", (int32)tokens.ItemAtFast(i));
 //drawTime += system_time() - drawStart;
 				}
-				// TODO: the tokens are actually hirachically sorted,
+				// NOTE: The tokens are actually hirachically sorted,
 				// so traversing the list in revers and calling
-				// child->DrawAfterChildren would actually work correctly,
-				// only that drawing outside a view is not yet supported
-				// in the app_server.
+				// child->DrawAfterChildren actually works correctly
+				for (int32 i = count - 1; i >= 0; i--) {
+					if (BView* view = _FindView((int32)tokens.ItemAtFast(i)))
+						view->_DrawAfterChildren(updateRect);
+				}
+
 //printf("  %ld views drawn, total Draw() time: %lld\n", count, drawTime);
 			}
 

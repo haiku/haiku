@@ -565,35 +565,30 @@ private:
 							BView(const BView&);
 			BView&			operator=(const BView&);
 
-			void			_InitData(BRect frame, const char* name, uint32 resizeMask,
-								uint32 flags);
-			status_t		_SetViewBitmap(const BBitmap* bitmap,BRect srcRect,
-								BRect dstRect, uint32 followFlags, uint32 options);
-			void			DoBezier(int32 gr, BPoint* controlPoints, pattern p);
-			void			DoShape(int32 gr, BShape* shape, pattern p);
-			void			DoPictureClip(BPicture* picture, BPoint where, bool invert,
-								bool sync);
+			void			_InitData(BRect frame, const char* name,
+								uint32 resizeMask, uint32 flags);
+			status_t		_SetViewBitmap(const BBitmap* bitmap,
+								BRect srcRect, BRect dstRect,
+								uint32 followFlags, uint32 options);
+			void			_ClipToPicture(BPicture* picture, BPoint where,
+								bool invert, bool sync);
 
-			bool			do_owner_check() const;
-			bool			do_owner_check_no_pick() const;
-			void			check_lock() const;
-			void			check_lock_no_pick() const;
+			bool			_CheckOwnerLockAndSwitchCurrent() const;
+			bool			_CheckOwnerLock() const;
+			void			_CheckLockAndSwitchCurrent() const;
+			void			_CheckLock() const;
+			void			_SwitchServerCurrentView() const;
 
 			void			_SetOwner(BWindow* newOwner);
-			void			handle_tick();
-			char*			test_area(int32 length);
-			void			removeCommArray();
-			void			SetScroller(BScrollBar* sb);
-			void			UnsetScroller(BScrollBar* sb);
-			void			RealScrollTo(BPoint);
-			void			fetch_font();
-			uchar			font_encoding() const;
+			void			_RemoveCommArray();
+
 			BShelf*			_Shelf() const;
 			void			_SetShelf(BShelf* shelf);
 
 			void			_MoveTo(int32 x, int32 y);
 			void			_ResizeBy(int32 deltaWidth, int32 deltaHeight);
-			void			_ParentResizedBy(int32 x, int32 y);
+			void			_ParentResizedBy(int32 deltaWidth,
+								int32 deltaHeight);
 
 			void			_ConvertToScreen(BPoint* pt, bool checkLock) const;
 			void			_ConvertFromScreen(BPoint* pt, bool checkLock) const;
@@ -605,7 +600,8 @@ private:
 			void			_Activate(bool state);
 			void			_Attach();
 			void			_Detach();
-			void			_Draw(BRect updateRect);
+			void			_Draw(BRect screenUpdateRect);
+			void			_DrawAfterChildren(BRect screenUpdateRect);
 			void			_Pulse();
 
 			void			_UpdateStateForRemove();
@@ -621,8 +617,8 @@ private:
 			bool			_RemoveSelf();
 
 			// Debugging methods
-			void 			PrintToStream();
-			void			PrintTree();
+			void 			_PrintToStream();
+			void			_PrintTree();
 
 			int32			server_token;
 			uint32			fFlags;
