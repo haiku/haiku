@@ -37,8 +37,8 @@ class ServerPicture;
 class ViewLayer {
  public:
 							ViewLayer(IntRect frame, IntPoint scrollingOffset,
-								const char* name, int32 token, uint32 resizeMode,
-								uint32 flags);
+								const char* name, int32 token,
+								uint32 resizeMode, uint32 flags);
 
 	virtual					~ViewLayer();
 
@@ -164,8 +164,9 @@ class ViewLayer {
 
 			ServerBitmap*	ViewBitmap() const
 								{ return fViewBitmap; }
-			void			SetViewBitmap(ServerBitmap* bitmap, IntRect sourceRect,
-								IntRect destRect, int32 resizingMode, int32 options);
+			void			SetViewBitmap(ServerBitmap* bitmap,
+								IntRect sourceRect, IntRect destRect,
+								int32 resizingMode, int32 options);
 
 			void			PushState();
 			void			PopState();
@@ -177,11 +178,12 @@ class ViewLayer {
 			uint32			EventOptions() const
 								{ return fEventOptions; }
 
-			ServerCursor*	Cursor() const { return fCursor; }
 			void			SetCursor(ServerCursor* cursor);
+			ServerCursor*	Cursor() const { return fCursor; }
 
-			ServerPicture*	Picture() const;
 			void			SetPicture(ServerPicture* picture);
+			ServerPicture*	Picture() const
+								{ return fPicture; }
 
 			// for background clearing
 			virtual void	Draw(DrawingEngine* drawingEngine,
@@ -223,7 +225,7 @@ class ViewLayer {
 			// clipping
 			void			RebuildClipping(bool deep);
 			BRegion&		ScreenClipping(BRegion* windowContentClipping,
-										   bool force = false) const;
+								bool force = false) const;
 			void			InvalidateScreenClipping();
 	inline	bool			IsScreenClippingValid() const
 								{ return fScreenClippingValid; }
@@ -233,7 +235,7 @@ class ViewLayer {
 
 	protected:
 			void			_MoveScreenClipping(int32 x, int32 y,
-												bool deep);
+								bool deep);
 			Overlay*		_Overlay() const;
 			void			_UpdateOverlayView() const;
 

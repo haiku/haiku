@@ -1142,16 +1142,17 @@ ViewLayer::SetEventMask(uint32 eventMask, uint32 options)
 void
 ViewLayer::SetCursor(ServerCursor *cursor)
 {
-	if (cursor != fCursor) {
-		if (fCursor)
-			fCursor->Release();
+	if (cursor == fCursor)
+		return;
 
-		fCursor = cursor;
+	if (fCursor)
+		fCursor->Release();
 
-		if (fCursor) {
-			fCursor->Acquire();
-			fCursor->SetPendingViewCursor(false);
-		}
+	fCursor = cursor;
+
+	if (fCursor) {
+		fCursor->Acquire();
+		fCursor->SetPendingViewCursor(false);
 	}
 }
 
@@ -1160,13 +1161,6 @@ void
 ViewLayer::SetPicture(ServerPicture *picture)
 {
 	fPicture = picture;
-}
-
-
-ServerPicture *
-ViewLayer::Picture() const
-{
-	return fPicture;
 }
 
 
