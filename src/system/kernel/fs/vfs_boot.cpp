@@ -370,6 +370,14 @@ dprintf("get_boot_partitions(): boot method type: %ld\n", bootMethodType);
 		return status;
 	}
 
+	if (1 /* dump devices and partitions */) {
+		KDiskDevice *device;
+		int32 cookie = 0;
+		while ((device = manager->NextDevice(&cookie)) != NULL) {
+			device->Dump(true, 0);
+		}
+	}
+
 	struct BootPartitionVisitor : KPartitionVisitor {
 		BootPartitionVisitor(BootMethod* bootMethod, PartitionStack &stack)
 			: fPartitions(stack),
