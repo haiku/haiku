@@ -21,6 +21,12 @@
 
 #include <string.h>
 
+#define TRACE_MENU
+#ifdef TRACE_MENU
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
 
 MenuItem::MenuItem(const char *label, Menu *subMenu)
 	:
@@ -496,6 +502,8 @@ user_menu(Directory **_bootVolume)
 	Menu *safeModeMenu = NULL;
 	MenuItem *item;
 
+	TRACE(("user_menu: enter\n"));
+
 	// Add boot volume
 	menu->AddItem(item = new(nothrow) MenuItem("Select boot volume",
 		add_boot_volume_menu(*_bootVolume)));
@@ -527,6 +535,8 @@ user_menu(Directory **_bootVolume)
 
 	apply_safe_mode_options(safeModeMenu);
 	delete menu;
+
+	TRACE(("user_menu: leave\n"));
 
 	return B_OK;
 }
