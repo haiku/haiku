@@ -201,8 +201,10 @@ scan_device_int(ide_device_info *device, bool atapi)
 	// initialize device selection flags,
 	// this is the only place where this bit gets initialized in the task file
 	if (bus->controller->read_command_block_regs(bus->channel_cookie, &device->tf,
-			ide_mask_device_head) != B_OK) 
+			ide_mask_device_head) != B_OK) {
+		TRACE("scan_device_int: read_command_block_regs failed\n");
 		return false;
+	}
 
 	device->tf.lba.device = device->is_device1;
 

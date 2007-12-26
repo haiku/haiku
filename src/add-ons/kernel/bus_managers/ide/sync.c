@@ -98,9 +98,6 @@ ide_irq_handler(ide_bus_info *bus, uint8 status)
 {	
 	ide_device_info *device;
 
-	TRACE(("\n"));
-	FAST_LOG0(bus->log, ev_ide_irq_handle);
-
 	// we need to lock bus to have a solid bus state
 	// (side effect: we lock out the timeout handler and get
 	//  delayed if the IRQ happens at the same time as a command is
@@ -131,11 +128,9 @@ ide_irq_handler(ide_bus_info *bus, uint8 status)
 		return B_UNHANDLED_INTERRUPT;
 	}
 
-	TRACE(("state: %d\n", bus->state));
-
 	switch (bus->state) {
 		case ide_state_async_waiting:
-			TRACE(("async waiting\n"));
+			TRACE(("state: async waiting\n"));
 
 			bus->state = ide_state_accessing;
 
@@ -145,7 +140,7 @@ ide_irq_handler(ide_bus_info *bus, uint8 status)
 			return B_INVOKE_SCHEDULER; 
 
 		case ide_state_idle:
-			TRACE(("idle\n"));
+			TRACE(("state: idle, num_running_reqs %d\n", bus->num_running_reqs));
 
 			// this must be a service request;
 			// if no request is pending, the IRQ was fired wrongly
@@ -162,7 +157,7 @@ ide_irq_handler(ide_bus_info *bus, uint8 status)
 			return B_INVOKE_SCHEDULER;
 
 		case ide_state_sync_waiting:
-			TRACE(("sync waiting\n"));
+			TRACE(("state: sync waiting\n"));
 
 			bus->state = ide_state_accessing;
 			bus->sync_wait_timeout = false;
@@ -173,7 +168,7 @@ ide_irq_handler(ide_bus_info *bus, uint8 status)
 			return B_INVOKE_SCHEDULER;
 
 		case ide_state_accessing:
-			TRACE(("spurious IRQ - there is a command being executed\n"));
+			TRACE(("state: spurious IRQ - there is a command being executed\n"));
 
 			IDE_UNLOCK(bus);
 			return B_UNHANDLED_INTERRUPT;
