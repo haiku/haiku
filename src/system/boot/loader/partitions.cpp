@@ -104,6 +104,8 @@ Partition::Partition(int fd)
 	fIsFileSystem(false),
 	fIsPartitioningSystem(false)
 {
+	TRACE(("%p Partition::Partition\n", this));
+
 	memset((partition_data *)this, 0, sizeof(partition_data));
 	id = (partition_id)this;
 
@@ -114,7 +116,24 @@ Partition::Partition(int fd)
 
 Partition::~Partition()
 {
+	TRACE(("%p Partition::~Partition\n", this));
 	close(fFD);
+}
+
+
+void
+Partition::SetParent(Partition *parent)
+{
+	TRACE(("%p Partition::SetParent %p\n", this, parent));
+	fParent = parent;
+}
+
+
+Partition *
+Partition::Parent() const
+{
+	TRACE(("%p Partition::Parent is %p\n", this, fParent));
+	return fParent;
 }
 
 
@@ -174,6 +193,7 @@ Partition *
 Partition::AddChild()
 {
 	Partition *child = new Partition(fFD);
+	TRACE(("%p Partition::AddChild %p\n", this, child));
 	if (child == NULL)
 		return NULL;
 
@@ -188,7 +208,8 @@ Partition::AddChild()
 status_t
 Partition::_Mount(file_system_module_info *module, Directory **_fileSystem)
 {
-	TRACE(("check for file_system: %s\n", module->pretty_name));
+	TRACE(("%p Partition::_Mount check for file_system: %s\n", 
+		this, module->pretty_name));
 
 	Directory *fileSystem;
 	if (module->get_file_system(this, &fileSystem) == B_OK) {
@@ -230,7 +251,7 @@ Partition::Scan(bool mountFileSystems, bool isBootDevice)
 {
 	// scan for partitions first (recursively all eventual children as well)
 	
-	TRACE(("Partition::Scan()\n"));
+	TRACE(("%p Partition::Scan()\n", this));
 
 	// if we were not booted from the real boot device, we won't scan
 	// the device we were booted from (which is likely to be a slow
@@ -314,8 +335,8 @@ Partition::Scan(bool mountFileSystems, bool isBootDevice)
 		Partition *child = NULL;
 
 		while ((child = (Partition *)iterator.Next()) != NULL) {
-			TRACE(("*** scan child %p (start = %Ld, size = %Ld, parent = %p)!\n",
-				child, child->offset, child->size, child->Parent()));
+			TRACE(("%p Partition::Scan: *** scan child %p (start = %Ld, size = %Ld, parent = %p)!\n",
+				this, child, child->offset, child->size, child->Parent()));
 
 			child->Scan(mountFileSystems);
 

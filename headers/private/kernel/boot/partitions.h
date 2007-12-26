@@ -30,8 +30,8 @@ class Partition : public Node, public partition_data {
 		status_t Mount(Directory **_fileSystem = NULL, bool isBootDevice = false);
 		status_t Scan(bool mountFileSystems, bool isBootDevice = false);
 
-		void SetParent(Partition *parent) { fParent = parent; }
-		Partition *Parent() const { return fParent; }
+		void SetParent(Partition *parent);
+		Partition *Parent() const;
 
 		bool IsFileSystem() const { return fIsFileSystem; }
 		bool IsPartitioningSystem() const { return fIsPartitioningSystem; }
