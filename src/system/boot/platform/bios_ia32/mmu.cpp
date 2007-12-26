@@ -133,6 +133,9 @@ get_next_physical_page()
 static uint32 *
 get_next_page_table()
 {
+	TRACE(("get_next_page_table, sNextPageTableAddress %p, kPageTableRegionEnd %p\n", 
+		sNextPageTableAddress, kPageTableRegionEnd));
+	
 	addr_t address = sNextPageTableAddress;
 	if (address >= kPageTableRegionEnd)
 		return (uint32 *)get_next_physical_page();
@@ -210,9 +213,16 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 	// map the page to the correct page table
 	uint32 *pageTable = (uint32 *)(sPageDirectory[virtualAddress
 		/ (B_PAGE_SIZE * 1024)] & 0xfffff000);
-	pageTable[(virtualAddress % (B_PAGE_SIZE * 1024)) / B_PAGE_SIZE] = physicalAddress | flags;
+	uint32 tableEntry = (virtualAddress % (B_PAGE_SIZE * 1024)) / B_PAGE_SIZE;
+	
+	TRACE(("map_page: inserting pageTable %p, tableEntry %ld, physicalAddress %p\n", 
+		pageTable, tableEntry, physicalAddress));
+
+	pageTable[tableEntry] = physicalAddress | flags;
 
 	asm volatile("invlpg (%0)" : : "r" (virtualAddress));
+
+	TRACE(("map_page: done\n"));
 }
 
 
@@ -275,6 +285,8 @@ get_memory_map(extended_memory **_extendedMemory)
 static void
 init_page_directory(void)
 {
+	TRACE(("init_page_directory\n"));
+
 	// allocate a new pgdir
 	sPageDirectory = (uint32 *)get_next_physical_page();
 	gKernelArgs.arch_args.phys_pgdir = (uint32)sPageDirectory;
@@ -417,6 +429,7 @@ mmu_free(void *virtualAddress, size_t size)
 extern "C" void
 mmu_init_for_kernel(void)
 {
+	TRACE(("mmu_init_for_kernel\n"));
 	// set up a new idt
 	{
 		struct gdt_idt_descr idtDescriptor;
@@ -536,6 +549,8 @@ mmu_init_for_kernel(void)
 extern "C" void
 mmu_init(void)
 {
+	TRACE(("mmu_init\n"));
+
 	gKernelArgs.physical_allocated_range[0].start = sNextPhysicalAddress;
 	gKernelArgs.physical_allocated_range[0].size = 0;
 	gKernelArgs.num_physical_allocated_ranges = 1;
