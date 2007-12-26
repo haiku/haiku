@@ -140,6 +140,9 @@ void SnowView::AttachedToWindow()
 		fDragger->SetViewColor(col);
 		if (fDragger->InShelf()) {
 			p->SetFlags(p->Flags() | B_DRAW_ON_CHILDREN);
+#ifdef B_UPDATE_INVALIDATED
+			p->SetDoubleBuffering(p->DoubleBuffering() | B_UPDATE_EXPOSED);
+#endif
 			ResizeTo(p->Bounds().Width(), p->Bounds().Height());
 			MoveTo(0,0);
 			fDragger->MoveTo(p->Bounds().Width()-7, p->Bounds().Height()-7);
