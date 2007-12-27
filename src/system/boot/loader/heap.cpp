@@ -1,7 +1,7 @@
-/* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <boot/heap.h>
@@ -31,6 +31,8 @@
  * size 0 that can't be allocated.
  */
 
+#define DEBUG_ALLOCATIONS
+	// if defined, freed memory is filled with 0xcc
 
 struct free_chunk {
 	uint32		size;
@@ -53,10 +55,9 @@ static uint32 /*sHeapSize,*/ sMaxHeapSize, sAvailable;
 static free_chunk sFreeAnchor;
 
 
-/** Returns the amount of bytes that can be allocated
- *	in this chunk.
- */
-
+/*!	Returns the amount of bytes that can be allocated
+	in this chunk.
+*/
 uint32
 free_chunk::Size() const
 {
@@ -64,10 +65,9 @@ free_chunk::Size() const
 }
 
 
-/**	Splits the upper half at the requested location
- *	and returns it.
- */
-
+/*!	Splits the upper half at the requested location
+	and returns it.
+*/
 free_chunk *
 free_chunk::Split(uint32 splitSize)
 {
@@ -81,10 +81,9 @@ free_chunk::Split(uint32 splitSize)
 }
 
 
-/**	Checks if the specified chunk touches this chunk, so
- *	that they could be joined.
- */
-
+/*!	Checks if the specified chunk touches this chunk, so
+	that they could be joined.
+*/
 bool
 free_chunk::IsTouching(free_chunk *chunk)
 {
@@ -94,14 +93,13 @@ free_chunk::IsTouching(free_chunk *chunk)
 }
 
 
-/**	Joins the chunk to this chunk and returns the pointer
- *	to the new chunk - which will either be one of the
- *	two chunks.
- *	Note, the chunks must be joinable, or else this method
- *	doesn't work correctly. Use free_chunk::IsTouching()
- *	to check if this method can be applied.
- */
-
+/*!	Joins the chunk to this chunk and returns the pointer
+	to the new chunk - which will either be one of the
+	two chunks.
+	Note, the chunks must be joinable, or else this method
+	doesn't work correctly. Use free_chunk::IsTouching()
+	to check if this method can be applied.
+*/
 free_chunk *
 free_chunk::Join(free_chunk *chunk)
 {
@@ -151,6 +149,10 @@ free_chunk::Enqueue()
 
 	this->next = chunk;
 	last->next = this;
+
+#ifdef DEBUG_ALLOCATIONS
+	memset((uint8*)this + sizeof(free_chunk), 0xcc, this->size - sizeof(free_chunk));
+#endif
 }
 
 
@@ -322,6 +324,20 @@ free(void *allocated)
 		return;
 
 	free_chunk *freedChunk = free_chunk::SetToAllocated(allocated);
+
+#ifdef DEBUG_ALLOCATIONS
+	if (freedChunk->size > 65536)
+		panic("freed chunk %p clobbered (%lx)!\n", freedChunk, freedChunk->size);
+{
+	free_chunk *chunk = sFreeAnchor.next;
+	while (chunk) {
+		if (chunk->size > 65536 || freedChunk == chunk)
+			panic("invalid chunk in free list, or double free\n");
+		chunk = chunk->next;
+	}
+}
+#endif
+
 	sAvailable += freedChunk->size;
 
 	// try to join the new free chunk with an existing one
