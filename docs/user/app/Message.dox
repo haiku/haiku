@@ -95,16 +95,23 @@
 	
 	This class is at the center of the web of messaging classes, in the sense
 	that it defines the actual structure of the messages. Messages have two
-	important elements: the #what identifer, and the data members. The first
-	can be directly manipulated, the latter can be manipulated through
+	<b>important elements</b>: the #what identifer, and the data members. The
+	first can be directly manipulated, the latter can be manipulated through
 	AddData(), FindData() and ReplaceData() and their deratives. Neither of
 	these elements are mandatory.
 	
-	The second important role of BMessage is that it stores meta data: who sent
-	the message and with what intention? The methods of BMessage will disclose
-	if the message was a reply (IsReply()), where it came from
+	The second important role of BMessage is that it stores <b>meta data</b>:
+	who sent the message and with what intention? The methods of BMessage will
+	disclose if the message was a reply (IsReply()), where it came from
 	(IsSourceRemote()), whether a reply is expected (IsSourceWaiting()), and in
 	case the message is a reply, what it's a reply to (Previous()).
+	
+	Mostly, messages are used to pass information between the the objects in
+	your application, but because messages are such flexible data containers,
+	they are also often used for other <b>data storage purposes</b>. Many
+	applications store their settings as messages. Because messages can be
+	flattened to data streams (such as files), they provide an easy but
+	powerful tool for data storage.
 	
 	All methods can be classified in these areas:
 	- Adding, Finding, Replacing and Removing Data.
