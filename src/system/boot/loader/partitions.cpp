@@ -44,7 +44,8 @@ static const partition_module_info *sPartitionModules[] = {
 	&gApplePartitionModule,
 #endif
 };
-static const int32 sNumPartitionModules = sizeof(sPartitionModules) / sizeof(partition_module_info *);
+static const int32 sNumPartitionModules = sizeof(sPartitionModules)
+	/ sizeof(partition_module_info *);
 
 /* supported file system modules */
 
@@ -65,17 +66,17 @@ static file_system_module_info *sFileSystemModules[] = {
 	&gTarFileSystemModule,
 #endif
 };
-static const int32 sNumFileSystemModules = sizeof(sFileSystemModules) / sizeof(file_system_module_info *);
+static const int32 sNumFileSystemModules = sizeof(sFileSystemModules)
+	/ sizeof(file_system_module_info *);
 
 extern NodeList gPartitions;
 
 
 namespace boot {
 
-/** A convenience class to automatically close a
- *	file descriptor upon deconstruction.
- */
-
+/*! A convenience class to automatically close a
+	file descriptor upon deconstruction.
+*/
 class NodeOpener {
 	public:
 		NodeOpener(Node *node, int mode)
@@ -117,6 +118,17 @@ Partition::Partition(int fd)
 Partition::~Partition()
 {
 	TRACE(("%p Partition::~Partition\n", this));
+
+	// Tell the children that their parent is gone
+
+	NodeIterator iterator = gPartitions.GetIterator();
+	Partition *child;
+
+	while ((child = (Partition *)iterator.Next()) != NULL) {
+		if (child->Parent() == this)
+			child->SetParent(NULL);
+	}
+
 	close(fFD);
 }
 
@@ -132,7 +144,7 @@ Partition::SetParent(Partition *parent)
 Partition *
 Partition::Parent() const
 {
-	TRACE(("%p Partition::Parent is %p\n", this, fParent));
+	//TRACE(("%p Partition::Parent is %p\n", this, fParent));
 	return fParent;
 }
 
@@ -153,7 +165,8 @@ Partition::ReadAt(void *cookie, off_t position, void *buffer, size_t bufferSize)
 
 
 ssize_t 
-Partition::WriteAt(void *cookie, off_t position, const void *buffer, size_t bufferSize)
+Partition::WriteAt(void *cookie, off_t position, const void *buffer,
+	size_t bufferSize)
 {
 	if (position > this->size)
 		return 0;
@@ -250,7 +263,7 @@ status_t
 Partition::Scan(bool mountFileSystems, bool isBootDevice)
 {
 	// scan for partitions first (recursively all eventual children as well)
-	
+
 	TRACE(("%p Partition::Scan()\n", this));
 
 	// if we were not booted from the real boot device, we won't scan
@@ -277,6 +290,7 @@ Partition::Scan(bool mountFileSystems, bool isBootDevice)
 		if (priority < 0.0)
 			continue;
 
+		TRACE(("  priority: %ld\n", (int32)(priority * 1000)));
 		if (priority <= bestPriority) {
 			// the disk system recognized the partition worse than the currently
 			// best one
@@ -291,7 +305,6 @@ Partition::Scan(bool mountFileSystems, bool isBootDevice)
 		bestCookie = cookie;
 		bestPriority = priority;
 	}
-
 
 	// find the best FS module
 	const file_system_module_info *bestFSModule = NULL;
@@ -335,13 +348,15 @@ Partition::Scan(bool mountFileSystems, bool isBootDevice)
 		Partition *child = NULL;
 
 		while ((child = (Partition *)iterator.Next()) != NULL) {
-			TRACE(("%p Partition::Scan: *** scan child %p (start = %Ld, size = %Ld, parent = %p)!\n",
-				this, child, child->offset, child->size, child->Parent()));
+			TRACE(("%p Partition::Scan: *** scan child %p (start = %Ld, size "
+				"= %Ld, parent = %p)!\n", this, child, child->offset,
+				child->size, child->Parent()));
 
 			child->Scan(mountFileSystems);
 
 			if (!mountFileSystems || child->IsFileSystem()) {
-				// move the partitions containing file systems to the partition list
+				// move the partitions containing file systems to the partition
+				// list
 				fChildren.Remove(child);
 				gPartitions.Add(child);
 			}
@@ -377,15 +392,15 @@ Partition::Scan(bool mountFileSystems, bool isBootDevice)
 //	#pragma mark -
 
 
-/**	Scans the device passed in for partitioning systems. If none are found,
- *	a partition containing the whole device is created.
- *	All created partitions are added to the gPartitions list.
- */
-
+/*!	Scans the device passed in for partitioning systems. If none are found,
+	a partition containing the whole device is created.
+	All created partitions are added to the gPartitions list.
+*/
 status_t
 add_partitions_for(int fd, bool mountFileSystems, bool isBootDevice)
 {
-	TRACE(("add_partitions_for(fd = %d, mountFS = %s)\n", fd, mountFileSystems ? "yes" : "no"));
+	TRACE(("add_partitions_for(fd = %d, mountFS = %s)\n", fd,
+		mountFileSystems ? "yes" : "no"));
 
 	Partition *partition = new Partition(fd);
 
@@ -395,22 +410,14 @@ add_partitions_for(int fd, bool mountFileSystems, bool isBootDevice)
 
 	// add this partition to the list of partitions, if it contains
 	// or might contain a file system
-	if ((partition->Scan(mountFileSystems, isBootDevice) == B_OK && partition->IsFileSystem())
+	if ((partition->Scan(mountFileSystems, isBootDevice) == B_OK
+			&& partition->IsFileSystem())
 		|| (!partition->IsPartitioningSystem() && !mountFileSystems)) {
 		gPartitions.Add(partition);
 		return B_OK;
 	}
 
-	// if not, we'll need to tell the children that their parent is gone
-
-	NodeIterator iterator = gPartitions.GetIterator();
-	Partition *child = NULL;
-
-	while ((child = (Partition *)iterator.Next()) != NULL) {
-		if (child->Parent() == partition)
-			child->SetParent(NULL);
-	}
-
+	// if not, we no longer need the partition
 	delete partition;
 	return B_OK;
 }
@@ -419,7 +426,8 @@ add_partitions_for(int fd, bool mountFileSystems, bool isBootDevice)
 status_t
 add_partitions_for(Node *device, bool mountFileSystems, bool isBootDevice)
 {
-	TRACE(("add_partitions_for(%p, mountFS = %s)\n", device, mountFileSystems ? "yes" : "no"));
+	TRACE(("add_partitions_for(%p, mountFS = %s)\n", device,
+		mountFileSystems ? "yes" : "no"));
 
 	int fd = open_node(device, O_RDONLY);
 	if (fd < B_OK)
