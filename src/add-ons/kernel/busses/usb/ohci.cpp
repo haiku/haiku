@@ -346,9 +346,61 @@ OHCI::_Interrupt()
 	static spinlock lock = 0;
 	acquire_spinlock(&lock);
 
-	int32 result = B_UNHANDLED_INTERRUPT;
+	uint32 status = 0;
+	uint32 acknowledge = 0;
+	bool finishTransfers = false;
+	int32 result = B_HANDLED_INTERRUPT;
+
+	// The LSb of done_head is used to inform the HCD that an interrupt
+	// condition exists for both the done list and for another event recorded in
+	// the HcInterruptStatus register. If done_head is 0, then the interrupt
+	// was caused by other than the HccaDoneHead update and the
+	// HcInterruptStatus register needs to be accessed to determine that exact
+	// interrupt cause. If HccDoneHead is nonzero, then a done list update
+	// interrupt is indicated and if the LSb of the Dword is nonzero, then an
+	// additional interrupt event is indicated and HcInterruptStatus shuold be
+	// checked to determine its cause.
+	uint32 doneHead = fHcca->done_head;
+	if (doneHead != 0) {
+		status = OHCI_WRITEBACK_DONE_HEAD;
+		if (doneHead & OHCI_DONE_INTERRUPTS)
+			status |= _ReadReg(OHCI_INTERRUPT_STATUS)
+				& _ReadReg(OHCI_INTERRUPT_ENABLE);
+	} else {
+		status = _ReadReg(OHCI_INTERRUPT_STATUS) & _ReadReg(OHCI_INTERRUPT_ENABLE)
+			& ~OHCI_WRITEBACK_DONE_HEAD;
+		if (status == 0) {
+			// Nothing to be done (PCI shared interrupt)
+			release_spinlock(&lock);
+			return B_UNHANDLED_INTERRUPT;
+		}
+	}
+
+	if (status & OHCI_SCHEDULING_OVERRUN) {
+		// TODO
+	}
+
+	if (status & OHCI_WRITEBACK_DONE_HEAD) {
+		// TODO
+		finishTransfers = true;
+	}
+
+	if (status & OHCI_RESUME_DETECTED) {
+		// TODO
+	}
+
+	if (status & OHCI_UNRECOVERABLE_ERROR) {
+		// TODO
+	}
+
+	if (status & OHCI_ROOT_HUB_STATUS_CHANGE) {
+		// TODO
+	}
 
 	release_spinlock(&lock);
+
+	if (finishTransfers)
+		release_sem_etc(fFinishTransfersSem, 1, B_DO_NOT_RESCHEDULE);
 
 	return result;
 }
@@ -368,6 +420,9 @@ OHCI::_FinishTransfer()
 	while (!fStopFinishThread) {
 		if (acquire_sem(fFinishTransfersSem) < B_OK)
 			continue;
+		// We have to acknowledge here after we get the TD list
+		// fHcca->done_head = 0;
+		// Write back WDH bit in the interrupt status register
 	}
 }
 
@@ -491,9 +546,14 @@ OHCI::_SubmitControlRequest(Transfer *transfer)
 		_LinkDescriptors(setupDescriptor, statusDescriptor);
 	}
 
-	// TODO
 	// 1. Insert the chain descriptors to the endpoint
+	ohci_endpoint_descriptor *endpoint
+		= (ohci_endpoint_descriptor *)transfer->TransferPipe()->ControllerCookie();
+	endpoint->tail_physical_descriptor = statusDescriptor->physical_address;
+	endpoint->head_physical_descriptor = setupDescriptor->physical_address;
 	// 2. Clear the Skip bit in the enpoint
+	endpoint->flags &= ~OHCI_ENDPOINT_SKIP;
+	// 3. Tell the controller to process the control list
 	_WriteReg(OHCI_COMMAND_STATUS, OHCI_CONTROL_LIST_FILLED);
 
 	return B_OK;
@@ -934,6 +994,7 @@ OHCI::_InsertEndpointForPipe(Pipe *pipe)
 	}
 
 	Lock();
+	pipe->SetControllerCookie((void *)endpoint);
 	endpoint->next_logical_endpoint = head->next_logical_endpoint;
 	endpoint->next_physical_endpoint = head->next_physical_endpoint;
 	head->next_logical_endpoint = (void *)endpoint;
