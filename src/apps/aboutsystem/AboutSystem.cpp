@@ -41,6 +41,12 @@
 static const char *UptimeToString(char string[], size_t size);
 static const char *MemUsageToString(char string[], size_t size);
 
+static const rgb_color kDarkGrey = { 100, 100, 100, 255 };
+static const rgb_color kHaikuGreen = { 42, 131, 36, 255 };
+static const rgb_color kHaikuOrange = { 255, 69, 0, 255 };
+static const rgb_color kHaikuYellow = { 255, 176, 0, 255 };
+static const rgb_color kLinkBlue = { 80, 80, 200, 255 };
+
 
 class AboutApp : public BApplication {
 	public:
@@ -65,6 +71,8 @@ class AboutView : public BView {
 		virtual void Draw(BRect update);
 		virtual void MessageReceived(BMessage *msg);
 		virtual void MouseDown(BPoint pt);
+		
+		void	AddCopyrightEntry(const char *name, const char *text, const char *url=NULL);
 
 	private:
 		BStringView		*fMemView;
@@ -305,16 +313,10 @@ AboutView::AboutView(const BRect &rect)
 		fCreditsView, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS, false, true, B_PLAIN_BORDER);
 	AddChild(creditsScroller);
 
-	rgb_color darkgrey = { 100, 100, 100, 255 };
-	rgb_color haikuGreen = { 42, 131, 36, 255 };
-	rgb_color haikuOrange = { 255, 69, 0, 255 };
-	rgb_color haikuYellow = { 255, 176, 0, 255 };
-	rgb_color linkBlue = { 80, 80, 200, 255 };
-
 	BFont font(be_bold_font);
 	font.SetSize(font.Size() + 4);
 
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuGreen);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
 	fCreditsView->Insert("Haiku\n");
 
 	font.SetSize(be_bold_font->Size());
@@ -328,16 +330,16 @@ AboutView::AboutView(const BRect &rect)
 	snprintf(string, sizeof(string),
 		"Copyright " B_UTF8_COPYRIGHT "2001-%ld Haiku, Inc.\n", year);
 
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(string);
 
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &linkBlue);
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kLinkBlue);
 	fCreditsView->Insert("http://haiku-os.org\n\n");
 
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuOrange);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
 	fCreditsView->Insert("Team Leads:\n");
 
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Axel Dörfler\n"
 		"Phil Greenway\n"
@@ -348,10 +350,10 @@ AboutView::AboutView(const BRect &rect)
 		"Jonathan Yoder\n"
 		"\n");
 
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuOrange);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
 	fCreditsView->Insert("Developers:\n");
 
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Ithamar R. Adema\n"
 		"Stephan Aßmus\n"
@@ -370,10 +372,10 @@ AboutView::AboutView(const BRect &rect)
 		"Siarzhuk Zharski\n"
 		"\n");
 
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuOrange);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
 	fCreditsView->Insert("Contributors:\n");
 
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(
 		"Bruno G. Albuquerque\n"
 		"Andrea Anzani\n"
@@ -442,151 +444,128 @@ AboutView::AboutView(const BRect &rect)
 		"\n" B_UTF8_ELLIPSIS " and probably some more we forgot to mention (sorry!)"
 		"\n\n");
 
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuOrange);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
 	fCreditsView->Insert("Special Thanks To:\n");
 
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert("Travis Geiselbrecht (and his NewOS kernel)\n");
 	fCreditsView->Insert("Michael Phipps (project founder)\n\n");
 
 	font.SetSize(be_bold_font->Size() + 4);
 	font.SetFace(B_BOLD_FACE);
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuGreen);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
 	fCreditsView->Insert("\nCopyrights\n\n");
 
 	font.SetSize(be_bold_font->Size());
 	font.SetFace(B_BOLD_FACE | B_ITALIC_FACE);
 
+	// copyrights for various projects we use
+
 	// GNU copyrights
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
-	fCreditsView->Insert("The GNU Project\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
-	fCreditsView->Insert("Contains software from the GNU Project, "
-		"released under the GPL and LGPL licences:\n");
-	fCreditsView->Insert("	- GNU C Library,\n");
-	fCreditsView->Insert("	- GNU coretools, diffutils, findutils, gawk, bison, m4, make,\n");
-	fCreditsView->Insert("	- Bourne Again Shell.\n");
-	fCreditsView->Insert("Copyright " B_UTF8_COPYRIGHT " The Free Software Foundation.\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &linkBlue);
-	fCreditsView->Insert("www.gnu.org\n\n");
+	AddCopyrightEntry("The GNU Project", 
+		"Contains software from the GNU Project, "
+		"released under the GPL and LGPL licences:\n"
+		"	- GNU C Library,\n"
+		"	- GNU coretools, diffutils, findutils, gawk, bison, m4, make,\n"
+		"	- Bourne Again Shell.\n"
+		"Copyright " B_UTF8_COPYRIGHT " The Free Software Foundation.", 
+		"www.gnu.org");
 
 	// FFMpeg copyrights
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
-	fCreditsView->Insert("FFMpeg libavcodec\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
-	fCreditsView->Insert("Copyright " B_UTF8_COPYRIGHT " 2000-2007 Fabrice Bellard, et al.\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &linkBlue);
-	fCreditsView->Insert("www.ffmpeg.org\n\n");
+	AddCopyrightEntry("FFMpeg libavcodec", 
+		"Copyright " B_UTF8_COPYRIGHT " 2000-2007 Fabrice Bellard, et al.", 
+		"www.ffmpeg.org");
 
 	// AGG copyrights
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
-	fCreditsView->Insert("AntiGrain Geometry\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
-	fCreditsView->Insert("Copyright " B_UTF8_COPYRIGHT " 2002-2006 Maxim Shemanarev (McSeem).\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &linkBlue);
-	fCreditsView->Insert("www.antigrain.com\n\n");
+	AddCopyrightEntry("AntiGrain Geometry", 
+		"Copyright " B_UTF8_COPYRIGHT " 2002-2006 Maxim Shemanarev (McSeem).", 
+		"www.antigrain.com");
 
 	// PDFLib copyrights
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
-	fCreditsView->Insert("PDFLib\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
-	fCreditsView->Insert(
+	AddCopyrightEntry("PDFLib", 
 		"Copyright " B_UTF8_COPYRIGHT " 1997-2006 PDFlib GmbH and Thomas Merz. "
 		"All rights reserved.\n"
-		"PDFlib and the PDFlib logo are registered trademarks of PDFlib GmbH.\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &linkBlue);
-	fCreditsView->Insert("www.pdflib.com\n\n");
+		"PDFlib and the PDFlib logo are registered trademarks of PDFlib GmbH.", 
+		"www.pdflib.com");
 
 	// FreeType copyrights
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
-	fCreditsView->Insert("FreeType2\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
-	fCreditsView->Insert("Portions of this software are copyright " B_UTF8_COPYRIGHT " 1996-2006 The FreeType"
-		" Project.  All rights reserved.\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &linkBlue);
-	fCreditsView->Insert("www.freetype.org\n\n");
+	AddCopyrightEntry("FreeType2", 
+		"Portions of this software are copyright " B_UTF8_COPYRIGHT " 1996-2006 The FreeType"
+		" Project.  All rights reserved.", 
+		"www.freetype.org");
 
 	// Mesa3D (http://www.mesa3d.org) copyrights
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
-	fCreditsView->Insert("Mesa\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
-	fCreditsView->Insert(
+	AddCopyrightEntry("Mesa", 
 		"Copyright " B_UTF8_COPYRIGHT " 1999-2006 Brian Paul. "
-		"Mesa3D project.  All rights reserved.\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &linkBlue);
-	fCreditsView->Insert("www.mesa3d.org\n\n");
+		"Mesa3D project.  All rights reserved.", 
+		"www.mesa3d.org");
 
 	// SGI's GLU implementation copyrights
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
-	fCreditsView->Insert("GLU\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
-	fCreditsView->Insert(
+	AddCopyrightEntry("GLU", 
 		"Copyright " B_UTF8_COPYRIGHT " 1991-2000 Silicon Graphics, Inc. "
-		"SGI's Software FreeB license.  All rights reserved.\n\n");
+		"SGI's Software FreeB license.  All rights reserved.");
 
 	// GLUT implementation copyrights
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
-	fCreditsView->Insert("GLUT\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
-	fCreditsView->Insert(
+	AddCopyrightEntry("GLUT", 
 		"Copyright " B_UTF8_COPYRIGHT " 1994-1997 Mark Kilgard. "
 		"All rights reserved.\n"
 		"Copyright " B_UTF8_COPYRIGHT " 1997 Be Inc.\n"
-		"Copyright " B_UTF8_COPYRIGHT " 1999 Jake Hamby. \n\n");
+		"Copyright " B_UTF8_COPYRIGHT " 1999 Jake Hamby.");
 
 	// OpenGroup & DEC (BRegion backend) copyright
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
-	fCreditsView->Insert("BRegion backend (XFree86)\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
-	fCreditsView->Insert(
+	AddCopyrightEntry("BRegion backend (XFree86)", 
 		"Copyright " B_UTF8_COPYRIGHT " 1987, 1988, 1998  The Open Group.\n"
 		"Copyright " B_UTF8_COPYRIGHT " 1987, 1988 Digital Equipment Corporation, Maynard, Massachusetts.\n"
-		"All rights reserved.\n\n");
+		"All rights reserved.");
 
 	// Konatu font
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
-	fCreditsView->Insert("Konatu font\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
-	fCreditsView->Insert(
+	AddCopyrightEntry("Konatu font", 
 		"Copyright " B_UTF8_COPYRIGHT " 2002- MASUDA mitiya.\n"
-		"MIT license. All rights reserved.\n\n");
+		"MIT license. All rights reserved.");
 
 	// expat copyrights
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
-	fCreditsView->Insert("expat\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
-	fCreditsView->Insert(
+	AddCopyrightEntry("expat", 
 		"Copyright " B_UTF8_COPYRIGHT " 1998, 1999, 2000 Thai Open Source Software Center Ltd and Clark Cooper.\n"
-		"Copyright " B_UTF8_COPYRIGHT " 2001, 2002, 2003 Expat maintainers.\n\n");
+		"Copyright " B_UTF8_COPYRIGHT " 2001, 2002, 2003 Expat maintainers.");
 
 	// zlib copyrights
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
-	fCreditsView->Insert("zlib\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
-	fCreditsView->Insert(
-		"Copyright " B_UTF8_COPYRIGHT " 1995-2004 Jean-loup Gailly and Mark Adler.\n\n");
+	AddCopyrightEntry("zlib", 
+		"Copyright " B_UTF8_COPYRIGHT " 1995-2004 Jean-loup Gailly and Mark Adler.");
 
 	// zip copyrights
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
-	fCreditsView->Insert("Info-ZIP\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
-	fCreditsView->Insert(
-		"Copyright " B_UTF8_COPYRIGHT " 1990-2002 Info-ZIP. All rights reserved.\n\n");
+	AddCopyrightEntry("Info-ZIP", 
+		"Copyright " B_UTF8_COPYRIGHT " 1990-2002 Info-ZIP. All rights reserved.");
 
 	// bzip2 copyrights
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
-	fCreditsView->Insert("bzip2\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
-	fCreditsView->Insert(
-		"Copyright " B_UTF8_COPYRIGHT " 1996-2005 Julian R Seward. All rights reserved.\n\n");
+	AddCopyrightEntry("bzip2", 
+		"Copyright " B_UTF8_COPYRIGHT " 1996-2005 Julian R Seward. All rights reserved.");
 
 	// VIM copyrights
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &haikuYellow);
-	fCreditsView->Insert("Vi IMproved\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &darkgrey);
-	fCreditsView->Insert(
-		"Copyright " B_UTF8_COPYRIGHT " Bram Moolenaar et al.\n\n");
+	AddCopyrightEntry("Vi IMproved", 
+		"Copyright " B_UTF8_COPYRIGHT " Bram Moolenaar et al.");
 
+}
+
+
+void
+AboutView::AddCopyrightEntry(const char *name, const char *text, const char *url)
+{
+	BFont font(be_bold_font);
+	//font.SetSize(be_bold_font->Size());
+	font.SetFace(B_BOLD_FACE | B_ITALIC_FACE);
+
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuYellow);
+	fCreditsView->Insert(name);
+	fCreditsView->Insert("\n");
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
+	fCreditsView->Insert(text);
+	fCreditsView->Insert("\n");
+	if (url) {
+		fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kLinkBlue);
+		fCreditsView->Insert(url);
+		fCreditsView->Insert("\n");
+	}
+	fCreditsView->Insert("\n");
 }
 
 
