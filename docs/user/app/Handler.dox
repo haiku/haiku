@@ -7,7 +7,7 @@
  * 
  * Corresponds to:
  *		/trunk/headers/os/app/Handler.h  rev 22577
- *		/trunk/src/kits/app/Message.cpp  rev 21332
+ *		/trunk/src/kits/app/Handler.cpp  rev 21332
  */
 
 /*!
