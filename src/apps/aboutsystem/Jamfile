@@ -2,7 +2,15 @@ SubDir HAIKU_TOP src apps aboutsystem ;
 
 UsePrivateHeaders shared ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os kernel ] : true ;
+}
 if $(TARGET_PLATFORM) = r5 {
+	SubDirC++Flags -DR5_COMPATIBLE ;
+}
+if $(TARGET_PLATFORM) = dano {
 	SubDirC++Flags -DR5_COMPATIBLE ;
 }
 
