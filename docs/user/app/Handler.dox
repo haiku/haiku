@@ -1,0 +1,609 @@
+/*
+ * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ * 		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ * 
+ * Corresponds to:
+ *		/trunk/headers/os/app/Handler.h  rev 22577
+ *		/trunk/src/kits/app/Message.cpp  rev 21332
+ */
+
+/*!
+	\file Handler.h
+	\brief Provides the BHandler class.
+*/
+
+///// Globals /////
+
+/*!
+	\def B_OBSERVE_WHAT_CHANGE
+	\brief Internal.
+*/
+
+
+/*!
+	\def B_OBSERVE_ORIGINAL_WHAT
+	\brief Constant for a message data field in observer messages.
+	
+	If you have called one of the flavors of BHandler::StartWachting(), and
+	you receive a notification, sometimes there can be send a BMessage to go
+	with that notification. The message you receive is a copy of that message,
+	but with the what constant set to \c B_OBSERVER_NOTICE_CHANGE. The original
+	\c what constant of the transmitted data message is stored behind the
+	label defined by this constant.
+*/
+
+
+/*!
+	\var B_OBSERVER_OBSERVE_ALL
+	\brief Parameter to BHandler::StartWatching().
+	
+	\note Specifying this parameter as the \a what value, leads to the same
+		results as calling BHandler::StartWatchingAll().
+*/
+
+
+///// BHandler /////
+
+
+/*!
+	\class BHandler
+	\ingroup app
+	\brief Handles messages that are passed on by a BLooper.
+	
+	The BHandler class implements two important pieces of functionality. It
+	provides the foundations for <b>handling messages</b>, and it serves as a
+	<b>state machine</b> that sends out notifications of the state changes.
+	
+	The most common use of this class is to <b>handle messages</b>. Handlers
+	can be tied to loopers, which are the objects that send and receive
+	messages. As soon as a message is received, the looper passes through its
+	list of associated handlers and tries them in a certain order until the
+	message is handled, or the options are exhausted.
+	
+	You should know that a looper is a subclass of a handler, and as such,
+	loopers can be self-contained and do not need additional handlers. In many
+	cases, this construction will suffice. You will simply subclass the looper,
+	override its MessageReceived() hook and handle the messages you receive. In
+	some cases, you might opt in for a more ingenious construction. A
+	real-world example is the interface kit. Within that kit, the windows are
+	represented by a BLooper, and all the views and controls in that kit are
+	derived from BHandler. If you put a control in a window, then whenever
+	messages such as clicks are received, the window loops the handlers until
+	there is a handler that is at the screen position the click was in. It is
+	not unlikely that you will some day want to use this functionality of the
+	API. 
+	
+	If your handler is limited to a certain type of messages, you can set a
+	filter that the looper will apply to your message before passing it on to
+	your overridden MessageReceived() method. The BMessageFilter class provides
+	the framework for the flexible filtering options, and using AddFilter() you
+	can apply filters to this handler. Note that a filter object should only be
+	applied to one handler. They cannot be shared.
+	
+	For more information on the handling chain, have a look at the
+	documentation of the BLooper class.
+	
+	Using BHandler as a <b>state machine</b> is a second area of functionality.
+	Since handlers process messages, and perform actions associated with those,
+	they are the center of keeping track on the current state of things within
+	an application. If you want to synchronize these states between different
+	parts of your application, you could perform this manually by sending
+	messages to the interested components, or you can use the more flexible
+	approach with observers.
+	
+	Observers watch a certain state. A handler can track one or more different
+	states. Each state is represented by a four byte constant - just like the
+	\c what property of a message. Using the StartWatching() methods, you can
+	register observers both within your team, and in other applications. As an
+	argument of that method, you can supply the state you want to watch, or you
+	can register an observer using StartWatchingAll() to watch all the states
+	the handler tracks. When the handler needs to emit a state change, you can
+	use SendNotices(). You can specify the exact state change, and some data
+	that you want to be send to the observers. This data is in the form of the
+	very flexible BMessage, as such you are almost free to pass anything you
+	want.
+	
+	Whenever SendNotices() is called, all interested observers will receive a
+	message of the \a B_OBSERVER_NOTICE_CHANGE type. Please note that the
+	constant that is associated with the state itself is not transmitted. If
+	you require this information, consider using the message that is passed
+	on to describe the state change.
+
+	BHandler is a part of the chain in the eloquent messaging structure. For a
+	proper understanding of all its facets, have a look at the \ref app_messaging
+	"messaging overview".
+*/
+
+
+/*!
+	\fn BHandler::BHandler(const char* name = NULL)
+	\brief Construct a new handler with a \a name.
+	
+	The newly constructed handler is not associated with a looper until you
+	explicitly request this to happen. To associate this handler with a looper,
+	use BLooper::AddHandler().
+*/
+
+
+/*!
+	\fn BHandler::~BHandler()
+	\brief Free the filters of this handler, as well as the list of observers.
+	
+	This method does not remove the handler from the looper to which this
+	handler is associated. You should do this yourself, using
+	BLooper::RemoveHandler().
+*/
+
+
+/*!
+	\fn BArchivable *BHandler::Instantiate(BMessage *data)
+	\brief Static method to instantiate a handler from an archived message.
+	
+	\return A pointer to the instantiated handler, or \c NULL if the \a data
+		is not a valid archived BHandler object.
+	\see BHandler(BMessage* data)
+*/
+
+
+///// Archiving /////
+
+/*!
+	\name Archiving
+	BHandler inherits the BArchivable class, and as such implements support for
+	archiving and unarchiving handlers.
+*/
+
+
+//! @{
+	
+	
+/*!
+	\fn BHandler::BHandler(BMessage* data)
+	\brief Construct a handler from an archived message.
+	
+	This \a data has to be created using the BHandler::Archive() method.
+	Note that only the name is stored. The filters, the associated looper and
+	the observers are not stored, and should be manually added when you are
+	using this object.
+*/
+
+
+/*!
+	\fn status_t BHandler::Archive(BMessage *data, bool deep) const
+	\brief Archive a handler to a message
+	
+	Currently, only the name is archived. The filters, the associated looper
+	and the observers are not stored. 
+	
+	\param data The message to archive the object in.
+	\param deep This parameter is ignored, as BHandler does not have children.
+	\retval B_OK Archiving succeeded.
+	\retval B_BAD_VALUE The \a data parameter is not a valid message.
+	\see BHandler::Instantiate(BMessage *data)
+*/
+
+
+//! @}
+
+
+///// The guts of BHandler /////
+
+
+/*!
+	\name Core Functionality
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BHandler::MessageReceived(BMessage *message)
+	\brief Handle a message that has been received by the associated looper.
+	
+	This method is reimplemented in your subclasses. If the messages that have
+	been received by a looper pass through the filters, then they end up in
+	the MessageReceived() methods.
+	
+	The example shows a very common way to handle message. Usually, this
+	involves parsing the BMessage::what constant and then perform an action
+	based on that. 
+	
+\code
+void
+ShowImageApp::MessageReceived(BMessage *message)
+{
+	switch (message->what) {
+		case MSG_FILE_OPEN:
+			fOpenPanel->Show();
+			break;
+
+		case B_CANCEL:
+			// File open panel was closed,
+			// start checking count of open windows.
+			StartPulse();
+			break;
+		
+		default:
+			// We do not handle this message, pass it on to the base class.
+			BApplication::MessageReceived(message); 
+			break;
+	}
+}
+\endcode
+
+	If your handler cannot process this message, you should pass it on to the
+	base class. Eventually, it will reach the default implementation, which
+	will reply with a \c B_MESSAGE_NOT_UNDERSTOOD constant. 
+	
+	\warning Do not delete or otherwise cripple the \a message argument. It
+		does not belong to you.
+	
+	\param message The message that needs to be handled.
+*/
+
+
+/*!
+	\fn BLooper *BHandler::Looper() const
+	\brief Return a pointer to the looper that this handler is associated with.
+	
+	\return If the handler is not yet associated with a looper, it will return
+		\c NULL.
+	\see BLooper::AddHandler()
+	\see LockLooper()
+*/
+
+
+/*!
+	\fn void BHandler::SetName(const char *name)
+	\brief Set or change the name of this handler.
+	\see Name()
+*/
+
+
+/*!
+	\fn const char *BHandler::Name() const
+	\brief Return the name of this handler.
+	\see SetName()
+*/
+
+
+/*!
+	\fn void BHandler::SetNextHandler(BHandler *handler)
+	\brief Set the next handler in the chain that the message is passed on to
+		if this handler cannot process it.
+	
+	This method has three requirements:
+	-# This handler should belong to a looper.
+	-# The looper needs to be locked. See LockLooper().
+	-# The \a handler that you pass must be associated with the same looper.
+	
+	Failure to meet any of these requirements will result in your application
+	crashing.
+	
+	By default, the handlers are chained in order that they were associated to
+	a looper with BLooper::AddHander().
+	
+	\see NextHandler()
+*/
+
+
+/*!
+	\fn BHandler *BHandler::NextHandler() const
+	\brief Return the next hander in the chain to which the message is passed
+		on.
+	\see SetNextHandler()
+*/
+
+
+//! @}
+
+
+///// Message Filtering /////
+
+
+/*!
+	\name Message Filtering
+*/
+
+
+//! @{
+	
+	
+/*!
+	\fn void BHandler::AddFilter(BMessageFilter *filter)
+	\brief Add a filter as a prerequisite to this handler.
+	
+	If the handler is associated with a looper, this looper needs to be locked
+	in order for this operation to succeed.
+	
+	Note that the filter is not copied, rather a pointer to the filter is
+	stored. As such, you need to make sure that the filter object exists as
+	long as it is added to this handler.
+	
+	\see RemoveFilter(), SetFilterList()
+*/
+
+
+/*!
+	\fn bool BHandler::RemoveFilter(BMessageFilter *filter)
+	\brief Remove a filter from the filter list.
+	
+	If the handler is associated with a looper, this looper needs to be locked
+	in order for this operation to succeed.
+	
+	Note that the filter is not deleted, merely removed from the list. You need
+	to take care of the memory yourself.
+	
+	\retval true The filter was in the filter list and is removed.
+	\retval false The filter was not found in the filter list.
+	
+	\see AddFilter(), FilterList()
+*/
+
+
+/*!
+	\fn void BHandler::SetFilterList(BList* filters)
+	\brief Set the internal list of filters to \a filters.
+
+	If the handler is associated with a looper, this looper needs to be locked
+	in order for this operation to succeed.
+	
+	The internal list will be replaced with the new list of \a filters. All the
+	existing filters will be \b deleted.
+
+	\see AddFilter(), FilterList()
+*/
+
+
+/*!
+	\fn BList *BHandler::FilterList()
+	\brief Return a pointer to the list of filters.
+	
+	\return A pointer to the list of filters. Do not manipulate the list of
+		filters directly, but use the methods provided by this class, in order
+		to maintain internal consistency.
+		
+	\see AddFilter(), RemoveFilter(), SetFilterList().
+*/
+
+
+//! @}
+
+
+///// Locking /////
+
+
+/*!
+	\name Locking
+	
+	This class provides some utility functions to look the looper associated
+	with this handler.
+*/
+
+
+//! @{
+	
+	
+/*!
+	\fn bool BHandler::LockLooper()
+	\brief Lock the looper associated with this handler.
+	
+	\retval true The looper is locked.
+	\retval false There was an error acquiring the lock.
+	
+	\see LockLooperWithTimeout(), UnlockLooper()
+*/
+
+
+/*!
+	\fn status_t BHandler::LockLooperWithTimeout(bigtime_t timeout)
+	\brief Lock the looper associated with this handler, with a time out value.
+	
+	\param timeout The time to wait for acquiring the lock in microseconds. You
+		may also use B_INFINITE_TIMEOUT, in which this method will wait as long
+		as it takes to acquire the lock.
+	
+	\retval B_OK Locking succeeded.
+	\retval B_BAD_VALUE This handler is not associated with a looper (anymore).
+	\retval B_TIMED_OUT The time specified in \a timeout has passed without
+		locking the looper.
+	
+	\see LockLooper(), UnlockLooper()
+*/
+
+
+/*!
+	\fn void BHandler::UnlockLooper()
+	\brief Unlock the looper.
+*/
+
+
+//! @}
+
+
+///// Scripting //////
+
+
+/*!
+	\name Scripting
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BHandler * BHandler::ResolveSpecifier(BMessage *msg, int32 index,
+		BMessage *specifier, int32 form, const char *property)
+	\brief Undocumented.
+*/
+
+
+/*!
+	\fn status_t BHandler::GetSupportedSuites(BMessage *data)
+	\brief Undocumented.
+*/
+
+
+//! @}
+
+
+///// Observing /////
+
+
+/*!
+	\name Observing
+	
+	Handlers can function as state machines, which emit messages to observers
+	when the state changes. Use the following methods to subscribe to these
+	notifications.
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BHandler::StartWatching(BMessenger target, uint32 what)
+	\brief Subscribe a \a target to watch a specific state change.
+	
+	Use this method to subscribe messengers. This means that also observers
+	from other teams can be subscribed.
+	
+	\param target The messenger to which notifications need to be send.
+	\param what The state that needs to be watched.
+	\return During the call of this method, a notification will be transmitted
+		using the \a target. If this works, then this method will return
+		\c B_OK.
+	\see StartWatchingAll(BMessenger), StopWatching(BMessenger, uint32)
+*/
+
+
+/*!
+	\fn status_t BHandler::StartWatchingAll(BMessenger target)
+	\brief Subscribe a \a target to all events.
+	
+	This method performs the same task as StartWatching(BMessenger, uint32),
+	but it will subscribe the target to all the state changes this handler
+	knows.
+	\see StartWatching(BMessenger, uint32), StopWatchingAll(BMessenger)
+*/
+
+
+/*!
+	\fn status_t BHandler::StopWatching(BMessenger target, uint32 what)
+	\brief Unsubscribe an observer from watching a specific state.
+	
+	This method will unsubscribe the \a target from watching a specific event.
+	
+	\see StartWatching(BMessenger, uint32)
+*/
+
+
+/*!
+	\fn status_t BHandler::StopWatchingAll(BMessenger target)
+	\brief Unsubscribe an observer from watching all states.
+	
+	This method will unsubscribe the \a target from watching all state changes.
+	
+	\see StartWatchingAll(BMessenger)
+*/
+
+
+/*!
+	\fn status_t BHandler::StartWatching(BHandler* handler, uint32 what)
+	\brief Subscribe another \a handler to watch a specific state change.
+	
+	Use this method to subscribe handlers. Since pointers to handlers can only
+	exist in the local namespace, have a look at
+	StartWatching(BMessenger, uint32) for inter-team watching. 
+	
+	\param handler The handler to which notifications need to be send.
+	\param what The state that needs to be watched.
+	\return During the call of this method, a notification will be transmitted
+		using the \a handler. If this works, then this method will return
+		\c B_OK.
+	
+	\see StartWatchingAll(BHandler), StopWatching(BHandler, uint32)	
+*/
+
+
+/*!
+	\fn status_t BHandler::StartWatchingAll(BHandler* handler)
+	\brief Subscribe another \a handler to watch all state changes.
+	
+	
+	This method performs the same task as StartWatching(BHandler, uint32),
+	but it will subscribe the target to all the state changes this handler
+	knows.
+	\see StartWatching(BHandler, uint32), StopWatchingAll(BHandler)	
+*/
+
+
+/*!
+	\fn status_t BHandler::StopWatching(BHandler* handler, uint32 what)
+	\brief Unsubscribe an observer from watching a specific state.
+
+	This method will unsubscribe the \a handler from watching a specific event.
+
+	\see StartWatching(BHandler, uint32)
+*/
+
+
+/*!
+	\fn status_t BHandler::StopWatchingAll(BHandler* handler)
+	\brief Unsubscribe an observer from watching all states.
+	
+	This method will unsubscribe the \a handler from watching all state changes.
+	
+	\see StartWatchingAll(BHandler)
+*/
+
+
+//! @}
+
+
+///// State changes /////
+
+
+/*!
+	\name Emitting State Changes
+	If your handler functions as a state machine, and it has observers (which
+	subscribed using the StartWatching() method), you can emit these state
+	changes.
+*/
+
+
+//! @{
+	
+	
+/*!
+	\fn void BHandler::SendNotices(uint32 what, const BMessage *msg)
+	\brief Emit a state change to the observers.
+	
+	The actual state (specified by \a what) will not be transmitted. This is
+	merely for internal bookkeeping. It is not entirely unimaginable that you
+	still want to inform the observers of what actually took place. You can
+	use the \a msg to transmit this, and any other data you want. Note that the
+	message will be copied and slightly altered: the \c what member of the
+	message will be \c B_OBSERVER_NOTICE_CHANGE, and the \c what constant you
+	specified will be stored in the #B_OBSERVE_ORIGINAL_WHAT label.
+	
+	\param what The identifier of the state.
+	\param msg Any data associated with the state change. You retain ownership
+		of this data, so make sure you dispose it when you are done.
+*/
+	
+	
+/*!
+	\fn bool BHandler::IsWatched() const
+	\brief Check if there are any observers watching this handler.
+*/
+
+
+//! @}
+
