@@ -1250,10 +1250,9 @@ BShelf::_CreateZombie(BMessage *data, BDragger *&dragger)
 
 	_BZombieReplicantView_ *zombie = NULL;
 	if (data->WasDropped()) {
-		BPoint dropPoint, offset;
-		dropPoint = data->DropPoint(&offset);
+		BPoint offset;
+		BPoint dropPoint = data->DropPoint(&offset);
 
-		frame.OffsetTo(B_ORIGIN);
 		frame.OffsetTo(fContainerView->ConvertFromScreen(dropPoint) - offset);
 
 		zombie = new _BZombieReplicantView_(frame, B_ERROR);
