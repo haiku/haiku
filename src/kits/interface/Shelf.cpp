@@ -1193,50 +1193,73 @@ BShelf::_GetReplicant(BMessage *data, BView *view, const BPoint &point,
 	// TODO: test me -- there seems to be lots of bugs parked here!
 	BView *replicant = NULL;
 	_GetReplicantData(data, view, replicant, dragger, relation);
-
+	
 	if (dragger != NULL)
-		dragger->_SetShelf(this);
+		dragger->_SetViewToDrag(replicant);
 
-	BRect frame;
-	if (relation == BDragger::TARGET_IS_CHILD)
-		frame = dragger->Frame().OffsetToCopy(point);
-	else {
-		frame = replicant->Frame().OffsetToCopy(point);
-		fContainerView->AddChild(replicant);
-	}
-
+	BRect frame = view->Frame().OffsetToCopy(point);
 	if (!CanAcceptReplicantView(frame, replicant, data)) {
 		// the view has not been accepted
-
 		if (relation == BDragger::TARGET_IS_PARENT
-			|| relation == BDragger::TARGET_IS_SIBLING) {
-			replicant->RemoveSelf();				
+			|| relation == BDragger::TARGET_IS_SIBLING) {			
 			delete replicant;			
 		}
-
 		if (relation == BDragger::TARGET_IS_CHILD
-			|| relation == BDragger::TARGET_IS_SIBLING) {
-			dragger->RemoveSelf();			
+			|| relation == BDragger::TARGET_IS_SIBLING) {	
 			delete dragger;
 		}
-		
 		return NULL;
 	}
 
 	BPoint adjust = AdjustReplicantBy(frame, data);
 	
-	// TODO: that's probably not correct for all relations (or any?)
-	// At least, commenting this line fixes a bug in BSnow		
+	if (dragger != NULL)
+		dragger->_SetShelf(this);
+
+	// TODO: could be not correct for some relations	
 	view->MoveTo(point + adjust);
 
 	// if it's a sibling or a child, we need to add the dragger
 	if (relation == BDragger::TARGET_IS_SIBLING
 		|| relation == BDragger::TARGET_IS_CHILD)
 		fContainerView->AddChild(dragger);
-
+	
+	if (relation != BDragger::TARGET_IS_CHILD)
+		fContainerView->AddChild(replicant);
+	
 	replicant->AddFilter(new ReplicantViewFilter(this, replicant));
 
 	return replicant;
+}
+
+
+/* static */
+void
+BShelf::_GetReplicantData(BMessage *data, BView *view, BView *&replicant,
+			BDragger *&dragger, BDragger::relation &relation)
+{
+	// Check if we have a dragger archived as "__widget" inside the message
+	BMessage widget;
+	if (data->FindMessage("__widget", &widget) == B_OK) {
+		image_id draggerImage = B_ERROR;
+		replicant = view;
+		dragger = dynamic_cast<BDragger*>(_InstantiateObject(&widget, &draggerImage));
+		// Replicant is a sibling, or unknown, if there isn't a dragger		
+		if (dragger != NULL)			
+			relation = BDragger::TARGET_IS_SIBLING;
+
+	} else if ((dragger = dynamic_cast<BDragger*>(view)) != NULL) {
+		// Replicant is child of the dragger			
+		relation = BDragger::TARGET_IS_CHILD;		
+		replicant = dragger->ChildAt(0);		
+
+	} else {
+		// Replicant is parent of the dragger
+		relation = BDragger::TARGET_IS_PARENT;		
+		replicant = view;
+		dragger = dynamic_cast<BDragger *>(replicant->FindView("_dragger_"));
+			// can be NULL, the replicant could not have a dragger at all
+	}
 }
 
 
@@ -1340,42 +1363,6 @@ BShelf::_GetProperty(BMessage *msg, BMessage *reply)
 	}
 
 	return err;
-}
-
-
-/* static */
-void
-BShelf::_GetReplicantData(BMessage *data, BView *view, BView *&replicant,
-			BDragger *&dragger, BDragger::relation &relation)
-{
-	// Check if we have a dragger archived as "__widget" inside the message
-	BMessage widget;
-	if (data->FindMessage("__widget", &widget) == B_OK) {
-		image_id draggerImage = B_ERROR;
-		replicant = view;
-		dragger = dynamic_cast<BDragger*>(_InstantiateObject(&widget, &draggerImage));
-		if (dragger != NULL) {
-			// Replicant is either a sibling or unknown
-			dragger->_SetViewToDrag(replicant);
-			relation = BDragger::TARGET_IS_SIBLING;
-		}
-	} else {
-		// Replicant is child of the dragger
-		if ((dragger = dynamic_cast<BDragger*>(view)) != NULL) {
-			replicant = dragger->ChildAt(0);
-			dragger->_SetViewToDrag(replicant);
-			relation = BDragger::TARGET_IS_CHILD;
-		} else {
-			// Replicant is parent of the dragger
-			replicant = view;
-			dragger = dynamic_cast<BDragger *>(replicant->FindView("_dragger_"));
-
-			if (dragger)
-				dragger->_SetViewToDrag(replicant);
-
-			relation = BDragger::TARGET_IS_PARENT;
-		}
-	}
 }
 
 
