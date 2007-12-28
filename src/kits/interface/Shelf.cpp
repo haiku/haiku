@@ -1178,7 +1178,7 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 			} else {
 				// Replicant is parent of the dragger
 				replicant = view;
-				dragger = dynamic_cast<BDragger*>(replicant->FindView("_dragger_"));
+				dragger = dynamic_cast<BDragger *>(replicant->FindView("_dragger_"));
 
 				if (dragger)
 					dragger->_SetViewToDrag(replicant);
@@ -1217,7 +1217,8 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 		BPoint adjust = AdjustReplicantBy(frame, data);
 		
 		// TODO: that's probably not correct for all relations (or any?)
-		view->MoveTo(point + adjust);	
+		// At least, commenting this line fixes a bug in BSnow		
+		view->MoveTo(point + adjust);
 
 		// if it's a sibling or a child, we need to add the dragger
 		if (relation == BDragger::TARGET_IS_SIBLING
