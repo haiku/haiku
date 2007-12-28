@@ -77,6 +77,7 @@ class AboutView : public BView {
 		virtual void MouseDown(BPoint pt);
 		
 		void	AddCopyrightEntry(const char *name, const char *text, const char *url=NULL);
+		void	PickRandomHaiku();
 
 	private:
 		BStringView		*fMemView;
@@ -573,28 +574,6 @@ AboutView::AboutView(const BRect &rect)
 }
 
 
-void
-AboutView::AddCopyrightEntry(const char *name, const char *text, const char *url)
-{
-	BFont font(be_bold_font);
-	//font.SetSize(be_bold_font->Size());
-	font.SetFace(B_BOLD_FACE | B_ITALIC_FACE);
-
-	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuYellow);
-	fCreditsView->Insert(name);
-	fCreditsView->Insert("\n");
-	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-	fCreditsView->Insert(text);
-	fCreditsView->Insert("\n");
-	if (url) {
-		fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kLinkBlue);
-		fCreditsView->Insert(url);
-		fCreditsView->Insert("\n");
-	}
-	fCreditsView->Insert("\n");
-}
-
-
 AboutView::~AboutView(void)
 {
 	delete fScrollRunner;
@@ -614,8 +593,10 @@ void
 AboutView::MouseDown(BPoint pt)
 {
 	BRect r(92, 26, 105, 31);
-	if (r.Contains(pt))
+	if (r.Contains(pt)) {
 		printf("Easter Egg\n");
+		PickRandomHaiku();
+	}
 	
 	if (Bounds().Contains(pt)) {
 		fLastActionTime = system_time();
@@ -731,6 +712,78 @@ AboutView::MessageReceived(BMessage *msg)
 		default:
 			BView::MessageReceived(msg);
 			break;
+	}
+}
+
+
+void
+AboutView::AddCopyrightEntry(const char *name, const char *text, const char *url)
+{
+	BFont font(be_bold_font);
+	//font.SetSize(be_bold_font->Size());
+	font.SetFace(B_BOLD_FACE | B_ITALIC_FACE);
+
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuYellow);
+	fCreditsView->Insert(name);
+	fCreditsView->Insert("\n");
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
+	fCreditsView->Insert(text);
+	fCreditsView->Insert("\n");
+	if (url) {
+		fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kLinkBlue);
+		fCreditsView->Insert(url);
+		fCreditsView->Insert("\n");
+	}
+	fCreditsView->Insert("\n");
+}
+
+void
+AboutView::PickRandomHaiku()
+{
+	BFile fortunes(
+#ifdef __HAIKU__
+		"/etc/fortunes/Haiku",
+#else
+		"data/etc/fortunes/Haiku",
+#endif
+		B_READ_ONLY);
+	struct stat st;
+	if (fortunes.InitCheck() < B_OK)
+		return;
+	if (fortunes.GetStat(&st) < B_OK)
+		return;
+	char *buff = (char *)malloc((size_t)st.st_size + 1);
+	if (!buff)
+		return;
+	buff[(size_t)st.st_size] = '\0';
+	BList haikuList;
+	if (fortunes.Read(buff, (size_t)st.st_size) == (ssize_t)st.st_size) {
+		char *p = buff;
+		while (p && *p) {
+			char *e = strchr(p, '%');
+			BString *s = new BString(p, e ? (e - p) : -1);
+			haikuList.AddItem(s);
+			p = e;
+			if (p && (*p == '%'))
+				p++;
+			if (p && (*p == '\n'))
+				p++;
+		}
+	}
+	free(buff);
+	if (haikuList.CountItems() < 1)
+		return;
+	BString *s = (BString *)haikuList.ItemAt(rand() % haikuList.CountItems());
+	BFont font(be_bold_font);
+	font.SetSize(be_bold_font->Size());
+	font.SetFace(B_BOLD_FACE | B_ITALIC_FACE);
+	fCreditsView->SelectAll();
+	fCreditsView->Delete();
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kDarkGrey);
+	fCreditsView->Insert(s->String());
+	fCreditsView->Insert("\n");
+	while ((s = (BString *)haikuList.RemoveItem((int32)0))) {
+		delete s;
 	}
 }
 
