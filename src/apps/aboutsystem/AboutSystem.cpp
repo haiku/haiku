@@ -17,6 +17,7 @@
 #include <Messenger.h>
 #include <OS.h>
 #include <Path.h>
+#include <Query.h>
 #include <Resources.h>
 #include <Screen.h>
 #include <ScrollView.h>
@@ -26,6 +27,8 @@
 #include <TranslationUtils.h>
 #include <TranslatorFormats.h>
 #include <View.h>
+#include <Volume.h>
+#include <VolumeRoster.h>
 #include <Window.h>
 
 #include <cpu_type.h>
@@ -36,6 +39,7 @@
 
 
 #define SCROLL_CREDITS_VIEW 'mviv'
+#define READ_APP_QUERY_ENT 'raqe'
 
 
 static const char *UptimeToString(char string[], size_t size);
@@ -86,6 +90,7 @@ class AboutView : public BView {
 		
 		bigtime_t		fLastActionTime;
 		BMessageRunner	*fScrollRunner;
+		BQuery			fAppsQuery;
 };
 
 
@@ -107,7 +112,13 @@ AboutWindow::AboutWindow()
 	: BWindow(BRect(0, 0, 500, 300), "About This System", B_TITLED_WINDOW, 
 			B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 {
-	AddChild(new AboutView(Bounds()));
+	AboutView *view = new AboutView(Bounds());
+	AddChild(view);
+	
+	// start reading from the app query
+	BMessage msg(READ_APP_QUERY_ENT);
+	BMessenger msgr(view);
+	msgr.SendMessage(&msg);
 
 	MoveTo((BScreen().Frame().Width() - Bounds().Width()) / 2,
 		(BScreen().Frame().Height() - Bounds().Height()) / 2 );
@@ -451,15 +462,12 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->Insert("Travis Geiselbrecht (and his NewOS kernel)\n");
 	fCreditsView->Insert("Michael Phipps (project founder)\n\n");
 
+	// copyrights for various projects we use
+
 	font.SetSize(be_bold_font->Size() + 4);
 	font.SetFace(B_BOLD_FACE);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
 	fCreditsView->Insert("\nCopyrights\n\n");
-
-	font.SetSize(be_bold_font->Size());
-	font.SetFace(B_BOLD_FACE | B_ITALIC_FACE);
-
-	// copyrights for various projects we use
 
 	// GNU copyrights
 	AddCopyrightEntry("The GNU Project", 
@@ -544,6 +552,22 @@ AboutView::AboutView(const BRect &rect)
 	AddCopyrightEntry("Vi IMproved", 
 		"Copyright " B_UTF8_COPYRIGHT " Bram Moolenaar et al.");
 
+	// Build a list of installed applications and show their 
+	// long version info. Well-behaved apps usually give
+	// copyright info there.
+	
+	font.SetSize(be_bold_font->Size() + 4);
+	font.SetFace(B_BOLD_FACE);
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
+	fCreditsView->Insert("\nInstalled applications\n\n");
+
+	BVolume bootVolume;
+	BVolumeRoster().GetBootVolume(&bootVolume);
+	fAppsQuery.SetVolume(&bootVolume);
+	if (fAppsQuery.SetPredicate("((BEOS:APP_SIG==\"**\")&&(name!=\"*.so\")&&(name!=\"*.rsrc\")&&"
+								"(BEOS:TYPE==\"application/x-vnd.Be-elfexecutable\"))") >= B_OK) {
+		fAppsQuery.Fetch();
+	}
 }
 
 
@@ -646,6 +670,59 @@ AboutView::MessageReceived(BMessage *msg)
 			if (scrollBar->Value() < max)
 				fCreditsView->ScrollBy(0, 5);
 			
+			break;
+		}
+		
+		case READ_APP_QUERY_ENT:
+		{
+			BEntry ent;
+			if (fAppsQuery.GetNextEntry(&ent) < B_OK) {
+				fAppsQuery.Clear();
+				break;
+			}
+			BFile file;
+			BPath path;
+			if (ent.Exists() && 
+				ent.GetPath(&path) >= B_OK &&
+				file.SetTo(&ent, B_READ_ONLY) >= B_OK) {
+				/* filter only apps */
+				if (strncmp(path.Path(), "/boot/apps", 10) == 0) {
+					BAppFileInfo appFileInfo(&file);
+					uint32 flags;
+					version_info version;
+					if (appFileInfo.InitCheck() >= B_OK && 
+						appFileInfo.GetAppFlags(&flags) >= B_OK && 
+						appFileInfo.GetVersionInfo(&version, B_APP_VERSION_KIND) >= B_OK) {
+						//printf("AppFileInfo for %s :\n", path.Path());
+						//printf("flags: %08x\n", flags);
+						BString name;
+						BString info;
+						name << path.Leaf();
+						if (strlen(version.short_info) && 
+							strcmp(version.short_info, path.Leaf()))
+							name << " (" << version.short_info << ")";
+						/*
+						info << "\tVersion: ";
+						info << version.major << ".";
+						info << version.middle << ".";
+						info << version.minor;
+						char varieties[] = "dabgmf";
+						if (version.variety > B_FINAL_VERSION)
+							info << "?";
+						else
+							info << varieties[version.variety];
+						info << version.internal;
+						info << "\n";
+						*/
+						info << version.long_info;
+						AddCopyrightEntry(name.String(), info.String());
+						
+					}
+				}
+			}
+			// note for self: read next entry :)
+			BMessage m(READ_APP_QUERY_ENT);
+			BMessenger(this).SendMessage(&m);
 			break;
 		}
 		
