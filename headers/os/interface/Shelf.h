@@ -101,6 +101,8 @@ class BShelf : public BHandler {
 		status_t			_DeleteReplicant(BPrivate::replicant_data* replicant);
 		status_t			_AddReplicant(BMessage* data,
 								BPoint* location, uint32 uniqueID);
+		BView				*_GetReplicant(BMessage *data, BView *view, const BPoint &point,
+							BDragger *&dragger, BDragger::relation &relation);		
 		_BZombieReplicantView_		*_CreateZombie(BMessage *data, BDragger *&dragger);
 		
 		status_t			_GetProperty(BMessage* message, BMessage* reply);

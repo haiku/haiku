@@ -1142,11 +1142,6 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 			}
 		}
 	}
-
-	BDragger* dragger = NULL;
-	BView* replicant = NULL;
-	BDragger::relation relation = BDragger::TARGET_UNKNOWN;
-	_BZombieReplicantView_* zombie = NULL;
 	
 	// Instantiate the object, if this fails we have a zombie
 	image_id image;
@@ -1157,58 +1152,16 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 		return send_reply(data, B_ERROR, uniqueID);
 	}
 
+	BDragger* dragger = NULL;
+	BView* replicant = NULL;
+	BDragger::relation relation = BDragger::TARGET_UNKNOWN;
+	_BZombieReplicantView_* zombie = NULL;
 	if (view != NULL) {
-		BPoint point;
-		if (location)
-			point = *location;
-		else
-			point = view->Frame().LeftTop();
+		const BPoint point = location ? *location : view->Frame().LeftTop();
+		replicant = _GetReplicant(data, view, point, dragger, relation);
+		if (replicant == NULL)
+			send_reply(data, B_ERROR, uniqueID);
 
-		// TODO: test me -- there seems to be lots of bugs parked here!
-
-		_GetReplicantData(data, view, replicant, dragger, relation);
-
-		if (dragger != NULL)
-			dragger->_SetShelf(this);
-
-		BRect frame;
-		if (relation == BDragger::TARGET_IS_CHILD)
-			frame = dragger->Frame().OffsetToCopy(point);
-		else {
-			frame = replicant->Frame().OffsetToCopy(point);
-			fContainerView->AddChild(replicant);
-		}
-
-		if (!CanAcceptReplicantView(frame, replicant, data)) {
-			// the view has not been accepted
-
-			if (relation == BDragger::TARGET_IS_PARENT
-				|| relation == BDragger::TARGET_IS_SIBLING) {
-				replicant->RemoveSelf();				
-				delete replicant;			
-			}
-
-			if (relation == BDragger::TARGET_IS_CHILD
-				|| relation == BDragger::TARGET_IS_SIBLING) {
-				dragger->RemoveSelf();			
-				delete dragger;
-			}
-
-			return send_reply(data, B_ERROR, uniqueID);
-		}
-
-		BPoint adjust = AdjustReplicantBy(frame, data);
-		
-		// TODO: that's probably not correct for all relations (or any?)
-		// At least, commenting this line fixes a bug in BSnow		
-		view->MoveTo(point + adjust);
-
-		// if it's a sibling or a child, we need to add the dragger
-		if (relation == BDragger::TARGET_IS_SIBLING
-			|| relation == BDragger::TARGET_IS_CHILD)
-			fContainerView->AddChild(dragger);
-
-		replicant->AddFilter(new ReplicantViewFilter(this, replicant));
 	} else if (fDisplayZombies && fAllowZombies)
 		zombie = _CreateZombie(data, dragger);
 
@@ -1230,6 +1183,60 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 	fReplicants.AddItem(item);
 
 	return send_reply(data, B_OK, uniqueID);
+}
+
+
+BView *
+BShelf::_GetReplicant(BMessage *data, BView *view, const BPoint &point,
+		BDragger *&dragger, BDragger::relation &relation)
+{
+	// TODO: test me -- there seems to be lots of bugs parked here!
+	BView *replicant = NULL;
+	_GetReplicantData(data, view, replicant, dragger, relation);
+
+	if (dragger != NULL)
+		dragger->_SetShelf(this);
+
+	BRect frame;
+	if (relation == BDragger::TARGET_IS_CHILD)
+		frame = dragger->Frame().OffsetToCopy(point);
+	else {
+		frame = replicant->Frame().OffsetToCopy(point);
+		fContainerView->AddChild(replicant);
+	}
+
+	if (!CanAcceptReplicantView(frame, replicant, data)) {
+		// the view has not been accepted
+
+		if (relation == BDragger::TARGET_IS_PARENT
+			|| relation == BDragger::TARGET_IS_SIBLING) {
+			replicant->RemoveSelf();				
+			delete replicant;			
+		}
+
+		if (relation == BDragger::TARGET_IS_CHILD
+			|| relation == BDragger::TARGET_IS_SIBLING) {
+			dragger->RemoveSelf();			
+			delete dragger;
+		}
+		
+		return NULL;
+	}
+
+	BPoint adjust = AdjustReplicantBy(frame, data);
+	
+	// TODO: that's probably not correct for all relations (or any?)
+	// At least, commenting this line fixes a bug in BSnow		
+	view->MoveTo(point + adjust);
+
+	// if it's a sibling or a child, we need to add the dragger
+	if (relation == BDragger::TARGET_IS_SIBLING
+		|| relation == BDragger::TARGET_IS_CHILD)
+		fContainerView->AddChild(dragger);
+
+	replicant->AddFilter(new ReplicantViewFilter(this, replicant));
+
+	return replicant;
 }
 
 
