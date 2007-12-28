@@ -163,7 +163,9 @@ AboutView::AboutView(const BRect &rect)
 		r.OffsetBy(0, fLogo->Bounds().Height());
 
 	fInfoView = new BView(r, "infoview", B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM, B_WILL_DRAW);
-	fInfoView->SetViewColor(235, 235, 235);
+	fInfoView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fInfoView->SetLowColor(fInfoView->ViewColor());
+	fInfoView->SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 	AddChild(fInfoView);
 
 	// Add all the various labels for system infomation
