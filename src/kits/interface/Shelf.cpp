@@ -178,6 +178,25 @@ send_reply(BMessage* message, status_t status, uint32 uniqueID)
 }
 
 
+static bool
+find_replicant(BList &list, const char *className, const char *addOn)
+{
+	int32 i = 0;
+	replicant_data *item;
+	while ((item = (replicant_data *)list.ItemAt(i++)) != NULL) {
+		const char *replicantClassName;
+		const char *replicantAddOn;
+		if (item->message->FindString("class", &replicantClassName) == B_OK
+			&& item->message->FindString("add_on", &replicantAddOn) == B_OK
+			&& !strcmp(className, replicantClassName)
+			&& addOn != NULL && replicantAddOn != NULL
+			&& !strcmp(addOn, replicantAddOn))
+		return true;
+	}
+	return false;
+}
+
+
 //	#pragma mark -
 
 
@@ -1105,7 +1124,7 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 
 	// Check if we can accept this message
 	if (!CanAcceptReplicantMessage(data)) {
-		printf("Replicant was rejected by BShelf: CanAcceptReplicant() returned false");
+		printf("Replicant was rejected by BShelf::CanAcceptReplicantMessage()");
 		return send_reply(data, B_ERROR, uniqueID);
 	}
 
@@ -1115,22 +1134,11 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 		const char *addOn = NULL;
 
 		if (data->FindString("class", &className) == B_OK
-			&& data->FindString("add_on", &addOn) == B_OK) {
-			int32 i = 0;
-			replicant_data *item;
-			const char *replicantClassName = NULL;
-			const char *replicantAddOn = NULL;
-
-			while ((item = (replicant_data*)fReplicants.ItemAt(i++)) != NULL) {
-				if (item->message->FindString("class", &replicantClassName) == B_OK
-					&& item->message->FindString("add_on", &replicantAddOn) == B_OK
-					&& !strcmp(className, replicantClassName)
-					&& addOn != NULL && replicantAddOn != NULL
-					&& !strcmp(addOn, replicantAddOn)) {
-					printf("Replicant was rejected. Unique replicant already exists. class=%s, signature=%s",
-						replicantClassName, replicantAddOn);
-					return send_reply(data, B_ERROR, uniqueID);
-				}
+			&& data->FindString("add_on", &addOn) == B_OK) {		
+			if (find_replicant(fReplicants, className, addOn)) {		
+				printf("Replicant was rejected. Unique replicant already exists. class=%s, signature=%s",
+					className, addOn);
+				return send_reply(data, B_ERROR, uniqueID);
 			}
 		}
 	}
@@ -1158,44 +1166,18 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 
 		// TODO: test me -- there seems to be lots of bugs parked here!
 
-		// Check if we have a dragger archived as "__widget" inside the message
-		BMessage widget;
-		if (data->FindMessage("__widget", &widget) == B_OK) {
-			image_id draggerImage = B_ERROR;
-			replicant = view;
-			dragger = dynamic_cast<BDragger*>(_InstantiateObject(&widget, &draggerImage));
-			if (dragger != NULL) {
-				// Replicant is either a sibling or unknown
-				dragger->_SetViewToDrag(replicant);
-				relation = BDragger::TARGET_IS_SIBLING;
-			}
-		} else {
-			// Replicant is child of the dragger
-			if ((dragger = dynamic_cast<BDragger*>(view)) != NULL) {
-				replicant = dragger->ChildAt(0);
-				dragger->_SetViewToDrag(replicant);
-				relation = BDragger::TARGET_IS_CHILD;
-			} else {
-				// Replicant is parent of the dragger
-				replicant = view;
-				dragger = dynamic_cast<BDragger *>(replicant->FindView("_dragger_"));
-
-				if (dragger)
-					dragger->_SetViewToDrag(replicant);
-
-				relation = BDragger::TARGET_IS_PARENT;
-			}
-		}
+		_GetReplicantData(data, view, replicant, dragger, relation);
 
 		if (dragger != NULL)
 			dragger->_SetShelf(this);
 
 		BRect frame;
-		if (relation != BDragger::TARGET_IS_CHILD) {
+		if (relation == BDragger::TARGET_IS_CHILD)
+			frame = dragger->Frame().OffsetToCopy(point);
+		else {
 			frame = replicant->Frame().OffsetToCopy(point);
 			fContainerView->AddChild(replicant);
-		} else
-			frame = dragger->Frame().OffsetToCopy(point);
+		}
 
 		if (!CanAcceptReplicantView(frame, replicant, data)) {
 			// the view has not been accepted
@@ -1205,6 +1187,7 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 				replicant->RemoveSelf();				
 				delete replicant;			
 			}
+
 			if (relation == BDragger::TARGET_IS_CHILD
 				|| relation == BDragger::TARGET_IS_SIBLING) {
 				dragger->RemoveSelf();			
@@ -1226,34 +1209,10 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 			fContainerView->AddChild(dragger);
 
 		replicant->AddFilter(new ReplicantViewFilter(this, replicant));
-	} else if (fDisplayZombies && fAllowZombies) {
-		// TODO: the zombies must be adjusted and moved as well!
-		BRect frame;
-		if (data->FindRect("_frame", &frame) != B_OK)
-			frame = BRect();
+	} else if (fDisplayZombies && fAllowZombies)
+		zombie = _CreateZombie(data, dragger);
 
-		if (data->WasDropped()) {
-			BPoint dropPoint, offset;
-			dropPoint = data->DropPoint(&offset);
-
-			frame.OffsetTo(B_ORIGIN);
-			frame.OffsetTo(fContainerView->ConvertFromScreen(dropPoint) - offset);
-
-			zombie = new _BZombieReplicantView_(frame, B_ERROR);
-
-			frame.OffsetTo(B_ORIGIN);
-
-			dragger = new BDragger(frame, zombie);
-			dragger->_SetShelf(this);
-			dragger->_SetZombied(true);
-
-			zombie->AddChild(dragger);
-			zombie->SetArchive(data);
-			zombie->AddFilter(new ReplicantViewFilter(this, zombie));
-
-			fContainerView->AddChild(zombie);
-		}
-	} else if (!fAllowZombies) {
+	else if (!fAllowZombies) {
 		// There was no view, and we're not allowed to have any zombies
 		// in the house
 		return send_reply(data, B_ERROR, uniqueID);
@@ -1271,6 +1230,41 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 	fReplicants.AddItem(item);
 
 	return send_reply(data, B_OK, uniqueID);
+}
+
+
+_BZombieReplicantView_ *
+BShelf::_CreateZombie(BMessage *data, BDragger *&dragger)
+{
+	// TODO: the zombies must be adjusted and moved as well!
+	BRect frame;
+	if (data->FindRect("_frame", &frame) != B_OK)
+		frame = BRect();
+
+	_BZombieReplicantView_ *zombie = NULL;
+	if (data->WasDropped()) {
+		BPoint dropPoint, offset;
+		dropPoint = data->DropPoint(&offset);
+
+		frame.OffsetTo(B_ORIGIN);
+		frame.OffsetTo(fContainerView->ConvertFromScreen(dropPoint) - offset);
+
+		zombie = new _BZombieReplicantView_(frame, B_ERROR);
+
+		frame.OffsetTo(B_ORIGIN);
+
+		dragger = new BDragger(frame, zombie);
+		dragger->_SetShelf(this);
+		dragger->_SetZombied(true);
+
+		zombie->AddChild(dragger);
+		zombie->SetArchive(data);
+		zombie->AddFilter(new ReplicantViewFilter(this, zombie));
+
+		fContainerView->AddChild(zombie);
+	}
+
+	return zombie;
 }
 
 
@@ -1340,6 +1334,42 @@ BShelf::_GetProperty(BMessage *msg, BMessage *reply)
 	}
 
 	return err;
+}
+
+
+/* static */
+void
+BShelf::_GetReplicantData(BMessage *data, BView *view, BView *&replicant,
+			BDragger *&dragger, BDragger::relation &relation)
+{
+	// Check if we have a dragger archived as "__widget" inside the message
+	BMessage widget;
+	if (data->FindMessage("__widget", &widget) == B_OK) {
+		image_id draggerImage = B_ERROR;
+		replicant = view;
+		dragger = dynamic_cast<BDragger*>(_InstantiateObject(&widget, &draggerImage));
+		if (dragger != NULL) {
+			// Replicant is either a sibling or unknown
+			dragger->_SetViewToDrag(replicant);
+			relation = BDragger::TARGET_IS_SIBLING;
+		}
+	} else {
+		// Replicant is child of the dragger
+		if ((dragger = dynamic_cast<BDragger*>(view)) != NULL) {
+			replicant = dragger->ChildAt(0);
+			dragger->_SetViewToDrag(replicant);
+			relation = BDragger::TARGET_IS_CHILD;
+		} else {
+			// Replicant is parent of the dragger
+			replicant = view;
+			dragger = dynamic_cast<BDragger *>(replicant->FindView("_dragger_"));
+
+			if (dragger)
+				dragger->_SetViewToDrag(replicant);
+
+			relation = BDragger::TARGET_IS_PARENT;
+		}
+	}
 }
 
 

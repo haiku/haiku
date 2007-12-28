@@ -6,6 +6,7 @@
 #define _SHELF_H
 
 
+#include <Dragger.h>
 #include <Handler.h>
 #include <List.h>
 
@@ -13,6 +14,7 @@ class BDataIO;
 class BPoint;
 class BView;
 class BEntry;
+class _BZombieReplicantView_;
 struct entry_ref;
 
 namespace BPrivate {
@@ -99,8 +101,11 @@ class BShelf : public BHandler {
 		status_t			_DeleteReplicant(BPrivate::replicant_data* replicant);
 		status_t			_AddReplicant(BMessage* data,
 								BPoint* location, uint32 uniqueID);
-		status_t			_GetProperty(BMessage* message, BMessage* reply);
+		_BZombieReplicantView_		*_CreateZombie(BMessage *data, BDragger *&dragger);
 		
+		status_t			_GetProperty(BMessage* message, BMessage* reply);
+		static void			_GetReplicantData(BMessage *message, BView *view, BView *&replicant,
+								BDragger *&dragger, BDragger::relation &relation);
 		static BArchivable*		_InstantiateObject(BMessage *archive, image_id *image);
 
 	private:
