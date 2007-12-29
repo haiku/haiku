@@ -222,25 +222,45 @@ BColorControl::SetValue(int32 value)
 	c2.blue = (value & 0x0000FF00) >> 8;
 	char string[4];
 
+	// values for calculating the selector rectangles for invalidation
+	// analogous to selector drawing in _DrawColorArea
+	float rampXGradient = (ceil(fColumns * fCellSize) - 4 - 7)  / 255;
+	float rampSize = (Bounds().bottom - 2) / 4.0;
+	float x, y;
+
 	if (c1.red != c2.red) {
 		sprintf(string, "%d", c2.red);
 		fRedText->SetText(string);
+		
+		y = rampSize * 1.5;
+		x = 2 + c1.red * rampXGradient;
+		Invalidate(BRect(x - 2, y - 2, x + 6, y + 6));
+		x = 2 + c2.red * rampXGradient;
+		Invalidate(BRect(x - 2, y - 2, x + 6, y + 6));
 	}
 
 	if (c1.green != c2.green) {
 		sprintf(string, "%d", c2.green);
 		fGreenText->SetText(string);
-	}
 
+		y = rampSize * 2.5;		
+		x = 2 + c1.green * rampXGradient;
+		Invalidate(BRect(x - 2, y - 2, x + 6, y + 6));
+		x = 2 + c2.green * rampXGradient;
+		Invalidate(BRect(x - 2, y - 2, x + 6, y + 6));
+	}
 	if (c1.blue != c2.blue) {
 		sprintf(string, "%d", c2.blue);
 		fBlueText->SetText(string);
+		
+		y = rampSize * 3.5;
+		x = 2 + c1.blue * rampXGradient;
+		Invalidate(BRect(x - 2, y - 2, x + 6, y + 6));
+		x = 2 + c2.blue * rampXGradient;
+		Invalidate(BRect(x - 2, y - 2, x + 6, y + 6));
 	}
 
 	BControl::SetValueNoUpdate(value);
-
-	// TODO: This causes lot of flickering
-	Invalidate();
 
 	if (LockLooper()) {
 		Window()->UpdateIfNeeded();
