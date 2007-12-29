@@ -24,6 +24,10 @@ typedef struct {
 	uint64		bus_frequency;
 	uint64		time_base_frequency;
 
+	// page root table
+	uint32	phys_pgroot;
+	uint32	vir_pgroot;
+//XXX:
 	addr_range	page_table;		// virtual address and size of the page table
 	addr_range	exception_handlers;
 	addr_range	framebuffer;		// maps where the framebuffer is located, in physical memory
