@@ -44,8 +44,6 @@ MergeObject <libbe>interface_kit.o :
 	ChannelControl.cpp
 	ChannelSlider.cpp
 	CheckBox.cpp
-	ColumnListView.cpp
-	ColumnTypes.cpp
 	ColorConversion.cpp
 	ColorControl.cpp
 	ColorTools.cpp
@@ -127,4 +125,9 @@ MergeObject <libbe>interface_kit.o :
 	LayoutOptimizer.cpp
 	OneElementLayouter.cpp
 	SimpleLayouter.cpp
+;
+
+StaticLibrary libcolumnlistview.a :
+	ColumnListView.cpp
+	ColumnTypes.cpp
 ;

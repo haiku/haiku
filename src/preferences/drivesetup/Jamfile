@@ -10,8 +10,8 @@ Preference DriveSetup :
 	MainWindow.cpp
 	PartitionList.cpp
 	Support.cpp
-	:
-	be
+
+	: be libcolumnlistview.a
 	:
 	DriveSetup.rdef
 ;
