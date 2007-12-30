@@ -941,7 +941,7 @@ FrameMoved(origin);
 
 			while (true) {
 				BMessage* pendingMessage = MessageQueue()->FindMessage(
-					B_WINDOW_RESIZED, 0);
+					B_WINDOW_ACTIVATED, 0);
 				if (pendingMessage == NULL)
 					break;
 
