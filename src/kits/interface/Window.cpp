@@ -874,22 +874,18 @@ BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 				// combine with pending resize notifications
 				BMessage* pendingMessage;
 				while ((pendingMessage = MessageQueue()->FindMessage(B_WINDOW_RESIZED, 0))) {
-					if (pendingMessage != msg) {
-						int32 nextWidth;
-						if (pendingMessage->FindInt32("width", &nextWidth) == B_OK)
-							width = nextWidth;
+					int32 nextWidth;
+					if (pendingMessage->FindInt32("width", &nextWidth) == B_OK)
+						width = nextWidth;
 
-						int32 nextHeight;
-						if (pendingMessage->FindInt32("height", &nextHeight) == B_OK) 
-							height = nextHeight;
+					int32 nextHeight;
+					if (pendingMessage->FindInt32("height", &nextHeight) == B_OK) 
+						height = nextHeight;
 
-						MessageQueue()->RemoveMessage(pendingMessage);
-						delete pendingMessage;
-							// this deletes the first *additional* message
-							// fCurrentMessage is safe
-					} else {
-						MessageQueue()->RemoveMessage(pendingMessage);
-					}
+					MessageQueue()->RemoveMessage(pendingMessage);
+					delete pendingMessage;
+						// this deletes the first *additional* message
+						// fCurrentMessage is safe
 				}
 				if (width != fFrame.Width() || height != fFrame.Height()) {
 					// NOTE: we might have already handled the resize
@@ -932,33 +928,53 @@ FrameMoved(origin);
 		}
 
 		case B_WINDOW_ACTIVATED:
-			if (target == this) {
-				bool active;
-				if (msg->FindBool("active", &active) == B_OK
-					&& active != fActive) {
-					fActive = active;
-
-					WindowActivated(active);
-
-					// call hook function 'WindowActivated(bool)' for all
-					// views attached to this window.
-					fTopView->_Activate(active);
-
-					// we notify the input server if we are gaining or losing focus
-					// from a view which has the B_INPUT_METHOD_AWARE on a window 
-					// (de)activation
-					bool inputMethodAware = false;
-					if (fFocus)
-						inputMethodAware = fFocus->Flags() & B_INPUT_METHOD_AWARE;
-					BMessage msg(active && inputMethodAware ? IS_FOCUS_IM_AWARE_VIEW : IS_UNFOCUS_IM_AWARE_VIEW);
-					BMessenger messenger(fFocus);
-					BMessage reply;
-					if (fFocus)
-						msg.AddMessenger("view", messenger);
-					_control_input_server_(&msg, &reply);
-				}
-			} else
+			if (target != this) {
 				target->MessageReceived(msg);
+				break;
+			}
+
+			bool active;
+			if (msg->FindBool("active", &active) != B_OK)
+				break;
+
+			// find latest activation message
+
+			while (true) {
+				BMessage* pendingMessage = MessageQueue()->FindMessage(
+					B_WINDOW_RESIZED, 0);
+				if (pendingMessage == NULL)
+					break;
+
+				bool nextActive;
+				if (pendingMessage->FindBool("active", &nextActive) == B_OK)
+					active = nextActive;
+
+				MessageQueue()->RemoveMessage(pendingMessage);
+				delete pendingMessage;
+			}
+
+			if (active != fActive) {
+				fActive = active;
+
+				WindowActivated(active);
+
+				// call hook function 'WindowActivated(bool)' for all
+				// views attached to this window.
+				fTopView->_Activate(active);
+
+				// we notify the input server if we are gaining or losing focus
+				// from a view which has the B_INPUT_METHOD_AWARE on a window 
+				// (de)activation
+				bool inputMethodAware = false;
+				if (fFocus)
+					inputMethodAware = fFocus->Flags() & B_INPUT_METHOD_AWARE;
+				BMessage msg(active && inputMethodAware ? IS_FOCUS_IM_AWARE_VIEW : IS_UNFOCUS_IM_AWARE_VIEW);
+				BMessenger messenger(fFocus);
+				BMessage reply;
+				if (fFocus)
+					msg.AddMessenger("view", messenger);
+				_control_input_server_(&msg, &reply);
+			}
 			break;
 
 		case B_SCREEN_CHANGED:
@@ -1686,8 +1702,7 @@ BWindow::UpdateIfNeeded()
 
 	BMessage *msg;
 	for (int32 i = 0; (msg = queue->FindMessage(i)) != NULL; i++) {
-		// TODO: Dispatch more messages ?!?!? Check what beos does.
-		if (msg->what == _UPDATE_ || msg->what == B_WINDOW_ACTIVATED) {
+		if (msg->what == _UPDATE_) {
 			BWindow::DispatchMessage(msg, this);
 				// we need to make sure that no overridden method is called 
 				// here; for BWindow::DispatchMessage() we now exactly what
@@ -1695,8 +1710,8 @@ BWindow::UpdateIfNeeded()
 			queue->RemoveMessage(msg);
 			delete msg;
 			break;
-			// NOTE: "i" would have to be decreased if there were
-			// multiple _UPDATE_ messages and we would not break!
+				// NOTE: "i" would have to be decreased if there were
+				// multiple _UPDATE_ messages and we would not break!
 		}
 	}
 
