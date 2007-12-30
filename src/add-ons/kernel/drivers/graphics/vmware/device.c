@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Eric Petit <eric.petit@lapsus.org>
+ *		Michael Pfeiffer <laplace@users.sourceforge.net>
  */
 
 
@@ -259,6 +260,17 @@ FreeHook(void *dev)
 }
 
 
+static void
+UpdateCursor(SharedInfo *si)
+{
+	WriteReg(SVGA_REG_CURSOR_ID, CURSOR_ID);
+	WriteReg(SVGA_REG_CURSOR_X, si->cursorX);
+	WriteReg(SVGA_REG_CURSOR_Y, si->cursorY);
+	WriteReg(SVGA_REG_CURSOR_ON, si->cursorShow ? SVGA_CURSOR_ON_SHOW :
+				SVGA_CURSOR_ON_HIDE);			
+}
+
+
 /*--------------------------------------------------------------------*/
 /* ControlHook: responds the the ioctl from the accelerant */
 
@@ -325,17 +337,16 @@ ControlHook(void *dev, uint32 msg, void *buf, size_t len)
 		case VMWARE_MOVE_CURSOR:
 		{
 			uint16 *pos = buf;
-			WriteReg(SVGA_REG_CURSOR_ID, CURSOR_ID);
-			WriteReg(SVGA_REG_CURSOR_X, pos[0]);
-			WriteReg(SVGA_REG_CURSOR_Y, pos[1]);
+			si->cursorX = pos[0];
+			si->cursorY = pos[1];
+			UpdateCursor(si);
 			return B_OK;
 		}
 
 		case VMWARE_SHOW_CURSOR:
 		{
-			bool show = *((bool *)buf);
-			WriteReg(SVGA_REG_CURSOR_ON, show ? SVGA_CURSOR_ON_HIDE :
-				SVGA_CURSOR_ON_SHOW);
+			si->cursorShow = *((bool *)buf);
+			UpdateCursor(si);
 			return B_OK;
 		}
 		

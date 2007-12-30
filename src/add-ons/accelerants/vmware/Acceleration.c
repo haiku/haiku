@@ -6,6 +6,7 @@
  * Authors:
  *		Be Incorporated
  *		Eric Petit <eric.petit@lapsus.org>
+ *      Michael Pfeiffer <laplace@users.sourceforge.net>
  */
 
 
@@ -18,13 +19,13 @@ SCREEN_TO_SCREEN_BLIT(engine_token *et, blit_params *list, uint32 count)
 	uint32 i;
 	blit_params *b;
 
+	FifoBeginWrite();
 	for (i = 0; i < count; i++) {
 		b = &list[i];
 #if 0
 		TRACE("BLIT %dx%d, %dx%d->%dx%d\n", b->width + 1, b->height + 1,
 			b->src_left, b->src_top, b->dest_left, b->dest_top);
 #endif
-		FifoBeginWrite();
 		FifoWrite(SVGA_CMD_RECT_COPY);
 		FifoWrite(b->src_left);
 		FifoWrite(b->src_top);
@@ -32,8 +33,9 @@ SCREEN_TO_SCREEN_BLIT(engine_token *et, blit_params *list, uint32 count)
 		FifoWrite(b->dest_top);
 		FifoWrite(b->width + 1);
 		FifoWrite(b->height + 1);
-		FifoEndWrite();
 	}
+	FifoEndWrite();
+	FifoSync();
 }
 
 

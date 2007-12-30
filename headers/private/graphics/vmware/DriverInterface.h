@@ -6,6 +6,7 @@
  * Authors:
  *		Be Incorporated
  *		Eric Petit <eric.petit@lapsus.org>
+ *		Michael Pfeiffer <laplace@users.sourceforge.net>
  */
 
 #ifndef DRIVERINTERFACE_H
@@ -14,6 +15,7 @@
 #include <GraphicsDefs.h>
 #include <Accelerant.h>
 #include <Drivers.h>
+#include <KernelExport.h>
 #include <PCI.h>
 #include <OS.h>
 
@@ -99,6 +101,7 @@ typedef struct {
 	/* For registers access */
 	uint16			indexPort;
 	uint16			valuePort;
+	spinlock		portLock;
 
 	/* Mapped areas */
 	area_id			fbArea;
@@ -116,6 +119,11 @@ typedef struct {
 	Benaphore		engineLock;
 	Benaphore		fifoLock;
 	uint32			fifoNext;
+	
+	/* Cursor state */
+	bool			cursorShow;
+	uint16			cursorX;
+	uint16			cursorY;
 } SharedInfo;
 
 #endif

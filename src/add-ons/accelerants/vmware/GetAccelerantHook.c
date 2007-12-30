@@ -6,6 +6,7 @@
  * Authors:
  *		Be Incorporated
  *		Eric Petit <eric.petit@lapsus.org>
+ *		Michael Pfeiffer <laplace@users.sourceforge.net>
  */
 
 #include "GlobalData.h"
@@ -17,6 +18,7 @@ get_accelerant_hook(uint32 feature, void *data)
 	switch (feature) {
 #define HOOK(x) case B_##x: return (void *)x
 #define ZERO(x) case B_##x: return (void *)0
+#define HOOK_IF(x, cap) case B_##x: if (gSi->capabilities & cap) return (void *)x; else return (void *)0
 
 		/* initialization */
 		HOOK(INIT_ACCELERANT);
@@ -46,13 +48,9 @@ get_accelerant_hook(uint32 feature, void *data)
 		HOOK(SET_DPMS_MODE);
 
 		/* Cursor managment (Cursor.c) */
-#if 0
-		if (gSi->capabilities & SVGA_CAP_ALPHA_CURSOR) {
-			HOOK(SET_CURSOR_SHAPE);
-			HOOK(MOVE_CURSOR);
-			HOOK(SHOW_CURSOR);
-		}
-#endif
+		HOOK_IF(SET_CURSOR_SHAPE, SVGA_CAP_ALPHA_CURSOR);
+		HOOK_IF(MOVE_CURSOR, SVGA_CAP_ALPHA_CURSOR);
+		HOOK_IF(SHOW_CURSOR, SVGA_CAP_ALPHA_CURSOR);
 
 		/* synchronization */
 		HOOK(ACCELERANT_ENGINE_COUNT);
@@ -63,8 +61,7 @@ get_accelerant_hook(uint32 feature, void *data)
 		HOOK(SYNC_TO_TOKEN);
 
 		/* 2D acceleration (Acceleration.c) */
-		if (gSi->capabilities & SVGA_CAP_RECT_COPY)
-			HOOK(SCREEN_TO_SCREEN_BLIT);
+		HOOK_IF(SCREEN_TO_SCREEN_BLIT, SVGA_CAP_RECT_COPY);
 		ZERO(FILL_RECTANGLE);
 		ZERO(INVERT_RECTANGLE);
 		ZERO(FILL_SPAN);
