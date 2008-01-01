@@ -3541,81 +3541,82 @@ BTextView::_DrawLine(BView *view, const int32 &lineNum, const int32 &startOffset
 	}
 	
 	// do we have any text to draw?
-	if (length > 0) {
-		bool foundTab = false;
-		int32 tabChars = 0;
-		int32 numTabs = 0;
-		int32 offset = startOffset != -1 ? startOffset : line->offset;
-		const BFont *font = NULL;
-		const rgb_color *color = NULL;
-		int32 numBytes;
-		// iterate through each style on this line
-		while ((numBytes = fStyles->Iterate(offset, length, fInline, &font,
-				&color)) != 0) {
-			view->SetFont(font);
-			view->SetHighColor(*color);
+	if (length <= 0)
+		return;
 
-			tabChars = numBytes;
-			do {
-				foundTab = fText->FindChar(B_TAB, offset, &tabChars);
-				if (foundTab) {
-					do {
-						numTabs++;
-						if (ByteAt(offset + tabChars + numTabs) != B_TAB)
-							break;
-					} while ((tabChars + numTabs) < numBytes);
-				}
+	bool foundTab = false;
+	int32 tabChars = 0;
+	int32 numTabs = 0;
+	int32 offset = startOffset != -1 ? startOffset : line->offset;
+	const BFont *font = NULL;
+	const rgb_color *color = NULL;
+	int32 numBytes;
+	// iterate through each style on this line
+	while ((numBytes = fStyles->Iterate(offset, length, fInline, &font,
+			&color)) != 0) {
+		view->SetFont(font);
+		view->SetHighColor(*color);
 
-				if (inputRegion.CountRects() > 0) {
-					BRegion textRegion;
-					GetTextRegion(offset, offset + length, &textRegion);
+		tabChars = numBytes;
+		do {
+			foundTab = fText->FindChar(B_TAB, offset, &tabChars);
+			if (foundTab) {
+				do {
+					numTabs++;
+					if (ByteAt(offset + tabChars + numTabs) != B_TAB)
+						break;
+				} while ((tabChars + numTabs) < numBytes);
+			}
 
-					textRegion.IntersectWith(&inputRegion);
-					view->PushState();	
+			if (inputRegion.CountRects() > 0) {
+				BRegion textRegion;
+				GetTextRegion(offset, offset + length, &textRegion);
 
-					// Highlight in blue the inputted text
-					view->SetHighColor(kBlueInputColor);
+				textRegion.IntersectWith(&inputRegion);
+				view->PushState();	
+
+				// Highlight in blue the inputted text
+				view->SetHighColor(kBlueInputColor);
+				view->FillRect(textRegion.Frame());
+
+				// Highlight in red the selected part
+				if (fInline->SelectionLength() > 0) {
+					BRegion selectedRegion;
+					GetTextRegion(fInline->Offset()
+						+ fInline->SelectionOffset(), fInline->Offset()
+						+ fInline->SelectionOffset()
+						+ fInline->SelectionLength(), &selectedRegion);
+
+					textRegion.IntersectWith(&selectedRegion);
+
+					view->SetHighColor(kRedInputColor);
 					view->FillRect(textRegion.Frame());
-
-					// Highlight in red the selected part
-					if (fInline->SelectionLength() > 0) {
-						BRegion selectedRegion;
-						GetTextRegion(fInline->Offset()
-							+ fInline->SelectionOffset(), fInline->Offset()
-							+ fInline->SelectionOffset()
-							+ fInline->SelectionLength(), &selectedRegion);
-
-						textRegion.IntersectWith(&selectedRegion);
-
-						view->SetHighColor(kRedInputColor);
-						view->FillRect(textRegion.Frame());
-					}
-
-					view->PopState();
 				}
 
-				int32 returnedBytes = tabChars;
-				const char *stringToDraw = fText->GetString(offset,
-					&returnedBytes);
+				view->PopState();
+			}
 
-				view->DrawString(stringToDraw, returnedBytes);
-				if (foundTab) {
-					float penPos = PenLocation().x - fTextRect.left;
-					float tabWidth = _ActualTabWidth(penPos);
-					if (numTabs > 1)
-						tabWidth += ((numTabs - 1) * fTabWidth);
+			int32 returnedBytes = tabChars;
+			const char *stringToDraw = fText->GetString(offset,
+				&returnedBytes);
 
-					view->MovePenBy(tabWidth, 0.0);
-					tabChars += numTabs;
-				}
+			view->DrawString(stringToDraw, returnedBytes);
+			if (foundTab) {
+				float penPos = PenLocation().x - fTextRect.left;
+				float tabWidth = _ActualTabWidth(penPos);
+				if (numTabs > 1)
+					tabWidth += ((numTabs - 1) * fTabWidth);
 
-				offset += tabChars;
-				length -= tabChars;
-				numBytes -= tabChars;
-				tabChars = numBytes;
-				numTabs = 0;
-			} while (foundTab && tabChars > 0);
-		}
+				view->MovePenBy(tabWidth, 0.0);
+				tabChars += numTabs;
+			}
+
+			offset += tabChars;
+			length -= tabChars;
+			numBytes -= tabChars;
+			tabChars = numBytes;
+			numTabs = 0;
+		} while (foundTab && tabChars > 0);
 	}
 }
 
@@ -4191,12 +4192,6 @@ BTextView::_Deactivate()
 			Highlight(fSelStart, fSelEnd);
 	} else
 		_HideCaret();
-	
-	BPoint where;
-	ulong buttons;
-	GetMouse(&where, &buttons);
-	if (Bounds().Contains(where))
-		SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
 }
 
 
