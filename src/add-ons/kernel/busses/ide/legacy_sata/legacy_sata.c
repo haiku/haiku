@@ -184,6 +184,7 @@ controller_probe(device_node_handle parent)
 			break;
 	}
 
+	bus_master_base &= ~PCI_address_space;
 	for (index = 0; index < num_channels; index++) {
 		command_block_base[index] &= ~PCI_address_space;
 		control_block_base[index] &= ~PCI_address_space;
