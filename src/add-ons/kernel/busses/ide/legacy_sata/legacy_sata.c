@@ -121,7 +121,7 @@ controller_supports(device_node_handle parent, bool *_noConnection)
 static status_t
 controller_probe(device_node_handle parent)
 {
-        device_node_handle controller_node;
+	device_node_handle controller_node;
 	device_node_handle channels[4];
 	uint16 command_block_base[4];
 	uint16 control_block_base[4];
@@ -133,6 +133,7 @@ controller_probe(device_node_handle parent)
 	uint16 vendor_id;
 	uint8 int_num;
 	status_t res;
+	uint8 index;
 	
 	TRACE("controller_probe\n");
 
@@ -176,35 +177,40 @@ controller_probe(device_node_handle parent)
 
 		case ID(PCI_vendor_ALI, PCI_device_ALI5287):
 			num_channels = 4;
-                        command_block_base[2] = pci->read_pci_config(device, PCI_base_registers + 0, 4) + 8;
-                        control_block_base[2] = pci->read_pci_config(device, PCI_base_registers + 4, 4) + 4;
-                        command_block_base[3] = pci->read_pci_config(device, PCI_base_registers + 8, 4) + 8;
-                        control_block_base[3] = pci->read_pci_config(device, PCI_base_registers + 12, 4) + 4;
+			command_block_base[2] = pci->read_pci_config(device, PCI_base_registers + 0, 4) + 8;
+			control_block_base[2] = pci->read_pci_config(device, PCI_base_registers + 4, 4) + 4;
+			command_block_base[3] = pci->read_pci_config(device, PCI_base_registers + 8, 4) + 8;
+			control_block_base[3] = pci->read_pci_config(device, PCI_base_registers + 12, 4) + 4;
 			break;
 	}
 
-        res = ide_adapter->detect_controller(pci, device, parent, bus_master_base, 
-                CONTROLLER_MODULE_NAME, "" /* XXX: unused: controller_driver_type*/, CONTROLLER_NAME, true,
-                true, 1, 0xffff, 0x10000, &controller_node);
-        // don't register if controller is already registered!
-        // (happens during rescan; registering new channels would kick out old channels)
-        if (res != B_OK)
+	for (index = 0; index < num_channels; index++) {
+		command_block_base[index] &= ~PCI_address_space;
+		control_block_base[index] &= ~PCI_address_space;
+	}
+
+	res = ide_adapter->detect_controller(pci, device, parent, bus_master_base, 
+		CONTROLLER_MODULE_NAME, "" /* XXX: unused: controller_driver_type*/, CONTROLLER_NAME, true,
+		true, 1, 0xffff, 0x10000, &controller_node);
+	// don't register if controller is already registered!
+	// (happens during rescan; registering new channels would kick out old channels)
+	if (res != B_OK)
 		goto err;
 	if (controller_node == NULL) {
 		res = B_IO_ERROR;
-                goto err;
+		goto err;
 	}
 
-        // ignore errors during registration of channels - could be a simple rescan collision
-        res = ide_adapter->detect_channel(pci, device, controller_node, CHANNEL_MODULE_NAME,
-                true, command_block_base[0], control_block_base[0], bus_master_base,
-                int_num, true, "Primary Channel", &channels[0], false);
+	// ignore errors during registration of channels - could be a simple rescan collision
+	res = ide_adapter->detect_channel(pci, device, controller_node, CHANNEL_MODULE_NAME,
+		true, command_block_base[0], control_block_base[0], bus_master_base,
+		int_num, true, "Primary Channel", &channels[0], false);
 
 	dprintf("Primary Channel: %s\n", strerror(res));
 
-        res = ide_adapter->detect_channel(pci, device, controller_node, CHANNEL_MODULE_NAME,
-                true, command_block_base[1], control_block_base[1], bus_master_base,
-                int_num, false, "Secondary Channel", &channels[1], false);
+	res = ide_adapter->detect_channel(pci, device, controller_node, CHANNEL_MODULE_NAME,
+		true, command_block_base[1], control_block_base[1], bus_master_base,
+		int_num, false, "Secondary Channel", &channels[1], false);
 
 	dprintf("Secondary Channel: %s\n", strerror(res));
 
