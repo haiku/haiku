@@ -80,9 +80,8 @@ enum {
 // interrupt number (uint8)
 // can also be defined in controller node if both channels use same IRQ!
 #define IDE_ADAPTER_INTNUM "ide_adapter/irq"
-// non-zero if primary channel, else secondary channel (uint8)
-#define IDE_ADAPTER_IS_PRIMARY "ide_adapter/is_primary"
-
+// 0 if primary channel, 1 if secondary channel, 2 if tertiary, ... (uint8)
+#define IDE_ADAPTER_CHANNEL_INDEX "ide_adapter/channel_index"
 
 // controller node items
 // io address of bus master registers (uint16)
@@ -164,14 +163,14 @@ typedef struct {
 	status_t (*publish_channel)(device_node_handle controller_node,
 					const char *channel_module_name, uint16 command_block_base,
 					uint16 control_block_base, uint8 intnum, bool can_dma,
-					bool is_primary, const char *name, 
+					uint8 channel_index, const char *name, 
 					io_resource_handle *resources, device_node_handle *node);
 	// verify channel configuration and publish node on success
 	status_t (*detect_channel)(pci_device_module_info *pci, pci_device pci_device,
 					device_node_handle controller_node, const char *channel_module_name,
 					bool controller_can_dma, uint16 command_block_base,
 					uint16 control_block_base, uint16 bus_master_base,
-					uint8 intnum, bool is_primary, const char *name,
+					uint8 intnum, uint8 channel_index, const char *name,
 					device_node_handle *node, bool supports_compatibility_mode);
 
 	// functions that must be called by init/uninit etc. of controller driver

@@ -51,6 +51,11 @@
 /* XXX: To be moved to PCI.h */
 #define PCI_command_interrupt	0x400
 
+static const char * const kChannelNames[] = {
+	"Primary Channel", "Secondary Channel",
+	"Tertiary Channel", "Quaternary Channel"
+};
+
 static ide_for_controller_interface*	ide;
 static ide_adapter_interface*		ide_adapter;
 static device_manager_info*		dm;
@@ -184,10 +189,10 @@ controller_probe(device_node_handle parent)
 			break;
 	}
 
-	bus_master_base &= ~PCI_address_space;
+	bus_master_base &= PCI_address_io_mask;
 	for (index = 0; index < num_channels; index++) {
-		command_block_base[index] &= ~PCI_address_space;
-		control_block_base[index] &= ~PCI_address_space;
+		command_block_base[index] &= PCI_address_io_mask;
+		control_block_base[index] &= PCI_address_io_mask;
 	}
 
 	res = ide_adapter->detect_controller(pci, device, parent, bus_master_base, 
@@ -203,31 +208,15 @@ controller_probe(device_node_handle parent)
 	}
 
 	// ignore errors during registration of channels - could be a simple rescan collision
-	res = ide_adapter->detect_channel(pci, device, controller_node, CHANNEL_MODULE_NAME,
-		true, command_block_base[0], control_block_base[0], bus_master_base,
-		int_num, true, "Primary Channel", &channels[0], false);
 
-	dprintf("Primary Channel: %s\n", strerror(res));
-
-	res = ide_adapter->detect_channel(pci, device, controller_node, CHANNEL_MODULE_NAME,
-		true, command_block_base[1], control_block_base[1], bus_master_base,
-		int_num, false, "Secondary Channel", &channels[1], false);
-
-	dprintf("Secondary Channel: %s\n", strerror(res));
-
-	if (num_channels == 4) {
+	for (index = 0; index < num_channels; index++) {
 		res = ide_adapter->detect_channel(pci, device, controller_node, CHANNEL_MODULE_NAME,
-			true, command_block_base[2], control_block_base[2], bus_master_base,
-			int_num, true, "Tertiary Channel", &channels[2], false);
+			true, command_block_base[index], control_block_base[index], bus_master_base,
+			int_num, index, kChannelNames[index], &channels[index], false);
 
-		dprintf("Tertiary Channel: %s\n", strerror(res));
-
-		res = ide_adapter->detect_channel(pci, device, controller_node, CHANNEL_MODULE_NAME,
-			true, command_block_base[3], control_block_base[3], bus_master_base,
-			int_num, false, "Quaternary Channel", &channels[3], false);
-
-		dprintf("Quaternary Channel: %s\n", strerror(res));
+		dprintf("%s: %s\n", kChannelNames[index], strerror(res));
 	}
+
 
 	dm->uninit_driver(parent);
 

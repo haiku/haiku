@@ -274,19 +274,25 @@ probe_controller(device_node_handle parent)
 	bus_master_base = pci->read_pci_config(device, PCI_base_registers + 16, 4);
 	intnum = pci->read_pci_config(device, PCI_interrupt_line, 1);
 
+	command_block_base[0] &= PCI_address_io_mask;
+	control_block_base[0] &= PCI_address_io_mask;
+	command_block_base[1] &= PCI_address_io_mask;
+	control_block_base[1] &= PCI_address_io_mask;
+	bus_master_base &= PCI_address_io_mask;
+
 	res = detect_controller(pci, device, parent, bus_master_base, intnum, &controller_node);
 	if (res != B_OK || controller_node == NULL)
 		goto err;
 
 	ide_adapter->detect_channel(pci, device, controller_node, 
 		PROMISE_TX2_CHANNEL_MODULE_NAME, true,
-		command_block_base[0], control_block_base[0], bus_master_base, intnum, true, 
-		"Primary Channel", &channels[0], false);
+		command_block_base[0], control_block_base[0], bus_master_base, intnum,
+		0, "Primary Channel", &channels[0], false);
 
 	ide_adapter->detect_channel(pci, device, controller_node, 
 		PROMISE_TX2_CHANNEL_MODULE_NAME, true, 
-		command_block_base[1], control_block_base[1], bus_master_base, intnum, false, 
-		"Secondary Channel", &channels[1], false);
+		command_block_base[1], control_block_base[1], bus_master_base, intnum, 
+		1, "Secondary Channel", &channels[1], false);
 
 	pnp->uninit_driver(parent);
 

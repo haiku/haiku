@@ -329,7 +329,7 @@ ide_adapter_init_channel(device_node_handle node, ide_channel ide_channel,
 	uint8 intnum;
 	int prdt_size;
 	physical_entry pe[1];
-	uint8 is_primary;
+	uint8 channel_index;
 	status_t res;
 
 	TRACE("PCI-IDE: init channel...\n");
@@ -338,7 +338,7 @@ ide_adapter_init_channel(device_node_handle node, ide_channel ide_channel,
 	if (pnp->get_attr_uint16(node, IDE_ADAPTER_COMMAND_BLOCK_BASE, &command_block_base, false) != B_OK
 		|| pnp->get_attr_uint16(node, IDE_ADAPTER_CONTROL_BLOCK_BASE, &control_block_base, false) != B_OK
 		|| pnp->get_attr_uint8(node, IDE_ADAPTER_INTNUM, &intnum, true) != B_OK
-		|| pnp->get_attr_uint8(node, IDE_ADAPTER_IS_PRIMARY, &is_primary, false) != B_OK)
+		|| pnp->get_attr_uint8(node, IDE_ADAPTER_CHANNEL_INDEX, &channel_index, false) != B_OK)
 		return B_ERROR;
 
 	if (pnp->init_driver(pnp->get_parent(node), NULL, NULL, (void **)&controller) != B_OK)
@@ -356,11 +356,13 @@ ide_adapter_init_channel(device_node_handle node, ide_channel ide_channel,
 	channel->lost = false;
 	channel->command_block_base = command_block_base;
 	channel->control_block_base = control_block_base;
-	channel->bus_master_base = controller->bus_master_base + (is_primary ? 0 : 8);
+	channel->bus_master_base = controller->bus_master_base + (channel_index * 8);
 	channel->intnum = intnum;
 	channel->ide_channel = ide_channel;
 	channel->dmaing = false;
 	channel->inthand = inthand;
+
+	TRACE("PCI-IDE: bus master base %#x\n", channel->bus_master_base);
 
 	// PRDT must be contiguous, dword-aligned and must not cross 64K boundary 
 	prdt_size = (IDE_ADAPTER_MAX_SG_COUNT * sizeof( prd_entry ) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1);
@@ -442,7 +444,7 @@ static status_t
 ide_adapter_publish_channel(device_node_handle controller_node, 
 	const char *channel_module_name, uint16 command_block_base,
 	uint16 control_block_base, uint8 intnum, bool can_dma,
-	bool is_primary, const char *name, io_resource_handle *resources,
+	uint8 channel_index, const char *name, io_resource_handle *resources,
 	device_node_handle *node)
 {
 	device_attr attrs[] = {
@@ -457,7 +459,7 @@ ide_adapter_publish_channel(device_node_handle controller_node,
 		{ IDE_ADAPTER_CONTROL_BLOCK_BASE, B_UINT16_TYPE, { ui16: control_block_base }},
 		{ IDE_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { ui8: can_dma }},
 		{ IDE_ADAPTER_INTNUM, B_UINT8_TYPE, { ui8: intnum }},
-		{ IDE_ADAPTER_IS_PRIMARY, B_UINT8_TYPE, { ui8: is_primary }},
+		{ IDE_ADAPTER_CHANNEL_INDEX, B_UINT8_TYPE, { ui8: channel_index }},
 		{ NULL }
 	};
 
@@ -473,7 +475,7 @@ static status_t
 ide_adapter_detect_channel(pci_device_module_info *pci, pci_device pci_device,
 	device_node_handle controller_node, const char *channel_module_name,
 	bool controller_can_dma, uint16 command_block_base, uint16 control_block_base,
-	uint16 bus_master_base, uint8 intnum, bool is_primary, const char *name,
+	uint16 bus_master_base, uint8 intnum, uint8 channel_index, const char *name,
 	device_node_handle *node, bool supports_compatibility_mode)
 {
 	uint8 api;
@@ -485,14 +487,14 @@ ide_adapter_detect_channel(pci_device_module_info *pci, pci_device pci_device,
 	api = pci->read_pci_config(pci_device, PCI_class_api, 1);
 
 	if (supports_compatibility_mode
-		&& is_primary && (api & IDE_API_PRIMARY_NATIVE) == 0) {
+		&& channel_index == 0 && (api & IDE_API_PRIMARY_NATIVE) == 0) {
 		command_block_base = 0x1f0;
 		control_block_base = 0x3f6;
 		intnum = 14;
 		TRACE("PCI-IDE: Controller in legacy mode: cmd %#x, ctrl %#x, irq %d\n",
 			  command_block_base, control_block_base, intnum);
 	} else if (supports_compatibility_mode
-		&& !is_primary && (api & IDE_API_PRIMARY_NATIVE) == 0) {
+		&& channel_index == 1 && (api & IDE_API_PRIMARY_NATIVE) == 0) {
 		command_block_base = 0x170;
 		control_block_base = 0x376;
 		intnum = 15;
@@ -521,7 +523,7 @@ ide_adapter_detect_channel(pci_device_module_info *pci, pci_device pci_device,
 		uint8 status = pci->read_io_8(pci_device, bus_master_base
 			+ IDE_BM_STATUS_REG);
 
-		if (status & IDE_BM_STATUS_SIMPLEX_DMA && !is_primary) {
+		if (status & IDE_BM_STATUS_SIMPLEX_DMA && channel_index != 0) {
 			// in simplex mode, channels cannot operate independantly of each other;
 			// we simply disable bus mastering of second channel to satisfy that;
 			// better were to use a controller lock, but this had to be done in the IDE
@@ -531,10 +533,6 @@ ide_adapter_detect_channel(pci_device_module_info *pci, pci_device pci_device,
 			controller_can_dma = false;
 		}
 	}
-
-	bus_master_base += is_primary ? 0 : 8;
-
-	TRACE("PCI-IDE: bus master base %#x\n", bus_master_base);
 
 	{
 		// allocate channel's I/O resources
@@ -553,7 +551,7 @@ ide_adapter_detect_channel(pci_device_module_info *pci, pci_device pci_device,
 
 	return ide_adapter_publish_channel(controller_node, channel_module_name,
 		command_block_base, control_block_base, intnum, controller_can_dma,
-		is_primary, name, resource_handles, node);
+		channel_index, name, resource_handles, node);
 }
 
 
@@ -738,11 +736,11 @@ ide_adapter_probe_controller(device_node_handle parent, const char *controller_d
 	bus_master_base = pci->read_pci_config(device, PCI_base_registers + 16, 4);
 	intnum = pci->read_pci_config(device, PCI_interrupt_line, 1);
 
-	command_block_base[0] &= ~PCI_address_space;
-	control_block_base[0] &= ~PCI_address_space;
-	command_block_base[1] &= ~PCI_address_space;
-	control_block_base[1] &= ~PCI_address_space;
-	bus_master_base &= ~PCI_address_space;
+	command_block_base[0] &= PCI_address_io_mask;
+	control_block_base[0] &= PCI_address_io_mask;
+	command_block_base[1] &= PCI_address_io_mask;
+	control_block_base[1] &= PCI_address_io_mask;
+	bus_master_base &= PCI_address_io_mask;
 
 	res = ide_adapter_detect_controller(pci, device, parent, bus_master_base, 
 		controller_driver, controller_driver_type, controller_name, can_dma,
@@ -755,11 +753,11 @@ ide_adapter_probe_controller(device_node_handle parent, const char *controller_d
 	// ignore errors during registration of channels - could be a simple rescan collision
 	ide_adapter_detect_channel(pci, device, controller_node, channel_module_name,
 		can_dma, command_block_base[0], control_block_base[0], bus_master_base,
-		intnum, true, "Primary Channel", &channels[0], supports_compatibility_mode);
+		intnum, 0, "Primary Channel", &channels[0], supports_compatibility_mode);
 
 	ide_adapter_detect_channel(pci, device, controller_node, channel_module_name,
 		can_dma, command_block_base[1], control_block_base[1], bus_master_base,
-		intnum, false, "Secondary Channel", &channels[1], supports_compatibility_mode);
+		intnum, 1, "Secondary Channel", &channels[1], supports_compatibility_mode);
 	
 	pnp->uninit_driver(parent);
 		
