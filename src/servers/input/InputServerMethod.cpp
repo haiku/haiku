@@ -159,7 +159,10 @@ _BMethodAddOn_::_BMethodAddOn_(BInputServerMethod *method, const char *name,
 	fMenu(NULL)
 {
 	fName = strdup(name);
-	memcpy(fIcon, icon, 16*16*1);
+	if (icon != NULL)
+		memcpy(fIcon, icon, 16*16*1);
+	else
+		memset(fIcon, 0x1d, 16*16*1);
 }
 
 
@@ -193,7 +196,11 @@ status_t
 _BMethodAddOn_::SetIcon(const uchar* icon)
 {	
 	CALLED();
-	memcpy(fIcon, icon, 16*16*1);
+
+	if (icon != NULL)
+		memcpy(fIcon, icon, 16*16*1);
+	else
+		memset(fIcon, 0x1d, 16*16*1);
 
 	BMessage msg(IS_UPDATE_ICON);
 	msg.AddInt32("cookie", (uint32)fMethod);
