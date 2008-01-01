@@ -216,6 +216,7 @@ scan_device_int(ide_device_info *device, bool atapi)
 	// do a short wait first - if there's no device at all we could wait forever
 	// ToDo: have a look at this; if it times out (when the time is too short),
 	//		the kernel seems to crash a little later)!
+	TRACE("scan_device_int: waiting 100ms...\n");
 	if (acquire_sem_etc(bus->sync_wait_sem, 1, B_RELATIVE_TIMEOUT, 100000) == B_TIMED_OUT) {
 		bool cont;
 
@@ -248,6 +249,7 @@ scan_device_int(ide_device_info *device, bool atapi)
 		// there is something, so wait for it
 		acquire_sem(bus->sync_wait_sem);
 	}
+	TRACE("scan_device_int: got a fast response\n");
 
 	// cancel the timeout manually; usually this is done by wait_for_sync(), but
 	// we've used the wait semaphore directly	
