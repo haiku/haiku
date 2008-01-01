@@ -84,19 +84,19 @@ virtual void		_ReservedPrintJob4();
 					BPrintJob(const BPrintJob &);
 		BPrintJob	&operator=(const BPrintJob &);
 
-		void				RecurseView(BView *v, BPoint origin, BPicture *p, BRect r);
-		void				MangleName(char *filename);
-		void				HandlePageSetup(BMessage *setup);
-		bool				HandlePrintSetup(BMessage *setup);
+		void				_RecurseView(BView *view, BPoint origin, BPicture *p, BRect r);
+		void				_GetMangledName(char *buffer, size_t bufferSize) const;
+		void				_HandlePageSetup(BMessage *setup);
+		bool				_HandlePrintSetup(BMessage *setup);
 
-		void				NewPage();
-		void				EndLastPage();
+		void				_NewPage();
+		void				_EndLastPage();
 
-		void				AddSetupSpec();
-		void				AddPicture(BPicture *picture, BRect *rect, BPoint where);
+		void				_AddSetupSpec();
+		void				_AddPicture(BPicture &picture, BRect &rect, BPoint &where);
 
-		char*				GetCurrentPrinterName() const;
-		void				LoadDefaultSettings();
+		char*				_GetCurrentPrinterName() const;
+		void				_LoadDefaultSettings();
 
 		char *				fPrintJobName;
 		int32				fPageNumber;

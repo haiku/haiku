@@ -251,19 +251,10 @@ BPrintJob::~BPrintJob()
 {
 	CancelJob();
 	
-	if (fPrintJobName != NULL) {
-		free(fPrintJobName);
-		fPrintJobName = NULL;
-	}
-	
-	delete fDefaultSetupMessage;
-	fDefaultSetupMessage = NULL;
-	
+	free(fPrintJobName);
 	delete fSetupMessage;
-	fSetupMessage = NULL;
-	
+	delete fDefaultSetupMessage;
 	delete fCurrentPageHeader;
-	fCurrentPageHeader = NULL;
 }
 
 
@@ -307,7 +298,7 @@ BPrintJob::ConfigPage()
 		return status;
 	delete fSetupMessage;
 	fSetupMessage = configuration.Result();
-	HandlePageSetup(fSetupMessage);
+	_HandlePageSetup(fSetupMessage);
 	return B_OK;
 }
 
@@ -351,7 +342,7 @@ BPrintJob::ConfigJob()
 		return status;
 	delete fSetupMessage;
 	fSetupMessage = configuration.Result();	
-	HandlePrintSetup(fSetupMessage);
+	_HandlePrintSetup(fSetupMessage);
 	return B_OK;
 }
 
@@ -378,7 +369,7 @@ BPrintJob::BeginJob()
 	if (status != B_OK)
 		return;
 	
-	char *printer = GetCurrentPrinterName();
+	char *printer = _GetCurrentPrinterName();
 	if (printer == NULL)
 		return;
 		
@@ -386,7 +377,7 @@ BPrintJob::BeginJob()
 	free(printer);
 	
 	char mangledName[B_FILE_NAME_LENGTH];
-	MangleName(mangledName);
+	_GetMangledName(mangledName, B_FILE_NAME_LENGTH);
 	
 	path.Append(mangledName);
 	
@@ -415,7 +406,7 @@ BPrintJob::BeginJob()
 	// add printer settings message
 	if (!fSetupMessage->HasString(PSRV_FIELD_CURRENT_PRINTER))
 		fSetupMessage->AddString(PSRV_FIELD_CURRENT_PRINTER, printer);
-	AddSetupSpec();
+	_AddSetupSpec();
 
 	// prepare page header 
 	// number_of_pictures is updated in DrawView()
@@ -449,7 +440,7 @@ BPrintJob::CommitJob()
 	}
 	
 	// update spool file		
-	EndLastPage();
+	_EndLastPage();
 
 	// set file attributes
  	app_info appInfo;
@@ -534,8 +525,8 @@ BPrintJob::DrawView(BView *view, BRect rect, BPoint where)
 	
 	if (view->LockLooper()) {
 		BPicture picture;
-		RecurseView(view, where, &picture, rect);
-		AddPicture(&picture, &rect, where);		
+		_RecurseView(view, where, &picture, rect);
+		_AddPicture(picture, rect, where);		
 		view->UnlockLooper();
 	}
 }
@@ -556,7 +547,7 @@ void
 BPrintJob::SetSettings(BMessage *message)
 {
 	if (message != NULL) {
-		HandlePrintSetup(message);	
+		_HandlePrintSetup(message);	
 	} 
 	delete fSetupMessage;
 	fSetupMessage = message;
@@ -566,7 +557,7 @@ BPrintJob::SetSettings(BMessage *message)
 bool
 BPrintJob::IsSettingsMessageValid(BMessage *message) const
 {
-	char *printerName = GetCurrentPrinterName();
+	char *printerName = _GetCurrentPrinterName();
 	if (printerName == NULL) {
 		return false;
 	}
@@ -588,6 +579,8 @@ BPrintJob::IsSettingsMessageValid(BMessage *message) const
 BRect
 BPrintJob::PaperRect()
 {
+	if (fDefaultSetupMessage == NULL)
+		_LoadDefaultSettings();
 	return fPaperSize;
 }
 
@@ -595,6 +588,8 @@ BPrintJob::PaperRect()
 BRect
 BPrintJob::PrintableRect()
 {
+	if (fDefaultSetupMessage == NULL)
+		_LoadDefaultSettings();
 	return fUsableSize;
 }
 
@@ -602,12 +597,13 @@ BPrintJob::PrintableRect()
 void
 BPrintJob::GetResolution(int32 *xdpi, int32 *ydpi)
 {
-	if (xdpi != NULL) {
+	if (fDefaultSetupMessage == NULL)
+		_LoadDefaultSettings();
+
+	if (xdpi != NULL)
 		*xdpi = fXResolution;
-	}
-	if (ydpi != NULL) {
+	if (ydpi != NULL)
 		*ydpi = fYResolution;
-	}
 }
 
 
@@ -652,7 +648,7 @@ BPrintJob::PrinterType(void *) const
 
 
 void
-BPrintJob::RecurseView(BView *view, BPoint origin,
+BPrintJob::_RecurseView(BView *view, BPoint origin,
                        BPicture *picture, BRect rect)
 {
 	ASSERT(picture != NULL);
@@ -671,24 +667,21 @@ BPrintJob::RecurseView(BView *view, BPoint origin,
 	while (child != NULL) {
 		// TODO: origin and rect should probably
 		// be converted for children views in some way
-		RecurseView(child, origin, picture, rect);
+		_RecurseView(child, origin, picture, rect);
 		child = child->NextSibling();
 	}
 }
 
 
 void
-BPrintJob::MangleName(char *filename)
+BPrintJob::_GetMangledName(char *buffer, size_t bufferSize) const
 {
-	char sysTime[10];
-	snprintf(sysTime, sizeof(sysTime), "@%lld", system_time() / 1000);
-	strncpy(filename, fPrintJobName, B_FILE_NAME_LENGTH - sizeof(sysTime));
-	strcat(filename, sysTime);
+	snprintf(buffer, bufferSize, "%s@%lld", fPrintJobName, system_time() / 1000);
 }
 
 
 void
-BPrintJob::HandlePageSetup(BMessage *setup)
+BPrintJob::_HandlePageSetup(BMessage *setup)
 {
 	setup->FindRect(PSRV_FIELD_PRINTABLE_RECT, &fUsableSize);
 	setup->FindRect(PSRV_FIELD_PAPER_RECT, &fPaperSize);
@@ -705,9 +698,9 @@ BPrintJob::HandlePageSetup(BMessage *setup)
 
 
 bool
-BPrintJob::HandlePrintSetup(BMessage *message)
+BPrintJob::_HandlePrintSetup(BMessage *message)
 {
-	HandlePageSetup(message);
+	_HandlePageSetup(message);
 
 	bool valid = true;
 	if (message->FindInt32(PSRV_FIELD_FIRST_PAGE, &fFirstPage) != B_OK) {
@@ -722,7 +715,7 @@ BPrintJob::HandlePrintSetup(BMessage *message)
 
 
 void
-BPrintJob::NewPage()
+BPrintJob::_NewPage()
 {
 	// write page header
 	fCurrentPageHeaderOffset = fSpoolFile->Position();
@@ -736,7 +729,7 @@ BPrintJob::NewPage()
 
 
 void
-BPrintJob::EndLastPage()
+BPrintJob::_EndLastPage()
 {
 	fSpoolFile->Seek(0, SEEK_SET);
 	fCurrentHeader.page_count = fPageNumber;
@@ -744,27 +737,25 @@ BPrintJob::EndLastPage()
 
 
 void
-BPrintJob::AddSetupSpec()
+BPrintJob::_AddSetupSpec()
 {
 	fSetupMessage->Flatten(fSpoolFile);
 }
 
 
 void
-BPrintJob::AddPicture(BPicture *picture, BRect *rect, BPoint where)
+BPrintJob::_AddPicture(BPicture &picture, BRect &rect, BPoint &where)
 {
-	ASSERT(picture != NULL);
 	ASSERT(fSpoolFile != NULL);
-	ASSERT(rect != NULL);
 
 	if (fCurrentPageHeader->number_of_pictures == 0) {
-		NewPage();	
+		_NewPage();	
 	}
 	fCurrentPageHeader->number_of_pictures ++;
 
 	fSpoolFile->Write(&where, sizeof(where));
-	fSpoolFile->Write(rect, sizeof(*rect));
-	picture->Flatten(fSpoolFile);
+	fSpoolFile->Write(&rect, sizeof(rect));
+	picture.Flatten(fSpoolFile);
 }
 
 
@@ -772,7 +763,7 @@ BPrintJob::AddPicture(BPicture *picture, BRect *rect, BPoint where)
 // or NULL if it ccould not be obtained.
 // Caller is responsible to free the string using free().
 char *
-BPrintJob::GetCurrentPrinterName() const
+BPrintJob::_GetCurrentPrinterName() const
 {  
 	BMessenger printServer;
 	if (GetPrinterServerMessenger(printServer)) {
@@ -795,7 +786,7 @@ BPrintJob::GetCurrentPrinterName() const
 
 
 void
-BPrintJob::LoadDefaultSettings()
+BPrintJob::_LoadDefaultSettings()
 {
 	BMessenger printServer;
 	if (GetPrinterServerMessenger(printServer) != B_OK) {
@@ -807,7 +798,7 @@ BPrintJob::LoadDefaultSettings()
     
 	printServer.SendMessage(&message, reply);
     
-	HandlePrintSetup(reply);
+	_HandlePrintSetup(reply);
     
 	delete fDefaultSetupMessage;  	
 	fDefaultSetupMessage = reply;
