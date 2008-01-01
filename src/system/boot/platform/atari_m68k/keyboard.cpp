@@ -10,26 +10,15 @@
 #include <boot/platform.h>
 
 
-static uint16
+static uint32
 check_for_key(void)
 {
-//XXX: non blocking in ?
-#if 0
-	bios_regs regs;
-	regs.eax = 0x0100;
-	call_bios(0x16, &regs);
-
-	// the zero flag is set when there is no key stroke waiting for us
-	if (regs.flags & ZERO_FLAG)
+	union key k;
+	if (Bconstat(DEV_CON) == 0)
 		return 0;
 
-	// remove the key from the buffer
-	regs.eax = 0;
-	call_bios(0x16, &regs);
-
-	return regs.eax & 0xffff;
-#endif
-	return 0;
+	k.d0 = Bconin(DEV_CON);
+	return k.d0;
 }
 
 
@@ -45,7 +34,7 @@ extern "C" union key
 wait_for_key(void)
 {
 	union key key;
-	key.d0 = Bconin(2);
+	key.d0 = Bconin(DEV_CON);
 
 	return key;
 }
@@ -57,7 +46,7 @@ check_for_boot_keys(void)
 	union key key;
 	uint32 options = 0;
 
-	while ((key.ax = check_for_key()) != 0) {
+	while ((key.d0 = check_for_key()) != 0) {
 		switch (key.code.ascii) {
 			case ' ':
 				options |= BOOT_OPTION_MENU;

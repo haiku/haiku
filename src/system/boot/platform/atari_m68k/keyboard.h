@@ -8,8 +8,10 @@
 union key {
 	uint32 d0;
 	struct {
-		uint16 bios;	// scan code
-		uint16 ascii;
+		uint8 modifiers; // not always present!
+		uint8 bios;	// scan code
+		uint8 dummy;
+		uint8 ascii;
 	} code;
 };
 

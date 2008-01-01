@@ -16,6 +16,7 @@ extern "C" {
 #define DEV_PRINTER	0
 #define DEV_AUX	1
 #define DEV_CON	2
+#define DEV_CONSOLE	2
 #define DEV_MIDI	3
 #define DEV_IKBD	4
 #define DEV_RAW	5
