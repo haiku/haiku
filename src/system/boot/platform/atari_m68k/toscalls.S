@@ -19,7 +19,7 @@ _trap_ret_addr:
 /*	uint32 bios(uint16 nr, ...); */
 FUNCTION(bios):
 	move.l	(%a7)+,_trap_ret_addr
-	trap	#
+	trap	#13
 	move.l	_trap_ret_addr,-(%a7)
 	rts
 
