@@ -17,7 +17,7 @@ extern "C" {
  * Atari BIOS calls
  */
 
-extern uint32 bios(uint16 nr, ...);
+extern int32 bios(uint16 nr, ...);
 
 #define Bconin(p0) bios(2, p0)
 //XXX nparams ?
@@ -27,14 +27,15 @@ extern uint32 bios(uint16 nr, ...);
  * Atari XBIOS calls
  */
 
-extern uint32 bios(uint16 nr, ...);
+extern int32 bios(uint16 nr, ...);
+
 
 
 /* 
  * Atari GEMDOS calls
  */
 
-extern uint32 gemdos(uint16 nr, ...);
+extern int32 gemdos(uint16 nr, ...);
 
 // official names
 #define Cconin() gemdos(1)
@@ -42,6 +43,13 @@ extern uint32 gemdos(uint16 nr, ...);
 
 // check for names
 #define terminate() GEMDOS(0)
+
+/*
+ * error mapping
+ * in debug.c
+ */
+
+extern status_t toserror(int32 err);
 
 #ifdef __cplusplus
 }
