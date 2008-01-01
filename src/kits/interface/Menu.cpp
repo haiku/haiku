@@ -1170,6 +1170,8 @@ BMenu::Track(bool sticky, BRect *clickToOpenRect)
 		UnlockLooper();
 	}
 
+	_SetStickyMode(sticky);
+
 	int action;
 	BMenuItem *menuItem = _Track(&action);
 
