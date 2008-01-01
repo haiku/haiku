@@ -50,7 +50,7 @@ struct tosbpb {
 #define K_INSERT	0x40
 
 #define RW_READ			0x00
-#define RW_READ			0x01
+#define RW_WRITE		0x01
 #define RW_NOMEDIACH	0x02
 #define RW_NORETRY		0x04
 #define RW_NOTRANSLATE	0x08

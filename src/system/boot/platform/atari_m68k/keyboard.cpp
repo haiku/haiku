@@ -5,7 +5,7 @@
 
 
 #include "keyboard.h"
-#include "bios.h"
+#include "toscalls.h"
 
 #include <boot/platform.h>
 
