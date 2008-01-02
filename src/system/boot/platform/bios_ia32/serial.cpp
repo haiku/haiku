@@ -43,7 +43,7 @@ serial_putc(char c)
 {
 	// wait until the transmitter empty bit is set
 	while ((in8(sSerialBasePort + SERIAL_LINE_STATUS) & 0x20) == 0)
-		;
+		asm volatile ("pause;");
 
 	out8(c, sSerialBasePort + SERIAL_TRANSMIT_BUFFER);
 }

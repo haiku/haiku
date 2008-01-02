@@ -59,7 +59,7 @@ quick_sample:
 		out8(0x00, 0x43); /* latch counter value */
 		s_low = in8(0x40);
 		s_high = in8(0x40);
-	} while(s_high != 255);
+	} while (s_high != 255);
 	t1 = rdtsc();
 	do {
 		out8(0x00, 0x43); /* latch counter value */
@@ -77,13 +77,13 @@ not_so_quick_sample:
 		out8(0x00, 0x43); /* latch counter value */
 		s_low = in8(0x40);
 		s_high = in8(0x40);
-	} while (s_high!= 255);
+	} while (s_high != 255);
 	t1 = rdtsc();
 	do {
 		out8(0x00, 0x43); /* latch counter value */
 		low = in8(0x40);
 		high = in8(0x40);
-	} while (high> 192);
+	} while (high > 192);
 	t2 = rdtsc();
 	p2 = t2-t1;
 	r2 = (double)(p2) / (double)(((s_high << 8) | s_low) - ((high << 8) | low));
@@ -101,7 +101,7 @@ not_so_quick_sample:
 		out8(0x00, 0x43); /* latch counter value */
 		s_low = in8(0x40);
 		s_high = in8(0x40);
-	} while (s_high!= 255);
+	} while (s_high != 255);
 	t1 = rdtsc();
 	do {
 		out8(0x00, 0x43); /* latch counter value */
@@ -246,8 +246,8 @@ spin(bigtime_t microseconds)
 {
 	bigtime_t time = system_time();
 
-	while((system_time() - time) < microseconds)
-		;
+	while ((system_time() - time) < microseconds)
+		asm volatile ("pause;");
 }
 
 
