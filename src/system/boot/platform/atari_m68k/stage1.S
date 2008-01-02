@@ -25,7 +25,8 @@
  * in 512 byte blocks and dl - BIOS ID of the boot drive.
  * 
  * Compile via:
- * nasm -f bin -O5 -o stage1.bin stage1.S
+ * generated.m68k/cross-tools/bin/m68k-unknown-haiku-gcc -nostdlib -fpic -c -o stage1.o src/system/boot/platform/atari_m68k/stage1.S
+ * generated.m68k/cross-tools/bin/m68k-unknown-haiku-objcopy -O binary stage1.o stage1
  */
 
 // 1 enabled verbose output
