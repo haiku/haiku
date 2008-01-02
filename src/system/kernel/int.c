@@ -43,6 +43,8 @@ struct io_vector {
 #ifdef DEBUG_INT
 	int64				handled_count;
 	int64				unhandled_count;
+	int					trigger_count;
+	int					ignored_count;
 #endif
 };
 
@@ -125,6 +127,8 @@ int_init_post_vm(kernel_args *args)
 		#ifdef DEBUG_INT
 			io_vectors[i].handled_count = 0;
 			io_vectors[i].unhandled_count = 0;
+			io_vectors[i].trigger_count = 0;
+			io_vectors[i].ignored_count = 0;
 		#endif
 		initque(&io_vectors[i].handler_list);	/* initialize handler queue */
 	}
@@ -283,10 +287,23 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 	}
 
 #ifdef DEBUG_INT
-	if (status != B_UNHANDLED_INTERRUPT)
+	io_vectors[vector].trigger_count++;
+	if (status != B_UNHANDLED_INTERRUPT) {
 		io_vectors[vector].handled_count++;
-	else
+	} else {
 		io_vectors[vector].unhandled_count++;
+		io_vectors[vector].ignored_count++;
+	}
+	// disable interrupt when more than 99% are unhandled
+	if (io_vectors[vector].trigger_count > 100000) {
+		if (io_vectors[vector].ignored_count > 99000) {
+			io_vectors[vector].enable_count = -100;
+			arch_int_disable_io_interrupt(vector);
+			dprintf("Disabling unhandled io interrupt %d\n", vector);
+		}
+		io_vectors[vector].trigger_count = 0;
+		io_vectors[vector].ignored_count = 0;
+	}
 #endif
 
 	release_spinlock(&io_vectors[vector].vector_lock);
