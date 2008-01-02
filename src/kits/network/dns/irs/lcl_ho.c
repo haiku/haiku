@@ -1,4 +1,9 @@
 /*
+ * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+/*
  * Copyright (c) 1985, 1988, 1993
  *    The Regents of the University of California.  All rights reserved.
  * 
@@ -105,6 +110,7 @@ static const char rcsid[] = "$Id$";
 
 struct pvt {
 	FILE *		fp;
+	int			index;
 	struct hostent	host;
 	char *		h_addr_ptrs[MAXADDRS + 1];
 	char *		host_aliases[MAXALIASES];
@@ -333,9 +339,25 @@ ho_next(struct irs_ho *this) {
 	if (!pvt->fp)
 		ho_rewind(this);
 	if (!pvt->fp) {
-		RES_SET_H_ERRNO(pvt->res, NETDB_INTERNAL);
-		return (NULL);
+		if (pvt->index > 0)
+			return (NULL);
+
+		strcpy(pvt->hostbuf, "localhost");
+		pvt->host_aliases[0] = pvt->hostbuf;
+		pvt->host_aliases[1] = NULL;
+		pvt->h_addr_ptrs[0] = (char *)pvt->host_addr;
+		pvt->h_addr_ptrs[1] = NULL;
+		pvt->host.h_addr_list = pvt->h_addr_ptrs;
+		pvt->host.h_length = INADDRSZ;
+		pvt->host.h_addrtype = AF_INET;
+		pvt->host.h_aliases = pvt->host_aliases;
+		((struct in_addr *)pvt->host_addr)->s_addr = INADDR_LOOPBACK;
+		pvt->index++;
+
+		RES_SET_H_ERRNO(pvt->res, NETDB_SUCCESS);
+		return (&pvt->host);
 	}
+
 	bufp = pvt->hostbuf;
 	bufsiz = sizeof pvt->hostbuf;
 	offset = 0;
@@ -433,8 +455,10 @@ ho_rewind(struct irs_ho *this) {
 			return;
 		(void)fclose(pvt->fp);
 	}
-	if (!(pvt->fp = fopen(_PATH_HOSTS, "r")))
+	if (!(pvt->fp = fopen(_PATH_HOSTS, "r"))) {
+		pvt->index = 0;
 		return;
+	}
 	if (fcntl(fileno(pvt->fp), F_SETFD, 1) < 0) {
 		(void)fclose(pvt->fp);
 		pvt->fp = NULL;
