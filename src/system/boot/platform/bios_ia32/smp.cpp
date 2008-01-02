@@ -60,8 +60,6 @@ extern "C" void smp_trampoline(void);
 extern "C" void smp_trampoline_end(void);
 
 
-static struct mp_floating_struct *sFloatingStruct = NULL;
-
 static int smp_get_current_cpu(void);
 
 
@@ -90,19 +88,17 @@ smp_get_current_cpu(void)
 }
 
 
-static uint32 *
+static mp_floating_struct *
 smp_mp_probe(uint32 base, uint32 limit)
 {
-	uint32 *ptr;
-
 	TRACE(("smp_mp_probe: entry base 0x%lx, limit 0x%lx\n", base, limit));
-
-	for (ptr = (uint32 *) base; (uint32)ptr < limit; ptr++) {
-		if (*ptr == MP_FLOATING_SIGNATURE) {
-			TRACE(("smp_mp_probe: found floating pointer structure at %p\n", ptr));
-			return ptr;
+	for (uint32 *pointer = (uint32 *)base; (uint32)pointer < limit; pointer++) {
+		if (*pointer == MP_FLOATING_SIGNATURE) {
+			TRACE(("smp_mp_probe: found floating pointer structure at %p\n", pointer));
+			return (mp_floating_struct *)pointer;
 		}
 	}
+
 	return NULL;
 }
 
@@ -122,28 +118,43 @@ smp_acpi_probe(uint32 base, uint32 limit)
 }
 
 
-static void
-smp_do_mp_config()
+static status_t
+smp_do_mp_config(mp_floating_struct *floatingStruct)
 {
-	struct mp_config_table *config;
-	char *ptr;
-	int i;
-#ifdef TRACE_SMP
-	const char *cpu_family[] = { "", "", "", "", "Intel 486",
-		"Intel Pentium", "Intel Pentium Pro", "Intel Pentium II" };
+	TRACE(("smp: intel mp version %s, %s",
+		(floatingStruct->spec_revision == 1) ? "1.1" : "1.4",
+		(floatingStruct->mp_feature_2 & 0x80)
+			? "imcr and pic compatibility mode.\n"
+			: "virtual wire compatibility mode.\n"));
+
+	if (floatingStruct->config_table == NULL) {
+#if 1
+		// XXX need to implement
+		TRACE(("smp: standard configuration %d unimplemented\n", floatingStruct->mp_feature_1));
+		gKernelArgs.num_cpus = 1;
+		return B_OK;
+#else
+		/* this system conforms to one of the default configurations */
+		TRACE(("smp: standard configuration %d\n", floatingStruct->mp_feature_1));
+		gKernelArgs.num_cpus = 2;
+		gKernelArgs.cpu_apic_id[0] = 0;
+		gKernelArgs.cpu_apic_id[1] = 1;
+		apic_phys = (unsigned int *) 0xfee00000;
+		ioapic_phys = (unsigned int *) 0xfec00000;
+		dprintf("smp: WARNING: standard configuration code is untested");
+		return B_OK;
 #endif
+	}
 
 	/*
 	 * we are not running in standard configuration, so we have to look through
 	 * all of the mp configuration table crap to figure out how many processors
 	 * we have, where our apics are, etc.
 	 */
+	mp_config_table *config = floatingStruct->config_table;
 	gKernelArgs.num_cpus = 0;
 
-	config = sFloatingStruct->config_table;
-
 	/* print out our new found configuration. */
-
 	TRACE(("smp: oem id: %.8s product id: %.12s\n", config->oem,
 		config->product));
 	TRACE(("smp: base table has %d entries, extended section %d bytes\n",
@@ -151,58 +162,62 @@ smp_do_mp_config()
 
 	gKernelArgs.arch_args.apic_phys = (uint32)config->apic;
 
-	ptr = (char *)((uint32)config + sizeof(struct mp_config_table));
-	for (i = 0; i < config->num_base_entries; i++) {
-		switch (*ptr) {
+	char *pointer = (char *)((uint32)config + sizeof(struct mp_config_table));
+	for (int32 i = 0; i < config->num_base_entries; i++) {
+		switch (*pointer) {
 			case MP_BASE_PROCESSOR:
 			{
 				if (gKernelArgs.num_cpus == MAX_BOOT_CPUS) {
 					TRACE(("smp: already reached maximum boot CPUs (%d)\n", MAX_BOOT_CPUS));
-					ptr += sizeof(struct mp_base_processor);
+					pointer += sizeof(struct mp_base_processor);
 					break;
 				}
 
-				struct mp_base_processor *processor = (struct mp_base_processor *)ptr;
+				struct mp_base_processor *processor = (struct mp_base_processor *)pointer;
 
 				gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus] = processor->apic_id;
 				gKernelArgs.arch_args.cpu_os_id[processor->apic_id] = gKernelArgs.num_cpus;
 				gKernelArgs.arch_args.cpu_apic_version[gKernelArgs.num_cpus] = processor->apic_version;
 
+#ifdef TRACE_SMP
+				const char *cpuFamily[] = { "", "", "", "", "Intel 486",
+					"Intel Pentium", "Intel Pentium Pro", "Intel Pentium II" };
+#endif
 				TRACE(("smp: cpu#%ld: %s, apic id %d, version %d%s\n",
-					gKernelArgs.num_cpus, cpu_family[(processor->signature & 0xf00) >> 8],
+					gKernelArgs.num_cpus, cpuFamily[(processor->signature & 0xf00) >> 8],
 					processor->apic_id, processor->apic_version, (processor->cpu_flags & 0x2) ?
 					", BSP" : ""));
 
 				gKernelArgs.num_cpus++;
-				ptr += sizeof(struct mp_base_processor);
+				pointer += sizeof(struct mp_base_processor);
 				break;
 			}
 			case MP_BASE_BUS:
 			{
-				struct mp_base_bus *bus = (struct mp_base_bus *)ptr;
+				struct mp_base_bus *bus = (struct mp_base_bus *)pointer;
 
 				TRACE(("smp: bus %d: %c%c%c%c%c%c\n", bus->bus_id,
 					bus->name[0], bus->name[1], bus->name[2], bus->name[3],
 					bus->name[4], bus->name[5]));
 
-				ptr += sizeof(struct mp_base_bus);
+				pointer += sizeof(struct mp_base_bus);
 				break;
 			}
 			case MP_BASE_IO_APIC:
 			{
-				struct mp_base_ioapic *io = (struct mp_base_ioapic *) ptr;
+				struct mp_base_ioapic *io = (struct mp_base_ioapic *)pointer;
 				gKernelArgs.arch_args.ioapic_phys = (uint32)io->addr;
 
 				TRACE(("smp: found io apic with apic id %d, version %d\n",
 					io->ioapic_id, io->ioapic_version));
 
-				ptr += sizeof(struct mp_base_ioapic);
+				pointer += sizeof(struct mp_base_ioapic);
 				break;
 			}
 			case MP_BASE_IO_INTR:
 			case MP_BASE_LOCAL_INTR:
 			{
-				struct mp_base_interrupt *interrupt = (struct mp_base_interrupt *)ptr;
+				struct mp_base_interrupt *interrupt = (struct mp_base_interrupt *)pointer;
 
 				dprintf("smp: %s int: type %d, source bus %d, irq %3d, dest apic %d, int %3d, polarity %d, trigger mode %d\n",
 					interrupt->type == MP_BASE_IO_INTR ? "I/O" : "local",
@@ -210,7 +225,7 @@ smp_do_mp_config()
 					interrupt->source_bus_irq, interrupt->dest_apic_id,
 					interrupt->dest_apic_int, interrupt->polarity,
 					interrupt->trigger_mode);
-				ptr += sizeof(struct mp_base_interrupt);
+				pointer += sizeof(struct mp_base_interrupt);
 				break;
 			}
 		}
@@ -221,9 +236,7 @@ smp_do_mp_config()
 		(void *)gKernelArgs.arch_args.ioapic_phys,
 		gKernelArgs.num_cpus);
 
-	// this BIOS looks broken, because it didn't report any cpus (VMWare)
-	if (gKernelArgs.num_cpus == 0)
-		gKernelArgs.num_cpus = 1;
+	return gKernelArgs.num_cpus > 0 ? B_OK : B_ERROR;
 }
 
 
@@ -313,69 +326,6 @@ smp_do_acpi_config(acpi_rsdp *rsdp)
 }
 
 
-static int
-smp_find_mp_config(void)
-{
-	int i;
-
-#if NO_SMP
-	if (1)
-		return gKernelArgs.num_cpus = 1;
-#endif
-
-	// first try to find ACPI tables to get MP configuration as it handles
-	// physical as well as logical MP configurations as in multiple cpus,
-	// multiple cores or hyper threading.
-	for (i = 0; acpi_scan_spots[i].length > 0; i++) {
-		acpi_rsdp *rsdp = smp_acpi_probe(smp_scan_spots[i].start,
-			smp_scan_spots[i].stop);
-		if (rsdp != NULL && smp_do_acpi_config(rsdp) == B_OK)
-			return gKernelArgs.num_cpus;
-	}
-
-	for (i = 0; smp_scan_spots[i].length > 0; i++) {
-		sFloatingStruct = (struct mp_floating_struct *)smp_mp_probe(smp_scan_spots[i].start,
-			smp_scan_spots[i].stop);
-		if (sFloatingStruct != NULL)
-			break;
-	}
-
-	if (sFloatingStruct != NULL) {
-		TRACE(("smp_boot: intel mp version %s, %s",
-			(sFloatingStruct->spec_revision == 1) ? "1.1" : "1.4",
-			(sFloatingStruct->mp_feature_2 & 0x80)
-				? "imcr and pic compatibility mode.\n"
-				: "virtual wire compatibility mode.\n"));
-
-		if (sFloatingStruct->config_table == NULL) {
-			// XXX need to implement
-#if 1
-			TRACE(("smp: standard configuration %d unimplemented\n", sFloatingStruct->mp_feature_1));
-			gKernelArgs.num_cpus = 1;
-			return 1;
-#else
-			/* this system conforms to one of the default configurations */
-//			mp_num_def_config = sFloatingStruct->mp_feature_1;
-			TRACE(("smp: standard configuration %d\n", sFloatingStruct->mp_feature_1));
-/*			num_cpus = 2;
-			gKernelArgs.cpu_apic_id[0] = 0;
-			gKernelArgs.cpu_apic_id[1] = 1;
-			apic_phys = (unsigned int *) 0xfee00000;
-			ioapic_phys = (unsigned int *) 0xfec00000;
-			kprintf ("smp: WARNING: standard configuration code is untested");
-*/
-#endif
-		} else {
-			smp_do_mp_config();
-		}
-
-		return gKernelArgs.num_cpus;
-	}
-
-	return gKernelArgs.num_cpus = 1;
-}
-
-
 /** Target function of the trampoline code.
  *	The trampoline code should have the pgdir and a gdt set up for us,
  *	along with us being on the final stack for this processor. We need
@@ -459,21 +409,48 @@ calculate_apic_timer_conversion_factor(void)
 
 
 void
-smp_boot_other_cpus(void)
+smp_init_other_cpus(void)
 {
-	uint32 trampolineCode;
-	uint32 trampolineStack;
-	uint32 i;
-
 	void *handle = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
 	if (handle != NULL) {
 		if (get_driver_boolean_parameter(handle, B_SAFEMODE_DISABLE_SMP, false, false)) {
 			// SMP has been disabled!
+			TRACE(("smp disabled per safemode setting\n"));
 			gKernelArgs.num_cpus = 1;
 		}
 		unload_driver_settings(handle);
 	}
 
+	if (gKernelArgs.num_cpus < 2)
+		return;
+
+	TRACE(("smp: found %ld cpus\n", gKernelArgs.num_cpus));
+	TRACE(("smp: apic_phys = %p\n", (void *)gKernelArgs.arch_args.apic_phys));
+	TRACE(("smp: ioapic_phys = %p\n", (void *)gKernelArgs.arch_args.ioapic_phys));
+
+	// map in the apic & ioapic
+	gKernelArgs.arch_args.apic = (uint32 *)mmu_map_physical_memory(
+		gKernelArgs.arch_args.apic_phys, B_PAGE_SIZE, kDefaultPageFlags);
+	gKernelArgs.arch_args.ioapic = (uint32 *)mmu_map_physical_memory(
+		gKernelArgs.arch_args.ioapic_phys, B_PAGE_SIZE, kDefaultPageFlags);
+
+	TRACE(("smp: apic = %p\n", gKernelArgs.arch_args.apic));
+	TRACE(("smp: ioapic = %p\n", gKernelArgs.arch_args.ioapic));
+
+	// calculate how fast the apic timer is
+	calculate_apic_timer_conversion_factor();
+
+	for (uint32 i = 1; i < gKernelArgs.num_cpus; i++) {
+		// create a final stack the trampoline code will put the ap processor on
+		gKernelArgs.cpu_kstack[i].start = (addr_t)mmu_allocate(NULL, KERNEL_STACK_SIZE);
+		gKernelArgs.cpu_kstack[i].size = KERNEL_STACK_SIZE;
+	}
+}
+
+
+void
+smp_boot_other_cpus(void)
+{
 	if (gKernelArgs.num_cpus < 2)
 		return;
 
@@ -486,11 +463,11 @@ smp_boot_other_cpus(void)
 	// (these have to be < 1M physical, 0xa0000-0xfffff is reserved by the BIOS,
 	// and when PXE services are used, the 0x8d000-0x9ffff is also reserved)
 #ifdef _PXE_ENV
-	trampolineCode = 0x8b000;
-	trampolineStack = 0x8c000;
+	uint32 trampolineCode = 0x8b000;
+	uint32 trampolineStack = 0x8c000;
 #else
-	trampolineCode = 0x9f000;
-	trampolineStack = 0x9e000;
+	uint32 trampolineCode = 0x9f000;
+	uint32 trampolineStack = 0x9e000;
 #endif
 
 	// copy the trampoline code over
@@ -498,7 +475,7 @@ smp_boot_other_cpus(void)
 		(uint32)&smp_trampoline_end - (uint32)&smp_trampoline);
 
 	// boot the cpus
-	for (i = 1; i < gKernelArgs.num_cpus; i++) {
+	for (uint32 i = 1; i < gKernelArgs.num_cpus; i++) {
 		uint32 *finalStack;
 		uint32 *tempStack;
 		uint32 config;
@@ -611,31 +588,29 @@ smp_add_safemode_menus(Menu *menu)
 void
 smp_init(void)
 {
-	if (smp_find_mp_config() > 1) {
-		uint32 i;
+#if NO_SMP
+	gKernelArgs.num_cpus = 1;
+	return;
+#endif
 
-		TRACE(("smp_boot: had found > 1 cpus\n"));
-		TRACE(("post config:\n"));
-		TRACE(("num_cpus = %ld\n", gKernelArgs.num_cpus));
-		TRACE(("apic_phys = %p\n", (void *)gKernelArgs.arch_args.apic_phys));
-		TRACE(("ioapic_phys = %p\n", (void *)gKernelArgs.arch_args.ioapic_phys));
-
-		// map in the apic & ioapic
-		gKernelArgs.arch_args.apic = (uint32 *)mmu_map_physical_memory(
-			gKernelArgs.arch_args.apic_phys, B_PAGE_SIZE, kDefaultPageFlags);
-		gKernelArgs.arch_args.ioapic = (uint32 *)mmu_map_physical_memory(
-			gKernelArgs.arch_args.ioapic_phys, B_PAGE_SIZE, kDefaultPageFlags);
-
-		TRACE(("apic = %p\n", gKernelArgs.arch_args.apic));
-		TRACE(("ioapic = %p\n", gKernelArgs.arch_args.ioapic));
-
-		// calculate how fast the apic timer is
-		calculate_apic_timer_conversion_factor();
-
-		for (i = 1; i < gKernelArgs.num_cpus; i++) {
-			// create a final stack the trampoline code will put the ap processor on
-			gKernelArgs.cpu_kstack[i].start = (addr_t)mmu_allocate(NULL, KERNEL_STACK_SIZE);
-			gKernelArgs.cpu_kstack[i].size = KERNEL_STACK_SIZE;
-		}
+	// first try to find ACPI tables to get MP configuration as it handles
+	// physical as well as logical MP configurations as in multiple cpus,
+	// multiple cores or hyper threading.
+	for (int32 i = 0; acpi_scan_spots[i].length > 0; i++) {
+		acpi_rsdp *rsdp = smp_acpi_probe(smp_scan_spots[i].start,
+			smp_scan_spots[i].stop);
+		if (rsdp != NULL && smp_do_acpi_config(rsdp) == B_OK)
+			return;
 	}
+
+	// then try to find MPS tables and do configuration based on them
+	for (int32 i = 0; smp_scan_spots[i].length > 0; i++) {
+		mp_floating_struct *floatingStruct = smp_mp_probe(
+			smp_scan_spots[i].start, smp_scan_spots[i].stop);
+		if (floatingStruct != NULL && smp_do_mp_config(floatingStruct) == B_OK)
+			return;
+	}
+
+	// everything failed or we are not running an SMP system
+	gKernelArgs.num_cpus = 1;
 }

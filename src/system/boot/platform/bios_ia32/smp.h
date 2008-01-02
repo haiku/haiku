@@ -18,6 +18,7 @@ extern "C" {
 #endif
 
 extern void smp_init(void);
+extern void smp_init_other_cpus(void);
 extern void smp_boot_other_cpus(void);
 
 #ifdef __cplusplus
