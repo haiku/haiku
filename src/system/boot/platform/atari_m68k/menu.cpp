@@ -28,9 +28,9 @@ platform_add_menus(Menu *menu)
 			item->SetData(B_SAFEMODE_FAIL_SAFE_VIDEO_MODE);
 			item->SetHelpText("The system will use VESA mode and won't try to open any video graphics driver");
 
+#if 0
 			smp_add_safemode_menus(menu);
 
-#if 0
 			menu->AddItem(item = new(nothrow) MenuItem("Don't call the BIOS"));
 			item->SetType(MENU_ITEM_MARKABLE);
 
