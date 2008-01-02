@@ -21,11 +21,11 @@ struct atari_partition_entry {
 #define ATARI_PART_BOOTABLE	0x80
 	uint8	flags;
 	/* some known types */
-#define ATARI_PART_TYEP_GEM 'G', 'E', 'M'
-#define ATARI_PART_TYEP_LNX 'L', 'N', 'X'
-#define ATARI_PART_TYEP_OS9 'O', 'S', '9'
+#define ATARI_PART_TYPE_GEM 'G', 'E', 'M'
+#define ATARI_PART_TYPE_LNX 'L', 'N', 'X'
+#define ATARI_PART_TYPE_OS9 'O', 'S', '9'
 	/* the one we'll use */
-#define ATARI_PART_TYEP_BFS 'B', 'F', 'S'
+#define ATARI_PART_TYPE_BFS 'B', 'F', 'S'
 	char	id[3];
 	uint32	start;
 	uint32	size;
