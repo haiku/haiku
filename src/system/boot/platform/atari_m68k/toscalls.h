@@ -113,11 +113,10 @@ extern int32 xbios(uint16 nr, ...);
 extern int32 gemdos(uint16 nr, ...);
 
 // official names
+#define Pterm0() gemdos(0)
 #define Cconin() gemdos(1)
 #define Super(a) gemdos(0x20, (uint32)a)
-
-// check for names
-#define terminate() GEMDOS(0)
+#define Pterm(retcode) gemdos(76, (int16)retcode)
 
 /*
  * error mapping
