@@ -104,7 +104,7 @@ static void
 read_settings(size_t &memorySize, bool &hardwareCursor, bool &ignoreAllocated)
 {
 	size_t size = 8; // 8 MB
-	hardwareCursor = true;
+	hardwareCursor = false;
 	ignoreAllocated = false;
 
 	void *settings = load_driver_settings("intel_extreme");
@@ -145,6 +145,45 @@ determine_stolen_memory_size(intel_info &info)
 	// read stolen memory from the PCI configuration of the PCI bridge
 	uint16 memoryConfig = gPCI->read_pci_config(0, 0, 0, INTEL_GRAPHICS_MEMORY_CONTROL, 2);
 	size_t memorySize = 1 << 20; // 1 MB
+	size_t gttSize = 0;
+
+	// TODO: check if the GTT is really part of the stolen memory
+	if (info.device_type == (INTEL_TYPE_9xx | INTEL_TYPE_965)) {
+		switch (memoryConfig & i965_GTT_MASK) {
+			case i965_GTT_128K:
+				gttSize = 128 << 10;
+				break;
+			case i965_GTT_256K:
+				gttSize = 256 << 10;
+				break;
+			case i965_GTT_512K:
+				gttSize = 512 << 10;
+				break;
+		}
+	} else if (info.device_type == (INTEL_TYPE_9xx | INTEL_TYPE_G33)) {
+		switch (memoryConfig & G33_GTT_MASK) {
+			case G33_GTT_1M:
+				gttSize = 1 << 20;
+				break;
+			case G33_GTT_2M:
+				gttSize = 2 << 20;
+				break;
+		}
+	} else {
+		// older models have the GTT as large as their frame buffer mapping
+		// TODO: check if the i9xx version works with the i8xx chips as well
+		size_t frameBufferSize = 0;
+		if ((info.device_type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_8xx) {
+			if ((info.device_type & INTEL_TYPE_83x) != 0
+				&& (memoryConfig & MEMORY_MASK) == i830_FRAME_BUFFER_64M)
+				frameBufferSize = 64 << 20;
+			else
+				frameBufferSize = 128 << 20;
+		} else if ((info.device_type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_9xx)
+			frameBufferSize = info.pci->u.h0.base_register_sizes[2];
+
+		gttSize = frameBufferSize / 1024;
+	}
 
 	// TODO: test with different models!
 
@@ -181,10 +220,16 @@ determine_stolen_memory_size(intel_info &info)
 			case i855_STOLEN_MEMORY_64M:
 				memorySize *= 64;
 				break;
+			case i855_STOLEN_MEMORY_128M:
+				memorySize *= 128;
+				break;
+			case i855_STOLEN_MEMORY_256M:
+				memorySize *= 256;
+				break;
 		}
 	}
 
-	return memorySize;
+	return memorySize - gttSize - 4096;
 }
 
 
@@ -352,7 +397,7 @@ intel_extreme_init(intel_info &info)
 	AreaKeeper graphicsMapper;
 	info.graphics_memory_area = graphicsMapper.Map("intel extreme graphics memory",
 		(void *)info.pci->u.h0.base_registers[fbIndex],
-		totalSize, B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
+		totalSize, B_ANY_KERNEL_BLOCK_ADDRESS /*| B_MTR_WC*/,
 		B_READ_AREA | B_WRITE_AREA, (void **)&info.graphics_memory);
 	if (graphicsMapper.InitCheck() < B_OK) {
 		// try again without write combining
@@ -386,25 +431,32 @@ intel_extreme_init(intel_info &info)
 
 	// init graphics memory manager
 
-	info.memory_manager = mem_init("intel extreme memory manager", 0, totalSize, 1024, 
-		min_c(totalSize / 1024, 512));
-	if (info.memory_manager == NULL)
-		return B_NO_MEMORY;
+	AreaKeeper gttMapper;
+	info.gtt_area = -1;
 
 	if ((info.device_type & INTEL_TYPE_9xx) != 0) {
 		if ((info.device_type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_965) {
 			info.gtt_base = info.registers + i965_GTT_BASE;
 			info.gtt_size = i965_GTT_SIZE;
 		} else {
-			// TODO: map it in???
-			info.gtt_base = (uint8*)info.pci->u.h0.base_register_sizes[3];
-			info.gtt_size = i830_GTT_SIZE;
-				// TODO: for now...
+			info.gtt_area = gttMapper.Map("intel extreme gtt",
+				(void *)info.pci->u.h0.base_registers[3], totalSize / 1024,
+				B_ANY_KERNEL_ADDRESS, 0, (void **)&info.gtt_base);
+			if (gttMapper.InitCheck() < B_OK) {
+				dprintf(DEVICE_NAME ": could not map GTT area!\n");
+				return info.gtt_area;
+			}
+			info.gtt_size = totalSize / 1024;
 		}
 	} else {
 		info.gtt_base = info.registers + i830_GTT_BASE;
 		info.gtt_size = i830_GTT_SIZE;
 	}
+
+	info.memory_manager = mem_init("intel extreme memory manager", 0, totalSize, 1024, 
+		min_c(totalSize / 1024, 512));
+	if (info.memory_manager == NULL)
+		return B_NO_MEMORY;
 
 	// reserve ring buffer memory (currently, this memory is placed in
 	// the graphics memory), but this could bring us problems with
@@ -426,11 +478,23 @@ intel_extreme_init(intel_info &info)
 		secondary.base = info.graphics_memory + secondary.offset;
 	}
 
+	// Fix some problems on certain chips (taken from X driver)
+	// TODO: clean this up
+	if (info.pci->device_id == 0x2a02 || info.pci->device_id == 0x2a12) {
+		dprintf("i965GM/i965GME quirk\n");
+		write32(info.registers + 0x6204, (1L << 29));
+	} else {
+		dprintf("i965 quirk\n");
+		write32(info.registers + 0x6204, (1L << 29) | (1L << 23));
+	}
+	write32(info.registers + 0x7408, 0x10);
+
 	// no errors, so keep areas and mappings
 	sharedCreator.Detach();
 	additionalMemoryCreator.Detach();
 	graphicsMapper.Detach();
 	mmioMapper.Detach();
+	gttMapper.Detach();
 
 	info.shared_info->graphics_memory_area = info.graphics_memory_area;
 	info.shared_info->registers_area = info.registers_area;
@@ -463,8 +527,17 @@ intel_extreme_init(intel_info &info)
 
 	// setup overlay registers
 
-	info.overlay_registers = (overlay_registers *)((uint8 *)info.shared_info
-		+ ROUND_TO_PAGE_SIZE(sizeof(intel_shared_info)));
+	if (info.device_type == (INTEL_TYPE_9xx | INTEL_TYPE_G33)) {
+		if (mem_alloc(info.memory_manager, B_PAGE_SIZE, &info,
+				&info.overlay_handle, &info.overlay_offset) == B_OK) {
+			info.overlay_registers = (overlay_registers *)(info.graphics_memory
+				+ info.overlay_offset);
+			info.shared_info->overlay_offset = info.overlay_offset;
+		}
+	} else {
+		info.overlay_registers = (overlay_registers *)((uint8 *)info.shared_info
+			+ ROUND_TO_PAGE_SIZE(sizeof(intel_shared_info)));
+	}
 	init_overlay_registers(info.overlay_registers);
 
 	physical_entry physicalEntry;
@@ -474,12 +547,11 @@ intel_extreme_init(intel_info &info)
 	// The hardware status page and the cursor memory share one area with
 	// the overlay registers and the shared info
 
-	get_memory_map((uint8 *)info.overlay_registers + B_PAGE_SIZE,
-		B_PAGE_SIZE, &physicalEntry, 1);
+	uint8 *base = (uint8 *)info.shared_info + ROUND_TO_PAGE_SIZE(sizeof(intel_shared_info));
+	get_memory_map(base + B_PAGE_SIZE, B_PAGE_SIZE, &physicalEntry, 1);
 	info.shared_info->physical_status_page = (uint8 *)physicalEntry.address;
 
-	get_memory_map((uint8 *)info.overlay_registers + 2 * B_PAGE_SIZE,
-		B_PAGE_SIZE, &physicalEntry, 1);
+	get_memory_map(base + 2 * B_PAGE_SIZE, B_PAGE_SIZE, &physicalEntry, 1);
 	info.shared_info->physical_cursor_memory = (uint8 *)physicalEntry.address;
 
 	// setup the GTT to point to include the additional memory
@@ -537,6 +609,7 @@ intel_extreme_uninit(intel_info &info)
 	mem_destroy(info.memory_manager);
 
 	delete_area(info.graphics_memory_area);
+	delete_area(info.gtt_area);
 	delete_area(info.registers_area);
 	delete_area(info.shared_area);
 

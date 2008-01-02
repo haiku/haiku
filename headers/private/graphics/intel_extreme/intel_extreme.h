@@ -27,9 +27,10 @@
 #define INTEL_TYPE_9xx			0x04
 #define INTEL_TYPE_83x			0x10
 #define INTEL_TYPE_85x			0x20
-#define INTEL_TYPE_915			0x10
+#define INTEL_TYPE_91x			0x10
 #define INTEL_TYPE_945			0x20
 #define INTEL_TYPE_965			0x40
+#define INTEL_TYPE_G33			0x80
 
 #define DEVICE_NAME				"intel_extreme"
 #define INTEL_ACCELERANT_NAME	"intel_extreme.accelerant"
@@ -84,6 +85,7 @@ struct intel_shared_info {
 	bool			overlay_active;
 	uint32			overlay_token;
 	uint8*			physical_overlay_registers;
+	uint32			overlay_offset;
 
 	bool			hardware_cursor_enabled;
 	sem_id			vblank_sem;
@@ -138,13 +140,18 @@ struct intel_free_graphics_memory {
 
 // PCI bridge memory management
 #define INTEL_GRAPHICS_MEMORY_CONTROL	0x52
+#define MEMORY_MASK						0x01
 #define STOLEN_MEMORY_MASK				0x70
+#define i965_GTT_MASK					0x000e
+#define G33_GTT_MASK					0x0300
 
 // models i830 and up
 #define i830_LOCAL_MEMORY_ONLY			0x10
 #define i830_STOLEN_512K				0x20
 #define i830_STOLEN_1M					0x30
 #define i830_STOLEN_8M					0x40
+#define i830_FRAME_BUFFER_64M			0x01
+#define i830_FRAME_BUFFER_128M			0x00
 
 // models i855 and up
 #define i855_STOLEN_MEMORY_1M			0x10
@@ -154,6 +161,8 @@ struct intel_free_graphics_memory {
 #define i855_STOLEN_MEMORY_32M			0x50
 #define i855_STOLEN_MEMORY_48M			0x60
 #define i855_STOLEN_MEMORY_64M			0x70
+#define i855_STOLEN_MEMORY_128M			0x80
+#define i855_STOLEN_MEMORY_256M			0x90
 
 // graphics page translation table
 #define INTEL_PAGE_TABLE_CONTROL		0x02020
@@ -163,6 +172,11 @@ struct intel_free_graphics_memory {
 #define i830_GTT_SIZE					0x20000
 #define i965_GTT_BASE					0x80000	// (- 0xfffff)
 #define i965_GTT_SIZE					0x80000
+#define i965_GTT_128K					(2 << 1)
+#define i965_GTT_256K					(1 << 1)
+#define i965_GTT_512K					(0 << 1)
+#define G33_GTT_1M						(1 << 8)
+#define G33_GTT_2M						(2 << 8)
 #define GTT_ENTRY_VALID					0x01
 #define GTT_ENTRY_LOCAL_MEMORY			0x02
 
@@ -481,12 +495,21 @@ struct overlay_registers {
 
 	uint32 _reserved20;
 
+	uint32 start_0y;
+	uint32 start_1y;
+	uint32 start_0u;
+	uint32 start_0v;
+	uint32 start_1u;
+	uint32 start_1v;
+	uint32 _reserved21[6];
+#if 0
 	// (0x70) AWINPOS - alpha blend window position
 	uint32 awinpos;
 	// (0x74) AWINSZ - alpha blend window size
 	uint32 awinsz;
 
 	uint32 _reserved21[10];
+#endif
 
 	// (0xa0) FASTHSCALE - fast horizontal downscale (strangely enough,
 	// the next two registers switch the usual Y/RGB vs. UV order)
@@ -508,6 +531,10 @@ struct overlay_registers {
 	uint16 vertical_coefficients_uv[128];
 	uint16 horizontal_coefficients_uv[128];
 };
+
+// i965 overlay support is currently realized using its 3D hardware
+#define INTEL_i965_OVERLAY_STATE_SIZE	36864
+#define INTEL_i965_3D_CONTEXT_SIZE		32768
 
 struct hardware_status {
 	uint32	interrupt_status_register;
