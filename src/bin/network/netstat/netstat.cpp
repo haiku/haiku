@@ -59,7 +59,8 @@ inet_print_address(sockaddr* _address)
 		return;
 	}
 
-	hostent* host = gethostbyaddr((const char*)_address, sizeof(sockaddr_in), AF_INET);
+	hostent* host = gethostbyaddr((const char*)&address.sin_addr,
+		sizeof(sockaddr_in), AF_INET);
 	servent* service = getservbyport(ntohs(address.sin_port), NULL);
 
 	const char *hostName;
