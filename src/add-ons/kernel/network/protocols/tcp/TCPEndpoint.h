@@ -72,8 +72,6 @@ class TCPEndpoint : public net_protocol, public ProtocolSocket {
 		tcp_state State() const { return fState; }
 		bool IsBound() const;
 
-		void DeleteSocket();
-
 		status_t DelayedAcknowledge();
 		status_t SendAcknowledge(bool force);
 		status_t UpdateTimeWait();

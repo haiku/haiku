@@ -763,14 +763,6 @@ TCPEndpoint::IsBound() const
 }
 
 
-void
-TCPEndpoint::DeleteSocket()
-{
-	// the next call will delete `this'.
-	gSocketModule->delete_socket(socket);
-}
-
-
 status_t
 TCPEndpoint::DelayedAcknowledge()
 {
@@ -1887,6 +1879,6 @@ TCPEndpoint::_TimeWaitTimer(struct net_timer *timer, void *data)
 	if (mutex_lock(&endpoint->fLock) < B_OK)
 		return;
 
-	endpoint->DeleteSocket();
+	gSocketModule->delete_socket(endpoint->socket);
 }
 
