@@ -15,7 +15,10 @@
  * http://www.fortunecity.com/skyscraper/apple/308/html/chap3.htm
  * http://leonard.oxg.free.fr/articles/multi_atari/multi_atari.html
  * http://alive.atari.org/alive10/btmania.php
+ * gas stuff:
+ * http://www.gnu.org/software/binutils/manual/gas-2.9.1/html_chapter/as_18.html#SEC214
  * 
+ * x86:
  * The offset of the partition in 512 byte blocks must be written at
  * position PARTITION_OFFSET_OFFSET (32 bit little endian; makebootable does
  * that) or otherwise the code can't find the partition.
@@ -55,13 +58,23 @@
 
 
 // BIOS calls
+#ifndef _ASSEMBLER
+#error plop
+#endif
 
 
-
-
-
-
+.loop:
+	move	#'.',%d0
+	bsr		putc
+	bra		.loop
 	rts
 
-
+/* prints the char in d0.b to the console */
+putc:
+	move.w	d0,-(%sp)
+	move.w	#2,-(%sp)	// DEV_CON
+	move.w	#3,-(%sp)	// Bconout
+	trap	#13
+	addi	#6,%sp
+	rts
 
