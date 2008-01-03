@@ -277,7 +277,7 @@ area_allocate_pages(object_cache *cache, void **pages, uint32 flags)
 	// so we lock them. when moving the slab to the empty list we should
 	// unlock them, and lock them again when getting one from the empty list.
 	area_id areaId = create_area(cache->name, pages, B_ANY_KERNEL_ADDRESS,
-		cache->slab_size, lock, B_READ_AREA | B_WRITE_AREA);
+		cache->slab_size, lock, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (areaId < 0)
 		return areaId;
 
