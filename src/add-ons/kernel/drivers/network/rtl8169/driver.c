@@ -50,7 +50,7 @@ init_hardware(void)
 	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci) < B_OK)
 		return B_ERROR;
 	for (res = B_ERROR, i = 0; pci->get_nth_pci_info(i, &info) == B_OK; i++) {
-		if (info.vendor_id == 0x10ec && info.device_id == 0x8169) {
+		if (info.vendor_id == 0x10ec && (info.device_id == 0x8169 || info.device_id == 0x8167)) {
 			res = B_OK;
 			break;
 		}
@@ -86,7 +86,7 @@ init_driver(void)
 	}
 	
 	for (cards = 0, index = 0; gPci->get_nth_pci_info(index++, item) == B_OK; ) {
-		if (item->vendor_id == 0x10ec && item->device_id == 0x8169) {
+		if (item->vendor_id == 0x10ec && (item->device_id == 0x8169 || item->device_id == 0x8167)) {
 			char name[64];
 			sprintf(name, "net/rtl8169/%d", cards);
 			gDevList[cards] = item;
