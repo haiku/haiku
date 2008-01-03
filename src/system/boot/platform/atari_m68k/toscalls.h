@@ -21,6 +21,22 @@ extern "C" {
 #define DEV_IKBD	4
 #define DEV_RAW	5
 
+#define K_RSHIFT	0x01
+#define K_LSHIFT	0x02
+#define K_CTRL	0x04
+#define K_ALT	0x08
+#define K_CAPSLOCK	0x10
+#define K_CLRHOME	0x20
+#define K_INSERT	0x40
+
+#define RW_READ			0x00
+#define RW_WRITE		0x01
+#define RW_NOMEDIACH	0x02
+#define RW_NORETRY		0x04
+#define RW_NOTRANSLATE	0x08
+
+#ifndef __ASSEMBLER__
+
 /* 
  * Atari BIOS calls
  */
@@ -41,19 +57,6 @@ struct tosbpb {
 	int16 bflags;
 };
 
-#define K_RSHIFT	0x01
-#define K_LSHIFT	0x02
-#define K_CTRL	0x04
-#define K_ALT	0x08
-#define K_CAPSLOCK	0x10
-#define K_CLRHOME	0x20
-#define K_INSERT	0x40
-
-#define RW_READ			0x00
-#define RW_WRITE		0x01
-#define RW_NOMEDIACH	0x02
-#define RW_NORETRY		0x04
-#define RW_NOTRANSLATE	0x08
 
 //#define Getmpb() bios(0)
 #define Bconstat(dev) bios(1, (uint16)dev)
@@ -124,6 +127,8 @@ extern int32 gemdos(uint16 nr, ...);
  */
 
 extern status_t toserror(int32 err);
+
+#endif /* __ASSEMBLER__ */
 
 #ifdef __cplusplus
 }
