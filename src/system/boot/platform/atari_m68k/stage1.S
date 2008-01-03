@@ -30,6 +30,11 @@
  * Compile via:
  * generated.m68k/cross-tools/bin/m68k-unknown-haiku-gcc -nostdlib -fpic -c -o stage1.o src/system/boot/platform/atari_m68k/stage1.S
  * generated.m68k/cross-tools/bin/m68k-unknown-haiku-objcopy -O binary stage1.o stage1
+ * 
+ * Add to image:
+ * dd conv=notrunc if=haiku/trunk/stage1 of=em-20-200.swapped.hd bs=1 count=30
+ * set bootable:
+ * echo -en '\x12\x34' | dd conv=notrunc seek=510 bs=1 count=2 of=em-20-200.swapped.hd
  */
 
 #include "toscalls.h"
