@@ -182,8 +182,8 @@ private:
 
 			void			_UpdateStateOpenSelect(BMenuItem* item,
 								bigtime_t& openTime, bigtime_t& closeTime);
-			void			_UpdateStateClose(BMenuItem* item,
-								const BPoint& where, const uint32& buttons);
+			void			_UpdateStateClose(BMenuItem* item, const BPoint& where,
+								const uint32& buttons);
 
 			bool			_AddItem(BMenuItem* item, int32 index);
 			bool			_RemoveItems(int32 index, int32 count,

@@ -1175,7 +1175,6 @@ BMenu::Track(bool sticky, BRect *clickToOpenRect)
 	int action;
 	BMenuItem *menuItem = _Track(&action);
 
-	_SetStickyMode(false);
 	fExtraRect = NULL;
 
 	return menuItem;
@@ -1253,7 +1252,7 @@ BMenu::_InitData(BMessage* archive)
 		archive->FindFloat("_maxwidth", &fMaxContentWidth);
 
 		BMessage msg;
-       	for (int32 i = 0; archive->FindMessage("_items", i, &msg) == B_OK; i++) {
+       		for (int32 i = 0; archive->FindMessage("_items", i, &msg) == B_OK; i++) {
 			BArchivable *object = instantiate_object(&msg);
 			if (BMenuItem *item = dynamic_cast<BMenuItem *>(object)) {
 				BRect bounds;
@@ -1367,6 +1366,14 @@ BMenu::_Track(int *action, long start)
 	if (fSuper != NULL)
 		fSuper->fState = MENU_STATE_TRACKING_SUBMENU;
 
+	BPoint location;
+	uint32 buttons;
+	if (LockLooper()) {	
+		GetMouse(&location, &buttons);
+		UnlockLooper();	
+	}
+	
+	bool releasedOnce = buttons == 0;
 	while (true) {
 		if (_CustomTrackingWantsToQuit())
 			break;
@@ -1374,12 +1381,7 @@ BMenu::_Track(int *action, long start)
 		bool locked = LockLooper();
 		if (!locked)
 			break;
-
-		bigtime_t snoozeAmount = 50000;
-		BPoint location;
-		uint32 buttons;
-		GetMouse(&location, &buttons, true);
-
+		
 		BMenuWindow *window = static_cast<BMenuWindow *>(Window());
 
 		BPoint screenLocation = ConvertToScreen(location);
@@ -1387,8 +1389,11 @@ BMenu::_Track(int *action, long start)
 			item = NULL;
 		} else {
 			item = _HitTestItems(location, B_ORIGIN);
-			if (item != NULL)
+			if (item != NULL) {
 				_UpdateStateOpenSelect(item, openTime, closeTime);
+				if (!releasedOnce)
+					releasedOnce = true;			
+			}
 		}
 
 		// Track the submenu
@@ -1397,58 +1402,58 @@ BMenu::_Track(int *action, long start)
 			locked = false;
 			int submenuAction = MENU_STATE_TRACKING;
 			BMenu *submenu = fSelected->Submenu();
-			bool wasSticky = _IsStickyMode();
-			if (wasSticky)
-				submenu->_SetStickyMode(true);
+			submenu->_SetStickyMode(_IsStickyMode());
 			BMenuItem *submenuItem = submenu->_Track(&submenuAction);
-
-			// check if the user started holding down a mouse button in a submenu
-			if (wasSticky && !_IsStickyMode()) {
-				buttons = 1;
-					// buttons must have been pressed in the meantime
-			}
-
 			if (submenuAction == MENU_STATE_CLOSED) {
 				item = submenuItem;
-				fState = submenuAction;
-				break;
+				fState = MENU_STATE_CLOSED;			
 			}
-
-			locked = LockLooper();
-			if (!locked)
-				break;
 		} else if (item == NULL) {
-			if (_OverSuper(screenLocation)) {
+			if (_OverSuper(screenLocation))
 				fState = MENU_STATE_TRACKING;
-				UnlockLooper();
-				break;
-			}
+			else {
+				if (!_OverSubmenu(fSelected, screenLocation)
+					&& system_time() > closeTime + kHysteresis
+					&& fState != MENU_STATE_TRACKING_SUBMENU) {
+					_SelectItem(NULL);
+					fState = MENU_STATE_TRACKING;
+				}
 
-			if (!_OverSubmenu(fSelected, screenLocation)
-				&& system_time() > closeTime + kHysteresis
-				&& fState != MENU_STATE_TRACKING_SUBMENU) {
-				_SelectItem(NULL);
-				fState = MENU_STATE_TRACKING;
-			}
-
-			if (fSuper != NULL) {
-				// Give supermenu the chance to continue tracking
-				*action = fState;
-				if (locked)
-					UnlockLooper();
-
-				return NULL;
+				if (fSuper != NULL) {
+					// Give supermenu the chance to continue tracking
+					*action = fState;
+					if (locked)
+						UnlockLooper();
+					return NULL;
+				}
 			}
 		}
 
-		if (locked)
+		if (!locked)
+			locked = LockLooper();
+	
+		BPoint newLocation;
+		uint32 newButtons;		
+		if (locked) {
+			GetMouse(&newLocation, &newButtons, true);
 			UnlockLooper();
+			locked = false;
+		}
 
-		_UpdateStateClose(item, location, buttons);
-
+		if (newLocation != location || newButtons != buttons) {
+			if (!releasedOnce && newButtons == 0 && buttons != 0)
+				releasedOnce = true;				
+			location = newLocation;
+			buttons = newButtons;
+		}
+		
+		if (releasedOnce)
+			_UpdateStateClose(item, location, buttons);
+		
 		if (fState == MENU_STATE_CLOSED)
 			break;
 
+		bigtime_t snoozeAmount = 50000;
 		snooze(snoozeAmount);
 	}
 
@@ -1459,9 +1464,6 @@ BMenu::_Track(int *action, long start)
 		_SelectItem(NULL);
 		UnlockLooper();
 	}
-
-	if (_IsStickyMode())
-		_SetStickyMode(false);
 
 	// delete the menu window recycled for all the child menus
 	_DeleteMenuWindow();
@@ -1503,17 +1505,14 @@ BMenu::_UpdateStateClose(BMenuItem* item, const BPoint& where,
 	if (buttons != 0 && _IsStickyMode()) {
 		if (item == NULL)
 			fState = MENU_STATE_CLOSED;
-		else {
-			BMenu *supermenu = Supermenu();
-			for(; supermenu; supermenu = supermenu->Supermenu())
-				supermenu->_SetStickyMode(false);
+		else
 			_SetStickyMode(false);
-		}
 	} else if (buttons == 0 && !_IsStickyMode()) {
 		if (fExtraRect != NULL && fExtraRect->Contains(where)) {
 			_SetStickyMode(true);
 			fExtraRect = NULL;
-				// This code should be executed only once
+				// Setting this to NULL will prevent this code
+				// to be executed next time
 		} else
 			fState = MENU_STATE_CLOSED;
 	}
@@ -2159,7 +2158,16 @@ BMenu::_SetIgnoreHidden(bool on)
 void
 BMenu::_SetStickyMode(bool on)
 {
-	if (fStickyMode != on) {
+	if (fStickyMode == on)
+		return;
+	
+	fStickyMode = on;
+
+	// If we are switching to sticky mode, propagate the status
+	// back to the super menu
+	if (fSuper != NULL)
+		fSuper->_SetStickyMode(on);
+	else {
 		// TODO: Ugly hack, but it needs to be done right here in this method
 		BMenuBar *menuBar = dynamic_cast<BMenuBar *>(this);
 		if (on && menuBar != NULL && menuBar->LockLooper()) {
@@ -2168,14 +2176,7 @@ BMenu::_SetStickyMode(bool on)
 			menuBar->_StealFocus();
 			menuBar->UnlockLooper();
 		}
-
-		fStickyMode = on;
 	}
-
-	// If we are switching to sticky mode, propagate the status
-	// back to the super menu
-	if (on && fSuper != NULL)
-		fSuper->_SetStickyMode(on);
 }
 
 
@@ -2222,22 +2223,20 @@ BMenu::_ChooseTrigger(const char *title, int32& index, uint32& trigger,
 
 	// two runs: first we look out for uppercase letters
 	// TODO: support Unicode characters correctly!
-
 	for (uint32 i = 0; (c = title[i]) != '\0'; i++) {
 		if (!IsInsideGlyph(c) && isupper(c) && !triggers.HasTrigger(c)) {
 			index = i;
 			trigger = tolower(c);
-			return triggers.AddTrigger(c);;
+			return triggers.AddTrigger(c);
 		}
 	}
 
 	// then, if we still haven't found anything, we accept them all
-
 	index = 0;
 	while ((c = UTF8ToCharCode(&title)) != 0) {
 		if (!isspace(c) && !triggers.HasTrigger(c)) {
 			trigger = tolower(c);
-			return triggers.AddTrigger(c);;
+			return triggers.AddTrigger(c);
 		}
 
 		index++;

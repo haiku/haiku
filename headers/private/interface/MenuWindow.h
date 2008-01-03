@@ -25,6 +25,8 @@ class BMenuWindow : public BWindow {
 	public:
 		BMenuWindow(const char *name);
 		virtual ~BMenuWindow();
+
+		virtual void DispatchMessage(BMessage *message, BHandler *handler);
 	
 		void AttachMenu(BMenu *menu);
 		void DetachMenu();

@@ -244,6 +244,13 @@ BMenuWindow::~BMenuWindow()
 
 
 void
+BMenuWindow::DispatchMessage(BMessage *message, BHandler *handler)
+{
+	BWindow::DispatchMessage(message, handler);
+}
+
+
+void
 BMenuWindow::AttachMenu(BMenu *menu)
 {
 	if (fMenuFrame)

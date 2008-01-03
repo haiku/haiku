@@ -446,17 +446,6 @@ BMenuBar::_TrackTask(void *arg)
 }
 
 
-// Note: since sqrt is slow, we don't use it and return the square of the distance
-// TODO: Move this to some common place, could be used in BMenu too.
-#define square(x) ((x) * (x))
-static float
-point_distance(const BPoint &pointA, const BPoint &pointB)
-{
-	return square(pointA.x - pointB.x) + square(pointA.y - pointB.y);
-}
-#undef square
-
-
 BMenuItem *
 BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 {	
@@ -466,23 +455,22 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 	BWindow *window = Window();
 	fState = MENU_STATE_TRACKING;
 
-	if (startIndex != -1) {
-		be_app->ObscureCursor();
-		if (window->Lock()) {
+	BPoint where;
+	uint32 buttons;
+	if (window->Lock()) {
+		if (startIndex != -1) {
+			be_app->ObscureCursor();		
 			_SelectItem(ItemAt(startIndex), true, true);
-			window->Unlock();
 		}
+		GetMouse(&where, &buttons);
+		window->Unlock();
 	}
-
+	
 	while (true) {
 		bigtime_t snoozeAmount = 40000;
 		bool locked = (Window() != NULL && window->Lock());//WithTimeout(200000)
 		if (!locked)
 			break;
-
-		BPoint where;
-		uint32 buttons;
-		GetMouse(&where, &buttons, true);
 
 		BMenuItem *menuItem = _HitTestItems(where, B_ORIGIN);
 		if (menuItem != NULL) {
@@ -520,35 +508,26 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 			locked = false;
 			snoozeAmount = 30000;
 			bool wasSticky = _IsStickyMode();
-			if (wasSticky)
-				menu->_SetStickyMode(true);
+			menu->_SetStickyMode(wasSticky);
 			int localAction;
 			fChosenItem = menu->_Track(&localAction);
-			if (menu->State(NULL) == MENU_STATE_TRACKING
-				&& menu->_IsStickyMode())
-				menu->_SetStickyMode(false);
 
-			// check if the user started holding down a mouse button in a submenu
-			if (wasSticky && !_IsStickyMode()) {
-				buttons = 1;
-					// buttons must have been pressed in the meantime
+			// The mouse could have meen moved since the last time we
+			// checked its position, or buttons might have been pressed.
+			// Unfortunately our child menus don't tell
+			// us the new position.
+			// TODO: Maybe have a shared struct between all menus
+			// where to store the current mouse position ?
+			// (Or just use the BView mouse hooks)			
+			BPoint newWhere;
+			if (window->Lock()) {
+				GetMouse(&newWhere, &buttons);
+				window->Unlock();
 			}
 
 			// This code is needed to make menus
 			// that are children of BMenuFields "sticky" (see ticket #953)
 			if (localAction == MENU_STATE_CLOSED) {
-				// The mouse could have meen moved since the last time we
-				// checked its position. Unfortunately our child menus don't tell
-				// us the new position.
-				// TODO: Maybe have a shared struct between all menus
-				// where to store the current mouse position ? 				
-				BPoint newWhere;
-				uint32 newButtons;
-				if (window->Lock()) {
-					GetMouse(&newWhere, &newButtons);
-					window->Unlock();
-				}
-
 				if (fExtraRect != NULL && fExtraRect->Contains(where)
 					// 9 = 3 pixels ^ 2 (since point_distance() returns the square of the distance)					
 					&& point_distance(newWhere, where) < 9) {
@@ -563,8 +542,14 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 			fState = MENU_STATE_TRACKING;
 		}
 
-		if (locked)
+		if (!locked)
+			locked = window->Lock();
+	
+		if (locked) {
+			GetMouse(&where, &buttons, true);
 			window->Unlock();
+			locked = false;
+		}
 
 		if (fState == MENU_STATE_CLOSED 
 			|| (buttons != 0 && _IsStickyMode() && menuItem == NULL))
