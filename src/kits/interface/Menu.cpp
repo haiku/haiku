@@ -1409,8 +1409,11 @@ BMenu::_Track(int *action, long start)
 				fState = MENU_STATE_CLOSED;			
 			}
 		} else if (item == NULL) {
-			if (_OverSuper(screenLocation))
+			if (_OverSuper(screenLocation)) {
 				fState = MENU_STATE_TRACKING;
+				UnlockLooper();
+				break;			
+			}
 			else {
 				if (!_OverSubmenu(fSelected, screenLocation)
 					&& system_time() > closeTime + kHysteresis
