@@ -32,6 +32,8 @@
  * generated.m68k/cross-tools/bin/m68k-unknown-haiku-objcopy -O binary stage1.o stage1
  */
 
+#include "toscalls.h"
+
 // 1 enabled verbose output
 //#define DEBUG 1
 
@@ -57,11 +59,6 @@
 #define	S_IFDIR						00000040000o
 
 
-// BIOS calls
-#ifndef _ASSEMBLER
-#error plop
-#endif
-
 
 .loop:
 	move	#'.',%d0
@@ -71,10 +68,10 @@
 
 /* prints the char in d0.b to the console */
 putc:
-	move.w	d0,-(%sp)
-	move.w	#2,-(%sp)	// DEV_CON
+	move.w	%d0,-(%sp)
+	move.w	#DEV_CON,-(%sp)	// DEV_CON
 	move.w	#3,-(%sp)	// Bconout
 	trap	#13
-	addi	#6,%sp
+	add.l	#6,%sp
 	rts
 
