@@ -371,6 +371,8 @@ Desktop::Init()
 	if (fSharedReadOnlyArea < B_OK)
 		return fSharedReadOnlyArea;
 
+	gFontManager->AttachUser(fUserID);
+
 	fSettings = new DesktopSettingsPrivate(fServerReadOnlyMemory);
 
 	for (int32 i = 0; i < kMaxWorkspaces; i++) {
@@ -407,8 +409,6 @@ Desktop::Init()
 	BRegion stillAvailableOnScreen;
 	_RebuildClippingForAllWindows(stillAvailableOnScreen);
 	_SetBackground(stillAvailableOnScreen);
-
-	gFontManager->AttachUser(fUserID);
 
 	SetCursor(NULL);
 		// this will set the default cursor
