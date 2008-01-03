@@ -343,14 +343,14 @@ ho_next(struct irs_ho *this) {
 			return (NULL);
 
 		strcpy(pvt->hostbuf, "localhost");
-		pvt->host_aliases[0] = pvt->hostbuf;
-		pvt->host_aliases[1] = NULL;
+		pvt->host_aliases[0] = NULL;
 		pvt->h_addr_ptrs[0] = (char *)pvt->host_addr;
 		pvt->h_addr_ptrs[1] = NULL;
 		pvt->host.h_addr_list = pvt->h_addr_ptrs;
 		pvt->host.h_length = INADDRSZ;
 		pvt->host.h_addrtype = AF_INET;
 		pvt->host.h_aliases = pvt->host_aliases;
+		pvt->host.h_name = pvt->hostbuf;
 		((struct in_addr *)pvt->host_addr)->s_addr = INADDR_LOOPBACK;
 		pvt->index++;
 
