@@ -381,7 +381,7 @@ dump_image_info(struct elf_image_info *image)
 	kprintf(" rela_len 0x%x\n", image->rela_len);
 	kprintf(" pltrel %p\n", image->pltrel);
 	kprintf(" pltrel_len 0x%x\n", image->pltrel_len);
-	
+
 	kprintf(" debug_symbols %p (%ld)\n", image->debug_symbols, image->num_debug_symbols);
 }
 
@@ -1256,15 +1256,19 @@ load_kernel_add_on(const char *path)
 	image->elf_header = elfHeader;
 	image->name = strdup(path);
 
-	programHeaders = (struct Elf32_Phdr *)malloc(elfHeader->e_phnum * elfHeader->e_phentsize);
+	programHeaders = (struct Elf32_Phdr *)malloc(elfHeader->e_phnum
+		* elfHeader->e_phentsize);
 	if (programHeaders == NULL) {
 		dprintf("%s: error allocating space for program headers\n", fileName);
 		status = B_NO_MEMORY;
 		goto error2;
 	}
 
-	TRACE(("reading in program headers at 0x%lx, length 0x%x\n", elfHeader->e_phoff, elfHeader->e_phnum * elfHeader->e_phentsize));
-	length = _kern_read(fd, elfHeader->e_phoff, programHeaders, elfHeader->e_phnum * elfHeader->e_phentsize);
+	TRACE(("reading in program headers at 0x%lx, length 0x%x\n",
+		elfHeader->e_phoff, elfHeader->e_phnum * elfHeader->e_phentsize));
+
+	length = _kern_read(fd, elfHeader->e_phoff, programHeaders,
+		elfHeader->e_phnum * elfHeader->e_phentsize);
 	if (length < B_OK) {
 		status = length;
 		TRACE(("%s: error reading in program headers\n", fileName));
@@ -1287,9 +1291,11 @@ load_kernel_add_on(const char *path)
 		if (programHeaders[i].p_type != PT_LOAD)
 			continue;
 
-		length += ROUNDUP(programHeaders[i].p_memsz + (programHeaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
+		length += ROUNDUP(programHeaders[i].p_memsz
+			+ (programHeaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
 
-		end = ROUNDUP(programHeaders[i].p_memsz + programHeaders[i].p_vaddr, B_PAGE_SIZE);
+		end = ROUNDUP(programHeaders[i].p_memsz + programHeaders[i].p_vaddr,
+			B_PAGE_SIZE);
 		if (end > reservedSize)
 			reservedSize = end;
 	}
@@ -1303,8 +1309,10 @@ load_kernel_add_on(const char *path)
 
 	// reserve that space and allocate the areas from that one
 	if (vm_reserve_address_range(vm_kernel_address_space_id(), &reservedAddress,
-			B_ANY_KERNEL_ADDRESS, reservedSize, 0) < B_OK)
+			B_ANY_KERNEL_ADDRESS, reservedSize, 0) < B_OK) {
+		status = B_NO_MEMORY;
 		goto error3;
+	}
 
 	start = (addr_t)reservedAddress;
 	image->data_region.size = 0;
@@ -1323,7 +1331,8 @@ load_kernel_add_on(const char *path)
 				image->dynamic_section = programHeaders[i].p_vaddr;
 				continue;
 			default:
-				dprintf("%s: unhandled pheader type 0x%lx\n", fileName, programHeaders[i].p_type);
+				dprintf("%s: unhandled pheader type 0x%lx\n", fileName,
+					programHeaders[i].p_type);
 				continue;
 		}
 
@@ -1352,13 +1361,16 @@ load_kernel_add_on(const char *path)
 			continue;
 		}
 
-		region->start = (addr_t)reservedAddress + ROUNDOWN(programHeaders[i].p_vaddr, B_PAGE_SIZE);
+		region->start = (addr_t)reservedAddress + ROUNDOWN(
+			programHeaders[i].p_vaddr, B_PAGE_SIZE);
 		region->size = ROUNDUP(programHeaders[i].p_memsz
 			+ (programHeaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
-		region->id = create_area(regionName, (void **)&region->start, B_EXACT_ADDRESS,
-			region->size, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		region->id = create_area(regionName, (void **)&region->start,
+			B_EXACT_ADDRESS, region->size, B_FULL_LOCK,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if (region->id < B_OK) {
-			dprintf("%s: error allocating area: %s\n", fileName, strerror(region->id));
+			dprintf("%s: error allocating area: %s\n", fileName,
+				strerror(region->id));
 			status = B_NOT_AN_EXECUTABLE;
 			goto error4;
 		}
@@ -1404,11 +1416,13 @@ load_kernel_add_on(const char *path)
 
 	// We needed to read in the contents of the "text" area, but
 	// now we can protect it read-only/execute
-	set_area_protection(image->text_region.id, B_KERNEL_READ_AREA | B_KERNEL_EXECUTE_AREA);
+	set_area_protection(image->text_region.id,
+		B_KERNEL_READ_AREA | B_KERNEL_EXECUTE_AREA);
 
 	// There might be a hole between the two segments, and we don't need to
 	// reserve this any longer
-	vm_unreserve_address_range(vm_kernel_address_space_id(), reservedAddress, reservedSize);
+	vm_unreserve_address_range(vm_kernel_address_space_id(), reservedAddress,
+		reservedSize);
 
 	// ToDo: this should be enabled by kernel settings!
 	if (1)
@@ -1427,7 +1441,8 @@ error5:
 	delete_area(image->data_region.id);
 	delete_area(image->text_region.id);
 error4:
-	vm_unreserve_address_range(vm_kernel_address_space_id(), reservedAddress, reservedSize);
+	vm_unreserve_address_range(vm_kernel_address_space_id(), reservedAddress,
+		reservedSize);
 error3:
 	free(programHeaders);
 error2:
@@ -1437,6 +1452,9 @@ error1:
 error:
 	mutex_unlock(&sImageLoadMutex);
 error0:
+	dprintf("Could not load kernel add-on \"%s\": %s\n", path,
+		strerror(status));
+
 	if (vnode)
 		vfs_put_vnode(vnode);
 	_kern_close(fd);
