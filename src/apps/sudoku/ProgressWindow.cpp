@@ -79,7 +79,11 @@ void
 ProgressWindow::Start(BWindow* referenceWindow)
 {
 	BAutolock _(this);
+
 	_Center(referenceWindow);
+
+	if (referenceWindow != NULL)
+		SetWorkspaces(referenceWindow->Workspaces());
 
 	fRetrievedUpdate = false;
 	fRetrievedShow = false;
