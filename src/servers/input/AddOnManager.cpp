@@ -520,9 +520,13 @@ AddOnManager::LoadReplicant()
 					if (replicant.FindMessenger("result", &result) == B_OK) {
 						gInputServer->SetMethodReplicant(new BMessenger(result));
 					}
-				} 
+				}
 			}
 		}
+	}
+
+	if (!gInputServer->MethodReplicant()) {
+		fprintf(stderr, "LoadReplicant(): Method replicant not found!\n");
 	}
 }
 
