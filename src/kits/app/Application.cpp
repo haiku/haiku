@@ -51,12 +51,21 @@ BResources *BApplication::sAppResources = NULL;
 BLocker BApplication::sAppResourcesLock("_app_resources_lock");
 
 
+enum {
+	kWindowByIndex,
+	kWindowByName,
+	kLooperByIndex,
+	kLooperByID,
+	kLooperByName,
+	kApplication
+};
+
 static property_info sPropertyInfo[] = {
 	{
 		"Window",
 		{},
 		{B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER},
-		NULL, 0,
+		NULL, kWindowByIndex,
 		{},
 		{},
 		{}
@@ -65,7 +74,7 @@ static property_info sPropertyInfo[] = {
 		"Window",
 		{},
 		{B_NAME_SPECIFIER},
-		NULL, 1,
+		NULL, kWindowByName,
 		{},
 		{},
 		{}
@@ -74,7 +83,7 @@ static property_info sPropertyInfo[] = {
 		"Looper",
 		{},
 		{B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER},
-		NULL, 2,
+		NULL, kLooperByIndex,
 		{},
 		{},
 		{}
@@ -83,7 +92,7 @@ static property_info sPropertyInfo[] = {
 		"Looper",
 		{},
 		{B_ID_SPECIFIER},
-		NULL, 3,
+		NULL, kLooperByID,
 		{},
 		{},
 		{}
@@ -92,7 +101,7 @@ static property_info sPropertyInfo[] = {
 		"Looper",
 		{},
 		{B_NAME_SPECIFIER},
-		NULL, 4,
+		NULL, kLooperByName,
 		{},
 		{},
 		{}
@@ -101,7 +110,7 @@ static property_info sPropertyInfo[] = {
 		"Name",
 		{B_GET_PROPERTY},
 		{B_DIRECT_SPECIFIER},
-		NULL, 5,
+		NULL, kApplication,
 		{B_STRING_TYPE},
 		{},
 		{}
@@ -110,7 +119,7 @@ static property_info sPropertyInfo[] = {
 		"Window",
 		{B_COUNT_PROPERTIES},
 		{B_DIRECT_SPECIFIER},
-		NULL, 5,
+		NULL, kApplication,
 		{B_INT32_TYPE},
 		{},
 		{}
@@ -119,7 +128,7 @@ static property_info sPropertyInfo[] = {
 		"Loopers",
 		{B_GET_PROPERTY},
 		{B_DIRECT_SPECIFIER},
-		NULL, 5,
+		NULL, kApplication,
 		{B_MESSENGER_TYPE},
 		{},
 		{}
@@ -128,7 +137,7 @@ static property_info sPropertyInfo[] = {
 		"Windows",
 		{B_GET_PROPERTY},
 		{B_DIRECT_SPECIFIER},
-		NULL, 5,
+		NULL, kApplication,
 		{B_MESSENGER_TYPE},
 		{},
 		{}
@@ -137,7 +146,7 @@ static property_info sPropertyInfo[] = {
 		"Looper",
 		{B_COUNT_PROPERTIES},
 		{B_DIRECT_SPECIFIER},
-		NULL, 5,
+		NULL, kApplication,
 		{B_INT32_TYPE},
 		{},
 		{}
@@ -622,105 +631,114 @@ BApplication::AboutRequested()
 
 BHandler *
 BApplication::ResolveSpecifier(BMessage *message, int32 index,
-        BMessage *specifier, int32 what, const char *property)
+	BMessage *specifier, int32 what, const char *property)
 {
 	BPropertyInfo propInfo(sPropertyInfo);
 	status_t err = B_OK;
 	uint32 data;
-	
-	if (propInfo.FindMatch(message, 0, specifier, what, property, &data) >=0) {
+
+	if (propInfo.FindMatch(message, 0, specifier, what, property, &data) >= 0) {
 		switch (data) {
-			case 0: {
-				int32 ind = -1;
-				err = specifier->FindInt32("index", &ind);
+			case kWindowByIndex:
+			{
+				int32 index;
+				err = specifier->FindInt32("index", &index);
 				if (err != B_OK)
 					break;
+
 				if (what == B_REVERSE_INDEX_SPECIFIER)
-					ind = CountWindows() - ind;
-				err = B_BAD_INDEX;
-				BWindow *win = WindowAt(ind);
-				if (win) {
-					if (index <= 0 && message->what == B_GET_PROPERTY)
-						return this;
+					index = CountWindows() - index;
+
+				BWindow *window = WindowAt(index);
+				if (window != NULL) {
 					message->PopSpecifier();
-					BMessenger(win).SendMessage(message);
-					return NULL;
-				}
+					BMessenger(window).SendMessage(message);
+				} else
+					err = B_BAD_INDEX;
 				break;
 			}
-			case 1: {
+
+			case kWindowByName:
+			{
 				const char *name;
 				err = specifier->FindString("name", &name);
 				if (err != B_OK)
 					break;
-				err = B_NAME_NOT_FOUND;
-				for (int32 i=0; i<CountWindows(); i++) {
-					BWindow *win = WindowAt(i);
-					if (win && win->Name() && strlen(win->Name()) == strlen(name)
-						&& !strcmp(win->Name(), name)) {
-							if (index <= 0 && message->what == B_GET_PROPERTY)
-								return this;
-							message->PopSpecifier();
-							BMessenger(win).SendMessage(message);
-							return NULL;
+
+				for (int32 i = 0;; i++) {
+					BWindow *window = WindowAt(i);
+					if (window == NULL) {
+						err = B_NAME_NOT_FOUND;
+						break;
+					}
+					if (window->Title() != NULL && !strcmp(window->Title(), name)) {
+						message->PopSpecifier();
+						BMessenger(window).SendMessage(message);
+						break;
 					}
 				}
 				break;
 			}
-			case 2: {
-				int32 ind = -1;
-				err = specifier->FindInt32("index", &ind);
+
+			case kLooperByIndex:
+			{
+				int32 index;
+				err = specifier->FindInt32("index", &index);
 				if (err != B_OK)
 					break;
+
 				if (what == B_REVERSE_INDEX_SPECIFIER)
-					ind = CountLoopers() - ind;
-				err = B_BAD_INDEX;
-				BLooper *looper = LooperAt(ind);
-				if (looper) {
-					if (index <= 0)
-						return this;
+					index = CountLoopers() - index;
+
+				BLooper *looper = LooperAt(index);
+				if (looper != NULL) {
 					message->PopSpecifier();
 					BMessenger(looper).SendMessage(message);
-					return NULL;
-				}
+				} else
+					err = B_BAD_INDEX;
 				break;
 			}
-			case 3:
-				//if (index == 0)
-				//	return this;
-				
+
+			case kLooperByID:
+				// TODO: implement getting looper by ID!
 				break;
-			case 4: {
+
+			case kLooperByName:
+			{
 				const char *name;
 				err = specifier->FindString("name", &name);
 				if (err != B_OK)
 					break;
-				err = B_NAME_NOT_FOUND;
-				for (int32 i=0; i<CountLoopers(); i++) {
+
+				for (int32 i = 0;; i++) {
 					BLooper *looper = LooperAt(i);
-					if (looper && looper->Name() && strlen(looper->Name()) == strlen(name)
-						&& !strcmp(looper->Name(), name)) {
-						if (index <= 0)
-							return this;
+					if (looper == NULL) {
+						err = B_NAME_NOT_FOUND;
+						break;
+					}
+					if (looper->Name() != NULL && !strcmp(looper->Name(), name)) {
 						message->PopSpecifier();
 						BMessenger(looper).SendMessage(message);
-						return NULL;
+						break;
 					}
 				}
 				break;
 			}
-			case 5:
+
+			case kApplication:
 				return this;
 		}
 	} else {
-			return BLooper::ResolveSpecifier(message, index, specifier, what,
-				property);		
+		return BLooper::ResolveSpecifier(message, index, specifier, what,
+			property);
 	}
 
-	BMessage reply(B_MESSAGE_NOT_UNDERSTOOD);
-	reply.AddInt32("error", err);
-	reply.AddString("message", strerror(err));
-	message->SendReply(&reply);
+	if (err != B_OK) {
+		BMessage reply(B_MESSAGE_NOT_UNDERSTOOD);
+		reply.AddInt32("error", err);
+		reply.AddString("message", strerror(err));
+		message->SendReply(&reply);
+	}
 
 	return NULL;
 	
