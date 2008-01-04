@@ -196,6 +196,27 @@ typedef struct {
 #define COMMAND_LIST_ENTRY_COUNT 32
 
 
+// Command FIS layout - Host to Device (H2D)
+//  0 - FIS Type (0x27)
+//  1 - C bit (0x80)
+//  2 - Command
+//  3 - Features
+//  4 - Sector Number           (LBA Low, bits 0-7)
+//  5 - Cylinder Low            (LBA Mid, bits 8-15)
+//  6 - Cylinder High           (LBA High, bits 16-23)
+//  7 - Device / Head           (for 28-bit LBA commands, bits 24-27)
+//  8 - Sector Number expanded  (LBA Low-previous, bits 24-31)
+//  9 - Cylinder Low expanded   (LBA Mid-previous, bits 32-39)
+// 10 - Cylinder High expanded  (LBA High-previous, bits 40-47)
+// 11 - Features expanded
+// 12 - Sector Count            (Sector count, bits 0-7)
+// 13 - Sector Count expanded   (Sector count, bits 8-15)
+// 14 - Reserved (0)
+// 15 - Control
+// 16 - Reserved (0)
+// 17 - Reserved (0)
+// 18 - Reserved (0)
+// 19 - Reserved (0)
 typedef struct {
 	uint8		cfis[0x40];		// command FIS
 	uint8		acmd[0x20];		// ATAPI command
