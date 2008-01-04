@@ -38,10 +38,10 @@ ExpanderRule::ExpanderRule(const char* mimetype, const char* filenameExtension,
 
 ExpanderRules::ExpanderRules()
 {
-	fList.AddItem(new ExpanderRule("", 								".tar.gz", 	"zcat %s | tar -tvf -", 		"zcat %s | tar -xf -"));
-	fList.AddItem(new ExpanderRule("", 								".tar.bz2", "bzcat %s | tar -tvf -", 		"bzcat %s | tar -xf -"));
-	fList.AddItem(new ExpanderRule("", 								".tar.Z", 	"zcat %s | tar -tvf -", 		"zcat %s | tar -xf -"));
-	fList.AddItem(new ExpanderRule("", 								".tgz", 	"zcat %s | tar -tvf -", 		"zcat %s | tar -xf -"));
+	fList.AddItem(new ExpanderRule("", 								".tar.gz", 	"tar -ztvf %s", 				"tar -zxf %s"));
+	fList.AddItem(new ExpanderRule("", 								".tar.bz2", "tar -jtvf %s",					"tar -jxf %s"));
+	fList.AddItem(new ExpanderRule("", 								".tar.Z", 	"tar -Ztvf %s", 				"tar -Zxf %s"));
+	fList.AddItem(new ExpanderRule("", 								".tgz", 	"tar -ztvf %s", 				"tar -zxf %s"));
 	fList.AddItem(new ExpanderRule("application/x-tar", 			".tar", 	"tar -tvf %s", 					"tar -xf %s"));
 	fList.AddItem(new ExpanderRule("application/x-gzip",			".gz", 		"echo %s | sed 's/.gz$//g'", 	"gunzip %s"));
 	fList.AddItem(new ExpanderRule("application/x-bzip2",			".bz2", 	"echo %s | sed 's/.bz2$//g'", 	"bunzip2 %s"));
