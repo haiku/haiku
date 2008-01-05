@@ -189,14 +189,21 @@
 
 #define EMU_A2_PTR		0x20
 #define EMU_A2_DATA		0x24
+#define EMU_A2_IPR2		0x28
+#define EMU_A2_INTE2	0x2c
+#define EMU_A2_HCFG2	0x34
+#define EMU_A2_IPR3		0x38
+#define EMU_A2_INTE3	0x3c
 
-#define EMU_A2_SRCSEL	0x600000
+#define EMU_A2_SRCSEL	0x60
 #define EMU_A2_SRCSEL_ENABLE_SPDIF	0x00000004
 #define EMU_A2_SRCSEL_ENABLE_SRCMULTI	0x00000010
-#define EMU_A2_SRCMULTI	0x6e0000
+#define EMU_A2_SRCMULTI	0x6e
 #define EMU_A2_SRCMULTI_ENABLE_INPUT	0xff00ff00
-#define EMU_A2_SRCMULTI2 0x7b0000
-#define EMU_A2_SRCMULTI2_ENABLE_INPUT	0xff000000
+#define EMU_A2_P17V_SPDIF 0x7a
+#define EMU_A2_P17V_SPDIF_ENABLE		0xff000000
+#define EMU_A2_P17V_I2S 0x7b
+#define EMU_A2_P17V_I2S_ENABLE		0xff000000
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 

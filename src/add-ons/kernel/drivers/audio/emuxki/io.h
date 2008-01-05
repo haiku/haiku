@@ -57,5 +57,8 @@ void emuxki_codec_write(device_config *config, int regno, uint16 value);
 
 void emuxki_inte_enable(device_config *config, uint32 value);
 void emuxki_inte_disable(device_config *config, uint32 value);
-	       
+
+uint32 emuxki_p16v_read(device_config *config, uint16 chano, uint16 reg);
+void emuxki_p16v_write(device_config *config, uint16 chano, uint16 reg, uint32 data);
+
 #endif

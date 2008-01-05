@@ -473,6 +473,11 @@ emuxki_channel_commit_fx(emuxki_channel *chan)
 	uint8			chano = chan->num;
 	
 	if(IS_AUDIGY(&card->config)) {
+		emuxki_chan_write(&card->config, chano, 0x4c, 0);
+		emuxki_chan_write(&card->config, chano, 0x4d, 0);
+		emuxki_chan_write(&card->config, chano, 0x4e, 0);
+		emuxki_chan_write(&card->config, chano, 0x4f, 0);
+		
 		emuxki_chan_write(&card->config, chano, EMU_A_CHAN_FXRT1,
 			      (chan->fxsend.d.dest << 24) |
 			      (chan->fxsend.c.dest << 16) |
@@ -1969,7 +1974,21 @@ emuxki_int(void *arg)
 
 		emuxki_reg_write_32(&card->config, EMU_IPR, ipr);
 	}
-	
+
+	if(IS_AUDIGY2(&card->config)) {
+		while ((ipr = emuxki_reg_read_32(&card->config, EMU_A2_IPR2))) {
+			emuxki_reg_write_32(&card->config, EMU_A2_IPR2, ipr);
+			break;	// avoid loop
+		}
+
+		if (card->info.revision == 4) {
+			while ((ipr = emuxki_reg_read_32(&card->config, EMU_A2_IPR3))) {
+				emuxki_reg_write_32(&card->config, EMU_A2_IPR3, ipr);
+				break; // avoid loop
+			}
+		}
+	}
+
 	if(gotone)
 		return B_INVOKE_SCHEDULER;
 
@@ -2155,6 +2174,12 @@ emuxki_setup(emuxki_dev * card)
 	}
 	
 	emuxki_reg_write_32(&card->config, EMU_INTE, EMU_INTE_SAMPLERATER | EMU_INTE_PCIERRENABLE);
+	if(IS_AUDIGY2(&card->config)) {
+		emuxki_reg_write_32(&card->config, EMU_A2_INTE2, 0);
+		if (card->info.revision == 4) {
+			emuxki_reg_write_32(&card->config, EMU_A2_INTE3, 0);
+		}
+	}
 	
 	PRINT(("installing interrupt : %lx\n", card->config.irq));
 	install_io_interrupt_handler(card->config.irq, emuxki_int, card, 0);
@@ -2654,16 +2679,17 @@ emuxki_init(emuxki_dev * card)
 	if(IS_AUDIGY2(&card->config)) {
 		emuxki_chan_write(&card->config, 0, EMU_A2_SPDIF_SAMPLERATE, EMU_A2_SPDIF_UNKNOWN);
 		
-		emuxki_reg_write_32(&card->config, EMU_A2_PTR, EMU_A2_SRCSEL);
-		emuxki_reg_write_32(&card->config, EMU_A2_DATA, 
+		emuxki_p16v_write(&card->config, 0, EMU_A2_SRCSEL, 
 			EMU_A2_SRCSEL_ENABLE_SPDIF | EMU_A2_SRCSEL_ENABLE_SRCMULTI);
-	
+		
 		if (card->info.revision == 4) {
-			emuxki_reg_write_32(&card->config, EMU_A2_PTR, EMU_A2_SRCMULTI);
-			emuxki_reg_write_32(&card->config, EMU_A2_DATA, EMU_A2_SRCMULTI_ENABLE_INPUT);
+			emuxki_p16v_write(&card->config, 0, EMU_A2_SRCMULTI, EMU_A2_SRCMULTI_ENABLE_INPUT);
 		} else {
-			emuxki_reg_write_32(&card->config, EMU_A2_PTR, EMU_A2_SRCMULTI2);
-			emuxki_reg_write_32(&card->config, EMU_A2_DATA, EMU_A2_SRCMULTI2_ENABLE_INPUT);
+			emuxki_p16v_write(&card->config, 0, EMU_A2_P17V_I2S, EMU_A2_P17V_I2S_ENABLE);
+			emuxki_p16v_write(&card->config, 0, EMU_A2_P17V_SPDIF, EMU_A2_P17V_SPDIF_ENABLE);
+
+			emuxki_reg_write_32(&card->config, EMU_A_IOCFG, 
+				emuxki_reg_read_32(&card->config, EMU_A_IOCFG) & ~0x8);
 		}
 	}
 	

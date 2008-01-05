@@ -226,3 +226,19 @@ emuxki_inte_disable(device_config *config, uint32 value)
 	emuxki_reg_write_32(config, EMU_INTE,
 		emuxki_reg_read_32(config, EMU_INTE) & ~value);
 }
+
+/* p16v */
+uint32
+emuxki_p16v_read(device_config *config, uint16 chano, uint16 reg)
+{
+	emuxki_reg_write_32(config, EMU_A2_PTR, reg << 16 | chano);
+	return emuxki_reg_read_32(config, EMU_A2_DATA);
+}
+
+
+void 
+emuxki_p16v_write(device_config *config, uint16 chano, uint16 reg, uint32 data)
+{
+	emuxki_reg_write_32(config, EMU_A2_PTR, reg << 16 | chano);
+	emuxki_reg_write_32(config, EMU_A2_DATA, data);
+}
