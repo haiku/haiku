@@ -17,8 +17,6 @@
 #define AHCI_ID_GENERATOR "ahci/id"
 #define AHCI_ID_ITEM "ahci/id"
 
-device_manager_info *gDeviceManager;
-
 
 const device_info kSupportedDevices[] = {
 	{ 0x1002, 0x4380, "ATI SB600" },
@@ -372,11 +370,14 @@ driver_module_info sAHCIDevice = {
 	ahci_get_supported_paths,
 };
 
+
 module_dependency module_dependencies[] = {
 	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&gDeviceManager },
+//	{ B_PCI_MODULE_NAME, (module_info **)&gPCI },
 	{ SCSI_FOR_SIM_MODULE_NAME, (module_info **)&gSCSI },
 	{}
 };
+
 
 module_info *modules[] = {
 	(module_info *)&sAHCIDevice,

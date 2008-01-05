@@ -8,6 +8,7 @@
 #include "ahci_defs.h"
 
 class AHCIController;
+class sata_request;
 
 class AHCIPort {
 public:
@@ -32,6 +33,9 @@ private:
 	void		ScsiInquiry(scsi_ccb *request);
 	void		ScsiReadCapacity(scsi_ccb *request);
 	void		ScsiReadWrite(scsi_ccb *request, uint64 position, size_t length, bool isWrite);
+	void		ScsiSynchronizeCache(scsi_ccb *request);
+
+	void		ExecuteSataRequest(sata_request *request, bool isWrite = false);
 
 	status_t	ResetDevice();
 	status_t	PostResetDevice();

@@ -15,6 +15,7 @@
 
 
 pci_device_module_info *gPCI;
+device_manager_info *gDeviceManager;
 scsi_for_sim_interface *gSCSI;
 
 
