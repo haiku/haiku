@@ -251,6 +251,11 @@ extern device_manager_info *gDeviceManager;
 extern pci_device_module_info *gPCI;
 extern scsi_for_sim_interface *gSCSI;
 
+
+#define MAX_SECTOR_LBA_28 ((1ull << 28) - 1)
+#define MAX_SECTOR_LBA_48 ((1ull << 48) - 1)
+
+
 #define LO32(val) ((uint32)(val))
 #define HI32(val) (((uint64)(val)) >> 32)
 #define ASSERT(expr) if (expr) {} else panic(#expr)
