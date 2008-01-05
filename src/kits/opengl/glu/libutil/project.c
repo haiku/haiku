@@ -168,74 +168,57 @@ static void __gluMultMatrixVecd(const GLdouble matrix[16], const GLdouble in[4],
 }
 
 /*
-** inverse = invert(src)
-** New, faster implementation by Shan Hao Bo, April 2006.
+** Invert 4x4 matrix.
+** Contributed by David Moore (See Mesa bug #6748)
 */
-static int __gluInvertMatrixd(const GLdouble src[16], GLdouble inverse[16])
+static int __gluInvertMatrixd(const GLdouble m[16], GLdouble invOut[16])
 {
-	int i, j, k;
-	double t;
-	GLdouble temp[4][4];
-	 
-	for (i=0; i<4; i++) {
-		for (j=0; j<4; j++) {
-		    temp[i][j] = src[i*4+j];
-		}
-	}
-	__gluMakeIdentityd(inverse);
-	
-	for (i = 0; i < 4; i++) {
-		if (temp[i][i] == 0.0f) {
-		    /*
-		    ** Look for non-zero element in column
-		    */
-		    for (j = i + 1; j < 4; j++) {
-				if (temp[j][i] != 0.0f) {
-				    break;
-				}
-		    }
-		
-		    if (j != 4) {
-				/*
-				 ** Swap rows.
-				 */
-				for (k = 0; k < 4; k++) {
-				    t = temp[i][k];
-				    temp[i][k] = temp[j][k];
-				    temp[j][k] = t;
-			
-				    t = inverse[i*4+k];
-				    inverse[i*4+k] = inverse[j*4+k];
-				    inverse[j*4+k] = t;
-				}
-		    }
-		    else {
-				/*
-				** No non-zero pivot.  The matrix is singular, 
-which shouldn't
-				** happen.  This means the user gave us a bad 
-matrix.
-				*/
-				return GL_FALSE;
-		    }
-		}
-		
-		t = 1.0f / temp[i][i];
-		for (k = 0; k < 4; k++) {
-		    temp[i][k] *= t;
-		    inverse[i*4+k] *= t;
-		}
-		for (j = 0; j < 4; j++) {
-		    if (j != i) {
-				t = temp[j][i];
-				for (k = 0; k < 4; k++) {
-					    temp[j][k] -= temp[i][k]*t;
-					    inverse[j*4+k] -= inverse[i*4+k]*t;
-				}
-		    }
-		}
-	}
-	return GL_TRUE;
+    double inv[16], det;
+    int i;
+
+    inv[0] =   m[5]*m[10]*m[15] - m[5]*m[11]*m[14] - m[9]*m[6]*m[15]
+             + m[9]*m[7]*m[14] + m[13]*m[6]*m[11] - m[13]*m[7]*m[10];
+    inv[4] =  -m[4]*m[10]*m[15] + m[4]*m[11]*m[14] + m[8]*m[6]*m[15]
+             - m[8]*m[7]*m[14] - m[12]*m[6]*m[11] + m[12]*m[7]*m[10];
+    inv[8] =   m[4]*m[9]*m[15] - m[4]*m[11]*m[13] - m[8]*m[5]*m[15]
+             + m[8]*m[7]*m[13] + m[12]*m[5]*m[11] - m[12]*m[7]*m[9];
+    inv[12] = -m[4]*m[9]*m[14] + m[4]*m[10]*m[13] + m[8]*m[5]*m[14]
+             - m[8]*m[6]*m[13] - m[12]*m[5]*m[10] + m[12]*m[6]*m[9];
+    inv[1] =  -m[1]*m[10]*m[15] + m[1]*m[11]*m[14] + m[9]*m[2]*m[15]
+             - m[9]*m[3]*m[14] - m[13]*m[2]*m[11] + m[13]*m[3]*m[10];
+    inv[5] =   m[0]*m[10]*m[15] - m[0]*m[11]*m[14] - m[8]*m[2]*m[15]
+             + m[8]*m[3]*m[14] + m[12]*m[2]*m[11] - m[12]*m[3]*m[10];
+    inv[9] =  -m[0]*m[9]*m[15] + m[0]*m[11]*m[13] + m[8]*m[1]*m[15]
+             - m[8]*m[3]*m[13] - m[12]*m[1]*m[11] + m[12]*m[3]*m[9];
+    inv[13] =  m[0]*m[9]*m[14] - m[0]*m[10]*m[13] - m[8]*m[1]*m[14]
+             + m[8]*m[2]*m[13] + m[12]*m[1]*m[10] - m[12]*m[2]*m[9];
+    inv[2] =   m[1]*m[6]*m[15] - m[1]*m[7]*m[14] - m[5]*m[2]*m[15]
+             + m[5]*m[3]*m[14] + m[13]*m[2]*m[7] - m[13]*m[3]*m[6];
+    inv[6] =  -m[0]*m[6]*m[15] + m[0]*m[7]*m[14] + m[4]*m[2]*m[15]
+             - m[4]*m[3]*m[14] - m[12]*m[2]*m[7] + m[12]*m[3]*m[6];
+    inv[10] =  m[0]*m[5]*m[15] - m[0]*m[7]*m[13] - m[4]*m[1]*m[15]
+             + m[4]*m[3]*m[13] + m[12]*m[1]*m[7] - m[12]*m[3]*m[5];
+    inv[14] = -m[0]*m[5]*m[14] + m[0]*m[6]*m[13] + m[4]*m[1]*m[14]
+             - m[4]*m[2]*m[13] - m[12]*m[1]*m[6] + m[12]*m[2]*m[5];
+    inv[3] =  -m[1]*m[6]*m[11] + m[1]*m[7]*m[10] + m[5]*m[2]*m[11]
+             - m[5]*m[3]*m[10] - m[9]*m[2]*m[7] + m[9]*m[3]*m[6];
+    inv[7] =   m[0]*m[6]*m[11] - m[0]*m[7]*m[10] - m[4]*m[2]*m[11]
+             + m[4]*m[3]*m[10] + m[8]*m[2]*m[7] - m[8]*m[3]*m[6];
+    inv[11] = -m[0]*m[5]*m[11] + m[0]*m[7]*m[9] + m[4]*m[1]*m[11]
+             - m[4]*m[3]*m[9] - m[8]*m[1]*m[7] + m[8]*m[3]*m[5];
+    inv[15] =  m[0]*m[5]*m[10] - m[0]*m[6]*m[9] - m[4]*m[1]*m[10]
+             + m[4]*m[2]*m[9] + m[8]*m[1]*m[6] - m[8]*m[2]*m[5];
+
+    det = m[0]*inv[0] + m[1]*inv[4] + m[2]*inv[8] + m[3]*inv[12];
+    if (det == 0)
+        return GL_FALSE;
+
+    det = 1.0 / det;
+
+    for (i = 0; i < 16; i++)
+        invOut[i] = inv[i] * det;
+
+    return GL_TRUE;
 }
 
 static void __gluMultMatricesd(const GLdouble a[16], const GLdouble b[16],
