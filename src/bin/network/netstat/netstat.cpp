@@ -1,9 +1,10 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		James Woodcock
  */
 
 
@@ -22,11 +23,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <getopt.h>
 
 
 extern const char* __progname;
 const char* kProgramName = __progname;
 
+static int sResolveNames = 1;
 
 struct address_family {
 	int			family;
@@ -59,9 +62,13 @@ inet_print_address(sockaddr* _address)
 		return;
 	}
 
-	hostent* host = gethostbyaddr((const char*)&address.sin_addr,
-		sizeof(sockaddr_in), AF_INET);
-	servent* service = getservbyport(ntohs(address.sin_port), NULL);
+	hostent* host = NULL;
+	servent* service = NULL;
+	if (sResolveNames) {
+		host = gethostbyaddr((const char*)&address.sin_addr, sizeof(in_addr),
+			AF_INET);
+		service = getservbyport(ntohs(address.sin_port), NULL);
+	}
 
 	const char *hostName;
 	if (host != NULL)
@@ -94,7 +101,10 @@ inet_print_address(sockaddr* _address)
 void
 usage(int status)
 {
-	printf("usage: %s\n", kProgramName);
+	printf("usage: %s [-nh]\n", kProgramName);
+	printf("options:\n");
+	printf("	-n	don't resolve names\n");
+	printf("	-h	this help\n");
 
 	exit(status);
 }
@@ -141,20 +151,44 @@ get_address_family(const char* argument, int32& familyIndex)
 int
 main(int argc, char** argv)
 {
-	if (argc > 1 && (!strcmp(argv[1], "--help") || !strcmp(argv[1], "-h")))
-		usage(0);
+	int optionIndex = 0;
+	int opt;
+	static struct option longOptions[] = {
+		{"help", no_argument, 0, 'h'},
+		{"numeric", no_argument, 0, 'n'},
+		{0, 0, 0, 0}
+	};
+
+	do {
+		opt = getopt_long(argc, argv, "hn", longOptions, &optionIndex);
+		switch (opt) {
+			case -1:
+				// end of arguments, do nothing
+				break;
+
+			case 'n':
+				sResolveNames = 0;
+				break;
+
+			case 'h':
+			default:
+				usage(0);
+				break;
+		}
+	} while (opt != -1);
 
 	int stack = open(NET_STACK_DRIVER_PATH, O_RDWR);
 	if (stack < 0) {
-		fprintf(stderr, "%s: The networking stack doesn't seem to be available.\n",
-			kProgramName);
+		fprintf(stderr, "%s: The networking stack doesn't seem to be "
+			"available.\n", kProgramName);
 		return -1;
 	}
 
 	bool printProgram = true;
-		// TODO: add some program options... :-)
+		// TODO: add some more program options... :-)
 
-	printf("Proto  Recv-Q Send-Q Local Address         Foreign Address       State        Program\n");
+	printf("Proto  Recv-Q Send-Q Local Address         Foreign Address       "
+		"State        Program\n");
 
 	uint32 cookie = 0;
 	int family = -1;
