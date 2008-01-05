@@ -401,11 +401,12 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	TRACE("AHCIPort::ScsiInquiry port %d\n", fIndex);
 
 	scsi_cmd_inquiry *cmd = (scsi_cmd_inquiry *)request->cdb;
+	scsi_res_inquiry scsiData;
 	ata_res_identify_device	ataData;
 
 	ASSERT(sizeof(ataData) == 512);
 
-	if (cmd->evpd || cmd->page_code) {
+	if (cmd->evpd || cmd->page_code || request->data_length < sizeof(scsiData)) {
 		TRACE("invalid request\n");
 		request->subsys_status = SCSI_REQ_ABORTED;
 		gSCSI->finished(request, 1);
@@ -432,7 +433,6 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	}
 */
 
-	scsi_res_inquiry scsiData;
 	scsiData.device_type = scsi_dev_direct_access;
 	scsiData.device_qualifier = scsi_periph_qual_connected;
 	scsiData.device_type_modifier = 0;
@@ -491,8 +491,7 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 		request->subsys_status = SCSI_DATA_RUN_ERR;
 	} else {
 		request->subsys_status = SCSI_REQ_CMP;
-		request->data_resid = request->data_length - sizeof(scsiData);// ???
-		request->data_length = sizeof(scsiData); // ???
+		request->data_resid = request->data_length - sizeof(scsiData);
 	}
 	gSCSI->finished(request, 1);
 }
@@ -517,7 +516,7 @@ AHCIPort::ScsiReadCapacity(scsi_ccb *request)
 	scsi_cmd_read_capacity *cmd = (scsi_cmd_read_capacity *)request->cdb;
 	scsi_res_read_capacity scsiData;
 
-	if (cmd->pmi || cmd->lba) {
+	if (cmd->pmi || cmd->lba || request->data_length < sizeof(scsiData)) {
 		TRACE("invalid request\n");
 		return;
 	}
@@ -534,18 +533,16 @@ AHCIPort::ScsiReadCapacity(scsi_ccb *request)
 		request->subsys_status = SCSI_DATA_RUN_ERR;
 	} else {
 		request->subsys_status = SCSI_REQ_CMP;
-		request->data_resid = request->data_length - sizeof(scsiData);// ???
-		request->data_length = sizeof(scsiData); // ???
+		request->data_resid = request->data_length - sizeof(scsiData);
 	}
 	gSCSI->finished(request, 1);
 }
 
 
 void
-AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 position, size_t length, bool isWrite)
+AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 lba, size_t sectorCount, bool isWrite)
 {
-	uint32 bytecount = length * 512;
-	RWTRACE("ScsiReadWrite: position %llu, size %lu, isWrite %d\n", position * 512, bytecount, isWrite);
+	RWTRACE("ScsiReadWrite: position %llu, size %lu, isWrite %d\n", lba * 512, sectorCount * 512, isWrite);
 
 #if 0
 	if (isWrite) {
@@ -556,22 +553,22 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 position, size_t length, bool 
 		return;
 	}
 #endif
-	
-	request->data_length = bytecount; // XXX really?
+
+	ASSERT(request->data_length == sectorCount * 512);
 	sata_request *sreq = new sata_request(request);
 
 	if (fUse48BitCommands) {
-		if (length > 65536)
-			panic("ahci: ScsiReadWrite length too large, %lu sectors", length);
-		if (position > MAX_SECTOR_LBA_48)
+		if (sectorCount > 65536)
+			panic("ahci: ScsiReadWrite length too large, %lu sectors", sectorCount);
+		if (lba > MAX_SECTOR_LBA_48)
 			panic("achi: ScsiReadWrite position too large for 48-bit LBA\n");
-		sreq->set_ata48_cmd(isWrite ? 0x35 : 0x25, position, length);
+		sreq->set_ata48_cmd(isWrite ? 0x35 : 0x25, lba, sectorCount);
 	} else {
-		if (length > 256)
-			panic("ahci: ScsiReadWrite length too large, %lu sectors", length);
-		if (position > MAX_SECTOR_LBA_28)
+		if (sectorCount > 256)
+			panic("ahci: ScsiReadWrite length too large, %lu sectors", sectorCount);
+		if (lba > MAX_SECTOR_LBA_28)
 			panic("achi: ScsiReadWrite position too large for normal LBA\n");
-		sreq->set_ata28_cmd(isWrite ? 0xca : 0xc8, position, length);
+		sreq->set_ata28_cmd(isWrite ? 0xca : 0xc8, lba, sectorCount);
 	}
 
 	ExecuteSataRequest(sreq, isWrite);
