@@ -714,7 +714,7 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 		case SCSI_OP_READ_12:
 		case SCSI_OP_WRITE_12:
 		{
-			scsi_cmd_rw_10 *cmd = (scsi_cmd_rw_10 *)request->cdb;
+			scsi_cmd_rw_12 *cmd = (scsi_cmd_rw_12 *)request->cdb;
 			uint32 position = B_BENDIAN_TO_HOST_INT32(cmd->lba);
 			size_t length = B_BENDIAN_TO_HOST_INT32(cmd->length);
 			bool isWrite = request->cdb[0] == SCSI_OP_WRITE_12;
