@@ -12,6 +12,7 @@
 
 #include <KernelExport.h>
 #include <ByteOrder.h>
+#include <new>
 #include <stdio.h>
 #include <string.h>
 
@@ -502,7 +503,7 @@ AHCIPort::ScsiSynchronizeCache(scsi_ccb *request)
 {
 	TRACE("AHCIPort::ScsiSynchronizeCache port %d\n", fIndex);
 
-	sata_request *sreq = new sata_request(request);
+	sata_request *sreq = new(std::nothrow) sata_request(request);
 	sreq->set_ata_cmd(fUse48BitCommands ? 0xea : 0xe7); // Flush Cache
 	ExecuteSataRequest(sreq);
 }
@@ -555,7 +556,7 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 lba, size_t sectorCount, bool 
 #endif
 
 	ASSERT(request->data_length == sectorCount * 512);
-	sata_request *sreq = new sata_request(request);
+	sata_request *sreq = new(std::nothrow) sata_request(request);
 
 	if (fUse48BitCommands) {
 		if (sectorCount > 65536)
