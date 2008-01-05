@@ -15,6 +15,10 @@ extern "C" {
 #define AHCI_DEVICE_MODULE_NAME "busses/scsi/ahci/device_v1"
 #define AHCI_SIM_MODULE_NAME "busses/scsi/ahci/sim/v1"
 
+// RW1 = Write 1 to set bit (writing 0 is ignored)
+// RWC = Write 1 to clear bit (writing 0 is ignored)
+
+
 enum {
 	CAP_S64A		= (1 << 31),	// Supports 64-bit Addressing
 	CAP_SNCQ		= (1 << 30),	// Supports Native Command Queuing
@@ -47,7 +51,7 @@ enum {
 	GHC_AE			= (1 << 31),	// AHCI Enable
 	GHC_MRSM		= (1 << 2),		// MSI Revert to Single Message
 	GHC_IE			= (1 << 1),		// Interrupt Enable
-	GHC_HR			= (1 << 0),		// HBA Reset
+	GHC_HR			= (1 << 0),		// HBA Reset **RW1**
 };
 
 
@@ -77,7 +81,7 @@ typedef struct {
 	uint32		clbu;			// Command List Base Address Upper 32-Bits
 	uint32		fb;				// FIS Base Address (alignment 256 byte)
 	uint32		fbu;			// FIS Base Address Upper 32-Bits
-	uint32		is;				// Interrupt Status
+	uint32		is;				// Interrupt Status **RWC**
 	uint32		ie;				// Interrupt Enable
 	uint32		cmd;			// Command and Status
 	uint32 		res1;			// Reserved
@@ -85,9 +89,9 @@ typedef struct {
 	uint32		sig;			// Signature
 	uint32		ssts;			// Serial ATA Status (SCR0: SStatus)
 	uint32		sctl;			// Serial ATA Control (SCR2: SControl)
-	uint32		serr;			// Serial ATA Error (SCR1: SError)
-	uint32		sact;			// Serial ATA Active (SCR3: SActive)
-	uint32		ci;				// Command Issue
+	uint32		serr;			// Serial ATA Error (SCR1: SError) **RWC**
+	uint32		sact;			// Serial ATA Active (SCR3: SActive) **RW1**
+	uint32		ci;				// Command Issue **RW1**
 	uint32		sntf;			// SNotification
 	uint32		res2;			// Reserved for FIS-based Switching Definition
 	uint32		res[11];		// Reserved

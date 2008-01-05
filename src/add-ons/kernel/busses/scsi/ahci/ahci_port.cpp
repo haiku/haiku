@@ -610,7 +610,7 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 
 	cpu_status cpu = disable_interrupts();
 	acquire_spinlock(&fSpinlock);
-	fRegs->ci |= 1;
+	fRegs->ci = 1;
 	FlushPostedWrites();
 	fCommandsActive |= 1;
 	release_spinlock(&fSpinlock);
