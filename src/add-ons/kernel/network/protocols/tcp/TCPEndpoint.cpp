@@ -459,8 +459,10 @@ TCPEndpoint::Accept(struct net_socket **_acceptedSocket)
 
 		locker.Lock();
 		status = gSocketModule->dequeue_connected(socket, _acceptedSocket);
+#ifdef TRACE_TCP
 		if (status == B_OK)
 			TRACE("  Accept() returning %p", (*_acceptedSocket)->first_protocol);
+#endif
 	} while (status < B_OK);
 
 	return status;
@@ -551,11 +553,11 @@ TCPEndpoint::SendData(net_buffer *buffer)
 
 	if (fState == CLOSED)
 		return ENOTCONN;
-	else if (fState == LISTEN) {
+	if (fState == LISTEN)
 		return EDESTADDRREQ;
-	} else if (fState == FINISH_SENT || fState == FINISH_ACKNOWLEDGED
-				|| fState == CLOSING || fState == WAIT_FOR_FINISH_ACKNOWLEDGE
-				|| fState == TIME_WAIT) {
+	if (fState == FINISH_SENT || fState == FINISH_ACKNOWLEDGED
+		|| fState == CLOSING || fState == WAIT_FOR_FINISH_ACKNOWLEDGE
+		|| fState == TIME_WAIT) {
 		// TODO: send SIGPIPE signal to app?
 		return EPIPE;
 	}
@@ -651,15 +653,15 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 
 	while (true) {
 		if (fState == CLOSING || fState == WAIT_FOR_FINISH_ACKNOWLEDGE
-				|| fState == TIME_WAIT) {
+			|| fState == TIME_WAIT) {
 			// ``Connection closing''.
 			return B_OK;
 		}
 
 		if (fReceiveQueue.Available() > 0) {
-			if (fReceiveQueue.Available() >= dataNeeded ||
-				((fReceiveQueue.PushedData() > 0)
-					&& (fReceiveQueue.PushedData() >= fReceiveQueue.Available())))
+			if (fReceiveQueue.Available() >= dataNeeded
+				|| (fReceiveQueue.PushedData() > 0
+					&& fReceiveQueue.PushedData() >= fReceiveQueue.Available()))
 				break;
 		} else if (fState == FINISH_RECEIVED) {
 			// ``If no text is awaiting delivery, the RECEIVE will
@@ -667,7 +669,7 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 			return B_OK;
 		}
 
-		if ((flags & MSG_DONTWAIT) || (socket->receive.timeout == 0))
+		if ((flags & MSG_DONTWAIT) != 0 || socket->receive.timeout == 0)
 			return B_WOULD_BLOCK;
 
 		status_t status = fReceiveList.Wait(locker, timeout, false);
@@ -677,7 +679,7 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 			// available. So we actually check if there is data, and if so,
 			// push it to the user.
 			if ((status == B_TIMED_OUT || status == B_INTERRUPTED)
-					&& fReceiveQueue.Available() > 0)
+				&& fReceiveQueue.Available() > 0)
 				break;
 
 			return posix_error(status);
@@ -772,7 +774,8 @@ TCPEndpoint::DelayedAcknowledge()
 		return SendAcknowledge(true);
 	}
 
-	gStackModule->set_timer(&fDelayedAcknowledgeTimer, TCP_DELAYED_ACKNOWLEDGE_TIMEOUT);
+	gStackModule->set_timer(&fDelayedAcknowledgeTimer,
+		TCP_DELAYED_ACKNOWLEDGE_TIMEOUT);
 	return B_OK;
 }
 
@@ -794,6 +797,7 @@ TCPEndpoint::_StartPersistTimer()
 void
 TCPEndpoint::_EnterTimeWait()
 {
+	TRACE("_EnterTimeWait()\n");
 	gStackModule->set_timer(&fTimeWaitTimer, TCP_MAX_SEGMENT_LIFETIME << 1);
 }
 
@@ -910,7 +914,8 @@ TCPEndpoint::DumpInternalState() const
 
 
 int32
-TCPEndpoint::_SynchronizeSentReceive(tcp_segment_header &segment, net_buffer *buffer)
+TCPEndpoint::_SynchronizeSentReceive(tcp_segment_header &segment,
+	net_buffer *buffer)
 {
 	TRACE("SynchronizeSentReceive()");
 
@@ -993,7 +998,8 @@ TCPEndpoint::SegmentReceived(tcp_segment_header &segment, net_buffer *buffer)
 int32
 TCPEndpoint::_SegmentReceived(tcp_segment_header &segment, net_buffer *buffer)
 {
-	uint32 advertisedWindow = (uint32)segment.advertised_window << fSendWindowShift;
+	uint32 advertisedWindow = (uint32)segment.advertised_window
+		<< fSendWindowShift;
 
 	// First, handle the most common case for uni-directional data transfer
 	// (known as header prediction - the segment must not change the window,
@@ -1004,7 +1010,6 @@ TCPEndpoint::_SegmentReceived(tcp_segment_header &segment, net_buffer *buffer)
 		&& fReceiveNext == segment.sequence
 		&& advertisedWindow > 0 && advertisedWindow == fSendWindow
 		&& fSendNext == fSendMax) {
-
 		_UpdateTimestamps(segment, buffer->size);
 
 		if (buffer->size == 0) {
@@ -1020,8 +1025,9 @@ TCPEndpoint::_SegmentReceived(tcp_segment_header &segment, net_buffer *buffer)
 			&& !(fFlags & FLAG_NO_RECEIVE)) {
 			if (_AddData(segment, buffer))
 				_NotifyReader();
-			return KEEP | ((segment.flags & TCP_FLAG_PUSH) ?
-				IMMEDIATE_ACKNOWLEDGE : ACKNOWLEDGE);
+
+			return KEEP | ((segment.flags & TCP_FLAG_PUSH) != 0
+				? IMMEDIATE_ACKNOWLEDGE : ACKNOWLEDGE);
 		}
 	}
 
@@ -1108,7 +1114,8 @@ TCPEndpoint::_ShouldSendSegment(tcp_segment_header &segment, uint32 length,
 			return true;
 	}
 
-	if ((segment.flags & (TCP_FLAG_SYNCHRONIZE | TCP_FLAG_FINISH | TCP_FLAG_RESET)) != 0)
+	if ((segment.flags & (TCP_FLAG_SYNCHRONIZE | TCP_FLAG_FINISH
+			| TCP_FLAG_RESET)) != 0)
 		return true;
 
 	// there is no reason to send a segment just now
@@ -1140,14 +1147,14 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 	tcp_segment_header segment(_CurrentFlags());
 
 	if ((fOptions & TCP_NOOPT) == 0) {
-		if (fFlags & FLAG_OPTION_TIMESTAMP) {
+		if ((fFlags & FLAG_OPTION_TIMESTAMP) != 0) {
 			segment.options |= TCP_HAS_TIMESTAMPS;
 			segment.timestamp_reply = fReceivedTimestamp;
 			segment.timestamp_value = tcp_now();
 		}
 
-		if ((segment.flags & TCP_FLAG_SYNCHRONIZE)
-			&& (fSendNext == fInitialSendSequence)) {
+		if ((segment.flags & TCP_FLAG_SYNCHRONIZE) != 0
+			&& fSendNext == fInitialSendSequence) {
 			// add connection establishment options
 			segment.max_segment_size = fReceiveMaxSegmentSize;
 			if (fFlags & FLAG_OPTION_WINDOW_SCALE) {
@@ -1294,7 +1301,8 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 			fLastAcknowledgeSent = segment.acknowledge;
 
 		length -= segmentLength;
-		segment.flags &= ~(TCP_FLAG_SYNCHRONIZE | TCP_FLAG_RESET | TCP_FLAG_FINISH);
+		segment.flags &= ~(TCP_FLAG_SYNCHRONIZE | TCP_FLAG_RESET
+			| TCP_FLAG_FINISH);
 	} while (length > 0);
 
 	// if we sent data from the beggining of the send queue,
@@ -1348,7 +1356,7 @@ TCPEndpoint::_AvailableData() const
 	//       sockets.
 	if (fState == LISTEN)
 		return gSocketModule->count_connected(socket);
-	else if (fState == SYNCHRONIZE_SENT)
+	if (fState == SYNCHRONIZE_SENT)
 		return 0;
 
 	ssize_t availableData = fReceiveQueue.Available();
@@ -1375,26 +1383,27 @@ TCPEndpoint::_ShouldReceive() const
 		return false;
 
 	return fState == ESTABLISHED || fState == FINISH_SENT
-			|| fState == FINISH_ACKNOWLEDGED;
+		|| fState == FINISH_ACKNOWLEDGED;
 }
 
 
 int32
 TCPEndpoint::_Receive(tcp_segment_header &segment, net_buffer *buffer)
 {
-	uint32 advertisedWindow = (uint32)segment.advertised_window << fSendWindowShift;
+	uint32 advertisedWindow = (uint32)segment.advertised_window
+		<< fSendWindowShift;
 
 	size_t segmentLength = buffer->size;
 
 	if (segment.flags & TCP_FLAG_RESET) {
 		// is this a valid reset?
 		if (fLastAcknowledgeSent <= segment.sequence
-			&& tcp_sequence(segment.sequence)
-				< (fLastAcknowledgeSent + fReceiveWindow)) {
+			&& tcp_sequence(segment.sequence) < (fLastAcknowledgeSent
+				+ fReceiveWindow)) {
 			if (fState == SYNCHRONIZE_RECEIVED)
 				fError = ECONNREFUSED;
 			else if (fState == CLOSING || fState == TIME_WAIT
-					|| fState == WAIT_FOR_FINISH_ACKNOWLEDGE)
+				|| fState == WAIT_FOR_FINISH_ACKNOWLEDGE)
 				fError = ENOTCONN;
 			else
 				fError = ECONNRESET;
@@ -1461,9 +1470,12 @@ TCPEndpoint::_Receive(tcp_segment_header &segment, net_buffer *buffer)
 		gBufferModule->remove_trailer(buffer, drop);
 	}
 
-	if (advertisedWindow > fSendWindow)
+#ifdef TRACE_TCP
+	if (advertisedWindow > fSendWindow) {
 		TRACE("  Receive(): Window update %lu -> %lu", fSendWindow,
 			advertisedWindow);
+	}
+#endif
 
 	fSendWindow = advertisedWindow;
 	if (advertisedWindow > fSendMaxWindow)
@@ -1598,8 +1610,8 @@ TCPEndpoint::_UpdateTimestamps(tcp_segment_header &segment,
 	if (fFlags & FLAG_OPTION_TIMESTAMP) {
 		tcp_sequence sequence(segment.sequence);
 
-		if ((fLastAcknowledgeSent >= sequence
-				&& fLastAcknowledgeSent < (sequence + segmentLength)))
+		if (fLastAcknowledgeSent >= sequence
+			&& fLastAcknowledgeSent < (sequence + segmentLength))
 			fReceivedTimestamp = segment.timestamp_value;
 	}
 }
@@ -1793,8 +1805,8 @@ TCPEndpoint::_UpdateSRTT(int32 roundTripTime)
 	rtt -= (fRoundTripDeviation / 4);
 	fRoundTripDeviation += rtt;
 
-	fRetransmitTimeout = ((fRoundTripTime / 4 +
-		fRoundTripDeviation) / 2) * kTimestampFactor;
+	fRetransmitTimeout = ((fRoundTripTime / 4 + fRoundTripDeviation) / 2)
+		* kTimestampFactor;
 
 	TRACE("  RTO is now %llu (after rtt %ldms)", fRetransmitTimeout,
 		roundTripTime);
@@ -1813,11 +1825,10 @@ TCPEndpoint::_ResetSlowStart()
 void
 TCPEndpoint::_DuplicateAcknowledge(tcp_segment_header &segment)
 {
-	fDuplicateAcknowledgeCount++;
-
-	if (fDuplicateAcknowledgeCount < 3)
+	if (++fDuplicateAcknowledgeCount < 3)
 		return;
-	else if (fDuplicateAcknowledgeCount == 3) {
+
+	if (fDuplicateAcknowledgeCount == 3) {
 		_ResetSlowStart();
 		fCongestionWindow = fSlowStartThreshold + 3
 			* fSendMaxSegmentSize;
@@ -1875,9 +1886,6 @@ TCPEndpoint::_DelayedAcknowledgeTimer(struct net_timer *timer, void *data)
 TCPEndpoint::_TimeWaitTimer(struct net_timer *timer, void *data)
 {
 	TCPEndpoint *endpoint = (TCPEndpoint *)data;
-
-	if (mutex_lock(&endpoint->fLock) < B_OK)
-		return;
 
 	gSocketModule->delete_socket(endpoint->socket);
 }
