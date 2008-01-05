@@ -5,6 +5,7 @@
  * Authors:
  *		Maxim Shemanarev <mcseemagg@yahoo.com>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Anthony Lee <don.anthony.lee@gmail.com>
  */
 
 //----------------------------------------------------------------------------
@@ -421,59 +422,56 @@ FontEngine::PrepareGlyph(unsigned glyphCode)
 
 	switch(fGlyphRendering) {
 		case glyph_ren_native_mono:
-			fLastError = FT_Render_Glyph(fFace->glyph, FT_RENDER_MODE_MONO);
-			if (fLastError == 0) {
-				decompose_ft_bitmap_mono(fFace->glyph->bitmap, 
-										 fFace->glyph->bitmap_left,
-										 kFlipY ? -fFace->glyph->bitmap_top : 
-													 fFace->glyph->bitmap_top,
-										 kFlipY,
-										 fScanlineBin,
-										 fScanlineStorageBin);
-				fBounds.x1 = fScanlineStorageBin.min_x();
-				fBounds.y1 = fScanlineStorageBin.min_y();
-				fBounds.x2 = fScanlineStorageBin.max_x();
-				fBounds.y2 = fScanlineStorageBin.max_y();
-				fDataSize = fScanlineStorageBin.byte_size(); 
-				fDataType = glyph_data_mono;
-				return true;
-			}
-			break;
-	
-	
 		case glyph_ren_native_gray8:
-			fLastError = FT_Render_Glyph(fFace->glyph, FT_RENDER_MODE_NORMAL);
+			fLastError = FT_Render_Glyph(fFace->glyph,
+						     fGlyphRendering == glyph_ren_native_mono ?
+							FT_RENDER_MODE_MONO : FT_RENDER_MODE_NORMAL);
 			if (fLastError == 0) {
-				decompose_ft_bitmap_gray8(fFace->glyph->bitmap, 
-										  fFace->glyph->bitmap_left,
-										  kFlipY ? -fFace->glyph->bitmap_top : 
-													  fFace->glyph->bitmap_top,
-										  kFlipY,
-										  fScanlineAA,
-										  fScanlineStorageAA);
-				fBounds.x1 = fScanlineStorageAA.min_x();
-				fBounds.y1 = fScanlineStorageAA.min_y();
-				fBounds.x2 = fScanlineStorageAA.max_x();
-				fBounds.y2 = fScanlineStorageAA.max_y();
-				fDataSize = fScanlineStorageAA.byte_size(); 
-				fDataType = glyph_data_gray8;
-				return true;
+				switch (fFace->glyph->bitmap.pixel_mode) {
+					case FT_PIXEL_MODE_MONO:
+						decompose_ft_bitmap_mono(fFace->glyph->bitmap, 
+							fFace->glyph->bitmap_left,
+							kFlipY ? -fFace->glyph->bitmap_top
+							: fFace->glyph->bitmap_top,
+							kFlipY, fScanlineBin, fScanlineStorageBin);
+						fBounds.x1 = fScanlineStorageBin.min_x();
+						fBounds.y1 = fScanlineStorageBin.min_y();
+						fBounds.x2 = fScanlineStorageBin.max_x();
+						fBounds.y2 = fScanlineStorageBin.max_y();
+						fDataSize = fScanlineStorageBin.byte_size(); 
+						fDataType = glyph_data_mono;
+						return true;
+
+					case FT_PIXEL_MODE_GRAY:
+						decompose_ft_bitmap_gray8(fFace->glyph->bitmap, 
+							fFace->glyph->bitmap_left,
+							kFlipY ? -fFace->glyph->bitmap_top
+							: fFace->glyph->bitmap_top,
+							kFlipY, fScanlineAA, fScanlineStorageAA);
+						fBounds.x1 = fScanlineStorageAA.min_x();
+						fBounds.y1 = fScanlineStorageAA.min_y();
+						fBounds.x2 = fScanlineStorageAA.max_x();
+						fBounds.y2 = fScanlineStorageAA.max_y();
+						fDataSize = fScanlineStorageAA.byte_size(); 
+						fDataType = glyph_data_gray8;
+						return true;
+
+					default:
+						break;
+				}
 			}
 			break;
-	
-	
+
 		case glyph_ren_outline:
 			fPath.remove_all();
-			if (decompose_ft_outline(fFace->glyph->outline, kFlipY,
-					fPath)) {
-
-				agg::rect_d bnd = fPath.bounding_rect();
+			if (decompose_ft_outline(fFace->glyph->outline, kFlipY, fPath)) {
+				agg::rect_d bounds = fPath.bounding_rect();
+				fBounds.x1 = int(floor(bounds.x1));
+				fBounds.y1 = int(floor(bounds.y1));
+				fBounds.x2 = int(ceil(bounds.x2));
+				fBounds.y2 = int(ceil(bounds.y2));
 				fDataSize = fPath.byte_size();
 				fDataType = glyph_data_outline;
-				fBounds.x1 = int(floor(bnd.x1));
-				fBounds.y1 = int(floor(bnd.y1));
-				fBounds.x2 = int(ceil(bnd.x2));
-				fBounds.y2 = int(ceil(bnd.y2));
 				return true;
 			}
 			break;
@@ -580,11 +578,15 @@ FontEngine::Init(const char* fontFilePath, unsigned faceIndex, double size,
 	}
 
 	FT_Set_Pixel_Sizes(fFace,
-		unsigned(size * 64.0) >> 6,	// pixel_width
-		unsigned(size * 64.0) >> 6);  // pixel_height
+		unsigned(size * 64.0) >> 6,		// pixel_width
+		unsigned(size * 64.0) >> 6);	// pixel_height
 
-	if (charMap != FT_ENCODING_NONE)
+	if (charMap != FT_ENCODING_NONE) {
 		fLastError = FT_Select_Charmap(fFace, charMap);
+	} else {
+		if (FT_Select_Charmap(fFace, FT_ENCODING_UNICODE) != 0)
+			fLastError = FT_Select_Charmap(fFace, FT_ENCODING_NONE);
+	}
 
 	return fLastError == 0;
 }
