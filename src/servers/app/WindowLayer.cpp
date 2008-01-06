@@ -107,8 +107,8 @@ WindowLayer::WindowLayer(const BRect& frame, const char *name,
 	fLastMousePosition(0.0, 0.0),
 	fLastMoveTime(0),
 
-	fCurrentUpdateSession(),
-	fPendingUpdateSession(),
+	fCurrentUpdateSession(&fUpdateSessions[0]),
+	fPendingUpdateSession(&fUpdateSessions[1]),
 	fUpdateRequested(false),
 	fInUpdate(false),
 
@@ -293,10 +293,10 @@ WindowLayer::MoveBy(int32 x, int32 y)
 	if (fContentRegionValid)
 		fContentRegion.OffsetBy(x, y);
 
-	if (fCurrentUpdateSession.IsUsed())
-		fCurrentUpdateSession.MoveBy(x, y);
-	if (fPendingUpdateSession.IsUsed())
-		fPendingUpdateSession.MoveBy(x, y);
+	if (fCurrentUpdateSession->IsUsed())
+		fCurrentUpdateSession->MoveBy(x, y);
+	if (fPendingUpdateSession->IsUsed())
+		fPendingUpdateSession->MoveBy(x, y);
 
 	fEffectiveDrawingRegionValid = false;
 
@@ -437,10 +437,12 @@ WindowLayer::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 			// move along the already dirty regions that are common
 			// with the region that we could copy
 			_ShiftPartOfRegion(&fDirtyRegion, region, xOffset, yOffset);
-			if (fPendingUpdateSession.IsUsed())
-				_ShiftPartOfRegion(&fPendingUpdateSession.DirtyRegion(), region, xOffset, yOffset);
+			if (fPendingUpdateSession->IsUsed()) {
+				_ShiftPartOfRegion(&(fPendingUpdateSession->DirtyRegion()), region,
+					xOffset, yOffset);
+			}
 
-			if (fCurrentUpdateSession.IsUsed()) {
+			if (fCurrentUpdateSession->IsUsed()) {
 				// if there are parts in the current update session
 				// that intersect with the copied region, we cannot
 				// simply shift them as with the other dirty regions
@@ -449,10 +451,10 @@ WindowLayer::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 				// new dirty region instead
 				BRegion* common = fRegionPool.GetRegion(*region);
 				// see if there is a common part at all
-				common->IntersectWith(&fCurrentUpdateSession.DirtyRegion());
+				common->IntersectWith(&fCurrentUpdateSession->DirtyRegion());
 				if (common->CountRects() > 0) {
 					// cut the common part from the region
-					fCurrentUpdateSession.DirtyRegion().Exclude(common);
+					fCurrentUpdateSession->DirtyRegion().Exclude(common);
 					newDirty->Include(common);
 				}
 				fRegionPool.Recycle(common);
@@ -549,10 +551,10 @@ WindowLayer::GetEffectiveDrawingRegion(ViewLayer* layer, BRegion& region)
 		if (fUpdateRequested && !fInUpdate) {
 			// we requested an update, but the client has not started it yet,
 			// so it is only allowed to draw outside the pending update sessions region
-			fEffectiveDrawingRegion.Exclude(&fPendingUpdateSession.DirtyRegion());
+			fEffectiveDrawingRegion.Exclude(&(fPendingUpdateSession->DirtyRegion()));
 		} else if (fInUpdate) {
 			// enforce the dirty region of the update session
-			fEffectiveDrawingRegion.IntersectWith(&fCurrentUpdateSession.DirtyRegion());
+			fEffectiveDrawingRegion.IntersectWith(&fCurrentUpdateSession->DirtyRegion());
 		} else {
 			// not in update, the view can draw everywhere
 //printf("WindowLayer(%s)::GetEffectiveDrawingRegion(for %s) - outside update\n", Title(), layer->Name());
@@ -1679,12 +1681,12 @@ WindowLayer::_TriggerContentRedraw(BRegion& dirtyContentRegion)
 	if (IsVisible() && dirtyContentRegion.CountRects() > 0) {
 		// put this into the pending dirty region
 		// to eventually trigger a client redraw
-		bool wasExpose = fPendingUpdateSession.IsExpose();
+		bool wasExpose = fPendingUpdateSession->IsExpose();
 		BRegion* backgroundClearingRegion = &dirtyContentRegion;
 
 		_TransferToUpdateSession(&dirtyContentRegion);
 
-		if (fPendingUpdateSession.IsExpose()) {
+		if (fPendingUpdateSession->IsExpose()) {
 			if (!fContentRegionValid)
 				_UpdateContentRegion();
 
@@ -1692,7 +1694,7 @@ WindowLayer::_TriggerContentRedraw(BRegion& dirtyContentRegion)
 				// there was suddenly added a dirty region
 				// caused by exposing content, we need to clear
 				// the entire background
-				backgroundClearingRegion = &fPendingUpdateSession.DirtyRegion();
+				backgroundClearingRegion = &(fPendingUpdateSession->DirtyRegion());
 			}
 
 			if (fDrawingEngine->LockParallelAccess()) {
@@ -1767,10 +1769,10 @@ WindowLayer::_TransferToUpdateSession(BRegion* contentDirtyRegion)
 //snooze(10000);
 
 	// add to pending
-	fPendingUpdateSession.SetUsed(true);
-//	if (!fPendingUpdateSession.IsExpose())
-	fPendingUpdateSession.AddCause(fDirtyCause);
-	fPendingUpdateSession.Include(contentDirtyRegion);
+	fPendingUpdateSession->SetUsed(true);
+//	if (!fPendingUpdateSession->IsExpose())
+	fPendingUpdateSession->AddCause(fDirtyCause);
+	fPendingUpdateSession->Include(contentDirtyRegion);
 
 	// clip pending update session from current
 	// update session, it makes no sense to draw stuff
@@ -1784,8 +1786,8 @@ WindowLayer::_TransferToUpdateSession(BRegion* contentDirtyRegion)
 	// until everything settles down. Potentially, this could even give
 	// the impression of faster updates, even though they might look
 	// wrong when looked at closer, but will fix themselves shortly later
-//	if (fCurrentUpdateSession.IsUsed() && fCurrentUpdateSession.IsExpose()) {
-//		fCurrentUpdateSession.Exclude(contentDirtyRegion);
+//	if (fCurrentUpdateSession->IsUsed() && fCurrentUpdateSession->IsExpose()) {
+//		fCurrentUpdateSession->Exclude(contentDirtyRegion);
 //		fEffectiveDrawingRegionValid = false;
 //	}
 
@@ -1823,10 +1825,11 @@ WindowLayer::BeginUpdate(BPrivate::PortLink& link)
 
 	if (fUpdateRequested) {
 		// make the pending update session the current update session
-		// TODO: the toggling between the update sessions is too
-		// expensive, optimize with some pointer tricks
+		// (toggle the pointers)
+		UpdateSession* temp = fCurrentUpdateSession;
 		fCurrentUpdateSession = fPendingUpdateSession;
-		fPendingUpdateSession.SetUsed(false);
+		fPendingUpdateSession = temp;
+		fPendingUpdateSession->SetUsed(false);
 		// all drawing command from the client
 		// will have the dirty region from the update
 		// session enforced
@@ -1842,7 +1845,7 @@ WindowLayer::BeginUpdate(BPrivate::PortLink& link)
 			_UpdateContentRegion();
 
 		BRegion* dirty = fRegionPool.GetRegion(
-			fCurrentUpdateSession.DirtyRegion());
+			fCurrentUpdateSession->DirtyRegion());
 		if (!dirty) {
 			link.StartMessage(B_ERROR);
 			link.Flush();
@@ -1875,7 +1878,7 @@ WindowLayer::BeginUpdate(BPrivate::PortLink& link)
 		link.Attach<int32>(B_NULL_TOKEN);
 		link.Flush();
 
-		if (!fCurrentUpdateSession.IsExpose() && fDrawingEngine->LockParallelAccess()) {
+		if (!fCurrentUpdateSession->IsExpose() && fDrawingEngine->LockParallelAccess()) {
 //fDrawingEngine->FillRegion(dirty, (rgb_color){ 255, 0, 0, 255 });
 			fDrawingEngine->SuspendAutoSync();
 
@@ -1903,12 +1906,12 @@ WindowLayer::EndUpdate()
 	// NOTE: see comment in _BeginUpdate()
 
 	if (fInUpdate) {
-		fCurrentUpdateSession.SetUsed(false);
+		fCurrentUpdateSession->SetUsed(false);
 
 		fInUpdate = false;
 		fEffectiveDrawingRegionValid = false;
 	}
-	if (fPendingUpdateSession.IsUsed()) {
+	if (fPendingUpdateSession->IsUsed()) {
 		// send this to client
 		_SendUpdateMessage();
 	} else {
@@ -2053,13 +2056,4 @@ WindowLayer::UpdateSession::AddCause(uint8 cause)
 	fCause |= cause;
 }
 
-
-WindowLayer::UpdateSession&
-WindowLayer::UpdateSession::operator=(const WindowLayer::UpdateSession& other)
-{
-	fDirtyRegion = other.fDirtyRegion;
-	fInUse = other.fInUse;
-	fCause = other.fCause;
-	return *this;
-}
 

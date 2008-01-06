@@ -320,8 +320,6 @@ class WindowLayer {
 		inline	bool				IsRequest() const
 										{ return fCause & UPDATE_REQUEST; }
 	
-				UpdateSession&		operator=(const UpdateSession& other);
-	
 	 private:
 				BRegion				fDirtyRegion;
 				bool				fInUse;
@@ -330,8 +328,9 @@ class WindowLayer {
 
 			BRegion				fDecoratorRegion;
 
-			UpdateSession		fCurrentUpdateSession;
-			UpdateSession		fPendingUpdateSession;
+			UpdateSession		fUpdateSessions[2];
+			UpdateSession*		fCurrentUpdateSession;
+			UpdateSession*		fPendingUpdateSession;
 			// these two flags are supposed to ensure a sane
 			// and consistent update session
 			bool				fUpdateRequested : 1;
