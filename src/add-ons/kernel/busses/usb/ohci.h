@@ -20,6 +20,7 @@ class OHCIRootHub;
 
 typedef struct transfer_data_s {
 	Transfer		*transfer;
+	ohci_general_td	*top;
 	bool			incoming;
 	bool			canceled;
 	transfer_data_s	*link;
@@ -80,6 +81,12 @@ private:
 static	int32						_InterruptHandler(void *data);
 		int32						_Interrupt();
 
+		// Transfer functions
+		status_t					_AddPendingTransfer(Transfer *transfer,
+										ohci_general_td *first,
+										ohci_general_td *last,
+										bool directionIn);
+
 static	int32						_FinishThread(void *data);
 		void						_FinishTransfer();
 
@@ -120,6 +127,10 @@ static	int32						_FinishThread(void *data);
 										ohci_general_td *topDescriptor,
 										iovec *vector,
 										size_t vectorCount);
+
+		// OHCI needs this function
+		addr_t						_LogicalAddress(addr_t physical);
+		bool						_IsIsochronous(addr_t logical);
 
 		// Register functions
 inline	void						_WriteReg(uint32 reg, uint32 value);

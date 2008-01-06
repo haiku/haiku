@@ -378,23 +378,31 @@ OHCI::_Interrupt()
 
 	if (status & OHCI_SCHEDULING_OVERRUN) {
 		// TODO
+		TRACE(("usb_ohci: scheduling overrun occured\n"));
 	}
 
 	if (status & OHCI_WRITEBACK_DONE_HEAD) {
-		// TODO
+		TRACE(("usb_ohci: transfer descriptor processed\n"));
+		// Ack it in the finisher thread, not here.
+		result = B_INVOKE_SCHEDULER;
 		finishTransfers = true;
 	}
 
 	if (status & OHCI_RESUME_DETECTED) {
 		// TODO
+		TRACE(("usb_ohci: resume detected\n"));
 	}
 
 	if (status & OHCI_UNRECOVERABLE_ERROR) {
-		// TODO
+		TRACE(("usb_ohci: unrecoverable error. Controller halted\n"));
+		_WriteReg(OHCI_CONTROL, OHCI_HC_FUNCTIONAL_STATE_RESET);
+		// TODO: what else?
+		// Perhaps, clean up all the memory.
 	}
 
 	if (status & OHCI_ROOT_HUB_STATUS_CHANGE) {
 		// TODO
+		TRACE(("usb_ohci: root hub status change\n"));
 	}
 
 	release_spinlock(&lock);
@@ -420,10 +428,48 @@ OHCI::_FinishTransfer()
 	while (!fStopFinishThread) {
 		if (acquire_sem(fFinishTransfersSem) < B_OK)
 			continue;
-		// We have to acknowledge here after we get the TD list
-		// fHcca->done_head = 0;
-		// Write back WDH bit in the interrupt status register
+
+		// eat up sems that have been released by multiple interrupts
+		int32 semCount = 0;
+		get_sem_count(fFinishTransfersSem, &semCount);
+		if (semCount > 0)
+			acquire_sem_etc(fFinishTransfersSem, semCount, B_RELATIVE_TIMEOUT, 0);
+
+		// Pull out the done list and reverse its order
+		// for both general and isochronous descriptors
+		addr_t done_list = fHcca->done_head & ~OHCI_DONE_INTERRUPTS;
+		addr_t logical = _LogicalAddress(done_list);
+		if (_IsIsochronous(logical)) {
+			ohci_general_td *descriptor = (ohci_general_td *)logical;
+		} else {
+			ohci_isochronous_td *descriptor = (ohci_isochronous_td *)logical;
+		}
+
+		// Acknowledge the interrupt
+		fHcca->done_head = 0;
+		_WriteReg(OHCI_INTERRUPT_ENABLE, OHCI_WRITEBACK_DONE_HEAD);
+
 	}
+}
+
+
+addr_t
+OHCI::_LogicalAddress(addr_t physical)
+{
+	// How do I implement it ?
+	// 1 - Hash function like others (*BSD, Linux)
+	// 2 - Adding a method to our slab allocator (
+	//		offset from the base are the same for phys and logic)
+	return 0;
+}
+
+
+bool
+OHCI::_IsIsochronous(addr_t logical)
+{
+	// I have NO IDEA how to implement this.
+	// BSD uses two hash table.
+	return false;
 }
 
 
@@ -461,6 +507,7 @@ OHCI::Start()
 status_t
 OHCI::SubmitTransfer(Transfer *transfer)
 {
+	// short circuit the root hub
 	if (transfer->TransferPipe()->DeviceAddress() == fRootHubAddress)
 		return fRootHub->ProcessTransfer(this, transfer);
 
@@ -522,10 +569,11 @@ OHCI::_SubmitControlRequest(Transfer *transfer)
 	vector.iov_len = sizeof(usb_request_data);
 	_WriteDescriptorChain(setupDescriptor, &vector, 1);
 
+	status_t  result;
 	if (transfer->VectorCount() > 0) {
 		ohci_general_td *dataDescriptor = NULL;
 		ohci_general_td *lastDescriptor = NULL;
-		status_t result = _CreateDescriptorChain(&dataDescriptor,
+		result = _CreateDescriptorChain(&dataDescriptor,
 			&lastDescriptor,
 			directionIn ? OHCI_TD_DIRECTION_PID_OUT : OHCI_TD_DIRECTION_PID_IN,
 			transfer->VectorLength());
@@ -556,7 +604,24 @@ OHCI::_SubmitControlRequest(Transfer *transfer)
 	// 3. Tell the controller to process the control list
 	_WriteReg(OHCI_COMMAND_STATUS, OHCI_CONTROL_LIST_FILLED);
 
+	result = _AddPendingTransfer(transfer, setupDescriptor, statusDescriptor,
+		directionIn);
+	if (result < B_OK) {
+		TRACE_ERROR(("usb_ohci: failed to add pending transfer\n"));
+		_FreeDescriptorChain(setupDescriptor);
+		return result;
+	}
+
 	return B_OK;
+}
+
+
+status_t
+OHCI::_AddPendingTransfer(Transfer *transfer, ohci_general_td *first,
+	ohci_general_td *last, bool direction)
+{
+	// TODO
+	return B_ERROR;
 }
 
 
@@ -580,6 +645,13 @@ OHCI::_CreateDescriptorChain(ohci_general_td **_firstDescriptor,
 	ohci_general_td **_lastDescriptor, uint8 direction, size_t bufferSize)
 {
 	return B_ERROR;
+}
+
+
+void
+OHCI::_FreeDescriptorChain(ohci_general_td *top)
+{
+	// TODO
 }
 
 
@@ -911,6 +983,20 @@ OHCI::_FreeGeneralDescriptor(ohci_general_td *descriptor)
 
 	fStack->FreeChunk((void *)descriptor, (void *)descriptor->physical_address,
 		sizeof(ohci_general_td));
+}
+
+
+ohci_isochronous_td*
+_CreateIsochronousDescriptor()
+{
+	// TODO
+	return NULL;
+}
+
+
+void _FreeIsochronousDescriptor(ohci_isochronous_td *descriptor)
+{
+	// TODO
 }
 
 

@@ -375,7 +375,7 @@ typedef struct ohci_isochronous_td
 {
 	uint32		flags;
 	uint32		buffer_page_byte_0;			// Physical page number of byte 0
-	uint32		next_descriptor;			// Next isochronous transfer descriptor
+	uint32		next_physical_descriptor;	// Next isochronous transfer descriptor
 	uint32		last_byte_address;			// Physical buffer end
 	uint16		offset[OHCI_ITD_NOFFSET];	// Buffer offsets
 };
