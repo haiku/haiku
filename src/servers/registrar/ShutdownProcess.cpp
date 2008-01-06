@@ -61,6 +61,9 @@ static const bigtime_t kNonAppQuitTimeout = 500000; // 0.5 s
 // the shutdown window before closing it automatically.
 static const bigtime_t kDisplayAbortingAppTimeout = 3000000; // 3 s
 
+static const int kStripeWidth = 30;
+static const int kIconVSpacing = 6;
+static const int kIconSize = 32;
 
 // message what fields (must not clobber the registrar's message namespace)
 enum {
@@ -248,7 +251,7 @@ public:
 		// create the views
 
 		// root view
-		fRootView = new(nothrow) TAlertView(BRect(0, 0, 100,  15), "app icons",
+		fRootView = new(nothrow) TAlertView(BRect(0, 0, 10,  10), "app icons",
 			B_FOLLOW_NONE, 0);
 		if (!fRootView)
 			return B_NO_MEMORY;
@@ -351,8 +354,7 @@ public:
 		fTextView->SetText("two\nlines");
 		int textHeight = (int)fTextView->TextHeight(0, 1) + 1;
 
-		int rightPartX = fRootView->Frame().IntegerWidth()
-			+ 1;
+		int rightPartX = kStripeWidth + kIconSize / 2 + 1;
 		int textX = rightPartX + kInnerHSpacing;
 		int textY = kVSpacing;
 		int buttonsY = textY + textHeight + kInnerVSpacing;
@@ -533,7 +535,7 @@ private:
 		virtual void Draw(BRect updateRect)
 		{
 			BRect stripeRect = Bounds();
-			stripeRect.right = 30;
+			stripeRect.right = kStripeWidth;
 			SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
 			FillRect(stripeRect);
 			
@@ -544,7 +546,8 @@ private:
 				} else
 					SetDrawingMode(B_OP_OVER);
 				
-				DrawBitmapAsync(fAppInfo->largeIcon, BPoint(18, 6));
+				DrawBitmapAsync(fAppInfo->largeIcon,
+					BPoint(kStripeWidth - kIconSize / 2, kIconVSpacing));
 			}
 		}
 
