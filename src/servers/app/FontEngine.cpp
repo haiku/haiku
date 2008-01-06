@@ -332,12 +332,25 @@ decompose_ft_bitmap_gray8(const FT_Bitmap& bitmap, int x, int y,
 	}
 	for (i = 0; i < bitmap.rows; i++) {
 		sl.reset_spans();
-		const uint8* p = buf;
-		for (j = 0; j < bitmap.width; j++) {
-			if (*p)
-				sl.add_cell(x + j, *p);
-			++p;
-		}
+
+		if (bitmap.pixel_mode == FT_PIXEL_MODE_MONO) {
+			// font has built-in mono bitmap
+			agg::bitset_iterator bits(buf, 0);
+			int j;
+			for (j = 0; j < bitmap.width; j++) {
+				if (bits.bit())
+					sl.add_cell(x + j, agg::cover_full);
+				++bits;
+			}
+		} else {
+			const uint8* p = buf;
+			for (j = 0; j < bitmap.width; j++) {
+				if (*p)
+					sl.add_cell(x + j, *p);
+				++p;
+			}
+ 		}
+
 		buf += pitch;
 		if (sl.num_spans()) {
 			sl.finalize(y - i - 1);
@@ -422,46 +435,41 @@ FontEngine::PrepareGlyph(unsigned glyphCode)
 
 	switch(fGlyphRendering) {
 		case glyph_ren_native_mono:
-		case glyph_ren_native_gray8:
-			fLastError = FT_Render_Glyph(fFace->glyph,
-						     fGlyphRendering == glyph_ren_native_mono ?
-							FT_RENDER_MODE_MONO : FT_RENDER_MODE_NORMAL);
+			fLastError = FT_Render_Glyph(fFace->glyph, FT_RENDER_MODE_MONO);
 			if (fLastError == 0) {
-				switch (fFace->glyph->bitmap.pixel_mode) {
-					case FT_PIXEL_MODE_MONO:
-						decompose_ft_bitmap_mono(fFace->glyph->bitmap, 
-							fFace->glyph->bitmap_left,
-							kFlipY ? -fFace->glyph->bitmap_top
-							: fFace->glyph->bitmap_top,
-							kFlipY, fScanlineBin, fScanlineStorageBin);
-						fBounds.x1 = fScanlineStorageBin.min_x();
-						fBounds.y1 = fScanlineStorageBin.min_y();
-						fBounds.x2 = fScanlineStorageBin.max_x();
-						fBounds.y2 = fScanlineStorageBin.max_y();
-						fDataSize = fScanlineStorageBin.byte_size(); 
-						fDataType = glyph_data_mono;
-						return true;
-
-					case FT_PIXEL_MODE_GRAY:
-						decompose_ft_bitmap_gray8(fFace->glyph->bitmap, 
-							fFace->glyph->bitmap_left,
-							kFlipY ? -fFace->glyph->bitmap_top
-							: fFace->glyph->bitmap_top,
-							kFlipY, fScanlineAA, fScanlineStorageAA);
-						fBounds.x1 = fScanlineStorageAA.min_x();
-						fBounds.y1 = fScanlineStorageAA.min_y();
-						fBounds.x2 = fScanlineStorageAA.max_x();
-						fBounds.y2 = fScanlineStorageAA.max_y();
-						fDataSize = fScanlineStorageAA.byte_size(); 
-						fDataType = glyph_data_gray8;
-						return true;
-
-					default:
-						break;
-				}
+				decompose_ft_bitmap_mono(fFace->glyph->bitmap,
+					fFace->glyph->bitmap_left, kFlipY ?
+					-fFace->glyph->bitmap_top : fFace->glyph->bitmap_top,
+					kFlipY, fScanlineBin, fScanlineStorageBin);
+				fBounds.x1 = fScanlineStorageBin.min_x();
+				fBounds.y1 = fScanlineStorageBin.min_y();
+				fBounds.x2 = fScanlineStorageBin.max_x();
+				fBounds.y2 = fScanlineStorageBin.max_y();
+				fDataSize = fScanlineStorageBin.byte_size(); 
+				fDataType = glyph_data_mono;
+				return true;
 			}
 			break;
-
+	
+	
+		case glyph_ren_native_gray8:
+			fLastError = FT_Render_Glyph(fFace->glyph, FT_RENDER_MODE_NORMAL);
+			if (fLastError == 0) {
+				decompose_ft_bitmap_gray8(fFace->glyph->bitmap, 
+					fFace->glyph->bitmap_left, kFlipY ?
+					-fFace->glyph->bitmap_top : fFace->glyph->bitmap_top,
+					kFlipY, fScanlineAA, fScanlineStorageAA);
+				fBounds.x1 = fScanlineStorageAA.min_x();
+				fBounds.y1 = fScanlineStorageAA.min_y();
+				fBounds.x2 = fScanlineStorageAA.max_x();
+				fBounds.y2 = fScanlineStorageAA.max_y();
+				fDataSize = fScanlineStorageAA.byte_size(); 
+				fDataType = glyph_data_gray8;
+				return true;
+			}
+			break;
+	
+	
 		case glyph_ren_outline:
 			fPath.remove_all();
 			if (decompose_ft_outline(fFace->glyph->outline, kFlipY, fPath)) {
@@ -513,8 +521,7 @@ FontEngine::GetKerning(unsigned first, unsigned second,
 {
 	if (fFace && first && second && FT_HAS_KERNING(fFace)) {
 		FT_Vector delta;
-		FT_Get_Kerning(fFace, first, second,
-					   FT_KERNING_DEFAULT, &delta);
+		FT_Get_Kerning(fFace, first, second, FT_KERNING_DEFAULT, &delta);
 
 		double dx = int26p6_to_dbl(delta.x);
 		double dy = int26p6_to_dbl(delta.y);
@@ -545,16 +552,11 @@ FontEngine::Init(const char* fontFilePath, unsigned faceIndex, double size,
 
 	FT_Done_Face(fFace);
 	if (fontFileBuffer && fontFileBufferSize) {
-		fLastError = FT_New_Memory_Face(fLibrary, 
-										  (const FT_Byte*)fontFileBuffer, 
-										  fontFileBufferSize, 
-										  faceIndex, 
-										  &fFace);
+		fLastError = FT_New_Memory_Face(fLibrary,
+			(const FT_Byte*)fontFileBuffer, fontFileBufferSize,
+			faceIndex, &fFace);
 	} else {
-		fLastError = FT_New_Face(fLibrary,
-								   fontFilePath,
-								   faceIndex,
-								   &fFace);
+		fLastError = FT_New_Face(fLibrary, fontFilePath, faceIndex, &fFace);
 	}
 
 	if (fLastError != 0)
