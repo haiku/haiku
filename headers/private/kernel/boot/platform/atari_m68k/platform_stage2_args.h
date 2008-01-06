@@ -10,6 +10,7 @@
 #endif
 
 struct platform_stage2_args {
+	int dummy;
 };
 
 #endif	/* KERNEL_BOOT_PLATFORM_ATARI_M68K_STAGE2_ARGS_H */
