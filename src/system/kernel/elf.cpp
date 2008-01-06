@@ -62,8 +62,7 @@ static mutex sImageLoadMutex;	// serializes loading/unloading add-ons
 static bool sInitialized = false;
 
 
-/** calculates hash for an image using its ID */
-
+/*! Calculates hash for an image using its ID */
 static uint32
 image_hash(void *_image, const void *_key, uint32 range)
 {
@@ -77,8 +76,7 @@ image_hash(void *_image, const void *_key, uint32 range)
 }
 
 
-/** compares an image to a given ID */
-
+/*!	Compares an image to a given ID */
 static int
 image_compare(void *_image, const void *_key)
 {
@@ -117,8 +115,7 @@ register_elf_image(struct elf_image_info *image)
 }
 
 
-/**	Note, you must lock the image mutex when you call this function. */
-
+/*!	Note, you must lock the image mutex when you call this function. */
 static struct elf_image_info *
 find_image_at_address(addr_t address)
 {
@@ -481,28 +478,34 @@ elf_parse_dynamic_section(struct elf_image_info *image)
 				neededOffset = d[i].d_un.d_ptr + image->text_region.delta;
 				break;
 			case DT_HASH:
-				image->symhash = (uint32 *)(d[i].d_un.d_ptr + image->text_region.delta);
+				image->symhash = (uint32 *)(d[i].d_un.d_ptr
+					+ image->text_region.delta);
 				break;
 			case DT_STRTAB:
-				image->strtab = (char *)(d[i].d_un.d_ptr + image->text_region.delta);
+				image->strtab = (char *)(d[i].d_un.d_ptr
+					+ image->text_region.delta);
 				break;
 			case DT_SYMTAB:
-				image->syms = (struct Elf32_Sym *)(d[i].d_un.d_ptr + image->text_region.delta);
+				image->syms = (struct Elf32_Sym *)(d[i].d_un.d_ptr
+					+ image->text_region.delta);
 				break;
 			case DT_REL:
-				image->rel = (struct Elf32_Rel *)(d[i].d_un.d_ptr + image->text_region.delta);
+				image->rel = (struct Elf32_Rel *)(d[i].d_un.d_ptr
+					+ image->text_region.delta);
 				break;
 			case DT_RELSZ:
 				image->rel_len = d[i].d_un.d_val;
 				break;
 			case DT_RELA:
-				image->rela = (struct Elf32_Rela *)(d[i].d_un.d_ptr + image->text_region.delta);
+				image->rela = (struct Elf32_Rela *)(d[i].d_un.d_ptr
+					+ image->text_region.delta);
 				break;
 			case DT_RELASZ:
 				image->rela_len = d[i].d_un.d_val;
 				break;
 			case DT_JMPREL:
-				image->pltrel = (struct Elf32_Rel *)(d[i].d_un.d_ptr + image->text_region.delta);
+				image->pltrel = (struct Elf32_Rel *)(d[i].d_un.d_ptr
+					+ image->text_region.delta);
 				break;
 			case DT_PLTRELSZ:
 				image->pltrel_len = d[i].d_un.d_val;
@@ -520,7 +523,7 @@ elf_parse_dynamic_section(struct elf_image_info *image)
 	if (!image->symhash || !image->syms || !image->strtab)
 		return B_ERROR;
 
-	TRACE(("needed_offset = %d\n", neededOffset));
+	TRACE(("needed_offset = %ld\n", neededOffset));
 
 	if (neededOffset >= 0)
 		image->needed = STRING(image, neededOffset);
@@ -529,64 +532,74 @@ elf_parse_dynamic_section(struct elf_image_info *image)
 }
 
 
-/**	this function first tries to see if the first image and it's already resolved symbol is okay, otherwise
- *	it tries to link against the shared_image
- *	XXX gross hack and needs to be done better
- */
-
+/*!	Resolves the \a symbol by linking against \a sharedImage if necessary.
+	Returns the resolved symbol's address in \a _symbolAddress.
+	TODO: eventually get rid of "symbolPrepend"
+*/
 status_t
-elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *sym,
-	struct elf_image_info *shared_image, const char *sym_prepend, addr_t *sym_addr)
+elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *symbol,
+	struct elf_image_info *sharedImage, const char *symbolPrepend,
+	addr_t *_symbolAddress)
 {
-	struct Elf32_Sym *sym2;
-	char new_symname[512];
-
-	switch (sym->st_shndx) {
+	switch (symbol->st_shndx) {
 		case SHN_UNDEF:
+		{
+			struct Elf32_Sym *newSymbol;
+			char newNameBuffer[368];
+			char *newName;
+
 			// patch the symbol name
-			strlcpy(new_symname, sym_prepend, sizeof(new_symname));
-			strlcat(new_symname, SYMNAME(image, sym), sizeof(new_symname));
+			if (symbolPrepend) {
+				newName = newNameBuffer;
+				strlcpy(newName, symbolPrepend, sizeof(newName));
+				strlcat(newName, SYMNAME(image, symbol), sizeof(newName));
+			} else
+				newName = SYMNAME(image, symbol);
 
 			// it's undefined, must be outside this image, try the other image
-			sym2 = elf_find_symbol(shared_image, new_symname);
-			if (!sym2) {
+			newSymbol = elf_find_symbol(sharedImage, newName);
+			if (newSymbol == NULL) {
 				dprintf("\"%s\": could not resolve symbol '%s'\n",
-					image->name, new_symname);
+					image->name, newName);
 				return B_MISSING_SYMBOL;
 			}
 
 			// make sure they're the same type
-			if (ELF32_ST_TYPE(sym->st_info) != ELF32_ST_TYPE(sym2->st_info)) {
-				dprintf("elf_resolve_symbol: found symbol '%s' in shared image but wrong type\n", new_symname);
+			if (ELF32_ST_TYPE(symbol->st_info)
+					!= ELF32_ST_TYPE(newSymbol->st_info)) {
+				dprintf("elf_resolve_symbol: found symbol '%s' in shared image but wrong type\n", newName);
 				return B_MISSING_SYMBOL;
 			}
 
-			if (ELF32_ST_BIND(sym2->st_info) != STB_GLOBAL && ELF32_ST_BIND(sym2->st_info) != STB_WEAK) {
-				TRACE(("elf_resolve_symbol: found symbol '%s' but not exported\n", new_symname));
+			if (ELF32_ST_BIND(newSymbol->st_info) != STB_GLOBAL
+				&& ELF32_ST_BIND(newSymbol->st_info) != STB_WEAK) {
+				TRACE(("elf_resolve_symbol: found symbol '%s' but not exported\n", newName));
 				return B_MISSING_SYMBOL;
 			}
 
-			*sym_addr = sym2->st_value + shared_image->text_region.delta;
-			return B_NO_ERROR;
+			*_symbolAddress = newSymbol->st_value
+				+ sharedImage->text_region.delta;
+			return B_OK;
+		}
 		case SHN_ABS:
-			*sym_addr = sym->st_value;
-			return B_NO_ERROR;
+			*_symbolAddress = symbol->st_value;
+			return B_OK;
 		case SHN_COMMON:
 			// ToDo: finish this
 			TRACE(("elf_resolve_symbol: COMMON symbol, finish me!\n"));
 			return B_ERROR;
+
 		default:
 			// standard symbol
-			*sym_addr = sym->st_value + image->text_region.delta;
-			return B_NO_ERROR;
+			*_symbolAddress = symbol->st_value + image->text_region.delta;
+			return B_OK;
 	}
 }
 
 
-/** Until we have shared library support, just links against the kernel */
-
+/*! Until we have shared library support, just links against the kernel */
 static int
-elf_relocate(struct elf_image_info *image, const char *sym_prepend)
+elf_relocate(struct elf_image_info *image, const char *symbolPrepend)
 {
 	int status = B_NO_ERROR;
 
@@ -594,26 +607,33 @@ elf_relocate(struct elf_image_info *image, const char *sym_prepend)
 
 	// deal with the rels first
 	if (image->rel) {
-		TRACE(("total %i relocs\n", image->rel_len / (int)sizeof(struct Elf32_Rel)));
+		TRACE(("total %i relocs\n",
+			image->rel_len / (int)sizeof(struct Elf32_Rel)));
 
-		status = arch_elf_relocate_rel(image, sym_prepend, sKernelImage, image->rel, image->rel_len);
+		status = arch_elf_relocate_rel(image, symbolPrepend, sKernelImage,
+			image->rel, image->rel_len);
 		if (status < B_OK)
 			return status;
 	}
 
 	if (image->pltrel) {
-		TRACE(("total %i plt-relocs\n", image->pltrel_len / (int)sizeof(struct Elf32_Rel)));
+		TRACE(("total %i plt-relocs\n",
+			image->pltrel_len / (int)sizeof(struct Elf32_Rel)));
 
-		if (image->pltrel_type == DT_REL)
-			status = arch_elf_relocate_rel(image, sym_prepend, sKernelImage, image->pltrel, image->pltrel_len);
-		else
-			status = arch_elf_relocate_rela(image, sym_prepend, sKernelImage, (struct Elf32_Rela *)image->pltrel, image->pltrel_len);
+		if (image->pltrel_type == DT_REL) {
+			status = arch_elf_relocate_rel(image, symbolPrepend, sKernelImage,
+				image->pltrel, image->pltrel_len);
+		} else {
+			status = arch_elf_relocate_rela(image, symbolPrepend, sKernelImage,
+				(struct Elf32_Rela *)image->pltrel, image->pltrel_len);
+		}
 		if (status < B_OK)
 			return status;
 	}
 
 	if (image->rela) {
-		status = arch_elf_relocate_rela(image, sym_prepend, sKernelImage, image->rela, image->rela_len);
+		status = arch_elf_relocate_rela(image, symbolPrepend, sKernelImage,
+			image->rela, image->rela_len);
 		if (status < B_OK)
 			return status;
 	}
@@ -809,7 +829,7 @@ insert_preloaded_image(struct preloaded_image *preloadedImage, bool kernel)
 		goto error1;
 
 	if (!kernel) {
-		status = elf_relocate(image, "");
+		status = elf_relocate(image, NULL);
 		if (status < B_OK)
 			goto error1;
 	} else
@@ -841,8 +861,7 @@ error1:
 }
 
 
-//	#pragma mark -
-//	public kernel API
+//	#pragma mark - public kernel API
 
 
 status_t
@@ -881,15 +900,13 @@ done:
 }
 
 
-//	#pragma mark -
-//	kernel private API
+//	#pragma mark - kernel private API
 
 
-/**	Looks up a symbol by address in all images loaded in kernel space.
- *	Note, if you need to call this function outside a debugger, make
- *	sure you fix locking and the way it returns its information, first!
- */
-
+/*!	Looks up a symbol by address in all images loaded in kernel space.
+	Note, if you need to call this function outside a debugger, make
+	sure you fix locking and the way it returns its information, first!
+*/
 status_t
 elf_debug_lookup_symbol_address(addr_t address, addr_t *_baseAddress,
 	const char **_symbolName, const char **_imageName, bool *_exactMatch)
@@ -1322,7 +1339,7 @@ load_kernel_add_on(const char *path)
 		char regionName[B_OS_NAME_LENGTH];
 		elf_region *region;
 
-		TRACE(("looking at program header %d\n", i));
+		TRACE(("looking at program header %ld\n", i));
 
 		switch (programHeaders[i].p_type) {
 			case PT_LOAD:
@@ -1410,7 +1427,7 @@ load_kernel_add_on(const char *path)
 	if (status < B_OK)
 		goto error5;
 
-	status = elf_relocate(image, "");
+	status = elf_relocate(image, NULL);
 	if (status < B_OK)
 		goto error5;
 
