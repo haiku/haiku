@@ -57,7 +57,7 @@ file_map::file_map(fssh_off_t _size)
 {
 	array = NULL;
 	count = 0;
-	size = size;
+	size = _size;
 }
 
 
@@ -91,7 +91,7 @@ fssh_status_t
 file_map::Add(fssh_file_io_vec *vecs, fssh_size_t vecCount,
 	fssh_off_t &lastOffset)
 {
-	TRACE(("file_map::Add(vecCount = %ld)\n", vecCount));
+	TRACE(("file_map::Add(vecCount = %u)\n", vecCount));
 
 	fssh_off_t offset = 0;
 
@@ -129,7 +129,7 @@ file_map::Add(fssh_file_io_vec *vecs, fssh_size_t vecCount,
 #ifdef TRACE_FILE_MAP
 	for (uint32_t i = 0; i < count; i++) {
 		file_extent *extent = ExtentAt(i);
-		fssh_dprintf("[%ld] extend offset %Ld, disk offset %Ld, length %Ld\n",
+		fssh_dprintf("[%u] extend offset %Ld, disk offset %Ld, length %Ld\n",
 			i, extent->offset, extent->disk.offset, extent->disk.length);
 	}
 #endif
@@ -183,7 +183,7 @@ extern "C" void *
 fssh_file_map_create(fssh_mount_id mountID, fssh_vnode_id vnodeID,
 	fssh_off_t size)
 {
-	TRACE(("file_map_create(mountID = %ld, vnodeID = %Ld)\n", mountID, vnodeID));
+	TRACE(("file_map_create(mountID = %d, vnodeID = %Ld)\n", mountID, vnodeID));
 
 	file_map *map = new file_map(size);
 	if (map == NULL)
@@ -249,7 +249,7 @@ fssh_file_map_translate(void *_map, fssh_off_t offset, fssh_size_t size,
 	fssh_size_t maxVecs = *_count;
 	fssh_status_t status = FSSH_B_OK;
 
-	if (offset > map.size) {
+	if (offset >= map.size) {
 		*_count = 0;
 		return FSSH_B_OK;
 	}
