@@ -253,7 +253,7 @@ file_map_translate(void *_map, off_t offset, size_t size, file_io_vec *vecs,
 	size_t maxVecs = *_count;
 	status_t status = B_OK;
 
-	if (offset > map.size) {
+	if (offset >= map.size) {
 		*_count = 0;
 		return B_OK;
 	}

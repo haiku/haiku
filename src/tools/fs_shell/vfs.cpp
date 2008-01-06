@@ -1749,7 +1749,7 @@ common_file_io_vec_pages(int fd, const fssh_file_io_vec *fileVecs,
 	fssh_status_t status;
 	fssh_size_t size;
 
-	if (!doWrite) {
+	if (!doWrite && vecOffset == 0) {
 		// now directly read the data from the device
 		// the first file_io_vec can be read directly
 
@@ -1757,8 +1757,8 @@ common_file_io_vec_pages(int fd, const fssh_file_io_vec *fileVecs,
 		if (size > numBytes)
 			size = numBytes;
 
-		status = fssh_read_pages(fd, fileVecs[0].offset, vecs, vecCount,
-			&size, false);
+		status = fssh_read_pages(fd, fileVecs[0].offset, &vecs[vecIndex],
+			vecCount - vecIndex, &size, false);
 		if (status < FSSH_B_OK)
 			return status;
 
@@ -1790,9 +1790,11 @@ common_file_io_vec_pages(int fd, const fssh_file_io_vec *fileVecs,
 		for (; vecIndex < vecCount; vecIndex++) {
 			if (size < vecs[vecIndex].iov_len)
 				break;
-	
+
 			size -= vecs[vecIndex].iov_len;
 		}
+
+		vecOffset = size;
 	} else {
 		fileVecIndex = 0;
 		size = 0;

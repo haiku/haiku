@@ -2594,7 +2594,7 @@ common_file_io_vec_pages(struct vnode *vnode, void *cookie,
 	status_t status;
 	size_t size;
 
-	if (!doWrite) {
+	if (!doWrite && vecOffset == 0) {
 		// now directly read the data from the device
 		// the first file_io_vec can be read directly
 
@@ -2603,8 +2603,8 @@ common_file_io_vec_pages(struct vnode *vnode, void *cookie,
 			size = numBytes;
 
 		status = FS_CALL(vnode, read_pages)(vnode->mount->cookie,
-			vnode->private_node, cookie, fileVecs[0].offset, vecs, vecCount,
-			&size, false);
+			vnode->private_node, cookie, fileVecs[0].offset, &vecs[vecIndex],
+			vecCount - vecIndex, &size, false);
 		if (status < B_OK)
 			return status;
 
@@ -2636,9 +2636,11 @@ common_file_io_vec_pages(struct vnode *vnode, void *cookie,
 		for (; vecIndex < vecCount; vecIndex++) {
 			if (size < vecs[vecIndex].iov_len)
 				break;
-	
+
 			size -= vecs[vecIndex].iov_len;
 		}
+
+		vecOffset = size;
 	} else {
 		fileVecIndex = 0;
 		size = 0;
