@@ -143,7 +143,7 @@ create_data_header(size_t headerSpace)
 	header->first_free = NULL;
 	header->first_node = NULL;
 
-	TRACE(("  create new data header %p\n", header));
+	TRACE(("%ld:   create new data header %p\n", find_thread(NULL), header));
 	return header;
 }
 
@@ -154,7 +154,7 @@ release_data_header(data_header *header)
 	if (atomic_add(&header->ref_count, -1) != 1)
 		return;
 
-	TRACE(("  free header %p\n", header));
+	TRACE(("%ld:   free header %p\n", find_thread(NULL), header));
 	free_data_header(header);
 }
 
@@ -242,7 +242,7 @@ init_first_data_node(data_node *node)
 	node->start = header->data_end + header->data_space;
 	node->used = 0;
 	node->header_space = header->data_space;
-	node->tail_space = MAX_FREE_BUFFER_SIZE - header->data_space;
+	node->tail_space = (uint8 *)header + BUFFER_SIZE - node->start;
 
 	header->first_node = node;
 }
@@ -259,7 +259,9 @@ add_data_node(data_header *header, data_header *located = NULL)
 	if (node == NULL)
 		return NULL;
 
-	TRACE(("  add data node %p to header %p\n", node, header));
+	TRACE(("%ld:   add data node %p to header %p\n", find_thread(NULL), node,
+		header));
+
 	acquire_data_header(header);
 	if (located != header)
 		acquire_data_header(located);
@@ -276,8 +278,8 @@ remove_data_node(data_node *node)
 {
 	data_header *located = node->located;
 
-	TRACE(("  remove data node %p from header %p (located %p)\n",
-		node, node->header, located));
+	TRACE(("%ld:   remove data node %p from header %p (located %p)\n",
+		find_thread(NULL), node, node->header, located));
 
 	if (located != node->header)
 		release_data_header(node->header);
@@ -299,7 +301,7 @@ static inline data_node *
 get_node_at_offset(net_buffer_private *buffer, size_t offset)
 {
 	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
-	while (node->offset + node->used < offset) {
+	while (node->offset + node->used <= offset) {
 		node = (data_node *)list_get_next_item(&buffer->buffers, node);
 		if (node == NULL)
 			return NULL;
@@ -336,7 +338,7 @@ create_buffer(size_t headerSpace)
 	if (buffer == NULL)
 		return NULL;
 
-	TRACE(("create buffer %p\n", buffer));
+	TRACE(("%ld: create buffer %p\n", find_thread(NULL), buffer));
 
 	data_header *header = create_data_header(headerSpace);
 	if (header == NULL) {
@@ -373,7 +375,7 @@ free_buffer(net_buffer *_buffer)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 
-	TRACE(("free buffer %p\n", buffer));
+	TRACE(("%ld: free buffer %p\n", find_thread(NULL), buffer));
 
 	data_node *node;
 	while ((node = (data_node *)list_remove_head_item(&buffer->buffers)) != NULL) {
@@ -392,10 +394,14 @@ duplicate_buffer(net_buffer *_buffer)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 
+	TRACE(("%ld: duplicate_buffer(buffer %p)\n", find_thread(NULL), buffer));
+
 	net_buffer *duplicate = create_buffer(buffer->first_node.header_space);
 	if (duplicate == NULL)
 		return NULL;
 
+	TRACE(("%ld:   duplicate: %p)\n", find_thread(NULL), duplicate));
+	
 	// copy the data from the source buffer
 
 	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
@@ -429,11 +435,13 @@ clone_buffer(net_buffer *_buffer, bool shareFreeSpace)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 
-	TRACE(("clone_buffer(buffer %p)\n", buffer));
+	TRACE(("%ld: clone_buffer(buffer %p)\n", find_thread(NULL), buffer));
 
 	net_buffer_private *clone = allocate_net_buffer();
 	if (clone == NULL)
 		return NULL;
+
+	TRACE(("%ld:   clone: %p\n", find_thread(NULL), buffer));
 
 	data_node *sourceNode = (data_node *)list_get_first_item(&buffer->buffers);
 	if (sourceNode == NULL) {
@@ -504,7 +512,8 @@ split_buffer(net_buffer *from, uint32 offset)
 	if (buffer == NULL)
 		return NULL;
 
-	TRACE(("split_buffer(buffer %p -> %p, offset %ld)\n", from, buffer, offset));
+	TRACE(("%ld: split_buffer(buffer %p -> %p, offset %ld)\n",
+		find_thread(NULL), from, buffer, offset));
 
 	if (trim_data(buffer, offset) == B_OK) {
 		if (remove_header(from, offset) == B_OK)
@@ -530,7 +539,8 @@ merge_buffer(net_buffer *_buffer, net_buffer *_with, bool after)
 	if (with == NULL)
 		return B_BAD_VALUE;
 
-	TRACE(("merge buffer %p with %p (%s)\n", buffer, with, after ? "after" : "before"));
+	TRACE(("%ld: merge buffer %p with %p (%s)\n", find_thread(NULL), buffer,
+		with, after ? "after" : "before"));
 	//dump_buffer(buffer);
 	//dprintf("with:\n");
 	//dump_buffer(with);
@@ -685,8 +695,8 @@ prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
 
-	TRACE(("prepend_size(buffer %p, size %ld) [has %ld]\n", buffer, size,
-		node->header_space));
+	TRACE(("%ld: prepend_size(buffer %p, size %ld) [has %u]\n",
+		find_thread(NULL), buffer, size, node->header_space));
 	//dump_buffer(buffer);
 
 	if (node->header_space < size) {
@@ -779,7 +789,8 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 	data_node *node = (data_node *)list_get_last_item(&buffer->buffers);
 
-	TRACE(("append_size(buffer %p, size %ld)\n", buffer, size));
+	TRACE(("%ld: append_size(buffer %p, size %ld)\n", find_thread(NULL),
+		buffer, size));
 	//dump_buffer(buffer);
 
 	if (node->tail_space < size) {
@@ -787,19 +798,19 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 
 		// compute how many buffers we're going to need
 		// TODO: this doesn't leave any tail space, if that should be desired...
-		uint32 tailSpace = node->tail_space;
+		uint32 previousTailSpace = node->tail_space;
 		uint32 minimalHeaderSpace = sizeof(data_header) + 3 * sizeof(data_node);
-		uint32 sizeNeeded = size - tailSpace;
+		uint32 sizeNeeded = size - previousTailSpace;
 		uint32 count = (sizeNeeded + BUFFER_SIZE - minimalHeaderSpace - 1)
 			/ (BUFFER_SIZE - minimalHeaderSpace);
 		uint32 headerSpace = BUFFER_SIZE - sizeNeeded / count - sizeof(data_header);
 		uint32 sizeUsed = MAX_FREE_BUFFER_SIZE - headerSpace;
-		uint32 sizeAdded = tailSpace;
+		uint32 sizeAdded = previousTailSpace;
 
 		// allocate space left in the node
-		node->tail_space -= tailSpace;
-		node->used += tailSpace;
-		buffer->size += tailSpace;
+		node->tail_space = 0;
+		node->used += previousTailSpace;
+		buffer->size += previousTailSpace;
 
 		// allocate all buffers
 
@@ -883,7 +894,8 @@ remove_header(net_buffer *_buffer, size_t bytes)
 	if (bytes > buffer->size)
 		return B_BAD_VALUE;
 
-	TRACE(("remove_header(buffer %p, %ld bytes)\n", buffer, bytes));
+	TRACE(("%ld: remove_header(buffer %p, %ld bytes)\n", find_thread(NULL),
+		buffer, bytes));
 	//dump_buffer(buffer);
 
 	size_t left = bytes;
@@ -951,8 +963,8 @@ static status_t
 trim_data(net_buffer *_buffer, size_t newSize)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
-	TRACE(("trim_data(buffer %p, newSize = %ld, buffer size = %ld)\n",
-		buffer, newSize, buffer->size));
+	TRACE(("%ld: trim_data(buffer %p, newSize = %ld, buffer size = %ld)\n",
+		find_thread(NULL), buffer, newSize, buffer->size));
 	//dump_buffer(buffer);
 
 	if (newSize > buffer->size)
@@ -1002,8 +1014,8 @@ append_cloned_data(net_buffer *_buffer, net_buffer *_source, uint32 offset,
 
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 	net_buffer_private *source = (net_buffer_private *)_source;
-	TRACE(("append_cloned_data(buffer %p, source %p, offset = %ld, bytes = %ld)\n",
-		buffer, source, offset, bytes));
+	TRACE(("%ld: append_cloned_data(buffer %p, source %p, offset = %ld, "
+		"bytes = %ld)\n", find_thread(NULL), buffer, source, offset, bytes));
 
 	if (source->size < offset + bytes || source->size < offset)
 		return B_BAD_VALUE;
