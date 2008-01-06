@@ -76,15 +76,16 @@ WindowLayer::WindowLayer(const BRect& frame, const char *name,
 
 	fVisibleRegion(),
 	fVisibleContentRegion(),
-	fVisibleContentRegionValid(false),
 	fDirtyRegion(),
 	fDirtyCause(0),
 
 	fBorderRegion(),
-	fBorderRegionValid(false),
 	fContentRegion(),
-	fContentRegionValid(false),
 	fEffectiveDrawingRegion(),
+
+	fVisibleContentRegionValid(false),
+	fBorderRegionValid(false),
+	fContentRegionValid(false),
 	fEffectiveDrawingRegionValid(false),
 
 	fRegionPool(),
@@ -203,11 +204,9 @@ WindowLayer::GetFullRegion(BRegion* region)
 	// TODO: if someone needs to call this from
 	// the outside, the clipping needs to be readlocked!
 
+	// start from the decorator border, extend to use the frame
 	GetBorderRegion(region);
-
-	// start from the frame, extend to include decorator border
 	region->Include(fFrame);
-
 }
 
 // GetBorderRegion
@@ -218,25 +217,11 @@ WindowLayer::GetBorderRegion(BRegion* region)
 	// the outside, the clipping needs to be readlocked!
 
 	if (!fBorderRegionValid) {
-		// TODO: checkup Decorator::GetFootPrint() to see if it is as fast as this:
-/*		fBorderRegion.Set(BRect(fFrame.left - 4, fFrame.top - 20,
-							  	(fFrame.left + fFrame.right) / 2, fFrame.top - 5));
-		fBorderRegion.Include(BRect(fFrame.left - 4, fFrame.top - 4,
-									fFrame.right + 4, fFrame.top - 1));
-		fBorderRegion.Include(BRect(fFrame.left - 4, fFrame.top,
-									fFrame.left - 1, fFrame.bottom));
-		fBorderRegion.Include(BRect(fFrame.right + 1, fFrame.top,
-									fFrame.right + 4, fFrame.bottom - 11));
-		fBorderRegion.Include(BRect(fFrame.left - 4, fFrame.bottom + 1,
-									fFrame.right - 11, fFrame.bottom + 4));
-		fBorderRegion.Include(BRect(fFrame.right - 10, fFrame.bottom - 10,
-									fFrame.right + 4, fFrame.bottom + 4));*/
-
-		// TODO: remove and use Decorator::GetFootPrint()
-		// start from the frame, extend to include decorator border
-		if (fDecorator) {
+		if (fDecorator)
 			fDecorator->GetFootprint(&fBorderRegion);
-		}
+		else
+			fBorderRegion.MakeEmpty();
+
 		fBorderRegionValid = true;
 	}
 

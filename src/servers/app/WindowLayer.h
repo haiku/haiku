@@ -250,7 +250,6 @@ class WindowLayer {
 	
 			BRegion				fVisibleRegion;
 			BRegion				fVisibleContentRegion;
-			bool				fVisibleContentRegionValid;
 			// our part of the "global" dirty region
 			// it is calculated from the desktop thread,
 			// but we can write to it when we read locked
@@ -261,24 +260,26 @@ class WindowLayer {
 
 			// caching local regions
 			BRegion				fBorderRegion;
-			bool				fBorderRegionValid;
 			BRegion				fContentRegion;
-			bool				fContentRegionValid;
 			BRegion				fEffectiveDrawingRegion;
-			bool				fEffectiveDrawingRegionValid;
+
+			bool				fVisibleContentRegionValid : 1;
+			bool				fBorderRegionValid : 1;
+			bool				fContentRegionValid : 1;
+			bool				fEffectiveDrawingRegionValid : 1;
 
 			::RegionPool		fRegionPool;
 
 			BObjectList<WindowLayer> fSubsets;
 
 // TODO: remove those some day (let the decorator handle that stuff)
-			bool				fIsClosing;
-			bool				fIsMinimizing;
-			bool				fIsZooming;
-			bool				fIsResizing;
-			bool				fIsSlidingTab;
-			bool				fIsDragging;
-			bool				fActivateOnMouseUp;
+			bool				fIsClosing : 1;
+			bool				fIsMinimizing : 1;
+			bool				fIsZooming : 1;
+			bool				fIsResizing : 1;
+			bool				fIsSlidingTab : 1;
+			bool				fIsDragging : 1;
+			bool				fActivateOnMouseUp : 1;
 
 			::Decorator*		fDecorator;
 			ViewLayer*			fTopLayer;

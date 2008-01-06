@@ -474,9 +474,9 @@ DefaultDecorator::GetFootprint(BRegion *region)
 	if (fLook == B_NO_BORDER_WINDOW_LOOK)
 		return;
 
+	region->Include(fTopBorder);
 	region->Include(fLeftBorder);
 	region->Include(fRightBorder);
-	region->Include(fTopBorder);
 	region->Include(fBottomBorder);
 	
 	if (fLook == B_BORDERED_WINDOW_LOOK)
