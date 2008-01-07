@@ -1924,6 +1924,19 @@ BMenu::_DrawItems(BRect updateRect)
 }
 
 
+int
+BMenu::State(BMenuItem **item) const
+{
+	if (fState == MENU_STATE_TRACKING || fState == MENU_STATE_CLOSED)
+		return fState;
+
+	if (fSelected != NULL && fSelected->Submenu() != NULL)
+		return fSelected->Submenu()->State(item);
+
+	return fState;
+}
+
+
 void
 BMenu::InvokeItem(BMenuItem *item, bool now)
 {
