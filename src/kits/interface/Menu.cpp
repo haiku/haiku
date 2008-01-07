@@ -1413,10 +1413,8 @@ BMenu::_Track(int *action, long start)
 				fState = MENU_STATE_TRACKING;
 				UnlockLooper();
 				break;			
-			}
-			else {
-				if (!_OverSubmenu(fSelected, screenLocation)
-					&& system_time() > closeTime + kHysteresis
+			} else {
+				if (system_time() > closeTime + kHysteresis
 					&& fState != MENU_STATE_TRACKING_SUBMENU) {
 					_SelectItem(NULL);
 					fState = MENU_STATE_TRACKING;
