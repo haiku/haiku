@@ -384,7 +384,9 @@ BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool showMenu, BRect *speci
 	
 	fPrevFocusToken = -1;
 	fTracking = true;
-		
+	
+	// We are called from the window's thread,
+	// so let's call MenusBeginning() directly
 	window->MenusBeginning();
 	
 	fMenuSem = create_sem(0, "window close sem");
@@ -431,10 +433,7 @@ BMenuBar::_TrackTask(void *arg)
 	menuBar->fTracking = false;
 	menuBar->fExtraRect = NULL;
 
-	// Sends a _MENUS_DONE_ message to the BWindow.
-	// Weird: There is a _MENUS_DONE_ message but not a 
-	// _MENUS_BEGINNING_ message, in fact the MenusBeginning()
-	// hook function is called directly.
+	// We aren't the BWindow thread, so don't call MenusEnded() directly
 	BWindow *window = menuBar->Window();
 	window->PostMessage(_MENUS_DONE_);
 	
