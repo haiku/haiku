@@ -53,141 +53,82 @@ wait_for_drdy(ide_device_info *device)
 }
 
 
-/** reset entire IDE bus 
- *	all active request apart from <ignore> are resubmitted
- */
-
-bool
-reset_bus(ide_device_info *device, ide_qrequest *ignore)
+status_t
+reset_bus(ide_bus_info *bus, uint32 *sigDev0, uint32 *sigDev1)
 {
-	ide_bus_info *bus = device->bus;
 	ide_controller_interface *controller = bus->controller;
 	ide_channel_cookie channel = bus->channel_cookie;
+	ide_task_file tf;
+	status_t status;
 
-	dprintf("ide: reset_bus() device %p, bus %p\n", device, bus);
+	dprintf("ATA: reset_bus %p\n", bus);
 
-	FAST_LOG0(bus->log, ev_ide_reset_bus);
+	// disable interrupts and assert SRST for at least 5 usec
+	if (controller->write_device_control(channel, ide_devctrl_bit3 | ide_devctrl_nien | ide_devctrl_srst) != B_OK)
+		goto error;
+	spin(20);
 
-	if (device->reconnect_timer_installed) {
-		cancel_timer(&device->reconnect_timer.te);
-		device->reconnect_timer_installed = false;
+	// clear SRST for at least 2 ms
+	if (controller->write_device_control(channel, ide_devctrl_bit3 | ide_devctrl_nien) != B_OK)
+		goto error;
+	snooze(5000);
+
+	// wait up to 30 seconds for busy to clear, abort when error is set
+	status = ata_wait(bus, 0, ide_status_bsy, true, 33000000);
+	if (status != B_OK)
+		goto error;
+
+	tf.chs.head = 0;
+	tf.chs.mode = ide_mode_lba;
+
+	// select device 0
+	tf.chs.device = 0;
+	if (controller->write_command_block_regs(channel, &tf, ide_mask_device_head) != B_OK)
+		goto error;
+	status = ata_wait(bus, 0, ide_status_bsy | ide_status_drq, true, 50000);
+	if (status != B_OK) {
+		dprintf("ATA: reset_bus: device 0 not present\n");
+		*sigDev0 = 0;
+	} else {
+		if (controller->read_command_block_regs(channel, &tf, ide_mask_sector_count |
+			ide_mask_LBA_low | ide_mask_LBA_mid | ide_mask_LBA_high) != B_OK)
+			goto error;
+
+		*sigDev0 = tf.lba.sector_count;
+		*sigDev0 |= ((uint32)tf.lba.lba_0_7) << 8;
+		*sigDev0 |= ((uint32)tf.lba.lba_8_15) << 16;
+		*sigDev0 |= ((uint32)tf.lba.lba_16_23) << 24;
 	}
 
-	if (device->other_device->reconnect_timer_installed) {
-		cancel_timer(&device->other_device->reconnect_timer.te);
-		device->other_device->reconnect_timer_installed = false;
+	// select device 1
+	tf.chs.device = 1;
+	if (controller->write_command_block_regs(channel, &tf, ide_mask_device_head) != B_OK)
+		goto error;
+	status = ata_wait(bus, 0, ide_status_bsy | ide_status_drq, true, 50000);
+	if (status != B_OK) {
+		dprintf("ATA: reset_bus: device 1 not present\n");
+		*sigDev1 = 0;
+	} else {
+		if (controller->read_command_block_regs(channel, &tf, ide_mask_sector_count |
+			ide_mask_LBA_low | ide_mask_LBA_mid | ide_mask_LBA_high) != B_OK)
+			goto error;
+
+		*sigDev1 = tf.lba.sector_count;
+		*sigDev1 |= ((uint32)tf.lba.lba_0_7) << 8;
+		*sigDev1 |= ((uint32)tf.lba.lba_8_15) << 16;
+		*sigDev1 |= ((uint32)tf.lba.lba_16_23) << 24;
 	}
 
-	// activate srst signal for 5 µs
-	// also, deactivate IRQ
-	// (as usual, we will get an IRQ on disabling, but as we leave them
-	// disabled for 2 ms, this false report is ignored)
-	if (controller->write_device_control(channel, 
-			ide_devctrl_nien | ide_devctrl_srst | ide_devctrl_bit3) != B_OK)
-		goto err0;
+	dprintf("ATA: reset_bus success, device 0 signature: 0x%08lx, device 1 signature: 0x%08lx\n", *sigDev0, *sigDev1);
 
-	spin(5);
+	return B_OK;
 
-	if (controller->write_device_control(channel, ide_devctrl_nien | ide_devctrl_bit3) != B_OK)
-		goto err0;
+error:
 
-	// let devices wake up
-	snooze(2000);
-
-	// ouch, we have to wait up to 31 seconds!
-	if (!ide_wait(device, 0, ide_status_bsy, true, 31000000)) {
-		// as we don't know which of the devices is broken
-		// we leave them both alive
-		if (controller->write_device_control(channel, ide_devctrl_bit3) != B_OK)
-			goto err0;
-
-		set_sense(device, SCSIS_KEY_HARDWARE_ERROR, SCSIS_ASC_LUN_TIMEOUT);
-		goto err1;
-	}
-
-	if (controller->write_device_control(channel, ide_devctrl_bit3) != B_OK)
-		goto err0;
-
-	finish_all_requests(bus->devices[0], ignore, SCSI_SCSI_BUS_RESET, true);
-	finish_all_requests(bus->devices[1], ignore, SCSI_SCSI_BUS_RESET, true);
-
-	dprintf("ide: reset_bus() device %p, bus %p success\n", device, bus);
-	return true;
-
-err0:
-	set_sense(device, SCSIS_KEY_HARDWARE_ERROR, SCSIS_ASC_INTERNAL_FAILURE);
-
-err1:
-	finish_all_requests(bus->devices[0], ignore, SCSI_SCSI_BUS_RESET, true);
-	finish_all_requests(bus->devices[1], ignore, SCSI_SCSI_BUS_RESET, true);
-
-	//xpt->call_async( bus->xpt_cookie, -1, -1, AC_BUS_RESET, NULL, 0 );
-
-	dprintf("ide: reset_bus() device %p, bus %p failed\n", device, bus);
-	return false;
+	dprintf("ATA: reset_bus failed\n");
+	return B_ERROR;
 }
 
-
-/** execute packet device reset.
- *	resets entire bus on fail or if device is not atapi;
- *	all requests but <ignore> are resubmitted
- */
-
-bool
-reset_device(ide_device_info *device, ide_qrequest *ignore)
-{
-	ide_bus_info *bus = device->bus;
-	status_t res;
-	uint8 orig_command;
-
-	dprintf("ide: reset_device() device %p\n", device);
-
-	FAST_LOG1(bus->log, ev_ide_reset_device, device->is_device1);
-	SHOW_FLOW0(3, "");
-
-	if (!device->is_atapi)
-		goto err;
-
-	if (device->reconnect_timer_installed) {
-		cancel_timer(&device->reconnect_timer.te);
-		device->reconnect_timer_installed = false;
-	}
-
-	// select device
-	if (bus->controller->write_command_block_regs(bus->channel_cookie, &device->tf, 
-			ide_mask_device_head) != B_OK) 
-		goto err;
-
-	// safe original command to let caller restart it
-	orig_command = device->tf.write.command;
-
-	// send device reset, independ of current device state
-	// (that's the point of a reset)
-	device->tf.write.command = IDE_CMD_DEVICE_RESET;
-	res = bus->controller->write_command_block_regs(bus->channel_cookie,
-		&device->tf, ide_mask_command);
-	device->tf.write.command = orig_command;
-
-	if (res != B_OK)
-		goto err;
-
-	// don't know how long to wait, but 31 seconds, like soft reset, 
-	// should be enough
-	if (!ide_wait(device, 0, ide_status_bsy, true, 31000000))
-		goto err;
-
-	// alright, resubmit all requests		
-	finish_all_requests(device, ignore, SCSI_SCSI_BUS_RESET, true);
-
-	SHOW_FLOW0(3, "done");
-	dprintf("ide: reset_device() device %p success\n", device);
-	return true;
-
-err:
-	// do the hard way
-	dprintf("ide: reset_device() device %p failed, calling reset_bus\n", device);
-	return reset_bus(device, ignore);
-}
 
 /** new_state must be either accessing, async_waiting or sync_waiting
  *	param_mask must not include command register
@@ -250,12 +191,13 @@ retry:
 			return false;
 		}
 
+/*
 		// reset device and retry
 		if (reset_device(device, qrequest) && ++num_retries <= MAX_FAILED_SEND) {
 			SHOW_FLOW0(1, "retrying");
 			goto retry;
 		}
-
+*/
 		SHOW_FLOW0(1, "giving up");
 
 		// reset to often - abort request
@@ -328,6 +270,39 @@ err1:
 err:
 	device->subsys_status = SCSI_HBA_ERR;
 	return false;
+}
+
+
+status_t
+ata_wait(ide_bus_info *bus, uint8 mask, uint8 not_mask,
+		 bool check_err, bigtime_t timeout)
+{
+	bigtime_t startTime = system_time();
+	bigtime_t elapsedTime;
+	uint8 status;
+
+	spin(1); // device needs 400ns to set status
+
+	for (;;) {
+
+		status = bus->controller->get_altstatus(bus->channel_cookie);
+
+		if (check_err && (status & ide_status_err) != 0)
+			return B_ERROR;
+
+		if ((status & mask) == mask && (status & not_mask) == 0)
+			return B_OK;
+
+		elapsedTime = system_time() - startTime;
+
+		if (elapsedTime > timeout)
+			return B_TIMED_OUT;
+		
+		if (elapsedTime < 5000)
+			spin(1);
+		else
+			snooze(5000);
+	}
 }
 
 

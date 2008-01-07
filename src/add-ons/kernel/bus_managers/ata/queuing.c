@@ -370,5 +370,6 @@ send_abort_queue(ide_device_info *device)
 
 err:
 	// ouch! device didn't react - we have to reset it
-	return reset_device(device, NULL);
+	//return reset_device(device, NULL);
+	return false;
 }

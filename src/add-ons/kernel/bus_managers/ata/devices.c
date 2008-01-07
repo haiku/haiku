@@ -49,7 +49,7 @@ cleanup_device_links(ide_device_info *device)
 
 /** destroy device info */
 
-static void
+void
 destroy_device(ide_device_info *device)
 {
 	TRACE("destroy_device: device %p\n", device);
@@ -101,7 +101,7 @@ setup_device_links(ide_bus_info *bus, ide_device_info *device)
 
 /** create device info */
 
-static ide_device_info *
+ide_device_info *
 create_device(ide_bus_info *bus, bool is_device1)
 {
 	ide_device_info *device;
@@ -185,7 +185,7 @@ prep_infoblock(ide_device_info *device)
 
 
 /** read info block of ATA or ATAPI device */
-
+/*
 static bool
 scan_device_int(ide_device_info *device, bool atapi)
 {
@@ -284,10 +284,24 @@ scan_device_int(ide_device_info *device, bool atapi)
 	prep_infoblock(device);
 	return true;	
 }
-
+*/
 
 /** scan one device */
+status_t
+scan_device(ide_device_info *device, bool isAtapi)
+{
+	dprintf("ATA: scan_device\n");
 
+	if (ata_read_infoblock(device, isAtapi) != B_OK) {
+		dprintf("ATA: couldn't read infoblock for device %p\n", device);
+		return B_ERROR;
+	}
+
+	prep_infoblock(device);
+	return B_OK;
+}
+
+/*
 void
 scan_device_worker(ide_bus_info *bus, void *arg)
 {
@@ -321,12 +335,11 @@ scan_device_worker(ide_bus_info *bus, void *arg)
 		goto err;
 
 	bus->state = ide_state_idle;
-	release_sem(bus->scan_device_sem);
 	return;
 
 err:
 	destroy_device(device);
 
 	bus->state = ide_state_idle;
-	release_sem(bus->scan_device_sem);
 }
+*/

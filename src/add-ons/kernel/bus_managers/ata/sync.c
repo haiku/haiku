@@ -263,7 +263,7 @@ ide_timeout_dpc(void *arg)
 	FAST_LOG1(bus->log, ev_ide_timeout_dpc, (uint32)qrequest);
 
 	// this also resets overlapped commands
-	reset_device(device, qrequest);
+//	reset_device(device, qrequest);
 
 	device->subsys_status = SCSI_CMD_TIMEOUT;
 

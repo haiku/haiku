@@ -221,9 +221,6 @@ struct ide_bus_info {
 	ide_device_info *devices[2];
 	ide_device_info *first_device;
 
-	ide_synced_pc scan_bus_syncinfo;	// used to start bus scan
-	sem_id scan_device_sem;		// released when device has been scanned
-
 	ide_synced_pc disconnect_syncinfo;	// used to handle lost controller
 
 	uchar path_id;
@@ -331,6 +328,8 @@ void ata_dpc_PIO(ide_qrequest *qrequest);
 
 void ata_exec_io(ide_device_info *device, ide_qrequest *qrequest);
 
+status_t ata_read_infoblock(ide_device_info *device, bool isAtapi);
+
 
 // atapi.c
 
@@ -343,6 +342,9 @@ void atapi_exec_io(ide_device_info *device, ide_qrequest *qrequest);
 
 // basic_prot.c
 
+status_t ata_wait(ide_bus_info *bus, uint8 mask, uint8 not_mask, bool check_err, bigtime_t timeout);
+
+
 bool ide_wait(ide_device_info *device, int mask, int not_mask, bool check_err,
 	bigtime_t timeout);
 bool wait_for_drq(ide_device_info *device);
@@ -353,10 +355,12 @@ bool wait_for_drdy(ide_device_info *device);
 bool send_command(ide_device_info *device, ide_qrequest *qrequest,
 	bool need_drdy, uint32 timeout, ide_bus_state new_state);
 bool device_start_service( ide_device_info *device, int *tag);
-bool reset_device(ide_device_info *device, ide_qrequest *ignore);
-bool reset_bus(ide_device_info *device, ide_qrequest *ignore);
+//bool reset_device(ide_device_info *device, ide_qrequest *ignore);
+//bool reset_bus(ide_device_info *device, ide_qrequest *ignore);
 	
 bool check_service_req(ide_device_info *device);
+
+status_t reset_bus(ide_bus_info *bus, uint32 *sigDev0, uint32 *sigDev1);
 
 
 // channel_mgr.c
@@ -366,7 +370,10 @@ extern ide_for_controller_interface ide_for_controller_module;
 
 // device_mgr.c
 
-void scan_device_worker(ide_bus_info *bus, void *arg);
+status_t scan_device(ide_device_info *device, bool isAtapi);
+void destroy_device(ide_device_info *device);
+ide_device_info *create_device(ide_bus_info *bus, bool is_device1);
+
 
 
 // dma.c

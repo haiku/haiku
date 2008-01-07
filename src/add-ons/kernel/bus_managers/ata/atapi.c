@@ -201,7 +201,7 @@ packet_dpc(ide_qrequest *qrequest)
 			// TODO: the device will abort next command with a reset condition
 			// 		perhaps we should hide that by reading sense?
 			SHOW_FLOW0(3, "Reset");
-			reset_device(device, qrequest);
+//			reset_device(device, qrequest);
 			
 			finish_checksense(qrequest);
 			return;

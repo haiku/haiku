@@ -79,20 +79,7 @@ static void set_check_condition(ide_qrequest *qrequest);
 static inline bool
 is_queuable(ide_device_info *device, scsi_ccb *request)
 {
-	int opcode = request->cdb[0];
-
-	// XXX disable queuing
-	if (!device->CQ_enabled)
-		return false;
-
-	// make sure the caller allows queuing	
-	if ((request->flags & SCSI_ORDERED_QTAG) != 0)
-		return false;
-
-	// for atapi, all commands could be queued, but all
-	// atapi devices I know don't support queuing anyway
-	return opcode == SCSI_OP_READ_6 || opcode == SCSI_OP_WRITE_6
-		|| opcode == SCSI_OP_READ_10 || opcode == SCSI_OP_WRITE_10;
+	return false;
 }
 
 
@@ -241,34 +228,38 @@ sim_path_inquiry(ide_bus_info *bus, scsi_path_inquiry *info)
 }
 
 
-static void
-scan_device(ide_bus_info *bus, int device)
-{
-	SHOW_FLOW0(4, "");
-
-	// currently, the SCSI bus manager doesn't block the
-	// bus when a bus or device scan is issued, so we
-	// have to use a SPC for that to be sure no one else
-	// is accessing the device or bus concurrently
-	schedule_synced_pc(bus, &bus->scan_bus_syncinfo, (void *)device);
-
-	acquire_sem(bus->scan_device_sem);
-}
-
-
 static uchar
 sim_scan_bus(ide_bus_info *bus)
 {
+	uint32 deviceSignature[2];
+	ide_device_info *device;
+	status_t status;
+	bool isAtapi;
 	int i;
 
-	SHOW_FLOW0(4, "");
+	dprintf("ATA: sim_scan_bus: bus %p\n", bus);
 
 	if (bus->disconnected)
 		return SCSI_NO_HBA;
 
+//	IDE_LOCK(bus);
+
+	status = reset_bus(bus, &deviceSignature[0], &deviceSignature[1]);
+
 	for (i = 0; i < bus->max_devices; ++i) {
-		scan_device(bus, i);
+		if (bus->devices[i])
+			destroy_device(bus->devices[i]);
+
+		if (status == B_OK && deviceSignature[i] != 0) {
+			isAtapi = deviceSignature[i] == 0xeb140101;
+			device = create_device(bus, i /* isDevice1 */);
+			if (scan_device(device, isAtapi) != B_OK)
+				destroy_device(device);
+		}
 	}
+//	IDE_UNLOCK(bus);
+
+	dprintf("ATA: sim_scan_bus: bus %p finished\n", bus);
 
 	return SCSI_REQ_CMP;
 }
@@ -581,7 +572,6 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 	}
 #endif
 
-	init_synced_pc(&bus->scan_bus_syncinfo, scan_device_worker);
 	init_synced_pc(&bus->disconnect_syncinfo, disconnect_worker);
 
 	bus->scsi_cookie = user_cookie;
@@ -600,12 +590,6 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 	}
 
 	bus->devices[0] = bus->devices[1] = NULL;
-
-	bus->scan_device_sem = create_sem(0, "ide_scan_finished");
-	if (bus->scan_device_sem < 0) {
-		status = bus->scan_device_sem;
-		goto err3;
-	}
 
 	status = INIT_BEN(&bus->status_report_ben, "ide_status_report");
 	if (status < B_OK) 
@@ -675,13 +659,11 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 err5:
 	DELETE_BEN(&bus->status_report_ben);
 err4:
-	delete_sem(bus->scan_device_sem);
 err3:
 	delete_sem(bus->sync_wait_sem);
 err2:	
 	scsi->free_dpc(bus->irq_dpc);
 err1:
-	uninit_synced_pc(&bus->scan_bus_syncinfo);
 	uninit_synced_pc(&bus->disconnect_syncinfo);
 #ifdef USE_FAST_LOG
 	fast_log->stop_log(bus->log);
@@ -702,10 +684,8 @@ ide_sim_uninit_bus(ide_bus_info *bus)
 	pnp->put_device_node(parent);
 
 	DELETE_BEN(&bus->status_report_ben);	
-	delete_sem(bus->scan_device_sem);
 	delete_sem(bus->sync_wait_sem);
 	scsi->free_dpc(bus->irq_dpc);
-	uninit_synced_pc(&bus->scan_bus_syncinfo);
 	uninit_synced_pc(&bus->disconnect_syncinfo);
 //	fast_log->stop_log(bus->log);
 
