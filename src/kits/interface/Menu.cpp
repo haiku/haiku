@@ -1374,32 +1374,34 @@ BMenu::_Track(int *action, long start)
 	}
 	
 	bool releasedOnce = buttons == 0;
-	while (true) {
+	while (fState != MENU_STATE_CLOSED) {
 		if (_CustomTrackingWantsToQuit())
 			break;
 
-		bool locked = LockLooper();
-		if (!locked)
+		if (!LockLooper())
 			break;
 		
 		BMenuWindow *window = static_cast<BMenuWindow *>(Window());
-
 		BPoint screenLocation = ConvertToScreen(location);
 		if (window->CheckForScrolling(screenLocation)) {
-			item = NULL;
-		} else {
-			item = _HitTestItems(location, B_ORIGIN);
-			if (item != NULL) {
-				_UpdateStateOpenSelect(item, openTime, closeTime);
-				if (!releasedOnce)
-					releasedOnce = true;			
-			}
+			UnlockLooper();		
+			continue;
+		}
+	
+		item = _HitTestItems(location, B_ORIGIN);
+		if (item != NULL) {
+			_UpdateStateOpenSelect(item, openTime, closeTime);
+			if (!releasedOnce)
+				releasedOnce = true;			
 		}
 
 		// Track the submenu
 		if (_OverSubmenu(fSelected, screenLocation)) {
+			// Since the submenu has its own looper,
+			// we can unlock ours. Doing so also make sure
+			// that our window gets any update message to
+			// redraw itself
 			UnlockLooper();
-			locked = false;
 			int submenuAction = MENU_STATE_TRACKING;
 			BMenu *submenu = fSelected->Submenu();
 			submenu->_SetStickyMode(_IsStickyMode());
@@ -1408,6 +1410,8 @@ BMenu::_Track(int *action, long start)
 				item = submenuItem;
 				fState = MENU_STATE_CLOSED;			
 			}
+			if (!LockLooper())
+				break;
 		} else if (item == NULL) {
 			if (_OverSuper(screenLocation)) {
 				fState = MENU_STATE_TRACKING;
@@ -1423,39 +1427,35 @@ BMenu::_Track(int *action, long start)
 				if (fSuper != NULL) {
 					// Give supermenu the chance to continue tracking
 					*action = fState;
-					if (locked)
-						UnlockLooper();
+					UnlockLooper();
 					return NULL;
 				}
 			}
 		}
 
-		if (!locked)
-			locked = LockLooper();
-	
-		BPoint newLocation;
-		uint32 newButtons;		
-		if (locked) {
-			GetMouse(&newLocation, &newButtons, true);
-			UnlockLooper();
-			locked = false;
-		}
+		UnlockLooper();
 
-		if (newLocation != location || newButtons != buttons) {
-			if (!releasedOnce && newButtons == 0 && buttons != 0)
-				releasedOnce = true;				
-			location = newLocation;
-			buttons = newButtons;
-		}
-		
-		if (releasedOnce)
-			_UpdateStateClose(item, location, buttons);
-		
-		if (fState == MENU_STATE_CLOSED)
-			break;
+		if (fState != MENU_STATE_CLOSED) {
+			bigtime_t snoozeAmount = 50000;
+			snooze(snoozeAmount);
 
-		bigtime_t snoozeAmount = 50000;
-		snooze(snoozeAmount);
+			BPoint newLocation;
+			uint32 newButtons;
+			if (LockLooper()) {	
+				GetMouse(&newLocation, &newButtons, true);
+				UnlockLooper();
+			}
+
+			if (newLocation != location || newButtons != buttons) {
+				if (!releasedOnce && newButtons == 0 && buttons != 0)
+					releasedOnce = true;				
+				location = newLocation;
+				buttons = newButtons;
+			}
+		
+			if (releasedOnce)
+				_UpdateStateClose(item, location, buttons);
+		}	
 	}
 
 	if (action != NULL)
