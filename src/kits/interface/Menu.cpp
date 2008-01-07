@@ -1405,6 +1405,11 @@ BMenu::_Track(int *action, long start)
 			int submenuAction = MENU_STATE_TRACKING;
 			BMenu *submenu = fSelected->Submenu();
 			submenu->_SetStickyMode(_IsStickyMode());
+
+			// The following call blocks until the submenu
+			// gives control back to us, either because the mouse
+			// pointer goes out of the submenu's bounds, or because
+			// the user closes the menu 
 			BMenuItem *submenuItem = submenu->_Track(&submenuAction);
 			if (submenuAction == MENU_STATE_CLOSED) {
 				item = submenuItem;

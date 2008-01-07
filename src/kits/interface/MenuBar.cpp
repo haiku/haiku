@@ -465,10 +465,9 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 		window->Unlock();
 	}
 	
-	while (true) {
+	while (fState != MENU_STATE_CLOSED) {
 		bigtime_t snoozeAmount = 40000;
-		bool locked = (Window() != NULL && window->Lock());//WithTimeout(200000)
-		if (!locked)
+		if (Window() == NULL || !window->Lock())
 			break;
 
 		BMenuItem *menuItem = _HitTestItems(where, B_ORIGIN);
@@ -504,7 +503,6 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 			// is over its window
 			BMenu *menu = fSelected->Submenu();
 			window->Unlock();
-			locked = false;
 			snoozeAmount = 30000;
 			bool wasSticky = _IsStickyMode();
 			menu->_SetStickyMode(wasSticky);
@@ -535,35 +533,36 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 				} else
 					fState = MENU_STATE_CLOSED;
 			}
+			if (!window->Lock())
+				break;
 		} else if (menuItem == NULL && fSelected != NULL
 			&& !_IsStickyMode() && Bounds().Contains(where)) {
 			_SelectItem(NULL);
 			fState = MENU_STATE_TRACKING;
 		}
 
-		if (!locked)
-			locked = window->Lock();
-	
-		if (locked) {
-			GetMouse(&where, &buttons, true);
-			window->Unlock();
-			locked = false;
-		}
+		window->Unlock();
+		
+		if (fState != MENU_STATE_CLOSED) {
+			if (snoozeAmount > 0)
+				snooze(snoozeAmount);	
+			
+			if (window->Lock()) {
+				GetMouse(&where, &buttons, true);
+				window->Unlock();
+			}
 
-		if (fState == MENU_STATE_CLOSED 
-			|| (buttons != 0 && _IsStickyMode() && menuItem == NULL))
-			break;
-		else if (buttons == 0 && !_IsStickyMode()) {
-			if ((fSelected != NULL && fSelected->Submenu() == NULL)
-				|| menuItem == NULL) {
-				fChosenItem = fSelected;
-				break;
-			} else
-				_SetStickyMode(true);
+			if ((buttons != 0 && _IsStickyMode() && menuItem == NULL))
+				fState = MENU_STATE_CLOSED;
+			else if (buttons == 0 && !_IsStickyMode()) {
+				if ((fSelected != NULL && fSelected->Submenu() == NULL)
+					|| menuItem == NULL) {
+					fChosenItem = fSelected;
+					fState = MENU_STATE_CLOSED;
+				} else
+					_SetStickyMode(true);
+			}		
 		}
-
-		if (snoozeAmount > 0)
-			snooze(snoozeAmount);		
 	}
 
 	if (window->Lock()) {
