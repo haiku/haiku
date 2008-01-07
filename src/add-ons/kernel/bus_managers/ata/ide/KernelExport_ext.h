@@ -1,0 +1,31 @@
+/*
+ * Copyright 2004-2006, Haiku, Inc. All RightsReserved.
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
+
+/*
+	Functions that are missing in kernel.
+*/
+
+#ifndef _KERNEL_EXPORT_EXT_H
+#define _KERNEL_EXPORT_EXT_H
+
+#include <KernelExport.h>
+#include <iovec.h>
+
+
+// get memory map of iovec
+status_t get_iovec_memory_map( 
+	iovec *vec, 				// iovec to analyze
+	size_t vec_count, 			// number of entries in vec
+	size_t vec_offset, 			// number of bytes to skip at beginning of vec
+	size_t len, 				// number of bytes to analyze
+	physical_entry *map, 		// resulting memory map
+	size_t max_entries, 		// max number of entries in map
+	size_t *num_entries, 		// actual number of map entries used
+	size_t *mapped_len 			// actual number of bytes described by map
+);
+
+#endif	// _KERNEL_EXPORT_EXT_H
