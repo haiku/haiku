@@ -496,9 +496,7 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 					_SelectItem(menuItem);					
 				}
 			}
-		}
-
-		if (_OverSubmenu(fSelected, ConvertToScreen(where))) {
+		} else if (_OverSubmenu(fSelected, ConvertToScreen(where))) {
 			// call _Track() from the selected sub-menu when the mouse cursor
 			// is over its window
 			BMenu *menu = fSelected->Submenu();

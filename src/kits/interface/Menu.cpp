@@ -67,6 +67,7 @@ public:
 	}
 };
 
+
 }	// namespace BPrivate
 
 
@@ -1230,7 +1231,7 @@ BMenu::_InitData(BMessage* archive)
 	SetFont(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE);
 
 	fLayoutData = new LayoutData;
-
+	
 	SetLowColor(sMenuInfo.background_color);
 	SetViewColor(sMenuInfo.background_color);
 
@@ -1372,7 +1373,7 @@ BMenu::_Track(int *action, long start)
 		GetMouse(&location, &buttons);
 		UnlockLooper();	
 	}
-	
+
 	bool releasedOnce = buttons == 0;
 	while (fState != MENU_STATE_CLOSED) {
 		if (_CustomTrackingWantsToQuit())
@@ -1392,11 +1393,9 @@ BMenu::_Track(int *action, long start)
 		if (item != NULL) {
 			_UpdateStateOpenSelect(item, openTime, closeTime);
 			if (!releasedOnce)
-				releasedOnce = true;			
-		}
-
-		// Track the submenu
-		if (_OverSubmenu(fSelected, screenLocation)) {
+				releasedOnce = true;
+		
+		} else if (_OverSubmenu(fSelected, screenLocation)) {
 			// Since the submenu has its own looper,
 			// we can unlock ours. Doing so also make sure
 			// that our window gets any update message to
@@ -1417,24 +1416,24 @@ BMenu::_Track(int *action, long start)
 			}
 			if (!LockLooper())
 				break;
-		} else if (item == NULL) {
-			if (_OverSuper(screenLocation)) {
-				fState = MENU_STATE_TRACKING;
-				UnlockLooper();
-				break;			
-			} else {
-				if (system_time() > closeTime + kHysteresis
-					&& fState != MENU_STATE_TRACKING_SUBMENU) {
-					_SelectItem(NULL);
-					fState = MENU_STATE_TRACKING;
-				}
+		} else if (_OverSuper(screenLocation)) {
+			fState = MENU_STATE_TRACKING;			
+			UnlockLooper();
+			break;			
+		} else {
+			// Mouse pointer outside menu
 
-				if (fSuper != NULL) {
-					// Give supermenu the chance to continue tracking
-					*action = fState;
-					UnlockLooper();
-					return NULL;
-				}
+			if (system_time() > closeTime + kHysteresis
+				&& fState != MENU_STATE_TRACKING_SUBMENU) {
+				_SelectItem(NULL);
+				fState = MENU_STATE_TRACKING;
+			}
+
+			if (fSuper != NULL) {
+				// Give supermenu the chance to continue tracking
+				*action = fState;
+				UnlockLooper();
+				return NULL;
 			}
 		}
 
