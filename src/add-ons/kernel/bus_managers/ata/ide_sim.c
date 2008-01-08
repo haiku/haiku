@@ -264,6 +264,13 @@ sim_scan_bus(ide_bus_info *bus)
 	return SCSI_REQ_CMP;
 }
 
+static uchar
+sim_not_scan_bus(ide_bus_info *bus)
+{
+	dprintf("ATA: sim_not_scan_bus\n");
+	return SCSI_REQ_CMP;
+}
+
 
 static uchar
 sim_abort(ide_bus_info *bus, scsi_ccb *ccb_to_abort)
@@ -843,7 +850,7 @@ scsi_sim_interface ide_sim_module = {
 	(uchar (*)(scsi_sim_cookie, scsi_ccb *))		sim_term_io,
 
 	(uchar (*)(scsi_sim_cookie, scsi_path_inquiry *))sim_path_inquiry,
-	(uchar (*)(scsi_sim_cookie))					sim_scan_bus,
+	(uchar (*)(scsi_sim_cookie))					sim_not_scan_bus,
 	(uchar (*)(scsi_sim_cookie))					sim_reset_bus,
 	
 	(void (*)(scsi_sim_cookie, uchar, 

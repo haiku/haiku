@@ -63,61 +63,65 @@ reset_bus(ide_bus_info *bus, uint32 *sigDev0, uint32 *sigDev1)
 
 	dprintf("ATA: reset_bus %p\n", bus);
 
+
 	// disable interrupts and assert SRST for at least 5 usec
 	if (controller->write_device_control(channel, ide_devctrl_bit3 | ide_devctrl_nien | ide_devctrl_srst) != B_OK)
 		goto error;
 	spin(20);
 
-	// clear SRST for at least 2 ms
+	// clear SRST and wait for at least 2 ms but (we wait 150ms like everyone else does)
 	if (controller->write_device_control(channel, ide_devctrl_bit3 | ide_devctrl_nien) != B_OK)
 		goto error;
-	snooze(5000);
+	snooze(150000);
 
-	// wait up to 30 seconds for busy to clear, abort when error is set
-	status = ata_wait(bus, 0, ide_status_bsy, true, 33000000);
-	if (status != B_OK)
-		goto error;
+	ata_select_device(bus, 0);
 
-	tf.chs.head = 0;
-	tf.chs.mode = ide_mode_lba;
+	dprintf("altstatus device 0: %x\n", controller->get_altstatus(channel));
 
-	// select device 0
-	tf.chs.device = 0;
-	if (controller->write_command_block_regs(channel, &tf, ide_mask_device_head) != B_OK)
-		goto error;
-	status = ata_wait(bus, 0, ide_status_bsy | ide_status_drq, true, 50000);
+	// wait up to 31 seconds for busy to clear, abort when error is set
+	status = ata_wait(bus, 0, ide_status_bsy, false, 31000000);
 	if (status != B_OK) {
-		dprintf("ATA: reset_bus: device 0 not present\n");
-		*sigDev0 = 0;
-	} else {
-		if (controller->read_command_block_regs(channel, &tf, ide_mask_sector_count |
-			ide_mask_LBA_low | ide_mask_LBA_mid | ide_mask_LBA_high) != B_OK)
-			goto error;
-
-		*sigDev0 = tf.lba.sector_count;
-		*sigDev0 |= ((uint32)tf.lba.lba_0_7) << 8;
-		*sigDev0 |= ((uint32)tf.lba.lba_8_15) << 16;
-		*sigDev0 |= ((uint32)tf.lba.lba_16_23) << 24;
+		if (status == B_TIMED_OUT)
+			dprintf("ATA: reset_bus: timeout\n");
+		else
+			dprintf("ATA: reset_bus: error bit set\n");
+		goto error;
 	}
 
-	// select device 1
-	tf.chs.device = 1;
-	if (controller->write_command_block_regs(channel, &tf, ide_mask_device_head) != B_OK)
+	if (controller->read_command_block_regs(channel, &tf, ide_mask_sector_count |
+		ide_mask_LBA_low | ide_mask_LBA_mid | ide_mask_LBA_high) != B_OK)
 		goto error;
-	status = ata_wait(bus, 0, ide_status_bsy | ide_status_drq, true, 50000);
-	if (status != B_OK) {
-		dprintf("ATA: reset_bus: device 1 not present\n");
-		*sigDev1 = 0;
-	} else {
-		if (controller->read_command_block_regs(channel, &tf, ide_mask_sector_count |
-			ide_mask_LBA_low | ide_mask_LBA_mid | ide_mask_LBA_high) != B_OK)
-			goto error;
 
-		*sigDev1 = tf.lba.sector_count;
-		*sigDev1 |= ((uint32)tf.lba.lba_0_7) << 8;
-		*sigDev1 |= ((uint32)tf.lba.lba_8_15) << 16;
-		*sigDev1 |= ((uint32)tf.lba.lba_16_23) << 24;
+	*sigDev0 = tf.lba.sector_count;
+	*sigDev0 |= ((uint32)tf.lba.lba_0_7) << 8;
+	*sigDev0 |= ((uint32)tf.lba.lba_8_15) << 16;
+	*sigDev0 |= ((uint32)tf.lba.lba_16_23) << 24;
+
+
+
+	ata_select_device(bus, 1);
+
+	dprintf("altstatus device 1: %x\n", controller->get_altstatus(channel));
+
+	// wait up to 31 seconds for busy to clear, abort when error is set
+	status = ata_wait(bus, 0, ide_status_bsy, false, 31000000);
+	if (status != B_OK) {
+		if (status == B_TIMED_OUT)
+			dprintf("ATA: reset_bus: timeout\n");
+		else
+			dprintf("ATA: reset_bus: error bit set\n");
+		goto error;
 	}
+
+	if (controller->read_command_block_regs(channel, &tf, ide_mask_sector_count |
+		ide_mask_LBA_low | ide_mask_LBA_mid | ide_mask_LBA_high) != B_OK)
+		goto error;
+
+	*sigDev1 = tf.lba.sector_count;
+	*sigDev1 |= ((uint32)tf.lba.lba_0_7) << 8;
+	*sigDev1 |= ((uint32)tf.lba.lba_8_15) << 16;
+	*sigDev1 |= ((uint32)tf.lba.lba_16_23) << 24;
+
 
 	dprintf("ATA: reset_bus success, device 0 signature: 0x%08lx, device 1 signature: 0x%08lx\n", *sigDev0, *sigDev1);
 

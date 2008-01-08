@@ -17,6 +17,36 @@
 
 #define TRACE dprintf
 
+void
+ata_select_device(ide_bus_info *bus, int device)
+{
+	ide_task_file tf;
+	tf.chs.head = 0;
+	tf.chs.mode = ide_mode_lba;
+	tf.chs.device = device ? 1 : 0;
+
+	bus->controller->read_command_block_regs(bus->channel_cookie, &tf, ide_mask_device_head);
+	spin(1); // wait 400 nsec
+}
+
+
+/*
+
+void
+ata_select_device(ide_device_info *device)
+{
+	ide_task_file tf;
+	tf.chs.head = 0;
+	tf.chs.mode = ide_mode_lba;
+	tf.chs.device = device->is_device1;
+
+	device->bus->controller->read_command_block_regs(device->bus->channel_cookie, &tf, 
+		ide_mask_device_head);
+	spin(1); // wait 400 nsec
+}
+*/
+
+
 /** verify that device is ready for further PIO transmission */
 
 static bool
