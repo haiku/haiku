@@ -404,27 +404,33 @@ BSlider::KeyDown(const char *bytes, int32 numBytes)
 	if (!IsEnabled() || IsHidden())
 		return;
 
+	int32 newValue = Value();
+
 	switch (bytes[0]) {
 		case B_LEFT_ARROW:
 		case B_DOWN_ARROW: {
-			int32 oldValue = Value();
-
-			SetValue(Value() - KeyIncrementValue());
-			if (oldValue != Value())
-				Invoke();
+			newValue -= KeyIncrementValue();
 			break;
 		}
 		case B_RIGHT_ARROW:
 		case B_UP_ARROW: {
-			int32 oldValue = Value();
-
-			SetValue(Value() + KeyIncrementValue());
-			if (oldValue != Value())
-				Invoke();
+			newValue += KeyIncrementValue();
 			break;
 		}
+		case B_HOME:
+			newValue = fMinValue;
+			break;
+		case B_END:
+			newValue = fMaxValue;
+			break;
 		default:
 			BControl::KeyDown(bytes, numBytes);
+			return;
+	}
+
+	if (newValue != Value()) {
+		SetValue(newValue);
+		InvokeNotify(ModificationMessage(), B_CONTROL_MODIFIED);
 	}
 }
 
