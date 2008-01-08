@@ -212,8 +212,13 @@ BDiskDeviceRoster::VisitEachPartition(BDiskDeviceVisitor *visitor,
 		BDiskDevice deviceOnStack;
 		BDiskDevice *useDevice = (device ? device : &deviceOnStack);
 		BPartition *foundPartition = NULL;
-		while (!foundPartition && GetNextDevice(useDevice) == B_OK)
+		while (GetNextDevice(useDevice) == B_OK) {
 			foundPartition = useDevice->VisitEachDescendant(visitor);
+			if (foundPartition) {
+				terminatedEarly = true;
+				break;
+			}
+		}
 		fDeviceCookie = oldCookie;
 		if (!terminatedEarly)
 			useDevice->Unset();
