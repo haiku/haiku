@@ -615,15 +615,6 @@ BSlider::SetValue(int32 value)
 
 		BRect oldThumbFrame = ThumbFrame();
 
-		if (IsFocus() && Style() == B_TRIANGLE_THUMB) {
-			// we need to update the region with the focus mark as well
-			// (a method BSlider::FocusMarkFrame() would be nice as well)
-			if (fOrientation == B_HORIZONTAL)
-				oldThumbFrame.bottom += 2;
-			else
-				oldThumbFrame.left -= 2;
-		}
-
 		// While it would be enough to do this dependent on fUseFillColor,
 		// that doesn't work out if DrawBar() has been overridden by a sub class
 		if (fOrientation == B_HORIZONTAL)
@@ -634,7 +625,25 @@ BSlider::SetValue(int32 value)
 		_SetLocation(loc);
 
 		BControl::SetValueNoUpdate(value);
-		Invalidate(oldThumbFrame | ThumbFrame());
+		BRect invalid = oldThumbFrame | ThumbFrame();
+
+		if (Style() == B_TRIANGLE_THUMB) {
+			// 1) we need to take care of pixels touched because of
+			//    anti-aliasing
+			// 2) we need to update the region with the focus mark as well
+			//    (a method BSlider::FocusMarkFrame() would be nice as well)
+			if (fOrientation == B_HORIZONTAL) {
+				if (IsFocus())
+					invalid.bottom += 2;
+				invalid.InsetBy(-1, 0);
+			} else {
+				if (IsFocus())
+					invalid.left -= 2;
+				invalid.InsetBy(0, -1);
+			}
+		}
+
+		Invalidate(invalid);
 
 		// update text label
 
