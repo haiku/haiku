@@ -60,9 +60,16 @@ reset_bus(ide_bus_info *bus, uint32 *sigDev0, uint32 *sigDev1)
 	ide_channel_cookie channel = bus->channel_cookie;
 	ide_task_file tf;
 	status_t status;
+	bool devicePresent0;
+	bool devicePresent1;
 
 	dprintf("ATA: reset_bus %p\n", bus);
 
+	devicePresent0 = ata_is_device_present(bus, 0);
+	devicePresent1 = ata_is_device_present(bus, 1);
+
+	dprintf("ATA: reset_bus: ata_is_device_present device 0, present %d\n", devicePresent0);
+	dprintf("ATA: reset_bus: ata_is_device_present device 1, present %d\n", devicePresent1);
 
 	// disable interrupts and assert SRST for at least 5 usec
 	if (controller->write_device_control(channel, ide_devctrl_bit3 | ide_devctrl_nien | ide_devctrl_srst) != B_OK)
@@ -74,54 +81,59 @@ reset_bus(ide_bus_info *bus, uint32 *sigDev0, uint32 *sigDev1)
 		goto error;
 	snooze(150000);
 
-	ata_select_device(bus, 0);
+	if (devicePresent0) {
 
-	dprintf("altstatus device 0: %x\n", controller->get_altstatus(channel));
+		ata_select_device(bus, 0);
+		dprintf("altstatus device 0: %x\n", controller->get_altstatus(channel));
 
-	// wait up to 31 seconds for busy to clear, abort when error is set
-	status = ata_wait(bus, 0, ide_status_bsy, false, 31000000);
-	if (status != B_OK) {
-		if (status == B_TIMED_OUT)
-			dprintf("ATA: reset_bus: timeout\n");
-		else
-			dprintf("ATA: reset_bus: error bit set\n");
-		goto error;
+		// wait up to 31 seconds for busy to clear, abort when error is set
+		status = ata_wait(bus, 0, ide_status_bsy, false, 31000000);
+		if (status != B_OK) {
+			if (status == B_TIMED_OUT)
+				dprintf("ATA: reset_bus: timeout\n");
+			else
+				dprintf("ATA: reset_bus: error bit set\n");
+			goto error;
+		}
+
+		if (controller->read_command_block_regs(channel, &tf, ide_mask_sector_count |
+			ide_mask_LBA_low | ide_mask_LBA_mid | ide_mask_LBA_high) != B_OK)
+			goto error;
+
+		*sigDev0 = tf.lba.sector_count;
+		*sigDev0 |= ((uint32)tf.lba.lba_0_7) << 8;
+		*sigDev0 |= ((uint32)tf.lba.lba_8_15) << 16;
+		*sigDev0 |= ((uint32)tf.lba.lba_16_23) << 24;
+	} else {
+		*sigDev0 = 0;
 	}
 
-	if (controller->read_command_block_regs(channel, &tf, ide_mask_sector_count |
-		ide_mask_LBA_low | ide_mask_LBA_mid | ide_mask_LBA_high) != B_OK)
-		goto error;
+	if (devicePresent1) {	
+		
+		ata_select_device(bus, 1);
+		dprintf("altstatus device 1: %x\n", controller->get_altstatus(channel));
 
-	*sigDev0 = tf.lba.sector_count;
-	*sigDev0 |= ((uint32)tf.lba.lba_0_7) << 8;
-	*sigDev0 |= ((uint32)tf.lba.lba_8_15) << 16;
-	*sigDev0 |= ((uint32)tf.lba.lba_16_23) << 24;
+		// wait up to 31 seconds for busy to clear, abort when error is set
+		status = ata_wait(bus, 0, ide_status_bsy, false, 31000000);
+		if (status != B_OK) {
+			if (status == B_TIMED_OUT)
+				dprintf("ATA: reset_bus: timeout\n");
+			else
+				dprintf("ATA: reset_bus: error bit set\n");
+			goto error;
+		}
 
+		if (controller->read_command_block_regs(channel, &tf, ide_mask_sector_count |
+			ide_mask_LBA_low | ide_mask_LBA_mid | ide_mask_LBA_high) != B_OK)
+			goto error;
 
-
-	ata_select_device(bus, 1);
-
-	dprintf("altstatus device 1: %x\n", controller->get_altstatus(channel));
-
-	// wait up to 31 seconds for busy to clear, abort when error is set
-	status = ata_wait(bus, 0, ide_status_bsy, false, 31000000);
-	if (status != B_OK) {
-		if (status == B_TIMED_OUT)
-			dprintf("ATA: reset_bus: timeout\n");
-		else
-			dprintf("ATA: reset_bus: error bit set\n");
-		goto error;
+		*sigDev1 = tf.lba.sector_count;
+		*sigDev1 |= ((uint32)tf.lba.lba_0_7) << 8;
+		*sigDev1 |= ((uint32)tf.lba.lba_8_15) << 16;
+		*sigDev1 |= ((uint32)tf.lba.lba_16_23) << 24;
+	} else {
+		*sigDev1 = 0;
 	}
-
-	if (controller->read_command_block_regs(channel, &tf, ide_mask_sector_count |
-		ide_mask_LBA_low | ide_mask_LBA_mid | ide_mask_LBA_high) != B_OK)
-		goto error;
-
-	*sigDev1 = tf.lba.sector_count;
-	*sigDev1 |= ((uint32)tf.lba.lba_0_7) << 8;
-	*sigDev1 |= ((uint32)tf.lba.lba_8_15) << 16;
-	*sigDev1 |= ((uint32)tf.lba.lba_16_23) << 24;
-
 
 	dprintf("ATA: reset_bus success, device 0 signature: 0x%08lx, device 1 signature: 0x%08lx\n", *sigDev0, *sigDev1);
 

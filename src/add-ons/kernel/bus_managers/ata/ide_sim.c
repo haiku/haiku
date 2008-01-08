@@ -659,6 +659,13 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 
 	*cookie = bus;
 
+/*
+	// make sure LBA bit is set
+	bus->controller->read_command_block_regs(bus->channel_cookie, &device->tf, ide_mask_device_head);
+	tf.chs.mode = ide_mode_lba;
+	bus->controller->write_command_block_regs(bus->channel_cookie, &device->tf, ide_mask_device_head);
+*/
+
 	// detect devices
 	sim_scan_bus(bus);
 	return B_OK;

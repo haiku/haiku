@@ -25,8 +25,29 @@ ata_select_device(ide_bus_info *bus, int device)
 	tf.chs.mode = ide_mode_lba;
 	tf.chs.device = device ? 1 : 0;
 
-	bus->controller->read_command_block_regs(bus->channel_cookie, &tf, ide_mask_device_head);
+	bus->controller->write_command_block_regs(bus->channel_cookie, &tf, ide_mask_device_head);
 	spin(1); // wait 400 nsec
+}
+
+
+bool
+ata_is_device_present(ide_bus_info *bus, int device)
+{
+	ide_task_file tf;
+
+	ata_select_device(bus, device);
+
+	tf.lba.sector_count = 0xaa;
+	tf.lba.lba_0_7 = 0x55;
+
+	bus->controller->write_command_block_regs(bus->channel_cookie, &tf,
+		ide_mask_sector_count | ide_mask_LBA_low);
+	spin(1); // wait 400 nsec
+
+	bus->controller->read_command_block_regs(bus->channel_cookie, &tf,
+		ide_mask_sector_count | ide_mask_LBA_low);
+
+	return tf.lba.sector_count == 0xaa && tf.lba.lba_0_7 == 0x55;
 }
 
 

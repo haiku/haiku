@@ -317,6 +317,8 @@ device_released_bus(ide_device_info *device)
 
 //void ata_select_device(ide_device_info *device);
 void ata_select_device(ide_bus_info *bus, int device);
+bool ata_is_device_present(ide_bus_info *bus, int device);
+
 
 bool check_rw_error(ide_device_info *device, ide_qrequest *qrequest);
 bool check_output(ide_device_info *device, bool drdy_required, int error_mask, bool is_write);
