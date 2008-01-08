@@ -124,6 +124,7 @@ CodyCam::CodyCam()
 	fPort(0),
 	fVideoControlWindow(NULL)
 {
+	chdir("/boot/home");
 }
 
 
@@ -922,7 +923,6 @@ ControlWindow::QuitRequested()
 
 
 int main() {
-	chdir("/boot/home");
 	CodyCam app;
 	app.Run();
 	return 0;	
