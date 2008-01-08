@@ -7,6 +7,7 @@
  */
 #include "DiskView.h"
 
+#include <DiskDeviceRoster.h>
 #include <DiskDeviceVisitor.h>
 #include <HashMap.h>
 
@@ -61,17 +62,18 @@ struct PartitionBox {
 
 class PartitionDrawer : public BDiskDeviceVisitor {
 public:
-	PartitionDrawer(BView* view)
+	PartitionDrawer(BView* view, partition_id selectedPartition)
 		: fView(view)
 		, fBoxMap()
 		, fColorIndex(0)
+		, fSelectedPartition(selectedPartition)
 	{
 	}
 
 	virtual bool Visit(BDiskDevice* device)
 	{
 		fBoxMap.Put(device->ID(), PartitionBox(fView->Bounds(), _NextColor()));
-		return true;
+		return false;
 	}
 
 	virtual bool Visit(BPartition* partition, int32 level)
@@ -81,10 +83,45 @@ public:
 
 		PartitionBox parent = fBoxMap.Get(partition->Parent()->ID());
 		BRect frame = parent.frame;
-		// TODO .... calculate frame within parent frame (inset...)
+		// calculate frame within parent frame
+		off_t offset = partition->Offset();
+		off_t size = partition->Size();
+		off_t parentOffset = partition->Parent()->Offset();
+		off_t parentSize = partition->Parent()->Size();
+		float width = frame.Width() * size / parentSize;
+		frame.left = roundf(frame.left + frame.Width()
+			* (offset - parentOffset) / parentSize);
+		frame.right = frame.left + width;
 
-		fBoxMap.Put(partition->ID(), PartitionBox(frame, _NextColor()));
-		return true;
+		frame.InsetBy(4, 4);
+		if (frame.right < frame.left)
+			frame.right = frame.left;
+
+		rgb_color color = _NextColor();
+		fBoxMap.Put(partition->ID(), PartitionBox(frame, color));
+
+		return false;
+	}
+
+	void Draw(BView* view)
+	{
+		PartitionBoxMap::Iterator iterator = fBoxMap.GetIterator();
+		while (iterator.HasNext()) {
+			PartitionBoxMap::Entry entry = iterator.Next();
+			PartitionBox box = entry.value;
+			BRect frame = box.frame;
+			if (entry.key == fSelectedPartition) {
+				fView->SetHighColor(80, 80, 80);
+				frame.InsetBy(-2, -2);
+				fView->StrokeRect(frame);
+				frame.InsetBy(1, 1);
+				fView->StrokeRect(frame);
+				frame.InsetBy(1, 1);
+			}
+	
+			fView->SetHighColor(box.color);
+			fView->FillRect(frame);
+		}
 	}
 
  private:
@@ -103,6 +140,7 @@ public:
 	BView*				fView;
 	PartitionBoxMap		fBoxMap;
 	int32				fColorIndex;
+	partition_id		fSelectedPartition;
 };
 
 
@@ -114,7 +152,7 @@ DiskView::DiskView(const BRect& frame, uint32 resizeMode)
 	, fDisk(NULL)
 	, fSelectedParition(-1)
 {
-	for (int32 i = 0; i < 256; i++) {
+	for (int32 i = 0; i < kMaxPartitionColors; i++) {
 		kPartitionColors[i].red = (i * 1675) & 0xff;
 		kPartitionColors[i].green = (i * 318) & 0xff;
 		kPartitionColors[i].blue = (i * 9328) & 0xff;
@@ -144,12 +182,19 @@ DiskView::Draw(BRect updateRect)
 	// TODO: render the partitions (use PartitionDrawer to iterate our disk)
 	SetHighColor(255, 255, 120);
 	FillRect(bounds);
+
+	PartitionDrawer drawer(this, fSelectedParition);
+	BDiskDeviceRoster roster;
+	roster.VisitEachPartition(&drawer, fDisk);
+
+	drawer.Draw(this);
 }
 
 
 void
 DiskView::SetDisk(BDiskDevice* disk, partition_id selectedPartition)
 {
+printf("DiskView::SetDisk(%p, %ld)\n", disk, selectedPartition);
 	delete fDisk;
 	fDisk = disk;
 	fSelectedParition = selectedPartition;

@@ -12,55 +12,62 @@
 #include <Path.h>
 
 
+static const char* kUnavailableString = "";
+
+enum {
+//	kBitmapColumn,
+	kDeviceColumn,
+	kFilesystemColumn,
+	kVolumeNameColumn,
+	kMountedAtColumn,
+	kSizeColumn
+};
+
+
 PartitionListRow::PartitionListRow(BPartition* partition)
 	: Inherited()
 	, fPartitionID(partition->ID())
 {
+//	SetField(new BBitmapField(NULL), kBitmapColumn);
+
 	BPath path;
-	char size[1024];
-
 	partition->GetPath(&path);
-
-	SetField(new BBitmapField(NULL), 0);
-
-//	if (partition->IsDevice()) // Only show device path for actual devices (so only for /dev/disk/..../raw entries)
-		SetField(new BStringField(path.Path()), 1);
-//	else
-//		SetField(new BStringField("n/a"), 1);
+	SetField(new BStringField(path.Path()), kDeviceColumn);
 
 //	if (partition->ContainsPartitioningSystem()) {
-//		SetField(new BStringField(partition->ContentType()), 2);
+//		SetField(new BStringField(partition->ContentType()), kFilesystemColumn);
 //	} else {
-//		SetField(new BStringField("n/a"), 2);
+//		SetField(new BStringField(kUnavailableString), kFilesystemColumn);
 //	}
 
 	if (partition->ContainsFileSystem()) {
-		SetField(new BStringField(partition->ContentType()), 2); // Filesystem
-		SetField(new BStringField(partition->ContentName()), 3); // Volume Name
+		SetField(new BStringField(partition->ContentType()), kFilesystemColumn);
+		SetField(new BStringField(partition->ContentName()), kVolumeNameColumn);
 	} else {
-		SetField(new BStringField("n/a"), 2);
-		SetField(new BStringField("n/a"), 3);
+		SetField(new BStringField(kUnavailableString), kFilesystemColumn);
+		SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
 	}
 	
 	if (partition->IsMounted() && partition->GetMountPoint(&path) == B_OK) {
-		SetField(new BStringField(path.Path()),  4);
+		SetField(new BStringField(path.Path()),  kMountedAtColumn);
 	} else {
-		SetField(new BStringField("n/a"), 4);
+		SetField(new BStringField(kUnavailableString), kMountedAtColumn);
 	}
 
-	SetField(new BStringField(string_for_size(partition->Size(), size)), 5);
+	char size[1024];
+	SetField(new BStringField(string_for_size(partition->Size(), size)), kSizeColumn);
 }
 
 
 PartitionListView::PartitionListView(const BRect& frame, uint32 resizeMode)
 	: Inherited(frame, "storagelist", resizeMode, 0, B_NO_BORDER, true)
 {
-	AddColumn(new BBitmapColumn("", 20, 20, 100, B_ALIGN_CENTER), 0);
-	AddColumn(new BStringColumn("Device", 100, 50, 500, B_TRUNCATE_MIDDLE), 1);
-	AddColumn(new BStringColumn("Filesystem", 100, 50, 500, B_TRUNCATE_MIDDLE), 2);
-	AddColumn(new BStringColumn("Volume Name", 100, 50, 500, B_TRUNCATE_MIDDLE), 3);
-	AddColumn(new BStringColumn("Mounted At", 100, 50, 500, B_TRUNCATE_MIDDLE), 4);
-	AddColumn(new BStringColumn("Size", 100, 50, 500, B_TRUNCATE_END), 5);
+//	AddColumn(new BBitmapColumn("", 20, 20, 100, B_ALIGN_CENTER), kBitmapColumn);
+	AddColumn(new BStringColumn("Device", 150, 50, 500, B_TRUNCATE_MIDDLE), kDeviceColumn);
+	AddColumn(new BStringColumn("Filesystem", 100, 50, 500, B_TRUNCATE_MIDDLE), kFilesystemColumn);
+	AddColumn(new BStringColumn("Volume Name", 130, 50, 500, B_TRUNCATE_MIDDLE), kVolumeNameColumn);
+	AddColumn(new BStringColumn("Mounted At", 100, 50, 500, B_TRUNCATE_MIDDLE), kMountedAtColumn);
+	AddColumn(new BStringColumn("Size", 100, 50, 500, B_TRUNCATE_END, B_ALIGN_RIGHT), kSizeColumn);
 }
 
 

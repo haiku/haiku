@@ -298,8 +298,8 @@ DriveVisitor::Visit(BDiskDevice* device)
 {
 	fPartitionList->AddPartition(device);
 
-	printf("Visit(%p)\n", device);
-	dump_partition_info(device);
+//	printf("Visit(%p)\n", device);
+//	dump_partition_info(device);
 
 	return false; // Don't stop yet!
 }
@@ -310,8 +310,8 @@ DriveVisitor::Visit(BPartition* partition, int32 level)
 {
 	fPartitionList->AddPartition(partition);
 
-	printf("Visit(%p, %ld)\n", partition, level);
-	dump_partition_info(partition);
+//	printf("Visit(%p, %ld)\n", partition, level);
+//	dump_partition_info(partition);
 
 	return false; // Don't stop yet!
 }
