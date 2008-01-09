@@ -1,12 +1,12 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "AttributeWindow.h"
-#include "AttributeEditors.h"
 #include "ProbeView.h"
+#include "TypeEditors.h"
 
 #include <MenuBar.h>
 #include <MenuItem.h>

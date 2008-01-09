@@ -1,10 +1,10 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
 
-#include "AttributeEditors.h"
+#include "TypeEditors.h"
 #include "DataEditor.h"
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU

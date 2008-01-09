@@ -12,7 +12,7 @@ Application DiskProbe :
 	ProbeWindow.cpp
 	FileWindow.cpp
 	AttributeWindow.cpp
-	AttributeEditors.cpp
+	TypeEditors.cpp
 	ProbeView.cpp
 	OpenWindow.cpp
 	FindWindow.cpp
