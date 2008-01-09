@@ -845,32 +845,34 @@ ata_read_infoblock(ide_device_info *device, bool isAtapi)
 	ide_bus_info *bus = device->bus;
 	int status;
 
-	TRACE("ata_read_infoblock: device %p, isAtapi %d\n", device, isAtapi);
+	TRACE("ata_read_infoblock: bus %p, device %d, isAtapi %d\n", device->bus, device->is_device1, isAtapi);
 
 	// disable interrupts
 	bus->controller->write_device_control(bus->channel_cookie, ide_devctrl_bit3 | ide_devctrl_nien);
-
-	device->tf_param_mask = 0;
-	device->tf.write.command = isAtapi ? IDE_CMD_IDENTIFY_PACKET_DEVICE	: IDE_CMD_IDENTIFY_DEVICE;
 
 	// initialize device selection flags,
 	// this is the only place where this bit gets initialized in the task file
 	if (bus->controller->read_command_block_regs(bus->channel_cookie, &device->tf,
 			ide_mask_device_head) != B_OK) {
 		TRACE("ata_read_infoblock: read_command_block_regs failed\n");
-		return B_ERROR;
+		goto error;
 	}
 
-	device->tf.lba.device = device->is_device1;
+	ata_select_device(device->bus, device->is_device1);
+
+	device->tf.lba.device = device->is_device1; // XXX fix me
+
+	device->tf_param_mask = 0;
+	device->tf.write.command = isAtapi ? IDE_CMD_IDENTIFY_PACKET_DEVICE	: IDE_CMD_IDENTIFY_DEVICE;
 
 	if (!send_command(device, NULL, isAtapi ? false : true, 20, ide_state_sync_waiting)) {
 		TRACE("ata_read_infoblock: send_command failed\n");
-		return B_ERROR;
+		goto error;
 	}
 
 	if (ata_wait(bus, ide_status_drq, ide_status_bsy, true, 4000000) != B_OK) {
 		TRACE("ata_read_infoblock: wait failed\n");
-		return B_ERROR;
+		goto error;
 	}
 
 	// get the infoblock		
@@ -879,9 +881,21 @@ ata_read_infoblock(ide_device_info *device, bool isAtapi)
 
 	if (!wait_for_drqdown(device)) {
 		TRACE("scan_device_int: wait_for_drqdown failed\n");
-		return false;
+		goto error;
 	}
+
+	IDE_LOCK(bus);
+	bus->state = ide_state_idle;
+	cancel_timer(&bus->timer.te);
+	IDE_UNLOCK(bus);
 
 	TRACE("ata_read_infoblock: success\n");
 	return B_OK;
+
+error:
+	IDE_LOCK(bus);
+	bus->state = ide_state_idle;
+	cancel_timer(&bus->timer.te);
+	IDE_UNLOCK(bus);
+	return B_ERROR;
 }

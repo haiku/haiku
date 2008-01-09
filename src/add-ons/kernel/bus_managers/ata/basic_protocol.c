@@ -54,22 +54,20 @@ wait_for_drdy(ide_device_info *device)
 
 
 status_t
-reset_bus(ide_bus_info *bus, uint32 *sigDev0, uint32 *sigDev1)
+reset_bus(ide_bus_info *bus, bool *devicePresent0, uint32 *sigDev0, bool *devicePresent1, uint32 *sigDev1)
 {
 	ide_controller_interface *controller = bus->controller;
 	ide_channel_cookie channel = bus->channel_cookie;
 	ide_task_file tf;
 	status_t status;
-	bool devicePresent0;
-	bool devicePresent1;
 
 	dprintf("ATA: reset_bus %p\n", bus);
 
-	devicePresent0 = ata_is_device_present(bus, 0);
-	devicePresent1 = ata_is_device_present(bus, 1);
+	*devicePresent0 = ata_is_device_present(bus, 0);
+	*devicePresent1 = ata_is_device_present(bus, 1);
 
-	dprintf("ATA: reset_bus: ata_is_device_present device 0, present %d\n", devicePresent0);
-	dprintf("ATA: reset_bus: ata_is_device_present device 1, present %d\n", devicePresent1);
+	dprintf("ATA: reset_bus: ata_is_device_present device 0, present %d\n", *devicePresent0);
+	dprintf("ATA: reset_bus: ata_is_device_present device 1, present %d\n", *devicePresent1);
 
 	// disable interrupts and assert SRST for at least 5 usec
 	if (controller->write_device_control(channel, ide_devctrl_bit3 | ide_devctrl_nien | ide_devctrl_srst) != B_OK)
@@ -81,7 +79,7 @@ reset_bus(ide_bus_info *bus, uint32 *sigDev0, uint32 *sigDev1)
 		goto error;
 	snooze(150000);
 
-	if (devicePresent0) {
+	if (*devicePresent0) {
 
 		ata_select_device(bus, 0);
 		dprintf("altstatus device 0: %x\n", controller->get_altstatus(channel));
@@ -108,7 +106,7 @@ reset_bus(ide_bus_info *bus, uint32 *sigDev0, uint32 *sigDev1)
 		*sigDev0 = 0;
 	}
 
-	if (devicePresent1) {	
+	if (*devicePresent1) {	
 		
 		ata_select_device(bus, 1);
 		dprintf("altstatus device 1: %x\n", controller->get_altstatus(channel));

@@ -228,46 +228,45 @@ sim_path_inquiry(ide_bus_info *bus, scsi_path_inquiry *info)
 }
 
 
-static uchar
-sim_scan_bus(ide_bus_info *bus)
+static void
+scan_bus(ide_bus_info *bus)
 {
 	uint32 deviceSignature[2];
+	bool devicePresent[2];
 	ide_device_info *device;
 	status_t status;
 	bool isAtapi;
 	int i;
 
-	dprintf("ATA: sim_scan_bus: bus %p\n", bus);
+	dprintf("ATA: scan_bus: bus %p\n", bus);
 
 	if (bus->disconnected)
-		return SCSI_NO_HBA;
+		return;
 
-//	IDE_LOCK(bus);
-
-	status = reset_bus(bus, &deviceSignature[0], &deviceSignature[1]);
+	status = reset_bus(bus, &devicePresent[0], &deviceSignature[0], &devicePresent[1], &deviceSignature[1]);
 
 	for (i = 0; i < bus->max_devices; ++i) {
 		if (bus->devices[i])
 			destroy_device(bus->devices[i]);
 
-		if (status == B_OK && deviceSignature[i] != 0) {
+		if (status == B_OK && devicePresent[i]) {
 			isAtapi = deviceSignature[i] == 0xeb140101;
+			dprintf("ATA: scan_bus: bus %p, creating device %d\n", bus, i);
 			device = create_device(bus, i /* isDevice1 */);
-			if (scan_device(device, isAtapi) != B_OK)
+			if (scan_device(device, isAtapi) != B_OK) {
+				dprintf("ATA: scan_bus: bus %p, scanning failed, destroying device %d\n", bus, i);
 				destroy_device(device);
+			}
 		}
 	}
-//	IDE_UNLOCK(bus);
 
-	dprintf("ATA: sim_scan_bus: bus %p finished\n", bus);
-
-	return SCSI_REQ_CMP;
+	dprintf("ATA: scan_bus: bus %p finished\n", bus);
 }
 
 static uchar
-sim_not_scan_bus(ide_bus_info *bus)
+sim_rescan_bus(ide_bus_info *bus)
 {
-	dprintf("ATA: sim_not_scan_bus\n");
+	dprintf("ATA: sim_rescan_bus\n");
 	return SCSI_REQ_CMP;
 }
 
@@ -667,7 +666,7 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 */
 
 	// detect devices
-	sim_scan_bus(bus);
+	scan_bus(bus);
 	return B_OK;
 
 err5:
@@ -857,7 +856,7 @@ scsi_sim_interface ide_sim_module = {
 	(uchar (*)(scsi_sim_cookie, scsi_ccb *))		sim_term_io,
 
 	(uchar (*)(scsi_sim_cookie, scsi_path_inquiry *))sim_path_inquiry,
-	(uchar (*)(scsi_sim_cookie))					sim_not_scan_bus,
+	(uchar (*)(scsi_sim_cookie))					sim_rescan_bus,
 	(uchar (*)(scsi_sim_cookie))					sim_reset_bus,
 	
 	(void (*)(scsi_sim_cookie, uchar, 

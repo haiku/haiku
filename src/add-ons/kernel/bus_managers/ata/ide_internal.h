@@ -365,7 +365,7 @@ bool device_start_service( ide_device_info *device, int *tag);
 	
 bool check_service_req(ide_device_info *device);
 
-status_t reset_bus(ide_bus_info *bus, uint32 *sigDev0, uint32 *sigDev1);
+status_t reset_bus(ide_bus_info *bus, bool *devicePresent0, uint32 *sigDev0, bool *devicePresent1, uint32 *sigDev1);
 
 
 // channel_mgr.c
