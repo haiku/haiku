@@ -153,6 +153,7 @@ class VideoWindow : public BWindow {
 		StringValueSetting*		fDirectorySetting;
 		BooleanValueSetting*	fPassiveFtpSetting;
 		StringValueSetting*		fFilenameSetting;
+		StringValueSetting*		fImageFormatSettings;
 		EnumeratedStringValueSetting* fCaptureRateSetting;
 };
 

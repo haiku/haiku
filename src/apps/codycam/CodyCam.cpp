@@ -694,8 +694,12 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 	AddTranslationItems(fImageFormatMenu, B_TRANSLATOR_BITMAP);
 	fImageFormatMenu->SetTargetForItems(this);
 
-	if (fImageFormatMenu->FindItem("JPEG Image") != NULL)
+	if (fImageFormatSettings->Value() && fImageFormatMenu->FindItem(fImageFormatSettings->Value()) != NULL)
+		fImageFormatMenu->FindItem(fImageFormatSettings->Value())->SetMarked(true);
+	else if (fImageFormatMenu->FindItem("JPEG Image") != NULL)
 		fImageFormatMenu->FindItem("JPEG Image")->SetMarked(true);
+	else if (fImageFormatMenu->FindItem("JPEG image") != NULL)
+		fImageFormatMenu->FindItem("JPEG image")->SetMarked(true);
 	else
 		fImageFormatMenu->ItemAt(0)->SetMarked(true);
 
@@ -833,6 +837,8 @@ VideoWindow::_SetUpSettings(const char* filename, const char* dirname)
 	fSettings->Add(fPassiveFtpSetting = new BooleanValueSetting("PassiveFtp", 1));
 	fSettings->Add(fFilenameSetting = new StringValueSetting("StillImageFilename",
 		"codycam.jpg", "still image filename expected", ""));
+	fSettings->Add(fImageFormatSettings = new StringValueSetting("ImageFileFormat",
+		"JPEG Image", "image file format expected", ""));
 	fSettings->Add(fCaptureRateSetting = new EnumeratedStringValueSetting("CaptureRate",
 		"Every 5 minutes", kCaptureRate, "capture rate expected",
 		"unrecognized capture rate specified"));
@@ -850,6 +856,7 @@ VideoWindow::_QuitSettings()
 	fDirectorySetting->ValueChanged(fDirectory->Text());
 	fPassiveFtpSetting->ValueChanged(fPassiveFtp->Value());
 	fFilenameSetting->ValueChanged(fFileName->Text());
+	fImageFormatSettings->ValueChanged(fImageFormatMenu->FindMarked()->Label());
 	fCaptureRateSetting->ValueChanged(fCaptureRateMenu->FindMarked()->Label());
 	
 	fSettings->SaveSettings();
