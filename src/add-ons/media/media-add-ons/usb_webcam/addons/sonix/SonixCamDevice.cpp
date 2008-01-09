@@ -415,7 +415,7 @@ SonixCamDevice::ValidateEndOfFrameTag(const uint8 *tag, size_t taglen, size_t da
 
 // -----------------------------------------------------------------------------
 status_t
-SonixCamDevice::GetFrameBitmap(BBitmap **bm, bigtime_t *stamp=NULL)
+SonixCamDevice::GetFrameBitmap(BBitmap **bm, bigtime_t *stamp /* = NULL */)
 {
 	BBitmap *b;
 	CamFrame *f;
