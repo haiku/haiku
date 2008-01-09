@@ -473,9 +473,9 @@ channel_init(device_node_handle node, void *userCookie, void **_channelCookie)
 	if (1 /* debug */){
 		uint8 bus, device, function;
 		uint16 vendorID, deviceID;
-		dm->get_attr_uint16(node, PCI_DEVICE_BUS_ITEM, &bus, true);
-		dm->get_attr_uint16(node, PCI_DEVICE_DEVICE_ITEM, &device, true);
-		dm->get_attr_uint16(node, PCI_DEVICE_FUNCTION_ITEM, &function, true);
+		dm->get_attr_uint8(node, PCI_DEVICE_BUS_ITEM, &bus, true);
+		dm->get_attr_uint8(node, PCI_DEVICE_DEVICE_ITEM, &device, true);
+		dm->get_attr_uint8(node, PCI_DEVICE_FUNCTION_ITEM, &function, true);
 		dm->get_attr_uint16(node, PCI_DEVICE_VENDOR_ID_ITEM, &vendorID, true);
 		dm->get_attr_uint16(node, PCI_DEVICE_DEVICE_ID_ITEM, &deviceID, true);
 		TRACE("bus %3d, device %2d, function %2d: vendor %04x, device %04x\n",
