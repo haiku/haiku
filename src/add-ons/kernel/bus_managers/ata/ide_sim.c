@@ -78,20 +78,10 @@ static void disconnect_worker(ide_bus_info *bus, void *arg);
 static void set_check_condition(ide_qrequest *qrequest);
 
 
-/** check whether this request can be within device */
-
-static inline bool
-is_queuable(ide_device_info *device, scsi_ccb *request)
-{
-	return false;
-}
-
-
 static void
 sim_scsi_io(ide_bus_info *bus, scsi_ccb *request)
 {
 	ide_device_info *device;
-	bool queuable;
 	ide_qrequest *qrequest;
 	//ide_request_priv *priv;
 
@@ -116,8 +106,6 @@ sim_scsi_io(ide_bus_info *bus, scsi_ccb *request)
 	if (request->target_lun > device->last_lun)
 		goto err_inv_device;
 
-	queuable = is_queuable(device, request);
-
 	// grab the bus	
 	ACQUIRE_BEN(&bus->status_report_ben);
 	IDE_LOCK(bus);
@@ -126,27 +114,26 @@ sim_scsi_io(ide_bus_info *bus, scsi_ccb *request)
 		goto err_bus_busy;
 
 	// bail out if device can't accept further requests
-	if (device->free_qrequests == NULL
-		|| (device->num_running_reqs > 0 && !queuable)) 
+	if (device->qreqFree == NULL)
 		goto err_device_busy;
 
 	bus->state = ide_state_accessing;
+
+	++bus->num_running_reqs;
 
 	IDE_UNLOCK(bus);
 	RELEASE_BEN(&bus->status_report_ben);
 
 	// as we own the bus, noone can bother us
-	qrequest = device->free_qrequests;
-	device->free_qrequests = qrequest->next;
+	qrequest = device->qreqFree;
+	device->qreqFree = NULL;
+	device->qreqActive = qrequest;
 
 	qrequest->request = request;
-	qrequest->queuable = queuable;
 	qrequest->running = true;
 	qrequest->uses_dma = false;
 
-	++device->num_running_reqs;
-	++bus->num_running_reqs;
-	bus->active_qrequest = qrequest;
+	bus->active_qrequest = qrequest; // XXX whats this!?!?!
 
 	FAST_LOGN(bus->log, ev_ide_scsi_io_exec, 4, (uint32)qrequest,
 		(uint32)request, bus->num_running_reqs, device->num_running_reqs);
@@ -247,20 +234,32 @@ scan_bus(ide_bus_info *bus)
 	if (bus->disconnected)
 		return;
 
-	status = reset_bus(bus, &devicePresent[0], &deviceSignature[0], &devicePresent[1], &deviceSignature[1]);
-
 	for (i = 0; i < bus->max_devices; ++i) {
 		if (bus->devices[i])
 			destroy_device(bus->devices[i]);
+	}
 
-		if (status == B_OK && devicePresent[i]) {
-			isAtapi = deviceSignature[i] == 0xeb140101;
-			dprintf("ATA: scan_bus: bus %p, creating device %d\n", bus, i);
-			device = create_device(bus, i /* isDevice1 */);
-			if (scan_device(device, isAtapi) != B_OK) {
-				dprintf("ATA: scan_bus: bus %p, scanning failed, destroying device %d\n", bus, i);
-				destroy_device(device);
-			}
+	status = reset_bus(bus, &devicePresent[0], &deviceSignature[0], &devicePresent[1], &deviceSignature[1]);
+
+	for (i = 0; i < bus->max_devices; ++i) {
+		if (!devicePresent[i])
+			continue;
+
+		isAtapi = deviceSignature[i] == 0xeb140101;
+
+		dprintf("ATA: scan_bus: bus %p, creating device %d, signature is 0x%08lx\n",
+			bus, i, deviceSignature[i]);
+
+		device = create_device(bus, i /* isDevice1 */);
+
+		if (scan_device(device, isAtapi) != B_OK) {
+			dprintf("ATA: scan_bus: bus %p, scanning failed, destroying device %d\n", bus, i);
+			destroy_device(device);
+			continue;
+		}
+		if (configure_device(device, isAtapi) != B_OK) {
+			dprintf("ATA: scan_bus: bus %p, configure failed, destroying device %d\n", bus, i);
+			destroy_device(device);
 		}
 	}
 
@@ -370,7 +369,6 @@ finish_request(ide_qrequest *qrequest, bool resubmit)
 	ide_device_info *device = qrequest->device;
 	ide_bus_info *bus = device->bus;
 	scsi_ccb *request;
-	uint num_running;
 
 	FAST_LOG2(bus->log, ev_ide_finish_request, (uint32)qrequest, resubmit);
 	SHOW_FLOW0(3, "");
@@ -380,13 +378,11 @@ finish_request(ide_qrequest *qrequest, bool resubmit)
 	request = qrequest->request;
 
 	qrequest->running = false;
-	qrequest->next = device->free_qrequests;
-	device->free_qrequests = qrequest;
 
-	// num_running is not really correct as the XPT is interested
-	// in the number of concurrent requests when it was *started* !
-	num_running = device->num_running_reqs--;
-	--bus->num_running_reqs;
+	device->qreqFree = device->qreqActive;
+	device->qreqActive = NULL;
+
+	--bus->num_running_reqs; // XXX borked!!!
 
 	// paranoia
 	bus->active_qrequest = NULL;
@@ -405,7 +401,7 @@ finish_request(ide_qrequest *qrequest, bool resubmit)
 	if (resubmit)
 		scsi->resubmit(request);
 	else
-		scsi->finished(request, num_running);
+		scsi->finished(request, 1);
 
 	RELEASE_BEN(&bus->status_report_ben);
 }
@@ -472,7 +468,7 @@ finish_reset_queue(ide_qrequest *qrequest)
 	scsi->block_bus(bus->scsi_cookie);
 
 	finish_checksense(qrequest);
-	send_abort_queue(qrequest->device);
+//	send_abort_queue(qrequest->device); // XXX fix this
 
 	scsi->unblock_bus(bus->scsi_cookie);
 }
@@ -487,16 +483,14 @@ finish_norelease(ide_qrequest *qrequest, bool resubmit)
 {
 	ide_device_info *device = qrequest->device;
 	ide_bus_info *bus = device->bus;
-	uint num_requests;
 
 	FAST_LOG2(bus->log, ev_ide_finish_norelease, (uint32)qrequest, resubmit);
 
 	qrequest->running = false;
-	qrequest->next = device->free_qrequests;
-	device->free_qrequests = qrequest;
 
-	num_requests = device->num_running_reqs++;
-	--bus->num_running_reqs;
+
+	device->qreqFree = device->qreqActive;
+	device->qreqActive = 0;
 
 	if (bus->active_qrequest == qrequest)
 		bus->active_qrequest = NULL;
@@ -506,7 +500,7 @@ finish_norelease(ide_qrequest *qrequest, bool resubmit)
 	if (resubmit)
 		scsi->resubmit(qrequest->request);
 	else
-		scsi->finished(qrequest->request, num_requests);
+		scsi->finished(qrequest->request, 1);
 
 	RELEASE_BEN(&bus->status_report_ben);
 }
@@ -531,6 +525,8 @@ finish_all_requests(ide_device_info *device, ide_qrequest *ignore,
 	// the entire bus instead (it won't take that long anyway)
 	scsi->block_bus(device->bus->scsi_cookie);
 
+	// XXX fix this
+/*
 	for (i = 0; i < device->queue_depth; ++i) {
 		ide_qrequest *qrequest = &device->qreq_array[i];
 
@@ -539,7 +535,7 @@ finish_all_requests(ide_device_info *device, ide_qrequest *ignore,
 			finish_norelease(qrequest, resubmit);
 		}
 	}
-
+*/
 	scsi->unblock_bus(device->bus->scsi_cookie);
 }
 
@@ -634,22 +630,6 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 	}
 
 	SHOW_FLOW(2, "can_dma: %d", bus->can_DMA);
-
-	if (bus->can_DMA) {
-		if (pnp->get_attr_uint8(node, IDE_CONTROLLER_CAN_CQ_ITEM, &bus->can_CQ, true) != B_OK) {
-			// per default, command queuing is supported unless the driver
-			// reports problems (queuing should be transparent to
-			// controller, but for sure there is some buggy, over-optimizing
-			// controller out there)
-			bus->can_CQ = true;
-		}
-	} else {
-		// I am not sure if it's a problem of the driver or the drive (probably the
-		// former), but we're generally disabling command queueing in case of PIO
-		// transfers. Since those should be rare on a real system (as is CQ support
-		// in the drive), it's not really worth investigating, though.
-		bus->can_CQ = false;
-	}
 
 	parent = pnp->get_parent(node);
 

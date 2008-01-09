@@ -448,8 +448,8 @@ access_finished(ide_bus_info *bus, ide_device_info *device)
 		// normally, there is always an device; only exception is a
 		// bus without devices, not sure whether this can really happen though
 		if (device) {
-			if (try_service(device))
-				return;
+//			if (try_service(device))
+//				return;
 		}
 
 		// noone wants it, so execute pending synced_pc

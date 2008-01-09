@@ -463,18 +463,18 @@ atapi_exec_io(ide_device_info *device, ide_qrequest *qrequest)
 
 
 /*!	Prepare device info for ATAPI device */
-bool
-prep_atapi(ide_device_info *device)
+status_t
+configure_atapi_device(ide_device_info *device)
 {
 	ide_device_infoblock *infoblock = &device->infoblock;
 
-	SHOW_FLOW0(3, "");
+	dprintf("configure_atapi_device\n");
 
 	device->is_atapi = true;
 	device->exec_io = atapi_exec_io;
 
 	if (infoblock->_0.atapi.ATAPI != 2)
-		return false;
+		return B_ERROR;
 
 	switch(infoblock->_0.atapi.drq_speed) {
 		case 0:
@@ -486,7 +486,7 @@ prep_atapi(ide_device_info *device)
 			device->atapi.packet_irq_timeout = IDE_STD_TIMEOUT;
 			break;
 		default:
-			return false;
+			return B_ERROR;
 	}
 
 	SHOW_FLOW(3, "drq speed: %d", infoblock->_0.atapi.drq_speed);
@@ -504,13 +504,8 @@ prep_atapi(ide_device_info *device)
 	// (SCSI bus manager sets LUN there automatically)
 	device->tf.packet.lun = 0;
 
-	if (!initialize_qreq_array(device, 1)
-		|| !configure_dma(device))
-		return false;
+	if (!configure_dma(device))
+		return B_ERROR;
 
-	// currently, we don't support queuing, but I haven't found any
-	// ATAPI device that supports queuing anyway, so this is no loss
-	device->CQ_enabled = device->CQ_supported = false;
-
-	return true;
+	return B_OK;
 }

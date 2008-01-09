@@ -96,10 +96,10 @@ reset_bus(ide_bus_info *bus, bool *devicePresent0, uint32 *sigDev0, bool *device
 			goto error;
 
 		if (tf.read.error != 0x01 && tf.read.error != 0x81)
-			dprintf("ATA: device 0 failed, error code is 0x%02\n", tf.read.error);
+			dprintf("ATA: device 0 failed, error code is 0x%02x\n", tf.read.error);
 
 		if (tf.read.error >= 0x80)
-			dprintf("ATA: device 0 indicates that device 1 failed, error code is 0x%02\n", tf.read.error);
+			dprintf("ATA: device 0 indicates that device 1 failed, error code is 0x%02x\n", tf.read.error);
 
 		*sigDev0 = tf.lba.sector_count;
 		*sigDev0 |= ((uint32)tf.lba.lba_0_7) << 8;
@@ -126,7 +126,7 @@ reset_bus(ide_bus_info *bus, bool *devicePresent0, uint32 *sigDev0, bool *device
 			goto error;
 
 		if (tf.read.error != 0x01)
-			dprintf("ATA: device 1 failed, error code is 0x%02\n", tf.read.error);
+			dprintf("ATA: device 1 failed, error code is 0x%02x\n", tf.read.error);
 
 		*sigDev1 = tf.lba.sector_count;
 		*sigDev1 |= ((uint32)tf.lba.lba_0_7) << 8;
@@ -136,7 +136,7 @@ reset_bus(ide_bus_info *bus, bool *devicePresent0, uint32 *sigDev0, bool *device
 		*sigDev1 = 0;
 	}
 
-	dprintf("ATA: reset_bus success, device 0 signature: 0x%08lx, device 1 signature: 0x%08lx\n", *sigDev0, *sigDev1);
+	dprintf("ATA: reset_bus done\n");
 
 	return B_OK;
 
@@ -368,101 +368,5 @@ ide_wait(ide_device_info *device, int mask, int not_mask,
 		if (elapsed_time > 5000)
 			snooze(elapsed_time / 10);
 	}
-}
-
-
-/**	tell device to continue queued command
- *	on return, no waiting is active!
- *	tag - will contain tag of command to be continued
- *	return: true - request continued
- *	       false - something went wrong; sense set
- */
-
-bool
-device_start_service(ide_device_info *device, int *tag)
-{
-	ide_bus_info *bus = device->bus;
-
-	FAST_LOG1(bus->log, ev_ide_device_start_service, device->is_device1);
-
-	device->tf.write.command = IDE_CMD_SERVICE;
-	device->tf.queued.mode = ide_mode_lba;
-
-	if (bus->active_device != device) {
-		// don't apply any precautions in terms of IRQ
-		// -> the bus is in accessing state, so IRQs are ignored anyway
-		if (bus->controller->write_command_block_regs(bus->channel_cookie,
-				&device->tf, ide_mask_device_head) != B_OK)
-			// on error, pretend that this device asks for service
-			// -> the disappeared controller will be recognized soon ;)
-			return true;
-
-		bus->active_device = device;
-
-		// give one clock (400 ns) to take notice
-		spin(1);
-	}
-
-	// here we go...
-	if (bus->controller->write_command_block_regs(bus->channel_cookie, &device->tf,
-			ide_mask_command) != B_OK)
-		goto err;
-
-	// we need to wait for the device as we want to read the tag
-	if (!ide_wait(device, ide_status_drdy, ide_status_bsy, false, 1000000))
-		return false;
-
-	// read tag
-	if (bus->controller->read_command_block_regs(bus->channel_cookie, &device->tf,
-			ide_mask_sector_count) != B_OK)
-		goto err;
-
-	if (device->tf.queued.release) {
-		// bus release is the wrong answer to a service request
-		set_sense(device, SCSIS_KEY_HARDWARE_ERROR, SCSIS_ASC_INTERNAL_FAILURE);
-		return false;
-	}
-
-	*tag = device->tf.queued.tag;
-
-	FAST_LOG2(bus->log, ev_ide_device_start_service2, device->is_device1, *tag);
-	return true;
-
-err:
-	set_sense(device, SCSIS_KEY_HARDWARE_ERROR, SCSIS_ASC_INTERNAL_FAILURE);
-	return false;
-}
-
-
-/** check device whether it wants to continue queued request */
-
-bool
-check_service_req(ide_device_info *device)
-{
-	ide_bus_info *bus = device->bus;
-	int status;
-
-	// fast bailout if there is no request pending	
-	if (device->num_running_reqs == 0)
-		return false;
-
-	if (bus->active_device != device) {
-		// don't apply any precautions in terms of IRQ
-		// -> the bus is in accessing state, so IRQs are ignored anyway
-		if (bus->controller->write_command_block_regs(bus->channel_cookie, 
-				&device->tf, ide_mask_device_head) != B_OK)
-			// on error, pretend that this device asks for service
-			// -> the disappeared controller will be recognized soon ;)
-			return true;
-
-		bus->active_device = device;
-
-		// give one clock (400 ns) to take notice
-		spin(1);
-	}
-
-	status = bus->controller->get_altstatus(bus->channel_cookie);
-
-	return (status & ide_status_service) != 0;
 }
 

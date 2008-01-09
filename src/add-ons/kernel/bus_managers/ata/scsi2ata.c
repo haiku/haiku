@@ -82,7 +82,7 @@ ata_mode_sense_10(ide_device_info *device, ide_qrequest *qrequest)
 
 	memset(&control, 0, sizeof(control));
 	control.RLEC = false;
-	control.DQue = !device->CQ_enabled;
+	control.DQue = 1;//!device->CQ_enabled;
 	control.QErr = false;
 		// when a command fails we requeue all 
 		// lost commands automagically
@@ -112,7 +112,7 @@ ata_mode_select_control_page(ide_device_info *device, ide_qrequest *qrequest,
 	}
 
 	// we only support enabling/disabling command queuing
-	enable_CQ(device, !page->DQue);
+//	enable_CQ(device, !page->DQue);
 	return true;
 }
 
@@ -324,7 +324,7 @@ ata_inquiry(ide_device_info *device, ide_qrequest *qrequest)
 	data.additional_length = sizeof(scsi_res_inquiry) - 4;
 
 	data.soft_reset = false;
-	data.cmd_queue = device->queue_depth > 1;
+	data.cmd_queue = 0;//device->queue_depth > 1;
 	data.linked = false;
 
 	// these values are free-style

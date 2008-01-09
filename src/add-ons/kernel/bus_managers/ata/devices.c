@@ -56,16 +56,13 @@ destroy_device(ide_device_info *device)
 
 	// paranoia
 	device->exec_io = NULL;
-	cancel_timer(&device->reconnect_timer.te);
-
-	scsi->free_dpc(device->reconnect_timeout_dpc);
 
 	cleanup_device_links(device);
 
-	destroy_qreq_array(device);
-
-	uninit_synced_pc(&device->reconnect_timeout_synced_pc);
-
+	if (device->qreqActive)
+		dprintf("destroy_device: Warning request still active\n");
+	free(device->qreqFree);
+	
 	free(device);
 }
 
@@ -120,20 +117,17 @@ create_device(ide_bus_info *bus, bool is_device1)
 	setup_device_links(bus, device);
 
 	device->DMA_failures = 0;
-	device->CQ_failures = 0;
 	device->num_failed_send = 0;
 
 	device->combined_sense = 0;
 
-	device->num_running_reqs = 0;
+	device->qreqActive = NULL;
+	device->qreqFree = (ide_qrequest *)malloc(sizeof(ide_qrequest));
+	memset(device->qreqFree, 0, sizeof(ide_qrequest));
+	device->qreqFree->running = false;
+	device->qreqFree->device = device;
+	device->qreqFree->request = NULL;
 
-	device->reconnect_timer.device = device;
-
-	init_synced_pc(&device->reconnect_timeout_synced_pc, 
-		reconnect_timeout_worker);
-	
-	if (scsi->alloc_dpc(&device->reconnect_timeout_dpc) != B_OK)
-		goto err;
 
 	device->total_sectors = 0;
 	return device;
@@ -199,4 +193,16 @@ scan_device(ide_device_info *device, bool isAtapi)
 
 	prep_infoblock(device);
 	return B_OK;
+}
+
+
+status_t
+configure_device(ide_device_info *device, bool isAtapi)
+{
+	dprintf("ATA: configure_device\n");
+
+	if (isAtapi)
+		return configure_atapi_device(device);
+	else
+		return configure_ata_device(device);
 }

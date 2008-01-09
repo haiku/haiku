@@ -91,18 +91,13 @@ typedef struct ide_device_info {
 	uint8 use_LBA : 1;				// true for LBA, false for CHS
 	uint8 use_48bits : 1;			// true for LBA48
 	uint8 is_atapi : 1;				// true for ATAPI, false for ATA
-	uint8 CQ_supported : 1;			// Command Queuing supported
-	uint8 CQ_enabled : 1;			// Command Queuing enabled
 	uint8 DMA_supported : 1;		// DMA supported
 	uint8 DMA_enabled : 1;			// DMA enabled
 	uint8 is_device1 : 1;			// true for slave, false for master
 
-	uint8 queue_depth;				// maximum Command Queueing depth
-
 	uint8 last_lun;					// last LUN 
 
 	uint8 DMA_failures;				// DMA failures in a row
-	uint8 CQ_failures;				// Command Queuing failures during _last_ command
 	uint8 num_failed_send;			// number of consequetive send problems
 
 	// next two error codes are copied to request on finish_request & co.
@@ -112,9 +107,8 @@ typedef struct ide_device_info {
 	// pending error codes
 	uint32 combined_sense;			// emulated sense of device
 
-	struct ide_qrequest *qreq_array;	// array of ide requests
-	struct ide_qrequest *free_qrequests;	// free list
-	int num_running_reqs;			// number of running requests
+	struct ide_qrequest *qreqActive;
+	struct ide_qrequest *qreqFree;
 
 	struct ide_device_info *other_device;	// other device on same bus
 
@@ -138,11 +132,6 @@ typedef struct ide_device_info {
 	} atapi;
 
 	uint8 device_type;				// atapi device type
-
-	bool reconnect_timer_installed;	// true, if reconnect timer is running
-	ide_device_timer_info reconnect_timer;	// reconnect timeout
-	scsi_dpc_cookie reconnect_timeout_dpc;	// dpc fired by timeout
-	ide_synced_pc reconnect_timeout_synced_pc;	// spc fired by dpc
 
 	// pio from here on
 	int left_sg_elem;				// remaining sg elements
@@ -175,8 +164,6 @@ typedef struct ide_qrequest {
 	uint8 running : 1;			// true if "on bus"
 	uint8 uses_dma : 1;			// true if using dma
 	uint8 packet_irq : 1;		// true if waiting for command packet irq
-	uint8 queuable : 1;			// true if command queuing is used
-	uint8 tag;					// command queuing tag
 } ide_qrequest;
 
 
@@ -323,8 +310,6 @@ bool ata_is_device_present(ide_bus_info *bus, int device);
 bool check_rw_error(ide_device_info *device, ide_qrequest *qrequest);
 bool check_output(ide_device_info *device, bool drdy_required, int error_mask, bool is_write);
 
-bool prep_ata(ide_device_info *device);
-void enable_CQ(ide_device_info *device, bool enable);
 void ata_send_rw(ide_device_info *device, ide_qrequest *qrequest,
 	uint64 pos, size_t length, bool write);
 
@@ -335,11 +320,10 @@ void ata_exec_io(ide_device_info *device, ide_qrequest *qrequest);
 
 status_t ata_read_infoblock(ide_device_info *device, bool isAtapi);
 
+status_t configure_ata_device(ide_device_info *device);
 
 // atapi.c
-
-bool prep_atapi(ide_device_info *device);
-
+status_t configure_atapi_device(ide_device_info *device);
 void send_packet(ide_device_info *device, ide_qrequest *qrequest, bool write);
 void packet_dpc(ide_qrequest *qrequest);
 void atapi_exec_io(ide_device_info *device, ide_qrequest *qrequest);
@@ -359,7 +343,6 @@ bool wait_for_drdy(ide_device_info *device);
 // timeout in seconds
 bool send_command(ide_device_info *device, ide_qrequest *qrequest,
 	bool need_drdy, uint32 timeout, ide_bus_state new_state);
-bool device_start_service( ide_device_info *device, int *tag);
 //bool reset_device(ide_device_info *device, ide_qrequest *ignore);
 //bool reset_bus(ide_device_info *device, ide_qrequest *ignore);
 	
@@ -379,7 +362,7 @@ status_t scan_device(ide_device_info *device, bool isAtapi);
 void destroy_device(ide_device_info *device);
 ide_device_info *create_device(ide_bus_info *bus, bool is_device1);
 
-
+status_t configure_device(ide_device_info *device, bool isAtapi);
 
 // dma.c
 
@@ -406,17 +389,6 @@ void prep_PIO_transfer(ide_device_info *device, ide_qrequest *qrequest);
 status_t read_PIO_block(ide_qrequest *qrequest, int length);
 status_t write_PIO_block(ide_qrequest *qrequest, int length);
 
-
-// queuing.c
-
-bool send_abort_queue(ide_device_info *device);
-bool try_service(ide_device_info *device);
-
-void reconnect_timeout_worker(ide_bus_info *bus, void *arg);
-int32 reconnect_timeout(timer *arg);
-
-bool initialize_qreq_array(ide_device_info *device, int queue_depth);
-void destroy_qreq_array(ide_device_info *device);
 
 
 // sync.c

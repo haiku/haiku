@@ -198,7 +198,6 @@ ata_dpc_DMA(ide_qrequest *qrequest)
 	if (dma_success && !dev_err) {
 		// reset error count if DMA worked
 		device->DMA_failures = 0;
-		device->CQ_failures = 0;
 		qrequest->request->data_resid = 0;
 		finish_checksense(qrequest);
 	} else {
@@ -251,27 +250,6 @@ create_rw_taskfile(ide_device_info *device, ide_qrequest *qrequest,
 			if (length > 0xffff)
 				goto err;
 
-			if (qrequest->queuable) {
-				// queued LBA48
-				device->tf_param_mask = ide_mask_features_48
-					| ide_mask_sector_count
-					| ide_mask_LBA_low_48
-					| ide_mask_LBA_mid_48
-					| ide_mask_LBA_high_48;
-
-				device->tf.queued48.sector_count_0_7 = length & 0xff;
-				device->tf.queued48.sector_count_8_15 = (length >> 8) & 0xff;
-				device->tf.queued48.tag = qrequest->tag;
-				device->tf.queued48.lba_0_7 = pos & 0xff;
-				device->tf.queued48.lba_8_15 = (pos >> 8) & 0xff;
-				device->tf.queued48.lba_16_23 = (pos >> 16) & 0xff;
-				device->tf.queued48.lba_24_31 = (pos >> 24) & 0xff;
-				device->tf.queued48.lba_32_39 = (pos >> 32) & 0xff;
-				device->tf.queued48.lba_40_47 = (pos >> 40) & 0xff;
-				device->tf.queued48.command = write ? IDE_CMD_WRITE_DMA_QUEUED 
-					: IDE_CMD_READ_DMA_QUEUED;
-				return true;
-			} else {
 				// non-queued LBA48
 				device->tf_param_mask = ide_mask_sector_count_48
 					| ide_mask_LBA_low_48
@@ -288,7 +266,6 @@ create_rw_taskfile(ide_device_info *device, ide_qrequest *qrequest,
 				device->tf.lba48.lba_40_47 = (pos >> 40) & 0xff;
 				device->tf.lba48.command = cmd_48[qrequest->uses_dma][write];
 				return true;
-			}
 		} else {
 			// normal LBA
 			SHOW_FLOW0(3, "using LBA");
@@ -296,26 +273,6 @@ create_rw_taskfile(ide_device_info *device, ide_qrequest *qrequest,
 			if (length > 0x100)
 				goto err;
 
-			if (qrequest->queuable) {
-				// queued LBA
-				SHOW_FLOW( 3, "creating DMA queued command, tag=%d", qrequest->tag );
-				device->tf_param_mask = ide_mask_features
-					| ide_mask_sector_count
-					| ide_mask_LBA_low
-					| ide_mask_LBA_mid
-					| ide_mask_LBA_high
-					| ide_mask_device_head;
-
-				device->tf.queued.sector_count = length & 0xff;
-				device->tf.queued.tag = qrequest->tag;
-				device->tf.queued.lba_0_7 = pos & 0xff;
-				device->tf.queued.lba_8_15 = (pos >> 8) & 0xff;
-				device->tf.queued.lba_16_23 = (pos >> 16) & 0xff;
-				device->tf.queued.lba_24_27 = (pos >> 24) & 0xf;
-				device->tf.queued.command = write ? IDE_CMD_WRITE_DMA_QUEUED 
-					: IDE_CMD_READ_DMA_QUEUED;
-				return true;
-			} else {
 				// non-queued LBA
 				SHOW_FLOW0( 3, "creating normal DMA/PIO command" );
 				device->tf_param_mask = ide_mask_sector_count
@@ -331,7 +288,6 @@ create_rw_taskfile(ide_device_info *device, ide_qrequest *qrequest,
 				device->tf.lba.lba_24_27 = (pos >> 24) & 0xf;
 				device->tf.lba.command = cmd_28[qrequest->uses_dma][write];
 				return true;
-			}
 		}
 	} else {
 		// CHS mode
@@ -402,6 +358,7 @@ ata_send_rw(ide_device_info *device, ide_qrequest *qrequest,
 		if (!prepare_dma(device, qrequest)) {
 			// fall back to PIO on error
 
+/*
 			// if command queueing is used and there is another command
 			// already running, we cannot fallback to PIO immediately -> declare
 			// command as not queuable and resubmit it, so the scsi bus manager
@@ -412,6 +369,7 @@ ata_send_rw(ide_device_info *device, ide_qrequest *qrequest,
 				finish_retry(qrequest);
 				return;
 			}
+*/
 
 			qrequest->uses_dma = false;
 		}
@@ -439,33 +397,6 @@ ata_send_rw(ide_device_info *device, ide_qrequest *qrequest,
 		goto err_send;
 
 	if (qrequest->uses_dma) {
-		// if queuing used, we have to ask device first whether it wants
-		// to postpone the command
-		// XXX: using the bus release IRQ we don't have to busy wait for
-		// a response, but I heard that IBM drives have problems with
-		// that IRQ; to be evaluated
-		if (qrequest->queuable) {
-			if (!wait_for_drdy(device))
-				goto err_send;
-
-			if (check_rw_error(device, qrequest))
-				goto err_send;
-
-			if (device_released_bus(device)) {
-				// device enqueued command, so we have to wait;
-				// in access_finished, we'll ask device whether it wants to
-				// continue some other command
-				bus->active_qrequest = NULL;
-
-				access_finished(bus, device);
-				// we may have rejected commands meanwhile, so tell
-				// the SIM that it can resend them now
-				scsi->cont_send_bus(bus->scsi_cookie);
-				return;
-			}
-
-			//SHOW_ERROR0( 2, "device executes command instantly" );
-		}
 
 		start_dma_wait_no_lock(device, qrequest);
 	} else {
@@ -736,13 +667,10 @@ configure_rmsn(ide_device_info *device)
 
 
 static bool
-configure_command_queueing(ide_device_info *device)
+disable_command_queueing(ide_device_info *device)
 {
-	device->CQ_enabled = device->CQ_supported = false;
-
-	if (!device->bus->can_CQ
-		|| !device->infoblock.DMA_QUEUED_supported)
-		return initialize_qreq_array(device, 1);
+	if (!device->infoblock.DMA_QUEUED_supported)
+		return true;
 
 	if (device->infoblock.RELEASE_irq_supported
 		&& !device_set_feature( device, IDE_CMD_SET_FEATURES_DISABLE_REL_INT))
@@ -752,23 +680,18 @@ configure_command_queueing(ide_device_info *device)
 		&& !device_set_feature(device, IDE_CMD_SET_FEATURES_DISABLE_SERV_INT))
 		dprintf("Cannot disable service irq\n");
 
-	device->CQ_enabled = device->CQ_supported = true;
-
-	SHOW_INFO0(2, "Enabled command queueing");
-
-	// official IBM docs talk about 31 queue entries, though 
-	// their disks report 32; let's hope their docs are wrong
-	return initialize_qreq_array(device, device->infoblock.queue_depth + 1);
+	return true;
 }
 
 
-bool
-prep_ata(ide_device_info *device)
+
+status_t
+configure_ata_device(ide_device_info *device)
 {
 	ide_device_infoblock *infoblock = &device->infoblock;
 	uint32 chs_capacity;
 
-	SHOW_FLOW0(3, "");
+	TRACE("configure_ata_device\n");
 
 	device->is_atapi = false;
 	device->exec_io = ata_exec_io;
@@ -780,11 +703,9 @@ prep_ata(ide_device_info *device)
 		// we merge it to "CFA bit set" for easier (later) testing
 		if (*(uint16 *)infoblock == 0x848a)
 			infoblock->CFA_supported = true;
-		else
-			return false;
+		else 
+			return B_ERROR;
 	}
-
-	SHOW_FLOW0(3, "1");
 
 	if (!infoblock->_54_58_valid) {
 		// normally, current_xxx contains active CHS mapping,
@@ -820,22 +741,12 @@ prep_ata(ide_device_info *device)
 	if (device->use_48bits)
 		device->total_sectors = infoblock->LBA48_total_sectors;
 
-	SHOW_FLOW0(3, "2");
-
 	if (!configure_dma(device)
-		|| !configure_command_queueing(device)
+		|| !disable_command_queueing(device)
 		|| !configure_rmsn(device))
-		return false;
+		return B_ERROR;
 
-	SHOW_FLOW0(3, "3");
-
-	return true;
-}
-
-
-void
-enable_CQ(ide_device_info *device, bool enable)
-{
+	return B_OK;
 }
 
 
@@ -865,7 +776,7 @@ ata_read_infoblock(ide_device_info *device, bool isAtapi)
 	device->tf_param_mask = 0;
 	device->tf.write.command = isAtapi ? IDE_CMD_IDENTIFY_PACKET_DEVICE	: IDE_CMD_IDENTIFY_DEVICE;
 
-	if (!send_command(device, NULL, isAtapi ? false : true, 20, ide_state_sync_waiting)) {
+	if (!send_command(device, NULL, isAtapi ? false : true, 20, ide_state_accessing)) {
 		TRACE("ata_read_infoblock: send_command failed\n");
 		goto error;
 	}
@@ -880,7 +791,7 @@ ata_read_infoblock(ide_device_info *device, bool isAtapi)
 		sizeof(device->infoblock) / sizeof(uint16), false);
 
 	if (!wait_for_drqdown(device)) {
-		TRACE("scan_device_int: wait_for_drqdown failed\n");
+		TRACE("ata_read_infoblock: wait_for_drqdown failed\n");
 		goto error;
 	}
 
