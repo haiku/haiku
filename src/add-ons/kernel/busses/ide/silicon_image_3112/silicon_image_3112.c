@@ -467,13 +467,25 @@ channel_init(device_node_handle node, void *userCookie, void **_channelCookie)
 	if (!channel)
 		return B_NO_MEMORY;
 
-	TRACE("channel %p\n", channel);	
-
 	if (dm->get_attr_uint32(node, "silicon_image_3112/chan_index", &channelIndex, false) != B_OK)
 		goto err;
 
+	if (1 /* debug */){
+		uint8 bus, device, function;
+		uint16 vendorID, deviceID;
+		dm->get_attr_uint16(node, PCI_DEVICE_BUS_ITEM, &bus, true);
+		dm->get_attr_uint16(node, PCI_DEVICE_DEVICE_ITEM, &device, true);
+		dm->get_attr_uint16(node, PCI_DEVICE_FUNCTION_ITEM, &function, true);
+		dm->get_attr_uint16(node, PCI_DEVICE_VENDOR_ID_ITEM, &vendorID, true);
+		dm->get_attr_uint16(node, PCI_DEVICE_DEVICE_ID_ITEM, &deviceID, true);
+		TRACE("bus %3d, device %2d, function %2d: vendor %04x, device %04x\n",
+			bus, device, function, vendorID, deviceID);
+	}
+
 	TRACE("channel_index %ld\n", channelIndex);
 	TRACE("channel name: %s\n", kControllerChannelData[channelIndex].name);
+
+	TRACE("channel %p\n", channel);	
 		
 	if (dm->init_driver(dm->get_parent(node), NULL, NULL, (void **)&controller) != B_OK)
 		goto err;
