@@ -662,7 +662,8 @@ set_page_state_nolock(vm_page *page, int pageState)
 
 		if (pageState != PAGE_STATE_INACTIVE && page->cache != NULL)
 			panic("to be freed page %p has cache", page);
-	} else if (pageState == PAGE_STATE_MODIFIED && page->cache->temporary)
+	}
+	if (pageState == PAGE_STATE_MODIFIED && page->cache->temporary)
 		sModifiedTemporaryPages++;
 	else if (page->state == PAGE_STATE_MODIFIED && page->cache->temporary)
 		sModifiedTemporaryPages--;
@@ -682,6 +683,9 @@ set_page_state_nolock(vm_page *page, int pageState)
 }
 
 
+/*! Moves a modified page into either the active or inactive page queue
+	depending on its usage count and wiring.
+*/
 static void
 move_page_to_active_or_inactive_queue(vm_page *page, bool dequeued)
 {
