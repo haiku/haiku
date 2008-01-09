@@ -34,7 +34,13 @@
  * Add to image:
  * dd conv=notrunc if=haiku/trunk/stage1 of=em-20-200.swapped.hd bs=1 count=30
  * set bootable:
- * echo -en '\x12\x34' | dd conv=notrunc seek=510 bs=1 count=2 of=em-20-200.swapped.hd
+ * XXX: that's wrong! echo -en '\x12\x34' | dd conv=notrunc seek=510 bs=1 count=2 of=em-20-200.swapped.hd
+ * 
+ * .PRG file format:
+ * http://mail-index.netbsd.org/tech-userlevel/2007/04/02/0000.html
+ * http://pagesperso-orange.fr/patrice.mandin/en/howto-binutils.html
+ * http://www.wotsit.org/download.asp?f=atariexe&sc=252874182
+ * 
  */
 
 #include "toscalls.h"
